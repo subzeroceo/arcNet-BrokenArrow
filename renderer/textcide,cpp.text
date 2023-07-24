@@ -1,0 +1,2110 @@
+// Copyright (C) 2004 Id Software, Inc.
+//
+
+#ifndef __DECLMANAGER_H__
+#define __DECLMANAGER_H__
+
+/*
+===============================================================================
+
+	Declaration Manager
+
+	All "small text" data types, like materials, sound shaders, fx files,
+	entity defs, etc. are managed uniformly, allowing reloading, purging,
+	listing, printing, etc. All "large text" data types that never have more
+	than one declaration in a given file, like maps, models, AAS files, etc.
+	are not handled here.
+
+	A decl will never, ever go away once it is created. The manager is
+	garranteed to always return the same decl pointer for a decl type/name
+	combination. The index of a decl in the per type list also stays the
+	same throughout the lifetime of the engine. Although the pointer to
+	a decl always stays the same, one should never maintain pointers to
+	data inside decls. The data stored in a decl is not garranteed to stay
+	the same for more than one engine frame.
+
+	The decl indexes of explicitely defined decls are garrenteed to be
+	consistent based on the parsed decl files. However, the indexes of
+	implicit decls may be different based on the order in which levels
+	are loaded.
+
+	The decl namespaces are separate for each type. Comments for decls go
+	above the text definition to keep them associated with the proper decl.
+
+	During decl parsing, errors should never be issued, only warnings
+	followed by a call to MakeDefault().
+
+===============================================================================
+*/
+
+typedef enum {
+	DECL_TABLE				= 0,
+	DECL_MATERIAL,
+	DECL_SKIN,
+	DECL_SOUND,
+	DECL_ENTITYDEF,
+	DECL_MODELDEF,
+// RAVEN BEGIN
+// jscott: added new decls
+	DECL_MATERIALTYPE,
+	DECL_LIPSYNC,
+	DECL_PLAYBACK,
+	DECL_EFFECT,
+// rjohnson: camera is now contained in a def for frame commands
+	DECL_CAMERADEF,
+// jscott: don't use these
+//	DECL_FX,
+//	DECL_PARTICLE,
+// RAVEN END
+	DECL_AF,
+	DECL_PDA,
+	DECL_VIDEO,
+	DECL_AUDIO,
+	DECL_EMAIL,
+	DECL_MODELEXPORT,
+	DECL_MAPDEF,
+
+	// new decl types can be added here
+	DECL_PLAYER_MODEL,
+
+	DECL_MAX_TYPES			= 32
+} declType_t;
+
+typedef enum {
+	DS_UNPARSED,
+	DS_DEFAULTED,			// set if a parse failed due to an error, or the lack of any source
+	DS_PARSED
+} declState_t;
+
+const int DECL_LEXER_FLAGS	=	LEXFL_NOSTRINGCONCAT |				// multiple strings seperated by whitespaces are not concatenated
+								LEXFL_NOSTRINGESCAPECHARS |			// no escape characters inside strings
+								LEXFL_ALLOWPATHNAMES |				// allow path seperators in names
+								LEXFL_ALLOWMULTICHARLITERALS |		// allow multi character literals
+								LEXFL_ALLOWBACKSLASHSTRINGCONCAT |	// allow multiple strings seperated by '\' to be concatenated
+								LEXFL_NOFATALERRORS;				// just set a flag instead of fatal erroring
+
+
+class arcDeclerationBase {
+public:
+	virtual 				~arcDeclerationBase() {};
+	virtual const char *	GetName( void ) const = 0;
+	virtual declType_t		GetType( void ) const = 0;
+	virtual declState_t		GetState( void ) const = 0;
+	virtual bool			IsImplicit( void ) const = 0;
+	virtual bool			IsValid( void ) const = 0;
+	virtual void			Invalidate( void ) = 0;
+	virtual void			Reload( void ) = 0;
+	virtual void			EnsureNotPurged( void ) = 0;
+	virtual int				Index( void ) const = 0;
+	virtual int				GetLineNum( void ) const = 0;
+	virtual const char *	GetFileName( void ) const = 0;
+	virtual void			GetText( char *text ) const = 0;
+	virtual int				GetTextLength( void ) const = 0;
+// RAVEN BEGIN
+	virtual int				GetCompressedLength( void ) const = 0;
+// RAVEN END
+	virtual void			SetText( const char *text ) = 0;
+	virtual bool			ReplaceSourceFileText( void ) = 0;
+	virtual bool			SourceFileChanged( void ) const = 0;
+	virtual void			MakeDefault( void ) = 0;
+	virtual bool			EverReferenced( void ) const = 0;
+// RAVEN BEGIN
+	virtual void			SetReferencedThisLevel( void ) = 0;
+// RAVEN END
+	virtual bool			SetDefaultText( void ) = 0;
+	virtual const char *	DefaultDefinition( void ) const = 0;
+	virtual bool			Parse( const char *text, const int textLength, bool noCaching ) = 0;
+	virtual void			FreeData( void ) = 0;
+	virtual size_t			Size( void ) const = 0;
+	virtual void			List( void ) const = 0;
+	virtual void			Print( void ) const = 0;
+// RAVEN BEGIN
+// jscott: to prevent a recursive crash
+	virtual	bool			RebuildTextSource( void ) { return( false ); }
+// scork: Validation call for detailed error-reporting
+	virtual bool			Validate( const char *psText, int iLength, arcNetString &strReportTo ) const = 0;
+// RAVEN END
+};
+
+// RAVEN BEGIN
+// jscott: for guides
+#define MAX_GUIDE_PARMS				20
+#define	MAX_GUIDE_SHADER_SIZE		20480
+
+class rvDeclGuide
+{
+private:
+	arcNetString		mName;
+	arcNetString		mParms[MAX_GUIDE_PARMS];
+	arcNetString		mDefinition;
+	int			mNumParms;
+
+public:
+				rvDeclGuide( arcNetString &name );
+				~rvDeclGuide( void );
+
+	const char	*GetName( void ) const { return( mName.c_str() ); }
+	int			GetNumParms( void ) const { return( mNumParms ); }
+	const char	*GetParm( int index ) const { assert( index < mNumParms ); return( mParms[index].c_str() ); }
+
+	void		SetParm( int index, const char *value );
+	void		RemoveOuterBracing( void );
+	void		Parse( idLexer *src );
+	bool		Evaluate( idLexer *src, arcNetString &definition );
+};
+// RAVEN END
+
+class arcDecleration {
+public:
+							// The constructor should initialize variables such that
+							// an immediate call to FreeData() does no harm.
+							arcDecleration( void ) { base = NULL; }
+	virtual 				~arcDecleration( void ) {};
+
+							// Returns the name of the decl.
+	const char *			GetName( void ) const { return base->GetName(); }
+
+							// Returns the decl type.
+	declType_t				GetType( void ) const { return base->GetType(); }
+
+							// Returns the decl state which is usefull for finding out if a decl defaulted.
+	declState_t				GetState( void ) const { return base->GetState(); }
+
+							// Returns true if the decl was defaulted or the text was created with a call to SetDefaultText.
+	bool					IsImplicit( void ) const { return base->IsImplicit(); }
+
+							// The only way non-manager code can have an invalid decl is if the *ByIndex()
+							// call was used with forceParse = false to walk the lists to look at names
+							// without touching the media.
+	bool					IsValid( void ) const { return base->IsValid(); }
+
+							// Sets state back to unparsed.
+							// Used by decl editors to undo any changes to the decl.
+	void					Invalidate( void ) { base->Invalidate(); }
+
+							// if a pointer might possible be stale from a previous level,
+							// call this to have it re-parsed
+	void					EnsureNotPurged( void ) { base->EnsureNotPurged(); }
+
+							// Returns the index in the per-type list.
+	int						Index( void ) const { return base->Index(); }
+
+							// Returns the line number the decl starts.
+	int						GetLineNum( void ) const { return base->GetLineNum(); }
+
+							// Returns the name of the file in which the decl is defined.
+	const char *			GetFileName( void ) const { return base->GetFileName(); }
+
+							// Returns the decl text.
+	void					GetText( char *text ) const { base->GetText( text ); }
+
+							// Returns the length of the decl text.
+	int						GetTextLength( void ) const { return base->GetTextLength(); }
+
+							// Returns the compressed length of the decl text.
+	int						GetCompressedLength( void ) const { return( base->GetCompressedLength() ); }
+
+							// Sets new decl text.
+	void					SetText( const char *text ) { base->SetText( text ); }
+
+							// Saves out new text for the decl.
+							// Used by decl editors to replace the decl text in the source file.
+	bool					ReplaceSourceFileText( void ) { return base->ReplaceSourceFileText(); }
+
+							// Returns true if the source file changed since it was loaded and parsed.
+	bool					SourceFileChanged( void ) const { return base->SourceFileChanged(); }
+
+							// Frees data and makes the decl a default.
+	void					MakeDefault( void ) { base->MakeDefault(); }
+
+							// Returns true if the decl was ever referenced.
+	bool					EverReferenced( void ) const { return base->EverReferenced(); }
+
+public:
+							// Sets textSource to a default text if necessary.
+							// This may be overridden to provide a default definition based on the
+							// decl name. For instance materials may default to an implicit definition
+							// using a texture with the same name as the decl.
+	virtual bool			SetDefaultText( void ) { return base->SetDefaultText(); }
+
+							// Each declaration type must have a default string that it is guaranteed
+							// to parse acceptably. When a decl is not explicitly found, is purged, or
+							// has an error while parsing, MakeDefault() will do a FreeData(), then a
+							// Parse() with DefaultDefinition(). The defaultDefintion should start with
+							// an open brace and end with a close brace.
+	virtual const char *	DefaultDefinition( void ) const { return base->DefaultDefinition(); }
+
+							// The manager will have already parsed past the type, name and opening brace.
+							// All necessary media will be touched before return.
+							// The manager will have called FreeData() before issuing a Parse().
+							// The subclass can call MakeDefault() internally at any point if
+							// there are parse errors.
+	virtual bool			Parse( const char *text, const int textLength, bool noCaching ) { return base->Parse( text, textLength, noCaching ); }
+
+							// Frees any pointers held by the subclass. This may be called before
+							// any Parse(), so the constructor must have set sane values. The decl will be
+							// invalid after issuing this call, but it will always be immediately followed
+							// by a Parse()
+	virtual void			FreeData( void ) { base->FreeData(); }
+
+							// Returns the size of the decl in memory.
+	virtual size_t			Size( void ) const { return base->Size(); }
+
+							// If this isn't overridden, it will just print the decl name.
+							// The manager will have printed 7 characters on the line already,
+							// containing the reference state and index number.
+	virtual void			List( void ) const { base->List(); }
+
+							// The print function will already have dumped the text source
+							// and common data, subclasses can override this to dump more
+							// explicit data.
+	virtual void			Print( void ) const { base->Print(); }
+
+// RAVEN BEGIN
+							// Rebuilds the text source of the decl for saving
+	virtual	bool			RebuildTextSource( void ) { return( base->RebuildTextSource() ); }
+
+							// Marks this decl as referenced this level
+	virtual void			SetReferencedThisLevel( void ) { base->SetReferencedThisLevel(); }
+
+// scork: for detailed error reporting
+	virtual bool			Validate( const char *psText, int iLength, arcNetString &strReportTo ) const { return base->Validate( psText, iLength, strReportTo ); }
+// RAVEN END
+
+public:
+	arcDeclerationBase *			base;
+};
+
+
+template< class type >
+ARC_INLINE arcDecleration *arcDeclAllocator( void ) {
+	return new type;
+}
+
+// RAVEN BEGIN
+// jsinger: added to allow support for serialization/deserialization of binary decls
+#ifdef RV_BINARYDECLS
+template< class type >
+ARC_INLINE SerializableBase *arcDeclStreamAllocator( SerialInputStream &stream ) {
+	type *ptr = new type(stream);
+
+	return dynamic_cast<SerializableBase *>(ptr);
+}
+#endif
+
+
+class arcMaterial;
+class arcDeclTable;
+class arcDeclSkin;
+class arcSoundShader;
+
+// RAVEN BEGIN
+// jscott: new decl types
+class rvDeclMatType;
+class rvDeclLipSync;
+class rvDeclPlayback;
+class rvDeclEffect;
+class rvDeclPlayerModel;
+// RAVEN END
+
+class arcDeclerationManager {
+public:
+	virtual					~arcDeclerationManager( void ) {}
+
+	virtual void			SetInsideLoad( bool var ) = 0;
+	virtual bool			GetInsideLoad( void ) = 0;
+	virtual void			Init( void ) = 0;
+	virtual void			Shutdown( void ) = 0;
+	virtual void			Reload( bool force ) = 0;
+
+	virtual void			BeginLevelLoad() = 0;
+	virtual void			EndLevelLoad() = 0;
+
+							// Registers a new decl type.
+// RAVEN BEGIN
+// jsinger: Added to support serialization/deserialization of binary decls
+#ifdef RV_BINARYDECLS
+	virtual void			RegisterDeclType( const char *typeName, declType_t type, arcDecleration *(*allocator)( void ), SerializableBase *(*streamAllocator)( SerialInputStream &stream ) ) = 0;
+#else
+	virtual void			RegisterDeclType( const char *typeName, declType_t type, arcDecleration *(*allocator)( void ) ) = 0;
+#endif
+// jsinger: Added to support loading all decls from a single file
+#ifdef RV_SINGLE_DECL_FILE
+	virtual void			StartLoadingDecls() = 0;
+	virtual void			FinishLoadingDecls() = 0;
+	virtual void			LoadDeclsFromFile() = 0;
+	virtual void			WriteDeclFile() = 0;
+	virtual void			FlushDecls() = 0;
+#endif
+// RAVEN END
+
+// RAVEN BEGIN
+// jscott: for timing
+							// Registers a new folder with decl files.
+	virtual void			RegisterDeclFolderWrapper( const char *folder, const char *extension, declType_t defaultType, bool unique = false, bool norecurse = false ) = 0;
+// RAVEN END
+
+							// Returns a checksum for all loaded decl text.
+	virtual int				GetChecksum( void ) const = 0;
+
+							// Returns the number of decl types.
+	virtual int				GetNumDeclTypes( void ) const = 0;
+
+							// Returns the type name for a decl type.
+	virtual const char *	GetDeclNameFromType( declType_t type ) const = 0;
+
+							// Returns the decl type for a type name.
+	virtual declType_t		GetDeclTypeFromName( const char *typeName ) const = 0;
+
+							// If makeDefault is true, a default decl of appropriate type will be created
+							// if an explicit one isn't found. If makeDefault is false, NULL will be returned
+							// if the decl wasn't explcitly defined.
+	virtual const arcDecleration *	FindType( declType_t type, const char *name, bool makeDefault = true, bool noCaching = false ) = 0;
+
+	virtual const arcDecleration*	FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault = true ) = 0;
+
+	virtual void			ReloadFile( const char* filename, bool force ) = 0;
+
+							// Returns the number of decls of the given type.
+	virtual int				GetNumDecls( declType_t type ) = 0;
+
+							// The complete lists of decls can be walked to populate editor browsers.
+							// If forceParse is set false, you can get the decl to check name / filename / etc.
+							// without causing it to parse the source and load media.
+	virtual const arcDecleration *	DeclByIndex( declType_t type, int index, bool forceParse = true ) = 0;
+
+							// List and print decls.
+	virtual void			ListType( const arcCommandArgs &args, declType_t type ) = 0;
+	virtual void			PrintType( const arcCommandArgs &args, declType_t type ) = 0;
+
+							// Creates a new default decl of the given type with the given name in
+							// the given file used by editors to create a new decls.
+	virtual arcDecleration *		CreateNewDecl( declType_t type, const char *name, const char *fileName ) = 0;
+
+							// BSM - Added for the material editors rename capabilities
+	virtual bool			RenameDecl( declType_t type, const char* oldName, const char* newName ) = 0;
+
+							// When media files are loaded, a reference line can be printed at a
+							// proper indentation if decl_show is set
+	virtual void			MediaPrint( const char *fmt, ... ) arc_attribute((format(printf,2,3))) = 0;
+
+	virtual void			WritePrecacheCommands( arcNetFile *f ) = 0;
+
+// RAVEN BEGIN
+// jscott: precache any guide (template) files
+	virtual void					ParseGuides( void ) = 0;
+	virtual	void					ShutdownGuides( void ) = 0;
+	virtual bool					EvaluateGuide( arcNetString &name, idLexer *src, arcNetString &definition ) = 0;
+	virtual bool					EvaluateInlineGuide( arcNetString &name, arcNetString &definition ) = 0;
+// RAVEN END
+									// Convenience functions for specific types.
+	virtual	const arcMaterial *		FindMaterial( const char *name, bool makeDefault = true ) = 0;
+	virtual const arcDeclTable *		FindTable( const char *name, bool makeDefault = true ) = 0;
+	virtual const arcDeclSkin *		FindSkin( const char *name, bool makeDefault = true ) = 0;
+	virtual const arcSoundShader *	FindSound( const char *name, bool makeDefault = true ) = 0;
+// RAVEN BEGIN
+// jscott: for new Raven decls
+	virtual const rvDeclMatType *	FindMaterialType( const char *name, bool makeDefault = true ) = 0;
+	virtual	const rvDeclLipSync *	FindLipSync( const char *name, bool makeDefault = true ) = 0;
+	virtual	const rvDeclPlayback *	FindPlayback( const char *name, bool makeDefault = true ) = 0;
+	virtual	const rvDeclEffect *	FindEffect( const char *name, bool makeDefault = true ) = 0;
+// RAVEN END
+
+	virtual const arcMaterial *		MaterialByIndex( int index, bool forceParse = true ) = 0;
+	virtual const arcDeclTable *		TableByIndex( int index, bool forceParse = true ) = 0;
+	virtual const arcDeclSkin *		SkinByIndex( int index, bool forceParse = true ) = 0;
+	virtual const arcSoundShader *	SoundByIndex( int index, bool forceParse = true ) = 0;
+// RAVEN BEGIN
+// jscott: for new Raven decls
+	virtual const rvDeclMatType *	MaterialTypeByIndex( int index, bool forceParse = true ) = 0;
+	virtual const rvDeclLipSync *	LipSyncByIndex( int index, bool forceParse = true ) = 0;
+	virtual	const rvDeclPlayback *	PlaybackByIndex( int index, bool forceParse = true ) = 0;
+	virtual const rvDeclEffect *	EffectByIndex( int index, bool forceParse = true ) = 0;
+
+	virtual void					StartPlaybackRecord( rvDeclPlayback *playback ) = 0;
+	virtual bool					SetPlaybackData( rvDeclPlayback *playback, int now, int control, class rvDeclPlaybackData *pbd ) = 0;
+	virtual bool					GetPlaybackData( const rvDeclPlayback *playback, int control, int now, int last, class rvDeclPlaybackData *pbd ) = 0;
+	virtual bool					FinishPlayback( rvDeclPlayback *playback ) = 0;
+
+	virtual	arcNetString					GetNewName( declType_t type, const char *base ) = 0;
+	virtual	const char *			GetDeclTypeName( declType_t type ) = 0;
+	virtual size_t					ListDeclSummary( const arcCommandArgs &args ) = 0;
+	virtual void					RemoveDeclFile( const char *file ) = 0;
+// scork: Validation call for detailed error-reporting
+	virtual bool					Validate( declType_t type, int iIndex, arcNetString &strReportTo ) = 0;
+	virtual arcDecleration *				AllocateDecl( declType_t type ) = 0;
+
+#if defined(_XENON)
+// mwhitlock: Xenon texture streaming
+	virtual void					SetLightMaterialList(arcNetList<arcMaterial*>* materialList) = 0;
+	virtual void					SetEntityMaterialList(arcNetList<arcMaterial*>* materialList) = 0;
+	virtual void					PurgeType( declType_t type ) = 0;
+#endif
+// RAVEN END
+};
+
+extern arcDeclerationManager *		declManager;
+
+template< declType_t type >
+ARC_INLINE void arcListDecls_f( const arcCommandArgs &args ) {
+	declManager->ListType( args, type );
+}
+
+template< declType_t type >
+ARC_INLINE void PrintDecls_f( const arcCommandArgs &args ) {
+	declManager->PrintType( args, type );
+}
+
+#endif /* !__DECLMANAGER_H__ */
+#ifndef __MATERIAL_H__
+#define __MATERIAL_H__
+
+/*
+===============================================================================
+
+	Material
+
+===============================================================================
+*/
+
+class arcImage;
+class idCinematic;
+class idUserInterface;
+class idMegaTexture;
+// RAVEN BEGIN
+// rjohnson: new shader stage system
+class rvNewShaderStage;
+class rvGLSLShaderStage;
+// RAVEN END
+
+// moved from image.h for default parm
+typedef enum {
+	TR_REPEAT,
+	TR_CLAMP,
+	TR_CLAMP_TO_BORDER,		// this should replace TR_CLAMP_TO_ZERO and TR_CLAMP_TO_ZERO_ALPHA,
+							// but I don't want to risk changing it right now
+	TR_CLAMP_TO_ZERO,		// guarantee 0,0,0,255 edge for projected textures,
+	// set AFTER image format selection
+	TR_CLAMP_TO_ZERO_ALPHA,	// guarantee 0 alpha edge for projected textures,
+	// set AFTER image format selection
+	TR_MIRRORED_REPEAT,
+} textureRepeat_t;
+
+typedef struct {
+	int		stayTime;		// msec for no change
+	float	maxAngle;		// maximum dot product to reject projection angles
+} decalInfo_t;
+
+typedef enum {
+	DFRM_NONE,
+	DFRM_SPRITE,
+	DFRM_TUBE,
+	DFRM_FLARE,
+	DFRM_EXPAND,
+	DFRM_MOVE,
+	DFRM_EYEBALL,
+// ddynerman: rectangular sprites
+	DFRM_RECTSPRITE,
+// RAVEN END
+	DFRM_TURB
+} deformSurf_t;
+
+typedef enum {
+	DI_STATIC,
+	DI_SCRATCH,		// video, screen wipe, etc
+	DI_CUBE_RENDER,
+	DI_MIRROR_RENDER,
+// RAVEN BEGIN
+// AReis: Used for water reflection/refraction.
+	DI_REFLECTION_RENDER,
+	DI_REFRACTION_RENDER,
+// RAVEN END
+	DI_REMOTE_RENDER
+} dynamicImage_t;
+
+// note: keep opNames[] in sync with changes
+typedef enum {
+	OP_TYPE_ADD,
+	OP_TYPE_SUBTRACT,
+	OP_TYPE_MULTIPLY,
+	OP_TYPE_DIVIDE,
+	OP_TYPE_MOD,
+	OP_TYPE_TABLE,
+	OP_TYPE_GT,
+	OP_TYPE_GE,
+	OP_TYPE_LT,
+	OP_TYPE_LE,
+	OP_TYPE_EQ,
+	OP_TYPE_NE,
+	OP_TYPE_AND,
+	OP_TYPE_OR,
+	OP_TYPE_SOUND
+// RAVEN BEGIN
+// rjohnson: new shader stage system
+	,
+	OP_TYPE_GLSL_ENABLED,
+	OP_TYPE_POT_X,
+	OP_TYPE_POT_Y,
+// RAVEN END
+} expOpType_t;
+
+typedef enum {
+	EXP_REG_TIME,
+
+	EXP_REG_PARM0,
+	EXP_REG_PARM1,
+	EXP_REG_PARM2,
+	EXP_REG_PARM3,
+	EXP_REG_PARM4,
+	EXP_REG_PARM5,
+	EXP_REG_PARM6,
+	EXP_REG_PARM7,
+	EXP_REG_PARM8,
+	EXP_REG_PARM9,
+	EXP_REG_PARM10,
+	EXP_REG_PARM11,
+
+	EXP_REG_GLOBAL0,
+	EXP_REG_GLOBAL1,
+	EXP_REG_GLOBAL2,
+	EXP_REG_GLOBAL3,
+	EXP_REG_GLOBAL4,
+	EXP_REG_GLOBAL5,
+	EXP_REG_GLOBAL6,
+	EXP_REG_GLOBAL7,
+
+// RAVEN BEGIN
+// rjohnson: added vertex randomizing
+	EXP_REG_VERTEX_RANDOMIZER,
+// RAVEN END
+
+	EXP_REG_NUM_PREDEFINED
+} expRegister_t;
+
+// RAVEN BEGIN
+// rjohnson: added new decal support
+
+// decal registers
+#define EXP_REG_DECAL_LIFE		EXP_REG_PARM4
+#define	REG_DECAL_LIFE			4
+#define EXP_REG_DECAL_SPAWN		EXP_REG_PARM5
+#define	REG_DECAL_SPAWN			5
+// RAVEN END
+
+typedef struct {
+	expOpType_t		opType;
+	int				a, b, c;
+} expOp_t;
+
+typedef struct {
+	int				registers[4];
+} colorStage_t;
+
+typedef enum {
+	TG_EXPLICIT,
+	TG_DIFFUSE_CUBE,
+	TG_REFLECT_CUBE,
+	TG_SKYBOX_CUBE,
+	TG_WOBBLESKY_CUBE,
+	TG_SCREEN			// screen aligned, for mirrorRenders and screen space temporaries
+} texGen_t;
+
+typedef struct {
+	idCinematic *		cinematic;
+	arcImage *			image;
+	texGen_t			texgen;
+	bool				hasMatrix;
+	int					matrix[2][3];	// we only allow a subset of the full projection matrix
+
+	// dynamic image variables
+	dynamicImage_t	dynamic;
+	int					width, height;
+	int					dynamicFrameCount;
+} textureStage_t;
+
+// the order BUMP / DIFFUSE / SPECULAR is necessary for interactions to draw correctly on low end cards
+typedef enum {
+	SL_AMBIENT,						// execute after lighting
+	SL_BUMP,
+	SL_DIFFUSE,
+	SL_SPECULAR
+} stageLighting_t;
+
+// cross-blended terrain textures need to modulate the color by
+// the vertex color to smoothly blend between two textures
+typedef enum {
+	SVC_IGNORE,
+	SVC_MODULATE,
+	SVC_INVERSE_MODULATE
+} stageVertexColor_t;
+
+static const int	MAX_FRAGMENT_IMAGES = 8;
+// RAVEN BEGIN
+// AReis: Increased MAX_VERTEX_PARMS from 4 to 16 and added MAX_FRAGMENT_PARMS.
+static const int	MAX_VERTEX_PARMS = 16;
+static const int	MAX_FRAGMENT_PARMS = 8;
+// RAVEN END
+
+typedef struct {
+	int					vertexProgram;
+
+// RAVEN BEGIN
+// dluetscher: added support for specifying MD5R specfic vertex programs
+// Q4SDK: maintain compatible structure padding
+#if defined( _MD5R_SUPPORT ) || defined( Q4SDK_MD5R )
+	int					md5rVertexProgram;
+#endif
+// RAVEN END
+
+	int					numVertexParms;
+	int					vertexParms[MAX_VERTEX_PARMS][4];	// evaluated register indexes
+
+// RAVEN BEGIN
+// AReis: New Fragment Parm stuff.
+	int					numFragmentParms;
+	int					fragmentParms[MAX_FRAGMENT_PARMS][4];	// evaluated register indexes
+// RAVEN END
+
+	int					fragmentProgram;
+	int					numFragmentProgramImages;
+	arcImage *			fragmentProgramImages[MAX_FRAGMENT_IMAGES];
+
+// RAVEN BEGIN
+// AReis: Custom Bindings. These override existing parm values.
+	bool				vertexParmsBindings[MAX_VERTEX_PARMS];
+	bool				fragmentParmsBindings[MAX_FRAGMENT_PARMS];
+
+// AReis: So fragment images can be bound to program specified binding, this
+// list keeps track of which image to use (if any, 0 if use specified image).
+	int					fragmentProgramBindings[MAX_FRAGMENT_IMAGES];
+// RAVEN END
+
+	idMegaTexture		*megaTexture;		// handles all the binding and parameter setting
+} newShaderStage_t;
+
+typedef struct {
+	int					conditionRegister;	// if registers[conditionRegister] == 0, skip stage
+	stageLighting_t		lighting;			// determines which passes interact with lights
+	int					drawStateBits;
+	colorStage_t		color;
+	bool				hasAlphaTest;
+// RAVEN BEGIN
+	bool				hasAlphaFunc;
+	int					alphaTestMode;
+// RAVEN END
+	int					alphaTestRegister;
+	textureStage_t		texture;
+	stageVertexColor_t	vertexColor;
+	bool				ignoreAlphaTest;	// this stage should act as translucent, even
+											// if the surface is alpha tested
+	float				privatePolygonOffset;	// a per-stage polygon offset
+
+	newShaderStage_t	*newStage;			// vertex / fragment program based stage
+
+// RAVEN BEGIN
+// rjohnson: new shader stage system
+	rvNewShaderStage	*newShaderStage;
+
+// rjohnson: added new decal support
+	int					mStageRegisterStart;
+	int					mNumStageRegisters;
+	int					mStageOpsStart;
+	int					mNumStageOps;
+// RAVEN END
+} materialStage_t;
+
+typedef enum {
+	MC_BAD,
+	MC_OPAQUE,			// completely fills the triangle, will have black drawn on fillDepthBuffer
+	MC_PERFORATED,		// may have alpha tested holes
+	MC_TRANSLUCENT		// blended with background
+} materialCoverage_t;
+
+typedef enum {
+	SS_MIN = -10000,
+// RAVEN BEGIN
+	SS_SUBVIEW = -4,	// mirrors, viewscreens, etc
+	SS_PREGUI = -3,		// guis
+// RAVEN END
+	SS_GUI = -2,		// guis
+	SS_BAD = -1,
+	SS_OPAQUE,			// opaque
+
+	SS_PORTAL_SKY,
+
+	SS_DECAL,			// scorch marks, etc.
+
+	SS_FAR,
+	SS_MEDIUM,			// normal translucent
+	SS_CLOSE,
+
+	SS_ALMOST_NEAREST,	// gun smoke puffs
+
+	SS_NEAREST,			// screen blood blobs
+
+	SS_POST_PROCESS = 100,	// after a screen copy to texture
+	SS_MAX = 10000
+} materialSort_t;
+
+typedef enum {
+	CT_FRONT_SIDED,
+	CT_BACK_SIDED,
+	CT_TWO_SIDED
+} cullType_t;
+
+// these don't effect per-material storage, so they can be very large
+const int MAX_SHADER_STAGES			= 256;
+
+const int MAX_TEXGEN_REGISTERS		= 4;
+
+const int MAX_ENTITY_SHADER_PARMS	= 12;
+
+// material flags
+typedef enum {
+	MF_DEFAULTED				= BIT(0),
+	MF_POLYGONOFFSET			= BIT(1),
+	MF_NOSHADOWS				= BIT(2),
+	MF_FORCESHADOWS				= BIT(3),
+	MF_NOSELFSHADOW				= BIT(4),
+	MF_NOPORTALFOG				= BIT(5),	// this fog volume won't ever consider a portal fogged out
+	MF_EDITOR_VISIBLE			= BIT(6)	// in use (visible) per editor
+// RAVEN BEGIN
+// jscott: for portal skies
+	,
+	MF_SKY						= BIT(7),
+	MF_NEED_CURRENT_RENDER		= BIT(8)	// for hud guis that need sort order preseved but need back end too
+// RAVEN END
+} materialFlags_t;
+
+// contents flags, NOTE: make sure to keep the defines in doom_defs.script up to date with these!
+typedef enum {
+	CONTENTS_SOLID				= BIT(0),	// an eye is never valid in a solid
+	CONTENTS_OPAQUE				= BIT(1),	// blocks visibility (for ai)
+	CONTENTS_WATER				= BIT(2),	// used for water
+	CONTENTS_PLAYERCLIP			= BIT(3),	// solid to players
+	CONTENTS_MONSTERCLIP		= BIT(4),	// solid to monsters
+	CONTENTS_MOVEABLECLIP		= BIT(5),	// solid to moveable entities
+	CONTENTS_IKCLIP				= BIT(6),	// solid to IK
+	CONTENTS_BLOOD				= BIT(7),	// used to detect blood decals
+	CONTENTS_BODY				= BIT(8),	// used for actors
+	CONTENTS_PROJECTILE			= BIT(9),	// used for projectiles
+	CONTENTS_CORPSE				= BIT(10),	// used for dead bodies
+	CONTENTS_RENDERMODEL		= BIT(11),	// used for render models for collision detection
+	CONTENTS_TRIGGER			= BIT(12),	// used for triggers
+	CONTENTS_AAS_SOLID			= BIT(13),	// solid for AAS
+	CONTENTS_AAS_OBSTACLE		= BIT(14),	// used to compile an obstacle into AAS that can be enabled/disabled
+	CONTENTS_FLASHLIGHT_TRIGGER	= BIT(15),	// used for triggers that are activated by the flashlight
+// RAVEN BEGIN
+// bdube: new clip that blocks monster visibility
+	CONTENTS_SIGHTCLIP			= BIT(16),	// used for blocking sight for actors and cameras
+	CONTENTS_LARGESHOTCLIP		= BIT(17),	// used to block large shots (fence that allows bullets through but not rockets for example)
+// cdr: AASTactical
+	CONTENTS_NOTACTICALFEATURES	= BIT(18),	// don't place tactical features here
+	CONTENTS_VEHICLECLIP		= BIT(19),	// solid to vehicles
+
+	// contents used by utils
+	CONTENTS_AREAPORTAL			= BIT(20),	// portal separating renderer areas
+	CONTENTS_NOCSG				= BIT(21),	// don't cut this brush with CSG operations in the editor
+	CONTENTS_FLYCLIP			= BIT(22),	// solid to vehicles
+
+// mekberg: added
+	CONTENTS_ITEMCLIP			= BIT(23),	// so items can collide
+	CONTENTS_PROJECTILECLIP		= BIT(24),  // unlike contents_projectile, projectiles only NOT hitscans
+// RAVEN END
+
+	CONTENTS_REMOVE_UTIL		= ~(CONTENTS_AREAPORTAL|CONTENTS_NOCSG)
+} contentsFlags_t;
+
+// surface types
+const int NUM_SURFACE_BITS		= 4;
+const int MAX_SURFACE_TYPES		= 1 << NUM_SURFACE_BITS;
+
+typedef enum {
+	SURFTYPE_NONE,					// default type
+    SURFTYPE_METAL,
+	SURFTYPE_STONE,
+	SURFTYPE_FLESH,
+	SURFTYPE_WOOD,
+	SURFTYPE_CARDBOARD,
+	SURFTYPE_LIQUID,
+	SURFTYPE_GLASS,
+	SURFTYPE_PLASTIC,
+	SURFTYPE_RICOCHET,
+	SURFTYPE_10,
+	SURFTYPE_11,
+	SURFTYPE_12,
+	SURFTYPE_13,
+	SURFTYPE_14,
+	SURFTYPE_15
+} surfTypes_t;
+
+// surface flags
+typedef enum {
+	SURF_TYPE_BIT0				= BIT(0),	// encodes the material type (metal, flesh, concrete, etc.)
+	SURF_TYPE_BIT1				= BIT(1),	// "
+	SURF_TYPE_BIT2				= BIT(2),	// "
+	SURF_TYPE_BIT3				= BIT(3),	// "
+	SURF_TYPE_MASK				= ( 1 << NUM_SURFACE_BITS ) - 1,
+
+	SURF_NODAMAGE				= BIT(4),	// never give falling damage
+	SURF_SLICK					= BIT(5),	// effects game physics
+	SURF_COLLISION				= BIT(6),	// collision surface
+	SURF_LADDER					= BIT(7),	// player can climb up this surface
+	SURF_NOIMPACT				= BIT(8),	// don't make missile explosions
+	SURF_NOSTEPS				= BIT(9),	// no footstep sounds
+	SURF_DISCRETE				= BIT(10),	// not clipped or merged by utilities
+	SURF_NOFRAGMENT				= BIT(11),	// dmap won't cut surface at each bsp boundary
+	SURF_NULLNORMAL				= BIT(12),	// renderbump will draw this surface as 0x80 0x80 0x80, which
+											// won't collect light from any angle
+// RAVEN BEGIN
+// bdube: added bounce
+	SURF_BOUNCE					= BIT(13),	// projectiles should bounce off this surface
+
+// dluetscher: added no T fix
+	SURF_NO_T_FIX				= BIT(14),	// merge surfaces (like decals), but does not try to T-fix them
+
+// RAVEN END
+} surfaceFlags_t;
+
+class arcAudioSystem;
+
+// RAVEN BEGIN
+// jsinger: added to allow support for serialization/deserialization of binary decls
+#ifdef RV_BINARYDECLS
+class arcMaterial : public arcDecleration, public Serializable<'IMAT'> {
+public:
+// jsinger:
+	virtual void		Write( SerialOutputStream &stream ) const;
+	virtual void		AddReferences() const;
+						arcMaterial( SerialInputStream &stream );
+#else
+class arcMaterial : public arcDecleration {
+#endif
+// rjohnson: new shader stage system
+	friend class rvNewShaderStage;
+	friend class rvGLSLShaderStage;
+// RAVEN END
+
+public:
+						arcMaterial();
+	virtual				~arcMaterial();
+
+	virtual size_t		Size( void ) const;
+	virtual bool		SetDefaultText( void );
+	virtual const char *DefaultDefinition( void ) const;
+	virtual bool		Parse( const char *text, const int textLength, bool noCaching );
+	virtual void		FreeData( void );
+	virtual void		Print( void ) const;
+
+						// returns the internal image name for stage 0, which can be used
+						// for the renderer CaptureRenderToImage() call
+						// I'm not really sure why this needs to be virtual...
+	virtual const char	*ImageName( void ) const;
+
+	void				ReloadImages( bool force ) const;
+// RAVEN BEGIN
+// mwhitlock: Xenon texture streaming
+#if defined(_XENON)
+	int					streamCount;
+	int					streamTimeStamp;
+	static int			masterStreamTimeStamp;
+	bool				StreamImages( bool inBackground );
+	void				UnstreamImages( void );
+	void				UpdateImage( int stage, const byte *data, int width, int height );
+#endif
+// RAVEN END
+						// returns number of stages this material contains
+	const int			GetNumStages( void ) const { return numStages; }
+
+						// get a specific stage
+	const materialStage_t *GetStage( const int index ) const { assert(index >= 0 && index < numStages); return &stages[index]; }
+
+						// get the first bump map stage, or NULL if not present.
+						// used for bumpy-specular
+	const materialStage_t *GetBumpStage( void ) const;
+
+						// returns true if the material will draw anything at all.  Triggers, portals,
+						// etc, will not have anything to draw.  A not drawn surface can still castShadow,
+						// which can be used to make a simplified shadow hull for a complex object set
+						// as noShadow
+	bool				IsDrawn( void ) const { return ( numStages > 0 || entityGui != 0 || gui != NULL ); }
+
+						// returns true if the material will draw any non light interaction stages
+	bool				HasAmbient( void ) const { return ( numAmbientStages > 0 ); }
+
+						// returns true if material has a gui
+	bool				HasGui( void ) const { return ( entityGui != 0 || gui != NULL ); }
+
+						// returns true if the material will generate another view, either as
+						// a mirror or dynamic rendered image
+	bool				HasSubview( void ) const { return hasSubview; }
+
+						// returns true if the material will generate shadows, not making a
+						// distinction between global and no-self shadows
+	bool				SurfaceCastsShadow( void ) const { return TestMaterialFlag( MF_FORCESHADOWS ) || !TestMaterialFlag( MF_NOSHADOWS ); }
+
+						// returns true if the material will generate interactions with fog/blend lights
+						// All non-translucent surfaces receive fog unless they are explicitly noFog
+	bool				ReceivesFog( void ) const { return ( IsDrawn() && !noFog && coverage != MC_TRANSLUCENT ); }
+
+						// returns true if the material will generate interactions with normal lights
+						// Many special effect surfaces don't have any bump/diffuse/specular
+						// stages, and don't interact with lights at all
+	bool				ReceivesLighting( void ) const { return numAmbientStages != numStages; }
+
+						// returns true if the material should generate interactions on sides facing away
+						// from light centers, as with noshadow and noselfshadow options
+	bool				ReceivesLightingOnBackSides( void ) const { return ( materialFlags & (MF_NOSELFSHADOW|MF_NOSHADOWS) ) != 0; }
+
+						// Standard two-sided triangle rendering won't work with bump map lighting, because
+						// the normal and tangent vectors won't be correct for the back sides.  When two
+						// sided lighting is desired. typically for alpha tested surfaces, this is
+						// addressed by having CleanupModelSurfaces() create duplicates of all the triangles
+						// with apropriate order reversal.
+	bool				ShouldCreateBackSides( void ) const { return shouldCreateBackSides; }
+
+						// characters and models that are created by a complete renderbump can use a faster
+						// method of tangent and normal vector generation than surfaces which have a flat
+						// renderbump wrapped over them.
+	bool				UseUnsmoothedTangents( void ) const { return unsmoothedTangents; }
+
+						// by default, monsters can have blood overlays placed on them, but this can
+						// be overrided on a per-material basis with the "noOverlays" material command.
+						// This will always return false for translucent surfaces
+	bool				AllowOverlays( void ) const { return allowOverlays; }
+
+						// MC_OPAQUE, MC_PERFORATED, or MC_TRANSLUCENT, for interaction list linking and
+						// dmap flood filling
+						// The depth buffer will not be filled for MC_TRANSLUCENT surfaces
+						// FIXME: what do nodraw surfaces return?
+	materialCoverage_t	Coverage( void ) const { return coverage; }
+
+						// returns true if this material takes precedence over other in coplanar cases
+	bool				HasHigherDmapPriority( const arcMaterial &other ) const { return ( IsDrawn() && !other.IsDrawn() ) ||
+																						( Coverage() < other.Coverage() ); }
+
+						// returns a idUserInterface if it has a global gui, or NULL if no gui
+	idUserInterface	*	GlobalGui( void ) const { return gui; }
+
+						// a discrete surface will never be merged with other surfaces by dmap, which is
+						// necessary to prevent mutliple gui surfaces, mirrors, autosprites, and some other
+						// special effects from being combined into a single surface
+						// guis, merging sprites or other effects, mirrors and remote views are always discrete
+	bool				IsDiscrete( void ) const { return ( entityGui || gui || deform != DFRM_NONE || sort == SS_SUBVIEW ||
+												( surfaceFlags & SURF_DISCRETE ) != 0 ); }
+
+						// Normally, dmap chops each surface by every BSP boundary, then reoptimizes.
+						// For gigantic polygons like sky boxes, this can cause a huge number of planar
+						// triangles that make the optimizer take forever to turn back into a single
+						// triangle.  The "noFragment" option causes dmap to only break the polygons at
+						// area boundaries, instead of every BSP boundary.  This has the negative effect
+						// of not automatically fixing up interpenetrations, so when this is used, you
+						// should manually make the edges of your sky box exactly meet, instead of poking
+						// into each other.
+	bool				NoFragment( void ) const { return ( surfaceFlags & SURF_NOFRAGMENT ) != 0; }
+
+// RAVEN BEGIN
+// dluetscher: added SURF_NO_T_FIX to merge surfaces (like decals), but skipping any T-junction fixing
+	bool				NoTFix( void ) const { return ( surfaceFlags & SURF_NO_T_FIX ) != 0; }
+// RAVEN END
+
+	//------------------------------------------------------------------
+
+// RAVEN BEGIN
+// jscott: added accessor
+	const rvDeclMatType *		GetMaterialType( void ) const { return( materialType ); }
+	const rvDeclMatType *		GetMaterialType( arcVec2 &tc ) const;
+	byte *						GetMaterialTypeArray( void ) const { return( materialTypeArray ); }
+	const char *				GetMaterialTypeArrayName( void ) const { return( materialTypeArrayName.c_str() ); }
+
+// jscott: for profiling
+	int							GetTexelCount( void ) const;
+
+// jscott: for error checking
+	bool						HasDefaultedImage( void ) const;
+
+// jscott: for Radiant
+	arcImage *					GetDiffuseImage( void ) const;
+
+// AReis: New portal distance culling stuff.
+	float						GetPortalNear( void ) const { return( portalDistanceNear ); }
+	float						GetPortalFar( void ) const { return( portalDistanceFar ); }
+	const arcImage *				GetPortalImage( void ) const { return( portalImage ); }
+
+// jscott: to prevent a recursive crash
+	virtual	bool				RebuildTextSource( void ) { return( false ); }
+// scork: for detailed error-reporting
+	virtual bool				Validate( const char *psText, int iTextLength, arcNetString &strReportTo ) const;
+// RAVEN END
+
+	//==================================================================
+	// light shader specific functions, only called for light entities
+
+						// lightshader option to fill with fog from viewer instead of light from center
+	bool				IsFogLight() const { return fogLight; }
+
+						// perform simple blending of the projection, instead of interacting with bumps and textures
+	bool				IsBlendLight() const { return blendLight; }
+
+						// an ambient light has non-directional bump mapping and no specular
+	bool				IsAmbientLight() const { return ambientLight; }
+
+						// implicitly no-shadows lights (ambients, fogs, etc) will never cast shadows
+						// but individual light entities can also override this value
+	bool				LightCastsShadows() const { return TestMaterialFlag( MF_FORCESHADOWS ) ||
+								( !fogLight && !ambientLight && !blendLight && !TestMaterialFlag( MF_NOSHADOWS ) ); }
+
+						// fog lights, blend lights, ambient lights, etc will all have to have interaction
+						// triangles generated for sides facing away from the light as well as those
+						// facing towards the light.  It is debatable if noshadow lights should effect back
+						// sides, making everything "noSelfShadow", but that would make noshadow lights
+						// potentially slower than normal lights, which detracts from their optimization
+						// ability, so they currently do not.
+	bool				LightEffectsBackSides() const { return fogLight || ambientLight || blendLight; }
+
+						// NULL unless an image is explicitly specified in the shader with "lightFalloffShader <image>"
+	arcImage	*			LightFalloffImage() const { return lightFalloffImage; }
+
+	//------------------------------------------------------------------
+
+						// returns the renderbump command line for this shader, or an empty string if not present
+	const char *		GetRenderBump() const { return renderBump; };
+
+						// set specific material flag(s)
+	void				SetMaterialFlag( const int flag ) const { materialFlags |= flag; }
+
+						// clear specific material flag(s)
+	void				ClearMaterialFlag( const int flag ) const { materialFlags &= ~flag; }
+
+						// test for existance of specific material flag(s)
+	bool				TestMaterialFlag( const int flag ) const { return ( materialFlags & flag ) != 0; }
+
+						// get content flags
+	const int			GetContentFlags( void ) const { return contentFlags; }
+
+						// get surface flags
+	const int			GetSurfaceFlags( void ) const { return surfaceFlags; }
+
+						// gets name for surface type (stone, metal, flesh, etc.)
+	const surfTypes_t	GetSurfaceType( void ) const { return static_cast<surfTypes_t>( surfaceFlags & SURF_TYPE_MASK ); }
+
+						// get material description
+	const char *		GetDescription( void ) const { return desc; }
+
+						// get sort order
+	const float			GetSort( void ) const { return sort; }
+						// this is only used by the gui system to force sorting order
+						// on images referenced from tga's instead of materials.
+						// this is done this way as there are 2000 tgas the guis use
+	void				SetSort( float s ) const { sort = s; };
+
+						// DFRM_NONE, DFRM_SPRITE, etc
+	deformSurf_t			Deform( void ) const { return deform; }
+
+						// flare size, expansion size, etc
+	const int			GetDeformRegister( int index ) const { return deformRegisters[index]; }
+
+						// particle system to emit from surface and table for turbulent
+	const arcDecleration		*GetDeformDecl( void ) const { return deformDecl; }
+
+						// currently a surface can only have one unique texgen for all the stages
+	texGen_t			Texgen() const;
+
+						// wobble sky parms
+	const int *			GetTexGenRegisters( void ) const { return texGenRegisters; }
+
+						// get cull type
+	const cullType_t	GetCullType( void ) const { return cullType; }
+
+	float				GetEditorAlpha( void ) const { return editorAlpha; }
+
+	int					GetEntityGui( void ) const { return entityGui; }
+
+	decalInfo_t			GetDecalInfo( void ) const { return decalInfo; }
+
+						// spectrums are used for "invisible writing" that can only be
+						// illuminated by a light of matching spectrum
+	int					Spectrum( void ) const { return spectrum; }
+
+	float				GetPolygonOffset( void ) const { return polygonOffset; }
+
+	float				GetSurfaceArea( void ) const { return surfaceArea; }
+	void				AddToSurfaceArea( float area ) { surfaceArea += area; }
+
+	//------------------------------------------------------------------
+
+						// returns the length, in milliseconds, of the videoMap on this material,
+						// or zero if it doesn't have one
+	int					CinematicLength( void ) const;
+
+	void				CloseCinematic( void ) const;
+
+	void				ResetCinematicTime( int time ) const;
+
+	void				UpdateCinematic( int time ) const;
+
+	//------------------------------------------------------------------
+
+						// gets an image for the editor to use
+	arcImage *			GetEditorImage( void ) const;
+	int					GetImageWidth( void ) const;
+	int					GetImageHeight( void ) const;
+
+	void				SetGui( const char *_gui ) const;
+
+						// just for resource tracking
+	void				SetImageClassifications( int tag ) const;
+
+	//------------------------------------------------------------------
+
+						// returns number of registers this material contains
+	const int			GetNumRegisters() const { return numRegisters; }
+
+// RAVEN BEGIN
+// rjohnson: added vertex randomizing
+						// regs should point to a float array large enough to hold GetNumRegisters() floats
+	void				EvaluateRegisters( float *regs, const float entityParms[MAX_ENTITY_SHADER_PARMS],
+											const struct viewDef_s *view, int soundEmitter = 0, arcVec3 *randomizer = NULL ) const;
+// RAVEN END
+
+// RAVEN BEGIN
+// rjohnson: added new decal support
+	void				EvaluateStageRegisters( int StageIndex, float *registers, const float shaderParms[MAX_ENTITY_SHADER_PARMS], float FloatTime) const;
+
+// rjohnson: started tracking image/material usage
+	void				ClearUseCount( void ) { useCount = 0; }
+	void				IncreaseUseCount( void ) { useCount++; globalUseCount++; }
+	int					GetUseCount( void ) { return useCount; }
+	int					GetGlobalUseCount( void ) const { return globalUseCount; }
+	void				ResolveUse( void );
+// RAVEN END
+
+						// if a material only uses constants (no entityParm or globalparm references), this
+						// will return a pointer to an internal table, and EvaluateRegisters will not need
+						// to be called.  If NULL is returned, EvaluateRegisters must be used.
+	const float *		ConstantRegisters() const;
+
+	bool				SuppressInSubview() const				{ return suppressInSubview; };
+	bool				IsPortalSky() const						{ return portalSky; };
+	void				AddReference();
+
+private:
+	// parse the entire material
+	void				CommonInit();
+// RAVEN BEGIN
+// scork: now returns false (WHEN VALIDATING) under circumstances which would cause a common->FatalError normally, caller should bail ASAP on return.
+	bool				ParseMaterial( idLexer &src );
+// RAVEN END
+	bool				MatchToken( idLexer &src, const char *match );
+	void				ParseSort( idLexer &src );
+	void				ParseBlend( idLexer &src, materialStage_t *stage );
+	void				ParseVertexParm( idLexer &src, newShaderStage_t *newStage );
+// RAVEN BEGIN
+// AReis: New fragment parm stuff.
+	void				ParseFragmentParm( idLexer &src, newShaderStage_t *newStage );
+// RAVEN END
+	void				ParseFragmentMap( idLexer &src, newShaderStage_t *newStage );
+
+// RAVEN BEGIN
+// scork: now returns false (WHEN VALIDATING) under circumstances which would cause a common->FatalError normally, caller should bail ASAP on return.
+	bool				ParseStage( idLexer &src, const textureRepeat_t trpDefault = TR_REPEAT );
+// RAVEN END
+	void				ParseDeform( idLexer &src );
+	void				ParseDecalInfo( idLexer &src );
+	bool				CheckSurfaceParm( arcNetToken *token );
+	int					GetExpressionConstant( float f );
+	int					GetExpressionTemporary( void );
+	expOp_t	*			GetExpressionOp( void );
+	int					EmitOp( int a, int b, expOpType_t opType );
+	int					ParseEmitOp( idLexer &src, int a, expOpType_t opType, int priority );
+	int					ParseTerm( idLexer &src );
+	int					ParseExpressionPriority( idLexer &src, int priority );
+	int					ParseExpression( idLexer &src );
+	void				ClearStage( materialStage_t *ss );
+	int					NameToSrcBlendMode( const arcNetString &name );
+	int					NameToDstBlendMode( const arcNetString &name );
+	void				MultiplyTextureMatrix( textureStage_t *ts, int registers[2][3] );	// FIXME: for some reason the const is bad for gcc and Mac
+	void				SortInteractionStages();
+// RAVEN BEGIN
+// scork: now returns false (WHEN VALIDATING) under circumstances which would cause a common->FatalError normally, caller should bail ASAP on return.
+	bool				AddImplicitStages( const textureRepeat_t trpDefault = TR_REPEAT );
+// RAVEN END
+	void				CheckForConstantRegisters();
+
+private:
+	arcNetString				desc;				// description
+	arcNetString				renderBump;			// renderbump command options, without the "renderbump" at the start
+
+	arcImage	*			lightFalloffImage;
+
+	int					entityGui;			// draw a gui with the idUserInterface from the renderEntity_t
+											// non zero will draw gui, gui2, or gui3 from renderEnitty_t
+	mutable idUserInterface	*gui;			// non-custom guis are shared by all users of a material
+
+// RAVEN BEGIN
+// jscott: for material types
+	const rvDeclMatType *materialType;
+	byte				*materialTypeArray;	// an array of material type indices generated from the hit image
+	arcNetString				materialTypeArrayName;
+	int					MTAWidth;
+	int					MTAHeight;
+
+// rjohnson: started tracking image/material usage
+	int					useCount;
+	int					globalUseCount;
+
+// AReis: New portal distance culling stuff.
+	float				portalDistanceNear;
+	float				portalDistanceFar;
+	arcImage *			portalImage;
+// RAVEN END
+
+	bool				noFog;				// surface does not create fog interactions
+
+	int					spectrum;			// for invisible writing, used for both lights and surfaces
+
+	float				polygonOffset;
+
+	int					contentFlags;		// content flags
+	int					surfaceFlags;		// surface flags
+	mutable int			materialFlags;		// material flags
+
+	decalInfo_t			decalInfo;
+
+
+	mutable	float		sort;				// lower numbered shaders draw before higher numbered
+	deformSurf_t			deform;
+	int					deformRegisters[4];		// numeric parameter for deforms
+	const arcDecleration		*deformDecl;			// for surface emitted particle deforms and tables
+
+	int					texGenRegisters[MAX_TEXGEN_REGISTERS];	// for wobbleSky
+
+	materialCoverage_t	coverage;
+	cullType_t			cullType;			// CT_FRONT_SIDED, CT_BACK_SIDED, or CT_TWO_SIDED
+	bool				shouldCreateBackSides;
+
+	bool				fogLight;
+	bool				blendLight;
+	bool				ambientLight;
+	bool				unsmoothedTangents;
+	bool				hasSubview;			// mirror, remote render, etc
+	bool				allowOverlays;
+
+	int					numOps;
+	expOp_t *			ops;				// evaluate to make expressionRegisters
+
+	int					numRegisters;																			//
+	float *				expressionRegisters;
+
+	float *				constantRegisters;	// NULL if ops ever reference globalParms or entityParms
+
+	int					numStages;
+	int					numAmbientStages;
+
+	materialStage_t *		stages;
+
+	struct mtrParsingData_s	*pd;			// only used during parsing
+
+	float				surfaceArea;		// only for listSurfaceAreas
+
+	// we defer loading of the editor image until it is asked for, so the game doesn't load up
+	// all the invisible and uncompressed images.
+	// If editorImage is NULL, it will atempt to load editorImageName, and set editorImage to that or defaultImage
+	arcNetString				editorImageName;
+	mutable arcImage *	editorImage;		// image used for non-shaded preview
+	float				editorAlpha;
+
+	bool				suppressInSubview;
+	bool				portalSky;
+	int					refCount;
+};
+
+typedef arcNetList<const arcMaterial *> arcMatList;
+
+// RAVEN BEGIN
+class rvMaterialEdit
+{
+public:
+	virtual ~rvMaterialEdit() {}
+	virtual	void		SetGui( arcMaterial *edit, const char *name ) = 0;
+	virtual int			GetImageWidth( const arcMaterial *edit ) const = 0;
+	virtual int			GetImageHeight( const arcMaterial *edit ) const = 0;
+};
+
+extern rvMaterialEdit	*materialEdit;
+// RAVEN END
+
+#endif /* !__MATERIAL_H__ */
+#ifndef __SYS_PUBLIC__
+#define __SYS_PUBLIC__
+
+
+/*
+===============================================================================
+
+	Non-portable system services.
+
+===============================================================================
+*/
+
+
+// Win32
+#ifdef _WINDOWS
+
+#define	BUILD_STRING					"win-x86"
+#define BUILD_OS_ID						0
+#define	CPUSTRING						"x86"
+#define CPU_EASYARGS					1
+
+#define ALIGN16( x )					__declspec(align(16)) x
+#define PACKED
+
+#define _alloca16( x )					((void *)((((int)_alloca( (x)+15 )) + 15) & ~15))
+
+#arcExceptions						__forceinline
+#define ARC_STATICTEMPLATE				static
+
+#define assertmem( x, y )				assert( _CrtIsValidPointer( x, y, true ) )
+
+#endif
+
+#ifdef __GNUC__
+#define arc_attribute(x) __attribute__(x)
+#else
+#define arc_attribute(x)
+#endif
+
+// Mac OSX
+#if defined(MACOS_X) || defined(__APPLE__)
+
+#include <sys/types.h>
+
+#if __GNUC__ < 4
+#include "osx/apple_bool.h"
+#endif
+
+#define BUILD_STRING				"MacOSX-universal"
+#define BUILD_OS_ID					1
+#ifdef __ppc__
+	#define	CPUSTRING					"ppc"
+	#define CPU_EASYARGS				0
+#elif defined(__i386__)
+	#define	CPUSTRING					"x86"
+	#define CPU_EASYARGS				1
+#endif
+
+#define ALIGN16( x )					x __attribute__ ((aligned (16)))
+#ifdef __MWERKS__
+#define PACKED
+#else
+#define PACKED							__attribute__((packed))
+#endif
+
+#define _alloca							alloca
+#define _alloca16( x )					((void *)((((int)alloca( (x)+15 )) + 15) & ~15))
+
+#define __cdecl
+#define ASSERT							assert
+
+#define ARC_STATICTEMPLATE
+
+#define assertmem( x, y )
+
+#endif
+
+
+// Linux
+#ifdef __linux__
+
+#ifdef __i386__
+	#define	BUILD_STRING				"linux-x86"
+	#define BUILD_OS_ID					2
+	#define CPUSTRING					"x86"
+	#define CPU_EASYARGS				1
+#elif defined(__ppc__)
+	#define	BUILD_STRING				"linux-ppc"
+	#define CPUSTRING					"ppc"
+	#define CPU_EASYARGS				0
+#endif
+
+#define _alloca							alloca
+#define _alloca16( x )					((void *)((((int)alloca( (x)+15 )) + 15) & ~15))
+
+#define ALIGN16( x )					x
+#define PACKED							__attribute__((packed))
+
+#define __cdecl
+#define ASSERT							assert
+
+#arcExceptions						inline
+#define ARC_STATICTEMPLATE
+
+#define assertmem( x, y )
+
+#endif
+
+void			Sys_Init( void );
+void			Sys_Shutdown( void );
+void			Sys_Error( const char *error, ...);
+void			Sys_Quit( void );
+
+bool			Sys_AlreadyRunning( void );
+
+// note that this isn't journaled...
+char *			Sys_GetClipboardData( void );
+void			Sys_SetClipboardData( const char *string );
+
+// will go to the various text consoles
+// NOT thread safe - never use in the async paths
+void			Sys_Printf( const char *msg, ... )arc_attribute((format(printf,1,2)));
+
+// guaranteed to be thread-safe
+void			Sys_DebugPrintf( const char *fmt, ... )arc_attribute((format(printf,1,2)));
+void			Sys_DebugVPrintf( const char *fmt, va_list arg );
+
+// a decent minimum sleep time to avoid going below the process scheduler speeds
+#define			SYS_MINSLEEP	20
+
+// allow game to yield CPU time
+// NOTE: due to SYS_MINSLEEP this is very bad portability karma, and should be completely removed
+void			Sys_Sleep( int msec );
+
+// returns whether the main rendering window has focus
+bool			Sys_IsAppActive( void );
+
+// Sys_Milliseconds should only be used for profiling purposes,
+// any game related timing information should come from event timestamps
+int				Sys_Milliseconds( void );
+
+// for accurate performance testing
+double			Sys_GetClockTicks( void );
+double			Sys_ClockTicksPerSecond( void );
+
+// returns a selection of the CPUID_* flags
+cpuid_t			Sys_GetProcessorId( void );
+const char *	Sys_GetProcessorString( void );
+
+// returns true if the FPU stack is empty
+bool			Sys_FPU_StackIsEmpty( void );
+
+// empties the FPU stack
+void			Sys_FPU_ClearStack( void );
+
+// returns the FPU state as a string
+const char *	Sys_FPU_GetState( void );
+
+// enables the given FPU exceptions
+void			Sys_FPU_EnableExceptions( int exceptions );
+
+// sets the FPU precision
+void			Sys_FPU_SetPrecision( int precision );
+
+// sets the FPU rounding mode
+void			Sys_FPU_SetRounding( int rounding );
+
+// sets Flush-To-Zero mode (only available when CPUID_FTZ is set)
+void			Sys_FPU_SetFTZ( bool enable );
+
+// sets Denormals-Are-Zero mode (only available when CPUID_DAZ is set)
+void			Sys_FPU_SetDAZ( bool enable );
+
+// returns amount of system ram
+int				Sys_GetSystemRam( void );
+
+// returns amount of video ram
+int				Sys_GetVideoRam( void );
+
+// returns amount of drive space in path
+int				Sys_GetDriveFreeSpace( const char *path );
+
+// returns memory stats
+void			Sys_GetCurrentMemoryStatus( sysMemoryStats_t &stats );
+void			Sys_GetExeLaunchMemoryStatus( sysMemoryStats_t &stats );
+
+// lock and unlock memory
+bool			Sys_LockMemory( void *ptr, int bytes );
+bool			Sys_UnlockMemory( void *ptr, int bytes );
+
+// set amount of physical work memory
+void			Sys_SetPhysicalWorkMemory( int minBytes, int maxBytes );
+
+// allows retrieving the call stack at execution points
+void			Sys_GetCallStack( address_t *callStack, const int callStackSize );
+const char *	Sys_GetCallStackStr( const address_t *callStack, const int callStackSize );
+const char *	Sys_GetCallStackCurStr( int depth );
+const char *	Sys_GetCallStackCurAddressStr( int depth );
+void			Sys_ShutdownSymbols( void );
+
+#ifdef _LOAD_DLL
+// DLL loading, the path should be a fully qualified OS path to the DLL file to be loaded
+int				Sys_DLL_Load( const char *dllName );
+void *			Sys_DLL_GetProcAddress( int dllHandle, const char *procName );
+void			Sys_DLL_Unload( int dllHandle );
+#endif // _LOAD_DLL
+
+// event generation
+void			Sys_GenerateEvents( void );
+sysEvent_t		Sys_GetEvent( void );
+void			Sys_ClearEvents( void );
+
+// input is tied to windows, so it needs to be started up and shut down whenever
+// the main window is recreated
+void			Sys_InitInput( void );
+void			Sys_ShutdownInput( void );
+// keyboard input polling
+int				Sys_PollKeyboardInputEvents( void );
+int				Sys_ReturnKeyboardInputEvent( const int n, int &ch, bool &state );
+void			Sys_EndKeyboardInputEvents( void );
+int				Sys_MapKey( unsigned long key, unsigned short wParam );
+
+// mouse input polling
+int				Sys_PollMouseInputEvents( void );
+int				Sys_ReturnMouseInputEvent( const int n, int &action, int &value );
+void			Sys_EndMouseInputEvents( void );
+
+// RAVEN BEGIN
+// ksergent: joystick input polling
+int				Sys_PollJoystickInputEvents( void );
+bool			Sys_IsJoystickEnabled( void );
+bool			Sys_IsJoystickConnected( int index );
+int				Sys_ReturnJoystickInputEvent( const int n, int &action, int &value );
+void			Sys_EndJoystickInputEvents( void );
+// RAVEN END
+
+// when the console is down, or the game is about to perform a lengthy
+// operation like map loading, the system can release the mouse cursor
+// when in windowed mode
+bool			Sys_IsWindowVisible( void );
+void			Sys_Mkdir( const char *path );
+
+// RAVEN BEGIN
+// jscott: thread handling
+void			Sys_StartAsyncThread( void );
+void			Sys_EndAsyncThread( void );
+
+// jscott: VTune interface
+#ifndef _FINAL
+void			Sys_StartProfiling( void );
+void			Sys_StopProfiling( void );
+#endif
+// RAVEN END
+
+// NOTE: do we need to guarantee the same output on all platforms?
+const char *	Sys_TimeStampToStr( long timeStamp );
+const char *	Sys_DefaultCDPath( void );
+const char *	Sys_DefaultBasePath( void );
+const char *	Sys_DefaultSavePath( void );
+const char *	Sys_EXEPath( void );
+
+// for getting current system (real world) time
+int				Sys_RealTime( sysTime_t* sysTime );
+
+// use fs_debug to verbose Sys_ListFiles
+// returns -1 if directory was not found (the list is cleared)
+int				Sys_ListFiles( const char *directory, const char *extension, arcNetList<class arcNetString> &list );
+
+// RAVEN BEGIN
+// rjohnson: added block
+bool			Sys_AppShouldSleep		( void );
+// RAVEN END
+
+/*
+==============================================================
+
+	Networking
+
+==============================================================
+*/
+
+#define	PORT_ANY			-1
+
+class idPort {
+public:
+				idPort();				// this just zeros netSocket and port
+				~idPort();
+
+	// if the InitForPort fails, the idPort.port field will remain 0
+// RAVEN BEGIN
+// asalmon: option for xbox to create a VDP socket
+#ifdef _XBOX
+	bool		InitForPort( int portNumber, bool vdp = false );
+#else
+	bool		InitForPort( int portNumber );
+#endif
+// RAVEN END
+	int			GetPort( void ) const { return port; }
+// RAVEN BEGIN
+// amccarthy: For Xbox this needs to be an unsigned int
+#ifdef _XBOX
+	unsigned int GetSocket( void ) const { return netSocket; }
+#endif
+// RAVEN END
+	void		Close();
+
+	bool		GetPacket( netadr_t &from, void *data, int &size, int maxSize );
+	bool		GetPacketBlocking( netadr_t &from, void *data, int &size, int maxSize, int timeout );
+	void		SendPacket( const netadr_t to, const void *data, int size );
+
+//RAVEN BEGIN
+//asalmon: second version of sendPacket for Xbox avoids netadr_t
+#ifdef _XBOX
+	bool		SendPacketVDP( const struct sockaddr *to, const void *data, int size );
+#endif
+//RAVEN END
+
+	void		GetTrafficStats(  int &bytesSent, int &packetsSent, int &bytesReceived, int &packetsReceived ) const;
+
+	void		SetSilent( bool silent );
+	bool		GetSilent( void ) const;
+
+private:
+	int			packetsRead;
+	int			bytesRead;
+
+	int			packetsWritten;
+	int			bytesWritten;
+
+	int			port;			// UDP port
+//RAVEN BEGIN
+//amccarthy: For Xbox this needs to be an unsigned int
+#ifdef _XBOX
+	unsigned int			netSocket;		// OS specific socket
+#else
+	int						netSocket;
+#endif
+//RAVEN END
+
+	bool		silent;			// don't emit anything for a while
+};
+
+/*
+===============
+idPort::GetTrafficStats
+===============
+*/
+ARC_INLINE void idPort::GetTrafficStats(  int &_bytesSent, int &_packetsSent, int &_bytesReceived, int &_packetsReceived ) const {
+	_bytesSent = bytesWritten;
+	_packetsSent = packetsWritten;
+	_bytesReceived = bytesRead;
+	_packetsReceived = packetsRead;
+}
+
+/*
+===============
+idPort::SetSilent
+===============
+*/
+ARC_INLINE void idPort::SetSilent( bool _silent ) { silent = _silent; }
+
+/*
+===============
+idPort::GetSilent
+===============
+*/
+ARC_INLINE bool idPort::GetSilent( void ) const { return silent; }
+
+class idTCP;
+class idTCPServer;
+
+const int IDPOLL_READ	= (1<<0);
+const int IDPOLL_WRITE	= (1<<1);
+const int IDPOLL_ERROR	= (1<<2);
+
+class idPoller {
+public:
+				idPoller();
+
+	void		Clear( void );
+
+	// will replace existing entries
+	void		Add( int fd, int which = IDPOLL_READ );
+	void		Add( const idTCP &tcp, int which = IDPOLL_READ );
+	void		Add( const idTCPServer &tcp, int which = IDPOLL_READ );
+
+	void		Remove( int fd ) { Add(fd, 0); }
+	void		Remove( const idTCP &tcp ) { Add(tcp, 0); }
+	void		Remove( const idTCPServer &serv ) { Add(serv, 0); }
+
+	// returns IDPOLL_ flags
+	int			Check( int fd );
+	int			Check( const idTCP &tcp );
+	int			Check( const idTCPServer &serv );
+
+	// returns the number of fds set, timeout is in ms, <0 is forever
+	int			Poll( int timeout = -1 );
+
+private:
+	int			max_fd;
+	fd_set		readfds, writefds, exceptfds;
+	fd_set		rreadfds, rwritefds, rexceptfds;
+};
+
+class idTCPServer {
+public:
+				idTCPServer();
+	virtual		~idTCPServer();
+
+	bool		Listen( const char *net_interface, short port );
+	bool		Accept( idTCP &client );
+	void		Close();
+
+	const netadr_t &GetAddress( void ) const { return address; }
+
+private:
+	netadr_t	address;		// local address
+	int fd;
+
+	friend void idPoller::Add( const idTCPServer &serv, int which );
+	friend void idPoller::Remove( const idTCPServer &serv );
+	friend int idPoller::Check( const idTCPServer &serv );
+};
+
+class idTCP {
+public:
+				idTCP();
+				idTCP( const netadr_t &address, int fd );
+				idTCP( const idTCP &tcp );
+	virtual		~idTCP();
+
+	idTCP &		operator = (const idTCP &tcp);
+
+	// if host is host:port, the value of port is ignored
+	bool		Init( const char *host, short port );
+	void		Close();
+
+	// returns -1 on failure (and closes socket)
+	// those are non blocking, can be used for polling
+	// there is no buffering, you are not guaranteed to Read or Write everything in a single call
+	// (specially on win32, see recv and send documentation)
+	int			Read( void *data, int size );
+	int			Write( const void *data, int size );
+
+	const netadr_t &GetAddress( void ) const { return address; }
+
+private:
+	netadr_t	address;		// remote address
+	int			fd;				// OS specific socket
+
+	friend void idPoller::Add( const idTCP &tcp, int which );
+	friend void idPoller::Remove( const idTCP &tcp );
+	friend int idPoller::Check( const idTCP &tcp );
+};
+
+				// parses the port number
+				// can also do DNS resolve if you ask for it.
+				// NOTE: DNS resolve is a slow/blocking call, think before you use
+				// ( could be exploited for server DoS )
+bool			Sys_StringToNetAdr( const char *s, netadr_t *a, bool doDNSResolve );
+const char *	Sys_NetAdrToString( const netadr_t a );
+bool			Sys_IsLANAddress( const netadr_t a );
+bool			Sys_CompareNetAdrBase( const netadr_t a, const netadr_t b );
+
+void			Sys_InitNetworking( void );
+void			Sys_ShutdownNetworking( void );
+
+// read proxy information from environment
+#define			MAX_PROXY_LENGTH 128
+bool			Sys_GetHTTPProxyAddress( char proxy[ MAX_PROXY_LENGTH ] );
+
+// RAVEN BEGIN
+// ddynerman: utility functions
+// TTimo: FIXME if exposed, call them Sys_
+int Net_GetNumInterfaces( void );
+netadr_t Net_GetInterface( int index );
+
+// asalmon: Xbox live related functions
+#ifdef _XBOX
+#define NONCE_SIZE  8
+bool			Sys_CreateLiveMatch( void );
+bool			Sys_CreateSystemLinkMatch( void );
+bool			Sys_VerifyString(const char *string);
+#endif
+// RAVEN END
+
+
+/*
+==============================================================
+
+	Multi-threading
+
+==============================================================
+*/
+
+typedef unsigned int (*xthread_t)( void * );
+
+typedef enum {
+	THREAD_NORMAL,
+	THREAD_ABOVE_NORMAL,
+	THREAD_HIGHEST
+} xthreadPriority;
+
+typedef struct {
+	const char *	name;
+	int				threadHandle;
+	unsigned long	threadId;
+// RAVEN BEGIN
+// ksergent: included to track multiprocessor system
+#ifdef _XBOX
+	unsigned char cpuID;
+#endif
+// RAVEN END
+} xthreadInfo;
+
+const int MAX_THREADS				= 10;
+extern xthreadInfo *g_threads[MAX_THREADS];
+extern int			g_thread_count;
+
+void				Sys_CreateThread( xthread_t function, void *parms, xthreadPriority priority, xthreadInfo &info, const char *name, xthreadInfo *threads[MAX_THREADS], int *thread_count );
+void				Sys_DestroyThread( xthreadInfo& info ); // sets threadHandle back to 0
+
+// find the name of the calling thread
+// if index != NULL, set the index in g_threads array (use -1 for "main" thread)
+const char *		Sys_GetThreadName( int *index = 0 );
+
+const int MAX_CRITICAL_SECTIONS		= 4;
+
+enum {
+	CRITICAL_SECTION_ZERO = 0,
+	CRITICAL_SECTION_ONE,
+	CRITICAL_SECTION_TWO,
+	CRITICAL_SECTION_THREE
+};
+
+void				Sys_EnterCriticalSection( int index = CRITICAL_SECTION_ZERO );
+void				Sys_LeaveCriticalSection( int index = CRITICAL_SECTION_ZERO );
+
+const int MAX_TRIGGER_EVENTS		= 4;
+
+enum {
+	TRIGGER_EVENT_ZERO = 0,
+	TRIGGER_EVENT_ONE,
+	TRIGGER_EVENT_TWO,
+	TRIGGER_EVENT_THREE
+};
+
+void				Sys_WaitForEvent( int index = TRIGGER_EVENT_ZERO );
+void				Sys_TriggerEvent( int index = TRIGGER_EVENT_ZERO );
+
+/*
+==============================================================
+
+	arcSys
+
+==============================================================
+*/
+
+class arcSys {
+public:
+	virtual ~arcSys() { }
+	virtual void			DebugPrintf( const char *fmt, ... )arc_attribute((format(printf,2,3))) = 0;
+	virtual void			DebugVPrintf( const char *fmt, va_list arg ) = 0;
+
+	virtual double			GetClockTicks( void ) = 0;
+	virtual double			ClockTicksPerSecond( void ) = 0;
+	virtual cpuid_t			GetProcessorId( void ) = 0;
+	virtual const char *	GetProcessorString( void ) = 0;
+	virtual const char *	FPU_GetState( void ) = 0;
+	virtual bool			FPU_StackIsEmpty( void ) = 0;
+	virtual void			FPU_SetFTZ( bool enable ) = 0;
+	virtual void			FPU_SetDAZ( bool enable ) = 0;
+// RAVEN BEGIN
+	virtual void			FPU_SetPrecision( int flags ) = 0;
+// RAVEN END
+
+	virtual bool			LockMemory( void *ptr, int bytes ) = 0;
+	virtual bool			UnlockMemory( void *ptr, int bytes ) = 0;
+
+	virtual void			GetCallStack( address_t *callStack, const int callStackSize ) = 0;
+	virtual const char *	GetCallStackStr( const address_t *callStack, const int callStackSize ) = 0;
+	virtual const char *	GetCallStackCurStr( int depth ) = 0;
+	virtual void			ShutdownSymbols( void ) = 0;
+
+	virtual int				DLL_Load( const char *dllName ) = 0;
+	virtual void *			DLL_GetProcAddress( int dllHandle, const char *procName ) = 0;
+	virtual void			DLL_Unload( int dllHandle ) = 0;
+	virtual void			DLL_GetFileName( const char *baseName, char *dllName, int maxLength ) = 0;
+
+	virtual sysEvent_t		GenerateMouseButtonEvent( int button, bool down ) = 0;
+	virtual sysEvent_t		GenerateMouseMoveEvent( int deltax, int deltay ) = 0;
+
+// RAVEN BEGIN
+	virtual int				MapKey( unsigned long lParam, unsigned short wParam ) = 0;
+	virtual void			AddKeyPress( int key, bool state ) = 0;
+	virtual int				GetNumKeyPresses( void ) = 0;
+	virtual	bool			GetKeyPress( const int n, int &key, bool &state ) = 0;
+
+	virtual void *			CreateWindowEx( const char *className, const char *windowName, int style, int x, int y, int w, int h, void *parent, void *menu, void *instance, void *param, int extStyle = 0 ) = 0;
+	virtual void *			GetDC( void *hWnd ) = 0;
+	virtual	void			ReleaseDC( void *hWnd, void *hDC ) = 0;
+	virtual	void			ShowWindow( void *hWnd, int show ) = 0;
+	virtual	void			UpdateWindow( void *hWnd ) = 0;
+	virtual bool			IsWindowVisible( void *hWnd ) = 0;
+	virtual void			SetForegroundWindow( void *hWnd ) = 0;
+	virtual void			SetFocus( void *hWnd ) = 0;
+	virtual	void			DestroyWindow( void *hWnd ) = 0;
+
+	virtual	void			ShowConsole( int visLevel, bool quitOnClose ) = 0;
+	virtual	void			UpdateConsole( void ) = 0;
+	virtual void			SetConsoleName( const char* consoleName ) = 0;
+	virtual bool			IsAppActive( void ) const = 0;
+	virtual	int				Milliseconds( void ) = 0;
+	virtual void			InitInput( void ) = 0;
+	virtual void			ShutdownInput( void ) = 0;
+	virtual void			GenerateEvents( void ) = 0;
+	virtual void			GrabMouseCursor( bool grabIt ) = 0;
+
+	virtual FILE			*FOpen( const char *name, const char *mode ) = 0;
+	virtual void			FPrintf( FILE *file, const char *fmt ) = 0;
+	virtual int				FTell( FILE *file ) = 0;
+	virtual int				FSeek( FILE *file, long offset, int mode ) = 0;
+	virtual void			FClose( FILE *file ) = 0;
+	virtual int				FRead( void *buffer, int size, int count, FILE *file ) = 0;
+	virtual int				FWrite( void *buffer, int size, int count, FILE *file ) = 0;
+	virtual	long			FileTimeStamp( FILE *file ) = 0;
+	virtual int				FEof( FILE *stream  ) = 0;
+	virtual char			*FGets( char *string, int n, FILE *stream ) = 0;
+	virtual void			FFlush( FILE *f ) = 0;
+	virtual int				SetVBuf( FILE *stream, char *buffer, int mode, size_t size  ) = 0;
+// RAVEN END
+
+	virtual void			OpenURL( const char *url, bool quit ) = 0;
+	virtual void			StartProcess( const char *exePath, bool quit ) = 0;
+
+	virtual int				GetGUID( char *buf, int buflen ) = 0;
+};
+
+extern arcSys *				sys;
+
+// RAVEN BEGIN
+// jnewquist: Scope timing tools
+#if defined(_XENON)
+class ScopeAutoMeasure {
+public:
+	ARC_INLINE ScopeAutoMeasure(const char *name) {
+		mName = name;
+		QueryPerformanceCounter( &mStartTime );
+	}
+	ARC_INLINE ~ScopeAutoMeasure() {
+		LARGE_INTEGER endTime;
+		QueryPerformanceCounter( &endTime );
+		double time = (double)(endTime.QuadPart - mStartTime.QuadPart) / (Sys_ClockTicksPerSecond() * 0.000001);
+		printf( "Time %s: %f us\n", mName, time);
+	}
+protected:
+	LARGE_INTEGER	mStartTime;
+	const char *	mName;
+};
+
+#if defined(TIME_CAPTURE) //&& defined(_PROFILE)
+
+class TimedScope {
+public:
+	ARC_INLINE TimedScope(const char *name) {
+		mName = name;
+		mNext = mFirst;
+		mFirst = this;
+		mTime.QuadPart = 0;
+	}
+	static void ComputeCost() {
+		LARGE_INTEGER TicksPerSecond;
+		QueryPerformanceFrequency( &TicksPerSecond );
+		sTicksPerMicrosecond = (double)TicksPerSecond.QuadPart * 0.000001;
+
+		// get a rough time estimate for the cost of a call to Sys_Milliseconds so that we can remove it from the function costs
+		LARGE_INTEGER before;
+		QueryPerformanceCounter( &before );
+
+		LARGE_INTEGER test;
+		for (int i=0; i<1000000; i++)
+		{
+			QueryPerformanceCounter( &test );
+		}
+		LARGE_INTEGER after;
+		QueryPerformanceCounter( &after );
+
+		__int64 Ticks = after.QuadPart - before.QuadPart;
+		sQueryPerformanceCounterCost.QuadPart = (double)Ticks/1000000.0f;
+	}
+
+	// automatically deducts the cost of the Sys_Milliseconds() call used to gather the timing
+	ARC_INLINE void AddTime(unsigned long long ticks) {
+		// add number of microseconds
+		mTime.QuadPart += (ticks - sQueryPerformanceCounterCost.QuadPart)/sTicksPerMicrosecond;
+	}
+	ARC_INLINE void AddCall() {
+		mCalls++;
+	}
+	ARC_INLINE static void PrintTimes( void ) {
+		if ( !mFirst) {
+			return;
+		}
+		printf( "Start Frame\n" );
+		for (TimedScope* p=mFirst; p; p = p->mNext) {
+			printf( "\t%20s: %d us\t%d calls\t %f us/call\n", p->mName, p->mTime, p->mCalls, (p->mCalls)?(double)p->mTime.QuadPart/(double)p->mCalls:0.0f);
+		}
+		printf( "End Frame\n\n" );
+	}
+	ARC_INLINE static void ClearTimes( void ) {
+		if ( !mFirst) {
+			return;
+		}
+		for (TimedScope* p=mFirst; p; p = p->mNext) {
+			p->mTime.QuadPart = 0;
+		}
+	}
+	ARC_INLINE static void ClearCalls( void ) {
+		if ( !mFirst) {
+			return;
+		}
+		for (TimedScope* p=mFirst; p; p = p->mNext) {
+			p->mCalls = 0;
+		}
+	}
+protected:
+	static TimedScope *		mFirst;
+	TimedScope *			mNext;
+	const char *			mName;
+	LARGE_INTEGER			mTime;
+	unsigned int			mCalls;
+	static LARGE_INTEGER	sQueryPerformanceCounterCost;
+	static double			sTicksPerMicrosecond;
+};
+
+class ScopeAutoTimer {
+public:
+	ARC_INLINE ScopeAutoTimer(TimedScope *scope) {
+		QueryPerformanceCounter( &mStartTime );
+		//mStartTime = Sys_Milliseconds();
+		mScope = scope;
+	}
+	ARC_INLINE ~ScopeAutoTimer() {
+		LARGE_INTEGER endTime;
+		QueryPerformanceCounter( &endTime );
+
+		//unsigned int time = (unsigned int)Sys_Milliseconds() - mStartTime;
+		// pass in number of ticks used and TimedScope will adjust it to a number of microseconds
+		mScope->AddTime(endTime.QuadPart - mStartTime.QuadPart);
+		mScope->AddCall();
+	}
+protected:
+	LARGE_INTEGER	mStartTime;
+	TimedScope *	mScope;
+};
+
+#define TIME_THIS_SCOPE(name) \
+	static TimedScope scopeTime(name); \
+	ScopeAutoTimer autoTimer(&scopeTime)
+#else
+#define TIME_THIS_SCOPE(name)
+#endif
+#endif
+
+#define STRINGIZE_INDIRECT(F, X) F(X)
+#define STRINGIZE(X) #X
+#define __LINESTR__ STRINGIZE_INDIRECT(STRINGIZE, __LINE__)
+#define __FILELINEFUNC__ (__FILE__ " " __LINESTR__ " " __FUNCTION__)
+#define __FUNCLINE__ ( __FUNCTION__ " " __LINESTR__ )
+
+// RAVEN END
+
+#endif /* !__SYS_PUBLIC__ */

@@ -1,0 +1,141 @@
+#ifndef __WINDING2D_H__
+#define __WINDING2D_H__
+
+/*
+===============================================================================
+
+	A 2D winding is an arbitrary convex 2D polygon defined by an array of points.
+
+===============================================================================
+*/
+
+#define	MAX_POINTS_ON_WINDING_2D		16
+
+
+class idWinding2D {
+public:
+					idWinding2D( void );
+
+	idWinding2D &	operator=( const idWinding2D &winding );
+	const arcVec2 &	operator[]( const int index ) const;
+	arcVec2 &		operator[]( const int index );
+
+	void			Clear( void );
+	void			AddPoint( const arcVec2 &point );
+	int				GetNumPoints( void ) const;
+
+	void			Expand( const float d );
+	void			ExpandForAxialBox( const arcVec2 bounds[2] );
+
+					// splits the winding into a front and back winding, the winding itself stays unchanged
+					// returns a SIDE_?
+	int				Split( const arcVec3 &plane, const float epsilon, idWinding2D **front, idWinding2D **back ) const;
+					// cuts off the part at the back side of the plane, returns true if some part was at the front
+					// if there is nothing at the front the number of points is set to zero
+	bool			ClipInPlace( const arcVec3 &plane, const float epsilon = ON_EPSILON, const bool keepOn = false );
+
+	idWinding2D *	Copy( void ) const;
+	idWinding2D *	Reverse( void ) const;
+
+	float			GetArea( void ) const;
+	arcVec2			GetCenter( void ) const;
+	float			GetRadius( const arcVec2 &center ) const;
+	void			GetBounds( arcVec2 bounds[2] ) const;
+
+	bool			IsTiny( void ) const;
+	bool			IsHuge( void ) const;	// base winding for a plane is typically huge
+	void			Print( void ) const;
+
+	float			PlaneDistance( const arcVec3 &plane ) const;
+	int				PlaneSide( const arcVec3 &plane, const float epsilon = ON_EPSILON ) const;
+
+	bool			PointInside( const arcVec2 &point, const float epsilon ) const;
+	bool			LineIntersection( const arcVec2 &start, const arcVec2 &end ) const;
+	bool			RayIntersection( const arcVec2 &start, const arcVec2 &dir, float &scale1, float &scale2, int *edgeNums = NULL ) const;
+
+	static arcVec3	Plane2DFromPoints( const arcVec2 &start, const arcVec2 &end, const bool normalize = false );
+	static arcVec3	Plane2DFromVecs( const arcVec2 &start, const arcVec2 &dir, const bool normalize = false );
+	static bool		Plane2DIntersection( const arcVec3 &plane1, const arcVec3 &plane2, arcVec2 &point );
+
+private:
+	int				numPoints;
+	arcVec2			p[MAX_POINTS_ON_WINDING_2D];
+};
+
+ARC_INLINE idWinding2D::idWinding2D( void ) {
+	numPoints = 0;
+}
+
+ARC_INLINE idWinding2D &idWinding2D::operator=( const idWinding2D &winding ) {
+	int i;
+
+	for ( i = 0; i < winding.numPoints; i++ ) {
+		p[i] = winding.p[i];
+	}
+	numPoints = winding.numPoints;
+	return *this;
+}
+
+ARC_INLINE const arcVec2 &idWinding2D::operator[]( const int index ) const {
+	return p[index];
+}
+
+ARC_INLINE arcVec2 &idWinding2D::operator[]( const int index ) {
+	return p[index];
+}
+
+ARC_INLINE void idWinding2D::Clear( void ) {
+	numPoints = 0;
+}
+
+ARC_INLINE void idWinding2D::AddPoint( const arcVec2 &point ) {
+	p[numPoints++] = point;
+}
+
+ARC_INLINE int idWinding2D::GetNumPoints( void ) const {
+	return numPoints;
+}
+
+ARC_INLINE arcVec3 idWinding2D::Plane2DFromPoints( const arcVec2 &start, const arcVec2 &end, const bool normalize ) {
+	arcVec3 plane;
+	plane.x = start.y - end.y;
+	plane.y = end.x - start.x;
+	if ( normalize ) {
+		plane.ToVec2().Normalize();
+	}
+	plane.z = - ( start.x * plane.x + start.y * plane.y );
+	return plane;
+}
+
+ARC_INLINE arcVec3 idWinding2D::Plane2DFromVecs( const arcVec2 &start, const arcVec2 &dir, const bool normalize ) {
+	arcVec3 plane;
+	plane.x = -dir.y;
+	plane.y = dir.x;
+	if ( normalize ) {
+		plane.ToVec2().Normalize();
+	}
+	plane.z = - ( start.x * plane.x + start.y * plane.y );
+	return plane;
+}
+
+ARC_INLINE bool idWinding2D::Plane2DIntersection( const arcVec3 &plane1, const arcVec3 &plane2, arcVec2 &point ) {
+	float n00, n01, n11, det, invDet, f0, f1;
+
+	n00 = plane1.x * plane1.x + plane1.y * plane1.y;
+	n01 = plane1.x * plane2.x + plane1.y * plane2.y;
+	n11 = plane2.x * plane2.x + plane2.y * plane2.y;
+	det = n00 * n11 - n01 * n01;
+
+	if ( arcMath::Fabs(det) < 1e-6f ) {
+		return false;
+	}
+
+	invDet = 1.0f / det;
+	f0 = ( n01 * plane2.z - n11 * plane1.z ) * invDet;
+	f1 = ( n01 * plane1.z - n00 * plane2.z ) * invDet;
+	point.x = f0 * plane1.x + f1 * plane2.x;
+	point.y = f0 * plane1.y + f1 * plane2.y;
+	return true;
+}
+
+#endif /* !__WINDING2D_H__ */
