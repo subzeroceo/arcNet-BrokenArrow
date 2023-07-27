@@ -16,7 +16,7 @@ typedef struct {
 	float im;
 } cpxFloat_t;
 
-class teCKFFT {
+class anFFT {
 public:
 	static void		FFT1D( cpxFloat_t *data, int N, int ISI, int stride = 1 );
 	static void		FFT2D( cpxFloat_t *data, int N, int ISI );
