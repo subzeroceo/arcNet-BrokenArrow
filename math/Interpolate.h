@@ -778,11 +778,95 @@ ARC_INLINE float anHermiteInterpolator<type>::HermiteAlpha(const float t) const 
 
 //==============================================================================================
 //
+// CatMull-Rom-Spline Interpolation
+// this class wouldnt ever gotten implemented if it wasnt for Cody. Simple
+// and i love interpolation mathematics but i overlooked it. Thanks
+//==============================================================================================
+
+
+class anCatMullROMSpline {
+public:
+					anCatMullROMSpline() { Clear(); }
+	void			Clear();
+
+					// add your nodes, updates apply with adding numNodes.
+					// This avoids having to call nodes.Num() repeatedly.
+					// Otherwise, the nodes/tangent functions are sufficient and fully interpolate Catmull-Rom splines
+	void			AddPoint( const anVec3 &point );
+	anVec3			GetValue( float alpha );
+
+	float			tension;
+	float			continuity;
+	float			bias;			
+	anList<anVec3>	nodes;			// control points
+
+protected:
+	anVec3			GetNode( int i );
+
+					// This implements cubic Catmull-Rom spline interpolation using the incoming
+					// and outgoing tangents.
+	anVec3			IncomingTangent( int i );
+	anVec3			OutgoingTangent( int i );
+};
+
+ARC_INLINE void anCatMullROMSpline::Clear() {
+	tension = continuity = bias = 0.0f;
+	nodes.Clear();
+}
+
+ARC_INLINE void anCatMullROMSpline::AddPoint( const anVec3 &point ) {
+	nodes.Append( point );
+	numNodes++;
+}
+
+ARC_INLINE anVec3 anCatMullROMSpline::GetNode( int i ) {
+	// Clamping has the effect of having duplicate nodes beyond the array boundaries
+	int index = anMath::ClampInt( 0, nodes.Num()-1, i );
+	return nodes[index];
+}
+
+ARC_INLINE anVec3 anCatMullROMSpline::IncomingTangent( int i ) {
+	anVec3 p0 = GetNode( i - 1 );
+	anVec3 p1 = GetNode( i );
+	return ( p1 - p0 ).Normalize();
+}
+
+ARC_INLINE anVec3 anCatMullROMSpline::OutgoingTangent( int i ) {
+	anVec3 p1 = GetNode( i );
+	anVec3 p2 = GetNode( i + 1 );
+	return ( p2 - p1 ).Normalize();
+}
+
+ARC_INLINE anVec3 anCatMullROMSpline::GetValue( float t ) {
+	int p0 = Floor( t );
+	int p1 = p0 + 1;
+	float t = t - ( float )p0;
+
+	anVec3 a = GetNode( p0 );
+	anVec3 b = GetNode( p1 );
+
+	anVec3 tangent0 = IncomingTangent( p0 );
+	anVec3 tangent1 = OutgoingTangent( p1 );
+
+	anVec3 result = a * ( 2 * t * t * t - 3 * t * t + 1 ) + 
+					b * ( -2 * t * t * t + 3 * t * t ) +
+			tangent0 * ( t * t * t - 2 * t * t + t ) +
+			tangent1 * ( t * t * t - t * t );
+
+  return result;
+}
+
+
+
+//==============================================================================================
+//
 // TCB Spline Interpolation
 //
 // Defines a Kochanek-Bartels spline, in short a Hermite spline with formulae to calculate the tangents
 // Requires extra points at the ends, try duplicating first and last
 //==============================================================================================
+
+
 class anTCBSpline {
 	//TODO: Make a template like the others so it can handle something other than vec3 types
 public:
