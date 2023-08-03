@@ -422,13 +422,13 @@ static void vorbis_encode_noisebias_setup(vorbis_info *vi,double s,int block,
   p->noisewindowhimin=guard[block].hi;
   p->noisewindowfixed=guard[block].fixed;
 
-  for (j = 0;j<P_NOISECURVES;j++ )
+  for ( j = 0;j<P_NOISECURVES;j++ )
     for ( i=0;i<P_BANDS;i++ )
       p->noiseoff[j][i]=in[is].data[j][i]*(1.-ds)+in[is+1].data[j][i]*ds;
 
   /* impulse blocks may take a user specified bias to boost the
      nominal/high noise encoding depth */
-  for (j = 0;j<P_NOISECURVES;j++ ){
+  for ( j = 0;j<P_NOISECURVES;j++ ){
     float min=p->noiseoff[j][0]+6; /* the lowest it can go */
     for ( i=0;i<P_BANDS;i++ ){
       p->noiseoff[j][i]+=userbias;
@@ -478,12 +478,12 @@ static void vorbis_encode_residue_setup(vorbis_info *vi,
   int i,n;
 
   vorbis_info_residue0 *r=ci->residue_param[number]=
-    _ogg_malloc(sizeof(*r) );
+    _ogg_malloc( sizeof(*r) );
 
   memcpy(r,res->res,sizeof(*r) );
   if (ci->residues<=number)ci->residues=number+1;
 
-  switch(ci->blocksizes[block] ){
+  switch (ci->blocksizes[block] ){
   case 64:case 128:case 256:
     r->grouping=16;
     break;
@@ -604,7 +604,7 @@ static void vorbis_encode_map_n_res_setup(vorbis_info *vi,double s,
     memcpy(ci->map_param[i],map+i,sizeof(*map) );
     if ( i>=ci->maps)ci->maps=i+1;
 
-    for (j = 0;j<map[i].submaps;j++ )
+    for ( j = 0;j<map[i].submaps;j++ )
       vorbis_encode_residue_setup(vi,map[i].residuesubmap[j],i
 				  ,res+map[i].residuesubmap[j] );
   }
@@ -619,7 +619,7 @@ static double setting_to_approx_bitrate(vorbis_info *vi){
   int ch=vi->channels;
   double *r=setup->rate_mapping;
 
-  if (r==NULL)
+  if (r== nullptr )
     return(-1 );
 
   return((r[is]*(1.-ds)+r[is+1]*ds)*ch);
@@ -633,10 +633,10 @@ static void get_setup_template(vorbis_info *vi,
   highlevel_encode_setup *hi=&ci->hi;
   if (q_or_bitrate)req/=ch;
 
-  while(setup_list[i] ){
-    if (setup_list[i]->coupling_restriction==-1 ||
+  while( setup_list[i] ){
+    if ( setup_list[i]->coupling_restriction==-1 ||
        setup_list[i]->coupling_restriction==ch){
-      if (srate>=setup_list[i]->samplerate_min_restriction &&
+      if ( srate>=setup_list[i]->samplerate_min_restriction &&
 	 srate<=setup_list[i]->samplerate_max_restriction){
 	int mappings=setup_list[i]->mappings;
 	double *map=(q_or_bitrate?
@@ -647,7 +647,7 @@ static void get_setup_template(vorbis_info *vi,
 	   fall within this template's modes? */
 	if (req<map[0] ){++i;continue;}
 	if (req>map[setup_list[i]->mappings] ){++i;continue;}
-	for (j = 0;j<mappings;j++ )
+	for ( j = 0;j<mappings;j++ )
 	  if (req>=map[j] && req<map[j+1] )break;
 	/* an all-points match */
 	hi->setup=setup_list[i];
@@ -665,7 +665,7 @@ static void get_setup_template(vorbis_info *vi,
     i++;
   }
 
-  hi->setup=NULL;
+  hi->setup=nullptr;
 }
 
 /* encoders will need to use vorbis_info_init beforehand and call
@@ -678,10 +678,10 @@ static void get_setup_template(vorbis_info *vi,
 int vorbis_encode_setup_init(vorbis_info *vi){
   int i0=0,singleblock=0;
   codec_setup_info *ci=vi->codec_setup;
-  ve_setup_data_template *setup=NULL;
+  ve_setup_data_template *setup=nullptr;
   highlevel_encode_setup *hi=&ci->hi;
 
-  if (ci==NULL)return(OV_EINVAL);
+  if (ci== nullptr )return(OV_EINVAL);
   if ( !hi->impulse_block_p)i0=1;
 
   /* too low/high an ATH floater is nonsensical, but doesn't break anything */
@@ -696,7 +696,7 @@ int vorbis_encode_setup_init(vorbis_info *vi){
   /* get the appropriate setup template; matches the fetch in previous
      stages */
   setup=(ve_setup_data_template *)hi->setup;
-  if (setup==NULL)return(OV_EINVAL);
+  if ( setup== nullptr )return(OV_EINVAL);
 
   hi->set_in_stone=1;
   /* choose block sizes from configured sizes as well as paying
@@ -1009,14 +1009,14 @@ int vorbis_encode_ctl(vorbis_info *vi,int number,void *arg){
     highlevel_encode_setup *hi=&ci->hi;
     int setp=(number&0xf); /* a read request has a low nibble of 0 */
 
-    if (setp && hi->set_in_stone)return(OV_EINVAL);
+    if ( setp && hi->set_in_stone)return(OV_EINVAL);
 
-    switch(number){
+    switch (number){
     case OV_ECTL_RATEMANAGE_GET:
       {
 
 	struct ovectl_ratemanage_arg *ai=
-	  (struct ovectl_ratemanage_arg *)arg;
+	  ( struct ovectl_ratemanage_arg *)arg;
 
 	ai->management_active=hi->managed;
 	ai->bitrate_av_window=hi->bitrate_av_window;
@@ -1033,8 +1033,8 @@ int vorbis_encode_ctl(vorbis_info *vi,int number,void *arg){
     case OV_ECTL_RATEMANAGE_SET:
       {
 	struct ovectl_ratemanage_arg *ai=
-	  (struct ovectl_ratemanage_arg *)arg;
-	if (ai==NULL){
+	  ( struct ovectl_ratemanage_arg *)arg;
+	if (ai== nullptr ){
 	  hi->managed=0;
 	} else{
 	  hi->managed=ai->management_active;
@@ -1047,8 +1047,8 @@ int vorbis_encode_ctl(vorbis_info *vi,int number,void *arg){
     case OV_ECTL_RATEMANAGE_AVG:
       {
 	struct ovectl_ratemanage_arg *ai=
-	  (struct ovectl_ratemanage_arg *)arg;
-	if (ai==NULL){
+	  ( struct ovectl_ratemanage_arg *)arg;
+	if (ai== nullptr ){
 	  hi->bitrate_av_lo=0;
 	  hi->bitrate_av_hi=0;
 	  hi->bitrate_av_window=0;
@@ -1074,8 +1074,8 @@ int vorbis_encode_ctl(vorbis_info *vi,int number,void *arg){
     case OV_ECTL_RATEMANAGE_HARD:
       {
 	struct ovectl_ratemanage_arg *ai=
-	  (struct ovectl_ratemanage_arg *)arg;
-	if (ai==NULL){
+	  ( struct ovectl_ratemanage_arg *)arg;
+	if (ai== nullptr ){
 	  hi->bitrate_min=0;
 	  hi->bitrate_max=0;
 	  hi->bitrate_limit_window=0;

@@ -57,8 +57,8 @@ static float unitnorm(float x){
 
 #define FABS(x) fabs(*(x) )
 
-#define todB(x)   (*(x)==0?-400.f:log(*(x)**(x) )*4.34294480f)
-#define todB_nn(x)   (*(x)==0.f?-400.f:log(*(x) )*8.6858896f)
+#define todB(x)   (*(x) == 0?-400.f:log(*(x)**(x) )*4.34294480f)
+#define todB_nn(x)   (*(x) == 0.f?-400.f:log(*(x) )*8.6858896f)
 
 #endif
 

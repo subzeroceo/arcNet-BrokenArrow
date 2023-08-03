@@ -64,7 +64,7 @@
       requires strm->avail_out >= 258 for each loop to avoid checking for
       output space.
  */
-void inflate_fast(strm, start)
+void inflate_fast( strm, start)
 z_streamp strm;
 unsigned start;         /* inflate()'s starting value for strm->avail_out */
 {
@@ -95,12 +95,12 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
     unsigned char FAR *from;    /* where to copy match from */
 
     /* copy state to local variables */
-    state = (struct inflate_state FAR *)strm->state;
+    state = ( struct inflate_state FAR *)strm->state;
     in = strm->next_in - OFF;
-    last = in + (strm->avail_in - 5);
+    last = in + ( strm->avail_in - 5);
     out = strm->next_out - OFF;
-    beg = out - (start - strm->avail_out);
-    end = out + (strm->avail_out - 257);
+    beg = out - ( start - strm->avail_out);
+    end = out + ( strm->avail_out - 257);
 #ifdef INFLATE_STRICT
     dmax = state->dmax;
 #endif
@@ -131,7 +131,7 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
         bits -= op;
         op = (unsigned)(this.op);
         if (op == 0 ) {                          /* literal */
-            Tracevv((stderr, this.val >= 0x20 && this.val < 0x7f ?
+            Tracevv(( stderr, this.val >= 0x20 && this.val < 0x7f ?
                     "inflate:         literal '%c'\n" :
                     "inflate:         literal 0x%02x\n", this.val) );
             PUP(out) = (unsigned char)(this.val);
@@ -148,7 +148,7 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
                 hold >>= op;
                 bits -= op;
             }
-            Tracevv((stderr, "inflate:         length %u\n", len) );
+            Tracevv(( stderr, "inflate:         length %u\n", len) );
             if (bits < 15) {
                 hold += (unsigned long)(PUP(in) ) << bits;
                 bits += 8;
@@ -182,7 +182,7 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
 #endif
                 hold >>= op;
                 bits -= op;
-                Tracevv((stderr, "inflate:         distance %u\n", dist) );
+                Tracevv(( stderr, "inflate:         distance %u\n", dist) );
                 op = (unsigned)(out - beg);     /* max distance in output */
                 if (dist > op) {                /* see if copy from window */
                     op = dist - op;             /* distance back in window */
@@ -273,7 +273,7 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
             goto dolen;
         }
         else if (op & 32) {                     /* end-of-block */
-            Tracevv((stderr, "inflate:         end of block\n" ) );
+            Tracevv(( stderr, "inflate:         end of block\n" ) );
             state->mode = TYPE;
             break;
         }

@@ -284,16 +284,16 @@ int vorbis_bitrate_addblock(vorbis_block *vb){
 
 	slew=(new-bm->avgfloat)/samples*vi->rate;
 
-	if (slew<bi->avgfloat_downslew_max)
+	if ( slew<bi->avgfloat_downslew_max)
 	  new=bm->avgfloat+bi->avgfloat_downslew_max/vi->rate*samples;
-	if (slew>bi->avgfloat_upslew_max)
+	if ( slew>bi->avgfloat_upslew_max)
 	  new=bm->avgfloat+bi->avgfloat_upslew_max/vi->rate*samples;
 
 	bm->avgfloat=new;
 	/* apply the average floater to new blocks */
 	bin=rint(bm->avgfloat);
 
-	/*fprintf(stderr,"%d ",bin);*/
+	/*fprintf( stderr,"%d ",bin);*/
 
 	while(bm->avg_centeracc>desired_center){
 	  samples=ci->blocksizes[bm->queue_actual[bm->avg_center]&
@@ -409,15 +409,15 @@ int vorbis_bitrate_addblock(vorbis_block *vb){
 	/* update bit counter with new limit and replace any stack
            limits that have been replaced by our new lower limit */
 	stackctr=bm->minmax_stackptr;
-	while(stackctr>newstack){
+	while( stackctr>newstack){
 	  bm->minmax_acctotal-=
-	    LIMITBYTES(stackctr,bm->minmax_limitstack[stackctr] );
-	  bm->minmax_acctotal+=LIMITBYTES(stackctr,limit);
+	    LIMITBYTES( stackctr,bm->minmax_limitstack[stackctr] );
+	  bm->minmax_acctotal+=LIMITBYTES( stackctr,limit);
 
-	  if (stackctr<bm->minmax_stackptr)
+	  if ( stackctr<bm->minmax_stackptr)
 	    for ( i=0;i<bins*2;i++ )
 	      bm->minmax_binstack[stackctr*bins*2+i]+=
-		bm->minmax_binstack[(stackctr+1 )*bins*2+i];
+		bm->minmax_binstack[( stackctr+1 )*bins*2+i];
 
 	  stackctr--;
 	}

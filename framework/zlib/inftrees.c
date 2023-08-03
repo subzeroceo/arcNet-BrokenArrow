@@ -106,7 +106,7 @@ unsigned short FAR *work;
     /* accumulate lengths for codes (assumes lens[] all in 0..MAXBITS) */
     for (len = 0; len <= MAXBITS; len++ )
         count[len] = 0;
-    for (sym = 0; sym < codes; sym++ )
+    for ( sym = 0; sym < codes; sym++ )
         count[lens[sym]]++;
 
     /* bound code lengths, force root to be within code lengths */
@@ -143,7 +143,7 @@ unsigned short FAR *work;
         offs[len + 1] = offs[len] + count[len];
 
     /* sort symbols by length, by symbol order within each length */
-    for (sym = 0; sym < codes; sym++ )
+    for ( sym = 0; sym < codes; sym++ )
         if (lens[sym] != 0 ) work[offs[lens[sym]]++] = (unsigned short)sym;
 
     /*

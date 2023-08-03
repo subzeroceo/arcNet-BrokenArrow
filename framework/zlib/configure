@@ -11,7 +11,7 @@
 # To impose specific compiler or flags or install directory, use for example:
 #    prefix=$HOME CC=cc CFLAGS="-O4" ./configure
 # or for csh/tcsh users:
-#    (setenv prefix $HOME; setenv CC cc; setenv CFLAGS "-O4"; ./configure)
+#    ( setenv prefix $HOME; setenv CC cc; setenv CFLAGS "-O4"; ./configure)
 # LDSHARED is the command to be used to create a shared library
 
 # Incorrect settings of CC or CFLAGS may prevent creating a shared library.

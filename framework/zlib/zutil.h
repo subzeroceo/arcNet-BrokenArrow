@@ -50,13 +50,13 @@ typedef unsigned short ush;
 typedef ush FAR ushf;
 typedef unsigned long  ulg;
 
-extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
-/* (size given to avoid silly warnings with Visual C++ ) */
+extern const char *const z_errmsg[10]; /* indexed by 2-zlib_error */
+/* ( size given to avoid silly warnings with Visual C++ ) */
 
-#define ERR_MSG(err) z_errmsg[Z_NEED_DICT-(err)]
+#define ERR_MSG( err) z_errmsg[Z_NEED_DICT-( err)]
 
-#define ERR_RETURN(strm,err) \
-  return (strm->msg = (char*)ERR_MSG(err), (err) )
+#define ERR_RETURN( strm,err) \
+  return ( strm->msg = (char*)ERR_MSG( err), ( err) )
 /* To be used only when the state is known to be valid */
 
         /* common constants */
@@ -128,7 +128,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #    include <unix.h> /* for fdopen */
 #  else
 #    ifndef fdopen
-#      define fdopen(fd,mode) NULL /* No fdopen() */
+#      define fdopen(fd,mode) nullptr /* No fdopen() */
 #    endif
 #  endif
 #endif
@@ -148,12 +148,12 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #endif
 
 #if defined(_BEOS_) || defined(RISCOS)
-#  define fdopen(fd,mode) NULL /* No fdopen() */
+#  define fdopen(fd,mode) nullptr /* No fdopen() */
 #endif
 
 #if (defined(_MSC_VER) && (_MSC_VER > 600) )
 #  if defined(_WIN32_WCE)
-#    define fdopen(fd,mode) NULL /* No fdopen() */
+#    define fdopen(fd,mode) nullptr /* No fdopen() */
 #    ifndef _PTRDIFF_T_DEFINED
        typedef int ptrdiff_t;
 #      define _PTRDIFF_T_DEFINED
@@ -261,9 +261,9 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 voidpf zcalloc OF((voidpf opaque, unsigned items, unsigned size) );
 void   zcfree  OF((voidpf opaque, voidpf ptr) );
 
-#define ZALLOC(strm, items, size) \
-           (*((strm)->zalloc) )((strm)->opaque, (items), (size) )
-#define ZFREE(strm, addr)  (*((strm)->zfree) )((strm)->opaque, (voidpf)(addr) )
-#define TRY_FREE(s, p) {if (p) ZFREE(s, p);}
+#define ZALLOC( strm, items, size) \
+           (*(( strm)->zalloc) )(( strm)->opaque, (items), ( size) )
+#define ZFREE( strm, addr)  (*(( strm)->zfree) )(( strm)->opaque, (voidpf)(addr) )
+#define TRY_FREE( s, p) {if (p) ZFREE( s, p);}
 
 #endif /* ZUTIL_H */

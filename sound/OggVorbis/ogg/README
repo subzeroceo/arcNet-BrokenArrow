@@ -56,7 +56,7 @@ and as root if desired :
 
 make install
 
-This will install the Ogg libraries (static and shared) into
+This will install the Ogg libraries ( static and shared) into
 /usr/local/lib, includes into /usr/local/include and API manpages
 (once we write some) into /usr/local/man.
 

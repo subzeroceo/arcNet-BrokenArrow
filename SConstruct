@@ -281,16 +281,16 @@ if ( int( JOBS ) > 1 ):
 # 0 for monolithic build
 localEngineDLL = 1
 # carry around rather than using .a, avoids binutils bugs
-idLibObjects = []
+anLibObjects = []
 engineObjects = []
 # curl usage. there is a global toggle flag
 local_curl = 0
 curl_lib = []
-# if arcLibrary should produce PIC objects ( depending on core or game inclusion )
+# if anLibrary should produce PIC objects ( depending on core or game inclusion )
 localLibPic = 0
 # switch between base game build and d3xp game build
 
-GLOBALS = 'g_env g_env_noopt g_os ID_MCHECK ALSA idLibObjects localLibPic curl_lib local_curl OPTCPPFLAGS'
+GLOBALS = 'g_env g_env_noopt g_os ID_MCHECK ALSA anLibObjects localLibPic curl_lib local_curl OPTCPPFLAGS'
 
 Export( 'GLOBALS ' + GLOBALS )
 
@@ -314,8 +314,8 @@ if ( TARGET_CORE == '1' ):
 		VariantDir( g_build + '/core/glimp', '.', duplicate = 1 )
 		SConscript( g_build + '/core/glimp/sys/scons/SConscript.gl' )
 		VariantDir( g_build + '/core', '.', duplicate = 0 )
-		idLibObjects = SConscript( g_build + '/core/sys/scons/SConscript.arcLibrary' )
-		Export( 'GLOBALS ' + GLOBALS ) # update idLibObjects
+		anLibObjects = SConscript( g_build + '/core/sys/scons/SConscript.anLibrary' )
+		Export( 'GLOBALS ' + GLOBALS ) # update anLibObjects
 		engine = SConscript( g_build + '/core/sys/scons/SConscript.core' )
 
 		InstallAs( '#engine.' + cpu, engine )
@@ -326,7 +326,7 @@ if ( TARGET_MONO == '1' ):
 	VariantDir( g_build + '/mono/glimp', '.', duplicate = 1 )
 	SConscript( g_build + '/mono/glimp/sys/scons/SConscript.gl' )
 	VariantDir( g_build + '/mono', '.', duplicate = 0 )
-	idLibObjects = SConscript( g_build + '/mono/sys/scons/SConscript.arcLibrary' )
+	anLibObjects = SConscript( g_build + '/mono/sys/scons/SConscript.anLibrary' )
 	engineObjects = SConscript( g_build + '/mono/sys/scons/SConscript.game' )
 	Export( 'GLOBALS ' + GLOBALS )
 	engineMono = SConscript( g_build + '/mono/sys/scons/SConscript.core' )

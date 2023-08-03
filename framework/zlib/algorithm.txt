@@ -180,7 +180,7 @@ bits long:
 
 So what we have here are three tables with a total of 20 entries that had to
 be constructed.  That's compared to 64 entries for a single table.  Or
-compared to 16 entries for a Huffman tree (six two entry tables and one four
+compared to 16 entries for a Huffman tree ( six two entry tables and one four
 entry table).  Assuming that the code ideally represents the probability of
 the symbols, it takes on the average 1.25 lookups per symbol.  That's compared
 to one lookup for the single table, or 1.66 lookups per symbol for the

@@ -51,9 +51,9 @@ static static_codebook _16u0__p1_0 = {
 	_vq_lengthlist__16u0__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__16u0__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -92,9 +92,9 @@ static static_codebook _16u0__p2_0 = {
 	_vq_lengthlist__16u0__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__16u0__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -169,9 +169,9 @@ static static_codebook _16u0__p3_0 = {
 	_vq_lengthlist__16u0__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16u0__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -246,9 +246,9 @@ static static_codebook _16u0__p4_0 = {
 	_vq_lengthlist__16u0__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16u0__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -294,9 +294,9 @@ static static_codebook _16u0__p5_0 = {
 	_vq_lengthlist__16u0__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__16u0__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -352,9 +352,9 @@ static static_codebook _16u0__p6_0 = {
 	_vq_lengthlist__16u0__p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__16u0__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -391,9 +391,9 @@ static static_codebook _16u0__p6_1 = {
 	_vq_lengthlist__16u0__p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16u0__p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -432,9 +432,9 @@ static static_codebook _16u0__p7_0 = {
 	_vq_lengthlist__16u0__p7_0,
 	1, -518803456, 1628680192, 2, 0,
 	_vq_quantlist__16u0__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -496,9 +496,9 @@ static static_codebook _16u0__p7_1 = {
 	_vq_lengthlist__16u0__p7_1,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__16u0__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -581,9 +581,9 @@ static static_codebook _16u0__p7_2 = {
 	_vq_lengthlist__16u0__p7_2,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__16u0__p7_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u0__p7_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -598,10 +598,10 @@ static static_codebook _huff_book__16u0__single = {
 	2, 64,
 	_huff_lengthlist__16u0__single,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -619,10 +619,10 @@ static static_codebook _huff_book__16u1__long = {
 	2, 100,
 	_huff_lengthlist__16u1__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -661,9 +661,9 @@ static static_codebook _16u1__p1_0 = {
 	_vq_lengthlist__16u1__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__16u1__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -702,9 +702,9 @@ static static_codebook _16u1__p2_0 = {
 	_vq_lengthlist__16u1__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__16u1__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -779,9 +779,9 @@ static static_codebook _16u1__p3_0 = {
 	_vq_lengthlist__16u1__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16u1__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -856,9 +856,9 @@ static static_codebook _16u1__p4_0 = {
 	_vq_lengthlist__16u1__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16u1__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -904,9 +904,9 @@ static static_codebook _16u1__p5_0 = {
 	_vq_lengthlist__16u1__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__16u1__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -952,9 +952,9 @@ static static_codebook _16u1__p6_0 = {
 	_vq_lengthlist__16u1__p6_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__16u1__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -993,9 +993,9 @@ static static_codebook _16u1__p7_0 = {
 	_vq_lengthlist__16u1__p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__16u1__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1046,9 +1046,9 @@ static static_codebook _16u1__p7_1 = {
 	_vq_lengthlist__16u1__p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__16u1__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1099,9 +1099,9 @@ static static_codebook _16u1__p8_0 = {
 	_vq_lengthlist__16u1__p8_0,
 	1, -524582912, 1618345984, 4, 0,
 	_vq_quantlist__16u1__p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1152,9 +1152,9 @@ static static_codebook _16u1__p8_1 = {
 	_vq_lengthlist__16u1__p8_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__16u1__p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1216,9 +1216,9 @@ static static_codebook _16u1__p9_0 = {
 	_vq_lengthlist__16u1__p9_0,
 	1, -514071552, 1627381760, 4, 0,
 	_vq_quantlist__16u1__p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1280,9 +1280,9 @@ static static_codebook _16u1__p9_1 = {
 	_vq_lengthlist__16u1__p9_1,
 	1, -522338304, 1620115456, 4, 0,
 	_vq_quantlist__16u1__p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1351,9 +1351,9 @@ static static_codebook _16u1__p9_2 = {
 	_vq_lengthlist__16u1__p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__16u1__p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u1__p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1371,10 +1371,10 @@ static static_codebook _huff_book__16u1__short = {
 	2, 100,
 	_huff_lengthlist__16u1__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -1392,10 +1392,10 @@ static static_codebook _huff_book__16u2__long = {
 	2, 100,
 	_huff_lengthlist__16u2__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -1413,10 +1413,10 @@ static static_codebook _huff_book__16u2__short = {
 	2, 100,
 	_huff_lengthlist__16u2__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -1455,9 +1455,9 @@ static static_codebook _16u2_p1_0 = {
 	_vq_lengthlist__16u2_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__16u2_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1532,9 +1532,9 @@ static static_codebook _16u2_p2_0 = {
 	_vq_lengthlist__16u2_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16u2_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1580,9 +1580,9 @@ static static_codebook _16u2_p3_0 = {
 	_vq_lengthlist__16u2_p3_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__16u2_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1651,9 +1651,9 @@ static static_codebook _16u2_p4_0 = {
 	_vq_lengthlist__16u2_p4_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__16u2_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1692,9 +1692,9 @@ static static_codebook _16u2_p5_0 = {
 	_vq_lengthlist__16u2_p5_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__16u2_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1745,9 +1745,9 @@ static static_codebook _16u2_p5_1 = {
 	_vq_lengthlist__16u2_p5_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__16u2_p5_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p5_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1803,9 +1803,9 @@ static static_codebook _16u2_p6_0 = {
 	_vq_lengthlist__16u2_p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__16u2_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1842,9 +1842,9 @@ static static_codebook _16u2_p6_1 = {
 	_vq_lengthlist__16u2_p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16u2_p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1900,9 +1900,9 @@ static static_codebook _16u2_p7_0 = {
 	_vq_lengthlist__16u2_p7_0,
 	1, -523206656, 1618345984, 4, 0,
 	_vq_quantlist__16u2_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1953,9 +1953,9 @@ static static_codebook _16u2_p7_1 = {
 	_vq_lengthlist__16u2_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__16u2_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2017,9 +2017,9 @@ static static_codebook _16u2_p8_0 = {
 	_vq_lengthlist__16u2_p8_0,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__16u2_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2102,9 +2102,9 @@ static static_codebook _16u2_p8_1 = {
 	_vq_lengthlist__16u2_p8_1,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__16u2_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2166,9 +2166,9 @@ static static_codebook _16u2_p9_0 = {
 	_vq_lengthlist__16u2_p9_0,
 	1, -510275072, 1611661312, 14, 0,
 	_vq_quantlist__16u2_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2244,9 +2244,9 @@ static static_codebook _16u2_p9_1 = {
 	_vq_lengthlist__16u2_p9_1,
 	1, -518488064, 1611661312, 10, 0,
 	_vq_quantlist__16u2_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2340,9 +2340,9 @@ static static_codebook _16u2_p9_2 = {
 	_vq_lengthlist__16u2_p9_2,
 	1, -526909440, 1611661312, 6, 0,
 	_vq_quantlist__16u2_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__16u2_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2357,10 +2357,10 @@ static static_codebook _huff_book__44u0__long = {
 	2, 64,
 	_huff_lengthlist__44u0__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -2399,9 +2399,9 @@ static static_codebook _44u0__p1_0 = {
 	_vq_lengthlist__44u0__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u0__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2440,9 +2440,9 @@ static static_codebook _44u0__p2_0 = {
 	_vq_lengthlist__44u0__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u0__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2517,9 +2517,9 @@ static static_codebook _44u0__p3_0 = {
 	_vq_lengthlist__44u0__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u0__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2594,9 +2594,9 @@ static static_codebook _44u0__p4_0 = {
 	_vq_lengthlist__44u0__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u0__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2642,9 +2642,9 @@ static static_codebook _44u0__p5_0 = {
 	_vq_lengthlist__44u0__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u0__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2700,9 +2700,9 @@ static static_codebook _44u0__p6_0 = {
 	_vq_lengthlist__44u0__p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44u0__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2739,9 +2739,9 @@ static static_codebook _44u0__p6_1 = {
 	_vq_lengthlist__44u0__p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u0__p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2816,9 +2816,9 @@ static static_codebook _44u0__p7_0 = {
 	_vq_lengthlist__44u0__p7_0,
 	1, -518709248, 1626677248, 3, 0,
 	_vq_quantlist__44u0__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2874,9 +2874,9 @@ static static_codebook _44u0__p7_1 = {
 	_vq_lengthlist__44u0__p7_1,
 	1, -523010048, 1618608128, 4, 0,
 	_vq_quantlist__44u0__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2932,9 +2932,9 @@ static static_codebook _44u0__p7_2 = {
 	_vq_lengthlist__44u0__p7_2,
 	1, -531103744, 1611661312, 4, 0,
 	_vq_quantlist__44u0__p7_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u0__p7_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2949,10 +2949,10 @@ static static_codebook _huff_book__44u0__short = {
 	2, 64,
 	_huff_lengthlist__44u0__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -2967,10 +2967,10 @@ static static_codebook _huff_book__44u1__long = {
 	2, 64,
 	_huff_lengthlist__44u1__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -3009,9 +3009,9 @@ static static_codebook _44u1__p1_0 = {
 	_vq_lengthlist__44u1__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u1__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3050,9 +3050,9 @@ static static_codebook _44u1__p2_0 = {
 	_vq_lengthlist__44u1__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u1__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3127,9 +3127,9 @@ static static_codebook _44u1__p3_0 = {
 	_vq_lengthlist__44u1__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u1__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3204,9 +3204,9 @@ static static_codebook _44u1__p4_0 = {
 	_vq_lengthlist__44u1__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u1__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3252,9 +3252,9 @@ static static_codebook _44u1__p5_0 = {
 	_vq_lengthlist__44u1__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u1__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3310,9 +3310,9 @@ static static_codebook _44u1__p6_0 = {
 	_vq_lengthlist__44u1__p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44u1__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3349,9 +3349,9 @@ static static_codebook _44u1__p6_1 = {
 	_vq_lengthlist__44u1__p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u1__p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3392,9 +3392,9 @@ static static_codebook _44u1__p7_0 = {
 	_vq_lengthlist__44u1__p7_0,
 	1, -518017024, 1626677248, 3, 0,
 	_vq_quantlist__44u1__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3450,9 +3450,9 @@ static static_codebook _44u1__p7_1 = {
 	_vq_lengthlist__44u1__p7_1,
 	1, -523010048, 1618608128, 4, 0,
 	_vq_quantlist__44u1__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3508,9 +3508,9 @@ static static_codebook _44u1__p7_2 = {
 	_vq_lengthlist__44u1__p7_2,
 	1, -531103744, 1611661312, 4, 0,
 	_vq_quantlist__44u1__p7_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u1__p7_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3525,10 +3525,10 @@ static static_codebook _huff_book__44u1__short = {
 	2, 64,
 	_huff_lengthlist__44u1__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -3543,10 +3543,10 @@ static static_codebook _huff_book__44u2__long = {
 	2, 64,
 	_huff_lengthlist__44u2__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -3585,9 +3585,9 @@ static static_codebook _44u2__p1_0 = {
 	_vq_lengthlist__44u2__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u2__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3626,9 +3626,9 @@ static static_codebook _44u2__p2_0 = {
 	_vq_lengthlist__44u2__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u2__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3703,9 +3703,9 @@ static static_codebook _44u2__p3_0 = {
 	_vq_lengthlist__44u2__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u2__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3780,9 +3780,9 @@ static static_codebook _44u2__p4_0 = {
 	_vq_lengthlist__44u2__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u2__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3828,9 +3828,9 @@ static static_codebook _44u2__p5_0 = {
 	_vq_lengthlist__44u2__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u2__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3886,9 +3886,9 @@ static static_codebook _44u2__p6_0 = {
 	_vq_lengthlist__44u2__p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44u2__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3925,9 +3925,9 @@ static static_codebook _44u2__p6_1 = {
 	_vq_lengthlist__44u2__p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u2__p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3973,9 +3973,9 @@ static static_codebook _44u2__p7_0 = {
 	_vq_lengthlist__44u2__p7_0,
 	1, -516612096, 1626677248, 4, 0,
 	_vq_quantlist__44u2__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4031,9 +4031,9 @@ static static_codebook _44u2__p7_1 = {
 	_vq_lengthlist__44u2__p7_1,
 	1, -523010048, 1618608128, 4, 0,
 	_vq_quantlist__44u2__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4089,9 +4089,9 @@ static static_codebook _44u2__p7_2 = {
 	_vq_lengthlist__44u2__p7_2,
 	1, -531103744, 1611661312, 4, 0,
 	_vq_quantlist__44u2__p7_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u2__p7_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4106,10 +4106,10 @@ static static_codebook _huff_book__44u2__short = {
 	2, 64,
 	_huff_lengthlist__44u2__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -4124,10 +4124,10 @@ static static_codebook _huff_book__44u3__long = {
 	2, 64,
 	_huff_lengthlist__44u3__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -4166,9 +4166,9 @@ static static_codebook _44u3__p1_0 = {
 	_vq_lengthlist__44u3__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u3__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4207,9 +4207,9 @@ static static_codebook _44u3__p2_0 = {
 	_vq_lengthlist__44u3__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u3__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4284,9 +4284,9 @@ static static_codebook _44u3__p3_0 = {
 	_vq_lengthlist__44u3__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u3__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4361,9 +4361,9 @@ static static_codebook _44u3__p4_0 = {
 	_vq_lengthlist__44u3__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u3__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4409,9 +4409,9 @@ static static_codebook _44u3__p5_0 = {
 	_vq_lengthlist__44u3__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u3__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4467,9 +4467,9 @@ static static_codebook _44u3__p6_0 = {
 	_vq_lengthlist__44u3__p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44u3__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4506,9 +4506,9 @@ static static_codebook _44u3__p6_1 = {
 	_vq_lengthlist__44u3__p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u3__p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4554,9 +4554,9 @@ static static_codebook _44u3__p7_0 = {
 	_vq_lengthlist__44u3__p7_0,
 	1, -515907584, 1627381760, 4, 0,
 	_vq_quantlist__44u3__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4618,9 +4618,9 @@ static static_codebook _44u3__p7_1 = {
 	_vq_lengthlist__44u3__p7_1,
 	1, -522338304, 1620115456, 4, 0,
 	_vq_quantlist__44u3__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4689,9 +4689,9 @@ static static_codebook _44u3__p7_2 = {
 	_vq_lengthlist__44u3__p7_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44u3__p7_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u3__p7_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4706,10 +4706,10 @@ static static_codebook _huff_book__44u3__short = {
 	2, 64,
 	_huff_lengthlist__44u3__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -4724,10 +4724,10 @@ static static_codebook _huff_book__44u4__long = {
 	2, 64,
 	_huff_lengthlist__44u4__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -4766,9 +4766,9 @@ static static_codebook _44u4__p1_0 = {
 	_vq_lengthlist__44u4__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u4__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4807,9 +4807,9 @@ static static_codebook _44u4__p2_0 = {
 	_vq_lengthlist__44u4__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u4__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4884,9 +4884,9 @@ static static_codebook _44u4__p3_0 = {
 	_vq_lengthlist__44u4__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u4__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4961,9 +4961,9 @@ static static_codebook _44u4__p4_0 = {
 	_vq_lengthlist__44u4__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u4__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5009,9 +5009,9 @@ static static_codebook _44u4__p5_0 = {
 	_vq_lengthlist__44u4__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u4__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5067,9 +5067,9 @@ static static_codebook _44u4__p6_0 = {
 	_vq_lengthlist__44u4__p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44u4__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5106,9 +5106,9 @@ static static_codebook _44u4__p6_1 = {
 	_vq_lengthlist__44u4__p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u4__p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5164,9 +5164,9 @@ static static_codebook _44u4__p7_0 = {
 	_vq_lengthlist__44u4__p7_0,
 	1, -514332672, 1627381760, 4, 0,
 	_vq_quantlist__44u4__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5228,9 +5228,9 @@ static static_codebook _44u4__p7_1 = {
 	_vq_lengthlist__44u4__p7_1,
 	1, -522338304, 1620115456, 4, 0,
 	_vq_quantlist__44u4__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5299,9 +5299,9 @@ static static_codebook _44u4__p7_2 = {
 	_vq_lengthlist__44u4__p7_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44u4__p7_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u4__p7_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5316,10 +5316,10 @@ static static_codebook _huff_book__44u4__short = {
 	2, 64,
 	_huff_lengthlist__44u4__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -5337,10 +5337,10 @@ static static_codebook _huff_book__44u5__long = {
 	2, 100,
 	_huff_lengthlist__44u5__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -5379,9 +5379,9 @@ static static_codebook _44u5__p1_0 = {
 	_vq_lengthlist__44u5__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u5__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5420,9 +5420,9 @@ static static_codebook _44u5__p2_0 = {
 	_vq_lengthlist__44u5__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u5__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5497,9 +5497,9 @@ static static_codebook _44u5__p3_0 = {
 	_vq_lengthlist__44u5__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u5__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5574,9 +5574,9 @@ static static_codebook _44u5__p4_0 = {
 	_vq_lengthlist__44u5__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u5__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5622,9 +5622,9 @@ static static_codebook _44u5__p5_0 = {
 	_vq_lengthlist__44u5__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u5__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5670,9 +5670,9 @@ static static_codebook _44u5__p6_0 = {
 	_vq_lengthlist__44u5__p6_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u5__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5711,9 +5711,9 @@ static static_codebook _44u5__p7_0 = {
 	_vq_lengthlist__44u5__p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44u5__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5764,9 +5764,9 @@ static static_codebook _44u5__p7_1 = {
 	_vq_lengthlist__44u5__p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u5__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5817,9 +5817,9 @@ static static_codebook _44u5__p8_0 = {
 	_vq_lengthlist__44u5__p8_0,
 	1, -524582912, 1618345984, 4, 0,
 	_vq_quantlist__44u5__p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5870,9 +5870,9 @@ static static_codebook _44u5__p8_1 = {
 	_vq_lengthlist__44u5__p8_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u5__p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5928,9 +5928,9 @@ static static_codebook _44u5__p9_0 = {
 	_vq_lengthlist__44u5__p9_0,
 	1, -514332672, 1627381760, 4, 0,
 	_vq_quantlist__44u5__p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5992,9 +5992,9 @@ static static_codebook _44u5__p9_1 = {
 	_vq_lengthlist__44u5__p9_1,
 	1, -522338304, 1620115456, 4, 0,
 	_vq_quantlist__44u5__p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6063,9 +6063,9 @@ static static_codebook _44u5__p9_2 = {
 	_vq_lengthlist__44u5__p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44u5__p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u5__p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6083,10 +6083,10 @@ static static_codebook _huff_book__44u5__short = {
 	2, 100,
 	_huff_lengthlist__44u5__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -6104,10 +6104,10 @@ static static_codebook _huff_book__44u6__long = {
 	2, 100,
 	_huff_lengthlist__44u6__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -6146,9 +6146,9 @@ static static_codebook _44u6__p1_0 = {
 	_vq_lengthlist__44u6__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u6__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6187,9 +6187,9 @@ static static_codebook _44u6__p2_0 = {
 	_vq_lengthlist__44u6__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u6__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6264,9 +6264,9 @@ static static_codebook _44u6__p3_0 = {
 	_vq_lengthlist__44u6__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u6__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6341,9 +6341,9 @@ static static_codebook _44u6__p4_0 = {
 	_vq_lengthlist__44u6__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u6__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6389,9 +6389,9 @@ static static_codebook _44u6__p5_0 = {
 	_vq_lengthlist__44u6__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u6__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6437,9 +6437,9 @@ static static_codebook _44u6__p6_0 = {
 	_vq_lengthlist__44u6__p6_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u6__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6478,9 +6478,9 @@ static static_codebook _44u6__p7_0 = {
 	_vq_lengthlist__44u6__p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44u6__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6531,9 +6531,9 @@ static static_codebook _44u6__p7_1 = {
 	_vq_lengthlist__44u6__p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u6__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6584,9 +6584,9 @@ static static_codebook _44u6__p8_0 = {
 	_vq_lengthlist__44u6__p8_0,
 	1, -524582912, 1618345984, 4, 0,
 	_vq_quantlist__44u6__p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6637,9 +6637,9 @@ static static_codebook _44u6__p8_1 = {
 	_vq_lengthlist__44u6__p8_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u6__p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6701,9 +6701,9 @@ static static_codebook _44u6__p9_0 = {
 	_vq_lengthlist__44u6__p9_0,
 	1, -514071552, 1627381760, 4, 0,
 	_vq_quantlist__44u6__p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6765,9 +6765,9 @@ static static_codebook _44u6__p9_1 = {
 	_vq_lengthlist__44u6__p9_1,
 	1, -522338304, 1620115456, 4, 0,
 	_vq_quantlist__44u6__p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6836,9 +6836,9 @@ static static_codebook _44u6__p9_2 = {
 	_vq_lengthlist__44u6__p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44u6__p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u6__p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6856,10 +6856,10 @@ static static_codebook _huff_book__44u6__short = {
 	2, 100,
 	_huff_lengthlist__44u6__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -6877,10 +6877,10 @@ static static_codebook _huff_book__44u7__long = {
 	2, 100,
 	_huff_lengthlist__44u7__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -6919,9 +6919,9 @@ static static_codebook _44u7__p1_0 = {
 	_vq_lengthlist__44u7__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u7__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6960,9 +6960,9 @@ static static_codebook _44u7__p2_0 = {
 	_vq_lengthlist__44u7__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u7__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7037,9 +7037,9 @@ static static_codebook _44u7__p3_0 = {
 	_vq_lengthlist__44u7__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u7__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7114,9 +7114,9 @@ static static_codebook _44u7__p4_0 = {
 	_vq_lengthlist__44u7__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u7__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7162,9 +7162,9 @@ static static_codebook _44u7__p5_0 = {
 	_vq_lengthlist__44u7__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u7__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7210,9 +7210,9 @@ static static_codebook _44u7__p6_0 = {
 	_vq_lengthlist__44u7__p6_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u7__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7251,9 +7251,9 @@ static static_codebook _44u7__p7_0 = {
 	_vq_lengthlist__44u7__p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44u7__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7304,9 +7304,9 @@ static static_codebook _44u7__p7_1 = {
 	_vq_lengthlist__44u7__p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u7__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7357,9 +7357,9 @@ static static_codebook _44u7__p8_0 = {
 	_vq_lengthlist__44u7__p8_0,
 	1, -524582912, 1618345984, 4, 0,
 	_vq_quantlist__44u7__p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7410,9 +7410,9 @@ static static_codebook _44u7__p8_1 = {
 	_vq_lengthlist__44u7__p8_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u7__p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7463,9 +7463,9 @@ static static_codebook _44u7__p9_0 = {
 	_vq_lengthlist__44u7__p9_0,
 	1, -512171520, 1630791680, 4, 0,
 	_vq_quantlist__44u7__p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7521,9 +7521,9 @@ static static_codebook _44u7__p9_1 = {
 	_vq_lengthlist__44u7__p9_1,
 	1, -518889472, 1622704128, 4, 0,
 	_vq_quantlist__44u7__p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7617,9 +7617,9 @@ static static_codebook _44u7__p9_2 = {
 	_vq_lengthlist__44u7__p9_2,
 	1, -526909440, 1611661312, 6, 0,
 	_vq_quantlist__44u7__p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u7__p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7637,10 +7637,10 @@ static static_codebook _huff_book__44u7__short = {
 	2, 100,
 	_huff_lengthlist__44u7__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -7658,10 +7658,10 @@ static static_codebook _huff_book__44u8__long = {
 	2, 100,
 	_huff_lengthlist__44u8__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -7679,10 +7679,10 @@ static static_codebook _huff_book__44u8__short = {
 	2, 100,
 	_huff_lengthlist__44u8__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -7721,9 +7721,9 @@ static static_codebook _44u8_p1_0 = {
 	_vq_lengthlist__44u8_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u8_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7798,9 +7798,9 @@ static static_codebook _44u8_p2_0 = {
 	_vq_lengthlist__44u8_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u8_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7846,9 +7846,9 @@ static static_codebook _44u8_p3_0 = {
 	_vq_lengthlist__44u8_p3_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u8_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7917,9 +7917,9 @@ static static_codebook _44u8_p4_0 = {
 	_vq_lengthlist__44u8_p4_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44u8_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7958,9 +7958,9 @@ static static_codebook _44u8_p5_0 = {
 	_vq_lengthlist__44u8_p5_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44u8_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8011,9 +8011,9 @@ static static_codebook _44u8_p5_1 = {
 	_vq_lengthlist__44u8_p5_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u8_p5_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p5_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8069,9 +8069,9 @@ static static_codebook _44u8_p6_0 = {
 	_vq_lengthlist__44u8_p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44u8_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8108,9 +8108,9 @@ static static_codebook _44u8_p6_1 = {
 	_vq_lengthlist__44u8_p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u8_p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8166,9 +8166,9 @@ static static_codebook _44u8_p7_0 = {
 	_vq_lengthlist__44u8_p7_0,
 	1, -523206656, 1618345984, 4, 0,
 	_vq_quantlist__44u8_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8219,9 +8219,9 @@ static static_codebook _44u8_p7_1 = {
 	_vq_lengthlist__44u8_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u8_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8283,9 +8283,9 @@ static static_codebook _44u8_p8_0 = {
 	_vq_lengthlist__44u8_p8_0,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__44u8_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8368,9 +8368,9 @@ static static_codebook _44u8_p8_1 = {
 	_vq_lengthlist__44u8_p8_1,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__44u8_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8416,9 +8416,9 @@ static static_codebook _44u8_p9_0 = {
 	_vq_lengthlist__44u8_p9_0,
 	1, -511895552, 1631393792, 4, 0,
 	_vq_quantlist__44u8_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8494,9 +8494,9 @@ static static_codebook _44u8_p9_1 = {
 	_vq_lengthlist__44u8_p9_1,
 	1, -518287360, 1622704128, 5, 0,
 	_vq_quantlist__44u8_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8590,9 +8590,9 @@ static static_codebook _44u8_p9_2 = {
 	_vq_lengthlist__44u8_p9_2,
 	1, -526909440, 1611661312, 6, 0,
 	_vq_quantlist__44u8_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u8_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8610,10 +8610,10 @@ static static_codebook _huff_book__44u9__long = {
 	2, 100,
 	_huff_lengthlist__44u9__long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -8631,10 +8631,10 @@ static static_codebook _huff_book__44u9__short = {
 	2, 100,
 	_huff_lengthlist__44u9__short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -8673,9 +8673,9 @@ static static_codebook _44u9_p1_0 = {
 	_vq_lengthlist__44u9_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44u9_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8750,9 +8750,9 @@ static static_codebook _44u9_p2_0 = {
 	_vq_lengthlist__44u9_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u9_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8798,9 +8798,9 @@ static static_codebook _44u9_p3_0 = {
 	_vq_lengthlist__44u9_p3_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44u9_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8869,9 +8869,9 @@ static static_codebook _44u9_p4_0 = {
 	_vq_lengthlist__44u9_p4_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44u9_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8910,9 +8910,9 @@ static static_codebook _44u9_p5_0 = {
 	_vq_lengthlist__44u9_p5_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44u9_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8963,9 +8963,9 @@ static static_codebook _44u9_p5_1 = {
 	_vq_lengthlist__44u9_p5_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u9_p5_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p5_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9021,9 +9021,9 @@ static static_codebook _44u9_p6_0 = {
 	_vq_lengthlist__44u9_p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44u9_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9060,9 +9060,9 @@ static static_codebook _44u9_p6_1 = {
 	_vq_lengthlist__44u9_p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44u9_p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9118,9 +9118,9 @@ static static_codebook _44u9_p7_0 = {
 	_vq_lengthlist__44u9_p7_0,
 	1, -523206656, 1618345984, 4, 0,
 	_vq_quantlist__44u9_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9171,9 +9171,9 @@ static static_codebook _44u9_p7_1 = {
 	_vq_lengthlist__44u9_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44u9_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9235,9 +9235,9 @@ static static_codebook _44u9_p8_0 = {
 	_vq_lengthlist__44u9_p8_0,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__44u9_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9320,9 +9320,9 @@ static static_codebook _44u9_p8_1 = {
 	_vq_lengthlist__44u9_p8_1,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__44u9_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9384,9 +9384,9 @@ static static_codebook _44u9_p9_0 = {
 	_vq_lengthlist__44u9_p9_0,
 	1, -510036736, 1631393792, 4, 0,
 	_vq_quantlist__44u9_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9462,9 +9462,9 @@ static static_codebook _44u9_p9_1 = {
 	_vq_lengthlist__44u9_p9_1,
 	1, -518287360, 1622704128, 5, 0,
 	_vq_quantlist__44u9_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9558,9 +9558,9 @@ static static_codebook _44u9_p9_2 = {
 	_vq_lengthlist__44u9_p9_2,
 	1, -526909440, 1611661312, 6, 0,
 	_vq_quantlist__44u9_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44u9_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9599,9 +9599,9 @@ static static_codebook _8u0__p1_0 = {
 	_vq_lengthlist__8u0__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__8u0__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9640,9 +9640,9 @@ static static_codebook _8u0__p2_0 = {
 	_vq_lengthlist__8u0__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__8u0__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9717,9 +9717,9 @@ static static_codebook _8u0__p3_0 = {
 	_vq_lengthlist__8u0__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__8u0__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9794,9 +9794,9 @@ static static_codebook _8u0__p4_0 = {
 	_vq_lengthlist__8u0__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__8u0__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9842,9 +9842,9 @@ static static_codebook _8u0__p5_0 = {
 	_vq_lengthlist__8u0__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__8u0__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9900,9 +9900,9 @@ static static_codebook _8u0__p6_0 = {
 	_vq_lengthlist__8u0__p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__8u0__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9939,9 +9939,9 @@ static static_codebook _8u0__p6_1 = {
 	_vq_lengthlist__8u0__p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__8u0__p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9980,9 +9980,9 @@ static static_codebook _8u0__p7_0 = {
 	_vq_lengthlist__8u0__p7_0,
 	1, -518803456, 1628680192, 2, 0,
 	_vq_quantlist__8u0__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10044,9 +10044,9 @@ static static_codebook _8u0__p7_1 = {
 	_vq_lengthlist__8u0__p7_1,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__8u0__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10129,9 +10129,9 @@ static static_codebook _8u0__p7_2 = {
 	_vq_lengthlist__8u0__p7_2,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__8u0__p7_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u0__p7_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10146,10 +10146,10 @@ static static_codebook _huff_book__8u0__single = {
 	2, 64,
 	_huff_lengthlist__8u0__single,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -10188,9 +10188,9 @@ static static_codebook _8u1__p1_0 = {
 	_vq_lengthlist__8u1__p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__8u1__p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10229,9 +10229,9 @@ static static_codebook _8u1__p2_0 = {
 	_vq_lengthlist__8u1__p2_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__8u1__p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10306,9 +10306,9 @@ static static_codebook _8u1__p3_0 = {
 	_vq_lengthlist__8u1__p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__8u1__p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10383,9 +10383,9 @@ static static_codebook _8u1__p4_0 = {
 	_vq_lengthlist__8u1__p4_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__8u1__p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10431,9 +10431,9 @@ static static_codebook _8u1__p5_0 = {
 	_vq_lengthlist__8u1__p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__8u1__p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10479,9 +10479,9 @@ static static_codebook _8u1__p6_0 = {
 	_vq_lengthlist__8u1__p6_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__8u1__p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10520,9 +10520,9 @@ static static_codebook _8u1__p7_0 = {
 	_vq_lengthlist__8u1__p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__8u1__p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10573,9 +10573,9 @@ static static_codebook _8u1__p7_1 = {
 	_vq_lengthlist__8u1__p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__8u1__p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10626,9 +10626,9 @@ static static_codebook _8u1__p8_0 = {
 	_vq_lengthlist__8u1__p8_0,
 	1, -524582912, 1618345984, 4, 0,
 	_vq_quantlist__8u1__p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10679,9 +10679,9 @@ static static_codebook _8u1__p8_1 = {
 	_vq_lengthlist__8u1__p8_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__8u1__p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10743,9 +10743,9 @@ static static_codebook _8u1__p9_0 = {
 	_vq_lengthlist__8u1__p9_0,
 	1, -514071552, 1627381760, 4, 0,
 	_vq_quantlist__8u1__p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10807,9 +10807,9 @@ static static_codebook _8u1__p9_1 = {
 	_vq_lengthlist__8u1__p9_1,
 	1, -522338304, 1620115456, 4, 0,
 	_vq_quantlist__8u1__p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10878,9 +10878,9 @@ static static_codebook _8u1__p9_2 = {
 	_vq_lengthlist__8u1__p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__8u1__p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__8u1__p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10898,10 +10898,10 @@ static static_codebook _huff_book__8u1__single = {
 	2, 100,
 	_huff_lengthlist__8u1__single,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 

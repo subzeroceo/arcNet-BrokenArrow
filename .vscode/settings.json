@@ -58,5 +58,11 @@
   "editor.defaultFormatter": "AMiner.codegeex",
   "editor.defaultColorDecorators": true,
 "editor.detectIndentation": false,
-"editor.useTabStops": false
+"editor.useTabStops": false,
+"codeium.enableSearch": true,
+"clangd.checkUpdates": false,
+"clangd.serverCompletionRanking": false,
+"path-autocomplete.extensionOnImport": true,
+"codeium.searchMaxWorkspaceFileCount": 500,
+"search.useIgnoreFiles": false
 }

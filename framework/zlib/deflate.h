@@ -222,7 +222,7 @@ typedef struct internal_state {
      *     when input comes from standard input.  (This can also be done for
      *     all blocks if lit_bufsize is not greater than 32K.)
      *   - if compression is not successful for a file smaller than 64K, we can
-     *     even emit a stored file instead of a stored block (saving 5 bytes).
+     *     even emit a stored file instead of a stored block ( saving 5 bytes).
      *     This is applicable only for zip (not gzip or zlib).
      *   - creating new Huffman trees less frequently may not provide fast
      *     adaptation to changes in the input data statistics. (Take for
@@ -265,7 +265,7 @@ typedef struct internal_state {
 /* Output a byte on the stream.
  * IN assertion: there is enough room in pending_buf.
  */
-#define put_byte(s, c) {s->pending_buf[s->pending++] = ( c );}
+#define put_byte( s, c) {s->pending_buf[s->pending++] = ( c );}
 
 
 #define MIN_LOOKAHEAD (MAX_MATCH+MIN_MATCH+1 )
@@ -273,7 +273,7 @@ typedef struct internal_state {
  * See deflate.c for comments about the MIN_MATCH+1.
  */
 
-#define MAX_DIST(s)  ((s)->w_size-MIN_LOOKAHEAD)
+#define MAX_DIST( s)  (( s)->w_size-MIN_LOOKAHEAD)
 /* In order to simplify the code, particularly on 16 bit machines, match
  * distances are limited to MAX_DIST instead of WSIZE.
  */
@@ -305,14 +305,14 @@ void _tr_stored_block OF((deflate_state *s, charf *buf, ulg stored_len,
   extern const uch _dist_code[];
 #endif
 
-# define _tr_tally_lit(s, c, flush) \
+# define _tr_tally_lit( s, c, flush) \
   { uch cc = ( c ); \
     s->d_buf[s->last_lit] = 0; \
     s->l_buf[s->last_lit++] = cc; \
     s->dyn_ltree[cc].Freq++; \
-    flush = (s->last_lit == s->lit_bufsize-1 ); \
+    flush = ( s->last_lit == s->lit_bufsize-1 ); \
    }
-# define _tr_tally_dist(s, distance, length, flush) \
+# define _tr_tally_dist( s, distance, length, flush) \
   { uch len = (length); \
     ush dist = (distance); \
     s->d_buf[s->last_lit] = dist; \
@@ -320,12 +320,12 @@ void _tr_stored_block OF((deflate_state *s, charf *buf, ulg stored_len,
     dist--; \
     s->dyn_ltree[_length_code[len]+LITERALS+1].Freq++; \
     s->dyn_dtree[d_code(dist)].Freq++; \
-    flush = (s->last_lit == s->lit_bufsize-1 ); \
+    flush = ( s->last_lit == s->lit_bufsize-1 ); \
   }
 #else
-# define _tr_tally_lit(s, c, flush) flush = _tr_tally(s, 0, c)
-# define _tr_tally_dist(s, distance, length, flush) \
-              flush = _tr_tally(s, distance, length)
+# define _tr_tally_lit( s, c, flush) flush = _tr_tally( s, 0, c)
+# define _tr_tally_dist( s, distance, length, flush) \
+              flush = _tr_tally( s, distance, length)
 #endif
 
 #endif /* DEFLATE_H */

@@ -44,7 +44,7 @@ int vorbis_analysis(vorbis_block *vb, ogg_packet *op){
      itself figure out what soft mode to use.  This allows easier
      bitrate management */
 
-  if ((ret=_mapping_P[0]->forward(vb) ))
+  if ((ret=_mapping_P[0]->forward(vb) ) )
     return(ret);
 
   if (op){
@@ -75,7 +75,7 @@ void _analysis_output_always(char *base,int i,float *v,int n,int bark,int dB,ogg
 
     if ( !of)perror( "failed to open data dump file" );
 
-    for (j = 0;j<n;j++ ){
+    for ( j = 0;j<n;j++ ){
       if (bark){
 	float b=toBARK((4000.f*j/n)+.25);
 	fprintf(of,"%f ",b);

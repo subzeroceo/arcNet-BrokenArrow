@@ -149,14 +149,14 @@ typedef struct vorbis_comment{
 
 
 /* libvorbis encodes in two abstraction layers; first we perform DSP
-   and produce a packet (see docs/analysis.txt).  The packet is then
-   coded into a framed OggSquish bitstream by the second layer (see
+   and produce a packet ( see docs/analysis.txt).  The packet is then
+   coded into a framed OggSquish bitstream by the second layer ( see
    docs/framing.txt).  Decode is the reverse process; we sync/frame
    the bitstream and extract individual packets, then decode the
    packet back into PCM audio.
 
    The extra framing/packetizing is used in streaming formats, such as
-   files.  Over the net (such as with UDP), the framing and
+   files.  Over the net ( such as with UDP), the framing and
    packetization aren't necessary as they're provided by the transport
    and the streaming layer is not used */
 

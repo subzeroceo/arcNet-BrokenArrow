@@ -44,10 +44,10 @@ int ZEXPORT compress2 (dest, destLen, source, sourceLen, level)
     stream.opaque = (voidpf)0;
 
     err = deflateInit(&stream, level);
-    if (err != Z_OK) return err;
+    if ( err != Z_OK) return err;
 
     err = deflate(&stream, Z_FINISH);
-    if (err != Z_STREAM_END) {
+    if ( err != Z_STREAM_END) {
         deflateEnd(&stream);
         return err == Z_OK ? Z_BUF_ERROR : err;
     }
@@ -72,8 +72,8 @@ int ZEXPORT compress (dest, destLen, source, sourceLen)
      If the default memLevel or windowBits for deflateInit() is changed, then
    this function needs to be updated.
  */
-uLong ZEXPORT compressBound (sourceLen)
+uLong ZEXPORT compressBound ( sourceLen)
     uLong sourceLen;
 {
-    return sourceLen + (sourceLen >> 12) + (sourceLen >> 14) + 11;
+    return sourceLen + ( sourceLen >> 12) + ( sourceLen >> 14) + 11;
 }

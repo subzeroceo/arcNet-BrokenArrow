@@ -34,7 +34,7 @@
 /* this can also be run as an integer transform by uncommenting a
    define in mdct.h; the integerization is a first pass and although
    it's likely stable for Vorbis, the dynamic range is constrained and
-   roundoff isn't done (so it's noisy).  Consider it functional, but
+   roundoff isn't done ( so it's noisy).  Consider it functional, but
    only a starting point.  There's no point on a machine with an FPU */
 
 #include <stdio.h>
@@ -50,8 +50,8 @@
    some window function algebra. */
 
 void mdct_init(mdct_lookup *lookup,int n){
-  int   *bitrev=_ogg_malloc(sizeof(*bitrev)*(n/4) );
-  DATA_TYPE *T=_ogg_malloc(sizeof(*T)*(n+n/4) );
+  int   *bitrev=_ogg_malloc( sizeof(*bitrev)*(n/4) );
+  DATA_TYPE *T=_ogg_malloc( sizeof(*T)*(n+n/4) );
 
   int i;
   int n2=n>>1;
@@ -63,10 +63,10 @@ void mdct_init(mdct_lookup *lookup,int n){
 /* trig lookups... */
 
   for ( i=0;i<n/4;i++ ){
-    T[i*2]=FLOAT_CONV(cos((M_PI/n)*(4*i) ));
-    T[i*2+1]=FLOAT_CONV(-sin((M_PI/n)*(4*i) ));
-    T[n2+i*2]=FLOAT_CONV(cos((M_PI/(2*n) )*(2*i+1 ) ));
-    T[n2+i*2+1]=FLOAT_CONV(sin((M_PI/(2*n) )*(2*i+1 ) ));
+    T[i*2]=FLOAT_CONV(cos((M_PI/n)*(4*i) ) );
+    T[i*2+1]=FLOAT_CONV(-sin((M_PI/n)*(4*i) ) );
+    T[n2+i*2]=FLOAT_CONV(cos((M_PI/(2*n) )*(2*i+1 ) ) );
+    T[n2+i*2+1]=FLOAT_CONV( sin((M_PI/(2*n) )*(2*i+1 ) ) );
   }
   for ( i=0;i<n/8;i++ ){
     T[n+i*2]=FLOAT_CONV(cos((M_PI/n)*(4*i+2) )*.5);
@@ -80,7 +80,7 @@ void mdct_init(mdct_lookup *lookup,int n){
     int msb=1<<(log2n-2);
     for ( i=0;i<n/8;i++ ){
       int acc=0;
-      for (j = 0;msb>>j;j++ )
+      for ( j = 0;msb>>j;j++ )
 	if ((msb>>j)&i)acc|=1<<j;
       bitrev[i*2]=((~acc)&mask)-1;
       bitrev[i*2+1]=acc;
@@ -327,11 +327,11 @@ STIN void mdct_butterflies(mdct_lookup *init,
   }
 
   for ( i=1;--stages>0;i++ ){
-    for (j = 0;j<(1<<i);j++ )
+    for ( j = 0;j<(1<<i);j++ )
       mdct_butterfly_generic(T,x+(points>>i)*j,points>>i,4<<i);
   }
 
-  for (j = 0;j<points;j+=32)
+  for ( j = 0;j<points;j+=32)
     mdct_butterfly_32(x+j );
 
 }

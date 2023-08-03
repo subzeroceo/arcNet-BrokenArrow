@@ -85,7 +85,7 @@ local void make_crc_table OF(( void ) );
   with the lowest powers in the most significant bit.  Then adding polynomials
   is just exclusive-or, and multiplying a polynomial by x is a right shift by
   one.  If we call the above polynomial p, and represent a byte as the
-  polynomial q, also with the lowest power in the most significant bit (so the
+  polynomial q, also with the lowest power in the most significant bit ( so the
   byte 0xb1 is the polynomial x^7+x^3+x+1 ), then the CRC is (q*x^32) mod p,
   where a mod b means the remainder after dividing a by b.
 
@@ -159,7 +159,7 @@ local void make_crc_table()
         FILE *out;
 
         out = fopen( "crc32.h", "w" );
-        if (out == NULL) return;
+        if (out == nullptr ) return;
         fprintf(out, "/* crc32.h -- tables for rapid CRC calculation\n" );
         fprintf(out, " * Generated automatically by crc32.c\n */\n\n" );
         fprintf(out, "local const unsigned long FAR " );
@@ -221,7 +221,7 @@ unsigned long ZEXPORT crc32(crc, buf, len)
     const unsigned char FAR *buf;
     unsigned len;
 {
-    if (buf == Z_NULL) return 0UL;
+    if (buf == Z_NULL ) return 0UL;
 
 #ifdef DYNAMIC_CRC_TABLE
     if (crc_table_empty)
@@ -229,11 +229,11 @@ unsigned long ZEXPORT crc32(crc, buf, len)
 #endif /* DYNAMIC_CRC_TABLE */
 
 #ifdef BYFOUR
-    if (sizeof(void *) == sizeof(ptrdiff_t) ) {
+    if ( sizeof(void *) == sizeof(ptrdiff_t) ) {
         u4 endian;
 
         endian = 1;
-        if (*((unsigned char *)(&endian) ))
+        if (*((unsigned char *)(&endian) ) )
             return crc32_little(crc, buf, len);
         else
             return crc32_big(crc, buf, len);
@@ -356,7 +356,7 @@ local unsigned long gf2_matrix_times(mat, vec)
 }
 
 /* ========================================================================= */
-local void gf2_matrix_square(square, mat)
+local void gf2_matrix_square( square, mat)
     unsigned long *square;
     unsigned long *mat;
 {

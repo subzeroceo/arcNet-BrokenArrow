@@ -58,7 +58,7 @@ void _ve_envelope_init(envelope_lookup *e,vorbis_info *vi){
   e->band[5].begin=17;  e->band[5].end=8;
   e->band[6].begin=22;  e->band[6].end=8;
 
-  for (j = 0;j<VE_BANDS;j++ ){
+  for ( j = 0;j<VE_BANDS;j++ ){
     n=e->band[j].end;
     e->band[j].window=_ogg_malloc(n*sizeof(*e->band[0].window) );
     for ( i=0;i<n;i++ ){
@@ -161,7 +161,7 @@ static int _ve_amp(envelope_lookup *ve,
   /*_analysis_output_always( "spread",seq2++,vec,n/4,0,0,0 );*/
 
   /* perform preecho/postecho triggering by band */
-  for (j = 0;j<VE_BANDS;j++ ){
+  for ( j = 0;j<VE_BANDS;j++ ){
     float acc=0.;
     float valmax,valmin;
 
@@ -283,7 +283,7 @@ long _ve_envelope_search(vorbis_dsp_state *v){
 	    float *marker=alloca( v->pcm_current*sizeof(*marker) );
 	    int l,m;
 	    memset(marker,0,sizeof(*marker)*v->pcm_current);
-	    fprintf(stderr,"mark! seq=%d, cursor:%fs time:%fs\n",
+	    fprintf( stderr,"mark! seq=%d, cursor:%fs time:%fs\n",
 		    seq,
 		    (totalshift+ve->cursor)/44100.,
 		    (totalshift+j )/44100.);
@@ -359,7 +359,7 @@ void _ve_envelope_shift(envelope_lookup *e,long shift){
 						     ahead of ve->current */
   int smallshift=shift/e->searchstep;
 
-  memmove(e->mark,e->mark+smallshift,(smallsize-smallshift)*sizeof(*e->mark) );
+  memmove(e->mark,e->mark+smallshift,( smallsize-smallshift)*sizeof(*e->mark) );
 
   #if 0
   for ( i=0;i<VE_BANDS*e->ch;i++ )

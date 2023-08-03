@@ -59,8 +59,8 @@ Carsten Bormann
    Output: m lpc coefficients, excitation energy */
 
 float vorbis_lpc_from_data(float *data,float *lpci,int n,int m){
-  double *aut=alloca(sizeof(*aut)*(m+1 ) );
-  double *lpc=alloca(sizeof(*lpc)*(m) );
+  double *aut=alloca( sizeof(*aut)*(m+1 ) );
+  double *lpc=alloca( sizeof(*lpc)*(m) );
   double error;
   int i,j;
 
@@ -79,7 +79,7 @@ float vorbis_lpc_from_data(float *data,float *lpci,int n,int m){
   for ( i=0;i<m;i++ ){
     double r= -aut[i+1];
 
-    if (error==0 ){
+    if ( error==0 ){
       memset(lpci,0,m*sizeof(*lpci) );
       return 0;
     }
@@ -89,13 +89,13 @@ float vorbis_lpc_from_data(float *data,float *lpci,int n,int m){
        and needs reflection coefficients, save the results of 'r' from
        each iteration. */
 
-    for (j = 0;j<i;j++ )r-=lpc[j]*aut[i-j];
+    for ( j = 0;j<i;j++ )r-=lpc[j]*aut[i-j];
     r/=error;
 
     /* Update LPC coefficients and total error */
 
     lpc[i]=r;
-    for (j = 0;j<i/2;j++ ){
+    for ( j = 0;j<i/2;j++ ){
       double tmp=lpc[j];
 
       lpc[j]+=r*lpc[i-1-j];
@@ -106,7 +106,7 @@ float vorbis_lpc_from_data(float *data,float *lpci,int n,int m){
     error*=1.f-r*r;
   }
 
-  for (j = 0;j<m;j++ )lpci[j]=( float )lpc[j];
+  for ( j = 0;j<m;j++ )lpci[j]=( float )lpc[j];
 
   /* we need the error value to know how big an impulse to hit the
      filter with later */
@@ -123,7 +123,7 @@ void vorbis_lpc_predict(float *coeff,float *prime,int m,
 
   long i,j,o,p;
   float y;
-  float *work=alloca(sizeof(*work)*(m+n) );
+  float *work=alloca( sizeof(*work)*(m+n) );
 
   if ( !prime)
     for ( i=0;i<m;i++ )
@@ -136,7 +136,7 @@ void vorbis_lpc_predict(float *coeff,float *prime,int m,
     y=0;
     o=i;
     p=m;
-    for (j = 0;j<m;j++ )
+    for ( j = 0;j<m;j++ )
       y-=work[o++]*coeff[--p];
 
     data[i]=work[o]=y;

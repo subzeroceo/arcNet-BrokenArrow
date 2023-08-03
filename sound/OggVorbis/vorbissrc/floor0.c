@@ -75,7 +75,7 @@ static vorbis_info_floor *floor0_unpack (vorbis_info *vi,oggpack_buffer *opb){
   codec_setup_info     *ci=vi->codec_setup;
   int j;
 
-  vorbis_info_floor0 *info=_ogg_malloc(sizeof(*info) );
+  vorbis_info_floor0 *info=_ogg_malloc( sizeof(*info) );
   info->order=oggpack_read(opb,8);
   info->rate=oggpack_read(opb,16);
   info->barkmap=oggpack_read(opb,16);
@@ -88,7 +88,7 @@ static vorbis_info_floor *floor0_unpack (vorbis_info *vi,oggpack_buffer *opb){
   if (info->barkmap<1 )goto err_out;
   if (info->numbooks<1 )goto err_out;
 
-  for (j = 0;j<info->numbooks;j++ ){
+  for ( j = 0;j<info->numbooks;j++ ){
     info->books[j]=oggpack_read(opb,8);
     if (info->books[j]<0 || info->books[j]>=ci->books)goto err_out;
   }
@@ -96,7 +96,7 @@ static vorbis_info_floor *floor0_unpack (vorbis_info *vi,oggpack_buffer *opb){
 
  err_out:
   floor0_free_info(info);
-  return(NULL);
+  return(nullptr );
 }
 
 /* initialize Bark scale and normalization lookups.  We could do this
@@ -130,7 +130,7 @@ static void floor0_map_lazy_init(vorbis_block      *vb,
        necessary in some mapping combinations to keep the scale spacing
        accurate */
     look->linearmap[W]=_ogg_malloc((n+1 )*sizeof(**look->linearmap) );
-    for (j = 0;j<n;j++ ){
+    for ( j = 0;j<n;j++ ){
       int val=floor( toBARK((info->rate/2.f)/n*j)
 		     *scale); /* bark numbers represent band edges */
       if (val>=look->ln)val=look->ln-1; /* guard against the approximation */
@@ -175,9 +175,9 @@ static void *floor0_inverse1(vorbis_block *vb,vorbis_look_floor *i){
          vector */
       float *lsp=_vorbis_block_alloc(vb,sizeof(*lsp)*(look->m+b->dim+1 ) );
 
-      for (j = 0;j<look->m;j+=b->dim)
+      for ( j = 0;j<look->m;j+=b->dim)
 	if (vorbis_book_decodev_set(b,lsp+j,&vb->opb,b->dim)==-1 )goto eop;
-      for (j = 0;j<look->m;){
+      for ( j = 0;j<look->m;){
 	for ( k = 0;k<b->dim;k++,j++ )lsp[j]+=last;
 	last=lsp[j-1];
       }
@@ -187,7 +187,7 @@ static void *floor0_inverse1(vorbis_block *vb,vorbis_look_floor *i){
     }
   }
  eop:
-  return(NULL);
+  return(nullptr );
 }
 
 static int floor0_inverse2(vorbis_block *vb,vorbis_look_floor *i,
@@ -215,7 +215,7 @@ static int floor0_inverse2(vorbis_block *vb,vorbis_look_floor *i,
 
 /* export hooks */
 vorbis_func_floor floor0_exportbundle={
-  NULL,&floor0_unpack,&floor0_look,&floor0_free_info,
+  nullptr,&floor0_unpack,&floor0_look,&floor0_free_info,
   &floor0_free_look,&floor0_inverse1,&floor0_inverse2
 };
 

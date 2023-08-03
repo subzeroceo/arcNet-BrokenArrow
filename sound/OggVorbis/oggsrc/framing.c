@@ -370,7 +370,7 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
 
   /* continued packet flag? */
   os->header[5]=0x00;
-  if ((os->lacing_vals[0]&0x100)==0 )os->header[5]|=0x01;
+  if ((os->lacing_vals[0]&0x100) == 0 )os->header[5]|=0x01;
   /* first page flag? */
   if (os->b_o_s==0 )os->header[5]|=0x02;
   /* last page flag? */
@@ -387,7 +387,7 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   {
     long serialno=os->serialno;
     for ( i=14;i<18;i++ ){
-      os->header[i]=(serialno&0xff);
+      os->header[i]=( serialno&0xff);
       serialno>>=8;
     }
   }
@@ -513,15 +513,15 @@ char *ogg_sync_buffer(ogg_sync_state *oy, long size){
     oy->returned=0;
   }
 
-  if (size>oy->storage-oy->fill){
+  if ( size>oy->storage-oy->fill){
     /* We need to extend the internal buffer */
-    long newsize=size+oy->fill+4096; /* an extra page to be nice */
+    long newSize=size+oy->fill+4096; /* an extra page to be nice */
 
     if (oy->data)
-      oy->data=_ogg_realloc(oy->data,newsize);
+      oy->data=_ogg_realloc(oy->data,newSize);
     else
-      oy->data=_ogg_malloc(newsize);
-    oy->storage=newsize;
+      oy->data=_ogg_malloc(newSize);
+    oy->storage=newSize;
   }
 
   /* expose a segment at least as large as requested at the fill mark */
@@ -714,7 +714,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   }
 
   /* check the serial number */
-  if (serialno!=os->serialno)return(-1 );
+  if ( serialno!=os->serialno)return(-1 );
   if (version>0 )return(-1 );
 
   _os_lacing_expand(os,segments+1 );
@@ -758,7 +758,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
 
   {
     int saved=-1;
-    while(segptr<segments){
+    while( segptr<segments){
       int val=header[27+segptr];
       os->lacing_vals[os->lacing_fill]=val;
       os->granule_vals[os->lacing_fill]=-1;
@@ -777,7 +777,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
     }
 
     /* set the granulepos on the last granuleval of the last full packet */
-    if (saved!=-1 ){
+    if ( saved!=-1 ){
       os->granule_vals[saved]=granulepos;
     }
 
@@ -858,7 +858,7 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
     int eos=os->lacing_vals[ptr]&0x200; /* last packet of the stream? */
     int bos=os->lacing_vals[ptr]&0x100; /* first packet of the stream? */
 
-    while(size==255){
+    while( size==255){
       int val=os->lacing_vals[++ptr];
       size=val&0xff;
       if (val&0x200)eos=0x200;
@@ -908,11 +908,11 @@ void checkpacket(ogg_packet *op,int len, int no, int pos){
   static int lastno=0;
 
   if (op->bytes!=len){
-    fprintf(stderr,"incorrect packet length!\n" );
+    fprintf( stderr,"incorrect packet length!\n" );
     exit(1 );
   }
   if (op->granulepos!=pos){
-    fprintf(stderr,"incorrect packet position!\n" );
+    fprintf( stderr,"incorrect packet position!\n" );
     exit(1 );
   }
 
@@ -927,15 +927,15 @@ void checkpacket(ogg_packet *op,int len, int no, int pos){
   }
   lastno=no;
   if (op->packetno!=sequence){
-    fprintf(stderr,"incorrect packet sequence %ld != %d\n",
+    fprintf( stderr,"incorrect packet sequence %ld != %d\n",
 	    (long)(op->packetno),sequence);
     exit(1 );
   }
 
   /* Test data */
-  for (j = 0;j<op->bytes;j++ )
+  for ( j = 0;j<op->bytes;j++ )
     if (op->packet[j]!=((j+no)&0xff) ){
-      fprintf(stderr,"body data mismatch (1 ) at pos %ld: %x!=%lx!\n\n",
+      fprintf( stderr,"body data mismatch (1 ) at pos %ld: %x!=%lx!\n\n",
 	      j,op->packet[j],(j+no)&0xff);
       exit(1 );
     }
@@ -944,25 +944,25 @@ void checkpacket(ogg_packet *op,int len, int no, int pos){
 void check_page(unsigned char *data,const int *header,ogg_page *og){
   long j;
   /* Test data */
-  for (j = 0;j<og->body_len;j++ )
+  for ( j = 0;j<og->body_len;j++ )
     if (og->body[j]!=data[j] ){
-      fprintf(stderr,"body data mismatch (2) at pos %ld: %x!=%x!\n\n",
+      fprintf( stderr,"body data mismatch (2) at pos %ld: %x!=%x!\n\n",
 	      j,data[j],og->body[j] );
       exit(1 );
     }
 
   /* Test header */
-  for (j = 0;j<og->header_len;j++ ){
+  for ( j = 0;j<og->header_len;j++ ){
     if (og->header[j]!=header[j] ){
-      fprintf(stderr,"header content mismatch at pos %ld:\n",j);
-      for (j = 0;j<header[26]+27;j++ )
-	fprintf(stderr," (%ld)%02x:%02x",j,header[j],og->header[j] );
-      fprintf(stderr,"\n" );
+      fprintf( stderr,"header content mismatch at pos %ld:\n",j);
+      for ( j = 0;j<header[26]+27;j++ )
+	fprintf( stderr," (%ld)%02x:%02x",j,header[j],og->header[j] );
+      fprintf( stderr,"\n" );
       exit(1 );
     }
   }
   if (og->header_len!=header[26]+27){
-    fprintf(stderr,"header length incorrect! (%ld!=%d)\n",
+    fprintf( stderr,"header length incorrect! (%ld!=%d)\n",
 	    og->header_len,header[26]+27);
     exit(1 );
   }
@@ -970,12 +970,12 @@ void check_page(unsigned char *data,const int *header,ogg_page *og){
 
 void print_header(ogg_page *og){
   int j;
-  fprintf(stderr,"\nHEADER:\n" );
-  fprintf(stderr,"  capture: %c %c %c %c  version: %d  flags: %x\n",
+  fprintf( stderr,"\nHEADER:\n" );
+  fprintf( stderr,"  capture: %c %c %c %c  version: %d  flags: %x\n",
 	  og->header[0],og->header[1],og->header[2],og->header[3],
 	  ( int )og->header[4],( int )og->header[5] );
 
-  fprintf(stderr,"  granulepos: %d  serialno: %d  pageno: %ld\n",
+  fprintf( stderr,"  granulepos: %d  serialno: %d  pageno: %ld\n",
 	  (og->header[9]<<24)|(og->header[8]<<16)|
 	  (og->header[7]<<8)|og->header[6],
 	  (og->header[17]<<24)|(og->header[16]<<16)|
@@ -983,14 +983,14 @@ void print_header(ogg_page *og){
 	  ((long)(og->header[21] )<<24)|(og->header[20]<<16)|
 	  (og->header[19]<<8)|og->header[18] );
 
-  fprintf(stderr,"  checksum: %02x:%02x:%02x:%02x\n  segments: %d ( ",
+  fprintf( stderr,"  checksum: %02x:%02x:%02x:%02x\n  segments: %d ( ",
 	  ( int )og->header[22],( int )og->header[23],
 	  ( int )og->header[24],( int )og->header[25],
 	  ( int )og->header[26] );
 
   for (j=27;j<og->header_len;j++ )
-    fprintf(stderr,"%d ",( int )og->header[j] );
-  fprintf(stderr," )\n\n" );
+    fprintf( stderr,"%d ",( int )og->header[j] );
+  fprintf( stderr," )\n\n" );
 }
 
 void copy_page(ogg_page *og){
@@ -1004,7 +1004,7 @@ void copy_page(ogg_page *og){
 }
 
 void error( void ){
-  fprintf(stderr,"error!\n" );
+  fprintf( stderr,"error!\n" );
   exit(1 );
 }
 
@@ -1223,7 +1223,7 @@ void test_pack(const int *pl, const int **headers){
 
     granule_pos+=1024;
 
-    for (j = 0;j<len;j++ )data[inptr++]=i+j;
+    for ( j = 0;j<len;j++ )data[inptr++]=i+j;
 
     /* submit the test packet */
     ogg_stream_packetin(&os_en,&op);
@@ -1235,10 +1235,10 @@ void test_pack(const int *pl, const int **headers){
       while(ogg_stream_pageout(&os_en,&og) ){
 	/* We have a page.  Check it carefully */
 
-	fprintf(stderr,"%ld, ",pageno);
+	fprintf( stderr,"%ld, ",pageno);
 
-	if (headers[pageno]==NULL){
-	  fprintf(stderr,"coded too many pages!\n" );
+	if (headers[pageno]== nullptr ){
+	  fprintf( stderr,"coded too many pages!\n" );
 	  exit(1 );
 	}
 
@@ -1269,12 +1269,12 @@ void test_pack(const int *pl, const int **headers){
 
 	    /* packets out? */
 	    while(ogg_stream_packetpeek(&os_de,&op_de2)>0 ){
-	      ogg_stream_packetpeek(&os_de,NULL);
+	      ogg_stream_packetpeek(&os_de,nullptr );
 	      ogg_stream_packetout(&os_de,&op_de); /* just catching them all */
 
 	      /* verify peek and out match */
-	      if (memcmp(&op_de,&op_de2,sizeof(op_de) )){
-		fprintf(stderr,"packetout != packetpeek! pos=%ld\n",
+	      if (memcmp(&op_de,&op_de2,sizeof(op_de) ) ){
+		fprintf( stderr,"packetout != packetpeek! pos=%ld\n",
 			depacket);
 		exit(1 );
 	      }
@@ -1282,17 +1282,17 @@ void test_pack(const int *pl, const int **headers){
 	      /* verify the packet! */
 	      /* check data */
 	      if (memcmp( data+depacket,op_de.packet,op_de.bytes) ){
-		fprintf(stderr,"packet data mismatch in decode! pos=%ld\n",
+		fprintf( stderr,"packet data mismatch in decode! pos=%ld\n",
 			depacket);
 		exit(1 );
 	      }
 	      /* check bos flag */
 	      if (bosflag==0 && op_de.b_o_s==0 ){
-		fprintf(stderr,"b_o_s flag not set on packet!\n" );
+		fprintf( stderr,"b_o_s flag not set on packet!\n" );
 		exit(1 );
 	      }
 	      if (bosflag && op_de.b_o_s){
-		fprintf(stderr,"b_o_s flag incorrectly set on packet!\n" );
+		fprintf( stderr,"b_o_s flag incorrectly set on packet!\n" );
 		exit(1 );
 	      }
 	      bosflag=1;
@@ -1300,7 +1300,7 @@ void test_pack(const int *pl, const int **headers){
 
 	      /* check eos flag */
 	      if (eosflag){
-		fprintf(stderr,"Multiple decoded packets with eos flag!\n" );
+		fprintf( stderr,"Multiple decoded packets with eos flag!\n" );
 		exit(1 );
 	      }
 
@@ -1308,7 +1308,7 @@ void test_pack(const int *pl, const int **headers){
 
 	      /* check granulepos flag */
 	      if (op_de.granulepos!=-1 ){
-		fprintf(stderr," granule:%ld ",(long)op_de.granulepos);
+		fprintf( stderr," granule:%ld ",(long)op_de.granulepos);
 	      }
 	    }
 	  }
@@ -1317,31 +1317,31 @@ void test_pack(const int *pl, const int **headers){
     }
   }
   _ogg_free( data);
-  if (headers[pageno]!=NULL){
-    fprintf(stderr,"did not write last page!\n" );
+  if (headers[pageno]!=nullptr ){
+    fprintf( stderr,"did not write last page!\n" );
     exit(1 );
   }
-  if (headers[pageout]!=NULL){
-    fprintf(stderr,"did not decode last page!\n" );
+  if (headers[pageout]!=nullptr ){
+    fprintf( stderr,"did not decode last page!\n" );
     exit(1 );
   }
   if (inptr!=outptr){
-    fprintf(stderr,"encoded page data incomplete!\n" );
+    fprintf( stderr,"encoded page data incomplete!\n" );
     exit(1 );
   }
   if (inptr!=deptr){
-    fprintf(stderr,"decoded page data incomplete!\n" );
+    fprintf( stderr,"decoded page data incomplete!\n" );
     exit(1 );
   }
   if (inptr!=depacket){
-    fprintf(stderr,"decoded packet data incomplete!\n" );
+    fprintf( stderr,"decoded packet data incomplete!\n" );
     exit(1 );
   }
   if ( !eosflag){
-    fprintf(stderr,"Never got a packet with EOS set!\n" );
+    fprintf( stderr,"Never got a packet with EOS set!\n" );
     exit(1 );
   }
-  fprintf(stderr,"ok.\n" );
+  fprintf( stderr,"ok.\n" );
 }
 
 int main( void ){
@@ -1356,45 +1356,45 @@ int main( void ){
   {
     /* 17 only */
     const int packets[]={17, -1};
-    const int *headret[]={head1_0,NULL};
+    const int *headret[]={head1_0,nullptr};
 
-    fprintf(stderr,"testing single page encoding... " );
+    fprintf( stderr,"testing single page encoding... " );
     test_pack(packets,headret);
   }
 
   {
     /* 17, 254, 255, 256, 500, 510, 600 byte, pad */
     const int packets[]={17, 254, 255, 256, 500, 510, 600, -1};
-    const int *headret[]={head1_1,head2_1,NULL};
+    const int *headret[]={head1_1,head2_1,nullptr};
 
-    fprintf(stderr,"testing basic page encoding... " );
+    fprintf( stderr,"testing basic page encoding... " );
     test_pack(packets,headret);
   }
 
   {
     /* nil packets; beginning,middle,end */
     const int packets[]={0,17, 254, 255, 0, 256, 0, 500, 510, 600, 0, -1};
-    const int *headret[]={head1_2,head2_2,NULL};
+    const int *headret[]={head1_2,head2_2,nullptr};
 
-    fprintf(stderr,"testing basic nil packets... " );
+    fprintf( stderr,"testing basic nil packets... " );
     test_pack(packets,headret);
   }
 
   {
     /* large initial packet */
     const int packets[]={4345,259,255,-1};
-    const int *headret[]={head1_3,head2_3,NULL};
+    const int *headret[]={head1_3,head2_3,nullptr};
 
-    fprintf(stderr,"testing initial-packet lacing > 4k... " );
+    fprintf( stderr,"testing initial-packet lacing > 4k... " );
     test_pack(packets,headret);
   }
 
   {
     /* continuing packet test */
     const int packets[]={0,4345,259,255,-1};
-    const int *headret[]={head1_4,head2_4,head3_4,NULL};
+    const int *headret[]={head1_4,head2_4,head3_4,nullptr};
 
-    fprintf(stderr,"testing single packet page span... " );
+    fprintf( stderr,"testing single packet page span... " );
     test_pack(packets,headret);
   }
 
@@ -1433,27 +1433,27 @@ int main( void ){
 		   10,10,10,10,10,10,10,10,
 		   10,10,10,10,10,10,10,10,
 		   10,10,10,10,10,10,10,50,-1};
-    const int *headret[]={head1_5,head2_5,head3_5,NULL};
+    const int *headret[]={head1_5,head2_5,head3_5,nullptr};
 
-    fprintf(stderr,"testing max packet segments... " );
+    fprintf( stderr,"testing max packet segments... " );
     test_pack(packets,headret);
   }
 
   {
     /* packet that overspans over an entire page */
     const int packets[]={0,100,9000,259,255,-1};
-    const int *headret[]={head1_6,head2_6,head3_6,head4_6,NULL};
+    const int *headret[]={head1_6,head2_6,head3_6,head4_6,nullptr};
 
-    fprintf(stderr,"testing very large packets... " );
+    fprintf( stderr,"testing very large packets... " );
     test_pack(packets,headret);
   }
 
   {
     /* term only page.  why not? */
     const int packets[]={0,100,4080,-1};
-    const int *headret[]={head1_7,head2_7,head3_7,NULL};
+    const int *headret[]={head1_7,head2_7,head3_7,nullptr};
 
-    fprintf(stderr,"testing zero data page (1 nil packet)... " );
+    fprintf( stderr,"testing zero data page (1 nil packet)... " );
     test_pack(packets,headret);
   }
 
@@ -1477,7 +1477,7 @@ int main( void ){
       op.e_o_s=(pl[i+1]<0?1:0 );
       op.granulepos=( i+1 )*1000;
 
-      for (j = 0;j<len;j++ )data[inptr++]=i+j;
+      for ( j = 0;j<len;j++ )data[inptr++]=i+j;
       ogg_stream_packetin(&os_en,&op);
     }
 
@@ -1485,8 +1485,8 @@ int main( void ){
 
     /* retrieve finished pages */
     for ( i=0;i<5;i++ ){
-      if (ogg_stream_pageout(&os_en,&og[i] )==0 ){
-	fprintf(stderr,"Too few pages output building sync tests!\n" );
+      if (ogg_stream_pageout(&os_en,&og[i] ) == 0 ){
+	fprintf( stderr,"Too few pages output building sync tests!\n" );
 	exit(1 );
       }
       copy_page(&og[i] );
@@ -1497,7 +1497,7 @@ int main( void ){
       ogg_page temp;
       ogg_packet test;
 
-      fprintf(stderr,"Testing loss of pages... " );
+      fprintf( stderr,"Testing loss of pages... " );
 
       ogg_sync_reset(&oy);
       ogg_stream_reset(&os_de);
@@ -1527,14 +1527,14 @@ int main( void ){
       if (ogg_stream_packetout(&os_de,&test)!=1 )error();
       checkpacket(&test,4079,2,3000);
       if (ogg_stream_packetout(&os_de,&test)!=-1 ){
-	fprintf(stderr,"Error: loss of page did not return error\n" );
+	fprintf( stderr,"Error: loss of page did not return error\n" );
 	exit(1 );
       }
       if (ogg_stream_packetout(&os_de,&test)!=1 )error();
       checkpacket(&test,76,5,-1 );
       if (ogg_stream_packetout(&os_de,&test)!=1 )error();
       checkpacket(&test,34,6,-1 );
-      fprintf(stderr,"ok.\n" );
+      fprintf( stderr,"ok.\n" );
     }
 
     /* Test lost pages on pagein/packetout: rollback with continuation */
@@ -1542,7 +1542,7 @@ int main( void ){
       ogg_page temp;
       ogg_packet test;
 
-      fprintf(stderr,"Testing loss of pages (rollback required)... " );
+      fprintf( stderr,"Testing loss of pages (rollback required)... " );
 
       ogg_sync_reset(&oy);
       ogg_stream_reset(&os_de);
@@ -1576,19 +1576,19 @@ int main( void ){
       if (ogg_stream_packetout(&os_de,&test)!=1 )error();
       checkpacket(&test,2956,3,4000);
       if (ogg_stream_packetout(&os_de,&test)!=-1 ){
-	fprintf(stderr,"Error: loss of page did not return error\n" );
+	fprintf( stderr,"Error: loss of page did not return error\n" );
 	exit(1 );
       }
       if (ogg_stream_packetout(&os_de,&test)!=1 )error();
       checkpacket(&test,300,13,14000);
-      fprintf(stderr,"ok.\n" );
+      fprintf( stderr,"ok.\n" );
     }
 
     /* the rest only test sync */
     {
       ogg_page og_de;
       /* Test fractional page inputs: incomplete capture */
-      fprintf(stderr,"Testing sync on partial inputs... " );
+      fprintf( stderr,"Testing sync on partial inputs... " );
       ogg_sync_reset(&oy);
       memcpy(ogg_sync_buffer(&oy,og[1].header_len),og[1].header,
 	     3);
@@ -1623,13 +1623,13 @@ int main( void ){
       ogg_sync_wrote(&oy,og[1].body_len-1000);
       if (ogg_sync_pageout(&oy,&og_de)<=0 )error();
 
-      fprintf(stderr,"ok.\n" );
+      fprintf( stderr,"ok.\n" );
     }
 
     /* Test fractional page inputs: page + incomplete capture */
     {
       ogg_page og_de;
-      fprintf(stderr,"Testing sync on 1+partial inputs... " );
+      fprintf( stderr,"Testing sync on 1+partial inputs... " );
       ogg_sync_reset(&oy);
 
       memcpy(ogg_sync_buffer(&oy,og[1].header_len),og[1].header,
@@ -1654,13 +1654,13 @@ int main( void ){
       ogg_sync_wrote(&oy,og[1].body_len);
       if (ogg_sync_pageout(&oy,&og_de)<=0 )error();
 
-      fprintf(stderr,"ok.\n" );
+      fprintf( stderr,"ok.\n" );
     }
 
     /* Test recapture: garbage + page */
     {
       ogg_page og_de;
-      fprintf(stderr,"Testing search for capture... " );
+      fprintf( stderr,"Testing search for capture... " );
       ogg_sync_reset(&oy);
 
       /* 'garbage' */
@@ -1691,13 +1691,13 @@ int main( void ){
       ogg_sync_wrote(&oy,og[2].body_len);
       if (ogg_sync_pageout(&oy,&og_de)<=0 )error();
 
-      fprintf(stderr,"ok.\n" );
+      fprintf( stderr,"ok.\n" );
     }
 
     /* Test recapture: page + garbage + page */
     {
       ogg_page og_de;
-      fprintf(stderr,"Testing recapture... " );
+      fprintf( stderr,"Testing recapture... " );
       ogg_sync_reset(&oy);
 
       memcpy(ogg_sync_buffer(&oy,og[1].header_len),og[1].header,
@@ -1733,7 +1733,7 @@ int main( void ){
       if (ogg_sync_pageout(&oy,&og_de)>0 )error();
       if (ogg_sync_pageout(&oy,&og_de)<=0 )error();
 
-      fprintf(stderr,"ok.\n" );
+      fprintf( stderr,"ok.\n" );
     }
   }
 

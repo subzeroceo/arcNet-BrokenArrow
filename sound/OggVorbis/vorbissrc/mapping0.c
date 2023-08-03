@@ -146,7 +146,7 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
 
  err_out:
   mapping0_free_info(info);
-  return(NULL);
+  return(nullptr );
 }
 
 #include "os.h"
@@ -248,13 +248,13 @@ static int mapping0_forward(vorbis_block *vb){
   int                    n=vb->pcmend;
   int i,j,k;
 
-  int    *nonzero    = alloca(sizeof(*nonzero)*vi->channels);
+  int    *nonzero    = alloca( sizeof(*nonzero)*vi->channels);
   float  **gmdct     = _vorbis_block_alloc(vb,vi->channels*sizeof(*gmdct) );
   int    **ilogmaskch= _vorbis_block_alloc(vb,vi->channels*sizeof(*ilogmaskch) );
   int ***floor_posts = _vorbis_block_alloc(vb,vi->channels*sizeof(*floor_posts) );
 
   float global_ampmax=vbi->ampmax;
-  float *local_ampmax=alloca(sizeof(*local_ampmax)*vi->channels);
+  float *local_ampmax=alloca( sizeof(*local_ampmax)*vi->channels);
   int blocktype=vbi->blocktype;
 
   int modenumber=vb->W;
@@ -343,7 +343,7 @@ static int mapping0_forward(vorbis_block *vb){
       floor_posts[i]=_vorbis_block_alloc(vb,PACKETBLOBS*sizeof(**floor_posts) );
       memset(floor_posts[i],0,sizeof(**floor_posts)*PACKETBLOBS);
 
-      for (j = 0;j<n/2;j++ )
+      for ( j = 0;j<n/2;j++ )
 	logmdct[j]=todB(mdct+j );
 
 #if 0
@@ -504,10 +504,10 @@ static int mapping0_forward(vorbis_block *vb){
   /* iterate over the many masking curve fits we've created */
 
   {
-    float **res_bundle=alloca(sizeof(*res_bundle)*vi->channels);
-    float **couple_bundle=alloca(sizeof(*couple_bundle)*vi->channels);
-    int *zerobundle=alloca(sizeof(*zerobundle)*vi->channels);
-    int **sortindex=alloca(sizeof(*sortindex)*vi->channels);
+    float **res_bundle=alloca( sizeof(*res_bundle)*vi->channels);
+    float **couple_bundle=alloca( sizeof(*couple_bundle)*vi->channels);
+    int *zerobundle=alloca( sizeof(*zerobundle)*vi->channels);
+    int **sortindex=alloca( sizeof(*sortindex)*vi->channels);
     float **mag_memo;
     int **mag_sort;
 
@@ -524,11 +524,11 @@ static int mapping0_forward(vorbis_block *vb){
 					mag_memo);
     }
 
-    memset(sortindex,0,sizeof(*sortindex)*vi->channels);
+    memset( sortindex,0,sizeof(*sortindex)*vi->channels);
     if (psy_look->vi->normal_channel_p){
       for ( i=0;i<vi->channels;i++ ){
 	float *mdct    =gmdct[i];
-	sortindex[i]=alloca(sizeof(**sortindex)*n/2);
+	sortindex[i]=alloca( sizeof(**sortindex)*n/2);
 	_vp_noise_normalize_sort(psy_look,mdct,sortindex[i] );
       }
     }
@@ -564,7 +564,7 @@ static int mapping0_forward(vorbis_block *vb){
 	  char buf[80];
 	  sprintf(buf,"maskI%c%d",i?'R':'L',k);
 	  float work[n/2];
-	  for (j = 0;j<n/2;j++ )
+	  for ( j = 0;j<n/2;j++ )
 	    work[j]=FLOOR1_fromdB_LOOKUP[ilogmask[j]];
 	  _analysis_output(buf,seq,work,n/2,1,1,0 );
 	}
@@ -582,7 +582,7 @@ static int mapping0_forward(vorbis_block *vb){
 	{
 	  char buf[80];
 	  float work[n/2];
-	  for (j = 0;j<n/2;j++ )
+	  for ( j = 0;j<n/2;j++ )
 	    work[j]=FLOOR1_fromdB_LOOKUP[ilogmask[j]]*(res+n/2)[j];
 	  sprintf(buf,"resI%c%d",i?'R':'L',k);
 	  _analysis_output(buf,seq,work,n/2,1,1,0 );
@@ -616,7 +616,7 @@ static int mapping0_forward(vorbis_block *vb){
 	long **classifications;
 	int resnum=info->residuesubmap[i];
 
-	for (j = 0;j<vi->channels;j++ ){
+	for ( j = 0;j<vi->channels;j++ ){
 	  if (info->chmuxlist[j]==i){
 	    zerobundle[ch_in_bundle]=0;
 	    if (nonzero[j] )zerobundle[ch_in_bundle]=1;
@@ -630,7 +630,7 @@ static int mapping0_forward(vorbis_block *vb){
 
 	_residue_P[ci->residue_type[resnum]]->
 	  forward(vb,b->residue[resnum],
-		  couple_bundle,NULL,zerobundle,ch_in_bundle,classifications);
+		  couple_bundle,nullptr,zerobundle,ch_in_bundle,classifications);
       }
 
       /* ok, done encoding.  Mark this protopacket and prepare next. */
@@ -659,11 +659,11 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_info_mapping *l){
   int                   i,j;
   long                  n=vb->pcmend=ci->blocksizes[vb->W];
 
-  float **pcmbundle=alloca(sizeof(*pcmbundle)*vi->channels);
-  int    *zerobundle=alloca(sizeof(*zerobundle)*vi->channels);
+  float **pcmbundle=alloca( sizeof(*pcmbundle)*vi->channels);
+  int    *zerobundle=alloca( sizeof(*zerobundle)*vi->channels);
 
-  int   *nonzero  =alloca(sizeof(*nonzero)*vi->channels);
-  void **floormemo=alloca(sizeof(*floormemo)*vi->channels);
+  int   *nonzero  =alloca( sizeof(*nonzero)*vi->channels);
+  void **floormemo=alloca( sizeof(*floormemo)*vi->channels);
 
   /* recover the spectral envelope; store it in the PCM vector for now */
   for ( i=0;i<vi->channels;i++ ){
@@ -689,7 +689,7 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_info_mapping *l){
   /* recover the residue into our working vectors */
   for ( i=0;i<info->submaps;i++ ){
     int ch_in_bundle=0;
-    for (j = 0;j<vi->channels;j++ ){
+    for ( j = 0;j<vi->channels;j++ ){
       if (info->chmuxlist[j]==i){
 	if (nonzero[j] )
 	  zerobundle[ch_in_bundle]=1;
@@ -709,7 +709,7 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_info_mapping *l){
     float *pcmM=vb->pcm[info->coupling_mag[i]];
     float *pcmA=vb->pcm[info->coupling_ang[i]];
 
-    for (j = 0;j<n/2;j++ ){
+    for ( j = 0;j<n/2;j++ ){
       float mag=pcmM[j];
       float ang=pcmA[j];
 

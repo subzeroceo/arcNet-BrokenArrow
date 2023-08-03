@@ -87,7 +87,7 @@ static void drfti1( int n, float *wa, int *ifac){
     ido=n/l2;
     ipm=ip-1;
 
-    for (j = 0;j<ipm;j++ ){
+    for ( j = 0;j<ipm;j++ ){
       ld+=l1;
       i=is;
       argld=( float )ld*argh;

@@ -183,12 +183,12 @@ static vorbis_info_floor1 _floor_set0={1,
 static vorbis_info_mapping0 mapping_info={1,{0,1},{0},{0},{0},0, 1, {0},{1}};
 static codec_setup_info codec_setup0={ {0,0},
 				       1,1,1,1,1,0,1,
-				       {NULL},
+				       {nullptr},
 				       {0},{&mapping_info},
-				       {0},{NULL},
+				       {0},{nullptr},
 				       {1},{&_floor_set0},
-				       {2},{NULL},
-				       {NULL},
+				       {2},{nullptr},
+				       {nullptr},
 				       {&_psy_set0},
 				       &_psy_set0G};
 
@@ -201,7 +201,7 @@ void analysis(char *base,int i,float *v,int n,int bark,int dB){
     sprintf(buffer,"%s_%d.m",base,i);
     of=fopen(buffer,"w" );
 
-    for (j = 0;j<n;j++ ){
+    for ( j = 0;j<n;j++ ){
       if (dB && v[j]==0 )
 	  fprintf(of,"\n\n" );
       else{
@@ -285,7 +285,7 @@ int main( int argc,char *argv[] ){
   drft_init(&f_look,framesize);
   _vp_psy_init(&p_look,&_psy_set0,&_psy_set0G,framesize/2,44100);
   pg_look=_vp_global_look(&vi);
-  floor_look=_floor_P[1]->look(NULL,NULL,&_floor_set0);
+  floor_look=_floor_P[1]->look(nullptr,nullptr,&_floor_set0);
 
   /* we cheat on the WAV header; we just bypass 44 bytes and never
      verify that it matches 16bit/stereo/44.1kHz. */
@@ -296,7 +296,7 @@ int main( int argc,char *argv[] ){
 
   analysis( "window",0,window,framesize,0,0 );
 
-  fprintf(stderr,"Processing for frame size %d...\n",framesize);
+  fprintf( stderr,"Processing for frame size %d...\n",framesize);
 
   while( !eos){
     long bytes=fread(buffer2,1,framesize*2,stdin);
@@ -330,7 +330,7 @@ int main( int argc,char *argv[] ){
 	analysis( "pre",frameno+i,pcm[i],framesize,0,0 );
 
 	/* fft and mdct transforms  */
-	for (j = 0;j<framesize;j++ )
+	for ( j = 0;j<framesize;j++ )
 	  fft[j]=pcm[i][j]*=window[j];
 
 	drft_forward(&f_look,fft);
@@ -346,7 +346,7 @@ int main( int argc,char *argv[] ){
 	if (local_ampmax[i]>ampmax)ampmax=local_ampmax[i];
 
 	mdct_forward(&m_look,pcm[i],mdct);
-	for (j = 0;j<framesize/2;j++ )
+	for ( j = 0;j<framesize/2;j++ )
 	  logmdct[j]=todB(mdct+j );
 
 	analysis( "mdct",frameno+i,logmdct,framesize/2,1,0 );
@@ -400,9 +400,9 @@ int main( int argc,char *argv[] ){
 			 pcm[i],
 			 local_ampmax[i] );
 
-	for (j = 0;j<framesize/2;j++ )
+	for ( j = 0;j<framesize/2;j++ )
 	  if (fabs(pcm[i][j] )>1500)
-	    fprintf(stderr,"%ld ",frameno+i);
+	    fprintf( stderr,"%ld ",frameno+i);
 
 	analysis( "res",frameno+i,pcm[i],framesize/2,1,0 );
 	analysis( "codedflr",frameno+i,flr[i],framesize/2,1,1 );
@@ -432,7 +432,7 @@ int main( int argc,char *argv[] ){
 	float *pcmM=pcm[mapping_info.coupling_mag[i]];
 	float *pcmA=pcm[mapping_info.coupling_ang[i]];
 
-	for (j = 0;j<framesize/2;j++ ){
+	for ( j = 0;j<framesize/2;j++ ){
 	  float mag=pcmM[j];
 	  float ang=pcmA[j];
 
@@ -461,7 +461,7 @@ int main( int argc,char *argv[] ){
       for ( i=0;i<2;i++ ){
 	float amp;
 
-	for (j = 0;j<framesize/2;j++ )
+	for ( j = 0;j<framesize/2;j++ )
 	  pcm[i][j]*=flr[i][j];
 
 	analysis( "final",frameno+i,pcm[i],framesize/2,1,1 );
@@ -469,7 +469,7 @@ int main( int argc,char *argv[] ){
 	/* take it back to time */
 	mdct_backward(&m_look,pcm[i],pcm[i] );
 
-	for (j = 0;j<framesize/2;j++ )
+	for ( j = 0;j<framesize/2;j++ )
 	  out[i][j]+=pcm[i][j]*window[j];
 
 	analysis( "out",frameno+i,out[i],framesize/2,0,0 );
@@ -482,16 +482,16 @@ int main( int argc,char *argv[] ){
 	char  *ptr=buffer+i*2;
 	float *mono=out[i];
 	int flag=0;
-	for (j = 0;j<framesize/2;j++ ){
+	for ( j = 0;j<framesize/2;j++ ){
 	  int val=mono[j]*32767.;
 	  /* might as well guard against clipping */
 	  if (val>32767){
-	    if ( !flag)fprintf(stderr,"clipping in frame %ld ",frameno+i);
+	    if ( !flag)fprintf( stderr,"clipping in frame %ld ",frameno+i);
 	    flag=1;
 	    val=32767;
 	  }
 	  if (val<-32768){
-	    if ( !flag)fprintf(stderr,"clipping in frame %ld ",frameno+i);
+	    if ( !flag)fprintf( stderr,"clipping in frame %ld ",frameno+i);
 	    flag=1;
 	    val=-32768;
 	  }
@@ -501,7 +501,7 @@ int main( int argc,char *argv[] ){
 	}
       }
 
-      fprintf(stderr,"*" );
+      fprintf( stderr,"*" );
       fwrite(buffer,1,framesize*2,stdout);
       memmove(buffer,buffer2,framesize*2);
 
@@ -513,9 +513,9 @@ int main( int argc,char *argv[] ){
     } else
       eos=1;
   }
-  fprintf(stderr,"average raw bits of entropy: %.03g/sample\n",acc/tot);
-  fprintf(stderr,"average nonzero samples: %.03g/%d\n",nonz/tot*framesize/2,
+  fprintf( stderr,"average raw bits of entropy: %.03g/sample\n",acc/tot);
+  fprintf( stderr,"average nonzero samples: %.03g/%d\n",nonz/tot*framesize/2,
 	  framesize/2);
-  fprintf(stderr,"Done\n\n" );
+  fprintf( stderr,"Done\n\n" );
   return 0;
 }

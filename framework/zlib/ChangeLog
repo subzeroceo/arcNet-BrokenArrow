@@ -224,7 +224,7 @@ Changes in 1.2.0.5 (8 September 2003)
   INSERT_STRING [Truta]
 - Compare TOO_FAR with 32767 instead of 32768, to avoid 16-bit warnings
   [Truta]
-- Compare function pointers with 0, not with NULL or Z_NULL [Truta]
+- Compare function pointers with 0, not with nullptr or Z_NULL [Truta]
 - Fix prototype of syncsearch in inflate.c [Truta]
 - Introduce ASMINF macro to be enabled when using an ASM implementation
   of inflate_fast [Truta]
@@ -455,7 +455,7 @@ Changes in 1.1.2 (19 March 98)
 Changes in 1.1.1 (27 Feb 98)
 - fix macros _tr_tally_* in deflate.h for debug mode  (Glenn Randers-Pehrson)
 - remove block truncation heuristic which had very marginal effect for zlib
-  (smaller lit_bufsize than in gzip 1.2.4) and degraded a little the
+  ( smaller lit_bufsize than in gzip 1.2.4) and degraded a little the
   compression ratio on some files. This also allows inlining _tr_tally for
   matches in deflate_slow.
 - added msdos/Makefile.w32 for WIN32 Microsoft Visual C++ (Bob Frazier)
@@ -618,7 +618,7 @@ Changes in 1.0.5 (3 Jan 98)
 - Update web address in README
 
 Changes in 1.0.4 (24 Jul 96)
-- In very rare conditions, deflate(s, Z_FINISH) could fail to produce an EOF
+- In very rare conditions, deflate( s, Z_FINISH) could fail to produce an EOF
   bit, so the decompressor could decompress all the correct data but went
   on to attempt decompressing extra garbage data. This affected minigzip too.
 - zlibVersion and gzerror return const char* (needed for DLL)

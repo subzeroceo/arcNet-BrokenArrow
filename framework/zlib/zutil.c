@@ -11,7 +11,7 @@
 struct internal_state      {int dummy;}; /* for buggy compilers */
 #endif
 
-const char * const z_errmsg[10] = {
+const char *const z_errmsg[10] = {
 "need dictionary",     /* Z_NEED_DICT       2  */
 "stream end",          /* Z_STREAM_END      1  */
 "",                    /* Z_OK              0  */
@@ -24,7 +24,7 @@ const char * const z_errmsg[10] = {
 ""};
 
 
-const char * ZEXPORT zlibVersion()
+const char *ZEXPORT zlibVersion()
 {
     return ZLIB_VERSION;
 }
@@ -34,25 +34,25 @@ uLong ZEXPORT zlibCompileFlags()
     uLong flags;
 
     flags = 0;
-    switch (sizeof(uInt) ) {
+    switch ( sizeof(uInt) ) {
     case 2:     break;
     case 4:     flags += 1;     break;
     case 8:     flags += 2;     break;
     default:    flags += 3;
     }
-    switch (sizeof(uLong) ) {
+    switch ( sizeof(uLong) ) {
     case 2:     break;
     case 4:     flags += 1 << 2;        break;
     case 8:     flags += 2 << 2;        break;
     default:    flags += 3 << 2;
     }
-    switch (sizeof(voidpf) ) {
+    switch ( sizeof(voidpf) ) {
     case 2:     break;
     case 4:     flags += 1 << 4;        break;
     case 8:     flags += 2 << 4;        break;
     default:    flags += 3 << 4;
     }
-    switch (sizeof(z_off_t) ) {
+    switch ( sizeof(z_off_t) ) {
     case 2:     break;
     case 4:     flags += 1 << 6;        break;
     case 8:     flags += 2 << 6;        break;
@@ -122,7 +122,7 @@ int z_verbose = verbose;
 void z_error (m)
     char *m;
 {
-    fprintf(stderr, "%s\n", m);
+    fprintf( stderr, "%s\n", m);
     exit(1 );
 }
 #endif
@@ -130,10 +130,10 @@ void z_error (m)
 /* exported to allow conversion of error code to string for compress() and
  * uncompress()
  */
-const char * ZEXPORT zError(err)
+const char *ZEXPORT zError( err)
     int err;
 {
-    return ERR_MSG(err);
+    return ERR_MSG( err);
 }
 
 #if defined(_WIN32_WCE)
@@ -157,23 +157,22 @@ void zmemcpy(dest, source, len)
     } while (--len != 0 );
 }
 
-int zmemcmp(s1, s2, len)
+int zmemcmp( s1, s2, len)
     const Bytef* s1;
     const Bytef* s2;
     uInt  len;
 {
     uInt j;
 
-    for (j = 0; j < len; j++ ) {
-        if (s1[j] != s2[j] ) return 2*(s1[j] > s2[j] )-1;
+    for ( j = 0; j < len; j++ ) {
+        if ( s1[j] != s2[j] ) return 2*( s1[j] > s2[j] )-1;
     }
     return 0;
 }
 
 void zmemzero(dest, len)
     Bytef* dest;
-    uInt  len;
-{
+    uInt  len; {
     if (len == 0 ) return;
     do {
         *dest++ = 0;  /* ??? to be unrolled */
@@ -213,8 +212,7 @@ local ptr_table table[MAX_PTR];
  * a protected system like OS/2. Use Microsoft C instead.
  */
 
-voidpf zcalloc (voidpf opaque, unsigned items, unsigned size)
-{
+voidpf zcalloc(voidpf opaque, unsigned items, unsigned size) {
     voidpf buf = opaque; /* just to make some compilers happy */
     ulg bsize = (ulg)items*size;
 
@@ -227,7 +225,7 @@ voidpf zcalloc (voidpf opaque, unsigned items, unsigned size)
     } else {
         buf = farmalloc(bsize + 16L);
     }
-    if (buf == NULL || next_ptr >= MAX_PTR) return NULL;
+    if (buf == nullptr || next_ptr >= MAX_PTR) return nullptr;
     table[next_ptr].org_ptr = buf;
 
     /* Normalize the pointer to seg:0 */
@@ -237,8 +235,7 @@ voidpf zcalloc (voidpf opaque, unsigned items, unsigned size)
     return buf;
 }
 
-void  zcfree (voidpf opaque, voidpf ptr)
-{
+void  zcfree(voidpf opaque, voidpf ptr) {
     int n;
     if (*(ush*)&ptr != 0 ) { /* object < 64K */
         farfree(ptr);
@@ -272,14 +269,12 @@ void  zcfree (voidpf opaque, voidpf ptr)
 #  define _hfree   hfree
 #endif
 
-voidpf zcalloc (voidpf opaque, unsigned items, unsigned size)
-{
+voidpf zcalloc (voidpf opaque, unsigned items, unsigned size) {
     if (opaque) opaque = 0; /* to make compiler happy */
     return _halloc((long)items, size);
 }
 
-void  zcfree (voidpf opaque, voidpf ptr)
-{
+void  zcfree (voidpf opaque, voidpf ptr) {
     if (opaque) opaque = 0; /* to make compiler happy */
     _hfree(ptr);
 }

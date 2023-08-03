@@ -15,7 +15,7 @@
 
   The LSP generation code is taken (with minimal modification and a
   few bugfixes) from "On the Computation of the LSP Frequencies" by
-  Joseph Rothweiler (see http://www.rothweiler.us for contact info).
+  Joseph Rothweiler ( see http://www.rothweiler.us for contact info).
   The paper is available at:
 
   http://www.myown1.com/joe/lsf
@@ -160,15 +160,15 @@ void vorbis_lsp_to_curve(float *curve,int *map,int n,int ln,float *lsp,int m,
     pi*=labs(ilsp[1]-wi);
 
     for (j=3;j<m;j+=2){
-      if ( !(shift=MLOOP_1[(pi|qi)>>25] ) )
-	if ( !(shift=MLOOP_2[(pi|qi)>>19] ) )
+      if ( !( shift=MLOOP_1[(pi|qi)>>25] ) )
+	if ( !( shift=MLOOP_2[(pi|qi)>>19] ) )
 	  shift=MLOOP_3[(pi|qi)>>16];
       qi=(qi>>shift)*labs(ilsp[j-1]-wi);
       pi=(pi>>shift)*labs(ilsp[j]-wi);
       qexp+=shift;
     }
-    if ( !(shift=MLOOP_1[(pi|qi)>>25] ) )
-      if ( !(shift=MLOOP_2[(pi|qi)>>19] ) )
+    if ( !( shift=MLOOP_1[(pi|qi)>>25] ) )
+      if ( !( shift=MLOOP_2[(pi|qi)>>19] ) )
 	shift=MLOOP_3[(pi|qi)>>16];
 
     /* pi,qi normalized collectively, both tracked using qexp */
@@ -180,8 +180,8 @@ void vorbis_lsp_to_curve(float *curve,int *map,int n,int ln,float *lsp,int m,
       pi=(pi>>shift)<<14;
       qexp+=shift;
 
-      if ( !(shift=MLOOP_1[(pi|qi)>>25] ) )
-	if ( !(shift=MLOOP_2[(pi|qi)>>19] ) )
+      if ( !( shift=MLOOP_1[(pi|qi)>>25] ) )
+	if ( !( shift=MLOOP_2[(pi|qi)>>19] ) )
 	  shift=MLOOP_3[(pi|qi)>>16];
 
       pi>>=shift;
@@ -309,7 +309,7 @@ static int comp(const void *a,const void *b){
 static int Laguerre_With_Deflation(float *a,int ord,float *r){
   int i,m;
   double lastdelta=0.f;
-  double *defl=alloca(sizeof(*defl)*(ord+1 ) );
+  double *defl=alloca( sizeof(*defl)*(ord+1 ) );
   for ( i=0;i<=ord;i++ )defl[i]=a[i];
 
   for (m=ord;m>0;m--){
@@ -369,7 +369,7 @@ static int Newton_Raphson(float *a,int ord,float *r){
 
   for ( i=0; i<ord;i++ ) root[i] = r[i];
 
-  while(error>1e-20){
+  while( error>1e-20){
     error=0;
 
     for ( i=0; i<ord; i++ ) { /* Update each point. */
@@ -404,10 +404,10 @@ static int Newton_Raphson(float *a,int ord,float *r){
 int vorbis_lpc_to_lsp(float *lpc,float *lsp,int m){
   int order2=(m+1 )>>1;
   int g1_order,g2_order;
-  float *g1=alloca(sizeof(*g1)*(order2+1 ) );
-  float *g2=alloca(sizeof(*g2)*(order2+1 ) );
-  float *g1r=alloca(sizeof(*g1r)*(order2+1 ) );
-  float *g2r=alloca(sizeof(*g2r)*(order2+1 ) );
+  float *g1=alloca( sizeof(*g1)*(order2+1 ) );
+  float *g2=alloca( sizeof(*g2)*(order2+1 ) );
+  float *g1r=alloca( sizeof(*g1r)*(order2+1 ) );
+  float *g2r=alloca( sizeof(*g2r)*(order2+1 ) );
   int i;
 
   /* even and odd are slightly different base cases */

@@ -466,7 +466,7 @@ oggpack_buffer o;
 oggpack_buffer r;
 
 void report(char *in){
-  fprintf(stderr,"%s",in);
+  fprintf( stderr,"%s",in);
   exit(1 );
 }
 
@@ -481,7 +481,7 @@ void cliptest(unsigned long *b,int vals,int bits,int *comp,int compsize){
   bytes=oggpack_bytes(&o);
   if (bytes!=compsize)report( "wrong number of bytes!\n" );
   for ( i=0;i<bytes;i++ )if (buffer[i]!=comp[i] ){
-    for ( i=0;i<bytes;i++ )fprintf(stderr,"%x %x\n",( int )buffer[i],( int )comp[i] );
+    for ( i=0;i<bytes;i++ )fprintf( stderr,"%x %x\n",( int )buffer[i],( int )comp[i] );
     report( "wrote incorrect value!\n" );
   }
   oggpack_readinit(&r,buffer,bytes);
@@ -516,7 +516,7 @@ void cliptestB(unsigned long *b,int vals,int bits,int *comp,int compsize){
   bytes=oggpackB_bytes(&o);
   if (bytes!=compsize)report( "wrong number of bytes!\n" );
   for ( i=0;i<bytes;i++ )if (buffer[i]!=comp[i] ){
-    for ( i=0;i<bytes;i++ )fprintf(stderr,"%x %x\n",( int )buffer[i],( int )comp[i] );
+    for ( i=0;i<bytes;i++ )fprintf( stderr,"%x %x\n",( int )buffer[i],( int )comp[i] );
     report( "wrote incorrect value!\n" );
   }
   oggpackB_readinit(&r,buffer,bytes);
@@ -610,19 +610,19 @@ int main( void ){
   /* Later we test against pregenerated bitstreams */
   oggpack_writeinit(&o);
 
-  fprintf(stderr,"\nSmall preclipped packing (LSb): " );
+  fprintf( stderr,"\nSmall preclipped packing (LSb): " );
   cliptest(testbuffer1,test1size,0,one,onesize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nNull bit call (LSb): " );
+  fprintf( stderr,"\nNull bit call (LSb): " );
   cliptest(testbuffer3,test3size,0,two,twosize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nLarge preclipped packing (LSb): " );
+  fprintf( stderr,"\nLarge preclipped packing (LSb): " );
   cliptest(testbuffer2,test2size,0,three,threesize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\n32 bit preclipped packing (LSb): " );
+  fprintf( stderr,"\n32 bit preclipped packing (LSb): " );
   oggpack_reset(&o);
   for ( i=0;i<test2size;i++ )
     oggpack_write(&o,large[i],32);
@@ -632,62 +632,62 @@ int main( void ){
   for ( i=0;i<test2size;i++ ){
     if (oggpack_look(&r,32)==-1 )report( "out of data. failed!" );
     if (oggpack_look(&r,32)!=large[i] ){
-      fprintf(stderr,"%ld != %ld (%lx!=%lx):",oggpack_look(&r,32),large[i],
+      fprintf( stderr,"%ld != %ld (%lx!=%lx):",oggpack_look(&r,32),large[i],
 	      oggpack_look(&r,32),large[i] );
       report( "read incorrect value!\n" );
     }
     oggpack_adv(&r,32);
   }
   if (oggpack_bytes(&r)!=bytes)report( "leftover bytes after read!\n" );
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nSmall unclipped packing (LSb): " );
+  fprintf( stderr,"\nSmall unclipped packing (LSb): " );
   cliptest(testbuffer1,test1size,7,four,foursize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nLarge unclipped packing (LSb): " );
+  fprintf( stderr,"\nLarge unclipped packing (LSb): " );
   cliptest(testbuffer2,test2size,17,five,fivesize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nSingle bit unclipped packing (LSb): " );
+  fprintf( stderr,"\nSingle bit unclipped packing (LSb): " );
   cliptest(testbuffer3,test3size,1,six,sixsize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nTesting read past end (LSb): " );
+  fprintf( stderr,"\nTesting read past end (LSb): " );
   oggpack_readinit(&r,"\0\0\0\0\0\0\0\0",8);
   for ( i=0;i<64;i++ ){
     if (oggpack_read(&r,1 )!=0 ){
-      fprintf(stderr,"failed; got -1 prematurely.\n" );
+      fprintf( stderr,"failed; got -1 prematurely.\n" );
       exit(1 );
     }
   }
   if (oggpack_look(&r,1 )!=-1 ||
      oggpack_read(&r,1 )!=-1 ){
-      fprintf(stderr,"failed; read past end without -1.\n" );
+      fprintf( stderr,"failed; read past end without -1.\n" );
       exit(1 );
   }
   oggpack_readinit(&r,"\0\0\0\0\0\0\0\0",8);
   if (oggpack_read(&r,30)!=0 || oggpack_read(&r,16)!=0 ){
-      fprintf(stderr,"failed 2; got -1 prematurely.\n" );
+      fprintf( stderr,"failed 2; got -1 prematurely.\n" );
       exit(1 );
   }
 
   if (oggpack_look(&r,18)!=0 ||
      oggpack_look(&r,18)!=0 ){
-    fprintf(stderr,"failed 3; got -1 prematurely.\n" );
+    fprintf( stderr,"failed 3; got -1 prematurely.\n" );
       exit(1 );
   }
   if (oggpack_look(&r,19)!=-1 ||
      oggpack_look(&r,19)!=-1 ){
-    fprintf(stderr,"failed; read past end without -1.\n" );
+    fprintf( stderr,"failed; read past end without -1.\n" );
       exit(1 );
   }
   if (oggpack_look(&r,32)!=-1 ||
      oggpack_look(&r,32)!=-1 ){
-    fprintf(stderr,"failed; read past end without -1.\n" );
+    fprintf( stderr,"failed; read past end without -1.\n" );
       exit(1 );
   }
-  fprintf(stderr,"ok.\n" );
+  fprintf( stderr,"ok.\n" );
 
   /********** lazy, cut-n-paste retest with MSb packing ***********/
 
@@ -695,19 +695,19 @@ int main( void ){
   /* Later we test against pregenerated bitstreams */
   oggpackB_writeinit(&o);
 
-  fprintf(stderr,"\nSmall preclipped packing (MSb): " );
+  fprintf( stderr,"\nSmall preclipped packing (MSb): " );
   cliptestB(testbuffer1,test1size,0,oneB,onesize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nNull bit call (MSb): " );
+  fprintf( stderr,"\nNull bit call (MSb): " );
   cliptestB(testbuffer3,test3size,0,twoB,twosize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nLarge preclipped packing (MSb): " );
+  fprintf( stderr,"\nLarge preclipped packing (MSb): " );
   cliptestB(testbuffer2,test2size,0,threeB,threesize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\n32 bit preclipped packing (MSb): " );
+  fprintf( stderr,"\n32 bit preclipped packing (MSb): " );
   oggpackB_reset(&o);
   for ( i=0;i<test2size;i++ )
     oggpackB_write(&o,large[i],32);
@@ -717,62 +717,62 @@ int main( void ){
   for ( i=0;i<test2size;i++ ){
     if (oggpackB_look(&r,32)==-1 )report( "out of data. failed!" );
     if (oggpackB_look(&r,32)!=large[i] ){
-      fprintf(stderr,"%ld != %ld (%lx!=%lx):",oggpackB_look(&r,32),large[i],
+      fprintf( stderr,"%ld != %ld (%lx!=%lx):",oggpackB_look(&r,32),large[i],
 	      oggpackB_look(&r,32),large[i] );
       report( "read incorrect value!\n" );
     }
     oggpackB_adv(&r,32);
   }
   if (oggpackB_bytes(&r)!=bytes)report( "leftover bytes after read!\n" );
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nSmall unclipped packing (MSb): " );
+  fprintf( stderr,"\nSmall unclipped packing (MSb): " );
   cliptestB(testbuffer1,test1size,7,fourB,foursize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nLarge unclipped packing (MSb): " );
+  fprintf( stderr,"\nLarge unclipped packing (MSb): " );
   cliptestB(testbuffer2,test2size,17,fiveB,fivesize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nSingle bit unclipped packing (MSb): " );
+  fprintf( stderr,"\nSingle bit unclipped packing (MSb): " );
   cliptestB(testbuffer3,test3size,1,sixB,sixsize);
-  fprintf(stderr,"ok." );
+  fprintf( stderr,"ok." );
 
-  fprintf(stderr,"\nTesting read past end (MSb): " );
+  fprintf( stderr,"\nTesting read past end (MSb): " );
   oggpackB_readinit(&r,"\0\0\0\0\0\0\0\0",8);
   for ( i=0;i<64;i++ ){
     if (oggpackB_read(&r,1 )!=0 ){
-      fprintf(stderr,"failed; got -1 prematurely.\n" );
+      fprintf( stderr,"failed; got -1 prematurely.\n" );
       exit(1 );
     }
   }
   if (oggpackB_look(&r,1 )!=-1 ||
      oggpackB_read(&r,1 )!=-1 ){
-      fprintf(stderr,"failed; read past end without -1.\n" );
+      fprintf( stderr,"failed; read past end without -1.\n" );
       exit(1 );
   }
   oggpackB_readinit(&r,"\0\0\0\0\0\0\0\0",8);
   if (oggpackB_read(&r,30)!=0 || oggpackB_read(&r,16)!=0 ){
-      fprintf(stderr,"failed 2; got -1 prematurely.\n" );
+      fprintf( stderr,"failed 2; got -1 prematurely.\n" );
       exit(1 );
   }
 
   if (oggpackB_look(&r,18)!=0 ||
      oggpackB_look(&r,18)!=0 ){
-    fprintf(stderr,"failed 3; got -1 prematurely.\n" );
+    fprintf( stderr,"failed 3; got -1 prematurely.\n" );
       exit(1 );
   }
   if (oggpackB_look(&r,19)!=-1 ||
      oggpackB_look(&r,19)!=-1 ){
-    fprintf(stderr,"failed; read past end without -1.\n" );
+    fprintf( stderr,"failed; read past end without -1.\n" );
       exit(1 );
   }
   if (oggpackB_look(&r,32)!=-1 ||
      oggpackB_look(&r,32)!=-1 ){
-    fprintf(stderr,"failed; read past end without -1.\n" );
+    fprintf( stderr,"failed; read past end without -1.\n" );
       exit(1 );
   }
-  fprintf(stderr,"ok.\n\n" );
+  fprintf( stderr,"ok.\n\n" );
 
 
   return(0 );

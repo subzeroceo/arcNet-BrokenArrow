@@ -100,7 +100,7 @@ print "static float FROMdB2_LOOKUP[FROMdB2_LOOKUP_SZ]={\n";
 for ($i=0;$i<$fromdB2_sz;){
     print "\t";
     for ($j = 0;$j<4 && $i<$fromdB_sz;$j++ ){
-	printf "%15.10g,", 10**(.05*(-$fromdB_gran/$fromdB2_sz*(.5+$i++ ) ));
+	printf "%15.10g,", 10**(.05*(-$fromdB_gran/$fromdB2_sz*(.5+$i++ ) ) );
     }
     print "\n";
 }

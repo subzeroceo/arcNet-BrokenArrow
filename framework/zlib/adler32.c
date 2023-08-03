@@ -72,13 +72,13 @@ uLong ZEXPORT adler32(adler, buf, len)
         if (adler >= BASE)
             adler -= BASE;
         sum2 += adler;
-        if (sum2 >= BASE)
+        if ( sum2 >= BASE)
             sum2 -= BASE;
-        return adler | (sum2 << 16);
+        return adler | ( sum2 << 16);
     }
 
     /* initial Adler-32 value (deferred check for len == 1 speed) */
-    if (buf == Z_NULL)
+    if (buf == Z_NULL )
         return 1L;
 
     /* in case short lengths are provided, keep it somewhat fast */
@@ -89,8 +89,8 @@ uLong ZEXPORT adler32(adler, buf, len)
         }
         if (adler >= BASE)
             adler -= BASE;
-        MOD4(sum2);             /* only added so many BASE's */
-        return adler | (sum2 << 16);
+        MOD4( sum2);             /* only added so many BASE's */
+        return adler | ( sum2 << 16);
     }
 
     /* do length NMAX blocks -- requires just one modulo operation */
@@ -102,7 +102,7 @@ uLong ZEXPORT adler32(adler, buf, len)
             buf += 16;
         } while (--n);
         MOD(adler);
-        MOD(sum2);
+        MOD( sum2);
     }
 
     /* do remaining bytes (less than NMAX, still just one modulo) */
@@ -117,11 +117,11 @@ uLong ZEXPORT adler32(adler, buf, len)
             sum2 += adler;
         }
         MOD(adler);
-        MOD(sum2);
+        MOD( sum2);
     }
 
     /* return recombined sums */
-    return adler | (sum2 << 16);
+    return adler | ( sum2 << 16);
 }
 
 /* ========================================================================= */
@@ -138,12 +138,12 @@ uLong ZEXPORT adler32_combine(adler1, adler2, len2)
     rem = (unsigned)(len2 % BASE);
     sum1 = adler1 & 0xffff;
     sum2 = rem * sum1;
-    MOD(sum2);
+    MOD( sum2);
     sum1 += (adler2 & 0xffff) + BASE - 1;
     sum2 += ((adler1 >> 16) & 0xffff) + ((adler2 >> 16) & 0xffff) + BASE - rem;
-    if (sum1 > BASE) sum1 -= BASE;
-    if (sum1 > BASE) sum1 -= BASE;
-    if (sum2 > (BASE << 1 ) ) sum2 -= (BASE << 1 );
-    if (sum2 > BASE) sum2 -= BASE;
-    return sum1 | (sum2 << 16);
+    if ( sum1 > BASE) sum1 -= BASE;
+    if ( sum1 > BASE) sum1 -= BASE;
+    if ( sum2 > (BASE << 1 ) ) sum2 -= (BASE << 1 );
+    if ( sum2 > BASE) sum2 -= BASE;
+    return sum1 | ( sum2 << 16);
 }

@@ -58,19 +58,19 @@ ve_setup_data_template ve_setup_8_stereo={
   _psy_tone_suppress,
 
   _vp_tonemask_adj_8,
-  NULL,
+  nullptr,
   _vp_tonemask_adj_8,
 
   _psy_noiseguards_8,
   _psy_noisebias_8,
   _psy_noisebias_8,
-  NULL,
-  NULL,
+  nullptr,
+  nullptr,
   _psy_noise_suppress,
   
   _psy_compand_8,
   _psy_compand_8_mapping,
-  NULL,
+  nullptr,
 
   {_noise_start_8,_noise_start_8},
   {_noise_part_8,_noise_part_8},
@@ -88,7 +88,7 @@ ve_setup_data_template ve_setup_8_stereo={
   _floor_books,
   _floor,
   _floor_mapping_8,
-  NULL,
+  nullptr,
 
   _mapres_template_8_stereo
 };
@@ -109,19 +109,19 @@ ve_setup_data_template ve_setup_8_uncoupled={
   _psy_tone_suppress,
 
   _vp_tonemask_adj_8,
-  NULL,
+  nullptr,
   _vp_tonemask_adj_8,
 
   _psy_noiseguards_8,
   _psy_noisebias_8,
   _psy_noisebias_8,
-  NULL,
-  NULL,
+  nullptr,
+  nullptr,
   _psy_noise_suppress,
   
   _psy_compand_8,
   _psy_compand_8_mapping,
-  NULL,
+  nullptr,
 
   {_noise_start_8,_noise_start_8},
   {_noise_part_8,_noise_part_8},
@@ -139,7 +139,7 @@ ve_setup_data_template ve_setup_8_uncoupled={
   _floor_books,
   _floor,
   _floor_mapping_8,
-  NULL,
+  nullptr,
 
   _mapres_template_8_uncoupled
 };

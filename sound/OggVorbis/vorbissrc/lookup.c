@@ -46,9 +46,9 @@ float vorbis_invsq2explook( int a){
 #include <stdio.h>
 /* interpolated lookup based fromdB function, domain -140dB to 0dB only */
 float vorbis_fromdBlook(float a){
-  int i=vorbis_ftoi(a*(( float )(-(1<<FROMdB2_SHIFT) ))-.5f);
+  int i=vorbis_ftoi(a*(( float )(-(1<<FROMdB2_SHIFT) ) )-.5f);
   return ( i<0 )?1.f:
-    (( i>=(FROMdB_LOOKUP_SZ<<FROMdB_SHIFT) )?0.f:
+    ( ( i>=(FROMdB_LOOKUP_SZ<<FROMdB_SHIFT) )?0.f:
      FROMdB_LOOKUP[i>>FROMdB_SHIFT]*FROMdB2_LOOKUP[i&FROMdB2_MASK] );
 }
 
@@ -78,7 +78,7 @@ long vorbis_invsqlook_i(long a,long e){
 float vorbis_fromdBlook_i(long a){
   int i=(-a)>>(12-FROMdB2_SHIFT);
   return ( i<0 )?1.f:
-    (( i>=(FROMdB_LOOKUP_SZ<<FROMdB_SHIFT) )?0.f:
+    ( ( i>=(FROMdB_LOOKUP_SZ<<FROMdB_SHIFT) )?0.f:
      FROMdB_LOOKUP[i>>FROMdB_SHIFT]*FROMdB2_LOOKUP[i&FROMdB2_MASK] );
 }
 

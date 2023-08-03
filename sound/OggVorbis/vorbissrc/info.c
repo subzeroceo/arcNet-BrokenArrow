@@ -68,11 +68,11 @@ void vorbis_comment_add(vorbis_comment *vc,char *comment){
   vc->user_comments[vc->comments]=_ogg_malloc(vc->comment_lengths[vc->comments]+1 );
   strcpy(vc->user_comments[vc->comments], comment);
   vc->comments++;
-  vc->user_comments[vc->comments]=NULL;
+  vc->user_comments[vc->comments]=nullptr;
 }
 
 void vorbis_comment_add_tag(vorbis_comment *vc, char *tag, char *contents){
-  char *comment=alloca(strlen(tag)+strlen(contents)+2); /* +2 for = and \0 */
+  char *comment=alloca( strlen(tag)+strlen(contents)+2); /* +2 for = and \0 */
   strcpy(comment, tag);
   strcat(comment, "=" );
   strcat(comment, contents);
@@ -84,7 +84,7 @@ void vorbis_comment_add_tag(vorbis_comment *vc, char *tag, char *contents){
 static int tagcompare(const char *s1, const char *s2, int n){
   int c=0;
   while(c < n){
-    if (toupper(s1[c] ) != toupper(s2[c] ) )
+    if (toupper( s1[c] ) != toupper( s2[c] ) )
       return !0;
     c++;
   }
@@ -109,7 +109,7 @@ char *vorbis_comment_query(vorbis_comment *vc, char *tag, int count){
 	found++;
     }
   }
-  return NULL; /* didn't find anything */
+  return nullptr; /* didn't find anything */
 }
 
 int vorbis_comment_query_count(vorbis_comment *vc, char *tag){
@@ -350,7 +350,7 @@ int vorbis_synthesis_headerin(vorbis_info *vi,vorbis_comment *vc,ogg_packet *op)
 	/* not a vorbis header */
 	return(OV_ENOTVORBIS);
       }
-      switch(packtype){
+      switch (packtype){
       case 0x01: /* least significant *bit* is read first */
 	if ( !op->b_o_s){
 	  /* Not the initial packet */
@@ -372,7 +372,7 @@ int vorbis_synthesis_headerin(vorbis_info *vi,vorbis_comment *vc,ogg_packet *op)
 	return(_vorbis_unpack_comment(vc,&opb) );
 
       case 0x05: /* least significant *bit* is read first */
-	if (vi->rate==0 || vc->vendor==NULL){
+	if (vi->rate==0 || vc->vendor== nullptr ){
 	  /* um... we didn;t get the initial header or comments yet */
 	  return(OV_EBADHEADER);
 	}
@@ -590,9 +590,9 @@ int vorbis_analysis_headerout(vorbis_dsp_state *v,
   if (b->header)_ogg_free(b->header);
   if (b->header1)_ogg_free(b->header1);
   if (b->header2)_ogg_free(b->header2);
-  b->header=NULL;
-  b->header1=NULL;
-  b->header2=NULL;
+  b->header=nullptr;
+  b->header1=nullptr;
+  b->header2=nullptr;
   return(ret);
 }
 

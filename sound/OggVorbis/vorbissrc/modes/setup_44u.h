@@ -67,7 +67,7 @@ ve_setup_data_template ve_setup_44_uncoupled={
 
   _psy_global_44,
   _global_mapping_44,
-  NULL,
+  nullptr,
 
   _floor_books,
   _floor,
@@ -118,7 +118,7 @@ ve_setup_data_template ve_setup_44_uncoupled_low={
 
   _psy_global_44,
   _global_mapping_44_low,
-  NULL,
+  nullptr,
 
   _floor_books,
   _floor,

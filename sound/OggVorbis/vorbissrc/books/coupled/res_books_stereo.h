@@ -456,9 +456,9 @@ static static_codebook _16c0_s_p1_0 = {
 	_vq_lengthlist__16c0_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__16c0_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -533,9 +533,9 @@ static static_codebook _16c0_s_p2_0 = {
 	_vq_lengthlist__16c0_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16c0_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -610,9 +610,9 @@ static static_codebook _16c0_s_p3_0 = {
 	_vq_lengthlist__16c0_s_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16c0_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -658,9 +658,9 @@ static static_codebook _16c0_s_p4_0 = {
 	_vq_lengthlist__16c0_s_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__16c0_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -706,9 +706,9 @@ static static_codebook _16c0_s_p5_0 = {
 	_vq_lengthlist__16c0_s_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__16c0_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -777,9 +777,9 @@ static static_codebook _16c0_s_p6_0 = {
 	_vq_lengthlist__16c0_s_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__16c0_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -818,9 +818,9 @@ static static_codebook _16c0_s_p7_0 = {
 	_vq_lengthlist__16c0_s_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__16c0_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -871,9 +871,9 @@ static static_codebook _16c0_s_p7_1 = {
 	_vq_lengthlist__16c0_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__16c0_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -929,9 +929,9 @@ static static_codebook _16c0_s_p8_0 = {
 	_vq_lengthlist__16c0_s_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__16c0_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -968,9 +968,9 @@ static static_codebook _16c0_s_p8_1 = {
 	_vq_lengthlist__16c0_s_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16c0_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1009,9 +1009,9 @@ static static_codebook _16c0_s_p9_0 = {
 	_vq_lengthlist__16c0_s_p9_0,
 	1, -518803456, 1628680192, 2, 0,
 	_vq_quantlist__16c0_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1073,9 +1073,9 @@ static static_codebook _16c0_s_p9_1 = {
 	_vq_lengthlist__16c0_s_p9_1,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__16c0_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1158,9 +1158,9 @@ static static_codebook _16c0_s_p9_2 = {
 	_vq_lengthlist__16c0_s_p9_2,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__16c0_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c0_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1178,10 +1178,10 @@ static static_codebook _huff_book__16c0_s_single = {
 	2, 100,
 	_huff_lengthlist__16c0_s_single,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -1199,10 +1199,10 @@ static static_codebook _huff_book__16c1_s_long = {
 	2, 100,
 	_huff_lengthlist__16c1_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -1646,9 +1646,9 @@ static static_codebook _16c1_s_p1_0 = {
 	_vq_lengthlist__16c1_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__16c1_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1723,9 +1723,9 @@ static static_codebook _16c1_s_p2_0 = {
 	_vq_lengthlist__16c1_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16c1_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1800,9 +1800,9 @@ static static_codebook _16c1_s_p3_0 = {
 	_vq_lengthlist__16c1_s_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16c1_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1848,9 +1848,9 @@ static static_codebook _16c1_s_p4_0 = {
 	_vq_lengthlist__16c1_s_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__16c1_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1896,9 +1896,9 @@ static static_codebook _16c1_s_p5_0 = {
 	_vq_lengthlist__16c1_s_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__16c1_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -1967,9 +1967,9 @@ static static_codebook _16c1_s_p6_0 = {
 	_vq_lengthlist__16c1_s_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__16c1_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2008,9 +2008,9 @@ static static_codebook _16c1_s_p7_0 = {
 	_vq_lengthlist__16c1_s_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__16c1_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2061,9 +2061,9 @@ static static_codebook _16c1_s_p7_1 = {
 	_vq_lengthlist__16c1_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__16c1_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2119,9 +2119,9 @@ static static_codebook _16c1_s_p8_0 = {
 	_vq_lengthlist__16c1_s_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__16c1_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2158,9 +2158,9 @@ static static_codebook _16c1_s_p8_1 = {
 	_vq_lengthlist__16c1_s_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16c1_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2216,9 +2216,9 @@ static static_codebook _16c1_s_p9_0 = {
 	_vq_lengthlist__16c1_s_p9_0,
 	1, -513964032, 1628680192, 4, 0,
 	_vq_quantlist__16c1_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2280,9 +2280,9 @@ static static_codebook _16c1_s_p9_1 = {
 	_vq_lengthlist__16c1_s_p9_1,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__16c1_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2365,9 +2365,9 @@ static static_codebook _16c1_s_p9_2 = {
 	_vq_lengthlist__16c1_s_p9_2,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__16c1_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c1_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2385,10 +2385,10 @@ static static_codebook _huff_book__16c1_s_short = {
 	2, 100,
 	_huff_lengthlist__16c1_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -2406,10 +2406,10 @@ static static_codebook _huff_book__16c2_s_long = {
 	2, 100,
 	_huff_lengthlist__16c2_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -2448,9 +2448,9 @@ static static_codebook _16c2_s_p1_0 = {
 	_vq_lengthlist__16c2_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__16c2_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2525,9 +2525,9 @@ static static_codebook _16c2_s_p2_0 = {
 	_vq_lengthlist__16c2_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16c2_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2573,9 +2573,9 @@ static static_codebook _16c2_s_p3_0 = {
 	_vq_lengthlist__16c2_s_p3_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__16c2_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2644,9 +2644,9 @@ static static_codebook _16c2_s_p4_0 = {
 	_vq_lengthlist__16c2_s_p4_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__16c2_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2685,9 +2685,9 @@ static static_codebook _16c2_s_p5_0 = {
 	_vq_lengthlist__16c2_s_p5_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__16c2_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2738,9 +2738,9 @@ static static_codebook _16c2_s_p5_1 = {
 	_vq_lengthlist__16c2_s_p5_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__16c2_s_p5_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p5_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2796,9 +2796,9 @@ static static_codebook _16c2_s_p6_0 = {
 	_vq_lengthlist__16c2_s_p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__16c2_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2835,9 +2835,9 @@ static static_codebook _16c2_s_p6_1 = {
 	_vq_lengthlist__16c2_s_p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__16c2_s_p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2893,9 +2893,9 @@ static static_codebook _16c2_s_p7_0 = {
 	_vq_lengthlist__16c2_s_p7_0,
 	1, -523206656, 1618345984, 4, 0,
 	_vq_quantlist__16c2_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -2946,9 +2946,9 @@ static static_codebook _16c2_s_p7_1 = {
 	_vq_lengthlist__16c2_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__16c2_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3010,9 +3010,9 @@ static static_codebook _16c2_s_p8_0 = {
 	_vq_lengthlist__16c2_s_p8_0,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__16c2_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3095,9 +3095,9 @@ static static_codebook _16c2_s_p8_1 = {
 	_vq_lengthlist__16c2_s_p8_1,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__16c2_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3153,9 +3153,9 @@ static static_codebook _16c2_s_p9_0 = {
 	_vq_lengthlist__16c2_s_p9_0,
 	1, -510275072, 1631393792, 4, 0,
 	_vq_quantlist__16c2_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3224,9 +3224,9 @@ static static_codebook _16c2_s_p9_1 = {
 	_vq_lengthlist__16c2_s_p9_1,
 	1, -518488064, 1622704128, 5, 0,
 	_vq_quantlist__16c2_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3291,9 +3291,9 @@ static static_codebook _16c2_s_p9_2 = {
 	_vq_lengthlist__16c2_s_p9_2,
 	1, -528875520, 1611661312, 5, 0,
 	_vq_quantlist__16c2_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__16c2_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3311,10 +3311,10 @@ static static_codebook _huff_book__16c2_s_short = {
 	2, 100,
 	_huff_lengthlist__16c2_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -3332,10 +3332,10 @@ static static_codebook _huff_book__44c0_s_long = {
 	2, 100,
 	_huff_lengthlist__44c0_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -3779,9 +3779,9 @@ static static_codebook _44c0_s_p1_0 = {
 	_vq_lengthlist__44c0_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c0_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3856,9 +3856,9 @@ static static_codebook _44c0_s_p2_0 = {
 	_vq_lengthlist__44c0_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c0_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3933,9 +3933,9 @@ static static_codebook _44c0_s_p3_0 = {
 	_vq_lengthlist__44c0_s_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c0_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -3981,9 +3981,9 @@ static static_codebook _44c0_s_p4_0 = {
 	_vq_lengthlist__44c0_s_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c0_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4029,9 +4029,9 @@ static static_codebook _44c0_s_p5_0 = {
 	_vq_lengthlist__44c0_s_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c0_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4100,9 +4100,9 @@ static static_codebook _44c0_s_p6_0 = {
 	_vq_lengthlist__44c0_s_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c0_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4141,9 +4141,9 @@ static static_codebook _44c0_s_p7_0 = {
 	_vq_lengthlist__44c0_s_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c0_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4194,9 +4194,9 @@ static static_codebook _44c0_s_p7_1 = {
 	_vq_lengthlist__44c0_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c0_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4252,9 +4252,9 @@ static static_codebook _44c0_s_p8_0 = {
 	_vq_lengthlist__44c0_s_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c0_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4291,9 +4291,9 @@ static static_codebook _44c0_s_p8_1 = {
 	_vq_lengthlist__44c0_s_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c0_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4368,9 +4368,9 @@ static static_codebook _44c0_s_p9_0 = {
 	_vq_lengthlist__44c0_s_p9_0,
 	1, -518283264, 1627103232, 3, 0,
 	_vq_quantlist__44c0_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4426,9 +4426,9 @@ static static_codebook _44c0_s_p9_1 = {
 	_vq_lengthlist__44c0_s_p9_1,
 	1, -522616832, 1620115456, 4, 0,
 	_vq_quantlist__44c0_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4497,9 +4497,9 @@ static static_codebook _44c0_s_p9_2 = {
 	_vq_lengthlist__44c0_s_p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c0_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -4517,10 +4517,10 @@ static static_codebook _huff_book__44c0_s_short = {
 	2, 100,
 	_huff_lengthlist__44c0_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -4538,10 +4538,10 @@ static static_codebook _huff_book__44c0_sm_long = {
 	2, 100,
 	_huff_lengthlist__44c0_sm_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -4985,9 +4985,9 @@ static static_codebook _44c0_sm_p1_0 = {
 	_vq_lengthlist__44c0_sm_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c0_sm_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5062,9 +5062,9 @@ static static_codebook _44c0_sm_p2_0 = {
 	_vq_lengthlist__44c0_sm_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c0_sm_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5139,9 +5139,9 @@ static static_codebook _44c0_sm_p3_0 = {
 	_vq_lengthlist__44c0_sm_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c0_sm_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5187,9 +5187,9 @@ static static_codebook _44c0_sm_p4_0 = {
 	_vq_lengthlist__44c0_sm_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c0_sm_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5235,9 +5235,9 @@ static static_codebook _44c0_sm_p5_0 = {
 	_vq_lengthlist__44c0_sm_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c0_sm_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5306,9 +5306,9 @@ static static_codebook _44c0_sm_p6_0 = {
 	_vq_lengthlist__44c0_sm_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c0_sm_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5347,9 +5347,9 @@ static static_codebook _44c0_sm_p7_0 = {
 	_vq_lengthlist__44c0_sm_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c0_sm_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5400,9 +5400,9 @@ static static_codebook _44c0_sm_p7_1 = {
 	_vq_lengthlist__44c0_sm_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c0_sm_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5458,9 +5458,9 @@ static static_codebook _44c0_sm_p8_0 = {
 	_vq_lengthlist__44c0_sm_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c0_sm_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5497,9 +5497,9 @@ static static_codebook _44c0_sm_p8_1 = {
 	_vq_lengthlist__44c0_sm_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c0_sm_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5545,9 +5545,9 @@ static static_codebook _44c0_sm_p9_0 = {
 	_vq_lengthlist__44c0_sm_p9_0,
 	1, -516186112, 1627103232, 4, 0,
 	_vq_quantlist__44c0_sm_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5603,9 +5603,9 @@ static static_codebook _44c0_sm_p9_1 = {
 	_vq_lengthlist__44c0_sm_p9_1,
 	1, -522616832, 1620115456, 4, 0,
 	_vq_quantlist__44c0_sm_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5674,9 +5674,9 @@ static static_codebook _44c0_sm_p9_2 = {
 	_vq_lengthlist__44c0_sm_p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c0_sm_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c0_sm_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -5694,10 +5694,10 @@ static static_codebook _huff_book__44c0_sm_short = {
 	2, 100,
 	_huff_lengthlist__44c0_sm_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -5715,10 +5715,10 @@ static static_codebook _huff_book__44c1_s_long = {
 	2, 100,
 	_huff_lengthlist__44c1_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -6162,9 +6162,9 @@ static static_codebook _44c1_s_p1_0 = {
 	_vq_lengthlist__44c1_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c1_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6239,9 +6239,9 @@ static static_codebook _44c1_s_p2_0 = {
 	_vq_lengthlist__44c1_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c1_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6316,9 +6316,9 @@ static static_codebook _44c1_s_p3_0 = {
 	_vq_lengthlist__44c1_s_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c1_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6364,9 +6364,9 @@ static static_codebook _44c1_s_p4_0 = {
 	_vq_lengthlist__44c1_s_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c1_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6412,9 +6412,9 @@ static static_codebook _44c1_s_p5_0 = {
 	_vq_lengthlist__44c1_s_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c1_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6483,9 +6483,9 @@ static static_codebook _44c1_s_p6_0 = {
 	_vq_lengthlist__44c1_s_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c1_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6524,9 +6524,9 @@ static static_codebook _44c1_s_p7_0 = {
 	_vq_lengthlist__44c1_s_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c1_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6577,9 +6577,9 @@ static static_codebook _44c1_s_p7_1 = {
 	_vq_lengthlist__44c1_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c1_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6635,9 +6635,9 @@ static static_codebook _44c1_s_p8_0 = {
 	_vq_lengthlist__44c1_s_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c1_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6674,9 +6674,9 @@ static static_codebook _44c1_s_p8_1 = {
 	_vq_lengthlist__44c1_s_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c1_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6732,9 +6732,9 @@ static static_codebook _44c1_s_p9_0 = {
 	_vq_lengthlist__44c1_s_p9_0,
 	1, -514541568, 1627103232, 4, 0,
 	_vq_quantlist__44c1_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6790,9 +6790,9 @@ static static_codebook _44c1_s_p9_1 = {
 	_vq_lengthlist__44c1_s_p9_1,
 	1, -522616832, 1620115456, 4, 0,
 	_vq_quantlist__44c1_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6861,9 +6861,9 @@ static static_codebook _44c1_s_p9_2 = {
 	_vq_lengthlist__44c1_s_p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c1_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -6881,10 +6881,10 @@ static static_codebook _huff_book__44c1_s_short = {
 	2, 100,
 	_huff_lengthlist__44c1_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -6902,10 +6902,10 @@ static static_codebook _huff_book__44c1_sm_long = {
 	2, 100,
 	_huff_lengthlist__44c1_sm_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -7349,9 +7349,9 @@ static static_codebook _44c1_sm_p1_0 = {
 	_vq_lengthlist__44c1_sm_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c1_sm_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7426,9 +7426,9 @@ static static_codebook _44c1_sm_p2_0 = {
 	_vq_lengthlist__44c1_sm_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c1_sm_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7503,9 +7503,9 @@ static static_codebook _44c1_sm_p3_0 = {
 	_vq_lengthlist__44c1_sm_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c1_sm_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7551,9 +7551,9 @@ static static_codebook _44c1_sm_p4_0 = {
 	_vq_lengthlist__44c1_sm_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c1_sm_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7599,9 +7599,9 @@ static static_codebook _44c1_sm_p5_0 = {
 	_vq_lengthlist__44c1_sm_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c1_sm_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7670,9 +7670,9 @@ static static_codebook _44c1_sm_p6_0 = {
 	_vq_lengthlist__44c1_sm_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c1_sm_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7711,9 +7711,9 @@ static static_codebook _44c1_sm_p7_0 = {
 	_vq_lengthlist__44c1_sm_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c1_sm_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7764,9 +7764,9 @@ static static_codebook _44c1_sm_p7_1 = {
 	_vq_lengthlist__44c1_sm_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c1_sm_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7822,9 +7822,9 @@ static static_codebook _44c1_sm_p8_0 = {
 	_vq_lengthlist__44c1_sm_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c1_sm_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7861,9 +7861,9 @@ static static_codebook _44c1_sm_p8_1 = {
 	_vq_lengthlist__44c1_sm_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c1_sm_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7919,9 +7919,9 @@ static static_codebook _44c1_sm_p9_0 = {
 	_vq_lengthlist__44c1_sm_p9_0,
 	1, -514541568, 1627103232, 4, 0,
 	_vq_quantlist__44c1_sm_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -7977,9 +7977,9 @@ static static_codebook _44c1_sm_p9_1 = {
 	_vq_lengthlist__44c1_sm_p9_1,
 	1, -522616832, 1620115456, 4, 0,
 	_vq_quantlist__44c1_sm_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8048,9 +8048,9 @@ static static_codebook _44c1_sm_p9_2 = {
 	_vq_lengthlist__44c1_sm_p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c1_sm_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c1_sm_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8068,10 +8068,10 @@ static static_codebook _huff_book__44c1_sm_short = {
 	2, 100,
 	_huff_lengthlist__44c1_sm_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -8089,10 +8089,10 @@ static static_codebook _huff_book__44c2_s_long = {
 	2, 100,
 	_huff_lengthlist__44c2_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -8536,9 +8536,9 @@ static static_codebook _44c2_s_p1_0 = {
 	_vq_lengthlist__44c2_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c2_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8613,9 +8613,9 @@ static static_codebook _44c2_s_p2_0 = {
 	_vq_lengthlist__44c2_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c2_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8690,9 +8690,9 @@ static static_codebook _44c2_s_p3_0 = {
 	_vq_lengthlist__44c2_s_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c2_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8738,9 +8738,9 @@ static static_codebook _44c2_s_p4_0 = {
 	_vq_lengthlist__44c2_s_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c2_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8786,9 +8786,9 @@ static static_codebook _44c2_s_p5_0 = {
 	_vq_lengthlist__44c2_s_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c2_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8857,9 +8857,9 @@ static static_codebook _44c2_s_p6_0 = {
 	_vq_lengthlist__44c2_s_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c2_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8898,9 +8898,9 @@ static static_codebook _44c2_s_p7_0 = {
 	_vq_lengthlist__44c2_s_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c2_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -8951,9 +8951,9 @@ static static_codebook _44c2_s_p7_1 = {
 	_vq_lengthlist__44c2_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c2_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9009,9 +9009,9 @@ static static_codebook _44c2_s_p8_0 = {
 	_vq_lengthlist__44c2_s_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c2_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9048,9 +9048,9 @@ static static_codebook _44c2_s_p8_1 = {
 	_vq_lengthlist__44c2_s_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c2_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9106,9 +9106,9 @@ static static_codebook _44c2_s_p9_0 = {
 	_vq_lengthlist__44c2_s_p9_0,
 	1, -514541568, 1627103232, 4, 0,
 	_vq_quantlist__44c2_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9164,9 +9164,9 @@ static static_codebook _44c2_s_p9_1 = {
 	_vq_lengthlist__44c2_s_p9_1,
 	1, -522616832, 1620115456, 4, 0,
 	_vq_quantlist__44c2_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9235,9 +9235,9 @@ static static_codebook _44c2_s_p9_2 = {
 	_vq_lengthlist__44c2_s_p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c2_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c2_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9255,10 +9255,10 @@ static static_codebook _huff_book__44c2_s_short = {
 	2, 100,
 	_huff_lengthlist__44c2_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -9276,10 +9276,10 @@ static static_codebook _huff_book__44c3_s_long = {
 	2, 100,
 	_huff_lengthlist__44c3_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -9723,9 +9723,9 @@ static static_codebook _44c3_s_p1_0 = {
 	_vq_lengthlist__44c3_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c3_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9800,9 +9800,9 @@ static static_codebook _44c3_s_p2_0 = {
 	_vq_lengthlist__44c3_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c3_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9877,9 +9877,9 @@ static static_codebook _44c3_s_p3_0 = {
 	_vq_lengthlist__44c3_s_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c3_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9925,9 +9925,9 @@ static static_codebook _44c3_s_p4_0 = {
 	_vq_lengthlist__44c3_s_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c3_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -9973,9 +9973,9 @@ static static_codebook _44c3_s_p5_0 = {
 	_vq_lengthlist__44c3_s_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c3_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10044,9 +10044,9 @@ static static_codebook _44c3_s_p6_0 = {
 	_vq_lengthlist__44c3_s_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c3_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10085,9 +10085,9 @@ static static_codebook _44c3_s_p7_0 = {
 	_vq_lengthlist__44c3_s_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c3_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10138,9 +10138,9 @@ static static_codebook _44c3_s_p7_1 = {
 	_vq_lengthlist__44c3_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c3_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10196,9 +10196,9 @@ static static_codebook _44c3_s_p8_0 = {
 	_vq_lengthlist__44c3_s_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c3_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10235,9 +10235,9 @@ static static_codebook _44c3_s_p8_1 = {
 	_vq_lengthlist__44c3_s_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c3_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10293,9 +10293,9 @@ static static_codebook _44c3_s_p9_0 = {
 	_vq_lengthlist__44c3_s_p9_0,
 	1, -514332672, 1627381760, 4, 0,
 	_vq_quantlist__44c3_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10357,9 +10357,9 @@ static static_codebook _44c3_s_p9_1 = {
 	_vq_lengthlist__44c3_s_p9_1,
 	1, -522338304, 1620115456, 4, 0,
 	_vq_quantlist__44c3_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10428,9 +10428,9 @@ static static_codebook _44c3_s_p9_2 = {
 	_vq_lengthlist__44c3_s_p9_2,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c3_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c3_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10448,10 +10448,10 @@ static static_codebook _huff_book__44c3_s_short = {
 	2, 100,
 	_huff_lengthlist__44c3_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -10469,10 +10469,10 @@ static static_codebook _huff_book__44c4_s_long = {
 	2, 100,
 	_huff_lengthlist__44c4_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -10916,9 +10916,9 @@ static static_codebook _44c4_s_p1_0 = {
 	_vq_lengthlist__44c4_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c4_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -10993,9 +10993,9 @@ static static_codebook _44c4_s_p2_0 = {
 	_vq_lengthlist__44c4_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c4_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11070,9 +11070,9 @@ static static_codebook _44c4_s_p3_0 = {
 	_vq_lengthlist__44c4_s_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c4_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11118,9 +11118,9 @@ static static_codebook _44c4_s_p4_0 = {
 	_vq_lengthlist__44c4_s_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c4_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11166,9 +11166,9 @@ static static_codebook _44c4_s_p5_0 = {
 	_vq_lengthlist__44c4_s_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c4_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11237,9 +11237,9 @@ static static_codebook _44c4_s_p6_0 = {
 	_vq_lengthlist__44c4_s_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c4_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11278,9 +11278,9 @@ static static_codebook _44c4_s_p7_0 = {
 	_vq_lengthlist__44c4_s_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c4_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11331,9 +11331,9 @@ static static_codebook _44c4_s_p7_1 = {
 	_vq_lengthlist__44c4_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c4_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11389,9 +11389,9 @@ static static_codebook _44c4_s_p8_0 = {
 	_vq_lengthlist__44c4_s_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c4_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11428,9 +11428,9 @@ static static_codebook _44c4_s_p8_1 = {
 	_vq_lengthlist__44c4_s_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c4_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11486,9 +11486,9 @@ static static_codebook _44c4_s_p9_0 = {
 	_vq_lengthlist__44c4_s_p9_0,
 	1, -513964032, 1628680192, 4, 0,
 	_vq_quantlist__44c4_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11550,9 +11550,9 @@ static static_codebook _44c4_s_p9_1 = {
 	_vq_lengthlist__44c4_s_p9_1,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__44c4_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11635,9 +11635,9 @@ static static_codebook _44c4_s_p9_2 = {
 	_vq_lengthlist__44c4_s_p9_2,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__44c4_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c4_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -11655,10 +11655,10 @@ static static_codebook _huff_book__44c4_s_short = {
 	2, 100,
 	_huff_lengthlist__44c4_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -11676,10 +11676,10 @@ static static_codebook _huff_book__44c5_s_long = {
 	2, 100,
 	_huff_lengthlist__44c5_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -12123,9 +12123,9 @@ static static_codebook _44c5_s_p1_0 = {
 	_vq_lengthlist__44c5_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c5_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12200,9 +12200,9 @@ static static_codebook _44c5_s_p2_0 = {
 	_vq_lengthlist__44c5_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c5_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12277,9 +12277,9 @@ static static_codebook _44c5_s_p3_0 = {
 	_vq_lengthlist__44c5_s_p3_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c5_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12325,9 +12325,9 @@ static static_codebook _44c5_s_p4_0 = {
 	_vq_lengthlist__44c5_s_p4_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c5_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12373,9 +12373,9 @@ static static_codebook _44c5_s_p5_0 = {
 	_vq_lengthlist__44c5_s_p5_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c5_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12444,9 +12444,9 @@ static static_codebook _44c5_s_p6_0 = {
 	_vq_lengthlist__44c5_s_p6_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c5_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12485,9 +12485,9 @@ static static_codebook _44c5_s_p7_0 = {
 	_vq_lengthlist__44c5_s_p7_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c5_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12538,9 +12538,9 @@ static static_codebook _44c5_s_p7_1 = {
 	_vq_lengthlist__44c5_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c5_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12596,9 +12596,9 @@ static static_codebook _44c5_s_p8_0 = {
 	_vq_lengthlist__44c5_s_p8_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c5_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12635,9 +12635,9 @@ static static_codebook _44c5_s_p8_1 = {
 	_vq_lengthlist__44c5_s_p8_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c5_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12699,9 +12699,9 @@ static static_codebook _44c5_s_p9_0 = {
 	_vq_lengthlist__44c5_s_p9_0,
 	1, -512522752, 1628852224, 4, 0,
 	_vq_quantlist__44c5_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12770,9 +12770,9 @@ static static_codebook _44c5_s_p9_1 = {
 	_vq_lengthlist__44c5_s_p9_1,
 	1, -520814592, 1620377600, 5, 0,
 	_vq_quantlist__44c5_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12855,9 +12855,9 @@ static static_codebook _44c5_s_p9_2 = {
 	_vq_lengthlist__44c5_s_p9_2,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__44c5_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c5_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -12875,10 +12875,10 @@ static static_codebook _huff_book__44c5_s_short = {
 	2, 100,
 	_huff_lengthlist__44c5_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -12896,10 +12896,10 @@ static static_codebook _huff_book__44c6_s_long = {
 	2, 100,
 	_huff_lengthlist__44c6_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -12938,9 +12938,9 @@ static static_codebook _44c6_s_p1_0 = {
 	_vq_lengthlist__44c6_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c6_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13015,9 +13015,9 @@ static static_codebook _44c6_s_p2_0 = {
 	_vq_lengthlist__44c6_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c6_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13063,9 +13063,9 @@ static static_codebook _44c6_s_p3_0 = {
 	_vq_lengthlist__44c6_s_p3_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c6_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13134,9 +13134,9 @@ static static_codebook _44c6_s_p4_0 = {
 	_vq_lengthlist__44c6_s_p4_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c6_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13175,9 +13175,9 @@ static static_codebook _44c6_s_p5_0 = {
 	_vq_lengthlist__44c6_s_p5_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c6_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13228,9 +13228,9 @@ static static_codebook _44c6_s_p5_1 = {
 	_vq_lengthlist__44c6_s_p5_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c6_s_p5_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p5_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13286,9 +13286,9 @@ static static_codebook _44c6_s_p6_0 = {
 	_vq_lengthlist__44c6_s_p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c6_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13325,9 +13325,9 @@ static static_codebook _44c6_s_p6_1 = {
 	_vq_lengthlist__44c6_s_p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c6_s_p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13383,9 +13383,9 @@ static static_codebook _44c6_s_p7_0 = {
 	_vq_lengthlist__44c6_s_p7_0,
 	1, -523206656, 1618345984, 4, 0,
 	_vq_quantlist__44c6_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13436,9 +13436,9 @@ static static_codebook _44c6_s_p7_1 = {
 	_vq_lengthlist__44c6_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c6_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13500,9 +13500,9 @@ static static_codebook _44c6_s_p8_0 = {
 	_vq_lengthlist__44c6_s_p8_0,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__44c6_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13585,9 +13585,9 @@ static static_codebook _44c6_s_p8_1 = {
 	_vq_lengthlist__44c6_s_p8_1,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__44c6_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13643,9 +13643,9 @@ static static_codebook _44c6_s_p9_0 = {
 	_vq_lengthlist__44c6_s_p9_0,
 	1, -511845376, 1630791680, 4, 0,
 	_vq_quantlist__44c6_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13701,9 +13701,9 @@ static static_codebook _44c6_s_p9_1 = {
 	_vq_lengthlist__44c6_s_p9_1,
 	1, -518889472, 1622704128, 4, 0,
 	_vq_quantlist__44c6_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13797,9 +13797,9 @@ static static_codebook _44c6_s_p9_2 = {
 	_vq_lengthlist__44c6_s_p9_2,
 	1, -526909440, 1611661312, 6, 0,
 	_vq_quantlist__44c6_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c6_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13817,10 +13817,10 @@ static static_codebook _huff_book__44c6_s_short = {
 	2, 100,
 	_huff_lengthlist__44c6_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -13838,10 +13838,10 @@ static static_codebook _huff_book__44c7_s_long = {
 	2, 100,
 	_huff_lengthlist__44c7_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -13880,9 +13880,9 @@ static static_codebook _44c7_s_p1_0 = {
 	_vq_lengthlist__44c7_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c7_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -13957,9 +13957,9 @@ static static_codebook _44c7_s_p2_0 = {
 	_vq_lengthlist__44c7_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c7_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14005,9 +14005,9 @@ static static_codebook _44c7_s_p3_0 = {
 	_vq_lengthlist__44c7_s_p3_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c7_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14076,9 +14076,9 @@ static static_codebook _44c7_s_p4_0 = {
 	_vq_lengthlist__44c7_s_p4_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c7_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14117,9 +14117,9 @@ static static_codebook _44c7_s_p5_0 = {
 	_vq_lengthlist__44c7_s_p5_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c7_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14170,9 +14170,9 @@ static static_codebook _44c7_s_p5_1 = {
 	_vq_lengthlist__44c7_s_p5_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c7_s_p5_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p5_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14228,9 +14228,9 @@ static static_codebook _44c7_s_p6_0 = {
 	_vq_lengthlist__44c7_s_p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c7_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14267,9 +14267,9 @@ static static_codebook _44c7_s_p6_1 = {
 	_vq_lengthlist__44c7_s_p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c7_s_p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14325,9 +14325,9 @@ static static_codebook _44c7_s_p7_0 = {
 	_vq_lengthlist__44c7_s_p7_0,
 	1, -523206656, 1618345984, 4, 0,
 	_vq_quantlist__44c7_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14378,9 +14378,9 @@ static static_codebook _44c7_s_p7_1 = {
 	_vq_lengthlist__44c7_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c7_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14442,9 +14442,9 @@ static static_codebook _44c7_s_p8_0 = {
 	_vq_lengthlist__44c7_s_p8_0,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__44c7_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14527,9 +14527,9 @@ static static_codebook _44c7_s_p8_1 = {
 	_vq_lengthlist__44c7_s_p8_1,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__44c7_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14585,9 +14585,9 @@ static static_codebook _44c7_s_p9_0 = {
 	_vq_lengthlist__44c7_s_p9_0,
 	1, -511845376, 1630791680, 4, 0,
 	_vq_quantlist__44c7_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14643,9 +14643,9 @@ static static_codebook _44c7_s_p9_1 = {
 	_vq_lengthlist__44c7_s_p9_1,
 	1, -518889472, 1622704128, 4, 0,
 	_vq_quantlist__44c7_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14739,9 +14739,9 @@ static static_codebook _44c7_s_p9_2 = {
 	_vq_lengthlist__44c7_s_p9_2,
 	1, -526909440, 1611661312, 6, 0,
 	_vq_quantlist__44c7_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c7_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14759,10 +14759,10 @@ static static_codebook _huff_book__44c7_s_short = {
 	2, 100,
 	_huff_lengthlist__44c7_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -14780,10 +14780,10 @@ static static_codebook _huff_book__44c8_s_long = {
 	2, 100,
 	_huff_lengthlist__44c8_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -14822,9 +14822,9 @@ static static_codebook _44c8_s_p1_0 = {
 	_vq_lengthlist__44c8_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c8_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14899,9 +14899,9 @@ static static_codebook _44c8_s_p2_0 = {
 	_vq_lengthlist__44c8_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c8_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -14947,9 +14947,9 @@ static static_codebook _44c8_s_p3_0 = {
 	_vq_lengthlist__44c8_s_p3_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c8_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15018,9 +15018,9 @@ static static_codebook _44c8_s_p4_0 = {
 	_vq_lengthlist__44c8_s_p4_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c8_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15059,9 +15059,9 @@ static static_codebook _44c8_s_p5_0 = {
 	_vq_lengthlist__44c8_s_p5_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c8_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15112,9 +15112,9 @@ static static_codebook _44c8_s_p5_1 = {
 	_vq_lengthlist__44c8_s_p5_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c8_s_p5_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p5_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15170,9 +15170,9 @@ static static_codebook _44c8_s_p6_0 = {
 	_vq_lengthlist__44c8_s_p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c8_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15209,9 +15209,9 @@ static static_codebook _44c8_s_p6_1 = {
 	_vq_lengthlist__44c8_s_p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c8_s_p6_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p6_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15267,9 +15267,9 @@ static static_codebook _44c8_s_p7_0 = {
 	_vq_lengthlist__44c8_s_p7_0,
 	1, -523206656, 1618345984, 4, 0,
 	_vq_quantlist__44c8_s_p7_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p7_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15320,9 +15320,9 @@ static static_codebook _44c8_s_p7_1 = {
 	_vq_lengthlist__44c8_s_p7_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c8_s_p7_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p7_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15384,9 +15384,9 @@ static static_codebook _44c8_s_p8_0 = {
 	_vq_lengthlist__44c8_s_p8_0,
 	1, -520986624, 1620377600, 4, 0,
 	_vq_quantlist__44c8_s_p8_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p8_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15469,9 +15469,9 @@ static static_codebook _44c8_s_p8_1 = {
 	_vq_lengthlist__44c8_s_p8_1,
 	1, -529268736, 1611661312, 5, 0,
 	_vq_quantlist__44c8_s_p8_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p8_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15540,9 +15540,9 @@ static static_codebook _44c8_s_p9_0 = {
 	_vq_lengthlist__44c8_s_p9_0,
 	1, -509798400, 1631393792, 5, 0,
 	_vq_quantlist__44c8_s_p9_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p9_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15618,9 +15618,9 @@ static static_codebook _44c8_s_p9_1 = {
 	_vq_lengthlist__44c8_s_p9_1,
 	1, -518287360, 1622704128, 5, 0,
 	_vq_quantlist__44c8_s_p9_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p9_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15714,9 +15714,9 @@ static static_codebook _44c8_s_p9_2 = {
 	_vq_lengthlist__44c8_s_p9_2,
 	1, -526909440, 1611661312, 6, 0,
 	_vq_quantlist__44c8_s_p9_2,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c8_s_p9_2,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15734,10 +15734,10 @@ static static_codebook _huff_book__44c8_s_short = {
 	2, 100,
 	_huff_lengthlist__44c8_s_short,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -15755,10 +15755,10 @@ static static_codebook _huff_book__44c9_s_long = {
 	2, 100,
 	_huff_lengthlist__44c9_s_long,
 	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	0
 };
 
@@ -15797,9 +15797,9 @@ static static_codebook _44c9_s_p1_0 = {
 	_vq_lengthlist__44c9_s_p1_0,
 	1, -535822336, 1611661312, 2, 0,
 	_vq_quantlist__44c9_s_p1_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c9_s_p1_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15874,9 +15874,9 @@ static static_codebook _44c9_s_p2_0 = {
 	_vq_lengthlist__44c9_s_p2_0,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c9_s_p2_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c9_s_p2_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15922,9 +15922,9 @@ static static_codebook _44c9_s_p3_0 = {
 	_vq_lengthlist__44c9_s_p3_0,
 	1, -531628032, 1611661312, 4, 0,
 	_vq_quantlist__44c9_s_p3_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c9_s_p3_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -15993,9 +15993,9 @@ static static_codebook _44c9_s_p4_0 = {
 	_vq_lengthlist__44c9_s_p4_0,
 	1, -529530880, 1611661312, 5, 0,
 	_vq_quantlist__44c9_s_p4_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c9_s_p4_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -16034,9 +16034,9 @@ static static_codebook _44c9_s_p5_0 = {
 	_vq_lengthlist__44c9_s_p5_0,
 	1, -529137664, 1618345984, 2, 0,
 	_vq_quantlist__44c9_s_p5_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c9_s_p5_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -16087,9 +16087,9 @@ static static_codebook _44c9_s_p5_1 = {
 	_vq_lengthlist__44c9_s_p5_1,
 	1, -531365888, 1611661312, 4, 0,
 	_vq_quantlist__44c9_s_p5_1,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c9_s_p5_1,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -16145,9 +16145,9 @@ static static_codebook _44c9_s_p6_0 = {
 	_vq_lengthlist__44c9_s_p6_0,
 	1, -526516224, 1616117760, 4, 0,
 	_vq_quantlist__44c9_s_p6_0,
-	NULL,
+	nullptr,
 	&_vq_auxt__44c9_s_p6_0,
-	NULL,
+	nullptr,
 	0
 };
 
@@ -16184,2897 +16184,4 @@ static static_codebook _44c9_s_p6_1 = {
 	_vq_lengthlist__44c9_s_p6_1,
 	1, -533725184, 1611661312, 3, 0,
 	_vq_quantlist__44c9_s_p6_1,
-	NULL,
-	&_vq_auxt__44c9_s_p6_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__44c9_s_p7_0[] = {
-	6,
-	5,
-	7,
-	4,
-	8,
-	3,
-	9,
-	2,
-	10,
-	1,
-	11,
-	0,
-	12,
-};
-
-static long _vq_lengthlist__44c9_s_p7_0[] = {
-	 1, 4, 4, 7, 7, 8, 8, 9, 9,10,10,11,11, 6, 5, 5,
-	 7, 7, 9, 8,10,10,11,11,12,12, 6, 5, 5, 7, 7, 9,
-	 9,10,10,11,11,12,12,20, 6, 6, 7, 7, 9, 9,10,10,
-	11,11,12,12,20, 7, 7, 7, 7, 9, 9,10,10,11,11,13,
-	12,20,10,10, 8, 8, 9, 9,11,11,12,12,13,13,20,11,
-	11, 8, 8, 9, 9,11,11,12,12,13,13,20,20,20,10,10,
-	10,10,11,11,12,12,13,13,20,20,20,10,10,10,10,11,
-	11,12,12,13,13,20,20,20,14,14,11,11,12,12,13,13,
-	14,13,20,20,20,14,15,11,11,11,11,13,13,14,13,20,
-	20,20,20,19,12,12,12,12,13,13,14,14,19,19,19,19,
-	19,13,13,12,12,13,13,14,14,
-};
-
-static float _vq_quantthresh__44c9_s_p7_0[] = {
-	-60.5, -49.5, -38.5, -27.5, -16.5, -5.5, 5.5, 16.5, 
-	27.5, 38.5, 49.5, 60.5, 
-};
-
-static long _vq_quantmap__44c9_s_p7_0[] = {
-	   11,    9,    7,    5,    3,    1,    0,    2,
-	    4,    6,    8,   10,   12,
-};
-
-static encode_aux_threshmatch _vq_auxt__44c9_s_p7_0 = {
-	_vq_quantthresh__44c9_s_p7_0,
-	_vq_quantmap__44c9_s_p7_0,
-	13,
-	13
-};
-
-static static_codebook _44c9_s_p7_0 = {
-	2, 169,
-	_vq_lengthlist__44c9_s_p7_0,
-	1, -523206656, 1618345984, 4, 0,
-	_vq_quantlist__44c9_s_p7_0,
-	NULL,
-	&_vq_auxt__44c9_s_p7_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__44c9_s_p7_1[] = {
-	5,
-	4,
-	6,
-	3,
-	7,
-	2,
-	8,
-	1,
-	9,
-	0,
-	10,
-};
-
-static long _vq_lengthlist__44c9_s_p7_1[] = {
-	 5, 6, 6, 6, 6, 7, 6, 7, 7, 7, 7, 8, 6, 6, 6, 6,
-	 7, 7, 7, 7, 7, 7, 8, 6, 6, 6, 6, 7, 7, 7, 7, 7,
-	 7, 8, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 6,
-	 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 7, 7, 7, 7, 7, 7,
-	 7, 7, 8, 8, 8, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8,
-	 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 7, 7, 7,
-	 7, 7, 7, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 8, 8,
-	 8, 8, 8, 7, 7, 7, 7, 7, 7,
-};
-
-static float _vq_quantthresh__44c9_s_p7_1[] = {
-	-4.5, -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 
-	3.5, 4.5, 
-};
-
-static long _vq_quantmap__44c9_s_p7_1[] = {
-	    9,    7,    5,    3,    1,    0,    2,    4,
-	    6,    8,   10,
-};
-
-static encode_aux_threshmatch _vq_auxt__44c9_s_p7_1 = {
-	_vq_quantthresh__44c9_s_p7_1,
-	_vq_quantmap__44c9_s_p7_1,
-	11,
-	11
-};
-
-static static_codebook _44c9_s_p7_1 = {
-	2, 121,
-	_vq_lengthlist__44c9_s_p7_1,
-	1, -531365888, 1611661312, 4, 0,
-	_vq_quantlist__44c9_s_p7_1,
-	NULL,
-	&_vq_auxt__44c9_s_p7_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__44c9_s_p8_0[] = {
-	7,
-	6,
-	8,
-	5,
-	9,
-	4,
-	10,
-	3,
-	11,
-	2,
-	12,
-	1,
-	13,
-	0,
-	14,
-};
-
-static long _vq_lengthlist__44c9_s_p8_0[] = {
-	 1, 4, 4, 7, 7, 8, 8, 8, 8, 9, 9,10,10,11,11, 6,
-	 5, 5, 7, 7, 9, 9, 8, 9,10,10,11,11,12,12, 6, 5,
-	 5, 7, 7, 9, 9, 9, 9,10,10,11,11,12,12,19, 7, 8,
-	 8, 8, 9, 9, 9, 9,10,10,11,11,12,13,19, 8, 8, 8,
-	 8, 9, 9, 9, 9,10,10,11,12,12,12,19,12,12, 9, 9,
-	 9,10, 9,10,10,10,12,12,12,12,19,12,12, 9, 9,10,
-	 9,10,10,11,11,12,11,13,13,19,19,19, 9, 9, 9, 9,
-	10,10,11,11,12,12,12,12,19,19,19, 9, 9, 9, 9,10,
-	10,11,11,12,12,13,13,19,19,19,13,13,10,10,10,10,
-	12,12,12,12,13,13,19,19,19,13,13,10,10,10,10,12,
-	12,12,12,13,13,19,19,19,19,19,11,12,11,11,12,12,
-	13,12,13,13,19,19,19,18,18,12,11,11,10,12,11,13,
-	13,13,14,18,18,18,18,18,15,16,12,12,13,12,13,13,
-	14,14,18,18,18,18,18,16,15,12,11,12,11,13,13,14,
-	14,
-};
-
-static float _vq_quantthresh__44c9_s_p8_0[] = {
-	-136.5, -115.5, -94.5, -73.5, -52.5, -31.5, -10.5, 10.5, 
-	31.5, 52.5, 73.5, 94.5, 115.5, 136.5, 
-};
-
-static long _vq_quantmap__44c9_s_p8_0[] = {
-	   13,   11,    9,    7,    5,    3,    1,    0,
-	    2,    4,    6,    8,   10,   12,   14,
-};
-
-static encode_aux_threshmatch _vq_auxt__44c9_s_p8_0 = {
-	_vq_quantthresh__44c9_s_p8_0,
-	_vq_quantmap__44c9_s_p8_0,
-	15,
-	15
-};
-
-static static_codebook _44c9_s_p8_0 = {
-	2, 225,
-	_vq_lengthlist__44c9_s_p8_0,
-	1, -520986624, 1620377600, 4, 0,
-	_vq_quantlist__44c9_s_p8_0,
-	NULL,
-	&_vq_auxt__44c9_s_p8_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__44c9_s_p8_1[] = {
-	10,
-	9,
-	11,
-	8,
-	12,
-	7,
-	13,
-	6,
-	14,
-	5,
-	15,
-	4,
-	16,
-	3,
-	17,
-	2,
-	18,
-	1,
-	19,
-	0,
-	20,
-};
-
-static long _vq_lengthlist__44c9_s_p8_1[] = {
-	 4, 6, 6, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9,
-	 9, 9, 9, 9, 9,10, 6, 6, 7, 7, 8, 8, 8, 8, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,10, 6, 6, 7, 7, 8,
-	 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,10,
-	 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9,10,10,10, 7, 8, 8, 8, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9,10,10,10, 8, 8, 8, 8,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,10,10,
-	10, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9,10,10,10, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9,10,10,10,10,10, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,10,10,10,
-	10,10, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9,10,10,10,10,10, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9,10,10,10,10,10, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,10,10,10,10,
-	10,10,10, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9,10,10,10,10,10,10,10, 9, 9, 9, 9,10,10,10,10,
-	 9, 9, 9, 9, 9, 9,10,10,10,10,10,10,10, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,10,10,10,10,10,
-	10,10, 9, 9, 9, 9, 9,10, 9, 9, 9, 9, 9, 9, 9, 9,
-	10,10,10,10,10,10,10,10,10, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9,10,10,10,10,10,10,10,10,10,10,10,
-	10,10, 9, 9, 9,10, 9, 9, 9, 9,10,10,10,10,10,10,
-	10,10,10, 9,10, 9, 9, 9, 9, 9, 9, 9, 9, 9,10,10,
-	10,10,10,10,10,10,10,10,10,10, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9,10,10,10,10,10,10,10,10,10,10,10, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9,
-};
-
-static float _vq_quantthresh__44c9_s_p8_1[] = {
-	-9.5, -8.5, -7.5, -6.5, -5.5, -4.5, -3.5, -2.5, 
-	-1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 
-	6.5, 7.5, 8.5, 9.5, 
-};
-
-static long _vq_quantmap__44c9_s_p8_1[] = {
-	   19,   17,   15,   13,   11,    9,    7,    5,
-	    3,    1,    0,    2,    4,    6,    8,   10,
-	   12,   14,   16,   18,   20,
-};
-
-static encode_aux_threshmatch _vq_auxt__44c9_s_p8_1 = {
-	_vq_quantthresh__44c9_s_p8_1,
-	_vq_quantmap__44c9_s_p8_1,
-	21,
-	21
-};
-
-static static_codebook _44c9_s_p8_1 = {
-	2, 441,
-	_vq_lengthlist__44c9_s_p8_1,
-	1, -529268736, 1611661312, 5, 0,
-	_vq_quantlist__44c9_s_p8_1,
-	NULL,
-	&_vq_auxt__44c9_s_p8_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__44c9_s_p9_0[] = {
-	9,
-	8,
-	10,
-	7,
-	11,
-	6,
-	12,
-	5,
-	13,
-	4,
-	14,
-	3,
-	15,
-	2,
-	16,
-	1,
-	17,
-	0,
-	18,
-};
-
-static long _vq_lengthlist__44c9_s_p9_0[] = {
-	 1, 4, 4,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10, 7, 9,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10, 7, 9,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9,
-};
-
-static float _vq_quantthresh__44c9_s_p9_0[] = {
-	-7913.5, -6982.5, -6051.5, -5120.5, -4189.5, -3258.5, -2327.5, -1396.5, 
-	-465.5, 465.5, 1396.5, 2327.5, 3258.5, 4189.5, 5120.5, 6051.5, 
-	6982.5, 7913.5, 
-};
-
-static long _vq_quantmap__44c9_s_p9_0[] = {
-	   17,   15,   13,   11,    9,    7,    5,    3,
-	    1,    0,    2,    4,    6,    8,   10,   12,
-	   14,   16,   18,
-};
-
-static encode_aux_threshmatch _vq_auxt__44c9_s_p9_0 = {
-	_vq_quantthresh__44c9_s_p9_0,
-	_vq_quantmap__44c9_s_p9_0,
-	19,
-	19
-};
-
-static static_codebook _44c9_s_p9_0 = {
-	2, 361,
-	_vq_lengthlist__44c9_s_p9_0,
-	1, -508535424, 1631393792, 5, 0,
-	_vq_quantlist__44c9_s_p9_0,
-	NULL,
-	&_vq_auxt__44c9_s_p9_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__44c9_s_p9_1[] = {
-	9,
-	8,
-	10,
-	7,
-	11,
-	6,
-	12,
-	5,
-	13,
-	4,
-	14,
-	3,
-	15,
-	2,
-	16,
-	1,
-	17,
-	0,
-	18,
-};
-
-static long _vq_lengthlist__44c9_s_p9_1[] = {
-	 1, 4, 4, 7, 7, 8, 8, 8, 8, 9,10,10,10,12,11,12,
-	13,13,12, 6, 5, 5, 8, 8, 8, 9, 8, 9,10,10,11,11,
-	12,12,14,13,13,12, 5, 5, 5, 8, 8, 9, 8, 8, 9,10,
-	10,11,11,12,12,14,12,13,13,16, 8, 8, 9, 9, 9, 9,
-	 9, 9,10,10,11,12,13,13,13,13,14,14,16, 8, 8, 9,
-	 9, 9, 9, 9, 9,11,11,12,11,13,13,14,13,13,13,16,
-	14,13, 9, 9, 9, 9,10,10,11,12,12,13,13,13,14,13,
-	15,14,16,13,13, 9, 8, 9, 9,10,10,12,11,13,13,14,
-	14,14,14,15,14,16,16,16, 9, 9, 9, 9,10,10,12,12,
-	12,13,13,13,15,13,15,15,16,16,16, 9, 7, 9, 8,10,
-	11,11,12,12,13,13,16,15,14,14,14,16,16,16,13,13,
-	10,10,11,11,13,15,13,14,13,14,14,13,14,14,16,16,
-	16,13,12,10, 9,11,11,12,12,14,14,13,14,14,14,14,
-	14,16,16,16,16,16,12,13,11,11,12,13,13,13,14,15,
-	14,14,16,15,16,16,16,16,16,12,11,12,12,15,13,13,
-	13,14,13,15,14,15,14,16,16,16,16,16,14,15,12,13,
-	13,12,14,15,15,14,15,14,15,13,16,16,16,16,16,16,
-	16,13,13,14,12,16,12,16,15,14,15,14,14,16,16,16,
-	16,16,16,16,15,14,14,14,15,16,16,16,16,14,16,16,
-	16,16,16,16,16,16,16,14,14,14,12,15,11,15,13,16,
-	15,16,15,16,16,16,16,16,16,16,15,16,14,14,15,13,
-	15,16,16,16,16,15,16,16,16,16,16,16,16,16,16,15,
-	15,14,13,14,16,16,14,15,16,
-};
-
-static float _vq_quantthresh__44c9_s_p9_1[] = {
-	-416.5, -367.5, -318.5, -269.5, -220.5, -171.5, -122.5, -73.5, 
-	-24.5, 24.5, 73.5, 122.5, 171.5, 220.5, 269.5, 318.5, 
-	367.5, 416.5, 
-};
-
-static long _vq_quantmap__44c9_s_p9_1[] = {
-	   17,   15,   13,   11,    9,    7,    5,    3,
-	    1,    0,    2,    4,    6,    8,   10,   12,
-	   14,   16,   18,
-};
-
-static encode_aux_threshmatch _vq_auxt__44c9_s_p9_1 = {
-	_vq_quantthresh__44c9_s_p9_1,
-	_vq_quantmap__44c9_s_p9_1,
-	19,
-	19
-};
-
-static static_codebook _44c9_s_p9_1 = {
-	2, 361,
-	_vq_lengthlist__44c9_s_p9_1,
-	1, -518287360, 1622704128, 5, 0,
-	_vq_quantlist__44c9_s_p9_1,
-	NULL,
-	&_vq_auxt__44c9_s_p9_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__44c9_s_p9_2[] = {
-	24,
-	23,
-	25,
-	22,
-	26,
-	21,
-	27,
-	20,
-	28,
-	19,
-	29,
-	18,
-	30,
-	17,
-	31,
-	16,
-	32,
-	15,
-	33,
-	14,
-	34,
-	13,
-	35,
-	12,
-	36,
-	11,
-	37,
-	10,
-	38,
-	9,
-	39,
-	8,
-	40,
-	7,
-	41,
-	6,
-	42,
-	5,
-	43,
-	4,
-	44,
-	3,
-	45,
-	2,
-	46,
-	1,
-	47,
-	0,
-	48,
-};
-
-static long _vq_lengthlist__44c9_s_p9_2[] = {
-	 3, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6,
-	 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-	 6, 7, 6, 6, 7, 7, 6, 7, 6, 7, 7, 7, 7, 7, 7, 7,
-	 7,
-};
-
-static float _vq_quantthresh__44c9_s_p9_2[] = {
-	-23.5, -22.5, -21.5, -20.5, -19.5, -18.5, -17.5, -16.5, 
-	-15.5, -14.5, -13.5, -12.5, -11.5, -10.5, -9.5, -8.5, 
-	-7.5, -6.5, -5.5, -4.5, -3.5, -2.5, -1.5, -0.5, 
-	0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 
-	8.5, 9.5, 10.5, 11.5, 12.5, 13.5, 14.5, 15.5, 
-	16.5, 17.5, 18.5, 19.5, 20.5, 21.5, 22.5, 23.5, 
-};
-
-static long _vq_quantmap__44c9_s_p9_2[] = {
-	   47,   45,   43,   41,   39,   37,   35,   33,
-	   31,   29,   27,   25,   23,   21,   19,   17,
-	   15,   13,   11,    9,    7,    5,    3,    1,
-	    0,    2,    4,    6,    8,   10,   12,   14,
-	   16,   18,   20,   22,   24,   26,   28,   30,
-	   32,   34,   36,   38,   40,   42,   44,   46,
-	   48,
-};
-
-static encode_aux_threshmatch _vq_auxt__44c9_s_p9_2 = {
-	_vq_quantthresh__44c9_s_p9_2,
-	_vq_quantmap__44c9_s_p9_2,
-	49,
-	49
-};
-
-static static_codebook _44c9_s_p9_2 = {
-	1, 49,
-	_vq_lengthlist__44c9_s_p9_2,
-	1, -526909440, 1611661312, 6, 0,
-	_vq_quantlist__44c9_s_p9_2,
-	NULL,
-	&_vq_auxt__44c9_s_p9_2,
-	NULL,
-	0
-};
-
-static long _huff_lengthlist__44c9_s_short[] = {
-	 5,13,17,15,16,16,18,17,18,18, 5, 7,10,12,12,12,
-	12,17,18,17, 7, 6, 7, 8, 9, 9, 9,13,17,17, 8, 6,
-	 6, 5, 6, 7, 8,11,16,18, 9, 7, 7, 5, 5, 6, 7,10,
-	15,18, 9, 8, 7, 6, 5, 4, 5, 7,13,17,11,11, 9, 8,
-	 7, 4, 3, 5,12,18,13,13,12,10, 7, 5, 4, 3, 8,13,
-	16,16,16,13, 8, 8, 7, 5, 8,12,15,18,17,15,11,10,
-	 9, 8,10,14,
-};
-
-static static_codebook _huff_book__44c9_s_short = {
-	2, 100,
-	_huff_lengthlist__44c9_s_short,
-	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p1_0[] = {
-	1,
-	0,
-	2,
-};
-
-static long _vq_lengthlist__8c0_s_p1_0[] = {
-	 1, 5, 4, 0, 0, 0, 0, 0, 0, 5, 7, 7, 0, 0, 0, 0,
-	 0, 0, 5, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 5, 8, 8, 0, 0, 0, 0, 0, 0, 7, 8, 9, 0, 0, 0,
-	 0, 0, 0, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 5, 8, 8, 0, 0, 0, 0, 0, 0, 7, 9, 9, 0, 0,
-	 0, 0, 0, 0, 7, 9, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 8, 8, 0, 0, 0, 0,
-	 0, 0, 8,10,10, 0, 0, 0, 0, 0, 0, 8, 9, 9, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7,10, 9, 0, 0, 0,
-	 0, 0, 0, 8, 9,11, 0, 0, 0, 0, 0, 0, 9,11,11, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 9,10, 0, 0,
-	 0, 0, 0, 0, 9,11,10, 0, 0, 0, 0, 0, 0, 9,11,11,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 5, 8, 8, 0, 0, 0, 0, 0, 0, 8, 9, 9, 0, 0,
-	 0, 0, 0, 0, 8, 9,10, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 7, 9, 9, 0, 0, 0, 0, 0, 0, 9,11,11, 0,
-	 0, 0, 0, 0, 0, 9,10,11, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 7, 9,10, 0, 0, 0, 0, 0, 0, 9,11,11,
-	 0, 0, 0, 0, 0, 0, 8,11, 9, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0,
-};
-
-static float _vq_quantthresh__8c0_s_p1_0[] = {
-	-0.5, 0.5, 
-};
-
-static long _vq_quantmap__8c0_s_p1_0[] = {
-	    1,    0,    2,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p1_0 = {
-	_vq_quantthresh__8c0_s_p1_0,
-	_vq_quantmap__8c0_s_p1_0,
-	3,
-	3
-};
-
-static static_codebook _8c0_s_p1_0 = {
-	8, 6561,
-	_vq_lengthlist__8c0_s_p1_0,
-	1, -535822336, 1611661312, 2, 0,
-	_vq_quantlist__8c0_s_p1_0,
-	NULL,
-	&_vq_auxt__8c0_s_p1_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p2_0[] = {
-	2,
-	1,
-	3,
-	0,
-	4,
-};
-
-static long _vq_lengthlist__8c0_s_p2_0[] = {
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0,
-};
-
-static float _vq_quantthresh__8c0_s_p2_0[] = {
-	-1.5, -0.5, 0.5, 1.5, 
-};
-
-static long _vq_quantmap__8c0_s_p2_0[] = {
-	    3,    1,    0,    2,    4,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p2_0 = {
-	_vq_quantthresh__8c0_s_p2_0,
-	_vq_quantmap__8c0_s_p2_0,
-	5,
-	5
-};
-
-static static_codebook _8c0_s_p2_0 = {
-	4, 625,
-	_vq_lengthlist__8c0_s_p2_0,
-	1, -533725184, 1611661312, 3, 0,
-	_vq_quantlist__8c0_s_p2_0,
-	NULL,
-	&_vq_auxt__8c0_s_p2_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p3_0[] = {
-	2,
-	1,
-	3,
-	0,
-	4,
-};
-
-static long _vq_lengthlist__8c0_s_p3_0[] = {
-	 1, 4, 4, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 5, 6, 7, 7, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 4, 5, 5, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 7, 7, 8, 8,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 6, 7, 7, 8, 8, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0,
-};
-
-static float _vq_quantthresh__8c0_s_p3_0[] = {
-	-1.5, -0.5, 0.5, 1.5, 
-};
-
-static long _vq_quantmap__8c0_s_p3_0[] = {
-	    3,    1,    0,    2,    4,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p3_0 = {
-	_vq_quantthresh__8c0_s_p3_0,
-	_vq_quantmap__8c0_s_p3_0,
-	5,
-	5
-};
-
-static static_codebook _8c0_s_p3_0 = {
-	4, 625,
-	_vq_lengthlist__8c0_s_p3_0,
-	1, -533725184, 1611661312, 3, 0,
-	_vq_quantlist__8c0_s_p3_0,
-	NULL,
-	&_vq_auxt__8c0_s_p3_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p4_0[] = {
-	4,
-	3,
-	5,
-	2,
-	6,
-	1,
-	7,
-	0,
-	8,
-};
-
-static long _vq_lengthlist__8c0_s_p4_0[] = {
-	 1, 2, 3, 7, 7, 0, 0, 0, 0, 0, 0, 0, 6, 6, 0, 0,
-	 0, 0, 0, 0, 0, 6, 6, 0, 0, 0, 0, 0, 0, 0, 7, 7,
-	 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0,
-	 8, 8, 0, 0, 0, 0, 0, 0, 0, 9, 8, 0, 0, 0, 0, 0,
-	 0, 0,10,10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0,
-};
-
-static float _vq_quantthresh__8c0_s_p4_0[] = {
-	-3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 
-};
-
-static long _vq_quantmap__8c0_s_p4_0[] = {
-	    7,    5,    3,    1,    0,    2,    4,    6,
-	    8,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p4_0 = {
-	_vq_quantthresh__8c0_s_p4_0,
-	_vq_quantmap__8c0_s_p4_0,
-	9,
-	9
-};
-
-static static_codebook _8c0_s_p4_0 = {
-	2, 81,
-	_vq_lengthlist__8c0_s_p4_0,
-	1, -531628032, 1611661312, 4, 0,
-	_vq_quantlist__8c0_s_p4_0,
-	NULL,
-	&_vq_auxt__8c0_s_p4_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p5_0[] = {
-	4,
-	3,
-	5,
-	2,
-	6,
-	1,
-	7,
-	0,
-	8,
-};
-
-static long _vq_lengthlist__8c0_s_p5_0[] = {
-	 1, 3, 3, 5, 5, 7, 6, 8, 8, 0, 0, 0, 7, 7, 7, 7,
-	 8, 8, 0, 0, 0, 7, 7, 7, 7, 8, 9, 0, 0, 0, 8, 8,
-	 8, 8, 9, 9, 0, 0, 0, 8, 8, 8, 8, 9, 9, 0, 0, 0,
-	 9, 9, 8, 8,10,10, 0, 0, 0, 9, 9, 8, 8,10,10, 0,
-	 0, 0,10,10, 9, 9,10,10, 0, 0, 0, 0, 0, 9, 9,10,
-	10,
-};
-
-static float _vq_quantthresh__8c0_s_p5_0[] = {
-	-3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 
-};
-
-static long _vq_quantmap__8c0_s_p5_0[] = {
-	    7,    5,    3,    1,    0,    2,    4,    6,
-	    8,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p5_0 = {
-	_vq_quantthresh__8c0_s_p5_0,
-	_vq_quantmap__8c0_s_p5_0,
-	9,
-	9
-};
-
-static static_codebook _8c0_s_p5_0 = {
-	2, 81,
-	_vq_lengthlist__8c0_s_p5_0,
-	1, -531628032, 1611661312, 4, 0,
-	_vq_quantlist__8c0_s_p5_0,
-	NULL,
-	&_vq_auxt__8c0_s_p5_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p6_0[] = {
-	8,
-	7,
-	9,
-	6,
-	10,
-	5,
-	11,
-	4,
-	12,
-	3,
-	13,
-	2,
-	14,
-	1,
-	15,
-	0,
-	16,
-};
-
-static long _vq_lengthlist__8c0_s_p6_0[] = {
-	 1, 3, 3, 6, 6, 8, 8, 9, 9, 8, 8,10, 9,10,10,11,
-	11, 0, 0, 0, 7, 7, 8, 8, 9, 9, 9, 9,10,10,11,11,
-	11,12, 0, 0, 0, 7, 7, 8, 8, 9, 9, 9, 9,10,10,11,
-	11,12,11, 0, 0, 0, 8, 8, 9, 9,10,10, 9, 9,10,10,
-	11,11,12,12, 0, 0, 0, 8, 8, 9, 9,10,10, 9, 9,11,
-	10,11,11,12,12, 0, 0, 0, 9, 9, 9, 9,10,10,10,10,
-	11,11,11,12,12,12, 0, 0, 0, 9, 9, 9, 9,10,10,10,
-	10,11,11,12,12,13,13, 0, 0, 0,10,10,10,10,11,11,
-	10,10,11,11,12,12,13,13, 0, 0, 0, 0, 0,10, 9,10,
-	11,10,10,11,11,12,12,13,13, 0, 0, 0, 0, 0, 9, 9,
-	10, 9,10,11,12,12,13,13,14,13, 0, 0, 0, 0, 0, 9,
-	 9, 9,10,10,10,11,11,13,12,13,13, 0, 0, 0, 0, 0,
-	10,10,10,10,11,11,12,12,13,13,14,14, 0, 0, 0, 0,
-	 0, 0, 0,10,10,11,11,12,12,13,13,13,14, 0, 0, 0,
-	 0, 0, 0, 0,11,11,11,11,12,12,13,14,14,14, 0, 0,
-	 0, 0, 0, 0, 0,11,11,11,11,12,12,13,13,14,13, 0,
-	 0, 0, 0, 0, 0, 0,11,11,12,12,13,13,14,14,14,14,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0,12,12,12,12,13,13,14,
-	14,
-};
-
-static float _vq_quantthresh__8c0_s_p6_0[] = {
-	-7.5, -6.5, -5.5, -4.5, -3.5, -2.5, -1.5, -0.5, 
-	0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 
-};
-
-static long _vq_quantmap__8c0_s_p6_0[] = {
-	   15,   13,   11,    9,    7,    5,    3,    1,
-	    0,    2,    4,    6,    8,   10,   12,   14,
-	   16,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p6_0 = {
-	_vq_quantthresh__8c0_s_p6_0,
-	_vq_quantmap__8c0_s_p6_0,
-	17,
-	17
-};
-
-static static_codebook _8c0_s_p6_0 = {
-	2, 289,
-	_vq_lengthlist__8c0_s_p6_0,
-	1, -529530880, 1611661312, 5, 0,
-	_vq_quantlist__8c0_s_p6_0,
-	NULL,
-	&_vq_auxt__8c0_s_p6_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p7_0[] = {
-	1,
-	0,
-	2,
-};
-
-static long _vq_lengthlist__8c0_s_p7_0[] = {
-	 1, 4, 4, 7, 6, 6, 7, 6, 6, 4, 7, 7,11, 9,10,12,
-	 9,10, 4, 7, 7,10,10,10,11, 9, 9, 6,11,10,11,11,
-	12,11,11,11, 6,10,10,11,11,12,11,10,10, 6, 9,10,
-	11,11,11,11,10,10, 7,10,11,12,11,11,12,11,12, 6,
-	 9, 9,10, 9, 9,11,10,10, 6, 9, 9,10,10,10,11,10,
-	10,
-};
-
-static float _vq_quantthresh__8c0_s_p7_0[] = {
-	-5.5, 5.5, 
-};
-
-static long _vq_quantmap__8c0_s_p7_0[] = {
-	    1,    0,    2,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p7_0 = {
-	_vq_quantthresh__8c0_s_p7_0,
-	_vq_quantmap__8c0_s_p7_0,
-	3,
-	3
-};
-
-static static_codebook _8c0_s_p7_0 = {
-	4, 81,
-	_vq_lengthlist__8c0_s_p7_0,
-	1, -529137664, 1618345984, 2, 0,
-	_vq_quantlist__8c0_s_p7_0,
-	NULL,
-	&_vq_auxt__8c0_s_p7_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p7_1[] = {
-	5,
-	4,
-	6,
-	3,
-	7,
-	2,
-	8,
-	1,
-	9,
-	0,
-	10,
-};
-
-static long _vq_lengthlist__8c0_s_p7_1[] = {
-	 1, 3, 3, 6, 6, 8, 8, 9, 9, 9, 9,10,10,10, 7, 7,
-	 8, 8, 9, 9, 9, 9,10,10, 9, 7, 7, 8, 8, 9, 9, 9,
-	 9,10,10,10, 8, 8, 9, 9, 9, 9, 9, 9,10,10,10, 8,
-	 8, 9, 9, 9, 9, 8, 9,10,10,10, 8, 8, 9, 9, 9,10,
-	10,10,10,10,10, 9, 9, 9, 9, 9, 9,10,10,11,10,11,
-	 9, 9, 9, 9,10,10,10,10,11,11,11,10,10, 9, 9,10,
-	10,10, 9,11,10,10,10,10,10,10, 9, 9,10,10,11,11,
-	10,10,10, 9, 9, 9,10,10,10,
-};
-
-static float _vq_quantthresh__8c0_s_p7_1[] = {
-	-4.5, -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 
-	3.5, 4.5, 
-};
-
-static long _vq_quantmap__8c0_s_p7_1[] = {
-	    9,    7,    5,    3,    1,    0,    2,    4,
-	    6,    8,   10,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p7_1 = {
-	_vq_quantthresh__8c0_s_p7_1,
-	_vq_quantmap__8c0_s_p7_1,
-	11,
-	11
-};
-
-static static_codebook _8c0_s_p7_1 = {
-	2, 121,
-	_vq_lengthlist__8c0_s_p7_1,
-	1, -531365888, 1611661312, 4, 0,
-	_vq_quantlist__8c0_s_p7_1,
-	NULL,
-	&_vq_auxt__8c0_s_p7_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p8_0[] = {
-	6,
-	5,
-	7,
-	4,
-	8,
-	3,
-	9,
-	2,
-	10,
-	1,
-	11,
-	0,
-	12,
-};
-
-static long _vq_lengthlist__8c0_s_p8_0[] = {
-	 1, 4, 4, 7, 6, 7, 7, 7, 7, 8, 8, 9, 9, 7, 6, 6,
-	 7, 7, 8, 8, 7, 7, 8, 9,10,10, 7, 6, 6, 7, 7, 8,
-	 7, 7, 7, 9, 9,10,12, 0, 8, 8, 8, 8, 8, 9, 8, 8,
-	 9, 9,10,10, 0, 8, 8, 8, 8, 8, 9, 8, 9, 9, 9,11,
-	10, 0, 0,13, 9, 8, 9, 9, 9, 9,10,10,11,11, 0,13,
-	 0, 9, 9, 9, 9, 9, 9,11,10,11,11, 0, 0, 0, 8, 9,
-	10, 9,10,10,13,11,12,12, 0, 0, 0, 8, 9, 9, 9,10,
-	10,13,12,12,13, 0, 0, 0,12, 0,10,10,12,11,10,11,
-	12,12, 0, 0, 0,13,13,10,10,10,11,12, 0,13, 0, 0,
-	 0, 0, 0, 0,13,11, 0,12,12,12,13,12, 0, 0, 0, 0,
-	 0, 0,13,13,11,13,13,11,12,
-};
-
-static float _vq_quantthresh__8c0_s_p8_0[] = {
-	-27.5, -22.5, -17.5, -12.5, -7.5, -2.5, 2.5, 7.5, 
-	12.5, 17.5, 22.5, 27.5, 
-};
-
-static long _vq_quantmap__8c0_s_p8_0[] = {
-	   11,    9,    7,    5,    3,    1,    0,    2,
-	    4,    6,    8,   10,   12,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p8_0 = {
-	_vq_quantthresh__8c0_s_p8_0,
-	_vq_quantmap__8c0_s_p8_0,
-	13,
-	13
-};
-
-static static_codebook _8c0_s_p8_0 = {
-	2, 169,
-	_vq_lengthlist__8c0_s_p8_0,
-	1, -526516224, 1616117760, 4, 0,
-	_vq_quantlist__8c0_s_p8_0,
-	NULL,
-	&_vq_auxt__8c0_s_p8_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p8_1[] = {
-	2,
-	1,
-	3,
-	0,
-	4,
-};
-
-static long _vq_lengthlist__8c0_s_p8_1[] = {
-	 1, 3, 4, 5, 5, 7, 6, 6, 6, 5, 7, 7, 7, 6, 6, 7,
-	 7, 7, 6, 6, 7, 7, 7, 6, 6,
-};
-
-static float _vq_quantthresh__8c0_s_p8_1[] = {
-	-1.5, -0.5, 0.5, 1.5, 
-};
-
-static long _vq_quantmap__8c0_s_p8_1[] = {
-	    3,    1,    0,    2,    4,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p8_1 = {
-	_vq_quantthresh__8c0_s_p8_1,
-	_vq_quantmap__8c0_s_p8_1,
-	5,
-	5
-};
-
-static static_codebook _8c0_s_p8_1 = {
-	2, 25,
-	_vq_lengthlist__8c0_s_p8_1,
-	1, -533725184, 1611661312, 3, 0,
-	_vq_quantlist__8c0_s_p8_1,
-	NULL,
-	&_vq_auxt__8c0_s_p8_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p9_0[] = {
-	1,
-	0,
-	2,
-};
-
-static long _vq_lengthlist__8c0_s_p9_0[] = {
-	 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-	 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-	 8, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7,
-};
-
-static float _vq_quantthresh__8c0_s_p9_0[] = {
-	-157.5, 157.5, 
-};
-
-static long _vq_quantmap__8c0_s_p9_0[] = {
-	    1,    0,    2,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p9_0 = {
-	_vq_quantthresh__8c0_s_p9_0,
-	_vq_quantmap__8c0_s_p9_0,
-	3,
-	3
-};
-
-static static_codebook _8c0_s_p9_0 = {
-	4, 81,
-	_vq_lengthlist__8c0_s_p9_0,
-	1, -518803456, 1628680192, 2, 0,
-	_vq_quantlist__8c0_s_p9_0,
-	NULL,
-	&_vq_auxt__8c0_s_p9_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p9_1[] = {
-	7,
-	6,
-	8,
-	5,
-	9,
-	4,
-	10,
-	3,
-	11,
-	2,
-	12,
-	1,
-	13,
-	0,
-	14,
-};
-
-static long _vq_lengthlist__8c0_s_p9_1[] = {
-	 1, 4, 4, 5, 5,10, 8,11,11,11,11,11,11,11,11, 6,
-	 6, 6, 7, 6,11,10,11,11,11,11,11,11,11,11, 7, 5,
-	 6, 6, 6, 8, 7,11,11,11,11,11,11,11,11,11, 7, 8,
-	 8, 8, 9, 9,11,11,11,11,11,11,11,11,11, 9, 8, 7,
-	 8, 9,11,11,11,11,11,11,11,11,11,11,11,10,11,11,
-	11,11,11,11,11,11,11,11,11,11,11,11,11,10,11,11,
-	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
-	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
-	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
-	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
-	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
-	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
-	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
-	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
-	11,
-};
-
-static float _vq_quantthresh__8c0_s_p9_1[] = {
-	-136.5, -115.5, -94.5, -73.5, -52.5, -31.5, -10.5, 10.5, 
-	31.5, 52.5, 73.5, 94.5, 115.5, 136.5, 
-};
-
-static long _vq_quantmap__8c0_s_p9_1[] = {
-	   13,   11,    9,    7,    5,    3,    1,    0,
-	    2,    4,    6,    8,   10,   12,   14,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p9_1 = {
-	_vq_quantthresh__8c0_s_p9_1,
-	_vq_quantmap__8c0_s_p9_1,
-	15,
-	15
-};
-
-static static_codebook _8c0_s_p9_1 = {
-	2, 225,
-	_vq_lengthlist__8c0_s_p9_1,
-	1, -520986624, 1620377600, 4, 0,
-	_vq_quantlist__8c0_s_p9_1,
-	NULL,
-	&_vq_auxt__8c0_s_p9_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c0_s_p9_2[] = {
-	10,
-	9,
-	11,
-	8,
-	12,
-	7,
-	13,
-	6,
-	14,
-	5,
-	15,
-	4,
-	16,
-	3,
-	17,
-	2,
-	18,
-	1,
-	19,
-	0,
-	20,
-};
-
-static long _vq_lengthlist__8c0_s_p9_2[] = {
-	 1, 5, 5, 7, 7, 8, 7, 8, 8,10,10, 9, 9,10,10,10,
-	11,11,10,12,11,12,12,12, 9, 8, 8, 8, 8, 8, 9,10,
-	10,10,10,11,11,11,10,11,11,12,12,11,12, 8, 8, 7,
-	 7, 8, 9,10,10,10, 9,10,10, 9,10,10,11,11,11,11,
-	11,11, 9, 9, 9, 9, 8, 9,10,10,11,10,10,11,11,12,
-	10,10,12,12,11,11,10, 9, 9,10, 8, 9,10,10,10, 9,
-	10,10,11,11,10,11,10,10,10,12,12,12, 9,10, 9,10,
-	 9, 9,10,10,11,11,11,11,10,10,10,11,12,11,12,11,
-	12,10,11,10,11, 9,10, 9,10, 9,10,10, 9,10,10,11,
-	10,11,11,11,11,12,11, 9,10,10,10,10,11,11,11,11,
-	11,10,11,11,11,11,10,12,10,12,12,11,12,10,10,11,
-	10, 9,11,10,11, 9,10,11,10,10,10,11,11,11,11,12,
-	12,10, 9, 9,11,10, 9,12,11,10,12,12,11,11,11,11,
-	10,11,11,12,11,10,12, 9,11,10,11,10,10,11,10,11,
-	 9,10,10,10,11,12,11,11,12,11,10,10,11,11, 9,10,
-	10,12,10,11,10,10,10, 9,10,10,10,10, 9,10,10,11,
-	11,11,11,12,11,10,10,10,10,11,11,10,11,11, 9,11,
-	10,12,10,12,11,10,11,10,10,10,11,10,10,11,11,10,
-	11,10,10,10,10,11,11,12,10,10,10,11,10,11,12,11,
-	10,11,10,10,11,11,10,12,10, 9,10,10,11,11,11,10,
-	12,10,10,11,11,11,10,10,11,10,10,10,11,10,11,10,
-	12,11,11,10,10,10,12,10,10,11, 9,10,11,11,11,10,
-	10,11,10,10, 9,11,11,12,12,11,12,11,11,11,11,11,
-	11, 9,10,11,10,12,10,10,10,10,11,10,10,11,10,10,
-	12,10,10,10,10,10, 9,12,10,10,10,10,12, 9,11,10,
-	10,11,10,12,12,10,12,12,12,10,10,10,10, 9,10,11,
-	10,10,12,10,10,12,11,10,11,10,10,12,11,10,12,10,
-	10,11, 9,11,10, 9,10, 9,10,
-};
-
-static float _vq_quantthresh__8c0_s_p9_2[] = {
-	-9.5, -8.5, -7.5, -6.5, -5.5, -4.5, -3.5, -2.5, 
-	-1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 
-	6.5, 7.5, 8.5, 9.5, 
-};
-
-static long _vq_quantmap__8c0_s_p9_2[] = {
-	   19,   17,   15,   13,   11,    9,    7,    5,
-	    3,    1,    0,    2,    4,    6,    8,   10,
-	   12,   14,   16,   18,   20,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c0_s_p9_2 = {
-	_vq_quantthresh__8c0_s_p9_2,
-	_vq_quantmap__8c0_s_p9_2,
-	21,
-	21
-};
-
-static static_codebook _8c0_s_p9_2 = {
-	2, 441,
-	_vq_lengthlist__8c0_s_p9_2,
-	1, -529268736, 1611661312, 5, 0,
-	_vq_quantlist__8c0_s_p9_2,
-	NULL,
-	&_vq_auxt__8c0_s_p9_2,
-	NULL,
-	0
-};
-
-static long _huff_lengthlist__8c0_s_single[] = {
-	 4, 5,18, 7,10, 6, 7, 8, 9,10, 5, 2,18, 5, 7, 5,
-	 6, 7, 8,11,17,17,17,17,17,17,17,17,17,17, 7, 4,
-	17, 6, 9, 6, 8,10,12,15,11, 7,17, 9, 6, 6, 7, 9,
-	11,15, 6, 4,17, 6, 6, 4, 5, 8,11,16, 6, 6,17, 8,
-	 6, 5, 6, 9,13,16, 8, 9,17,11, 9, 8, 8,11,13,17,
-	 9,12,17,15,14,13,12,13,14,17,12,15,17,17,17,17,
-	17,16,17,17,
-};
-
-static static_codebook _huff_book__8c0_s_single = {
-	2, 100,
-	_huff_lengthlist__8c0_s_single,
-	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p1_0[] = {
-	1,
-	0,
-	2,
-};
-
-static long _vq_lengthlist__8c1_s_p1_0[] = {
-	 1, 5, 5, 0, 0, 0, 0, 0, 0, 5, 7, 7, 0, 0, 0, 0,
-	 0, 0, 5, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 5, 8, 7, 0, 0, 0, 0, 0, 0, 7, 8, 9, 0, 0, 0,
-	 0, 0, 0, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 5, 7, 8, 0, 0, 0, 0, 0, 0, 7, 9, 8, 0, 0,
-	 0, 0, 0, 0, 7, 9, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 8, 8, 0, 0, 0, 0,
-	 0, 0, 8, 9, 9, 0, 0, 0, 0, 0, 0, 8, 9, 9, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 9, 9, 0, 0, 0,
-	 0, 0, 0, 8, 8,10, 0, 0, 0, 0, 0, 0, 9,10,10, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 9, 9, 0, 0,
-	 0, 0, 0, 0, 8,10, 9, 0, 0, 0, 0, 0, 0, 9,10,10,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 5, 8, 8, 0, 0, 0, 0, 0, 0, 8, 9, 9, 0, 0,
-	 0, 0, 0, 0, 8, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 7, 9, 9, 0, 0, 0, 0, 0, 0, 9,10,10, 0,
-	 0, 0, 0, 0, 0, 8, 9,10, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 7, 9, 9, 0, 0, 0, 0, 0, 0, 9,10,10,
-	 0, 0, 0, 0, 0, 0, 8,10, 8, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0,
-};
-
-static float _vq_quantthresh__8c1_s_p1_0[] = {
-	-0.5, 0.5, 
-};
-
-static long _vq_quantmap__8c1_s_p1_0[] = {
-	    1,    0,    2,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p1_0 = {
-	_vq_quantthresh__8c1_s_p1_0,
-	_vq_quantmap__8c1_s_p1_0,
-	3,
-	3
-};
-
-static static_codebook _8c1_s_p1_0 = {
-	8, 6561,
-	_vq_lengthlist__8c1_s_p1_0,
-	1, -535822336, 1611661312, 2, 0,
-	_vq_quantlist__8c1_s_p1_0,
-	NULL,
-	&_vq_auxt__8c1_s_p1_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p2_0[] = {
-	2,
-	1,
-	3,
-	0,
-	4,
-};
-
-static long _vq_lengthlist__8c1_s_p2_0[] = {
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0,
-};
-
-static float _vq_quantthresh__8c1_s_p2_0[] = {
-	-1.5, -0.5, 0.5, 1.5, 
-};
-
-static long _vq_quantmap__8c1_s_p2_0[] = {
-	    3,    1,    0,    2,    4,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p2_0 = {
-	_vq_quantthresh__8c1_s_p2_0,
-	_vq_quantmap__8c1_s_p2_0,
-	5,
-	5
-};
-
-static static_codebook _8c1_s_p2_0 = {
-	4, 625,
-	_vq_lengthlist__8c1_s_p2_0,
-	1, -533725184, 1611661312, 3, 0,
-	_vq_quantlist__8c1_s_p2_0,
-	NULL,
-	&_vq_auxt__8c1_s_p2_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p3_0[] = {
-	2,
-	1,
-	3,
-	0,
-	4,
-};
-
-static long _vq_lengthlist__8c1_s_p3_0[] = {
-	 2, 4, 4, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 6, 6, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 4, 4, 4, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 7, 7,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 6, 6, 6, 7, 7, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0,
-};
-
-static float _vq_quantthresh__8c1_s_p3_0[] = {
-	-1.5, -0.5, 0.5, 1.5, 
-};
-
-static long _vq_quantmap__8c1_s_p3_0[] = {
-	    3,    1,    0,    2,    4,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p3_0 = {
-	_vq_quantthresh__8c1_s_p3_0,
-	_vq_quantmap__8c1_s_p3_0,
-	5,
-	5
-};
-
-static static_codebook _8c1_s_p3_0 = {
-	4, 625,
-	_vq_lengthlist__8c1_s_p3_0,
-	1, -533725184, 1611661312, 3, 0,
-	_vq_quantlist__8c1_s_p3_0,
-	NULL,
-	&_vq_auxt__8c1_s_p3_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p4_0[] = {
-	4,
-	3,
-	5,
-	2,
-	6,
-	1,
-	7,
-	0,
-	8,
-};
-
-static long _vq_lengthlist__8c1_s_p4_0[] = {
-	 1, 2, 3, 7, 7, 0, 0, 0, 0, 0, 0, 0, 6, 6, 0, 0,
-	 0, 0, 0, 0, 0, 6, 6, 0, 0, 0, 0, 0, 0, 0, 7, 7,
-	 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0,
-	 8, 8, 0, 0, 0, 0, 0, 0, 0, 9, 8, 0, 0, 0, 0, 0,
-	 0, 0,10,10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0,
-};
-
-static float _vq_quantthresh__8c1_s_p4_0[] = {
-	-3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 
-};
-
-static long _vq_quantmap__8c1_s_p4_0[] = {
-	    7,    5,    3,    1,    0,    2,    4,    6,
-	    8,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p4_0 = {
-	_vq_quantthresh__8c1_s_p4_0,
-	_vq_quantmap__8c1_s_p4_0,
-	9,
-	9
-};
-
-static static_codebook _8c1_s_p4_0 = {
-	2, 81,
-	_vq_lengthlist__8c1_s_p4_0,
-	1, -531628032, 1611661312, 4, 0,
-	_vq_quantlist__8c1_s_p4_0,
-	NULL,
-	&_vq_auxt__8c1_s_p4_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p5_0[] = {
-	4,
-	3,
-	5,
-	2,
-	6,
-	1,
-	7,
-	0,
-	8,
-};
-
-static long _vq_lengthlist__8c1_s_p5_0[] = {
-	 1, 3, 3, 4, 5, 6, 6, 8, 8, 0, 0, 0, 8, 8, 7, 7,
-	 9, 9, 0, 0, 0, 8, 8, 7, 7, 9, 9, 0, 0, 0, 9,10,
-	 8, 8, 9, 9, 0, 0, 0,10,10, 8, 8, 9, 9, 0, 0, 0,
-	11,10, 8, 8,10,10, 0, 0, 0,11,11, 8, 8,10,10, 0,
-	 0, 0,12,12, 9, 9,10,10, 0, 0, 0, 0, 0, 9, 9,10,
-	10,
-};
-
-static float _vq_quantthresh__8c1_s_p5_0[] = {
-	-3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 
-};
-
-static long _vq_quantmap__8c1_s_p5_0[] = {
-	    7,    5,    3,    1,    0,    2,    4,    6,
-	    8,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p5_0 = {
-	_vq_quantthresh__8c1_s_p5_0,
-	_vq_quantmap__8c1_s_p5_0,
-	9,
-	9
-};
-
-static static_codebook _8c1_s_p5_0 = {
-	2, 81,
-	_vq_lengthlist__8c1_s_p5_0,
-	1, -531628032, 1611661312, 4, 0,
-	_vq_quantlist__8c1_s_p5_0,
-	NULL,
-	&_vq_auxt__8c1_s_p5_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p6_0[] = {
-	8,
-	7,
-	9,
-	6,
-	10,
-	5,
-	11,
-	4,
-	12,
-	3,
-	13,
-	2,
-	14,
-	1,
-	15,
-	0,
-	16,
-};
-
-static long _vq_lengthlist__8c1_s_p6_0[] = {
-	 1, 3, 3, 5, 5, 8, 8, 8, 8, 9, 9,10,10,11,11,11,
-	11, 0, 0, 0, 8, 8, 8, 8, 9, 9, 9, 9,10,10,11,11,
-	12,12, 0, 0, 0, 8, 8, 8, 8, 9, 9, 9, 9,10,10,11,
-	11,12,12, 0, 0, 0, 9, 9, 8, 8,10,10,10,10,11,11,
-	12,12,12,12, 0, 0, 0, 9, 9, 8, 8,10,10,10,10,11,
-	11,12,12,12,12, 0, 0, 0,10,10, 9, 9,10,10,10,10,
-	11,11,12,12,13,13, 0, 0, 0,10,10, 9, 9,10,10,10,
-	10,11,11,12,12,13,13, 0, 0, 0,11,11, 9, 9,10,10,
-	10,10,11,11,12,12,13,13, 0, 0, 0, 0, 0, 9, 9,10,
-	10,10,10,11,11,12,12,13,13, 0, 0, 0, 0, 0, 9, 9,
-	10,10,11,11,12,12,12,12,13,13, 0, 0, 0, 0, 0, 9,
-	 9,10,10,11,11,12,11,12,12,13,13, 0, 0, 0, 0, 0,
-	10,10,11,11,11,11,12,12,13,12,13,13, 0, 0, 0, 0,
-	 0, 0, 0,11,10,11,11,12,12,13,13,13,13, 0, 0, 0,
-	 0, 0, 0, 0,11,11,12,12,12,12,13,13,13,14, 0, 0,
-	 0, 0, 0, 0, 0,11,11,12,12,12,12,13,13,14,13, 0,
-	 0, 0, 0, 0, 0, 0,12,12,12,12,13,13,13,13,14,14,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0,12,12,13,13,13,13,14,
-	14,
-};
-
-static float _vq_quantthresh__8c1_s_p6_0[] = {
-	-7.5, -6.5, -5.5, -4.5, -3.5, -2.5, -1.5, -0.5, 
-	0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 
-};
-
-static long _vq_quantmap__8c1_s_p6_0[] = {
-	   15,   13,   11,    9,    7,    5,    3,    1,
-	    0,    2,    4,    6,    8,   10,   12,   14,
-	   16,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p6_0 = {
-	_vq_quantthresh__8c1_s_p6_0,
-	_vq_quantmap__8c1_s_p6_0,
-	17,
-	17
-};
-
-static static_codebook _8c1_s_p6_0 = {
-	2, 289,
-	_vq_lengthlist__8c1_s_p6_0,
-	1, -529530880, 1611661312, 5, 0,
-	_vq_quantlist__8c1_s_p6_0,
-	NULL,
-	&_vq_auxt__8c1_s_p6_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p7_0[] = {
-	1,
-	0,
-	2,
-};
-
-static long _vq_lengthlist__8c1_s_p7_0[] = {
-	 1, 4, 4, 6, 6, 6, 7, 6, 6, 4, 7, 7,10, 9, 9,10,
-	 9, 9, 5, 7, 7,10, 9, 9,10, 9, 9, 6,10,10,10,10,
-	10,11,10,10, 6, 9, 9,10, 9,10,11,10,10, 6, 9, 9,
-	10, 9, 9,11, 9,10, 7,10,10,11,11,11,11,10,10, 6,
-	 9, 9,10,10,10,11, 9, 9, 6, 9, 9,10,10,10,10, 9,
-	 9,
-};
-
-static float _vq_quantthresh__8c1_s_p7_0[] = {
-	-5.5, 5.5, 
-};
-
-static long _vq_quantmap__8c1_s_p7_0[] = {
-	    1,    0,    2,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p7_0 = {
-	_vq_quantthresh__8c1_s_p7_0,
-	_vq_quantmap__8c1_s_p7_0,
-	3,
-	3
-};
-
-static static_codebook _8c1_s_p7_0 = {
-	4, 81,
-	_vq_lengthlist__8c1_s_p7_0,
-	1, -529137664, 1618345984, 2, 0,
-	_vq_quantlist__8c1_s_p7_0,
-	NULL,
-	&_vq_auxt__8c1_s_p7_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p7_1[] = {
-	5,
-	4,
-	6,
-	3,
-	7,
-	2,
-	8,
-	1,
-	9,
-	0,
-	10,
-};
-
-static long _vq_lengthlist__8c1_s_p7_1[] = {
-	 2, 3, 3, 5, 5, 7, 7, 7, 7, 7, 7,10,10, 9, 7, 7,
-	 7, 7, 8, 8, 8, 8, 9, 9, 9, 7, 7, 7, 7, 8, 8, 8,
-	 8,10,10,10, 7, 7, 7, 7, 8, 8, 8, 8,10,10,10, 7,
-	 7, 7, 7, 8, 8, 8, 8,10,10,10, 8, 8, 8, 8, 8, 8,
-	 8, 8,10,10,10, 8, 8, 8, 8, 8, 8, 8, 8,10,10,10,
-	 8, 8, 8, 8, 8, 8, 8, 8,10,10,10,10,10, 8, 8, 8,
-	 8, 8, 8,10,10,10,10,10, 8, 8, 8, 8, 8, 8,10,10,
-	10,10,10, 8, 8, 8, 8, 8, 8,
-};
-
-static float _vq_quantthresh__8c1_s_p7_1[] = {
-	-4.5, -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 
-	3.5, 4.5, 
-};
-
-static long _vq_quantmap__8c1_s_p7_1[] = {
-	    9,    7,    5,    3,    1,    0,    2,    4,
-	    6,    8,   10,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p7_1 = {
-	_vq_quantthresh__8c1_s_p7_1,
-	_vq_quantmap__8c1_s_p7_1,
-	11,
-	11
-};
-
-static static_codebook _8c1_s_p7_1 = {
-	2, 121,
-	_vq_lengthlist__8c1_s_p7_1,
-	1, -531365888, 1611661312, 4, 0,
-	_vq_quantlist__8c1_s_p7_1,
-	NULL,
-	&_vq_auxt__8c1_s_p7_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p8_0[] = {
-	6,
-	5,
-	7,
-	4,
-	8,
-	3,
-	9,
-	2,
-	10,
-	1,
-	11,
-	0,
-	12,
-};
-
-static long _vq_lengthlist__8c1_s_p8_0[] = {
-	 1, 4, 4, 6, 6, 8, 8, 8, 8, 9, 9,10,10, 7, 5, 5,
-	 7, 7, 8, 8, 8, 8, 9,10,11,11, 7, 5, 5, 7, 7, 8,
-	 8, 9, 9,10,10,11,11, 0, 8, 8, 8, 8, 9, 9, 9, 9,
-	 9,10,11,11, 0, 8, 8, 8, 8, 9, 9, 9, 9,10,10,11,
-	11, 0,12,12, 9, 9, 9, 9,10, 9,10,11,11,11, 0,13,
-	12, 9, 8, 9, 9,10,10,11,11,12,11, 0, 0, 0, 9, 9,
-	 9, 9,10,10,11,11,12,12, 0, 0, 0,10,10, 9, 9,10,
-	10,11,11,12,12, 0, 0, 0,13,13,10,10,11,11,12,11,
-	13,12, 0, 0, 0,14,14,10,10,11,10,11,11,12,12, 0,
-	 0, 0, 0, 0,12,12,11,11,12,12,13,13, 0, 0, 0, 0,
-	 0,12,12,11,10,12,11,13,12,
-};
-
-static float _vq_quantthresh__8c1_s_p8_0[] = {
-	-27.5, -22.5, -17.5, -12.5, -7.5, -2.5, 2.5, 7.5, 
-	12.5, 17.5, 22.5, 27.5, 
-};
-
-static long _vq_quantmap__8c1_s_p8_0[] = {
-	   11,    9,    7,    5,    3,    1,    0,    2,
-	    4,    6,    8,   10,   12,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p8_0 = {
-	_vq_quantthresh__8c1_s_p8_0,
-	_vq_quantmap__8c1_s_p8_0,
-	13,
-	13
-};
-
-static static_codebook _8c1_s_p8_0 = {
-	2, 169,
-	_vq_lengthlist__8c1_s_p8_0,
-	1, -526516224, 1616117760, 4, 0,
-	_vq_quantlist__8c1_s_p8_0,
-	NULL,
-	&_vq_auxt__8c1_s_p8_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p8_1[] = {
-	2,
-	1,
-	3,
-	0,
-	4,
-};
-
-static long _vq_lengthlist__8c1_s_p8_1[] = {
-	 2, 3, 3, 5, 5, 6, 6, 6, 5, 5, 6, 6, 6, 5, 5, 6,
-	 6, 6, 5, 5, 6, 6, 6, 5, 5,
-};
-
-static float _vq_quantthresh__8c1_s_p8_1[] = {
-	-1.5, -0.5, 0.5, 1.5, 
-};
-
-static long _vq_quantmap__8c1_s_p8_1[] = {
-	    3,    1,    0,    2,    4,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p8_1 = {
-	_vq_quantthresh__8c1_s_p8_1,
-	_vq_quantmap__8c1_s_p8_1,
-	5,
-	5
-};
-
-static static_codebook _8c1_s_p8_1 = {
-	2, 25,
-	_vq_lengthlist__8c1_s_p8_1,
-	1, -533725184, 1611661312, 3, 0,
-	_vq_quantlist__8c1_s_p8_1,
-	NULL,
-	&_vq_auxt__8c1_s_p8_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p9_0[] = {
-	6,
-	5,
-	7,
-	4,
-	8,
-	3,
-	9,
-	2,
-	10,
-	1,
-	11,
-	0,
-	12,
-};
-
-static long _vq_lengthlist__8c1_s_p9_0[] = {
-	 1, 3, 3,10,10,10,10,10,10,10,10,10,10, 5, 6, 6,
-	10,10,10,10,10,10,10,10,10,10, 6, 7, 8,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	10,10,10,10,10, 9, 9, 9, 9,
-};
-
-static float _vq_quantthresh__8c1_s_p9_0[] = {
-	-1732.5, -1417.5, -1102.5, -787.5, -472.5, -157.5, 157.5, 472.5, 
-	787.5, 1102.5, 1417.5, 1732.5, 
-};
-
-static long _vq_quantmap__8c1_s_p9_0[] = {
-	   11,    9,    7,    5,    3,    1,    0,    2,
-	    4,    6,    8,   10,   12,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p9_0 = {
-	_vq_quantthresh__8c1_s_p9_0,
-	_vq_quantmap__8c1_s_p9_0,
-	13,
-	13
-};
-
-static static_codebook _8c1_s_p9_0 = {
-	2, 169,
-	_vq_lengthlist__8c1_s_p9_0,
-	1, -513964032, 1628680192, 4, 0,
-	_vq_quantlist__8c1_s_p9_0,
-	NULL,
-	&_vq_auxt__8c1_s_p9_0,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p9_1[] = {
-	7,
-	6,
-	8,
-	5,
-	9,
-	4,
-	10,
-	3,
-	11,
-	2,
-	12,
-	1,
-	13,
-	0,
-	14,
-};
-
-static long _vq_lengthlist__8c1_s_p9_1[] = {
-	 1, 4, 4, 5, 5, 7, 7, 9, 9,11,11,12,12,13,13, 6,
-	 5, 5, 6, 6, 9, 9,10,10,12,12,12,13,15,14, 6, 5,
-	 5, 7, 7, 9, 9,10,10,12,12,12,13,14,13,17, 7, 7,
-	 8, 8,10,10,11,11,12,13,13,13,13,13,17, 7, 7, 8,
-	 8,10,10,11,11,13,13,13,13,14,14,17,11,11, 9, 9,
-	11,11,12,12,12,13,13,14,15,13,17,12,12, 9, 9,11,
-	11,12,12,13,13,13,13,14,16,17,17,17,11,12,12,12,
-	13,13,13,14,15,14,15,15,17,17,17,12,12,11,11,13,
-	13,14,14,15,14,15,15,17,17,17,15,15,13,13,14,14,
-	15,14,15,15,16,15,17,17,17,15,15,13,13,13,14,14,
-	15,15,15,15,16,17,17,17,17,16,14,15,14,14,15,14,
-	14,15,15,15,17,17,17,17,17,14,14,16,14,15,15,15,
-	15,15,15,17,17,17,17,17,17,16,16,15,17,15,15,14,
-	17,15,17,16,17,17,17,17,16,15,14,15,15,15,15,15,
-	15,
-};
-
-static float _vq_quantthresh__8c1_s_p9_1[] = {
-	-136.5, -115.5, -94.5, -73.5, -52.5, -31.5, -10.5, 10.5, 
-	31.5, 52.5, 73.5, 94.5, 115.5, 136.5, 
-};
-
-static long _vq_quantmap__8c1_s_p9_1[] = {
-	   13,   11,    9,    7,    5,    3,    1,    0,
-	    2,    4,    6,    8,   10,   12,   14,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p9_1 = {
-	_vq_quantthresh__8c1_s_p9_1,
-	_vq_quantmap__8c1_s_p9_1,
-	15,
-	15
-};
-
-static static_codebook _8c1_s_p9_1 = {
-	2, 225,
-	_vq_lengthlist__8c1_s_p9_1,
-	1, -520986624, 1620377600, 4, 0,
-	_vq_quantlist__8c1_s_p9_1,
-	NULL,
-	&_vq_auxt__8c1_s_p9_1,
-	NULL,
-	0
-};
-
-static long _vq_quantlist__8c1_s_p9_2[] = {
-	10,
-	9,
-	11,
-	8,
-	12,
-	7,
-	13,
-	6,
-	14,
-	5,
-	15,
-	4,
-	16,
-	3,
-	17,
-	2,
-	18,
-	1,
-	19,
-	0,
-	20,
-};
-
-static long _vq_lengthlist__8c1_s_p9_2[] = {
-	 2, 4, 4, 6, 6, 7, 7, 8, 8, 8, 8, 9, 8, 9, 9, 9,
-	 9, 9, 9, 9, 9,11,11,12, 7, 7, 7, 7, 8, 8, 9, 9,
-	 9, 9,10,10,10,10,10,10,10,10,11,11,11, 7, 7, 7,
-	 7, 8, 8, 9, 8, 9, 9, 9, 9, 9, 9,10,10,10,10,11,
-	11,12, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9,10,10,10,10,
-	10,10,10,10,11,11,11, 7, 7, 8, 8, 8, 8, 9, 9, 9,
-	 9,10,10,10,10,10,10,10,10,11,11,11, 8, 8, 8, 8,
-	 9, 9, 9, 9, 9, 9,10,10,10,10,10,10,10,10,11,11,
-	11, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9,10,10,10,10,10,
-	10,10,10,11,12,11, 9, 9, 8, 9, 9, 9, 9, 9,10,10,
-	10,10,10,10,10,10,10,10,11,11,11,11,11, 8, 8, 9,
-	 9, 9, 9,10,10,10,10,10,10,10,10,10,10,11,12,11,
-	12,11, 9, 9, 9, 9, 9,10,10,10,10,10,10,10,10,10,
-	10,10,11,11,11,11,11, 9, 9, 9, 9,10,10,10,10,10,
-	10,10,10,10,10,10,10,12,11,12,11,11, 9, 9, 9,10,
-	10,10,10,10,10,10,10,10,10,10,10,10,12,11,11,11,
-	11,11,11,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	11,11,11,12,11,11,12,11,10,10,10,10,10,10,10,10,
-	10,10,10,10,11,10,11,11,11,11,11,11,11,10,10,10,
-	10,10,10,10,10,10,10,10,10,10,10,11,11,12,11,12,
-	11,11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-	11,11,12,11,12,11,11,11,11,10,10,10,10,10,10,10,
-	10,10,10,10,10,11,11,12,11,11,12,11,11,12,10,10,
-	11,10,10,10,10,10,10,10,10,10,11,11,11,11,11,11,
-	11,11,11,10,10,10,10,10,10,10,10,10,10,10,10,12,
-	12,11,12,11,11,12,12,12,11,11,10,10,10,10,10,10,
-	10,10,10,11,12,12,11,12,12,11,12,11,11,11,11,10,
-	10,10,10,10,10,10,10,10,10,
-};
-
-static float _vq_quantthresh__8c1_s_p9_2[] = {
-	-9.5, -8.5, -7.5, -6.5, -5.5, -4.5, -3.5, -2.5, 
-	-1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 
-	6.5, 7.5, 8.5, 9.5, 
-};
-
-static long _vq_quantmap__8c1_s_p9_2[] = {
-	   19,   17,   15,   13,   11,    9,    7,    5,
-	    3,    1,    0,    2,    4,    6,    8,   10,
-	   12,   14,   16,   18,   20,
-};
-
-static encode_aux_threshmatch _vq_auxt__8c1_s_p9_2 = {
-	_vq_quantthresh__8c1_s_p9_2,
-	_vq_quantmap__8c1_s_p9_2,
-	21,
-	21
-};
-
-static static_codebook _8c1_s_p9_2 = {
-	2, 441,
-	_vq_lengthlist__8c1_s_p9_2,
-	1, -529268736, 1611661312, 5, 0,
-	_vq_quantlist__8c1_s_p9_2,
-	NULL,
-	&_vq_auxt__8c1_s_p9_2,
-	NULL,
-	0
-};
-
-static long _huff_lengthlist__8c1_s_single[] = {
-	 4, 6,18, 8,11, 8, 8, 9, 9,10, 4, 4,18, 5, 9, 5,
-	 6, 7, 8,10,18,18,18,18,17,17,17,17,17,17, 7, 5,
-	17, 6,11, 6, 7, 8, 9,12,12, 9,17,12, 8, 8, 9,10,
-	10,13, 7, 5,17, 6, 8, 4, 5, 6, 8,10, 6, 5,17, 6,
-	 8, 5, 4, 5, 7, 9, 7, 7,17, 8, 9, 6, 5, 5, 6, 8,
-	 8, 8,17, 9,11, 8, 6, 6, 6, 7, 9,10,17,12,12,10,
-	 9, 7, 7, 8,
-};
-
-static static_codebook _huff_book__8c1_s_single = {
-	2, 100,
-	_huff_lengthlist__8c1_s_single,
-	0, 0, 0, 0, 0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	0
-};
-
+	
