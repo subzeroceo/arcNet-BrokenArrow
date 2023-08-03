@@ -1,5 +1,5 @@
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 
@@ -19,10 +19,10 @@ ARC_INLINE int UpdateVertexIndex( int vertexIndexNum[2], int *vertexRemap, int *
 
 /*
 =================
-arcSurface::Split
+anSurface::Split
 =================
 */
-int arcSurface::Split( const arcPlane &plane, const float epsilon, arcSurface **front, arcSurface **back, int *frontOnPlaneEdges, int *backOnPlaneEdges ) const {
+int anSurface::Split( const anPlane &plane, const float epsilon, anSurface **front, anSurface **back, int *frontOnPlaneEdges, int *backOnPlaneEdges ) const {
 	float *			dists;
 	float			f;
 	byte *			sides;
@@ -39,11 +39,11 @@ int arcSurface::Split( const arcPlane &plane, const float epsilon, arcSurface **
 	int				numOnPlaneEdges[2];
 	int				maxOnPlaneEdges;
 	int				i;
-	arcSurface *		surface[2];
-	arcDrawVert		v;
+	anSurface *		surface[2];
+	anDrawVertex		v;
 
 	dists = (float *) _alloca( verts.Num() * sizeof( float ) );
-	sides = ( byte * ) _alloca( verts.Num() * sizeof( byte ) );
+	sides = (byte *) _alloca( verts.Num() * sizeof( byte ) );
 
 	counts[0] = counts[1] = counts[2] = 0;
 
@@ -60,35 +60,35 @@ int arcSurface::Split( const arcPlane &plane, const float epsilon, arcSurface **
 		counts[sides[i]]++;
 	}
 
-	*front = *back = NULL;
+	*front = *back = nullptr;
 
 	// if coplanar, put on the front side if the normals match
 	if ( !counts[SIDE_FRONT] && !counts[SIDE_BACK] ) {
 		f = ( verts[indexes[1]].xyz - verts[indexes[0]].xyz ).Cross( verts[indexes[0]].xyz - verts[indexes[2]].xyz ) * plane.Normal();
 		if ( FLOATSIGNBITSET( f ) ) {
-			*back = new arcSurface( *this );
+			*back = new anSurface( *this );
 			return SIDE_BACK;
 		} else {
-			*front = new arcSurface( *this );
+			*front = new anSurface( *this );
 			return SIDE_FRONT;
 		}
 	}
 	// if nothing at the front of the clipping plane
 	if ( !counts[SIDE_FRONT] ) {
-		*back = new arcSurface( *this );
+		*back = new anSurface( *this );
 		return SIDE_BACK;
 	}
 	// if nothing at the back of the clipping plane
 	if ( !counts[SIDE_BACK] ) {
-		*front = new arcSurface( *this );
+		*front = new anSurface( *this );
 		return SIDE_FRONT;
 	}
 
 	// allocate front and back surface
-	*front = surface[0] = new arcSurface();
-	*back = surface[1] = new arcSurface();
+	*front = surface[0] = new anSurface();
+	*back = surface[1] = new anSurface();
 
-	edgeSplitVertex = ( int * ) _alloca( edges.Num() * sizeof( int ) );
+	edgeSplitVertex = ( int*) _alloca( edges.Num() * sizeof( int ) );
 	numEdgeSplitVertexes = 0;
 
 	maxOnPlaneEdges = 4 * counts[SIDE_ON];
@@ -119,13 +119,13 @@ int arcSurface::Split( const arcPlane &plane, const float epsilon, arcSurface **
 	surface[1]->indexes.Resize( ( ( counts[SIDE_BACK] + counts[SIDE_ON] ) * 2 ) + ( numEdgeSplitVertexes * 4 ) );
 
 	// allocate indexes to construct the triangle indexes for the front and back surface
-	vertexRemap[0] = ( int * ) _alloca( verts.Num() * sizeof( int ) );
+	vertexRemap[0] = ( int*) _alloca( verts.Num() * sizeof( int ) );
 	memset( vertexRemap[0], -1, verts.Num() * sizeof( int ) );
-	vertexRemap[1] = ( int * ) _alloca( verts.Num() * sizeof( int ) );
+	vertexRemap[1] = ( int*) _alloca( verts.Num() * sizeof( int ) );
 	memset( vertexRemap[1], -1, verts.Num() * sizeof( int ) );
 
-	vertexCopyIndex[0] = ( int * ) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
-	vertexCopyIndex[1] = ( int * ) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
+	vertexCopyIndex[0] = ( int*) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
+	vertexCopyIndex[1] = ( int*) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
 
 	vertexIndexNum[0][0] = vertexIndexNum[1][0] = 0;
 	vertexIndexNum[0][1] = vertexIndexNum[1][1] = numEdgeSplitVertexes;
@@ -137,8 +137,8 @@ int arcSurface::Split( const arcPlane &plane, const float epsilon, arcSurface **
 
 	maxOnPlaneEdges += 4 * numEdgeSplitVertexes;
 	// allocate one more in case no triangles are actually split which may happen for a disconnected surface
-	onPlaneEdges[0] = ( int * ) _alloca( ( maxOnPlaneEdges + 1 ) * sizeof( int ) );
-	onPlaneEdges[1] = ( int * ) _alloca( ( maxOnPlaneEdges + 1 ) * sizeof( int ) );
+	onPlaneEdges[0] = ( int*) _alloca( ( maxOnPlaneEdges + 1 ) * sizeof( int ) );
+	onPlaneEdges[1] = ( int*) _alloca( ( maxOnPlaneEdges + 1 ) * sizeof( int ) );
 	numOnPlaneEdges[0] = numOnPlaneEdges[1] = 0;
 
 	// split surface triangles
@@ -153,7 +153,7 @@ int arcSurface::Split( const arcPlane &plane, const float epsilon, arcSurface **
 		v1 = indexes[i+1];
 		v2 = indexes[i+2];
 
-		switch( ( INTSIGNBITSET( edgeSplitVertex[e0] ) | ( INTSIGNBITSET( edgeSplitVertex[e1] ) << 1 ) | ( INTSIGNBITSET( edgeSplitVertex[e2] ) << 2 ) ) ^ 7 ) {
+		switch ( ( INTSIGNBITSET( edgeSplitVertex[e0] ) | ( INTSIGNBITSET( edgeSplitVertex[e1] ) << 1 ) | ( INTSIGNBITSET( edgeSplitVertex[e2] ) << 2 ) ) ^ 7 ) {
 			case 0: {	// no edges split
 				if ( ( sides[v0] & sides[v1] & sides[v2] ) & SIDE_ON ) {
 					// coplanar
@@ -336,10 +336,10 @@ int arcSurface::Split( const arcPlane &plane, const float epsilon, arcSurface **
 
 /*
 =================
-arcSurface::ClipInPlace
+anSurface::ClipInPlace
 =================
 */
-bool arcSurface::ClipInPlace( const arcPlane &plane, const float epsilon, const bool keepOn ) {
+bool anSurface::ClipInPlace( const anPlane &plane, const float epsilon, const bool keepOn ) {
 	float *			dists;
 	float			f;
 	byte *			sides;
@@ -352,12 +352,12 @@ bool arcSurface::ClipInPlace( const arcPlane &plane, const float epsilon, const 
 	int *			indexPtr;
 	int				indexNum;
 	int				numEdgeSplitVertexes;
-	arcDrawVert		v;
-	arcNetList<arcDrawVert> newVerts;
-	arcNetList<int>		newIndexes;
+	anDrawVertex		v;
+	anList<anDrawVertex> newVerts;
+	anList<int>		newIndexes;
 
 	dists = (float *) _alloca( verts.Num() * sizeof( float ) );
-	sides = ( byte * ) _alloca( verts.Num() * sizeof( byte ) );
+	sides = (byte *) _alloca( verts.Num() * sizeof( byte ) );
 
 	counts[0] = counts[1] = counts[2] = 0;
 
@@ -394,7 +394,7 @@ bool arcSurface::ClipInPlace( const arcPlane &plane, const float epsilon, const 
 		return true;
 	}
 
-	edgeSplitVertex = ( int * ) _alloca( edges.Num() * sizeof( int ) );
+	edgeSplitVertex = ( int*) _alloca( edges.Num() * sizeof( int ) );
 	numEdgeSplitVertexes = 0;
 
 	counts[SIDE_FRONT] = counts[SIDE_BACK] = 0;
@@ -407,7 +407,7 @@ bool arcSurface::ClipInPlace( const arcPlane &plane, const float epsilon, const 
 		// if both vertexes are on the same side or one is on the clipping plane
 		if ( !( sides[v0] ^ sides[v1] ) || ( ( sides[v0] | sides[v1] ) & SIDE_ON ) ) {
 			edgeSplitVertex[i] = -1;
-			counts[(sides[v0]|sides[v1] ) & SIDE_BACK]++;
+			counts[( sides[v0]|sides[v1] ) & SIDE_BACK]++;
 		} else {
 			f = dists[v0] / ( dists[v0] - dists[v1] );
 			v.LerpAll( verts[v0], verts[v1], f );
@@ -421,10 +421,10 @@ bool arcSurface::ClipInPlace( const arcPlane &plane, const float epsilon, const 
 	newIndexes.Resize( ( counts[SIDE_FRONT] << 1 ) + ( numEdgeSplitVertexes << 2 ) );
 
 	// allocate indexes to construct the triangle indexes for the front and back surface
-	vertexRemap = ( int * ) _alloca( verts.Num() * sizeof( int ) );
+	vertexRemap = ( int*) _alloca( verts.Num() * sizeof( int ) );
 	memset( vertexRemap, -1, verts.Num() * sizeof( int ) );
 
-	vertexCopyIndex = ( int * ) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
+	vertexCopyIndex = ( int*) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
 
 	vertexIndexNum[0] = 0;
 	vertexIndexNum[1] = numEdgeSplitVertexes;
@@ -444,7 +444,7 @@ bool arcSurface::ClipInPlace( const arcPlane &plane, const float epsilon, const 
 		v1 = indexes[i+1];
 		v2 = indexes[i+2];
 
-		switch( ( INTSIGNBITSET( edgeSplitVertex[e0] ) | ( INTSIGNBITSET( edgeSplitVertex[e1] ) << 1 ) | ( INTSIGNBITSET( edgeSplitVertex[e2] ) << 2 ) ) ^ 7 ) {
+		switch ( ( INTSIGNBITSET( edgeSplitVertex[e0] ) | ( INTSIGNBITSET( edgeSplitVertex[e1] ) << 1 ) | ( INTSIGNBITSET( edgeSplitVertex[e2] ) << 2 ) ) ^ 7 ) {
 			case 0: {	// no edges split
 				if ( ( sides[v0] | sides[v1] | sides[v2] ) & SIDE_BACK ) {
 					break;
@@ -567,10 +567,10 @@ bool arcSurface::ClipInPlace( const arcPlane &plane, const float epsilon, const 
 
 /*
 =============
-arcSurface::IsConnected
+anSurface::IsConnected
 =============
 */
-bool arcSurface::IsConnected( void ) const {
+bool anSurface::IsConnected( void ) const {
 	int i, j, numIslands, numTris;
 	int queueStart, queueEnd;
 	int *queue, *islandNum;
@@ -579,9 +579,9 @@ bool arcSurface::IsConnected( void ) const {
 
 	numIslands = 0;
 	numTris = indexes.Num() / 3;
-	islandNum = ( int * ) _alloca16( numTris * sizeof( int ) );
+	islandNum = ( int*) _alloca16( numTris * sizeof( int ) );
 	memset( islandNum, -1, numTris * sizeof( int ) );
-	queue = ( int * ) _alloca16( numTris * sizeof( int ) );
+	queue = ( int*) _alloca16( numTris * sizeof( int ) );
 
 	for ( i = 0; i < numTris; i++ ) {
 		if ( islandNum[i] != -1 ) {
@@ -620,10 +620,10 @@ bool arcSurface::IsConnected( void ) const {
 
 /*
 =================
-arcSurface::IsClosed
+anSurface::IsClosed
 =================
 */
-bool arcSurface::IsClosed( void ) const {
+bool anSurface::IsClosed( void ) const {
 	for ( int i = 0; i < edges.Num(); i++ ) {
 		if ( edges[i].tris[0] < 0 || edges[i].tris[1] < 0 ) {
 			return false;
@@ -634,16 +634,16 @@ bool arcSurface::IsClosed( void ) const {
 
 /*
 =============
-arcSurface::IsPolytope
+anSurface::IsPolytope
 =============
 */
-bool arcSurface::IsPolytope( const float epsilon ) const {
+bool anSurface::IsPolytope( const float epsilon ) const {
 	if ( !IsClosed() ) {
 		return false;
 	}
 
 	for ( int i = 0; i < indexes.Num(); i += 3 ) {
-		arcPlane plane.FromPoints( verts[indexes[i+0]].xyz, verts[indexes[i+1]].xyz, verts[indexes[i+2]].xyz );
+		anPlane plane.FromPoints( verts[indexes[i+0]].xyz, verts[indexes[i+1]].xyz, verts[indexes[i+2]].xyz );
 		for ( int j = 0; j < verts.Num(); j++ ) {
 			if ( plane.Side( verts[j].xyz, epsilon ) == SIDE_FRONT ) {
 				return false;
@@ -655,11 +655,11 @@ bool arcSurface::IsPolytope( const float epsilon ) const {
 
 /*
 =============
-arcSurface::PlaneDistance
+anSurface::PlaneDistance
 =============
 */
-float arcSurface::PlaneDistance( const arcPlane &plane ) const {
-	float min = arcMath::INFINITY;
+float anSurface::PlaneDistance( const anPlane &plane ) const {
+	float min = anMath::INFINITY;
 	float max = -min;
 	for ( int i = 0; i < verts.Num(); i++ ) {
 		float -d = plane.Distance( verts[i].xyz );
@@ -687,10 +687,10 @@ float arcSurface::PlaneDistance( const arcPlane &plane ) const {
 
 /*
 =============
-arcSurface::PlaneSide
+anSurface::PlaneSide
 =============
 */
-int arcSurface::PlaneSide( const arcPlane &plane, const float epsilon ) const {
+int anSurface::PlaneSide( const anPlane &plane, const float epsilon ) const {
 	bool front = false;
 	bool back = false;
 	for ( int i = 0; i < verts.Num(); i++ ) {
@@ -721,10 +721,10 @@ int arcSurface::PlaneSide( const arcPlane &plane, const float epsilon ) const {
 
 /*
 =================
-arcSurface::LineIntersection
+anSurface::LineIntersection
 =================
 */
-bool arcSurface::LineIntersection( const arcVec3 &start, const arcVec3 &end, bool backFaceCull ) const {
+bool anSurface::LineIntersection( const anVec3 &start, const anVec3 &end, bool backFaceCull ) const {
 	float scale;
 	RayIntersection( start, end - start, scale, false );
 	return ( scale >= 0.0f && scale <= 1.0f );
@@ -732,18 +732,18 @@ bool arcSurface::LineIntersection( const arcVec3 &start, const arcVec3 &end, boo
 
 /*
 =================
-arcSurface::RayIntersection
+anSurface::RayIntersection
 =================
 */
-bool arcSurface::RayIntersection( const arcVec3 &start, const arcVec3 &dir, float &scale, bool backFaceCull ) const {
+bool anSurface::RayIntersection( const anVec3 &start, const anVec3 &dir, float &scale, bool backFaceCull ) const {
 	int i, i0, i1, i2, s0, s1, s2;
 	float d, s;
 	byte *sidedness;
-	arcPluecker rayPl, pl;
-	arcPlane plane;
+	anPluecker rayPl, pl;
+	anPlane plane;
 
-	sidedness = ( byte * )_alloca( edges.Num() * sizeof( byte ) );
-	scale = arcMath::INFINITY;
+	sidedness = (byte *)_alloca( edges.Num() * sizeof( byte ) );
+	scale = anMath::INFINITY;
 
 	rayPl.FromRay( start, dir );
 
@@ -751,7 +751,7 @@ bool arcSurface::RayIntersection( const arcVec3 &start, const arcVec3 &dir, floa
 	for ( i = 0; i < edges.Num(); i++ ) {
 		pl.FromLine( verts[ edges[i].verts[1] ].xyz, verts[ edges[i].verts[0] ].xyz );
 		d = pl.PermutedInnerProduct( rayPl );
-		sidedness[ i ] = FLOATSIGNBITSET( d );
+		sidedness[i] = FLOATSIGNBITSET( d );
 	}
 
 	// test triangles
@@ -765,19 +765,19 @@ bool arcSurface::RayIntersection( const arcVec3 &start, const arcVec3 &dir, floa
 		if ( s0 & s1 & s2 ) {
 			plane.FromPoints( verts[indexes[i+0]].xyz, verts[indexes[i+1]].xyz, verts[indexes[i+2]].xyz );
 			plane.RayIntersection( start, dir, s );
-			if ( arcMath::Fabs( s ) < arcMath::Fabs( scale ) ) {
+			if ( anMath::Fabs( s ) < anMath::Fabs( scale ) ) {
 				scale = s;
 			}
-		} else if ( !backFaceCull && !(s0 | s1 | s2) ) {
+		} else if ( !backFaceCull && !( s0 | s1 | s2) ) {
 			plane.FromPoints( verts[indexes[i+0]].xyz, verts[indexes[i+1]].xyz, verts[indexes[i+2]].xyz );
 			plane.RayIntersection( start, dir, s );
-			if ( arcMath::Fabs( s ) < arcMath::Fabs( scale ) ) {
+			if ( anMath::Fabs( s ) < anMath::Fabs( scale ) ) {
 				scale = s;
 			}
 		}
 	}
 
-	if ( arcMath::Fabs( scale ) < arcMath::INFINITY ) {
+	if ( anMath::Fabs( scale ) < anMath::INFINITY ) {
 		return true;
 	}
 	return false;
@@ -785,19 +785,19 @@ bool arcSurface::RayIntersection( const arcVec3 &start, const arcVec3 &dir, floa
 
 /*
 =================
-arcSurface::GenerateEdgeIndexes
+anSurface::GenerateEdgeIndexes
 
   Assumes each edge is shared by at most two triangles.
 =================
 */
-void arcSurface::GenerateEdgeIndexes( void ) {
+void anSurface::GenerateEdgeIndexes( void ) {
 	int i, j, i0, i1, i2, s, v0, v1, edgeNum;
 	int *index, *vertexEdges, *edgeChain;
 	surfaceEdge_t e[3];
 
-	vertexEdges = ( int * ) _alloca16( verts.Num() * sizeof( int ) );
+	vertexEdges = ( int*) _alloca16( verts.Num() * sizeof( int ) );
 	memset( vertexEdges, -1, verts.Num() * sizeof( int ) );
-	edgeChain = ( int * ) _alloca16( indexes.Num() * sizeof( int ) );
+	edgeChain = ( int*) _alloca16( indexes.Num() * sizeof( int ) );
 
 	edgeIndexes.SetNum( indexes.Num(), true );
 
@@ -855,10 +855,10 @@ void arcSurface::GenerateEdgeIndexes( void ) {
 
 /*
 =================
-arcSurface::FindEdge
+anSurface::FindEdge
 =================
 */
-int arcSurface::FindEdge( int v1, int v2 ) const {
+int anSurface::FindEdge( int v1, int v2 ) const {
 	if ( v1 < v2 ) {
 		int firstVert = v1;
 		int secondVert = v2;

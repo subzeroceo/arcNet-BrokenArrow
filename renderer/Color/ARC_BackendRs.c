@@ -124,7 +124,7 @@ void arcNetRenderSystem::BindIndexBuffer( void )
 void arcNetRenderSystem::BindFramebuffer()
 void arcNetRenderSystem::PurgeBuffers( void )
 void arcNetRenderSystem::ClearBuffers()
-void arcNetRenderSystem::EndFrame( int *frontEndMsec, int *backEndMsec, int *numVerts = NULL, int *numIndexes = NULL ) = 0;
+void arcNetRenderSystem::EndFrame( int *frontEndMsec, int *backEndMsec, int *numVerts = nullptr, int *numIndexes = nullptr ) = 0;
 
 void arcNetRenderSystem::SetUniforms() = 0;
 void arcNetRenderSystem::DrawArrays() = 0;
@@ -341,7 +341,7 @@ arcNetRenderSystem() {
 		RB_PrintF( "Extension Formated Name:%s/n", extension );
 		"Total Available Extensions:", extensionCount );
 // Print individual extension names with total count
-    printf("Available OpenGL extensions:\n");
+    printf( "Available OpenGL extensions:\n" );
     for ( GLint i = 0; i < numExtensions; ++i) {
         const GLubyte* extension = glGetStringi(GL_EXTENSIONS, i);
         printf( "Extension Formatted Name: %-30s", extension);
@@ -394,7 +394,7 @@ public:
 	virtual void			InitRenderView( void ) = 0;
 	virtual void			ATI_ExtensionSystems( void ) = 0;
 
-							// create the buffers for the init and rendering of the view(s)
+							// create the buffers for the init and rendering of the view( s)
 	virtual void			CreateBuffers( void ) = 0;
 	virtual void			BindVertexBuffer( void ) = 0;	// are we binding the vertex buffer? since we dont bind so much as older versions, less binding?
 	virtual void			BindIndexBuffer( void ) = 0;	// are we binding the vertex buffer? since we dont bind so much as older versions, less binding?
@@ -407,8 +407,8 @@ public:
 	virtual void 			PurgeBuffers( void ) = 0;
     		void 			ClearBuffers() = 0; // makes sure all the buffers for the next frame are cleared.
 
-	// if the pointers are not NULL, timing info will be returned and prey it ends the framebuffers
-	virtual void			EndFrame( int *frontEndMsec, int *backEndMsec, int *numVerts = NULL, int *numIndexes = NULL ) = 0;
+	// if the pointers are not nullptr, timing info will be returned and prey it ends the framebuffers
+	virtual void			EndFrame( int *frontEndMsec, int *backEndMsec, int *numVerts = nullptr, int *numIndexes = nullptr ) = 0;
 
 							// we will be using these functions to set and draw uniform gl ext
 							// and Open GL Vertex Arrays and Elements. part of Render views rendering

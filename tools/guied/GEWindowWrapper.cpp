@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 #include "../../sys/win32/rc/guied_resource.h"
 #include "../../renderer/tr_local.h"
@@ -52,13 +52,13 @@ rvGEWindowWrapper::rvGEWindowWrapper( idWindow *window,EWindowType type ) {
 rvGEWindowWrapper * rvGEWindowWrapper::GetWrapper( idWindow *window ) {
 	idWinInt *var;
 	var = dynamic_cast< idWinInt*>(window->GetWinVarByName( "guied_wrapper" ) );
-	return var ? ((rvGEWindowWrapper *) ( int ) (*var) ) : NULL;
+	return var ? ((rvGEWindowWrapper *) ( int ) (*var) ) : nullptr;
 }
 
 //Updates the gui editor's representation of the window rectangle from the
 //windows rectangle
 void rvGEWindowWrapper::UpdateRect( void ) {
-	arcVec4 rect;
+	anVec4 rect;
 	idWinRectangle *winrect;
 
 	winrect = dynamic_cast< idWinRectangle*>(mWindow->GetWinVarByName( "rect" ) );
@@ -93,7 +93,7 @@ void rvGEWindowWrapper::CalcScreenRect( void ) {
 	idWindow *parent;
 	mScreenRect = mClientRect;
 
-	if ( NULL != (parent = mWindow->GetParent() ) ) {
+	if ( nullptr != (parent = mWindow->GetParent() ) ) {
 		rvGEWindowWrapper *wrapper = GetWrapper(parent);
 		assert(wrapper);
 
@@ -132,7 +132,7 @@ void rvGEWindowWrapper::SetRect( idRectangle &rect ) {
 	mClientRect = rect;
 	CalcScreenRect();
 
-	s = va( "%d,%d,%d,%d", ( int ) (rect.x + 0.5f), ( int ) (rect.y + 0.5f), ( int ) ((rect.w + 0.5f) * (mFlippedHorz ? -1 : 1 ) ), ( int ) ((rect.h + 0.5f) * (mFlippedVert ? -1 : 1 ) ));
+	s = va( "%d,%d,%d,%d", ( int ) (rect.x + 0.5f), ( int ) (rect.y + 0.5f), ( int ) ((rect.w + 0.5f) * (mFlippedHorz ? -1 : 1 ) ), ( int ) ((rect.h + 0.5f) * (mFlippedVert ? -1 : 1 ) ) );
 	mState.Set( "rect", s);
 
 	UpdateWindowState();
@@ -152,7 +152,7 @@ void rvGEWindowWrapper::SetDeleted( bool del ) {
 }
 
 // Sets the window state from the given dictionary
-void rvGEWindowWrapper::SetState( const arcDictionary &dict ) {
+void rvGEWindowWrapper::SetState( const anDict &dict ) {
 	mState.Clear();
 	mState.Copy(dict);
 
@@ -166,7 +166,7 @@ void rvGEWindowWrapper::SetStateKey( const char *key,const char *value,bool upda
 	if ( update ) {
 		UpdateWindowState();
 		// Make sure the rectangle gets updated if its changing
-		if ( !arcNetString::Icmp(key, "rect" ) ) {
+		if ( !anString::Icmp(key, "rect" ) ) {
 			UpdateRect();
 		}
 	}
@@ -174,7 +174,7 @@ void rvGEWindowWrapper::SetStateKey( const char *key,const char *value,bool upda
 
 // Sets the given state key and updates the
 void rvGEWindowWrapper::DeleteStateKey( const char *key ) {
-	if ( !arcNetString::Icmp(key, "rect" ) || !arcNetString::Icmp(key, "name" ) ) {
+	if ( !anString::Icmp(key, "rect" ) || !anString::Icmp(key, "name" ) ) {
 		return;
 	}
 	mState.Delete(key);
@@ -183,7 +183,7 @@ void rvGEWindowWrapper::DeleteStateKey( const char *key ) {
 // Updates the windows real state with wrappers internal state.  Visibility is
 // handled specially
 void rvGEWindowWrapper::UpdateWindowState( void ) {
-	arcNetString realVisible;
+	anString realVisible;
 	bool tempVisible;
 	//int	  i;
 
@@ -213,7 +213,7 @@ idWindow * rvGEWindowWrapper::WindowFromPoint( float x,float y,bool visibleOnly 
 
 	// If the window isnt visible then skip it
 	if ( visibleOnly && (mHidden || mDeleted) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// Now check our children next
@@ -239,35 +239,35 @@ idWindow * rvGEWindowWrapper::WindowFromPoint( float x,float y,bool visibleOnly 
 	// We have to check this last because a child could be out outside of the parents
 	// rectangle and we still want it selectable.
 	if ( !mScreenRect.Contains(x, y) ) {
-		return NULL;
+		return nullptr;
 	}
 	return mWindow;
 }
 
 // Converts the given string to a window type
 rvGEWindowWrapper::EWindowType rvGEWindowWrapper::StringToWindowType( const char *string ) {
-	if ( !arcNetString::Icmp(string, "windowDef" ) ) {
+	if ( !anString::Icmp(string, "windowDef" ) ) {
 		return WT_NORMAL;
-	} else if ( !arcNetString::Icmp(string, "editDef" ) ) {
+	} else if ( !anString::Icmp(string, "editDef" ) ) {
 		return WT_EDIT;
-	} else if ( !arcNetString::Icmp(string, "choiceDef" ) ) {
+	} else if ( !anString::Icmp(string, "choiceDef" ) ) {
 		return WT_CHOICE;
-	} else if ( !arcNetString::Icmp(string, "sliderDef" ) ) {
+	} else if ( !anString::Icmp(string, "sliderDef" ) ) {
 		return WT_SLIDER;
-	} else if ( !arcNetString::Icmp(string, "bindDef" ) ) {
+	} else if ( !anString::Icmp(string, "bindDef" ) ) {
 		return WT_BIND;
-	} else if ( !arcNetString::Icmp(string, "listDef" ) ) {
+	} else if ( !anString::Icmp(string, "listDef" ) ) {
 		return WT_LIST;
-	} else if ( !arcNetString::Icmp(string, "renderDef" ) ) {
+	} else if ( !anString::Icmp(string, "renderDef" ) ) {
 		return WT_RENDER;
-	} else if ( !arcNetString::Icmp(string, "htmlDef" ) ) {
+	} else if ( !anString::Icmp(string, "htmlDef" ) ) {
 		return WT_HTML;
 	}
 	return WT_UNKNOWN;
 }
 
 // Converts the given window type to a string
-const char * rvGEWindowWrapper::WindowTypeToString( EWindowType type ) {
+const char *rvGEWindowWrapper::WindowTypeToString( EWindowType type ) {
 	static const char *typeNames[] = {
 		"Unknown", "windowDef", "editDef", "htmlDef", "choiceDef", "sliderDef", "bindDef", "listDef", "renderDef"
 	};
@@ -356,17 +356,17 @@ bool rvGEWindowWrapper::Collapse( void ) {
 // After a the windwo wrapper is attached to a window and the window is parsed
 // the finish method is called to finish up any last details
 void rvGEWindowWrapper::Finish( void ) {
-	mOldVisible = ((bool) * dynamic_cast< idWinBool*>(mWindow->GetWinVarByName( "visible" ) ));
+	mOldVisible = ((bool) * dynamic_cast< idWinBool*>(mWindow->GetWinVarByName( "visible" ) ) );
 	mHidden = mOldVisible ? false : true;
 	UpdateRect();
 }
 
 // After a the windwo wrapper is attached to a window and the window is parsed
 // the finish method is called to finish up any last details
-bool rvGEWindowWrapper::VerfiyStateKey( const char *name,const char *value,arcNetString *result ) {
-	arcNetString old;
+bool rvGEWindowWrapper::VerfiyStateKey( const char *name,const char *value,anString *result ) {
+	anString old;
 	bool failed;
-	ARCParser src(value, strlen(value), "", LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT);
+	anParser src(value, strlen(value), "", LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT);
 
 	// Save the current value
 	old = mState.GetString( name );
@@ -385,15 +385,15 @@ bool rvGEWindowWrapper::VerfiyStateKey( const char *name,const char *value,arcNe
 	}
 
 	// Restore the old value
-	ARCParser src2(old, old.Length(), "", LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT);
+	anParser src2(old, old.Length(), "", LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT);
 	if ( !mWindow->ParseInternalVar(name, &src2) ) {
 		if ( !mWindow->ParseRegEntry(name, &src2) ) {
 		}
 	}
 
 	// Check to see if the old value matches the new value
-	arcNetString before;
-	arcNetString after;
+	anString before;
+	anString after;
 
 	before = value;
 	before.StripTrailingWhitespace();

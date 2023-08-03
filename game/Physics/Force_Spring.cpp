@@ -1,44 +1,44 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idForce, idForce_Spring )
+CLASS_DECLARATION( anForce, anForce_Spring )
 END_CLASS
 
 /*
 ================
-idForce_Spring::idForce_Spring
+anForce_Spring::anForce_Spring
 ================
 */
-idForce_Spring::idForce_Spring( void ) {
+anForce_Spring::anForce_Spring( void ) {
 	Kstretch		= 100.0f;
 	Kcompress		= 100.0f;
 	damping			= 0.0f;
 	restLength		= 0.0f;
-	physics1		= NULL;
+	physics1		= nullptr;
 	id1				= 0;
 	p1				= vec3_zero;
-	physics2		= NULL;
+	physics2		= nullptr;
 	id2				= 0;
 	p2				= vec3_zero;
 }
 
 /*
 ================
-idForce_Spring::~idForce_Spring
+anForce_Spring::~anForce_Spring
 ================
 */
-idForce_Spring::~idForce_Spring( void ) {
+anForce_Spring::~anForce_Spring( void ) {
 }
 
 /*
 ================
-idForce_Spring::InitSpring
+anForce_Spring::InitSpring
 ================
 */
-void idForce_Spring::InitSpring( float Kstretch, float Kcompress, float damping, float restLength ) {
+void anForce_Spring::InitSpring( float Kstretch, float Kcompress, float damping, float restLength ) {
 	this->Kstretch = Kstretch;
 	this->Kcompress = Kcompress;
 	this->damping = damping;
@@ -47,10 +47,10 @@ void idForce_Spring::InitSpring( float Kstretch, float Kcompress, float damping,
 
 /*
 ================
-idForce_Spring::SetPosition
+anForce_Spring::SetPosition
 ================
 */
-void idForce_Spring::SetPosition( idPhysics *physics1, int id1, const arcVec3 &p1, idPhysics *physics2, int id2, const arcVec3 &p2 ) {
+void anForce_Spring::SetPosition( anPhysics *physics1, int id1, const anVec3 &p1, anPhysics *physics2, int id2, const anVec3 &p2 ) {
 	this->physics1 = physics1;
 	this->id1 = id1;
 	this->p1 = p1;
@@ -61,13 +61,13 @@ void idForce_Spring::SetPosition( idPhysics *physics1, int id1, const arcVec3 &p
 
 /*
 ================
-idForce_Spring::Evaluate
+anForce_Spring::Evaluate
 ================
 */
-void idForce_Spring::Evaluate( int time ) {
+void anForce_Spring::Evaluate( int time ) {
 	float length;
-	arcMat3 axis;
-	arcVec3 pos1, pos2, velocity1, velocity2, force, dampingForce;
+	anMat3 axis;
+	anVec3 pos1, pos2, velocity1, velocity2, force, dampingForce;
 	impactInfo_t info;
 
 	pos1 = p1;
@@ -109,8 +109,7 @@ void idForce_Spring::Evaluate( int time ) {
 				physics2->AddForce( id2, pos2, -force );
 			}
 		}
-	}
-	else {
+	} else {
 		if ( Kcompress > 0.0f ) {
 			force = ( Square( length - restLength ) * Kcompress ) * force - dampingForce;
 			if ( physics1 ) {
@@ -125,39 +124,39 @@ void idForce_Spring::Evaluate( int time ) {
 
 /*
 ================
-idForce_Spring::RemovePhysics
+anForce_Spring::RemovePhysics
 ================
 */
-void idForce_Spring::RemovePhysics( const idPhysics *phys ) {
+void anForce_Spring::RemovePhysics( const anPhysics *phys ) {
 	if ( physics1 == phys ) {
-		physics1 = NULL;
+		physics1 = nullptr;
 	}
 	if ( physics2 == phys ) {
-		physics2 = NULL;
+		physics2 = nullptr;
 	}
 }
 
 /*
 ================
-idForce_Spring::Save
+anForce_Spring::Save
 ================
 */
-void idForce_Spring::Save( idSaveGame *savefile ) const {
-	savefile->WriteFloat ( Kstretch );
-	savefile->WriteFloat ( Kcompress );
-	savefile->WriteFloat ( damping );
-	savefile->WriteFloat ( restLength );
+void anForce_Spring::Save( anSaveGame *savefile ) const {
+	savefile->WriteFloat( Kstretch );
+	savefile->WriteFloat( Kcompress );
+	savefile->WriteFloat( damping );
+	savefile->WriteFloat( restLength );
 }
 
 /*
 ================
-idForce_Spring::Restore
+anForce_Spring::Restore
 ================
 */
-void idForce_Spring::Restore( idRestoreGame *savefile ) {
-	savefile->ReadFloat ( Kstretch );
-	savefile->ReadFloat ( Kcompress );
-	savefile->ReadFloat ( damping );
-	savefile->ReadFloat ( restLength );
+void anForce_Spring::Restore( anRestoreGame *savefile ) {
+	savefile->ReadFloat( Kstretch );
+	savefile->ReadFloat( Kcompress );
+	savefile->ReadFloat( damping );
+	savefile->ReadFloat( restLength );
 }
 

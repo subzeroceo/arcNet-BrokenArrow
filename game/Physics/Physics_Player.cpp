@@ -1,9 +1,9 @@
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idPhysics_Actor, idPhysics_Player )
+CLASS_DECLARATION( anPhysics_Actor, anPhysics_Player )
 END_CLASS
 
 // movement parameters
@@ -24,10 +24,10 @@ const float PM_AIRFRICTION		= 0.0f;
 const float PM_WATERFRICTION	= 2.0f;
 const float PM_FLYFRICTION		= 3.0f;
 const float PM_NOCLIPFRICTION	= 12.0f;
-// RAVEN BEGIN
+
 // bdube: sliding
 const float PM_SLIDEFRICTION    = 0.5f;
-// RAVEN END
+
 
 const float MIN_WALK_NORMAL		= 0.7f;		// can't walk on very steep slopes
 const float OVERCLIP			= 1.001f;
@@ -45,24 +45,24 @@ const int PMF_ALL_TIMES			= (PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK
 
 int c_pmove = 0;
 
-float idPhysics_Player::Pm_Accelerate( void ) {
+float anPhysics_Player::Pm_Accelerate( void ) {
 	return gameLocal.IsMultiplayer() ? PM_ACCELERATE_MP : PM_ACCELERATE_SP;
 }
 
-float idPhysics_Player::Pm_AirAccelerate( void ) {
+float anPhysics_Player::Pm_AirAccelerate( void ) {
 	return gameLocal.IsMultiplayer() ? PM_AIRACCELERATE_MP : PM_AIRACCELERATE_SP;
 }
 
 /*
 ============
-idPhysics_Player::CmdScale
+anPhysics_Player::CmdScale
 
 Returns the scale factor to apply to cmd movements
 This allows the clients to use axial -127 to 127 values for all directions
 without getting a sqrt(2) distortion in speed.
 ============
 */
-float idPhysics_Player::CmdScale( const usercmd_t &cmd ) const {
+float anPhysics_Player::CmdScale( const usercmd_t &cmd ) const {
 	int		max;
 	float	total;
 	float	scale;
@@ -93,20 +93,20 @@ float idPhysics_Player::CmdScale( const usercmd_t &cmd ) const {
 		return 0.0f;
 	}
 
-	total = arcMath::Sqrt( (float) forwardmove * forwardmove + rightmove * rightmove + upmove * upmove );
-	scale = (float) playerSpeed * max / ( 127.0f * total );
+	total = anMath::Sqrt( ( float ) forwardmove * forwardmove + rightmove * rightmove + upmove * upmove );
+	scale = ( float ) playerSpeed * max / ( 127.0f * total );
 
 	return scale;
 }
 
 /*
 ==============
-idPhysics_Player::Accelerate
+anPhysics_Player::Accelerate
 
 Handles user intended acceleration
 ==============
 */
-void idPhysics_Player::Accelerate( const arcVec3 &wishdir, const float wishspeed, const float accel ) {
+void anPhysics_Player::Accelerate( const anVec3 &wishdir, const float wishspeed, const float accel ) {
 #if 1
 	// q2 style
 	float addspeed, accelspeed, currentspeed;
@@ -116,14 +116,14 @@ void idPhysics_Player::Accelerate( const arcVec3 &wishdir, const float wishspeed
 	if (addspeed <= 0) {
 		return;
 	}
-// RAVEN BEGIN
+
 // nmckenzie: added ability to try alternate accelerations.
 	if ( pm_acceloverride.GetFloat() > 0.0f ) {
 		accelspeed = pm_acceloverride.GetFloat() * frametime * wishspeed;
 	} else {
 		accelspeed = accel * frametime * wishspeed;
 	}
-// RAVEN END
+
 	if ( accelspeed > addspeed ) {
 		accelspeed = addspeed;
 	}
@@ -132,8 +132,8 @@ void idPhysics_Player::Accelerate( const arcVec3 &wishdir, const float wishspeed
 
 #else
 	// proper way (avoids strafe jump maxspeed bug), but feels bad
-	arcVec3		wishVelocity;
-	arcVec3		pushDir;
+	anVec3		wishVelocity;
+	anVec3		pushDir;
 	float		pushLen;
 	float		canPush;
 
@@ -152,19 +152,19 @@ void idPhysics_Player::Accelerate( const arcVec3 &wishdir, const float wishspeed
 
 /*
 ==================
-idPhysics_Player::SlideMove
+anPhysics_Player::SlideMove
 
 Returns true if the velocity was clipped in some way
 ==================
 */
 #define	MAX_CLIP_PLANES	5
 
-bool idPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool push ) {
+bool anPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool push ) {
 	int			i, j, k, pushFlags;
 	int			bumpcount, numbumps, numplanes;
 	float		d, time_left, into, totalMass;
-	arcVec3		dir, planes[MAX_CLIP_PLANES];
-	arcVec3		end, stepEnd, primal_velocity, endVelocity, endClipVelocity, clipVelocity;
+	anVec3		dir, planes[MAX_CLIP_PLANES];
+	anVec3		end, stepEnd, primal_velocity, endVelocity, endClipVelocity, clipVelocity;
 	trace_t		trace, stepTrace, downTrace;
 	bool		nearGround, stepped, pushed;
 
@@ -206,10 +206,10 @@ bool idPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool
 		end = current.origin + time_left * current.velocity;
 
 		// see if we can make it there
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.Translation( self, trace, current.origin, end, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 		time_left -= time_left * trace.fraction;
 		current.origin = trace.endpos;
 
@@ -228,10 +228,10 @@ bool idPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool
 				// trace down to see if the player is near the ground
 				// step checking when near the ground allows the player to move up stairs smoothly while jumping
 				stepEnd = current.origin + maxStepHeight * gravityNormal;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 				gameLocal.Translation( self, downTrace, current.origin, stepEnd, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 				nearGround = ( downTrace.fraction < 1.0f && (downTrace.c.normal * -gravityNormal) > MIN_WALK_NORMAL );
 			}
 
@@ -240,24 +240,24 @@ bool idPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool
 
 				// step up
 				stepEnd = current.origin - maxStepHeight * gravityNormal;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 				gameLocal.Translation( self, downTrace, current.origin, stepEnd, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 
 				// trace along velocity
 				stepEnd = downTrace.endpos + time_left * current.velocity;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 				gameLocal.Translation( self, stepTrace, downTrace.endpos, stepEnd, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 
 				// step down
 				stepEnd = stepTrace.endpos + maxStepHeight * gravityNormal;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 				gameLocal.Translation( self, downTrace, stepTrace.endpos, stepEnd, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 
   				if ( downTrace.fraction >= 1.0f || (downTrace.c.normal * -gravityNormal) > MIN_WALK_NORMAL ) {
 					// if moved the entire distance
@@ -298,7 +298,7 @@ bool idPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool
 
 			if ( totalMass > 0.0f ) {
 				// decrease velocity based on the total mass of the objects being pushed ?
-				current.velocity *= 1.0f - arcMath::ClampFloat( 0.0f, 1000.0f, totalMass - 20.0f ) * ( 1.0f / 950.0f );
+				current.velocity *= 1.0f - anMath::ClampFloat( 0.0f, 1000.0f, totalMass - 20.0f ) * ( 1.0f / 950.0f );
 				pushed = true;
 			}
 
@@ -415,10 +415,10 @@ bool idPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool
 	// step down
 	if ( stepDown && groundPlane ) {
 		stepEnd = current.origin + gravityNormal * maxStepHeight;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.Translation( self, downTrace, current.origin, stepEnd, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 		if ( downTrace.fraction > 1e-4f && downTrace.fraction < 1.0f ) {
 			current.stepUp -= ( downTrace.endpos - current.origin ) * gravityNormal;
 			current.origin = downTrace.endpos;
@@ -443,13 +443,13 @@ bool idPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool
 
 /*
 ==================
-idPhysics_Player::Friction
+anPhysics_Player::Friction
 
 Handles both ground friction and water friction
 ==================
 */
-void idPhysics_Player::Friction( void ) {
-	arcVec3	vel;
+void anPhysics_Player::Friction( void ) {
+	anVec3	vel;
 	float	speed, newspeed, control;
 	float	drop;
 
@@ -468,12 +468,12 @@ void idPhysics_Player::Friction( void ) {
 	drop = 0;
 
 	// spectator friction
-// RAVEN BEGIN
+
 // nmckenzie: allow trying custom frictions
 	if ( pm_frictionoverride.GetFloat() > -1 ) {
 		drop += speed * pm_frictionoverride.GetFloat() * frametime;
 	} else if ( current.movementType == PM_SPECTATOR ) {
-// RAVEN END
+
 		drop += speed * PM_FLYFRICTION * frametime;
 	}
 	// apply ground friction
@@ -483,14 +483,14 @@ void idPhysics_Player::Friction( void ) {
 			// if getting knocked back, no friction
 			if ( !(current.movementFlags & PMF_TIME_KNOCKBACK) ) {
 				control = speed < PM_STOPSPEED ? PM_STOPSPEED : speed;
-// RAVEN BEGIN
+
 // bdube: crouch slide
 				if ( current.crouchSlideTime > 0 ) {
 					drop += control * PM_SLIDEFRICTION * frametime;
 				} else {
 					drop += control * PM_FRICTION * frametime;
 				}
-// RAVEN END
+
 			}
 		}
 	}
@@ -524,15 +524,15 @@ void idPhysics_Player::Friction( void ) {
 
 /*
 ===================
-idPhysics_Player::WaterJumpMove
+anPhysics_Player::WaterJumpMove
 
 Flying out of the water
 ===================
 */
-void idPhysics_Player::WaterJumpMove( void ) {
+void anPhysics_Player::WaterJumpMove( void ) {
 
 	// waterjump has no control, but falls
-	idPhysics_Player::SlideMove( true, true, false, false );
+	anPhysics_Player::SlideMove( true, true, false, false );
 
 	// add gravity
 	current.velocity += gravityNormal * frametime;
@@ -546,24 +546,24 @@ void idPhysics_Player::WaterJumpMove( void ) {
 
 /*
 ===================
-idPhysics_Player::WaterMove
+anPhysics_Player::WaterMove
 ===================
 */
-void idPhysics_Player::WaterMove( void ) {
-	arcVec3	wishvel;
+void anPhysics_Player::WaterMove( void ) {
+	anVec3	wishvel;
 	float	wishspeed;
-	arcVec3	wishdir;
+	anVec3	wishdir;
 	float	scale;
 	float	vel;
 
-	if ( idPhysics_Player::CheckWaterJump() ) {
-		idPhysics_Player::WaterJumpMove();
+	if ( anPhysics_Player::CheckWaterJump() ) {
+		anPhysics_Player::WaterJumpMove();
 		return;
 	}
 
-	idPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
-	scale = idPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	// user intentions
 	if ( !scale ) {
@@ -580,7 +580,7 @@ void idPhysics_Player::WaterMove( void ) {
 		wishspeed = playerSpeed * PM_SWIMSCALE;
 	}
 
-	idPhysics_Player::Accelerate( wishdir, wishspeed, PM_WATERACCELERATE );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, PM_WATERACCELERATE );
 
 	// make sure we can go up slopes easily under water
 	if ( groundPlane && ( current.velocity * groundTrace.c.normal ) < 0.0f ) {
@@ -592,24 +592,24 @@ void idPhysics_Player::WaterMove( void ) {
 		current.velocity *= vel;
 	}
 
-	idPhysics_Player::SlideMove( false, true, false, false );
+	anPhysics_Player::SlideMove( false, true, false, false );
 }
 
 /*
 ===================
-idPhysics_Player::FlyMove
+anPhysics_Player::FlyMove
 ===================
 */
-void idPhysics_Player::FlyMove( void ) {
-	arcVec3	wishvel;
+void anPhysics_Player::FlyMove( void ) {
+	anVec3	wishvel;
 	float	wishspeed;
-	arcVec3	wishdir;
+	anVec3	wishdir;
 	float	scale;
 
 	// normal slowdown
-	idPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
-	scale = idPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	if ( !scale ) {
 		wishvel = vec3_origin;
@@ -621,23 +621,23 @@ void idPhysics_Player::FlyMove( void ) {
 	wishdir = wishvel;
 	wishspeed = wishdir.Normalize();
 
-	idPhysics_Player::Accelerate( wishdir, wishspeed, PM_FLYACCELERATE );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, PM_FLYACCELERATE );
 
-	idPhysics_Player::SlideMove( false, false, false, false );
+	anPhysics_Player::SlideMove( false, false, false, false );
 }
 
 /*
 ===================
-idPhysics_Player::AirMove
+anPhysics_Player::AirMove
 ===================
 */
-void idPhysics_Player::AirMove( void ) {
-	arcVec3		wishvel;
-	arcVec3		wishdir;
+void anPhysics_Player::AirMove( void ) {
+	anVec3		wishvel;
+	anVec3		wishdir;
 	float		wishspeed;
 	float		scale;
 
-// RAVEN BEGIN
+
 // bdube: crouch time
 	// if the player isnt pressing crouch and heading down then accumulate slide time
 	if ( command.upmove >= 0 && current.velocity * gravityNormal > 0 ) {
@@ -646,11 +646,11 @@ void idPhysics_Player::AirMove( void ) {
 			current.crouchSlideTime = 2000;
 		}
 	}
-// RAVEN END
 
-	idPhysics_Player::Friction();
 
-	scale = idPhysics_Player::CmdScale( command );
+	anPhysics_Player::Friction();
+
+	scale = anPhysics_Player::CmdScale( command );
 
 	// project moves down to flat plane
 	viewForward -= (viewForward * gravityNormal) * gravityNormal;
@@ -665,7 +665,7 @@ void idPhysics_Player::AirMove( void ) {
 	wishspeed *= scale;
 
 	// not on ground, so little effect on velocity
-	idPhysics_Player::Accelerate( wishdir, wishspeed, Pm_AirAccelerate() );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, Pm_AirAccelerate() );
 
 	// we may have a ground plane that is very steep, even
 	// though we don't have a groundentity
@@ -675,43 +675,43 @@ void idPhysics_Player::AirMove( void ) {
 	}
 
 	// NOTE: enable stair checking while moving through the air in multiplayer to allow bunny hopping onto stairs
-	idPhysics_Player::SlideMove( true, gameLocal.isMultiplayer, false, false );
+	anPhysics_Player::SlideMove( true, gameLocal.isMultiplayer, false, false );
 }
 
 /*
 ===================
-idPhysics_Player::WalkMove
+anPhysics_Player::WalkMove
 ===================
 */
-void idPhysics_Player::WalkMove( void ) {
-	arcVec3		wishvel;
-	arcVec3		wishdir;
+void anPhysics_Player::WalkMove( void ) {
+	anVec3		wishvel;
+	anVec3		wishdir;
 	float		wishspeed;
 	float		scale;
 	float		accelerate;
-	arcVec3		oldVelocity, vel;
+	anVec3		oldVelocity, vel;
 	float		oldVel, newVel;
 
 	if ( waterLevel > WATERLEVEL_WAIST && ( viewForward * groundTrace.c.normal ) > 0.0f ) {
 		// begin swimming
-		idPhysics_Player::WaterMove();
+		anPhysics_Player::WaterMove();
 		return;
 	}
 
-	if ( idPhysics_Player::CheckJump() ) {
+	if ( anPhysics_Player::CheckJump() ) {
 		// jumped away
 		if ( waterLevel > WATERLEVEL_FEET ) {
-			idPhysics_Player::WaterMove();
+			anPhysics_Player::WaterMove();
 		}
 		else {
-			idPhysics_Player::AirMove();
+			anPhysics_Player::AirMove();
 		}
 		return;
 	}
 
-	idPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
-	scale = idPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	// project moves down to flat plane
 	viewForward -= (viewForward * gravityNormal) * gravityNormal;
@@ -748,7 +748,7 @@ void idPhysics_Player::WalkMove( void ) {
 		accelerate = Pm_Accelerate();
 	}
 
-	idPhysics_Player::Accelerate( wishdir, wishspeed, accelerate );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, accelerate );
 
 	if ( ( groundMaterial && groundMaterial->GetSurfaceFlags() & SURF_SLICK ) || current.movementFlags & PMF_TIME_KNOCKBACK ) {
 		current.velocity += gravityVector * frametime;
@@ -766,7 +766,7 @@ void idPhysics_Player::WalkMove( void ) {
 			oldVel = oldVelocity.LengthSqr();
 			if ( oldVel > 1.0f ) {
 				// don't decrease velocity when going up or down a slope
-				current.velocity *= arcMath::Sqrt( oldVel / newVel );
+				current.velocity *= anMath::Sqrt( oldVel / newVel );
 			}
 		}
 	}
@@ -779,15 +779,15 @@ void idPhysics_Player::WalkMove( void ) {
 
 	gameLocal.push.InitSavingPushedEntityPositions();
 
-	idPhysics_Player::SlideMove( false, true, true, !gameLocal.isMultiplayer );
+	anPhysics_Player::SlideMove( false, true, true, !gameLocal.isMultiplayer );
 }
 
 /*
 ==============
-idPhysics_Player::DeadMove
+anPhysics_Player::DeadMove
 ==============
 */
-void idPhysics_Player::DeadMove( void ) {
+void anPhysics_Player::DeadMove( void ) {
 	float	forward;
 
 	if ( !walking ) {
@@ -808,20 +808,20 @@ void idPhysics_Player::DeadMove( void ) {
 
 /*
 ===============
-idPhysics_Player::NoclipMove
+anPhysics_Player::NoclipMove
 ===============
 */
-void idPhysics_Player::NoclipMove( void ) {
+void anPhysics_Player::NoclipMove( void ) {
 	float		speed, drop, friction, newspeed, stopspeed;
 	float		scale, wishspeed;
-	arcVec3		wishdir;
+	anVec3		wishdir;
 
-// RAVEN BEGIN
+
 // nmckenzie: allow trying custom frictions
-	if ( pm_frictionoverride.GetFloat ( ) > -1 ) {
-		idPhysics_Player::Friction();
+	if ( pm_frictionoverride.GetFloat() > -1 ) {
+		anPhysics_Player::Friction();
 	} else {
-// RAVEN END
+
 
 	// friction
 	speed = current.velocity.Length();
@@ -845,20 +845,20 @@ void idPhysics_Player::NoclipMove( void ) {
 		current.velocity *= newspeed / speed;
 	}
 
-// RAVEN BEGIN
+
 // nmckenzie: allow trying custom frictions
 	}
-// RAVEN END
+
 
 	// accelerate
-	scale = idPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	wishdir = scale * (viewForward * command.forwardmove + viewRight * command.rightmove);
 	wishdir -= scale * gravityNormal * command.upmove;
 	wishspeed = wishdir.Normalize();
 	wishspeed *= scale;
 
-	idPhysics_Player::Accelerate( wishdir, wishspeed, Pm_Accelerate() );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, Pm_Accelerate() );
 
 	// move
 	current.origin += frametime * current.velocity;
@@ -866,23 +866,23 @@ void idPhysics_Player::NoclipMove( void ) {
 
 /*
 ===============
-idPhysics_Player::SpectatorMove
+anPhysics_Player::SpectatorMove
 ===============
 */
-void idPhysics_Player::SpectatorMove( void ) {
-	arcVec3	wishvel;
+void anPhysics_Player::SpectatorMove( void ) {
+	anVec3	wishvel;
 	float	wishspeed;
-	arcVec3	wishdir;
+	anVec3	wishdir;
 	float	scale;
 
 	trace_t	trace;
-	arcVec3	end;
+	anVec3	end;
 
 	// fly movement
 
-	idPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
-	scale = idPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	if ( !scale ) {
 		wishvel = vec3_origin;
@@ -894,18 +894,18 @@ void idPhysics_Player::SpectatorMove( void ) {
 	wishdir = wishvel;
 	wishspeed = wishdir.Normalize();
 
-	idPhysics_Player::Accelerate( wishdir, wishspeed, PM_FLYACCELERATE );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, PM_FLYACCELERATE );
 
-	idPhysics_Player::SlideMove( false, false, false, false );
+	anPhysics_Player::SlideMove( false, false, false, false );
 }
 
 /*
 ============
-idPhysics_Player::LadderMove
+anPhysics_Player::LadderMove
 ============
 */
-void idPhysics_Player::LadderMove( void ) {
-	arcVec3	wishdir, wishvel, right;
+void anPhysics_Player::LadderMove( void ) {
+	anVec3	wishdir, wishvel, right;
 	float	wishspeed, scale;
 	float	upscale;
 
@@ -921,8 +921,8 @@ void idPhysics_Player::LadderMove( void ) {
 		upscale = -1.0f;
 	}
 
-	scale = idPhysics_Player::CmdScale( command );
-	wishvel = -0.9f * gravityNormal * upscale * scale * (float)command.forwardmove;
+	scale = anPhysics_Player::CmdScale( command );
+	wishvel = -0.9f * gravityNormal * upscale * scale * ( float )command.forwardmove;
 
 	// strafe
 	if ( command.rightmove ) {
@@ -936,20 +936,20 @@ void idPhysics_Player::LadderMove( void ) {
 		if ( ladderNormal * viewForward > 0.0f ) {
 			right = -right;
 		}
-		wishvel += 2.0f * right * scale * (float) command.rightmove;
+		wishvel += 2.0f * right * scale * ( float ) command.rightmove;
 	}
 
 	// up down movement
 	if ( command.upmove ) {
-		wishvel += -0.5f * gravityNormal * scale * (float) command.upmove;
+		wishvel += -0.5f * gravityNormal * scale * ( float ) command.upmove;
 	}
 
 	// do strafe friction
-	idPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
 	// accelerate
 	wishspeed = wishvel.Normalize();
-	idPhysics_Player::Accelerate( wishvel, wishspeed, Pm_Accelerate() );
+	anPhysics_Player::Accelerate( wishvel, wishspeed, Pm_Accelerate() );
 
 	// cap the vertical velocity
 	upscale = current.velocity * -gravityNormal;
@@ -975,15 +975,15 @@ void idPhysics_Player::LadderMove( void ) {
 		}
 	}
 
-	idPhysics_Player::SlideMove( false, ( command.forwardmove > 0 ), false, false );
+	anPhysics_Player::SlideMove( false, ( command.forwardmove > 0 ), false, false );
 }
 
 /*
 =============
-idPhysics_Player::CorrectAllSolid
+anPhysics_Player::CorrectAllSolid
 =============
 */
-void idPhysics_Player::CorrectAllSolid( trace_t &trace, int contents ) {
+void anPhysics_Player::CorrectAllSolid( trace_t &trace, int contents ) {
 	if ( debugLevel ) {
 		gameLocal.Printf( "%i:allsolid\n", c_pmove );
 	}
@@ -1001,22 +1001,22 @@ void idPhysics_Player::CorrectAllSolid( trace_t &trace, int contents ) {
 		trace.c.entityNum = ENTITYNUM_WORLD;
 		trace.c.id = 0;
 		trace.c.type = CONTACT_TRMVERTEX;
-		trace.c.material = NULL;
+		trace.c.material = nullptr;
 		trace.c.contents = contents;
 	}
 }
 
 /*
 =============
-idPhysics_Player::CheckGround
+anPhysics_Player::CheckGround
 =============
 */
-// RAVEN BEGIN
+
 // MrE: check stuck
-void idPhysics_Player::CheckGround( bool checkStuck ) {
-// RAVEN END
+void anPhysics_Player::CheckGround( bool checkStuck ) {
+
 	int i, contents;
-	arcVec3 point;
+	anVec3 point;
 	bool hadGroundContacts;
 
 	hadGroundContacts = HasGroundContacts();
@@ -1040,23 +1040,23 @@ void idPhysics_Player::CheckGround( bool checkStuck ) {
 		groundTrace.fraction = 1.0f;
 	}
 
-// RAVEN BEGIN
+
 // ddynerman: multiple collision worlds
 // MrE: check stuck
 	if ( checkStuck ) {
 		contents = gameLocal.Contents( self, current.origin, clipModel, clipModel->GetAxis(), -1, self );
 		if ( contents & MASK_SOLID ) {
 			// do something corrective if stuck in solid
-			idPhysics_Player::CorrectAllSolid( groundTrace, contents );
+			anPhysics_Player::CorrectAllSolid( groundTrace, contents );
 		}
 	}
-// RAVEN END
+
 
 	// if the trace didn't hit anything, we are in free fall
 	if ( groundTrace.fraction == 1.0f ) {
 		groundPlane = false;
 		walking = false;
-		groundEntityPtr = NULL;
+		groundEntityPtr = nullptr;
 		return;
 	}
 
@@ -1080,9 +1080,9 @@ void idPhysics_Player::CheckGround( bool checkStuck ) {
 			gameLocal.Printf( "%i:steep\n", c_pmove );
 		}
 
-		// FIXME: if they can't slide down the slope, let them walk (sharp crevices)
+		// FIXME: if they can't slide down the slope, let them walk ( sharp crevices)
 
-		if( gameLocal.isMultiplayer ) {
+		if ( gameLocal.isMultiplayer ) {
 			// in multiplayer, instead of sliding push the player out from the normal for some free fall
 			current.origin += groundTrace.c.normal;
 
@@ -1135,15 +1135,15 @@ void idPhysics_Player::CheckGround( bool checkStuck ) {
 
 /*
 ==============
-idPhysics_Player::CheckDuck
+anPhysics_Player::CheckDuck
 
 Sets clip model size
 ==============
 */
-void idPhysics_Player::CheckDuck( void ) {
+void anPhysics_Player::CheckDuck( void ) {
 	trace_t	trace;
-	arcVec3 end;
-	arcBounds bounds;
+	anVec3 end;
+	anBounds bounds;
 	float maxZ;
 
 	if ( current.movementType == PM_DEAD ) {
@@ -1158,10 +1158,10 @@ void idPhysics_Player::CheckDuck( void ) {
 			if ( current.movementFlags & PMF_DUCKED ) {
 				// try to stand up
 				end = current.origin - ( pm_normalheight.GetFloat() - pm_crouchheight.GetFloat() ) * gravityNormal;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 				gameLocal.Translation( self, trace, current.origin, end, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 				if ( trace.fraction >= 1.0f ) {
 					current.movementFlags &= ~PMF_DUCKED;
 				}
@@ -1169,21 +1169,21 @@ void idPhysics_Player::CheckDuck( void ) {
 		}
 
 		if ( current.movementFlags & PMF_DUCKED ) {
-// RAVEN BEGIN
+
 // bdube: crouch slide
 			if ( !current.crouchSlideTime ) {
 				playerSpeed = crouchSpeed;
 			}
-// RAVEN END
+
 			maxZ = pm_crouchheight.GetFloat();
 		} else {
 			maxZ = pm_normalheight.GetFloat();
-// RAVEN BEGIN
+
 // bdube: crouch slide
 			if ( groundPlane && current.crouchSlideTime ) {
 				current.crouchSlideTime = 0;
 			}
-// RAVEN END
+
 		}
 	}
 	// if the clipModel height should change
@@ -1192,20 +1192,20 @@ void idPhysics_Player::CheckDuck( void ) {
 		bounds = clipModel->GetBounds();
 		bounds[1][2] = maxZ;
 		if ( pm_usecylinder.GetBool() ) {
-			clipModel->LoadModel( idTraceModel( bounds, 8 ), NULL );
+			clipModel->LoadModel( anTraceModel( bounds, 8 ), nullptr );
 		} else {
-			clipModel->LoadModel( idTraceModel( bounds ), NULL );
+			clipModel->LoadModel( anTraceModel( bounds ), nullptr );
 		}
 	}
 }
 
 /*
 ================
-idPhysics_Player::CheckLadder
+anPhysics_Player::CheckLadder
 ================
 */
-void idPhysics_Player::CheckLadder( void ) {
-	arcVec3		forward, start, end;
+void anPhysics_Player::CheckLadder( void ) {
+	anVec3		forward, start, end;
 	trace_t		trace;
 	float		tracedist;
 
@@ -1230,10 +1230,10 @@ void idPhysics_Player::CheckLadder( void ) {
 	}
 
 	end = current.origin + tracedist * forward;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	gameLocal.Translation( self, trace, current.origin, end, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 	// if near a surface
 	if ( trace.fraction < 1.0f ) {
 
@@ -1242,16 +1242,16 @@ void idPhysics_Player::CheckLadder( void ) {
 
 			// check a step height higher
 			end = current.origin - gravityNormal * ( maxStepHeight * 0.75f );
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 			gameLocal.Translation( self, trace, current.origin, end, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 			start = trace.endpos;
 			end = start + tracedist * forward;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 			gameLocal.Translation( self, trace, start, end, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 
 			// if also near a surface a step height higher
 			if ( trace.fraction < 1.0f ) {
@@ -1268,11 +1268,11 @@ void idPhysics_Player::CheckLadder( void ) {
 
 /*
 =============
-idPhysics_Player::CheckJump
+anPhysics_Player::CheckJump
 =============
 */
-bool idPhysics_Player::CheckJump( void ) {
-	arcVec3 addVelocity;
+bool anPhysics_Player::CheckJump( void ) {
+	anVec3 addVelocity;
 
 	if ( command.upmove < 10 ) {
 		// not holding jump
@@ -1294,26 +1294,26 @@ bool idPhysics_Player::CheckJump( void ) {
 	current.movementFlags |= PMF_JUMP_HELD | PMF_JUMPED;
 
 	addVelocity = 2.0f * maxJumpHeight * -gravityVector;
-	addVelocity *= arcMath::Sqrt( addVelocity.Normalize() );
+	addVelocity *= anMath::Sqrt( addVelocity.Normalize() );
 	current.velocity += addVelocity;
 
-// RAVEN BEGIN
+
 // bdube: crouch slide, nick maggoire is awesome
 	current.crouchSlideTime = 0;
-// RAVEN END
+
 
 	return true;
 }
 
 /*
 =============
-idPhysics_Player::CheckWaterJump
+anPhysics_Player::CheckWaterJump
 =============
 */
-bool idPhysics_Player::CheckWaterJump( void ) {
-	arcVec3	spot;
+bool anPhysics_Player::CheckWaterJump( void ) {
+	anVec3	spot;
 	int		cont;
-	arcVec3	flatforward;
+	anVec3	flatforward;
 
 	if ( current.movementTime ) {
 		return false;
@@ -1329,19 +1329,19 @@ bool idPhysics_Player::CheckWaterJump( void ) {
 
 	spot = current.origin + 30.0f * flatforward;
 	spot -= 4.0f * gravityNormal;
-// RAVEN BEGIN
+
 // ddynerman: multiple collision worlds
-	cont = gameLocal.Contents( self, spot, NULL, mat3_identity, -1, self );
-// RAVEN END
+	cont = gameLocal.Contents( self, spot, nullptr, mat3_identity, -1, self );
+
 	if ( !(cont & CONTENTS_SOLID) ) {
 		return false;
 	}
 
 	spot -= 16.0f * gravityNormal;
-// RAVEN BEGIN
+
 // ddynerman: multiple collision worlds
-	cont = gameLocal.Contents( self, spot, NULL, mat3_identity, -1, self );
-// RAVEN END
+	cont = gameLocal.Contents( self, spot, nullptr, mat3_identity, -1, self );
+
 	if ( cont ) {
 		return false;
 	}
@@ -1356,12 +1356,12 @@ bool idPhysics_Player::CheckWaterJump( void ) {
 
 /*
 =============
-idPhysics_Player::SetWaterLevel
+anPhysics_Player::SetWaterLevel
 =============
 */
-void idPhysics_Player::SetWaterLevel( void ) {
-	arcVec3		point;
-	arcBounds	bounds;
+void anPhysics_Player::SetWaterLevel( void ) {
+	anVec3		point;
+	anBounds	bounds;
 	int			contents;
 
 	//
@@ -1372,17 +1372,17 @@ void idPhysics_Player::SetWaterLevel( void ) {
 
 	bounds = clipModel->GetBounds();
 
-// RAVEN BEGIN
+
 // AReis: Get back the water entity (if there is one), so we can grab his density
 // then apply some force to the fluid since we're moving through it.
-	idEntity *other = NULL;
+	anEntity *other = nullptr;
 
 	// check at feet level
 	point = current.origin - ( bounds[0][2] + 1.0f ) * gravityNormal;
-// RAVEN BEGIN
+
 // ddynerman: multiple collision worlds
-	contents = gameLocal.Contents( self, point, NULL, mat3_identity, -1, self, &other );
-// RAVEN END
+	contents = gameLocal.Contents( self, point, nullptr, mat3_identity, -1, self, &other );
+
 	if ( contents & MASK_WATER ) {
 
 		waterType = contents;
@@ -1390,20 +1390,20 @@ void idPhysics_Player::SetWaterLevel( void ) {
 
 		// check at waist level
 		point = current.origin - ( bounds[1][2] - bounds[0][2] ) * 0.5f * gravityNormal;
-// RAVEN BEGIN
+
 // ddynerman: multiple collision worlds
-		contents = gameLocal.Contents( self, point, NULL, mat3_identity, -1, self );
-// RAVEN END
+		contents = gameLocal.Contents( self, point, nullptr, mat3_identity, -1, self );
+
 		if ( contents & MASK_WATER ) {
 
 			waterLevel = WATERLEVEL_WAIST;
 
 			// check at head level
 			point = current.origin - ( bounds[1][2] - 1.0f ) * gravityNormal;
-// RAVEN BEGIN
+
 // ddynerman: multiple collision worlds
-			contents = gameLocal.Contents( self, point, NULL, mat3_identity, -1, self );
-// RAVEN END
+			contents = gameLocal.Contents( self, point, nullptr, mat3_identity, -1, self );
+
 			if ( contents & MASK_WATER ) {
 				waterLevel = WATERLEVEL_HEAD;
 			}
@@ -1413,10 +1413,10 @@ void idPhysics_Player::SetWaterLevel( void ) {
 
 /*
 ================
-idPhysics_Player::DropTimers
+anPhysics_Player::DropTimers
 ================
 */
-void idPhysics_Player::DropTimers( void ) {
+void anPhysics_Player::DropTimers( void ) {
 	// drop misc timing counter
 	if ( current.movementTime ) {
 		if ( framemsec >= current.movementTime ) {
@@ -1428,7 +1428,7 @@ void idPhysics_Player::DropTimers( void ) {
 		}
 	}
 
-// RAVEN BEGIN
+
 // bdube: crouch slide
 	if ( groundPlane && current.crouchSlideTime ) {
 		if ( framemsec >= current.crouchSlideTime ) {
@@ -1437,15 +1437,15 @@ void idPhysics_Player::DropTimers( void ) {
 			current.crouchSlideTime -= framemsec;
 		}
 	}
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Player::MovePlayer
+anPhysics_Player::MovePlayer
 ================
 */
-void idPhysics_Player::MovePlayer( int msec ) {
+void anPhysics_Player::MovePlayer( int msec ) {
 
 	// this counter lets us debug movement problems with a journal
 	// by setting a conditional breakpoint for the previous frame
@@ -1480,33 +1480,33 @@ void idPhysics_Player::MovePlayer( int msec ) {
 	current.velocity -= current.pushVelocity;
 
 	// view vectors
-	viewAngles.ToVectors( &viewForward, NULL, NULL );
+	viewAngles.ToVectors( &viewForward, nullptr, nullptr );
 	viewForward *= clipModelAxis;
 	viewRight = gravityNormal.Cross( viewForward );
 	viewRight.Normalize();
 
 	// fly in spectator mode
-// RAVEN BEGIN
+
 // nmckenzie: Allowing ways to force spectator movement.
 	if ( current.movementType == PM_SPECTATOR || pm_forcespectatormove.GetBool() ) {
-// RAVEN END
+
 		SpectatorMove();
-		idPhysics_Player::DropTimers();
-// RAVEN BEGIN
+		anPhysics_Player::DropTimers();
+
 // abahr: need to clear pushVelocity.  Was causing problems when noclipping while on a mover
 		ClearPushedVelocity();
-// RAVEN END
+
 		return;
 	}
 
 	// special no clip mode
 	if ( current.movementType == PM_NOCLIP ) {
-		idPhysics_Player::NoclipMove();
-		idPhysics_Player::DropTimers();
-// RAVEN BEGIN
+		anPhysics_Player::NoclipMove();
+		anPhysics_Player::DropTimers();
+
 // abahr: need to clear pushVelocity.  Was causing problems when noclipping while on a mover
 		ClearPushedVelocity();
-// RAVEN END
+
 		return;
 	}
 
@@ -1518,68 +1518,68 @@ void idPhysics_Player::MovePlayer( int msec ) {
 	}
 
 	// set watertype and waterlevel
-// RAVEN BEGIN
+
 // ddynerman: water disabled in MP
 	if ( !gameLocal.isMultiplayer ) {
-		idPhysics_Player::SetWaterLevel();
+		anPhysics_Player::SetWaterLevel();
 	}
-// RAVEN END
+
 
 	// check for ground
-	idPhysics_Player::CheckGround( true );
+	anPhysics_Player::CheckGround( true );
 
 	// check if up against a ladder
-// RAVEN BEGIN
+
 // MrE: no ladders in MP
 	if ( !gameLocal.isMultiplayer ) {
-		idPhysics_Player::CheckLadder();
+		anPhysics_Player::CheckLadder();
 	}
-// RAVEN END
+
 
 	// set clip model size
-	idPhysics_Player::CheckDuck();
+	anPhysics_Player::CheckDuck();
 
 	// handle timers
-	idPhysics_Player::DropTimers();
+	anPhysics_Player::DropTimers();
 
 	// move
 	if ( current.movementType == PM_DEAD ) {
 		// dead
-		idPhysics_Player::DeadMove();
+		anPhysics_Player::DeadMove();
 	}
 	else if ( ladder ) {
 		// going up or down a ladder
-		idPhysics_Player::LadderMove();
+		anPhysics_Player::LadderMove();
 	}
-// RAVEN BEGIN
+
 // ddynerman: water disabled in MP
 	else if ( !gameLocal.isMultiplayer && current.movementFlags & PMF_TIME_WATERJUMP ) {
 
 		// jumping out of water
-		idPhysics_Player::WaterJumpMove();
+		anPhysics_Player::WaterJumpMove();
 	}
 	else if ( !gameLocal.isMultiplayer && waterLevel > 1 ) {
-// RAVEN END
+
 		// swimming
-		idPhysics_Player::WaterMove();
+		anPhysics_Player::WaterMove();
 	}
 	else if ( walking ) {
 		// walking on ground
-		idPhysics_Player::WalkMove();
+		anPhysics_Player::WalkMove();
 	}
 	else {
 		// airborne
-		idPhysics_Player::AirMove();
+		anPhysics_Player::AirMove();
 	}
 
-// RAVEN BEGIN
+
 // ddynerman: water disabled in MP
-	if( !gameLocal.isMultiplayer ) {
-		idPhysics_Player::SetWaterLevel();
+	if ( !gameLocal.isMultiplayer ) {
+		anPhysics_Player::SetWaterLevel();
 	}
-// RAVEN END
 
-	idPhysics_Player::CheckGround( false );
+
+	anPhysics_Player::CheckGround( false );
 
 	// move the player velocity back into the world frame
 	current.velocity += current.pushVelocity;
@@ -1590,76 +1590,76 @@ void idPhysics_Player::MovePlayer( int msec ) {
 
 /*
 ================
-idPhysics_Player::GetWaterLevel
+anPhysics_Player::GetWaterLevel
 ================
 */
-waterLevel_t idPhysics_Player::GetWaterLevel( void ) const {
+waterLevel_t anPhysics_Player::GetWaterLevel( void ) const {
 	return waterLevel;
 }
 
 /*
 ================
-idPhysics_Player::GetWaterType
+anPhysics_Player::GetWaterType
 ================
 */
-int idPhysics_Player::GetWaterType( void ) const {
+int anPhysics_Player::GetWaterType( void ) const {
 	return waterType;
 }
 
 /*
 ================
-idPhysics_Player::HasJumped
+anPhysics_Player::HasJumped
 ================
 */
-bool idPhysics_Player::HasJumped( void ) const {
+bool anPhysics_Player::HasJumped( void ) const {
 	return ( ( current.movementFlags & PMF_JUMPED ) != 0 );
 }
 
 /*
 ================
-idPhysics_Player::HasSteppedUp
+anPhysics_Player::HasSteppedUp
 ================
 */
-bool idPhysics_Player::HasSteppedUp( void ) const {
+bool anPhysics_Player::HasSteppedUp( void ) const {
 	return ( ( current.movementFlags & ( PMF_STEPPED_UP | PMF_STEPPED_DOWN ) ) != 0 );
 }
 
 /*
 ================
-idPhysics_Player::GetStepUp
+anPhysics_Player::GetStepUp
 ================
 */
-float idPhysics_Player::GetStepUp( void ) const {
+float anPhysics_Player::GetStepUp( void ) const {
 	return current.stepUp;
 }
 
 /*
 ================
-idPhysics_Player::IsCrouching
+anPhysics_Player::IsCrouching
 ================
 */
-bool idPhysics_Player::IsCrouching( void ) const {
+bool anPhysics_Player::IsCrouching( void ) const {
 	//MCG: if bound, never think we're crouched
 	return ( !masterEntity&&( current.movementFlags & PMF_DUCKED ) != 0 );
 }
 
 /*
 ================
-idPhysics_Player::OnLadder
+anPhysics_Player::OnLadder
 ================
 */
-bool idPhysics_Player::OnLadder( void ) const {
+bool anPhysics_Player::OnLadder( void ) const {
 	return ladder;
 }
 
 /*
 ================
-idPhysics_Player::idPhysics_Player
+anPhysics_Player::anPhysics_Player
 ================
 */
-idPhysics_Player::idPhysics_Player( void ) {
+anPhysics_Player::anPhysics_Player( void ) {
 	debugLevel = false;
-	clipModel = NULL;
+	clipModel = nullptr;
 	clipMask = 0;
 	memset( &current, 0, sizeof( current ) );
 	saved = current;
@@ -1677,7 +1677,7 @@ idPhysics_Player::idPhysics_Player( void ) {
 	walking = false;
 	groundPlane = false;
 	memset( &groundTrace, 0, sizeof( groundTrace ) );
-	groundMaterial = NULL;
+	groundMaterial = nullptr;
 	ladder = false;
 	ladderNormal.Zero();
 	waterLevel = WATERLEVEL_NONE;
@@ -1686,10 +1686,10 @@ idPhysics_Player::idPhysics_Player( void ) {
 
 /*
 ================
-idPhysics_Player_SavePState
+anPhysics_Player_SavePState
 ================
 */
-void idPhysics_Player_SavePState( idSaveGame *savefile, const playerPState_t &state ) {
+void anPhysics_Player_SavePState( anSaveGame *savefile, const playerPState_t &state ) {
 	savefile->WriteVec3( state.origin );
 	savefile->WriteVec3( state.velocity );
 	savefile->WriteVec3( state.localOrigin );
@@ -1707,10 +1707,10 @@ void idPhysics_Player_SavePState( idSaveGame *savefile, const playerPState_t &st
 
 /*
 ================
-idPhysics_Player_RestorePState
+anPhysics_Player_RestorePState
 ================
 */
-void idPhysics_Player_RestorePState( idRestoreGame *savefile, playerPState_t &state ) {
+void anPhysics_Player_RestorePState( anRestoreGame *savefile, playerPState_t &state ) {
 	savefile->ReadVec3( state.origin );
 	savefile->ReadVec3( state.velocity );
 	savefile->ReadVec3( state.localOrigin );
@@ -1728,13 +1728,13 @@ void idPhysics_Player_RestorePState( idRestoreGame *savefile, playerPState_t &st
 
 /*
 ================
-idPhysics_Player::Save
+anPhysics_Player::Save
 ================
 */
-void idPhysics_Player::Save( idSaveGame *savefile ) const {
+void anPhysics_Player::Save( anSaveGame *savefile ) const {
 
-	idPhysics_Player_SavePState( savefile, current );
-	idPhysics_Player_SavePState( savefile, saved );
+	anPhysics_Player_SavePState( savefile, current );
+	anPhysics_Player_SavePState( savefile, saved );
 
 	savefile->WriteFloat( walkSpeed );
 	savefile->WriteFloat( crouchSpeed );
@@ -1765,13 +1765,13 @@ void idPhysics_Player::Save( idSaveGame *savefile ) const {
 
 /*
 ================
-idPhysics_Player::Restore
+anPhysics_Player::Restore
 ================
 */
-void idPhysics_Player::Restore( idRestoreGame *savefile ) {
+void anPhysics_Player::Restore( anRestoreGame *savefile ) {
 
-	idPhysics_Player_RestorePState( savefile, current );
-	idPhysics_Player_RestorePState( savefile, saved );
+	anPhysics_Player_RestorePState( savefile, current );
+	anPhysics_Player_RestorePState( savefile, saved );
 
 	savefile->ReadFloat( walkSpeed );
 	savefile->ReadFloat( crouchSpeed );
@@ -1796,72 +1796,72 @@ void idPhysics_Player::Restore( idRestoreGame *savefile ) {
 	savefile->ReadBool( ladder );
 	savefile->ReadVec3( ladderNormal );
 
-	savefile->ReadInt( (int &)waterLevel );
+	savefile->ReadInt( ( int&)waterLevel );
 	savefile->ReadInt( waterType );
 }
 
 /*
 ================
-idPhysics_Player::SetPlayerInput
+anPhysics_Player::SetPlayerInput
 ================
 */
-void idPhysics_Player::SetPlayerInput( const usercmd_t &cmd, const idAngles &newViewAngles ) {
+void anPhysics_Player::SetPlayerInput( const usercmd_t &cmd, const anAngles &newViewAngles ) {
 	command = cmd;
 	viewAngles = newViewAngles;		// can't use cmd.angles cause of the delta_angles
 }
 
 /*
 ================
-idPhysics_Player::SetSpeed
+anPhysics_Player::SetSpeed
 ================
 */
-void idPhysics_Player::SetSpeed( const float newWalkSpeed, const float newCrouchSpeed ) {
+void anPhysics_Player::SetSpeed( const float newWalkSpeed, const float newCrouchSpeed ) {
 	walkSpeed = newWalkSpeed;
 	crouchSpeed = newCrouchSpeed;
 }
 
 /*
 ================
-idPhysics_Player::SetMaxStepHeight
+anPhysics_Player::SetMaxStepHeight
 ================
 */
-void idPhysics_Player::SetMaxStepHeight( const float newMaxStepHeight ) {
+void anPhysics_Player::SetMaxStepHeight( const float newMaxStepHeight ) {
 	maxStepHeight = newMaxStepHeight;
 }
 
 /*
 ================
-idPhysics_Player::GetMaxStepHeight
+anPhysics_Player::GetMaxStepHeight
 ================
 */
-float idPhysics_Player::GetMaxStepHeight( void ) const {
+float anPhysics_Player::GetMaxStepHeight( void ) const {
 	return maxStepHeight;
 }
 
 /*
 ================
-idPhysics_Player::SetMaxJumpHeight
+anPhysics_Player::SetMaxJumpHeight
 ================
 */
-void idPhysics_Player::SetMaxJumpHeight( const float newMaxJumpHeight ) {
+void anPhysics_Player::SetMaxJumpHeight( const float newMaxJumpHeight ) {
 	maxJumpHeight = newMaxJumpHeight;
 }
 
 /*
 ================
-idPhysics_Player::SetMovementType
+anPhysics_Player::SetMovementType
 ================
 */
-void idPhysics_Player::SetMovementType( const pmtype_t type ) {
+void anPhysics_Player::SetMovementType( const pmtype_t type ) {
 	current.movementType = type;
 }
 
 /*
 ================
-idPhysics_Player::SetKnockBack
+anPhysics_Player::SetKnockBack
 ================
 */
-void idPhysics_Player::SetKnockBack( const int knockBackTime ) {
+void anPhysics_Player::SetKnockBack( const int knockBackTime ) {
 	if ( current.movementTime ) {
 		return;
 	}
@@ -1871,21 +1871,21 @@ void idPhysics_Player::SetKnockBack( const int knockBackTime ) {
 
 /*
 ================
-idPhysics_Player::SetDebugLevel
+anPhysics_Player::SetDebugLevel
 ================
 */
-void idPhysics_Player::SetDebugLevel( bool set ) {
+void anPhysics_Player::SetDebugLevel( bool set ) {
 	debugLevel = set;
 }
 
 /*
 ================
-idPhysics_Player::Evaluate
+anPhysics_Player::Evaluate
 ================
 */
-bool idPhysics_Player::Evaluate( int timeStepMSec, int endTimeMSec ) {
-	arcVec3 masterOrigin, oldOrigin;
-	arcMat3 masterAxis;
+bool anPhysics_Player::Evaluate( int timeStepMSec, int endTimeMSec ) {
+	anVec3 masterOrigin, oldOrigin;
+	anMat3 masterAxis;
 
 	waterLevel = WATERLEVEL_NONE;
 	waterType = 0;
@@ -1899,10 +1899,10 @@ bool idPhysics_Player::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 		self->GetMasterPosition( masterOrigin, masterAxis );
 		current.origin = masterOrigin + current.localOrigin * masterAxis;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
-// RAVEN END
+
 		current.velocity = ( current.origin - oldOrigin ) / ( timeStepMSec * 0.001f );
 		masterDeltaYaw = masterYaw;
 		masterYaw = masterAxis[0].ToYaw();
@@ -1912,46 +1912,46 @@ bool idPhysics_Player::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 	ActivateContactEntities();
 
-	idPhysics_Player::MovePlayer( timeStepMSec );
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+	anPhysics_Player::MovePlayer( timeStepMSec );
+
+
 // TTimo: only if tied to an ent
 	if ( self ) {
 		clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
 
 		// IsOutsideWorld uses self, so it needs to be non null
 		if ( IsOutsideWorld() ) {
-			gameLocal.Warning( "clip model outside world bounds for entity '%s' at (%s)", self ? "NULL" : self->name.c_str(), current.origin.ToString(0) );
+			gameLocal.Warning( "clip model outside world bounds for entity '%s' at (%s)", self ? "nullptr" : self->name.c_str(), current.origin.ToString(0) );
 		}
 	}
-// RAVEN END
+
 
 	return true; //( current.origin != oldOrigin );
 }
 
 /*
 ================
-idPhysics_Player::UpdateTime
+anPhysics_Player::UpdateTime
 ================
 */
-void idPhysics_Player::UpdateTime( int endTimeMSec ) {
+void anPhysics_Player::UpdateTime( int endTimeMSec ) {
 }
 
 /*
 ================
-idPhysics_Player::GetTime
+anPhysics_Player::GetTime
 ================
 */
-int idPhysics_Player::GetTime( void ) const {
+int anPhysics_Player::GetTime( void ) const {
 	return gameLocal.time;
 }
 
 /*
 ================
-idPhysics_Player::GetImpactInfo
+anPhysics_Player::GetImpactInfo
 ================
 */
-void idPhysics_Player::GetImpactInfo( const int id, const arcVec3 &point, impactInfo_t *info ) const {
+void anPhysics_Player::GetImpactInfo( const int id, const anVec3 &point, impactInfo_t *info ) const {
 	info->invMass = invMass;
 	info->invInertiaTensor.Zero();
 	info->position.Zero();
@@ -1960,10 +1960,10 @@ void idPhysics_Player::GetImpactInfo( const int id, const arcVec3 &point, impact
 
 /*
 ================
-idPhysics_Player::ApplyImpulse
+anPhysics_Player::ApplyImpulse
 ================
 */
-void idPhysics_Player::ApplyImpulse( const int id, const arcVec3 &point, const arcVec3 &impulse ) {
+void anPhysics_Player::ApplyImpulse( const int id, const anVec3 &point, const anVec3 &impulse ) {
 	if ( current.movementType != PM_NOCLIP ) {
 		current.velocity += impulse * invMass;
 	}
@@ -1971,54 +1971,54 @@ void idPhysics_Player::ApplyImpulse( const int id, const arcVec3 &point, const a
 
 /*
 ================
-idPhysics_Player::IsAtRest
+anPhysics_Player::IsAtRest
 ================
 */
-bool idPhysics_Player::IsAtRest( void ) const {
+bool anPhysics_Player::IsAtRest( void ) const {
 	return false;
 }
 
 /*
 ================
-idPhysics_Player::GetRestStartTime
+anPhysics_Player::GetRestStartTime
 ================
 */
-int idPhysics_Player::GetRestStartTime( void ) const {
+int anPhysics_Player::GetRestStartTime( void ) const {
 	return -1;
 }
 
 /*
 ================
-idPhysics_Player::SaveState
+anPhysics_Player::SaveState
 ================
 */
-void idPhysics_Player::SaveState( void ) {
+void anPhysics_Player::SaveState( void ) {
 	saved = current;
 }
 
 /*
 ================
-idPhysics_Player::RestoreState
+anPhysics_Player::RestoreState
 ================
 */
-void idPhysics_Player::RestoreState( void ) {
+void anPhysics_Player::RestoreState( void ) {
 	current = saved;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
-// RAVEN END
+
 
 	EvaluateContacts();
 }
 
 /*
 ================
-idPhysics_Player::SetOrigin
+anPhysics_Player::SetOrigin
 ================
 */
-void idPhysics_Player::SetOrigin( const arcVec3 &newOrigin, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Player::SetOrigin( const anVec3 &newOrigin, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.localOrigin = newOrigin;
 	if ( masterEntity ) {
@@ -2029,59 +2029,59 @@ void idPhysics_Player::SetOrigin( const arcVec3 &newOrigin, int id ) {
 	else {
 		current.origin = newOrigin;
 	}
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 // TTimo: only if tied to an ent
 	if ( self ) {
 		clipModel->Link( self, 0, newOrigin, clipModel->GetAxis() );
 	}
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Player::GetOrigin
+anPhysics_Player::GetOrigin
 ================
 */
-const arcVec3 & idPhysics_Player::PlayerGetOrigin( void ) const {
+const anVec3 & anPhysics_Player::PlayerGetOrigin( void ) const {
 	return current.origin;
 }
 
 /*
 ================
-idPhysics_Player::SetAxis
+anPhysics_Player::SetAxis
 ================
 */
-void idPhysics_Player::SetAxis( const arcMat3 &newAxis, int id ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+void anPhysics_Player::SetAxis( const anMat3 &newAxis, int id ) {
+
+
 	clipModel->Link( self, 0, clipModel->GetOrigin(), newAxis );
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Player::Translate
+anPhysics_Player::Translate
 ================
 */
-void idPhysics_Player::Translate( const arcVec3 &translation, int id ) {
+void anPhysics_Player::Translate( const anVec3 &translation, int id ) {
 
 	current.localOrigin += translation;
 	current.origin += translation;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Player::Rotate
+anPhysics_Player::Rotate
 ================
 */
-void idPhysics_Player::Rotate( const idRotation &rotation, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Player::Rotate( const anRotation &rotation, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.origin *= rotation;
 	if ( masterEntity ) {
@@ -2091,41 +2091,41 @@ void idPhysics_Player::Rotate( const idRotation &rotation, int id ) {
 	else {
 		current.localOrigin = current.origin;
 	}
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	clipModel->Link( self, 0, current.origin, clipModel->GetAxis() * rotation.ToMat3() );
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Player::SetLinearVelocity
+anPhysics_Player::SetLinearVelocity
 ================
 */
-void idPhysics_Player::SetLinearVelocity( const arcVec3 &newLinearVelocity, int id ) {
+void anPhysics_Player::SetLinearVelocity( const anVec3 &newLinearVelocity, int id ) {
 	current.velocity = newLinearVelocity;
 }
 
 /*
 ================
-idPhysics_Player::GetLinearVelocity
+anPhysics_Player::GetLinearVelocity
 ================
 */
-const arcVec3 &idPhysics_Player::GetLinearVelocity( int id ) const {
+const anVec3 &anPhysics_Player::GetLinearVelocity( int id ) const {
 	return current.velocity;
 }
 
 /*
 ================
-idPhysics_Player::SetPushed
+anPhysics_Player::SetPushed
 ================
 */
-void idPhysics_Player::SetPushed( int deltaTime ) {
-	arcVec3 velocity;
+void anPhysics_Player::SetPushed( int deltaTime ) {
+	anVec3 velocity;
 	float d;
 
 	// velocity with which the player is pushed
-	velocity = ( current.origin - saved.origin ) / ( deltaTime * arcMath::M_MS2SEC );
+	velocity = ( current.origin - saved.origin ) / ( deltaTime * anMath::M_MS2SEC );
 
 	// remove any downward push velocity
 	d = velocity * gravityNormal;
@@ -2138,33 +2138,33 @@ void idPhysics_Player::SetPushed( int deltaTime ) {
 
 /*
 ================
-idPhysics_Player::GetPushedLinearVelocity
+anPhysics_Player::GetPushedLinearVelocity
 ================
 */
-const arcVec3 &idPhysics_Player::GetPushedLinearVelocity( const int id ) const {
+const anVec3 &anPhysics_Player::GetPushedLinearVelocity( const int id ) const {
 	return current.lastPushVelocity;
 }
 
 /*
 ================
-idPhysics_Player::ClearPushedVelocity
+anPhysics_Player::ClearPushedVelocity
 ================
 */
-void idPhysics_Player::ClearPushedVelocity( void ) {
+void anPhysics_Player::ClearPushedVelocity( void ) {
 	current.pushVelocity.Zero();
-	current.lastPushVelocity.Zero ( );
+	current.lastPushVelocity.Zero();
 }
 
 /*
 ================
-idPhysics_Player::SetMaster
+anPhysics_Player::SetMaster
 
   the binding is never orientated
 ================
 */
-void idPhysics_Player::SetMaster( idEntity *master, const bool orientated ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Player::SetMaster( anEntity *master, const bool orientated ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	if ( master ) {
 		if ( !masterEntity ) {
@@ -2178,24 +2178,24 @@ void idPhysics_Player::SetMaster( idEntity *master, const bool orientated ) {
 	}
 	else {
 		if ( masterEntity ) {
-			masterEntity = NULL;
+			masterEntity = nullptr;
 		}
 	}
 }
 
 const float	PLAYER_VELOCITY_MAX				= 4000;
 const int	PLAYER_VELOCITY_TOTAL_BITS		= 16;
-const int	PLAYER_VELOCITY_EXPONENT_BITS	= arcMath::BitsForInteger( arcMath::BitsForFloat( PLAYER_VELOCITY_MAX ) ) + 1;
+const int	PLAYER_VELOCITY_EXPONENT_BITS	= anMath::BitsForInteger( anMath::BitsForFloat( PLAYER_VELOCITY_MAX ) ) + 1;
 const int	PLAYER_VELOCITY_MANTISSA_BITS	= PLAYER_VELOCITY_TOTAL_BITS - 1 - PLAYER_VELOCITY_EXPONENT_BITS;
 const int	PLAYER_MOVEMENT_TYPE_BITS		= 3;
 const int	PLAYER_MOVEMENT_FLAGS_BITS		= 8;
 
 /*
 ================
-idPhysics_Player::WriteToSnapshot
+anPhysics_Player::WriteToSnapshot
 ================
 */
-void idPhysics_Player::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void anPhysics_Player::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	msg.WriteFloat( current.origin[0] );
 	msg.WriteFloat( current.origin[1] );
 	msg.WriteFloat( current.origin[2] );
@@ -2220,23 +2220,23 @@ void idPhysics_Player::WriteToSnapshot( idBitMsgDelta &msg ) const {
 	msg.WriteBits( current.movementType, PLAYER_MOVEMENT_TYPE_BITS );
 	msg.WriteBits( current.movementFlags, PLAYER_MOVEMENT_FLAGS_BITS );
 	msg.WriteDeltaLong( 0, current.movementTime );
-// RAVEN BEGIN
+
 // bdube: crouch slide
 	msg.WriteDeltaLong( 0, current.crouchSlideTime );
 // abahr: gravity
 	//msg.WriteQuat( GetAxis().ToQuat() );
 	//msg.WriteVec3( GetGravity() );
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Player::ReadFromSnapshot
+anPhysics_Player::ReadFromSnapshot
 ================
 */
-void idPhysics_Player::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void anPhysics_Player::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 
-	arcVec3 oldOrigin = current.origin;
+	anVec3 oldOrigin = current.origin;
 
 	current.origin[0] = msg.ReadFloat();
 	current.origin[1] = msg.ReadFloat();
@@ -2250,7 +2250,7 @@ void idPhysics_Player::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 //	current.velocity[1] = msg.ReadFloat( PLAYER_VELOCITY_EXPONENT_BITS, PLAYER_VELOCITY_MANTISSA_BITS );
 //	current.velocity[2] = msg.ReadFloat( PLAYER_VELOCITY_EXPONENT_BITS, PLAYER_VELOCITY_MANTISSA_BITS );
 
-	arcVec3 oldVelocity = current.velocity;
+	anVec3 oldVelocity = current.velocity;
 
 	current.velocity[0] = msg.ReadDeltaFloat( 0.0f );
 	current.velocity[1] = msg.ReadDeltaFloat( 0.0f );
@@ -2274,31 +2274,31 @@ void idPhysics_Player::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	current.movementType = msg.ReadBits( PLAYER_MOVEMENT_TYPE_BITS );
 
 	current.movementFlags = msg.ReadBits( PLAYER_MOVEMENT_FLAGS_BITS );
-	if( !( saved.movementFlags & PMF_JUMP_HELD ) && current.movementFlags & PMF_JUMP_HELD ) {
-		assert( self && self->IsType( idPlayer::GetClassType() ) );
-		((idPlayer*)self)->jumpDuringHitch = true;
+	if ( !( saved.movementFlags & PMF_JUMP_HELD ) && current.movementFlags & PMF_JUMP_HELD ) {
+		assert( self && self->IsType( anBasePlayer::GetClassType() ) );
+		((anBasePlayer*)self)->jumpDuringHitch = true;
 	}
 
 	current.movementTime = msg.ReadDeltaLong( 0 );
 
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
-// RAVEN END
+
 	}
-// RAVEN BEGIN
+
 // bdube: crouch slide
 	current.crouchSlideTime = msg.ReadDeltaLong( 0 );
-// RAVEN END
+
 }
 
 /*
 ===============
-idPhysics_Player::SetClipModelNoLink
+anPhysics_Player::SetClipModelNoLink
 ===============
 */
-void idPhysics_Player::SetClipModelNoLink( idClipModel *model ) {
+void anPhysics_Player::SetClipModelNoLink( anClipModel *model ) {
 	assert( model );
 	assert( model->IsTraceModel() );
 

@@ -7,7 +7,7 @@ instancing of objects.
 
 */
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -35,7 +35,7 @@ static int						eventCallbackMemory	= 0;
 
 /*
 ================
-idTypeInfo::idClassType()
+idTypeInfo::anClassType()
 
 Constructor for class.  Should only be called from CLASS_DECLARATION macro.
 Handles linking class definition into class hierarchy.  This should only happen
@@ -44,8 +44,8 @@ initialized in any order, the constructor must handle the case that subclasses
 are initialized before superclasses.
 ================
 */
-idTypeInfo::idTypeInfo( const char *classname, const char *superclass, idEventFunc<idClass> *eventCallbacks, idClass *( *_createInstance )( void ),
-	void ( idClass::*Spawn )( void ), bool ( *_inhibitSpawn )( const arcDict& args ) ) {
+idTypeInfo::idTypeInfo( const char *classname, const char *superclass, idEventFunc<anClass> *eventCallbacks, anClass *( *_createInstance )( void ),
+	void ( anClass::*Spawn )( void ), bool ( *_inhibitSpawn )( const anDict& args ) ) {
 
 	idTypeInfo *type;
 	idTypeInfo **insert;
@@ -53,27 +53,27 @@ idTypeInfo::idTypeInfo( const char *classname, const char *superclass, idEventFu
 	this->classname			= classname;
 	this->superclass		= superclass;
 	this->eventCallbacks	= eventCallbacks;
-	this->eventMap			= NULL;
+	this->eventMap			= nullptr;
 	this->Spawn				= Spawn;
 	this->_createInstance	= _createInstance;
 	this->_inhibitSpawn		= _inhibitSpawn;
-	this->super				= idClass::GetClass( superclass );
+	this->super				= anClass::GetClass( superclass );
 	this->freeEventMap		= false;
 	typeNum					= 0;
 	lastChild				= 0;
 
 	// Check if any subclasses were initialized before their superclass
-	for ( type = typelist; type != NULL; type = type->next ) {
-		if ( ( type->super == NULL ) && !arcNetString::Cmp( type->superclass, this->classname ) &&
-			arcNetString::Cmp( type->classname, "idClass" ) ) {
+	for ( type = typelist; type != nullptr; type = type->next ) {
+		if ( ( type->super == nullptr ) && !anString::Cmp( type->superclass, this->classname ) &&
+			anString::Cmp( type->classname, "anClass" ) ) {
 			type->super	= this;
 		}
 	}
 
 	// Insert sorted
 	for ( insert = &typelist; *insert; insert = &(*insert)->next ) {
-		assert( arcNetString::Cmp( classname, (*insert)->classname ) );
-		if ( arcNetString::Cmp( classname, (*insert)->classname ) < 0 ) {
+		assert( anString::Cmp( classname, (*insert)->classname ) );
+		if ( anString::Cmp( classname, (*insert)->classname ) < 0 ) {
 			next = *insert;
 			*insert = this;
 			break;
@@ -81,7 +81,7 @@ idTypeInfo::idTypeInfo( const char *classname, const char *superclass, idEventFu
 	}
 	if ( !*insert ) {
 		*insert = this;
-		next = NULL;
+		next = nullptr;
 	}
 }
 
@@ -104,7 +104,7 @@ table for fast lookups of event functions.  Should only be called once.
 */
 void idTypeInfo::Init( void ) {
 	idTypeInfo				*c;
-	idEventFunc<idClass>	*def;
+	idEventFunc<anClass>	*def;
 	int						ev;
 	int						i;
 	bool					*set;
@@ -129,7 +129,7 @@ void idTypeInfo::Init( void ) {
 	node.SetOwner( this );
 
 	// keep track of the number of children below each class
-	for ( c = super; c != NULL; c = c->super ) {
+	for ( c = super; c != nullptr; c = c->super ) {
 		c->lastChild++;
 	}
 
@@ -158,21 +158,21 @@ void idTypeInfo::Init( void ) {
 	// go through the inheritence order and copies the event callback function into
 	// a list indexed by the event number.  This allows fast lookups of
 	// event functions.
-	for ( c = this; c != NULL; c = c->super ) {
+	for ( c = this; c != nullptr; c = c->super ) {
 		def = c->eventCallbacks;
 		if ( !def ) {
 			continue;
 		}
 
-		// go through each entry until we hit the NULL terminator
-		for ( i = 0; def[ i ].event != NULL; i++ )	{
-			ev = def[ i ].event->GetEventNum();
+		// go through each entry until we hit the nullptr terminator
+		for ( i = 0; def[i].event != nullptr; i++ )	{
+			ev = def[i].event->GetEventNum();
 
 			if ( set[ ev ] ) {
 				continue;
 			}
 			set[ ev ] = true;
-			eventMap[ ev ] = def[ i ].function;
+			eventMap[ ev ] = def[i].function;
 		}
 	}
 
@@ -192,46 +192,46 @@ void idTypeInfo::Shutdown() {
 	// free up the memory used for event lookups
 	if ( eventMap && freeEventMap ) {
 		delete[] eventMap;
-		eventMap = NULL;
+		eventMap = nullptr;
 	}
 }
 
 
 /***********************************************************************
 
-  idClass
+  anClass
 
 ***********************************************************************/
 
-const arcEventDefInternal EV_Remove( "internal_immediateremove", NULL );
-const arcEventDef EV_SafeRemove( "remove", '\0', DOC_TEXT( "Schedules the object for removal at the end of the frame." ), 0, NULL );
+const arcEventDefInternal EV_Remove( "internal_immediateremove", nullptr );
+const arcEventDef EV_SafeRemove( "remove", '\0', DOC_TEXT( "Schedules the object for removal at the end of the frame." ), 0, nullptr );
 const arcEventDef EV_IsClass( "isClass", 'd', DOC_TEXT( "Returns whether the object is of the type specified, including being derived from the type." ), 1, "Type handles can be looked up using $event:getTypeHandle$.", "d", "handle", "Handle to the type to check for." );
 
-ABSTRACT_DECLARATION( NULL, idClass )
-	EVENT( EV_Remove,				idClass::Event_Remove )
-	EVENT( EV_SafeRemove,			idClass::Event_SafeRemove )
-	EVENT( EV_IsClass,				idClass::Event_IsClass )
+ABSTRACT_DECLARATION( nullptr, anClass )
+	EVENT( EV_Remove,				anClass::Event_Remove )
+	EVENT( EV_SafeRemove,			anClass::Event_SafeRemove )
+	EVENT( EV_IsClass,				anClass::Event_IsClass )
 END_CLASS
 
 // alphabetical order
-arcNetList<idTypeInfo *>	idClass::types;
+anList<idTypeInfo *>	anClass::types;
 // typenum order
-arcNetList<idTypeInfo *>	idClass::typenums;
+anList<idTypeInfo *>	anClass::typenums;
 
-arcNetList< idClass* >		idClass::spawningObjects; // objects which are currently spawning
+anList< anClass* >		anClass::spawningObjects; // objects which are currently spawning
 
 
-bool	idClass::initialized	= false;
-int		idClass::typeNumBits	= 0;
-size_t	idClass::memused		= 0;
-int		idClass::numobjects		= 0;
+bool	anClass::initialized	= false;
+int		anClass::typeNumBits	= 0;
+size_t	anClass::memused		= 0;
+int		anClass::numobjects		= 0;
 
 /*
 ================
-idClass::CallSpawn
+anClass::CallSpawn
 ================
 */
-void idClass::CallSpawn( void ) {
+void anClass::CallSpawn( void ) {
 	spawningObjects.Alloc() = this;
 
 	CallSpawnFunc( GetType() );
@@ -241,10 +241,10 @@ void idClass::CallSpawn( void ) {
 
 /*
 ================
-idClass::CallSpawnFunc
+anClass::CallSpawnFunc
 ================
 */
-classSpawnFunc_t idClass::CallSpawnFunc( idTypeInfo *cls ) {
+classSpawnFunc_t anClass::CallSpawnFunc( idTypeInfo *cls ) {
 	classSpawnFunc_t func;
 
 	if ( cls->super ) {
@@ -263,11 +263,11 @@ classSpawnFunc_t idClass::CallSpawnFunc( idTypeInfo *cls ) {
 
 /*
 ================
-idClass::FindUninitializedMemory
+anClass::FindUninitializedMemory
 ================
 */
-void idClass::FindUninitializedMemory( void ) {
-#if 0 //def ID_DEBUG_UNINITIALIZED_MEMORY
+void anClass::FindUninitializedMemory( void ) {
+#if 0 //def ARC_DEBUG_UNINITIALIZED_MEMORY
 	unsigned long *ptr = ( ( unsigned long * )this ) - 1;
 	int size = *ptr;
 	assert( ( size & 3 ) == 0 );
@@ -283,38 +283,38 @@ void idClass::FindUninitializedMemory( void ) {
 
 /*
 ================
-idClass::Spawn
+anClass::Spawn
 ================
 */
-void idClass::Spawn( void ) {
+void anClass::Spawn( void ) {
 }
 
 /*
 ================
-idClass::~idClass
+anClass::~anClass
 
 Destructor for object.  Cancels any events that depend on this object.
 ================
 */
-idClass::~idClass() {
+anClass::~anClass() {
 	idEvent::CancelEvents( this );
 }
 
 /*
 ================
-idClass::DisplayInfo_f
+anClass::DisplayInfo_f
 ================
 */
-void idClass::DisplayInfo_f( const idCmdArgs &args ) {
+void anClass::DisplayInfo_f( const anCommandArgs &args ) {
 	gameLocal.Printf( "Class memory status: %i bytes allocated in %i objects\n", memused, numobjects );
 }
 
 /*
 ================
-idClass::ListClasses_f
+anClass::ListClasses_f
 ================
 */
-void idClass::ListClasses_f( const idCmdArgs &args ) {
+void anClass::ListClasses_f( const anCommandArgs &args ) {
 	int			i;
 	idTypeInfo *type;
 
@@ -322,7 +322,7 @@ void idClass::ListClasses_f( const idCmdArgs &args ) {
 	gameLocal.Printf( "----------------------------------------------------------------------\n" );
 
 	for ( i = 0; i < types.Num(); i++ ) {
-		type = types[ i ];
+		type = types[i];
 		gameLocal.Printf( "%-24s %-24s %6d %6d\n", type->classname, type->superclass, type->typeNum, type->lastChild - type->typeNum );
 	}
 
@@ -331,20 +331,20 @@ void idClass::ListClasses_f( const idCmdArgs &args ) {
 
 /*
 ================
-idClass::WikiClassPage_f
+anClass::WikiClassPage_f
 ================
 */
-void idClass::WikiClassPage_f( const idCmdArgs &args ) {
+void anClass::WikiClassPage_f( const anCommandArgs &args ) {
 	const char* typeName = args.Argv( 1 );
 	if ( *typeName == '\0' ) {
 		for ( int i = 0; i < types.Num(); i++ ) {
 			sdWikiFormatter wiki;
-			wiki.BuildClassInfo( types[ i ] );
-			wiki.WriteToFile( va( "wiki/classes/%s.txt", types[ i ]->classname ) );
+			wiki.BuildClassInfo( types[i] );
+			wiki.WriteToFile( va( "wiki/classes/%s.txt", types[i]->classname ) );
 		}
 	} else {
-		const idTypeInfo* type = idClass::GetClass( typeName );
-		if ( type == NULL ) {
+		const idTypeInfo* type = anClass::GetClass( typeName );
+		if ( type == nullptr ) {
 			gameLocal.Warning( "Unknown class '%s'", typeName );
 			return;
 		}
@@ -357,21 +357,21 @@ void idClass::WikiClassPage_f( const idCmdArgs &args ) {
 
 /*
 ================
-idClass::WikiClassTree_f
+anClass::WikiClassTree_f
 ================
 */
-void idClass::WikiClassTree_f( const idCmdArgs &args ) {
-	idTypeInfo* type = NULL;
+void anClass::WikiClassTree_f( const anCommandArgs &args ) {
+	idTypeInfo* type = nullptr;
 
 	const char* baseTypeName = args.Argv( 1 );
 	if ( *baseTypeName != '\0' ) {
-		type = idClass::GetClass( baseTypeName );
-		if ( type == NULL ) {
+		type = anClass::GetClass( baseTypeName );
+		if ( type == nullptr ) {
 			gameLocal.Warning( "Unknown class '%s'", baseTypeName );
 			return;
 		}
 	} else {
-		type = &idClass::Type;
+		type = &anClass::Type;
 	}
 
 	sdWikiFormatter wiki;
@@ -381,16 +381,16 @@ void idClass::WikiClassTree_f( const idCmdArgs &args ) {
 
 /*
 ================
-idClass::CreateInstance
+anClass::CreateInstance
 ================
 */
-idClass *idClass::CreateInstance( const char *name ) {
+anClass *anClass::CreateInstance( const char *name ) {
 	const idTypeInfo	*type;
-	idClass				*obj;
+	anClass				*obj;
 
-	type = idClass::GetClass( name );
+	type = anClass::GetClass( name );
 	if ( !type ) {
-		return NULL;
+		return nullptr;
 	}
 
 	obj = type->CreateInstance();
@@ -399,7 +399,7 @@ idClass *idClass::CreateInstance( const char *name ) {
 
 /*
 ================
-idClass::Init
+anClass::Init
 
 Should be called after all idTypeInfos are initialized, so must be called
 manually upon game code initialization.  Tells all the idTypeInfos to initialize
@@ -407,7 +407,7 @@ their event callback table for the associated class.  This should only be called
 once during the execution of the program or DLL.
 ================
 */
-void idClass::InitClasses( void ) {
+void anClass::InitClasses( void ) {
 	idTypeInfo	*c;
 	int			num;
 
@@ -419,20 +419,20 @@ void idClass::InitClasses( void ) {
 	}
 
 	// init the event callback tables for all the classes
-	for ( c = typelist; c != NULL; c = c->next ) {
+	for ( c = typelist; c != nullptr; c = c->next ) {
 		c->Init();
 	}
 
 	// number the types according to the class hierarchy so we can quickly determine if a class
 	// is a subclass of another
 	num = 0;
-	for ( c = classHierarchy.GetNext(); c != NULL; c = c->node.GetNext(), num++ ) {
+	for ( c = classHierarchy.GetNext(); c != nullptr; c = c->node.GetNext(), num++ ) {
         c->typeNum = num;
 		c->lastChild += num;
 	}
 
 	// number of bits needed to send types over network
-	typeNumBits = arcMath::BitsForInteger( num );
+	typeNumBits = anMath::BitsForInteger( num );
 
 	// create a list of the types so we can do quick lookups
 	// one list in alphabetical order, one in typenum order
@@ -441,7 +441,7 @@ void idClass::InitClasses( void ) {
 	typenums.SetGranularity( 1 );
 	typenums.SetNum( num );
 	num = 0;
-	for ( c = typelist; c != NULL; c = c->next, num++ ) {
+	for ( c = typelist; c != nullptr; c = c->next, num++ ) {
 		types[ num ] = c;
 		typenums[ c->typeNum ] = c;
 	}
@@ -453,13 +453,13 @@ void idClass::InitClasses( void ) {
 
 /*
 ================
-idClass::Shutdown
+anClass::Shutdown
 ================
 */
-void idClass::ShutdownClasses( void ) {
+void anClass::ShutdownClasses( void ) {
 	idTypeInfo	*c;
 
-	for ( c = typelist; c != NULL; c = c->next ) {
+	for ( c = typelist; c != nullptr; c = c->next ) {
 		c->Shutdown();
 	}
 	types.Clear();
@@ -470,23 +470,23 @@ void idClass::ShutdownClasses( void ) {
 
 /*
 ================
-idClass::new
+anClass::new
 ================
 */
-#ifdef ID_DEBUG_MEMORY
+#ifdef ARC_DEBUG_MEMORY
 #undef new
 #endif
 
-void * idClass::operator new( size_t s ) {
+void * anClass::operator new( size_t s ) {
 	size_t *p;
 
 	s += sizeof( size_t );
-	p = (size_t *)Mem_Alloc( s );
+	p = ( size_t *)Mem_Alloc( s );
 	*p = s;
 	memused += s;
 	numobjects++;
 
-#ifdef ID_DEBUG_UNINITIALIZED_MEMORY
+#ifdef ARC_DEBUG_UNINITIALIZED_MEMORY
 	unsigned long *ptr = (unsigned long *)p;
 	size_t size = s;
 	assert( ( size & 3 ) == 0 );
@@ -499,16 +499,16 @@ void * idClass::operator new( size_t s ) {
 	return p + 1;
 }
 
-void * idClass::operator new( size_t s, int, int, char *, int ) {
+void * anClass::operator new( size_t s, int, int, char *, int ) {
 	size_t *p;
 
 	s += sizeof( size_t );
-	p = (size_t *)Mem_Alloc( s );
+	p = ( size_t *)Mem_Alloc( s );
 	*p = s;
 	memused += s;
 	numobjects++;
 
-#ifdef ID_DEBUG_UNINITIALIZED_MEMORY
+#ifdef ARC_DEBUG_UNINITIALIZED_MEMORY
 	unsigned long *ptr = (unsigned long *)p;
 	size_t size = s;
 	assert( ( size & 3 ) == 0 );
@@ -521,31 +521,31 @@ void * idClass::operator new( size_t s, int, int, char *, int ) {
 	return p + 1;
 }
 
-#ifdef ID_DEBUG_MEMORY
+#ifdef ARC_DEBUG_MEMORY
 #define new ID_DEBUG_NEW
 #endif
 
 /*
 ================
-idClass::delete
+anClass::delete
 ================
 */
-void idClass::operator delete( void *ptr ) {
+void anClass::operator delete( void *ptr ) {
 	int *p;
 
 	if ( ptr ) {
-		p = ( ( int * )ptr ) - 1;
+		p = ( ( int*)ptr ) - 1;
 		memused -= *p;
 		numobjects--;
         Mem_Free( p );
 	}
 }
 
-void idClass::operator delete( void *ptr, int, int, char *, int ) {
+void anClass::operator delete( void *ptr, int, int, char *, int ) {
 	int *p;
 
 	if ( ptr ) {
-		p = ( ( int * )ptr ) - 1;
+		p = ( ( int*)ptr ) - 1;
 		memused -= *p;
 		numobjects--;
         Mem_Free( p );
@@ -554,13 +554,13 @@ void idClass::operator delete( void *ptr, int, int, char *, int ) {
 
 /*
 ================
-idClass::GetClass
+anClass::GetClass
 
 Returns the idTypeInfo for the name of the class passed in.  This is a static function
-so it must be called as idClass::GetClass( classname )
+so it must be called as anClass::GetClass( classname )
 ================
 */
-idTypeInfo *idClass::GetClass( const char *name ) {
+idTypeInfo *anClass::GetClass( const char *name ) {
 	idTypeInfo	*c;
 	int			order;
 	int			mid;
@@ -568,9 +568,9 @@ idTypeInfo *idClass::GetClass( const char *name ) {
 	int			max;
 
 	if ( !initialized ) {
-		// idClass::Init hasn't been called yet, so do a slow lookup
-		for ( c = typelist; c != NULL; c = c->next ) {
-			if ( !arcNetString::Cmp( c->classname, name ) ) {
+		// anClass::Init hasn't been called yet, so do a slow lookup
+		for ( c = typelist; c != nullptr; c = c->next ) {
+			if ( !anString::Cmp( c->classname, name ) ) {
 				return c;
 			}
 		}
@@ -581,7 +581,7 @@ idTypeInfo *idClass::GetClass( const char *name ) {
 		while( min <= max ) {
 			mid = ( min + max ) / 2;
 			c = types[ mid ];
-			order = arcNetString::Cmp( c->classname, name );
+			order = anString::Cmp( c->classname, name );
 			if ( !order ) {
 				return c;
 			} else if ( order > 0 ) {
@@ -592,19 +592,19 @@ idTypeInfo *idClass::GetClass( const char *name ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-idClass::GetType
+anClass::GetType
 ================
 */
-idTypeInfo *idClass::GetType( const int typeNum ) {
+idTypeInfo *anClass::GetType( const int typeNum ) {
 	idTypeInfo *c;
 
 	if ( !initialized ) {
-		for ( c = typelist; c != NULL; c = c->next ) {
+		for ( c = typelist; c != nullptr; c = c->next ) {
 			if ( c->typeNum == typeNum ) {
 				return c;
 			}
@@ -613,17 +613,17 @@ idTypeInfo *idClass::GetType( const int typeNum ) {
 		return typenums[ typeNum ];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-idClass::GetClassname
+anClass::GetClassname
 
 Returns the text classname of the object.
 ================
 */
-const char *idClass::GetClassname( void ) const {
+const char *anClass::GetClassname( void ) const {
 	idTypeInfo *type;
 
 	type = GetType();
@@ -632,24 +632,24 @@ const char *idClass::GetClassname( void ) const {
 
 /*
 ================
-idClass::ArgCompletion_ClassName
+anClass::ArgCompletion_ClassName
 ================
 */
-void idClass::ArgCompletion_ClassName( const idCmdArgs &args, void(*callback)( const char *s ) ) {
+void anClass::ArgCompletion_ClassName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
 	int i;
 	for ( i = 0; i < types.Num(); i++ ) {
-		callback( va( "%s %s", args.Argv( 0 ), types[ i ]->classname ) );
+		callback( va( "%s %s", args.Argv( 0 ), types[i]->classname ) );
 	}
 }
 
 /*
 ================
-idClass::GetSuperclass
+anClass::GetSuperclass
 
 Returns the text classname of the superclass.
 ================
 */
-const char *idClass::GetSuperclass( void ) const {
+const char *anClass::GetSuperclass( void ) const {
 	idTypeInfo *cls;
 
 	cls = GetType();
@@ -658,19 +658,19 @@ const char *idClass::GetSuperclass( void ) const {
 
 /*
 ================
-idClass::CancelEvents
+anClass::CancelEvents
 ================
 */
-void idClass::CancelEvents( const arcEventDef *ev ) {
+void anClass::CancelEvents( const arcEventDef *ev ) {
 	idEvent::CancelEvents( this, ev );
 }
 
 /*
 ================
-idClass::PostEventArgs
+anClass::PostEventArgs
 ================
 */
-bool idClass::PostEventArgs( const arcEventDef *ev, int time, int numargs, bool guiEvent, ... ) {
+bool anClass::PostEventArgs( const arcEventDef *ev, int time, int numargs, bool guiEvent, ... ) {
 	idTypeInfo	*c;
 	idEvent		*event;
 	va_list		args;
@@ -698,25 +698,25 @@ bool idClass::PostEventArgs( const arcEventDef *ev, int time, int numargs, bool 
 
 /*
 ================
-idClass::PostGUIEventMS
+anClass::PostGUIEventMS
 ================
 */
-bool idClass::PostGUIEventMS( const arcEventDef *ev, int time ) {
+bool anClass::PostGUIEventMS( const arcEventDef *ev, int time ) {
 	return PostEventArgs( ev, time, 0, true );
 }
 
 /*
 ================
-idClass::PostEventMS
+anClass::PostEventMS
 ================
 */
-bool idClass::PostEventMS( const arcEventDef *ev, int time ) {
+bool anClass::PostEventMS( const arcEventDef *ev, int time ) {
 	if ( gameLocal.isClient ) {
 		if ( ev == &EV_SafeRemove ) {
 			if ( IsType( arcEntity::Type ) ) {
 				// Clients aren't allowed to do this.
 				assert( false );
-				gameLocal.Warning( "Client called idClass::PostEventMS with EV_Remove or EV_SafeRemove!" );
+				gameLocal.Warning( "Client called anClass::PostEventMS with EV_Remove or EV_SafeRemove!" );
 				return false;
 			}
 		}
@@ -727,163 +727,163 @@ bool idClass::PostEventMS( const arcEventDef *ev, int time ) {
 
 /*
 ================
-idClass::PostEventMS
+anClass::PostEventMS
 ================
 */
-bool idClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1 ) {
+bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1 ) {
 	return PostEventArgs( ev, time, 1, false, &arg1 );
 }
 
 /*
 ================
-idClass::PostEventMS
+anClass::PostEventMS
 ================
 */
-bool idClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2 ) {
+bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2 ) {
 	return PostEventArgs( ev, time, 2, false, &arg1, &arg2 );
 }
 
 /*
 ================
-idClass::PostEventMS
+anClass::PostEventMS
 ================
 */
-bool idClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
+bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
 	return PostEventArgs( ev, time, 3, false, &arg1, &arg2, &arg3 );
 }
 
 /*
 ================
-idClass::PostEventMS
+anClass::PostEventMS
 ================
 */
-bool idClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
+bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
 	return PostEventArgs( ev, time, 4, false, &arg1, &arg2, &arg3, &arg4 );
 }
 
 /*
 ================
-idClass::PostEventMS
+anClass::PostEventMS
 ================
 */
-bool idClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
+bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
 	return PostEventArgs( ev, time, 5, false, &arg1, &arg2, &arg3, &arg4, &arg5 );
 }
 
 /*
 ================
-idClass::PostEventMS
+anClass::PostEventMS
 ================
 */
-bool idClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
+bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
 	return PostEventArgs( ev, time, 6, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6 );
 }
 
 /*
 ================
-idClass::PostEventMS
+anClass::PostEventMS
 ================
 */
-bool idClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
+bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
 	return PostEventArgs( ev, time, 7, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7 );
 }
 
 /*
 ================
-idClass::PostEventMS
+anClass::PostEventMS
 ================
 */
-bool idClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
+bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
 	return PostEventArgs( ev, time, 8, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7, &arg8 );
 }
 
 /*
 ================
-idClass::PostEventSec
+anClass::PostEventSec
 ================
 */
-bool idClass::PostEventSec( const arcEventDef *ev, float time ) {
+bool anClass::PostEventSec( const arcEventDef *ev, float time ) {
 	return PostEventArgs( ev, SEC2MS( time ), 0, false );
 }
 
 /*
 ================
-idClass::PostEventSec
+anClass::PostEventSec
 ================
 */
-bool idClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1 ) {
+bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 1, false, &arg1 );
 }
 
 /*
 ================
-idClass::PostEventSec
+anClass::PostEventSec
 ================
 */
-bool idClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2 ) {
+bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 2, false, &arg1, &arg2 );
 }
 
 /*
 ================
-idClass::PostEventSec
+anClass::PostEventSec
 ================
 */
-bool idClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
+bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 3, false, &arg1, &arg2, &arg3 );
 }
 
 /*
 ================
-idClass::PostEventSec
+anClass::PostEventSec
 ================
 */
-bool idClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
+bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 4, false, &arg1, &arg2, &arg3, &arg4 );
 }
 
 /*
 ================
-idClass::PostEventSec
+anClass::PostEventSec
 ================
 */
-bool idClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
+bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 5, false, &arg1, &arg2, &arg3, &arg4, &arg5 );
 }
 
 /*
 ================
-idClass::PostEventSec
+anClass::PostEventSec
 ================
 */
-bool idClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
+bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 6, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6 );
 }
 
 /*
 ================
-idClass::PostEventSec
+anClass::PostEventSec
 ================
 */
-bool idClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
+bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 7, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7 );
 }
 
 /*
 ================
-idClass::PostEventSec
+anClass::PostEventSec
 ================
 */
-bool idClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
+bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 8, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7, &arg8 );
 }
 
 /*
 ================
-idClass::ProcessEventArgs
+anClass::ProcessEventArgs
 ================
 */
-bool idClass::ProcessEventArgs( const arcEventDef *ev, int numargs, ... ) {
+bool anClass::ProcessEventArgs( const arcEventDef *ev, int numargs, ... ) {
 	idTypeInfo	*c;
 	int			num;
 	UINT_PTR	data[ D_EVENT_MAXARGS ];
@@ -910,95 +910,95 @@ bool idClass::ProcessEventArgs( const arcEventDef *ev, int numargs, ... ) {
 
 /*
 ================
-idClass::ProcessEvent
+anClass::ProcessEvent
 ================
 */
-bool idClass::ProcessEvent( const arcEventDef *ev ) {
+bool anClass::ProcessEvent( const arcEventDef *ev ) {
 	return ProcessEventArgs( ev, 0 );
 }
 
 /*
 ================
-idClass::ProcessEvent
+anClass::ProcessEvent
 ================
 */
-bool idClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1 ) {
+bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1 ) {
 	return ProcessEventArgs( ev, 1, &arg1 );
 }
 
 /*
 ================
-idClass::ProcessEvent
+anClass::ProcessEvent
 ================
 */
-bool idClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2 ) {
+bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2 ) {
 	return ProcessEventArgs( ev, 2, &arg1, &arg2 );
 }
 
 /*
 ================
-idClass::ProcessEvent
+anClass::ProcessEvent
 ================
 */
-bool idClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
+bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
 	return ProcessEventArgs( ev, 3, &arg1, &arg2, &arg3 );
 }
 
 /*
 ================
-idClass::ProcessEvent
+anClass::ProcessEvent
 ================
 */
-bool idClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
+bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
 	return ProcessEventArgs( ev, 4, &arg1, &arg2, &arg3, &arg4 );
 }
 
 /*
 ================
-idClass::ProcessEvent
+anClass::ProcessEvent
 ================
 */
-bool idClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
+bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
 	return ProcessEventArgs( ev, 5, &arg1, &arg2, &arg3, &arg4, &arg5 );
 }
 
 /*
 ================
-idClass::ProcessEvent
+anClass::ProcessEvent
 ================
 */
-bool idClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
+bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
 	return ProcessEventArgs( ev, 6, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6 );
 }
 
 /*
 ================
-idClass::ProcessEvent
+anClass::ProcessEvent
 ================
 */
-bool idClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
+bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
 	return ProcessEventArgs( ev, 7, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7 );
 }
 
 /*
 ================
-idClass::ProcessEvent
+anClass::ProcessEvent
 ================
 */
-bool idClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
+bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
 	return ProcessEventArgs( ev, 8, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7, &arg8 );
 }
 
 #ifdef GAME_FPU_EXCEPTIONS
-extern idCVar g_fpuExceptions;
+extern anCVar g_fpuExceptions;
 #endif // GAME_FPU_EXCEPTIONS
 
 /*
 ================
-idClass::ProcessEventArgPtr
+anClass::ProcessEventArgPtr
 ================
 */
-bool idClass::ProcessEventArgPtr( const arcEventDef *ev, const UINT_PTR *data ) {
+bool anClass::ProcessEventArgPtr( const arcEventDef *ev, const UINT_PTR *data ) {
 	idTypeInfo	*c;
 	int			num;
 	eventCallback_t	callback;
@@ -1024,7 +1024,7 @@ the function prototypes must have matching float declaration
 http://developer.apple.com/documentation/DeveloperTools/Conceptual/MachORuntime/2rt_powerpc_abi/chapter_9_section_5.html
 */
 
-	switch( ev->GetFormatspecIndex() ) {
+	switch ( ev->GetFormatspecIndex() ) {
 	case 1 << D_EVENT_MAXARGS :
 		( this->*callback )();
 		break;
@@ -1045,48 +1045,48 @@ http://developer.apple.com/documentation/DeveloperTools/Conceptual/MachORuntime/
 
 	assert( D_EVENT_MAXARGS == 8 );
 
-	switch( ev->GetNumArgs() ) {
+	switch ( ev->GetNumArgs() ) {
 	case 0 :
 		( this->*callback )();
 		break;
 
 	case 1 :
-		typedef void ( idClass::*eventCallback_1_t )( const UINT_PTR );
+		typedef void ( anClass::*eventCallback_1_t )( const UINT_PTR );
 		( this->*( eventCallback_1_t )callback )( data[ 0 ] );
 		break;
 
 	case 2 :
-		typedef void ( idClass::*eventCallback_2_t )( const UINT_PTR, const UINT_PTR );
+		typedef void ( anClass::*eventCallback_2_t )( const UINT_PTR, const UINT_PTR );
 		( this->*( eventCallback_2_t )callback )( data[ 0 ], data[ 1 ] );
 		break;
 
 	case 3 :
-		typedef void ( idClass::*eventCallback_3_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR );
+		typedef void ( anClass::*eventCallback_3_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR );
 		( this->*( eventCallback_3_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ] );
 		break;
 
 	case 4 :
-		typedef void ( idClass::*eventCallback_4_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
+		typedef void ( anClass::*eventCallback_4_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
 		( this->*( eventCallback_4_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ] );
 		break;
 
 	case 5 :
-		typedef void ( idClass::*eventCallback_5_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
+		typedef void ( anClass::*eventCallback_5_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
 		( this->*( eventCallback_5_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ], data[ 4 ] );
 		break;
 
 	case 6 :
-		typedef void ( idClass::*eventCallback_6_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
+		typedef void ( anClass::*eventCallback_6_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
 		( this->*( eventCallback_6_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ], data[ 4 ], data[ 5 ] );
 		break;
 
 	case 7 :
-		typedef void ( idClass::*eventCallback_7_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
+		typedef void ( anClass::*eventCallback_7_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
 		( this->*( eventCallback_7_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ], data[ 4 ], data[ 5 ], data[ 6 ] );
 		break;
 
 	case 8 :
-		typedef void ( idClass::*eventCallback_8_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
+		typedef void ( anClass::*eventCallback_8_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
 		( this->*( eventCallback_8_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ], data[ 4 ], data[ 5 ], data[ 6 ], data[ 7 ] );
 		break;
 
@@ -1110,24 +1110,24 @@ http://developer.apple.com/documentation/DeveloperTools/Conceptual/MachORuntime/
 
 /*
 ================
-idClass::Event_Remove
+anClass::Event_Remove
 ================
 */
-void idClass::Event_Remove( void ) {
+void anClass::Event_Remove( void ) {
 	OnEventRemove();
 	delete this;
 }
 
 /*
 ================
-idClass::Event_SafeRemove
+anClass::Event_SafeRemove
 ================
 */
-void idClass::Event_SafeRemove( void ) {
+void anClass::Event_SafeRemove( void ) {
 	if ( gameLocal.isClient && IsType( arcEntity::Type ) ) {
 		// Clients aren't allowed to do this.
 		assert( false );
-		gameLocal.Warning( "Client called idClass::Event_SafeRemove!" );
+		gameLocal.Warning( "Client called anClass::Event_SafeRemove!" );
 		return;
 	}
 
@@ -1137,11 +1137,11 @@ void idClass::Event_SafeRemove( void ) {
 
 /*
 ================
-idClass::Event_IsClass
+anClass::Event_IsClass
 ================
 */
-void idClass::Event_IsClass( int typeNumber ) {
-	idTypeInfo* type = idClass::GetType( typeNumber );
+void anClass::Event_IsClass( int typeNumber ) {
+	idTypeInfo* type = anClass::GetType( typeNumber );
 	if ( !type ) {
 		sdProgram::ReturnInteger( 0 );
 		return;
@@ -1155,10 +1155,10 @@ void idClass::Event_IsClass( int typeNumber ) {
 idTypeInfo::CreateInstance
 ================
 */
-idClass* idTypeInfo::CreateInstance( void ) const {
-	idClass* instance = _createInstance();
+anClass* idTypeInfo::CreateInstance( void ) const {
+	anClass* instance = _createInstance();
 	if ( instance ) {
-		idLinkList< idClass >* node = instance->GetInstanceNode();
+		anLinkList< anClass >* node = instance->GetInstanceNode();
 		if ( node ) {
 			node->AddToEnd( instances );
 		}
@@ -1171,6 +1171,6 @@ idClass* idTypeInfo::CreateInstance( void ) const {
 idTypeInfo::InhibitSpawn
 ================
 */
-bool idTypeInfo::InhibitSpawn( const arcDict& args ) const {
+bool idTypeInfo::InhibitSpawn( const anDict& args ) const {
 	return _inhibitSpawn( args );
 }

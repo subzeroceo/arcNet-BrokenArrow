@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "splines.h"
@@ -11,13 +11,13 @@ aRCCameraDef *g_splineList = &splineList;
 glLabeledPoint
 ================
 */
-void glLabeledPoint(arcVec4 &color, arcVec3 &point, float size, const char *label) {
+void glLabeledPoint(anVec4 &color, anVec3 &point, float size, const char *label) {
 	qglColor3fv( color.ToFloatPtr() );
 	qglPointSize( size );
 	qglBegin( GL_POINTS );
 	qglVertex3fv( point.ToFloatPtr() );
 	qglEnd();
-	arcVec3 v = point;
+	anVec3 v = point;
 	v.x += 1;
 	v.y += 1;
 	v.z += 1;
@@ -30,16 +30,16 @@ void glLabeledPoint(arcVec4 &color, arcVec3 &point, float size, const char *labe
 QGLBox
 ================
 */
-void QGLBox( arcVec4 &color, arcVec3 &point, float size ) {
-	arcVec3 mins( point );
-	arcVec3 maxs( point );
+void QGLBox( anVec4 &color, anVec3 &point, float size ) {
+	anVec3 mins( point );
+	anVec3 maxs( point );
 	mins[0] -= size;
 	mins[1] += size;
 	mins[2] -= size;
 	maxs[0] += size;
 	maxs[1] -= size;
 	maxs[2] += size;
-	arcVec4	saveColor;
+	anVec4	saveColor;
 	qglGetFloatv( GL_CURRENT_COLOR, saveColor.ToFloatPtr() );
 	qglColor3fv( color.ToFloatPtr() );
 	qglBegin( GL_LINE_LOOP );
@@ -91,9 +91,9 @@ void splineDraw() {
 debugLine
 ================
 */
-void debugLine(arcVec4 &color, float x, float y, float z, float x2, float y2, float z2) {
-	arcVec3 from( x, y, z );
-	arcVec3 to( x2, y2, z2 );
+void debugLine(anVec4 &color, float x, float y, float z, float x2, float y2, float z2) {
+	anVec3 from( x, y, z );
+	anVec3 to( x2, y2, z2 );
 	session->rw->DebugLine( color, from, to );
 }
 
@@ -111,18 +111,18 @@ idPointListInterface
 idPointListInterface::selectPointByRay
 ================
 */
-int idPointListInterface::selectPointByRay( const arcVec3 &origin, const arcVec3 &direction, bool single ) {
+int idPointListInterface::selectPointByRay( const anVec3 &origin, const anVec3 &direction, bool single ) {
 	// find the point closest to the ray
 	float besti = -1;
 	float bestd = 8;
 	float count = numPoints();
 
 	for ( int i = 0; i < count; i++ ) {
-		arcVec3 temp = *getPoint( i );
-		arcVec3 temp2 = temp;
+		anVec3 temp = *getPoint( i );
+		anVec3 temp2 = temp;
 		temp -= origin;
-		float d = arcVec3::Dot( temp, direction );
-		arcVec3::MA( origin, d, direction, temp );
+		float d = anVec3::Dot( temp, direction );
+		anVec3::MA( origin, d, direction, temp );
 		temp2 -= temp;
 		d = temp2.Length();
 		if ( d <= bestd ) {
@@ -198,7 +198,7 @@ void idPointListInterface::deselectAll() {
 idPointListInterface::getSelectedPoint
 ================
 */
-arcVec3 *idPointListInterface::getSelectedPoint( int index ) {
+anVec3 *idPointListInterface::getSelectedPoint( int index ) {
 	assert(index >= 0 && index < numSelectedPoints() );
 	return getPoint(selectedPoints[index] );
 }
@@ -208,7 +208,7 @@ arcVec3 *idPointListInterface::getSelectedPoint( int index ) {
 idPointListInterface::UpdateSelection
 ================
 */
-void idPointListInterface::UpdateSelection(const arcVec3 &move) {
+void idPointListInterface::UpdateSelection(const anVec3 &move) {
 	int count = selectedPoints.Num();
 	for ( int i = 0; i < count; i++ ) {
 		*getPoint(selectedPoints[i] ) += move;
@@ -230,17 +230,17 @@ void idPointListInterface::drawSelection() {
 /*
 =================================================================================
 
-idSplineList
+anSplineList
 
 =================================================================================
 */
 
 /*
 ================
-idSplineList::clearControl
+anSplineList::clearControl
 ================
 */
-void idSplineList::clearControl() {
+void anSplineList::clearControl() {
 	for ( int i = 0; i < controlPoints.Num(); i++ ) {
 		delete controlPoints[i];
 	}
@@ -249,10 +249,10 @@ void idSplineList::clearControl() {
 
 /*
 ================
-idSplineList::clearSpline
+anSplineList::clearSpline
 ================
 */
-void idSplineList::clearSpline() {
+void anSplineList::clearSpline() {
 	for ( int i = 0; i < splinePoints.Num(); i++ ) {
 		delete splinePoints[i];
 	}
@@ -261,29 +261,29 @@ void idSplineList::clearSpline() {
 
 /*
 ================
-idSplineList::clear
+anSplineList::clear
 ================
 */
-void idSplineList::clear() {
+void anSplineList::clear() {
 	clearControl();
 	clearSpline();
 	splineTime.Clear();
-	selected = NULL;
+	selected = nullptr;
 	dirty = true;
 	activeSegment = 0;
 	granularity = 0.025f;
-	pathColor = arcVec4(1.0f, 0.5f, 0.0f, 1.0f);
-	controlColor = arcVec4(0.7f, 0.0f, 1.0f, 1.0f);
-	segmentColor = arcVec4(0.0f, 0.0f, 1.0f, 1.0 );
-	activeColor = arcVec4(1.0f, 0.0f, 0.0f, 1.0f);
+	pathColor = anVec4(1.0f, 0.5f, 0.0f, 1.0f);
+	controlColor = anVec4(0.7f, 0.0f, 1.0f, 1.0f);
+	segmentColor = anVec4(0.0f, 0.0f, 1.0f, 1.0 );
+	activeColor = anVec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
 /*
 ================
-idSplineList::setColors
+anSplineList::setColors
 ================
 */
-void idSplineList::setColors(arcVec4 &path, arcVec4 &segment, arcVec4 &control, arcVec4 &active) {
+void anSplineList::setColors(anVec4 &path, anVec4 &segment, anVec4 &control, anVec4 &active) {
 	pathColor = path;
 	segmentColor = segment;
 	controlColor = control;
@@ -292,10 +292,10 @@ void idSplineList::setColors(arcVec4 &path, arcVec4 &segment, arcVec4 &control, 
 
 /*
 ================
-idSplineList::validTime
+anSplineList::validTime
 ================
 */
-bool idSplineList::validTime() {
+bool anSplineList::validTime() {
 	if ( dirty ) {
 		buildSpline();
 	}
@@ -306,12 +306,12 @@ bool idSplineList::validTime() {
 
 /*
 ================
-idSplineList::addToRenderer
+anSplineList::addToRenderer
 ================
 */
-void idSplineList::addToRenderer() {
+void anSplineList::addToRenderer() {
 	int i;
-	arcVec3 mins, maxs;
+	anVec3 mins, maxs;
 
 	if (controlPoints.Num() == 0 ) {
 		return;
@@ -339,7 +339,7 @@ void idSplineList::addToRenderer() {
 	}
 
 	int step = 0;
-	arcVec3 step1;
+	anVec3 step1;
 	for ( i = 3; i < controlPoints.Num(); i++ ) {
 		for (float tension = 0.0f; tension < 1.001f; tension += 0.1f) {
 			float x = 0;
@@ -366,10 +366,10 @@ void idSplineList::addToRenderer() {
 
 /*
 ================
-idSplineList::buildSpline
+anSplineList::buildSpline
 ================
 */
-void idSplineList::buildSpline() {
+void anSplineList::buildSpline() {
 	int start = Sys_Milliseconds();
 	clearSpline();
 	for ( int i = 3; i < controlPoints.Num(); i++ ) {
@@ -382,7 +382,7 @@ void idSplineList::buildSpline() {
 				y += controlPoints[i - (3 - j)]->y * CalcSpline(j, tension);
 				z += controlPoints[i - (3 - j)]->z * CalcSpline(j, tension);
 			}
-			splinePoints.Append(new arcVec3( x, y, z ) );
+			splinePoints.Append(new anVec3( x, y, z ) );
 		}
 	}
 	dirty = false;
@@ -391,10 +391,10 @@ void idSplineList::buildSpline() {
 
 /*
 ================
-idSplineList::draw
+anSplineList::draw
 ================
 */
-void idSplineList::draw(bool editMode) {
+void anSplineList::draw(bool editMode) {
         int i;
 
 	if (controlPoints.Num() == 0 ) {
@@ -450,10 +450,10 @@ void idSplineList::draw(bool editMode) {
 
 /*
 ================
-idSplineList::totalDistance
+anSplineList::totalDistance
 ================
 */
-float idSplineList::totalDistance() {
+float anSplineList::totalDistance() {
 	// FIXME: save dist and return
 	//
 	if (controlPoints.Num() == 0 ) {
@@ -465,7 +465,7 @@ float idSplineList::totalDistance() {
 	}
 
 	float dist = 0.0f;
-	arcVec3 temp;
+	anVec3 temp;
 	int count = splinePoints.Num();
 	for ( int i = 1; i < count; i++ ) {
 		temp = *splinePoints[i-1];
@@ -477,10 +477,10 @@ float idSplineList::totalDistance() {
 
 /*
 ================
-idSplineList::initPosition
+anSplineList::initPosition
 ================
 */
-void idSplineList::initPosition(long bt, long totalTime) {
+void anSplineList::initPosition(long bt, long totalTime) {
 	if ( dirty ) {
 		buildSpline();
 	}
@@ -497,7 +497,7 @@ void idSplineList::initPosition(long bt, long totalTime) {
 	splineTime.Append(bt);
 	double dist = totalDistance();
 	double distSoFar = 0.0;
-	arcVec3 temp;
+	anVec3 temp;
 	int count = splinePoints.Num();
 	//for ( int i = 2; i < count - 1; i++ ) {
 	for ( int i = 1; i < count; i++ ) {
@@ -514,11 +514,11 @@ void idSplineList::initPosition(long bt, long totalTime) {
 
 /*
 ================
-idSplineList::CalcSpline
+anSplineList::CalcSpline
 ================
 */
-float idSplineList::CalcSpline( int step, float tension) {
-	switch(step) {
+float anSplineList::CalcSpline( int step, float tension) {
+	switch (step) {
 		case 0:	return (pow(1 - tension, 3) ) / 6;
 		case 1:	return (3 * pow(tension, 3) - 6 * pow(tension, 2) + 4) / 6;
 		case 2:	return (-3 * pow(tension, 3) + 3 * pow(tension, 2) + 3 * tension + 1 ) / 6;
@@ -529,10 +529,10 @@ float idSplineList::CalcSpline( int step, float tension) {
 
 /*
 ================
-idSplineList::UpdateSelection
+anSplineList::UpdateSelection
 ================
 */
-void idSplineList::UpdateSelection(const arcVec3 &move) {
+void anSplineList::UpdateSelection(const anVec3 &move) {
 	if (selected) {
 		dirty = true;
 		VectorAdd(*selected, move, *selected);
@@ -541,10 +541,10 @@ void idSplineList::UpdateSelection(const arcVec3 &move) {
 
 /*
 ================
-idSplineList::SetSelectedPoint
+anSplineList::SetSelectedPoint
 ================
 */
-void idSplineList::SetSelectedPoint(arcVec3 *p) {
+void anSplineList::SetSelectedPoint(anVec3 *p) {
 	if (p) {
 		p->SnapInt();
 		for ( int i = 0; i < controlPoints.Num(); i++ ) {
@@ -553,17 +553,17 @@ void idSplineList::SetSelectedPoint(arcVec3 *p) {
 			}
 		}
 	} else {
-		selected = NULL;
+		selected = nullptr;
 	}
 }
 
 /*
 ================
-idSplineList::GetPosition
+anSplineList::GetPosition
 ================
 */
-const arcVec3 *idSplineList::GetPosition(long t) {
-	static arcVec3 interpolatedPos;
+const anVec3 *anSplineList::GetPosition(long t) {
+	static anVec3 interpolatedPos;
 
 	int count = splineTime.Num();
 	if (count == 0 ) {
@@ -585,7 +585,7 @@ const arcVec3 *idSplineList::GetPosition(long t) {
 	distSoFar += distToTravel;
 	float tempDistance = 0;
 
-	arcVec3 temp;
+	anVec3 temp;
 	int count = splinePoints.Num();
 	//for ( int i = 2; i < count - 1; i++ ) {
 	for ( int i = 1; i < count; i++ ) {
@@ -603,8 +603,8 @@ const arcVec3 *idSplineList::GetPosition(long t) {
 		double timeHi = splineTime[i + 1];
 		double timeLo = splineTime[i - 1];
 		double percent = (timeHi - t) / (timeHi - timeLo);
-		arcVec3 v1 = *splinePoints[i - 1];
-		arcVec3 v2 = *splinePoints[i + 1];
+		anVec3 v1 = *splinePoints[i - 1];
+		anVec3 v2 = *splinePoints[i + 1];
 		v2 *= ( 1.0f - percent );
 		v1 *= percent;
 		v2 += v1;
@@ -620,8 +620,8 @@ const arcVec3 *idSplineList::GetPosition(long t) {
 				//float percent = ( float )(baseTime + time - t) / time;
 				double percent = (timeHi - t) / (timeHi - timeLo);
 				// pick two bounding points
-				arcVec3 v1 = *splinePoints[activeSegment-1];
-				arcVec3 v2 = *splinePoints[activeSegment+1];
+				anVec3 v1 = *splinePoints[activeSegment-1];
+				anVec3 v2 = *splinePoints[activeSegment+1];
 				v2 *= ( 1.0f - percent );
 				v1 *= percent;
 				v2 += v1;
@@ -639,12 +639,12 @@ const arcVec3 *idSplineList::GetPosition(long t) {
 
 /*
 ================
-idSplineList::parse
+anSplineList::parse
 ================
 */
-void idSplineList::Parse( ARCParser *src ) {
-	arcNetToken token;
-	arcNetString key;
+void anSplineList::Parse( anParser *src ) {
+	anToken token;
+	anString key;
 
 	src->ExpectTokenString( "{" );
 
@@ -659,7 +659,7 @@ void idSplineList::Parse( ARCParser *src ) {
 		if ( token == "( " ) {
 			src->UnreadToken( &token );
 			// read the control point
-			arcVec3 point;
+			anVec3 point;
 			src->Parse1DMatrix( 3, point.ToFloatPtr() );
 			addPoint(point.x, point.y, point.z);
 		} else {
@@ -680,10 +680,10 @@ void idSplineList::Parse( ARCParser *src ) {
 
 /*
 ================
-idSplineList::write
+anSplineList::write
 ================
 */
-void idSplineList::write( arcNetFile *f, const char *p) {
+void anSplineList::write( anFile *f, const char *p) {
 	f->Printf( "\t\t%s {\n", p );
 
 	//f->Printf( "\t\tname %s\n", name.c_str() );
@@ -724,7 +724,7 @@ void aRCCameraDef::clear() {
 		delete events[i];
 	}
 	delete cameraPosition;
-	cameraPosition = NULL;
+	cameraPosition = nullptr;
 	events.Clear();
 	targetPositions.Clear();
 }
@@ -752,7 +752,7 @@ aRCCameraDef::addTarget
 ================
 */
 void aRCCameraDef::addTarget(const char *name, ARCCameraPos::positionType type) {
-	const char *text = (name == NULL) ? va( "target0%d", numTargets()+1 ) : name;
+	const char *text = (name == nullptr ) ? va( "target0%d", numTargets()+1 ) : name;
 	ARCCameraPos *pos = newFromType(type);
 	if ( pos ) {
 		pos->setName( name );
@@ -772,7 +772,7 @@ aRCCameraDef::getActiveTarget
 */
 ARCCameraPos *aRCCameraDef::getActiveTarget() {
 	if (targetPositions.Num() == 0 ) {
-		addTarget(NULL, ARCCameraPos::FIXED);
+		addTarget(nullptr, ARCCameraPos::FIXED);
 	}
 	return targetPositions[activeTarget];
 }
@@ -784,7 +784,7 @@ aRCCameraDef::getActiveTarget
 */
 ARCCameraPos *aRCCameraDef::getActiveTarget( int index ) {
 	if (targetPositions.Num() == 0 ) {
-		addTarget(NULL, ARCCameraPos::FIXED);
+		addTarget(nullptr, ARCCameraPos::FIXED);
 		return targetPositions[0];
 	}
 	return targetPositions[index];
@@ -797,7 +797,7 @@ aRCCameraDef::setActiveTargetByName
 */
 void aRCCameraDef::setActiveTargetByName( const char *name ) {
 	for ( int i = 0; i < targetPositions.Num(); i++ ) {
-		if (arcNetString::Icmp(name, targetPositions[i]->getName() ) == 0 ) {
+		if (anString::Icmp(name, targetPositions[i]->getName() ) == 0 ) {
 			setActiveTarget( i );
 			return;
 		}
@@ -848,7 +848,7 @@ int aRCCameraDef::numPoints() {
 aRCCameraDef::getPoint
 ================
 */
-const arcVec3 *aRCCameraDef::getPoint( int index ) {
+const anVec3 *aRCCameraDef::getPoint( int index ) {
 	if ( camEdit ) {
 		return cameraPosition->getPoint( index );
 	}
@@ -894,7 +894,7 @@ aRCCameraDef::getPositionObj
 ================
 */
 ARCCameraPos *aRCCameraDef::getPositionObj() {
-	if (cameraPosition == NULL) {
+	if (cameraPosition == nullptr ) {
 		cameraPosition = new ARCFixedPos();
 	}
 	return cameraPosition;
@@ -905,7 +905,7 @@ ARCCameraPos *aRCCameraDef::getPositionObj() {
 aRCCameraDef::getActiveSegmentInfo
 ================
 */
-void aRCCameraDef::getActiveSegmentInfo( int segment, arcVec3 &origin, arcVec3 &direction, float *fov) {
+void aRCCameraDef::getActiveSegmentInfo( int segment, anVec3 &origin, anVec3 &direction, float *fov) {
 #if 0
 	if ( !camSpline.validTime() ) {
 		buildCamera();
@@ -920,7 +920,7 @@ void aRCCameraDef::getActiveSegmentInfo( int segment, arcVec3 &origin, arcVec3 &
 	origin = *camSpline.getSegmentPoint(segment);
 
 
-	arcVec3 temp;
+	anVec3 temp;
 
 	int numTargets = getTargetSpline()->controlPoints.Num();
 	int count = camSpline.splineTime.Num();
@@ -946,7 +946,7 @@ void aRCCameraDef::getActiveSegmentInfo( int segment, arcVec3 &origin, arcVec3 &
 aRCCameraDef::getCameraInfo
 ================
 */
-bool aRCCameraDef::getCameraInfo(long time, arcVec3 &origin, arcVec3 &direction, float *fv) {
+bool aRCCameraDef::getCameraInfo(long time, anVec3 &origin, anVec3 &direction, float *fv) {
 	char	buff[ 1024 ];
 	int		i;
 
@@ -973,7 +973,7 @@ bool aRCCameraDef::getCameraInfo(long time, arcVec3 &origin, arcVec3 &direction,
 					memset(buff, 0, sizeof(buff) );
 					strcpy(buff, events[i]->getParam() );
 					const char *param1 = strtok(buff, " \t,\0" );
-					const char *param2 = strtok(NULL, " \t,\0" );
+					const char *param2 = strtok(nullptr, " \t,\0" );
 					fov.reset(fov.GetFOV( time ), atof(param1), time, atoi(param2) );
 					//*fv = fov = atof(events[i]->getParam() );
 				} else if (events[i]->getType() == aRCCameraEvent::EVENT_CAMERA) {
@@ -989,7 +989,7 @@ bool aRCCameraDef::getCameraInfo(long time, arcVec3 &origin, arcVec3 &direction,
 
 	*fv = fov.GetFOV( time );
 
-	arcVec3 temp = origin;
+	anVec3 temp = origin;
 
 	int numTargets = targetPositions.Num();
 	if (numTargets == 0 ) {
@@ -1039,8 +1039,8 @@ aRCCameraDef::buildCamera
 void aRCCameraDef::buildCamera() {
 	int i;
 	int lastSwitch = 0;
-	arcNetList<float> waits;
-	arcNetList<int> targets;
+	anList<float> waits;
+	anList<int> targets;
 
 	totalTime = baseTime;
 	cameraPosition->setTime(totalTime * 1000);
@@ -1083,7 +1083,7 @@ void aRCCameraDef::buildCamera() {
 
 			}
 			case aRCCameraEvent::EVENT_WAIT : {
-				waits.Append(atof(events[i]->getParam() ));
+				waits.Append(atof(events[i]->getParam() ) );
 
 				//FIXME: this is quite hacky for Wolf E3, accel and decel needs
 				// do be parameter based etc..
@@ -1124,7 +1124,7 @@ void aRCCameraDef::buildCamera() {
 				count = 0;
 
 				// get total amount of time over the remainder of the segment
-				for (j = index; j < camSpline.numSegments() - 1; j++ ) {
+				for ( j = index; j < camSpline.numSegments() - 1; j++ ) {
 					total += camSpline.getSegmentTime(j + 1 ) - camSpline.getSegmentTime(j);
 					count++;
 				}
@@ -1140,7 +1140,7 @@ void aRCCameraDef::buildCamera() {
 				int additive = newTotal;
 
 				// now propogate that difference out to each segment
-				for (j = index; j < camSpline.numSegments(); j++ ) {
+				for ( j = index; j < camSpline.numSegments(); j++ ) {
 					camSpline.addSegmentTime(j, additive);
 					additive += newTotal;
 				}
@@ -1194,10 +1194,10 @@ void aRCCameraDef::startCamera(long t) {
 aRCCameraDef::parse
 ================
 */
-void aRCCameraDef::Parse( ARCParser *src  ) {
-	arcNetToken token;
+void aRCCameraDef::Parse( anParser *src  ) {
+	anToken token;
 
-	src->ReadToken(&token);
+	src->ReadToken( &token );
 	src->ExpectTokenString( "{" );
 	while ( 1 ) {
 		src->ExpectAnyToken( &token );
@@ -1251,9 +1251,9 @@ aRCCameraDef::load
 ================
 */
 bool aRCCameraDef::load( const char *filename ) {
-	ARCParser *src;
+	anParser *src;
 
-	src = new ARCParser( filename, LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
+	src = new anParser( filename, LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 	if ( !src->IsLoaded() ) {
 		common->Printf( "couldn't load %s\n", filename );
 		delete src;
@@ -1274,7 +1274,7 @@ aRCCameraDef::save
 ================
 */
 void aRCCameraDef::save(const char *filename) {
-	arcNetFile *f = fileSystem->OpenFileWrite( filename, "fs_devpath" );
+	anFile *f = fileSystem->OpenFileWrite( filename, "fs_devpath" );
 	if ( f ) {
 		int i;
 		f->Printf( "cameraPathDef { \n" );
@@ -1347,7 +1347,7 @@ ARCCameraPos *aRCCameraDef::newFromType( ARCCameraPos::positionType t ) {
 		case ARCCameraPos::INTERPOLATED : return new idInterpolatedPosition();
 		case ARCCameraPos::SPLINE : return new ARCSplinePos();
 	};
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1385,9 +1385,9 @@ const char *aRCCameraEvent::eventStr[] = {
 aRCCameraEvent::parse
 ================
 */
-void aRCCameraEvent::Parse( ARCParser *src ) {
-	arcNetToken token;
-	arcNetString key;
+void aRCCameraEvent::Parse( anParser *src ) {
+	anToken token;
+	anString key;
 
 	src->ExpectTokenString( "{" );
 
@@ -1403,7 +1403,7 @@ void aRCCameraEvent::Parse( ARCParser *src ) {
 		key = token;
 		src->ReadTokenOnLine( &token );
 		if ( !key.Icmp( "type" ) ) {
-			type = static_cast<aRCCameraEvent::eventType>(atoi(token.c_str() ));
+			type = static_cast<aRCCameraEvent::eventType>(atoi(token.c_str() ) );
 		}
 		else if ( !key.Icmp( "param" ) ) {
 			paramStr = token;
@@ -1423,7 +1423,7 @@ void aRCCameraEvent::Parse( ARCParser *src ) {
 aRCCameraEvent::write
 ================
 */
-void aRCCameraEvent::write( arcNetFile *f, const char *name) {
+void aRCCameraEvent::write( anFile *f, const char *name) {
 	f->Printf( "\t%s {\n", name );
 	f->Printf( "\t\ttype %d\n", static_cast<int>(type) );
 	f->Printf( "\t\tparam \"%s\"\n", paramStr.c_str() );
@@ -1458,7 +1458,7 @@ ARCCameraPos::positionStr
 void ARCCameraPos::clearVelocities() {
 	for ( int i = 0; i < velocities.Num(); i++ ) {
 		delete velocities[i];
-		velocities[i] = NULL;
+		velocities[i] = nullptr;
 	}
 	velocities.Clear();
 }
@@ -1483,8 +1483,8 @@ float ARCCameraPos::getVelocity( long t ) {
 ARCCameraPos::parseToken
 ================
 */
-bool ARCCameraPos::parseToken( const arcNetString &key, ARCParser *src ) {
-	arcNetToken token;
+bool ARCCameraPos::parseToken( const anString &key, anParser *src ) {
+	anToken token;
 
 	if ( !key.Icmp( "time" ) ) {
 		time = src->ParseInt();
@@ -1519,7 +1519,7 @@ bool ARCCameraPos::parseToken( const arcNetString &key, ARCParser *src ) {
 ARCCameraPos::write
 ================
 */
-void ARCCameraPos::write( arcNetFile *f, const char *p ) {
+void ARCCameraPos::write( anFile *f, const char *p ) {
 	f->Printf( "\t\ttime %i\n", time );
 	f->Printf( "\t\ttype %i\n", static_cast<int>(type) );
 	f->Printf( "\t\tname %s\n", name.c_str() );
@@ -1542,7 +1542,7 @@ idInterpolatedPosition
 idInterpolatedPosition::getPoint
 ================
 */
-arcVec3 *idInterpolatedPosition::getPoint( int index ) {
+anVec3 *idInterpolatedPosition::getPoint( int index ) {
 	assert( index >= 0 && index < 2 );
 	if ( index == 0 ) {
 		return &startPos;
@@ -1570,7 +1570,7 @@ void idInterpolatedPosition::addPoint( const float x, const float y, const float
 idInterpolatedPosition::addPoint
 ================
 */
-void idInterpolatedPosition::addPoint( const arcVec3 &v ) {
+void idInterpolatedPosition::addPoint( const anVec3 &v ) {
 	if (first) {
 		startPos = v;
 		first = false;
@@ -1603,7 +1603,7 @@ void idInterpolatedPosition::start( long t ) {
 	ARCCameraPos::start(t);
 	lastTime = startTime;
 	distSoFar = 0.0f;
-	arcVec3 temp = startPos;
+	anVec3 temp = startPos;
 	temp -= endPos;
 	calcVelocity(temp.Length() );
 }
@@ -1613,8 +1613,8 @@ void idInterpolatedPosition::start( long t ) {
 idInterpolatedPosition::GetPosition
 ================
 */
-const arcVec3 *idInterpolatedPosition::GetPosition( long t ) {
-	static arcVec3 interpolatedPos;
+const anVec3 *idInterpolatedPosition::GetPosition( long t ) {
+	static anVec3 interpolatedPos;
 
 	if (t - startTime > 6000) {
 		int i = 0;
@@ -1633,7 +1633,7 @@ const arcVec3 *idInterpolatedPosition::GetPosition( long t ) {
 
 	float distToTravel = timePassed * velocity;
 
-	arcVec3 temp = startPos;
+	anVec3 temp = startPos;
 	temp -= endPos;
 	float distance = temp.Length();
 
@@ -1649,8 +1649,8 @@ const arcVec3 *idInterpolatedPosition::GetPosition( long t ) {
 	// the following line does a straigt calc on percentage of time
 	// float percent = ( float )(startTime + time - t) / time;
 
-	arcVec3 v1 = startPos;
-	arcVec3 v2 = endPos;
+	anVec3 v1 = startPos;
+	anVec3 v2 = endPos;
 	v1 *= ( 1.0f - percent );
 	v2 *= percent;
 	v1 += v2;
@@ -1663,8 +1663,8 @@ const arcVec3 *idInterpolatedPosition::GetPosition( long t ) {
 idInterpolatedPosition::parse
 ================
 */
-void idInterpolatedPosition::Parse( ARCParser *src ) {
-	arcNetToken token;
+void idInterpolatedPosition::Parse( anParser *src ) {
+	anToken token;
 
 	src->ExpectTokenString( "{" );
 	while ( 1 ) {
@@ -1690,7 +1690,7 @@ void idInterpolatedPosition::Parse( ARCParser *src ) {
 idInterpolatedPosition::write
 ================
 */
-void idInterpolatedPosition::write( arcNetFile *f, const char *p ) {
+void idInterpolatedPosition::write( anFile *f, const char *p ) {
 	f->Printf( "\t%s {\n", p );
 	ARCCameraPos::write( f, p );
 	f->Printf( "\t\tstartPos ( %f %f %f )\n", startPos.x, startPos.y, startPos.z );
@@ -1744,8 +1744,8 @@ void ARCCamFOV::reset( float startfov, float endfov, int start, int len ) {
 ARCCamFOV::parse
 ================
 */
-void ARCCamFOV::Parse( ARCParser *src ) {
-	arcNetToken token;
+void ARCCamFOV::Parse( anParser *src ) {
+	anToken token;
 
 	src->ExpectTokenString( "{" );
 	while ( 1 ) {
@@ -1776,7 +1776,7 @@ void ARCCamFOV::Parse( ARCParser *src ) {
 ARCCamFOV::write
 ================
 */
-void ARCCamFOV::write( arcNetFile *f, const char *p ) {
+void ARCCamFOV::write( anFile *f, const char *p ) {
 	f->Printf( "\t%s {\n", p );
 	f->Printf( "\t\tfov %f\n", fov );
 	f->Printf( "\t\tstartFOV %f\n", startFOV );
@@ -1798,8 +1798,8 @@ ARCFixedPos
 ARCFixedPos::parse
 ================
 */
-void ARCFixedPos::Parse( ARCParser *src ) {
-	arcNetToken token;
+void ARCFixedPos::Parse( anParser *src ) {
+	anToken token;
 
 	src->ExpectTokenString( "{" );
 	while ( 1 ) {
@@ -1822,7 +1822,7 @@ void ARCFixedPos::Parse( ARCParser *src ) {
 ARCFixedPos::write
 ================
 */
-void ARCFixedPos::write( arcNetFile *f, const char *p ) {
+void ARCFixedPos::write( anFile *f, const char *p ) {
 	f->Printf( "\t%s {\n", p );
 	ARCCameraPos::write( f, p );
 	f->Printf( "\t\tpos ( %f %f %f )\n", pos.x, pos.y, pos.z );
@@ -1855,8 +1855,8 @@ void ARCSplinePos::start( long t ) {
 ARCSplinePos::parse
 ================
 */
-void ARCSplinePos::Parse( ARCParser *src ) {
-	arcNetToken token;
+void ARCSplinePos::Parse( anParser *src ) {
+	anToken token;
 
 	src->ExpectTokenString( "{" );
 	while ( 1 ) {
@@ -1879,7 +1879,7 @@ void ARCSplinePos::Parse( ARCParser *src ) {
 ARCSplinePos::write
 ================
 */
-void ARCSplinePos::write( arcNetFile *f, const char *p ) {
+void ARCSplinePos::write( anFile *f, const char *p ) {
 	f->Printf( "\t%s {\n", p );
 	ARCCameraPos::write( f, p );
 	target.write( f, "target" );
@@ -1891,8 +1891,8 @@ void ARCSplinePos::write( arcNetFile *f, const char *p ) {
 ARCSplinePos::GetPosition
 ================
 */
-const arcVec3 *ARCSplinePos::GetPosition(long t) {
-	static arcVec3 interpolatedPos;
+const anVec3 *ARCSplinePos::GetPosition(long t) {
+	static anVec3 interpolatedPos;
 
 	float velocity = getVelocity(t);
 	float timePassed = t - lastTime;
@@ -1914,7 +1914,7 @@ const arcVec3 *ARCSplinePos::GetPosition(long t) {
 	double lastDistance1,lastDistance2;
 	lastDistance1 = lastDistance2 = 0;
 	//FIXME: calc distances on spline build
-	arcVec3 temp;
+	anVec3 temp;
 	int count = target.numSegments();
 	//for ( int i = 2; i < count - 1; i++ ) {
 	int i;
@@ -1939,8 +1939,8 @@ const arcVec3 *ARCSplinePos::GetPosition(long t) {
 		double timeHi = target.getSegmentTime( i + 1 );
 		double timeLo = target.getSegmentTime( i - 1 );
 		double percent = (timeHi - t) / (timeHi - timeLo);
-		arcVec3 v1 = *target.getSegmentPoint( i - 1 );
-		arcVec3 v2 = *target.getSegmentPoint( i + 1 );
+		anVec3 v1 = *target.getSegmentPoint( i - 1 );
+		anVec3 v2 = *target.getSegmentPoint( i + 1 );
 		v2 *= ( 1.0f - percent );
 		v1 *= percent;
 		v2 += v1;
@@ -1952,8 +1952,8 @@ const arcVec3 *ARCSplinePos::GetPosition(long t) {
 			lastDistance1 = d;
 		}
 
-		arcVec3 v1 = *target.getSegmentPoint( i - 1 );
-		arcVec3 v2 = *target.getSegmentPoint( i );
+		anVec3 v1 = *target.getSegmentPoint( i - 1 );
+		anVec3 v2 = *target.getSegmentPoint( i );
 		double percent = (lastDistance2 - targetDistance) / (lastDistance2 - lastDistance1);
 		v2 *= ( 1.0f - percent );
 		v1 *= percent;

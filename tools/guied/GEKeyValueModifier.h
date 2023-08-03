@@ -46,9 +46,9 @@ public:
 
 protected:
 
-	arcNetString		mKey;
-	arcNetString		mValue;
-	arcNetString		mUndoValue;
+	anString		mKey;
+	anString		mValue;
+	anString		mUndoValue;
 };
 
 ARC_INLINE bool rvGEKeyValueModifier::CanMerge ( rvGEModifier* merge )

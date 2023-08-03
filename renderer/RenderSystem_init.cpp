@@ -1,4 +1,5 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
+#include <X11/Xlib.h>
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -14,187 +15,187 @@ qglConfig_t	qglConfig;
 
 static void GfxInfo_f( void );
 
-const char *r_rendererArgs[] = { "best", "arb", "arb2", "Cg", "exp", "nv10", "nv20", "r200", NULL };
+const char *r_rendererArgs[] = { "best", "arb", "arb2", "Cg", "exp", "nv10", "nv20", "r200", nullptr };
 
-arcCVarSystem r_inhibitFragmentProgram( "r_inhibitFragmentProgram", "0", CVAR_RENDERER | CVAR_BOOL, "ignore the fragment program extension" );
-arcCVarSystem r_glDriver( "r_glDriver", "", CVAR_RENDERER, "\"opengl32\", etc." );
-arcCVarSystem r_useLightPortalFlow( "r_useLightPortalFlow", "1", CVAR_RENDERER | CVAR_BOOL, "use a more precise area reference determination" );
-arcCVarSystem r_multiSamples( "r_multiSamples", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "number of antialiasing samples" );
-arcCVarSystem r_mode( "r_mode", "3", CVAR_ARCHIVE | CVAR_RENDERER | CVAR_INTEGER, "video mode number" );
-arcCVarSystem r_displayRefresh( "r_displayRefresh", "0", CVAR_RENDERER | CVAR_INTEGER | CVAR_NOCHEAT, "optional display refresh rate option for vid mode", 0.0f, 200.0f );
-arcCVarSystem r_fullscreen( "r_fullscreen", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "0 = windowed, 1 = full screen" );
-//arcCVarSystem r_customWidth( "r_customWidth", "720", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen width. set r_mode to -1 to activate" );
-arcCVarSystem r_customWidth( "r_customWidth", "640", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen width. set r_mode to -1 to activate" );
-arcCVarSystem r_customHeight( "r_customHeight", "480", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen height. set r_mode to -1 to activate" );
-arcCVarSystem r_singleTriangle( "r_singleTriangle", "0", CVAR_RENDERER | CVAR_BOOL, "only draw a single triangle per primitive" );
-arcCVarSystem r_checkBounds( "r_checkBounds", "0", CVAR_RENDERER | CVAR_BOOL, "compare all surface bounds with precalculated ones" );
-//arcCVarSystem r_clearScreen( "r_clearScreen", "0", CVAR_RENDERER | CVAR_INTEGER, "clears the rendered screen" );
-arcCVarSystem r_logFile( "r_logFile", "0", CVAR_RENDERER | CVAR_INTEGER, "number of frames to emit GL logs" );
-arcCVarSystem r_clear( "r_clear", "2", CVAR_RENDERER, "force screen clear every frame, 1 = purple, 2 = black, 'r g b' = custom" );
+anCVarSystem r_inhibitFragmentProgram( "r_inhibitFragmentProgram", "0", CVAR_RENDERER | CVAR_BOOL, "ignore the fragment program extension" );
+anCVarSystem r_glDriver( "r_glDriver", "", CVAR_RENDERER, "\"opengl32\", etc." );
+anCVarSystem r_useLightPortalFlow( "r_useLightPortalFlow", "1", CVAR_RENDERER | CVAR_BOOL, "use a more precise area reference determination" );
+anCVarSystem r_multiSamples( "r_multiSamples", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "number of antialiasing samples" );
+anCVarSystem r_mode( "r_mode", "3", CVAR_ARCHIVE | CVAR_RENDERER | CVAR_INTEGER, "video mode number" );
+anCVarSystem r_displayRefresh( "r_displayRefresh", "0", CVAR_RENDERER | CVAR_INTEGER | CVAR_NOCHEAT, "optional display refresh rate option for vid mode", 0.0f, 200.0f );
+anCVarSystem r_fullscreen( "r_fullscreen", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "0 = windowed, 1 = full screen" );
+//anCVarSystem r_customWidth( "r_customWidth", "720", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen width. set r_mode to -1 to activate" );
+anCVarSystem r_customWidth( "r_customWidth", "640", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen width. set r_mode to -1 to activate" );
+anCVarSystem r_customHeight( "r_customHeight", "480", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen height. set r_mode to -1 to activate" );
+anCVarSystem r_singleTriangle( "r_singleTriangle", "0", CVAR_RENDERER | CVAR_BOOL, "only draw a single triangle per primitive" );
+anCVarSystem r_checkBounds( "r_checkBounds", "0", CVAR_RENDERER | CVAR_BOOL, "compare all surface bounds with precalculated ones" );
+//anCVarSystem r_clearScreen( "r_clearScreen", "0", CVAR_RENDERER | CVAR_INTEGER, "clears the rendered screen" );
+anCVarSystem r_logFile( "r_logFile", "0", CVAR_RENDERER | CVAR_INTEGER, "number of frames to emit GL logs" );
+anCVarSystem r_clear( "r_clear", "2", CVAR_RENDERER, "force screen clear every frame, 1 = purple, 2 = black, 'r g b' = custom" );
 
-arcCVarSystem r_useNV20MonoLights( "r_useNV20MonoLights", "1", CVAR_RENDERER | CVAR_INTEGER, "use pass optimization for mono lights" );
-arcCVarSystem r_useConstantMaterials( "r_useConstantMaterials", "1", CVAR_RENDERER | CVAR_BOOL, "use pre-calculated material registers if possible" );
-arcCVarSystem r_useTripleTextureARB( "r_useTripleTextureARB", "1", CVAR_RENDERER | CVAR_BOOL, "cards with 3+ texture units do a two pass instead of three pass" );
-arcCVarSystem r_useSilRemap( "r_useSilRemap", "1", CVAR_RENDERER | CVAR_BOOL, "consider verts with the same XYZ, but different ST the same for shadows" );
-arcCVarSystem r_useNodeCommonChildren( "r_useNodeCommonChildren", "1", CVAR_RENDERER | CVAR_BOOL, "stop pushing reference bounds early when possible" );
-arcCVarSystem r_useShadowProjectedCull( "r_useShadowProjectedCull", "1", CVAR_RENDERER | CVAR_BOOL, "discard triangles outside light volume before shadowing" );
-arcCVarSystem r_useShadowVertexProgram( "r_useShadowVertexProgram", "1", CVAR_RENDERER | CVAR_BOOL, "do the shadow projection in the vertex program on capable cards" );
-arcCVarSystem r_useShadowSurfaceScissor( "r_useShadowSurfaceScissor", "1", CVAR_RENDERER | CVAR_BOOL, "scissor shadows by the scissor rect of the interaction surfaces" );
-arcCVarSystem r_useInteractionTable( "r_useInteractionTable", "1", CVAR_RENDERER | CVAR_BOOL, "create a full entityDefs * lightDefs table to make finding interactions faster" );
-arcCVarSystem r_useTurboShadow( "r_useTurboShadow", "1", CVAR_RENDERER | CVAR_BOOL, "use the infinite projection with W technique for dynamic shadows" );
-arcCVarSystem r_useTwoSidedStencil( "r_useTwoSidedStencil", "1", CVAR_RENDERER | CVAR_BOOL, "do stencil shadows in one pass with different ops on each side" );
-arcCVarSystem r_useDeferredTangents( "r_useDeferredTangents", "1", CVAR_RENDERER | CVAR_BOOL, "defer tangents calculations after deform" );
-arcCVarSystem r_useCachedDynamicModels( "r_useCachedDynamicModels", "1", CVAR_RENDERER | CVAR_BOOL, "cache snapshots of dynamic models" );
+anCVarSystem r_useNV20MonoLights( "r_useNV20MonoLights", "1", CVAR_RENDERER | CVAR_INTEGER, "use pass optimization for mono lights" );
+anCVarSystem r_useConstantMaterials( "r_useConstantMaterials", "1", CVAR_RENDERER | CVAR_BOOL, "use pre-calculated material registers if possible" );
+anCVarSystem r_useTripleTextureARB( "r_useTripleTextureARB", "1", CVAR_RENDERER | CVAR_BOOL, "cards with 3+ texture units do a two pass instead of three pass" );
+anCVarSystem r_useSilRemap( "r_useSilRemap", "1", CVAR_RENDERER | CVAR_BOOL, "consider verts with the same XYZ, but different ST the same for shadows" );
+anCVarSystem r_useNodeCommonChildren( "r_useNodeCommonChildren", "1", CVAR_RENDERER | CVAR_BOOL, "stop pushing reference bounds early when possible" );
+anCVarSystem r_useShadowProjectedCull( "r_useShadowProjectedCull", "1", CVAR_RENDERER | CVAR_BOOL, "discard triangles outside light volume before shadowing" );
+anCVarSystem r_useShadowVertexProgram( "r_useShadowVertexProgram", "1", CVAR_RENDERER | CVAR_BOOL, "do the shadow projection in the vertex program on capable cards" );
+anCVarSystem r_useShadowSurfaceScissor( "r_useShadowSurfaceScissor", "1", CVAR_RENDERER | CVAR_BOOL, "scissor shadows by the scissor rect of the interaction surfaces" );
+anCVarSystem r_useInteractionTable( "r_useInteractionTable", "1", CVAR_RENDERER | CVAR_BOOL, "create a full entityDefs * lightDefs table to make finding interactions faster" );
+anCVarSystem r_useTurboShadow( "r_useTurboShadow", "1", CVAR_RENDERER | CVAR_BOOL, "use the infinite projection with W technique for dynamic shadows" );
+anCVarSystem r_useTwoSidedStencil( "r_useTwoSidedStencil", "1", CVAR_RENDERER | CVAR_BOOL, "do stencil shadows in one pass with different ops on each side" );
+anCVarSystem r_useDeferredTangents( "r_useDeferredTangents", "1", CVAR_RENDERER | CVAR_BOOL, "defer tangents calculations after deform" );
+anCVarSystem r_useCachedDynamicModels( "r_useCachedDynamicModels", "1", CVAR_RENDERER | CVAR_BOOL, "cache snapshots of dynamic models" );
 
-arcCVarSystem r_useVertexBuffers( "r_useVertexBuffers", "1", CVAR_RENDERER | CVAR_INTEGER, "use ARB_vertex_buffer_object for vertexes", 0, 1, arcCmdSystem::ArgCompletion_Integer<0,1>  );
-arcCVarSystem r_useIndexBuffers( "r_useIndexBuffers", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "use ARB_vertex_buffer_object for indexes", 0, 1, arcCmdSystem::ArgCompletion_Integer<0,1>  );
+anCVarSystem r_useVertexBuffers( "r_useVertexBuffers", "1", CVAR_RENDERER | CVAR_INTEGER, "use ARB_vertex_buffer_object for vertexes", 0, 1, arcCmdSystem::ArgCompletion_Integer<0,1>  );
+anCVarSystem r_useIndexBuffers( "r_useIndexBuffers", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "use ARB_vertex_buffer_object for indexes", 0, 1, arcCmdSystem::ArgCompletion_Integer<0,1>  );
 
-arcCVarSystem r_useStateCaching( "r_useStateCaching", "1", CVAR_RENDERER | CVAR_BOOL, "avoid redundant state changes in GL_*() calls" );
-arcCVarSystem r_useInfiniteFarZ( "r_useInfiniteFarZ", "1", CVAR_RENDERER | CVAR_BOOL, "use the no-far-clip-plane trick" );
+anCVarSystem r_useStateCaching( "r_useStateCaching", "1", CVAR_RENDERER | CVAR_BOOL, "avoid redundant state changes in GL_*() calls" );
+anCVarSystem r_useInfiniteFarZ( "r_useInfiniteFarZ", "1", CVAR_RENDERER | CVAR_BOOL, "use the no-far-clip-plane trick" );
 
-arcCVarSystem r_znear( "r_znear", "3", CVAR_RENDERER | CVAR_FLOAT, "near Z clip plane distance", 0.001f, 200.0f );
+anCVarSystem r_znear( "r_znear", "3", CVAR_RENDERER | CVAR_FLOAT, "near Z clip plane distance", 0.001f, 200.0f );
 
-arcCVarSystem r_ignoreGLErrors( "r_ignoreGLErrors", "1", CVAR_RENDERER | CVAR_BOOL, "ignore GL errors" );
-arcCVarSystem r_finish( "r_finish", "0", CVAR_RENDERER | CVAR_BOOL, "force a call to glFinish() every frame" );
-arcCVarSystem r_swapInterval( "r_swapInterval", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "changes wglSwapIntarval" );
+anCVarSystem r_ignoreGLErrors( "r_ignoreGLErrors", "1", CVAR_RENDERER | CVAR_BOOL, "ignore GL errors" );
+anCVarSystem r_finish( "r_finish", "0", CVAR_RENDERER | CVAR_BOOL, "force a call to glFinish() every frame" );
+anCVarSystem r_swapInterval( "r_swapInterval", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "changes wglSwapIntarval" );
 
-arcCVarSystem r_gamma( "r_gamma", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "changes gamma tables", 0.5f, 3.0f );
-arcCVarSystem r_brightness( "r_brightness", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "changes gamma tables", 0.5f, 2.0f );
+anCVarSystem r_gamma( "r_gamma", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "changes gamma tables", 0.5f, 3.0f );
+anCVarSystem r_brightness( "r_brightness", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "changes gamma tables", 0.5f, 2.0f );
 
-arcCVarSystem r_renderer( "r_renderer", "best", CVAR_RENDERER | CVAR_ARCHIVE, "hardware specific renderer path to use", r_rendererArgs, arcCmdSystem::ArgCompletion_String<r_rendererArgs> );
+anCVarSystem r_renderer( "r_renderer", "best", CVAR_RENDERER | CVAR_ARCHIVE, "hardware specific renderer path to use", r_rendererArgs, arcCmdSystem::ArgCompletion_String<r_rendererArgs> );
 
-arcCVarSystem r_jitter( "r_jitter", "0", CVAR_RENDERER | CVAR_BOOL, "randomly subpixel jitter the projection matrix" );
+anCVarSystem r_jitter( "r_jitter", "0", CVAR_RENDERER | CVAR_BOOL, "randomly subpixel jitter the projection matrix" );
 
-arcCVarSystem r_skipSuppress( "r_skipSuppress", "0", CVAR_RENDERER | CVAR_BOOL, "ignore the per-view suppressions" );
-arcCVarSystem r_skipPostProcess( "r_skipPostProcess", "0", CVAR_RENDERER | CVAR_BOOL, "skip all post-process renderings" );
-arcCVarSystem r_skipLightScale( "r_skipLightScale", "0", CVAR_RENDERER | CVAR_BOOL, "don't do any post-interaction light scaling, makes things dim on low-dynamic range cards" );
-arcCVarSystem r_skipInteractions( "r_skipInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "skip all light/surface interaction drawing" );
-arcCVarSystem r_skipDynamicTextures( "r_skipDynamicTextures", "0", CVAR_RENDERER | CVAR_BOOL, "don't dynamically create textures" );
-arcCVarSystem r_skipCopyTexture( "r_skipCopyTexture", "0", CVAR_RENDERER | CVAR_BOOL, "do all rendering, but don't actually copyTexSubImage2D" );
-arcCVarSystem r_skipBackEnd( "r_skipBackEnd", "0", CVAR_RENDERER | CVAR_BOOL, "don't draw anything" );
-arcCVarSystem r_skipRender( "r_skipRender", "0", CVAR_RENDERER | CVAR_BOOL, "skip 3D rendering, but pass 2D" );
-arcCVarSystem r_skipRenderContext( "r_skipRenderContext", "0", CVAR_RENDERER | CVAR_BOOL, "NULL the rendering context during backend 3D rendering" );
-arcCVarSystem r_skipTranslucent( "r_skipTranslucent", "0", CVAR_RENDERER | CVAR_BOOL, "skip the translucent interaction rendering" );
-arcCVarSystem r_skipAmbient( "r_skipAmbient", "0", CVAR_RENDERER | CVAR_BOOL, "bypasses all non-interaction drawing" );
-arcCVarSystem r_skipNewAmbient( "r_skipNewAmbient", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "bypasses all vertex/fragment program ambient drawing" );
-arcCVarSystem r_skipBlendLights( "r_skipBlendLights", "0", CVAR_RENDERER | CVAR_BOOL, "skip all blend lights" );
-arcCVarSystem r_skipFogLights( "r_skipFogLights", "0", CVAR_RENDERER | CVAR_BOOL, "skip all fog lights" );
-arcCVarSystem r_skipDeforms( "r_skipDeforms", "0", CVAR_RENDERER | CVAR_BOOL, "leave all deform materials in their original state" );
-arcCVarSystem r_skipFrontEnd( "r_skipFrontEnd", "0", CVAR_RENDERER | CVAR_BOOL, "bypasses all front end work, but 2D gui rendering still draws" );
-arcCVarSystem r_skipUpdates( "r_skipUpdates", "0", CVAR_RENDERER | CVAR_BOOL, "1 = don't accept any entity or light updates, making everything static" );
-arcCVarSystem r_skipOverlays( "r_skipOverlays", "0", CVAR_RENDERER | CVAR_BOOL, "skip overlay surfaces" );
-arcCVarSystem r_skipSpecular( "r_skipSpecular", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_CHEAT | CVAR_ARCHIVE, "use black for specular1" );
-arcCVarSystem r_skipBump( "r_skipBump", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "uses a flat surface instead of the bump map" );
-arcCVarSystem r_skipDiffuse( "r_skipDiffuse", "0", CVAR_RENDERER | CVAR_BOOL, "use black for diffuse" );
-arcCVarSystem r_skipROQ( "r_skipROQ", "0", CVAR_RENDERER | CVAR_BOOL, "skip ROQ decoding" );
+anCVarSystem r_skipSuppress( "r_skipSuppress", "0", CVAR_RENDERER | CVAR_BOOL, "ignore the per-view suppressions" );
+anCVarSystem r_skipPostProcess( "r_skipPostProcess", "0", CVAR_RENDERER | CVAR_BOOL, "skip all post-process renderings" );
+anCVarSystem r_skipLightScale( "r_skipLightScale", "0", CVAR_RENDERER | CVAR_BOOL, "don't do any post-interaction light scaling, makes things dim on low-dynamic range cards" );
+anCVarSystem r_skipInteractions( "r_skipInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "skip all light/surface interaction drawing" );
+anCVarSystem r_skipDynamicTextures( "r_skipDynamicTextures", "0", CVAR_RENDERER | CVAR_BOOL, "don't dynamically create textures" );
+anCVarSystem r_skipCopyTexture( "r_skipCopyTexture", "0", CVAR_RENDERER | CVAR_BOOL, "do all rendering, but don't actually copyTexSubImage2D" );
+anCVarSystem r_skipBackEnd( "r_skipBackEnd", "0", CVAR_RENDERER | CVAR_BOOL, "don't draw anything" );
+anCVarSystem r_skipRender( "r_skipRender", "0", CVAR_RENDERER | CVAR_BOOL, "skip 3D rendering, but pass 2D" );
+anCVarSystem r_skipRenderContext( "r_skipRenderContext", "0", CVAR_RENDERER | CVAR_BOOL, "nullptr the rendering context during backend 3D rendering" );
+anCVarSystem r_skipTranslucent( "r_skipTranslucent", "0", CVAR_RENDERER | CVAR_BOOL, "skip the translucent interaction rendering" );
+anCVarSystem r_skipAmbient( "r_skipAmbient", "0", CVAR_RENDERER | CVAR_BOOL, "bypasses all non-interaction drawing" );
+anCVarSystem r_skipNewAmbient( "r_skipNewAmbient", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "bypasses all vertex/fragment program ambient drawing" );
+anCVarSystem r_skipBlendLights( "r_skipBlendLights", "0", CVAR_RENDERER | CVAR_BOOL, "skip all blend lights" );
+anCVarSystem r_skipFogLights( "r_skipFogLights", "0", CVAR_RENDERER | CVAR_BOOL, "skip all fog lights" );
+anCVarSystem r_skipDeforms( "r_skipDeforms", "0", CVAR_RENDERER | CVAR_BOOL, "leave all deform materials in their original state" );
+anCVarSystem r_skipFrontEnd( "r_skipFrontEnd", "0", CVAR_RENDERER | CVAR_BOOL, "bypasses all front end work, but 2D gui rendering still draws" );
+anCVarSystem r_skipUpdates( "r_skipUpdates", "0", CVAR_RENDERER | CVAR_BOOL, "1 = don't accept any entity or light updates, making everything static" );
+anCVarSystem r_skipOverlays( "r_skipOverlays", "0", CVAR_RENDERER | CVAR_BOOL, "skip overlay surfaces" );
+anCVarSystem r_skipSpecular( "r_skipSpecular", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_CHEAT | CVAR_ARCHIVE, "use black for specular1" );
+anCVarSystem r_skipBump( "r_skipBump", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "uses a flat surface instead of the bump map" );
+anCVarSystem r_skipDiffuse( "r_skipDiffuse", "0", CVAR_RENDERER | CVAR_BOOL, "use black for diffuse" );
+anCVarSystem r_skipROQ( "r_skipROQ", "0", CVAR_RENDERER | CVAR_BOOL, "skip ROQ decoding" );
 
-arcCVarSystem r_ignore( "r_ignore", "0", CVAR_RENDERER, "used for random debugging without defining new vars" );
-arcCVarSystem r_ignore2( "r_ignore2", "0", CVAR_RENDERER, "used for random debugging without defining new vars" );
-arcCVarSystem r_usePreciseTriangleInteractions( "r_usePreciseTriangleInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "1 = do winding clipping to determine if each ambiguous tri should be lit" );
-arcCVarSystem r_useCulling( "r_useCulling", "2", CVAR_RENDERER | CVAR_INTEGER, "0 = none, 1 = sphere, 2 = sphere + box", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
-arcCVarSystem r_useLightCulling( "r_useLightCulling", "3", CVAR_RENDERER | CVAR_INTEGER, "0 = none, 1 = box, 2 = exact clip of polyhedron faces, 3 = also areas", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
-arcCVarSystem r_useLightScissors( "r_useLightScissors", "1", CVAR_RENDERER | CVAR_BOOL, "1 = use custom scissor rectangle for each light" );
-arcCVarSystem r_useClippedLightScissors( "r_useClippedLightScissors", "1", CVAR_RENDERER | CVAR_INTEGER, "0 = full screen when near clipped, 1 = exact when near clipped, 2 = exact always", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
-arcCVarSystem r_useEntityCulling( "r_useEntityCulling", "1", CVAR_RENDERER | CVAR_BOOL, "0 = none, 1 = box" );
-arcCVarSystem r_useEntityScissors( "r_useEntityScissors", "0", CVAR_RENDERER | CVAR_BOOL, "1 = use custom scissor rectangle for each entity" );
-arcCVarSystem r_useInteractionCulling( "r_useInteractionCulling", "1", CVAR_RENDERER | CVAR_BOOL, "1 = cull interactions" );
-arcCVarSystem r_useInteractionScissors( "r_useInteractionScissors", "2", CVAR_RENDERER | CVAR_INTEGER, "1 = use a custom scissor rectangle for each shadow interaction, 2 = also crop using portal scissors", -2, 2, arcCmdSystem::ArgCompletion_Integer<-2,2> );
-arcCVarSystem r_useShadowCulling( "r_useShadowCulling", "1", CVAR_RENDERER | CVAR_BOOL, "try to cull shadows from partially visible lights" );
-arcCVarSystem r_useFrustumFarDistance( "r_useFrustumFarDistance", "0", CVAR_RENDERER | CVAR_FLOAT, "if != 0 force the view frustum far distance to this distance" );
+anCVarSystem r_ignore( "r_ignore", "0", CVAR_RENDERER, "used for random debugging without defining new vars" );
+anCVarSystem r_ignore2( "r_ignore2", "0", CVAR_RENDERER, "used for random debugging without defining new vars" );
+anCVarSystem r_usePreciseTriangleInteractions( "r_usePreciseTriangleInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "1 = do winding clipping to determine if each ambiguous tri should be lit" );
+anCVarSystem r_useCulling( "r_useCulling", "2", CVAR_RENDERER | CVAR_INTEGER, "0 = none, 1 = sphere, 2 = sphere + box", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem r_useLightCulling( "r_useLightCulling", "3", CVAR_RENDERER | CVAR_INTEGER, "0 = none, 1 = box, 2 = exact clip of polyhedron faces, 3 = also areas", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
+anCVarSystem r_useLightScissors( "r_useLightScissors", "1", CVAR_RENDERER | CVAR_BOOL, "1 = use custom scissor rectangle for each light" );
+anCVarSystem r_useClippedLightScissors( "r_useClippedLightScissors", "1", CVAR_RENDERER | CVAR_INTEGER, "0 = full screen when near clipped, 1 = exact when near clipped, 2 = exact always", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem r_useEntityCulling( "r_useEntityCulling", "1", CVAR_RENDERER | CVAR_BOOL, "0 = none, 1 = box" );
+anCVarSystem r_useEntityScissors( "r_useEntityScissors", "0", CVAR_RENDERER | CVAR_BOOL, "1 = use custom scissor rectangle for each entity" );
+anCVarSystem r_useInteractionCulling( "r_useInteractionCulling", "1", CVAR_RENDERER | CVAR_BOOL, "1 = cull interactions" );
+anCVarSystem r_useInteractionScissors( "r_useInteractionScissors", "2", CVAR_RENDERER | CVAR_INTEGER, "1 = use a custom scissor rectangle for each shadow interaction, 2 = also crop using portal scissors", -2, 2, arcCmdSystem::ArgCompletion_Integer<-2,2> );
+anCVarSystem r_useShadowCulling( "r_useShadowCulling", "1", CVAR_RENDERER | CVAR_BOOL, "try to cull shadows from partially visible lights" );
+anCVarSystem r_useFrustumFarDistance( "r_useFrustumFarDistance", "0", CVAR_RENDERER | CVAR_FLOAT, "if != 0 force the view frustum far distance to this distance" );
 
-arcCVarSystem r_offsetFactor( "r_offsetfactor", "0", CVAR_RENDERER | CVAR_FLOAT, "polygon offset parameter" );
-arcCVarSystem r_offsetUnits( "r_offsetunits", "-600", CVAR_RENDERER | CVAR_FLOAT, "polygon offset parameter" );
-arcCVarSystem r_shadowPolygonOffset( "r_shadowPolygonOffset", "-1", CVAR_RENDERER | CVAR_FLOAT, "bias value added to depth test for stencil shadow drawing" );
-arcCVarSystem r_shadowPolygonFactor( "r_shadowPolygonFactor", "0", CVAR_RENDERER | CVAR_FLOAT, "scale value for stencil shadow drawing" );
-arcCVarSystem r_frontBuffer( "r_frontBuffer", "0", CVAR_RENDERER | CVAR_BOOL, "draw to front buffer for debugging" );
-arcCVarSystem r_skipSubviews( "r_skipSubviews", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = don't render any gui elements on surfaces" );
-arcCVarSystem r_skipGuiShaders( "r_skipGuiShaders", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = skip all gui elements on surfaces, 2 = skip drawing but still handle events, 3 = draw but skip events", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
-arcCVarSystem r_skipParticles( "r_skipParticles", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = skip all particle systems", 0, 1, arcCmdSystem::ArgCompletion_Integer<0,1> );
-arcCVarSystem r_subviewOnly( "r_subviewOnly", "0", CVAR_RENDERER | CVAR_BOOL, "1 = don't render main view, allowing subviews to be debugged" );
-arcCVarSystem r_shadows( "r_shadows", "1", CVAR_RENDERER | CVAR_BOOL  | CVAR_ARCHIVE, "enable shadows" );
-arcCVarSystem r_testARBProgram( "r_testARBProgram", "0", CVAR_RENDERER | CVAR_BOOL, "experiment with vertex/fragment programs" );
-arcCVarSystem r_testGamma( "r_testGamma", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels", 0, 195 );
-arcCVarSystem r_testGammaBias( "r_testGammaBias", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels" );
-arcCVarSystem r_testStepGamma( "r_testStepGamma", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels" );
-arcCVarSystem r_lightScale( "r_lightScale", "2", CVAR_RENDERER | CVAR_FLOAT, "all light intensities are multiplied by this" );
-arcCVarSystem r_lightSourceRadius( "r_lightSourceRadius", "0", CVAR_RENDERER | CVAR_FLOAT, "for soft-shadow sampling" );
-arcCVarSystem r_flareSize( "r_flareSize", "1", CVAR_RENDERER | CVAR_FLOAT, "scale the flare deforms from the material def" );
+anCVarSystem r_offsetFactor( "r_offsetfactor", "0", CVAR_RENDERER | CVAR_FLOAT, "polygon offset parameter" );
+anCVarSystem r_offsetUnits( "r_offsetunits", "-600", CVAR_RENDERER | CVAR_FLOAT, "polygon offset parameter" );
+anCVarSystem r_shadowPolygonOffset( "r_shadowPolygonOffset", "-1", CVAR_RENDERER | CVAR_FLOAT, "bias value added to depth test for stencil shadow drawing" );
+anCVarSystem r_shadowPolygonFactor( "r_shadowPolygonFactor", "0", CVAR_RENDERER | CVAR_FLOAT, "scale value for stencil shadow drawing" );
+anCVarSystem r_frontBuffer( "r_frontBuffer", "0", CVAR_RENDERER | CVAR_BOOL, "draw to front buffer for debugging" );
+anCVarSystem r_skipSubviews( "r_skipSubviews", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = don't render any gui elements on surfaces" );
+anCVarSystem r_skipGuiShaders( "r_skipGuiShaders", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = skip all gui elements on surfaces, 2 = skip drawing but still handle events, 3 = draw but skip events", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
+anCVarSystem r_skipParticles( "r_skipParticles", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = skip all particle systems", 0, 1, arcCmdSystem::ArgCompletion_Integer<0,1> );
+anCVarSystem r_subviewOnly( "r_subviewOnly", "0", CVAR_RENDERER | CVAR_BOOL, "1 = don't render main view, allowing subviews to be debugged" );
+anCVarSystem r_shadows( "r_shadows", "1", CVAR_RENDERER | CVAR_BOOL  | CVAR_ARCHIVE, "enable shadows" );
+anCVarSystem r_testARBProgram( "r_testARBProgram", "0", CVAR_RENDERER | CVAR_BOOL, "experiment with vertex/fragment programs" );
+anCVarSystem r_testGamma( "r_testGamma", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels", 0, 195 );
+anCVarSystem r_testGammaBias( "r_testGammaBias", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels" );
+anCVarSystem r_testStepGamma( "r_testStepGamma", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels" );
+anCVarSystem r_lightScale( "r_lightScale", "2", CVAR_RENDERER | CVAR_FLOAT, "all light intensities are multiplied by this" );
+anCVarSystem r_lightSourceRadius( "r_lightSourceRadius", "0", CVAR_RENDERER | CVAR_FLOAT, "for soft-shadow sampling" );
+anCVarSystem r_flareSize( "r_flareSize", "1", CVAR_RENDERER | CVAR_FLOAT, "scale the flare deforms from the material def" );
 
-arcCVarSystem r_useExternalShadows( "r_useExternalShadows", "1", CVAR_RENDERER | CVAR_INTEGER, "1 = skip drawing caps when outside the light volume, 2 = force to no caps for testing", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
-arcCVarSystem r_useOptimizedShadows( "r_useOptimizedShadows", "1", CVAR_RENDERER | CVAR_BOOL, "use the dmap generated static shadow volumes" );
-arcCVarSystem r_useScissor( "r_useScissor", "1", CVAR_RENDERER | CVAR_BOOL, "scissor clip as portals and lights are processed" );
-arcCVarSystem r_useCombinerDisplayLists( "r_useCombinerDisplayLists", "1", CVAR_RENDERER | CVAR_BOOL | CVAR_NOCHEAT, "put all nvidia register combiner programming in display lists" );
-arcCVarSystem r_useDepthBoundsTest( "r_useDepthBoundsTest", "1", CVAR_RENDERER | CVAR_BOOL, "use depth bounds test to reduce shadow fill" );
+anCVarSystem r_useExternalShadows( "r_useExternalShadows", "1", CVAR_RENDERER | CVAR_INTEGER, "1 = skip drawing caps when outside the light volume, 2 = force to no caps for testing", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem r_useOptimizedShadows( "r_useOptimizedShadows", "1", CVAR_RENDERER | CVAR_BOOL, "use the dmap generated static shadow volumes" );
+anCVarSystem r_useScissor( "r_useScissor", "1", CVAR_RENDERER | CVAR_BOOL, "scissor clip as portals and lights are processed" );
+anCVarSystem r_useCombinerDisplayLists( "r_useCombinerDisplayLists", "1", CVAR_RENDERER | CVAR_BOOL | CVAR_NOCHEAT, "put all nvidia register combiner programming in display lists" );
+anCVarSystem r_useDepthBoundsTest( "r_useDepthBoundsTest", "1", CVAR_RENDERER | CVAR_BOOL, "use depth bounds test to reduce shadow fill" );
 
-arcCVarSystem r_screenFraction( "r_screenFraction", "100", CVAR_RENDERER | CVAR_INTEGER, "for testing fill rate, the resolution of the entire screen can be changed" );
-arcCVarSystem r_demonstrateBug( "r_demonstrateBug", "0", CVAR_RENDERER | CVAR_BOOL, "used during development to show IHV's their problems" );
-arcCVarSystem r_usePortals( "r_usePortals", "1", CVAR_RENDERER | CVAR_BOOL, " 1 = use portals to perform area culling, otherwise draw everything" );
-arcCVarSystem r_singleLight( "r_singleLight", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one light" );
-arcCVarSystem r_singleEntity( "r_singleEntity", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one entity" );
-arcCVarSystem r_singleSurface( "r_singleSurface", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one surface on each entity" );
-arcCVarSystem r_singleArea( "r_singleArea", "0", CVAR_RENDERER | CVAR_BOOL, "only draw the portal area the view is actually in" );
-arcCVarSystem r_forceLoadImages( "r_forceLoadImages", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "draw all images to screen after registration" );
-arcCVarSystem r_orderIndexes( "r_orderIndexes", "1", CVAR_RENDERER | CVAR_BOOL, "perform index reorganization to optimize vertex use" );
-arcCVarSystem r_lightAllBackFaces( "r_lightAllBackFaces", "0", CVAR_RENDERER | CVAR_BOOL, "light all the back faces, even when they would be shadowed" );
+anCVarSystem r_screenFraction( "r_screenFraction", "100", CVAR_RENDERER | CVAR_INTEGER, "for testing fill rate, the resolution of the entire screen can be changed" );
+anCVarSystem r_demonstrateBug( "r_demonstrateBug", "0", CVAR_RENDERER | CVAR_BOOL, "used during development to show IHV's their problems" );
+anCVarSystem r_usePortals( "r_usePortals", "1", CVAR_RENDERER | CVAR_BOOL, " 1 = use portals to perform area culling, otherwise draw everything" );
+anCVarSystem r_singleLight( "r_singleLight", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one light" );
+anCVarSystem r_singleEntity( "r_singleEntity", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one entity" );
+anCVarSystem r_singleSurface( "r_singleSurface", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one surface on each entity" );
+anCVarSystem r_singleArea( "r_singleArea", "0", CVAR_RENDERER | CVAR_BOOL, "only draw the portal area the view is actually in" );
+anCVarSystem r_forceLoadImages( "r_forceLoadImages", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "draw all images to screen after registration" );
+anCVarSystem r_orderIndexes( "r_orderIndexes", "1", CVAR_RENDERER | CVAR_BOOL, "perform index reorganization to optimize vertex use" );
+anCVarSystem r_lightAllBackFaces( "r_lightAllBackFaces", "0", CVAR_RENDERER | CVAR_BOOL, "light all the back faces, even when they would be shadowed" );
 
 // visual debugging info
-arcCVarSystem r_showPortals( "r_showPortals", "0", CVAR_RENDERER | CVAR_BOOL, "draw portal outlines in color based on passed / not passed" );
-arcCVarSystem r_showUnsmoothedTangents( "r_showUnsmoothedTangents", "0", CVAR_RENDERER | CVAR_BOOL, "if 1, put all nvidia register combiner programming in display lists" );
-arcCVarSystem r_showSilhouette( "r_showSilhouette", "0", CVAR_RENDERER | CVAR_BOOL, "highlight edges that are casting shadow planes" );
-arcCVarSystem r_showVertexColor( "r_showVertexColor", "0", CVAR_RENDERER | CVAR_BOOL, "draws all triangles with the solid vertex color" );
-arcCVarSystem r_showUpdates( "r_showUpdates", "0", CVAR_RENDERER | CVAR_BOOL, "report entity and light updates and ref counts" );
-arcCVarSystem r_showDemo( "r_showDemo", "0", CVAR_RENDERER | CVAR_BOOL, "report reads and writes to the demo file" );
-arcCVarSystem r_showDynamic( "r_showDynamic", "0", CVAR_RENDERER | CVAR_BOOL, "report stats on dynamic surface generation" );
-arcCVarSystem r_showLightScale( "r_showLightScale", "0", CVAR_RENDERER | CVAR_BOOL, "report the scale factor applied to drawing for overbrights" );
-arcCVarSystem r_showDefs( "r_showDefs", "0", CVAR_RENDERER | CVAR_BOOL, "report the number of modeDefs and lightDefs in view" );
-arcCVarSystem r_showTrace( "r_showTrace", "0", CVAR_RENDERER | CVAR_INTEGER, "show the intersection of an eye trace with the world", arcCmdSystem::ArgCompletion_Integer<0,2> );
-arcCVarSystem r_showIntensity( "r_showIntensity", "0", CVAR_RENDERER | CVAR_BOOL, "draw the screen colors based on intensity, red = 0, green = 128, blue = 255" );
-arcCVarSystem r_showImages( "r_showImages", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = show all images instead of rendering, 2 = show in proportional size", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
-arcCVarSystem r_showSmp( "r_showSmp", "0", CVAR_RENDERER | CVAR_BOOL, "show which end (front or back) is blocking" );
-arcCVarSystem r_showLights( "r_showLights", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = just print volumes numbers, highlighting ones covering the view, 2 = also draw planes of each volume, 3 = also draw edges of each volume", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
-arcCVarSystem r_showShadows( "r_showShadows", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = visualize the stencil shadow volumes, 2 = draw filled in", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
-arcCVarSystem r_showShadowCount( "r_showShadowCount", "0", CVAR_RENDERER | CVAR_INTEGER, "colors screen based on shadow volume depth complexity, >= 2 = print overdraw count based on stencil index values, 3 = only show turboshadows, 4 = only show static shadows", 0, 4, arcCmdSystem::ArgCompletion_Integer<0,4> );
-arcCVarSystem r_showLightScissors( "r_showLightScissors", "0", CVAR_RENDERER | CVAR_BOOL, "show light scissor rectangles" );
-arcCVarSystem r_showEntityScissors( "r_showEntityScissors", "0", CVAR_RENDERER | CVAR_BOOL, "show entity scissor rectangles" );
-arcCVarSystem r_showInteractionFrustums( "r_showInteractionFrustums", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = show a frustum for each interaction, 2 = also draw lines to light origin, 3 = also draw entity bbox", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
-arcCVarSystem r_showInteractionScissors( "r_showInteractionScissors", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = show screen rectangle which contains the interaction frustum, 2 = also draw construction lines", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
-arcCVarSystem r_showLightCount( "r_showLightCount", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = colors surfaces based on light count, 2 = also count everything through walls, 3 = also print overdraw", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
-arcCVarSystem r_showViewEntitys( "r_showViewEntitys", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = displays the bounding boxes of all view models, 2 = print index numbers" );
-arcCVarSystem r_showTris( "r_showTris", "0", CVAR_RENDERER | CVAR_INTEGER, "enables wireframe rendering of the world, 1 = only draw visible ones, 2 = draw all front facing, 3 = draw all", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
-arcCVarSystem r_showSurfaceInfo( "r_showSurfaceInfo", "0", CVAR_RENDERER | CVAR_BOOL, "show surface material name under crosshair" );
-arcCVarSystem r_showNormals( "r_showNormals", "0", CVAR_RENDERER | CVAR_FLOAT, "draws wireframe normals" );
-arcCVarSystem r_showMemory( "r_showMemory", "0", CVAR_RENDERER | CVAR_BOOL, "print frame memory utilization" );
-arcCVarSystem r_showCull( "r_showCull", "0", CVAR_RENDERER | CVAR_BOOL, "report sphere and box culling stats" );
-arcCVarSystem r_showInteractions( "r_showInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "report interaction generation activity" );
-arcCVarSystem r_showDepth( "r_showDepth", "0", CVAR_RENDERER | CVAR_BOOL, "display the contents of the depth buffer and the depth range" );
-arcCVarSystem r_showSurfaces( "r_showSurfaces", "0", CVAR_RENDERER | CVAR_BOOL, "report surface/light/shadow counts" );
-arcCVarSystem r_showPrimitives( "r_showPrimitives", "0", CVAR_RENDERER | CVAR_INTEGER, "report drawsurf/index/vertex counts" );
-arcCVarSystem r_showEdges( "r_showEdges", "0", CVAR_RENDERER | CVAR_BOOL, "draw the sil edges" );
-arcCVarSystem r_showTexturePolarity( "r_showTexturePolarity", "0", CVAR_RENDERER | CVAR_BOOL, "shade triangles by texture area polarity" );
-arcCVarSystem r_showTangentSpace( "r_showTangentSpace", "0", CVAR_RENDERER | CVAR_INTEGER, "shade triangles by tangent space, 1 = use 1st tangent vector, 2 = use 2nd tangent vector, 3 = use normal vector", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
-arcCVarSystem r_showDominantTri( "r_showDominantTri", "0", CVAR_RENDERER | CVAR_BOOL, "draw lines from vertexes to center of dominant triangles" );
-arcCVarSystem r_showAlloc( "r_showAlloc", "0", CVAR_RENDERER | CVAR_BOOL, "report alloc/free counts" );
-arcCVarSystem r_showTextureVectors( "r_showTextureVectors", "0", CVAR_RENDERER | CVAR_FLOAT, " if > 0 draw each triangles texture (tangent) vectors" );
-arcCVarSystem r_showOverDraw( "r_showOverDraw", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = geometry overdraw, 2 = light interaction overdraw, 3 = geometry and light interaction overdraw", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
+anCVarSystem r_showPortals( "r_showPortals", "0", CVAR_RENDERER | CVAR_BOOL, "draw portal outlines in color based on passed / not passed" );
+anCVarSystem r_showUnsmoothedTangents( "r_showUnsmoothedTangents", "0", CVAR_RENDERER | CVAR_BOOL, "if 1, put all nvidia register combiner programming in display lists" );
+anCVarSystem r_showSilhouette( "r_showSilhouette", "0", CVAR_RENDERER | CVAR_BOOL, "highlight edges that are casting shadow planes" );
+anCVarSystem r_showVertexColor( "r_showVertexColor", "0", CVAR_RENDERER | CVAR_BOOL, "draws all triangles with the solid vertex color" );
+anCVarSystem r_showUpdates( "r_showUpdates", "0", CVAR_RENDERER | CVAR_BOOL, "report entity and light updates and ref counts" );
+anCVarSystem r_showDemo( "r_showDemo", "0", CVAR_RENDERER | CVAR_BOOL, "report reads and writes to the demo file" );
+anCVarSystem r_showDynamic( "r_showDynamic", "0", CVAR_RENDERER | CVAR_BOOL, "report stats on dynamic surface generation" );
+anCVarSystem r_showLightScale( "r_showLightScale", "0", CVAR_RENDERER | CVAR_BOOL, "report the scale factor applied to drawing for overbrights" );
+anCVarSystem r_showDefs( "r_showDefs", "0", CVAR_RENDERER | CVAR_BOOL, "report the number of modeDefs and lightDefs in view" );
+anCVarSystem r_showTrace( "r_showTrace", "0", CVAR_RENDERER | CVAR_INTEGER, "show the intersection of an eye trace with the world", arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem r_showIntensity( "r_showIntensity", "0", CVAR_RENDERER | CVAR_BOOL, "draw the screen colors based on intensity, red = 0, green = 128, blue = 255" );
+anCVarSystem r_showImages( "r_showImages", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = show all images instead of rendering, 2 = show in proportional size", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem r_showSmp( "r_showSmp", "0", CVAR_RENDERER | CVAR_BOOL, "show which end (front or back) is blocking" );
+anCVarSystem r_showLights( "r_showLights", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = just print volumes numbers, highlighting ones covering the view, 2 = also draw planes of each volume, 3 = also draw edges of each volume", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
+anCVarSystem r_showShadows( "r_showShadows", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = visualize the stencil shadow volumes, 2 = draw filled in", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
+anCVarSystem r_showShadowCount( "r_showShadowCount", "0", CVAR_RENDERER | CVAR_INTEGER, "colors screen based on shadow volume depth complexity, >= 2 = print overdraw count based on stencil index values, 3 = only show turboshadows, 4 = only show static shadows", 0, 4, arcCmdSystem::ArgCompletion_Integer<0,4> );
+anCVarSystem r_showLightScissors( "r_showLightScissors", "0", CVAR_RENDERER | CVAR_BOOL, "show light scissor rectangles" );
+anCVarSystem r_showEntityScissors( "r_showEntityScissors", "0", CVAR_RENDERER | CVAR_BOOL, "show entity scissor rectangles" );
+anCVarSystem r_showInteractionFrustums( "r_showInteractionFrustums", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = show a frustum for each interaction, 2 = also draw lines to light origin, 3 = also draw entity bbox", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
+anCVarSystem r_showInteractionScissors( "r_showInteractionScissors", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = show screen rectangle which contains the interaction frustum, 2 = also draw construction lines", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem r_showLightCount( "r_showLightCount", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = colors surfaces based on light count, 2 = also count everything through walls, 3 = also print overdraw", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
+anCVarSystem r_showViewEntitys( "r_showViewEntitys", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = displays the bounding boxes of all view models, 2 = print index numbers" );
+anCVarSystem r_showTris( "r_showTris", "0", CVAR_RENDERER | CVAR_INTEGER, "enables wireframe rendering of the world, 1 = only draw visible ones, 2 = draw all front facing, 3 = draw all", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
+anCVarSystem r_showSurfaceInfo( "r_showSurfaceInfo", "0", CVAR_RENDERER | CVAR_BOOL, "show surface material name under crosshair" );
+anCVarSystem r_showNormals( "r_showNormals", "0", CVAR_RENDERER | CVAR_FLOAT, "draws wireframe normals" );
+anCVarSystem r_showMemory( "r_showMemory", "0", CVAR_RENDERER | CVAR_BOOL, "print frame memory utilization" );
+anCVarSystem r_showCull( "r_showCull", "0", CVAR_RENDERER | CVAR_BOOL, "report sphere and box culling stats" );
+anCVarSystem r_showInteractions( "r_showInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "report interaction generation activity" );
+anCVarSystem r_showDepth( "r_showDepth", "0", CVAR_RENDERER | CVAR_BOOL, "display the contents of the depth buffer and the depth range" );
+anCVarSystem r_showSurfaces( "r_showSurfaces", "0", CVAR_RENDERER | CVAR_BOOL, "report surface/light/shadow counts" );
+anCVarSystem r_showPrimitives( "r_showPrimitives", "0", CVAR_RENDERER | CVAR_INTEGER, "report drawsurf/index/vertex counts" );
+anCVarSystem r_showEdges( "r_showEdges", "0", CVAR_RENDERER | CVAR_BOOL, "draw the sil edges" );
+anCVarSystem r_showTexturePolarity( "r_showTexturePolarity", "0", CVAR_RENDERER | CVAR_BOOL, "shade triangles by texture area polarity" );
+anCVarSystem r_showTangentSpace( "r_showTangentSpace", "0", CVAR_RENDERER | CVAR_INTEGER, "shade triangles by tangent space, 1 = use 1st tangent vector, 2 = use 2nd tangent vector, 3 = use normal vector", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
+anCVarSystem r_showDominantTri( "r_showDominantTri", "0", CVAR_RENDERER | CVAR_BOOL, "draw lines from vertexes to center of dominant triangles" );
+anCVarSystem r_showAlloc( "r_showAlloc", "0", CVAR_RENDERER | CVAR_BOOL, "report alloc/free counts" );
+anCVarSystem r_showTextureVectors( "r_showTextureVectors", "0", CVAR_RENDERER | CVAR_FLOAT, " if > 0 draw each triangles texture (tangent) vectors" );
+anCVarSystem r_showOverDraw( "r_showOverDraw", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = geometry overdraw, 2 = light interaction overdraw, 3 = geometry and light interaction overdraw", 0, 3, arcCmdSystem::ArgCompletion_Integer<0,3> );
 
-arcCVarSystem r_lockSurfaces( "r_lockSurfaces", "0", CVAR_RENDERER | CVAR_BOOL, "allow moving the view point without changing the composition of the scene, including culling" );
-arcCVarSystem r_useEntityCallbacks( "r_useEntityCallbacks", "1", CVAR_RENDERER | CVAR_BOOL, "if 0, issue the callback immediately at update time, rather than defering" );
+anCVarSystem r_lockSurfaces( "r_lockSurfaces", "0", CVAR_RENDERER | CVAR_BOOL, "allow moving the view point without changing the composition of the scene, including culling" );
+anCVarSystem r_useEntityCallbacks( "r_useEntityCallbacks", "1", CVAR_RENDERER | CVAR_BOOL, "if 0, issue the callback immediately at update time, rather than defering" );
 
-arcCVarSystem r_showSkel( "r_showSkel", "0", CVAR_RENDERER | CVAR_INTEGER, "draw the skeleton when model animates, 1 = draw model with skeleton, 2 = draw skeleton only", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
-arcCVarSystem r_jointNameScale( "r_jointNameScale", "0.02", CVAR_RENDERER | CVAR_FLOAT, "size of joint names when r_showskel is set to 1" );
-arcCVarSystem r_jointNameOffset( "r_jointNameOffset", "0.5", CVAR_RENDERER | CVAR_FLOAT, "offset of joint names when r_showskel is set to 1" );
+anCVarSystem r_showSkel( "r_showSkel", "0", CVAR_RENDERER | CVAR_INTEGER, "draw the skeleton when model animates, 1 = draw model with skeleton, 2 = draw skeleton only", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem r_jointNameScale( "r_jointNameScale", "0.02", CVAR_RENDERER | CVAR_FLOAT, "size of joint names when r_showskel is set to 1" );
+anCVarSystem r_jointNameOffset( "r_jointNameOffset", "0.5", CVAR_RENDERER | CVAR_FLOAT, "offset of joint names when r_showskel is set to 1" );
 
-arcCVarSystem r_cgVertexProfile( "r_cgVertexProfile", "best", CVAR_RENDERER | CVAR_ARCHIVE, "arbvp1, vp20, vp30" );
-arcCVarSystem r_cgFragmentProfile( "r_cgFragmentProfile", "best", CVAR_RENDERER | CVAR_ARCHIVE, "arbfp1, fp30" );
+anCVarSystem r_cgVertexProfile( "r_cgVertexProfile", "best", CVAR_RENDERER | CVAR_ARCHIVE, "arbvp1, vp20, vp30" );
+anCVarSystem r_cgFragmentProfile( "r_cgFragmentProfile", "best", CVAR_RENDERER | CVAR_ARCHIVE, "arbfp1, fp30" );
 
-arcCVarSystem r_debugLineDepthTest( "r_debugLineDepthTest", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "perform depth test on debug lines" );
-arcCVarSystem r_debugLineWidth( "r_debugLineWidth", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "width of debug lines" );
-arcCVarSystem r_debugArrowStep( "r_debugArrowStep", "120", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "step size of arrow cone line rotation in degrees", 0, 120 );
-arcCVarSystem r_debugPolygonFilled( "r_debugPolygonFilled", "1", CVAR_RENDERER | CVAR_BOOL, "draw a filled polygon" );
+anCVarSystem r_debugLineDepthTest( "r_debugLineDepthTest", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "perform depth test on debug lines" );
+anCVarSystem r_debugLineWidth( "r_debugLineWidth", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "width of debug lines" );
+anCVarSystem r_debugArrowStep( "r_debugArrowStep", "120", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "step size of arrow cone line rotation in degrees", 0, 120 );
+anCVarSystem r_debugPolygonFilled( "r_debugPolygonFilled", "1", CVAR_RENDERER | CVAR_BOOL, "draw a filled polygon" );
 
-arcCVarSystem r_materialOverride( "r_materialOverride", "", CVAR_RENDERER, "overrides all materials", arcCmdSystem::ArgCompletion_Decl<DECL_MATERIAL> );
+anCVarSystem r_materialOverride( "r_materialOverride", "", CVAR_RENDERER, "overrides all materials", arcCmdSystem::ArgCompletion_Decl<DECL_MATERIAL> );
 
-arcCVarSystem r_debugRenderToTexture( "r_debugRenderToTexture", "0", CVAR_RENDERER | CVAR_INTEGER, "" );
+anCVarSystem r_debugRenderToTexture( "r_debugRenderToTexture", "0", CVAR_RENDERER | CVAR_INTEGER, "" );
 
 void ( APIENTRY * qglMultiTexCoord2fARB )( GLenum texture, GLfloat s, GLfloat t );
 void ( APIENTRY * qglMultiTexCoord2fvARB )( GLenum texture, GLfloat *st );
@@ -273,15 +274,22 @@ PFNGLBINDPROGRAMARBPROC					qglBindProgramARB;
 PFNGLGENPROGRAMSARBPROC					qglGenProgramsARB;
 PFNGLPROGRAMENVPARAMETER4FVARBPROC		qglProgramEnvParameter4fvARB;
 PFNGLPROGRAMLOCALPARAMETER4FVARBPROC	qglProgramLocalParameter4fvARB;
+	// GL_ARB_vertex_array_object
+PFNGLGENVERTEXARRAYSPROC 				qglGenVertexArrays;
+PFNGLBINDVERTEXARRAYPROC 				qglBindVertexArray;
+PFNGLDELETEVERTEXARRAYSPROC 			qglDeleteVertexArrays;
+PFNGLISVERTEXARRAYPROC					qglIsVertexArray;
 
 // GL_EXT_depth_bounds_test
-PFNGLDEPTHBOUNDSEXTPROC                 qglDepthBoundsEXT;
+PFNGLDEPTHBOUNDSEXTPROC					qglDepthBoundsEXT;
+PFNGLDEPTHBOUNDSPROC					qglDepthBounds;
 
+PFNGLARBDEPTHCLAMPPROC GL_ARB_depth_clamp;
 void RB_Error( errorParm_t code, const char *fmt, ... ) {
 	char buf[ 4096 ];
 	va_list	argptr;
 	va_start( argptr, fmt );
-	arcNetString::vsnprintf( buf, sizeof( buf ), fmt, argptr );
+	anString::vsnprintf( buf, sizeof( buf ), fmt, argptr );
 	va_end( argptr );
 	common->Error( code, "%s", buf );
 }
@@ -290,12 +298,20 @@ void RB_Printf( const char *fmt, ... ) {
 	char buf[ MAXPRINTMSG ];
 	va_list	argptr;
 	va_start( argptr, fmt );
-	arcNetString::vsnprintf( buf, sizeof( buf ), fmt, argptr );
+	anString::vsnprintf( buf, sizeof( buf ), fmt, argptr );
 	va_end( argptr );
 
 	common->Printf( PRINT_ALL, "%s", buf );
 }
 
+/*
+========================
+qglBindMultiTextureEXT
+
+As of 2011/09/16 the Intel drivers for "Sandy-Bridge" and "Ivy-Bridge" integrated graphics
+no longer support the BindMultiTexture extension.
+========================
+*/
 void APIENTRY qglBindMultiTextureEXT( GLenum texunit, GLenum target, GLuint texture ) {
 	qglActiveTextureARB( texunit );
 	qglBindTexture( target, texture );
@@ -334,9 +350,13 @@ void GL_Begin( GLenum mode ) {
 
 	}
 }
-
-void GL_END( void ) {
-
+static void CALLBACK DebugCallback( unsigned int source, unsigned int type, unsigned int id, unsigned int severity, int length, const char *message, const void *userParam ) {
+#if defined(_WIN32)
+	OutputDebugString( message );
+	OutputDebugString( "\n" );
+#else
+	printf( "%s\n", message );
+#endif
 }
 
 /*
@@ -344,8 +364,8 @@ void GL_END( void ) {
 R_CheckExtension
 =================
 */
-bool R_CheckExtension( char *name ) {
-	if ( !strstr( qglConfig.qglExtStrOutput, name ) ) {
+static bool R_CheckExtension( const char *name ) {
+	if ( !strstr( qglConfig.extensionsStr, name ) ) {
 		common->Printf( "X..%s not found\n", name );
 		return false;
 	}
@@ -357,19 +377,85 @@ bool R_CheckExtension( char *name ) {
 /*
 ==================
 R_CheckPortableExtensions
+
+
+GL_ARB_depth_clamp, GL_ARB_texture_float, drawElementsBaseVertex
+GL_ARB_texture_compression_rgtc - not fully added yet just print msg atm
+GL_ARB_fragment_shader - added may need more added onto it
+GL_ARB_vertex_array_object - added
+GL_ARB_seamless_cube_map - added
+
+GL_EXT_direct_state_access - added / partial
+	- glNamedBufferData - not yet added
+	- glNamedBufferSubData - not yet added
+	- glMapNamedBuffer -not yet added
+	- glUnmapNamedBuffer - not yet added
+	- glNamedBufferStorage - added
+	- glCreateBuffers - added
+	- glDeleteBuffers - added
+
+GL_ARB_framebuffer_object - added / partial will add more
+	qglGenFramebuffers; - added
+	qglBindFramebuffer; - added
+	qglDeleteFramebuffers; - added
+	qglFramebufferTexture; - added
+
+GL_ARB_fragment_shader - added
+	glCreateShader - added
+	glShaderSource - added
+	glCompileShader - added
+	glCreateProgram - added
+	glAttachShader - added
+	glAttachShader - added
+	glLinkProgram - added
+	glUseProgram - added
+	glDeleteShader - added
+	glGetUniformLocation - added
+	glUniform1f - added
+	glCreateShaderProgramv - added
+	glBindProgramPipeline - added
+	glDeleteProgram - added
+GL_ARB_vertex_array_object - added / partial
+qglDrawRangeElementsEXT - added
+qglBlendEquationEXT - added
+
+Heres an examples one way to check a version and string output
+
+if ( stricmpn( qglConfig.vendor_string, "ATI Technologies",16 ) == 0
+&& stricmpn( qglConfig.version_string, "1.3.3",5 ) == 0 && qglConfig.version_string[5] < '9' ) {
+g_bTextureRectangleHack = true;
+}
 ==================
 */
 static void R_CheckPortableExtensions( void ) {
-	qglConfig.qglVersion = atof( qglConfig.versionOutput );
+	if ( glSLAvailable ) {
+		qglConfig.qglVersion = atof( qglConfig.qglslVersion );
+		strncpyz( qglConfig.qglVersion, (const char *)qglGetString( GL_SHADING_LANGUAGE_VERSION ), sizeof( qglConfig.qglVersion ) );
+		sscanf( qglConfig.qglVersion, "%d.%d", &qglConfig.versionStr, &qglConfig.qglslVersion );
+		common->Printf( "...using GLSL version %s\n", qglConfig.qglVersion );
+	} else {
+		qglConfig.qglVersion = atof( qglConfig.versionStr );
+	}
+
+	if ( Icmpn( qglConfig.rendererStr, "ATI ", 4 ) == 0 || Icmpn( qglConfig.rendererStr, "AMD ", 4 ) == 0 ) {
+		qglConfig.vendor = VEN_AMD64VEGA;
+	} else if ( Icmpn( qglConfig.rendererStr, "NVIDIA", 6 ) == 0 ) {
+		qglConfig.vendor = VEN_NVIDIA;
+	} else if ( Icmpn( qglConfig.rendererStr, "Intel", 5 ) == 0 ) {
+		qglConfig.vendor = VEN_INTEL;
+	}
+	if ( Icmpn( qglConfig.rendererStr, "Mesa", 4 ) == 0 || Icmpn( qglConfig.rendererStr, "X.org", 4 ) == 0 || Icmpn( qglConfig.rendererStr, "Gallium", 7 ) == 0 ) {
+		qglConfig.driverType = GLDRIVER_OGL_MESA;
+	}
 
 	// GL_ARB_multitexture
 	qglConfig.multitextureAvailable = R_CheckExtension( "GL_ARB_multitexture" );
 
+	// FIXME: fix this for gl 4.6
 	if ( qglConfig.multitextureAvailable ) {
 		qglMultiTexCoord2fARB = (void(APIENTRY *)( GLenum, GLfloat, GLfloat) )GLimp_ExtensionPointer( "glMultiTexCoord2fARB" );
 		qglMultiTexCoord2fvARB = (void(APIENTRY *)( GLenum, GLfloat *) )GLimp_ExtensionPointer( "glMultiTexCoord2fvARB" );
 		qglActiveTextureARB = (void(APIENTRY *)( GLenum) )GLimp_ExtensionPointer( "glActiveTextureARB" );
-		qglClientActiveTextureARB = (void(APIENTRY *)( GLenum) )GLimp_ExtensionPointer( "glClientActiveTextureARB" );
 		qglGetIntegerv( GL_MAX_TEXTURE_UNITS_ARB, (GLint *)&qglConfig.maxImageUnits );
 		if ( qglConfig.maxImageUnits > MAX_MULTITEXTURE_UNITS ) {
 			qglConfig.maxImageUnits = MAX_MULTITEXTURE_UNITS;
@@ -380,11 +466,12 @@ static void R_CheckPortableExtensions( void ) {
 		qglGetIntegerv( GL_MAX_TEXTURE_COORDS_ARB, (GLint *)&qglConfig.maxImageCoords );
 		qglGetIntegerv( GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint *)&qglConfig.maxTextureImageUnits );
 	}
-
-	// GL_ARB_texture_env_combine
+	// GL_EXT_clamp_to_edge
+	//qglConfig.clampToEdgeAvailable = CR_CheckExtension( "GL_EXT_texture_edge_clamp\n" );
+	//// GL_ARB_texture_env_combine
 	qglConfig.textureEnvCombine = R_CheckExtension( "GL_ARB_texture_env_combine" );
 
-	// GL_ARB_texture_cube_map
+	// GL_ARB_texture_cube_map and GL_ARB_seamless_cube_map
 	qglConfig.useCubeMap = R_CheckExtension( "GL_ARB_texture_cube_map" );
 
 	// GL_ARB_texture_env_dot3
@@ -396,12 +483,41 @@ static void R_CheckPortableExtensions( void ) {
 	// GL_ARB_texture_non_power_of_two
 	qglConfig.isImageNonPO2 = R_CheckExtension( "GL_ARB_texture_non_power_of_two" );
 
+	if ( qglConfig.qglVersion >= 3.2 || R_CheckExtension( "GL_ARB_seamless_cube_map" ) ) {
+		qglConfig.useSeamlessCubeMap = R_CheckExtension( "GL_ARB_seamless_cube_map" );
+		r_useSeamlessCubeMap.SetModified();
+	}
+	// GL_ARB_framebuffer_sRGB
+	//qglConfig.sRGBFramebufferAvailable = GLEW_ARB_framebuffer_sRGB != 0;
+	//r_useSRGB.SetModified();
+
+	//qglConfig.directStateAccess = R_CheckExtension( "GL_EXT_direct_state_access" );
+	// GL_EXT_direct_state_access  Check if the extension is supported
+	if ( qglConfig.qglVersion >= 4.6 || R_CheckExtension( "GL_EXT_direct_state_access" ) ) {
+		common->Printf( "...using %s\n", "GL_EXT_direct_state_access" );
+		qglNamedBufferData = (PFNGLNAMEDBUFFERDATAPROC)GLimp_ExtensionPointer( "glNamedBufferData" );
+	    qglNamedBufferStorage = (PFNGLNAMEDBUFFERSTORAGEPROC)GLimp_ExtensionPointer( "glNamedBufferStorage" );
+	    qglCreateBuffers = (PFNGLCREATEBUFFERSPROC)GLimp_ExtensionPointer( "glCreateBuffers" );
+	    qglDeleteBuffers = (PFNGLDELETEBUFFERSPROC)GLimp_ExtensionPointer( "glDeleteBuffers" );
+		qglConfig.directStateAccess = true;
+	} else {
+		common->Printf( "X..%s not found\n", "GL_EXT_direct_state_access" );
+		qglConfig.directStateAccess = false;
+	}
+
+	// add GL_ARB_texture_compression_rgtc, GL_ARB_texture_compression_bptc
 	// GL_ARB_texture_compression + GL_S3_s3tc
 	// DRI drivers may have GL_ARB_texture_compression but no GL_EXT_texture_compression_s3tc
 	if ( R_CheckExtension( "GL_ARB_texture_compression" ) && R_CheckExtension( "GL_EXT_texture_compression_s3tc" ) ) {
 		qglConfig.textureCompression = true;
 		qglCompressedTexImage2DARB = (PFNGLCOMPRESSEDTEXIMAGE2DARBPROC)GLimp_ExtensionPointer( "glCompressedTexImage2DARB" );
 		qglGetCompressedTexImageARB = (PFNGLGETCOMPRESSEDTEXIMAGEARBPROC)GLimp_ExtensionPointer( "glGetCompressedTexImageARB" );
+	} else {
+		qglConfig.textureCompression = false;
+	} else if ( R_CheckExtension( "GL_ARB_texture_compression_rgtc" ) && R_CheckExtension( "GL_ARB_texture_compression_bptc" ) ) {
+		qglConfig.textureCompression = true;
+		//qglCompressed = (PFNGL  ARBPROC)GLimp_ExtensionPointer( "glCompressed" );
+		//qglGetCompressed = (PFNGL ARBPROC)GLimp_ExtensionPointer( "glGetCompressed" );
 	} else {
 		qglConfig.textureCompression = false;
 	}
@@ -415,7 +531,7 @@ static void R_CheckPortableExtensions( void ) {
 		qglConfig.maxTextureAnisotropy = 1;
 	}
 
-	// GL_EXT_texture_lod_bias
+	// GL_EXT_texture_lod_bias GL_ARB_shader_texture_lod
 	// The actual extension is broken as specified, storing the state in the texture unit instead
 	// of the texture object.  The behavior in GL 1.4 is the behavior we use.
 	if ( qglConfig.qglVersion >= 1.4 || R_CheckExtension( "GL_EXT_texture_lod" ) ) {
@@ -424,6 +540,11 @@ static void R_CheckPortableExtensions( void ) {
 	} else {
 		common->Printf( "X..%s not found\n", "GL_1.4_texture_lod_bias" );
 		qglConfig.useTextureLODBias = false;
+	} else if ( qglConfig.qglVersion >= 3.0 && image_lodbias && globalImages->distanceLod )
+		qglConfig.distanceLod = R_CheckExtension( "GL_ARB_shader_texture_lod" );
+	} else {
+		common->Printf( "System does not support %s\n", "GL_ARB_shader_texture_lod" )
+		globalImages->distanceLod = false;
 	}
 
 	// GL_EXT_shared_texture_palette
@@ -433,11 +554,24 @@ static void R_CheckPortableExtensions( void ) {
 	}
 
 	// GL_EXT_texture3D (not currently used for anything)
-	qglConfig.3DImagesActive = R_CheckExtension( "GL_EXT_texture3D" );
-	if ( qglConfig.3DImagesActive ) {
+	qglConfig.use3DImageEXT = R_CheckExtension( "GL_EXT_texture3D" );
+	if ( qglConfig.use3DImageEXT ) {
 		qglTexImage3D =
 			(void (APIENTRY *)( GLenum, GLint, GLint, GLsizei, GLsizei, GLsizei, GLint, GLenum, GLenum, const GLvoid *) )
 			GLimp_ExtensionPointer( "glTexImage3D" );
+	}
+
+	// qglBlendEquationEXT
+	qglConfig.blendSquareAvailable = R_CheckExtension( "qglBlendEquationEXT" );
+	if ( qglConfig.blendSquareAvailable ) {
+		qglBlendEquationEXT = (void (APIENTRY *)( GLenum mode ) )
+			GLimp_ExtensionPointer( "glCombinerParameterfvNV" );
+	}
+
+	qglConfig.drawRangeElementsAvailable = R_CheckExtension( "qglDrawRangeElementsEXT" );
+	if ( qglConfig.drawRangeElementsAvailable ) {
+		qglDrawRangeElementsEXT = (void (APIENTRY *)(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *RESTRICT indices) )
+			GLimp_ExtensionPointer( "qglDrawRangeElementsEXT" );
 	}
 
 	// EXT_stencil_wrap
@@ -488,8 +622,6 @@ static void R_CheckPortableExtensions( void ) {
 	if ( ! qglConfig.atiShaderFragmentOn ) {
 		// only on OSX: ATI_fragment_shader is faked through ATI_text_fragment_shader (macosx_glimp.cpp)
 		qglConfig.atiShaderFragmentOn = R_CheckExtension( "GL_ATI_text_fragment_shader" );
-	}
-	if ( qglConfig.atiShaderFragmentOn ) {
 		qglGenFragmentShadersATI = (PFNGLGENFRAGMENTSHADERSATIPROC)GLimp_ExtensionPointer( "glGenFragmentShadersATI" );
 		qglBindFragmentShaderATI = (PFNGLBINDFRAGMENTSHADERATIPROC)GLimp_ExtensionPointer( "glBindFragmentShaderATI" );
 		qglDeleteFragmentShaderATI = (PFNGLDELETEFRAGMENTSHADERATIPROC)GLimp_ExtensionPointer( "glDeleteFragmentShaderATI" );
@@ -506,9 +638,27 @@ static void R_CheckPortableExtensions( void ) {
 		qglSetFragmentShaderConstantATI = (PFNGLSETFRAGMENTSHADERCONSTANTATIPROC)GLimp_ExtensionPointer( "glSetFragmentShaderConstantATI" );
 	}
 
+	// GL_ARB_fragment_shader
+	qglConfig.fragmentShaderAvailable = R_CheckExtension( "GL_ARB_fragment_shader" );
+	if ( qglConfig.fragmentShaderAvailable ) {
+	    qglCreateShader = (PFNGLCREATESHADERPROC)GLimp_ExtensionPointer( "glCreateShader" );
+	    qglShaderSource = (PFNGLSHADERSOURCEPROC)GLimp_ExtensionPointer( "glShaderSource" );
+	    qglCompileShader = (PFNGLCOMPILESHADERPROC)GLimp_ExtensionPointer( "glCompileShader" );
+	    qglCreateProgram = (PFNGLCREATEPROGRAMPROC)GLimp_ExtensionPointer( "glCreateProgram" );
+	    qglAttachShader = (PFNGLATTACHSHADERPROC)GLimp_ExtensionPointer( "glAttachShader" );
+	    qglLinkProgram = (PFNGLLINKPROGRAMPROC)GLimp_ExtensionPointer( "glLinkProgram" );
+	    qglUseProgram = (PFNGLUSEPROGRAMPROC)GLimp_ExtensionPointer( "glUseProgram" );
+	    qglDeleteShader = (PFNGLDELETESHADERPROC)GLimp_ExtensionPointer( "glDeleteShader" );
+	    qglGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)GLimp_ExtensionPointer( "glGetUniformLocation" );
+	    qglUniform1f = (PFNGLUNIFORM1FPROC)GLimp_ExtensionPointer( "glUniform1f" );
+	    qglGenFragmentShadersARB = (PFNGLGENFRAGMENTSHADERSARBPROC)GLimp_ExtensionPointer( "glCreateShaderProgramv" );
+	    qglBindFragmentShaderARB = (PFNGLBINDFRAGMENTSHADERARBPROC)GLimp_ExtensionPointer( "glBindProgramPipeline" );
+		qglDeleteFragmentShaderARB = (PFNGLDELETEPROGRAMSARBPROC)GLimp_ExtensionPointer( "glDeleteProgram" );
+	}
+
 	// ARB_vertex_buffer_object
 	qglConfig.ARBVertexBufferObjectAvailable = R_CheckExtension( "GL_ARB_vertex_buffer_object" );
-	if ( qglConfig.ARBVertexBufferObjectAvailable) {
+	if ( qglConfig.ARBVertexBufferObjectAvailable ) {
 		qglBindBufferARB = (PFNGLBINDBUFFERARBPROC)GLimp_ExtensionPointer( "glBindBufferARB" );
 		qglDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC)GLimp_ExtensionPointer( "glDeleteBuffersARB" );
 		qglGenBuffersARB = (PFNGLGENBUFFERSARBPROC)GLimp_ExtensionPointer( "glGenBuffersARB" );
@@ -522,9 +672,43 @@ static void R_CheckPortableExtensions( void ) {
 		qglGetBufferPointervARB = (PFNGLGETBUFFERPOINTERVARBPROC)GLimp_ExtensionPointer( "glGetBufferPointervARB" );
 	}
 
-	// ARB_vertex_program
+	// GL_ARB_framebuffer_object move this upnorth outside the function.
+	PFNGLGENFRAMEBUFFERSPROC qglGenFramebuffers;
+	PFNGLBINDFRAMEBUFFERPROC qglBindFramebuffer;
+	PFNGLDELETEFRAMEBUFFERSPROC qglDeleteFramebuffers;
+	PFNGLFRAMEBUFFERTEXTUREPROC qglFramebufferTexture;
+	// ... include other necessary function pointers
+
+	// Check if the extension is supported
+	if ( qglConfig.framebufferObjectAvailable ) {
+		qglConfig.framebufferObjectAvailable = R_CheckExtension( "GL_ARB_framebuffer_object" );
+		// Get function pointers
+		qglGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)GLimp_ExtensionPointer( "glGenFramebuffers" );
+		qglBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)GLimp_ExtensionPointer( "glBindFramebuffer" );
+		qglDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)GLimp_ExtensionPointer( "glDeleteFramebuffers" );
+		qglFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)GLimp_ExtensionPointer( "glFramebufferTexture" );
+		// ... obtain other necessary function pointers
+	} else if ( R_CheckExtension( "GLEW_EXT_framebuffer_object" ) ) {
+		qglGetIntegerv( GL_MAX_RENDERBUFFER_SIZE, &qglConfig.maxRenderbufferSize );
+		qglGetIntegerv( GL_MAX_COLOR_ATTACHMENTS, &qglConfig.maxColorAttachments );
+		common->Printf( "...using %s\n", "GL_EXT_framebuffer_object" );
+	} else {
+		common->Printf( "X..%s not found\n", "GL_EXT_framebuffer_object" );
+	}
+
+	//if ( qglConfig.qglVersion >= 3.0 || R_CheckExtension( "GL_ARB_texture_float" ) ) {}
+	// Check if the extension is supported
+	if ( qglConfig.qglVersion >= 3.0 || R_CheckExtension( "GL_ARB_vertex_array_object" ) ) {
+	    // Get function pointers
+		qglGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)GLimp_ExtensionPointer( "glGenVertexArrays" );
+		qglBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)GLimp_ExtensionPointer( "glBindVertexArray" );
+		qglDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)GLimp_ExtensionPointer( "glDeleteVertexArrays" );
+		qglIsVertexArray = (PFNGLISVERTEXARRAYPROC)GLimp_ExtensionPointer( "glIsVertexArray" );
+	}
+
+	// ARB_vertex_program update but keeping for testing purposes. GLSL todo
 	qglConfig.ARBVertexProgramAvailable = R_CheckExtension( "GL_ARB_vertex_program" );
-	if ( qglConfig.ARBVertexProgramAvailable) {
+	if ( qglConfig.ARBVertexProgramAvailable ) {
 		qglVertexAttribPointerARB = (PFNGLVERTEXATTRIBPOINTERARBPROC)GLimp_ExtensionPointer( "glVertexAttribPointerARB" );
 		qglEnableVertexAttribArrayARB = (PFNGLENABLEVERTEXATTRIBARRAYARBPROC)GLimp_ExtensionPointer( "glEnableVertexAttribArrayARB" );
 		qglDisableVertexAttribArrayARB = (PFNGLDISABLEVERTEXATTRIBARRAYARBPROC)GLimp_ExtensionPointer( "glDisableVertexAttribArrayARB" );
@@ -535,12 +719,12 @@ static void R_CheckPortableExtensions( void ) {
 		qglProgramLocalParameter4fvARB = (PFNGLPROGRAMLOCALPARAMETER4FVARBPROC)GLimp_ExtensionPointer( "glProgramLocalParameter4fvARB" );
 	}
 
-	// ARB_fragment_program
+	// ARB_fragment_program update but keeping for testing purposes. GLSL todo
 	if ( r_inhibitFragmentProgram.GetBool() ) {
 		qglConfig.ARBFragmentProgramAvailable = false;
 	} else {
 		qglConfig.ARBFragmentProgramAvailable = R_CheckExtension( "GL_ARB_fragment_program" );
-		if (qglConfig.ARBFragmentProgramAvailable) {
+		if ( qglConfig.ARBFragmentProgramAvailable ) {
 			// these are the same as ARB_vertex_program
 			qglProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC)GLimp_ExtensionPointer( "glProgramStringARB" );
 			qglBindProgramARB = (PFNGLBINDPROGRAMARBPROC)GLimp_ExtensionPointer( "glBindProgramARB" );
@@ -550,17 +734,67 @@ static void R_CheckPortableExtensions( void ) {
 	}
 
 	// check for minimum set
-	if ( !qglConfig.multitextureAvailable || !qglConfig.textureEnvCombine || !qglConfig.useCubeMap
-		|| !qglConfig.envDot3 ) {
-			common->Error( common->GetLanguageDict()->GetString( "#str_06780" ) );
+	if ( !qglConfig.multitextureAvailable || !qglConfig.textureEnvCombine || !qglConfig.useCubeMap || !qglConfig.envDot3 ) {
+		common->Error( common->GetLanguageDict()->GetString( "#str_06780" ) );
 	}
 
+		// OpenGL 3.2 - GL_ARB_depth_clamp
+	if ( qglConfig.qglVersion >= 3.2 || R_CheckExtension( "GL_ARB_depth_clamp" ) || R_CheckExtension( "GL_ARB_seamless_cube_map" ) ) {
+		qglRefConfig.depthClamp = true;
+		qglConfig.seamlessCubeMap = true;
+		qglConfig.depthClamp = R_CheckExtension( "GL_ARB_depth_clamp" );
+		qglConfig.seamlessCubeMap = R_CheckExtension( "GL_ARB_seamless_cube_map" );
+		RB_Printf( result[qglConfig.seamlessCubeMap], extension );
+		Printf( result[qglConfig.depthClamp], extension );
+	} else {
+		Printf( result[2], extension );
+	}
  	// GL_EXT_depth_bounds_test
  	qglConfig.depthBoundsTest = R_CheckExtension( "EXT_depth_bounds_test" );
  	if ( qglConfig.depthBoundsTest ) {
+		qglDepthBounds = (PFNGLDEPTHBOUNDSEXTPROC)GLimp_ExtensionPointer( "glDepthBounds" );
+	} else {
  		qglDepthBoundsEXT = (PFNGLDEPTHBOUNDSEXTPROC)GLimp_ExtensionPointer( "glDepthBoundsEXT" );
- 	}
+	}
+
+	// GLSL, core in OpenGL > 2.0
+	//glConfig.glslAvailable = ( glConfig.glVersion >= 2.0f );
+
+	// GL_ARB_uniform_buffer_object
+	/*qglConfig.uniformBufferAvailable = R_CheckExtension( "GL_ARB_uniform_buffer_object" );
+	if ( qglConfig.uniformBufferAvailable ) {
+		qglGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, (GLint *)&qglConfig.uniformBufferOffsetAlignment );
+		if ( qglConfig.uniformBufferOffsetAlignment < 256 ) {
+			qglConfig.uniformBufferOffsetAlignment = 256;
+		}
+
+	}
+	qglConfig.floatBufferAvailable = qglConfig.uniformBufferAvailable && ( qglConfig.driverType == GLDRV_OGL3X || qglConfig.driverType == GLDRV_OGL32_CORE_PROFILE || qglConfig.driverType == GLDRV_OGL32_PROFILE );*/
+	// GL_ARB_occlusion_query
+	qglConfig.occlusionQueryAvailable = GLEW_ARB_occlusion_query != 0;
+
+	// GL_ARB_timer_query
+	qglConfig.timerQueryAvailable = ( GLEW_ARB_timer_query != 0 || GLEW_EXT_timer_query != 0 ) && ( qglConfig.vendor != VENDOR_INTEL || r_skipIntelWorkarounds.GetBool() ) && qglConfig.driverType != GLDRV_OGL_MESA;
+
+	// GL_ARB_debug_output
+	qglConfig.debugOutputAvailable = R_CheckExtension( "GLEW_ARB_debug_output" );
+	if ( qglConfig.debugOutputAvailable ) {
+		if ( r_debugContext.GetInteger() >= 1 ) {
+			qglDebugMessageCallbackARB( ( GLDEBUGPROCARB ) DebugCallback, nullptr );
+			if ( r_debugContext.GetInteger() >= 2 ) {
+				// force everything to happen in the main thread instead of in a separate driver thread
+				qglEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB );
+			}
+		if ( r_debugContext.GetInteger() >= 3 ) {
+			// enable all the low priority messages
+			qglDebugMessageControlARB( GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_ARB, 0, nullptr, true );
+		}
+	}
+	// generate one global Vertex Array Object (VAO)
+	qglGenVertexArrays( 1, &qglConfig.global_vao );
+	qglBindVertexArray( qglConfig.global_vao );
 }
+
 static bool r_initialized = false;
 
 /*
@@ -650,7 +884,6 @@ and model information functions.
 ==================
 */
 void R_InitOpenGL( void ) {
-	GLint			temp;
 	glimpParms_t	parms;
 
 	common->Printf( "----- R_InitOpenGL -----\n" );
@@ -699,12 +932,37 @@ void R_InitOpenGL( void ) {
 	soundSystem->InitHW();
 
 	// get our config strings
-	qglConfig.vendorOutput = (const char *)qglGetString( GL_VENDOR );
-	qglConfig.rendererOutput = (const char *)qglGetString( GL_RENDERER );
-	qglConfig.versionOutput = (const char *)qglGetString( GL_VERSION );
-	qglConfig.qglExtStrOutput = (const char *)qglGetString( GL_EXTENSIONS );
+	qglConfig.vendorStr = (const char *)qglGetString( GL_VENDOR );
+	qglConfig.rendererStr = (const char *)qglGetString( GL_RENDERER );
+	qglConfig.versionStr = (const char *)qglGetString( GL_VERSION );
+	qglConfig.shaderLangVerson = ( const char* )qglGetString( GL_SHADING_LANGUAGE_VERSION );
+	qglConfig.extensionsStr = (const char *)qglGetString( GL_EXTENSIONS );
+	if ( qglConfig.extensionsStr == nullptr ) {
+		// As of OpenGL 3.2, qglGetStringi is required to obtain the available extensions
+		//qglGetStringi = ( PFNGLGETSTRINGIPROC )GLimp_ExtensionPointer( "glGetStringi" );
+		// Build the extensions string
+		GLint numExtensions;
+		qglGetIntegerv( GL_NUM_EXTENSIONS, &numExtensions );
+		extensionsStr.Clear();
+		for ( int i = 0; i < numExtensions; i++ ) {
+			extensionsStr.Append( (const char *)qglGetStringi( GL_EXTENSIONS, i ) );
+			// the now deprecated glGetString method usaed to create a single string with each extension separated by a space
+			if ( i < numExtensions - 1 ) {
+				extensionsStr.Append( ' ' );
+			}
+		}
+		qglConfig.extensionsStr = extensionsStr.c_str();
+	}
+
+	qglConfig.qglVersion = atof( qglConfig.version_string );
+	qglConfig.qglslVersion = atof( qglConfig.shaderLangVerson );
+	common->Printf( "OpenGL Version  : %3.1f\n", qglConfig.qglVersion );
+	common->Printf( "OpenGL Vendor   : %s\n", qglConfig.vendor_string );
+	common->Printf( "OpenGL Renderer : %s\n", qglConfig.rendererStr );
+	common->Printf( "OpenGL GLSL     : %3.1f\n", qglConfig.qglslVersion );
 
 	// OpenGL driver constants
+	GLint temp;
 	qglGetIntegerv( GL_MAX_TEXTURE_SIZE, &temp );
 	qglConfig.maxImageSize = temp;
 
@@ -726,7 +984,7 @@ void R_InitOpenGL( void ) {
 	R_ARB2_Init();
 
 	cmdSystem->AddCommand( "reloadARBprograms", R_ReloadARBPrograms_f, CMD_FL_RENDERER, "reloads ARB programs" );
-	R_ReloadARBPrograms_f( arcCommandArgs() );
+	R_ReloadARBPrograms_f( anCommandArgs() );
 
 	// allocate the vertex array range or vertex objects
 	vertexCache.Init();
@@ -745,12 +1003,12 @@ void R_InitOpenGL( void ) {
 	static bool glCheck = false;
 	if ( !glCheck && win32.osversion.dwMajorVersion == 6 ) {
 		glCheck = true;
-		if ( !arcNetString::Icmp( qglConfig.vendorOutput, "Microsoft" ) && arcNetString::FindText( qglConfig.rendererOutput, "OpenGL-D3D" ) != -1 ) {
+		if ( !anString::Icmp( qglConfig.vendorStr, "Microsoft" ) && anString::FindText( qglConfig.rendererStr, "OpenGL-D3D" ) != -1 ) {
 			if ( cvarSystem->GetCVarBool( "r_fullscreen" ) ) {
 				cmdSystem->BufferCommandText( CMD_EXEC_NOW, "vid_restart partial windowed\n" );
 				Sys_GrabMouseCursor( false );
 			}
-			int ret = MessageBox( NULL, "Please install OpenGL drivers from your graphics hardware vendor to run " GAME_NAME ".\nYour OpenGL functionality is limited.",
+			int ret = MessageBox( nullptr, "Please install OpenGL drivers from your graphics hardware vendor to run " GAME_NAME ".\nYour OpenGL functionality is limited.",
 				"Insufficient OpenGL capabilities", MB_OKCANCEL | MB_ICONWARNING | MB_TASKMODAL );
 			if ( ret == IDCANCEL ) {
 				cmdSystem->BufferCommandText( CMD_EXEC_APPEND, "quit\n" );
@@ -773,13 +1031,21 @@ void GL_CheckErrors( void ) {
     GLenum	err;
     char	stack[64];
 
+	if ( !r_ignoreGLErrors.GetBool() ) {
+		//common->Printf( "GL_CheckErrors: %s\n", stack );
+		return false;
+	}
+
 	// check for up to 10 errors pending
+	bool error = false;
+
 	for ( int i = 0; i < 10; i++ ) {
 		err = qglGetError();
 		if ( err == GL_NO_ERROR ) {
-			return;
+			break;
 		}
-		switch( err ) {
+		error = true;
+		switch ( err ) {
 			case GL_INVALID_ENUM:
 				strncpy( stack, "GL_INVALID_ENUM" );
 				break;
@@ -799,14 +1065,12 @@ void GL_CheckErrors( void ) {
 				strncpy( stack, "GL_OUT_OF_MEMORY" );
 				break;
 			default:
-				arcNetString::snPrintf( stack, sizeof( stack ), "%i", err );
+				anString::snPrintf( stack, sizeof( stack ), "%i", err );
 				break;
 		}
-
-		if ( !r_ignoreGLErrors.GetBool() ) {
-			common->Printf( "GL_CheckErrors: %s\n", stack );
-		}
+		common->Printf( "caught OpenGL error: %s in file %s line %i\n", stack, filename, line );
 	}
+	return error;
 }
 
 /*
@@ -816,9 +1080,9 @@ R_ReloadSurface_f
 Reload the material displayed by r_showSurfaceInfo
 =====================
 */
-static void R_ReloadSurface_f( const arcCommandArgs &args ) {
+static void R_ReloadSurface_f( const anCommandArgs &args ) {
 	modelTrace_t mt;
-	arcVec3 start, end;
+	anVec3 start, end;
 
 	// start far enough away that we don't hit the player model
 	start = tr.primaryView->renderView.vieworg + tr.primaryView->renderView.viewAxis[0] * 16;
@@ -841,7 +1105,7 @@ static void R_ReloadSurface_f( const arcCommandArgs &args ) {
 R_ListModes_f
 ==============
 */
-static void R_ListModes_f( const arcCommandArgs &args ) {
+static void R_ListModes_f( const anCommandArgs &args ) {
 	int i;
 
 	common->Printf( "\n" );
@@ -860,20 +1124,20 @@ testimage <number>
 testimage <filename>
 =============
 */
-void R_TestImage_f( const arcCommandArgs &args ) {
+void R_TestImage_f( const anCommandArgs &args ) {
 	int imageNum;
 
 	if ( tr.testVideo ) {
 		delete tr.testVideo;
-		tr.testVideo = NULL;
+		tr.testVideo = nullptr;
 	}
-	tr.testImage = NULL;
+	tr.testImage = nullptr;
 
 	if ( args.Argc() != 2 ) {
 		return;
 	}
 
-	if ( arcNetString::IsNumeric( args.Argv(1 ) ) ) {
+	if ( anString::IsNumeric( args.Argv(1 ) ) ) {
 		imageNum = atoi( args.Argv(1 ) );
 		if ( imageNum >= 0 && imageNum < globalImages->images.Num() ) {
 			tr.testImage = globalImages->images[imageNum];
@@ -884,17 +1148,17 @@ void R_TestImage_f( const arcCommandArgs &args ) {
 }
 
 static int R_QSortSurfaceAreas( const void *a, const void *b ) {
-	const arcMaterial	*ea, *eb;
+	const anMaterial	*ea, *eb;
 	int	ac, bc;
 
-	ea = *( arcMaterial ** )a;
+	ea = *( anMaterial ** )a;
 	if ( !ea->EverReferenced() ) {
 		ac = 0;
 	} else {
 		ac = ea->GetSurfaceArea();
 	}
 
-	eb = *( arcMaterial ** ) b;
+	eb = *( anMaterial ** ) b;
 
 	if ( !eb->EverReferenced() ) {
 		bc = 0;
@@ -909,7 +1173,7 @@ static int R_QSortSurfaceAreas( const void *a, const void *b ) {
 		return 1;
 	}
 
-	return arcNetString::Icmp( ea->GetName(), eb->GetName() );
+	return anString::Icmp( ea->GetName(), eb->GetName() );
 }
 
 /*
@@ -919,15 +1183,15 @@ R_ReportSurfaceAreas_f
 Prints a list of the materials sorted by surface area
 ===================
 */
-void R_ReportSurfaceAreas_f( const arcCommandArgs &args ) {
+void R_ReportSurfaceAreas_f( const anCommandArgs &args ) {
 	int		i, count;
-	arcMaterial	**list;
+	anMaterial	**list;
 
 	count = declManager->GetNumDecls( DECL_MATERIAL );
-	list = ( arcMaterial ** )_alloca( count * sizeof( *list ) );
+	list = ( anMaterial ** )_alloca( count * sizeof( *list ) );
 
 	for ( i = 0; i < count; i++ ) {
-		list[i] = ( arcMaterial * )declManager->DeclByIndex( DECL_MATERIAL, i, false );
+		list[i] = ( anMaterial * )declManager->DeclByIndex( DECL_MATERIAL, i, false );
 	}
 
 	qsort( list, count, sizeof( list[0] ), R_QSortSurfaceAreas );
@@ -947,19 +1211,53 @@ void R_ReportSurfaceAreas_f( const arcCommandArgs &args ) {
 }
 
 /*
+================
+R_ExtractTGA_f
+================
+*/
+void R_ExtractTGA_f( const anCommandArgs &args ) {
+	anString relativePath;
+	anString extension;
+	//anFileList *fileList;
+	int imageNum;
+	anImage	*img = nullptr;
+	//anDxtDecoder dxt;
+
+	if ( args.Argc() != 2 ) {
+		common->Printf( "usage: ExtractTGA <image path or image number>\n" );
+		return;
+	}
+
+	if ( anString::IsNumeric( args.Argv( 1 ) ) ) {
+		imageNum = atoi( args.Argv( 1 ) );
+		if ( imageNum >= 0 && imageNum < globalImages->images.Num() ) {
+			img = globalImages->images[imageNum];
+		}
+	} else {
+		img = globalImages->ImageFromFile( args.Argv( 1 ), TF_DEFAULT, TR_REPEAT, TD_DEFAULT );
+	}
+	if ( !img ) {
+		common->Warning( "Image '%s' not found.\n", args.Argv( 1 ) );
+		return;
+	}
+	common->Printf( "Saving image\n" );
+	img->ActuallySaveImage();
+}
+
+/*
 ===================
 R_ReportImageDuplication_f
 
 Checks for images with the same hash value and does a better comparison
 ===================
 */
-void R_ReportImageDuplication_f( const arcCommandArgs &args ) {
+void R_ReportImageDuplication_f( const anCommandArgs &args ) {
 	int	count = 0;
 
 	common->Printf( "Images with duplicated contents:\n" );
 
 	for ( int i = 0; i < globalImages->images.Num(); i++ ) {
-		ARCImage	*image1 = globalImages->images[i];
+		anImage	*image1 = globalImages->images[i];
 		if ( image1->isPartialImage ) {
 			// ignore background loading stubs
 			continue;
@@ -977,10 +1275,10 @@ void R_ReportImageDuplication_f( const arcCommandArgs &args ) {
 		}
 		byte *data1;
 
-		R_LoadImageProgram( image1->imgName, &data1, &w1, &h1, NULL );
+		R_LoadImageProgram( image1->imgName, &data1, &w1, &h1, nullptr );
 
 		for ( int j = 0; j < i; j++ ) {
-			ARCImage *image2 = globalImages->images[j];
+			anImage *image2 = globalImages->images[j];
 			if ( image2->isPartialImage || image2->generatorFunction ) {
 				continue;
 			}
@@ -990,7 +1288,7 @@ void R_ReportImageDuplication_f( const arcCommandArgs &args ) {
 			if ( image1->imageHash != image2->imageHash ||  image2->uploadWidth != image1->uploadWidth || image2->uploadHeight != image1->uploadHeight ) {
 				continue;
 			}
-			if ( !arcNetString::Icmp( image1->imgName, image2->imgName ) ) {
+			if ( !anString::Icmp( image1->imgName, image2->imgName ) ) {
 				// ignore same image-with-different-parms
 				continue;
 			}
@@ -998,7 +1296,7 @@ void R_ReportImageDuplication_f( const arcCommandArgs &args ) {
 			byte	*data2;
 			int		w2, h2;
 
-			R_LoadImageProgram( image2->imgName, &data2, &w2, &h2, NULL );
+			R_LoadImageProgram( image2->imgName, &data2, &w2, &h2, nullptr );
 
 			if ( w2 != w1 || h2 != h1 ) {
 				R_StaticFree( data2 );
@@ -1048,7 +1346,7 @@ static float R_RenderingFPS( const renderView_t *renderView ) {
 		// render
 		renderSystem->BeginFrame( qglConfig.vidWidth, qglConfig.vidHeight );
 		tr.primaryWorld->RenderScene( renderView );
-		renderSystem->EndFrame( NULL, NULL );
+		renderSystem->EndFrame( nullptr, nullptr );
 		qglFinish();
 		count++;
 		end = Sys_Milliseconds();
@@ -1067,7 +1365,7 @@ static float R_RenderingFPS( const renderView_t *renderView ) {
 R_Benchmark_f
 ================
 */
-void R_Benchmark_f( const arcCommandArgs &args ) {
+void R_Benchmark_f( const anCommandArgs &args ) {
 	if ( !tr.primaryView ) {
 		common->Printf( "No primaryView for benchmarking\n" );
 		return;
@@ -1116,9 +1414,9 @@ tiling it into window-sized chunks and rendering each chunk separately
 If ref isn't specified, the full session UpdateScreen will be done.
 ====================
 */
-void R_ReadTiledPixels( int width, int height, byte *buffer, renderView_t *ref = NULL ) {
+void R_ReadTiledPixels( int width, int height, byte *buffer, renderView_t *ref = nullptr ) {
 	// include extra space for OpenGL padding to word boundaries
-	byte *temp = ( byte * )R_StaticAlloc( ( qglConfig.vidWidth+3 ) * qglConfig.vidHeight * 3 );
+	byte *temp = (byte *)R_StaticAlloc( ( qglConfig.vidWidth+3 ) * qglConfig.vidHeight * 3 );
 
 	int	oldWidth = qglConfig.vidWidth;
 	int oldHeight = qglConfig.vidHeight;
@@ -1136,7 +1434,7 @@ void R_ReadTiledPixels( int width, int height, byte *buffer, renderView_t *ref =
 			if ( ref ) {
 				tr.BeginFrame( oldWidth, oldHeight );
 				tr.primaryWorld->RenderScene( ref );
-				tr.EndFrame( NULL, NULL );
+				tr.EndFrame( nullptr, nullptr );
 			} else {
 				session->UpdateScreen();
 			}
@@ -1183,22 +1481,22 @@ Move to tr_imagefiles.c...
 
 Will automatically tile render large screen shots if necessary
 Downsample is the number of steps to mipmap the image before saving it
-If ref == NULL, session->updateScreen will be used
+If ref == nullptr, session->updateScreen will be used
 ==================
 */
-void ARCRenderEngineLocal::TakeScreenshot( int width, int height, const char *fileName, int blends, renderView_t *ref ) {
+void anRenderSystemLocal::TakeScreenshot( int width, int height, const char *fileName, int blends, renderView_t *ref ) {
 	//takingScreenshot = true;
 
 	int	pix = width * height;
 
-	byte *buffer = ( byte * )R_StaticAlloc( pix*3 + 18 );
+	byte *buffer = (byte *)R_StaticAlloc( pix*3 + 18 );
 	memset ( buffer, 0, 18 );
 
 	if ( blends <= 1 ) {
 		R_ReadTiledPixels( width, height, buffer + 18, ref );
 	} else {
 		unsigned short *shortBuffer = (unsigned short *)R_StaticAlloc( pix*2*3 );
-		memset (shortBuffer, 0, pix*2*3);
+		memset ( shortBuffer, 0, pix*2*3);
 
 		// enable anti-aliasing jitter
 		r_jitter.SetBool( true );
@@ -1256,7 +1554,7 @@ from the beginning, because recording demo avis can involve
 thousands of shots
 ==================
 */
-void R_ScreenshotFilename( int &lastNumber, const char *base, arcNetString &fileName ) {
+void R_ScreenshotFilename( int &lastNumber, const char *base, anString &fileName ) {
 	bool restrict = cvarSystem->GetCVarBool( "fs_restrict" );
 	cvarSystem->SetCVarBool( "fs_restrict", false );
 
@@ -1281,7 +1579,7 @@ void R_ScreenshotFilename( int &lastNumber, const char *base, arcNetString &file
 		if ( lastNumber == 99999 ) {
 			break;
 		}
-		int len = fileSystem->ReadFile( fileName, NULL, NULL );
+		int len = fileSystem->ReadFile( fileName, nullptr, nullptr );
 		if ( len <= 0 ) {
 			break;
 		}
@@ -1301,9 +1599,9 @@ screenshot [width] [height] [samples]
 ==================
 */
 #define	MAX_BLENDS	256	// to keep the accumulation in shorts
-void R_ScreenShot_f( const arcCommandArgs &args ) {
+void R_ScreenShot_f( const anCommandArgs &args ) {
 	static int lastNumber = 0;
-	arcNetString checkname;
+	anString checkname;
 
 	int width = qglConfig.vidWidth;
 	int height = qglConfig.vidHeight;
@@ -1350,7 +1648,7 @@ void R_ScreenShot_f( const arcCommandArgs &args ) {
 	// put the console away
 	console->Close();
 
-	tr.TakeScreenshot( width, height, checkname, blends, NULL );
+	tr.TakeScreenshot( width, height, checkname, blends, nullptr );
 
 	common->Printf( "Wrote %s\n", checkname.c_str() );
 }
@@ -1368,10 +1666,10 @@ void R_StencilShot( void ) {
 	int	pix = width * height;
 
 	int	c = pix * 3 + 18;
-	byte *buffer = ( byte * )Mem_Alloc( c );
+	byte *buffer = (byte *)Mem_Alloc( c );
 	memset (buffer, 0, 18);
 
-	byte *byteBuffer = ( byte * )Mem_Alloc( pix );
+	byte *byteBuffer = (byte *)Mem_Alloc( pix );
 
 	qglReadPixels( 0, 0, width, height, GL_STENCIL_INDEX , GL_UNSIGNED_BYTE, byteBuffer );
 
@@ -1405,9 +1703,9 @@ envshot <basename>
 Saves out env/<basename>_ft.tga, etc
 ==================
 */
-void R_EnvShot_f( const arcCommandArgs &args ) {
-	arcNetString fullname;
-	arcMat3 axis[6];
+void R_EnvShot_f( const anCommandArgs &args ) {
+	anString fullname;
+	anMat3 axis[6];
 	char *extensions[6] =  { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga",
 		"_pz.tga", "_nz.tga" };
 
@@ -1474,134 +1772,16 @@ void R_EnvShot_f( const arcCommandArgs &args ) {
 
 	common->Printf( "Wrote %s, etc\n", fullname.c_str() );
 }
-void R_MakeAmbientMap_f( const arcCommandArgs &args ) {
-	const char *extensions[6] = { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga", "_pz.tga", "_nz.tga" };
-	byte *buffers[6];
-	int width, height;
-
-	if ( args.Argc() != 2 && args.Argc() != 3 ) {
-		common->Printf( "USAGE: ambientshot <basename> [size]\n" );
-		return;
-	}
-	const char *baseName = args.Argv( 1 );
-
-	int downSample = 0;
-	if ( args.Argc() == 3 ) {
-		int outSize = atoi( args.Argv( 2 ) );
-	} else {
-		int outSize = 32;
-	}
-
-	memset( &cubeAxis, 0, sizeof( cubeAxis ) );
-	cubeAxis[0][0][0] = 1;
-	cubeAxis[0][1][2] = 1;
-	cubeAxis[0][2][1] = 1;
-
-	cubeAxis[1][0][0] = -1;
-	cubeAxis[1][1][2] = -1;
-	cubeAxis[1][2][1] = 1;
-
-	cubeAxis[2][0][1] = 1;
-	cubeAxis[2][1][0] = -1;
-	cubeAxis[2][2][2] = -1;
-
-	cubeAxis[3][0][1] = -1;
-	cubeAxis[3][1][0] = -1;
-	cubeAxis[3][2][2] = 1;
-
-	cubeAxis[4][0][2] = 1;
-	cubeAxis[4][1][0] = -1;
-	cubeAxis[4][2][1] = 1;
-
-	cubeAxis[5][0][2] = -1;
-	cubeAxis[5][1][0] = 1;
-	cubeAxis[5][2][1] = 1;
-
-	// read all of the images
-	for ( int i = 0 ; i < 6 ; i++ ) {
-		arcNetString fullname;
-		common->Sprintf( fullname, "env/%s%s", baseName, extensions[i] );
-		common->Printf( "loading %s\n", fullname.c_str() );
-		session->UpdateScreen();
-		R_LoadImage( fullname, &buffers[i], &width, &height, NULL, true );
-		if ( !buffers[i] ) {
-			common->Printf( "failed.\n" );
-			for ( int i-- ; i >= 0 ; i-- ) {
-				Mem_Free( buffers[i] );
-			}
-			return;
-		}
-	}
-
-	// resample with hemispherical blending
-	int	samples = 1000;
-
-	byte *outBuffer = (byte *)_alloca( outSize * outSize * 4 );
-
-	for ( int map = 0 ; map < 2 ; map++ ) {
-		for ( int i = 0 ; i < 6 ; i++ ) {
-			for ( int x = 0 ; x < outSize ; x++ ) {
-				for ( int y = 0 ; y < outSize ; y++ ) {
-					float total[3];
-					arcVec3 dir = cubeAxis[i][0] + -( -1 + 2.0 *x/ ( outSize-1 ) ) * cubeAxis[i][1] + -( -1 + 2.0 *y/ ( outSize-1 ) ) * cubeAxis[i][2];
-					dir.Normalize();
-					total[0] = total[1] = total[2] = 0;
-					float limit = map ? 0.95 : 0.25;		// small for specular, almost hemisphere for ambient
-					for ( int s = 0 ; s < samples ; s++ ) {
-						// pick a random direction vector that is inside the unit sphere but not behind dir,
-						// which is a robust way to evenly sample a hemisphere
-						while( 1 ) {
-							for ( int j = 0 ; j < 3 ; j++ ) {
-								arcVec3 test[j] = -1 + 2 * ( rand() & 0x7fff )/(float)0x7fff;
-							}
-							if ( test.Length() > 1.0 ) {
-								continue;
-							}
-							test.Normalize();
-							if ( test * dir > limit ) {	// don't do a complete hemisphere
-								break;
-							}
-						}
-						byte result[4];
-						R_SampleCubeMap( test, width, buffers, result );
-						total[0] += result[0];
-						total[1] += result[1];
-						total[2] += result[2];
-					}
-					outBuffer[(y*outSize+x)*4+0] = total[0] / samples;
-					outBuffer[(y*outSize+x)*4+1] = total[1] / samples;
-					outBuffer[(y*outSize+x)*4+2] = total[2] / samples;
-					outBuffer[(y*outSize+x)*4+3] = 255;
-				}
-			}
-
-			if ( map == 0 ) {
-				common->Sprintf( fullname, "env/%s_amb%s", baseName, extensions[i] );
-			} else {
-				common->Sprintf( fullname, "env/%s_spec%s", baseName, extensions[i] );
-			}
-			common->Printf( "writing %s\n", fullname.c_str() );
-			session->UpdateScreen();
-			R_WriteTGA( fullname, outBuffer, outSize, outSize );
-		}
-	}
-
-	for ( int i = 0 ; i < 6 ; i++ ) {
-		if ( buffers[i] ) {
-			Mem_Free( buffers[i] );
-		}
-	}
-}
 //============================================================================
 
-static arcMat3 cubeAxis[6];
+static anMat3 cubeAxis[6];
 
 /*
 ==================
 R_SampleCubeMap
 ==================
 */
-void R_SampleCubeMap( const arcVec3 &dir, int size, byte *buffers[6], byte result[4] ) {
+void R_SampleCubeMap( const anVec3 &dir, int size, byte *buffers[6], byte result[4] ) {
 	float	adir[3];
 
 	adir[0] = fabs(dir[0] );
@@ -1647,20 +1827,138 @@ void R_SampleCubeMap( const arcVec3 &dir, int size, byte *buffers[6], byte resul
 }
 
 
-void R_SampleCubeMap( const arcVec3 &dir, int size, byte *buffers[6], byte result[4] ) {
-    int axis = arcMath::Max( dir.Begin(), dir.End() ) - dir.Begin();
+void R_SampleCubeMap( const anVec3 &dir, int size, byte *buffers[6], byte result[4] ) {
+    int axis = anMath::Max( dir.Begin(), dir.End() ) - dir.Begin();
 
     float fx = -( dir * cubeAxis[axis][1]) / ( dir * cubeAxis[axis][0] );
     float fy = -( dir * cubeAxis[axis][2]) / ( dir * cubeAxis[axis][0] );
 
-    int x = arcMath::Clamp( static_cast<int>( size * 0.5f * ( fx + 1 ) ), 0, size - 1 );
-    int y = arcMath::Clamp( static_cast<int>( size * 0.5f * ( fy + 1 )) , 0, size - 1 );
+    int x = anMath::Clamp( static_cast<int>( size * 0.5f * ( fx + 1 ) ), 0, size - 1 );
+    int y = anMath::Clamp( static_cast<int>( size * 0.5f * ( fy + 1 ) ) , 0, size - 1 );
 
     int index = ( y * size + x ) * 4;
     memcpy( result, &buffers[axis][index], sizeof( byte ) * 4 );
 }
 
 
+void R_MakeAmbientMap_f( const anCommandArgs &args ) {
+	const char *extensions[6] = { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga", "_pz.tga", "_nz.tga" };
+	byte *buffers[6];
+	int width, height;
+
+	if ( args.Argc() != 2 && args.Argc() != 3 ) {
+		common->Printf( "USAGE: ambientshot <basename> [size]\n" );
+		return;
+	}
+	const char *baseName = args.Argv( 1 );
+
+	int downSample = 0;
+	if ( args.Argc() == 3 ) {
+		int outSize = atoi( args.Argv( 2 ) );
+	} else {
+		int outSize = 32;
+	}
+
+	memset( &cubeAxis, 0, sizeof( cubeAxis ) );
+	cubeAxis[0][0][0] = 1;
+	cubeAxis[0][1][2] = 1;
+	cubeAxis[0][2][1] = 1;
+
+	cubeAxis[1][0][0] = -1;
+	cubeAxis[1][1][2] = -1;
+	cubeAxis[1][2][1] = 1;
+
+	cubeAxis[2][0][1] = 1;
+	cubeAxis[2][1][0] = -1;
+	cubeAxis[2][2][2] = -1;
+
+	cubeAxis[3][0][1] = -1;
+	cubeAxis[3][1][0] = -1;
+	cubeAxis[3][2][2] = 1;
+
+	cubeAxis[4][0][2] = 1;
+	cubeAxis[4][1][0] = -1;
+	cubeAxis[4][2][1] = 1;
+
+	cubeAxis[5][0][2] = -1;
+	cubeAxis[5][1][0] = 1;
+	cubeAxis[5][2][1] = 1;
+
+	// read all of the images
+	for ( int i = 0 ; i < 6 ; i++ ) {
+		anString fullname;
+		common->Sprintf( fullname, "env/%s%s", baseName, extensions[i] );
+		common->Printf( "loading %s\n", fullname.c_str() );
+		session->UpdateScreen();
+		R_LoadImage( fullname, &buffers[i], &width, &height, nullptr, true );
+		if ( !buffers[i] ) {
+			common->Printf( "failed.\n" );
+			for ( int i-- ; i >= 0 ; i-- ) {
+				Mem_Free( buffers[i] );
+			}
+			return;
+		}
+	}
+
+	// resample with hemispherical blending
+	int	samples = 1000;
+
+	byte *outBuffer = (byte *)_alloca( outSize * outSize * 4 );
+
+	for ( int map = 0 ; map < 2 ; map++ ) {
+		for ( int i = 0 ; i < 6 ; i++ ) {
+			for ( int x = 0 ; x < outSize ; x++ ) {
+				for ( int y = 0 ; y < outSize ; y++ ) {
+					float total[3];
+					anVec3 dir = cubeAxis[i][0] + -( -1 + 2.0 *x/ ( outSize-1 ) ) * cubeAxis[i][1] + -( -1 + 2.0 *y/ ( outSize-1 ) ) * cubeAxis[i][2];
+					dir.Normalize();
+					total[0] = total[1] = total[2] = 0;
+					float limit = map ? 0.95 : 0.25;		// small for specular, almost hemisphere for ambient
+					for ( int s = 0 ; s < samples ; s++ ) {
+						// pick a random direction vector that is inside the unit sphere but not behind dir,
+						// which is a robust way to evenly sample a hemisphere
+						while( 1 ) {
+							for ( int j = 0 ; j < 3 ; j++ ) {
+								anVec3 test[j] = -1 + 2 * ( rand() & 0x7fff )/( float )0x7fff;
+							}
+							if ( test.Length() > 1.0 ) {
+								continue;
+							}
+							test.Normalize();
+							if ( test * dir > limit ) {	// don't do a complete hemisphere
+								break;
+							}
+						}
+						byte result[4];
+						R_SampleCubeMap( test, width, buffers, result );
+						total[0] += result[0];
+						total[1] += result[1];
+						total[2] += result[2];
+					}
+					outBuffer[(y*outSize+x)*4+0] = total[0] / samples;
+					outBuffer[(y*outSize+x)*4+1] = total[1] / samples;
+					outBuffer[(y*outSize+x)*4+2] = total[2] / samples;
+					outBuffer[(y*outSize+x)*4+3] = 255;
+				}
+			}
+
+			if ( map == 0 ) {
+				common->Sprintf( fullname, "env/%s_amb%s", baseName, extensions[i] );
+			} else {
+				common->Sprintf( fullname, "env/%s_spec%s", baseName, extensions[i] );
+			}
+			common->Printf( "writing %s\n", fullname.c_str() );
+			session->UpdateScreen();
+			R_WriteTGA( fullname, outBuffer, outSize, outSize );
+		}
+	}
+
+	for ( int i = 0 ; i < 6 ; i++ ) {
+		if ( buffers[i] ) {
+			Mem_Free( buffers[i] );
+		}
+	}
+}
 /*
 ==================
 R_MakeAmbientMap_f
@@ -1670,8 +1968,8 @@ R_MakeAmbientMap_f <basename> [size]
 Saves out env/<basename>_amb_ft.tga, etc
 ==================
 */
-void R_MakeAmbientMap_f( const arcCommandArgs &args ) {
-	arcNetString fullname;
+void R_MakeAmbientMap_f( const anCommandArgs &args ) {
+	anString fullname;
 	char *extensions[6] =  { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga", "_pz.tga", "_nz.tga" };
 
 	if ( args.Argc() != 2 && args.Argc() != 3 ) {
@@ -1720,7 +2018,7 @@ void R_MakeAmbientMap_f( const arcCommandArgs &args ) {
 		sprintf( fullname, "env/%s%s", baseName, extensions[i] );
 		common->Printf( "loading %s\n", fullname.c_str() );
 		session->UpdateScreen();
-		R_LoadImage( fullname, &buffers[i], &width, &height, NULL, true );
+		R_LoadImage( fullname, &buffers[i], &width, &height, nullptr, true );
 		if ( !buffers[i] ) {
 			common->Printf( "failed.\n" );
 			for ( int i--; i >= 0; i-- ) {
@@ -1733,7 +2031,7 @@ void R_MakeAmbientMap_f( const arcCommandArgs &args ) {
 	// resample with hemispherical blending
 	int	samples = 1000;
 
-	byte *outBuffer = ( byte * )_alloca( outSize * outSize * 4 );
+	byte *outBuffer = (byte *)_alloca( outSize * outSize * 4 );
 
 	for ( int map = 0; map < 2; map++ ) {
 		for ( int i = 0; i < 6; i++ ) {
@@ -1741,7 +2039,7 @@ void R_MakeAmbientMap_f( const arcCommandArgs &args ) {
 				for ( int y = 0; y < outSize; y++ ) {
 					float total[3];
 
-					arcVec3 dir = cubeAxis[i][0] + -( -1 + 2.0f*x/( outSize-1 ) ) * cubeAxis[i][1] + -( -1 + 2.0f*y/( outSize-1 ) ) * cubeAxis[i][2];
+					anVec3 dir = cubeAxis[i][0] + -( -1 + 2.0f*x/( outSize-1 ) ) * cubeAxis[i][1] + -( -1 + 2.0f*y/( outSize-1 ) ) * cubeAxis[i][2];
 					dir.Normalize();
 					total[0] = total[1] = total[2] = 0;
 	//samples = 1;
@@ -1750,7 +2048,7 @@ void R_MakeAmbientMap_f( const arcCommandArgs &args ) {
 					for ( int s = 0; s < samples; s++ ) {
 						// pick a random direction vector that is inside the unit sphere but not behind dir,
 						// which is a robust way to evenly sample a hemisphere
-						arcVec3	test;
+						anVec3	test;
 						while ( 1 ) {
 							for ( int j = 0; j < 3; j++ ) {
 								test[j] = -1 + 2 * (rand()&0x7fff)/( float )0x7fff;
@@ -1795,6 +2093,95 @@ void R_MakeAmbientMap_f( const arcCommandArgs &args ) {
 	}
 }
 
+void R_TransformCubemap( const char *orgDirection[6], const char *orgDir, const char *destDirection[6], const char *destDir, const char *baseName ) {
+	anString	 fullname;
+	bool        errorInOriginalImages = false;
+	byte *		buffers[6];
+	int			width = 0, height = 0;
+
+	for ( int i = 0; i < 6; i++ ) {
+		fullname.Format( "%s/%s%s.%s", orgDir, baseName, orgDirection[i], fileExten [TGA] );
+		common->Printf( "loading %s\n", fullname.c_str() );
+		const bool captureToImage = false;
+		common->UpdateScreen( captureToImage );
+		R_LoadImage( fullname, &buffers[i], &width, &height, nullptr, true );
+		// check for errors in the buffer
+		if ( !buffers[i] ) {
+			common->Printf( "failed.\n" );
+			errorInOriginalImages = true;
+		} else if( width != height ) {
+			common->Printf( "wrong size pal!\n\n\nget your shit together and set the size according to your images!\n\n\ninept programmers are inept!\n" );
+			errorInOriginalImages = true;
+		} else {
+			errorInOriginalImages = false;
+		}
+
+		if ( errorInOriginalImages ) {
+			errorInOriginalImages = false;
+			for ( int i--; i >= 0; i-- ) {
+				// clean up every buffer from this stage down
+				Mem_Free( buffers[i] );
+			}
+
+			return;
+		}
+
+		// apply rotations and flips
+		R_ApplyCubeMapTransforms( i, buffers[i], width );
+
+		// save the images with the appropiate skybox naming convention
+		fullname.Format( "%s/%s/%s%s.%s", destDir, baseName, baseName, destDirection[i], fileExten [TGA] );
+		common->Printf( "writing %s\n", fullname.c_str() );
+		common->UpdateScreen( false );
+		R_WriteTGA( fullname, buffers[i], width, width );
+	}
+
+	for ( int i = 0; i < 6; i++ ) {
+		if ( buffers[i] ) {
+			Mem_Free( buffers[i] );
+		}
+	}
+}
+
+/*
+==================
+R_TransformEnvToSkybox_f
+
+R_TransformEnvToSkybox_f <basename>
+
+transforms env textures (of the type px, py, pz, nx, ny, nz)
+to skybox textures ( forward, back, left, right, up, down)
+==================
+*/
+void R_TransformEnvToSkybox_f( const anCommandArgs &args ) {
+	if ( args.Argc() != 2 ) {
+		common->Printf( "USAGE: envToSky <basename>\n" );
+		return;
+	}
+
+	R_TransformCubemap( envDirection, "env", skyDirection, "skybox", args.Argv( 1 ) );
+}
+
+/*
+==================
+R_TransformSkyboxToEnv_f
+
+R_TransformSkyboxToEnv_f <basename>
+
+transforms skybox textures ( forward, back, left, right, up, down)
+to env textures (of the type px, py, pz, nx, ny, nz)
+==================
+*/
+
+void R_TransformSkyboxToEnv_f( const anCommandArgs &args ) {
+	if ( args.Argc() != 2 ) {
+		common->Printf( "USAGE: skyToEnv <basename>\n" );
+		return;
+	}
+
+	R_TransformCubemap( skyDirection, "skybox", envDirection, "env", args.Argv( 1 ) );
+}
+
 //============================================================================
 
 /*
@@ -1802,15 +2189,16 @@ void R_MakeAmbientMap_f( const arcCommandArgs &args ) {
 GfxInfo_f
 ================
 */
-void GfxInfo_f( const arcCommandArgs &args ) {
+void GfxInfo_f( const anCommandArgs &args ) {
 	const char *fsstrings[] = {"windowed""fullscreen" };
+	common->Printf( "CPU: %s\n", Sys_GetProcessorString() );
 
-	common->Printf( "\nGL_VENDOR: %s\n", qglConfig.vendorOutput );
-	common->Printf( "GL_RENDERER: %s\n", qglConfig.rendererOutput );
-	common->Printf( "GL_VERSION: %s\n", qglConfig.versionOutput );
-	common->Printf( "GL_EXTENSIONS: %s\n", qglConfig.qglExtStrOutput );
-	if ( qglConfig.qwglExtStrOutput ) {
-		common->Printf( "WGL_EXTENSIONS: %s\n", qglConfig.qwglExtStrOutput );
+	common->Printf( "\nGL_VENDOR: %s\n", qglConfig.vendorStr );
+	common->Printf( "GL_RENDERER: %s\n", qglConfig.rendererStr );
+	common->Printf( "GL_VERSION: %s\n", qglConfig.versionStr );
+	common->Printf( "GL_EXTENSIONS: %s\n", qglConfig.extensionsStr );
+	if ( qglConfig.wglExtensionsStr ) {
+		common->Printf( "WGL_EXTENSIONS: %s\n", qglConfig.wglExtensionsStr );
 	}
 	common->Printf( "GL_MAX_TEXTURE_SIZE: %d\n", qglConfig.maxImageSize );
 	common->Printf( "GL_MAX_TEXTURE_UNITS_ARB: %d\n", qglConfig.maxImageUnits );
@@ -1819,12 +2207,13 @@ void GfxInfo_f( const arcCommandArgs &args ) {
 	common->Printf( "\nPIXELFORMAT: color(%d-bits) Z(%d-bit) stencil(%d-bits)\n", qglConfig.colorBits, qglConfig.depthBits, qglConfig.stencilBits );
 	common->Printf( "MODE: %d, %d x %d %s hz:", r_mode.GetInteger(), qglConfig.vidWidth, qglConfig.vidHeight, fsstrings[r_fullscreen.GetBool()] );
 
+	common->Printf( "%i multisamples\n", qglConfig.multisamples );
+
 	if ( qglConfig.displayFrequency ) {
 		common->Printf( "%d\n", qglConfig.displayFrequency );
 	} else {
 		common->Printf( "N/A\n" );
 	}
-	common->Printf( "CPU: %s\n", Sys_GetProcessorString() );
 
 	const char *active[2] = { "", " (ACTIVE)" };
 	common->Printf( "ARB path ENABLED%s\n", active[tr.backEndRenderer == BE_ARB] );
@@ -1887,6 +2276,11 @@ extern	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 	} else {
 		common->Printf( "Vertex cache is SLOW\n" );
 	}
+	//if( qglConfig.gpuSkinningAvailable ) {
+		//common->Printf( S_COLOR_GREEN "GPU skeletal animation available\n" );
+	//Color/} else {
+		//common->Printf( S_COLOR_RED "GPU skeletal animation not available ( slower CPU path active)\n" );
+	//}
 }
 
 /*
@@ -1894,7 +2288,7 @@ extern	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 R_VidRestart_f
 =================
 */
-void R_VidRestart_f( const arcCommandArgs &args ) {
+void R_VidRestart_f( const anCommandArgs &args ) {
 	// if OpenGL isn't started, do nothing
 	if ( !qglConfig.isInitialized ) {
 		return;
@@ -1903,11 +2297,11 @@ void R_VidRestart_f( const arcCommandArgs &args ) {
 	bool full = true;
 	bool forceWindow = false;
 	for ( int i = 1; i < args.Argc(); i++ ) {
-		if ( arcNetString::Icmp( args.Argv( i ), "partial" ) == 0 ) {
+		if ( anString::Icmp( args.Argv( i ), "partial" ) == 0 ) {
 			full = false;
 			continue;
 		}
-		if ( arcNetString::Icmp( args.Argv( i ), "windowed" ) == 0 ) {
+		if ( anString::Icmp( args.Argv( i ), "windowed" ) == 0 ) {
 			forceWindow = true;
 			continue;
 		}
@@ -1930,7 +2324,6 @@ void R_VidRestart_f( const arcCommandArgs &args ) {
 	vertexCache.PurgeAll();
 
 	// sound and input are tied to the window we are about to destroy
-
 	if ( full ) {
 		// free all of our texture numbers
 		//soundSystem->ShutdownHW();
@@ -1963,10 +2356,10 @@ void R_VidRestart_f( const arcCommandArgs &args ) {
 
 	// make sure the regeneration doesn't use anything no longer valid
 	tr.viewCount++;
-	tr.viewDef = NULL;
+	tr.viewDef = nullptr;
 
 	// regenerate all necessary interactions
-	R_RegenerateWorld_f( arcCommandArgs() );
+	R_RegenerateWorld_f( anCommandArgs() );
 
 	// check for problems
 	inr err = qglGetError();
@@ -2004,7 +2397,7 @@ R_SizeUp_f
 Keybinding command
 =================
 */
-static void R_SizeUp_f( const arcCommandArgs &args ) {
+static void R_SizeUp_f( const anCommandArgs &args ) {
 	if ( r_screenFraction.GetInteger() + 10 > 100 ) {
 		r_screenFraction.SetInteger( 100 );
 	} else {
@@ -2019,7 +2412,7 @@ R_SizeDown_f
 Keybinding command
 =================
 */
-static void R_SizeDown_f( const arcCommandArgs &args ) {
+static void R_SizeDown_f( const anCommandArgs &args ) {
 	if ( r_screenFraction.GetInteger() - 10 < 10 ) {
 		r_screenFraction.SetInteger( 10 );
 	} else {
@@ -2034,7 +2427,7 @@ TouchGui_f
 this is called from the main thread
 ===============
 */
-void R_TouchGui_f( const arcCommandArgs &args ) {
+void R_TouchGui_f( const anCommandArgs &args ) {
 	const char	*gui = args.Argv( 1 );
 
 	if ( !gui[0] ) {
@@ -2090,10 +2483,10 @@ void R_InitCommands( void ) {
 
 /*
 ===============
-ARCRenderEngineLocal::Clear
+anRenderSystemLocal::Clear
 ===============
 */
-void ARCRenderEngineLocal::Clear( void ) {
+void anRenderSystemLocal::Clear( void ) {
 	registered = false;
 	frameCount = 0;
 	viewCount = 0;
@@ -2109,25 +2502,43 @@ void ARCRenderEngineLocal::Clear( void ) {
 	ambientLightVector.Zero();
 	sortOffset = 0;
 	worlds.Clear();
-	primaryWorld = NULL;
+	primaryWorld = nullptr;
 	memset( &primaryRenderView, 0, sizeof( primaryRenderView ) );
-	primaryView = NULL;
-	defaultMaterial = NULL;
-	testImage = NULL;
-	ambientCubeImage = NULL;
-	viewDef = NULL;
+	primaryView = nullptr;
+	defaultMaterial = nullptr;
+	testImage = nullptr;
+	ambientCubeImage = nullptr;
+	viewDef = nullptr;
 	memset( &pc, 0, sizeof( pc ) );
 	memset( &lockSurfacesCmd, 0, sizeof( lockSurfacesCmd ) );
 	memset( &identitySpace, 0, sizeof( identitySpace ) );
-	logFile = NULL;
+	logFile = nullptr;
 	stencilIncr = 0;
 	stencilDecr = 0;
 	memset( renderCrops, 0, sizeof( renderCrops ) );
 	currentRenderCrop = 0;
 	guiRecursionLevel = 0;
-	guiModel = NULL;
+	guiModel = nullptr;
 	memset( gammaTable, 0, sizeof( gammaTable ) );
 	takingScreenshot = false;
+	if ( unitSquareTriangles != nullptr ) {
+		Mem_Free( unitSquareTriangles );
+		unitSquareTriangles = nullptr;
+	}
+
+	if ( zeroOneCubeTriangles != nullptr ) {
+		Mem_Free( zeroOneCubeTriangles );
+		zeroOneCubeTriangles = nullptr;
+	}
+
+	if ( testImageTriangles != nullptr ) {
+		Mem_Free( testImageTriangles );
+		testImageTriangles = nullptr;
+	}
+	//if ( hudTriangles != nullptr ) {
+		//Mem_Free( hudTriangles );
+		//hudTriangles = nullptr;
+	//}
 }
 
 void R_InitMaterials() {
@@ -2142,11 +2553,200 @@ void R_InitMaterials() {
 }
 
 /*
+=============
+R_MakeFullScreenTris
+=============
+*/
+static srfTriangles_t* R_MakeFullScreenTris() {
+	// copy verts and indexes
+	srfTriangles_t* tri = ( srfTriangles_t*)Mem_ClearedAlloc( sizeof( *tri ), TAG_RENDER_TOOLS );
+
+	tri->numIndexes = 6;
+	tri->numVerts = 4;
+
+	int indexSize = tri->numIndexes * sizeof( tri->indexes[0] );
+	int allocatedIndexBytes = ALIGN( indexSize, 16 );
+	tri->indexes = (triIndex_t *)Mem_Alloc( allocatedIndexBytes, TAG_RENDER_TOOLS );
+
+	int vertexSize = tri->numVerts * sizeof( tri->verts[0] );
+	int allocatedVertexBytes =  ALIGN( vertexSize, 16 );
+	tri->verts = (anDrawVert *)Mem_ClearedAlloc( allocatedVertexBytes, TAG_RENDER_TOOLS );
+
+	anDrawVert* verts = tri->verts;
+
+	triIndex_t tempIndexes[6] = { 3, 0, 2, 2, 0, 1 };
+	memcpy( tri->indexes, tempIndexes, indexSize );
+
+	verts[0].xyz[0] = -1.0f;
+	verts[0].xyz[1] = 1.0f;
+	verts[0].SetTexCoord( 0.0f, 1.0f );
+
+	verts[1].xyz[0] = 1.0f;
+	verts[1].xyz[1] = 1.0f;
+	verts[1].SetTexCoord( 1.0f, 1.0f );
+
+	verts[2].xyz[0] = 1.0f;
+	verts[2].xyz[1] = -1.0f;
+	verts[2].SetTexCoord( 1.0f, 0.0f );
+
+	verts[3].xyz[0] = -1.0f;
+	verts[3].xyz[1] = -1.0f;
+	verts[3].SetTexCoord( 0.0f, 0.0f );
+
+	for( int i = 0; i < 4; i++ ) {
+		verts[i].SetColor( 0xffffffff );
+	}
+
+	return tri;
+}
+/*
+=============
+R_MakeZeroOneCubeTris
+=============
+*/
+static srfTriangles_t* R_MakeZeroOneCubeTris() {
+	srfTriangles_t* tri = ( srfTriangles_t *)Mem_ClearedAlloc( sizeof( *tri ), TAG_RENDER_TOOLS );
+
+	tri->numVerts = 8;
+	tri->numIndexes = 36;
+
+	const int indexSize = tri->numIndexes * sizeof( tri->indexes[0] );
+	const int allocatedIndexBytes = ALIGN( indexSize, 16 );
+	tri->indexes = (triIndex_t *)Mem_Alloc( allocatedIndexBytes, TAG_RENDER_TOOLS );
+
+	const int vertexSize = tri->numVerts * sizeof( tri->verts[0] );
+	const int allocatedVertexBytes =  ALIGN( vertexSize, 16 );
+	tri->verts = ( anDrawVert* )Mem_ClearedAlloc( allocatedVertexBytes, TAG_RENDER_TOOLS );
+
+	anDrawVert *verts = tri->verts;
+
+	const float low = 0.0f;
+	const float high = 1.0f;
+
+	anVec3 center( 0.0f );
+	anVec3 mx( low, 0.0f, 0.0f );
+	anVec3 px( high, 0.0f, 0.0f );
+	anVec3 my( 0.0f,  low, 0.0f );
+	anVec3 py( 0.0f, high, 0.0f );
+	anVec3 mz( 0.0f, 0.0f,  low );
+	anVec3 pz( 0.0f, 0.0f, high );
+
+	verts[0].xyz = center + mx + my + mz;
+	verts[1].xyz = center + px + my + mz;
+	verts[2].xyz = center + px + py + mz;
+	verts[3].xyz = center + mx + py + mz;
+	verts[4].xyz = center + mx + my + pz;
+	verts[5].xyz = center + px + my + pz;
+	verts[6].xyz = center + px + py + pz;
+	verts[7].xyz = center + mx + py + pz;
+
+	// bottom
+	tri->indexes[ 0 * 3 + 0] = 2;
+	tri->indexes[ 0 * 3 + 1] = 3;
+	tri->indexes[ 0 * 3 + 2] = 0;
+	tri->indexes[ 1 * 3 + 0] = 1;
+	tri->indexes[ 1 * 3 + 1] = 2;
+	tri->indexes[ 1 * 3 + 2] = 0;
+	// back
+	tri->indexes[ 2 * 3 + 0] = 5;
+	tri->indexes[ 2 * 3 + 1] = 1;
+	tri->indexes[ 2 * 3 + 2] = 0;
+	tri->indexes[ 3 * 3 + 0] = 4;
+	tri->indexes[ 3 * 3 + 1] = 5;
+	tri->indexes[ 3 * 3 + 2] = 0;
+	// left
+	tri->indexes[ 4 * 3 + 0] = 7;
+	tri->indexes[ 4 * 3 + 1] = 4;
+	tri->indexes[ 4 * 3 + 2] = 0;
+	tri->indexes[ 5 * 3 + 0] = 3;
+	tri->indexes[ 5 * 3 + 1] = 7;
+	tri->indexes[ 5 * 3 + 2] = 0;
+	// right
+	tri->indexes[ 6 * 3 + 0] = 1;
+	tri->indexes[ 6 * 3 + 1] = 5;
+	tri->indexes[ 6 * 3 + 2] = 6;
+	tri->indexes[ 7 * 3 + 0] = 2;
+	tri->indexes[ 7 * 3 + 1] = 1;
+	tri->indexes[ 7 * 3 + 2] = 6;
+	// front
+	tri->indexes[ 8 * 3 + 0] = 3;
+	tri->indexes[ 8 * 3 + 1] = 2;
+	tri->indexes[ 8 * 3 + 2] = 6;
+	tri->indexes[ 9 * 3 + 0] = 7;
+	tri->indexes[ 9 * 3 + 1] = 3;
+	tri->indexes[ 9 * 3 + 2] = 6;
+	// top
+	tri->indexes[10 * 3 + 0] = 4;
+	tri->indexes[10 * 3 + 1] = 7;
+	tri->indexes[10 * 3 + 2] = 6;
+	tri->indexes[11 * 3 + 0] = 5;
+	tri->indexes[11 * 3 + 1] = 4;
+	tri->indexes[11 * 3 + 2] = 6;
+
+	for( int i = 0 ; i < 4 ; i++ ) {
+		verts[i].SetColor( 0xffffffff );
+	}
+
+	return tri;
+}
+
+/*
+================
+R_MakeTestImageTriangles
+
+Initializes the Test Image Triangles
+================
+*/
+srfTriangles_t* R_MakeTestImageTriangles() {
+	srfTriangles_t *tri = ( srfTriangles_t *)Mem_ClearedAlloc( sizeof( *tri ), TAG_RENDER_TOOLS );
+
+	tri->numIndexes = 6;
+	tri->numVerts = 4;
+
+	int indexSize = tri->numIndexes * sizeof( tri->indexes[0] );
+	int allocatedIndexBytes = ALIGN( indexSize, 16 );
+	tri->indexes = (triIndex_t *)Mem_Alloc( allocatedIndexBytes, TAG_RENDER_TOOLS );
+
+	int vertexSize = tri->numVerts * sizeof( tri->verts[0] );
+	int allocatedVertexBytes =  ALIGN( vertexSize, 16 );
+	tri->verts = (anrawVert *)Mem_ClearedAlloc( allocatedVertexBytes, TAG_RENDER_TOOLS );
+
+	ALIGNTYPE16 triIndex_t tempIndexes[6] = { 3, 0, 2, 2, 0, 1 };
+	memcpy( tri->indexes, tempIndexes, indexSize );
+
+	anDrawVert* tempVerts = tri->verts;
+	tempVerts[0].xyz[0] = 0.0f;
+	tempVerts[0].xyz[1] = 0.0f;
+	tempVerts[0].xyz[2] = 0;
+	tempVerts[0].SetTexCoord( 0.0, 0.0f );
+
+	tempVerts[1].xyz[0] = 1.0f;
+	tempVerts[1].xyz[1] = 0.0f;
+	tempVerts[1].xyz[2] = 0;
+	tempVerts[1].SetTexCoord( 1.0f, 0.0f );
+
+	tempVerts[2].xyz[0] = 1.0f;
+	tempVerts[2].xyz[1] = 1.0f;
+	tempVerts[2].xyz[2] = 0;
+	tempVerts[2].SetTexCoord( 1.0f, 1.0f );
+
+	tempVerts[3].xyz[0] = 0.0f;
+	tempVerts[3].xyz[1] = 1.0f;
+	tempVerts[3].xyz[2] = 0;
+	tempVerts[3].SetTexCoord( 0.0f, 1.0f );
+
+	for( int i = 0; i < 4; i++ ) {
+		tempVerts[i].SetColor( 0xFFFFFFFF );
+	}
+	return tri;
+}
+
+/*
 ===============
-ARCRenderEngineLocal::Init
+anRenderSystemLocal::Init
 ===============
 */
-void ARCRenderEngineLocal::Init( void ) {
+void anRenderSystemLocal::Init( void ) {
 	common->Printf( "------- Initializing Teck RenderSystem --------\n" );
 
 	// clear all our internal state
@@ -2159,14 +2759,15 @@ void ARCRenderEngineLocal::Init( void ) {
 	ambientLightVector[2] = 0.8925f;
 	ambientLightVector[3] = 1.0f;
 
-	memset( &backEnd, 0, sizeof( backEnd ) );
+	//memset( &backEnd, 0, sizeof( backEnd ) );
 
 	R_InitCvars();
 	R_InitCommands();
 
-	guiModel = new arcInteractiveGuiModel;
+	guiModel = new anInteractiveGuiModel;
 	guiModel->Clear();
-
+	tr_guiModel = guiModel;	// for DeviceContext fast path
+	renderCache->Init();
 	R_InitTriSurfData();
 
 	globalImages->Init();
@@ -2184,18 +2785,23 @@ void ARCRenderEngineLocal::Init( void ) {
 	identitySpace.modelMatrix[2*4+2] = 1.0f;
 
 	// make sure the tr.unitSquareTriangles data is current in the vertex / index cache
-	if ( unitSquareTriangles == NULL ) {
+	if ( unitSquareTriangles == nullptr || zeroOneCubeTriangles == nullptr || testImageTriangles == nullptr ) {
 		unitSquareTriangles = R_CreateFullScreenTris();
+		zeroOneCubeTriangles = R_CreateZeroOneCubeTris();
+		testImageTriangles = R_CreateTestImageTris();
 	}
 	// make sure the tr.zeroOneCubeTriangles data is current in the vertex / index cache
-	if ( zeroOneCubeTriangles == NULL ) {
+	/*if (  ) {
 		zeroOneCubeTriangles = R_CreateZeroOneCubeTris();
 	}
 	// make sure the tr.testImageTriangles data is current in the vertex / index cache
-	if ( testImageTriangles == NULL )  {
+	if (  )  {
 		testImageTriangles = R_CreateTestImageTris();
-	}
+	}*/
 
+	//if ( hudTriangles == nullptr )  {
+	//	hudTriangles = R_MakeHUDTriangles();
+	//}
 	// determine which back end we will use
 	// ??? this is invalid here as there is not enough information to set it up correctly
 	SetBackEndRenderer();
@@ -2206,21 +2812,22 @@ void ARCRenderEngineLocal::Init( void ) {
 
 /*
 ===============
-ARCRenderEngineLocal::Shutdown
+anRenderSystemLocal::Shutdown
 ===============
 */
-void ARCRenderEngineLocal::Shutdown( void ) {
+void anRenderSystemLocal::Shutdown( void ) {
 	common->Printf( "Teck RenderSystem Shutdown\n" );
 
-	R_DoneFreeType( );
+	R_DoneFreeType();
 
-	if ( qglConfig.isInitialized ) {
+	if ( qglConfig.isInitialized && R_IsInitialized() ) {
 		globalImages->PurgeAllImages();
 	}
 
 	fonts.DeleteContents();
 	renderModelManager->Shutdown();
 	globalImages->Shutdown();
+	renderCache->Shutdown();
 
 	// close the r_logFile
 	if ( logFile ) {
@@ -2244,7 +2851,7 @@ void ARCRenderEngineLocal::Shutdown( void ) {
 	Clear();
 
 	ShutdownOpenGL();
-	isInitialized = false;
+	qglConfig.isInitialized = false;
 }
 
 /*
@@ -2262,10 +2869,10 @@ void idRenderSystemLocal::ResetGuiModels() {
 
 /*
 ========================
-ARCRenderEngineLocal::BeginLevelLoad
+anRenderSystemLocal::BeginLevelLoad
 ========================
 */
-void ARCRenderEngineLocal::BeginLevelLoad( void ) {
+void anRenderSystemLocal::BeginLevelLoad( void ) {
 	renderModelManager->BeginLevelLoad();
 	globalImages->BeginLevelLoad();
 	// Re-Initialize the Default Materials if needed.
@@ -2274,19 +2881,19 @@ void ARCRenderEngineLocal::BeginLevelLoad( void ) {
 
 /*
 ========================
-ARCRenderEngineLocal::LoadLevelImages
+anRenderSystemLocal::LoadLevelImages
 ========================
 */
-void ARCRenderEngineLocal::LoadLevelImages() {
+void anRenderSystemLocal::LoadLevelImages() {
 	globalImages->LoadLevelImages( false );
 }
 
 /*
 ========================
-ARCRenderEngineLocal::Preload
+anRenderSystemLocal::Preload
 ========================
 */
-///void ARCRenderEngineLocal::Preload( const idPreloadManifest& manifest, const char* mapName ) {
+///void anRenderSystemLocal::Preload( const idPreloadManifest &manifest, const char* mapName ) {
 	//globalImages->Preload( manifest, true );
 	//uiManager->Preload( mapName );
 	//renderModelManager->Preload( manifest );
@@ -2294,10 +2901,10 @@ ARCRenderEngineLocal::Preload
 
 /*
 ========================
-ARCRenderEngineLocal::EndLevelLoad
+anRenderSystemLocal::EndLevelLoad
 ========================
 */
-void ARCRenderEngineLocal::EndLevelLoad( void ) {
+void anRenderSystemLocal::EndLevelLoad( void ) {
 	renderModelManager->EndLevelLoad();
 	globalImages->EndLevelLoad();
 	if ( r_forceLoadImages.GetBool() ) {
@@ -2306,20 +2913,140 @@ void ARCRenderEngineLocal::EndLevelLoad( void ) {
 }
 
 /*
+============
+RegisterFont
+
+Loads 3 point sizes, 12, 24, and 48
+============
+*/
+bool anRenderSystemLocal::RegisterFont( const char *fontName, fontInfoEx_t &font ) {
+	void *faceData;
+	ARC_TIME_T ftime;
+	int i, len, fontCount;
+	char name[1024];
+
+	int pointSize = 12;
+/*	if ( registeredFontCount >= MAX_FONTS ) {
+		common->Warning( "RegisterFont: Too many fonts registered already." );
+		return false;
+	}
+
+	int pointSize = 12;
+	anString::snPrintf( name, sizeof( name ), "%s/fontImage_%i.dat", fontName, pointSize );
+	for ( i = 0; i < registeredFontCount; i++ ) {
+		if ( anString::Icmp(name, registeredFont[i].fontInfoS.name) == 0 ) {
+			memcpy( &font, &registeredFont[i], sizeof( fontInfoEx_t ) );
+			return true;
+		}
+	}*/
+
+	memset( &font, 0, sizeof( font ) );
+
+	for ( fontCount = 0; fontCount < 3; fontCount++ ) {
+		if ( fontCount == 0 ) {
+			pointSize = 12;
+		} else if ( fontCount == 1 ) {
+			pointSize = 24;
+		} else {
+			pointSize = 48;
+		}
+		// we also need to adjust the scale based on point size relative to 48 points as the ui scaling is based on a 48 point font
+		float glyphScale = 1.0f; 		// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
+		glyphScale *= 48.0f / pointSize;
+
+		anString::snPrintf( name, sizeof( name ), "%s/fontImage_%i.dat", fontName, pointSize );
+
+		fontInfo_t *outFont;
+		if ( fontCount == 0 ) {
+			outFont = &font.fontInfoS;
+		} else if ( fontCount == 1 ) {
+			outFont = &font.fontInfoM;
+		} else {
+			outFont = &font.fontInfoXL;
+		}
+
+		anString::Copynz( outFont->name, name, sizeof( outFont->name ) );
+
+		len = fileSystem->ReadFile( name, nullptr, &ftime );
+		if ( len != sizeof( fontInfo_t ) ) {
+			common->Warning( "RegisterFont: couldn't find font: '%s'", name );
+			return false;
+		}
+
+		fileSystem->ReadFile( name, &faceData, &ftime );
+		fdOffset = 0;
+		fdFile = reinterpret_cast<unsigned char*>(faceData);
+		for ( i = 0; i < GLYPHS_PER_FONT; i++ ) {
+			outFont->glyphs[i].height		= readInt();
+			outFont->glyphs[i].top			= readInt();
+			outFont->glyphs[i].bottom		= readInt();
+			outFont->glyphs[i].pitch		= readInt();
+			outFont->glyphs[i].xSkip		= readInt();
+			outFont->glyphs[i].imageWidth	= readInt();
+			outFont->glyphs[i].imageHeight	= readInt();
+			outFont->glyphs[i].s			= readFloat();
+			outFont->glyphs[i].t			= readFloat();
+			outFont->glyphs[i].s2			= readFloat();
+			outFont->glyphs[i].t2			= readFloat();
+			int junk /* font.glyphs[i].glyph */		= readInt();
+			//FIXME: the +6, -6 skips the embedded fonts/
+			memcpy( outFont->glyphs[i].shaderName, &fdFile[fdOffset + 6], 32 - 6 );
+			fdOffset += 32;
+		}
+		outFont->glyphScale = readFloat();
+
+		int mw = 0;
+		int mh = 0;
+		for ( i = GLYPH_START; i < GLYPH_END; i++ ) {
+			anString::snPrintf(name, sizeof( name ), "%s/%s", fontName, outFont->glyphs[i].shaderName);
+			outFont->glyphs[i].glyph = declManager->FindMaterial( name );
+			outFont->glyphs[i].glyph->SetSort( SS_GUI );
+			if (mh < outFont->glyphs[i].height) {
+				mh = outFont->glyphs[i].height;
+			}
+			if (mw < outFont->glyphs[i].xSkip) {
+				mw = outFont->glyphs[i].xSkip;
+			}
+		}
+		if (fontCount == 0 ) {
+			font.maxHeightS = mw;
+			font.maxHeightS = mh;
+		} else if (fontCount == 1 ) {
+			font.maxWidthMedium = mw;
+			font.maxHeightMedium = mh;
+		} else {
+			font.maxWidthXL = mw;
+			font.maxHeighXL = mh;
+		}
+		fileSystem->FreeFile( faceData );
+	}
+
+	//memcpy( &registeredFont[registeredFontCount++], &font, sizeof( fontInfoEx_t ) );
+	return true;
+}
+
+/*
 ========================
-ARCRenderEngineLocal::InitOpenGL
+anRenderSystemLocal::ResetFonts
 ========================
 */
-void ARCRenderEngineLocal::InitOpenGL( void ) {
+void anRenderSystemLocal::ResetFonts() {
+	fonts.DeleteContents( true );
+}
+
+/*
+========================
+anRenderSystemLocal::InitOpenGL
+========================
+*/
+void anRenderSystemLocal::InitOpenGL( void ) {
 	// if OpenGL isn't started, start it now
-	if ( !qglConfig.isInitialized ) {
-		int	err;
-
+	if ( !qglConfig.isInitialized && !R_IsInitialized() ) {
 		R_InitOpenGL();
-
+		// Reloading images here causes the rendertargets to get deleted
 		globalImages->ReloadAllImages();
 
-		err = qglGetError();
+		int err = qglGetError();
 		if ( err != GL_NO_ERROR ) {
 			common->Printf( "qglGetError() = 0x%x\n", err );
 		}
@@ -2328,22 +3055,24 @@ void ARCRenderEngineLocal::InitOpenGL( void ) {
 
 /*
 ========================
-ARCRenderEngineLocal::ShutdownOpenGL
+anRenderSystemLocal::ShutdownOpenGL
 ========================
 */
-void ARCRenderEngineLocal::ShutdownOpenGL( void ) {
+void anRenderSystemLocal::ShutdownOpenGL( void ) {
 	// free the context and close the window
 	R_ShutdownFrameData();
 	GLimp_Shutdown();
 	qglConfig.isInitialized = false;
+	//r_initialized = false;
 }
 
 /*
 ========================
-ARCRenderEngineLocal::IsOpenGLRunning
+anRenderSystemLocal::IsOpenGLRunning
 ========================
 */
-bool ARCRenderEngineLocal::IsOpenGLRunning( void ) const {
+bool anRenderSystemLocal::IsOpenGLRunning( void ) const {
+	//return R_IsInitialized();
 	if ( !qglConfig.isInitialized ) {
 		return false;
 	}
@@ -2353,37 +3082,37 @@ bool ARCRenderEngineLocal::IsOpenGLRunning( void ) const {
 
 /*
 ========================
-ARCRenderEngineLocal::IsFullScreen
+anRenderSystemLocal::IsFullScreen
 ========================
 */
-bool ARCRenderEngineLocal::IsFullScreen( void ) const {
+bool anRenderSystemLocal::IsFullScreen( void ) const {
 	return qglConfig.isFullscreen;// != 0;
 }
 
 /*
 ========================
-ARCRenderEngineLocal::GetScreenWidth
+anRenderSystemLocal::GetScreenWidth
 ========================
 */
-int ARCRenderEngineLocal::GetScreenWidth() const {
+int anRenderSystemLocal::GetScreenWidth() const {
 	return qglConfig.vidWidth;
 }
 
 /*
 ========================
-ARCRenderEngineLocal::GetScreenHeight
+anRenderSystemLocal::GetScreenHeight
 ========================
 */
-int ARCRenderEngineLocal::GetScreenHeight() const {
+int anRenderSystemLocal::GetScreenHeight() const {
 	return qglConfig.vidHeight;
 }
 
 /*
 ========================
-ARCRenderEngineLocal::GetCardCaps
+anRenderSystemLocal::GetCardCaps
 ========================
 */
-void ARCRenderEngineLocal::GetCardCaps( bool &oldCard, bool &nv10or20 ) {
+void anRenderSystemLocal::GetCardCaps( bool &oldCard, bool &nv10or20 ) {
 	nv10or20 = ( tr.backEndRenderer == BE_NV10 || tr.backEndRenderer == BE_NV20 );
 	oldCard = ( tr.backEndRenderer == BE_ARB || tr.backEndRenderer == BE_R200 || tr.backEndRenderer == BE_NV10 || tr.backEndRenderer == BE_NV20 );
 }

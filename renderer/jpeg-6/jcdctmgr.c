@@ -65,7 +65,7 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
     qtblno = compptr->quant_tbl_no;
     /* Make sure specified quantization table is present */
     if (qtblno < 0 || qtblno >= NUM_QUANT_TBLS ||
-	cinfo->quant_tbl_ptrs[qtblno] == NULL)
+	cinfo->quant_tbl_ptrs[qtblno] == nullptr )
       ERREXIT1(cinfo, JERR_NO_QUANT_TABLE, qtblno);
     qtbl = cinfo->quant_tbl_ptrs[qtblno];
     /* Compute divisors for this quant table */
@@ -76,7 +76,7 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
       /* For LL&M IDCT method, divisors are equal to raw quantization
        * coefficients multiplied by 8 (to counteract scaling).
        */
-      if (fdct->divisors[qtblno] == NULL) {
+      if (fdct->divisors[qtblno] == nullptr ) {
 	fdct->divisors[qtblno] = (DCTELEM *)
 	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				      DCTSIZE2 * SIZEOF(DCTELEM) );
@@ -110,7 +110,7 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
 	};
 	SHIFT_TEMPS
 
-	if (fdct->divisors[qtblno] == NULL) {
+	if (fdct->divisors[qtblno] == nullptr ) {
 	  fdct->divisors[qtblno] = (DCTELEM *)
 	    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 					DCTSIZE2 * SIZEOF(DCTELEM) );
@@ -143,7 +143,7 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
 	  1.0, 0.785694958, 0.541196100, 0.275899379
 	};
 
-	if (fdct->float_divisors[qtblno] == NULL) {
+	if (fdct->float_divisors[qtblno] == nullptr ) {
 	  fdct->float_divisors[qtblno] = (FAST_FLOAT *)
 	    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 					DCTSIZE2 * SIZEOF(FAST_FLOAT) );
@@ -154,7 +154,7 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
 	  for (col = 0; col < DCTSIZE; col++ ) {
 	    fdtbl[i] = (FAST_FLOAT)
 	      (1.0 / ((( double ) qtbl->quantval[jpeg_zigzag_order[i]] *
-		       aanscalefactor[row] * aanscalefactor[col] * 8.0 ) ));
+		       aanscalefactor[row] * aanscalefactor[col] * 8.0 ) ) );
 	    i++;
 	  }
 	}
@@ -351,7 +351,7 @@ jinit_forward_dct (j_compress_ptr cinfo)
   fdct = (my_fdct_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_fdct_controller) );
-  cinfo->fdct = (struct jpeg_forward_dct *) fdct;
+  cinfo->fdct = ( struct jpeg_forward_dct *) fdct;
   fdct->pub.start_pass = start_pass_fdctmgr;
 
   switch (cinfo->dct_method) {
@@ -380,9 +380,9 @@ jinit_forward_dct (j_compress_ptr cinfo)
 
   /* Mark divisor tables unallocated */
   for ( i = 0; i < NUM_QUANT_TBLS; i++ ) {
-    fdct->divisors[i] = NULL;
+    fdct->divisors[i] = nullptr;
 #ifdef DCT_FLOAT_SUPPORTED
-    fdct->float_divisors[i] = NULL;
+    fdct->float_divisors[i] = nullptr;
 #endif
   }
 }

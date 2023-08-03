@@ -122,7 +122,7 @@ start_output_pass (j_decompress_ptr cinfo)
   my_coef_ptr coef = (my_coef_ptr) cinfo->coef;
 
   /* If multipass, check to see whether to use block smoothing on this pass */
-  if (coef->pub.coef_arrays != NULL) {
+  if (coef->pub.coef_arrays != nullptr ) {
     if (cinfo->do_block_smoothing && smoothing_ok(cinfo) )
       coef->pub.decompress_data = decompress_smooth_data;
     else
@@ -163,7 +163,7 @@ decompress_onepass (j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
 	 MCU_col_num++ ) {
       /* Try to fetch an MCU.  Entropy decoder expects buffer to be zeroed. */
       jzero_far((void FAR *) coef->MCU_buffer[0],
-		(size_t) (cinfo->blocks_in_MCU * SIZEOF(JBLOCK) ));
+		( size_t) (cinfo->blocks_in_MCU * SIZEOF(JBLOCK) ) );
       if ( ! (*cinfo->entropy->decode_mcu) (cinfo, coef->MCU_buffer) ) {
 	/* Suspension forced; update state counters and exit */
 	coef->MCU_vert_offset = yoffset;
@@ -404,21 +404,21 @@ smoothing_ok (j_decompress_ptr cinfo)
   int * coef_bits;
   int * coef_bits_latch;
 
-  if ( ! cinfo->progressive_mode || cinfo->coef_bits == NULL)
+  if ( ! cinfo->progressive_mode || cinfo->coef_bits == nullptr )
     return FALSE;
 
   /* Allocate latch area if not already done */
-  if (coef->coef_bits_latch == NULL)
-    coef->coef_bits_latch = ( int * )
+  if (coef->coef_bits_latch == nullptr )
+    coef->coef_bits_latch = ( int*)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				  cinfo->num_components *
-				  (SAVED_COEFS * SIZEOF( int ) ));
+				  (SAVED_COEFS * SIZEOF( int ) ) );
   coef_bits_latch = coef->coef_bits_latch;
 
   for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
        ci++, compptr++ ) {
     /* All components' quantization values must already be latched. */
-    if ((qtable = compptr->quant_table) == NULL)
+    if ((qtable = compptr->quant_table) == nullptr )
       return FALSE;
     /* Verify DC & first 5 AC quantizers are nonzero to avoid zero-divide. */
     for (coefi = 0; coefi <= 5; coefi++ ) {
@@ -669,11 +669,11 @@ jinit_d_coef_controller (j_decompress_ptr cinfo, boolean need_full_buffer)
   coef = (my_coef_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_coef_controller) );
-  cinfo->coef = (struct jpeg_d_coef_controller *) coef;
+  cinfo->coef = ( struct jpeg_d_coef_controller *) coef;
   coef->pub.start_input_pass = start_input_pass;
   coef->pub.start_output_pass = start_output_pass;
 #ifdef BLOCK_SMOOTHING_SUPPORTED
-  coef->coef_bits_latch = NULL;
+  coef->coef_bits_latch = nullptr;
 #endif
 
   /* Create the coefficient buffer. */
@@ -720,6 +720,6 @@ jinit_d_coef_controller (j_decompress_ptr cinfo, boolean need_full_buffer)
     }
     coef->pub.consume_data = dummy_consume_data;
     coef->pub.decompress_data = decompress_onepass;
-    coef->pub.coef_arrays = NULL; /* flag for no virtual arrays */
+    coef->pub.coef_arrays = nullptr; /* flag for no virtual arrays */
   }
 }

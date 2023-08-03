@@ -6,7 +6,7 @@ Spawner.cpp
 ================
 */
 
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Game_local.h"
@@ -16,11 +16,11 @@ Spawner.cpp
 #include "ai/AI_Manager.h"
 #include "ai/AI_Util.h"
 
-const idEventDef EV_Spawner_RemoveNullActiveEntities( "removeNullActiveEntities" );
-const idEventDef EV_Spawner_NumActiveEntities( "numActiveEntities", "", 'd' );
-const idEventDef EV_Spawner_GetActiveEntity( "getActiveEntity", "d", 'e' );
+const anEventDef EV_Spawner_RemoveNullActiveEntities( "removeNullActiveEntities" );
+const anEventDef EV_Spawner_NumActiveEntities( "numActiveEntities", "", 'd' );
+const anEventDef EV_Spawner_GetActiveEntity( "getActiveEntity", "d", 'e' );
 
-CLASS_DECLARATION( idEntity, rvSpawner )
+CLASS_DECLARATION( anEntity, rvSpawner )
 	EVENT( EV_Activate,								rvSpawner::Event_Activate )
 	EVENT( EV_Spawner_RemoveNullActiveEntities,		rvSpawner::Event_RemoveNullActiveEntities )
 	EVENT( EV_Spawner_NumActiveEntities,			rvSpawner::Event_NumActiveEntities )
@@ -54,7 +54,7 @@ void rvSpawner::Spawn( void ){
 		spawnWaves = maxActive;
 	}
 
-	FindSpawnTypes ( );
+	FindSpawnTypes();
 }
 
 /*
@@ -62,7 +62,7 @@ void rvSpawner::Spawn( void ){
 rvSpawner::Save
 ==============
 */
-void rvSpawner::Save ( idSaveGame *savefile ) const{
+void rvSpawner::Save ( anSaveGame *savefile ) const{
 	savefile->WriteInt( numSpawned );
 	savefile->WriteInt( maxToSpawn );
 	savefile->WriteFloat( nextSpawnTime );
@@ -70,7 +70,7 @@ void rvSpawner::Save ( idSaveGame *savefile ) const{
 
 	int i;
 	savefile->WriteInt( currentActive.Num() );
-	for( i = 0; i < currentActive.Num(); i++ ) {
+	for ( i = 0; i < currentActive.Num(); i++ ) {
 		currentActive[i].Save ( savefile );
 	}
 
@@ -80,7 +80,7 @@ void rvSpawner::Save ( idSaveGame *savefile ) const{
 
 	savefile->WriteInt( spawnPoints.Num() );
     for ( i = 0; i < spawnPoints.Num(); i++ ) {
-		spawnPoints[ i ].Save ( savefile );
+		spawnPoints[i].Save ( savefile );
 	}
 
 	savefile->WriteInt ( callbacks.Num() );
@@ -95,7 +95,7 @@ void rvSpawner::Save ( idSaveGame *savefile ) const{
 rvSpawner::Restore
 ==============
 */
-void rvSpawner::Restore ( idRestoreGame *savefile ){
+void rvSpawner::Restore ( anRestoreGame *savefile ){
 	int num;
 	int i;
 
@@ -105,9 +105,9 @@ void rvSpawner::Restore ( idRestoreGame *savefile ){
 	savefile->ReadInt( maxActive );
 
 	savefile->ReadInt( num );
-	currentActive.Clear ( );
+	currentActive.Clear();
 	currentActive.SetNum( num );
-	for( i = 0; i < num; i++ ) {
+	for ( i = 0; i < num; i++ ) {
 		currentActive[i].Restore ( savefile );
 	}
 
@@ -117,7 +117,7 @@ void rvSpawner::Restore ( idRestoreGame *savefile ){
 
 	savefile->ReadInt( num );
 	spawnPoints.SetNum( num);
-	for( i = 0; i < num; i ++ ) {
+	for ( i = 0; i < num; i ++ ) {
 		spawnPoints[i].Restore ( savefile );
 	}
 
@@ -140,9 +140,9 @@ prefix "def_spawn" will be included in the list.
 ==============
 */
 void rvSpawner::FindSpawnTypes ( void ){
-	const idKeyValue *kv;
-	for ( kv = spawnArgs.MatchPrefix( "def_spawn", NULL ); kv; kv = spawnArgs.MatchPrefix( "def_spawn", kv ) ) {
-		spawnTypes.Append ( kv->GetValue ( ) );
+	const anKeyValue *kv;
+	for ( kv = spawnArgs.MatchPrefix( "def_spawn", nullptr ); kv; kv = spawnArgs.MatchPrefix( "def_spawn", kv ) ) {
+		spawnTypes.Append ( kv->GetValue() );
 
 		// precache decls
 		declManager->FindType( DECL_AF, kv->GetValue(), true, false );
@@ -156,25 +156,25 @@ rvSpawner::FindTargets
 */
 void rvSpawner::FindTargets ( void ) {
 	int i;
-	arcBounds						bounds( arcVec3( -16, -16, 0 ), arcVec3( 16, 16, 72 ) );
+	anBounds						bounds( anVec3( -16, -16, 0 ), anVec3( 16, 16, 72 ) );
 	trace_t tr;
 
-	idEntity::FindTargets ( );
+	anEntity::FindTargets();
 
 	// Copy the relevant targets to the spawn point list (right now only target_null entities)
 	for ( i = targets.Num() - 1; i >= 0; i -- ) {
-		idEntity* ent;
+		anEntity* ent;
 		ent = targets[i];
-		if ( idStr::Icmp ( ent->spawnArgs.GetString ( "classname" ), "target_null" ) ) {
+		if ( anString::Icmp ( ent->spawnArgs.GetString ( "classname" ), "target_null" ) ) {
 			continue;
 		}
 
-		idEntityPtr<idEntity> &entityPtr = spawnPoints.Alloc();
+		anEntityPtr<anEntity> &entityPtr = spawnPoints.Alloc();
 		entityPtr = ent;
 
-		if( !spawnArgs.GetBool("ignoreSpawnPointValidation") ) {
-			gameLocal.TraceBounds( this, tr, ent->GetPhysics()->GetOrigin(), ent->GetPhysics()->GetOrigin(), bounds, MASK_MONSTERSOLID, NULL );
-			if ( gameLocal.entities[tr.c.entityNum] && !gameLocal.entities[tr.c.entityNum]->IsType ( idActor::GetClassType ( ) ) ) {
+		if ( !spawnArgs.GetBool( "ignoreSpawnPointValidation" ) ) {
+			gameLocal.TraceBounds( this, tr, ent->GetPhysics()->GetOrigin(), ent->GetPhysics()->GetOrigin(), bounds, MASK_MONSTERSOLID, nullptr );
+			if ( gameLocal.entities[tr.c.entityNum] && !gameLocal.entities[tr.c.entityNum]->IsType ( anActor::GetClassType() ) ) {
 				//drop a console warning here
 				gameLocal.Warning ( "Spawner '%s' can't spawn at point '%s', the monster won't fit.", GetName(), ent->GetName() );
 			}
@@ -187,13 +187,13 @@ void rvSpawner::FindTargets ( void ) {
 rvSpawner::ValidateSpawnPoint
 ==============
 */
-bool rvSpawner::ValidateSpawnPoint ( const arcVec3 origin, const arcBounds &bounds ){
+bool rvSpawner::ValidateSpawnPoint ( const anVec3 origin, const anBounds &bounds ){
 	trace_t tr;
-	if( spawnArgs.GetBool("ignoreSpawnPointValidation") ) {
+	if ( spawnArgs.GetBool( "ignoreSpawnPointValidation" ) ) {
 		return true;
 	}
 
-	gameLocal.TraceBounds( this, tr, origin, origin, bounds, MASK_MONSTERSOLID, NULL );
+	gameLocal.TraceBounds( this, tr, origin, origin, bounds, MASK_MONSTERSOLID, nullptr );
 	return tr.fraction >= 1.0f;
 }
 
@@ -202,8 +202,8 @@ bool rvSpawner::ValidateSpawnPoint ( const arcVec3 origin, const arcBounds &boun
 rvSpawner::AddSpawnPoint
 ==============
 */
-void rvSpawner::AddSpawnPoint ( idEntity* point ) {
-	idEntityPtr<idEntity> &entityPtr = spawnPoints.Alloc();
+void rvSpawner::AddSpawnPoint ( anEntity* point ) {
+	anEntityPtr<anEntity> &entityPtr = spawnPoints.Alloc();
 	entityPtr = point;
 
 	// If there were no spawnPoints then start with the delay
@@ -217,7 +217,7 @@ void rvSpawner::AddSpawnPoint ( idEntity* point ) {
 rvSpawner::RemoveSpawnPoint
 ==============
 */
-void rvSpawner::RemoveSpawnPoint ( idEntity* point ) {
+void rvSpawner::RemoveSpawnPoint ( anEntity* point ) {
 	int i;
 	for ( i = spawnPoints.Num()-1; i >= 0; i -- ) {
 		if ( spawnPoints[i] == point ) {
@@ -232,9 +232,9 @@ void rvSpawner::RemoveSpawnPoint ( idEntity* point ) {
 rvSpawner::GetSpawnPoint
 ==============
 */
-void rvSpawner::AddCallback ( idEntity* owner, const idEventDef* ev ) {
-	spawnerCallback_t& callback = callbacks.Alloc ( );
-	callback.event = ev->GetName ( );
+void rvSpawner::AddCallback ( anEntity* owner, const anEventDef* ev ) {
+	spawnerCallback_t& callback = callbacks.Alloc();
+	callback.event = ev->GetName();
 	callback.ent = owner;
 }
 
@@ -243,11 +243,11 @@ void rvSpawner::AddCallback ( idEntity* owner, const idEventDef* ev ) {
 rvSpawner::GetSpawnPoint
 ==============
 */
-idEntity *rvSpawner::GetSpawnPoint ( void ) {
-	arcBounds						bounds( arcVec3( -16, -16, 0 ), arcVec3( 16, 16, 72 ) );
-	idList< idEntityPtr<idEntity> >	spawns;
+anEntity *rvSpawner::GetSpawnPoint ( void ) {
+	anBounds						bounds( anVec3( -16, -16, 0 ), anVec3( 16, 16, 72 ) );
+	anList< anEntityPtr<anEntity> >	spawns;
 	int								spawnIndex;
-	idEntity*						spawnEnt;
+	anEntity*						spawnEnt;
 
 	// Run through all spawnPoints and choose a random one. Each time a spawn point is excluded
 	// it will be removed from the list until there are no more items in the list.
@@ -273,7 +273,7 @@ idEntity *rvSpawner::GetSpawnPoint ( void ) {
 		return spawnEnt;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -281,12 +281,12 @@ idEntity *rvSpawner::GetSpawnPoint ( void ) {
 rvSpawner::GetSpawnType
 ==============
 */
-const char* rvSpawner::GetSpawnType ( idEntity* spawnPoint ) {
-	const idKeyValue* kv;
+const char* rvSpawner::GetSpawnType ( anEntity* spawnPoint ) {
+	const anKeyValue* kv;
 
 	if ( spawnPoint ) {
 		// If the spawn point has any "def_spawn" keys then they override the normal spawn keys
-		kv = spawnPoint->spawnArgs.MatchPrefix ( "def_spawn", NULL );
+		kv = spawnPoint->spawnArgs.MatchPrefix ( "def_spawn", nullptr );
 		if ( kv ) {
 			const char* types [ MAX_SPAWN_TYPES ];
 			int			typeCount;
@@ -294,7 +294,7 @@ const char* rvSpawner::GetSpawnType ( idEntity* spawnPoint ) {
 			for ( typeCount = 0;
 				  typeCount < MAX_SPAWN_TYPES && kv;
 				  kv = spawnPoint->spawnArgs.MatchPrefix ( "def_spawn", kv ) ) {
-				types [ typeCount++ ] = kv->GetValue ( ).c_str();
+				types [ typeCount++ ] = kv->GetValue().c_str();
 			}
 
 			return types[ gameLocal.random.RandomInt( typeCount ) ];
@@ -302,7 +302,7 @@ const char* rvSpawner::GetSpawnType ( idEntity* spawnPoint ) {
 	}
 
 	// No spawn types?
-	if ( !spawnTypes.Num ( ) ) {
+	if ( !spawnTypes.Num() ) {
 		return "";
 	}
 
@@ -315,10 +315,10 @@ const char* rvSpawner::GetSpawnType ( idEntity* spawnPoint ) {
 rvSpawner::CopyPrefixedSpawnArgs
 ==============
 */
-void rvSpawner::CopyPrefixedSpawnArgs( idEntity *src, const char *prefix, idDict &args ){
-	const idKeyValue *kv = src->spawnArgs.MatchPrefix( prefix, NULL );
+void rvSpawner::CopyPrefixedSpawnArgs( anEntity *src, const char *prefix, anDict &args ){
+	const anKeyValue *kv = src->spawnArgs.MatchPrefix( prefix, nullptr );
 	while( kv ) {
-		args.Set( kv->GetKey().c_str() + idStr::Length( prefix ), kv->GetValue() );
+		args.Set( kv->GetKey().c_str() + anString::Length( prefix ), kv->GetValue() );
 		kv = src->spawnArgs.MatchPrefix( prefix, kv );
 	}
 }
@@ -329,14 +329,14 @@ rvSpawner::SpawnEnt
 ==============
 */
 bool rvSpawner::SpawnEnt( void ){
-	idDict		args;
-	idEntity*	spawnPoint;
-	idEntity*	spawnedEnt;
+	anDict		args;
+	anEntity*	spawnPoint;
+	anEntity*	spawnedEnt;
 	const char* temp;
 
 	// Find a spawn point to spawn the entity
-	spawnPoint = GetSpawnPoint ( );
-	if( !spawnPoint ){
+	spawnPoint = GetSpawnPoint();
+	if ( !spawnPoint ){
 		return false;
 	}
 
@@ -356,7 +356,7 @@ bool rvSpawner::SpawnEnt( void ){
 
 	// Copy all keywords prefixed with "spawn_" to the entity being spawned.
 	CopyPrefixedSpawnArgs( this, "spawn_", args );
-	if( spawnPoint != this ) {
+	if ( spawnPoint != this ) {
 		CopyPrefixedSpawnArgs( spawnPoint, "spawn_", args );
 	}
 
@@ -369,10 +369,10 @@ bool rvSpawner::SpawnEnt( void ){
 	spawnedEnt->ProcessEvent( &EV_Activate, this );
 
 	// Play a spawning effect if it has one - do we possibly want some script hooks in here?
-	gameLocal.PlayEffect ( spawnArgs, "fx_spawning", spawnPoint->GetPhysics()->GetOrigin(), arcVec3(0,0,1).ToMat3() );
+	gameLocal.PlayEffect ( spawnArgs, "fx_spawning", spawnPoint->GetPhysics()->GetOrigin(), anVec3(0,0,1).ToMat3() );
 
 	// script function for spawning guys
-	if( spawnArgs.GetString( "call", "", &temp ) && *temp ) {
+	if ( spawnArgs.GetString( "call", "", &temp ) && *temp ) {
 		gameLocal.CallFrameCommand ( this, temp );
 	}
 
@@ -385,12 +385,12 @@ bool rvSpawner::SpawnEnt( void ){
 	int c;
 	for ( c = callbacks.Num() - 1; c >= 0; c-- ) {
 		if ( callbacks[c].ent ) {
-			callbacks[c].ent->ProcessEvent ( idEventDef::FindEvent ( callbacks[c].event ), this, spawnedEnt );
+			callbacks[c].ent->ProcessEvent ( anEventDef::FindEvent ( callbacks[c].event ), this, spawnedEnt );
 		}
 	}
 
 	// Activate the spawn point entity when an enemy is spawned there and all of its targets
-	if( spawnPoint != this ){
+	if ( spawnPoint != this ){
 		spawnPoint->ProcessEvent( &EV_Activate, spawnPoint );
 		spawnPoint->ActivateTargets( spawnedEnt );
 
@@ -413,11 +413,11 @@ rvSpawner::Think
 */
 void rvSpawner::Think( void ){
 	if ( thinkFlags & TH_THINK ) {
-		if( ActiveListChanged() ) {// If an entity has been removed and we have not been informed via Detach
+		if ( ActiveListChanged() ) {// If an entity has been removed and we have not been informed via Detach
 			nextSpawnTime = gameLocal.GetTime() + spawnDelay;
 		}
 
-		CheckSpawn ( );
+		CheckSpawn();
 	}
 }
 
@@ -430,7 +430,7 @@ void rvSpawner::CheckSpawn ( void ) {
 	int count;
 
 	// Any spawn points?
-	if ( !spawnPoints.Num ( ) ) {
+	if ( !spawnPoints.Num() ) {
 		return;
 	}
 
@@ -447,12 +447,12 @@ void rvSpawner::CheckSpawn ( void ) {
 	// Spawn in waves?
 	for ( count = 0; count < spawnWaves; count ++ ) {
 		// Too many active?
-		if( currentActive.Num() >= maxActive ) {
+		if ( currentActive.Num() >= maxActive ) {
 			return;
 		}
 
 		// Spawn a new entity
-		SpawnEnt ( );
+		SpawnEnt();
 
 		// Are we at the limit now?
 		if ( maxToSpawn > -1 && numSpawned >= maxToSpawn ) {
@@ -471,18 +471,18 @@ void rvSpawner::CheckSpawn ( void ) {
 rvSpawner::CallScriptEvents
 ==============
 */
-void rvSpawner::CallScriptEvents( const char* prefixKey, idEntity* parm ) {
-	if( !prefixKey || !prefixKey[0] ) {
+void rvSpawner::CallScriptEvents( const char* prefixKey, anEntity* parm ) {
+	if ( !prefixKey || !prefixKey[0] ) {
 		return;
 	}
 
 	rvScriptFuncUtility func;
-	for( const idKeyValue* kv = spawnArgs.MatchPrefix(prefixKey); kv; kv = spawnArgs.MatchPrefix(prefixKey, kv) ) {
-		if( !kv->GetValue().Length() ) {
+	for ( const anKeyValue* kv = spawnArgs.MatchPrefix(prefixKey); kv; kv = spawnArgs.MatchPrefix(prefixKey, kv) ) {
+		if ( !kv->GetValue().Length() ) {
 			continue;
 		}
 
-		if( func.Init(kv->GetValue()) <= SFU_ERROR ) {
+		if ( func.Init(kv->GetValue()) <= SFU_ERROR ) {
 			continue;
 		}
 
@@ -512,7 +512,7 @@ Attach the given AI to the spawner.  This will increase the active count of the 
 set the spawner pointer in the ai.
 ==============
 */
-void rvSpawner::Attach ( idEntity* ent ) {
+void rvSpawner::Attach ( anEntity* ent ) {
 	currentActive.AddUnique( ent );
 }
 
@@ -525,7 +525,7 @@ Attach the given AI to the spawner.  This will increase the active count of the 
 set the spawner pointer in the ai.
 ==============
 */
-void rvSpawner::Detach ( idEntity* ent ){
+void rvSpawner::Detach ( anEntity* ent ){
 	currentActive.Remove( ent );
 
 	nextSpawnTime = gameLocal.GetTime() + spawnDelay;
@@ -536,13 +536,13 @@ void rvSpawner::Detach ( idEntity* ent ){
 rvSpawner::Event_Activate
 ==============
 */
-void rvSpawner::Event_Activate ( idEntity *activator ) {
+void rvSpawner::Event_Activate ( anEntity *activator ) {
 
 	// "trigger_only" spawners will attempt to spawn when triggered
 	if ( spawnArgs.GetBool ( "trigger_only" ) ) {
 		// Update next spawn time to follo CheckSpawn into thinking its time to spawn again
 		nextSpawnTime = gameLocal.time;
-		CheckSpawn ( );
+		CheckSpawn();
 		return;
 	}
 
@@ -573,8 +573,8 @@ rvSpawner::Event_RemoveNullActiveEntities
 ==============
 */
 void rvSpawner::Event_RemoveNullActiveEntities( void ) {
-	for( int ix = currentActive.Num() - 1; ix >= 0; --ix ) {
-		if( !currentActive[ix].IsValid() ) {
+	for ( int ix = currentActive.Num() - 1; ix >= 0; --ix ) {
+		if ( !currentActive[ix].IsValid() ) {
 			currentActive.RemoveIndex( ix );
 		}
 	}
@@ -586,7 +586,7 @@ rvSpawner::Event_NumActiveEntities
 ==============
 */
 void rvSpawner::Event_NumActiveEntities( void ) {
-	idThread::ReturnInt( currentActive.Num() );
+	anThread::ReturnInt( currentActive.Num() );
 }
 
 /*
@@ -595,6 +595,6 @@ rvSpawner::Event_GetActiveEntity
 ==============
 */
 void rvSpawner::Event_GetActiveEntity( int index ) {
-	idThread::ReturnEntity( (index < 0 || index >= currentActive.Num()) ? NULL : currentActive[index] );
+	anThread::ReturnEntity( (index < 0 || index >= currentActive.Num()) ? nullptr : currentActive[index] );
 }
 

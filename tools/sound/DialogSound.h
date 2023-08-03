@@ -38,10 +38,10 @@ If you have questions concerning this license or the applicable additional terms
 
 class CDialogSound : public CDialog {
 public:
-							CDialogSound(CWnd* pParent = NULL);   // standard constructor\
+							CDialogSound(CWnd* pParent = nullptr );   // standard constructor\
 
-	void					Set( const arcDictionary *source );
-	void					Get( arcDictionary *dest );
+	void					Set( const anDict *source );
+	void					Get( anDict *dest );
 
 	enum { NONE, SOUNDS, SOUNDPARENT, WAVES, WAVEDIR, INUSESOUNDS };
 
@@ -115,19 +115,19 @@ private:
 	//}}AFX_DATA
 
 	CString					playSound;
-	arcHashTable<HTREEITEM>	quickTree;
+	anHashTable<HTREEITEM>	quickTree;
 	HTREEITEM				inUseTree;
 private:
 	void					AddSounds(bool rootItem);
-	HTREEITEM				AddStrList(const char *root, const arcStringList &list, int id);
+	HTREEITEM				AddStrList(const char *root, const anStringList &list, int id);
 	HTREEITEM				InsertTreeItem(const char *name, const char *fullName, HTREEITEM item);
-	arcNetString					RebuildItemName(const char *root, HTREEITEM item);
+	anString					RebuildItemName(const char *root, HTREEITEM item);
 	void					UpdateSelectedOrigin(float x, float y, float z);
 	void					AddGroups();
 	void					AddSpeakers();
 	void					AddInUseSounds();
 	void					ApplyChanges( bool volumeOnly = false , bool updateInUseTree = true );
-	void					SetWaveSize( const char *p = NULL );
+	void					SetWaveSize( const char *p = nullptr );
 	void					SetVolume( float f );
 	virtual BOOL			PreTranslateMessage(MSG* pMsg);
 };

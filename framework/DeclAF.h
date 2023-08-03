@@ -9,7 +9,7 @@
 ===============================================================================
 */
 
-class arcDeclAF;
+class anDeclAF;
 
 typedef enum {
 	DECLAF_CONSTRAINT_INVALID,
@@ -27,7 +27,7 @@ typedef enum {
 	DECLAF_JOINTMOD_BOTH
 } declAFJointMod_t;
 
-typedef bool (*getJointTransform_t)( void *model, const arcJointMat *frame, const char *jointName, arcVec3 &origin, arcMat3 &axis );
+typedef bool (*getJointTransform_t)( void *model, const arcJointMat *frame, const char *jointName, anVec3 &origin, anMat3 &axis );
 
 class arcAFVector {
 public:
@@ -37,28 +37,28 @@ public:
 		VEC_BONECENTER,
 		VEC_BONEDIR
 	}						type;
-	arcNetString					joint1;
-	arcNetString					joint2;
+	anString					joint1;
+	anString					joint2;
 
 public:
 							arcAFVector();
 
-	bool					Parse( arcLexer &src );
+	bool					Parse( anLexer &src );
 	bool					Finish( const char *fileName, const getJointTransform_t GetJointTransform, const arcJointMat *frame, void *model ) const;
-	bool					Write( arcNetFile *f ) const;
-	const char *			ToString( arcNetString &str, const int precision = 8 );
-	const arcVec3 &			ToVec3() const { return vec; }
-	arcVec3 &				ToVec3() { return vec; }
+	bool					Write( anFile *f ) const;
+	const char *			ToString( anString &str, const int precision = 8 );
+	const anVec3 &			ToVec3() const { return vec; }
+	anVec3 &				ToVec3() { return vec; }
 
 private:
-	mutable arcVec3			vec;
+	mutable anVec3			vec;
 	bool					negate;
 };
 
-class arcDeclAF_Body {
+class anDeclAF_Body {
 public:
-	arcNetString					name;
-	arcNetString					jointName;
+	anString					name;
+	anString					jointName;
 	declAFJointMod_t		jointMod;
 	int						modelType;
 	arcAFVector				v1, v2;
@@ -66,26 +66,26 @@ public:
 	float					width;
 	float					density;
 	arcAFVector				origin;
-	arcAngles				angles;
+	anAngles				angles;
 	int						contents;
 	int						clipMask;
 	bool					selfCollision;
-	arcMat3					inertiaScale;
+	anMat3					inertiaScale;
 	float					linearFriction;
 	float					angularFriction;
 	float					contactFriction;
-	arcNetString					containedJoints;
+	anString					containedJoints;
 	arcAFVector				frictionDirection;
 	arcAFVector				contactMotorDirection;
 public:
-	void					SetDefault( const arcDeclAF *file );
+	void					SetDefault( const anDeclAF *file );
 };
 
-class arcDeclAF_Constraint {
+class anDeclAF_Constraint {
 public:
-	arcNetString					name;
-	arcNetString					body1;
-	arcNetString					body2;
+	anString					name;
+	anString					body1;
+	anString					body2;
 	declAFConstraintType_t	type;
 	float					friction;
 	float					stretch;
@@ -107,14 +107,14 @@ public:
 	float					limitAngles[3];
 
 public:
-	void					SetDefault( const arcDeclAF *file );
+	void					SetDefault( const anDeclAF *file );
 };
 
-class arcDeclAF : public arcDecleration {
+class anDeclAF : public anDecl {
 	friend class arcAFFileManager;
 public:
-							arcDeclAF();
-	virtual					~arcDeclAF();
+							anDeclAF();
+	virtual					~anDeclAF();
 
 	virtual size_t			Size() const;
 	virtual const char *	DefaultDefinition() const;
@@ -134,22 +134,22 @@ public:
 	void					DeleteConstraint( const char *name );
 
 	static int				ContentsFromString( const char *str );
-	static const char *		ContentsToString( const int contents, arcNetString &str );
+	static const char *		ContentsToString( const int contents, anString &str );
 
 	static declAFJointMod_t	JointModFromString( const char *str );
 	static const char *		JointModToString( declAFJointMod_t jointMod );
 
 public:
 	bool					modified;
-	arcNetString					model;
-	arcNetString					skin;
+	anString					model;
+	anString					skin;
 	float					defaultLinearFriction;
 	float					defaultAngularFriction;
 	float					defaultContactFriction;
 	float					defaultConstraintFriction;
 	float					totalMass;
-	arcVec2					suspendVelocity;
-	arcVec2					suspendAcceleration;
+	anVec2					suspendVelocity;
+	anVec2					suspendAcceleration;
 	float					noMoveTime;
 	float					noMoveTranslation;
 	float					noMoveRotation;
@@ -158,29 +158,29 @@ public:
 	int						contents;
 	int						clipMask;
 	bool					selfCollision;
-	arcNetList<arcDeclAF_Body *, TAG_IDLIB_LIST_PHYSICS>			bodies;
-	arcNetList<arcDeclAF_Constraint *, TAG_IDLIB_LIST_PHYSICS>	constraints;
+	anList<anDeclAF_Body *, TAG_IDLIB_LIST_PHYSICS>			bodies;
+	anList<anDeclAF_Constraint *, TAG_IDLIB_LIST_PHYSICS>	constraints;
 
 private:
-	bool					ParseContents( arcLexer &src, int &c ) const;
-	bool					ParseBody( arcLexer &src );
-	bool					ParseFixed( arcLexer &src );
-	bool					ParseBallAndSocketJoint( arcLexer &src );
-	bool					ParseUniversalJoint( arcLexer &src );
-	bool					ParseHinge( arcLexer &src );
-	bool					ParseSlider( arcLexer &src );
-	bool					ParseSpring( arcLexer &src );
-	bool					ParseSettings( arcLexer &src );
+	bool					ParseContents( anLexer &src, int &c ) const;
+	bool					ParseBody( anLexer &src );
+	bool					ParseFixed( anLexer &src );
+	bool					ParseBallAndSocketJoint( anLexer &src );
+	bool					ParseUniversalJoint( anLexer &src );
+	bool					ParseHinge( anLexer &src );
+	bool					ParseSlider( anLexer &src );
+	bool					ParseSpring( anLexer &src );
+	bool					ParseSettings( anLexer &src );
 
-	bool					WriteBody( arcNetFile *f, const arcDeclAF_Body &body ) const;
-	bool					WriteFixed( arcNetFile *f, const arcDeclAF_Constraint &c ) const;
-	bool					WriteBallAndSocketJoint( arcNetFile *f, const arcDeclAF_Constraint &c ) const;
-	bool					WriteUniversalJoint( arcNetFile *f, const arcDeclAF_Constraint &c ) const;
-	bool					WriteHinge( arcNetFile *f, const arcDeclAF_Constraint &c ) const;
-	bool					WriteSlider( arcNetFile *f, const arcDeclAF_Constraint &c ) const;
-	bool					WriteSpring( arcNetFile *f, const arcDeclAF_Constraint &c ) const;
-	bool					WriteConstraint( arcNetFile *f, const arcDeclAF_Constraint &c ) const;
-	bool					WriteSettings( arcNetFile *f ) const;
+	bool					WriteBody( anFile *f, const anDeclAF_Body &body ) const;
+	bool					WriteFixed( anFile *f, const anDeclAF_Constraint &c ) const;
+	bool					WriteBallAndSocketJoint( anFile *f, const anDeclAF_Constraint &c ) const;
+	bool					WriteUniversalJoint( anFile *f, const anDeclAF_Constraint &c ) const;
+	bool					WriteHinge( anFile *f, const anDeclAF_Constraint &c ) const;
+	bool					WriteSlider( anFile *f, const anDeclAF_Constraint &c ) const;
+	bool					WriteSpring( anFile *f, const anDeclAF_Constraint &c ) const;
+	bool					WriteConstraint( anFile *f, const anDeclAF_Constraint &c ) const;
+	bool					WriteSettings( anFile *f ) const;
 
 	bool					RebuildTextSource();
 };

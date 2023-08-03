@@ -28,27 +28,27 @@ If you have questions concerning this license or the applicable additional terms
 
 void		Eclass_InitForSourceDirectory( const char *path );
 eclass_t *	Eclass_ForName( const char *name, bool has_brushes );
-bool		Eclass_hasModel(eclass_t *e, arcVec3 &vMin, arcVec3 &vMax);
+bool		Eclass_hasModel(eclass_t *e, anVec3 &vMin, anVec3 &vMax);
 
 typedef struct entity_s {
 	struct entity_s	*prev, *next;
 	brush_t		brushes;					// head/tail of list
 	int			undoId, redoId, entityId;	// used for undo/redo
-	arcVec3		origin;
+	anVec3		origin;
 	arcNetHandle_t	lightDef;
 	arcNetHandle_t	modelDef;
 	ARCSoundEmitter *soundEmitter;
 	eclass_t *	eclass;
-	arcDictionary		epairs;
+	anDict		epairs;
 	eclass_t *	md3Class;
-	arcMat3		rotation;
-	arcVec3 		lightOrigin;		// for lights that have been combined with models
-	arcMat3		lightRotation;		// ''
+	anMat3		rotation;
+	anVec3 		lightOrigin;		// for lights that have been combined with models
+	anMat3		lightRotation;		// ''
 	bool		trackLightOrigin;
-	aRcnicalCurve<arcVec3> *curve;
+	anCurve<anVec3> *curve;
 } entity_t;
 
-void		ParseEpair(arcDictionary *dict);
+void		ParseEpair(anDict *dict);
 const char *ValueForKey(entity_t *ent, const char *key);
 int			GetNumKeys(entity_t *ent);
 const char *GetKeyString(entity_t *ent, int iIndex);
@@ -56,21 +56,21 @@ void		SetKeyValue (entity_t *ent, const char *key, const char *value, bool track
 void		DeleteKey (entity_t *ent, const char *key);
 float		FloatForKey (entity_t *ent, const char *key);
 int			IntForKey (entity_t *ent, const char *key);
-bool		GetVectorForKey (entity_t *ent, const char *key, arcVec3 &vec);
-bool		GetVector4ForKey (entity_t *ent, const char *key, arcVec4 &vec);
+bool		GetVectorForKey (entity_t *ent, const char *key, anVec3 &vec);
+bool		GetVector4ForKey (entity_t *ent, const char *key, anVec4 &vec);
 bool		GetFloatForKey(entity_t *end, const char *key, float *f);
-void		SetKeyVec3(entity_t *ent, const char *key, arcVec3 v);
-void		SetKeyMat3(entity_t *ent, const char *key, arcMat3 m);
-bool		GetMatrixForKey(entity_t *ent, const char *key, arcMat3 &mat);
+void		SetKeyVec3(entity_t *ent, const char *key, anVec3 v);
+void		SetKeyMat3(entity_t *ent, const char *key, anMat3 m);
+bool		GetMatrixForKey(entity_t *ent, const char *key, anMat3 &mat);
 
 void		Entity_UpdateSoundEmitter( entity_t *ent );
-aRcnicalCurve<arcVec3> *Entity_MakeCurve( entity_t *e );
+anCurve<anVec3> *Entity_MakeCurve( entity_t *e );
 void		Entity_UpdateCurveData( entity_t *e );
 void		Entity_SetCurveData( entity_t *e );
 void		Entity_Free (entity_t *e);
 void		Entity_FreeEpairs(entity_t *e);
 int			Entity_MemorySize(entity_t *e);
-entity_t *	Entity_Parse (bool onlypairs, brush_t* pList = NULL);
+entity_t *	Entity_Parse (bool onlypairs, brush_t* pList = nullptr );
 void		Entity_Write (entity_t *e, FILE *f, bool use_region);
 void		Entity_WriteSelected(entity_t *e, FILE *f);
 void		Entity_WriteSelected(entity_t *e, CMemFile*);
@@ -88,7 +88,7 @@ entity_t *	Entity_New();
 void		Entity_SetName(entity_t *e, const char *name);
 
 int			GetUniqueTargetId( int iHint);
-eclass_t *	GetCachedModel(entity_t *pEntity, const char *pName, arcVec3 &vMin, arcVec3 &vMax);
+eclass_t *	GetCachedModel(entity_t *pEntity, const char *pName, anVec3 &vMin, anVec3 &vMax);
 
 //Timo : used for parsing epairs in brush primitive
 void		Entity_Name(entity_t *e, bool force);

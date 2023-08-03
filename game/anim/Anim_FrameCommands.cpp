@@ -1,7 +1,7 @@
 // Copyright (C) 2007 Id Software, Inc.
 //
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "Anim_FrameCommands.h"
@@ -18,8 +18,8 @@
 ===============================================================================
 */
 
-idCVar g_debugFrameCommands( "g_debugFrameCommands", "0", CVAR_GAME | CVAR_BOOL | CVAR_CHEAT, "Prints out frame commands as they are called" );
-idCVar g_debugFrameCommandsFilter( "g_debugFrameCommandsFilter", "", CVAR_GAME  | CVAR_CHEAT, "Filter the type of framecommands" );
+anCVar g_debugFrameCommands( "g_debugFrameCommands", "0", CVAR_GAME | CVAR_BOOL | CVAR_CHEAT, "Prints out frame commands as they are called" );
+anCVar g_debugFrameCommandsFilter( "g_debugFrameCommandsFilter", "", CVAR_GAME  | CVAR_CHEAT, "Filter the type of framecommands" );
 
 sdAnimFrameCommand::factory_t sdAnimFrameCommand::frameCommandFactory;
 
@@ -74,8 +74,8 @@ sdAnimFrameCommand*	sdAnimFrameCommand::Alloc( const char* typeName ) {
 sdAnimFrameCommand_ScriptFunction::Init
 ============
 */
-bool sdAnimFrameCommand_ScriptFunction::Init( idParser& src ) {
-	arcNetToken token;
+bool sdAnimFrameCommand_ScriptFunction::Init( anParser& src ) {
+	anToken token;
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Error( "sdAnimFrameCommand_ScriptFunction::Init Unexpected end of line" );
 		return false;
@@ -89,8 +89,8 @@ bool sdAnimFrameCommand_ScriptFunction::Init( idParser& src ) {
 sdAnimFrameCommand_ScriptFunction::Run
 ============
 */
-void sdAnimFrameCommand_ScriptFunction::Run( idClass* ent ) const {
-	if ( gameLocal.program == NULL ) {
+void sdAnimFrameCommand_ScriptFunction::Run( anClass* ent ) const {
+	if ( gameLocal.program == nullptr ) {
 		return;
 	}
 	gameLocal.CallFrameCommand( gameLocal.program->FindFunction( functionName ) );
@@ -111,8 +111,8 @@ void sdAnimFrameCommand_ScriptFunction::Run( idClass* ent ) const {
 sdAnimFrameCommand_ScriptObjectFunction::Init
 ============
 */
-bool sdAnimFrameCommand_ScriptObjectFunction::Init( idParser& src ) {
-	arcNetToken token;
+bool sdAnimFrameCommand_ScriptObjectFunction::Init( anParser& src ) {
+	anToken token;
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Error( "sdAnimFrameCommand_ScriptObjectFunction::Init Unexpected end of line" );
 		return false;
@@ -126,8 +126,8 @@ bool sdAnimFrameCommand_ScriptObjectFunction::Init( idParser& src ) {
 sdAnimFrameCommand_ScriptObjectFunction::Run
 ============
 */
-void sdAnimFrameCommand_ScriptObjectFunction::Run( idClass* ent ) const {
-	if ( gameLocal.program == NULL ) {
+void sdAnimFrameCommand_ScriptObjectFunction::Run( anClass* ent ) const {
+	if ( gameLocal.program == nullptr ) {
 		return;
 	}
 	gameLocal.CallObjectFrameCommand( ent->GetScriptObject(), functionName, false );
@@ -147,8 +147,8 @@ void sdAnimFrameCommand_ScriptObjectFunction::Run( idClass* ent ) const {
 sdAnimFrameCommand_Event::Init
 ============
 */
-bool sdAnimFrameCommand_Event::Init( idParser& src ) {
-	arcNetToken token;
+bool sdAnimFrameCommand_Event::Init( anParser& src ) {
+	anToken token;
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Error( "sdAnimFrameCommand_Event::Init Unexpected end of line" );
 		return false;
@@ -171,9 +171,9 @@ bool sdAnimFrameCommand_Event::Init( idParser& src ) {
 sdAnimFrameCommand_Event::Run
 ============
 */
-void sdAnimFrameCommand_Event::Run( idClass* ent ) const {
+void sdAnimFrameCommand_Event::Run( anClass* ent ) const {
 	if ( !ent ) {
-		gameLocal.Warning( "sdAnimFrameCommand_Event::Run NULL entity" );
+		gameLocal.Warning( "sdAnimFrameCommand_Event::Run nullptr entity" );
 		return;
 	}
 	ent->ProcessEvent( ev );
@@ -193,14 +193,14 @@ void sdAnimFrameCommand_Event::Run( idClass* ent ) const {
 sdAnimFrameCommand_Sound::Init
 ============
 */
-bool sdAnimFrameCommand_Sound::Init( idParser& src ) {
+bool sdAnimFrameCommand_Sound::Init( anParser& src ) {
 	const sdDeclStringMap* map = gameLocal.declStringMapType[ "soundChannelMap" ];
 	if ( !map ) {
 		gameLocal.Error( "sdAnimFrameCommand_Sound::Init stringMap 'soundChannelMap' not found" );
 		return false;
 	}
 
-	arcNetToken token;
+	anToken token;
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Error( "sdAnimFrameCommand_Sound::Init Unexpected end of line" );
 		return false;
@@ -228,10 +228,10 @@ bool sdAnimFrameCommand_Sound::Init( idParser& src ) {
 sdAnimFrameCommand_Sound::Run
 ============
 */
-void sdAnimFrameCommand_Sound::Run( idClass* ent ) const {
+void sdAnimFrameCommand_Sound::Run( anClass* ent ) const {
 	arcEntity* entity = ent->Cast< arcEntity >();
 	if ( entity ) {
-		entity->StartSound( soundName, soundChannel, 0, NULL );
+		entity->StartSound( soundName, soundChannel, 0, nullptr );
 	} else {
 		gameLocal.Warning( "sdAnimFrameCommand_Sound::Run Not Currently Supported on Client Entities" );
 	}
@@ -251,14 +251,14 @@ void sdAnimFrameCommand_Sound::Run( idClass* ent ) const {
 sdAnimFrameCommand_Fade::Init
 ============
 */
-bool sdAnimFrameCommand_Fade::Init( idParser& src ) {
+bool sdAnimFrameCommand_Fade::Init( anParser& src ) {
 	const sdDeclStringMap* map = gameLocal.declStringMapType[ "soundChannelMap" ];
 	if ( !map ) {
 		gameLocal.Error( "sdAnimFrameCommand_Fade::Init stringMap 'soundChannelMap' not found" );
 		return false;
 	}
 
-	arcNetToken token;
+	anToken token;
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Error( "sdAnimFrameCommand_Fade::Init Unexpected end of line" );
 		return false;
@@ -294,7 +294,7 @@ bool sdAnimFrameCommand_Fade::Init( idParser& src ) {
 sdAnimFrameCommand_Fade::Run
 ============
 */
-void sdAnimFrameCommand_Fade::Run( idClass* ent ) const {
+void sdAnimFrameCommand_Fade::Run( anClass* ent ) const {
 	arcEntity* entity = ent->Cast< arcEntity >();
 	if ( entity ) {
 		entity->FadeSound( soundChannel, to, over );
@@ -316,15 +316,15 @@ void sdAnimFrameCommand_Fade::Run( idClass* ent ) const {
 sdAnimFrameCommand_Skin::Init
 ============
 */
-bool sdAnimFrameCommand_Skin::Init( idParser& src ) {
-	arcNetToken token;
+bool sdAnimFrameCommand_Skin::Init( anParser& src ) {
+	anToken token;
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Error( "sdAnimFrameCommand_Skin::Init Unexpected end of line" );
 		return false;
 	}
 
 	if ( !token.Icmp( "none" ) ) {
-		skin = NULL;
+		skin = nullptr;
 	} else {
 		skin = gameLocal.declSkinType[ token ];
 		if ( !skin ) {
@@ -341,9 +341,9 @@ bool sdAnimFrameCommand_Skin::Init( idParser& src ) {
 sdAnimFrameCommand_Skin::Run
 ============
 */
-void sdAnimFrameCommand_Skin::Run( idClass* ent ) const {
+void sdAnimFrameCommand_Skin::Run( anClass* ent ) const {
 	if ( !ent ) {
-		gameLocal.Warning( "sdAnimFrameCommand_Skin::Run: NULL entity" );
+		gameLocal.Warning( "sdAnimFrameCommand_Skin::Run: nullptr entity" );
 		return;
 	}
 
@@ -363,8 +363,8 @@ void sdAnimFrameCommand_Skin::Run( idClass* ent ) const {
 sdAnimFrameCommand_Effect::Init
 ============
 */
-bool sdAnimFrameCommand_Effect::Init( idParser& src ) {
-	arcNetToken token;
+bool sdAnimFrameCommand_Effect::Init( anParser& src ) {
+	anToken token;
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Error( "sdAnimFrameCommand_Effect::Init Unexpected end of line" );
 		return false;
@@ -387,9 +387,9 @@ bool sdAnimFrameCommand_Effect::Init( idParser& src ) {
 sdAnimFrameCommand_Effect::Run
 ============
 */
-void sdAnimFrameCommand_Effect::Run( idClass* ent ) const {
+void sdAnimFrameCommand_Effect::Run( anClass* ent ) const {
 	if ( !ent ) {
-		gameLocal.Warning( "sdAnimFrameCommand_Effect::Run: NULL entity" );
+		gameLocal.Warning( "sdAnimFrameCommand_Effect::Run: nullptr entity" );
 		return;
 	}
 
@@ -400,14 +400,14 @@ void sdAnimFrameCommand_Effect::Run( idClass* ent ) const {
 			gameLocal.Warning( "sdAnimFrameCommand_Effect::Run Invalid Joint %s", jointName.c_str() );
 			return;
 		}
-		entity->PlayEffect( effectName, colorWhite.ToVec3(), NULL, handle );
+		entity->PlayEffect( effectName, colorWhite.ToVec3(), nullptr, handle );
 		return;
 	}
 
 	rvClientEntity* clientEnt = ent->Cast< rvClientEntity >();
 	if ( clientEnt ) {
 		arcAnimator* clientAnimator = clientEnt->GetAnimator();
-		clientEnt->PlayEffect( effectName, colorWhite.ToVec3(), NULL, clientAnimator ? clientAnimator->GetJointHandle( jointName ) : INVALID_JOINT );
+		clientEnt->PlayEffect( effectName, colorWhite.ToVec3(), nullptr, clientAnimator ? clientAnimator->GetJointHandle( jointName ) : INVALID_JOINT );
 		return;
 	}
 }
@@ -425,8 +425,8 @@ void sdAnimFrameCommand_Effect::Run( idClass* ent ) const {
 sdAnimFrameCommand_FootStep::Init
 ============
 */
-bool sdAnimFrameCommand_FootStep::Init( idParser& src ) {
-	arcNetToken token;
+bool sdAnimFrameCommand_FootStep::Init( anParser& src ) {
+	anToken token;
 	rightFoot = false;
 	if ( src.ReadTokenOnLine( &token ) ) {
 		bool valid = true;
@@ -448,9 +448,9 @@ bool sdAnimFrameCommand_FootStep::Init( idParser& src ) {
 sdAnimFrameCommand_FootStep::Run
 ============
 */
-void sdAnimFrameCommand_FootStep::Run( idClass* ent ) const {
+void sdAnimFrameCommand_FootStep::Run( anClass* ent ) const {
 	arcNetBasePlayer* player = ent->Cast< arcNetBasePlayer >();
-	if ( player == NULL ) {
+	if ( player == nullptr ) {
 		gameLocal.Warning( "sdAnimFrameCommand_FootStep::Run: Invalid Entity" );
 		return;
 	}
@@ -471,7 +471,7 @@ void sdAnimFrameCommand_FootStep::Run( idClass* ent ) const {
 sdAnimFrameCommand_DemoScript::Init
 ============
 */
-bool sdAnimFrameCommand_DemoScript::Init( idParser& src ) {
+bool sdAnimFrameCommand_DemoScript::Init( anParser& src ) {
 	src.ParseRestOfLine( command );
 	return true;
 }
@@ -481,16 +481,16 @@ bool sdAnimFrameCommand_DemoScript::Init( idParser& src ) {
 sdAnimFrameCommand_DemoScript::Run
 ============
 */
-void sdAnimFrameCommand_DemoScript::Run( idClass* ent ) const {
+void sdAnimFrameCommand_DemoScript::Run( anClass* ent ) const {
 	sdDemoScript* demoScript = sdDemoManager::GetInstance().GetScript();
 	if ( !demoScript ) {
 		return;
 	}
 
-	idParser src( LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT | LEXFL_NOFATALERRORS );
+	anParser src( LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT | LEXFL_NOFATALERRORS );
 	src.LoadMemory( command, command.Length(), "sdAnimFrameCommand_DemoScript::Run" );
 
-	arcNetToken token;
+	anToken token;
 	if ( src.ExpectAnyToken( &token ) ) {
 		sdDemoScript::sdEvent* event = sdDemoScript::CreateEvent( token.c_str() );
 
@@ -513,8 +513,8 @@ void sdAnimFrameCommand_DemoScript::Run( idClass* ent ) const {
 sdAnimFrameCommand_WeaponState::Init
 ============
 */
-bool sdAnimFrameCommand_WeaponState::Init( idParser& src ) {
-	arcNetToken token;
+bool sdAnimFrameCommand_WeaponState::Init( anParser& src ) {
+	anToken token;
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Error( "sdAnimFrameCommand_WeaponState::Init Unexpected end of line" );
 		return false;
@@ -530,18 +530,18 @@ bool sdAnimFrameCommand_WeaponState::Init( idParser& src ) {
 sdAnimFrameCommand_WeaponState::Run
 ============
 */
-void sdAnimFrameCommand_WeaponState::Run( idClass* ent ) const {
+void sdAnimFrameCommand_WeaponState::Run( anClass* ent ) const {
 	arcNetBasePlayer* player = ent->Cast< arcNetBasePlayer >();
 	if ( !player ) {
 		gameLocal.Warning( "FrameCommand 'weaponState' on entity '%s' is only supported for players.", ent->GetName() );
 		return;
 	}
 
-	if ( !command.Icmp( "hide" )) {
+	if ( !command.Icmp( "hide" ) ) {
 		if ( idWeapon* weapon = player->GetWeapon()) {
 			weapon->HideWorldModel();
 		}
-	} else if ( !command.Icmp( "show" )) {
+	} else if ( !command.Icmp( "show" ) ) {
 		if ( idWeapon* weapon = player->GetWeapon()) {
 			weapon->ShowWorldModel();
 			player->GetInventory().HideCurrentItem( true );
@@ -551,7 +551,7 @@ void sdAnimFrameCommand_WeaponState::Run( idClass* ent ) const {
 	}
 
 	if ( g_debugFrameCommands.GetBool() ) {
-		if ( !arcNetString::Length( g_debugFrameCommandsFilter.GetString()) || arcNetString::FindText( GetTypeName(), g_debugFrameCommandsFilter.GetString(), false ) != arcNetString::INVALID_POSITION )  {
+		if ( !anString::Length( g_debugFrameCommandsFilter.GetString()) || anString::FindText( GetTypeName(), g_debugFrameCommandsFilter.GetString(), false ) != anString::INVALID_POSITION )  {
 			gameLocal.Printf( "Command '%s': state '%s'\n", GetTypeName(), command.c_str() );
 		}
 	}

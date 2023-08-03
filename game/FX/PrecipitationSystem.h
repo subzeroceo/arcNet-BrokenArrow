@@ -24,9 +24,9 @@ struct sdPrecipArgs {
 	sdPrecipitationParameters p;
 	const sdHeightMapInstance*	heightMap;
 	float currentWaterHeight;
-	arcBounds bounds;
+	anBounds bounds;
 
-	ARC_INLINE float GetGroundHeightAtPos( const arcVec3 &pos, const arcVec3 &origin ) {
+	ARC_INLINE float GetGroundHeightAtPos( const anVec3 &pos, const anVec3 &origin ) {
 		return heightMap->GetHeight( pos - origin );
 	}
 
@@ -83,8 +83,8 @@ template < class ParticleClass > void sdPrecipitationSystem<ParticleClass>::Pres
 
 	this->params.bounds.ExpandSelf( 5.f );
 	this->params.currentWaterHeight = -32000.f;
-	const arcClipModel* clipModel;
-	int count = gameLocal.clip.ClipModelsTouchingBounds( CLIP_DEBUG_PARMS this->params.bounds, CONTENTS_WATER, &clipModel, 1, NULL );
+	const anClipModel* clipModel;
+	int count = gameLocal.clip.ClipModelsTouchingBounds( CLIP_DEBUG_PARMS this->params.bounds, CONTENTS_WATER, &clipModel, 1, nullptr );
 	if ( count ) {
 		if ( clipModel->GetNumCollisionModels() ) {
 			arcCollisionModel* model = clipModel->GetCollisionModel( 0 );
@@ -137,9 +137,9 @@ template < class ParticleClass > void sdPrecipitationSystem<ParticleClass>::Free
 
 class sdFlake {
 private:
-	arcVec3 position;
-	arcVec3 velocity;
-	arcVec3 velocityNorm;
+	anVec3 position;
+	anVec3 velocity;
+	anVec3 velocityNorm;
 	float height;
 	float weight;
 	float alpha;
@@ -155,7 +155,7 @@ public:
 
 	void StaticInitializeAndRender( sdTemplatedParticleSystem<sdFlake, sdPrecipArgs> *sys ) {
 		srfTriangles_t * tri = sys->GetTriSurf();
-		arcDrawVert *verts = tri->verts + tri->numVerts;
+		anDrawVertex *verts = tri->verts + tri->numVerts;
 		for ( int i=0; i<3; i++ ) {
 			verts[i].color[0] = 0xFF;
 			verts[i].color[1] = 0xFF;
@@ -181,14 +181,14 @@ public:
 	bool Initialize( sdTemplatedParticleSystem<sdFlake, sdPrecipArgs> *sys ) {
 		float precipDist = sys->params.GetPrecipitationDistance();
 
-		position[0] = idRandom::StaticRandom().CRandomFloat() * precipDist;
-		position[1] = idRandom::StaticRandom().CRandomFloat() * precipDist;
-		position[2] = idRandom::StaticRandom().CRandomFloat() * precipDist;
+		position[0] = anRandom::StaticRandom().CRandomFloat() * precipDist;
+		position[1] = anRandom::StaticRandom().CRandomFloat() * precipDist;
+		position[2] = anRandom::StaticRandom().CRandomFloat() * precipDist;
 		position += sys->GetViewOrg();
 
 		velocity = sys->params.p.windScale * sdAtmosphere::currentAtmosphere->GetWindVector();
-		velocity[2] = -(sys->params.p.fallMin +  idRandom::StaticRandom().RandomFloat() * ( sys->params.p.fallMax - sys->params.p.fallMin ));
-		float blend = idRandom::StaticRandom().RandomFloat(); // weight and height are related
+		velocity[2] = -( sys->params.p.fallMin +  anRandom::StaticRandom().RandomFloat() * ( sys->params.p.fallMax - sys->params.p.fallMin ) );
+		float blend = anRandom::StaticRandom().RandomFloat(); // weight and height are related
 		height = sys->params.p.heightMin + blend * ( sys->params.p.heightMax - sys->params.p.heightMin );
 		weight = sys->params.p.weightMin + blend * ( sys->params.p.weightMax - sys->params.p.weightMin );
 
@@ -201,7 +201,7 @@ public:
 	}
 
 	bool Update( sdTemplatedParticleSystem<sdFlake, sdPrecipArgs> *sys ) {
-		arcVec2 distance;
+		anVec2 distance;
 
 		if ( nextDropTime == -1 ) {
 			return false;
@@ -211,7 +211,7 @@ public:
 
 		// Snow lives in a box 2*MAX_PRECIPITATION_DISTANCE long and wide and 1.5*MAX_PRECIPITATION_DISTANCE high
 		// This wastes less snow particles in the common case of a player on level ground
-		arcVec3 local = position - sys->GetViewOrg();
+		anVec3 local = position - sys->GetViewOrg();
 		float precipDist = sys->params.GetPrecipitationDistance();
 		if ( local.x < -precipDist ) {
 			local.x += 2 * precipDist;
@@ -239,12 +239,12 @@ public:
 	}
 
 	void Render( sdTemplatedParticleSystem<sdFlake, sdPrecipArgs> *sys ) {
-		arcVec3			forward, right;
-		arcDrawVert*		face;
-		arcVec2			line;
+		anVec3			forward, right;
+		anDrawVertex*		face;
+		anVec2			line;
 		float			sinTumbling, cosTumbling, dist;
-		arcVec3			start, finish;
-		arcVec3			left, up;
+		anVec3			start, finish;
+		anVec3			left, up;
 		srfTriangles_t*	tri;
 		float size;
 
@@ -254,8 +254,8 @@ public:
 
 		start = position;
 
-		sinTumbling = arcMath::Sin( position[2] * 0.03125f * ( 0.5f * weight ) );
-		cosTumbling = arcMath::Cos( ( position[2] + position[1] ) * 0.03125f * ( 0.5f * weight ) );
+		sinTumbling = anMath::Sin( position[2] * 0.03125f * ( 0.5f * weight ) );
+		cosTumbling = anMath::Cos( ( position[2] + position[1] ) * 0.03125f * ( 0.5f * weight ) );
 		start[0] += sys->params.p.tumbleStrength * ( 1.0f - velocityNorm[2] ) * sinTumbling;
 		start[1] += sys->params.p.tumbleStrength * ( 1.0f - velocityNorm[2] ) * cosTumbling;
 
@@ -325,9 +325,9 @@ public:
 /************************************************************************/
 class sdDrop {
 private:
-	arcVec3 position;
-	arcVec3 velocity;
-	arcVec3 velocityNorm;
+	anVec3 position;
+	anVec3 velocity;
+	anVec3 velocityNorm;
 	float height;
 	float weight;
 	float alpha;
@@ -342,7 +342,7 @@ public:
 
 	void StaticInitializeAndRender( sdTemplatedParticleSystem<sdDrop, sdPrecipArgs> *sys ) {
 		srfTriangles_t * tri = sys->GetTriSurf();
-		arcDrawVert *verts = tri->verts + tri->numVerts;
+		anDrawVertex *verts = tri->verts + tri->numVerts;
 		for ( int i=0; i<3; i++ ) {
 			verts[i].color[0] = 0xFF;
 			verts[i].color[1] = 0xFF;
@@ -369,9 +369,9 @@ public:
 
 		float precipDist = sys->params.GetPrecipitationDistance();
 
-		position[0] = idRandom::StaticRandom().CRandomFloat() * precipDist;
-		position[1] = idRandom::StaticRandom().CRandomFloat() * precipDist;
-		position[2] = idRandom::StaticRandom().CRandomFloat() * precipDist;
+		position[0] = anRandom::StaticRandom().CRandomFloat() * precipDist;
+		position[1] = anRandom::StaticRandom().CRandomFloat() * precipDist;
+		position[2] = anRandom::StaticRandom().CRandomFloat() * precipDist;
 		position += sys->GetViewOrg();
 
 		float lower = Max( sys->params.GetGroundHeightAtPos( position, sys->GetRenderEntity().origin ), sys->params.currentWaterHeight );
@@ -382,12 +382,12 @@ public:
 				// Very deep underground no point to spawn anything
 				return false;
 			}
-			position[2] = lower + idRandom::StaticRandom().RandomFloat() * ( ceil - lower );
+			position[2] = lower + anRandom::StaticRandom().RandomFloat() * ( ceil - lower );
 		}
 
 		velocity = sdAtmosphere::currentAtmosphere->GetWindVector() * sys->params.p.windScale;
-		velocity[2] = -(sys->params.p.fallMin +  idRandom::StaticRandom().RandomFloat() * ( sys->params.p.fallMax - sys->params.p.fallMin ));
-		float blend = idRandom::StaticRandom().RandomFloat(); // weight and height are related
+		velocity[2] = -( sys->params.p.fallMin +  anRandom::StaticRandom().RandomFloat() * ( sys->params.p.fallMax - sys->params.p.fallMin ) );
+		float blend = anRandom::StaticRandom().RandomFloat(); // weight and height are related
 		height = sys->params.p.heightMin + blend * ( sys->params.p.heightMax - sys->params.p.heightMin );
 		weight = sys->params.p.weightMin + blend * ( sys->params.p.weightMax - sys->params.p.weightMin );
 
@@ -400,7 +400,7 @@ public:
 	}
 
 	bool Update( sdTemplatedParticleSystem<sdDrop, sdPrecipArgs> *sys ) {
-		arcVec2 distance;
+		anVec2 distance;
 
 		if ( nextDropTime == -1 ) {
 			return false;
@@ -408,7 +408,7 @@ public:
 
 		position += velocity * (gameLocal.msec * 0.001f);
 
-		arcVec3 local = position - sys->GetViewOrg();
+		anVec3 local = position - sys->GetViewOrg();
 		float precipDist = sys->params.GetPrecipitationDistance();
 		if ( local.x < -precipDist ) {
 			local.x += 2 * precipDist;
@@ -453,12 +453,12 @@ public:
 	void Render( sdTemplatedParticleSystem<sdDrop, sdPrecipArgs> *sys ) {
 		// Draw a raindrop
 
-		arcVec3		forward, right;
-		arcDrawVert	*face;
+		anVec3		forward, right;
+		anDrawVertex	*face;
 		srfTriangles_t *tri;
-		arcVec2		line;
+		anVec2		line;
 		float		len, dist;
-		arcVec3		start, finish;
+		anVec3		start, finish;
 
 		if ( nextDropTime == -1 ) {
 			return;
@@ -532,8 +532,8 @@ public:
 
 class sdSplash {
 private:
-	arcVec3 position;
-	arcVec3 velocity;
+	anVec3 position;
+	anVec3 velocity;
 	float size;
 	float weight;
 	float alpha;
@@ -550,7 +550,7 @@ public:
 
 	void StaticInitializeAndRender( sdTemplatedParticleSystem<sdSplash, sdPrecipArgs> *sys ) {
 		srfTriangles_t * tri = sys->GetTriSurf();
-		arcDrawVert *verts = tri->verts + tri->numVerts;
+		anDrawVertex *verts = tri->verts + tri->numVerts;
 		for ( int i=0; i<4; i++ ) {
 			verts[i].color[0] = 0xFF;
 			verts[i].color[1] = 0xFF;
@@ -578,8 +578,8 @@ public:
 
 	bool Initialize( sdTemplatedParticleSystem<sdSplash, sdPrecipArgs> *sys ) {
 		float precipDist = sys->params.GetPrecipitationDistance();
-		position.x = idRandom::StaticRandom().CRandomFloat() * precipDist;
-		position.y = idRandom::StaticRandom().CRandomFloat() * precipDist;
+		position.x = anRandom::StaticRandom().CRandomFloat() * precipDist;
+		position.y = anRandom::StaticRandom().CRandomFloat() * precipDist;
 		position += sys->GetViewOrg();
 		position.z = sys->params.GetGroundHeightAtPos( position, sys->GetRenderEntity().origin );
 		if ( position.z < sys->params.currentWaterHeight ) {
@@ -587,8 +587,8 @@ public:
 		}
 
 		velocity = sys->params.p.windScale * sdAtmosphere::currentAtmosphere->GetWindVector();
-		velocity.z = (sys->params.p.fallMin +  idRandom::StaticRandom().RandomFloat() * ( sys->params.p.fallMax - sys->params.p.fallMin ));
-		float blend = idRandom::StaticRandom().RandomFloat(); // weight and height are related
+		velocity.z = ( sys->params.p.fallMin +  anRandom::StaticRandom().RandomFloat() * ( sys->params.p.fallMax - sys->params.p.fallMin ) );
+		float blend = anRandom::StaticRandom().RandomFloat(); // weight and height are related
 		size   = sys->params.p.heightMin + blend * ( sys->params.p.heightMax - sys->params.p.heightMin );
 		weight = sys->params.p.weightMin + blend * ( sys->params.p.weightMax - sys->params.p.weightMin );
 
@@ -596,13 +596,13 @@ public:
 
 		// Ensure it doesn't attempt to generate every frame, to prevent
 		// 'clumping' when there's only a small sky area available.
-		lifeTime = sys->params.p.timeMin + idRandom::StaticRandom().RandomFloat() * ( sys->params.p.timeMax - sys->params.p.timeMin );
+		lifeTime = sys->params.p.timeMin + anRandom::StaticRandom().RandomFloat() * ( sys->params.p.timeMax - sys->params.p.timeMin );
 		dropTime = /*gameLocal.time + */lifeTime;
 		return true;
 	}
 
 	bool Update( sdTemplatedParticleSystem<sdSplash, sdPrecipArgs> *sys ) {
-		arcVec2 distance;
+		anVec2 distance;
 
 		if ( dropTime < 0 ) {
 			return false;
@@ -614,7 +614,7 @@ public:
 
 		// Snow lives in a box 2*MAX_PRECIPITATION_DISTANCE long and wide and 1.5*MAX_PRECIPITATION_DISTANCE high
 		// This wastes less snow particles in the common case of a player on level ground
-		arcVec3 local = position - sys->GetViewOrg();
+		anVec3 local = position - sys->GetViewOrg();
 		bool wrapped = false;
 		float precipDist = sys->params.GetPrecipitationDistance();
 		if ( local.x < -precipDist ) {
@@ -637,7 +637,7 @@ public:
 
 		if ( wrapped ) {
 			position.z = sys->params.GetGroundHeightAtPos( position, sys->GetRenderEntity().origin ) + sys->params.p.tumbleStrength;
-			if ( position.z < (sys->params.currentWaterHeight + sys->params.p.tumbleStrength ) ) {
+			if ( position.z < ( sys->params.currentWaterHeight + sys->params.p.tumbleStrength ) ) {
 				position.z = sys->params.currentWaterHeight + sys->params.p.tumbleStrength;
 			}
 		}
@@ -648,10 +648,10 @@ public:
 	}
 
 	void Render( sdTemplatedParticleSystem<sdSplash, sdPrecipArgs> *sys ) {
-		arcDrawVert*		face;
-		arcVec3			start;
+		anDrawVertex*		face;
+		anVec3			start;
 		srfTriangles_t*	tri;
-		arcVec3			left, up;
+		anVec3			left, up;
 
 		if ( dropTime < 0 ) {
 			return;
@@ -666,7 +666,7 @@ public:
 		left *= size;
 		up *= size;
 
-		byte color = (int)(((dropTime) / (float)lifeTime) *  255.0f);
+		byte color = (int)(((dropTime) / ( float )lifeTime) *  255.0f);
 		dword colorDW = color | color << 8 | color << 16 | color << 24;
 
 		face->xyz = start - up - left;

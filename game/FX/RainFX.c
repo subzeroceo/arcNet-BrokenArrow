@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -24,8 +24,8 @@ void RainFX::Spawn( void ) {
 	re->numInsts = 9;
 	re->insts = new sdInstInfo[ re->numInsts ];
 
-	arcVec3 zero;
-	arcMat3 I;
+	anVec3 zero;
+	anMat3 I;
 	zero.Zero();
 	I.Identity();
 	this->SetPosition( zero, I );
@@ -41,25 +41,25 @@ RainFX::Think
 */
 void RainFX::Think( void ) {
 	renderEntity_t *re = GetRenderEntity();
-	if ( re->hModel == NULL ) {
+	if ( re->hModel == nullptr ) {
 		return;
 	}
 
-	arcBounds modelbb = re->hModel->Bounds();
-	arcVec3 extents = ( modelbb.GetMaxs() - modelbb.GetMins() ) * 0.5f;
+	anBounds modelbb = re->hModel->Bounds();
+	anVec3 extents = ( modelbb.GetMaxs() - modelbb.GetMins() ) * 0.5f;
 
 	arcPlayer *p = gameLocal.GetLocalViewPlayer();
-	arcVec3 const &v = p->GetViewPos();
-	int gridx = arcMath::Ftoi( arcMath::Floor(v.x / extents.x) );
-	int gridy = arcMath::Ftoi( arcMath::Floor(v.y / extents.y) );
+	anVec3 const &v = p->GetViewPos();
+	int gridx = anMath::Ftoi( anMath::Floor(v.x / extents.x) );
+	int gridy = anMath::Ftoi( anMath::Floor(v.y / extents.y) );
 
-	arcBounds bounds;
+	anBounds bounds;
 	bounds.Clear();
 	sdInstInfo *inst = re->insts;
 	for ( int y=- 1; y<= 1; y++ ) {
 		for ( int x=- 1; x<= 1; x++ ) {
-			arcBounds bb2;
-			inst->fadeOrigin = inst->inst.origin = arcVec3( (x + gridx) * extents.x, (y + gridy) * extents.y, v.z );
+			anBounds bb2;
+			inst->fadeOrigin = inst->inst.origin = anVec3( (x + gridx) * extents.x, (y + gridy) * extents.y, v.z );
 			inst->inst.axis.Identity();
 			inst->maxVisDist = 0;
 			inst->minVisDist = 0.f;
@@ -139,25 +139,25 @@ RainPrecipitation::Update
 */
 void RainPrecipitation::Update( void ) {
 	renderEntity_t *re = GetRenderEntity();
-	if ( re->hModel == NULL ) {
+	if ( re->hModel == nullptr ) {
 		return;
 	}
 
-	arcBounds modelbb = re->hModel->Bounds();
-	arcVec3 extents = ( modelbb.GetMaxs() - modelbb.GetMins() ) * 0.5f;
+	anBounds modelbb = re->hModel->Bounds();
+	anVec3 extents = ( modelbb.GetMaxs() - modelbb.GetMins() ) * 0.5f;
 
 	arcPlayer *p = gameLocal.GetLocalViewPlayer();
-	arcVec3 const &v = p->GetViewPos();
-	int gridx = arcMath::Ftoi( arcMath::Floor(v.x / extents.x) );
-	int gridy = arcMath::Ftoi( arcMath::Floor(v.y / extents.y) );
+	anVec3 const &v = p->GetViewPos();
+	int gridx = anMath::Ftoi( anMath::Floor(v.x / extents.x) );
+	int gridy = anMath::Ftoi( anMath::Floor(v.y / extents.y) );
 
-	arcBounds bounds;
+	anBounds bounds;
 	bounds.Clear();
 	sdInstInfo *inst = re->insts;
 	for ( int y=- 1; y<= 1; y++ ) {
 		for ( int x=- 1; x<= 1; x++ ) {
-			arcBounds bb2;
-			inst->fadeOrigin = inst->inst.origin = arcVec3( ( x + gridx ) * extents.x, ( y + gridy ) * extents.y, v.z );
+			anBounds bb2;
+			inst->fadeOrigin = inst->inst.origin = anVec3( ( x + gridx ) * extents.x, ( y + gridy ) * extents.y, v.z );
 			inst->inst.axis.Identity();
 			inst->maxVisDist = 0;
 			inst->minVisDist = 0.f;
@@ -179,14 +179,14 @@ void RainPrecipitation::Update( void ) {
 		return;
 	}
 
-	arcVec3 viewOrg;
+	anVec3 viewOrg;
 	renderView_t view;
 	if ( DemoMngr::GetInstance().CalculateRenderView( &view ) ) {
 		viewOrg = view.vieworg;
 	} else {
 		// If we are inside don't run the bacground effect
 		arcPlayer *player = gameLocal.GetLocalViewPlayer();
-		if ( player == NULL ) {
+		if ( player == nullptr ) {
 			return;
 		}
 		viewOrg = player->GetRenderView()->vieworg;

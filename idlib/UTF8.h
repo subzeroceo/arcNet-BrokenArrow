@@ -1,16 +1,16 @@
 #ifndef __UTF8_H__
 #define __UTF8_H__
 
-class arcNetUTF8 {
+class anUTF8 {
 public:
-			arcNetUTF8( arcNetFile *file );
-			arcNetUTF8( const byte *data, const int size );
-			~arcNetUTF8( void );
+			anUTF8( anFile *file );
+			anUTF8( const byte *data, const int size );
+			~anUTF8( void );
 
 	int		DecodeLength( void ) const;
 	int		Decode( wchar_t* to ) const;
 
-	static void	Encode( arcNetFile *file, const wchar_t *data, int len );
+	static void	Encode( anFile *file, const wchar_t *data, int len );
 
 private:
 	void	Init( void );
@@ -25,22 +25,22 @@ private:
 	int		alloced;
 };
 
-ARC_INLINE arcNetUTF8::~arcNetUTF8( void ) {
+ARC_INLINE anUTF8::~anUTF8( void ) {
 	Release();
 }
 
-ARC_INLINE void arcNetUTF8::Init( void ) {
+ARC_INLINE void anUTF8::Init( void ) {
 	len = 0;
 	alloced = 0;
-	data = NULL;
+	data = nullptr;
 }
 
-ARC_INLINE void arcNetUTF8::Release( void ) {
+ARC_INLINE void anUTF8::Release( void ) {
 	delete [] data;
 	Init();
 }
 
-ARC_INLINE void arcNetUTF8::EnsureAlloced( int size ) {
+ARC_INLINE void anUTF8::EnsureAlloced( int size ) {
 	if ( size > alloced ) {
 		Release();
 	}

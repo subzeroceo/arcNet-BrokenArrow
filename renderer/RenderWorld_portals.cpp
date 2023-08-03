@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -17,23 +17,23 @@ typedef struct portalStack_s {
 	portal_t	*p;
 	const struct portalStack_s *next;
 
-	ARCScreenRect	rect;
+	anScreenRect	rect;
 
 	int			numPortalPlanes;
-	arcPlane		portalPlanes[MAX_PORTAL_PLANES+1];
+	anPlane		portalPlanes[MAX_PORTAL_PLANES+1];
 	// positive side is outside the visible frustum
 } portalStack_t;
 
 /*
 ===================
-ARCRenderWorldLocal::ScreenRectForWinding
+anRenderWorldLocal::ScreenRectForWinding
 ===================
 */
-ARCScreenRect ARCRenderWorldLocal::ScreenRectFromWinding( const arcWinding *w, viewEntity_t *space ) {
-	ARCScreenRect	r;
+anScreenRect anRenderWorldLocal::ScreenRectFromWinding( const anWinding *w, viewEntity_t *space ) {
+	anScreenRect	r;
 	int				i;
-	arcVec3			v;
-	arcVec3			ndc;
+	anVec3			v;
+	anVec3			ndc;
 	float			windowX, windowY;
 
 	r.Clear();
@@ -57,11 +57,11 @@ ARCScreenRect ARCRenderWorldLocal::ScreenRectFromWinding( const arcWinding *w, v
 PortalIsFoggedOut
 ===================
 */
-bool ARCRenderWorldLocal::PortalIsFoggedOut( const portal_t *p ) {
-	ARCRenderLightsLocal	*ldef;
-	const arcWinding	*w;
+bool anRenderWorldLocal::PortalIsFoggedOut( const portal_t *p ) {
+	anRenderLightsLocal	*ldef;
+	const anWinding	*w;
 	int			i;
-	arcPlane		forward;
+	anPlane		forward;
 
 	ldef = p->doublePortal->fogLight;
 	if ( !ldef ) {
@@ -69,7 +69,7 @@ bool ARCRenderWorldLocal::PortalIsFoggedOut( const portal_t *p ) {
 	}
 
 	// find the current density of the fog
-	const arcMaterial	*lightShader = ldef->lightShader;
+	const anMaterial	*lightShader = ldef->lightShader;
 	int		size = sizeof( float ) *lightShader->GetNumRegisters();
 	float	*regs =(float *)_alloca( size );
 
@@ -113,16 +113,16 @@ bool ARCRenderWorldLocal::PortalIsFoggedOut( const portal_t *p ) {
 FloodViewThroughArea_r
 ===================
 */
-void ARCRenderWorldLocal::FloodViewThroughArea_r( const arcVec3 origin, int areaNum, const struct portalStack_s *ps ) {
+void anRenderWorldLocal::FloodViewThroughArea_r( const anVec3 origin, int areaNum, const struct portalStack_s *ps ) {
 	portal_t*		p;
 	float			d;
 	portalArea_t *	area;
 	const portalStack_t	*check;
 	portalStack_t	newStack;
 	int				i, j;
-	arcVec3			v1, v2;
+	anVec3			v1, v2;
 	int				addPlanes;
-	arcFixedWinding	w;		// we won't overflow because MAX_PORTAL_PLANES = 20
+	anFixedWinding	w;		// we won't overflow because MAX_PORTAL_PLANES = 20
 
 	area = &portalAreas[ areaNum ];
 
@@ -245,11 +245,11 @@ sides facing in) that should contain the origin, such as a view frustum or a poi
 Zero planes assumes an unbounded volume.
 =======================
 */
-void ARCRenderWorldLocal::FlowViewThroughPortals( const arcVec3 origin, int numPlanes, const arcPlane *planes ) {
+void anRenderWorldLocal::FlowViewThroughPortals( const anVec3 origin, int numPlanes, const anPlane *planes ) {
 	portalStack_t	ps;
 
-	ps.next = NULL;
-	ps.p = NULL;
+	ps.next = nullptr;
+	ps.p = nullptr;
 
 	for ( int i = 0; i < numPlanes; i++ ) {
 		ps.portalPlanes[i] = planes[i];
@@ -284,16 +284,16 @@ void ARCRenderWorldLocal::FlowViewThroughPortals( const arcVec3 origin, int numP
 FloodLightThroughArea_r
 ===================
 */
-void ARCRenderWorldLocal::FloodLightThroughArea_r( ARCRenderLightsLocal *light, int areaNum, const struct portalStack_s *ps ) {
+void anRenderWorldLocal::FloodLightThroughArea_r( anRenderLightsLocal *light, int areaNum, const struct portalStack_s *ps ) {
 	portal_t*		p;
 	float			d;
 	portalArea_t *	area;
 	const portalStack_t	*check, *firstPortalStack;
 	portalStack_t	newStack;
 	int				i, j;
-	arcVec3			v1, v2;
+	anVec3			v1, v2;
 	int				addPlanes;
-	arcFixedWinding	w;		// we won't overflow because MAX_PORTAL_PLANES = 20
+	anFixedWinding	w;		// we won't overflow because MAX_PORTAL_PLANES = 20
 
 	area = &portalAreas[ areaNum ];
 
@@ -398,10 +398,10 @@ This can only be used for shadow casting lights that have a generated
 prelight, because shadows are cast from back side which may not be in visible areas.
 =======================
 */
-void ARCRenderWorldLocal::FlowLightThroughPortals( ARCRenderLightsLocal *light ) {
+void anRenderWorldLocal::FlowLightThroughPortals( anRenderLightsLocal *light ) {
 	portalStack_t	ps;
 	int				i;
-	const arcVec3 origin = light->globalLightOrigin;
+	const anVec3 origin = light->globalLightOrigin;
 
 	// if the light origin areaNum is not in a valid area,
 	// the light won't have any area refs
@@ -421,13 +421,13 @@ void ARCRenderWorldLocal::FlowLightThroughPortals( ARCRenderLightsLocal *light )
 
 /*
 ===================
-ARCRenderWorldLocal::FloodFrustumAreas_r
+anRenderWorldLocal::FloodFrustumAreas_r
 ===================
 */
-areaNumRef_t *ARCRenderWorldLocal::FloodFrustumAreas_r( const ARCFrustum &frustum, const int areaNum, const arcBounds &bounds, areaNumRef_t *areas ) {
+areaNumRef_t *anRenderWorldLocal::FloodFrustumAreas_r( const anFrustum &frustum, const int areaNum, const anBounds &bounds, areaNumRef_t *areas ) {
 	portal_t *p;
 	portalArea_t *portalArea;
-	arcBounds newBounds;
+	anBounds newBounds;
 	areaNumRef_t *a;
 
 	portalArea = &portalAreas[ areaNum ];
@@ -479,14 +479,14 @@ areaNumRef_t *ARCRenderWorldLocal::FloodFrustumAreas_r( const ARCFrustum &frustu
 
 /*
 ===================
-ARCRenderWorldLocal::FloodFrustumAreas
+anRenderWorldLocal::FloodFrustumAreas
 
   Retrieves all the portal areas the frustum floods into where the frustum starts in the given areas.
   All portals are assumed to be open.
 ===================
 */
-areaNumRef_t *ARCRenderWorldLocal::FloodFrustumAreas( const ARCFrustum &frustum, areaNumRef_t *areas ) {
-	arcBounds bounds;
+areaNumRef_t *anRenderWorldLocal::FloodFrustumAreas( const anFrustum &frustum, areaNumRef_t *areas ) {
+	anBounds bounds;
 	areaNumRef_t *a;
 
 	// bounds that cover the whole frustum
@@ -516,7 +516,7 @@ CullEntityByPortals
 Return true if the entity reference bounds do not intersect the current portal chain.
 ================
 */
-bool ARCRenderWorldLocal::CullEntityByPortals( const ARCRenderEntityLocal *entity, const portalStack_t *ps ) {
+bool anRenderWorldLocal::CullEntityByPortals( const anRenderEntityLocal *entity, const portalStack_t *ps ) {
 	if ( !r_useEntityCulling.GetBool() ) {
 		return false;
 	}
@@ -541,12 +541,12 @@ Any models that are visible through the current portalStack will
 have their scissor
 ===================
 */
-void ARCRenderWorldLocal::AddAreaEntityRefs( int areaNum, const portalStack_t *ps ) {
+void anRenderWorldLocal::AddAreaEntityRefs( int areaNum, const portalStack_t *ps ) {
 	areaReference_t		*ref;
-	ARCRenderEntityLocal	*entity;
+	anRenderEntityLocal	*entity;
 	portalArea_t		*area;
 	viewEntity_t		*vEnt;
-	arcBounds			b;
+	anBounds			b;
 
 	area = &portalAreas[ areaNum ];
 
@@ -594,11 +594,11 @@ Return true if the light frustum does not intersect the current portal chain.
 The last stack plane is not used because lights are not near clipped.
 ================
 */
-bool ARCRenderWorldLocal::CullLightByPortals( const ARCRenderLightsLocal *light, const portalStack_t *ps ) {
+bool anRenderWorldLocal::CullLightByPortals( const anRenderLightsLocal *light, const portalStack_t *ps ) {
 	int				i, j;
-	const surfTriangles_t *tri;
+	const srfTriangles_t *tri;
 	float			d;
-	arcFixedWinding	w;		// we won't overflow because MAX_PORTAL_PLANES = 20
+	anFixedWinding	w;		// we won't overflow because MAX_PORTAL_PLANES = 20
 
 	if ( r_useLightCulling.GetInteger() == 0 ) {
 		return false;
@@ -616,7 +616,7 @@ bool ARCRenderWorldLocal::CullLightByPortals( const ARCRenderLightsLocal *light,
 			}
 
 			// get the exact winding for this side
-			const arcWinding *ow = light->frustumWindings[i];
+			const anWinding *ow = light->frustumWindings[i];
 
 			// projected lights may have one of the frustums degenerated
 			if ( !ow ) {
@@ -670,10 +670,10 @@ AddAreaLightRefs
 This is the only point where lights get added to the viewLights list
 ===================
 */
-void ARCRenderWorldLocal::AddAreaLightRefs( int areaNum, const portalStack_t *ps ) {
+void anRenderWorldLocal::AddAreaLightRefs( int areaNum, const portalStack_t *ps ) {
 	areaReference_t		*lref;
 	portalArea_t		*area;
-	ARCRenderLightsLocal *light;
+	anRenderLightsLocal *light;
 	viewLight_t			*vLight;
 
 	area = &portalAreas[ areaNum ];
@@ -716,7 +716,7 @@ This may be entered multiple times with different planes
 if more than one portal sees into the area
 ===================
 */
-void ARCRenderWorldLocal::AddAreaRefs( int areaNum, const portalStack_t *ps ) {
+void anRenderWorldLocal::AddAreaRefs( int areaNum, const portalStack_t *ps ) {
 	// mark the viewCount, so r_showPortals can display the
 	// considered portals
 	portalAreas[ areaNum ].viewCount = tr.viewCount;
@@ -730,7 +730,7 @@ void ARCRenderWorldLocal::AddAreaRefs( int areaNum, const portalStack_t *ps ) {
 BuildConnectedAreas_r
 ===================
 */
-void ARCRenderWorldLocal::BuildConnectedAreas_r( int areaNum ) {
+void anRenderWorldLocal::BuildConnectedAreas_r( int areaNum ) {
 	portal_t		*portal;
 
 	if ( tr.viewDef->connectedAreas[areaNum] ) {
@@ -755,7 +755,7 @@ BuildConnectedAreas
 This is only valid for a given view, not all views in a frame
 ===================
 */
-void ARCRenderWorldLocal::BuildConnectedAreas( void ) {
+void anRenderWorldLocal::BuildConnectedAreas( void ) {
 	tr.viewDef->connectedAreas = (bool *)R_FrameAlloc( numPortalAreas *sizeof( tr.viewDef->connectedAreas[0] ) );
 
 	// if we are outside the world, we can see all areas
@@ -782,10 +782,10 @@ The scissorRects on the viewEntitys and viewLights may be empty if
 they were considered, but not actually visible.
 =============
 */
-void ARCRenderWorldLocal::FindViewLightsAndEntities( void ) {
+void anRenderWorldLocal::FindViewLightsAndEntities( void ) {
 	// clear the visible lightDef and entityDef lists
-	tr.viewDef->viewLights = NULL;
-	tr.viewDef->viewEntitys = NULL;
+	tr.viewDef->viewLights = nullptr;
+	tr.viewDef->viewEntitys = nullptr;
 
 	// find the area to start the portal flooding in
 	if ( !r_usePortals.GetBool() ) {
@@ -838,7 +838,7 @@ void ARCRenderWorldLocal::FindViewLightsAndEntities( void ) {
 NumPortals
 ==============
 */
-int ARCRenderWorldLocal::NumPortals( void ) const {
+int anRenderWorldLocal::NumPortals( void ) const {
 	return numInterAreaPortals;
 }
 
@@ -850,10 +850,10 @@ Game code uses this to identify which portals are inside doors.
 Returns 0 if no portal contacts the bounds
 ==============
 */
-arcNetHandle_t ARCRenderWorldLocal::FindPortal( const arcBounds &b ) const {
-	arcBounds		wb;
+arcNetHandle_t anRenderWorldLocal::FindPortal( const anBounds &b ) const {
+	anBounds		wb;
 	doublePortal_t	*portal;
-	arcWinding		*w;
+	anWinding		*w;
 
 	for ( int i = 0; i < numInterAreaPortals; i++ ) {
 		portal = &doublePortals[i];
@@ -876,7 +876,7 @@ arcNetHandle_t ARCRenderWorldLocal::FindPortal( const arcBounds &b ) const {
 FloodConnectedAreas
 =============
 */
-void	ARCRenderWorldLocal::FloodConnectedAreas( portalArea_t *area, int portalAttributeIndex ) {
+void	anRenderWorldLocal::FloodConnectedAreas( portalArea_t *area, int portalAttributeIndex ) {
 	if ( area->connectedAreaNum[portalAttributeIndex] == connectedAreaNum ) {
 		return;
 	}
@@ -895,12 +895,12 @@ AreasAreConnected
 
 ==============
 */
-bool	ARCRenderWorldLocal::AreasAreConnected( int areaNum1, int areaNum2, portalConnection_t connection ) {
+bool	anRenderWorldLocal::AreasAreConnected( int areaNum1, int areaNum2, portalConnection_t connection ) {
 	if ( areaNum1 == -1 || areaNum2 == -1 ) {
 		return false;
 	}
 	if ( areaNum1 > numPortalAreas || areaNum2 > numPortalAreas || areaNum1 < 0 || areaNum2 < 0 ) {
-		common->Error( "ARCRenderWorldLocal::AreAreasConnected: bad parms: %i, %i", areaNum1, areaNum2 );
+		common->Error( "anRenderWorldLocal::AreAreasConnected: bad parms: %i, %i", areaNum1, areaNum2 );
 	}
 
 	int	attribute = 0;
@@ -912,7 +912,7 @@ bool	ARCRenderWorldLocal::AreasAreConnected( int areaNum1, int areaNum2, portalC
 		intConnection >>= 1;
 	}
 	if ( attribute >= NUM_PORTAL_ATTRIBUTES || ( 1 << attribute ) != ( int )connection ) {
-		common->Error( "ARCRenderWorldLocal::AreasAreConnected: bad connection number: %i\n", ( int )connection );
+		common->Error( "anRenderWorldLocal::AreasAreConnected: bad connection number: %i\n", ( int )connection );
 	}
 
 	return portalAreas[areaNum1].connectedAreaNum[attribute] == portalAreas[areaNum2].connectedAreaNum[attribute];
@@ -926,7 +926,7 @@ SetPortalState
 doors explicitly close off portals when shut
 ==============
 */
-void ARCRenderWorldLocal::SetPortalState( arcNetHandle_t portal, int blockTypes ) {
+void anRenderWorldLocal::SetPortalState( arcNetHandle_t portal, int blockTypes ) {
 	if ( portal == 0 ) {
 		return;
 	}
@@ -962,7 +962,7 @@ void ARCRenderWorldLocal::SetPortalState( arcNetHandle_t portal, int blockTypes 
 GetPortalState
 ==============
 */
-int ARCRenderWorldLocal::GetPortalState( arcNetHandle_t portal ) {
+int anRenderWorldLocal::GetPortalState( arcNetHandle_t portal ) {
 	if ( portal == 0 ) {
 		return 0;
 	}
@@ -976,16 +976,16 @@ int ARCRenderWorldLocal::GetPortalState( arcNetHandle_t portal ) {
 
 /*
 =====================
-ARCRenderWorldLocal::ShowPortals
+anRenderWorldLocal::ShowPortals
 
 Debugging tool, won't work correctly with SMP or when mirrors are present
 =====================
 */
-void ARCRenderWorldLocal::ShowPortals() {
+void anRenderWorldLocal::ShowPortals() {
 	int			i, j;
 	portalArea_t	*area;
 	portal_t	*p;
-	arcWinding	*w;
+	anWinding	*w;
 
 	// flood out through portals, setting area viewCount
 	for ( i = 0; i < numPortalAreas; i++ ) {

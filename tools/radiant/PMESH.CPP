@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -38,30 +38,30 @@ extern void MemFile_fprintf( CMemFile *pMemFile,const char *pText,... );
 extern face_t *Face_Alloc( void );
 void _Write3DMatrix( FILE *f,int y,int x,int z,float *m );
 void _Write3DMatrix( CMemFile *f,int y,int x,int z,float *m );
-extern void SamplePatch( float ctrl[3][3][5],int baseCol,int baseRow,int width,int horzSub,int vertSub,arcDrawVert *outVerts,arcDrawVert *drawVerts );
-patchMesh_t *Patch_GenerateGeneric( int width,int height,int orientation,const arcVec3 &mins,const arcVec3 &maxs );
+extern void SamplePatch( float ctrl[3][3][5],int baseCol,int baseRow,int width,int horzSub,int vertSub,anDrawVertex *outVerts,anDrawVertex *drawVerts );
+patchMesh_t *Patch_GenerateGeneric( int width,int height,int orientation,const anVec3 &mins,const anVec3 &maxs );
 
 
 
 patchMesh_t * MakeNewPatch( int width,int height ) {
-	patchMesh_t	*pm	= reinterpret_cast< patchMesh_t*>(Mem_ClearedAlloc(sizeof(patchMesh_t) ));
+	patchMesh_t	*pm	= reinterpret_cast< patchMesh_t*>(Mem_ClearedAlloc(sizeof(patchMesh_t) ) );
 	pm->horzSubdivisions = DEFAULT_CURVE_SUBDIVISION;
 	pm->vertSubdivisions = DEFAULT_CURVE_SUBDIVISION;
 	pm->explicitSubdivisions = false;
 	pm->width = width;
 	pm->height = height;
-	pm->verts = reinterpret_cast< arcDrawVert*>(Mem_ClearedAlloc(sizeof(arcDrawVert) * width * height) );
-	//pm->ctrl = reinterpret_cast<arcDrawVert*>(Mem_ClearedAlloc(sizeof(arcDrawVert) * width * height) );
+	pm->verts = reinterpret_cast< anDrawVertex*>(Mem_ClearedAlloc(sizeof(anDrawVertex) * width * height) );
+	//pm->ctrl = reinterpret_cast<anDrawVertex*>(Mem_ClearedAlloc(sizeof(anDrawVertex) * width * height) );
 	//pm->ctrl = &pm->verts;
 	return pm;
 }
 
 
 void Patch_AdjustSize( patchMesh_t *p,int wadj,int hadj ) {
-	arcDrawVert	*newverts	= reinterpret_cast< arcDrawVert*>(Mem_ClearedAlloc(sizeof(arcDrawVert) * (p->width + wadj) * (p->height + hadj) ));
+	anDrawVertex	*newverts	= reinterpret_cast< anDrawVertex*>(Mem_ClearedAlloc(sizeof(anDrawVertex) * (p->width + wadj) * (p->height + hadj) ) );
 	int			copyWidth	= (wadj < 0 ) ? p->width + wadj : p->width;
 	int			copyHeight	= (hadj < 0 ) ? p->height + hadj : p->height;
-	int			copysize	= copyWidth *copyHeight * sizeof(arcDrawVert);
+	int			copysize	= copyWidth *copyHeight * sizeof(anDrawVertex);
 
 	for ( int i = 0; i < p->width; i++ ) {
 		for ( int j = 0; j < p->height; j++ ) {
@@ -76,8 +76,8 @@ void Patch_AdjustSize( patchMesh_t *p,int wadj,int hadj ) {
 }
 
 // algorithm from Journal of graphics tools, 2(1 ):21-28, 1997
-bool RayIntersectsTri( const arcVec3 &origin,const arcVec3 &direction,const arcVec3 &vert0,const arcVec3 &vert1,const arcVec3 &vert2,float &scale ) {
-	arcVec3	edge1, edge2, tvec, pvec, qvec;
+bool RayIntersectsTri( const anVec3 &origin,const anVec3 &direction,const anVec3 &vert0,const anVec3 &vert1,const anVec3 &vert2,float &scale ) {
+	anVec3	edge1, edge2, tvec, pvec, qvec;
 	float	det, inv_det;
 	scale = 0;
 
@@ -119,10 +119,10 @@ bool RayIntersectsTri( const arcVec3 &origin,const arcVec3 &direction,const arcV
 	return true;
 }
 
-bool Patch_Intersect( patchMesh_t *pm,arcVec3 origin,arcVec3 direction,float &scale ) {
+bool Patch_Intersect( patchMesh_t *pm,anVec3 origin,anVec3 direction,float &scale ) {
 	int				i, j;
 	//float scale;
-	arcSurface_Patch	cp	(pm->width * 6, pm->height * 6);
+	anSurface_Patch	cp	(pm->width * 6, pm->height * 6);
 
 	cp.SetSize(pm->width, pm->height);
 	for ( i = 0; i < pm->width; i++ ) {
@@ -178,7 +178,7 @@ patchMesh_t * Patch_MakeNew( patchMesh_t *p,int newWidth,int newHeight ) {
 
 void Patch_Combine( patchMesh_t *p,patchMesh_t *p2,int sourceCol1,int sourceCol2,int sourceRow1,int sourceRow2,bool invert1,bool invert2 ) {
 	int			i, j, out;
-	patchMesh_t	*newPatch	= NULL;
+	patchMesh_t	*newPatch	= nullptr;
 	if ( sourceCol1 >= 0 ) {
 		// adding width
 		if ( sourceCol2 >= 0 ) {
@@ -563,7 +563,7 @@ void Patch_Weld( patchMesh_t *p,patchMesh_t *p2 ) {
 
 
 // used for a save spot
-patchMesh_t	*patchSave				= NULL;
+patchMesh_t	*patchSave				= nullptr;
 
 // Tracks the selected patch for point manipulation/update. FIXME: Need to revert back to a generalized
 // brush approach
@@ -586,7 +586,7 @@ bool		g_bPatchBendMode	= false;
 int			g_nPatchBendState	= -1;
 int			g_nPatchInsertState	= -1;
 int			g_nBendOriginIndex	= 0;
-arcVec3		g_vBendOrigin;
+anVec3		g_vBendOrigin;
 
 bool		g_bPatchAxisOnRow	= true;
 int			g_nPatchAxisIndex	= 0;
@@ -637,7 +637,7 @@ Patch_MemorySize
 ==================
 */
 int Patch_MemorySize( patchMesh_t *p ) {
-	return (sizeof(patchMesh_t) + p->width * p->height * sizeof(arcDrawVert) );
+	return (sizeof(patchMesh_t) + p->width * p->height * sizeof(anDrawVertex) );
 }
 
 
@@ -674,14 +674,14 @@ int	neighbors[8][2]	= {
 
 void Patch_MeshNormals( patchMesh_t *in ) {
 	int			i, j, k, dist;
-	arcVec3		normal;
-	arcVec3		sum;
+	anVec3		normal;
+	anVec3		sum;
 	int			count;
-	arcVec3		base;
-	arcVec3		delta;
+	anVec3		base;
+	anVec3		delta;
 	int			x, y;
-	arcDrawVert	*dv;
-	arcVec3		around[8], temp;
+	anDrawVertex	*dv;
+	anVec3		around[8], temp;
 	bool		good[8];
 	bool		wrapWidth, wrapHeight;
 	float		len;
@@ -714,7 +714,7 @@ void Patch_MeshNormals( patchMesh_t *in ) {
 	for ( i = 0; i < in->width; i++ ) {
 		for ( j = 0; j < in->height; j++ ) {
 			count = 0;
-			//--dv = reinterpret_cast<arcDrawVert*>(in.ctrl[j*in.width+i] );
+			//--dv = reinterpret_cast<anDrawVertex*>(in.ctrl[j*in.width+i] );
 			dv = &in->ctrl( i, j);
 			VectorCopy(dv->xyz, base);
 			for ( k = 0; k < 8; k++ ) {
@@ -790,7 +790,7 @@ void Patch_MakeDirty( patchMesh_t *p ) {
 Patch_CalcBounds
 ==================
 */
-void Patch_CalcBounds( patchMesh_t *p,arcVec3 &vMin,arcVec3 &vMax ) {
+void Patch_CalcBounds( patchMesh_t *p,anVec3 &vMin,anVec3 &vMax ) {
 	vMin[0] = vMin[1] = vMin[2] = 999999;
 	vMax[0] = vMax[1] = vMax[2] = -999999;
 
@@ -813,13 +813,13 @@ void Patch_CalcBounds( patchMesh_t *p,arcVec3 &vMin,arcVec3 &vMax ) {
 Brush_RebuildBrush
 ==================
 */
-void Brush_RebuildBrush( brush_t *b,arcVec3 vMins,arcVec3 vMaxs,bool patch ) {
+void Brush_RebuildBrush( brush_t *b,anVec3 vMins,anVec3 vMaxs,bool patch ) {
 	//
 	// Total hack job
 	// Rebuilds a brush
 	int			i, j;
 	face_t		*f, *next;
-	arcVec3		pts[4][2];
+	anVec3		pts[4][2];
 	texdef_t	texdef;
 	// free faces
 
@@ -839,7 +839,7 @@ void Brush_RebuildBrush( brush_t *b,arcVec3 vMins,arcVec3 vMaxs,bool patch ) {
 		Face_Free(f);
 	}
 
-	b->brush_faces = NULL;
+	b->brush_faces = nullptr;
 
 	// left the last face so we can use its texdef
 
@@ -902,7 +902,7 @@ void Brush_RebuildBrush( brush_t *b,arcVec3 vMins,arcVec3 vMaxs,bool patch ) {
 }
 
 void WINAPI Patch_Rebuild( patchMesh_t *p ) {
-	arcVec3	vMin, vMax;
+	anVec3	vMin, vMax;
 	Patch_CalcBounds(p, vMin, vMax);
 	Brush_RebuildBrush(p->pSymbiot, vMin, vMax);
 	Patch_MakeDirty(p);
@@ -916,11 +916,11 @@ AddBrushForPatch
 */
 brush_t * AddBrushForPatch( patchMesh_t *pm,bool bLinkToWorld ) {
 	// find the farthest points in x,y,z
-	arcVec3	vMin, vMax;
+	anVec3	vMin, vMax;
 	Patch_CalcBounds(pm, vMin, vMax);
 
 	for ( int j = 0; j < 3; j++ ) {
-		if ( arcMath::Fabs(vMin[j] - vMax[j] ) <= VECTOR_EPSILON ) {
+		if ( anMath::Fabs(vMin[j] - vMax[j] ) <= VECTOR_EPSILON ) {
 			vMin[j] -= 4;
 			vMax[j] += 4;
 		}
@@ -971,7 +971,7 @@ float Patch_Width( patchMesh_t *p ) {
 	for ( int j = 0; j < p->height - 1; j++ ) {
 		float	t	= 0;
 		for ( int i = 0; i < p->width - 1; i++ ) {
-			arcVec3	vTemp;
+			anVec3	vTemp;
 			vTemp = p->ctrl( i, j).xyz - p->ctrl( i + 1, j).xyz;
 			t += vTemp.Length();
 		}
@@ -992,7 +992,7 @@ float Patch_Height( patchMesh_t *p ) {
 	for ( int j = 0; j < p->width - 1; j++ ) {
 		float	t	= 0;
 		for ( int i = 0; i < p->height - 1; i++ ) {
-			arcVec3	vTemp;
+			anVec3	vTemp;
 			vTemp = p->ctrl(j, i).xyz - p->ctrl(j, i + 1 ).xyz;
 			t += vTemp.Length();
 		}
@@ -1011,7 +1011,7 @@ Patch_WidthDistanceTo
 float Patch_WidthDistanceTo( patchMesh_t *p,int j ) {
 	float	f	= 0;
 	for ( int i = 0; i < j; i++ ) {
-		arcVec3	vTemp;
+		anVec3	vTemp;
 		vTemp = p->ctrl( i, 0 ).xyz - p->ctrl( i + 1, 0 ).xyz;
 		f += vTemp.Length();
 	}
@@ -1026,7 +1026,7 @@ Patch_HeightDistanceTo
 float Patch_HeightDistanceTo( patchMesh_t *p,int j ) {
 	float	f	= 0;
 	for ( int i = 0; i < j; i++ ) {
-		arcVec3	vTemp;
+		anVec3	vTemp;
 		vTemp = p->ctrl(0, i).xyz - p->ctrl(0, i + 1 ).xyz;
 		f += vTemp.Length();
 	}
@@ -1117,8 +1117,8 @@ int	Interior3ByCount	= sizeof(Interior3By) / sizeof( int[2] );
 int	Interior5ByCount	= sizeof(Interior5By) / sizeof( int[2] );
 
 face_t * Patch_GetAxisFace( patchMesh_t *p ) {
-	face_t	*f	= NULL;
-	arcVec3	vTemp;
+	face_t	*f	= nullptr;
+	anVec3	vTemp;
 	brush_t	*b	= p->pSymbiot;
 
 	for ( f = b->brush_faces; f; f = f->next ) {
@@ -1137,7 +1137,7 @@ face_t * Patch_GetAxisFace( patchMesh_t *p ) {
 		}
 	}
 
-	if ( f == NULL ) {
+	if ( f == nullptr ) {
 		f = b->brush_faces;
 	}
 	return f;
@@ -1147,7 +1147,7 @@ int	g_nFaceCycle	= 0;
 
 face_t * nextFace( patchMesh_t *p ) {
 	brush_t	*b	= p->pSymbiot;
-	face_t	*f	= NULL;
+	face_t	*f	= nullptr;
 	int		n	= 0;
 	for ( f = b->brush_faces; f && n <= g_nFaceCycle; f = f->next ) {
 		n++;
@@ -1167,7 +1167,7 @@ face_t * nextFace( patchMesh_t *p ) {
 void Patch_CapTexture( patchMesh_t *p,bool bFaceCycle = false,bool alt = false ) {
 	Patch_MeshNormals(p);
 	face_t	*f	= (bFaceCycle) ? nextFace(p) : Patch_GetAxisFace(p);
-	arcVec3	vSave;
+	anVec3	vSave;
 	VectorCopy(f->plane, vSave);
 	float	fRotate	= f->texdef.rotate;
 	f->texdef.rotate = 0;
@@ -1187,7 +1187,7 @@ void Patch_CapTexture( patchMesh_t *p,bool bFaceCycle = false,bool alt = false )
 			if ( !bFaceCycle ) {
 				VectorCopy(p->ctrl( i, j).normal, f->plane );
 			}
-			arcVec5	temp;
+			anVec5	temp;
 			temp.x = p->ctrl( i, j).xyz.x;
 			temp.y = p->ctrl( i, j).xyz.y;
 			temp.z = p->ctrl( i, j).xyz.z;
@@ -1207,7 +1207,7 @@ void Patch_CapTexture( patchMesh_t *p,bool bFaceCycle = false,bool alt = false )
 	Patch_MakeDirty(p);
 }
 
-void FillPatch( patchMesh_t *p,arcVec3 v ) {
+void FillPatch( patchMesh_t *p,anVec3 v ) {
 	for ( int i = 0; i < p->width; i++ ) {
 		for ( int j = 0; j < p->height; j++ ) {
 			VectorCopy( v, p->ctrl( i, j).xyz);
@@ -1218,7 +1218,7 @@ void FillPatch( patchMesh_t *p,arcVec3 v ) {
 brush_t * Cap( patchMesh_t *pParent,bool bByColumn,bool bFirst ) {
 	brush_t		*b;
 	patchMesh_t	*p;
-	arcVec3		vMin, vMax;
+	anVec3		vMin, vMax;
 	int			i, j;
 
 	bool		bSmall	= true;
@@ -1232,7 +1232,7 @@ brush_t * Cap( patchMesh_t *pParent,bool bByColumn,bool bFirst ) {
 
 	if ( !b ) {
 		Sys_Status( "Unable to cap. You may need to ungroup the patch.\n" );
-		return NULL;
+		return nullptr;
 	}
 
 	p = b->pPatch;
@@ -1272,7 +1272,7 @@ brush_t * Cap( patchMesh_t *pParent,bool bByColumn,bool bFirst ) {
 		}
 	}
 
-	arcVec3	vTemp;
+	anVec3	vTemp;
 	for ( j = 0; j < 3; j++ ) {
 		vTemp[j] = vMin[j] + abs((vMax[j] - vMin[j] ) * 0.5);
 	}
@@ -1287,12 +1287,12 @@ brush_t * Cap( patchMesh_t *pParent,bool bByColumn,bool bFirst ) {
 	}
 
 	if ( bFirst ) {
-		arcDrawVert	vertTemp;
+		anDrawVertex	vertTemp;
 		for ( i = 0; i < p->width; i++ ) {
 			for ( j = 0; j < p->height / 2; j++ ) {
-				memcpy(&vertTemp, &p->ctrl( i, p->height - 1 - j), sizeof(arcDrawVert) );
-				memcpy(&p->ctrl( i, p->height - 1 - j), &p->ctrl( i, j), sizeof(arcDrawVert) );
-				memcpy(&p->ctrl( i, j), &vertTemp, sizeof(arcDrawVert) );
+				memcpy(&vertTemp, &p->ctrl( i, p->height - 1 - j), sizeof(anDrawVertex) );
+				memcpy(&p->ctrl( i, p->height - 1 - j), &p->ctrl( i, j), sizeof(anDrawVertex) );
+				memcpy(&p->ctrl( i, j), &vertTemp, sizeof(anDrawVertex) );
 			}
 		}
 	}
@@ -1305,7 +1305,7 @@ brush_t * Cap( patchMesh_t *pParent,bool bByColumn,bool bFirst ) {
 brush_t * CapSpecial( patchMesh_t *pParent,int nType,bool bFirst ) {
 	brush_t		*b;
 	patchMesh_t	*p;
-	arcVec3		vMin, vMax, vTemp;
+	anVec3		vMin, vMax, vTemp;
 	int			i, j;
 
 	if ( nType == CCapDialog::IENDCAP ) {
@@ -1316,7 +1316,7 @@ brush_t * CapSpecial( patchMesh_t *pParent,int nType,bool bFirst ) {
 
 	if ( !b ) {
 		Sys_Status( "Unable to cap. Make sure you ungroup before re-capping." );
-		return NULL;
+		return nullptr;
 	}
 
 	p = b->pPatch;
@@ -1346,7 +1346,7 @@ brush_t * CapSpecial( patchMesh_t *pParent,int nType,bool bFirst ) {
 		VectorCopy(pParent->ctrl( 1, nIndex).xyz, p->ctrl(2, 0 ).xyz);
 		VectorCopy(pParent->ctrl( 1, nIndex).xyz, p->ctrl(2, 1 ).xyz);
 	} else if ( nType == CCapDialog::BEVEL ) {
-		arcVec3	p1, p2, p3, p4, temp, dir;
+		anVec3	p1, p2, p3, p4, temp, dir;
 
 		VectorCopy(pParent->ctrl(0, nIndex).xyz, p3);
 		VectorCopy(pParent->ctrl( 1, nIndex).xyz, p1);
@@ -1411,12 +1411,12 @@ brush_t * CapSpecial( patchMesh_t *pParent,int nType,bool bFirst ) {
 
 	bool	bEndCap	= (nType == CCapDialog::ENDCAP || nType == CCapDialog::IENDCAP);
 	if ( ( !bFirst && !bEndCap) || (bFirst && bEndCap) ) {
-		arcDrawVert	vertTemp;
+		anDrawVertex	vertTemp;
 		for ( i = 0; i < p->width; i++ ) {
 			for ( j = 0; j < p->height / 2; j++ ) {
-				memcpy(&vertTemp, &p->ctrl( i, p->height - 1 - j), sizeof(arcDrawVert) );
-				memcpy(&p->ctrl( i, p->height - 1 - j), &p->ctrl( i, j), sizeof(arcDrawVert) );
-				memcpy(&p->ctrl( i, j), &vertTemp, sizeof(arcDrawVert) );
+				memcpy(&vertTemp, &p->ctrl( i, p->height - 1 - j), sizeof(anDrawVertex) );
+				memcpy(&p->ctrl( i, p->height - 1 - j), &p->ctrl( i, j), sizeof(anDrawVertex) );
+				memcpy(&p->ctrl( i, j), &vertTemp, sizeof(anDrawVertex) );
 			}
 		}
 	}
@@ -1430,10 +1430,10 @@ brush_t * CapSpecial( patchMesh_t *pParent,int nType,bool bFirst ) {
 
 
 void Patch_CapCurrent( bool bInvertedBevel,bool bInvertedEndcap ) {
-	patchMesh_t	*pParent	= NULL;
+	patchMesh_t	*pParent	= nullptr;
 	brush_t		*b[4];
-	brush_t		*pCap		= NULL;
-	b[0] = b[1] = b[2] = b[3] = NULL;
+	brush_t		*pCap		= nullptr;
+	b[0] = b[1] = b[2] = b[3] = nullptr;
 	int	nIndex	= 0;
 
 	if ( !QE_SingleBrush() ) {
@@ -1442,7 +1442,7 @@ void Patch_CapCurrent( bool bInvertedBevel,bool bInvertedEndcap ) {
 	}
 
 
-	for ( brush_t*pb = selected_brushes.next; pb != NULL && pb != &selected_brushes; pb = pb->next ) {
+	for ( brush_t*pb = selected_brushes.next; pb != nullptr && pb != &selected_brushes; pb = pb->next ) {
 		if ( pb->pPatch ) {
 			pParent = pb->pPatch;
 			// decide which if any ends we are going to cap
@@ -1451,25 +1451,25 @@ void Patch_CapCurrent( bool bInvertedBevel,bool bInvertedEndcap ) {
 			// then we need to ask which kind of cap to add
 			if ( pParent->ctrl(0, 0 ).xyz.Compare(pParent->ctrl(pParent->width - 1, 0 ).xyz) ) {
 				pCap = Cap(pParent, true, false);
-				if ( pCap != NULL ) {
+				if ( pCap != nullptr ) {
 					b[nIndex++] = pCap;
 				}
 			}
 			if ( pParent->ctrl(0, pParent->height - 1 ).xyz.Compare(pParent->ctrl(pParent->width - 1, pParent->height - 1 ).xyz) ) {
 				pCap = Cap(pParent, true, true);
-				if ( pCap != NULL ) {
+				if ( pCap != nullptr ) {
 					b[nIndex++] = pCap;
 				}
 			}
 			if ( pParent->ctrl(0, 0 ).xyz.Compare(pParent->ctrl(0, pParent->height - 1 ).xyz) ) {
 				pCap = Cap(pParent, false, false);
-				if ( pCap != NULL ) {
+				if ( pCap != nullptr ) {
 					b[nIndex++] = pCap;
 				}
 			}
 			if ( pParent->ctrl(pParent->width - 1, 0 ).xyz.Compare(pParent->ctrl(pParent->width - 1, pParent->height - 1 ).xyz) ) {
 				pCap = Cap(pParent, false, true);
-				if ( pCap != NULL ) {
+				if ( pCap != nullptr ) {
 					b[nIndex++] = pCap;
 				}
 			}
@@ -1508,7 +1508,7 @@ void Patch_CapCurrent( bool bInvertedBevel,bool bInvertedEndcap ) {
 void GenerateEndCaps( brush_t *brushParent,bool bBevel,bool bEndcap,bool bInverted ) {
 	brush_t		*b, *b2;
 	patchMesh_t	*p, *p2, *pParent;
-	arcVec3		vTemp, vMin, vMax;
+	anVec3		vTemp, vMin, vMax;
 	int			i, j;
 
 	pParent = brushParent->pPatch;
@@ -1687,7 +1687,7 @@ void GenerateEndCaps( brush_t *brushParent,bool bBevel,bool bEndcap,bool bInvert
 	}
 
 	if ( bCreated ) {
-		arcDrawVert	vertTemp;
+		anDrawVertex	vertTemp;
 		for ( i = 0; i < p->width; i++ ) {
 			for ( j = 0; j < p->height; j++ ) {
 				p->ctrl( i, j).xyz[2] = vMin[2];
@@ -1695,9 +1695,9 @@ void GenerateEndCaps( brush_t *brushParent,bool bBevel,bool bEndcap,bool bInvert
 			}
 
 			for ( j = 0; j < p->height / 2; j++ ) {
-				memcpy(&vertTemp, &p->ctrl( i, p->height - 1 - j), sizeof(arcDrawVert) );
-				memcpy(&p->ctrl( i, p->height - 1 - j), &p->ctrl( i, j), sizeof(arcDrawVert) );
-				memcpy(&p->ctrl( i, j), &vertTemp, sizeof(arcDrawVert) );
+				memcpy(&vertTemp, &p->ctrl( i, p->height - 1 - j), sizeof(anDrawVertex) );
+				memcpy(&p->ctrl( i, p->height - 1 - j), &p->ctrl( i, j), sizeof(anDrawVertex) );
+				memcpy(&p->ctrl( i, j), &vertTemp, sizeof(anDrawVertex) );
 			}
 		}
 		//Select_Delete();
@@ -1861,7 +1861,7 @@ void Patch_BrushToMesh( bool bCone,bool bBevel,bool bEndcap,bool bSquare,int nHe
 	Select_Brush( b );
 }
 
-patchMesh_t * Patch_GenerateGeneric( int width,int height,int orientation,const arcVec3 &mins,const arcVec3 &maxs ) {
+patchMesh_t * Patch_GenerateGeneric( int width,int height,int orientation,const anVec3 &mins,const anVec3 &maxs ) {
 	patchMesh_t	*p	= MakeNewPatch(width, height);
 	p->d_texture = Texture_ForName(g_qeglobals.d_texturewin.texdef.name);
 
@@ -1903,12 +1903,12 @@ Patch_GenericMesh
 brush_t * Patch_GenericMesh( int width,int height,int orientation,bool bDeleteSource,bool bOverride,patchMesh_t *parent ) {
 	if ( height < 3 || height> 15 || width < 3 || width> 15 ) {
 		Sys_Status( "Invalid patch width or height.\n" );
-		return NULL;
+		return nullptr;
 	}
 
 	if ( !bOverride && !QE_SingleBrush() ) {
 		Sys_Status( "Cannot generate a patch from multiple selections.\n" );
-		return NULL;
+		return nullptr;
 	}
 
 	brush_t		*b	= selected_brushes.next;
@@ -1938,7 +1938,7 @@ brush_t * Patch_GenericMesh( int width,int height,int orientation,bool bDeleteSo
 PointInMoveList
 ==================
 */
-int PointInMoveList( arcVec3 *pf ) {
+int PointInMoveList( anVec3 *pf ) {
 	for ( int i = 0; i < g_qeglobals.d_num_move_points; i++ ) {
 		if ( pf == g_qeglobals.d_move_points[i] ) {
 			return i;
@@ -1952,7 +1952,7 @@ int PointInMoveList( arcVec3 *pf ) {
 PointValueInMoveList
 ==================
 */
-static int PointValueInMoveList( arcVec3 v ) {
+static int PointValueInMoveList( anVec3 v ) {
 	for ( int i = 0; i < g_qeglobals.d_num_move_points; i++ ) {
 		if ( v.Compare(*g_qeglobals.d_move_points[i] ) ) {
 			return i;
@@ -1966,7 +1966,7 @@ static int PointValueInMoveList( arcVec3 v ) {
 RemovePointFromMoveList
 ==================
 */
-void RemovePointFromMoveList( arcVec3 v ) {
+void RemovePointFromMoveList( anVec3 v ) {
 	int	n;
 	while ( (n = PointValueInMoveList( v) ) >= 0 ) {
 		for ( int i = n; i < g_qeglobals.d_num_move_points - 1; i++ ) {
@@ -1996,7 +1996,7 @@ bool ColumnSelected( patchMesh_t *p,int nCol ) {
 AddPoint
 ==================
 */
-static void AddPoint( patchMesh_t *p,arcVec3 *v,bool bWeldOrDrill = true ) {
+static void AddPoint( patchMesh_t *p,anVec3 *v,bool bWeldOrDrill = true ) {
 	int	nDim1	= (g_pParentWnd->ActiveXY()->GetViewType() == YZ) ? 1 : 0;
 	int	nDim2	= (g_pParentWnd->ActiveXY()->GetViewType() == XY) ? 1 : 2;
 	g_qeglobals.d_move_points[g_qeglobals.d_num_move_points++] = v;
@@ -2010,7 +2010,7 @@ static void AddPoint( patchMesh_t *p,arcVec3 *v,bool bWeldOrDrill = true ) {
 					}
 				}
 				if ( g_bPatchDrillDown && g_nPatchClickedView != W_CAMERA ) {
-					if ( (arcMath::Fabs((*v)[nDim1] - p->ctrl( i, j).xyz[nDim1] ) <= VECTOR_EPSILON) && (arcMath::Fabs((*v)[nDim2] - p->ctrl( i, j).xyz[nDim2] ) <= VECTOR_EPSILON) ) {
+					if ( (anMath::Fabs((*v)[nDim1] - p->ctrl( i, j).xyz[nDim1] ) <= VECTOR_EPSILON) && (anMath::Fabs((*v)[nDim2] - p->ctrl( i, j).xyz[nDim2] ) <= VECTOR_EPSILON) ) {
 						if ( PointInMoveList(&p->ctrl( i, j).xyz) == -1 ) {
 							g_qeglobals.d_move_points[g_qeglobals.d_num_move_points++] = &p->ctrl( i, j).xyz;
 							continue;
@@ -2019,7 +2019,7 @@ static void AddPoint( patchMesh_t *p,arcVec3 *v,bool bWeldOrDrill = true ) {
 #if 0
 		  int l = 0;
 					for ( int k = 0; k < 2; k++ ) {
-						if (arcMath::Fabs( v[k] - p->ctrl( i,j).xyz[k] ) > VECTOR_EPSILON)
+						if (anMath::Fabs( v[k] - p->ctrl( i,j).xyz[k] ) > VECTOR_EPSILON)
 						continue;
 						l++;
 					}
@@ -2101,7 +2101,7 @@ void SelectColumn( patchMesh_t *p,int nCol,bool bMulti ) {
 AddPatchMovePoint
 ==================
 */
-void AddPatchMovePoint( arcVec3 v,bool bMulti,bool bFull ) {
+void AddPatchMovePoint( anVec3 v,bool bMulti,bool bFull ) {
 	if ( !g_bSameView && !bMulti && !bFull ) {
 		g_bSameView = true;
 		return;
@@ -2150,7 +2150,7 @@ void AddPatchMovePoint( arcVec3 v,bool bMulti,bool bFull ) {
 Patch_UpdateSelected
 ==================
 */
-void Patch_UpdateSelected( arcVec3 vMove ) {
+void Patch_UpdateSelected( anVec3 vMove ) {
 	int	i, j;
 	for ( i = 0; i < g_qeglobals.d_num_move_points; i++ ) {
 		VectorAdd(*g_qeglobals.d_move_points[i], vMove, *g_qeglobals.d_move_points[i] );
@@ -2174,7 +2174,7 @@ void Patch_UpdateSelected( arcVec3 vMove ) {
 				}
 			}
 
-			arcVec3	vMin, vMax;
+			anVec3	vMin, vMax;
 			Patch_CalcBounds(p, vMin, vMax);
 			Brush_RebuildBrush(p->pSymbiot, vMin, vMax);
 		}
@@ -2197,7 +2197,7 @@ void Patch_AdjustSubdivisions( float hadj,float vadj ) {
 	Sys_UpdateWindows(W_ALL);
 }
 
-extern float ShadeForNormal( arcVec3 normal );
+extern float ShadeForNormal( anVec3 normal );
 
 /*
 =================
@@ -2222,7 +2222,7 @@ void DrawPatchMesh( patchMesh_t *pm,bool bPoints,int *list,bool bShade = false )
 		}
 
 		//FIXME: finish consolidating all the patch crap
-		arcSurface_Patch	*cp	= new arcSurface_Patch(pm->width * 6, pm->height * 6);
+		anSurface_Patch	*cp	= new anSurface_Patch(pm->width * 6, pm->height * 6);
 		cp->SetSize(pm->width, pm->height);
 		for ( i = 0; i < pm->width; i++ ) {
 			for ( j = 0; j < pm->height; j++ ) {
@@ -2242,7 +2242,7 @@ void DrawPatchMesh( patchMesh_t *pm,bool bPoints,int *list,bool bShade = false )
 		int			height	= cp->GetHeight();
 		/*
 					for ( i = 0; i < width; i++ ) {
-						for (j = 0; j < height; j++ ) {
+						for ( j = 0; j < height; j++ ) {
 							qglBegin( GL_POINTS );
 							int index = j * width + i;
 							qglVertex3fv((*cp)[index].xyz);
@@ -2256,18 +2256,18 @@ void DrawPatchMesh( patchMesh_t *pm,bool bPoints,int *list,bool bShade = false )
 			*/
 #ifdef TEST_SURFACE_CLIPPING
 		int			n;
-		arcSurface	*surf	= cp;
-		arcSurface	*front, *back;
+		anSurface	*surf	= cp;
+		anSurface	*front, *back;
 
-		surf->Split(arcPlane( 1, 0, 0, 0 ), 0.1f, &front, &back);
+		surf->Split(anPlane( 1, 0, 0, 0 ), 0.1f, &front, &back);
 		if ( front && back ) {
-			front->TranslateSelf(arcVec3(10, 10, 10) );
+			front->TranslateSelf(anVec3(10, 10, 10) );
 			(*front) += (*back);
 			surf = front;
 		} else {
 			surf = cp;
 		}
-		//		surf->ClipInPlace( arcPlane( 1, 0, 0, 0 ), 0.1f, true );
+		//		surf->ClipInPlace( anPlane( 1, 0, 0, 0 ), 0.1f, true );
 
 		qglBegin( GL_TRIANGLES);
 		for ( i = 0; i < surf->GetNumIndexes(); i += 3 ) {
@@ -2341,7 +2341,7 @@ void DrawPatchMesh( patchMesh_t *pm,bool bPoints,int *list,bool bShade = false )
 		qglCallList(*list);
 	}
 
-	arcVec3	*pSelectedPoints[256];
+	anVec3	*pSelectedPoints[256];
 	int		nIndex	= 0;
 
 	// FIXME: this bend painting code needs to be rolled up significantly as it is a mess right now
@@ -2561,7 +2561,7 @@ void Patch_DrawCam( patchMesh_t *pm,bool selected ) {
 	qglColor3f ( 1,1,1 );
 	for ( int i = 0; i < pm->width; i++ ) {
 		for ( int j = 0; j < pm->height; j++ ) {
-			arcVec3 temp;
+			anVec3 temp;
 			qglBegin ( GL_LINES );
 			qglVertex3fv (pm->ctrl( i,j).xyz);
 			VectorMA (pm->ctrl( i,j).xyz, 8, pm->ctrl( i,j].normal, temp);
@@ -2589,7 +2589,7 @@ void BrushesForSection( float section[2][4][7] ) {
 Patch_Move
 ==================
 */
-void Patch_Move( patchMesh_t *pm,const arcVec3 vMove,bool bRebuild ) {
+void Patch_Move( patchMesh_t *pm,const anVec3 vMove,bool bRebuild ) {
 	Patch_MakeDirty(pm);
 	for ( int w = 0; w < pm->width; w++ ) {
 		for ( int h = 0; h < pm->height; h++ ) {
@@ -2597,7 +2597,7 @@ void Patch_Move( patchMesh_t *pm,const arcVec3 vMove,bool bRebuild ) {
 		}
 	}
 	if ( bRebuild ) {
-		arcVec3	vMin, vMax;
+		anVec3	vMin, vMax;
 		Patch_CalcBounds(pm, vMin, vMax);
 		//Brush_RebuildBrush(patchMeshes[n].pSymbiot, vMin, vMax);
 	}
@@ -2609,8 +2609,8 @@ void Patch_Move( patchMesh_t *pm,const arcVec3 vMove,bool bRebuild ) {
 Patch_ApplyMatrix
 ==================
 */
-void Patch_ApplyMatrix( patchMesh_t *p,const arcVec3 vOrigin,const arcMat3 matrix,bool bSnap ) {
-	arcVec3	vTemp;
+void Patch_ApplyMatrix( patchMesh_t *p,const anVec3 vOrigin,const anMat3 matrix,bool bSnap ) {
+	anVec3	vTemp;
 
 	for ( int w = 0; w < p->width; w++ ) {
 		for ( int h = 0; h < p->height; h++ ) {
@@ -2622,7 +2622,7 @@ void Patch_ApplyMatrix( patchMesh_t *p,const arcVec3 vOrigin,const arcMat3 matri
 			p->ctrl(w, h).xyz = vTemp + vOrigin;
 		}
 	}
-	arcVec3	vMin, vMax;
+	anVec3	vMin, vMax;
 	Patch_CalcBounds(p, vMin, vMax);
 	Brush_RebuildBrush(p->pSymbiot, vMin, vMax);
 }
@@ -2712,7 +2712,7 @@ Patch_Delete
 */
 void Patch_Delete( patchMesh_t *p ) {
 	if ( p->pSymbiot ) {
-		p->pSymbiot->pPatch = NULL;
+		p->pSymbiot->pPatch = nullptr;
 	}
 
 	Mem_Free(p->verts);
@@ -2721,7 +2721,7 @@ void Patch_Delete( patchMesh_t *p ) {
 	}
 	Mem_Free(p);
 
-	p = NULL;
+	p = nullptr;
 
 	UpdatePatchInspector();
 }
@@ -2732,7 +2732,7 @@ void Patch_Delete( patchMesh_t *p ) {
 Patch_Scale
 ==================
 */
-void Patch_Scale( patchMesh_t *p,const arcVec3 vOrigin,const arcVec3 vAmt,bool bRebuild ) {
+void Patch_Scale( patchMesh_t *p,const anVec3 vOrigin,const anVec3 vAmt,bool bRebuild ) {
 	for ( int w = 0; w < p->width; w++ ) {
 		for ( int h = 0; h < p->height; h++ ) {
 			if ( g_qeglobals.d_select_mode == sel_curvepoint && PointInMoveList(&p->ctrl(w, h).xyz) == -1 )
@@ -2745,7 +2745,7 @@ void Patch_Scale( patchMesh_t *p,const arcVec3 vOrigin,const arcVec3 vAmt,bool b
 		}
 	}
 	if ( bRebuild ) {
-		arcVec3	vMin, vMax;
+		anVec3	vMin, vMax;
 		Patch_CalcBounds(p, vMin, vMax);
 		Brush_RebuildBrush(p->pSymbiot, vMin, vMax);
 	}
@@ -2804,8 +2804,8 @@ void Patch_SetTextureName( patchMesh_t *p,const char *name ) {
 Patch_DragScale
 ==================
 */
-bool Patch_DragScale( patchMesh_t *p,arcVec3 vAmt,arcVec3 vMove ) {
-	arcVec3	vMin, vMax, vScale, vTemp, vMid;
+bool Patch_DragScale( patchMesh_t *p,anVec3 vAmt,anVec3 vMove ) {
+	anVec3	vMin, vMax, vScale, vTemp, vMid;
 	int		i;
 
 	Patch_CalcBounds(p, vMin, vMax);
@@ -2864,7 +2864,7 @@ Patch_InsertColumn
 */
 void Patch_InsertColumn( patchMesh_t *p,bool bAdd ) {
 	int		h, w, i, j;
-	arcVec3	vTemp;
+	anVec3	vTemp;
 
 	if ( p->width + 2 >= MAX_PATCH_WIDTH ) {
 		return;
@@ -2886,18 +2886,18 @@ void Patch_InsertColumn( patchMesh_t *p,bool bAdd ) {
 				vTemp[i] /= 3;
 			}
 
-			memcpy(&p->ctrl(j + 2, h), &p->ctrl(j, h), sizeof(arcDrawVert) );
-			memcpy(&p->ctrl(j, h), &p->ctrl(j - 1, h), sizeof(arcDrawVert) );
+			memcpy(&p->ctrl(j + 2, h), &p->ctrl(j, h), sizeof(anDrawVertex) );
+			memcpy(&p->ctrl(j, h), &p->ctrl(j - 1, h), sizeof(anDrawVertex) );
 
 			VectorAdd(p->ctrl(j, h).xyz, vTemp, p->ctrl(j, h).xyz);
-			memcpy(&p->ctrl(j + 1, h), &p->ctrl(j, h), sizeof(arcDrawVert) );
+			memcpy(&p->ctrl(j + 1, h), &p->ctrl(j, h), sizeof(anDrawVertex) );
 			VectorAdd(p->ctrl(j + 1, h).xyz, vTemp, p->ctrl(j + 1, h).xyz);
 		}
 	} else {
 		for ( h = 0; h < p->height; h++ ) {
 			w = p->width - 3;
 			while ( w >= 0 ) {
-				memcpy(&p->ctrl(w + 2, h), &p->ctrl(w, h), sizeof(arcDrawVert) );
+				memcpy(&p->ctrl(w + 2, h), &p->ctrl(w, h), sizeof(anDrawVertex) );
 				w--;
 			}
 			VectorSubtract(p->ctrl( 1, h).xyz, p->ctrl(0, h).xyz, vTemp);
@@ -2922,7 +2922,7 @@ Patch_InsertRow
 */
 void Patch_InsertRow( patchMesh_t *p,bool bAdd ) {
 	int		h, w, i, j;
-	arcVec3	vTemp;
+	anVec3	vTemp;
 
 	if ( p->height + 2 >= MAX_PATCH_HEIGHT ) {
 		return;
@@ -2939,18 +2939,18 @@ void Patch_InsertRow( patchMesh_t *p,bool bAdd ) {
 				vTemp[i] /= 3;
 			}
 
-			memcpy(&p->ctrl(w, j + 2), &p->ctrl(w, j), sizeof(arcDrawVert) );
-			memcpy(&p->ctrl(w, j), &p->ctrl(w, j - 1 ), sizeof(arcDrawVert) );
+			memcpy(&p->ctrl(w, j + 2), &p->ctrl(w, j), sizeof(anDrawVertex) );
+			memcpy(&p->ctrl(w, j), &p->ctrl(w, j - 1 ), sizeof(anDrawVertex) );
 
 			VectorAdd(p->ctrl(w, j).xyz, vTemp, p->ctrl(w, j).xyz);
-			memcpy(&p->ctrl(w, j + 1 ), &p->ctrl(w, j), sizeof(arcDrawVert) );
+			memcpy(&p->ctrl(w, j + 1 ), &p->ctrl(w, j), sizeof(anDrawVertex) );
 			VectorAdd(p->ctrl(w, j + 1 ).xyz, vTemp, p->ctrl(w, j + 1 ).xyz);
 		}
 	} else {
 		for ( w = 0; w < p->width; w++ ) {
 			h = p->height - 3;
 			while ( h >= 0 ) {
-				memcpy(&p->ctrl(w, h + 2), &p->ctrl(w, h), sizeof(arcDrawVert) );
+				memcpy(&p->ctrl(w, h + 2), &p->ctrl(w, h), sizeof(anDrawVertex) );
 				h--;
 			}
 			VectorSubtract(p->ctrl(w, 1 ).xyz, p->ctrl(w, 0 ).xyz, vTemp);
@@ -2982,7 +2982,7 @@ void Patch_RemoveRow( patchMesh_t *p,bool bFirst ) {
 	if ( bFirst ) {
 		for ( int w = 0; w < p->width; w++ ) {
 			for ( int h = 0; h < p->height - 2; h++ ) {
-				memcpy(&p->ctrl(w, h), &p->ctrl(w, h + 2), sizeof(arcDrawVert) );
+				memcpy(&p->ctrl(w, h), &p->ctrl(w, h + 2), sizeof(anDrawVertex) );
 			}
 		}
 	}
@@ -3006,7 +3006,7 @@ void Patch_RemoveColumn( patchMesh_t *p,bool bFirst ) {
 	if ( bFirst ) {
 		for ( int h = 0; h < p->height; h++ ) {
 			for ( int w = 0; w < p->width - 2; w++ ) {
-				memcpy(&p->ctrl(w, h), &p->ctrl(w + 2, h), sizeof(arcDrawVert) );
+				memcpy(&p->ctrl(w, h), &p->ctrl(w + 2, h), sizeof(anDrawVertex) );
 			}
 		}
 	}
@@ -3018,7 +3018,7 @@ void Patch_RemoveColumn( patchMesh_t *p,bool bFirst ) {
 
 
 void Patch_DisperseRows() {
-	arcVec3	vTemp, vTemp2;
+	anVec3	vTemp, vTemp2;
 	int		i, w, h;
 
 
@@ -3061,7 +3061,7 @@ Patch_AdjustColumns
 ==================
 */
 void Patch_DisperseColumns() {
-	arcVec3	vTemp, vTemp2;
+	anVec3	vTemp, vTemp2;
 	int		i, w, h;
 
 	for ( brush_t*pb = selected_brushes.next; pb != &selected_brushes; pb = pb->next ) {
@@ -3117,7 +3117,7 @@ void Patch_AdjustSelected( bool bInsert,bool bColumn,bool bFlag ) {
 				}
 			}
 			bUpdate = true;
-			arcVec3		vMin, vMax;
+			anVec3		vMin, vMax;
 			patchMesh_t	*p	= pb->pPatch;
 			Patch_CalcBounds(p, vMin, vMax);
 			Brush_RebuildBrush(p->pSymbiot, vMin, vMax);
@@ -3155,14 +3155,14 @@ void Parse3DMatrix( int z,int y,int x,float *p ) {
 
 // parses a patch
 brush_t * Patch_Parse( bool bOld ) {
-	const arcMaterial *tex = declManager->FindMaterial(NULL);
+	const anMaterial *tex = declManager->FindMaterial(nullptr );
 	GetToken(true);
 
 	if ( strcmp(token, "{" ) ) {
-		return NULL;
+		return nullptr;
 	}
 
-	patchMesh_t	*pm	= NULL;
+	patchMesh_t	*pm	= nullptr;
 
 	if ( g_qeglobals.bSurfacePropertiesPlugin ) {
 		assert(true);
@@ -3184,7 +3184,7 @@ brush_t * Patch_Parse( bool bOld ) {
 		}
 
 		if ( strcmp(token, "( " ) ) {
-			return NULL;
+			return nullptr;
 		}
 
 		// width, height, flags (currently only negative)
@@ -3222,7 +3222,7 @@ brush_t * Patch_Parse( bool bOld ) {
 
 		GetToken(false);
 		if ( strcmp(token, " )" ) )
-			return NULL;
+			return nullptr;
 	}
 
 
@@ -3253,7 +3253,7 @@ brush_t * Patch_Parse( bool bOld ) {
 	}
 
 	if ( strcmp(token, "}" ) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	brush_t	*b	= AddBrushForPatch(pm, false);
@@ -3355,7 +3355,7 @@ Patch_RotateTexture
 ==================
 */
 void Patch_RotateTexture( patchMesh_t *p,float fAngle ) {
-	arcVec3	vMin, vMax;
+	anVec3	vMin, vMax;
 	Patch_CalcBounds(p, vMin, vMax);
 	Patch_MakeDirty(p);
 	for ( int w = 0; w < p->width; w++ ) {
@@ -3431,13 +3431,13 @@ void Patch_ShiftTexture( patchMesh_t *p,float fx,float fy,bool autoAdjust ) {
 }
 
 void patchInvert( patchMesh_t *p ) {
-	arcDrawVert	vertTemp;
+	anDrawVertex	vertTemp;
 	Patch_MakeDirty(p);
 	for ( int i = 0; i < p->width; i++ ) {
 		for ( int j = 0; j < p->height / 2; j++ ) {
-			memcpy(&vertTemp, &p->ctrl( i, p->height - 1 - j), sizeof(arcDrawVert) );
-			memcpy(&p->ctrl( i, p->height - 1 - j), &p->ctrl( i, j), sizeof(arcDrawVert) );
-			memcpy(&p->ctrl( i, j), &vertTemp, sizeof(arcDrawVert) );
+			memcpy(&vertTemp, &p->ctrl( i, p->height - 1 - j), sizeof(anDrawVertex) );
+			memcpy(&p->ctrl( i, p->height - 1 - j), &p->ctrl( i, j), sizeof(anDrawVertex) );
+			memcpy(&p->ctrl( i, j), &vertTemp, sizeof(anDrawVertex) );
 		}
 	}
 }
@@ -3464,7 +3464,7 @@ void Patch_ToggleInverted() {
 }
 
 void Patch_FlipTexture( patchMesh_t *p,bool y ) {
-	arcVec2	temp;
+	anVec2	temp;
 	Patch_MakeDirty(p);
 	if ( y ) {
 		for ( int i = 0; i < p->height; i++ ) {
@@ -3540,7 +3540,7 @@ void Patch_Restore( patchMesh_t *p ) {
 		memcpy(p->verts, patchSave->verts, sizeof(p->verts[0] ) * p->width * p->height);
 		Mem_Free(patchSave->verts);
 		Mem_Free(patchSave);
-		patchSave = NULL;
+		patchSave = nullptr;
 	}
 }
 
@@ -3631,7 +3631,7 @@ patchMesh_t * SinglePatchSelected() {
 	if ( selected_brushes.next->pPatch ) {
 		return selected_brushes.next->pPatch;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void Patch_BendToggle() {
@@ -3982,7 +3982,7 @@ void Patch_SubdivideSelected( bool subdivide,int horz,int vert ) {
 
 
 
-bool within( arcVec3 vTest,arcVec3 vTL,arcVec3 vBR ) {
+bool within( anVec3 vTest,anVec3 vTL,anVec3 vBR ) {
 	int	nDim1	= (g_pParentWnd->ActiveXY()->GetViewType() == YZ) ? 1 : 0;
 	int	nDim2	= (g_pParentWnd->ActiveXY()->GetViewType() == XY) ? 1 : 2;
 	if ( (vTest[nDim1] > vTL[nDim1] && vTest[nDim1] < vBR[nDim1] ) || (vTest[nDim1] < vTL[nDim1] && vTest[nDim1] > vBR[nDim1] ) ) {
@@ -4013,7 +4013,7 @@ void Patch_SelectAreaPoints() {
 	}
 }
 
-const char * Patch_GetTextureName() {
+const char *Patch_GetTextureName() {
 	brush_t	*b	= selected_brushes.next;
 	if ( b->pPatch ) {
 		patchMesh_t	*p	= b->pPatch;
@@ -4035,7 +4035,7 @@ patchMesh_t * Patch_Duplicate( patchMesh_t *pFrom ) {
 	p->bOverlay = false;
 	p->nListID = -1;
 
-	memcpy(p->verts, pFrom->verts, p->width * p->height * sizeof(arcDrawVert) );
+	memcpy(p->verts, pFrom->verts, p->width * p->height * sizeof(anDrawVertex) );
 
 	AddBrushForPatch(p);
 	return p;
@@ -4046,7 +4046,7 @@ void Patch_Thicken( int nAmount,bool bSeam ) {
 	int			i, j, h, w;
 	brush_t		*b;
 	patchMesh_t	*pSeam;
-	arcVec3		vMin, vMax;
+	anVec3		vMin, vMax;
 	CPtrArray	brushes;
 
 	nAmount = -nAmount;
@@ -4155,7 +4155,7 @@ void Patch_Thicken( int nAmount,bool bSeam ) {
 	}
 
 	for ( i = 0; i < brushes.GetSize(); i++ ) {
-		Select_Brush(reinterpret_cast< brush_t*>(brushes.GetAt( i ) ));
+		Select_Brush(reinterpret_cast< brush_t*>(brushes.GetAt( i ) ) );
 	}
 
 	if ( brushes.GetSize() > 0 ) {
@@ -4236,7 +4236,7 @@ void Patch_UnFreeze( bool bAll ) {
 
 void Patch_Transpose() {
 	int			i, j, w;
-	arcDrawVert	dv;
+	anDrawVertex	dv;
 	for ( brush_t*pb = selected_brushes.next; pb != &selected_brushes; pb = pb->next ) {
 		if ( pb->pPatch ) {
 			patchMesh_t	*p	= pb->pPatch;
@@ -4246,12 +4246,12 @@ void Patch_Transpose() {
 					for ( j = i + 1; j < p->width; j++ ) {
 						if ( j < p->height ) {
 							// swap the value
-							memcpy(&dv, &p->ctrl(j, i), sizeof(arcDrawVert) );
-							memcpy(&p->ctrl(j, i), &p->ctrl( i, j), sizeof(arcDrawVert) );
-							memcpy(&p->ctrl( i, j), &dv, sizeof(arcDrawVert) );
+							memcpy(&dv, &p->ctrl(j, i), sizeof(anDrawVertex) );
+							memcpy(&p->ctrl(j, i), &p->ctrl( i, j), sizeof(anDrawVertex) );
+							memcpy(&p->ctrl( i, j), &dv, sizeof(anDrawVertex) );
 						} else {
 							// just copy
-							memcpy(&p->ctrl(j, i), &p->ctrl( i, j), sizeof(arcDrawVert) );
+							memcpy(&p->ctrl(j, i), &p->ctrl( i, j), sizeof(anDrawVertex) );
 						}
 					}
 				}
@@ -4260,12 +4260,12 @@ void Patch_Transpose() {
 					for ( j = i + 1; j < p->height; j++ ) {
 						if ( j < p->width ) {
 							// swap the value
-							memcpy(&dv, &p->ctrl( i, j), sizeof(arcDrawVert) );
-							memcpy(&p->ctrl( i, j), &p->ctrl(j, i), sizeof(arcDrawVert) );
-							memcpy(&p->ctrl(j, i), &dv, sizeof(arcDrawVert) );
+							memcpy(&dv, &p->ctrl( i, j), sizeof(anDrawVertex) );
+							memcpy(&p->ctrl( i, j), &p->ctrl(j, i), sizeof(anDrawVertex) );
+							memcpy(&p->ctrl(j, i), &dv, sizeof(anDrawVertex) );
 						} else {
 							// just copy
-							memcpy(&p->ctrl( i, j), &p->ctrl(j, i), sizeof(arcDrawVert) );
+							memcpy(&p->ctrl( i, j), &p->ctrl(j, i), sizeof(anDrawVertex) );
 						}
 					}
 				}
@@ -4294,7 +4294,7 @@ void Select_SnapToGrid() {
 					}
 				}
 			}
-			arcVec3	vMin, vMax;
+			anVec3	vMin, vMax;
 			Patch_CalcBounds(p, vMin, vMax);
 			Brush_RebuildBrush(p->pSymbiot, vMin, vMax);
 		} else {
@@ -4307,14 +4307,14 @@ void Select_SnapToGrid() {
 void Patch_FindReplaceTexture( brush_t *pb,const char *pFind,const char *pReplace,bool bForce ) {
 	if ( pb->pPatch ) {
 		patchMesh_t	*p	= pb->pPatch;
-		if ( bForce || arcNetString::Icmp(p->d_texture->GetName(), pFind) == 0 ) {
+		if ( bForce || anString::Icmp(p->d_texture->GetName(), pFind) == 0 ) {
 			p->d_texture = Texture_ForName(pReplace);
 			//strcpy(p->d_texture->name, pReplace);
 		}
 	}
 }
 
-void Patch_ReplaceQTexture( brush_t *pb,arcMaterial *pOld,arcMaterial *pNew ) {
+void Patch_ReplaceQTexture( brush_t *pb,anMaterial *pOld,anMaterial *pNew ) {
 	if ( pb->pPatch ) {
 		patchMesh_t	*p	= pb->pPatch;
 		if ( p->d_texture == pOld ) {
@@ -4326,7 +4326,7 @@ void Patch_ReplaceQTexture( brush_t *pb,arcMaterial *pOld,arcMaterial *pNew ) {
 void Patch_Clone( patchMesh_t *p,brush_t *pNewOwner ) {
 }
 
-void Patch_FromTriangle( arcVec5 vx,arcVec5 vy,arcVec5 vz ) {
+void Patch_FromTriangle( anVec5 vx,anVec5 vy,anVec5 vz ) {
 	patchMesh_t	*p	= MakeNewPatch(3, 3);
 	p->d_texture = Texture_ForName(g_qeglobals.d_texturewin.texdef.name);
 	p->type = PATCH_TRIANGLE;
@@ -4343,9 +4343,9 @@ void Patch_FromTriangle( arcVec5 vx,arcVec5 vy,arcVec5 vz ) {
 	// 2 1 goes to mid of y and z
 	// 2 2 goes to y
 
-	arcVec5	vMidXZ;
-	arcVec5	vMidXY;
-	arcVec5	vMidYZ;
+	anVec5	vMidXZ;
+	anVec5	vMidXY;
+	anVec5	vMidYZ;
 
 
 	vMidXZ.Lerp(vx, vz, 0.5);
@@ -4397,8 +4397,8 @@ sets an epair for the given patch
 */
 void Patch_SetEpair( patchMesh_t *p,const char *pKey,const char *pValue ) {
 	if ( g_qeglobals.m_bBrushPrimitMode ) {
-		if ( p->epairs == NULL ) {
-			p->epairs = new arcDictionary;
+		if ( p->epairs == nullptr ) {
+			p->epairs = new anDict;
 		}
 		p->epairs->Set(pKey, pValue);
 	}
@@ -4409,7 +4409,7 @@ void Patch_SetEpair( patchMesh_t *p,const char *pKey,const char *pValue ) {
 Patch_GetKeyValue
 =================
 */
-const char * Patch_GetKeyValue( patchMesh_t *p,const char *pKey ) {
+const char *Patch_GetKeyValue( patchMesh_t *p,const char *pKey ) {
 	if ( g_qeglobals.m_bBrushPrimitMode ) {
 		if ( p->epairs ) {
 			return p->epairs->GetString(pKey);

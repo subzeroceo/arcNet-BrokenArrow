@@ -1,13 +1,13 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #include "DrawVert.h"
 #pragma hdrstop
 
 /*
 =============
-arcDrawVert::Normalize
+anDrawVertex::Normalize
 =============
 */
-void arcDrawVert::Normalize( void ) {
+void anDrawVertex::Normalize( void ) {
 	normal.Normalize();
 	tangents[1].Cross( normal, tangents[0] );
 	tangents[1].Normalize();
@@ -17,10 +17,10 @@ void arcDrawVert::Normalize( void ) {
 
 /*
 ============
-arcShadowCache::CreateShadowCache
+anShadowCache::CreateShadowCache
 ============
 */
-int arcShadowCache::CreateShadowCache( arcShadowCache *vertexCache, const arcDrawVert *verts, const int numVerts ) {
+int anShadowCache::CreateShadowCache( anShadowCache *vertexCache, const anDrawVertex *verts, const int numVerts ) {
 	for ( int i = 0; i < numVerts; i++ ) {
 		vertexCache[i*2+0].xyzw[0] = verts[i].xyz[0];
 		vertexCache[i*2+0].xyzw[1] = verts[i].xyz[1];
@@ -37,10 +37,10 @@ int arcShadowCache::CreateShadowCache( arcShadowCache *vertexCache, const arcDra
 
 /*
 ===================
-arcShadowCache::CreateShadowCache
+anShadowCache::CreateShadowCache
 ===================
 */
-int arcShadowCache::CreateShadowCache( arcShadowCache *vertexCache, const arcDrawVert *verts, const int numVerts ) {
+int anShadowCache::CreateShadowCache( anShadowCache *vertexCache, const anDrawVertex *verts, const int numVerts ) {
 	for ( int i = 0; i < numVerts; i++ ) {
 		vertexCache[0].xyzw[0] = verts[i].xyz[0];
 		vertexCache[0].xyzw[1] = verts[i].xyz[1];

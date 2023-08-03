@@ -1,7 +1,7 @@
 // Copyright (C) 2007 Id Software, Inc.
 //
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "TraceModelCache.h"
@@ -11,13 +11,13 @@
 
 /*
 ===============
-arcTraceModelCache::ClearTraceModelCache
+anTraceModelCache::ClearTraceModelCache
 ===============
 */
-void arcTraceModelCache::ClearTraceModelCache( void ) {
+void anTraceModelCache::ClearTraceModelCache( void ) {
 	for ( int i = 0; i < cache.Num(); i++ ) {
-		collisionModelManager->FreeModel( cache[ i ]->collisionModel );
-		cache[ i ]->collisionModel = NULL;
+		collisionModelManager->FreeModel( cache[i]->collisionModel );
+		cache[i]->collisionModel = nullptr;
 	}
 	cache.Clear();
 	fileCache.Clear();
@@ -28,26 +28,26 @@ void arcTraceModelCache::ClearTraceModelCache( void ) {
 
 /*
 ===============
-arcTraceModelCache::TraceModelCacheSize
+anTraceModelCache::TraceModelCacheSize
 ===============
 */
-size_t arcTraceModelCache::TraceModelCacheSize( void ) {
+size_t anTraceModelCache::TraceModelCacheSize( void ) {
 	return cache.Size();
 }
 
 /*
 ===============
-arcTraceModelCache::FindTraceModel
+anTraceModelCache::FindTraceModel
 ===============
 */
-int arcTraceModelCache::FindTraceModel( const arcTraceModel& trm, bool includeBrushes ) {
+int anTraceModelCache::FindTraceModel( const anTraceModel& trm, bool includeBrushes ) {
 	int hashKey = GetTraceModelHashKey( trm );
-	for ( int i = hash.GetFirst( hashKey ); i != idHashIndex::NULL_INDEX; i = hash.GetNext( i ) ) {
-		if ( cache[ i ]->trm != trm ) {
+	for ( int i = hash.GetFirst( hashKey ); i != anHashIndex::NULL_INDEX; i = hash.GetNext( i ) ) {
+		if ( cache[i]->trm != trm ) {
 			continue;
 		}
 
-		if ( cache[ i ]->includesBrushes != includeBrushes ) {
+		if ( cache[i]->includesBrushes != includeBrushes ) {
 			continue;
 		}
 
@@ -58,13 +58,13 @@ int arcTraceModelCache::FindTraceModel( const arcTraceModel& trm, bool includeBr
 
 /*
 ===============
-arcTraceModelCache::PrecacheTraceModel
+anTraceModelCache::PrecacheTraceModel
 ===============
 */
-int arcTraceModelCache::PrecacheTraceModel( const arcTraceModel &trm, const char* fileName ) {
+int anTraceModelCache::PrecacheTraceModel( const anTraceModel &trm, const char* fileName ) {
 	int index = AllocTraceModel( trm, false );
 	cache[index]->refCount--;
-	if ( fileName != NULL ) {
+	if ( fileName != nullptr ) {
 		AllocFileEntry( fileName, index );
 	}
 	return index;
@@ -72,16 +72,16 @@ int arcTraceModelCache::PrecacheTraceModel( const arcTraceModel &trm, const char
 
 /*
 ===============
-arcTraceModelCache::AllocTraceModel
+anTraceModelCache::AllocTraceModel
 ===============
 */
-int arcTraceModelCache::AllocTraceModel( const arcTraceModel &trm, bool includeBrushes ) {
+int anTraceModelCache::AllocTraceModel( const anTraceModel &trm, bool includeBrushes ) {
 	int i, hashKey, traceModelIndex;
 
 	hashKey = GetTraceModelHashKey( trm );
-	for ( i = hash.GetFirst( hashKey ); i != idHashIndex::NULL_INDEX; i = hash.GetNext( i ) ) {
-		if ( cache[ i ]->trm == trm ) {
-			cache[ i ]->refCount++;
+	for ( i = hash.GetFirst( hashKey ); i != anHashIndex::NULL_INDEX; i = hash.GetNext( i ) ) {
+		if ( cache[i]->trm == trm ) {
+			cache[i]->refCount++;
 			return i;
 		}
 	}
@@ -104,12 +104,12 @@ int arcTraceModelCache::AllocTraceModel( const arcTraceModel &trm, bool includeB
 
 /*
 ===============
-arcTraceModelCache::FreeTraceModel
+anTraceModelCache::FreeTraceModel
 ===============
 */
-void arcTraceModelCache::FreeTraceModel( const int traceModelIndex ) {
+void anTraceModelCache::FreeTraceModel( const int traceModelIndex ) {
 	if ( traceModelIndex < 0 || traceModelIndex >= cache.Num() || cache[ traceModelIndex ]->refCount <= 0 ) {
-		gameLocal.Warning( "arcClipModel::FreeTraceModel: tried to free uncached trace model" );
+		gameLocal.Warning( "anClipModel::FreeTraceModel: tried to free uncached trace model" );
 		return;
 	}
 	cache[ traceModelIndex ]->refCount--;
@@ -117,12 +117,12 @@ void arcTraceModelCache::FreeTraceModel( const int traceModelIndex ) {
 
 /*
 ===============
-arcTraceModelCache::CopyTraceModel
+anTraceModelCache::CopyTraceModel
 ===============
 */
-int arcTraceModelCache::CopyTraceModel( const int traceModelIndex ) {
+int anTraceModelCache::CopyTraceModel( const int traceModelIndex ) {
 	if ( traceModelIndex < 0 || traceModelIndex >= cache.Num() || cache[ traceModelIndex ]->refCount <= 0 ) {
-		gameLocal.Warning( "arcTraceModelCache::CopyTraceModel: tried to copy an uncached trace model" );
+		gameLocal.Warning( "anTraceModelCache::CopyTraceModel: tried to copy an uncached trace model" );
 		return -1;
 	}
 	cache[ traceModelIndex ]->refCount++;
@@ -131,13 +131,13 @@ int arcTraceModelCache::CopyTraceModel( const int traceModelIndex ) {
 
 /*
 ===============
-arcTraceModelCache::GetMassProperties
+anTraceModelCache::GetMassProperties
 ===============
 */
-void arcTraceModelCache::GetMassProperties( const int traceModelIndex, const float density, float &mass, arcVec3 &centerOfMass, arcMat3 &inertiaTensor ) const {
+void anTraceModelCache::GetMassProperties( const int traceModelIndex, const float density, float &mass, anVec3 &centerOfMass, anMat3 &inertiaTensor ) const {
 	if ( traceModelIndex < 0 || traceModelIndex >= cache.Num() || cache[ traceModelIndex ]->refCount <= 0 ) {
 		assert( 0 );
-		gameLocal.Warning( "arcTraceModelCache::GetMassProperties: tried to use an uncached trace model" );
+		gameLocal.Warning( "anTraceModelCache::GetMassProperties: tried to use an uncached trace model" );
 		inertiaTensor.Identity();
 		centerOfMass.Zero();
 		mass = 1.0f;
@@ -153,26 +153,24 @@ void arcTraceModelCache::GetMassProperties( const int traceModelIndex, const flo
 
 /*
 ===============
-arcTraceModelCache::GetTraceModelHashKey
+anTraceModelCache::GetTraceModelHashKey
 ===============
 */
-int arcTraceModelCache::GetTraceModelHashKey( const arcTraceModel &trm ) {
-	const arcVec3 &v = trm.bounds[0];
-	return ( trm.type << 8 ) ^ ( trm.numVerts << 4 ) ^ ( trm.numEdges << 2 ) ^ ( trm.numPolys << 0 ) ^ arcMath::FloatHash( v.ToFloatPtr(), v.GetDimension() );
+int anTraceModelCache::GetTraceModelHashKey( const anTraceModel &trm ) {
+	const anVec3 &v = trm.bounds[0];
+	return ( trm.type << 8 ) ^ ( trm.numVerts << 4 ) ^ ( trm.numEdges << 2 ) ^ ( trm.numPolys << 0 ) ^ anMath::FloatHash( v.ToFloatPtr(), v.GetDimension() );
 }
-
 
 /*
 ============
 NewPolyPoint
 ============
 */
-arcTraceModelCache::polyPoint_t	arcTraceModelCache::polyPointPool[ MAX_TRACEMODEL_WATER_POINTS_POOL ];
-arcTraceModelCache::polyPoint_t*	arcTraceModelCache::freePolyPoints[ MAX_TRACEMODEL_WATER_POINTS_POOL ];
-int								arcTraceModelCache::numFreePolyPoints = 0;
-bool							arcTraceModelCache::polyPointPoolValid = false;
-
-arcTraceModelCache::polyPoint_t* arcTraceModelCache::NewPolyPoint( void ) {
+anTraceModelCache::polyPoint_t	anTraceModelCache::polyPointPool[ MAX_TRACEMODEL_WATER_POINTS_POOL ];
+anTraceModelCache::polyPoint_t *anTraceModelCache::freePolyPoints[ MAX_TRACEMODEL_WATER_POINTS_POOL ];
+int anTraceModelCache::numFreePolyPoints = 0;
+bool anTraceModelCache::polyPointPoolValid = false;
+anTraceModelCache::polyPoint_t *anTraceModelCache::NewPolyPoint( void ) {
 /*	polyPoint_t* point = new polyPoint_t;
 	numPolyPoints++;
 	if ( numPolyPoints > maxNumPolyPoints ) {
@@ -182,14 +180,14 @@ arcTraceModelCache::polyPoint_t* arcTraceModelCache::NewPolyPoint( void ) {
 
 	if ( !polyPointPoolValid ) {
 		for ( int i = 0; i < MAX_TRACEMODEL_WATER_POINTS_POOL; i++ ) {
-			freePolyPoints[ i ] = &polyPointPool[ i ];
+			freePolyPoints[i] = &polyPointPool[i];
 		}
 		polyPointPoolValid = true;
 		numFreePolyPoints = MAX_TRACEMODEL_WATER_POINTS_POOL;
 	}
 
 	if ( numFreePolyPoints == 0 ) {
-		return NULL;
+		return nullptr;
 	}
 
 	numFreePolyPoints--;
@@ -202,11 +200,11 @@ arcTraceModelCache::polyPoint_t* arcTraceModelCache::NewPolyPoint( void ) {
 DeletePolyPoint
 ============
 */
-void arcTraceModelCache::DeletePolyPoint( polyPoint_t* point ) {
+void anTraceModelCache::DeletePolyPoint( polyPoint_t* point ) {
 /*	delete point;
 	numPolyPoints--;*/
 	for ( int i = 0; i < numFreePolyPoints; i++ ) {
-		if ( freePolyPoints[ i ] == point ) {
+		if ( freePolyPoints[i] == point ) {
 			// WTF - shouldn't happen!
 			int poo = 3;
 		}
@@ -221,7 +219,7 @@ void arcTraceModelCache::DeletePolyPoint( polyPoint_t* point ) {
 DeletePointList
 ============
 */
-void arcTraceModelCache::DeletePointList( idLinkList< polyPoint_t >& points ) {
+void anTraceModelCache::DeletePointList( anLinkList<polyPoint_t> &points ) {
 	while ( polyPoint_t* next = points.Next() ) {
 		DeletePolyPoint( next );
 	}
@@ -232,14 +230,13 @@ void arcTraceModelCache::DeletePointList( idLinkList< polyPoint_t >& points ) {
 FindClosestPoints
 ============
 */
-void arcTraceModelCache::FindClosestPoints( idLinkList< polyPoint_t >& points, polyPointPtr_t& closePoint1, polyPointPtr_t& closePoint2 ) {
-	closePoint1 = NULL;
-	closePoint2 = NULL;
-	float closeDist	= arcMath::INFINITY;
+void anTraceModelCache::FindClosestPoints( anLinkList<polyPoint_t>& points, polyPointPtr_t& closePoint1, polyPointPtr_t& closePoint2 ) {
+	closePoint1 = nullptr;
+	closePoint2 = nullptr;
+	float closeDist	= anMath::INFINITY;
 
 	for ( polyPoint_t* next = points.Next(); next; next = next->node.Next() ) {
 		for ( polyPoint_t* next2 = next->node.Next(); next2; next2 = next2->node.Next() ) {
-
 			float dist = ( next->xyz - next2->xyz ).LengthSqr() * next->squareWeight * next2->squareWeight;
 			if ( dist < closeDist ) {
 				closeDist	= dist;
@@ -252,17 +249,17 @@ void arcTraceModelCache::FindClosestPoints( idLinkList< polyPoint_t >& points, p
 
 /*
 ============
-arcTraceModelCache::SetupWaterPoints
+anTraceModelCache::SetupWaterPoints
 ============
 */
-void arcTraceModelCache::SetupWaterPoints( trmCache_t& entry ) {
-	arcTraceModel& trm = entry.trm;
+void anTraceModelCache::SetupWaterPoints( trmCache_t &entry ) {
+	anTraceModel& trm = entry.trm;
 	if ( !trm.bounds.GetVolume() || !trm.isConvex ) {
 		return;
 	}
 
 	numFreePolyPoints = MAX_TRACEMODEL_WATER_POINTS_POOL;
-	idLinkList< polyPoint_t > points;
+	anLinkList<polyPoint_t> points;
 
 	const int numPoints = MAX_TRACEMODEL_WATER_POINTS;
 
@@ -271,7 +268,7 @@ void arcTraceModelCache::SetupWaterPoints( trmCache_t& entry ) {
 	while ( true ) {
 		count = 0;
 		float numPerSide = pow( numPoints * startScale, 1.f / 3.f );
-		arcVec3 spacing = ( trm.bounds.GetMaxs() - trm.bounds.GetMins() ) * ( 1 / numPerSide );
+		anVec3 spacing = ( trm.bounds.GetMaxs() - trm.bounds.GetMins() ) * ( 1 / numPerSide );
 		if ( spacing.FixDenormals( 0.00001f ) ) {
 			// one of the values is too small!
 			return;
@@ -280,14 +277,13 @@ void arcTraceModelCache::SetupWaterPoints( trmCache_t& entry ) {
 		for ( float x = trm.bounds.GetMins().x; x < trm.bounds.GetMaxs().x; x+= spacing.x ) {
 			for ( float y = trm.bounds.GetMins().y; y < trm.bounds.GetMaxs().y; y+= spacing.y ) {
 				for ( float z = trm.bounds.GetMins().z; z < trm.bounds.GetMaxs().z; z+= spacing.z ) {
-					arcVec3 xyz( x, y, z );
+					anVec3 xyz( x, y, z );
 					xyz += spacing * 0.5f;
-
 					if ( !trm.ContainsPoint( xyz ) ) {
 						continue;
 					}
 					polyPoint_t* point = NewPolyPoint();
-					if ( point == NULL ) {
+					if ( point == nullptr ) {
 						continue;
 					}
 
@@ -333,8 +329,8 @@ void arcTraceModelCache::SetupWaterPoints( trmCache_t& entry ) {
 
 	int i = 0;
 	for ( polyPoint_t* next = points.Next(); next; next = next->node.Next() ) {
-		entry.waterPoints[ i ].weight = next->weight;
-		entry.waterPoints[ i ].xyz	= next->xyz;
+		entry.waterPoints[i].weight = next->weight;
+		entry.waterPoints[i].xyz	= next->xyz;
 		i++;
 	}
 	entry.hasWater = true;
@@ -344,12 +340,12 @@ void arcTraceModelCache::SetupWaterPoints( trmCache_t& entry ) {
 
 /*
 ============
-arcTraceModelCache::Write
+anTraceModelCache::Write
 ============
 */
-void arcTraceModelCache::Write( int index, arcNetFile* fp ) {
+void anTraceModelCache::Write( int index, anFile* fp ) {
 	if ( index < 0 || index >= cache.Num() ) {
-		gameLocal.Warning( "arcClipModel::Write: tried to write uncached trace model" );
+		gameLocal.Warning( "anClipModel::Write: tried to write uncached trace model" );
 		return;
 	}
 
@@ -366,31 +362,31 @@ void arcTraceModelCache::Write( int index, arcNetFile* fp ) {
 	fp->WriteBool( entry.hasWater );
 	if ( entry.hasWater ) {
 		for ( int i = 0; i < MAX_TRACEMODEL_WATER_POINTS; i++ ) {
-			fp->WriteVec3( entry.waterPoints[ i ].xyz );
-			fp->WriteFloat( entry.waterPoints[ i ].weight );
+			fp->WriteVec3( entry.waterPoints[i].xyz );
+			fp->WriteFloat( entry.waterPoints[i].weight );
 		}
 	}
 }
 
 /*
 ============
-arcTraceModelCache::TrmMaterialForName
+anTraceModelCache::TrmMaterialForName
 ============
 */
-const arcMaterial* arcTraceModelCache::TrmMaterialForName( const char* name ) {
+const anMaterial* anTraceModelCache::TrmMaterialForName( const char* name ) {
 	if ( *name == '\0' ) {
-		return NULL;
+		return nullptr;
 	}
 	return gameLocal.declMaterialType[ name ];
 }
 
 /*
 ============
-arcTraceModelCache::TrmNameForMaterial
+anTraceModelCache::TrmNameForMaterial
 ============
 */
-const char* arcTraceModelCache::TrmNameForMaterial( const arcMaterial* material ) {
-	if ( material == NULL ) {
+const char* anTraceModelCache::TrmNameForMaterial( const anMaterial *material ) {
+	if ( material == nullptr ) {
 		return "";
 	}
 	return material->GetName();
@@ -398,24 +394,24 @@ const char* arcTraceModelCache::TrmNameForMaterial( const arcMaterial* material 
 
 /*
 ============
-arcTraceModelCache::Read
+anTraceModelCache::Read
 ============
 */
-void arcTraceModelCache::Read( arcTraceModel& trm, arcNetFile* fp ) {
-	arcNetString header;
+void anTraceModelCache::Read( anTraceModel& trm, anFile* fp ) {
+	anString header;
 	fp->ReadString( header );
 
 	if ( header != TRM_HEADER ) {
-		gameLocal.Warning( "arcTraceModelCache::Read File is not a Trace Model '%s'", fp->GetName() );
+		gameLocal.Warning( "anTraceModelCache::Read File is not a Trace Model '%s'", fp->GetName() );
 		trm.SetupBox( 8.f );
 		AllocFileEntry( fp->GetName(), AllocTraceModel( trm, false ) );
 		return;
 	}
 
-	arcNetString version;
+	anString version;
 	fp->ReadString( version );
 	if ( version != TRM_VERSION ) {
-		gameLocal.Warning( "arcTraceModelCache::Read File has Wrong Version '%s'", fp->GetName() );
+		gameLocal.Warning( "anTraceModelCache::Read File has Wrong Version '%s'", fp->GetName() );
 		trm.SetupBox( 8.f );
 		AllocFileEntry( fp->GetName(), AllocTraceModel( trm, false ) );
 		return;
@@ -433,8 +429,8 @@ void arcTraceModelCache::Read( arcTraceModel& trm, arcNetFile* fp ) {
 	fp->ReadBool( entry.hasWater );
 	if ( entry.hasWater ) {
 		for ( int i = 0; i < MAX_TRACEMODEL_WATER_POINTS; i++ ) {
-			fp->ReadVec3( entry.waterPoints[ i ].xyz );
-			fp->ReadFloat( entry.waterPoints[ i ].weight );
+			fp->ReadVec3( entry.waterPoints[i].xyz );
+			fp->ReadFloat( entry.waterPoints[i].weight );
 		}
 	}
 
@@ -445,7 +441,7 @@ void arcTraceModelCache::Read( arcTraceModel& trm, arcNetFile* fp ) {
 	}
 
 	if ( FindTraceModel( fp->GetName(), entry.includesBrushes ) != -1 ) {
-		gameLocal.Error( "arcTraceModelCache::Tried to Cache an Already Cached File'%s'", fp->GetName() );
+		gameLocal.Error( "anTraceModelCache::Tried to Cache an Already Cached File'%s'", fp->GetName() );
 	}
 
 	int traceModelIndex = cache.Num();
@@ -464,10 +460,10 @@ void arcTraceModelCache::Read( arcTraceModel& trm, arcNetFile* fp ) {
 
 /*
 ============
-arcTraceModelCache::FindTraceModel
+anTraceModelCache::FindTraceModel
 ============
 */
-int arcTraceModelCache::FindTraceModel( const char* fileName, bool includeBrushes ) {
+int anTraceModelCache::FindTraceModel( const char* fileName, bool includeBrushes ) {
 	int index = FindFileEntry( fileName, includeBrushes );
 	if ( index == -1 ) {
 		return -1;
@@ -478,11 +474,11 @@ int arcTraceModelCache::FindTraceModel( const char* fileName, bool includeBrushe
 
 /*
 ============
-arcTraceModelCache::AllocFileEntry
+anTraceModelCache::AllocFileEntry
 ============
 */
-void arcTraceModelCache::AllocFileEntry( const char* fileName, int traceModelIndex ) {
-	int hashKey = arcNetString::Hash( fileName );
+void anTraceModelCache::AllocFileEntry( const char *fileName, int traceModelIndex ) {
+	int hashKey = anString::Hash( fileName );
 
 	int cacheIndex = fileCache.Num();
 	trmFileCache_t& cache = fileCache.Alloc();
@@ -494,18 +490,18 @@ void arcTraceModelCache::AllocFileEntry( const char* fileName, int traceModelInd
 
 /*
 ============
-arcTraceModelCache::FindFileEntry
+anTraceModelCache::FindFileEntry
 ============
 */
-int arcTraceModelCache::FindFileEntry( const char* fileName, bool includeBrushes ) {
-	int hashKey = arcNetString::Hash( fileName );
+int anTraceModelCache::FindFileEntry( const char* fileName, bool includeBrushes ) {
+	int hashKey = anString::Hash( fileName );
 
-	for ( int i = nameHash.GetFirst( hashKey ); i != idHashIndex::NULL_INDEX; i = nameHash.GetNext( i ) ) {
-		if ( fileCache[ i ].fileName.Cmp( fileName ) != 0 ) {
+	for ( int i = nameHash.GetFirst( hashKey ); i != anHashIndex::NULL_INDEX; i = nameHash.GetNext( i ) ) {
+		if ( fileCache[i].fileName.Cmp( fileName ) != 0 ) {
 			continue;
 		}
 
-		if ( cache[ fileCache[ i ].entryIndex ]->includesBrushes != includeBrushes ) {
+		if ( cache[ fileCache[i].entryIndex ]->includesBrushes != includeBrushes ) {
 			continue;
 		}
 

@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 /*
@@ -30,24 +30,24 @@ public:
 	virtual void			Init();
 	virtual void			Shutdown();
 
-	virtual void			AddCommand( const char *cmdName, cmdFunction_t function, int flags, const char *description, argCompletion_t argCompletion = NULL );
+	virtual void			AddCommand( const char *cmdName, cmdFunction_t function, int flags, const char *description, argCompletion_t argCompletion = nullptr );
 	virtual void			RemoveCommand( const char *cmdName );
 	virtual void			RemoveFlaggedCommands( int flags );
 
 	virtual void			CommandCompletion( void(*callback)( const char *s ) );
 	virtual void			ArgCompletion( const char *cmdString, void(*callback)( const char *s ) );
-	virtual void			ExecuteCommandText( const char * text );
-	virtual void			AppendCommandText( const char * text );
+	virtual void			ExecuteCommandText( const char *text );
+	virtual void			AppendCommandText( const char *text );
 
 	virtual void			BufferCommandText( cmdExecution_t exec, const char *text );
 	virtual void			ExecuteCommandBuffer();
 
-	virtual void			ArgCompletion_FolderExtension( const arcCommandArgs &args, void(*callback)( const char *s ), const char *folder, bool stripFolder, ... );
-	virtual void			ArgCompletion_DeclName( const arcCommandArgs &args, void(*callback)( const char *s ), int type );
+	virtual void			ArgCompletion_FolderExtension( const anCommandArgs &args, void(*callback)( const char *s ), const char *folder, bool stripFolder, ... );
+	virtual void			ArgCompletion_DeclName( const anCommandArgs &args, void(*callback)( const char *s ), int type );
 
-	virtual void			BufferCommandArgs( cmdExecution_t exec, const arcCommandArgs &args );
+	virtual void			BufferCommandArgs( cmdExecution_t exec, const anCommandArgs &args );
 
-	virtual void			SetupReloadEngine( const arcCommandArgs &args );
+	virtual void			SetupReloadEngine( const anCommandArgs &args );
 	virtual bool			PostReloadEngine();
 
 	void					SetWait( int numFrames ) { wait = numFrames; }
@@ -62,44 +62,44 @@ private:
 	int						textLength;
 	byte					textBuf[MAX_COMMANDBUFFER];
 
-	arcNetString					completionString;
+	anString					completionString;
 	aRcStrList				completionParms;
 
 	// piggybacks on the text buffer, avoids tokenize again and screwing it up
-	arcNetList<arcCommandArgs>		tokenizedCmds;
+	anList<anCommandArgs>		tokenizedCmds;
 
 	// a command stored to be executed after a reloadEngine and all associated commands have been processed
-	arcCommandArgs				postReload;
+	anCommandArgs				postReload;
 
 private:
-	void					ExecuteTokenizedString( const arcCommandArgs &args );
+	void					ExecuteTokenizedString( const anCommandArgs &args );
 	void					InsertCommandText( const char *text );
 
-	static void				ListByFlags( const arcCommandArgs &args, cmdFlags_t flags );
-	static void				List_f( const arcCommandArgs &args );
-	static void				SystemList_f( const arcCommandArgs &args );
-	static void				RendererList_f( const arcCommandArgs &args );
-	static void				SoundList_f( const arcCommandArgs &args );
-	static void				GameList_f( const arcCommandArgs &args );
-	static void				ToolList_f( const arcCommandArgs &args );
-	static void				Exec_f( const arcCommandArgs &args );
-	static void				Vstr_f( const arcCommandArgs &args );
-	static void				Echo_f( const arcCommandArgs &args );
-	static void				Parse_f( const arcCommandArgs &args );
-	static void				Wait_f( const arcCommandArgs &args );
-	static void				PrintMemInfo_f( const arcCommandArgs &args );
+	static void				ListByFlags( const anCommandArgs &args, cmdFlags_t flags );
+	static void				List_f( const anCommandArgs &args );
+	static void				SystemList_f( const anCommandArgs &args );
+	static void				RendererList_f( const anCommandArgs &args );
+	static void				SoundList_f( const anCommandArgs &args );
+	static void				GameList_f( const anCommandArgs &args );
+	static void				ToolList_f( const anCommandArgs &args );
+	static void				Exec_f( const anCommandArgs &args );
+	static void				Vstr_f( const anCommandArgs &args );
+	static void				Echo_f( const anCommandArgs &args );
+	static void				Parse_f( const anCommandArgs &args );
+	static void				Wait_f( const anCommandArgs &args );
+	static void				PrintMemInfo_f( const anCommandArgs &args );
 };
 ARCCmdSysLocal			cmdSystemLocal;
 arcCmdSystem *				cmdSystem = &cmdSystemLocal;
 
 /*
 ================================================
-aRcSortCommandDef
+anSortCommandDef
 ================================================
 */
-class aRcSortCommandDef : public ARCSortQuick< commandDef_t, aRcSortCommandDef > {
+class anSortCommandDef : public anSortQuick< commandDef_t, anSortCommandDef > {
 public:
-	int Compare( const commandDef_t & a, const commandDef_t & b ) const { return arcNetString::Icmp( a.name, b.name ); }
+	int Compare( const commandDef_t & a, const commandDef_t & b ) const { return anString::Icmp( a.name, b.name ); }
 };
 
 /*
@@ -107,11 +107,11 @@ public:
 ARCCmdSysLocal::ListByFlags
 ============
 */
-void ARCCmdSysLocal::ListByFlags( const arcCommandArgs &args, cmdFlags_t flags ) {
+void ARCCmdSysLocal::ListByFlags( const anCommandArgs &args, cmdFlags_t flags ) {
 	int i;
-	arcNetString match;
+	anString match;
 	const commandDef_t *cmd;
-	arcNetList<const commandDef_t *> cmdList;
+	anList<const commandDef_t *> cmdList;
 
 	if ( args.Argc() > 1 ) {
 		match = args.Args( 1, -1 );
@@ -124,14 +124,14 @@ void ARCCmdSysLocal::ListByFlags( const arcCommandArgs &args, cmdFlags_t flags )
 		if ( !( cmd->flags & flags ) ) {
 			continue;
 		}
-		if ( match.Length() && arcNetString( cmd->name ).Filter( match, false ) == 0 ) {
+		if ( match.Length() && anString( cmd->name ).Filter( match, false ) == 0 ) {
 			continue;
 		}
 
 		cmdList.Append( cmd );
 	}
 
-	//cmdList.SortWithTemplate( aRcSortCommandDef() );
+	//cmdList.SortWithTemplate( anSortCommandDef() );
 
 	for ( i = 0; i < cmdList.Num(); i++ ) {
 		cmd = cmdList[i];
@@ -147,7 +147,7 @@ void ARCCmdSysLocal::ListByFlags( const arcCommandArgs &args, cmdFlags_t flags )
 ARCCmdSysLocal::List_f
 ============
 */
-void ARCCmdSysLocal::List_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::List_f( const anCommandArgs &args ) {
 	ARCCmdSysLocal::ListByFlags( args, CMD_FL_ALL );
 }
 
@@ -156,7 +156,7 @@ void ARCCmdSysLocal::List_f( const arcCommandArgs &args ) {
 ARCCmdSysLocal::SystemList_f
 ============
 */
-void ARCCmdSysLocal::SystemList_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::SystemList_f( const anCommandArgs &args ) {
 	ARCCmdSysLocal::ListByFlags( args, CMD_FL_SYSTEM );
 }
 
@@ -165,7 +165,7 @@ void ARCCmdSysLocal::SystemList_f( const arcCommandArgs &args ) {
 ARCCmdSysLocal::RendererList_f
 ============
 */
-void ARCCmdSysLocal::RendererList_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::RendererList_f( const anCommandArgs &args ) {
 	ARCCmdSysLocal::ListByFlags( args, CMD_FL_RENDERER );
 }
 
@@ -174,7 +174,7 @@ void ARCCmdSysLocal::RendererList_f( const arcCommandArgs &args ) {
 ARCCmdSysLocal::SoundList_f
 ============
 */
-void ARCCmdSysLocal::SoundList_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::SoundList_f( const anCommandArgs &args ) {
 	ARCCmdSysLocal::ListByFlags( args, CMD_FL_SOUND );
 }
 
@@ -183,7 +183,7 @@ void ARCCmdSysLocal::SoundList_f( const arcCommandArgs &args ) {
 ARCCmdSysLocal::GameList_f
 ============
 */
-void ARCCmdSysLocal::GameList_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::GameList_f( const anCommandArgs &args ) {
 	ARCCmdSysLocal::ListByFlags( args, CMD_FL_GAME );
 }
 
@@ -192,7 +192,7 @@ void ARCCmdSysLocal::GameList_f( const arcCommandArgs &args ) {
 ARCCmdSysLocal::ToolList_f
 ============
 */
-void ARCCmdSysLocal::ToolList_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::ToolList_f( const anCommandArgs &args ) {
 	ARCCmdSysLocal::ListByFlags( args, CMD_FL_TOOL );
 }
 
@@ -201,10 +201,10 @@ void ARCCmdSysLocal::ToolList_f( const arcCommandArgs &args ) {
 ARCCmdSysLocal::Exec_f
 ===============
 */
-void ARCCmdSysLocal::Exec_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::Exec_f( const anCommandArgs &args ) {
 	char *	f;
 	int		len;
-	arcNetString	filename;
+	anString	filename;
 
 	if ( args.Argc () != 2 ) {
 		common->Printf( "exec <filename> : execute a script file\n" );
@@ -213,7 +213,7 @@ void ARCCmdSysLocal::Exec_f( const arcCommandArgs &args ) {
 
 	filename = args.Argv(1 );
 	filename.DefaultFileExtension( ".cfg" );
-	len = fileSystem->ReadFile( filename, reinterpret_cast<void **>(&f), NULL );
+	len = fileSystem->ReadFile( filename, reinterpret_cast<void **>(&f), nullptr );
 	if ( !f ) {
 		common->Printf( "couldn't exec %s\n", args.Argv(1 ) );
 		return;
@@ -232,7 +232,7 @@ ARCCmdSysLocal::Vstr_f
 Inserts the current value of a cvar as command text
 ===============
 */
-void ARCCmdSysLocal::Vstr_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::Vstr_f( const anCommandArgs &args ) {
 	const char *v;
 
 	if ( args.Argc () != 2 ) {
@@ -252,7 +252,7 @@ ARCCmdSysLocal::Echo_f
 Just prints the rest of the line to the console
 ===============
 */
-void ARCCmdSysLocal::Echo_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::Echo_f( const anCommandArgs &args ) {
 	for ( int i = 1; i < args.Argc(); i++ ) {
 		common->Printf( "%s ", args.Argv( i ) );
 	}
@@ -266,7 +266,7 @@ ARCCmdSysLocal::Wait_f
 Causes execution of the remainder of the command buffer to be delayed until next frame.
 ============
 */
-void ARCCmdSysLocal::Wait_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::Wait_f( const anCommandArgs &args ) {
 	if ( args.Argc() == 2 ) {
 		cmdSystemLocal.SetWait( atoi( args.Argv( 1 ) ) );
 	} else {
@@ -281,7 +281,7 @@ ARCCmdSysLocal::Parse_f
 This just prints out how the rest of the line was parsed, as a debugging tool.
 ============
 */
-void ARCCmdSysLocal::Parse_f( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::Parse_f( const anCommandArgs &args ) {
 	for ( int i = 0; i < args.Argc(); i++ ) {
 		common->Printf( "%i: %s\n", i, args.Argv( i ) );
 	}
@@ -306,7 +306,7 @@ void ARCCmdSysLocal::Init() {
 	AddCommand( "wait", Wait_f, CMD_FL_SYSTEM, "delays remaining buffered commands one or more frames" );
 
 	// link in all the commands declared with static idCommandLink variables or CONSOLE_COMMAND macros
-	for ( idCommandLink * link = CommandLinks(); link != NULL; link = link->next ) {
+	for ( idCommandLink * link = CommandLinks(); link != nullptr; link = link->next ) {
 		AddCommand( link->cmdName_, link->function_, CMD_FL_SYSTEM, link->description_, link->argCompletion_ );
 	}
 
@@ -346,7 +346,7 @@ void ARCCmdSysLocal::AddCommand( const char *cmdName, cmdFunction_t function, in
 
 	// fail if the command already exists
 	for ( cmd = commands; cmd; cmd = cmd->next ) {
-		if ( arcNetString::Cmp( cmdName, cmd->name ) == 0 ) {
+		if ( anString::Cmp( cmdName, cmd->name ) == 0 ) {
 			if ( function != cmd->function ) {
 				common->Printf( "ARCCmdSysLocal::AddCommand: %s already defined\n", cmdName );
 			}
@@ -373,7 +373,7 @@ void ARCCmdSysLocal::RemoveCommand( const char *cmdName ) {
 	commandDef_t *cmd, **last;
 
 	for ( last = &commands, cmd = *last; cmd; cmd = *last ) {
-		if ( arcNetString::Cmp( cmdName, cmd->name ) == 0 ) {
+		if ( anString::Cmp( cmdName, cmd->name ) == 0 ) {
 			*last = cmd->next;
 			Mem_Free( cmd->name );
 			Mem_Free( cmd->description );
@@ -424,7 +424,7 @@ ARCCmdSysLocal::ArgCompletion
 */
 void ARCCmdSysLocal::ArgCompletion( const char *cmdString, void(*callback)( const char *s ) ) {
 	commandDef_t *cmd;
-	arcCommandArgs args;
+	anCommandArgs args;
 
 	args.TokenizeString( cmdString, false );
 
@@ -432,7 +432,7 @@ void ARCCmdSysLocal::ArgCompletion( const char *cmdString, void(*callback)( cons
 		if ( !cmd->argCompletion ) {
 			continue;
 		}
-		if ( arcNetString::Icmp( args.Argv( 0 ), cmd->name ) == 0 ) {
+		if ( anString::Icmp( args.Argv( 0 ), cmd->name ) == 0 ) {
 			cmd->argCompletion( args, callback );
 			break;
 		}
@@ -444,7 +444,7 @@ void ARCCmdSysLocal::ArgCompletion( const char *cmdString, void(*callback)( cons
 ARCCmdSysLocal::ExecuteTokenizedString
 ============
 */
-void ARCCmdSysLocal::ExecuteTokenizedString( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::ExecuteTokenizedString( const anCommandArgs &args ) {
 	commandDef_t *cmd, **prev;
 
 	// execute the command line
@@ -455,7 +455,7 @@ void ARCCmdSysLocal::ExecuteTokenizedString( const arcCommandArgs &args ) {
 	// check registered command functions
 	for ( prev = &commands; *prev; prev = &cmd->next ) {
 		cmd = *prev;
-		if ( arcNetString::Icmp( args.Argv( 0 ), cmd->name ) == 0 ) {
+		if ( anString::Icmp( args.Argv( 0 ), cmd->name ) == 0 ) {
 			// rearrange the links so that the command will be
 			// near the head of the list next time it is used
 			*prev = cmd->next;
@@ -492,7 +492,7 @@ Tokenizes, then executes.
 ============
 */
 void ARCCmdSysLocal::ExecuteCommandText( const char *text ) {
-	ExecuteTokenizedString( arcCommandArgs( text, false ) );
+	ExecuteTokenizedString( anCommandArgs( text, false ) );
 }
 
 /*
@@ -512,7 +512,7 @@ void ARCCmdSysLocal::InsertCommandText( const char *text ) {
 
 	// move the existing command text
 	for ( int i = textLength - 1; i >= 0; i-- ) {
-		textBuf[ i + len ] = textBuf[ i ];
+		textBuf[ i + len ] = textBuf[i];
 	}
 
 	// copy the new text in
@@ -548,7 +548,7 @@ ARCCmdSysLocal::BufferCommandText
 ============
 */
 void ARCCmdSysLocal::BufferCommandText( cmdExecution_t exec, const char *text ) {
-	switch( exec ) {
+	switch ( exec ) {
 		case CMD_EXEC_NOW: {
 			ExecuteCommandText( text );
 			break;
@@ -572,7 +572,7 @@ void ARCCmdSysLocal::BufferCommandText( cmdExecution_t exec, const char *text ) 
 ARCCmdSysLocal::BufferCommandArgs
 ============
 */
-void ARCCmdSysLocal::BufferCommandArgs( cmdExecution_t exec, const arcCommandArgs &args ) {
+void ARCCmdSysLocal::BufferCommandArgs( cmdExecution_t exec, const anCommandArgs &args ) {
 	switch ( exec ) {
 		case CMD_EXEC_NOW: {
 			ExecuteTokenizedString( args );
@@ -595,7 +595,7 @@ ARCCmdSysLocal::ExecuteCommandBuffer
 ============
 */
 void ARCCmdSysLocal::ExecuteCommandBuffer() {
-	arcCommandArgs	args;
+	anCommandArgs	args;
 
 	while ( textLength ) {
 		if ( wait )	{
@@ -622,7 +622,7 @@ void ARCCmdSysLocal::ExecuteCommandBuffer() {
 
 		char *text[i] = 0;
 
-		if ( !arcNetString::Cmp( text, "_execTokenized" ) ) {
+		if ( !anString::Cmp( text, "_execTokenized" ) ) {
 			args = tokenizedCmds[ 0 ];
 			tokenizedCmds.RemoveIndex( 0 );
 		} else {
@@ -650,9 +650,9 @@ void ARCCmdSysLocal::ExecuteCommandBuffer() {
 ARCCmdSysLocal::ArgCompletion_FolderExtension
 ============
 */
-void ARCCmdSysLocal::ArgCompletion_FolderExtension( const arcCommandArgs &args, void(*callback)( const char *s ), const char *folder, bool stripFolder, ... ) {
+void ARCCmdSysLocal::ArgCompletion_FolderExtension( const anCommandArgs &args, void(*callback)( const char *s ), const char *folder, bool stripFolder, ... ) {
 	//char path[MAX_STRING_CHARS];
-	//arcNetString filename;
+	//anString filename;
 
 	//filename.Format( "%s/%s", folder, args.Argv( 0 ) );
 	//callback( filename.c_str() );
@@ -666,8 +666,8 @@ void ARCCmdSysLocal::ArgCompletion_FolderExtension( const arcCommandArgs &args, 
 	aRcStrstring += args.Argv( 1 );
 
 	if ( string.Icmp( completionString ) != 0 ) {
-		arcNetString parm, path;
-		arcFileList *names;
+		anString parm, path;
+		anFileList *names;
 
 		completionString = string;
 		completionParms.Clear();
@@ -682,7 +682,7 @@ void ARCCmdSysLocal::ArgCompletion_FolderExtension( const arcCommandArgs &args, 
 		// list folders
 		names = fileSystem->ListFiles( path, "/", true, true );
 		for ( int i = 0; i < names->GetNumFiles(); i++ ) {
-			arcNetString name = names->GetFile( i );
+			anString name = names->GetFile( i );
 			if ( stripFolder ) {
 				name.Strip( folder );
 			} else {
@@ -695,10 +695,10 @@ void ARCCmdSysLocal::ArgCompletion_FolderExtension( const arcCommandArgs &args, 
 
 		// list files
 		va_start( argPtr, stripFolder );
-		for ( extension = va_arg( argPtr, const char * ); extension; extension = va_arg( argPtr, const char * ) ) {
+		for ( extension = va_arg( argPtr, const char *); extension; extension = va_arg( argPtr, const char *) ) {
 			names = fileSystem->ListFiles( path, extension, true, true );
 			for ( i = 0; i < names->GetNumFiles(); i++ ) {
-				arcNetString name = names->GetFile( i );
+				anString name = names->GetFile( i );
 				if ( stripFolder ) {
 					name.Strip( folder );
 				} else {
@@ -721,14 +721,14 @@ void ARCCmdSysLocal::ArgCompletion_FolderExtension( const arcCommandArgs &args, 
 ARCCmdSysLocal::ArgCompletion_DeclName
 ============
 */
-void ARCCmdSysLocal::ArgCompletion_DeclName( const arcCommandArgs &args, void(*callback)( const char *s ), int type ) {
-	if ( declManager == NULL ) {
+void ARCCmdSysLocal::ArgCompletion_DeclName( const anCommandArgs &args, void(*callback)( const char *s ), int type ) {
+	if ( declManager == nullptr ) {
 		return;
 	}
 
 	int num = declManager->GetNumDecls( ( declType_t )type );
 	for ( int i = 0; i < num; i++ ) {
-		callback( arcNetString( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( ( declType_t )type, i , false )->GetName() );
+		callback( anString( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( ( declType_t )type, i , false )->GetName() );
 	}
 }
 
@@ -737,7 +737,7 @@ void ARCCmdSysLocal::ArgCompletion_DeclName( const arcCommandArgs &args, void(*c
 ARCCmdSysLocal::SetupReloadEngine
 ============
 */
-void ARCCmdSysLocal::SetupReloadEngine( const arcCommandArgs &args ) {
+void ARCCmdSysLocal::SetupReloadEngine( const anCommandArgs &args ) {
 	BufferCommandText( CMD_EXEC_APPEND, "reloadEngine\n" );
 	postReload = args;
 }

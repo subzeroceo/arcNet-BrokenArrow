@@ -1,55 +1,55 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 #include "tr_local.h"
 
-ARCRenderEntityLocal::ARCRenderEntityLocal() {
+anRenderEntityLocal::anRenderEntityLocal() {
 	memset( &parms, 0, sizeof( parms ) );
 	memset( modelMatrix, 0, sizeof( modelMatrix ) );
 
-	world					= NULL;
+	world					= nullptr;
 	index					= 0;
 	lastModifiedFrameNum	= 0;
 	archived				= false;
-	dynamicModel			= NULL;
+	dynamicModel			= nullptr;
 	dynamicModelFrameCount	= 0;
-	cachedDynamicModel		= NULL;
+	cachedDynamicModel		= nullptr;
 	referenceBounds			= bounds_zero;
 	viewCount				= 0;
-	viewEntity				= NULL;
+	viewEntity				= nullptr;
 	visibleCount			= 0;
-	decals					= NULL;
-	overlay					= NULL;
-	entityRefs				= NULL;
-	firstInteraction		= NULL;
-	lastInteraction			= NULL;
+	decals					= nullptr;
+	overlay					= nullptr;
+	entityRefs				= nullptr;
+	firstInteraction		= nullptr;
+	lastInteraction			= nullptr;
 	needsPortalSky			= false;
 }
 
-void ARCRenderEntityLocal::FreeRenderEntity() {
+void anRenderEntityLocal::FreeRenderEntity() {
 	#ifdef _DEBUG
 	assert( 0 );
 	#endif
 }
 
-void ARCRenderEntityLocal::UpdateRenderEntity( const renderEntity_t *re, bool forceUpdate ) {
+void anRenderEntityLocal::UpdateRenderEntity( const renderEntity_t *re, bool forceUpdate ) {
 }
 
-void ARCRenderEntityLocal::GetRenderEntity( renderEntity_t *re ) {
+void anRenderEntityLocal::GetRenderEntity( renderEntity_t *re ) {
 }
 
-void ARCRenderEntityLocal::ForceUpdate() {
+void anRenderEntityLocal::ForceUpdate() {
 }
 
-int ARCRenderEntityLocal::GetIndex() {
+int anRenderEntityLocal::GetIndex() {
 	return index;
 }
 
-void ARCRenderEntityLocal::ProjectOverlay( const arcPlane localTextureAxis[2], const arcMaterial *material ) {
+void anRenderEntityLocal::ProjectOverlay( const anPlane localTextureAxis[2], const anMaterial *material ) {
 }
-void ARCRenderEntityLocal::RemoveDecals() {
+void anRenderEntityLocal::RemoveDecals() {
 }
 
-ARCRenderLightsLocal::ARCRenderLightsLocal() {
+anRenderLightsLocal::anRenderLightsLocal() {
 	memset( &parms, 0, sizeof( parms ) );
 	memset( modelMatrix, 0, sizeof( modelMatrix ) );
 	memset( shadowFrustums, 0, sizeof( shadowFrustums ) );
@@ -58,32 +58,32 @@ ARCRenderLightsLocal::ARCRenderLightsLocal() {
 	memset( frustumWindings, 0, sizeof( frustumWindings ) );
 
 	lightHasMoved			= false;
-	world					= NULL;
+	world					= nullptr;
 	index					= 0;
 	areaNum					= 0;
 	lastModifiedFrameNum	= 0;
 	archived				= false;
-	lightShader				= NULL;
-	falloffImage			= NULL;
+	lightShader				= nullptr;
+	falloffImage			= nullptr;
 	globalLightOrigin		= vec3_zero;
-	frustumTris				= NULL;
+	frustumTris				= nullptr;
 	numShadowFrustums		= 0;
 	viewCount				= 0;
-	viewLight				= NULL;
-	references				= NULL;
-	foggedPortals			= NULL;
-	firstInteraction		= NULL;
-	lastInteraction			= NULL;
+	viewLight				= nullptr;
+	references				= nullptr;
+	foggedPortals			= nullptr;
+	firstInteraction		= nullptr;
+	lastInteraction			= nullptr;
 }
 
-void ARCRenderLightsLocal::FreeRenderLight() {
+void anRenderLightsLocal::FreeRenderLight() {
 }
-void ARCRenderLightsLocal::UpdateRenderLight( const renderLight_t *re, bool forceUpdate ) {
+void anRenderLightsLocal::UpdateRenderLight( const renderLight_t *re, bool forceUpdate ) {
 }
-void ARCRenderLightsLocal::GetRenderLight( renderLight_t *re ) {
+void anRenderLightsLocal::GetRenderLight( renderLight_t *re ) {
 }
-void ARCRenderLightsLocal::ForceUpdate() {
+void anRenderLightsLocal::ForceUpdate() {
 }
-int ARCRenderLightsLocal::GetIndex() {
+int anRenderLightsLocal::GetIndex() {
 	return index;
 }

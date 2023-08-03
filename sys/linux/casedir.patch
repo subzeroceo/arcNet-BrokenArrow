@@ -10,43 +10,43 @@ Index: framework/FileSystem.cpp
 +// often .jpg and .tga patterns
  #define MAX_CACHED_DIRS 6
 
- class idDEntry : public arcStringList {
+ class anDEntry : public anStringList {
 @@ -173,6 +173,11 @@
- 	void Init(const char *directory, const char *extension, const arcStringList &list );
+ 	void Init(const char *directory, const char *extension, const anStringList &list );
  };
 
 +typedef struct {
-+	arcNetString path;
-+	arcNetString OSpath;
++	anString path;
++	anString OSpath;
 +} casematch_t;
 +
- class arcFileSystem_local : public arcNetFile {
+ class anFileSystem_local : public anFile {
  public:
- 						arcFileSystem_local( void );
+ 						anFileSystem_local( void );
 @@ -227,11 +232,14 @@
  	int					numServerPaks;
  	int					serverPaks[MAX_SEARCH_PATHS];
 
--	idDEntry			dir_cache[MAX_CACHED_DIRS]; // fifo
-+	idDEntry		dir_cache[MAX_CACHED_DIRS]; // fifo
+-	anDEntry			dir_cache[MAX_CACHED_DIRS]; // fifo
++	anDEntry		dir_cache[MAX_CACHED_DIRS]; // fifo
  	int					dir_cache_index;
  	int					dir_cache_count;
 +
-+	arcNetList<casematch_t> dir_case; // match directories in a case insensitive way
++	anList<casematch_t> dir_case; // match directories in a case insensitive way
 
  private:
 +	const char *	CaseSearch(const char *in_dir);
- 	void				ReplaceSeparators( arcNetString &path, char sep = PATHSEPERATOR_CHAR );
+ 	void				ReplaceSeparators( anString &path, char sep = PATHSEPERATOR_CHAR );
  	long				HashFileName( const char *fname ) const;
- 	bool				FilenameCompare( const char *s1, const char *s2 );
+ 	bool				CompareFileName( const char *s1, const char *s2 );
 @@ -1118,6 +1126,89 @@
 
  /*
  ===============
-+arcFileSystem_local::CaseSearch
++anFileSystem_local::CaseSearch
 +===============
 +*/
-+const char* arcFileSystem_local::CaseSearch(const char *in_dir) {
++const char *anFileSystem_local::CaseSearch(const char *in_dir) {
 +	const char *ret;
 +	int i, j;
 +	// FIXME: go faster with a hash?
@@ -55,7 +55,7 @@ Index: framework/FileSystem.cpp
 +			ret = dir_case[i].OSpath.c_str();
 +			Com_Printf( "index %d: '%s' matched as '%s'\n", i, in_dir, ret);
 +			if ( ret[0] == '\0' ) {
-+				return NULL;
++				return nullptr;
 +			}
 +			return ret;
 +		}
@@ -65,10 +65,10 @@ Index: framework/FileSystem.cpp
 +	Com_Printf( "CaseSearch not found: '%s'\n", in_dir);
 +	// walk down the directory tree searching for a case insensitive match
 +	// use StripFilename to bust out the chunks
-+	arcStringList dirs;
-+	arcStringList entries;
-+	arcNetString walk_path = in_dir;
-+	arcNetString current_dir;
++	anStringList dirs;
++	anStringList entries;
++	anString walk_path = in_dir;
++	anString current_dir;
 +	int list_ret;
 +	do {
 +		walk_path.ExtractFileName(current_dir);
@@ -80,7 +80,7 @@ Index: framework/FileSystem.cpp
 +	if ( list_ret == -1 ) {
 +		Com_DPrintf( "WARNING: didn't find any matching root directory for '%s'\n", in_dir);
 +		dir_case.Append(entry);
-+		return NULL;
++		return nullptr;
 +	}
 +	// start walking down and doing matches
 +	bool bMatched;
@@ -101,7 +101,7 @@ Index: framework/FileSystem.cpp
 +			Com_Printf( "no match\n" );
 +			entry.OSpath = "";
 +			dir_case.Append(entry);
-+			return NULL;
++			return nullptr;
 +		}
 +		entry.OSpath += PATHSEPERATOR_STR;
 +		entry.OSpath += entries[j];
@@ -110,7 +110,7 @@ Index: framework/FileSystem.cpp
 +			Com_DPrintf( "WARNING: didn't find entries in '%s' after successful icase match\n", entry.OSpath.c_str() );
 +			entry.OSpath = "";
 +			dir_case.Append(entry);
-+			return NULL;
++			return nullptr;
 +		}
 +	}
 +
@@ -119,14 +119,14 @@ Index: framework/FileSystem.cpp
 +	Com_Printf( "case matched '%s' as '%s'\n", in_dir, ret);
 +	if ( ret[0] == '\0' ) {
 +		Com_DPrintf( "WARNING: unexpected empty entry after successful case walk for '%s'\n", in_dir);
-+		return NULL;
++		return nullptr;
 +	}
 +	return ret;
 +}
 +
 +/*
 +===============
- arcFileSystem_local::ListOSFiles
+ anFileSystem_local::ListOSFiles
 
   call to the OS for a listing of files in an OS directory
 @@ -1156,10 +1247,19 @@
@@ -141,7 +141,7 @@ Index: framework/FileSystem.cpp
 +		}
 +		ret = Sys_ListFiles( cased_dir, extension, list );
 +		if ( ret == -1 ) {
-+			Com_DPrintf( "arcFileSystem_local::ListOSFiles: unexpected, Sys_ListFiles failed on case matched directory\n" );
++			Com_DPrintf( "anFileSystem_local::ListOSFiles: unexpected, Sys_ListFiles failed on case matched directory\n" );
 +			return -1;
 +		}
  	}
@@ -208,6 +208,6 @@ Index: sys/sys_public.h
  // use fs_debug to verbose Sys_ListFiles
  // returns -1 if directory was not found (the list is cleared)
 +// if there is a / passed as extension, return directories
- int				Sys_ListFiles( const char *directory, const char *extension, arcStringList &list);
+ int				Sys_ListFiles( const char *directory, const char *extension, anStringList &list);
 
  // For the mac, we need to explicitly flush vertex buffer areas before using them

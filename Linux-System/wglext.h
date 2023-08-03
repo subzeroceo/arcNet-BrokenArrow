@@ -452,9 +452,9 @@ typedef BOOL (WINAPI * PFNWGLRESTOREBUFFERREGIONARBPROC) (HANDLE hRegion, int x,
 #ifndef WGL_ARB_extensions_string
 #define WGL_ARB_extensions_string 1
 #ifdef WGL_WGLEXT_PROTOTYPES
-extern const char * WINAPI wglGetExtensionsStringARB (HDC hdc);
+extern const char *WINAPI wglGetExtensionsStringARB (HDC hdc);
 #endif /* WGL_WGLEXT_PROTOTYPES */
-typedef const char * (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
+typedef const char *(WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
 #endif
 
 #ifndef WGL_ARB_pixel_format
@@ -548,9 +548,9 @@ typedef VOID (WINAPI * PFNWGLDESTROYDISPLAYCOLORTABLEEXTPROC) ( GLushort id);
 #ifndef WGL_EXT_extensions_string
 #define WGL_EXT_extensions_string 1
 #ifdef WGL_WGLEXT_PROTOTYPES
-extern const char * WINAPI wglGetExtensionsStringEXT ( void );
+extern const char *WINAPI wglGetExtensionsStringEXT ( void );
 #endif /* WGL_WGLEXT_PROTOTYPES */
-typedef const char * (WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC) ( void );
+typedef const char *(WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC) ( void );
 #endif
 
 #ifndef WGL_EXT_make_current_read

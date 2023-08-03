@@ -1,68 +1,68 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Common_local.h"
 
-arcCVarSystem net_clientMaxPrediction( "net_clientMaxPrediction", "5000", CVAR_SYSTEM | CVAR_INTEGER | CVAR_NOCHEAT, "maximum number of milliseconds a client can predict ahead of server." );
-arcCVarSystem net_snapRate( "net_snapRate", "100", CVAR_SYSTEM | CVAR_INTEGER, "How many milliseconds between sending snapshots" );
-arcCVarSystem net_ucmdRate( "net_ucmdRate", "40", CVAR_SYSTEM | CVAR_INTEGER, "How many milliseconds between sending usercmds" );
+anCVarSystem net_clientMaxPrediction( "net_clientMaxPrediction", "5000", CVAR_SYSTEM | CVAR_INTEGER | CVAR_NOCHEAT, "maximum number of milliseconds a client can predict ahead of server." );
+anCVarSystem net_snapRate( "net_snapRate", "100", CVAR_SYSTEM | CVAR_INTEGER, "How many milliseconds between sending snapshots" );
+anCVarSystem net_ucmdRate( "net_ucmdRate", "40", CVAR_SYSTEM | CVAR_INTEGER, "How many milliseconds between sending usercmds" );
 
-arcCVarSystem net_debug_snapShotTime( "net_debug_snapShotTime", "0", CVAR_BOOL | CVAR_ARCHIVE, "" );
-arcCVarSystem com_forceLatestSnap( "com_forceLatestSnap", "0", CVAR_BOOL, "" );
+anCVarSystem net_debug_snapShotTime( "net_debug_snapShotTime", "0", CVAR_BOOL | CVAR_ARCHIVE, "" );
+anCVarSystem com_forceLatestSnap( "com_forceLatestSnap", "0", CVAR_BOOL, "" );
 
 // Enables effective snap rate: dynamically adjust the client snap rate based on:
 //	-client FPS
 //	-server FPS (interpolated game time received / interval it was received over)
 //  -local buffered time (leave a cushion to absorb spikes, slow down when infront of it, speed up when behind it) ie: net_minBufferedSnapPCT_Static
-arcCVarSystem net_effectiveSnapRateEnable( "net_effectiveSnapRateEnable", "1", CVAR_BOOL, "Dynamically adjust client snaprate" );
-arcCVarSystem net_effectiveSnapRateDebug( "net_effectiveSnapRateDebug", "0", CVAR_BOOL, "Debug" );
+anCVarSystem net_effectiveSnapRateEnable( "net_effectiveSnapRateEnable", "1", CVAR_BOOL, "Dynamically adjust client snaprate" );
+anCVarSystem net_effectiveSnapRateDebug( "net_effectiveSnapRateDebug", "0", CVAR_BOOL, "Debug" );
 
 // Min buffered snapshot time to keep as a percentage of the effective snaprate
 //	-ie we want to keep 50% of the amount of time difference between last two snaps.
 //	-we need to scale this because we may get throttled at the snaprate may change
 //  -Acts as a buffer to absorb spikes
-arcCVarSystem net_minBufferedSnapPCT_Static( "net_minBufferedSnapPCT_Static", "1.0", CVAR_FLOAT, "Min amount of snapshot buffer time we want need to buffer" );
-arcCVarSystem net_maxBufferedSnapMS( "net_maxBufferedSnapMS", "336", CVAR_INTEGER, "Max time to allow for interpolation cushion" );
-arcCVarSystem net_minBufferedSnapWinPCT_Static( "net_minBufferedSnapWinPCT_Static", "1.0", CVAR_FLOAT, "Min amount of snapshot buffer time we want need to buffer" );
+anCVarSystem net_minBufferedSnapPCT_Static( "net_minBufferedSnapPCT_Static", "1.0", CVAR_FLOAT, "Min amount of snapshot buffer time we want need to buffer" );
+anCVarSystem net_maxBufferedSnapMS( "net_maxBufferedSnapMS", "336", CVAR_INTEGER, "Max time to allow for interpolation cushion" );
+anCVarSystem net_minBufferedSnapWinPCT_Static( "net_minBufferedSnapWinPCT_Static", "1.0", CVAR_FLOAT, "Min amount of snapshot buffer time we want need to buffer" );
 
 // Factor at which we catch speed up interpolation if we fall behind our optimal interpolation window
 //  -This is a static factor. We may experiment with a dynamic one that would be faster the farther you are from the ideal window
-arcCVarSystem net_interpolationCatchupRate( "net_interpolationCatchupRate", "1.3", CVAR_FLOAT, "Scale interpolationg rate when we fall behind" );
-arcCVarSystem net_interpolationFallbackRate( "net_interpolationFallbackRate", "0.95", CVAR_FLOAT, "Scale interpolationg rate when we fall behind" );
-arcCVarSystem net_interpolationBaseRate( "net_interpolationBaseRate", "1.0", CVAR_FLOAT, "Scale interpolationg rate when we fall behind" );
+anCVarSystem net_interpolationCatchupRate( "net_interpolationCatchupRate", "1.3", CVAR_FLOAT, "Scale interpolationg rate when we fall behind" );
+anCVarSystem net_interpolationFallbackRate( "net_interpolationFallbackRate", "0.95", CVAR_FLOAT, "Scale interpolationg rate when we fall behind" );
+anCVarSystem net_interpolationBaseRate( "net_interpolationBaseRate", "1.0", CVAR_FLOAT, "Scale interpolationg rate when we fall behind" );
 
 // Enabled a dynamic ideal snap buffer window: we will scale the distance and size
-arcCVarSystem net_optimalDynamic( "net_optimalDynamic", "1", CVAR_BOOL, "How fast to add to our optimal time buffer when we are playing snapshots faster than server is feeding them to us" );
+anCVarSystem net_optimalDynamic( "net_optimalDynamic", "1", CVAR_BOOL, "How fast to add to our optimal time buffer when we are playing snapshots faster than server is feeding them to us" );
 
 // These values are used instead if net_optimalDynamic is 0 (don't scale by actual snap rate/interval)
-arcCVarSystem net_optimalSnapWindow( "net_optimalSnapWindow", "112", CVAR_FLOAT, "" );
-arcCVarSystem net_optimalSnapTime( "net_optimalSnapTime", "112", CVAR_FLOAT, "How fast to add to our optimal time buffer when we are playing snapshots faster than server is feeding them to us" );
+anCVarSystem net_optimalSnapWindow( "net_optimalSnapWindow", "112", CVAR_FLOAT, "" );
+anCVarSystem net_optimalSnapTime( "net_optimalSnapTime", "112", CVAR_FLOAT, "How fast to add to our optimal time buffer when we are playing snapshots faster than server is feeding them to us" );
 
 // this is at what percentage of being ahead of the interpolation buffer that we start slowing down (we ramp down from 1.0 to 0.0 starting here)
 // this is a percentage of the total cushion time.
-arcCVarSystem net_interpolationSlowdownStart( "net_interpolationSlowdownStart", "0.5", CVAR_FLOAT, "Scale interpolation rate when we fall behind" );
+anCVarSystem net_interpolationSlowdownStart( "net_interpolationSlowdownStart", "0.5", CVAR_FLOAT, "Scale interpolation rate when we fall behind" );
 
 
 // Extrapolation is now disabled
-arcCVarSystem net_maxExtrapolationInMS( "net_maxExtrapolationInMS", "0", CVAR_INTEGER, "Max time in MS that extrapolation is allowed to occur." );
+anCVarSystem net_maxExtrapolationInMS( "net_maxExtrapolationInMS", "0", CVAR_INTEGER, "Max time in MS that extrapolation is allowed to occur." );
 
 static const int SNAP_USERCMDS = 8192;
 
 /*
 ===============
-arcCommonLocal::SendSnapshots
+anCommonLocal::SendSnapshots
 ===============
 */
-int arcCommonLocal::GetSnapRate() {
+int anCommonLocal::GetSnapRate() {
 	return net_snapRate.GetInteger();
 }
 
 /*
 ===============
-arcCommonLocal::SendSnapshots
+anCommonLocal::SendSnapshots
 ===============
 */
-void arcCommonLocal::SendSnapshots() {
+void anCommonLocal::SendSnapshots() {
 	if ( !mapSpawned ) {
 		return;
 	}
@@ -84,14 +84,14 @@ void arcCommonLocal::SendSnapshots() {
 
 /*
 ===============
-arcCommonLocal::NetReceiveSnapshot
+anCommonLocal::NetReceiveSnapshot
 ===============
 */
-void arcCommonLocal::NetReceiveSnapshot( class ARCSnapShot & ss ) {
+void anCommonLocal::NetReceiveSnapshot( class ARCSnapShot & ss ) {
 	ss.SetRecvTime( Sys_Milliseconds() );
 	// If we are about to overwrite the oldest snap, then force a read, which will cause a pop on screen, but we have to do this.
 	if ( writeSnapshotIndex - readSnapshotIndex >= RECEIVE_SNAPSHOT_BUFFER_SIZE ) {
-		arcLibrary::Printf( "Overwritting oldest snapshot %d with new snapshot %d\n", readSnapshotIndex, writeSnapshotIndex );
+		anLibrary::Printf( "Overwritting oldest snapshot %d with new snapshot %d\n", readSnapshotIndex, writeSnapshotIndex );
 		assert( writeSnapshotIndex % RECEIVE_SNAPSHOT_BUFFER_SIZE == readSnapshotIndex % RECEIVE_SNAPSHOT_BUFFER_SIZE );
 		ProcessNextSnapshot();
 	}
@@ -107,10 +107,10 @@ void arcCommonLocal::NetReceiveSnapshot( class ARCSnapShot & ss ) {
 
 /*
 ===============
-arcCommonLocal::SendUsercmd
+anCommonLocal::SendUsercmd
 ===============
 */
-void arcCommonLocal::SendUsercmds( int localClientNum ) {
+void anCommonLocal::SendUsercmds( int localClientNum ) {
 	if ( !mapSpawned ) {
 		return;
 	}
@@ -126,7 +126,7 @@ void arcCommonLocal::SendUsercmds( int localClientNum ) {
 	// Which may result in duplicate usercmds being sent in the case of a low net_ucmdRate
 	// But the LZW compressor means the extra usercmds are not large and the redundancy can smooth packet loss
 	byte buffer[idPacketProcessor::MAX_FINAL_PACKET_SIZE];
-	ARCBitMessage msg( buffer, sizeof( buffer ) );
+	anBitMessage msg( buffer, sizeof( buffer ) );
 	idSerializer ser( msg, true );
 	usercmd_t empty;
 	usercmd_t * last = &empty;
@@ -146,13 +146,13 @@ void arcCommonLocal::SendUsercmds( int localClientNum ) {
 
 /*
 ===============
-arcCommonLocal::NetReceiveUsercmds
+anCommonLocal::NetReceiveUsercmds
 ===============
 */
-void arcCommonLocal::NetReceiveUsercmds( int peer, ARCBitMessage & msg ) {
+void anCommonLocal::NetReceiveUsercmds( int peer, anBitMessage & msg ) {
 	int clientNum = Game()->MapPeerToClient( peer );
 	if ( clientNum == -1 ) {
-		arcLibrary::Warning( "NetReceiveUsercmds: Could not find client for peer %d", peer );
+		anLibrary::Warning( "NetReceiveUsercmds: Could not find client for peer %d", peer );
 		return;
 	}
 
@@ -161,14 +161,14 @@ void arcCommonLocal::NetReceiveUsercmds( int peer, ARCBitMessage & msg ) {
 
 /*
 ===============
-arcCommonLocal::NetReceiveReliable
+anCommonLocal::NetReceiveReliable
 ===============
 */
-void arcCommonLocal::NetReceiveReliable( int peer, int type, ARCBitMessage & msg ) {
+void anCommonLocal::NetReceiveReliable( int peer, int type, anBitMessage & msg ) {
 	int clientNum = Game()->MapPeerToClient( peer );
 	// Only servers care about the client num. Band-aid for problems related to the host's peerIndex being -1 on clients.
 	if ( common->IsServer() && clientNum == -1 ) {
-		arcLibrary::Warning( "NetReceiveReliable: Could not find client for peer %d", peer );
+		anLibrary::Warning( "NetReceiveReliable: Could not find client for peer %d", peer );
 		return;
 	}
 
@@ -178,16 +178,16 @@ void arcCommonLocal::NetReceiveReliable( int peer, int type, ARCBitMessage & msg
 	reliable.client = clientNum;
 	reliable.type = type;
 	reliable.dataSize = msgSize;
-	reliable.data = ( byte * )Mem_Alloc( msgSize, TAG_NETWORKING );
+	reliable.data = (byte *)Mem_Alloc( msgSize, TAG_NETWORKING );
 	memcpy( reliable.data, msgData, msgSize );
 }
 
 /*
 ========================
-arcCommonLocal::ProcessSnapshot
+anCommonLocal::ProcessSnapshot
 ========================
 */
-void arcCommonLocal::ProcessSnapshot( ARCSnapShot & ss ) {
+void anCommonLocal::ProcessSnapshot( ARCSnapShot & ss ) {
 	int time = Sys_Milliseconds();
 
 	snapTime = time;
@@ -198,7 +198,7 @@ void arcCommonLocal::ProcessSnapshot( ARCSnapShot & ss ) {
 	static int lastReceivedLocalTime = 0;
 	int timeSinceLastSnap = ( time - lastReceivedLocalTime );
 	if ( net_debug_snapShotTime.GetBool() ) {
-		arcLibrary::Printf( "^2ProcessSnapshot. delta serverTime: %d  delta localTime: %d \n", ( snapCurrent.serverTime-snapPrevious.serverTime ), timeSinceLastSnap );
+		anLibrary::Printf( "^2ProcessSnapshot. delta serverTime: %d  delta localTime: %d \n", ( snapCurrent.serverTime-snapPrevious.serverTime ), timeSinceLastSnap );
 	}
 	lastReceivedLocalTime = time;
 	// Read usercmds from other players
@@ -206,7 +206,7 @@ void arcCommonLocal::ProcessSnapshot( ARCSnapShot & ss ) {
 		if ( p == game->GetLocalClientNum() ) {
 			continue;
 		}
-		ARCBitMessage msg;
+		anBitMessage msg;
 		if ( ss.GetObjectMsgByID( SNAP_USERCMDS + p, msg ) ) {
 			NetReadUsercmds( p, msg );
 		}
@@ -227,18 +227,18 @@ void arcCommonLocal::ProcessSnapshot( ARCSnapShot & ss ) {
 
 /*
 ========================
-arcCommonLocal::NetReadUsercmds
+anCommonLocal::NetReadUsercmds
 ========================
 */
-void arcCommonLocal::NetReadUsercmds( int clientNum, ARCBitMessage & msg ) {
+void anCommonLocal::NetReadUsercmds( int clientNum, anBitMessage & msg ) {
 	if ( clientNum == -1 ) {
-		arcLibrary::Warning( "NetReadUsercmds: Trying to read commands from invalid clientNum %d", clientNum );
+		anLibrary::Warning( "NetReadUsercmds: Trying to read commands from invalid clientNum %d", clientNum );
 		return;
 	}
 
 	// TODO: This shouldn't actually happen. Figure out why it does.
 	// Seen on clients when another client leaves a match.
-	if ( msg.GetReadData() == NULL ) {
+	if ( msg.GetReadData() == nullptr ) {
 		return;
 	}
 
@@ -283,13 +283,13 @@ void arcCommonLocal::NetReadUsercmds( int clientNum, ARCBitMessage & msg ) {
 
 /*
 ========================
-arcCommonLocal::CalcSnapTimeBuffered
+anCommonLocal::CalcSnapTimeBuffered
 Return the amount of game time left of buffered snapshots
 totalBufferedTime - total amount of snapshot time (includng what we've already past in current interpolate)
-totalRecvTime - total real time (sys_milliseconds) all of totalBufferedTime was received over
+totalRecvTime - total real time ( sys_milliseconds) all of totalBufferedTime was received over
 ========================
 */
-int arcCommonLocal::CalcSnapTimeBuffered( int & totalBufferedTime, int & totalRecvTime ) {
+int anCommonLocal::CalcSnapTimeBuffered( int & totalBufferedTime, int & totalRecvTime ) {
 	totalBufferedTime = snapRate;
 	totalRecvTime = snapTimeDelta;
 
@@ -315,16 +315,16 @@ int arcCommonLocal::CalcSnapTimeBuffered( int & totalBufferedTime, int & totalRe
 	// remove time we've already interpolated over
 	int timeLeft = totalBufferedTime - Min< int >( snapRate, snapCurrentTime );
 
-	//arcLibrary::Printf( "CalcSnapTimeBuffered. timeLeft: %d totalRecvTime: %d, totalTimeBuffered: %d\n", timeLeft, totalRecvTime, totalBufferedTime );
+	//anLibrary::Printf( "CalcSnapTimeBuffered. timeLeft: %d totalRecvTime: %d, totalTimeBuffered: %d\n", timeLeft, totalRecvTime, totalBufferedTime );
 	return timeLeft;
 }
 
 /*
 ========================
-arcCommonLocal::InterpolateSnapshot
+anCommonLocal::InterpolateSnapshot
 ========================
 */
-void arcCommonLocal::InterpolateSnapshot( netTimes_t & prev, netTimes_t & next, float fraction, bool predict ) {
+void anCommonLocal::InterpolateSnapshot( netTimes_t & prev, netTimes_t & next, float fraction, bool predict ) {
 	int serverTime = Lerp( prev.serverTime, next.serverTime, fraction );
 
 	Game()->SetServerGameTimeMs( serverTime );		// Set the global server time to the interpolated time of the server
@@ -336,14 +336,14 @@ void arcCommonLocal::InterpolateSnapshot( netTimes_t & prev, netTimes_t & next, 
 
 /*
 ========================
-arcCommonLocal::ExecuteReliableMessages
+anCommonLocal::ExecuteReliableMessages
 ========================
 */
-void arcCommonLocal::ExecuteReliableMessages() {
+void anCommonLocal::ExecuteReliableMessages() {
 	// Process any reliable messages we've received
 	for ( int i = 0; i < reliableQueue.Num(); i++ ) {
 		reliableMsg_t & reliable = reliableQueue[i];
-		game->ProcessReliableMessage( reliable.client, reliable.type, ARCBitMessage( (const byte *)reliable.data, reliable.dataSize ) );
+		game->ProcessReliableMessage( reliable.client, reliable.type, anBitMessage( (const byte *)reliable.data, reliable.dataSize ) );
 		Mem_Free( reliable.data );
 	}
 	reliableQueue.Clear();
@@ -352,10 +352,10 @@ void arcCommonLocal::ExecuteReliableMessages() {
 
 /*
 ========================
-arcCommonLocal::ResetNetworkingState
+anCommonLocal::ResetNetworkingState
 ========================
 */
-void arcCommonLocal::ResetNetworkingState() {
+void anCommonLocal::ResetNetworkingState() {
 	snapTime		= 0;
 	snapTimeWrite	= 0;
 	snapCurrentTime	= 0;

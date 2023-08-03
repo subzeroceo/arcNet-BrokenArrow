@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -7,7 +7,7 @@
 
 // CConsoleDlg dialog
 IMPLEMENT_DYNCREATE(CConsoleDlg, CDialog)
-CConsoleDlg::CConsoleDlg(CWnd* pParent /*=NULL*/)
+CConsoleDlg::CConsoleDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CConsoleDlg::IDD) {
     currentHistoryPosition = -1;
     currentCommand = "";
@@ -24,7 +24,7 @@ void CConsoleDlg::DoDataExchange(CDataExchange* pDX) {
 }
 
 void CConsoleDlg::AddText( const char *msg ) {
-	arcNetString work;
+	anString work;
 	CString work2;
 
 	work = msg;
@@ -50,7 +50,7 @@ END_MESSAGE_MAP()
 // CConsoleDlg message handlers
 void CConsoleDlg::OnSize(UINT nType, int cx, int cy) {
 	CDialog::OnSize(nType, cx, cy);
-	if (editInput.GetSafeHwnd() == NULL) {
+	if (editInput.GetSafeHwnd() == nullptr ) {
 		return;
 	}
 
@@ -58,8 +58,8 @@ void CConsoleDlg::OnSize(UINT nType, int cx, int cy) {
 	GetWindowRect(rect);
 	editInput.GetWindowRect(crect);
 
-	editInput.SetWindowPos(NULL, 4, rect.Height() - 4 - crect.Height(), rect.Width() - 8, crect.Height(), SWP_SHOWWINDOW);
-	editConsole.SetWindowPos(NULL, 4, 4, rect.Width() - 8, rect.Height() - crect.Height() - 8, SWP_SHOWWINDOW);
+	editInput.SetWindowPos(nullptr, 4, rect.Height() - 4 - crect.Height(), rect.Width() - 8, crect.Height(), SWP_SHOWWINDOW);
+	editConsole.SetWindowPos(nullptr, 4, 4, rect.Width() - 8, rect.Height() - crect.Height() - 8, SWP_SHOWWINDOW);
 }
 
 BOOL CConsoleDlg::PreTranslateMessage(MSG* pMsg) {
@@ -156,12 +156,12 @@ void CConsoleDlg::OnSetFocus(CWnd* pOldWnd) {
 	editInput.SetFocus();
 }
 
-void CConsoleDlg::SetConsoleText ( const arcNetString& text ) {
+void CConsoleDlg::SetConsoleText ( const anString& text ) {
 	editInput.Clear ();
 	editInput.SetWindowText ( text.c_str() );
 }
 
-void CConsoleDlg::ExecuteCommand ( const arcNetString& cmd ) {
+void CConsoleDlg::ExecuteCommand ( const anString& cmd ) {
 	CString str;
 	if ( cmd.Length() > 0 ) {
 		str = cmd;

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -46,7 +46,7 @@ static char THIS_FILE[] = __FILE__;
 CSurfaceDlg g_dlgSurface;
 
 
-CSurfaceDlg::CSurfaceDlg(CWnd* pParent /*=NULL*/)
+CSurfaceDlg::CSurfaceDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CSurfaceDlg::IDD, pParent) {
 	//{{AFX_DATA_INIT(CSurfaceDlg)
 	m_nHorz = 3;
@@ -148,7 +148,7 @@ END_MESSAGE_MAP()
 
 texdef_t	g_old_texdef;
 texdef_t	g_patch_texdef;
-HWND		g_surfwin = NULL;
+HWND		g_surfwin = nullptr;
 bool	g_changed_surface;
 
 /*
@@ -173,7 +173,7 @@ void CSurfaceDlg::SetTexMods() {
 	}
 
 	int faceCount = g_ptrSelectedFaces.GetSize();
-	face_t *selFace = NULL;
+	face_t *selFace = nullptr;
 	if (faceCount) {
 		selFace = reinterpret_cast < face_t * > (g_ptrSelectedFaces.GetAt(0 ) );
 	} else {
@@ -288,7 +288,7 @@ void DoSurface ( void ) {
 	g_old_texdef = g_qeglobals.d_texturewin.texdef;
 	g_changed_surface = false;
 
-	if (g_surfwin == NULL && g_dlgSurface.GetSafeHwnd() == NULL) {
+	if (g_surfwin == nullptr && g_dlgSurface.GetSafeHwnd() == nullptr ) {
 		g_patch_texdef.scale[0] = 0.05f;
 		g_patch_texdef.scale[1] = 0.05f;
 		g_patch_texdef.shift[0] = 0.05f;
@@ -300,7 +300,7 @@ void DoSurface ( void ) {
 		CRect rct;
 		LONG lSize = sizeof(rct);
 		if (LoadRegistryInfo( "radiant_SurfaceWindow", &rct, &lSize) )  {
-			g_dlgSurface.SetWindowPos( NULL, rct.left, rct.top, 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW );
+			g_dlgSurface.SetWindowPos( nullptr, rct.left, rct.top, 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW );
 		}
 		g_dlgSurface.ShowWindow(SW_SHOW);
 		Sys_UpdateWindows(W_ALL);
@@ -351,7 +351,7 @@ BOOL CSurfaceDlg::OnInitDialog() {
 
 void CSurfaceDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) {
 	UpdateData(TRUE);
-	if (pScrollBar->IsKindOf(RUNTIME_CLASS(CSliderCtrl) )) {
+	if (pScrollBar->IsKindOf(RUNTIME_CLASS(CSliderCtrl) ) ) {
 		CSliderCtrl *ctrl = reinterpret_cast<CSliderCtrl*>(pScrollBar);
 		assert(ctrl);
 		if (ctrl == &m_wndVerticalSubdivisions) {
@@ -383,16 +383,16 @@ void CSurfaceDlg::OnOK() {
 	//GetTexMods();
 	UpdateData(TRUE);
 	if (m_strMaterial.Find( ":" ) >= 0 ) {
-		const arcMaterial *mat = declManager->FindMaterial(m_strMaterial);
+		const anMaterial *mat = declManager->FindMaterial(m_strMaterial);
 		Select_UpdateTextureName(m_strMaterial);
 	}
-	g_surfwin = NULL;
+	g_surfwin = nullptr;
 	CDialog::OnOK();
 	Sys_UpdateWindows(W_ALL);
 }
 
 void CSurfaceDlg::OnClose() {
-	g_surfwin = NULL;
+	g_surfwin = nullptr;
 	CDialog::OnClose();
 }
 
@@ -411,21 +411,21 @@ void CSurfaceDlg::OnDestroy() {
 		SaveRegistryInfo( "radiant_SurfaceWindow", &rct, sizeof(rct) );
 	}
 	CDialog::OnDestroy();
-	g_surfwin = NULL;
+	g_surfwin = nullptr;
 	Sys_UpdateWindows(W_ALL);
 }
 
 void CSurfaceDlg::OnBtnCancel() {
 	g_qeglobals.d_texturewin.texdef = g_old_texdef;
 	if (g_changed_surface) {
-		//++timo if !g_qeglobals.m_bBrushPrimitMode send a NULL brushprimit_texdef
+		//++timo if !g_qeglobals.m_bBrushPrimitMode send a nullptr brushprimit_texdef
 		if ( !g_qeglobals.m_bBrushPrimitMode) {
 			common->Printf( "Warning : non brush primitive mode call to CSurfaceDlg::GetTexMods broken\n" );
 			common->Printf( "          ( Select_SetTexture not called )\n" );
 		}
 		//		Select_SetTexture(&g_qeglobals.d_texturewin.texdef);
 	}
-	g_surfwin = NULL;
+	g_surfwin = nullptr;
 	DestroyWindow();
 }
 
@@ -575,12 +575,12 @@ void CSurfaceDlg::OnSetfocusHscale()
 
 void CSurfaceDlg::OnKillfocusHscale()
 {
-	focusControl = NULL;
+	focusControl = nullptr;
 }
 
 void CSurfaceDlg::OnKillfocusVscale()
 {
-	focusControl = NULL;
+	focusControl = nullptr;
 }
 
 void CSurfaceDlg::OnSetfocusVscale()
@@ -590,7 +590,7 @@ void CSurfaceDlg::OnSetfocusVscale()
 
 void CSurfaceDlg::OnKillfocusEditWidth()
 {
-	focusControl = NULL;
+	focusControl = nullptr;
 }
 
 void CSurfaceDlg::OnSetfocusEditWidth()
@@ -600,7 +600,7 @@ void CSurfaceDlg::OnSetfocusEditWidth()
 
 void CSurfaceDlg::OnKillfocusEditHeight()
 {
-	focusControl = NULL;
+	focusControl = nullptr;
 }
 
 void CSurfaceDlg::OnSetfocusEditHeight()
@@ -620,7 +620,7 @@ void CSurfaceDlg::OnBtnFlipy()
 
 void CSurfaceDlg::OnKillfocusRotate()
 {
-	focusControl = NULL;
+	focusControl = nullptr;
 }
 
 void CSurfaceDlg::OnSetfocusRotate()

@@ -97,8 +97,8 @@ jround_up (long a, long b)
 #define FMEMZERO(target,size)	MEMZERO(target,size)
 #else				/* 80x86 case, define if we can */
 #ifdef USE_FMEM
-#define FMEMCOPY(dest,src,size)	_fmemcpy((void FAR *)(dest), (const void FAR *)(src), (size_t)(size) )
-#define FMEMZERO(target,size)	_fmemset((void FAR *)(target), 0, (size_t)(size) )
+#define FMEMCOPY(dest,src,size)	_fmemcpy((void FAR *)(dest), (const void FAR *)( src), ( size_t)( size) )
+#define FMEMZERO(target,size)	_fmemset((void FAR *)(target), 0, ( size_t)( size) )
 #endif
 #endif
 
@@ -115,7 +115,7 @@ jcopy_sample_rows (JSAMPARRAY input_array, int source_row,
 {
   register JSAMPROW inptr, outptr;
 #ifdef FMEMCOPY
-  register size_t count = (size_t) (num_cols * SIZEOF(JSAMPLE) );
+  register size_t count = ( size_t) (num_cols * SIZEOF(JSAMPLE) );
 #else
   register JDIMENSION count;
 #endif
@@ -143,7 +143,7 @@ jcopy_block_row (JBLOCKROW input_row, JBLOCKROW output_row,
 /* Copy a row of coefficient blocks from one place to another. */
 {
 #ifdef FMEMCOPY
-  FMEMCOPY(output_row, input_row, num_blocks * (DCTSIZE2 * SIZEOF(JCOEF) ));
+  FMEMCOPY(output_row, input_row, num_blocks * (DCTSIZE2 * SIZEOF(JCOEF) ) );
 #else
   register JCOEFPTR inptr, outptr;
   register long count;

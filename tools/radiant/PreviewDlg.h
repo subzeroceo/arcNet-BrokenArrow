@@ -33,24 +33,24 @@ If you have questions concerning this license or the applicable additional terms
 // CPreviewDlg dialog
 
 struct CommentedItem {
-	arcNetString Name;
-	arcNetString Path;
-	arcNetString Comments;
+	anString Name;
+	anString Path;
+	anString Comments;
 };
 
 class CPreviewDlg : public CDialog
 {
 public:
 	enum {MODELS, GUIS, SOUNDS, MATERIALS, SCRIPTS, SOUNDPARENT, WAVES, PARTICLES, MODELPARENT, GUIPARENT, COMMENTED, SKINS};
-	CPreviewDlg(CWnd* pParent = NULL);   // standard constructor
+	CPreviewDlg(CWnd* pParent = nullptr );   // standard constructor
 	virtual ~CPreviewDlg();
-	void SetMode( int mode, const char *preSelect = NULL );
+	void SetMode( int mode, const char *preSelect = nullptr );
 	void RebuildTree( const char *data );
 	void SetDisablePreview( bool b ) {
 		disablePreview = b;
 	}
 
-	arcNetString mediaName;
+	anString mediaName;
 	int returnCode;
 
 	bool Waiting();
@@ -68,18 +68,18 @@ private:
 	idGLDrawableMaterial m_drawMaterial;
 	idGLDrawableModel m_drawModel;
 	idGLWidget wndPreview;
-	arcHashTable<HTREEITEM> quickTree;
-	arcNetList<CommentedItem> items;
+	anHashTable<HTREEITEM> quickTree;
+	anList<CommentedItem> items;
 	virtual BOOL OnInitDialog();
 	int currentMode;
 	void AddCommentedItems();
-	arcNetString data;
+	anString data;
 	bool disablePreview;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	void BuildTree();
-	void AddStrList(const char *root, const arcStringList &list, int type);
+	void AddStrList(const char *root, const anStringList &list, int type);
 	void AddSounds(bool rootItems);
 	void AddMaterials(bool rootItems);
 	void AddParticles(bool rootItems);
@@ -89,7 +89,7 @@ protected:
 
 public:
 	afx_msg void OnTvnSelchangedTreeMedia(NMHDR *pNMHDR, LRESULT *pResult);
-	virtual BOOL Create(LPCTSTR lpszTemplateName, CWnd* pParentWnd = NULL);
+	virtual BOOL Create(LPCTSTR lpszTemplateName, CWnd* pParentWnd = nullptr );
 protected:
 	virtual void OnCancel();
 	virtual void OnOK();

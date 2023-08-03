@@ -2,8 +2,8 @@
 #ifndef __GAME_TRIGGER_H__
 #define __GAME_TRIGGER_H__
 
-extern const idEventDef EV_Enable;
-extern const idEventDef EV_Disable;
+extern const anEventDef EV_Enable;
+extern const anEventDef EV_Disable;
 
 /*
 ===============================================================================
@@ -13,7 +13,7 @@ extern const idEventDef EV_Disable;
 ===============================================================================
 */
 
-class idTrigger : public idEntity {
+class idTrigger : public anEntity {
 public:
 	CLASS_PROTOTYPE( idTrigger );
 
@@ -24,26 +24,26 @@ public:
 
 	const function_t *	GetScriptFunction( void ) const;
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	virtual void		Enable( void );
 	virtual void		Disable( void );
 
 protected:
-// RAVEN BEGIN
+
 // abahr: removed const from function
-	void				CallScript( idEntity* scriptEntity );
-// RAVEN END
+	void				CallScript( anEntity* scriptEntity );
+
 
 	void				Event_Enable( void );
 	void				Event_Disable( void );
 
-// RAVEN BEGIN
+
 // abahr: changed to allow parms to be passed
-	idList<rvScriptFuncUtility> scriptFunctions;
+	anList<rvScriptFuncUtility> scriptFunctions;
 	//const function_t *	scriptFunction;
-// RAVEN END
+
 };
 
 
@@ -63,8 +63,8 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 	virtual void		Think( void );
 
 private:
@@ -73,7 +73,7 @@ private:
 	float				delay;
 	float				random_delay;
 	int					nextTriggerTime;
-	idStr				requires;
+	anString				requires;
 	int					removeItem;
 	bool				touchClient;
 	bool				touchOther;
@@ -84,20 +84,20 @@ private:
 	int					controlZoneTrigger;
 	int					prevZoneController;
 
-	idList<idPlayer*>	playersInTrigger;
+	anList<anBasePlayer*>	playersInTrigger;
 
-	bool				CheckFacing( idEntity *activator );
+	bool				CheckFacing( anEntity *activator );
 	void				HandleControlZoneTrigger();
 
-// RAVEN BEGIN
+
 // kfuller: want trigger_relays entities to be able to respond to earthquakes
 	void				Event_EarthQuake				(float requiresLOS);
-// RAVEN END
 
-	void				TriggerAction( idEntity *activator );
-	void				Event_TriggerAction( idEntity *activator );
-	void				Event_Trigger( idEntity *activator );
-	void				Event_Touch( idEntity *other, trace_t *trace );
+
+	void				TriggerAction( anEntity *activator );
+	void				Event_TriggerAction( anEntity *activator );
+	void				Event_Trigger( anEntity *activator );
+	void				Event_Touch( anEntity *other, trace_t *trace );
 };
 
 
@@ -115,8 +115,8 @@ public:
 
 						idTrigger_EntityName( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Spawn( void );
 
@@ -127,12 +127,12 @@ private:
 	float				random_delay;
 	int					nextTriggerTime;
 	bool				triggerFirst;
-	idStr				entityName;
+	anString				entityName;
 
-	void				TriggerAction( idEntity *activator );
-	void				Event_TriggerAction( idEntity *activator );
-	void				Event_Trigger( idEntity *activator );
-	void				Event_Touch( idEntity *other, trace_t *trace );
+	void				TriggerAction( anEntity *activator );
+	void				Event_TriggerAction( anEntity *activator );
+	void				Event_Trigger( anEntity *activator );
+	void				Event_Touch( anEntity *other, trace_t *trace );
 };
 
 /*
@@ -149,8 +149,8 @@ public:
 
 						idTrigger_Timer( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Spawn( void );
 
@@ -162,11 +162,11 @@ private:
 	float				wait;
 	bool				on;
 	float				delay;
-	idStr				onName;
-	idStr				offName;
+	anString				onName;
+	anString				offName;
 
 	void				Event_Timer( void );
-	void				Event_Use( idEntity *activator );
+	void				Event_Use( anEntity *activator );
 };
 
 
@@ -184,8 +184,8 @@ public:
 
 						idTrigger_Count( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Spawn( void );
 
@@ -194,8 +194,8 @@ private:
 	int					count;
 	float				delay;
 
-	void				Event_Trigger( idEntity *activator );
-	void				Event_TriggerAction( idEntity *activator );
+	void				Event_Trigger( anEntity *activator );
+	void				Event_TriggerAction( anEntity *activator );
 };
 
 
@@ -213,8 +213,8 @@ public:
 
 						idTrigger_Hurt( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Spawn( void );
 
@@ -223,13 +223,13 @@ private:
 	float				delay;
 	int					nextTime;
 
-// RAVEN BEGIN
+
 // kfuller: added playeronly
 	bool				playerOnly;
-// RAVEN END
 
-	void				Event_Touch( idEntity *other, trace_t *trace );
-	void				Event_Toggle( idEntity *activator );
+
+	void				Event_Touch( anEntity *other, trace_t *trace );
+	void				Event_Toggle( anEntity *activator );
 };
 
 
@@ -247,7 +247,7 @@ public:
 	CLASS_PROTOTYPE( idTrigger_Fade );
 
 private:
-	void				Event_Trigger( idEntity *activator );
+	void				Event_Trigger( anEntity *activator );
 };
 
 
@@ -270,8 +270,8 @@ public:
 	void				Spawn( void );
 	virtual void		Think( void );
 
-	void				Save( idSaveGame *savefile );
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile );
+	void				Restore( anRestoreGame *savefile );
 
 	virtual void		Enable( void );
 	virtual void		Disable( void );
@@ -279,10 +279,10 @@ public:
 	void				TouchEntities( void );
 
 private:
-	idClipModel *		clipModel;
+	anClipModel *		clipModel;
 	int					filterTeam;
 
-	void				Event_Trigger( idEntity *activator );
+	void				Event_Trigger( anEntity *activator );
 };
 
 #endif /* !__GAME_TRIGGER_H__ */

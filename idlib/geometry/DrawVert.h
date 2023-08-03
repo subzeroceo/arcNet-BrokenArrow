@@ -15,7 +15,7 @@
 // vertex programs we convert the floating-point value in the range [0, 1]
 // to the range [-1, 1] by multiplying with 2 and subtracting 1.
 #define VERTEX_BYTE_TO_FLOAT( x )		( (x) * ( 2.0f / 255.0f ) - 1.0f )
-#define VERTEX_FLOAT_TO_BYTE( x )		arcMath::Ftob( ( (x) + 1.0f ) * ( 255.0f / 2.0f ) + 0.5f )
+#define VERTEX_FLOAT_TO_BYTE( x )		anMath::Ftob( ( (x) + 1.0f ) * ( 255.0f / 2.0f ) + 0.5f )
 #define ST_TO_FLOAT				1.0f / 4096.0f
 #define FLOAT_TO_ST				4096.0f
 #define ST_TO_FLOAT_LOWRANGE	1.0f / 32767.0f
@@ -37,29 +37,29 @@ typedef unsigned short halfFloat;
 #define DRAWVERT_TANGENT_OFFSET		(5*4)
 #define DRAWVERT_COLOR_OFFSET		(6*4)
 #define DRAWVERT_COLOR2_OFFSET		(7*4)
-#define DRAWVERT_TANGENT0_OFFSET	(8*4)		// offsetof( idDrawVert, tangents[0] )
-#define DRAWVERT_TANGENT1_OFFSET	(11*4)		// offsetof( idDrawVert, tangents[1]
+#define DRAWVERT_TANGENT0_OFFSET	(8*4)		// offsetof( anDrawVert, tangents[0] )
+#define DRAWVERT_TANGENT1_OFFSET	(11*4)		// offsetof( anDrawVert, tangents[1]
 #else
 // offsets for SIMD code
-#define DRAWVERT_SIZE				64			// sizeof( arcDrawVert )
-#define DRAWVERT_SIZE_SHIFT			6			// log2( sizeof( arcDrawVert ) )
-#define DRAWVERT_XYZ_OFFSET			(0*4)		// offsetof( arcDrawVert, xyz )
-#define DRAWVERT_NORMAL_OFFSET		(4*4)		// offsetof( arcDrawVert, normal )
-#define DRAWVERT_TANGENT_OFFSET		(8*4)		// offsetof( arcDrawVert, tangent )
+#define DRAWVERT_SIZE				64			// sizeof( anDrawVertex )
+#define DRAWVERT_SIZE_SHIFT			6			// log2( sizeof( anDrawVertex ) )
+#define DRAWVERT_XYZ_OFFSET			(0*4)		// offsetof( anDrawVertex, xyz )
+#define DRAWVERT_NORMAL_OFFSET		(4*4)		// offsetof( anDrawVertex, normal )
+#define DRAWVERT_TANGENT_OFFSET		(8*4)		// offsetof( anDrawVertex, tangent )
 #define DRAWVERT_COLOR_OFFSET		(6*4)
 #define DRAWVERT_COLOR2_OFFSET		(7*4)
 #endif
 
-assert_offsetof( arcDrawVert, xyz,		DRAWVERT_XYZ_OFFSET );
-assert_offsetof( arcDrawVert, normal,	DRAWVERT_NORMAL_OFFSET );
-assert_offsetof( arcDrawVert, tangent,	DRAWVERT_TANGENT_OFFSET );
-assert_sizeof( arcDrawVert, 			DRAWVERT_SIZE );
-assert_sizeof( arcDrawVert, (1<<DRAWVERT_SIZE_SHIFT) );
-assert_offsetof( arcDrawVert, _normal,	DRAWVERT_NORMAL_OFFSET );
-assert_offsetof( arcDrawVert, _tangent,	DRAWVERT_TANGENT_OFFSET );
+assert_offsetof( anDrawVertex, xyz,		DRAWVERT_XYZ_OFFSET );
+assert_offsetof( anDrawVertex, normal,	DRAWVERT_NORMAL_OFFSET );
+assert_offsetof( anDrawVertex, tangent,	DRAWVERT_TANGENT_OFFSET );
+assert_sizeof( anDrawVertex, 			DRAWVERT_SIZE );
+assert_sizeof( anDrawVertex, (1<<DRAWVERT_SIZE_SHIFT) );
+assert_offsetof( anDrawVertex, _normal,	DRAWVERT_NORMAL_OFFSET );
+assert_offsetof( anDrawVertex, _tangent,	DRAWVERT_TANGENT_OFFSET );
 
-typedef arcMath arcMath
-typedef arcMath arcMath
+typedef anMath anMath
+typedef anMath anMath
 
 /*
 ========================
@@ -108,50 +108,50 @@ ARC_INLINE halfFloat F32toF16( float a ) {
 ===============================================================================
 */
 
-class arcDrawVert {
+class anDrawVertex {
 public:
-	arcVec3				xyz;
-	arcVec2				st;
-	arcVec3				normal;
-	arcVec3				tangents[2];
+	anVec3				xyz;
+	anVec2				st;
+	anVec3				normal;
+	anVec3				tangents[2];
 	byte				color[4];
 	float				padding;
-	arcVec3				_normal;
+	anVec3				_normal;
 	byte				_color2[4];
-	arcVec4				_tangent;		// [3] is texture polarity sign
-	arcVec2 				_st;
-	arcVec2 				_st2;
+	anVec4				_tangent;		// [3] is texture polarity sign
+	anVec2 				_st;
+	anVec2 				_st2;
 
 	float				operator[]( const int index ) const;
 	float &				operator[]( const int index );
 
-	bool				operator==( const arcDrawVert &ndx ) const;
+	bool				operator==( const anDrawVertex &ndx ) const;
 
 	void				Clear( void );
 
-	const arcVec3		GetNormal() const;
-	const arcVec3		GetNormalRaw() const;		// not re-normalized for renderbump
+	const anVec3		GetNormal() const;
+	const anVec3		GetNormalRaw() const;		// not re-normalized for renderbump
 
 	float				GetNormalIndex( int idx ) const;
 
 	// must be normalized already!
 	void				SetNormal( float x, float y, float z );
-	void				SetNormal( const arcVec3 &n );
+	void				SetNormal( const anVec3 &n );
 
-	const arcVec3		GetTangent() const;
-	const arcVec3		GetTangentRaw() const;		// not re-normalized for renderbump
+	const anVec3		GetTangent() const;
+	const anVec3		GetTangentRaw() const;		// not re-normalized for renderbump
 
 	// must be normalized already!
 	void				SetTangent( float x, float y, float z );
-	void				SetTangent( const arcVec3 &t );
+	void				SetTangent( const anVec3 &t );
 
 	// derived from normal, tangent, and tangent flag
-	const arcVec3 		GetBiTangent() const;
-	const arcVec3 		GetBiTangentRaw() const;	// not re-normalized for renderbump
-	const arcVec4 		GetTangentVec4( void ) const;
+	const anVec3 		GetBiTangent() const;
+	const anVec3 		GetBiTangentRaw() const;	// not re-normalized for renderbump
+	const anVec4 		GetTangentVec4( void ) const;
 
 	void				SetBiTangent( float x, float y, float z );
-	ARC_INLINE void		SetBiTangent( const arcVec3 &t );
+	ARC_INLINE void		SetBiTangent( const anVec3 &t );
 
 	float				GetBiTangentSign() const;
 	byte				GetBiTangentSignBit() const;
@@ -159,11 +159,11 @@ public:
 	void				SetBiTangentSign( float sign );		// either 1.0f or -1.0f
 
 	void				SetTexCoordNative( const halfFloat s, const halfFloat t );
-	void				SetTexCoord( const arcVec2 & st );
+	void				SetTexCoord( const anVec2 & st );
 	void				SetTexCoord( float s, float t );
 	void				SetTexCoordS( float s );
 	void				SetTexCoordT( float t );
-	const arcVec2		GetTexCoord() const;
+	const anVec2		GetTexCoord() const;
 	const halfFloat		GetTexCoordNativeS() const;
 	const halfFloat		GetTexCoordNativeT() const;
 
@@ -171,10 +171,10 @@ public:
 	ARC_INLINE void		SetBiTangentSign( float sign );
 	ARC_INLINE void		SetBiTangentSignBit( byte bit );
 
-	void				Lerp( const arcDrawVert &a, const arcDrawVert &b, const float f );
-	void				LerpAll( const arcDrawVert &a, const arcDrawVert &b, const float f );
-	void				LerpAllNotOptimized( const arcDrawVert &a, const arcDrawVert &b, const float f );
-	void				LerpSetCord( const arcDrawVert &a, const arcDrawVert &b, const float f );
+	void				Lerp( const anDrawVertex &a, const anDrawVertex &b, const float f );
+	void				LerpAll( const anDrawVertex &a, const anDrawVertex &b, const float f );
+	void				LerpAllNotOptimized( const anDrawVertex &a, const anDrawVertex &b, const float f );
+	void				LerpSetCord( const anDrawVertex &a, const anDrawVertex &b, const float f );
 
 	void				Normalize( void );
 
@@ -183,15 +183,15 @@ public:
 	dword				GetColor( void ) const;
 	dword				GetColor2() const;
 
-	void			SetCoords( bool lowrange, const arcVec2 &st );
+	void			SetCoords( bool lowrange, const anVec2 &st );
 	void			SetCoords( float s, float t );
-	void			SetCoords( const arcVec2 &st );
-	void			SetCoords( const arcDrawVert &dv );
+	void			SetCoords( const anVec2 &st );
+	void			SetCoords( const anDrawVertex &dv );
 	void			SetIndexCoords( int i, float v );
 
 	float				GetIndexCoords( int idx ) const;
 	void				GetCoords( float &s, float &t ) const;
-	const arcVec2 &		GetCoords( void ) const;
+	const anVec2 &		GetCoords( void ) const;
 
 	void				SetNativeOrderColor( dword color );
 	void				SetNativeOrderColor2( dword color );
@@ -200,23 +200,23 @@ public:
 
 	void				ClearColor();
 
-	static arcDrawVert	GetSkinnedDrawVert( const arcDrawVert & vert, const arcJointMatrix * joints );
-	static arcVec3		GetSkinnedDrawVertPosition( const arcDrawVert & vert, const arcJointMatrix * joints );
+	static anDrawVertex	GetSkinnedDrawVert( const anDrawVertex & vert, const arcJointMatrix * joints );
+	static anVec3		GetSkinnedDrawVertPosition( const anDrawVertex & vert, const arcJointMatrix * joints );
 };
 
-ARC_INLINE float arcDrawVert::operator[]( const int index ) const {
+ARC_INLINE float anDrawVertex::operator[]( const int index ) const {
 	assert( index >= 0 && index < 5 );
 	return ( (float *)( ( &xyz ) ) )[index];
 }
-ARC_INLINE float &arcDrawVert::operator[]( const int index ) {
+ARC_INLINE float &anDrawVertex::operator[]( const int index ) {
 	assert( index >= 0 && index < 5 );
 	return ( (float *)( ( &xyz ) ) )[index];
 }
-ARC_INLINE bool arcDrawVert::operator==( const arcDrawVert &ndx ) const {
+ARC_INLINE bool anDrawVertex::operator==( const anDrawVertex &ndx ) const {
 	return ( ndx.xyz.Compare( xyz ) && ( ndx._st[0] == _st[0] && ndx._st[1] == _st[1] ) );
 }
 
-ARC_INLINE void arcDrawVert::Clear( void ) {
+ARC_INLINE void anDrawVertex::Clear( void ) {
 	xyz.Zero();
 	st.Zero();
 	normal.Zero();
@@ -227,93 +227,93 @@ ARC_INLINE void arcDrawVert::Clear( void ) {
 
 /*
 ========================
-arcDrawVert::GetNormal
+anDrawVertex::GetNormal
 ========================
 */
-ARC_INLINE const arcVec3 arcDrawVert::GetNormal() const {
-	arcVec3 n( VERTEX_BYTE_TO_FLOAT( normal[0] ), VERTEX_BYTE_TO_FLOAT( normal[1] ), VERTEX_BYTE_TO_FLOAT( normal[2] ) );
+ARC_INLINE const anVec3 anDrawVertex::GetNormal() const {
+	anVec3 n( VERTEX_BYTE_TO_FLOAT( normal[0] ), VERTEX_BYTE_TO_FLOAT( normal[1] ), VERTEX_BYTE_TO_FLOAT( normal[2] ) );
 	n.Normalize();	// after the normal has been compressed & uncompressed, it may not be normalized anymore
 	return n;
 }
 
 /*
 ========================
-arcDrawVert::GetNormalRaw
+anDrawVertex::GetNormalRaw
 ========================
 */
-ARC_INLINE const arcVec3 arcDrawVert::GetNormalRaw() const {
-	arcVec3 n( VERTEX_BYTE_TO_FLOAT( normal[0] ), VERTEX_BYTE_TO_FLOAT( normal[1] ), VERTEX_BYTE_TO_FLOAT( normal[2] ) );
+ARC_INLINE const anVec3 anDrawVertex::GetNormalRaw() const {
+	anVec3 n( VERTEX_BYTE_TO_FLOAT( normal[0] ), VERTEX_BYTE_TO_FLOAT( normal[1] ), VERTEX_BYTE_TO_FLOAT( normal[2] ) );
 	// don't re-normalize just like we do in the vertex programs
 	return n;
 }
 
 /*
 ========================
-arcDrawVert::SetNormal
+anDrawVertex::SetNormal
 must be normalized already!
 ========================
 */
-ARC_INLINE void arcDrawVert::SetNormal( const arcVec3 & n ) {
+ARC_INLINE void anDrawVertex::SetNormal( const anVec3 & n ) {
 	VertexFloatToByte( n.x, n.y, n.z, normal );
 }
 
 /*
 ========================
-arcDrawVert::SetNormal
+anDrawVertex::SetNormal
 ========================
 */
-ARC_INLINE void arcDrawVert::SetNormal( float x, float y, float z ) {
+ARC_INLINE void anDrawVertex::SetNormal( float x, float y, float z ) {
 	VertexFloatToByte( x, y, z, normal );
 }
 
 /*
 ========================
-&arcDrawVert::GetTangent
+&anDrawVertex::GetTangent
 ========================
 */
-ARC_INLINE const arcVec3 arcDrawVert::GetTangent() const {
-	arcVec3 t( VERTEX_BYTE_TO_FLOAT( tangent[0] ), VERTEX_BYTE_TO_FLOAT( tangent[1] ), VERTEX_BYTE_TO_FLOAT( tangent[2] ) );
+ARC_INLINE const anVec3 anDrawVertex::GetTangent() const {
+	anVec3 t( VERTEX_BYTE_TO_FLOAT( tangent[0] ), VERTEX_BYTE_TO_FLOAT( tangent[1] ), VERTEX_BYTE_TO_FLOAT( tangent[2] ) );
 	t.Normalize();
 	return t;
 }
 
 /*
 ========================
-&arcDrawVert::GetTangentRaw
+&anDrawVertex::GetTangentRaw
 ========================
 */
-ARC_INLINE const arcVec3 arcDrawVert::GetTangentRaw() const {
-	arcVec3 t( VERTEX_BYTE_TO_FLOAT( tangent[0] ), VERTEX_BYTE_TO_FLOAT( tangent[1] ), VERTEX_BYTE_TO_FLOAT( tangent[2] ) );
+ARC_INLINE const anVec3 anDrawVertex::GetTangentRaw() const {
+	anVec3 t( VERTEX_BYTE_TO_FLOAT( tangent[0] ), VERTEX_BYTE_TO_FLOAT( tangent[1] ), VERTEX_BYTE_TO_FLOAT( tangent[2] ) );
 	// don't re-normalize just like we do in the vertex programs
 	return t;
 }
 
 /*
 ========================
-arcDrawVert::SetTangent
+anDrawVertex::SetTangent
 ========================
 */
-ARC_INLINE void arcDrawVert::SetTangent( float x, float y, float z ) {
+ARC_INLINE void anDrawVertex::SetTangent( float x, float y, float z ) {
 	VertexFloatToByte( x, y, z, tangent );
 }
 
 /*
 ========================
-arcDrawVert::SetTangent
+anDrawVertex::SetTangent
 ========================
 */
-ARC_INLINE void arcDrawVert::SetTangent( const arcVec3 & t ) {
+ARC_INLINE void anDrawVertex::SetTangent( const anVec3 & t ) {
 	VertexFloatToByte( t.x, t.y, t.z, tangent );
 }
 
 /*
 ========================
-arcDrawVert::GetBiTangent
+anDrawVertex::GetBiTangent
 ========================
 */
-ARC_INLINE const arcVec3 arcDrawVert::GetBiTangent() const {
+ARC_INLINE const anVec3 anDrawVertex::GetBiTangent() const {
 	// derive from the normal, tangent, and bitangent direction flag
-	arcVec3 bitangent;
+	anVec3 bitangent;
 	bitangent.Cross( GetNormal(), GetTangent() );
 	bitangent *= GetBiTangentSign();
 	return bitangent;
@@ -321,13 +321,13 @@ ARC_INLINE const arcVec3 arcDrawVert::GetBiTangent() const {
 
 /*
 ========================
-arcDrawVert::GetBiTangentRaw
+anDrawVertex::GetBiTangentRaw
 ========================
 */
-ARC_INLINE const arcVec3 arcDrawVert::GetBiTangentRaw() const {
+ARC_INLINE const anVec3 anDrawVertex::GetBiTangentRaw() const {
 	// derive from the normal, tangent, and bitangent direction flag
 	// don't re-normalize just like we do in the vertex programs
-	arcVec3 bitangent;
+	anVec3 bitangent;
 	bitangent.Cross( GetNormalRaw(), GetTangentRaw() );
 	bitangent *= GetBiTangentSign();
 	return bitangent;
@@ -335,70 +335,70 @@ ARC_INLINE const arcVec3 arcDrawVert::GetBiTangentRaw() const {
 
 /*
 ========================
-arcDrawVert::SetBiTangent
+anDrawVertex::SetBiTangent
 ========================
 */
-ARC_INLINE void arcDrawVert::SetBiTangent( float x, float y, float z ) {
-	SetBiTangent( arcVec3( x, y, z ) );
+ARC_INLINE void anDrawVertex::SetBiTangent( float x, float y, float z ) {
+	SetBiTangent( anVec3( x, y, z ) );
 }
 
 /*
 ========================
-arcDrawVert::SetBiTangent
+anDrawVertex::SetBiTangent
 ========================
 */
-ARC_INLINE void arcDrawVert::SetBiTangent( const arcVec3 &t ) {
-	arcVec3 bitangent;
+ARC_INLINE void anDrawVertex::SetBiTangent( const anVec3 &t ) {
+	anVec3 bitangent;
 	bitangent.Cross( GetNormal(), GetTangent() );
 	SetBiTangentSign( bitangent * t );
 }
 
 /*
 ========================
-arcDrawVert::GetBiTangentSign
+anDrawVertex::GetBiTangentSign
 ========================
 */
-ARC_INLINE float arcDrawVert::GetBiTangentSign() const {
+ARC_INLINE float anDrawVertex::GetBiTangentSign() const {
 	return ( tangent[3] < 128 ) ? -1.0f : 1.0f;
 }
 
 /*
 ========================
-arcDrawVert::GetBiTangentSignBit
+anDrawVertex::GetBiTangentSignBit
 ========================
 */
-ARC_INLINE byte arcDrawVert::GetBiTangentSignBit() const {
+ARC_INLINE byte anDrawVertex::GetBiTangentSignBit() const {
 	return ( tangent[3] < 128 ) ? 1 : 0;
 }
 
 /*
 ========================
-arcDrawVert::SetBiTangentSign
+anDrawVertex::SetBiTangentSign
 ========================
 */
-ARC_INLINE void arcDrawVert::SetBiTangentSign( float sign ) {
+ARC_INLINE void anDrawVertex::SetBiTangentSign( float sign ) {
 	tangent[3] = ( sign < 0.0f ) ? 0 : 255;
 }
 
 /*
 ========================
-arcDrawVert::SetBiTangentSignBit
+anDrawVertex::SetBiTangentSignBit
 ========================
 */
-ARC_INLINE void arcDrawVert::SetBiTangentSignBit( byte sign ) {
+ARC_INLINE void anDrawVertex::SetBiTangentSignBit( byte sign ) {
 	tangent[3] = sign ? 0 : 255;
 }
 
-ARC_INLINE void arcDrawVert::SetIndexCoords( int idx, float v ) {
+ARC_INLINE void anDrawVertex::SetIndexCoords( int idx, float v ) {
 #if defined( SD_USE_DRAWVERT_SIZE_32 )
-	_st[idx] = (short)( v * FLOAT_TO_ST );
+	_st[idx] = ( short)( v * FLOAT_TO_ST );
 #else
 	_st[idx] = v;
 #if 0
 	if ( _st[0] < -8.f || _st[0] > ( 32767/4096.f ) ) {
 		assert( 0 );
 	}
-	if ( _st[1] < -8.f || _st[1] > ( 32767/4096.f )) {
+	if ( _st[1] < -8.f || _st[1] > ( 32767/4096.f ) ) {
 		assert( 0 );
 	}
 #endif
@@ -406,39 +406,39 @@ ARC_INLINE void arcDrawVert::SetIndexCoords( int idx, float v ) {
 }
 
 
-ARC_INLINE float arcDrawVert::GetZ( short x, short y, byte sign ) const {
+ARC_INLINE float anDrawVertex::GetZ( short x, short y, byte sign ) const {
 	float v = 1.0f - ( x * x + y * y ) / ( 32767.0f * 32767.0f );
 	float sqrtv = v > 0.f ? sqrtf( v ) : 0.f;
-	return sqrtv * ( (float)sign - 1.f );
+	return sqrtv * ( ( float )sign - 1.f );
 }
 
 /*
 ========================
-arcDrawVert::Lerp
+anDrawVertex::Lerp
 ========================
 */
-ARC_INLINE void arcDrawVert::LerpSetCord( const arcDrawVert &a, const arcDrawVert &b, const float f ) {
+ARC_INLINE void anDrawVertex::LerpSetCord( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
 	xyz = a.xyz + f * ( b.xyz - a.xyz );
 	SetTexCoord( ::Lerp( a.GetTexCoord(), b.GetTexCoord(), f ) );
 }
 
-ARC_INLINE void arcDrawVert::Lerp( const arcDrawVert &a, const arcDrawVert &b, const float f ) {
+ARC_INLINE void anDrawVertex::Lerp( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
 	xyz = a.xyz + f * ( b.xyz - a.xyz );
 	st = a.st + f * ( b.st - a.st );
 }
 
 /*
 ========================
-arcDrawVert::LerpAll
+anDrawVertex::LerpAll
 ========================
 */
-ARC_INLINE void arcDrawVert::LerpAllNotOptimized( const arcDrawVert &a, const arcDrawVert &b, const float f ) {
+ARC_INLINE void anDrawVertex::LerpAllNotOptimized( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
 	xyz = ::Lerp( a.xyz, b.xyz, f );
 	SetTexCoord( ::Lerp( a.GetTexCoord(), b.GetTexCoord(), f ) );
 
-	arcVec3 normal = ::Lerp( a.GetNormal(), b.GetNormal(), f );
-	arcVec3 tangent = ::Lerp( a.GetTangent(), b.GetTangent(), f );
-	arcVec3 bitangent = ::Lerp( a.GetBiTangent(), b.GetBiTangent(), f );
+	anVec3 normal = ::Lerp( a.GetNormal(), b.GetNormal(), f );
+	anVec3 tangent = ::Lerp( a.GetTangent(), b.GetTangent(), f );
+	anVec3 bitangent = ::Lerp( a.GetBiTangent(), b.GetBiTangent(), f );
 	normal.Normalize();
 	tangent.Normalize();
 	bitangent.Normalize();
@@ -459,10 +459,10 @@ ARC_INLINE void arcDrawVert::LerpAllNotOptimized( const arcDrawVert &a, const ar
 
 /*
 ========================
-arcDrawVert::LerpAll
+anDrawVertex::LerpAll
 ========================
 */
-ARC_INLINE void arcDrawVert::LerpAll( const arcDrawVert &a, const arcDrawVert &b, const float f ) {
+ARC_INLINE void anDrawVertex::LerpAll( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
 	xyz = a.xyz + f * ( b.xyz - a.xyz );
 	st = a.st + f * ( b.st - a.st );
 
@@ -477,131 +477,131 @@ ARC_INLINE void arcDrawVert::LerpAll( const arcDrawVert &a, const arcDrawVert &b
 	color[3] = ( byte )( a.color[3] + f * ( b.color[3] - a.color[3] ) );
 }
 
-ARC_INLINE void arcDrawVert::SetColor( dword color ) {
+ARC_INLINE void anDrawVertex::SetColor( dword color ) {
 	*reinterpret_cast<dword *>( this->color ) = color;
 }
 
-ARC_INLINE dword arcDrawVert::GetColor( void ) const {
+ARC_INLINE dword anDrawVertex::GetColor( void ) const {
 	return *reinterpret_cast<const dword *>( this->color );
 }
 
 /*
 ========================
-arcDrawVert::SetNativeOrderColor
+anDrawVertex::SetNativeOrderColor
 ========================
 */
-ARC_INLINE void arcDrawVert::SetNativeOrderColor( dword color ) {
+ARC_INLINE void anDrawVertex::SetNativeOrderColor( dword color ) {
 	*reinterpret_cast<dword *>( this->color ) = color;
 }
 
 /*
 ========================
-arcDrawVert::SetTexCoordNative
+anDrawVertex::SetTexCoordNative
 ========================
 */
-ARC_INLINE void arcDrawVert::SetTexCoordNative( const halfFloat s, const halfFloat t ) {
+ARC_INLINE void anDrawVertex::SetTexCoordNative( const halfFloat s, const halfFloat t ) {
 	st[0] = s;
 	st[1] = t;
 }
 
 /*
 ========================
-arcDrawVert::SetTexCoord
+anDrawVertex::SetTexCoord
 ========================
 */
-ARC_INLINE void arcDrawVert::SetTexCoord( const arcVec2 & st ) {
+ARC_INLINE void anDrawVertex::SetTexCoord( const anVec2 & st ) {
 	SetTexCoordS( st.x );
 	SetTexCoordT( st.y );
 }
 
 /*
 ========================
-arcDrawVert::SetTexCoord
+anDrawVertex::SetTexCoord
 ========================
 */
-ARC_INLINE void arcDrawVert::SetTexCoord( float s, float t ) {
+ARC_INLINE void anDrawVertex::SetTexCoord( float s, float t ) {
 	SetTexCoordS( s );
 	SetTexCoordT( t );
 }
 
 /*
 ========================
-arcDrawVert::SetTexCoordS
+anDrawVertex::SetTexCoordS
 ========================
 */
-ARC_INLINE void arcDrawVert::SetTexCoordS( float s ) {
+ARC_INLINE void anDrawVertex::SetTexCoordS( float s ) {
 	st[0] = F32toF16( s );
 }
 
 /*
 ========================
-arcDrawVert::SetTexCoordT
+anDrawVertex::SetTexCoordT
 ========================
 */
-ARC_INLINE void arcDrawVert::SetTexCoordT( float t ) {
+ARC_INLINE void anDrawVertex::SetTexCoordT( float t ) {
 	st[1] = F32toF16( t );
 }
 
 /*
 ========================
-arcDrawVert::GetTexCoord
+anDrawVertex::GetTexCoord
 ========================
 */
-ARC_INLINE const arcVec2 arcDrawVert::GetTexCoord() const {
-	return arcVec2( F16toF32( st[0] ), F16toF32( st[1] ) );
+ARC_INLINE const anVec2 anDrawVertex::GetTexCoord() const {
+	return anVec2( F16toF32( st[0] ), F16toF32( st[1] ) );
 }
 
 /*
 ========================
-arcDrawVert::GetTexCoordNativeS
+anDrawVertex::GetTexCoordNativeS
 ========================
 */
-ARC_INLINE const halfFloat arcDrawVert::GetTexCoordNativeS() const {
+ARC_INLINE const halfFloat anDrawVertex::GetTexCoordNativeS() const {
 	return st[0];
 }
 
 /*
 ========================
-arcDrawVert::GetTexCoordNativeT
+anDrawVertex::GetTexCoordNativeT
 ========================
 */
-ARC_INLINE const halfFloat arcDrawVert::GetTexCoordNativeT() const {
+ARC_INLINE const halfFloat anDrawVertex::GetTexCoordNativeT() const {
 	return st[1];
 }
 
 /*
 ========================
-arcDrawVert::SetNativeOrderColor2
+anDrawVertex::SetNativeOrderColor2
 ========================
 */
-ARC_INLINE void arcDrawVert::SetNativeOrderColor2( dword color2 ) {
+ARC_INLINE void anDrawVertex::SetNativeOrderColor2( dword color2 ) {
 	*reinterpret_cast<dword *>(this->color2) = color2;
 }
 
 /*
 ========================
-arcDrawVert::SetColor
+anDrawVertex::SetColor
 ========================
 */
-ARC_INLINE void arcDrawVert::SetColor2( dword color2 ) {
+ARC_INLINE void anDrawVertex::SetColor2( dword color2 ) {
 	*reinterpret_cast<dword *>(this->color2) = color2;
 }
 
 /*
 ========================
-arcDrawVert::ClearColor2
+anDrawVertex::ClearColor2
 ========================
 */
-ARC_INLINE void arcDrawVert::ClearColor2() {
+ARC_INLINE void anDrawVertex::ClearColor2() {
 	*reinterpret_cast<dword *>(this->color2) = 0x80808080;
 }
 
 /*
 ========================
-arcDrawVert::GetColor2
+anDrawVertex::GetColor2
 ========================
 */
-ARC_INLINE dword arcDrawVert::GetColor2() const {
+ARC_INLINE dword anDrawVertex::GetColor2() const {
 	return *reinterpret_cast<const dword *>(this->color2);
 }
 
@@ -612,8 +612,8 @@ WriteDrawVerts16
 Use 16-byte in-order SIMD writes because the destVerts may live in write-combined memory
 ========================
 */
-ARC_INLINE void WriteDrawVerts16( arcDrawVert * destVerts, const arcDrawVert * localVerts, int numVerts ) {
-	assert_sizeof( arcDrawVert, 32 );
+ARC_INLINE void WriteDrawVerts16( anDrawVertex * destVerts, const anDrawVertex * localVerts, int numVerts ) {
+	assert_sizeof( anDrawVertex, 32 );
 	assert_16_byte_aligned( destVerts );
 	assert_16_byte_aligned( localVerts );
 #ifdef ID_WIN_X86_SSE2_INTRIN
@@ -624,17 +624,17 @@ ARC_INLINE void WriteDrawVerts16( arcDrawVert * destVerts, const arcDrawVert * l
 		_mm_stream_si128( (__m128i *)( (byte *)( destVerts + i ) + 16 ), v1 );
 	}
 #else
-	memcpy( destVerts, localVerts, numVerts * sizeof( arcDrawVert ) );
+	memcpy( destVerts, localVerts, numVerts * sizeof( anDrawVertex ) );
 #endif
 }
 
 /*
 =====================
-arcDrawVert::GetSkinnedDrawVert
+anDrawVertex::GetSkinnedDrawVert
 =====================
 */
-ARC_INLINE arcDrawVert arcDrawVert::GetSkinnedDrawVert( const arcDrawVert & vert, const arcJointMatrix * joints ) {
-	if ( joints == NULL ) {
+ARC_INLINE anDrawVertex anDrawVertex::GetSkinnedDrawVert( const anDrawVertex & vert, const arcJointMatrix * joints ) {
+	if ( joints == nullptr ) {
 		return vert;
 	}
 
@@ -654,8 +654,8 @@ ARC_INLINE arcDrawVert arcDrawVert::GetSkinnedDrawVert( const arcDrawVert & vert
 	arcJointMatrix::Mad( accum, j2, w2 );
 	arcJointMatrix::Mad( accum, j3, w3 );
 
-	arcDrawVert outVert;
-	outVert.xyz = accum * arcVec4( vert.xyz.x, vert.xyz.y, vert.xyz.z, 1.0f );
+	anDrawVertex outVert;
+	outVert.xyz = accum * anVec4( vert.xyz.x, vert.xyz.y, vert.xyz.z, 1.0f );
 	outVert.SetTexCoordNative( vert.GetTexCoordNativeS(), vert.GetTexCoordNativeT() );
 	outVert.SetNormal( accum * vert.GetNormal() );
 	outVert.SetTangent( accum * vert.GetTangent() );
@@ -669,11 +669,11 @@ ARC_INLINE arcDrawVert arcDrawVert::GetSkinnedDrawVert( const arcDrawVert & vert
 
 /*
 =====================
-arcDrawVert::GetSkinnedDrawVertPosition
+anDrawVertex::GetSkinnedDrawVertPosition
 =====================
 */
-ARC_INLINE arcVec3 arcDrawVert::GetSkinnedDrawVertPosition( const arcDrawVert & vert, const arcJointMatrix * joints ) {
-	if ( joints == NULL ) {
+ARC_INLINE anVec3 anDrawVertex::GetSkinnedDrawVertPosition( const anDrawVertex & vert, const arcJointMatrix * joints ) {
+	if ( joints == nullptr ) {
 		return vert.xyz;
 	}
 
@@ -693,7 +693,7 @@ ARC_INLINE arcVec3 arcDrawVert::GetSkinnedDrawVertPosition( const arcDrawVert & 
 	arcJointMatrix::Mad( accum, j2, w2 );
 	arcJointMatrix::Mad( accum, j3, w3 );
 
-	return accum * arcVec4( vert.xyz.x, vert.xyz.y, vert.xyz.z, 1.0f );
+	return accum * anVec4( vert.xyz.x, vert.xyz.y, vert.xyz.z, 1.0f );
 }
 
 /*
@@ -701,19 +701,19 @@ ARC_INLINE arcVec3 arcDrawVert::GetSkinnedDrawVertPosition( const arcDrawVert & 
 Shadow Vertex
 ===============================================================================
 */
-class arcShadowCache {
+class anShadowCache {
 public:
-	arcVec4			xyzw;
-	arcVec4			xyz;	// we use homogenous coordinate tricks
+	anVec4			xyzw;
+	anVec4			xyz;	// we use homogenous coordinate tricks
 	byte			color[4];
 	byte			color2[4];
 	byte			pad[8];		// pad to multiple of 32-byte for glDrawElementsBaseVertex
 
 	void			Clear();
-	static int		CreateShadowCache( arcShadowCache * vertexCache, const arcDrawVert *verts, const int numVerts );
+	static int		CreateShadowCache( anShadowCache * vertexCache, const anDrawVertex *verts, const int numVerts );
 
 	void			ClearSkinned();
-	static int		CreateSkinnedShadowCache( arcShadowCache * vertexCache, const arcDrawVert *verts, const int numVerts );
+	static int		CreateSkinnedShadowCache( anShadowCache * vertexCache, const anDrawVertex *verts, const int numVerts );
 };
 
 
@@ -721,22 +721,22 @@ public:
 #define SHADOWVERTSKINNED_COLOR_OFFSET		(16)
 #define SHADOWVERTSKINNED_COLOR2_OFFSET		(20)
 
-assert_offsetof( arcShadowCache, xyzw, SHADOWVERTSKINNED_XYZW_OFFSET );
-assert_offsetof( arcShadowCache, color, SHADOWVERTSKINNED_COLOR_OFFSET );
-assert_offsetof( arcShadowCache, color2, SHADOWVERTSKINNED_COLOR2_OFFSET );
+assert_offsetof( anShadowCache, xyzw, SHADOWVERTSKINNED_XYZW_OFFSET );
+assert_offsetof( anShadowCache, color, SHADOWVERTSKINNED_COLOR_OFFSET );
+assert_offsetof( anShadowCache, color2, SHADOWVERTSKINNED_COLOR2_OFFSET );
 
 #define SHADOWVERT_XYZW_OFFSET		(0)
-#define SHADOWVERT_SIZE				16			// sizeof( arcDrawVert )
-#define SHADOWVERT_SIZE_SHIFT		4			// log2( sizeof( arcDrawVert ) )
-assert_sizeof( arcShadowCache, SHADOWVERT_SIZE );
-assert_sizeof( arcShadowCache, (1<<SHADOWVERT_SIZE_SHIFT) );
-assert_offsetof( arcShadowCache, xyzw, SHADOWVERT_XYZW_OFFSET );
+#define SHADOWVERT_SIZE				16			// sizeof( anDrawVertex )
+#define SHADOWVERT_SIZE_SHIFT		4			// log2( sizeof( anDrawVertex ) )
+assert_sizeof( anShadowCache, SHADOWVERT_SIZE );
+assert_sizeof( anShadowCache, (1<<SHADOWVERT_SIZE_SHIFT) );
+assert_offsetof( anShadowCache, xyzw, SHADOWVERT_XYZW_OFFSET );
 
-ARC_INLINE void arcShadowCache::Clear() {
+ARC_INLINE void anShadowCache::Clear() {
 	xyzw.Zero();
 }
 
-ARC_INLINE void arcShadowCache::CreateSkinned() {
+ARC_INLINE void anShadowCache::CreateSkinned() {
 	xyzw.Zero();
 }
 #endif

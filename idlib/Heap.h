@@ -28,11 +28,11 @@ void		Mem_EnableLeakTest( const char *name );
 void		Mem_ClearFrameStats( void );
 void		Mem_GetFrameStats( memoryStats_t &allocs, memoryStats_t &frees );
 void		Mem_GetStats( memoryStats_t &stats );
-void		Mem_Dump_f( const class arcCommandArgs &args );
-void		Mem_DumpCompressed_f( const class arcCommandArgs &args );
+void		Mem_Dump_f( const class anCommandArgs &args );
+void		Mem_DumpCompressed_f( const class anCommandArgs &args );
 void		Mem_AllocDefragBlock( void );
 
-#ifndef ID_DEBUG_MEMORY
+#ifndef ARC_DEBUG_MEMORY
 
 void *		Mem_Alloc( const int size );
 void *		Mem_ClearedAlloc( const int size );
@@ -63,7 +63,7 @@ char *		Mem_CopyString( const char *in, const char *fileName, const int lineNumb
 void *		Mem_Alloc16( const int size, const char *fileName, const int lineNumber );
 void		Mem_Free16( void *ptr, const char *fileName, const int lineNumber );
 
-#ifdef ARC_REDIRECT_NEWDELETE
+//#ifdef ARC_REDIRECT_NEWDELETE
 ARC_INLINE void *operator new( size_t s, int t1, int t2, char *fileName, int lineNumber ) {
 	return Mem_Alloc( s, fileName, lineNumber );
 }
@@ -116,10 +116,10 @@ ARC_INLINE void operator delete[]( void *p ) {
 */
 
 template<class type, int blockSize>
-class arcBlockAlloc {
+class anBlockAlloc {
 public:
-							arcBlockAlloc( void );
-							~arcBlockAlloc( void );
+							anBlockAlloc( void );
+							~anBlockAlloc( void );
 
 	void					Shutdown( void );
 
@@ -147,19 +147,19 @@ private:
 };
 
 template<class type, int blockSize>
-arcBlockAlloc<type,blockSize>::arcBlockAlloc( void ) {
-	blocks = NULL;
-	free = NULL;
+anBlockAlloc<type,blockSize>::anBlockAlloc( void ) {
+	blocks = nullptr;
+	free = nullptr;
 	total = active = 0;
 }
 
 template<class type, int blockSize>
-arcBlockAlloc<type,blockSize>::~arcBlockAlloc( void ) {
+anBlockAlloc<type,blockSize>::~anBlockAlloc( void ) {
 	Shutdown();
 }
 
 template<class type, int blockSize>
-type *arcBlockAlloc<type,blockSize>::Alloc( void ) {
+type *anBlockAlloc<type,blockSize>::Alloc( void ) {
 	if ( !free ) {
 		block_t *block = new block_t;
 		block->next = blocks;
@@ -173,12 +173,12 @@ type *arcBlockAlloc<type,blockSize>::Alloc( void ) {
 	active++;
 	element_t *element = free;
 	free = free->next;
-	element->next = NULL;
+	element->next = nullptr;
 	return &element->t;
 }
 
 template<class type, int blockSize>
-void arcBlockAlloc<type,blockSize>::Free( type *t ) {
+void anBlockAlloc<type,blockSize>::Free( type *t ) {
 	element_t *element = (element_t *)( ( (unsigned char *) t ) - ( ( int ) &((element_t *)0 )->t ) );
 	element->next = free;
 	free = element;
@@ -186,14 +186,14 @@ void arcBlockAlloc<type,blockSize>::Free( type *t ) {
 }
 
 template<class type, int blockSize>
-void arcBlockAlloc<type,blockSize>::Shutdown( void ) {
+void anBlockAlloc<type,blockSize>::Shutdown( void ) {
 	while( blocks ) {
 		block_t *block = blocks;
 		blocks = blocks->next;
 		delete block;
 	}
-	blocks = NULL;
-	free = NULL;
+	blocks = nullptr;
+	free = nullptr;
 	total = active = 0;
 }
 
@@ -201,7 +201,7 @@ void arcBlockAlloc<type,blockSize>::Shutdown( void ) {
 ==============================================================================
 
 	Dynamic allocator, simple wrapper for normal allocations which can
-	be interchanged with arcDynamicBlockAlloc.
+	be interchanged with anDynamicBlockAlloc.
 
 	No constructor is called for the 'type'.
 	Allocated blocks are always 16 byte aligned.
@@ -210,10 +210,10 @@ void arcBlockAlloc<type,blockSize>::Shutdown( void ) {
 */
 
 template<class type, int baseBlockSize, int minBlockSize>
-class arcDynamicAlloc {
+class anDynamicAlloc {
 public:
-									arcDynamicAlloc( void );
-									~arcDynamicAlloc( void );
+									anDynamicAlloc( void );
+									~anDynamicAlloc( void );
 
 	void							Init( void );
 	void							Shutdown( void );
@@ -246,29 +246,29 @@ private:
 };
 
 template<class type, int baseBlockSize, int minBlockSize>
-arcDynamicAlloc<type, baseBlockSize, minBlockSize>::arcDynamicAlloc( void ) {
+anDynamicAlloc<type, baseBlockSize, minBlockSize>::anDynamicAlloc( void ) {
 	Clear();
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-arcDynamicAlloc<type, baseBlockSize, minBlockSize>::~arcDynamicAlloc( void ) {
+anDynamicAlloc<type, baseBlockSize, minBlockSize>::~anDynamicAlloc( void ) {
 	Shutdown();
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicAlloc<type, baseBlockSize, minBlockSize>::Init( void ) {
+void anDynamicAlloc<type, baseBlockSize, minBlockSize>::Init( void ) {
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicAlloc<type, baseBlockSize, minBlockSize>::Shutdown( void ) {
+void anDynamicAlloc<type, baseBlockSize, minBlockSize>::Shutdown( void ) {
 	Clear();
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-type *arcDynamicAlloc<type, baseBlockSize, minBlockSize>::Alloc( const int num ) {
+type *anDynamicAlloc<type, baseBlockSize, minBlockSize>::Alloc( const int num ) {
 	numAllocs++;
 	if ( num <= 0 ) {
-		return NULL;
+		return nullptr;
 	}
 	numUsedBlocks++;
 	usedBlockMemory += num * sizeof( type );
@@ -276,16 +276,16 @@ type *arcDynamicAlloc<type, baseBlockSize, minBlockSize>::Alloc( const int num )
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-type *arcDynamicAlloc<type, baseBlockSize, minBlockSize>::Resize( type *ptr, const int num ) {
+type *anDynamicAlloc<type, baseBlockSize, minBlockSize>::Resize( type *ptr, const int num ) {
 	numResizes++;
 
-	if ( ptr == NULL ) {
+	if ( ptr == nullptr ) {
 		return Alloc( num );
 	}
 
 	if ( num <= 0 ) {
 		Free( ptr );
-		return NULL;
+		return nullptr;
 	}
 
 	assert( 0 );
@@ -293,21 +293,21 @@ type *arcDynamicAlloc<type, baseBlockSize, minBlockSize>::Resize( type *ptr, con
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicAlloc<type, baseBlockSize, minBlockSize>::Free( type *ptr ) {
+void anDynamicAlloc<type, baseBlockSize, minBlockSize>::Free( type *ptr ) {
 	numFrees++;
-	if ( ptr == NULL ) {
+	if ( ptr == nullptr ) {
 		return;
 	}
 	Mem_Free16( ptr );
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-const char *arcDynamicAlloc<type, baseBlockSize, minBlockSize>::CheckMemory( const type *ptr ) const {
-	return NULL;
+const char *anDynamicAlloc<type, baseBlockSize, minBlockSize>::CheckMemory( const type *ptr ) const {
+	return nullptr;
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicAlloc<type, baseBlockSize, minBlockSize>::Clear( void ) {
+void anDynamicAlloc<type, baseBlockSize, minBlockSize>::Clear( void ) {
 	numUsedBlocks = 0;
 	usedBlockMemory = 0;
 	numAllocs = 0;
@@ -327,14 +327,14 @@ void arcDynamicAlloc<type, baseBlockSize, minBlockSize>::Clear( void ) {
 ==============================================================================
 */
 
-#include "containers/BTree.h"
+#include "BT"
 
 //#define DYNAMIC_BLOCK_ALLOC_CHECK
 
 template<class type>
-class ARCDynamicBlock {
+class anDynamicAlloc {
 public:
-	type *							GetMemory( void ) const { return (type *)( ( ( byte * ) this ) + sizeof( ARCDynamicBlock<type> ) ); }
+	type *							GetMemory( void ) const { return (type *)( ( (byte *) this ) + sizeof( anDynamicAlloc<type> ) ); }
 	int								GetSize( void ) const { return abs( size ); }
 	void							SetSize( int s, bool isBaseBlock ) { size = isBaseBlock ? -s : s; }
 	bool							IsBaseBlock( void ) const { return ( size < 0 ); }
@@ -345,16 +345,16 @@ public:
 #endif
 
 	int								size;					// size in bytes of the block
-	ARCDynamicBlock<type> *			prev;					// previous memory block
-	ARCDynamicBlock<type> *			next;					// next memory block
-	idBTreeNode<ARCDynamicBlock<type>,int> *node;			// node in the B-Tree with free blocks
+	anDynamicAlloc<type> *			prev;					// previous memory block
+	anDynamicAlloc<type> *			next;					// next memory block
+	anBinaryTreeNode<anDynamicAlloc<type>,int> *node;			// node in the B-Tree with free blocks
 };
 
 template<class type, int baseBlockSize, int minBlockSize>
-class arcDynamicBlockAlloc {
+class anDynamicBlockAlloc {
 public:
-									arcDynamicBlockAlloc( void );
-									~arcDynamicBlockAlloc( void );
+									anDynamicBlockAlloc( void );
+									~anDynamicBlockAlloc( void );
 
 	void							Init( void );
 	void							Shutdown( void );
@@ -376,9 +376,9 @@ public:
 	int								GetNumEmptyBaseBlocks( void ) const;
 
 private:
-	ARCDynamicBlock<type> *			firstBlock;				// first block in list in order of increasing address
-	ARCDynamicBlock<type> *			lastBlock;				// last block in list in order of increasing address
-	idBTree<ARCDynamicBlock<type>,int,4>freeTree;			// B-Tree with free memory blocks
+	anDynamicAlloc<type> *			firstBlock;				// first block in list in order of increasing address
+	anDynamicAlloc<type> *			lastBlock;				// last block in list in order of increasing address
+	anBinaryTree<anDynamicAlloc<type>,int,4>freeTree;			// B-Tree with free memory blocks
 	bool							allowAllocs;			// allow base block allocations
 	bool							lockMemory;				// lock memory so it cannot get swapped out
 
@@ -398,44 +398,44 @@ private:
 	int								numFrees;
 
 	void							Clear( void );
-	ARCDynamicBlock<type> *			AllocInternal( const int num );
-	ARCDynamicBlock<type> *			ResizeInternal( ARCDynamicBlock<type> *block, const int num );
-	void							FreeInternal( ARCDynamicBlock<type> *block );
-	void							LinkFreeInternal( ARCDynamicBlock<type> *block );
-	void							UnlinkFreeInternal( ARCDynamicBlock<type> *block );
+	anDynamicAlloc<type> *			AllocInternal( const int num );
+	anDynamicAlloc<type> *			ResizeInternal( anDynamicAlloc<type> *block, const int num );
+	void							FreeInternal( anDynamicAlloc<type> *block );
+	void							LinkFreeInternal( anDynamicAlloc<type> *block );
+	void							UnlinkFreeInternal( anDynamicAlloc<type> *block );
 	void							CheckMemory( void ) const;
 };
 
 template<class type, int baseBlockSize, int minBlockSize>
-arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::arcDynamicBlockAlloc( void ) {
+anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::anDynamicBlockAlloc( void ) {
 	Clear();
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::~arcDynamicBlockAlloc( void ) {
+anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::~anDynamicBlockAlloc( void ) {
 	Shutdown();
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Init( void ) {
+void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Init( void ) {
 	freeTree.Init();
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Shutdown( void ) {
-	ARCDynamicBlock<type> *block;
+void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Shutdown( void ) {
+	anDynamicAlloc<type> *block;
 
-	for ( block = firstBlock; block != NULL; block = block->next ) {
-		if ( block->node == NULL ) {
+	for ( block = firstBlock; block != nullptr; block = block->next ) {
+		if ( block->node == nullptr ) {
 			FreeInternal( block );
 		}
 	}
 
-	for ( block = firstBlock; block != NULL; block = firstBlock ) {
+	for ( block = firstBlock; block != nullptr; block = firstBlock ) {
 		firstBlock = block->next;
 		assert( block->IsBaseBlock() );
 		if ( lockMemory ) {
-			arcLibrary::sys->UnlockMemory( block, block->GetSize() + ( int )sizeof( ARCDynamicBlock<type> ) );
+			anLibrary::sys->UnlockMemory( block, block->GetSize() + ( int )sizeof( anDynamicAlloc<type> ) );
 		}
 		Mem_Free16( block );
 	}
@@ -446,20 +446,20 @@ void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Shutdown( void ) {
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::SetFixedBlocks( int numBlocks ) {
-	ARCDynamicBlock<type> *block;
+void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::SetFixedBlocks( int numBlocks ) {
+	anDynamicAlloc<type> *block;
 
 	for ( int i = numBaseBlocks; i < numBlocks; i++ ) {
-		block = ( ARCDynamicBlock<type> * ) Mem_Alloc16( baseBlockSize );
+		block = ( anDynamicAlloc<type> * ) Mem_Alloc16( baseBlockSize );
 		if ( lockMemory ) {
-			arcLibrary::sys->LockMemory( block, baseBlockSize );
+			anLibrary::sys->LockMemory( block, baseBlockSize );
 		}
 #ifdef DYNAMIC_BLOCK_ALLOC_CHECK
 		memcpy( block->id, blockId, sizeof( block->id ) );
 		block->allocator = (void*)this;
 #endif
-		block->SetSize( baseBlockSize - ( int )sizeof( ARCDynamicBlock<type> ), true );
-		block->next = NULL;
+		block->SetSize( baseBlockSize - ( int )sizeof( anDynamicAlloc<type> ), true );
+		block->next = nullptr;
 		block->prev = lastBlock;
 		if ( lastBlock ) {
 			lastBlock->next = block;
@@ -467,7 +467,7 @@ void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::SetFixedBlocks( in
 			firstBlock = block;
 		}
 		lastBlock = block;
-		block->node = NULL;
+		block->node = nullptr;
 
 		FreeInternal( block );
 
@@ -479,18 +479,18 @@ void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::SetFixedBlocks( in
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::SetLockMemory( bool lock ) {
+void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::SetLockMemory( bool lock ) {
 	lockMemory = lock;
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::FreeEmptyBaseBlocks( void ) {
-	ARCDynamicBlock<type> *block, *next;
+void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::FreeEmptyBaseBlocks( void ) {
+	anDynamicAlloc<type> *block, *next;
 
-	for ( block = firstBlock; block != NULL; block = next ) {
+	for ( block = firstBlock; block != nullptr; block = next ) {
 		next = block->next;
 
-		if ( block->IsBaseBlock() && block->node != NULL && ( next == NULL || next->IsBaseBlock() ) ) {
+		if ( block->IsBaseBlock() && block->node != nullptr && ( next == nullptr || next->IsBaseBlock() ) ) {
 			UnlinkFreeInternal( block );
 			if ( block->prev ) {
 				block->prev->next = block->next;
@@ -503,10 +503,10 @@ void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::FreeEmptyBaseBlock
 				lastBlock = block->prev;
 			}
 			if ( lockMemory ) {
-				arcLibrary::sys->UnlockMemory( block, block->GetSize() + ( int )sizeof( ARCDynamicBlock<type> ) );
+				anLibrary::sys->UnlockMemory( block, block->GetSize() + ( int )sizeof( anDynamicAlloc<type> ) );
 			}
 			numBaseBlocks--;
-			baseBlockMemory -= block->GetSize() + ( int )sizeof( ARCDynamicBlock<type> );
+			baseBlockMemory -= block->GetSize() + ( int )sizeof( anDynamicAlloc<type> );
 			Mem_Free16( block );
 		}
 	}
@@ -517,13 +517,13 @@ void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::FreeEmptyBaseBlock
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-int arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::GetNumEmptyBaseBlocks( void ) const {
+int anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::GetNumEmptyBaseBlocks( void ) const {
 	int numEmptyBaseBlocks;
-	ARCDynamicBlock<type> *block;
+	anDynamicAlloc<type> *block;
 
 	numEmptyBaseBlocks = 0;
-	for ( block = firstBlock; block != NULL; block = block->next ) {
-		if ( block->IsBaseBlock() && block->node != NULL && ( block->next == NULL || block->next->IsBaseBlock() ) ) {
+	for ( block = firstBlock; block != nullptr; block = block->next ) {
+		if ( block->IsBaseBlock() && block->node != nullptr && ( block->next == nullptr || block->next->IsBaseBlock() ) ) {
 			numEmptyBaseBlocks++;
 		}
 	}
@@ -531,22 +531,22 @@ int arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::GetNumEmptyBaseBloc
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-type *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Alloc( const int num ) {
-	ARCDynamicBlock<type> *block;
+type *anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Alloc( const int num ) {
+	anDynamicAlloc<type> *block;
 
 	numAllocs++;
 
 	if ( num <= 0 ) {
-		return NULL;
+		return nullptr;
 	}
 
 	block = AllocInternal( num );
-	if ( block == NULL ) {
-		return NULL;
+	if ( block == nullptr ) {
+		return nullptr;
 	}
 	block = ResizeInternal( block, num );
-	if ( block == NULL ) {
-		return NULL;
+	if ( block == nullptr ) {
+		return nullptr;
 	}
 
 #ifdef DYNAMIC_BLOCK_ALLOC_CHECK
@@ -560,26 +560,26 @@ type *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Alloc( const int 
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-type *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Resize( type *ptr, const int num ) {
+type *anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Resize( type *ptr, const int num ) {
 
 	numResizes++;
 
-	if ( ptr == NULL ) {
+	if ( ptr == nullptr ) {
 		return Alloc( num );
 	}
 
 	if ( num <= 0 ) {
 		Free( ptr );
-		return NULL;
+		return nullptr;
 	}
 
-	ARCDynamicBlock<type> *block = ( ARCDynamicBlock<type> * ) ( ( ( byte * ) ptr ) - ( int )sizeof( ARCDynamicBlock<type> ) );
+	anDynamicAlloc<type> *block = ( anDynamicAlloc<type> * ) ( ( (byte *) ptr ) - ( int )sizeof( anDynamicAlloc<type> ) );
 
 	usedBlockMemory -= block->GetSize();
 
 	block = ResizeInternal( block, num );
-	if ( block == NULL ) {
-		return NULL;
+	if ( block == nullptr ) {
+		return nullptr;
 	}
 
 #ifdef DYNAMIC_BLOCK_ALLOC_CHECK
@@ -592,15 +592,14 @@ type *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Resize( type *ptr
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Free( type *ptr ) {
-
+void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Free( type *ptr ) {
 	numFrees++;
 
-	if ( ptr == NULL ) {
+	if ( ptr == nullptr ) {
 		return;
 	}
 
-	ARCDynamicBlock<type> *block = ( ARCDynamicBlock<type> * ) ( ( ( byte * ) ptr ) - ( int )sizeof( ARCDynamicBlock<type> ) );
+	anDynamicAlloc<type> *block = ( anDynamicAlloc<type> * ) ( ( (byte *) ptr ) - ( int )sizeof( anDynamicAlloc<type> ) );
 
 	numUsedBlocks--;
 	usedBlockMemory -= block->GetSize();
@@ -613,16 +612,16 @@ void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Free( type *ptr ) 
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-const char *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::CheckMemory( const type *ptr ) const {
-	ARCDynamicBlock<type> *block;
+const char *anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::CheckMemory( const type *ptr ) const {
+	anDynamicAlloc<type> *block;
 
-	if ( ptr == NULL ) {
-		return NULL;
+	if ( ptr == nullptr ) {
+		return nullptr;
 	}
 
-	block = ( ARCDynamicBlock<type> * ) ( ( ( byte * ) ptr ) - ( int )sizeof( ARCDynamicBlock<type> ) );
+	block = ( anDynamicAlloc<type> * ) ( ( (byte *) ptr ) - ( int )sizeof( anDynamicAlloc<type> ) );
 
-	if ( block->node != NULL ) {
+	if ( block->node != nullptr ) {
 		return "memory has been freed";
 	}
 
@@ -636,25 +635,25 @@ const char *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::CheckMemory
 #endif
 
 	/* base blocks can be larger than baseBlockSize which can cause this code to fail
-	ARCDynamicBlock<type> *base;
-	for ( base = firstBlock; base != NULL; base = base->next ) {
+	anDynamicAlloc<type> *base;
+	for ( base = firstBlock; base != nullptr; base = base->next ) {
 		if ( base->IsBaseBlock() ) {
 			if ( ( ( int )block) >= ( ( int )base) && ( ( int )block) < ( ( int )base) + baseBlockSize ) {
 				break;
 			}
 		}
 	}
-	if ( base == NULL ) {
+	if ( base == nullptr ) {
 		return "no base block found for memory";
 	}
 	*/
 
-	return NULL;
+	return nullptr;
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Clear( void ) {
-	firstBlock = lastBlock = NULL;
+void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Clear( void ) {
+	firstBlock = lastBlock = nullptr;
 	allowAllocs = true;
 	lockMemory = false;
 	numBaseBlocks = 0;
@@ -675,25 +674,25 @@ void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::Clear( void ) {
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-ARCDynamicBlock<type> *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::AllocInternal( const int num ) {
-	ARCDynamicBlock<type> *block;
+anDynamicAlloc<type> *anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::AllocInternal( const int num ) {
+	anDynamicAlloc<type> *block;
 	int alignedBytes = ( num * sizeof( type ) + 15 ) & ~15;
 
 	block = freeTree.FindSmallestLargerEqual( alignedBytes );
-	if ( block != NULL ) {
+	if ( block != nullptr ) {
 		UnlinkFreeInternal( block );
 	} else if ( allowAllocs ) {
-		int allocSize = Max( baseBlockSize, alignedBytes + ( int )sizeof( ARCDynamicBlock<type> ) );
-		block = ( ARCDynamicBlock<type> * ) Mem_Alloc16( allocSize );
+		int allocSize = Max( baseBlockSize, alignedBytes + ( int )sizeof( anDynamicAlloc<type> ) );
+		block = ( anDynamicAlloc<type> * ) Mem_Alloc16( allocSize );
 		if ( lockMemory ) {
-			arcLibrary::sys->LockMemory( block, baseBlockSize );
+			anLibrary::sys->LockMemory( block, baseBlockSize );
 		}
 #ifdef DYNAMIC_BLOCK_ALLOC_CHECK
 		memcpy( block->id, blockId, sizeof( block->id ) );
 		block->allocator = (void*)this;
 #endif
-		block->SetSize( allocSize - ( int )sizeof( ARCDynamicBlock<type> ), true );
-		block->next = NULL;
+		block->SetSize( allocSize - ( int )sizeof( anDynamicAlloc<type> ), true );
+		block->next = nullptr;
 		block->prev = lastBlock;
 		if ( lastBlock ) {
 			lastBlock->next = block;
@@ -701,7 +700,7 @@ ARCDynamicBlock<type> *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::
 			firstBlock = block;
 		}
 		lastBlock = block;
-		block->node = NULL;
+		block->node = nullptr;
 
 		numBaseBlocks++;
 		baseBlockMemory += allocSize;
@@ -711,7 +710,7 @@ ARCDynamicBlock<type> *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-ARCDynamicBlock<type> *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::ResizeInternal( ARCDynamicBlock<type> *block, const int num ) {
+anDynamicAlloc<type> *anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::ResizeInternal( anDynamicAlloc<type> *block, const int num ) {
 	int alignedBytes = ( num * sizeof( type ) + 15 ) & ~15;
 
 #ifdef DYNAMIC_BLOCK_ALLOC_CHECK
@@ -720,15 +719,12 @@ ARCDynamicBlock<type> *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::
 
 	// if the new size is larger
 	if ( alignedBytes > block->GetSize() ) {
-
-		ARCDynamicBlock<type> *nextBlock = block->next;
-
+		anDynamicAlloc<type> *nextBlock = block->next;
 		// try to annexate the next block if it's free
-		if ( nextBlock && !nextBlock->IsBaseBlock() && nextBlock->node != NULL &&
-				block->GetSize() + ( int )sizeof( ARCDynamicBlock<type> ) + nextBlock->GetSize() >= alignedBytes ) {
-
+		if ( nextBlock && !nextBlock->IsBaseBlock() && nextBlock->node != nullptr &&
+				block->GetSize() + ( int )sizeof( anDynamicAlloc<type> ) + nextBlock->GetSize() >= alignedBytes ) {
 			UnlinkFreeInternal( nextBlock );
-			block->SetSize( block->GetSize() + ( int )sizeof( ARCDynamicBlock<type> ) + nextBlock->GetSize(), block->IsBaseBlock() );
+			block->SetSize( block->GetSize() + ( int )sizeof( anDynamicAlloc<type> ) + nextBlock->GetSize(), block->IsBaseBlock() );
 			block->next = nextBlock->next;
 			if ( nextBlock->next ) {
 				nextBlock->next->prev = block;
@@ -737,10 +733,10 @@ ARCDynamicBlock<type> *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::
 			}
 		} else {
 			// allocate a new block and copy
-			ARCDynamicBlock<type> *oldBlock = block;
+			anDynamicAlloc<type> *oldBlock = block;
 			block = AllocInternal( num );
-			if ( block == NULL ) {
-				return NULL;
+			if ( block == nullptr ) {
+				return nullptr;
 			}
 			memcpy( block->GetMemory(), oldBlock->GetMemory(), oldBlock->GetSize() );
 			FreeInternal( oldBlock );
@@ -748,18 +744,18 @@ ARCDynamicBlock<type> *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::
 	}
 
 	// if the unused space at the end of this block is large enough to hold a block with at least one element
-	if ( block->GetSize() - alignedBytes - ( int )sizeof( ARCDynamicBlock<type> ) < Max( minBlockSize, ( int )sizeof( type ) ) ) {
+	if ( block->GetSize() - alignedBytes - ( int )sizeof( anDynamicAlloc<type> ) < Max( minBlockSize, ( int )sizeof( type ) ) ) {
 		return block;
 	}
 
-	ARCDynamicBlock<type> *newBlock;
+	anDynamicAlloc<type> *newBlock;
 
-	newBlock = ( ARCDynamicBlock<type> * ) ( ( ( byte * ) block ) + ( int )sizeof( ARCDynamicBlock<type> ) + alignedBytes );
+	newBlock = ( anDynamicAlloc<type> * ) ( ( (byte *) block ) + ( int )sizeof( anDynamicAlloc<type> ) + alignedBytes );
 #ifdef DYNAMIC_BLOCK_ALLOC_CHECK
 	memcpy( newBlock->id, blockId, sizeof( newBlock->id ) );
 	newBlock->allocator = (void*)this;
 #endif
-	newBlock->SetSize( block->GetSize() - alignedBytes - ( int )sizeof( ARCDynamicBlock<type> ), false );
+	newBlock->SetSize( block->GetSize() - alignedBytes - ( int )sizeof( anDynamicAlloc<type> ), false );
 	newBlock->next = block->next;
 	newBlock->prev = block;
 	if ( newBlock->next ) {
@@ -767,7 +763,7 @@ ARCDynamicBlock<type> *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::
 	} else {
 		lastBlock = newBlock;
 	}
-	newBlock->node = NULL;
+	newBlock->node = nullptr;
 	block->next = newBlock;
 	block->SetSize( alignedBytes, block->IsBaseBlock() );
 
@@ -777,19 +773,17 @@ ARCDynamicBlock<type> *arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::FreeInternal( ARCDynamicBlock<type> *block ) {
-
-	assert( block->node == NULL );
-
+void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::FreeInternal( anDynamicAlloc<type> *block ) {
+	assert( block->node == nullptr );
 #ifdef DYNAMIC_BLOCK_ALLOC_CHECK
 	assert( block->id[0] == 0x11111111 && block->id[1] == 0x22222222 && block->id[2] == 0x33333333 && block->allocator == (void*)this );
 #endif
 
 	// try to merge with a next free block
-	ARCDynamicBlock<type> *nextBlock = block->next;
-	if ( nextBlock && !nextBlock->IsBaseBlock() && nextBlock->node != NULL ) {
+	anDynamicAlloc<type> *nextBlock = block->next;
+	if ( nextBlock && !nextBlock->IsBaseBlock() && nextBlock->node != nullptr ) {
 		UnlinkFreeInternal( nextBlock );
-		block->SetSize( block->GetSize() + ( int )sizeof( ARCDynamicBlock<type> ) + nextBlock->GetSize(), block->IsBaseBlock() );
+		block->SetSize( block->GetSize() + ( int )sizeof( anDynamicAlloc<type> ) + nextBlock->GetSize(), block->IsBaseBlock() );
 		block->next = nextBlock->next;
 		if ( nextBlock->next ) {
 			nextBlock->next->prev = block;
@@ -799,10 +793,10 @@ void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::FreeInternal( ARCD
 	}
 
 	// try to merge with a previous free block
-	ARCDynamicBlock<type> *prevBlock = block->prev;
-	if ( prevBlock && !block->IsBaseBlock() && prevBlock->node != NULL ) {
+	anDynamicAlloc<type> *prevBlock = block->prev;
+	if ( prevBlock && !block->IsBaseBlock() && prevBlock->node != nullptr ) {
 		UnlinkFreeInternal( prevBlock );
-		prevBlock->SetSize( prevBlock->GetSize() + ( int )sizeof( ARCDynamicBlock<type> ) + block->GetSize(), prevBlock->IsBaseBlock() );
+		prevBlock->SetSize( prevBlock->GetSize() + ( int )sizeof( anDynamicAlloc<type> ) + block->GetSize(), prevBlock->IsBaseBlock() );
 		prevBlock->next = block->next;
 		if ( block->next ) {
 			block->next->prev = prevBlock;
@@ -816,32 +810,32 @@ void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::FreeInternal( ARCD
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-ARC_INLINE void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::LinkFreeInternal( ARCDynamicBlock<type> *block ) {
+ARC_INLINE void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::LinkFreeInternal( anDynamicAlloc<type> *block ) {
 	block->node = freeTree.Add( block, block->GetSize() );
 	numFreeBlocks++;
 	freeBlockMemory += block->GetSize();
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-ARC_INLINE void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::UnlinkFreeInternal( ARCDynamicBlock<type> *block ) {
+ARC_INLINE void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::UnlinkFreeInternal( anDynamicAlloc<type> *block ) {
 	freeTree.Remove( block->node );
-	block->node = NULL;
+	block->node = nullptr;
 	numFreeBlocks--;
 	freeBlockMemory -= block->GetSize();
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-void arcDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::CheckMemory( void ) const {
-	ARCDynamicBlock<type> *block;
+void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::CheckMemory( void ) const {
+	anDynamicAlloc<type> *block;
 
-	for ( block = firstBlock; block != NULL; block = block->next ) {
+	for ( block = firstBlock; block != nullptr; block = block->next ) {
 		// make sure the block is properly linked
-		if ( block->prev == NULL ) {
+		if ( block->prev == nullptr ) {
 			assert( firstBlock == block );
 		} else {
 			assert( block->prev->next == block );
 		}
-		if ( block->next == NULL ) {
+		if ( block->next == nullptr ) {
 			assert( lastBlock == block );
 		} else {
 			assert( block->next->prev == block );

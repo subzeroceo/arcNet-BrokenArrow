@@ -36,7 +36,7 @@ If you have questions concerning this license or the applicable additional terms
 * Structure used associate a material name with a tree item.
 */
 typedef struct {
-	arcNetString		materialName;
+	anString		materialName;
 	HTREEITEM	treeItem;
 } MaterialTreeItem_t;
 
@@ -48,8 +48,8 @@ class MaterialTreeView : public CTreeView, public MaterialView {
 public:
 	virtual			~MaterialTreeView();
 
-	void			InitializeMaterialList(bool includeFile = true, const char* filename = NULL);
-	void			BuildMaterialList(bool includeFile = true, const char* filename = NULL);
+	void			InitializeMaterialList(bool includeFile = true, const char* filename = nullptr );
+	void			BuildMaterialList(bool includeFile = true, const char* filename = nullptr );
 
 	//Material Interface
 	virtual void	MV_OnMaterialChange(MaterialDoc* pMaterial);
@@ -66,7 +66,7 @@ public:
 	bool			CanDelete();
 	bool			CanRename();
 	bool			CanSaveFile();
-	arcNetString			GetSaveFilename();
+	anString			GetSaveFilename();
 
 	bool			FindNextMaterial(MaterialSearchData_t* searchData);
 	HTREEITEM		FindNextMaterial(HTREEITEM item, MaterialSearchData_t* searchData);
@@ -132,10 +132,10 @@ protected:
 
 	//Utility methods
 	void			RenameMaterial(HTREEITEM item, const char* originalName);
-	bool			GetFileName(HTREEITEM item, arcNetString& out);
-	arcNetString			GetMediaPath(HTREEITEM item, DWORD type);
-	void			GetMaterialPaths(HTREEITEM item, arcNetList<MaterialTreeItem_t>* list);
-	void			AddStrList(const char *root, arcStringList *list, bool includeFile);
+	bool			GetFileName(HTREEITEM item, anString& out);
+	anString			GetMediaPath(HTREEITEM item, DWORD type);
+	void			GetMaterialPaths(HTREEITEM item, anList<MaterialTreeItem_t>* list);
+	void			AddStrList(const char *root, anStringList *list, bool includeFile);
 	void			PopupMenu(CPoint* pt);
 	void			SetItemImage(HTREEITEM item, bool mod, bool apply, bool children);
 
@@ -143,7 +143,7 @@ protected:
 	//Methods for working with the quicktree
 	void			CleanLookupTrees(HTREEITEM item);
 	void			BuildLookupTrees(HTREEITEM item);
-	arcNetString			GetQuicktreePath(HTREEITEM item);
+	anString			GetQuicktreePath(HTREEITEM item);
 
 
 protected:
@@ -151,14 +151,14 @@ protected:
 	bool					treeWithFile;
 
 	//Hashtables for quick lookups
-	arcHashTable<HTREEITEM>	quickTree;
-	arcHashTable<HTREEITEM>	materialToTree;
-	arcHashTable<HTREEITEM>	fileToTree;
+	anHashTable<HTREEITEM>	quickTree;
+	anHashTable<HTREEITEM>	materialToTree;
+	anHashTable<HTREEITEM>	fileToTree;
 
 
 	//Member variables for renaming folders
 	HTREEITEM				renamedFolder;
-	arcNetList<MaterialTreeItem_t> affectedMaterials;
+	anList<MaterialTreeItem_t> affectedMaterials;
 
 	CImageList*				dragImage;
 	bool					bDragging;

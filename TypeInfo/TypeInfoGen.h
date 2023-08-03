@@ -13,76 +13,76 @@
 ===================================================================================
 */
 
-class arcConstantInfo {
+class anConstantInfo {
 public:
-	arcNetString						name;
-	arcNetString						type;
-	arcNetString						value;
+	anString					name;
+	anString					type;
+	anString					value;
 };
 
-class arcEnumValueInfo {
+class anEnumValueInfo {
 public:
-	arcNetString						name;
+	anString					name;
 	int							value;
 };
 
-class arcEnumTypeInfo {
+class anEnumTypeInfo {
 public:
-	arcNetString						typeName;
-	arcNetString						scope;
+	anString					typeName;
+	anString					scope;
 	bool						unnamed;
 	bool						isTemplate;
-	arcNetList<arcEnumValueInfo>		values;
+	anList<anEnumValueInfo>		values;
 };
 
-class arcClassVariableInfo {
+class anClassVariableInfo {
 public:
-	arcNetString						name;
-	arcNetString						type;
+	anString					name;
+	anString					type;
 	int							bits;
 };
 
-class arcClassTypeInfo {
+class anClassTypeInfo {
 public:
-	arcNetString						typeName;
-	arcNetString						superType;
-	arcNetString						scope;
+	anString					typeName;
+	anString					superType;
+	anString					scope;
 	bool						unnamed;
 	bool						isTemplate;
-	arcNetList<arcClassVariableInfo>	variables;
+	anList<anClassVariableInfo>	variables;
 };
 
-class ARCInfoGen {
+class anInfoGen {
 public:
-								ARCInfoGen( void );
-								~ARCInfoGen( void );
+								anInfoGen( void );
+								~anInfoGen( void );
 
 	void						AddDefine( const char *define );
 	void						CreateTypeInfo( const char *path );
 	void						WriteTypeInfo( const char *fileName ) const;
 
 private:
-	arcStringList				defines;
+	anStringList				defines;
 
-	arcNetList<arcConstantInfo *>	constants;
-	arcNetList<arcEnumTypeInfo *>	enums;
-	arcNetList<arcClassTypeInfo *>	classes;
+	anList<anConstantInfo *>	constants;
+	anList<anEnumTypeInfo *>	enums;
+	anList<anClassTypeInfo *>	classes;
 
 	int							numTemplates;
 	int							maxInheritance;
-	arcNetString					maxInheritanceClass;
+	anString					maxInheritanceClass;
 
 	int							GetInheritance( const char *typeName ) const;
-	int							EvaluateIntegerString( const arcNetString &string );
-	float						EvaluateFloatString( const arcNetString &string );
-	arcConstantInfo *			FindConstant( const char *name );
-	int							GetIntegerConstant( const char *scope, const char *name, ARCParser &src );
-	float						GetFloatConstant( const char *scope, const char *name, ARCParser &src );
-	int							ParseArraySize( const char *scope, ARCParser &src );
-	void						ParseConstantValue( const char *scope, ARCParser &src, arcNetString &value );
-	arcEnumTypeInfo *			ParseEnumType( const char *scope, bool isTemplate, bool typeDef, ARCParser &src );
-	arcClassTypeInfo *			ParseClassType( const char *scope, const char *templateArgs, bool isTemplate, bool typeDef, ARCParser &src );
-	void						ParseScope( const char *scope, bool isTemplate, ARCParser &src, arcClassTypeInfo *typeInfo );
+	int							EvaluateIntegerString( const anString &string );
+	float						EvaluateFloatString( const anString &string );
+	anConstantInfo *			FindConstant( const char *name );
+	int							GetIntegerConstant( const char *scope, const char *name, anParser &src );
+	float						GetFloatConstant( const char *scope, const char *name, anParser &src );
+	int							ParseArraySize( const char *scope, anParser &src );
+	void						ParseConstantValue( const char *scope, anParser &src, anString &value );
+	anEnumTypeInfo *			ParseEnumType( const char *scope, bool isTemplate, bool typeDef, anParser &src );
+	anClassTypeInfo *			ParseClassType( const char *scope, const char *templateArgs, bool isTemplate, bool typeDef, anParser &src );
+	void						ParseScope( const char *scope, bool isTemplate, anParser &src, anClassTypeInfo *typeInfo );
 };
 
 #endif // !__TYPEINFOGEN_H__

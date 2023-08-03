@@ -41,7 +41,7 @@ class CNewProjDlg : public CDialog
 {
 // Construction
 public:
-	CNewProjDlg(CWnd* pParent = NULL);   // standard constructor
+	CNewProjDlg(CWnd* pParent = nullptr );   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CNewProjDlg)

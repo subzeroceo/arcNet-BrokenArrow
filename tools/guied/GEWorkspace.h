@@ -43,9 +43,9 @@ class rvGEClipboardItem
 {
 public:
 
-	arcDictionary	mStateDict;
-	arcDictionary	mScriptDict;
-	arcDictionary	mVarDict;
+	anDict	mStateDict;
+	anDict	mScriptDict;
+	anDict	mVarDict;
 };
 
 class rvGEWorkspace
@@ -84,7 +84,7 @@ public:
 	};
 
 	rvGEWorkspace ( rvGEApp* app );
-	~rvGEWorkspace ( );
+	~rvGEWorkspace();
 
 	// Attach the workspace to a win32 window
 	bool					Attach					( HWND wnd );
@@ -93,7 +93,7 @@ public:
 	void					Detach					( void );
 
 	bool					NewFile					( void );
-	bool					LoadFile				( const char* filename, arcNetString* error = NULL );
+	bool					LoadFile				( const char* filename, anString* error = nullptr );
 	bool					SaveFile				( const char* filename );
 	const char*				GetFilename				( void );
 
@@ -134,13 +134,13 @@ public:
 	rvGEModifierStack&			GetModifierStack		( void );
 	idUserInterfaceLocal*		GetInterface			( void );
 	rvGESelectionMgr&			GetSelectionMgr			( void );
-	arcNetList<rvGEClipboardItem*>	GetClipboard			( void );
+	anList<rvGEClipboardItem*>	GetClipboard			( void );
 	HWND						GetWindow				( void );
 
 	void					HandleMessage			( UINT msg, WPARAM wParam, LPARAM lParam );
 
-	arcVec2&					WindowToWorkspace		( arcVec2& point );
-	arcVec2&					WorkspaceToWindow		( arcVec2& point );
+	anVec2&					WindowToWorkspace		( anVec2& point );
+	anVec2&					WorkspaceToWindow		( anVec2& point );
 	idRectangle&			WindowToWorkspace		( idRectangle& rect );
 	idRectangle&			WorkspaceToWindow		( idRectangle& rect );
 
@@ -180,8 +180,8 @@ protected:
 	void					RenderGrid			( void );
 
 	// File related methods
-	void					WriteTabs			( arcNetFile* file, int depth );
-	bool					WriteWindow			( arcNetFile* file, int depth, idWindow* window );
+	void					WriteTabs			( anFile* file, int depth );
+	bool					WriteWindow			( anFile* file, int depth, idWindow* window );
 
 	// Message handlers
 	int						HandleRButtonDown	( WPARAM wParam, LPARAM lParam );
@@ -202,7 +202,7 @@ protected:
 	void					UpdateCursor		( float x, float y );
 	void					UpdateCursor		( rvGESelectionMgr::EHitTest type );
 	void					UpdateTitle			( void );
-	idWindow*				NewWindow			( arcDictionary* state, rvGEWindowWrapper::EWindowType type );
+	idWindow*				NewWindow			( anDict* state, rvGEWindowWrapper::EWindowType type );
 	void					Scroll				( int scrollbar, int offset );
 
 	// Modifier methods
@@ -226,13 +226,13 @@ protected:
 	int							mWindowWidth;
 	int							mWindowHeight;
 
-	arcNetString						mFilename;
+	anString						mFilename;
 
 	rvGEModifierStack			mModifiers;
 	rvGESelectionMgr			mSelections;
 
 	rvGESelectionMgr::EHitTest	mDragType;
-	arcVec2						mDragPoint;
+	anVec2						mDragPoint;
 	int							mDragTime;
 	bool						mDragX;
 	bool						mDragY;
@@ -240,9 +240,9 @@ protected:
 
 	rvGEApp*					mApplication;
 
-	static arcNetList<rvGEClipboardItem*>	mClipboard;
-	arcNetList<idWindow*>					mSelectMenu;
-	arcVec2								mSelectMenuPos;
+	static anList<rvGEClipboardItem*>	mClipboard;
+	anList<idWindow*>					mSelectMenu;
+	anVec2								mSelectMenuPos;
 
 private:
 
@@ -297,7 +297,7 @@ ARC_INLINE rvGESelectionMgr& rvGEWorkspace::GetSelectionMgr ( void )
 
 ARC_INLINE void rvGEWorkspace::ShowHidden ( void )
 {
-	AddModifierShowAll ( );
+	AddModifierShowAll();
 }
 
 ARC_INLINE void rvGEWorkspace::AddModifierMoveNudge ( float x, float y, bool snap )
@@ -325,7 +325,7 @@ ARC_INLINE HWND rvGEWorkspace::GetWindow ( void )
 	return mWnd;
 }
 
-ARC_INLINE arcNetList<rvGEClipboardItem*> rvGEWorkspace::GetClipboard ( void )
+ARC_INLINE anList<rvGEClipboardItem*> rvGEWorkspace::GetClipboard ( void )
 {
 	return mClipboard;
 }

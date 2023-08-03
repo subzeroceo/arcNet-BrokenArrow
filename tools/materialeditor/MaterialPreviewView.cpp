@@ -1,9 +1,8 @@
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../radiant/QE3.H"
 #include "MaterialPreviewView.h"
-
 
 // MaterialPreviewView
 IMPLEMENT_DYNCREATE(MaterialPreviewView, CView)
@@ -21,14 +20,11 @@ BEGIN_MESSAGE_MAP(MaterialPreviewView, CView)
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
-
 // MaterialPreviewView drawing
-
 void MaterialPreviewView::OnDraw(CDC* pDC) {
 }
 
 // MaterialPreviewView diagnostics
-
 #ifdef _DEBUG
 void MaterialPreviewView::AssertValid() const {
 	CView::AssertValid();
@@ -42,9 +38,9 @@ void MaterialPreviewView::Dump(CDumpContext& dc) const {
 // MaterialPreviewView message handlers
 
 int MaterialPreviewView::OnCreate(LPCREATESTRUCT lpCreateStruct) {
-	if (CView::OnCreate(lpCreateStruct) == -1 )
+	if ( CView::OnCreate(lpCreateStruct) == -1 ) {
 		return -1;
-
+	}
 	DWORD dwStyle;
 	CRect rc;
 
@@ -54,10 +50,10 @@ int MaterialPreviewView::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	GetClientRect(rc);
 
 	// Initialize the rendered window and material
-	renderWindow.Create( NULL, "renderWindow", dwStyle, rc, this, 1010 );
+	renderWindow.Create( nullptr, "renderWindow", dwStyle, rc, this, 1010 );
 
 	renderWindow.setDrawable( &renderedView );
-	renderWindow.SetWindowPos(NULL, 0, 0, rc.Width(), rc.Height(), SWP_SHOWWINDOW);
+	renderWindow.SetWindowPos(nullptr, 0, 0, rc.Width(), rc.Height(), SWP_SHOWWINDOW);
 
 	return 0;
 }
@@ -67,7 +63,7 @@ void MaterialPreviewView::OnSize(UINT nType, int cx, int cy) {
 	CView::OnSize( nType, cx, cy );
 	GetClientRect( rc );
 
-	renderWindow.SetWindowPos(NULL, 0, 0, rc.Width(), rc.Height(), SWP_SHOWWINDOW);
+	renderWindow.SetWindowPos(nullptr, 0, 0, rc.Width(), rc.Height(), SWP_SHOWWINDOW);
 	renderWindow.Invalidate();
 	renderWindow.RedrawWindow();
 }
@@ -90,11 +86,11 @@ void MaterialPreviewView::OnGlobalParmChange( int parmNum, float value ) {
 	renderedView.setGlobalParm( parmNum, value );
 }
 
-void MaterialPreviewView::OnLightShaderChange( int lightId, arcNetString shaderName ) {
+void MaterialPreviewView::OnLightShaderChange( int lightId, anString shaderName ) {
 	renderedView.setLightShader( lightId, shaderName );
 }
 
-void MaterialPreviewView::OnLightColorChange( int lightId, arcVec3 &color ) {
+void MaterialPreviewView::OnLightColorChange( int lightId, anVec3 &color ) {
 	renderedView.setLightColor( lightId, color );
 }
 
@@ -118,7 +114,7 @@ void MaterialPreviewView::OnModelChange( int modelId ) {
 	renderedView.setObject( modelId );
 }
 
-void MaterialPreviewView::OnCustomModelChange( arcNetString modelName ) {
+void MaterialPreviewView::OnCustomModelChange( anString modelName ) {
 	renderedView.setCustomModel( modelName );
 }
 
@@ -130,7 +126,7 @@ extern bool Sys_KeyDown( int key);
 extern float fDiff(float f1, float f2);
 
 idGLDrawableView::idGLDrawableView() {
-	material = NULL;
+	material = nullptr;
 	modelDefHandle = -1;
 
 	objectId = 0;
@@ -141,8 +137,8 @@ idGLDrawableView::idGLDrawableView() {
 	viewRotation.Set( 0.f, 0.f, 0.f );
 	viewDistance = -196.f;
 
-	world = NULL;
-	worldModel = NULL;
+	world = nullptr;
+	worldModel = nullptr;
 
 	ResetView();
 }
@@ -153,7 +149,7 @@ idGLDrawableView::~idGLDrawableView() {
 }
 
 void idGLDrawableView::ResetView( void ) {
-	arcDictionary spawnArgs;
+	anDict spawnArgs;
 
 	InitWorld();
 
@@ -187,12 +183,12 @@ void idGLDrawableView::ResetView( void ) {
 }
 
 void idGLDrawableView::InitWorld() {
-	if ( world == NULL && worldModel == NULL ) {
+	if ( world == nullptr && worldModel == nullptr ) {
 		world = renderSystem->AllocRenderWorld();
 		worldModel = renderModelManager->AllocModel();
 	}
 
-	world->InitFromMap( NULL );
+	world->InitFromMap( nullptr );
 	worldModel->InitEmpty( "GLWorldModel" );
 
 	viewLights.Clear();
@@ -236,15 +232,15 @@ void idGLDrawableView::mouseMove( float x, float y ) {
 				viewRotation.yaw += -(xo * sensitivity);
 				viewRotation.pitch += (yo * sensitivity);
 
-				viewRotation.pitch = arcMath::ClampFloat( -89.9f, 89.9f, viewRotation.pitch );
+				viewRotation.pitch = anMath::ClampFloat( -89.9f, 89.9f, viewRotation.pitch );
 			}
 
 		// Right mouse button moves lights in the view plane
 		} else if (button == MK_RBUTTON) {
 			int		i;
 			float	lightMovement = 0;
-			arcVec3	lightForward, lightRight, lightUp;
-			arcVec3	lightMove;
+			anVec3	lightForward, lightRight, lightUp;
+			anVec3	lightMove;
 
 			lightMove.Zero();
 			viewRotation.ToVectors( &lightForward, &lightRight, &lightUp );
@@ -255,7 +251,7 @@ void idGLDrawableView::mouseMove( float x, float y ) {
 					lightMovement = -( y - pressY ) * sensitivity;
 					pressY = y;
 
-					lightMovement = arcMath::ClampFloat( -32.f, 32.f, lightMovement );
+					lightMovement = anMath::ClampFloat( -32.f, 32.f, lightMovement );
 					lightMove = lightForward * lightMovement;
 				}
 			} else {
@@ -263,14 +259,14 @@ void idGLDrawableView::mouseMove( float x, float y ) {
 					lightMovement = (x - pressX) * sensitivity;
 					pressX = x;
 
-					lightMovement = arcMath::ClampFloat( -32.f, 32.f, lightMovement );
+					lightMovement = anMath::ClampFloat( -32.f, 32.f, lightMovement );
 					lightMove = lightRight * lightMovement;
 				}
 				if (y != pressY) {
 					lightMovement = -(y - pressY) * sensitivity;
 					pressY = y;
 
-					lightMovement = arcMath::ClampFloat( -32.f, 32.f, lightMovement );
+					lightMovement = anMath::ClampFloat( -32.f, 32.f, lightMovement );
 					lightMove += lightUp * lightMovement;
 				}
 			}
@@ -302,9 +298,9 @@ void idGLDrawableView::mouseMove( float x, float y ) {
 
 void idGLDrawableView::addLight( void ) {
 	int				lightId;
-	arcNetString		str;
+	anString		str;
 	lightInfo_t		viewLight;
-	arcDictionary	spawnArgs;
+	anDict	spawnArgs;
 
 	lightId = viewLights.Num();
 
@@ -333,14 +329,13 @@ void idGLDrawableView::addLight( void ) {
 void idGLDrawableView::deleteLight( const int lightId ) {
 	if ( lightId < viewLights.Num() ) {
 		world->FreeLightDef( viewLights[lightId].lightDefHandle );
-
 		viewLights.RemoveIndex( lightId );
 	}
 }
 
 void idGLDrawableView::UpdateCamera( renderView_t *refdef ) {
-	arcVec3		pos, dir;
-	arcAngles	angs;
+	anVec3		pos, dir;
+	anAngles	angs;
 
 	// Set the camera origin
 	pos = viewRotation.ToForward();
@@ -355,7 +350,7 @@ void idGLDrawableView::UpdateCamera( renderView_t *refdef ) {
 
 
 void idGLDrawableView::UpdateModel( void ) {
-	switch( objectId ) {
+	switch ( objectId ) {
 		case 0:
 			worldModel = renderModelManager->FindModel( "models/materialeditor/cube128.ase" );
 			break;
@@ -415,26 +410,25 @@ void idGLDrawableView::UpdateLights( void ) {
 }
 
 void idGLDrawableView::drawLights( renderView_t *refdef ) {
-	for ( int i=0; i < viewLights.Num(); i++ ) {
+	for ( int i = 0; i < viewLights.Num(); i++ ) {
 		lightInfo_t	*vLight = &viewLights[i];
 
-		arcVec4 lColor;
+		anVec4 lColor;
 		lColor.x = vLight->color.x;
 		lColor.y = vLight->color.y;
 		lColor.z = vLight->color.z;
 		lColor.w = 1.f;
 
-		ARCSphere sphere(vLight->renderLight.origin, 4);
+		anSphere sphere(vLight->renderLight.origin, 4);
 		session->rw->DebugSphere( lColor, sphere, 0, true );
-		session->rw->DrawText( va( "%d", i+1 ), vLight->renderLight.origin + arcVec3(0,0,5), 0.25f, arcVec4( 1,1,0,1 ), refdef->viewAxis, 1, 0, true );
+		session->rw->DrawText( va( "%d", i+1 ), vLight->renderLight.origin + anVec3(0,0,5), 0.25f, anVec4( 1,1,0,1 ), refdef->viewAxis, 1, 0, true );
 	}
 }
-
 
 void idGLDrawableView::draw( int x, int y, int w, int h) {
 	int i;
 	renderView_t	refdef;
-	const arcMaterial		*mat = material;
+	const anMaterial		*mat = material;
 
 	if ( mat ) {
 		qglViewport( x, y, w, h );
@@ -460,7 +454,7 @@ void idGLDrawableView::draw( int x, int y, int w, int h) {
 		refdef.width = SCREEN_WIDTH;
 		refdef.height = SCREEN_HEIGHT;
 		refdef.fov_x = 90;
-		refdef.fov_y = 2 * atan( ( float )h / w ) * arcMath::M_RAD2DEG;
+		refdef.fov_y = 2 * atan( ( float )h / w ) * anMath::M_RAD2DEG;
 
 		refdef.time = eventLoop->Milliseconds();
 
@@ -470,7 +464,7 @@ void idGLDrawableView::draw( int x, int y, int w, int h) {
 			drawLights( &refdef );
 		}
 
-		renderSystem->EndFrame( NULL, NULL );
+		renderSystem->EndFrame( nullptr, nullptr );
 
 		world->DebugClearLines( refdef.time );
 
@@ -489,7 +483,7 @@ void idGLDrawableView::setMedia(const char *name) {
 	if (name && *name) {
 		material = declManager->FindMaterial( name );
 	} else {
-		material = NULL;
+		material = nullptr;
 	}
 
 	if ( material->GetNumStages() == 0 ) {
@@ -534,13 +528,13 @@ void idGLDrawableView::setGlobalParm( int parmNum, float value ) {
 	globalParms[ parmNum ] = value;
 }
 
-void idGLDrawableView::setLightShader( const int lightId, const arcNetString shaderName ) {
+void idGLDrawableView::setLightShader( const int lightId, const anString shaderName ) {
 	if ( lightId < viewLights.Num() ) {
 		viewLights[ lightId ].shader = declManager->FindMaterial( shaderName, false );
 	}
 }
 
-void idGLDrawableView::setLightColor( const int lightId, const arcVec3 &value ) {
+void idGLDrawableView::setLightColor( const int lightId, const anVec3 &value ) {
 	if ( lightId < viewLights.Num() ) {
 		// Update this lights color
 		viewLights[ lightId ].color = value;
@@ -564,7 +558,7 @@ void idGLDrawableView::setObject( int Id ) {
 	UpdateModel();
 }
 
-void idGLDrawableView::setCustomModel( const arcNetString modelName ) {
+void idGLDrawableView::setCustomModel( const anString modelName ) {
 	if ( modelName.Length() ) {
 		objectId = -1;
 	} else {
@@ -579,4 +573,3 @@ void idGLDrawableView::setCustomModel( const arcNetString modelName ) {
 void idGLDrawableView::setShowLights( bool _showLights ) {
 	showLights = _showLights;
 }
-

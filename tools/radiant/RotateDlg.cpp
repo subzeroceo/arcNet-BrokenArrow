@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -43,7 +43,7 @@ static char THIS_FILE[] = __FILE__;
 // CRotateDlg dialog
 
 
-CRotateDlg::CRotateDlg(CWnd* pParent /*=NULL*/)
+CRotateDlg::CRotateDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CRotateDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CRotateDlg)

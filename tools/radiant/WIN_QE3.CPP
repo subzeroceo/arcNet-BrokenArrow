@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -17,7 +17,7 @@ int		update_bits;
  =======================================================================================================================
  */
 void Sys_MarkMapModified( void ) {
-	arcNetString title;
+	anString title;
 
 	if (mapModified != 1 ) {
 		mapModified = 1;	// mark the map as changed
@@ -44,17 +44,17 @@ void Sys_SetTitle(const char *text) {
 HCURSOR waitcursor;
 
 void Sys_BeginWait( void ) {
-	waitcursor = SetCursor(LoadCursor(NULL, IDC_WAIT) );
+	waitcursor = SetCursor(LoadCursor(nullptr, IDC_WAIT) );
 }
 
 bool Sys_Waiting() {
-	return (waitcursor != NULL);
+	return (waitcursor != nullptr );
 }
 
 void Sys_EndWait( void ) {
 	if (waitcursor) {
 		SetCursor(waitcursor);
-		waitcursor = NULL;
+		waitcursor = nullptr;
 	}
 }
 
@@ -129,7 +129,7 @@ int WINAPI QEW_SetupPixelFormat(HDC hDC, bool zbuffer) {
 
 	int pixelFormat = ChoosePixelFormat(hDC, &win32.pfd);
 	if (pixelFormat > 0 ) {
-		if (SetPixelFormat(hDC, pixelFormat, &win32.pfd) == NULL) {
+		if (SetPixelFormat(hDC, pixelFormat, &win32.pfd) == nullptr ) {
 			Error( "SetPixelFormat failed." );
 		}
 	} else {

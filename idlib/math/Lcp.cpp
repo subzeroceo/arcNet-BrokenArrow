@@ -1,7 +1,7 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
-static arcCVarSystem lcp_showFailures( "lcp_showFailures", "0", CVAR_SYSTEM | CVAR_BOOL, "show LCP solver failures" );
+static anCVarSystem lcp_showFailures( "lcp_showFailures", "0", CVAR_SYSTEM | CVAR_BOOL, "show LCP solver failures" );
 
 const float LCP_BOUND_EPSILON			= 1e-5f;
 const float LCP_ACCEL_EPSILON			= 1e-5f;
@@ -12,22 +12,22 @@ const float LCP_DELTA_FORCE_EPSILON		= 1e-9f;
 
 //===============================================================
 //                                                        M
-//  aRcLCPSquared                                         MrE
+//  anLCPSquared                                         MrE
 //                                                        E
 //===============================================================
 
-class aRcLCPSquared : public aRcLCP {
+class anLCPSquared : public anLCP {
 public:
-	virtual bool	Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b, const arcVecX &o_lo, const arcVecX &o_hi, const int *o_boxIndex );
+	virtual bool	Solve( const anMatX &o_m, anVecX &o_x, const anVecX &o_b, const anVecX &o_lo, const anVecX &o_hi, const int *o_boxIndex );
 
 private:
-	arcMatX		m;					// original matrix
-	arcVecX		b;					// right hand side
-	arcVecX		lo, hi;				// low and high bounds
-	arcVecX		f, a;				// force and acceleration
-	arcVecX		delta_f, delta_a;	// delta force and delta acceleration
-	arcMatX		clamped;			// LU factored sub matrix for clamped variables
-	arcVecX		diagonal;			// reciprocal of diagonal of U of the LU factored sub matrix for clamped variables
+	anMatX		m;					// original matrix
+	anVecX		b;					// right hand side
+	anVecX		lo, hi;				// low and high bounds
+	anVecX		f, a;				// force and acceleration
+	anVecX		delta_f, delta_a;	// delta force and delta acceleration
+	anMatX		clamped;			// LU factored sub matrix for clamped variables
+	anVecX		diagonal;			// reciprocal of diagonal of U of the LU factored sub matrix for clamped variables
 	int				numUnbounded;		// number of unbounded variables
 	int				numClamped;			// number of clamped variables
 	float **		rowPtrs;			// pointers to the rows of m
@@ -38,7 +38,7 @@ private:
 
 private:
 	bool			FactorClamped( void );
-	void			SolveClamped( arcVecX &x, const float *b );
+	void			SolveClamped( anVecX &x, const float *b );
 	void			Swap( int i, int j );
 	void			AddClamped( int r );
 	void			RemoveClamped( int r );
@@ -51,16 +51,16 @@ private:
 
 /*
 ============
-aRcLCPSquared::FactorClamped
+anLCPSquared::FactorClamped
 ============
 */
-bool aRcLCPSquared::FactorClamped( void ) {
+bool anLCPSquared::FactorClamped( void ) {
 	for ( int i = 0; i < numClamped; i++ ) {
 		memcpy( clamped[i], rowPtrs[i], numClamped * sizeof( float ) );
 	}
 
 	for ( int i = 0; i < numClamped; i++ ) {
-		float s = arcMath::Fabs( clamped[i][i] );
+		float s = anMath::Fabs( clamped[i][i] );
 		if ( s == 0.0f ) {
 			return false;
 		}
@@ -83,10 +83,10 @@ bool aRcLCPSquared::FactorClamped( void ) {
 
 /*
 ============
-aRcLCPSquared::SolveClamped
+anLCPSquared::SolveClamped
 ============
 */
-void aRcLCPSquared::SolveClamped( arcVecX &x, const float *b ) {
+void anLCPSquared::SolveClamped( anVecX &x, const float *b ) {
 	// solve L
 	for ( int i = 0; i < numClamped; i++ ) {
 		float sum = b[i];
@@ -108,15 +108,15 @@ void aRcLCPSquared::SolveClamped( arcVecX &x, const float *b ) {
 
 /*
 ============
-aRcLCPSquared::Swap
+anLCPSquared::Swap
 ============
 */
-void aRcLCPSquared::Swap( int i, int j ) {
+void anLCPSquared::Swap( int i, int j ) {
 	if ( i == j ) {
 		return;
 	}
 
-	idSwap( rowPtrs[i], rowPtrs[j] );
+	anSwap( rowPtrs[i], rowPtrs[j] );
 	m.SwapColumns( i, j );
 	b.SwapElements( i, j );
 	lo.SwapElements( i, j );
@@ -124,18 +124,18 @@ void aRcLCPSquared::Swap( int i, int j ) {
 	a.SwapElements( i, j );
 	f.SwapElements( i, j );
 	if ( boxIndex ) {
-		idSwap( boxIndex[i], boxIndex[j] );
+		anSwap( boxIndex[i], boxIndex[j] );
 	}
-	idSwap( side[i], side[j] );
-	idSwap( permuted[i], permuted[j] );
+	anSwap( side[i], side[j] );
+	anSwap( permuted[i], permuted[j] );
 }
 
 /*
 ============
-aRcLCPSquared::AddClamped
+anLCPSquared::AddClamped
 ============
 */
-void aRcLCPSquared::AddClamped( int r ) {
+void anLCPSquared::AddClamped( int r ) {
 	assert( r >= numClamped );
 
 	// add a row at the bottom and a column at the right of the factored
@@ -168,10 +168,10 @@ void aRcLCPSquared::AddClamped( int r ) {
 
 /*
 ============
-aRcLCPSquared::RemoveClamped
+anLCPSquared::RemoveClamped
 ============
 */
-void aRcLCPSquared::RemoveClamped( int r ) {
+void anLCPSquared::RemoveClamped( int r ) {
 	assert( r < numClamped );
 
 	numClamped--;
@@ -238,7 +238,7 @@ void aRcLCPSquared::RemoveClamped( int r ) {
 		diag += p0 * p1;
 
 		if ( double diag == 0.0f ) {
-			arcLibrary::common->Printf( "aRcLCPSquared::RemoveClamped: updating factorization failed\n" );
+			anLibrary::common->Printf( "anLCPSquared::RemoveClamped: updating factorization failed\n" );
 			return;
 		}
 
@@ -249,7 +249,7 @@ void aRcLCPSquared::RemoveClamped( int r ) {
 		diag += q0 * q1;
 
 		if ( diag == 0.0f ) {
-			arcLibrary::common->Printf( "aRcLCPSquared::RemoveClamped: updating factorization failed\n" );
+			anLibrary::common->Printf( "anLCPSquared::RemoveClamped: updating factorization failed\n" );
 			return;
 		}
 
@@ -288,12 +288,12 @@ void aRcLCPSquared::RemoveClamped( int r ) {
 
 /*
 ============
-aRcLCPSquared::CalcForceDelta
+anLCPSquared::CalcForceDelta
 
   modifies this->delta_f
 ============
 */
-ARC_INLINE void aRcLCPSquared::CalcForceDelta( int d, float dir ) {
+ARC_INLINE void anLCPSquared::CalcForceDelta( int d, float dir ) {
 	delta_f[d] = dir;
 
 	if ( numClamped == 0 ) {
@@ -320,12 +320,12 @@ ARC_INLINE void aRcLCPSquared::CalcForceDelta( int d, float dir ) {
 
 /*
 ============
-aRcLCPSquared::CalcAccelDelta
+anLCPSquared::CalcAccelDelta
 
   modifies this->delta_a and uses this->delta_f
 ============
 */
-ARC_INLINE void aRcLCPSquared::CalcAccelDelta( int d ) {
+ARC_INLINE void anLCPSquared::CalcAccelDelta( int d ) {
 	float dot;
 
 	// only the not clamped variables, including the current variable, can have a change in acceleration
@@ -338,12 +338,12 @@ ARC_INLINE void aRcLCPSquared::CalcAccelDelta( int d ) {
 
 /*
 ============
-aRcLCPSquared::ChangeForce
+anLCPSquared::ChangeForce
 
   modifies this->f and uses this->delta_f
 ============
 */
-ARC_INLINE void aRcLCPSquared::ChangeForce( int d, float step ) {
+ARC_INLINE void anLCPSquared::ChangeForce( int d, float step ) {
 	// only the clamped variables and current variable have a force delta unequal zero
 	SIMDProcessor->MulAdd( f.ToFloatPtr(), step, delta_f.ToFloatPtr(), numClamped );
 	f[d] += step * delta_f[d];
@@ -351,24 +351,24 @@ ARC_INLINE void aRcLCPSquared::ChangeForce( int d, float step ) {
 
 /*
 ============
-aRcLCPSquared::ChangeAccel
+anLCPSquared::ChangeAccel
 
   modifies this->a and uses this->delta_a
 ============
 */
-ARC_INLINE void aRcLCPSquared::ChangeAccel( int d, float step ) {
+ARC_INLINE void anLCPSquared::ChangeAccel( int d, float step ) {
 	// only the not clamped variables, including the current variable, can have an acceleration unequal zero
 	SIMDProcessor->MulAdd( a.ToFloatPtr() + numClamped, step, delta_a.ToFloatPtr() + numClamped, d - numClamped + 1 );
 }
 
 /*
 ============
-aRcLCPSquared::GetMaxStep
+anLCPSquared::GetMaxStep
 ============
 */
-void aRcLCPSquared::GetMaxStep( int d, float dir, float &maxStep, int &limit, int &limitSide ) const {
+void anLCPSquared::GetMaxStep( int d, float dir, float &maxStep, int &limit, int &limitSide ) const {
 	// default to a full step for the current variable
-	if ( arcMath::Fabs( delta_a[d] ) > LCP_DELTA_ACCEL_EPSILON ) {
+	if ( anMath::Fabs( delta_a[d] ) > LCP_DELTA_ACCEL_EPSILON ) {
 		maxStep = -a[d] / delta_a[d];
 	} else {
 		maxStep = 0.0f;
@@ -378,7 +378,7 @@ void aRcLCPSquared::GetMaxStep( int d, float dir, float &maxStep, int &limit, in
 
 	// test the current variable
 	if ( dir < 0.0f ) {
-		if ( lo[d] != -arcMath::INFINITY ) {
+		if ( lo[d] != -anMath::INFINITY ) {
 			float s = ( lo[d] - f[d] ) / dir;
 			if ( s < maxStep ) {
 				maxStep = s;
@@ -386,7 +386,7 @@ void aRcLCPSquared::GetMaxStep( int d, float dir, float &maxStep, int &limit, in
 			}
 		}
 	} else {
-		if ( hi[d] != arcMath::INFINITY ) {
+		if ( hi[d] != anMath::INFINITY ) {
 			float s = ( hi[d] - f[d] ) / dir;
 			if ( s < maxStep ) {
 				maxStep = s;
@@ -399,7 +399,7 @@ void aRcLCPSquared::GetMaxStep( int d, float dir, float &maxStep, int &limit, in
 	for ( int  i = numUnbounded; i < numClamped; i++ ) {
 		if ( delta_f[i] < -LCP_DELTA_FORCE_EPSILON ) {
 			// if there is a low boundary
-			if ( lo[i] != -arcMath::INFINITY ) {
+			if ( lo[i] != -anMath::INFINITY ) {
 				float s = ( lo[i] - f[i] ) / delta_f[i];
 				if ( s < maxStep ) {
 					maxStep = s;
@@ -409,7 +409,7 @@ void aRcLCPSquared::GetMaxStep( int d, float dir, float &maxStep, int &limit, in
 			}
 		} else if ( delta_f[i] > LCP_DELTA_FORCE_EPSILON ) {
 			// if there is a high boundary
-			if ( hi[i] != arcMath::INFINITY ) {
+			if ( hi[i] != anMath::INFINITY ) {
 				float s = ( hi[i] - f[i] ) / delta_f[i];
 				if ( s < maxStep ) {
 					maxStep = s;
@@ -448,10 +448,10 @@ void aRcLCPSquared::GetMaxStep( int d, float dir, float &maxStep, int &limit, in
 
 /*
 ============
-aRcLCPSquared::Solve
+anLCPSquared::Solve
 ============
 */
-bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b, const arcVecX &o_lo, const arcVecX &o_hi, const int *o_boxIndex ) {
+bool anLCPSquared::Solve( const anMatX &o_m, anVecX &o_x, const anVecX &o_b, const anVecX &o_lo, const anVecX &o_hi, const int *o_boxIndex ) {
 	int i, j, n, limit, limitSide, boxStartIndex;
 	float dir, maxStep, dot, s;
 	char *failed;
@@ -472,10 +472,10 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 	lo.SetData( o_lo.GetSize(), VECX_ALLOCA( o_lo.GetSize() ) );
 	hi.SetData( o_hi.GetSize(), VECX_ALLOCA( o_hi.GetSize() ) );
 	if ( o_boxIndex ) {
-		boxIndex = ( int * )_alloca16( o_x.GetSize() * sizeof( int ) );
+		boxIndex = ( int*)_alloca16( o_x.GetSize() * sizeof( int ) );
 		memcpy( boxIndex, o_boxIndex, o_x.GetSize() * sizeof( int ) );
 	} else {
-		boxIndex = NULL;
+		boxIndex = nullptr;
 	}
 
 	// we override the const on o_m here but on exit the matrix is unchanged
@@ -493,10 +493,10 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 	}
 
 	// tells if a variable is at the low boundary, high boundary or inbetween
-	side = ( int * ) _alloca16( m.GetNumRows() * sizeof( int ) );
+	side = ( int*) _alloca16( m.GetNumRows() * sizeof( int ) );
 
 	// index to keep track of the permutation
-	permuted = ( int * ) _alloca16( m.GetNumRows() * sizeof( int ) );
+	permuted = ( int*) _alloca16( m.GetNumRows() * sizeof( int ) );
 	for ( i = 0; i < m.GetNumRows(); i++ ) {
 		permuted[i] = i;
 	}
@@ -504,7 +504,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 	// permute input so all unbounded variables come first
 	numUnbounded = 0;
 	for ( i = 0; i < m.GetNumRows(); i++ ) {
-		if ( lo[i] == -arcMath::INFINITY && hi[i] == arcMath::INFINITY ) {
+		if ( lo[i] == -anMath::INFINITY && hi[i] == anMath::INFINITY ) {
 			if ( numUnbounded != i ) {
 				Swap( numUnbounded, i );
 			}
@@ -516,7 +516,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 	boxStartIndex = m.GetNumRows();
 	if ( boxIndex ) {
 		for ( i = m.GetNumRows() - 1; i >= numUnbounded; i-- ) {
-			if ( boxIndex[i] >= 0 && ( lo[i] != -arcMath::INFINITY || hi[i] != arcMath::INFINITY ) ) {
+			if ( boxIndex[i] >= 0 && ( lo[i] != -anMath::INFINITY || hi[i] != anMath::INFINITY ) ) {
 				boxStartIndex--;
 				if ( boxStartIndex != i ) {
 					Swap( boxStartIndex, i );
@@ -536,7 +536,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 	if ( numUnbounded ) {
 		// factor and solve for unbounded variables
 		if ( !FactorClamped() ) {
-			arcLibrary::common->Printf( "aRcLCPSquared::Solve: unbounded factorization failed\n" );
+			anLibrary::common->Printf( "anLCPSquared::Solve: unbounded factorization failed\n" );
 			return false;
 		}
 		SolveClamped( f, b.ToFloatPtr() );
@@ -557,7 +557,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 	delta_a.SetData( m.GetNumRows(), VECX_ALLOCA( m.GetNumRows() ) );
 
 	// solve for bounded variables
-	failed = NULL;
+	failed = nullptr;
 	for ( i = numUnbounded; i < m.GetNumRows(); i++ ) {
 
 		// once we hit the box start index we can initialize the low and high boundaries of the variables using the box index
@@ -567,11 +567,11 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 			}
 			for ( j = boxStartIndex; j < m.GetNumRows(); j++ ) {
 				s = o_x[boxIndex[j]];
-				if ( lo[j] != -arcMath::INFINITY ) {
-					lo[j] = - arcMath::Fabs( lo[j] * s );
+				if ( lo[j] != -anMath::INFINITY ) {
+					lo[j] = - anMath::Fabs( lo[j] * s );
 				}
-				if ( hi[j] != arcMath::INFINITY ) {
-					hi[j] = arcMath::Fabs( hi[j] * s );
+				if ( hi[j] != anMath::INFINITY ) {
+					hi[j] = anMath::Fabs( hi[j] * s );
 				}
 			}
 		}
@@ -593,7 +593,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 		}
 
 		// if inside the clamped region
-		if ( arcMath::Fabs( a[i] ) <= LCP_ACCEL_EPSILON ) {
+		if ( anMath::Fabs( a[i] ) <= LCP_ACCEL_EPSILON ) {
 			side[i] = 0;
 			AddClamped( i );
 			continue;
@@ -638,7 +638,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 
 			// clamp/unclamp the variable that limited this step
 			side[limit] = limitSide;
-			switch( limitSide ) {
+			switch ( limitSide ) {
 				case 0: {
 					a[limit] = 0.0f;
 					AddClamped( limit );
@@ -679,7 +679,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 #ifdef IGNORE_UNSATISFIABLE_VARIABLES
 	if ( numIgnored ) {
 		if ( lcp_showFailures.GetBool() ) {
-			arcLibrary::common->Printf( "aRcLCP_Symmetry::Solve: %d of %d bounded variables ignored\n", numIgnored, m.GetNumRows() - numUnbounded );
+			anLibrary::common->Printf( "anLCP_Symmetry::Solve: %d of %d bounded variables ignored\n", numIgnored, m.GetNumRows() - numUnbounded );
 		}
 	}
 #endif
@@ -687,7 +687,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 	// if failed clear remaining forces
 	if ( failed ) {
 		if ( lcp_showFailures.GetBool() ) {
-			arcLibrary::common->Printf( "aRcLCPSquared::Solve: %s (%d of %d bounded variables ignored)\n", failed, m.GetNumRows() - i, m.GetNumRows() - numUnbounded );
+			anLibrary::common->Printf( "anLCPSquared::Solve: %s (%d of %d bounded variables ignored)\n", failed, m.GetNumRows() - i, m.GetNumRows() - numUnbounded );
 		}
 		for ( j = i; j < m.GetNumRows(); j++ ) {
 			f[j] = 0.0f;
@@ -711,7 +711,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 				if ( lo[i] != hi[i] && a[i] > LCP_ACCEL_EPSILON ) {
 					int bah2 = 1;
 				}
-			} else if ( f[i] < lo[i] || f[i] > hi[i] || arcMath::Fabs( a[i] ) > 1.0f ) {
+			} else if ( f[i] < lo[i] || f[i] > hi[i] || anMath::Fabs( a[i] ) > 1.0f ) {
 				int bah3 = 1;
 			}
 		}
@@ -732,7 +732,7 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 		}
 		if ( i != j ) {
 			m.SwapColumns( i, j );
-			idSwap( permuted[i], permuted[j] );
+			anSwap( permuted[i], permuted[j] );
 		}
 	}
 
@@ -741,24 +741,24 @@ bool aRcLCPSquared::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b,
 
 //===============================================================
 //                                                        M
-//  aRcLCP_Symmetry                                      MrE
+//  anLCP_Symmetry                                      MrE
 //                                                        E
 //===============================================================
 
-class aRcLCP_Symmetry : public aRcLCP {
+class anLCP_Symmetry : public anLCP {
 public:
-	virtual bool	Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b, const arcVecX &o_lo, const arcVecX &o_hi, const int *o_boxIndex );
+	virtual bool	Solve( const anMatX &o_m, anVecX &o_x, const anVecX &o_b, const anVecX &o_lo, const anVecX &o_hi, const int *o_boxIndex );
 
 private:
-	arcMatX		m;					// original matrix
-	arcVecX		b;					// right hand side
-	arcVecX		lo, hi;				// low and high bounds
-	arcVecX		f, a;				// force and acceleration
-	arcVecX		delta_f, delta_a;	// delta force and delta acceleration
-	arcMatX		clamped;			// LDLt factored sub matrix for clamped variables
-	arcVecX		diagonal;			// reciprocal of diagonal of LDLt factored sub matrix for clamped variables
-	arcVecX		solveCache1;		// intermediate result cached in SolveClamped
-	arcVecX		solveCache2;		// "
+	anMatX		m;					// original matrix
+	anVecX		b;					// right hand side
+	anVecX		lo, hi;				// low and high bounds
+	anVecX		f, a;				// force and acceleration
+	anVecX		delta_f, delta_a;	// delta force and delta acceleration
+	anMatX		clamped;			// LDLt factored sub matrix for clamped variables
+	anVecX		diagonal;			// reciprocal of diagonal of LDLt factored sub matrix for clamped variables
+	anVecX		solveCache1;		// intermediate result cached in SolveClamped
+	anVecX		solveCache2;		// "
 	int				numUnbounded;		// number of unbounded variables
 	int				numClamped;			// number of clamped variables
 	int				clampedChangeStart;	// lowest row/column changed in the clamped matrix during an iteration
@@ -770,7 +770,7 @@ private:
 
 private:
 	bool			FactorClamped( void );
-	void			SolveClamped( arcVecX &x, const float *b );
+	void			SolveClamped( anVecX &x, const float *b );
 	void			Swap( int i, int j );
 	void			AddClamped( int r, bool useSolveCache );
 	void			RemoveClamped( int r );
@@ -783,10 +783,10 @@ private:
 
 /*
 ============
-aRcLCP_Symmetry::FactorClamped
+anLCP_Symmetry::FactorClamped
 ============
 */
-bool aRcLCP_Symmetry::FactorClamped( void ) {
+bool anLCP_Symmetry::FactorClamped( void ) {
 	clampedChangeStart = 0;
 
 	for ( int i = 0; i < numClamped; i++ ) {
@@ -797,10 +797,10 @@ bool aRcLCP_Symmetry::FactorClamped( void ) {
 
 /*
 ============
-aRcLCP_Symmetry::SolveClamped
+anLCP_Symmetry::SolveClamped
 ============
 */
-void aRcLCP_Symmetry::SolveClamped( arcVecX &x, const float *b ) {
+void anLCP_Symmetry::SolveClamped( anVecX &x, const float *b ) {
 	// solve L
 	SIMDProcessor->MatX_LowerTriangularSolve( clamped, solveCache1.ToFloatPtr(), b, numClamped, clampedChangeStart );
 
@@ -815,15 +815,15 @@ void aRcLCP_Symmetry::SolveClamped( arcVecX &x, const float *b ) {
 
 /*
 ============
-aRcLCP_Symmetry::Swap
+anLCP_Symmetry::Swap
 ============
 */
-void aRcLCP_Symmetry::Swap( int i, int j ) {
+void anLCP_Symmetry::Swap( int i, int j ) {
 	if ( i == j ) {
 		return;
 	}
 
-	idSwap( rowPtrs[i], rowPtrs[j] );
+	anSwap( rowPtrs[i], rowPtrs[j] );
 	m.SwapColumns( i, j );
 	b.SwapElements( i, j );
 	lo.SwapElements( i, j );
@@ -831,18 +831,18 @@ void aRcLCP_Symmetry::Swap( int i, int j ) {
 	a.SwapElements( i, j );
 	f.SwapElements( i, j );
 	if ( boxIndex ) {
-		idSwap( boxIndex[i], boxIndex[j] );
+		anSwap( boxIndex[i], boxIndex[j] );
 	}
-	idSwap( side[i], side[j] );
-	idSwap( permuted[i], permuted[j] );
+	anSwap( side[i], side[j] );
+	anSwap( permuted[i], permuted[j] );
 }
 
 /*
 ============
-aRcLCP_Symmetry::AddClamped
+anLCP_Symmetry::AddClamped
 ============
 */
-void aRcLCP_Symmetry::AddClamped( int r, bool useSolveCache ) {
+void anLCP_Symmetry::AddClamped( int r, bool useSolveCache ) {
 	float d, dot;
 
 	assert( r >= numClamped );
@@ -876,7 +876,7 @@ void aRcLCP_Symmetry::AddClamped( int r, bool useSolveCache ) {
 	d = rowPtrs[numClamped][numClamped] - dot;
 
 	if ( d == 0.0f ) {
-		arcLibrary::common->Printf( "aRcLCP_Symmetry::AddClamped: updating factorization failed\n" );
+		anLibrary::common->Printf( "anLCP_Symmetry::AddClamped: updating factorization failed\n" );
 		numClamped++;
 		return;
 	}
@@ -889,10 +889,10 @@ void aRcLCP_Symmetry::AddClamped( int r, bool useSolveCache ) {
 
 /*
 ============
-aRcLCP_Symmetry::RemoveClamped
+anLCP_Symmetry::RemoveClamped
 ============
 */
-void aRcLCP_Symmetry::RemoveClamped( int r ) {
+void anLCP_Symmetry::RemoveClamped( int r ) {
 	int i, j, n;
 	float *addSub, *original, *v, *ptr, *v1, *v2, dot;
 	double sum, diag, newDiag, invNewDiag, p1, p2, alpha1, alpha2, beta1, beta2;
@@ -920,7 +920,7 @@ void aRcLCP_Symmetry::RemoveClamped( int r ) {
 		if ( numClamped == 1 ) {
 			diag = rowPtrs[0][0];
 			if ( diag == 0.0f ) {
-				arcLibrary::common->Printf( "aRcLCP_Symmetry::RemoveClamped: updating factorization failed\n" );
+				anLibrary::common->Printf( "anLCP_Symmetry::RemoveClamped: updating factorization failed\n" );
 				return;
 			}
 			clamped[0][0] = diag;
@@ -950,7 +950,7 @@ void aRcLCP_Symmetry::RemoveClamped( int r ) {
 			SIMDProcessor->Dot( dot, clamped[r], v, r );
 			diag = rowPtrs[r][r] - dot;
 			if ( diag == 0.0f ) {
-				arcLibrary::common->Printf( "aRcLCP_Symmetry::RemoveClamped: updating factorization failed\n" );
+				anLibrary::common->Printf( "anLCP_Symmetry::RemoveClamped: updating factorization failed\n" );
 				return;
 			}
 			clamped[r][r] = diag;
@@ -981,7 +981,7 @@ void aRcLCP_Symmetry::RemoveClamped( int r ) {
 	v1 = (float *) _alloca16( numClamped * sizeof( float ) );
 	v2 = (float *) _alloca16( numClamped * sizeof( float ) );
 
-	diag = arcMath::SQRT_1OVER2;
+	diag = anMath::SQRT_1OVER2;
 	v1[r] = ( 0.5f * addSub[r] + 1.0f ) * diag;
 	v2[r] = ( 0.5f * addSub[r] - 1.0f ) * diag;
 	for ( i = r+1; i < numClamped; i++ ) {
@@ -998,7 +998,7 @@ void aRcLCP_Symmetry::RemoveClamped( int r ) {
 		p1 = v1[i];
 		newDiag = diag + alpha1 * p1 * p1;
 		if ( newDiag == 0.0f ) {
-			arcLibrary::common->Printf( "aRcLCP_Symmetry::RemoveClamped: updating factorization failed\n" );
+			anLibrary::common->Printf( "anLCP_Symmetry::RemoveClamped: updating factorization failed\n" );
 			return;
 		}
 
@@ -1011,7 +1011,7 @@ void aRcLCP_Symmetry::RemoveClamped( int r ) {
 		newDiag = diag + alpha2 * p2 * p2;
 
 		if ( newDiag == 0.0f ) {
-			arcLibrary::common->Printf( "aRcLCP_Symmetry::RemoveClamped: updating factorization failed\n" );
+			anLibrary::common->Printf( "anLCP_Symmetry::RemoveClamped: updating factorization failed\n" );
 			return;
 		}
 
@@ -1060,12 +1060,12 @@ void aRcLCP_Symmetry::RemoveClamped( int r ) {
 
 /*
 ============
-aRcLCP_Symmetry::CalcForceDelta
+anLCP_Symmetry::CalcForceDelta
 
   modifies this->delta_f
 ============
 */
-ARC_INLINE void aRcLCP_Symmetry::CalcForceDelta( int d, float dir ) {
+ARC_INLINE void anLCP_Symmetry::CalcForceDelta( int d, float dir ) {
 	int i;
 	float *ptr;
 
@@ -1089,12 +1089,12 @@ ARC_INLINE void aRcLCP_Symmetry::CalcForceDelta( int d, float dir ) {
 
 /*
 ============
-aRcLCP_Symmetry::CalcAccelDelta
+anLCP_Symmetry::CalcAccelDelta
 
   modifies this->delta_a and uses this->delta_f
 ============
 */
-ARC_INLINE void aRcLCP_Symmetry::CalcAccelDelta( int d ) {
+ARC_INLINE void anLCP_Symmetry::CalcAccelDelta( int d ) {
 	int j;
 	float dot;
 
@@ -1108,12 +1108,12 @@ ARC_INLINE void aRcLCP_Symmetry::CalcAccelDelta( int d ) {
 
 /*
 ============
-aRcLCP_Symmetry::ChangeForce
+anLCP_Symmetry::ChangeForce
 
   modifies this->f and uses this->delta_f
 ============
 */
-ARC_INLINE void aRcLCP_Symmetry::ChangeForce( int d, float step ) {
+ARC_INLINE void anLCP_Symmetry::ChangeForce( int d, float step ) {
 	// only the clamped variables and current variable have a force delta unequal zero
 	SIMDProcessor->MulAdd( f.ToFloatPtr(), step, delta_f.ToFloatPtr(), numClamped );
 	f[d] += step * delta_f[d];
@@ -1121,27 +1121,27 @@ ARC_INLINE void aRcLCP_Symmetry::ChangeForce( int d, float step ) {
 
 /*
 ============
-aRcLCP_Symmetry::ChangeAccel
+anLCP_Symmetry::ChangeAccel
 
   modifies this->a and uses this->delta_a
 ============
 */
-ARC_INLINE void aRcLCP_Symmetry::ChangeAccel( int d, float step ) {
+ARC_INLINE void anLCP_Symmetry::ChangeAccel( int d, float step ) {
 	// only the not clamped variables, including the current variable, can have an acceleration unequal zero
 	SIMDProcessor->MulAdd( a.ToFloatPtr() + numClamped, step, delta_a.ToFloatPtr() + numClamped, d - numClamped + 1 );
 }
 
 /*
 ============
-aRcLCP_Symmetry::GetMaxStep
+anLCP_Symmetry::GetMaxStep
 ============
 */
-void aRcLCP_Symmetry::GetMaxStep( int d, float dir, float &maxStep, int &limit, int &limitSide ) const {
+void anLCP_Symmetry::GetMaxStep( int d, float dir, float &maxStep, int &limit, int &limitSide ) const {
 	int i;
 	float s;
 
 	// default to a full step for the current variable
-	if ( arcMath::Fabs( delta_a[d] ) > LCP_DELTA_ACCEL_EPSILON ) {
+	if ( anMath::Fabs( delta_a[d] ) > LCP_DELTA_ACCEL_EPSILON ) {
 		maxStep = -a[d] / delta_a[d];
 	} else {
 		maxStep = 0.0f;
@@ -1151,7 +1151,7 @@ void aRcLCP_Symmetry::GetMaxStep( int d, float dir, float &maxStep, int &limit, 
 
 	// test the current variable
 	if ( dir < 0.0f ) {
-		if ( lo[d] != -arcMath::INFINITY ) {
+		if ( lo[d] != -anMath::INFINITY ) {
 			s = ( lo[d] - f[d] ) / dir;
 			if ( s < maxStep ) {
 				maxStep = s;
@@ -1159,7 +1159,7 @@ void aRcLCP_Symmetry::GetMaxStep( int d, float dir, float &maxStep, int &limit, 
 			}
 		}
 	} else {
-		if ( hi[d] != arcMath::INFINITY ) {
+		if ( hi[d] != anMath::INFINITY ) {
 			s = ( hi[d] - f[d] ) / dir;
 			if ( s < maxStep ) {
 				maxStep = s;
@@ -1172,7 +1172,7 @@ void aRcLCP_Symmetry::GetMaxStep( int d, float dir, float &maxStep, int &limit, 
 	for ( i = numUnbounded; i < numClamped; i++ ) {
 		if ( delta_f[i] < -LCP_DELTA_FORCE_EPSILON ) {
 			// if there is a low boundary
-			if ( lo[i] != -arcMath::INFINITY ) {
+			if ( lo[i] != -anMath::INFINITY ) {
 				s = ( lo[i] - f[i] ) / delta_f[i];
 				if ( s < maxStep ) {
 					maxStep = s;
@@ -1182,7 +1182,7 @@ void aRcLCP_Symmetry::GetMaxStep( int d, float dir, float &maxStep, int &limit, 
 			}
 		} else if ( delta_f[i] > LCP_DELTA_FORCE_EPSILON ) {
 			// if there is a high boundary
-			if ( hi[i] != arcMath::INFINITY ) {
+			if ( hi[i] != anMath::INFINITY ) {
 				s = ( hi[i] - f[i] ) / delta_f[i];
 				if ( s < maxStep ) {
 					maxStep = s;
@@ -1221,10 +1221,10 @@ void aRcLCP_Symmetry::GetMaxStep( int d, float dir, float &maxStep, int &limit, 
 
 /*
 ============
-aRcLCP_Symmetry::Solve
+anLCP_Symmetry::Solve
 ============
 */
-bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_b, const arcVecX &o_lo, const arcVecX &o_hi, const int *o_boxIndex ) {
+bool anLCP_Symmetry::Solve( const anMatX &o_m, anVecX &o_x, const anVecX &o_b, const anVecX &o_lo, const anVecX &o_hi, const int *o_boxIndex ) {
 	int i, j, n, limit, limitSide, boxStartIndex;
 	float dir, maxStep, dot, s;
 	char *failed;
@@ -1245,10 +1245,10 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 	lo.SetData( o_lo.GetSize(), VECX_ALLOCA( o_lo.GetSize() ) );
 	hi.SetData( o_hi.GetSize(), VECX_ALLOCA( o_hi.GetSize() ) );
 	if ( o_boxIndex ) {
-		boxIndex = ( int * )_alloca16( o_x.GetSize() * sizeof( int ) );
+		boxIndex = ( int*)_alloca16( o_x.GetSize() * sizeof( int ) );
 		memcpy( boxIndex, o_boxIndex, o_x.GetSize() * sizeof( int ) );
 	} else {
-		boxIndex = NULL;
+		boxIndex = nullptr;
 	}
 
 	// we override the const on o_m here but on exit the matrix is unchanged
@@ -1266,10 +1266,10 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 	}
 
 	// tells if a variable is at the low boundary, high boundary or inbetween
-	side = ( int * ) _alloca16( m.GetNumRows() * sizeof( int ) );
+	side = ( int*) _alloca16( m.GetNumRows() * sizeof( int ) );
 
 	// index to keep track of the permutation
-	permuted = ( int * ) _alloca16( m.GetNumRows() * sizeof( int ) );
+	permuted = ( int*) _alloca16( m.GetNumRows() * sizeof( int ) );
 	for ( i = 0; i < m.GetNumRows(); i++ ) {
 		permuted[i] = i;
 	}
@@ -1277,7 +1277,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 	// permute input so all unbounded variables come first
 	numUnbounded = 0;
 	for ( i = 0; i < m.GetNumRows(); i++ ) {
-		if ( lo[i] == -arcMath::INFINITY && hi[i] == arcMath::INFINITY ) {
+		if ( lo[i] == -anMath::INFINITY && hi[i] == anMath::INFINITY ) {
 			if ( numUnbounded != i ) {
 				Swap( numUnbounded, i );
 			}
@@ -1289,7 +1289,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 	boxStartIndex = m.GetNumRows();
 	if ( boxIndex ) {
 		for ( i = m.GetNumRows() - 1; i >= numUnbounded; i-- ) {
-			if ( boxIndex[i] >= 0 && ( lo[i] != -arcMath::INFINITY || hi[i] != arcMath::INFINITY ) ) {
+			if ( boxIndex[i] >= 0 && ( lo[i] != -anMath::INFINITY || hi[i] != anMath::INFINITY ) ) {
 				boxStartIndex--;
 				if ( boxStartIndex != i ) {
 					Swap( boxStartIndex, i );
@@ -1311,7 +1311,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 	if ( numUnbounded ) {
 		// factor and solve for unbounded variables
 		if ( !FactorClamped() ) {
-			arcLibrary::common->Printf( "aRcLCP_Symmetry::Solve: unbounded factorization failed\n" );
+			anLibrary::common->Printf( "anLCP_Symmetry::Solve: unbounded factorization failed\n" );
 			return false;
 		}
 		SolveClamped( f, b.ToFloatPtr() );
@@ -1332,7 +1332,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 	delta_a.SetData( m.GetNumRows(), VECX_ALLOCA( m.GetNumRows() ) );
 
 	// solve for bounded variables
-	failed = NULL;
+	failed = nullptr;
 	for ( i = numUnbounded; i < m.GetNumRows(); i++ ) {
 		clampedChangeStart = 0;
 		// once we hit the box start index we can initialize the low and high boundaries of the variables using the box index
@@ -1342,11 +1342,11 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 			}
 			for ( j = boxStartIndex; j < m.GetNumRows(); j++ ) {
 				s = o_x[boxIndex[j]];
-				if ( lo[j] != -arcMath::INFINITY ) {
-					lo[j] = - arcMath::Fabs( lo[j] * s );
+				if ( lo[j] != -anMath::INFINITY ) {
+					lo[j] = - anMath::Fabs( lo[j] * s );
 				}
-				if ( hi[j] != arcMath::INFINITY ) {
-					hi[j] = arcMath::Fabs( hi[j] * s );
+				if ( hi[j] != anMath::INFINITY ) {
+					hi[j] = anMath::Fabs( hi[j] * s );
 				}
 			}
 		}
@@ -1368,7 +1368,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 		}
 
 		// if inside the clamped region
-		if ( arcMath::Fabs( a[i] ) <= LCP_ACCEL_EPSILON ) {
+		if ( anMath::Fabs( a[i] ) <= LCP_ACCEL_EPSILON ) {
 			side[i] = 0;
 			AddClamped( i, false );
 			continue;
@@ -1413,7 +1413,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 
 			// clamp/unclamp the variable that limited this step
 			side[limit] = limitSide;
-			switch( limitSide ) {
+			switch ( limitSide ) {
 				case 0: {
 					a[limit] = 0.0f;
 					AddClamped( limit, ( limit == i ) );
@@ -1454,7 +1454,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 #ifdef IGNORE_UNSATISFIABLE_VARIABLES
 	if ( numIgnored ) {
 		if ( lcp_showFailures.GetBool() ) {
-			arcLibrary::common->Printf( "aRcLCP_Symmetry::Solve: %d of %d bounded variables ignored\n", numIgnored, m.GetNumRows() - numUnbounded );
+			anLibrary::common->Printf( "anLCP_Symmetry::Solve: %d of %d bounded variables ignored\n", numIgnored, m.GetNumRows() - numUnbounded );
 		}
 	}
 #endif
@@ -1462,7 +1462,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 	// if failed clear remaining forces
 	if ( failed ) {
 		if ( lcp_showFailures.GetBool() ) {
-			arcLibrary::common->Printf( "aRcLCP_Symmetry::Solve: %s (%d of %d bounded variables ignored)\n", failed, m.GetNumRows() - i, m.GetNumRows() - numUnbounded );
+			anLibrary::common->Printf( "anLCP_Symmetry::Solve: %s (%d of %d bounded variables ignored)\n", failed, m.GetNumRows() - i, m.GetNumRows() - numUnbounded );
 		}
 		for ( j = i; j < m.GetNumRows(); j++ ) {
 			f[j] = 0.0f;
@@ -1486,7 +1486,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 				if ( lo[i] != hi[i] && a[i] > LCP_ACCEL_EPSILON ) {
 					int bah2 = 1;
 				}
-			} else if ( f[i] < lo[i] || f[i] > hi[i] || arcMath::Fabs( a[i] ) > 1.0f ) {
+			} else if ( f[i] < lo[i] || f[i] > hi[i] || anMath::Fabs( a[i] ) > 1.0f ) {
 				int bah3 = 1;
 			}
 		}
@@ -1507,7 +1507,7 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 		}
 		if ( i != j ) {
 			m.SwapColumns( i, j );
-			idSwap( permuted[i], permuted[j] );
+			anSwap( permuted[i], permuted[j] );
 		}
 	}
 
@@ -1517,54 +1517,54 @@ bool aRcLCP_Symmetry::Solve( const arcMatX &o_m, arcVecX &o_x, const arcVecX &o_
 
 //===============================================================
 //
-//	aRcLCP
+//	anLCP
 //
 //===============================================================
 
 /*
 ============
-aRcLCP::AllocSquare
+anLCP::AllocSquare
 ============
 */
-aRcLCP *aRcLCP::AllocSquare( void ) {
-	aRcLCP *lcp = new aRcLCPSquared;
+anLCP *anLCP::AllocSquare( void ) {
+	anLCP *lcp = new anLCPSquared;
 	lcp->SetMaxIterations( 32 );
 	return lcp;
 }
 
 /*
 ============
-aRcLCP::AllocSymmetric
+anLCP::AllocSymmetric
 ============
 */
-aRcLCP *aRcLCP::AllocSymmetric( void ) {
-	aRcLCP *lcp = new aRcLCP_Symmetry;
+anLCP *anLCP::AllocSymmetric( void ) {
+	anLCP *lcp = new anLCP_Symmetry;
 	lcp->SetMaxIterations( 32 );
 	return lcp;
 }
 
 /*
 ============
-aRcLCP::~aRcLCP
+anLCP::~anLCP
 ============
 */
-aRcLCP::~aRcLCP( void ) {
+anLCP::~anLCP( void ) {
 }
 
 /*
 ============
-aRcLCP::SetMaxIterations
+anLCP::SetMaxIterations
 ============
 */
-void aRcLCP::SetMaxIterations( int max ) {
+void anLCP::SetMaxIterations( int max ) {
 	maxIterations = max;
 }
 
 /*
 ============
-aRcLCP::GetMaxIterations
+anLCP::GetMaxIterations
 ============
 */
-int aRcLCP::GetMaxIterations( void ) {
+int anLCP::GetMaxIterations( void ) {
 	return maxIterations;
 }

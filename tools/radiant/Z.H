@@ -32,7 +32,7 @@ typedef struct
 {
 	int		width, height;
 
-	arcVec3	origin;			// at center of window
+	anVec3	origin;			// at center of window
 	float	scale;
 } z_t;
 

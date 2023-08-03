@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -81,7 +81,7 @@ Modifies the shaderParms on all the lights so the level
 designers can easily test different color schemes
 ====================
 */
-void R_ModulateLights_f( const arcCommandArgs &args ) {
+void R_ModulateLights_f( const anCommandArgs &args ) {
 	if ( !tr.primaryWorld ) {
 		return;
 	}
@@ -98,7 +98,7 @@ void R_ModulateLights_f( const arcCommandArgs &args ) {
 
 	int count = 0;
 	for ( i = 0; i < tr.primaryWorld->lightDefs.Num(); i++ ) {
-		ARCRenderLightsLocal	*light;
+		anRenderLightsLocal	*light;
 
 		light = tr.primaryWorld->lightDefs[i];
 		if ( light ) {
@@ -123,7 +123,7 @@ chaining them to both the area and the entityDef.
 Bumps tr.viewCount.
 ===============
 */
-void R_CreateEntityRefs( ARCRenderEntityLocal *def ) {
+void R_CreateEntityRefs( anRenderEntityLocal *def ) {
 	if ( !def->parms.hModel ) {
 		def->parms.hModel = renderModelManager->DefaultModel();
 	}
@@ -147,12 +147,12 @@ void R_CreateEntityRefs( ARCRenderEntityLocal *def ) {
 		common->Printf( "big entityRef: %f,%f\n", def->referenceBounds[1][0] - def->referenceBounds[0][0], def->referenceBounds[1][1] - def->referenceBounds[0][1] );
 	}
 
-	arcVec3 transformed[8];
+	anVec3 transformed[8];
 
 	for ( int i = 0; i < 8; i++ ) {
-		arcVec3 v[0] = def->referenceBounds[i&1][0];
-		arcVec3 v[1] = def->referenceBounds[( i>>1 )&1][1];
-		arcVec3 v[2] = def->referenceBounds[( i >> 2 )&1][2];
+		anVec3 v[0] = def->referenceBounds[i&1][0];
+		anVec3 v[1] = def->referenceBounds[( i>>1 )&1][1];
+		anVec3 v[2] = def->referenceBounds[( i >> 2 )&1][2];
 
 		R_LocalPointToGlobal( def->modelMatrix, v, transformed[i] );
 	}
@@ -162,7 +162,7 @@ void R_CreateEntityRefs( ARCRenderEntityLocal *def ) {
 	tr.viewCount++;
 
 	// push these points down the BSP tree into areas
-	def->world->PushVolumeIntoTree( def, NULL, 8, transformed );
+	def->world->PushVolumeIntoTree( def, nullptr, 8, transformed );
 }
 
 
@@ -183,14 +183,14 @@ Assumes that right and up are not normalized
 This is also called by dmap during map processing.
 =====================
 */
-void R_SetLightProject( arcPlane lightProject[4], const arcVec3 origin, const arcVec3 target, const arcVec3 rightVector, const arcVec3 upVector, const arcVec3 start, const arcVec3 stop ) {
-	arcVec4 targetGlobal;
+void R_SetLightProject( anPlane lightProject[4], const anVec3 origin, const anVec3 target, const anVec3 rightVector, const anVec3 upVector, const anVec3 start, const anVec3 stop ) {
+	anVec4 targetGlobal;
 
-	arcVec3 right = rightVector;
+	anVec3 right = rightVector;
 	float rLen = right.Normalize();
-	arcVec3 up = upVector;
+	anVec3 up = upVector;
 	float uLen = up.Normalize();
-	arcVec3 normal = up.Cross( right );
+	anVec3 normal = up.Cross( right );
 	normal.Normalize();
 
 	float dist = target * normal; //  - ( origin * normal );
@@ -228,7 +228,7 @@ void R_SetLightProject( arcPlane lightProject[4], const arcVec3 origin, const ar
 		dist = 1;
 	}
 	lightProject[3] = normal * ( 1.0f / dist );
-	arcVec4 startGlobal = start + origin;
+	anVec4 startGlobal = start + origin;
 	lightProject[3][3] = -( startGlobal * lightProject[3].Normal() );
 }
 
@@ -240,7 +240,7 @@ Creates plane equations from the light projection, positive sides
 face out of the light
 ===================
 */
-void R_SetLightFrustum( const arcPlane lightProject[4], arcPlane frustum[6] ) {
+void R_SetLightFrustum( const anPlane lightProject[4], anPlane frustum[6] ) {
 	// we want the planes of s=0, s=q, t=0, and t=q
 	frustum[0] = lightProject[0];
 	frustum[1] = lightProject[1];
@@ -268,17 +268,17 @@ void R_SetLightFrustum( const arcPlane lightProject[4], arcPlane frustum[6] ) {
 R_FreeLightDefFrustum
 ====================
 */
-void R_FreeLightDefFrustum( ARCRenderLightsLocal *ldef ) {
+void R_FreeLightDefFrustum( anRenderLightsLocal *ldef ) {
 	// free the frustum tris
 	if ( ldef->frustumTris ) {
 		R_FreeStaticTriSurf( ldef->frustumTris );
-		ldef->frustumTris = NULL;
+		ldef->frustumTris = nullptr;
 	}
 	// free frustum windings
 	for ( int i = 0; i < 6; i++ ) {
 		if ( ldef->frustumWindings[i] ) {
 			delete ldef->frustumWindings[i];
-			ldef->frustumWindings[i] = NULL;
+			ldef->frustumWindings[i] = nullptr;
 		}
 	}
 }
@@ -290,7 +290,7 @@ R_DeriveLightData
 Fills everything in based on light->parms
 =================
 */
-void R_DeriveLightData( ARCRenderLightsLocal *light ) {
+void R_DeriveLightData( anRenderLightsLocal *light ) {
 	// decide which light shader we are going to use
 	if ( light->parms.shader ) {
 		light->lightShader = light->parms.shader;
@@ -308,7 +308,7 @@ void R_DeriveLightData( ARCRenderLightsLocal *light ) {
 	if ( !light->falloffImage ) {
 		// use the falloff from the default shader of the correct type
 		if ( light->parms.pointLight ) {
-			const arcMaterial *defaultShader = declManager->FindMaterial( "lights/defaultPointLight" );
+			const anMaterial *defaultShader = declManager->FindMaterial( "lights/defaultPointLight" );
 			light->falloffImage = defaultShader->LightFalloffImage();
 		} else {
 			// projected lights by default don't diminish with distance
@@ -341,18 +341,18 @@ void R_DeriveLightData( ARCRenderLightsLocal *light ) {
 	R_AxisToModelMatrix( light->parms.axis, light->parms.origin, light->modelMatrix );
 
 	for ( int i = 0; i < 6; i++ ) {
-		arcPlane temp = light->frustum[i];
+		anPlane temp = light->frustum[i];
 		R_LocalPlaneToGlobal( light->modelMatrix, temp, light->frustum[i] );
 	}
 	for ( int i = 0; i < 4; i++ ) {
-		arcPlane temp = light->lightProject[i];
+		anPlane temp = light->lightProject[i];
 		R_LocalPlaneToGlobal( light->modelMatrix, temp, light->lightProject[i] );
 	}
 
 	// adjust global light origin for off center projections and parallel projections
 	// we are just faking parallel by making it a very far off center for now
 	if ( light->parms.parallel ) {
-		arcVec3	dir = light->parms.lightCenter;
+		anVec3	dir = light->parms.lightCenter;
 		if ( !dir.Normalize() ) {
 			// make point straight up if not specified
 			dir[2] = 1;
@@ -377,9 +377,9 @@ R_CreateLightRefs
 =================
 */
 #define	MAX_LIGHT_VERTS	40
-void R_CreateLightRefs( ARCRenderLightsLocal *light ) {
-	arcVec3	points[MAX_LIGHT_VERTS];
-	surfTriangles_t	*tri = light->frustumTris;
+void R_CreateLightRefs( anRenderLightsLocal *light ) {
+	anVec3	points[MAX_LIGHT_VERTS];
+	srfTriangles_t	*tri = light->frustumTris;
 
 	// because a light frustum is made of only six intersecting planes,
 	// we should never be able to get a stupid number of points...
@@ -416,7 +416,7 @@ void R_CreateLightRefs( ARCRenderLightsLocal *light ) {
 		light->world->FlowLightThroughPortals( light );
 	} else {
 		// push these points down the BSP tree into areas
-		light->world->PushVolumeIntoTree( NULL, light, tri->numVerts, points );
+		light->world->PushVolumeIntoTree( nullptr, light, tri->numVerts, points );
 	}
 }
 
@@ -427,8 +427,8 @@ R_RenderLightFrustum
 Called by the editor and dmap to operate on light volumes
 ===============
 */
-void R_RenderLightFrustum( const renderLight_t &renderLight, arcPlane lightFrustum[6] ) {
-	ARCRenderLightsLocal fakeLight;
+void R_RenderLightFrustum( const renderLight_t &renderLight, anPlane lightFrustum[6] ) {
+	anRenderLightsLocal fakeLight;
 
 	memset( &fakeLight, 0, sizeof( fakeLight ) );
 	fakeLight.parms = renderLight;
@@ -450,7 +450,7 @@ void R_RenderLightFrustum( const renderLight_t &renderLight, arcPlane lightFrust
 WindingCompletelyInsideLight
 ===============
 */
-bool WindingCompletelyInsideLight( const arcWinding *w, const ARCRenderLightsLocal *ldef ) {
+bool WindingCompletelyInsideLight( const anWinding *w, const anRenderLightsLocal *ldef ) {
 	for ( int i = 0; i < w->GetNumPoints(); i++ ) {
 		for ( int j = 0; j < 6; j++ ) {
 			float d = ( *w )[i].ToVec3() * ldef->frustum[j].Normal() + ldef->frustum[j][3];
@@ -470,8 +470,8 @@ When a fog light is created or moved, see if it completely
 encloses any portals, which may allow them to be fogged closed.
 ======================
 */
-void R_CreateLightDefFogPortals( ARCRenderLightsLocal *ldef ) {
-	areaReference_t *ldef->foggedPortals = NULL;
+void R_CreateLightDefFogPortals( anRenderLightsLocal *ldef ) {
+	areaReference_t *ldef->foggedPortals = nullptr;
 
 	if ( !ldef->lightShader->IsFogLight() ) {
 		return;
@@ -510,14 +510,14 @@ R_FreeLightDefDerivedData
 Frees all references and lit surfaces from the light
 ====================
 */
-void R_FreeLightDefDerivedData( ARCRenderLightsLocal *ldef ) {
+void R_FreeLightDefDerivedData( anRenderLightsLocal *ldef ) {
 	// rmove any portal fog references
 	for ( doublePortal_t *dp = ldef->foggedPortals; dp; dp = dp->nextFoggedPortal ) {
-		dp->fogLight = NULL;
+		dp->fogLight = nullptr;
 	}
 
 	// free all the interactions
-	while ( ldef->firstInteraction != NULL ) {
+	while ( ldef->firstInteraction != nullptr ) {
 		ldef->firstInteraction->UnlinkAndFree();
 	}
 
@@ -532,7 +532,7 @@ void R_FreeLightDefDerivedData( ARCRenderLightsLocal *ldef ) {
 		// put it back on the free list for reuse
 		ldef->world->areaReferenceAllocator.Free( lref );
 	}
-	ldef->references = NULL;
+	ldef->references = nullptr;
 
 	R_FreeLightDefFrustum( ldef );
 }
@@ -545,34 +545,34 @@ Used by both RE_FreeEntityDef and RE_UpdateEntityDef
 Does not actually free the entityDef.
 ===================
 */
-void R_FreeEntityDefDerivedData( ARCRenderEntityLocal *def, bool keepDecals, bool keepCachedDynamicModel ) {
+void R_FreeEntityDefDerivedData( anRenderEntityLocal *def, bool keepDecals, bool keepCachedDynamicModel ) {
 	// demo playback needs to free the joints, while normal play
 	// leaves them in the control of the game
 	if ( session->readDemo ) {
 		if ( def->parms.joints ) {
 			Mem_Free16( def->parms.joints );
-			def->parms.joints = NULL;
+			def->parms.joints = nullptr;
 		}
 		if ( def->parms.callbackData ) {
 			Mem_Free( def->parms.callbackData );
-			def->parms.callbackData = NULL;
+			def->parms.callbackData = nullptr;
 		}
 		for ( int i = 0; i < MAX_RENDERENTITY_GUI; i++ ) {
-			if ( def->parms.gui[ i ] ) {
-				delete def->parms.gui[ i ];
-				def->parms.gui[ i ] = NULL;
+			if ( def->parms.gui[i] ) {
+				delete def->parms.gui[i];
+				def->parms.gui[i] = nullptr;
 			}
 		}
 	}
 
 	// free all the interactions
-	while ( def->firstInteraction != NULL ) {
+	while ( def->firstInteraction != nullptr ) {
 		def->firstInteraction->UnlinkAndFree();
 	}
 
 	// clear the dynamic model if present
 	if ( def->dynamicModel ) {
-		def->dynamicModel = NULL;
+		def->dynamicModel = nullptr;
 	}
 
 	if ( !keepDecals ) {
@@ -582,7 +582,7 @@ void R_FreeEntityDefDerivedData( ARCRenderEntityLocal *def, bool keepDecals, boo
 
 	if ( !keepCachedDynamicModel ) {
 		delete def->cachedDynamicModel;
-		def->cachedDynamicModel = NULL;
+		def->cachedDynamicModel = nullptr;
 	}
 
 	// free the entityRefs from the areas
@@ -596,7 +596,7 @@ void R_FreeEntityDefDerivedData( ARCRenderEntityLocal *def, bool keepDecals, boo
 		// put it back on the free list for reuse
 		def->world->areaReferenceAllocator.Free( ref );
 	}
-	def->entityRefs = NULL;
+	def->entityRefs = nullptr;
 }
 
 /*
@@ -608,15 +608,15 @@ only need to do this on entity update, not the full
 R_FreeEntityDefDerivedData
 ==================
 */
-void R_ClearEntityDefDynamicModel( ARCRenderEntityLocal *def ) {
+void R_ClearEntityDefDynamicModel( anRenderEntityLocal *def ) {
 	// free all the interaction surfaces
-	for ( ARCInteraction *inter = def->firstInteraction; inter != NULL && !inter->IsEmpty(); inter = inter->entityNext ) {
+	for ( an Interaction *inter = def->firstInteraction; inter != nullptr && !inter->IsEmpty(); inter = inter->entityNext ) {
 		inter->FreeSurfaces();
 	}
 
 	// clear the dynamic model if present
 	if ( def->dynamicModel ) {
-		def->dynamicModel = NULL;
+		def->dynamicModel = nullptr;
 	}
 }
 
@@ -625,10 +625,10 @@ void R_ClearEntityDefDynamicModel( ARCRenderEntityLocal *def ) {
 R_FreeEntityDefDecals
 ===================
 */
-void R_FreeEntityDefDecals( ARCRenderEntityLocal *def ) {
+void R_FreeEntityDefDecals( anRenderEntityLocal *def ) {
 	while( def->decals ) {
-		ARCRenderModelDecal *next = def->decals->Next();
-		ARCRenderModelDecal::Free( def->decals );
+		anRenderModelDecal *next = def->decals->Next();
+		anRenderModelDecal::Free( def->decals );
 		def->decals = next;
 	}
 }
@@ -638,8 +638,8 @@ void R_FreeEntityDefDecals( ARCRenderEntityLocal *def ) {
 R_FreeEntityDefFadedDecals
 ===================
 */
-void R_FreeEntityDefFadedDecals( ARCRenderEntityLocal *def, int time ) {
-	def->decals = ARCRenderModelDecal::RemoveFadedDecals( def->decals, time );
+void R_FreeEntityDefFadedDecals( anRenderEntityLocal *def, int time ) {
+	def->decals = anRenderModelDecal::RemoveFadedDecals( def->decals, time );
 }
 
 /*
@@ -647,10 +647,10 @@ void R_FreeEntityDefFadedDecals( ARCRenderEntityLocal *def, int time ) {
 R_FreeEntityDefOverlay
 ===================
 */
-void R_FreeEntityDefOverlay( ARCRenderEntityLocal *def ) {
+void R_FreeEntityDefOverlay( anRenderEntityLocal *def ) {
 	if ( def->overlay ) {
-		ARCRenderModelOverlay::Free( def->overlay );
-		def->overlay = NULL;
+		anRenderModelOverlay::Free( def->overlay );
+		def->overlay = nullptr;
 	}
 }
 
@@ -663,9 +663,9 @@ ReloadModels and RegenerateWorld call this
 ===================
 */
 void R_FreeDerivedData( void ) {
-	ARCRenderWorldLocal *rw;
-	ARCRenderEntityLocal *def;
-	ARCRenderLightsLocal *light;
+	anRenderWorldLocal *rw;
+	anRenderEntityLocal *def;
+	anRenderLightsLocal *light;
 
 	for ( int j = 0; j < tr.worlds.Num(); j++ ) {
 		rw = tr.worlds[j];
@@ -692,11 +692,11 @@ void R_FreeDerivedData( void ) {
 R_CheckForEntityDefsUsingModel
 ===================
 */
-void R_CheckForEntityDefsUsingModel( ARCRenderModel *model ) {
+void R_CheckForEntityDefsUsingModel( anRenderModel *model ) {
 	for ( int j = 0; j < tr.worlds.Num(); j++ ) {
-		ARCRenderWorldLocal *rw = tr.worlds[j];
+		anRenderWorldLocal *rw = tr.worlds[j];
 		for ( int i = 0; i < rw->entityDefs.Num(); i++ ) {
-			ARCRenderEntityLocal *def = rw->entityDefs[i];
+			anRenderEntityLocal *def = rw->entityDefs[i];
 			if ( !def ) {
 				continue;
 			}
@@ -720,12 +720,12 @@ ReloadModels and RegenerateWorld call this
 void R_ReCreateWorldReferences( void ) {
 	// let the interaction generation code know this shouldn't be optimized for
 	// a particular view
-	tr.viewDef = NULL;
+	tr.viewDef = nullptr;
 
 	for ( int j = 0; j < tr.worlds.Num(); j++ ) {
-		ARCRenderWorldLocal *rw = tr.worlds[j];
+		anRenderWorldLocal *rw = tr.worlds[j];
 		for ( int i = 0; i < rw->entityDefs.Num(); i++ ) {
-			ARCRenderEntityLocal *def = rw->entityDefs[i];
+			anRenderEntityLocal *def = rw->entityDefs[i];
 			if ( !def ) {
 				continue;
 			}
@@ -739,7 +739,7 @@ void R_ReCreateWorldReferences( void ) {
 		}
 
 		for ( int i = 0; i < rw->lightDefs.Num(); i++ ) {
-			ARCRenderLightsLocal *light = rw->lightDefs[i];
+			anRenderLightsLocal *light = rw->lightDefs[i];
 			if ( !light ) {
 				continue;
 			}
@@ -759,7 +759,7 @@ Frees and regenerates all references and interactions, which
 must be done when switching between display list mode and immediate mode
 ===================
 */
-void R_RegenerateWorld_f( const arcCommandArgs &args ) {
+void R_RegenerateWorld_f( const anCommandArgs &args ) {
 	R_FreeDerivedData();
 
 	// watch how much memory we allocate

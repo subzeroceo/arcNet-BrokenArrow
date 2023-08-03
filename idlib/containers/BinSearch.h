@@ -13,13 +13,13 @@
 
 /*
 ====================
-idBinSearch_GreaterEqual
+BinSearch_GreaterEqual
 
 	Finds the last array element which is smaller than the given value.
 ====================
 */
-template< class type >
-ARC_INLINE int idBinSearch_Less( const type *array, const int arraySize, const type &value ) {
+template<class type>
+ARC_INLINE int BinSearch_Less( const type *array, const int arraySize, const type &value ) {
 	int len = arraySize;
 	int mid = len;
 	int offset = 0;
@@ -35,13 +35,13 @@ ARC_INLINE int idBinSearch_Less( const type *array, const int arraySize, const t
 
 /*
 ====================
-idBinSearch_GreaterEqual
+BinSearch_GreaterEqual
 
 	Finds the last array element which is smaller than or equal to the given value.
 ====================
 */
-template< class type >
-ARC_INLINE int idBinSearch_LessEqual( const type *array, const int arraySize, const type &value ) {
+template<class type>
+ARC_INLINE int BinSearch_LessEqual( const type *array, const int arraySize, const type &value ) {
 	int len = arraySize;
 	int mid = len;
 	int offset = 0;
@@ -57,13 +57,13 @@ ARC_INLINE int idBinSearch_LessEqual( const type *array, const int arraySize, co
 
 /*
 ====================
-idBinSearch_Greater
+BinSearch_Greater
 
 	Finds the first array element which is greater than the given value.
 ====================
 */
-template< class type >
-ARC_INLINE int idBinSearch_Greater( const type *array, const int arraySize, const type &value ) {
+template<class type>
+ARC_INLINE int BinSearch_Greater( const type *array, const int arraySize, const type &value ) {
 	int len = arraySize;
 	int mid = len;
 	int offset = 0;
@@ -83,13 +83,13 @@ ARC_INLINE int idBinSearch_Greater( const type *array, const int arraySize, cons
 
 /*
 ====================
-idBinSearch_GreaterEqual
+BinSearch_GreaterEqual
 
 	Finds the first array element which is greater than or equal to the given value.
 ====================
 */
-template< class type >
-ARC_INLINE int idBinSearch_GreaterEqual( const type *array, const int arraySize, const type &value ) {
+template<class type>
+ARC_INLINE int BinSearch_GreaterEqual( const type *array, const int arraySize, const type &value ) {
 	int len = arraySize;
 	int mid = len;
 	int offset = 0;
@@ -107,4 +107,4 @@ ARC_INLINE int idBinSearch_GreaterEqual( const type *array, const int arraySize,
 	return offset+res;
 }
 
-#endif /* !__BINSEARCH_H__ */
+#endif // !__BINSEARCH_H__

@@ -28,16 +28,16 @@ If you have questions concerning this license or the applicable additional terms
 /*
 crazy gcc 3.3.5 optimization bug
 happens even at -O1
-if you remove the 'return NULL;' after Error(), it only happens at -O3 / release
+if you remove the 'return nullptr;' after Error(), it only happens at -O3 / release
 see dmap.gcc.zip test map and .proc outputs
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "dmap.h"
 
-extern arcBounds optBounds;
+extern anBounds optBounds;
 
 #define MAX_OPT_VERTEXES 0x10000
 extern int numOptVerts;
@@ -48,7 +48,7 @@ extern optVertex_t optVerts[MAX_OPT_VERTEXES];
 FindOptVertex
 ================
 */
-optVertex_t *FindOptVertex( arcDrawVert *v, optimizeGroup_t *opt ) {
+optVertex_t *FindOptVertex( anDrawVertex *v, optimizeGroup_t *opt ) {
 	int		i;
 	float	x, y;
 	optVertex_t	*vert;
@@ -66,7 +66,7 @@ optVertex_t *FindOptVertex( arcDrawVert *v, optimizeGroup_t *opt ) {
 
 	if ( numOptVerts >= MAX_OPT_VERTEXES ) {
 		common->Error( "MAX_OPT_VERTEXES" );
-		return NULL;
+		return nullptr;
 	}
 
 	numOptVerts++;

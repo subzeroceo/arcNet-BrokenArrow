@@ -1,14 +1,14 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 #include "../../sys/win32/common_resource.h"
 
-arcCVarSystem rbfg_DefaultWidth( "rbfg_DefaultWidth", "0", 0, "" );
-arcCVarSystem rbfg_DefaultHeight( "rbfg_DefaultHeight", "0", 0, "" );
+anCVarSystem rbfg_DefaultWidth( "rbfg_DefaultWidth", "0", 0, "" );
+anCVarSystem rbfg_DefaultHeight( "rbfg_DefaultHeight", "0", 0, "" );
 
-static arcNetString RBFName;
+static anString RBFName;
 
 static bool CheckPow2( int Num) {
-	while(Num) {
+	while( num ) {
 		if ((Num & 1 ) && (Num != 1 ) ) {
 			return false;
 		}

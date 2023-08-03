@@ -17,7 +17,7 @@ public:
 	static void			Init( void );
 	static void			InitProcessor( const char *module, bool forceGeneric );
 	static void			Shutdown( void );
-	static void			Test_f( const class arcCommandArgs &args );
+	static void			Test_f( const class anCommandArgs &args );
 };
 
 
@@ -35,21 +35,21 @@ public:
 #define VPCALL
 #endif
 
-class arcVec2;
-class arcVec3;
-class arcVec4;
-class arcVec5;
-class arcVec6;
-class arcVecX;
-class arcMat2;
-class arcMat3;
-class arcMat4;
-class arcMat5;
-class arcMat6;
-class arcMatX;
-class arcPlane;
-class arcDrawVert;
-class idJointQuat;
+class anVec2;
+class anVec3;
+class anVec4;
+class anVec5;
+class anVec6;
+class anVecX;
+class anMat2;
+class anMat3;
+class anMat4;
+class anMat5;
+class anMat6;
+class anMatX;
+class anPlane;
+class anDrawVertex;
+class anJointQuat;
 class arcJointMat;
 struct dominantTri_s;
 
@@ -71,7 +71,7 @@ public:
 
 	cpuid_t							cpuid;
 
-	virtual const char * VPCALL		GetName( void ) const = 0;
+	virtual const char *VPCALL		GetName( void ) const = 0;
 
 	virtual void VPCALL Add( float *dst, const float constant, const float *src, const int count ) = 0;
 	virtual void VPCALL Add( float *dst, const float *src0, const float *src1, const int count ) = 0;
@@ -86,13 +86,13 @@ public:
 	virtual void VPCALL MulSub( float *dst, const float constant, const float *src, const int count ) = 0;
 	virtual void VPCALL MulSub( float *dst, const float *src0, const float *src1, const int count ) = 0;
 
-	virtual	void VPCALL Dot( float *dst, const arcVec3 &constant, const arcVec3 *src, const int count ) = 0;
-	virtual	void VPCALL Dot( float *dst, const arcVec3 &constant, const arcPlane *src, const int count ) = 0;
-	virtual void VPCALL Dot( float *dst, const arcVec3 &constant, const arcDrawVert *src, const int count ) = 0;
-	virtual	void VPCALL Dot( float *dst, const arcPlane &constant,const arcVec3 *src, const int count ) = 0;
-	virtual	void VPCALL Dot( float *dst, const arcPlane &constant,const arcPlane *src, const int count ) = 0;
-	virtual void VPCALL Dot( float *dst, const arcPlane &constant,const arcDrawVert *src, const int count ) = 0;
-	virtual	void VPCALL Dot( float *dst, const arcVec3 *src0, const arcVec3 *src1, const int count ) = 0;
+	virtual	void VPCALL Dot( float *dst, const anVec3 &constant, const anVec3 *src, const int count ) = 0;
+	virtual	void VPCALL Dot( float *dst, const anVec3 &constant, const anPlane *src, const int count ) = 0;
+	virtual void VPCALL Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) = 0;
+	virtual	void VPCALL Dot( float *dst, const anPlane &constant,const anVec3 *src, const int count ) = 0;
+	virtual	void VPCALL Dot( float *dst, const anPlane &constant,const anPlane *src, const int count ) = 0;
+	virtual void VPCALL Dot( float *dst, const anPlane &constant,const anDrawVertex *src, const int count ) = 0;
+	virtual	void VPCALL Dot( float *dst, const anVec3 *src0, const anVec3 *src1, const int count ) = 0;
 	virtual void VPCALL Dot( float &dot, const float *src1, const float *src2, const int count ) = 0;
 
 	virtual	void VPCALL CmpGT( byte *dst, const float *src0, const float constant, const int count ) = 0;
@@ -105,10 +105,10 @@ public:
 	virtual	void VPCALL CmpLE( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) = 0;
 
 	virtual	void VPCALL MinMax( float &min, float &max, const float *src, const int count ) = 0;
-	virtual	void VPCALL MinMax( arcVec2 &min, arcVec2 &max, const arcVec2 *src, const int count ) = 0;
-	virtual	void VPCALL MinMax( arcVec3 &min, arcVec3 &max, const arcVec3 *src, const int count ) = 0;
-	virtual	void VPCALL MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *src, const int count ) = 0;
-	virtual	void VPCALL MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *src, const int *indexes, const int count ) = 0;
+	virtual	void VPCALL MinMax( anVec2 &min, anVec2 &max, const anVec2 *src, const int count ) = 0;
+	virtual	void VPCALL MinMax( anVec3 &min, anVec3 &max, const anVec3 *src, const int count ) = 0;
+	virtual	void VPCALL MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) = 0;
+	virtual	void VPCALL MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) = 0;
 
 	virtual	void VPCALL Clamp( float *dst, const float *src, const float min, const float max, const int count ) = 0;
 	virtual	void VPCALL ClampMin( float *dst, const float *src, const float min, const int count ) = 0;
@@ -128,37 +128,37 @@ public:
 	virtual void VPCALL SubAssign16( float *dst, const float *src, const int count ) = 0;
 	virtual void VPCALL MulAssign16( float *dst, const float constant, const int count ) = 0;
 
-	// arcMatX operations
-	virtual void VPCALL MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) = 0;
-	virtual void VPCALL MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) = 0;
-	virtual void VPCALL MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) = 0;
-	virtual void VPCALL MatX_TransposeMultiplyVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) = 0;
-	virtual void VPCALL MatX_TransposeMultiplyAddVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) = 0;
-	virtual void VPCALL MatX_TransposeMultiplySubVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) = 0;
-	virtual void VPCALL MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, const arcMatX &m2 ) = 0;
-	virtual void VPCALL MatX_TransposeMultiplyMatX( arcMatX &dst, const arcMatX &m1, const arcMatX &m2 ) = 0;
-	virtual void VPCALL MatX_LowerTriangularSolve( const arcMatX &L, float *x, const float *b, const int n, int skip = 0 ) = 0;
-	virtual void VPCALL MatX_LowerTriangularSolveTranspose( const arcMatX &L, float *x, const float *b, const int n ) = 0;
-	virtual bool VPCALL MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, const int n ) = 0;
+	// anMatX operations
+	virtual void VPCALL MatX_MultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) = 0;
+	virtual void VPCALL MatX_MultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) = 0;
+	virtual void VPCALL MatX_MultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) = 0;
+	virtual void VPCALL MatX_TransposeMultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) = 0;
+	virtual void VPCALL MatX_TransposeMultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) = 0;
+	virtual void VPCALL MatX_TransposeMultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) = 0;
+	virtual void VPCALL MatX_MultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 ) = 0;
+	virtual void VPCALL MatX_TransposeMultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 ) = 0;
+	virtual void VPCALL MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip = 0 ) = 0;
+	virtual void VPCALL MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n ) = 0;
+	virtual bool VPCALL MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, const int n ) = 0;
 
 	// rendering
-	virtual void VPCALL BlendJoints( idJointQuat *joints, const idJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) = 0;
-	virtual void VPCALL ConvertJointQuatsToJointMats( arcJointMat *jointMats, const idJointQuat *jointQuats, const int numJoints ) = 0;
-	virtual void VPCALL ConvertJointMatsToJointQuats( idJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) = 0;
+	virtual void VPCALL BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) = 0;
+	virtual void VPCALL ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) = 0;
+	virtual void VPCALL ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) = 0;
 	virtual void VPCALL TransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) = 0;
 	virtual void VPCALL UntransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) = 0;
-	virtual void VPCALL TransformVerts( arcDrawVert *verts, const int numVerts, const arcJointMat *joints, const arcVec4 *weights, const int *index, const int numWeights ) = 0;
-	virtual void VPCALL TracePointCull( byte *cullBits, byte &totalOr, const float radius, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) = 0;
-	virtual void VPCALL DecalPointCull( byte *cullBits, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) = 0;
-	virtual void VPCALL OverlayPointCull( byte *cullBits, arcVec2 *texCoords, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) = 0;
-	virtual void VPCALL DeriveTriPlanes( arcPlane *planes, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
-	virtual void VPCALL DeriveTangents( arcPlane *planes, arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
-	virtual void VPCALL DeriveUnsmoothedTangents( arcDrawVert *verts, const dominantTri_s *dominantTris, const int numVerts ) = 0;
-	virtual void VPCALL NormalizeTangents( arcDrawVert *verts, const int numVerts ) = 0;
-	virtual void VPCALL CreateTextureSpaceLightVectors( arcVec3 *lightVectors, const arcVec3 &lightOrigin, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
-	virtual void VPCALL CreateSpecularTextureCoords( arcVec4 *texCoords, const arcVec3 &lightOrigin, const arcVec3 &viewOrigin, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
-	virtual int  VPCALL CreateShadowCache( arcVec4 *vertexCache, int *vertRemap, const arcVec3 &lightOrigin, const arcDrawVert *verts, const int numVerts ) = 0;
-	virtual int  VPCALL CreateVertexProgramShadowCache( arcVec4 *vertexCache, const arcDrawVert *verts, const int numVerts ) = 0;
+	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights ) = 0;
+	virtual void VPCALL TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) = 0;
+	virtual void VPCALL DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) = 0;
+	virtual void VPCALL OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) = 0;
+	virtual void VPCALL DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
+	virtual void VPCALL DeriveTangents( anPlane *planes, anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
+	virtual void VPCALL DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) = 0;
+	virtual void VPCALL NormalizeTangents( anDrawVertex *verts, const int numVerts ) = 0;
+	virtual void VPCALL CreateTextureSpaceLightVectors( anVec3 *lightVectors, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
+	virtual void VPCALL CreateSpecularTextureCoords( anVec4 *texCoords, const anVec3 &lightOrigin, const anVec3 &viewOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
+	virtual int  VPCALL CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) = 0;
+	virtual int  VPCALL CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) = 0;
 
 	// sound mixing
 	virtual void VPCALL UpSamplePCMTo44kHz( float *dest, const short *pcm, const int numSamples, const int kHz, const int numChannels ) = 0;

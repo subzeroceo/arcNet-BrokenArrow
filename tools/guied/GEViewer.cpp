@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/guied_resource.h"
@@ -8,7 +8,7 @@
 #include "GEViewer.h"
 
 rvGEViewer::rvGEViewer( ) {
-	mInterface = NULL;
+	mInterface = nullptr;
 	mPaused    = true;
 	mTime	   = 0;
 }
@@ -22,7 +22,7 @@ bool rvGEViewer::Create ( HWND parent )
 	wndClass.cbSize			= sizeof(WNDCLASSEX);
 	wndClass.lpszClassName	= "GUIED_VIEWER";
 	wndClass.lpfnWndProc	= rvGEViewer::WndProc;
-	wndClass.hInstance		= gApp.GetInstance ( );
+	wndClass.hInstance		= gApp.GetInstance();
 	wndClass.style			= CS_OWNDC|CS_BYTEALIGNWINDOW|CS_VREDRAW|CS_HREDRAW;
 	wndClass.hbrBackground	= (HBRUSH) (COLOR_3DFACE + 1 );
 	RegisterClassEx ( &wndClass );
@@ -30,7 +30,7 @@ bool rvGEViewer::Create ( HWND parent )
 	mWnd = CreateWindowEx ( WS_EX_TOOLWINDOW, "GUIED_VIEWER", "GUI Viewer",
 							WS_SYSMENU|WS_THICKFRAME|WS_CAPTION|WS_POPUP|WS_OVERLAPPED|WS_BORDER|WS_CLIPSIBLINGS|WS_CHILD,
 							CW_USEDEFAULT, CW_USEDEFAULT, SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
-							parent, NULL, gApp.GetInstance(), this );
+							parent, nullptr, gApp.GetInstance(), this );
 
 	gApp.GetOptions().GetWindowPlacement ( "viewer", mWnd );
 
@@ -83,21 +83,21 @@ bool rvGEViewer::Destroy ( void ) {
 }
 
 bool rvGEViewer::OpenFile ( const char* filename ) {
-	arcNetString tempfile;
-	arcNetString ospath;
+	anString tempfile;
+	anString ospath;
 
 	delete mInterface;
 
 	tempfile = filename;
 	tempfile.StripPath ();
-	tempfile.StripFileExtension ( );
+	tempfile.StripFileExtension();
 	tempfile = va( "guis/temp.guied", tempfile.c_str() );
 	ospath = fileSystem->RelativePathToOSPath ( tempfile, "fs_basepath" );
 
 	// Make sure the gui directory exists
-	arcNetString createDir = ospath;
-	createDir.StripFilename ( );
-	CreateDirectory ( createDir, NULL );
+	anString createDir = ospath;
+	createDir.StripFilename();
+	CreateDirectory ( createDir, nullptr );
 
 	SetFileAttributes ( ospath, FILE_ATTRIBUTE_NORMAL );
 	DeleteFile ( ospath );
@@ -116,7 +116,7 @@ bool rvGEViewer::OpenFile ( const char* filename ) {
 
 	DeleteFile ( ospath );
 
-	Play ( );
+	Play();
 
 	return true;
 }
@@ -199,11 +199,11 @@ LRESULT CALLBACK rvGEViewer::WndProc ( HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			switch ( LOWORD(wParam) )
 			{
 				case ID_GUIED_VIEWER_PLAY:
-					viewer->Play ( );
+					viewer->Play();
 					break;
 
 				case ID_GUIED_VIEWER_PAUSE:
-					viewer->Pause ( );
+					viewer->Pause();
 					break;
 			}
 			break;
@@ -311,8 +311,8 @@ sysEvent_t event;
 			break;
 
 		case WM_CLOSE:
-			viewer->mInterface = NULL;
-			gApp.CloseViewer ( );
+			viewer->mInterface = nullptr;
+			gApp.CloseViewer();
 			return 0;
 
 		case WM_CREATE: {
@@ -321,9 +321,9 @@ sysEvent_t event;
 
 			viewer = (rvGEViewer*)cs->lpCreateParams;
 			viewer->mWnd = hwnd;
-			viewer->SetupPixelFormat ( );
+			viewer->SetupPixelFormat();
 
-			viewer->mToolbar = CreateWindowEx ( 0, TOOLBARCLASSNAME, "", CCS_BOTTOM|WS_CHILD|WS_VISIBLE,0,0,0,0, hwnd, (HMENU)IDR_GUIED_VIEWERTOOLBAR, gApp.GetInstance(), NULL );
+			viewer->mToolbar = CreateWindowEx ( 0, TOOLBARCLASSNAME, "", CCS_BOTTOM|WS_CHILD|WS_VISIBLE,0,0,0,0, hwnd, (HMENU)IDR_GUIED_VIEWERTOOLBAR, gApp.GetInstance(), nullptr );
 
 		    // Send the TB_BUTTONSTRUCTSIZE message, which is required for backward compatibility.
 			SendMessage( viewer->mToolbar, TB_BUTTONSTRUCTSIZE, ( WPARAM )sizeof( TBBUTTON ), 0 );
@@ -372,7 +372,7 @@ sysEvent_t event;
 		}
 
 		case WM_SETCURSOR:
-			SetCursor ( NULL );
+			SetCursor ( nullptr );
 			break;
 	}
 
@@ -408,7 +408,7 @@ bool rvGEViewer::SetupPixelFormat ( void )
 	int pixelFormat = ChoosePixelFormat(hDC, &win32.pfd);
 	if (pixelFormat > 0 )
 	{
-		if (SetPixelFormat(hDC, pixelFormat, &win32.pfd) == NULL)
+		if (SetPixelFormat(hDC, pixelFormat, &win32.pfd) == nullptr )
 		{
 			result = false;
 		}
@@ -489,7 +489,7 @@ void rvGEViewer::Render	( HDC dc )
 		renderSystem->EndFrame( &frontEnd, &backEnd );
 	}
 
-	qglFinish ( );
+	qglFinish();
 	qwglSwapBuffers(dc);
 }
 

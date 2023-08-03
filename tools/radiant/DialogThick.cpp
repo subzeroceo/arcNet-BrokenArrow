@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDialogThick dialog
 
 
-CDialogThick::CDialogThick(CWnd* pParent /*=NULL*/)
+CDialogThick::CDialogThick(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDialogThick::IDD, pParent) {
 	//{{AFX_DATA_INIT(CDialogThick)
 	m_bSeams = TRUE;

@@ -1,9 +1,9 @@
-// RAVEN BEGIN
+
 // bdube: note that this file is no longer merged with Doom3 updates
 //
 // MERGE_DATE 09/30/2004
 
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Game_local.h"
@@ -20,12 +20,12 @@
 ===============================================================================
 */
 
-const idEventDef EV_BecomeNonSolid( "becomeNonSolid" );
-const idEventDef EV_SetOwnerFromSpawnArgs( "<setOwnerFromSpawnArgs>" );
-const idEventDef EV_IsAtRest( "isAtRest", NULL, 'd' );
-const idEventDef EV_CanDamage( "canDamage", "f" );
-const idEventDef EV_SetHealth( "setHealth", "f" );
-const idEventDef EV_RadiusDamage( "<radiusDamage>", "es" );
+const anEventDef EV_BecomeNonSolid( "becomeNonSolid" );
+const anEventDef EV_SetOwnerFromSpawnArgs( "<setOwnerFromSpawnArgs>" );
+const anEventDef EV_IsAtRest( "isAtRest", nullptr, 'd' );
+const anEventDef EV_CanDamage( "canDamage", "f" );
+const anEventDef EV_SetHealth( "setHealth", "f" );
+const anEventDef EV_RadiusDamage( "<radiusDamage>", "es" );
 
 CLASS_DECLARATION( idDamagable, idMoveable )
 	EVENT( EV_Activate,					idMoveable::Event_Activate )
@@ -51,13 +51,13 @@ idMoveable::idMoveable( void ) {
  	minDamageVelocity	= 100.0f;
  	maxDamageVelocity	= 200.0f;
 	nextCollideFxTime	= 0;
- 	initialSpline		= NULL;
+ 	initialSpline		= nullptr;
  	initialSplineDir	= vec3_zero;
 	unbindOnDeath		= false;
 	allowStep			= false;
  	canDamage			= false;
 
-	lastAttacker		= NULL;
+	lastAttacker		= nullptr;
 }
 
 /*
@@ -67,8 +67,8 @@ idMoveable::~idMoveable
 */
 idMoveable::~idMoveable( void ) {
  	delete initialSpline;
- 	initialSpline = NULL;
- 	SetPhysics( NULL );
+ 	initialSpline = nullptr;
+ 	SetPhysics( nullptr );
 }
 
 /*
@@ -77,24 +77,24 @@ idMoveable::Spawn
 ================
 */
 void idMoveable::Spawn( void ) {
-	idTraceModel trm;
+	anTraceModel trm;
 	float density, friction, bouncyness;
 	int clipShrink;
-	idStr clipModelName;
+	anString clipModelName;
 	bool setClipModel = false;
-	arcBounds bounds;
+	anBounds bounds;
 
 	// check if a clip model is set
 	spawnArgs.GetString( "clipmodel", "", clipModelName );
 	if ( !clipModelName[0] ) {
-		arcVec3 size;
-		if ( spawnArgs.GetVector( "mins", NULL, bounds[0] ) &&
-			spawnArgs.GetVector( "maxs", NULL, bounds[1] ) ) {
+		anVec3 size;
+		if ( spawnArgs.GetVector( "mins", nullptr, bounds[0] ) &&
+			spawnArgs.GetVector( "maxs", nullptr, bounds[1] ) ) {
 			setClipModel = true;
 			if ( bounds[0][0] > bounds[1][0] || bounds[0][1] > bounds[1][1] || bounds[0][2] > bounds[1][2] ) {
 				gameLocal.Error( "Invalid bounds '%s'-'%s' on moveable '%s'", bounds[0].ToString(), bounds[1].ToString(), name.c_str() );
 			}
-		} else if ( spawnArgs.GetVector( "size", NULL, size ) ) {
+		} else if ( spawnArgs.GetVector( "size", nullptr, size ) ) {
 			if ( ( size.x < 0.0f ) || ( size.y < 0.0f ) || ( size.z < 0.0f ) ) {
 				gameLocal.Error( "Invalid size '%s' on moveable '%s'", size.ToString(), name.c_str() );
 			}
@@ -126,11 +126,11 @@ void idMoveable::Spawn( void ) {
 
 	// get rigid body properties
 	spawnArgs.GetFloat( "density", "0.5", density );
-	density = arcMath::ClampFloat( 0.001f, 1000.0f, density );
+	density = anMath::ClampFloat( 0.001f, 1000.0f, density );
 	spawnArgs.GetFloat( "friction", "0.05", friction );
-	friction = arcMath::ClampFloat( 0.0f, 1.0f, friction );
+	friction = anMath::ClampFloat( 0.0f, 1.0f, friction );
 	spawnArgs.GetFloat( "bouncyness", "0.6", bouncyness );
-	bouncyness = arcMath::ClampFloat( 0.0f, 1.0f, bouncyness );
+	bouncyness = anMath::ClampFloat( 0.0f, 1.0f, bouncyness );
 	unbindOnDeath = spawnArgs.GetBool( "unbindondeath" );
 
 	nextCollideFxTime = 0;
@@ -150,22 +150,22 @@ void idMoveable::Spawn( void ) {
 
 	// setup the physics
 	physicsObj.SetSelf( this );
-// RAVEN BEGIN
+
 // mwhitlock: Dynamic memory consolidation
-	RV_PUSH_HEAP_MEM( this );
-// RAVEN END
-	physicsObj.SetClipModel( new idClipModel( trm, GetRenderModelMaterial() ), density );
-// RAVEN BEGIN
+	PUSH_HEAP_MEM( this );
+
+	physicsObj.SetClipModel( new anClipModel( trm, GetRenderModelMaterial() ), density );
+
 // mwhitlock: Dynamic memory consolidation
-	RV_POP_HEAP();
-// RAVEN END
+	POP_HEAP();
+
 	physicsObj.SetOrigin( GetPhysics()->GetOrigin() );
 	physicsObj.SetAxis( GetPhysics()->GetAxis() );
 	physicsObj.SetBouncyness( bouncyness );
 	physicsObj.SetFriction( 0.6f, 0.6f, friction );
 	physicsObj.SetGravity( gameLocal.GetGravity() );
 	physicsObj.SetContents( CONTENTS_SOLID );
-	physicsObj.SetClipMask( MASK_SOLID | CONTENTS_BODY | CONTENTS_CORPSE | CONTENTS_MOVEABLECLIP | CONTENTS_WATER );
+	physicsObj.SetClipMask( MASK_SOLID | CONTENTS_ACTORBODY | CONTENTS_CORPSE | CONTENTS_MOVEABLECLIP | CONTENTS_WATER );
 	SetPhysics( &physicsObj );
 
 	if ( spawnArgs.GetBool( "nodrop" ) ) {
@@ -184,10 +184,10 @@ void idMoveable::Spawn( void ) {
 
 	allowStep = spawnArgs.GetBool( "allowStep", "1" );
 
-// RAVEN BEGIN
+
 // cdr: Obstacle Avoidance
 	fl.isAIObstacle = !physicsObj.IsPushable();
-// RAVEN END
+
 
 	PostEventMS( &EV_SetOwnerFromSpawnArgs, 0 );
 }
@@ -197,7 +197,7 @@ void idMoveable::Spawn( void ) {
 idMoveable::Save
 ================
 */
-void idMoveable::Save( idSaveGame *savefile ) const {
+void idMoveable::Save( anSaveGame *savefile ) const {
 
 	savefile->WriteStaticObject( physicsObj );
 
@@ -207,14 +207,14 @@ void idMoveable::Save( idSaveGame *savefile ) const {
  	savefile->WriteFloat( minDamageVelocity );
  	savefile->WriteFloat( maxDamageVelocity );
 
-	savefile->WriteInt( initialSpline != NULL ? initialSpline->GetTime( 0 ) : -1 );
+	savefile->WriteInt( initialSpline != nullptr ? initialSpline->GetTime( 0 ) : -1 );
 	savefile->WriteVec3( initialSplineDir );
 
 	savefile->WriteBool( unbindOnDeath );
 	savefile->WriteBool( allowStep );
 	savefile->WriteBool( canDamage );
 
-	lastAttacker.Save(savefile);		// cnicholson: Added unsaved var
+	lastAttacker.Save( savefile);		// cnicholson: Added unsaved var
 }
 
 /*
@@ -222,7 +222,7 @@ void idMoveable::Save( idSaveGame *savefile ) const {
 idMoveable::Restore
 ================
 */
-void idMoveable::Restore( idRestoreGame *savefile ) {
+void idMoveable::Restore( anRestoreGame *savefile ) {
    	int initialSplineTime;
 
 	savefile->ReadStaticObject( physicsObj );
@@ -237,15 +237,15 @@ void idMoveable::Restore( idRestoreGame *savefile ) {
 	if ( initialSplineTime != -1 ) {
    		InitInitialSpline( initialSplineTime );
  	} else {
- 		initialSpline = NULL;
+ 		initialSpline = nullptr;
    	}
 
 	savefile->ReadVec3( initialSplineDir );
 	savefile->ReadBool( unbindOnDeath );
 	savefile->ReadBool( allowStep );
-	savefile->ReadBool( canDamage );	// cnicholson: Added unrestored var
+	savefile->ReadBool( canDamage );
 
-	lastAttacker.Restore(savefile);		// cnicholson: Added unrestored var
+	lastAttacker.Restore( savefile);
 
    	RestorePhysics( &physicsObj );
 }
@@ -256,7 +256,7 @@ idMoveable::Hide
 ================
 */
 void idMoveable::Hide( void ) {
-// RAVEN BEGIN
+
 // abahr: changed parent scope
 	idDamagable::Hide();
 	physicsObj.SetContents( 0 );
@@ -268,7 +268,7 @@ idMoveable::Show
 ================
 */
 void idMoveable::Show( void ) {
-// RAVEN BEGIN
+
 // abahr: changed parent scope
 	idDamagable::Show();
 	if ( !spawnArgs.GetBool( "nonsolid" ) ) {
@@ -281,29 +281,29 @@ void idMoveable::Show( void ) {
 idMoveable::Collide
 =================
 */
-bool idMoveable::Collide( const trace_t &collision, const arcVec3 &velocity ) {
+bool idMoveable::Collide( const trace_t &collision, const anVec3 &velocity ) {
 	float len, f;
-	arcVec3 dir;
-	idEntity *ent;
+	anVec3 dir;
+	anEntity *ent;
 
 	dir = velocity;
 	len = dir.NormalizeFast();
 
 	if ( len > BOUNCE_SOUND_MIN_VELOCITY ) {
 		if ( gameLocal.time > nextCollideFxTime ) {
-			PlayEffect ( gameLocal.GetEffect(spawnArgs,"fx_collide",collision.c.materialType), collision.c.point, collision.c.normal.ToMat3() );
-// RAVEN BEGIN
+			PlayEffect ( gameLocal.GetEffect( spawnArgs,"fx_collide",collision.c.materialType), collision.c.point, collision.c.normal.ToMat3() );
+
 // jscott: fixed negative sqrt call
-			if( len > BOUNCE_SOUND_MAX_VELOCITY ) {
+			if ( len > BOUNCE_SOUND_MAX_VELOCITY ) {
 				f = 1.0f;
-			} else if( len <= BOUNCE_SOUND_MIN_VELOCITY ) {
+			} else if ( len <= BOUNCE_SOUND_MIN_VELOCITY ) {
 				f = 0.0f;
 			} else {
 				f = ( len - BOUNCE_SOUND_MIN_VELOCITY ) * ( 1.0f / ( BOUNCE_SOUND_MAX_VELOCITY - BOUNCE_SOUND_MIN_VELOCITY ) );
 			}
-// RAVEN END
+
 			SetSoundVolume( f );
-			StartSound( "snd_bounce", SND_CHANNEL_BODY, 0, false, NULL );
+			StartSound( "snd_bounce", SND_CHANNEL_BODY, 0, false, nullptr );
 
 			nextCollideFxTime = gameLocal.time + BOUNCE_SOUND_DELAY_MIN + gameLocal.random.RandomInt(BOUNCE_SOUND_DELAY_MAX - BOUNCE_SOUND_DELAY_MIN);
 		}
@@ -312,16 +312,16 @@ bool idMoveable::Collide( const trace_t &collision, const arcVec3 &velocity ) {
 	if ( canDamage && damage.Length() ) {
 		ent = gameLocal.entities[ collision.c.entityNum ];
 		if ( ent && len > minDamageVelocity ) {
-// RAVEN BEGIN
+
 // jscott: fixed negative sqrt call
-			if( len > maxDamageVelocity ) {
+			if ( len > maxDamageVelocity ) {
 				f = 1.0f;
-			} else if( len <= minDamageVelocity ) {
+			} else if ( len <= minDamageVelocity ) {
 				f = 0.0f;
 			} else {
-				f = arcMath::Sqrt( len - minDamageVelocity ) * ( 1.0f / arcMath::Sqrt( maxDamageVelocity - minDamageVelocity ) );
+				f = anMath::Sqrt( len - minDamageVelocity ) * ( 1.0f / anMath::Sqrt( maxDamageVelocity - minDamageVelocity ) );
 			}
-// RAVEN END
+
 			ent->Damage( this, GetPhysics()->GetClipModel()->GetOwner(), dir, damage, f, INVALID_JOINT );
 		}
 	}
@@ -334,13 +334,13 @@ bool idMoveable::Collide( const trace_t &collision, const arcVec3 &velocity ) {
 idMoveable::Damage
 ============
 */
-void idMoveable::Damage( idEntity *inflictor, idEntity *attacker, const arcVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
+void idMoveable::Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
 	idDamagable::Damage ( inflictor, attacker, dir, damageDefName, damageScale, location );
 
 	// Cache the attacker to ensure credit for a kill is given to the entity that caused the damage
 	lastAttacker = inflictor;
 // jshepard:
-//	gameLocal.Warning("idMoveable Damaged! Health is %d", health);
+//	gameLocal.Warning( "idMoveable Damaged! Health is %d", health);
 
 }
 
@@ -349,10 +349,10 @@ void idMoveable::Damage( idEntity *inflictor, idEntity *attacker, const arcVec3 
 idMoveable::Killed
 ============
 */
-void idMoveable::Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location ) {
+void idMoveable::Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location ) {
 
 // jshepard: I am dead!
-//	gameLocal.Warning("idMoveable Killed! Health is %d", health);
+//	gameLocal.Warning( "idMoveable Killed! Health is %d", health);
 
 /*
 	// No more taking damage
@@ -396,12 +396,12 @@ void idMoveable::Killed( idEntity *inflictor, idEntity *attacker, int damage, co
 
 		StartSound( "snd_explode", SND_CHANNEL_ANY );
 
-		StopAllEffects ( );
-		gameLocal.PlayEffect ( gameLocal.GetEffect(spawnArgs, "fx_explode"), GetPhysics()->GetOrigin(), (-GetPhysics()->GetGravityNormal()).ToMat3(), false, vec3_origin, true );
+		StopAllEffects();
+		gameLocal.PlayEffect ( gameLocal.GetEffect( spawnArgs, "fx_explode" ), GetPhysics()->GetOrigin(), (-GetPhysics()->GetGravityNormal()).ToMat3(), false, vec3_origin, true );
 	}
 
 	if ( renderEntity.gui[ 0 ] ) {
-		renderEntity.gui[ 0 ] = NULL;
+		renderEntity.gui[ 0 ] = nullptr;
 	}
 
 	ActivateTargets( this );
@@ -432,7 +432,7 @@ void idMoveable::ExecuteStage ( void ) {
 idMoveable::AddDamageEffect
 ================
 */
-void idMoveable::AddDamageEffect ( const trace_t &collision, const arcVec3 &velocity, const char *damageDefName, idEntity* inflictor ) {
+void idMoveable::AddDamageEffect ( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor ) {
 
 	// Play an impact effect during this stage?
 	if ( stageDict ) {
@@ -485,7 +485,7 @@ void idMoveable::InitInitialSpline( int startTime ) {
 	initialSpline = GetSpline();
 	initialSplineTime = spawnArgs.GetInt( "initialSplineTime", "300" );
 
-	if ( initialSpline != NULL ) {
+	if ( initialSpline != nullptr ) {
 		initialSpline->MakeUniform( initialSplineTime );
 		initialSpline->ShiftTime( startTime - initialSpline->GetTime( 0 ) );
 		initialSplineDir = initialSpline->GetCurrentFirstDerivative( startTime );
@@ -501,22 +501,22 @@ idMoveable::FollowInitialSplinePath
 ================
 */
 bool idMoveable::FollowInitialSplinePath( void ) {
-	if ( initialSpline != NULL ) {
+	if ( initialSpline != nullptr ) {
 		if ( gameLocal.time < initialSpline->GetTime( initialSpline->GetNumValues() - 1 ) ) {
-			arcVec3 splinePos = initialSpline->GetCurrentValue( gameLocal.time );
-			arcVec3 linearVelocity = ( splinePos - physicsObj.GetOrigin() ) * gameLocal.GetMHz();
+			anVec3 splinePos = initialSpline->GetCurrentValue( gameLocal.time );
+			anVec3 linearVelocity = ( splinePos - physicsObj.GetOrigin() ) * gameLocal.GetMHz();
 			physicsObj.SetLinearVelocity( linearVelocity );
 
-			arcVec3 splineDir = initialSpline->GetCurrentFirstDerivative( gameLocal.time );
-			arcVec3 dir = initialSplineDir * physicsObj.GetAxis();
-			arcVec3 angularVelocity = dir.Cross( splineDir );
+			anVec3 splineDir = initialSpline->GetCurrentFirstDerivative( gameLocal.time );
+			anVec3 dir = initialSplineDir * physicsObj.GetAxis();
+			anVec3 angularVelocity = dir.Cross( splineDir );
 			angularVelocity.Normalize();
-			angularVelocity *= arcMath::ACos16( dir * splineDir / splineDir.Length() ) * gameLocal.GetMHz();
+			angularVelocity *= anMath::ACos16( dir * splineDir / splineDir.Length() ) * gameLocal.GetMHz();
 			physicsObj.SetAngularVelocity( angularVelocity );
 			return true;
 		} else {
 			delete initialSpline;
-			initialSpline = NULL;
+			initialSpline = nullptr;
 		}
 	}
 	return false;
@@ -530,13 +530,13 @@ idMoveable::Think
 void idMoveable::Think( void ) {
 	if ( thinkFlags & TH_THINK ) {
 		// Move to the next stage?
-		UpdateStage ( );
+		UpdateStage();
 
 		if ( !FollowInitialSplinePath() && stage == -1 ) {
 			BecomeInactive( TH_THINK );
 		}
 	}
-// RAVEN BEGIN
+
 // abahr: changed parent scope
 	idDamagable::Think();
 }
@@ -546,14 +546,14 @@ void idMoveable::Think( void ) {
 idMoveable::GetRenderModelMaterial
 ================
 */
-const arcMaterial *idMoveable::GetRenderModelMaterial( void ) const {
+const anMaterial *idMoveable::GetRenderModelMaterial( void ) const {
 	if ( renderEntity.customShader ) {
 		return renderEntity.customShader;
 	}
 	if ( renderEntity.hModel && renderEntity.hModel->NumSurfaces() ) {
 		 return renderEntity.hModel->Surface( 0 )->shader;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -561,7 +561,7 @@ const arcMaterial *idMoveable::GetRenderModelMaterial( void ) const {
 idMoveable::WriteToSnapshot
 ================
 */
-void idMoveable::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void idMoveable::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	physicsObj.WriteToSnapshot( msg );
 }
 
@@ -570,7 +570,7 @@ void idMoveable::WriteToSnapshot( idBitMsgDelta &msg ) const {
 idMoveable::ReadFromSnapshot
 ================
 */
-void idMoveable::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void idMoveable::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	physicsObj.ReadFromSnapshot( msg );
 	if ( msg.HasChanged() ) {
 		UpdateVisuals();
@@ -591,9 +591,9 @@ void idMoveable::Event_BecomeNonSolid( void ) {
 idMoveable::Event_Activate
 ================
 */
-void idMoveable::Event_Activate( idEntity *activator ) {
+void idMoveable::Event_Activate( anEntity *activator ) {
 	float delay;
-	arcVec3 init_velocity, init_avelocity;
+	anVec3 init_velocity, init_avelocity;
 
 	Show();
 
@@ -622,10 +622,10 @@ void idMoveable::Event_Activate( idEntity *activator ) {
 
 	InitInitialSpline( gameLocal.time );
 
-// RAVEN BEGIN
+
 // jshepard: we should update it's stage on activation, specifically for falling blocks.
 	UpdateStage();
-// RAVEN END
+
 
 }
 
@@ -635,7 +635,7 @@ idMoveable::Event_SetOwnerFromSpawnArgs
 ================
 */
 void idMoveable::Event_SetOwnerFromSpawnArgs( void ) {
-	idStr owner;
+	anString owner;
 
 	if ( spawnArgs.GetString( "owner", "", owner ) ) {
 		ProcessEvent( &EV_SetOwner, gameLocal.FindEntity( owner ) );
@@ -648,7 +648,7 @@ idMoveable::Event_IsAtRest
 ================
 */
 void idMoveable::Event_IsAtRest( void ) {
-	idThread::ReturnInt( physicsObj.IsAtRest() );
+	anThread::ReturnInt( physicsObj.IsAtRest() );
 }
 
 /*
@@ -674,7 +674,7 @@ void idMoveable::Event_SetHealth( float newHealth ) {
 idMoveable::Event_RadiusDamage
 ================
 */
-void idMoveable::Event_RadiusDamage( idEntity *attacker, const char* splash ) {
+void idMoveable::Event_RadiusDamage( anEntity *attacker, const char* splash ) {
 	gameLocal.RadiusDamage( GetPhysics()->GetOrigin(), this, attacker, this, this, splash );
 }
 
@@ -709,7 +709,7 @@ idBarrel::idBarrel() {
 idBarrel::Save
 ================
 */
-void idBarrel::Save( idSaveGame *savefile ) const {
+void idBarrel::Save( anSaveGame *savefile ) const {
 	savefile->WriteFloat( radius );
 	savefile->WriteInt( barrelAxis );
 	savefile->WriteVec3( lastOrigin );
@@ -723,7 +723,7 @@ void idBarrel::Save( idSaveGame *savefile ) const {
 idBarrel::Restore
 ================
 */
-void idBarrel::Restore( idRestoreGame *savefile ) {
+void idBarrel::Restore( anRestoreGame *savefile ) {
 	savefile->ReadFloat( radius );
 	savefile->ReadInt( barrelAxis );
 	savefile->ReadVec3( lastOrigin );
@@ -740,13 +740,13 @@ idBarrel::BarrelThink
 void idBarrel::BarrelThink( void ) {
 	bool wasAtRest, onGround;
 	float movedDistance, rotatedDistance, angle;
-	arcVec3 curOrigin, gravityNormal, dir;
-	arcMat3 curAxis, axis;
+	anVec3 curOrigin, gravityNormal, dir;
+	anMat3 curAxis, axis;
 
 	wasAtRest = IsAtRest();
 
 	// Progress to the next stage?
-	UpdateStage ( );
+	UpdateStage();
 
 	// run physics
 	RunPhysics();
@@ -768,16 +768,16 @@ void idBarrel::BarrelThink( void ) {
 			movedDistance = dir.LengthSqr();
 
 			// if the barrel moved and the barrel is not aligned with the gravity direction
-			if ( movedDistance > 0.0f && arcMath::Fabs( gravityNormal * curAxis[barrelAxis] ) < 0.7f ) {
+			if ( movedDistance > 0.0f && anMath::Fabs( gravityNormal * curAxis[barrelAxis] ) < 0.7f ) {
 
 				// barrel movement since last think frame orthogonal to the barrel axis
-				movedDistance = arcMath::Sqrt( movedDistance );
+				movedDistance = anMath::Sqrt( movedDistance );
 				dir *= 1.0f / movedDistance;
-				movedDistance = ( 1.0f - arcMath::Fabs( dir * curAxis[barrelAxis] ) ) * movedDistance;
+				movedDistance = ( 1.0f - anMath::Fabs( dir * curAxis[barrelAxis] ) ) * movedDistance;
 
 				// get rotation about barrel axis since last think frame
 				angle = lastAxis[(barrelAxis+1)%3] * curAxis[(barrelAxis+1)%3];
-				angle = arcMath::ACos( angle );
+				angle = anMath::ACos( angle );
 				// distance along cylinder hull
 				rotatedDistance = angle * radius;
 
@@ -786,7 +786,7 @@ void idBarrel::BarrelThink( void ) {
 
 					// additional rotation of the visual model to make it look
 					// like the barrel rolls instead of slides
-					angle = 180.0f * (movedDistance - rotatedDistance) / (radius * arcMath::PI);
+					angle = 180.0f * (movedDistance - rotatedDistance) / (radius * anMath::PI);
 					if ( gravityNormal.Cross( curAxis[barrelAxis] ) * dir < 0.0f ) {
 						additionalRotation += angle;
 					} else {
@@ -794,7 +794,7 @@ void idBarrel::BarrelThink( void ) {
 					}
 					dir = vec3_origin;
 					dir[barrelAxis] = 1.0f;
-					additionalAxis = idRotation( vec3_origin, dir, additionalRotation ).ToMat3();
+					additionalAxis = anRotation( vec3_origin, dir, additionalRotation ).ToMat3();
 				}
 			}
 		}
@@ -827,7 +827,7 @@ void idBarrel::Think( void ) {
 idBarrel::GetPhysicsToVisualTransform
 ================
 */
-bool idBarrel::GetPhysicsToVisualTransform( arcVec3 &origin, arcMat3 &axis ) {
+bool idBarrel::GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis ) {
 	origin = vec3_origin;
 	axis = additionalAxis;
 	return true;
@@ -839,7 +839,7 @@ idBarrel::Spawn
 ================
 */
 void idBarrel::Spawn( void ) {
-	const arcBounds &bounds = GetPhysics()->GetBounds();
+	const anBounds &bounds = GetPhysics()->GetBounds();
 
 	// radius of the barrel cylinder
 	radius = ( bounds[1][0] - bounds[0][0] ) * 0.5f;
@@ -871,8 +871,8 @@ idExplodingBarrel
 
 ===============================================================================
 */
-const idEventDef EV_Respawn( "<respawn>" );
-const idEventDef EV_TriggerTargets( "<triggertargets>" );
+const anEventDef EV_Respawn( "<respawn>" );
+const anEventDef EV_TriggerTargets( "<triggertargets>" );
 
 CLASS_DECLARATION( idBarrel, idExplodingBarrel )
 	EVENT( EV_Activate,					idExplodingBarrel::Event_Activate )
@@ -919,7 +919,7 @@ idExplodingBarrel::~idExplodingBarrel() {
 idExplodingBarrel::Save
 ================
 */
-void idExplodingBarrel::Save( idSaveGame *savefile ) const {
+void idExplodingBarrel::Save( anSaveGame *savefile ) const {
 
 	savefile->WriteInt( state );
 	savefile->WriteVec3( spawnOrigin );
@@ -939,16 +939,16 @@ void idExplodingBarrel::Save( idSaveGame *savefile ) const {
 idExplodingBarrel::Restore
 ================
 */
-void idExplodingBarrel::Restore( idRestoreGame *savefile ) {
+void idExplodingBarrel::Restore( anRestoreGame *savefile ) {
 
-	savefile->ReadInt( (int &)state );
+	savefile->ReadInt( ( int&)state );
 	savefile->ReadVec3( spawnOrigin );
 	savefile->ReadMat3( spawnAxis );
-	savefile->ReadInt( (int &)ipsHandle );
-	savefile->ReadInt( (int &)lightHandle );
-// RAVEN BEGIN
+	savefile->ReadInt( ( int&)ipsHandle );
+	savefile->ReadInt( ( int&)lightHandle );
+
 	savefile->ReadRenderEntity( ipsEntity, &spawnArgs );
-// RAVEN END
+
 	savefile->ReadRenderLight( light );
 	if ( lightHandle != -1 ) {
 		//get the handle again as it's out of date after a restore!
@@ -1098,12 +1098,12 @@ void idExplodingBarrel::AddLight( const char *name, bool burn ) {
 	light.origin = physicsObj.GetOrigin();
 	light.origin.z += 128;
 	light.pointLight = true;
-// RAVEN BEGIN
+
 // dluetscher: added detail levels to render lights
 	light.detailLevel = DEFAULT_LIGHT_DETAIL_LEVEL;
 // dluetscher: made sure that barrels are set to no shadows
 	light.noShadows = true;
-// RAVEN END
+
 	light.shader = declManager->FindMaterial( name );
 	light.shaderParms[ SHADERPARM_RED ] = 2.0f;
 	light.shaderParms[ SHADERPARM_GREEN ] = 2.0f;
@@ -1122,7 +1122,7 @@ idExplodingBarrel::ExplodingEffects
 void idExplodingBarrel::ExplodingEffects( void ) {
 	const char *temp;
 
-	StartSound( "snd_explode", SND_CHANNEL_ANY, 0, false, NULL );
+	StartSound( "snd_explode", SND_CHANNEL_ANY, 0, false, nullptr );
 
 	temp = spawnArgs.GetString( "model_damage", "" );
 	if ( temp && *temp ) {
@@ -1130,7 +1130,7 @@ void idExplodingBarrel::ExplodingEffects( void ) {
 		Show();
 	}
 
-// RAVEN BEGIN
+
 // bdube: replaced with playing an effect
 /*
 	temp = spawnArgs.GetString( "mtr_lightexplode", "" );
@@ -1139,7 +1139,7 @@ void idExplodingBarrel::ExplodingEffects( void ) {
 	}
 */
 	StopEffect ( "fx_burn" );
-	gameLocal.PlayEffect ( gameLocal.GetEffect(spawnArgs, "fx_explode"), GetPhysics()->GetOrigin(), (-GetPhysics()->GetGravityNormal()).ToMat3(), false, vec3_origin, true );
+	gameLocal.PlayEffect ( gameLocal.GetEffect( spawnArgs, "fx_explode" ), GetPhysics()->GetOrigin(), (-GetPhysics()->GetGravityNormal()).ToMat3(), false, vec3_origin, true );
 
 	gameLocal.ProjectDecal( GetPhysics()->GetOrigin(), GetPhysics()->GetGravity(), 128.0f, true, 96.0f, "textures/decals/genericdamage" );
 }
@@ -1149,7 +1149,7 @@ void idExplodingBarrel::ExplodingEffects( void ) {
 idExplodingBarrel::Killed
 ================
 */
-void idExplodingBarrel::Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location ) {
+void idExplodingBarrel::Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location ) {
 
  	if ( IsHidden() || state == EXPLODED || state == EXPLODING || state == BURNING ) {
 		return;
@@ -1159,8 +1159,8 @@ void idExplodingBarrel::Killed( idEntity *inflictor, idEntity *attacker, int dam
 	if ( f > 0.0f && state == NORMAL ) {
 		state = BURNING;
 		PostEventSec( &EV_Explode, f );
-		StartSound( "snd_burn", SND_CHANNEL_ANY, 0, false, NULL );
-		PlayEffect ( gameLocal.GetEffect(spawnArgs,"fx_burn"),
+		StartSound( "snd_burn", SND_CHANNEL_ANY, 0, false, nullptr );
+		PlayEffect ( gameLocal.GetEffect( spawnArgs,"fx_burn" ),
 					 vec3_origin, (-GetPhysics()->GetGravityNormal()).ToMat3(), true, vec3_origin, true );
 		return;
 	} else {
@@ -1181,17 +1181,17 @@ void idExplodingBarrel::Killed( idEntity *inflictor, idEntity *attacker, int dam
 
 	ExplodingEffects( );
 
-// RAVEN BEGIN
+
 // bdube: replaced with playing an effect
 /*
 	//FIXME: need to precache all the debris stuff here and in the projectiles
-	const idKeyValue *kv = spawnArgs.MatchPrefix( "def_debris" );
+	const anKeyValue *kv = spawnArgs.MatchPrefix( "def_debris" );
 	// bool first = true;
 	while ( kv ) {
-		const idDict *debris_args = gameLocal.FindEntityDefDict( kv->GetValue(), false );
+		const anDict *debris_args = gameLocal.FindEntityDefDict( kv->GetValue(), false );
 		if ( debris_args ) {
-			idEntity *ent;
-			arcVec3 dir;
+			anEntity *ent;
+			anVec3 dir;
 			idDebris *debris;
 			//if ( first ) {
 				dir = physicsObj.GetAxis()[1];
@@ -1218,7 +1218,7 @@ void idExplodingBarrel::Killed( idEntity *inflictor, idEntity *attacker, int dam
 		kv = spawnArgs.MatchPrefix( "def_debris", kv );
 	}
 */
-// RAVEN END
+
 
 	physicsObj.PutToRest();
 	CancelEvents( &EV_Explode );
@@ -1241,18 +1241,18 @@ void idExplodingBarrel::Killed( idEntity *inflictor, idEntity *attacker, int dam
 idExplodingBarrel::Think
 ================
 */
-void idExplodingBarrel::Damage( idEntity *inflictor, idEntity *attacker, const arcVec3 &dir,
+void idExplodingBarrel::Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir,
 					  const char *damageDefName, const float damageScale, const int location ) {
 
 
-	const idDict *damageDef = gameLocal.FindEntityDefDict( damageDefName, false );
+	const anDict *damageDef = gameLocal.FindEntityDefDict( damageDefName, false );
 	if ( !damageDef ) {
 		gameLocal.Error( "Unknown damageDef '%s'\n", damageDefName );
 	}
-	if ( damageDef->FindKey( "radius" ) && GetPhysics()->GetContents() != 0 && GetBindMaster() == NULL ) {
+	if ( damageDef->FindKey( "radius" ) && GetPhysics()->GetContents() != 0 && GetBindMaster() == nullptr ) {
 		PostEventMS( &EV_Explode, 400 );
 	} else {
-		idEntity::Damage( inflictor, attacker, dir, damageDefName, damageScale, location );
+		anEntity::Damage( inflictor, attacker, dir, damageDefName, damageScale, location );
 	}
 }
 
@@ -1274,7 +1274,7 @@ idExplodingBarrel::Event_Explode
 void idExplodingBarrel::Event_Explode() {
 	if ( state == NORMAL || state == BURNING ) {
 		state = BURNEXPIRED;
-		Killed( NULL, NULL, 0, vec3_zero, 0 );
+		Killed( nullptr, nullptr, 0, vec3_zero, 0 );
 	}
 }
 
@@ -1304,7 +1304,7 @@ void idExplodingBarrel::Event_Respawn() {
 idMoveable::Event_Activate
 ================
 */
-void idExplodingBarrel::Event_Activate( idEntity *activator ) {
+void idExplodingBarrel::Event_Activate( anEntity *activator ) {
 	Killed( activator, activator, 0, vec3_origin, 0 );
 }
 
@@ -1315,7 +1315,7 @@ void idExplodingBarrel::Event_Activate( idEntity *activator ) {
 idMoveable::WriteToSnapshot
 ================
 */
-void idExplodingBarrel::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void idExplodingBarrel::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	idMoveable::WriteToSnapshot( msg );
 	msg.WriteBits( IsHidden(), 1 );
 	msg.WriteBits( state, 3 );
@@ -1326,7 +1326,7 @@ void idExplodingBarrel::WriteToSnapshot( idBitMsgDelta &msg ) const {
 idMoveable::ReadFromSnapshot
 ================
 */
-void idExplodingBarrel::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void idExplodingBarrel::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	explode_state_t newState;
 
 	idMoveable::ReadFromSnapshot( msg );
@@ -1344,4 +1344,4 @@ void idExplodingBarrel::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	}
 }
 
-// RAVEN END
+

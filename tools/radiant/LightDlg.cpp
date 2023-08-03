@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -72,14 +72,14 @@ void CLightInfo::Defaults() {
 
 
 void CLightInfo::DefaultPoint() {
-	arcVec3 oldColor = color;
+	anVec3 oldColor = color;
 	Defaults();
 	color = oldColor;
 	pointLight = true;
 }
 
 void CLightInfo::DefaultProjected() {
-	arcVec3 oldColor = color;
+	anVec3 oldColor = color;
 	Defaults();
 	color = oldColor;
 	pointLight = false;
@@ -88,7 +88,7 @@ void CLightInfo::DefaultProjected() {
 	lightRight[0] = -128;
 }
 
-void CLightInfo::FromDict( const arcDictionary *e ) {
+void CLightInfo::FromDict( const anDict *e ) {
 
 	lightRadius.Zero();
 	lightTarget.Zero();
@@ -156,9 +156,9 @@ void CLightInfo::FromDict( const arcDictionary *e ) {
 	}
 }
 
-void CLightInfo::ToDictFromDifferences ( arcDictionary *e, const arcDictionary *differences ) {
+void CLightInfo::ToDictFromDifferences ( anDict *e, const anDict *differences ) {
     for ( int i = 0; i < differences->GetNumKeyVals (); i ++ ) {
-        const idKeyValue *kv = differences->GetKeyVal( i );
+        const anKeyValue *kv = differences->GetKeyVal( i );
 
         if ( kv->GetValue().Length() > 0 ) {
             e->Set ( kv->GetKey() ,kv->GetValue() );
@@ -171,7 +171,7 @@ void CLightInfo::ToDictFromDifferences ( arcDictionary *e, const arcDictionary *
 }
 
 //write all info to a dict, regardless of light type
-void CLightInfo::ToDictWriteAllInfo( arcDictionary *e ) {
+void CLightInfo::ToDictWriteAllInfo( anDict *e ) {
     e->Set( "noshadows", ( !castShadows) ? "1" : "0" );
 	e->Set( "nospecular", ( !castSpecular) ? "1" : "0" );
 	e->Set( "nodiffuse", ( !castDiffuse) ? "1" : "0" );
@@ -182,7 +182,7 @@ void CLightInfo::ToDictWriteAllInfo( arcDictionary *e ) {
 		e->Set( "texture", strTexture);
 	}
 
-	arcVec3 temp = color;
+	anVec3 temp = color;
 	temp /= 255;
 	e->SetVector( "_color", temp);
 
@@ -202,7 +202,7 @@ void CLightInfo::ToDictWriteAllInfo( arcDictionary *e ) {
 	e->Set( "light_end", va( "%g %g %g", lightEnd[0], lightEnd[1], lightEnd[2] ) );
 }
 
-void CLightInfo::ToDict( arcDictionary *e ) {
+void CLightInfo::ToDict( anDict *e ) {
 
 	e->Delete( "noshadows" );
 	e->Delete( "nospecular" );
@@ -231,7 +231,7 @@ void CLightInfo::ToDict( arcDictionary *e ) {
 		e->Set( "texture", strTexture);
 	}
 
-	arcVec3 temp = color;
+	anVec3 temp = color;
 	temp /= 255;
 	e->SetVector( "_color", temp);
 
@@ -273,10 +273,10 @@ CLightInfo::CLightInfo() {
 /////////////////////////////////////////////////////////////////////////////
 // CLightDlg dialog
 
-CLightDlg *g_LightDialog = NULL;
+CLightDlg *g_LightDialog = nullptr;
 
 
-CLightDlg::CLightDlg(CWnd* pParent /*=NULL*/)
+CLightDlg::CLightDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CLightDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CLightDlg)
@@ -568,7 +568,7 @@ void CLightDlg::UpdateLightInfoFromDialog( void ) {
 	lightInfo.lightCenter[2] = m_centerZ;
 }
 
-void CLightDlg::SaveLightInfo( const arcDictionary *differences ) {
+void CLightDlg::SaveLightInfo( const anDict *differences ) {
 
 	if ( com_editorActive ) {
 
@@ -587,7 +587,7 @@ void CLightDlg::SaveLightInfo( const arcDictionary *differences ) {
 	} else {
 
 		// used in-game
-		arcNetList<arcEntity *> list;
+		anList<arcEntity *> list;
 
 		list.SetNum( 128 );
 		int count = engineEdit->GetSelectedEntities( list.Ptr(), list.Num() );
@@ -596,12 +596,12 @@ void CLightDlg::SaveLightInfo( const arcDictionary *differences ) {
 		for ( int i = 0; i < count; i++ ) {
 			if ( differences ) {
 				engineEdit->EntityChangeSpawnArgs( list[i], differences );
-				engineEdit->EntityUpdateChangeableSpawnArgs( list[i], NULL );
+				engineEdit->EntityUpdateChangeableSpawnArgs( list[i], nullptr );
 			} else {
-				arcDictionary newArgs;
+				anDict newArgs;
 				lightInfo.ToDict( &newArgs );
 				engineEdit->EntityChangeSpawnArgs( list[i], &newArgs );
-				engineEdit->EntityUpdateChangeableSpawnArgs( list[i], NULL );
+				engineEdit->EntityUpdateChangeableSpawnArgs( list[i], nullptr );
 			}
 			engineEdit->EntityUpdateVisuals( list[i] );
 		}
@@ -632,10 +632,10 @@ void CLightDlg::ColorButtons() {
 void CLightDlg::LoadLightTextures() {
 	int count = declManager->GetNumDecls( DECL_MATERIAL );
 	int i;
-	const arcMaterial *mat;
+	const anMaterial *mat;
 	for ( i = 0; i < count; i++ ) {
 		mat = declManager->MaterialByIndex( i, false);
-		arcNetString str = mat->GetName();
+		anString str = mat->GetName();
 		str.ToLower();
 		if (str.Icmpn( "lights/", strlen( "lights/" ) ) == 0 || str.Icmpn( "fogs/", strlen( "fogs/" ) ) == 0 ) {
 			m_wndLights.AddString(mat->GetName() );
@@ -706,7 +706,7 @@ void CLightDlg::OnRadioFalloff()
 
 void CLightDlg::OnOK() {
 	UpdateLightInfoFromDialog();
-	SaveLightInfo( NULL );
+	SaveLightInfo( nullptr );
 	Sys_UpdateWindows(W_ALL);
 	CDialog::OnOK();
 }
@@ -718,7 +718,7 @@ entity_t *SingleLightSelected() {
 			return b->owner;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CLightDlg::UpdateDialog( bool updateChecks )
@@ -737,7 +737,7 @@ void CLightDlg::UpdateDialog( bool updateChecks )
 			title = "Light Editor";
 		} else {
 			//find the last brush belonging to the last entity selected and use that as the source
-			e = NULL;
+			e = nullptr;
 			for ( brush_t *b = selected_brushes.next; b != &selected_brushes; b = b->next ) {
 				if ( ( b->owner->eclass->nShowFlags & ECLASS_LIGHT ) && !b->entityModel ) {
 					e = b->owner;
@@ -755,7 +755,7 @@ void CLightDlg::UpdateDialog( bool updateChecks )
 		}
 	} else {
 		// used in-game
-		arcNetList<arcEntity *> list;
+		anList<arcEntity *> list;
 
 		list.SetNum( 128 );
 		int count = engineEdit->GetSelectedEntities( list.Ptr(), list.Num() );
@@ -779,24 +779,24 @@ void CLightDlg::UpdateDialog( bool updateChecks )
 	}
 }
 
-void LightEditorInit( const arcDictionary *spawnArgs ) {
+void LightEditorInit( const anDict *spawnArgs ) {
 	if ( renderSystem->IsFullScreen() ) {
 		common->Printf( "Cannot run the light editor in fullscreen mode.\n"
 					"Set r_fullscreen to 0 and vid_restart.\n" );
 		return;
 	}
 
-	if ( g_LightDialog == NULL ) {
+	if ( g_LightDialog == nullptr ) {
 		InitAfx();
 		g_LightDialog = new CLightDlg();
 	}
 
-	if ( g_LightDialog->GetSafeHwnd() == NULL ) {
+	if ( g_LightDialog->GetSafeHwnd() == nullptr ) {
 		g_LightDialog->Create( IDD_DIALOG_LIGHT );
 		CRect rct;
 		LONG lSize = sizeof( rct );
 		if ( LoadRegistryInfo( "Radiant::LightWindow", &rct, &lSize ) ) {
-			g_LightDialog->SetWindowPos(NULL, rct.left, rct.top, 0,0, SWP_NOSIZE);
+			g_LightDialog->SetWindowPos(nullptr, rct.left, rct.top, 0,0, SWP_NOSIZE);
 		}
 	}
 
@@ -818,7 +818,7 @@ void LightEditorRun( void ) {
 	MSG *msg = &m_msgCur;
 #endif
 
-	while( ::PeekMessage(msg, NULL, NULL, NULL, PM_NOREMOVE) ) {
+	while( ::PeekMessage(msg, nullptr, nullptr, nullptr, PM_NOREMOVE) ) {
 		// pump message
 		if ( !AfxGetApp()->PumpMessage() ) {
 		}
@@ -827,18 +827,18 @@ void LightEditorRun( void ) {
 
 void LightEditorShutdown( void ) {
 	delete g_LightDialog;
-	g_LightDialog = NULL;
+	g_LightDialog = nullptr;
 }
 
 void UpdateLightInspector() {
-	if ( g_LightDialog && g_LightDialog->GetSafeHwnd() != NULL ) {
+	if ( g_LightDialog && g_LightDialog->GetSafeHwnd() != nullptr ) {
 		g_LightDialog->UpdateDialog(true);   //jhefty - update ALL info about the light, including check boxes
 	}
 }
 
 void CLightDlg::OnApply() {
 	UpdateLightInfoFromDialog();
-	SaveLightInfo( NULL );
+	SaveLightInfo( nullptr );
 	Sys_UpdateWindows( W_ALL );
 }
 
@@ -853,7 +853,7 @@ void CLightDlg::UpdateColor( float r, float g, float b, float a ) {
 	color[2] = a * b;
 	ColorButtons();
 	UpdateLightInfoFromDialog();
-	SaveLightInfo( NULL );
+	SaveLightInfo( nullptr );
 	Sys_UpdateWindows( W_CAMERA );
 }
 
@@ -941,7 +941,7 @@ void CLightDlg::OnCheckParallel() {
 
 //jhefty - only apply settings that are different
 void CLightDlg::OnApplyDifferences () {
-	arcDictionary differences, modified, original;
+	anDict differences, modified, original;
 
 	UpdateLightInfoFromDialog();
 
@@ -952,8 +952,8 @@ void CLightDlg::OnApplyDifferences () {
 
 	// jhefty - compile a set of modified values to apply
 	for ( int i = 0; i < modified.GetNumKeyVals (); i ++ ) {
-		const idKeyValue* valModified = modified.GetKeyVal ( i );
-		const idKeyValue* valOriginal = original.FindKey ( valModified->GetKey() );
+		const anKeyValue* valModified = modified.GetKeyVal ( i );
+		const anKeyValue* valOriginal = original.FindKey ( valModified->GetKey() );
 
 		//if it hasn't changed, remove it from the list of values to apply
 		if ( !valOriginal || ( valModified->GetValue() == valOriginal->GetValue() ) ) {

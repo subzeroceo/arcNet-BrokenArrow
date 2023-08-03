@@ -1,4 +1,4 @@
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Game_local.h"
@@ -45,8 +45,8 @@ arcMultiModelAF::~arcMultiModelAF( void ) {
 arcMultiModelAF::SetModelForId
 ================
 */
-void arcMultiModelAF::SetModelForId( int id, const idStr &modelName ) {
-	modelHandles.AssureSize( id+1, NULL );
+void arcMultiModelAF::SetModelForId( int id, const anString &modelName ) {
+	modelHandles.AssureSize( id+1, nullptr );
 	modelDefHandles.AssureSize( id+1, -1 );
 	modelHandles[id] = renderModelManager->FindModel( modelName );
 }
@@ -116,30 +116,30 @@ arcNetChain::BuildChain
   this allows an object to be attached to multiple chains while keeping a single tree structure
 ================
 */
-void arcNetChain::BuildChain( const idStr &name, const arcVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld ) {
+void arcNetChain::BuildChain( const anString &name, const anVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld ) {
 	int i;
 	float halfLinkLength = linkLength * 0.5f;
-	arcTraceModel trm;
-	arcClipModel *clip;
+	anTraceModel trm;
+	anClipModel *clip;
 	arcAFBody *body, *lastBody;
 	arcAFConstraint_BallAndSocketJoint *bsj;
 	arcAFConstraint_UniversalJoint *uj;
-	arcVec3 org;
+	anVec3 org;
 
 	// create a trace model
-	trm = arcTraceModel( linkLength, linkWidth );
+	trm = anTraceModel( linkLength, linkWidth );
 	trm.Translate( -trm.offset );
 
-	org = origin - arcVec3( 0, 0, halfLinkLength );
+	org = origin - anVec3( 0, 0, halfLinkLength );
 
-	lastBody = NULL;
+	lastBody = nullptr;
 	for ( i = 0; i < numLinks; i++ ) {
 
 		// add body
-		clip = new arcClipModel( trm );
+		clip = new anClipModel( trm );
 		clip->SetContents( CONTENTS_SOLID );
 		clip->Link( gameLocal.clip, this, 0, org, mat3_identity );
-		body = new arcAFBody( name + idStr(i), clip, density );
+		body = new arcAFBody( name + anString( i ), clip, density );
 		physicsObj.AddBody( body );
 
 		// visual model for body
@@ -148,25 +148,25 @@ void arcNetChain::BuildChain( const idStr &name, const arcVec3 &origin, float li
 		// add constraint
 		if ( bindToWorld ) {
 			if ( !lastBody ) {
-				uj = new arcAFConstraint_UniversalJoint( name + idStr(i), body, lastBody );
-				uj->SetShafts( arcVec3( 0, 0, -1 ), arcVec3( 0, 0, 1 ) );
-				//uj->SetConeLimit( arcVec3( 0, 0, -1 ), 30.0f );
-				//uj->SetPyramidLimit( arcVec3( 0, 0, -1 ), arcVec3( 1, 0, 0 ), 90.0f, 30.0f );
+				uj = new arcAFConstraint_UniversalJoint( name + anString( i ), body, lastBody );
+				uj->SetShafts( anVec3( 0, 0, -1 ), anVec3( 0, 0, 1 ) );
+				//uj->SetConeLimit( anVec3( 0, 0, -1 ), 30.0f );
+				//uj->SetPyramidLimit( anVec3( 0, 0, -1 ), anVec3( 1, 0, 0 ), 90.0f, 30.0f );
 			}
 			else {
-				uj = new arcAFConstraint_UniversalJoint( name + idStr(i), lastBody, body );
-				uj->SetShafts( arcVec3( 0, 0, 1 ), arcVec3( 0, 0, -1 ) );
-				//uj->SetConeLimit( arcVec3( 0, 0, 1 ), 30.0f );
+				uj = new arcAFConstraint_UniversalJoint( name + anString( i ), lastBody, body );
+				uj->SetShafts( anVec3( 0, 0, 1 ), anVec3( 0, 0, -1 ) );
+				//uj->SetConeLimit( anVec3( 0, 0, 1 ), 30.0f );
 			}
-			uj->SetAnchor( org + arcVec3( 0, 0, halfLinkLength ) );
+			uj->SetAnchor( org + anVec3( 0, 0, halfLinkLength ) );
 			uj->SetFriction( 0.9f );
 			physicsObj.AddConstraint( uj );
 		}
 		else {
 			if ( lastBody ) {
-				bsj = new arcAFConstraint_BallAndSocketJoint( "joint" + idStr(i), lastBody, body );
-				bsj->SetAnchor( org + arcVec3( 0, 0, halfLinkLength ) );
-				bsj->SetConeLimit( arcVec3( 0, 0, 1 ), 60.0f, arcVec3( 0, 0, 1 ) );
+				bsj = new arcAFConstraint_BallAndSocketJoint( "joint" + anString( i ), lastBody, body );
+				bsj->SetAnchor( org + anVec3( 0, 0, halfLinkLength ) );
+				bsj->SetConeLimit( anVec3( 0, 0, 1 ), 60.0f, anVec3( 0, 0, 1 ) );
 				physicsObj.AddConstraint( bsj );
 			}
 		}
@@ -186,11 +186,11 @@ void arcNetChain::Spawn( void ) {
 	int numLinks;
 	float length, linkLength, linkWidth, density;
 	bool drop;
-	arcVec3 origin;
+	anVec3 origin;
 
 	spawnArgs.GetBool( "drop", "0", drop );
 	spawnArgs.GetInt( "links", "3", numLinks );
-	spawnArgs.GetFloat( "length", idStr( numLinks * 32.0f ), length );
+	spawnArgs.GetFloat( "length", anString( numLinks * 32.0f ), length );
 	spawnArgs.GetFloat( "width", "8", linkWidth );
 	spawnArgs.GetFloat( "density", "0.2", density );
 	linkLength = length / numLinks;
@@ -199,7 +199,7 @@ void arcNetChain::Spawn( void ) {
 	// initialize physics
 	physicsObj.SetSelf( this );
 	physicsObj.SetGravity( gameLocal.GetGravity() );
-	physicsObj.SetClipMask( MASK_SOLID | CONTENTS_BODY );
+	physicsObj.SetClipMask( MASK_SOLID | CONTENTS_ACTORBODY );
 	SetPhysics( &physicsObj );
 
 	BuildChain( "link", origin, linkLength, linkWidth, density, numLinks, !drop );
@@ -222,8 +222,8 @@ arcAFAttachment::arcAFAttachment
 =====================
 */
 arcAFAttachment::arcAFAttachment( void ) {
-	body			= NULL;
-	combatModel		= NULL;
+	body			= nullptr;
+	combatModel		= nullptr;
 	idleAnim		= 0;
 	attachJoint		= INVALID_JOINT;
 }
@@ -238,7 +238,7 @@ arcAFAttachment::~arcAFAttachment( void ) {
 	StopSound( SND_CHANNEL_ANY, false );
 
 	delete combatModel;
-	combatModel = NULL;
+	combatModel = nullptr;
 }
 
 /*
@@ -273,7 +273,7 @@ arcAFAttachment::ClearBody
 =====================
 */
 void arcAFAttachment::ClearBody( void ) {
-	body = NULL;
+	body = nullptr;
 	attachJoint = INVALID_JOINT;
 	Hide();
 }
@@ -308,7 +308,7 @@ unarchives object from save game file
 ================
 */
 void arcAFAttachment::Restore( arcRestoreGame *savefile ) {
-	savefile->ReadObject( reinterpret_cast<idClass *&>( body ) );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( body ) );
 	savefile->ReadInt( idleAnim );
 	savefile->ReadJoint( attachJoint );
 
@@ -343,7 +343,7 @@ arcAFAttachment::Damage
 Pass damage to body at the bindjoint
 ============
 */
-void arcAFAttachment::Damage( arcEntity *inflictor, arcEntity *attacker, const arcVec3 &dir,
+void arcAFAttachment::Damage( arcEntity *inflictor, arcEntity *attacker, const anVec3 &dir,
 	const char *damageDefName, const float damageScale, const int location ) {
 
 	if ( body ) {
@@ -356,7 +356,7 @@ void arcAFAttachment::Damage( arcEntity *inflictor, arcEntity *attacker, const a
 arcAFAttachment::AddDamageEffect
 ================
 */
-void arcAFAttachment::AddDamageEffect( const trace_t &collision, const arcVec3 &velocity, const char *damageDefName ) {
+void arcAFAttachment::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName ) {
 	if ( body ) {
 		trace_t c = collision;
 		c.c.id = JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint );
@@ -369,7 +369,7 @@ void arcAFAttachment::AddDamageEffect( const trace_t &collision, const arcVec3 &
 arcAFAttachment::GetImpactInfo
 ================
 */
-void arcAFAttachment::GetImpactInfo( arcEntity *ent, int id, const arcVec3 &point, impactInfo_t *info ) {
+void arcAFAttachment::GetImpactInfo( arcEntity *ent, int id, const anVec3 &point, impactInfo_t *info ) {
 	if ( body ) {
 		body->GetImpactInfo( ent, JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint ), point, info );
 	} else {
@@ -382,7 +382,7 @@ void arcAFAttachment::GetImpactInfo( arcEntity *ent, int id, const arcVec3 &poin
 arcAFAttachment::ApplyImpulse
 ================
 */
-void arcAFAttachment::ApplyImpulse( arcEntity *ent, int id, const arcVec3 &point, const arcVec3 &impulse ) {
+void arcAFAttachment::ApplyImpulse( arcEntity *ent, int id, const anVec3 &point, const anVec3 &impulse ) {
 	if ( body ) {
 		body->ApplyImpulse( ent, JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint ), point, impulse );
 	} else {
@@ -395,7 +395,7 @@ void arcAFAttachment::ApplyImpulse( arcEntity *ent, int id, const arcVec3 &point
 arcAFAttachment::AddForce
 ================
 */
-void arcAFAttachment::AddForce( arcEntity *ent, int id, const arcVec3 &point, const arcVec3 &force ) {
+void arcAFAttachment::AddForce( arcEntity *ent, int id, const anVec3 &point, const anVec3 &force ) {
 	if ( body ) {
 		body->AddForce( ent, JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint ), point, force );
 	} else {
@@ -436,7 +436,7 @@ void arcAFAttachment::SetCombatModel( void ) {
 		combatModel->Unlink();
 		combatModel->LoadModel( modelDefHandle );
 	} else {
-		combatModel = new arcClipModel( modelDefHandle );
+		combatModel = new anClipModel( modelDefHandle );
 	}
 	combatModel->SetOwner( body );
 }
@@ -446,7 +446,7 @@ void arcAFAttachment::SetCombatModel( void ) {
 arcAFAttachment::GetCombatModel
 ================
 */
-arcClipModel *arcAFAttachment::GetCombatModel( void ) const {
+anClipModel *arcAFAttachment::GetCombatModel( void ) const {
 	return combatModel;
 }
 
@@ -500,7 +500,7 @@ arcAFEntity_Base::arcAFEntity_Base
 ================
 */
 arcAFEntity_Base::arcAFEntity_Base( void ) {
-	combatModel = NULL;
+	combatModel = nullptr;
 	combatModelContents = 0;
 	nextSoundTime = 0;
 	spawnOrigin.Zero();
@@ -514,7 +514,7 @@ arcAFEntity_Base::~arcAFEntity_Base
 */
 arcAFEntity_Base::~arcAFEntity_Base( void ) {
 	delete combatModel;
-	combatModel = NULL;
+	combatModel = nullptr;
 }
 
 /*
@@ -564,7 +564,7 @@ arcAFEntity_Base::LoadAF
 ================
 */
 bool arcAFEntity_Base::LoadAF( void ) {
-	idStr fileName;
+	anString fileName;
 
 	if ( !spawnArgs.GetString( "articulatedFigure", "*unknown*", fileName ) ) {
 		return false;
@@ -617,14 +617,14 @@ int arcAFEntity_Base::BodyForClipModelId( int id ) const {
 arcAFEntity_Base::SaveState
 ================
 */
-void arcAFEntity_Base::SaveState( arcDict &args ) const {
-	const idKeyValue *kv;
+void arcAFEntity_Base::SaveState( anDict &args ) const {
+	const anKeyValue *kv;
 
 	// save the ragdoll pose
 	af.SaveState( args );
 
 	// save all the bind constraints
-	kv = spawnArgs.MatchPrefix( "bindConstraint ", NULL );
+	kv = spawnArgs.MatchPrefix( "bindConstraint ", nullptr );
 	while ( kv ) {
 		args.Set( kv->GetKey(), kv->GetValue() );
 		kv = spawnArgs.MatchPrefix( "bindConstraint ", kv );
@@ -650,7 +650,7 @@ void arcAFEntity_Base::SaveState( arcDict &args ) const {
 arcAFEntity_Base::LoadState
 ================
 */
-void arcAFEntity_Base::LoadState( const arcDict &args ) {
+void arcAFEntity_Base::LoadState( const anDict &args ) {
 	af.LoadState( args );
 }
 
@@ -677,7 +677,7 @@ void arcAFEntity_Base::RemoveBindConstraints( void ) {
 arcAFEntity_Base::GetImpactInfo
 ================
 */
-void arcAFEntity_Base::GetImpactInfo( arcEntity *ent, int id, const arcVec3 &point, impactInfo_t *info ) {
+void arcAFEntity_Base::GetImpactInfo( arcEntity *ent, int id, const anVec3 &point, impactInfo_t *info ) {
 	if ( af.IsActive() ) {
 		af.GetImpactInfo( ent, id, point, info );
 	} else {
@@ -690,7 +690,7 @@ void arcAFEntity_Base::GetImpactInfo( arcEntity *ent, int id, const arcVec3 &poi
 arcAFEntity_Base::ApplyImpulse
 ================
 */
-void arcAFEntity_Base::ApplyImpulse( arcEntity *ent, int id, const arcVec3 &point, const arcVec3 &impulse ) {
+void arcAFEntity_Base::ApplyImpulse( arcEntity *ent, int id, const anVec3 &point, const anVec3 &impulse ) {
 	if ( af.IsLoaded() ) {
 		af.ApplyImpulse( ent, id, point, impulse );
 	}
@@ -704,7 +704,7 @@ void arcAFEntity_Base::ApplyImpulse( arcEntity *ent, int id, const arcVec3 &poin
 arcAFEntity_Base::AddForce
 ================
 */
-void arcAFEntity_Base::AddForce( arcEntity *ent, int id, const arcVec3 &point, const arcVec3 &force ) {
+void arcAFEntity_Base::AddForce( arcEntity *ent, int id, const anVec3 &point, const anVec3 &force ) {
 	if ( af.IsLoaded() ) {
 		af.AddForce( ent, id, point, force );
 	}
@@ -718,14 +718,14 @@ void arcAFEntity_Base::AddForce( arcEntity *ent, int id, const arcVec3 &point, c
 arcAFEntity_Base::Collide
 ================
 */
-bool arcAFEntity_Base::Collide( const trace_t &collision, const arcVec3 &velocity ) {
+bool arcAFEntity_Base::Collide( const trace_t &collision, const anVec3 &velocity ) {
 	float v, f;
 
 	if ( af.IsActive() ) {
 		v = -( velocity * collision.c.normal );
 		if ( v > BOUNCE_SOUND_MIN_VELOCITY && gameLocal.time > nextSoundTime ) {
-			f = v > BOUNCE_SOUND_MAX_VELOCITY ? 1.0f : arcMath::Sqrt( v - BOUNCE_SOUND_MIN_VELOCITY ) * ( 1.0f / arcMath::Sqrt( BOUNCE_SOUND_MAX_VELOCITY - BOUNCE_SOUND_MIN_VELOCITY ) );
-			if ( StartSound( "snd_bounce", SND_CHANNEL_ANY, 0, false, NULL ) ) {
+			f = v > BOUNCE_SOUND_MAX_VELOCITY ? 1.0f : anMath::Sqrt( v - BOUNCE_SOUND_MIN_VELOCITY ) * ( 1.0f / anMath::Sqrt( BOUNCE_SOUND_MAX_VELOCITY - BOUNCE_SOUND_MIN_VELOCITY ) );
+			if ( StartSound( "snd_bounce", SND_CHANNEL_ANY, 0, false, nullptr ) ) {
 				// don't set the volume unless there is a bounce sound as it overrides the entire channel
 				// which causes footsteps on ai's to not honor their shader parms
 				SetSoundVolume( f );
@@ -742,7 +742,7 @@ bool arcAFEntity_Base::Collide( const trace_t &collision, const arcVec3 &velocit
 arcAFEntity_Base::GetPhysicsToVisualTransform
 ================
 */
-bool arcAFEntity_Base::GetPhysicsToVisualTransform( arcVec3 &origin, arcMat3 &axis ) {
+bool arcAFEntity_Base::GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis ) {
 	if ( af.IsActive() ) {
 		af.GetPhysicsToVisualTransform( origin, axis );
 		return true;
@@ -774,7 +774,7 @@ void arcAFEntity_Base::SetCombatModel( void ) {
 		combatModel->Unlink();
 		combatModel->LoadModel( modelDefHandle );
 	} else {
-		combatModel = new arcClipModel( modelDefHandle );
+		combatModel = new anClipModel( modelDefHandle );
 	}
 }
 
@@ -783,7 +783,7 @@ void arcAFEntity_Base::SetCombatModel( void ) {
 arcAFEntity_Base::GetCombatModel
 ================
 */
-arcClipModel *arcAFEntity_Base::GetCombatModel( void ) const {
+anClipModel *arcAFEntity_Base::GetCombatModel( void ) const {
 	return combatModel;
 }
 
@@ -862,15 +862,15 @@ arcAFEntity_Base::DropAFs
 ================
 */
 void arcAFEntity_Base::DropAFs( arcEntity *ent, const char *type, arcList<arcEntity *> *list ) {
-	const idKeyValue *kv;
+	const anKeyValue *kv;
 	const char *skinName;
 	arcEntity *newEnt;
 	arcAFEntity_Base *af;
-	arcDict args;
-	const arcDeclSkin *skin;
+	anDict args;
+	const anDeclSkin *skin;
 
 	// drop the articulated figures
-	kv = ent->spawnArgs.MatchPrefix( va( "def_drop%sAF", type ), NULL );
+	kv = ent->spawnArgs.MatchPrefix( va( "def_drop%sAF", type ), nullptr );
 	while ( kv ) {
 
 		args.Set( "classname", kv->GetValue() );
@@ -902,7 +902,7 @@ void arcAFEntity_Base::DropAFs( arcEntity *ent, const char *type, arcList<arcEnt
 arcAFEntity_Base::Event_SetConstraintPosition
 ================
 */
-void arcAFEntity_Base::Event_SetConstraintPosition( const char *name, const arcVec3 &pos ) {
+void arcAFEntity_Base::Event_SetConstraintPosition( const char *name, const anVec3 &pos ) {
 	af.SetConstraintPosition( name, pos );
 }
 
@@ -929,7 +929,7 @@ arcAFEntity_Gibbable::arcAFEntity_Gibbable
 ================
 */
 arcAFEntity_Gibbable::arcAFEntity_Gibbable( void ) {
-	skeletonModel = NULL;
+	skeletonModel = nullptr;
 	skeletonModelDefHandle = -1;
 	gibbed = false;
 }
@@ -953,7 +953,7 @@ arcAFEntity_Gibbable::Save
 */
 void arcAFEntity_Gibbable::Save( arcSaveGame *savefile ) const {
 	savefile->WriteBool( gibbed );
-	savefile->WriteBool( combatModel != NULL );
+	savefile->WriteBool( combatModel != nullptr );
 }
 
 /*
@@ -995,12 +995,12 @@ void arcAFEntity_Gibbable::InitSkeletonModel( void ) {
 	const char *modelName;
 	const arcDeclModelDef *modelDef;
 
-	skeletonModel = NULL;
+	skeletonModel = nullptr;
 	skeletonModelDefHandle = -1;
 
 	modelName = spawnArgs.GetString( "model_gib" );
 
-	modelDef = NULL;
+	modelDef = nullptr;
 	if ( modelName[0] != '\0' ) {
 		modelDef = static_cast<const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelName, false ) );
 		if ( modelDef ) {
@@ -1008,7 +1008,7 @@ void arcAFEntity_Gibbable::InitSkeletonModel( void ) {
 		} else {
 			skeletonModel = renderModelManager->FindModel( modelName );
 		}
-		if ( skeletonModel != NULL && renderEntity.hModel != NULL ) {
+		if ( skeletonModel != nullptr && renderEntity.hModel != nullptr ) {
 			if ( skeletonModel->NumJoints() != renderEntity.hModel->NumJoints() ) {
 				gameLocal.Error( "gib model '%s' has different number of joints than model '%s'",
 									skeletonModel->Name(), renderEntity.hModel->Name() );
@@ -1035,7 +1035,7 @@ void arcAFEntity_Gibbable::Present( void ) {
 	}
 
 	// update skeleton model
-	if ( gibbed && !IsHidden() && skeletonModel != NULL ) {
+	if ( gibbed && !IsHidden() && skeletonModel != nullptr ) {
 		skeleton = renderEntity;
 		skeleton.hModel = skeletonModel;
 		// add to refresh list
@@ -1054,7 +1054,7 @@ void arcAFEntity_Gibbable::Present( void ) {
 arcAFEntity_Gibbable::Damage
 ================
 */
-void arcAFEntity_Gibbable::Damage( arcEntity *inflictor, arcEntity *attacker, const arcVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
+void arcAFEntity_Gibbable::Damage( arcEntity *inflictor, arcEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
 	if ( !fl.takedamage ) {
 		return;
 	}
@@ -1069,15 +1069,15 @@ void arcAFEntity_Gibbable::Damage( arcEntity *inflictor, arcEntity *attacker, co
 arcAFEntity_Gibbable::SpawnGibs
 =====================
 */
-void arcAFEntity_Gibbable::SpawnGibs( const arcVec3 &dir, const char *damageDefName ) {
+void arcAFEntity_Gibbable::SpawnGibs( const anVec3 &dir, const char *damageDefName ) {
 	int i;
 	bool gibNonSolid;
-	arcVec3 entityCenter, velocity;
+	anVec3 entityCenter, velocity;
 	arcList<arcEntity *> list;
 
 	assert( !gameLocal.isClient );
 
-	const arcDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
+	const anDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
 	if ( !damageDef ) {
 		gameLocal.Error( "Unknown damageDef '%s'", damageDefName );
 	}
@@ -1116,13 +1116,13 @@ void arcAFEntity_Gibbable::SpawnGibs( const arcVec3 &dir, const char *damageDefN
 arcAFEntity_Gibbable::Gib
 ============
 */
-void arcAFEntity_Gibbable::Gib( const arcVec3 &dir, const char *damageDefName ) {
+void arcAFEntity_Gibbable::Gib( const anVec3 &dir, const char *damageDefName ) {
 	// only gib once
 	if ( gibbed ) {
 		return;
 	}
 
-	const arcDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
+	const anDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
 	if ( !damageDef ) {
 		gameLocal.Error( "Unknown damageDef '%s'", damageDefName );
 	}
@@ -1145,7 +1145,7 @@ void arcAFEntity_Gibbable::Gib( const arcVec3 &dir, const char *damageDefName ) 
 			SpawnGibs( dir, damageDefName );
 			renderEntity.noShadow = true;
 			renderEntity.shaderParms[ SHADERPARM_TIME_OF_DEATH ] = gameLocal.time * 0.001f;
-			StartSound( "snd_gibbed", SND_CHANNEL_ANY, 0, false, NULL );
+			StartSound( "snd_gibbed", SND_CHANNEL_ANY, 0, false, nullptr );
 			gibbed = true;
 		}
 	} else {
@@ -1162,7 +1162,7 @@ arcAFEntity_Gibbable::Event_Gib
 ============
 */
 void arcAFEntity_Gibbable::Event_Gib( const char *damageDefName ) {
-	Gib( arcVec3( 0, 0, 1 ), damageDefName );
+	Gib( anVec3( 0, 0, 1 ), damageDefName );
 }
 
 /*
@@ -1254,7 +1254,7 @@ arcAFEntity_Generic::Event_Activate
 */
 void arcAFEntity_Generic::Event_Activate( arcEntity *activator ) {
 	float delay;
-	arcVec3 init_velocity, init_avelocity;
+	anVec3 init_velocity, init_avelocity;
 
 	Show();
 
@@ -1299,7 +1299,7 @@ arcAFEntity_WithAttachedHead::arcAFEntity_WithAttachedHead
 ================
 */
 arcAFEntity_WithAttachedHead::arcAFEntity_WithAttachedHead() {
-	head = NULL;
+	head = nullptr;
 }
 
 /*
@@ -1369,11 +1369,11 @@ arcAFEntity_WithAttachedHead::SetupHead
 */
 void arcAFEntity_WithAttachedHead::SetupHead( void ) {
 	arcAFAttachment		*headEnt;
-	idStr				jointName;
+	anString				jointName;
 	const char			*headModel;
 	jointHandle_t		joint;
-	arcVec3				origin;
-	arcMat3				axis;
+	anVec3				origin;
+	anMat3				axis;
 
 	headModel = spawnArgs.GetString( "def_head", "" );
 	if ( headModel[ 0 ] ) {
@@ -1383,7 +1383,7 @@ void arcAFEntity_WithAttachedHead::SetupHead( void ) {
 			gameLocal.Error( "Joint '%s' not found for 'head_joint' on '%s'", jointName.c_str(), name.c_str() );
 		}
 
-		headEnt = static_cast<arcAFAttachment *>( gameLocal.SpawnEntityType( arcAFAttachment::Type, NULL ) );
+		headEnt = static_cast<arcAFAttachment *>( gameLocal.SpawnEntityType( arcAFAttachment::Type, nullptr ) );
 		headEnt->SetName( va( "%s_head", name.c_str() ) );
 		headEnt->SetBody( this, headModel, joint );
 		headEnt->SetCombatModel();
@@ -1475,7 +1475,7 @@ void arcAFEntity_WithAttachedHead::Show( void ) {
 arcAFEntity_WithAttachedHead::ProjectOverlay
 ================
 */
-void arcAFEntity_WithAttachedHead::ProjectOverlay( const arcVec3 &origin, const arcVec3 &dir, float size, const char *material ) {
+void arcAFEntity_WithAttachedHead::ProjectOverlay( const anVec3 &origin, const anVec3 &dir, float size, const char *material ) {
 
 	arcEntity::ProjectOverlay( origin, dir, size, material );
 
@@ -1489,7 +1489,7 @@ void arcAFEntity_WithAttachedHead::ProjectOverlay( const arcVec3 &origin, const 
 arcAFEntity_WithAttachedHead::Gib
 ============
 */
-void arcAFEntity_WithAttachedHead::Gib( const arcVec3 &dir, const char *damageDefName ) {
+void arcAFEntity_WithAttachedHead::Gib( const anVec3 &dir, const char *damageDefName ) {
 	// only gib once
 	if ( gibbed ) {
 		return;
@@ -1506,7 +1506,7 @@ arcAFEntity_WithAttachedHead::Event_Gib
 ============
 */
 void arcAFEntity_WithAttachedHead::Event_Gib( const char *damageDefName ) {
-	Gib( arcVec3( 0, 0, 1 ), damageDefName );
+	Gib( anVec3( 0, 0, 1 ), damageDefName );
 }
 
 /*
@@ -1516,7 +1516,7 @@ arcAFEntity_WithAttachedHead::Event_Activate
 */
 void arcAFEntity_WithAttachedHead::Event_Activate( arcEntity *activator ) {
 	float delay;
-	arcVec3 init_velocity, init_avelocity;
+	anVec3 init_velocity, init_avelocity;
 
 	Show();
 
@@ -1559,13 +1559,13 @@ arcAFEntity_Vehicle::arcAFEntity_Vehicle
 ================
 */
 arcAFEntity_Vehicle::arcAFEntity_Vehicle( void ) {
-	player				= NULL;
+	player				= nullptr;
 	eyesJoint			= INVALID_JOINT;
 	steeringWheelJoint	= INVALID_JOINT;
 	wheelRadius			= 0.0f;
 	steerAngle			= 0.0f;
 	steerSpeed			= 0.0f;
-	dustSmoke			= NULL;
+	dustSmoke			= nullptr;
 }
 
 /*
@@ -1597,12 +1597,12 @@ void arcAFEntity_Vehicle::Spawn( void ) {
 	spawnArgs.GetFloat( "wheelRadius", "20", wheelRadius );
 	spawnArgs.GetFloat( "steerSpeed", "5", steerSpeed );
 
-	player = NULL;
+	player = nullptr;
 	steerAngle = 0.0f;
 
 	const char *smokeName = spawnArgs.GetString( "smoke_vehicle_dust", "muzzlesmoke" );
 	if ( *smokeName != '\0' ) {
-		dustSmoke = static_cast<const arcDeclParticle *>( declManager->FindType( DECL_PARTICLE, smokeName ) );
+		dustSmoke = static_cast<const anDeclParticle *>( declManager->FindType( DECL_PARTICLE, smokeName ) );
 	}
 }
 
@@ -1612,13 +1612,13 @@ arcAFEntity_Vehicle::Use
 ================
 */
 void arcAFEntity_Vehicle::Use( arcNetBasePlayer *other ) {
-	arcVec3 origin;
-	arcMat3 axis;
+	anVec3 origin;
+	anMat3 axis;
 
 	if ( player ) {
 		if ( player == other ) {
 			other->Unbind();
-			player = NULL;
+			player = nullptr;
 
 			af.GetPhysics()->SetComeToRest( true );
 		}
@@ -1677,7 +1677,7 @@ arcAFEntity_VehicleSimple::arcAFEntity_VehicleSimple
 arcAFEntity_VehicleSimple::arcAFEntity_VehicleSimple( void ) {
 	int i;
 	for ( i = 0; i < 4; i++ ) {
-		suspension[i] = NULL;
+		suspension[i] = nullptr;
 	}
 }
 
@@ -1688,7 +1688,7 @@ arcAFEntity_VehicleSimple::~arcAFEntity_VehicleSimple
 */
 arcAFEntity_VehicleSimple::~arcAFEntity_VehicleSimple( void ) {
 	delete wheelModel;
-	wheelModel = NULL;
+	wheelModel = nullptr;
 }
 
 /*
@@ -1703,16 +1703,16 @@ void arcAFEntity_VehicleSimple::Spawn( void ) {
 		"wheelJointRearLeft",
 		"wheelJointRearRight"
 	};
-	static arcVec3 wheelPoly[4] = { arcVec3( 2, 2, 0 ), arcVec3( 2, -2, 0 ), arcVec3( -2, -2, 0 ), arcVec3( -2, 2, 0 ) };
+	static anVec3 wheelPoly[4] = { anVec3( 2, 2, 0 ), anVec3( 2, -2, 0 ), anVec3( -2, -2, 0 ), anVec3( -2, 2, 0 ) };
 
 	int i;
-	arcVec3 origin;
-	arcMat3 axis;
-	arcTraceModel trm;
+	anVec3 origin;
+	anMat3 axis;
+	anTraceModel trm;
 
 	trm.SetupPolygon( wheelPoly, 4 );
-	trm.Translate( arcVec3( 0, 0, -wheelRadius ) );
-	wheelModel = new arcClipModel( trm );
+	trm.Translate( anVec3( 0, 0, -wheelRadius ) );
+	wheelModel = new anClipModel( trm );
 
 	for ( i = 0; i < 4; i++ ) {
 		const char *wheelJointName = spawnArgs.GetString( wheelJointKeys[i], "" );
@@ -1750,9 +1750,9 @@ arcAFEntity_VehicleSimple::Think
 void arcAFEntity_VehicleSimple::Think( void ) {
 	int i;
 	float force = 0.0f, velocity = 0.0f, steerAngle = 0.0f;
-	arcVec3 origin;
-	arcMat3 axis;
-	idRotation wheelRotation, steerRotation;
+	anVec3 origin;
+	anMat3 axis;
+	anRotation wheelRotation, steerRotation;
 
 	if ( thinkFlags & TH_THINK ) {
 
@@ -1762,7 +1762,7 @@ void arcAFEntity_VehicleSimple::Think( void ) {
 			if ( player->usercmd.forwardmove < 0 ) {
 				velocity = -velocity;
 			}
-			force = arcMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
+			force = anMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
 			steerAngle = GetSteerAngle();
 		}
 
@@ -1872,12 +1872,12 @@ arcAFEntity_VehicleFourWheels::arcAFEntity_VehicleFourWheels( void ) {
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
-		wheels[i]		= NULL;
+		wheels[i]		= nullptr;
 		wheelJoints[i]	= INVALID_JOINT;
 		wheelAngles[i]	= 0.0f;
 	}
-	steering[0]			= NULL;
-	steering[1]			= NULL;
+	steering[0]			= nullptr;
+	steering[1]			= nullptr;
 }
 
 /*
@@ -1930,7 +1930,7 @@ void arcAFEntity_VehicleFourWheels::Spawn( void ) {
 		if ( !steeringHingeName[0] ) {
 			gameLocal.Error( "arcAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i] );
 		}
-		steering[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( steeringHingeName ));
+		steering[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( steeringHingeName ) );
 		if ( !steering[i] ) {
 			gameLocal.Error( "arcAFEntity_VehicleFourWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName );
 		}
@@ -1948,9 +1948,9 @@ arcAFEntity_VehicleFourWheels::Think
 void arcAFEntity_VehicleFourWheels::Think( void ) {
 	int i;
 	float force = 0.0f, velocity = 0.0f, steerAngle = 0.0f;
-	arcVec3 origin;
-	arcMat3 axis;
-	idRotation rotation;
+	anVec3 origin;
+	anMat3 axis;
+	anRotation rotation;
 
 	if ( thinkFlags & TH_THINK ) {
 
@@ -1960,7 +1960,7 @@ void arcAFEntity_VehicleFourWheels::Think( void ) {
 			if ( player->usercmd.forwardmove < 0 ) {
 				velocity = -velocity;
 			}
-			force = arcMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
+			force = anMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
 			steerAngle = GetSteerAngle();
 		}
 
@@ -2048,14 +2048,14 @@ arcAFEntity_VehicleSixWheels::arcAFEntity_VehicleSixWheels( void ) {
 	int i;
 
 	for ( i = 0; i < 6; i++ ) {
-		wheels[i]		= NULL;
+		wheels[i]		= nullptr;
 		wheelJoints[i]	= INVALID_JOINT;
 		wheelAngles[i]	= 0.0f;
 	}
-	steering[0]			= NULL;
-	steering[1]			= NULL;
-	steering[2]			= NULL;
-	steering[3]			= NULL;
+	steering[0]			= nullptr;
+	steering[1]			= nullptr;
+	steering[2]			= nullptr;
+	steering[3]			= nullptr;
 }
 
 /*
@@ -2114,7 +2114,7 @@ void arcAFEntity_VehicleSixWheels::Spawn( void ) {
 		if ( !steeringHingeName[0] ) {
 			gameLocal.Error( "arcAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i] );
 		}
-		steering[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( steeringHingeName ));
+		steering[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( steeringHingeName ) );
 		if ( !steering[i] ) {
 			gameLocal.Error( "arcAFEntity_VehicleSixWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName );
 		}
@@ -2132,9 +2132,9 @@ arcAFEntity_VehicleSixWheels::Think
 void arcAFEntity_VehicleSixWheels::Think( void ) {
 	int i;
 	float force = 0.0f, velocity = 0.0f, steerAngle = 0.0f;
-	arcVec3 origin;
-	arcMat3 axis;
-	idRotation rotation;
+	anVec3 origin;
+	anMat3 axis;
+	anRotation rotation;
 
 	if ( thinkFlags & TH_THINK ) {
 
@@ -2144,7 +2144,7 @@ void arcAFEntity_VehicleSixWheels::Think( void ) {
 			if ( player->usercmd.forwardmove < 0 ) {
 				velocity = -velocity;
 			}
-			force = arcMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
+			force = anMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
 			steerAngle = GetSteerAngle();
 		}
 
@@ -2277,7 +2277,7 @@ arcAFEntity_SteamPipe::Spawn
 ================
 */
 void arcAFEntity_SteamPipe::Spawn( void ) {
-	arcVec3 steamDir;
+	anVec3 steamDir;
 	const char *steamBodyName;
 
 	LoadAF();
@@ -2314,7 +2314,7 @@ void arcAFEntity_SteamPipe::InitSteamRenderEntity( void ) {
 	steamRenderEntity.shaderParms[ SHADERPARM_RED ]		= 1.0f;
 	steamRenderEntity.shaderParms[ SHADERPARM_GREEN ]	= 1.0f;
 	steamRenderEntity.shaderParms[ SHADERPARM_BLUE ]	= 1.0f;
-	modelDef = NULL;
+	modelDef = nullptr;
 	temp = spawnArgs.GetString ( "model_steam" );
 	if ( *temp != '\0' ) {
 		if ( !strstr( temp, "." ) ) {
@@ -2345,7 +2345,7 @@ arcAFEntity_SteamPipe::Think
 ================
 */
 void arcAFEntity_SteamPipe::Think( void ) {
-	arcVec3 steamDir;
+	anVec3 steamDir;
 
 	if ( thinkFlags & TH_THINK ) {
 		steamDir.x = gameLocal.random.CRandomFloat() * steamForce;
@@ -2392,10 +2392,10 @@ arcAFEntity_ClawFourFingers::arcAFEntity_ClawFourFingers
 ================
 */
 arcAFEntity_ClawFourFingers::arcAFEntity_ClawFourFingers( void ) {
-	fingers[0]	= NULL;
-	fingers[1]	= NULL;
-	fingers[2]	= NULL;
-	fingers[3]	= NULL;
+	fingers[0]	= nullptr;
+	fingers[1]	= nullptr;
+	fingers[2]	= nullptr;
+	fingers[3]	= nullptr;
 }
 
 /*
@@ -2420,7 +2420,7 @@ void arcAFEntity_ClawFourFingers::Restore( arcRestoreGame *savefile ) {
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
-		fingers[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( clawConstraintNames[i] ));
+		fingers[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( clawConstraintNames[i] ) );
 		fingers[i]->Restore( savefile );
 	}
 
@@ -2447,7 +2447,7 @@ void arcAFEntity_ClawFourFingers::Spawn( void ) {
 	fl.takedamage = true;
 
 	for ( i = 0; i < 4; i++ ) {
-		fingers[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( clawConstraintNames[i] ));
+		fingers[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( clawConstraintNames[i] ) );
 		if ( !fingers[i] ) {
 			gameLocal.Error( "idClaw_FourFingers '%s': can't find claw constraint '%s'", name.c_str(), clawConstraintNames[i] );
 		}
@@ -2494,15 +2494,15 @@ void arcAFEntity_ClawFourFingers::Event_StopFingers( void ) {
 
 /*
 ================
-idGameEdit::AF_SpawnEntity
+anGameEdit::AF_SpawnEntity
 ================
 */
-bool idGameEdit::AF_SpawnEntity( const char *fileName ) {
-	arcDict args;
+bool anGameEdit::AF_SpawnEntity( const char *fileName ) {
+	anDict args;
 	arcNetBasePlayer *player;
 	arcAFEntity_Generic *ent;
-	const arcDeclAF *af;
-	arcVec3 org;
+	const anDeclAF *af;
+	anVec3 org;
 	float yaw;
 
 	player = gameLocal.GetLocalPlayer();
@@ -2510,14 +2510,14 @@ bool idGameEdit::AF_SpawnEntity( const char *fileName ) {
 		return false;
 	}
 
-	af = static_cast<const arcDeclAF *>( declManager->FindType( DECL_AF, fileName ) );
+	af = static_cast<const anDeclAF *>( declManager->FindType( DECL_AF, fileName ) );
 	if ( !af ) {
 		return false;
 	}
 
 	yaw = player->viewAngles.yaw;
 	args.Set( "angle", va( "%f", yaw + 180 ) );
-	org = player->GetPhysics()->GetOrigin() + arcAngles( 0, yaw, 0 ).ToForward() * 80 + arcVec3( 0, 0, 1 );
+	org = player->GetPhysics()->GetOrigin() + anAngles( 0, yaw, 0 ).ToForward() * 80 + anVec3( 0, 0, 1 );
 	args.Set( "origin", org.ToString() );
 	args.Set( "spawnclass", "arcAFEntity_Generic" );
 	if ( af->model[0] ) {
@@ -2544,19 +2544,19 @@ bool idGameEdit::AF_SpawnEntity( const char *fileName ) {
 
 /*
 ================
-idGameEdit::AF_UpdateEntities
+anGameEdit::AF_UpdateEntities
 ================
 */
-void idGameEdit::AF_UpdateEntities( const char *fileName ) {
+void anGameEdit::AF_UpdateEntities( const char *fileName ) {
 	arcEntity *ent;
 	arcAFEntity_Base *af;
-	idStr name;
+	anString name;
 
 	name = fileName;
 	name.StripFileExtension();
 
 	// reload any arcAFEntity_Generic which uses the given articulated figure file
-	for ( ent = gameLocal.spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next() ) {
+	for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
 		if ( ent->IsType( arcAFEntity_Base::Type ) ) {
 			af = static_cast<arcAFEntity_Base *>(ent);
 			if ( name.Icmp( af->GetAFName() ) == 0 ) {
@@ -2569,18 +2569,18 @@ void idGameEdit::AF_UpdateEntities( const char *fileName ) {
 
 /*
 ================
-idGameEdit::AF_UndoChanges
+anGameEdit::AF_UndoChanges
 ================
 */
-void idGameEdit::AF_UndoChanges( void ) {
+void anGameEdit::AF_UndoChanges( void ) {
 	int i, c;
 	arcEntity *ent;
 	arcAFEntity_Base *af;
-	arcDeclAF *decl;
+	anDeclAF *decl;
 
 	c = declManager->GetNumDecls( DECL_AF );
 	for ( i = 0; i < c; i++ ) {
-		decl = static_cast<arcDeclAF *>( const_cast<arcDecl *>( declManager->DeclByIndex( DECL_AF, i, false ) ) );
+		decl = static_cast<anDeclAF *>( const_cast<arcDecl *>( declManager->DeclByIndex( DECL_AF, i, false ) ) );
 		if ( !decl->modified ) {
 			continue;
 		}
@@ -2589,10 +2589,10 @@ void idGameEdit::AF_UndoChanges( void ) {
 		declManager->FindType( DECL_AF, decl->GetName() );
 
 		// reload all AF entities using the file
-		for ( ent = gameLocal.spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next() ) {
+		for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
 			if ( ent->IsType( arcAFEntity_Base::Type ) ) {
 				af = static_cast<arcAFEntity_Base *>(ent);
-				if ( idStr::Icmp( decl->GetName(), af->GetAFName() ) == 0 ) {
+				if ( anString::Icmp( decl->GetName(), af->GetAFName() ) == 0 ) {
 					af->LoadAF();
 				}
 			}
@@ -2610,7 +2610,7 @@ typedef struct {
 	const idMD5Joint *joints;
 } jointTransformData_t;
 
-static bool GetJointTransform( void *model, const idJointMat *frame, const char *jointName, arcVec3 &origin, arcMat3 &axis ) {
+static bool GetJointTransform( void *model, const anJointMat *frame, const char *jointName, anVec3 &origin, anMat3 &axis ) {
 	int i;
 	jointTransformData_t *data = reinterpret_cast<jointTransformData_t *>(model);
 
@@ -2632,7 +2632,7 @@ static bool GetJointTransform( void *model, const idJointMat *frame, const char 
 GetArgString
 ================
 */
-static const char *GetArgString( const arcDict &args, const arcDict *defArgs, const char *key ) {
+static const char *GetArgString( const anDict &args, const anDict *defArgs, const char *key ) {
 	const char *s;
 
 	s = args.GetString( key );
@@ -2644,30 +2644,30 @@ static const char *GetArgString( const arcDict &args, const arcDict *defArgs, co
 
 /*
 ================
-idGameEdit::AF_CreateMesh
+anGameEdit::AF_CreateMesh
 ================
 */
-idRenderModel *idGameEdit::AF_CreateMesh( const arcDict &args, arcVec3 &meshOrigin, arcMat3 &meshAxis, bool &poseIsSet ) {
+anRenderModel *anGameEdit::AF_CreateMesh( const anDict &args, anVec3 &meshOrigin, anMat3 &meshAxis, bool &poseIsSet ) {
 	int i, jointNum;
-	const arcDeclAF *af;
-	const arcDeclAF_Body *fb;
+	const anDeclAF *af;
+	const anDeclAF_Body *fb;
 	renderEntity_t ent;
-	arcVec3 origin, *bodyOrigin, *newBodyOrigin, *modifiedOrigin;
-	arcMat3 axis, *bodyAxis, *newBodyAxis, *modifiedAxis;
+	anVec3 origin, *bodyOrigin, *newBodyOrigin, *modifiedOrigin;
+	anMat3 axis, *bodyAxis, *newBodyAxis, *modifiedAxis;
 	declAFJointMod_t *jointMod;
-	arcAngles angles;
-	const arcDict *defArgs;
-	const idKeyValue *arg;
-	idStr name;
+	anAngles angles;
+	const anDict *defArgs;
+	const anKeyValue *arg;
+	anString name;
 	jointTransformData_t data;
 	const char *classname, *afName, *modelName;
-	idRenderModel *md5;
+	anRenderModel *md5;
 	const arcDeclModelDef *modelDef;
-	const idMD5Anim *MD5anim;
+	const anM8DAnim *MD5anim;
 	const idMD5Joint *MD5joint;
 	const idMD5Joint *MD5joints;
 	int numMD5joints;
-	idJointMat *originalJoints;
+	anJointMat *originalJoints;
 	int parentNum;
 
 	poseIsSet = false;
@@ -2679,16 +2679,16 @@ idRenderModel *idGameEdit::AF_CreateMesh( const arcDict &args, arcVec3 &meshOrig
 
 	// get the articulated figure
 	afName = GetArgString( args, defArgs, "articulatedFigure" );
-	af = static_cast<const arcDeclAF *>( declManager->FindType( DECL_AF, afName ) );
+	af = static_cast<const anDeclAF *>( declManager->FindType( DECL_AF, afName ) );
 	if ( !af ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// get the md5 model
 	modelName = GetArgString( args, defArgs, "model" );
 	modelDef = static_cast< const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelName, false ) );
 	if ( !modelDef ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// make sure model hasn't been purged
@@ -2699,17 +2699,17 @@ idRenderModel *idGameEdit::AF_CreateMesh( const arcDict &args, arcVec3 &meshOrig
 	// get the md5
 	md5 = modelDef->ModelHandle();
 	if ( !md5 || md5->IsDefaultModel() ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// get the articulated figure pose anim
 	int animNum = modelDef->GetAnim( "af_pose" );
 	if ( !animNum ) {
-		return NULL;
+		return nullptr;
 	}
 	const arcAnim *anim = modelDef->GetAnim( animNum );
 	if ( !anim ) {
-		return NULL;
+		return nullptr;
 	}
 	MD5anim = anim->MD5Anim( 0 );
 	MD5joints = md5->GetJoints();
@@ -2720,16 +2720,16 @@ idRenderModel *idGameEdit::AF_CreateMesh( const arcDict &args, arcVec3 &meshOrig
 	ent.customSkin = modelDef->GetSkin();
 	ent.bounds.Clear();
 	ent.numJoints = numMD5joints;
-	ent.joints = ( idJointMat * )_alloca16( ent.numJoints * sizeof( *ent.joints ) );
+	ent.joints = ( anJointMat * )_alloca16( ent.numJoints * sizeof( *ent.joints ) );
 
 	// create animation from of the af_pose
 	ANIM_CreateAnimFrame( md5, MD5anim, ent.numJoints, ent.joints, 1, modelDef->GetVisualOffset(), false );
 
 	// buffers to store the initial origin and axis for each body
-	bodyOrigin = (arcVec3 *) _alloca16( af->bodies.Num() * sizeof( arcVec3 ) );
-	bodyAxis = (arcMat3 *) _alloca16( af->bodies.Num() * sizeof( arcMat3 ) );
-	newBodyOrigin = (arcVec3 *) _alloca16( af->bodies.Num() * sizeof( arcVec3 ) );
-	newBodyAxis = (arcMat3 *) _alloca16( af->bodies.Num() * sizeof( arcMat3 ) );
+	bodyOrigin = (anVec3 *) _alloca16( af->bodies.Num() * sizeof( anVec3 ) );
+	bodyAxis = (anMat3 *) _alloca16( af->bodies.Num() * sizeof( anMat3 ) );
+	newBodyOrigin = (anVec3 *) _alloca16( af->bodies.Num() * sizeof( anVec3 ) );
+	newBodyAxis = (anMat3 *) _alloca16( af->bodies.Num() * sizeof( anMat3 ) );
 
 	// finish the AF positions
 	data.ent = &ent;
@@ -2755,7 +2755,7 @@ idRenderModel *idGameEdit::AF_CreateMesh( const arcDict &args, arcVec3 &meshOrig
 	}
 
 	// get any new body transforms stored in the key/value pairs
-	for ( arg = args.MatchPrefix( "body ", NULL ); arg; arg = args.MatchPrefix( "body ", arg ) ) {
+	for ( arg = args.MatchPrefix( "body ", nullptr ); arg; arg = args.MatchPrefix( "body ", arg ) ) {
 		name = arg->GetKey();
 		name.Strip( "body " );
 		for ( i = 0; i < af->bodies.Num(); i++ ) {
@@ -2780,16 +2780,16 @@ idRenderModel *idGameEdit::AF_CreateMesh( const arcDict &args, arcVec3 &meshOrig
 	}
 
 	// save the original joints
-	originalJoints = ( idJointMat * )_alloca16( numMD5joints * sizeof( originalJoints[0] ) );
+	originalJoints = ( anJointMat * )_alloca16( numMD5joints * sizeof( originalJoints[0] ) );
 	memcpy( originalJoints, ent.joints, numMD5joints * sizeof( originalJoints[0] ) );
 
 	// buffer to store the joint mods
 	jointMod = (declAFJointMod_t *) _alloca16( numMD5joints * sizeof( declAFJointMod_t ) );
 	memset( jointMod, -1, numMD5joints * sizeof( declAFJointMod_t ) );
-	modifiedOrigin = (arcVec3 *) _alloca16( numMD5joints * sizeof( arcVec3 ) );
-	memset( modifiedOrigin, 0, numMD5joints * sizeof( arcVec3 ) );
-	modifiedAxis = (arcMat3 *) _alloca16( numMD5joints * sizeof( arcMat3 ) );
-	memset( modifiedAxis, 0, numMD5joints * sizeof( arcMat3 ) );
+	modifiedOrigin = (anVec3 *) _alloca16( numMD5joints * sizeof( anVec3 ) );
+	memset( modifiedOrigin, 0, numMD5joints * sizeof( anVec3 ) );
+	modifiedAxis = (anMat3 *) _alloca16( numMD5joints * sizeof( anMat3 ) );
+	memset( modifiedAxis, 0, numMD5joints * sizeof( anMat3 ) );
 
 	// get all the joint modifications
 	for ( i = 0; i < af->bodies.Num(); i++ ) {
@@ -2818,34 +2818,34 @@ idRenderModel *idGameEdit::AF_CreateMesh( const arcDict &args, arcVec3 &meshOrig
 	for ( i = 1; i < numMD5joints; i++, MD5joint++ ) {
 
 		parentNum = MD5joint->parent - MD5joints;
-		arcMat3 parentAxis = originalJoints[ parentNum ].ToMat3();
-		arcMat3 localm = originalJoints[i].ToMat3() * parentAxis.Transpose();
-		arcVec3 localt = ( originalJoints[i].ToVec3() - originalJoints[ parentNum ].ToVec3() ) * parentAxis.Transpose();
+		anMat3 parentAxis = originalJoints[ parentNum ].ToMat3();
+		anMat3 localm = originalJoints[i].ToMat3() * parentAxis.Transpose();
+		anVec3 localt = ( originalJoints[i].ToVec3() - originalJoints[ parentNum ].ToVec3() ) * parentAxis.Transpose();
 
-		switch( jointMod[i] ) {
+		switch ( jointMod[i] ) {
 			case DECLAF_JOINTMOD_ORIGIN: {
-				ent.joints[ i ].SetRotation( localm * ent.joints[ parentNum ].ToMat3() );
-				ent.joints[ i ].SetTranslation( modifiedOrigin[ i ] );
+				ent.joints[i].SetRotation( localm * ent.joints[ parentNum ].ToMat3() );
+				ent.joints[i].SetTranslation( modifiedOrigin[i] );
 				break;
 			}
 			case DECLAF_JOINTMOD_AXIS: {
-				ent.joints[ i ].SetRotation( modifiedAxis[ i ] );
-				ent.joints[ i ].SetTranslation( ent.joints[ parentNum ].ToVec3() + localt * ent.joints[ parentNum ].ToMat3() );
+				ent.joints[i].SetRotation( modifiedAxis[i] );
+				ent.joints[i].SetTranslation( ent.joints[ parentNum ].ToVec3() + localt * ent.joints[ parentNum ].ToMat3() );
 				break;
 			}
 			case DECLAF_JOINTMOD_BOTH: {
-				ent.joints[ i ].SetRotation( modifiedAxis[ i ] );
-				ent.joints[ i ].SetTranslation( modifiedOrigin[ i ] );
+				ent.joints[i].SetRotation( modifiedAxis[i] );
+				ent.joints[i].SetTranslation( modifiedOrigin[i] );
 				break;
 			}
 			default: {
-				ent.joints[ i ].SetRotation( localm * ent.joints[ parentNum ].ToMat3() );
-				ent.joints[ i ].SetTranslation( ent.joints[ parentNum ].ToVec3() + localt * ent.joints[ parentNum ].ToMat3() );
+				ent.joints[i].SetRotation( localm * ent.joints[ parentNum ].ToMat3() );
+				ent.joints[i].SetTranslation( ent.joints[ parentNum ].ToVec3() + localt * ent.joints[ parentNum ].ToMat3() );
 				break;
 			}
 		}
 	}
 
 	// instantiate a mesh using the joint information from the render entity
-	return md5->InstantiateDynamicModel( &ent, NULL, NULL );
+	return md5->InstantiateDynamicModel( &ent, nullptr, nullptr );
 }

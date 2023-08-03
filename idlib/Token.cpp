@@ -1,13 +1,13 @@
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 
 /*
 ================
-arcNetToken::NumberValue
+anToken::NumberValue
 ================
 */
-void arcNetToken::NumberValue( void ) {
+void anToken::NumberValue( void ) {
 	int i, pow, div, c;
 	const char *p;
 	double m;
@@ -66,7 +66,7 @@ void arcNetToken::NumberValue( void ) {
 				}
 			}
 		}
-		intvalue = arcMath::Ftol( floatvalue );
+		intvalue = anMath::Ftol( floatvalue );
 	} else if ( subtype & TT_DECIMAL ) {
 		while( *p ) {
 			intvalue = intvalue * 10 + (*p - '0');
@@ -129,11 +129,11 @@ void arcNetToken::NumberValue( void ) {
 
 /*
 ================
-arcNetToken::ClearTokenWhiteSpace
+anToken::ClearTokenWhiteSpace
 ================
 */
-void arcNetToken::ClearTokenWhiteSpace( void ) {
-	whiteSpaceStart_p = NULL;
-	whiteSpaceEnd_p = NULL;
+void anToken::ClearTokenWhiteSpace( void ) {
+	whiteSpaceStart_p = nullptr;
+	whiteSpaceEnd_p = nullptr;
 	linesCrossed = 0;
 }

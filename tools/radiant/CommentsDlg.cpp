@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -6,7 +6,7 @@
 #include "CommentsDlg.h"
 
 IMPLEMENT_DYNAMIC(CCommentsDlg, CDialog)
-CCommentsDlg::CCommentsDlg(CWnd* pParent /*=NULL*/) : CDialog(CCommentsDlg::IDD, pParent), strName(_T( "" ) ), strPath(_T( "" ) ), strComments(_T( "" ) ){
+CCommentsDlg::CCommentsDlg(CWnd* pParent /*=nullptr*/) : CDialog(CCommentsDlg::IDD, pParent), strName(_T( "" ) ), strPath(_T( "" ) ), strComments(_T( "" ) ){
 }
 
 CCommentsDlg::~CCommentsDlg(){

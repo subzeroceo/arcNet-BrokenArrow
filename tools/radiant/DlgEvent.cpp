@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -42,7 +42,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgEvent dialog
 
 
-CDlgEvent::CDlgEvent(CWnd* pParent /*=NULL*/)
+CDlgEvent::CDlgEvent(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgEvent::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEvent)

@@ -1,33 +1,33 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 
 /*
 =================
-arcDeclSkin::Size
+anDeclSkin::Size
 =================
 */
-size_t arcDeclSkin::Size() const {
-	return sizeof( arcDeclSkin );
+size_t anDeclSkin::Size() const {
+	return sizeof( anDeclSkin );
 }
 
 /*
 ================
-arcDeclSkin::FreeData
+anDeclSkin::FreeData
 ================
 */
-void arcDeclSkin::FreeData() {
+void anDeclSkin::FreeData() {
 	mappings.Clear();
 }
 
 /*
 ================
-arcDeclSkin::Parse
+anDeclSkin::Parse
 ================
 */
-bool arcDeclSkin::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
-	arcLexer src;
-	arcNetToken	token, token2;
+bool anDeclSkin::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+	anLexer src;
+	anToken	token, token2;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( DECL_LEXER_FLAGS );
@@ -58,7 +58,7 @@ bool arcDeclSkin::Parse( const char *text, const int textLength, bool allowBinar
 
 		if ( !token.Icmp( "*" ) ) {
 			// wildcard
-			map.from = NULL;
+			map.from = nullptr;
 		} else {
 			map.from = declManager->FindMaterial( token );
 		}
@@ -73,15 +73,15 @@ bool arcDeclSkin::Parse( const char *text, const int textLength, bool allowBinar
 
 /*
 ================
-arcDeclSkin::SetDefaultText
+anDeclSkin::SetDefaultText
 ================
 */
-bool arcDeclSkin::SetDefaultText() {
+bool anDeclSkin::SetDefaultText() {
 	// if there exists a material with the same name
 	if ( declManager->FindType( DECL_MATERIAL, GetName(), false ) ) {
 		char generated[2048];
 
-		arcNetString::snPrintf( generated, sizeof( generated ),
+		anString::snPrintf( generated, sizeof( generated ),
 						"skin %s // IMPLICITLY GENERATED\n"
 						"{\n"
 						"_default %s\n"
@@ -95,10 +95,10 @@ bool arcDeclSkin::SetDefaultText() {
 
 /*
 ================
-arcDeclSkin::DefaultDefinition
+anDeclSkin::DefaultDefinition
 ================
 */
-const char *arcDeclSkin::DefaultDefinition() const {
+const char *anDeclSkin::DefaultDefinition() const {
 	return
 		"{\n"
 	"\t"	"\"*\"\t\"_default\"\n"
@@ -107,19 +107,19 @@ const char *arcDeclSkin::DefaultDefinition() const {
 
 /*
 ================
-arcDeclSkin::GetNumModelAssociations
+anDeclSkin::GetNumModelAssociations
 ================
 */
-const int arcDeclSkin::GetNumModelAssociations(void ) const {
+const int anDeclSkin::GetNumModelAssociations(void ) const {
 	return associatedModels.Num();
 }
 
 /*
 ================
-arcDeclSkin::GetAssociatedModel
+anDeclSkin::GetAssociatedModel
 ================
 */
-const char *arcDeclSkin::GetAssociatedModel( int index ) const {
+const char *anDeclSkin::GetAssociatedModel( int index ) const {
 	if ( index >= 0 && index < associatedModels.Num() ) {
 		return associatedModels[index];
 	}
@@ -131,11 +131,11 @@ const char *arcDeclSkin::GetAssociatedModel( int index ) const {
 RemapShaderBySkin
 ===============
 */
-const arcMaterial *arcDeclSkin::RemapShaderBySkin( const arcMaterial *shader ) const {
+const anMaterial *anDeclSkin::RemapShaderBySkin( const anMaterial *shader ) const {
 	int		i;
 
 	if ( !shader ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// never remap surfaces that were originally nodraw, like collision hulls
@@ -146,7 +146,7 @@ const arcMaterial *arcDeclSkin::RemapShaderBySkin( const arcMaterial *shader ) c
 	for ( i = 0; i < mappings.Num(); i++ ) {
 		const skinMapping_t	*map = &mappings[i];
 
-		// NULL = wildcard match
+		// nullptr = wildcard match
 		if ( !map->from || map->from == shader ) {
 			return map->to;
 		}

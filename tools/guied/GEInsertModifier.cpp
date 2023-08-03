@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "GEApp.h"
@@ -40,10 +40,10 @@ rvGEInsertModifier::rvGEInsertModifier ( const char* name, idWindow* window, idW
 
 	assert ( mParent );
 
-	mUndoParent = window->GetParent ( );
-	mUndoBefore = NULL;
-	mUndoRect   = mWrapper->GetClientRect ( );
-	mRect		= mWrapper->GetClientRect ( );
+	mUndoParent = window->GetParent();
+	mUndoBefore = nullptr;
+	mUndoRect   = mWrapper->GetClientRect();
+	mRect		= mWrapper->GetClientRect();
 
 	// Find the child window the window being inserted is before
 	if ( mUndoParent )
@@ -55,7 +55,7 @@ rvGEInsertModifier::rvGEInsertModifier ( const char* name, idWindow* window, idW
 
 		index = mUndoParent->GetChildIndex ( mWindow );
 
-		if ( index + 1 < pwrapper->GetChildCount ( ) )
+		if ( index + 1 < pwrapper->GetChildCount() )
 		{
 			mUndoBefore = pwrapper->GetChild ( index + 1 );
 		}

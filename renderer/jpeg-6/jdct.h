@@ -155,10 +155,10 @@ EXTERN void jpeg_idct_1x1
  */
 
 #ifdef SHORTxSHORT_32		/* may work if 'int' is 32 bits */
-#define MULTIPLY16C16(var,const)  (((INT16) (var) ) * ((INT16) (const) ))
+#define MULTIPLY16C16(var,const)  (((INT16) (var) ) * ((INT16) (const) ) )
 #endif
 #ifdef SHORTxLCONST_32		/* known to work with Microsoft C 6.0 */
-#define MULTIPLY16C16(var,const)  (((INT16) (var) ) * ((INT32) (const) ))
+#define MULTIPLY16C16(var,const)  (((INT16) (var) ) * ((INT32) (const) ) )
 #endif
 
 #ifndef MULTIPLY16C16		/* default definition */
@@ -168,7 +168,7 @@ EXTERN void jpeg_idct_1x1
 /* Same except both inputs are variables. */
 
 #ifdef SHORTxSHORT_32		/* may work if 'int' is 32 bits */
-#define MULTIPLY16V16(var1,var2)  (((INT16) (var1) ) * ((INT16) (var2) ))
+#define MULTIPLY16V16(var1,var2)  (((INT16) (var1) ) * ((INT16) (var2) ) )
 #endif
 
 #ifndef MULTIPLY16V16		/* default definition */

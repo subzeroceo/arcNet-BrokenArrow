@@ -32,16 +32,16 @@ Private structures used by the MD3 loader.
 #define	MD3_XYZ_SCALE		(1.0/64)
 
 typedef struct md3Frame_s {
-	arcVec3		bounds[2];
-	arcVec3		localOrigin;
+	anVec3		bounds[2];
+	anVec3		localOrigin;
 	float		radius;
 	char		name[16];
 } md3Frame_t;
 
 typedef struct md3Tag_s {
 	char		name[MAX_MD3PATH];	// tag name
-	arcVec3		origin;
-	arcVec3		axis[3];
+	anVec3		origin;
+	anVec3		axis[3];
 } md3Tag_t;
 
 /*
@@ -78,7 +78,7 @@ typedef struct md3Surface_s {
 
 typedef struct {
 	char				name[MAX_MD3PATH];
-	const arcMaterial *	shader;			// for in-game use
+	const anMaterial *	shader;			// for in-game use
 } md3Shader_t;
 
 typedef struct {

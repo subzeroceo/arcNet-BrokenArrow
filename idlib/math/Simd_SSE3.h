@@ -12,12 +12,12 @@
 class arcSIMD_SSE3 : public idSIMD_SSE2 {
 public:
 #if defined(MACOS_X) && defined(__i386__)
-	virtual const char * VPCALL GetName( void ) const;
+	virtual const char *VPCALL GetName( void ) const;
 
 #elif defined(_WIN32)
-	virtual const char * VPCALL GetName( void ) const;
+	virtual const char *VPCALL GetName( void ) const;
 
-	virtual void VPCALL TransformVerts( arcDrawVert *verts, const int numVerts, const arcJointMat *joints, const arcVec4 *weights, const int *index, const int numWeights );
+	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights );
 
 #endif
 };

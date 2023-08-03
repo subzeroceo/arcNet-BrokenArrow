@@ -1,13 +1,13 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Model_local.h"
 #include "tr_local.h"	// just for R_FreeWorldInteractions and R_CreateWorldInteractions
 
 
-//arcCVarSystem binaryLoadRenderModels( "binaryLoadRenderModels", "1", 0, "enable binary load/write of render models" );
-arcCVarSystem preload_MapModels( "preload_MapModels", "1", CVAR_SYSTEM | CVAR_BOOL, "preload models during begin or end levelload" );
-arcCVarSystem postLoadExportModels( "postLoadExportModels", "0", CVAR_BOOL | CVAR_RENDERER, "export models after loading to OBJ model format" );
+//anCVarSystem binaryLoadRenderModels( "binaryLoadRenderModels", "1", 0, "enable binary load/write of render models" );
+anCVarSystem preload_MapModels( "preload_MapModels", "1", CVAR_SYSTEM | CVAR_BOOL, "preload models during begin or end levelload" );
+anCVarSystem postLoadExportModels( "postLoadExportModels", "0", CVAR_BOOL | CVAR_RENDERER, "export models after loading to OBJ model format" );
 
 class ARCModelManagerLocal : public ARCModelManager {
 public:
@@ -16,16 +16,16 @@ public:
 
 	virtual void			Init();
 	virtual void			Shutdown();
-	virtual ARCRenderModel	*AllocModel();
-	virtual void			FreeModel( ARCRenderModel *model );
-	virtual ARCRenderModel	*FindModel( const char *modelName );
-	virtual ARCRenderModel	*CheckModel( const char *modelName );
-	virtual ARCRenderModel	*DefaultModel();
-	virtual void			AddModel( ARCRenderModel *model );
-	virtual void			RemoveModel( ARCRenderModel *model );
+	virtual anRenderModel	*AllocModel();
+	virtual void			FreeModel( anRenderModel *model );
+	virtual anRenderModel	*FindModel( const char *modelName );
+	virtual anRenderModel	*CheckModel( const char *modelName );
+	virtual anRenderModel	*DefaultModel();
+	virtual void			AddModel( anRenderModel *model );
+	virtual void			RemoveModel( anRenderModel *model );
 	virtual void			ReloadModels( bool forceAll = false );
 	virtual void			FreeModelVertexCaches();
-	virtual void			WritePrecacheCommands( arcNetFile *file );
+	virtual void			WritePrecacheCommands( anFile *file );
 	virtual void			BeginLevelLoad();
 	virtual void			Preload( const idPreloadManifest &manifest );
 	virtual void			EndLevelLoad();
@@ -33,20 +33,20 @@ public:
 	virtual	void			PrintMemInfo( MemInfo_t *mi );
 
 private:
-	arcNetList<ARCRenderModel*>models;
-	ARCHashIndex			hash;
-	ARCRenderModel			*defaultModel;
-	ARCRenderModel			*beamModel;
-	ARCRenderModel			*spriteModel;
-	ARCRenderModel			*trailModel;
+	anList<anRenderModel*>models;
+	anHashIndex			hash;
+	anRenderModel			*defaultModel;
+	anRenderModel			*beamModel;
+	anRenderModel			*spriteModel;
+	anRenderModel			*trailModel;
 	bool					insideLevelLoad;		// don't actually load now
 
-	ARCRenderModel			*GetModel( const char *modelName, bool createIfNotFound );
+	anRenderModel			*GetModel( const char *modelName, bool createIfNotFound );
 
-	static void				PrintModel_f( const arcCommandArgs &args );
-	static void				ListModels_f( const arcCommandArgs &args );
-	static void				ReloadModels_f( const arcCommandArgs &args );
-	static void				TouchModel_f( const arcCommandArgs &args );
+	static void				PrintModel_f( const anCommandArgs &args );
+	static void				ListModels_f( const anCommandArgs &args );
+	static void				ReloadModels_f( const anCommandArgs &args );
+	static void				TouchModel_f( const anCommandArgs &args );
 };
 
 
@@ -59,11 +59,11 @@ ARCModelManagerLocal::ARCModelManagerLocal
 ==============
 */
 ARCModelManagerLocal::ARCModelManagerLocal() {
-	defaultModel = NULL;
-	beamModel = NULL;
-	spriteModel = NULL;
+	defaultModel = nullptr;
+	beamModel = nullptr;
+	spriteModel = nullptr;
 	insideLevelLoad = false;
-	trailModel = NULL;
+	trailModel = nullptr;
 }
 
 /*
@@ -71,13 +71,13 @@ ARCModelManagerLocal::ARCModelManagerLocal() {
 ARCModelManagerLocal::PrintModel_f
 ==============
 */
-void ARCModelManagerLocal::PrintModel_f( const arcCommandArgs &args ) {
+void ARCModelManagerLocal::PrintModel_f( const anCommandArgs &args ) {
 	if ( args.Argc() != 2 ) {
 		common->Printf( "usage: printModel <modelName>\n" );
 		return;
 	}
 
-	ARCRenderModel *model = renderModelManager->CheckModel( args.Argv( 1 ) );
+	anRenderModel *model = renderModelManager->CheckModel( args.Argv( 1 ) );
 	if ( !model ) {
 		common->Printf( "model \"%s\" not found\n", args.Argv( 1 ) );
 		return;
@@ -91,7 +91,7 @@ void ARCModelManagerLocal::PrintModel_f( const arcCommandArgs &args ) {
 ARCModelManagerLocal::ListModels_f
 ==============
 */
-void ARCModelManagerLocal::ListModels_f( const arcCommandArgs &args ) {
+void ARCModelManagerLocal::ListModels_f( const anCommandArgs &args ) {
 	int		totalMem = 0;
 	int		inUse = 0;
 
@@ -99,7 +99,7 @@ void ARCModelManagerLocal::ListModels_f( const arcCommandArgs &args ) {
 	common->Printf( " ---   --- ----- ----\n" );
 
 	for ( int i = 0; i < localModelManager.models.Num(); i++ ) {
-		ARCRenderModel	*model = localModelManager.models[i];
+		anRenderModel	*model = localModelManager.models[i];
 		if ( !model->IsLoaded() ) {
 			continue;
 		}
@@ -120,8 +120,8 @@ void ARCModelManagerLocal::ListModels_f( const arcCommandArgs &args ) {
 ARCModelManagerLocal::ReloadModels_f
 ==============
 */
-void ARCModelManagerLocal::ReloadModels_f( const arcCommandArgs &args ) {
-	if ( arcNetString::Icmp( args.Argv(1 ), "all" ) == 0 ) {
+void ARCModelManagerLocal::ReloadModels_f( const anCommandArgs &args ) {
+	if ( anString::Icmp( args.Argv(1 ), "all" ) == 0 ) {
 		localModelManager.ReloadModels( true );
 	} else {
 		localModelManager.ReloadModels( false );
@@ -135,7 +135,7 @@ ARCModelManagerLocal::TouchModel_f
 Precache a specific model
 ==============
 */
-void ARCModelManagerLocal::TouchModel_f( const arcCommandArgs &args ) {
+void ARCModelManagerLocal::TouchModel_f( const anCommandArgs &args ) {
 	const char	*model = args.Argv( 1 );
 
 	if ( !model[0] ) {
@@ -145,7 +145,7 @@ void ARCModelManagerLocal::TouchModel_f( const arcCommandArgs &args ) {
 
 	common->Printf( "touchModel %s\n", model );
 	session->UpdateScreen();
-	ARCRenderModel *m = renderModelManager->CheckModel( model );
+	anRenderModel *m = renderModelManager->CheckModel( model );
 	if ( !m ) {
 		common->Printf( "...not found\n" );
 	}
@@ -156,9 +156,9 @@ void ARCModelManagerLocal::TouchModel_f( const arcCommandArgs &args ) {
 ARCModelManagerLocal::WritePrecacheCommands
 =================
 */
-void ARCModelManagerLocal::WritePrecacheCommands( arcNetFile *f ) {
+void ARCModelManagerLocal::WritePrecacheCommands( anFile *f ) {
 	for ( int i = 0; i < models.Num(); i++ ) {
-		ARCRenderModel	*model = models[i];
+		anRenderModel	*model = models[i];
 		if ( !model ) {
 			continue;
 		}
@@ -187,7 +187,7 @@ void ARCModelManagerLocal::Init() {
 	insideLevelLoad = false;
 
 	// create a default model
-	aRcModelStatic *model = new aRcModelStatic;
+	anModelStatic *model = new anModelStatic;
 	model->InitEmpty( "_DEFAULT" );
 	model->MakeDefaultModel();
 	model->SetLevelLoadReferenced( true );
@@ -195,13 +195,13 @@ void ARCModelManagerLocal::Init() {
 	AddModel( model );
 
 	// create the beam model
-	aRcModelStatic *beam = new idRenderModelBeam;
+	anModelStatic *beam = new idRenderModelBeam;
 	beam->InitEmpty( "_BEAM" );
 	beam->SetLevelLoadReferenced( true );
 	beamModel = beam;
 	AddModel( beam );
 
-	aRcModelStatic *sprite = new idRenderModelSprite;
+	anModelStatic *sprite = new idRenderModelSprite;
 	sprite->InitEmpty( "_SPRITE" );
 	sprite->SetLevelLoadReferenced( true );
 	spriteModel = sprite;
@@ -223,25 +223,25 @@ void ARCModelManagerLocal::Shutdown() {
 ARCModelManagerLocal::GetModel
 =================
 */
-ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool createIfNotFound ) {
-	//arcNetString::StripExtension( modelName )
+anRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool createIfNotFound ) {
+	//anString::StripExtension( modelName )
 	if ( !modelName || !modelName[0] ) {
-		return NULL;
+		return nullptr;
 	}
 	//int key = HashKey_String( modelName );
 
-	aRcStaticString< MAX_OSPATH > canonical = modelName;
+	anStaticString< MAX_OSPATH > canonical = modelName;
 	canonical.ToLower();
 
-	aRcStaticString< MAX_OSPATH > extension;
+	anStaticString< MAX_OSPATH > extension;
 
 	// see if it is already present
 	int key = hash.GenerateKey( modelName, false );
 	for ( int i = hash.First( key ); i != -1; i = hash.Next( i ) ) {
-		ARCRenderModel *model = models[i];
+		anRenderModel *model = models[i];
 		if ( canonical.Icmp( model->Name() ) == 0 ) {
 			if ( !model->IsLoaded() ) {
-				arcNetString generatedFileName = "generated/rendermodels/";
+				anString generatedFileName = "generated/rendermodels/";
 				generatedFileName.AppendPath( canonical );
 				generatedFileName.SetFileExtension( va( "b%s", extension.c_str() ) );
 
@@ -250,7 +250,7 @@ ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool crea
 				ARC_TIME_T generatedTimeStamp = fileSystem->GetTimestamp( generatedFileName );
 				if ( generatedTimeStamp > sourceTimeStamp ) {
 					if ( model->SupportsBinaryModel() && binaryLoadRenderModels.GetBool() ) {
-					arcFileLocal file( fileSystem->OpenFileReadMemory( generatedFileName ) );
+					anFileLocal file( fileSystem->OpenFileReadMemory( generatedFileName ) );
 					model->PurgeModel();
 					if ( !model->LoadBinaryModel( file, sourceTimeStamp ) ) {
 						model->LoadModel();
@@ -271,22 +271,22 @@ ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool crea
 
 	// see if we can load it
 
-	// determine which subclass of ARCRenderModel to initialize
+	// determine which subclass of anRenderModel to initialize
 
-	ARCRenderModel	*model = NULL;
-	arcNetString extension;
+	anRenderModel	*model = nullptr;
+	anString extension;
 	canonical.ExtractFileExtension( extension );
 	//if ( ( extension.Icmp( "md8" ) == 0 ) || (extension.Icmp( "obj" ) == 0) || ( extension.Icmp( "ase" ) == 0 ) || ( extension.Icmp( "lwo" ) == 0 ) || ( extension.Icmp( "flt" ) == 0 ) || ( extension.Icmp( "ma" ) == 0 ) ) {
-		//model = new( TAG_MODEL ) aRcModelStatic;
+		//model = new( TAG_MODEL ) anModelStatic;
 		//model->InitFromFile( canonical );
 	if ( ( extension.Icmp( "ase" ) == 0 ) || ( extension.Icmp( "lwo" ) == 0 ) || ( extension.Icmp( "flt" ) == 0 ) ) {
-		model = new aRcModelStatic;
+		model = new anModelStatic;
 		model->InitFromFile( modelName );
 	} else if ( extension.Icmp( "ma" ) == 0 ) {
-		model = new aRcModelStatic;
+		model = new anModelStatic;
 		model->InitFromFile( modelName );
 	} else if ( extension.Icmp( MD5_MESH_EXT ) == 0 ) {
-		model = new idRenderModelMD5;
+		model = new anRenderModelM8D;
 		model->InitFromFile( modelName );
 	} else if ( extension.Icmp( "md3" ) == 0 ) {
 		model = new idRenderModelMD3;
@@ -295,13 +295,13 @@ ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool crea
 		model = new idRenderModelPrt;
 		model->InitFromFile( modelName );
 	} else if ( extension.Icmp( "liquid" ) == 0  ) {
-		model = new ARCLiquidModel;
+		model = new anLiquidModel;
 		model->InitFromFile( modelName );
 	}
 
-	aRcStaticString< MAX_OSPATH > generatedFileName;
+	anStaticString< MAX_OSPATH > generatedFileName;
 
-	if ( model != NULL ) {
+	if ( model != nullptr ) {
 		generatedFileName = "generated/rendermodels/";
 		generatedFileName.AppendPath( canonical );
 		generatedFileName.SetFileExtension( va( "b%s", extension.c_str() ) );
@@ -310,7 +310,7 @@ ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool crea
 		ARC_TIME_T sourceTimeStamp = fileSystem->GetTimestamp( canonical );
 		ARC_TIME_T generatedTimeStamp = fileSystem->GetTimestamp( generatedFileName );
 		if ( generatedTimeStamp > sourceTimeStamp ) {
-			arcFileLocal file( fileSystem->OpenFileReadMemory( generatedFileName ) );
+			anFileLocal file( fileSystem->OpenFileReadMemory( generatedFileName ) );
 			if ( !model->SupportsBinaryModel() || !binaryLoadRenderModels.GetBool() ) {
 				model->InitFromFile( canonical );
 			}
@@ -319,24 +319,24 @@ ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool crea
 				model->InitFromFile( canonical );
 				// default models shouldn't be cached as binary models
 				if ( !model->IsDefaultModel() ) {
-					arcFileLocal outputFile( fileSystem->OpenFileWrite( generatedFileName, "fs_basepath" ) );
-					arcLibrary::Printf( "Writing %s\n", generatedFileName.c_str() );
+					anFileLocal outputFile( fileSystem->OpenFileWrite( generatedFileName, "fs_basepath" ) );
+					anLibrary::Printf( "Writing %s\n", generatedFileName.c_str() );
 					model->WriteBinaryModel( outputFile );
 				}
 			} else {
-				arcLibrary::Printf( "loaded binary model %s from file %s\n", model->Name(), generatedFileName.c_str() );
+				anLibrary::Printf( "loaded binary model %s from file %s\n", model->Name(), generatedFileName.c_str() );
 			}
 		}
-	} else if ( model == NULL ) {
+	} else if ( model == nullptr ) {
 		if ( extension.Length() ) {
 			common->Warning( "unknown model type '%s'", canonical.c_str() );
 		}
 
 		if ( !createIfNotFound ) {
-			return NULL;
+			return nullptr;
 		}
 
-		aRcModelStatic	*smodel = new aRcModelStatic;
+		anModelStatic	*smodel = new anModelStatic;
 		smodel->InitEmpty( modelName );
 		smodel->MakeDefaultModel();
 
@@ -349,8 +349,8 @@ ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool crea
 
 	if ( !createIfNotFound && model->IsDefaultModel() ) {
 		delete model;
-		model = NULL;
-		return NULL;
+		model = nullptr;
+		return nullptr;
 	}
 
 	if ( cvarSystem->GetCVarBool( "fs_buildEngine" ) ) {
@@ -358,7 +358,7 @@ ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool crea
 	}
 
 	if ( postLoadExportModels.GetBool() && ( model != defaultModel && model != beamModel && model != spriteModel ) ) {
-		aRcStaticString< MAX_OSPATH > exportedFileName;
+		anStaticString< MAX_OSPATH > exportedFileName;
 
 		exportedFileName = "exported/rendermodels/";
 		exportedFileName.AppendPath( canonical );
@@ -370,11 +370,11 @@ ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool crea
 		// TODO: only update if generated has changed
 
 		//if ( timeStamp == FILE_NOT_FOUND_TIMESTAMP ) {
-			arcFileLocal objFile( fileSystem->OpenFileWrite( exportedFileName, "fs_basepath" ) );
-			arcLibrary::Printf( "Writing %s\n", exportedFileName.c_str() );
+			anFileLocal objFile( fileSystem->OpenFileWrite( exportedFileName, "fs_basepath" ) );
+			anLibrary::Printf( "Writing %s\n", exportedFileName.c_str() );
 
 			exportedFileName.SetFileExtension( ".mtl" );
-			arcFileLocal mtlFile( fileSystem->OpenFileWrite( exportedFileName, "fs_basepath" ) );
+			anFileLocal mtlFile( fileSystem->OpenFileWrite( exportedFileName, "fs_basepath" ) );
 
 			model->ExportOBJ( objFile, mtlFile );
 		}
@@ -389,8 +389,8 @@ ARCRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool crea
 ARCModelManagerLocal::AllocModel
 =================
 */
-ARCRenderModel *ARCModelManagerLocal::AllocModel() {
-	return new( TAG_MODEL ) aRcModelStatic();
+anRenderModel *ARCModelManagerLocal::AllocModel() {
+	return new( TAG_MODEL ) anModelStatic();
 }
 
 /*
@@ -407,11 +407,11 @@ aRcModelBSE* ARCModelManagerLocal::AllocBSEModel() {
 ARCModelManagerLocal::FreeModel
 =================
 */
-void ARCModelManagerLocal::FreeModel( ARCRenderModel *model ) {
+void ARCModelManagerLocal::FreeModel( anRenderModel *model ) {
 	if ( !model ) {
 		return;
 	}
-	if ( !dynamic_cast<aRcModelStatic *>( model ) ) {
+	if ( !dynamic_cast<anModelStatic *>( model ) ) {
 		common->Error( "ARCModelManager::FreeModel: model '%s' is not a static model", model->Name() );
 		return;
 	}
@@ -438,7 +438,7 @@ void ARCModelManagerLocal::FreeModel( ARCRenderModel *model ) {
 ARCModelManagerLocal::FindModel
 =================
 */
-ARCRenderModel *ARCModelManagerLocal::FindModel( const char *modelName ) {
+anRenderModel *ARCModelManagerLocal::FindModel( const char *modelName ) {
 	return GetModel( modelName, true );
 }
 
@@ -447,7 +447,7 @@ ARCRenderModel *ARCModelManagerLocal::FindModel( const char *modelName ) {
 ARCModelManagerLocal::CheckModel
 =================
 */
-ARCRenderModel *ARCModelManagerLocal::CheckModel( const char *modelName ) {
+anRenderModel *ARCModelManagerLocal::CheckModel( const char *modelName ) {
 	return GetModel( modelName, false );
 }
 
@@ -456,7 +456,7 @@ ARCRenderModel *ARCModelManagerLocal::CheckModel( const char *modelName ) {
 ARCModelManagerLocal::DefaultModel
 =================
 */
-ARCRenderModel *ARCModelManagerLocal::DefaultModel() {
+anRenderModel *ARCModelManagerLocal::DefaultModel() {
 	return defaultModel;
 }
 
@@ -465,7 +465,7 @@ ARCRenderModel *ARCModelManagerLocal::DefaultModel() {
 ARCModelManagerLocal::AddModel
 =================
 */
-void ARCModelManagerLocal::AddModel( ARCRenderModel *model ) {
+void ARCModelManagerLocal::AddModel( anRenderModel *model ) {
 	hash.Add( hash.GenerateKey( model->Name(), false ), models.Append( model ) );
 }
 
@@ -474,7 +474,7 @@ void ARCModelManagerLocal::AddModel( ARCRenderModel *model ) {
 ARCModelManagerLocal::RemoveModel
 =================
 */
-void ARCModelManagerLocal::RemoveModel( ARCRenderModel *model ) {
+void ARCModelManagerLocal::RemoveModel( anRenderModel *model ) {
 	int index = models.FindIndex( model );
 	if ( index != -1 ) {
 		hash.RemoveIndex( hash.GenerateKey( model->Name(), false ), index );
@@ -498,7 +498,7 @@ void ARCModelManagerLocal::ReloadModels( bool forceAll ) {
 
 	// skip the default model at index 0
 	for ( int i = 1; i < models.Num(); i++ ) {
-		ARCRenderModel *model = models[i];
+		anRenderModel *model = models[i];
 		// we may want to allow world model reloading in the future, but we don't now
 		if ( !model->IsReloadable() ) {
 			continue;
@@ -507,7 +507,7 @@ void ARCModelManagerLocal::ReloadModels( bool forceAll ) {
 		if ( !forceAll ) {
 			// check timestamp
 			ARC_TIME_T current;
-			fileSystem->ReadFile( model->Name(), NULL, &current );
+			fileSystem->ReadFile( model->Name(), nullptr, &current );
 			if ( current <= model->Timestamp() ) {
 				continue;
 			}
@@ -529,7 +529,7 @@ ARCModelManagerLocal::FreeModelVertexCaches
 */
 void ARCModelManagerLocal::FreeModelVertexCaches() {
 	for ( int i = 0; i < models.Num(); i++ ) {
-		ARCRenderModel *model = models[i];
+		anRenderModel *model = models[i];
 		model->FreeVertexCache();
 	}
 }
@@ -543,7 +543,7 @@ void ARCModelManagerLocal::BeginLevelLoad() {
 	insideLevelLoad = true;
 
 	for ( int i = 0; i < models.Num(); i++ ) {
-		ARCRenderModel *model = models[i];
+		anRenderModel *model = models[i];
 		// Reloads all of the models
 		if ( com_purgeAll.GetBool() && model->IsReloadable() ) {
 			R_CheckForEntityDefsUsingModel( model );
@@ -563,21 +563,21 @@ void ARCModelManagerLocal::BeginLevelLoad() {
 ARCModelManagerLocal::Preload
 =================
 */
-void ARCModelManagerLocal::Preload( const aRcPreloadManifest& manifest ) {
+void ARCModelManagerLocal::Preload( const anPreloadManifest& manifest ) {
 	if ( preload_MapModels.GetBool() ) {
 		// preload this levels images
 		int	start = Sys_Milliseconds();
 		int numLoaded = 0;
-		arcNetList< preloadSort_t > preloadSort;
+		anList< preloadSort_t > preloadSort;
 		preloadSort.Resize( manifest.NumResources() );
 		for ( int i = 0; i < manifest.NumResources(); i++ ) {
 			const preloadEntry_s& p = manifest.GetPreloadByIndex( i );
-			aRcResCacheEntries rc;
-			aRcStaticString< MAX_OSPATH > filename;
+			anResourceCacheEntries rc;
+			anStaticString< MAX_OSPATH > filename;
 			if ( p.resType == PRELOAD_MODEL ) {
 				filename = "generated/rendermodels/";
 				filename += p.resourceName;
-				aRcStaticString< 16 > ext;
+				anStaticString< 16 > ext;
 				filename.ExtractFileExtension( ext );
 				filename.SetFileExtension( va( "b%s", ext.c_str() ) );
 			}
@@ -598,14 +598,14 @@ void ARCModelManagerLocal::Preload( const aRcPreloadManifest& manifest ) {
 			}
 		}
 
-		preloadSort.SortWithTemplate( aRcSortPreload() );
+		preloadSort.SortWithTemplate( anSortPreload() );
 
 		for ( int i = 0; i < preloadSort.Num(); i++ ) {
-			const preloadSort_t& ps = preloadSort[ i ];
+			const preloadSort_t& ps = preloadSort[i];
 			const preloadEntry_s& p = manifest.GetPreloadByIndex( ps.idx );
 			if ( p.resType == PRELOAD_MODEL ) {
-				idRenderModel* model = FindModel( p.resourceName );
-				if ( model != NULL ) {
+				anRenderModel* model = FindModel( p.resourceName );
+				if ( model != nullptr ) {
 					model->SetLevelLoadReferenced( true );
 				}
 			} else if ( p.resType == PRELOAD_PARTICLE ) {
@@ -637,7 +637,7 @@ void ARCModelManagerLocal::EndLevelLoad() {
 
 	// purge any models not touched
 	for ( int i = 0; i < models.Num(); i++ ) {
-		ARCRenderModel *model = models[i];
+		anRenderModel *model = models[i];
 		if ( !model->IsLevelLoadReferenced() && model->IsLoaded() && model->IsReloadable() ) {
 			common->Printf( "Begin Level Load - Purging: %s\n", model->Name() );
 			purgeCount++;
@@ -654,7 +654,7 @@ void ARCModelManagerLocal::EndLevelLoad() {
 
 	// load any new ones
 	for ( int i = 0; i < models.Num(); i++ ) {
-		ARCRenderModel *model = models[i];
+		anRenderModel *model = models[i];
 		if ( model->IsLevelLoadReferenced() && !model->IsLoaded() && model->IsReloadable() ) {
 			loadCount++;
 			model->LoadModel();
@@ -666,7 +666,7 @@ void ARCModelManagerLocal::EndLevelLoad() {
 	// create static vertex/index buffers for all models
 	for ( int i = 0; i < models.Num(); i++ ) {
 		common->UpdateLevelLoadPacifier();
-		idRenderModel *model = models[i];
+		anRenderModel *model = models[i];
 		if ( model->IsLoaded() ) {
 			for ( int j = 0; j < model->NumSurfaces(); j++ ) {
 				R_CreateStaticBuffersForTri( *( model->Surface( j )->geometry ) );
@@ -689,7 +689,7 @@ ARCModelManagerLocal::PrintMemInfo
 =================
 */
 void ARCModelManagerLocal::PrintMemInfo( MemInfo_t *mi ) {
-	arcNetFile *f = fileSystem->OpenFileWrite( mi->filebase + "_models.txt" );
+	anFile *f = fileSystem->OpenFileWrite( mi->filebase + "_models.txt" );
 	if ( !f ) {
 		return;
 	}
@@ -713,19 +713,19 @@ void ARCModelManagerLocal::PrintMemInfo( MemInfo_t *mi ) {
 
 	// print next
 	for ( int i = 0; i < localModelManager.models.Num(); i++ ) {
-		ARCRenderModel *model = localModelManager.models[sortIndex[i]];
+		anRenderModel *model = localModelManager.models[sortIndex[i]];
 		if ( !model->IsLoaded() ) {
 			continue;
 		}
 
 		int mem = model->Memory();
 		int totalMem += mem;
-		f->Printf( "%s %s\n", arcNetString::FormatNumber( mem ).c_str(), model->Name() );
+		f->Printf( "%s %s\n", anString::FormatNumber( mem ).c_str(), model->Name() );
 	}
 
 	delete sortIndex;
 	mi->modelAssetsTotal = totalMem;
 
-	f->Printf( "\nTotal model bytes allocated: %s\n", arcNetString::FormatNumber( totalMem ).c_str() );
+	f->Printf( "\nTotal model bytes allocated: %s\n", anString::FormatNumber( totalMem ).c_str() );
 	fileSystem->CloseFile( f );
 }

@@ -1,26 +1,28 @@
-#include "../precompiled.h"
+#include "../Lib.h"
+#include "Radians.h"
+#include "Vector.h"
 #pragma hdrstop
 
 /*
 =====================
-arcQuats::ToAngles
+anQuats::ToAngles
 =====================
 */
-arcAngles arcQuats::ToAngles( void ) const {
+anAngles anQuats::ToAngles( void ) const {
 	return ToMat3().ToAngles();
 }
 
 /*
 =====================
-arcQuats::ToRotation
+anQuats::ToRotation
 =====================
 */
-arcRotate arcQuats::ToRotation( void ) const {
-	arcVec3 vec.x = x;
-	arcVec3 vec.y = y;
-	arcVec3vec.z = z;
+anRotation anQuats::ToRotation( void ) const {
+	anVec3 vec.x = x;
+	anVec3 vec.y = y;
+	anVec3vec.z = z;
 
-	float angle = arcMath::ACos( w );
+	float angle = anMath::ACos( w );
 
 	if ( angle == 0.0f ) {
 		vec.Set( 0.0f, 0.0f, 1.0f );
@@ -28,18 +30,79 @@ arcRotate arcQuats::ToRotation( void ) const {
 		//vec *= (1.0f / sin( angle ) );
 		vec.Normalize();
 		vec.FixDegenerateNormal();
-		angle *= 2.0f * arcMath::M_RAD2DEG;
+		angle *= 2.0f * anMath::M_RAD2DEG;
 	}
-	return arcRotate( vec3_origin, vec, angle );
+	return anRotation( vec3_origin, vec, angle );
 }
+void SetRotationXYZ( const anVec3 &a ) {
+	//assert( a.IsValid() );
+	float sx, cx;
 
+	SinCos( anVec3( a.x * anVec3( 0.5f ) ), &sx, &cx );
+
+	float sy, cy;
+
+	SinCos( abVec3( a.y * anVec3( 0.5f ) ), &sy, &cy );
+
+	float sz, cz;
+
+	SinCos( anVec3( a.z * anVec3( 0.5f ) ), &sz, &cz );
+
+	float w = cx * cy * cz + sx * sy * sz;
+
+
+	anVec3 v.x = cz * cy * sx - sz * sy * cx;
+
+	v.y = cz * sy * cx + sz * cy * sx;
+	v.z = sz * cy * cx - cz * sy * sx;
 /*
 =====================
-arcQuats::ToMat3
+anQuats::Mat3ToQuat
+
+first calculates the trace of the matrix, which is the sum of the diagonal elements.
 =====================
 */
-arcMat3 arcQuats::ToMat3( void ) const {
-	arcMat3	mat;
+void anQuats::Mat3ToQuat( const anMat3 &src, const anQuat &dst ) const {
+	static int next[ 3 ] = { 1, 2, 0 };
+
+	float trace = src[0][0] + src[1][1] + src[2][2];
+	if ( trace > 0.0f ) {
+		float s = ( float )anMath::Sqrt( trace + 1.0f );
+		dst.w = s * 0.5f;
+		s = 0.5f / s;
+
+		dst.x = ( src[2][1] - src[1][2] ) * s;
+		dst.y = ( src[0][2] - src[2][0] ) * s;
+		dst.z = ( src[1][0] - src[0][1] ) * s;
+	} else {
+		int i = 0;
+		if ( src[1][1] > src[0][0] ) {
+			i = 1;
+		}
+		if ( src[2][2] > src[i][i] ) {
+			i = 2;
+		}
+
+		int j = next[i];
+		int k = next[j];
+
+		float s = ( float )anMath::Sqrt( ( src[i][i] - ( src[j][j] + src[k][k] ) ) + 1.0f );
+		dst[i] = s * 0.5f;
+
+		s = 0.5f / s;
+
+		dst.w = ( src[k][j] - src[j][k] ) * s;
+		dst[j] = ( src[j][i] + src[i][j] ) * s;
+		dst[k] = ( src[k][i] + src[i][k] ) * s;
+	}
+}
+/*
+=====================
+anQuats::ToMat3
+=====================
+*/
+anMat3 anQuats::ToMat3( void ) const {
+	anMat3	mat;
 	float	wx, wy, wz;
 	float	xx, yy, yz;
 	float	xy, xz, zz;
@@ -61,83 +124,83 @@ arcMat3 arcQuats::ToMat3( void ) const {
 	wy = w * y2;
 	wz = w * z2;
 
-	mat[ 0 ][ 0 ] = 1.0f - ( yy + zz );
-	mat[ 0 ][ 1 ] = xy - wz;
-	mat[ 0 ][ 2 ] = xz + wy;
+	mat[0][0] = 1.0f - ( yy + zz );
+	mat[0][1] = xy - wz;
+	mat[0][2] = xz + wy;
 
-	mat[ 1 ][ 0 ] = xy + wz;
-	mat[ 1 ][ 1 ] = 1.0f - ( xx + zz );
-	mat[ 1 ][ 2 ] = yz - wx;
+	mat[1][0] = xy + wz;
+	mat[1][1] = 1.0f - ( xx + zz );
+	mat[1][2] = yz - wx;
 
-	mat[ 2 ][ 0 ] = xz - wy;
-	mat[ 2 ][ 1 ] = yz + wx;
-	mat[ 2 ][ 2 ] = 1.0f - ( xx + yy );
+	mat[2][0] = xz - wy;
+	mat[2][1] = yz + wx;
+	mat[2][2] = 1.0f - ( xx + yy );
 
 	return mat;
 }
 
 /*
 =====================
-arcQuats::ToMat4
+anQuats::ToMat4
 =====================
 */
-arcMat4 arcQuats::ToMat4( void ) const {
+anMat4 anQuats::ToMat4( void ) const {
 	return ToMat3().ToMat4();
 }
 
 /*
 =====================
-arcQuats::ToCQuat
+anQuats::ToCQuat
 =====================
 */
-arcCQuats arcQuats::ToCQuat( void ) const {
+anCQuats anQuats::ToCQuat( void ) const {
 	if ( w < 0.0f ) {
-		return arcCQuats( -x, -y, -z );
+		return anCQuats( -x, -y, -z );
 	}
-	return arcCQuats( x, y, z );
+	return anCQuats( x, y, z );
 }
 
 /*
 ============
-arcQuats::ToAngularVelocity
+anQuats::ToAngularVelocity
 ============
 */
-arcVec3 arcQuats::ToAngularVelocity( void ) const {
-	arcVec3 vec.x = x;
-	arcVec3 vec.y = y;
-	arcVec3 vec.z = z;
+anVec3 anQuats::ToAngularVelocity( void ) const {
+	anVec3 vec.x = x;
+	anVec3 vec.y = y;
+	anVec3 vec.z = z;
 	vec.Normalize();
-	return vec * arcMath::ACos( w );
+	return vec * anMath::ACos( w );
 }
 
 /*
 ============
-arcQuats::AngleTo
+anQuats::AngleTo
 ============
 */
-arcVec3 arcQuats::AngleTo( const arcQuats &ang ) const {
-	 arcVec3 d = arcVec3::Dot( ang );
+anVec3 anQuats::AngleTo( const anQuats &ang ) const {
+	 anVec3 d = anVec3::Dot( ang );
 	// acos does clamping.
 	return Math::Acos( d * d * 2 - 1 );
 }
 
 /*
 =============
-arcQuats::ToString
+anQuats::ToString
 =============
 */
-const char *arcQuats::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anQuats::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
 =====================
-arcQuats::Slerp
+anQuats::Slerp
 
 Spherical linear interpolation between two quaternions.
 =====================
 */
-arcQuats &arcQuats::Slerp( const arcQuats &from, const arcQuats &to, float t ) {
+anQuats &anQuats::Slerp( const anQuats &from, const anQuats &to, float t ) {
 	if ( t <= 0.0f ) {
 		*this = from;
 		return *this;
@@ -155,10 +218,10 @@ arcQuats &arcQuats::Slerp( const arcQuats &from, const arcQuats &to, float t ) {
 
 	float cosom = from.x * to.x + from.y * to.y + from.z * to.z + from.w * to.w;
 	if ( cosom < 0.0f ) {
-		arcQuats temp = -to;
+		anQuats temp = -to;
 		cosom = -cosom;
 	} else {
-		arcQuats temp = to;
+		anQuats temp = to;
 	}
 
 	if ( ( 1.0f - cosom ) > 1e-6f ) {
@@ -169,10 +232,10 @@ arcQuats &arcQuats::Slerp( const arcQuats &from, const arcQuats &to, float t ) {
 		float scale1 = sin( t * omega ) * sinom;
 #else
 		float scale0 = 1.0f - cosom * cosom;
-		float sinom = arcMath::InvSqrt( scale0 );
-		float omega = arcMath::ATan16( scale0 * sinom, cosom );
-		float scale0 = arcMath::Sin16( ( 1.0f - t ) * omega ) * sinom;
-		float scale1 = arcMath::Sin16( t * omega ) * sinom;
+		float sinom = anMath::InvSqrt( scale0 );
+		float omega = anMath::ATan16( scale0 * sinom, cosom );
+		float scale0 = anMath::Sin16( ( 1.0f - t ) * omega ) * sinom;
+		float scale1 = anMath::Sin16( t * omega ) * sinom;
 #endif
 	} else {
 		float scale0 = 1.0f - t;
@@ -185,54 +248,54 @@ arcQuats &arcQuats::Slerp( const arcQuats &from, const arcQuats &to, float t ) {
 
 /*
 =============
-arcCQuats::SphericalCubicInterpolate
+anCQuats::SphericalCubicInterpolate
 =============
 */
-arcCQuats SphericalCubicInterpolate( const arcCQuats &bb, const arcCQuats &pa, const arcCQuats &pb, const arcVec3 &weight ) const {
+anCQuats SphericalCubicInterpolate( const anCQuats &bb, const anCQuats &pa, const anCQuats &pb, const anVec3 &weight ) const {
 	// FIXME: Uh oh here we go again.
 }
 
 /*
 =============
-arcCQuats::ToAngles
+anCQuats::ToAngles
 =============
 */
-arcAngles arcCQuats::ToAngles( void ) const {
+anAngles anCQuats::ToAngles( void ) const {
 	return ToQuat().ToAngles();
 }
 
 /*
 =============
-arcCQuats::ToRotation
+anCQuats::ToRotation
 =============
 */
-arcRotate arcCQuats::ToRotation( void ) const {
+anRotation anCQuats::ToRotation( void ) const {
 	return ToQuat().ToRotation();
 }
 
 /*
 =============
-arcCQuats::ToMat3
+anCQuats::ToMat3
 =============
 */
-arcMat3 arcCQuats::ToMat3( void ) const {
+anMat3 anCQuats::ToMat3( void ) const {
 	return ToQuat().ToMat3();
 }
 
 /*
 =============
-arcCQuats::ToMat4
+anCQuats::ToMat4
 =============
 */
-arcMat4 arcCQuats::ToMat4( void ) const {
+anMat4 anCQuats::ToMat4( void ) const {
 	return ToQuat().ToMat4();
 }
 
 /*
 =============
-arcCQuats::ToString
+anCQuats::ToString
 =============
 */
-const char *arcCQuats::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anCQuats::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }

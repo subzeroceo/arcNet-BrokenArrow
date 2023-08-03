@@ -9,7 +9,7 @@
 ==============================================================================
 */
 
-template< class type >
+template<class type>
 class ARCHierarchy {
 public:
 
@@ -45,12 +45,12 @@ private:
 ARCHierarchy<type>::ARCHierarchy
 ================
 */
-template< class type >
+template<class type>
 ARCHierarchy<type>::ARCHierarchy() {
-	owner	= NULL;
-	parent	= NULL;
-	sibling	= NULL;
-	child	= NULL;
+	owner	= nullptr;
+	parent	= nullptr;
+	sibling	= nullptr;
+	child	= nullptr;
 }
 
 /*
@@ -58,7 +58,7 @@ ARCHierarchy<type>::ARCHierarchy() {
 ARCHierarchy<type>::~ARCHierarchy
 ================
 */
-template< class type >
+template<class type>
 ARCHierarchy<type>::~ARCHierarchy() {
 	RemoveFromHierarchy();
 }
@@ -70,7 +70,7 @@ ARCHierarchy<type>::Owner
 Gets the object that is associated with this node.
 ================
 */
-template< class type >
+template<class type>
 type *ARCHierarchy<type>::Owner( void ) const {
 	return owner;
 }
@@ -82,7 +82,7 @@ ARCHierarchy<type>::SetOwner
 Sets the object that this node is associated with.
 ================
 */
-template< class type >
+template<class type>
 void ARCHierarchy<type>::SetOwner( type *object ) {
 	owner = object;
 }
@@ -92,7 +92,7 @@ void ARCHierarchy<type>::SetOwner( type *object ) {
 ARCHierarchy<type>::ParentedBy
 ================
 */
-template< class type >
+template<class type>
 bool ARCHierarchy<type>::ParentedBy( const ARCHierarchy &node ) const {
 	if ( parent == &node ) {
 		return true;
@@ -109,7 +109,7 @@ ARCHierarchy<type>::ParentTo
 Makes the given node the parent.
 ================
 */
-template< class type >
+template<class type>
 void ARCHierarchy<type>::ParentTo( ARCHierarchy &node ) {
 	RemoveFromParent();
 
@@ -125,7 +125,7 @@ ARCHierarchy<type>::MakeSiblingAfter
 Makes the given node a sibling after the passed in node.
 ================
 */
-template< class type >
+template<class type>
 void ARCHierarchy<type>::MakeSiblingAfter( ARCHierarchy &node ) {
 	RemoveFromParent();
 	parent	= node.parent;
@@ -138,7 +138,7 @@ void ARCHierarchy<type>::MakeSiblingAfter( ARCHierarchy &node ) {
 ARCHierarchy<type>::RemoveFromParent
 ================
 */
-template< class type >
+template<class type>
 void ARCHierarchy<type>::RemoveFromParent( void ) {
 	ARCHierarchy<type> *prev;
 
@@ -151,8 +151,8 @@ void ARCHierarchy<type>::RemoveFromParent( void ) {
 		}
 	}
 
-	parent = NULL;
-	sibling = NULL;
+	parent = nullptr;
+	sibling = nullptr;
 }
 
 /*
@@ -162,7 +162,7 @@ ARCHierarchy<type>::RemoveFromHierarchy
 Removes the node from the hierarchy and adds it's children to the parent.
 ================
 */
-template< class type >
+template<class type>
 void ARCHierarchy<type>::RemoveFromHierarchy( void ) {
 	ARCHierarchy<type> *parentNode;
 	ARCHierarchy<type> *node;
@@ -188,12 +188,12 @@ void ARCHierarchy<type>::RemoveFromHierarchy( void ) {
 ARCHierarchy<type>::GetParent
 ================
 */
-template< class type >
+template<class type>
 type *ARCHierarchy<type>::GetParent( void ) const {
 	if ( parent ) {
 		return parent->owner;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -201,12 +201,12 @@ type *ARCHierarchy<type>::GetParent( void ) const {
 ARCHierarchy<type>::GetChild
 ================
 */
-template< class type >
+template<class type>
 type *ARCHierarchy<type>::GetChild( void ) const {
 	if ( child ) {
 		return child->owner;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -214,39 +214,39 @@ type *ARCHierarchy<type>::GetChild( void ) const {
 ARCHierarchy<type>::GetSibling
 ================
 */
-template< class type >
+template<class type>
 type *ARCHierarchy<type>::GetSibling( void ) const {
 	if ( sibling ) {
 		return sibling->owner;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
 ARCHierarchy<type>::GetPriorSiblingNode
 
-Returns NULL if no parent, or if it is the first child.
+Returns nullptr if no parent, or if it is the first child.
 ================
 */
-template< class type >
+template<class type>
 ARCHierarchy<type> *ARCHierarchy<type>::GetPriorSiblingNode( void ) const {
 	if ( !parent || ( parent->child == this ) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	ARCHierarchy<type> *prev;
 	ARCHierarchy<type> *node;
 
 	node = parent->child;
-	prev = NULL;
-	while( ( node != this ) && ( node != NULL ) ) {
+	prev = nullptr;
+	while( ( node != this ) && ( node != nullptr ) ) {
 		prev = node;
 		node = node->sibling;
 	}
 
 	if ( node != this ) {
-		arcLibrary::Error( "ARCHierarchy::GetPriorSibling: could not find node in parent's list of children" );
+		anLibrary::Error( "ARCHierarchy::GetPriorSibling: could not find node in parent's list of children" );
 	}
 
 	return prev;
@@ -256,10 +256,10 @@ ARCHierarchy<type> *ARCHierarchy<type>::GetPriorSiblingNode( void ) const {
 ================
 ARCHierarchy<type>::GetPriorSibling
 
-Returns NULL if no parent, or if it is the first child.
+Returns nullptr if no parent, or if it is the first child.
 ================
 */
-template< class type >
+template<class type>
 type *ARCHierarchy<type>::GetPriorSibling( void ) const {
 	ARCHierarchy<type> *prior;
 
@@ -268,7 +268,7 @@ type *ARCHierarchy<type>::GetPriorSibling( void ) const {
 		return prior->owner;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -278,7 +278,7 @@ ARCHierarchy<type>::GetNext
 Goes through all nodes of the hierarchy.
 ================
 */
-template< class type >
+template<class type>
 type *ARCHierarchy<type>::GetNext( void ) const {
 	const ARCHierarchy<type> *node;
 
@@ -286,13 +286,13 @@ type *ARCHierarchy<type>::GetNext( void ) const {
 		return child->owner;
 	} else {
 		node = this;
-		while( node && node->sibling == NULL ) {
+		while( node && node->sibling == nullptr ) {
 			node = node->parent;
 		}
 		if ( node ) {
 			return node->sibling->owner;
 		} else {
-			return NULL;
+			return nullptr;
 		}
 	}
 }
@@ -304,7 +304,7 @@ ARCHierarchy<type>::GetNextLeaf
 Goes through all leaf nodes of the hierarchy.
 ================
 */
-template< class type >
+template<class type>
 type *ARCHierarchy<type>::GetNextLeaf( void ) const {
 	const ARCHierarchy<type> *node;
 
@@ -316,7 +316,7 @@ type *ARCHierarchy<type>::GetNextLeaf( void ) const {
 		return node->owner;
 	} else {
 		node = this;
-		while( node && node->sibling == NULL ) {
+		while( node && node->sibling == nullptr ) {
 			node = node->parent;
 		}
 		if ( node ) {
@@ -326,7 +326,7 @@ type *ARCHierarchy<type>::GetNextLeaf( void ) const {
 			}
 			return node->owner;
 		} else {
-			return NULL;
+			return nullptr;
 		}
 	}
 }

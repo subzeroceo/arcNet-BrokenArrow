@@ -1,4 +1,4 @@
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
@@ -7,9 +7,9 @@
 #include "AI_Medic.h"
 
 
-const idEventDef AI_DisableHeal	( "disableHeal" );
-const idEventDef AI_EnableHeal	( "enableHeal" );
-const idEventDef AI_TakePatient ( "takePatient", "e" );
+const anEventDef AI_DisableHeal	( "disableHeal" );
+const anEventDef AI_EnableHeal	( "enableHeal" );
+const anEventDef AI_TakePatient ( "takePatient", "e" );
 
 CLASS_DECLARATION( rvAITactical, rvAIMedic )
 	EVENT( AI_DisableHeal,					rvAIMedic::Event_DisableHeal )
@@ -25,7 +25,7 @@ rvAIMedic::rvAIMedic
 ================
 */
 rvAIMedic::rvAIMedic ( void ) {
-	patient = NULL;
+	patient = nullptr;
 	isTech = false;
 	noAutoHeal = false;
 	stationary = false;
@@ -55,7 +55,7 @@ void rvAIMedic::InitSpawnArgsVariables( void )
 
 	/*
 	// JTD: check for player being strogg, since the limits will be different in that case..
-	idStr str = gameLocal.world->spawnArgs.GetString ( "player", "player_marine" );
+	anString str = gameLocal.world->spawnArgs.GetString ( "player", "player_marine" );
 	str.Strip( "player_" );
 	// ...we'll end up with something like minMarineHeal...or minStroggHeal
 	*/
@@ -71,7 +71,7 @@ void rvAIMedic::Spawn ( void ) {
 	InitSpawnArgsVariables();
 
 	stationary = spawnArgs.GetBool( "stationary" );
-	silent = spawnArgs.GetBool( "silent", "0");
+	silent = spawnArgs.GetBool( "silent", "0" );
 	if ( spawnArgs.GetBool( "disableHeal" ) ) {
 		Event_DisableHeal();
 	}
@@ -92,7 +92,7 @@ rvAIMedic::Show
 */
 void rvAIMedic::Show( void ) {
 	rvAITactical::Show();
-	HideAttachment( spawnArgs.GetString("def_attach") );
+	HideAttachment( spawnArgs.GetString( "def_attach" ) );
 }
 
 /*
@@ -100,7 +100,7 @@ void rvAIMedic::Show( void ) {
 rvAIMedic::Save
 ================
 */
-void rvAIMedic::Save( idSaveGame *savefile ) const {
+void rvAIMedic::Save( anSaveGame *savefile ) const {
 	patient.Save( savefile );
 	savefile->WriteBool( healing );
     savefile->WriteInt( lastPatientCheckTime );
@@ -124,7 +124,7 @@ void rvAIMedic::Save( idSaveGame *savefile ) const {
 rvAIMedic::Restore
 ================
 */
-void rvAIMedic::Restore( idRestoreGame *savefile ) {
+void rvAIMedic::Restore( anRestoreGame *savefile ) {
 	patient.Restore( savefile );
 	savefile->ReadBool( healing );
 	savefile->ReadInt( lastPatientCheckTime );
@@ -192,10 +192,10 @@ void rvAIMedic::Event_DisableMovement ( void ) {
 rvAIMedic::TalkTo
 =====================
 */
-void rvAIMedic::TalkTo( idActor *actor )  {
-	if ( actor->IsType( idPlayer::GetClassType() ) )
+void rvAIMedic::TalkTo( anActor *actor )  {
+	if ( actor->IsType( anBasePlayer::GetClassType() ) )
 	{
-		idPlayer* player = dynamic_cast<idPlayer*>(actor);
+		anBasePlayer* player = dynamic_cast<anBasePlayer*>(actor);
 		if ( player )
 		{
 			emergencyOverride = true;
@@ -235,20 +235,20 @@ void rvAIMedic::GetDebugInfo( debugInfoProc_t proc, void* userData ) {
 	proc ( "rvAIMedic", "stationary",		stationary?"true":"false", userData );
 	proc ( "rvAIMedic", "silent",			silent?"true":"false", userData );
 	proc ( "rvAIMedic", "healObeyTether",	healObeyTether?"true":"false", userData );
-	proc ( "rvAIMedic", "patient",			patient==NULL?"<none>":patient->GetName(), userData );
+	proc ( "rvAIMedic", "patient",			patient== nullptr?"<none>":patient->GetName(), userData );
 	proc ( "rvAIMedic", "wasAware",			wasAware?"true":"false", userData );
 	proc ( "rvAIMedic", "wasIgnoreEnemies",	wasIgnoreEnemies?"true":"false", userData );
-	proc ( "rvAIMedic", "lastPatientCheckTime",va("%d",lastPatientCheckTime), userData );
-	proc ( "rvAIMedic", "healDebounceTime",	va("%d",healDebounceTime), userData );
+	proc ( "rvAIMedic", "lastPatientCheckTime",va( "%d",lastPatientCheckTime), userData );
+	proc ( "rvAIMedic", "healDebounceTime",	va( "%d",healDebounceTime), userData );
 	proc ( "rvAIMedic", "healing",			healing?"true":"false", userData );
 	proc ( "rvAIMedic", "emergencyOverride",healing?"true":"false", userData );
-	//proc ( "rvAIMedic", "healedAmount",		va("%d",healedAmount), userData );
-	proc ( "rvAIMedic", "minHealValue",		va("%d",minHealValue), userData );
-	proc ( "rvAIMedic", "maxHealValue",		va("%d",maxHealValue), userData );
-	proc ( "rvAIMedic", "healAmt",			va("%d",healAmt), userData );
-	proc ( "rvAIMedic", "patientRange",		va("%f",patientRange), userData );
-	proc ( "rvAIMedic", "buddyRange",		va("%f",buddyRange), userData );
-	proc ( "rvAIMedic", "enemyRange",		va("%f",enemyRange), userData );
+	//proc ( "rvAIMedic", "healedAmount",		va( "%d",healedAmount), userData );
+	proc ( "rvAIMedic", "minHealValue",		va( "%d",minHealValue), userData );
+	proc ( "rvAIMedic", "maxHealValue",		va( "%d",maxHealValue), userData );
+	proc ( "rvAIMedic", "healAmt",			va( "%d",healAmt), userData );
+	proc ( "rvAIMedic", "patientRange",		va( "%f",patientRange), userData );
+	proc ( "rvAIMedic", "buddyRange",		va( "%f",buddyRange), userData );
+	proc ( "rvAIMedic", "enemyRange",		va( "%f",enemyRange), userData );
 	proc ( "rvAIMedic", "tech",				isTech?"true":"false", userData );
 }
 
@@ -267,7 +267,7 @@ bool rvAIMedic::IsTethered ( void ) const {
 	return false;
 }
 
-void rvAIMedic::TakePatient( idPlayer* pPatient )
+void rvAIMedic::TakePatient( anBasePlayer* pPatient )
 {
 	patient = pPatient;
 	if ( emergencyOverride )
@@ -288,7 +288,7 @@ void rvAIMedic::TakePatient( idPlayer* pPatient )
 	{
 		//have enough time to say this before we get there...?
 		//jshepard: tech/medic dependent speech
-		if( isTech ) {
+		if ( isTech ) {
 			Speak( "lipsync_call_player_tech_", true );
 		} else {
 			Speak( "lipsync_call_player_", true );
@@ -326,13 +326,13 @@ void rvAIMedic::DropPatient( void )
 		ProcessEvent( &AI_BecomeAggressive );
 		combat.fl.aware = wasAware;
 		combat.fl.ignoreEnemies = wasIgnoreEnemies;
-		lookTarget = NULL;
+		lookTarget = nullptr;
 	} else if ( lookTarget == patient ) {
 		//if scripted, clear the looktarget only if it's the patient?  This could be wrong, though....
-		lookTarget = NULL;
+		lookTarget = nullptr;
 	}
 
-	patient = NULL;
+	patient = nullptr;
 
 	if ( healDebounceInterval ) {
 		healDebounceTime = gameLocal.GetTime() + healDebounceInterval;
@@ -343,10 +343,10 @@ void rvAIMedic::DropPatient( void )
 		UpdateTactical ( 0 );
 	}
 	//FIXME: what if they stay in this state?
-	HideAttachment( spawnArgs.GetString("def_attach") );
+	HideAttachment( spawnArgs.GetString( "def_attach" ) );
 }
 
-void rvAIMedic::SetHealValues( idPlayer* player )
+void rvAIMedic::SetHealValues( anBasePlayer* player )
 {
 	if ( !player )
 	{
@@ -364,7 +364,7 @@ void rvAIMedic::SetHealValues( idPlayer* player )
 	}
 }
 
-bool rvAIMedic::CheckTakePatient( idPlayer* player )
+bool rvAIMedic::CheckTakePatient( anBasePlayer* player )
 {
 	if ( !player )
 	{
@@ -382,11 +382,11 @@ bool rvAIMedic::CheckTakePatient( idPlayer* player )
 
 	if ( curHealValue < maxPatientValue )
 	{//they are hurt
-		if ( curHealValue <= minHealValue || (gameLocal.GetTime() >= healDebounceTime && emergencyOverride && (!maxHealValue || curHealValue < maxHealValue)) )
+		if ( curHealValue <= minHealValue || (gameLocal.GetTime() >= healDebounceTime && emergencyOverride && ( !maxHealValue || curHealValue < maxHealValue)) )
 		{//patient needs healing or he requested a heal and it's been long enough and he's below the max heal level (if there is one)
 			if ( DistanceTo( player ) < patientRange )
 			{//close enough
-				if ( (!move.fl.disabled && !stationary) || DistanceTo( player ) <= combat.meleeRange )
+				if ( ( !move.fl.disabled && !stationary) || DistanceTo( player ) <= combat.meleeRange )
 				{//either I am allowed to move or player is close enough that I don't have to
 					//if ( !tether || tether->ValidateDestination( this, player->GetPhysics()->GetOrigin() ) )
 					{//not tethered or patient is in our tether
@@ -432,7 +432,7 @@ bool rvAIMedic::SituationAllowsPatient( void )
 		{//don't care how crazy it is, go for it!
 			return true;
 		}
-		if ( (!GetEnemy() || !enemyInPVS || !enemyInRange ) && gameLocal.GetTime() - enemy.changeTime > 5000 )
+		if ( ( !GetEnemy() || !enemyInPVS || !enemyInRange ) && gameLocal.GetTime() - enemy.changeTime > 5000 )
 		{//haven't had an enemy for 5 seconds
 			if ( !aiManager.LocalTeamHasEnemies( this, buddyRange, enemyRange, true ) )
 			{//local buddies don't have enemies
@@ -468,9 +468,9 @@ rvAIMedic::Think
 ================
 */
 void rvAIMedic::Think ( void ) {
-	rvAITactical::Think ( );
+	rvAITactical::Think();
 
-//	while( entMedic.getKey("alive") == "true" && entMedic.getKey("healer") == "1")
+//	while( entMedic.getKey( "alive" ) == "true" && entMedic.getKey( "healer" ) == "1" )
 //???
 	if ( !noAutoHeal )
 	{
@@ -483,7 +483,7 @@ void rvAIMedic::Think ( void ) {
 			}
 			if ( AvailableToTakePatient() )
 			{
-				idPlayer* player = gameLocal.GetLocalPlayer();
+				anBasePlayer* player = gameLocal.GetLocalPlayer();
 
 				if ( CheckTakePatient( player ) )
 				{
@@ -491,8 +491,8 @@ void rvAIMedic::Think ( void ) {
 				}
 				//otherwise, check team?
 				/*
-				idActor* actor;
-				for( actor = aiManager.GetAllyTeam ( (aiTeam_t)team ); actor; actor = actor->teamNode.Next() )
+				anActor* actor;
+				for ( actor = aiManager.GetAllyTeam ( (aiTeam_t)team ); actor; actor = actor->teamNode.Next() )
 				{
 					if ( CheckTakePatient( actor ) )
 					{
@@ -511,13 +511,13 @@ rvAIMedic::OnStateThreadClear
 =====================
 */
 void rvAIMedic::OnStateThreadClear( const char *statename, int flags ) {
-	if ( idStr::Icmp( statename, "State_Medic" ) ) {
+	if ( anString::Icmp( statename, "State_Medic" ) ) {
 		if ( patient ) {
 			//BAH!  Someone changed our state on us!
 			if ( lookTarget == patient ) {
-				lookTarget = NULL;
+				lookTarget = nullptr;
 			}
-			patient = NULL;
+			patient = nullptr;
 			healing = false;
 		}
 	}
@@ -529,7 +529,7 @@ rvAIMedic::OnStartMoving
 ============
 */
 void rvAIMedic::OnStartMoving ( void ) {
-	idAI::OnStartMoving();
+	anSAAI::OnStartMoving();
 	if ( patient )
 	{//we were trying to heal!
 		if ( move.moveCommand != MOVE_TO_ENTITY
@@ -550,8 +550,8 @@ void rvAIMedic::OnStartMoving ( void ) {
 rvAIMedic::Pain
 =====================
 */
-bool rvAIMedic::Pain( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location ) {
-	bool retVal = idAI::Pain( inflictor, attacker, damage, dir, location );
+bool rvAIMedic::Pain( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location ) {
+	bool retVal = anSAAI::Pain( inflictor, attacker, damage, dir, location );
 	if ( retVal && patient ) {
 		//if get hit while trying to heal, protect ourselves
 		if ( !aifl.scripted ) {
@@ -581,7 +581,7 @@ END_CLASS_STATES
 
 /*
 ================
-idAI::State_Medic
+anSAAI::State_Medic
 
 Rush towards the patient to melee range and heal until they're okay
 ================
@@ -633,7 +633,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 						if ( !IsSpeaking() && speakTime < (gameLocal.GetTime() - 2000)  && !silent )
 						{//didn't speak in last couple seconds
 							//jshepard: tech/medic dependent speech
-							if( isTech ) {
+							if ( isTech ) {
 								Speak( "lipsync_heal_start_tech_", true );
 							} else {
 								Speak( "lipsync_heal_start_", true );
@@ -644,7 +644,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 					healing = true;
 					// check for preHeal anim key and if it's present, play it first.
 					const char  *preHealAnim;
-					if ( spawnArgs.GetString( "anim_preHeal", "", &preHealAnim ))
+					if ( spawnArgs.GetString( "anim_preHeal", "", &preHealAnim ) )
 					{
 						PlayAnim( ANIMCHANNEL_TORSO, preHealAnim, 4 );
 						return SRESULT_STAGE ( STAGE_PRE_HEAL_ANIM_WAIT );
@@ -672,7 +672,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 			*/
 
 			// Perform actions on the way to the patient
-			if ( UpdateAction ( ) ) {
+			if ( UpdateAction() ) {
 				return SRESULT_WAIT;
 			}
 
@@ -684,7 +684,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 					// If we dont have an enemy or havent seen our enemy for a while just find a new one entirely
 					if ( gameLocal.time - enemy.checkTime > 250 ) {
 						CheckForEnemy ( true, true );
-					} else if ( !IsEnemyRecentlyVisible ( ) ) {
+					} else if ( !IsEnemyRecentlyVisible() ) {
 						CheckForEnemy ( true );
 					}
 				}
@@ -697,7 +697,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 			const char  *preHealAnim;
 			spawnArgs.GetString( "anim_preHeal", "", &preHealAnim );
 
-			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || idStr::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), preHealAnim ))
+			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anString::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), preHealAnim ) )
 			{//finished or interrupted
 				PlayAnim( ANIMCHANNEL_TORSO, "medic_treating_player_start", 4 );
 				return SRESULT_STAGE ( STAGE_HEAL_START_WAIT );
@@ -716,14 +716,14 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 				ProcessEvent( &AI_ForcePosture, AIPOSTURE_STAND );
 			}
 			*/
-			TurnToward ( patient->GetPhysics()->GetOrigin ( ) );
+			TurnToward ( patient->GetPhysics()->GetOrigin() );
 
-			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || idStr::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player_start" ) )
+			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anString::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player_start" ) )
 			{//finished or interrupted
 //				PlayCycle( ANIMCHANNEL_TORSO, "medic_treating_player", 4 );
 				PlayAnim( ANIMCHANNEL_TORSO, "medic_treating_player", 4 );
 				//show the tool, just in case the anim was interrupted
-				ShowAttachment( spawnArgs.GetString("def_attach") );
+				ShowAttachment( spawnArgs.GetString( "def_attach" ) );
 				return SRESULT_STAGE ( STAGE_HEAL );
 			}
 			return SRESULT_WAIT;
@@ -768,11 +768,11 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 				*/
 
 				// Always face patient when in melee range
-				TurnToward ( patient->GetPhysics()->GetOrigin ( ) );
+				TurnToward ( patient->GetPhysics()->GetOrigin() );
 
 				// Perform actions while standing still
 				/*
-				if ( UpdateAction ( ) ) {
+				if ( UpdateAction() ) {
 					return SRESULT_WAIT;
 				}
 
@@ -788,15 +788,15 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 				*/
 
 				//jshepard: tech/medic dependent speech
-				if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || idStr::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player" ) ) {
+				if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anString::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player" ) ) {
 					if ( !isTech ) {
 						patient->health = patient->health+healAmt>maxPatientValue?maxPatientValue:patient->health+healAmt;
-						if( !silent) {
+						if ( !silent) {
 							Speak( "lipsync_heal_end_", true );
 						}
 					} else {
 						patient->inventory.armor = patient->inventory.armor+healAmt>maxPatientValue?maxPatientValue:patient->inventory.armor+healAmt;;
-						if( !silent) {
+						if ( !silent) {
 							Speak( "lipsync_heal_end_tech_", true );
 						}
 					}
@@ -822,7 +822,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 			return SRESULT_WAIT;
 
 		case STAGE_WAIT_FINISH:
-			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || idStr::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player_end" ) )
+			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anString::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player_end" ) )
 			{//finished or interrupted
 				//turn off the tool, just in case we were interrupted
 				DropPatient();

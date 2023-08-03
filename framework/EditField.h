@@ -53,7 +53,7 @@ public:
 					arcTextDimension( void );
 					~arcTextDimension( void );
 
-	void			Init( const wchar_t *text, const int textLength, const arcNet2DBounds &rect, unsigned int flags, const qhandle_t font, const int pointSize, arcNetList<int> *lineBreaks = NULL );
+	void			Init( const wchar_t *text, const int textLength, const an2DBounds &rect, unsigned int flags, const qhandle_t font, const int pointSize, anList<int> *lineBreaks = nullptr );
 
 	int				GetAdvance( const int index ) const;
 	float			GetWidth( const int startIndex, const int endIndex ) const;
@@ -106,8 +106,8 @@ ARC_INLINE arcTextDimension::~arcTextDimension( void ) {
 arcTextDimension::Init
 ============
 */
-ARC_INLINE void arcTextDimension::Init( const wchar_t *text, const int textLength, const arcNet2DBounds &rect, unsigned int flags, const qhandle_t font, const int pointSize, arcNetList<int> *lineBreaks ) {
-	if ( lineBreaks != NULL ) {
+ARC_INLINE void arcTextDimension::Init( const wchar_t *text, const int textLength, const an2DBounds &rect, unsigned int flags, const qhandle_t font, const int pointSize, anList<int> *lineBreaks ) {
+	if ( lineBreaks != nullptr ) {
 		lineBreaks->SetNum( 0, false );
 	}
 
@@ -117,7 +117,7 @@ ARC_INLINE void arcTextDimension::Init( const wchar_t *text, const int textLengt
 		return;
 	}
 
-	if ( advances != NULL && textLength > this->textLength && advances != &advancesBase[0] ) {
+	if ( advances != nullptr && textLength > this->textLength && advances != &advancesBase[0] ) {
 		Mem_Free( advances );
 		advances = &advancesBase[0];
 	}
@@ -128,14 +128,14 @@ ARC_INLINE void arcTextDimension::Init( const wchar_t *text, const int textLengt
 
 	deviceContext->GetTextDimensions( text, rect, flags, font, pointSize, width, height, &scale, &advances, lineBreaks );
 
-	int numLines = ( lineBreaks != NULL ) ? lineBreaks->Num() : 0;
+	int numLines = ( lineBreaks != nullptr ) ? lineBreaks->Num() : 0;
 
 	// a trailing empty line isn't included in the total drawn height
 	if ( text[ textLength - 1 ] == L'\n' ) {
 		numLines--;
 	}
 
-	lineHeight = arcMath::Ftoi( arcMath::Ceil( static_cast<float>( height ) / ( numLines + 1 ) ) );
+	lineHeight = anMath::Ftoi( anMath::Ceil( static_cast<float>( height ) / ( numLines + 1 ) ) );
 	this->textLength = textLength;
 }
 
@@ -145,7 +145,7 @@ arcTextDimension::GetAdvance
 ============
 */
 ARC_INLINE int arcTextDimension::GetAdvance( const int index ) const {
-	if ( advances == NULL ) {
+	if ( advances == nullptr ) {
 		return 0;
 	}
 
@@ -158,7 +158,7 @@ arcTextDimensionHelper::GetWidth
 ============
 */
 ARC_INLINE float arcTextDimension::GetWidth( const int startIndex, const int endIndex ) const {
-	if ( advances == NULL || textLength == 0 ) {
+	if ( advances == nullptr || textLength == 0 ) {
 		return 0.0f;
 	}
 
@@ -175,7 +175,7 @@ arcTextDimension::ToVirtualScreenSize
 ============
 */
 ARC_INLINE int arcTextDimension::ToVirtualScreenSize( const int size ) const {
-	return arcMath::Ftoi( arcMath::Ceil( ( size >> 6 ) / scale ) );
+	return anMath::Ftoi( anMath::Ceil( ( size >> 6 ) / scale ) );
 }
 
 /*

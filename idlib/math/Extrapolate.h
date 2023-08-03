@@ -19,11 +19,11 @@ typedef enum {
 	EXTRAPOLATION_NOSTOP		= 0x40	// do not stop at startTime + duration
 } extrapolation_t;
 
-template< class type >
-class aRcExtrapolation {
-	friend class aRcTypeTools;
+template<class type>
+class anExtrapolation {
+	friend class anTypeTools;
 public:
-						aRcExtrapolation();
+						anExtrapolation();
 
 	void				Init( const float startTime, const float duration, const type &startValue, const type &baseSpeed, const type &speed, const extrapolation_t extrapolationType );
 	type				GetCurrentValue( float time ) const;
@@ -52,11 +52,11 @@ private:
 
 /*
 ====================
-aRcExtrapolation::aRcExtrapolation
+anExtrapolation::anExtrapolation
 ====================
 */
-template< class type >
-ARC_INLINE aRcExtrapolation<type>::aRcExtrapolation() {
+template<class type>
+ARC_INLINE anExtrapolation<type>::anExtrapolation() {
 	extrapolationType = EXTRAPOLATION_NONE;
 	startTime = duration = 0.0f;
 	memset( &startValue, 0, sizeof( startValue ) );
@@ -68,11 +68,11 @@ ARC_INLINE aRcExtrapolation<type>::aRcExtrapolation() {
 
 /*
 ====================
-aRcExtrapolation::Init
+anExtrapolation::Init
 ====================
 */
-template< class type >
-ARC_INLINE void aRcExtrapolation<type>::Init( const float startTime, const float duration, const type &startValue, const type &baseSpeed, const type &speed, const extrapolation_t extrapolationType ) {
+template<class type>
+ARC_INLINE void anExtrapolation<type>::Init( const float startTime, const float duration, const type &startValue, const type &baseSpeed, const type &speed, const extrapolation_t extrapolationType ) {
 	this->extrapolationType = extrapolationType;
 	this->startTime = startTime;
 	this->duration = duration;
@@ -85,11 +85,11 @@ ARC_INLINE void aRcExtrapolation<type>::Init( const float startTime, const float
 
 /*
 ====================
-aRcExtrapolation::GetCurrentValue
+anExtrapolation::GetCurrentValue
 ====================
 */
-template< class type >
-ARC_INLINE type aRcExtrapolation<type>::GetCurrentValue( float time ) const {
+template<class type>
+ARC_INLINE type anExtrapolation<type>::GetCurrentValue( float time ) const {
 	float deltaTime, s;
 
 	if ( time == currentTime ) {
@@ -106,7 +106,7 @@ ARC_INLINE type aRcExtrapolation<type>::GetCurrentValue( float time ) const {
 		time = startTime + duration;
 	}
 
-	switch( extrapolationType & ~EXTRAPOLATION_NOSTOP ) {
+	switch ( extrapolationType & ~EXTRAPOLATION_NOSTOP ) {
 		case EXTRAPOLATION_NONE: {
 			deltaTime = ( time - startTime ) * 0.001f;
 			currentValue = startValue + deltaTime * baseSpeed;
@@ -142,7 +142,7 @@ ARC_INLINE type aRcExtrapolation<type>::GetCurrentValue( float time ) const {
 				currentValue = startValue;
 			} else {
 				deltaTime = ( time - startTime ) / duration;
-				s = ( 1.0f - arcMath::Cos( deltaTime * arcMath::HALF_PI ) ) * duration * 0.001f * arcMath::SQRT_1OVER2;
+				s = ( 1.0f - anMath::Cos( deltaTime * anMath::HALF_PI ) ) * duration * 0.001f * anMath::SQRT_1OVER2;
 				currentValue = startValue + deltaTime * baseSpeed + s * speed;
 			}
 			break;
@@ -152,7 +152,7 @@ ARC_INLINE type aRcExtrapolation<type>::GetCurrentValue( float time ) const {
 				currentValue = startValue;
 			} else {
 				deltaTime = ( time - startTime ) / duration;
-				s = arcMath::Sin( deltaTime * arcMath::HALF_PI ) * duration * 0.001f * arcMath::SQRT_1OVER2;
+				s = anMath::Sin( deltaTime * anMath::HALF_PI ) * duration * 0.001f * anMath::SQRT_1OVER2;
 				currentValue = startValue + deltaTime * baseSpeed + s * speed;
 			}
 			break;
@@ -163,11 +163,11 @@ ARC_INLINE type aRcExtrapolation<type>::GetCurrentValue( float time ) const {
 
 /*
 ====================
-aRcExtrapolation::GetCurrentSpeed
+anExtrapolation::GetCurrentSpeed
 ====================
 */
-template< class type >
-ARC_INLINE type aRcExtrapolation<type>::GetCurrentSpeed( float time ) const {
+template<class type>
+ARC_INLINE type anExtrapolation<type>::GetCurrentSpeed( float time ) const {
 	float deltaTime, s;
 
 	if ( time < startTime || !duration ) {
@@ -178,7 +178,7 @@ ARC_INLINE type aRcExtrapolation<type>::GetCurrentSpeed( float time ) const {
 		return ( startValue - startValue );
 	}
 
-	switch( extrapolationType & ~EXTRAPOLATION_NOSTOP ) {
+	switch ( extrapolationType & ~EXTRAPOLATION_NOSTOP ) {
 		case EXTRAPOLATION_NONE: {
 			return baseSpeed;
 		}
@@ -197,12 +197,12 @@ ARC_INLINE type aRcExtrapolation<type>::GetCurrentSpeed( float time ) const {
 		}
 		case EXTRAPOLATION_ACCELSINE: {
 			deltaTime = ( time - startTime ) / duration;
-			s = arcMath::Sin( deltaTime * arcMath::HALF_PI );
+			s = anMath::Sin( deltaTime * anMath::HALF_PI );
 			return baseSpeed + s * speed;
 		}
 		case EXTRAPOLATION_DECELSINE: {
 			deltaTime = ( time - startTime ) / duration;
-			s = arcMath::Cos( deltaTime * arcMath::HALF_PI );
+			s = anMath::Cos( deltaTime * anMath::HALF_PI );
 			return baseSpeed + s * speed;
 		}
 		default: {

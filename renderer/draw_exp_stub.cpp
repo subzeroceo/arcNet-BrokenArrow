@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 void R_Exp_Init( void ) {

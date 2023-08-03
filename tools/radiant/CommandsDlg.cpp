@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CCommandsDlg dialog
-CCommandsDlg::CCommandsDlg(CWnd* pParent /*=NULL*/) : CDialog(CCommandsDlg::IDD, pParent) {
+CCommandsDlg::CCommandsDlg(CWnd* pParent /*=nullptr*/) : CDialog(CCommandsDlg::IDD, pParent) {
 	//{{AFX_DATA_INIT(CCommandsDlg)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT

@@ -1,19 +1,19 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 
-void BoxToPoints( const arcVec3 &center, const arcVec3 &extents, const arcMat3 &axis, arcVec3 points[8] );
+void BoxToPoints( const anVec3 &center, const anVec3 &extents, const anMat3 &axis, anVec3 points[8] );
 
 /*
 ============
-ARCFrustum::ProjectionBounds
+anFrustum::ProjectionBounds
 ============
 */
-bool ARCFrustum::ProjectionBounds( const ARCBox &box, arcBounds &projectionBounds ) const {
+bool anFrustum::ProjectionBounds( const anBox &box, anBounds &projectionBounds ) const {
 	int i, p1, p2, pointCull[8], culled, outside;
 	float scale1, scale2;
-	ARCFrustum localFrustum;
-	arcVec3 points[8], localOrigin;
-	arcMat3 localAxis, localScaled;
-	arcBounds bounds( -box.GetExtents(), box.GetExtents() );
+	anFrustum localFrustum;
+	anVec3 points[8], localOrigin;
+	anMat3 localAxis, localScaled;
+	anBounds bounds( -box.GetExtents(), box.GetExtents() );
 
 	// if the frustum origin is inside the bounds
 	if ( bounds.ContainsPoint( ( origin - box.GetCenter() ) * box.GetAxis().Transpose() ) ) {
@@ -68,7 +68,7 @@ bool ARCFrustum::ProjectionBounds( const ARCBox &box, arcBounds &projectionBound
 
 	for ( i = 0; i < 4; i++ ) {
 		p1 = 4 + i;
-		p2 = 4 + (( i+1 )&3);
+		p2 = 4 + ( ( i+1 )&3);
 		AddLocalLineToProjectionBoundsUseCull( points[p1], points[p2], pointCull[p1], pointCull[p2], projectionBounds );
 	}
 
@@ -85,29 +85,29 @@ bool ARCFrustum::ProjectionBounds( const ARCBox &box, arcBounds &projectionBound
 		if ( (outside & 2) && (outside & 8) ) {
 			BoundsRayIntersection( bounds, localOrigin, localScaled[0] - localScaled[1] - localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, -1.0f, -1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, -1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, -1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, -1.0f, -1.0f ) );
 			}
 		}
 		if ( (outside & 2) && (outside & 4) ) {
 			BoundsRayIntersection( bounds, localOrigin, localScaled[0] - localScaled[1] + localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f  ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, -1.0f, 1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, -1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, -1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, -1.0f, 1.0f ) );
 			}
 		}
 		if ( (outside & 1 ) && (outside & 8) ) {
 			BoundsRayIntersection( bounds, localOrigin, localScaled[0] + localScaled[1] - localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f  ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, 1.0f, -1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, 1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, 1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, 1.0f, -1.0f ) );
 			}
 		}
 		if ( (outside & 1 ) && (outside & 2) ) {
 			BoundsRayIntersection( bounds, localOrigin, localScaled[0] + localScaled[1] + localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f  ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, 1.0f, 1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, 1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, 1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, 1.0f, 1.0f ) );
 			}
 		}
 	}

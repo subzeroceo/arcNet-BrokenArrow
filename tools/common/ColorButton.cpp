@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "ColorButton.h"
@@ -43,12 +43,12 @@ Sets the current color button color
 */
 void ColorButton_SetColor ( HWND hWnd, COLORREF color )
 {
-	if ( NULL == hWnd )
+	if ( nullptr == hWnd )
 	{
 		return;
 	}
 	SetWindowLong ( hWnd, GWL_USERDATA, color );
-	InvalidateRect ( hWnd, NULL, FALSE );
+	InvalidateRect ( hWnd, nullptr, FALSE );
 }
 
 void ColorButton_SetColor ( HWND hWnd, const char* color )
@@ -58,7 +58,7 @@ void ColorButton_SetColor ( HWND hWnd, const char* color )
 	float blue;
 	float alpha;
 
-	if ( NULL == hWnd )
+	if ( nullptr == hWnd )
 	{
 		return;
 	}
@@ -75,7 +75,7 @@ void AlphaButton_SetColor ( HWND hWnd, const char* color )
 	float blue;
 	float alpha;
 
-	if ( NULL == hWnd )
+	if ( nullptr == hWnd )
 	{
 		return;
 	}

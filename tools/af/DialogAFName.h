@@ -34,7 +34,7 @@ class DialogAFName : public CDialog {
 	DECLARE_DYNAMIC(DialogAFName)
 
 public:
-						DialogAFName(CWnd* pParent = NULL);   // standard constructor
+						DialogAFName(CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogAFName();
 	void				SetName( CString &str );
 	void				GetName( CString &str );

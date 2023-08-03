@@ -34,7 +34,7 @@ class DialogAFView : public CDialog {
 	DECLARE_DYNAMIC(DialogAFView)
 
 public:
-						DialogAFView(CWnd* pParent = NULL);   // standard constructor
+						DialogAFView(CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogAFView();
 
 	enum				{ IDD = IDD_DIALOG_AF_VIEW };

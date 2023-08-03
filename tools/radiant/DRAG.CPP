@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -35,13 +35,13 @@ If you have questions concerning this license or the applicable additional terms
 /* drag either multiple brushes, or select plane points from a single brush. */
 bool			g_moveOnly = false;
 bool			drag_ok;
-arcVec3			drag_xvec;
-arcVec3			drag_yvec;
+anVec3			drag_xvec;
+anVec3			drag_yvec;
 
 static int		buttonstate;
 int				pressx, pressy;
-static arcVec3	pressdelta;
-static arcVec3	vPressStart;
+static anVec3	pressdelta;
+static anVec3	vPressStart;
 static int		buttonx, buttony;
 
 // int num_move_points; float *move_points[1024];
@@ -54,8 +54,8 @@ bool			drag_first;
 AxializeVector
 ================
 */
-static void AxializeVector( arcVec3 &v ) {
-	arcVec3	a;
+static void AxializeVector( anVec3 &v ) {
+	anVec3	a;
 	float	o;
 	int		i;
 
@@ -72,7 +72,7 @@ static void AxializeVector( arcVec3 &v ) {
 	}
 
 	for ( i = 0; i < 3; i++ ) {
-		a[i] = arcMath::Fabs( v[i] );
+		a[i] = anMath::Fabs( v[i] );
 	}
 
 	if (a[0] > a[1] && a[0] > a[2] ) {
@@ -95,7 +95,7 @@ static void AxializeVector( arcVec3 &v ) {
 	}
 }
 
-extern bool UpdateActiveDragPoint(const arcVec3 &move);
+extern bool UpdateActiveDragPoint(const anVec3 &move);
 extern void SetActiveDrag(CDragPoint *p);
 
 /*
@@ -104,7 +104,7 @@ Draw_Setup
 ================
 */
 static void Drag_Setup( int x, int y, int buttons,
-					   const arcVec3 &xaxis, const arcVec3 &yaxis, const arcVec3 &origin, const arcVec3 &dir ) {
+					   const anVec3 &xaxis, const anVec3 &yaxis, const anVec3 &origin, const anVec3 &dir ) {
 	qertrace_t	t;
 	face_t		*f;
 
@@ -287,7 +287,7 @@ Drag_Begin
 ================
 */
 void Drag_Begin( int x, int y, int buttons,
-				const arcVec3 &xaxis, const arcVec3 &yaxis, const arcVec3 &origin, const arcVec3 &dir ) {
+				const anVec3 &xaxis, const anVec3 &yaxis, const anVec3 &origin, const anVec3 &dir ) {
 	qertrace_t	t;
 
 	drag_ok = false;
@@ -352,7 +352,7 @@ void Drag_Begin( int x, int y, int buttons,
 				Select_CopyPatchTextureCoords ( t.brush->pPatch );
 			} else {
 				Select_ProjectFaceOntoPatch( t.face );
-				ConvertTexMatWithQTexture(&t.face->brushprimit_texdef, t.face->d_texture, &bp_local, NULL);
+				ConvertTexMatWithQTexture(&t.face->brushprimit_texdef, t.face->d_texture, &bp_local, nullptr );
 				Texture_SetTexture(&t.face->texdef, &bp_local, false, true);
 			}
 			UpdateSurfaceDialog();
@@ -425,9 +425,9 @@ void Drag_Begin( int x, int y, int buttons,
 			if (t.brush->brush_faces->texdef.name[0] == '(') {
 				if (t.brush->owner->eclass->nShowFlags & ECLASS_LIGHT) {
 					CString		strBuff;
-					arcMaterial	*pTex = declManager->FindMaterial(g_qeglobals.d_texturewin.texdef.name);
+					anMaterial	*pTex = declManager->FindMaterial(g_qeglobals.d_texturewin.texdef.name);
 					if (pTex) {
-						arcVec3	vColor = pTex->getColor();
+						anVec3	vColor = pTex->getColor();
 
 						float	fLargest = 0.0f;
 						for ( int i = 0; i < 3; i++ ) {
@@ -473,7 +473,7 @@ void Drag_Begin( int x, int y, int buttons,
 }
 
 
-void Brush_GetBounds(brush_t *b, arcVec3 &mins, arcVec3 &maxs) {
+void Brush_GetBounds(brush_t *b, anVec3 &mins, anVec3 &maxs) {
 	int		i;
 
 	for ( i = 0; i < 3; i++ ) {
@@ -498,11 +498,11 @@ void Brush_GetBounds(brush_t *b, arcVec3 &mins, arcVec3 &maxs) {
 MoveSelection
 ================
 */
-static void MoveSelection( const arcVec3 &orgMove ) {
+static void MoveSelection( const anVec3 &orgMove ) {
 	int		i, success;
 	brush_t *b;
 	CString strStatus;
-	arcVec3	vTemp, vTemp2, end, move;
+	anVec3	vTemp, vTemp2, end, move;
 
 	move = orgMove;
 
@@ -554,7 +554,7 @@ static void MoveSelection( const arcVec3 &orgMove ) {
 	}
 
 	if (g_pParentWnd->ActiveXY()->ScaleMode() ) {
-		arcVec3	v;
+		anVec3	v;
 		v[0] = v[1] = v[2] = 1.0f;
 		for ( int i = 0; i < 3; i++ ) {
 			if ( move[i] > 0.0f ) {
@@ -569,7 +569,7 @@ static void MoveSelection( const arcVec3 &orgMove ) {
 		return;
 	}
 
-	arcVec3	vDistance;
+	anVec3	vDistance;
 	VectorSubtract(pressdelta, vPressStart, vDistance);
 	strStatus.Format( "Distance x: %.3f  y: %.3f  z: %.3f", vDistance[0], vDistance[1], vDistance[2] );
 	g_pParentWnd->SetStatusText(3, strStatus);
@@ -648,7 +648,7 @@ static void MoveSelection( const arcVec3 &orgMove ) {
 
 				// if ( !Patch_DragScale(b->nPatchID, vTemp2, move) )
 				if ( !Patch_DragScale(b->pPatch, vTemp2, move) ) {
-					b = NULL;
+					b = nullptr;
 					break;
 				}
 			}
@@ -685,7 +685,7 @@ Drag_MouseMoved
 ================
 */
 void Drag_MouseMoved( int x, int y, int buttons) {
-	arcVec3	move, delta;
+	anVec3	move, delta;
 	int		i;
 
 	if ( !buttons || !drag_ok) {

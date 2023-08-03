@@ -67,13 +67,13 @@
 // supports these intrinsics but XLC does not.
 #define PPC_INTRINSICS
 
-// This assumes that the arcDrawVert array that is used in DeriveUnsmoothedTangents is aligned. If its not aligned,
+// This assumes that the anDrawVertex array that is used in DeriveUnsmoothedTangents is aligned. If its not aligned,
 // then we don't get any speedup
 //#define DERIVE_UNSMOOTH_DRAWVERT_ALIGNED
 
 // Disable DRAWVERT_PADDED since we disabled the ENABLE_CULL optimizations and the default
 // implementation does not allow for the extra padding.
-// This assumes that arcDrawVert has been padded by 4 bytes so that xyz always starts at an aligned
+// This assumes that anDrawVertex has been padded by 4 bytes so that xyz always starts at an aligned
 // address
 //#define DRAWVERT_PADDED
 
@@ -81,7 +81,7 @@ class arcSIMD_AltiVec : public arcSIMD_Generic {
 #if defined(MACOS_X) && defined(__ppc__)
 public:
 
-	virtual const char * VPCALL GetName( void ) const;
+	virtual const char *VPCALL GetName( void ) const;
 
 #ifdef ENABLE_SIMPLE_MATH
 	// Basic math, works for both aligned and unaligned data
@@ -101,13 +101,13 @@ public:
 
 #ifdef ENABLE_DOT
 	// Dot products, expects data structures in contiguous memory
-	virtual void VPCALL Dot( float *dst, const arcVec3 &constant, const arcVec3 *src, const int count );
-	virtual void VPCALL Dot( float *dst, const arcVec3 &constant, const arcPlane *src, const int count );
-	virtual void VPCALL Dot( float *dst, const arcVec3 &constant, const arcDrawVert *src, const int count );
-	virtual void VPCALL Dot( float *dst, const arcPlane &constant,const arcVec3 *src, const int count );
-	virtual void VPCALL Dot( float *dst, const arcPlane &constant,const arcPlane *src, const int count );
-	virtual void VPCALL Dot( float *dst, const arcPlane &constant,const arcDrawVert *src, const int count );
-	virtual void VPCALL Dot( float *dst, const arcVec3 *src0, const arcVec3 *src1, const int count );
+	virtual void VPCALL Dot( float *dst, const anVec3 &constant, const anVec3 *src, const int count );
+	virtual void VPCALL Dot( float *dst, const anVec3 &constant, const anPlane *src, const int count );
+	virtual void VPCALL Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count );
+	virtual void VPCALL Dot( float *dst, const anPlane &constant,const anVec3 *src, const int count );
+	virtual void VPCALL Dot( float *dst, const anPlane &constant,const anPlane *src, const int count );
+	virtual void VPCALL Dot( float *dst, const anPlane &constant,const anDrawVertex *src, const int count );
+	virtual void VPCALL Dot( float *dst, const anVec3 *src0, const anVec3 *src1, const int count );
 	virtual void VPCALL Dot( float &dot, const float *src1, const float *src2, const int count );
 #endif
 
@@ -126,10 +126,10 @@ public:
 #ifdef ENABLE_MINMAX
 	// Min/Max. Expects data structures in contiguous memory
 	virtual void VPCALL MinMax( float &min,			float &max,				const float *src, const int count );
-	virtual	void VPCALL MinMax( arcVec2 &min,		arcVec2 &max, const arcVec2 *src, const int count );
-	virtual void VPCALL MinMax( arcVec3 &min,		arcVec3 &max, const arcVec3 *src, const int count );
-	virtual	void VPCALL MinMax( arcVec3 &min,		arcVec3 &max, const arcDrawVert *src, const int count );
-	virtual	void VPCALL MinMax( arcVec3 &min,		arcVec3 &max, const arcDrawVert *src, const int *indexes, const int count );
+	virtual	void VPCALL MinMax( anVec2 &min,		anVec2 &max, const anVec2 *src, const int count );
+	virtual void VPCALL MinMax( anVec3 &min,		anVec3 &max, const anVec3 *src, const int count );
+	virtual	void VPCALL MinMax( anVec3 &min,		anVec3 &max, const anDrawVertex *src, const int count );
+	virtual	void VPCALL MinMax( anVec3 &min,		anVec3 &max, const anDrawVertex *src, const int *indexes, const int count );
 #endif
 
 #ifdef ENABLE_CLAMP
@@ -159,50 +159,50 @@ public:
 //  Most of these deal with tiny matrices or vectors, generally not worth altivec'ing since
 //  the scalar code is already really fast
 
-//	virtual void VPCALL MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec );
-//	virtual void VPCALL MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec );
-//	virtual void VPCALL MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec );
-//	virtual void VPCALL MatX_TransposeMultiplyVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec );
-//	virtual void VPCALL MatX_TransposeMultiplyAddVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec );
-//	virtual void VPCALL MatX_TransposeMultiplySubVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec );
-//	virtual void VPCALL MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, const arcMatX &m2 );
-//	virtual void VPCALL MatX_TransposeMultiplyMatX( arcMatX &dst, const arcMatX &m1, const arcMatX &m2 );
+//	virtual void VPCALL MatX_MultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec );
+//	virtual void VPCALL MatX_MultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec );
+//	virtual void VPCALL MatX_MultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec );
+//	virtual void VPCALL MatX_TransposeMultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec );
+//	virtual void VPCALL MatX_TransposeMultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec );
+//	virtual void VPCALL MatX_TransposeMultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec );
+//	virtual void VPCALL MatX_MultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 );
+//	virtual void VPCALL MatX_TransposeMultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 );
 
 #ifdef ENABLE_LOWER_TRIANGULAR
-	virtual void VPCALL MatX_LowerTriangularSolve( const arcMatX &L, float *x, const float *b, const int n, int skip = 0 );
-	virtual void VPCALL MatX_LowerTriangularSolveTranspose( const arcMatX &L, float *x, const float *b, const int n );
-	virtual bool VPCALL MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, const int n );
+	virtual void VPCALL MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip = 0 );
+	virtual void VPCALL MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n );
+	virtual bool VPCALL MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, const int n );
 #endif
 #ifdef LIVE_VICARIOUSLY
-	virtual void VPCALL BlendJoints( idJointQuat *joints, const idJointQuat *blendJoints, const float lerp, const int *index, const int numJoints );
-	virtual void VPCALL ConvertJointQuatsToJointMats( arcJointMat *jointMats, const idJointQuat *jointQuats, const int numJoints );
-	virtual void VPCALL ConvertJointMatsToJointQuats( idJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints );
+	virtual void VPCALL BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints );
+	virtual void VPCALL ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints );
+	virtual void VPCALL ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints );
 #endif
 
 #ifdef LIVE_VICARIOUSLY
 	virtual void VPCALL TransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
 	virtual void VPCALL UntransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
-	virtual void VPCALL TransformVerts( arcDrawVert *verts, const int numVerts, const arcJointMat *joints, const arcVec4 *weights, const int *index, const int numWeights );
+	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights );
 #endif
 
 #ifdef ENABLE_CULL
-	virtual void VPCALL TracePointCull( byte *cullBits, byte &totalOr, const float radius, const arcPlane *planes, const arcDrawVert *verts, const int numVerts );
-	virtual void VPCALL DecalPointCull( byte *cullBits, const arcPlane *planes, const arcDrawVert *verts, const int numVerts );
-	virtual void VPCALL OverlayPointCull( byte *cullBits, arcVec2 *texCoords, const arcPlane *planes, const arcDrawVert *verts, const int numVerts );
+	virtual void VPCALL TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts );
+	virtual void VPCALL DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts );
+	virtual void VPCALL OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts );
 #endif
 
 #ifdef ENABLE_DERIVE
-	virtual void VPCALL DeriveTriPlanes( arcPlane *planes, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes );
-	virtual void VPCALL DeriveTangents( arcPlane *planes, arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes );
-	virtual void VPCALL DeriveUnsmoothedTangents( arcDrawVert *verts, const dominantTri_s *dominantTris, const int numVerts );
-	virtual void VPCALL NormalizeTangents( arcDrawVert *verts, const int numVerts );
+	virtual void VPCALL DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes );
+	virtual void VPCALL DeriveTangents( anPlane *planes, anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes );
+	virtual void VPCALL DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts );
+	virtual void VPCALL NormalizeTangents( anDrawVertex *verts, const int numVerts );
 #endif
 
 #ifdef ENABLE_CREATE
-	virtual void VPCALL CreateTextureSpaceLightVectors( arcVec3 *lightVectors, const arcVec3 &lightOrigin, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes );
-	virtual void VPCALL CreateSpecularTextureCoords( arcVec4 *texCoords, const arcVec3 &lightOrigin, const arcVec3 &viewOrigin, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes );
-	virtual int  VPCALL CreateShadowCache( arcVec4 *vertexCache, int *vertRemap, const arcVec3 &lightOrigin, const arcDrawVert *verts, const int numVerts );
-	virtual int  VPCALL CreateVertexProgramShadowCache( arcVec4 *vertexCache, const arcDrawVert *verts, const int numVerts );
+	virtual void VPCALL CreateTextureSpaceLightVectors( anVec3 *lightVectors, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes );
+	virtual void VPCALL CreateSpecularTextureCoords( anVec4 *texCoords, const anVec3 &lightOrigin, const anVec3 &viewOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes );
+	virtual int  VPCALL CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts );
+	virtual int  VPCALL CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts );
 #endif
 
 #ifdef ENABLE_SOUND_ROUTINES

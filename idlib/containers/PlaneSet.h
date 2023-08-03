@@ -9,23 +9,23 @@
 ===============================================================================
 */
 
-class aRcPlaneSet : public arcNetList<arcPlane> {
+class aRcPlaneSet : public anList<anPlane> {
 public:
 
-	void					Clear( void ) { arcNetList<arcPlane>::Clear(); hash.Free(); }
+	void					Clear( void ) { anList<anPlane>::Clear(); hash.Free(); }
 
-	int						FindPlane( const arcPlane &plane, const float normalEps, const float distEps );
+	int						FindPlane( const anPlane &plane, const float normalEps, const float distEps );
 
 private:
-	ARCHashIndex				hash;
+	anHashIndex				hash;
 };
 
-ARC_INLINE int aRcPlaneSet::FindPlane( const arcPlane &plane, const float normalEps, const float distEps ) {
+ARC_INLINE int aRcPlaneSet::FindPlane( const anPlane &plane, const float normalEps, const float distEps ) {
 	int i, border, hashKey;
 
 	assert( distEps <= 0.125f );
 
-	hashKey = ( int )( arcMath::Fabs( plane.Dist() ) * 0.125f );
+	hashKey = ( int )( anMath::Fabs( plane.Dist() ) * 0.125f );
 	for ( border = -1; border <= 1; border++ ) {
 		for ( i = hash.First( hashKey + border ); i >= 0; i = hash.Next( i ) ) {
 			if ( (*this)[i].Compare( plane, normalEps, distEps ) ) {

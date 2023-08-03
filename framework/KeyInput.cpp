@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 typedef struct {
@@ -219,7 +219,7 @@ keyname_t keynames[] =
 	ALIASKEY( ",", COMMA ),
 	ALIASKEY( ".", PERIOD ),
 
-	{K_NONE, NULL, NULL}
+	{K_NONE, nullptr, nullptr}
 };
 
 class idKey {
@@ -227,12 +227,12 @@ public:
 					idKey() { down = false; repeats = 0; usercmdAction = 0; }
 	bool			down;
 	int				repeats;		// if > 1, it is autorepeating
-	arcNetString			binding;
+	anString			binding;
 	int				usercmdAction;	// for testing by the asyncronous usercmd generation
 };
 
 bool		key_overstrikeMode = false;
-idKey *		keys = NULL;
+idKey *		keys = nullptr;
 
 
 /*
@@ -240,7 +240,7 @@ idKey *		keys = NULL;
 idKeyInput::ArgCompletion_KeyName
 ===================
 */
-void idKeyInput::ArgCompletion_KeyName( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
+void idKeyInput::ArgCompletion_KeyName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
 	for ( keyname_t * kn = keynames; kn->name; kn++ ) {
 		callback( va( "%s %s", args.Argv( 0 ), kn->name ) );
 	}
@@ -282,7 +282,7 @@ bool idKeyInput::IsDown( int keynum ) {
 idKeyInput::StringToKeyNum
 ========================
 */
-keyNum_t idKeyInput::StringToKeyNum( const char * str ) {
+keyNum_t idKeyInput::StringToKeyNum( const char *str ) {
 
 	if ( !str || !str[0] ) {
 		return K_NONE;
@@ -290,7 +290,7 @@ keyNum_t idKeyInput::StringToKeyNum( const char * str ) {
 
 	// scan for a text match
 	for ( keyname_t * kn = keynames; kn->name; kn++ ) {
-		if ( !arcNetString::Icmp( str, kn->name ) ) {
+		if ( !anString::Icmp( str, kn->name ) ) {
 			return kn->keynum;
 		}
 	}
@@ -303,7 +303,7 @@ keyNum_t idKeyInput::StringToKeyNum( const char * str ) {
 idKeyInput::KeyNumToString
 ========================
 */
-const char * idKeyInput::KeyNumToString( keyNum_t keynum ) {
+const char *idKeyInput::KeyNumToString( keyNum_t keynum ) {
 	// check for a key string
 	for ( keyname_t * kn = keynames; kn->name; kn++ ) {
 		if ( keynum == kn->keynum ) {
@@ -319,7 +319,7 @@ const char * idKeyInput::KeyNumToString( keyNum_t keynum ) {
 idKeyInput::LocalizedKeyName
 ========================
 */
-const char * idKeyInput::LocalizedKeyName( keyNum_t keynum ) {
+const char *idKeyInput::LocalizedKeyName( keyNum_t keynum ) {
 	if ( keynum < K_JOY1 ) {
 		// On the PC, we want to turn the scan code in to a key label that matches the currently selected keyboard layout
 		unsigned char keystate[256] = { 0 };
@@ -332,7 +332,7 @@ const char * idKeyInput::LocalizedKeyName( keyNum_t keynum ) {
 			result = ToUnicode( vkey, scancode, keystate, temp, sizeof( temp ) / sizeof( temp[0] ), 0 );
 		}
 		if ( result > 0 && temp[0] > ' ' && iswprint( temp[0] ) ) {
-			static arcNetString bindStr;
+			static anString bindStr;
 			bindStr.Empty();
 			bindStr.AppendUTF8Char( temp[0] );
 			return bindStr;
@@ -400,7 +400,7 @@ int idKeyInput::GetUsercmdAction( int keynum ) {
 Key_Unbind_f
 ===================
 */
-void Key_Unbind_f( const arcCommandArgs &args ) {
+void Key_Unbind_f( const anCommandArgs &args ) {
 	int		b;
 
 	if ( args.Argc() != 2 ) {
@@ -424,7 +424,7 @@ void Key_Unbind_f( const arcCommandArgs &args ) {
 Key_Unbindall_f
 ===================
 */
-void Key_Unbindall_f( const arcCommandArgs &args ) {
+void Key_Unbindall_f( const anCommandArgs &args ) {
 	for ( int i = 0; i < K_LAST_KEY; i++ ) {
 		idKeyInput::SetBinding( i, "" );
 	}
@@ -435,7 +435,7 @@ void Key_Unbindall_f( const arcCommandArgs &args ) {
 Key_Bind_f
 ===================
 */
-void Key_Bind_f( const arcCommandArgs &args ) {
+void Key_Bind_f( const anCommandArgs &args ) {
 	int			i, c, b;
 	char		cmd[MAX_STRING_CHARS];
 
@@ -480,14 +480,14 @@ Key_BindUnBindTwo_f
 binds keynum to bindcommand and unbinds if there are already two binds on the key
 ============
 */
-void Key_BindUnBindTwo_f( const arcCommandArgs &args ) {
+void Key_BindUnBindTwo_f( const anCommandArgs &args ) {
 	int c = args.Argc();
 	if ( c < 3 ) {
 		common->Printf( "bindunbindtwo <keynum> [command]\n" );
 		return;
 	}
 	int key = atoi( args.Argv( 1 ) );
-	arcNetString bind = args.Argv( 2 );
+	anString bind = args.Argv( 2 );
 	if ( idKeyInput::NumBinds( bind ) >= 2 && !idKeyInput::KeyIsBoundTo( key, bind ) ) {
 		idKeyInput::UnbindBinding( bind );
 	}
@@ -503,7 +503,7 @@ idKeyInput::WriteBindings
 Writes lines containing "bind key value"
 ============
 */
-void idKeyInput::WriteBindings( arcNetFile *f ) {
+void idKeyInput::WriteBindings( anFile *f ) {
 	f->Printf( "unbindall\n" );
 
 	for ( int i = 0; i < K_LAST_KEY; i++ ) {
@@ -519,7 +519,7 @@ void idKeyInput::WriteBindings( arcNetFile *f ) {
 Key_ListBinds_f
 ============
 */
-void Key_ListBinds_f( const arcCommandArgs &args ) {
+void Key_ListBinds_f( const anCommandArgs &args ) {
 	for ( int i = 0; i < K_LAST_KEY; i++ ) {
 		if ( keys[i].binding.Length() ) {
 			common->Printf( "%s \"%s\"\n", idKeyInput::KeyNumToString( (keyNum_t)i ), keys[i].binding.c_str() );
@@ -541,16 +541,16 @@ const char *idKeyInput::KeysFromBinding( const char *bind ) {
 		for ( int i = 0; i < K_LAST_KEY; i++ ) {
 			if ( keys[i].binding.Icmp( bind ) == 0 ) {
 				if ( keyName[0] != '\0' ) {
-					arcNetString::Append( keyName, sizeof( keyName ), ARCLocalization::GetString( "#str_07183" ) );
+					anString::Append( keyName, sizeof( keyName ), ARCLocalization::GetString( "#str_07183" ) );
 				}
-				arcNetString::Append( keyName, sizeof( keyName ), LocalizedKeyName( (keyNum_t)i ) );
+				anString::Append( keyName, sizeof( keyName ), LocalizedKeyName( (keyNum_t)i ) );
 			}
 		}
 	}
 	if ( keyName[0] == '\0' ) {
-		arcNetString::Copynz( keyName, ARCLocalization::GetString( "#str_07133" ), sizeof( keyName ) );
+		anString::Copynz( keyName, ARCLocalization::GetString( "#str_07133" ), sizeof( keyName ) );
 	}
-	arcNetString::ToLower( keyName );
+	anString::ToLower( keyName );
 	return keyName;
 }
 
@@ -561,22 +561,22 @@ idKeyInput::KeyBindingsFromBinding
 return: bindings for keyboard mouse and gamepad
 ========================
 */
-keyBindings_t idKeyInput::KeyBindingsFromBinding( const char * bind, bool firstOnly, bool localized ) {
-	arcNetString keyboard;
-	arcNetString mouse;
-	arcNetString gamepad;
+keyBindings_t idKeyInput::KeyBindingsFromBinding( const char *bind, bool firstOnly, bool localized ) {
+	anString keyboard;
+	anString mouse;
+	anString gamepad;
 
 	if ( bind && *bind ) {
 		for ( int i = 0; i < K_LAST_KEY; i++ ) {
 			if ( keys[i].binding.Icmp( bind ) == 0 ) {
 				if ( i >= K_JOY1 && i <= K_JOY_DPAD_RIGHT ) {
-					const char * gamepadKey = "";
+					const char *gamepadKey = "";
 					if ( localized ) {
 						gamepadKey = LocalizedKeyName( (keyNum_t)i );
 					} else {
 						gamepadKey = KeyNumToString( (keyNum_t)i );
 					}
-					if ( arcNetString::Icmp( gamepadKey, "" ) != 0 ) {
+					if ( anString::Icmp( gamepadKey, "" ) != 0 ) {
 						if ( !gamepad.IsEmpty() ) {
 							if ( firstOnly ) {
 								continue;
@@ -586,13 +586,13 @@ keyBindings_t idKeyInput::KeyBindingsFromBinding( const char * bind, bool firstO
 						gamepad.Append( gamepadKey );
 					}
 				} else if ( i >= K_MOUSE1 && i <= K_MWHEELUP ) {
-					const char * mouseKey = "";
+					const char *mouseKey = "";
 					if ( localized ) {
 						mouseKey = LocalizedKeyName( (keyNum_t)i );
 					} else {
 						mouseKey = KeyNumToString( (keyNum_t)i );
 					}
-					if ( arcNetString::Icmp( mouseKey, "" ) != 0 ) {
+					if ( anString::Icmp( mouseKey, "" ) != 0 ) {
 						if ( !mouse.IsEmpty() ) {
 							if ( firstOnly ) {
 								continue;
@@ -602,13 +602,13 @@ keyBindings_t idKeyInput::KeyBindingsFromBinding( const char * bind, bool firstO
 						mouse.Append( mouseKey );
 					}
 				} else {
-					const char * tmp = "";
+					const char *tmp = "";
 					if ( localized ) {
 						tmp = LocalizedKeyName( (keyNum_t)i );
 					} else {
 						tmp = KeyNumToString( (keyNum_t)i );
 					}
-					if ( arcNetString::Icmp( tmp, "" ) != 0 && arcNetString::Icmp( tmp, keyboard ) != 0 ) {
+					if ( anString::Icmp( tmp, "" ) != 0 && anString::Icmp( tmp, keyboard ) != 0 ) {
 						if ( !keyboard.IsEmpty() ) {
 							if ( firstOnly ) {
 								continue;
@@ -636,10 +636,10 @@ idKeyInput::BindingFromKey
 returns the binding for the localized name of the key
 ============
 */
-const char * idKeyInput::BindingFromKey( const char *key ) {
+const char *idKeyInput::BindingFromKey( const char *key ) {
 	const int keyNum = idKeyInput::StringToKeyNum( key );
 	if ( keyNum < 0 || keyNum >= K_LAST_KEY ) {
-		return NULL;
+		return nullptr;
 	}
 	return keys[keyNum].binding.c_str();
 }
@@ -765,7 +765,7 @@ idKeyInput::Shutdown
 */
 void idKeyInput::Shutdown() {
 	delete [] keys;
-	keys = NULL;
+	keys = nullptr;
 }
 
 

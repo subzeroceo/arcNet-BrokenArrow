@@ -48,12 +48,12 @@ class idGLDrawableWorld : public idGLDrawable {
 public:
 	idGLDrawableWorld();
 	~idGLDrawableWorld();
-	void AddTris(surfTriangles_t *tris, const arcMaterial *mat);
+	void AddTris(srfTriangles_t *tris, const anMaterial *mat);
 	virtual void draw( int x, int y, int w, int h);
 	void InitWorld();
 protected:
-	ARCRenderWorld *world;
-	ARCRenderModel *worldModel;
+	anRenderWorld *world;
+	anRenderModel *worldModel;
 	arcNetHandle_t	worldModelDef;
 	arcNetHandle_t	lightDef;
 	arcNetHandle_t   modelDef;
@@ -62,7 +62,7 @@ protected:
 class idGLDrawableMaterial : public idGLDrawableWorld {
 public:
 
-	idGLDrawableMaterial(const arcMaterial *mat) {
+	idGLDrawableMaterial(const anMaterial *mat) {
 		material = mat;
 		scale = 1.0;
 		light = 1.0;
@@ -70,7 +70,7 @@ public:
 	}
 
 	idGLDrawableMaterial() {
-		material = NULL;
+		material = nullptr;
 		light = 1.0;
 		worldDirty = true;
 		realTime = 50;
@@ -87,7 +87,7 @@ public:
 	virtual void Update() { worldDirty = true ;};
 
 protected:
-	const arcMaterial *material;
+	const anMaterial *material;
 	bool worldDirty;
 	float light;
 };
@@ -115,11 +115,11 @@ public:
 protected:
 	bool worldDirty;
 	float light;
-	arcNetString skinStr;
-	arcQuats rotation;
-	arcVec3 lastPress;
+	anString skinStr;
+	anQuats rotation;
+	anVec3 lastPress;
 	float radius;
-	arcVec4 rect;
+	anVec4 rect;
 
 };
 
@@ -157,7 +157,7 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(idGLWidget)
 	public:
-	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
+	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = nullptr );
 	protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	//}}AFX_VIRTUAL

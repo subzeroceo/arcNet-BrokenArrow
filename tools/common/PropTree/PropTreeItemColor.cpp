@@ -17,7 +17,7 @@
 //	useful.
 
 //#include "stdafx.h"
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "PropTree.h"
@@ -118,7 +118,7 @@ static LONG FindSpot(CPoint point)
 /////////////////////////////////////////////////////////////////////////////
 // CPropTreeItemColor
 
-COLORREF* CPropTreeItemColor::s_pColors = NULL;
+COLORREF* CPropTreeItemColor::s_pColors = nullptr;
 
 CPropTreeItemColor::CPropTreeItemColor() :
 	m_cColor(0 ),
@@ -157,7 +157,7 @@ void CPropTreeItemColor::SetDefaultColorsList(COLORREF* pColors)
 
 void CPropTreeItemColor::DrawAttribute(CDC* pDC, const RECT& rc)
 {
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	CRect r(rc);
 
@@ -225,14 +225,14 @@ void CPropTreeItemColor::OnActivate( int activateType, CPoint point)
 	r.right = r.left + 150;
 	r.bottom = r.top + 120;
 
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 	m_pProp->GetCtrlParent()->ClientToScreen(r);
 
 	if ( !IsWindow(m_hWnd) )
 	{
 		LPCTSTR pszClassName;
 
-		pszClassName = AfxRegisterWndClass(CS_VREDRAW|CS_HREDRAW, LoadCursor(NULL, IDC_ARROW), (HBRUSH)(COLOR_BTNFACE + 1 ) );
+		pszClassName = AfxRegisterWndClass(CS_VREDRAW|CS_HREDRAW, LoadCursor(nullptr, IDC_ARROW), (HBRUSH)(COLOR_BTNFACE + 1 ) );
 
 		DWORD dwStyle = WS_POPUP|WS_DLGFRAME;
 
@@ -240,7 +240,7 @@ void CPropTreeItemColor::OnActivate( int activateType, CPoint point)
 		m_rcButton.SetRect(40, 94, 110, 114);
 	}
 
-	SetWindowPos(NULL, r.left, r.top, r.Width() + 1, r.Height(), SWP_NOZORDER|SWP_SHOWWINDOW);
+	SetWindowPos(nullptr, r.left, r.top, r.Width() + 1, r.Height(), SWP_NOZORDER|SWP_SHOWWINDOW);
 	SetFocus();
 }
 
@@ -267,7 +267,7 @@ void CPropTreeItemColor::OnPaint()
 		SetRect(&_crColors[i].rcSpot, pt.x, pt.y, pt.x + 13, pt.y + 13);
 	}
 
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	dc.SelectObject(m_pProp->GetNormalFont() );
 
@@ -320,7 +320,7 @@ BOOL CPropTreeItemColor::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 		if (FindSpot( point )!=-1 || m_rcButton.PtInRect( point ) )
 		{
-			SetCursor(LoadCursor(ghInst, MAKEINTRESOURCE(IDC_FPOINT) ));
+			SetCursor(LoadCursor(ghInst, MAKEINTRESOURCE(IDC_FPOINT) ) );
 			return TRUE;
 		}
 
@@ -355,7 +355,7 @@ void CPropTreeItemColor::OnLButtonDown(UINT, CPoint point)
 
 		m_bInDialog = TRUE;
 
-		ASSERT(m_pProp!=NULL);
+		ASSERT(m_pProp!=nullptr );
 		m_pProp->DisableInput();
 
 		ShowWindow(SW_HIDE);

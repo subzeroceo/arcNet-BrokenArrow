@@ -9,26 +9,26 @@
 ===============================================================================
 */
 
-class arcWinding {
+class anWinding {
 
 public:
-					arcWinding( void );
-					explicit arcWinding( const int n );								// allocate for n points
-					explicit arcWinding( const arcVec3 *verts, const int n );			// winding from points
-					explicit arcWinding( const arcVec3 &normal, const float dist );	// base winding for plane
-					explicit arcWinding( const arcPlane &plane );						// base winding for plane
-					explicit arcWinding( const arcWinding &winding );
-	virtual			~arcWinding( void );
+					anWinding( void );
+					explicit anWinding( const int n );								// allocate for n points
+					explicit anWinding( const anVec3 *verts, const int n );			// winding from points
+					explicit anWinding( const anVec3 &normal, const float dist );	// base winding for plane
+					explicit anWinding( const anPlane &plane );						// base winding for plane
+					explicit anWinding( const anWinding &winding );
+	virtual			~anWinding( void );
 
-	arcWinding &	operator=( const arcWinding &winding );
-	const arcVec5 &	operator[]( const int index ) const;
-	arcVec5 &		operator[]( const int index );
+	anWinding &	operator=( const anWinding &winding );
+	const anVec5 &	operator[]( const int index ) const;
+	anVec5 &		operator[]( const int index );
 
 					// add a point to the end of the winding point array
-	arcWinding &	operator+=( const arcVec3 &v );
-	arcWinding &	operator+=( const arcVec5 &v );
-	void			AddPoint( const arcVec3 &v );
-	void			AddPoint( const arcVec5 &v );
+	anWinding &	operator+=( const anVec3 &v );
+	anWinding &	operator+=( const anVec5 &v );
+	void			AddPoint( const anVec3 &v );
+	void			AddPoint( const anVec5 &v );
 
 					// number of points on winding
 	int				GetNumPoints( void ) const;
@@ -36,87 +36,87 @@ public:
 	virtual void	Clear( void );
 
 					// huge winding for plane, the points go counter clockwise when facing the front of the plane
-	void			BaseForPlane( const arcVec3 &normal, const float dist );
-	void			BaseForPlane( const arcPlane &plane );
+	void			BaseForPlane( const anVec3 &normal, const float dist );
+	void			BaseForPlane( const anPlane &plane );
 
 					// splits the winding into a front and back winding, the winding itself stays unchanged
 					// returns a SIDE_?
-	int				Split( const arcPlane &plane, const float epsilon, arcWinding **front, arcWinding **back ) const;
+	int				Split( const anPlane &plane, const float epsilon, anWinding **front, anWinding **back ) const;
 					// returns the winding fragment at the front of the clipping plane,
-					// if there is nothing at the front the winding itself is destroyed and NULL is returned
-	arcWinding *	Clip( const arcPlane &plane, const float epsilon = ON_EPSILON, const bool keepOn = false );
+					// if there is nothing at the front the winding itself is destroyed and nullptr is returned
+	anWinding *	Clip( const anPlane &plane, const float epsilon = ON_EPSILON, const bool keepOn = false );
 					// cuts off the part at the back side of the plane, returns true if some part was at the front
 					// if there is nothing at the front the number of points is set to zero
-	bool			ClipInPlace( const arcPlane &plane, const float epsilon = ON_EPSILON, const bool keepOn = false );
+	bool			ClipInPlace( const anPlane &plane, const float epsilon = ON_EPSILON, const bool keepOn = false );
 
 					// returns a copy of the winding
-	arcWinding *	Copy( void ) const;
-	arcWinding *	Reverse( void ) const;
+	anWinding *	Copy( void ) const;
+	anWinding *	Reverse( void ) const;
 	void			ReverseSelf( void );
 	void			RemoveEqualPoints( const float epsilon = ON_EPSILON );
-	void			RemoveColinearPoints( const arcVec3 &normal, const float epsilon = ON_EPSILON );
+	void			RemoveColinearPoints( const anVec3 &normal, const float epsilon = ON_EPSILON );
 	void			RemovePoint( int point );
-	void			InsertPoint( const arcVec3 &point, int spot );
-	bool			InsertPointIfOnEdge( const arcVec3 &point, const arcPlane &plane, const float epsilon = ON_EPSILON );
+	void			InsertPoint( const anVec3 &point, int spot );
+	bool			InsertPointIfOnEdge( const anVec3 &point, const anPlane &plane, const float epsilon = ON_EPSILON );
 					// add a winding to the convex hull
-	void			AddToConvexHull( const arcWinding *winding, const arcVec3 &normal, const float epsilon = ON_EPSILON );
+	void			AddToConvexHull( const anWinding *winding, const anVec3 &normal, const float epsilon = ON_EPSILON );
 					// add a point to the convex hull
-	void			AddToConvexHull( const arcVec3 &point, const arcVec3 &normal, const float epsilon = ON_EPSILON );
-					// tries to merge 'this' with the given winding, returns NULL if merge fails, both 'this' and 'w' stay intact
+	void			AddToConvexHull( const anVec3 &point, const anVec3 &normal, const float epsilon = ON_EPSILON );
+					// tries to merge 'this' with the given winding, returns nullptr if merge fails, both 'this' and 'w' stay intact
 					// 'keep' tells if the contacting points should stay even if they create colinear edges
-	arcWinding *	TryMerge( const arcWinding &w, const arcVec3 &normal, int keep = false ) const;
+	anWinding *	TryMerge( const anWinding &w, const anVec3 &normal, int keep = false ) const;
 					// check whether the winding is valid or not
 	bool			Check( bool print = true ) const;
 
 	float			GetArea( void ) const;
-	arcVec3			GetCenter( void ) const;
-	float			GetRadius( const arcVec3 &center ) const;
-	void			GetPlane( arcVec3 &normal, float &dist ) const;
-	void			GetPlane( arcPlane &plane ) const;
-	void			GetBounds( arcBounds &bounds ) const;
+	anVec3			GetCenter( void ) const;
+	float			GetRadius( const anVec3 &center ) const;
+	void			GetPlane( anVec3 &normal, float &dist ) const;
+	void			GetPlane( anPlane &plane ) const;
+	void			GetBounds( anBounds &bounds ) const;
 
 	bool			IsTiny( void ) const;
 	bool			IsHuge( void ) const;	// base winding for a plane is typically huge
 	void			Print( void ) const;
 
-	float			PlaneDistance( const arcPlane &plane ) const;
-	int				PlaneSide( const arcPlane &plane, const float epsilon = ON_EPSILON ) const;
+	float			PlaneDistance( const anPlane &plane ) const;
+	int				PlaneSide( const anPlane &plane, const float epsilon = ON_EPSILON ) const;
 
-	bool			PlanesConcave( const arcWinding &w2, const arcVec3 &normal1, const arcVec3 &normal2, float dist1, float dist2 ) const;
+	bool			PlanesConcave( const anWinding &w2, const anVec3 &normal1, const anVec3 &normal2, float dist1, float dist2 ) const;
 
-	bool			PointInside( const arcVec3 &normal, const arcVec3 &point, const float epsilon ) const;
+	bool			PointInside( const anVec3 &normal, const anVec3 &point, const float epsilon ) const;
 					// returns true if the line or ray intersects the winding
-	bool			LineIntersection( const arcPlane &windingPlane, const arcVec3 &start, const arcVec3 &end, bool backFaceCull = false ) const;
+	bool			LineIntersection( const anPlane &windingPlane, const anVec3 &start, const anVec3 &end, bool backFaceCull = false ) const;
 					// intersection point is start + dir * scale
-	bool			RayIntersection( const arcPlane &windingPlane, const arcVec3 &start, const arcVec3 &dir, float &scale, bool backFaceCull = false ) const;
+	bool			RayIntersection( const anPlane &windingPlane, const anVec3 &start, const anVec3 &dir, float &scale, bool backFaceCull = false ) const;
 
-	static float	TriangleArea( const arcVec3 &a, const arcVec3 &b, const arcVec3 &c );
+	static float	TriangleArea( const anVec3 &a, const anVec3 &b, const anVec3 &c );
 
 protected:
 	int				numPoints;				// number of points
-	arcVec5 *		p;						// pointer to point data
+	anVec5 *		p;						// pointer to point data
 	int				allocedSize;
 
 	bool			EnsureAlloced( int n, bool keep = false );
 	virtual bool	ReAllocate( int n, bool keep = false );
 };
 
-ARC_INLINE arcWinding::arcWinding( void ) {
+ARC_INLINE anWinding::anWinding( void ) {
 	numPoints = allocedSize = 0;
-	p = NULL;
+	p = nullptr;
 }
 
-ARC_INLINE arcWinding::arcWinding( int n ) {
+ARC_INLINE anWinding::anWinding( int n ) {
 	numPoints = allocedSize = 0;
-	p = NULL;
+	p = nullptr;
 	EnsureAlloced( n );
 }
 
-ARC_INLINE arcWinding::arcWinding( const arcVec3 *verts, const int n ) {
+ARC_INLINE anWinding::anWinding( const anVec3 *verts, const int n ) {
 	int i;
 
 	numPoints = allocedSize = 0;
-	p = NULL;
+	p = nullptr;
 	if ( !EnsureAlloced( n ) ) {
 		numPoints = 0;
 		return;
@@ -128,19 +128,19 @@ ARC_INLINE arcWinding::arcWinding( const arcVec3 *verts, const int n ) {
 	numPoints = n;
 }
 
-ARC_INLINE arcWinding::arcWinding( const arcVec3 &normal, const float dist ) {
+ARC_INLINE anWinding::anWinding( const anVec3 &normal, const float dist ) {
 	numPoints = allocedSize = 0;
-	p = NULL;
+	p = nullptr;
 	BaseForPlane( normal, dist );
 }
 
-ARC_INLINE arcWinding::arcWinding( const arcPlane &plane ) {
+ARC_INLINE anWinding::anWinding( const anPlane &plane ) {
 	numPoints = allocedSize = 0;
-	p = NULL;
+	p = nullptr;
 	BaseForPlane( plane );
 }
 
-ARC_INLINE arcWinding::arcWinding( const arcWinding &winding ) {
+ARC_INLINE anWinding::anWinding( const anWinding &winding ) {
 	int i;
 	if ( !EnsureAlloced( winding.GetNumPoints() ) ) {
 		numPoints = 0;
@@ -152,12 +152,12 @@ ARC_INLINE arcWinding::arcWinding( const arcWinding &winding ) {
 	numPoints = winding.GetNumPoints();
 }
 
-ARC_INLINE arcWinding::~arcWinding( void ) {
+ARC_INLINE anWinding::~anWinding( void ) {
 	delete[] p;
-	p = NULL;
+	p = nullptr;
 }
 
-ARC_INLINE arcWinding &arcWinding::operator=( const arcWinding &winding ) {
+ARC_INLINE anWinding &anWinding::operator=( const anWinding &winding ) {
 	int i;
 
 	if ( !EnsureAlloced( winding.numPoints ) ) {
@@ -171,27 +171,27 @@ ARC_INLINE arcWinding &arcWinding::operator=( const arcWinding &winding ) {
 	return *this;
 }
 
-ARC_INLINE const arcVec5 &arcWinding::operator[]( const int index ) const {
+ARC_INLINE const anVec5 &anWinding::operator[]( const int index ) const {
 	//assert( index >= 0 && index < numPoints );
 	return p[index];
 }
 
-ARC_INLINE arcVec5 &arcWinding::operator[]( const int index ) {
+ARC_INLINE anVec5 &anWinding::operator[]( const int index ) {
 	//assert( index >= 0 && index < numPoints );
 	return p[index];
 }
 
-ARC_INLINE arcWinding &arcWinding::operator+=( const arcVec3 &v ) {
+ARC_INLINE anWinding &anWinding::operator+=( const anVec3 &v ) {
 	AddPoint( v );
 	return *this;
 }
 
-ARC_INLINE arcWinding &arcWinding::operator+=( const arcVec5 &v ) {
+ARC_INLINE anWinding &anWinding::operator+=( const anVec5 &v ) {
 	AddPoint( v );
 	return *this;
 }
 
-ARC_INLINE void arcWinding::AddPoint( const arcVec3 &v ) {
+ARC_INLINE void anWinding::AddPoint( const anVec3 &v ) {
 	if ( !EnsureAlloced(numPoints+1, true) ) {
 		return;
 	}
@@ -199,7 +199,7 @@ ARC_INLINE void arcWinding::AddPoint( const arcVec3 &v ) {
 	numPoints++;
 }
 
-ARC_INLINE void arcWinding::AddPoint( const arcVec5 &v ) {
+ARC_INLINE void anWinding::AddPoint( const anVec5 &v ) {
 	if ( !EnsureAlloced(numPoints+1, true) ) {
 		return;
 	}
@@ -207,28 +207,28 @@ ARC_INLINE void arcWinding::AddPoint( const arcVec5 &v ) {
 	numPoints++;
 }
 
-ARC_INLINE int arcWinding::GetNumPoints( void ) const {
+ARC_INLINE int anWinding::GetNumPoints( void ) const {
 	return numPoints;
 }
 
-ARC_INLINE void arcWinding::SetNumPoints( int n ) {
+ARC_INLINE void anWinding::SetNumPoints( int n ) {
 	if ( !EnsureAlloced( n, true ) ) {
 		return;
 	}
 	numPoints = n;
 }
 
-ARC_INLINE void arcWinding::Clear( void ) {
+ARC_INLINE void anWinding::Clear( void ) {
 	numPoints = 0;
 	delete[] p;
-	p = NULL;
+	p = nullptr;
 }
 
-ARC_INLINE void arcWinding::BaseForPlane( const arcPlane &plane ) {
+ARC_INLINE void anWinding::BaseForPlane( const anPlane &plane ) {
 	BaseForPlane( plane.Normal(), plane.Dist() );
 }
 
-ARC_INLINE bool arcWinding::EnsureAlloced( int n, bool keep ) {
+ARC_INLINE bool anWinding::EnsureAlloced( int n, bool keep ) {
 	if ( n > allocedSize ) {
 		return ReAllocate( n, keep );
 	}
@@ -239,7 +239,7 @@ ARC_INLINE bool arcWinding::EnsureAlloced( int n, bool keep ) {
 /*
 ===============================================================================
 
-	arcFixedWinding is a fixed buffer size winding not using
+	anFixedWinding is a fixed buffer size winding not using
 	memory allocations.
 
 	When an operation would overflow the fixed buffer a warning
@@ -250,45 +250,45 @@ ARC_INLINE bool arcWinding::EnsureAlloced( int n, bool keep ) {
 
 #define	MAX_POINTS_ON_WINDING	64
 
-class arcFixedWinding : public arcWinding {
+class anFixedWinding : public anWinding {
 
 public:
-					arcFixedWinding( void );
-					explicit arcFixedWinding( const int n );
-					explicit arcFixedWinding( const arcVec3 *verts, const int n );
-					explicit arcFixedWinding( const arcVec3 &normal, const float dist );
-					explicit arcFixedWinding( const arcPlane &plane );
-					explicit arcFixedWinding( const arcWinding &winding );
-					explicit arcFixedWinding( const arcFixedWinding &winding );
-	virtual			~arcFixedWinding( void );
+					anFixedWinding( void );
+					explicit anFixedWinding( const int n );
+					explicit anFixedWinding( const anVec3 *verts, const int n );
+					explicit anFixedWinding( const anVec3 &normal, const float dist );
+					explicit anFixedWinding( const anPlane &plane );
+					explicit anFixedWinding( const anWinding &winding );
+					explicit anFixedWinding( const anFixedWinding &winding );
+	virtual			~anFixedWinding( void );
 
-	arcFixedWinding &operator=( const arcWinding &winding );
+	anFixedWinding &operator=( const anWinding &winding );
 
 	virtual void	Clear( void );
 
 					// splits the winding in a back and front part, 'this' becomes the front part
 					// returns a SIDE_?
-	int				Split( arcFixedWinding *back, const arcPlane &plane, const float epsilon = ON_EPSILON );
+	int				Split( anFixedWinding *back, const anPlane &plane, const float epsilon = ON_EPSILON );
 
 protected:
-	arcVec5			data[MAX_POINTS_ON_WINDING];	// point data
+	anVec5			data[MAX_POINTS_ON_WINDING];	// point data
 
 	virtual bool	ReAllocate( int n, bool keep = false );
 };
 
-ARC_INLINE arcFixedWinding::arcFixedWinding( void ) {
+ARC_INLINE anFixedWinding::anFixedWinding( void ) {
 	numPoints = 0;
 	p = data;
 	allocedSize = MAX_POINTS_ON_WINDING;
 }
 
-ARC_INLINE arcFixedWinding::arcFixedWinding( int n ) {
+ARC_INLINE anFixedWinding::anFixedWinding( int n ) {
 	numPoints = 0;
 	p = data;
 	allocedSize = MAX_POINTS_ON_WINDING;
 }
 
-ARC_INLINE arcFixedWinding::arcFixedWinding( const arcVec3 *verts, const int n ) {
+ARC_INLINE anFixedWinding::anFixedWinding( const anVec3 *verts, const int n ) {
 	int i;
 
 	numPoints = 0;
@@ -305,21 +305,21 @@ ARC_INLINE arcFixedWinding::arcFixedWinding( const arcVec3 *verts, const int n )
 	numPoints = n;
 }
 
-ARC_INLINE arcFixedWinding::arcFixedWinding( const arcVec3 &normal, const float dist ) {
+ARC_INLINE anFixedWinding::anFixedWinding( const anVec3 &normal, const float dist ) {
 	numPoints = 0;
 	p = data;
 	allocedSize = MAX_POINTS_ON_WINDING;
 	BaseForPlane( normal, dist );
 }
 
-ARC_INLINE arcFixedWinding::arcFixedWinding( const arcPlane &plane ) {
+ARC_INLINE anFixedWinding::anFixedWinding( const anPlane &plane ) {
 	numPoints = 0;
 	p = data;
 	allocedSize = MAX_POINTS_ON_WINDING;
 	BaseForPlane( plane );
 }
 
-ARC_INLINE arcFixedWinding::arcFixedWinding( const arcWinding &winding ) {
+ARC_INLINE anFixedWinding::anFixedWinding( const anWinding &winding ) {
 	int i;
 
 	p = data;
@@ -334,7 +334,7 @@ ARC_INLINE arcFixedWinding::arcFixedWinding( const arcWinding &winding ) {
 	numPoints = winding.GetNumPoints();
 }
 
-ARC_INLINE arcFixedWinding::arcFixedWinding( const arcFixedWinding &winding ) {
+ARC_INLINE anFixedWinding::anFixedWinding( const anFixedWinding &winding ) {
 	int i;
 
 	p = data;
@@ -349,11 +349,11 @@ ARC_INLINE arcFixedWinding::arcFixedWinding( const arcFixedWinding &winding ) {
 	numPoints = winding.GetNumPoints();
 }
 
-ARC_INLINE arcFixedWinding::~arcFixedWinding( void ) {
-	p = NULL;	// otherwise it tries to free the fixed buffer
+ARC_INLINE anFixedWinding::~anFixedWinding( void ) {
+	p = nullptr;	// otherwise it tries to free the fixed buffer
 }
 
-ARC_INLINE arcFixedWinding &arcFixedWinding::operator=( const arcWinding &winding ) {
+ARC_INLINE anFixedWinding &anFixedWinding::operator=( const anWinding &winding ) {
 	int i;
 
 	if ( !EnsureAlloced( winding.GetNumPoints() ) ) {
@@ -367,7 +367,7 @@ ARC_INLINE arcFixedWinding &arcFixedWinding::operator=( const arcWinding &windin
 	return *this;
 }
 
-ARC_INLINE void arcFixedWinding::Clear( void ) {
+ARC_INLINE void anFixedWinding::Clear( void ) {
 	numPoints = 0;
 }
 #endif	/* !__WINDING_H__ */

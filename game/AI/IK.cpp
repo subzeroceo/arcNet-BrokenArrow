@@ -1,5 +1,5 @@
 
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Game_local.h"
@@ -20,8 +20,8 @@ idIK::idIK
 idIK::idIK( void ) {
 	ik_activate = false;
 	initialized = false;
-	self = NULL;
-	animator = NULL;
+	self = nullptr;
+	animator = nullptr;
 	modifiedAnim = 0;
 	modelOffset.Zero();
 }
@@ -39,11 +39,11 @@ idIK::~idIK( void ) {
 idIK::Save
 ================
 */
-void idIK::Save( idSaveGame *savefile ) const {
+void idIK::Save( anSaveGame *savefile ) const {
 	savefile->WriteBool( initialized );
 	savefile->WriteBool( ik_activate );
 	savefile->WriteObject( self );
-	savefile->WriteString( animator != NULL && animator->GetAnim( modifiedAnim ) ? animator->GetAnim( modifiedAnim )->Name() : "" );
+	savefile->WriteString( animator != nullptr && animator->GetAnim( modifiedAnim ) ? animator->GetAnim( modifiedAnim )->Name() : "" );
 	//savefile->WriteInt( modifiedAnim );  // Recomputed during restore, do not save
 	savefile->WriteVec3( modelOffset );
 }
@@ -53,19 +53,19 @@ void idIK::Save( idSaveGame *savefile ) const {
 idIK::Restore
 ================
 */
-void idIK::Restore( idRestoreGame *savefile ) {
-	idStr anim;
+void idIK::Restore( anRestoreGame *savefile ) {
+	anString anim;
 
 	savefile->ReadBool( initialized );
 	savefile->ReadBool( ik_activate );
-	savefile->ReadObject( reinterpret_cast<idClass *&>( self ) );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( self ) );
 	savefile->ReadString( anim );
 	//savefile->ReadInt( modifiedAnim );	// This is defined below
 	savefile->ReadVec3( modelOffset );
 
 	if ( self ) {
 		animator = self->GetAnimator();
-		if ( animator == NULL || animator->ModelDef() == NULL ) {
+		if ( animator == nullptr || animator->ModelDef() == nullptr ) {
 			gameLocal.Warning( "idIK::Restore: IK for entity '%s' at (%s) has no model set.",
 								self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
 		}
@@ -75,7 +75,7 @@ void idIK::Restore( idRestoreGame *savefile ) {
 									self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
 		}
 	} else {
-		animator = NULL;
+		animator = nullptr;
 		modifiedAnim = 0;
 	}
 }
@@ -94,28 +94,28 @@ bool idIK::IsInitialized( void ) const {
 idIK::Init
 ================
 */
-bool idIK::Init( idEntity *self, const char *anim, const arcVec3 &modelOffset ) {
-	idRenderModel *model;
+bool idIK::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
+	anRenderModel *model;
 
-	if ( self == NULL ) {
+	if ( self == nullptr ) {
 		return false;
 	}
 
 	this->self = self;
 
 	animator = self->GetAnimator();
-	if ( animator == NULL || animator->ModelDef() == NULL ) {
+	if ( animator == nullptr || animator->ModelDef() == nullptr ) {
 		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no model set.",
 							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
 		return false;
 	}
-	if ( animator->ModelDef()->ModelHandle() == NULL ) {
+	if ( animator->ModelDef()->ModelHandle() == nullptr ) {
 		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) uses default model.",
 							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
 		return false;
 	}
 	model = animator->ModelHandle();
-	if ( model == NULL ) {
+	if ( model == nullptr ) {
 		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no model set.",
 							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
 		return false;
@@ -154,17 +154,17 @@ void idIK::ClearJointMods( void ) {
 idIK::SolveTwoBones
 ================
 */
-bool idIK::SolveTwoBones( const arcVec3 &startPos, const arcVec3 &endPos, const arcVec3 &dir, float len0, float len1, arcVec3 &jointPos ) {
+bool idIK::SolveTwoBones( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, float len0, float len1, anVec3 &jointPos ) {
 	float length, lengthSqr, lengthInv, x, y;
-	arcVec3 vec0, vec1;
+	anVec3 vec0, vec1;
 
 	vec0 = endPos - startPos;
 	lengthSqr = vec0.LengthSqr();
-	lengthInv = arcMath::InvSqrt( lengthSqr );
+	lengthInv = anMath::InvSqrt( lengthSqr );
 	length = lengthInv * lengthSqr;
 
 	// if the start and end position are too far out or too close to each other
-	if ( length > len0 + len1 || length < arcMath::Fabs( len0 - len1 ) ) {
+	if ( length > len0 + len1 || length < anMath::Fabs( len0 - len1 ) ) {
 		jointPos = startPos + 0.5f * vec0;
 		return false;
 	}
@@ -174,7 +174,7 @@ bool idIK::SolveTwoBones( const arcVec3 &startPos, const arcVec3 &endPos, const 
 	vec1.Normalize();
 
 	x = ( length * length + len0 * len0 - len1 * len1 ) * ( 0.5f * lengthInv );
-	y = arcMath::Sqrt( len0 * len0 - x * x );
+	y = anMath::Sqrt( len0 * len0 - x * x );
 
 	jointPos = startPos + x * vec0 + y * vec1;
 
@@ -186,7 +186,7 @@ bool idIK::SolveTwoBones( const arcVec3 &startPos, const arcVec3 &endPos, const 
 idIK::GetBoneAxis
 ================
 */
-float idIK::GetBoneAxis( const arcVec3 &startPos, const arcVec3 &endPos, const arcVec3 &dir, arcMat3 &axis ) {
+float idIK::GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, anMat3 &axis ) {
 	float length;
 	axis[0] = endPos - startPos;
 	length = axis[0].Normalize();
@@ -214,7 +214,7 @@ idIK_Walk::idIK_Walk() {
 	int i;
 
 	initialized = false;
-	footModel = NULL;
+	footModel = nullptr;
 	numLegs = 0;
 	enabledLegs = 0;
 	for ( i = 0; i < MAX_LEGS; i++ ) {
@@ -269,7 +269,7 @@ idIK_Walk::~idIK_Walk() {
 idIK_Walk::Save
 ================
 */
-void idIK_Walk::Save( idSaveGame *savefile ) const {
+void idIK_Walk::Save( anSaveGame *savefile ) const {
 	idIK::Save( savefile );
 
 	savefile->WriteClipModel( footModel );
@@ -317,7 +317,7 @@ void idIK_Walk::Save( idSaveGame *savefile ) const {
 idIK_Walk::Restore
 ================
 */
-void idIK_Walk::Restore( idRestoreGame *savefile ) {
+void idIK_Walk::Restore( anRestoreGame *savefile ) {
 	idIK::Restore( savefile );
 
 	savefile->ReadClipModel( footModel );
@@ -365,20 +365,20 @@ void idIK_Walk::Restore( idRestoreGame *savefile ) {
 idIK_Walk::Init
 ================
 */
-bool idIK_Walk::Init( idEntity *self, const char *anim, const arcVec3 &modelOffset ) {
+bool idIK_Walk::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	int i;
 	float footSize;
-	arcVec3 verts[4];
-	idTraceModel trm;
+	anVec3 verts[4];
+	anTraceModel trm;
 	const char *jointName;
-	arcVec3 dir, ankleOrigin, kneeOrigin, hipOrigin, dirOrigin;
-	arcMat3 axis, ankleAxis, kneeAxis, hipAxis;
+	anVec3 dir, ankleOrigin, kneeOrigin, hipOrigin, dirOrigin;
+	anMat3 axis, ankleAxis, kneeAxis, hipAxis;
 
-	static arcVec3 footWinding[4] = {
-		arcVec3(  1.0f,  1.0f, 0.0f ),
-		arcVec3( -1.0f,  1.0f, 0.0f ),
-		arcVec3( -1.0f, -1.0f, 0.0f ),
-		arcVec3(  1.0f, -1.0f, 0.0f )
+	static anVec3 footWinding[4] = {
+		anVec3(  1.0f,  1.0f, 0.0f ),
+		anVec3( -1.0f,  1.0f, 0.0f ),
+		anVec3( -1.0f, -1.0f, 0.0f ),
+		anVec3(  1.0f, -1.0f, 0.0f )
 	};
 
 	if ( !self ) {
@@ -395,7 +395,7 @@ bool idIK_Walk::Init( idEntity *self, const char *anim, const arcVec3 &modelOffs
 	}
 
 	int numJoints = animator->NumJoints();
-	idJointMat *joints = ( idJointMat * )_alloca16( numJoints * sizeof( joints[0] ) );
+	anJointMat *joints = ( anJointMat * )_alloca16( numJoints * sizeof( joints[0] ) );
 
 	// create the animation frame used to setup the IK
 	gameEdit->ANIM_CreateAnimFrame( animator->ModelHandle(), animator->GetAnim( modifiedAnim )->MD5Anim( 0 ), numJoints, joints, 1, animator->ModelDef()->GetVisualOffset() + modelOffset, animator->RemoveOrigin() );
@@ -445,18 +445,18 @@ bool idIK_Walk::Init( idEntity *self, const char *anim, const arcVec3 &modelOffs
 	for ( i = 0; i < numLegs; i++ ) {
 		oldAnkleHeights[i] = 0.0f;
 
-		ankleAxis = joints[ ankleJoints[ i ] ].ToMat3();
-		ankleOrigin = joints[ ankleJoints[ i ] ].ToVec3();
+		ankleAxis = joints[ ankleJoints[i] ].ToMat3();
+		ankleOrigin = joints[ ankleJoints[i] ].ToVec3();
 
-		kneeAxis = joints[ kneeJoints[ i ] ].ToMat3();
-		kneeOrigin = joints[ kneeJoints[ i ] ].ToVec3();
+		kneeAxis = joints[ kneeJoints[i] ].ToMat3();
+		kneeOrigin = joints[ kneeJoints[i] ].ToVec3();
 
-		hipAxis = joints[ hipJoints[ i ] ].ToMat3();
-		hipOrigin = joints[ hipJoints[ i ] ].ToVec3();
+		hipAxis = joints[ hipJoints[i] ].ToMat3();
+		hipOrigin = joints[ hipJoints[i] ].ToVec3();
 
 		// get the IK direction
 		if ( dirJoints[i] != INVALID_JOINT ) {
-			dirOrigin = joints[ dirJoints[ i ] ].ToVec3();
+			dirOrigin = joints[ dirJoints[i] ].ToVec3();
 			dir = dirOrigin - kneeOrigin;
 		} else {
 			dir.Set( 1.0f, 0.0f, 0.0f );
@@ -492,7 +492,7 @@ bool idIK_Walk::Init( idEntity *self, const char *anim, const arcVec3 &modelOffs
 			verts[i] = footWinding[i] * footSize;
 		}
 		trm.SetupPolygon( verts, 4 );
-		footModel = new idClipModel( trm );
+		footModel = new anClipModel( trm );
 	}
 
 	initialized = true;
@@ -509,10 +509,10 @@ void idIK_Walk::Evaluate( void ) {
 	int i, newPivotFoot = 0;
 	float modelHeight, jointHeight, lowestHeight, floorHeights[MAX_LEGS];
 	float shift, smallestShift, newHeight, step, newPivotYaw, height, largestAnkleHeight;
-	arcVec3 modelOrigin, normal, hipDir, kneeDir, start, end, jointOrigins[MAX_LEGS];
-	arcVec3 footOrigin, ankleOrigin, kneeOrigin, hipOrigin, waistOrigin;
-	arcMat3 modelAxis, waistAxis, axis;
-	arcMat3 hipAxis[MAX_LEGS], kneeAxis[MAX_LEGS], ankleAxis[MAX_LEGS];
+	anVec3 modelOrigin, normal, hipDir, kneeDir, start, end, jointOrigins[MAX_LEGS];
+	anVec3 footOrigin, ankleOrigin, kneeOrigin, hipOrigin, waistOrigin;
+	anMat3 modelAxis, waistAxis, axis;
+	anMat3 hipAxis[MAX_LEGS], kneeAxis[MAX_LEGS], ankleAxis[MAX_LEGS];
 	trace_t results;
 
 	if ( !self || !gameLocal.isNewFrame ) {
@@ -535,7 +535,7 @@ void idIK_Walk::Evaluate( void ) {
 	animator->CreateFrame( gameLocal.time, false );
 
 	// get the joint positions for the feet
-	lowestHeight = arcMath::INFINITY;
+	lowestHeight = anMath::INFINITY;
 	for ( i = 0; i < numLegs; i++ ) {
 		animator->GetJointTransform( footJoints[i], gameLocal.time, footOrigin, axis );
 		jointOrigins[i] = modelOrigin + footOrigin * modelAxis;
@@ -551,7 +551,7 @@ void idIK_Walk::Evaluate( void ) {
 		newPivotYaw = modelAxis[0].ToYaw();
 
 		// change pivot foot
-		if ( newPivotFoot != pivotFoot || arcMath::Fabs( arcMath::AngleNormalize180( newPivotYaw - pivotYaw ) ) > 30.0f ) {
+		if ( newPivotFoot != pivotFoot || anMath::Fabs( anMath::AngleNormalize180( newPivotYaw - pivotYaw ) ) > 30.0f ) {
 			pivotFoot = newPivotFoot;
 			pivotYaw = newPivotYaw;
 			animator->GetJointTransform( footJoints[pivotFoot], gameLocal.time, footOrigin, axis );
@@ -571,14 +571,14 @@ void idIK_Walk::Evaluate( void ) {
 
 		start = jointOrigins[i] + normal * footUpTrace;
 		end = jointOrigins[i] - normal * footDownTrace;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.Translation( self, results, start, end, footModel, mat3_identity, CONTENTS_SOLID|CONTENTS_IKCLIP, self );
-// RAVEN END
+
 		floorHeights[i] = results.endpos * normal;
 
 		if ( ik_debug.GetBool() && footModel ) {
-			idFixedWinding w;
+			anFixedWinding w;
 			for ( int j = 0; j < footModel->GetTraceModel()->numVerts; j++ ) {
 				w += footModel->GetTraceModel()->verts[j];
 			}
@@ -586,7 +586,7 @@ void idIK_Walk::Evaluate( void ) {
 		}
 	}
 
-	const idPhysics *phys = self->GetPhysics();
+	const anPhysics *phys = self->GetPhysics();
 
 	// test whether or not the character standing on the ground
 	bool onGround = phys->HasGroundContacts();
@@ -594,19 +594,19 @@ void idIK_Walk::Evaluate( void ) {
 	// test whether or not the character is standing on a plat
 	bool onPlat = false;
 	for ( i = 0; i < phys->GetNumContacts(); i++ ) {
-		idEntity *ent = gameLocal.entities[ phys->GetContact( i ).entityNum ];
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-		if ( ent != NULL && ent->IsType( idPlat::GetClassType() ) ) {
-// RAVEN END
+		anEntity *ent = gameLocal.entities[ phys->GetContact( i ).entityNum ];
+
+
+		if ( ent != nullptr && ent->IsType( idPlat::GetClassType() ) ) {
+
 			onPlat = true;
 			break;
 		}
 	}
 
 	// adjust heights of the ankles
-	smallestShift = arcMath::INFINITY;
-	largestAnkleHeight = -arcMath::INFINITY;
+	smallestShift = anMath::INFINITY;
+	largestAnkleHeight = -anMath::INFINITY;
 	for ( i = 0; i < numLegs; i++ ) {
 
 		if ( onGround && ( enabledLegs & ( 1 << i ) ) ) {
@@ -649,10 +649,10 @@ void idIK_Walk::Evaluate( void ) {
 	if ( minWaistFloorDist > 0.0f && waistOffset * normal < 0.0f ) {
 		start = waistOrigin;
 		end = waistOrigin + waistOffset - normal * minWaistFloorDist;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.Translation( self, results, start, end, footModel, modelAxis, CONTENTS_SOLID|CONTENTS_IKCLIP, self );
-// RAVEN END
+
 		height = ( waistOrigin + waistOffset - results.endpos ) * normal;
 		if ( height < minWaistFloorDist ) {
 			waistOffset += ( minWaistFloorDist - height ) * normal;
@@ -833,7 +833,7 @@ idIK_Reach::~idIK_Reach() {
 idIK_Reach::Save
 ================
 */
-void idIK_Reach::Save( idSaveGame *savefile ) const {
+void idIK_Reach::Save( anSaveGame *savefile ) const {
 	idIK::Save( savefile );
 
 	savefile->WriteInt( numArms );
@@ -858,7 +858,7 @@ void idIK_Reach::Save( idSaveGame *savefile ) const {
 idIK_Reach::Restore
 ================
 */
-void idIK_Reach::Restore( idRestoreGame *savefile ) {
+void idIK_Reach::Restore( anRestoreGame *savefile ) {
 	idIK::Restore( savefile );
 
 	savefile->ReadInt( numArms );
@@ -883,12 +883,12 @@ void idIK_Reach::Restore( idRestoreGame *savefile ) {
 idIK_Reach::Init
 ================
 */
-bool idIK_Reach::Init( idEntity *self, const char *anim, const arcVec3 &modelOffset ) {
+bool idIK_Reach::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	int i;
 	const char *jointName;
-	idTraceModel trm;
-	arcVec3 dir, handOrigin, elbowOrigin, shoulderOrigin, dirOrigin;
-	arcMat3 axis, handAxis, elbowAxis, shoulderAxis;
+	anTraceModel trm;
+	anVec3 dir, handOrigin, elbowOrigin, shoulderOrigin, dirOrigin;
+	anMat3 axis, handAxis, elbowAxis, shoulderAxis;
 
 	if ( !self ) {
 		return false;
@@ -904,7 +904,7 @@ bool idIK_Reach::Init( idEntity *self, const char *anim, const arcVec3 &modelOff
 	}
 
 	int numJoints = animator->NumJoints();
-	idJointMat *joints = ( idJointMat * )_alloca16( numJoints * sizeof( joints[0] ) );
+	anJointMat *joints = ( anJointMat * )_alloca16( numJoints * sizeof( joints[0] ) );
 
 	// create the animation frame used to setup the IK
 	gameEdit->ANIM_CreateAnimFrame( animator->ModelHandle(), animator->GetAnim( modifiedAnim )->MD5Anim( 0 ), numJoints, joints, 1, animator->ModelDef()->GetVisualOffset() + modelOffset, animator->RemoveOrigin() );
@@ -941,18 +941,18 @@ bool idIK_Reach::Init( idEntity *self, const char *anim, const arcVec3 &modelOff
 	// get the arm bone lengths and rotation matrices
 	for ( i = 0; i < numArms; i++ ) {
 
-		handAxis = joints[ handJoints[ i ] ].ToMat3();
-		handOrigin = joints[ handJoints[ i ] ].ToVec3();
+		handAxis = joints[ handJoints[i] ].ToMat3();
+		handOrigin = joints[ handJoints[i] ].ToVec3();
 
-		elbowAxis = joints[ elbowJoints[ i ] ].ToMat3();
-		elbowOrigin = joints[ elbowJoints[ i ] ].ToVec3();
+		elbowAxis = joints[ elbowJoints[i] ].ToMat3();
+		elbowOrigin = joints[ elbowJoints[i] ].ToVec3();
 
-		shoulderAxis = joints[ shoulderJoints[ i ] ].ToMat3();
-		shoulderOrigin = joints[ shoulderJoints[ i ] ].ToVec3();
+		shoulderAxis = joints[ shoulderJoints[i] ].ToMat3();
+		shoulderOrigin = joints[ shoulderJoints[i] ].ToVec3();
 
 		// get the IK direction
 		if ( dirJoints[i] != INVALID_JOINT ) {
-			dirOrigin = joints[ dirJoints[ i ] ].ToVec3();
+			dirOrigin = joints[ dirJoints[i] ].ToVec3();
 			dir = dirOrigin - elbowOrigin;
 		} else {
 			dir.Set( -1.0f, 0.0f, 0.0f );
@@ -982,9 +982,9 @@ idIK_Reach::Evaluate
 */
 void idIK_Reach::Evaluate( void ) {
 	int i;
-	arcVec3 modelOrigin, shoulderOrigin, elbowOrigin, handOrigin, shoulderDir, elbowDir;
-	arcMat3 modelAxis, axis;
-	arcMat3 shoulderAxis[MAX_ARMS], elbowAxis[MAX_ARMS];
+	anVec3 modelOrigin, shoulderOrigin, elbowOrigin, handOrigin, shoulderDir, elbowDir;
+	anMat3 modelAxis, axis;
+	anMat3 shoulderAxis[MAX_ARMS], elbowAxis[MAX_ARMS];
 	trace_t trace;
 
 	modelOrigin = self->GetRenderEntity()->origin;
@@ -1003,10 +1003,10 @@ void idIK_Reach::Evaluate( void ) {
 		handOrigin = modelOrigin + handOrigin * modelAxis;
 
 		// get first collision going from shoulder to hand
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.TracePoint( self, trace, shoulderOrigin, handOrigin, CONTENTS_SOLID, self );
-// RAVEN END
+
 		handOrigin = trace.endpos;
 
 		// get the IK bend direction

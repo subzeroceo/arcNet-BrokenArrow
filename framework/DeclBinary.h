@@ -8,7 +8,7 @@ ARCBinaryDecl
 A helper class to ensure that binary data generation is handled uniformly across decl types
 Should be added to the Parse() member of an arcDecl-derived class
 
-To ensure that tokens are generated consistently it should be created after the LEXFL_  parsing flags are set on the input ARCParser
+To ensure that tokens are generated consistently it should be created after the LEXFL_  parsing flags are set on the input anParser
 
 The destructor handles setting dependencies and storing any binary generated data
 ==============
@@ -22,19 +22,19 @@ ARCBinaryDecl
 */
 class ARCBinaryDecl {
 public:
-							ARCBinaryDecl( arcDecl *decl_, const char *text, int textLength, ARCParser &src_ );
+							ARCBinaryDecl( arcDecl *decl_, const char *text, int textLength, anParser &src_ );
 							~ARCBinaryDecl();
 
 	void					GetBinaryBuffer( const byte *&buffer, int& length ) const;
-	const arcFile_Memory*	GetOutputFile() const { return binaryOutput; }
+	const anFileMemory*	GetOutputFile() const { return binaryOutput; }
 	void					Finish( void );
 
 private:
-	ARCParser				&src;				// parser that we're reading from/settings up
-	arcFile_Memory			*binaryOutput;		// tokenized parser output to be stored on the decl
+	anParser				&src;				// parser that we're reading from/settings up
+	anFileMemory			*binaryOutput;		// tokenized parser output to be stored on the decl
 
-	arcDeclAudio			*decl;				// source/target decl
-	arcDeclMaterialCLass	*type;				// type of the decl, used for decl type-specific behavior
+	anDeclAudio			*decl;				// source/target decl
+	anDeclSurfaceType	*type;				// type of the decl, used for decl type-specific behavior
 
 	byte*					declBuffer;			// binary buffer retrieved from the decl
 	int						declBufferLength;	// binary buffer length retrieved from the decl
@@ -46,16 +46,16 @@ private:
 ARCBinaryDecl::ARCBinaryDecl
 ============
 */
-ARC_INLINE ARCBinaryDecl::ARCBinaryDecl( arcDecl *decl_, const char *text, int textLength, ARCParser &src_ ) :
-	binaryOutput( NULL ),
+ARC_INLINE ARCBinaryDecl::ARCBinaryDecl( arcDecl *decl_, const char *text, int textLength, anParser &src_ ) :
+	binaryOutput( nullptr ),
 	decl( decl_ ),
 	src( src_ ),
-	declBuffer( NULL ),
+	declBuffer( nullptr ),
 	declBufferLength( 0 ) {
 
 	type = declManager->GetDeclType( decl->GetType() );
 
-	arcNetTokenCache* cache = NULL;
+	anTokenCache* cache = nullptr;
 	if ( !type->UsePrivateTokens() ) {
 		cache = &declManager->GetGlobalTokenCache();
 	}
@@ -67,14 +67,14 @@ ARC_INLINE ARCBinaryDecl::ARCBinaryDecl( arcDecl *decl_, const char *text, int t
 		// store expanded text (except for templates) so that it's written in its entirety to the binary decl file
 		if ( cvarSystem->GetCVarBool( "com_writeBinaryDecls" ) && !type->WriteBinary() && !type->AlwaysGenerateBinary() && decl->GetState() != DS_DEFAULTED ) {
 			src.LoadMemory( text, textLength, va( "%s: %s", decl->GetFileName(), decl->GetName() ), decl->GetLineNum() );
-			if ( decl->GetFileLevelIncludeDependencies() != NULL ) {
+			if ( decl->GetFileLevelIncludeDependencies() != nullptr ) {
 				src.AddIncludes( *( decl->GetFileLevelIncludeDependencies() ) );
 			}
 
-			arcStringBuilder_Heap builder;
+			anStringBuilder_Heap builder;
 
-			arcNetToken token;
-			while ( src.ReadToken( &token )) {
+			anToken token;
+			while ( src.ReadToken( &token ) ) {
 				if ( token.type == TT_STRING ) {
 					builder += "\"";
 				}
@@ -91,7 +91,7 @@ ARC_INLINE ARCBinaryDecl::ARCBinaryDecl( arcDecl *decl_, const char *text, int t
 	}
 
 	// no need to setup file dependencies in binary mode
-	if ( decl->GetFileLevelIncludeDependencies() != NULL && !decl->HasBinaryBuffer() ) {
+	if ( decl->GetFileLevelIncludeDependencies() != nullptr && !decl->HasBinaryBuffer() ) {
 		src.AddIncludes( *( decl->GetFileLevelIncludeDependencies() ) );
 	}
 
@@ -122,8 +122,8 @@ ARCBinaryDecl::GetBinaryBuffer
 ============
 */
 ARC_INLINE void ARCBinaryDecl::GetBinaryBuffer( const byte*& buffer, int& length ) const {
-	if ( declBuffer == NULL || declBufferLength == 0 ) {
-		if ( binaryOutput != NULL ) {
+	if ( declBuffer == nullptr || declBufferLength == 0 ) {
+		if ( binaryOutput != nullptr ) {
 			buffer = reinterpret_cast< const byte* >( binaryOutput->GetDataPtr() );
 			length = binaryOutput->Length();
 			return;
@@ -141,25 +141,25 @@ ARCBinaryDecl::Finish
 */
 ARC_INLINE void ARCBinaryDecl::Finish( void ) {
 	// no dependencies in binary mode, except for types that always generate
-	if ( decl != NULL && ( binaryOutput == NULL || type->AlwaysGenerateBinary() ) ) {
+	if ( decl != nullptr && ( binaryOutput == nullptr || type->AlwaysGenerateBinary() ) ) {
 		declManager->AddDependencies( decl, src );
 	}
 
-	if ( decl != NULL && binaryOutput != NULL && decl->GetState() != DS_DEFAULTED ) {
+	if ( decl != nullptr && binaryOutput != nullptr && decl->GetState() != DS_DEFAULTED ) {
 		decl->SetBinarySource( reinterpret_cast< const byte* >( binaryOutput->GetDataPtr() ), binaryOutput->Length() );
 	}
 
-	if ( decl != NULL && declBuffer != NULL ) {
+	if ( decl != nullptr && declBuffer != nullptr ) {
 		decl->FreeSourceBuffer( declBuffer );
-		declBuffer = NULL;
+		declBuffer = nullptr;
 	}
 
-	if ( binaryOutput != NULL ) {
+	if ( binaryOutput != nullptr ) {
 		fileSystem->CloseFile( binaryOutput );
-		binaryOutput = NULL;
+		binaryOutput = nullptr;
 	}
 
-	decl = NULL;
+	decl = nullptr;
 }
 
 

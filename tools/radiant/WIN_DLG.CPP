@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -458,20 +458,20 @@ BOOL CALLBACK AboutDlgProc( HWND hwndDlg,UINT uMsg, WPARAM wParam,LPARAM lParam 
 	switch (uMsg) {
 	case WM_INITDIALOG: {
 			char buffer[1024];
-			arcNetString::snPrintf(buffer, 1024, "DOOM Radiant Build %d\nCopyright �1999-2004 Id Software, Inc.\n", BUILD_NUMBER);
+			anString::snPrintf(buffer, 1024, "DOOM Radiant Build %d\nCopyright �1999-2004 Id Software, Inc.\n", BUILD_NUMBER);
 //			SetDlgItemText( hwndDlg, IDC_ABOUT_INFO, buffer);
 
-			arcNetString::snPrintf( buffer, 1024, "Renderer:\t%s", qglGetString( GL_RENDERER ) );
+			anString::snPrintf( buffer, 1024, "Renderer:\t%s", qglGetString( GL_RENDERER ) );
 			SetDlgItemText( hwndDlg, IDC_ABOUT_GLRENDERER, buffer );
 
-			arcNetString::snPrintf( buffer, 1024, "Version:\t\t%s", qglGetString( GL_VERSION ) );
+			anString::snPrintf( buffer, 1024, "Version:\t\t%s", qglGetString( GL_VERSION ) );
 			SetDlgItemText( hwndDlg, IDC_ABOUT_GLVERSION, buffer );
 
-			arcNetString::snPrintf( buffer, 1024, "Vendor:\t\t%s", qglGetString( GL_VENDOR ) );
+			anString::snPrintf( buffer, 1024, "Vendor:\t\t%s", qglGetString( GL_VENDOR ) );
 			SetDlgItemText( hwndDlg, IDC_ABOUT_GLVENDOR, buffer);
 
 			char extensions[4096];
-			arcNetString::snPrintf( extensions, 4096, "%s", qglGetString( GL_EXTENSIONS ) );
+			anString::snPrintf( extensions, 4096, "%s", qglGetString( GL_EXTENSIONS ) );
 			HWND hWndExtensions = GetDlgItem( hwndDlg, IDC_ABOUT_GLEXTENSIONS );
 
 			char *start = extensions;

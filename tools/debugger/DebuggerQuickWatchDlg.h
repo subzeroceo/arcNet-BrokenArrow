@@ -34,15 +34,15 @@ class rvDebuggerQuickWatchDlg
 {
 public:
 
-	rvDebuggerQuickWatchDlg ( );
+	rvDebuggerQuickWatchDlg();
 
-	bool	DoModal				( rvDebuggerWindow* window, int callstackDepth, const char* variable = NULL );
+	bool	DoModal				( rvDebuggerWindow* window, int callstackDepth, const char* variable = nullptr );
 
 protected:
 
 	HWND				mWnd;
 	int					mCallstackDepth;
-	arcNetString				mVariable;
+	anString				mVariable;
 	rvDebuggerWindow*	mDebuggerWindow;
 
 	void				SetVariable	( const char* varname, bool force = false );

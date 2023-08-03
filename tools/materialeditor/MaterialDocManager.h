@@ -50,7 +50,7 @@ public:
 	void			UnRegisterAllMaterialViews();
 
 	//Material Selection
-	void			SetSelectedMaterial(arcMaterial* material);
+	void			SetSelectedMaterial(anMaterial* material);
 	MaterialDoc*	GetCurrentMaterialDoc() { return currentMaterial; };
 
 	//State Checking Methods
@@ -60,7 +60,7 @@ public:
 	bool			IsAnyModified();
 
 	//Adding or deleting a material
-	void			AddMaterial(const char* name, const char* filename, const char* sourceText = NULL, bool addUndo = true);
+	void			AddMaterial(const char* name, const char* filename, const char* sourceText = nullptr, bool addUndo = true);
 	void			RedoAddMaterial(const char* name, bool clearData = true);
 	void			DeleteMaterial(MaterialDoc* material, bool addUndo = true);
 
@@ -80,21 +80,21 @@ public:
 
 	//Used to get and/or create a MaterialDoc object for editing
 	MaterialDoc* 	CreateMaterialDoc(const char* materialName);
-	MaterialDoc* 	CreateMaterialDoc(arcMaterial* material);
-	MaterialDoc* 	GetInProgressDoc(arcMaterial* material);
+	MaterialDoc* 	CreateMaterialDoc(anMaterial* material);
+	MaterialDoc* 	GetInProgressDoc(anMaterial* material);
 
 	//Copy Paste
-	void			CopyMaterial(MaterialDoc* materialDoc = NULL, bool cut = false);
+	void			CopyMaterial(MaterialDoc* materialDoc = nullptr, bool cut = false);
 	void			ClearCopy();
 	bool			IsCopyMaterial();
-	arcNetString			GetCopyMaterialName();
+	anString			GetCopyMaterialName();
 	void			PasteMaterial(const char* name, const char* filename);
 
 	void			CopyStage(MaterialDoc* materialDoc, int stageNum);
 	void			ClearCopyStage();
 	bool			IsCopyStage();
 	void			PasteStage(MaterialDoc* materialDoc);
-	void			GetCopyStageInfo( int& type, arcNetString& name);
+	void			GetCopyStageInfo( int& type, anString& name);
 
 	//Undo/Redo
 	void			Undo();
@@ -110,7 +110,7 @@ public:
 	bool			FindMaterial(const char* name, MaterialSearchData_t* searchData, bool checkName);
 
 	//Misc
-	arcNetString			GetUniqueMaterialName(arcNetString name);
+	anString			GetUniqueMaterialName(anString name);
 
 protected:
 
@@ -146,18 +146,18 @@ protected:
 	void			AttributeChanged(MaterialDoc* materialDoc, int stage, const char* attribName);
 
 protected:
-	arcNetList<MaterialView*>		materialViews;
+	anList<MaterialView*>		materialViews;
 	MaterialDoc*				currentMaterial;
-	arcHashTable<MaterialDoc*>	inProgressMaterials;
+	anHashTable<MaterialDoc*>	inProgressMaterials;
 
-	arcNetList<MaterialModifier*>	undoModifiers;
-	arcNetList<MaterialModifier*>	redoModifiers;
+	anList<MaterialModifier*>	undoModifiers;
+	anList<MaterialModifier*>	redoModifiers;
 
 	//Copy/Paste
 	bool						cutMaterial;
-	arcNetString						copyMaterial;
+	anString						copyMaterial;
 
 	//Copy/Paste Stage
-	arcNetString						copyStageMaterial;
+	anString						copyStageMaterial;
 	MEStage_t					copyStage;
 };

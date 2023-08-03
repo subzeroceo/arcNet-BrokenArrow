@@ -10,7 +10,7 @@ Camera providing an alternative view of the level.
 ===============================================================================
 */
 
-class idCamera : public idEntity {
+class idCamera : public anEntity {
 public:
 	ABSTRACT_PROTOTYPE( idCamera );
 
@@ -28,9 +28,9 @@ idCameraView
 ===============================================================================
 */
 
-extern const idEventDef EV_SetFOV;
-extern const idEventDef EV_Camera_Start;
-extern const idEventDef EV_Camera_Stop;
+extern const anEventDef EV_SetFOV;
+extern const anEventDef EV_Camera_Start;
+extern const anEventDef EV_Camera_Stop;
 
 class idCameraView : public idCamera {
 public:
@@ -38,30 +38,30 @@ public:
  							idCameraView();
 
 	// save games
-	void					Save( idSaveGame *savefile ) const;				// archives object for save game file
-	void					Restore( idRestoreGame *savefile );				// unarchives object from save game file
+	void					Save( anSaveGame *savefile ) const;				// archives object for save game file
+	void					Restore( anRestoreGame *savefile );				// unarchives object from save game file
 
 	void					Spawn( );
 	virtual void			GetViewParms( renderView_t *view );
 	virtual void			Stop( void );
 
 protected:
-	void					Event_Activate( idEntity *activator );
+	void					Event_Activate( anEntity *activator );
 	void					Event_SetAttachments();
-	void					SetAttachment( idEntity **e, const char *p );
-// RAVEN BEGIN
+	void					SetAttachment( anEntity **e, const char *p );
+
 // bdube: changed fov to interpolated value
 	idInterpolate<float>	fov;
-// RAVEN END
-	idEntity				*attachedTo;
-	idEntity				*attachedView;
 
-// RAVEN BEGIN
+	anEntity				*attachedTo;
+	anEntity				*attachedView;
+
+
 // bdube: added setfov event
 	void					Event_SetFOV		( float fov );
 	void					Event_BlendFOV		( float beginFOV, float endFOV, float blendTime );
 	void					Event_GetFOV		( void );
-// RAVEN END
+
 };
 
 
@@ -74,7 +74,7 @@ A camera which follows a path defined by an animation.
 ===============================================================================
 */
 
-// RAVEN BEGIN
+
 // rjohnson: camera is now contained in a def for frame commands
 
 /*
@@ -87,27 +87,27 @@ A camera which follows a path defined by an animation.
 class idDeclCameraDef;
 
 typedef struct {
-	idCQuat				q;
-	arcVec3				t;
+	anCQuat				q;
+	anVec3				t;
 	float				fov;
 } cameraFrame_t;
 
 class rvCameraAnimation {
 private:
-	idList<int>					cameraCuts;
-	idList<cameraFrame_t>		camera;
-	idList<frameLookup_t>		frameLookup;
-	idList<frameCommand_t>		frameCommands;
+	anList<int>					cameraCuts;
+	anList<cameraFrame_t>		camera;
+	anList<frameLookup_t>		frameLookup;
+	anList<frameCommand_t>		frameCommands;
 	int							frameRate;
-	idStr						name;
-	idStr						realname;
+	anString						name;
+	anString						realname;
 
 public:
 								rvCameraAnimation();
 								rvCameraAnimation( const idDeclCameraDef *cameraDef, const rvCameraAnimation *anim );
 								~rvCameraAnimation();
 
-	void						SetAnim( const idDeclCameraDef *cameraDef, const char *sourcename, const char *animname, idStr filename );
+	void						SetAnim( const idDeclCameraDef *cameraDef, const char *sourcename, const char *animname, anString filename );
 	const char					*Name( void ) const;
 	const char					*FullName( void ) const;
 	int							NumFrames( void ) const;
@@ -116,9 +116,9 @@ public:
 	const int					GetCut( int index ) const;
 	const int					GetFrameRate( void ) const;
 
-	const char					*AddFrameCommand( const class idDeclCameraDef *cameraDef, const idList<int>& frames, idLexer &src, const idDict *def );
-	void						CallFrameCommands( idEntity *ent, int from, int to ) const;
-	void						CallFrameCommandSound ( const frameCommand_t& command, idEntity* ent, const s_channelType channel ) const;
+	const char					*AddFrameCommand( const class idDeclCameraDef *cameraDef, const anList<int>& frames, anLexer &src, const anDict *def );
+	void						CallFrameCommands( anEntity *ent, int from, int to ) const;
+	void						CallFrameCommandSound ( const frameCommand_t& command, anEntity* ent, const s_channelType channel ) const;
 };
 
 ARC_INLINE const cameraFrame_t *rvCameraAnimation::GetAnim( int index ) const {
@@ -140,7 +140,7 @@ ARC_INLINE const int rvCameraAnimation::GetFrameRate( void ) const {
 
 ==============================================================================================
 */
-// RAVEN BEGIN
+
 // jsinger: added to support serialization/deserialization of binary decls
 #ifdef RV_BINARYDECLS
 class idDeclCameraDef : public idDecl, public Serializable<'IDCD'> {
@@ -152,7 +152,7 @@ public:
 #else
 class idDeclCameraDef : public idDecl {
 #endif
-// RAVEN END
+
 public:
 								idDeclCameraDef();
 								~idDeclCameraDef();
@@ -162,12 +162,12 @@ public:
 	virtual bool				Parse( const char *text, const int textLength, bool noCaching );
 	virtual void				FreeData( void );
 
-// RAVEN BEGIN
+
 // jscott: to prevent a recursive crash
 	virtual	bool				RebuildTextSource( void ) { return( false ); }
 // scork: for detailed error-reporting
-	virtual bool				Validate( const char *psText, int iTextLength, idStr &strReportTo ) const;
-// RAVEN END
+	virtual bool				Validate( const char *psText, int iTextLength, anString &strReportTo ) const;
+
 
 	void						Touch( void ) const;
 
@@ -179,15 +179,15 @@ public:
 
 private:
 	void						CopyDecl( const idDeclCameraDef *decl );
-	bool						ParseAnim( idLexer &src, int numDefaultAnims );
+	bool						ParseAnim( anLexer &src, int numDefaultAnims );
 
 private:
-	idList<rvCameraAnimation *>	anims;
+	anList<rvCameraAnimation *>	anims;
 };
 
 ARC_INLINE const rvCameraAnimation *idDeclCameraDef::GetAnim( int index ) const {
 	if ( ( index < 1 ) || ( index > anims.Num() ) ) {
-		return NULL;
+		return nullptr;
 	}
 	return anims[ index - 1 ];
 }
@@ -207,20 +207,20 @@ public:
 							~idCameraAnim();
 
 	// save games
-	void					Save( idSaveGame *savefile ) const;				// archives object for save game file
-	void					Restore( idRestoreGame *savefile );				// unarchives object from save game file
+	void					Save( anSaveGame *savefile ) const;				// archives object for save game file
+	void					Restore( anRestoreGame *savefile );				// unarchives object from save game file
 
 	void					Spawn( void );
 	virtual void			GetViewParms( renderView_t *view );
 
 private:
 	int						threadNum;
-	arcVec3					offset;
+	anVec3					offset;
 	int						starttime;
 	int						cycle;
 	const idDeclCameraDef	*cameraDef;
 	int						lastFrame;
-	idEntityPtr<idEntity>	activator;
+	anEntityPtr<anEntity>	activator;
 
 	void					Start( void );
 	void					Stop( void );
@@ -230,19 +230,19 @@ private:
 	void					Event_Start( void );
 	void					Event_Stop( void );
 	void					Event_SetCallback( void );
-	void					Event_Activate( idEntity *activator );
+	void					Event_Activate( anEntity *activator );
 
-// RAVEN BEGIN
+
 // mekberg: wait support
 	void					Event_IsActive( );
 
-	idList<dword>			imageTable;
-	idList<int>				imageCmds;
-// RAVEN END
-};
-// RAVEN END
+	anList<dword>			imageTable;
+	anList<int>				imageCmds;
 
-// RAVEN BEGIN
+};
+
+
+
 /*
 ===============================================================================
 
@@ -259,8 +259,8 @@ public:
 							~rvCameraPortalSky( void ) {}
 
 	// save games
-	void					Save( idSaveGame *savefile ) const;				// archives object for save game file
-	void					Restore( idRestoreGame *savefile );				// unarchives object from save game file
+	void					Save( anSaveGame *savefile ) const;				// archives object for save game file
+	void					Restore( anRestoreGame *savefile );				// unarchives object from save game file
 
 	void					Spawn( void );
 	virtual void			GetViewParms( renderView_t *view );
@@ -281,8 +281,8 @@ public:
 							~rvCameraPlayback( void ) {}
 
 	// save games
-	void					Save( idSaveGame *savefile ) const;				// archives object for save game file
-	void					Restore( idRestoreGame *savefile );				// unarchives object from save game file
+	void					Save( anSaveGame *savefile ) const;				// archives object for save game file
+	void					Restore( anRestoreGame *savefile );				// unarchives object from save game file
 
 	void					Spawn( void );
 	virtual void			GetViewParms( renderView_t *view );
@@ -291,6 +291,6 @@ private:
 	int						startTime;
 	const rvDeclPlayback	*playback;
 };
-// RAVEN END
+
 
 #endif /* !__GAME_CAMERA_H__ */

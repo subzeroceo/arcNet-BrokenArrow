@@ -1,47 +1,18 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
-#include "AASFile.h"
-#include "AASFile_local.h"
+#include "SEASFile.h"
+#include "SEASFile_local.h"
 #include "AASCluster.h"
-
 
 /*
 ================
-idAASCluster::UpdatePortal
+anSEASCluster::UpdatePortal
 ================
 */
-bool idAASCluster::UpdatePortal( int areaNum, int clusterNum ) {
+bool anSEASCluster::UpdatePortal( int areaNum, int clusterNum ) {
 	int portalNum;
-	aasPortal_t *portal;
+	seasPortal_t *portal;
 
 	// find the portal for this area
 	for ( portalNum = 1; portalNum < file->portals.Num(); portalNum++ ) {
@@ -67,14 +38,10 @@ bool idAASCluster::UpdatePortal( int areaNum, int clusterNum ) {
 	// if the portal has no front cluster yet
 	if ( !portal->clusters[0] ) {
 		portal->clusters[0] = clusterNum;
-	}
 	// if the portal has no back cluster yet
-	else if ( !portal->clusters[1] )
-	{
+	} else if ( !portal->clusters[1] ) {
 		portal->clusters[1] = clusterNum;
-	}
-	else
-	{
+	} else {
 		// remove the cluster portal flag contents
 		file->areas[areaNum].contents &= ~AREACONTENTS_CLUSTERPORTAL;
 		return false;
@@ -91,14 +58,14 @@ bool idAASCluster::UpdatePortal( int areaNum, int clusterNum ) {
 
 /*
 ================
-idAASCluster::FloodClusterAreas_r
+anSEASCluster::FloodClusterAreas_r
 ================
 */
-bool idAASCluster::FloodClusterAreas_r( int areaNum, int clusterNum ) {
-	aasArea_t *area;
-	aasFace_t *face;
+bool anSEASCluster::FloodClusterAreas_r( int areaNum, int clusterNum ) {
+	seasArea_t *area;
+	seasFace_t *face;
 	int faceNum, i;
-	idReachability *reach;
+	anReachability *reach;
 
 	area = &file->areas[areaNum];
 
@@ -131,8 +98,7 @@ bool idAASCluster::FloodClusterAreas_r( int areaNum, int clusterNum ) {
 						return false;
 					}
 				}
-			}
-			else {
+			} else {
 				if ( face->areas[0] ) {
 					if ( !FloodClusterAreas_r( face->areas[0], clusterNum ) ) {
 						return false;
@@ -161,34 +127,31 @@ bool idAASCluster::FloodClusterAreas_r( int areaNum, int clusterNum ) {
 
 /*
 ================
-idAASCluster::RemoveAreaClusterNumbers
+anSEASCluster::RemoveAreaClusterNumbers
 ================
 */
-void idAASCluster::RemoveAreaClusterNumbers( void ) {
-	int i;
-
-	for ( i = 1; i < file->areas.Num(); i++ ) {
+void anSEASCluster::RemoveAreaClusterNumbers( void ) {
+	for ( int i = 1; i < file->areas.Num(); i++ ) {
 		file->areas[i].cluster = 0;
 	}
 }
 
 /*
 ================
-idAASCluster::NumberClusterAreas
+anSEASCluster::NumberClusterAreas
 ================
 */
-void idAASCluster::NumberClusterAreas( int clusterNum ) {
-	int i, portalNum;
-	aasCluster_t *cluster;
-	aasPortal_t *portal;
+void anSEASCluster::NumberClusterAreas( int clusterNum ) {
+	int portalNum;
+	seasCluster_t *cluster;
+	seasPortal_t *portal;
 
 	cluster = &file->clusters[clusterNum];
 	cluster->numAreas = 0;
 	cluster->numReachableAreas = 0;
 
 	// number all areas in this cluster WITH reachabilities
-	for ( i = 1; i < file->areas.Num(); i++ ) {
-
+	for ( int i = 1; i < file->areas.Num(); i++ ) {
 		if ( file->areas[i].cluster != clusterNum ) {
 			continue;
 		}
@@ -202,26 +165,23 @@ void idAASCluster::NumberClusterAreas( int clusterNum ) {
 	}
 
 	// number all portals in this cluster WITH reachabilities
-	for ( i = 0; i < cluster->numPortals; i++ ) {
+	for ( int i = 0; i < cluster->numPortals; i++ ) {
 		portalNum = file->portalIndex[cluster->firstPortal + i];
 		portal = &file->portals[portalNum];
-
-		if ( !(file->areas[portal->areaNum].flags & (AREA_REACHABLE_WALK|AREA_REACHABLE_FLY) ) ) {
+		if ( !( file->areas[portal->areaNum].flags & ( AREA_REACHABLE_WALK|AREA_REACHABLE_FLY) ) ) {
 			continue;
 		}
 
 		if ( portal->clusters[0] == clusterNum ) {
 			portal->clusterAreaNum[0] = cluster->numAreas++;
-		}
-		else {
+		} else {
 			portal->clusterAreaNum[1] = cluster->numAreas++;
 		}
 		cluster->numReachableAreas++;
 	}
 
 	// number all areas in this cluster WITHOUT reachabilities
-	for ( i = 1; i < file->areas.Num(); i++ ) {
-
+	for ( int i = 1; i < file->areas.Num(); i++ ) {
 		if ( file->areas[i].cluster != clusterNum ) {
 			continue;
 		}
@@ -234,18 +194,16 @@ void idAASCluster::NumberClusterAreas( int clusterNum ) {
 	}
 
 	// number all portals in this cluster WITHOUT reachabilities
-	for ( i = 0; i < cluster->numPortals; i++ ) {
+	for ( int i = 0; i < cluster->numPortals; i++ ) {
 		portalNum = file->portalIndex[cluster->firstPortal + i];
 		portal = &file->portals[portalNum];
-
 		if ( file->areas[portal->areaNum].flags & (AREA_REACHABLE_WALK|AREA_REACHABLE_FLY) ) {
 			continue;
 		}
 
 		if ( portal->clusters[0] == clusterNum ) {
 			portal->clusterAreaNum[0] = cluster->numAreas++;
-		}
-		else {
+		} else {
 			portal->clusterAreaNum[1] = cluster->numAreas++;
 		}
 	}
@@ -253,16 +211,16 @@ void idAASCluster::NumberClusterAreas( int clusterNum ) {
 
 /*
 ================
-idAASCluster::FindClusters
+anSEASCluster::FindClusters
 ================
 */
-bool idAASCluster::FindClusters( void ) {
-	int i, clusterNum;
-	aasCluster_t cluster;
+bool anSEASCluster::FindClusters( void ) {
+	int clusterNum;
+	seasCluster_t cluster;
 
 	RemoveAreaClusterNumbers();
 
-	for ( i = 1; i < file->areas.Num(); i++ ) {
+	for ( int i = 1; i < file->areas.Num(); i++ ) {
 		// if the area is already part of a cluster
 		if ( file->areas[i].cluster ) {
 			continue;
@@ -300,14 +258,13 @@ bool idAASCluster::FindClusters( void ) {
 
 /*
 ================
-idAASCluster::CreatePortals
+anSEASCluster::CreatePortals
 ================
 */
-void idAASCluster::CreatePortals( void ) {
-	int i;
-	aasPortal_t portal;
+void anSEASCluster::CreatePortals( void ) {
+	seasPortal_t portal;
 
-	for ( i = 1; i < file->areas.Num(); i++ ) {
+	for ( int i = 1; i < file->areas.Num(); i++ ) {
 		// if the area is a cluster portal
 		if ( file->areas[i].contents & AREACONTENTS_CLUSTERPORTAL ) {
 			portal.areaNum = i;
@@ -320,18 +277,17 @@ void idAASCluster::CreatePortals( void ) {
 
 /*
 ================
-idAASCluster::TestPortals
+anSEASCluster::TestPortals
 ================
 */
-bool idAASCluster::TestPortals( void ) {
-	int i;
-	aasPortal_t *portal, *portal2;
-	aasArea_t *area, *area2;
-	idReachability *reach;
+bool anSEASCluster::TestPortals( void ) {
+	seasPortal_t *portal, *portal2;
+	seasArea_t *area, *area2;
+	anReachability *reach;
 	bool ok;
 
 	ok = true;
-	for ( i = 1; i < file->portals.Num(); i++ ) {
+	for ( int i = 1; i < file->portals.Num(); i++ ) {
 		portal = &file->portals[i];
 		area = &file->areas[portal->areaNum];
 
@@ -383,7 +339,6 @@ bool idAASCluster::TestPortals( void ) {
 		// this portal may not have reachabilities to a portal that doesn't seperate the same clusters
 		for ( reach = area->reach; reach; reach = reach->next ) {
 			area2 = &file->areas[ reach->toAreaNum ];
-
 			if ( !(area2->contents & AREACONTENTS_CLUSTERPORTAL) ) {
 				continue;
 			}
@@ -410,21 +365,21 @@ bool idAASCluster::TestPortals( void ) {
 
 /*
 ================
-idAASCluster::RemoveInvalidPortals
+anSEASCluster::RemoveInvalidPortals
 ================
 */
-void idAASCluster::RemoveInvalidPortals( void ) {
-	int i, j, k, face1Num, face2Num, otherAreaNum, numOpenAreas, numInvalidPortals;
-	aasFace_t *face1, *face2;
+void anSEASCluster::RemoveInvalidPortals( void ) {
+	int face1Num, face2Num, otherAreaNum, numOpenAreas, numInvalidPortals;
+	seasFace_t *face1, *face2;
 
 	numInvalidPortals = 0;
-	for ( i = 0; i < file->areas.Num(); i++ ) {
+	for ( int i = 0; i < file->areas.Num(); i++ ) {
 		if ( !( file->areas[i].contents & AREACONTENTS_CLUSTERPORTAL ) ) {
 			continue;
 		}
 
 		numOpenAreas = 0;
-		for ( j = 0; j < file->areas[i].numFaces; j++ ) {
+		for ( int j = 0; j < file->areas[i].numFaces; j++ ) {
 			face1Num = file->faceIndex[ file->areas[i].firstFace + j ];
 			face1 = &file->faces[ abs(face1Num) ];
 			otherAreaNum = face1->areas[ face1Num < 0 ];
@@ -433,7 +388,7 @@ void idAASCluster::RemoveInvalidPortals( void ) {
 				continue;
 			}
 
-			for ( k = 0; k < j; k++ ) {
+			for ( int k = 0; k < j; k++ ) {
 				face2Num = file->faceIndex[ file->areas[i].firstFace + k ];
 				face2 = &file->faces[ abs(face2Num) ];
 				if ( otherAreaNum == face2->areas[ face2Num < 0 ] ) {
@@ -460,11 +415,10 @@ void idAASCluster::RemoveInvalidPortals( void ) {
 
 /*
 ================
-idAASCluster::Build
+anSEASCluster::Build
 ================
 */
-bool idAASCluster::Build( idAASFileLocal *file ) {
-
+bool anSEASCluster::Build( anSEASFileLocal *file ) {
 	common->Printf( "[Clustering]\n" );
 
 	this->file = file;
@@ -473,15 +427,11 @@ bool idAASCluster::Build( idAASFileLocal *file ) {
 	RemoveInvalidPortals();
 
 	while( 1 ) {
-
 		// delete all existing clusters
 		file->DeleteClusters();
-
 		// create the portals from the portal areas
 		CreatePortals();
-
 		common->Printf( "\r%6d", file->portals.Num() );
-
 		// find the clusters
 		if ( !FindClusters() ) {
 			continue;
@@ -509,12 +459,12 @@ bool idAASCluster::Build( idAASFileLocal *file ) {
 
 /*
 ================
-idAASCluster::BuildSingleCluster
+anSEASCluster::BuildSingleCluster
 ================
 */
-bool idAASCluster::BuildSingleCluster( idAASFileLocal *file ) {
-	int i, numAreas;
-	aasCluster_t cluster;
+bool anSEASCluster::BuildSingleCluster( anSEASFileLocal *file ) {
+	int numAreas;
+	seasCluster_t cluster;
 
 	common->Printf( "[Clustering]\n" );
 
@@ -528,7 +478,7 @@ bool idAASCluster::BuildSingleCluster( idAASFileLocal *file ) {
 	cluster.numAreas = file->areas.Num();
 	cluster.numReachableAreas = 0;
 	// give all reachable areas in the cluster a number
-	for ( i = 0; i < file->areas.Num(); i++ ) {
+	for ( int i = 0; i < file->areas.Num(); i++ ) {
 		file->areas[i].cluster = file->clusters.Num();
 		if ( file->areas[i].flags & (AREA_REACHABLE_WALK|AREA_REACHABLE_FLY) ) {
 			file->areas[i].clusterAreaNum = cluster.numReachableAreas++;
@@ -536,7 +486,7 @@ bool idAASCluster::BuildSingleCluster( idAASFileLocal *file ) {
 	}
 	// give the remaining areas a number within the cluster
 	numAreas = cluster.numReachableAreas;
-	for ( i = 0; i < file->areas.Num(); i++ ) {
+	for ( int i = 0; i < file->areas.Num(); i++ ) {
 		if ( file->areas[i].flags & (AREA_REACHABLE_WALK|AREA_REACHABLE_FLY) ) {
 			continue;
 		}
@@ -547,7 +497,7 @@ bool idAASCluster::BuildSingleCluster( idAASFileLocal *file ) {
 	common->Printf( "%6d portals\n", file->portals.Num() );
 	common->Printf( "%6d clusters\n", file->clusters.Num() );
 
-	for ( i = 0; i < file->clusters.Num(); i++ ) {
+	for ( int i = 0; i < file->clusters.Num(); i++ ) {
 		common->Printf( "%6d reachable areas in cluster %d\n", file->clusters[i].numReachableAreas, i );
 	}
 

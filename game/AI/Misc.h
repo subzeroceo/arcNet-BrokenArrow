@@ -14,7 +14,7 @@ that can be bound to other entities.  Should not be subclassed.
 ===============================================================================
 */
 
-class idSpawnableEntity : public idEntity {
+class idSpawnableEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( idSpawnableEntity );
 
@@ -35,34 +35,34 @@ private:
 ===============================================================================
 */
 
-class idPlayerStart : public idEntity {
+class anBasePlayerStart : public anEntity {
 public:
-	CLASS_PROTOTYPE( idPlayerStart );
+	CLASS_PROTOTYPE( anBasePlayerStart );
 
 	enum {
-		EVENT_TELEPORTPLAYER = idEntity::EVENT_MAXEVENTS,
+		EVENT_TELEPORTPLAYER = anEntity::EVENT_MAXEVENTS,
 		EVENT_TELEPORTITEM,
 		EVENT_MAXEVENTS
 	};
 
-						idPlayerStart( void );
+						anBasePlayerStart( void );
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
-	virtual bool		ClientReceiveEvent( int event, int time, const idBitMsg &msg );
+	virtual bool		ClientReceiveEvent( int event, int time, const anBitMsg &msg );
 
 private:
 	int					teleportStage;
 
-	void				Event_TeleportEntity( idEntity *activator, bool predicted, arcVec3& prevOrigin = vec3_origin );
-	void				Event_Teleport( idEntity *activator );
-	void				Teleport( idEntity* other );
-	void				Event_TeleportStage( idPlayer *player );
-	void				Event_ResetCamera( idPlayer *player );
-	void				TeleportPlayer( idPlayer *player );
+	void				Event_TeleportEntity( anEntity *activator, bool predicted, anVec3& prevOrigin = vec3_origin );
+	void				Event_Teleport( anEntity *activator );
+	void				Teleport( anEntity* other );
+	void				Event_TeleportStage( anBasePlayer *player );
+	void				Event_ResetCamera( anBasePlayer *player );
+	void				TeleportPlayer( anBasePlayer *player );
 };
 
 
@@ -77,21 +77,21 @@ private:
 ===============================================================================
 */
 
-class idActivator : public idEntity {
+class idActivator : public anEntity {
 public:
 	CLASS_PROTOTYPE( idActivator );
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	virtual void		Think( void );
 
 private:
 	bool				stay_on;
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -101,7 +101,7 @@ private:
 
 ===============================================================================
 */
-class idPathCorner : public idEntity {
+class idPathCorner : public anEntity {
 public:
 	CLASS_PROTOTYPE( idPathCorner );
 
@@ -109,13 +109,13 @@ public:
 
 	static void			DrawDebugInfo( void );
 
-	static idPathCorner *RandomPath( const idEntity *source, const idEntity *ignore );
+	static idPathCorner *RandomPath( const anEntity *source, const anEntity *ignore );
 
 private:
 	void				Event_RandomPath( void );
 };
 
-// RAVEN BEGIN
+
 // bdube: jump points
 /*
 ===============================================================================
@@ -125,7 +125,7 @@ private:
 ===============================================================================
 */
 
-class rvDebugJumpPoint : public idEntity {
+class rvDebugJumpPoint : public anEntity {
 public:
 
 	CLASS_PROTOTYPE( rvDebugJumpPoint );
@@ -141,29 +141,29 @@ public:
 ===============================================================================
 */
 
-class idDamagable : public idEntity {
+class idDamagable : public anEntity {
 public:
 	CLASS_PROTOTYPE( idDamagable );
 
 						idDamagable( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Spawn( void );
-	void				Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location );
+	void				Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
 
-// RAVEN BEGIN
+
 // abahr:
-	virtual void		Damage( idEntity *inflictor, idEntity *attacker, const arcVec3 &dir, const char *damageDefName, const float damageScale, const int location );
+	virtual void		Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
 
 	int					invincibleTime;
-// RAVEN BEGIN
+
 // abahr: changed to protected
 protected:
 	int					stage;
 	int					stageNext;
-	const idDict*		stageDict;
+	const anDict*		stageDict;
 	int					stageEndTime;
 	int					stageEndHealth;
 	int					stageEndSpeed;
@@ -174,16 +174,16 @@ protected:
 
 	virtual void		ExecuteStage	( void );
 	void				UpdateStage		( void );
-	arcVec3				GetStageVector	( const char* key, const char* defaultString = "" ) const;
+	anVec3				GetStageVector	( const char* key, const char* defaultString = "" ) const;
 	float				GetStageFloat	( const char* key, const char* defaultString = "" ) const;
 	int					GetStageInt		( const char* key, const char* defaultString = "" ) const;
-// RAVEN END
+
 
 	int					count;
 	int					nextTriggerTime;
 
-	void				BecomeBroken( idEntity *activator );
-	void				Event_BecomeBroken( idEntity *activator );
+	void				BecomeBroken( anEntity *activator );
+	void				Event_BecomeBroken( anEntity *activator );
 	void				Event_RestoreDamagable( void );
 };
 
@@ -195,14 +195,14 @@ protected:
 ===============================================================================
 */
 
-class idExplodable : public idEntity {
+class idExplodable : public anEntity {
 public:
 	CLASS_PROTOTYPE( idExplodable );
 
 	void				Spawn( void );
 
 private:
-	void				Event_Explode( idEntity *activator );
+	void				Event_Explode( anEntity *activator );
 };
 
 
@@ -214,24 +214,24 @@ private:
 ===============================================================================
 */
 
-class idSpring : public idEntity {
+class idSpring : public anEntity {
 public:
 	CLASS_PROTOTYPE( idSpring );
 
 	void				Spawn( void );
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	virtual void		Think( void );
 
 private:
-	idEntityPtr<idEntity>	ent1;
-	idEntityPtr<idEntity>	ent2;
+	anEntityPtr<anEntity>	ent1;
+	anEntityPtr<anEntity>	ent2;
 	int						id1;
 	int						id2;
-	arcVec3					p1;
-	arcVec3					p2;
-	idForce_Spring			spring;
+	anVec3					p1;
+	anVec3					p2;
+	anForce_Spring			spring;
 
 	void				Event_LinkSpring( void );
 };
@@ -240,44 +240,44 @@ private:
 /*
 ===============================================================================
 
-  idForceField
+  anForceField
 
 ===============================================================================
 */
 
-class idForceField : public idEntity {
+class anForceField : public anEntity {
 public:
-	CLASS_PROTOTYPE( idForceField );
+	CLASS_PROTOTYPE( anForceField );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Spawn( void );
 
 	virtual void		Think( void );
 
-// RAVEN BEGIN
+
 // kfuller: idDamagable may want to change some things on the fly
 	void				SetExplosion(float force) { forceField.Explosion(force); }
-// RAVEN END
 
 
-// RAVEN BEGIN
+
+
 // bdube: made force field protected
 protected:
 
-	idForce_Field		forceField;
+	anForce_Field		forceField;
 
 private:
-// RAVEN END
+
 	void				Toggle( void );
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 	void				Event_Toggle( void );
 	void				Event_FindTargets( void );
 };
 
-// RAVEN BEGIN
+
 // bdube: jump pads
 /*
 ===============================================================================
@@ -287,7 +287,7 @@ private:
 ===============================================================================
 */
 
-class rvJumpPad : public idForceField {
+class rvJumpPad : public anForceField {
 public:
 	CLASS_PROTOTYPE( rvJumpPad );
 
@@ -303,14 +303,14 @@ private:
 	void				Event_FindTargets( void );
 
 	enum {
-		EVENT_JUMPFX = idEntity::EVENT_MAXEVENTS,
+		EVENT_JUMPFX = anEntity::EVENT_MAXEVENTS,
 		EVENT_MAXEVENTS
 	};
-	bool				ClientReceiveEvent( int event, int time, const idBitMsg &msg );
+	bool				ClientReceiveEvent( int event, int time, const anBitMsg &msg );
 
-	arcMat3				effectAxis;
+	anMat3				effectAxis;
 };
-// RAVEN END
+
 
 /*
 ===============================================================================
@@ -327,21 +327,21 @@ public:
 							idAnimated();
 							~idAnimated();
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	void					Spawn( void );
 	virtual bool			LoadAF( const char* keyname );
 	bool					StartRagdoll( void );
-	virtual bool			GetPhysicsToSoundTransform( arcVec3 &origin, arcMat3 &axis );
+	virtual bool			GetPhysicsToSoundTransform( anVec3 &origin, anMat3 &axis );
 
-// RAVEN BEGIN
+
 // bdube: script
 	void					Think ( void );
 
-	virtual	void			Damage( idEntity *inflictor, idEntity *attacker, const arcVec3 &dir, const char *damageDefName, const float damageScale, const int location );
+	virtual	void			Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
  	virtual bool			ShouldConstructScriptObjectAtSpawn( void ) const;
-// RAVEN END
+
 
 private:
 	int						num_anims;
@@ -349,26 +349,26 @@ private:
 	int						anim;
 	int						blendFrames;
 	jointHandle_t			soundJoint;
-	idEntityPtr<idEntity>	activator;
+	anEntityPtr<anEntity>	activator;
 	bool					activated;
 
-// RAVEN BEGIN
+
 // bdube: script variables
 	// script control
-	idThread *				scriptThread;
-	idStr					state;
-	idStr					idealState;
+	anThread *				scriptThread;
+	anString					state;
+	anString					idealState;
 	int						animDoneTime[ANIM_NumAnimChannels];
 
 	// Script state management
 	void					UpdateScript( void );
 	void					SetState( const char *statename, int blend );
 	void					CallHandler ( const char* handler );
-// RAVEN END
+
 
 	void					PlayNextAnim( void );
 
-	void					Event_Activate( idEntity *activator );
+	void					Event_Activate( anEntity *activator );
 	void					Event_Start( void );
 	void					Event_StartRagdoll( void );
 	void					Event_AnimDone( int animIndex );
@@ -376,13 +376,13 @@ private:
 	void					Event_LaunchMissiles( const char *projectilename, const char *sound, const char *launchjoint, const char *targetjoint, int numshots, int framedelay );
 	void					Event_LaunchMissilesUpdate( int launchjoint, int targetjoint, int numshots, int framedelay );
 
-// RAVEN BEGIN
+
 // kfuller: added
 	void					Event_SetAnimState( const char* state, int blendframes );
 	void					Event_PlayAnim( int channel, const char *animname );
 	void					Event_PlayCycle( int channel, const char *animname );
 	void					Event_AnimDone2( int channel, int blendFrames );
-// RAVEN END
+
 };
 
 /*
@@ -393,32 +393,32 @@ private:
 ===============================================================================
 */
 
-class idStaticEntity : public idEntity {
+class idStaticEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( idStaticEntity );
 
 						idStaticEntity( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Spawn( void );
 	void				ShowEditingDialog( void );
 	virtual void		Hide( void );
 	virtual void		Show( void );
-	void				Fade( const arcVec4 &to, float fadeTime );
+	void				Fade( const anVec4 &to, float fadeTime );
 	virtual void		Think( void );
 
-	virtual void		WriteToSnapshot( idBitMsgDelta &msg ) const;
-	virtual void		ReadFromSnapshot( const idBitMsgDelta &msg );
+	virtual void		WriteToSnapshot( anBitMsgDelta &msg ) const;
+	virtual void		ReadFromSnapshot( const anBitMsgDelta &msg );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 
 	int					spawnTime;
 	bool				active;
-	arcVec4				fadeFrom;
-	arcVec4				fadeTo;
+	anVec4				fadeFrom;
+	anVec4				fadeTo;
 	int					fadeStart;
 	int					fadeEnd;
 	bool				runGui;
@@ -439,14 +439,14 @@ public:
 
 						idFuncEmitter( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Spawn( void );
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 
-	virtual void		WriteToSnapshot( idBitMsgDelta &msg ) const;
-	virtual void		ReadFromSnapshot( const idBitMsgDelta &msg );
+	virtual void		WriteToSnapshot( anBitMsgDelta &msg ) const;
+	virtual void		ReadFromSnapshot( const anBitMsgDelta &msg );
 
 private:
 	bool				hidden;
@@ -454,10 +454,10 @@ private:
 };
 
 
-// RAVEN BEGIN
+
 // bdube: not using
 #if 0
-// RAVEN END
+
 
 /*
 ===============================================================================
@@ -467,7 +467,7 @@ idFuncSmoke
 ===============================================================================
 */
 
-class idFuncSmoke : public idEntity {
+class idFuncSmoke : public anEntity {
 public:
 	CLASS_PROTOTYPE( idFuncSmoke );
 
@@ -475,11 +475,11 @@ public:
 
 	void					Spawn( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	virtual void			Think( void );
-	void					Event_Activate( idEntity *activator );
+	void					Event_Activate( anEntity *activator );
 
 private:
 	int						smokeTime;
@@ -487,10 +487,10 @@ private:
 	bool					restart;
 };
 
-// RAVEN BEGIN
+
 // bdube: not using
 #endif
-// RAVEN END
+
 
 /*
 ===============================================================================
@@ -509,7 +509,7 @@ public:
 	void				Spawn( void );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 	void				Event_Splat();
 };
 
@@ -522,20 +522,20 @@ idTextEntity
 ===============================================================================
 */
 
-class idTextEntity : public idEntity {
+class idTextEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( idTextEntity );
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	virtual void		Think( void );
 	virtual void		ClientPredictionThink( void );
 
 private:
-	idStr				text;
+	anString				text;
 	bool				playerOriented;
 };
 
@@ -548,7 +548,7 @@ idLocationEntity
 ===============================================================================
 */
 
-class idLocationEntity : public idEntity {
+class idLocationEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( idLocationEntity );
 
@@ -559,7 +559,7 @@ public:
 private:
 };
 
-class idLocationSeparatorEntity : public idEntity {
+class idLocationSeparatorEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( idLocationSeparatorEntity );
 
@@ -568,7 +568,7 @@ public:
 private:
 };
 
-class idVacuumSeparatorEntity : public idEntity {
+class idVacuumSeparatorEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( idVacuumSeparatorEntity );
 
@@ -576,16 +576,16 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 
 private:
 	qhandle_t			portal;
 };
 
-class idVacuumEntity : public idEntity {
+class idVacuumEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( idVacuumEntity );
 
@@ -594,9 +594,9 @@ public:
 private:
 };
 
-// RAVEN BEGIN
+
 // abahr
-class rvGravitySeparatorEntity : public idEntity {
+class rvGravitySeparatorEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( rvGravitySeparatorEntity );
 
@@ -604,28 +604,28 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 
 private:
 	qhandle_t			portal;
 };
 
-class rvGravityArea : public idEntity {
+class rvGravityArea : public anEntity {
 public:
 	ABSTRACT_PROTOTYPE( rvGravityArea );
 
 	void					Spawn( void );
 
 	virtual int				GetArea() const { return area; }
-	virtual const arcVec3	GetGravity( const arcVec3& origin, const arcMat3& axis, int clipMask, idEntity* passEntity ) const = 0;
-	virtual const arcVec3	GetGravity( const idEntity* ent ) const = 0;
-	virtual const arcVec3	GetGravity( const rvClientEntity* ent ) const = 0;
+	virtual const anVec3	GetGravity( const anVec3& origin, const anMat3& axis, int clipMask, anEntity* passEntity ) const = 0;
+	virtual const anVec3	GetGravity( const anEntity* ent ) const = 0;
+	virtual const anVec3	GetGravity( const rvClientEntity* ent ) const = 0;
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	bool					IsEqualTo( const rvGravityArea* area ) const;
 	bool					operator==( const rvGravityArea* area ) const;
@@ -643,29 +643,29 @@ public:
 
 	void					Spawn( void );
 
-	virtual const arcVec3	GetGravity( const arcVec3& origin, const arcMat3& axis, int clipMask, idEntity* passEntity ) const { return gravity; }
-	virtual const arcVec3	GetGravity( const idEntity* ent ) const { return gravity; }
-	virtual const arcVec3	GetGravity( const rvClientEntity* ent ) const { return gravity; }
+	virtual const anVec3	GetGravity( const anVec3& origin, const anMat3& axis, int clipMask, anEntity* passEntity ) const { return gravity; }
+	virtual const anVec3	GetGravity( const anEntity* ent ) const { return gravity; }
+	virtual const anVec3	GetGravity( const rvClientEntity* ent ) const { return gravity; }
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 protected:
-	arcVec3					gravity;
+	anVec3					gravity;
 };
 
 class rvGravityArea_SurfaceNormal : public rvGravityArea {
 public:
 	CLASS_PROTOTYPE( rvGravityArea_SurfaceNormal );
 
-	virtual const arcVec3	GetGravity( const arcVec3& origin, const arcMat3& axis, int clipMask, idEntity* passEntity ) const;
-	virtual const arcVec3	GetGravity( const idEntity* ent ) const;
-	virtual const arcVec3	GetGravity( const rvClientEntity* ent ) const;
+	virtual const anVec3	GetGravity( const anVec3& origin, const anMat3& axis, int clipMask, anEntity* passEntity ) const;
+	virtual const anVec3	GetGravity( const anEntity* ent ) const;
+	virtual const anVec3	GetGravity( const rvClientEntity* ent ) const;
 
 protected:
-	virtual const arcVec3	GetGravity( const idPhysics* physics ) const;
+	virtual const anVec3	GetGravity( const anPhysics* physics ) const;
 };
-// RAVEN END
+
 
 /*
 ===============================================================================
@@ -675,7 +675,7 @@ protected:
 ===============================================================================
 */
 
-class idBeam : public idEntity {
+class idBeam : public anEntity {
 public:
 	CLASS_PROTOTYPE( idBeam );
 
@@ -683,25 +683,25 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	virtual void		Think( void );
 
 	void				SetMaster( idBeam *masterbeam );
-	void				SetBeamTarget( const arcVec3 &origin );
+	void				SetBeamTarget( const anVec3 &origin );
 
 	virtual void		Show( void );
 
-	virtual void		WriteToSnapshot( idBitMsgDelta &msg ) const;
-	virtual void		ReadFromSnapshot( const idBitMsgDelta &msg );
+	virtual void		WriteToSnapshot( anBitMsgDelta &msg ) const;
+	virtual void		ReadFromSnapshot( const anBitMsgDelta &msg );
 
 private:
 	void				Event_MatchTarget( void );
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 
-	idEntityPtr<idBeam>	target;
-	idEntityPtr<idBeam>	master;
+	anEntityPtr<idBeam>	target;
+	anEntityPtr<idBeam>	master;
 };
 
 
@@ -715,17 +715,17 @@ private:
 
 class idRenderModelLiquid;
 
-class idLiquid : public idEntity {
+class idLiquid : public anEntity {
 public:
 	CLASS_PROTOTYPE( idLiquid );
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 private:
-	void				Event_Touch( idEntity *other, trace_t *trace );
+	void				Event_Touch( anEntity *other, trace_t *trace );
 
 
 	idRenderModelLiquid *model;
@@ -740,7 +740,7 @@ private:
 ===============================================================================
 */
 
-class idShaking : public idEntity {
+class idShaking : public anEntity {
 public:
 	CLASS_PROTOTYPE( idShaking );
 
@@ -749,15 +749,15 @@ public:
 
 	void					Spawn( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 private:
-	idPhysics_Parametric	physicsObj;
+	anPhysics_Parametric	physicsObj;
 	bool					active;
 
 	void					BeginShaking( void );
-	void					Event_Activate( idEntity *activator );
+	void					Event_Activate( anEntity *activator );
 };
 
 
@@ -769,7 +769,7 @@ private:
 ===============================================================================
 */
 
-class idEarthQuake : public idEntity {
+class idEarthQuake : public anEntity {
 public:
 	CLASS_PROTOTYPE( idEarthQuake );
 
@@ -777,16 +777,16 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	virtual void		Think( void );
 
-// RAVEN BEGIN
+
 // kfuller: look for fx entities and the like that may want to be triggered when a mortar round (aka earthquake) goes off
 protected:
 	void				AffectNearbyEntities(float affectRadius);
-// RAVEN END
+
 
 private:
 	int					nextTriggerTime;
@@ -798,7 +798,7 @@ private:
 	bool				disabled;
 	float				shakeTime;
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -810,7 +810,7 @@ private:
 ===============================================================================
 */
 
-class idFuncPortal : public idEntity {
+class idFuncPortal : public anEntity {
 public:
 	CLASS_PROTOTYPE( idFuncPortal );
 
@@ -818,14 +818,14 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 private:
 	qhandle_t			portal;
 	bool				state;
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -836,7 +836,7 @@ private:
 ===============================================================================
 */
 
-class idFuncAASPortal : public idEntity {
+class idFuncAASPortal : public anEntity {
 public:
 	CLASS_PROTOTYPE( idFuncAASPortal );
 
@@ -844,13 +844,13 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 private:
 	bool				state;
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -861,7 +861,7 @@ private:
 ===============================================================================
 */
 
-class idFuncAASObstacle : public idEntity {
+class idFuncAASObstacle : public anEntity {
 public:
 	CLASS_PROTOTYPE( idFuncAASObstacle );
 
@@ -869,15 +869,15 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				SetState ( bool _state );
 
 private:
 	bool				state;
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -889,7 +889,7 @@ idFuncRadioChatter
 ===============================================================================
 */
 
-class idFuncRadioChatter : public idEntity {
+class idFuncRadioChatter : public anEntity {
 public:
 	CLASS_PROTOTYPE( idFuncRadioChatter );
 
@@ -897,17 +897,17 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	static void			RepeatLast ( void );
 
 private:
-	static idEntityPtr<idFuncRadioChatter> lastRadioChatter;
+	static anEntityPtr<idFuncRadioChatter> lastRadioChatter;
 	float				time;
 	bool				isActive;
-	void				Event_Activate( idEntity *activator );
-	void				Event_ResetRadioHud( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
+	void				Event_ResetRadioHud( anEntity *activator );
 	void				Event_IsActive( void );
 };
 
@@ -920,7 +920,7 @@ private:
 ===============================================================================
 */
 
-class idPhantomObjects : public idEntity {
+class idPhantomObjects : public anEntity {
 public:
 	CLASS_PROTOTYPE( idPhantomObjects );
 
@@ -928,26 +928,26 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	virtual void		Think( void );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 	void				Event_Throw( void );
-	void				Event_ShakeObject( idEntity *object, int starttime );
+	void				Event_ShakeObject( anEntity *object, int starttime );
 
 	int					end_time;
 	float				throw_time;
 	float				shake_time;
-	arcVec3				shake_ang;
+	anVec3				shake_ang;
 	float				speed;
 	int					min_wait;
 	int					max_wait;
-	idEntityPtr<idActor>target;
-	idList<int>			targetTime;
-	idList<arcVec3>		lastTargetPos;
+	anEntityPtr<anActor>target;
+	anList<int>			targetTime;
+	anList<anVec3>		lastTargetPos;
 };
 
 
@@ -959,13 +959,13 @@ rvFuncSaveGame
 ===============================================================================
 */
 
-class rvFuncSaveGame : public idEntity {
+class rvFuncSaveGame : public anEntity {
 public:
 	CLASS_PROTOTYPE( rvFuncSaveGame );
 
 	void				Spawn( void );
 
-	void				Event_Activate		( idEntity *activator );
+	void				Event_Activate		( anEntity *activator );
 
 private:
 };

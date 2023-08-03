@@ -1,31 +1,31 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Common_local.h"
 
-arcCVarSystem com_product_lang_ext( "com_product_lang_ext", "1", CVAR_INTEGER | CVAR_SYSTEM | CVAR_ARCHIVE, "Extension to use when creating language files." );
+anCVarSystem com_product_lang_ext( "com_product_lang_ext", "1", CVAR_INTEGER | CVAR_SYSTEM | CVAR_ARCHIVE, "Extension to use when creating language files." );
 
 /*
 =================
 LoadMapLocalizeData
 =================
 */
-typedef arcHashTable<arcStringList> ListHash;
+typedef anHashTable<anStringList> ListHash;
 void LoadMapLocalizeData(ListHash& listHash) {
-	arcNetString fileName = "map_localize.cfg";
-	const char *buffer = NULL;
-	arcLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+	anString fileName = "map_localize.cfg";
+	const char *buffer = nullptr;
+	anLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
 
-	if ( fileSystem->ReadFile( fileName, (void**)&buffer ) > 0 ) {
-		src.LoadMemory( buffer, strlen(buffer), fileName );
+	if ( fileSystem->ReadFile( fileName, (void **)&buffer ) > 0 ) {
+		src.LoadMemory( buffer, strlen( buffer ), fileName );
 		if ( src.IsLoaded() ) {
-			arcNetString classname;
-			arcNetToken token;
+			anString classname;
+			anToken token;
 			while ( src.ReadToken( &token ) ) {
 				classname = token;
 				src.ExpectTokenString( "{" );
 
-				arcStringList list;
+				anStringList list;
 				while ( src.ReadToken( &token) ) {
 					if ( token == "}" ) {
 						break;
@@ -40,103 +40,103 @@ void LoadMapLocalizeData(ListHash& listHash) {
 	}
 }
 
-void LoadGuiParmExcludeList(arcStringList& list) {
-	arcNetString fileName = "guiparm_exclude.cfg";
-	const char *buffer = NULL;
-	arcLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+void LoadGuiParmExcludeList( anStringList &list ) {
+	anString fileName = "guiparm_exclude.cfg";
+	const char *buffer = nullptr;
+	anLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
 
-	if ( fileSystem->ReadFile( fileName, (void**)&buffer ) > 0 ) {
-		src.LoadMemory( buffer, strlen(buffer), fileName );
+	if ( fileSystem->ReadFile( fileName, (void **)&buffer ) > 0 ) {
+		src.LoadMemory( buffer, strlen( buffer ), fileName );
 		if ( src.IsLoaded() ) {
-			arcNetString classname;
-			arcNetToken token;
+			anString classname;
+			anToken token;
 			while ( src.ReadToken( &token ) ) {
 				list.Append( token );
 			}
 		}
-		fileSystem->FreeFile( (void*)buffer );
+		fileSystem->FreeFile( (void *)buffer );
 	}
 }
 
-bool TestMapVal(arcNetString& str) {
+bool TestMapVal(anString& str) {
 	//Already Localized?
-	if (str.Find( "#str_" ) != -1 ) {
+	if ( str.Find( "#str_" ) != -1 ) {
 		return false;
 	}
 
 	return true;
 }
 
-bool TestGuiParm(const char* parm, const char* value, arcStringList& excludeList) {
-	arcNetString testVal = value;
+bool TestGuiParm( const char *parm, const char* value, anStringList &excludeList ) {
+	anString testVal = value;
 
 	//Already Localized?
-	if (testVal.Find( "#str_" ) != -1 ) {
+	if ( testVal.Find( "#str_" ) != -1 ) {
 		return false;
 	}
 
 	//Numeric
-	if (testVal.IsNumeric() ) {
+	if ( testVal.IsNumeric() ) {
 		return false;
 	}
 
 	//Contains ::
-	if (testVal.Find( "::" ) != -1 ) {
+	if ( testVal.Find( "::" ) != -1 ) {
 		return false;
 	}
 
 	//Contains /
-	if (testVal.Find( "/" ) != -1 ) {
+	if ( testVal.Find( "/" ) != -1 ) {
 		return false;
 	}
 
-	if (excludeList.Find(testVal) ) {
+	if ( excludeList.Find( testVal ) ) {
 		return false;
 	}
 
 	return true;
 }
 
-void GetFileList(const char* dir, const char* ext, arcStringList& list) {
+void GetFileList( const char* dir, const char* ext, anStringList& list) {
 	//Recurse Subdirectories
-	arcStringList dirList;
-	Sys_ListFiles(dir, "/", dirList);
+	anStringList dirList;
+	Sys_ListFiles( dir, "/", dirList);
 	for ( int i = 0; i < dirList.Num(); i++ ) {
 		if (dirList[i] == "." || dirList[i] == ".." ) {
 			continue;
 		}
-		arcNetString fullName = va( "%s/%s", dir, dirList[i].c_str() );
+		anString fullName = va( "%s/%s", dir, dirList[i].c_str() );
 		GetFileList(fullName, ext, list);
 	}
 
-	arcStringList fileList;
-	Sys_ListFiles(dir, ext, fileList);
+	anStringList fileList;
+	Sys_ListFiles( dir, ext, fileList);
 	for ( int i = 0; i < fileList.Num(); i++ ) {
-		arcNetString fullName = va( "%s/%s", dir, fileList[i].c_str() );
-		list.Append(fullName);
+		anString fullName = va( "%s/%s", dir, fileList[i].c_str() );
+		list.Append( fullName );
 	}
 }
 
-int LocalizeMap(const char* mapName, arcLangDictionary &langDict, ListHash& listHash, arcStringList& excludeList, bool writeFile) {
+int LocalizeMap(const char* mapName, anLangDict &langDict, ListHash& listHash, anStringList& excludeList, bool writeFile) {
 	common->Printf( "Localizing Map '%s'\n", mapName);
 
 	int strCount = 0;
 
-	idMapFile map;
+	anMapFile map;
 	if ( map.Parse(mapName, false, false ) ) {
 		int count = map.GetNumEntities();
 		for ( int j = 0; j < count; j++ ) {
-			idMapEntity *ent = map.GetEntity( j );
+			anMapEntity *ent = map.GetEntity( j );
 			if ( ent ) {
-				arcNetString classname = ent->epairs.GetString( "classname" );
+				anString classname = ent->epairs.GetString( "classname" );
 
 				//Hack: for info_location
 				bool hasLocation = false;
-				arcStringList* list;
+				anStringList* list;
 				listHash.Get(classname, &list);
 				if (list) {
 					for ( int k = 0; k < list->Num(); k++ ) {
-						arcNetString val = ent->epairs.GetString((*list)[k], "" );
+						anString val = ent->epairs.GetString((*list)[k], "" );
 						if (val.Length() && classname == "info_location" && (*list)[k] == "location" ) {
 							hasLocation = true;
 						}
@@ -155,7 +155,7 @@ int LocalizeMap(const char* mapName, arcLangDictionary &langDict, ListHash& list
 				listHash.Get( "all", &list);
 				if (list) {
 					for ( int k = 0; k < list->Num(); k++ ) {
-						arcNetString val = ent->epairs.GetString((*list)[k], "" );
+						anString val = ent->epairs.GetString((*list)[k], "" );
 						if (val.Length() && TestMapVal(val) ) {
 							//Localize it!!!
 							strCount++;
@@ -165,7 +165,7 @@ int LocalizeMap(const char* mapName, arcLangDictionary &langDict, ListHash& list
 				}
 
 				//Localize the gui_parms
-				const idKeyValue* kv = ent->epairs.MatchPrefix( "gui_parm" );
+				const anKeyValue* kv = ent->epairs.MatchPrefix( "gui_parm" );
 				while( kv ) {
 					if (TestGuiParm(kv->GetKey(), kv->GetValue(), excludeList) ) {
 						//Localize It!
@@ -178,8 +178,8 @@ int LocalizeMap(const char* mapName, arcLangDictionary &langDict, ListHash& list
 		}
 		if (writeFile && strCount > 0 )  {
 			//Before we write the map file lets make a backup of the original
-			arcNetString file =  fileSystem->RelativePathToOSPath(mapName);
-			arcNetString bak = file.Left(file.Length() - 4);
+			anString file =  fileSystem->RelativePathToOSPath(mapName);
+			anString bak = file.Left(file.Length() - 4);
 			bak.Append( ".bak_loc" );
 			fileSystem->CopyFile( file, bak );
 
@@ -196,7 +196,7 @@ int LocalizeMap(const char* mapName, arcLangDictionary &langDict, ListHash& list
 LocalizeMaps_f
 =================
 */
-CONSOLE_COMMAND( localizeMaps, "localize maps", NULL ) {
+CONSOLE_COMMAND( localizeMaps, "localize maps", nullptr ) {
 	if ( args.Argc() < 2 ) {
 		common->Printf( "Usage: localizeMaps <count | dictupdate | all> <map>\n" );
 		return;
@@ -208,12 +208,12 @@ CONSOLE_COMMAND( localizeMaps, "localize maps", NULL ) {
 	bool dictUpdate = false;
 	bool write = false;
 
-	if ( arcNetString::Icmp( args.Argv(1 ), "count" ) == 0 ) {
+	if ( anString::Icmp( args.Argv(1 ), "count" ) == 0 ) {
 		count = true;
-	} else if ( arcNetString::Icmp( args.Argv(1 ), "dictupdate" ) == 0 ) {
+	} else if ( anString::Icmp( args.Argv(1 ), "dictupdate" ) == 0 ) {
 		count = true;
 		dictUpdate = true;
-	} else if ( arcNetString::Icmp( args.Argv(1 ), "all" ) == 0 ) {
+	} else if ( anString::Icmp( args.Argv(1 ), "all" ) == 0 ) {
 		count = true;
 		dictUpdate = true;
 		write = true;
@@ -223,11 +223,11 @@ CONSOLE_COMMAND( localizeMaps, "localize maps", NULL ) {
 		return;
 	}
 
-	arcLangDictionary strTable;
-	arcNetString filename = va( "strings/english%.3i.lang", com_product_lang_ext.GetInteger() ); {
+	anLangDict strTable;
+	anString filename = va( "strings/en%.3i.lang", com_product_lang_ext.GetInteger() ); {
 		// I think this is equivalent...
-		const byte * buffer = NULL;
-		int len = fileSystem->ReadFile( filename, (void**)&buffer );
+		const byte * buffer = nullptr;
+		int len = fileSystem->ReadFile( filename, (void **)&buffer );
 		if ( verify( len > 0 ) ) {
 			strTable.Load( buffer, len, filename );
 		}
@@ -245,16 +245,16 @@ CONSOLE_COMMAND( localizeMaps, "localize maps", NULL ) {
 	ListHash listHash;
 	LoadMapLocalizeData(listHash);
 
-	arcStringList excludeList;
+	anStringList excludeList;
 	LoadGuiParmExcludeList(excludeList);
 
 	if (args.Argc() == 3) {
 		strCount += LocalizeMap(args.Argv(2), strTable, listHash, excludeList, write);
 	} else {
-		arcStringList files;
-		GetFileList( "z:/d3xp/d3xp/maps/game", "*.map", files);
+		anStringList files;
+		GetFileList( "z:/xp/maps/game", "*.map", files);
 		for ( int i = 0; i < files.Num(); i++ ) {
-			arcNetString file =  fileSystem->OSPathToRelativePath(files[i] );
+			anString file =  fileSystem->OSPathToRelativePath(files[i] );
 			strCount += LocalizeMap(file, strTable, listHash, excludeList, write);
 		}
 	}
@@ -275,35 +275,35 @@ CONSOLE_COMMAND( localizeMaps, "localize maps", NULL ) {
 LocalizeGuis_f
 =================
 */
-CONSOLE_COMMAND( localizeGuis, "localize guis", NULL ) {
+CONSOLE_COMMAND( localizeGuis, "localize guis", nullptr ) {
 	if ( args.Argc() != 2 ) {
 		common->Printf( "Usage: localizeGuis <all | gui>\n" );
 		return;
 	}
 
-	arcLangDictionary strTable;
+	anLangDict strTable;
 
-	arcNetString filename = va( "strings/english%.3i.lang", com_product_lang_ext.GetInteger() );
+	anString filename = va( "strings/english%.3i.lang", com_product_lang_ext.GetInteger() );
 
 	{
 		// I think this is equivalent...
-		const byte * buffer = NULL;
-		int len = fileSystem->ReadFile( filename, (void**)&buffer );
+		const byte * buffer = nullptr;
+		int len = fileSystem->ReadFile( filename, (void **)&buffer );
 		if ( verify( len > 0 ) ) {
 			strTable.Load( buffer, len, filename );
 		}
 		fileSystem->FreeFile( (void *)buffer );
 
 		// ... to this
-		//if (strTable.Load( filename ) == false) {
+		//if ( strTable.Load( filename ) == false) {
 		//	//This is a new file so set the base index
 		//	strTable.SetBaseID(com_product_lang_ext.GetInteger()*100000);
 		//}
 	}
 
-	arcFileList *files;
-	if ( arcNetString::Icmp( args.Argv(1 ), "all" ) == 0 ) {
-		arcNetString game = cvarSystem->GetCVarString( "expansion" );
+	anFileList *files;
+	if ( anString::Icmp( args.Argv(1 ), "all" ) == 0 ) {
+		anString game = cvarSystem->GetCVarString( "expansion" );
 		if (game.Length() ) {
 			files = fileSystem->ListFilesTree( "guis", "*.gui", true, game );
 		} else {
@@ -331,34 +331,34 @@ CONSOLE_COMMAND( localizeGuis, "localize guis", NULL ) {
 	strTable.Save( filename );
 }
 
-CONSOLE_COMMAND( localizeGuiParmsTest, "Create test files that show gui parms localized and ignored.", NULL ) {
+CONSOLE_COMMAND( localizeGuiParmsTest, "Create test files that show gui parms localized and ignored.", nullptr ) {
 	common->SetRefreshOnPrint( true );
 
-	arcNetFile *localizeFile = fileSystem->OpenFileWrite( "gui_parm_localize.csv" );
-	arcNetFile *noLocalizeFile = fileSystem->OpenFileWrite( "gui_parm_nolocalize.csv" );
+	anFile *localizeFile = fileSystem->OpenFileWrite( "gui_parm_localize.csv" );
+	anFile *noLocalizeFile = fileSystem->OpenFileWrite( "gui_parm_nolocalize.csv" );
 
-	arcStringList excludeList;
+	anStringList excludeList;
 	LoadGuiParmExcludeList(excludeList);
 
-	arcStringList files;
+	anStringList files;
 	GetFileList( "z:///maps/game", "*.map", files);
 
 	for ( int i = 0; i < files.Num(); i++ ) {
 		common->Printf( "Testing Map '%s'\n", files[i].c_str() );
-		idMapFile map;
-		arcNetString file =  fileSystem->OSPathToRelativePath(files[i] );
+		anMapFile map;
+		anString file =  fileSystem->OSPathToRelativePath(files[i] );
 		if ( map.Parse(file, false, false ) ) {
 			int count = map.GetNumEntities();
 			for ( int j = 0; j < count; j++ ) {
-				idMapEntity *ent = map.GetEntity( j );
+				anMapEntity *ent = map.GetEntity( j );
 				if ( ent ) {
-					const idKeyValue* kv = ent->epairs.MatchPrefix( "gui_parm" );
+					const anKeyValue* kv = ent->epairs.MatchPrefix( "gui_parm" );
 					while( kv ) {
 						if (TestGuiParm(kv->GetKey(), kv->GetValue(), excludeList) ) {
-							arcNetString out = va( "%s,%s,%s\r\n", kv->GetValue().c_str(), kv->GetKey().c_str(), file.c_str() );
+							anString out = va( "%s,%s,%s\r\n", kv->GetValue().c_str(), kv->GetKey().c_str(), file.c_str() );
 							localizeFile->Write( out.c_str(), out.Length() );
 						} else {
-							arcNetString out = va( "%s,%s,%s\r\n", kv->GetValue().c_str(), kv->GetKey().c_str(), file.c_str() );
+							anString out = va( "%s,%s,%s\r\n", kv->GetValue().c_str(), kv->GetKey().c_str(), file.c_str() );
 							noLocalizeFile->Write( out.c_str(), out.Length() );
 						}
 						kv = ent->epairs.MatchPrefix( "gui_parm", kv );
@@ -375,45 +375,45 @@ CONSOLE_COMMAND( localizeGuiParmsTest, "Create test files that show gui parms lo
 }
 
 
-CONSOLE_COMMAND( localizeMapsTest, "Create test files that shows which strings will be localized.", NULL ) {
+CONSOLE_COMMAND( localizeMapsTest, "Create test files that shows which strings will be localized.", nullptr ) {
 	ListHash listHash;
 	LoadMapLocalizeData(listHash);
 	common->SetRefreshOnPrint( true );
 
-	arcNetFile *localizeFile = fileSystem->OpenFileWrite( "map_localize.csv" );
+	anFile *localizeFile = fileSystem->OpenFileWrite( "map_localize.csv" );
 
-	arcStringList files;
-	GetFileList( "z:/d3xp/d3xp/maps/game", "*.map", files);
+	anStringList files;
+	GetFileList( "z:/xp/maps/game", "*.map", files);
 
 	for ( int i = 0; i < files.Num(); i++ ) {
 		common->Printf( "Testing Map '%s'\n", files[i].c_str() );
-		idMapFile map;
-		arcNetString file =  fileSystem->OSPathToRelativePath(files[i] );
+		anMapFile map;
+		anString file =  fileSystem->OSPathToRelativePath(files[i] );
 		if ( map.Parse(file, false, false ) ) {
 			int count = map.GetNumEntities();
 			for ( int j = 0; j < count; j++ ) {
-				idMapEntity *ent = map.GetEntity( j );
+				anMapEntity *ent = map.GetEntity( j );
 				if ( ent ) {
 					//Temp code to get a list of all entity key value pairs
-					/*arcNetString classname = ent->epairs.GetString( "classname" );
+					/*anString classname = ent->epairs.GetString( "classname" );
 					if (classname == "worldspawn" || classname == "func_static" || classname == "light" || classname == "speaker" || classname.Left(8) == "trigger_" ) {
 						continue;
 					}
 					for ( int i = 0; i < ent->epairs.GetNumKeyVals(); i++ ) {
-						const idKeyValue* kv = ent->epairs.GetKeyVal( i );
-						arcNetString out = va( "%s,%s,%s,%s\r\n", classname.c_str(), kv->GetKey().c_str(), kv->GetValue().c_str(), file.c_str() );
+						const anKeyValue* kv = ent->epairs.GetKeyVal( i );
+						anString out = va( "%s,%s,%s,%s\r\n", classname.c_str(), kv->GetKey().c_str(), kv->GetValue().c_str(), file.c_str() );
 						localizeFile->Write( out.c_str(), out.Length() );
 					}*/
-					arcNetString classname = ent->epairs.GetString( "classname" );
+					anString classname = ent->epairs.GetString( "classname" );
 
 					//Hack: for info_location
 					bool hasLocation = false;
 
-					arcStringList* list;
+					anStringList* list;
 					listHash.Get(classname, &list);
 					if (list) {
 						for ( int k = 0; k < list->Num(); k++ ) {
-							arcNetString val = ent->epairs.GetString((*list)[k], "" );
+							anString val = ent->epairs.GetString((*list)[k], "" );
 							if (classname == "info_location" && (*list)[k] == "location" ) {
 								hasLocation = true;
 							}
@@ -421,7 +421,7 @@ CONSOLE_COMMAND( localizeMapsTest, "Create test files that shows which strings w
 							if (val.Length() && TestMapVal(val) ) {
 
 								if ( !hasLocation || (*list)[k] == "location" ) {
-									arcNetString out = va( "%s,%s,%s\r\n", val.c_str(), (*list)[k].c_str(), file.c_str() );
+									anString out = va( "%s,%s,%s\r\n", val.c_str(), (*list)[k].c_str(), file.c_str() );
 									localizeFile->Write( out.c_str(), out.Length() );
 								}
 							}
@@ -431,9 +431,9 @@ CONSOLE_COMMAND( localizeMapsTest, "Create test files that shows which strings w
 					listHash.Get( "all", &list);
 					if (list) {
 						for ( int k = 0; k < list->Num(); k++ ) {
-							arcNetString val = ent->epairs.GetString((*list)[k], "" );
+							anString val = ent->epairs.GetString((*list)[k], "" );
 							if (val.Length() && TestMapVal(val) ) {
-								arcNetString out = va( "%s,%s,%s\r\n", val.c_str(), (*list)[k].c_str(), file.c_str() );
+								anString out = va( "%s,%s,%s\r\n", val.c_str(), (*list)[k].c_str(), file.c_str() );
 								localizeFile->Write( out.c_str(), out.Length() );
 							}
 						}
@@ -449,23 +449,23 @@ CONSOLE_COMMAND( localizeMapsTest, "Create test files that shows which strings w
 
 /*
 ===============
-arcCommonLocal::LocalizeSpecificMapData
+anCommonLocal::LocalizeSpecificMapData
 ===============
 */
-void arcCommonLocal::LocalizeSpecificMapData( const char *fileName, arcLangDictionary &langDict, const arcLangDictionary &replaceArgs ) {
-	arcNetString out, ws, work;
+void anCommonLocal::LocalizeSpecificMapData( const char *fileName, anLangDict &langDict, const anLangDict &replaceArgs ) {
+	anString out, ws, work;
 
-	idMapFile map;
+	anMapFile map;
 	if ( map.Parse( fileName, false, false ) ) {
 		int count = map.GetNumEntities();
 		for ( int i = 0; i < count; i++ ) {
-			idMapEntity *ent = map.GetEntity( i );
+			anMapEntity *ent = map.GetEntity( i );
 			if ( ent ) {
 				for ( int j = 0; j < replaceArgs.GetNumKeyVals(); j++ ) {
-					const idLangKeyValue *kv = replaceArgs.GetKeyVal( j );
+					const anLangKeyValue *kv = replaceArgs.GetKeyVal( j );
 					const char *temp = ent->epairs.GetString( kv->key );
-					if ( ( temp != NULL ) && *temp ) {
-						arcNetString val = kv->value;
+					if ( ( temp != nullptr ) && *temp ) {
+						anString val = kv->value;
 						if ( val == temp ) {
 							ent->epairs.Set( kv->key, langDict.AddString( temp ) );
 						}
@@ -479,27 +479,27 @@ void arcCommonLocal::LocalizeSpecificMapData( const char *fileName, arcLangDicti
 
 /*
 ===============
-arcCommonLocal::LocalizeMapData
+anCommonLocal::LocalizeMapData
 ===============
 */
-void arcCommonLocal::LocalizeMapData( const char *fileName, arcLangDictionary &langDict ) {
-	const char *buffer = NULL;
-	arcLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+void anCommonLocal::LocalizeMapData( const char *fileName, anLangDict &langDict ) {
+	const char *buffer = nullptr;
+	anLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
 
 	common->SetRefreshOnPrint( true );
 
-	if ( fileSystem->ReadFile( fileName, (void**)&buffer ) > 0 ) {
-		src.LoadMemory( buffer, strlen(buffer), fileName );
+	if ( fileSystem->ReadFile( fileName, (void **)&buffer ) > 0 ) {
+		src.LoadMemory( buffer, strlen( buffer ), fileName );
 		if ( src.IsLoaded() ) {
 			common->Printf( "Processing %s\n", fileName );
-			arcNetString mapFileName;
-			arcNetToken token, token2;
-			arcLangDictionary replaceArgs;
+			anString mapFileName;
+			anToken token, token2;
+			anLangDict replaceArgs;
 			while ( src.ReadToken( &token ) ) {
 				mapFileName = token;
 				replaceArgs.Clear();
 				src.ExpectTokenString( "{" );
-				while ( src.ReadToken( &token) ) {
+				while ( src.ReadToken( &token ) ) {
 					if ( token == "}" ) {
 						break;
 					}
@@ -522,28 +522,28 @@ void arcCommonLocal::LocalizeMapData( const char *fileName, arcLangDictionary &l
 
 /*
 ===============
-arcCommonLocal::LocalizeGui
+anCommonLocal::LocalizeGui
 ===============
 */
-void arcCommonLocal::LocalizeGui( const char *fileName, arcLangDictionary &langDict ) {
-	arcNetString out, ws, work;
-	const char *buffer = NULL;
+void anCommonLocal::LocalizeGui( const char *fileName, anLangDict &langDict ) {
+	anString out, ws, work;
+	const char *buffer = nullptr;
 	out.Empty();
 	int k;
 	char ch;
 	char slash = '\\';
 	char tab = 't';
 	char nl = 'n';
-	arcLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
-	if ( fileSystem->ReadFile( fileName, (void**)&buffer ) > 0 ) {
-		src.LoadMemory( buffer, strlen(buffer), fileName );
+	anLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+	if ( fileSystem->ReadFile( fileName, (void **)&buffer ) > 0 ) {
+		src.LoadMemory( buffer, strlen( buffer ), fileName );
 		if ( src.IsLoaded() ) {
-			arcNetFile *outFile = fileSystem->OpenFileWrite( fileName );
+			anFile *outFile = fileSystem->OpenFileWrite( fileName );
 			common->Printf( "Processing %s\n", fileName );
 
 			const bool captureToImage = false;
 			UpdateScreen( captureToImage );
-			arcNetToken token;
+			anToken token;
 			while( src.ReadToken( &token ) ) {
 				src.GetLastWhiteSpace( ws );
 				out += ws;

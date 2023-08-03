@@ -14,27 +14,27 @@
 ===================================================================================
 */
 
-class idPhysics_Actor : public idPhysics_Base {
+class anPhysics_Actor : public anPhysics_Base {
 
 public:
-	CLASS_PROTOTYPE( idPhysics_Actor );
+	CLASS_PROTOTYPE( anPhysics_Actor );
 
-							idPhysics_Actor( void );
-							~idPhysics_Actor( void );
+							anPhysics_Actor( void );
+							~anPhysics_Actor( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 							// get delta yaw of master
 	float					GetMasterDeltaYaw( void ) const;
 							// returns the ground entity
-	idEntity *				GetGroundEntity( void ) const;
+	anEntity *				GetGroundEntity( void ) const;
 							// align the clip model with the gravity direction
 	void					SetClipModelAxis( void );
 
 public:	// common physics interface
-	void					SetClipModel( idClipModel *model, float density, int id = 0, bool freeOld = true );
-	idClipModel *			GetClipModel( int id = 0 ) const;
+	void					SetClipModel( anClipModel *model, float density, int id = 0, bool freeOld = true );
+	anClipModel *			GetClipModel( int id = 0 ) const;
 	int						GetNumClipModels( void ) const;
 
 	void					SetMass( float mass, int id = -1 );
@@ -43,23 +43,23 @@ public:	// common physics interface
 	void					SetContents( int contents, int id = -1 );
 	int						GetContents( int id = -1 ) const;
 
-	const arcBounds &		GetBounds( int id = -1 ) const;
-	const arcBounds &		GetAbsBounds( int id = -1 ) const;
+	const anBounds &		GetBounds( int id = -1 ) const;
+	const anBounds &		GetAbsBounds( int id = -1 ) const;
 
 	bool					IsPushable( void ) const;
 
-	const arcVec3 &			GetOrigin( int id = 0 ) const;
-	const arcMat3 &			GetAxis( int id = 0 ) const;
+	const anVec3 &			GetOrigin( int id = 0 ) const;
+	const anMat3 &			GetAxis( int id = 0 ) const;
 
-	void					SetGravity( const arcVec3 &newGravity );
-// RAVEN BEGIN
+	void					SetGravity( const anVec3 &newGravity );
+
 // abahr: made virtual
-	virtual const arcMat3&	GetGravityAxis( void ) const;
-// RAVEN END
+	virtual const anMat3&	GetGravityAxis( void ) const;
 
-	void					ClipTranslation( trace_t &results, const arcVec3 &translation, const idClipModel *model ) const;
-	void					ClipRotation( trace_t &results, const idRotation &rotation, const idClipModel *model ) const;
-	int						ClipContents( const idClipModel *model ) const;
+
+	void					ClipTranslation( trace_t &results, const anVec3 &translation, const anClipModel *model ) const;
+	void					ClipRotation( trace_t &results, const anRotation &rotation, const anClipModel *model ) const;
+	int						ClipContents( const anClipModel *model ) const;
 
 	void					DisableClip( void );
 	void					EnableClip( void );
@@ -70,20 +70,20 @@ public:	// common physics interface
 	bool					EvaluateContacts( void );
 
 protected:
-	idClipModel *			clipModel;			// clip model used for collision detection
-	arcMat3					clipModelAxis;		// axis of clip model aligned with gravity direction
+	anClipModel *			clipModel;			// clip model used for collision detection
+	anMat3					clipModelAxis;		// axis of clip model aligned with gravity direction
 
 	// derived properties
 	float					mass;
 	float					invMass;
 
 	// master
-	idEntity *				masterEntity;
+	anEntity *				masterEntity;
 	float					masterYaw;
 	float					masterDeltaYaw;
 
 	// results of last evaluate
-	idEntityPtr<idEntity>	groundEntityPtr;
+	anEntityPtr<anEntity>	groundEntityPtr;
 };
 
 #endif /* !__PHYSICS_ACTOR_H__ */

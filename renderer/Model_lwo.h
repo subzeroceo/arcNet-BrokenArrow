@@ -13,7 +13,7 @@
 
 /* chunk and subchunk IDs */
 
-#define LWID_(a,b,c,d) (( ( a )<<24)|( ( b )<<16)|( ( c )<<8)|( d ) )
+#define LWID_(a,b,c,d) ( ( ( a )<<24)|( ( b )<<16)|( ( c )<<8)|( d ) )
 
 #define ID_FORM  LWID_('F','O','R','M')
 #define ID_LWO2  LWID_('L','W','O','2')
@@ -550,24 +550,24 @@ void lwFreeLayer( lwLayer *layer );
 
 void lwFreePoints( lwPointList *point );
 void lwFreePolygons( lwPolygonList *plist );
-int lwGetPoints( arcNetFile *fp, int cksize, lwPointList *point );
+int lwGetPoints( anFile *fp, int cksize, lwPointList *point );
 void lwGetBoundingBox( lwPointList *point, float bbox[] );
 int lwAllocPolygons( lwPolygonList *plist, int npols, int nverts );
-int lwGetPolygons( arcNetFile *fp, int cksize, lwPolygonList *plist, int ptoffset );
+int lwGetPolygons( anFile *fp, int cksize, lwPolygonList *plist, int ptoffset );
 void lwGetPolyNormals( lwPointList *point, lwPolygonList *polygon );
 int lwGetPointPolygons( lwPointList *point, lwPolygonList *polygon );
 int lwResolvePolySurfaces( lwPolygonList *polygon, lwTagList *tlist,
    lwSurface **surf, int *nsurfs );
 void lwGetVertNormals( lwPointList *point, lwPolygonList *polygon );
 void lwFreeTags( lwTagList *tlist );
-int lwGetTags( arcNetFile *fp, int cksize, lwTagList *tlist );
-int lwGetPolygonTags( arcNetFile *fp, int cksize, lwTagList *tlist,
+int lwGetTags( anFile *fp, int cksize, lwTagList *tlist );
+int lwGetPolygonTags( anFile *fp, int cksize, lwTagList *tlist,
    lwPolygonList *plist );
 
 /* vmap.c */
 
 void lwFreeVMap( lwVMap *vmap );
-lwVMap *lwGetVMap( arcNetFile *fp, int cksize, int ptoffset, int poloffset,
+lwVMap *lwGetVMap( anFile *fp, int cksize, int ptoffset, int poloffset,
    int perpoly );
 int lwGetPointVMaps( lwPointList *point, lwVMap *vmap );
 int lwGetPolyVMaps( lwPolygonList *polygon, lwVMap *vmap );
@@ -575,13 +575,13 @@ int lwGetPolyVMaps( lwPolygonList *polygon, lwVMap *vmap );
 /* clip.c */
 
 void lwFreeClip( lwClip *clip );
-lwClip *lwGetClip( arcNetFile *fp, int cksize );
+lwClip *lwGetClip( anFile *fp, int cksize );
 lwClip *lwFindClip( lwClip *list, int index );
 
 /* envelope.c */
 
 void lwFreeEnvelope( lwEnvelope *env );
-lwEnvelope *lwGetEnvelope( arcNetFile *fp, int cksize );
+lwEnvelope *lwGetEnvelope( anFile *fp, int cksize );
 lwEnvelope *lwFindEnvelope( lwEnvelope *list, int index );
 float lwEvalEnvelope( lwEnvelope *env, float time );
 
@@ -590,20 +590,20 @@ float lwEvalEnvelope( lwEnvelope *env, float time );
 void lwFreePlugin( lwPlugin *p );
 void lwFreeTexture( lwTexture *t );
 void lwFreeSurface( lwSurface *surf );
-int lwGetTHeader( arcNetFile *fp, int hsz, lwTexture *tex );
-int lwGetTMap( arcNetFile *fp, int tmapsz, lwTMap *tmap );
-int lwGetImageMap( arcNetFile *fp, int rsz, lwTexture *tex );
-int lwGetProcedural( arcNetFile *fp, int rsz, lwTexture *tex );
-int lwGetGradient( arcNetFile *fp, int rsz, lwTexture *tex );
-lwTexture *lwGetTexture( arcNetFile *fp, int bloksz, unsigned int type );
-lwPlugin *lwGetShader( arcNetFile *fp, int bloksz );
-lwSurface *lwGetSurface( arcNetFile *fp, int cksize );
+int lwGetTHeader( anFile *fp, int hsz, lwTexture *tex );
+int lwGetTMap( anFile *fp, int tmapsz, lwTMap *tmap );
+int lwGetImageMap( anFile *fp, int rsz, lwTexture *tex );
+int lwGetProcedural( anFile *fp, int rsz, lwTexture *tex );
+int lwGetGradient( anFile *fp, int rsz, lwTexture *tex );
+lwTexture *lwGetTexture( anFile *fp, int bloksz, unsigned int type );
+lwPlugin *lwGetShader( anFile *fp, int bloksz );
+lwSurface *lwGetSurface( anFile *fp, int cksize );
 lwSurface *lwDefaultSurface( void );
 
 /* lwob.c */
 
-lwSurface *lwGetSurface5( arcNetFile *fp, int cksize, lwObject *obj );
-int lwGetPolygons5( arcNetFile *fp, int cksize, lwPolygonList *plist, int ptoffset );
+lwSurface *lwGetSurface5( anFile *fp, int cksize, lwObject *obj );
+int lwGetPolygons5( anFile *fp, int cksize, lwPolygonList *plist, int ptoffset );
 lwObject *lwGetObject5( const char *filename, unsigned int *failID, int *failpos );
 
 /* list.c */
@@ -618,23 +618,23 @@ void lwListInsert( void **vlist, void *vitem,
 float dot( float a[], float b[] );
 void cross( float a[], float b[], float c[] );
 void normalize( float v[] );
-#define vecangle( a, b ) ( float ) arcMath::ACos( dot( a, b ) )
+#define vecangle( a, b ) ( float ) anMath::ACos( dot( a, b ) )
 
 /* lwio.c */
 
 void  set_flen( int i );
 int   get_flen( void );
-void *getbytes( arcNetFile *fp, int size );
-void  skipbytes( arcNetFile *fp, int n );
-int   getI1( arcNetFile *fp );
-short getI2( arcNetFile *fp );
-int   getI4( arcNetFile *fp );
-unsigned char  getU1( arcNetFile *fp );
-unsigned short getU2( arcNetFile *fp );
-unsigned int   getU4( arcNetFile *fp );
-int   getVX( arcNetFile *fp );
-float getF4( arcNetFile *fp );
-char *getS0( arcNetFile *fp );
+void *getbytes( anFile *fp, int size );
+void  skipbytes( anFile *fp, int n );
+int   getI1( anFile *fp );
+short getI2( anFile *fp );
+int   getI4( anFile *fp );
+unsigned char  getU1( anFile *fp );
+unsigned short getU2( anFile *fp );
+unsigned int   getU4( anFile *fp );
+int   getVX( anFile *fp );
+float getF4( anFile *fp );
+char *getS0( anFile *fp );
 int   sgetI1( unsigned char **bp );
 short sgetI2( unsigned char **bp );
 int   sgetI4( unsigned char **bp );

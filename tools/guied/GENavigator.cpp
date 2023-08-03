@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/guied_resource.h"
@@ -7,14 +7,14 @@
 
 #define	GENAV_ITEMHEIGHT	22
 
-rvGENavigator::rvGENavigator ( )
+rvGENavigator::rvGENavigator()
 {
-	mWnd = NULL;
-	mWorkspace = NULL;
-	mVisibleIcon = NULL;
-	mScriptsIcon = NULL;
-	mVisibleIconDisabled = NULL;
-	mScriptsLightIcon = NULL;
+	mWnd = nullptr;
+	mWorkspace = nullptr;
+	mVisibleIcon = nullptr;
+	mScriptsIcon = nullptr;
+	mVisibleIconDisabled = nullptr;
+	mScriptsLightIcon = nullptr;
 }
 
 /*
@@ -32,8 +32,8 @@ bool rvGENavigator::Create ( HWND parent, bool visible )
 	wndClass.lpszClassName = "GUIEDITOR_NAVIGATOR_CLASS";
 	wndClass.lpfnWndProc = rvGENavigator::WndProc;
 	wndClass.hbrBackground = (HBRUSH)GetStockObject( LTGRAY_BRUSH );;
-	wndClass.hCursor       = LoadCursor((HINSTANCE) NULL, IDC_ARROW);
-	wndClass.lpszMenuName  = NULL;
+	wndClass.hCursor       = LoadCursor((HINSTANCE) nullptr, IDC_ARROW);
+	wndClass.lpszMenuName  = nullptr;
 	wndClass.hInstance     = win32.hInstance;
 	RegisterClassEx ( &wndClass );
 
@@ -50,7 +50,7 @@ bool rvGENavigator::Create ( HWND parent, bool visible )
 							WS_SYSMENU|WS_THICKFRAME|WS_CAPTION|WS_POPUP|WS_OVERLAPPED|WS_BORDER|WS_CLIPSIBLINGS|WS_CHILD,
 							0, 0, 200,300,
 							parent,
-							NULL,
+							nullptr,
 							win32.hInstance,
 							this );
 
@@ -66,7 +66,7 @@ bool rvGENavigator::Create ( HWND parent, bool visible )
 
 		GetWindowRect ( parent, &rParent );
 		GetWindowRect ( mWnd, &rNav );
-		SetWindowPos ( mWnd, NULL,
+		SetWindowPos ( mWnd, nullptr,
 					rParent.right - 10 - (rNav.right-rNav.left),
 					rParent.bottom - 10 - (rNav.bottom-rNav.top),
 					0,0,
@@ -116,7 +116,7 @@ LRESULT CALLBACK rvGENavigator::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, LP
 	switch ( msg )
 	{
 		case WM_INITMENUPOPUP:
-			return SendMessage ( gApp.GetMDIFrame ( ), msg, wParam, lParam );
+			return SendMessage ( gApp.GetMDIFrame(), msg, wParam, lParam );
 
 		case WM_ACTIVATE:
 			common->ActivateTool( LOWORD( wParam ) != WA_INACTIVE );
@@ -142,7 +142,7 @@ LRESULT CALLBACK rvGENavigator::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, LP
 			if ( window )
 			{
 				rvGEWindowWrapper*	wrapper	= rvGEWindowWrapper::GetWrapper ( window );
-				arcNetString				name    = window->GetName();
+				anString				name    = window->GetName();
 				RECT				rDraw;
 				float				offset;
 				bool				disabled;
@@ -150,9 +150,9 @@ LRESULT CALLBACK rvGENavigator::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, LP
 				idWindow* parent = window;
 				offset = 1;
 				disabled = false;
-				while ( parent = parent->GetParent ( ) )
+				while ( parent = parent->GetParent() )
 				{
-					if ( rvGEWindowWrapper::GetWrapper ( parent )->IsHidden ( ) )
+					if ( rvGEWindowWrapper::GetWrapper ( parent )->IsHidden() )
 					{
 						disabled = true;
 					}
@@ -175,9 +175,9 @@ LRESULT CALLBACK rvGENavigator::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, LP
 				InflateRect ( &rDraw, -3, -3 );
 				Draw3dRect ( dis->hDC, &rDraw, GetSysColorBrush ( COLOR_3DSHADOW ), GetSysColorBrush ( COLOR_3DHILIGHT ) );
 
-				if ( !wrapper->IsHidden ( ) )
+				if ( !wrapper->IsHidden() )
 				{
-					DrawIconEx ( dis->hDC, rDraw.left, rDraw.top, disabled?nav->mVisibleIconDisabled:nav->mVisibleIcon, 16, 16,0, NULL, DI_NORMAL );
+					DrawIconEx ( dis->hDC, rDraw.left, rDraw.top, disabled?nav->mVisibleIconDisabled:nav->mVisibleIcon, 16, 16,0, nullptr, DI_NORMAL );
 				}
 
 				CopyRect ( &rDraw, &dis->rcItem );
@@ -193,23 +193,23 @@ LRESULT CALLBACK rvGENavigator::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, LP
 					FillRect ( dis->hDC, &rDraw, GetSysColorBrush ( COLOR_WINDOW ) );
 				}
 
-				if ( wrapper->CanHaveChildren ( ) && window->GetChildCount ( ) )
+				if ( wrapper->CanHaveChildren() && window->GetChildCount() )
 				{
-					if ( wrapper->IsExpanded ( ) )
+					if ( wrapper->IsExpanded() )
 					{
-						DrawIconEx ( dis->hDC, rDraw.left + offset, rDraw.top + 3, nav->mCollapseIcon, 16, 16,0, NULL, DI_NORMAL );
+						DrawIconEx ( dis->hDC, rDraw.left + offset, rDraw.top + 3, nav->mCollapseIcon, 16, 16,0, nullptr, DI_NORMAL );
 					}
 					else
 					{
-						DrawIconEx ( dis->hDC, rDraw.left + offset, rDraw.top + 3, nav->mExpandIcon, 16, 16,0, NULL, DI_NORMAL );
+						DrawIconEx ( dis->hDC, rDraw.left + offset, rDraw.top + 3, nav->mExpandIcon, 16, 16,0, nullptr, DI_NORMAL );
 					}
 				}
 
 				HPEN pen = CreatePen ( PS_SOLID, 1, GetSysColor ( COLOR_3DSHADOW ) );
 				HPEN oldpen = (HPEN)SelectObject ( dis->hDC, pen );
-				MoveToEx ( dis->hDC, rDraw.left, dis->rcItem.top, NULL );
+				MoveToEx ( dis->hDC, rDraw.left, dis->rcItem.top, nullptr );
 				LineTo ( dis->hDC, dis->rcItem.right, dis->rcItem.top );
-				MoveToEx ( dis->hDC, rDraw.left, dis->rcItem.bottom, NULL );
+				MoveToEx ( dis->hDC, rDraw.left, dis->rcItem.bottom, nullptr );
 				LineTo ( dis->hDC, dis->rcItem.right, dis->rcItem.bottom);
 				SelectObject ( dis->hDC, oldpen );
 				DeleteObject ( pen );
@@ -221,9 +221,9 @@ LRESULT CALLBACK rvGENavigator::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, LP
 				SetTextColor ( dis->hDC, GetSysColor ( colorIndex ) );
 				DrawText ( dis->hDC, name, name.Length(), &rDraw, DT_LEFT|DT_VCENTER|DT_SINGLELINE );
 
-				if ( wrapper->GetVariableDict().GetNumKeyVals ( ) || wrapper->GetScriptDict().GetNumKeyVals ( ) )
+				if ( wrapper->GetVariableDict().GetNumKeyVals() || wrapper->GetScriptDict().GetNumKeyVals() )
 				{
-					DrawIconEx ( dis->hDC, dis->rcItem.right - 16, (dis->rcItem.bottom+dis->rcItem.top)/2-6, (dis->itemState & ODS_SELECTED)?nav->mScriptsLightIcon:nav->mScriptsIcon, 13, 13,0, NULL, DI_NORMAL );
+					DrawIconEx ( dis->hDC, dis->rcItem.right - 16, (dis->rcItem.bottom+dis->rcItem.top)/2-6, (dis->itemState & ODS_SELECTED)?nav->mScriptsLightIcon:nav->mScriptsIcon, 13, 13,0, nullptr, DI_NORMAL );
 				}
 			}
 
@@ -304,11 +304,11 @@ LRESULT CALLBACK rvGENavigator::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, LP
 						idWindow* window = (idWindow*)item.lParam;
 						rvGEWindowWrapper* wrapper = rvGEWindowWrapper::GetWrapper(window);
 
-						offset = wrapper->GetDepth ( ) * 10 + 1;
+						offset = wrapper->GetDepth() * 10 + 1;
 
 						if ( info.pt.x < GENAV_ITEMHEIGHT )
 						{
-							if ( !rvGEWindowWrapper::GetWrapper(window)->IsHidden ( ) )
+							if ( !rvGEWindowWrapper::GetWrapper(window)->IsHidden() )
 							{
 								nav->mWorkspace->HideWindow ( window );
 							}
@@ -319,23 +319,23 @@ LRESULT CALLBACK rvGENavigator::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, LP
 						}
 						else if ( info.pt.x > GENAV_ITEMHEIGHT + offset && info.pt.x < GENAV_ITEMHEIGHT + offset + 16 )
 						{
-							if ( wrapper->CanHaveChildren ( ) && window->GetChildCount ( ) )
+							if ( wrapper->CanHaveChildren() && window->GetChildCount() )
 							{
-								if ( wrapper->IsExpanded ( ) )
+								if ( wrapper->IsExpanded() )
 								{
-									wrapper->Collapse ( );
-									nav->Update ( );
+									wrapper->Collapse();
+									nav->Update();
 								}
 								else
 								{
-									wrapper->Expand ( );
-									nav->Update ( );
+									wrapper->Expand();
+									nav->Update();
 								}
 							}
 						}
 						else if ( nh->code == NM_DBLCLK )
 						{
-							SendMessage ( gApp.GetMDIFrame ( ), WM_COMMAND, MAKELONG(ID_GUIED_ITEM_PROPERTIES,0 ), 0 );
+							SendMessage ( gApp.GetMDIFrame(), WM_COMMAND, MAKELONG(ID_GUIED_ITEM_PROPERTIES,0 ), 0 );
 						}
 					}
 
@@ -355,7 +355,7 @@ LRESULT CALLBACK rvGENavigator::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, LP
 					{
 						ClientToScreen ( hWnd, &info.pt );
 						HMENU menu = GetSubMenu ( LoadMenu ( gApp.GetInstance(), MAKEINTRESOURCE(IDR_GUIED_ITEM_POPUP) ), 0 );
-						TrackPopupMenu ( menu, TPM_RIGHTBUTTON|TPM_LEFTALIGN, info.pt.x, info.pt.y, 0, gApp.GetMDIFrame ( ), NULL );
+						TrackPopupMenu ( menu, TPM_RIGHTBUTTON|TPM_LEFTALIGN, info.pt.x, info.pt.y, 0, gApp.GetMDIFrame(), nullptr );
 						DestroyMenu ( menu );
 					}
 
@@ -435,7 +435,7 @@ void rvGENavigator::AddWindow ( idWindow* window )
 	wrapper = rvGEWindowWrapper::GetWrapper ( window );
 
 	// Dont add deleted windows
-	if ( !wrapper || wrapper->IsDeleted ( ) )
+	if ( !wrapper || wrapper->IsDeleted() )
 	{
 		return;
 	}
@@ -456,7 +456,7 @@ void rvGENavigator::AddWindow ( idWindow* window )
 	}
 
 	// Dont continue if not expanded.
-	if ( !wrapper->IsExpanded ( ) )
+	if ( !wrapper->IsExpanded() )
 	{
 		return;
 	}
@@ -479,7 +479,7 @@ void rvGENavigator::SetWorkspace ( rvGEWorkspace* workspace )
 {
 	mWorkspace = workspace;
 
-	Update ( );
+	Update();
 }
 
 /*
@@ -497,7 +497,7 @@ void rvGENavigator::Update ( void )
 	// Add starting with the desktop window
 	if ( mWorkspace )
 	{
-		AddWindow ( mWorkspace->GetInterface ( )->GetDesktop ( ) );
+		AddWindow ( mWorkspace->GetInterface()->GetDesktop() );
 	}
 
 	// For some reason the horizontal scrollbar wants to show up initially after an update
@@ -531,9 +531,9 @@ void rvGENavigator::UpdateSelections ( void )
 		window = (idWindow*) item.lParam;
 		wrapper = rvGEWindowWrapper::GetWrapper ( window );
 
-		ListView_SetItemState ( mTree, i, wrapper->IsSelected ( )?LVIS_SELECTED:0, LVIS_SELECTED );
+		ListView_SetItemState ( mTree, i, wrapper->IsSelected()?LVIS_SELECTED:0, LVIS_SELECTED );
 
-		if ( wrapper->IsSelected ( ) )
+		if ( wrapper->IsSelected() )
 		{
 			ListView_EnsureVisible ( mTree, i, false );
 		}
@@ -549,7 +549,7 @@ Repaints the navigator window
 */
 void rvGENavigator::Refresh ( void )
 {
-	InvalidateRect ( mTree, NULL, FALSE );
+	InvalidateRect ( mTree, nullptr, FALSE );
 //	UpdateWindow ( mTree );
 }
 

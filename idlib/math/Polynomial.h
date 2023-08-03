@@ -76,20 +76,20 @@ private:
 ARC_INLINE arcPolynomial::arcPolynomial( void ) {
 	degree = -1;
 	allocated = 0;
-	coefficient = NULL;
+	coefficient = nullptr;
 }
 
 ARC_INLINE arcPolynomial::arcPolynomial( int d ) {
 	degree = -1;
 	allocated = 0;
-	coefficient = NULL;
+	coefficient = nullptr;
 	Resize( d, false );
 }
 
 ARC_INLINE arcPolynomial::arcPolynomial( float a, float b ) {
 	degree = -1;
 	allocated = 0;
-	coefficient = NULL;
+	coefficient = nullptr;
 	Resize( 1, false );
 	coefficient[0] = b;
 	coefficient[1] = a;
@@ -98,7 +98,7 @@ ARC_INLINE arcPolynomial::arcPolynomial( float a, float b ) {
 ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c ) {
 	degree = -1;
 	allocated = 0;
-	coefficient = NULL;
+	coefficient = nullptr;
 	Resize( 2, false );
 	coefficient[0] = c;
 	coefficient[1] = b;
@@ -108,7 +108,7 @@ ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c ) {
 ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c, float d ) {
 	degree = -1;
 	allocated = 0;
-	coefficient = NULL;
+	coefficient = nullptr;
 	Resize( 3, false );
 	coefficient[0] = d;
 	coefficient[1] = c;
@@ -119,7 +119,7 @@ ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c, float d ) {
 ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c, float d, float e ) {
 	degree = -1;
 	allocated = 0;
-	coefficient = NULL;
+	coefficient = nullptr;
 	Resize( 4, false );
 	coefficient[0] = e;
 	coefficient[1] = d;
@@ -345,7 +345,7 @@ ARC_INLINE bool arcPolynomial::Compare( const arcPolynomial &p, const float epsi
 		return false;
 	}
 	for ( int i = 0; i <= degree; i++ ) {
-		if ( arcMath::Fabs( coefficient[i] - p.coefficient[i] ) > epsilon ) {
+		if ( anMath::Fabs( coefficient[i] - p.coefficient[i] ) > epsilon ) {
 			return false;
 		}
 	}
@@ -447,7 +447,7 @@ ARC_INLINE int arcPolynomial::GetRoots2( float a, float b, float c, float *roots
 	if ( ds < 0.0f ) {
 		return 0;
 	} else if ( ds > 0.0f ) {
-		ds = arcMath::Sqrt( ds );
+		ds = anMath::Sqrt( ds );
 		roots[0] = 0.5f * ( -b - ds );
 		roots[1] = 0.5f * ( -b + ds );
 		return 2;
@@ -475,35 +475,35 @@ ARC_INLINE int arcPolynomial::GetRoots3( float a, float b, float c, float d, flo
 	ds = 0.25f * g * g + ( 1.0f / 27.0f ) * f * f * f;
 
 	if ( ds < 0.0f ) {
-		dist = arcMath::Sqrt( ( -1.0f / 3.0f ) * f );
-		angle = ( 1.0f / 3.0f ) * arcMath::ATan( arcMath::Sqrt( -ds ), -halfg );
-		cs = arcMath::Cos( angle );
-		ss = arcMath::Sin( angle );
+		dist = anMath::Sqrt( ( -1.0f / 3.0f ) * f );
+		angle = ( 1.0f / 3.0f ) * anMath::ATan( anMath::Sqrt( -ds ), -halfg );
+		cs = anMath::Cos( angle );
+		ss = anMath::Sin( angle );
 		roots[0] = 2.0f * dist * cs - ofs;
-		roots[1] = -dist * ( cs + arcMath::SQRT_THREE * ss ) - ofs;
-		roots[2] = -dist * ( cs - arcMath::SQRT_THREE * ss ) - ofs;
+		roots[1] = -dist * ( cs + anMath::SQRT_THREE * ss ) - ofs;
+		roots[2] = -dist * ( cs - anMath::SQRT_THREE * ss ) - ofs;
 		return 3;
 	} else if ( ds > 0.0f )  {
-		ds = arcMath::Sqrt( ds );
+		ds = anMath::Sqrt( ds );
 		t = -halfg + ds;
 		if ( t >= 0.0f ) {
-			roots[0] = arcMath::Pow( t, ( 1.0f / 3.0f ) );
+			roots[0] = anMath::Pow( t, ( 1.0f / 3.0f ) );
 		} else {
-			roots[0] = -arcMath::Pow( -t, ( 1.0f / 3.0f ) );
+			roots[0] = -anMath::Pow( -t, ( 1.0f / 3.0f ) );
 		}
 		t = -halfg - ds;
 		if ( t >= 0.0f ) {
-			roots[0] += arcMath::Pow( t, ( 1.0f / 3.0f ) );
+			roots[0] += anMath::Pow( t, ( 1.0f / 3.0f ) );
 		} else {
-			roots[0] -= arcMath::Pow( -t, ( 1.0f / 3.0f ) );
+			roots[0] -= anMath::Pow( -t, ( 1.0f / 3.0f ) );
 		}
 		roots[0] -= ofs;
 		return 1;
 	} else {
 		if ( halfg >= 0.0f ) {
-			t = -arcMath::Pow( halfg, ( 1.0f / 3.0f ) );
+			t = -anMath::Pow( halfg, ( 1.0f / 3.0f ) );
 		} else {
-			t = arcMath::Pow( -halfg, ( 1.0f / 3.0f ) );
+			t = anMath::Pow( -halfg, ( 1.0f / 3.0f ) );
 		}
 		roots[0] = 2.0f * t - ofs;
 		roots[1] = -t - ofs;
@@ -535,19 +535,19 @@ ARC_INLINE int arcPolynomial::GetRoots4( float a, float b, float c, float d, flo
 	if ( ds < 0.0f ) {
 		return 0;
 	} else if ( ds > 0.0f ) {
-		r = arcMath::Sqrt( ds );
+		r = anMath::Sqrt( ds );
 		t1 = 0.75f * b * b - r * r - 2.0f * c;
 		t2 = ( 4.0f * b * c - 8.0f * d - b * b * b ) / ( 4.0f * r );
 		tp = t1 + t2;
 		tm = t1 - t2;
 
 		if ( tp >= 0.0f ) {
-			s1 = arcMath::Sqrt( tp );
+			s1 = anMath::Sqrt( tp );
 			roots[count++] = -0.25f * b + 0.5f * ( r + s1 );
 			roots[count++] = -0.25f * b + 0.5f * ( r - s1 );
 		}
 		if ( tm >= 0.0f ) {
-			s2 = arcMath::Sqrt( tm );
+			s2 = anMath::Sqrt( tm );
 			roots[count++] = -0.25f * b + 0.5f * ( s2 - r );
 			roots[count++] = -0.25f * b - 0.5f * ( s2 + r );
 		}
@@ -555,15 +555,15 @@ ARC_INLINE int arcPolynomial::GetRoots4( float a, float b, float c, float d, flo
 	} else {
 		t2 = y * y - 4.0f * e;
 		if ( t2 >= 0.0f ) {
-			t2 = 2.0f * arcMath::Sqrt( t2 );
+			t2 = 2.0f * anMath::Sqrt( t2 );
 			t1 = 0.75f * b * b - 2.0f * c;
 			if ( t1 + t2 >= 0.0f ) {
-				s1 = arcMath::Sqrt( t1 + t2 );
+				s1 = anMath::Sqrt( t1 + t2 );
 				roots[count++] = -0.25f * b + 0.5f * s1;
 				roots[count++] = -0.25f * b - 0.5f * s1;
 			}
 			if ( t1 - t2 >= 0.0f ) {
-				s2 = arcMath::Sqrt( t1 - t2 );
+				s2 = anMath::Sqrt( t1 - t2 );
 				roots[count++] = -0.25f * b + 0.5f * s2;
 				roots[count++] = -0.25f * b - 0.5f * s2;
 			}
@@ -584,7 +584,7 @@ ARC_INLINE void arcPolynomial::Resize( int d, bool keep ) {
 	int alloc = ( d + 1 + 3 ) & ~3;
 	if ( alloc > allocated ) {
 		float *ptr = (float *) Mem_Alloc16( alloc * sizeof( float ) );
-		if ( coefficient != NULL ) {
+		if ( coefficient != nullptr ) {
 			if ( keep ) {
 				for ( int i = 0; i <= degree; i++ ) {
 					ptr[i] = coefficient[i];

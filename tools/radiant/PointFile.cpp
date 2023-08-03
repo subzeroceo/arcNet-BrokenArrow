@@ -26,13 +26,13 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
 
 #define	MAX_POINTFILE	8192
-static arcVec3	s_pointvecs[MAX_POINTFILE];
+static anVec3	s_pointvecs[MAX_POINTFILE];
 static int		s_num_points, s_check_point;
 
 void Pointfile_Delete ( void )
@@ -49,7 +49,7 @@ void Pointfile_Delete ( void )
 // advance camera to next point
 void Pointfile_Next ( void )
 {
-	arcVec3	dir;
+	anVec3	dir;
 
 	if (s_check_point >= s_num_points-2)
 	{
@@ -70,7 +70,7 @@ void Pointfile_Next ( void )
 // advance camera to previous point
 void Pointfile_Prev ( void )
 {
-	arcVec3	dir;
+	anVec3	dir;
 
 	if ( s_check_point == 0 )
 	{
@@ -92,7 +92,7 @@ void WINAPI Pointfile_Check ( void )
 {
 	char	name[1024];
 	FILE	*f;
-	arcVec3	v;
+	anVec3	v;
 
 	strcpy (name, currentmap);
 	StripExtension ( name );

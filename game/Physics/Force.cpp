@@ -1,38 +1,35 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
-
 #include "../Game_local.h"
+CLASS_DECLARATION( anClass, anForce )END_CLASS
 
-CLASS_DECLARATION( idClass, idForce )
-END_CLASS
-
-idList<idForce*> idForce::forceList;
+anList<anForce *> anForce::forceList;
 
 /*
 ================
-idForce::idForce
+anForce::anForce
 ================
 */
-idForce::idForce( void ) {
+anForce::anForce( void ) {
 	forceList.Append( this );
 }
 
 /*
 ================
-idForce::~idForce
+anForce::~anForce
 ================
 */
-idForce::~idForce( void ) {
+anForce::~anForce( void ) {
 	forceList.Remove( this );
 }
 
 /*
 ================
-idForce::DeletePhysics
+anForce::DeletePhysics
 ================
 */
-void idForce::DeletePhysics( const idPhysics *phys ) {
+void anForce::DeletePhysics( const anPhysics *phys ) {
 	int i;
 
 	for ( i = 0; i < forceList.Num(); i++ ) {
@@ -42,25 +39,25 @@ void idForce::DeletePhysics( const idPhysics *phys ) {
 
 /*
 ================
-idForce::ClearForceList
+anForce::ClearForceList
 ================
 */
-void idForce::ClearForceList( void ) {
+void anForce::ClearForceList( void ) {
 	forceList.Clear();
 }
 
 /*
 ================
-idForce::Evaluate
+anForce::Evaluate
 ================
 */
-void idForce::Evaluate( int time ) {
+void anForce::Evaluate( int time ) {
 }
 
 /*
 ================
-idForce::RemovePhysics
+anForce::RemovePhysics
 ================
 */
-void idForce::RemovePhysics( const idPhysics *phys ) {
+void anForce::RemovePhysics( const anPhysics *phys ) {
 }

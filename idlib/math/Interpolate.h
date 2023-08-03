@@ -9,12 +9,12 @@
 ==============================================================================================
 */
 
-template< class type >
-class aRcInterpolation {
-	friend class aRcTypeTools;
+template<class type>
+class anInterpolation {
+	friend class anTypeTools;
 public:
-						aRcInterpolation();
-						virtual ~aRcInterpolation() { }
+						anInterpolation();
+						virtual ~anInterpolation() { }
 
 	void				Init( const float startTime, const float duration, const type &startValue, const type &endValue );
 	void				SetStartTime( float time ) { this->startTime = time; }
@@ -45,11 +45,11 @@ private:
 
 /*
 ====================
-aRcInterpolation::aRcInterpolation
+anInterpolation::anInterpolation
 ====================
 */
-template< class type >
-ARC_INLINE aRcInterpolation<type>::aRcInterpolation() {
+template<class type>
+ARC_INLINE anInterpolation<type>::anInterpolation() {
 	currentTime = startTime = duration = 0;
 	memset( &currentValue, 0, sizeof( currentValue ) );
 	startValue = endValue = currentValue;
@@ -57,11 +57,11 @@ ARC_INLINE aRcInterpolation<type>::aRcInterpolation() {
 
 /*
 ====================
-aRcInterpolation::Init
+anInterpolation::Init
 ====================
 */
-template< class type >
-ARC_INLINE void aRcInterpolation<type>::Init( const float startTime, const float duration, const type &startValue, const type &endValue ) {
+template<class type>
+ARC_INLINE void anInterpolation<type>::Init( const float startTime, const float duration, const type &startValue, const type &endValue ) {
 	this->startTime = startTime;
 	this->duration = duration;
 	this->startValue = startValue;
@@ -72,11 +72,11 @@ ARC_INLINE void aRcInterpolation<type>::Init( const float startTime, const float
 
 /*
 ====================
-aRcInterpolation::GetCurrentValue
+anInterpolation::GetCurrentValue
 ====================
 */
-template< class type >
-ARC_INLINE type aRcInterpolation<type>::GetCurrentValue( float time ) const {
+template<class type>
+ARC_INLINE type anInterpolation<type>::GetCurrentValue( float time ) const {
 	float deltaTime;
 
 	deltaTime = time - startTime;
@@ -92,9 +92,9 @@ ARC_INLINE type aRcInterpolation<type>::GetCurrentValue( float time ) const {
 	}
 	return currentValue;
 }
-template< class type >
-ARC_INLINE type aRcInterpolation<type>::GetDeltaValue( float startTime, float endTime ) const {
-	return GetCurrentValue(endTime) - GetCurrentValue(startTime);
+template<class type>
+ARC_INLINE type anInterpolation<type>::GetDeltaValue( float startTime, float endTime ) const {
+	return GetCurrentValue(endTime) - GetCurrentValue( startTime);
 }
 
 ARC_INLINE float Linear( float frac ) {
@@ -102,7 +102,7 @@ ARC_INLINE float Linear( float frac ) {
 }
 
 ARC_INLINE float SinusoidalMidPoint( float frac ) {
-	return arcMath::Sin( DEG2RAD(arcMath::MidPointLerp(0.0f, 60.0f, 90.0f, frac) ) );
+	return anMath::Sin( DEG2RAD(anMath::MidPointLerp(0.0f, 60.0f, 90.0f, frac) ) );
 }
 
 /*
@@ -112,10 +112,10 @@ Spheric Interloper--Spheric Interloper--Spheric Interloper--Spheric Interloper--
 ==============================================================================================
 */
 typedef float (*TimeManipFunc) ( float );
-class aRcSphericalInterpolation : public aRcInterpolation<arcQuats> {
+class anSphericalInterpolation : public anInterpolation<anQuats> {
 public:
-						aRcSphericalInterpolation();
-	virtual arcQuats GetCurrentValue( float time ) const;
+						anSphericalInterpolation();
+	virtual anQuats GetCurrentValue( float time ) const;
 
 	void				SetTimeFunction( TimeManipFunc func ) { timeFunc = func; }
 
@@ -125,30 +125,28 @@ protected:
 
 /*
 ====================
-aRcSphericalInterpolation::aRcSphericalInterpolation
+anSphericalInterpolation::anSphericalInterpolation
 ====================
 */
-ARC_INLINE aRcSphericalInterpolation::aRcSphericalInterpolation() :
-	aRcInterpolation<arcQuats>() {
+ARC_INLINE anSphericalInterpolation::anSphericalInterpolation() :
+	anInterpolation<anQuats>() {
 	SetTimeFunction( SinusoidalMidPoint );
 }
 
 /*
 ====================
-aRcSphericalInterpolation::GetCurrentValue
+anSphericalInterpolation::GetCurrentValue
 ====================
 */
-ARC_INLINE arcQuats aRcSphericalInterpolation::GetCurrentValue( float time ) const {
-	float deltaTime;
-
-	deltaTime = time - startTime;
+ARC_INLINE anQuats anSphericalInterpolation::GetCurrentValue( float time ) const {
+	float deltaTime = time - startTime;
 
 	if ( time != currentTime ) {
 		currentTime = time;
 		if ( duration == 0.0f ) {
 			currentValue = endValue;
 		} else {
-			currentValue.Slerp( startValue, endValue, timeFunc( ( float )deltaTime / duration) );
+			currentValue.Slerp( startValue, endValue, timeFunc( ( float )deltaTime / duration ) );
 		}
 	}
 	return currentValue;
@@ -181,10 +179,10 @@ control can be quite involved and may depend on the specific kinematic structure
 EXAMPLE:
 import numpy as np
 
-def interpolate(start, end, steps):
+def interpolate( start, end, steps):
     result = []
-    for i in range(steps):
-        t = i / (steps - 1 )  # Interpolation parameter between 0 and 1
+    for i in range( steps):
+        t = i / ( steps - 1 )  # Interpolation parameter between 0 and 1
         interpolated_point = (1 - t) * start + t * end
         result.append(interpolated_point)
     return result
@@ -192,16 +190,16 @@ def interpolate(start, end, steps):
 # Example usage
 start_point = np.array([0, 0, 0, 0, 0])
 end_point = np.array([10, 5, 3, 90, 45])
-interpolated_points = interpolate(start_point, end_point, steps=10)
+interpolated_points = interpolate( start_point, end_point, steps=10)
 
 ==============================================================================================
 */
 
-template< class type >
-class aRcLinearKinematicInterpolation  {
-	friend class aRcTypeTools;
+template<class type>
+class anLinearKinematicInterpolation  {
+	friend class anTypeTools;
 public:
-						aRcLinearKinematicInterpolation();
+						anLinearKinematicInterpolation();
 
 	void				Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue );
 	void				SetStartTime( float time ) { startTime = time; Invalidate(); }
@@ -227,7 +225,7 @@ private:
 	float				decelTime;
 	type				startValue;
 	type				endValue;
-	mutable aRcExtrapolation<type> extrapolate;
+	mutable anExtrapolation<type> extrapolate;
 
 	void				Invalidate( void );
 	void				SetPhase( float time ) const;
@@ -235,11 +233,11 @@ private:
 
 /*
 ====================
-aRcLinearKinematicInterpolation::aRcLinearKinematicInterpolation
+anLinearKinematicInterpolation::anLinearKinematicInterpolation
 ====================
 */
-template< class type >
-ARC_INLINE aRcLinearKinematicInterpolation<type>::aRcLinearKinematicInterpolation() {
+template<class type>
+ARC_INLINE anLinearKinematicInterpolation<type>::anLinearKinematicInterpolation() {
 	startTime = accelTime = linearTime = decelTime = 0;
 	memset( &startValue, 0, sizeof( startValue ) );
 	endValue = startValue;
@@ -247,11 +245,11 @@ ARC_INLINE aRcLinearKinematicInterpolation<type>::aRcLinearKinematicInterpolatio
 
 /*
 ====================
-aRcLinearKinematicInterpolation::Init
+anLinearKinematicInterpolation::Init
 ====================
 */
-template< class type >
-ARC_INLINE void aRcLinearKinematicInterpolation<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue ) {
+template<class type>
+ARC_INLINE void anLinearKinematicInterpolation<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue ) {
 	type speed;
 
 	this->startTime = startTime;
@@ -282,24 +280,22 @@ ARC_INLINE void aRcLinearKinematicInterpolation<type>::Init( const float startTi
 
 /*
 ====================
-aRcLinearKinematicInterpolation::Invalidate
+anLinearKinematicInterpolation::Invalidate
 ====================
 */
-template< class type >
-ARC_INLINE void aRcLinearKinematicInterpolation<type>::Invalidate( void ) {
+template<class type>
+ARC_INLINE void anLinearKinematicInterpolation<type>::Invalidate( void ) {
 	extrapolate.Init( 0, 0, extrapolate.GetStartValue(), extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_NONE );
 }
 
 /*
 ====================
-aRcLinearKinematicInterpolation::SetPhase
+anLinearKinematicInterpolation::SetPhase
 ====================
 */
-template< class type >
-ARC_INLINE void aRcLinearKinematicInterpolation<type>::SetPhase( float time ) const {
-	float deltaTime;
-
-	deltaTime = time - startTime;
+template<class type>
+ARC_INLINE void anLinearKinematicInterpolation<type>::SetPhase( float time ) const {
+	float deltaTime = time - startTime;
 	if ( deltaTime < accelTime ) {
 		if ( extrapolate.GetExtrapolationType() != EXTRAPOLATION_ACCELLINEAR ) {
 			extrapolate.Init( startTime, accelTime, startValue, extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_ACCELLINEAR );
@@ -317,22 +313,22 @@ ARC_INLINE void aRcLinearKinematicInterpolation<type>::SetPhase( float time ) co
 
 /*
 ====================
-aRcLinearKinematicInterpolation::GetCurrentValue
+anLinearKinematicInterpolation::GetCurrentValue
 ====================
 */
-template< class type >
-ARC_INLINE type aRcLinearKinematicInterpolation<type>::GetCurrentValue( float time ) const {
+template<class type>
+ARC_INLINE type anLinearKinematicInterpolation<type>::GetCurrentValue( float time ) const {
 	SetPhase( time );
 	return extrapolate.GetCurrentValue( time );
 }
 
 /*
 ====================
-aRcLinearKinematicInterpolation::GetCurrentSpeed
+anLinearKinematicInterpolation::GetCurrentSpeed
 ====================
 */
-template< class type >
-ARC_INLINE type aRcLinearKinematicInterpolation<type>::GetCurrentSpeed( float time ) const {
+template<class type>
+ARC_INLINE type anLinearKinematicInterpolation<type>::GetCurrentSpeed( float time ) const {
 	SetPhase( time );
 	return extrapolate.GetCurrentSpeed( time );
 }
@@ -346,11 +342,11 @@ ARC_INLINE type aRcLinearKinematicInterpolation<type>::GetCurrentSpeed( float ti
 ==============================================================================================
 */
 
-template< class type >
-class aRcInterpolateSineKinematics  {
-	friend class aRcTypeTools;
+template<class type>
+class anInterpolateSineKinematics  {
+	friend class anTypeTools;
 public:
-						aRcInterpolateSineKinematics();
+						anInterpolateSineKinematics();
 
 	void				Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue );
 	void				SetStartTime( float time ) { startTime = time; Invalidate(); }
@@ -376,7 +372,7 @@ private:
 	float				decelTime;
 	type				startValue;
 	type				endValue;
-	mutable aRcExtrapolation<type> extrapolate;
+	mutable anExtrapolation<type> extrapolate;
 
 	void				Invalidate( void );
 	void				SetPhase( float time ) const;
@@ -384,11 +380,11 @@ private:
 
 /*
 ====================
-aRcInterpolateSineKinematics::aRcInterpolateSineKinematics
+anInterpolateSineKinematics::anInterpolateSineKinematics
 ====================
 */
-template< class type >
-ARC_INLINE aRcInterpolateSineKinematics<type>::aRcInterpolateSineKinematics() {
+template<class type>
+ARC_INLINE anInterpolateSineKinematics<type>::anInterpolateSineKinematics() {
 	startTime = accelTime = linearTime = decelTime = 0;
 	memset( &startValue, 0, sizeof( startValue ) );
 	endValue = startValue;
@@ -396,11 +392,11 @@ ARC_INLINE aRcInterpolateSineKinematics<type>::aRcInterpolateSineKinematics() {
 
 /*
 ====================
-aRcInterpolateSineKinematics::Init
+anInterpolateSineKinematics::Init
 ====================
 */
-template< class type >
-ARC_INLINE void aRcInterpolateSineKinematics<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue ) {
+template<class type>
+ARC_INLINE void anInterpolateSineKinematics<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue ) {
 	type speed;
 
 	this->startTime = startTime;
@@ -418,7 +414,7 @@ ARC_INLINE void aRcInterpolateSineKinematics<type>::Init( const float startTime,
 		this->decelTime = duration - this->accelTime;
 	}
 	this->linearTime = duration - this->accelTime - this->decelTime;
-	speed = ( endValue - startValue ) * ( 1000.0f / ( ( float ) this->linearTime + ( this->accelTime + this->decelTime ) * arcMath::SQRT_1OVER2 ) );
+	speed = ( endValue - startValue ) * ( 1000.0f / ( ( float ) this->linearTime + ( this->accelTime + this->decelTime ) * anMath::SQRT_1OVER2 ) );
 
 	if ( this->accelTime ) {
 		extrapolate.Init( startTime, this->accelTime, startValue, ( startValue - startValue ), speed, EXTRAPOLATION_ACCELSINE );
@@ -428,7 +424,7 @@ ARC_INLINE void aRcInterpolateSineKinematics<type>::Init( const float startTime,
 		extrapolate.Init( startTime, this->decelTime, startValue, ( startValue - startValue ), speed, EXTRAPOLATION_DECELSINE );
 	}
 }
-ARC_INLINE void aRcInterpolateSineKinematics<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type& startValue, const type& endValue ) {
+ARC_INLINE void anInterpolateSineKinematics<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type& startValue, const type& endValue ) {
     this->startTime = startTime;
     this->startValue = startValue;
     this->endValue = endValue;
@@ -449,7 +445,7 @@ ARC_INLINE void aRcInterpolateSineKinematics<type>::Init( const float startTime,
 
     // Calculate the speed based on the difference between the end and start values
     // The linear time and (acceleration time + deceleration time) are used to adjust the speed calculation
-    type speed = ( endValue - startValue ) *  (1000.0f / (linearTime + ( accelTime + decelTime ) * arcMath::SQRT_1OVER2 ) );
+    type speed = ( endValue - startValue ) *  (1000.0f / (linearTime + ( accelTime + decelTime ) * anMath::SQRT_1OVER2 ) );
 
     ExtrapolationType extrapolationType = EXTRAPOLATION_DECELSINE;
     if ( accelTime > 0 ) {
@@ -466,59 +462,201 @@ ARC_INLINE void aRcInterpolateSineKinematics<type>::Init( const float startTime,
 
 /*
 ====================
-aRcInterpolateSineKinematics::Invalidate
+anInterpolateSineKinematics::Invalidate
 ====================
 */
-template< class type >
-ARC_INLINE void aRcInterpolateSineKinematics<type>::Invalidate( void ) {
+template<class type>
+ARC_INLINE void anInterpolateSineKinematics<type>::Invalidate( void ) {
 	extrapolate.Init( 0, 0, extrapolate.GetStartValue(), extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_NONE );
 }
 
 /*
 ====================
-aRcInterpolateSineKinematics::SetPhase
+anInterpolateSineKinematics::SetPhase
 ====================
 */
-template< class type >
-ARC_INLINE void aRcInterpolateSineKinematics<type>::SetPhase( float time ) const {
-	float deltaTime;
-
-	deltaTime = time - startTime;
+template<class type>
+ARC_INLINE void anInterpolateSineKinematics<type>::SetPhase( float time ) const {
+	float deltaTime = time - startTime;
 	if ( deltaTime < accelTime ) {
 		if ( extrapolate.GetExtrapolationType() != EXTRAPOLATION_ACCELSINE ) {
 			extrapolate.Init( startTime, accelTime, startValue, extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_ACCELSINE );
 		}
 	} else if ( deltaTime < accelTime + linearTime ) {
 		if ( extrapolate.GetExtrapolationType() != EXTRAPOLATION_LINEAR ) {
-			extrapolate.Init( startTime + accelTime, linearTime, startValue + extrapolate.GetSpeed() * ( accelTime * 0.001f * arcMath::SQRT_1OVER2 ), extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_LINEAR );
+			extrapolate.Init( startTime + accelTime, linearTime, startValue + extrapolate.GetSpeed() * ( accelTime * 0.001f * anMath::SQRT_1OVER2 ), extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_LINEAR );
 		}
 	} else {
 		if ( extrapolate.GetExtrapolationType() != EXTRAPOLATION_DECELSINE ) {
-			extrapolate.Init( startTime + accelTime + linearTime, decelTime, endValue - ( extrapolate.GetSpeed() * ( decelTime * 0.001f * arcMath::SQRT_1OVER2 ) ), extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_DECELSINE );
+			extrapolate.Init( startTime + accelTime + linearTime, decelTime, endValue - ( extrapolate.GetSpeed() * ( decelTime * 0.001f * anMath::SQRT_1OVER2 ) ), extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_DECELSINE );
 		}
 	}
 }
 
 /*
 ====================
-aRcInterpolateSineKinematics::GetCurrentValue
+anInterpolateSineKinematics::GetCurrentValue
 ====================
 */
-template< class type >
-ARC_INLINE type aRcInterpolateSineKinematics<type>::GetCurrentValue( float time ) const {
+template<class type>
+ARC_INLINE type anInterpolateSineKinematics<type>::GetCurrentValue( float time ) const {
 	SetPhase( time );
 	return extrapolate.GetCurrentValue( time );
 }
 
 /*
 ====================
-aRcInterpolateSineKinematics::GetCurrentSpeed
+anInterpolateSineKinematics::GetCurrentSpeed
 ====================
 */
-template< class type >
-ARC_INLINE type aRcInterpolateSineKinematics<type>::GetCurrentSpeed( float time ) const {
+template<class type>
+ARC_INLINE type anInterpolateSineKinematics<type>::GetCurrentSpeed( float time ) const {
 	SetPhase( time );
 	return extrapolate.GetCurrentSpeed( time );
+}
+/*
+=============================================================================
+
+	Lanczos Interpolation - AKA Lanczos Kernel
+
+=============================================================================
+*/
+
+template <class type>
+class anLanczosInterpolator {
+public:
+    static				anLanczosInterpolator();
+    void			Init( const int startTime, const int duration, const type startValue, const type endValue, const int kernelSize );
+    void			SetStartTime( int time ) { this->startTime = time; }
+    void			SetDuration( int duration ) { this->duration = duration; }
+    void			SetStartValue( const type& start ) { this->startValue = start; }
+    void			SetEndValue( const type& end ) { this->endValue = end; }
+    type			GetCurrentValue( int time ) const;
+    bool			IsDone( int time ) const { return ( time >= startTime + duration ); }
+    int				GetStartTime( void ) const { return startTime; }
+    int				GetDuration( void)  const { return duration; }
+    const type& 	GetStartValue(void ) const { return startValue; }
+    const type&		GetEndValue( void ) const { return endValue; }
+    int				GetKernelSize( void ) const { return kernelSize; }
+
+    float			LanczosKernel(float x ) const;
+    float			KernelScale(float x ) const;
+
+private:
+    int 			startTime;
+    int				duration;
+    type			startValue;
+    type			endValue;
+    int				kernelSize;
+    mutable int		currentTime;
+    mutable type	currentValue;
+
+private:
+
+		anLanczosInterpolator() {
+		// Initialize lookup table
+		for ( int i = 0; i < KERNEL_SIZE * 2; i++ ) {
+			float x = (float)i - KERNEL_SIZE;
+		kernelTable[i] = sinc( x ) * sinc( x / KERNEL_SIZE );
+		}
+	}
+
+	// receieves the val, calculates the Lanczos kernel formula with the table
+	// returns with the index table lookup
+	float GetKernelValue( float x ) {
+		x = anMath::Clamp( x, -KERNEL_SIZE, KERNEL_SIZE );
+		int index = ( int ) x + KERNEL_SIZE;
+		return kernelTable[index];
+	}
+
+	 // we want to ensure the kernel is encapsulated securely hidden no FKC jokes..
+ 	float kernelTable[KERNEL_SIZE*2];
+
+};
+
+/*
+====================
+anLanczosInterpolator::anLanczosInterpolator
+====================
+*/
+template<class type>
+ARC_INLINE anLanczosInterpolator<type>::anLanczosInterpolator() {
+	currentTime = startTime = duration = 0;
+	memset( &currentValue, 0, sizeof( currentValue ) );
+	startValue = endValue = currentValue;
+	kernelSize = currentValue = 1;
+}
+
+/*
+====================
+anLanczosInterpolator::Init
+====================
+*/
+template<class type>
+ARC_INLINE void anLanczosInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue, const int kernelSize ) {
+	this->kernelSize = kernelSize;
+	this->startTime = startTime;
+	this->duration = duration;
+	this->startValue = startValue;
+	this->endValue = endValue;
+	this->currentTime = startTime - 1;
+	this->currentValue = startValue;
+}
+
+template<class type>
+ARC_INLINE anLanczosInterpolator::GetCurrentValue( int time ) const {
+	int lanczosTime = time - startTime;
+	if ( time != currentTime ) {
+		currentTime = time;
+		if ( lanczosTime <= 0 ) {
+			currentValue = startValue;
+		} else if ( lanczosTime >= duration ) {
+			currentValue = endValue;
+		} else {
+            // Calculate the interpolation value using the Lanczos kernel
+            type fraction = static_cast<type>( lanczosTime ) / duration;
+            type interpolatedValue = 0.0f;
+            for ( int i = 0; i < kernelSize; i++ ) {
+                type weight = LanczosKernel( static_cast<type>( i ) - fraction );
+				interpolatedValue += weight * ( endValue - startValue ) * fraction + startValue;
+				//interpolatedValue = startValue + ( endValue - startValue ) * LanczosKernel( ( float ) lanczosTime / duration );
+            }
+            currentValue = interpolatedValue;
+        }
+    }
+    return currentValue;
+}
+
+template<class type>
+ARC_INLINE const float anLanczosInterpolator::LanczosKernel( const float x ) const {
+    if ( x == 0.0f ) {
+        return 1.0f;
+    } else if ( anMath::Abs( x ) < kernelSize ) {
+        float piX = anMath::PI * x;
+        return kernelSize * anMath::Sin( piX ) * anMath::Sin( piX / kernelSize ) / ( piX * piX );
+    } else {
+        return 0.0f;
+    }
+}
+
+
+// Lanczos kernel function
+template<class type>
+ARC_INLINE  const float anLanczosInterpolator::KernelScale( float x ) const {
+    const float radius = 2.0f;
+    if ( x > -radius && x < radius ) {
+        return sinc( x ) * sinc( x / radius );
+    }
+    return 0.0f;
+}
+
+
+// Sinc function
+float sinc( loat x ) {
+    if ( x == 0.0f ) {
+        return 1.0f;
+    }
+    return sin(x * M_PI) / (x * M_PI);
 }
 
 //==============================================================================================
@@ -527,10 +665,10 @@ ARC_INLINE type aRcInterpolateSineKinematics<type>::GetCurrentSpeed( float time 
 //
 //==============================================================================================
 
-template< class type >
-class aRcHermiteInterpolator {
+template<class type>
+class anHermiteInterpolator {
 public:
-						aRcHermiteInterpolator();
+						anHermiteInterpolator();
 	void				Init( const int startTime, const int duration, const type startValue, const type endValue, float S1, float S2 );
 	void				Init( const int startTime, const int duration, const type startValue, const type endValue );
 	void				SetStartTime( int time ) { this->startTime = time; }
@@ -561,11 +699,11 @@ private:
 
 /*
 ====================
-aRcHermiteInterpolator::aRcHermiteInterpolator
+anHermiteInterpolator::anHermiteInterpolator
 ====================
 */
-template< class type >
-ARC_INLINE aRcHermiteInterpolator<type>::aRcHermiteInterpolator() {
+template<class type>
+ARC_INLINE anHermiteInterpolator<type>::anHermiteInterpolator() {
 	currentTime = startTime = duration = 0;
 	memset( &currentValue, 0, sizeof( currentValue ) );
 	startValue = endValue = currentValue;
@@ -574,11 +712,11 @@ ARC_INLINE aRcHermiteInterpolator<type>::aRcHermiteInterpolator() {
 
 /*
 ====================
-aRcHermiteInterpolator::Init
+anHermiteInterpolator::Init
 ====================
 */
-template< class type >
-ARC_INLINE void aRcHermiteInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue, const float S1, const float S2 ) {
+template<class type>
+ARC_INLINE void anHermiteInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue, const float S1, const float S2 ) {
 	this->S1 = S1;
 	this->S2 = S2;
 	this->startTime = startTime;
@@ -591,11 +729,11 @@ ARC_INLINE void aRcHermiteInterpolator<type>::Init( const int startTime, const i
 
 /*
 ====================
-aRcHermiteInterpolator::Init
+anHermiteInterpolator::Init
 ====================
 */
-template< class type >
-ARC_INLINE void aRcHermiteInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue ) {
+template<class type>
+ARC_INLINE void anHermiteInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue ) {
 	this->startTime = startTime;
 	this->duration = duration;
 	this->startValue = startValue;
@@ -606,14 +744,12 @@ ARC_INLINE void aRcHermiteInterpolator<type>::Init( const int startTime, const i
 
 /*
 ====================
-aRcHermiteInterpolator::GetCurrentValue
+anHermiteInterpolator::GetCurrentValue
 ====================
 */
-template< class type >
-ARC_INLINE type aRcHermiteInterpolator<type>::GetCurrentValue( int time ) const {
-	int deltaTime;
-
-	deltaTime = time - startTime;
+template<class type>
+ARC_INLINE type anHermiteInterpolator<type>::GetCurrentValue( int time ) const {
+	int deltaTime = time - startTime;
 	if ( time != currentTime ) {
 		currentTime = time;
 		if ( deltaTime <= 0 ) {
@@ -628,8 +764,8 @@ ARC_INLINE type aRcHermiteInterpolator<type>::GetCurrentValue( int time ) const 
 }
 
 // Returns an alpha value [0..1] based on Hermite Parameters N1, N2, S1, S2 and an input alpha 't'
-template< class type >
-ARC_INLINE float aRcHermiteInterpolator<type>::HermiteAlpha(const float t) const {
+template<class type>
+ARC_INLINE float anHermiteInterpolator<type>::HermiteAlpha(const float t) const {
 	float N1 = 0.0f;
 	float N2 = 1.0f;
 	float tSquared = t * t;
@@ -642,74 +778,158 @@ ARC_INLINE float aRcHermiteInterpolator<type>::HermiteAlpha(const float t) const
 
 //==============================================================================================
 //
+// CatMull-Rom-Spline Interpolation
+// this class wouldnt ever gotten implemented if it wasnt for Cody. Simple
+// and i love interpolation mathematics but i overlooked it. Thanks
+//==============================================================================================
+
+
+class anCatMullROMSpline {
+public:
+					anCatMullROMSpline() { Clear(); }
+	void			Clear();
+
+					// add your nodes, updates apply with adding numNodes.
+					// This avoids having to call nodes.Num() repeatedly.
+					// Otherwise, the nodes/tangent functions are sufficient and fully interpolate Catmull-Rom splines
+	void			AddPoint( const anVec3 &point );
+	anVec3			GetValue( float alpha );
+
+	float			tension;
+	float			continuity;
+	float			bias;			
+	anList<anVec3>	nodes;			// control points
+
+protected:
+	anVec3			GetNode( int i );
+
+					// This implements cubic Catmull-Rom spline interpolation using the incoming
+					// and outgoing tangents.
+	anVec3			IncomingTangent( int i );
+	anVec3			OutgoingTangent( int i );
+};
+
+ARC_INLINE void anCatMullROMSpline::Clear() {
+	tension = continuity = bias = 0.0f;
+	nodes.Clear();
+}
+
+ARC_INLINE void anCatMullROMSpline::AddPoint( const anVec3 &point ) {
+	nodes.Append( point );
+	numNodes++;
+}
+
+ARC_INLINE anVec3 anCatMullROMSpline::GetNode( int i ) {
+	// Clamping has the effect of having duplicate nodes beyond the array boundaries
+	int index = anMath::ClampInt( 0, nodes.Num()-1, i );
+	return nodes[index];
+}
+
+ARC_INLINE anVec3 anCatMullROMSpline::IncomingTangent( int i ) {
+	anVec3 p0 = GetNode( i - 1 );
+	anVec3 p1 = GetNode( i );
+	return ( p1 - p0 ).Normalize();
+}
+
+ARC_INLINE anVec3 anCatMullROMSpline::OutgoingTangent( int i ) {
+	anVec3 p1 = GetNode( i );
+	anVec3 p2 = GetNode( i + 1 );
+	return ( p2 - p1 ).Normalize();
+}
+
+ARC_INLINE anVec3 anCatMullROMSpline::GetValue( float t ) {
+	int p0 = Floor( t );
+	int p1 = p0 + 1;
+	float t = t - ( float )p0;
+
+	anVec3 a = GetNode( p0 );
+	anVec3 b = GetNode( p1 );
+
+	anVec3 tangent0 = IncomingTangent( p0 );
+	anVec3 tangent1 = OutgoingTangent( p1 );
+
+	anVec3 result = a * ( 2 * t * t * t - 3 * t * t + 1 ) + 
+					b * ( -2 * t * t * t + 3 * t * t ) +
+			tangent0 * ( t * t * t - 2 * t * t + t ) +
+			tangent1 * ( t * t * t - t * t );
+
+  return result;
+}
+
+
+
+//==============================================================================================
+//
 // TCB Spline Interpolation
 //
 // Defines a Kochanek-Bartels spline, in short a Hermite spline with formulae to calculate the tangents
 // Requires extra points at the ends, try duplicating first and last
 //==============================================================================================
-class aRcTCBSpline {
+
+
+class anTCBSpline {
 	//TODO: Make a template like the others so it can handle something other than vec3 types
 public:
-					aRcTCBSpline() { Clear(); }
+					anTCBSpline() { Clear(); }
 	void			Clear();
-	void			AddPoint( const arcVec3 &point );
+	void			AddPoint( const anVec3 &point );
 	void			SetControls( float tension, float continuity, float bias );
-	arcVec3			GetValue( float alpha );
+	anVec3			GetValue( float alpha );
 
 	float			tension;		// How much of an increase in sharpness does the curve bend?
 	float			continuity;		// How rapid is the change in speed and direction?
 	float			bias;			// What is the direction of the curve as it passes through the key point?
-	arcNetList<arcVec3> nodes;			// control points
+	anList<anVec3> nodes;			// control points
 
 protected:
-	arcVec3			GetNode( int i );
-	arcVec3			IncomingTangent( int i );
-	arcVec3			OutgoingTangent( int i );
+	anVec3			GetNode( int i );
+	anVec3			IncomingTangent( int i );
+	anVec3			OutgoingTangent( int i );
 };
 
-ARC_INLINE void aRcTCBSpline::Clear() {
+ARC_INLINE void anTCBSpline::Clear() {
 	tension = continuity = bias = 0.0f;
 	nodes.Clear();
 }
 
-ARC_INLINE void aRcTCBSpline::AddPoint( const arcVec3 &point ) {
+ARC_INLINE void anTCBSpline::AddPoint( const anVec3 &point ) {
 	nodes.Append( point );
 }
 
-ARC_INLINE void aRcTCBSpline::SetControls( float tension, float continuity, float bias ) {
-	this->tension = arcMath::ClampFloat( 0.0f, 1.0f, tension );
-	this->continuity = arcMath::ClampFloat( 0.0f, 1.0f, continuity );
-	this->bias = arcMath::ClampFloat( 0.0f, 1.0f, bias );
+ARC_INLINE void anTCBSpline::SetControls( float tension, float continuity, float bias ) {
+	this->tension = anMath::ClampFloat( 0.0f, 1.0f, tension );
+	this->continuity = anMath::ClampFloat( 0.0f, 1.0f, continuity );
+	this->bias = anMath::ClampFloat( 0.0f, 1.0f, bias );
 }
 
-ARC_INLINE arcVec3 aRcTCBSpline::GetNode( int i ) {
+ARC_INLINE anVec3 anTCBSpline::GetNode( int i ) {
 	// Clamping has the effect of having duplicate nodes beyond the array boundaries
-	int index = arcMath::ClampInt( 0, nodes.Num()-1, i );
+	int index = anMath::ClampInt( 0, nodes.Num()-1, i );
 	return nodes[index];
 }
 
-ARC_INLINE arcVec3 aRcTCBSpline::IncomingTangent( int i ) {
-	return	( ( 1.0f - tension )*( 1.0f - continuity )*( 1.0f + bias ) * 0.5f) * (GetNode(i) - GetNode(i-1)) +
-			( ( 1.0f - tension )*( 1.0f + continuity )*( 1.0f - bias ) * 0.5f) * (GetNode(i+1) - GetNode(i));
+ARC_INLINE anVec3 anTCBSpline::IncomingTangent( int i ) {
+	return	( ( 1.0f - tension )*( 1.0f - continuity )*( 1.0f + bias ) * 0.5f) * (GetNode( i ) - GetNode(i-1)) +
+			( ( 1.0f - tension )*( 1.0f + continuity )*( 1.0f - bias ) * 0.5f) * (GetNode(i+1) - GetNode( i ));
 }
 
-ARC_INLINE arcVec3 aRcTCBSpline::OutgoingTangent( int i ) {
-	return	((1.0f-tension)*( 1.0f + continuity )*( 1.0f + bias ) * 0.5f) * (GetNode(i) - GetNode(i-1)) +
-			((1.0f-tension)*( 1.0f - continuity )*( 1.0f - bias ) * 0.5f) * (GetNode(i+1) - GetNode(i));
+ARC_INLINE anVec3 anTCBSpline::OutgoingTangent( int i ) {
+	return	((1.0f-tension)*( 1.0f + continuity )*( 1.0f + bias ) * 0.5f) * (GetNode( i ) - GetNode(i-1)) +
+			((1.0f-tension)*( 1.0f - continuity )*( 1.0f - bias ) * 0.5f) * (GetNode(i+1) - GetNode( i ));
 }
 
-ARC_INLINE arcVec3 aRcTCBSpline::GetValue( float alpha ) {
-	float t = arcMath::ClampFloat(0.0f, 1.0f, alpha);
+ARC_INLINE anVec3 anTCBSpline::GetValue( float alpha ) {
+	float t = anMath::ClampFloat(0.0f, 1.0f, alpha);
 	int numNodes = nodes.Num();
 	int numSegments = numNodes-1;
 	int startNode = t * numSegments;
 	t = ( t * numSegments ) - startNode;		// t = alpha within this segment
 
 	// Calculate hermite parameters
-	arcVec3 N1 = GetNode( startNode );
-	arcVec3 N2 = GetNode( startNode + 1 );
-	arcVec3 S1 = OutgoingTangent( startNode );
-	arcVec3 S2 = IncomingTangent( startNode + 1 );
+	anVec3 N1 = GetNode( startNode );
+	anVec3 N2 = GetNode( startNode + 1 );
+	anVec3 S1 = OutgoingTangent( startNode );
+	anVec3 S2 = IncomingTangent( startNode + 1 );
 
 	float tSquared = t*t;
 	float tCubed = tSquared*t;
@@ -727,10 +947,10 @@ ARC_INLINE arcVec3 aRcTCBSpline::GetValue( float alpha ) {
 //	Interpolates from startValue to endValue to startValue over duration
 //==============================================================================================
 
-template< class type >
-class aRcSawInterpolation {
+template<class type>
+class anSawInterpolation {
 public:
-						aRcSawInterpolation();
+						anSawInterpolation();
 	void				Init( const int startTime, const int duration, const type startValue, const type endValue );
 	void				SetStartTime( int time ) { this->startTime = time; }
 	void				SetDuration( int duration ) { this->duration = duration; }
@@ -752,15 +972,15 @@ private:
 	mutable type		currentValue;
 };
 
-template< class type >
-ARC_INLINE aRcSawInterpolation<type>::aRcSawInterpolation() {
+template<class type>
+ARC_INLINE anSawInterpolation<type>::anSawInterpolation() {
 	currentTime = startTime = duration = 0;
 	memset( &currentValue, 0, sizeof( currentValue ) );
 	startValue = endValue = currentValue;
 }
 
-template< class type >
-ARC_INLINE void aRcSawInterpolation<type>::Init( const int startTime, const int duration, const type startValue, const type endValue ) {
+template<class type>
+ARC_INLINE void anSawInterpolation<type>::Init( const int startTime, const int duration, const type startValue, const type endValue ) {
 	this->startTime = startTime;
 	this->duration = duration;
 	this->startValue = startValue;
@@ -769,21 +989,17 @@ ARC_INLINE void aRcSawInterpolation<type>::Init( const int startTime, const int 
 	this->currentValue = startValue;
 }
 
-template< class type >
-ARC_INLINE type aRcSawInterpolation<type>::GetCurrentValue( int time ) const {
-	int deltaTime;
-
-	deltaTime = time - startTime;
+template<class type>
+ARC_INLINE type anSawInterpolation<type>::GetCurrentValue( int time ) const {
+	int deltaTime = time - startTime;
 	if ( time != currentTime ) {
 		currentTime = time;
 		if ( deltaTime <= 0 ) {
 			currentValue = startValue;
-		}
-		else if ( deltaTime >= duration ) {
+		} else if ( deltaTime >= duration ) {
 			currentValue = startValue;
-		}
-		else {
-			float frac = (( float ) deltaTime / duration );
+		} else {
+			float frac = ( ( float ) deltaTime / duration );
 			if (frac < 0.5f) {
 				currentValue = startValue + ( endValue - startValue ) * frac * 2.0f;
 			}
@@ -803,10 +1019,10 @@ ARC_INLINE type aRcSawInterpolation<type>::GetCurrentValue( int time ) const {
 //	Oscillates between min and max over given period
 //==============================================================================================
 
-template< class type >
-class aRcSinOscillator {
+template<class type>
+class anSinOscillator {
 public:
-						aRcSinOscillator();
+						anSinOscillator();
 	void				Init( const int startTime, const int period, const type min, const type max );
 	void				SetStartTime( int time ) { this->startTime = time; }
 	void				SetPeriod( int period ) { this->period = period; }
@@ -827,15 +1043,15 @@ private:
 	mutable type		currentValue;
 };
 
-template< class type >
-ARC_INLINE aRcSinOscillator<type>::aRcSinOscillator() {
+template<class type>
+ARC_INLINE anSinOscillator<type>::anSinOscillator() {
 	currentTime = startTime = period = 0;
 	memset( &currentValue, 0, sizeof( currentValue ) );
 	minValue = maxValue = currentValue;
 }
 
-template< class type >
-ARC_INLINE void aRcSinOscillator<type>::Init( const int startTime, const int period, const type minValue, const type maxValue ) {
+template<class type>
+ARC_INLINE void anSinOscillator<type>::Init( const int startTime, const int period, const type minValue, const type maxValue ) {
 	this->startTime = startTime;
 	this->period = period;
 	this->minValue = minValue;
@@ -844,17 +1060,153 @@ ARC_INLINE void aRcSinOscillator<type>::Init( const int startTime, const int per
 	this->currentValue = minValue;
 }
 
-template< class type >
-ARC_INLINE type aRcSinOscillator<type>::GetCurrentValue( int time ) const {
-
+template<class type>
+ARC_INLINE type anSinOscillator<type>::GetCurrentValue( int time ) const {
 	if ( time != currentTime ) {
 		currentTime = time;
 
 		float deltaTime = period == 0 ? 0.0f : ( time - startTime ) / ( float ) period;
-		float s = (1.0f + ( float ) sin(deltaTime * arcMath::TWO_PI)) * 0.5f;
-		currentValue = minValue + s * (maxValue - minValue);
+		float s = ( 1.0f + ( float ) sin( deltaTime * anMath::TWO_PI ) ) * 0.5f;
+		currentValue = minValue + s * ( maxValue - minValue );
 	}
 	return currentValue;
+}
+
+
+
+/*
+==============================================================================================
+
+	Bandpass filter styleee, with lerping on the leading and falling edges.
+	If OOB flag is set, an additional OOB value will be returned if the
+	time is out with the boundaries of the filter.
+
+	        _______
+		   /       \
+		  /         \
+	_____/           \______
+
+
+	With OOB conditions:
+	        _______
+		   /       \
+		  /         \
+	     /           \
+	     |           |
+	     |           |
+	     |           |
+	_____|           |______
+
+==============================================================================================
+*/
+
+template<typename type>
+class anBandPassFilter {
+public:
+						anBandPassFilter( void );
+	void				Init( const float lowPassStart, const float lowPassDuration, const float highPassStart, const float highPassDuration, const type &lowValue, const type &highValue );
+	void				SetLowPassStart( float _time ) { lowStartTime = _time; }
+	void				SetLowPassDuration( float _duration ) { lowDuration = _duration; }
+	void				SetHighPassStart( float _time ) { highStartTime = _time; }
+	void				SetHighPassDuration( float _duration ) { highDuration = _duration; }
+	void				SetLowValue( const type& _low ) { lowValue = _low; }
+	void				SetHighValue( const type& _high ) { highValue = _high; }
+	void				SetOOBValue( const type& _value ) { oobFlag = true; oobValue = _value; }
+	void				SetOOBFlag( bool _flag ) { oobFlag = _flag; }
+	type				GetCurrentValue( float time ) const;
+	bool				IsDone( float time ) const { return ( time >= highStartTime + highDuration ); }
+	float				GetLowPassStart( void ) const { return lowStartTime; }
+	float				GetLowPassDuration( void ) const { return lowDuration; }
+	float				GetHighPassStart( void ) const { return highStartTime; }
+	float				GetHighPassDuration( void ) const { return highDuration; }
+	const type&			GetOOBValue( void ) const { return oobValue; }
+	bool				GetOOBFlag( void ) const { return oobFlag; }
+	const type&			GetLowValue( void ) const { return lowValue; }
+	const type&			GetHighValue( void ) const { return highValue; }
+
+private:
+	float				lowStartTime, lowDuration;
+	float				highStartTime, highDuration;
+	type				oobValue;
+	bool				oobFlag;
+	type				lowValue, highValue;
+};
+
+/*
+====================
+anBandPassFilter::idInterpolate
+====================
+*/
+template<typename type>
+ARC_INLINE anBandPassFilter<type>::anBandPassFilter( void ) {
+	lowStartTime	= 0.f;
+	lowDuration		= 0.f;
+	highStartTime	= 0.f;
+	highDuration	= 0.f;
+
+	oobFlag			= false;
+
+	memset( &lowValue, 0, sizeof( lowValue ) );
+	highValue = lowValue;
+}
+
+/*
+====================
+anBandPassFilter::Init
+====================
+*/
+template<typename type>
+ARC_INLINE void anBandPassFilter<type>::Init( const float lowPassStart, const float lowPassDuration, const float highPassStart, const float highPassDuration, const type& _lowValue, const type& _highValue ) {
+	assert( lowPassDuration >= 0 );
+	assert( highPassDuration >= 0 );
+	assert( lowPassStart + lowPassDuration <= highPassStart );
+
+	lowStartTime		= lowPassStart;
+	lowDuration			= lowPassDuration;
+	highStartTime		= highPassStart;
+	highDuration		= highPassDuration;
+
+	lowValue			= _lowValue;
+	highValue			= _highValue;
+}
+
+/*
+====================
+anBandPassFilter::GetCurrentValue
+====================
+*/
+template<typename type>
+ARC_INLINE type anBandPassFilter<type>::GetCurrentValue( float time ) const {
+	if ( time < lowStartTime ) {
+		// pre leading edge condition
+
+		if ( oobFlag ) {
+			return oobValue;
+		}
+		return lowValue;
+	}
+
+	if ( time < lowStartTime + lowDuration ) {
+		// on the leading edge
+		float frac = ( time - lowStartTime ) / lowDuration;
+		return Lerp( lowValue, highValue, frac );
+	}
+
+	if ( time < highStartTime ) {
+		// on the upper level
+		return highValue;
+	}
+
+	if ( time < highStartTime + highDuration ) {
+		// on the trailing edge
+		float frac = ( time - highStartTime ) / highDuration;
+		return Lerp( highValue, lowValue, frac );
+	}
+
+	if ( oobFlag ) {
+		return oobValue;
+	}
+	return lowValue;
 }
 
 #endif

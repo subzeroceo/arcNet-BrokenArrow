@@ -2,9 +2,9 @@
 #define __KEYINPUT_H__
 
 struct keyBindings_t {
-	arcNetString keyboard;
-	arcNetString mouse;
-	arcNetString gamepad;
+	anString keyboard;
+	anString mouse;
+	anString gamepad;
 };
 
 class idSerializer;
@@ -17,7 +17,7 @@ public:
 	static void				Init();
 	static void				Shutdown();
 
-	static void				ArgCompletion_KeyName( const arcCommandArgs &args, void(*callback)( const char *s ) );
+	static void				ArgCompletion_KeyName( const anCommandArgs &args, void(*callback)( const char *s ) );
 	static void				PreliminaryKeyEvent( int keyNum, bool down );
 	static bool				IsDown( int keyNum );
 	static int				GetUsercmdAction( int keyNum );
@@ -25,7 +25,7 @@ public:
 	static void				SetOverstrikeMode( bool state );
 	static void				ClearStates();
 
-	static keyNum_t			StringToKeyNum( const char * str );		// This is used by the "bind" command
+	static keyNum_t			StringToKeyNum( const char *str );		// This is used by the "bind" command
 	static const char *		KeyNumToString( keyNum_t keyNum );		// This is the inverse of StringToKeyNum, used for config files
 	static const char *		LocalizedKeyName( keyNum_t keyNum );	// This returns text suitable to print on screen
 
@@ -37,8 +37,8 @@ public:
 	static const char *		KeysFromBinding( const char *bind );
 	static const char *		BindingFromKey( const char *key );
 	static bool				KeyIsBoundTo( int keyNum, const char *binding );
-	static void				WriteBindings( arcNetFile *f );
-	static keyBindings_t	KeyBindingsFromBinding( const char * bind, bool firstOnly = false, bool localized = false );
+	static void				WriteBindings( anFile *f );
+	static keyBindings_t	KeyBindingsFromBinding( const char *bind, bool firstOnly = false, bool localized = false );
 };
 
 #endif /* !__KEYINPUT_H__ */

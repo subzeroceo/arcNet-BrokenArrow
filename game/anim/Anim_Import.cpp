@@ -1,4 +1,4 @@
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
@@ -10,10 +10,10 @@
 
 ***********************************************************************/
 
-static arcNetString				Maya_Error;
+static anString				Maya_Error;
 
-static exporterInterface_t	Maya_ConvertModel = NULL;
-static exporterShutdown_t	Maya_Shutdown = NULL;
+static exporterInterface_t	Maya_ConvertModel = nullptr;
+static exporterShutdown_t	Maya_Shutdown = nullptr;
 static int					importDLL = 0;
 
 bool idModelExport::initialized = false;
@@ -42,8 +42,8 @@ void idModelExport::Shutdown( void ) {
 	}
 
 	importDLL = 0;
-	Maya_Shutdown = NULL;
-	Maya_ConvertModel = NULL;
+	Maya_Shutdown = nullptr;
+	Maya_ConvertModel = nullptr;
 	Maya_Error.Clear();
 	initialized = false;
 }
@@ -68,7 +68,7 @@ bool idModelExport::CheckMayaInstall( void ) {
 		return false;
 	}
 
-	lres = RegQueryValueEx( hKey, "MAYA_INSTALL_LOCATION", NULL, (unsigned long*)&lType, (unsigned char*)NULL, (unsigned long*)NULL );
+	lres = RegQueryValueEx( hKey, "MAYA_INSTALL_LOCATION", nullptr, (unsigned long*)&lType, (unsigned char*)nullptr, (unsigned long*)nullptr );
 
 	RegCloseKey( hKey );
 
@@ -116,8 +116,8 @@ void idModelExport::LoadMayaDll( void ) {
 	Maya_ConvertModel = ( exporterInterface_t )sys->DLL_GetProcAddress( importDLL, "Maya_ConvertModel" );
 	Maya_Shutdown = ( exporterShutdown_t )sys->DLL_GetProcAddress( importDLL, "Maya_Shutdown" );
 	if ( !Maya_ConvertModel || !dllEntry || !Maya_Shutdown ) {
-		Maya_ConvertModel = NULL;
-		Maya_Shutdown = NULL;
+		Maya_ConvertModel = nullptr;
+		Maya_Shutdown = nullptr;
 		sys->DLL_Unload( importDLL );
 		importDLL = 0;
 		gameLocal.Error( "Invalid interface on export DLL." );
@@ -127,8 +127,8 @@ void idModelExport::LoadMayaDll( void ) {
 	// initialize the DLL
 	if ( !dllEntry( MD5_VERSION, common, sys ) ) {
 		// init failed
-		Maya_ConvertModel = NULL;
-		Maya_Shutdown = NULL;
+		Maya_ConvertModel = nullptr;
+		Maya_Shutdown = nullptr;
 		sys->DLL_Unload( importDLL );
 		importDLL = 0;
 		gameLocal.Error( "Export DLL init failed." );
@@ -145,12 +145,12 @@ version number has changed.
 =====================
 */
 bool idModelExport::ConvertMayaToMD5( void ) {
-	ID_TIME_T
+	ARC_TIME_T
 		sourceTime;
-	ID_TIME_T		destTime;
+	ARC_TIME_T		destTime;
 	int			version;
-	arcNetToken		cmdLine;
-	arcNetString		path;
+	anToken		cmdLine;
+	anString		path;
 
 	// check if our DLL got loaded
 	if ( initialized && !Maya_ConvertModel ) {
@@ -164,14 +164,14 @@ bool idModelExport::ConvertMayaToMD5( void ) {
 	}
 
 	// get the source file's time
-	if ( fileSystem->ReadFile( src, NULL, &sourceTime ) < 0 ) {
+	if ( fileSystem->ReadFile( src, nullptr, &sourceTime ) < 0 ) {
 		// source file doesn't exist
 		return true;
 	}
 
 	// get the destination file's time
-	if ( !force && ( fileSystem->ReadFile( dest, NULL, &destTime ) >= 0 ) ) {
-		idParser parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS );
+	if ( !force && ( fileSystem->ReadFile( dest, nullptr, &destTime ) >= 0 ) ) {
+		anParser parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS );
 		parser.LoadFile( dest );
 		// read the file version
 		if ( parser.CheckTokenString( MD5_VERSION_STRING ) ) {
@@ -247,7 +247,7 @@ idModelExport::ExportModel
 ====================
 */
 bool idModelExport::ExportModel( const char *model ) {
-	const char *game = cvarSystem->GetCVarString( "fs_game" );
+	const char *game = cvarSystem->GetCVarString( "fs_enginepath" );
 	if ( strlen(game) == 0 ) {
 		game = BASE_GAMEDIR;
 	}
@@ -272,7 +272,7 @@ idModelExport::ExportAnim
 ====================
 */
 bool idModelExport::ExportAnim( const char *anim ) {
-	const char *game = cvarSystem->GetCVarString( "fs_game" );
+	const char *game = cvarSystem->GetCVarString( "fs_enginepath" );
 	if ( strlen(game) == 0 ) {
 		game = BASE_GAMEDIR;
 	}
@@ -296,10 +296,10 @@ bool idModelExport::ExportAnim( const char *anim ) {
 idModelExport::ParseOptions
 ====================
 */
-bool idModelExport::ParseOptions( idLexer &lex ) {
-	arcNetToken	token;
-	arcNetString	destdir;
-	arcNetString	sourcedir;
+bool idModelExport::ParseOptions( anLexer &lex ) {
+	anToken	token;
+	anString	destdir;
+	anString	sourcedir;
 
 	if ( !lex.ReadToken( &token ) ) {
 		lex.Error( "Expected filename" );
@@ -361,13 +361,13 @@ bool idModelExport::ParseOptions( idLexer &lex ) {
 idModelExport::ParseExportSection
 ====================
 */
-int idModelExport::ParseExportSection( idParser &parser ) {
-	arcNetToken	command;
-	arcNetToken	token;
-	arcNetString	defaultCommands;
-	idLexer lex;
-	arcNetString	temp;
-	arcNetString	parms;
+int idModelExport::ParseExportSection( anParser &parser ) {
+	anToken	command;
+	anToken	token;
+	anString	defaultCommands;
+	anLexer lex;
+	anString	temp;
+	anString	parms;
 	int		count;
 
 	// only export sections that match our export mask
@@ -430,7 +430,7 @@ int idModelExport::ParseExportSection( idParser &parser ) {
 
 			Reset();
 			if ( ParseOptions( lex ) ) {
-				const char *game = cvarSystem->GetCVarString( "fs_game" );
+				const char *game = cvarSystem->GetCVarString( "fs_enginepath" );
 				if ( strlen(game) == 0 ) {
 					game = BASE_GAMEDIR;
 				}
@@ -444,7 +444,7 @@ int idModelExport::ParseExportSection( idParser &parser ) {
 				} else {
 					dest.SetFileExtension( command );
 				}
-				arcNetString back = commandLine;
+				anString back = commandLine;
 				sprintf( commandLine, "%s %s -dest %s -game %s%s", command.c_str(), src.c_str(), dest.c_str(), game, commandLine.c_str() );
 				if ( ConvertMayaToMD5() ) {
 					count++;
@@ -469,8 +469,8 @@ idModelExport::ExportDefFile
 ================
 */
 int idModelExport::ExportDefFile( const char *filename ) {
-	idParser	parser( LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWPATHNAMES | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
-	arcNetToken		token;
+	anParser	parser( LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWPATHNAMES | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+	anToken		token;
 	int			count;
 
 	count = 0;
@@ -512,7 +512,7 @@ int idModelExport::ExportModels( const char *pathname, const char *extension ) {
 
 	count = 0;
 
-	arcFileList *files = fileSystem->ListFiles( pathname, extension );
+	anFileList *files = fileSystem->ListFiles( pathname, extension );
 	for ( int i = 0; i < files->GetNumFiles(); i++ ) {
 		count += ExportDefFile( va( "%s/%s", pathname, files->GetFile( i ) ) );
 	}

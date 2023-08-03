@@ -14,7 +14,7 @@ idTarget
 ===============================================================================
 */
 
-class idTarget : public idEntity {
+class idTarget : public anEntity {
 public:
 	CLASS_PROTOTYPE( idTarget );
 };
@@ -33,7 +33,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_Remove );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -50,7 +50,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_Show );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -67,7 +67,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_Damage );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -84,7 +84,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_SessionCommand );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -101,7 +101,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_EndLevel );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 
 };
 
@@ -121,7 +121,7 @@ public:
 	void				Think( void );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -137,7 +137,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_SetGlobalShaderTime );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -154,7 +154,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_SetShaderParm );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -171,7 +171,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_SetShaderTime );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -188,17 +188,17 @@ public:
 
 						idTarget_FadeEntity( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Think( void );
 
 private:
-	arcVec4				fadeFrom;
+	anVec4				fadeFrom;
 	int					fadeStart;
 	int					fadeEnd;
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -214,7 +214,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_LightFadeIn );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -230,7 +230,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_LightFadeOut );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -248,11 +248,11 @@ public:
 	void				Spawn( void );
 
 private:
-	void				Event_Activate( idEntity *activator );
-// RAVEN BEGIN
-// abahr: fixing issue with EV_Activate not taking NULL ptrs
+	void				Event_Activate( anEntity *activator );
+
+// abahr: fixing issue with EV_Activate not taking nullptr ptrs
 	void				Event_PostSpawn();
-// RAVEN END
+
 };
 
 
@@ -271,7 +271,7 @@ public:
 	void				Spawn( void );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -289,7 +289,7 @@ public:
 	void				Spawn( void );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -307,29 +307,29 @@ public:
 
 						idTarget_SetInfluence( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Spawn( void );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 	void				Event_RestoreInfluence();
 	void				Event_GatherEntities();
 	void				Event_Flash( float flash, int out );
 	void				Event_ClearFlash( float flash );
 	void				Think( void );
 
-	idList<int>			lightList;
-	idList<int>			guiList;
-	idList<int>			soundList;
-	idList<int>			genericList;
+	anList<int>			lightList;
+	anList<int>			guiList;
+	anList<int>			soundList;
+	anList<int>			genericList;
 	float				flashIn;
 	float				flashOut;
 	float				delay;
-	idStr				flashInSound;
-	idStr				flashOutSound;
-	idEntity *			switchToCamera;
+	anString				flashInSound;
+	anString				flashOutSound;
+	anEntity *			switchToCamera;
 	idInterpolate<float>fovSetting;
 	bool				soundFaded;
 	bool				restoreOnTrigger;
@@ -349,7 +349,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_SetKeyVal );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -365,15 +365,15 @@ class idTarget_SetFov : public idTarget {
 public:
 	CLASS_PROTOTYPE( idTarget_SetFov );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 	void				Think( void );
 
 private:
 	idInterpolate<int>	fovSetting;
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -390,10 +390,10 @@ public:
 	CLASS_PROTOTYPE( idTarget_SetPrimaryObjective );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
-// RAVEN BEGIN
+
 // bdube: added player database
 /*
 ===============================================================================
@@ -408,7 +408,7 @@ public:
 	CLASS_PROTOTYPE( rvTarget_AddDatabaseEntry );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 // jshepard: secret area discovery
@@ -426,7 +426,7 @@ public:
 	CLASS_PROTOTYPE( rvTarget_SecretArea );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -442,7 +442,7 @@ public:
 	CLASS_PROTOTYPE( rvTarget_BossBattle );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 	void				Event_SetShieldPercent( float percent );
 	void				Event_SetBossMaxHealth( float f );
 	void				Event_AllowShieldBar( float activate );
@@ -463,7 +463,7 @@ public:
 	CLASS_PROTOTYPE( rvTarget_TetherAI );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -484,7 +484,7 @@ private:
 };
 
 
-// RAVEN END
+
 
 /*
 ===============================================================================
@@ -499,7 +499,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_LockDoor );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -515,7 +515,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_CallObjectFunction );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -532,7 +532,7 @@ public:
 	CLASS_PROTOTYPE( idTarget_EnableLevelWeapons );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -552,13 +552,13 @@ public:
 
 	void				Spawn( void );
 
-	void				Save( idSaveGame *savefile ) const;
-	void				Restore( idRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
 private:
-	arcVec3				playerPos;
+	anVec3				playerPos;
 
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 	void				Event_TipOff( void );
 	void				Event_GetPlayerPos( void );
 };
@@ -574,7 +574,7 @@ class idTarget_GiveSecurity : public idTarget {
 public:
 	CLASS_PROTOTYPE( idTarget_GiveSecurity );
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -589,7 +589,7 @@ class idTarget_RemoveWeapons : public idTarget {
 public:
 	CLASS_PROTOTYPE( idTarget_RemoveWeapons );
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 
@@ -604,7 +604,7 @@ class idTarget_LevelTrigger : public idTarget {
 public:
 	CLASS_PROTOTYPE( idTarget_LevelTrigger );
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -618,7 +618,7 @@ class idTarget_EnableStamina : public idTarget {
 public:
 	CLASS_PROTOTYPE( idTarget_EnableStamina );
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -632,7 +632,7 @@ class idTarget_FadeSoundClass : public idTarget {
 public:
 	CLASS_PROTOTYPE( idTarget_FadeSoundClass );
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 	void				Event_RestoreVolume();
 };
 
@@ -652,8 +652,8 @@ public:
 	void				Spawn( void );
 
 private:
-	void				Event_Activate( idEntity *activator );
-	void				Event_LaunchProjectile( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
+	void				Event_LaunchProjectile( anEntity *activator );
 };
 
 /*
@@ -669,7 +669,7 @@ public:
 	CLASS_PROTOTYPE( rvTarget_ExitAreaAlert );
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 
 /*
@@ -682,7 +682,7 @@ rvTarget_AmmoStash
 typedef struct	ammodata_s	{
 
 	int			ammoIndex;
-	idStr		ammoName;
+	anString		ammoName;
 	int			ammoCount;
 	int			ammoMax;
 	float		percentFull;
@@ -699,6 +699,6 @@ public:
 	ammodata_t			AmmoArray[ AMMO_ARRAY_SIZE];
 
 private:
-	void				Event_Activate( idEntity *activator );
+	void				Event_Activate( anEntity *activator );
 };
 #endif /* !__GAME_TARGET_H__ */

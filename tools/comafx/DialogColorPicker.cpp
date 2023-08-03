@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 #include "../../sys/win32/rc/Radiant_resource.h"
 #include "DialogColorPicker.h"
@@ -15,7 +15,7 @@ class CMyColorDialog : public CColorDialog {
   DECLARE_DYNCREATE(CMyColorDialog);
      // Construction
 public:
-     CMyColorDialog( COLORREF clrInit = 0, DWORD dwFlags = 0, CWnd *pParentWnd = NULL );
+     CMyColorDialog( COLORREF clrInit = 0, DWORD dwFlags = 0, CWnd *pParentWnd = nullptr );
      virtual int DoModal();
 
 protected:
@@ -54,7 +54,7 @@ void CMyColorDialog::InitCustColors() {
 	for ( int i = 0; i < NCUSTCOLORS; i++ ) {
 		CString entry;
 		entry.Format( "tool_color%d", i);
-		arcCVarSystem *cvar = cvarSystem->Find( entry );
+		anCVarSystem *cvar = cvarSystem->Find( entry );
 		if ( cvar ) {
 			c_LastCustColors[i] = c_CustColors[i] = cvar->GetInteger();
 		} else {
@@ -202,17 +202,17 @@ CPoint PointOnLine(CPoint pt1,CPoint pt2,int len,int maxlen ) {
 		x *= x;
 		C = x - a2/(m2 + 1 );
 
-		x = (B + arcMath::Sqrt(B*B - (4.0*A*C) ))/(2.0*A);
+		x = (B + anMath::Sqrt(B*B - (4.0*A*C) ) )/(2.0*A);
 		y = m*x + c;
 		pt = CPoint( ( int )x,( int )y);
 		if (Distance(pt,pt1) > maxlen || Distance(pt,pt2) > maxlen) {
-			x = (B - arcMath::Sqrt(B*B - (4.0*A*C) ))/(2.0 * A);
+			x = (B - anMath::Sqrt(B*B - (4.0*A*C) ) )/(2.0 * A);
 			y = m*x + c;
 			pt = CPoint( ( int )x,( int )y);
 		}
 	} else {
 		a2 = a*a;
-		y = arcMath::Sqrt(a2);
+		y = anMath::Sqrt(a2);
 		x = 0;
 		pt = CPoint( ( int )x,( int )y);
 		pt += pt1;
@@ -237,7 +237,7 @@ int Distance(CPoint pt1,CPoint pt2) {
 	x *= x;
 
 	a = ( double )x + ( double )y ;
-	a = arcMath::Sqrt( a );
+	a = anMath::Sqrt( a );
 	return ( int )a;
 }
 
@@ -358,7 +358,7 @@ HSVType RGBType::toHSV() {
 
 /////////////////////////////////////////////////////////////////////////////
 // CDialogColorPicker dialog
-CDialogColorPicker::CDialogColorPicker( COLORREF c, CWnd* pParent /*=NULL*/)
+CDialogColorPicker::CDialogColorPicker( COLORREF c, CWnd* pParent /*=nullptr*/)
 	: CDialog(CDialogColorPicker::IDD, pParent) {
 	//{{AFX_DATA_INIT(CDialogColorPicker)
 	m_overBright = 0.0f;
@@ -379,7 +379,7 @@ CDialogColorPicker::CDialogColorPicker( COLORREF c, CWnd* pParent /*=NULL*/)
 	m_bInitOver = FALSE;
 	m_bInDrawAll = FALSE;
 	overBright = 1.0f;
-	UpdateParent = NULL;
+	UpdateParent = nullptr;
 }
 
 CDialogColorPicker::~CDialogColorPicker() {
@@ -557,7 +557,7 @@ BOOL CDialogColorPicker::OnInitDialog() {
 	GetDlgItem(IDC_STATIC_NEWCOLOR)->GetWindowRect(&NewColorRect);
 	ScreenToClient(&NewColorRect);
 
-	CWindowDC dc(NULL);
+	CWindowDC dc(nullptr );
 	CSize bmSize;
 
 	//	Set Up HSB
@@ -612,7 +612,7 @@ BOOL CDialogColorPicker::OnInitDialog() {
 
 	m_bInitOver = TRUE;
 
-	SetTimer(0, 50, NULL);
+	SetTimer(0, 50, nullptr );
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -1089,7 +1089,7 @@ void CDialogColorPicker::LoadMappedBitmap(CBitmap& bitmap,UINT nIdResource,CSize
 		int i,j;
 
 		for ( i=0; i < height; i++ ){
-			for (j = 0; j < width; j++ ){
+			for ( j = 0; j < width; j++ ){
 				if (memDC.GetPixel(j,i) == sourceColor) {
 					memDC.SetPixel(j,i,colorWindow);
 				}

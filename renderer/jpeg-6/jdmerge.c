@@ -87,10 +87,10 @@ build_ycc_rgb_table (j_decompress_ptr cinfo)
   INT32 x;
   SHIFT_TEMPS
 
-  upsample->Cr_r_tab = ( int * )
+  upsample->Cr_r_tab = ( int*)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				(MAXJSAMPLE+1 ) * SIZEOF( int ) );
-  upsample->Cb_b_tab = ( int * )
+  upsample->Cb_b_tab = ( int*)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				(MAXJSAMPLE+1 ) * SIZEOF( int ) );
   upsample->Cr_g_tab = (INT32 *)
@@ -374,7 +374,7 @@ jinit_merged_upsampler (j_decompress_ptr cinfo)
   upsample = (my_upsample_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_upsampler) );
-  cinfo->upsample = (struct jpeg_upsampler *) upsample;
+  cinfo->upsample = ( struct jpeg_upsampler *) upsample;
   upsample->pub.start_pass = start_pass_merged_upsample;
   upsample->pub.need_context_rows = FALSE;
 
@@ -386,12 +386,12 @@ jinit_merged_upsampler (j_decompress_ptr cinfo)
     /* Allocate a spare row buffer */
     upsample->spare_row = (JSAMPROW)
       (*cinfo->mem->alloc_large) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-		(size_t) (upsample->out_row_width * SIZEOF(JSAMPLE) ));
+		( size_t) (upsample->out_row_width * SIZEOF(JSAMPLE) ) );
   } else {
     upsample->pub.upsample = merged_1v_upsample;
     upsample->upmethod = h2v1_merged_upsample;
     /* No spare row needed */
-    upsample->spare_row = NULL;
+    upsample->spare_row = nullptr;
   }
 
   build_ycc_rgb_table(cinfo);

@@ -111,7 +111,7 @@ public:
 	bool GetNurbMode() {
 		return nurbMode;
 	}
-	idCurve_NURBS<arcVec2> *GetNurb() {
+	anCurve_NURBS<anVec2> *GetNurb() {
 		return &nurb;
 	}
 	void OnPrecisionCursorCycle();
@@ -156,7 +156,7 @@ protected:  // control bar embedded members
 	bool m_bCamPreview;
 	bool busy;
 	bool nurbMode;
-	idCurve_NURBS<arcVec2> nurb;
+	anCurve_NURBS<anVec2> nurb;
 	// Generated message map functions
 protected:
 	bool m_bDoLoop;

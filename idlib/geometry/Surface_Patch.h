@@ -9,13 +9,13 @@
 ===============================================================================
 */
 
-class arcSurface_Patch : public arcSurface {
+class anSurface_Patch : public anSurface {
 
 public:
-						arcSurface_Patch( void );
-						arcSurface_Patch( int maxPatchWidth, int maxPatchHeight );
-						arcSurface_Patch( const arcSurface_Patch &patch );
-						~arcSurface_Patch( void );
+						anSurface_Patch( void );
+						anSurface_Patch( int maxPatchWidth, int maxPatchHeight );
+						anSurface_Patch( const anSurface_Patch &patch );
+						~anSurface_Patch( void );
 
 	void				SetSize( int patchWidth, int patchHeight );
 	int					GetWidth( void ) const;
@@ -45,34 +45,34 @@ private:
 						// move all points to the start of the verts buffer
 	void				Collapse( void );
 						// project a point onto a vector to calculate maximum curve error
-	void				ProjectPointOntoVector( const arcVec3 &point, const arcVec3 &vStart, const arcVec3 &vEnd, arcVec3 &vProj );
+	void				ProjectPointOntoVector( const anVec3 &point, const anVec3 &vStart, const anVec3 &vEnd, anVec3 &vProj );
 						// generate normals
 	void				GenerateNormals( void );
 						// generate triangle indexes
 	void				GenerateIndexes( void );
 						// lerp point from two patch point
-	void				LerpVert( const arcDrawVert &a, const arcDrawVert &b, arcDrawVert &out ) const;
+	void				LerpVert( const anDrawVertex &a, const anDrawVertex &b, anDrawVertex &out ) const;
 						// sample a single 3x3 patch
-	void				SampleSinglePatchPoint( const arcDrawVert ctrl[3][3], float u, float v, arcDrawVert *out ) const;
-	void				SampleSinglePatch( const arcDrawVert ctrl[3][3], int baseCol, int baseRow, int width, int horzSub, int vertSub, arcDrawVert *outVerts ) const;
+	void				SampleSinglePatchPoint( const anDrawVertex ctrl[3][3], float u, float v, anDrawVertex *out ) const;
+	void				SampleSinglePatch( const anDrawVertex ctrl[3][3], int baseCol, int baseRow, int width, int horzSub, int vertSub, anDrawVertex *outVerts ) const;
 };
 
 /*
 =================
-arcSurface_Patch::arcSurface_Patch
+anSurface_Patch::anSurface_Patch
 =================
 */
-ARC_INLINE arcSurface_Patch::arcSurface_Patch( void ) {
+ARC_INLINE anSurface_Patch::anSurface_Patch( void ) {
 	height = width = maxHeight = maxWidth = 0;
 	expanded = false;
 }
 
 /*
 =================
-arcSurface_Patch::arcSurface_Patch
+anSurface_Patch::anSurface_Patch
 =================
 */
-ARC_INLINE arcSurface_Patch::arcSurface_Patch( int maxPatchWidth, int maxPatchHeight ) {
+ARC_INLINE anSurface_Patch::anSurface_Patch( int maxPatchWidth, int maxPatchHeight ) {
 	width = height = 0;
 	maxWidth = maxPatchWidth;
 	maxHeight = maxPatchHeight;
@@ -82,36 +82,36 @@ ARC_INLINE arcSurface_Patch::arcSurface_Patch( int maxPatchWidth, int maxPatchHe
 
 /*
 =================
-arcSurface_Patch::arcSurface_Patch
+anSurface_Patch::anSurface_Patch
 =================
 */
-ARC_INLINE arcSurface_Patch::arcSurface_Patch( const arcSurface_Patch &patch ) {
+ARC_INLINE anSurface_Patch::anSurface_Patch( const anSurface_Patch &patch ) {
 	(*this) = patch;
 }
 
 /*
 =================
-arcSurface_Patch::~arcSurface_Patch
+anSurface_Patch::~anSurface_Patch
 =================
 */
-ARC_INLINE arcSurface_Patch::~arcSurface_Patch() {
+ARC_INLINE anSurface_Patch::~anSurface_Patch() {
 }
 
 /*
 =================
-arcSurface_Patch::GetWidth
+anSurface_Patch::GetWidth
 =================
 */
-ARC_INLINE int arcSurface_Patch::GetWidth( void ) const {
+ARC_INLINE int anSurface_Patch::GetWidth( void ) const {
 	return width;
 }
 
 /*
 =================
-arcSurface_Patch::GetHeight
+anSurface_Patch::GetHeight
 =================
 */
-ARC_INLINE int arcSurface_Patch::GetHeight( void ) const {
+ARC_INLINE int anSurface_Patch::GetHeight( void ) const {
 	return height;
 }
 

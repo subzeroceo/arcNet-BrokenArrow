@@ -4,35 +4,35 @@
 /*
 ===============================================================================
 
-	arcStringPool
+	anStringPool
 
 ===============================================================================
 */
 
-class arcStringPool;
+class anStringPool;
 
-class ARCPoolString : public arcNetString {
-	friend class arcStringPool;
+class ARCPoolString : public anString {
+	friend class anStringPool;
 
 public:
 						ARCPoolString() { numUsers = 0; }
 						~ARCPoolString() { assert( numUsers == 0 ); }
 
 						// returns total size of allocated memory
-	size_t				Allocated( void ) const { return arcNetString::Allocated(); }
+	size_t				Allocated( void ) const { return anString::Allocated(); }
 						// returns total size of allocated memory including size of string pool type
 	size_t				Size( void ) const { return sizeof( *this ) + Allocated(); }
 						// returns a pointer to the pool this string was allocated from
-	const arcStringPool *	GetPool( void ) const { return pool; }
+	const anStringPool *	GetPool( void ) const { return pool; }
 
 private:
-	arcStringPool *			pool;
+	anStringPool *			pool;
 	mutable int			numUsers;
 };
 
-class arcStringPool {
+class anStringPool {
 public:
-						arcStringPool() { caseSensitive = true; }
+						anStringPool() { caseSensitive = true; }
 
 	void				SetCaseSensitive( bool caseSensitive );
 
@@ -49,25 +49,25 @@ public:
 
 private:
 	bool				caseSensitive;
-	arcNetList<ARCPoolString *>	pool;
-	ARCHashIndex			poolHash;
+	anList<ARCPoolString *>	pool;
+	anHashIndex			poolHash;
 };
 
 /*
 ================
-arcStringPool::SetCaseSensitive
+anStringPool::SetCaseSensitive
 ================
 */
-ARC_INLINE void arcStringPool::SetCaseSensitive( bool caseSensitive ) {
+ARC_INLINE void anStringPool::SetCaseSensitive( bool caseSensitive ) {
 	this->caseSensitive = caseSensitive;
 }
 
 /*
 ================
-arcStringPool::AllocString
+anStringPool::AllocString
 ================
 */
-ARC_INLINE const ARCPoolString *arcStringPool::AllocString( const char *string ) {
+ARC_INLINE const ARCPoolString *anStringPool::AllocString( const char *string ) {
 	int i, hash;
 	ARCPoolString *poolStr;
 
@@ -89,7 +89,7 @@ ARC_INLINE const ARCPoolString *arcStringPool::AllocString( const char *string )
 	}
 
 	poolStr = new ARCPoolString;
-	*static_cast<arcNetString *>(poolStr) = string;
+	*static_cast<anString *>(poolStr) = string;
 	poolStr->pool = this;
 	poolStr->numUsers = 1;
 	poolHash.Add( hash, pool.Append( poolStr ) );
@@ -98,10 +98,10 @@ ARC_INLINE const ARCPoolString *arcStringPool::AllocString( const char *string )
 
 /*
 ================
-arcStringPool::FreeString
+anStringPool::FreeString
 ================
 */
-ARC_INLINE void arcStringPool::FreeString( const ARCPoolString *poolStr ) {
+ARC_INLINE void anStringPool::FreeString( const ARCPoolString *poolStr ) {
 	int i, hash;
 
 	assert( poolStr->numUsers >= 1 );
@@ -133,10 +133,10 @@ ARC_INLINE void arcStringPool::FreeString( const ARCPoolString *poolStr ) {
 
 /*
 ================
-arcStringPool::CopyString
+anStringPool::CopyString
 ================
 */
-ARC_INLINE const ARCPoolString *arcStringPool::CopyString( const ARCPoolString *poolStr ) {
+ARC_INLINE const ARCPoolString *anStringPool::CopyString( const ARCPoolString *poolStr ) {
 
 	assert( poolStr->numUsers >= 1 );
 
@@ -152,10 +152,10 @@ ARC_INLINE const ARCPoolString *arcStringPool::CopyString( const ARCPoolString *
 
 /*
 ================
-arcStringPool::Clear
+anStringPool::Clear
 ================
 */
-ARC_INLINE void arcStringPool::Clear( void ) {
+ARC_INLINE void anStringPool::Clear( void ) {
 	int i;
 
 	for ( i = 0; i < pool.Num(); i++ ) {
@@ -167,10 +167,10 @@ ARC_INLINE void arcStringPool::Clear( void ) {
 
 /*
 ================
-arcStringPool::Allocated
+anStringPool::Allocated
 ================
 */
-ARC_INLINE size_t arcStringPool::Allocated( void ) const {
+ARC_INLINE size_t anStringPool::Allocated( void ) const {
 	int i;
 	size_t size;
 
@@ -183,10 +183,10 @@ ARC_INLINE size_t arcStringPool::Allocated( void ) const {
 
 /*
 ================
-arcStringPool::Size
+anStringPool::Size
 ================
 */
-ARC_INLINE size_t arcStringPool::Size( void ) const {
+ARC_INLINE size_t anStringPool::Size( void ) const {
 	int i;
 	size_t size;
 

@@ -1,4 +1,4 @@
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 #if defined( MACOS_X )
@@ -10,42 +10,42 @@
 /*
 ===============================================================================
 
-	arcLibrary
+	anLibrary
 
 ===============================================================================
 */
 
-arcSystem *	arcLibrary::sys		= NULL;
-arcCommon *	arcLibrary::common		= NULL;
-arcCVarSystem *	arcLibrary::cvarSystem	= NULL;
-arcNetFile *		arcLibrary::fileSystem	= NULL;
-int				arcLibrary::frameNumber = 0;
+anSystem *	anLibrary::sys		= nullptr;
+anCommon *	anLibrary::common		= nullptr;
+anCVarSystem *	anLibrary::cvarSystem	= nullptr;
+anFile *		anLibrary::fileSystem	= nullptr;
+int				anLibrary::frameNumber = 0;
 
 /*
 ================
-arcLibrary::Init
+anLibrary::Init
 ================
 */
-void arcLibrary::Init( void ) {
+void anLibrary::Init( void ) {
 	assert( sizeof( bool ) == 1 );
 	Swap_Init();			// initialize little/big endian conversion
 	Mem_Init();				// initialize memory manager
-	arcNetString::InitMemory();	// init string memory allocator
+	anString::InitMemory();	// init string memory allocator
 	arcSIMD::Init();			// initialize generic SIMD implementation
-	arcMath::Init();		// initialize math
-	arcMatX::Test();		// test arcMatX
+	anMath::Init();		// initialize math
+	anMatX::Test();		// test anMatX
 	arcPolynomial::Test();	// test arcPolynomial
-	arcDictionary::Init(); // initialize the dictionary string pools
+	anDict::Init(); // initialize the dictionary string pools
 }
 
 /*
 ================
-arcLibrary::ShutDown
+anLibrary::ShutDown
 ================
 */
-void arcLibrary::ShutDown( void ) {
-	arcDictionary::Shutdown();	// shut down the dictionary string pools
-	arcNetString::ShutdownMemory(); // shut down the string memory allocator
+void anLibrary::ShutDown( void ) {
+	anDict::Shutdown();	// shut down the dictionary string pools
+	anString::ShutdownMemory(); // shut down the string memory allocator
 	arcSIMD::Shutdown();		// shut down the SIMD engine
 	Mem_Shutdown();			// shut down the memory manager
 }
@@ -58,24 +58,24 @@ void arcLibrary::ShutDown( void ) {
 ===============================================================================
 */
 
-arcVec4	colorBlack	= arcVec4( 0.00f, 0.00f, 0.00f, 1.00f );
-arcVec4	colorWhite	= arcVec4( 1.00f, 1.00f, 1.00f, 1.00f );
-arcVec4	colorRed	= arcVec4( 1.00f, 0.00f, 0.00f, 1.00f );
-arcVec4	colorGreen	= arcVec4( 0.00f, 1.00f, 0.00f, 1.00f );
-arcVec4	colorBlue	= arcVec4( 0.00f, 0.00f, 1.00f, 1.00f );
-arcVec4	colorYellow	= arcVec4( 1.00f, 1.00f, 0.00f, 1.00f );
-arcVec4	colorMagenta= arcVec4( 1.00f, 0.00f, 1.00f, 1.00f );
-arcVec4	colorCyan	= arcVec4( 0.00f, 1.00f, 1.00f, 1.00f );
-arcVec4	colorOrange	= arcVec4( 1.00f, 0.50f, 0.00f, 1.00f );
-arcVec4	colorPurple	= arcVec4( 0.60f, 0.00f, 0.60f, 1.00f );
-arcVec4	colorPink	= arcVec4( 0.73f, 0.40f, 0.48f, 1.00f );
-arcVec4	colorBrown	= arcVec4( 0.40f, 0.35f, 0.08f, 1.00f );
-arcVec4	colorLtGrey	= arcVec4( 0.75f, 0.75f, 0.75f, 1.00f );
-arcVec4	colorMdGrey	= arcVec4( 0.50f, 0.50f, 0.50f, 1.00f );
-arcVec4	colorDkGrey	= arcVec4( 0.25f, 0.25f, 0.25f, 1.00f );
-arcVec4 colorGold	= arcVec4(1.0f, 0.843f, 0.0f, 1.0f);
-arcVec4	colorBrown2	= ARVec4(0.3f, 0.23f, 0.0f, 1.0f);
-arcVec4	colorTrans	= ARVec4(0.0f, 0.0f, 0.0f, 0.0f);
+anVec4	colorBlack	= anVec4( 0.00f, 0.00f, 0.00f, 1.00f );
+anVec4	colorWhite	= anVec4( 1.00f, 1.00f, 1.00f, 1.00f );
+anVec4	colorRed	= anVec4( 1.00f, 0.00f, 0.00f, 1.00f );
+anVec4	colorGreen	= anVec4( 0.00f, 1.00f, 0.00f, 1.00f );
+anVec4	colorBlue	= anVec4( 0.00f, 0.00f, 1.00f, 1.00f );
+anVec4	colorYellow	= anVec4( 1.00f, 1.00f, 0.00f, 1.00f );
+anVec4	colorMagenta= anVec4( 1.00f, 0.00f, 1.00f, 1.00f );
+anVec4	colorCyan	= anVec4( 0.00f, 1.00f, 1.00f, 1.00f );
+anVec4	colorOrange	= anVec4( 1.00f, 0.50f, 0.00f, 1.00f );
+anVec4	colorPurple	= anVec4( 0.60f, 0.00f, 0.60f, 1.00f );
+anVec4	colorPink	= anVec4( 0.73f, 0.40f, 0.48f, 1.00f );
+anVec4	colorBrown	= anVec4( 0.40f, 0.35f, 0.08f, 1.00f );
+anVec4	colorLtGrey	= anVec4( 0.75f, 0.75f, 0.75f, 1.00f );
+anVec4	colorMdGrey	= anVec4( 0.50f, 0.50f, 0.50f, 1.00f );
+anVec4	colorDkGrey	= anVec4( 0.25f, 0.25f, 0.25f, 1.00f );
+anVec4 colorGold	= anVec4(1.0f, 0.843f, 0.0f, 1.0f);
+anVec4	colorBrown2	= ARVec4(0.3f, 0.23f, 0.0f, 1.0f);
+anVec4	colorTrans	= ARVec4(0.0f, 0.0f, 0.0f, 0.0f);
 
 static dword colorMask[2] = { 255, 0 };
 
@@ -93,7 +93,7 @@ ARC_INLINE static byte ColorFloatToByte( float c ) {
 PackColor
 ================
 */
-dword PackColor( const arcVec4 &color ) {
+dword PackColor( const anVec4 &color ) {
 	dword dx = ColorFloatToByte( color.x );
 	dword dy = ColorFloatToByte( color.y );
 	dword dz = ColorFloatToByte( color.z );
@@ -113,7 +113,7 @@ dword PackColor( const arcVec4 &color ) {
 UnpackColor
 ================
 */
-void UnpackColor( const dword color, arcVec4 &unpackedColor ) {
+void UnpackColor( const dword color, anVec4 &unpackedColor ) {
 #if defined(_WIN32) || defined(__linux__) || (defined(MACOS_X) && defined(__i386__) )
 	unpackedColor.Set( ( ( color >> 0 ) & 255 ) * ( 1.0f / 255.0f ),
 						( ( color >> 8 ) & 255 ) * ( 1.0f / 255.0f ),
@@ -134,7 +134,7 @@ void UnpackColor( const dword color, arcVec4 &unpackedColor ) {
 PackColor
 ================
 */
-dword PackColor( const arcVec3 &color ) {
+dword PackColor( const anVec3 &color ) {
 	dword dx = ColorFloatToByte( color.x );
 	dword dy = ColorFloatToByte( color.y );
 	dword dz = ColorFloatToByte( color.z );
@@ -153,7 +153,7 @@ dword PackColor( const arcVec3 &color ) {
 UnpackColor
 ================
 */
-void UnpackColor( const dword color, arcVec3 &unpackedColor ) {
+void UnpackColor( const dword color, anVec3 &unpackedColor ) {
 #if defined(_WIN32) || defined(__linux__) || (defined(MACOS_X) && defined(__i386__) )
 	unpackedColor.Set( ( ( color >> 0 ) & 255 ) * ( 1.0f / 255.0f ),
 						( ( color >> 8 ) & 255 ) * ( 1.0f / 255.0f ),
@@ -169,15 +169,15 @@ void UnpackColor( const dword color, arcVec3 &unpackedColor ) {
 
 /*
 ===============
-arcLibrary::Error
+anLibrary::Error
 ===============
 */
-void arcLibrary::Error( const char *fmt, ... ) {
+void anLibrary::Error( const char *fmt, ... ) {
 	va_list		argptr;
 	char		text[MAX_STRING_CHARS];
 
 	va_start( argptr, fmt );
-	arcNetString::vsnPrintf( text, sizeof( text ), fmt, argptr );
+	anString::vsnPrintf( text, sizeof( text ), fmt, argptr );
 	va_end( argptr );
 
 	common->Error( "%s", text );
@@ -185,15 +185,15 @@ void arcLibrary::Error( const char *fmt, ... ) {
 
 /*
 ===============
-arcLibrary::Warning
+anLibrary::Warning
 ===============
 */
-void arcLibrary::Warning( const char *fmt, ... ) {
+void anLibrary::Warning( const char *fmt, ... ) {
 	va_list		argptr;
 	char		text[MAX_STRING_CHARS];
 
 	va_start( argptr, fmt );
-	arcNetString::vsnPrintf( text, sizeof( text ), fmt, argptr );
+	anString::vsnPrintf( text, sizeof( text ), fmt, argptr );
 	va_end( argptr );
 
 	common->Warning( "%s", text );
@@ -402,7 +402,7 @@ SixtetsForIntLittle
 ================
 */
 void SixtetsForIntLittle( byte *out, int src) {
-	byte *b = ( byte * )&src;
+	byte *b = (byte *)&src;
 	out[0] = ( b[0] & 0xfc ) >> 2;
 	out[1] = ( ( b[0] & 0x3 ) << 4 ) + ( ( b[1] & 0xf0 ) >> 4 );
 	out[2] = ( ( b[1] & 0xf ) << 2 ) + ( ( b[2] & 0xc0 ) >> 6 );
@@ -429,7 +429,7 @@ IntForSixtetsLittle
 */
 int IntForSixtetsLittle( byte *in ) {
 	int ret = 0;
-	byte *b = ( byte * )&ret;
+	byte *b = (byte *)&ret;
 	b[0] |= in[0] << 2;
 	b[0] |= ( in[1] & 0x30 ) >> 4;
 	b[1] |= ( in[1] & 0xf ) << 4;
@@ -463,7 +463,7 @@ void Swap_Init( void ) {
 	byte	swaptest[2] = {1,0};
 
 	// set the byte swapping variables in a portable manner
-	if ( *(short *)swaptest == 1 ) {
+	if ( *( short *)swaptest == 1 ) {
 		// little endian ex: x86
 		_BigShort = ShortSwap;
 		_LittleShort = ShortNoSwap;
@@ -499,19 +499,19 @@ Swap_IsBigEndian
 */
 bool Swap_IsBigEndian( void ) {
 	byte	swaptest[2] = {1,0};
-	return *(short *)swaptest != 1;
+	return *( short *)swaptest != 1;
 }
 
 /*
 ===============================================================================
 
 	Assertion
-
+				Contains the AssertMacro implementation.
 ===============================================================================
 */
 
-void AssertFailed( const char *file, int line, const char *expression ) {
-	arcLibrary::sys->DebugPrintf( "\n\nASSERTION FAILED!\n%s(%d): '%s'\n", file, line, expression );
+void AssertFailed( const char *file, int line, const char *expression ) const {
+	anLibrary::sys->DebugPrintf( "\n\nASSERTION FAILED!\n%s(%d): '%s'\n", file, line, expression );
 #ifdef _WIN32
 	__asm int 0x03
 #elif defined( __linux__ )
@@ -520,3 +520,55 @@ void AssertFailed( const char *file, int line, const char *expression ) {
 	kill( getpid(), SIGINT );
 #endif
 }
+
+anCVar com_assertOutOfDebugger( "com_assertOutOfDebugger", "0", CVAR_BOOL, "by default, do not assert while not running under the debugger" );
+
+struct skippedAssertion_t {
+	skippedAssertion_t() : file( nullptr ), line( -1 ) {}
+	const char *	file;
+	int				line;
+};
+static anStaticList<skippedAssertion_t,20> skippedAssertions;
+
+/*
+========================
+AssertFailed
+========================
+*/
+bool AssertFailed( const char *file, int line, const char *expression ) {
+	// Set this to true to skip ALL assertions, including ones YOU CAUSE!
+	static volatile bool skipAllAssertions = false;
+	if ( skipAllAssertions ) {
+		return false;
+	}
+
+	// Set this to true to skip ONLY this assertion
+	static volatile bool skipThisAssertion = false;
+	skipThisAssertion = false;
+
+	for ( int i = 0; i < skippedAssertions.Num(); i++ ) {
+		if ( skippedAssertions[i].file == file && skippedAssertions[i].line == line ) {
+			skipThisAssertion = true;
+			// Set breakpoint here to re-enable
+			if ( !skipThisAssertion ) {
+				skippedAssertions.RemoveIndexFast( i );
+			}
+			return false;
+		}
+	}
+
+	idLib::Warning( "ASSERTION FAILED! %s(%d): '%s'", file, line, expression );
+
+	if ( IsDebuggerPresent() || com_assertOutOfDebugger.GetBool() ) {
+			__debugbreak();
+	}
+
+	if ( skipThisAssertion ) {
+		skippedAssertion_t * skipped = skippedAssertions.Alloc();
+		skipped->file = file;
+		skipped->line = line;
+	}
+
+	return true;
+}
+anExceptions::anExceptions(const char *text) { strcpy( error, text); }

@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "Simd_Generic.h"
@@ -21,7 +21,7 @@
 arcSIMD_SSE3::GetName
 ============
 */
-const char * arcSIMD_SSE3::GetName( void ) const {
+const char *arcSIMD_SSE3::GetName( void ) const {
 	return "MMX & SSE & SSE2 & SSE3";
 }
 
@@ -96,7 +96,7 @@ const char * arcSIMD_SSE3::GetName( void ) const {
 #define _xmm6	0xC6
 #define _xmm7	0xC7
 
-#define RSCALE( s )		( (s&2)<<5 ) | ( (s&4)<<5 ) | ( (s&8)<<3 ) | ( (s&8)<<4 )
+#define RSCALE( s )		( ( s&2)<<5 ) | ( ( s&4)<<5 ) | ( ( s&8)<<3 ) | ( ( s&8)<<4 )
 
 #define ADDRESS_ADDC( reg0, constant )						0x40 | ( reg0 & 7 )	\
 	_asm _emit constant
@@ -211,7 +211,7 @@ const char * arcSIMD_SSE3::GetName( void ) const {
 SSE3_Dot
 ============
 */
-float SSE3_Dot( const arcVec4 &v1, const arcVec4 &v2 ) {
+float SSE3_Dot( const anVec4 &v1, const anVec4 &v2 ) {
 	float d;
 	__asm {
 		mov		esi, v1
@@ -230,7 +230,7 @@ float SSE3_Dot( const arcVec4 &v1, const arcVec4 &v2 ) {
 arcSIMD_SSE3::GetName
 ============
 */
-const char * arcSIMD_SSE3::GetName( void ) const {
+const char *arcSIMD_SSE3::GetName( void ) const {
 	return "MMX & SSE & SSE2 & SSE3";
 }
 
@@ -239,12 +239,12 @@ const char * arcSIMD_SSE3::GetName( void ) const {
 arcSIMD_SSE3::TransformVerts
 ============
 */
-void VPCALL arcSIMD_SSE3::TransformVerts( arcDrawVert *verts, const int numVerts, const arcJointMat *joints, const arcVec4 *weights, const int *index, const int numWeights ) {
+void VPCALL arcSIMD_SSE3::TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights ) {
 #if 1
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
-	assert( sizeof( arcVec4 ) == JOINTWEIGHT_SIZE );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anVec4 ) == JOINTWEIGHT_SIZE );
 	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
 
 	__asm {
@@ -316,9 +316,9 @@ void VPCALL arcSIMD_SSE3::TransformVerts( arcDrawVert *verts, const int numVerts
 #else
 
 	int i;
-	const byte *jointsPtr = ( byte * )joints;
+	const byte *jointsPtr = (byte *)joints;
 	for ( int j = i = 0; i < numVerts; i++ ) {
-		arcVec3 v;
+		anVec3 v;
 		v = ( *(arcJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
 		while( index[j*2+1] == 0 ) {
 			j++;

@@ -27,9 +27,9 @@ public:
 	static rvGEWindowWrapper*	GetWrapper ( idWindow* window );
 
 	idWindow*			GetWindow			( void );
-	arcDictionary&				GetStateDict		( void );
-	arcDictionary&				GetVariableDict		( void );
-	arcDictionary&				GetScriptDict		( void );
+	anDict&				GetStateDict		( void );
+	anDict&				GetVariableDict		( void );
+	anDict&				GetScriptDict		( void );
 	idRectangle&		GetClientRect		( void );
 	idRectangle&		GetScreenRect		( void );
 	EWindowType			GetWindowType		( void );
@@ -38,10 +38,10 @@ public:
 	idWindow*			GetChild			( int index );
 
 	void				SetRect				( idRectangle& rect );
-	void				SetState			( const arcDictionary& dict );
+	void				SetState			( const anDict& dict );
 	void				SetStateKey			( const char* key, const char* value, bool update = true );
 	void				DeleteStateKey		( const char* key );
-	bool				VerfiyStateKey		( const char* name, const char* value, arcNetString* result = NULL );
+	bool				VerfiyStateKey		( const char* name, const char* value, anString* result = nullptr );
 
 	bool				IsFlippedHorz		( void );
 	bool				IsFlippedVert		( void );
@@ -81,9 +81,9 @@ protected:
 	idRectangle		mClientRect;
 	idRectangle		mScreenRect;
 	idWindow*		mWindow;
-	arcDictionary			mState;
-	arcDictionary			mVariables;
-	arcDictionary			mScripts;
+	anDict			mState;
+	anDict			mVariables;
+	anDict			mScripts;
 	bool			mFlippedHorz;
 	bool			mFlippedVert;
 	bool			mHidden;
@@ -95,17 +95,17 @@ protected:
 	EWindowType		mType;
 };
 
-ARC_INLINE arcDictionary& rvGEWindowWrapper::GetStateDict ( void )
+ARC_INLINE anDict& rvGEWindowWrapper::GetStateDict ( void )
 {
 	return mState;
 }
 
-ARC_INLINE arcDictionary& rvGEWindowWrapper::GetVariableDict ( void )
+ARC_INLINE anDict& rvGEWindowWrapper::GetVariableDict ( void )
 {
 	return mVariables;
 }
 
-ARC_INLINE arcDictionary& rvGEWindowWrapper::GetScriptDict ( void )
+ARC_INLINE anDict& rvGEWindowWrapper::GetScriptDict ( void )
 {
 	return mScripts;
 }

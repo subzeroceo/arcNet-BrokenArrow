@@ -21,20 +21,20 @@ static /* const */ char *nvctrl_extension_name = NV_CONTROL_NAME;
 static int close_display();
 static Bool wire_to_event();
 static /* const */ XExtensionHooks nvctrl_extension_hooks = {
-		NULL,                               /* create_gc */
-		NULL,                               /* copy_gc */
-		NULL,                               /* flush_gc */
-		NULL,                               /* free_gc */
-		NULL,                               /* create_font */
-		NULL,                               /* free_font */
+		nullptr,                               /* create_gc */
+		nullptr,                               /* copy_gc */
+		nullptr,                               /* flush_gc */
+		nullptr,                               /* free_gc */
+		nullptr,                               /* create_font */
+		nullptr,                               /* free_font */
 		close_display,                      /* close_display */
 		wire_to_event,                      /* wire_to_event */
-		NULL,                               /* event_to_wire */
-		NULL,                               /* error */
-		NULL,                               /* error_string */
+		nullptr,                               /* event_to_wire */
+		nullptr,                               /* error */
+		nullptr,                               /* error_string */
 };
 
-static XEXT_GENERATE_FIND_DISPLAY(find_display, nvctrl_ext_info, nvctrl_extension_name, &nvctrl_extension_hooks, NV_CONTROL_EVENTS, NULL)
+static XEXT_GENERATE_FIND_DISPLAY(find_display, nvctrl_ext_info, nvctrl_extension_name, &nvctrl_extension_hooks, NV_CONTROL_EVENTS, nullptr )
 static XEXT_GENERATE_CLOSE_DISPLAY (close_display, nvctrl_ext_info)
 
 Bool XNVCTRLQueryExtension(Display *dpy, int *event_basep, int *error_basep) {
@@ -42,7 +42,7 @@ Bool XNVCTRLQueryExtension(Display *dpy, int *event_basep, int *error_basep) {
 
 		if (XextHasExtension(info) ) {
 				if (event_basep) *event_basep = info->codes->first_event;
-				if (error_basep) *error_basep = info->codes->first_error;
+				if ( error_basep) *error_basep = info->codes->first_error;
 				return True;
 		} else {
 				return False;
@@ -189,7 +189,7 @@ Bool XNVCTRLQueryStringAttribute(Display *dpy, int screen, unsigned int display_
 				return False;
 		} else {
 				_XRead(dpy, (char *) *ptr, numbytes);
-				if (slop) _XEatData(dpy, 4-slop);
+				if ( slop) _XEatData(dpy, 4-slop);
 		}
 		exists = rep.flags;
 		UnlockDisplay (dpy);

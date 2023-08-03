@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -39,7 +39,7 @@ If you have questions concerning this license or the applicable additional terms
 // DialogAFConstraintFixed dialog
 
 toolTip_t DialogAFConstraintFixed::toolTips[] = {
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 IMPLEMENT_DYNAMIC(DialogAFConstraintFixed, CDialog)
@@ -49,10 +49,10 @@ IMPLEMENT_DYNAMIC(DialogAFConstraintFixed, CDialog)
 DialogAFConstraintFixed::DialogAFConstraintFixed
 ================
 */
-DialogAFConstraintFixed::DialogAFConstraintFixed(CWnd* pParent /*=NULL*/)
+DialogAFConstraintFixed::DialogAFConstraintFixed(CWnd* pParent /*=nullptr*/)
 	: CDialog(DialogAFConstraintFixed::IDD, pParent)
-	, constraint(NULL)
-	, file(NULL)
+	, constraint(nullptr )
+	, file(nullptr )
 {
 	Create( IDD_DIALOG_AF_CONSTRAINT_FIXED, pParent );
 	EnableToolTips( TRUE );
@@ -90,9 +90,9 @@ void DialogAFConstraintFixed::InitJointLists( void ) {
 DialogAFConstraintFixed::LoadFile
 ================
 */
-void DialogAFConstraintFixed::LoadFile( arcDeclAF *af ) {
+void DialogAFConstraintFixed::LoadFile( anDeclAF *af ) {
 	file = af;
-	constraint = NULL;
+	constraint = nullptr;
 	InitJointLists();
 }
 
@@ -110,7 +110,7 @@ void DialogAFConstraintFixed::SaveFile( void ) {
 DialogAFConstraintFixed::LoadConstraint
 ================
 */
-void DialogAFConstraintFixed::LoadConstraint( arcDeclAF_Constraint *c ) {
+void DialogAFConstraintFixed::LoadConstraint( anDeclAF_Constraint *c ) {
 
 	constraint = c;
 

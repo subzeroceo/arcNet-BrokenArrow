@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../renderer/tr_local.h"
@@ -14,15 +14,15 @@ public:
   fhTrisBuffer();
   void Add(const fhSimpleVert* vertices, int verticesCount);
   void Add(const fhSimpleVert& a, const fhSimpleVert& b, const fhSimpleVert& c);
-  void Add(arcVec3 a, arcVec3 b, arcVec3 c, arcVec4 color = arcVec4( 1,1,1,1 ) );
+  void Add(anVec3 a, anVec3 b, anVec3 c, anVec4 color = anVec4( 1,1,1,1 ) );
   void Clear();
-  void Commit(ARCImage* texture, const arcVec4& colorModulate, const arcVec4& colorAdd);
+  void Commit(anImage* texture, const anVec4& colorModulate, const anVec4& colorAdd);
 
   const fhSimpleVert* Vertices() const;
   int TriNum() const;
 
 private:
-  arcNetList<fhSimpleVert> vertices;
+  anList<fhSimpleVert> vertices;
 };
 
 class fhSurfaceBuffer {
@@ -30,19 +30,19 @@ public:
   fhSurfaceBuffer();
   ~fhSurfaceBuffer();
 
-  fhTrisBuffer* GetMaterialBuffer(const arcMaterial* material);
+  fhTrisBuffer* GetMaterialBuffer(const anMaterial* material);
   fhTrisBuffer* GetColorBuffer();
 
   void Clear();
-  void Commit(const arcVec4& colorModulate = arcVec4( 1,1,1,1 ), const arcVec4& colorAdd = arcVec4(0,0,0,0 ) );
+  void Commit(const anVec4& colorModulate = anVec4( 1,1,1,1 ), const anVec4& colorAdd = anVec4(0,0,0,0 ) );
 
 private:
   struct entry_t {
-    const arcMaterial* material;
+    const anMaterial* material;
     fhTrisBuffer trisBuffer;
   };
 
-  arcNetList<entry_t*> entries;
+  anList<entry_t*> entries;
   fhTrisBuffer coloredTrisBuffer;
 };
 
@@ -51,19 +51,19 @@ public:
   fhPointBuffer();
   ~fhPointBuffer();
 
-  void Add(const arcVec3& xyz, const arcVec4& color, float size);
-  void Add(const arcVec3& xyz, const arcVec3& color, float size);
+  void Add(const anVec3& xyz, const anVec4& color, float size);
+  void Add(const anVec3& xyz, const anVec3& color, float size);
   void Clear();
   void Commit();
 
 private:
   struct entry_t {
-    arcNetList<fhSimpleVert> vertices;
+    anList<fhSimpleVert> vertices;
     float size;
     void Commit();
   };
 
-  arcNetList<entry_t*> entries;
+  anList<entry_t*> entries;
   const short* indices = nullptr;
 };
 
@@ -89,7 +89,7 @@ void fhTrisBuffer::Add(const fhSimpleVert* vertices, int verticesCount) {
     this->vertices.Append(vertices[i] );
 }
 
-void fhTrisBuffer::Add(arcVec3 a, arcVec3 b, arcVec3 c, arcVec4 color) {
+void fhTrisBuffer::Add(anVec3 a, anVec3 b, anVec3 c, anVec4 color) {
 
   fhSimpleVert vert;
   vert.color[0] = static_cast<byte>(color[0] * 255.0f);
@@ -126,7 +126,7 @@ int fhTrisBuffer::TriNum() const {
   return vertices.Num() / 3;
 }
 
-void fhTrisBuffer::Commit(ARCImage* texture, const arcVec4& colorModulate, const arcVec4& colorAdd) {
+void fhTrisBuffer::Commit(anImage* texture, const anVec4& colorModulate, const anVec4& colorAdd) {
   const int verticesUsed = vertices.Num();
 
   if (verticesUsed > 0 ) {
@@ -142,10 +142,10 @@ void fhTrisBuffer::Commit(ARCImage* texture, const arcVec4& colorModulate, const
 
     fhRenderProgram::SetModelViewMatrix( GL_ModelViewMatrix.Top() );
     fhRenderProgram::SetProjectionMatrix( GL_ProjectionMatrix.Top() );
-    fhRenderProgram::SetDiffuseColor(arcVec4( 1,1,1,1 ) );
+    fhRenderProgram::SetDiffuseColor(anVec4( 1,1,1,1 ) );
 	fhRenderProgram::SetColorAdd(colorAdd);
 	fhRenderProgram::SetColorModulate(colorModulate);
-	fhRenderProgram::SetBumpMatrix(arcVec4( 1,0,0,0 ), arcVec4(0,1,0,0 ) );
+	fhRenderProgram::SetBumpMatrix(anVec4( 1,0,0,0 ), anVec4(0,1,0,0 ) );
 
     int verticesCommitted = 0;
     while (verticesCommitted < verticesUsed)
@@ -177,7 +177,7 @@ fhSurfaceBuffer::~fhSurfaceBuffer() {
   }
 }
 
-fhTrisBuffer* fhSurfaceBuffer::GetMaterialBuffer(const arcMaterial* material) {
+fhTrisBuffer* fhSurfaceBuffer::GetMaterialBuffer(const anMaterial* material) {
   if ( !material)
     return GetColorBuffer();
 
@@ -212,7 +212,7 @@ void fhSurfaceBuffer::Clear() {
   coloredTrisBuffer.Clear();
 }
 
-void fhSurfaceBuffer::Commit(const arcVec4& colorModulate, const arcVec4& colorAdd) {
+void fhSurfaceBuffer::Commit(const anVec4& colorModulate, const anVec4& colorAdd) {
   for ( int i=0; i<entries.Num(); ++i) {
     entry_t* entry = entries[i];
 
@@ -233,7 +233,7 @@ fhPointBuffer::~fhPointBuffer() {
 	}
 }
 
-void fhPointBuffer::Add(const arcVec3& xyz, const arcVec4& color, float size) {
+void fhPointBuffer::Add(const anVec3& xyz, const anVec4& color, float size) {
   if (size <= 0.001f)
     return;
 
@@ -261,8 +261,8 @@ void fhPointBuffer::Add(const arcVec3& xyz, const arcVec4& color, float size) {
   entries.Append(e);
 }
 
-void fhPointBuffer::Add(const arcVec3& xyz, const arcVec3& color, float size) {
-  Add(xyz, arcVec4(color, 1.0f), size);
+void fhPointBuffer::Add(const anVec3& xyz, const anVec3& color, float size) {
+  Add(xyz, anVec4(color, 1.0f), size);
 }
 
 void fhPointBuffer::Clear() {
@@ -295,9 +295,9 @@ void fhPointBuffer::entry_t::Commit() {
 
     fhRenderProgram::SetModelViewMatrix( GL_ModelViewMatrix.Top() );
     fhRenderProgram::SetProjectionMatrix( GL_ProjectionMatrix.Top() );
-	fhRenderProgram::SetDiffuseColor(arcVec4( 1,1,1,1 ) );
-	fhRenderProgram::SetColorAdd(arcVec4(0,0,0,0 ) );
-	fhRenderProgram::SetColorModulate(arcVec4( 1,1,1,1 ) );
+	fhRenderProgram::SetDiffuseColor(anVec4( 1,1,1,1 ) );
+	fhRenderProgram::SetColorAdd(anVec4(0,0,0,0 ) );
+	fhRenderProgram::SetColorModulate(anVec4( 1,1,1,1 ) );
 
     int verticesCommitted = 0;
     while (verticesCommitted < verticesUsed) {

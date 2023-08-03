@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/win_local.h"
@@ -24,7 +24,7 @@ InitAfx
 */
 void InitAfx( void ) {
 	if ( !afxInitialized ) {
-		AfxWinInit( win32.hInstance, NULL, "", SW_SHOW );
+		AfxWinInit( win32.hInstance, nullptr, "", SW_SHOW );
 		AfxInitRichEdit();
 		afxInitialized = true;
 	}

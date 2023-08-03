@@ -36,7 +36,7 @@ jpeg_create_compress (j_compress_ptr cinfo)
    */
   {
     struct jpeg_error_mgr * err = cinfo->err;
-    MEMZERO(cinfo, SIZEOF(struct jpeg_compress_struct) );
+    MEMZERO(cinfo, SIZEOF( struct jpeg_compress_struct) );
     cinfo->err = err;
   }
   cinfo->is_decompressor = FALSE;
@@ -45,17 +45,17 @@ jpeg_create_compress (j_compress_ptr cinfo)
   jinit_memory_mgr((j_common_ptr) cinfo);
 
   /* Zero out pointers to permanent structures. */
-  cinfo->progress = NULL;
-  cinfo->dest = NULL;
+  cinfo->progress = nullptr;
+  cinfo->dest = nullptr;
 
-  cinfo->comp_info = NULL;
+  cinfo->comp_info = nullptr;
 
   for ( i = 0; i < NUM_QUANT_TBLS; i++ )
-    cinfo->quant_tbl_ptrs[i] = NULL;
+    cinfo->quant_tbl_ptrs[i] = nullptr;
 
   for ( i = 0; i < NUM_HUFF_TBLS; i++ ) {
-    cinfo->dc_huff_tbl_ptrs[i] = NULL;
-    cinfo->ac_huff_tbl_ptrs[i] = NULL;
+    cinfo->dc_huff_tbl_ptrs[i] = nullptr;
+    cinfo->ac_huff_tbl_ptrs[i] = nullptr;
   }
 
   cinfo->input_gamma = 1.0;	/* in case application forgets */
@@ -108,14 +108,14 @@ jpeg_suppress_tables (j_compress_ptr cinfo, boolean suppress)
   JHUFF_TBL * htbl;
 
   for ( i = 0; i < NUM_QUANT_TBLS; i++ ) {
-    if ((qtbl = cinfo->quant_tbl_ptrs[i] ) != NULL)
+    if ((qtbl = cinfo->quant_tbl_ptrs[i] ) != nullptr )
       qtbl->sent_table = suppress;
   }
 
   for ( i = 0; i < NUM_HUFF_TBLS; i++ ) {
-    if ((htbl = cinfo->dc_huff_tbl_ptrs[i] ) != NULL)
+    if ((htbl = cinfo->dc_huff_tbl_ptrs[i] ) != nullptr )
       htbl->sent_table = suppress;
-    if ((htbl = cinfo->ac_huff_tbl_ptrs[i] ) != NULL)
+    if ((htbl = cinfo->ac_huff_tbl_ptrs[i] ) != nullptr )
       htbl->sent_table = suppress;
   }
 }
@@ -145,7 +145,7 @@ jpeg_finish_compress (j_compress_ptr cinfo)
   while ( ! cinfo->master->is_last_pass) {
     (*cinfo->master->prepare_for_pass) (cinfo);
     for (iMCU_row = 0; iMCU_row < cinfo->total_iMCU_rows; iMCU_row++ ) {
-      if (cinfo->progress != NULL) {
+      if (cinfo->progress != nullptr ) {
 	cinfo->progress->pass_counter = (long) iMCU_row;
 	cinfo->progress->pass_limit = (long) cinfo->total_iMCU_rows;
 	(*cinfo->progress->progress_monitor) ((j_common_ptr) cinfo);
@@ -153,7 +153,7 @@ jpeg_finish_compress (j_compress_ptr cinfo)
       /* We bypass the main controller and invoke coef controller directly;
        * all work is being done from the coefficient buffer.
        */
-      if ( ! (*cinfo->coef->compress_data) (cinfo, (JSAMPIMAGE) NULL) )
+      if ( ! (*cinfo->coef->compress_data) (cinfo, (JSAMPIMAGE) nullptr ) )
 	ERREXIT(cinfo, JERR_CANT_SUSPEND);
     }
     (*cinfo->master->finish_pass) (cinfo);
@@ -204,7 +204,7 @@ jpeg_write_marker (j_compress_ptr cinfo, int marker,
  *		jpeg_finish_compress(cinfo);
  *
  * jpeg_write_tables has the side effect of marking all tables written
- * (same as jpeg_suppress_tables(..., TRUE) ).  Thus a subsequent start_compress
+ * ( same as jpeg_suppress_tables(..., TRUE) ).  Thus a subsequent start_compress
  * will not re-emit the tables unless it is passed write_all_tables=TRUE.
  */
 

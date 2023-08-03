@@ -4,32 +4,32 @@
 /*
 ===============================================================================
 
-	idCompressor is a layer ontop of arcNetFile which provides lossless data
+	anCompressor is a layer ontop of anFile which provides lossless data
 	compression. The compressor can be used as a regular file and multiple
 	compressors can be stacked ontop of each other.
 
 ===============================================================================
 */
 
-class idCompressor : public arcNetFile {
+class anCompressor : public anFile {
 public:
 							// compressor allocation
-	static idCompressor *	AllocNoCompression();
-	static idCompressor *	AllocBitStream();
-	static idCompressor *	AllocRunLength();
-	static idCompressor *	AllocRunLength_ZeroBased();
-	static idCompressor *	AllocHuffman();
-	static idCompressor *	AllocArithmetic();
-	static idCompressor *	AllocLZSS();
-	static idCompressor *	AllocLZSS_WordAligned();
-	static idCompressor *	AllocLZW();
+	static anCompressor *	AllocNoCompression();
+	static anCompressor *	AllocBitStream();
+	static anCompressor *	AllocRunLength();
+	static anCompressor *	AllocRunLength_ZeroBased();
+	static anCompressor *	AllocHuffman();
+	static anCompressor *	AllocArithmetic();
+	static anCompressor *	AllocLZSS();
+	static anCompressor *	AllocLZSS_WordAligned();
+	static anCompressor *	AllocLZW();
 
 							// initialization
-	virtual void			Init( arcNetFile *f, bool compress, int wordLength ) = 0;
+	virtual void			Init( anFile *f, bool compress, int wordLength ) = 0;
 	virtual void			FinishCompress() = 0;
 	virtual float			GetCompressionRatio() const = 0;
 
-							// common arcNetFile interface
+							// common anFile interface
 	virtual const char *	GetName() = 0;
 	virtual const char *	GetFullPath() = 0;
 	virtual int				Read( void *outData, int outLength ) = 0;

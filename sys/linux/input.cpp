@@ -1,11 +1,11 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #include "../posix/posix_public.h"
 #include "local.h"
 #include <pthread.h>
 
-arcCVarSystem in_mouse( "in_mouse", "1", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
-arcCVarSystem in_dgamouse( "in_dgamouse", "1", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
-arcCVarSystem in_nograb( "in_nograb", "0", CVAR_SYSTEM | CVAR_NOCHEAT, "" );
+anCVarSystem in_mouse( "in_mouse", "1", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
+anCVarSystem in_dgamouse( "in_dgamouse", "1", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
+anCVarSystem in_nograb( "in_nograb", "0", CVAR_SYSTEM | CVAR_NOCHEAT, "" );
 
 // have a working xkb extension
 static bool have_xkb = false;
@@ -45,7 +45,7 @@ static byte s_scantokey[128] = {
 /* 78 */ 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void IN_Clear_f( const arcCommandArgs &args ) {
+void IN_Clear_f( const anCommandArgs &args ) {
 	idKeyInput::ClearStates();
 }
 
@@ -224,7 +224,7 @@ static bool Sys_XPendingInput( void ) {
     x11_fd = ConnectionNumber( dpy );
     FD_ZERO( &fdset );
     FD_SET( x11_fd, &fdset );
-    if ( select( x11_fd+1, &fdset, NULL, NULL, &zero_time ) == 1 ) {
+    if ( select( x11_fd+1, &fdset, nullptr, nullptr, &zero_time ) == 1 ) {
 		return XPending( dpy );
     }
 	// Oh well, nothing is ready ..
@@ -247,14 +247,14 @@ static bool Sys_XRepeatPress( XEvent *event ) {
 			repeated = true;
 			XNextEvent( dpy, &peekevent );
 			// emit an SE_CHAR for the repeat
-			lookupRet = XLookupString( (XKeyEvent*)&peekevent, buf, sizeof(buf), &keysym, NULL );
+			lookupRet = XLookupString( (XKeyEvent*)&peekevent, buf, sizeof(buf), &keysym, nullptr );
 			if (lookupRet > 0 ) {
-				Posix_QueEvent( SE_CHAR, buf[ 0 ], 0, 0, NULL);
+				Posix_QueEvent( SE_CHAR, buf[ 0 ], 0, 0, nullptr );
 			} else {
 				// shouldn't we be doing a release/press in this order rather?
 				// ( doesn't work .. but that's what I would have expected to do though )
-				Posix_QueEvent( SE_KEY, s_scantokey[peekevent.xkey.keycode], true, 0, NULL);
-				Posix_QueEvent( SE_KEY, s_scantokey[peekevent.xkey.keycode], false, 0, NULL);
+				Posix_QueEvent( SE_KEY, s_scantokey[peekevent.xkey.keycode], true, 0, nullptr );
+				Posix_QueEvent( SE_KEY, s_scantokey[peekevent.xkey.keycode], false, 0, nullptr );
 			}
 		}
   	}
@@ -288,8 +288,8 @@ void Posix_PollInput() {
 				#ifdef XEVT_DBG2
 					printf( "SE_KEY press %d\n", key_event->keycode);
 				#endif
-				Posix_QueEvent( SE_KEY, s_scantokey[key_event->keycode], true, 0, NULL);
-				lookupRet = XLookupString(key_event, buf, sizeof(buf), &keysym, NULL);
+				Posix_QueEvent( SE_KEY, s_scantokey[key_event->keycode], true, 0, nullptr );
+				lookupRet = XLookupString(key_event, buf, sizeof(buf), &keysym, nullptr );
 				if (lookupRet > 0 ) {
 					char s = buf[0];
 					#ifdef XEVT_DBG
@@ -299,7 +299,7 @@ void Posix_PollInput() {
 					#ifdef XEVT_DBG2
 						printf( "SE_CHAR %s\n", buf);
 					#endif
-					Posix_QueEvent( SE_CHAR, s, 0, 0, NULL);
+					Posix_QueEvent( SE_CHAR, s, 0, 0, nullptr );
 				}
 				if ( !Posix_AddKeyboardPollEvent( s_scantokey[key_event->keycode], true ) )
 					return;
@@ -320,18 +320,18 @@ void Posix_PollInput() {
 				#ifdef XEVT_DBG2
 					printf( "SE_KEY release %d\n", key_event->keycode);
 				#endif
-				Posix_QueEvent( SE_KEY, s_scantokey[key_event->keycode], false, 0, NULL);
+				Posix_QueEvent( SE_KEY, s_scantokey[key_event->keycode], false, 0, nullptr );
 				if ( !Posix_AddKeyboardPollEvent( s_scantokey[key_event->keycode], false ) )
 					return;
 			break;
 
 			case ButtonPress:
 				if (event.xbutton.button == 4) {
-					Posix_QueEvent( SE_KEY, K_MWHEELUP, true, 0, NULL);
+					Posix_QueEvent( SE_KEY, K_MWHEELUP, true, 0, nullptr );
 					if ( !Posix_AddMousePollEvent( M_DELTAZ, 1 ) )
 						return;
 				} else if (event.xbutton.button == 5) {
-					Posix_QueEvent( SE_KEY, K_MWHEELDOWN, true, 0, NULL);
+					Posix_QueEvent( SE_KEY, K_MWHEELDOWN, true, 0, nullptr );
 					if ( !Posix_AddMousePollEvent( M_DELTAZ, -1 ) )
 						return;
 				} else {
@@ -350,7 +350,7 @@ void Posix_PollInput() {
 					if (b == -1 || b > 4) {
 						common->DPrintf( "X ButtonPress %d not supported\n", event.xbutton.button);
 					} else {
-						Posix_QueEvent( SE_KEY, K_MOUSE1 + b, true, 0, NULL);
+						Posix_QueEvent( SE_KEY, K_MOUSE1 + b, true, 0, nullptr );
 						if ( !Posix_AddMousePollEvent( M_ACTION1 + b, true ) )
 							return;
 					}
@@ -359,9 +359,9 @@ void Posix_PollInput() {
 
 			case ButtonRelease:
 				if (event.xbutton.button == 4) {
-					Posix_QueEvent( SE_KEY, K_MWHEELUP, false, 0, NULL);
+					Posix_QueEvent( SE_KEY, K_MWHEELUP, false, 0, nullptr );
 				} else if (event.xbutton.button == 5) {
-					Posix_QueEvent( SE_KEY, K_MWHEELDOWN, false, 0, NULL);
+					Posix_QueEvent( SE_KEY, K_MWHEELDOWN, false, 0, nullptr );
 				} else {
 					b = -1;
 					if (event.xbutton.button == 1 ) {
@@ -378,7 +378,7 @@ void Posix_PollInput() {
 					if (b == -1 || b > 4) {
 						common->DPrintf( "X ButtonRelease %d not supported\n", event.xbutton.button);
 					} else {
-						Posix_QueEvent( SE_KEY, K_MOUSE1 + b, false, 0, NULL);
+						Posix_QueEvent( SE_KEY, K_MOUSE1 + b, false, 0, nullptr );
 						if ( !Posix_AddMousePollEvent( M_ACTION1 + b, false ) )
 							return;
 					}
@@ -392,7 +392,7 @@ void Posix_PollInput() {
 					dx = event.xmotion.x_root;
 					dy = event.xmotion.y_root;
 
-					Posix_QueEvent( SE_MOUSE, dx, dy, 0, NULL);
+					Posix_QueEvent( SE_MOUSE, dx, dy, 0, nullptr );
 
 					// if we overflow here, we'll get a warning, but the delta will be completely processed anyway
 					Posix_AddMousePollEvent( M_DELTAX, dx );
@@ -406,7 +406,7 @@ void Posix_PollInput() {
 						mwx = qglConfig.vidWidth / 2;
 						mwy = qglConfig.vidHeight / 2;
 
-						Posix_QueEvent( SE_MOUSE, mx, my, 0, NULL);
+						Posix_QueEvent( SE_MOUSE, mx, my, 0, nullptr );
 
 						Posix_AddMousePollEvent( M_DELTAX, mx );
 						if ( !Posix_AddMousePollEvent( M_DELTAY, my ) )
@@ -465,7 +465,7 @@ unsigned char Sys_MapCharForKey( int _key ) {
 	event.xkey.keycode = key;
 	event.xkey.state = kbd_state.group << 13;
 
-	lookupRet = XLookupString( (XKeyEvent *)&event, buf, sizeof( buf ), &keysym, NULL );
+	lookupRet = XLookupString( (XKeyEvent *)&event, buf, sizeof( buf ), &keysym, nullptr );
 	if ( lookupRet <= 0 ) {
 		Sys_Printf( "Sys_MapCharForKey: XLookupString key 0x%x failed\n", key );
 		return (unsigned char)_key;

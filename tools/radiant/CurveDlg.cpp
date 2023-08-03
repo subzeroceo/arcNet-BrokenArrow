@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -37,7 +37,7 @@ If you have questions concerning this license or the applicable additional terms
 // CCurveDlg dialog
 
 IMPLEMENT_DYNAMIC(CCurveDlg, CDialog)
-CCurveDlg::CCurveDlg(CWnd* pParent /*=NULL*/)
+CCurveDlg::CCurveDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CCurveDlg::IDD, pParent)
 {
 }

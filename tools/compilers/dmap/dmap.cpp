@@ -1,32 +1,4 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "dmap.h"
@@ -164,10 +136,10 @@ ResetDmapGlobals
 */
 void ResetDmapGlobals( void ) {
 	dmapGlobals.mapFileBase[0] = '\0';
-	dmapGlobals.dmapFile = NULL;
+	dmapGlobals.dmapFile = nullptr;
 	dmapGlobals.mapPlanes.Clear();
 	dmapGlobals.num_entities = 0;
-	dmapGlobals.uEntities = NULL;
+	dmapGlobals.uEntities = nullptr;
 	dmapGlobals.entityNum = 0;
 	dmapGlobals.mapLights.Clear();
 	dmapGlobals.verbose = false;
@@ -195,11 +167,11 @@ void ResetDmapGlobals( void ) {
 Dmap
 ============
 */
-void Dmap( const arcCommandArgs &args ) {
+void Dmap( const anCommandArgs &args ) {
 	int			i;
 	int			start, end;
 	char		path[1024];
-	arcNetString		passedName;
+	anString		passedName;
 	bool		leaked = false;
 	bool		noCM = false;
 	bool		noAAS = false;
@@ -232,58 +204,58 @@ void Dmap( const arcCommandArgs &args ) {
 			}
 		}
 
-		if ( !arcNetString::Icmp( s,"glview" ) ) {
+		if ( !anString::Icmp( s,"glview" ) ) {
 			dmapGlobals.glview = true;
-		} else if ( !arcNetString::Icmp( s, "v" ) ) {
+		} else if ( !anString::Icmp( s, "v" ) ) {
 			common->Printf( "verbose = true\n" );
 			dmapGlobals.verbose = true;
-		} else if ( !arcNetString::Icmp( s, "draw" ) ) {
+		} else if ( !anString::Icmp( s, "draw" ) ) {
 			common->Printf( "drawflag = true\n" );
 			dmapGlobals.drawflag = true;
-		} else if ( !arcNetString::Icmp( s, "noFlood" ) ) {
+		} else if ( !anString::Icmp( s, "noFlood" ) ) {
 			common->Printf( "noFlood = true\n" );
 			dmapGlobals.noFlood = true;
-		} else if ( !arcNetString::Icmp( s, "noLightCarve" ) ) {
+		} else if ( !anString::Icmp( s, "noLightCarve" ) ) {
 			common->Printf( "noLightCarve = true\n" );
 			dmapGlobals.noLightCarve = true;
-		} else if ( !arcNetString::Icmp( s, "lightCarve" ) ) {
+		} else if ( !anString::Icmp( s, "lightCarve" ) ) {
 			common->Printf( "noLightCarve = false\n" );
 			dmapGlobals.noLightCarve = false;
-		} else if ( !arcNetString::Icmp( s, "noOpt" ) ) {
+		} else if ( !anString::Icmp( s, "noOpt" ) ) {
 			common->Printf( "noOptimize = true\n" );
 			dmapGlobals.noOptimize = true;
-		} else if ( !arcNetString::Icmp( s, "verboseentities" ) ) {
+		} else if ( !anString::Icmp( s, "verboseentities" ) ) {
 			common->Printf( "verboseentities = true\n" );
 			dmapGlobals.verboseentities = true;
-		} else if ( !arcNetString::Icmp( s, "noCurves" ) ) {
+		} else if ( !anString::Icmp( s, "noCurves" ) ) {
 			common->Printf( "noCurves = true\n" );
 			dmapGlobals.noCurves = true;
-		} else if ( !arcNetString::Icmp( s, "noModels" ) ) {
+		} else if ( !anString::Icmp( s, "noModels" ) ) {
 			common->Printf( "noModels = true\n" );
 			dmapGlobals.noModelBrushes = true;
-		} else if ( !arcNetString::Icmp( s, "noClipSides" ) ) {
+		} else if ( !anString::Icmp( s, "noClipSides" ) ) {
 			common->Printf( "noClipSides = true\n" );
 			dmapGlobals.noClipSides = true;
-		} else if ( !arcNetString::Icmp( s, "noCarve" ) ) {
+		} else if ( !anString::Icmp( s, "noCarve" ) ) {
 			common->Printf( "noCarve = true\n" );
 			dmapGlobals.fullCarve = false;
-		} else if ( !arcNetString::Icmp( s, "shadowOpt" ) ) {
+		} else if ( !anString::Icmp( s, "shadowOpt" ) ) {
 			dmapGlobals.shadowOptLevel = (shadowOptLevel_t)atoi( args.Argv( i+1 ) );
 			common->Printf( "shadowOpt = %i\n",dmapGlobals.shadowOptLevel );
 			i += 1;
-		} else if ( !arcNetString::Icmp( s, "noTjunc" ) ) {
+		} else if ( !anString::Icmp( s, "noTjunc" ) ) {
 			// triangle optimization won't work properly without tjunction fixing
 			common->Printf ( "noTJunc = true\n" );
 			dmapGlobals.noTJunc = true;
 			dmapGlobals.noOptimize = true;
 			common->Printf ( "forcing noOptimize = true\n" );
-		} else if ( !arcNetString::Icmp( s, "noCM" ) ) {
+		} else if ( !anString::Icmp( s, "noCM" ) ) {
 			noCM = true;
 			common->Printf( "noCM = true\n" );
-		} else if ( !arcNetString::Icmp( s, "noAAS" ) ) {
+		} else if ( !anString::Icmp( s, "noAAS" ) ) {
 			noAAS = true;
 			common->Printf( "noAAS = true\n" );
-		} else if ( !arcNetString::Icmp( s, "editorOutput" ) ) {
+		} else if ( !anString::Icmp( s, "editorOutput" ) ) {
 #ifdef _WIN32
 			com_outputMsg = true;
 #endif
@@ -302,9 +274,9 @@ void Dmap( const arcCommandArgs &args ) {
 		passedName = "maps/" + passedName;
 	}
 
-	arcNetString stripped = passedName;
+	anString stripped = passedName;
 	stripped.StripFileExtension();
-	arcNetString::Copynz( dmapGlobals.mapFileBase, stripped, sizeof(dmapGlobals.mapFileBase) );
+	anString::Copynz( dmapGlobals.mapFileBase, stripped, sizeof(dmapGlobals.mapFileBase) );
 
 	bool region = false;
 	// if this isn't a regioned map, delete the last saved region map
@@ -378,7 +350,7 @@ void Dmap( const arcCommandArgs &args ) {
 	dmapGlobals.mapPlanes.Clear();
 
 #ifdef _WIN32
-	if ( com_outputMsg && com_hwndMsg != NULL ) {
+	if ( com_outputMsg && com_hwndMsg != nullptr ) {
 		unsigned int msg = ::RegisterWindowMessage( DMAP_DONE );
 		::PostMessage( com_hwndMsg, msg, 0, 0 );
 	}
@@ -390,7 +362,7 @@ void Dmap( const arcCommandArgs &args ) {
 Dmap_f
 ============
 */
-void Dmap_f( const arcCommandArgs &args ) {
+void Dmap_f( const anCommandArgs &args ) {
 
 	common->ClearWarnings( "running dmap" );
 

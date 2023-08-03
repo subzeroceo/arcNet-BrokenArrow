@@ -17,23 +17,23 @@ const float AI_TETHER_MINRANGE			= 8.0f;
 ===============================================================================
 */
 
-class rvAITrigger : public idEntity {
+class rvAITrigger : public anEntity {
 public:
 	CLASS_PROTOTYPE ( rvAITrigger );
 
 	rvAITrigger ( void );
 
 	void			Spawn					( void );
-	void			Save					( idSaveGame *savefile ) const;
-	void			Restore					( idRestoreGame *savefile );
+	void			Save					( anSaveGame *savefile ) const;
+	void			Restore					( anRestoreGame *savefile );
 	virtual void	Think					( void );
 
 	virtual void	FindTargets				( void );
 
 protected:
 
-	idList< idEntityPtr<idAI> >			testAI;
-	idList< idEntityPtr<rvSpawner> >	testSpawner;
+	anList< anEntityPtr<anSAAI> >			testAI;
+	anList< anEntityPtr<rvSpawner> >	testSpawner;
 
 	bool								conditionDead;
 	bool								conditionTether;
@@ -46,34 +46,34 @@ protected:
 
 private:
 
-	void			Event_Activate			( idEntity* activator );
+	void			Event_Activate			( anEntity* activator );
 	void			Event_PostRestore		( void );
 
-	void			Event_AppendFromSpawner	( rvSpawner* spawner, idEntity* spawned );
+	void			Event_AppendFromSpawner	( rvSpawner* spawner, anEntity* spawned );
 };
 
 /*
 ===============================================================================
-								rvAITether
+								anSAAITether
 ===============================================================================
 */
 
-class rvAITether : public idEntity {
+class anSAAITether : public anEntity {
 public:
-	CLASS_PROTOTYPE ( rvAITether );
+	CLASS_PROTOTYPE ( anSAAITether );
 
-	rvAITether ( void );
+	anSAAITether ( void );
 
 	void			Spawn						( void );
-	void			Save						( idSaveGame *savefile ) const;
-	void			Restore						( idRestoreGame *savefile );
+	void			Save						( anSaveGame *savefile ) const;
+	void			Restore						( anRestoreGame *savefile );
 	void			InitNonPersistentSpawnArgs	( void );
 
-	virtual bool	ValidateAAS				( idAI* ai );
-	virtual bool	ValidateDestination		( idAI* ai, const arcVec3& dest );
-	virtual bool	ValidateBounds			( const arcBounds& bounds );
+	virtual bool	ValidateAAS				( anSAAI* ai );
+	virtual bool	ValidateDestination		( anSAAI* ai, const anVec3& dest );
+	virtual bool	ValidateBounds			( const anBounds& bounds );
 
-	virtual bool	FindGoal				( idAI* ai, aasGoal_t& goal );
+	virtual bool	FindGoal				( anSAAI* ai, seasGoal_t& goal );
 	virtual float	GetOriginReachedRange	( void ) {return AI_TETHER_MINRANGE;}
 
 	virtual void	DebugDraw				( void );
@@ -81,14 +81,14 @@ public:
 	bool			CanBreak				( void ) const;
 	bool			IsAutoBreak				( void ) const;
 
-	idList<int>		areaNum;
+	anList<int>		areaNum;
 
 	bool			IsWalkForced			( void ) const;
 	bool			IsRunForced				( void ) const;
 
 protected:
 
-	idEntityPtr<idLocationEntity>	location;
+	anEntityPtr<idLocationEntity>	location;
 
 	struct tetherFlags_s {
 		bool		canBreak			:1;			// Temporarily break when enemy is within tether
@@ -101,46 +101,46 @@ protected:
 
 private:
 
-	void			Event_Activate				( idEntity* activator );
+	void			Event_Activate				( anEntity* activator );
 	void			Event_TetherSetupLocation	( void );
 	void			Event_TetherGetLocation		( void );
 };
 
-ARC_INLINE bool rvAITether::CanBreak ( void ) const {
+ARC_INLINE bool anSAAITether::CanBreak ( void ) const {
 	return tfl.canBreak;
 }
 
-ARC_INLINE bool rvAITether::IsWalkForced ( void ) const {
+ARC_INLINE bool anSAAITether::IsWalkForced ( void ) const {
 	return tfl.forceWalk;
 }
 
-ARC_INLINE bool rvAITether::IsRunForced ( void ) const {
+ARC_INLINE bool anSAAITether::IsRunForced ( void ) const {
 	return tfl.forceRun;
 }
 
-ARC_INLINE bool rvAITether::IsAutoBreak ( void ) const {
+ARC_INLINE bool anSAAITether::IsAutoBreak ( void ) const {
 	return tfl.autoBreak;
 }
 
 /*
 ===============================================================================
-								rvAITetherBehind
+								anSAAITetherBehind
 ===============================================================================
 */
 
-class rvAITetherBehind : public rvAITether {
+class anSAAITetherBehind : public anSAAITether {
 public:
-	CLASS_PROTOTYPE ( rvAITetherBehind );
+	CLASS_PROTOTYPE ( anSAAITetherBehind );
 
-					rvAITetherBehind( void ) { range = 0.0f; }
+					anSAAITetherBehind( void ) { range = 0.0f; }
 
 	void			Spawn						( void );
-	void			Save						( idSaveGame *savefile ) const { }
-	void			Restore						( idRestoreGame *savefile );
+	void			Save						( anSaveGame *savefile ) const { }
+	void			Restore						( anRestoreGame *savefile );
 	void			InitNonPersistentSpawnArgs	( void );
 
-	virtual bool	ValidateDestination			( idAI* ai, const arcVec3& dest );
-	virtual bool	ValidateBounds				( const arcBounds& bounds );
+	virtual bool	ValidateDestination			( anSAAI* ai, const anVec3& dest );
+	virtual bool	ValidateBounds				( const anBounds& bounds );
 	virtual void	DebugDraw					( void );
 
 protected:
@@ -150,23 +150,23 @@ protected:
 
 /*
 ===============================================================================
-								rvAITetherRadius
+								anSAAITetherRadius
 ===============================================================================
 */
 
-class rvAITetherRadius : public rvAITether {
+class anSAAITetherRadius : public anSAAITether {
 public:
-	CLASS_PROTOTYPE ( rvAITetherRadius );
+	CLASS_PROTOTYPE ( anSAAITetherRadius );
 
-					rvAITetherRadius( void ) { radiusSqr = 0.0f; }
+					anSAAITetherRadius( void ) { radiusSqr = 0.0f; }
 
 	void			Spawn						( void );
-	void			Save						( idSaveGame *savefile ) const { }
-	void			Restore						( idRestoreGame *savefile );
+	void			Save						( anSaveGame *savefile ) const { }
+	void			Restore						( anRestoreGame *savefile );
 	void			InitNonPersistentSpawnArgs	( void );
 
-	virtual bool	ValidateDestination			( idAI* ai, const arcVec3& dest );
-	virtual bool	ValidateBounds				( const arcBounds& bounds );
+	virtual bool	ValidateDestination			( anSAAI* ai, const anVec3& dest );
+	virtual bool	ValidateBounds				( const anBounds& bounds );
 	virtual void	DebugDraw					( void );
 
 	/*
@@ -189,13 +189,13 @@ protected:
 
 /*
 ===============================================================================
-								rvAITetherRadius
+								anSAAITetherRadius
 ===============================================================================
 */
 
-class rvAITetherClear : public rvAITether {
+class anSAAITetherClear : public anSAAITether {
 public:
-	CLASS_PROTOTYPE ( rvAITetherClear );
+	CLASS_PROTOTYPE ( anSAAITetherClear );
 };
 
 /*
@@ -204,13 +204,13 @@ public:
 ===============================================================================
 */
 
-class rvAIBecomePassive : public idEntity {
+class rvAIBecomePassive : public anEntity {
 public:
 	CLASS_PROTOTYPE ( rvAIBecomePassive );
 
 private:
 
-	void			Event_Activate			( idEntity* activator );
+	void			Event_Activate			( anEntity* activator );
 };
 
 /*
@@ -219,13 +219,13 @@ private:
 ===============================================================================
 */
 
-class rvAIBecomeAggressive : public idEntity {
+class rvAIBecomeAggressive : public anEntity {
 public:
 	CLASS_PROTOTYPE ( rvAIBecomeAggressive );
 
 private:
 
-	void			Event_Activate			( idEntity* activator );
+	void			Event_Activate			( anEntity* activator );
 };
 
 #endif // __AI_UTIL__

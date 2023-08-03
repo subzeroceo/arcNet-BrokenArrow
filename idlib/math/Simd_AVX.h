@@ -10,26 +10,26 @@
 #define VPCALL
 #endif
 
-class arcVec2;
-class arcVec3;
-class arcVec4;
-class arcVec5;
-class arcVec6;
-class arcVecX;
-class arcMat2;
-class arcMat3;
-class arcMat4;
-class arcMat5;
-class arcMat6;
-class arcMatX;
-class arcPlane;
-class arcDrawVert;
-class idJointQuat;
+class anVec2;
+class anVec3;
+class anVec4;
+class anVec5;
+class anVec6;
+class anVecX;
+class anMat2;
+class anMat3;
+class anMat4;
+class anMat5;
+class anMat6;
+class anMatX;
+class anPlane;
+class anDrawVertex;
+class anJointQuat;
 class arcJointMat;
 struct dominantTri_s;
 
 // SIMD macro for loading values from memory
-#define LOAD_SIMD(src) _mm_loadu_ps(src)
+#define LOAD_SIMD( src) _mm_loadu_ps( src)
 // SIMD macro for storing values to memory
 #define STORE_SIMD(dest, src) _mm_storeu_ps(dest, src)
 // SIMD macro for adding two vectors
@@ -46,7 +46,7 @@ struct dominantTri_s;
 #define HORIZONTAL_ADD_SIMD(a) _mm_hadd_ps(a, a)
 
 // AVX macro for loading values from memory
-#define LOAD_SIMD_AVX(src) _mm256_loadu_ps(src)
+#define LOAD_SIMD_AVX( src) _mm256_loadu_ps( src)
 // AVX macro for storing values to memory
 #define STORE_SIMD_AVX(dest, src) _mm256_storeu_ps(dest, src)
 // AVX macro for adding two vectors
@@ -78,11 +78,11 @@ public:
 
     VPCALL arcSIMD_AVX( int n ) = 0;
     VPCALL arcSIMD_AVX( size_t numElements ) : arcSIMDProcessor( numElements ) { }
-    const char * VPCALL GetName( void ) const;
+    const char *VPCALL GetName( void ) const;
    	float VPCALL DotProduct( const float *src1, const float *src2, const int count ) = 0;
     void VPCALL Sub16 ( float *dst, const float *src1, const float *src2, const int count ) = 0;
     void VPCALL Add16( float *dst, const float *src1, const float *src2, const int count ) = 0;
-    void VPCALL Dot( float *dst, const arcVec3 &constant, const arcDrawVert *src, const int count ) = 0;
+    void VPCALL Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) = 0;
     void VPCALL Add( float *dst, const float *src0, const float *src1, const int count ) = 0;
     virtual void VPCALL Mul( float *dst, const float *src0, const float *src1, const int count ) = 0;
     virtual void VPCALL MulSub( float *dst, const float *src0, const float *src1, const int count ) = 0;
@@ -106,30 +106,30 @@ public:
     virtual void VPCALL Memcpy( void *dest0, const int val, const int count0 ) = 0;
     virtual void VPCALL Memset( void *dest0, const int val, const int count0 ) = 0;
 
-    virtual void VPCALL MatX_LowerTriangularSolve( const arcMatX &L, float *x, const float *b, const int n, int skip = 0 ) = 0;
-    virtual void VPCALL MatX_LowerTriangularSolveTranspose( const arcMatX &L, float *x, const float *b, const int n ) = 0;
-    virtual bool VPCALL MatX_LDLTFactor( arcMatX &mat, arcVecX& invDiag, const int n ) = 0;
+    virtual void VPCALL MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip = 0 ) = 0;
+    virtual void VPCALL MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n ) = 0;
+    virtual bool VPCALL MatX_LDLTFactor( anMatX &mat, anVecX& invDiag, const int n ) = 0;
 
-    virtual void VPCALL BlendJoints( idJointQuat *joints, const idJointQuat *blendJoints, const float lerp, const int* index, const int numJoints ) = 0;
-    virtual void VPCALL ConvertJointQuatsToJointMats(arcJointMat *jointMats, const idJointQuat *jointQuats, const int numJoints ) = 0;
-    virtual void VPCALL ConvertJointMatsToJointQuats(idJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) = 0;
+    virtual void VPCALL BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int* index, const int numJoints ) = 0;
+    virtual void VPCALL ConvertJointQuatsToJointMats(arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) = 0;
+    virtual void VPCALL ConvertJointMatsToJointQuats(anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) = 0;
 
     virtual void VPCALL TransformJoints( arcJointMat *jointMats, const int* parents, const int firstJoint, const int lastJoint ) = 0;
     virtual void VPCALL UntransformJoints( arcJointMat *jointMats, const int* parents, const int firstJoint, const int lastJoint ) = 0;
-    virtual void VPCALL TransformVerts( arcDrawVert *verts, const int numVerts, const arcJointMat *joints, const arcVec4* weights, const int* index, const int numWeights ) = 0;
+    virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4* weights, const int* index, const int numWeights ) = 0;
 
-    static void GetCropBounds( const frustumCorners_t &corners, const float *renderMat, arcBounds &bounds );
+    static void GetCropBounds( const frustumCorners_t &corners, const float *renderMat, anBounds &bounds );
 
-    void VPCALL TracePointCull( byte *cullBits, byte& totalOr, const float radius, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) = 0;
-    virtual void VPCALL DecalPointCull( byte *cullBits, const arcPlane* planes, const arcDrawVert *verts, const int numVerts ) = 0;
-    virtual void VPCALL OverlayPointCull( byte *cullBits, arcVec2 *texCoords, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) = 0;
+    void VPCALL TracePointCull( byte *cullBits, byte& totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) = 0;
+    virtual void VPCALL DecalPointCull( byte *cullBits, const anPlane* planes, const anDrawVertex *verts, const int numVerts ) = 0;
+    virtual void VPCALL OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) = 0;
 
-    virtual void VPCALL DeriveTriPlanes( arcPlane *planes, const arcDrawVert *verts, const int numVerts, const int* indexes, const int numIndexes ) = 0;
+    virtual void VPCALL DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int* indexes, const int numIndexes ) = 0;
 
- 	virtual void VPCALL DeriveTriPlanes( arcPlane *planes, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
-	virtual void VPCALL DeriveTangents( arcPlane *planes, arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
-	virtual void VPCALL DeriveUnsmoothedTangents( arcDrawVert *verts, const dominantTri_s *dominantTris, const int numVerts ) = 0;
-	virtual void VPCALL NormalizeTangents( arcDrawVert *verts, const int numVerts ) = 0;
+ 	virtual void VPCALL DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
+	virtual void VPCALL DeriveTangents( anPlane *planes, anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) = 0;
+	virtual void VPCALL DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) = 0;
+	virtual void VPCALL NormalizeTangents( anDrawVertex *verts, const int numVerts ) = 0;
 };
 
 // pointer to SIMD processor

@@ -1,5 +1,5 @@
 #pragma hdrstop
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 
 /*
 ================================================================================================
@@ -43,7 +43,7 @@ void arcDebugGraph::Init( int numBars ) {
 arcDebugGraph::AddGridLine
 ========================
 */
-void arcDebugGraph::AddGridLine( float value, const arcVec4 & color ) {
+void arcDebugGraph::AddGridLine( float value, const anVec4 & color ) {
 	graphPlot_t & line = grid.Alloc();
 	line.value = value;
 	line.color = color;
@@ -54,7 +54,7 @@ void arcDebugGraph::AddGridLine( float value, const arcVec4 & color ) {
 arcDebugGraph::SetValue
 ========================
 */
-void arcDebugGraph::SetValue( int b, float value, const arcVec4 & color ) {
+void arcDebugGraph::SetValue( int b, float value, const anVec4 & color ) {
 	if ( !enable ) {
 		return;
 	}
@@ -74,7 +74,7 @@ void arcDebugGraph::SetValue( int b, float value, const arcVec4 & color ) {
 arcDebugGraph::SetLabel
 ========================
 */
-void arcDebugGraph::SetLabel( int b, const char * text ) {
+void arcDebugGraph::SetLabel( int b, const char *text ) {
 	if ( labels.Num() != bars.Num() ) {
 		labels.SetNum( bars.Num() );
 	}
@@ -86,7 +86,7 @@ void arcDebugGraph::SetLabel( int b, const char * text ) {
 arcDebugGraph::Render
 ========================
 */
-void arcDebugGraph::Render( ARCRenderSystem * gui ) {
+void arcDebugGraph::Render( anRenderSystem * gui ) {
 	if ( !enable ) {
 		return;
 	}
@@ -103,7 +103,7 @@ void arcDebugGraph::Render( ARCRenderSystem * gui ) {
 		float barLeft = position.x + border;
 		float barTop = position.y + border;
 		for ( int i = 0; i < bars.Num(); i++ ) {
-			arcVec4 rect( vec4_zero );
+			anVec4 rect( vec4_zero );
 			if ( mode == GRAPH_LINE ) {
 				rect.Set( barLeft + barWidth * bars[i].value, barTop + i * barHeight, 1.0f, barHeight - border );
 			} else if ( mode == GRAPH_FILL ) {
@@ -118,13 +118,13 @@ void arcDebugGraph::Render( ARCRenderSystem * gui ) {
 			for ( int i = 0; i < labels.Num(); i++ ) {
 				maxLen = Max( maxLen, labels[i].Length() );
 			}
-			arcVec4 rect( position );
+			anVec4 rect( position );
 			rect.x -= SMALLCHAR_WIDTH * maxLen;
 			rect.z = SMALLCHAR_WIDTH * maxLen;
 			gui->DrawFilled( bgColor, rect.x, rect.y, rect.z, rect.w );
 			for ( int i = 0; i < labels.Num(); i++ ) {
-				arcVec2 pos( barLeft - SMALLCHAR_WIDTH * maxLen, barTop + i * barHeight );
-				gui->DrawSmallStringExt( arcMath::Ftoi( pos.x ), arcMath::Ftoi( pos.y ), labels[i], fontColor, true );
+				anVec2 pos( barLeft - SMALLCHAR_WIDTH * maxLen, barTop + i * barHeight );
+				gui->DrawSmallStringExt( anMath::Ftoi( pos.x ), anMath::Ftoi( pos.y ), labels[i], fontColor, true );
 			}
 		}
 	} else {
@@ -135,11 +135,11 @@ void arcDebugGraph::Render( ARCRenderSystem * gui ) {
 		float barBottom = barTop + barHeight;
 
 		for ( int i = 0; i < grid.Num(); i++ ) {
-			arcVec4 rect( position.x, barBottom - barHeight * grid[i].value, position.z, 1.0f );
+			anVec4 rect( position.x, barBottom - barHeight * grid[i].value, position.z, 1.0f );
 			gui->DrawFilled( grid[i].color, rect.x, rect.y, rect.z, rect.w );
 		}
 		for ( int i = 0; i < bars.Num(); i++ ) {
-			arcVec4 rect;
+			anVec4 rect;
 			if ( mode == GRAPH_LINE ) {
 				rect.Set( barLeft + i * barWidth, barBottom - barHeight * bars[i].value, barWidth - border, 1.0f );
 			} else if ( mode == GRAPH_FILL ) {
@@ -150,13 +150,13 @@ void arcDebugGraph::Render( ARCRenderSystem * gui ) {
 			gui->DrawFilled( bars[i].color, rect.x, rect.y, rect.z, rect.w );
 		}
 		if ( labels.Num() > 0 ) {
-			arcVec4 rect( position );
+			anVec4 rect( position );
 			rect.y += barHeight;
 			rect.w = SMALLCHAR_HEIGHT;
 			gui->DrawFilled( bgColor, rect.x, rect.y, rect.z, rect.w );
 			for ( int i = 0; i < labels.Num(); i++ ) {
-				arcVec2 pos( barLeft + i * barWidth, barBottom + border );
-				gui->DrawSmallStringExt( arcMath::Ftoi( pos.x ), arcMath::Ftoi( pos.y ), labels[i], fontColor, true );
+				anVec2 pos( barLeft + i * barWidth, barBottom + border );
+				gui->DrawSmallStringExt( anMath::Ftoi( pos.x ), anMath::Ftoi( pos.y ), labels[i], fontColor, true );
 			}
 		}
 	}

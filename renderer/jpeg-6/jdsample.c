@@ -36,7 +36,7 @@ typedef struct {
   /* Color conversion buffer.  When using separate upsampling and color
    * conversion steps, this buffer holds one upsampled row group until it
    * has been color converted and output.
-   * Note: we do not allocate any storage for component(s) which are full-size,
+   * Note: we do not allocate any storage for component( s) which are full-size,
    * ie do not need rescaling.  The corresponding entry of color_buf[] is
    * simply set to point to the input data array, thereby avoiding copying.
    */
@@ -170,7 +170,7 @@ METHODDEF void
 noop_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
 	       JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
 {
-  *output_data_ptr = NULL;	/* safety check */
+  *output_data_ptr = nullptr;	/* safety check */
 }
 
 
@@ -338,7 +338,7 @@ h2v1_fancy_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
  * Again a triangle filter; see comments for h2v1 case, above.
  *
  * It is OK for us to reference the adjacent input rows because we demanded
- * context from the main buffer controller (see initialization code).
+ * context from the main buffer controller ( see initialization code).
  */
 
 METHODDEF void
@@ -407,7 +407,7 @@ jinit_upsampler (j_decompress_ptr cinfo)
   upsample = (my_upsample_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_upsampler) );
-  cinfo->upsample = (struct jpeg_upsampler *) upsample;
+  cinfo->upsample = ( struct jpeg_upsampler *) upsample;
   upsample->pub.start_pass = start_pass_upsample;
   upsample->pub.upsample = sep_upsample;
   upsample->pub.need_context_rows = FALSE; /* until we find out differently */

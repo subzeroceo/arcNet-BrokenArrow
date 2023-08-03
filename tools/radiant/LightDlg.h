@@ -43,22 +43,22 @@ public:
 	CString		strTexture;
 	bool		equalRadius;
 	bool		explicitStartEnd;
-	arcVec3		lightStart;
-	arcVec3		lightEnd;
-	arcVec3		lightUp;
-	arcVec3		lightRight;
-	arcVec3		lightTarget;
-	arcVec3		lightCenter;
-	arcVec3		color;
+	anVec3		lightStart;
+	anVec3		lightEnd;
+	anVec3		lightUp;
+	anVec3		lightRight;
+	anVec3		lightTarget;
+	anVec3		lightCenter;
+	anVec3		color;
 	bool		fog;
-	arcVec4		fogDensity;
+	anVec4		fogDensity;
 
 	bool		strobe;
 	float		strobeSpeed;
 	bool		rotate;
 	float		rotateSpeed;
 
-	arcVec3		lightRadius;
+	anVec3		lightRadius;
 	bool		castShadows;
 	bool		castSpecular;
 	bool		castDiffuse;
@@ -68,10 +68,10 @@ public:
 	void		Defaults();
 	void		DefaultProjected();
 	void		DefaultPoint();
-	void		FromDict( const arcDictionary *e );
-	void		ToDict( arcDictionary *e );
-    void		ToDictFromDifferences( arcDictionary *e, const arcDictionary *differences );
-    void		ToDictWriteAllInfo( arcDictionary *e );
+	void		FromDict( const anDict *e );
+	void		ToDict( anDict *e );
+    void		ToDictFromDifferences( anDict *e, const anDict *differences );
+    void		ToDictWriteAllInfo( anDict *e );
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ public:
 
 class CLightDlg : public CDialog {
 public:
-					CLightDlg(CWnd* pParent = NULL);   // standard constructor
+					CLightDlg(CWnd* pParent = nullptr );   // standard constructor
 					~CLightDlg();
 
 	void			UpdateDialogFromLightInfo( void );
@@ -90,7 +90,7 @@ public:
 	void			EnableControls();
 	void			LoadLightTextures();
 	void			ColorButtons();
-	void			SaveLightInfo( const arcDictionary *differences );
+	void			SaveLightInfo( const anDict *differences );
 
 // Dialog Data
 	//{{AFX_DATA(CLightDlg)
@@ -178,7 +178,7 @@ private:
 	CBitmap					fogBitmap;
 	CLightInfo				lightInfo;
     CLightInfo				lightInfoOriginal;
-	arcVec3					color;
+	anVec3					color;
 	idGLDrawableMaterial *	m_drawMaterial;
 };
 

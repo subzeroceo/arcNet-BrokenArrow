@@ -32,33 +32,33 @@ typedef enum {
 #define	MAXTOUCH					32
 
 typedef struct playerPState_s {
-	arcVec3					origin;
-	arcVec3					velocity;
-	arcVec3					localOrigin;
-	arcVec3					pushVelocity;
-// RAVEN BEGIN
+	anVec3					origin;
+	anVec3					velocity;
+	anVec3					localOrigin;
+	anVec3					pushVelocity;
+
 // bdube: added
-	arcVec3					lastPushVelocity;
-// RAVEN END
+	anVec3					lastPushVelocity;
+
 	float					stepUp;
 	int						movementType;
 	int						movementFlags;
 	int						movementTime;
-// RAVEN BEGIN
+
 // bdube: crouch slide
 	int						crouchSlideTime;
-// RAVEN END
+
 } playerPState_t;
 
-class idPhysics_Player : public idPhysics_Actor {
+class anPhysics_Player : public anPhysics_Actor {
 
 public:
-	CLASS_PROTOTYPE( idPhysics_Player );
+	CLASS_PROTOTYPE( anPhysics_Player );
 
-							idPhysics_Player( void );
+							anPhysics_Player( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 							// initialisation
 	void					SetSpeed( const float newWalkSpeed, const float newCrouchSpeed );
@@ -66,7 +66,7 @@ public:
 	float					GetMaxStepHeight( void ) const;
 	void					SetMaxJumpHeight( const float newMaxJumpHeight );
 	void					SetMovementType( const pmtype_t type );
-	void					SetPlayerInput( const usercmd_t &cmd, const idAngles &newViewAngles );
+	void					SetPlayerInput( const usercmd_t &cmd, const anAngles &newViewAngles );
 	void					SetKnockBack( const int knockBackTime );
 	void					SetDebugLevel( bool set );
 							// feed back from last physics frame
@@ -77,47 +77,47 @@ public:
 	float					GetStepUp( void ) const;
 	bool					IsCrouching( void ) const;
 	bool					OnLadder( void ) const;
-	const arcVec3 &			PlayerGetOrigin( void ) const;	// != GetOrigin
+	const anVec3 &			PlayerGetOrigin( void ) const;	// != GetOrigin
 
 public:	// common physics interface
 	bool					Evaluate( int timeStepMSec, int endTimeMSec );
 	void					UpdateTime( int endTimeMSec );
 	int						GetTime( void ) const;
 
-	void					GetImpactInfo( const int id, const arcVec3 &point, impactInfo_t *info ) const;
-	void					ApplyImpulse( const int id, const arcVec3 &point, const arcVec3 &impulse );
+	void					GetImpactInfo( const int id, const anVec3 &point, impactInfo_t *info ) const;
+	void					ApplyImpulse( const int id, const anVec3 &point, const anVec3 &impulse );
 	bool					IsAtRest( void ) const;
 	int						GetRestStartTime( void ) const;
 
 	void					SaveState( void );
 	void					RestoreState( void );
 
-	void					SetOrigin( const arcVec3 &newOrigin, int id = -1 );
-	void					SetAxis( const arcMat3 &newAxis, int id = -1 );
+	void					SetOrigin( const anVec3 &newOrigin, int id = -1 );
+	void					SetAxis( const anMat3 &newAxis, int id = -1 );
 
-	void					Translate( const arcVec3 &translation, int id = -1 );
-	void					Rotate( const idRotation &rotation, int id = -1 );
+	void					Translate( const anVec3 &translation, int id = -1 );
+	void					Rotate( const anRotation &rotation, int id = -1 );
 
-	void					SetLinearVelocity( const arcVec3 &newLinearVelocity, int id = 0 );
+	void					SetLinearVelocity( const anVec3 &newLinearVelocity, int id = 0 );
 
-	const arcVec3 &			GetLinearVelocity( int id = 0 ) const;
+	const anVec3 &			GetLinearVelocity( int id = 0 ) const;
 
 	void					SetPushed( int deltaTime );
-	const arcVec3 &			GetPushedLinearVelocity( const int id = 0 ) const;
+	const anVec3 &			GetPushedLinearVelocity( const int id = 0 ) const;
 	void					ClearPushedVelocity( void );
 
-	void					SetMaster( idEntity *master, const bool orientated = true );
+	void					SetMaster( anEntity *master, const bool orientated = true );
 
-	void					WriteToSnapshot( idBitMsgDelta &msg ) const;
-	void					ReadFromSnapshot( const idBitMsgDelta &msg );
+	void					WriteToSnapshot( anBitMsgDelta &msg ) const;
+	void					ReadFromSnapshot( const anBitMsgDelta &msg );
 
-// RAVEN BEGIN
+
 // kfuller: Added
 	bool					IsNoclip( void ) const;
 	bool					IsDead( void ) const;
-// RAVEN END
 
-	void					SetClipModelNoLink( idClipModel *clip );
+
+	void					SetClipModelNoLink( anClipModel *clip );
 
 private:
 	// player physics state
@@ -133,24 +133,24 @@ private:
 
 	// player input
 	usercmd_t				command;
-	idAngles				viewAngles;
+	anAngles				viewAngles;
 
 	// run-time variables
 	int						framemsec;
 	float					frametime;
 	float					playerSpeed;
-	arcVec3					viewForward;
-	arcVec3					viewRight;
+	anVec3					viewForward;
+	anVec3					viewRight;
 
 	// walk movement
 	bool					walking;
 	bool					groundPlane;
 	trace_t					groundTrace;
-	const arcMaterial *		groundMaterial;
+	const anMaterial *		groundMaterial;
 
 	// ladder movement
 	bool					ladder;
-	arcVec3					ladderNormal;
+	anVec3					ladderNormal;
 
 	// results of last evaluate
 	waterLevel_t			waterLevel;
@@ -158,7 +158,7 @@ private:
 
 private:
 	float					CmdScale( const usercmd_t &cmd ) const;
-	void					Accelerate( const arcVec3 &wishdir, const float wishspeed, const float accel );
+	void					Accelerate( const anVec3 &wishdir, const float wishspeed, const float accel );
 	bool					SlideMove( bool gravity, bool stepUp, bool stepDown, bool push );
 	void					Friction( void );
 	void					WaterJumpMove( void );
@@ -171,10 +171,10 @@ private:
 	void					SpectatorMove( void );
 	void					LadderMove( void );
 	void					CorrectAllSolid( trace_t &trace, int contents );
-// RAVEN BEGIN
+
 // MrE: check stuck
 	void					CheckGround( bool checkStuck );
-// RAVEN END
+
 	void					CheckDuck( void );
 	void					CheckLadder( void );
 	bool					CheckJump( void );
@@ -187,11 +187,11 @@ private:
 	float					Pm_AirAccelerate( void );
 };
 
-ARC_INLINE bool idPhysics_Player::IsNoclip( void ) const {
+ARC_INLINE bool anPhysics_Player::IsNoclip( void ) const {
 	return current.movementType == PM_NOCLIP;
 }
 
-ARC_INLINE bool idPhysics_Player::IsDead( void ) const {
+ARC_INLINE bool anPhysics_Player::IsDead( void ) const {
 	return current.movementType == PM_DEAD;
 }
 

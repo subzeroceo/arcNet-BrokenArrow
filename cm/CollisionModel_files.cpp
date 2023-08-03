@@ -6,7 +6,7 @@
 ===============================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "CollisionModel_local.h"
@@ -24,16 +24,16 @@ Writing of collision model file
 ===============================================================================
 */
 
-void CM_GetNodeBounds( arcBounds *bounds, cm_node_t *node );
+void CM_GetNodeBounds( anBounds *bounds, cm_node_t *node );
 int CM_GetNodeContents( cm_node_t *node );
 
 
 /*
 ================
-arcCollisionModelManagerLocal::WriteNodes
+anSoftBodiesPhysicsManager::WriteNodes
 ================
 */
-void arcCollisionModelManagerLocal::WriteNodes( arcNetFile *fp, cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::WriteNodes( anFile *fp, cm_node_t *node ) {
 	fp->WriteFloatString( "\t( %d %f )\n", node->planeType, node->planeDist );
 	if ( node->planeType != -1 ) {
 		WriteNodes( fp, node->children[0] );
@@ -43,10 +43,10 @@ void arcCollisionModelManagerLocal::WriteNodes( arcNetFile *fp, cm_node_t *node 
 
 /*
 ================
-arcCollisionModelManagerLocal::CountPolygonMemory
+anSoftBodiesPhysicsManager::CountPolygonMemory
 ================
 */
-int arcCollisionModelManagerLocal::CountPolygonMemory( cm_node_t *node ) const {
+int anSoftBodiesPhysicsManager::CountPolygonMemory( cm_node_t *node ) const {
 	cm_polygonRef_t *pref;
 	cm_polygon_t *p;
 	int memory;
@@ -70,10 +70,10 @@ int arcCollisionModelManagerLocal::CountPolygonMemory( cm_node_t *node ) const {
 
 /*
 ================
-arcCollisionModelManagerLocal::WritePolygons
+anSoftBodiesPhysicsManager::WritePolygons
 ================
 */
-void arcCollisionModelManagerLocal::WritePolygons( arcNetFile *fp, cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::WritePolygons( anFile *fp, cm_node_t *node ) {
 	cm_polygonRef_t *pref;
 	cm_polygon_t *p;
 	int i;
@@ -101,15 +101,13 @@ void arcCollisionModelManagerLocal::WritePolygons( arcNetFile *fp, cm_node_t *no
 
 /*
 ================
-arcCollisionModelManagerLocal::CountBrushMemory
+anSoftBodiesPhysicsManager::CountBrushMemory
 ================
 */
-int arcCollisionModelManagerLocal::CountBrushMemory( cm_node_t *node ) const {
+int anSoftBodiesPhysicsManager::CountBrushMemory( cm_node_t *node ) const {
 	cm_brushRef_t *bref;
 	cm_brush_t *b;
-	int memory;
-
-	memory = 0;
+	int memory = 0;
 	for ( bref = node->brushes; bref; bref = bref->next ) {
 		b = bref->b;
 		if ( b->checkcount == checkCount ) {
@@ -128,10 +126,10 @@ int arcCollisionModelManagerLocal::CountBrushMemory( cm_node_t *node ) const {
 
 /*
 ================
-arcCollisionModelManagerLocal::WriteBrushes
+anSoftBodiesPhysicsManager::WriteBrushes
 ================
 */
-void arcCollisionModelManagerLocal::WriteBrushes( arcNetFile *fp, cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::WriteBrushes( anFile *fp, cm_node_t *node ) {
 	cm_brushRef_t *bref;
 	cm_brush_t *b;
 	int i;
@@ -157,29 +155,41 @@ void arcCollisionModelManagerLocal::WriteBrushes( arcNetFile *fp, cm_node_t *nod
 
 /*
 ================
-arcCollisionModelManagerLocal::WriteCollisionModel
+anSoftBodiesPhysicsManager::WriteCollisionModel
 ================
 */
-void arcCollisionModelManagerLocal::WriteCollisionModel( arcNetFile *fp, cm_model_t *model ) {
-	int i, polygonMemory, brushMemory;
+void anSoftBodiesPhysicsManager::WriteCollisionModel( anFile *fp, cm_model_t *model ) {
+	int polygonMemory, brushMemory;
 
 	fp->WriteFloatString( "collisionModel \"%s\" {\n", model->name.c_str() );
 	// vertices
 	fp->WriteFloatString( "\tvertices { /* numVertices = */ %d\n", model->numVertices );
-	for ( i = 0; i < model->numVertices; i++ ) {
+	for ( int i = 0; i < model->numVertices; i++ ) {
 		fp->WriteFloatString( "\t/* %d */ ( %f %f %f )\n", i, model->vertices[i].p[0], model->vertices[i].p[1], model->vertices[i].p[2] );
 	}
 	fp->WriteFloatString( "\t}\n" );
+
+	// Write soft body vertices
+	//fp->WriteFloatString( "\tsoftBodyVerts { /* num = */ %d \n", model->softBodyVerts.Size() );
+    // Write soft body vertices
+	//fp->WriteFloatString( "\tsoftBodyVerts { /* num = */ %d \n", model->softBodyVerts.size());
+	//for ( oftBodyVertex &v : model->softBodyVerts) {
+	//	fp->WriteFloatString( "\t( %f %f %f )\n", v.position.x, v.position.y, v.position.z);
+	//}
+	//fp->WriteFloatString( "\t}\n" );
+
 	// edges
 	fp->WriteFloatString( "\tedges { /* numEdges = */ %d\n", model->numEdges );
 	for ( i = 0; i < model->numEdges; i++ ) {
 		fp->WriteFloatString( "\t/* %d */ ( %d %d ) %d %d\n", i, model->edges[i].vertexNum[0], model->edges[i].vertexNum[1], model->edges[i].internal, model->edges[i].numUsers );
 	}
 	fp->WriteFloatString( "\t}\n" );
+
 	// nodes
 	fp->WriteFloatString( "\tnodes {\n" );
 	WriteNodes( fp, model->node );
 	fp->WriteFloatString( "\t}\n" );
+
 	// polygons
 	checkCount++;
 	polygonMemory = CountPolygonMemory( model->node );
@@ -187,6 +197,7 @@ void arcCollisionModelManagerLocal::WriteCollisionModel( arcNetFile *fp, cm_mode
 	checkCount++;
 	WritePolygons( fp, model->node );
 	fp->WriteFloatString( "\t}\n" );
+
 	// brushes
 	checkCount++;
 	brushMemory = CountBrushMemory( model->node );
@@ -194,18 +205,19 @@ void arcCollisionModelManagerLocal::WriteCollisionModel( arcNetFile *fp, cm_mode
 	checkCount++;
 	WriteBrushes( fp, model->node );
 	fp->WriteFloatString( "\t}\n" );
+
 	// closing brace
 	fp->WriteFloatString( "}\n" );
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::WriteCollisionModelsToFile
+anSoftBodiesPhysicsManager::WriteCollisionModelsToFile
 ================
 */
-void arcCollisionModelManagerLocal::WriteCollisionModelsToFile( const char *filename, int firstModel, int lastModel, unsigned int mapFileCRC ) {
-	arcNetFile *fp;
-	arcNetString name;
+void anSoftBodiesPhysicsManager::WriteCollisionModelsToFile( const char *filename, int firstModel, int lastModel, unsigned int mapFileCRC ) {
+	anFile *fp;
+	anString name;
 
 	name = filename;
 	name.SetFileExtension( CM_FILE_EXT );
@@ -214,7 +226,7 @@ void arcCollisionModelManagerLocal::WriteCollisionModelsToFile( const char *file
 	// _D3XP was saving to fs_cdpath
 	fp = fileSystem->OpenFileWrite( name, "fs_devpath" );
 	if ( !fp ) {
-		common->Warning( "arcCollisionModelManagerLocal::WriteCollisionModelsToFile: Error opening file %s\n", name.c_str() );
+		common->Warning( "anSoftBodiesPhysicsManager::WriteCollisionModelsToFile: Error opening file %s\n", name.c_str() );
 		return;
 	}
 
@@ -225,7 +237,7 @@ void arcCollisionModelManagerLocal::WriteCollisionModelsToFile( const char *file
 
 	// write the collision models
 	for ( int i = firstModel; i < lastModel; i++ ) {
-		WriteCollisionModel( fp, models[ i ] );
+		WriteCollisionModel( fp, models[i] );
 	}
 
 	fileSystem->CloseFile( fp );
@@ -233,12 +245,12 @@ void arcCollisionModelManagerLocal::WriteCollisionModelsToFile( const char *file
 
 /*
 ================
-arcCollisionModelManagerLocal::WriteCollisionModelForMapEntity
+anSoftBodiesPhysicsManager::WriteCollisionModelForMapEntity
 ================
 */
-bool arcCollisionModelManagerLocal::WriteCollisionModelForMapEntity( const idMapEntity *mapEnt, const char *filename, const bool testTraceModel ) {
-	arcNetFile *fp;
-	arcNetString name;
+bool anSoftBodiesPhysicsManager::WriteCollisionModelForMapEntity( const anMapEntity *mapEnt, const char *filename, const bool testTraceModel ) {
+	anFile *fp;
+	anString name;
 	cm_model_t *model;
 
 	SetupHash();
@@ -251,7 +263,7 @@ bool arcCollisionModelManagerLocal::WriteCollisionModelForMapEntity( const idMap
 	common->Printf( "writing %s\n", name.c_str() );
 	fp = fileSystem->OpenFileWrite( name, "fs_devpath" );
 	if ( !fp ) {
-		common->Printf( "arcCollisionModelManagerLocal::WriteCollisionModelForMapEntity: Error opening file %s\n", name.c_str() );
+		common->Printf( "anSoftBodiesPhysicsManager::WriteCollisionModelForMapEntity: Error opening file %s\n", name.c_str() );
 		FreeModel( model );
 		return false;
 	}
@@ -267,7 +279,7 @@ bool arcCollisionModelManagerLocal::WriteCollisionModelForMapEntity( const idMap
 	fileSystem->CloseFile( fp );
 
 	if ( testTraceModel ) {
-		arcTraceModel trm;
+		anTraceModel trm;
 		TrmFromModel( model, trm );
 	}
 
@@ -287,10 +299,10 @@ Loading of collision model file
 
 /*
 ================
-arcCollisionModelManagerLocal::ParseVertices
+anSoftBodiesPhysicsManager::ParseVertices
 ================
 */
-void arcCollisionModelManagerLocal::ParseVertices( arcLexer *src, cm_model_t *model ) {
+void anSoftBodiesPhysicsManager::ParseVertices( anLexer *src, cm_model_t *model ) {
 	src->ExpectTokenString( "{" );
 	model->numVertices = src->ParseInt();
 	model->maxVertices = model->numVertices;
@@ -306,10 +318,10 @@ void arcCollisionModelManagerLocal::ParseVertices( arcLexer *src, cm_model_t *mo
 
 /*
 ================
-arcCollisionModelManagerLocal::ParseEdges
+anSoftBodiesPhysicsManager::ParseEdges
 ================
 */
-void arcCollisionModelManagerLocal::ParseEdges( arcLexer *src, cm_model_t *model ) {
+void anSoftBodiesPhysicsManager::ParseEdges( anLexer *src, cm_model_t *model ) {
 	int i;
 
 	src->ExpectTokenString( "{" );
@@ -334,16 +346,16 @@ void arcCollisionModelManagerLocal::ParseEdges( arcLexer *src, cm_model_t *model
 
 /*
 ================
-arcCollisionModelManagerLocal::ParseNodes
+anSoftBodiesPhysicsManager::ParseNodes
 ================
 */
-cm_node_t *arcCollisionModelManagerLocal::ParseNodes( arcLexer *src, cm_model_t *model, cm_node_t *parent ) {
+cm_node_t *anSoftBodiesPhysicsManager::ParseNodes( anLexer *src, cm_model_t *model, cm_node_t *parent ) {
 	cm_node_t *node;
 
 	model->numNodes++;
 	node = AllocNode( model, model->numNodes < NODE_BLOCK_SIZE_SMALL ? NODE_BLOCK_SIZE_SMALL : NODE_BLOCK_SIZE_LARGE );
-	node->brushes = NULL;
-	node->polygons = NULL;
+	node->brushes = nullptr;
+	node->polygons = nullptr;
 	node->parent = parent;
 	src->ExpectTokenString( "( " );
 	node->planeType = src->ParseInt();
@@ -358,14 +370,14 @@ cm_node_t *arcCollisionModelManagerLocal::ParseNodes( arcLexer *src, cm_model_t 
 
 /*
 ================
-arcCollisionModelManagerLocal::ParsePolygons
+anSoftBodiesPhysicsManager::ParsePolygons
 ================
 */
-void arcCollisionModelManagerLocal::ParsePolygons( arcLexer *src, cm_model_t *model ) {
+void anSoftBodiesPhysicsManager::ParsePolygons( anLexer *src, cm_model_t *model ) {
 	cm_polygon_t *p;
 	int i, numEdges;
-	arcVec3 normal;
-	arcNetToken token;
+	anVec3 normal;
+	anToken token;
 
 	if ( src->CheckTokenType( TT_NUMBER, 0, &token ) ) {
 		model->polygonBlock = (cm_polygonBlock_t *) Mem_Alloc( sizeof( cm_polygonBlock_t ) + token.GetIntValue() );
@@ -395,20 +407,20 @@ void arcCollisionModelManagerLocal::ParsePolygons( arcLexer *src, cm_model_t *mo
 		p->contents = p->material->GetContentFlags();
 		p->checkcount = 0;
 		// filter polygon into tree
-		R_FilterPolygonIntoTree( model, model->node, NULL, p );
+		R_FilterPolygonIntoTree( model, model->node, nullptr, p );
 	}
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::ParseBrushes
+anSoftBodiesPhysicsManager::ParseBrushes
 ================
 */
-void arcCollisionModelManagerLocal::ParseBrushes( arcLexer *src, cm_model_t *model ) {
+void anSoftBodiesPhysicsManager::ParseBrushes( anLexer *src, cm_model_t *model ) {
 	cm_brush_t *b;
 	int i, numPlanes;
-	arcVec3 normal;
-	arcNetToken token;
+	anVec3 normal;
+	anToken token;
 
 	if ( src->CheckTokenType( TT_NUMBER, 0, &token ) ) {
 		model->brushBlock = (cm_brushBlock_t *) Mem_Alloc( sizeof( cm_brushBlock_t ) + token.GetIntValue() );
@@ -440,18 +452,18 @@ void arcCollisionModelManagerLocal::ParseBrushes( arcLexer *src, cm_model_t *mod
 		b->checkcount = 0;
 		b->primitiveNum = 0;
 		// filter brush into tree
-		R_FilterBrushIntoTree( model, model->node, NULL, b );
+		R_FilterBrushIntoTree( model, model->node, nullptr, b );
 	}
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::ParseCollisionModel
+anSoftBodiesPhysicsManager::ParseCollisionModel
 ================
 */
-bool arcCollisionModelManagerLocal::ParseCollisionModel( arcLexer *src ) {
+bool anSoftBodiesPhysicsManager::ParseCollisionModel( anLexer *src ) {
 	cm_model_t *model;
-	arcNetToken token;
+	anToken token;
 
 	if ( numModels >= MAX_SUBMODELS ) {
 		common->Error( "LoadModel: no free slots" );
@@ -480,7 +492,7 @@ bool arcCollisionModelManagerLocal::ParseCollisionModel( arcLexer *src ) {
 
 		if ( token == "nodes" ) {
 			src->ExpectTokenString( "{" );
-			model->node = ParseNodes( src, model, NULL );
+			model->node = ParseNodes( src, model, nullptr );
 			src->ExpectTokenString( "}" );
 			continue;
 		}
@@ -518,19 +530,19 @@ bool arcCollisionModelManagerLocal::ParseCollisionModel( arcLexer *src ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::LoadCollisionModelFile
+anSoftBodiesPhysicsManager::LoadCollisionModelFile
 ================
 */
-bool arcCollisionModelManagerLocal::LoadCollisionModelFile( const char *name, unsigned int mapFileCRC ) {
-	arcNetString fileName;
-	arcNetToken token;
-	arcLexer *src;
+bool anSoftBodiesPhysicsManager::LoadCollisionModelFile( const char *name, unsigned int mapFileCRC ) {
+	anString fileName;
+	anToken token;
+	anLexer *src;
 	unsigned int crc;
 
 	// load it
 	fileName = name;
 	fileName.SetFileExtension( CM_FILE_EXT );
-	src = new arcLexer( fileName );
+	src = new anLexer( fileName );
 	src->SetFlags( LEXFL_NOSTRINGCONCAT | LEXFL_NODOLLARPRECOMPILE );
 	if ( !src->IsLoaded() ) {
 		delete src;
@@ -576,7 +588,7 @@ bool arcCollisionModelManagerLocal::LoadCollisionModelFile( const char *name, un
 			continue;
 		}
 
-		src->Error( "arcCollisionModelManagerLocal::LoadCollisionModelFile: bad token \"%s\"", token.c_str() );
+		src->Error( "anSoftBodiesPhysicsManager::LoadCollisionModelFile: bad token \"%s\"", token.c_str() );
 	}
 
 	delete src;

@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "MaterialModifier.h"
@@ -127,7 +127,7 @@ void StageMoveModifier::Redo() {
 /**
 * Constructor for StageDeleteModifier
 */
-StageDeleteModifier::StageDeleteModifier(MaterialDocManager* manager, const char* materialName, int stageNum, arcDictionary stageData)
+StageDeleteModifier::StageDeleteModifier(MaterialDocManager* manager, const char* materialName, int stageNum, anDict stageData)
 : MaterialModifier(manager, materialName) {
 	this->stageNum = stageNum;
 	this->stageData = stageData;
@@ -361,7 +361,7 @@ void RenameMaterialFolderModifier::Redo() {
 /**
 * Constructor for DeleteMaterialFolderModifier
 */
-DeleteMaterialFolderModifier::DeleteMaterialFolderModifier(MaterialDocManager* manager, const char* materialName, MaterialTreeView* view, HTREEITEM parent, arcStringList* affectedMaterials)
+DeleteMaterialFolderModifier::DeleteMaterialFolderModifier(MaterialDocManager* manager, const char* materialName, MaterialTreeView* view, HTREEITEM parent, anStringList* affectedMaterials)
 : MaterialModifier(manager, materialName) {
 	this->view = view;
 	this->parent = parent;

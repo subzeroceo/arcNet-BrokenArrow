@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -88,11 +88,11 @@ int Undo_MemorySize( void )
 	size = 0;
 	for (undo = g_undolist; undo; undo = undo->next)
 	{
-		for (pBrush = undo->brushlist.next; pBrush != NULL && pBrush != &undo->brushlist; pBrush = pBrush->next)
+		for (pBrush = undo->brushlist.next; pBrush != nullptr && pBrush != &undo->brushlist; pBrush = pBrush->next)
 		{
 			size += Brush_MemorySize(pBrush);
 		}
-		for (pEntity = undo->entitylist.next; pEntity != NULL && pEntity != &undo->entitylist; pEntity = pEntity->next)
+		for (pEntity = undo->entitylist.next; pEntity != nullptr && pEntity != &undo->entitylist; pEntity = pEntity->next)
 		{
 			size += Entity_MemorySize(pEntity);
 		}
@@ -117,20 +117,20 @@ void Undo_ClearRedo( void )
 	for (redo = g_redolist; redo; redo = nextredo)
 	{
 		nextredo = redo->next;
-		for (pBrush = redo->brushlist.next; pBrush != NULL && pBrush != &redo->brushlist; pBrush = pNextBrush)
+		for (pBrush = redo->brushlist.next; pBrush != nullptr && pBrush != &redo->brushlist; pBrush = pNextBrush)
 		{
 			pNextBrush = pBrush->next;
 			Brush_Free(pBrush);
 		}
-		for (pEntity = redo->entitylist.next; pEntity != NULL && pEntity != &redo->entitylist; pEntity = pNextEntity)
+		for (pEntity = redo->entitylist.next; pEntity != nullptr && pEntity != &redo->entitylist; pEntity = pNextEntity)
 		{
 			pNextEntity = pEntity->next;
 			Entity_Free(pEntity);
 		}
 		Mem_Free(redo);
 	}
-	g_redolist = NULL;
-	g_lastredo = NULL;
+	g_redolist = nullptr;
+	g_lastredo = nullptr;
 	g_redoId = 1;
 }
 
@@ -151,13 +151,13 @@ void Undo_Clear( void )
 	for (undo = g_undolist; undo; undo = nextundo)
 	{
 		nextundo = undo->next;
-		for (pBrush = undo->brushlist.next; pBrush != NULL && pBrush != &undo->brushlist; pBrush = pNextBrush)
+		for (pBrush = undo->brushlist.next; pBrush != nullptr && pBrush != &undo->brushlist; pBrush = pNextBrush)
 		{
 			pNextBrush = pBrush->next;
 			g_undoMemorySize -= Brush_MemorySize(pBrush);
 			Brush_Free(pBrush);
 		}
-		for (pEntity = undo->entitylist.next; pEntity != NULL && pEntity != &undo->entitylist; pEntity = pNextEntity)
+		for (pEntity = undo->entitylist.next; pEntity != nullptr && pEntity != &undo->entitylist; pEntity = pNextEntity)
 		{
 			pNextEntity = pEntity->next;
 			g_undoMemorySize -= Entity_MemorySize(pEntity);
@@ -166,8 +166,8 @@ void Undo_Clear( void )
 		g_undoMemorySize -= sizeof(undo_t);
 		Mem_Free(undo);
 	}
-	g_undolist = NULL;
-	g_lastundo = NULL;
+	g_undolist = nullptr;
+	g_lastundo = nullptr;
 	g_undoSize = 0;
 	g_undoMemorySize = 0;
 	g_undoId = 1;
@@ -231,15 +231,15 @@ void Undo_FreeFirstUndo( void )
 	//remove the oldest undo from the undo buffer
 	undo = g_undolist;
 	g_undolist = g_undolist->next;
-	g_undolist->prev = NULL;
+	g_undolist->prev = nullptr;
 	//
-	for (pBrush = undo->brushlist.next; pBrush != NULL && pBrush != &undo->brushlist; pBrush = pNextBrush)
+	for (pBrush = undo->brushlist.next; pBrush != nullptr && pBrush != &undo->brushlist; pBrush = pNextBrush)
 	{
 		pNextBrush = pBrush->next;
 		g_undoMemorySize -= Brush_MemorySize(pBrush);
 		Brush_Free(pBrush);
 	}
-	for (pEntity = undo->entitylist.next; pEntity != NULL && pEntity != &undo->entitylist; pEntity = pNextEntity)
+	for (pEntity = undo->entitylist.next; pEntity != nullptr && pEntity != &undo->entitylist; pEntity = pNextEntity)
 	{
 		pNextEntity = pEntity->next;
 		g_undoMemorySize -= Entity_MemorySize(pEntity);
@@ -280,7 +280,7 @@ void Undo_GeneralStart(char *operation)
 	if (g_lastundo) g_lastundo->next = undo;
 	else g_undolist = undo;
 	undo->prev = g_lastundo;
-	undo->next = NULL;
+	undo->next = nullptr;
 	g_lastundo = undo;
 
 	undo->time = Sys_DoubleTime();
@@ -291,14 +291,14 @@ void Undo_GeneralStart(char *operation)
 	undo->done = false;
 	undo->operation = operation;
 	//reset the undo IDs of all brushes using the new ID
-	for (pBrush = active_brushes.next; pBrush != NULL && pBrush != &active_brushes; pBrush = pBrush->next)
+	for (pBrush = active_brushes.next; pBrush != nullptr && pBrush != &active_brushes; pBrush = pBrush->next)
 	{
 		if (pBrush->undoId == undo->id)
 		{
 			pBrush->undoId = 0;
 		}
 	}
-	for (pBrush = selected_brushes.next; pBrush != NULL && pBrush != &selected_brushes; pBrush = pBrush->next)
+	for (pBrush = selected_brushes.next; pBrush != nullptr && pBrush != &selected_brushes; pBrush = pBrush->next)
 	{
 		if (pBrush->undoId == undo->id)
 		{
@@ -306,7 +306,7 @@ void Undo_GeneralStart(char *operation)
 		}
 	}
 	//reset the undo IDs of all entities using thew new ID
-	for (pEntity = entities.next; pEntity != NULL && pEntity != &entities; pEntity = pEntity->next)
+	for (pEntity = entities.next; pEntity != nullptr && pEntity != &entities; pEntity = pEntity->next)
 	{
 		if (pEntity->undoId == undo->id)
 		{
@@ -419,7 +419,7 @@ void Undo_AddBrushList(brush_t *brushlist)
 		Sys_Status( "Undo_AddBrushList: WARNING adding brushes after entity.\n" );
 	}
 	//copy the brushes to the undo
-	for (pBrush = brushlist->next; pBrush != NULL && pBrush != brushlist; pBrush=pBrush->next)
+	for (pBrush = brushlist->next; pBrush != nullptr && pBrush != brushlist; pBrush=pBrush->next)
 	{
 		//if the brush is already in the undo
 		if (Undo_BrushInUndo(g_lastundo, pBrush) )
@@ -479,7 +479,7 @@ void Undo_EndBrushList(brush_t *brushlist)
 		//Sys_Status( "Undo_End: last undo already finished.\n" );
 		return;
 	}
-	for (brush_t* pBrush = brushlist->next; pBrush != NULL && pBrush != brushlist; pBrush=pBrush->next)
+	for (brush_t* pBrush = brushlist->next; pBrush != nullptr && pBrush != brushlist; pBrush=pBrush->next)
 	{
 		pBrush->undoId = g_lastundo->id;
 	}
@@ -596,8 +596,8 @@ void Undo_Undo( void )
 	}
 	// get the last undo
 	undo = g_lastundo;
-	if (g_lastundo->prev) g_lastundo->prev->next = NULL;
-	else g_undolist = NULL;
+	if (g_lastundo->prev) g_lastundo->prev->next = nullptr;
+	else g_undolist = nullptr;
 	g_lastundo = g_lastundo->prev;
 
 	//allocate a new redo
@@ -611,7 +611,7 @@ void Undo_Undo( void )
 	if (g_lastredo) g_lastredo->next = redo;
 	else g_redolist = redo;
 	redo->prev = g_lastredo;
-	redo->next = NULL;
+	redo->next = nullptr;
 	g_lastredo = redo;
 	redo->time = Sys_DoubleTime();
 	redo->id = g_redoId++;
@@ -619,14 +619,14 @@ void Undo_Undo( void )
 	redo->operation = undo->operation;
 
 	//reset the redo IDs of all brushes using the new ID
-	for (pBrush = active_brushes.next; pBrush != NULL && pBrush != &active_brushes; pBrush = pBrush->next)
+	for (pBrush = active_brushes.next; pBrush != nullptr && pBrush != &active_brushes; pBrush = pBrush->next)
 	{
 		if (pBrush->redoId == redo->id)
 		{
 			pBrush->redoId = 0;
 		}
 	}
-	for (pBrush = selected_brushes.next; pBrush != NULL && pBrush != &selected_brushes; pBrush = pBrush->next)
+	for (pBrush = selected_brushes.next; pBrush != nullptr && pBrush != &selected_brushes; pBrush = pBrush->next)
 	{
 		if (pBrush->redoId == redo->id)
 		{
@@ -634,7 +634,7 @@ void Undo_Undo( void )
 		}
 	}
 	//reset the redo IDs of all entities using thew new ID
-	for (pEntity = entities.next; pEntity != NULL && pEntity != &entities; pEntity = pEntity->next)
+	for (pEntity = entities.next; pEntity != nullptr && pEntity != &entities; pEntity = pEntity->next)
 	{
 		if (pEntity->redoId == redo->id)
 		{
@@ -645,7 +645,7 @@ void Undo_Undo( void )
 	// remove current selection
 	Select_Deselect();
 	// move "created" brushes to the redo
-	for (pBrush = active_brushes.next; pBrush != NULL && pBrush != &active_brushes; pBrush=pNextBrush)
+	for (pBrush = active_brushes.next; pBrush != nullptr && pBrush != &active_brushes; pBrush=pNextBrush)
 	{
 		pNextBrush = pBrush->next;
 		if (pBrush->undoId == undo->id)
@@ -661,13 +661,13 @@ void Undo_Undo( void )
 		}
 	}
 	// move "created" entities to the redo
-	for (pEntity = entities.next; pEntity != NULL && pEntity != &entities; pEntity = pNextEntity)
+	for (pEntity = entities.next; pEntity != nullptr && pEntity != &entities; pEntity = pNextEntity)
 	{
 		pNextEntity = pEntity->next;
 		if (pEntity->undoId == undo->id)
 		{
 			// check if this entity is in the undo
-			for (pUndoEntity = undo->entitylist.next; pUndoEntity != NULL && pUndoEntity != &undo->entitylist; pUndoEntity = pUndoEntity->next)
+			for (pUndoEntity = undo->entitylist.next; pUndoEntity != nullptr && pUndoEntity != &undo->entitylist; pUndoEntity = pUndoEntity->next)
 			{
 				// move brushes to the undo entity
 				if (pUndoEntity->entityId == pEntity->entityId)
@@ -686,7 +686,7 @@ void Undo_Undo( void )
 		}
 	}
 	// add the undo entities back into the entity list
-	for (pEntity = undo->entitylist.next; pEntity != NULL && pEntity != &undo->entitylist; pEntity = undo->entitylist.next)
+	for (pEntity = undo->entitylist.next; pEntity != nullptr && pEntity != &undo->entitylist; pEntity = undo->entitylist.next)
 	{
 		g_undoMemorySize -= Entity_MemorySize(pEntity);
 		//if this is the world entity
@@ -707,12 +707,12 @@ void Undo_Undo( void )
 		}
 	}
 	// add the undo brushes back into the selected brushes
-	for (pBrush = undo->brushlist.next; pBrush != NULL && pBrush != &undo->brushlist; pBrush = undo->brushlist.next)
+	for (pBrush = undo->brushlist.next; pBrush != nullptr && pBrush != &undo->brushlist; pBrush = undo->brushlist.next)
 	{
 		g_undoMemorySize -= Brush_MemorySize(pBrush);
 		Brush_RemoveFromList(pBrush);
     	Brush_AddToList(pBrush, &active_brushes);
-		for (pEntity = entities.next; pEntity != NULL && pEntity != &entities; pEntity = pEntity->next)
+		for (pEntity = entities.next; pEntity != nullptr && pEntity != &entities; pEntity = pEntity->next)
 		{
 			if (pEntity->entityId == pBrush->ownerId)
 			{
@@ -721,7 +721,7 @@ void Undo_Undo( void )
 			}
 		}
 		//if the brush is not linked then it should be linked into the world entity
-		if (pEntity == NULL || pEntity == &entities)
+		if (pEntity == nullptr || pEntity == &entities)
 		{
 			Entity_LinkBrush(world_entity, pBrush);
 		}
@@ -742,11 +742,11 @@ void Undo_Undo( void )
 
 	Sys_BeginWait();
 	brush_t *b, *next;
-	for (b = active_brushes.next; b != NULL && b != &active_brushes; b=next) {
+	for (b = active_brushes.next; b != nullptr && b != &active_brushes; b=next) {
 		next = b->next;
 		Brush_Build( b, true, false, false );
 	}
-	for (b = selected_brushes.next; b != NULL && b != &selected_brushes; b=next) {
+	for (b = selected_brushes.next; b != nullptr && b != &selected_brushes; b=next) {
 		next = b->next;
 		Brush_Build( b, true, false, false );
 	}
@@ -781,15 +781,15 @@ void Undo_Redo( void )
 	}
 	// get the last redo
 	redo = g_lastredo;
-	if (g_lastredo->prev) g_lastredo->prev->next = NULL;
-	else g_redolist = NULL;
+	if (g_lastredo->prev) g_lastredo->prev->next = nullptr;
+	else g_redolist = nullptr;
 	g_lastredo = g_lastredo->prev;
 	//
 	Undo_GeneralStart(redo->operation);
 	// remove current selection
 	Select_Deselect();
 	// move "created" brushes back to the last undo
-	for (pBrush = active_brushes.next; pBrush != NULL && pBrush != &active_brushes; pBrush = pNextBrush)
+	for (pBrush = active_brushes.next; pBrush != nullptr && pBrush != &active_brushes; pBrush = pNextBrush)
 	{
 		pNextBrush = pBrush->next;
 		if (pBrush->redoId == redo->id)
@@ -803,13 +803,13 @@ void Undo_Redo( void )
 		}
 	}
 	// move "created" entities back to the last undo
-	for (pEntity = entities.next; pEntity != NULL && pEntity != &entities; pEntity = pNextEntity)
+	for (pEntity = entities.next; pEntity != nullptr && pEntity != &entities; pEntity = pNextEntity)
 	{
 		pNextEntity = pEntity->next;
 		if (pEntity->redoId == redo->id)
 		{
 			// check if this entity is in the redo
-			for (pRedoEntity = redo->entitylist.next; pRedoEntity != NULL && pRedoEntity != &redo->entitylist; pRedoEntity = pRedoEntity->next)
+			for (pRedoEntity = redo->entitylist.next; pRedoEntity != nullptr && pRedoEntity != &redo->entitylist; pRedoEntity = pRedoEntity->next)
 			{
 				// move brushes to the redo entity
 				if (pRedoEntity->entityId == pEntity->entityId)
@@ -829,7 +829,7 @@ void Undo_Redo( void )
 		}
 	}
 	// add the undo entities back into the entity list
-	for (pEntity = redo->entitylist.next; pEntity != NULL && pEntity != &redo->entitylist; pEntity = redo->entitylist.next)
+	for (pEntity = redo->entitylist.next; pEntity != nullptr && pEntity != &redo->entitylist; pEntity = redo->entitylist.next)
 	{
 		//if this is the world entity
 		if (pEntity->entityId == world_entity->entityId)
@@ -848,11 +848,11 @@ void Undo_Redo( void )
 		}
 	}
 	// add the redo brushes back into the selected brushes
-	for (pBrush = redo->brushlist.next; pBrush != NULL && pBrush != &redo->brushlist; pBrush = redo->brushlist.next)
+	for (pBrush = redo->brushlist.next; pBrush != nullptr && pBrush != &redo->brushlist; pBrush = redo->brushlist.next)
 	{
 		Brush_RemoveFromList(pBrush);
     	Brush_AddToList(pBrush, &active_brushes);
-		for (pEntity = entities.next; pEntity != NULL && pEntity != &entities; pEntity = pEntity->next)
+		for (pEntity = entities.next; pEntity != nullptr && pEntity != &entities; pEntity = pEntity->next)
 		{
 			if (pEntity->entityId == pBrush->ownerId)
 			{
@@ -861,7 +861,7 @@ void Undo_Redo( void )
 			}
 		}
 		//if the brush is not linked then it should be linked into the world entity
-		if (pEntity == NULL || pEntity == &entities)
+		if (pEntity == nullptr || pEntity == &entities)
 		{
 			Entity_LinkBrush(world_entity, pBrush);
 		}

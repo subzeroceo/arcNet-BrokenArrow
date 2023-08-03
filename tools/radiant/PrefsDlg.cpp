@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -115,7 +115,7 @@ static char THIS_FILE[] = __FILE__;
 // CPrefsDlg dialog
 
 
-CPrefsDlg::CPrefsDlg(CWnd* pParent /*=NULL*/)
+CPrefsDlg::CPrefsDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CPrefsDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPrefsDlg)
@@ -253,7 +253,7 @@ void CPrefsDlg::OnOK()
 }
 
 int GetCvarInt(const char *name, const int def) {
-	arcCVarSystem *cvar = cvarSystem->Find( name );
+	anCVarSystem *cvar = cvarSystem->Find( name );
 	if ( cvar ) {
 		return cvar->GetInteger();
 	} else {
@@ -262,7 +262,7 @@ int GetCvarInt(const char *name, const int def) {
 }
 
 const char *GetCvarString( const char *name, const char *def ) {
-	arcCVarSystem *cvar = cvarSystem->Find( name );
+	anCVarSystem *cvar = cvarSystem->Find( name );
 	if ( cvar ) {
 		return cvar->GetString();
 	} else {
@@ -282,7 +282,7 @@ void SetCvarString( const char *name, const char *value ) {
 
 void SetCvarBinary(const char *name, void *pv, int size) {
 	unsigned char *in = new unsigned char[size];
-	arcNetString s;
+	anString s;
 	memset( in, 0, size );
 	memcpy( in, pv, size );
 	for ( int i = 0; i < size; i++ ) {
@@ -296,7 +296,7 @@ void SetCvarBinary(const char *name, void *pv, int size) {
 bool GetCvarBinary( const char *name, void *pv, int size ) {
 	bool ret = false;
 	unsigned char *out = new unsigned char[size];
-	arcNetString s = GetCvarString( name, "" );
+	anString s = GetCvarString( name, "" );
 	if ( s.Length() / 2 == size ) {
 		int j = 0;
 		for ( int i = 0; i < s.Length(); i += 2 ) {

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "dmap.h"
@@ -47,7 +47,7 @@ resolved: normals.  otherwise adjacent facet shaded surfaces get their
 
 #endif
 
-static	arcNetFile	*procFile;
+static	anFile	*procFile;
 
 #define	AREANUM_DIFFERENT	-2
 /*
@@ -88,17 +88,17 @@ int	PruneNodes_r( node_t *node ) {
 	return a1;
 }
 
-static void WriteFloat( arcNetFile *f, float v )
+static void WriteFloat( anFile *f, float v )
 {
-	if ( arcMath::Fabs( v - arcMath::Rint( v) ) < 0.001 ) {
-		f->WriteFloatString( "%i ", ( int )arcMath::Rint( v) );
+	if ( anMath::Fabs( v - anMath::Rint( v) ) < 0.001 ) {
+		f->WriteFloatString( "%i ", ( int )anMath::Rint( v) );
 	}
 	else {
 		f->WriteFloatString( "%f ", v );
 	}
 }
 
-void Write1DMatrix( arcNetFile *f, int x, float *m ) {
+void Write1DMatrix( anFile *f, int x, float *m ) {
 	int		i;
 
 	f->WriteFloatString( "( " );
@@ -150,20 +150,20 @@ MatchVert
 #define	ST_EPSILON	0.001
 #define	COSINE_EPSILON	0.999
 
-static bool MatchVert( const arcDrawVert *a, const arcDrawVert *b ) {
-	if ( arcMath::Fabs( a->xyz[0] - b->xyz[0] ) > XYZ_EPSILON ) {
+static bool MatchVert( const anDrawVertex *a, const anDrawVertex *b ) {
+	if ( anMath::Fabs( a->xyz[0] - b->xyz[0] ) > XYZ_EPSILON ) {
 		return false;
 	}
-	if ( arcMath::Fabs( a->xyz[1] - b->xyz[1] ) > XYZ_EPSILON ) {
+	if ( anMath::Fabs( a->xyz[1] - b->xyz[1] ) > XYZ_EPSILON ) {
 		return false;
 	}
-	if ( arcMath::Fabs( a->xyz[2] - b->xyz[2] ) > XYZ_EPSILON ) {
+	if ( anMath::Fabs( a->xyz[2] - b->xyz[2] ) > XYZ_EPSILON ) {
 		return false;
 	}
-	if ( arcMath::Fabs( a->st[0] - b->st[0] ) > ST_EPSILON ) {
+	if ( anMath::Fabs( a->st[0] - b->st[0] ) > ST_EPSILON ) {
 		return false;
 	}
-	if ( arcMath::Fabs( a->st[1] - b->st[1] ) > ST_EPSILON ) {
+	if ( anMath::Fabs( a->st[1] - b->st[1] ) > ST_EPSILON ) {
 		return false;
 	}
 
@@ -188,13 +188,13 @@ ShareMapTriVerts
 Converts independent triangles to shared vertex triangles
 ====================
 */
-surfTriangles_t	*ShareMapTriVerts( const mapTri_t *tris ) {
+srfTriangles_t	*ShareMapTriVerts( const mapTri_t *tris ) {
 	const mapTri_t	*step;
 	int			count;
 	int			i, j;
 	int			numVerts;
 	int			numIndexes;
-	surfTriangles_t	*uTri;
+	srfTriangles_t	*uTri;
 
 	// unique the vertexes
 	count = CountTriList( tris );
@@ -208,7 +208,7 @@ surfTriangles_t	*ShareMapTriVerts( const mapTri_t *tris ) {
 
 	for ( step = tris; step; step = step->next ) {
 		for ( i = 0; i < 3; i++ ) {
-			const arcDrawVert	*dv;
+			const anDrawVertex	*dv;
 
 			dv = &step->v[i];
 
@@ -241,7 +241,7 @@ surfTriangles_t	*ShareMapTriVerts( const mapTri_t *tris ) {
 CleanupUTriangles
 ==================
 */
-static void CleanupUTriangles( surfTriangles_t *tri ) {
+static void CleanupUTriangles( srfTriangles_t *tri ) {
 	// perform cleanup operations
 
 	R_RangeCheckIndexes( tri );
@@ -260,7 +260,7 @@ WriteUTriangles
 Writes text verts and indexes to procfile
 ====================
 */
-static void WriteUTriangles( const surfTriangles_t *uTris ) {
+static void WriteUTriangles( const srfTriangles_t *uTris ) {
 	int			col;
 	int			i;
 
@@ -272,7 +272,7 @@ static void WriteUTriangles( const surfTriangles_t *uTris ) {
 	col = 0;
 	for ( i = 0; i < uTris->numVerts; i++ ) {
 		float	vec[8];
-		const arcDrawVert *dv;
+		const anDrawVertex *dv;
 
 		dv = &uTris->verts[i];
 
@@ -318,7 +318,7 @@ WriteShadowTriangles
 Writes text verts and indexes to procfile
 ====================
 */
-static void WriteShadowTriangles( const surfTriangles_t *tri ) {
+static void WriteShadowTriangles( const srfTriangles_t *tri ) {
 	int			col;
 	int			i;
 
@@ -383,12 +383,12 @@ static void WriteOutputSurfaces( int entityNum, int areaNum ) {
 	mapTri_t	*ambient, *copy;
 	int			surfaceNum;
 	int			numSurfaces;
-	idMapEntity	*entity;
+	anMapEntity	*entity;
 	uArea_t		*area;
 	optimizeGroup_t	*group, *groupStep;
 	int			i; // , j;
 //	int			col;
-	surfTriangles_t	*uTri;
+	srfTriangles_t	*uTri;
 //	mapTri_t	*tri;
 typedef struct interactionTris_s {
 	struct interactionTris_s	*next;
@@ -430,11 +430,11 @@ typedef struct interactionTris_s {
 		// surface, even though they couldn't be merged together to save
 		// vertexes because they had different planes, texture coordinates, or lights.
 		// Different mergeGroups will stay in separate surfaces.
-		ambient = NULL;
+		ambient = nullptr;
 
 		// each light that illuminates any of the groups in the surface will
 		// get its own list of indexes out of the original surface
-		interactions = NULL;
+		interactions = nullptr;
 
 		for ( groupStep = group; groupStep; groupStep = groupStep->nextGroup ) {
 			if ( groupStep->surfaceEmited ) {
@@ -502,7 +502,7 @@ WriteNode_r
 static void WriteNode_r( node_t *node ) {
 	int		child[2];
 	int		i;
-	arcPlane	*plane;
+	anPlane	*plane;
 
 	if ( node->planenum == PLANENUM_LEAF ) {
 		// we shouldn't get here unless the entire world
@@ -576,7 +576,7 @@ WriteOutputPortals
 static void WriteOutputPortals( uEntity_t *e ) {
 	int			i, j;
 	interAreaPortal_t	*iap;
-	arcWinding			*w;
+	anWinding			*w;
 
 	procFile->WriteFloatString( "interAreaPortals { /* numAreas = */ %i /* numIAP = */ %i\n\n",
 		e->numAreas, numInterAreaPortals );
@@ -636,7 +636,7 @@ WriteOutputFile
 void WriteOutputFile( void ) {
 	int				i;
 	uEntity_t		*entity;
-	arcNetString			qpath;
+	anString			qpath;
 
 	// write the file
 	common->Printf( "----- WriteOutputFile -----\n" );
@@ -675,7 +675,7 @@ void WriteOutputFile( void ) {
 		procFile->WriteFloatString( "}\n\n" );
 
 		R_FreeStaticTriSurf( light->shadowTris );
-		light->shadowTris = NULL;
+		light->shadowTris = nullptr;
 	}
 
 	fileSystem->CloseFile( procFile );

@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -10,7 +10,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-CCameraTargetDlg::CCameraTargetDlg(CWnd* pParent /*=NULL*/)
+CCameraTargetDlg::CCameraTargetDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CCameraTargetDlg::IDD, pParent) {
 	m_nType = 0;
 	m_strName = _T( "" );

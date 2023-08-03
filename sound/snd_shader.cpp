@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "snd_local.h"
@@ -34,70 +34,70 @@ If you have questions concerning this license or the applicable additional terms
 
 /*
 ===============
-arcSoundShader::Init
+anSoundShader::Init
 ===============
 */
-void arcSoundShader::Init( void ) {
+void anSoundShader::Init( void ) {
 	desc = "<no description>";
 	errorDuringParse = false;
 	onDemand = false;
 	numEntries = 0;
 	numLeadins = 0;
 	leadinVolume = 0;
-	altSound = NULL;
+	altSound = nullptr;
 }
 
 /*
 ===============
-arcSoundShader::arcSoundShader
+anSoundShader::anSoundShader
 ===============
 */
-arcSoundShader::arcSoundShader( void ) {
+anSoundShader::anSoundShader( void ) {
 	Init();
 }
 
 /*
 ===============
-arcSoundShader::~arcSoundShader
+anSoundShader::~anSoundShader
 ===============
 */
-arcSoundShader::~arcSoundShader( void ) {
+anSoundShader::~anSoundShader( void ) {
 }
 
 /*
 =================
-arcSoundShader::Size
+anSoundShader::Size
 =================
 */
-size_t arcSoundShader::Size( void ) const {
-	return sizeof( arcSoundShader );
+size_t anSoundShader::Size( void ) const {
+	return sizeof( anSoundShader );
 }
 
 /*
 ===============
-arcSoundShader::arcSoundShader::FreeData
+anSoundShader::anSoundShader::FreeData
 ===============
 */
-void arcSoundShader::FreeData() {
+void anSoundShader::FreeData() {
 	numEntries = 0;
 	numLeadins = 0;
 }
 
 /*
 ===================
-arcSoundShader::SetDefaultText
+anSoundShader::SetDefaultText
 ===================
 */
-bool arcSoundShader::SetDefaultText( void ) {
-	arcNetString wavname;
+bool anSoundShader::SetDefaultText( void ) {
+	anString wavname;
 
 	wavname = GetName();
 	wavname.DefaultFileExtension( ".wav" );		// if the name has .ogg in it, that will stay
 
 	// if there exists a wav file with the same name
-	if ( 1 ) { //fileSystem->ReadFile( wavname, NULL ) != -1 ) {
+	if ( 1 ) { //fileSystem->ReadFile( wavname, nullptr ) != -1 ) {
 		char generated[2048];
-		arcNetString::snPrintf( generated, sizeof( generated ),
+		anString::snPrintf( generated, sizeof( generated ),
 						"sound %s // IMPLICITLY GENERATED\n"
 						"{\n"
 						"%s\n"
@@ -114,7 +114,7 @@ bool arcSoundShader::SetDefaultText( void ) {
 DefaultDefinition
 ===================
 */
-const char *arcSoundShader::DefaultDefinition() const {
+const char *anSoundShader::DefaultDefinition() const {
 	return
 		"{\n"
 	"\t"	"_default.wav\n"
@@ -123,13 +123,13 @@ const char *arcSoundShader::DefaultDefinition() const {
 
 /*
 ===============
-arcSoundShader::Parse
+anSoundShader::Parse
 
   this is called by the declManager
 ===============
 */
-bool arcSoundShader::Parse( const char *text, const int textLength ) {
-	arcLexer	src;
+bool anSoundShader::Parse( const char *text, const int textLength ) {
+	anLexer	src;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( DECL_LEXER_FLAGS );
@@ -147,12 +147,12 @@ bool arcSoundShader::Parse( const char *text, const int textLength ) {
 
 /*
 ===============
-arcSoundShader::ParseShader
+anSoundShader::ParseShader
 ===============
 */
-bool arcSoundShader::ParseShader( arcLexer &src ) {
+bool anSoundShader::ParseShader( anLexer &src ) {
 	int			i;
-	arcNetToken		token;
+	anToken		token;
 
 	parms.minDistance = 1;
 	parms.maxDistance = 10;
@@ -162,11 +162,11 @@ bool arcSoundShader::ParseShader( arcLexer &src ) {
 	parms.soundClass = 0;
 
 	speakerMask = 0;
-	altSound = NULL;
+	altSound = nullptr;
 
 	for ( i = 0; i < SOUND_MAX_LIST_WAVS; i++ ) {
-		leadins[i] = NULL;
-		entries[i] = NULL;
+		leadins[i] = nullptr;
+		entries[i] = nullptr;
 	}
 	numEntries = 0;
 	numLeadins = 0;
@@ -186,7 +186,7 @@ bool arcSoundShader::ParseShader( arcLexer &src ) {
 		}
 		// minimum number of sounds
 		else if ( !token.Icmp( "minSamples" ) ) {
-			maxSamples = arcMath::ClampInt( src.ParseInt(), SOUND_MAX_LIST_WAVS, maxSamples );
+			maxSamples = anMath::ClampInt( src.ParseInt(), SOUND_MAX_LIST_WAVS, maxSamples );
 		}
 		// description
 		else if ( !token.Icmp( "description" ) ) {
@@ -337,18 +337,18 @@ bool arcSoundShader::ParseShader( arcLexer &src ) {
 			// add to the wav list
 			if ( soundSystemLocal.soundCache && numEntries < maxSamples ) {
 				token.BackSlashesToSlashes();
-				arcNetString lang = cvarSystem->GetCVarString( "sys_lang" );
+				anString lang = cvarSystem->GetCVarString( "sys_lang" );
 				if ( lang.Icmp( "english" ) != 0 && token.Find( "sound/vo/", false ) >= 0 ) {
-					arcNetString work = token;
+					anString work = token;
 					work.ToLower();
 					work.StripLeading( "sound/vo/" );
 					work = va( "sound/vo/%s/%s", lang.c_str(), work.c_str() );
-					if ( fileSystem->ReadFile( work, NULL, NULL ) > 0 ) {
+					if ( fileSystem->ReadFile( work, nullptr, nullptr ) > 0 ) {
 						token = work;
 					} else {
 						// also try to find it with the .ogg extension
 						work.SetFileExtension( ".ogg" );
-						if ( fileSystem->ReadFile( work, NULL, NULL ) > 0 ) {
+						if ( fileSystem->ReadFile( work, nullptr, nullptr ) > 0 ) {
 							token = work;
 						}
 					}
@@ -371,24 +371,24 @@ bool arcSoundShader::ParseShader( arcLexer &src ) {
 
 /*
 ===============
-arcSoundShader::CheckShakesAndOgg
+anSoundShader::CheckShakesAndOgg
 ===============
 */
-bool arcSoundShader::CheckShakesAndOgg( void ) const {
+bool anSoundShader::CheckShakesAndOgg( void ) const {
 	int i;
 	bool ret = false;
 
 	for ( i = 0; i < numLeadins; i++ ) {
-		if ( leadins[ i ]->objectInfo.wFormatTag == WAVE_FORMAT_TAG_OGG ) {
+		if ( leadins[i]->objectInfo.wFormatTag == WAVE_FORMAT_TAG_OGG ) {
 			common->Warning( "sound shader '%s' has shakes and uses OGG file '%s'",
-								GetName(), leadins[ i ]->name.c_str() );
+								GetName(), leadins[i]->name.c_str() );
 			ret = true;
 		}
 	}
 	for ( i = 0; i < numEntries; i++ ) {
-		if ( entries[ i ]->objectInfo.wFormatTag == WAVE_FORMAT_TAG_OGG ) {
+		if ( entries[i]->objectInfo.wFormatTag == WAVE_FORMAT_TAG_OGG ) {
 			common->Warning( "sound shader '%s' has shakes and uses OGG file '%s'",
-								GetName(), entries[ i ]->name.c_str() );
+								GetName(), entries[i]->name.c_str() );
 			ret = true;
 		}
 	}
@@ -397,14 +397,14 @@ bool arcSoundShader::CheckShakesAndOgg( void ) const {
 
 /*
 ===============
-arcSoundShader::List
+anSoundShader::List
 ===============
 */
-void arcSoundShader::List() const {
-	arcStringList	shaders;
+void anSoundShader::List() const {
+	anStringList	shaders;
 
 	common->Printf( "%4i: %s\n", Index(), GetName() );
-	if ( arcNetString::Icmp( GetDescription(), "<no description>" ) != 0 ) {
+	if ( anString::Icmp( GetDescription(), "<no description>" ) != 0 ) {
 		common->Printf( "      description: %s\n", GetDescription() );
 	}
 	for ( int k = 0; k < numLeadins; k++ ) {
@@ -425,46 +425,46 @@ void arcSoundShader::List() const {
 
 /*
 ===============
-arcSoundShader::GetAltSound
+anSoundShader::GetAltSound
 ===============
 */
-const arcSoundShader *arcSoundShader::GetAltSound( void ) const {
+const anSoundShader *anSoundShader::GetAltSound( void ) const {
 	return altSound;
 }
 
 /*
 ===============
-arcSoundShader::GetMinDistance
+anSoundShader::GetMinDistance
 ===============
 */
-float arcSoundShader::GetMinDistance() const {
+float anSoundShader::GetMinDistance() const {
 	return parms.minDistance;
 }
 
 /*
 ===============
-arcSoundShader::GetMaxDistance
+anSoundShader::GetMaxDistance
 ===============
 */
-float arcSoundShader::GetMaxDistance() const {
+float anSoundShader::GetMaxDistance() const {
 	return parms.maxDistance;
 }
 
 /*
 ===============
-arcSoundShader::GetDescription
+anSoundShader::GetDescription
 ===============
 */
-const char *arcSoundShader::GetDescription() const {
+const char *anSoundShader::GetDescription() const {
 	return desc;
 }
 
 /*
 ===============
-arcSoundShader::HasDefaultSound
+anSoundShader::HasDefaultSound
 ===============
 */
-bool arcSoundShader::HasDefaultSound() const {
+bool anSoundShader::HasDefaultSound() const {
 	for ( int i = 0; i < numEntries; i++ ) {
 		if ( entries[i] && entries[i]->defaultSound ) {
 			return true;
@@ -475,28 +475,28 @@ bool arcSoundShader::HasDefaultSound() const {
 
 /*
 ===============
-arcSoundShader::GetParms
+anSoundShader::GetParms
 ===============
 */
-const soundShaderParms_t *arcSoundShader::GetParms() const {
+const soundShaderParms_t *anSoundShader::GetParms() const {
 	return &parms;
 }
 
 /*
 ===============
-arcSoundShader::GetNumSounds
+anSoundShader::GetNumSounds
 ===============
 */
-int arcSoundShader::GetNumSounds() const {
+int anSoundShader::GetNumSounds() const {
 	return numLeadins + numEntries;
 }
 
 /*
 ===============
-arcSoundShader::GetSound
+anSoundShader::GetSound
 ===============
 */
-const char *arcSoundShader::GetSound( int index ) const {
+const char *anSoundShader::GetSound( int index ) const {
 	if ( index >= 0 ) {
 		if ( index < numLeadins ) {
 			return leadins[index]->name.c_str();

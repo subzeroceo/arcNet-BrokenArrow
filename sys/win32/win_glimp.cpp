@@ -2,9 +2,9 @@
 ===========================================================================
 
 Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
+This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
 
 Doom 3 Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ If you have questions concerning this license or the applicable additional terms
 ** Note that the GLW_xxx functions are Windows specific GL-subsystem
 ** related functions that are relevant ONLY to win_glimp.c
 */
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "win_local.h"
@@ -69,7 +69,7 @@ PFNWGLRELEASEPBUFFERDCARBPROC	wglReleasePbufferDCARB;
 PFNWGLDESTROYPBUFFERARBPROC	wglDestroyPbufferARB;
 PFNWGLQUERYPBUFFERARBPROC	wglQueryPbufferARB;
 
-// WGL_ARB_render_texture 
+// WGL_ARB_render_texture
 PFNWGLBINDTEXIMAGEARBPROC		wglBindTexImageARB;
 PFNWGLRELEASETEXIMAGEARBPROC	wglReleaseTexImageARB;
 PFNWGLSETPBUFFERATTRIBARBPROC	wglSetPbufferAttribARB;
@@ -265,7 +265,7 @@ LONG WINAPI FakeWndProc (
     qwglMakeCurrent(hDC, hGLRC);
 
 	// free things
-    wglMakeCurrent(NULL, NULL);
+    wglMakeCurrent(nullptr, nullptr );
     wglDeleteContext(hGLRC);
     ReleaseDC(hWnd, hDC);
 
@@ -280,7 +280,7 @@ GLW_GetWGLExtensionsWithFakeWindow
 */
 void GLW_CheckWGLExtensions( HDC hDC ) {
 	wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC)
-							  GLimp_ExtensionPointer("wglGetExtensionsStringARB");
+							  GLimp_ExtensionPointer( "wglGetExtensionsStringARB" );
 	if ( wglGetExtensionsStringARB ) {
 		glConfig.wgl_extensions_string = (const char *) wglGetExtensionsStringARB(hDC);
 	} else {
@@ -292,21 +292,21 @@ void GLW_CheckWGLExtensions( HDC hDC ) {
 	r_swapInterval.SetModified();	// force a set next frame
 
 	// WGL_ARB_pixel_format
-	wglGetPixelFormatAttribivARB = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)GLimp_ExtensionPointer("wglGetPixelFormatAttribivARB");
-	wglGetPixelFormatAttribfvARB = (PFNWGLGETPIXELFORMATATTRIBFVARBPROC)GLimp_ExtensionPointer("wglGetPixelFormatAttribfvARB");
-	wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)GLimp_ExtensionPointer("wglChoosePixelFormatARB");
+	wglGetPixelFormatAttribivARB = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)GLimp_ExtensionPointer( "wglGetPixelFormatAttribivARB" );
+	wglGetPixelFormatAttribfvARB = (PFNWGLGETPIXELFORMATATTRIBFVARBPROC)GLimp_ExtensionPointer( "wglGetPixelFormatAttribfvARB" );
+	wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)GLimp_ExtensionPointer( "wglChoosePixelFormatARB" );
 
 	// WGL_ARB_pbuffer
-	wglCreatePbufferARB = (PFNWGLCREATEPBUFFERARBPROC)GLimp_ExtensionPointer("wglCreatePbufferARB");
-	wglGetPbufferDCARB = (PFNWGLGETPBUFFERDCARBPROC)GLimp_ExtensionPointer("wglGetPbufferDCARB");
-	wglReleasePbufferDCARB = (PFNWGLRELEASEPBUFFERDCARBPROC)GLimp_ExtensionPointer("wglReleasePbufferDCARB");
-	wglDestroyPbufferARB = (PFNWGLDESTROYPBUFFERARBPROC)GLimp_ExtensionPointer("wglDestroyPbufferARB");
-	wglQueryPbufferARB = (PFNWGLQUERYPBUFFERARBPROC)GLimp_ExtensionPointer("wglQueryPbufferARB");
+	wglCreatePbufferARB = (PFNWGLCREATEPBUFFERARBPROC)GLimp_ExtensionPointer( "wglCreatePbufferARB" );
+	wglGetPbufferDCARB = (PFNWGLGETPBUFFERDCARBPROC)GLimp_ExtensionPointer( "wglGetPbufferDCARB" );
+	wglReleasePbufferDCARB = (PFNWGLRELEASEPBUFFERDCARBPROC)GLimp_ExtensionPointer( "wglReleasePbufferDCARB" );
+	wglDestroyPbufferARB = (PFNWGLDESTROYPBUFFERARBPROC)GLimp_ExtensionPointer( "wglDestroyPbufferARB" );
+	wglQueryPbufferARB = (PFNWGLQUERYPBUFFERARBPROC)GLimp_ExtensionPointer( "wglQueryPbufferARB" );
 
-	// WGL_ARB_render_texture 
-	wglBindTexImageARB = (PFNWGLBINDTEXIMAGEARBPROC)GLimp_ExtensionPointer("wglBindTexImageARB");
-	wglReleaseTexImageARB = (PFNWGLRELEASETEXIMAGEARBPROC)GLimp_ExtensionPointer("wglReleaseTexImageARB");
-	wglSetPbufferAttribARB = (PFNWGLSETPBUFFERATTRIBARBPROC)GLimp_ExtensionPointer("wglSetPbufferAttribARB");
+	// WGL_ARB_render_texture
+	wglBindTexImageARB = (PFNWGLBINDTEXIMAGEARBPROC)GLimp_ExtensionPointer( "wglBindTexImageARB" );
+	wglReleaseTexImageARB = (PFNWGLRELEASETEXIMAGEARBPROC)GLimp_ExtensionPointer( "wglReleaseTexImageARB" );
+	wglSetPbufferAttribARB = (PFNWGLSETPBUFFERATTRIBARBPROC)GLimp_ExtensionPointer( "wglSetPbufferAttribARB" );
 }
 
 /*
@@ -325,7 +325,7 @@ static void GLW_GetWGLExtensionsWithFakeWindow( void ) {
         40, 40,
         640,
         480,
-        NULL, NULL, win32.hInstance, NULL );
+        nullptr, nullptr, win32.hInstance, nullptr );
     if ( !hWnd ) {
         common->FatalError( "GLW_GetWGLExtensionsWithFakeWindow: Couldn't create fake window" );
     }
@@ -338,7 +338,7 @@ static void GLW_GetWGLExtensionsWithFakeWindow( void ) {
 	ReleaseDC( hWnd, hDC );
 
     DestroyWindow( hWnd );
-    while ( GetMessage( &msg, NULL, 0, 0 ) ) {
+    while ( GetMessage( &msg, nullptr, 0, 0 ) ) {
         TranslateMessage( &msg );
         DispatchMessage( &msg );
     }
@@ -365,7 +365,7 @@ shown, and create the rendering context
 ====================
 */
 static bool GLW_InitDriver( glimpParms_t parms ) {
-    PIXELFORMATDESCRIPTOR src = 
+    PIXELFORMATDESCRIPTOR src =
 	{
 		sizeof(PIXELFORMATDESCRIPTOR),	// size of this pfd
 		1,								// version number
@@ -379,7 +379,7 @@ static bool GLW_InitDriver( glimpParms_t parms ) {
 		0,								// shift bit ignored
 		0,								// no accumulation buffer
 		0, 0, 0, 0, 					// accum bits ignored
-		24,								// 24-bit z-buffer	
+		24,								// 24-bit z-buffer
 		8,								// 8-bit stencil buffer
 		0,								// no auxiliary buffer
 		PFD_MAIN_PLANE,					// main layer
@@ -392,17 +392,17 @@ static bool GLW_InitDriver( glimpParms_t parms ) {
 	//
 	// get a DC for our window if we don't already have one allocated
 	//
-	if ( win32.hDC == NULL ) {
+	if ( win32.hDC == nullptr ) {
 		common->Printf( "...getting DC: " );
 
-		if ( ( win32.hDC = GetDC( win32.hWnd ) ) == NULL ) {
+		if ( ( win32.hDC = GetDC( win32.hWnd ) ) == nullptr ) {
 			common->Printf( "^3failed^0\n" );
 			return false;
 		}
 		common->Printf( "succeeded\n" );
 	}
 
-	// the multisample path uses the wgl 
+	// the multisample path uses the wgl
 	if ( wglChoosePixelFormatARB && parms.multiSamples > 1 ) {
 		int		iAttributes[20];
 		FLOAT	fAttributes[] = {0, 0};
@@ -447,7 +447,7 @@ static bool GLW_InitDriver( glimpParms_t parms ) {
 		// otherwise use the GDI functions.
 		//
 		if ( ( win32.pixelformat = ChoosePixelFormat( win32.hDC, &src ) ) == 0 ) {
-			common->Printf( "...^3GLW_ChoosePFD failed^0\n");
+			common->Printf( "...^3GLW_ChoosePFD failed^0\n" );
 			return false;
 		}
 		common->Printf( "...PIXELFORMAT %d selected\n", win32.pixelformat );
@@ -483,7 +483,7 @@ static bool GLW_InitDriver( glimpParms_t parms ) {
 	common->Printf( "...making context current: " );
 	if ( !qwglMakeCurrent( win32.hDC, win32.hGLRC ) ) {
 		qwglDeleteContext( win32.hGLRC );
-		win32.hGLRC = NULL;
+		win32.hGLRC = nullptr;
 		common->Printf( "^3failed^0\n" );
 		return false;
 	}
@@ -515,8 +515,8 @@ static void GLW_CreateWindowClasses( void ) {
 	wc.cbWndExtra    = 0;
 	wc.hInstance     = win32.hInstance;
 	wc.hIcon         = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
-	wc.hCursor       = LoadCursor (NULL,IDC_ARROW);
-	wc.hbrBackground = (struct HBRUSH__ *)COLOR_GRAYTEXT;
+	wc.hCursor       = LoadCursor (nullptr,IDC_ARROW);
+	wc.hbrBackground = ( struct HBRUSH__ *)COLOR_GRAYTEXT;
 	wc.lpszMenuName  = 0;
 	wc.lpszClassName = WIN32_WINDOW_CLASS_NAME;
 
@@ -533,8 +533,8 @@ static void GLW_CreateWindowClasses( void ) {
 	wc.cbWndExtra    = 0;
 	wc.hInstance     = win32.hInstance;
 	wc.hIcon         = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
-	wc.hCursor       = LoadCursor (NULL,IDC_ARROW);
-	wc.hbrBackground = (struct HBRUSH__ *)COLOR_GRAYTEXT;
+	wc.hCursor       = LoadCursor (nullptr,IDC_ARROW);
+	wc.hbrBackground = ( struct HBRUSH__ *)COLOR_GRAYTEXT;
 	wc.lpszMenuName  = 0;
 	wc.lpszClassName = WIN32_FAKE_WINDOW_CLASS_NAME;
 
@@ -589,7 +589,7 @@ static bool GLW_CreateWindow( glimpParms_t parms ) {
 		x = win32.win_xpos.GetInteger();
 		y = win32.win_ypos.GetInteger();
 
-		// adjust window coordinates if necessary 
+		// adjust window coordinates if necessary
 		// so that the window is completely on screen
 		if ( x + w > win32.desktopWidth ) {
 			x = ( win32.desktopWidth - w );
@@ -606,22 +606,22 @@ static bool GLW_CreateWindow( glimpParms_t parms ) {
 	}
 
 	win32.hWnd = CreateWindowEx (
-		 exstyle, 
+		 exstyle,
 		 WIN32_WINDOW_CLASS_NAME,
 		 GAME_NAME,
 		 stylebits,
 		 x, y, w, h,
-		 NULL,
-		 NULL,
+		 nullptr,
+		 nullptr,
 		 win32.hInstance,
-		 NULL);
+		 nullptr );
 
 	if ( !win32.hWnd ) {
 		common->Printf( "^3GLW_CreateWindow() - Couldn't create window^0\n" );
 		return false;
 	}
 
-	::SetTimer( win32.hWnd, 0, 100, NULL );
+	::SetTimer( win32.hWnd, 0, 100, nullptr );
 
 	ShowWindow( win32.hWnd, SW_SHOW );
 	UpdateWindow( win32.hWnd );
@@ -630,7 +630,7 @@ static bool GLW_CreateWindow( glimpParms_t parms ) {
 	if ( !GLW_InitDriver( parms ) ) {
 		ShowWindow( win32.hWnd, SW_HIDE );
 		DestroyWindow( win32.hWnd );
-		win32.hWnd = NULL;
+		win32.hWnd = nullptr;
 		return false;
 	}
 
@@ -695,7 +695,7 @@ static bool GLW_SetFullScreen( glimpParms_t parms ) {
 	// first make sure the user is not trying to select a mode that his card/monitor can't handle
 	matched = false;
 	for ( modeNum = 0 ; ; modeNum++ ) {
-		if ( !EnumDisplaySettings( NULL, modeNum, &devmode ) ) {
+		if ( !EnumDisplaySettings( nullptr, modeNum, &devmode ) ) {
 			if ( matched ) {
 				// we got a resolution match, but not a frequency match
 				// so disable the frequency requirement
@@ -730,9 +730,9 @@ static bool GLW_SetFullScreen( glimpParms_t parms ) {
 		dm.dmDisplayFrequency = parms.displayHz;
 		dm.dmFields |= DM_DISPLAYFREQUENCY;
 	}
-	
+
 	common->Printf( "...calling CDS: " );
-	
+
 	// try setting the exact mode requested, because some drivers don't report
 	// the low res modes in EnumDisplaySettings, but still work
 	if ( ( cdsRet = ChangeDisplaySettings( &dm, CDS_FULLSCREEN ) ) == DISP_CHANGE_SUCCESSFUL ) {
@@ -745,14 +745,14 @@ static bool GLW_SetFullScreen( glimpParms_t parms ) {
 	// the exact mode failed, so scan EnumDisplaySettings for the next largest mode
 	//
 	common->Printf( "^3failed^0, " );
-	
+
 	PrintCDSError( cdsRet );
 
 	common->Printf( "...trying next higher resolution:" );
-	
+
 	// we could do a better matching job here...
 	for ( modeNum = 0 ; ; modeNum++ ) {
-		if ( !EnumDisplaySettings( NULL, modeNum, &devmode ) ) {
+		if ( !EnumDisplaySettings( nullptr, modeNum, &devmode ) ) {
 			break;
 		}
 		if ( (int)devmode.dmPelsWidth >= parms.width
@@ -805,7 +805,7 @@ bool GLimp_Init( glimpParms_t parms ) {
 
 	// we can't run in a window unless it is 32 bpp
 	if ( win32.desktopBitsPixel < 32 && !parms.fullScreen ) {
-		common->Printf("^3Windowed mode requires 32 bit desktop depth^0\n");
+		common->Printf( "^3Windowed mode requires 32 bit desktop depth^0\n" );
 		return false;
 	}
 
@@ -861,7 +861,7 @@ bool GLimp_Init( glimpParms_t parms ) {
 ===================
 GLimp_SetScreenParms
 
-Sets up the screen based on passed parms.. 
+Sets up the screen based on passed parms..
 ===================
 */
 bool GLimp_SetScreenParms( glimpParms_t parms ) {
@@ -905,7 +905,7 @@ bool GLimp_SetScreenParms( glimpParms_t parms ) {
 		x = win32.win_xpos.GetInteger();
 		y = win32.win_ypos.GetInteger();
 
-		// adjust window coordinates if necessary 
+		// adjust window coordinates if necessary
 		// so that the window is completely on screen
 		if ( x + w > win32.desktopWidth ) {
 			x = ( win32.desktopWidth - w );
@@ -948,24 +948,24 @@ void GLimp_Shutdown( void ) {
 
 	common->Printf( "Shutting down OpenGL subsystem\n" );
 
-	// set current context to NULL
+	// set current context to nullptr
 	if ( qwglMakeCurrent ) {
-		retVal = qwglMakeCurrent( NULL, NULL ) != 0;
-		common->Printf( "...wglMakeCurrent( NULL, NULL ): %s\n", success[retVal] );
+		retVal = qwglMakeCurrent( nullptr, nullptr ) != 0;
+		common->Printf( "...wglMakeCurrent( nullptr, nullptr ): %s\n", success[retVal] );
 	}
 
 	// delete HGLRC
 	if ( win32.hGLRC ) {
 		retVal = qwglDeleteContext( win32.hGLRC ) != 0;
 		common->Printf( "...deleting GL context: %s\n", success[retVal] );
-		win32.hGLRC = NULL;
+		win32.hGLRC = nullptr;
 	}
 
 	// release DC
 	if ( win32.hDC ) {
 		retVal = ReleaseDC( win32.hWnd, win32.hDC ) != 0;
 		common->Printf( "...releasing DC: %s\n", success[retVal] );
-		win32.hDC   = NULL;
+		win32.hDC   = nullptr;
 	}
 
 	// destroy window
@@ -973,7 +973,7 @@ void GLimp_Shutdown( void ) {
 		common->Printf( "...destroying window\n" );
 		ShowWindow( win32.hWnd, SW_HIDE );
 		DestroyWindow( win32.hWnd );
-		win32.hWnd = NULL;
+		win32.hWnd = nullptr;
 	}
 
 	// reset display settings
@@ -987,7 +987,7 @@ void GLimp_Shutdown( void ) {
 	if ( win32.renderThreadHandle ) {
 		common->Printf( "...closing smp thread\n" );
 		CloseHandle( win32.renderThreadHandle );
-		win32.renderThreadHandle = NULL;
+		win32.renderThreadHandle = nullptr;
 	}
 
 	// restore gamma
@@ -1051,12 +1051,12 @@ GLimp_DeactivateContext
 */
 void GLimp_DeactivateContext( void ) {
 	qglFinish();
-	if ( !qwglMakeCurrent( win32.hDC, NULL ) ) {
+	if ( !qwglMakeCurrent( win32.hDC, nullptr ) ) {
 		win32.wglErrors++;
 	}
 #ifdef REALLOC_DC
-	// makeCurrent NULL frees the DC, so get another
-	if ( ( win32.hDC = GetDC( win32.hWnd ) ) == NULL ) {
+	// makeCurrent nullptr frees the DC, so get another
+	if ( ( win32.hDC = GetDC( win32.hWnd ) ) == nullptr ) {
 		win32.wglErrors++;
 	}
 #endif
@@ -1073,7 +1073,7 @@ static void GLimp_RenderThreadWrapper( void ) {
 	win32.glimpRenderThread();
 
 	// unbind the context before we die
-	qwglMakeCurrent( win32.hDC, NULL );
+	qwglMakeCurrent( win32.hDC, nullptr );
 }
 
 /*
@@ -1091,16 +1091,16 @@ bool GLimp_SpawnRenderThread( void (*function)( void ) ) {
 	if ( info.dwNumberOfProcessors < 2 ) {
 		return false;
 	}
-	
+
 	// create the IPC elements
-	win32.renderCommandsEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-	win32.renderCompletedEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-	win32.renderActiveEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
+	win32.renderCommandsEvent = CreateEvent( nullptr, TRUE, FALSE, nullptr );
+	win32.renderCompletedEvent = CreateEvent( nullptr, TRUE, FALSE, nullptr );
+	win32.renderActiveEvent = CreateEvent( nullptr, TRUE, FALSE, nullptr );
 
 	win32.glimpRenderThread = function;
 
 	win32.renderThreadHandle = CreateThread(
-	   NULL,	// LPSECURITY_ATTRIBUTES lpsa,
+	   nullptr,	// LPSECURITY_ATTRIBUTES lpsa,
 	   0,		// DWORD cbStack,
 	   (LPTHREAD_START_ROUTINE)GLimp_RenderThreadWrapper,	// LPTHREAD_START_ROUTINE lpStartAddr,
 	   0,			// LPVOID lpvThreadParm,

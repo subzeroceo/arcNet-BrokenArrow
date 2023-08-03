@@ -9,12 +9,12 @@ class rvDebuggerWatch
 {
 public:
 
-	arcNetString	mVariable;
-	arcNetString	mValue;
+	anString	mVariable;
+	anString	mValue;
 	bool	mModified;
 };
 
-typedef arcNetList<rvDebuggerWatch*>		rvDebuggerWatchList;
+typedef anList<rvDebuggerWatch*>		rvDebuggerWatchList;
 
 class rvDebuggerClient;
 
@@ -40,8 +40,8 @@ public:
 
 protected:
 
-	bool					FindPrev( const char* text = NULL );
-	bool					FindNext( const char* text = NULL );
+	bool					FindPrev( const char* text = nullptr );
+	bool					FindNext( const char* text = nullptr );
 
 	void					UpdateWatch( void );
 	void					UpdateWindowMenu( void );
@@ -53,7 +53,7 @@ protected:
 	bool					OpenScript( const char* filename, int lineNumber = -1  );
 	void					EnableWindows( bool state );
 
-	int						GetSelectedText( arcNetString& text );
+	int						GetSelectedText( anString& text );
 
 	void					ToggleBreakpoint( void );
 
@@ -75,8 +75,8 @@ protected:
 
 	WNDPROC							mOldWatchProc;
 	WNDPROC							mOldScriptProc;
-	arcNetString						mTooltipVar;
-	arcNetString						mTooltipValue;
+	anString						mTooltipVar;
+	anString						mTooltipValue;
 
 	HINSTANCE						mInstance;
 	HIMAGELIST						mImageList;
@@ -84,7 +84,7 @@ protected:
 	RECT							mSplitterRect;
 	bool							mSplitterDrag;
 
-	arcNetList<rvDebuggerScript*>		mScripts;
+	anList<rvDebuggerScript*>		mScripts;
 	int								mActiveScript;
 	int								mLastActiveScript;
 	int								mCurrentStackDepth;
@@ -96,7 +96,7 @@ protected:
 	int								mZoomScaleDem;
 	int								mMarginSize;
 
-	arcNetString						mFind;
+	anString						mFind;
 
 	rvDebuggerClient*				mClient;
 

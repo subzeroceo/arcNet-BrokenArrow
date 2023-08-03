@@ -13,10 +13,10 @@
 
 const int MAX_PUSHED_EVENTS =	64;
 
-class arcEventLoop {
+class anEventLoop {
 public:
-					arcEventLoop();
-					~arcEventLoop();
+					anEventLoop();
+					~anEventLoop();
 
 	void			Init();
 
@@ -38,8 +38,8 @@ public:
 	int				JournalLevel() const;
 
 					// Journal file.
-	arcNetFile *		com_journalFile;
-	arcNetFile *		com_journalDataFile;
+	anFile *		com_journalFile;
+	anFile *		com_journalDataFile;
 
 private:
 					// all events will have this subtracted from their time
@@ -48,13 +48,13 @@ private:
 	int				com_pushedEventsHead, com_pushedEventsTail;
 	sysEvent_t		com_pushedEvents[MAX_PUSHED_EVENTS];
 
-	static arcCVarSystem	com_journal;
+	static anCVarSystem	com_journal;
 
 	sysEvent_t		GetRealEvent();
 	void			ProcessEvent( sysEvent_t ev );
 	void			PushEvent( sysEvent_t *event );
 };
 
-extern	arcEventLoop	*eventLoop;
+extern	anEventLoop	*eventLoop;
 
 #endif /* !__EVENTLOOP_H__ */

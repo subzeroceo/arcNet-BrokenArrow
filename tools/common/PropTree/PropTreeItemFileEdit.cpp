@@ -2,7 +2,7 @@
 
 
 //#include "stdafx.h"
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "proptree.h"
@@ -88,10 +88,10 @@ void CPropTreeItemFileEdit::OnInsertFile() {
 
 	if ( dlg.DoModal()== IDOK) {
 
-		arcNetString currentText = (char*)GetItemValue();
-		arcNetString newText = currentText.Left(startSel) + currentText.Right(currentText.Length() - endSel);
+		anString currentText = (char*)GetItemValue();
+		anString newText = currentText.Left(startSel) + currentText.Right(currentText.Length() - endSel);
 
-		arcNetString filename = fileSystem->OSPathToRelativePath(dlg.m_ofn.lpstrFile);
+		anString filename = fileSystem->OSPathToRelativePath(dlg.m_ofn.lpstrFile);
 		filename.BackSlashesToSlashes();
 
 

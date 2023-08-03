@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "RegistryOptions.h"
@@ -63,7 +63,7 @@ bool rvRegistryOptions::Save ( void )
 	int		i;
 
 	// Create the top level key
-	if ( ERROR_SUCCESS != RegCreateKeyEx ( HKEY_LOCAL_MACHINE, mBaseKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL ) )
+	if ( ERROR_SUCCESS != RegCreateKeyEx ( HKEY_LOCAL_MACHINE, mBaseKey, 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &hKey, nullptr ) )
 	{
 		return false;
 	}
@@ -71,7 +71,7 @@ bool rvRegistryOptions::Save ( void )
 	// Write out the values
 	for ( i = 0; i < mValues.GetNumKeyVals(); i ++ )
 	{
-		const idKeyValue* key = mValues.GetKeyVal ( i );
+		const anKeyValue* key = mValues.GetKeyVal ( i );
 		assert ( key );
 		RegSetValueEx ( hKey, key->GetKey().c_str(), 0, REG_SZ, (BYTE*)key->GetValue().c_str(), key->GetValue().Length() );
 	}
@@ -101,8 +101,8 @@ bool rvRegistryOptions::Load ( void )
 	DWORD	dwSize;
 	int		i;
 
-	mValues.Clear ( );
-	mRecentFiles.Clear ( );
+	mValues.Clear();
+	mRecentFiles.Clear();
 
 	if ( ERROR_SUCCESS != RegOpenKeyEx ( HKEY_LOCAL_MACHINE, mBaseKey, 0, KEY_READ, &hKey ) )
 	{
@@ -112,12 +112,12 @@ bool rvRegistryOptions::Load ( void )
 	// Read in the values and recent files
 	keyname[0] = 0;
 	dwSize = MAX_PATH;
-	for ( i = 0; RegEnumValue ( hKey, i, keyname, &dwSize, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS; i ++ )
+	for ( i = 0; RegEnumValue ( hKey, i, keyname, &dwSize, nullptr, nullptr, nullptr, nullptr ) == ERROR_SUCCESS; i ++ )
 	{
 		temp[0] = '\0';
 		dwSize = MAX_PATH;
 
-		if ( ERROR_SUCCESS != RegQueryValueEx ( hKey, keyname, NULL, &dwType, (LPBYTE)temp, &dwSize ) )
+		if ( ERROR_SUCCESS != RegQueryValueEx ( hKey, keyname, nullptr, &dwType, (LPBYTE)temp, &dwSize ) )
 		{
 			continue;
 		}
@@ -125,7 +125,7 @@ bool rvRegistryOptions::Load ( void )
 		dwSize = MAX_PATH;
 
 		// Skip the mru values
-		if ( !arcNetString(keyname).IcmpPrefix ( "mru" ) )
+		if ( !anString(keyname).IcmpPrefix ( "mru" ) )
 		{
 			continue;
 		}
@@ -137,7 +137,7 @@ bool rvRegistryOptions::Load ( void )
 	for ( i = 0; i < MAX_MRU_SIZE; i ++ )
 	{
 		dwSize = MAX_PATH;
-		if ( ERROR_SUCCESS != RegQueryValueEx ( hKey, va( "mru%d", i ), NULL, &dwType, (LPBYTE)temp, &dwSize ) )
+		if ( ERROR_SUCCESS != RegQueryValueEx ( hKey, va( "mru%d", i ), nullptr, &dwType, (LPBYTE)temp, &dwSize ) )
 		{
 			continue;
 		}
@@ -162,7 +162,7 @@ void rvRegistryOptions::SetWindowPlacement ( const char* name, HWND hwnd )
 	wp.length = sizeof(wp);
 	::GetWindowPlacement ( hwnd, &wp );
 
-	arcNetString out;
+	anString out;
 
 	out = va( "%d %d %d %d %d %d %d %d %d %d",
 			 wp.flags,
@@ -191,7 +191,7 @@ bool rvRegistryOptions::GetWindowPlacement ( const char* name, HWND hwnd )
 	WINDOWPLACEMENT wp;
 	wp.length = sizeof(wp);
 
-	const idKeyValue* key = mValues.FindKey ( name );
+	const anKeyValue* key = mValues.FindKey ( name );
 	if ( !key )
 	{
 		return false;
@@ -225,7 +225,7 @@ void rvRegistryOptions::AddRecentFile ( const char* filename )
 {
 	int i;
 
-	arcNetString path = filename;
+	anString path = filename;
 
 	// Remove duplicates first
 	for ( i = mRecentFiles.Num() - 1; i >= 0; i -- )
@@ -238,7 +238,7 @@ void rvRegistryOptions::AddRecentFile ( const char* filename )
 	}
 
 	// Alwasy trip to the max MRU size
-	while ( mRecentFiles.Num ( ) >= MAX_MRU_SIZE )
+	while ( mRecentFiles.Num() >= MAX_MRU_SIZE )
 	{
 		mRecentFiles.RemoveIndex ( 0 );
 	}
@@ -257,7 +257,7 @@ void rvRegistryOptions::SetColumnWidths ( const char* name, HWND list )
 {
 	LVCOLUMN col;
 	int		 index;
-	arcNetString	 widths;
+	anString	 widths;
 
 	col.mask = LVCF_WIDTH;
 
@@ -278,7 +278,7 @@ Retrieve a group of column widths from the options
 */
 void rvRegistryOptions::GetColumnWidths ( const char* name, HWND list )
 {
-	arcNetString		widths;
+	anString		widths;
 	const char* parse;
 	const char* next;
 	int			index;
@@ -287,7 +287,7 @@ void rvRegistryOptions::GetColumnWidths ( const char* name, HWND list )
 	parse = widths;
 	index = 0;
 
-	while ( NULL != (next = strchr ( parse, ' ' ) ) )
+	while ( nullptr != (next = strchr ( parse, ' ' ) ) )
 	{
 		int width;
 
@@ -307,7 +307,7 @@ Set binary data for the given key
 */
 void rvRegistryOptions::SetBinary ( const char* name, const unsigned char* data, int size )
 {
-	arcNetString binary;
+	anString binary;
 	for ( size --; size >= 0; size --, data++ )
 	{
 		binary += va( "%02x", *data );

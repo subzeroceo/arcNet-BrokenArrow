@@ -6,7 +6,7 @@ AI_Announcements.cpp
 ================
 */
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
@@ -15,17 +15,17 @@ AI_Announcements.cpp
 
 /*
 =====================
-idAI::AnnounceNewEnemy
+anSAAI::AnnounceNewEnemy
 
 Announce that we are going to shooting at a different enemy
 =====================
 */
-void idAI::AnnounceNewEnemy( void ) {
+void anSAAI::AnnounceNewEnemy( void ) {
 	if ( !CanAnnounce ( announceRate ) ) {
 		return;
 	}
 
-	if ( !enemy.ent || !enemy.ent->IsType( idActor::GetClassType() ) ) {
+	if ( !enemy.ent || !enemy.ent->IsType( anActor::GetClassType() ) ) {
 		return;
 	}
 
@@ -54,11 +54,11 @@ void idAI::AnnounceNewEnemy( void ) {
 	}
 	*/
 
-	idActor* newEnemyAct = static_cast<idActor*>(enemy.ent.GetEntity());
+	anActor* newEnemyAct = static_cast<anActor*>(enemy.ent.GetEntity());
 	bool	 result		 = false;
 
 	//first see if the new enemy is behind our buddy closest to the enemy
-	idActor* teammate = aiManager.NearestTeammateToPoint( this, newEnemyAct->GetPhysics()->GetOrigin(), false, 200.0f );
+	anActor* teammate = aiManager.NearestTeammateToPoint( this, newEnemyAct->GetPhysics()->GetOrigin(), false, 200.0f );
 	if ( teammate ) {
 		if ( aiManager.ActorIsBehindActor( newEnemyAct, teammate ) ) {
 			result = Speak ( "lipsync_enemy_back", true );
@@ -75,15 +75,15 @@ void idAI::AnnounceNewEnemy( void ) {
 			}
 
 			// IF we still havent spoken and we're talking to the player, give him directional info
-			if ( !result && teammate->IsType( idPlayer::GetClassType() ) ) {
-				idPlayer* teamPlayer = static_cast<idPlayer*>(teammate);
-				arcVec3 dir = newEnemyAct->GetPhysics()->GetOrigin()-teamPlayer->GetPhysics()->GetOrigin();
+			if ( !result && teammate->IsType( anBasePlayer::GetClassType() ) ) {
+				anBasePlayer* teamPlayer = static_cast<anBasePlayer*>(teammate);
+				anVec3 dir = newEnemyAct->GetPhysics()->GetOrigin()-teamPlayer->GetPhysics()->GetOrigin();
 				dir.z = 0;
 				dir.NormalizeFast();
-				arcVec3 fwd = teamPlayer->viewAxis[0];
+				anVec3 fwd = teamPlayer->viewAxis[0];
 				fwd.z = 0.0f;
 				fwd.NormalizeFast();
-				arcVec3 lt = teamPlayer->viewAxis[1];
+				anVec3 lt = teamPlayer->viewAxis[1];
 				lt.z = 0.0f;
 				lt.NormalizeFast();
 				if ( fabs( dir * fwd ) < 0.4f )	{
@@ -113,12 +113,12 @@ void idAI::AnnounceNewEnemy( void ) {
 
 /*
 =====================
-idAI::AnnounceKill
+anSAAI::AnnounceKill
 
 Announce that we have killed our enemy
 =====================
 */
-void idAI::AnnounceKill( idActor* victim ) {
+void anSAAI::AnnounceKill( anActor* victim ) {
 	if ( !CanAnnounce ( announceRate ) ) {
 		return;
 	}
@@ -138,12 +138,12 @@ void idAI::AnnounceKill( idActor* victim ) {
 /*
 	// If the victim is targetting the player and was close to the player when he died
 	// then announce to the player to be careful
-	if ( victim->IsType( idAI::Type ) )	{
-		idAI* vicAI = static_cast<idAI*>(victim);
-		if ( vicAI && vicAI->GetEnemy() && vicAI->GetEnemy()->IsType ( idPlayer::GetClassType() ) ) {
-			idPlayer* vicEnemyPlayer = static_cast<idPlayer*>(vicAI->GetEnemy());
+	if ( victim->IsType( anSAAI::Type ) )	{
+		anSAAI* vicAI = static_cast<anSAAI*>(victim);
+		if ( vicAI && vicAI->GetEnemy() && vicAI->GetEnemy()->IsType ( anBasePlayer::GetClassType() ) ) {
+			anBasePlayer* vicEnemyPlayer = static_cast<anBasePlayer*>(vicAI->GetEnemy());
 			if ( vicEnemyPlayer->team == team ) {
-				arcVec3 diff = vicAI->GetPhysics()->GetOrigin() - vicEnemyPlayer->GetPhysics()->GetOrigin();
+				anVec3 diff = vicAI->GetPhysics()->GetOrigin() - vicEnemyPlayer->GetPhysics()->GetOrigin();
 				if ( !vicEnemyPlayer->CheckFOV ( vicAI->GetPhysics()->GetOrigin() ) || diff.LengthSqr() < 300.0f * 300.0f ) {
 					Speak( "lipsync_watchit", true );
 					return;
@@ -154,7 +154,7 @@ void idAI::AnnounceKill( idActor* victim ) {
 
 	// Chance that we say "watch it" to the closest teammate to him if the guy that died was facing the teammate
 	// when he died (ie, was a possible threat)
-	idActor* teammate = aiManager.NearestTeammateToPoint( this, victim->GetPhysics()->GetOrigin(), false, 300.0f );
+	anActor* teammate = aiManager.NearestTeammateToPoint( this, victim->GetPhysics()->GetOrigin(), false, 300.0f );
 	if ( teammate && victim->CheckFOV(teammate->GetPhysics()->GetOrigin()) ) {
 		if ( gameLocal.random.RandomInt(2) < 1 ) {
 			Speak( "lipsync_watchit", true );
@@ -167,12 +167,12 @@ void idAI::AnnounceKill( idActor* victim ) {
 
 /*
 =====================
-idAI::AnnounceTactical
+anSAAI::AnnounceTactical
 
 Announce the changing of tactical status
 =====================
 */
-void idAI::AnnounceTactical( aiTactical_t newTactical ) {
+void anSAAI::AnnounceTactical( aiTactical_t newTactical ) {
 	bool result = false;
 
 	// If already speaking dont bother
@@ -225,18 +225,18 @@ void idAI::AnnounceTactical( aiTactical_t newTactical ) {
 
 /*
 =====================
-idAI::AnnounceSuppressed
+anSAAI::AnnounceSuppressed
 
 Announce that someone is using supressing fire on us
 =====================
 */
-void idAI::AnnounceSuppressed( idActor *suppressor ) {
+void anSAAI::AnnounceSuppressed( anActor *suppressor ) {
 
 	//jshepard: Suppressed and suppressing removed by request
 	return;
 /*
 	// Dont bother if we are already speaking
-	if ( !CanAnnounce ( ) ) {
+	if ( !CanAnnounce() ) {
 		return;
 	}
 
@@ -255,18 +255,18 @@ void idAI::AnnounceSuppressed( idActor *suppressor ) {
 
 /*
 =====================
-idAI::AnnounceSuppressing
+anSAAI::AnnounceSuppressing
 
 Announce that we are about to use supressing fire
 =====================
 */
-void idAI::AnnounceSuppressing( void ) {
+void anSAAI::AnnounceSuppressing( void ) {
 
 	//jshepard: Suppressed and suppressing removed by request
 	return;
 /*
 	// Dont bother if already speaking
-	if ( !CanAnnounce ( ) ) {
+	if ( !CanAnnounce() ) {
 		return;
 	}
 
@@ -276,8 +276,8 @@ void idAI::AnnounceSuppressing( void ) {
 	}
 
 	//Make the guy being shot at know this
-	if ( enemy.ent->IsType( idAI::Type ) ) {
-		idAI* enemyAI = dynamic_cast<idAI*>(enemy.ent.GetEntity());
+	if ( enemy.ent->IsType( anSAAI::Type ) ) {
+		anSAAI* enemyAI = dynamic_cast<anSAAI*>(enemy.ent.GetEntity());
 		if ( enemyAI  ) {
 			enemyAI->AnnounceSuppressed( this );
 		}
@@ -291,17 +291,17 @@ void idAI::AnnounceSuppressing( void ) {
 
 /*
 =====================
-idAI::AnnounceFlinch
+anSAAI::AnnounceFlinch
 
 Announce that an attack just missed us
 =====================
 */
-void idAI::AnnounceFlinch( idEntity *attacker ) {
+void anSAAI::AnnounceFlinch( anEntity *attacker ) {
 	if ( !CanAnnounce ( announceRate ) ) {
 		return;
 	}
 
-	idActor* attackActor = dynamic_cast<idActor*>(attacker);
+	anActor* attackActor = dynamic_cast<anActor*>(attacker);
 
 	// Friendly fire?
 	if ( attackActor && attackActor->team == team ) {
@@ -337,12 +337,12 @@ void idAI::AnnounceFlinch( idEntity *attacker ) {
 
 /*
 =====================
-idAI::AnnounceInjured
+anSAAI::AnnounceInjured
 
 Announce that we have been injured
 =====================
 */
-void idAI::AnnounceInjured( void ) {
+void anSAAI::AnnounceInjured( void ) {
 	if ( !CanAnnounce ( 1.0f ) ) {
 		return;
 	}
@@ -352,12 +352,12 @@ void idAI::AnnounceInjured( void ) {
 
 /*
 =====================
-idAI::AnnounceFriendlyFire
+anSAAI::AnnounceFriendlyFire
 
 Announce that someone on our own team is shooting us
 =====================
 */
-void idAI::AnnounceFriendlyFire( idActor* attacker ) {
+void anSAAI::AnnounceFriendlyFire( anActor* attacker ) {
 	if ( !CanAnnounce ( announceRate ) ) {
 		return;
 	}
@@ -368,7 +368,7 @@ void idAI::AnnounceFriendlyFire( idActor* attacker ) {
 	}
 
 	// Don't react to ff from other buddy AI
-	if ( !attacker->IsType( idPlayer::GetClassType() ) ) {
+	if ( !attacker->IsType( anBasePlayer::GetClassType() ) ) {
 		return;
 	}
 
@@ -395,10 +395,10 @@ void idAI::AnnounceFriendlyFire( idActor* attacker ) {
 
 /*
 =====================
-idAI::AnnounceGrenade
+anSAAI::AnnounceGrenade
 =====================
 */
-void idAI::AnnounceGrenade( void ) {
+void anSAAI::AnnounceGrenade( void ) {
 	if ( !CanAnnounce ( 1 ) ) {
 		return;
 	}
@@ -414,12 +414,12 @@ void idAI::AnnounceGrenade( void ) {
 
 /*
 =====================
-idAI::AnnounceGrenadeThrow
+anSAAI::AnnounceGrenadeThrow
 
 Announce that we are throwing a grenade
 =====================
 */
-void idAI::AnnounceGrenadeThrow( void ) {
+void anSAAI::AnnounceGrenadeThrow( void ) {
 	if ( !CanAnnounce ( announceRate ) ) {
 		return;
 	}
@@ -441,15 +441,15 @@ rvAIManager::AnnounceDeath
 Announce through an ally of the victem that they have died
 =====================
 */
-void rvAIManager::AnnounceDeath( idAI* victim, idEntity* attacker ) {
-	idActor* teammate;
-	idAI*	 teammateAI;
+void rvAIManager::AnnounceDeath( anSAAI* victim, anEntity* attacker ) {
+	anActor* teammate;
+	anSAAI*	 teammateAI;
 
 	// Friendly fire kill?
 	//MCG NOTE: This isn't even possible anymore...
-	if ( attacker->IsType ( idPlayer::GetClassType() ) && static_cast<idPlayer*>(attacker)->team == victim->team ) {
-		teammate   = NearestTeammateToPoint( static_cast<idActor*>(attacker), attacker->GetPhysics()->GetOrigin(), true, 500.0f );
-		teammateAI = dynamic_cast<idAI*>(teammate);
+	if ( attacker->IsType ( anBasePlayer::GetClassType() ) && static_cast<anBasePlayer*>(attacker)->team == victim->team ) {
+		teammate   = NearestTeammateToPoint( static_cast<anActor*>(attacker), attacker->GetPhysics()->GetOrigin(), true, 500.0f );
+		teammateAI = dynamic_cast<anSAAI*>(teammate);
 
 		if ( teammateAI && teammateAI->CanAnnounce( teammateAI->announceRate ) ) {
 			teammateAI->Speak( "lipsync_traitor", true );
@@ -458,10 +458,10 @@ void rvAIManager::AnnounceDeath( idAI* victim, idEntity* attacker ) {
 	}
 
 	teammate   = NearestTeammateToPoint( victim, victim->GetPhysics()->GetOrigin(), true, 1000.0f );
-	teammateAI = dynamic_cast<idAI*>(teammate);
+	teammateAI = dynamic_cast<anSAAI*>(teammate);
 
 	//jshepard: double check to make sure we don't call out our own death!
-	if( teammateAI == victim )	{
+	if ( teammateAI == victim )	{
 		//MCG: note - NearestTeammateToPoint should *never* allow this, should never happen
 		assert(0);
 		return;
@@ -487,45 +487,45 @@ void rvAIManager::AnnounceDeath( idAI* victim, idEntity* attacker ) {
 	// Annoucne specific death or just a generic death
 	const char* shortName;
 	if ( !victim->spawnArgs.GetString ( "npc_shortname", "", &shortName ) || !*shortName ||
-		 !teammateAI->Speak ( va("lipsync_%s_killed", shortName ), true ) ) {
+		 !teammateAI->Speak ( va( "lipsync_%s_killed", shortName ), true ) ) {
 		teammateAI->Speak( "lipsync_mandown", true );
 	}
 }
 
 /*
 =====================
-idAI::AnnounceKill
+anSAAI::AnnounceKill
 
 Announces an ai being killed
 =====================
 */
-void rvAIManager::AnnounceKill ( idAI* victim, idEntity* attacker, idEntity* inflictor ) {
-	idActor* teammate;
-	idAI*	 teammateAI;
+void rvAIManager::AnnounceKill ( anSAAI* victim, anEntity* attacker, anEntity* inflictor ) {
+	anActor* teammate;
+	anSAAI*	 teammateAI;
 
 	// Friendly fire deaths are handled elsewhere
-	if ( attacker->IsType ( idActor::GetClassType() ) && static_cast<idActor*>(attacker)->team == victim->team ) {
+	if ( attacker->IsType ( anActor::GetClassType() ) && static_cast<anActor*>(attacker)->team == victim->team ) {
 		return;
 	}
 
 	// If it was an AI guy that did the killing then just let him announce it
-	if ( attacker->IsType( idAI::Type ) ) {
+	if ( attacker->IsType( anSAAI::Type ) ) {
 		//announce the kill
- 		static_cast<idAI*>(attacker)->AnnounceKill( victim );
-	} else if ( attacker->IsType( idPlayer::GetClassType() ) ) {
-		idPlayer* attackerPlayer = static_cast<idPlayer*>(attacker);
+ 		static_cast<anSAAI*>(attacker)->AnnounceKill( victim );
+	} else if ( attacker->IsType( anBasePlayer::GetClassType() ) ) {
+		anBasePlayer* attackerPlayer = static_cast<anBasePlayer*>(attacker);
 
 		// If the guy who died is an AI guy who was targetting a buddy nearby, have him say "thanks!"
 		// jshepard: these are cut unless we can get some tighter "thanks" quotes
-/*		if ( victim->IsType( idAI::Type ) )	{
-			idAI* victimAI = static_cast<idAI*>(victim);
+/*		if ( victim->IsType( anSAAI::Type ) )	{
+			anSAAI* victimAI = static_cast<anSAAI*>(victim);
 			//if the victim's enemy is a teammate of mine, make the teammate say "thanks!"
 			if ( victimAI && victimAI->GetEnemy() ) {
-				idAI* victimEnemyAI = dynamic_cast<idAI*>(victimAI->GetEnemy());
+				anSAAI* victimEnemyAI = dynamic_cast<anSAAI*>(victimAI->GetEnemy());
 
 				// See if the enemy of the guy who died is a teammate and wants to say thanks
-				if ( victimEnemyAI && victimEnemyAI->CanAnnounce ( ) && victimEnemyAI->team == attackerPlayer->team ) {
-					float distSqr = (victimAI->GetPhysics()->GetOrigin() - victimEnemyAI->GetPhysics()->GetOrigin()).LengthSqr ( );
+				if ( victimEnemyAI && victimEnemyAI->CanAnnounce() && victimEnemyAI->team == attackerPlayer->team ) {
+					float distSqr = (victimAI->GetPhysics()->GetOrigin() - victimEnemyAI->GetPhysics()->GetOrigin()).LengthSqr();
 					if ( distSqr < Square ( 300.0f ) ) {
 						//teammate was fighting him or close to him
 						victimEnemyAI->Speak( "lipsync_thanks", true );
@@ -537,7 +537,7 @@ void rvAIManager::AnnounceKill ( idAI* victim, idEntity* attacker, idEntity* inf
 
 		// Grab a nearby teammate of the player and say "nice shot!"
 		teammate   = NearestTeammateToPoint( attackerPlayer, attacker->GetPhysics()->GetOrigin(), true, 500.0f, true );
-		teammateAI = dynamic_cast<idAI*>(teammate);
+		teammateAI = dynamic_cast<anSAAI*>(teammate);
 		if ( teammateAI && teammateAI->CanAnnounce( teammateAI->announceRate ) ) {
 			idProjectile* proj = dynamic_cast<idProjectile*>(inflictor);
 			//killed them with a grenade?

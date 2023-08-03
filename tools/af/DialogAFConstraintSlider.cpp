@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -45,7 +45,7 @@ toolTip_t DialogAFConstraintSlider::toolTips[] = {
 	{ IDC_COMBO_SLIDER_AXIS_JOINT2, "bone end joint" },
 	{ IDC_EDIT_SLIDER_AXIS_PITCH, "pitch angle" },
 	{ IDC_EDIT_SLIDER_AXIS_YAW, "yaw angle" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 IMPLEMENT_DYNAMIC(DialogAFConstraintSlider, CDialog)
@@ -55,12 +55,12 @@ IMPLEMENT_DYNAMIC(DialogAFConstraintSlider, CDialog)
 DialogAFConstraintSlider::DialogAFConstraintSlider
 ================
 */
-DialogAFConstraintSlider::DialogAFConstraintSlider(CWnd* pParent /*=NULL*/)
+DialogAFConstraintSlider::DialogAFConstraintSlider(CWnd* pParent /*=nullptr*/)
 	: CDialog(DialogAFConstraintSlider::IDD, pParent)
 	, m_axisPitch(0 )
 	, m_axisYaw(0 )
-	, constraint(NULL)
-	, file(NULL)
+	, constraint(nullptr )
+	, file(nullptr )
 {
 	Create( IDD_DIALOG_AF_CONSTRAINT_SLIDER, pParent );
 	EnableToolTips( TRUE );
@@ -102,7 +102,7 @@ void DialogAFConstraintSlider::InitJointLists( void ) {
 		return;
 	}
 
-	const ARCRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
+	const anRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
 	if ( !model ) {
 		return;
 	}
@@ -120,9 +120,9 @@ void DialogAFConstraintSlider::InitJointLists( void ) {
 DialogAFConstraintSlider::LoadFile
 ================
 */
-void DialogAFConstraintSlider::LoadFile( arcDeclAF *af ) {
+void DialogAFConstraintSlider::LoadFile( anDeclAF *af ) {
 	file = af;
-	constraint = NULL;
+	constraint = nullptr;
 	InitJointLists();
 }
 
@@ -140,9 +140,9 @@ void DialogAFConstraintSlider::SaveFile( void ) {
 DialogAFConstraintSlider::LoadConstraint
 ================
 */
-void DialogAFConstraintSlider::LoadConstraint( arcDeclAF_Constraint *c ) {
+void DialogAFConstraintSlider::LoadConstraint( anDeclAF_Constraint *c ) {
 	int i, s1, s2;
-	arcAngles angles;
+	anAngles angles;
 
 	constraint = c;
 
@@ -187,7 +187,7 @@ void DialogAFConstraintSlider::SaveConstraint( void ) {
 		constraint->axis.joint2 = str;
 	}
 	else {
-		constraint->axis.ToVec3() = arcAngles( m_axisPitch, m_axisYaw, 0.0f ).ToForward();
+		constraint->axis.ToVec3() = anAngles( m_axisPitch, m_axisYaw, 0.0f ).ToForward();
 	}
 
 	AFDialogSetFileModified();

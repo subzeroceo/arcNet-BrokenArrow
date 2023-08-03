@@ -1,15 +1,15 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
 #include "Model_local.h"
 
-static const char *MD5_SnapshotName = "_MD5_Snapshot_";
+static const char *M8D_SnapshotName = "_M8D5_Snapshot_";
 
 
 /***********************************************************************
 
-	idMD5Mesh
+	anM8DMesh
 
 ***********************************************************************/
 
@@ -20,56 +20,56 @@ static int c_numWeightJoints = 0;
 typedef struct vertexWeight_s {
 	int							vert;
 	int							joint;
-	arcVec3						offset;
+	anVec3						offset;
 	float						jointWeight;
 } vertexWeight_t;
 
 /*
 ====================
-idMD5Mesh::idMD5Mesh
+anM8DMesh::anM8DMesh
 ====================
 */
-idMD5Mesh::idMD5Mesh() {
-	scaledWeights	= NULL;
-	weightIndex		= NULL;
-	shader			= NULL;
+anM8DMesh::anM8DMesh() {
+	scaledWeights	= nullptr;
+	weightIndex		= nullptr;
+	shader			= nullptr;
 	numTris			= 0;
-	deformInfo		= NULL;
+	deformInfo		= nullptr;
 	surfaceNum		= 0;
 }
 
 /*
 ====================
-idMD5Mesh::~idMD5Mesh
+anM8DMesh::~anM8DMesh
 ====================
 */
-idMD5Mesh::~idMD5Mesh() {
+anM8DMesh::~anM8DMesh() {
 	Mem_Free16( scaledWeights );
 	Mem_Free16( weightIndex );
 	if ( deformInfo ) {
 		R_FreeDeformInfo( deformInfo );
-		deformInfo = NULL;
+		deformInfo = nullptr;
 	}
 }
 
 /*
 ====================
-idMD5Mesh::ParseMesh
+anM8DMesh::ParseMesh
 ====================
 */
-void idMD5Mesh::ParseMesh( arcLexer &parser, int numJoints, const arcJointMat *joints ) {
-	arcNetToken		token;
-	arcNetToken		name;
+void anM8DMesh::ParseMesh( anLexer &parser, int numJoints, const arcJointMat *joints ) {
+	anToken		token;
+	anToken		name;
 	int			num;
 	int			count;
 	int			jointnum;
-	arcNetString		shaderName;
+	anString		shaderName;
 	int			i, j;
-	arcNetList<int>	tris;
-	arcNetList<int>	firstWeightForVertex;
-	arcNetList<int>	numWeightsForVertex;
+	anList<int>	tris;
+	anList<int>	firstWeightForVertex;
+	anList<int>	numWeightsForVertex;
 	int			maxweight;
-	arcNetList<vertexWeight_t> tempWeights;
+	anList<vertexWeight_t> tempWeights;
 
 	parser.ExpectTokenString( "{" );
 
@@ -109,18 +109,18 @@ void idMD5Mesh::ParseMesh( arcLexer &parser, int numJoints, const arcJointMat *j
 		parser.ExpectTokenString( "vert" );
 		parser.ParseInt();
 
-		parser.Parse1DMatrix( 2, texCoords[ i ].ToFloatPtr() );
+		parser.Parse1DMatrix( 2, texCoords[i].ToFloatPtr() );
 
-		firstWeightForVertex[ i ]	= parser.ParseInt();
-		numWeightsForVertex[ i ]	= parser.ParseInt();
+		firstWeightForVertex[i]	= parser.ParseInt();
+		numWeightsForVertex[i]	= parser.ParseInt();
 
-		if ( !numWeightsForVertex[ i ] ) {
+		if ( !numWeightsForVertex[i] ) {
 			parser.Error( "Vertex without any joint weights." );
 		}
 
-		numWeights += numWeightsForVertex[ i ];
-		if ( numWeightsForVertex[ i ] + firstWeightForVertex[ i ] > maxweight ) {
-			maxweight = numWeightsForVertex[ i ] + firstWeightForVertex[ i ];
+		numWeights += numWeightsForVertex[i];
+		if ( numWeightsForVertex[i] + firstWeightForVertex[i] > maxweight ) {
+			maxweight = numWeightsForVertex[i] + firstWeightForVertex[i];
 		}
 	}
 
@@ -168,15 +168,15 @@ void idMD5Mesh::ParseMesh( arcLexer &parser, int numJoints, const arcJointMat *j
 			parser.Error( "Joint Index out of range(%d): %d", numJoints, jointnum );
 		}
 
-		tempWeights[ i ].joint			= jointnum;
-		tempWeights[ i ].jointWeight	= parser.ParseFloat();
+		tempWeights[i].joint			= jointnum;
+		tempWeights[i].jointWeight	= parser.ParseFloat();
 
-		parser.Parse1DMatrix( 3, tempWeights[ i ].offset.ToFloatPtr() );
+		parser.Parse1DMatrix( 3, tempWeights[i].offset.ToFloatPtr() );
 	}
 
 	// create pre-scaled weights and an index for the vertex/joint lookup
-	scaledWeights = (arcVec4 *) Mem_Alloc16( numWeights * sizeof( scaledWeights[0] ) );
-	weightIndex = ( int * ) Mem_Alloc16( numWeights * 2 * sizeof( weightIndex[0] ) );
+	scaledWeights = (anVec4 *) Mem_Alloc16( numWeights * sizeof( scaledWeights[0] ) );
+	weightIndex = ( int*) Mem_Alloc16( numWeights * 2 * sizeof( weightIndex[0] ) );
 	memset( weightIndex, 0, numWeights * 2 * sizeof( weightIndex[0] ) );
 
 	count = 0;
@@ -208,7 +208,7 @@ void idMD5Mesh::ParseMesh( arcLexer &parser, int numJoints, const arcJointMat *j
 	// build the information that will be common to all animations of this mesh:
 	// silhouette edge connectivity and normal / tangent generation information
 	//
-	arcDrawVert *verts = (arcDrawVert *) _alloca16( texCoords.Num() * sizeof( arcDrawVert ) );
+	anDrawVertex *verts = (anDrawVertex *) _alloca16( texCoords.Num() * sizeof( anDrawVertex ) );
 	for ( i = 0; i < texCoords.Num(); i++ ) {
 		verts[i].Clear();
 		verts[i].st = texCoords[i];
@@ -219,35 +219,32 @@ void idMD5Mesh::ParseMesh( arcLexer &parser, int numJoints, const arcJointMat *j
 
 /*
 ====================
-idMD5Mesh::TransformVerts
+anM8DMesh::TransformVerts
 ====================
 */
-void idMD5Mesh::TransformVerts( arcDrawVert *verts, const arcJointMat *entJoints ) {
+void anM8DMesh::TransformVerts( anDrawVertex *verts, const arcJointMat *entJoints ) {
 	SIMDProcessor->TransformVerts( verts, texCoords.Num(), entJoints, scaledWeights, weightIndex, numWeights );
 }
 
 /*
 ====================
-idMD5Mesh::TransformScaledVerts
+anM8DMesh::TransformScaledVerts
 
 Special transform to make the mesh seem fat or skinny.  May be used for zombie deaths
 ====================
 */
-void idMD5Mesh::TransformScaledVerts( arcDrawVert *verts, const arcJointMat *entJoints, float scale ) {
-	arcVec4 *scaledWeights = (arcVec4 *) _alloca16( numWeights * sizeof( scaledWeights[0] ) );
+void anM8DMesh::TransformScaledVerts( anDrawVertex *verts, const arcJointMat *entJoints, float scale ) {
+	anVec4 *scaledWeights = (anVec4 *) _alloca16( numWeights * sizeof( scaledWeights[0] ) );
 	SIMDProcessor->Mul( scaledWeights[0].ToFloatPtr(), scale, scaledWeights[0].ToFloatPtr(), numWeights * 4 );
 	SIMDProcessor->TransformVerts( verts, texCoords.Num(), entJoints, scaledWeights, weightIndex, numWeights );
 }
 
 /*
 ====================
-idMD5Mesh::UpdateSurface
+anM8DMesh::UpdateSurface
 ====================
 */
-void idMD5Mesh::UpdateSurface( const struct renderEntity_s *ent, const arcJointMat *entJoints, modelSurface_t *surf ) {
-	int i, base;
-	surfTriangles_t *tri;
-
+void anM8DMesh::UpdateSurface( const struct renderEntity_s *ent, const arcJointMat *entJoints, modelSurface_t *surf ) {
 	tr.pc.c_deformedSurfaces++;
 	tr.pc.c_deformedVerts += deformInfo->numOutputVerts;
 	tr.pc.c_deformedIndexes += deformInfo->numIndexes;
@@ -267,7 +264,7 @@ void idMD5Mesh::UpdateSurface( const struct renderEntity_s *ent, const arcJointM
 		surf->geometry = R_AllocStaticTriSurf();
 	}
 
-	tri = surf->geometry;
+	srfTriangles_t *tri = surf->geometry;
 
 	// note that some of the data is references, and should not be freed
 	tri->deformedSurface = true;
@@ -286,7 +283,7 @@ void idMD5Mesh::UpdateSurface( const struct renderEntity_s *ent, const arcJointM
 	tri->dominantTris = deformInfo->dominantTris;
 	tri->numVerts = deformInfo->numOutputVerts;
 
-	if ( tri->verts == NULL ) {
+	if ( tri->verts == nullptr ) {
 		R_AllocStaticTriSurfVerts( tri, tri->numVerts );
 		for ( i = 0; i < deformInfo->numSourceVerts; i++ ) {
 			tri->verts[i].Clear();
@@ -301,8 +298,8 @@ void idMD5Mesh::UpdateSurface( const struct renderEntity_s *ent, const arcJointM
 	}
 
 	// replicate the mirror seam vertexes
-	base = deformInfo->numOutputVerts - deformInfo->numMirroredVerts;
-	for ( i = 0; i < deformInfo->numMirroredVerts; i++ ) {
+	int base = deformInfo->numOutputVerts - deformInfo->numMirroredVerts;
+	for ( int i = 0; i < deformInfo->numMirroredVerts; i++ ) {
 		tri->verts[base + i] = tri->verts[deformInfo->mirroredVerts[i]];
 	}
 
@@ -320,12 +317,12 @@ void idMD5Mesh::UpdateSurface( const struct renderEntity_s *ent, const arcJointM
 
 /*
 ====================
-idMD5Mesh::CalcBounds
+anM8DMesh::CalcBounds
 ====================
 */
-arcBounds idMD5Mesh::CalcBounds( const arcJointMat *entJoints ) {
-	arcBounds	bounds;
-	arcDrawVert *verts = (arcDrawVert *) _alloca16( texCoords.Num() * sizeof( arcDrawVert ) );
+anBounds anM8DMesh::CalcBounds( const arcJointMat *entJoints ) {
+	anBounds	bounds;
+	anDrawVertex *verts = (anDrawVertex *) _alloca16( texCoords.Num() * sizeof( anDrawVertex ) );
 
 	TransformVerts( verts, entJoints );
 
@@ -336,34 +333,31 @@ arcBounds idMD5Mesh::CalcBounds( const arcJointMat *entJoints ) {
 
 /*
 ====================
-idMD5Mesh::NearestJoint
+anM8DMesh::NearestJoint
 ====================
 */
-int idMD5Mesh::NearestJoint( int a, int b, int c ) const {
-	int i, bestJoint, vertNum, weightVertNum;
-	float bestWeight;
-
+int anM8DMesh::NearestJoint( int a, int b, int c ) const {
 	// duplicated vertices might not have weights
 	if ( a >= 0 && a < texCoords.Num() ) {
-		vertNum = a;
+		int vertNum = a;
 	} else if ( b >= 0 && b < texCoords.Num() ) {
-		vertNum = b;
+		int vertNum = b;
 	} else if ( c >= 0 && c < texCoords.Num() ) {
-		vertNum = c;
+		int vertNum = c;
 	} else {
 		// all vertices are duplicates which shouldn't happen
 		return 0;
 	}
 
 	// find the first weight for this vertex
- 	weightVertNum = 0;
-	for ( i = 0; weightVertNum < vertNum; i++ ) {
+ 	int weightVertNum = 0;
+	for ( int i = 0; weightVertNum < vertNum; i++ ) {
 		weightVertNum += weightIndex[i*2+1];
 	}
 
 	// get the joint for the largest weight
-	bestWeight = scaledWeights[i].w;
-	bestJoint = weightIndex[i*2+0] / sizeof( arcJointMat );
+	float bestWeight = scaledWeights[i].w;
+	int bestJoint = weightIndex[i*2+0] / sizeof( arcJointMat );
 	for (; weightIndex[i*2+1] == 0; i++ ) {
 		if ( scaledWeights[i].w > bestWeight ) {
 			bestWeight = scaledWeights[i].w;
@@ -375,58 +369,53 @@ int idMD5Mesh::NearestJoint( int a, int b, int c ) const {
 
 /*
 ====================
-idMD5Mesh::NumVerts
+anM8DMesh::NumVerts
 ====================
 */
-int idMD5Mesh::NumVerts( void ) const {
+int anM8DMesh::NumVerts( void ) const {
 	return texCoords.Num();
 }
 
 /*
 ====================
-idMD5Mesh::NumTris
+anM8DMesh::NumTris
 ====================
 */
-int	idMD5Mesh::NumTris( void ) const {
+int	anM8DMesh::NumTris( void ) const {
 	return numTris;
 }
 
 /*
 ====================
-idMD5Mesh::NumWeights
+anM8DMesh::NumWeights
 ====================
 */
-int	idMD5Mesh::NumWeights( void ) const {
+int	anM8DMesh::NumWeights( void ) const {
 	return numWeights;
 }
 
 /***********************************************************************
 
-	idRenderModelMD5
+	anRenderModelM8D
 
 ***********************************************************************/
 
 /*
 ====================
-idRenderModelMD5::ParseJoint
+anRenderModelM8D::ParseJoint
 ====================
 */
-void idRenderModelMD5::ParseJoint( arcLexer &parser, aRcMD5Joint *joint, idJointQuat *defaultPose ) {
-	arcNetToken	token;
-	int		num;
+void anRenderModelM8D::ParseJoint( anLexer &parser, anM8DJoint *joint, anJointQuat *defaultPose ) {
+	anToken	token;
 
-	//
 	// parse name
-	//
 	parser.ReadToken( &token );
 	joint->name = token;
 
-	//
 	// parse parent
-	//
-	num = parser.ParseInt();
+	int num = parser.ParseInt();
 	if ( num < 0 ) {
-		joint->parent = NULL;
+		joint->parent = nullptr;
 	} else {
 		if ( num >= joints.Num() - 1 ) {
 			parser.Error( "Invalid parent for joint '%s'", joint->name.c_str() );
@@ -434,9 +423,7 @@ void idRenderModelMD5::ParseJoint( arcLexer &parser, aRcMD5Joint *joint, idJoint
 		joint->parent = &joints[ num ];
 	}
 
-	//
 	// parse default pose
-	//
 	parser.Parse1DMatrix( 3, defaultPose->t.ToFloatPtr() );
 	parser.Parse1DMatrix( 3, defaultPose->q.ToFloatPtr() );
 	defaultPose->q.w = defaultPose->q.CalcW();
@@ -444,31 +431,31 @@ void idRenderModelMD5::ParseJoint( arcLexer &parser, aRcMD5Joint *joint, idJoint
 
 /*
 ====================
-idRenderModelMD5::InitFromFile
+anRenderModelM8D::InitFromFile
 ====================
 */
-void idRenderModelMD5::InitFromFile( const char *fileName ) {
+void anRenderModelM8D::InitFromFile( const char *fileName ) {
 	name = fileName;
 	LoadModel();
 }
 
 /*
 ====================
-idRenderModelMD5::LoadModel
+anRenderModelM8D::LoadModel
 
 used for initial loads, reloadModel, and reloading the data of purged models
 Upon exit, the model will absolutely be valid, but possibly as a default model
 ====================
 */
-void idRenderModelMD5::LoadModel() {
+void anRenderModelM8D::LoadModel() {
 	int			version;
 	int			i;
 	int			num;
 	int			parentNum;
-	arcNetToken		token;
-	arcLexer		parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS );
-	idJointQuat	*pose;
-	aRcMD5Joint	*joint;
+	anToken		token;
+	anLexer		parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS );
+	anJointQuat	*pose;
+	anM8DJoint	*joint;
 	arcJointMat *poseMat3;
 
 	if ( !purged ) {
@@ -521,19 +508,19 @@ void idRenderModelMD5::LoadModel() {
 	joint = joints.Ptr();
 	for ( i = 0; i < joints.Num(); i++, joint++, pose++ ) {
 		ParseJoint( parser, joint, pose );
-		poseMat3[ i ].SetRotation( pose->q.ToMat3() );
-		poseMat3[ i ].SetTranslation( pose->t );
+		poseMat3[i].SetRotation( pose->q.ToMat3() );
+		poseMat3[i].SetTranslation( pose->t );
 		if ( joint->parent ) {
 			parentNum = joint->parent - joints.Ptr();
-			pose->q = ( poseMat3[ i ].ToMat3() * poseMat3[ parentNum ].ToMat3().Transpose() ).ToQuat();
-			pose->t = ( poseMat3[ i ].ToVec3() - poseMat3[ parentNum ].ToVec3() ) * poseMat3[ parentNum ].ToMat3().Transpose();
+			pose->q = ( poseMat3[i].ToMat3() * poseMat3[ parentNum ].ToMat3().Transpose() ).ToQuat();
+			pose->t = ( poseMat3[i].ToVec3() - poseMat3[ parentNum ].ToVec3() ) * poseMat3[ parentNum ].ToMat3().Transpose();
 		}
 	}
 	parser.ExpectTokenString( "}" );
 
 	for ( i = 0; i < meshes.Num(); i++ ) {
 		parser.ExpectTokenString( "mesh" );
-		meshes[ i ].ParseMesh( parser, defaultPose.Num(), poseMat3 );
+		meshes[i].ParseMesh( parser, defaultPose.Num(), poseMat3 );
 	}
 
 	//
@@ -542,22 +529,22 @@ void idRenderModelMD5::LoadModel() {
 	CalculateBounds( poseMat3 );
 
 	// set the timestamp for reloadmodels
-	fileSystem->ReadFile( name, NULL, &timeStamp );
+	fileSystem->ReadFile( name, nullptr, &timeStamp );
 }
 
 /*
 ==============
-idRenderModelMD5::Print
+anRenderModelM8D::Print
 ==============
 */
-void idRenderModelMD5::Print() const {
-	const idMD5Mesh	*mesh;
+void anRenderModelM8D::Print() const {
+	const anM8DMesh	*mesh;
 	int			i;
 
 	common->Printf( "%s\n", name.c_str() );
 	common->Printf( "Dynamic model.\n" );
 	common->Printf( "Generated smooth normals.\n" );
-	common->Printf( "    verts  tris weights material\n" );
+	common->Printf( "    vertexs  triangles weights material\n" );
 	int	totalVerts = 0;
 	int	totalTris = 0;
 	int	totalWeights = 0;
@@ -568,24 +555,23 @@ void idRenderModelMD5::Print() const {
 		common->Printf( "%2i: %5i %5i %7i %s\n", i, mesh->NumVerts(), mesh->NumTris(), mesh->NumWeights(), mesh->shader->GetName() );
 	}
 	common->Printf( "-----\n" );
-	common->Printf( "%4i verts.\n", totalVerts );
-	common->Printf( "%4i tris.\n", totalTris );
+	common->Printf( "%4i vertexes.\n", totalVerts );
+	common->Printf( "%4i triangles.\n", totalTris );
 	common->Printf( "%4i weights.\n", totalWeights );
 	common->Printf( "%4i joints.\n", joints.Num() );
 }
 
 /*
 ==============
-idRenderModelMD5::List
+anRenderModelM8D::List
 ==============
 */
-void idRenderModelMD5::List() const {
-	int			i;
-	const idMD5Mesh	*mesh;
-	int			totalTris = 0;
-	int			totalVerts = 0;
+void anRenderModelM8D::List() const {
+	const anM8DMesh	*mesh;
+	int totalTris = 0;
+	int totalVerts = 0;
 
-	for ( mesh = meshes.Ptr(), i = 0; i < meshes.Num(); i++, mesh++ ) {
+	for ( mesh = meshes.Ptr(), int i = 0; i < meshes.Num(); i++, mesh++ ) {
 		totalTris += mesh->numTris;
 		totalVerts += mesh->NumVerts();
 	}
@@ -600,37 +586,35 @@ void idRenderModelMD5::List() const {
 
 /*
 ====================
-idRenderModelMD5::CalculateBounds
+anRenderModelM8D::CalculateBounds
 ====================
 */
-void idRenderModelMD5::CalculateBounds( const arcJointMat *entJoints ) {
-	int			i;
-	idMD5Mesh	*mesh;
+void anRenderModelM8D::CalculateBounds( const arcJointMat *entJoints ) {
+	anM8DMesh *mesh;
 
 	bounds.Clear();
-	for ( mesh = meshes.Ptr(), i = 0; i < meshes.Num(); i++, mesh++ ) {
+	for ( mesh = meshes.Ptr(), int i = 0; i < meshes.Num(); i++, mesh++ ) {
 		bounds.AddBounds( mesh->CalcBounds( entJoints ) );
 	}
 }
 
 /*
 ====================
-idRenderModelMD5::Bounds
+anRenderModelM8D::Bounds
 
 This calculates a rough bounds by using the joint radii without
 transforming all the points
 ====================
 */
-arcBounds idRenderModelMD5::Bounds( const renderEntity_t *ent ) const {
+anBounds anRenderModelM8D::Bounds( const renderEntity_t *ent ) const {
 #if 0
 	// we can't calculate a rational bounds without an entity,
 	// because joints could be positioned to deform it into an
 	// arbitrarily large shape
 	if ( !ent ) {
-		common->Error( "idRenderModelMD5::Bounds: called without entity" );
+		common->Error( "ModelMD5::Bounds: called without entity" );
 	}
 #endif
-
 	if ( !ent ) {
 		// this is the bounds for the reference pose
 		return bounds;
@@ -641,64 +625,63 @@ arcBounds idRenderModelMD5::Bounds( const renderEntity_t *ent ) const {
 
 /*
 ====================
-idRenderModelMD5::DrawJoints
+anRenderModelM8D::DrawJoints
 ====================
 */
-void idRenderModelMD5::DrawJoints( const renderEntity_t *ent, const struct viewDef_s *view ) const {
-	int					i;
+void anRenderModelM8D::DrawJoints( const renderEntity_t *ent, const struct viewDef_s *view ) const {
 	int					num;
-	arcVec3				pos;
+	anVec3				pos;
 	const arcJointMat	*joint;
-	const aRcMD5Joint	*md5Joint;
+	const anM8DJoint	*md5Joint;
 	int					parentNum;
 
 	num = ent->numJoints;
 	joint = ent->joints;
 	md5Joint = joints.Ptr();
-	for ( i = 0; i < num; i++, joint++, md5Joint++ ) {
+	for ( int i = 0; i < num; i++, joint++, md5Joint++ ) {
 		pos = ent->origin + joint->ToVec3() * ent->axis;
 		if ( md5Joint->parent ) {
 			parentNum = md5Joint->parent - joints.Ptr();
-			session->rw->DebugLine( colorWhite, ent->origin + ent->joints[ parentNum ].ToVec3() * ent->axis, pos );
+			rw->DebugLine( colorWhite, ent->origin + ent->joints[ parentNum ].ToVec3() * ent->axis, pos );
 		}
 
-		session->rw->DebugLine( colorRed,	pos, pos + joint->ToMat3()[ 0 ] * 2.0f * ent->axis );
-		session->rw->DebugLine( colorGreen,	pos, pos + joint->ToMat3()[ 1 ] * 2.0f * ent->axis );
-		session->rw->DebugLine( colorBlue,	pos, pos + joint->ToMat3()[ 2 ] * 2.0f * ent->axis );
+		rw->DebugLine( colorRed,	pos, pos + joint->ToMat3()[ 0 ] * 2.0f * ent->axis );
+		rw->DebugLine( colorGreen,	pos, pos + joint->ToMat3()[ 1 ] * 2.0f * ent->axis );
+		rw->DebugLine( colorBlue,	pos, pos + joint->ToMat3()[ 2 ] * 2.0f * ent->axis );
 	}
 
-	arcBounds bounds;
+	anBounds bounds;
 
 	bounds.FromTransformedBounds( ent->bounds, vec3_zero, ent->axis );
-	session->rw->DebugBounds( colorMagenta, bounds, ent->origin );
+	rw->DebugBounds( colorMagenta, bounds, ent->origin );
 
 	if ( ( r_jointNameScale.GetFloat() != 0.0f ) && ( bounds.Expand( 128.0f ).ContainsPoint( view->renderView.vieworg - ent->origin ) ) ) {
-		arcVec3	offset( 0, 0, r_jointNameOffset.GetFloat() );
+		anVec3	offset( 0, 0, r_jointNameOffset.GetFloat() );
 		float	scale;
 
 		scale = r_jointNameScale.GetFloat();
 		joint = ent->joints;
 		num = ent->numJoints;
-		for ( i = 0; i < num; i++, joint++ ) {
+		for ( int i = 0; i < num; i++, joint++ ) {
 			pos = ent->origin + joint->ToVec3() * ent->axis;
-			session->rw->DrawText( joints[ i ].name, pos + offset, scale, colorWhite, view->renderView.viewAxis, 1 );
+			rw->DrawText( joints[i].name, pos + offset, scale, colorWhite, view->renderView.viewAxis, 1 );
 		}
 	}
 }
 
 /*
 ====================
-idRenderModelMD5::InstantiateDynamicModel
+anRenderModelM8D::InstantiateDynamicModel
 ====================
 */
-ARCRenderModel *idRenderModelMD5::InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel ) {
-	int					i, surfaceNum;
-	idMD5Mesh			*mesh;
-	aRcModelStatic	*staticModel;
+anRenderModel *anRenderModelM8D::InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel ) {
+	int				i, surfaceNum;
+	anM8DMesh		*mesh;
+	anModelStatic	*staticModel;
 
 	if ( cachedModel && !r_useCachedDynamicModels.GetBool() ) {
 		delete cachedModel;
-		cachedModel = NULL;
+		cachedModel = nullptr;
 	}
 
 	if ( purged ) {
@@ -707,37 +690,37 @@ ARCRenderModel *idRenderModelMD5::InstantiateDynamicModel( const struct renderEn
 	}
 
 	if ( !ent->joints ) {
-		common->Printf( "idRenderModelMD5::InstantiateDynamicModel: NULL joints on renderEntity for '%s'\n", Name() );
+		common->Printf( "anRenderModelM8D::InstantiateDynamicModel: nullptr joints on renderEntity for '%s'\n", Name() );
 		delete cachedModel;
-		return NULL;
+		return nullptr;
 	} else if ( ent->numJoints != joints.Num() ) {
-		common->Printf( "idRenderModelMD5::InstantiateDynamicModel: renderEntity has different number of joints than model for '%s'\n", Name() );
+		common->Printf( "anRenderModelM8D::InstantiateDynamicModel: renderEntity has different number of joints than model for '%s'\n", Name() );
 		delete cachedModel;
-		return NULL;
+		return nullptr;
 	}
 
 	tr.pc.c_generateMd5++;
 
 	if ( cachedModel ) {
-		assert( dynamic_cast<aRcModelStatic *>(cachedModel) != NULL );
-		assert( arcNetString::Icmp( cachedModel->Name(), MD5_SnapshotName ) == 0 );
-		staticModel = static_cast<aRcModelStatic *>(cachedModel);
+		assert( dynamic_cast<anModelStatic *>(cachedModel) != nullptr );
+		assert( anString::Icmp( cachedModel->Name(), M8D_SnapshotName ) == 0 );
+		staticModel = static_cast<anModelStatic *>(cachedModel);
 	} else {
-		staticModel = new aRcModelStatic;
-		staticModel->InitEmpty( MD5_SnapshotName );
+		staticModel = new anModelStatic;
+		staticModel->InitEmpty( M8D_SnapshotName );
 	}
 
 	staticModel->bounds.Clear();
 
 	if ( r_showSkel.GetInteger() ) {
-		if ( ( view != NULL ) && ( !r_skipSuppress.GetBool() || !ent->suppressSurfaceInViewID || ( ent->suppressSurfaceInViewID != view->renderView.viewID ) ) ) {
+		if ( ( view != nullptr ) && ( !r_skipSuppress.GetBool() || !ent->suppressSurfaceInViewID || ( ent->suppressSurfaceInViewID != view->renderView.viewID ) ) ) {
 			// only draw the skeleton
 			DrawJoints( ent, view );
 		}
 
 		if ( r_showSkel.GetInteger() > 1 ) {
 			// turn off the model when showing the skeleton
-			staticModel->InitEmpty( MD5_SnapshotName );
+			staticModel->InitEmpty( M8D_SnapshotName );
 			return staticModel;
 		}
 	}
@@ -746,10 +729,8 @@ ARCRenderModel *idRenderModelMD5::InstantiateDynamicModel( const struct renderEn
 	for ( mesh = meshes.Ptr(), i = 0; i < meshes.Num(); i++, mesh++ ) {
 		// avoid deforming the surface if it will be a nodraw due to a skin remapping
 		// FIXME: may have to still deform clipping hulls
-		const arcMaterial *shader = mesh->shader;
-
+		const anMaterial *shader = mesh->shader;
 		shader = R_RemapShaderBySkin( shader, ent->customSkin, ent->customShader );
-
 		if ( !shader || ( !shader->IsDrawn() && !shader->SurfaceCastsShadow() ) ) {
 			staticModel->DeleteSurfaceWithId( i );
 			mesh->surfaceNum = -1;
@@ -763,12 +744,12 @@ ARCRenderModel *idRenderModelMD5::InstantiateDynamicModel( const struct renderEn
 			surf = &staticModel->surfaces[surfaceNum];
 		} else {
 			// Remove Overlays before adding new surfaces
-			ARCRenderModelOverlay::RemoveOverlaySurfacesFromModel( staticModel );
+			anRenderModelOverlay::RemoveOverlaySurfacesFromModel( staticModel );
 
 			mesh->surfaceNum = staticModel->NumSurfaces();
 			surf = &staticModel->surfaces.Alloc();
-			surf->geometry = NULL;
-			surf->shader = NULL;
+			surf->geometry = nullptr;
+			surf->shader = nullptr;
 			surf->id = i;
 		}
 
@@ -783,52 +764,52 @@ ARCRenderModel *idRenderModelMD5::InstantiateDynamicModel( const struct renderEn
 
 /*
 ====================
-idRenderModelMD5::IsDynamicModel
+anRenderModelM8D::IsDynamicModel
 ====================
 */
-dynamicModel_t idRenderModelMD5::IsDynamicModel() const {
+dynamicModel_t anRenderModelM8D::IsDynamicModel() const {
 	return DM_CACHED;
 }
 
 /*
 ====================
-idRenderModelMD5::NumJoints
+anRenderModelM8D::NumJoints
 ====================
 */
-int idRenderModelMD5::NumJoints( void ) const {
+int anRenderModelM8D::NumJoints( void ) const {
 	return joints.Num();
 }
 
 /*
 ====================
-idRenderModelMD5::GetJoints
+anRenderModelM8D::GetJoints
 ====================
 */
-const aRcMD5Joint *idRenderModelMD5::GetJoints( void ) const {
+const anM8DJoint *anRenderModelM8D::GetJoints( void ) const {
 	return joints.Ptr();
 }
 
 /*
 ====================
-idRenderModelMD5::GetDefaultPose
+anRenderModelM8D::GetDefaultPose
 ====================
 */
-const idJointQuat *idRenderModelMD5::GetDefaultPose( void ) const {
+const anJointQuat *anRenderModelM8D::GetDefaultPose( void ) const {
 	return defaultPose.Ptr();
 }
 
 /*
 ====================
-idRenderModelMD5::GetJointHandle
+anRenderModelM8D::GetJointHandle
 ====================
 */
-jointHandle_t idRenderModelMD5::GetJointHandle( const char *name ) const {
-	const aRcMD5Joint *joint;
+jointHandle_t anRenderModelM8D::GetJointHandle( const char *name ) const {
+	const anM8DJoint *joint;
 	int	i;
 
 	joint = joints.Ptr();
 	for ( i = 0; i < joints.Num(); i++, joint++ ) {
-		if ( arcNetString::Icmp( joint->name.c_str(), name ) == 0 ) {
+		if ( anString::Icmp( joint->name.c_str(), name ) == 0 ) {
 			return ( jointHandle_t )i;
 		}
 	}
@@ -838,10 +819,10 @@ jointHandle_t idRenderModelMD5::GetJointHandle( const char *name ) const {
 
 /*
 =====================
-idRenderModelMD5::GetJointName
+anRenderModelM8D::GetJointName
 =====================
 */
-const char *idRenderModelMD5::GetJointName( jointHandle_t handle ) const {
+const char *anRenderModelM8D::GetJointName( jointHandle_t handle ) const {
 	if ( ( handle < 0 ) || ( handle >= joints.Num() ) ) {
 		return "<invalid joint>";
 	}
@@ -851,18 +832,17 @@ const char *idRenderModelMD5::GetJointName( jointHandle_t handle ) const {
 
 /*
 ====================
-idRenderModelMD5::NearestJoint
+anRenderModelM8D::NearestJoint
 ====================
 */
-int idRenderModelMD5::NearestJoint( int surfaceNum, int a, int b, int c ) const {
-	int i;
-	const idMD5Mesh *mesh;
+int anRenderModelM8D::NearestJoint( int surfaceNum, int a, int b, int c ) const {
+	const anM8DMesh *mesh;
 
 	if ( surfaceNum > meshes.Num() ) {
-		common->Error( "idRenderModelMD5::NearestJoint: surfaceNum > meshes.Num()" );
+		common->Error( "anRenderModelM8D::NearestJoint: surfaceNum > meshes.Num()" );
 	}
 
-	for ( mesh = meshes.Ptr(), i = 0; i < meshes.Num(); i++, mesh++ ) {
+	for ( mesh = meshes.Ptr(), int i = 0; i < meshes.Num(); i++, mesh++ ) {
 		if ( mesh->surfaceNum == surfaceNum ) {
 			return mesh->NearestJoint( a, b, c );
 		}
@@ -872,15 +852,15 @@ int idRenderModelMD5::NearestJoint( int surfaceNum, int a, int b, int c ) const 
 
 /*
 ====================
-idRenderModelMD5::TouchData
+anRenderModelM8D::TouchData
 
 models that are already loaded at level start time
 will still touch their materials to make sure they
 are kept loaded
 ====================
 */
-void idRenderModelMD5::TouchData() {
-	idMD5Mesh	*mesh;
+void anRenderModelM8D::TouchData() {
+	anM8DMesh	*mesh;
 	int			i;
 
 	for ( mesh = meshes.Ptr(), i = 0; i < meshes.Num(); i++, mesh++ ) {
@@ -890,13 +870,13 @@ void idRenderModelMD5::TouchData() {
 
 /*
 ===================
-idRenderModelMD5::PurgeModel
+anRenderModelM8D::PurgeModel
 
 frees all the data, but leaves the class around for dangling references,
 which can regenerate the data with LoadModel()
 ===================
 */
-void idRenderModelMD5::PurgeModel() {
+void anRenderModelM8D::PurgeModel() {
 	purged = true;
 	joints.Clear();
 	defaultPose.Clear();
@@ -905,23 +885,21 @@ void idRenderModelMD5::PurgeModel() {
 
 /*
 ===================
-idRenderModelMD5::Memory
+anRenderModelM8D::Memory
 ===================
 */
-int	idRenderModelMD5::Memory() const {
-	int		total, i;
-
-	total = sizeof( *this );
+int	anRenderModelM8D::Memory() const {
+	int total = sizeof( *this );
 	total += joints.MemoryUsed() + defaultPose.MemoryUsed() + meshes.MemoryUsed();
 
 	// count up strings
-	for ( i = 0; i < joints.Num(); i++ ) {
+	for ( int i = 0; i < joints.Num(); i++ ) {
 		total += joints[i].name.DynamicMemoryUsed();
 	}
 
 	// count up meshes
-	for ( i = 0; i < meshes.Num(); i++ ) {
-		const idMD5Mesh *mesh = &meshes[i];
+	for ( int i = 0; i < meshes.Num(); i++ ) {
+		const anM8DMesh *mesh = &meshes[i];
 
 		total += mesh->texCoords.MemoryUsed() + mesh->numWeights * ( sizeof( mesh->scaledWeights[0] ) + sizeof( mesh->weightIndex[0] ) * 2 );
 

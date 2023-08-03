@@ -1,4 +1,4 @@
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "win_local.h"
@@ -68,13 +68,13 @@ double Sys_ClockTicksPerSecond( void ) {
 		if ( !RegOpenKeyEx( HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", 0, KEY_READ, &hKey ) ) {
 			ProcSpeed = 0;
 			buflen = sizeof( ProcSpeed );
-			ret = RegQueryValueEx( hKey, "~MHz", NULL, NULL, (LPBYTE) &ProcSpeed, &buflen );
+			ret = RegQueryValueEx( hKey, "~MHz", nullptr, nullptr, (LPBYTE) &ProcSpeed, &buflen );
 			// If we don't succeed, try some other spellings.
 			if ( ret != ERROR_SUCCESS ) {
-				ret = RegQueryValueEx( hKey, "~Mhz", NULL, NULL, (LPBYTE) &ProcSpeed, &buflen );
+				ret = RegQueryValueEx( hKey, "~Mhz", nullptr, nullptr, (LPBYTE) &ProcSpeed, &buflen );
 			}
 			if ( ret != ERROR_SUCCESS ) {
-				ret = RegQueryValueEx( hKey, "~mhz", NULL, NULL, (LPBYTE) &ProcSpeed, &buflen );
+				ret = RegQueryValueEx( hKey, "~mhz", nullptr, nullptr, (LPBYTE) &ProcSpeed, &buflen );
 			}
 			RegCloseKey( hKey );
 			if ( ret == ERROR_SUCCESS ) {
@@ -686,8 +686,8 @@ int Sys_FPU_PrintStateFlags( char *ptr, int ctrl, int stat, int tags, int inof, 
 	for ( i = 0; statusWordFlags[i].name[0]; i++ ) {
 		ptr += sprintf( ptr+length, "  %-30s = %s\n", statusWordFlags[i].name, ( stat & ( 1 << statusWordFlags[i].bit ) ) ? "true" : "false" );
 	}
-	length += sprintf( ptr+length, "  %-30s = %d%d%d%d\n", "Condition code", (stat>>8)&1, (stat>>9)&1, (stat>>10)&1, (stat>>14)&1 );
-	length += sprintf( ptr+length, "  %-30s = %d\n", "Top of stack pointer", (stat>>11)&7 );
+	length += sprintf( ptr+length, "  %-30s = %d%d%d%d\n", "Condition code", ( stat>>8)&1, ( stat>>9)&1, ( stat>>10)&1, ( stat>>14)&1 );
+	length += sprintf( ptr+length, "  %-30s = %d\n", "Top of stack pointer", ( stat>>11)&7 );
 
 	return length;
 }
@@ -764,10 +764,10 @@ const char *Sys_FPU_GetState( void ) {
 		mov			ecx, esi
 		and			ecx, edx
 		jz			done
-		fxch		st(1)
+		fxch		st( 1 )
 		fst			qword ptr [edi+8]
 		inc			eax
-		fxch		st(1)
+		fxch		st( 1 )
 		shr			edx, 2
 		mov			ecx, esi
 		and			ecx, edx
@@ -820,13 +820,13 @@ const char *Sys_FPU_GetState( void ) {
 		mov			numValues, eax
 	}
 
-	int ctrl = *(int *)&fpuState[0];
-	int stat = *(int *)&fpuState[4];
-	int tags = *(int *)&fpuState[8];
-	int inof = *(int *)&fpuState[12];
-	int inse = *(int *)&fpuState[16];
-	int opof = *(int *)&fpuState[20];
-	int opse = *(int *)&fpuState[24];
+	int ctrl = *( int*)&fpuState[0];
+	int stat = *( int*)&fpuState[4];
+	int tags = *( int*)&fpuState[8];
+	int inof = *( int*)&fpuState[12];
+	int inse = *( int*)&fpuState[16];
+	int opof = *( int*)&fpuState[20];
+	int opse = *( int*)&fpuState[24];
 
 	ptr = fpuString;
 	ptr += sprintf( ptr,"FPU State:\n"

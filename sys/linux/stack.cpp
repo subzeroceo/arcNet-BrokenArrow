@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 
 /*
 ==================
@@ -26,7 +26,7 @@ void Sys_GetCallStack( address_t *callStack, const int callStackSize ) {
 Sys_GetCallStackStr
 ==================
 */
-const char * Sys_GetCallStackStr( const address_t *callStack, const int callStackSize ) {
+const char *Sys_GetCallStackStr( const address_t *callStack, const int callStackSize ) {
 	return "";
 }
 
@@ -35,7 +35,7 @@ const char * Sys_GetCallStackStr( const address_t *callStack, const int callStac
 Sys_GetCallStackStr
 ==================
 */
-const char * Sys_GetCallStackCurStr( int depth ) {
+const char *Sys_GetCallStackCurStr( int depth ) {
 	return "";
 }
 
@@ -78,7 +78,7 @@ const char *	Sys_GetCallStackStr( const address_t *callStack, int callStackSize 
 	strings = backtrace_symbols( (void **)callStack, callStackSize );
 	string[ 0 ] = '\0';
 	for ( i = 0; i < callStackSize; i++ ) {
-		arcNetString::snPrintf( string + strlen( string ), MAX_STRING_CHARS*2 - strlen( string ) - 1, "%s\n", strings[ i ] );
+		anString::snPrintf( string + strlen( string ), MAX_STRING_CHARS*2 - strlen( string ) - 1, "%s\n", strings[i] );
 	}
 	free( strings );
 	return string;
@@ -90,7 +90,7 @@ const char *	Sys_GetCallStackStr( const address_t *callStack, int callStackSize 
 Sys_GetCallStackStr
 ==================
 */
-const char * Sys_GetCallStackCurStr( int depth ) {
+const char *Sys_GetCallStackCurStr( int depth ) {
 	address_t array[ 32 ];
 	size_t size;
 
@@ -103,7 +103,7 @@ const char * Sys_GetCallStackCurStr( int depth ) {
 Sys_GetCallStackCurAddressStr
 ==================
 */
-const char * Sys_GetCallStackCurAddressStr( int depth ) {
+const char *Sys_GetCallStackCurAddressStr( int depth ) {
 	return Sys_GetCallStackCurStr( depth );
 }
 

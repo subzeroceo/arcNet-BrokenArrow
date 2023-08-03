@@ -1,45 +1,45 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
-arcCVarSystem g_useOldPDAStrings( "g_useOldPDAStrings", "0", CVAR_BOOL, "Read strings from the .pda files rather than from the .lang file" );
+anCVarSystem g_useOldPDAStrings( "g_useOldPDAStrings", "0", CVAR_BOOL, "Read strings from the .pda files rather than from the .lang file" );
 
 /*
 =================
-arcDeclPDA::Size
+anDeclPDA::Size
 =================
 */
-size_t arcDeclPDA::Size() const {
-	return sizeof( arcDeclPDA );
+size_t anDeclPDA::Size() const {
+	return sizeof( anDeclPDA );
 }
 
 /*
 ===============
-arcDeclPDA::Print
+anDeclPDA::Print
 ===============
 */
-void arcDeclPDA::Print() const {
+void anDeclPDA::Print() const {
 	common->Printf( "Implement me\n" );
 }
 
 /*
 ===============
-arcDeclPDA::List
+anDeclPDA::List
 ===============
 */
-void arcDeclPDA::List() const {
+void anDeclPDA::List() const {
 	common->Printf( "Implement me\n" );
 }
 
 /*
 ================
-arcDeclPDA::Parse
+anDeclPDA::Parse
 ================
 */
-bool arcDeclPDA::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
-	arcLexer src;
-	arcNetToken token;
+bool anDeclPDA::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+	anLexer src;
+	anToken token;
 
-	arcNetString baseStrId = va( "#str_%s_", GetName() );
+	anString baseStrId = va( "#str_%s_", GetName() );
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( DECL_LEXER_FLAGS );
@@ -47,7 +47,6 @@ bool arcDeclPDA::Parse( const char *text, const int textLength, bool allowBinary
 
 	// scan through, identifying each individual parameter
 	while( 1 ) {
-
 		if ( !src.ReadToken( &token ) ) {
 			break;
 		}
@@ -69,7 +68,6 @@ bool arcDeclPDA::Parse( const char *text, const int textLength, bool allowBinary
 
 		if ( !token.Icmp( "fullname" ) ) {
 			src.ReadToken( &token );
-
 			if ( g_useOldPDAStrings.GetBool() ) {
 				fullName = token;
 			} else {
@@ -126,19 +124,19 @@ bool arcDeclPDA::Parse( const char *text, const int textLength, bool allowBinary
 
 		if ( !token.Icmp( "email" ) ) {
 			src.ReadToken( &token );
-			emails.Append( static_cast<const arcDeclEmail *>( declManager->FindType( DECL_EMAIL, token ) ) );
+			emails.Append( static_cast<const anDeclEmail *>( declManager->FindType( DECL_EMAIL, token ) ) );
 			continue;
 		}
 
 		if ( !token.Icmp( "_audio" ) ) {
 			src.ReadToken( &token );
-			audios.Append( static_cast<const arcDeclAudio *>( declManager->FindType( DECL_AUDIO, token ) ) );
+			audios.Append( static_cast<const anDeclAudio *>( declManager->FindType( DECL_AUDIO, token ) ) );
 			continue;
 		}
 
 		if ( !token.Icmp( "_video" ) ) {
 			src.ReadToken( &token );
-			videos.Append( static_cast<const arcDeclVideo *>( declManager->FindType( DECL_VIDEO, token ) ) );
+			videos.Append( static_cast<const anDeclVideo *>( declManager->FindType( DECL_VIDEO, token ) ) );
 			continue;
 		}
 
@@ -156,10 +154,10 @@ bool arcDeclPDA::Parse( const char *text, const int textLength, bool allowBinary
 
 /*
 ===================
-arcDeclPDA::DefaultDefinition
+anDeclPDA::DefaultDefinition
 ===================
 */
-const char *arcDeclPDA::DefaultDefinition() const {
+const char *anDeclPDA::DefaultDefinition() const {
 	return
 		"{\n"
 		"\t"		"name  \"default\"\n"
@@ -168,10 +166,10 @@ const char *arcDeclPDA::DefaultDefinition() const {
 
 /*
 ===================
-arcDeclPDA::FreeData
+anDeclPDA::FreeData
 ===================
 */
-void arcDeclPDA::FreeData() {
+void anDeclPDA::FreeData() {
 	videos.Clear();
 	audios.Clear();
 	emails.Clear();
@@ -181,10 +179,10 @@ void arcDeclPDA::FreeData() {
 
 /*
 =================
-arcDeclPDA::RemoveAddedEmailsAndVideos
+anDeclPDA::RemoveAddedEmailsAndVideos
 =================
 */
-void arcDeclPDA::RemoveAddedEmailsAndVideos() const {
+void anDeclPDA::RemoveAddedEmailsAndVideos() const {
 	int num = emails.Num();
 	if ( originalEmails < num ) {
 		while ( num && num > originalEmails ) {
@@ -201,50 +199,50 @@ void arcDeclPDA::RemoveAddedEmailsAndVideos() const {
 
 /*
 =================
-arcDeclPDA::SetSecurity
+anDeclPDA::SetSecurity
 =================
 */
-void arcDeclPDA::SetSecurity( const char *sec ) const {
+void anDeclPDA::SetSecurity( const char *sec ) const {
 	security = sec;
 }
 
 /*
 =================
-arcDeclEmail::Size
+anDeclEmail::Size
 =================
 */
-size_t arcDeclEmail::Size() const {
-	return sizeof( arcDeclEmail );
+size_t anDeclEmail::Size() const {
+	return sizeof( anDeclEmail );
 }
 
 /*
 ===============
-arcDeclEmail::Print
+anDeclEmail::Print
 ===============
 */
-void arcDeclEmail::Print() const {
+void anDeclEmail::Print() const {
 	common->Printf( "Implement me\n" );
 }
 
 /*
 ===============
-arcDeclEmail::List
+anDeclEmail::List
 ===============
 */
-void arcDeclEmail::List() const {
+void anDeclEmail::List() const {
 	common->Printf( "Implement me\n" );
 }
 
 /*
 ================
-arcDeclEmail::Parse
+anDeclEmail::Parse
 ================
 */
-bool arcDeclEmail::Parse( const char *_text, const int textLength, bool allowBinaryVersion ) {
-	arcLexer src;
-	arcNetToken token;
+bool anDeclEmail::Parse( const char *_text, const int textLength, bool allowBinaryVersion ) {
+	anLexer src;
+	anToken token;
 
-	arcNetString baseStrId = va( "#str_%s_email_", GetName() );
+	anString baseStrId = va( "#str_%s_email_", GetName() );
 
 	src.LoadMemory( _text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWPATHNAMES |	LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT | LEXFL_NOFATALERRORS );
@@ -327,10 +325,10 @@ bool arcDeclEmail::Parse( const char *_text, const int textLength, bool allowBin
 
 /*
 ===================
-arcDeclEmail::DefaultDefinition
+anDeclEmail::DefaultDefinition
 ===================
 */
-const char *arcDeclEmail::DefaultDefinition() const {
+const char *anDeclEmail::DefaultDefinition() const {
 	return
 		"{\n"
 		"\t"	"{\n"
@@ -343,49 +341,49 @@ const char *arcDeclEmail::DefaultDefinition() const {
 
 /*
 ===================
-arcDeclEmail::FreeData
+anDeclEmail::FreeData
 ===================
 */
-void arcDeclEmail::FreeData() {
+void anDeclEmail::FreeData() {
 }
 
 /*
 =================
-arcDeclVideo::Size
+anDeclVideo::Size
 =================
 */
-size_t arcDeclVideo::Size() const {
-	return sizeof( arcDeclVideo );
+size_t anDeclVideo::Size() const {
+	return sizeof( anDeclVideo );
 }
 
 /*
 ===============
-arcDeclVideo::Print
+anDeclVideo::Print
 ===============
 */
-void arcDeclVideo::Print() const {
+void anDeclVideo::Print() const {
 	common->Printf( "Implement me\n" );
 }
 
 /*
 ===============
-arcDeclVideo::List
+anDeclVideo::List
 ===============
 */
-void arcDeclVideo::List() const {
+void anDeclVideo::List() const {
 	common->Printf( "Implement me\n" );
 }
 
 /*
 ================
-arcDeclVideo::Parse
+anDeclVideo::Parse
 ================
 */
-bool arcDeclVideo::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
-	arcLexer src;
-	arcNetToken token;
+bool anDeclVideo::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+	anLexer src;
+	anToken token;
 
-	arcNetString baseStrId = va( "#str_%s_video_", GetName() );
+	anString baseStrId = va( "#str_%s_video_", GetName() );
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWPATHNAMES |	LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT | LEXFL_NOFATALERRORS );
@@ -451,10 +449,10 @@ bool arcDeclVideo::Parse( const char *text, const int textLength, bool allowBina
 
 /*
 ===================
-arcDeclVideo::DefaultDefinition
+anDeclVideo::DefaultDefinition
 ===================
 */
-const char *arcDeclVideo::DefaultDefinition() const {
+const char *anDeclVideo::DefaultDefinition() const {
 	return
 		"{\n"
 		"\t"	"{\n"
@@ -465,49 +463,49 @@ const char *arcDeclVideo::DefaultDefinition() const {
 
 /*
 ===================
-arcDeclVideo::FreeData
+anDeclVideo::FreeData
 ===================
 */
-void arcDeclVideo::FreeData() {
+void anDeclVideo::FreeData() {
 }
 
 /*
 =================
-arcDeclAudio::Size
+anDeclAudio::Size
 =================
 */
-size_t arcDeclAudio::Size() const {
-	return sizeof( arcDeclAudio );
+size_t anDeclAudio::Size() const {
+	return sizeof( anDeclAudio );
 }
 
 /*
 ===============
-arcDeclAudio::Print
+anDeclAudio::Print
 ===============
 */
-void arcDeclAudio::Print() const {
+void anDeclAudio::Print() const {
 	common->Printf( "Implement me\n" );
 }
 
 /*
 ===============
-arcDeclAudio::List
+anDeclAudio::List
 ===============
 */
-void arcDeclAudio::List() const {
+void anDeclAudio::List() const {
 	common->Printf( "Implement me\n" );
 }
 
 /*
 ================
-arcDeclAudio::Parse
+anDeclAudio::Parse
 ================
 */
-bool arcDeclAudio::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
-	arcLexer src;
-	arcNetToken token;
+bool anDeclAudio::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+	anLexer src;
+	anToken token;
 
-	arcNetString baseStrId = va( "#str_%s_audio_", GetName() );
+	anString baseStrId = va( "#str_%s_audio_", GetName() );
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWPATHNAMES |	LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT | LEXFL_NOFATALERRORS );
@@ -560,10 +558,10 @@ bool arcDeclAudio::Parse( const char *text, const int textLength, bool allowBina
 
 /*
 ===================
-arcDeclAudio::DefaultDefinition
+anDeclAudio::DefaultDefinition
 ===================
 */
-const char *arcDeclAudio::DefaultDefinition() const {
+const char *anDeclAudio::DefaultDefinition() const {
 	return
 		"{\n"
 		"\t"	"{\n"
@@ -574,8 +572,8 @@ const char *arcDeclAudio::DefaultDefinition() const {
 
 /*
 ===================
-arcDeclAudio::FreeData
+anDeclAudio::FreeData
 ===================
 */
-void arcDeclAudio::FreeData() {
+void anDeclAudio::FreeData() {
 }

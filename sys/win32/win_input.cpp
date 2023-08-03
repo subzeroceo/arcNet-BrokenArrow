@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "win_local.h"
@@ -261,7 +261,7 @@ static const unsigned char *keyScanTable = s_scantokey;
 // scan codes instead of just the first 128.
 static unsigned char	rightAltKey = K_ALT;
 
-#define NUM_OBJECTS (sizeof(rgodf) / sizeof(rgodf[0]))
+#define NUM_OBJECTS ( sizeof(rgodf) / sizeof(rgodf[0]))
 
 static DIDATAFORMAT	df = {
 	sizeof(DIDATAFORMAT),       // this structure
@@ -289,13 +289,13 @@ bool IN_StartupKeyboard( void ) {
     DWORD   dwCoopFlags;
 
 	if ( !win32.g_pdi) {
-		common->Printf("keyboard: DirectInput has not been started\n");
+		common->Printf( "keyboard: DirectInput has not been started\n" );
 		return false;
 	}
 
 	if (win32.g_pKeyboard) {
 		win32.g_pKeyboard->Release();
-		win32.g_pKeyboard = NULL;
+		win32.g_pKeyboard = nullptr;
 	}
 
     // Detrimine where the buffer would like to be allocated
@@ -319,8 +319,8 @@ bool IN_StartupKeyboard( void ) {
         dwCoopFlags |= DISCL_NOWINKEY;
 
     // Obtain an interface to the system keyboard device.
-    if ( FAILED( hr = win32.g_pdi->CreateDevice( GUID_SysKeyboard, &win32.g_pKeyboard, NULL ) ) ) {
-		common->Printf("keyboard: couldn't find a keyboard device\n");
+    if ( FAILED( hr = win32.g_pdi->CreateDevice( GUID_SysKeyboard, &win32.g_pKeyboard, nullptr ) ) ) {
+		common->Printf( "keyboard: couldn't find a keyboard device\n" );
         return false;
 	}
 
@@ -339,7 +339,7 @@ bool IN_StartupKeyboard( void ) {
     // DirectInput applications.
     hr = win32.g_pKeyboard->SetCooperativeLevel( win32.hWnd, dwCoopFlags );
     if ( hr == DIERR_UNSUPPORTED && !bForeground && bExclusive ) {
-        common->Printf("keyboard: SetCooperativeLevel() returned DIERR_UNSUPPORTED.\nFor security reasons, background exclusive keyboard access is not allowed.\n");
+        common->Printf( "keyboard: SetCooperativeLevel() returned DIERR_UNSUPPORTED.\nFor security reasons, background exclusive keyboard access is not allowed.\n" );
         return false;
     }
 
@@ -372,7 +372,7 @@ bool IN_StartupKeyboard( void ) {
     // Acquire the newly created device
     win32.g_pKeyboard->Acquire();
 
-	common->Printf( "keyboard: DirectInput initialized.\n");
+	common->Printf( "keyboard: DirectInput initialized.\n" );
     return true;
 }
 
@@ -388,7 +388,7 @@ FIXME: scan code tables should include the upper 128 scan codes instead
 	   special-case is for right alt.
 =======
 */
-int IN_DIMapKey (int key) {
+int IN_DIMapKey ( intkey) {
 	if ( key>=128 ) {
 		switch ( key ) {
 			case DIK_HOME:
@@ -504,16 +504,16 @@ void IN_InitDirectInput( void ) {
 
 	common->Printf( "Initializing DirectInput...\n" );
 
-	if ( win32.g_pdi != NULL ) {
+	if ( win32.g_pdi != nullptr ) {
 		win32.g_pdi->Release();			// if the previous window was destroyed we need to do this
-		win32.g_pdi = NULL;
+		win32.g_pdi = nullptr;
 	}
 
     // Register with the DirectInput subsystem and get a pointer
     // to a IDirectInput interface we can use.
     // Create the base DirectInput object
-	if ( FAILED( hr = DirectInput8Create( GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&win32.g_pdi, NULL ) ) ) {
-		common->Printf ("DirectInputCreate failed\n");
+	if ( FAILED( hr = DirectInput8Create( GetModuleHandle(nullptr ), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&win32.g_pdi, nullptr ) ) ) {
+		common->Printf ( "DirectInputCreate failed\n" );
     }
 }
 
@@ -525,15 +525,15 @@ IN_InitDIMouse
 bool IN_InitDIMouse( void ) {
     HRESULT		hr;
 
-	if ( win32.g_pdi == NULL) {
+	if ( win32.g_pdi == nullptr ) {
 		return false;
 	}
 
 	// obtain an interface to the system mouse device.
-	hr = win32.g_pdi->CreateDevice( GUID_SysMouse, &win32.g_pMouse, NULL);
+	hr = win32.g_pdi->CreateDevice( GUID_SysMouse, &win32.g_pMouse, nullptr );
 
 	if (FAILED(hr)) {
-		common->Printf ("mouse: Couldn't open DI mouse device\n");
+		common->Printf ( "mouse: Couldn't open DI mouse device\n" );
 		return false;
 	}
 
@@ -545,7 +545,7 @@ bool IN_InitDIMouse( void ) {
     // This tells DirectInput that we will be passing a
     // DIMOUSESTATE2 structure to IDirectInputDevice::GetDeviceState.
     if ( FAILED( hr = win32.g_pMouse->SetDataFormat( &c_dfDIMouse2 ) ) ) {
-		common->Printf ("mouse: Couldn't set DI mouse format\n");
+		common->Printf ( "mouse: Couldn't set DI mouse format\n" );
 		return false;
 	}
 
@@ -553,7 +553,7 @@ bool IN_InitDIMouse( void ) {
 	hr = win32.g_pMouse->SetCooperativeLevel( win32.hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
 
 	if (FAILED(hr)) {
-		common->Printf ("mouse: Couldn't set DI coop level\n");
+		common->Printf ( "mouse: Couldn't set DI coop level\n" );
 		return false;
 	}
 
@@ -575,7 +575,7 @@ bool IN_InitDIMouse( void ) {
     dipdw.dwData            = DINPUT_BUFFERSIZE; // Arbitary buffer size
 
     if ( FAILED( hr = win32.g_pMouse->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) ) {
-		common->Printf ("mouse: Couldn't set DI buffersize\n");
+		common->Printf ( "mouse: Couldn't set DI buffersize\n" );
 		return false;
 	}
 
@@ -584,7 +584,7 @@ bool IN_InitDIMouse( void ) {
 	// clear any pending samples
 	Sys_PollMouseInputEvents();
 
-	common->Printf( "mouse: DirectInput initialized.\n");
+	common->Printf( "mouse: DirectInput initialized.\n" );
 	return true;
 }
 
@@ -671,17 +671,17 @@ void Sys_ShutdownInput( void ) {
 	IN_DeactivateKeyboard();
 	if ( win32.g_pKeyboard ) {
 		win32.g_pKeyboard->Release();
-		win32.g_pKeyboard = NULL;
+		win32.g_pKeyboard = nullptr;
 	}
 
     if ( win32.g_pMouse ) {
 		win32.g_pMouse->Release();
-		win32.g_pMouse = NULL;
+		win32.g_pMouse = nullptr;
 	}
 
     if ( win32.g_pdi ) {
 		win32.g_pdi->Release();
-		win32.g_pdi = NULL;
+		win32.g_pdi = nullptr;
 	}
 }
 
@@ -691,17 +691,17 @@ Sys_InitInput
 ===========
 */
 void Sys_InitInput( void ) {
-	common->Printf ("\n------- Input Initialization -------\n");
+	common->Printf ( "\n------- Input Initialization -------\n" );
 	IN_InitDirectInput();
 	if ( win32.in_mouse.GetBool() ) {
 		IN_InitDIMouse();
 		// don't grab the mouse on initialization
 		Sys_GrabMouseCursor( false );
 	} else {
-		common->Printf ("Mouse control not active.\n");
+		common->Printf ( "Mouse control not active.\n" );
 	}
 	IN_StartupKeyboard();
-	common->Printf ("------------------------------------\n");
+	common->Printf ( "------------------------------------\n" );
 	win32.in_mouse.ClearModified();
 }
 
@@ -711,7 +711,7 @@ Sys_InitScanTable
 ===========
 */
 void Sys_InitScanTable( void ) {
-	arcNetString lang = cvarSystem->GetCVarString( "sys_lang" );
+	anString lang = cvarSystem->GetCVarString( "sys_lang" );
 	if ( lang.Length() == 0 ) {
 		lang = "english";
 	}
@@ -828,7 +828,7 @@ int Sys_PollKeyboardInputEvents( void ) {
     DWORD              dwElements;
     HRESULT            hr;
 
-    if ( win32.g_pKeyboard == NULL ) {
+    if ( win32.g_pKeyboard == nullptr ) {
         return 0;
 	}
 
@@ -852,7 +852,7 @@ int Sys_PollKeyboardInputEvents( void ) {
 			//Bug 951: The following command really clears the garbage input.
 			//The original will still process keys in the buffer and was causing
 			//some problems.
-			win32.g_pKeyboard->GetDeviceData( sizeof(DIDEVICEOBJECTDATA), NULL, &dwElements, 0 );
+			win32.g_pKeyboard->GetDeviceData( sizeof(DIDEVICEOBJECTDATA), nullptr, &dwElements, 0 );
 			dwElements = 0;
 		}
         // hr may be DIERR_OTHERAPPHASPRIO or other errors.  This
@@ -880,7 +880,7 @@ and checking transitions
 int Sys_PollKeyboardInputEvents( void ) {
     HRESULT            hr;
 
-    if ( win32.g_pKeyboard == NULL ) {
+    if ( win32.g_pKeyboard == nullptr ) {
         return 0;
 	}
 
@@ -939,7 +939,7 @@ int Sys_ReturnKeyboardInputEvent( const int n, int &ch, bool &state ) {
 		// windows doesn't send keydown events to the WndProc for this key.
 		// ctrl and alt are handled here to get around windows sending ctrl and
 		// alt messages when the right-alt is pressed on non-US 102 keyboards.
-		Sys_QueEvent( GetTickCount(), SE_KEY, ch, state, 0, NULL );
+		Sys_QueEvent( GetTickCount(), SE_KEY, ch, state, 0, nullptr );
 	}
 	return ch;
 }
@@ -954,24 +954,24 @@ void Sys_QueMouseEvents( int dwElements ) {
 	for ( i = 0; i < dwElements; i++ ) {
 		if ( polled_didod[i].dwOfs >= DIMOFS_BUTTON0 && polled_didod[i].dwOfs <= DIMOFS_BUTTON7 ) {
 			value = (polled_didod[i].dwData & 0x80) == 0x80;
-			Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_KEY, K_MOUSE1 + ( polled_didod[i].dwOfs - DIMOFS_BUTTON0 ), value, 0, NULL );
+			Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_KEY, K_MOUSE1 + ( polled_didod[i].dwOfs - DIMOFS_BUTTON0 ), value, 0, nullptr );
 		} else {
 			switch (polled_didod[i].dwOfs) {
 			case DIMOFS_X:
 				value = polled_didod[i].dwData;
-				Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_MOUSE, value, 0, 0, NULL );
+				Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_MOUSE, value, 0, 0, nullptr );
 				break;
 			case DIMOFS_Y:
 				value = polled_didod[i].dwData;
-				Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_MOUSE, 0, value, 0, NULL );
+				Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_MOUSE, 0, value, 0, nullptr );
 				break;
 			case DIMOFS_Z:
 				value = ( (int) polled_didod[i].dwData ) / WHEEL_DELTA;
 				int key = value < 0 ? K_MWHEELDOWN : K_MWHEELUP;
 				value = abs( value );
 				while( value-- > 0 ) {
-					Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_KEY, key, true, 0, NULL );
-					Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_KEY, key, false, 0, NULL );
+					Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_KEY, key, true, 0, nullptr );
+					Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_KEY, key, false, 0, nullptr );
 				}
 				break;
 			}
@@ -1018,7 +1018,7 @@ int Sys_ReturnMouseInputEvent( const int n, int &action, int &value ) {
 		return 1;
 	}
 
-	switch( diaction ) {
+	switch ( diaction ) {
 		case DIMOFS_X:
 			value = polled_didod[n].dwData;
 			action = M_DELTAX;

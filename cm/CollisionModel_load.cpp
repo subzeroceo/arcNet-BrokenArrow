@@ -17,25 +17,24 @@
 ===============================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "CollisionModel_local.h"
 
 
-arcCollisionModelManagerLocal	collisionModelManagerLocal;
-arcCollisionModelManager *		collisionModelManager = &collisionModelManagerLocal;
+anSoftBodiesPhysicsManager	collisionModelManagerLocal;
+anCollisionModelManager *		collisionModelManager = &collisionModelManagerLocal;
 
 cm_windingList_t *				cm_windingList;
 cm_windingList_t *				cm_outList;
 cm_windingList_t *				cm_tmpList;
 
-ARCHashIndex *					cm_vertexHash;
-ARCHashIndex *					cm_edgeHash;
+anHashIndex *					cm_vertexHash;
+anHashIndex *					cm_edgeHash;
 
-arcBounds						cm_modelBounds;
+anBounds						cm_modelBounds;
 int								cm_vertexShift;
-
 
 /*
 ===============================================================================
@@ -47,10 +46,10 @@ Proc BSP tree for data pruning
 
 /*
 ================
-arcCollisionModelManagerLocal::ParseProcNodes
+anSoftBodiesPhysicsManager::ParseProcNodes
 ================
 */
-void arcCollisionModelManagerLocal::ParseProcNodes( arcLexer *src ) {
+void anSoftBodiesPhysicsManager::ParseProcNodes( anLexer *src ) {
 	src->ExpectTokenString( "{" );
 
 	numProcNodes = src->ParseInt();
@@ -61,7 +60,6 @@ void arcCollisionModelManagerLocal::ParseProcNodes( arcLexer *src ) {
 
 	for ( int i = 0; i < numProcNodes; i++ ) {
 		cm_procNode_t *node;
-
 		node = &procNodes[i];
 
 		src->Parse1DMatrix( 4, node->plane.ToFloatPtr() );
@@ -74,28 +72,28 @@ void arcCollisionModelManagerLocal::ParseProcNodes( arcLexer *src ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::LoadProcBSP
+anSoftBodiesPhysicsManager::LoadProcBSP
 
   FIXME: if the nodes would be at the start of the .proc file it would speed things up considerably
 ================
 */
-void arcCollisionModelManagerLocal::LoadProcBSP( const char *name ) {
-	arcNetString filename;
-	arcNetToken token;
-	arcLexer *src;
+void anSoftBodiesPhysicsManager::LoadProcBSP( const char *name ) {
+	anString filename;
+	anToken token;
+	anLexer *src;
 
 	// load it
 	filename = name;
 	filename.SetFileExtension( PROC_FILE_EXT );
-	src = new arcLexer( filename, LEXFL_NOSTRINGCONCAT | LEXFL_NODOLLARPRECOMPILE );
+	src = new anLexer( filename, LEXFL_NOSTRINGCONCAT | LEXFL_NODOLLARPRECOMPILE );
 	if ( !src->IsLoaded() ) {
-		common->Warning( "arcCollisionModelManagerLocal::LoadProcBSP: couldn't load %s", filename.c_str() );
+		common->Warning( "anSoftBodiesPhysicsManager::LoadProcBSP: couldn't load %s", filename.c_str() );
 		delete src;
 		return;
 	}
 
 	if ( !src->ReadToken( &token ) || token.Icmp( PROC_FILE_ID ) ) {
-		common->Warning( "arcCollisionModelManagerLocal::LoadProcBSP: bad id '%s' instead of '%s'", token.c_str(), PROC_FILE_ID );
+		common->Warning( "anSoftBodiesPhysicsManager::LoadProcBSP: bad id '%s' instead of '%s'", token.c_str(), PROC_FILE_ID );
 		delete src;
 		return;
 	}
@@ -126,7 +124,7 @@ void arcCollisionModelManagerLocal::LoadProcBSP( const char *name ) {
 			break;
 		}
 
-		src->Error( "arcCollisionModelManagerLocal::LoadProcBSP: bad token \"%s\"", token.c_str() );
+		src->Error( "anSoftBodiesPhysicsManager::LoadProcBSP: bad token \"%s\"", token.c_str() );
 	}
 
 	delete src;
@@ -142,38 +140,38 @@ Free map
 
 /*
 ================
-arcCollisionModelManagerLocal::Clear
+anSoftBodiesPhysicsManager::Clear
 ================
 */
-void arcCollisionModelManagerLocal::Clear( void ) {
+void anSoftBodiesPhysicsManager::Clear( void ) {
 	mapName.Clear();
 	mapFileTime = 0;
 	loaded = 0;
 	checkCount = 0;
 	maxModels = 0;
 	numModels = 0;
-	models = NULL;
+	models = nullptr;
 	memset( trmPolygons, 0, sizeof( trmPolygons ) );
-	trmBrushes[0] = NULL;
-	trmMaterial = NULL;
+	trmBrushes[0] = nullptr;
+	trmMaterial = nullptr;
 	numProcNodes = 0;
-	procNodes = NULL;
+	procNodes = nullptr;
 	getContacts = false;
-	contacts = NULL;
+	contacts = nullptr;
 	maxContacts = 0;
 	numContacts = 0;
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::RemovePolygonReferences_r
+anSoftBodiesPhysicsManager::RemovePolygonReferences_r
 ================
 */
-void arcCollisionModelManagerLocal::RemovePolygonReferences_r( cm_node_t *node, cm_polygon_t *p ) {
+void anSoftBodiesPhysicsManager::RemovePolygonReferences_r( cm_node_t *node, cm_polygon_t *p ) {
 	while( node ) {
 		for ( cm_polygonRef_t *pref = node->polygons; pref; pref = pref->next ) {
 			if ( pref->p == p ) {
-				pref->p = NULL;
+				pref->p = nullptr;
 				// cannot return here because we can have links down the tree due to polygon merging
 				//return;
 			}
@@ -195,14 +193,14 @@ void arcCollisionModelManagerLocal::RemovePolygonReferences_r( cm_node_t *node, 
 
 /*
 ================
-arcCollisionModelManagerLocal::RemoveBrushReferences_r
+anSoftBodiesPhysicsManager::RemoveBrushReferences_r
 ================
 */
-void arcCollisionModelManagerLocal::RemoveBrushReferences_r( cm_node_t *node, cm_brush_t *b ) {
+void anSoftBodiesPhysicsManager::RemoveBrushReferences_r( cm_node_t *node, cm_brush_t *b ) {
 	while( node ) {
 		for ( cm_brushRef_t *bref = node->brushes; bref; bref = bref->next ) {
 			if ( bref->b == b ) {
-				bref->b = NULL;
+				bref->b = nullptr;
 				return;
 			}
 		}
@@ -223,66 +221,66 @@ void arcCollisionModelManagerLocal::RemoveBrushReferences_r( cm_node_t *node, cm
 
 /*
 ================
-arcCollisionModelManagerLocal::FreeNode
+anSoftBodiesPhysicsManager::FreeNode
 ================
 */
-void arcCollisionModelManagerLocal::FreeNode( cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::FreeNode( cm_node_t *node ) {
 	// don't free the node here
 	// the nodes are allocated in blocks which are freed when the model is freed
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::FreePolygonReference
+anSoftBodiesPhysicsManager::FreePolygonReference
 ================
 */
-void arcCollisionModelManagerLocal::FreePolygonReference( cm_polygonRef_t *pref ) {
+void anSoftBodiesPhysicsManager::FreePolygonReference( cm_polygonRef_t *pref ) {
 	// don't free the polygon reference here
 	// the polygon references are allocated in blocks which are freed when the model is freed
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::FreeBrushReference
+anSoftBodiesPhysicsManager::FreeBrushReference
 ================
 */
-void arcCollisionModelManagerLocal::FreeBrushReference( cm_brushRef_t *bref ) {
+void anSoftBodiesPhysicsManager::FreeBrushReference( cm_brushRef_t *bref ) {
 	// don't free the brush reference here
 	// the brush references are allocated in blocks which are freed when the model is freed
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::FreePolygon
+anSoftBodiesPhysicsManager::FreePolygon
 ================
 */
-void arcCollisionModelManagerLocal::FreePolygon( cm_model_t *model, cm_polygon_t *poly ) {
+void anSoftBodiesPhysicsManager::FreePolygon( cm_model_t *model, cm_polygon_t *poly ) {
 	model->numPolygons--;
 	model->polygonMemory -= sizeof( cm_polygon_t ) + ( poly->numEdges - 1 ) * sizeof( poly->edges[0] );
-	if ( model->polygonBlock == NULL ) {
+	if ( model->polygonBlock == nullptr ) {
 		Mem_Free( poly );
 	}
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::FreeBrush
+anSoftBodiesPhysicsManager::FreeBrush
 ================
 */
-void arcCollisionModelManagerLocal::FreeBrush( cm_model_t *model, cm_brush_t *brush ) {
+void anSoftBodiesPhysicsManager::FreeBrush( cm_model_t *model, cm_brush_t *brush ) {
 	model->numBrushes--;
 	model->brushMemory -= sizeof( cm_brush_t ) + ( brush->numPlanes - 1 ) * sizeof( brush->planes[0] );
-	if ( model->brushBlock == NULL ) {
+	if ( model->brushBlock == nullptr ) {
 		Mem_Free( brush );
 	}
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::FreeTree_r
+anSoftBodiesPhysicsManager::FreeTree_r
 ================
 */
-void arcCollisionModelManagerLocal::FreeTree_r( cm_model_t *model, cm_node_t *headNode, cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::FreeTree_r( cm_model_t *model, cm_node_t *headNode, cm_node_t *node ) {
 	cm_polygonRef_t *pref;
 	cm_polygon_t *p;
 	cm_brushRef_t *bref;
@@ -313,19 +311,19 @@ void arcCollisionModelManagerLocal::FreeTree_r( cm_model_t *model, cm_node_t *he
 	// recurse down the tree
 	if ( node->planeType != -1 ) {
 		FreeTree_r( model, headNode, node->children[0] );
-		node->children[0] = NULL;
+		node->children[0] = nullptr;
 		FreeTree_r( model, headNode, node->children[1] );
-		node->children[1] = NULL;
+		node->children[1] = nullptr;
 	}
 	FreeNode( node );
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::FreeModel
+anSoftBodiesPhysicsManager::FreeModel
 ================
 */
-void arcCollisionModelManagerLocal::FreeModel( cm_model_t *model ) {
+void anSoftBodiesPhysicsManager::FreeModel( cm_model_t *model ) {
 	cm_polygonRefBlock_t *polygonRefBlock, *nextPolygonRefBlock;
 	cm_brushRefBlock_t *brushRefBlock, *nextBrushRefBlock;
 	cm_nodeBlock_t *nodeBlock, *nextNodeBlock;
@@ -363,10 +361,10 @@ void arcCollisionModelManagerLocal::FreeModel( cm_model_t *model ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::FreeMap
+anSoftBodiesPhysicsManager::FreeMap
 ================
 */
-void arcCollisionModelManagerLocal::FreeMap( void ) {
+void anSoftBodiesPhysicsManager::FreeMap( void ) {
 	if ( !loaded ) {
 		Clear();
 		return;
@@ -387,10 +385,10 @@ void arcCollisionModelManagerLocal::FreeMap( void ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::FreeTrmModelStructure
+anSoftBodiesPhysicsManager::FreeTrmModelStructure
 ================
 */
-void arcCollisionModelManagerLocal::FreeTrmModelStructure( void ) {
+void anSoftBodiesPhysicsManager::FreeTrmModelStructure( void ) {
 	int i;
 
 	assert( models );
@@ -403,8 +401,8 @@ void arcCollisionModelManagerLocal::FreeTrmModelStructure( void ) {
 	}
 	FreeBrush( models[MAX_SUBMODELS], trmBrushes[0]->b );
 
-	models[MAX_SUBMODELS]->node->polygons = NULL;
-	models[MAX_SUBMODELS]->node->brushes = NULL;
+	models[MAX_SUBMODELS]->node->polygons = nullptr;
+	models[MAX_SUBMODELS]->node->brushes = nullptr;
 	FreeModel( models[MAX_SUBMODELS] );
 }
 
@@ -419,12 +417,12 @@ Edge normals
 
 /*
 ================
-arcCollisionModelManagerLocal::CalculateEdgeNormals
+anSoftBodiesPhysicsManager::CalculateEdgeNormals
 ================
 */
 #define SHARP_EDGE_DOT	-0.7f
 
-void arcCollisionModelManagerLocal::CalculateEdgeNormals( cm_model_t *model, cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::CalculateEdgeNormals( cm_model_t *model, cm_node_t *node ) {
 	while( 1 ) {
 		for ( cm_polygonRef_t *pref = node->polygons; pref; pref = pref->next ) {
 			cm_polygon_t *p = pref->p;
@@ -440,7 +438,7 @@ void arcCollisionModelManagerLocal::CalculateEdgeNormals( cm_model_t *model, cm_
 				if ( edge->normal[0] == 0.0f && edge->normal[1] == 0.0f && edge->normal[2] == 0.0f ) {
 					// if the edge is only used by this polygon
 					if ( edge->numUsers == 1 ) {
-						arcVec3 dir = model->vertices[ edge->vertexNum[edgeNum < 0]].p - model->vertices[ edge->vertexNum[edgeNum > 0]].p;
+						anVec3 dir = model->vertices[ edge->vertexNum[edgeNum < 0]].p - model->vertices[ edge->vertexNum[edgeNum > 0]].p;
 						edge->normal = p->plane.Normal().Cross( dir );
 						edge->normal.Normalize();
 					} else {
@@ -452,7 +450,7 @@ void arcCollisionModelManagerLocal::CalculateEdgeNormals( cm_model_t *model, cm_
 					// if the two planes make a very sharp edge
 					if ( dot < SHARP_EDGE_DOT ) {
 						// max length normal pointing outside both polygons
-						arcVec3 dir = model->vertices[ edge->vertexNum[edgeNum > 0]].p - model->vertices[ edge->vertexNum[edgeNum < 0]].p;
+						anVec3 dir = model->vertices[ edge->vertexNum[edgeNum > 0]].p - model->vertices[ edge->vertexNum[edgeNum < 0]].p;
 						edge->normal = edge->normal.Cross( dir ) + p->plane.Normal().Cross( -dir );
 						edge->normal *= ( 0.5f / ( 0.5f + 0.5f * SHARP_EDGE_DOT ) ) / edge->normal.Length();
 						model->numSharpEdges++;
@@ -482,25 +480,25 @@ Trace model to general collision model
 
 /*
 ================
-arcCollisionModelManagerLocal::AllocModel
+anSoftBodiesPhysicsManager::AllocModel
 ================
 */
-cm_model_t *arcCollisionModelManagerLocal::AllocModel( void ) {
+cm_model_t *anSoftBodiesPhysicsManager::AllocModel( void ) {
 	cm_model_t *model = new cm_model_t;
 	model->contents = 0;
 	model->isConvex = false;
 	model->maxVertices = 0;
 	model->numVertices = 0;
-	model->vertices = NULL;
+	model->vertices = nullptr;
 	model->maxEdges = 0;
 	model->numEdges = 0;
-	model->edges= NULL;
-	model->node = NULL;
-	model->nodeBlocks = NULL;
-	model->polygonRefBlocks = NULL;
-	model->brushRefBlocks = NULL;
-	model->polygonBlock = NULL;
-	model->brushBlock = NULL;
+	model->edges= nullptr;
+	model->node = nullptr;
+	model->nodeBlocks = nullptr;
+	model->polygonRefBlocks = nullptr;
+	model->brushRefBlocks = nullptr;
+	model->polygonBlock = nullptr;
+	model->brushBlock = nullptr;
 	model->numPolygons = model->polygonMemory =
 	model->numBrushes = model->brushMemory =
 	model->numNodes = model->numBrushRefs =
@@ -513,10 +511,10 @@ cm_model_t *arcCollisionModelManagerLocal::AllocModel( void ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::AllocNode
+anSoftBodiesPhysicsManager::AllocNode
 ================
 */
-cm_node_t *arcCollisionModelManagerLocal::AllocNode( cm_model_t *model, int blockSize ) {
+cm_node_t *anSoftBodiesPhysicsManager::AllocNode( cm_model_t *model, int blockSize ) {
 	if ( !model->nodeBlocks || !model->nodeBlocks->nextNode ) {
 		cm_nodeBlock_t *nodeBlock = (cm_nodeBlock_t *) Mem_ClearedAlloc( sizeof( cm_nodeBlock_t ) + blockSize * sizeof( cm_node_t ) );
 		nodeBlock->nextNode = (cm_node_t *) ( ( (byte *) nodeBlock ) + sizeof( cm_nodeBlock_t ) );
@@ -527,22 +525,22 @@ cm_node_t *arcCollisionModelManagerLocal::AllocNode( cm_model_t *model, int bloc
 			node->parent = node + 1;
 			node = node->parent;
 		}
-		node->parent = NULL;
+		node->parent = nullptr;
 	}
 
 	node = model->nodeBlocks->nextNode;
 	model->nodeBlocks->nextNode = node->parent;
-	node->parent = NULL;
+	node->parent = nullptr;
 
 	return node;
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::AllocPolygonReference
+anSoftBodiesPhysicsManager::AllocPolygonReference
 ================
 */
-cm_polygonRef_t *arcCollisionModelManagerLocal::AllocPolygonReference( cm_model_t *model, int blockSize ) {
+cm_polygonRef_t *anSoftBodiesPhysicsManager::AllocPolygonReference( cm_model_t *model, int blockSize ) {
 	if ( !model->polygonRefBlocks || !model->polygonRefBlocks->nextRef ) {
 		cm_polygonRefBlock_t *prefBlock = (cm_polygonRefBlock_t *) Mem_Alloc( sizeof( cm_polygonRefBlock_t ) + blockSize * sizeof(cm_polygonRef_t) );
 		prefBlock->nextRef = (cm_polygonRef_t *) ( ( (byte *) prefBlock ) + sizeof( cm_polygonRefBlock_t ) );
@@ -553,7 +551,7 @@ cm_polygonRef_t *arcCollisionModelManagerLocal::AllocPolygonReference( cm_model_
 			pref->next = pref + 1;
 			pref = pref->next;
 		}
-		pref->next = NULL;
+		pref->next = nullptr;
 	}
 
 	pref = model->polygonRefBlocks->nextRef;
@@ -564,10 +562,10 @@ cm_polygonRef_t *arcCollisionModelManagerLocal::AllocPolygonReference( cm_model_
 
 /*
 ================
-arcCollisionModelManagerLocal::AllocBrushReference
+anSoftBodiesPhysicsManager::AllocBrushReference
 ================
 */
-cm_brushRef_t *arcCollisionModelManagerLocal::AllocBrushReference( cm_model_t *model, int blockSize ) {
+cm_brushRef_t *anSoftBodiesPhysicsManager::AllocBrushReference( cm_model_t *model, int blockSize ) {
 	if ( !model->brushRefBlocks || !model->brushRefBlocks->nextRef ) {
 		cm_brushRefBlock_t *brefBlock = (cm_brushRefBlock_t *) Mem_Alloc( sizeof(cm_brushRefBlock_t) + blockSize * sizeof(cm_brushRef_t) );
 		brefBlock->nextRef = (cm_brushRef_t *) ( ( (byte *) brefBlock ) + sizeof(cm_brushRefBlock_t) );
@@ -578,7 +576,7 @@ cm_brushRef_t *arcCollisionModelManagerLocal::AllocBrushReference( cm_model_t *m
 			bref->next = bref + 1;
 			bref = bref->next;
 		}
-		bref->next = NULL;
+		bref->next = nullptr;
 	}
 
 	bref = model->brushRefBlocks->nextRef;
@@ -589,10 +587,10 @@ cm_brushRef_t *arcCollisionModelManagerLocal::AllocBrushReference( cm_model_t *m
 
 /*
 ================
-arcCollisionModelManagerLocal::AllocPolygon
+anSoftBodiesPhysicsManager::AllocPolygon
 ================
 */
-cm_polygon_t *arcCollisionModelManagerLocal::AllocPolygon( cm_model_t *model, int numEdges ) {
+cm_polygon_t *anSoftBodiesPhysicsManager::AllocPolygon( cm_model_t *model, int numEdges ) {
 	int size = sizeof( cm_polygon_t ) + ( numEdges - 1 ) * sizeof( poly->edges[0] );
 	model->numPolygons++;
 	model->polygonMemory += size;
@@ -608,10 +606,10 @@ cm_polygon_t *arcCollisionModelManagerLocal::AllocPolygon( cm_model_t *model, in
 
 /*
 ================
-arcCollisionModelManagerLocal::AllocBrush
+anSoftBodiesPhysicsManager::AllocBrush
 ================
 */
-cm_brush_t *arcCollisionModelManagerLocal::AllocBrush( cm_model_t *model, int numPlanes ) {
+cm_brush_t *anSoftBodiesPhysicsManager::AllocBrush( cm_model_t *model, int numPlanes ) {
 	int size = sizeof( cm_brush_t ) + ( numPlanes - 1 ) * sizeof( brush->planes[0] );
 	model->numBrushes++;
 	model->brushMemory += size;
@@ -627,10 +625,10 @@ cm_brush_t *arcCollisionModelManagerLocal::AllocBrush( cm_model_t *model, int nu
 
 /*
 ================
-arcCollisionModelManagerLocal::AddPolygonToNode
+anSoftBodiesPhysicsManager::AddPolygonToNode
 ================
 */
-void arcCollisionModelManagerLocal::AddPolygonToNode( cm_model_t *model, cm_node_t *node, cm_polygon_t *p ) {
+void anSoftBodiesPhysicsManager::AddPolygonToNode( cm_model_t *model, cm_node_t *node, cm_polygon_t *p ) {
 	cm_polygonRef_t *pref = AllocPolygonReference( model, model->numPolygonRefs < REFERENCE_BLOCK_SIZE_SMALL ? REFERENCE_BLOCK_SIZE_SMALL : REFERENCE_BLOCK_SIZE_LARGE );
 	pref->p = p;
 	pref->next = node->polygons;
@@ -640,10 +638,10 @@ void arcCollisionModelManagerLocal::AddPolygonToNode( cm_model_t *model, cm_node
 
 /*
 ================
-arcCollisionModelManagerLocal::AddBrushToNode
+anSoftBodiesPhysicsManager::AddBrushToNode
 ================
 */
-void arcCollisionModelManagerLocal::AddBrushToNode( cm_model_t *model, cm_node_t *node, cm_brush_t *b ) {
+void anSoftBodiesPhysicsManager::AddBrushToNode( cm_model_t *model, cm_node_t *node, cm_brush_t *b ) {
 	cm_brushRef_t *bref = AllocBrushReference( model, model->numBrushRefs < REFERENCE_BLOCK_SIZE_SMALL ? REFERENCE_BLOCK_SIZE_SMALL : REFERENCE_BLOCK_SIZE_LARGE );
 	bref->b = b;
 	bref->next = node->brushes;
@@ -653,10 +651,10 @@ void arcCollisionModelManagerLocal::AddBrushToNode( cm_model_t *model, cm_node_t
 
 /*
 ================
-arcCollisionModelManagerLocal::SetupTrmModelStructure
+anSoftBodiesPhysicsManager::SetupTrmModelStructure
 ================
 */
-void arcCollisionModelManagerLocal::SetupTrmModelStructure( void ) {
+void anSoftBodiesPhysicsManager::SetupTrmModelStructure( void ) {
 	cm_model_t *model = AllocModel();
 
 	assert( models );
@@ -701,22 +699,22 @@ void arcCollisionModelManagerLocal::SetupTrmModelStructure( void ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::SetupTrmModel
+anSoftBodiesPhysicsManager::SetupTrmModel
 
 Trace models (item boxes, etc) are converted to collision models on the fly, using the last model slot
 as a reusable temporary buffer
 ================
 */
-cmHandle_t arcCollisionModelManagerLocal::SetupTrmModel( const arcTraceModel &trm, const arcMaterial *material ) {
+cmHandle_t anSoftBodiesPhysicsManager::SetupTrmModel( const anTraceModel &trm, const anMaterial *material ) {
 	assert( models );
 
-	if ( material == NULL ) {
+	if ( material == nullptr ) {
 		material = trmMaterial;
 	}
 
 	cm_model_t *model = models[MAX_SUBMODELS];
-	model->node->brushes = NULL;
-	model->node->polygons = NULL;
+	model->node->brushes = nullptr;
+	model->node->polygons = nullptr;
 	// if not a valid trace model
 	if ( trm.type == TRM_INVALID || !trm.numPolys ) {
 		return TRACE_MODEL_HANDLE;
@@ -787,12 +785,12 @@ Optimisation, removal of polygons contained within brushes or solid
 
 /*
 ============
-arcCollisionModelManagerLocal::R_ChoppedAwayByProcBSP
+anSoftBodiesPhysicsManager::R_ChoppedAwayByProcBSP
 ============
 */
-int arcCollisionModelManagerLocal::R_ChoppedAwayByProcBSP( int nodeNum, arcFixedWinding *w, const arcVec3 &normal, const arcVec3 &origin, const float radius ) {
+int anSoftBodiesPhysicsManager::R_ChoppedAwayByProcBSP( int nodeNum, anFixedWinding *w, const anVec3 &normal, const anVec3 &origin, const float radius ) {
 	int res;
-	arcFixedWinding back;
+	anFixedWinding back;
 	do {
 		cm_procNode_t *node = procNodes + nodeNum;
 		float dist = node->plane.Normal() * origin + node->plane[3];
@@ -836,17 +834,17 @@ int arcCollisionModelManagerLocal::R_ChoppedAwayByProcBSP( int nodeNum, arcFixed
 
 /*
 ============
-arcCollisionModelManagerLocal::ChoppedAwayByProcBSP
+anSoftBodiesPhysicsManager::ChoppedAwayByProcBSP
 ============
 */
-int arcCollisionModelManagerLocal::ChoppedAwayByProcBSP( const arcFixedWinding &w, const arcPlane &plane, int contents ) {
-	arcFixedWinding neww;
-	arcBounds bounds;
+int anSoftBodiesPhysicsManager::ChoppedAwayByProcBSP( const anFixedWinding &w, const anPlane &plane, int contents ) {
+	anFixedWinding neww;
+	anBounds bounds;
 	float radius;
-	arcVec3 origin;
+	anVec3 origin;
 
 	// if the .proc file has no BSP tree
-	if ( procNodes == NULL ) {
+	if ( procNodes == nullptr ) {
 		return false;
 	}
 	// don't chop if the polygon is not solid
@@ -865,15 +863,15 @@ int arcCollisionModelManagerLocal::ChoppedAwayByProcBSP( const arcFixedWinding &
 
 /*
 =============
-arcCollisionModelManagerLocal::ChopWindingWithBrush
+anSoftBodiesPhysicsManager::ChopWindingWithBrush
 
   returns the least number of winding fragments outside the brush
 =============
 */
-void arcCollisionModelManagerLocal::ChopWindingListWithBrush( cm_windingList_t *list, cm_brush_t *b ) {
+void anSoftBodiesPhysicsManager::ChopWindingListWithBrush( cm_windingList_t *list, cm_brush_t *b ) {
 	int i, k, res, startPlane, planeNum, bestNumWindings;
-	arcFixedWinding back, front;
-	arcPlane plane;
+	anFixedWinding back, front;
+	anPlane plane;
 	bool chopped;
 	int sidedness[MAX_POINTS_ON_WINDING];
 	float dist;
@@ -936,7 +934,7 @@ void arcCollisionModelManagerLocal::ChopWindingListWithBrush( cm_windingList_t *
 
 				if ( res == SIDE_BACK ) {
 					if ( cm_outList->numWindings >= MAX_WINDING_LIST ) {
-						common->Warning( "arcCollisionModelManagerLocal::ChopWindingWithBrush: primitive %d more than %d windings", list->primitiveNum, MAX_WINDING_LIST );
+						common->Warning( "anSoftBodiesPhysicsManager::ChopWindingWithBrush: primitive %d more than %d windings", list->primitiveNum, MAX_WINDING_LIST );
 						return;
 					}
 					// winding and brush didn't intersect, store the original winding
@@ -948,7 +946,7 @@ void arcCollisionModelManagerLocal::ChopWindingListWithBrush( cm_windingList_t *
 
 				if ( res == SIDE_CROSS ) {
 					if ( cm_tmpList->numWindings >= MAX_WINDING_LIST ) {
-						common->Warning( "arcCollisionModelManagerLocal::ChopWindingWithBrush: primitive %d more than %d windings", list->primitiveNum, MAX_WINDING_LIST );
+						common->Warning( "anSoftBodiesPhysicsManager::ChopWindingWithBrush: primitive %d more than %d windings", list->primitiveNum, MAX_WINDING_LIST );
 						return;
 					}
 					// store the front winding in the temporary list
@@ -969,7 +967,7 @@ void arcCollisionModelManagerLocal::ChopWindingListWithBrush( cm_windingList_t *
 				// store windings from temporary list in the out list
 				for ( i = 0; i < cm_tmpList->numWindings; i++ ) {
 					if ( cm_outList->numWindings + i >= MAX_WINDING_LIST ) {
-						common->Warning( "arcCollisionModelManagerLocal::ChopWindingWithBrush: primitive %d more than %d windings", list->primitiveNum, MAX_WINDING_LIST );
+						common->Warning( "anSoftBodiesPhysicsManager::ChopWindingWithBrush: primitive %d more than %d windings", list->primitiveNum, MAX_WINDING_LIST );
 						return;
 					}
 					cm_outList->w[cm_outList->numWindings+i] = cm_tmpList->w[i];
@@ -997,10 +995,10 @@ void arcCollisionModelManagerLocal::ChopWindingListWithBrush( cm_windingList_t *
 
 /*
 ============
-arcCollisionModelManagerLocal::R_ChopWindingListWithTreeBrushes
+anSoftBodiesPhysicsManager::R_ChopWindingListWithTreeBrushes
 ============
 */
-void arcCollisionModelManagerLocal::R_ChopWindingListWithTreeBrushes( cm_windingList_t *list, cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::R_ChopWindingListWithTreeBrushes( cm_windingList_t *list, cm_node_t *node ) {
 	int i;
 	cm_brushRef_t *bref;
 	cm_brush_t *b;
@@ -1062,7 +1060,7 @@ void arcCollisionModelManagerLocal::R_ChopWindingListWithTreeBrushes( cm_winding
 
 /*
 ============
-arcCollisionModelManagerLocal::WindingOutsideBrushes
+anSoftBodiesPhysicsManager::WindingOutsideBrushes
 
   Returns one winding which is not fully contained in brushes.
   We always favor less polygons over a stitched world.
@@ -1070,7 +1068,7 @@ arcCollisionModelManagerLocal::WindingOutsideBrushes
   without creating multiple winding fragments then the chopped winding is returned.
 ============
 */
-arcFixedWinding *arcCollisionModelManagerLocal::WindingOutsideBrushes( arcFixedWinding *w, const arcPlane &plane, int contents, int primitiveNum, cm_node_t *headNode ) {
+anFixedWinding *anSoftBodiesPhysicsManager::WindingOutsideBrushes( anFixedWinding *w, const anPlane &plane, int contents, int primitiveNum, cm_node_t *headNode ) {
 	int windingLeft;
 
 	cm_windingList->bounds.Clear();
@@ -1081,8 +1079,8 @@ arcFixedWinding *arcCollisionModelManagerLocal::WindingOutsideBrushes( arcFixedW
 	cm_windingList->origin = (cm_windingList->bounds[1] - cm_windingList->bounds[0]) * 0.5;
 	cm_windingList->radius = cm_windingList->origin.Length() + CHOP_EPSILON;
 	cm_windingList->origin = cm_windingList->bounds[0] + cm_windingList->origin;
-	cm_windingList->bounds[0] -= arcVec3( CHOP_EPSILON, CHOP_EPSILON, CHOP_EPSILON );
-	cm_windingList->bounds[1] += arcVec3( CHOP_EPSILON, CHOP_EPSILON, CHOP_EPSILON );
+	cm_windingList->bounds[0] -= anVec3( CHOP_EPSILON, CHOP_EPSILON, CHOP_EPSILON );
+	cm_windingList->bounds[1] += anVec3( CHOP_EPSILON, CHOP_EPSILON, CHOP_EPSILON );
 
 	cm_windingList->w[0] = *w;
 	cm_windingList->numWindings = 1;
@@ -1094,7 +1092,7 @@ arcFixedWinding *arcCollisionModelManagerLocal::WindingOutsideBrushes( arcFixedW
 	R_ChopWindingListWithTreeBrushes( cm_windingList, headNode );
 	//
 	if ( !cm_windingList->numWindings ) {
-		return NULL;
+		return nullptr;
 	}
 	if ( cm_windingList->numWindings == 1 ) {
 		return &cm_windingList->w[0];
@@ -1116,7 +1114,7 @@ arcFixedWinding *arcCollisionModelManagerLocal::WindingOutsideBrushes( arcFixedW
 	if ( windingLeft >= 0 ) {
 		return &cm_windingList->w[windingLeft];
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1129,19 +1127,19 @@ Merging polygons
 
 /*
 =============
-arcCollisionModelManagerLocal::ReplacePolygons
+anSoftBodiesPhysicsManager::ReplacePolygons
 
   does not allow for a node to have multiple references to the same polygon
 =============
 */
-void arcCollisionModelManagerLocal::ReplacePolygons( cm_model_t *model, cm_node_t *node, cm_polygon_t *p1, cm_polygon_t *p2, cm_polygon_t *newp ) {
+void anSoftBodiesPhysicsManager::ReplacePolygons( cm_model_t *model, cm_node_t *node, cm_polygon_t *p1, cm_polygon_t *p2, cm_polygon_t *newp ) {
 	cm_polygonRef_t *pref, *lastpref, *nextpref;
 	cm_polygon_t *p;
 	bool linked;
 
 	while( 1 ) {
 		linked = false;
-		lastpref = NULL;
+		lastpref = nullptr;
 		for ( pref = node->polygons; pref; pref = nextpref ) {
 			nextpref = pref->next;
 			//
@@ -1185,38 +1183,38 @@ void arcCollisionModelManagerLocal::ReplacePolygons( cm_model_t *model, cm_node_
 
 /*
 =============
-arcCollisionModelManagerLocal::TryMergePolygons
+anSoftBodiesPhysicsManager::TryMergePolygons
 =============
 */
 #define	CONTINUOUS_EPSILON	0.005f
 #define NORMAL_EPSILON		0.01f
 
-cm_polygon_t *arcCollisionModelManagerLocal::TryMergePolygons( cm_model_t *model, cm_polygon_t *p1, cm_polygon_t *p2 ) {
+cm_polygon_t *anSoftBodiesPhysicsManager::TryMergePolygons( cm_model_t *model, cm_polygon_t *p1, cm_polygon_t *p2 ) {
 	int i, j, nexti, prevj;
 	int p1BeforeShare, p1AfterShare, p2BeforeShare, p2AfterShare;
 	int newEdges[CM_MAX_POLYGON_EDGES], newNumEdges;
 	int edgeNum, edgeNum1, edgeNum2, newEdgeNum1, newEdgeNum2;
 	cm_edge_t *edge;
 	cm_polygon_t *newp;
-	arcVec3 delta, normal;
+	anVec3 delta, normal;
 	float dot;
 	bool keep1, keep2;
 
 	if ( p1->material != p2->material ) {
-		return NULL;
+		return nullptr;
 	}
-	if ( arcMath::Fabs( p1->plane.Dist() - p2->plane.Dist() ) > NORMAL_EPSILON ) {
-		return NULL;
+	if ( anMath::Fabs( p1->plane.Dist() - p2->plane.Dist() ) > NORMAL_EPSILON ) {
+		return nullptr;
 	}
 	for ( i = 0; i < 3; i++ ) {
-		if ( arcMath::Fabs( p1->plane.Normal()[i] - p2->plane.Normal()[i] ) > NORMAL_EPSILON ) {
-			return NULL;
+		if ( anMath::Fabs( p1->plane.Normal()[i] - p2->plane.Normal()[i] ) > NORMAL_EPSILON ) {
+			return nullptr;
 		}
 		if ( p1->bounds[0][i] > p2->bounds[1][i] ) {
-			return NULL;
+			return nullptr;
 		}
 		if ( p1->bounds[1][i] < p2->bounds[0][i] ) {
-			return NULL;
+			return nullptr;
 		}
 	}
 	// this allows for merging polygons with multiple shared edges
@@ -1249,7 +1247,7 @@ cm_polygon_t *arcCollisionModelManagerLocal::TryMergePolygons( cm_model_t *model
 		}
 	}
 	if ( p1BeforeShare < 0 || p1AfterShare < 0 || p2BeforeShare < 0 || p2AfterShare < 0 ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// check if the new polygon would still be convex
@@ -1267,7 +1265,7 @@ cm_polygon_t *arcCollisionModelManagerLocal::TryMergePolygons( cm_model_t *model
 
 	dot = delta * normal;
 	if (dot < -CONTINUOUS_EPSILON)
-		return NULL;			// not a convex polygon
+		return nullptr;			// not a convex polygon
 	keep1 = (bool)(dot > CONTINUOUS_EPSILON);
 
 	edgeNum = p2->edges[p2BeforeShare];
@@ -1284,7 +1282,7 @@ cm_polygon_t *arcCollisionModelManagerLocal::TryMergePolygons( cm_model_t *model
 
 	dot = delta * normal;
 	if (dot < -CONTINUOUS_EPSILON)
-		return NULL;			// not a convex polygon
+		return nullptr;			// not a convex polygon
 	keep2 = (bool)(dot > CONTINUOUS_EPSILON);
 
 	newEdgeNum1 = newEdgeNum2 = 0;
@@ -1362,10 +1360,10 @@ cm_polygon_t *arcCollisionModelManagerLocal::TryMergePolygons( cm_model_t *model
 
 /*
 =============
-arcCollisionModelManagerLocal::MergePolygonWithTreePolygons
+anSoftBodiesPhysicsManager::MergePolygonWithTreePolygons
 =============
 */
-bool arcCollisionModelManagerLocal::MergePolygonWithTreePolygons( cm_model_t *model, cm_node_t *node, cm_polygon_t *polygon ) {
+bool anSoftBodiesPhysicsManager::MergePolygonWithTreePolygons( cm_model_t *model, cm_node_t *node, cm_polygon_t *polygon ) {
 	int i;
 	cm_polygonRef_t *pref;
 	cm_polygon_t *p, *newp;
@@ -1418,12 +1416,12 @@ bool arcCollisionModelManagerLocal::MergePolygonWithTreePolygons( cm_model_t *mo
 
 /*
 =============
-arcCollisionModelManagerLocal::MergeTreePolygons
+anSoftBodiesPhysicsManager::MergeTreePolygons
 
   try to merge any two polygons with the same surface flags and the same contents
 =============
 */
-void arcCollisionModelManagerLocal::MergeTreePolygons( cm_model_t *model, cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::MergeTreePolygons( cm_model_t *model, cm_node_t *node ) {
 	cm_polygonRef_t *pref;
 	cm_polygon_t *p;
 	bool merge;
@@ -1478,12 +1476,12 @@ Find internal edges
 
 /*
 =============
-arcCollisionModelManagerLocal::PointInsidePolygon
+anSoftBodiesPhysicsManager::PointInsidePolygon
 =============
 */
-bool arcCollisionModelManagerLocal::PointInsidePolygon( cm_model_t *model, cm_polygon_t *p, arcVec3 &v ) {
+bool anSoftBodiesPhysicsManager::PointInsidePolygon( cm_model_t *model, cm_polygon_t *p, anVec3 &v ) {
 	int i, edgeNum;
-	arcVec3 *v1, *v2, dir1, dir2, vec;
+	anVec3 *v1, *v2, dir1, dir2, vec;
 	cm_edge_t *edge;
 
 	for ( i = 0; i < p->numEdges; i++ ) {
@@ -1504,13 +1502,13 @@ bool arcCollisionModelManagerLocal::PointInsidePolygon( cm_model_t *model, cm_po
 
 /*
 =============
-arcCollisionModelManagerLocal::FindInternalEdgesOnPolygon
+anSoftBodiesPhysicsManager::FindInternalEdgesOnPolygon
 =============
 */
-void arcCollisionModelManagerLocal::FindInternalEdgesOnPolygon( cm_model_t *model, cm_polygon_t *p1, cm_polygon_t *p2 ) {
+void anSoftBodiesPhysicsManager::FindInternalEdgesOnPolygon( cm_model_t *model, cm_polygon_t *p1, cm_polygon_t *p2 ) {
 	int i, j, k, edgeNum;
 	cm_edge_t *edge;
-	arcVec3 *v1, *v2, dir1, dir2;
+	anVec3 *v1, *v2, dir1, dir2;
 	float d;
 
 	// bounds of polygons should overlap or touch
@@ -1570,11 +1568,11 @@ void arcCollisionModelManagerLocal::FindInternalEdgesOnPolygon( cm_model_t *mode
 		} else {
 			// both vertices should be on the plane of the other polygon
 			d = p2->plane.Distance( *v1 );
-			if ( arcMath::Fabs(d) > VERTEX_EPSILON ) {
+			if ( anMath::Fabs(d) > VERTEX_EPSILON ) {
 				continue;
 			}
 			d = p2->plane.Distance( *v2 );
-			if ( arcMath::Fabs(d) > VERTEX_EPSILON ) {
+			if ( anMath::Fabs(d) > VERTEX_EPSILON ) {
 				continue;
 			}
 		}
@@ -1603,10 +1601,10 @@ void arcCollisionModelManagerLocal::FindInternalEdgesOnPolygon( cm_model_t *mode
 
 /*
 =============
-arcCollisionModelManagerLocal::FindInternalPolygonEdges
+anSoftBodiesPhysicsManager::FindInternalPolygonEdges
 =============
 */
-void arcCollisionModelManagerLocal::FindInternalPolygonEdges( cm_model_t *model, cm_node_t *node, cm_polygon_t *polygon ) {
+void anSoftBodiesPhysicsManager::FindInternalPolygonEdges( cm_model_t *model, cm_node_t *node, cm_polygon_t *polygon ) {
 	cm_polygonRef_t *pref;
 	cm_polygon_t *p;
 
@@ -1647,13 +1645,13 @@ void arcCollisionModelManagerLocal::FindInternalPolygonEdges( cm_model_t *model,
 
 /*
 =============
-arcCollisionModelManagerLocal::FindContainedEdges
+anSoftBodiesPhysicsManager::FindContainedEdges
 =============
 */
-void arcCollisionModelManagerLocal::FindContainedEdges( cm_model_t *model, cm_polygon_t *p ) {
+void anSoftBodiesPhysicsManager::FindContainedEdges( cm_model_t *model, cm_polygon_t *p ) {
 	int edgeNum;
 	cm_edge_t *edge;
-	arcFixedWinding w;
+	anFixedWinding w;
 
 	for ( int i = 0; i < p->numEdges; i++ ) {
 		edgeNum = p->edges[i];
@@ -1672,10 +1670,10 @@ void arcCollisionModelManagerLocal::FindContainedEdges( cm_model_t *model, cm_po
 
 /*
 =============
-arcCollisionModelManagerLocal::FindInternalEdges
+anSoftBodiesPhysicsManager::FindInternalEdges
 =============
 */
-void arcCollisionModelManagerLocal::FindInternalEdges( cm_model_t *model, cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::FindInternalEdges( cm_model_t *model, cm_node_t *node ) {
 	cm_polygonRef_t *pref;
 	cm_polygon_t *p;
 
@@ -1714,7 +1712,7 @@ Spatial subdivision
 CM_FindSplitter
 ================
 */
-static int CM_FindSplitter( const cm_node_t *node, const arcBounds &bounds, int *planeType, float *planeDist ) {
+static int CM_FindSplitter( const cm_node_t *node, const anBounds &bounds, int *planeType, float *planeDist ) {
 	int i, j, type, axis[3], polyCount;
 	float dist, t, bestt, size[3];
 	cm_brushRef_t *bref;
@@ -1818,8 +1816,8 @@ static int CM_FindSplitter( const cm_node_t *node, const arcBounds &bounds, int 
 CM_R_InsideAllChildren
 ================
 */
-static int CM_R_InsideAllChildren( cm_node_t *node, const arcBounds &bounds ) {
-	assert( node != NULL );
+static int CM_R_InsideAllChildren( cm_node_t *node, const anBounds &bounds ) {
+	assert( node != nullptr );
 	if ( node->planeType != -1 ) {
 		if ( bounds[0][node->planeType] >= node->planeDist ) {
 			return false;
@@ -1839,11 +1837,11 @@ static int CM_R_InsideAllChildren( cm_node_t *node, const arcBounds &bounds ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::R_FilterPolygonIntoTree
+anSoftBodiesPhysicsManager::R_FilterPolygonIntoTree
 ================
 */
-void arcCollisionModelManagerLocal::R_FilterPolygonIntoTree( cm_model_t *model, cm_node_t *node, cm_polygonRef_t *pref, cm_polygon_t *p ) {
-	assert(node != NULL);
+void anSoftBodiesPhysicsManager::R_FilterPolygonIntoTree( cm_model_t *model, cm_node_t *node, cm_polygonRef_t *pref, cm_polygon_t *p ) {
+	assert(node != nullptr );
 	while ( node->planeType != -1 ) {
 		if ( CM_R_InsideAllChildren( node, p->bounds ) ) {
 			break;
@@ -1853,7 +1851,7 @@ void arcCollisionModelManagerLocal::R_FilterPolygonIntoTree( cm_model_t *model, 
 		} else if ( p->bounds[1][node->planeType] <= node->planeDist ) {
 			node = node->children[1];
 		} else {
-			R_FilterPolygonIntoTree( model, node->children[1], NULL, p );
+			R_FilterPolygonIntoTree( model, node->children[1], nullptr, p );
 			node = node->children[0];
 		}
 	}
@@ -1867,11 +1865,11 @@ void arcCollisionModelManagerLocal::R_FilterPolygonIntoTree( cm_model_t *model, 
 
 /*
 ================
-arcCollisionModelManagerLocal::R_FilterBrushIntoTree
+anSoftBodiesPhysicsManager::R_FilterBrushIntoTree
 ================
 */
-void arcCollisionModelManagerLocal::R_FilterBrushIntoTree( cm_model_t *model, cm_node_t *node, cm_brushRef_t *pref, cm_brush_t *b ) {
-	assert( node != NULL );
+void anSoftBodiesPhysicsManager::R_FilterBrushIntoTree( cm_model_t *model, cm_node_t *node, cm_brushRef_t *pref, cm_brush_t *b ) {
+	assert( node != nullptr );
 	while ( node->planeType != -1 ) {
 		if ( CM_R_InsideAllChildren( node, b->bounds ) ) {
 			break;
@@ -1881,7 +1879,7 @@ void arcCollisionModelManagerLocal::R_FilterBrushIntoTree( cm_model_t *model, cm
 		} else if ( b->bounds[1][node->planeType] <= node->planeDist ) {
 			node = node->children[1];
 		} else {
-			R_FilterBrushIntoTree( model, node->children[1], NULL, b );
+			R_FilterBrushIntoTree( model, node->children[1], nullptr, b );
 			node = node->children[0];
 		}
 	}
@@ -1895,13 +1893,13 @@ void arcCollisionModelManagerLocal::R_FilterBrushIntoTree( cm_model_t *model, cm
 
 /*
 ================
-arcCollisionModelManagerLocal::R_CreateAxialBSPTree
+anSoftBodiesPhysicsManager::R_CreateAxialBSPTree
 
   a brush or polygon is linked in the node closest to the root where
   the brush or polygon is inside all children
 ================
 */
-cm_node_t *arcCollisionModelManagerLocal::R_CreateAxialBSPTree( cm_model_t *model, cm_node_t *node, const arcBounds &bounds ) {
+cm_node_t *anSoftBodiesPhysicsManager::R_CreateAxialBSPTree( cm_model_t *model, cm_node_t *node, const anBounds &bounds ) {
 	float planeDist;
 
 	if ( !CM_FindSplitter( node, bounds, &planeType, &planeDist ) ) {
@@ -1921,10 +1919,10 @@ cm_node_t *arcCollisionModelManagerLocal::R_CreateAxialBSPTree( cm_model_t *mode
 
 	model->numNodes += 2;
 	// set front node bounds
-	arcBounds frontBounds = bounds;
+	anBounds frontBounds = bounds;
 	frontBounds[0][planeType] = planeDist;
 	// set back node bounds
-	arcBounds backBounds = bounds;
+	anBounds backBounds = bounds;
 	backBounds[1][planeType] = planeDist;
 
 	int planeType;
@@ -1934,7 +1932,7 @@ cm_node_t *arcCollisionModelManagerLocal::R_CreateAxialBSPTree( cm_model_t *mode
 	node->children[1] = backNode;
 	// filter polygons and brushes down the tree if necesary
 	for ( cm_node_t *n = node; n; n = n->parent ) {
-		cm_brushRef_t *prevpref = NULL;
+		cm_brushRef_t *prevpref = nullptr;
 		for ( cm_polygonRef_t *pref = n->polygons; pref; pref = nextpref) {
 			cm_brushRef_t *nextpref = pref->next;
 			// if polygon is not inside all children
@@ -1950,7 +1948,7 @@ cm_node_t *arcCollisionModelManagerLocal::R_CreateAxialBSPTree( cm_model_t *mode
 				cm_brushRef_t *prevpref = pref;
 			}
 		}
-		cm_brushRef_t *prevbref = NULL;
+		cm_brushRef_t *prevbref = nullptr;
 		for ( cm_brushRef_t *bref = n->brushes; bref; bref = nextbref ) {
 			cm_brushRef_t *nextbref = bref->next;
 			// if brush is not inside all children
@@ -2005,13 +2003,13 @@ void CM_R_TestOptimisation( cm_node_t *node ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::CreateAxialBSPTree
+anSoftBodiesPhysicsManager::CreateAxialBSPTree
 ================
 */
-cm_node_t *arcCollisionModelManagerLocal::CreateAxialBSPTree( cm_model_t *model, cm_node_t *node ) {
+cm_node_t *anSoftBodiesPhysicsManager::CreateAxialBSPTree( cm_model_t *model, cm_node_t *node ) {
 	cm_polygonRef_t *pref;
 	cm_brushRef_t *bref;
-	arcBounds bounds;
+	anBounds bounds;
 
 	// get head node bounds
 	bounds.Clear();
@@ -2038,15 +2036,15 @@ Raw polygon and brush data
 
 /*
 ================
-arcCollisionModelManagerLocal::SetupHash
+anSoftBodiesPhysicsManager::SetupHash
 ================
 */
-void arcCollisionModelManagerLocal::SetupHash( void ) {
+void anSoftBodiesPhysicsManager::SetupHash( void ) {
 	if ( !cm_vertexHash ) {
-		cm_vertexHash = new ARCHashIndex( VERTEX_HASH_SIZE, 1024 );
+		cm_vertexHash = new anHashIndex( VERTEX_HASH_SIZE, 1024 );
 	}
 	if ( !cm_edgeHash ) {
-		cm_edgeHash = new ARCHashIndex( EDGE_HASH_SIZE, 1024 );
+		cm_edgeHash = new anHashIndex( EDGE_HASH_SIZE, 1024 );
 	}
 	// init variables used during loading and optimization
 	if ( !cm_windingList ) {
@@ -2062,28 +2060,28 @@ void arcCollisionModelManagerLocal::SetupHash( void ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::ShutdownHash
+anSoftBodiesPhysicsManager::ShutdownHash
 ================
 */
-void arcCollisionModelManagerLocal::ShutdownHash( void ) {
+void anSoftBodiesPhysicsManager::ShutdownHash( void ) {
 	delete cm_vertexHash;
-	cm_vertexHash = NULL;
+	cm_vertexHash = nullptr;
 	delete cm_edgeHash;
-	cm_edgeHash = NULL;
+	cm_edgeHash = nullptr;
 	delete cm_tmpList;
-	cm_tmpList = NULL;
+	cm_tmpList = nullptr;
 	delete cm_outList;
-	cm_outList = NULL;
+	cm_outList = nullptr;
 	delete cm_windingList;
-	cm_windingList = NULL;
+	cm_windingList = nullptr;
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::ClearHash
+anSoftBodiesPhysicsManager::ClearHash
 ================
 */
-void arcCollisionModelManagerLocal::ClearHash( arcBounds &bounds ) {
+void anSoftBodiesPhysicsManager::ClearHash( anBounds &bounds ) {
 	cm_vertexHash->Clear();
 	cm_edgeHash->Clear();
 
@@ -2105,14 +2103,14 @@ void arcCollisionModelManagerLocal::ClearHash( arcBounds &bounds ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::HashVec
+anSoftBodiesPhysicsManager::HashVec
 ================
 */
-ARC_INLINE int arcCollisionModelManagerLocal::HashVec(const arcVec3 &vec) {
+ARC_INLINE int anSoftBodiesPhysicsManager::HashVec(const anVec3 &vec) {
 /*	int x, y;
 
-	x = ((( int )( vec[0] - cm_modelBounds[0].x + 0.5 )) >> cm_vertexShift) & (VERTEX_HASH_BOXSIZE-1);
-	y = ((( int )( vec[1] - cm_modelBounds[0].y + 0.5 )) >> cm_vertexShift) & (VERTEX_HASH_BOXSIZE-1);
+	x = ((( int )( vec[0] - cm_modelBounds[0].x + 0.5 ) ) >> cm_vertexShift) & (VERTEX_HASH_BOXSIZE-1);
+	y = ((( int )( vec[1] - cm_modelBounds[0].y + 0.5 ) ) >> cm_vertexShift) & (VERTEX_HASH_BOXSIZE-1);
 
 	assert (x >= 0 && x < VERTEX_HASH_BOXSIZE && y >= 0 && y < VERTEX_HASH_BOXSIZE);
 
@@ -2127,16 +2125,16 @@ ARC_INLINE int arcCollisionModelManagerLocal::HashVec(const arcVec3 &vec) {
 
 /*
 ================
-arcCollisionModelManagerLocal::GetVertex
+anSoftBodiesPhysicsManager::GetVertex
 ================
 */
-int arcCollisionModelManagerLocal::GetVertex( cm_model_t *model, const arcVec3 &v, int *vertexNum ) {
+int anSoftBodiesPhysicsManager::GetVertex( cm_model_t *model, const anVec3 &v, int *vertexNum ) {
 	int i, hashKey, vn;
-	arcVec3 vert, *p;
+	anVec3 vert, *p;
 
-	for (i = 0; i < 3; i++) {
-		if ( arcMath::Fabs(v[i] - arcMath::Rint(v[i])) < INTEGRAL_EPSILON ) {
-			vert[i] = arcMath::Rint(v[i]);
+	for ( i = 0; i < 3; i++ ) {
+		if ( anMath::Fabs(v[i] - anMath::Rint(v[i])) < INTEGRAL_EPSILON ) {
+			vert[i] = anMath::Rint(v[i]);
 		} else {}
 			vert[i] = v[i];
 	}
@@ -2146,9 +2144,9 @@ int arcCollisionModelManagerLocal::GetVertex( cm_model_t *model, const arcVec3 &
 	for (vn = cm_vertexHash->First( hashKey ); vn >= 0; vn = cm_vertexHash->Next( vn ) ) {
 		p = &model->vertices[vn].p;
 		// first compare z-axis because hash is based on x-y plane
-		if (arcMath::Fabs(vert[2] - (*p)[2]) < VERTEX_EPSILON &&
-			arcMath::Fabs(vert[0] - (*p)[0]) < VERTEX_EPSILON &&
-			arcMath::Fabs(vert[1] - (*p)[1]) < VERTEX_EPSILON )
+		if (anMath::Fabs(vert[2] - (*p)[2]) < VERTEX_EPSILON &&
+			anMath::Fabs(vert[0] - (*p)[0]) < VERTEX_EPSILON &&
+			anMath::Fabs(vert[1] - (*p)[1]) < VERTEX_EPSILON )
 		{
 			*vertexNum = vn;
 			return true;
@@ -2177,10 +2175,10 @@ int arcCollisionModelManagerLocal::GetVertex( cm_model_t *model, const arcVec3 &
 
 /*
 ================
-arcCollisionModelManagerLocal::GetEdge
+anSoftBodiesPhysicsManager::GetEdge
 ================
 */
-int arcCollisionModelManagerLocal::GetEdge( cm_model_t *model, const arcVec3 &v1, const arcVec3 &v2, int *edgeNum, int v1num ) {
+int anSoftBodiesPhysicsManager::GetEdge( cm_model_t *model, const anVec3 &v1, const anVec3 &v2, int *edgeNum, int v1num ) {
 	int v2num, hashKey, e;
 	int found, *vertexNum;
 
@@ -2261,12 +2259,12 @@ int arcCollisionModelManagerLocal::GetEdge( cm_model_t *model, const arcVec3 &v1
 
 /*
 ================
-arcCollisionModelManagerLocal::CreatePolygon
+anSoftBodiesPhysicsManager::CreatePolygon
 ================
 */
-void arcCollisionModelManagerLocal::CreatePolygon( cm_model_t *model, arcFixedWinding *w, const arcPlane &plane, const arcMaterial *material, int primitiveNum ) {
+void anSoftBodiesPhysicsManager::CreatePolygon( cm_model_t *model, anFixedWinding *w, const anPlane &plane, const anMaterial *material, int primitiveNum ) {
 	int polyEdges[MAX_POINTS_ON_WINDING];
-	arcBounds bounds;
+	anBounds bounds;
 
 	// turn the winding into a sequence of edges
 	int numPolyEdges = 0;
@@ -2297,7 +2295,7 @@ void arcCollisionModelManagerLocal::CreatePolygon( cm_model_t *model, arcFixedWi
 	}
 	// don't overflow max edges
 	if ( numPolyEdges > CM_MAX_POLYGON_EDGES ) {
-		common->Warning( "arcCollisionModelManagerLocal::CreatePolygon: polygon has more than %d edges", numPolyEdges );
+		common->Warning( "anSoftBodiesPhysicsManager::CreatePolygon: polygon has more than %d edges", numPolyEdges );
 		numPolyEdges = CM_MAX_POLYGON_EDGES;
 	}
 
@@ -2314,17 +2312,17 @@ void arcCollisionModelManagerLocal::CreatePolygon( cm_model_t *model, arcFixedWi
 		edgeNum = polyEdges[i];
 		p->edges[i] = edgeNum;
 	}
-	R_FilterPolygonIntoTree( model, model->node, NULL, p );
+	R_FilterPolygonIntoTree( model, model->node, nullptr, p );
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::PolygonFromWinding
+anSoftBodiesPhysicsManager::PolygonFromWinding
 
   NOTE: for patches primitiveNum < 0 and abs(primitiveNum) is the real number
 ================
 */
-void arcCollisionModelManagerLocal::PolygonFromWinding( cm_model_t *model, arcFixedWinding *w, const arcPlane &plane, const arcMaterial *material, int primitiveNum ) {
+void anSoftBodiesPhysicsManager::PolygonFromWinding( cm_model_t *model, anFixedWinding *w, const anPlane &plane, const anMaterial *material, int primitiveNum ) {
 	int contents = material->GetContentFlags();
 
 	// if this polygon is part of the world model
@@ -2346,7 +2344,7 @@ void arcCollisionModelManagerLocal::PolygonFromWinding( cm_model_t *model, arcFi
 	}
 
 	if ( w->IsHuge() ) {
-		common->Warning( "arcCollisionModelManagerLocal::PolygonFromWinding: model %s primitive %d is degenerate", model->name.c_str(), abs(primitiveNum) );
+		common->Warning( "anSoftBodiesPhysicsManager::PolygonFromWinding: model %s primitive %d is degenerate", model->name.c_str(), abs(primitiveNum) );
 		return;
 	}
 
@@ -2360,10 +2358,10 @@ void arcCollisionModelManagerLocal::PolygonFromWinding( cm_model_t *model, arcFi
 
 /*
 =================
-arcCollisionModelManagerLocal::CreatePatchPolygons
+anSoftBodiesPhysicsManager::CreatePatchPolygons
 =================
 */
-void arcCollisionModelManagerLocal::CreatePatchPolygons( cm_model_t *model, arcSurface_Patch &mesh, const arcMaterial *material, int primitiveNum ) {
+void anSoftBodiesPhysicsManager::CreatePatchPolygons( cm_model_t *model, anSurface_Patch &mesh, const anMaterial *material, int primitiveNum ) {
 	for ( int i = 0; i < mesh.GetWidth() - 1; i++ ) {
 		for ( int j = 0; j < mesh.GetHeight() - 1; j++ ) {
 			int v1 = j * mesh.GetWidth() + i;
@@ -2372,14 +2370,14 @@ void arcCollisionModelManagerLocal::CreatePatchPolygons( cm_model_t *model, arcS
 			int v4 = v1 + mesh.GetWidth();
 
 			arcVex3 d1 = mesh[v2].xyz - mesh[v1].xyz;
-			arcVec3 d2 = mesh[v3].xyz - mesh[v1].xyz;
-			arcPlane plane.SetNormal( d1.Cross(d2) );
+			anVec3 d2 = mesh[v3].xyz - mesh[v1].xyz;
+			anPlane plane.SetNormal( d1.Cross(d2) );
 			if ( plane.Normalize() != 0.0f ) {
 				plane.FitThroughPoint( mesh[v1].xyz );
 				float dot = plane.Distance( mesh[v4].xyz );
 				// if we can turn it into a quad
-				if ( arcMath::Fabs(dot) < 0.1f ) {
-					arcFixedWinding w.Clear();
+				if ( anMath::Fabs(dot) < 0.1f ) {
+					anFixedWinding w.Clear();
 					w += mesh[v1].xyz;
 					w += mesh[v2].xyz;
 					w += mesh[v3].xyz;
@@ -2398,13 +2396,13 @@ void arcCollisionModelManagerLocal::CreatePatchPolygons( cm_model_t *model, arcS
 				}
 			}
 			// create the other triangle
-			arcVec3 d1 = mesh[v3].xyz - mesh[v1].xyz;
-			arcVec3 d2 = mesh[v4].xyz - mesh[v1].xyz;
+			anVec3 d1 = mesh[v3].xyz - mesh[v1].xyz;
+			anVec3 d2 = mesh[v4].xyz - mesh[v1].xyz;
 			plane.SetNormal( d1.Cross(d2) );
 			if ( plane.Normalize() != 0.0f ) {
 				plane.FitThroughPoint( mesh[v1].xyz );
 
-				arcFixedWinding w.Clear();
+				anFixedWinding w.Clear();
 				w += mesh[v1].xyz;
 				w += mesh[v3].xyz;
 				w += mesh[v4].xyz;
@@ -2420,23 +2418,23 @@ void arcCollisionModelManagerLocal::CreatePatchPolygons( cm_model_t *model, arcS
 CM_EstimateVertsAndEdges
 =================
 */
-static void CM_EstimateVertsAndEdges( const idMapEntity *mapEnt, int *numVerts, int *numEdges ) {
+static void CM_EstimateVertsAndEdges( const anMapEntity *mapEnt, int *numVerts, int *numEdges ) {
 	*numVerts = *numEdges = 0;
 	for ( int j = 0; j < mapEnt->GetNumPrimitives(); j++ ) {
-		const idMapPrimitive *mapPrim;
+		const anMapPrimitiveitive *mapPrim;
 		mapPrim = mapEnt->GetPrimitive(j);
-		if ( mapPrim->GetType() == idMapPrimitive::TYPE_PATCH ) {
+		if ( mapPrim->GetType() == anMapPrimitiveitive::TYPE_PATCH ) {
 			// assume maximum tesselation without adding verts
-			int width = static_cast<const idMapPatch*>(mapPrim)->GetWidth();
-			int height = static_cast<const idMapPatch*>(mapPrim)->GetHeight();
+			int width = static_cast<const anMapPatch*>(mapPrim)->GetWidth();
+			int height = static_cast<const anMapPatch*>(mapPrim)->GetHeight();
 			*numVerts += width * height;
 			*numEdges += (width-1) * height + width * (height-1) + (width-1) * (height-1);
 			continue;
 		}
-		if ( mapPrim->GetType() == idMapPrimitive::TYPE_BRUSH ) {
+		if ( mapPrim->GetType() == anMapPrimitiveitive::TYPE_BRUSH ) {
 			// assume cylinder with a polygon with (numSides - 2) edges ontop and on the bottom
-			*numVerts += (static_cast<const idMapBrush*>(mapPrim)->GetNumSides() - 2) * 2;
-			*numEdges += (static_cast<const idMapBrush*>(mapPrim)->GetNumSides() - 2) * 3;
+			*numVerts += ( static_cast<const anMapBrush*>(mapPrim)->GetNumSides() - 2) * 2;
+			*numEdges += ( static_cast<const anMapBrush*>(mapPrim)->GetNumSides() - 2) * 3;
 			continue;
 		}
 	}
@@ -2444,20 +2442,20 @@ static void CM_EstimateVertsAndEdges( const idMapEntity *mapEnt, int *numVerts, 
 
 /*
 =================
-arcCollisionModelManagerLocal::ConverPatch
+anSoftBodiesPhysicsManager::ConverPatch
 =================
 */
-void arcCollisionModelManagerLocal::ConvertPatch( cm_model_t *model, const idMapPatch *patch, int primitiveNum ) {
-	const arcMaterial *material;
-	arcSurface_Patch *cp;
+void anSoftBodiesPhysicsManager::ConvertPatch( cm_model_t *model, const anMapPatch *patch, int primitiveNum ) {
+	const anMaterial *material;
+	anSurface_Patch *cp;
 
 	material = declManager->FindMaterial( patch->GetMaterial() );
-	if ( !( material->GetContentFlags() & CONTENTS_REMOVE_UTIL ) ) {
+	if ( !( material->GetContentFlags() & _REMOVE_UTILITIES_ ) ) {
 		return;
 	}
 
 	// copy the patch
-	cp = new arcSurface_Patch( *patch );
+	cp = new anSurface_Patch( *patch );
 
 	// if the patch has an explicit number of subdivisions use it to avoid cracks
 	if ( patch->GetExplicitlySubdivided() ) {
@@ -2474,28 +2472,28 @@ void arcCollisionModelManagerLocal::ConvertPatch( cm_model_t *model, const idMap
 
 /*
 ================
-arcCollisionModelManagerLocal::ConvertBrushSides
+anSoftBodiesPhysicsManager::ConvertBrushSides
 ================
 */
-void arcCollisionModelManagerLocal::ConvertBrushSides( cm_model_t *model, const idMapBrush *mapBrush, int primitiveNum ) {
+void anSoftBodiesPhysicsManager::ConvertBrushSides( cm_model_t *model, const anMapBrush *mapBrush, int primitiveNum ) {
 	int i, j;
-	idMapBrushSide *mapSide;
-	arcFixedWinding w;
-	arcPlane *planes;
-	const arcMaterial *material;
+	anMapBrushSides *mapSide;
+	anFixedWinding w;
+	anPlane *planes;
+	const anMaterial *material;
 
 	// fix degenerate planes
-	planes = (arcPlane *) _alloca16( mapBrush->GetNumSides() * sizeof( planes[0] ) );
+	planes = (anPlane *) _alloca16( mapBrush->GetNumSides() * sizeof( planes[0] ) );
 	for ( int i = 0; i < mapBrush->GetNumSides(); i++ ) {
-		planes[i] = mapBrush->GetSide(i)->GetPlane();
+		planes[i] = mapBrush->GetSide( i )->GetPlane();
 		planes[i].FixDegeneracies( DEGENERATE_DIST_EPSILON );
 	}
 
 	// create a collision polygon for each brush side
 	for ( int i = 0; i < mapBrush->GetNumSides(); i++ ) {
-		mapSide = mapBrush->GetSide(i);
+		mapSide = mapBrush->GetSide( i );
 		material = declManager->FindMaterial( mapSide->GetMaterial() );
-		if ( !( material->GetContentFlags() & CONTENTS_REMOVE_UTIL ) ) {
+		if ( !( material->GetContentFlags() & _REMOVE_UTILITIES_ ) ) {
 			continue;
 		}
 		w.BaseForPlane( -planes[i] );
@@ -2514,34 +2512,34 @@ void arcCollisionModelManagerLocal::ConvertBrushSides( cm_model_t *model, const 
 
 /*
 ================
-arcCollisionModelManagerLocal::ConvertBrush
+anSoftBodiesPhysicsManager::ConvertBrush
 ================
 */
-void arcCollisionModelManagerLocal::ConvertBrush( cm_model_t *model, const idMapBrush *mapBrush, int primitiveNum ) {
+void anSoftBodiesPhysicsManager::ConvertBrush( cm_model_t *model, const anMapBrush *mapBrush, int primitiveNum ) {
 	int j, contents;
-	arcBounds bounds;
-	idMapBrushSide *mapSide;
+	anBounds bounds;
+	anMapBrushSides *mapSide;
 	cm_brush_t *brush;
-	arcPlane *planes;
-	arcFixedWinding w;
-	const arcMaterial *material = NULL;
+	anPlane *planes;
+	anFixedWinding w;
+	const anMaterial *material = nullptr;
 
 	contents = 0;
 	bounds.Clear();
 
 	// fix degenerate planes
-	planes = (arcPlane *) _alloca16( mapBrush->GetNumSides() * sizeof( planes[0] ) );
+	planes = (anPlane *) _alloca16( mapBrush->GetNumSides() * sizeof( planes[0] ) );
 	for ( int i = 0; i < mapBrush->GetNumSides(); i++ ) {
-		planes[i] = mapBrush->GetSide(i)->GetPlane();
+		planes[i] = mapBrush->GetSide( i )->GetPlane();
 		planes[i].FixDegeneracies( DEGENERATE_DIST_EPSILON );
 	}
 
 	// we are only getting the bounds for the brush so there's no need
 	// to create a winding for the last brush side
 	for ( i = 0; i < mapBrush->GetNumSides() - 1; i++ ) {
-		mapSide = mapBrush->GetSide(i);
+		mapSide = mapBrush->GetSide( i );
 		material = declManager->FindMaterial( mapSide->GetMaterial() );
-		contents |= ( material->GetContentFlags() & CONTENTS_REMOVE_UTIL );
+		contents |= ( material->GetContentFlags() & _REMOVE_UTILITIES_ );
 		w.BaseForPlane( -planes[i] );
 		for ( int j = 0; j < mapBrush->GetNumSides() && w.GetNumPoints(); j++ ) {
 			if ( i == j ) {
@@ -2589,7 +2587,7 @@ static int CM_CountNodeBrushes( const cm_node_t *node ) {
 CM_R_GetModelBounds
 ================
 */
-static void CM_R_GetNodeBounds( arcBounds *bounds, cm_node_t *node ) {
+static void CM_R_GetNodeBounds( anBounds *bounds, cm_node_t *node ) {
 	cm_polygonRef_t *pref;
 	cm_brushRef_t *bref;
 
@@ -2615,7 +2613,7 @@ static void CM_R_GetNodeBounds( arcBounds *bounds, cm_node_t *node ) {
 CM_GetNodeBounds
 ================
 */
-void CM_GetNodeBounds( arcBounds *bounds, cm_node_t *node ) {
+void CM_GetNodeBounds( anBounds *bounds, cm_node_t *node ) {
 	bounds->Clear();
 	CM_R_GetNodeBounds( bounds, node );
 	if ( bounds->IsCleared() ) {
@@ -2651,9 +2649,9 @@ int CM_GetNodeContents( cm_node_t *node ) {
 
 /*
 ==================
-arcCollisionModelManagerLocal::RemapEdges
+anSoftBodiesPhysicsManager::RemapEdges
 ==================
-*/void arcCollisionModelManagerLocal::RemapEdges( cm_node_t *node, int *edgeRemap ) {
+*/void anSoftBodiesPhysicsManager::RemapEdges( cm_node_t *node, int *edgeRemap ) {
 	while ( 1 ) {
 		for ( cm_polygonRef_t *pref = node->polygons; pref; pref = pref->next ) {
 			cm_polygon_t *p = pref->p;
@@ -2681,9 +2679,9 @@ arcCollisionModelManagerLocal::RemapEdges
 int newNumEdges = 1;
 for ( int i = 1; i < model->numEdges; i++ ) {
     // if the edge is used
-    if ( model->edges[ i ].numUsers ) {
-        remap[ i ] = newNumEdges;
-        model->edges[ newNumEdges ] = model->edges[ i ];
+    if ( model->edges[i].numUsers ) {
+        remap[i] = newNumEdges;
+        model->edges[ newNumEdges ] = model->edges[i];
         newNumEdges++;
     }
 }
@@ -2712,14 +2710,14 @@ if ( oldEdges ) {
 
 /*
 ==================
-arcCollisionModelManagerLocal::OptimizeArrays
+anSoftBodiesPhysicsManager::OptimizeArrays
 
   due to polygon merging and polygon removal the vertex and edge array
   can have a lot of unused entries.
 ==================
 */
-void arcCollisionModelManagerLocal::OptimizeArrays( cm_model_t *model ) {
-	int *remap = (int *) Mem_ClearedAlloc( Max( model->numVertices, model->numEdges ) * sizeof( int ) );
+void anSoftBodiesPhysicsManager::OptimizeArrays( cm_model_t *model ) {
+	int *remap = ( int*) Mem_ClearedAlloc( Max( model->numVertices, model->numEdges ) * sizeof( int ) );
 	// get all used vertices
 	for ( int i = 0; i < model->numEdges; i++ ) {
 		remap[ model->edges[i].vertexNum[0] ] = true;
@@ -2728,9 +2726,9 @@ void arcCollisionModelManagerLocal::OptimizeArrays( cm_model_t *model ) {
 	// create remap index and move vertices
 	int newNumVertices = 0;
 	for ( int i = 0; i < model->numVertices; i++ ) {
-		if ( remap[ i ] ) {
-		remap[ i ] = newNumVertices;
-				model->vertices[ newNumVertices ] = model->vertices[ i ];
+		if ( remap[i] ) {
+		remap[i] = newNumVertices;
+				model->vertices[ newNumVertices ] = model->vertices[i];
 			newNumVertices++;
 		}
 	}
@@ -2746,9 +2744,9 @@ void arcCollisionModelManagerLocal::OptimizeArrays( cm_model_t *model ) {
 	int newNumEdges = 1;
 	for ( int i = 1; i < model->numEdges; i++ ) {
 		// if the edge is used
-		if ( model->edges[ i ].numUsers ) {
-			remap[ i ] = newNumEdges;
-			model->edges[ newNumEdges ] = model->edges[ i ];
+		if ( model->edges[i].numUsers ) {
+			remap[i] = newNumEdges;
+			model->edges[ newNumEdges ] = model->edges[i];
 			newNumEdges++;
 		}
 	}
@@ -2778,10 +2776,10 @@ void arcCollisionModelManagerLocal::OptimizeArrays( cm_model_t *model ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::FinishModel
+anSoftBodiesPhysicsManager::FinishModel
 ================
 */
-void arcCollisionModelManagerLocal::FinishModel( cm_model_t *model ) {
+void anSoftBodiesPhysicsManager::FinishModel( cm_model_t *model ) {
 	// try to merge polygons
 	checkCount++;
 	MergeTreePolygons( model, model->node );
@@ -2809,23 +2807,23 @@ void arcCollisionModelManagerLocal::FinishModel( cm_model_t *model ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::LoadRenderModel
+anSoftBodiesPhysicsManager::LoadRenderModel
 ================
 */
-cm_model_t *arcCollisionModelManagerLocal::LoadRenderModel( const char *fileName ) {
-	arcNetString extension;
+cm_model_t *anSoftBodiesPhysicsManager::LoadRenderModel( const char *fileName ) {
+	anString extension;
 
 	// only load ASE and LWO models
-	arcNetString( fileName ).ExtractFileExtension( extension );
+	anString( fileName ).ExtractFileExtension( extension );
 	if ( ( extension.Icmp( "ase" ) != 0 ) && ( extension.Icmp( "lwo" ) != 0 ) && ( extension.Icmp( "ma" ) != 0 ) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( !renderModelManager->CheckModel( fileName ) ) {
-		return NULL;
+		return nullptr;
 	}
 
-	idRenderModel *renderModel = renderModelManager->FindModel( fileName );
+	anRenderModel *renderModel = renderModelManager->FindModel( fileName );
 
 	cm_model_t *model = AllocModel();
 	model->name = fileName;
@@ -2838,7 +2836,7 @@ cm_model_t *arcCollisionModelManagerLocal::LoadRenderModel( const char *fileName
 	model->maxEdges = 0;
 	model->numEdges = 0;
 
-	arcBounds bounds = renderModel->Bounds( NULL );
+	anBounds bounds = renderModel->Bounds( nullptr );
 
 	bool collisionSurface = false;
 	for ( int i = 0; i < renderModel->NumSurfaces(); i++ ) {
@@ -2851,7 +2849,7 @@ cm_model_t *arcCollisionModelManagerLocal::LoadRenderModel( const char *fileName
 	for ( int i = 0; i < renderModel->NumSurfaces(); i++ ) {
 		const modelSurface_t *surf = renderModel->Surface( i );
 		// if this surface has no contents
-		if ( ! ( surf->shader->GetContentFlags() & CONTENTS_REMOVE_UTIL ) ) {
+		if ( ! ( surf->shader->GetContentFlags() & _REMOVE_UTILITIES_ ) ) {
 			continue;
 		}
 		// if the model has a collision surface and this surface is not a collision surface
@@ -2877,7 +2875,7 @@ cm_model_t *arcCollisionModelManagerLocal::LoadRenderModel( const char *fileName
 	for ( int i = 0; i < renderModel->NumSurfaces(); i++ ) {
 		const modelSurface_t *surf = renderModel->Surface( i );
 		// if this surface has no contents
-		if ( ! ( surf->shader->GetContentFlags() & CONTENTS_REMOVE_UTIL ) ) {
+		if ( ! ( surf->shader->GetContentFlags() & _REMOVE_UTILITIES_ ) ) {
 			continue;
 		}
 		// if the model has a collision surface and this surface is not a collision surface
@@ -2886,12 +2884,12 @@ cm_model_t *arcCollisionModelManagerLocal::LoadRenderModel( const char *fileName
 		}
 
 		for ( int j = 0; j < surf->geometry->numIndexes; j += 3 ) {
-			arcFixedWinding w.Clear();
+			anFixedWinding w.Clear();
 			w += surf->geometry->verts[ surf->geometry->indexes[ j + 2 ] ].xyz;
 			w += surf->geometry->verts[ surf->geometry->indexes[ j + 1 ] ].xyz;
 			w += surf->geometry->verts[ surf->geometry->indexes[ j + 0 ] ].xyz;
 			w.GetPlane( plane );
-			arcPlane plane = -plane;
+			anPlane plane = -plane;
 			PolygonFromWinding( model, &w, plane, surf->shader, 1 );
 		}
 	}
@@ -2910,18 +2908,18 @@ cm_model_t *arcCollisionModelManagerLocal::LoadRenderModel( const char *fileName
 
 /*
 ================
-arcCollisionModelManagerLocal::CollisionModelForMapEntity
+anSoftBodiesPhysicsManager::CollisionModelForMapEntity
 ================
 */
-cm_model_t *arcCollisionModelManagerLocal::CollisionModelForMapEntity( const idMapEntity *mapEnt ) {
+cm_model_t *anSoftBodiesPhysicsManager::CollisionModelForMapEntity( const anMapEntity *mapEnt ) {
 	cm_model_t *model;
-	arcBounds bounds;
+	anBounds bounds;
 	const char *name;
 	int i, brushCount;
 
 	// if the entity has no primitives
 	if ( mapEnt->GetNumPrimitives() < 1 ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// get a name for the collision model
@@ -2955,11 +2953,11 @@ cm_model_t *arcCollisionModelManagerLocal::CollisionModelForMapEntity( const idM
 
 	// convert brushes
 	for ( i = 0; i < mapEnt->GetNumPrimitives(); i++ ) {
-		idMapPrimitive	*mapPrim;
+		anMapPrimitiveitive	*mapPrim;
 
-		mapPrim = mapEnt->GetPrimitive(i);
-		if ( mapPrim->GetType() == idMapPrimitive::TYPE_BRUSH ) {
-			ConvertBrush( model, static_cast<idMapBrush*>(mapPrim), i );
+		mapPrim = mapEnt->GetPrimitive( i );
+		if ( mapPrim->GetType() == anMapPrimitiveitive::TYPE_BRUSH ) {
+			ConvertBrush( model, static_cast<anMapBrush*>(mapPrim), i );
 			continue;
 		}
 	}
@@ -2985,15 +2983,15 @@ cm_model_t *arcCollisionModelManagerLocal::CollisionModelForMapEntity( const idM
 
 	// create polygons from patches and brushes
 	for ( i = 0; i < mapEnt->GetNumPrimitives(); i++ ) {
-		idMapPrimitive	*mapPrim;
+		anMapPrimitiveitive	*mapPrim;
 
-		mapPrim = mapEnt->GetPrimitive(i);
-		if ( mapPrim->GetType() == idMapPrimitive::TYPE_PATCH ) {
-			ConvertPatch( model, static_cast<idMapPatch*>(mapPrim), i );
+		mapPrim = mapEnt->GetPrimitive( i );
+		if ( mapPrim->GetType() == anMapPrimitiveitive::TYPE_PATCH ) {
+			ConvertPatch( model, static_cast<anMapPatch*>(mapPrim), i );
 			continue;
 		}
-		if ( mapPrim->GetType() == idMapPrimitive::TYPE_BRUSH ) {
-			ConvertBrushSides( model, static_cast<idMapBrush*>(mapPrim), i );
+		if ( mapPrim->GetType() == anMapPrimitiveitive::TYPE_BRUSH ) {
+			ConvertBrushSides( model, static_cast<anMapBrush*>(mapPrim), i );
 			continue;
 		}
 	}
@@ -3005,10 +3003,10 @@ cm_model_t *arcCollisionModelManagerLocal::CollisionModelForMapEntity( const idM
 
 /*
 ================
-arcCollisionModelManagerLocal::FindModel
+anSoftBodiesPhysicsManager::FindModel
 ================
 */
-cmHandle_t arcCollisionModelManagerLocal::FindModel( const char *name ) {
+cmHandle_t anSoftBodiesPhysicsManager::FindModel( const char *name ) {
 	// check if this model is already loaded
 	for ( int i = 0; i < numModels; i++ ) {
 		if ( !models[i]->name.Icmp( name ) ) {
@@ -3024,10 +3022,10 @@ cmHandle_t arcCollisionModelManagerLocal::FindModel( const char *name ) {
 
 /*
 ==================
-arcCollisionModelManagerLocal::PrintModelInfo
+anSoftBodiesPhysicsManager::PrintModelInfo
 ==================
 */
-void arcCollisionModelManagerLocal::PrintModelInfo( const cm_model_t *model ) {
+void anSoftBodiesPhysicsManager::PrintModelInfo( const cm_model_t *model ) {
 	common->Printf( "%6i vertices (%i KB)\n", model->numVertices, (model->numVertices * sizeof(cm_vertex_t))>>10 );
 	common->Printf( "%6i edges (%i KB)\n", model->numEdges, (model->numEdges * sizeof(cm_edge_t))>>10 );
 	common->Printf( "%6i polygons (%i KB)\n", model->numPolygons, model->polygonMemory>>10 );
@@ -3044,10 +3042,10 @@ void arcCollisionModelManagerLocal::PrintModelInfo( const cm_model_t *model ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::AccumulateModelInfo
+anSoftBodiesPhysicsManager::AccumulateModelInfo
 ================
 */
-void arcCollisionModelManagerLocal::AccumulateModelInfo( cm_model_t *model ) {
+void anSoftBodiesPhysicsManager::AccumulateModelInfo( cm_model_t *model ) {
 	memset( model, 0, sizeof( *model ) );
 	// accumulate statistics of all loaded models
 	for ( int i = 0; i < numModels; i++ ) {
@@ -3070,10 +3068,10 @@ void arcCollisionModelManagerLocal::AccumulateModelInfo( cm_model_t *model ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::ModelInfo
+anSoftBodiesPhysicsManager::ModelInfo
 ================
 */
-void arcCollisionModelManagerLocal::ModelInfo( cmHandle_t model ) {
+void anSoftBodiesPhysicsManager::ModelInfo( cmHandle_t model ) {
 	cm_model_t modelInfo;
 
 	if ( model == -1 ) {
@@ -3082,11 +3080,11 @@ void arcCollisionModelManagerLocal::ModelInfo( cmHandle_t model ) {
 		return;
 	}
 	if ( model < 0 || model > MAX_SUBMODELS || model > maxModels ) {
-		common->Printf( "arcCollisionModelManagerLocal::ModelInfo: invalid model handle\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::ModelInfo: invalid model handle\n" );
 		return;
 	}
 	if ( !models[model] ) {
-		common->Printf( "arcCollisionModelManagerLocal::ModelInfo: invalid model\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::ModelInfo: invalid model\n" );
 		return;
 	}
 
@@ -3095,10 +3093,10 @@ void arcCollisionModelManagerLocal::ModelInfo( cmHandle_t model ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::ListModels
+anSoftBodiesPhysicsManager::ListModels
 ================
 */
-void arcCollisionModelManagerLocal::ListModels( void ) {
+void anSoftBodiesPhysicsManager::ListModels( void ) {
 	int totalMemory = 0;
 	for ( int i = 0; i < numModels; i++ ) {
 		common->Printf( "%4d: %5d KB   %s\n", i, (models[i]->usedMemory>>10), models[i]->name.c_str() );
@@ -3109,13 +3107,13 @@ void arcCollisionModelManagerLocal::ListModels( void ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::BuildModels
+anSoftBodiesPhysicsManager::BuildModels
 ================
 */
-void arcCollisionModelManagerLocal::BuildModels( const idMapFile *mapFile ) {
-	const idMapEntity *mapEnt;
+void anSoftBodiesPhysicsManager::BuildModels( const anMapFile *mapFile ) {
+	const anMapEntity *mapEnt;
 
-	ARCTimer timer;
+	anTimer timer;
 	timer.Start();
 
 	if ( !LoadCollisionModelFile( mapFile->GetName(), mapFile->GetGeometryCRC() ) ) {
@@ -3128,9 +3126,9 @@ void arcCollisionModelManagerLocal::BuildModels( const idMapFile *mapFile ) {
 
 		// convert brushes and patches to collision data
 		for ( int i = 0; i < mapFile->GetNumEntities(); i++ ) {
-			mapEnt = mapFile->GetEntity(i);
+			mapEnt = mapFile->GetEntity( i );
 			if ( numModels >= MAX_SUBMODELS ) {
-				common->Error( "arcCollisionModelManagerLocal::BuildModels: more than %d collision models", MAX_SUBMODELS );
+				common->Error( "anSoftBodiesPhysicsManager::BuildModels: more than %d collision models", MAX_SUBMODELS );
 				break;
 			}
 			models[numModels] = CollisionModelForMapEntity( mapEnt );
@@ -3141,7 +3139,7 @@ void arcCollisionModelManagerLocal::BuildModels( const idMapFile *mapFile ) {
 
 		// free the proc bsp which is only used for data optimization
 		Mem_Free( procNodes );
-		procNodes = NULL;
+		procNodes = nullptr;
 
 		// write the collision models to a file
 		WriteCollisionModelsToFile( mapFile->GetName(), 0, numModels, mapFile->GetGeometryCRC() );
@@ -3160,12 +3158,12 @@ void arcCollisionModelManagerLocal::BuildModels( const idMapFile *mapFile ) {
 
 /*
 ================
-arcCollisionModelManagerLocal::LoadMap
+anSoftBodiesPhysicsManager::LoadMap
 ================
 */
-void arcCollisionModelManagerLocal::LoadMap( const idMapFile *mapFile ) {
-	if ( mapFile == NULL ) {
-		common->Error( "arcCollisionModelManagerLocal::LoadMap: NULL mapFile" );
+void anSoftBodiesPhysicsManager::LoadMap( const anMapFile *mapFile ) {
+	if ( mapFile == nullptr ) {
+		common->Error( "anSoftBodiesPhysicsManager::LoadMap: nullptr mapFile" );
 	}
 
 	// check whether we can keep the current collision map based on the mapName and mapFileTime
@@ -3208,12 +3206,12 @@ void arcCollisionModelManagerLocal::LoadMap( const idMapFile *mapFile ) {
 
 /*
 ===================
-arcCollisionModelManagerLocal::GetModelName
+anSoftBodiesPhysicsManager::GetModelName
 ===================
 */
-const char *arcCollisionModelManagerLocal::arcCollisionModelManagerLocal::GetModelName( cmHandle_t model ) const {
+const char *anSoftBodiesPhysicsManager::anSoftBodiesPhysicsManager::GetModelName( cmHandle_t model ) const {
 	if ( model < 0 || model > MAX_SUBMODELS || model >= numModels || !models[model] ) {
-		common->Printf( "arcCollisionModelManagerLocal::GetModelBounds: invalid model handle\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::GetModelBounds: invalid model handle\n" );
 		return "";
 	}
 	return models[model]->name.c_str();
@@ -3221,12 +3219,12 @@ const char *arcCollisionModelManagerLocal::arcCollisionModelManagerLocal::GetMod
 
 /*
 ===================
-arcCollisionModelManagerLocal::GetModelBounds
+anSoftBodiesPhysicsManager::GetModelBounds
 ===================
 */
-bool arcCollisionModelManagerLocal::GetModelBounds( cmHandle_t model, arcBounds &bounds ) const {
+bool anSoftBodiesPhysicsManager::GetModelBounds( cmHandle_t model, anBounds &bounds ) const {
 	if ( model < 0 || model > MAX_SUBMODELS || model >= numModels || !models[model] ) {
-		common->Printf( "arcCollisionModelManagerLocal::GetModelBounds: invalid model handle\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::GetModelBounds: invalid model handle\n" );
 		return false;
 	}
 
@@ -3236,12 +3234,12 @@ bool arcCollisionModelManagerLocal::GetModelBounds( cmHandle_t model, arcBounds 
 
 /*
 ===================
-arcCollisionModelManagerLocal::GetModelContents
+anSoftBodiesPhysicsManager::GetModelContents
 ===================
 */
-bool arcCollisionModelManagerLocal::GetModelContents( cmHandle_t model, int &contents ) const {
+bool anSoftBodiesPhysicsManager::GetModelContents( cmHandle_t model, int &contents ) const {
 	if ( model < 0 || model > MAX_SUBMODELS || model >= numModels || !models[model] ) {
-		common->Printf( "arcCollisionModelManagerLocal::GetModelContents: invalid model handle\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::GetModelContents: invalid model handle\n" );
 		return false;
 	}
 
@@ -3252,17 +3250,17 @@ bool arcCollisionModelManagerLocal::GetModelContents( cmHandle_t model, int &con
 
 /*
 ===================
-arcCollisionModelManagerLocal::GetModelVertex
+anSoftBodiesPhysicsManager::GetModelVertex
 ===================
 */
-bool arcCollisionModelManagerLocal::GetModelVertex( cmHandle_t model, int vertexNum, arcVec3 &vertex ) const {
+bool anSoftBodiesPhysicsManager::GetModelVertex( cmHandle_t model, int vertexNum, anVec3 &vertex ) const {
 	if ( model < 0 || model > MAX_SUBMODELS || model >= numModels || !models[model] ) {
-		common->Printf( "arcCollisionModelManagerLocal::GetModelVertex: invalid model handle\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::GetModelVertex: invalid model handle\n" );
 		return false;
 	}
 
 	if ( vertexNum < 0 || vertexNum >= models[model]->numVertices ) {
-		common->Printf( "arcCollisionModelManagerLocal::GetModelVertex: invalid vertex number\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::GetModelVertex: invalid vertex number\n" );
 		return false;
 	}
 
@@ -3273,18 +3271,18 @@ bool arcCollisionModelManagerLocal::GetModelVertex( cmHandle_t model, int vertex
 
 /*
 ===================
-arcCollisionModelManagerLocal::GetModelEdge
+anSoftBodiesPhysicsManager::GetModelEdge
 ===================
 */
-bool arcCollisionModelManagerLocal::GetModelEdge( cmHandle_t model, int edgeNum, arcVec3 &start, arcVec3 &end ) const {
+bool anSoftBodiesPhysicsManager::GetModelEdge( cmHandle_t model, int edgeNum, anVec3 &start, anVec3 &end ) const {
 	if ( model < 0 || model > MAX_SUBMODELS || model >= numModels || !models[model] ) {
-		common->Printf( "arcCollisionModelManagerLocal::GetModelEdge: invalid model handle\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::GetModelEdge: invalid model handle\n" );
 		return false;
 	}
 
 	edgeNum = abs( edgeNum );
 	if ( edgeNum >= models[model]->numEdges ) {
-		common->Printf( "arcCollisionModelManagerLocal::GetModelEdge: invalid edge number\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::GetModelEdge: invalid edge number\n" );
 		return false;
 	}
 
@@ -3296,12 +3294,12 @@ bool arcCollisionModelManagerLocal::GetModelEdge( cmHandle_t model, int edgeNum,
 
 /*
 ===================
-arcCollisionModelManagerLocal::GetModelPolygon
+anSoftBodiesPhysicsManager::GetModelPolygon
 ===================
 */
-bool arcCollisionModelManagerLocal::GetModelPolygon( cmHandle_t model, int polygonNum, arcFixedWinding &winding ) const {
+bool anSoftBodiesPhysicsManager::GetModelPolygon( cmHandle_t model, int polygonNum, anFixedWinding &winding ) const {
 	if ( model < 0 || model > MAX_SUBMODELS || model >= numModels || !models[model] ) {
-		common->Printf( "arcCollisionModelManagerLocal::GetModelPolygon: invalid model handle\n" );
+		common->Printf( "anSoftBodiesPhysicsManager::GetModelPolygon: invalid model handle\n" );
 		return false;
 	}
 
@@ -3316,20 +3314,20 @@ bool arcCollisionModelManagerLocal::GetModelPolygon( cmHandle_t model, int polyg
 }
 /*
 ===================
-arcCollisionModelManagerLocal::GetPolygonPlane
+anSoftBodiesPhysicsManager::GetPolygonPlane
 ===================
 */
 
-const arcPlane &arcCollisionModelManagerLocal::GetPolygonPlane( int polygonNum ) const {
+const anPlane &anSoftBodiesPhysicsManager::GetPolygonPlane( int polygonNum ) const {
 	return;
 }
 /*
 ===================
-arcCollisionModelManagerLocal::GetSurfacePolyCount
+anSoftBodiesPhysicsManager::GetSurfacePolyCount
 ===================
 */
 
-int arcCollisionModelManagerLocal::GetSurfacePolyCount( const cm_model_t *model, const arcNetString &entityName ) {
+int anSoftBodiesPhysicsManager::GetSurfacePolyCount( const cm_model_t *model, const anString &entityName ) {
     // Iterate over the polygons and count the ones belonging to the entity
     int numPolygons = 0;
     for ( int i = 0; i < model->numPolygons; i++ ) {
@@ -3342,10 +3340,10 @@ int arcCollisionModelManagerLocal::GetSurfacePolyCount( const cm_model_t *model,
 
 /*
 ===================
-arcCollisionModelManagerLocal::GetNumPolygons
+anSoftBodiesPhysicsManager::GetNumPolygons
 ===================
 */
-int arcCollisionModelManagerLocal::GetNumPolygons( void ) const {
+int anSoftBodiesPhysicsManager::GetNumPolygons( void ) const {
 	cm_polygon_t *poly = *reinterpret_cast<cm_polygon_t **>( &polygonNum );
 	for ( int i = 0; i < poly->numPolys; i++ ) {
 		poly->polys[i].numEdges = poly->numEdges;
@@ -3358,29 +3356,29 @@ int arcCollisionModelManagerLocal::GetNumPolygons( void ) const {
 }
 /*
 ===================
-arcCollisionModelManagerLocal::GetNumBrushPlanes
+anSoftBodiesPhysicsManager::GetNumBrushPlanes
 ===================
 */
 
-const arcMaterial *arcCollisionModelManagerLocal::GetPolygonMaterial( int polygonNum ) const {
+const anMaterial *anSoftBodiesPhysicsManager::GetPolygonMaterial( int polygonNum ) const {
 
 }
 
 /*
 ===================
-arcCollisionModelManagerLocal::GetNumBrushPlanes
+anSoftBodiesPhysicsManager::GetNumBrushPlanes
 ===================
 */
-int arcCollisionModelManagerLocal::GetNumBrushPlanes( void ) const {
+int anSoftBodiesPhysicsManager::GetNumBrushPlanes( void ) const {
 
 }
 
 /*
 ===================
-arcCollisionModelManagerLocal::GetModelName
+anSoftBodiesPhysicsManager::GetModelName
 ===================
 */
-const arcPlane &arcCollisionModelManagerLocal::GetBrushPlane( int planeNum ) const {
+const anPlane &anSoftBodiesPhysicsManager::GetBrushPlane( int planeNum ) const {
 
 }
 
@@ -3388,10 +3386,10 @@ const arcPlane &arcCollisionModelManagerLocal::GetBrushPlane( int planeNum ) con
 
 /*
 ================
-idCollisionModelManagerLocal::FinishModel
+anSoftBodiesPhysicsManager::FinishModel
 ================
 */
-void idCollisionModelManagerLocal::FinishModel( cm_model_t* model )
+void anSoftBodiesPhysicsManager::FinishModel( cm_model_t* model )
 {
 	// try to merge polygons
 	checkCount++;
@@ -3427,17 +3425,17 @@ static const unsigned int BCM_MAGIC = ( 'B' << 24 ) | ( 'C' << 16 ) | ( 'M' << 1
 
 /*
 ==================
-arcCollisionModelManagerLocal::LoadModel
+anSoftBodiesPhysicsManager::LoadModel
 ==================
 */
-cmHandle_t arcCollisionModelManagerLocal::LoadModel( const char *modelName, const bool precache ) {
+cmHandle_t anSoftBodiesPhysicsManager::LoadModel( const char *modelName, const bool precache ) {
 	int handle = FindModel( modelName );
 	if ( handle >= 0 ) {
 		return handle;
 	}
 
 	if ( numModels >= MAX_SUBMODELS ) {
-		common->Error( "arcCollisionModelManagerLocal::LoadModel: no free slots\n" );
+		common->Error( "anSoftBodiesPhysicsManager::LoadModel: no free slots\n" );
 		return 0;
 	}
 
@@ -3447,7 +3445,7 @@ cmHandle_t arcCollisionModelManagerLocal::LoadModel( const char *modelName, cons
 		if ( handle >= 0 ) {
 			return handle;
 		} else {
-			common->Warning( "arcCollisionModelManagerLocal::LoadModel: collision file for '%s' contains different model", modelName );
+			common->Warning( "anSoftBodiesPhysicsManager::LoadModel: collision file for '%s' contains different model", modelName );
 		}
 	}
 
@@ -3458,7 +3456,7 @@ cmHandle_t arcCollisionModelManagerLocal::LoadModel( const char *modelName, cons
 
 	// try to load a .ASE or .LWO model and convert it to a collision model
 	models[numModels] = LoadRenderModel( modelName );
-	if ( models[numModels] != NULL ) {
+	if ( models[numModels] != nullptr ) {
 		numModels++;
 		return ( numModels - 1 );
 	}
@@ -3468,24 +3466,24 @@ cmHandle_t arcCollisionModelManagerLocal::LoadModel( const char *modelName, cons
 
 /*
 ================
-idCollisionModelManagerLocal::LoadBinaryModel
+anSoftBodiesPhysicsManager::LoadBinaryModel
 ================
 */
-cm_model_t* idCollisionModelManagerLocal::LoadBinaryModel( const char* fileName, ID_TIME_T sourceTimeStamp ) {
-	idFileLocal file( fileSystem->OpenFileReadMemory( fileName ) );
-	if( file == NULL )
+cm_model_t* anSoftBodiesPhysicsManager::LoadBinaryModel( const char* fileName, ARC_TIME_T sourceTimeStamp ) {
+	anFileLocal file( fileSystem->OpenFileReadMemory( fileName ) );
+	if ( file == nullptr )
 	{
-		return NULL;
+		return nullptr;
 	}
 	return LoadBinaryModelFromFile( file, sourceTimeStamp );
 }
 
 /*
 ================
-idCollisionModelManagerLocal::WriteBinaryModel
+anSoftBodiesPhysicsManager::WriteBinaryModel
 ================
 */
-void idCollisionModelManagerLocal::WriteBinaryModelToFile( cm_model_t* model, idFile* file, ID_TIME_T sourceTimeStamp ) {
+void anSoftBodiesPhysicsManager::WriteBinaryModelToFile( cm_model_t* model, anFile* file, ARC_TIME_T sourceTimeStamp ) {
 	file->WriteBig( BCM_MAGIC );
 	file->WriteBig( sourceTimeStamp );
 	file->WriteString( model->name );
@@ -3503,14 +3501,14 @@ void idCollisionModelManagerLocal::WriteBinaryModelToFile( cm_model_t* model, id
 	file->WriteBig( model->numSharpEdges );
 	file->WriteBig( model->numRemovedPolys );
 	file->WriteBig( model->numMergedPolys );
-	for( int i = 0; i < model->numVertices; i++ )
+	for ( int i = 0; i < model->numVertices; i++ )
 	{
 		file->WriteBig( model->vertices[i].p );
 		file->WriteBig( model->vertices[i].checkcount );
 		file->WriteBig( model->vertices[i].side );
 		file->WriteBig( model->vertices[i].sideSet );
 	}
-	for( int i = 0; i < model->numEdges; i++ )
+	for ( int i = 0; i < model->numEdges; i++ )
 	{
 		file->WriteBig( model->edges[i].checkcount );
 		file->WriteBig( model->edges[i].internal );
@@ -3525,62 +3523,62 @@ void idCollisionModelManagerLocal::WriteBinaryModelToFile( cm_model_t* model, id
 	file->WriteBig( model->brushMemory );
 	struct local
 	{
-		static void BuildUniqueLists( cm_node_t* node, idList< cm_polygon_t* >& polys, idList< cm_brush_t* >& brushes )
+		static void BuildUniqueLists( cm_node_t* node, anList< cm_polygon_t* >& polys, anList< cm_brush_t* >& brushes )
 		{
-			for( cm_polygonRef_t* pr = node->polygons; pr != NULL; pr = pr->next )
+			for ( cm_polygonRef_t* pr = node->polygons; pr != nullptr; pr = pr->next )
 			{
 				polys.AddUnique( pr->p );
 			}
-			for( cm_brushRef_t* br = node->brushes; br != NULL; br = br->next )
+			for ( cm_brushRef_t* br = node->brushes; br != nullptr; br = br->next )
 			{
 				brushes.AddUnique( br->b );
 			}
-			if( node->planeType != -1 )
+			if ( node->planeType != -1 )
 			{
 				BuildUniqueLists( node->children[0], polys, brushes );
 				BuildUniqueLists( node->children[1], polys, brushes );
 			}
 		}
-		static void WriteNodeTree( idFile* file, cm_node_t* node, idList< cm_polygon_t* >& polys, idList< cm_brush_t* >& brushes )
+		static void WriteNodeTree( anFile* file, cm_node_t* node, anList< cm_polygon_t* >& polys, anList< cm_brush_t* >& brushes )
 		{
 			file->WriteBig( node->planeType );
 			file->WriteBig( node->planeDist );
-			for( cm_polygonRef_t* pr = node->polygons; pr != NULL; pr = pr->next )
+			for ( cm_polygonRef_t* pr = node->polygons; pr != nullptr; pr = pr->next )
 			{
 				file->WriteBig( polys.FindIndex( pr->p ) );
 			}
 			file->WriteBig( -1 );
-			for( cm_brushRef_t* br = node->brushes; br != NULL; br = br->next )
+			for ( cm_brushRef_t* br = node->brushes; br != nullptr; br = br->next )
 			{
 				file->WriteBig( brushes.FindIndex( br->b ) );
 			}
 			file->WriteBig( -1 );
-			if( node->planeType != -1 )
+			if ( node->planeType != -1 )
 			{
 				WriteNodeTree( file, node->children[0], polys, brushes );
 				WriteNodeTree( file, node->children[1], polys, brushes );
 			}
 		}
 	};
-	idList< cm_polygon_t* > polys;
-	idList< cm_brush_t* > brushes;
+	anList< cm_polygon_t* > polys;
+	anList< cm_brush_t* > brushes;
 	local::BuildUniqueLists( model->node, polys, brushes );
 	assert( polys.Num() == model->numPolygons );
 	assert( brushes.Num() == model->numBrushes );
 
-	idList< const idMaterial* > materials;
-	for( int i = 0; i < polys.Num(); i++ )
+	anList< const anMaterial* > materials;
+	for ( int i = 0; i < polys.Num(); i++ )
 	{
 		materials.AddUnique( polys[i]->material );
 	}
-	for( int i = 0; i < brushes.Num(); i++ )
+	for ( int i = 0; i < brushes.Num(); i++ )
 	{
 		materials.AddUnique( brushes[i]->material );
 	}
 	file->WriteBig( materials.Num() );
-	for( int i = 0; i < materials.Num(); i++ )
+	for ( int i = 0; i < materials.Num(); i++ )
 	{
-		if( materials[i] == NULL )
+		if ( materials[i] == nullptr )
 		{
 			file->WriteString( "" );
 		}
@@ -3589,7 +3587,7 @@ void idCollisionModelManagerLocal::WriteBinaryModelToFile( cm_model_t* model, id
 			file->WriteString( materials[i]->GetName() );
 		}
 	}
-	for( int i = 0; i < polys.Num(); i++ )
+	for ( int i = 0; i < polys.Num(); i++ )
 	{
 		file->WriteBig( ( int )materials.FindIndex( polys[i]->material ) );
 		file->WriteBig( polys[i]->numEdges );
@@ -3599,7 +3597,7 @@ void idCollisionModelManagerLocal::WriteBinaryModelToFile( cm_model_t* model, id
 		file->WriteBig( polys[i]->plane );
 		file->WriteBigArray( polys[i]->edges, polys[i]->numEdges );
 	}
-	for( int i = 0; i < brushes.Num(); i++ )
+	for ( int i = 0; i < brushes.Num(); i++ )
 	{
 		file->WriteBig( ( int )materials.FindIndex( brushes[i]->material ) );
 		file->WriteBig( brushes[i]->numPlanes );
@@ -3614,13 +3612,13 @@ void idCollisionModelManagerLocal::WriteBinaryModelToFile( cm_model_t* model, id
 
 /*
 ================
-idCollisionModelManagerLocal::WriteBinaryModel
+anSoftBodiesPhysicsManager::WriteBinaryModel
 ================
 */
-void idCollisionModelManagerLocal::WriteBinaryModel( cm_model_t* model, const char* fileName, ID_TIME_T sourceTimeStamp )
+void anSoftBodiesPhysicsManager::WriteBinaryModel( cm_model_t* model, const char* fileName, ARC_TIME_T sourceTimeStamp )
 {
-	idFileLocal file( fileSystem->OpenFileWrite( fileName, "fs_basepath" ) );
-	if( file == NULL )
+	anFileLocal file( fileSystem->OpenFileWrite( fileName, "fs_basepath" ) );
+	if ( file == nullptr )
 	{
 		common->Printf( "Failed to open %s\n", fileName );
 		return;
@@ -3630,48 +3628,48 @@ void idCollisionModelManagerLocal::WriteBinaryModel( cm_model_t* model, const ch
 
 /*
 ================
-idCollisionModelManagerLocal::LoadRenderModel
+anSoftBodiesPhysicsManager::LoadRenderModel
 ================
 */
-cm_model_t* idCollisionModelManagerLocal::LoadRenderModel( const char* fileName )
+cm_model_t* anSoftBodiesPhysicsManager::LoadRenderModel( const char* fileName )
 
 	int i, j;
-	idRenderModel* renderModel;
+	anRenderModel* renderModel;
 	const modelSurface_t* surf;
-	idFixedWinding w;
+	anFixedWinding w;
 	cm_node_t* node;
 	cm_model_t* model;
-	idPlane plane;
-	idBounds bounds;
+	anPlane plane;
+	anBounds bounds;
 	bool collisionSurface;
-	idStr extension;
+	anString extension;
 
 	// only load ASE and LWO models
-	idStr( fileName ).ExtractFileExtension( extension );
+	anString( fileName ).ExtractFileExtension( extension );
 
 	// RB: DAE support
-	if( ( extension.Icmp( "ase" ) != 0 ) && ( extension.Icmp( "lwo" ) != 0 ) && ( extension.Icmp( "ma" ) != 0 ) && ( extension.Icmp( "dae" ) != 0 ) )
+	if ( ( extension.Icmp( "ase" ) != 0 ) && ( extension.Icmp( "lwo" ) != 0 ) && ( extension.Icmp( "ma" ) != 0 ) && ( extension.Icmp( "dae" ) != 0 ) )
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	renderModel = renderModelManager->CheckModel( fileName );
-	if( !renderModel )
+	if ( !renderModel )
 	{
-		return NULL;
+		return nullptr;
 	}
 
-	idStrStatic< MAX_OSPATH > generatedFileName = "generated/collision/";
+	anStringStatic< MAX_OSPATH > generatedFileName = "generated/collision/";
 	generatedFileName.AppendPath( fileName );
 	generatedFileName.SetFileExtension( CMODEL_BINARYFILE_EXT );
 
-	ID_TIME_T sourceTimeStamp = renderModel->Timestamp();
+	ARC_TIME_T sourceTimeStamp = renderModel->Timestamp();
 	model = LoadBinaryModel( generatedFileName, sourceTimeStamp );
-	if( model != NULL )
+	if ( model != nullptr )
 	{
 		return model;
 	}
-	idLib::Printf( "Writing %s\n", generatedFileName.c_str() );
+	anLib::Printf( "Writing %s\n", generatedFileName.c_str() );
 
 	model = AllocModel();
 	model->name = fileName;
@@ -3684,27 +3682,27 @@ cm_model_t* idCollisionModelManagerLocal::LoadRenderModel( const char* fileName 
 	model->maxEdges = 0;
 	model->numEdges = 0;
 
-	bounds = renderModel->Bounds( NULL );
+	bounds = renderModel->Bounds( nullptr );
 
 	collisionSurface = false;
-	for( i = 0; i < renderModel->NumSurfaces(); i++ )
+	for ( i = 0; i < renderModel->NumSurfaces(); i++ )
 	{
 		surf = renderModel->Surface( i );
-		if( surf->shader->GetSurfaceFlags() & SURF_COLLISION )
+		if ( surf->shader->GetSurfaceFlags() & SURF_COLLISION )
 		{
 			collisionSurface = true;
 		}
 	}
 
-	for( i = 0; i < renderModel->NumSurfaces(); i++ ) {
+	for ( i = 0; i < renderModel->NumSurfaces(); i++ ) {
 		surf = renderModel->Surface( i );
 		// if this surface has no contents
-		if( !( surf->shader->GetContentFlags() & CONTENTS_REMOVE_UTIL ) )
+		if ( !( surf->shader->GetContentFlags() & _REMOVE_UTILITIES_ ) )
 		{
 			continue;
 		}
 		// if the model has a collision surface and this surface is not a collision surface
-		if( collisionSurface && !( surf->shader->GetSurfaceFlags() & SURF_COLLISION ) )
+		if ( collisionSurface && !( surf->shader->GetSurfaceFlags() & SURF_COLLISION ) )
 		{
 			continue;
 		}
@@ -3724,19 +3722,19 @@ cm_model_t* idCollisionModelManagerLocal::LoadRenderModel( const char* fileName 
 
 	ClearHash( bounds );
 
-	for( i = 0; i < renderModel->NumSurfaces(); i++ )
+	for ( i = 0; i < renderModel->NumSurfaces(); i++ )
 	{
 		surf = renderModel->Surface( i );
 		// if this surface has no contents
-		if( !( surf->shader->GetContentFlags() & CONTENTS_REMOVE_UTIL ) ) {
+		if ( !( surf->shader->GetContentFlags() & _REMOVE_UTILITIES_ ) ) {
 			continue;
 		}
 		// if the model has a collision surface and this surface is not a collision surface
-		if( collisionSurface && !( surf->shader->GetSurfaceFlags() & SURF_COLLISION ) ) {
+		if ( collisionSurface && !( surf->shader->GetSurfaceFlags() & SURF_COLLISION ) ) {
 			continue;
 		}
 
-		for( j = 0; j < surf->geometry->numIndexes; j += 3 ) {
+		for ( j = 0; j < surf->geometry->numIndexes; j += 3 ) {
 			w.Clear();
 			w += surf->geometry->verts[ surf->geometry->indexes[ j + 2 ] ].xyz;
 			w += surf->geometry->verts[ surf->geometry->indexes[ j + 1 ] ].xyz;
@@ -3765,10 +3763,10 @@ cm_model_t* idCollisionModelManagerLocal::LoadRenderModel( const char* fileName 
 /*
 /*
 ==================
-arcCollisionModelManagerLocal::TrmFromModel_r
+anSoftBodiesPhysicsManager::TrmFromModel_r
 ==================
 */
-bool arcCollisionModelManagerLocal::TrmFromModel_r( arcTraceModel &trm, cm_node_t *node ) {
+bool anSoftBodiesPhysicsManager::TrmFromModel_r( anTraceModel &trm, cm_node_t *node ) {
 	while ( 1 ) {
 		for ( cm_polygonRef_t *pref = node->polygons; pref; pref = pref->next ) {
 			cm_polygon_t *p = pref->p;
@@ -3789,7 +3787,7 @@ bool arcCollisionModelManagerLocal::TrmFromModel_r( arcTraceModel &trm, cm_node_
 			trm.polys[ trm.numPolys ].numEdges = p->numEdges;
 			// copy edge index
 			for ( int i = 0; i < p->numEdges; i++ ) {
-				trm.polys[ trm.numPolys ].edges[ i ] = p->edges[ i ];
+				trm.polys[ trm.numPolys ].edges[i] = p->edges[i];
 			}
 			trm.numPolys++;
 		}
@@ -3806,24 +3804,24 @@ bool arcCollisionModelManagerLocal::TrmFromModel_r( arcTraceModel &trm, cm_node_
 
 /*
 ==================
-arcCollisionModelManagerLocal::TrmFromModel
+anSoftBodiesPhysicsManager::TrmFromModel
 
   NOTE: polygon merging can merge colinear edges and as such might cause dangling edges.
 ==================
 */
-bool arcCollisionModelManagerLocal::TrmFromModel( const cm_model_t *model, arcTraceModel &trm ) {
+bool anSoftBodiesPhysicsManager::TrmFromModel( const cm_model_t *model, anTraceModel &trm ) {
 	int numEdgeUsers[MAX_TRACEMODEL_EDGES+1];
 
 	// if the model has too many vertices to fit in a trace model
 	if ( model->numVertices > MAX_TRACEMODEL_VERTS ) {
-		common->Printf( "arcCollisionModelManagerLocal::TrmFromModel: model %s has too many vertices.\n", model->name.c_str() );
+		common->Printf( "anSoftBodiesPhysicsManager::TrmFromModel: model %s has too many vertices.\n", model->name.c_str() );
 		PrintModelInfo( model );
 		return false;
 	}
 
 	// plus one because the collision model accounts for the first unused edge
 	if ( model->numEdges > MAX_TRACEMODEL_EDGES+1 ) {
-		common->Printf( "arcCollisionModelManagerLocal::TrmFromModel: model %s has too many edges.\n", model->name.c_str() );
+		common->Printf( "anSoftBodiesPhysicsManager::TrmFromModel: model %s has too many edges.\n", model->name.c_str() );
 		PrintModelInfo( model );
 		return false;
 	}
@@ -3837,22 +3835,22 @@ bool arcCollisionModelManagerLocal::TrmFromModel( const cm_model_t *model, arcTr
 	// copy polygons
 	checkCount++;
 	if ( !TrmFromModel_r( trm, model->node ) ) {
-		common->Printf( "arcCollisionModelManagerLocal::TrmFromModel: model %s has too many polygons.\n", model->name.c_str() );
+		common->Printf( "anSoftBodiesPhysicsManager::TrmFromModel: model %s has too many polygons.\n", model->name.c_str() );
 		PrintModelInfo( model );
 		return false;
 	}
 
 	// copy vertices
 	for ( int i = 0; i < model->numVertices; i++ ) {
-		trm.verts[ i ] = model->vertices[ i ].p;
-		trm.bounds.AddPoint( trm.verts[ i ] );
+		trm.verts[i] = model->vertices[i].p;
+		trm.bounds.AddPoint( trm.verts[i] );
 	}
 	trm.numVerts = model->numVertices;
 
 	// copy edges
 	for ( int i = 0; i < model->numEdges; i++ ) {
-		trm.edges[ i ].v[0] = model->edges[ i ].vertexNum[0];
-		trm.edges[ i ].v[1] = model->edges[ i ].vertexNum[1];
+		trm.edges[i].v[0] = model->edges[i].vertexNum[0];
+		trm.edges[i].v[1] = model->edges[i].vertexNum[1];
 	}
 	// minus one because the collision model accounts for the first unused edge
 	trm.numEdges = model->numEdges - 1;
@@ -3866,7 +3864,7 @@ bool arcCollisionModelManagerLocal::TrmFromModel( const cm_model_t *model, arcTr
 	}
 	for ( int i = 1; i <= trm.numEdges; i++ ) {
 		if ( numEdgeUsers[i] != 2 ) {
-			common->Printf( "arcCollisionModelManagerLocal::TrmFromModel: model %s has dangling edges, the model has to be an enclosed hull.\n", model->name.c_str() );
+			common->Printf( "anSoftBodiesPhysicsManager::TrmFromModel: model %s has dangling edges, the model has to be an enclosed hull.\n", model->name.c_str() );
 			PrintModelInfo( model );
 			return false;
 		}
@@ -3878,7 +3876,7 @@ bool arcCollisionModelManagerLocal::TrmFromModel( const cm_model_t *model, arcTr
 	for ( int i = 0; i < trm.numPolys; i++ ) {
 		// to be convex no vertices should be in front of any polygon plane
 		for ( int j = 0; j < trm.numVerts; j++ ) {
-			if ( trm.polys[ i ].normal * trm.verts[ j ] - trm.polys[ i ].dist > 0.01f ) {
+			if ( trm.polys[i].normal * trm.verts[ j ] - trm.polys[i].dist > 0.01f ) {
 				trm.isConvex = false;
 				break;
 			}
@@ -3898,13 +3896,13 @@ bool arcCollisionModelManagerLocal::TrmFromModel( const cm_model_t *model, arcTr
 
 /*
 ==================
-arcCollisionModelManagerLocal::TrmFromModel
+anSoftBodiesPhysicsManager::TrmFromModel
 ==================
 */
-bool arcCollisionModelManagerLocal::TrmFromModel( const char *modelName, arcTraceModel &trm ) {
+bool anSoftBodiesPhysicsManager::TrmFromModel( const char *modelName, anTraceModel &trm ) {
 	cmHandle_t handle = LoadModel( modelName, false );
 	if ( !handle ) {
-		common->Printf( "arcCollisionModelManagerLocal::TrmFromModel: model %s not found.\n", modelName );
+		common->Printf( "anSoftBodiesPhysicsManager::TrmFromModel: model %s not found.\n", modelName );
 		return false;
 	}
 

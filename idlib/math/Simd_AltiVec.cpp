@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "Simd_Generic.h"
@@ -332,10 +332,10 @@ inline vector float loadSplatUnalignedScalar( const float *s ) {
   VectorATan16
 
   For each element in vector:
-	n = arcMath::ATan16( x, y )
+	n = anMath::ATan16( x, y )
 ===============
 */
-// calculates arcLexer tangent of a vector with 16 bits of precision, based on atan16 in arcMath
+// calculates anLexer tangent of a vector with 16 bits of precision, based on atan16 in anMath
 inline vector float VectorATan16( vector float x, vector float y ) {
 
 	vector float xDivY = Divide( x, y );
@@ -373,7 +373,7 @@ inline vector float VectorATan16( vector float x, vector float y ) {
   VectorSin16
 
   For each element in vector:
-	n = arcMath::Sin16( v )
+	n = anMath::Sin16( v )
 ===============
 */
 inline vector float VectorSin16( vector float v ) {
@@ -470,7 +470,7 @@ inline float FastScalarInvSqrt( float f ) {
 	estimate = estimate + 0.5f * estimate * ( 1.0f - f * estimate * estimate );
 	return estimate;
 #else
-	return arcMath::InvSqrt( f );
+	return anMath::InvSqrt( f );
 #endif
 }
 
@@ -505,9 +505,9 @@ inline void FastScalarInvSqrt_x3( float *arg1, float *arg2, float *arg3 ) {
 	*arg2 = estimate2;
 	*arg3 = estimate3;
 #else
-	*arg1 = arcMath::InvSqrt( *arg1 );
-	*arg2 = arcMath::InvSqrt( *arg2 );
-	*arg3 = arcMath::InvSqrt( *arg3 );
+	*arg1 = anMath::InvSqrt( *arg1 );
+	*arg2 = anMath::InvSqrt( *arg2 );
+	*arg3 = anMath::InvSqrt( *arg3 );
 #endif
 }
 
@@ -560,12 +560,12 @@ inline void FastScalarInvSqrt_x6( float *arg1, float *arg2, float *arg3, float *
 	*arg5 = estimate5;
 	*arg6 = estimate6;
 #else
-	*arg1 = arcMath::InvSqrt( *arg1 );
-	*arg2 = arcMath::InvSqrt( *arg2 );
-	*arg3 = arcMath::InvSqrt( *arg3 );
-	*arg4 = arcMath::InvSqrt( *arg4 );
-	*arg5 = arcMath::InvSqrt( *arg5 );
-	*arg6 = arcMath::InvSqrt( *arg6 );
+	*arg1 = anMath::InvSqrt( *arg1 );
+	*arg2 = anMath::InvSqrt( *arg2 );
+	*arg3 = anMath::InvSqrt( *arg3 );
+	*arg4 = anMath::InvSqrt( *arg4 );
+	*arg5 = anMath::InvSqrt( *arg5 );
+	*arg6 = anMath::InvSqrt( *arg6 );
 #endif
 }
 
@@ -1261,7 +1261,7 @@ arcSIMD_AltiVec::Dot
   dst[i] = constant * src[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcVec3 &constant, const arcVec3 *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anVec3 *src, const int count ) {
 		register vector float vecLd1, vecLd2, vecLd3, vecLd4, vecLd5, vecLd6;
 		register vector float vecX, vecY, vecZ;
 		vector float vecX2, vecY2, vecZ2;
@@ -1373,9 +1373,9 @@ arcSIMD_AltiVec::Dot
   dst[i] = constant * src[i].Normal() + src[i][3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcVec3 &constant, const arcPlane *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anPlane *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant * src[(X)].Normal() + src[(X)][3];
-	assert( sizeof(arcPlane)  == PLANE_OFFSET * sizeof( float ) );
+	assert( sizeof(anPlane)  == PLANE_OFFSET * sizeof( float ) );
 	float constVal[4];
 	float srcVal[3];
 	float srcI3;
@@ -1492,10 +1492,10 @@ arcSIMD_AltiVec::Dot
   dst[i] = constant * src[i].xyz;
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcVec3 &constant, const arcDrawVert *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant * src[(X)].xyz;
-		// arcDrawVert size is 60 bytes
-		assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+		// anDrawVertex size is 60 bytes
+		assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 		register vector float v0, v1, v2, v3, v4, v5, v6, v7;
 		register vector float vecConstX, vecConstY, vecConstZ;
@@ -1577,11 +1577,11 @@ arcSIMD_AltiVec::Dot
   dst[i] = constant * src[i].xyz;
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcVec3 &constant, const arcDrawVert *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant * src[(X)].xyz;
 
-		// arcDrawVert size is 64 bytes
-		assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+		// anDrawVertex size is 64 bytes
+		assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 		register vector float v0, v1, v2, v3, v4, v5, v6, v7;
 		register vector float vecConstX, vecConstY, vecConstZ;
@@ -1648,7 +1648,7 @@ arcSIMD_AltiVec::Dot
   dst[i] = constant.Normal() * src[i] + constant[3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcPlane &constant, const arcVec3 *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anVec3 *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant.Normal() * src[(X)] + constant[3];
 		register vector float vecLd1, vecLd2, vecLd3, vecLd4, vecLd5, vecLd6;
 		register vector float vecX, vecY, vecZ, vecX2, vecY2, vecZ2;
@@ -1656,7 +1656,7 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcPlane &constant, const ar
 		register vector float vecConstX, vecConstY, vecConstZ;
 		register vector float vecConst3;
 
-		arcVec3 constNormal = constant.Normal();
+		anVec3 constNormal = constant.Normal();
 		float const3 = constant[3];
 
 		// permute vectors
@@ -1756,10 +1756,10 @@ arcSIMD_AltiVec::Dot
   dst[i] = constant.Normal() * src[i].Normal() + constant[3] * src[i][3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcPlane &constant, const arcPlane *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anPlane *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant.Normal() * src[(X)].Normal() + constant[3] * src[(X)][3];
 	// check plane size
-	assert( sizeof(arcPlane) == PLANE_OFFSET * sizeof( float ) );
+	assert( sizeof(anPlane) == PLANE_OFFSET * sizeof( float ) );
 	float constVal[4];
 	float srcVal[4];
 	const float *constPtr = constant.ToFloatPtr();
@@ -1861,10 +1861,10 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcPlane &constant, const ar
 	// cleanup
 	for (; i < count; i++ ) {
 		//dst[i] = constant.Normal() * src[i].Normal() + constant[3] * src[i][3];
-		srcVal[0] = *(srcPtr + ( i*PLANE_OFFSET) + 0 );
-		srcVal[1] = *(srcPtr + ( i*PLANE_OFFSET) + 1 );
-		srcVal[2] = *(srcPtr + ( i*PLANE_OFFSET) + 2 );
-		srcVal[3] = *(srcPtr + ( i*PLANE_OFFSET) + 3 );
+		srcVal[0] = *( srcPtr + ( i*PLANE_OFFSET) + 0 );
+		srcVal[1] = *( srcPtr + ( i*PLANE_OFFSET) + 1 );
+		srcVal[2] = *( srcPtr + ( i*PLANE_OFFSET) + 2 );
+		srcVal[3] = *( srcPtr + ( i*PLANE_OFFSET) + 3 );
 		dst[i] = srcVal[0] * constVal[0] + srcVal[1] * constVal[1] + srcVal[2] * constVal[2] + constVal[3] * srcVal[3];
 	}
 }
@@ -1878,10 +1878,10 @@ arcSIMD_AltiVec::Dot
   dst[i] = constant.Normal() * src[i].xyz + constant[3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcPlane &constant, const arcDrawVert *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant.Normal() * src[(X)].xyz + constant[3];
-	// arcDrawVert size is 60 bytes
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size is 60 bytes
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 	const float *constPtr = constant.ToFloatPtr();
 	const float *srcPtr = src[0].xyz.ToFloatPtr();
 
@@ -1967,9 +1967,9 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcPlane &constant, const ar
 
 	// cleanup
 	for (; i < count; i++ ) {
-		srcVal[0] = *(srcPtr + ( i*DRAWVERT_OFFSET) + 0 );
-		srcVal[1] = *(srcPtr + ( i*DRAWVERT_OFFSET) + 1 );
-		srcVal[2] = *(srcPtr + ( i*DRAWVERT_OFFSET) + 2 );
+		srcVal[0] = *( srcPtr + ( i*DRAWVERT_OFFSET) + 0 );
+		srcVal[1] = *( srcPtr + ( i*DRAWVERT_OFFSET) + 1 );
+		srcVal[2] = *( srcPtr + ( i*DRAWVERT_OFFSET) + 2 );
 		//	dst[i] = constant.Normal() * src[i].xyz + constant[3];
 
 		dst[i] = constVal[0] * srcVal[0] + constVal[1] * srcVal[1] + constVal[2] * srcVal[2];
@@ -1984,11 +1984,11 @@ arcSIMD_AltiVec::Dot
   dst[i] = constant.Normal() * src[i].xyz + constant[3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcPlane &constant, const arcDrawVert *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant.Normal() * src[(X)].xyz + constant[3];
 
-	// arcDrawVert size is 60 bytes
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size is 60 bytes
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 	int i;
 	const float *constPtr = constant.ToFloatPtr();
@@ -2058,9 +2058,9 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcPlane &constant, const ar
 
 	// cleanup
 	for (; i < count; i++ ) {
-		srcVal[0] = *(srcPtr + ( i*DRAWVERT_OFFSET) + 0 );
-		srcVal[1] = *(srcPtr + ( i*DRAWVERT_OFFSET) + 1 );
-		srcVal[2] = *(srcPtr + ( i*DRAWVERT_OFFSET) + 2 );
+		srcVal[0] = *( srcPtr + ( i*DRAWVERT_OFFSET) + 0 );
+		srcVal[1] = *( srcPtr + ( i*DRAWVERT_OFFSET) + 1 );
+		srcVal[2] = *( srcPtr + ( i*DRAWVERT_OFFSET) + 2 );
 		//	dst[i] = constant.Normal() * src[i].xyz + constant[3];
 
 		dst[i] = constVal[0] * srcVal[0] + constVal[1] * srcVal[1] + constVal[2] * srcVal[2];
@@ -2077,7 +2077,7 @@ arcSIMD_AltiVec::Dot
   dst[i] = src0[i] * src1[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const arcVec3 *src0, const arcVec3 *src1, const int count ) {
+void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 *src0, const anVec3 *src1, const int count ) {
 //#define OPER(X) dst[(X)] = src0[(X)] * src1[(X)];
 
 	int i;
@@ -2982,7 +2982,7 @@ arcSIMD_AltiVec::MinMax
 ============
 */
 void VPCALL arcSIMD_AltiVec::MinMax( float &min, float &max, const float *src, const int count ) {
-	min = arcMath::INFINITY; max = -arcMath::INFINITY;
+	min = anMath::INFINITY; max = -anMath::INFINITY;
 //#define OPER(X) if ( src[(X)] < min ) {min = src[(X)];} if ( src[(X)] > max ) {max = src[(X)];}
 
     register vector float v0, v1, v2, v3;
@@ -3053,11 +3053,11 @@ void VPCALL arcSIMD_AltiVec::MinMax( float &min, float &max, const float *src, c
 arcSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( arcVec2 &min, arcVec2 &max, const arcVec2 *src, const int count ) {
-	min[0] = min[1] = arcMath::INFINITY; max[0] = max[1] = -arcMath::INFINITY;
-//#define OPER(X) const arcVec2 &v = src[(X)]; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; }
+void VPCALL arcSIMD_AltiVec::MinMax( anVec2 &min, anVec2 &max, const anVec2 *src, const int count ) {
+	min[0] = min[1] = anMath::INFINITY; max[0] = max[1] = -anMath::INFINITY;
+//#define OPER(X) const anVec2 &v = src[(X)]; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; }
 
-	arcVec2 v;
+	anVec2 v;
 	int i = 0;
 	int j;
 
@@ -3145,13 +3145,13 @@ void VPCALL arcSIMD_AltiVec::MinMax( arcVec2 &min, arcVec2 &max, const arcVec2 *
 arcSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcVec3 *src, const int count ) {
-	min[0] = min[1] = min[2] = arcMath::INFINITY; max[0] = max[1] = max[2] = -arcMath::INFINITY;
-//#define OPER(X) const arcVec3 &v = src[(X)]; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; } if ( v[2] < min[2] ) { min[2] = v[2]; } if ( v[2] > max[2] ) { max[2] = v[2]; }
+void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anVec3 *src, const int count ) {
+	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
+//#define OPER(X) const anVec3 &v = src[(X)]; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; } if ( v[2] < min[2] ) { min[2] = v[2]; } if ( v[2] > max[2] ) { max[2] = v[2]; }
 
 	int i = 0;
 	const float *srcPtr = src[0].ToFloatPtr();
-	arcVec3 v;
+	anVec3 v;
 
 	register vector float vecLd1, vecLd2, vecLd3;
 	register vector float vecMin, vecMax;
@@ -3180,7 +3180,7 @@ void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcVec3 *
 			vecLd2 = vec_perm( v1, v2, permVec );
 			vecLd3 = vec_perm( v2, vecOld, permVec );
 
-			// put each arcVec3 into its own vector as X Y Z (crap)
+			// put each anVec3 into its own vector as X Y Z (crap)
 			vecSrc1 = vecLd1;
 			vecSrc2 = vec_sld( vecLd1, vecLd2, 12 );
 			vecSrc3 = vec_sld( vecLd2, vecLd3, 8 );
@@ -3246,10 +3246,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcVec3 *
 arcSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) {
 
-	min[0] = min[1] = min[2] = arcMath::INFINITY; max[0] = max[1] = max[2] = -arcMath::INFINITY;
-	arcVec3 v;
+	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
+	anVec3 v;
 	int i = 0;
 	register vector float vecMin, vecMax;
 
@@ -3345,10 +3345,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVe
 arcSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *src, const int count ) {
+void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) {
 
-	min[0] = min[1] = min[2] = arcMath::INFINITY; max[0] = max[1] = max[2] = -arcMath::INFINITY;
-	arcVec3 v;
+	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
+	anVec3 v;
 	int i = 0;
 	register vector float vecMin, vecMax;
 
@@ -3433,10 +3433,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVe
 arcSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *src, const int *indexes, const int count ) {
-	min[0] = min[1] = min[2] = arcMath::INFINITY; max[0] = max[1] = max[2] = -arcMath::INFINITY;
+void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
+	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 
-	arcVec3 v;
+	anVec3 v;
 	int i = 0;
 
 	register vector float vecMin, vecMax;
@@ -3539,10 +3539,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVe
 arcSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *src, const int *indexes, const int count ) {
-	min[0] = min[1] = min[2] = arcMath::INFINITY; max[0] = max[1] = max[2] = -arcMath::INFINITY;
+void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
+	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 
-	arcVec3 v;
+	anVec3 v;
 	int i = 0;
 
 	register vector float vecMin, vecMax;
@@ -4115,7 +4115,7 @@ arcSIMD_AltiVec::MatX_LowerTriangularSolve
 ============
 */
 
-void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolve( const arcMatX &L, float *x, const float *b, const int n, int skip ) {
+void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip ) {
 
 	int i, j;
 	const float *lptr;
@@ -4310,7 +4310,7 @@ arcSIMD_AltiVec::MatX_LowerTriangularSolveTranspose
   x == b is allowed
 ============
 */
-void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolveTranspose( const arcMatX &L, float *x, const float *b, const int n ) {
+void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n ) {
 
 	int nc;
 	const float *lptr;
@@ -4321,7 +4321,7 @@ void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolveTranspose( const arcMatX &
 	float x0, x1, x2, x3, x4, x5, x6;
 	// unrolled cases for n < 8
 	if ( n < 8 ) {
-		switch( n ) {
+		switch ( n ) {
 			// using local variables to avoid aliasing issues
 			case 0:
 				return;
@@ -4470,7 +4470,7 @@ void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolveTranspose( const arcMatX &
 arcSIMD_AltiVec::MatX_LDLTFactor
 ============
 */
-bool VPCALL arcSIMD_AltiVec::MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, const int n ) {
+bool VPCALL arcSIMD_AltiVec::MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, const int n ) {
 	int i, j, k, nc;
 	float *v, *diag, *mptr;
 	float s0, s1, s2, s3, sum, d;
@@ -4589,7 +4589,7 @@ bool VPCALL arcSIMD_AltiVec::MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, co
 			v[k+2] = diag[k+2] * mptr[k+2]; s2 += v[k+2] * mptr[k+2];
 			v[k+3] = diag[k+3] * mptr[k+3]; s3 += v[k+3] * mptr[k+3];
 		}
-		switch( i - k ) {
+		switch ( i - k ) {
 			case 3: v[k+2] = diag[k+2] * mptr[k+2]; s0 += v[k+2] * mptr[k+2];
 			case 2: v[k+1] = diag[k+1] * mptr[k+1]; s1 += v[k+1] * mptr[k+1];
 			case 1: v[k+0] = diag[k+0] * mptr[k+0]; s2 += v[k+0] * mptr[k+0];
@@ -4647,7 +4647,7 @@ bool VPCALL arcSIMD_AltiVec::MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, co
 				s3_2 += mptr2[k+7] * v[k+7];
 			}
 
-			switch( i - k ) {
+			switch ( i - k ) {
 				case 7: s0 += mptr[k+6] * v[k+6]; s0_2 += mptr2[k+6] * v[k+6];
 				case 6: s1 += mptr[k+5] * v[k+5]; s1_2 += mptr2[k+5] * v[k+5];
 				case 5: s2 += mptr[k+4] * v[k+4]; s2_2 += mptr2[k+4] * v[k+4];
@@ -4688,7 +4688,7 @@ bool VPCALL arcSIMD_AltiVec::MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, co
 				s2 += mptr[k+6] * v[k+6];
 				s3 += mptr[k+7] * v[k+7];
 			}
-			switch( i - k ) {
+			switch ( i - k ) {
 				case 7: s0 += mptr[k+6] * v[k+6];
 				case 6: s1 += mptr[k+5] * v[k+5];
 				case 5: s2 += mptr[k+4] * v[k+4];
@@ -4716,7 +4716,7 @@ bool VPCALL arcSIMD_AltiVec::MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, co
 arcSIMD_AltiVec::BlendJoints
 ============
 */
-void VPCALL arcSIMD_AltiVec::BlendJoints( idJointQuat *joints, const idJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) {
+void VPCALL arcSIMD_AltiVec::BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) {
 	int i;
 
 	// since lerp is a constant, we can special case the two cases if they're true
@@ -4727,7 +4727,7 @@ void VPCALL arcSIMD_AltiVec::BlendJoints( idJointQuat *joints, const idJointQuat
 
 	if ( lerp >= 1.0f ) {
 		// this copies each q from blendJoints to joints and copies each t from blendJoints to joints
-		memcpy( joints[0].q.ToFloatPtr(), blendJoints[0].q.ToFloatPtr(), sizeof(idJointQuat) * numJoints );
+		memcpy( joints[0].q.ToFloatPtr(), blendJoints[0].q.ToFloatPtr(), sizeof(anJointQuat) * numJoints );
 		return;
 	}
 
@@ -4765,7 +4765,7 @@ void VPCALL arcSIMD_AltiVec::BlendJoints( idJointQuat *joints, const idJointQuat
 		vector float vecFromX, vecFromY, vecFromZ, vecFromW;
 		vector float vecToX, vecToY, vecToZ, vecToW;
 
-		// load up the the idJointQuats from joints
+		// load up the the anJointQuats from joints
 		v0 = vec_ld( 0, jointPtr );
 		v1 = vec_ld( 15, jointPtr );
 		v2 = vec_perm( v0, v1, permVec );
@@ -4793,7 +4793,7 @@ void VPCALL arcSIMD_AltiVec::BlendJoints( idJointQuat *joints, const idJointQuat
 		vecFromZ = vec_mergeh( v3, v4 );
 		vecFromW = vec_mergel( v3, v4 );
 
-		// load up idJointQuats from blendJoints
+		// load up anJointQuats from blendJoints
 		v5 = vec_ld( 0, blendPtr );
 		v6 = vec_ld( 15, blendPtr );
 		v7 = vec_perm( v5, v6, permVec5 );
@@ -4910,7 +4910,7 @@ void VPCALL arcSIMD_AltiVec::BlendJoints( idJointQuat *joints, const idJointQuat
 		vec_ste( vecToW, 12, (float*) jointPtr4 );
 
 		// lerp is  v1 + l * ( v2 - v1 );
-		// the arcVec3 T is going to be 12 bytes after the Q, so we can do this without calling ToFloatPtr() again. since its
+		// the anVec3 T is going to be 12 bytes after the Q, so we can do this without calling ToFloatPtr() again. since its
 		float *jointVecPtr = (float*)( jointPtr + 4 );
 		float *jointVecPtr2 = (float*)( jointPtr2 + 4 );
 		float *jointVecPtr3 = (float*)( jointPtr3 + 4 );
@@ -4945,7 +4945,7 @@ void VPCALL arcSIMD_AltiVec::BlendJoints( idJointQuat *joints, const idJointQuat
 		vecVecY = vec_mergel( v0, v1 );
 		vecVecZ = vec_mergeh( v3, v4 );
 
-		// load blend joint arcVec3's
+		// load blend joint anVec3's
 		float *blendVecPtr = (float*)( blendPtr + 4 );
 		float *blendVecPtr2 =(float*)( blendPtr2 + 4 );
 		float *blendVecPtr3 = (float*)( blendPtr3 + 4 );
@@ -5047,7 +5047,7 @@ arcSIMD_AltiVec::ConvertJointQuatsToJointMats
 
 // SSE doesn't vectorize this, and I don't think we should either. Its mainly just copying data, there's very little math involved and
 // it's not easily parallelizable
-void VPCALL arcSIMD_AltiVec::ConvertJointQuatsToJointMats( arcJointMat *jointMats, const idJointQuat *jointQuats, const int numJoints ) {
+void VPCALL arcSIMD_AltiVec::ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) {
 
 	for ( int i = 0; i < numJoints; i++ ) {
 
@@ -5103,19 +5103,19 @@ void VPCALL arcSIMD_AltiVec::ConvertJointQuatsToJointMats( arcJointMat *jointMat
 arcSIMD_AltiVec::ConvertJointMatsToJointQuats
 ============
 */
-void VPCALL arcSIMD_AltiVec::ConvertJointMatsToJointQuats( idJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) {
+void VPCALL arcSIMD_AltiVec::ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) {
 
 	int index;
 
 	// Since we use very little of the data we have to pull in for the altivec version, we end up with
 	// a lot of wasted math. Rather than try to force it to use altivec, I wrote an optimized version
 	// of InvSqrt for the G5, and made it use that instead. With only this change, we get a little
-	// bigger than 50% speedup, which is not too shabby. Should really replace arcMath::InvSqrt with
+	// bigger than 50% speedup, which is not too shabby. Should really replace anMath::InvSqrt with
 	// my function so everyone can benefit on G5.
 
 	for ( index = 0; index < numJoints; index++ ) {
 
-		idJointQuat	jq;
+		anJointQuat	jq;
 		float		trace;
 		float		s;
 		float		t;
@@ -5131,7 +5131,7 @@ void VPCALL arcSIMD_AltiVec::ConvertJointMatsToJointQuats( idJointQuat *jointQua
 		if ( trace > 0.0f ) {
 
 			t = trace + 1.0f;
-			//s = arcMath::InvSqrt( t ) * 0.5f;
+			//s = anMath::InvSqrt( t ) * 0.5f;
 			s = FastScalarInvSqrt( t ) * 0.5f;
 
 			jq.q[3] = s * t;
@@ -5152,7 +5152,7 @@ void VPCALL arcSIMD_AltiVec::ConvertJointMatsToJointQuats( idJointQuat *jointQua
 			k = next[j];
 
 			t = ( mat[i * 4 + i] - ( mat[j * 4 + j] + mat[k * 4 + k] ) ) + 1.0f;
-			//s = arcMath::InvSqrt( t ) * 0.5f;
+			//s = anMath::InvSqrt( t ) * 0.5f;
 			s = FastScalarInvSqrt( t ) * 0.5f;
 
 			jq.q[i] = s * t;
@@ -5344,12 +5344,12 @@ arcSIMD_AltiVec::TransformVerts
 
 // Here we don't have much for the vector unit to do, and the gain we get from doing the math
 // in parallel is eaten by doing unaligned stores.
-void VPCALL arcSIMD_AltiVec::TransformVerts( arcDrawVert *verts, const int numVerts, const arcJointMat *joints, const arcVec4 *weights, const int *index, int numWeights ) {
+void VPCALL arcSIMD_AltiVec::TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, int numWeights ) {
 	int i, j;
-	const byte *jointsPtr = ( byte * )joints;
+	const byte *jointsPtr = (byte *)joints;
 
 	for ( j = i = 0; i < numVerts; i++ ) {
-		arcVec3 v;
+		anVec3 v;
 
 		float *matPtrOrig = ( *(arcJointMat *)( jointsPtr + index[j*2] ) ).ToFloatPtr();
 		float *weightPtr = (float*) weights[j].ToFloatPtr();
@@ -5404,10 +5404,10 @@ void VPCALL arcSIMD_AltiVec::TransformVerts( arcDrawVert *verts, const int numVe
 arcSIMD_AltiVec::TracePointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) {
+void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 	byte tOr;
 	tOr = 0;
@@ -5603,7 +5603,7 @@ void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, cons
 	for (; i < numVerts; i++ ) {
 		byte bits;
 		float d0, d1, d2, d3, t;
-		const arcVec3 &v = verts[i].xyz;
+		const anVec3 &v = verts[i].xyz;
 
 		d0 = planes[0].Distance( v );
 		d1 = planes[1].Distance( v );
@@ -5643,10 +5643,10 @@ void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, cons
 arcSIMD_AltiVec::TracePointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) {
+void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 	byte tOr;
 	tOr = 0;
@@ -5825,7 +5825,7 @@ void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, cons
 	for (; i < numVerts; i++ ) {
 		byte bits;
 		float d0, d1, d2, d3, t;
-		const arcVec3 &v = verts[i].xyz;
+		const anVec3 &v = verts[i].xyz;
 
 		d0 = planes[0].Distance( v );
 		d1 = planes[1].Distance( v );
@@ -5867,10 +5867,10 @@ void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, cons
 arcSIMD_AltiVec::DecalPointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) {
+void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 	int i;
 	const float *planePtr = planes[0].ToFloatPtr();
@@ -6093,7 +6093,7 @@ void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const arcPlane *pla
 	for (; i < numVerts; i++ ) {
 		byte bits;
 		float d0, d1, d2, d3, d4, d5;
-		const arcVec3 &v = verts[i].xyz;
+		const anVec3 &v = verts[i].xyz;
 
 		d0 = planes[0].Distance( v );
 		d1 = planes[1].Distance( v );
@@ -6121,10 +6121,10 @@ void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const arcPlane *pla
 arcSIMD_AltiVec::DecalPointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) {
+void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 	int i;
 	const float *planePtr = planes[0].ToFloatPtr();
@@ -6330,7 +6330,7 @@ void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const arcPlane *pla
 	for (; i < numVerts; i++ ) {
 		byte bits;
 		float d0, d1, d2, d3, d4, d5;
-		const arcVec3 &v = verts[i].xyz;
+		const anVec3 &v = verts[i].xyz;
 
 		d0 = planes[0].Distance( v );
 		d1 = planes[1].Distance( v );
@@ -6360,10 +6360,10 @@ void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const arcPlane *pla
 arcSIMD_AltiVec::OverlayPointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::OverlayPointCull( byte *cullBits, arcVec2 *texCoords, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) {
+void VPCALL arcSIMD_AltiVec::OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 	int i;
 
@@ -6559,10 +6559,10 @@ void VPCALL arcSIMD_AltiVec::OverlayPointCull( byte *cullBits, arcVec2 *texCoord
 arcSIMD_AltiVec::OverlayPointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::OverlayPointCull( byte *cullBits, arcVec2 *texCoords, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) {
+void VPCALL arcSIMD_AltiVec::OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 	int i;
 
@@ -6748,12 +6748,12 @@ arcSIMD_AltiVec::DeriveTriPlanes
 	Derives a plane equation for each triangle.
 ============
 */
-void VPCALL arcSIMD_AltiVec::DeriveTriPlanes( arcPlane *planes, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL arcSIMD_AltiVec::DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
-	// arcPlane size
-	assert( sizeof(arcPlane) == PLANE_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anPlane size
+	assert( sizeof(anPlane) == PLANE_OFFSET * sizeof( float ) );
 	int i;
 
 	vector float vecD0, vecD1, vecD2, vecD3, vecD4, vecD5, vecD6, vecD7;
@@ -7023,9 +7023,9 @@ void VPCALL arcSIMD_AltiVec::DeriveTriPlanes( arcPlane *planes, const arcDrawVer
 
 	// cleanup
 	for (; i < numIndexes; i += 3, j++ ) {
-		const arcDrawVert *a, *b, *c;
+		const anDrawVertex *a, *b, *c;
 		float d0[3], d1[3], f;
-		arcVec3 n;
+		anVec3 n;
 
 		a = verts + indexes[i + 0];
 		b = verts + indexes[i + 1];
@@ -7044,7 +7044,7 @@ void VPCALL arcSIMD_AltiVec::DeriveTriPlanes( arcPlane *planes, const arcDrawVer
 		n[2] = d1[0] * d0[1] - d1[1] * d0[0];
 
 		f = FastScalarInvSqrt( n.x * n.x + n.y * n.y + n.z * n.z );
-		//arcMath::RSqrt( n.x * n.x + n.y * n.y + n.z * n.z );
+		//anMath::RSqrt( n.x * n.x + n.y * n.y + n.z * n.z );
 
 		n.x *= f;
 		n.y *= f;
@@ -7066,18 +7066,18 @@ arcSIMD_AltiVec::DeriveTangents
 
 ============
 */
-void VPCALL arcSIMD_AltiVec::DeriveTangents( arcPlane *planes, arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL arcSIMD_AltiVec::DeriveTangents( anPlane *planes, anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 	int i;
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
 	memset( used, 0, numVerts * sizeof( used[0] ) );
 
-	arcPlane *planesPtr = planes;
+	anPlane *planesPtr = planes;
 	for ( i = 0; i < numIndexes; i += 3 ) {
-		arcDrawVert *a, *b, *c;
+		anDrawVertex *a, *b, *c;
 	//	unsigned long signBit;
 		float d0[5], d1[5], area;
-		arcVec3 n, t0, t1;
+		anVec3 n, t0, t1;
 		float f1, f2, f3;
 
 		int v0 = indexes[i + 0];
@@ -7196,11 +7196,11 @@ arcSIMD_AltiVec::DeriveUnsmoothedTangents
 ============
 */
 #define DERIVE_UNSMOOTHED_BITANGENT
-void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( arcDrawVert *verts, const dominantTri_s *dominantTris, const int numVerts ) {
+void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) {
 
 	int i;
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 	// drawverts aligned
 	assert( IS_16BYTE_ALIGNED( verts[0] ) );
 
@@ -7288,9 +7288,9 @@ void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( arcDrawVert *verts, const
 		v2 = vec_perm( v2, v2, (vector unsigned char)(4,5,6,7,0,1,2,3,8,9,10,11,0,1,2,3) );
 
 		// load second one
-		vecPerm0 = vec_lvsl( 0, xyzPtr + (( i+1 ) * DRAWVERT_OFFSET ) );
-		v0 = vec_ld( 0, xyzPtr + (( i+1 ) * DRAWVERT_OFFSET ) );
-		v1 = vec_ld( 16, xyzPtr + (( i+1 ) * DRAWVERT_OFFSET ) );
+		vecPerm0 = vec_lvsl( 0, xyzPtr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
+		v0 = vec_ld( 0, xyzPtr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
+		v1 = vec_ld( 16, xyzPtr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
 		vecVertA2 = vec_perm( v0, v1, vecPerm0 );
 
 		vecPerm3 = vec_lvsl( 0, xyzPtr + (bOffset2 * DRAWVERT_OFFSET ) );
@@ -7314,9 +7314,9 @@ void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( arcDrawVert *verts, const
 		v3 = vec_perm( v3, v3, (vector unsigned char)(4,5,6,7,0,1,2,3,8,9,10,11,0,1,2,3) );
 
 		// load third one
-		vecPerm0 = vec_lvsl( 0, xyzPtr + (( i+2) * DRAWVERT_OFFSET ) );
-		v0 = vec_ld( 0, xyzPtr + (( i+2) * DRAWVERT_OFFSET ) );
-		v1 = vec_ld( 16, xyzPtr + (( i+2) * DRAWVERT_OFFSET ) );
+		vecPerm0 = vec_lvsl( 0, xyzPtr + ( ( i+2) * DRAWVERT_OFFSET ) );
+		v0 = vec_ld( 0, xyzPtr + ( ( i+2) * DRAWVERT_OFFSET ) );
+		v1 = vec_ld( 16, xyzPtr + ( ( i+2) * DRAWVERT_OFFSET ) );
 		vecVertA3 = vec_perm( v0, v1, vecPerm0 );
 
 		vecPerm1 = vec_lvsl( 0, xyzPtr + (bOffset3 * DRAWVERT_OFFSET ) );
@@ -7340,9 +7340,9 @@ void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( arcDrawVert *verts, const
 		v4 = vec_perm( v4, v4, (vector unsigned char)(4,5,6,7,0,1,2,3,8,9,10,11,0,1,2,3) );
 
 		// load fourth one
-		vecPerm0 = vec_lvsl( 0, xyzPtr + (( i+3) * DRAWVERT_OFFSET ) );
-		v0 = vec_ld( 0, xyzPtr + (( i+3) * DRAWVERT_OFFSET ) );
-		v1 = vec_ld( 16, xyzPtr + (( i+3) * DRAWVERT_OFFSET ) );
+		vecPerm0 = vec_lvsl( 0, xyzPtr + ( ( i+3) * DRAWVERT_OFFSET ) );
+		v0 = vec_ld( 0, xyzPtr + ( ( i+3) * DRAWVERT_OFFSET ) );
+		v1 = vec_ld( 16, xyzPtr + ( ( i+3) * DRAWVERT_OFFSET ) );
 		vecVertA4 = vec_perm( v0, v1, vecPerm0 );
 
 		vecPerm3 = vec_lvsl( 0, xyzPtr + (bOffset4 * DRAWVERT_OFFSET ) );
@@ -7586,7 +7586,7 @@ void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( arcDrawVert *verts, const
 
 		// instead of doing permute, shift it where it needs to be and use vec_ste
 		// store out vectors
-		ALIGNED_STORE3( normalPtr + (( i+1 ) * DRAWVERT_OFFSET), vecStore1, vecStore2, vecStore3 );
+		ALIGNED_STORE3( normalPtr + ( ( i+1 ) * DRAWVERT_OFFSET), vecStore1, vecStore2, vecStore3 );
 
 		// read values that we need to preserve
 		vecLd1 = vec_ld( 0, normalPtr + ( ( i+2) * DRAWVERT_OFFSET ) );
@@ -7597,11 +7597,11 @@ void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( arcDrawVert *verts, const
 		vecStore3 = vec_perm( vecT1_3, vecT2_3, vecPermStore4 );
 
 		// store out vectors
-		ALIGNED_STORE3( normalPtr + (( i+2) * DRAWVERT_OFFSET), vecStore1, vecStore2, vecStore3 );
+		ALIGNED_STORE3( normalPtr + ( ( i+2) * DRAWVERT_OFFSET), vecStore1, vecStore2, vecStore3 );
 
 		// read values that we need to preserve
-		vecLd2 = vec_ld( 0, normalPtr + (( i+3) * DRAWVERT_OFFSET ) );
-		vecLd3 = vec_ld( 32, normalPtr + (( i+3) * DRAWVERT_OFFSET ) );
+		vecLd2 = vec_ld( 0, normalPtr + ( ( i+3) * DRAWVERT_OFFSET ) );
+		vecLd3 = vec_ld( 32, normalPtr + ( ( i+3) * DRAWVERT_OFFSET ) );
 
 		// generate vectors to store
 		vecStore1 = vec_perm( vecLd2, vecN4, vecPermHalves );
@@ -7609,12 +7609,12 @@ void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( arcDrawVert *verts, const
 		vecStore3 = vec_perm( vecT2_4, vecLd3, vecPermFirstThreeLast );
 
 		// store out vectors
-		ALIGNED_STORE3( normalPtr + (( i+3) * DRAWVERT_OFFSET ), vecStore1, vecStore2, vecStore3 );
+		ALIGNED_STORE3( normalPtr + ( ( i+3) * DRAWVERT_OFFSET ), vecStore1, vecStore2, vecStore3 );
 	}
 
 	// cleanup
 	for (; i < numVerts; i++ ) {
-		arcDrawVert *a, *b, *c;
+		anDrawVertex *a, *b, *c;
 		float d0, d1, d2, d3, d4;
 		float d5, d6, d7, d8, d9;
 		float s0, s1, s2;
@@ -7689,11 +7689,11 @@ arcSIMD_AltiVec::DeriveUnsmoothedTangents
 */
 #define DERIVE_UNSMOOTHED_BITANGENT
 
-void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( arcDrawVert *verts, const dominantTri_s *dominantTris, const int numVerts ) {
+void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) {
 	int i;
 
 	for ( i = 0; i < numVerts; i++ ) {
-		arcDrawVert *a, *b, *c;
+		anDrawVertex *a, *b, *c;
 		float d0, d1, d2, d3, d4;
 		float d5, d6, d7, d8, d9;
 		float s0, s1, s2;
@@ -7767,10 +7767,10 @@ arcSIMD_AltiVec::NormalizeTangents
 	tangent vectors onto the plane orthogonal to the vertex normal.
 ============
 */
-void VPCALL arcSIMD_AltiVec::NormalizeTangents( arcDrawVert *verts, const int numVerts ) {
+void VPCALL arcSIMD_AltiVec::NormalizeTangents( anDrawVertex *verts, const int numVerts ) {
 
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
 
 	float *addr = verts[0].normal.ToFloatPtr();
 	float *tAddr = verts[0].tangents[0].ToFloatPtr();
@@ -7804,13 +7804,13 @@ void VPCALL arcSIMD_AltiVec::NormalizeTangents( arcDrawVert *verts, const int nu
 	int i = 0;
 
 	if ( i+3 < numVerts ) {
-		// for loading normal from arcDrawVert
+		// for loading normal from anDrawVertex
 		vecPerm0 = vec_add( vec_lvsl( -1, addr ), (vector unsigned char)(1 ) );
 		vecPerm1 = vec_add( vec_lvsl( -1, addr + ( 1 * DRAWVERT_OFFSET ) ), (vector unsigned char)(1 ) );
 		vecPerm2 = vec_add( vec_lvsl( -1, addr + ( 2 * DRAWVERT_OFFSET ) ), (vector unsigned char)(1 ) );
 		vecPerm3 = vec_add( vec_lvsl( -1, addr + ( 3 * DRAWVERT_OFFSET ) ), (vector unsigned char)(1 ) );
 
-		// for loading tangents from arcDrawVert
+		// for loading tangents from anDrawVertex
 		vec1T0Perm = vec_add( vec_lvsl( -1, tAddr + ( 0 * DRAWVERT_OFFSET ) ), (vector unsigned char)(1 ) );
 		vec1T1Perm = vec_add( vec_lvsl( -1, tAddr + ( 0 * DRAWVERT_OFFSET ) + 3 ), (vector unsigned char)(1 ) );
 		vec2T0Perm = vec_add( vec_lvsl( -1, tAddr + ( 1 * DRAWVERT_OFFSET ) ), (vector unsigned char)(1 ) );
@@ -7847,16 +7847,16 @@ void VPCALL arcSIMD_AltiVec::NormalizeTangents( arcDrawVert *verts, const int nu
 		vector float vecNormal12 = vec_ld( 15, addr + ( i * DRAWVERT_OFFSET ) );
 		v0 = vec_perm( vecNormal11, vecNormal12, vecPerm0 );
 
-		vector float vecNormal21 = vec_ld( 0, addr + (( i+1 ) * DRAWVERT_OFFSET ) );
-		vector float vecNormal22 = vec_ld( 15, addr + (( i+1 ) * DRAWVERT_OFFSET ) );
+		vector float vecNormal21 = vec_ld( 0, addr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
+		vector float vecNormal22 = vec_ld( 15, addr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
 		v1 = vec_perm( vecNormal21, vecNormal22, vecPerm1 );
 
 		vector float vecNormal31 = vec_ld( 0, addr + ( ( i+2) * DRAWVERT_OFFSET ) );
 		vector float vecNormal32 = vec_ld( 15, addr + ( ( i+2) * DRAWVERT_OFFSET ) );
 		v2 = vec_perm( vecNormal31, vecNormal32, vecPerm2 );
 
-		vector float vecNormal41 = vec_ld( 0, addr + (( i+3) * DRAWVERT_OFFSET ) );
-		vector float vecNormal42 = vec_ld( 15, addr + (( i+3) * DRAWVERT_OFFSET ) );
+		vector float vecNormal41 = vec_ld( 0, addr + ( ( i+3) * DRAWVERT_OFFSET ) );
+		vector float vecNormal42 = vec_ld( 15, addr + ( ( i+3) * DRAWVERT_OFFSET ) );
 		v3 = vec_perm( vecNormal41, vecNormal42, vecPerm3 );
 
 		// zero out the last element of each useless vector
@@ -8108,61 +8108,61 @@ void VPCALL arcSIMD_AltiVec::NormalizeTangents( arcDrawVert *verts, const int nu
 		vec1T0 = vec_perm( vec1T0, vec1T0, storeT11 );
 		vec1T1 = vec_perm( vec1T1, vec1T1, storeT12 );
 
-		vec_ste( vec1T0, 0, tAddr + (( i+0 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec1T0, 4, tAddr + (( i+0 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec1T0, 8, tAddr + (( i+0 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec1T1, 12, tAddr + (( i+0 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec1T1, 16, tAddr + (( i+0 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec1T1, 20, tAddr + (( i+0 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec1T0, 0, tAddr + ( ( i+0 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec1T0, 4, tAddr + ( ( i+0 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec1T0, 8, tAddr + ( ( i+0 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec1T1, 12, tAddr + ( ( i+0 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec1T1, 16, tAddr + ( ( i+0 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec1T1, 20, tAddr + ( ( i+0 ) * DRAWVERT_OFFSET ) );
 
 		// store second tangents[0] and tangents[1]
 		vec2T0 = vec_perm( vec2T0, vec2T0, storeT21 );
 		vec2T1 = vec_perm( vec2T1, vec2T1, storeT22 );
 
-		vec_ste( vec2T0, 0, tAddr + (( i+1 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec2T0, 4, tAddr + (( i+1 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec2T0, 8, tAddr + (( i+1 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec2T1, 12, tAddr + (( i+1 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec2T1, 16, tAddr + (( i+1 ) * DRAWVERT_OFFSET ) );
-		vec_ste( vec2T1, 20, tAddr + (( i+1 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec2T0, 0, tAddr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec2T0, 4, tAddr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec2T0, 8, tAddr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec2T1, 12, tAddr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec2T1, 16, tAddr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
+		vec_ste( vec2T1, 20, tAddr + ( ( i+1 ) * DRAWVERT_OFFSET ) );
 
 		// store third tangents[0] and tangents[1]
 		vec3T0 = vec_perm( vec3T0, vec3T0, storeT31 );
 		vec3T1 = vec_perm( vec3T1, vec3T1, storeT32 );
 
-		vec_ste( vec3T0, 0, tAddr + (( i+2) * DRAWVERT_OFFSET ) );
-		vec_ste( vec3T0, 4, tAddr + (( i+2) * DRAWVERT_OFFSET ) );
-		vec_ste( vec3T0, 8, tAddr + (( i+2) * DRAWVERT_OFFSET ) );
-		vec_ste( vec3T1, 12, tAddr + (( i+2) * DRAWVERT_OFFSET ) );
-		vec_ste( vec3T1, 16, tAddr + (( i+2) * DRAWVERT_OFFSET ) );
-		vec_ste( vec3T1, 20, tAddr + (( i+2) * DRAWVERT_OFFSET ) );
+		vec_ste( vec3T0, 0, tAddr + ( ( i+2) * DRAWVERT_OFFSET ) );
+		vec_ste( vec3T0, 4, tAddr + ( ( i+2) * DRAWVERT_OFFSET ) );
+		vec_ste( vec3T0, 8, tAddr + ( ( i+2) * DRAWVERT_OFFSET ) );
+		vec_ste( vec3T1, 12, tAddr + ( ( i+2) * DRAWVERT_OFFSET ) );
+		vec_ste( vec3T1, 16, tAddr + ( ( i+2) * DRAWVERT_OFFSET ) );
+		vec_ste( vec3T1, 20, tAddr + ( ( i+2) * DRAWVERT_OFFSET ) );
 
 		// store fourth tangents[0] and tangents[1]
 		vec4T0 = vec_perm( vec4T0, vec4T0, storeT41 );
 		vec4T1 = vec_perm( vec4T1, vec4T1, storeT42 );
 
-		vec_ste( vec4T0, 0, tAddr + (( i+3) * DRAWVERT_OFFSET ) );
-		vec_ste( vec4T0, 4, tAddr + (( i+3) * DRAWVERT_OFFSET ) );
-		vec_ste( vec4T0, 8, tAddr + (( i+3) * DRAWVERT_OFFSET ) );
-		vec_ste( vec4T1, 12, tAddr + (( i+3) * DRAWVERT_OFFSET ) );
-		vec_ste( vec4T1, 16, tAddr + (( i+3) * DRAWVERT_OFFSET ) );
-		vec_ste( vec4T1, 20, tAddr + (( i+3) * DRAWVERT_OFFSET ) );
+		vec_ste( vec4T0, 0, tAddr + ( ( i+3) * DRAWVERT_OFFSET ) );
+		vec_ste( vec4T0, 4, tAddr + ( ( i+3) * DRAWVERT_OFFSET ) );
+		vec_ste( vec4T0, 8, tAddr + ( ( i+3) * DRAWVERT_OFFSET ) );
+		vec_ste( vec4T1, 12, tAddr + ( ( i+3) * DRAWVERT_OFFSET ) );
+		vec_ste( vec4T1, 16, tAddr + ( ( i+3) * DRAWVERT_OFFSET ) );
+		vec_ste( vec4T1, 20, tAddr + ( ( i+3) * DRAWVERT_OFFSET ) );
 	}
 
 	// cleanup
 	for (; i < numVerts; i++ ) {
-		arcVec3 &v = verts[i].normal;
+		anVec3 &v = verts[i].normal;
 		float f;
 
-		//f = arcMath::RSqrt( v.x * v.x + v.y * v.y + v.z * v.z );
+		//f = anMath::RSqrt( v.x * v.x + v.y * v.y + v.z * v.z );
 		f = FastScalarInvSqrt( v.x * v.x + v.y * v.y + v.z * v.z );
 		v.x *= f; v.y *= f; v.z *= f;
 
 		for ( int j = 0; j < 2; j++ ) {
-			arcVec3 &t = verts[i].tangents[j];
+			anVec3 &t = verts[i].tangents[j];
 
 			t -= ( t * v ) * v;
-		//	f = arcMath::RSqrt( t.x * t.x + t.y * t.y + t.z * t.z );
+		//	f = anMath::RSqrt( t.x * t.x + t.y * t.y + t.z * t.z );
 			f = FastScalarInvSqrt( t.x * t.x + t.y * t.y + t.z * t.z );
 			t.x *= f; t.y *= f; t.z *= f;
 		}
@@ -8182,7 +8182,7 @@ arcSIMD_AltiVec::CreateTextureSpaceLightVectors
 ============
 */
 
-void VPCALL arcSIMD_AltiVec::CreateTextureSpaceLightVectors( arcVec3 *lightVectors, const arcVec3 &lightOrigin, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL arcSIMD_AltiVec::CreateTextureSpaceLightVectors( anVec3 *lightVectors, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
 	memset( used, 0, numVerts * sizeof( used[0] ) );
@@ -8205,12 +8205,12 @@ void VPCALL arcSIMD_AltiVec::CreateTextureSpaceLightVectors( arcVec3 *lightVecto
 
 	for ( i = 0; i+1 < numVerts; i+=2 ) {
 
-		const arcDrawVert *v = &verts[i];
-		const arcDrawVert *v2 = &verts[i+1];
+		const anDrawVertex *v = &verts[i];
+		const anDrawVertex *v2 = &verts[i+1];
 
 		float x, y, z;
 		float x2, y2, z2;
-		arcVec3 lightDir, lightDir2;
+		anVec3 lightDir, lightDir2;
 
 		lightDir[0] = lightOrigin[0] - v->xyz[0];
 		lightDir[1] = lightOrigin[1] - v->xyz[1];
@@ -8247,8 +8247,8 @@ void VPCALL arcSIMD_AltiVec::CreateTextureSpaceLightVectors( arcVec3 *lightVecto
 			continue;
 		}
 
-		const arcDrawVert *v = &verts[i];
-		arcVec3 lightDir;
+		const anDrawVertex *v = &verts[i];
+		anVec3 lightDir;
 
 		lightDir[0] = lightOrigin[0] - v->xyz[0];
 		lightDir[1] = lightOrigin[1] - v->xyz[1];
@@ -8271,7 +8271,7 @@ arcSIMD_AltiVec::CreateSpecularTextureCoords
 	The texture coordinates are only calculated for the vertices referenced by the indexes.
 ============
 */
-void VPCALL arcSIMD_AltiVec::CreateSpecularTextureCoords( arcVec4 *texCoords, const arcVec3 &lightOrigin, const arcVec3 &viewOrigin, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL arcSIMD_AltiVec::CreateSpecularTextureCoords( anVec4 *texCoords, const anVec3 &lightOrigin, const anVec3 &viewOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
 	memset( used, 0, numVerts * sizeof( used[0] ) );
@@ -8519,7 +8519,7 @@ void VPCALL arcSIMD_AltiVec::CreateSpecularTextureCoords( arcVec4 *texCoords, co
 arcSIMD_AltiVec::CreateShadowCache
 ============
 */
-int VPCALL arcSIMD_AltiVec::CreateShadowCache( arcVec4 *vertexCache, int *vertRemap, const arcVec3 &lightOrigin, const arcDrawVert *verts, const int numVerts ) {
+int VPCALL arcSIMD_AltiVec::CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) {
 	int outVerts = 0;
 	int i = 0;
 
@@ -8665,7 +8665,7 @@ int VPCALL arcSIMD_AltiVec::CreateShadowCache( arcVec4 *vertexCache, int *vertRe
 arcSIMD_AltiVec::CreateShadowCache
 ============
 */
-int VPCALL arcSIMD_AltiVec::CreateShadowCache( arcVec4 *vertexCache, int *vertRemap, const arcVec3 &lightOrigin, const arcDrawVert *verts, const int numVerts ) {
+int VPCALL arcSIMD_AltiVec::CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) {
 	int outVerts = 0;
 	int i = 0;
 
@@ -8811,14 +8811,14 @@ int VPCALL arcSIMD_AltiVec::CreateShadowCache( arcVec4 *vertexCache, int *vertRe
 arcSIMD_AltiVec::CreateVertexProgramShadowCache
 ============
 */
-int VPCALL arcSIMD_AltiVec::CreateVertexProgramShadowCache( arcVec4 *vertexCache, const arcDrawVert *verts, const int numVerts ) {
+int VPCALL arcSIMD_AltiVec::CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) {
 
 	// vertexCache aligned
 	assert( IS_16BYTE_ALIGNED( vertexCache[0] ) );
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
-	// arcVec4 size
-	assert( sizeof(arcVec4) == IDVEC4_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anVec4 size
+	assert( sizeof(anVec4) == IDVEC4_OFFSET * sizeof( float ) );
 
 	register vector float v0, v1, v2, v3, v4, v5, v6, v7;
 	register vector float zeroVector = (vector float)(0.0 );
@@ -8903,12 +8903,12 @@ int VPCALL arcSIMD_AltiVec::CreateVertexProgramShadowCache( arcVec4 *vertexCache
 arcSIMD_AltiVec::CreateVertexProgramShadowCache
 ============
 */
-int VPCALL arcSIMD_AltiVec::CreateVertexProgramShadowCache( arcVec4 *vertexCache, const arcDrawVert *verts, const int numVerts ) {
+int VPCALL arcSIMD_AltiVec::CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) {
 
-	// arcDrawVert size
-	assert( sizeof(arcDrawVert) == DRAWVERT_OFFSET * sizeof( float ) );
-	// arcVec4 size
-	assert( sizeof(arcVec4) == IDVEC4_OFFSET * sizeof( float ) );
+	// anDrawVertex size
+	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
+	// anVec4 size
+	assert( sizeof(anVec4) == IDVEC4_OFFSET * sizeof( float ) );
 
 	register vector float v0, v1, v2, v3, v4, v5, v6, v7;
 	register vector float zeroVector = (vector float)(0.0 );
@@ -11120,7 +11120,7 @@ void VPCALL arcSIMD_AltiVec::MixedSoundToSamples( short *samples, const float *m
 
     //unaligned at start, since samples is not 16-byte aligned
     for (;  NOT_16BYTE_ALIGNED( samples[i] ) && ( i < numSamples ); i++ ) {
-		samples[i] = mixBuffer[i] <= -32768.0f ? -32768 : mixBuffer[i] >= 32767.0f ? 32767 : (short) mixBuffer[i];
+		samples[i] = mixBuffer[i] <= -32768.0f ? -32768 : mixBuffer[i] >= 32767.0f ? 32767 : ( short) mixBuffer[i];
     }
 
     constVec = (vector float)(65536.0f);
@@ -11172,7 +11172,7 @@ void VPCALL arcSIMD_AltiVec::MixedSoundToSamples( short *samples, const float *m
 
     //handle cleanup
     for (; i < numSamples; i++ ) {
-		samples[i] = mixBuffer[i] <= -32768.0f ? -32768 : mixBuffer[i] >= 32767.0f ? 32767 : (short) mixBuffer[i];
+		samples[i] = mixBuffer[i] <= -32768.0f ? -32768 : mixBuffer[i] >= 32767.0f ? 32767 : ( short) mixBuffer[i];
     }
 }
 #endif /* ENABLE_SOUND_ROUTINES */

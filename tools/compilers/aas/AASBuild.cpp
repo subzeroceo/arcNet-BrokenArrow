@@ -1,32 +1,4 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "AASBuild_local.h"
@@ -35,44 +7,44 @@ If you have questions concerning this license or the applicable additional terms
 
 //===============================================================
 //
-//	idAASBuild
+//	anSEASBuild
 //
 //===============================================================
 
 /*
 ============
-idAASBuild::idAASBuild
+anSEASBuild::anSEASBuild
 ============
 */
-idAASBuild::idAASBuild( void ) {
-	file = NULL;
-	procNodes = NULL;
+anSEASBuild::anSEASBuild( void ) {
+	file = nullptr;
+	procNodes = nullptr;
 	numProcNodes = 0;
 	numGravitationalSubdivisions = 0;
 	numMergedLeafNodes = 0;
 	numLedgeSubdivisions = 0;
-	ledgeMap = NULL;
+	ledgeMap = nullptr;
 }
 
 /*
 ============
-idAASBuild::~idAASBuild
+anSEASBuild::~anSEASBuild
 ============
 */
-idAASBuild::~idAASBuild( void ) {
+anSEASBuild::~anSEASBuild( void ) {
 	Shutdown();
 }
 
 /*
 ================
-idAASBuild::Shutdown
+anSEASBuild::Shutdown
 ================
 */
-void idAASBuild::Shutdown( void ) {
-	aasSettings = NULL;
+void anSEASBuild::Shutdown( void ) {
+	aasSettings = nullptr;
 	if ( file ) {
 		delete file;
-		file = NULL;
+		file = nullptr;
 	}
 	DeleteProcBSP();
 	numGravitationalSubdivisions = 0;
@@ -81,30 +53,30 @@ void idAASBuild::Shutdown( void ) {
 	ledgeList.Clear();
 	if ( ledgeMap ) {
 		delete ledgeMap;
-		ledgeMap = NULL;
+		ledgeMap = nullptr;
 	}
 }
 
 /*
 ================
-idAASBuild::ParseProcNodes
+anSEASBuild::ParseProcNodes
 ================
 */
-void idAASBuild::ParseProcNodes( arcLexer *src ) {
+void anSEASBuild::ParseProcNodes( anLexer *src ) {
 	int i;
 
 	src->ExpectTokenString( "{" );
 
-	idAASBuild::numProcNodes = src->ParseInt();
-	if ( idAASBuild::numProcNodes < 0 ) {
-		src->Error( "idAASBuild::ParseProcNodes: bad numProcNodes" );
+	anSEASBuild::numProcNodes = src->ParseInt();
+	if ( anSEASBuild::numProcNodes < 0 ) {
+		src->Error( "anSEASBuild::ParseProcNodes: bad numProcNodes" );
 	}
-	idAASBuild::procNodes = (aasProcNode_t *)Mem_ClearedAlloc( idAASBuild::numProcNodes * sizeof( aasProcNode_t ) );
+	anSEASBuild::procNodes = (aasProcNode_t *)Mem_ClearedAlloc( anSEASBuild::numProcNodes * sizeof( aasProcNode_t ) );
 
-	for ( i = 0; i < idAASBuild::numProcNodes; i++ ) {
+	for ( i = 0; i < anSEASBuild::numProcNodes; i++ ) {
 		aasProcNode_t *node;
 
-		node = &(idAASBuild::procNodes[i] );
+		node = &(anSEASBuild::procNodes[i] );
 
 		src->Parse1DMatrix( 4, node->plane.ToFloatPtr() );
 		node->children[0] = src->ParseInt();
@@ -116,20 +88,20 @@ void idAASBuild::ParseProcNodes( arcLexer *src ) {
 
 /*
 ================
-idAASBuild::LoadProcBSP
+anSEASBuild::LoadProcBSP
 ================
 */
-bool idAASBuild::LoadProcBSP( const char *name, ARC_TIME_T minFileTime ) {
-	arcNetString fileName;
-	arcNetToken token;
-	arcLexer *src;
+bool anSEASBuild::LoadProcBSP( const char *name, ARC_TIME_T minFileTime ) {
+	anString fileName;
+	anToken token;
+	anLexer *src;
 
 	// load it
 	fileName = name;
 	fileName.SetFileExtension( PROC_FILE_EXT );
-	src = new arcLexer( fileName, LEXFL_NOSTRINGCONCAT | LEXFL_NODOLLARPRECOMPILE );
+	src = new anLexer( fileName, LEXFL_NOSTRINGCONCAT | LEXFL_NODOLLARPRECOMPILE );
 	if ( !src->IsLoaded() ) {
-		common->Warning( "idAASBuild::LoadProcBSP: couldn't load %s", fileName.c_str() );
+		common->Warning( "anSEASBuild::LoadProcBSP: couldn't load %s", fileName.c_str() );
 		delete src;
 		return false;
 	}
@@ -141,7 +113,7 @@ bool idAASBuild::LoadProcBSP( const char *name, ARC_TIME_T minFileTime ) {
 	}
 
 	if ( !src->ReadToken( &token ) || token.Icmp( PROC_FILE_ID ) ) {
-		common->Warning( "idAASBuild::LoadProcBSP: bad id '%s' instead of '%s'", token.c_str(), PROC_FILE_ID );
+		common->Warning( "anSEASBuild::LoadProcBSP: bad id '%s' instead of '%s'", token.c_str(), PROC_FILE_ID );
 		delete src;
 		return false;
 	}
@@ -168,11 +140,11 @@ bool idAASBuild::LoadProcBSP( const char *name, ARC_TIME_T minFileTime ) {
 		}
 
 		if ( token == "nodes" ) {
-			idAASBuild::ParseProcNodes( src );
+			anSEASBuild::ParseProcNodes( src );
 			break;
 		}
 
-		src->Error( "idAASBuild::LoadProcBSP: bad token \"%s\"", token.c_str() );
+		src->Error( "anSEASBuild::LoadProcBSP: bad token \"%s\"", token.c_str() );
 	}
 
 	delete src;
@@ -182,30 +154,30 @@ bool idAASBuild::LoadProcBSP( const char *name, ARC_TIME_T minFileTime ) {
 
 /*
 ============
-idAASBuild::DeleteProcBSP
+anSEASBuild::DeleteProcBSP
 ============
 */
-void idAASBuild::DeleteProcBSP( void ) {
+void anSEASBuild::DeleteProcBSP( void ) {
 	if ( procNodes ) {
 		Mem_Free( procNodes );
-		procNodes = NULL;
+		procNodes = nullptr;
 	}
 	numProcNodes = 0;
 }
 
 /*
 ============
-idAASBuild::ChoppedAwayByProcBSP
+anSEASBuild::ChoppedAwayByProcBSP
 ============
 */
-bool idAASBuild::ChoppedAwayByProcBSP( int nodeNum, arcFixedWinding *w, const arcVec3 &normal, const arcVec3 &origin, const float radius ) {
+bool anSEASBuild::ChoppedAwayByProcBSP( int nodeNum, anFixedWinding *w, const anVec3 &normal, const anVec3 &origin, const float radius ) {
 	int res;
-	arcFixedWinding back;
+	anFixedWinding back;
 	aasProcNode_t *node;
 	float dist;
 
 	do {
-		node = idAASBuild::procNodes + nodeNum;
+		node = anSEASBuild::procNodes + nodeNum;
 		dist = node->plane.Normal() * origin + node->plane[3];
 		if ( dist > radius ) {
 			res = SIDE_FRONT;
@@ -238,7 +210,7 @@ bool idAASBuild::ChoppedAwayByProcBSP( int nodeNum, arcFixedWinding *w, const ar
 			}
 			// only recurse if the node is not solid
 			if ( node->children[1] > 0 ) {
-				if ( !idAASBuild::ChoppedAwayByProcBSP( node->children[1], &back, normal, origin, radius ) ) {
+				if ( !anSEASBuild::ChoppedAwayByProcBSP( node->children[1], &back, normal, origin, radius ) ) {
 					return false;
 				}
 			}
@@ -253,19 +225,19 @@ bool idAASBuild::ChoppedAwayByProcBSP( int nodeNum, arcFixedWinding *w, const ar
 
 /*
 ============
-idAASBuild::ClipBrushSidesWithProcBSP
+anSEASBuild::ClipBrushSidesWithProcBSP
 ============
 */
-void idAASBuild::ClipBrushSidesWithProcBSP( idBrushList &brushList ) {
+void anSEASBuild::ClipBrushSidesWithProcBSP( idBrushList &brushList ) {
 	int i, clippedSides;
 	idBrush *brush;
-	arcFixedWinding neww;
-	arcBounds bounds;
+	anFixedWinding neww;
+	anBounds bounds;
 	float radius;
-	arcVec3 origin;
+	anVec3 origin;
 
 	// if the .proc file has no BSP tree
-	if ( idAASBuild::procNodes == NULL ) {
+	if ( anSEASBuild::procNodes == nullptr ) {
 		return;
 	}
 
@@ -296,13 +268,13 @@ void idAASBuild::ClipBrushSidesWithProcBSP( idBrushList &brushList ) {
 
 /*
 ============
-idAASBuild::ContentsForAAS
+anSEASBuild::ContentsForAAS
 ============
 */
-int idAASBuild::ContentsForAAS( int contents ) {
+int anSEASBuild::ContentsForAAS( int contents ) {
 	int c;
 
-	if ( contents & ( CONTENTS_SOLID|CONTENTS_AAS_SOLID|CONTENTS_MONSTERCLIP ) ) {
+	if ( contents & ( CONTENTS_SOLID|CONTENTS_SOLID_SEAS|CONTENTS_MONSTERCLIP ) ) {
 		return AREACONTENTS_SOLID;
 	}
 	c = 0;
@@ -312,7 +284,7 @@ int idAASBuild::ContentsForAAS( int contents ) {
 	if ( contents & CONTENTS_AREAPORTAL ) {
 		c |= AREACONTENTS_CLUSTERPORTAL;
 	}
-	if ( contents & CONTENTS_AAS_OBSTACLE ) {
+	if ( contents & CONTENTS_OBSTACLE_SEAS ) {
 		c |= AREACONTENTS_OBSTACLE;
 	}
 	return c;
@@ -320,16 +292,16 @@ int idAASBuild::ContentsForAAS( int contents ) {
 
 /*
 ============
-idAASBuild::AddBrushForMapBrush
+anSEASBuild::AddBrushForMapBrush
 ============
 */
-idBrushList idAASBuild::AddBrushesForMapBrush( const idMapBrush *mapBrush, const arcVec3 &origin, const arcMat3 &axis, int entityNum, int primitiveNum, idBrushList brushList ) {
+idBrushList anSEASBuild::AddBrushesForMapBrush( const anMapBrush *mapBrush, const anVec3 &origin, const anMat3 &axis, int entityNum, int primitiveNum, idBrushList brushList ) {
 	int contents, i;
-	idMapBrushSide *mapSide;
-	const arcMaterial *mat;
-	arcNetList<idBrushSide *> sideList;
+	anMapBrushSides *mapSide;
+	const anMaterial *mat;
+	anList<idBrushSide *> sideList;
 	idBrush *brush;
-	arcPlane plane;
+	anPlane plane;
 
 	contents = 0;
 	for ( i = 0; i < mapBrush->GetNumSides(); i++ ) {
@@ -368,19 +340,19 @@ idBrushList idAASBuild::AddBrushesForMapBrush( const idMapBrush *mapBrush, const
 
 /*
 ============
-idAASBuild::AddBrushesForPatch
+anSEASBuild::AddBrushesForPatch
 ============
 */
-idBrushList idAASBuild::AddBrushesForMapPatch( const idMapPatch *mapPatch, const arcVec3 &origin, const arcMat3 &axis, int entityNum, int primitiveNum, idBrushList brushList ) {
+idBrushList anSEASBuild::AddBrushesForMapPatch( const anMapPatch *mapPatch, const anVec3 &origin, const anMat3 &axis, int entityNum, int primitiveNum, idBrushList brushList ) {
 	int i, j, contents, validBrushes;
 	float dot;
 	int v1, v2, v3, v4;
-	arcFixedWinding w;
-	arcPlane plane;
-	arcVec3 d1, d2;
+	anFixedWinding w;
+	anPlane plane;
+	anVec3 d1, d2;
 	idBrush *brush;
-	arcSurface_Patch mesh;
-	const arcMaterial *mat;
+	anSurface_Patch mesh;
+	const anMaterial *mat;
 
 	mat = declManager->FindMaterial( mapPatch->GetMaterial() );
 	contents = ContentsForAAS( mat->GetContentFlags() );
@@ -389,7 +361,7 @@ idBrushList idAASBuild::AddBrushesForMapPatch( const idMapPatch *mapPatch, const
 		return brushList;
 	}
 
-	mesh = arcSurface_Patch( *mapPatch );
+	mesh = anSurface_Patch( *mapPatch );
 
 	// if the patch has an explicit number of subdivisions use it to avoid cracks
 	if ( mapPatch->GetExplicitlySubdivided() ) {
@@ -415,7 +387,7 @@ idBrushList idAASBuild::AddBrushesForMapPatch( const idMapPatch *mapPatch, const
 				plane.FitThroughPoint( mesh[v1].xyz );
 				dot = plane.Distance( mesh[v4].xyz );
 				// if we can turn it into a quad
-				if ( arcMath::Fabs(dot) < 0.1f ) {
+				if ( anMath::Fabs(dot) < 0.1f ) {
 					w.Clear();
 					w += mesh[v1].xyz;
 					w += mesh[v2].xyz;
@@ -497,13 +469,13 @@ idBrushList idAASBuild::AddBrushesForMapPatch( const idMapPatch *mapPatch, const
 
 /*
 ============
-idAASBuild::AddBrushesForMapEntity
+anSEASBuild::AddBrushesForMapEntity
 ============
 */
-idBrushList idAASBuild::AddBrushesForMapEntity( const idMapEntity *mapEnt, int entityNum, idBrushList brushList ) {
+idBrushList anSEASBuild::AddBrushesForMapEntity( const anMapEntity *mapEnt, int entityNum, idBrushList brushList ) {
 	int i;
-	arcVec3 origin;
-	arcMat3 axis;
+	anVec3 origin;
+	anMat3 axis;
 
 	if ( mapEnt->GetNumPrimitives() < 1 ) {
 		return brushList;
@@ -513,23 +485,23 @@ idBrushList idAASBuild::AddBrushesForMapEntity( const idMapEntity *mapEnt, int e
 	if ( !mapEnt->epairs.GetMatrix( "rotation", "1 0 0 0 1 0 0 0 1", axis ) ) {
 		float angle = mapEnt->epairs.GetFloat( "angle" );
 		if ( angle != 0.0f ) {
-			axis = arcAngles( 0.0f, angle, 0.0f ).ToMat3();
+			axis = anAngles( 0.0f, angle, 0.0f ).ToMat3();
 		} else {
 			axis.Identity();
 		}
 	}
 
 	for ( i = 0; i < mapEnt->GetNumPrimitives(); i++ ) {
-		idMapPrimitive	*mapPrim;
+		anMapPrimitiveitive	*mapPrim;
 
 		mapPrim = mapEnt->GetPrimitive( i );
-		if ( mapPrim->GetType() == idMapPrimitive::TYPE_BRUSH ) {
-			brushList = AddBrushesForMapBrush( static_cast<idMapBrush*>(mapPrim), origin, axis, entityNum, i, brushList );
+		if ( mapPrim->GetType() == anMapPrimitiveitive::TYPE_BRUSH ) {
+			brushList = AddBrushesForMapBrush( static_cast<anMapBrush*>(mapPrim), origin, axis, entityNum, i, brushList );
 			continue;
 		}
-		if ( mapPrim->GetType() == idMapPrimitive::TYPE_PATCH ) {
+		if ( mapPrim->GetType() == anMapPrimitiveitive::TYPE_PATCH ) {
 			if ( aasSettings->usePatches ) {
-				brushList = AddBrushesForMapPatch( static_cast<idMapPatch*>(mapPrim), origin, axis, entityNum, i, brushList );
+				brushList = AddBrushesForMapPatch( static_cast<anMapPatch*>(mapPrim), origin, axis, entityNum, i, brushList );
 			}
 			continue;
 		}
@@ -540,10 +512,10 @@ idBrushList idAASBuild::AddBrushesForMapEntity( const idMapEntity *mapEnt, int e
 
 /*
 ============
-idAASBuild::AddBrushesForMapFile
+anSEASBuild::AddBrushesForMapFile
 ============
 */
-idBrushList idAASBuild::AddBrushesForMapFile( const idMapFile * mapFile, idBrushList brushList ) {
+idBrushList anSEASBuild::AddBrushesForMapFile( const anMapFile * mapFile, idBrushList brushList ) {
 	int i;
 
 	common->Printf( "[Brush Load]\n" );
@@ -553,7 +525,7 @@ idBrushList idAASBuild::AddBrushesForMapFile( const idMapFile * mapFile, idBrush
 	for ( i = 1; i < mapFile->GetNumEntities(); i++ ) {
 		const char *classname = mapFile->GetEntity( i )->epairs.GetString( "classname" );
 
-		if ( arcNetString::Icmp( classname, "func_aas_obstacle" ) == 0 ) {
+		if ( anString::Icmp( classname, "func_aas_obstacle" ) == 0 ) {
 			brushList = AddBrushesForMapEntity( mapFile->GetEntity( i ), i, brushList );
 		}
 	}
@@ -565,12 +537,12 @@ idBrushList idAASBuild::AddBrushesForMapFile( const idMapFile * mapFile, idBrush
 
 /*
 ============
-idAASBuild::CheckForEntities
+anSEASBuild::CheckForEntities
 ============
 */
-bool idAASBuild::CheckForEntities( const idMapFile *mapFile, arcStringList &entityClassNames ) const {
+bool anSEASBuild::CheckForEntities( const anMapFile *mapFile, anStringList &entityClassNames ) const {
 	int		i;
-	arcNetString	classname;
+	anString	classname;
 
 	com_editors |= EDITOR_AAS;
 
@@ -618,10 +590,10 @@ bool ExpandedMergeAllowed( idBrush *b1, idBrush *b2 ) {
 
 /*
 ============
-idAASBuild::ChangeMultipleBoundingBoxContents
+anSEASBuild::ChangeMultipleBoundingBoxContents
 ============
 */
-void idAASBuild::ChangeMultipleBoundingBoxContents_r( idBrushBSPNode *node, int mask ) {
+void anSEASBuild::ChangeMultipleBoundingBoxContents_r( idBrushBSPNode *node, int mask ) {
 	while( node ) {
 		if ( !( node->GetContents() & mask ) ) {
 			node->SetContents( node->GetContents() & ~AREACONTENTS_SOLID );
@@ -633,20 +605,20 @@ void idAASBuild::ChangeMultipleBoundingBoxContents_r( idBrushBSPNode *node, int 
 
 /*
 ============
-idAASBuild::Build
+anSEASBuild::Build
 ============
 */
-bool idAASBuild::Build( const arcNetString &fileName, const idAASSettings *settings ) {
+bool anSEASBuild::Build( const anString &fileName, const anSEASSettings *settings ) {
 	int i, bit, mask, startTime;
-	idMapFile * mapFile;
+	anMapFile * mapFile;
 	idBrushList brushList;
-	arcNetList<idBrushList*> expandedBrushes;
+	anList<idBrushList*> expandedBrushes;
 	idBrush *b;
 	idBrushBSP bsp;
-	arcNetString name;
-	idAASReach reach;
-	idAASCluster cluster;
-	arcStringList entityClassNames;
+	anString name;
+	anSEASReach reach;
+	anSEASCluster cluster;
+	anStringList entityClassNames;
 
 	startTime = Sys_Milliseconds();
 
@@ -657,7 +629,7 @@ bool idAASBuild::Build( const arcNetString &fileName, const idAASSettings *setti
 	name = fileName;
 	name.SetFileExtension( "map" );
 
-	mapFile = new idMapFile;
+	mapFile = new anMapFile;
 	if ( !mapFile->Parse( name ) ) {
 		delete mapFile;
 		common->Error( "Couldn't load map file: '%s'", name.c_str() );
@@ -788,15 +760,15 @@ bool idAASBuild::Build( const arcNetString &fileName, const idAASSettings *setti
 
 /*
 ============
-idAASBuild::BuildReachability
+anSEASBuild::BuildReachability
 ============
 */
-bool idAASBuild::BuildReachability( const arcNetString &fileName, const idAASSettings *settings ) {
+bool anSEASBuild::BuildReachability( const anString &fileName, const anSEASSettings *settings ) {
 	int startTime;
-	idMapFile * mapFile;
-	arcNetString name;
-	idAASReach reach;
-	idAASCluster cluster;
+	anMapFile * mapFile;
+	anString name;
+	anSEASReach reach;
+	anSEASCluster cluster;
 
 	startTime = Sys_Milliseconds();
 
@@ -805,14 +777,14 @@ bool idAASBuild::BuildReachability( const arcNetString &fileName, const idAASSet
 	name = fileName;
 	name.SetFileExtension( "map" );
 
-	mapFile = new idMapFile;
+	mapFile = new anMapFile;
 	if ( !mapFile->Parse( name ) ) {
 		delete mapFile;
 		common->Error( "Couldn't load map file: '%s'", name.c_str() );
 		return false;
 	}
 
-	file = new idAASFileLocal();
+	file = new anSEASFileLocal();
 
 	name.SetFileExtension( aasSettings->fileExtension );
 	if ( !file->Load( name, 0 ) ) {
@@ -845,9 +817,9 @@ bool idAASBuild::BuildReachability( const arcNetString &fileName, const idAASSet
 ParseOptions
 ============
 */
-int ParseOptions( const arcCommandArgs &args, idAASSettings &settings ) {
+int ParseOptions( const anCommandArgs &args, anSEASSettings &settings ) {
 	int i;
-	arcNetString str;
+	anString str;
 
 	for ( i = 1; i < args.Argc(); i++ ) {
 
@@ -876,11 +848,11 @@ int ParseOptions( const arcCommandArgs &args, idAASSettings &settings ) {
 RunAAS_f
 ============
 */
-void RunAAS_f( const arcCommandArgs &args ) {
+void RunAAS_f( const anCommandArgs &args ) {
 	int i;
-	idAASBuild aas;
-	idAASSettings settings;
-	arcNetString mapName;
+	anSEASBuild aas;
+	anSEASSettings settings;
+	anString mapName;
 
 	if ( args.Argc() <= 1 ) {
 		common->Printf( "runAAS [options] <mapfile>\n"
@@ -896,14 +868,14 @@ void RunAAS_f( const arcCommandArgs &args ) {
 	common->SetRefreshOnPrint( true );
 
 	// get the aas settings definitions
-	const arcDictionary *dict = engineEdit->FindEntityDefDict( "aas_types", false );
+	const anDict *dict = engineEdit->FindEntityDefDict( "aas_types", false );
 	if ( !dict ) {
 		common->Error( "Unable to find entityDef for 'aas_types'" );
 	}
 
-	const idKeyValue *kv = dict->MatchPrefix( "type" );
-	while( kv != NULL ) {
-		const arcDictionary *settingsDict = engineEdit->FindEntityDefDict( kv->GetValue(), false );
+	const anKeyValue *kv = dict->MatchPrefix( "type" );
+	while( kv != nullptr ) {
+		const anDict *settingsDict = engineEdit->FindEntityDefDict( kv->GetValue(), false );
 		if ( !settingsDict ) {
 			common->Warning( "Unable to find '%s' in def/aas.def", kv->GetValue().c_str() );
 		} else {
@@ -931,11 +903,11 @@ void RunAAS_f( const arcCommandArgs &args ) {
 RunAASDir_f
 ============
 */
-void RunAASDir_f( const arcCommandArgs &args ) {
+void RunAASDir_f( const anCommandArgs &args ) {
 	int i;
-	idAASBuild aas;
-	idAASSettings settings;
-	arcFileList *mapFiles;
+	anSEASBuild aas;
+	anSEASSettings settings;
+	anFileList *mapFiles;
 
 	if ( args.Argc() <= 1 ) {
 		common->Printf( "runAASDir <folder>\n" );
@@ -947,13 +919,13 @@ void RunAASDir_f( const arcCommandArgs &args ) {
 	common->SetRefreshOnPrint( true );
 
 	// get the aas settings definitions
-	const arcDictionary *dict = engineEdit->FindEntityDefDict( "aas_types", false );
+	const anDict *dict = engineEdit->FindEntityDefDict( "aas_types", false );
 	if ( !dict ) {
 		common->Error( "Unable to find entityDef for 'aas_types'" );
 	}
 
 	// scan for .map files
-	mapFiles = fileSystem->ListFiles( arcNetString( "maps/" ) + args.Argv(1 ), ".map" );
+	mapFiles = fileSystem->ListFiles( anString( "maps/" ) + args.Argv(1 ), ".map" );
 
 	// create AAS files for all the .map files
 	for ( i = 0; i < mapFiles->GetNumFiles(); i++ ) {
@@ -961,14 +933,14 @@ void RunAASDir_f( const arcCommandArgs &args ) {
 			common->Printf( "=======================================================\n" );
 		}
 
-		const idKeyValue *kv = dict->MatchPrefix( "type" );
-		while( kv != NULL ) {
-			const arcDictionary *settingsDict = engineEdit->FindEntityDefDict( kv->GetValue(), false );
+		const anKeyValue *kv = dict->MatchPrefix( "type" );
+		while( kv != nullptr ) {
+			const anDict *settingsDict = engineEdit->FindEntityDefDict( kv->GetValue(), false );
 			if ( !settingsDict ) {
 				common->Warning( "Unable to find '%s' in def/aas.def", kv->GetValue().c_str() );
 			} else {
 				settings.FromDict( kv->GetValue(), settingsDict );
-				aas.Build( arcNetString( "maps/" ) + args.Argv( 1 ) + "/" + mapFiles->GetFile( i ), &settings );
+				aas.Build( anString( "maps/" ) + args.Argv( 1 ) + "/" + mapFiles->GetFile( i ), &settings );
 			}
 
 			kv = dict->MatchPrefix( "type", kv );
@@ -989,10 +961,10 @@ void RunAASDir_f( const arcCommandArgs &args ) {
 RunReach_f
 ============
 */
-void RunReach_f( const arcCommandArgs &args ) {
+void RunReach_f( const anCommandArgs &args ) {
 	int i;
-	idAASBuild aas;
-	idAASSettings settings;
+	anSEASBuild aas;
+	anSEASSettings settings;
 
 	if ( args.Argc() <= 1 ) {
 		common->Printf( "runReach [options] <mapfile>\n" );
@@ -1004,20 +976,20 @@ void RunReach_f( const arcCommandArgs &args ) {
 	common->SetRefreshOnPrint( true );
 
 	// get the aas settings definitions
-	const arcDictionary *dict = engineEdit->FindEntityDefDict( "aas_types", false );
+	const anDict *dict = engineEdit->FindEntityDefDict( "aas_types", false );
 	if ( !dict ) {
 		common->Error( "Unable to find entityDef for 'aas_types'" );
 	}
 
-	const idKeyValue *kv = dict->MatchPrefix( "type" );
-	while( kv != NULL ) {
-		const arcDictionary *settingsDict = engineEdit->FindEntityDefDict( kv->GetValue(), false );
+	const anKeyValue *kv = dict->MatchPrefix( "type" );
+	while( kv != nullptr ) {
+		const anDict *settingsDict = engineEdit->FindEntityDefDict( kv->GetValue(), false );
 		if ( !settingsDict ) {
 			common->Warning( "Unable to find '%s' in def/aas.def", kv->GetValue().c_str() );
 		} else {
 			settings.FromDict( kv->GetValue(), settingsDict );
 			i = ParseOptions( args, settings );
-			aas.BuildReachability( arcNetString( "maps/" ) + args.Argv( i ), &settings );
+			aas.BuildReachability( anString( "maps/" ) + args.Argv( i ), &settings );
 		}
 
 		kv = dict->MatchPrefix( "type", kv );

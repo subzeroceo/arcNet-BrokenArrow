@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -11,7 +11,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-CCapDialog::CCapDialog(CWnd* pParent /*=NULL*/) : CDialog(CCapDialog::IDD, pParent) {
+CCapDialog::CCapDialog(CWnd* pParent /*=nullptr*/) : CDialog(CCapDialog::IDD, pParent) {
 	m_nCap = 0;
 }
 

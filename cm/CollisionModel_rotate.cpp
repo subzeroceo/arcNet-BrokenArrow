@@ -7,7 +7,7 @@
 ===============================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "CollisionModel_local.h"
@@ -33,9 +33,9 @@ CM_RotatePoint
   rotates a point about an arbitrary axis using the tangent of half the rotation angle
 ================
 */
-void CM_RotatePoint( arcVec3 &point, const arcVec3 &origin, const arcVec3 &axis, const float tanHalfAngle ) {
+void CM_RotatePoint( anVec3 &point, const anVec3 &origin, const anVec3 &axis, const float tanHalfAngle ) {
 	double d, t, s, c;
-	arcVec3 proj, v1, v2;
+	anVec3 proj, v1, v2;
 
 	point -= origin;
 	proj = axis * ( point * axis );
@@ -60,9 +60,9 @@ CM_RotateEdge
   rotates an edge about an arbitrary axis using the tangent of half the rotation angle
 ================
 */
-void CM_RotateEdge( arcVec3 &start, arcVec3 &end, const arcVec3 &origin, const arcVec3 &axis, const float tanHalfAngle ) {
+void CM_RotateEdge( anVec3 &start, anVec3 &end, const anVec3 &origin, const anVec3 &axis, const float tanHalfAngle ) {
 	double d, t, s, c;
-	arcVec3 proj, v1, v2;
+	anVec3 proj, v1, v2;
 
 	// r = tan( a / 2 );
 	// sin(a) = 2*r/(1+r*r);
@@ -87,18 +87,18 @@ void CM_RotateEdge( arcVec3 &start, arcVec3 &end, const arcVec3 &origin, const a
 
 /*
 ================
-arcCollisionModelManagerLocal::CollisionBetweenEdgeBounds
+anSoftBodiesPhysicsManager::CollisionBetweenEdgeBounds
 
   verifies if the collision of two edges occurs between the edge bounds
   also calculates the collision point and collision plane normal if the collision occurs between the bounds
 ================
 */
-int arcCollisionModelManagerLocal::CollisionBetweenEdgeBounds( cm_traceWork_t *tw, const arcVec3 &va, const arcVec3 &vb,
-												   const arcVec3 &vc, const arcVec3 &vd, float tanHalfAngle,
-												   arcVec3 &collisionPoint, arcVec3 &collisionNormal ) {
+int anSoftBodiesPhysicsManager::CollisionBetweenEdgeBounds( cm_traceWork_t *tw, const anVec3 &va, const anVec3 &vb,
+												   const anVec3 &vc, const anVec3 &vd, float tanHalfAngle,
+												   anVec3 &collisionPoint, anVec3 &collisionNormal ) {
 	float d1, d2, d;
-	arcVec3 at, bt, dir, dir1, dir2;
-	arcPluecker	pl1, pl2;
+	anVec3 at, bt, dir, dir1, dir2;
+	anPluecker	pl1, pl2;
 
 	at = va;
 	bt = vb;
@@ -154,17 +154,17 @@ int arcCollisionModelManagerLocal::CollisionBetweenEdgeBounds( cm_traceWork_t *t
 
 /*
 ================
-arcCollisionModelManagerLocal::RotateEdgeThroughEdge
+anSoftBodiesPhysicsManager::RotateEdgeThroughEdge
 
   calculates the tangent of half the rotation angle at which the edges collide
 ================
 */
-int arcCollisionModelManagerLocal::RotateEdgeThroughEdge( cm_traceWork_t *tw, const arcPluecker &pl1,
-												const arcVec3 &vc, const arcVec3 &vd,
+int anSoftBodiesPhysicsManager::RotateEdgeThroughEdge( cm_traceWork_t *tw, const anPluecker &pl1,
+												const anVec3 &vc, const anVec3 &vd,
 												const float minTan, float &tanHalfAngle ) {
 	double v0, v1, v2, a, b, c, d, sqrtd, q, frac1, frac2;
-	arcVec3 ct, dt;
-	arcPluecker pl2;
+	anVec3 ct, dt;
+	anPluecker pl2;
 
 	/*
 
@@ -282,7 +282,7 @@ int arcCollisionModelManagerLocal::RotateEdgeThroughEdge( cm_traceWork_t *tw, co
 			return false;
 		}
 		frac1 = -c / ( 2.0f * b );
-		frac2 = 1e10;	// = tan( arcMath::HALF_PI )
+		frac2 = 1e10;	// = tan( anMath::HALF_PI )
 	}
 	else {
 		d = b * b - c * a;
@@ -322,19 +322,19 @@ int arcCollisionModelManagerLocal::RotateEdgeThroughEdge( cm_traceWork_t *tw, co
 
 /*
 ================
-arcCollisionModelManagerLocal::EdgeFurthestFromEdge
+anSoftBodiesPhysicsManager::EdgeFurthestFromEdge
 
   calculates the direction of motion at the initial position, where dir < 0 means the edges move towards each other
   if the edges move away from each other the tangent of half the rotation angle at which
   the edges are furthest apart is also calculated
 ================
 */
-int arcCollisionModelManagerLocal::EdgeFurthestFromEdge( cm_traceWork_t *tw, const arcPluecker &pl1,
-												const arcVec3 &vc, const arcVec3 &vd,
+int anSoftBodiesPhysicsManager::EdgeFurthestFromEdge( cm_traceWork_t *tw, const anPluecker &pl1,
+												const anVec3 &vc, const anVec3 &vd,
 												float &tanHalfAngle, float &dir ) {
 	double v0, v1, v2, a, b, c, d, sqrtd, q, frac1, frac2;
-	arcVec3 ct, dt;
-	arcPluecker pl2;
+	anVec3 ct, dt;
+	anPluecker pl2;
 
 	/*
 
@@ -402,7 +402,7 @@ int arcCollisionModelManagerLocal::EdgeFurthestFromEdge( cm_traceWork_t *tw, con
 			return false;
 		}
 		frac1 = -c / ( 2.0f * b );
-		frac2 = 1e10;	// = tan( arcMath::HALF_PI )
+		frac2 = 1e10;	// = tan( anMath::HALF_PI )
 	}
 	else {
 		d = b * b - c * a;
@@ -445,17 +445,17 @@ int arcCollisionModelManagerLocal::EdgeFurthestFromEdge( cm_traceWork_t *tw, con
 
 /*
 ================
-arcCollisionModelManagerLocal::RotateTrmEdgeThroughPolygon
+anSoftBodiesPhysicsManager::RotateTrmEdgeThroughPolygon
 ================
 */
-void arcCollisionModelManagerLocal::RotateTrmEdgeThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmEdge_t *trmEdge ) {
+void anSoftBodiesPhysicsManager::RotateTrmEdgeThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmEdge_t *trmEdge ) {
 	int i, j, edgeNum;
 	float f1, f2, startTan, dir, tanHalfAngle;
 	cm_edge_t *edge;
 	cm_vertex_t *v1, *v2;
-	arcVec3 collisionPoint, collisionNormal, origin, epsDir;
-	arcPluecker epsPl;
-	arcBounds bounds;
+	anVec3 collisionPoint, collisionNormal, origin, epsDir;
+	anPluecker epsPl;
+	anBounds bounds;
 
 	// if the trm is convex and the rotation axis intersects the trm
 	if ( tw->isConvex && tw->axisIntersectsTrm ) {
@@ -481,7 +481,7 @@ void arcCollisionModelManagerLocal::RotateTrmEdgeThroughPolygon( cm_traceWork_t 
 		edge = tw->model->edges + abs( edgeNum );
 
 		// if this edge is already checked
-		if ( edge->checkcount == arcCollisionModelManagerLocal::checkCount ) {
+		if ( edge->checkcount == anSoftBodiesPhysicsManager::checkCount ) {
 			continue;
 		}
 
@@ -530,13 +530,13 @@ void arcCollisionModelManagerLocal::RotateTrmEdgeThroughPolygon( cm_traceWork_t 
 				// moving towards the polygon edge so stop immediately
 				tanHalfAngle = 0.0f;
 			}
-			else if ( arcMath::Fabs( startTan ) >= tw->maxTan ) {
+			else if ( anMath::Fabs( startTan ) >= tw->maxTan ) {
 				// never going to get beyond the start tangent during the current rotation
 				continue;
 			}
 			else {
 				// collide with the epsilon expanded edge
-				if ( !RotateEdgeThroughEdge(tw, trmEdge->plzaxis, v1->p + epsDir, v2->p + epsDir, arcMath::Fabs( startTan ), tanHalfAngle ) ) {
+				if ( !RotateEdgeThroughEdge(tw, trmEdge->plzaxis, v1->p + epsDir, v2->p + epsDir, anMath::Fabs( startTan ), tanHalfAngle ) ) {
 					tanHalfAngle = startTan;
 				}
 			}
@@ -549,7 +549,7 @@ void arcCollisionModelManagerLocal::RotateTrmEdgeThroughPolygon( cm_traceWork_t 
 			}
 		}
 
-		if ( arcMath::Fabs( tanHalfAngle ) >= tw->maxTan ) {
+		if ( anMath::Fabs( tanHalfAngle ) >= tw->maxTan ) {
 			continue;
 		}
 
@@ -566,7 +566,7 @@ void arcCollisionModelManagerLocal::RotateTrmEdgeThroughPolygon( cm_traceWork_t 
 		}
 
 		// fill in trace structure
-		tw->maxTan = arcMath::Fabs( tanHalfAngle );
+		tw->maxTan = anMath::Fabs( tanHalfAngle );
 		tw->trace.c.normal = collisionNormal;
 		tw->trace.c.normal.Normalize();
 		tw->trace.c.dist = tw->trace.c.normal * v1->p;
@@ -590,15 +590,15 @@ void arcCollisionModelManagerLocal::RotateTrmEdgeThroughPolygon( cm_traceWork_t 
 
 /*
 ================
-arcCollisionModelManagerLocal::RotatePointThroughPlane
+anSoftBodiesPhysicsManager::RotatePointThroughPlane
 
   calculates the tangent of half the rotation angle at which the point collides with the plane
 ================
 */
-int arcCollisionModelManagerLocal::RotatePointThroughPlane( const cm_traceWork_t *tw, const arcVec3 &point, const arcPlane &plane,
+int anSoftBodiesPhysicsManager::RotatePointThroughPlane( const cm_traceWork_t *tw, const anVec3 &point, const anPlane &plane,
 													const float angle, const float minTan, float &tanHalfAngle ) {
 	double v0, v1, v2, a, b, c, d, sqrtd, q, frac1, frac2;
-	arcVec3 p, normal;
+	anVec3 p, normal;
 
 	/*
 
@@ -653,7 +653,7 @@ int arcCollisionModelManagerLocal::RotatePointThroughPlane( const cm_traceWork_t
 			return false;
 		}
 		frac1 = -c / ( 2.0f * b );
-		frac2 = 1e10;	// = tan( arcMath::HALF_PI )
+		frac2 = 1e10;	// = tan( anMath::HALF_PI )
 	}
 	else {
 		d = b * b - c * a;
@@ -693,18 +693,18 @@ int arcCollisionModelManagerLocal::RotatePointThroughPlane( const cm_traceWork_t
 
 /*
 ================
-arcCollisionModelManagerLocal::PointFurthestFromPlane
+anSoftBodiesPhysicsManager::PointFurthestFromPlane
 
   calculates the direction of motion at the initial position, where dir < 0 means the point moves towards the plane
   if the point moves away from the plane the tangent of half the rotation angle at which
   the point is furthest away from the plane is also calculated
 ================
 */
-int arcCollisionModelManagerLocal::PointFurthestFromPlane( const cm_traceWork_t *tw, const arcVec3 &point, const arcPlane &plane,
+int anSoftBodiesPhysicsManager::PointFurthestFromPlane( const cm_traceWork_t *tw, const anVec3 &point, const anPlane &plane,
 													const float angle, float &tanHalfAngle, float &dir ) {
 
 	double v1, v2, a, b, c, d, sqrtd, q, frac1, frac2;
-	arcVec3 p, normal;
+	anVec3 p, normal;
 
 	/*
 
@@ -758,7 +758,7 @@ int arcCollisionModelManagerLocal::PointFurthestFromPlane( const cm_traceWork_t 
 			return false;
 		}
 		frac1 = -c / ( 2.0f * b );
-		frac2 = 1e10;	// = tan( arcMath::HALF_PI )
+		frac2 = 1e10;	// = tan( anMath::HALF_PI )
 	}
 	else {
 		d = b * b - c * a;
@@ -801,15 +801,15 @@ int arcCollisionModelManagerLocal::PointFurthestFromPlane( const cm_traceWork_t 
 
 /*
 ================
-arcCollisionModelManagerLocal::RotatePointThroughEpsilonPlane
+anSoftBodiesPhysicsManager::RotatePointThroughEpsilonPlane
 ================
 */
-int arcCollisionModelManagerLocal::RotatePointThroughEpsilonPlane( const cm_traceWork_t *tw, const arcVec3 &point, const arcVec3 &endPoint,
-							const arcPlane &plane, const float angle, const arcVec3 &origin,
-							float &tanHalfAngle, arcVec3 &collisionPoint, arcVec3 &endDir ) {
+int anSoftBodiesPhysicsManager::RotatePointThroughEpsilonPlane( const cm_traceWork_t *tw, const anVec3 &point, const anVec3 &endPoint,
+							const anPlane &plane, const float angle, const anVec3 &origin,
+							float &tanHalfAngle, anVec3 &collisionPoint, anVec3 &endDir ) {
 	float d, dir, startTan;
-	arcVec3 vec, startDir;
-	arcPlane epsPlane;
+	anVec3 vec, startDir;
+	anPlane epsPlane;
 
 	// epsilon expanded plane
 	epsPlane = plane;
@@ -858,13 +858,13 @@ int arcCollisionModelManagerLocal::RotatePointThroughEpsilonPlane( const cm_trac
 			// moving towards the polygon plane so stop immediately
 			tanHalfAngle = 0.0f;
 		}
-		else if ( arcMath::Fabs( startTan ) >= tw->maxTan ) {
+		else if ( anMath::Fabs( startTan ) >= tw->maxTan ) {
 			// never going to get beyond the start tangent during the current rotation
 			return false;
 		}
 		else {
 			// calculate collision with epsilon expanded plane
-			if ( !RotatePointThroughPlane( tw, point, epsPlane, angle, arcMath::Fabs( startTan ), tanHalfAngle ) ) {
+			if ( !RotatePointThroughPlane( tw, point, epsPlane, angle, anMath::Fabs( startTan ), tanHalfAngle ) ) {
 				tanHalfAngle = startTan;
 			}
 		}
@@ -891,14 +891,14 @@ int arcCollisionModelManagerLocal::RotatePointThroughEpsilonPlane( const cm_trac
 
 /*
 ================
-arcCollisionModelManagerLocal::RotateTrmVertexThroughPolygon
+anSoftBodiesPhysicsManager::RotateTrmVertexThroughPolygon
 ================
 */
-void arcCollisionModelManagerLocal::RotateTrmVertexThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmVertex_t *v, int vertexNum ) {
+void anSoftBodiesPhysicsManager::RotateTrmVertexThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmVertex_t *v, int vertexNum ) {
 	int i;
 	float tanHalfAngle;
-	arcVec3 endDir, collisionPoint;
-	arcPluecker pl;
+	anVec3 endDir, collisionPoint;
+	anPluecker pl;
 
 	// if the trm vertex is behind the polygon plane it cannot collide with the polygon within a 180 degrees rotation
 	if ( tw->isConvex && tw->axisIntersectsTrm && v->polygonSide ) {
@@ -921,7 +921,7 @@ void arcCollisionModelManagerLocal::RotateTrmVertexThroughPolygon( cm_traceWork_
 		return;
 	}
 
-	if ( arcMath::Fabs( tanHalfAngle ) < tw->maxTan ) {
+	if ( anMath::Fabs( tanHalfAngle ) < tw->maxTan ) {
 		// verify if 'collisionPoint' moving along 'endDir' moves between polygon edges
 		pl.FromRay( collisionPoint, endDir );
 		for ( i = 0; i < poly->numEdges; i++ ) {
@@ -936,7 +936,7 @@ void arcCollisionModelManagerLocal::RotateTrmVertexThroughPolygon( cm_traceWork_
 				}
 			}
 		}
-		tw->maxTan = arcMath::Fabs( tanHalfAngle );
+		tw->maxTan = anMath::Fabs( tanHalfAngle );
 		// collision plane is the polygon plane
 		tw->trace.c.normal = poly->plane.Normal();
 		tw->trace.c.dist = poly->plane.Dist();
@@ -951,14 +951,14 @@ void arcCollisionModelManagerLocal::RotateTrmVertexThroughPolygon( cm_traceWork_
 
 /*
 ================
-arcCollisionModelManagerLocal::RotateVertexThroughTrmPolygon
+anSoftBodiesPhysicsManager::RotateVertexThroughTrmPolygon
 ================
 */
-void arcCollisionModelManagerLocal::RotateVertexThroughTrmPolygon( cm_traceWork_t *tw, cm_trmPolygon_t *trmpoly, cm_polygon_t *poly, cm_vertex_t *v, arcVec3 &rotationOrigin ) {
+void anSoftBodiesPhysicsManager::RotateVertexThroughTrmPolygon( cm_traceWork_t *tw, cm_trmPolygon_t *trmpoly, cm_polygon_t *poly, cm_vertex_t *v, anVec3 &rotationOrigin ) {
 	int i, edgeNum;
 	float tanHalfAngle;
-	arcVec3 dir, endp, endDir, collisionPoint;
-	arcPluecker pl;
+	anVec3 dir, endp, endDir, collisionPoint;
+	anPluecker pl;
 	cm_trmEdge_t *edge;
 
 	// if the polygon vertex is behind the trm plane it cannot collide with the trm polygon within a 180 degrees rotation
@@ -987,7 +987,7 @@ void arcCollisionModelManagerLocal::RotateVertexThroughTrmPolygon( cm_traceWork_
 		return;
 	}
 
-	if ( arcMath::Fabs( tanHalfAngle ) < tw->maxTan ) {
+	if ( anMath::Fabs( tanHalfAngle ) < tw->maxTan ) {
 		// verify if 'collisionPoint' moving along 'endDir' moves between polygon edges
 		pl.FromRay( collisionPoint, endDir );
 		for ( i = 0; i < trmpoly->numEdges; i++ ) {
@@ -1004,7 +1004,7 @@ void arcCollisionModelManagerLocal::RotateVertexThroughTrmPolygon( cm_traceWork_
 				}
 			}
 		}
-		tw->maxTan = arcMath::Fabs( tanHalfAngle );
+		tw->maxTan = anMath::Fabs( tanHalfAngle );
 		// collision plane is the flipped trm polygon plane
 		tw->trace.c.normal = -trmpoly->plane.Normal();
 		tw->trace.c.dist = tw->trace.c.normal * v->p;
@@ -1019,12 +1019,12 @@ void arcCollisionModelManagerLocal::RotateVertexThroughTrmPolygon( cm_traceWork_
 
 /*
 ================
-arcCollisionModelManagerLocal::RotateTrmThroughPolygon
+anSoftBodiesPhysicsManager::RotateTrmThroughPolygon
 
   returns true if the polygon blocks the complete rotation
 ================
 */
-bool arcCollisionModelManagerLocal::RotateTrmThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *p ) {
+bool anSoftBodiesPhysicsManager::RotateTrmThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *p ) {
 	int i, j, k, edgeNum;
 	float d;
 	cm_trmVertex_t *bv;
@@ -1032,13 +1032,13 @@ bool arcCollisionModelManagerLocal::RotateTrmThroughPolygon( cm_traceWork_t *tw,
 	cm_trmPolygon_t *bp;
 	cm_vertex_t *v;
 	cm_edge_t *e;
-	arcVec3 *rotationOrigin;
+	anVec3 *rotationOrigin;
 
 	// if already checked this polygon
-	if ( p->checkcount == arcCollisionModelManagerLocal::checkCount ) {
+	if ( p->checkcount == anSoftBodiesPhysicsManager::checkCount ) {
 		return false;
 	}
-	p->checkcount = arcCollisionModelManagerLocal::checkCount;
+	p->checkcount = anSoftBodiesPhysicsManager::checkCount;
 
 	// if this polygon does not have the right contents behind it
 	if ( !(p->contents & tw->contents) ) {
@@ -1069,12 +1069,12 @@ bool arcCollisionModelManagerLocal::RotateTrmThroughPolygon( cm_traceWork_t *tw,
 
 	// if the polygon is too far from the first heart plane
 	d = p->bounds.PlaneDistance( tw->heartPlane1 );
-	if ( arcMath::Fabs(d) > tw->maxDistFromHeartPlane1 ) {
+	if ( anMath::Fabs(d) > tw->maxDistFromHeartPlane1 ) {
 		return false;
 	}
 
 	// rotation bounds should cross polygon plane
-	switch( tw->bounds.PlaneSide( p->plane ) ) {
+	switch ( tw->bounds.PlaneSide( p->plane ) ) {
 		case PLANESIDE_CROSS:
 			break;
 		case PLANESIDE_FRONT:
@@ -1134,11 +1134,11 @@ bool arcCollisionModelManagerLocal::RotateTrmThroughPolygon( cm_traceWork_t *tw,
 			edgeNum = p->edges[i];
 			e = tw->model->edges + abs( edgeNum );
 
-			if ( e->checkcount == arcCollisionModelManagerLocal::checkCount ) {
+			if ( e->checkcount == anSoftBodiesPhysicsManager::checkCount ) {
 				continue;
 			}
 			// set edge check count
-			e->checkcount = arcCollisionModelManagerLocal::checkCount;
+			e->checkcount = anSoftBodiesPhysicsManager::checkCount;
 			// can never collide with internal edges
 			if ( e->internal ) {
 				continue;
@@ -1149,11 +1149,11 @@ bool arcCollisionModelManagerLocal::RotateTrmThroughPolygon( cm_traceWork_t *tw,
 				v = tw->model->vertices + e->vertexNum[k ^ INTSIGNBITSET( edgeNum )];
 
 				// if this vertex is already checked
-				if ( v->checkcount == arcCollisionModelManagerLocal::checkCount ) {
+				if ( v->checkcount == anSoftBodiesPhysicsManager::checkCount ) {
 					continue;
 				}
 				// set vertex check count
-				v->checkcount = arcCollisionModelManagerLocal::checkCount;
+				v->checkcount = anSoftBodiesPhysicsManager::checkCount;
 
 				// if the vertex is outside the trm rotation bounds
 				if ( !tw->bounds.ContainsPoint( v->p ) ) {
@@ -1177,15 +1177,15 @@ bool arcCollisionModelManagerLocal::RotateTrmThroughPolygon( cm_traceWork_t *tw,
 
 /*
 ================
-arcCollisionModelManagerLocal::BoundsForRotation
+anSoftBodiesPhysicsManager::BoundsForRotation
 
   only for rotations < 180 degrees
 ================
 */
-void arcCollisionModelManagerLocal::BoundsForRotation( const arcVec3 &origin, const arcVec3 &axis, const arcVec3 &start, const arcVec3 &end, arcBounds &bounds ) {
+void anSoftBodiesPhysicsManager::BoundsForRotation( const anVec3 &origin, const anVec3 &axis, const anVec3 &start, const anVec3 &end, anBounds &bounds ) {
 	int i;
 	float radiusSqr;
-	arcVec3 v1, v2;
+	anVec3 v1, v2;
 
 	radiusSqr = ( start - origin ).LengthSqr();
 	v1 = ( start - origin ).Cross( axis );
@@ -1194,12 +1194,12 @@ void arcCollisionModelManagerLocal::BoundsForRotation( const arcVec3 &origin, co
 	for ( i = 0; i < 3; i++ ) {
 		// if the derivative changes sign along this axis during the rotation from start to end
 		if ( ( v1[i] > 0.0f && v2[i] < 0.0f ) || ( v1[i] < 0.0f && v2[i] > 0.0f ) ) {
-			if ( ( 0.5f * (start[i] + end[i]) - origin[i] ) > 0.0f ) {
+			if ( ( 0.5f * ( start[i] + end[i]) - origin[i] ) > 0.0f ) {
 				bounds[0][i] = Min( start[i], end[i] );
-				bounds[1][i] = origin[i] + arcMath::Sqrt( radiusSqr * ( 1.0f - axis[i] * axis[i] ) );
+				bounds[1][i] = origin[i] + anMath::Sqrt( radiusSqr * ( 1.0f - axis[i] * axis[i] ) );
 			}
 			else {
-				bounds[0][i] = origin[i] - arcMath::Sqrt( radiusSqr * ( 1.0f - axis[i] * axis[i] ) );
+				bounds[0][i] = origin[i] - anMath::Sqrt( radiusSqr * ( 1.0f - axis[i] * axis[i] ) );
 				bounds[1][i] = Max( start[i], end[i] );
 			}
 		}
@@ -1219,35 +1219,35 @@ void arcCollisionModelManagerLocal::BoundsForRotation( const arcVec3 &origin, co
 
 /*
 ================
-arcCollisionModelManagerLocal::Rotation180
+anSoftBodiesPhysicsManager::Rotation180
 ================
 */
-void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3 &rorg, const arcVec3 &axis,
-										const float startAngle, const float endAngle, const arcVec3 &start,
-										const arcTraceModel *trm, const arcMat3 &trmAxis, int contentMask,
-										cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
+void anSoftBodiesPhysicsManager::Rotation180( trace_t *results, const anVec3 &rorg, const anVec3 &axis,
+										const float startAngle, const float endAngle, const anVec3 &start,
+										const anTraceModel *trm, const anMat3 &trmAxis, int contentMask,
+										cmHandle_t model, const anVec3 &modelOrigin, const anMat3 &modelAxis ) {
 	int i, j, edgeNum;
 	float d, maxErr, initialTan;
 	bool model_rotated, trm_rotated;
-	arcVec3 dir, dir1, dir2, tmp, vr, vup, org, at, bt;
-	arcMat3 invModelAxis, endAxis, tmpAxis;
-	arcRotation startRotation, endRotation;
-	arcPluecker plaxis;
+	anVec3 dir, dir1, dir2, tmp, vr, vup, org, at, bt;
+	anMat3 invModelAxis, endAxis, tmpAxis;
+	anRotation startRotation, endRotation;
+	anPluecker plaxis;
 	cm_trmPolygon_t *poly;
 	cm_trmEdge_t *edge;
 	cm_trmVertex_t *vert;
 	ALIGN16( static cm_traceWork_t tw );
 
-	if ( model < 0 || model > MAX_SUBMODELS || model > arcCollisionModelManagerLocal::maxModels ) {
-		common->Printf( "arcCollisionModelManagerLocal::Rotation180: invalid model handle\n" );
+	if ( model < 0 || model > MAX_SUBMODELS || model > anSoftBodiesPhysicsManager::maxModels ) {
+		common->Printf( "anSoftBodiesPhysicsManager::Rotation180: invalid model handle\n" );
 		return;
 	}
-	if ( !arcCollisionModelManagerLocal::models[model] ) {
-		common->Printf( "arcCollisionModelManagerLocal::Rotation180: invalid model\n" );
+	if ( !anSoftBodiesPhysicsManager::models[model] ) {
+		common->Printf( "anSoftBodiesPhysicsManager::Rotation180: invalid model\n" );
 		return;
 	}
 
-	arcCollisionModelManagerLocal::checkCount++;
+	anSoftBodiesPhysicsManager::checkCount++;
 
 	tw.trace.fraction = 1.0f;
 	tw.trace.c.contents = 0;
@@ -1260,8 +1260,8 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 	tw.quickExit = false;
 	tw.angle = endAngle - startAngle;
 	assert( tw.angle > -180.0f && tw.angle < 180.0f );
-	tw.maxTan = initialTan = arcMath::Fabs( tan( ( arcMath::PI / 360.0f ) * tw.angle ) );
-	tw.model = arcCollisionModelManagerLocal::models[model];
+	tw.maxTan = initialTan = anMath::Fabs( tan( ( anMath::PI / 360.0f ) * tw.angle ) );
+	tw.model = anSoftBodiesPhysicsManager::models[model];
 	tw.start = start - modelOrigin;
 	// rotation axis, axis is assumed to be normalized
 	tw.axis = axis;
@@ -1275,7 +1275,7 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 	// maximum error of the circle approximation traced through the axial BSP tree
 	d = tw.radius * tw.radius - (CIRCLE_APPROXIMATION_LENGTH*CIRCLE_APPROXIMATION_LENGTH*0.25f);
 	if ( d > 0.0f ) {
-		maxErr = tw.radius - arcMath::Sqrt( d );
+		maxErr = tw.radius - anMath::Sqrt( d );
 	} else {
 		maxErr = tw.radius;
 	}
@@ -1342,7 +1342,7 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 		tw.maxDistFromHeartPlane1 = CM_BOX_EPSILON;
 
 		// trace through the model
-		arcCollisionModelManagerLocal::TraceThroughModel( &tw );
+		anSoftBodiesPhysicsManager::TraceThroughModel( &tw );
 
 		// store results
 		*results = tw.trace;
@@ -1350,7 +1350,7 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 		if ( tw.maxTan == initialTan ) {
 			results->fraction = 1.0f;
 		} else {
-			results->fraction = arcMath::Fabs( atan( tw.maxTan ) * ( 2.0f * 180.0f / arcMath::PI ) / tw.angle );
+			results->fraction = anMath::Fabs( atan( tw.maxTan ) * ( 2.0f * 180.0f / anMath::PI ) / tw.angle );
 		}
 		assert( results->fraction <= 1.0f );
 		endRotation.Set( rorg, axis, startAngle + (endAngle-startAngle) * results->fraction );
@@ -1372,7 +1372,7 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 	tw.pointTrace = false;
 
 	// setup trm structure
-	arcCollisionModelManagerLocal::SetupTrm( &tw, trm );
+	anSoftBodiesPhysicsManager::SetupTrm( &tw, trm );
 
 	trm_rotated = trmAxis.IsRotated();
 
@@ -1497,10 +1497,10 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 	for ( i = 0; i < 3; i++ ) {
 		tw.size[0][i] = tw.bounds[0][i] - tw.start[i];
 		tw.size[1][i] = tw.bounds[1][i] - tw.start[i];
-		if ( arcMath::Fabs( tw.size[0][i] ) > arcMath::Fabs( tw.size[1][i] ) ) {
-			tw.extents[i] = arcMath::Fabs( tw.size[0][i] ) + maxErr + CM_BOX_EPSILON;
+		if ( anMath::Fabs( tw.size[0][i] ) > anMath::Fabs( tw.size[1][i] ) ) {
+			tw.extents[i] = anMath::Fabs( tw.size[0][i] ) + maxErr + CM_BOX_EPSILON;
 		} else {
-			tw.extents[i] = arcMath::Fabs( tw.size[1][i] ) + maxErr + CM_BOX_EPSILON;
+			tw.extents[i] = anMath::Fabs( tw.size[1][i] ) + maxErr + CM_BOX_EPSILON;
 		}
 	}
 
@@ -1541,7 +1541,7 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 	tw.heartPlane1.FitThroughPoint( tw.start );
 	tw.maxDistFromHeartPlane1 = 0.0f;
 	for ( i = 0; i < tw.numVerts; i++ ) {
-		d = arcMath::Fabs( tw.heartPlane1.Distance( tw.vertices[i].p ) );
+		d = anMath::Fabs( tw.heartPlane1.Distance( tw.vertices[i].p ) );
 		if ( d > tw.maxDistFromHeartPlane1 ) {
 			tw.maxDistFromHeartPlane1 = d;
 		}
@@ -1552,7 +1552,7 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 	tw.modelVertexRotation.Set( tw.origin, tw.axis, -tw.angle );
 
 	// trace through the model
-	arcCollisionModelManagerLocal::TraceThroughModel( &tw );
+	anSoftBodiesPhysicsManager::TraceThroughModel( &tw );
 
 	// store results
 	*results = tw.trace;
@@ -1560,7 +1560,7 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 	if ( tw.maxTan == initialTan ) {
 		results->fraction = 1.0f;
 	} else {
-		results->fraction = arcMath::Fabs( atan( tw.maxTan ) * ( 2.0f * 180.0f / arcMath::PI ) / tw.angle );
+		results->fraction = anMath::Fabs( atan( tw.maxTan ) * ( 2.0f * 180.0f / anMath::PI ) / tw.angle );
 	}
 	assert( results->fraction <= 1.0f );
 	endRotation.Set( rorg, axis, startAngle + (endAngle-startAngle) * results->fraction );
@@ -1580,27 +1580,27 @@ void arcCollisionModelManagerLocal::Rotation180( trace_t *results, const arcVec3
 
 /*
 ================
-arcCollisionModelManagerLocal::Rotation
+anSoftBodiesPhysicsManager::Rotation
 ================
 */
 #ifdef _DEBUG
 static int entered = 0;
 #endif
 
-void arcCollisionModelManagerLocal::Rotation( trace_t *results, const arcVec3 &start, const arcRotation &rotation,
-										const arcTraceModel *trm, const arcMat3 &trmAxis, int contentMask,
-										cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
-	arcVec3 tmp;
+void anSoftBodiesPhysicsManager::Rotation( trace_t *results, const anVec3 &start, const anRotation &rotation,
+										const anTraceModel *trm, const anMat3 &trmAxis, int contentMask,
+										cmHandle_t model, const anVec3 &modelOrigin, const anMat3 &modelAxis ) {
+	anVec3 tmp;
 	float maxa, stepa, a, lasta;
 
-	assert( ((byte *)&star ) < ( (byte *)results ) || ( (byte *)&start ) > ( ( (byte *)results ) + sizeof( trace_t )) );
-	assert( ((byte *)&trmAxis ) < ( (byte *)results ) || ( (byte *)&trmAxis ) > ( ( (byte *)results ) + sizeof( trace_t )) );
+	assert( ((byte *)&star ) < ( (byte *)results ) || ( (byte *)&start ) > ( ( (byte *)results ) + sizeof( trace_t ) ) );
+	assert( ((byte *)&trmAxis ) < ( (byte *)results ) || ( (byte *)&trmAxis ) > ( ( (byte *)results ) + sizeof( trace_t ) ) );
 
 	memset( results, 0, sizeof(* results) );
 
 	// if special position test
 	if ( rotation.GetAngle() == 0.0f ) {
-		arcCollisionModelManagerLocal::ContentsTrm( results, start, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
+		anSoftBodiesPhysicsManager::ContentsTrm( results, start, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
 		return;
 	}
 
@@ -1611,7 +1611,7 @@ void arcCollisionModelManagerLocal::Rotation( trace_t *results, const arcVec3 &s
 		if ( !entered ) {
 			entered = 1;
 			// if already messed up to begin with
-			if ( arcCollisionModelManagerLocal::Contents( start, trm, trmAxis, -1, model, modelOrigin, modelAxis ) & contentMask ) {
+			if ( anSoftBodiesPhysicsManager::Contents( start, trm, trmAxis, -1, model, modelOrigin, modelAxis ) & contentMask ) {
 				startsolid = true;
 			}
 			entered = 0;
@@ -1632,7 +1632,7 @@ void arcCollisionModelManagerLocal::Rotation( trace_t *results, const arcVec3 &s
 		}
 		for ( lasta = 0.0f, a = stepa; fabs( a ) < fabs( maxa ) + 1.0f; lasta = a, a += stepa ) {
 			// partial rotation
-			arcCollisionModelManagerLocal::Rotation180( results, rotation.GetOrigin(), rotation.GetVec(), lasta, a, start, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
+			anSoftBodiesPhysicsManager::Rotation180( results, rotation.GetOrigin(), rotation.GetVec(), lasta, a, start, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
 			// if there is a collision
 			if ( results->fraction < 1.0f ) {
 				// fraction of total rotation
@@ -1644,7 +1644,7 @@ void arcCollisionModelManagerLocal::Rotation( trace_t *results, const arcVec3 &s
 		return;
 	}
 
-	arcCollisionModelManagerLocal::Rotation180( results, rotation.GetOrigin(), rotation.GetVec(), 0.0f, rotation.GetAngle(), start, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
+	anSoftBodiesPhysicsManager::Rotation180( results, rotation.GetOrigin(), rotation.GetVec(), 0.0f, rotation.GetAngle(), start, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
 
 #ifdef _DEBUG
 	// test for missed collisions
@@ -1652,13 +1652,13 @@ void arcCollisionModelManagerLocal::Rotation( trace_t *results, const arcVec3 &s
 		if ( !entered ) {
 			entered = 1;
 			// if the trm is stuck in the model
-			if ( arcCollisionModelManagerLocal::Contents( results->endpos, trm, results->endAxis, -1, model, modelOrigin, modelAxis ) & contentMask ) {
+			if ( anSoftBodiesPhysicsManager::Contents( results->endpos, trm, results->endAxis, -1, model, modelOrigin, modelAxis ) & contentMask ) {
 				trace_t tr;
 
 				// test where the trm is stuck in the model
-				arcCollisionModelManagerLocal::Contents( results->endpos, trm, results->endAxis, -1, model, modelOrigin, modelAxis );
+				anSoftBodiesPhysicsManager::Contents( results->endpos, trm, results->endAxis, -1, model, modelOrigin, modelAxis );
 				// re-run collision detection to find out where it failed
-				arcCollisionModelManagerLocal::Rotation( &tr, start, rotation, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
+				anSoftBodiesPhysicsManager::Rotation( &tr, start, rotation, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
 			}
 			entered = 0;
 		}

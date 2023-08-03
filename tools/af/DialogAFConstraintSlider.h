@@ -34,11 +34,11 @@ class DialogAFConstraintSlider : public CDialog {
 	DECLARE_DYNAMIC(DialogAFConstraintSlider)
 
 public:
-						DialogAFConstraintSlider(CWnd* pParent = NULL);   // standard constructor
+						DialogAFConstraintSlider(CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogAFConstraintSlider();
-	void				LoadFile( arcDeclAF *af );
+	void				LoadFile( anDeclAF *af );
 	void				SaveFile( void );
-	void				LoadConstraint( arcDeclAF_Constraint *c );
+	void				LoadConstraint( anDeclAF_Constraint *c );
 	void				SaveConstraint( void );
 	void				UpdateFile( void );
 
@@ -60,8 +60,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	arcDeclAF *			file;
-	arcDeclAF_Constraint*constraint;
+	anDeclAF *			file;
+	anDeclAF_Constraint*constraint;
 
 	//{{AFX_DATA(DialogAFConstraintSlider)
 	CComboBox			m_comboAxisJoint1;

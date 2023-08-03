@@ -40,7 +40,7 @@ public:
 	const char*		GetNextImageFilename( void );
 	const char*		SoundFilename( void );
 	void			InitFromFile( const char *fileName );
-	void			GetNthInputFileName( arcNetString &fileName, int n);
+	void			GetNthInputFileName( anString &fileName, int n);
 	bool			MoreFrames( void );
 	bool			OutputVectors( void );
 	bool			Timecode( void );
@@ -55,19 +55,19 @@ public:
 	int				JpegQuality( void );
 	bool			IsScaleable( void );
 
-	arcNetString			outputFilename;
+	anString			outputFilename;
 	int				numInputFiles;
 private:
 	int				*range;
 	bool			*padding, *padding2;
-	arcStringList		file;
-	arcStringList		file2;
-	arcNetString			soundfile;
-	arcNetString			currentPath;
-	arcNetString			tempFilename;
-	arcNetString			startPal;
-	arcNetString			endPal;
-	arcNetString			currentFile;
+	anStringList		file;
+	anStringList		file2;
+	anString			soundfile;
+	anString			currentPath;
+	anString			tempFilename;
+	anString			startPal;
+	anString			endPal;
+	anString			currentFile;
 	int				*skipnum, *skipnum2;
 	int				*startnum, *startnum2;
 	int				*endnum, *endnum2;

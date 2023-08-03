@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -137,7 +137,7 @@ void CTextureBar::OnBtnApplytexturestuff() {
 }
 
 void CTextureBar::GetSurfaceAttributes() {
-  texdef_t* pt = (g_ptrSelectedFaces.GetSize() > 0 ) ? &(reinterpret_cast<face_t*>(g_ptrSelectedFaces.GetAt(0 ) ))->texdef : &g_qeglobals.d_texturewin.texdef;
+  texdef_t* pt = (g_ptrSelectedFaces.GetSize() > 0 ) ? &(reinterpret_cast<face_t*>(g_ptrSelectedFaces.GetAt(0 ) ) )->texdef : &g_qeglobals.d_texturewin.texdef;
 
   if (pt) {
     m_nHShift = pt->shift[0];

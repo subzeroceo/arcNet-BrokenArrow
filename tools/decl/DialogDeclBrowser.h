@@ -10,7 +10,7 @@ class DialogDeclBrowser : public CDialog {
 	DECLARE_DYNAMIC(DialogDeclBrowser)
 
 public:
-						DialogDeclBrowser( CWnd* pParent = NULL );   // standard constructor
+						DialogDeclBrowser( CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogDeclBrowser();
 
 	void				ReloadDeclarations( void );
@@ -64,8 +64,8 @@ private:
 	CRect				initialRect;
 	CPathTreeCtrl		baseDeclTree;
 	int					numListedDecls;
-	arcNetString			findNameString;
-	arcNetString			findTextString;
+	anString			findNameString;
+	anString			findTextString;
 
 	TCHAR *				m_pchTip;
 	WCHAR *				m_pwchTip;
@@ -76,9 +76,9 @@ private:
 	void				AddGUIsToTree( CPathTreeCtrl &tree );
 	void				InitBaseDeclTree( void );
 
-	void				GetDeclName( HTREEITEM item, arcNetString &typeName, arcNetString &declName ) const;
-	const arcDecleration *GetDeclFromTreeItem( HTREEITEM item ) const;
-	const arcDecleration *GetSelectedDecl( void ) const;
+	void				GetDeclName( HTREEITEM item, anString &typeName, anString &declName ) const;
+	const anDecl *GetDeclFromTreeItem( HTREEITEM item ) const;
+	const anDecl *GetSelectedDecl( void ) const;
 	void				EditSelected( void ) const;
 };
 

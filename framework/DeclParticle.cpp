@@ -1,7 +1,7 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
-arcCVarSystem binaryLoadParticles( "binaryLoadParticles", "1", 0, "enable binary load/write of particle decls" );
+anCVarSystem binaryLoadParticles( "binaryLoadParticles", "1", 0, "enable binary load/write of particle decls" );
 
 static const byte BPRT_VERSION = 101;
 static const unsigned int BPRT_MAGIC = ( 'B' << 24 ) | ( 'P' << 16 ) | ( 'R' << 8 ) | BPRT_VERSION;
@@ -43,31 +43,28 @@ const int CustomParticleCount = sizeof( ParticleCustomDesc ) / sizeof( const Par
 
 /*
 =================
-arcDeclParticle::Size
+anDeclParticle::Size
 =================
 */
-size_t arcDeclParticle::Size() const {
-	return sizeof( arcDeclParticle );
+size_t anDeclParticle::Size() const {
+	return sizeof( anDeclParticle );
 }
 
 /*
 =====================
-arcDeclParticle::GetStageBounds
+anDeclParticle::GetStageBounds
 =====================
 */
-void arcDeclParticle::GetStageBounds( arcParticleStage *stage ) {
+void anDeclParticle::GetStageBounds( anParticleStage *stage ) {
 	stage->bounds.Clear();
 
 	// this isn't absolutely guaranteed, but it should be close
-
 	particleGen_t g;
 
-	renderEntity_t	renderEntity;
-	memset( &renderEntity, 0, sizeof( renderEntity ) );
+	renderEntity_t renderEntity = {};
 	renderEntity.axis = mat3_identity;
 
-	renderView_t	renderView;
-	memset( &renderView, 0, sizeof( renderView ) );
+	renderView_t renderView = {};
 	renderView.viewAxis = mat3_identity;
 
 	g.renderEnt = &renderEntity;
@@ -81,10 +78,8 @@ void arcDeclParticle::GetStageBounds( arcParticleStage *stage ) {
 	// just step through a lot of possible particles as a representative sampling
 	for ( int i = 0; i < 1000; i++ ) {
 		g.random = g.originalRandom = steppingRandom;
-
 		int	maxMsec = stage->particleLife * 1000;
 		for ( int inCycleTime = 0; inCycleTime < maxMsec; inCycleTime += 16 ) {
-
 			// make sure we get the very last tic, which may make up an extreme edge
 			if ( inCycleTime + 16 > maxMsec ) {
 				inCycleTime = maxMsec - 1;
@@ -96,7 +91,7 @@ void arcDeclParticle::GetStageBounds( arcParticleStage *stage ) {
 			// if the particle doesn't get drawn because it is faded out or beyond a kill region,
 			// don't increment the verts
 
-			arcVec3	origin;
+			anVec3	origin;
 			stage->ParticleOrigin( &g, origin );
 			stage->bounds.AddPoint( origin );
 		}
@@ -123,15 +118,16 @@ void arcDeclParticle::GetStageBounds( arcParticleStage *stage ) {
 
 /*
 ================
-arcDeclParticle::ParseParms
+anDeclParticle::ParseParms
 
 Parses a variable length list of parms on one line
 ================
 */
-void arcDeclParticle::ParseParms( arcLexer &src, float *parms, int maxParms ) {
-	arcNetToken token;
+void anDeclParticle::ParseParms( anLexer &src, float *parms, int maxParms ) {
+	anToken token;
 
-	memset( parms, 0, maxParms * sizeof( *parms ) );
+	// std::fill (global alias FillRangeElement) replacement for memset
+    FillRangeElement( parms, parms + maxParms, 0.0f );
 	int	count = 0;
 	while ( 1 ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
@@ -149,13 +145,13 @@ void arcDeclParticle::ParseParms( arcLexer &src, float *parms, int maxParms ) {
 
 /*
 ================
-arcDeclParticle::ParseParametric
+anDeclParticle::ParseParametric
 ================
 */
-void arcDeclParticle::ParseParametric( arcLexer &src, idParticleParm *parm ) {
-	arcNetToken token;
+void anDeclParticle::ParseParametric( anLexer &src, anParticleParm *parm ) {
+	anToken token;
 
-	parm->table = NULL;
+	parm->table = nullptr;
 	parm->from = parm->to = 0.0f;
 
 	if ( !src.ReadToken( &token ) ) {
@@ -179,20 +175,19 @@ void arcDeclParticle::ParseParametric( arcLexer &src, idParticleParm *parm ) {
 		}
 	} else {
 		// table
-		parm->table = static_cast<const arcDeclTable *>( declManager->FindType( DECL_TABLE, token, false ) );
+		parm->table = static_cast<const anDeclTable *>( declManager->FindType( DECL_TABLE, token, false ) );
 	}
-
 }
 
 /*
 ================
-arcDeclParticle::ParseParticleStage
+anDeclParticle::ParseParticleStage
 ================
 */
-arcParticleStage *arcDeclParticle::ParseParticleStage( arcLexer &src ) {
-	arcNetToken token;
+anParticleStage *anDeclParticle::ParseParticleStage( anLexer &src ) {
+	anToken token;
 
-	arcParticleStage *stage = new (TAG_DECL) arcParticleStage;
+	anParticleStage *stage = new anParticleStage;
 	stage->Default();
 
 	while (1 ) {
@@ -294,7 +289,7 @@ arcParticleStage *arcDeclParticle::ParseParticleStage( arcLexer &src ) {
 				stage->customPathType = PPATH_HELIX;
 			} else if ( !token.Icmp( "flies" ) ) {
 				stage->customPathType = PPATH_FLIES;
-			} else if ( !token.Icmp( "spherical" ) ) {
+			} else if ( !token.Icmp( "spheric" ) ) {
 				stage->customPathType = PPATH_ORBIT;
 			} else {
 				src.Error( "bad path type: %s\n", token.c_str() );
@@ -393,19 +388,19 @@ arcParticleStage *arcDeclParticle::ParseParticleStage( arcLexer &src ) {
 
 /*
 ================
-arcDeclParticle::Parse
+anDeclParticle::Parse
 ================
 */
-bool arcDeclParticle::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool anDeclParticle::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
 	if ( cvarSystem->GetCVarBool( "fs_buildresources" ) ) {
 		fileSystem->AddParticlePreload( GetName() );
 	}
 
-	arcLexer src;
-	arcNetToken	token;
+	anLexer src;
+	anToken	token;
 
 	unsigned int sourceChecksum = 0;
-	aRcStaticString< MAX_OSPATH > generatedFileName;
+	anStaticString< MAX_OSPATH > generatedFileName;
 	if ( allowBinaryVersion ) {
 		// Try to load the generated version of it
 		// If successful,
@@ -415,7 +410,7 @@ bool arcDeclParticle::Parse( const char *text, const int textLength, bool allowB
 		generatedFileName.AppendPath( GetName() );
 		generatedFileName.SetFileExtension( ".prt" );
 
-		arcFileLocal file( fileSystem->OpenFileReadMemory( generatedFileName ) );
+		anFileLocal file( fileSystem->OpenFileReadMemory( generatedFileName ) );
 		sourceChecksum = MD5_BlockChecksum( text, textLength );
 
 		if ( binaryLoadParticles.GetBool() && LoadBinary( file, sourceChecksum ) ) {
@@ -444,7 +439,7 @@ bool arcDeclParticle::Parse( const char *text, const int textLength, bool allowB
 				MakeDefault();
 				return false;
 			}
-			arcParticleStage *stage = ParseParticleStage( src );
+			anParticleStage *stage = ParseParticleStage( src );
 			if ( !stage ) {
 				src.Warning( "Particle stage parse failed" );
 				MakeDefault();
@@ -466,7 +461,7 @@ bool arcDeclParticle::Parse( const char *text, const int textLength, bool allowB
 
 	// don't calculate bounds or write binary files for defaulted ( non-existent ) particles in resource builds
 	if ( fileSystem->UsingResourceFiles() ) {
-		bounds = arcBounds( vec3_origin ).Expand( 8.0f );
+		bounds = anBounds( vec3_origin ).Expand( 8.0f );
 		return true;
 	}
 	//
@@ -479,12 +474,12 @@ bool arcDeclParticle::Parse( const char *text, const int textLength, bool allowB
 	}
 
 	if ( bounds.GetVolume() <= 0.1f ) {
-		bounds = arcBounds( vec3_origin ).Expand( 8.0f );
+		bounds = anBounds( vec3_origin ).Expand( 8.0f );
 	}
 
 	if ( allowBinaryVersion && binaryLoadParticles.GetBool() ) {
-		arcLibrary::Printf( "Writing %s\n", generatedFileName.c_str() );
-		arcFileLocal outputFile( fileSystem->OpenFileWrite( generatedFileName, "fs_basepath" ) );
+		anLibrary::Printf( "Writing %s\n", generatedFileName.c_str() );
+		anFileLocal outputFile( fileSystem->OpenFileWrite( generatedFileName, "fs_basepath" ) );
 		WriteBinary( outputFile, sourceChecksum );
 	}
 
@@ -493,23 +488,22 @@ bool arcDeclParticle::Parse( const char *text, const int textLength, bool allowB
 
 /*
 ========================
-arcDeclParticle::LoadBinary
+anDeclParticle::LoadBinary
 ========================
 */
-bool arcDeclParticle::LoadBinary( arcNetFile * file, unsigned int checksum ) {
-
-	if ( file == NULL ) {
+bool anDeclParticle::LoadBinary( anFile * file, unsigned int checksum ) {
+	if ( file == nullptr ) {
 		return false;
 	}
 
 	struct local {
-		static void LoadParticleParm( arcNetFile * file, idParticleParm & parm ) {
-			arcNetString name;
+		static void LoadParticleParm( anFile * file, anParticleParm & parm ) {
+			anString name;
 			file->ReadString( name );
 			if ( name.IsEmpty() ) {
-				parm.table = NULL;
+				parm.table = nullptr;
 			} else {
-				parm.table = (arcDeclTable *)declManager->FindType( DECL_TABLE, name, false );
+				parm.table = (anDeclTable *)declManager->FindType( DECL_TABLE, name, false );
 			}
 
 			file->ReadFloat( parm.from );
@@ -533,14 +527,13 @@ bool arcDeclParticle::LoadBinary( arcNetFile * file, unsigned int checksum ) {
 	file->ReadBig( numStages );
 
 	for ( int i = 0; i < numStages; i++ ) {
-		arcParticleStage * s = new (TAG_DECL) arcParticleStage;
+		anParticleStage * s = new (TAG_DECL) anParticleStage;
 		stages.Append( s );
 		assert( stages.Num() <= MAX_PARTICLE_STAGES );
-
-		arcNetString name;
+		anString name;
 		file->ReadString( name );
 		if ( name.IsEmpty() ) {
-			s->material = NULL;
+			s->material = nullptr;
 		} else {
 			s->material = declManager->FindMaterial( name );
 		}
@@ -592,18 +585,17 @@ bool arcDeclParticle::LoadBinary( arcNetFile * file, unsigned int checksum ) {
 
 /*
 ========================
-arcDeclParticle::WriteBinary
+anDeclParticle::WriteBinary
 ========================
 */
-void arcDeclParticle::WriteBinary( arcNetFile * file, unsigned int checksum ) {
-
-	if ( file == NULL ) {
+void anDeclParticle::WriteBinary( anFile *file, unsigned int checksum ) {
+	if ( file == nullptr ) {
 		return;
 	}
 
 	struct local {
-		static void WriteParticleParm( arcNetFile * file, idParticleParm & parm ) {
-			if ( parm.table != NULL && parm.table->GetName() != NULL ) {
+		static void WriteParticleParm( anFile *file, anParticleParm &parm ) {
+			if ( parm.table != nullptr && parm.table->GetName() != nullptr ) {
 				file->WriteString( parm.table->GetName() );
 			} else {
 				file->WriteString( "" );
@@ -618,9 +610,8 @@ void arcDeclParticle::WriteBinary( arcNetFile * file, unsigned int checksum ) {
 	file->WriteBig( stages.Num() );
 
 	for ( int i = 0; i < stages.Num(); i++ ) {
-		arcParticleStage * s = stages[i];
-
-		if ( s->material != NULL && s->material->GetName() != NULL ) {
+		anParticleStage *s = stages[i];
+		if ( s->material != nullptr && s->material->GetName() != nullptr ) {
 			file->WriteString( s->material->GetName() );
 		} else {
 			file->WriteString( "" );
@@ -670,19 +661,19 @@ void arcDeclParticle::WriteBinary( arcNetFile * file, unsigned int checksum ) {
 
 /*
 ================
-arcDeclParticle::FreeData
+anDeclParticle::FreeData
 ================
 */
-void arcDeclParticle::FreeData() {
+void anDeclParticle::FreeData() {
 	stages.DeleteContents( true );
 }
 
 /*
 ================
-arcDeclParticle::DefaultDefinition
+anDeclParticle::DefaultDefinition
 ================
 */
-const char *arcDeclParticle::DefaultDefinition() const {
+const char *anDeclParticle::DefaultDefinition() const {
 	return
 		"{\n"
 	"\t"	"{\n"
@@ -695,11 +686,10 @@ const char *arcDeclParticle::DefaultDefinition() const {
 
 /*
 ================
-arcDeclParticle::WriteParticleParm
+anDeclParticle::WriteParticleParm
 ================
 */
-void arcDeclParticle::WriteParticleParm( arcNetFile *f, idParticleParm *parm, const char *name ) {
-
+void anDeclParticle::WriteParticleParm( anFile *f, anParticleParm *parm, const char *name ) {
 	f->WriteFloatString( "\t\t%s\t\t\t\t ", name );
 	if ( parm->table ) {
 		f->WriteFloatString( "%s\n", parm->table->GetName() );
@@ -715,11 +705,10 @@ void arcDeclParticle::WriteParticleParm( arcNetFile *f, idParticleParm *parm, co
 
 /*
 ================
-arcDeclParticle::WriteStage
+anDeclParticle::WriteStage
 ================
 */
-void arcDeclParticle::WriteStage( arcNetFile *f, arcParticleStage *stage ) {
-
+void anDeclParticle::WriteStage( anFile *f, anParticleStage *stage ) {
 	int i;
 
 	f->WriteFloatString( "\t{\n" );
@@ -786,7 +775,6 @@ void arcDeclParticle::WriteStage( arcNetFile *f, arcParticleStage *stage ) {
 	f->WriteFloatString( "\t\trandomDistribution\t\t\t\t%i\n", static_cast<int>( stage->randomDistribution ) );
 	f->WriteFloatString( "\t\tboundsExpansion\t\t\t\t%.3f\n", stage->boundsExpansion );
 
-
 	f->WriteFloatString( "\t\tfadeIn\t\t\t\t%.3f\n", stage->fadeInFraction );
 	f->WriteFloatString( "\t\tfadeOut\t\t\t\t%.3f\n", stage->fadeOutFraction );
 	f->WriteFloatString( "\t\tfadeIndex\t\t\t\t%.3f\n", stage->fadeIndexFraction );
@@ -805,12 +793,11 @@ void arcDeclParticle::WriteStage( arcNetFile *f, arcParticleStage *stage ) {
 
 /*
 ================
-arcDeclParticle::RebuildTextSource
+anDeclParticle::RebuildTextSource
 ================
 */
-bool arcDeclParticle::RebuildTextSource() {
-	aRcFileMemory f;
-
+bool anDeclParticle::RebuildTextSource() {
+	anFileMemory f;
 	f.WriteFloatString( "\n\n/*\n"
 		"\tGenerated by the Particle Editor.\n"
 		"\tTo use the particle editor, launch the game and type 'editParticles' on the console.\n"
@@ -835,10 +822,10 @@ bool arcDeclParticle::RebuildTextSource() {
 
 /*
 ================
-arcDeclParticle::Save
+anDeclParticle::Save
 ================
 */
-bool arcDeclParticle::Save( const char *fileName ) {
+bool anDeclParticle::Save( const char *fileName ) {
 	RebuildTextSource();
 	if ( fileName ) {
 		declManager->CreateNewDecl( DECL_PARTICLE, GetName(), fileName );
@@ -850,21 +837,21 @@ bool arcDeclParticle::Save( const char *fileName ) {
 /*
 ====================================================================================
 
-idParticleParm
+anParticleParm
 
 ====================================================================================
 */
 
-float idParticleParm::Eval( float frac, arcRandom &rand ) const {
+float anParticleParm::Eval( float frac, arcRandom &rand ) const {
 	if ( table ) {
 		return table->TableLookup( frac );
 	}
 	return from + frac * ( to - from );
 }
 
-float idParticleParm::Integrate( float frac, arcRandom &rand ) const {
+float anParticleParm::Integrate( float frac, arcRandom &rand ) const {
 	if ( table ) {
-		common->Printf( "idParticleParm::Integrate: can't integrate tables\n" );
+		common->Printf( "anParticleParm::Integrate: can't integrate tables\n" );
 		return 0;
 	}
 	return ( from + frac * ( to - from ) * 0.5f ) * frac;
@@ -873,18 +860,18 @@ float idParticleParm::Integrate( float frac, arcRandom &rand ) const {
 /*
 ====================================================================================
 
-arcParticleStage
+anParticleStage
 
 ====================================================================================
 */
 
 /*
 ================
-arcParticleStage::arcParticleStage
+anParticleStage::anParticleStage
 ================
 */
-arcParticleStage::arcParticleStage() {
-	material = NULL;
+anParticleStage::anParticleStage() {
+	material = nullptr;
 	totalParticles = 0;
 	cycles = 0.0f;
 	cycleMsec = 0;
@@ -896,7 +883,7 @@ arcParticleStage::arcParticleStage() {
 	distributionParms[0] = distributionParms[1] = distributionParms[2] = distributionParms[3] = 0.0f;
 	directionType = PDIR_CONE;
 	directionParms[0] = directionParms[1] = directionParms[2] = directionParms[3] = 0.0f;
-	// idParticleParm		speed;
+	// anParticleParm		speed;
 	gravity = 0.0f;
 	worldGravity = false;
 	customPathType = PPATH_STANDARD;
@@ -908,11 +895,11 @@ arcParticleStage::arcParticleStage() {
 	randomDistribution = true;
 	entityColor = false;
 	initialAngle = 0.0f;
-	// idParticleParm		rotationSpeed;
+	// anParticleParm		rotationSpeed;
 	orientation = POR_VIEW;
 	orientationParms[0] = orientationParms[1] = orientationParms[2] = orientationParms[3] = 0.0f;
-	// idParticleParm		size
-	// idParticleParm		aspect
+	// anParticleParm		size
+	// anParticleParm		aspect
 	color.Zero();
 	fadeColor.Zero();
 	fadeInFraction = 0.0f;
@@ -925,12 +912,12 @@ arcParticleStage::arcParticleStage() {
 
 /*
 ================
-arcParticleStage::Default
+anParticleStage::Default
 
 Sets the stage to a default state
 ================
 */
-void arcParticleStage::Default() {
+void anParticleStage::Default() {
 	material = declManager->FindMaterial( "_default" );
 	totalParticles = 100;
 	spawnBunching = 1.0f;
@@ -954,7 +941,7 @@ void arcParticleStage::Default() {
 	orientationParms[3] = 0.0f;
 	speed.from = 150.0f;
 	speed.to = 150.0f;
-	speed.table = NULL;
+	speed.table = nullptr;
 	gravity = 1.0f;
 	worldGravity = false;
 	customPathType = PPATH_STANDARD;
@@ -972,13 +959,13 @@ void arcParticleStage::Default() {
 	initialAngle = 0.0f;
 	rotationSpeed.from = 0.0f;
 	rotationSpeed.to = 0.0f;
-	rotationSpeed.table = NULL;
+	rotationSpeed.table = nullptr;
 	size.from = 4.0f;
 	size.to = 4.0f;
-	size.table = NULL;
+	size.table = nullptr;
 	aspect.from = 1.0f;
 	aspect.to = 1.0f;
-	aspect.table = NULL;
+	aspect.table = nullptr;
 	color.x = 1.0f;
 	color.y = 1.0f;
 	color.z = 1.0f;
@@ -998,16 +985,16 @@ void arcParticleStage::Default() {
 
 /*
 ================
-arcParticleStage::NumQuadsPerParticle
+anParticleStage::NumQuadsPerParticle
 
 includes trails and cross faded animations
 ================
 */
-int arcParticleStage::NumQuadsPerParticle() const {
+int anParticleStage::NumQuadsPerParticle() const {
 	int	count = 1;
 
 	if ( orientation == POR_AIMED ) {
-		int	trails = arcMath::Ftoi( orientationParms[0] );
+		int	trails = anMath::Ftoi( orientationParms[0] );
 		// each trail stage will add an extra quad
 		count *= ( 1 + trails );
 	}
@@ -1022,17 +1009,17 @@ int arcParticleStage::NumQuadsPerParticle() const {
 
 /*
 ===============
-arcParticleStage::ParticleOrigin
+anParticleStage::ParticleOrigin
 ===============
 */
-void arcParticleStage::ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const {
+void anParticleStage::ParticleOrigin( particleGen_t *g, anVec3 &origin ) const {
 	if ( customPathType == PPATH_STANDARD ) {
 		//
 		// find intial origin distribution
 		//
 		float radiusSqr, angle1, angle2;
 
-		switch( distributionType ) {
+		switch ( distributionType ) {
 			case PDIST_RECT: {	// ( sizeX sizeY sizeZ )
 				origin[0] = ( ( randomDistribution ) ? g->random.CRandomFloat() : 1.0f ) * distributionParms[0];
 				origin[1] = ( ( randomDistribution ) ? g->random.CRandomFloat() : 1.0f ) * distributionParms[1];
@@ -1040,9 +1027,9 @@ void arcParticleStage::ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const
 				break;
 			}
 			case PDIST_CYLINDER: {	// ( sizeX sizeY sizeZ ringFraction )
-				angle1 = ( ( randomDistribution ) ? g->random.CRandomFloat() : 1.0f ) * arcMath::TWO_PI;
+				angle1 = ( ( randomDistribution ) ? g->random.CRandomFloat() : 1.0f ) * anMath::TWO_PI;
 
-				arcMath::SinCos16( angle1, origin[0], origin[1] );
+				anMath::SinCos16( angle1, origin[0], origin[1] );
 				origin[2] = ( ( randomDistribution ) ? g->random.CRandomFloat() : 1.0f );
 
 				// reproject points that are inside the ringFraction to the outer band
@@ -1107,17 +1094,17 @@ void arcParticleStage::ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const
 		//
 		// add the velocity over time
 		//
-		arcVec3	dir;
+		anVec3	dir;
 
-		switch( directionType ) {
+		switch ( directionType ) {
 			case PDIR_CONE: {
 				// angle is the full angle, so 360 degrees is any spherical direction
-				angle1 = g->random.CRandomFloat() * directionParms[0] * arcMath::M_DEG2RAD;
-				angle2 = g->random.CRandomFloat() * arcMath::PI;
+				angle1 = g->random.CRandomFloat() * directionParms[0] * anMath::M_DEG2RAD;
+				angle2 = g->random.CRandomFloat() * anMath::PI;
 
 				float s1, c1, s2, c2;
-				arcMath::SinCos16( angle1, s1, c1 );
-				arcMath::SinCos16( angle2, s2, c2 );
+				anMath::SinCos16( angle1, s1, c1 );
+				anMath::SinCos16( angle2, s2, c2 );
 
 				dir[0] = s1 * c2;
 				dir[1] = s1 * s2;
@@ -1142,14 +1129,14 @@ void arcParticleStage::ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const
 		// use the standard gravity
 		//
 		float angle1, angle2, speed1, speed2;
-		switch( customPathType ) {
+		switch ( customPathType ) {
 			case PPATH_HELIX: {		// ( sizeX sizeY sizeZ radialSpeed axialSpeed )
 				speed1 = g->random.CRandomFloat();
 				speed2 = g->random.CRandomFloat();
-				angle1 = g->random.RandomFloat() * arcMath::TWO_PI + customPathParms[3] * speed1 * g->age;
+				angle1 = g->random.RandomFloat() * anMath::TWO_PI + customPathParms[3] * speed1 * g->age;
 
 				float s1, c1;
-				arcMath::SinCos16( angle1, s1, c1 );
+				anMath::SinCos16( angle1, s1, c1 );
 
 				origin[0] = c1 * customPathParms[0];
 				origin[1] = s1 * customPathParms[1];
@@ -1157,14 +1144,14 @@ void arcParticleStage::ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const
 				break;
 			}
 			case PPATH_FLIES: {		// ( radialSpeed axialSpeed size )
-				speed1 = arcMath::ClampFloat( 0.4f, 1.0f, g->random.CRandomFloat() );
-				speed2 = arcMath::ClampFloat( 0.4f, 1.0f, g->random.CRandomFloat() );
-				angle1 = g->random.RandomFloat() * arcMath::PI * 2 + customPathParms[0] * speed1 * g->age;
-				angle2 = g->random.RandomFloat() * arcMath::PI * 2 + customPathParms[1] * speed1 * g->age;
+				speed1 = anMath::ClampFloat( 0.4f, 1.0f, g->random.CRandomFloat() );
+				speed2 = anMath::ClampFloat( 0.4f, 1.0f, g->random.CRandomFloat() );
+				angle1 = g->random.RandomFloat() * anMath::PI * 2 + customPathParms[0] * speed1 * g->age;
+				angle2 = g->random.RandomFloat() * anMath::PI * 2 + customPathParms[1] * speed1 * g->age;
 
 				float s1, c1, s2, c2;
-				arcMath::SinCos16( angle1, s1, c1 );
-				arcMath::SinCos16( angle2, s2, c2 );
+				anMath::SinCos16( angle1, s1, c1 );
+				anMath::SinCos16( angle2, s2, c2 );
 
 				origin[0] = c1 * c2;
 				origin[1] = s1 * c2;
@@ -1173,10 +1160,10 @@ void arcParticleStage::ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const
 				break;
 			}
 			case PPATH_ORBIT: {		// ( radius speed axis )
-				angle1 = g->random.RandomFloat() * arcMath::TWO_PI + customPathParms[1] * g->age;
+				angle1 = g->random.RandomFloat() * anMath::TWO_PI + customPathParms[1] * g->age;
 
 				float s1, c1;
-				arcMath::SinCos16( angle1, s1, c1 );
+				anMath::SinCos16( angle1, s1, c1 );
 
 				origin[0] = c1 * customPathParms[0];
 				origin[1] = s1 * customPathParms[0];
@@ -1190,7 +1177,7 @@ void arcParticleStage::ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const
 				break;
 			}
 			default: {
-				common->Error( "arcParticleStage::ParticleOrigin: bad customPathType" );
+				common->Error( "anParticleStage::ParticleOrigin: bad customPathType" );
 			}
 		}
 
@@ -1203,7 +1190,7 @@ void arcParticleStage::ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const
 
 	// add gravity after adjusting for axis
 	if ( worldGravity ) {
-		arcVec3 gra( 0, 0, -gravity );
+		anVec3 gra( 0, 0, -gravity );
 		gra *= g->renderEnt->axis.Transpose();
 		origin += gra * g->age * g->age;
 	} else {
@@ -1213,27 +1200,27 @@ void arcParticleStage::ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const
 
 /*
 ==================
-arcParticleStage::ParticleVerts
+anParticleStage::ParticleVerts
 ==================
 */
-int	arcParticleStage::ParticleVerts( particleGen_t *g, arcVec3 origin, arcDrawVert *verts ) const {
+int	anParticleStage::ParticleVerts( particleGen_t *g, anVec3 origin, anDrawVertex *verts ) const {
 	float	psize = size.Eval( g->frac, g->random );
 	float	paspect = aspect.Eval( g->frac, g->random );
 
 	float	width = psize;
 	float	height = psize * paspect;
 
-	arcVec3	left, up;
+	anVec3	left, up;
 
 	if ( orientation == POR_AIMED ) {
 		// reset the values to an earlier time to get a previous origin
 		arcRandom	currentRandom = g->random;
 		float		currentAge = g->age;
 		float		currentFrac = g->frac;
-		arcDrawVert *verts_p = verts;
-		arcVec3		stepOrigin = origin;
-		arcVec3		stepLeft;
-		int			numTrails = arcMath::Ftoi( orientationParms[0] );
+		anDrawVertex *verts_p = verts;
+		anVec3		stepOrigin = origin;
+		anVec3		stepLeft;
+		int			numTrails = anMath::Ftoi( orientationParms[0] );
 		float		trailTime = orientationParms[1];
 
 		if ( trailTime == 0 ) {
@@ -1248,12 +1235,12 @@ int	arcParticleStage::ParticleVerts( particleGen_t *g, arcVec3 origin, arcDrawVe
 			g->age = currentAge - ( i + 1 ) * trailTime / ( numTrails + 1 );	// time to back up
 			g->frac = g->age / particleLife;
 
-			arcVec3	oldOrigin;
+			anVec3	oldOrigin;
 			ParticleOrigin( g, oldOrigin );
 
 			up = stepOrigin - oldOrigin;	// along the direction of travel
 
-			arcVec3	forwardDir;
+			anVec3	forwardDir;
 			g->renderEnt->axis.ProjectVector( g->renderView->viewAxis[0], forwardDir );
 
 			up -= ( up * forwardDir ) * forwardDir;
@@ -1315,9 +1302,9 @@ int	arcParticleStage::ParticleVerts( particleGen_t *g, arcVec3 origin, arcDrawVe
 		angle -= angleMove;
 	}
 
-	angle = angle / 180 * arcMath::PI;
-	float c = arcMath::Cos16( angle );
-	float s = arcMath::Sin16( angle );
+	angle = angle / 180 * anMath::PI;
+	float c = anMath::Cos16( angle );
+	float s = anMath::Sin16( angle );
 
 	if ( orientation  == POR_Z ) {
 		// oriented in entity space
@@ -1345,7 +1332,7 @@ int	arcParticleStage::ParticleVerts( particleGen_t *g, arcVec3 origin, arcDrawVe
 		up[2] = c;
 	} else {
 		// oriented in viewer space
-		arcVec3	entityLeft, entityUp;
+		anVec3	entityLeft, entityUp;
 
 		g->renderEnt->axis.ProjectVector( g->renderView->viewAxis[1], entityLeft );
 		g->renderEnt->axis.ProjectVector( g->renderView->viewAxis[2], entityUp );
@@ -1367,10 +1354,10 @@ int	arcParticleStage::ParticleVerts( particleGen_t *g, arcVec3 origin, arcDrawVe
 
 /*
 ==================
-arcParticleStage::ParticleTexCoords
+anParticleStage::ParticleTexCoords
 ==================
 */
-void arcParticleStage::ParticleTexCoords( particleGen_t *g, arcDrawVert *verts ) const {
+void anParticleStage::ParticleTexCoords( particleGen_t *g, anDrawVertex *verts ) const {
 	float	s, width;
 	float	t, height;
 
@@ -1403,10 +1390,10 @@ void arcParticleStage::ParticleTexCoords( particleGen_t *g, arcDrawVert *verts )
 
 /*
 ==================
-arcParticleStage::ParticleColors
+anParticleStage::ParticleColors
 ==================
 */
-void arcParticleStage::ParticleColors( particleGen_t *g, arcDrawVert *verts ) const {
+void anParticleStage::ParticleColors( particleGen_t *g, anDrawVertex *verts ) const {
 	float	fadeFraction = 1.0f;
 
 	// most particles fade in at the beginning and fade out at the end
@@ -1428,7 +1415,7 @@ void arcParticleStage::ParticleColors( particleGen_t *g, arcDrawVert *verts ) co
 
 	for ( int i = 0; i < 4; i++ ) {
 		float	fcolor = ( ( entityColor ) ? g->renderEnt->shaderParms[i] : color[i] ) * fadeFraction + fadeColor[i] * ( 1.0f - fadeFraction );
-		int		icolor = arcMath::Ftoi( fcolor * 255.0f );
+		int		icolor = anMath::Ftoi( fcolor * 255.0f );
 		if ( icolor < 0 ) {
 			icolor = 0;
 		} else if ( icolor > 255 ) {
@@ -1443,7 +1430,7 @@ void arcParticleStage::ParticleColors( particleGen_t *g, arcDrawVert *verts ) co
 
 /*
 ================
-arcParticleStage::CreateParticle
+anParticleStage::CreateParticle
 
 Returns 0 if no particle is created because it is completely faded out
 Returns 4 if a normal quad is created
@@ -1455,8 +1442,8 @@ Vertex order is:
 2 3
 ================
 */
-int arcParticleStage::CreateParticle( particleGen_t *g, arcDrawVert *verts ) const {
-	arcVec3	origin;
+int anParticleStage::CreateParticle( particleGen_t *g, anDrawVertex *verts ) const {
+	anVec3	origin;
 
 	verts[0].Clear();
 	verts[1].Clear();
@@ -1485,7 +1472,7 @@ int arcParticleStage::CreateParticle( particleGen_t *g, arcDrawVert *verts ) con
 	float	frac = g->animationFrameFrac;
 	float	iFrac = 1.0f - frac;
 
-	arcVec2 tempST;
+	anVec2 tempST;
 	for ( int i = 0; i < numVerts; i++ ) {
 		verts[numVerts + i] = verts[i];
 
@@ -1508,43 +1495,43 @@ int arcParticleStage::CreateParticle( particleGen_t *g, arcDrawVert *verts ) con
 
 /*
 ==================
-arcParticleStage::GetCustomPathName
+anParticleStage::GetCustomPathName
 ==================
 */
-const char* arcParticleStage::GetCustomPathName() {
+const char* anParticleStage::GetCustomPathName() {
 	int index = ( customPathType < CustomParticleCount ) ? customPathType : 0;
 	return ParticleCustomDesc[index].name;
 }
 
 /*
 ==================
-arcParticleStage::GetCustomPathDesc
+anParticleStage::GetCustomPathDesc
 ==================
 */
-const char* arcParticleStage::GetCustomPathDesc() {
+const char* anParticleStage::GetCustomPathDesc() {
 	int index = ( customPathType < CustomParticleCount ) ? customPathType : 0;
 	return ParticleCustomDesc[index].desc;
 }
 
 /*
 ==================
-arcParticleStage::NumCustomPathParms
+anParticleStage::NumCustomPathParms
 ==================
 */
-int arcParticleStage::NumCustomPathParms() {
+int anParticleStage::NumCustomPathParms() {
 	int index = ( customPathType < CustomParticleCount ) ? customPathType : 0;
 	return ParticleCustomDesc[index].count;
 }
 
 /*
 ==================
-arcParticleStage::SetCustomPathType
+anParticleStage::SetCustomPathType
 ==================
 */
-void arcParticleStage::SetCustomPathType( const char *p ) {
+void anParticleStage::SetCustomPathType( const char *p ) {
 	customPathType = PPATH_STANDARD;
 	for ( int i = 0; i < CustomParticleCount; i ++ ) {
-		if ( arcNetString::Icmp( p, ParticleCustomDesc[i].name ) == 0 ) {
+		if ( anString::Icmp( p, ParticleCustomDesc[i].name ) == 0 ) {
 			customPathType = static_cast<prtCustomPth_t>( i );
 			break;
 		}
@@ -1553,10 +1540,10 @@ void arcParticleStage::SetCustomPathType( const char *p ) {
 
 /*
 ==================
-arcParticleStage::operator=
+anParticleStage::operator=
 ==================
 */
-void arcParticleStage::operator=( const arcParticleStage &src ) {
+void anParticleStage::operator=( const anParticleStage &src ) {
 	material = src.material;
 	totalParticles = src.totalParticles;
 	cycles = src.cycles;

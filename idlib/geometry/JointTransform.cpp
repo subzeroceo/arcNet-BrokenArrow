@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 /*
@@ -6,8 +6,8 @@
 arcJointMat::ToJointQuat
 =============
 */
-idJointQuat arcJointMat::ToJointQuat( void ) const {
-	idJointQuat	jq;
+anJointQuat arcJointMat::ToJointQuat( void ) const {
+	anJointQuat	jq;
 	float		trace;
 	float		s;
 	float		t;
@@ -22,7 +22,7 @@ idJointQuat arcJointMat::ToJointQuat( void ) const {
 	if ( trace > 0.0f ) {
 
 		t = trace + 1.0f;
-		s = arcMath::InvSqrt( t ) * 0.5f;
+		s = anMath::InvSqrt( t ) * 0.5f;
 
 		jq.q[3] = s * t;
 		jq.q[0] = ( mat[1 * 4 + 2] - mat[2 * 4 + 1] ) * s;
@@ -42,7 +42,7 @@ idJointQuat arcJointMat::ToJointQuat( void ) const {
 		k = next[j];
 
 		t = ( mat[i * 4 + i] - ( mat[j * 4 + j] + mat[k * 4 + k] ) ) + 1.0f;
-		s = arcMath::InvSqrt( t ) * 0.5f;
+		s = anMath::InvSqrt( t ) * 0.5f;
 
 		jq.q[i] = s * t;
 		jq.q[3] = ( mat[j * 4 + k] - mat[k * 4 + j] ) * s;

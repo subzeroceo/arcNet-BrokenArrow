@@ -2313,9 +2313,9 @@ typedef void (APIENTRY  *GLDEBUGPROC)(GLenum source,GLenum type,GLuint id,GLenum
 #define GL_READ_PIXELS_FORMAT             0x828D
 #define GL_READ_PIXELS_TYPE               0x828E
 #define GL_TEXTURE_IMAGE_FORMAT           0x828F
-#define GL_TEXTURE_IMAGE_TYPE             0x8290
+#define GL_TEXTURE_anImageYPE             0x8290
 #define GL_GET_TEXTURE_IMAGE_FORMAT       0x8291
-#define GL_GET_TEXTURE_IMAGE_TYPE         0x8292
+#define GL_GET_TEXTURE_anImageYPE         0x8292
 #define GL_MIPMAP                         0x8293
 #define GL_MANUAL_GENERATE_MIPMAP         0x8294
 #define GL_AUTO_GENERATE_MIPMAP           0x8295
@@ -2335,7 +2335,7 @@ typedef void (APIENTRY  *GLDEBUGPROC)(GLenum source,GLenum type,GLuint id,GLenum
 #define GL_SHADER_IMAGE_LOAD              0x82A4
 #define GL_SHADER_IMAGE_STORE             0x82A5
 #define GL_SHADER_IMAGE_ATOMIC            0x82A6
-#define GL_IMAGE_TEXEL_SIZE               0x82A7
+#define GL_anImageEXEL_SIZE               0x82A7
 #define GL_IMAGE_COMPATIBILITY_CLASS      0x82A8
 #define GL_IMAGE_PIXEL_FORMAT             0x82A9
 #define GL_IMAGE_PIXEL_TYPE               0x82AA
@@ -2960,9 +2960,9 @@ struct _cl_context;
 struct _cl_event;
 #define GL_SYNC_CL_EVENT_ARB              0x8240
 #define GL_SYNC_CL_EVENT_COMPLETE_ARB     0x8241
-typedef GLsync (APIENTRYP PFNGLCREATESYNCFROMCLEVENTARBPROC) (struct _cl_context *context, struct _cl_event *event, GLbitfield flags);
+typedef GLsync (APIENTRYP PFNGLCREATESYNCFROMCLEVENTARBPROC) ( struct _cl_context *context, struct _cl_event *event, GLbitfield flags);
 #ifdef GL_GLEXT_PROTOTYPES
-GLAPI GLsync APIENTRY glCreateSyncFromCLeventARB (struct _cl_context *context, struct _cl_event *event, GLbitfield flags);
+GLAPI GLsync APIENTRY glCreateSyncFromCLeventARB ( struct _cl_context *context, struct _cl_event *event, GLbitfield flags);
 #endif
 #endif /* GL_ARB_cl_event */
 
@@ -5797,8 +5797,8 @@ GLAPI void APIENTRY glProgramUniformui64vNV (GLuint program, GLint location, GLs
 #define GL_SHADING_RATE_8_INVOCATIONS_PER_PIXEL_NV 0x956E
 #define GL_SHADING_RATE_16_INVOCATIONS_PER_PIXEL_NV 0x956F
 #define GL_SHADING_RATE_IMAGE_BINDING_NV  0x955B
-#define GL_SHADING_RATE_IMAGE_TEXEL_WIDTH_NV 0x955C
-#define GL_SHADING_RATE_IMAGE_TEXEL_HEIGHT_NV 0x955D
+#define GL_SHADING_RATE_anImageEXEL_WIDTH_NV 0x955C
+#define GL_SHADING_RATE_anImageEXEL_HEIGHT_NV 0x955D
 #define GL_SHADING_RATE_IMAGE_PALETTE_SIZE_NV 0x955E
 #define GL_MAX_COARSE_FRAGMENT_SAMPLES_NV 0x955F
 #define GL_SHADING_RATE_SAMPLE_ORDER_DEFAULT_NV 0x95AE

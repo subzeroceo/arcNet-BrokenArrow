@@ -75,23 +75,23 @@ typedef enum {
 /*
 ===============================================================================
 
-	arcConesoleVariable
+	anCVar
 
 ===============================================================================
 */
 
-class arcConesoleVariable {
+class anCVar {
 public:
 							// Never use the default constructor.
-							arcConesoleVariable() { assert( typeid( this ) != typeid( arcConesoleVariable ) ); }
+							anCVar() { assert( typeid( this ) != typeid( anCVar ) ); }
 
 							// Always use one of the following constructors.
-							arcConesoleVariable( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion = NULL );
-							arcConesoleVariable( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, argCompletion_t valueCompletion = NULL );
-							arcConesoleVariable( const char *name, const char *value, int flags, const char *description, const char **valueStrings, argCompletion_t valueCompletion = NULL );
-							arcConesoleVariable( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion = NULL, const byte *data );
+							anCVar( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion = nullptr );
+							anCVar( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, argCompletion_t valueCompletion = nullptr );
+							anCVar( const char *name, const char *value, int flags, const char *description, const char **valueStrings, argCompletion_t valueCompletion = nullptr );
+							anCVar( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion = nullptr, const byte *data );
 
-	virtual					~arcConesoleVariable() {}
+	virtual					~anCVar() {}
 
 	const char *			GetName() const { return internalVar->name; }
 	int						GetFlags() const { return internalVar->flags; }
@@ -118,7 +118,7 @@ public:
 	void					SetFloat( const float value ) { internalVar->InternalSetFloat( value ); }
 	void					SetByte() { internalVar->InternalSetByte( value ); }
 
-	void					SetInternalVar( arcConesoleVariable *cvar ) { internalVar = cvar; }
+	void					SetInternalVar( anCVar *cvar ) { internalVar = cvar; }
 
 	static void				RegisterStaticVars();
 
@@ -135,8 +135,8 @@ protected:
 	float					floatValue;				// atof( value )
 	byte *					byteValue; 				// New member variable for storing a byte value
 
-	arcConesoleVariable *	internalVar;			// internal cvar
-	arcConesoleVariable *	next;					// next statically declared cvar
+	anCVar *	internalVar;			// internal cvar
+	anCVar *	next;					// next statically declared cvar
 
 private:
 	void					Init( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, const char **valueStrings, argCompletion_t valueCompletion );
@@ -149,26 +149,26 @@ private:
 
 	virtual const char *	InternalGetResetString() const { return value; }
 
-	static arcConesoleVariable *staticVars;
+	static anCVar *staticVars;
 };
 
-typedef arcConesoleVariable	cvar;
-ARC_INLINE arcConesoleVariable::arcConesoleVariable( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion ) {
+typedef anCVar cvar;
+ARC_INLINE anCVar::anCVar( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion ) {
 	if ( !valueCompletion && ( flags & CVAR_BOOL ) ) {
 		valueCompletion = arcCmdSystem::ArgCompletion_Boolean;
 	}
-	Init( name, value, flags, description, 1, -1, NULL, valueCompletion );
+	Init( name, value, flags, description, 1, -1, nullptr, valueCompletion );
 }
 
-ARC_INLINE arcConesoleVariable::arcConesoleVariable( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, argCompletion_t valueCompletion ) {
-	Init( name, value, flags, description, valueMin, valueMax, NULL, valueCompletion );
+ARC_INLINE anCVar::anCVar( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, argCompletion_t valueCompletion ) {
+	Init( name, value, flags, description, valueMin, valueMax, nullptr, valueCompletion );
 }
 
-ARC_INLINE arcConesoleVariable::arcConesoleVariable( const char *name, const char *value, int flags, const char *description, const char **valueStrings, argCompletion_t valueCompletion ) {
+ARC_INLINE anCVar::anCVar( const char *name, const char *value, int flags, const char *description, const char **valueStrings, argCompletion_t valueCompletion ) {
 	Init( name, value, flags, description, 1, -1, valueStrings, valueCompletion );
 }
 
-ARC_INLINE arcConesoleVariable::arcConesoleVariable( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion, const byte *data ) {
+ARC_INLINE anCVar::anCVar( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion, const byte *data ) {
     if ( !valueCompletion && (flags & CVAR_BYTE)) {
         valueCompletion = arcCmdSystem::ArgCompletion_byte;
     }
@@ -178,25 +178,25 @@ ARC_INLINE arcConesoleVariable::arcConesoleVariable( const char *name, const cha
 /*
 ===============================================================================
 
-	arcCVarSystem
+	anCVarSystem
 
 ===============================================================================
 */
 
-class arcCVarSystem {
+class anCVarSystem {
 public:
-	virtual					~arcCVarSystem() {}
+	virtual					~anCVarSystem() {}
 
 	virtual void			Init() = 0;
 	virtual void			Shutdown() = 0;
 	virtual bool			IsInitialized() const = 0;
 
 							// Registers a CVar.
-	virtual void			Register( arcConesoleVariable *cvar ) = 0;
+	virtual void			Register( anCVar *cvar ) = 0;
 
 							// Finds the CVar with the given name.
-							// Returns NULL if there is no CVar with the given name.
-	virtual arcConesoleVariable *Find( const char *name ) = 0;
+							// Returns nullptr if there is no CVar with the given name.
+	virtual anCVar *Find( const char *name ) = 0;
 
 							// Sets the value of a CVar by name.
 	virtual void			SetCVarString( const char *name, const char *value, int flags = 0 ) = 0;
@@ -214,7 +214,7 @@ public:
 
 							// Called by the command system when argv(0 ) doesn't match a known command.
 							// Returns true if argv(0 ) is a variable reference and prints or changes the CVar.
-	virtual bool			Command( const arcCommandArgs &args ) = 0;
+	virtual bool			Command( const anCommandArgs &args ) = 0;
 
 							// Command and argument completion using callback for each valid string.
 	virtual void			CommandCompletion( void(*callback)( const char *s ) ) = 0;
@@ -232,14 +232,14 @@ public:
 	virtual void			RemoveFlaggedAutoCompletion( int flags ) = 0;
 
 							// Writes variables with one of the given flags set to the given file.
-	virtual void			WriteFlaggedVariables( int flags, const char *setCmd, arcNetFile *f ) const = 0;
+	virtual void			WriteFlaggedVariables( int flags, const char *setCmd, anFile *f ) const = 0;
 
 							// Moves CVars to and from dictionaries.
-	virtual void			MoveCVarsToDict( int flags, arcDictionary & dict, bool onlyModified = false ) const = 0;
-	virtual void			SetCVarsFromDict( const arcDictionary &dict ) = 0;
+	virtual void			MoveCVarsToDict( int flags, anDict & dict, bool onlyModified = false ) const = 0;
+	virtual void			SetCVarsFromDict( const anDict &dict ) = 0;
 };
 
-extern arcCVarSystem *		cvarSystem;
+extern anCVarSystem *		cvarSystem;
 
 /*
 ===============================================================================
@@ -247,14 +247,14 @@ extern arcCVarSystem *		cvarSystem;
 	CVar Registration
 
 	Each DLL using CVars has to declare a private copy of the static variable
-	arcConesoleVariable::staticVars like this: arcConesoleVariable * arcConesoleVariable::staticVars = NULL;
-	Furthermore arcConesoleVariable::RegisterStaticVars() has to be called after the
+	anCVar::staticVars like this: anCVar * anCVar::staticVars = nullptr;
+	Furthermore anCVar::RegisterStaticVars() has to be called after the
 	cvarSystem pointer is set when the DLL is first initialized.
 
 ===============================================================================
 */
 
-ARC_INLINE void arcConesoleVariable::Init( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, const char **valueStrings, argCompletion_t valueCompletion ) {
+ARC_INLINE void anCVar::Init( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, const char **valueStrings, argCompletion_t valueCompletion ) {
 	this->name = name;
 	this->value = value;
 	this->flags = flags;
@@ -268,7 +268,7 @@ ARC_INLINE void arcConesoleVariable::Init( const char *name, const char *value, 
 	this->floatValue = 0.0f;
 	this->byteValue = 0;
 	this->internalVar = this;
-	if ( staticVars != (arcConesoleVariable *)0xFFFFFFFF ) {
+	if ( staticVars != (anCVar *)0xFFFFFFFF ) {
 		this->next = staticVars;
 		staticVars = this;
 	} else {
@@ -276,12 +276,12 @@ ARC_INLINE void arcConesoleVariable::Init( const char *name, const char *value, 
 	}
 }
 
-ARC_INLINE void arcConesoleVariable::RegisterStaticVars() {
-	if ( staticVars != (arcConesoleVariable *)0xFFFFFFFF ) {
-		for ( arcConesoleVariable *cvar = staticVars; cvar; cvar = cvar->next ) {
+ARC_INLINE void anCVar::RegisterStaticVars() {
+	if ( staticVars != (anCVar *)0xFFFFFFFF ) {
+		for ( anCVar *cvar = staticVars; cvar; cvar = cvar->next ) {
 			cvarSystem->Register( cvar );
 		}
-		staticVars = (arcConesoleVariable *)0xFFFFFFFF;
+		staticVars = (anCVar *)0xFFFFFFFF;
 	}
 }
 

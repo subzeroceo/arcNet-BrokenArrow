@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -13,9 +13,9 @@ static char THIS_FILE[] = __FILE__;
 #define NODE_DELTA 10
 #define NODE_TIME 25
 
-static idCVar g_debugWakes( "g_debugWakes", "0", CVAR_BOOL, "Debug the vehicle wakes" );
+static anCVar g_debugWakes( "g_debugWakes", "0", CVAR_BOOL, "Debug the vehicle wakes" );
 
-void WakeParms::ParseFromDict( const arcDict &spawnArgs ) {
+void WakeParms::ParseFromDict( const anDict &spawnArgs ) {
 
 	noWake = false;
 	centerMat = declHolder.declMaterialType.LocalFind( spawnArgs.GetString( "mtr_wake_center", "_default" ) );
@@ -29,9 +29,9 @@ void WakeParms::ParseFromDict( const arcDict &spawnArgs ) {
 	maxVisDist = spawnArgs.GetInt( "maxVisDist", "2048" );
 
 	numPoints = 0;
-	arcVec3 temp;
+	anVec3 temp;
 	numPoints=0;
-	while ( spawnArgs.GetVector( va("wake_point_%i", numPoints ), "0 0 0", temp ) ) {
+	while ( spawnArgs.GetVector( va( "wake_point_%i", numPoints ), "0 0 0", temp ) ) {
 		if ( numPoints >= MAX_POINTS ) {
 			common->Error( "Too many wake points" );
 		}
@@ -39,15 +39,15 @@ void WakeParms::ParseFromDict( const arcDict &spawnArgs ) {
 		numPoints++;
 	}
 
-	arcVec3 mid;
+	anVec3 mid;
 	mid.Zero();
-	for (int i=0; i<numPoints; i++) {
+	for ( int i=0; i<numPoints; i++ ) {
 		mid += points[i];
 	}
 	if ( numPoints ) {
-		mid /= (float)numPoints;
+		mid /= ( float )numPoints;
 	}
-	for (int i=0; i<numPoints; i++) {
+	for ( int i=0; i<numPoints; i++ ) {
 		normals[i] = points[i] - mid;
 		normals[i].Normalize();
 	}
@@ -103,7 +103,7 @@ WakeLayer::WakeLayer( void ) {
 	lastDeriv = vec3_origin;
 }
 
-void WakeLayer::Init( arcDrawVert *triangleVerts, int firstVertex ) {
+void WakeLayer::Init( anDrawVertex *triangleVerts, int firstVertex ) {
 	this->triangleVerts = triangleVerts;
 	this->firstVert = firstVertex;
 	numNodes = 0;
@@ -115,26 +115,26 @@ void WakeLayer::Init( arcDrawVert *triangleVerts, int firstVertex ) {
 	lastDeriv = vec3_origin;
 }
 
-void WakeLayer::AddNode( const arcVec3 &origin, const arcVec3 &emitLeft, float alpha ) {
-	arcVec3 up( 0.0f, 0.0f, 1.0f );
+void WakeLayer::AddNode( const anVec3 &origin, const anVec3 &emitLeft, float alpha ) {
+	anVec3 up( 0.0f, 0.0f, 1.0f );
 	float sgn = 1.f;
 	if ( !numNodes ) {
 		lastOrigin = origin;
 	}
 
 	// Update derivatives ( oh these such simple fd's but they seem to work fine :D )
-	arcVec3 dp = origin - lastOrigin;
+	anVec3 dp = origin - lastOrigin;
 	if ( !numNodes ) {
 		lastDeriv = dp;
 	}
-	arcVec3 ddp = dp - lastDeriv;
+	anVec3 ddp = dp - lastDeriv;
 	float  delta = dp.Length();
 
 	if ( numNodes && (delta < NODE_DELTA) ) {
 		return;
 	}
 
-	arcVec3 leftL;
+	anVec3 leftL;
 	leftL.Cross( dp, up );
 	leftL.Normalize();
 
@@ -142,7 +142,7 @@ void WakeLayer::AddNode( const arcVec3 &origin, const arcVec3 &emitLeft, float a
 	float curv;
 	float temp = dp.x*dp.x + dp.y*dp.y;
 	if ( temp ) {
-		float dv = arcMath::Pow( temp, -(3.0f/2.0f) );
+		float dv = anMath::Pow( temp, -(3.0f/2.0f) );
 		curv = (dp.x * ddp.y - dp.y * ddp.x) * dv;
 	} else {
 		curv = 0.00001f;// Almost straight
@@ -191,8 +191,8 @@ void WakeLayer::AddNode( const arcVec3 &origin, const arcVec3 &emitLeft, float a
 	index = index*2 + firstVert;
 	triangleVerts[index+0].xyz = origin + leftL * negWidth * posScale;
 	triangleVerts[index+1].xyz = origin - leftL * negWidth * negScale;
-	triangleVerts[index+0].SetST( arcVec2( texOfs, texNeg ) );
-	triangleVerts[index+1].SetST( arcVec2( texOfs, texPos ) );
+	triangleVerts[index+0].SetST( anVec2( texOfs, texNeg ) );
+	triangleVerts[index+1].SetST( anVec2( texOfs, texPos ) );
 	triangleVerts[index+0].color[0] = triangleVerts[index+0].color[1] = triangleVerts[index+0].color[2] = triangleVerts[index+0].color[3] = 255;
 	triangleVerts[index+1].color[0] = triangleVerts[index+1].color[1] = triangleVerts[index+1].color[2] = triangleVerts[index+1].color[3] = 255;
 	triangleVerts[index+0].SetTangent( leftL );
@@ -208,14 +208,14 @@ void WakeLayer::AddNode( const arcVec3 &origin, const arcVec3 &emitLeft, float a
 
 void WakeLayer::Update( srfTriangles_t *triangles ) {
 	// Remove nodes that timed out (they will be at the front)
-	while ( (( gameLocal.time - GetNode(0).spawnTime ) > lifeTime) && numNodes ) {
+	while ( ( ( gameLocal.time - GetNode(0).spawnTime ) > lifeTime) && numNodes ) {
 		PopFront();
 	}
 
 	// Update the index lists for the others
 	triangles->bounds.Clear();
 	for ( int i=1; i<numNodes; i++ ) {
-		int curIndex = RemapIndex(i);
+		int curIndex = RemapIndex( i );
 
 		if ( nodes[curIndex].breakWake ) continue; // Don't add connecting triangles with previous...
 		int lastIndex = RemapIndex(i-1);
@@ -228,7 +228,7 @@ void WakeLayer::Update( srfTriangles_t *triangles ) {
 			triangles->verts[curVertIndex+0].color[3] = 0;
 			triangles->verts[curVertIndex+1].color[3] = 0;
 		} else {
-			byte alpha = (1.0f - ((gameLocal.time - nodes[curIndex].spawnTime) / (float)lifeTime)) * 255 * basealpha;
+			byte alpha = (1.0f - ((gameLocal.time - nodes[curIndex].spawnTime) / ( float )lifeTime)) * 255 * basealpha;
 			triangles->verts[curVertIndex+0].color[3] = alpha;
 			triangles->verts[curVertIndex+1].color[3]  = alpha;
 		}
@@ -301,7 +301,7 @@ void Wake::Init(  const WakeParms &params, int ticket ) {
 	triangleVerts[1].SetNum( ( WakeLayer::MAX_NODES * 2 + 2)*MAX_POINTS );
 
 	const_cast<modelSurface_t *>(renderEntity.hModel->Surface(0))->material = params.centerMat;
-	const_cast<modelSurface_t *>(renderEntity.hModel->Surface(1))->material = params.edgeMat;
+	const_cast<modelSurface_t *>(renderEntity.hModel->Surface( 1 ))->material = params.edgeMat;
 	numPoints = params.numPoints;
 	for ( int i=0; i<numPoints; i++ ) {
 		points[i] = params.points[i];
@@ -314,7 +314,7 @@ void Wake::Init(  const WakeParms &params, int ticket ) {
 	GetTriSurf( 1, 1 )->bounds.Clear();
 
 	// Edges (these are just mirrors of each other)
-	for ( int i=0; i<MAX_POINTS; i++) {
+	for ( int i=0; i<MAX_POINTS; i++ ) {
 		layer[i].Init( triangleVerts[1].Begin(), WakeLayer::MAX_NODES * 2 * i );
 		layer[i].SetWidths( params.edgeWidths[0], params.edgeWidths[1] );
 		layer[i].SetCurvatureScales( params.edgeScales[0], params.edgeScales[1] );
@@ -342,11 +342,11 @@ static int side( float v ) {
 	}
 }
 
-void Wake::Update( const arcVec3 &forward, const arcVec3 &origin, const arcMat3 &axis ) {
+void Wake::Update( const anVec3 &forward, const anVec3 &origin, const anMat3 &axis ) {
 	// In worldspace
-	arcVec3 left;
-	arcVec3 up( 0.0f, 0.0f, 1.0f );
-	arcVec3 flat = forward;
+	anVec3 left;
+	anVec3 up( 0.0f, 0.0f, 1.0f );
+	anVec3 flat = forward;
 	flat.z = 0.0f;
 
 	if ( flat.LengthSqr() < 100.f ) {
@@ -359,17 +359,17 @@ void Wake::Update( const arcVec3 &forward, const arcVec3 &origin, const arcMat3 
 	left.Normalize();
 
 	// Find the extreme points of the bounding box normal to the forward direction
-	float min = arcMath::INFINITY;
-	float max = -arcMath::INFINITY;
-	arcVec3 newMinPoint;
-	arcVec3 newMaxPoint;
+	float min = anMath::INFINITY;
+	float max = -anMath::INFINITY;
+	anVec3 newMinPoint;
+	anVec3 newMaxPoint;
 
 	int minidx = -1;
 	int maxidx = -1;
 	float tpvalue[ MAX_POINTS ];
 	for ( int i=0; i<numPoints; i++ ) {
 		float tp = ( points[i] * axis ) * left;
-		tpvalue[ i ] = tp;
+		tpvalue[i] = tp;
 		if ( tp < min ) {
 			min = tp;
 			minidx = i;
@@ -384,45 +384,45 @@ void Wake::Update( const arcVec3 &forward, const arcVec3 &origin, const arcMat3 
 
 	float avg = (min+max) * 0.5f;
 	float alpha[ MAX_POINTS ];
-	for (int i=0; i<numPoints; i++ ) {
+	for ( int i=0; i<numPoints; i++ ) {
 		if ( tpvalue[i] < avg ) {
-			alpha[i] = arcMath::ClampFloat( 0.f, 1.f, 1.f-( ( tpvalue[i] - min ) / 25.f) );
+			alpha[i] = anMath::ClampFloat( 0.f, 1.f, 1.f-( ( tpvalue[i] - min ) / 25.f) );
 		} else {
-			alpha[i] = arcMath::ClampFloat( 0.f, 1.f, 1.f-( ( max - tpvalue[i] ) / 25.f) );
+			alpha[i] = anMath::ClampFloat( 0.f, 1.f, 1.f-( ( max - tpvalue[i] ) / 25.f) );
 		}
 	}
 
 	maxPoint = maxPoint * 0.95f + newMaxPoint * 0.05f;
 	minPoint = minPoint * 0.95f + newMinPoint * 0.05f;
 
-	arcVec3 worldMinPoint = minPoint * axis + origin;
-	arcVec3 worldMaxPoint = maxPoint * axis + origin;
+	anVec3 worldMinPoint = minPoint * axis + origin;
+	anVec3 worldMaxPoint = maxPoint * axis + origin;
 
 	worldMinPoint.z = origin.z;
 	worldMaxPoint.z = origin.z;
 
 	if ( g_debugWakes.GetBool() ) {
-		gameRenderWorld->DebugSphere( arcVec4( 1.0, 0.0, 0.0, 0.0 ), idSphere( worldMinPoint, 10 ) );
-		gameRenderWorld->DebugSphere( arcVec4( 0.0, 1.0, 0.0, 0.0 ), idSphere( worldMaxPoint, 10 ) );
+		gameRenderWorld->DebugSphere( anVec4( 1.0, 0.0, 0.0, 0.0 ), idSphere( worldMinPoint, 10 ) );
+		gameRenderWorld->DebugSphere( anVec4( 0.0, 1.0, 0.0, 0.0 ), idSphere( worldMaxPoint, 10 ) );
 		for ( int i=0; i<numPoints; i++ ) {
-			arcVec3 pnt = points[i];
+			anVec3 pnt = points[i];
 			//pnt.z = origin.z;
 
-			arcVec3 pointWorld = pnt * axis + origin;
+			anVec3 pointWorld = pnt * axis + origin;
 			pointWorld.z = origin.z;
-			arcVec3 normalWorld = normals[i] * axis;
-			gameRenderWorld->DebugSphere( arcVec4( 0.0, 0.0, 1.0, 0.0 ), idSphere( pointWorld, 10 ) );
+			anVec3 normalWorld = normals[i] * axis;
+			gameRenderWorld->DebugSphere( anVec4( 0.0, 0.0, 1.0, 0.0 ), idSphere( pointWorld, 10 ) );
 		}
 	}
 
-	static const arcVec3 offset( 0.0f, 0.0f, -1.0f );
+	static const anVec3 offset( 0.0f, 0.0f, -1.0f );
 
 	if ( gameLocal.time > nextNodeTime ) {
-		arcVec3 mid = ( worldMinPoint + worldMaxPoint ) * 0.5f;
-		for (int i=0; i<numPoints; i++) {
-			arcVec3 pnt = points[i];
-			arcVec3 wp = pnt * axis + origin;
-			arcVec3 emit = normals[i] * axis;
+		anVec3 mid = ( worldMinPoint + worldMaxPoint ) * 0.5f;
+		for ( int i=0; i<numPoints; i++ ) {
+			anVec3 pnt = points[i];
+			anVec3 wp = pnt * axis + origin;
+			anVec3 emit = normals[i] * axis;
 			wp.z = origin.z;
 			layer[i].AddNode( wp, emit, alpha[i] );
 		}
@@ -434,18 +434,18 @@ void Wake::Update( const arcVec3 &forward, const arcVec3 &origin, const arcMat3 
 }
 
 void Wake::Update( void ) {
-	idRenderModel *prevModel = renderEntity.hModel;
+	anRenderModel *prevModel = renderEntity.hModel;
 	SetDoubleBufferedModel();
-	memcpy( renderEntity.hModel->Surface(0)->geometry->verts, triangleVerts[0].Begin(), triangleVerts[0].Num() * sizeof(arcDrawVert) );
-	memcpy( renderEntity.hModel->Surface(1)->geometry->verts, triangleVerts[1].Begin(), triangleVerts[1].Num() * sizeof(arcDrawVert) );
+	memcpy( renderEntity.hModel->Surface(0)->geometry->verts, triangleVerts[0].Begin(), triangleVerts[0].Num() * sizeof(anDrawVertex) );
+	memcpy( renderEntity.hModel->Surface( 1 )->geometry->verts, triangleVerts[1].Begin(), triangleVerts[1].Num() * sizeof(anDrawVertex) );
 
 	renderEntity.hModel->FreeVertexCache();
 	GetTriSurf(0)->numIndexes = 0;
-	GetTriSurf(1)->numIndexes = 0;
-	for (int i=0; i<numPoints; i++) {
-		layer[i].Update( GetTriSurf(1) );
+	GetTriSurf( 1 )->numIndexes = 0;
+	for ( int i=0; i<numPoints; i++ ) {
+		layer[i].Update( GetTriSurf( 1 ) );
 	}
-//	GetTriSurf(1)->numIndexes = 0;
+//	GetTriSurf( 1 )->numIndexes = 0;
 	layer3.Update( GetTriSurf(0) );
 	renderEntity.bounds = GetTriSurf(0)->bounds;
 
@@ -454,7 +454,7 @@ void Wake::Update( void ) {
 	//}
 
 	bool allstopped = true;
-	for (int i=0; i<numPoints; i++) {
+	for ( int i=0; i<numPoints; i++ ) {
 		allstopped &= layer[i].NumNodes() == 0;
 	}
 
@@ -469,13 +469,13 @@ void Wake::Update( void ) {
 }
 
 void Wake::Break( void ) {
-	for (int i=0; i<numPoints; i++) {
+	for ( int i=0; i<numPoints; i++ ) {
 		layer[i].Break();
 	}
 	layer3.Break();
 }
 
-void Wake::AddPoint( const arcVec3 &point ) {
+void Wake::AddPoint( const anVec3 &point ) {
 	if ( numPoints >= MAX_POINTS ) return;
 	points[numPoints] = point;
 	numPoints++;
@@ -500,8 +500,8 @@ unsigned int WakeManagerLocal::AllocateWake( const WakeParms &params ) {
 			if ( g_debugWakes.GetBool() ) {
 				common->Printf( "Initializing wake %i-%i (%s) (%i)\n", i, ticket, params.centerMat->GetName(), gameLocal.time );
 			}
-			if ( !arcNetString::Cmp( "_default", params.centerMat->GetName() ) ) {
-				common->Printf("defaulted\n");
+			if ( !anString::Cmp( "_default", params.centerMat->GetName() ) ) {
+				common->Printf( "defaulted\n" );
 			}
 			wakes[i].Init( params, ticket );
 			ticket++;
@@ -524,7 +524,7 @@ unsigned int WakeManagerLocal::AllocateWake( const WakeParms &params ) {
 	return 0;
 }
 
-bool WakeManagerLocal::UpdateWake( unsigned int handle, const arcVec3 &forward, const arcVec3 &origin, const arcMat3 &axis ) {
+bool WakeManagerLocal::UpdateWake( unsigned int handle, const anVec3 &forward, const anVec3 &origin, const anMat3 &axis ) {
 	if ( handle == 0 ) return true;
 	int ticket  = handle >> 16;
 	int index = (handle & 0xFFFF)-1;
@@ -557,5 +557,5 @@ void WakeManagerLocal::Think( void ) {
 
 void WakeManagerLocal::Deinit( void ) {
 	delete []wakes;
-	wakes = NULL;
+	wakes = nullptr;
 }

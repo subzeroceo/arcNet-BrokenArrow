@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -14,7 +14,7 @@ extern HTREEITEM FindTreeItem(CTreeCtrl *tree, HTREEITEM root, const char *text,
 // CPreviewDlg dialog
 
 IMPLEMENT_DYNAMIC(CPreviewDlg, CDialog)
-CPreviewDlg::CPreviewDlg(CWnd* pParent /*=NULL*/)
+CPreviewDlg::CPreviewDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CPreviewDlg::IDD, pParent) {
 	currentMode = MODELS;
 	disablePreview = false;
@@ -53,7 +53,7 @@ BOOL CPreviewDlg::OnInitDialog() {
 
 	if ( mediaName.Length() ) {
 		HTREEITEM root = treeMedia.GetRootItem();
-		HTREEITEM sel = FindTreeItem(&treeMedia, root, mediaName, NULL );
+		HTREEITEM sel = FindTreeItem(&treeMedia, root, mediaName, nullptr );
 		if (sel) {
 			treeMedia.SelectItem(sel);
 		}
@@ -68,7 +68,7 @@ void CPreviewDlg::BuildTree() {
 	quickTree.Clear();
 	treeMedia.DeleteAllItems();
 
-	arcFileList *files;
+	anFileList *files;
 
 	if ( currentMode == GUIS ) {
 		files = fileSystem->ListFilesTree( "guis", ".gui" );
@@ -102,15 +102,15 @@ void CPreviewDlg::RebuildTree( const char *_data ) {
 }
 
 void CPreviewDlg::AddCommentedItems() {
-	const char *buffer = NULL;
+	const char *buffer = nullptr;
 	const char *path;
 	items.Clear();
 	path = (currentMode == GUIS) ? "guis/guis.commented" : "models/models.commented";
-	ARCParser src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
-	if (fileSystem->ReadFile(path, (void**)&buffer, NULL) && buffer) {
+	anParser src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+	if (fileSystem->ReadFile(path, (void**)&buffer, nullptr ) && buffer) {
 		src.LoadMemory(buffer, strlen(buffer), path);
 		if (src.IsLoaded() ) {
-			arcNetToken token, tok1, tok2, tok3;
+			anToken token, tok1, tok2, tok3;
 			while( src.ReadToken( &token ) ) {
 				if (token == "{" ) {
 					// start a new commented item
@@ -137,17 +137,17 @@ void CPreviewDlg::AddCommentedItems() {
 	}
 }
 
-void CPreviewDlg::AddStrList( const char *root, const arcStringList &list, int id ) {
-	arcNetString		out, path;
+void CPreviewDlg::AddStrList( const char *root, const anStringList &list, int id ) {
+	anString		out, path;
 	HTREEITEM	base = treeMedia.GetRootItem();
 	if (base) {
 		out = treeMedia.GetItemText(base);
 		if (stricmp(root, out) ) {
-			base = NULL;
+			base = nullptr;
 		}
 	}
 
-	if (base == NULL) {
+	if (base == nullptr ) {
 		base = treeMedia.InsertItem(root);
 		treeMedia.SetItemData(base, PARENTID);
 	}
@@ -157,9 +157,9 @@ void CPreviewDlg::AddStrList( const char *root, const arcStringList &list, int i
 
 	int		count = list.Num();
 
-	arcNetString	last, qt;
+	anString	last, qt;
 	for ( int i = 0; i < count; i++ ) {
-		arcNetString name = list[i];
+		anString name = list[i];
 
 		// now break the name down convert to slashes
 		name.BackSlashesToSlashes();
@@ -172,7 +172,7 @@ void CPreviewDlg::AddStrList( const char *root, const arcStringList &list, int i
 			if (index >= 0 ) {
 				name.Left(index, last);
 			}
-		} else if (arcNetString::Icmpn(last, name, len) == 0 && name.Last('/') <= len) {
+		} else if (anString::Icmpn(last, name, len) == 0 && name.Last('/') <= len) {
 			name.Right(name.Length() - len - 1, out);
 			add = treeMedia.InsertItem(out, item);
 			qt = root;
@@ -192,8 +192,8 @@ void CPreviewDlg::AddStrList( const char *root, const arcStringList &list, int i
 		while (index >= 0 ) {
 			index = name.Find('/');
 			if (index >= 0 ) {
-				HTREEITEM newItem = NULL;
-				HTREEITEM *check = NULL;
+				HTREEITEM newItem = nullptr;
+				HTREEITEM *check = nullptr;
 				name.Left( index, out );
 				path += out;
 				qt = root;
@@ -203,7 +203,7 @@ void CPreviewDlg::AddStrList( const char *root, const arcStringList &list, int i
 					newItem = *check;
 				}
 				//HTREEITEM	newItem = FindTreeItem(&treeMedia, item, name.Left(index, out), item);
-				if (newItem == NULL) {
+				if (newItem == nullptr ) {
 					newItem = treeMedia.InsertItem(out, item);
 					qt = root;
 					qt += "/";
@@ -249,8 +249,8 @@ void CPreviewDlg::OnTvnSelchangedTreeMedia(NMHDR *pNMHDR, LRESULT *pResult) {
 
 			// have to build the name back up
 			HTREEITEM parent = treeMedia.GetParentItem( item );
-			while ( parent != NULL ) {
-				arcNetString strParent = treeMedia.GetItemText( parent );
+			while ( parent != nullptr ) {
+				anString strParent = treeMedia.GetItemText( parent );
 				strParent += "/";
 				strParent += mediaName;
 				mediaName = strParent;
@@ -277,7 +277,7 @@ void CPreviewDlg::OnTvnSelchangedTreeMedia(NMHDR *pNMHDR, LRESULT *pResult) {
 			if ( treeMedia.ItemHasChildren(item) == FALSE ) {
 				int dw = abs( ( int )treeMedia.GetItemData( item ) ) - 1;
 				if ( dw < items.Num() ) {
-					arcNetString work = items[dw].Path;
+					anString work = items[dw].Path;
 					work += "\r\n\r\n";
 					work += items[dw].Comments;
 					editInfo.SetWindowText( work );
@@ -287,14 +287,14 @@ void CPreviewDlg::OnTvnSelchangedTreeMedia(NMHDR *pNMHDR, LRESULT *pResult) {
 		}
 
 		if ( currentMode == MODELS || currentMode == SKINS ) {
-			arcNetString modelMedia;
+			anString modelMedia;
 			if ( currentMode == MODELS ) {
 				modelMedia = mediaName;
 			} else {
 				modelMedia = data;
 			}
 			if ( modelMedia.Length() ) {
-				int size = fileSystem->ReadFile( modelMedia, NULL, NULL );
+				int size = fileSystem->ReadFile( modelMedia, nullptr, nullptr );
 				int lsize;
 				if ( strstr( modelMedia, ".lwo" ) ) {
 					lsize = 128 * 1024;
@@ -325,16 +325,16 @@ void CPreviewDlg::OnTvnSelchangedTreeMedia(NMHDR *pNMHDR, LRESULT *pResult) {
 			wndPreview.RedrawWindow();
 			RedrawWindow();
 		} else if ( currentMode == GUIS ) {
-			const arcMaterial *mat = declManager->FindMaterial( "guiSurfaces/guipreview" );
+			const anMaterial *mat = declManager->FindMaterial( "guiSurfaces/guipreview" );
 			mat->SetGui(mediaName);
 			m_drawMaterial.setMedia( "guiSurfaces/guipreview" );
 			m_drawMaterial.setScale(4.4f);
 			wndPreview.setDrawable(&m_drawMaterial);
 			wndPreview.Invalidate();
 			wndPreview.RedrawWindow();
-			arcUserInterfaces *gui = uiManager->FindGui( mediaName, false, false, true );
+			anUserInterfaces *gui = uiManager->FindGui( mediaName, false, false, true );
 			if ( gui ) {
-				arcNetString str = gui->Comment();
+				anString str = gui->Comment();
 				str.Replace( "\n", "\r\n" );
 				if ( str != "" ) {
 					editInfo.SetWindowText( str );
@@ -414,7 +414,7 @@ void CPreviewDlg::OnBnClickedButtonAdd() {
 			treeMedia.SetItemImage(item, 2, 2);
 			const char *path;
 			path = (currentMode == GUIS) ? "guis/guis.commented" : "models/models.commented";
-			arcNetString str;
+			anString str;
 			void *buffer;
 			fileSystem->ReadFile( path, &buffer );
 			str = (char *) buffer;
@@ -433,12 +433,12 @@ void CPreviewDlg::OnBnClickedButtonAdd() {
 
 void CPreviewDlg::AddSounds(bool rootItems) {
 	int i, j;
-	arcStringList list(1024);
-	arcStringList list2(1024);
+	anStringList list(1024);
+	anStringList list2(1024);
 	HTREEITEM base = treeMedia.InsertItem( "Sound Shaders" );
 
 	for ( i = 0; i < declManager->GetNumDecls( DECL_SOUND ); i++ ) {
-		const arcSoundShader *poo = declManager->SoundByIndex( i, false );
+		const anSoundShader *poo = declManager->SoundByIndex( i, false );
 		list.AddUnique( poo->GetFileName() );
 	}
 	list.Sort();
@@ -448,20 +448,20 @@ void CPreviewDlg::AddSounds(bool rootItems) {
 		treeMedia.SetItemData(child, SOUNDPARENT);
 		treeMedia.SetItemImage(child, 0, 1 );
 		list2.Clear();
-		for (j = 0; j < declManager->GetNumDecls( DECL_SOUND ); j++ ) {
-			const arcSoundShader *poo = declManager->SoundByIndex( j, false );
-			if ( arcNetString::Icmp( list[i], poo->GetFileName() ) == 0 ) {
+		for ( j = 0; j < declManager->GetNumDecls( DECL_SOUND ); j++ ) {
+			const anSoundShader *poo = declManager->SoundByIndex( j, false );
+			if ( anString::Icmp( list[i], poo->GetFileName() ) == 0 ) {
 				list2.Append( poo->GetName() );
 			}
 		}
 		list2.Sort();
-		for (j = 0; j < list2.Num(); j++ ) {
+		for ( j = 0; j < list2.Num(); j++ ) {
 			HTREEITEM child2 = treeMedia.InsertItem( list2[j], child );
 			treeMedia.SetItemData(child2, SOUNDS);
 			treeMedia.SetItemImage(child2, 2, 2);
 		}
 	}
-	arcFileList *files;
+	anFileList *files;
 	files = fileSystem->ListFilesTree( "sound", ".wav" );
     AddStrList( "Wave files", files->GetList(), WAVES );
 	fileSystem->FreeFileList( files );
@@ -473,7 +473,7 @@ void CPreviewDlg::SetMode( int mode, const char *preSelect ) {
 		mediaName = preSelect;
 	}
 
-	if (GetSafeHwnd() == NULL) {
+	if (GetSafeHwnd() == nullptr ) {
 		return;
 	}
 
@@ -536,14 +536,14 @@ void CPreviewDlg::OnBnClickedButtonPlay() {
 }
 
 void CPreviewDlg::AddMaterials(bool rootItems) {
-	arcStringList list(1024);
+	anStringList list(1024);
 	//char temp[2048];
 	int count = declManager->GetNumDecls( DECL_MATERIAL );
 	if (count > 0 ) {
 		for ( int i = 0; i < count; i++ ) {
-			const arcMaterial *mat = declManager->MaterialByIndex( i, false);
+			const anMaterial *mat = declManager->MaterialByIndex( i, false);
 			if ( !rootItems) {
-				if (strchr(mat->GetName(), '/') == NULL && strchr(mat->GetName(), '\\') == NULL) {
+				if (strchr(mat->GetName(), '/') == nullptr && strchr(mat->GetName(), '\\') == nullptr ) {
 					continue;
 				}
 			}
@@ -556,13 +556,13 @@ void CPreviewDlg::AddMaterials(bool rootItems) {
 }
 
 void CPreviewDlg::AddParticles(bool rootItems) {
-	arcStringList list(1024);
+	anStringList list(1024);
 	int count = declManager->GetNumDecls( DECL_PARTICLE );
 	if (count > 0 ) {
 		for ( int i = 0; i < count; i++ ) {
-			const arcDecleration *ips = declManager->DeclByIndex( DECL_PARTICLE, i );
+			const anDecl *ips = declManager->DeclByIndex( DECL_PARTICLE, i );
 			if ( !rootItems) {
-				if (strchr(ips->GetName(), '/') == NULL && strchr(ips->GetName(), '\\') == NULL) {
+				if (strchr(ips->GetName(), '/') == nullptr && strchr(ips->GetName(), '\\') == nullptr ) {
 					continue;
 				}
 			}
@@ -574,15 +574,15 @@ void CPreviewDlg::AddParticles(bool rootItems) {
 }
 
 void CPreviewDlg::AddSkins( bool rootItems ) {
-	arcStringList list(1024);
-	arcStringList list2(1024);
-	arcNetString str;
+	anStringList list(1024);
+	anStringList list2(1024);
+	anString str;
 	int count = declManager->GetNumDecls( DECL_SKIN );
 	if (count > 0 ) {
 		for ( int i = 0; i < count; i++ ) {
-			const arcDeclSkin *skin = declManager->SkinByIndex( i );
+			const anDeclSkin *skin = declManager->SkinByIndex( i );
 			if ( !rootItems) {
-				if (strchr(skin->GetName(), '/') == NULL && strchr(skin->GetName(), '\\') == NULL) {
+				if (strchr(skin->GetName(), '/') == nullptr && strchr(skin->GetName(), '\\') == nullptr ) {
 					continue;
 				}
 			}

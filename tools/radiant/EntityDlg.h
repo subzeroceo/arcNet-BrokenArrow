@@ -39,9 +39,9 @@ class CEntityDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CEntityDlg)
 public:
-	CEntityDlg(CWnd* pParent = NULL);   // standard constructor
+	CEntityDlg(CWnd* pParent = nullptr );   // standard constructor
 	virtual ~CEntityDlg();
-	void SetDict(arcDictionary *_dict) {
+	void SetDict(anDict *_dict) {
 		dict = dict;
 	}
 	void SetEditEntity(entity_t *ent) {
@@ -87,7 +87,7 @@ public:
 	CEdit editKey;
 	CEdit editVal;
 	void UpdateKeyVal(const char *key, const char *val);
-	void SelectCurvePointByRay(const arcVec3 &org, const arcVec3 &dir, int buttons);
+	void SelectCurvePointByRay(const anVec3 &org, const anVec3 &dir, int buttons);
 	void UpdateEntityCurve();
 
 
@@ -97,7 +97,7 @@ private:
 	CPropertyList listKeyVal;
 	CPropertyList listVars;
 	CComboBox comboClass;
-	arcDictionary *dict;
+	anDict *dict;
 	const idMD5Anim* currentAnimation;
 	int currentAnimationFrame;
 

@@ -1,3 +1,4 @@
+#include "../idlib/Lib.h"
 #pragma hdrsto
 #include "ColorSpace.h"
 
@@ -27,10 +28,10 @@ To *Color-Convert RGB and YCoCg* ColorSpaces, use the following conversions:
 
 /*
 ========================
-arcColorSpaces::ConvertRGBToYCoCg
+anColorSpaces::ConvertRGBToYCoCg
 ========================
 */
-void arcColorSpaces::ConvertRGBToYCoCg( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertRGBToYCoCg( byte *dst, const byte *src, int width, int height ) {
 	for ( int i = 0; i < width * height; i++ ) {
 		int r = src[i*4+0];
 		int g = src[i*4+1];
@@ -45,10 +46,10 @@ void arcColorSpaces::ConvertRGBToYCoCg( byte *dst, const byte *src, int width, i
 
 /*
 ========================
-arcColorSpaces::ConvertYCoCgToRGB
+anColorSpaces::ConvertYCoCgToRGB
 ========================
 */
-void arcColorSpaces::ConvertYCoCgToRGB( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertYCoCgToRGB( byte *dst, const byte *src, int width, int height ) {
 	for ( int i = 0; i < width * height; i++ ) {
 		int y  = src[i*4+0];
 		int co = src[i*4+1] - 128;
@@ -63,10 +64,10 @@ void arcColorSpaces::ConvertYCoCgToRGB( byte *dst, const byte *src, int width, i
 
 /*
 ========================
-arcColorSpaces::ConvertRGBToCoCg_Y
+anColorSpaces::ConvertRGBToCoCg_Y
 ========================
 */
-void arcColorSpaces::ConvertRGBToCoCg_Y( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertRGBToCoCg_Y( byte *dst, const byte *src, int width, int height ) {
 	for ( int i = 0; i < width * height; i++ ) {
 		int r = src[i*4+0];
 		int g = src[i*4+1];
@@ -81,10 +82,10 @@ void arcColorSpaces::ConvertRGBToCoCg_Y( byte *dst, const byte *src, int width, 
 
 /*
 ========================
-arcColorSpaces::ConvertCoCg_YToRGB
+anColorSpaces::ConvertCoCg_YToRGB
 ========================
 */
-void arcColorSpaces::ConvertCoCg_YToRGB( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertCoCg_YToRGB( byte *dst, const byte *src, int width, int height ) {
 	for ( int i = 0; i < width * height; i++ ) {
 		int co = src[i*4+0] - 128;
 		int cg = src[i*4+1] - 128;
@@ -99,13 +100,13 @@ void arcColorSpaces::ConvertCoCg_YToRGB( byte *dst, const byte *src, int width, 
 
 /*
 ========================
-arcColorSpaces::ConvertCoCgSYToRGB
+anColorSpaces::ConvertCoCgSYToRGB
 
 A scale factor is encoded in the Z value to give better compression of
 the color channels.
 ========================
 */
-void arcColorSpaces::ConvertCoCgSYToRGB( byte * dst, const byte * src, int width, int height ) {
+void anColorSpaces::ConvertCoCgSYToRGB( byte * dst, const byte * src, int width, int height ) {
 	for ( int i = 0; i < width * height; i++ ) {
 		int co = src[i*4+0] - 128;
 		int cg = src[i*4+1] - 128;
@@ -114,8 +115,8 @@ void arcColorSpaces::ConvertCoCgSYToRGB( byte * dst, const byte * src, int width
 
 		float	scale = 1.0f / ( 1.0f + a * ( 31.875f / 255.0f ) ) ;
 
-		co = arcMath::Ftoi( co * scale );
-		cg = arcMath::Ftoi( cg * scale );
+		co = anMath::Ftoi( co * scale );
+		cg = anMath::Ftoi( cg * scale );
 		dst[i*4+0] = CLAMP_BYTE( y + COCG_TO_R( co, cg ) );
 		dst[i*4+1] = CLAMP_BYTE( y + COCG_TO_G( co, cg ) );
 		dst[i*4+2] = CLAMP_BYTE( y + COCG_TO_B( co, cg ) );
@@ -125,10 +126,10 @@ void arcColorSpaces::ConvertCoCgSYToRGB( byte * dst, const byte * src, int width
 
 /*
 ========================
-arcColorSpaces::ConvertRGBToYCoCg420
+anColorSpaces::ConvertRGBToYCoCg420
 ========================
 */
-void arcColorSpaces::ConvertRGBToYCoCg420( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertRGBToYCoCg420( byte *dst, const byte *src, int width, int height ) {
 	int numSamples = 0;
 
 	for ( int j = 0; j < height; j += 2 ) {
@@ -173,10 +174,10 @@ void arcColorSpaces::ConvertRGBToYCoCg420( byte *dst, const byte *src, int width
 
 /*
 ========================
-arcColorSpaces::ConvertYCoCg420ToRGB
+anColorSpaces::ConvertYCoCg420ToRGB
 ========================
 */
-void arcColorSpaces::ConvertYCoCg420ToRGB( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertYCoCg420ToRGB( byte *dst, const byte *src, int width, int height ) {
 	int numSamples = width * height * 2 - width;
 
 	for ( int j = height - 2; j >= 0; j -= 2 ) {
@@ -263,12 +264,54 @@ const int g034414		= 22554;	// int( 0.34414 * (1<<16) + 0.5 )
 #define CBCR_TO_G( cb, cr )			( ( ycbcr_round - cb * g034414 - cr * g071414 ) >> ycbcr_shift )
 #define CBCR_TO_B( cb, cr )			( ( ycbcr_round + cb * b177200 ) >> ycbcr_shift )
 
+#define CLAMP( v, l, h ) ( ( v)<(l) ? (l) : ( v)>(h) ? (h) : v)
+
+static void ConvertRGBAtoYCoCgA( const GLbyte *in, GLbyte *src, GLint width, GLint height ) {
+	for ( GLint y = 0; y < height; y++ ) {
+		const GLbyte *inbyte  = in  + y * width * 4;
+		GLbyte       *outbyte = out + y * width * 4;
+
+		for ( GLint x = 0; x < width; x++ ) {
+			GLint r = *inbyte++;
+			GLint g = *inbyte++;
+			GLint b = *inbyte++;
+			GLint a = *inbyte++;
+			GLint rb2 = ( r + b ) >> 1;
+
+			*outbyte++ = ( g + rb2 ) >> 1;       // Y  =  R/4 + G/2 + B/4
+			*outbyte++ = ( r - b + 256 ) >> 1;   // Co =  R/2       - B/2
+			*outbyte++ = ( g - rb2 + 256 ) >> 1; // Cg = -R/4 + G/2 - B/4
+			*outbyte++ = a;
+		}
+	}
+}
+
+
+static void YCoCgAtoRGBA( const GLbyte *in, GLbyte *out, GLint width, GLint height ) {
+	for ( GLint y = 0; y < height; y++ ) {
+		const GLbyte *inbyte  = in  + y * width * 4;
+		GLbyte       *outbyte = out + y * width * 4;
+
+		for ( GLint x = 0; x < width; x++ ) {
+			GLint _Y = *inbyte++;
+			GLint Co = *inbyte++;
+			GLint Cg = *inbyte++;
+			GLint a  = *inbyte++;
+
+			*outbyte++ = CLAMP( _Y + Co - Cg,       0, 255 ); // R = Y + Co - Cg
+			*outbyte++ = CLAMP( _Y      + Cg - 128, 0, 255 ); // G = Y + Cg
+			*outbyte++ = CLAMP( _Y - Co - Cg + 256, 0, 255 ); // B = Y - Co - Cg
+			*outbyte++ = a;
+		}
+	}
+}
+
 /*
 ========================
-arcColorSpaces::ConvertRGBToYCbCr
+anColorSpaces::ConvertRGBToYCbCr
 ========================
 */
-void arcColorSpaces::ConvertRGBToYCbCr( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertRGBToYCbCr( byte *dst, const byte *src, int width, int height ) {
 	for ( int i = 0; i < width * height; i++ ) {
 		int r = src[i*4+0];
 		int g = src[i*4+1];
@@ -284,10 +327,10 @@ void arcColorSpaces::ConvertRGBToYCbCr( byte *dst, const byte *src, int width, i
 
 /*
 ========================
-arcColorSpaces::ConvertYCbCrToRGB
+anColorSpaces::ConvertYCbCrToRGB
 ========================
 */
-void arcColorSpaces::ConvertYCbCrToRGB( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertYCbCrToRGB( byte *dst, const byte *src, int width, int height ) {
 	for ( int i = 0; i < width * height; i++ ) {
 		int y  = src[i*4+0];
 		int cb = src[i*4+1] - 128;
@@ -301,10 +344,10 @@ void arcColorSpaces::ConvertYCbCrToRGB( byte *dst, const byte *src, int width, i
 
 /*
 ========================
-arcColorSpaces::ConvertRGBToCbCr_Y
+anColorSpaces::ConvertRGBToCbCr_Y
 ========================
 */
-void arcColorSpaces::ConvertRGBToCbCr_Y( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertRGBToCbCr_Y( byte *dst, const byte *src, int width, int height ) {
 	for ( int i = 0; i < width * height; i++ ) {
 		int r = src[i*4+0];
 		int g = src[i*4+1];
@@ -320,10 +363,10 @@ void arcColorSpaces::ConvertRGBToCbCr_Y( byte *dst, const byte *src, int width, 
 
 /*
 ========================
-arcColorSpaces::ConvertCbCr_YToRGB
+anColorSpaces::ConvertCbCr_YToRGB
 ========================
 */
-void arcColorSpaces::ConvertCbCr_YToRGB( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertCbCr_YToRGB( byte *dst, const byte *src, int width, int height ) {
 	for ( int i = 0; i < width * height; i++ ) {
 		int cb = src[i*4+0] - 128;
 		int cr = src[i*4+1] - 128;
@@ -339,10 +382,10 @@ void arcColorSpaces::ConvertCbCr_YToRGB( byte *dst, const byte *src, int width, 
 
 /*
 ========================
-arcColorSpaces::ConvertRGBToYCbCr420
+anColorSpaces::ConvertRGBToYCbCr420
 ========================
 */
-void arcColorSpaces::ConvertRGBToYCbCr420( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertRGBToYCbCr420( byte *dst, const byte *src, int width, int height ) {
 	int numSamples = 0;
 
 	for ( int j = 0; j < height; j += 2 ) {
@@ -387,10 +430,10 @@ void arcColorSpaces::ConvertRGBToYCbCr420( byte *dst, const byte *src, int width
 
 /*
 ========================
-arcColorSpaces::ConvertYCbCr420ToRGB
+anColorSpaces::ConvertYCbCr420ToRGB
 ========================
 */
-void arcColorSpaces::ConvertYCbCr420ToRGB( byte *dst, const byte *src, int width, int height ) {
+void anColorSpaces::ConvertYCbCr420ToRGB( byte *dst, const byte *src, int width, int height ) {
 	int numSamples = width * height * 2 - width;
 
 	for ( int j = height - 2; j >= 0; j -= 2 ) {
@@ -428,7 +471,7 @@ void arcColorSpaces::ConvertYCbCr420ToRGB( byte *dst, const byte *src, int width
 
 /*
 ========================
-arcColorSpaces::ConvertNormalMapToStereographicHeightMap
+anColorSpaces::ConvertNormalMapToStereographicHeightMap
 
 Converts a tangent space normal map to a height map.
 The iterative algorithm is pretty crappy but it's reasonably fast and good enough for testing purposes.
@@ -453,7 +496,7 @@ Ny(h,j) = H(h,j)
 
 ========================
 */
-void arcColorSpaces::ConvertNormalMapToStereographicHeightMap( byte *heightMap, const byte *normalMap, int width, int height, float &scale ) {
+void anColorSpaces::ConvertNormalMapToStereographicHeightMap( byte *heightMap, const byte *normalMap, int width, int height, float &scale ) {
 	arcTempArray<float> buffer( (width+1 ) * (height+1 ) * sizeof( float ) );
 
 	float * temp = (float *)buffer.Ptr();
@@ -502,8 +545,8 @@ void arcColorSpaces::ConvertNormalMapToStereographicHeightMap( byte *heightMap, 
 		scale0 = 1.0f - scale1;
 	}
 
-	float minHeight = arcMath::INFINITY;
-	float maxHeight = -arcMath::INFINITY;
+	float minHeight = anMath::INFINITY;
+	float maxHeight = -anMath::INFINITY;
 
 	for ( int j = 0; j < height; j++ ) {
 		for ( int i = 0; i < width; i++ ) {
@@ -521,19 +564,19 @@ void arcColorSpaces::ConvertNormalMapToStereographicHeightMap( byte *heightMap, 
 	float s = 255.0f / scale;
 	for ( int j = 0; j < height; j++ ) {
 		for ( int i = 0; i < width; i++ ) {
-			heightMap[j*width+i] = arcMath::Ftob( ( temp[j*width+i] - minHeight ) * s );
+			heightMap[j*width+i] = anMath::Ftob( ( temp[j*width+i] - minHeight ) * s );
 		}
 	}
 }
 
 /*
 ========================
-arcColorSpaces::ConvertStereographicHeightMapToNormalMap
+anColorSpaces::ConvertStereographicHeightMapToNormalMap
 
 This converts a heightmap of a stereographically projected normal map back into a regular normal map.
 ========================
 */
-void arcColorSpaces::ConvertStereographicHeightMapToNormalMap( byte *normalMap, const byte *heightMap, int width, int height, float scale ) {
+void anColorSpaces::ConvertStereographicHeightMapToNormalMap( byte *normalMap, const byte *heightMap, int width, int height, float scale ) {
 	for ( int i = 0; i < height; i++ ) {
 		int previ = Max( i, 0 );
 		int nexti = Min( i + 1, height - 1 );
@@ -541,7 +584,7 @@ void arcColorSpaces::ConvertStereographicHeightMapToNormalMap( byte *normalMap, 
 			int prevj = Max( j, 0 );
 			int nextj = Min( j + 1, width - 1 );
 
-			arcVec3 normal;
+			anVec3 normal;
 			float pX = scale * ( heightMap[i * width + prevj] - heightMap[i * width + nextj] ) / 255.0f;
 			float pY = scale * ( heightMap[previ * width + j] - heightMap[nexti * width + j] ) / 255.0f;
 			float denom = 2.0f / ( 1.0f + pX * pX + pY * pY );
@@ -558,12 +601,23 @@ void arcColorSpaces::ConvertStereographicHeightMapToNormalMap( byte *normalMap, 
 	}
 }
 
+    void ConvertSRGBToRGB() {
+        for ( int i = 0; i < 3; i++ ) {
+            int c = (* this)[i];
+           if ( c <= 0.040448643f ) {
+                c = c / 12.92f;
+            } else {
+                c = anMath::Pow( ( c + 0.055f ) / 1.055f, 2.4f );
+            }
+        }
+    }
+
 /*
 ========================
-arcColorSpaces::ConvertRGBToMonochrome
+anColorSpaces::ConvertRGBToMonochrome
 ========================
 */
-void arcColorSpaces::ConvertRGBToMonochrome( byte *mono, const byte *rgb, int width, int height ) {
+void anColorSpaces::ConvertRGBToMonochrome( byte *mono, const byte *rgb, int width, int height ) {
 	for ( int i = 0; i < height; i++ ) {
 		for ( int j = 0; j < width; j++ ) {
 			mono[i * width + j] = ( rgb[( i * width + j ) * 4 + 0] + rgb[( i * width + j ) * 4 + 1] + rgb[( i * width + j ) * 4 + 2] ) / 3;
@@ -573,10 +627,10 @@ void arcColorSpaces::ConvertRGBToMonochrome( byte *mono, const byte *rgb, int wi
 
 /*
 ========================
-arcColorSpaces::ConvertMonochromeToRGB
+anColorSpaces::ConvertMonochromeToRGB
 ========================
 */
-void arcColorSpaces::ConvertMonochromeToRGB( byte *rgb, const byte *mono, int width, int height ) {
+void anColorSpaces::ConvertMonochromeToRGB( byte *rgb, const byte *mono, int width, int height ) {
 	for ( int i = 0; i < height; i++ ) {
 		for ( int j = 0; j < width; j++ ) {
 			rgb[( i * width + j ) * 4 + 0] = mono[i * width + j];
@@ -591,7 +645,7 @@ void arcColorSpaces::ConvertMonochromeToRGB( byte *rgb, const byte *mono, int wi
 // example of how to use this parsing code for the rest of the codebase if needed:
 // const char *hex_code = "#FFA500"
 // int rgba = R_ParseHexDecimals(hex_code)
-// print message log here:("(%d, %d, %d, %d)\n", rgba >> 24 & 0xFF, rgba >> 16 & 0xFF, rgba >> 8 & 0xFF, rgba & 0xFF)
+// print message log here:( "(%d, %d, %d, %d)\n", rgba >> 24 & 0xFF, rgba >> 16 & 0xFF, rgba >> 8 & 0xFF, rgba & 0xFF)
 //
 void R_ParseHexDecimals( const char *hDecimal ) {
     const char *rgba = hDecimal;

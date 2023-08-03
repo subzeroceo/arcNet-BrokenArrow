@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "Brush.h"
@@ -75,7 +75,7 @@ idBrushSide::idBrushSide
 idBrushSide::idBrushSide( void ) {
 	flags = 0;
 	planeNum = -1;
-	winding = NULL;
+	winding = nullptr;
 }
 
 /*
@@ -83,11 +83,11 @@ idBrushSide::idBrushSide( void ) {
 idBrushSide::idBrushSide
 ============
 */
-idBrushSide::idBrushSide( const arcPlane &plane, int planeNum ) {
+idBrushSide::idBrushSide( const anPlane &plane, int planeNum ) {
 	this->flags = 0;
 	this->plane = plane;
 	this->planeNum = planeNum;
-	this->winding = NULL;
+	this->winding = nullptr;
 }
 
 /*
@@ -115,7 +115,7 @@ idBrushSide *idBrushSide::Copy( void ) const {
 		side->winding = winding->Copy();
 	}
 	else {
-		side->winding = NULL;
+		side->winding = nullptr;
 	}
 	return side;
 }
@@ -125,12 +125,12 @@ idBrushSide *idBrushSide::Copy( void ) const {
 idBrushSide::Split
 ============
 */
-int idBrushSide::Split( const arcPlane &splitPlane, idBrushSide **front, idBrushSide **back ) const {
-	arcWinding *frontWinding, *backWinding;
+int idBrushSide::Split( const anPlane &splitPlane, idBrushSide **front, idBrushSide **back ) const {
+	anWinding *frontWinding, *backWinding;
 
 	assert( winding );
 
-	*front = *back = NULL;
+	*front = *back = nullptr;
 
 	winding->Split( splitPlane, 0.0f, &frontWinding, &backWinding );
 
@@ -226,7 +226,7 @@ bool idBrush::CreateWindings( void ) {
 			delete side->winding;
 		}
 
-		side->winding = new arcWinding( side->plane.Normal(), side->plane.Dist() );
+		side->winding = new anWinding( side->plane.Normal(), side->plane.Dist() );
 
 		for ( j = 0; j < sides.Num() && side->winding; j++ ) {
 			if ( i == j ) {
@@ -265,7 +265,7 @@ idBrush::BoundBrush
 void idBrush::BoundBrush( const idBrush *original ) {
 	int i, j;
 	idBrushSide *side;
-	arcWinding *w;
+	anWinding *w;
 
 	assert( windingsValid );
 
@@ -310,7 +310,7 @@ void idBrush::BoundBrush( const idBrush *original ) {
 idBrush::FromSides
 ============
 */
-bool idBrush::FromSides( arcNetList<idBrushSide *> &sideList ) {
+bool idBrush::FromSides( anList<idBrushSide *> &sideList ) {
 	int i;
 
 	for ( i = 0; i < sideList.Num(); i++ ) {
@@ -327,17 +327,17 @@ bool idBrush::FromSides( arcNetList<idBrushSide *> &sideList ) {
 idBrush::FromWinding
 ============
 */
-bool idBrush::FromWinding( const arcWinding &w, const arcPlane &windingPlane ) {
+bool idBrush::FromWinding( const anWinding &w, const anPlane &windingPlane ) {
 	int i, j, bestAxis;
-	arcPlane plane;
-	arcVec3 normal, axialNormal;
+	anPlane plane;
+	anVec3 normal, axialNormal;
 
 	sides.Append( new idBrushSide( windingPlane, -1 ) );
 	sides.Append( new idBrushSide( -windingPlane, -1 ) );
 
 	bestAxis = 0;
 	for ( i = 1; i < 3; i++ ) {
-		if ( arcMath::Fabs( windingPlane.Normal()[i] ) > arcMath::Fabs( windingPlane.Normal()[bestAxis] ) ) {
+		if ( anMath::Fabs( windingPlane.Normal()[i] ) > anMath::Fabs( windingPlane.Normal()[bestAxis] ) ) {
 			bestAxis = i;
 		}
 	}
@@ -380,10 +380,10 @@ bool idBrush::FromWinding( const arcWinding &w, const arcPlane &windingPlane ) {
 idBrush::FromBounds
 ============
 */
-bool idBrush::FromBounds( const arcBounds &bounds ) {
+bool idBrush::FromBounds( const anBounds &bounds ) {
 	int axis, dir;
-	arcVec3 normal;
-	arcPlane plane;
+	anVec3 normal;
+	anPlane plane;
 
 	for ( axis = 0; axis < 3; axis++ ) {
 		for ( dir = -1; dir <= 1; dir += 2 ) {
@@ -403,7 +403,7 @@ bool idBrush::FromBounds( const arcBounds &bounds ) {
 idBrush::Transform
 ============
 */
-void idBrush::Transform( const arcVec3 &origin, const arcMat3 &axis ) {
+void idBrush::Transform( const anVec3 &origin, const anMat3 &axis ) {
 	int i;
 	bool transformed = false;
 
@@ -431,12 +431,12 @@ idBrush::GetVolume
 */
 float idBrush::GetVolume( void ) const {
 	int i;
-	arcWinding *w;
-	arcVec3 corner;
+	anWinding *w;
+	anVec3 corner;
 	float d, area, volume;
 
 	// grab the first valid point as a corner
-	w = NULL;
+	w = nullptr;
 	for ( i = 0; i < sides.Num(); i++ ) {
 		w = sides[i]->winding;
 		if ( w ) {
@@ -505,8 +505,8 @@ idBrush::TryMerge
 bool idBrush::TryMerge( const idBrush *brush, const aRcPlaneSet &planeList ) {
 	int i, j, k, l, m, seperatingPlane;
 	const idBrush *brushes[2];
-	const arcWinding *w;
-	const arcPlane *plane;
+	const anWinding *w;
+	const anPlane *plane;
 
 	// brush bounds should overlap
 	for ( i = 0; i < 3; i++ ) {
@@ -615,19 +615,19 @@ bool idBrush::TryMerge( const idBrush *brush, const aRcPlaneSet &planeList ) {
 idBrush::Split
 ============
 */
-int idBrush::Split( const arcPlane &plane, int planeNum, idBrush **front, idBrush **back ) const {
+int idBrush::Split( const anPlane &plane, int planeNum, idBrush **front, idBrush **back ) const {
 	int res, i, j;
 	idBrushSide *side, *frontSide, *backSide;
 	float dist, maxBack, maxFront, *maxBackWinding, *maxFrontWinding;
-	arcWinding *w, *mid;
+	anWinding *w, *mid;
 
 	assert( windingsValid );
 
 	if ( front ) {
-		*front = NULL;
+		*front = nullptr;
 	}
 	if ( back ) {
-		*back = NULL;
+		*back = nullptr;
 	}
 
 	res = bounds.PlaneSide( plane, -BRUSH_EPSILON );
@@ -693,7 +693,7 @@ int idBrush::Split( const arcPlane &plane, int planeNum, idBrush **front, idBrus
 		return PLANESIDE_FRONT;
 	}
 
-	mid = new arcWinding( plane.Normal(), plane.Dist() );
+	mid = new anWinding( plane.Normal(), plane.Dist() );
 
 	for ( i = 0; i < sides.Num() && mid; i++ ) {
 		mid = mid->Clip( -sides[i]->plane, BRUSH_EPSILON, false );
@@ -702,7 +702,7 @@ int idBrush::Split( const arcPlane &plane, int planeNum, idBrush **front, idBrus
 	if ( mid ) {
 		if ( mid->IsTiny() ) {
 			delete mid;
-			mid = NULL;
+			mid = nullptr;
 		}
 		else if ( mid->IsHuge() ) {
 			// if the winding is huge then the brush is unbounded
@@ -711,7 +711,7 @@ int idBrush::Split( const arcPlane &plane, int planeNum, idBrush **front, idBrus
 							bounds[0][0], bounds[0][1], bounds[0][2], bounds[1][0], bounds[1][1], bounds[1][2],
 							bounds[1][0]-bounds[0][0], bounds[1][1]-bounds[0][1], bounds[1][2]-bounds[0][2] );
 			delete mid;
-			mid = NULL;
+			mid = nullptr;
 		}
 	}
 
@@ -768,7 +768,7 @@ int idBrush::Split( const arcPlane &plane, int planeNum, idBrush **front, idBrus
 			else if ( maxFrontWinding[i] > -BRUSH_EPSILON ) {
 				// favor an overconstrained brush
 				side = side->Copy();
-				side->winding = side->winding->Clip( arcPlane( plane.Normal(), (plane.Dist() - (BRUSH_EPSILON+0.02f) ) ), 0.01f, true );
+				side->winding = side->winding->Clip( anPlane( plane.Normal(), (plane.Dist() - (BRUSH_EPSILON+0.02f) ) ), 0.01f, true );
 				assert( side->winding );
 				(*front)->sides.Append( side );
 			}
@@ -778,7 +778,7 @@ int idBrush::Split( const arcPlane &plane, int planeNum, idBrush **front, idBrus
 			else if ( maxBackWinding[i] < BRUSH_EPSILON ) {
 				// favor an overconstrained brush
 				side = side->Copy();
-				side->winding = side->winding->Clip( arcPlane( -plane.Normal(), -(plane.Dist() + (BRUSH_EPSILON+0.02f) ) ), 0.01f, true );
+				side->winding = side->winding->Clip( anPlane( -plane.Normal(), -(plane.Dist() + (BRUSH_EPSILON+0.02f) ) ), 0.01f, true );
 				assert( side->winding );
 				(*back)->sides.Append( side );
 			}
@@ -812,9 +812,9 @@ idBrush::AddBevelsForAxialBox
 void idBrush::AddBevelsForAxialBox( void ) {
 	int axis, dir, i, j, k, l, order;
 	idBrushSide *side, *newSide;
-	arcPlane plane;
-	arcVec3 normal, vec;
-	arcWinding *w, *w2;
+	anPlane plane;
+	anVec3 normal, vec;
+	anWinding *w, *w2;
 	float d, minBack;
 
 	assert( windingsValid );
@@ -946,10 +946,10 @@ void idBrush::AddBevelsForAxialBox( void ) {
 idBrush::ExpandForAxialBox
 ============
 */
-void idBrush::ExpandForAxialBox( const arcBounds &bounds ) {
+void idBrush::ExpandForAxialBox( const anBounds &bounds ) {
 	int i, j;
 	idBrushSide *side;
-	arcVec3 v;
+	anVec3 v;
 
 	AddBevelsForAxialBox();
 
@@ -1020,7 +1020,7 @@ idBrushList::idBrushList
 */
 idBrushList::idBrushList( void ) {
 	numBrushes = numBrushSides = 0;
-	head = tail = NULL;
+	head = tail = nullptr;
 }
 
 /*
@@ -1036,8 +1036,8 @@ idBrushList::~idBrushList( void ) {
 idBrushList::GetBounds
 ============
 */
-arcBounds idBrushList::GetBounds( void ) const {
-	arcBounds bounds;
+anBounds idBrushList::GetBounds( void ) const {
+	anBounds bounds;
 	idBrush *b;
 
 	bounds.Clear();
@@ -1053,7 +1053,7 @@ idBrushList::AddToTail
 ============
 */
 void idBrushList::AddToTail( idBrush *brush ) {
-	brush->next = NULL;
+	brush->next = nullptr;
 	if ( tail ) {
 		tail->next = brush;
 	}
@@ -1075,7 +1075,7 @@ void idBrushList::AddToTail( idBrushList &list ) {
 
 	for ( brush = list.head; brush; brush = next ) {
 		next = brush->next;
-		brush->next = NULL;
+		brush->next = nullptr;
 		if ( tail ) {
 			tail->next = brush;
 		}
@@ -1086,7 +1086,7 @@ void idBrushList::AddToTail( idBrushList &list ) {
 		numBrushes++;
 		numBrushSides += brush->sides.Num();
 	}
-	list.head = list.tail = NULL;
+	list.head = list.tail = nullptr;
 	list.numBrushes = 0;
 }
 
@@ -1123,7 +1123,7 @@ void idBrushList::AddToFront( idBrushList &list ) {
 		numBrushes++;
 		numBrushSides += brush->sides.Num();
 	}
-	list.head = list.tail = NULL;
+	list.head = list.tail = nullptr;
 	list.numBrushes = 0;
 }
 
@@ -1135,7 +1135,7 @@ idBrushList::Remove
 void idBrushList::Remove( idBrush *brush ) {
 	idBrush	*b, *last;
 
-	last = NULL;
+	last = nullptr;
 	for ( b = head; b; b = b->next ) {
 		if ( b == brush ) {
 			if ( last ) {
@@ -1163,7 +1163,7 @@ idBrushList::Delete
 void idBrushList::Delete( idBrush *brush ) {
 	idBrush	*b, *last;
 
-	last = NULL;
+	last = nullptr;
 	for ( b = head; b; b = b->next ) {
 		if ( b == brush ) {
 			if ( last ) {
@@ -1213,7 +1213,7 @@ void idBrushList::Free( void ) {
 		next = brush->next;
 		delete brush;
 	}
-	head = tail = NULL;
+	head = tail = nullptr;
 	numBrushes = numBrushSides = 0;
 }
 
@@ -1222,7 +1222,7 @@ void idBrushList::Free( void ) {
 idBrushList::Split
 ============
 */
-void idBrushList::Split( const arcPlane &plane, int planeNum, idBrushList &frontList, idBrushList &backList, bool useBrushSavedPlaneSide ) {
+void idBrushList::Split( const anPlane &plane, int planeNum, idBrushList &frontList, idBrushList &backList, bool useBrushSavedPlaneSide ) {
 	idBrush *b, *front, *back;
 
 	frontList.Clear();
@@ -1434,13 +1434,13 @@ void idBrushList::Merge( bool (*MergeAllowed)( idBrush *b1, idBrush *b2 ) ) {
 idBrushList::SetFlagOnFacingBrushSides
 ============
 */
-void idBrushList::SetFlagOnFacingBrushSides( const arcPlane &plane, int flag ) {
+void idBrushList::SetFlagOnFacingBrushSides( const anPlane &plane, int flag ) {
 	int i;
 	idBrush *b;
-	const arcWinding *w;
+	const anWinding *w;
 
 	for ( b = head; b; b = b->next ) {
-		if ( arcMath::Fabs( b->GetBounds().PlaneDistance( plane ) ) > 0.1f ) {
+		if ( anMath::Fabs( b->GetBounds().PlaneDistance( plane ) ) > 0.1f ) {
 			continue;
 		}
 		for ( i = 0; i < b->GetNumSides(); i++ ) {
@@ -1482,7 +1482,7 @@ void idBrushList::CreatePlaneList( aRcPlaneSet &planeList ) const {
 idBrushList::CreatePlaneList
 ============
 */
-void idBrushList::WriteBrushMap( const arcNetString &fileName, const arcNetString &ext ) const {
+void idBrushList::WriteBrushMap( const anString &fileName, const anString &ext ) const {
 	idBrushMap *map;
 
 	map = new idBrushMap( fileName, ext );
@@ -1502,8 +1502,8 @@ void idBrushList::WriteBrushMap( const arcNetString &fileName, const arcNetStrin
 idBrushMap::idBrushMap
 ============
 */
-idBrushMap::idBrushMap( const arcNetString &fileName, const arcNetString &ext ) {
-	arcNetString qpath;
+idBrushMap::idBrushMap( const anString &fileName, const anString &ext ) {
+	anString qpath;
 
 	qpath = fileName;
 	qpath.StripFileExtension();

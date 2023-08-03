@@ -2,5 +2,5 @@
 //
 
 
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop

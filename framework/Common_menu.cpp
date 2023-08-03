@@ -1,21 +1,21 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Common_local.h"
 
 /*
 ==============
-arcCommonLocal::InitializeMapsModes
+anCommonLocal::InitializeMapsModes
 ==============
 */
-void arcCommonLocal::InitializeMapsModes() {}
+void anCommonLocal::InitializeMapsModes() {}
 
 /*
 ==============
-arcCommonLocal::StartMainMenu
+anCommonLocal::StartMainMenu
 ==============
 */
-void arcCommonLocal::StartMenu( bool playIntro ) {
+void anCommonLocal::StartMenu( bool playIntro ) {
 	if ( game && game->Shell_IsActive() ) {
 		return;
 	}
@@ -36,10 +36,10 @@ void arcCommonLocal::StartMenu( bool playIntro ) {
 
 /*
 ===============
-arcCommonLocal::ExitMenu
+anCommonLocal::ExitMenu
 ===============
 */
-void arcCommonLocal::ExitMenu() {
+void anCommonLocal::ExitMenu() {
 	if ( game ) {
 		game->Shell_Show( false );
 	}
@@ -47,12 +47,12 @@ void arcCommonLocal::ExitMenu() {
 
 /*
 ==============
-arcCommonLocal::MenuEvent
+anCommonLocal::MenuEvent
 
 Executes any commands returned by the gui
 ==============
 */
-bool arcCommonLocal::MenuEvent( const sysEvent_t * event ) {
+bool anCommonLocal::MenuEvent( const sysEvent_t * event ) {
 
 	if ( session->GetSignInManager().ProcessInputEvent( event ) ) {
 		return true;
@@ -71,10 +71,10 @@ bool arcCommonLocal::MenuEvent( const sysEvent_t * event ) {
 
 /*
 =================
-arcCommonLocal::GuiFrameEvents
+anCommonLocal::GuiFrameEvents
 =================
 */
-void arcCommonLocal::GuiFrameEvents() {
+void anCommonLocal::GuiFrameEvents() {
 	if ( game ) {
 		game->Shell_SyncWithSession();
 	}

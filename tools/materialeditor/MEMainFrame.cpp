@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "MaterialEditor.h"
@@ -71,8 +71,8 @@ static UINT indicators[] = {
 * Constructor for MEMainFrame. Initialize some member data and load the options.
 */
 MEMainFrame::MEMainFrame() {
-	currentDoc = NULL;
-	m_find = NULL;
+	currentDoc = nullptr;
+	m_find = nullptr;
 	searchData.searched = false;
 	options.Load();
 }
@@ -242,7 +242,7 @@ int MEMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 
 	if ( !m_wndStatusBar.Create( this ) ||
 		!m_wndStatusBar.SetIndicators(indicators,
-		  sizeof(indicators)/sizeof(UINT) ))
+		  sizeof(indicators)/sizeof(UINT) ) )
 	{
 		TRACE0( "Failed to create status bar\n" );
 		return -1;      // fail to create
@@ -325,7 +325,7 @@ void MEMainFrame::OnSize(UINT nType, int cx, int cy) {
 */
 void MEMainFrame::OnTcnSelChange(NMHDR *pNMHDR, LRESULT *pResult) {
 	int sel = m_tabs.GetCurSel();
-	switch(sel) {
+	switch (sel) {
 		case 0:
 			m_splitterWnd.ShowWindow(SW_SHOW);
 			m_consoleView->ShowWindow(SW_HIDE);
@@ -362,7 +362,7 @@ void MEMainFrame::OnFileSaveMaterial() {
 * Saves the selected file.
 */
 void MEMainFrame::OnFileSaveFile() {
-	arcNetString filename = m_materialTreeView->GetSaveFilename();
+	anString filename = m_materialTreeView->GetSaveFilename();
 	if (filename.Length() > 0 ) {
 		materialDocManager.SaveFile(filename);
 	}
@@ -381,7 +381,7 @@ void MEMainFrame::OnFileSaveAll() {
 void MEMainFrame::OnFileSaveMaterialUpdate(CCmdUI *pCmdUI) {
 	MaterialDoc* pDoc = materialDocManager.GetCurrentMaterialDoc();
 
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -398,7 +398,7 @@ void MEMainFrame::OnFileSaveMaterialUpdate(CCmdUI *pCmdUI) {
 * Enables the Save File menu item if the current file contains a modified material.
 */
 void MEMainFrame::OnFileSaveFileUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -414,7 +414,7 @@ void MEMainFrame::OnFileSaveFileUpdate(CCmdUI *pCmdUI) {
 * Enables the Save All menu item if there are any materials that have been modified.
 */
 void MEMainFrame::OnFileSaveAllUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -440,7 +440,7 @@ void MEMainFrame::OnApplyMaterial() {
 * Applies all modified materials in the selected file.
 */
 void MEMainFrame::OnApplyFile() {
-	arcNetString filename = m_materialTreeView->GetSaveFilename();
+	anString filename = m_materialTreeView->GetSaveFilename();
 	if (filename.Length() > 0 ) {
 		materialDocManager.ApplyFile(filename);
 	}
@@ -458,7 +458,7 @@ void MEMainFrame::OnApplyAll() {
 */
 void MEMainFrame::OnApplyMaterialUpdate(CCmdUI *pCmdUI) {
 	MaterialDoc* pDoc = materialDocManager.GetCurrentMaterialDoc();
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -475,14 +475,14 @@ void MEMainFrame::OnApplyMaterialUpdate(CCmdUI *pCmdUI) {
 * that need to be applied.
 */
 void MEMainFrame::OnApplyFileUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
 
 	MaterialDoc* pDoc = materialDocManager.GetCurrentMaterialDoc();
 
-	if (pDoc && materialDocManager.DoesFileNeedApply(pDoc->renderMaterial->GetFileName() )) {
+	if (pDoc && materialDocManager.DoesFileNeedApply(pDoc->renderMaterial->GetFileName() ) ) {
 		pCmdUI->Enable(TRUE);
 	} else {
 		pCmdUI->Enable(FALSE);
@@ -494,7 +494,7 @@ void MEMainFrame::OnApplyFileUpdate(CCmdUI *pCmdUI) {
 * to be applied.
 */
 void MEMainFrame::OnApplyAllUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -512,7 +512,7 @@ void MEMainFrame::OnApplyAllUpdate(CCmdUI *pCmdUI) {
 void MEMainFrame::OnEditCut() {
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			m_materialTreeView->OnCut();
 		}
 	}
@@ -524,9 +524,9 @@ void MEMainFrame::OnEditCut() {
 void MEMainFrame::OnEditCopy() {
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(StageView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(StageView) ) ) {
 			m_stageView->OnCopy();
-		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			m_materialTreeView->OnCopy();
 		}
 	}
@@ -539,9 +539,9 @@ void MEMainFrame::OnEditPaste() {
 	CWnd* focus = GetFocus();
 
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(StageView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(StageView) ) ) {
 			m_stageView->OnPaste();
-		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			m_materialTreeView->OnPaste();
 		}
 	}
@@ -553,9 +553,9 @@ void MEMainFrame::OnEditPaste() {
 void MEMainFrame::OnEditDelete() {
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(StageView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(StageView) ) ) {
 			m_stageView->OnDeleteStage();
-		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			m_materialTreeView->OnDeleteMaterial();
 		}
 	}
@@ -567,9 +567,9 @@ void MEMainFrame::OnEditDelete() {
 void MEMainFrame::OnEditRename() {
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(StageView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(StageView) ) ) {
 			m_stageView->OnRenameStage();
-		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			m_materialTreeView->OnRenameMaterial();
 		}
 	}
@@ -580,7 +580,7 @@ void MEMainFrame::OnEditRename() {
 * Enable the cut menu item if a material is selected.
 */
 void MEMainFrame::OnEditCutUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -589,15 +589,15 @@ void MEMainFrame::OnEditCutUpdate(CCmdUI *pCmdUI) {
 
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(StageView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(StageView) ) ) {
 			if (m_stageView->CanCut() ) {
 				enable = TRUE;
 			}
-		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			if (m_materialTreeView->CanCut() ) {
 				enable = TRUE;
 			}
-		} else if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) ) ) {
 			enable = TRUE;
 		}
 	}
@@ -610,7 +610,7 @@ void MEMainFrame::OnEditCutUpdate(CCmdUI *pCmdUI) {
 */
 void MEMainFrame::OnEditCopyUpdate(CCmdUI *pCmdUI) {
 
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -619,15 +619,15 @@ void MEMainFrame::OnEditCopyUpdate(CCmdUI *pCmdUI) {
 
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(StageView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(StageView) ) ) {
 			if (m_stageView->CanCopy() ) {
 				enable = TRUE;
 			}
-		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			if (m_materialTreeView->CanCopy() ) {
 				enable = TRUE;
 			}
-		} else if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) ) ) {
 			enable = TRUE;
 		}
 	}
@@ -639,7 +639,7 @@ void MEMainFrame::OnEditCopyUpdate(CCmdUI *pCmdUI) {
 * Enables a paste operation when a material or stage has been copied.
 */
 void MEMainFrame::OnEditPasteUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -648,15 +648,15 @@ void MEMainFrame::OnEditPasteUpdate(CCmdUI *pCmdUI) {
 
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(StageView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(StageView) ) ) {
 			if (m_stageView->CanPaste() ) {
 				enable = TRUE;
 			}
-		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			if (m_materialTreeView->CanPaste() ) {
 				enable = TRUE;
 			}
-		} else if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) ) ) {
 			enable = TRUE;
 		}
 	}
@@ -668,7 +668,7 @@ void MEMainFrame::OnEditPasteUpdate(CCmdUI *pCmdUI) {
 * Enables a delete operation when a material or stage is selected.
 */
 void MEMainFrame::OnEditDeleteUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -677,15 +677,15 @@ void MEMainFrame::OnEditDeleteUpdate(CCmdUI *pCmdUI) {
 
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(StageView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(StageView) ) ) {
 			if (m_stageView->CanDelete() ) {
 				enable = TRUE;
 			}
-		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			if (m_materialTreeView->CanDelete() ) {
 				enable = TRUE;
 			}
-		} else if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) ) ) {
 			enable = TRUE;
 		}
 
@@ -698,7 +698,7 @@ void MEMainFrame::OnEditDeleteUpdate(CCmdUI *pCmdUI) {
 * Enables a rename operation when a material, folder or stage is selected.
 */
 void MEMainFrame::OnEditRenameUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
@@ -707,11 +707,11 @@ void MEMainFrame::OnEditRenameUpdate(CCmdUI *pCmdUI) {
 
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(StageView) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(StageView) ) ) {
 			if (m_stageView->CanRename() ) {
 				enable = TRUE;
 			}
-		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) )) {
+		} else if (focus->IsKindOf(RUNTIME_CLASS(MaterialTreeView) ) ) {
 			if (m_materialTreeView->CanRename() ) {
 				enable = TRUE;
 			}
@@ -724,7 +724,7 @@ void MEMainFrame::OnEditRenameUpdate(CCmdUI *pCmdUI) {
 * Opens the find dialog.
 */
 void MEMainFrame::OnEditFind() {
-	if (m_find== NULL) {
+	if (m_find== nullptr ) {
 		m_find = new FindDialog( this );
 		m_find->Create();
 		m_find->ShowWindow(SW_SHOW);
@@ -737,7 +737,7 @@ void MEMainFrame::OnEditFind() {
 * Performs a search with the previously selected search parameters.
 */
 void MEMainFrame::OnEditFindNext() {
-	FindNext(NULL);
+	FindNext(nullptr );
 }
 
 /**
@@ -747,7 +747,7 @@ void MEMainFrame::OnEditUndo() {
 	//Check for undo operation on special windows
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) ) ) {
 			m_materialEditView->m_textView.Undo();
 			return;
 		}
@@ -763,7 +763,7 @@ void MEMainFrame::OnEditRedo() {
 	//Check for redo operation on special windows
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) ) ) {
 			m_materialEditView->m_textView.Redo();
 			return;
 		}
@@ -776,14 +776,14 @@ void MEMainFrame::OnEditRedo() {
 * Enables the undo menu item if an undo is available.
 */
 void MEMainFrame::OnEditUndoUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
 
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) ) ) {
 			pCmdUI->Enable(m_materialEditView->m_textView.CanUndo() );
 			return;
 		}
@@ -796,14 +796,14 @@ void MEMainFrame::OnEditUndoUpdate(CCmdUI *pCmdUI) {
 * Enables the redo menu item if a redo is available.
 */
 void MEMainFrame::OnEditRedoUpdate(CCmdUI *pCmdUI) {
-	if (pCmdUI->m_pMenu == NULL) {
+	if (pCmdUI->m_pMenu == nullptr ) {
 		pCmdUI->Enable(TRUE);
 		return;
 	}
 
 	CWnd* focus = GetFocus();
 	if (focus) {
-		if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) )) {
+		if (focus->IsKindOf(RUNTIME_CLASS(CRichEditCtrl) ) ) {
 			pCmdUI->Enable(m_materialEditView->m_textView.CanRedo() );
 			return;
 		}
@@ -849,7 +849,7 @@ void MEMainFrame::OnReloadImages() {
 * Called by the find dialog when it is closing.
 */
 void MEMainFrame::CloseFind() {
-	m_find = NULL;
+	m_find = nullptr;
 }
 
 /**

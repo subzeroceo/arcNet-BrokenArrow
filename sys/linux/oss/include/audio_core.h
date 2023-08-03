@@ -114,19 +114,19 @@ struct dma_buffparms {
 	int tmpbuf_len, tmpbuf_ptr;
 	cnv_func_t convert_func;
 	unsigned int convert_mode;
-	struct audio_buffer *(*user_import) (struct audio_operations * adev,
+	struct audio_buffer *(*user_import) ( struct audio_operations * adev,
 							 struct dma_buffparms * dmap,
 							 sample_parms * parms,
 							 unsigned char *cbuf, int len);
-	int (*user_export) (struct audio_operations * adev,
+	int (*user_export) ( struct audio_operations * adev,
 					struct dma_buffparms * dmap, sample_parms * parms,
 					struct audio_buffer * buf, unsigned char *cbuf,
 					int maxbytes);
-	struct audio_buffer *(*device_read) (struct audio_operations * adev,
+	struct audio_buffer *(*device_read) ( struct audio_operations * adev,
 							 struct dma_buffparms * dmap,
 							 sample_parms * parms,
 							 unsigned char *cbuf, int len);
-	int (*device_write) (struct audio_operations * adev,
+	int (*device_write) ( struct audio_operations * adev,
 					 struct dma_buffparms * dmap,
 					 void *frombuf, void *tobuf,
 					 int maxspace, int *fromlen, int *tolen);
@@ -272,7 +272,7 @@ struct audio_operations {
 	struct audio_operations *sync_next;	/* Next device in sync group */
 
 	int rate_source;
-#define MAX_SAMPLE_RATES	20 /* Cannot be changed (see soundcard.h) */
+#define MAX_SAMPLE_RATES	20 /* Cannot be changed ( see soundcard.h) */
 	int nrates, rates[MAX_SAMPLE_RATES];
 
 #ifndef CONFIGURE_C

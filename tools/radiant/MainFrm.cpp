@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -42,7 +42,7 @@ static char		THIS_FILE[] = __FILE__;
 
 // globals
 CString			g_strAppPath;						// holds the full path of the executable
-CMainFrame		*g_pParentWnd = NULL;				// used to precast to CMainFrame
+CMainFrame		*g_pParentWnd = nullptr;				// used to precast to CMainFrame
 CPrefsDlg		g_Preferences;						// global prefs instance
 CPrefsDlg		&g_PrefsDlg = g_Preferences;		// reference used throughout
 int				g_nUpdateBits = 0;					// window update flags
@@ -697,7 +697,7 @@ void CMainFrame::OnDisplayChange(UINT wParam, long lParam) {
 void CMainFrame::OnBSPStatus(UINT wParam, long lParam) {
 	// lparam is an atom contain the text
 	char buff[1024];
-	if (::GlobalGetAtomName(static_cast<ATOM>(lParam), buff, sizeof(buff) )) {
+	if (::GlobalGetAtomName(static_cast<ATOM>(lParam), buff, sizeof(buff) ) ) {
 		common->Printf( "%s", buff);
 		::GlobalDeleteAtom(static_cast<ATOM>(lParam) );
 	}
@@ -708,7 +708,7 @@ void CMainFrame::OnBSPStatus(UINT wParam, long lParam) {
  =======================================================================================================================
  */
 void CMainFrame::OnBSPDone(UINT wParam, long lParam) {
-	arcNetString str = cvarSystem->GetCVarString( "radiant_bspdone" );
+	anString str = cvarSystem->GetCVarString( "radiant_bspdone" );
 	if (str.Length() ) {
 	    sndPlaySound(str.c_str(), SND_FILENAME | SND_ASYNC);
 	}
@@ -722,12 +722,12 @@ void CMainFrame::OnBSPDone(UINT wParam, long lParam) {
 CMainFrame::CMainFrame() {
 	m_bDoLoop = false;
 	g_pParentWnd = this;
-	m_pXYWnd = NULL;
-	m_pCamWnd = NULL;
-	m_pZWnd = NULL;
-	m_pYZWnd = NULL;
-	m_pXZWnd = NULL;
-	m_pActiveXY = NULL;
+	m_pXYWnd = nullptr;
+	m_pCamWnd = nullptr;
+	m_pZWnd = nullptr;
+	m_pYZWnd = nullptr;
+	m_pXZWnd = nullptr;
+	m_pActiveXY = nullptr;
 	m_bCamPreview = true;
 	nurbMode = 0;
 }
@@ -940,7 +940,7 @@ void CMainFrame::ShowMenuItemKeyBindings(CMenu *pMenu) {
 			}
 		}
 
-		for (j = 0; j < g_nKeyCount; j++ ) {
+		for ( j = 0; j < g_nKeyCount; j++ ) {
 			if (g_Commands[i].m_nKey == g_Keys[j].m_nVKKey) {
 				strcat(key, g_Keys[j].m_strName);
 				break;
@@ -968,7 +968,7 @@ MFCCreate
 */
 void MFCCreate( HINSTANCE hInstance )
 {
-	HMENU hMenu = NULL;
+	HMENU hMenu = nullptr;
 	int i = sizeof(g_qeglobals.d_savedinfo);
 	long l = i;
 
@@ -1034,7 +1034,7 @@ void MFCCreate( HINSTANCE hInstance )
  */
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	char	*pBuffer = g_strAppPath.GetBufferSetLength(_MAX_PATH + 1 );
-	int		nResult = ::GetModuleFileName(NULL, pBuffer, _MAX_PATH);
+	int		nResult = ::GetModuleFileName(nullptr, pBuffer, _MAX_PATH);
 	ASSERT(nResult != 0 );
 	pBuffer[g_strAppPath.ReverseFind('\\') + 1] = '\0';
 	g_strAppPath.ReleaseBuffer();
@@ -1058,7 +1058,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 		return -1;	// fail to create
 	}
 
-	if ( !m_wndStatusBar.Create( this ) || !m_wndStatusBar.SetIndicators(indicators, sizeof(indicators) / sizeof(UINT) )) {
+	if ( !m_wndStatusBar.Create( this ) || !m_wndStatusBar.SetIndicators(indicators, sizeof(indicators) / sizeof(UINT) ) ) {
 		TRACE0( "Failed to create status bar\n" );
 		return -1;	// fail to create
 	}
@@ -1130,7 +1130,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	SetActiveXY(m_pXYWnd);
 	m_pXYWnd->SetFocus();
 
-	PostMessage(WM_KEYDOWN, 'O', NULL);
+	PostMessage(WM_KEYDOWN, 'O', nullptr );
 
 	if ( radiant_entityMode.GetBool() ) {
 		g_qeglobals.d_savedinfo.exclude |= (EXCLUDE_PATHS | EXCLUDE_CLIP | EXCLUDE_CAULK | EXCLUDE_VISPORTALS | EXCLUDE_NODRAW | EXCLUDE_TRIGGERS);
@@ -1256,7 +1256,7 @@ void CMainFrame::CreateQEChildren() {
 	}
 
 	if ( !bProjectLoaded) {
-		CFileDialog dlgFile( true, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, EDITOR_WINDOWTEXT " Project files (*.qe4, *.prj)|*.qe4|*.prj||",	this );
+		CFileDialog dlgFile( true, nullptr, nullptr, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, EDITOR_WINDOWTEXT " Project files (*.qe4, *.prj)|*.qe4|*.prj||",	this );
 		if (dlgFile.DoModal() == IDOK) {
 			bProjectLoaded = QE_LoadProject(dlgFile.GetPathName().GetBuffer(0 ) );
 		}
@@ -1271,8 +1271,8 @@ void CMainFrame::CreateQEChildren() {
 	common->Printf( "Entering message loop\n" );
 
 	m_bDoLoop = true;
-	SetTimer(QE_TIMER0, 100, NULL);
-	SetTimer(QE_TIMER1, g_PrefsDlg.m_nAutoSave * 60 * 1000, NULL);
+	SetTimer(QE_TIMER0, 100, nullptr );
+	SetTimer(QE_TIMER1, g_PrefsDlg.m_nAutoSave * 60 * 1000, nullptr );
 }
 
 /*
@@ -1439,37 +1439,37 @@ void CMainFrame::OnDestroy() {
 	}
 
 	delete m_pXYWnd;
-	m_pXYWnd = NULL;
+	m_pXYWnd = nullptr;
 
 	if (m_pYZWnd->GetSafeHwnd() ) {
 		m_pYZWnd->SendMessage(WM_DESTROY, 0, 0 );
 	}
 
 	delete m_pYZWnd;
-	m_pYZWnd = NULL;
+	m_pYZWnd = nullptr;
 
 	if (m_pXZWnd->GetSafeHwnd() ) {
 		m_pXZWnd->SendMessage(WM_DESTROY, 0, 0 );
 	}
 
 	delete m_pXZWnd;
-	m_pXZWnd = NULL;
+	m_pXZWnd = nullptr;
 
 	if (m_pZWnd->GetSafeHwnd() ) {
 		m_pZWnd->SendMessage(WM_DESTROY, 0, 0 );
 	}
 
 	delete m_pZWnd;
-	m_pZWnd = NULL;
+	m_pZWnd = nullptr;
 
 	if (m_pCamWnd->GetSafeHwnd() ) {
 		m_pCamWnd->SendMessage(WM_DESTROY, 0, 0 );
 	}
 
 	delete m_pCamWnd;
-	m_pCamWnd = NULL;
+	m_pCamWnd = nullptr;
 
-	if ( arcNetString::Icmp(currentmap, "unnamed.map" ) != 0 ) {
+	if ( anString::Icmp(currentmap, "unnamed.map" ) != 0 ) {
 		g_PrefsDlg.m_strLastMap = currentmap;
 		g_PrefsDlg.SavePrefs();
 	}
@@ -1496,7 +1496,7 @@ void CMainFrame::OnDestroy() {
 	g_qeglobals.d_project_entity->epairs.Clear();
 
 	entity_t	*pEntity = g_qeglobals.d_project_entity->next;
-	while (pEntity != NULL && pEntity != g_qeglobals.d_project_entity) {
+	while (pEntity != nullptr && pEntity != g_qeglobals.d_project_entity) {
 		entity_t	*pNextEntity = pEntity->next;
 		Entity_Free(pEntity);
 		pEntity = pNextEntity;
@@ -1509,7 +1509,7 @@ void CMainFrame::OnDestroy() {
 	}
 
 	//
-	// FIXME: arcMaterial
+	// FIXME: anMaterial
 	// if (notexture) { // Timo // Surface properties plugin #ifdef _DEBUG if (
 	// !notexture->pData ) common->Printf( "WARNING: found a qtexture_t* with no
 	// IPluginQTexture\n" ); #endif if ( notexture->pData )
@@ -1517,7 +1517,7 @@ void CMainFrame::OnDestroy() {
 	// if (current_texture) free(current_texture);
 	//
 
-	// FIXME: arcMaterial FreeShaders();
+	// FIXME: anMaterial FreeShaders();
 	CFrameWnd::OnDestroy();
 
 	AfxGetApp()->ExitInstance();
@@ -1865,7 +1865,7 @@ void CMainFrame::OnFileSave() {
 	}
 
 	// DHM - _D3XP
-	SetTimer(QE_TIMER1, g_PrefsDlg.m_nAutoSave * 60 * 1000, NULL);
+	SetTimer(QE_TIMER1, g_PrefsDlg.m_nAutoSave * 60 * 1000, nullptr );
 }
 
 /*
@@ -1905,7 +1905,7 @@ void CMainFrame::OnFileSaveCopy() {
 	afn.nFilterIndex = 1;
 	afn.lpstrFile = aFile;
 	afn.nMaxFile = sizeof(aFile);
-	afn.lpstrFileTitle = NULL;
+	afn.lpstrFileTitle = nullptr;
 	afn.nMaxFileTitle = 0;
 	afn.lpstrInitialDir = strPath;
 	afn.lpstrTitle = aTitle;
@@ -2025,7 +2025,7 @@ void CMainFrame::OnViewNearest(unsigned int nID) {
 void CMainFrame::OnTextureWad(unsigned int nID) {
 	Sys_BeginWait();
 
-	// FIXME: arcMaterial Texture_ShowDirectory (nID);
+	// FIXME: anMaterial Texture_ShowDirectory (nID);
 	Sys_UpdateWindows(W_ALL);
 }
 
@@ -2066,14 +2066,14 @@ void RunBsp (const char *command) {
 		in = name;
 	}
 
-	if (arcNetString::Icmpn(command, "bspext", strlen( "runbsp" ) ) == 0 ) {
+	if (anString::Icmpn(command, "bspext", strlen( "runbsp" ) ) == 0 ) {
 		PROCESS_INFORMATION ProcessInformation;
 		STARTUPINFO	startupinfo;
 		char buff[2048];
 
-		arcNetString base = cvarSystem->GetCVarString( "fs_basepath" );
-		arcNetString cd = cvarSystem->GetCVarString( "fs_cdpath" );
-		arcNetString paths;
+		anString base = cvarSystem->GetCVarString( "fs_basepath" );
+		anString cd = cvarSystem->GetCVarString( "fs_cdpath" );
+		anString paths;
 		if (base.Length() ) {
 			paths += "+set fs_basepath ";
 			paths += base;
@@ -2085,28 +2085,28 @@ void RunBsp (const char *command) {
 
 		::GetModuleFileName(AfxGetApp()->m_hInstance, buff, sizeof(buff) );
 		if (strlen(command) > strlen( "bspext" ) ) {
-			arcNetString::snPrintf( sys, sizeof(sys), "%s %s +set r_fullscreen 0 +dmap editorOutput %s %s +quit", buff, paths.c_str(), command + strlen( "bspext" ), in );
+			anString::snPrintf( sys, sizeof(sys), "%s %s +set r_fullscreen 0 +dmap editorOutput %s %s +quit", buff, paths.c_str(), command + strlen( "bspext" ), in );
 		} else {
-			arcNetString::snPrintf( sys, sizeof(sys), "%s %s +set r_fullscreen 0 +dmap editorOutput %s +quit", buff, paths.c_str(), in );
+			anString::snPrintf( sys, sizeof(sys), "%s %s +set r_fullscreen 0 +dmap editorOutput %s +quit", buff, paths.c_str(), in );
 		}
 
 		::GetStartupInfo (&startupinfo);
-		if ( !CreateProcess(NULL, sys, NULL, NULL, FALSE, 0, NULL, NULL, &startupinfo, &ProcessInformation) ) {
+		if ( !CreateProcess(nullptr, sys, nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startupinfo, &ProcessInformation) ) {
 			common->Printf( "Could not start bsp process %s %s/n", buff, sys);
 		}
 		g_pParentWnd->SetFocus();
 
 	} else { // assumes bsp is the command
 		if (strlen(command) > strlen( "bsp" ) ) {
-			arcNetString::snPrintf( sys, sizeof(sys), "dmap %s %s", command + strlen( "bsp" ), in );
+			anString::snPrintf( sys, sizeof(sys), "dmap %s %s", command + strlen( "bsp" ), in );
 		} else {
-			arcNetString::snPrintf( sys, sizeof(sys), "dmap %s", in );
+			anString::snPrintf( sys, sizeof(sys), "dmap %s", in );
 		}
 
 		cmdSystem->BufferCommandText( CMD_EXEC_NOW, "disconnect\n" );
 
 		// issue the bsp command
-		Dmap_f( arcCommandArgs( sys, false ) );
+		Dmap_f( anCommandArgs( sys, false ) );
 	}
 }
 
@@ -2118,7 +2118,7 @@ void CMainFrame::OnBspCommand(unsigned int nID) {
 	RunBsp(bsp_commands[LOWORD(nID - CMD_BSPCOMMAND)] );
 
 	// DHM - _D3XP
-	SetTimer(QE_TIMER1, g_PrefsDlg.m_nAutoSave * 60 * 1000, NULL);
+	SetTimer(QE_TIMER1, g_PrefsDlg.m_nAutoSave * 60 * 1000, nullptr );
 }
 
 void CMainFrame::OnViewShowblocks() {
@@ -2458,7 +2458,7 @@ bool DoColor( int iIndex ) {
 extern void Select_SetKeyVal(const char *key, const char *val);
 void CMainFrame::OnMiscSelectentitycolor() {
 
-	entity_t *ent = NULL;
+	entity_t *ent = nullptr;
 	if (QE_SingleBrush(true, true) ) {
 		ent = selected_brushes.next->owner;
 		CString strColor = ValueForKey(ent, "_color" );
@@ -2490,7 +2490,7 @@ CString strReplaceKey;
 CString strReplaceValue;
 bool    gbWholeStringMatchOnly = true;
 bool	gbSelectAllMatchingEnts= false;
-brush_t* gpPrevEntBrushFound = NULL;
+brush_t* gpPrevEntBrushFound = nullptr;
 
 // all this because there's no ansi stristr(), sigh...
 //
@@ -2514,7 +2514,7 @@ LPCSTR String_ToLower(LPCSTR psString) {
 }
 
 
-bool FindNextBrush(brush_t* pPrevFoundBrush)	// can be NULL for fresh search {
+bool FindNextBrush(brush_t* pPrevFoundBrush)	// can be nullptr for fresh search {
 	bool bFoundSomething = false;
 	entity_t *pLastFoundEnt;
 	brush_t  *pLastFoundBrush;
@@ -2529,7 +2529,7 @@ bool FindNextBrush(brush_t* pPrevFoundBrush)	// can be NULL for fresh search {
 
 	if (pPrevFoundBrush && !gbSelectAllMatchingEnts)
 	{
-		brush_t *pPrev = NULL;
+		brush_t *pPrev = nullptr;
 		for (brush_t* b = active_brushes.next; b != &active_brushes; b = b->next)
 		{
 			if (pPrev == pPrevFoundBrush && pPrevFoundBrush)
@@ -2591,7 +2591,7 @@ bool FindNextBrush(brush_t* pPrevFoundBrush)	// can be NULL for fresh search {
 							(
 							(gbWholeStringMatchOnly && stricmp(psEntFoundValue, strFindValue)==0 )
 							||
-							( !gbWholeStringMatchOnly && strstr(String_ToLower(psEntFoundValue), String_ToLower(strFindValue) ))
+							( !gbWholeStringMatchOnly && strstr(String_ToLower(psEntFoundValue), String_ToLower(strFindValue) ) )
 							)
 							||											//  or
 							(strFindValue.IsEmpty() )					// any value for this key if blank value search specified
@@ -2615,10 +2615,10 @@ bool FindNextBrush(brush_t* pPrevFoundBrush)	// can be NULL for fresh search {
 								||
 								(gbWholeStringMatchOnly && stricmp(psEntFoundValue, strFindValue)==0 )
 								||
-								( !gbWholeStringMatchOnly && strstr(String_ToLower(psEntFoundValue), String_ToLower(strFindValue) ))
+								( !gbWholeStringMatchOnly && strstr(String_ToLower(psEntFoundValue), String_ToLower(strFindValue) ) )
 							)
 						{
-							if ( !gbWholeStringMatchOnly && strstr(String_ToLower(psEntFoundValue), String_ToLower(strFindValue) ))
+							if ( !gbWholeStringMatchOnly && strstr(String_ToLower(psEntFoundValue), String_ToLower(strFindValue) ) )
 							{
 //								OutputDebugString(va( "Matching because: psEntFoundValue '%s' & strFindValue '%s'\n",psEntFoundValue, strFindValue) );
 //								Sys_Printf( "Matching because: psEntFoundValue '%s' & strFindValue '%s'\n",psEntFoundValue, strFindValue);
@@ -2660,7 +2660,7 @@ bool FindNextBrush(brush_t* pPrevFoundBrush)	// can be NULL for fresh search {
 
 	if (bFoundSomething)
 	{
-		arcVec3 v3Origin;
+		anVec3 v3Origin;
 
 		if (pLastFoundEnt->origin[0] != 0.0f || pLastFoundEnt->origin[1] != 0.0f || pLastFoundEnt->origin[2] != 0.0f)
 		{
@@ -2706,7 +2706,7 @@ void CMainFrame::OnMiscFindOrReplaceEntity()
 	{
 		case ID_RET_REPLACE:
 		{
-			brush_t* next = NULL;
+			brush_t* next = nullptr;
 			int iOccurences = 0;
 			for (brush_t* b = active_brushes.next; b != &active_brushes; b = next)
 			{
@@ -2750,8 +2750,8 @@ void CMainFrame::OnMiscFindOrReplaceEntity()
 		break;
 		case ID_RET_FIND:
 		{
-			gpPrevEntBrushFound = NULL;
-			FindNextBrush(NULL);
+			gpPrevEntBrushFound = nullptr;
+			FindNextBrush(nullptr );
 		}
 		break;
 	}
@@ -2762,8 +2762,8 @@ void CMainFrame::OnMiscFindNextEntity()
 	//
 	if ( !FindNextBrush(gpPrevEntBrushFound) )
 	{
-		gpPrevEntBrushFound = NULL;
-		FindNextBrush(NULL);
+		gpPrevEntBrushFound = nullptr;
+		FindNextBrush(nullptr );
 	}
 }
 
@@ -2772,7 +2772,7 @@ void CMainFrame::OnMiscSetViewPos()
 	CString psNewCoords = GetString( "Input coords (x y z [rot] )\n\nUse spaces to seperate numbers" );
 	if ( !psNewCoords.IsEmpty() )
 	{
-		arcVec3 v3Viewpos;
+		anVec3 v3Viewpos;
 		float fYaw = 0;
 
 		psNewCoords.Remove(',');
@@ -3724,32 +3724,32 @@ void CMainFrame::UpdateWindows( int nBits) {
 
 	if (nBits & (W_XY | W_XY_OVERLAY) ) {
 		if (m_pXYWnd) {
-			m_pXYWnd->RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+			m_pXYWnd->RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 		}
 
 		if (m_pXZWnd) {
-			m_pXZWnd->RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+			m_pXZWnd->RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 		}
 
 		if (m_pYZWnd) {
-			m_pYZWnd->RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+			m_pYZWnd->RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 		}
 	}
 
 	if (nBits & W_CAMERA || ((nBits & W_CAMERA_IFON) && m_bCamPreview) ) {
 		if (m_pCamWnd) {
-			m_pCamWnd->RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+			m_pCamWnd->RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 		}
 	}
 
 	if (nBits & (W_Z | W_Z_OVERLAY) ) {
 		if (m_pZWnd) {
-			m_pZWnd->RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+			m_pZWnd->RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 		}
 	}
 
 	if (nBits & W_TEXTURE) {
-		g_Inspectors->texWnd.RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+		g_Inspectors->texWnd.RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 	}
 }
 
@@ -4664,7 +4664,7 @@ void CMainFrame::OnSelectionMovedown() {
 	Undo_Start( "move up" );
 	Undo_AddBrushList(&selected_brushes);
 
-	arcVec3	vAmt;
+	anVec3	vAmt;
 	vAmt[0] = vAmt[1] = 0.0f;
 	vAmt[2] = -g_qeglobals.d_gridsize;
 	Select_Move(vAmt);
@@ -4679,7 +4679,7 @@ void CMainFrame::OnSelectionMovedown() {
  =======================================================================================================================
  */
 void CMainFrame::OnSelectionMoveup() {
-	arcVec3	vAmt;
+	anVec3	vAmt;
 	vAmt[0] = vAmt[1] = 0.0f;
 	vAmt[2] = g_qeglobals.d_gridsize;
 	Select_Move(vAmt);
@@ -4766,12 +4766,12 @@ void CMainFrame::OnTexturesLoad() {
 	CString		strPath;
 	char		*p = strPath.GetBuffer(MAX_PATH + 1 );
 	bi.hwndOwner = GetSafeHwnd();
-	bi.pidlRoot = NULL;
+	bi.pidlRoot = nullptr;
 	bi.pszDisplayName = p;
 	bi.lpszTitle = "Load textures from path";
 	bi.ulFlags = 0;
-	bi.lpfn = NULL;
-	bi.lParam = NULL;
+	bi.lpfn = nullptr;
+	bi.lParam = nullptr;
 	bi.iImage = 0;
 
 	LPITEMIDLIST	pidlBrowse;
@@ -4780,7 +4780,7 @@ void CMainFrame::OnTexturesLoad() {
 		SHGetPathFromIDList(pidlBrowse, p);
 		strPath.ReleaseBuffer();
 		AddSlash(strPath);
-		//FIXME: arcMaterial
+		//FIXME: anMaterial
 		//Texture_ShowDirectory(strPath.GetBuffer(0 ) );
 	}
 }
@@ -4868,7 +4868,7 @@ void CMainFrame::OnCurveSphere() {
  =======================================================================================================================
  */
 void CMainFrame::OnFileImportmap() {
-	CFileDialog dlgFile(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, "Map files (*.map)|*.map||", this);
+	CFileDialog dlgFile(TRUE, nullptr, nullptr, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, "Map files (*.map)|*.map||", this);
 	if (dlgFile.DoModal() == IDOK) {
 		Map_ImportFile(dlgFile.GetPathName().GetBuffer(0 ) );
 	}
@@ -4879,7 +4879,7 @@ void CMainFrame::OnFileImportmap() {
  =======================================================================================================================
  */
 void CMainFrame::OnFileExportmap() {
-	CFileDialog dlgFile(FALSE, "map", NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, "Map files (*.map)|*.map||", this);
+	CFileDialog dlgFile(FALSE, "map", nullptr, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, "Map files (*.map)|*.map||", this);
 	if (dlgFile.DoModal() == IDOK) {
 		Map_SaveSelected(dlgFile.GetPathName().GetBuffer(0 ) );
 	}
@@ -4971,7 +4971,7 @@ void CMainFrame::NudgeSelection( int nDirection, float fAmount) {
 			fAmount = -fAmount;
 		}
 
-		arcVec3	v;
+		anVec3	v;
 		v[0] = v[1] = v[2] = 1.0f;
 		if (fAmount > 0 ) {
 			v[0] = 1.1f;
@@ -5027,7 +5027,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG *pMsg) {
  =======================================================================================================================
  */
 void CMainFrame::Nudge( int nDim, float fNudge) {
-	arcVec3	vMove;
+	anVec3	vMove;
 	vMove[0] = vMove[1] = vMove[2] = 0;
 	vMove[nDim] = fNudge;
 	Select_Move(vMove, true);
@@ -5449,7 +5449,7 @@ void CMainFrame::OnPatchTab() {
 		brush_t		*b = selected_brushes.next;
 		entity_t	*e;
 		if (b != &selected_brushes) {
-			if ( arcNetString::Icmp(b->owner->eclass->name, "worldspawn" ) != 0 ) {
+			if ( anString::Icmp(b->owner->eclass->name, "worldspawn" ) != 0 ) {
 				e = b->owner;
 				Select_Deselect();
 				brush_t *b2;
@@ -5619,7 +5619,7 @@ void CMainFrame::CheckTextureScale( int id) {
 	}
 
 	g_PrefsDlg.SavePrefs();
-	//FIXME: arcMaterial
+	//FIXME: anMaterial
 	//Texture_ResetPosition();
 	Sys_UpdateWindows(W_TEXTURE);
 }
@@ -5674,7 +5674,7 @@ void CMainFrame::OnTexturesTexturewindowscale50() {
  =======================================================================================================================
  */
 void CMainFrame::OnTexturesFlush() {
-	//FIXME: arcMaterial
+	//FIXME: anMaterial
 	//Texture_Flush();
 	Sys_UpdateWindows(W_ALL);
 }
@@ -5920,7 +5920,7 @@ void CMainFrame::OnEditSaveprefab() {
 				(
 					FALSE,
 					"pfb",
-					NULL,
+					nullptr,
 					OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
 					"Prefab files (*.pfb)|*.pfb||",
 					this
@@ -5943,7 +5943,7 @@ void CMainFrame::OnEditLoadprefab() {
 				(
 					TRUE,
 					"pfb",
-					NULL,
+					nullptr,
 					OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
 					"Prefab files (*.pfb)|*.pfb||",
 					this
@@ -6051,7 +6051,7 @@ void CMainFrame::OnTexturesShadersShow() {
  =======================================================================================================================
  */
 void CMainFrame::OnTexturesFlushUnused() {
-	//FIXME: arcMaterial
+	//FIXME: anMaterial
 	//Texture_FlushUnused();
 	Sys_UpdateWindows(W_TEXTURE);
 }
@@ -6070,7 +6070,7 @@ void CMainFrame::OnSelectionInvert() {
  =======================================================================================================================
  */
 void CMainFrame::OnProjectedLight() {
-	LightEditorInit( NULL );
+	LightEditorInit( nullptr );
 }
 
 /*
@@ -6165,8 +6165,8 @@ void CMainFrame::OnSplineTest() {
 	float	cycle = g_splineList->getTotalTime();
 	long	msecs = cycle * 1000;
 	long	current = start;
-	arcVec3	lookat(0, 0, 0 );
-	arcVec3	dir;
+	anVec3	lookat(0, 0, 0 );
+	anVec3	dir;
 
 	while (current < start + msecs) {
 		float	fov;
@@ -6289,9 +6289,9 @@ void CMainFrame::OnSelectionCombine()
 		return;
 	}
 
-	arcNetString str;
-	arcMat3 mat;
-	arcVec3 v;
+	anString str;
+	anMat3 mat;
+	anVec3 v;
 	if (e1->eclass->nShowFlags & ECLASS_LIGHT) {
 		// copy the lights origin and rotation matrix to
 		// light_origin and light_rotation
@@ -6347,12 +6347,12 @@ void CMainFrame::OnSelectionCombine()
 extern void Patch_Weld(patchMesh_t *p, patchMesh_t *p2);
 void CMainFrame::OnPatchCombine() {
 	patchMesh_t *p, *p2;
-	p = p2 = NULL;
+	p = p2 = nullptr;
 	for (brush_t *b = selected_brushes.next; b != &selected_brushes; b = b->next) {
 		if (b->pPatch) {
-			if (p == NULL) {
+			if (p == nullptr ) {
 				p = b->pPatch;
-			} else if (p2 == NULL) {
+			} else if (p2 == nullptr ) {
 				p2 = b->pPatch;
 				Patch_Weld(p, p2);
 				return;
@@ -6539,7 +6539,7 @@ void CMainFrame::OnNurbEditor() {
 	nurbMode ^= 1;
 	if (nurbMode) {
 		int num = nurb.GetNumValues();
-		arcNetString temp = va( "%i 3 ", num);
+		anString temp = va( "%i 3 ", num);
 		for ( int i = 0; i < num; i++ ) {
 			temp += va( "(%i %i) ", ( int )nurb.GetValue( i ).x, ( int )nurb.GetValue( i ).y);
 		}
@@ -6579,8 +6579,8 @@ void CMainFrame::OnSelectAlltargets()
 
 void CMainFrame::OnSelectCompleteEntity()
 {
-    brush_t* b = NULL;
-    entity_t* e = NULL;
+    brush_t* b = nullptr;
+    entity_t* e = nullptr;
 
     b = selected_brushes.next;
     if ( b == &selected_brushes )
@@ -6620,8 +6620,8 @@ void CMainFrame::OnPrecisionCursorCycle()
 
 void CMainFrame::OnGenerateMaterialsList()
 {
-	arcStringList mtrList;
-	arcNetString     mtrName,mtrFileName;
+	anStringList mtrList;
+	anString     mtrName,mtrFileName;
 
 
 	g_Inspectors->consoleWnd.ExecuteCommand ( "clear" );
@@ -6637,7 +6637,7 @@ void CMainFrame::OnGenerateMaterialsList()
 
 		}
 		else {
-			for ( face_t* f = b->brush_faces; f != NULL; f=f->next)
+			for ( face_t* f = b->brush_faces; f != nullptr; f=f->next)
 			{
 				mtrName = f->d_texture->GetName();
 				if ( !mtrList.Find( mtrName) ) {
@@ -6658,7 +6658,7 @@ void CMainFrame::OnGenerateMaterialsList()
 	mtrFileName = mtrFileName.StripPath();
 
 	common->Printf ( "Done...found %i unique materials\n" , mtrList.Num() );
-	mtrFileName = mtrFileName + arcNetString ( "_Materials.txt" );
+	mtrFileName = mtrFileName + anString ( "_Materials.txt" );
 	g_Inspectors->SetMode ( W_CONSOLE , true );
 	g_Inspectors->consoleWnd.SetConsoleText ( va ( "condump %s" , mtrFileName.c_str() ) );
 

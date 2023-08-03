@@ -4,7 +4,7 @@
 /*
 ===============================================================================
 
-	Binary Lexer
+	Binary anBinaryLexer
 
 ===============================================================================
 */
@@ -12,77 +12,77 @@
 #define LEXB_EXTENSION		".lxb"
 #define LEXB_VERSION		"LXB01"
 
-class arcNetTokenCache {
+class anTokenCache {
 public:
-								arcNetTokenCache();
-								~arcNetTokenCache();
+								anTokenCache();
+								~anTokenCache();
 
-	unsigned short				FindToken( const arcNetToken &token );
-	void						Swap( arcNetTokenCache &rhs );
+	unsigned short				FindToken( const anToken &token );
+	void						Swap( anTokenCache &rhs );
 	void						Clear( void );
 
-	bool						Write( arcNetFile *f );
-	bool						Read( arcNetFile *f );
+	bool						Write( anFile *f );
+	bool						Read( anFile *f );
 	bool						ReadBuffer( const byte *buffer, int length );
 	int							Num( void ) const;
 	size_t						Allocated( void ) const { return uniqueTokens.Allocated() + uniqueTokenHash.Allocated(); }
 
-	const arcNetToken &			operator[]( int index ) const { return uniqueTokens[ index ]; }
+	const anToken &			operator[]( int index ) const { return uniqueTokens[ index ]; }
 
 private:
-	arcNetList<arcNetToken>		uniqueTokens;
+	anList<anToken>		uniqueTokens;
 	arcHashIndexUShort			uniqueTokenHash;
 };
 
-ARC_INLINE arcNetTokenCache::arcNetTokenCache() {
+ARC_INLINE anTokenCache::anTokenCache() {
 	uniqueTokens.SetGranularity( 128 );
 	uniqueTokenHash.SetGranularity( 128 );
 }
 
-ARC_INLINE arcNetTokenCache::~arcNetTokenCache() {
+ARC_INLINE anTokenCache::~anTokenCache() {
 }
 
-ARC_INLINE void arcNetTokenCache::Swap( arcNetTokenCache& rhs ) {
+ARC_INLINE void anTokenCache::Swap( anTokenCache& rhs ) {
 	uniqueTokens.Swap( rhs.uniqueTokens );
 	uniqueTokenHash.Swap( rhs.uniqueTokenHash );
 }
 
-ARC_INLINE void arcNetTokenCache::Clear() {
+ARC_INLINE void anTokenCache::Clear() {
 	uniqueTokens.Clear();
 	uniqueTokenHash.Clear();
 }
 
-ARC_INLINE int arcNetTokenCache::Num( void ) const {
+ARC_INLINE int anTokenCache::Num( void ) const {
 	return uniqueTokens.Num();
 }
 
-class arcNetBinaryLexer {
+class anBinaryLexer {
 public:
-							arcNetBinaryLexer();
-							~arcNetBinaryLexer();
+							anBinaryLexer();
+							~anBinaryLexer();
 
-	bool					Write( arcNetFile *f );
-	bool					Read( arcNetFile *f );
+	bool					Write( anFile *f );
+	bool					Read( anFile *f );
 	bool					ReadBuffer( const byte* buffer, int length );
 
 	bool					IsLoaded( void ) const { return isLoaded; }
 	int						EndOfFile( void ) const;
 
-	void					AddToken( const arcNetToken &token, arcNetTokenCache *cache = NULL );
+	void					AddToken( const anToken &token, anTokenCache *cache = nullptr );
 
-	int						ReadToken( arcNetToken *token );
-	void					Swap( arcNetBinaryLexer &rhs );
+	int						ReadToken( anToken *token );
+	void					Swap( anBinaryLexer &rhs );
 
 	void					Clear( void );
 	void					ResetParsing( void );
 
 	int						NumUniqueTokens( void ) const;
 	int						NumTokens( void ) const;
-	const arcNetList<arcNetToken>&	GetUniqueTokens( void ) const;
+	const anList<anToken>&	GetUniqueTokens( void ) const;
 
-	void					SetData( const arcNetList<unsigned short> *indices, const arcNetTokenCache *cache );
+	void					SetData( const anList<unsigned short> *indices, const anTokenCache *cache );
 
-	const arcNetList<unsigned short>&
+	const anList<unsigned short>&
 							GetTokenStream() const	{ return tokens; }
 
 	size_t					Allocated( void ) const { return tokens.Allocated() + tokenCache.Allocated(); }
@@ -91,54 +91,54 @@ private:
 	bool					isLoaded;
 	int						nextToken;
 
-	arcNetTokenCache		tokenCache;
-	arcNetList<unsigned short>tokens;
+	anTokenCache		tokenCache;
+	anList<unsigned short>tokens;
 
 									// allow clients to set their own data
-	const arcNetList<unsigned short> *tokensData;
-	const arcNetTokenCache *	tokenCacheData;
+	const anList<unsigned short> *tokensData;
+	const anTokenCache *	tokenCacheData;
 };
 
-ARC_INLINE arcNetBinaryLexer::arcNetBinaryLexer( void ) {
+ARC_INLINE anBinaryLexer::anBinaryLexer( void ) {
 	Clear();
 	tokens.SetGranularity( 256 );
 }
 
-ARC_INLINE arcNetBinaryLexer::~arcNetBinaryLexer( void ) {
+ARC_INLINE anBinaryLexer::~anBinaryLexer( void ) {
 }
 
-ARC_INLINE void arcNetBinaryLexer::Swap( arcNetBinaryLexer& rhs ) {
+ARC_INLINE void anBinaryLexer::Swap( anBinaryLexer& rhs ) {
 	tokens.Swap( rhs.tokens );
 	tokenCache.Swap( rhs.tokenCache );
 	::Swap( nextToken, rhs.nextToken );
 	::Swap( isLoaded, rhs.isLoaded );
 }
 
-ARC_INLINE void arcNetBinaryLexer::Clear( void ) {
+ARC_INLINE void anBinaryLexer::Clear( void ) {
 	isLoaded = false;
 	nextToken = 0;
 	tokens.Clear();
 	tokenCache.Clear();
-	tokensData = NULL;
-	tokenCacheData = NULL;
+	tokensData = nullptr;
+	tokenCacheData = nullptr;
 }
 
-ARC_INLINE void arcNetBinaryLexer::ResetParsing( void ) {
+ARC_INLINE void anBinaryLexer::ResetParsing( void ) {
 	nextToken = 0;
 }
 
-ARC_INLINE int arcNetBinaryLexer::NumTokens( void ) const {
-	return tokensData != NULL ? tokensData->Num() : tokens.Num();
+ARC_INLINE int anBinaryLexer::NumTokens( void ) const {
+	return tokensData != nullptr ? tokensData->Num() : tokens.Num();
 }
 
-ARC_INLINE void arcNetBinaryLexer::SetData( const arcNetList<unsigned short>* indices, const arcNetTokenCache* cache ) {
+ARC_INLINE void anBinaryLexer::SetData( const anList<unsigned short>* indices, const anTokenCache* cache ) {
 	tokenCacheData = cache;
 	tokensData = indices;
 	isLoaded = true;
 }
 
 
-ARC_INLINE int arcNetBinaryLexer::EndOfFile() const {
+ARC_INLINE int anBinaryLexer::EndOfFile() const {
 	return nextToken >= tokens.Num();
 }
 

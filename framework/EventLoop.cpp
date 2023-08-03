@@ -1,44 +1,44 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
-arcCVarSystem arcEventLoop::com_journal( "com_journal", "0", CVAR_INIT|CVAR_SYSTEM, "1 = record journal, 2 = play back journal", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem anEventLoop::com_journal( "com_journal", "0", CVAR_INIT|CVAR_SYSTEM, "1 = record journal, 2 = play back journal", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
 
-arcEventLoop eventLoopLocal;
-arcEventLoop *eventLoop = &eventLoopLocal;
+anEventLoop eventLoopLocal;
+anEventLoop *eventLoop = &eventLoopLocal;
 
 
 /*
 =================
-arcEventLoop::arcEventLoop
+anEventLoop::anEventLoop
 =================
 */
-arcEventLoop::arcEventLoop() {
-	com_journalFile = NULL;
-	com_journalDataFile = NULL;
+anEventLoop::anEventLoop() {
+	com_journalFile = nullptr;
+	com_journalDataFile = nullptr;
 	initialTimeOffset = 0;
 }
 
 /*
 =================
-arcEventLoop::~arcEventLoop
+anEventLoop::~anEventLoop
 =================
 */
-arcEventLoop::~arcEventLoop() {
+anEventLoop::~anEventLoop() {
 }
 
 /*
 =================
-arcEventLoop::GetRealEvent
+anEventLoop::GetRealEvent
 =================
 */
-sysEvent_t	arcEventLoop::GetRealEvent() {
+sysEvent_t	anEventLoop::GetRealEvent() {
 	int			r;
 	sysEvent_t	ev;
 
 	// either get an event from the system or the journal file
 	if ( com_journal.GetInteger() == 2 ) {
 		r = com_journalFile->Read( &ev, sizeof(ev) );
-		if ( r != sizeof(ev) ) {
+		if ( r != sizeof( ev ) ) {
 			common->FatalError( "Error reading from journal file" );
 		}
 		if ( ev.evPtrLength ) {
@@ -71,17 +71,16 @@ sysEvent_t	arcEventLoop::GetRealEvent() {
 
 /*
 =================
-arcEventLoop::PushEvent
+anEventLoop::PushEvent
 =================
 */
-void arcEventLoop::PushEvent( sysEvent_t *event ) {
+void anEventLoop::PushEvent( sysEvent_t *event ) {
 	sysEvent_t		*ev;
 	static			bool printedWarning;
 
 	ev = &com_pushedEvents[ com_pushedEventsHead & (MAX_PUSHED_EVENTS-1 ) ];
 
 	if ( com_pushedEventsHead - com_pushedEventsTail >= MAX_PUSHED_EVENTS ) {
-
 		// don't print the warning constantly, or it can give time for more...
 		if ( !printedWarning ) {
 			printedWarning = true;
@@ -102,10 +101,10 @@ void arcEventLoop::PushEvent( sysEvent_t *event ) {
 
 /*
 =================
-arcEventLoop::GetEvent
+anEventLoop::GetEvent
 =================
 */
-sysEvent_t arcEventLoop::GetEvent() {
+sysEvent_t anEventLoop::GetEvent() {
 	if ( com_pushedEventsHead > com_pushedEventsTail ) {
 		com_pushedEventsTail++;
 		return com_pushedEvents[ (com_pushedEventsTail-1 ) & (MAX_PUSHED_EVENTS-1 ) ];
@@ -115,10 +114,10 @@ sysEvent_t arcEventLoop::GetEvent() {
 
 /*
 =================
-arcEventLoop::ProcessEvent
+anEventLoop::ProcessEvent
 =================
 */
-void arcEventLoop::ProcessEvent( sysEvent_t ev ) {
+void anEventLoop::ProcessEvent( sysEvent_t ev ) {
 	// track key up / down states
 	if ( ev.evType == SE_KEY ) {
 		idKeyInput::PreliminaryKeyEvent( ev.evValue, ( ev.evValue2 != 0 ) );
@@ -140,10 +139,10 @@ void arcEventLoop::ProcessEvent( sysEvent_t ev ) {
 
 /*
 ===============
-arcEventLoop::RunEventLoop
+anEventLoop::RunEventLoop
 ===============
 */
-int arcEventLoop::RunEventLoop( bool commandExecution ) {
+int anEventLoop::RunEventLoop( bool commandExecution ) {
 	sysEvent_t	ev;
 
 	while ( 1 ) {
@@ -166,10 +165,10 @@ int arcEventLoop::RunEventLoop( bool commandExecution ) {
 
 /*
 =============
-arcEventLoop::Init
+anEventLoop::Init
 =============
 */
-void arcEventLoop::Init() {
+void anEventLoop::Init() {
 	initialTimeOffset = Sys_Milliseconds();
 
 	common->StartupVariable( "journal" );
@@ -194,28 +193,28 @@ void arcEventLoop::Init() {
 
 /*
 =============
-arcEventLoop::Shutdown
+anEventLoop::Shutdown
 =============
 */
-void arcEventLoop::Shutdown() {
+void anEventLoop::Shutdown() {
 	if ( com_journalFile ) {
 		fileSystem->CloseFile( com_journalFile );
-		com_journalFile = NULL;
+		com_journalFile = nullptr;
 	}
 	if ( com_journalDataFile ) {
 		fileSystem->CloseFile( com_journalDataFile );
-		com_journalDataFile = NULL;
+		com_journalDataFile = nullptr;
 	}
 }
 
 /*
 ================
-arcEventLoop::Milliseconds
+anEventLoop::Milliseconds
 
 Can be used for profiling, but will be journaled accurately
 ================
 */
-int arcEventLoop::Milliseconds() {
+int anEventLoop::Milliseconds() {
 #if 1	// FIXME!
 	return Sys_Milliseconds() - initialTimeOffset;
 #else
@@ -223,21 +222,17 @@ int arcEventLoop::Milliseconds() {
 
 	// get events and push them until we get a null event with the current time
 	do {
-		ev = Com_GetRealEvent();
+		ev = common->GetRealEvent();
 		if ( ev.evType != SE_NONE ) {
-			Com_PushEvent( &ev );
+			common->PushEvent( &ev );
 		}
-	} while ( ev.evType != SE_NONE );
-
-	return ev.evTime;
-#endif
 }
 
 /*
 ================
-arcEventLoop::JournalLevel
+anEventLoop::JournalLevel
 ================
 */
-int arcEventLoop::JournalLevel() const {
+int anEventLoop::JournalLevel() const {
 	return com_journal.GetInteger();
 }

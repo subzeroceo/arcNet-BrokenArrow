@@ -10,21 +10,21 @@ aRcRadians::RadianCompleteNormalize
 */
 aRcRadians &aRcRadians::RadianCompleteNormalize( void ) {
 	// Get to -TWO_PI < a < TWO_PI
-	pitch = fmodf( pitch, arcMath::TWO_PI );
-	yaw = fmodf( yaw, arcMath::TWO_PI );
-	roll = fmodf( roll, arcMath::TWO_PI );
+	pitch = fmodf( pitch, anMath::TWO_PI );
+	yaw = fmodf( yaw, anMath::TWO_PI );
+	roll = fmodf( roll, anMath::TWO_PI );
 
 	// Fix any negatives
 	if ( pitch < 0.0f ) {
-		pitch += arcMath::TWO_PI;
+		pitch += anMath::TWO_PI;
 	}
 
 	if ( yaw < 0.0f ) {
-		yaw += arcMath::TWO_PI;
+		yaw += anMath::TWO_PI;
 	}
 
 	if ( roll < 0.0f ) {
-		roll += arcMath::TWO_PI;
+		roll += anMath::TWO_PI;
 	}
 
 	return( *this );
@@ -39,17 +39,17 @@ returns angles normalized to the range [-PI < angle <= PI]
 */
 aRcRadians &aRcRadians::RadianHalfNormalize( void ) {
 	// Get to -TWO_PI < a < TWO_PI
-	pitch = fmodf( pitch, arcMath::TWO_PI );
-	yaw = fmodf( yaw, arcMath::TWO_PI );
-	roll = fmodf( roll, arcMath::TWO_PI );
+	pitch = fmodf( pitch, anMath::TWO_PI );
+	yaw = fmodf( yaw, anMath::TWO_PI );
+	roll = fmodf( roll, anMath::TWO_PI );
 
 	for ( int i = 0; i < 3; i++ ) {
-		if ( ( *this )[i] < -arcMath::PI ) {
-			( *this )[i] += arcMath::TWO_PI;
+		if ( ( *this )[i] < -anMath::PI ) {
+			( *this )[i] += anMath::TWO_PI;
 		}
 
-		if ( ( *this )[i] > arcMath::PI ) {
-			( *this )[i] -= arcMath::TWO_PI;
+		if ( ( *this )[i] > anMath::PI ) {
+			( *this )[i] -= anMath::TWO_PI;
 		}
 	}
 
@@ -61,12 +61,12 @@ aRcRadians &aRcRadians::RadianHalfNormalize( void ) {
 aRcRadians::RadianToVector
 =================
 */
-void aRcRadians::RadianToVector( arcVec3 *forward, arcVec3 *right, arcVec3 *up ) const {
+void aRcRadians::RadianToVector( anVec3 *forward, anVec3 *right, anVec3 *up ) const {
 	float	sr, sp, sy, cr, cp, cy;
 
-	arcMath::SinCos( yaw, sy, cy );
-	arcMath::SinCos( pitch, sp, cp );
-	arcMath::SinCos( roll, sr, cr );
+	anMath::SinCos( yaw, sy, cy );
+	anMath::SinCos( pitch, sp, cp );
+	anMath::SinCos( roll, sr, cr );
 
 	if ( forward ) {
 		forward->Set( cp * cy, cp * sy, -sp );
@@ -87,35 +87,35 @@ aRcRadians::RadianToRotation
 this is the orignal
 =================
 */
-arcRotate aRcRadians::RadianToRotation( void ) const {
+anRotation aRcRadians::RadianToRotation( void ) const {
 	float sx, cx, sy, cy, sz, cz;
 
 	if ( pitch == 0.0f ) {
 		if ( yaw == 0.0f ) {
-			return arcRotate( vec3_origin, arcVec3( -1.0f, 0.0f, 0.0f ), roll );
+			return anRotation( vec3_origin, anVec3( -1.0f, 0.0f, 0.0f ), roll );
 		}
 		if ( roll == 0.0f ) {
-			return arcRotate( vec3_origin, arcVec3( 0.0f, 0.0f, -1.0f ), yaw );
+			return anRotation( vec3_origin, anVec3( 0.0f, 0.0f, -1.0f ), yaw );
 		}
 	} else if ( yaw == 0.0f && roll == 0.0f ) {
-		return arcRotate( vec3_origin, arcVec3( 0.0f, -1.0f, 0.0f ), pitch );
+		return anRotation( vec3_origin, anVec3( 0.0f, -1.0f, 0.0f ), pitch );
 	}
 
-	arcMath::SinCos( yaw, sz, cz );
-	arcMath::SinCos( pitch, sy, cy );
-	arcMath::SinCos( roll, sx, cx );
+	anMath::SinCos( yaw, sz, cz );
+	anMath::SinCos( pitch, sy, cy );
+	anMath::SinCos( roll, sx, cx );
 
 	float sxcy = sx * cy;
 	float cxcy = cx * cy;
 	float sxsy = sx * sy;
 	float cxsy = cx * sy;
 
-	arcVec3 vec.x =  cxsy * sz - sxcy * cz;
-	arcVec3 vec.y = -cxsy * cz - sxcy * sz;
-	arcVec3 vec.z =  sxsy * cz - cxcy * sz;
+	anVec3 vec.x =  cxsy * sz - sxcy * cz;
+	anVec3 vec.y = -cxsy * cz - sxcy * sz;
+	anVec3 vec.z =  sxsy * cz - cxcy * sz;
 	float w = cxcy * cz + sxsy * sz;
 
-	float angle = arcMath::ACos( w );
+	float angle = anMath::ACos( w );
 
 	if ( angle == 0.0f ) {
 		vec.Set( 0.0f, 0.0f, 1.0f );
@@ -125,36 +125,36 @@ arcRotate aRcRadians::RadianToRotation( void ) const {
 		vec.FixDegenerateNormal();
 		angle *= 2.0f * M_PI;
 	}
-	return arcRotate( vec3_origin, vec, angle );
+	return anRotation( vec3_origin, vec, angle );
 }
 
-arcRotate aRcRadians::RadianToRotation( void ) const {
+anRotation aRcRadians::RadianToRotation( void ) const {
 	if ( pitch == 0.0f ) {
 		if ( yaw == 0.0f ) {
-			return arcRotate( vec3_origin, arcVec3( -1.0f, 0.0f, 0.0f ), roll );
+			return anRotation( vec3_origin, anVec3( -1.0f, 0.0f, 0.0f ), roll );
 		}
 		if ( roll == 0.0f ) {
-			return arcRotate( vec3_origin, arcVec3( 0.0f, 0.0f, -1.0f ), yaw );
+			return anRotation( vec3_origin, anVec3( 0.0f, 0.0f, -1.0f ), yaw );
 		}
 	} else if ( yaw == 0.0f && roll == 0.0f ) {
-		return arcRotate( vec3_origin, arcVec3( 0.0f, -1.0f, 0.0f ), pitch );
+		return anRotation( vec3_origin, anVec3( 0.0f, -1.0f, 0.0f ), pitch );
 	}
 
-	arcMath::SinCos( yaw, sz, cz );
-	arcMath::SinCos( pitch, sy, cy );
-	arcMath::SinCos( roll, sx, cx );
+	anMath::SinCos( yaw, sz, cz );
+	anMath::SinCos( pitch, sy, cy );
+	anMath::SinCos( roll, sx, cx );
 
 	float sxcy = float sx * float cy;
 	float cxcy = float cx * float cy;
 	float sxsy = float sx * float sy;
 	float cxsy = float cx * float sy;
 
-	arcVec3 vec.x =  cxsy * sz - sxcy * cz;
-	arcVec3 vec.y = -cxsy * cz - sxcy * sz;
-	arcVec3 vec.z =  sxsy * cz - cxcy * sz;
+	anVec3 vec.x =  cxsy * sz - sxcy * cz;
+	anVec3 vec.y = -cxsy * cz - sxcy * sz;
+	anVec3 vec.z =  sxsy * cz - cxcy * sz;
 	float w = cxcy * cz + sxsy * sz;
 
-	angle = arcMath::ACos( w );
+	angle = anMath::ACos( w );
 
 	if ( angle == 0.0f ) {
 		vec.Set( 0.0f, 0.0f, 1.0f );
@@ -162,9 +162,9 @@ arcRotate aRcRadians::RadianToRotation( void ) const {
 		//vec *= ( 1.0f / sin( angle ) );
 		vec.Normalize();
 		vec.FixDegenerateNormal();
-		angle *= 2.0f * arcMath::M_PI;
+		angle *= 2.0f * anMath::M_PI;
 	}
-	return arcRotate( vec3_origin, vec, angle );
+	return anRotation( vec3_origin, vec, angle );
 }
 
 /*
@@ -172,17 +172,17 @@ arcRotate aRcRadians::RadianToRotation( void ) const {
 aRcRadians::RadianFromCenterPoint
 =================
 */
-double float aRcRadians::RadianFromCenterPoint( const arcVec3 &pt, const arcVec3 &center ) {
+double float aRcRadians::RadianFromCenterPoint( const anVec3 &pt, const anVec3 &center ) {
  	// Create a vector representing the origin
-	arcVec3 vec3_origin( 0.0f, 0.0f, 0.0f );
+	anVec3 vec3_origin( 0.0f, 0.0f, 0.0f );
 	// Create a vector representing the point
-	arcVec3 pt_vec;//pt_vec.x = pt.x - center.x;
+	anVec3 pt_vec;//pt_vec.x = pt.x - center.x;
 
 	center.ToVec3( cVec );
 	pt.ToVec3( pt_vec );
 
 	// Calculate the angle in radians and convert to degrees
-	arcVec3 diff = vec3_origin - pt_vec;
+	anVec3 diff = vec3_origin - pt_vec;
 	double angle = atan2( diff.z, diff.x ) * 180.0 / M_PI;
 
 	// Adjust the angle to be between 0 and 360
@@ -210,20 +210,20 @@ double float aRcRadians::RadianFromCenterPoint( const arcVec3 &pt, const arcVec3
 aRcRadians::ToForward
 =================
 */
-arcVec3 aRcRadians::RadianToForward( void ) const {
+anVec3 aRcRadians::RadianToForward( void ) const {
 	float sp, sy, cp, cy;
 
-    // Call the 'SinCos' function from the 'arcMath' class, passing 'yaw' as an argument
+    // Call the 'SinCos' function from the 'anMath' class, passing 'yaw' as an argument
     // The values of 'sy' and 'cy' are assigned the result of the 'SinCos' function
-	arcMath::SinCos( yaw, sy, cy );
+	anMath::SinCos( yaw, sy, cy );
 
-    // Call the 'SinCos' function from the 'arcMath' class, passing 'pitch' as an argument
+    // Call the 'SinCos' function from the 'anMath' class, passing 'pitch' as an argument
     // The values of 'sp' and 'cp' are assigned the result of the 'SinCos' function
-	arcMath::SinCos( pitch, sp, cp );
+	anMath::SinCos( pitch, sp, cp );
 
-    // Create an object of type 'arcVec3' using the values obtained from the previous calculations
+    // Create an object of type 'anVec3' using the values obtained from the previous calculations
     // The values of 'cp * cy', 'cp * sy', and '-sp' are used as arguments to construct the object
-	return( arcVec3( cp * cy, cp * sy, -sp ) );
+	return( anVec3( cp * cy, cp * sy, -sp ) );
 }
 
 /*
@@ -231,20 +231,20 @@ arcVec3 aRcRadians::RadianToForward( void ) const {
 aRcRadians::RadianToQuat
 =================
 */
-arcQuats aRcRadians::RadianToQuat( void ) const {
+anQuats aRcRadians::RadianToQuat( void ) const {
 	float sx, cx, sy, cy, sz, cz;
 	// I could add PI in place of
 	// yaw, pitch, roll.  But ima see how this rolls
-	arcMath::SinCos( yaw, sz, cz );
-	arcMath::SinCos( pitch, sy, cy );
-	arcMath::SinCos( roll, sx, cx );
+	anMath::SinCos( yaw, sz, cz );
+	anMath::SinCos( pitch, sy, cy );
+	anMath::SinCos( roll, sx, cx );
 
 	float sxcy = sx * cy;
 	float cxcy = cx * cy;
 	float sxsy = sx * sy;
 	float cxsy = cx * sy;
 
-	return arcQuats( cxsy*sz - sxcy*cz, -cxsy*cz - sxcy*sz, sxsy*cz - cxcy*sz, cxcy*cz + sxsy*sz );
+	return anQuats( cxsy*sz - sxcy*cz, -cxsy*cz - sxcy*sz, sxsy*cz - cxcy*sz, cxcy*cz + sxsy*sz );
 }
 
 /*
@@ -252,12 +252,12 @@ arcQuats aRcRadians::RadianToQuat( void ) const {
 aRcRadians::ToMat3
 =================
 */
-arcMat3 &aRcRadians::RadianToMat3( arcMat3 &mat ) const {
+anMat3 &aRcRadians::RadianToMat3( anMat3 &mat ) const {
 	float sr, sp, sy, cr, cp, cy;
 
-	arcMath::SinCos( yaw, sy, cy );
-	arcMath::SinCos( pitch, sp, cp );
-	arcMath::SinCos( roll, sr, cr );
+	anMath::SinCos( yaw, sy, cy );
+	anMath::SinCos( pitch, sp, cp );
+	anMath::SinCos( roll, sr, cr );
 
 	mat[0].Set( cp * cy, cp * sy, -sp );
 	mat[1].Set( sr * sp * cy + cr * -sy, sr * sp * sy + cr * cy, sr * cp );
@@ -271,8 +271,8 @@ arcMat3 &aRcRadians::RadianToMat3( arcMat3 &mat ) const {
 aRcRadians::ToMat4
 =================
 */
-arcMat4 aRcRadians::RadianToMat4( void ) const {
-	arcMat3 mat3 = RadianToMat3();
+anMat4 aRcRadians::RadianToMat4( void ) const {
+	anMat3 mat3 = RadianToMat3();
 	return mat3.ToMat4();
 }
 

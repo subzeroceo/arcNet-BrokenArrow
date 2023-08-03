@@ -62,7 +62,7 @@ def do_logfunc(f_in, f_out):
 				f_out.write('\tdll%s(' % t[2] )
 			started = 0
 			for i in names:
-				if (started):
+				if ( started):
 					f_out.write(', ')
 				else:
 					started = 1
@@ -71,4 +71,4 @@ def do_logfunc(f_in, f_out):
 			f_out.write('}\n\n')
 
 if __name__ == '__main__':
-	do_logfunc(sys.stdin, sys.stdout)
+	do_logfunc( sys.stdin, sys.stdout)

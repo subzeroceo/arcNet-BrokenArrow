@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -15,56 +15,55 @@
 
 /*
 ==================
-ARCRenderModelDecal::ARCRenderModelDecal
+anRenderModelDecal::anRenderModelDecal
 ==================
 */
-ARCRenderModelDecal::ARCRenderModelDecal( void ) {
+anRenderModelDecal::anRenderModelDecal( void ) {
 	memset( &tri, 0, sizeof( tri ) );
 	tri.verts = verts;
 	tri.indexes = indexes;
-	material = NULL;
-	nextDecal = NULL;
+	material = nullptr;
+	nextDecal = nullptr;
 }
 
 /*
 ==================
-ARCRenderModelDecal::~ARCRenderModelDecal
+anRenderModelDecal::~anRenderModelDecal
 ==================
 */
-ARCRenderModelDecal::~ARCRenderModelDecal( void ) {
+anRenderModelDecal::~anRenderModelDecal( void ) {
 }
 
 /*
 ==================
-ARCRenderModelDecal::ARCRenderModelDecal
+anRenderModelDecal::anRenderModelDecal
 ==================
 */
-ARCRenderModelDecal *ARCRenderModelDecal::Alloc( void ) {
-	return new ARCRenderModelDecal;
+anRenderModelDecal *anRenderModelDecal::Alloc( void ) {
+	return new anRenderModelDecal;
 }
 
 /*
 ==================
-ARCRenderModelDecal::ARCRenderModelDecal
+anRenderModelDecal::anRenderModelDecal
 ==================
 */
-void ARCRenderModelDecal::Free( ARCRenderModelDecal *decal ) {
+void anRenderModelDecal::Free( anRenderModelDecal *decal ) {
 	delete decal;
 }
 
 /*
 =================
-ARCRenderModelDecal::CreateProjectionInfo
+anRenderModelDecal::CreateProjectionInfo
 =================
 */
-bool ARCRenderModelDecal::CreateProjectionInfo( decalProjectionInfo_t &info, const arcFixedWinding &winding, const arcVec3 &projectionOrigin, const bool parallel, const float fadeDepth, const arcMaterial *material, const int startTime ) {
-
+bool anRenderModelDecal::CreateProjectionInfo( decalProjectionInfo_t &info, const anFixedWinding &winding, const anVec3 &projectionOrigin, const bool parallel, const float fadeDepth, const anMaterial *material, const int startTime ) {
 	if ( winding.GetNumPoints() != NUM_DECAL_BOUNDING_PLANES - 2 ) {
-		common->Printf( "ARCRenderModelDecal::CreateProjectionInfo: winding must have %d points\n", NUM_DECAL_BOUNDING_PLANES - 2 );
+		common->Printf( "anRenderModelDecal::CreateProjectionInfo: winding must have %d points\n", NUM_DECAL_BOUNDING_PLANES - 2 );
 		return false;
 	}
 
-	assert( material != NULL );
+	assert( material != nullptr );
 
 	info.projectionOrigin = projectionOrigin;
 	info.material = material;
@@ -74,7 +73,7 @@ bool ARCRenderModelDecal::CreateProjectionInfo( decalProjectionInfo_t &info, con
 	info.force = false;
 
 	// get the winding plane and the depth of the projection volume
-	arcPlane windingPlane;
+	anPlane windingPlane;
 	winding.GetPlane( windingPlane );
 	float depth = windingPlane.Distance( projectionOrigin );
 
@@ -89,7 +88,7 @@ bool ARCRenderModelDecal::CreateProjectionInfo( decalProjectionInfo_t &info, con
 	// calculate the world space projection volume bounding planes, positive sides face outside the decal
 	if ( parallel ) {
 		for ( int i = 0; i < winding.GetNumPoints(); i++ ) {
-			arcVec3 edge = winding[( i+1 )%winding.GetNumPoints()].ToVec3() - winding[i].ToVec3();
+			anVec3 edge = winding[( i+1 )%winding.GetNumPoints()].ToVec3() - winding[i].ToVec3();
 			info.boundingPlanes[i].Normal().Cross( windingPlane.Normal(), edge );
 			info.boundingPlanes[i].Normalize();
 			info.boundingPlanes[i].FitThroughPoint( winding[i].ToVec3() );
@@ -111,12 +110,12 @@ bool ARCRenderModelDecal::CreateProjectionInfo( decalProjectionInfo_t &info, con
 
 	// calculate the texture vectors for the winding
 	float	len, texArea, inva;
-	arcVec3	temp;
-	arcVec5	d0, d1;
+	anVec3	temp;
+	anVec5	d0, d1;
 
-	const arcVec5 &a = winding[0];
-	const arcVec5 &b = winding[1];
-	const arcVec5 &c = winding[2];
+	const anVec5 &a = winding[0];
+	const anVec5 &b = winding[1];
+	const anVec5 &c = winding[2];
 
 	d0 = b.ToVec3() - a.ToVec3();
 	d0.s = b.s - a.s;
@@ -147,10 +146,10 @@ bool ARCRenderModelDecal::CreateProjectionInfo( decalProjectionInfo_t &info, con
 
 /*
 =================
-ARCRenderModelDecal::CreateProjectionInfo
+anRenderModelDecal::CreateProjectionInfo
 =================
 */
-void ARCRenderModelDecal::GlobalProjectionInfoToLocal( decalProjectionInfo_t &localInfo, const decalProjectionInfo_t &info, const arcVec3 &origin, const arcMat3 &axis ) {
+void anRenderModelDecal::GlobalProjectionInfoToLocal( decalProjectionInfo_t &localInfo, const decalProjectionInfo_t &info, const anVec3 &origin, const anMat3 &axis ) {
 	float modelMatrix[16];
 
 	R_AxisToModelMatrix( axis, origin, modelMatrix );
@@ -175,26 +174,21 @@ void ARCRenderModelDecal::GlobalProjectionInfoToLocal( decalProjectionInfo_t &lo
 
 /*
 =================
-ARCRenderModelDecal::AddWinding
+anRenderModelDecal::AddWinding
 =================
 */
-void ARCRenderModelDecal::AddWinding( const arcWinding &w, const arcMaterial *decalMaterial, const arcPlane fadePlanes[2], float fadeDepth, int startTime ) {
-	int i;
-	float invFadeDepth, fade;
-	decalInfo_t	decalInfo;
-
-	if ( ( material == NULL || material == decalMaterial ) &&
-			tri.numVerts + w.GetNumPoints() < MAX_DECAL_VERTS &&
-				tri.numIndexes + ( w.GetNumPoints() - 2 ) * 3 < MAX_DECAL_INDEXES ) {
+void anRenderModelDecal::AddWinding( const anWinding &w, const anMaterial *decalMaterial, const anPlane fadePlanes[2], float fadeDepth, int startTime ) {
+	if ( ( material == nullptr || material == decalMaterial ) && tri.numVerts + w.GetNumPoints() < MAX_DECAL_VERTS &&
+			tri.numIndexes + ( w.GetNumPoints() - 2 ) * 3 < MAX_DECAL_INDEXES ) {
 
 		material = decalMaterial;
 
 		// add to this decal
-		decalInfo = material->GetDecalInfo();
-		invFadeDepth = -1.0f / fadeDepth;
+		decalInfo_t decalInfo = material->GetDecalInfo();
+		float invFadeDepth = -1.0f / fadeDepth;
 
-		for ( i = 0; i < w.GetNumPoints(); i++ ) {
-			fade = fadePlanes[0].Distance( w[i].ToVec3() ) * invFadeDepth;
+		for ( int i = 0; i < w.GetNumPoints(); i++ ) {
+			float fade = fadePlanes[0].Distance( w[i].ToVec3() ) * invFadeDepth;
 			if ( fade < 0.0f ) {
 				fade = fadePlanes[1].Distance( w[i].ToVec3() ) * invFadeDepth;
 			}
@@ -203,13 +197,13 @@ void ARCRenderModelDecal::AddWinding( const arcWinding &w, const arcMaterial *de
 			} else if ( fade > 0.99f ) {
 				fade = 1.0f;
 			}
-			fade = 1.0f - fade;
+			float fade = 1.0f - fade;
 			vertDepthFade[tri.numVerts + i] = fade;
 			tri.verts[tri.numVerts + i].xyz = w[i].ToVec3();
 			tri.verts[tri.numVerts + i].st[0] = w[i].s;
 			tri.verts[tri.numVerts + i].st[1] = w[i].t;
 			for ( int k = 0; k < 4; k++ ) {
-				int icolor = arcMath::FtoiFast( decalInfo.start[k] * fade * 255.0f );
+				int icolor = anMath::FtoiFast( decalInfo.start[k] * fade * 255.0f );
 				if ( icolor < 0 ) {
 					icolor = 0;
 				} else if ( icolor > 255 ) {
@@ -218,7 +212,7 @@ void ARCRenderModelDecal::AddWinding( const arcWinding &w, const arcMaterial *de
 				tri.verts[tri.numVerts + i].color[k] = icolor;
 			}
 		}
-		for ( i = 2; i < w.GetNumPoints(); i++ ) {
+		for ( int i = 2; i < w.GetNumPoints(); i++ ) {
 			tri.indexes[tri.numIndexes + 0] = tri.numVerts;
 			tri.indexes[tri.numIndexes + 1] = tri.numVerts + i - 1;
 			tri.indexes[tri.numIndexes + 2] = tri.numVerts + i;
@@ -233,7 +227,7 @@ void ARCRenderModelDecal::AddWinding( const arcWinding &w, const arcMaterial *de
 
 	// if we are at the end of the list, create a new decal
 	if ( !nextDecal ) {
-		nextDecal = ARCRenderModelDecal::Alloc();
+		nextDecal = anRenderModelDecal::Alloc();
 	}
 	// let the next decal on the chain take a look
 	nextDecal->AddWinding( w, decalMaterial, fadePlanes, fadeDepth, startTime );
@@ -241,11 +235,11 @@ void ARCRenderModelDecal::AddWinding( const arcWinding &w, const arcMaterial *de
 
 /*
 =================
-ARCRenderModelDecal::AddDepthFadedWinding
+anRenderModelDecal::AddDepthFadedWinding
 =================
 */
-void ARCRenderModelDecal::AddDepthFadedWinding( const arcWinding &w, const arcMaterial *decalMaterial, const arcPlane fadePlanes[2], float fadeDepth, int startTime ) {
-	arcFixedWinding front, back;
+void anRenderModelDecal::AddDepthFadedWinding( const anWinding &w, const anMaterial *decalMaterial, const anPlane fadePlanes[2], float fadeDepth, int startTime ) {
+	anFixedWinding front, back;
 
 	front = w;
 	if ( front.Split( &back, fadePlanes[0], 0.1f ) == SIDE_CROSS ) {
@@ -261,15 +255,13 @@ void ARCRenderModelDecal::AddDepthFadedWinding( const arcWinding &w, const arcMa
 
 /*
 =================
-ARCRenderModelDecal::CreateDecal
+anRenderModelDecal::CreateDecal
 =================
 */
-void ARCRenderModelDecal::CreateDecal( const ARCRenderModel *model, const decalProjectionInfo_t &localInfo ) {
-
+void anRenderModelDecal::CreateDecal( const anRenderModel *model, const decalProjectionInfo_t &localInfo ) {
 	// check all model surfaces
 	for ( int surfNum = 0; surfNum < model->NumSurfaces(); surfNum++ ) {
 		const modelSurface_t *surf = model->Surface( surfNum );
-
 		// if no geometry or no shader
 		if ( !surf->geometry || !surf->shader ) {
 			continue;
@@ -280,7 +272,7 @@ void ARCRenderModelDecal::CreateDecal( const ARCRenderModel *model, const decalP
 			continue;
 		}
 
-		surfTriangles_t *stri = surf->geometry;
+		srfTriangles_t *stri = surf->geometry;
 
 		// if the triangle bounds do not overlap with projection bounds
 		if ( !localInfo.projectionBounds.IntersectsBounds( stri->bounds ) ) {
@@ -288,7 +280,7 @@ void ARCRenderModelDecal::CreateDecal( const ARCRenderModel *model, const decalP
 		}
 
 		// allocate memory for the cull bits
-		byte *cullBits = ( byte * )_alloca16( stri->numVerts * sizeof( cullBits[0] ) );
+		byte *cullBits = (byte *)_alloca16( stri->numVerts * sizeof( cullBits[0] ) );
 
 		// catagorize all points by the planes
 		SIMDProcessor->DecalPointCull( cullBits, localInfo.boundingPlanes, stri->verts, stri->numVerts );
@@ -298,7 +290,6 @@ void ARCRenderModelDecal::CreateDecal( const ARCRenderModel *model, const decalP
 			int v1 = stri->indexes[index+0];
 			int v2 = stri->indexes[index+1];
 			int v3 = stri->indexes[index+2];
-
 			// skip triangles completely off one side
 			if ( cullBits[v1] & cullBits[v2] & cullBits[v3] ) {
 				continue;
@@ -311,7 +302,7 @@ void ARCRenderModelDecal::CreateDecal( const ARCRenderModel *model, const decalP
 			}
 
 			// create a winding with texture coordinates for the triangle
-			arcFixedWinding fw;
+			anFixedWinding fw;
 			fw.SetNumPoints( 3 );
 			if ( localInfo.parallel ) {
 				for ( int j = 0; j < 3; j++ ) {
@@ -321,7 +312,7 @@ void ARCRenderModelDecal::CreateDecal( const ARCRenderModel *model, const decalP
 				}
 			} else {
 				for ( int j = 0; j < 3; j++ ) {
-					arcVec3 dir;
+					anVec3 dir;
 					float scale;
 
 					fw[j] = stri->verts[stri->indexes[index+j]].xyz;
@@ -355,24 +346,24 @@ void ARCRenderModelDecal::CreateDecal( const ARCRenderModel *model, const decalP
 
 /*
 =====================
-ARCRenderModelDecal::RemoveFadedDecals
+anRenderModelDecal::RemoveFadedDecals
 =====================
 */
-ARCRenderModelDecal *ARCRenderModelDecal::RemoveFadedDecals( ARCRenderModelDecal *decals, int time ) {
+anRenderModelDecal *anRenderModelDecal::RemoveFadedDecals( anRenderModelDecal *decals, int time ) {
 	int i, j, minTime, newNumIndexes, newNumVerts;
 	int inUse[MAX_DECAL_VERTS];
 	decalInfo_t	decalInfo;
-	ARCRenderModelDecal *nextDecal;
+	anRenderModelDecal *nextDecal;
 
-	if ( decals == NULL ) {
-		return NULL;
+	if ( decals == nullptr ) {
+		return nullptr;
 	}
 
 	// recursively free any next decals
 	decals->nextDecal = RemoveFadedDecals( decals->nextDecal, time );
 
 	// free the decals if no material set
-	if ( decals->material == NULL ) {
+	if ( decals->material == nullptr ) {
 		nextDecal = decals->nextDecal;
 		Free( decals );
 		return nextDecal;
@@ -430,26 +421,23 @@ ARCRenderModelDecal *ARCRenderModelDecal::RemoveFadedDecals( ARCRenderModelDecal
 
 /*
 =====================
-ARCRenderModelDecal::AddDecalDrawSurf
+anRenderModelDecal::AddDecalDrawSurf
 =====================
 */
-void ARCRenderModelDecal::AddDecalDrawSurf( viewEntity_t *space ) {
-	int i, j, maxTime;
+void anRenderModelDecal::AddDecalDrawSurf( viewEntity_t *space ) {
 	float f;
-	decalInfo_t	decalInfo;
 
 	if ( tri.numIndexes == 0 ) {
 		return;
 	}
 
 	// fade down all the verts with time
-	decalInfo = material->GetDecalInfo();
-	maxTime = decalInfo.stayTime + decalInfo.fadeTime;
+	decalInfo_t decalInfo = material->GetDecalInfo();
+	int maxTime = decalInfo.stayTime + decalInfo.fadeTime;
 
 	// set vertex colors and remove faded triangles
-	for ( i = 0; i < tri.numIndexes; i += 3 ) {
+	for ( int i = 0; i < tri.numIndexes; i += 3 ) {
 		int	deltaTime = tr.viewDef->renderView.time - indexStartTime[i];
-
 		if ( deltaTime > maxTime ) {
 			continue;
 		}
@@ -459,14 +447,13 @@ void ARCRenderModelDecal::AddDecalDrawSurf( viewEntity_t *space ) {
 		}
 
 		deltaTime -= decalInfo.stayTime;
-		f = ( float )deltaTime / decalInfo.fadeTime;
+		float f = ( float )deltaTime / decalInfo.fadeTime;
 
-		for ( j = 0; j < 3; j++ ) {
+		for ( int j = 0; j < 3; j++ ) {
 			int	ind = tri.indexes[i+j];
-
 			for ( int k = 0; k < 4; k++ ) {
 				float fcolor = decalInfo.start[k] + ( decalInfo.end[k] - decalInfo.start[k] ) * f;
-				int icolor = arcMath::FtoiFast( fcolor * vertDepthFade[ind] * 255.0f );
+				int icolor = anMath::FtoiFast( fcolor * vertDepthFade[ind] * 255.0f );
 				if ( icolor < 0 ) {
 					icolor = 0;
 				} else if ( icolor > 255 ) {
@@ -480,30 +467,14 @@ void ARCRenderModelDecal::AddDecalDrawSurf( viewEntity_t *space ) {
 	// copy the tri and indexes to temp heap memory,
 	// because if we are running multi-threaded, we wouldn't
 	// be able to reorganize the index list
-	surfTriangles_t *newTri = (surfTriangles_t *)R_FrameAlloc( sizeof( *newTri ) );
+	srfTriangles_t *newTri = ( srfTriangles_t *)R_FrameAlloc( sizeof(* newTri) );
 	*newTri = tri;
 
 	// copy the current vertexes to temp vertex cache
-	newTri->ambientCache = vertexCache.AllocFrameTemp( tri.verts, tri.numVerts * sizeof( arcDrawVert ) );
+	newTri->ambientCache = vertexCache.AllocFrameTemp( tri.verts, tri.numVerts * sizeof( anDrawVertex ) );
 
 	// create the drawsurf
 	R_AddDrawSurf( newTri, space, &space->entityDef->parms, material, space->scissorRect );
 }
 
-/*
-====================
-ARCRenderModelDecal::ReadFromDemoFile
-====================
-*/
-void ARCRenderModelDecal::ReadFromDemoFile( ARCDemoFile *f ) {
-	// FIXME: implement
-}
 
-/*
-====================
-ARCRenderModelDecal::WriteToDemoFile
-====================
-*/
-void ARCRenderModelDecal::WriteToDemoFile( ARCDemoFile *f ) const {
-	// FIXME: implement
-}

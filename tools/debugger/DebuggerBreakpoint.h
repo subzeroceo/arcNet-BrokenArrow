@@ -45,7 +45,7 @@ protected:
 	bool	mEnabled;
 	int		mID;
 	int		mLineNumber;
-	arcNetString	mFilename;
+	anString	mFilename;
 
 private:
 

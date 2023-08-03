@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "dmap.h"
@@ -89,12 +89,12 @@ If you have questions concerning this license or the applicable additional terms
 
 typedef struct hashVert_s {
 	struct hashVert_s	*next;
-	arcVec3				v;
+	anVec3				v;
 	int					iv[3];
 } hashVert_t;
 
-static arcBounds	hashBounds;
-static arcVec3	hashScale;
+static anBounds	hashBounds;
+static anVec3	hashScale;
 static hashVert_t	*hashVerts[HASH_BINS][HASH_BINS][HASH_BINS];
 static int		numHashVerts, numTotalVerts;
 static int		hashIntMins[3], hashIntScale[3];
@@ -106,7 +106,7 @@ GetHashVert
 Also modifies the original vert to the snapped value
 ===============
 */
-struct hashVert_s	*GetHashVert( arcVec3 &v ) {
+struct hashVert_s	*GetHashVert( anVec3 &v ) {
 	int		iv[3];
 	int		block[3];
 	int		i;
@@ -179,7 +179,7 @@ bins that should hold the triangle
 ==================
 */
 static void HashBlocksForTri( const mapTri_t *tri, int blocks[2][3] ) {
-	arcBounds	bounds;
+	anBounds	bounds;
 	int			i;
 
 	bounds.Clear();
@@ -251,7 +251,7 @@ void HashTriangles( optimizeGroup_t *groupList ) {
 	// add all the points to the hash buckets
 	for ( group = groupList; group; group = group->nextGroup ) {
 		// don't create tjunctions against discrete surfaces (blood decals, etc)
-		if ( group->material != NULL && group->material->IsDiscrete() ) {
+		if ( group->material != nullptr && group->material->IsDiscrete() ) {
 			continue;
 		}
 		for ( a = group->triList; a; a = a->next ) {
@@ -293,28 +293,28 @@ void FreeTJunctionHash( void ) {
 FixTriangleAgainstHashVert
 
 Returns a list of two new mapTri if the hashVert is
-on an edge of the given mapTri, otherwise returns NULL.
+on an edge of the given mapTri, otherwise returns nullptr.
 ==================
 */
 static mapTri_t *FixTriangleAgainstHashVert( const mapTri_t *a, const hashVert_t *hv ) {
 	int			i;
-	const arcDrawVert	*v1, *v2, *v3;
-	arcDrawVert	split;
-	arcVec3		dir;
+	const anDrawVertex	*v1, *v2, *v3;
+	anDrawVertex	split;
+	anVec3		dir;
 	float		len;
 	float		frac;
 	mapTri_t	*new1, *new2;
-	arcVec3		temp;
+	anVec3		temp;
 	float		d, off;
-	const arcVec3 *v;
-	arcPlane		plane1, plane2;
+	const anVec3 *v;
+	anPlane		plane1, plane2;
 
 	v = &hv->v;
 
 	// if the triangle already has this hashVert as a vert,
 	// it can't be split by it
 	if ( a->hashVert[0] == hv || a->hashVert[1] == hv || a->hashVert[2] == hv ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// we probably should find the edge that the vertex is closest to.
@@ -357,7 +357,7 @@ static mapTri_t *FixTriangleAgainstHashVert( const mapTri_t *a, const hashVert_t
 		new1 = CopyMapTri( a );
 		new1->v[( i+1 )%3] = split;
 		new1->hashVert[( i+1 )%3] = hv;
-		new1->next = NULL;
+		new1->next = nullptr;
 
 		new2 = CopyMapTri( a );
 		new2->v[i] = split;
@@ -380,7 +380,7 @@ static mapTri_t *FixTriangleAgainstHashVert( const mapTri_t *a, const hashVert_t
 	}
 
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -406,11 +406,11 @@ static mapTri_t	*FixTriangleAgainstHash( const mapTri_t *tri ) {
 	if ( tri->hashVert[0] == tri->hashVert[1]
 		|| tri->hashVert[0] == tri->hashVert[2]
 		|| tri->hashVert[1] == tri->hashVert[2] ) {
-		return NULL;
+		return nullptr;
 	}
 
 	fixed = CopyMapTri( tri );
-	fixed->next = NULL;
+	fixed->next = nullptr;
 
 	HashBlocksForTri( tri, blocks );
 	for ( i = blocks[0][0]; i <= blocks[1][0]; i++ ) {
@@ -419,7 +419,7 @@ static mapTri_t	*FixTriangleAgainstHash( const mapTri_t *tri ) {
 				for ( hv = hashVerts[i][j][k]; hv; hv = hv->next ) {
 					// fix all triangles in the list against this point
 					test = fixed;
-					fixed = NULL;
+					fixed = nullptr;
 					for (; test; test = next ) {
 						next = test->next;
 						a = FixTriangleAgainstHashVert( test, hv );
@@ -489,11 +489,11 @@ void	FixAreaGroupsTjunctions( optimizeGroup_t *groupList ) {
 
 	for ( group = groupList; group; group = group->nextGroup ) {
 		// don't touch discrete surfaces
-		if ( group->material != NULL && group->material->IsDiscrete() ) {
+		if ( group->material != nullptr && group->material->IsDiscrete() ) {
 			continue;
 		}
 
-		newList = NULL;
+		newList = nullptr;
 		for ( tri = group->triList; tri; tri = tri->next ) {
 			fixed = FixTriangleAgainstHash( tri );
 			newList = MergeTriLists( newList, fixed );
@@ -572,7 +572,7 @@ void	FixGlobalTjunctions( uEntity_t *e ) {
 	for ( areaNum = 0; areaNum < e->numAreas; areaNum++ ) {
 		for ( group = e->areas[areaNum].groups; group; group = group->nextGroup ) {
 			// don't touch discrete surfaces
-			if ( group->material != NULL && group->material->IsDiscrete() ) {
+			if ( group->material != nullptr && group->material->IsDiscrete() ) {
 				continue;
 			}
 
@@ -590,7 +590,7 @@ void	FixGlobalTjunctions( uEntity_t *e ) {
 		for ( int eNum = 1; eNum < dmapGlobals.num_entities; eNum++ ) {
 			uEntity_t *entity = &dmapGlobals.uEntities[eNum];
 			const char *className = entity->mapEntity->epairs.GetString( "classname" );
-			if ( arcNetString::Icmp( className, "func_static" ) ) {
+			if ( anString::Icmp( className, "func_static" ) ) {
 				continue;
 			}
 			const char *modelName = entity->mapEntity->epairs.GetString( "model" );
@@ -601,26 +601,26 @@ void	FixGlobalTjunctions( uEntity_t *e ) {
 				continue;
 			}
 
-			ARCRenderModel	*model = renderModelManager->FindModel( modelName );
+			anRenderModel	*model = renderModelManager->FindModel( modelName );
 
 //			common->Printf( "adding T junction verts for %s.\n", entity->mapEntity->epairs.GetString( "name" ) );
 
-			arcMat3	axis;
+			anMat3	axis;
 			// get the rotation matrix in either full form, or single angle form
 			if ( !entity->mapEntity->epairs.GetMatrix( "rotation", "1 0 0 0 1 0 0 0 1", axis ) ) {
 				float angle = entity->mapEntity->epairs.GetFloat( "angle" );
 				if ( angle != 0.0f ) {
-					axis = arcAngles( 0.0f, angle, 0.0f ).ToMat3();
+					axis = anAngles( 0.0f, angle, 0.0f ).ToMat3();
 				} else {
 					axis.Identity();
 				}
 			}
 
-			arcVec3	origin = entity->mapEntity->epairs.GetVector( "origin" );
+			anVec3	origin = entity->mapEntity->epairs.GetVector( "origin" );
 
 			for ( i = 0; i < model->NumSurfaces(); i++ ) {
 				const modelSurface_t *surface = model->Surface( i );
-				const surfTriangles_t *tri = surface->geometry;
+				const srfTriangles_t *tri = surface->geometry;
 
 				mapTri_t	mapTri;
 				memset( &mapTri, 0, sizeof( mapTri ) );
@@ -630,7 +630,7 @@ void	FixGlobalTjunctions( uEntity_t *e ) {
 					mapTri.mergeGroup = (void *)surface;
 				}
 				for ( int j = 0; j < tri->numVerts; j += 3 ) {
-					arcVec3 v = tri->verts[j].xyz * axis + origin;
+					anVec3 v = tri->verts[j].xyz * axis + origin;
 					GetHashVert( v );
 				}
 			}
@@ -643,11 +643,11 @@ void	FixGlobalTjunctions( uEntity_t *e ) {
 	for ( areaNum = 0; areaNum < e->numAreas; areaNum++ ) {
 		for ( group = e->areas[areaNum].groups; group; group = group->nextGroup ) {
 			// don't touch discrete surfaces
-			if ( group->material != NULL && group->material->IsDiscrete() ) {
+			if ( group->material != nullptr && group->material->IsDiscrete() ) {
 				continue;
 			}
 
-			mapTri_t *newList = NULL;
+			mapTri_t *newList = nullptr;
 			for ( mapTri_t *tri = group->triList; tri; tri = tri->next ) {
 				mapTri_t *fixed = FixTriangleAgainstHash( tri );
 				newList = MergeTriLists( newList, fixed );

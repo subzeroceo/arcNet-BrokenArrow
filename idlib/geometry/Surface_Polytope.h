@@ -12,21 +12,21 @@
 ===============================================================================
 */
 
-class arcSurface_Polytope : public arcSurface {
+class anSurface_Polytope : public anSurface {
 public:
-						arcSurface_Polytope( void );
+						anSurface_Polytope( void );
 
-	void				FromPlanes( const arcPlane *planes, const int numPlanes );
+	void				FromPlanes( const anPlane *planes, const int numPlanes );
 
-	void				SetupTetrahedron( const arcBounds &bounds );
-	void				SetupHexahedron( const arcBounds &bounds );
-	void				SetupOctahedron( const arcBounds &bounds );
-	void				SetupDodecahedron( const arcBounds &bounds );
-	void				SetupIcosahedron( const arcBounds &bounds );
-	void				SetupCylinder( const arcBounds &bounds, const int numSides );
-	void				SetupCone( const arcBounds &bounds, const int numSides );
+	void				SetupTetrahedron( const anBounds &bounds );
+	void				SetupHexahedron( const anBounds &bounds );
+	void				SetupOctahedron( const anBounds &bounds );
+	void				SetupDodecahedron( const anBounds &bounds );
+	void				SetupIcosahedron( const anBounds &bounds );
+	void				SetupCylinder( const anBounds &bounds, const int numSides );
+	void				SetupCone( const anBounds &bounds, const int numSides );
 
-	int					SplitPolytope( const arcPlane &plane, const float epsilon, arcSurface_Polytope **front, arcSurface_Polytope **back ) const;
+	int					SplitPolytope( const anPlane &plane, const float epsilon, anSurface_Polytope **front, anSurface_Polytope **back ) const;
 
 protected:
 
@@ -34,10 +34,10 @@ protected:
 
 /*
 ====================
-arcSurface_Polytope::arcSurface_Polytope
+anSurface_Polytope::anSurface_Polytope
 ====================
 */
-ARC_INLINE arcSurface_Polytope::arcSurface_Polytope( void ) {
+ARC_INLINE anSurface_Polytope::anSurface_Polytope( void ) {
 }
 
-#endif /* !__SURFACE_POLYTOPE_H__ */
+#endif // !__SURFACE_POLYTOPE_H__

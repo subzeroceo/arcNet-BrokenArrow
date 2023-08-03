@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "Brush.h"
@@ -57,9 +57,9 @@ idBrushBSPPortal::idBrushBSPPortal
 */
 idBrushBSPPortal::idBrushBSPPortal( void ) {
 	planeNum = -1;
-	winding = NULL;
-	nodes[0] = nodes[1] = NULL;
-	next[0] = next[1] = NULL;
+	winding = nullptr;
+	nodes[0] = nodes[1] = nullptr;
+	next[0] = next[1] = nullptr;
 	faceNum = 0;
 	flags = 0;
 }
@@ -130,11 +130,11 @@ void idBrushBSPPortal::RemoveFromNode( idBrushBSPNode *l ) {
 
 	if ( nodes[0] == l ) {
 		*pp = next[0];
-		nodes[0] = NULL;
+		nodes[0] = nullptr;
 	}
 	else if ( nodes[1] == l ) {
 		*pp = next[1];
-		nodes[1] = NULL;
+		nodes[1] = nullptr;
 	}
 	else {
 		common->Error( "idBrushBSPPortal::RemoveFromNode: mislinked portal" );
@@ -170,10 +170,10 @@ void idBrushBSPPortal::Flip( void ) {
 idBrushBSPPortal::Split
 ============
 */
-int idBrushBSPPortal::Split( const arcPlane &splitPlane, idBrushBSPPortal **front, idBrushBSPPortal **back ) {
-	arcWinding *frontWinding, *backWinding;
+int idBrushBSPPortal::Split( const anPlane &splitPlane, idBrushBSPPortal **front, idBrushBSPPortal **back ) {
+	anWinding *frontWinding, *backWinding;
 
-	(*front) = (*back) = NULL;
+	(*front) = (*back) = nullptr;
 	winding->Split( splitPlane, 0.1f, &frontWinding, &backWinding );
 	if ( frontWinding ) {
 		(*front) = new idBrushBSPPortal();
@@ -217,9 +217,9 @@ idBrushBSPNode::idBrushBSPNode( void ) {
 	brushList.Clear();
 	contents = 0;
 	flags = 0;
-	volume = NULL;
-	portals = NULL;
-	children[0] = children[1] = NULL;
+	volume = nullptr;
+	portals = nullptr;
+	children[0] = children[1] = nullptr;
 	areaNum = 0;
 	occupied = 0;
 }
@@ -268,10 +268,10 @@ void idBrushBSPNode::SetContentsFromBrushes( void ) {
 idBrushBSPNode::GetPortalBounds
 ============
 */
-arcBounds idBrushBSPNode::GetPortalBounds( void ) {
+anBounds idBrushBSPNode::GetPortalBounds( void ) {
 	int s, i;
 	idBrushBSPPortal *p;
-	arcBounds bounds;
+	anBounds bounds;
 
 	bounds.Clear();
 	for ( p = portals; p; p = p->next[s] ) {
@@ -293,8 +293,8 @@ bool idBrushBSPNode::TestLeafNode( void ) {
 	int s, n;
 	float d;
 	idBrushBSPPortal *p;
-	arcVec3 center;
-	arcPlane plane;
+	anVec3 center;
+	anPlane plane;
 
 	n = 0;
 	center = vec3_origin;
@@ -327,13 +327,13 @@ bool idBrushBSPNode::TestLeafNode( void ) {
 idBrushBSPNode::Split
 ============
 */
-bool idBrushBSPNode::Split( const arcPlane &splitPlane, int splitPlaneNum ) {
+bool idBrushBSPNode::Split( const anPlane &splitPlane, int splitPlaneNum ) {
 	int s, i;
-	arcWinding *mid;
+	anWinding *mid;
 	idBrushBSPPortal *p, *midPortal, *newPortals[2];
 	idBrushBSPNode *newNodes[2];
 
-	mid = new arcWinding( splitPlane.Normal(), splitPlane.Dist() );
+	mid = new anWinding( splitPlane.Normal(), splitPlane.Dist() );
 
 	for ( p = portals; p && mid; p = p->next[s] ) {
 		s = (p->nodes[1] == this);
@@ -396,7 +396,7 @@ bool idBrushBSPNode::Split( const arcPlane &splitPlane, int splitPlaneNum ) {
 idBrushBSPNode::PlaneSide
 ============
 */
-int idBrushBSPNode::PlaneSide( const arcPlane &plane, float epsilon ) const {
+int idBrushBSPNode::PlaneSide( const anPlane &plane, float epsilon ) const {
 	int s, side;
 	idBrushBSPPortal *p;
 	bool front, back;
@@ -499,10 +499,10 @@ idBrushBSP::idBrushBSP
 ============
 */
 idBrushBSP::idBrushBSP( void ) {
-	root = outside = NULL;
+	root = outside = nullptr;
 	numSplits = numPrunedSplits = 0;
 	brushMapContents = 0;
-	brushMap = NULL;
+	brushMap = nullptr;
 }
 
 /*
@@ -532,7 +532,7 @@ void idBrushBSP::RemoveMultipleLeafNodeReferences_r( idBrushBSPNode *node ) {
 
 	if ( node->children[0] ) {
 		if ( node->children[0]->parent != node ) {
-			node->children[0] = NULL;
+			node->children[0] = nullptr;
 		}
 		else {
 			RemoveMultipleLeafNodeReferences_r( node->children[0] );
@@ -540,7 +540,7 @@ void idBrushBSP::RemoveMultipleLeafNodeReferences_r( idBrushBSPNode *node ) {
 	}
 	if ( node->children[1] ) {
 		if ( node->children[1]->parent != node ) {
-			node->children[1] = NULL;
+			node->children[1] = nullptr;
 		}
 		else {
 			RemoveMultipleLeafNodeReferences_r( node->children[1] );
@@ -588,8 +588,8 @@ typedef struct splitterStats_s {
 
 int idBrushBSP::BrushSplitterStats( const idBrush *brush, int planeNum, const aRcPlaneSet &planeList, bool *testedPlanes, struct splitterStats_s &stats ) {
 	int i, j, num, s, lastNumSplits;
-	const arcPlane *plane;
-	const arcWinding *w;
+	const anPlane *plane;
+	const anWinding *w;
 	float d, d_front, d_back, brush_front, brush_back;
 
 	plane = &planeList[planeNum];
@@ -703,7 +703,7 @@ int idBrushBSP::FindSplitter( idBrushBSPNode *node, const aRcPlaneSet &planeList
 
 			testedPlanes[planeNum] = testedPlanes[planeNum^1] = true;
 
-			if ( node->volume->Split( planeList[planeNum], planeNum, NULL, NULL ) != PLANESIDE_CROSS ) {
+			if ( node->volume->Split( planeList[planeNum], planeNum, nullptr, nullptr ) != PLANESIDE_CROSS ) {
 				continue;
 			}
 
@@ -804,9 +804,9 @@ idBrushBSPNode *idBrushBSP::BuildBrushBSP_r( idBrushBSPNode *node, const aRcPlan
 		// free node memory
 		node->brushList.Free();
 		delete node->volume;
-		node->volume = NULL;
+		node->volume = nullptr;
 
-		node->children[0] = node->children[1] = NULL;
+		node->children[0] = node->children[1] = nullptr;
 		return node;
 	}
 
@@ -831,7 +831,7 @@ idBrushBSPNode *idBrushBSP::BuildBrushBSP_r( idBrushBSPNode *node, const aRcPlan
 	// free node memory
 	node->brushList.Free();
 	delete node->volume;
-	node->volume = NULL;
+	node->volume = nullptr;
 
 	// process children
 	node->children[0] = BuildBrushBSP_r( node->children[0], planeList, testedPlanes, skipContents );
@@ -842,7 +842,7 @@ idBrushBSPNode *idBrushBSP::BuildBrushBSP_r( idBrushBSPNode *node, const aRcPlan
 		node->contents = node->children[0]->contents | node->children[1]->contents;
 		delete node->children[0];
 		delete node->children[1];
-		node->children[0] = node->children[1] = NULL;
+		node->children[0] = node->children[1] = nullptr;
 		numSplits--;
 		numGridCellSplits--;
 	}
@@ -897,16 +897,16 @@ idBrushBSPNode *idBrushBSP::ProcessGridCell( idBrushBSPNode *node, int skipConte
 idBrushBSP::BuildGrid_r
 ============
 */
-void idBrushBSP::BuildGrid_r( arcNetList<idBrushBSPNode *> &gridCells, idBrushBSPNode *node ) {
+void idBrushBSP::BuildGrid_r( anList<idBrushBSPNode *> &gridCells, idBrushBSPNode *node ) {
 	int axis;
 	float dist;
-	arcBounds bounds;
-	arcVec3 normal, halfSize;
+	anBounds bounds;
+	anVec3 normal, halfSize;
 
 	if ( !node->brushList.Num() ) {
 		delete node->volume;
-		node->volume = NULL;
-		node->children[0] = node->children[1] = NULL;
+		node->volume = nullptr;
+		node->children[0] = node->children[1] = nullptr;
 		return;
 	}
 
@@ -949,7 +949,7 @@ void idBrushBSP::BuildGrid_r( arcNetList<idBrushBSPNode *> &gridCells, idBrushBS
 	// free node memory
 	node->brushList.Free();
 	delete node->volume;
-	node->volume = NULL;
+	node->volume = nullptr;
 
 	// process children
 	BuildGrid_r( gridCells, node->children[0] );
@@ -966,7 +966,7 @@ void idBrushBSP::Build( idBrushList brushList, int skipContents,
 								bool (*MergeAllowed)( idBrush *b1, idBrush *b2 ) ) {
 
 	int i;
-	arcNetList<idBrushBSPNode *> gridCells;
+	anList<idBrushBSPNode *> gridCells;
 
 	common->Printf( "[Brush BSP]\n" );
 	common->Printf( "%6d brushes\n", brushList.Num() );
@@ -980,7 +980,7 @@ void idBrushBSP::Build( idBrushList brushList, int skipContents,
 	root->brushList = brushList;
 	root->volume = new idBrush();
 	root->volume->FromBounds( treeBounds );
-	root->parent = NULL;
+	root->parent = nullptr;
 
 	BuildGrid_r( gridCells, root );
 
@@ -1011,7 +1011,7 @@ void idBrushBSP::Build( idBrushList brushList, int skipContents,
 idBrushBSP::WriteBrushMap
 ============
 */
-void idBrushBSP::WriteBrushMap( const arcNetString &fileName, const arcNetString &ext, int contents ) {
+void idBrushBSP::WriteBrushMap( const anString &fileName, const anString &ext, int contents ) {
 	brushMap = new idBrushMap( fileName, ext );
 	brushMapContents = contents;
 }
@@ -1056,8 +1056,8 @@ void idBrushBSP::PruneTree_r( idBrushBSPNode *node, int contents ) {
 
 		delete node->children[0];
 		delete node->children[1];
-		node->children[0] = NULL;
-		node->children[1] = NULL;
+		node->children[0] = nullptr;
+		node->children[1] = nullptr;
 
 		numPrunedSplits++;
 	}
@@ -1082,11 +1082,11 @@ idBrushBSP::BaseWindingForNode
 */
 #define	BASE_WINDING_EPSILON		0.001f
 
-arcWinding *idBrushBSP::BaseWindingForNode( idBrushBSPNode *node ) {
-	arcWinding *w;
+anWinding *idBrushBSP::BaseWindingForNode( idBrushBSPNode *node ) {
+	anWinding *w;
 	idBrushBSPNode *n;
 
-	w = new arcWinding( node->plane.Normal(), node->plane.Dist() );
+	w = new anWinding( node->plane.Normal(), node->plane.Dist() );
 
 	// clip by all the parents
 	for ( n = node->parent; n && w; n = n->parent ) {
@@ -1115,7 +1115,7 @@ idBrushBSP::MakeNodePortal
 */
 void idBrushBSP::MakeNodePortal( idBrushBSPNode *node ) {
 	idBrushBSPPortal *newPortal, *p;
-	arcWinding *w;
+	anWinding *w;
 	int side;
 
 	w = BaseWindingForNode( node );
@@ -1163,8 +1163,8 @@ void idBrushBSP::SplitNodePortals( idBrushBSPNode *node ) {
 	int side;
 	idBrushBSPPortal *p, *nextPortal, *newPortal;
 	idBrushBSPNode *f, *b, *otherNode;
-	arcPlane *plane;
-	arcWinding *frontWinding, *backWinding;
+	anPlane *plane;
+	anWinding *frontWinding, *backWinding;
 
 	plane = &node->plane;
 	f = node->children[0];
@@ -1191,13 +1191,13 @@ void idBrushBSP::SplitNodePortals( idBrushBSPNode *node ) {
 
 		if ( frontWinding && frontWinding->IsTiny() ) {
 			delete frontWinding;
-			frontWinding = NULL;
+			frontWinding = nullptr;
 			//tinyportals++;
 		}
 
 		if ( backWinding && backWinding->IsTiny() ) {
 			delete backWinding;
-			backWinding = NULL;
+			backWinding = nullptr;
 			//tinyportals++;
 		}
 
@@ -1244,7 +1244,7 @@ void idBrushBSP::SplitNodePortals( idBrushBSPNode *node ) {
 		}
 	}
 
-	node->portals = NULL;
+	node->portals = nullptr;
 }
 
 /*
@@ -1254,7 +1254,7 @@ idBrushBSP::MakeTreePortals_r
 */
 void idBrushBSP::MakeTreePortals_r( idBrushBSPNode *node ) {
 	int i;
-	arcBounds bounds;
+	anBounds bounds;
 
 	numPortals++;
 	DisplayRealTimeString( "\r%6d", numPortals );
@@ -1290,10 +1290,10 @@ idBrushBSP::MakeOutsidePortals
 */
 void idBrushBSP::MakeOutsidePortals( void ) {
 	int i, j, n;
-	arcBounds bounds;
+	anBounds bounds;
 	idBrushBSPPortal *p, *portals[6];
-	arcVec3 normal;
-	arcPlane planes[6];
+	anVec3 normal;
+	anPlane planes[6];
 
 	// pad with some space so there will never be null volume leaves
 	bounds = treeBounds.Expand( 32 );
@@ -1305,10 +1305,10 @@ void idBrushBSP::MakeOutsidePortals( void ) {
 	}
 
 	outside = new idBrushBSPNode();
-	outside->parent = NULL;
-	outside->children[0] = outside->children[1] = NULL;
+	outside->parent = nullptr;
+	outside->children[0] = outside->children[1] = nullptr;
 	outside->brushList.Clear();
-	outside->portals = NULL;
+	outside->portals = nullptr;
 	outside->contents = 0;
 
 	for ( i = 0; i < 3; i++ ) {
@@ -1319,7 +1319,7 @@ void idBrushBSP::MakeOutsidePortals( void ) {
 			normal[i] = j ? -1 : 1;
 			p->plane.SetNormal( normal );
 			p->plane.SetDist( j ? -bounds[j][i] : bounds[j][i] );
-			p->winding = new arcWinding( p->plane.Normal(), p->plane.Dist() );
+			p->winding = new anWinding( p->plane.Normal(), p->plane.Dist() );
 			p->AddToNodes( root, outside );
 
 			n = j * 3 + i;
@@ -1330,7 +1330,7 @@ void idBrushBSP::MakeOutsidePortals( void ) {
 	// clip the base windings with all the other planes
 	for ( i = 0; i < 6; i++ ) {
 		for ( j = 0; j < 6; j++ ) {
-			if (j == i) {
+			if ( j == i) {
 				continue;
 			}
 			portals[i]->winding = portals[i]->winding->Clip( portals[j]->plane, ON_EPSILON );
@@ -1360,13 +1360,13 @@ Finds the shortest possible chain of portals that
 leads from the outside leaf to a specific occupied leaf.
 =============
 */
-void idBrushBSP::LeakFile( const arcNetString &fileName ) {
+void idBrushBSP::LeakFile( const anString &fileName ) {
 	int count, next, s;
-	arcVec3 mid;
-	arcNetFile *lineFile;
+	anVec3 mid;
+	anFile *lineFile;
 	idBrushBSPNode *node, *nextNode;
 	idBrushBSPPortal *p, *nextPortal;
-	arcNetString qpath, name;
+	anString qpath, name;
 
 	if ( !outside->occupied ) {
 		return;
@@ -1422,7 +1422,7 @@ void idBrushBSP::FloodThroughPortals_r( idBrushBSPNode *node, int contents, int 
 		common->Error( "FloodThroughPortals_r: node already occupied\n" );
 	}
 	if ( !node ) {
-		common->Error( "FloodThroughPortals_r: NULL node\n" );
+		common->Error( "FloodThroughPortals_r: nullptr node\n" );
 	}
 
 	node->occupied = depth;
@@ -1455,7 +1455,7 @@ void idBrushBSP::FloodThroughPortals_r( idBrushBSPNode *node, int contents, int 
 idBrushBSP::FloodFromOrigin
 ============
 */
-bool idBrushBSP::FloodFromOrigin( const arcVec3 &origin, int contents ) {
+bool idBrushBSP::FloodFromOrigin( const anVec3 &origin, int contents ) {
 	idBrushBSPNode *node;
 
 	//find the leaf to start in
@@ -1496,12 +1496,12 @@ idBrushBSP::FloodFromEntities
   Marks all nodes that can be reached by entites.
 ============
 */
-bool idBrushBSP::FloodFromEntities( const idMapFile *mapFile, int contents, const arcStringList &classNames ) {
+bool idBrushBSP::FloodFromEntities( const anMapFile *mapFile, int contents, const anStringList &classNames ) {
 	int i, j;
 	bool inside;
-	arcVec3 origin;
-	idMapEntity *mapEnt;
-	arcNetString classname;
+	anVec3 origin;
+	anMapEntity *mapEnt;
+	anString classname;
 
 	inside = false;
 	outside->occupied = 0;
@@ -1588,7 +1588,7 @@ void idBrushBSP::RemoveOutside_r( idBrushBSPNode *node, int contents ) {
 idBrushBSP::RemoveOutside
 ============
 */
-bool idBrushBSP::RemoveOutside( const idMapFile *mapFile, int contents, const arcStringList &classNames ) {
+bool idBrushBSP::RemoveOutside( const anMapFile *mapFile, int contents, const anStringList &classNames ) {
 	common->Printf( "[Remove Outside]\n" );
 
 	solidLeafNodes = outsideLeafNodes = insideLeafNodes = 0;
@@ -1651,7 +1651,7 @@ void idBrushBSP::MergeLeafNodePortals( idBrushBSPNode *node, int skipContents ) 
 	int s1, s2;
 	bool foundPortal;
 	idBrushBSPPortal *p1, *p2, *nextp1, *nextp2;
-	arcWinding *newWinding, *reverse;
+	anWinding *newWinding, *reverse;
 
 	// pass 1: merge all portals that seperate the same leaf nodes
 	for ( p1 = node->GetPortals(); p1; p1 = nextp1 ) {
@@ -1853,7 +1853,7 @@ void idBrushBSP::PruneMergedTree_r( idBrushBSPNode *node ) {
 idBrushBSP::UpdateTreeAfterMerge_r
 ============
 */
-void idBrushBSP::UpdateTreeAfterMerge_r( idBrushBSPNode *node, const arcBounds &bounds, idBrushBSPNode *oldNode, idBrushBSPNode *newNode ) {
+void idBrushBSP::UpdateTreeAfterMerge_r( idBrushBSPNode *node, const anBounds &bounds, idBrushBSPNode *oldNode, idBrushBSPNode *newNode ) {
 
 	if ( !node ) {
 		return;
@@ -1870,7 +1870,7 @@ void idBrushBSP::UpdateTreeAfterMerge_r( idBrushBSPNode *node, const arcBounds &
 		node->children[1] = newNode;
 	}
 
-	switch( bounds.PlaneSide( node->plane, 2.0f ) ) {
+	switch ( bounds.PlaneSide( node->plane, 2.0f ) ) {
 		case PLANESIDE_FRONT:
 			UpdateTreeAfterMerge_r( node->children[0], bounds, oldNode, newNode );
 			break;
@@ -1895,9 +1895,9 @@ bool idBrushBSP::TryMergeLeafNodes( idBrushBSPPortal *portal, int side ) {
 	int i, j, k, s1, s2, s;
 	idBrushBSPNode *nodes[2], *node1, *node2;
 	idBrushBSPPortal *p1, *p2, *p, *nextp;
-	arcPlane plane;
-	arcWinding *w;
-	arcBounds bounds, b;
+	anPlane plane;
+	anWinding *w;
+	anBounds bounds, b;
 
 	nodes[0] = node1 = portal->nodes[side];
 	nodes[1] = node2 = portal->nodes[!side];
@@ -1985,11 +1985,11 @@ idBrushBSP::MeltFloor_r
   flood through portals touching the bounds to find all vertices that might be inside the bounds
 ============
 */
-void idBrushBSP::MeltFlood_r( idBrushBSPNode *node, int skipContents, arcBounds &bounds, arcVectorSet<arcVec3,3> &vertexList ) {
+void idBrushBSP::MeltFlood_r( idBrushBSPNode *node, int skipContents, anBounds &bounds, anVectorSet<anVec3,3> &vertexList ) {
 	int s1, i;
 	idBrushBSPPortal *p1;
-	arcBounds b;
-	const arcWinding *w;
+	anBounds b;
+	const anWinding *w;
 
 	node->SetFlag( NODE_VISITED );
 
@@ -2036,10 +2036,10 @@ void idBrushBSP::MeltFlood_r( idBrushBSPNode *node, int skipContents, arcBounds 
 idBrushBSP::MeltLeafNodePortals
 ============
 */
-void idBrushBSP::MeltLeafNodePortals( idBrushBSPNode *node, int skipContents, arcVectorSet<arcVec3,3> &vertexList ) {
+void idBrushBSP::MeltLeafNodePortals( idBrushBSPNode *node, int skipContents, anVectorSet<anVec3,3> &vertexList ) {
 	int s1, i;
 	idBrushBSPPortal *p1;
-	arcBounds bounds;
+	anBounds bounds;
 
 	if ( node->GetFlags() & NODE_DONE ) {
 		return;
@@ -2077,7 +2077,7 @@ void idBrushBSP::MeltLeafNodePortals( idBrushBSPNode *node, int skipContents, ar
 idBrushBSP::MeltPortals_r
 ============
 */
-void idBrushBSP::MeltPortals_r( idBrushBSPNode *node, int skipContents, arcVectorSet<arcVec3,3> &vertexList ) {
+void idBrushBSP::MeltPortals_r( idBrushBSPNode *node, int skipContents, anVectorSet<anVec3,3> &vertexList ) {
 	if ( !node ) {
 		return;
 	}
@@ -2140,7 +2140,7 @@ idBrushBSP::MeltPortals
 ============
 */
 void idBrushBSP::MeltPortals( int skipContents ) {
-	arcVectorSet<arcVec3,3> vertexList;
+	anVectorSet<anVec3,3> vertexList;
 
 	numInsertedPoints = 0;
 	common->Printf( "[Melt Portals]\n" );

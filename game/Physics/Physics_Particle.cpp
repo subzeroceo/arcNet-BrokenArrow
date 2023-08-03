@@ -1,10 +1,10 @@
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 #include "../Projectile.h"
 
-CLASS_DECLARATION( idPhysics_Base, rvPhysics_Particle )
+CLASS_DECLARATION( anPhysics_Base, anPhysics_Particle )
 END_CLASS
 
 const float PRT_OVERCLIP	= 1.001f;
@@ -12,13 +12,13 @@ const float PRT_BOUNCESTOP	= 10.0f;
 
 /*
 ================
-rvPhysics_Particle::DropToFloorAndRest
+anPhysics_Particle::DropToFloorAndRest
 
 Drops the object straight down to the floor
 ================
 */
-void rvPhysics_Particle::DropToFloorAndRest( void ) {
-	arcVec3 down;
+void anPhysics_Particle::DropToFloorAndRest( void ) {
+	anVec3 down;
 	trace_t tr;
 
 	if ( testSolid ) {
@@ -34,20 +34,15 @@ void rvPhysics_Particle::DropToFloorAndRest( void ) {
 
 	// put the body on the floor
 	down = current.origin + gravityNormal * 128.0f;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	gameLocal.Translation( self, tr, current.origin, down, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 	current.origin = tr.endpos;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	clipModel->Link( self, clipModel->GetId(), tr.endpos, clipModel->GetAxis() );
-// RAVEN END
 
 	// if on the floor already
 	if ( tr.fraction == 0.0f ) {
 		PutToRest();
-		EvaluateContacts();//Do a final contact check.  Items that drop to floor never do this check otherwise
+		EvaluateContacts();// do a final contact check.  Items that drop to floor never do this check otherwise
 		dropToFloor = false;
 	} else if ( IsOutsideWorld() ) {
 		gameLocal.Warning( "entity outside world bounds '%s' type '%s' at (%s)",
@@ -59,11 +54,10 @@ void rvPhysics_Particle::DropToFloorAndRest( void ) {
 
 /*
 ================
-rvPhysics_Particle::DebugDraw
+anPhysics_Particle::DebugDraw
 ================
 */
-void rvPhysics_Particle::DebugDraw( void ) {
-
+void anPhysics_Particle::DebugDraw( void ) {
 	if ( rb_showBodies.GetBool() || ( rb_showActive.GetBool() && current.atRest < 0 ) ) {
 		collisionModelManager->DrawModel( clipModel->GetCollisionModel(), clipModel->GetOrigin(), clipModel->GetAxis(), vec3_origin, mat3_identity, 0.0f );
 	}
@@ -71,7 +65,7 @@ void rvPhysics_Particle::DebugDraw( void ) {
 	if ( rb_showContacts.GetBool() ) {
 		int i;
 		for ( i = 0; i < contacts.Num(); i ++ ) {
-			arcVec3 x, y;
+			anVec3 x, y;
 			contacts[i].normal.NormalVectors( x, y );
 			gameRenderWorld->DebugLine( colorWhite, contacts[i].point, contacts[i].point + 6.0f * contacts[i].normal );
 			gameRenderWorld->DebugLine( colorWhite, contacts[i].point - 2.0f * x, contacts[i].point + 2.0f * x );
@@ -82,13 +76,13 @@ void rvPhysics_Particle::DebugDraw( void ) {
 
 /*
 ================
-rvPhysics_Particle::rvPhysics_Particle
+anPhysics_Particle::anPhysics_Particle
 ================
 */
-rvPhysics_Particle::rvPhysics_Particle( void ) {
+anPhysics_Particle::anPhysics_Particle( void ) {
 	SetClipMask( MASK_SOLID );
 	SetBouncyness( 0.6f, true );
-	clipModel = NULL;
+	clipModel = nullptr;
 
 	memset( &current, 0, sizeof( current ) );
 	current.atRest = -1;
@@ -107,22 +101,22 @@ rvPhysics_Particle::rvPhysics_Particle( void ) {
 
 /*
 ================
-rvPhysics_Particle::~rvPhysics_Particle
+anPhysics_Particle::~anPhysics_Particle
 ================
 */
-rvPhysics_Particle::~rvPhysics_Particle( void ) {
+anPhysics_Particle::~anPhysics_Particle( void ) {
 	if ( clipModel ) {
 		delete clipModel;
-		clipModel = NULL;
+		clipModel = nullptr;
 	}
 }
 
 /*
 ================
-rvPhysics_Particle::Save
+anPhysics_Particle::Save
 ================
 */
-void rvPhysics_Particle::Save( idSaveGame *savefile ) const {
+void anPhysics_Particle::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( current.atRest );
 	savefile->WriteVec3( current.localOrigin );
 	savefile->WriteMat3( current.localAxis );
@@ -130,9 +124,9 @@ void rvPhysics_Particle::Save( idSaveGame *savefile ) const {
 	savefile->WriteVec3( current.origin );
 	savefile->WriteVec3( current.velocity );
 	savefile->WriteBool( current.onGround );
-	savefile->WriteBool( current.inWater );		// cnicholson: Added unsaved var
+	savefile->WriteBool( current.inWater );
 
-	savefile->WriteInt( saved.atRest );			// cnicholson: Added unsaved vars
+	savefile->WriteInt( saved.atRest );
 	savefile->WriteVec3( saved.localOrigin );
 	savefile->WriteMat3( saved.localAxis );
 	savefile->WriteVec3( saved.pushVelocity );
@@ -146,13 +140,13 @@ void rvPhysics_Particle::Save( idSaveGame *savefile ) const {
 	savefile->WriteFloat( contactFriction );
 	savefile->WriteFloat( bouncyness );
 	savefile->WriteBool ( allowBounce );
-	savefile->WriteBounds ( clipModel->GetBounds ( ) );	// cnicholson: Added unsaved var
+	savefile->WriteBounds ( clipModel->GetBounds() );
 
 	savefile->WriteBool( dropToFloor );
 	savefile->WriteBool( testSolid );
 
 	savefile->WriteBool( hasMaster );
-	savefile->WriteBool( isOrientated );	// cnicholson: Added unsaved var
+	savefile->WriteBool( isOrientated );
 	extraPassEntity.Save( savefile );
 
 	savefile->WriteClipModel( clipModel );
@@ -160,10 +154,10 @@ void rvPhysics_Particle::Save( idSaveGame *savefile ) const {
 
 /*
 ================
-rvPhysics_Particle::Restore
+anPhysics_Particle::Restore
 ================
 */
-void rvPhysics_Particle::Restore( idRestoreGame *savefile ) {
+void anPhysics_Particle::Restore( anRestoreGame *savefile ) {
 	savefile->ReadInt( current.atRest );
 	savefile->ReadVec3( current.localOrigin );
 	savefile->ReadMat3( current.localAxis );
@@ -171,9 +165,9 @@ void rvPhysics_Particle::Restore( idRestoreGame *savefile ) {
 	savefile->ReadVec3( current.origin );
 	savefile->ReadVec3( current.velocity );
 	savefile->ReadBool( current.onGround );
-	savefile->ReadBool( current.inWater );		// cnicholson: Added unsaved var
+	savefile->ReadBool( current.inWater );
 
-	savefile->ReadInt( saved.atRest );			// cnicholson: Added unsaved vars
+	savefile->ReadInt( saved.atRest );
 	savefile->ReadVec3( saved.localOrigin );
 	savefile->ReadMat3( saved.localAxis );
 	savefile->ReadVec3( saved.pushVelocity );
@@ -188,16 +182,16 @@ void rvPhysics_Particle::Restore( idRestoreGame *savefile ) {
 	savefile->ReadFloat( bouncyness );
 	savefile->ReadBool ( allowBounce );
 
-	arcBounds bounds;					// cnicholson: Added unrestored var
+	anBounds bounds;					// Added unrestored var
 	delete clipModel;
 	savefile->ReadBounds ( bounds );
-	clipModel = new idClipModel ( idTraceModel ( bounds ) );
+	clipModel = new anClipModel ( anTraceModel ( bounds ) );
 
 	savefile->ReadBool( dropToFloor );
 	savefile->ReadBool( testSolid );
 
 	savefile->ReadBool( hasMaster );
-	savefile->ReadBool( isOrientated );	// cnicholson: Added unrestored var
+	savefile->ReadBool( isOrientated );	// Added unrestored var
 	extraPassEntity.Restore( savefile );
 
 	savefile->ReadClipModel( clipModel );
@@ -205,11 +199,10 @@ void rvPhysics_Particle::Restore( idRestoreGame *savefile ) {
 
 /*
 ================
-rvPhysics_Particle::SetClipModel
+anPhysics_Particle::SetClipModel
 ================
 */
-void rvPhysics_Particle::SetClipModel( idClipModel *model, const float density, int id, bool freeOld ) {
-
+void anPhysics_Particle::SetClipModel( anClipModel *model, const float density, int id, bool freeOld ) {
 	assert( self );
 	assert( model );					// we need a clip model
 	assert( model->IsTraceModel() );	// and it should be a trace model
@@ -219,36 +212,33 @@ void rvPhysics_Particle::SetClipModel( idClipModel *model, const float density, 
 	}
 
 	clipModel = model;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
-// RAVEN END
 }
 
 /*
 ================
-rvPhysics_Particle::GetClipModel
+anPhysics_Particle::GetClipModel
 ================
 */
-idClipModel *rvPhysics_Particle::GetClipModel( int id ) const {
+anClipModel *anPhysics_Particle::GetClipModel( int id ) const {
 	return clipModel;
 }
 
 /*
 ================
-rvPhysics_Particle::GetNumClipModels
+anPhysics_Particle::GetNumClipModels
 ================
 */
-int rvPhysics_Particle::GetNumClipModels( void ) const {
+int anPhysics_Particle::GetNumClipModels( void ) const {
 	return 1;
 }
 
 /*
 ================
-rvPhysics_Particle::SetBouncyness
+anPhysics_Particle::SetBouncyness
 ================
 */
-void rvPhysics_Particle::SetBouncyness( const float b, bool _allowBounce ) {
+void anPhysics_Particle::SetBouncyness( const float b, bool _allowBounce ) {
 	allowBounce = _allowBounce;
 	if ( b < 0.0f || b > 1.0f ) {
 		return;
@@ -258,10 +248,10 @@ void rvPhysics_Particle::SetBouncyness( const float b, bool _allowBounce ) {
 
 /*
 ================
-rvPhysics_Particle::SetFriction
+anPhysics_Particle::SetFriction
 ================
 */
-void rvPhysics_Particle::SetFriction( const float linear, const float angular, const float contact ) {
+void anPhysics_Particle::SetFriction( const float linear, const float angular, const float contact ) {
 	linearFriction = linear;
 	angularFriction = angular;
 	contactFriction = contact;
@@ -270,10 +260,10 @@ void rvPhysics_Particle::SetFriction( const float linear, const float angular, c
 
 /*
 ================
-rvPhysics_Particle::PutToRest
+anPhysics_Particle::PutToRest
 ================
 */
-void rvPhysics_Particle::PutToRest( void ) {
+void anPhysics_Particle::PutToRest( void ) {
 	current.atRest = gameLocal.time;
 	current.velocity.Zero();
 	self->BecomeInactive( TH_PHYSICS );
@@ -281,84 +271,82 @@ void rvPhysics_Particle::PutToRest( void ) {
 
 /*
 ================
-rvPhysics_Particle::DropToFloor
+anPhysics_Particle::DropToFloor
 ================
 */
-void rvPhysics_Particle::DropToFloor( void ) {
+void anPhysics_Particle::DropToFloor( void ) {
 	dropToFloor = true;
 	testSolid = true;
 }
 
 /*
 ================
-rvPhysics_Particle::Activate
+anPhysics_Particle::Activate
 ================
 */
-void rvPhysics_Particle::Activate( void ) {
+void anPhysics_Particle::Activate( void ) {
 	current.atRest = -1;
 	self->BecomeActive( TH_PHYSICS );
 }
 
 /*
 ================
-rvPhysics_Particle::EvaluateContacts
+anPhysics_Particle::EvaluateContacts
 ================
 */
-bool rvPhysics_Particle::EvaluateContacts( void ) {
+bool anPhysics_Particle::EvaluateContacts( void ) {
 	ClearContacts();
 	AddGroundContacts( clipModel );
-
 	AddContactEntitiesForContacts();
-
 	return ( contacts.Num() != 0 );
 }
 
 /*
 ================
-rvPhysics_Particle::SetContents
+anPhysics_Particle::SetContents
 ================
 */
-void rvPhysics_Particle::SetContents( int contents, int id ) {
+void anPhysics_Particle::SetContents( int contents, int id ) {
 	clipModel->SetContents( contents );
 }
 
 /*
 ================
-rvPhysics_Particle::GetContents
+anPhysics_Particle::GetContents
 ================
 */
-int rvPhysics_Particle::GetContents( int id ) const {
+int anPhysics_Particle::GetContents( int id ) const {
 	return clipModel->GetContents();
 }
 
 /*
 ================
-rvPhysics_Particle::GetBounds
+anPhysics_Particle::GetBounds
 ================
 */
-const arcBounds &rvPhysics_Particle::GetBounds( int id ) const {
+const anBounds &anPhysics_Particle::GetBounds( int id ) const {
 	return clipModel->GetBounds();
 }
 
 /*
 ================
-rvPhysics_Particle::GetAbsBounds
+anPhysics_Particle::GetAbsBounds
 ================
 */
-const arcBounds &rvPhysics_Particle::GetAbsBounds( int id ) const {
+const anBounds &anPhysics_Particle::GetAbsBounds( int id ) const {
 	return clipModel->GetAbsBounds();
 }
 
 /*
 ================
-rvPhysics_Particle::Evaluate
+anPhysics_Particle::Evaluate
 
-  Evaluate the impulse based rigid body physics.
-  When a collision occurs an impulse is applied at the moment of impact but
-  the remaining time after the collision is ignored.
+Evaluate the impulse based rigid body physics.
+When a collision occurs an impulse is applied at the moment of impact but
+the remaining time after the collision is ignored.
 ================
 */
-bool rvPhysics_Particle::Evaluate( int timeStepMSec, int endTimeMSec ) {
+bool anPhysics_Particle::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	particlePState_t next;
 	float			 timeStep;
 	float			 upspeed;
@@ -367,19 +355,15 @@ bool rvPhysics_Particle::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 	// if bound to a master
 	if ( hasMaster ) {
-		arcVec3	masterOrigin;
-		arcMat3	masterAxis;
-		arcVec3	oldOrigin;
+		anVec3	masterOrigin;
+		anMat3	masterAxis;
+		anVec3	oldOrigin;
 
 		oldOrigin = current.origin;
 
 		self->GetMasterPosition( masterOrigin, masterAxis );
 		current.origin = masterOrigin + current.localOrigin * masterAxis;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 		clipModel->Link( self, clipModel->GetId(), current.origin, current.localAxis * masterAxis );
-// RAVEN END
-
 		trace_t tr;
 		gameLocal.Translation( self, tr, oldOrigin, current.origin, clipModel, clipModel->GetAxis(), clipMask, self );
 
@@ -407,7 +391,7 @@ bool rvPhysics_Particle::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	clipModel->Unlink();
 
 	// Determine if currently on the ground
-	CheckGround ( );
+	CheckGround();
 
 	// Determine the current upward velocity
 	if ( gravityNormal != vec3_zero ) {
@@ -430,7 +414,7 @@ bool rvPhysics_Particle::Evaluate( int timeStepMSec, int endTimeMSec ) {
 			current.velocity += (gravityVector * timeStep);
 		}
 	} else {
-		arcVec3 delta;
+		anVec3 delta;
 
 		// Slow down due to friction
 		ApplyFriction ( timeStep );
@@ -445,11 +429,7 @@ bool rvPhysics_Particle::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	}
 
 	// update the position of the clip model
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	clipModel->Link( self, clipModel->GetId(), current.origin, clipModel->GetAxis() );
-// RAVEN END
-
 	DebugDraw();
 
 	// get all the ground contacts
@@ -467,203 +447,183 @@ bool rvPhysics_Particle::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 /*
 ================
-rvPhysics_Particle::UpdateTime
+anPhysics_Particle::UpdateTime
 ================
 */
-void rvPhysics_Particle::UpdateTime( int endTimeMSec ) {
+void anPhysics_Particle::UpdateTime( int endTimeMSec ) {
 }
 
 /*
 ================
-rvPhysics_Particle::GetTime
+anPhysics_Particle::GetTime
 ================
 */
-int rvPhysics_Particle::GetTime( void ) const {
+int anPhysics_Particle::GetTime( void ) const {
 	return gameLocal.time;
 }
 
 /*
 ================
-rvPhysics_Particle::IsAtRest
+anPhysics_Particle::IsAtRest
 ================
 */
-bool rvPhysics_Particle::IsAtRest( void ) const {
+bool anPhysics_Particle::IsAtRest( void ) const {
 	return current.atRest >= 0;
 }
 
 /*
 ================
-rvPhysics_Particle::GetRestStartTime
+anPhysics_Particle::GetRestStartTime
 ================
 */
-int rvPhysics_Particle::GetRestStartTime( void ) const {
+int anPhysics_Particle::GetRestStartTime( void ) const {
 	return current.atRest;
 }
 
 /*
 ================
-rvPhysics_Particle::IsPushable
+anPhysics_Particle::IsPushable
 ================
 */
-bool rvPhysics_Particle::IsPushable( void ) const {
+bool anPhysics_Particle::IsPushable( void ) const {
 	return ( !hasMaster );
 }
 
 /*
 ================
-rvPhysics_Particle::SaveState
+anPhysics_Particle::SaveState
 ================
 */
-void rvPhysics_Particle::SaveState( void ) {
+void anPhysics_Particle::SaveState( void ) {
 	saved = current;
 }
 
 /*
 ================
-rvPhysics_Particle::RestoreState
+anPhysics_Particle::RestoreState
 ================
 */
-void rvPhysics_Particle::RestoreState( void ) {
+void anPhysics_Particle::RestoreState( void ) {
 	current = saved;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	clipModel->Link( self, clipModel->GetId(), current.origin, clipModel->GetAxis() );
-// RAVEN END
 	EvaluateContacts();
 }
 
 /*
 ================
-idPhysics::SetOrigin
+anPhysics::SetOrigin
 ================
 */
-void rvPhysics_Particle::SetOrigin( const arcVec3 &newOrigin, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Particle::SetOrigin( const anVec3 &newOrigin, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.localOrigin = newOrigin;
 	if ( hasMaster ) {
 		self->GetMasterPosition( masterOrigin, masterAxis );
 		current.origin = masterOrigin + newOrigin * masterAxis;
-	}
-	else {
+	} else {
 		current.origin = newOrigin;
 	}
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	clipModel->Link( self, clipModel->GetId(), current.origin, clipModel->GetAxis() );
-// RAVEN END
 
 	Activate();
 }
 
 /*
 ================
-idPhysics::SetAxis
+anPhysics::SetAxis
 ================
 */
-void rvPhysics_Particle::SetAxis( const arcMat3 &newAxis, int id ) {
+void anPhysics_Particle::SetAxis( const anMat3 &newAxis, int id ) {
 	current.localAxis = newAxis;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	clipModel->Link( self, 0, clipModel->GetOrigin(), newAxis );
-// RAVEN END
 	Activate();
 }
 
 /*
 ================
-rvPhysics_Particle::Translate
+anPhysics_Particle::Translate
 ================
 */
-void rvPhysics_Particle::Translate( const arcVec3 &translation, int id ) {
-
+void anPhysics_Particle::Translate( const anVec3 &translation, int id ) {
 	current.localOrigin += translation;
 	current.origin += translation;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	clipModel->Link( self, clipModel->GetId(), current.origin, clipModel->GetAxis() );
-// RAVEN END
-
 	Activate();
 }
 
 /*
 ================
-rvPhysics_Particle::Rotate(
+anPhysics_Particle::Rotate(
 ================
 */
-void rvPhysics_Particle::Rotate( const idRotation &rotation, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Particle::Rotate( const anRotation &rotation, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.origin *= rotation;
 	if ( hasMaster ) {
 		self->GetMasterPosition( masterOrigin, masterAxis );
 		current.localOrigin = ( current.origin - masterOrigin ) * masterAxis.Transpose();
-	}
-	else {
+	} else {
 		current.localOrigin = current.origin;
 	}
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	clipModel->Link( self, 0, current.origin, clipModel->GetAxis() * rotation.ToMat3() );
-// RAVEN END
 	Activate();
 }
 
 /*
 ================
-rvPhysics_Particle::GetOrigin
+anPhysics_Particle::GetOrigin
 ================
 */
-const arcVec3 &rvPhysics_Particle::GetOrigin( int id ) const {
+const anVec3 &anPhysics_Particle::GetOrigin( int id ) const {
 	return clipModel->GetOrigin();
 }
 
 /*
 ================
-rvPhysics_Particle::GetAxis
+anPhysics_Particle::GetAxis
 ================
 */
-const arcMat3 &rvPhysics_Particle::GetAxis( int id ) const {
+const anMat3 &anPhysics_Particle::GetAxis( int id ) const {
 	if ( !clipModel ) {
-		return idPhysics_Base::GetAxis ( id );
+		return anPhysics_Base::GetAxis ( id );
 	}
 	return clipModel->GetAxis();
 }
 
 /*
 ================
-rvPhysics_Particle::SetLinearVelocity
+anPhysics_Particle::SetLinearVelocity
 ================
 */
-void rvPhysics_Particle::SetLinearVelocity( const arcVec3 &velocity, int id ) {
+void anPhysics_Particle::SetLinearVelocity( const anVec3 &velocity, int id ) {
 	current.velocity = velocity;
 	Activate();
 }
 
 /*
 ================
-rvPhysics_Particle::GetLinearVelocity
+anPhysics_Particle::GetLinearVelocity
 ================
 */
-const arcVec3 &rvPhysics_Particle::GetLinearVelocity( int id ) const {
+const anVec3 &anPhysics_Particle::GetLinearVelocity( int id ) const {
 	return current.velocity;
 }
 
 /*
 ================
-rvPhysics_Particle::ClipTranslation
+anPhysics_Particle::ClipTranslation
 ================
 */
-void rvPhysics_Particle::ClipTranslation( trace_t &results, const arcVec3 &translation, const idClipModel *model ) const {
+void anPhysics_Particle::ClipTranslation( trace_t &results, const anVec3 &translation, const anClipModel *model ) const {
 	if ( model ) {
 		gameLocal.TranslationModel( self, results, clipModel->GetOrigin(), clipModel->GetOrigin() + translation,
 											clipModel, clipModel->GetAxis(), clipMask,
 											model->GetCollisionModel(), model->GetOrigin(), model->GetAxis() );
-	}
-	else {
+	} else {
 		gameLocal.Translation( self, results, clipModel->GetOrigin(), clipModel->GetOrigin() + translation,
 											clipModel, clipModel->GetAxis(), clipMask, self );
 	}
@@ -671,16 +631,15 @@ void rvPhysics_Particle::ClipTranslation( trace_t &results, const arcVec3 &trans
 
 /*
 ================
-rvPhysics_Particle::ClipRotation
+anPhysics_Particle::ClipRotation
 ================
 */
-void rvPhysics_Particle::ClipRotation( trace_t &results, const idRotation &rotation, const idClipModel *model ) const {
+void anPhysics_Particle::ClipRotation( trace_t &results, const anRotation &rotation, const anClipModel *model ) const {
 	if ( model ) {
 		gameLocal.RotationModel( self, results, clipModel->GetOrigin(), rotation,
 											clipModel, clipModel->GetAxis(), clipMask,
 											model->GetCollisionModel(), model->GetOrigin(), model->GetAxis() );
-	}
-	else {
+	} else {
 		gameLocal.Rotation( self, results, clipModel->GetOrigin(), rotation,
 											clipModel, clipModel->GetAxis(), clipMask, self );
 	}
@@ -688,85 +647,81 @@ void rvPhysics_Particle::ClipRotation( trace_t &results, const idRotation &rotat
 
 /*
 ================
-rvPhysics_Particle::ClipContents
+anPhysics_Particle::ClipContents
 ================
 */
-int rvPhysics_Particle::ClipContents( const idClipModel *model ) const {
+int anPhysics_Particle::ClipContents( const anClipModel *model ) const {
 	if ( model ) {
 		return gameLocal.ContentsModel( self, clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1,
 									model->GetCollisionModel(), model->GetOrigin(), model->GetAxis() );
-	}
-	else {
-		return gameLocal.Contents( self, clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1, NULL );
+	} else {
+		return gameLocal.Contents( self, clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1, nullptr );
 	}
 }
 
 /*
 ================
-rvPhysics_Particle::DisableClip
+anPhysics_Particle::DisableClip
 ================
 */
-void rvPhysics_Particle::DisableClip( void ) {
+void anPhysics_Particle::DisableClip( void ) {
 	clipModel->Disable();
 }
 
 /*
 ================
-rvPhysics_Particle::EnableClip
+anPhysics_Particle::EnableClip
 ================
 */
-void rvPhysics_Particle::EnableClip( void ) {
+void anPhysics_Particle::EnableClip( void ) {
 	clipModel->Enable();
 }
 
 /*
 ================
-rvPhysics_Particle::UnlinkClip
+anPhysics_Particle::UnlinkClip
 ================
 */
-void rvPhysics_Particle::UnlinkClip( void ) {
+void anPhysics_Particle::UnlinkClip( void ) {
 	clipModel->Unlink();
 }
 
 /*
 ================
-rvPhysics_Particle::LinkClip
+anPhysics_Particle::LinkClip
 ================
 */
-void rvPhysics_Particle::LinkClip( void ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+void anPhysics_Particle::LinkClip( void ) {
 	clipModel->Link( self, clipModel->GetId(), current.origin, clipModel->GetAxis() );
-// RAVEN END
 }
 
 /*
 ================
-rvPhysics_Particle::SetPushed
+anPhysics_Particle::SetPushed
 ================
 */
-void rvPhysics_Particle::SetPushed( int deltaTime ) {
+void anPhysics_Particle::SetPushed( int deltaTime ) {
 	// velocity with which the particle is pushed
-	current.pushVelocity = ( current.origin - saved.origin ) / ( deltaTime * arcMath::M_MS2SEC );
+	current.pushVelocity = ( current.origin - saved.origin ) / ( deltaTime * anMath::M_MS2SEC );
 }
 
 /*
 ================
-rvPhysics_Particle::GetPushedLinearVelocity
+anPhysics_Particle::GetPushedLinearVelocity
 ================
 */
-const arcVec3 &rvPhysics_Particle::GetPushedLinearVelocity( const int id ) const {
+const anVec3 &anPhysics_Particle::GetPushedLinearVelocity( const int id ) const {
 	return current.pushVelocity;
 }
 
 /*
 ================
-rvPhysics_Particle::SetMaster
+anPhysics_Particle::SetMaster
 ================
 */
-void rvPhysics_Particle::SetMaster( idEntity *master, const bool orientated ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Particle::SetMaster( anEntity *master, const bool orientated ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	if ( master ) {
 		if ( !hasMaster ) {
@@ -776,8 +731,7 @@ void rvPhysics_Particle::SetMaster( idEntity *master, const bool orientated ) {
 			hasMaster = true;
 		}
 		ClearContacts();
-	}
-	else {
+	} else {
 		if ( hasMaster ) {
 			hasMaster = false;
 			Activate();
@@ -787,12 +741,12 @@ void rvPhysics_Particle::SetMaster( idEntity *master, const bool orientated ) {
 
 /*
 =====================
-rvPhysics_Particle::CheckGround
+anPhysics_Particle::CheckGround
 =====================
 */
-void rvPhysics_Particle::CheckGround( void ) {
+void anPhysics_Particle::CheckGround( void ) {
 	trace_t	groundTrace;
-	arcVec3	down;
+	anVec3	down;
 
 	if ( gravityNormal == vec3_zero ) {
 		current.onGround = false;
@@ -816,11 +770,11 @@ void rvPhysics_Particle::CheckGround( void ) {
 
 /*
 ================
-rvPhysics_Particle::ApplyFriction
+anPhysics_Particle::ApplyFriction
 ================
 */
-void rvPhysics_Particle::ApplyFriction( float timeStep ) {
-	arcVec3	vel;
+void anPhysics_Particle::ApplyFriction( float timeStep ) {
+	anVec3	vel;
 	float	speed;
 	float	newspeed;
 
@@ -836,12 +790,12 @@ void rvPhysics_Particle::ApplyFriction( float timeStep ) {
 
 	// scale the velocity
 	if ( current.onGround ) {
-		newspeed = speed - ((speed * contactFriction) * timeStep);
+		newspeed = speed - ( ( speed * contactFriction ) * timeStep );
 	} else {
-		newspeed = speed - ((speed * linearFriction) * timeStep);
+		newspeed = speed - ( ( speed * linearFriction ) * timeStep );
 	}
 
-	if (newspeed < 0) {
+	if ( newspeed < 0 ) {
 		newspeed = 0;
 	}
 
@@ -850,21 +804,19 @@ void rvPhysics_Particle::ApplyFriction( float timeStep ) {
 
 /*
 ================
-rvPhysics_Particle::SlideMove
+anPhysics_Particle::SlideMove
 ================
 */
-bool rvPhysics_Particle::SlideMove( arcVec3 &start, arcVec3 &velocity, const arcVec3 &delta ) {
+bool anPhysics_Particle::SlideMove( anVec3 &start, anVec3 &velocity, const anVec3 &delta ) {
 	int		i;
 	trace_t tr;
-	arcVec3	move;
+	anVec3	move;
 	bool collide, rtnValue = false;
 
 	move = delta;
-	for( i = 0; i < 3; i++ ) { // be sure if you change this upper value in the for() to update the exit condition below!!!!!
+	for ( i = 0; i < 3; i++ ) { // be sure if you change this upper value in the for () to update the exit condition below!!!!!
 		gameLocal.Translation( self, tr, start, start + move, clipModel, clipModel->GetAxis(), clipMask, self, extraPassEntity );
-
 		start = tr.endpos;
-
 		if ( tr.fraction == 1.0f ) {
 			if ( i > 0 ) {
 				return false;
@@ -877,7 +829,7 @@ bool rvPhysics_Particle::SlideMove( arcVec3 &start, arcVec3 &velocity, const arc
 		// let the entity know about the collision
 		collide = self->Collide( tr, current.velocity, hitTeleporter );
 
-		idEntity* ent;
+		anEntity* ent;
 		ent = gameLocal.entities[tr.c.entityNum];
 		assert ( ent );
 
@@ -904,26 +856,20 @@ bool rvPhysics_Particle::SlideMove( arcVec3 &start, arcVec3 &velocity, const arc
 				velocity  = ( velocity - ( 2.0f * dot * tr.c.normal ) ) * bouncyness;
 			}
 			return true;
-//RAVEN BEGIN
-//jshepard: tr.c.material can (did) crash here if null
-		} else if ( allowBounce && tr.c.material && (tr.c.material->GetSurfaceFlags ( ) & SURF_BOUNCE) ) {
-//RAVEN END
+// tr.c.material can (did) crash here if null
+		} else if ( allowBounce && tr.c.material && (tr.c.material->GetSurfaceFlags() & SURF_BOUNCE) ) {
 			float dot;
 			move = tr.endpos;
 			dot = DotProduct( velocity, tr.c.normal );
 			velocity  = ( velocity - ( 2.0f * dot * tr.c.normal ) );
 			return true;
-		}
-// RAVEN BEGIN
-// dluetscher: removed redundant trace calls
-		else {
+		} else {
 			i = 4;
 			rtnValue = true;
 		}
-// RAVEN END
 
 		// clip the movement delta and velocity
-		if( collide ) {
+		if ( collide ) {
 			move.ProjectOntoPlane( tr.c.normal, PRT_OVERCLIP );
 			velocity.ProjectOntoPlane( tr.c.normal, PRT_OVERCLIP );
 		}
@@ -934,15 +880,15 @@ bool rvPhysics_Particle::SlideMove( arcVec3 &start, arcVec3 &velocity, const arc
 
 const float	PRT_VELOCITY_MAX			= 16000;
 const int	PRT_VELOCITY_TOTAL_BITS		= 16;
-const int	PRT_VELOCITY_EXPONENT_BITS	= arcMath::BitsForInteger( arcMath::BitsForFloat( PRT_VELOCITY_MAX ) ) + 1;
+const int	PRT_VELOCITY_EXPONENT_BITS	= anMath::BitsForInteger( anMath::BitsForFloat( PRT_VELOCITY_MAX ) ) + 1;
 const int	PRT_VELOCITY_MANTISSA_BITS	= PRT_VELOCITY_TOTAL_BITS - 1 - PRT_VELOCITY_EXPONENT_BITS;
 
 /*
 ================
-rvPhysics_Particle::WriteToSnapshot
+anPhysics_Particle::WriteToSnapshot
 ================
 */
-void rvPhysics_Particle::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void anPhysics_Particle::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	msg.WriteLong( current.atRest );
 	msg.WriteBits ( current.onGround, 1 );
 	msg.WriteFloat( current.origin[0] );
@@ -963,7 +909,7 @@ void rvPhysics_Particle::WriteToSnapshot( idBitMsgDelta &msg ) const {
 
 	// TODO: Check that this conditional write to delta message is OK
 	if ( hasMaster ) {
-		idCQuat localQuat;
+		anCQuat localQuat;
 		localQuat = current.localAxis.ToCQuat();
 
 		msg.WriteBits ( 1, 1 );
@@ -980,10 +926,10 @@ void rvPhysics_Particle::WriteToSnapshot( idBitMsgDelta &msg ) const {
 
 /*
 ================
-rvPhysics_Particle::ReadFromSnapshot
+anPhysics_Particle::ReadFromSnapshot
 ================
 */
-void rvPhysics_Particle::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void anPhysics_Particle::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	current.atRest = msg.ReadLong();
 	current.onGround = ( msg.ReadBits( 1 ) != 0 );
 	current.origin[0] = msg.ReadFloat();
@@ -1003,7 +949,7 @@ void rvPhysics_Particle::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	current.pushVelocity[2] = msg.ReadDeltaFloat( 0.0f );
 
 	if ( msg.ReadBits ( 1 ) ) {
-		idCQuat localQuat;
+		anCQuat localQuat;
 		localQuat.x = msg.ReadFloat( );
 		localQuat.y = msg.ReadFloat( );
 		localQuat.z = msg.ReadFloat( );
@@ -1014,9 +960,6 @@ void rvPhysics_Particle::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	}
 
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 		clipModel->Link( self, clipModel->GetId(), current.origin, clipModel->GetAxis() );
-// RAVEN END
 	}
 }

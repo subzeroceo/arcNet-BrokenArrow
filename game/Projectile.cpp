@@ -1,7 +1,7 @@
 // Copyright (C) 2007 Id Software, Inc.
 //
 
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -43,7 +43,7 @@ void sdProjectileNetworkData::MakeDefault( void ) {
 sdProjectileNetworkData::Write
 ================
 */
-void sdProjectileNetworkData::Write( arcNetFile* file ) const {
+void sdProjectileNetworkData::Write( anFile* file ) const {
 	if ( physicsData ) {
 		physicsData->Write( file );
 	}
@@ -56,7 +56,7 @@ void sdProjectileNetworkData::Write( arcNetFile* file ) const {
 sdProjectileNetworkData::Read
 ================
 */
-void sdProjectileNetworkData::Read( arcNetFile* file ) {
+void sdProjectileNetworkData::Read( anFile* file ) {
 	if ( physicsData ) {
 		physicsData->Read( file );
 	}
@@ -84,7 +84,7 @@ void sdProjectileBroadcastData::MakeDefault( void ) {
 		physicsData->MakeDefault();
 	}
 
-	team			= NULL;
+	team			= nullptr;
 	ownerId			= 0;
 	enemyId			= 0;
 	launchTime		= 0;
@@ -99,7 +99,7 @@ void sdProjectileBroadcastData::MakeDefault( void ) {
 sdProjectileBroadcastData::Write
 ================
 */
-void sdProjectileBroadcastData::Write( arcNetFile* file ) const {
+void sdProjectileBroadcastData::Write( anFile* file ) const {
 	if ( physicsData ) {
 		physicsData->Write( file );
 	}
@@ -113,7 +113,7 @@ void sdProjectileBroadcastData::Write( arcNetFile* file ) const {
 	file->WriteFloat( launchSpeed );
 	file->WriteInt( owners.Num() );
 	for ( int i = 0; i < owners.Num(); i++ ) {
-		file->WriteInt( owners[ i ] );
+		file->WriteInt( owners[i] );
 	}
 	file->WriteBool( hidden );
 	bindData.Write( file );
@@ -124,7 +124,7 @@ void sdProjectileBroadcastData::Write( arcNetFile* file ) const {
 sdProjectileBroadcastData::Read
 ================
 */
-void sdProjectileBroadcastData::Read( arcNetFile* file ) {
+void sdProjectileBroadcastData::Read( anFile* file ) {
 	if ( physicsData ) {
 		physicsData->Read( file );
 	}
@@ -133,7 +133,7 @@ void sdProjectileBroadcastData::Read( arcNetFile* file ) {
 
 	int teamIndex;
 	file->ReadInt( teamIndex );
-	team = teamIndex == -1 ? NULL : &sdTeamManager::GetInstance().GetTeamByIndex( teamIndex );
+	team = teamIndex == -1 ? nullptr : &sdTeamManager::GetInstance().GetTeamByIndex( teamIndex );
 
 	file->ReadInt( ownerId );
 	file->ReadInt( enemyId );
@@ -144,7 +144,7 @@ void sdProjectileBroadcastData::Read( arcNetFile* file ) {
 	file->ReadInt( count );
 	owners.SetNum( count );
 	for ( int i = 0; i < count; i++ ) {
-		file->ReadInt( owners[ i ] );
+		file->ReadInt( owners[i] );
 	}
 	file->ReadBool( hidden );
 	bindData.Read( file );
@@ -168,14 +168,14 @@ extern const arcEventDef EV_SetState;
 extern const arcEventDef EV_GetOwner;
 extern const arcEventDef EV_GetLaunchTime;
 
-const arcEventDef EV_GetDamagePower( "getDamagePower", 'f', DOC_TEXT( "Returns the projectile's damage multiplier." ), 0, NULL );
+const arcEventDef EV_GetDamagePower( "getDamagePower", 'f', DOC_TEXT( "Returns the projectile's damage multiplier." ), 0, nullptr );
 const arcEventDef EV_SetOwner( "setOwner", '\0', DOC_TEXT( "Sets the entity which owns the owner." ), 1, "The owner of a projectile cannot collide with it, and vice versa.", "E", "owner", "The new owner to set." );
 const arcEventDef EV_GetLaunchTime( "getLaunchTime", 'f', DOC_TEXT( "Returns the game time in seconds at which the projectile was launched." ), 0, "The result will be 0 if the projectile has not yet been fired." );
-const arcEventDef EV_Launch( "launch", '\0', DOC_TEXT( "Fires the projectile with the given world space velocity." ), 1, NULL, "v", "velocity", "The velocity to fire the projectile with." );
+const arcEventDef EV_Launch( "launch", '\0', DOC_TEXT( "Fires the projectile with the given world space velocity." ), 1, nullptr, "v", "velocity", "The velocity to fire the projectile with." );
 const arcEventDef EV_AddOwner( "addOwner", '\0', DOC_TEXT( "Adds an entity to the list of owners for the projectile." ), 1, "Owners cannot collide with the projectile, or vice versa.", "e", "owner", "New owner to add." );
-const arcEventDef EV_SetEnemy( "setEnemy", '\0', DOC_TEXT( "Sets the target entity for this object." ), 1, NULL, "E", "target", "New target to set." );
-const arcEventDef EV_GetEnemy( "getEnemy", 'e', DOC_TEXT( "Returns the entity's current target." ), 0, NULL );
-const arcEventDef EV_IsOwner( "isOwner", 'b', DOC_TEXT( "Returns whether the given entity is an owner of this projectile." ), 1, NULL, "e", "owner", "Entity to check." );
+const arcEventDef EV_SetEnemy( "setEnemy", '\0', DOC_TEXT( "Sets the target entity for this object." ), 1, nullptr, "E", "target", "New target to set." );
+const arcEventDef EV_GetEnemy( "getEnemy", 'e', DOC_TEXT( "Returns the entity's current target." ), 0, nullptr );
+const arcEventDef EV_IsOwner( "isOwner", 'b', DOC_TEXT( "Returns whether the given entity is an owner of this projectile." ), 1, nullptr, "e", "owner", "Entity to check." );
 
 CLASS_DECLARATION( arcEntity, idProjectile )
 	EVENT( EV_SetState,			idProjectile::Event_SetState )
@@ -199,7 +199,7 @@ idProjectile::idProjectile
 ================
 */
 idProjectile::idProjectile( void ) {
-	owner					= NULL;
+	owner					= nullptr;
 
 	damagePower				= 1.0f;
 
@@ -209,11 +209,11 @@ idProjectile::idProjectile( void ) {
 	launchSpeed				= 0.f;
 	health					= 0;
 
-	team					= NULL;
+	team					= nullptr;
 
-	baseScriptThread		= NULL;
-	scriptIdealState		= NULL;
-	scriptState				= NULL;
+	baseScriptThread		= nullptr;
+	scriptIdealState		= nullptr;
+	scriptState				= nullptr;
 
 	projectileFlags.scriptHide				= false;
 	projectileFlags.frozen					= false;
@@ -235,9 +235,9 @@ idProjectile::~idProjectile( void ) {
 
 	DeconstructScriptObject();
 
-	if ( baseScriptThread != NULL ) {
+	if ( baseScriptThread != nullptr ) {
 		gameLocal.program->FreeThread( baseScriptThread );
-		baseScriptThread = NULL;
+		baseScriptThread = nullptr;
 	}
 }
 
@@ -259,7 +259,7 @@ void idProjectile::Spawn( void ) {
 
 	scriptObject = gameLocal.program->AllocScriptObject( this, spawnArgs.GetString( "scriptobject", "default" ) );
 	baseScriptThread = ConstructScriptObject();
-	if ( baseScriptThread != NULL ) {
+	if ( baseScriptThread != nullptr ) {
 		baseScriptThread->ManualControl();
 		baseScriptThread->ManualDelete();
 	}
@@ -268,7 +268,7 @@ void idProjectile::Spawn( void ) {
 
 	if ( spawnArgs.GetBool( "has_postthink" ) ) {
 		onPostThink			= scriptObject->GetFunction( "OnPostThink" );
-		if ( onPostThink != NULL ) {
+		if ( onPostThink != nullptr ) {
 			postThinkEntNode.AddToEnd( gameLocal.postThinkEntities );
 		}
 	}
@@ -316,7 +316,7 @@ bool idProjectile::CanCollide( const arcEntity* other, int traceId ) const {
 			return false;
 		}
 		for ( int i = 0; i < owners.Num(); i++ ) {
-			if ( owners[ i ].GetEntity() == other ) {
+			if ( owners[i].GetEntity() == other ) {
 				return false;
 			}
 		}
@@ -329,7 +329,7 @@ bool idProjectile::CanCollide( const arcEntity* other, int traceId ) const {
 idProjectile::Create
 ================
 */
-void idProjectile::Create( arcEntity* _owner, const arcVec3 &start, const arcVec3 &dir ) {
+void idProjectile::Create( arcEntity* _owner, const anVec3 &start, const anVec3 &dir ) {
 	Unbind();
 
 	owner = _owner;
@@ -356,7 +356,7 @@ void idProjectile::InitPhysics( void ) {
 idProjectile::InitLaunchPhysics
 =================
 */
-void idProjectile::InitLaunchPhysics( float launchPower, const arcVec3& origin, const arcMat3& axes, const arcVec3& pushVelocity ) {
+void idProjectile::InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity ) {
 }
 
 /*
@@ -373,9 +373,9 @@ void idProjectile::Event_GetLaunchTime( void ) {
 idProjectile::Event_Launch
 ================
 */
-void idProjectile::Event_Launch( const arcVec3& velocity ) {
-	arcVec3 org = GetPhysics()->GetOrigin();
-	arcVec3 dir = velocity;
+void idProjectile::Event_Launch( const anVec3& velocity ) {
+	anVec3 org = GetPhysics()->GetOrigin();
+	anVec3 dir = velocity;
 	dir.Normalize();
 	Launch( org, dir, velocity, 0, 0, 1.f );
 }
@@ -385,7 +385,7 @@ void idProjectile::Event_Launch( const arcVec3& velocity ) {
 idProjectile::Launch
 =================
 */
-void idProjectile::Launch( const arcVec3& start, const arcVec3& dir, const arcVec3& pushVelocity, const float timeSinceFire, const float launchPower, const float dmgPower ) {
+void idProjectile::Launch( const anVec3& start, const anVec3& dir, const anVec3& pushVelocity, const float timeSinceFire, const float launchPower, const float dmgPower ) {
 	damagePower = dmgPower;
 	SetLaunchTime( gameLocal.time - SEC2MS( timeSinceFire ) );
 
@@ -395,7 +395,7 @@ void idProjectile::Launch( const arcVec3& start, const arcVec3& dir, const arcVe
 
 	Unbind();
 
-	arcMat3 axes = dir.ToMat3();
+	anMat3 axes = dir.ToMat3();
 
 	InitLaunchPhysics( launchPower, start, axes, pushVelocity );
 	launchSpeed = GetPhysics()->GetLinearVelocity().Length();
@@ -405,8 +405,8 @@ void idProjectile::Launch( const arcVec3& start, const arcVec3& dir, const arcVe
 	UpdateVisuals();
 	Present();
 
-	arcAngles tracerMuzzleAngles = axes.ToAngles();
-	arcVec3 anglesVec( tracerMuzzleAngles.pitch, tracerMuzzleAngles.yaw, tracerMuzzleAngles.roll );
+	anAngles tracerMuzzleAngles = axes.ToAngles();
+	anVec3 anglesVec( tracerMuzzleAngles.pitch, tracerMuzzleAngles.yaw, tracerMuzzleAngles.roll );
 
 	sdScriptHelper helper;
 	helper.Push( start );
@@ -425,8 +425,8 @@ void idProjectile::SetEnemy( arcEntity* newEnemy ) {
 	}
 
 	sdScriptHelper helper;
-	helper.Push( enemy ? enemy->GetScriptObject() : NULL );
-	helper.Push( newEnemy ? newEnemy->GetScriptObject() : NULL );
+	helper.Push( enemy ? enemy->GetScriptObject() : nullptr );
+	helper.Push( newEnemy ? newEnemy->GetScriptObject() : nullptr );
 
 	enemy = newEnemy;
 
@@ -491,7 +491,7 @@ bool idProjectile::IsOwner( arcEntity* other ) const {
 	}
 
 	for ( int i = 0; i < owners.Num(); i++ ) {
-		if ( other == owners[ i ] ) {
+		if ( other == owners[i] ) {
 			return true;
 		}
 	}
@@ -506,7 +506,7 @@ idProjectile::Thrust
 ================
 */
 void idProjectile::Thrust( void ) {
-	arcVec3 vel = GetPhysics()->GetLinearVelocity();
+	anVec3 vel = GetPhysics()->GetLinearVelocity();
 	vel += ( thrustPower * MS2SEC( gameLocal.msec ) ) * GetPhysics()->GetAxis()[ 0 ];	// apply thrust ( adjusted to per second )
 	vel.Truncate( launchSpeed );
 
@@ -560,7 +560,7 @@ void idProjectile::Think( void ) {
 	if ( launchTime != 0 && !projectileFlags.frozen ) {
 		if ( gameLocal.isNewFrame ) {
 			if ( projectileFlags.faceVelocity ) {
-				arcVec3 vel = GetPhysics()->GetLinearVelocity();
+				anVec3 vel = GetPhysics()->GetLinearVelocity();
 				float length = vel.Normalize();
 				if ( length > 0.75 ) {
 					projectileFlags.faceVelocitySet = true;
@@ -592,7 +592,7 @@ idProjectile::PostThink
 ================
 */
 void idProjectile::PostThink( void ) {
-	if ( onPostThink != NULL ) {
+	if ( onPostThink != nullptr ) {
 		sdScriptHelper helper;
 		CallNonBlockingScriptEvent( onPostThink, helper );
 	}
@@ -603,7 +603,7 @@ void idProjectile::PostThink( void ) {
 idProjectile::GetPostThinkNode
 ================
 */
-idLinkList< arcEntity >* idProjectile::GetPostThinkNode( void ) {
+anLinkList< arcEntity >* idProjectile::GetPostThinkNode( void ) {
 	return &postThinkEntNode;
 }
 
@@ -660,7 +660,7 @@ idProjectile::SetState
 */
 bool idProjectile::SetState( const sdProgram::sdFunction* newState ) {
 	if ( !newState ) {
-		gameLocal.Error( "idProjectile::SetState NULL state" );
+		gameLocal.Error( "idProjectile::SetState nullptr state" );
 	}
 
 	scriptState = newState;
@@ -718,7 +718,7 @@ void idProjectile::Event_SetOwner( arcEntity* _owner ) {
 idProjectile::Killed
 ================
 */
-void idProjectile::Killed( arcEntity *inflictor, arcEntity *attacker, int damage, const arcVec3 &dir, int location, const sdDeclDamage* damageDecl ) {
+void idProjectile::Killed( arcEntity *inflictor, arcEntity *attacker, int damage, const anVec3 &dir, int location, const sdDeclDamage* damageDecl ) {
 	sdScriptHelper h;
 	CallNonBlockingScriptEvent( scriptObject->GetFunction( "OnKilled" ), h );
 }
@@ -740,7 +740,7 @@ void idProjectile::SetLaunchTime( int time ) {
 	if ( !gameLocal.isClient ) {
 		int delay = targetForgetTime - gameLocal.time;
 		if ( delay > 0 ) {
-			PostEventMS( &EV_SetEnemy, delay, ( arcEntity* )NULL );
+			PostEventMS( &EV_SetEnemy, delay, ( arcEntity* )nullptr );
 		}
 	}
 
@@ -755,11 +755,11 @@ void idProjectile::SetLaunchTime( int time ) {
 idProjectile::Collide
 =================
 */
-bool idProjectile::Collide( const trace_t &collision, const arcVec3& velocity, int bodyId ) {
+bool idProjectile::Collide( const trace_t &collision, const anVec3& velocity, int bodyId ) {
 	sdLoggedTrace* loggedTrace = gameLocal.RegisterLoggedTrace( collision );
 
 	sdScriptHelper helper;
-	helper.Push( loggedTrace ? loggedTrace->GetScriptObject() : NULL );
+	helper.Push( loggedTrace ? loggedTrace->GetScriptObject() : nullptr );
 	helper.Push( velocity );
 	helper.Push( bodyId );
 	bool retVal = CallFloatNonBlockingScriptEvent( scriptObject->GetFunction( "OnCollide" ), helper ) != 0.0f;
@@ -776,7 +776,7 @@ idProjectile::OnTouch
 */
 void idProjectile::OnTouch( arcEntity *other, const trace_t& trace ) {
 	arcNetBasePlayer* player = other->Cast< arcNetBasePlayer >();
-	if ( player != NULL && !player->IsSpectator() && player->GetHealth() <= 0 ) {
+	if ( player != nullptr && !player->IsSpectator() && player->GetHealth() <= 0 ) {
 		return;
 	}
 
@@ -784,7 +784,7 @@ void idProjectile::OnTouch( arcEntity *other, const trace_t& trace ) {
 
 	sdScriptHelper helper;
 	helper.Push( other->GetScriptObject() );
-	helper.Push( loggedTrace ? loggedTrace->GetScriptObject() : NULL );
+	helper.Push( loggedTrace ? loggedTrace->GetScriptObject() : nullptr );
 	CallNonBlockingScriptEvent( scriptObject->GetFunction( "OnTouch" ), helper );
 
 	if ( loggedTrace ) {
@@ -798,7 +798,7 @@ idProjectile::UpdateModelTransform
 ================
 */
 void idProjectile::UpdateModelTransform( void ) {
-	arcPhysics* _physics = GetPhysics();
+	anPhysics* _physics = GetPhysics();
 
 	if ( projectileFlags.faceVelocitySet ) {
 		renderEntity.axis = visualAxes;
@@ -833,7 +833,7 @@ void idProjectile::ApplyNetworkState( networkStateMode_t mode, const sdEntitySta
 		launchSpeed = newData.launchSpeed;
 		owners.SetNum( newData.owners.Num() );
 		for ( int i = 0; i < owners.Num(); i++ ) {
-			owners[ i ].SetSpawnId( newData.owners[ i ] );
+			owners[i].SetSpawnId( newData.owners[i] );
 		}
 		if ( newData.hidden ) {
 			Hide();
@@ -849,7 +849,7 @@ void idProjectile::ApplyNetworkState( networkStateMode_t mode, const sdEntitySta
 idProjectile::ReadNetworkState
 ================
 */
-void idProjectile::ReadNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, const idBitMsg& msg ) const {
+void idProjectile::ReadNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, const anBitMsg& msg ) const {
 	if ( mode == NSM_VISIBLE ) {
 		NET_GET_STATES( sdProjectileNetworkData );
 		NET_READ_STATE_PHYSICS;
@@ -873,9 +873,9 @@ void idProjectile::ReadNetworkState( networkStateMode_t mode, const sdEntityStat
 		newData.owners.SetNum( count );
 		for ( int i = 0; i < newData.owners.Num(); i++ ) {
 			if ( i < baseData.owners.Num() ) {
-				newData.owners[ i ] = msg.ReadDeltaLong( baseData.owners[ i ] );
+				newData.owners[i] = msg.ReadDeltaLong( baseData.owners[i] );
 			} else {
-				newData.owners[ i ] = msg.ReadLong();
+				newData.owners[i] = msg.ReadLong();
 			}
 		}
 		newData.hidden			= msg.ReadBool();
@@ -890,7 +890,7 @@ void idProjectile::ReadNetworkState( networkStateMode_t mode, const sdEntityStat
 idProjectile::WriteNetworkState
 ================
 */
-void idProjectile::WriteNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, idBitMsg& msg ) const {
+void idProjectile::WriteNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, anBitMsg& msg ) const {
 	if ( mode == NSM_VISIBLE ) {
 		NET_GET_STATES( sdProjectileNetworkData );
 		NET_WRITE_STATE_PHYSICS;
@@ -912,7 +912,7 @@ void idProjectile::WriteNetworkState( networkStateMode_t mode, const sdEntitySta
 		newData.launchSpeed		= launchSpeed;
 		newData.owners.SetNum( owners.Num() );
 		for ( int i = 0; i < owners.Num(); i++ ) {
-			newData.owners[ i ] = owners[ i ].GetSpawnId();
+			newData.owners[i] = owners[i].GetSpawnId();
 		}
 		newData.hidden			= fl.hidden;
 
@@ -925,9 +925,9 @@ void idProjectile::WriteNetworkState( networkStateMode_t mode, const sdEntitySta
 		msg.WriteDeltaLong( baseData.owners.Num(), newData.owners.Num() );
 		for ( int i = 0; i < newData.owners.Num(); i++ ) {
 			if ( i < baseData.owners.Num() ) {
-				msg.WriteDeltaLong( baseData.owners[ i ], newData.owners[ i ] );
+				msg.WriteDeltaLong( baseData.owners[i], newData.owners[i] );
 			} else {
-				msg.WriteLong( newData.owners[ i ] );
+				msg.WriteLong( newData.owners[i] );
 			}
 		}
 		msg.WriteBool( newData.hidden );
@@ -982,7 +982,7 @@ bool idProjectile::CheckNetworkStateChanges( networkStateMode_t mode, const sdEn
 
 		int i;
 		for ( i = 0; i < owners.Num(); i++ ) {
-			if ( baseData.owners[ i ] != owners[ i ].GetSpawnId() ) {
+			if ( baseData.owners[i] != owners[i].GetSpawnId() ) {
 				return true;
 			}
 		}
@@ -1017,7 +1017,7 @@ sdEntityStateNetworkData* idProjectile::CreateNetworkStructure( networkStateMode
 		newData->physicsData = GetPhysics()->CreateNetworkStructure( mode );
 		return newData;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1037,7 +1037,7 @@ idProjectile_RigidBody::idProjectile_RigidBody
 ================
 */
 idProjectile_RigidBody::idProjectile_RigidBody( void ) {
-	waterEffects = NULL;
+	waterEffects = nullptr;
 }
 
 /*
@@ -1073,15 +1073,15 @@ void idProjectile_RigidBody::InitPhysics( void ) {
 	float mass					= spawnArgs.GetFloat( "mass" );
 	float buoyancy				= spawnArgs.GetFloat( "buoyancy" );
 
-	if ( mass < arcMath::FLT_EPSILON ) {
+	if ( mass < anMath::FLT_EPSILON ) {
 		gameLocal.Error( "Invalid mass on '%s'", GetEntityDefName() );
 	}
 
-	arcVec3 gravVec = gameLocal.GetGravity();
+	anVec3 gravVec = gameLocal.GetGravity();
 	gravVec.Normalize();
 
 	physicsObj.SetSelf( this );
-	physicsObj.SetClipModel( new arcClipModel( GetPhysics()->GetClipModel() ), 1.0f );
+	physicsObj.SetClipModel( new anClipModel( GetPhysics()->GetClipModel() ), 1.0f );
 	physicsObj.SetContents( 0 );
 	physicsObj.SetMass( mass );
 	physicsObj.SetFriction( linearFriction, angularFriction, contactFriction );
@@ -1100,9 +1100,9 @@ void idProjectile_RigidBody::InitPhysics( void ) {
 idProjectile_RigidBody::InitLaunchPhysics
 =================
 */
-void idProjectile_RigidBody::InitLaunchPhysics( float launchPower, const arcVec3& origin, const arcMat3& axes, const arcVec3& pushVelocity ) {
-	arcVec3 velocity				= spawnArgs.GetVector( "velocity", "0 0 0" );
-	arcVec3 angular_velocity		= spawnArgs.GetVector( "angular_velocity", "0 0 0" );
+void idProjectile_RigidBody::InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity ) {
+	anVec3 velocity				= spawnArgs.GetVector( "velocity", "0 0 0" );
+	anVec3 angular_velocity		= spawnArgs.GetVector( "angular_velocity", "0 0 0" );
 
 	float speed					= velocity.Length() + launchPower;
 
@@ -1115,7 +1115,7 @@ void idProjectile_RigidBody::InitLaunchPhysics( float launchPower, const arcVec3
 idProjectile_RigidBody::CheckWater
 ================
 */
-void idProjectile_RigidBody::CheckWater( const arcVec3& waterBodyOrg, const arcMat3& waterBodyAxis, arcCollisionModel* waterBodyModel ) {
+void idProjectile_RigidBody::CheckWater( const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel ) {
 	if ( waterEffects ) {
 		waterEffects->SetOrigin( GetPhysics()->GetOrigin() );
 		waterEffects->SetAxis( GetPhysics()->GetAxis() );
@@ -1140,7 +1140,7 @@ END_CLASS
 sdProjectile_Parabolic::sdProjectile_Parabolic
 ================
 */
-sdProjectile_Parabolic::sdProjectile_Parabolic( void ) : waterEffects(NULL) {
+sdProjectile_Parabolic::sdProjectile_Parabolic( void ) : waterEffects(nullptr ) {
 }
 
 /*
@@ -1169,11 +1169,11 @@ sdProjectile_Parabolic::InitPhysics
 void sdProjectile_Parabolic::InitPhysics( void ) {
 	float gravity				= spawnArgs.GetFloat( "gravity" );
 
-	arcVec3 gravVec = gameLocal.GetGravity();
+	anVec3 gravVec = gameLocal.GetGravity();
 	gravVec.Normalize();
 
 	physicsObj.SetSelf( this );
-	physicsObj.SetClipModel( new arcClipModel( GetPhysics()->GetClipModel() ) );
+	physicsObj.SetClipModel( new anClipModel( GetPhysics()->GetClipModel() ) );
 	physicsObj.SetGravity( gravVec * gravity );
 	physicsObj.SetContents( 0 );
 
@@ -1185,8 +1185,8 @@ void sdProjectile_Parabolic::InitPhysics( void ) {
 sdProjectile_Parabolic::InitLaunchPhysics
 =================
 */
-void sdProjectile_Parabolic::InitLaunchPhysics( float launchPower, const arcVec3& origin, const arcMat3& axes, const arcVec3& pushVelocity ) {
-	arcVec3 velocity				= spawnArgs.GetVector( "velocity", "0 0 0" );
+void sdProjectile_Parabolic::InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity ) {
+	anVec3 velocity				= spawnArgs.GetVector( "velocity", "0 0 0" );
 	float speed					= velocity.Length() + launchPower;
 	velocity					= ( axes[ 0 ] * speed ) + pushVelocity;
 
@@ -1198,7 +1198,7 @@ void sdProjectile_Parabolic::InitLaunchPhysics( float launchPower, const arcVec3
 sdProjectile_Parabolic::CheckWater
 ==============
 */
-void sdProjectile_Parabolic::CheckWater( const arcVec3& waterBodyOrg, const arcMat3& waterBodyAxis, arcCollisionModel* waterBodyModel ) {
+void sdProjectile_Parabolic::CheckWater( const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel ) {
 	if ( waterEffects ) {
 		waterEffects->SetOrigin( GetPhysics()->GetOrigin() );
 		waterEffects->SetAxis( GetPhysics()->GetAxis() );

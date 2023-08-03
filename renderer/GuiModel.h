@@ -1,5 +1,5 @@
 typedef struct {
-	const arcMaterial	*material;
+	const anMaterial	*material;
 	float				color[4];
 	int					firstVert;
 	int					numVerts;
@@ -7,25 +7,25 @@ typedef struct {
 	int					numIndexes;
 } guiModelSurface_t;
 
-class arcInteractiveGuiModel {
+class anInteractiveGuiModel {
 public:
-	arcInteractiveGuiModel();
+	anInteractiveGuiModel();
 
 	void	Clear();
 
-	//void	WriteToDemo( ARCDemoFile *demo );
-	//void	ReadFromDemo( ARCDemoFile *demo );
+	//void	WriteToDemo( anDemoFile *demo );
+	//void	ReadFromDemo( anDemoFile *demo );
 
 	void	EmitToCurrentView( float modelMatrix[16], bool depthHack );
 	void	EmitFullScreen();
 
 	// these calls are forwarded from the renderer
 	void	SetColor( float r, float g, float b, float a );
-	void	DrawStretchPic( const arcDrawVert *verts, const qglIndex_t *indexes, int vertCount, int indexCount, const arcMaterial *hShader,
+	void	DrawStretchPic( const anDrawVertex *verts, const qglIndex_t *indexes, int vertCount, int indexCount, const anMaterial *hShader,
 									bool clip = true, float min_x = 0.0f, float min_y = 0.0f, float max_x = 640.0f, float max_y = 480.0f );
 	void	DrawStretchPic( float x, float y, float w, float h,
-									float s1, float t1, float s2, float t2, const arcMaterial *hShader);
-	void	DrawStretchTri ( arcVec2 p1, arcVec2 p2, arcVec2 p3, arcVec2 t1, arcVec2 t2, arcVec2 t3, const arcMaterial *material );
+									float s1, float t1, float s2, float t2, const anMaterial *hShader);
+	void	DrawStretchTri ( anVec2 p1, anVec2 p2, anVec2 p3, anVec2 t1, anVec2 t2, anVec2 t3, const anMaterial *material );
 
 	//---------------------------
 private:
@@ -34,8 +34,8 @@ private:
 
 	guiModelSurface_t		*surf;
 
-	arcNetList<guiModelSurface_t>	surfaces;
-	arcNetList<qglIndex_t>		indexes;
-	arcNetList<arcDrawVert>	verts;
+	anList<guiModelSurface_t>	surfaces;
+	anList<qglIndex_t>		indexes;
+	anList<anDrawVertex>	verts;
 };
 

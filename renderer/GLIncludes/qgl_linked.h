@@ -336,6 +336,51 @@
 #define qglVertexPointer glVertexPointer
 #define qglViewport glViewport
 
+#define qglBindProgramNV glBindProgramNV
+#define qglLoadProgramNV glLoadProgramNV
+#define qglProgramParameter4fvNV glProgramParameter4fvNV
+
+#define qglTexImage3D glTexImage3D
+#define qglColorTableEXT glColorTableEXT
+#define qglBlendEquationEXT glBlendEquationEXT
+#define qglDrawRangeElementsEXT glDrawRangeElementsEXT
+#define qglStencilOpSeparateATI glStencilOpSeparateATI
+#define qglStencilFuncSeparateATI glStencilFuncSeparateATI
+
+// ARB_vertex_program / ARB_fragment_program
+#define qglVertexAttribPointerARB glVertexAttribPointerARB
+#define qglEnableVertexAttribArrayARB glEnableVertexAttribArrayARB
+#define qglDisableVertexAttribArrayARB glDisableVertexAttribArrayARB
+#define qglProgramStringARB	glProgramStringARB
+#define qglBindProgramARB glBindProgramARB
+#define qglGenProgramsARB glGenProgramsARB
+#define qglProgramEnvParameter4fvARB glProgramEnvParameter4fvARB
+#define qglProgramLocalParameter4fvARB glProgramLocalParameter4fvARB
+
+// GLSL fragment
+#define qglCreateShaderObjectARB glCreateShaderObjectARB
+#define qglDeleteObjectARB glDeleteObjectARB
+#define qglShaderSourceARB glShaderSourceARB
+#define qglCompileShaderARB glCompileShaderARB
+#define qglGetObjectParameterivARB glGetObjectParameterivARB
+#define qglCreateProgramObjectARB glCreateProgramObjectARB
+#define qglAttachObjectARB glAttachObjectARB
+#define qglDetachObjectARB glDetachObjectARB
+#define qglLinkProgramARB glLinkProgramARB
+#define qglUseProgramObjectARB glUseProgramObjectARB
+#define qglGetUniformLocationARB glGetUniformLocationARB
+#define qglUniform1fARB glUniform1fARB
+#define qglUniform1iARB glUniform1iARB
+#define qglUniform1fvARB glUniform1fvARB
+#define qglUniform2fvARB glUniform2fvARB
+#define qglUniform3fvARB glUniform3fvARB
+#define qglUniform4fvARB glUniform4fvARB
+#define qglGetInfoLogARB glGetInfoLogARB
+
+// GL_EXT_depth_bounds_test
+#define qglDepthBoundsEXT glDepthBoundsEXT
+#define qglDepthBounds glDepthBounds
+
 #ifdef GLX_VERSION_1_1 // catch all for any GLX-aware situation
 #define qglXChooseVisual glXChooseVisual
 #define qglXCreateContext glXCreateContext
@@ -344,3 +389,4 @@
 #define qglXSwapBuffers glXSwapBuffers
 #define qglXGetProcAddressARB glXGetProcAddressARB
 #endif
+

@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/common_resource.h"
@@ -6,7 +6,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // DialogName dialog
-DialogName::DialogName(const char *pName, CWnd* pParent /*=NULL*/)
+DialogName::DialogName(const char *pName, CWnd* pParent /*=nullptr*/)
 	: CDialog(DialogName::IDD, pParent) {
 	//{{AFX_DATA_INIT(DialogName)
 	m_strName = _T( "" );

@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/SoundEditor_resource.h"
@@ -7,7 +7,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CDialogSoundGroup dialog
-CDialogSoundGroup::CDialogSoundGroup(CWnd* pParent /*=NULL*/)
+CDialogSoundGroup::CDialogSoundGroup(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDialogSoundGroup::IDD, pParent) {
 	//{{AFX_DATA_INIT(CDialogSoundGroup)
 		// NOTE: the ClassWizard will add member initialization here

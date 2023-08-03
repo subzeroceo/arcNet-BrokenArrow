@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -10,13 +10,13 @@ CPtrArray	g_SelectedFaceBrushes;
 CPtrArray	&g_ptrSelectedFaces = g_SelectedFaces;
 CPtrArray	&g_ptrSelectedFaceBrushes = g_SelectedFaceBrushes;
 
-extern void Brush_Resize(brush_t *b, arcVec3 vMin, arcVec3 vMax);
+extern void Brush_Resize(brush_t *b, anVec3 vMin, anVec3 vMax);
 
 /*
  =======================================================================================================================
  =======================================================================================================================
  */
-qertrace_t Test_Ray(const arcVec3 &origin, const arcVec3 &dir, int flags) {
+qertrace_t Test_Ray(const anVec3 &origin, const anVec3 &dir, int flags) {
 	brush_t		*brush;
 	face_t		*face;
 	float		dist;
@@ -29,8 +29,8 @@ qertrace_t Test_Ray(const arcVec3 &origin, const arcVec3 &dir, int flags) {
 	CDragPoint	*drag = PointRay(origin, dir, &dist);
 	if (drag) {
 		t.dist = dist;
-		t.brush = NULL;
-		t.face = NULL;
+		t.brush = nullptr;
+		t.face = nullptr;
 		t.point = drag;
 		t.selected = false;
 		return t;
@@ -38,7 +38,7 @@ qertrace_t Test_Ray(const arcVec3 &origin, const arcVec3 &dir, int flags) {
 
 	if (flags & SF_CYCLE) {
 		CPtrArray	array;
-		brush_t		*pToSelect = (selected_brushes.next != &selected_brushes) ? selected_brushes.next : NULL;
+		brush_t		*pToSelect = (selected_brushes.next != &selected_brushes) ? selected_brushes.next : nullptr;
 		Select_Deselect();
 
 		// go through active brushes and accumulate all "hit" brushes
@@ -161,16 +161,16 @@ qertrace_t Test_Ray(const arcVec3 &origin, const arcVec3 &dir, int flags) {
 	}
 
 	// if entites first, but didn't find any, check regular
-	if ((flags & SF_ENTITIES_FIRST) && t.brush == NULL) {
+	if ((flags & SF_ENTITIES_FIRST) && t.brush == nullptr ) {
 		return Test_Ray(origin, dir, flags - SF_ENTITIES_FIRST);
 	}
 
 	return t;
 }
 
-extern void	AddSelectablePoint(brush_t *b, arcVec3 v, int type, bool priority);
+extern void	AddSelectablePoint(brush_t *b, anVec3 v, int type, bool priority);
 extern void	ClearSelectablePoints(brush_t *b);
-extern arcVec3 Brush_TransformedPoint(brush_t *b, const arcVec3 &in);
+extern anVec3 Brush_TransformedPoint(brush_t *b, const anVec3 &in);
 
 /*
  =======================================================================================================================
@@ -184,7 +184,7 @@ void Select_Brush(brush_t *brush, bool bComplete, bool bStatus) {
 	g_ptrSelectedFaces.RemoveAll();
 	g_ptrSelectedFaceBrushes.RemoveAll();
 
-	// selected_face = NULL;
+	// selected_face = nullptr;
 	if (g_qeglobals.d_select_count < MAX_MAP_ENTITIES) {
 		g_qeglobals.d_select_order[g_qeglobals.d_select_count] = brush;
 	}
@@ -251,7 +251,7 @@ singleselect:
 	}
 
 	if (bStatus) {
-		arcVec3	vMin, vMax, vSize;
+		anVec3	vMin, vMax, vSize;
 		Select_GetBounds(vMin, vMax);
 		VectorSubtract(vMax, vMin, vSize);
 
@@ -266,7 +266,7 @@ singleselect:
     Select_Ray If the origin is inside a brush, that brush will be ignored.
  =======================================================================================================================
  */
-void Select_Ray(arcVec3 origin, arcVec3 dir, int flags) {
+void Select_Ray(anVec3 origin, anVec3 dir, int flags) {
 	qertrace_t t = Test_Ray(origin, dir, flags);
 
 	if ( !t.brush) {
@@ -277,7 +277,7 @@ void Select_Ray(arcVec3 origin, arcVec3 dir, int flags) {
 		int		nCount = g_SelectedFaces.GetSize();
 		bool	bOk = true;
 		for ( int i = 0; i < nCount; i++ ) {
-			if (t.face == reinterpret_cast < face_t * > (g_SelectedFaces.GetAt( i ) )) {
+			if (t.face == reinterpret_cast < face_t * > (g_SelectedFaces.GetAt( i ) ) ) {
 				bOk = false;
 
 				// need to move remove i'th entry
@@ -322,7 +322,7 @@ void Select_Ray(arcVec3 origin, arcVec3 dir, int flags) {
 		// height=2 texture
 		//
 		brushprimit_texdef_t	brushprimit_texdef;
-		ConvertTexMatWithQTexture(&t.face->brushprimit_texdef, t.face->d_texture, &brushprimit_texdef, NULL);
+		ConvertTexMatWithQTexture(&t.face->brushprimit_texdef, t.face->d_texture, &brushprimit_texdef, nullptr );
 		Texture_SetTexture(&t.face->texdef, &brushprimit_texdef, false, false);
 		UpdateSurfaceDialog();
 		return;
@@ -360,7 +360,7 @@ void Select_Delete( void ) {
 	g_ptrSelectedFaces.RemoveAll();
 	g_ptrSelectedFaceBrushes.RemoveAll();
 
-	// selected_face = NULL;
+	// selected_face = nullptr;
 	g_qeglobals.d_select_mode = sel_brush;
 
 	g_qeglobals.d_select_count = 0;
@@ -384,7 +384,7 @@ void Select_Delete( void ) {
  =======================================================================================================================
  */
 void Select_Deselect(bool bDeselectFaces) {
-		ClearSelectablePoints(NULL);
+		ClearSelectablePoints(nullptr );
 	Patch_Deselect();
 
 	g_pParentWnd->ActiveXY()->UndoClear();
@@ -399,7 +399,7 @@ void Select_Deselect(bool bDeselectFaces) {
 			g_ptrSelectedFaces.RemoveAll();
 			g_ptrSelectedFaceBrushes.RemoveAll();
 
-			// selected_face = NULL;
+			// selected_face = nullptr;
 		}
 
 		Sys_UpdateWindows(W_ALL);
@@ -410,7 +410,7 @@ void Select_Deselect(bool bDeselectFaces) {
 		g_ptrSelectedFaces.RemoveAll();
 		g_ptrSelectedFaceBrushes.RemoveAll();
 
-		// selected_face = NULL;
+		// selected_face = nullptr;
 	}
 
 	g_qeglobals.d_select_mode = sel_brush;
@@ -437,7 +437,7 @@ void Select_Deselect(bool bDeselectFaces) {
     Select_Move
  =======================================================================================================================
  */
-void Select_Move(arcVec3 delta, bool bSnap) {
+void Select_Move(anVec3 delta, bool bSnap) {
 	// actually move the selected brushes
 	bool		updateOrigin = true;
 	entity_t	*lastOwner = selected_brushes.next->owner;
@@ -454,7 +454,7 @@ void Select_Move(arcVec3 delta, bool bSnap) {
 		}
 	}
 
-	arcVec3	vMin, vMax;
+	anVec3	vMin, vMax;
 	Select_GetBounds(vMin, vMax);
 
 	CString strStatus;
@@ -486,8 +486,8 @@ void Select_Clone( void ) {
  =======================================================================================================================
     Select_SetTexture Timo:: bFitScale to compute scale on the plane and counteract plane / axial plane snapping Timo::
     brush primitive texturing the brushprimit_texdef given must be understood as a qtexture_t width=2 height=2 ( HiRes
-    ) Timo:: texture plugin, added an IPluginTexdef* parameter must be casted to an IPluginTexdef! if not NULL, get
-    ->Copy() of it into each face or brush ( and remember to hook ) if NULL, means we have no information, ask for a
+    ) Timo:: texture plugin, added an IPluginTexdef* parameter must be casted to an IPluginTexdef! if not nullptr, get
+    ->Copy() of it into each face or brush ( and remember to hook ) if nullptr, means we have no information, ask for a
     default
  =======================================================================================================================
  */
@@ -514,7 +514,7 @@ void WINAPI Select_SetTexture(texdef_t *texdef,brushprimit_texdef_t	*brushprimit
 				Brush_SetTexture(b, texdef, brushprimit_texdef, bFitScale);
 				Undo_EndBrush( b );
 			} else if (b->owner->eclass->nShowFlags & ECLASS_LIGHT) {
-				if ( arcNetString::Cmpn(texdef->name, "lights/", strlen( "lights/" ) ) == 0 ) {
+				if ( anString::Cmpn(texdef->name, "lights/", strlen( "lights/" ) ) == 0 ) {
 					SetKeyValue(b->owner, "texture", texdef->name);
 					g_Inspectors->UpdateEntitySel(b->owner->eclass);
 					UpdateLightInspector();
@@ -539,7 +539,7 @@ void WINAPI Select_SetTexture(texdef_t *texdef,brushprimit_texdef_t	*brushprimit
     TRANSFORMATIONS
  =======================================================================================================================
  */
-void Select_GetBounds(arcVec3 &mins, arcVec3 &maxs) {
+void Select_GetBounds(anVec3 &mins, anVec3 &maxs) {
 	for ( int i = 0; i < 3; i++ ) {
 		mins[i] = 999999;
 		maxs[i] = -999999;
@@ -562,8 +562,8 @@ void Select_GetBounds(arcVec3 &mins, arcVec3 &maxs) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void Select_GetTrueMid(arcVec3 &mid) {
-	arcVec3	mins, maxs;
+void Select_GetTrueMid(anVec3 &mid) {
+	anVec3	mins, maxs;
 	Select_GetBounds( mins, maxs);
 
 	for ( int i = 0; i < 3; i++ ) {
@@ -575,12 +575,12 @@ void Select_GetTrueMid(arcVec3 &mid) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void Select_GetMid(arcVec3 &mid) {
+void Select_GetMid(anVec3 &mid) {
 #if 0
 	Select_GetTrueMid(mid);
 	return;
 #else
-	arcVec3	mins, maxs;
+	anVec3	mins, maxs;
 	int		i;
 
 	//if (g_PrefsDlg.m_bNoClamp) {
@@ -596,10 +596,10 @@ void Select_GetMid(arcVec3 &mid) {
 #endif
 }
 
-arcVec3	select_origin;
-arcMat3	select_matrix;
-arcMat3	select_bmatrix;
-arcRotate select_rotation;
+anVec3	select_origin;
+anMat3	select_matrix;
+anMat3	select_bmatrix;
+anRotation select_rotation;
 bool	select_fliporder;
 int		select_flipAxis;
 float	select_orgDeg;
@@ -647,10 +647,10 @@ VectorRotate3
 	rotation order is roll - pitch - yaw
 =================
 */
-void VectorRotate3( const arcVec3 &vIn, const arcVec3 &vRotation, arcVec3 &out) {
+void VectorRotate3( const anVec3 &vIn, const anVec3 &vRotation, anVec3 &out) {
 #if 1
 	int i, nIndex[3][2];
-	arcVec3 vWork, va;
+	anVec3 vWork, va;
 
 	va = vIn;
 	vWork = va;
@@ -670,7 +670,7 @@ void VectorRotate3( const arcVec3 &vIn, const arcVec3 &vRotation, arcVec3 &out) 
 	}
 	out = vWork;
 #else
-	arcAngles angles;
+	anAngles angles;
 
 	angles.pitch = vRotation[1];
 	angles.yaw = vRotation[2];
@@ -685,7 +685,7 @@ void VectorRotate3( const arcVec3 &vIn, const arcVec3 &vRotation, arcVec3 &out) 
 VectorRotate3Origin
 =================
 */
-void VectorRotate3Origin( const arcVec3 &vIn, const arcVec3 &vRotation, const arcVec3 &vOrigin, arcVec3 &out ) {
+void VectorRotate3Origin( const anVec3 &vIn, const anVec3 &vRotation, const anVec3 &vOrigin, anVec3 &out ) {
 	out = vIn - vOrigin;
 	VectorRotate3( out, vRotation, out );
 	out += vOrigin;
@@ -695,19 +695,19 @@ void VectorRotate3Origin( const arcVec3 &vIn, const arcVec3 &vRotation, const ar
  =======================================================================================================================
  =======================================================================================================================
  */
-extern void Brush_Rotate(brush_t *b, arcMat3 matrix, arcVec3 origin, bool bBuild);
+extern void Brush_Rotate(brush_t *b, anMat3 matrix, anVec3 origin, bool bBuild);
 
 void Select_ApplyMatrix(bool bSnap, bool rotateOrigins) {
 	brush_t *b;
 	face_t	*f;
 	int		i;
-	arcVec3	temp;
-	arcNetString str;
+	anVec3	temp;
+	anString str;
 	char	text[128];
-	entity_t *lastOwner = NULL;
+	entity_t *lastOwner = nullptr;
 
 	for (b = selected_brushes.next; b != &selected_brushes; b = b->next) {
-		bool doBrush = true;
+	bool doBrush = true;
 		if ( !(b->owner->eclass->nShowFlags & ECLASS_WORLDSPAWN) && b->owner != lastOwner) {
 			if (b->modelHandle || b->owner->eclass->nShowFlags & ECLASS_ROTATABLE) {
 				if (rotateOrigins) {
@@ -745,9 +745,9 @@ void Select_ApplyMatrix(bool bSnap, bool rotateOrigins) {
 				b->owner->lightRotation.OrthoNormalizeSelf();
 
 				if (b->modelHandle) {
-					arcBounds bo, bo2;
+					anBounds bo, bo2;
 					bo2.Zero();
-					if ( dynamic_cast<idRenderModelPrt*>( b->modelHandle ) || dynamic_cast<ARCLiquidModel*>( b->modelHandle ) ) {
+					if ( dynamic_cast<idRenderModelPrt*>( b->modelHandle ) || dynamic_cast<anLiquidModel*>( b->modelHandle ) ) {
 						bo2.ExpandSelf( 12.0f );
 					} else {
 						bo2 = b->modelHandle->Bounds();
@@ -801,8 +801,8 @@ void Select_ApplyMatrix(bool bSnap, bool rotateOrigins) {
 			}
 		}
 
-		if (b->owner->eclass->fixedsize && b->owner->eclass->entityModel == NULL) {
-			arcVec3 min, max;
+		if (b->owner->eclass->fixedsize && b->owner->eclass->entityModel == nullptr ) {
+			anVec3 min, max;
 			if (b->trackLightOrigin) {
 				min = b->owner->lightOrigin + b->owner->eclass->mins;
 				max = b->owner->lightOrigin + b->owner->eclass->maxs;
@@ -822,7 +822,7 @@ void Select_ApplyMatrix(bool bSnap, bool rotateOrigins) {
 		if ( b->owner->curve ) {
 			int c = b->owner->curve->GetNumValues();
 			for ( i = 0; i < c; i++ ) {
-				arcVec3 v = b->owner->curve->GetValue( i );
+				anVec3 v = b->owner->curve->GetValue( i );
 				v -= select_origin;
 				v *= select_matrix;
 				v += select_origin;
@@ -839,7 +839,7 @@ void Select_ApplyMatrix(bool bSnap, bool rotateOrigins) {
  =======================================================================================================================
  */
 void RotateFaceTexture(face_t *f, int nAxis, float fDeg) {
-	arcVec3	p1, p2, p3, rota;
+	anVec3	p1, p2, p3, rota;
 	p1[0] = p1[1] = p1[2] = 0;
 	VectorCopy(p1, p2);
 	VectorCopy(p1, p3);
@@ -851,8 +851,8 @@ void RotateFaceTexture(face_t *f, int nAxis, float fDeg) {
 	VectorRotate3Origin(p2, rota, select_origin, p2);
 	VectorRotate3Origin(p3, rota, select_origin, p3);
 
-	arcPlane		normal2;
-	arcVec3		vNormal;
+	anPlane		normal2;
+	anVec3		vNormal;
 	vNormal[0] = f->plane[0];
 	vNormal[1] = f->plane[1];
 	vNormal[2] = f->plane[2];
@@ -867,7 +867,7 @@ void RotateFaceTexture(face_t *f, int nAxis, float fDeg) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void RotateTextures( int nAxis, float fDeg, arcVec3 vOrigin ) {
+void RotateTextures( int nAxis, float fDeg, anVec3 vOrigin ) {
 	for ( brush_t * b = selected_brushes.next; b != &selected_brushes; b = b->next ) {
 		for ( face_t * f = b->brush_faces; f; f = f->next) {
 			if ( g_qeglobals.m_bBrushPrimitMode ) {
@@ -916,7 +916,7 @@ void Select_RotateAxis( int axis, float deg, bool bPaint, bool bMouse) {
 
 	select_fliporder = false;
 
-	arcVec3 vec = vec3_origin;
+	anVec3 vec = vec3_origin;
 	vec[axis] = 1.0f;
 
 	if (g_bRotateMode) {
@@ -925,7 +925,7 @@ void Select_RotateAxis( int axis, float deg, bool bPaint, bool bMouse) {
 
 	select_rotation.Set( select_origin, vec, deg );
 	select_matrix = select_rotation.ToMat3();
-	arcRotate rot(select_origin, vec, select_orgDeg);
+	anRotation rot(select_origin, vec, select_orgDeg);
 	rot.Normalize360();
 	select_bmatrix = rot.ToMat3();
 	if (g_PrefsDlg.m_bRotateLock) {
@@ -946,10 +946,10 @@ void Select_RotateAxis( int axis, float deg, bool bPaint, bool bMouse) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void ProjectOnPlane( const arcVec3 &normal, float dist, arcVec3 &ez, arcVec3 &p) {
-	if (arcMath::Fabs(ez[0] ) == 1 ) {
+void ProjectOnPlane( const anVec3 &normal, float dist, anVec3 &ez, anVec3 &p) {
+	if (anMath::Fabs(ez[0] ) == 1 ) {
 		p[0] = (dist - normal[1] * p[1] - normal[2] * p[2] ) / normal[0];
-	} else if (arcMath::Fabs(ez[1] ) == 1 ) {
+	} else if (anMath::Fabs(ez[1] ) == 1 ) {
 		p[1] = (dist - normal[0] * p[0] - normal[2] * p[2] ) / normal[1];
 	} else {
 		p[2] = (dist - normal[0] * p[0] - normal[1] * p[1] ) / normal[2];
@@ -960,10 +960,10 @@ void ProjectOnPlane( const arcVec3 &normal, float dist, arcVec3 &ez, arcVec3 &p)
  =======================================================================================================================
  =======================================================================================================================
  */
-void Back( arcVec3 &dir, arcVec3 &p)  {
-	if ( arcMath::Fabs( dir[0] ) == 1 ) {
+void Back( anVec3 &dir, anVec3 &p)  {
+	if ( anMath::Fabs( dir[0] ) == 1 ) {
 		p[0] = 0;
-	} else if ( arcMath::Fabs( dir[1] ) == 1 ) {
+	} else if ( anMath::Fabs( dir[1] ) == 1 ) {
 		p[1] = 0;
 	} else {
 		p[2] = 0;
@@ -975,13 +975,13 @@ void Back( arcVec3 &dir, arcVec3 &p)  {
 //    using scale[0] and scale[1]
 // =======================================================================================================================
 //
-void ComputeScale(arcVec3 &rex, arcVec3 &rey, arcVec3 &p, face_t *f) {
+void ComputeScale(anVec3 &rex, anVec3 &rey, anVec3 &p, face_t *f) {
 	float	px = DotProduct( rex, p );
 	float	py = DotProduct( rey, p );
 	px *= f->texdef.scale[0];
 	py *= f->texdef.scale[1];
 
-	arcVec3	aux;
+	anVec3	aux;
 	VectorCopy(rex, aux);
 	VectorScale(aux, px, aux);
 	VectorCopy(aux, p);
@@ -994,8 +994,8 @@ void ComputeScale(arcVec3 &rex, arcVec3 &rey, arcVec3 &p, face_t *f) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void ComputeAbsolute(face_t *f, arcVec3 &p1, arcVec3 &p2, arcVec3 &p3) {
-	arcVec3	ex, ey, ez; // local axis base
+void ComputeAbsolute(face_t *f, anVec3 &p1, anVec3 &p2, anVec3 &p3) {
+	anVec3	ex, ey, ez; // local axis base
 
 #ifdef _DEBUG
 	if (g_qeglobals.m_bBrushPrimitMode) {
@@ -1006,7 +1006,7 @@ void ComputeAbsolute(face_t *f, arcVec3 &p1, arcVec3 &p2, arcVec3 &p3) {
 	TextureAxisFromPlane( f->plane, ex, ey );
 	ez = ex.Cross( ey );
 
-	arcVec3	aux;
+	anVec3	aux;
 	VectorCopy(ex, aux);
 	VectorScale(aux, -f->texdef.shift[0], aux);
 	VectorCopy(aux, p1);
@@ -1024,7 +1024,7 @@ void ComputeAbsolute(face_t *f, arcVec3 &p1, arcVec3 &p2, arcVec3 &p3) {
 	VectorRotate3(p3, aux, p3);
 
 	// computing rotated local axis base
-	arcVec3	rex, rey;
+	anVec3	rex, rey;
 	VectorCopy(ex, rex);
 	VectorRotate3(rex, aux, rex);
 	VectorCopy(ey, rey);
@@ -1044,8 +1044,8 @@ void ComputeAbsolute(face_t *f, arcVec3 &p1, arcVec3 &p2, arcVec3 &p3) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void AbsoluteToLocal( const arcPlane &normal2, face_t *f, arcVec3 &p1, arcVec3 &p2, arcVec3 &p3) {
-	arcVec3	ex, ey, ez;
+void AbsoluteToLocal( const anPlane &normal2, face_t *f, anVec3 &p1, anVec3 &p2, anVec3 &p3) {
+	anVec3	ex, ey, ez;
 
 #ifdef _DEBUG
 	if (g_qeglobals.m_bBrushPrimitMode) {
@@ -1061,7 +1061,7 @@ void AbsoluteToLocal( const arcPlane &normal2, face_t *f, arcVec3 &p1, arcVec3 &
 	Back(ez, p2);
 	Back(ez, p3);
 
-	arcVec3	aux;
+	anVec3	aux;
 
 	// rotation
 	VectorCopy(p2, aux);
@@ -1071,7 +1071,7 @@ void AbsoluteToLocal( const arcPlane &normal2, face_t *f, arcVec3 &p1, arcVec3 &
 	float	y = DotProduct(aux, ey);
 	f->texdef.rotate = RAD2DEG( atan2(y, x) );
 
-	arcVec3	rex, rey;
+	anVec3	rex, rey;
 
 	// computing rotated local axis base
 	VectorCopy(ez, aux);
@@ -1197,7 +1197,7 @@ void Select_Scale(float x, float y, float z) {
 
 		Brush_Build(b, false);
 		if (b->pPatch) {
-			arcVec3	v;
+			anVec3	v;
 			v[0] = x;
 			v[1] = y;
 			v[2] = z;
@@ -1217,7 +1217,7 @@ void Select_CompleteTall( void ) {
 	brush_t *b, *next;
 
 	// int i;
-	arcVec3	mins, maxs;
+	anVec3	mins, maxs;
 
 	if ( !QE_SingleBrush() ) {
 		return;
@@ -1263,7 +1263,7 @@ void Select_PartialTall( void ) {
 	brush_t *b, *next;
 
 	// int i;
-	arcVec3	mins, maxs;
+	anVec3	mins, maxs;
 
 	if ( !QE_SingleBrush() ) {
 		return;
@@ -1321,7 +1321,7 @@ void Select_PartialTall( void ) {
 void Select_Touching( void ) {
 	brush_t *b, *next;
 	int		i;
-	arcVec3	mins, maxs;
+	anVec3	mins, maxs;
 
 	if ( !QE_SingleBrush() ) {
 		return;
@@ -1361,7 +1361,7 @@ void Select_Touching( void ) {
 void Select_Inside( void ) {
 	brush_t *b, *next;
 	int		i;
-	arcVec3	mins, maxs;
+	anVec3	mins, maxs;
 
 	if ( !QE_SingleBrush() ) {
 		return;
@@ -1558,7 +1558,7 @@ void Select_ScaleTexture(float x, float y, bool update, bool absolute) {
 	}
 }
 
-extern void Face_RotateTexture_BrushPrimit(face_t *face, float amount, arcVec3 origin);
+extern void Face_RotateTexture_BrushPrimit(face_t *face, float amount, anVec3 origin);
 
 /*
  =======================================================================================================================
@@ -1598,7 +1598,7 @@ void Select_RotateTexture(float amt, bool absolute) {
 			face_t	*selFace = reinterpret_cast < face_t * > (g_ptrSelectedFaces.GetAt( i ) );
 			brush_t *selBrush = reinterpret_cast < brush_t * > (g_ptrSelectedFaceBrushes.GetAt( i ) );
 			if (g_qeglobals.m_bBrushPrimitMode) {
-				arcVec3 org;
+				anVec3 org;
 				org.Zero();
 				//Face_RotateTexture_BrushPrimit(selFace, amt, selBrush->owner->origin);
 				Face_RotateTexture_BrushPrimit(selFace, amt, org);
@@ -1632,7 +1632,7 @@ void FindReplaceTextures(const char *pFind, const char *pReplace, bool bSelected
 		}
 
 		for (face_t * pFace = pBrush->brush_faces; pFace; pFace = pFace->next) {
-			if (bForce || arcNetString::Icmp(pFace->texdef.name, pFind) == 0 ) {
+			if (bForce || anString::Icmp(pFace->texdef.name, pFind) == 0 ) {
 				pFace->d_texture = Texture_ForName(pReplace);
 
 				// strcpy(pFace->texdef.name, pReplace);
@@ -1672,14 +1672,14 @@ void Select_AllOfType() {
 			}
 
 			if (b->pPatch) {
-				if ( arcNetString::Icmp(strName, b->pPatch->d_texture->GetName() ) == 0 ) {
+				if ( anString::Icmp(strName, b->pPatch->d_texture->GetName() ) == 0 ) {
 					Brush_RemoveFromList( b );
 					Brush_AddToList(b, &selected_brushes);
 				}
 			}
 			else {
 				for (face_t * pFace = b->brush_faces; pFace; pFace = pFace->next) {
-					if ( arcNetString::Icmp(strName, pFace->texdef.name) == 0 ) {
+					if ( anString::Icmp(strName, pFace->texdef.name) == 0 ) {
 						Brush_RemoveFromList( b );
 						Brush_AddToList(b, &selected_brushes);
 					}
@@ -1693,10 +1693,10 @@ void Select_AllOfType() {
 
 	b = selected_brushes.next;
 	e = b->owner;
-	if (e != NULL) {
+	if (e != nullptr ) {
 		if (e != world_entity) {
 			CString strName = e->eclass->name;
-			arcNetString strKey, strVal;
+			anString strKey, strVal;
 			bool	bCriteria = g_Inspectors->GetSelectAllCriteria(strKey, strVal);
 			common->Printf( "Selecting all %s(s)\n", strName);
 			Select_Deselect();
@@ -1709,8 +1709,8 @@ void Select_AllOfType() {
 				}
 
 				e = b->owner;
-				if (e != NULL) {
-					if ( arcNetString::Icmp(e->eclass->name, strName) == 0 ) {
+				if (e != nullptr ) {
+					if ( anString::Icmp(e->eclass->name, strName) == 0 ) {
 						bool	doIt = true;
 						if (bCriteria) {
 							CString str = ValueForKey(e, strKey);
@@ -1906,14 +1906,14 @@ void Select_Name(const char *pName) {
  =======================================================================================================================
  */
 void Select_CenterOrigin() {
-	arcVec3	mid;
+	anVec3	mid;
 
 	Select_GetTrueMid(mid);
 	mid.Snap();
 
 	brush_t		*b = selected_brushes.next;
 	entity_t	*e = b->owner;
-	if (e != NULL) {
+	if (e != nullptr ) {
 		if (e != world_entity) {
 			char	text[1024];
 			sprintf(text, "%i %i %i", ( int )mid[0], ( int )mid[1], ( int )mid[2] );
@@ -1955,7 +1955,7 @@ brush_t *Select_GetSelectedFaceBrush( int index ) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void Select_SetDefaultTexture(const arcMaterial *mat, bool fitScale, bool setTexture) {
+void Select_SetDefaultTexture(const anMaterial *mat, bool fitScale, bool setTexture) {
 	texdef_t				tex;
 	brushprimit_texdef_t	brushprimit_tex;
 	memset(&tex, 0, sizeof(tex) );
@@ -2011,7 +2011,7 @@ void Select_UpdateTextureName(const char *name) {
 				Brush_SetTextureName(b, name);
 				Undo_EndBrush( b );
 			} else if (b->owner->eclass->nShowFlags & ECLASS_LIGHT) {
-				if ( arcNetString::Cmpn(name, "lights/", strlen( "lights/" ) ) == 0 ) {
+				if ( anString::Cmpn(name, "lights/", strlen( "lights/" ) ) == 0 ) {
 					SetKeyValue(b->owner, "texture", name);
 					g_Inspectors->UpdateEntitySel(b->owner->eclass);
 					UpdateLightInspector();
@@ -2101,7 +2101,7 @@ void Select_CopyPatchTextureCoords( patchMesh_t *p ) {
 void Select_ProjectFaceOntoPatch( face_t *face ) {
 	for (brush_t * b = selected_brushes.next; b && b != &selected_brushes; b = b->next) {
 		if (b->pPatch) {
-			EmitBrushPrimitTextureCoordinates(face, NULL, b->pPatch);
+			EmitBrushPrimitTextureCoordinates(face, nullptr, b->pPatch);
 			Patch_MakeDirty(b->pPatch);
 		}
 	}
@@ -2133,7 +2133,7 @@ void Select_SetPatchST(float s1, float t1, float s2, float t2) {
 void Select_AllTargets() {
 	for (brush_t * b = selected_brushes.next; b && b != &selected_brushes; b = b->next) {
 		if (b->owner != world_entity) {
-			const idKeyValue *kv = b->owner->epairs.MatchPrefix( "target", NULL);
+			const anKeyValue *kv = b->owner->epairs.MatchPrefix( "target", nullptr );
 			while (kv) {
 				entity_t *ent = FindEntity( "name", kv->GetValue() );
 				if (ent) {

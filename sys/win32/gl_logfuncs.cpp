@@ -45,7 +45,7 @@ static GLboolean APIENTRY logAreTexturesResident(GLsizei n, const GLuint *textur
 
 static void APIENTRY logArrayElement(GLint i) {
 	fprintf( tr.logFile, "glArrayElement %d\n", i );
-	dllArrayElement(i);
+	dllArrayElement( i );
 }
 
 static void APIENTRY logBegin(GLenum mode) {
@@ -65,8 +65,8 @@ static void APIENTRY logBitmap(GLsizei width, GLsizei height, GLfloat xorig, GLf
 }
 
 static void APIENTRY logBlendFunc(GLenum sfactor, GLenum dfactor) {
-	fprintf( tr.logFile, "glBlendFunc %s %s\n", EnumString(sfactor), EnumString(dfactor) );
-	dllBlendFunc(sfactor, dfactor);
+	fprintf( tr.logFile, "glBlendFunc %s %s\n", EnumString( sfactor), EnumString(dfactor) );
+	dllBlendFunc( sfactor, dfactor);
 }
 
 static void APIENTRY logCallList(GLuint list) {
@@ -109,7 +109,7 @@ static void APIENTRY logClearIndex(GLfloat c) {
 
 static void APIENTRY logClearStencil(GLint s) {
 	fprintf( tr.logFile, "glClearStencil %d\n", s );
-	dllClearStencil(s);
+	dllClearStencil( s);
 }
 
 static void APIENTRY logClipPlane(GLenum plane, const GLdouble *equation) {
@@ -307,7 +307,7 @@ static void APIENTRY logColorMaterial(GLenum face, GLenum mode) {
 static void APIENTRY logColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) {
 // unknown type: "const GLvoid *" name: "pointer"
 	fprintf( tr.logFile, "glColorPointer %d %s %d 'const GLvoid * pointer'\n", size, EnumString(type), stride );
-	dllColorPointer(size, type, stride, pointer);
+	dllColorPointer( size, type, stride, pointer);
 }
 
 static void APIENTRY logCopyPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum type) {
@@ -408,7 +408,7 @@ static void APIENTRY logEdgeFlag(GLboolean flag) {
 static void APIENTRY logEdgeFlagPointer(GLsizei stride, const GLvoid *pointer) {
 // unknown type: "const GLvoid *" name: "pointer"
 	fprintf( tr.logFile, "glEdgeFlagPointer %d 'const GLvoid * pointer'\n", stride );
-	dllEdgeFlagPointer(stride, pointer);
+	dllEdgeFlagPointer( stride, pointer);
 }
 
 static void APIENTRY logEdgeFlagv(const GLboolean *flag) {
@@ -493,7 +493,7 @@ static void APIENTRY logEvalMesh2(GLenum mode, GLint i1, GLint i2, GLint j1, GLi
 
 static void APIENTRY logEvalPoint1(GLint i) {
 	fprintf( tr.logFile, "glEvalPoint1 %d\n", i );
-	dllEvalPoint1(i);
+	dllEvalPoint1( i );
 }
 
 static void APIENTRY logEvalPoint2(GLint i, GLint j) {
@@ -504,7 +504,7 @@ static void APIENTRY logEvalPoint2(GLint i, GLint j) {
 static void APIENTRY logFeedbackBuffer(GLsizei size, GLenum type, GLfloat *buffer) {
 // unknown type: "GLfloat *" name: "buffer"
 	fprintf( tr.logFile, "glFeedbackBuffer %d %s 'GLfloat * buffer'\n", size, EnumString(type) );
-	dllFeedbackBuffer(size, type, buffer);
+	dllFeedbackBuffer( size, type, buffer);
 }
 
 static void APIENTRY logFinish(void) {
@@ -1119,7 +1119,7 @@ static void APIENTRY logPixelZoom(GLfloat xfactor, GLfloat yfactor) {
 
 static void APIENTRY logPointSize(GLfloat size) {
 	fprintf( tr.logFile, "glPointSize %g\n", size );
-	dllPointSize(size);
+	dllPointSize( size);
 }
 
 static void APIENTRY logPolygonMode(GLenum face, GLenum mode) {
@@ -1411,7 +1411,7 @@ static void APIENTRY logScissor(GLint x, GLint y, GLsizei width, GLsizei height)
 static void APIENTRY logSelectBuffer(GLsizei size, GLuint *buffer) {
 // unknown type: "GLuint *" name: "buffer"
 	fprintf( tr.logFile, "glSelectBuffer %d 'GLuint * buffer'\n", size );
-	dllSelectBuffer(size, buffer);
+	dllSelectBuffer( size, buffer);
 }
 
 static void APIENTRY logShadeModel(GLenum mode) {
@@ -1436,7 +1436,7 @@ static void APIENTRY logStencilOp(GLenum fail, GLenum zfail, GLenum zpass) {
 
 static void APIENTRY logTexCoord1d(GLdouble s) {
 	fprintf( tr.logFile, "glTexCoord1d %g\n", s );
-	dllTexCoord1d(s);
+	dllTexCoord1d( s);
 }
 
 static void APIENTRY logTexCoord1dv(const GLdouble *v) {
@@ -1447,7 +1447,7 @@ static void APIENTRY logTexCoord1dv(const GLdouble *v) {
 
 static void APIENTRY logTexCoord1f(GLfloat s) {
 	fprintf( tr.logFile, "glTexCoord1f %g\n", s );
-	dllTexCoord1f(s);
+	dllTexCoord1f( s);
 }
 
 static void APIENTRY logTexCoord1fv(const GLfloat *v) {
@@ -1458,7 +1458,7 @@ static void APIENTRY logTexCoord1fv(const GLfloat *v) {
 
 static void APIENTRY logTexCoord1i(GLint s) {
 	fprintf( tr.logFile, "glTexCoord1i %d\n", s );
-	dllTexCoord1i(s);
+	dllTexCoord1i( s);
 }
 
 static void APIENTRY logTexCoord1iv(const GLint *v) {
@@ -1469,7 +1469,7 @@ static void APIENTRY logTexCoord1iv(const GLint *v) {
 
 static void APIENTRY logTexCoord1s(GLshort s) {
 	fprintf( tr.logFile, "glTexCoord1s %d\n", s );
-	dllTexCoord1s(s);
+	dllTexCoord1s( s);
 }
 
 static void APIENTRY logTexCoord1sv(const GLshort *v) {
@@ -1480,7 +1480,7 @@ static void APIENTRY logTexCoord1sv(const GLshort *v) {
 
 static void APIENTRY logTexCoord2d(GLdouble s, GLdouble t) {
 	fprintf( tr.logFile, "glTexCoord2d %g %g\n", s, t );
-	dllTexCoord2d(s, t);
+	dllTexCoord2d( s, t);
 }
 
 static void APIENTRY logTexCoord2dv(const GLdouble *v) {
@@ -1491,7 +1491,7 @@ static void APIENTRY logTexCoord2dv(const GLdouble *v) {
 
 static void APIENTRY logTexCoord2f(GLfloat s, GLfloat t) {
 	fprintf( tr.logFile, "glTexCoord2f %g %g\n", s, t );
-	dllTexCoord2f(s, t);
+	dllTexCoord2f( s, t);
 }
 
 static void APIENTRY logTexCoord2fv(const GLfloat *v) {
@@ -1502,7 +1502,7 @@ static void APIENTRY logTexCoord2fv(const GLfloat *v) {
 
 static void APIENTRY logTexCoord2i(GLint s, GLint t) {
 	fprintf( tr.logFile, "glTexCoord2i %d %d\n", s, t );
-	dllTexCoord2i(s, t);
+	dllTexCoord2i( s, t);
 }
 
 static void APIENTRY logTexCoord2iv(const GLint *v) {
@@ -1513,7 +1513,7 @@ static void APIENTRY logTexCoord2iv(const GLint *v) {
 
 static void APIENTRY logTexCoord2s(GLshort s, GLshort t) {
 	fprintf( tr.logFile, "glTexCoord2s %d %d\n", s, t );
-	dllTexCoord2s(s, t);
+	dllTexCoord2s( s, t);
 }
 
 static void APIENTRY logTexCoord2sv(const GLshort *v) {
@@ -1524,7 +1524,7 @@ static void APIENTRY logTexCoord2sv(const GLshort *v) {
 
 static void APIENTRY logTexCoord3d(GLdouble s, GLdouble t, GLdouble r) {
 	fprintf( tr.logFile, "glTexCoord3d %g %g %g\n", s, t, r );
-	dllTexCoord3d(s, t, r);
+	dllTexCoord3d( s, t, r);
 }
 
 static void APIENTRY logTexCoord3dv(const GLdouble *v) {
@@ -1535,7 +1535,7 @@ static void APIENTRY logTexCoord3dv(const GLdouble *v) {
 
 static void APIENTRY logTexCoord3f(GLfloat s, GLfloat t, GLfloat r) {
 	fprintf( tr.logFile, "glTexCoord3f %g %g %g\n", s, t, r );
-	dllTexCoord3f(s, t, r);
+	dllTexCoord3f( s, t, r);
 }
 
 static void APIENTRY logTexCoord3fv(const GLfloat *v) {
@@ -1546,7 +1546,7 @@ static void APIENTRY logTexCoord3fv(const GLfloat *v) {
 
 static void APIENTRY logTexCoord3i(GLint s, GLint t, GLint r) {
 	fprintf( tr.logFile, "glTexCoord3i %d %d %d\n", s, t, r );
-	dllTexCoord3i(s, t, r);
+	dllTexCoord3i( s, t, r);
 }
 
 static void APIENTRY logTexCoord3iv(const GLint *v) {
@@ -1557,7 +1557,7 @@ static void APIENTRY logTexCoord3iv(const GLint *v) {
 
 static void APIENTRY logTexCoord3s(GLshort s, GLshort t, GLshort r) {
 	fprintf( tr.logFile, "glTexCoord3s %d %d %d\n", s, t, r );
-	dllTexCoord3s(s, t, r);
+	dllTexCoord3s( s, t, r);
 }
 
 static void APIENTRY logTexCoord3sv(const GLshort *v) {
@@ -1568,7 +1568,7 @@ static void APIENTRY logTexCoord3sv(const GLshort *v) {
 
 static void APIENTRY logTexCoord4d(GLdouble s, GLdouble t, GLdouble r, GLdouble q) {
 	fprintf( tr.logFile, "glTexCoord4d %g %g %g %g\n", s, t, r, q );
-	dllTexCoord4d(s, t, r, q);
+	dllTexCoord4d( s, t, r, q);
 }
 
 static void APIENTRY logTexCoord4dv(const GLdouble *v) {
@@ -1579,7 +1579,7 @@ static void APIENTRY logTexCoord4dv(const GLdouble *v) {
 
 static void APIENTRY logTexCoord4f(GLfloat s, GLfloat t, GLfloat r, GLfloat q) {
 	fprintf( tr.logFile, "glTexCoord4f %g %g %g %g\n", s, t, r, q );
-	dllTexCoord4f(s, t, r, q);
+	dllTexCoord4f( s, t, r, q);
 }
 
 static void APIENTRY logTexCoord4fv(const GLfloat *v) {
@@ -1590,7 +1590,7 @@ static void APIENTRY logTexCoord4fv(const GLfloat *v) {
 
 static void APIENTRY logTexCoord4i(GLint s, GLint t, GLint r, GLint q) {
 	fprintf( tr.logFile, "glTexCoord4i %d %d %d %d\n", s, t, r, q );
-	dllTexCoord4i(s, t, r, q);
+	dllTexCoord4i( s, t, r, q);
 }
 
 static void APIENTRY logTexCoord4iv(const GLint *v) {
@@ -1601,7 +1601,7 @@ static void APIENTRY logTexCoord4iv(const GLint *v) {
 
 static void APIENTRY logTexCoord4s(GLshort s, GLshort t, GLshort r, GLshort q) {
 	fprintf( tr.logFile, "glTexCoord4s %d %d %d %d\n", s, t, r, q );
-	dllTexCoord4s(s, t, r, q);
+	dllTexCoord4s( s, t, r, q);
 }
 
 static void APIENTRY logTexCoord4sv(const GLshort *v) {
@@ -1613,7 +1613,7 @@ static void APIENTRY logTexCoord4sv(const GLshort *v) {
 static void APIENTRY logTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) {
 // unknown type: "const GLvoid *" name: "pointer"
 	fprintf( tr.logFile, "glTexCoordPointer %d %s %d 'const GLvoid * pointer'\n", size, EnumString(type), stride );
-	dllTexCoordPointer(size, type, stride, pointer);
+	dllTexCoordPointer( size, type, stride, pointer);
 }
 
 static void APIENTRY logTexEnvf(GLenum target, GLenum pname, GLfloat param) {
@@ -1862,7 +1862,7 @@ static void APIENTRY logVertex4sv(const GLshort *v) {
 static void APIENTRY logVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) {
 // unknown type: "const GLvoid *" name: "pointer"
 	fprintf( tr.logFile, "glVertexPointer %d %s %d 'const GLvoid * pointer'\n", size, EnumString(type), stride );
-	dllVertexPointer(size, type, stride, pointer);
+	dllVertexPointer( size, type, stride, pointer);
 }
 
 static void APIENTRY logViewport(GLint x, GLint y, GLsizei width, GLsizei height) {

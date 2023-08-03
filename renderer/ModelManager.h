@@ -28,18 +28,18 @@ public:
 	virtual void			EndLevelLoad() = 0;
 
 	// allocates a new empty render model.
-	virtual ARCRenderModel	*AllocModel() = 0;
+	virtual anRenderModel	*AllocModel() = 0;
 
 	// frees a render model
-	virtual void			FreeModel( ARCRenderModel *model ) = 0;
+	virtual void			FreeModel( anRenderModel *model ) = 0;
 
-	// returns NULL if modelName is NULL or an empty string, otherwise
+	// returns nullptr if modelName is nullptr or an empty string, otherwise
 	// it will create a default model if not loadable
-	virtual	ARCRenderModel	*FindModel( const char *modelName ) = 0;
+	virtual	anRenderModel	*FindModel( const char *modelName ) = 0;
 	virtual srfTriangles_t	*AllocStaticTriSurf( int verts, int indices ) = 0;
 	virtual void			FreeStaticTriSurf( srfTriangles_t *tris ) = 0;
 	virtual srfTriangles_t	*CopyStaticTriSurf( const srfTriangles_t *tri ) = 0;
-	virtual	srfTriangles_t	*PolytopeSurface( int numPlanes, const arcPlane *planes, idWinding **windings ) = 0;
+	virtual	srfTriangles_t	*PolytopeSurface( int numPlanes, const anPlane *planes, idWinding **windings ) = 0;
 	virtual void			CreateSilIndexes( srfTriangles_t *tris ) = 0;
 	virtual void			DeriveFacePlanes( srfTriangles_t *tris ) = 0;
 	virtual	void			BoundTriSurf( srfTriangles_t *tri ) = 0;
@@ -50,27 +50,27 @@ public:
 	virtual class idRenderLight	*CreateLightDef( void ) = 0;
 	virtual void			FreeLightDef( class idRenderLight *light ) = 0;
 
-	//virtual bool				CheckModel( ARCRenderModel *model ) = 0;
-	// returns NULL if not loadable
-	virtual	ARCRenderModel *CheckModel( const char *modelName ) = 0;
+	//virtual bool				CheckModel( anRenderModel *model ) = 0;
+	// returns nullptr if not loadable
+	virtual	anRenderModel *CheckModel( const char *modelName ) = 0;
 
 	// returns the default cube model
-	virtual	ARCRenderModel *DefaultModel() = 0;
+	virtual	anRenderModel *DefaultModel() = 0;
 
 	// world map parsing will add all the inline models with this call
-	virtual	void			AddModel( ARCRenderModel *model ) = 0;
+	virtual	void			AddModel( anRenderModel *model ) = 0;
 
 	// when a world map unloads, it removes its internal models from the list
 	// before freeing them.
 	// There may be an issue with multiple renderWorlds that share data...
-	virtual	void			RemoveModel( ARCRenderModel *model ) = 0;
+	virtual	void			RemoveModel( anRenderModel *model ) = 0;
 
 	// the reloadModels console command calls this, but it can
 	// also be explicitly invoked
 	virtual	void			ReloadModels( bool forceAll = false ) = 0;
 
 	// write "touchModel <model>" commands for each non-world-map model
-	virtual	void			WritePrecacheCommands( arcNetFile *f ) = 0;
+	virtual	void			WritePrecacheCommands( anFile *f ) = 0;
 
 	// called during vid_restart
 	virtual	void			FreeModelVertexCaches() = 0;

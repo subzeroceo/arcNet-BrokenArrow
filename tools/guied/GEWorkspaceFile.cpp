@@ -1,9 +1,9 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "GEApp.h"
 
-bool GECheckInDlg_DoModal( HWND parent, const char* filename, arcNetString* comment );
+bool GECheckInDlg_DoModal( HWND parent, const char* filename, anString* comment );
 
 /*
 ================
@@ -13,16 +13,16 @@ Writes the contents of the open gui file to disk
 ================
 */
 bool rvGEWorkspace::SaveFile( const char* filename ) {
-	arcNetFile*		file;
+	anFile*		file;
 	idWindow*	window;
 
-	SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_WAIT ) ) );
+	SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_WAIT ) ) );
 
 	mFilename = filename;
 
 	// Since quake can only write to its path we will write a temp file then copy it over
-	arcNetString tempfile;
-	arcNetString ospath;
+	anString tempfile;
+	anString ospath;
 
 	tempfile = "guis/temp.guied";
 	ospath = fileSystem->RelativePathToOSPath( tempfile, "fs_basepath" );
@@ -31,7 +31,7 @@ bool rvGEWorkspace::SaveFile( const char* filename ) {
 	if ( !(file = fileSystem->OpenFileWrite( tempfile ) ) )
 	{
 		int error = GetLastError( );
-		SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_ARROW ) ) );
+		SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_ARROW ) ) );
 		return false;
 	}
 
@@ -44,7 +44,7 @@ bool rvGEWorkspace::SaveFile( const char* filename ) {
 	if ( !CopyFile( ospath, filename, FALSE ) )
 	{
 		DeleteFile( ospath );
-		SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_ARROW ) ) );
+		SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_ARROW ) ) );
 		return false;
 	}
 
@@ -55,7 +55,7 @@ bool rvGEWorkspace::SaveFile( const char* filename ) {
 	mNew      = false;
 	UpdateTitle( );
 
-	SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_ARROW ) ) );
+	SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_ARROW ) ) );
 
 	return true;
 }
@@ -67,7 +67,7 @@ rvGEWorkspace::WriteTabs
 Writes the given number of tabs to the given file
 ================
 */
-void rvGEWorkspace::WriteTabs( arcNetFile* file, int depth  )
+void rvGEWorkspace::WriteTabs( anFile* file, int depth  )
 {
 	int i;
 
@@ -84,9 +84,9 @@ rvGEWorkspace::WriteWindow
 Writes the contents of the given window to the file
 ================
 */
-bool rvGEWorkspace::WriteWindow( arcNetFile* file, int depth, idWindow* window )
+bool rvGEWorkspace::WriteWindow( anFile* file, int depth, idWindow* window )
 {
-	arcNetString				out;
+	anString				out;
 	rvGEWindowWrapper*	wrapper;
 	int					i;
 
@@ -120,7 +120,7 @@ bool rvGEWorkspace::WriteWindow( arcNetFile* file, int depth, idWindow* window )
 
 	for ( i = 0; i < wrapper->GetStateDict().GetNumKeyVals(); i ++ )
 	{
-		const idKeyValue* key = wrapper->GetStateDict().GetKeyVal( i );
+		const anKeyValue* key = wrapper->GetStateDict().GetKeyVal( i );
 
 		// Dont write name to the files
 		if ( !key->GetKey().Icmp( "name" ) )
@@ -137,7 +137,7 @@ bool rvGEWorkspace::WriteWindow( arcNetFile* file, int depth, idWindow* window )
 		const char* p;
 		for ( p = key->GetValue().c_str(); *p; p ++ )
 		{
-			switch( *p )
+			switch ( *p )
 			{
 				case '\n':
 					file->Write( "\\n", 2 );
@@ -154,7 +154,7 @@ bool rvGEWorkspace::WriteWindow( arcNetFile* file, int depth, idWindow* window )
 
 	for ( i = 0; i < wrapper->GetVariableDict().GetNumKeyVals(); i ++ )
 	{
-		const idKeyValue* key = wrapper->GetVariableDict().GetKeyVal( i );
+		const anKeyValue* key = wrapper->GetVariableDict().GetKeyVal( i );
 
 		WriteTabs( file, depth );
 
@@ -173,14 +173,14 @@ bool rvGEWorkspace::WriteWindow( arcNetFile* file, int depth, idWindow* window )
 
 	for ( i = 0; i < wrapper->GetScriptDict().GetNumKeyVals(); i ++ )
 	{
-		const idKeyValue* key = wrapper->GetScriptDict().GetKeyVal( i );
+		const anKeyValue* key = wrapper->GetScriptDict().GetKeyVal( i );
 
 		WriteTabs( file, depth );
 
 		file->Write( key->GetKey(), key->GetKey().Length() );
 		file->Write( " ", 1 );
 
-		arcLexer src( key->GetValue(), key->GetValue().Length(), "", LEXFL_ALLOWMULTICHARLITERALS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+		anLexer src( key->GetValue(), key->GetValue().Length(), "", LEXFL_ALLOWMULTICHARLITERALS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
 		src.ParseBracedSectionExact( out, depth + 1 );
 
 		file->Write( out, out.Length() );
@@ -214,9 +214,9 @@ Opens a new file for editing
 */
 bool rvGEWorkspace::NewFile( void )
 {
-	arcNetString	empty;
-	arcNetString	ospath;
-	arcNetFile*	file;
+	anString	empty;
+	anString	ospath;
+	anFile*	file;
 
 	// Make a temporary file with nothing in it so we can just use
 	// load to do all the work
@@ -224,7 +224,7 @@ bool rvGEWorkspace::NewFile( void )
 	DeleteFile( ospath );
 
 	file = fileSystem->OpenFileWrite( "guis/Untitled.guiednew" );
-	if ( NULL == file )
+	if ( nullptr == file )
 	{
 		return false;
 	}
@@ -234,7 +234,7 @@ bool rvGEWorkspace::NewFile( void )
 	fileSystem->CloseFile( file );
 
 	// Load the temporary file
-	if ( !LoadFile( ospath, NULL ) )
+	if ( !LoadFile( ospath, nullptr ) )
 	{
 		// Ensure the temp file doesnt hang around
 		DeleteFile( ospath );
@@ -262,21 +262,21 @@ rvGEWorkspace::LoadFile
 Loads the given gui file.
 ================
 */
-bool rvGEWorkspace::LoadFile( const char* filename, arcNetString* error )
+bool rvGEWorkspace::LoadFile( const char* filename, anString* error )
 {
 	delete mInterface;
 
-	arcNetString tempfile;
-	arcNetString ospath;
+	anString tempfile;
+	anString ospath;
 	bool  result;
 
 	tempfile = "guis/temp.guied";
 	ospath = fileSystem->RelativePathToOSPath( tempfile, "fs_basepath" );
 
 	// Make sure the gui directory exists
-	arcNetString createDir = ospath;
+	anString createDir = ospath;
 	createDir.StripFilename( );
-	CreateDirectory( createDir, NULL );
+	CreateDirectory( createDir, nullptr );
 
 	SetFileAttributes( ospath, FILE_ATTRIBUTE_NORMAL );
 	DeleteFile( ospath );
@@ -295,7 +295,7 @@ bool rvGEWorkspace::LoadFile( const char* filename, arcNetString* error )
 	UpdateTitle( );
 
 	// Let the real window system parse it first
-	mInterface = NULL;
+	mInterface = nullptr;
 	result     = true;
 	try
 	{

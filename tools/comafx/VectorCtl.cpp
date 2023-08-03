@@ -1,4 +1,4 @@
- #include "..//idlib/precompiled.h"
+ #include "..//idlib/Lib.h"
 #pragma hdrstop
 
 
@@ -27,12 +27,12 @@ CVectorCtl::CVectorCtl() :
     m_bSelected (FALSE),
     m_bFrontVector (FALSE),
     m_dSensitivity (20.0 ),
-    m_procVectorChanging (NULL),
-    m_procVectorChanged (NULL) {
+    m_procVectorChanging (nullptr ),
+    m_procVectorChanged (nullptr ) {
     double DefaultVec[3] = DEFAULT_VEC;
     for ( int i=0; i<3; i++ ) {
         m_dVec[i] = DefaultVec[i];
-        pCtl[i] = NULL;
+        pCtl[i] = nullptr;
     }
 
 	rotationQuat.Set( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -127,15 +127,15 @@ COLORREF CVectorCtl::CalcLight(double dx, double dy, double dz) {
 
     int  r = int (  double(GetRValue(m_clrDiffuse) ) * NL +  // Diffuse
                     double(GetRValue(m_clrLight) ) * RV +    // Specular
-                    double(GetRValue(m_clrAmbient) )),       // Ambient
+                    double(GetRValue(m_clrAmbient) ) ),       // Ambient
 
          g = int (  double(GetGValue(m_clrDiffuse) ) * NL +  // Diffuse
                     double(GetGValue(m_clrLight) ) * RV +    // Specular
-                    double(GetGValue(m_clrAmbient) )),       // Ambient
+                    double(GetGValue(m_clrAmbient) ) ),       // Ambient
 
          b = int (  double(GetBValue(m_clrDiffuse) ) * NL +  // Diffuse
                     double(GetBValue(m_clrLight) ) * RV +    // Specular
-                    double(GetBValue(m_clrAmbient) ));       // Ambient
+                    double(GetBValue(m_clrAmbient) ) );       // Ambient
 
     r = min (255, r);   // Cutoff highlight
     g = min (255, g);
@@ -270,7 +270,7 @@ void CVectorCtl::CreateBackground() {
                bd = double(GetBValue (m_clrBackgroundEnd) - b) / double (m_iHeight);
         for ( int j = 0; j<m_iHeight; j++ ) {
             for ( int i=0; i<m_iWidth; i++ )
-                m_dcMem.SetPixelV ( i,j, RGB (BYTE(r),BYTE(g),BYTE( b ) ));
+                m_dcMem.SetPixelV ( i,j, RGB (BYTE(r),BYTE(g),BYTE( b ) ) );
             r+=rd; g+=gd; b+=bd;
         }
         Redraw( TRUE );
@@ -322,19 +322,19 @@ void CVectorCtl::OnMouseMove(UINT nFlags, CPoint point) {
 	float curX = ( float )( 2 * point.x - 64 ) / 64;
 	float curY = ( float )( 2 * point.y - 64 ) / 64;
 
-	arcVec3 to( -curX, -curY, 0.0f );
+	anVec3 to( -curX, -curY, 0.0f );
 	to.ProjectSelfOntoSphere( radius );
 	lastPress.ProjectSelfOntoSphere( radius );
 
-	arcVec3 axis;
+	anVec3 axis;
 	axis.Cross( to, lastPress );
 	float len = ( lastPress - to ).Length() / ( 2.0f * radius );
-	len = arcMath::ClampFloat( -1.0f, 1.0f, len );
+	len = anMath::ClampFloat( -1.0f, 1.0f, len );
 	float phi = 2.0f * asin ( len ) ;
 
 	axis.Normalize();
 	axis *= sin( phi / 2.0f );
-	arcQuats rot( axis.z, axis.y, axis.x, cos( phi / 2.0f ) );
+	anQuats rot( axis.z, axis.y, axis.x, cos( phi / 2.0f ) );
 	rot.Normalize();
 
 	rotationQuat *= rot;

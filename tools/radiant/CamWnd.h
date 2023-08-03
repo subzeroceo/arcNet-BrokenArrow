@@ -16,15 +16,15 @@ typedef enum {
 typedef struct {
 	int			width, height;
 
-	arcVec3		origin;
-	arcAngles	angles;
+	anVec3		origin;
+	anAngles	angles;
 
 	camera_draw_mode	draw_mode;
 
-	arcVec3		color;			// background
+	anVec3		color;			// background
 
-	arcVec3		forward, right, up;	// move matrix
-	arcVec3		vup, vpn, vright;	// view matrix
+	anVec3		forward, right, up;	// move matrix
+	anVec3		vup, vpn, vright;	// view matrix
 } camera_t;
 
 // CCamWnd window
@@ -92,7 +92,7 @@ public:
 	bool UpdateRenderEntities();
 	void MarkWorldDirty();
 
-	void SetView( const arcVec3 &origin, const arcAngles &angles ) {
+	void SetView( const anVec3 &origin, const anAngles &angles ) {
 		m_Camera.origin = origin;
 		m_Camera.angles = angles;
 	}
@@ -112,7 +112,7 @@ protected:
 
 	// game renderer interaction
 	arcNetHandle_t	worldModelDef;
-	ARCRenderModel	*worldModel;		// createRawModel of the brush and patch geometry
+	anRenderModel	*worldModel;		// createRawModel of the brush and patch geometry
 	bool	worldDirty;
 	bool	renderMode;
 	bool	rebuildMode;
@@ -131,13 +131,13 @@ protected:
 	CPoint m_ptCursor;
 	CPoint m_ptLastCursor;
 	face_t* m_pSide_select;
-	arcVec3 m_vCull1;
-	arcVec3 m_vCull2;
+	anVec3 m_vCull1;
+	anVec3 m_vCull2;
 	int m_nCullv1[3];
 	int m_nCullv2[3];
 	bool m_bClipMode;
-	arcVec3 saveOrg;
-	arcAngles saveAng;
+	anVec3 saveOrg;
+	anAngles saveAng;
 	bool saveValid;
 
 	// Generated message map functions

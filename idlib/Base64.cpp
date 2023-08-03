@@ -1,14 +1,14 @@
 
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 /*
 ============
-ARCEncodeBase64::Encode
+anEncodeBase64::Encode
 ============
 */
 static const char sixtet_to_base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-void ARCEncodeBase64::Encode( const byte *from, int size ) {
+void anEncodeBase64::Encode( const byte *from, int size ) {
 	EnsureAlloced( 4*( size + 3 )/3 + 2 ); // ratio and padding + trailing \0
 	byte *to = data;
 
@@ -41,21 +41,21 @@ void ARCEncodeBase64::Encode( const byte *from, int size ) {
 
 /*
 ============
-ARCEncodeBase64::DecodeLength
+anEncodeBase64::DecodeLength
 returns the minimum size in bytes of the target buffer for decoding
 4 base64 digits <-> 3 bytes
 ============
 */
-int ARCEncodeBase64::DecodeLength( void ) const {
+int anEncodeBase64::DecodeLength( void ) const {
 	return 3*len/4;
 }
 
 /*
 ============
-ARCEncodeBase64::Decode
+anEncodeBase64::Decode
 ============
 */
-int ARCEncodeBase64::Decode( byte *to ) const {
+int anEncodeBase64::Decode( byte *to ) const {
 	static char base64_to_sixtet[256];
 	static int tab_init = 0;
 	byte *from = data;
@@ -99,19 +99,19 @@ int ARCEncodeBase64::Decode( byte *to ) const {
 
 /*
 ============
-ARCEncodeBase64::Encode
+anEncodeBase64::Encode
 ============
 */
-void ARCEncodeBase64::Encode( const arcNetString &src ) {
+void anEncodeBase64::Encode( const anString &src ) {
 	Encode( (const byte *)src.c_str(), src.Length() );
 }
 
 /*
 ============
-ARCEncodeBase64::Decode
+anEncodeBase64::Decode
 ============
 */
-void ARCEncodeBase64::Decode( arcNetString &dest ) const {
+void anEncodeBase64::Decode( anString &dest ) const {
 	byte *buf = new byte[ DecodeLength()+1 ]; // +1 for trailing \0
 	int out = Decode( buf );
 	buf[out] = '\0';
@@ -121,10 +121,10 @@ void ARCEncodeBase64::Decode( arcNetString &dest ) const {
 
 /*
 ============
-ARCEncodeBase64::Decode
+anEncodeBase64::Decode
 ============
 */
-void ARCEncodeBase64::Decode( arcNetFile *dest ) const {
+void anEncodeBase64::Decode( anFile *dest ) const {
 	byte *buf = new byte[ DecodeLength()+1 ]; // +1 for trailing \0
 	int out = Decode( buf );
 	dest->Write( buf, out );
@@ -133,61 +133,61 @@ void ARCEncodeBase64::Decode( arcNetFile *dest ) const {
 
 #if 0
 void idBase64_TestBase64() {
-	arcNetString src;
-	ARCEncodeBase64 dest;
+	anString src;
+	anEncodeBase64 dest;
 	src = "Encode me in base64";
 	dest.Encode( src );
-	arcLibrary::common->Printf( "%s -> %s\n", src.c_str(), dest.c_str() );
+	anLibrary::common->Printf( "%s -> %s\n", src.c_str(), dest.c_str() );
 	dest.Decode( src );
-	arcLibrary::common->Printf( "%s -> %s\n", dest.c_str(), src.c_str() );
+	anLibrary::common->Printf( "%s -> %s\n", dest.c_str(), src.c_str() );
 
-	arcDictionary src_dict;
+	anDict src_dict;
 	src_dict.SetFloat( "float", 0.5f);
 	src_dict.SetBool( "bool", true );
 	src_dict.Set( "value", "foo" );
-	aRcFileMemory src_fmem( "serialize_dict" );
+	anFileMemory src_fmem( "serialize_dict" );
 	src_dict.WriteToFileHandle( &src_fmem );
 	dest.Encode( (const byte *)src_fmem.GetDataPtr(), src_fmem.Length() );
-	arcLibrary::common->Printf( "arcDictionary encoded to %s\n", dest.c_str() );
+	anLibrary::common->Printf( "anDict encoded to %s\n", dest.c_str() );
 
 	// now decode to another stream and build back
-	aRcFileMemory dest_fmem( "build_back" );
+	anFileMemory dest_fmem( "build_back" );
 	dest.Decode( &dest_fmem );
 	dest_fmem.MakeReadOnly();
-	arcDictionary dest_dict;
+	anDict dest_dict;
 	dest_dict.ReadFromFileHandle( &dest_fmem );
-	arcLibrary::common->Printf( "arcDictionary reconstructed after base64 decode\n" );
+	anLibrary::common->Printf( "anDict reconstructed after base64 decode\n" );
 	dest_dict.Print();
 
-	// test arcDictionary read from file - from python generated files, see arcDictionary.py
-	arcNetFile *file = arcLibrary::fileSystem->OpenFileRead( "arcDictionary.test" );
+	// test anDict read from file - from python generated files, see anDict.py
+	anFile *file = anLibrary::fileSystem->OpenFileRead( "anDict.test" );
 	if ( file ) {
-		arcDictionary test_dict;
+		anDict test_dict;
 		test_dict.ReadFromFileHandle( file );
 
-		arcLibrary::common->Printf( "read arcDictionary.test:\n" );
+		anLibrary::common->Printf( "read anDict.test:\n" );
 		test_dict.Print();
-		arcLibrary::fileSystem->CloseFile( file );
-		file = NULL;
+		anLibrary::fileSystem->CloseFile( file );
+		file = nullptr;
 	} else {
-		arcLibrary::common->Printf( "arcDictionary.test not found\n" );
+		anLibrary::common->Printf( "anDict.test not found\n" );
 	}
 
-	ARCEncodeBase64 base64_src;
+	anEncodeBase64 base64_src;
 	void *buffer;
-	if ( arcLibrary::fileSystem->ReadFile( "arcDictionary.base64.test", &buffer ) != -1 ) {
-		aRcFileMemory mem_src( "dict" );
-		arcLibrary::common->Printf( "read: %d %s\n", arcNetString::Length( (char*)buffer ), buffer );
+	if ( anLibrary::fileSystem->ReadFile( "anDict.base64.test", &buffer ) != -1 ) {
+		anFileMemory mem_src( "dict" );
+		anLibrary::common->Printf( "read: %d %s\n", anString::Length( (char*)buffer ), buffer );
 		base64_src = (char *)buffer;
 		base64_src.Decode( &mem_src );
 		mem_src.MakeReadOnly();
-		arcDictionary test_dict;
+		anDict test_dict;
 		test_dict.ReadFromFileHandle( &mem_src );
-		arcLibrary::common->Printf( "read arcDictionary.base64.test:\n" );
+		anLibrary::common->Printf( "read anDict.base64.test:\n" );
 		test_dict.Print();
-		arcLibrary::fileSystem->FreeFile( buffer );
+		anLibrary::fileSystem->FreeFile( buffer );
 	} else {
-		arcLibrary::common->Printf( "arcDictionary.base64.test not found\n" );
+		anLibrary::common->Printf( "anDict.base64.test not found\n" );
 	}
 }
 

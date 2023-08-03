@@ -4,7 +4,7 @@
 // - relaxed posture
 // - turning in place too much, rely more on look angles?
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
@@ -12,9 +12,9 @@
 #include "AI_Util.h"
 #include "AI_Tactical.h"
 
-const idEventDef AI_ForcePosture	( "forcePosture", "d" );
+const anEventDef AI_ForcePosture	( "forcePosture", "d" );
 
-CLASS_DECLARATION( idAI, rvAITactical )
+CLASS_DECLARATION( anSAAI, rvAITactical )
 	EVENT( AI_ForcePosture,					rvAITactical::Event_ForcePosture )
 	EVENT( EV_PostSpawn,					rvAITactical::Event_PostSpawn )
 END_CLASS
@@ -45,7 +45,7 @@ rvAITactical::rvAITactical ( void ) {
 void rvAITactical::InitSpawnArgsVariables ( void )
 {
 	// Initialize the posture info
-	InitPostureInfo ( );
+	InitPostureInfo();
 
 	maxShots = spawnArgs.GetInt ( "maxShots", "1" );
 	minShots = spawnArgs.GetInt ( "minShots", "1" );
@@ -69,7 +69,7 @@ void rvAITactical::Spawn ( void ) {
 	postureForce = AIPOSTURE_DEFAULT;
 	if ( spawnArgs.GetString ( "forcePosture", "", &temp ) && *temp ) {
 		for ( postureForce = AIPOSTURE_STAND; postureForce != AIPOSTURE_MAX; ((int&)postureForce)++ ) {
-			if ( !idStr::Icmp ( aiPostureString[postureForce], temp ) ) {
+			if ( !anString::Icmp ( aiPostureString[postureForce], temp ) ) {
 				break;
 			}
 		}
@@ -78,21 +78,21 @@ void rvAITactical::Spawn ( void ) {
 		}
 	}
 
-	UpdatePosture ( );
+	UpdatePosture();
 	postureCurrent = postureIdeal;
 
-	OnPostureChange ( );
+	OnPostureChange();
 
 	ammo	 = spawnArgs.GetInt ( "ammo", "-1" );
 
 	// Initialize custom actions
-	actionElbowAttack.Init		( spawnArgs, "action_elbowAttack",		NULL,	AIACTIONF_ATTACK );
-	actionKillswitchAttack.Init	( spawnArgs, "action_killswitchAttack",	NULL,	AIACTIONF_ATTACK );
+	actionElbowAttack.Init		( spawnArgs, "action_elbowAttack",		nullptr,	AIACTIONF_ATTACK );
+	actionKillswitchAttack.Init	( spawnArgs, "action_killswitchAttack",	nullptr,	AIACTIONF_ATTACK );
 
 	actionTimerPeek.Init ( spawnArgs, "actionTimer_peek" );
 
 //	playerFocusTime = 0;
-//	playerAnnoyTime = SEC2MS(spawnArgs.GetFloat ( "annoyed", "5" ));
+//	playerAnnoyTime = SEC2MS( spawnArgs.GetFloat ( "annoyed", "5" ) );
 
 	healthRegenNextTime = 0;
 	maxHealth = health;
@@ -104,18 +104,18 @@ rvAITactical::Think
 ================
 */
 void rvAITactical::Think ( void ) {
-	idAI::Think ( );
+	anSAAI::Think();
 
 	// If not simple thinking and not in an action, update the posture
 	if ( !(aifl.scripted&&move.moveCommand==MOVE_NONE) && aifl.awake && !aifl.simpleThink && !aifl.action && !aifl.dead ) {
-		if ( UpdatePosture ( ) ) {
+		if ( UpdatePosture() ) {
 			PerformAction ( "Torso_SetPosture", 4, true );
 		}
 	}
 
 // FIXME: disabled for now, its annoying people
 	/*
-	idPlayer* localPlayer;
+	anBasePlayer* localPlayer;
 	localPlayer = gameLocal.GetLocalPlayer();
 
 	// If the player has been standing in front of the marine and looking at him for too long he should say something
@@ -123,7 +123,7 @@ void rvAITactical::Think ( void ) {
 		&& !aifl.scripted && focusType == AIFOCUS_PLAYER && localPlayer && !IsSpeaking()
 		&& !localPlayer->IsBeingTalkedTo() //nobody else is talking to him right now
 		&& DistanceTo( localPlayer ) < 64.0f ) {
-		arcVec3		diff;
+		anVec3		diff;
 
 
 		diff = GetPhysics()->GetOrigin() - localPlayer->GetPhysics()->GetOrigin();
@@ -151,7 +151,7 @@ void rvAITactical::Think ( void ) {
 		//alive
 		if ( healthRegenEnabled && healthRegen ) {
 			if ( gameLocal.GetTime() >= healthRegenNextTime ) {
-				health = arcMath::ClampInt( 0, maxHealth, health+healthRegen );
+				health = anMath::ClampInt( 0, maxHealth, health+healthRegen );
 				healthRegenNextTime = gameLocal.GetTime() + 1000;
 			}
 		}
@@ -168,8 +168,8 @@ void rvAITactical::Think ( void ) {
 			//do an occasional check for solid architecture directly in front of us
 			nextWallTraceTime = gameLocal.GetTime() + gameLocal.random.RandomInt(750)+750;
 			trace_t	wallTrace;
-			arcVec3 start, end;
-			arcMat3 axis;
+			anVec3 start, end;
+			anMat3 axis;
 			if ( neckJoint != INVALID_JOINT ) {
 				GetJointWorldTransform ( neckJoint, gameLocal.GetTime(), start, axis );
 				end = start + axis[0] * 32.0f;
@@ -202,7 +202,7 @@ void rvAITactical::Think ( void ) {
 rvAITactical::Save
 ================
 */
-void rvAITactical::Save( idSaveGame *savefile ) const {
+void rvAITactical::Save( anSaveGame *savefile ) const {
 	savefile->WriteSyncId();
 
 	savefile->WriteInt ( ammo );
@@ -231,8 +231,8 @@ void rvAITactical::Save( idSaveGame *savefile ) const {
 rvAITactical::Restore
 ================
 */
-void rvAITactical::Restore( idRestoreGame *savefile ) {
-	InitSpawnArgsVariables ( );
+void rvAITactical::Restore( anRestoreGame *savefile ) {
+	InitSpawnArgsVariables();
 	savefile->ReadSyncId( "rvAITactical" );
 
 	savefile->ReadInt ( ammo );
@@ -254,7 +254,7 @@ void rvAITactical::Restore( idRestoreGame *savefile ) {
 
 	actionTimerPeek.Restore ( savefile );
 
-	UpdateAnimPrefix ( );
+	UpdateAnimPrefix();
 }
 
 /*
@@ -266,7 +266,7 @@ bool rvAITactical::CanTurn ( void ) const {
 	if ( !move.fl.moving && !postureInfo[postureCurrent].fl.canTurn ) {
 		return false;
 	}
-	return idAI::CanTurn ( );
+	return anSAAI::CanTurn();
 }
 
 /*
@@ -278,7 +278,7 @@ bool rvAITactical::CanMove ( void ) const {
 	if ( !postureInfo[postureCurrent].fl.canMove ) {
 		return false;
 	}
-	return idAI::CanMove ( );
+	return anSAAI::CanMove();
 }
 
 /*
@@ -300,14 +300,14 @@ rvAITactical::CheckActions
 */
 bool rvAITactical::CheckActions ( void ) {
 	// Pain?
-	if ( CheckPainActions ( ) ) {
+	if ( CheckPainActions() ) {
 		return true;
 	}
 
 	// If we are pressed, fight-- do not break melee combat until you or the enemy is dead.
-	if ( IsMeleeNeeded ( ))	{
-		if ( PerformAction ( &actionMeleeAttack, (checkAction_t)&idAI::CheckAction_MeleeAttack )							 ||
-			 PerformAction ( &actionElbowAttack, (checkAction_t)&idAI::CheckAction_LeapAttack )									) {
+	if ( IsMeleeNeeded())	{
+		if ( PerformAction ( &actionMeleeAttack, (checkAction_t)&anSAAI::CheckAction_MeleeAttack )							 ||
+			 PerformAction ( &actionElbowAttack, (checkAction_t)&anSAAI::CheckAction_LeapAttack )									) {
 			return true;
 		}
 		//take no actions other than fighting
@@ -326,9 +326,9 @@ bool rvAITactical::CheckActions ( void ) {
 		return true;
 	}
 
-	if ( IsBehindCover ( ) ) {
+	if ( IsBehindCover() ) {
 		// If we have no enemy try peeking
-		if ( !IsEnemyRecentlyVisible ( ) ) {
+		if ( !IsEnemyRecentlyVisible() ) {
 			if ( aiManager.CheckTeamTimer ( team, AITEAMTIMER_ACTION_PEEK ) ) {
 				if ( actionTimerPeek.IsDone ( actionTime ) ) {
 					actionTimerPeek.Reset ( actionTime, 0.5f );
@@ -342,13 +342,13 @@ bool rvAITactical::CheckActions ( void ) {
 		// Attacks from cover
 		if ( postureInfo[postureCurrent].fl.canShoot && (ammo > 0 || ammo == -1) ) {
 			// Kill switch attack from cover?
-			if ( postureInfo[postureCurrent].fl.canKillswitch && IsEnemyRecentlyVisible ( ) ) {
-				if ( PerformAction ( &actionKillswitchAttack, NULL, &actionTimerRangedAttack ) ) {
+			if ( postureInfo[postureCurrent].fl.canKillswitch && IsEnemyRecentlyVisible() ) {
+				if ( PerformAction ( &actionKillswitchAttack, nullptr, &actionTimerRangedAttack ) ) {
 					return true;
 				}
 			}
 
-			if ( PerformAction ( &actionRangedAttack, (checkAction_t)&idAI::CheckAction_RangedAttack, &actionTimerRangedAttack ) ) {
+			if ( PerformAction ( &actionRangedAttack, (checkAction_t)&anSAAI::CheckAction_RangedAttack, &actionTimerRangedAttack ) ) {
 				return true;
 			}
 		}
@@ -357,14 +357,14 @@ bool rvAITactical::CheckActions ( void ) {
 	}
 
 	// Standard attacks
-	if ( PerformAction ( &actionMeleeAttack, (checkAction_t)&idAI::CheckAction_MeleeAttack )							 ||
-		 PerformAction ( &actionElbowAttack, (checkAction_t)&idAI::CheckAction_LeapAttack )									) {
+	if ( PerformAction ( &actionMeleeAttack, (checkAction_t)&anSAAI::CheckAction_MeleeAttack )							 ||
+		 PerformAction ( &actionElbowAttack, (checkAction_t)&anSAAI::CheckAction_LeapAttack )									) {
 		return true;
 	}
 
 	// Ranged attack only if there is ammo
 	if ( postureInfo[postureCurrent].fl.canShoot && (ammo > 0 || ammo == -1) ) {
-		if ( PerformAction ( &actionRangedAttack, (checkAction_t)&idAI::CheckAction_RangedAttack, &actionTimerRangedAttack ) ) {
+		if ( PerformAction ( &actionRangedAttack, (checkAction_t)&anSAAI::CheckAction_RangedAttack, &actionTimerRangedAttack ) ) {
 			return true;
 		}
 	}
@@ -440,7 +440,7 @@ void rvAITactical::InitPostureInfo ( void ) {
 		aiPostureInfo_t& info = postureInfo[(aiPosture_t)posture];
 
 		postureCurrent = (aiPosture_t)posture;
-		UpdateAnimPrefix ( );
+		UpdateAnimPrefix();
 
 		info.fl.canMove   		= HasAnim ( ANIMCHANNEL_TORSO, "run", true );
 		info.fl.canPeek   		= HasAnim ( ANIMCHANNEL_TORSO, "peek", true );
@@ -470,17 +470,17 @@ bool rvAITactical::UpdatePosture ( void ) {
 		postureIdeal = AIPOSTURE_STAND;
 
 		// Behind cover?
-		if ( IsBehindCover ( ) ) {
+		if ( IsBehindCover() ) {
 			bool left;
 			if ( enemy.ent ) {
-				left = (aasSensor->Reserved()->Normal().Cross ( physicsObj.GetGravityNormal ( ) ) * (enemy.lastVisibleEyePosition - physicsObj.GetOrigin())) > 0.0f;
+				left = (aasSensor->Reserved()->Normal().Cross ( physicsObj.GetGravityNormal() ) * (enemy.lastVisibleEyePosition - physicsObj.GetOrigin())) > 0.0f;
 			} else if ( tether ) {
-				left = (aasSensor->Reserved()->Normal().Cross ( physicsObj.GetGravityNormal ( ) ) * tether->GetPhysics()->GetAxis()[0] ) > 0.0f;
+				left = (aasSensor->Reserved()->Normal().Cross ( physicsObj.GetGravityNormal() ) * tether->GetPhysics()->GetAxis()[0] ) > 0.0f;
 			} else {
 				left = false;
 			}
 			// Should be crouching behind cover?
-			if ( InCrouchCoverMode ( ) ) {
+			if ( InCrouchCoverMode() ) {
 				if ( (aasSensor->Reserved()->flags & FEATURE_LOOK_LEFT) && left ) {
 					postureIdeal = AIPOSTURE_CROUCH_COVER_LEFT;
 				} else if ( (aasSensor->Reserved()->flags & FEATURE_LOOK_RIGHT) && !left ) {
@@ -500,16 +500,16 @@ bool rvAITactical::UpdatePosture ( void ) {
 				}
 			}
 		} else if ( combat.fl.aware //aggressive
-			&& (FacingIdeal ( ) || CheckFOV ( currentFocusPos )) //looking in desired direction
+			&& (FacingIdeal() || CheckFOV ( currentFocusPos ) ) //looking in desired direction
 			&& ((leader && leader->IsCrouching()) || combat.fl.crouchViewClear) ) {//leader is crouching or we can crouch-look in this direction here
 			//we crouch only if leader is
 			postureIdeal = AIPOSTURE_CROUCH;
-		} else if ( CheckRelaxed ( ) ) {
+		} else if ( CheckRelaxed() ) {
 			postureIdeal = AIPOSTURE_RELAXED;
 		}
 
 		//never crouch in melee!
-		if( IsMeleeNeeded() )	{
+		if ( IsMeleeNeeded() )	{
 			postureIdeal = AIPOSTURE_STAND;
 		}
 	}
@@ -531,7 +531,7 @@ rvAITactical::OnPostureChange
 ================
 */
 void rvAITactical::OnPostureChange ( void ) {
-	UpdateAnimPrefix ( );
+	UpdateAnimPrefix();
 }
 
 /*
@@ -540,10 +540,10 @@ rvAITactical::OnSetKey
 ============
 */
 void rvAITactical::OnSetKey	( const char* key, const char* value ) {
-	idAI::OnSetKey ( key, value );
+	anSAAI::OnSetKey ( key, value );
 
 /*
-	if ( !idStr::Icmp ( key, "annoyed" ) ) {
+	if ( !anString::Icmp ( key, "annoyed" ) ) {
 		playerAnnoyTime = SEC2MS( atof ( value ) );
 	}
 */
@@ -556,7 +556,7 @@ rvAITactical::OnStopMoving
 */
 void rvAITactical::OnStopMoving	( aiMoveCommand_t oldMoveCommand ) {
 	// Ensure the peek doesnt happen immedately every time we stop at a cover
-	if ( IsBehindCover ( ) ){
+	if ( IsBehindCover() ){
 		actionTimerPeek.Clear ( actionTime );
 		actionTimerPeek.Add ( 2000, 0.5f );
 
@@ -567,7 +567,7 @@ void rvAITactical::OnStopMoving	( aiMoveCommand_t oldMoveCommand ) {
 		move.current_yaw = move.ideal_yaw;
 	}
 
-	idAI::OnStopMoving ( oldMoveCommand );
+	anSAAI::OnStopMoving ( oldMoveCommand );
 }
 
 /*
@@ -588,7 +588,7 @@ void rvAITactical::CalculateShots ( const char* fireAnim ) {
 	if ( animNum != 0 ) {
 		const idAnim* anim = GetAnimator()->GetAnim ( animNum );
 		if ( anim ) {
-			GetAnimator()->SetPlaybackRate ( animNum, ((float)anim->Length() * combat.aggressiveScale) / fireRate );
+			GetAnimator()->SetPlaybackRate ( animNum, ( ( float )anim->Length() * combat.aggressiveScale) / fireRate );
 		}
 	}
 }
@@ -618,19 +618,19 @@ rvAITactical::GetDebugInfo
 */
 void rvAITactical::GetDebugInfo	( debugInfoProc_t proc, void* userData ) {
 	// Base class first
-	idAI::GetDebugInfo ( proc, userData );
+	anSAAI::GetDebugInfo ( proc, userData );
 
 	proc ( "rvAITactical", "postureIdeal",		aiPostureString[postureIdeal], userData );
 	proc ( "rvAITactical", "postureCurrent",	aiPostureString[postureCurrent], userData );
-	proc ( "rvAITactical", "healthRegen",		va("%d",healthRegen), userData );
+	proc ( "rvAITactical", "healthRegen",		va( "%d",healthRegen), userData );
 	proc ( "rvAITactical", "healthRegenEnabled",healthRegenEnabled?"true":"false", userData );
-	proc ( "rvAITactical", "healthRegenNextTime",va("%d",healthRegenNextTime), userData );
-	proc ( "rvAITactical", "maxHealth",			va("%d",maxHealth), userData );
+	proc ( "rvAITactical", "healthRegenNextTime",va( "%d",healthRegenNextTime), userData );
+	proc ( "rvAITactical", "maxHealth",			va( "%d",maxHealth), userData );
 
-	proc ( "rvAITactical", "nextWallTraceTime",	va("%d",nextWallTraceTime), userData );
+	proc ( "rvAITactical", "nextWallTraceTime",	va( "%d",nextWallTraceTime), userData );
 
 
-	proc ( "idAI", "action_killswitchAttack",	aiActionStatusString[actionKillswitchAttack.status], userData );
+	proc ( "anSAAI", "action_killswitchAttack",	aiActionStatusString[actionKillswitchAttack.status], userData );
 }
 
 /*
@@ -670,10 +670,10 @@ stateResult_t rvAITactical::State_Torso_SetPosture ( const stateParms_t& parms )
 	};
 	switch ( parms.stage ) {
 		case STAGE_INIT: {
-			idStr transAnim = va("%s_to_%s", aiPostureString[postureCurrent], aiPostureString[postureIdeal] );
+			anString transAnim = va( "%s_to_%s", aiPostureString[postureCurrent], aiPostureString[postureIdeal] );
 			if ( !HasAnim ( ANIMCHANNEL_TORSO, transAnim ) ) {
 				postureCurrent = postureIdeal;
-				OnPostureChange ( );
+				OnPostureChange();
 				return SRESULT_DONE;
 			}
 
@@ -692,7 +692,7 @@ stateResult_t rvAITactical::State_Torso_SetPosture ( const stateParms_t& parms )
 					/*|| (move.fl.moving&&!move.fl.blocked)
 					|| (fabs(move.current_yaw-move.ideal_yaw) > 30.0f && (move.moveCommand == MOVE_FACE_ENEMY||move.moveCommand == MOVE_FACE_ENTITY))*/ ) {
 					postureCurrent = postureIdeal;
-					OnPostureChange ( );
+					OnPostureChange();
 					return SRESULT_DONE;
 				}
 			}
@@ -720,7 +720,7 @@ stateResult_t rvAITactical::State_Torso_SetPosture ( const stateParms_t& parms )
 		case STAGE_WAIT:
 			if ( AnimDone ( ANIMCHANNEL_TORSO, parms.blendFrames ) ) {
 				postureCurrent = postureIdeal;
-				OnPostureChange ( );
+				OnPostureChange();
 				return SRESULT_DONE;
 			}
 			return SRESULT_WAIT;
@@ -1025,7 +1025,7 @@ bool rvAITactical::IsCrouching( void ) const {
 		|| postureCurrent == AIPOSTURE_CROUCH_COVER_RIGHT ) {
 		return true;
 	}
-	return idAI::IsCrouching();
+	return anSAAI::IsCrouching();
 }
 
 /*
@@ -1034,7 +1034,7 @@ rvAITactical::Event_PostSpawn
 ================
 */
 void rvAITactical::Event_PostSpawn( void ) {
-	idAI::Event_PostSpawn();
+	anSAAI::Event_PostSpawn();
 	if ( team == AITEAM_MARINE && healthRegenEnabled )
 	{//regen-enabled buddy marine
 		if ( CheckDeathCausesMissionFailure() )

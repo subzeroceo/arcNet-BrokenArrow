@@ -56,7 +56,7 @@ protected:
 	idProgram*				mProgram;
 	idUserInterfaceLocal*	mInterface;
 	char*					mContents;
-	arcNetString					mFilename;
+	anString					mFilename;
 	ARC_TIME_T					mModifiedTime;
 };
 

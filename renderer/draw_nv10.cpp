@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -26,14 +26,14 @@ blended diffuse / specular maps to get the same effect
 ==================
 */
 static void RB_RenderInteraction( const drawSurf_t *surf ) {
-	const arcMaterial	*surfaceShader = surf->material;
+	const anMaterial	*surfaceShader = surf->material;
 	const float			*surfaceRegs = surf->shaderRegisters;
 	const viewLight_t	*vLight = backEnd.vLight;
-	const arcMaterial	*lightShader = vLight->lightShader;
+	const anMaterial	*lightShader = vLight->lightShader;
 	const float			*lightRegs = vLight->shaderRegisters;
-	static arcPlane		lightProject[4];	// reused across function calls
-	const surfTriangles_t	*tri = surf->geo;
-	const materialStage_t	*lastBumpStage = NULL;
+	static anPlane		lightProject[4];	// reused across function calls
+	const srfTriangles_t	*tri = surf->geo;
+	const materialStage_t	*lastBumpStage = nullptr;
 
 	RB_LogComment( "---------- RB_RenderInteraction %s on %s ----------\n",
 		lightShader->GetName(), surfaceShader->GetName() );
@@ -68,11 +68,11 @@ static void RB_RenderInteraction( const drawSurf_t *surf ) {
 
 
 	// set the vertex arrays, which may not all be enabled on a given pass
-	arcDrawVert	*ac = (arcDrawVert *)vertexCache.Position(tri->ambientCache);
-	qglVertexPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), ac->xyz.ToFloatPtr() );
+	anDrawVertex	*ac = (anDrawVertex *)vertexCache.Position(tri->ambientCache);
+	qglVertexPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), ac->xyz.ToFloatPtr() );
 	GL_SetCurrentTextureUnit( 0 );
-	qglTexCoordPointer( 2, GL_FLOAT, sizeof( arcDrawVert ), ac->st.ToFloatPtr() );
-	qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( arcDrawVert ), ac->color );
+	qglTexCoordPointer( 2, GL_FLOAT, sizeof( anDrawVertex ), ac->st.ToFloatPtr() );
+	qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( anDrawVertex ), ac->color );
 
 
 	// go through the individual stages
@@ -373,7 +373,7 @@ static void RB_RenderInteraction( const drawSurf_t *surf ) {
 
 			// the bump map in the alpha channel is now corrupted, so a normal diffuse
 			// map can't be drawn unless a new bumpmap is put down
-			lastBumpStage = NULL;
+			lastBumpStage = nullptr;
 
 			// fall through to the common handling of diffuse and specular projected lighting
 		}
@@ -522,7 +522,7 @@ static void RB_RenderInteractionList( const drawSurf_t *surf ) {
 	qglEnable( GL_REGISTER_COMBINERS_NV );
 
 	// force a space calculation for light vectors
-	backEnd.currentSpace = NULL;
+	backEnd.currentSpace = nullptr;
 
 	for ( const drawSurf_t *s = surf; s; s = s->nextOnLight ) {
 		RB_RenderInteraction( s );

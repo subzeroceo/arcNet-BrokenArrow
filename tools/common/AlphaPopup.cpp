@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/win_local.h"
@@ -34,8 +34,8 @@ If you have questions concerning this license or the applicable additional terms
 #include "MaskEdit.h"
 #include "../../sys/win32/rc/guied_resource.h"
 
-static HHOOK	gAlphaHook = NULL;
-static HWND		gAlphaDlg  = NULL;
+static HHOOK	gAlphaHook = nullptr;
+static HWND		gAlphaDlg  = nullptr;
 
 /*
 ================
@@ -92,7 +92,7 @@ LRESULT CALLBACK AlphaSlider_WndProc ( HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			if ( v < 0 ) v = 0;
 			if ( v > 1.0f ) v = 1.0f;
 			SetWindowLong ( hwnd, GWL_USERDATA, MAKELONG(0x8000,(unsigned short)(255.0f * v) ) );
-			InvalidateRect ( hwnd, NULL, FALSE );
+			InvalidateRect ( hwnd, nullptr, FALSE );
 
 			SetCapture ( hwnd );
 
@@ -110,7 +110,7 @@ LRESULT CALLBACK AlphaSlider_WndProc ( HWND hwnd, UINT msg, WPARAM wParam, LPARA
 				if ( v < 0 ) v = 0;
 				if ( v > 1.0f ) v = 1.0f;
 				SetWindowLong ( hwnd, GWL_USERDATA, MAKELONG(0x8000,(unsigned short)(255.0f * v) ) );
-				InvalidateRect ( hwnd, NULL, FALSE );
+				InvalidateRect ( hwnd, nullptr, FALSE );
 			}
 			break;
 
@@ -125,8 +125,8 @@ LRESULT CALLBACK AlphaSlider_WndProc ( HWND hwnd, UINT msg, WPARAM wParam, LPARA
 				if ( v < 0 ) v = 0;
 				if ( v > 1.0f ) v = 1.0f;
 				SetWindowLong ( hwnd, GWL_USERDATA, MAKELONG(0x8000,(unsigned short)(255.0f * v) ) );
-				InvalidateRect ( hwnd, NULL, FALSE );
-				ReleaseCapture ( );
+				InvalidateRect ( hwnd, nullptr, FALSE );
+				ReleaseCapture();
 				SendMessage ( GetParent ( hwnd ), WM_COMMAND, MAKELONG(GetWindowLong (hwnd,GWL_ID),0 ), 0 );
 			}
 			break;
@@ -238,7 +238,7 @@ INT_PTR CALLBACK AlphaSelectDlg_WndProc ( HWND hwnd, UINT msg, WPARAM wParam, LP
 			int color;
 
 			gAlphaDlg  = hwnd;
-			gAlphaHook = SetWindowsHookEx( WH_GETMESSAGE, AlphaSelectDlg_GetMsgProc, NULL, GetCurrentThreadId() );
+			gAlphaHook = SetWindowsHookEx( WH_GETMESSAGE, AlphaSelectDlg_GetMsgProc, nullptr, GetCurrentThreadId() );
 			color      = GetRValue(ColorButton_GetColor ((HWND)lParam) );
 
 			// The lParam for the alpha select dialog is the window handle of the button pressed
@@ -255,8 +255,8 @@ INT_PTR CALLBACK AlphaSelectDlg_WndProc ( HWND hwnd, UINT msg, WPARAM wParam, LP
 
 		case WM_DESTROY:
 			UnhookWindowsHookEx( gAlphaHook );
-			ReleaseCapture ( );
-			gAlphaDlg = NULL;
+			ReleaseCapture();
+			gAlphaDlg = nullptr;
 			break;
 
 		case WM_ACTIVATE:
@@ -335,7 +335,7 @@ void AlphaButton_OpenPopup ( HWND button )
 	GetWindowRect ( button, &rWindow );
 	dlg = CreateDialogParam ( win32.hInstance, MAKEINTRESOURCE(IDD_GUIED_ALPHA), GetParent(button), AlphaSelectDlg_WndProc, (LPARAM)button );
 
-	SetWindowPos ( dlg, NULL, rWindow.left, rWindow.bottom + 1, 0, 0, SWP_NOSIZE|SWP_NOZORDER );
+	SetWindowPos ( dlg, nullptr, rWindow.left, rWindow.bottom + 1, 0, 0, SWP_NOSIZE|SWP_NOZORDER );
 	ShowWindow ( dlg, SW_SHOW );
 	UpdateWindow ( dlg );
 	SetFocus ( dlg );

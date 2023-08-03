@@ -51,7 +51,7 @@ public:
 	virtual void		Draw( bool forceFullScreen ) = 0;
 	virtual void		Print( const char *text ) = 0;
 
-	virtual void		PrintOverlay( idOverlayHandle & handle, justify_t justify, VERIFY_FORMAT_STRING const char * text, ... ) = 0;
+	virtual void		PrintOverlay( idOverlayHandle & handle, justify_t justify, VERIFY_FORMAT_STRING const char *text, ... ) = 0;
 
 	virtual arcDebugGraph *CreateGraph( int numItems ) = 0;
 	virtual void		DestroyGraph( arcDebugGraph * graph ) = 0;

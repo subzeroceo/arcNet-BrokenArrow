@@ -4,47 +4,47 @@
 /*
 ===============================================================================
 
-	arcStringList
+	anStringList
 
 ===============================================================================
 */
 
-typedef arcNetList<arcNetString> arcStringList;
-typedef arcNetList<arcNetString*> idStrPtrList;
-typedef arcNetString *idStrPtr;
+typedef anList<anString> anStringList;
+typedef anList<anString*> anStringPtrList;
+typedef anString *anStringPtr;
 
 /*
 ================
-arcListSortCompare<idStrPtr>
+arcListSortCompare<anStringPtr>
 
-Compares two pointers to strings. Used to sort a list of string pointers alphabetically in arcNetList<arcNetString>::Sort.
+Compares two pointers to strings. Used to sort a list of string pointers alphabetically in anList<anString>::Sort.
 ================
 */
 template<>
-ARC_INLINE int arcListSortCompare<idStrPtr>( const idStrPtr *a, const idStrPtr *b ) {
+ARC_INLINE int arcListSortCompare<anStringPtr>( const anStringPtr *a, const anStringPtr *b ) {
 	return ( *a )->Icmp( **b );
 }
 
 /*
 ================
-arcStringList::Sort
+anStringList::Sort
 
 Sorts the list of strings alphabetically. Creates a list of pointers to the actual strings and sorts the
 pointer list. Then copies the strings into another list using the ordered list of pointers.
 ================
 */
 template<>
-ARC_INLINE void arcStringList::Sort( cmp_t *compare ) {
+ARC_INLINE void anStringList::Sort( cmp_t *compare ) {
 	if ( !num ) {
 		return;
 	}
 
-	arcNetList<arcNetString>		other;
-	arcNetList<idStrPtr>	pointerList;
+	anList<anString>		other;
+	anList<anStringPtr>	pointerList;
 
 	pointerList.SetNum( num );
 	for ( int i = 0; i < num; i++ ) {
-		pointerList[ i ] = &( *this )[ i ];
+		pointerList[i] = &( *this )[i];
 	}
 
 	pointerList.Sort();
@@ -52,7 +52,7 @@ ARC_INLINE void arcStringList::Sort( cmp_t *compare ) {
 	other.SetNum( num );
 	other.SetGranularity( granularity );
 	for ( int i = 0; i < other.Num(); i++ ) {
-		other[ i ] = *pointerList[ i ];
+		other[i] = *pointerList[i];
 	}
 
 	this->Swap( other );
@@ -60,13 +60,13 @@ ARC_INLINE void arcStringList::Sort( cmp_t *compare ) {
 
 /*
 ================
-arcStringList::SortSubSection
+anStringList::SortSubSection
 
 Sorts a subsection of the list of strings alphabetically.
 ================
 */
 template<>
-ARC_INLINE void arcStringList::SortSubSection( int startIndex, int endIndex, cmp_t *compare ) {
+ARC_INLINE void anStringList::SortSubSection( int startIndex, int endIndex, cmp_t *compare ) {
 	if ( !num ) {
 		return;
 	}
@@ -80,34 +80,34 @@ ARC_INLINE void arcStringList::SortSubSection( int startIndex, int endIndex, cmp
 		return;
 	}
 
-	arcNetList<arcNetString>		other;
-	arcNetList<idStrPtr>	pointerList;
+	anList<anString>		other;
+	anList<anStringPtr>	pointerList;
 
 	int s = endIndex - startIndex + 1;
 	other.SetNum( s );
 	pointerList.SetNum( s );
 	for ( int i = 0; i < s; i++ ) {
-		other[ i ] = ( *this )[ startIndex + i ];
-		pointerList[ i ] = &other[ i ];
+		other[i] = ( *this )[ startIndex + i ];
+		pointerList[i] = &other[i];
 	}
 
 	pointerList.Sort();
 
 	for ( int i = 0; i < s; i++ ) {
-		(*this)[ startIndex + i ] = *pointerList[ i ];
+		(*this)[ startIndex + i ] = *pointerList[i];
 	}
 }
 
 /*
 ================
-arcStringList::Size
+anStringList::Size
 ================
 */
 template<>
-ARC_INLINE size_t arcStringList::Size( void ) const {
+ARC_INLINE size_t anStringList::Size( void ) const {
 	size_t s = sizeof( *this );
 	for ( int i = 0; i < Num(); i++ ) {
-		s += ( *this )[ i ].Size();
+		s += ( *this )[i].Size();
 	}
 
 	return s;
@@ -116,49 +116,49 @@ ARC_INLINE size_t arcStringList::Size( void ) const {
 /*
 ===============================================================================
 
-	arcStringList path sorting
+	anStringList path sorting
 
 ===============================================================================
 */
 
 /*
 ================
-arcListSortComparePaths
+anListSortComparePaths
 
-Compares two pointers to strings. Used to sort a list of string pointers alphabetically in arcNetList<arcNetString>::Sort.
+Compares two pointers to strings. Used to sort a list of string pointers alphabetically in anList<anString>::Sort.
 ================
 */
-template<class idStrPtr>
-ARC_INLINE int arcListSortComparePaths( const idStrPtr *a, const idStrPtr *b ) {
+template<class anStringPtr>
+ARC_INLINE int anListSortComparePaths( const anStringPtr *a, const anStringPtr *b ) {
 	return ( *a )->IcmpPath( **b );
 }
 
 /*
 ================
-idStrListSortPaths
+anStringListSortPaths
 
 Sorts the list of path strings alphabetically and makes sure folders come first.
 ================
 */
-ARC_INLINE void idStrListSortPaths( arcStringList &list ) {
+ARC_INLINE void anStringListSortPaths( anStringList &list ) {
 	if ( !list.Num() ) {
 		return;
 	}
 
-	arcNetList<arcNetString>		other;
-	arcNetList<idStrPtr>	pointerList;
+	anList<anString>		other;
+	anList<anStringPtr>	pointerList;
 
 	pointerList.SetNum( list.Num() );
 	for ( int i = 0; i < list.Num(); i++ ) {
-		pointerList[ i ] = &list[ i ];
+		pointerList[i] = &list[i];
 	}
 
-	pointerList.Sort( arcListSortComparePaths<idStrPtr> );
+	pointerList.Sort( anListSortComparePaths<anStringPtr> );
 
 	other.SetNum( list.Num() );
 	other.SetGranularity( list.GetGranularity() );
 	for ( int i = 0; i < other.Num(); i++ ) {
-		other[ i ] = *pointerList[ i ];
+		other[i] = *pointerList[i];
 	}
 
 	list.Swap( other );

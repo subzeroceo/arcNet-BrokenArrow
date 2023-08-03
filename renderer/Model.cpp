@@ -1,32 +1,4 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -35,23 +7,23 @@ If you have questions concerning this license or the applicable additional terms
 #include "Model_lwo.h"
 #include "Model_ma.h"
 
-arcCVarSystem aRcModelStatic::r_mergeModelSurfaces( "r_mergeModelSurfaces", "1", CVAR_BOOL|CVAR_RENDERER, "combine model surfaces with the same material" );
-arcCVarSystem aRcModelStatic::r_slopVertex( "r_slopVertex", "0.01", CVAR_RENDERER, "merge xyz coordinates this far apart" );
-arcCVarSystem aRcModelStatic::r_slopTexCoord( "r_slopTexCoord", "0.001", CVAR_RENDERER, "merge texture coordinates this far apart" );
-arcCVarSystem aRcModelStatic::r_slopNormal( "r_slopNormal", "0.02", CVAR_RENDERER, "merge normals that dot less than this" );
+anCVarSystem anModelStatic::r_mergeModelSurfaces( "r_mergeModelSurfaces", "1", CVAR_BOOL|CVAR_RENDERER, "combine model surfaces with the same material" );
+anCVarSystem anModelStatic::r_slopVertex( "r_slopVertex", "0.01", CVAR_RENDERER, "merge xyz coordinates this far apart" );
+anCVarSystem anModelStatic::r_slopTexCoord( "r_slopTexCoord", "0.001", CVAR_RENDERER, "merge texture coordinates this far apart" );
+anCVarSystem anModelStatic::r_slopNormal( "r_slopNormal", "0.02", CVAR_RENDERER, "merge normals that dot less than this" );
 
 /*
 ================
-aRcModelStatic::aRcModelStatic
+anModelStatic::anModelStatic
 ================
 */
-aRcModelStatic::aRcModelStatic() {
+anModelStatic::anModelStatic() {
 	name = "<undefined>";
 	bounds.Clear();
 	lastModifiedFrame = 0;
 	lastArchivedFrame = 0;
 	overlaysAdded = 0;
-	shadowHull = NULL;
+	shadowHull = nullptr;
 	isStaticWorldModel = false;
 	defaulted = false;
 	purged = false;
@@ -63,19 +35,19 @@ aRcModelStatic::aRcModelStatic() {
 
 /*
 ================
-aRcModelStatic::~aRcModelStatic
+anModelStatic::~anModelStatic
 ================
 */
-aRcModelStatic::~aRcModelStatic() {
+anModelStatic::~anModelStatic() {
 	PurgeModel();
 }
 
 /*
 ==============
-aRcModelStatic::Print
+anModelStatic::Print
 ==============
 */
-void aRcModelStatic::Print() const {
+void anModelStatic::Print() const {
 	common->Printf( "%s\n", name.c_str() );
 	common->Printf( "Static model.\n" );
 	common->Printf( "bounds: (%f %f %f) to (%f %f %f)\n",
@@ -84,19 +56,17 @@ void aRcModelStatic::Print() const {
 
 	common->Printf( "    verts  tris material\n" );
 	for ( int i = 0; i < NumSurfaces(); i++ ) {
-		const modelSurface_t	*surf = Surface( i );
-
-		surfTriangles_t *tri = surf->geometry;
-		const arcMaterial *material = surf->shader;
-
+		const modelSurface_t *surf = Surface( i );
+		srfTriangles_t *tri = surf->geometry;
+		const anMaterial *material = surf->shader;
 		if ( !tri ) {
-			common->Printf( "%2i: %s, NULL surface geometry\n", i, material->GetName() );
+			common->Printf( "%2i: %s, nullptr surface geometry\n", i, material->GetName() );
 			continue;
 		}
 
 		common->Printf( "%2i: %5i %5i %s", i, tri->numVerts, tri->numIndexes / 3, material->GetName() );
 		if ( tri->generateNormals ) {
-			common->Printf( " (smoothed)\n" );
+			common->Printf( " ( smoothed)\n" );
 		} else {
 			common->Printf( "\n" );
 		}
@@ -105,10 +75,10 @@ void aRcModelStatic::Print() const {
 
 /*
 ==============
-aRcModelStatic::Memory
+anModelStatic::Memory
 ==============
 */
-int aRcModelStatic::Memory() const {
+int anModelStatic::Memory() const {
 	int	totalBytes = 0;
 
 	totalBytes += sizeof( *this );
@@ -132,10 +102,10 @@ int aRcModelStatic::Memory() const {
 
 /*
 ==============
-aRcModelStatic::List
+anModelStatic::List
 ==============
 */
-void aRcModelStatic::List() const {
+void anModelStatic::List() const {
 	int	totalTris = 0;
 	int	totalVerts = 0;
 	int	totalBytes = 0;
@@ -177,10 +147,10 @@ void aRcModelStatic::List() const {
 
 /*
 ================
-aRcModelStatic::IsDefaultModel
+anModelStatic::IsDefaultModel
 ================
 */
-bool aRcModelStatic::IsDefaultModel() const {
+bool anModelStatic::IsDefaultModel() const {
 	return defaulted;
 }
 
@@ -189,7 +159,7 @@ bool aRcModelStatic::IsDefaultModel() const {
 AddCubeFace
 ================
 */
-static void AddCubeFace( surfTriangles_t *tri, arcVec3 v1, arcVec3 v2, arcVec3 v3, arcVec3 v4 ) {
+static void AddCubeFace( srfTriangles_t *tri, anVec3 v1, anVec3 v2, anVec3 v3, anVec3 v4 ) {
 	tri->verts[tri->numVerts+0].Clear();
 	tri->verts[tri->numVerts+0].xyz = v1 * 8;
 	tri->verts[tri->numVerts+0].st[0] = 0;
@@ -223,11 +193,10 @@ static void AddCubeFace( surfTriangles_t *tri, arcVec3 v1, arcVec3 v2, arcVec3 v
 
 /*
 ================
-aRcModelStatic::MakeDefaultModel
+anModelStatic::MakeDefaultModel
 ================
 */
-void aRcModelStatic::MakeDefaultModel() {
-
+void anModelStatic::MakeDefaultModel() {
 	defaulted = true;
 
 	// throw out any surfaces we already have
@@ -235,8 +204,7 @@ void aRcModelStatic::MakeDefaultModel() {
 
 	// create one new surface
 	modelSurface_t	surf;
-
-	surfTriangles_t *tri = R_AllocStaticTriSurf();
+	srfTriangles_t *tri = R_AllocStaticTriSurf();
 
 	surf.shader = tr.defaultMaterial;
 	surf.geometry = tri;
@@ -244,14 +212,14 @@ void aRcModelStatic::MakeDefaultModel() {
 	R_AllocStaticTriSurfVerts( tri, 24 );
 	R_AllocStaticTriSurfIndexes( tri, 36 );
 
-	AddCubeFace( tri, arcVec3(-1, 1, 1 ), arcVec3( 1, 1, 1 ), arcVec3( 1, -1, 1 ), arcVec3(-1, -1, 1 ) );
-	AddCubeFace( tri, arcVec3(-1, 1, -1 ), arcVec3(-1, -1, -1 ), arcVec3( 1, -1, -1 ), arcVec3( 1, 1, -1 ) );
+	AddCubeFace( tri, anVec3(-1, 1, 1 ), anVec3( 1, 1, 1 ), anVec3( 1, -1, 1 ), anVec3(-1, -1, 1 ) );
+	AddCubeFace( tri, anVec3(-1, 1, -1 ), anVec3(-1, -1, -1 ), anVec3( 1, -1, -1 ), anVec3( 1, 1, -1 ) );
 
-	AddCubeFace( tri, arcVec3( 1, -1, 1 ), arcVec3( 1, 1, 1 ), arcVec3( 1, 1, -1 ), arcVec3( 1, -1, -1 ) );
-	AddCubeFace( tri, arcVec3(-1, -1, 1 ), arcVec3(-1, -1, -1 ), arcVec3(-1, 1, -1 ), arcVec3(-1, 1, 1 ) );
+	AddCubeFace( tri, anVec3( 1, -1, 1 ), anVec3( 1, 1, 1 ), anVec3( 1, 1, -1 ), anVec3( 1, -1, -1 ) );
+	AddCubeFace( tri, anVec3(-1, -1, 1 ), anVec3(-1, -1, -1 ), anVec3(-1, 1, -1 ), anVec3(-1, 1, 1 ) );
 
-	AddCubeFace( tri, arcVec3(-1, -1, 1 ), arcVec3( 1, -1, 1 ), arcVec3( 1, -1, -1 ), arcVec3(-1, -1, -1 ) );
-	AddCubeFace( tri, arcVec3(-1, 1, 1 ), arcVec3(-1, 1, -1 ), arcVec3( 1, 1, -1 ), arcVec3( 1, 1, 1 ) );
+	AddCubeFace( tri, anVec3(-1, -1, 1 ), anVec3( 1, -1, 1 ), anVec3( 1, -1, -1 ), anVec3(-1, -1, -1 ) );
+	AddCubeFace( tri, anVec3(-1, 1, 1 ), anVec3(-1, 1, -1 ), anVec3( 1, 1, -1 ), anVec3( 1, 1, 1 ) );
 
 	tri->generateNormals = true;
 
@@ -261,22 +229,22 @@ void aRcModelStatic::MakeDefaultModel() {
 
 /*
 ================
-aRcModelStatic::PartialInitFromFile
+anModelStatic::PartialInitFromFile
 ================
 */
-void aRcModelStatic::PartialInitFromFile( const char *fileName ) {
+void anModelStatic::PartialInitFromFile( const char *fileName ) {
 	fastLoad = true;
 	InitFromFile( fileName );
 }
 
 /*
 ================
-aRcModelStatic::InitFromFile
+anModelStatic::InitFromFile
 ================
 */
-void aRcModelStatic::InitFromFile( const char *fileName ) {
+void anModelStatic::InitFromFile( const char *fileName ) {
 	bool loaded;
-	arcNetString extension;
+	anString extension;
 
 	InitEmpty( fileName );
 
@@ -297,12 +265,12 @@ void aRcModelStatic::InitFromFile( const char *fileName ) {
 		loaded		= LoadMA( name );
 		reloadable	= true;
 	} else {
-		common->Warning( "aRcModelStatic::InitFromFile: unknown type for model: \'%s\'", name.c_str() );
+		common->Warning( "anModelStatic::InitFromFile: unknown type for model: \'%s\'", name.c_str() );
 		loaded		= false;
 	}
 
 	if ( !loaded ) {
-		common->Warning( "Couldn't load model: '%s'", name.c_str() );
+		common->Warning( "Failed to load model: '%s'", name.c_str() );
 		MakeDefaultModel();
 		return;
 	}
@@ -316,25 +284,25 @@ void aRcModelStatic::InitFromFile( const char *fileName ) {
 
 /*
 ================
-aRcModelStatic::LoadModel
+anModelStatic::LoadModel
 ================
 */
-void aRcModelStatic::LoadModel() {
+void anModelStatic::LoadModel() {
 	PurgeModel();
 	InitFromFile( name );
 }
 
 /*
 ================
-aRcModelStatic::InitEmpty
+anModelStatic::InitEmpty
 ================
 */
-void aRcModelStatic::InitEmpty( const char *fileName ) {
+void anModelStatic::InitEmpty( const char *fileName ) {
 	// model names of the form _area* are static parts of the
 	// world, and have already been considered for optimized shadows
 	// other model names are inline entity models, and need to be
 	// shadowed normally
-	if ( !arcNetString::Cmpn( fileName, "_area", 5 ) ) {
+	if ( !anString::Cmpn( fileName, "_area", 5 ) ) {
 		isStaticWorldModel = true;
 	} else {
 		isStaticWorldModel = false;
@@ -349,10 +317,10 @@ void aRcModelStatic::InitEmpty( const char *fileName ) {
 
 /*
 ================
-aRcModelStatic::AddSurface
+anModelStatic::AddSurface
 ================
 */
-void aRcModelStatic::AddSurface( modelSurface_t surface ) {
+void anModelStatic::AddSurface( modelSurface_t surface ) {
 	surfaces.Append( surface );
 	if ( surface.geometry ) {
 		bounds += surface.geometry->bounds;
@@ -361,56 +329,56 @@ void aRcModelStatic::AddSurface( modelSurface_t surface ) {
 
 /*
 ================
-aRcModelStatic::Name
+anModelStatic::Name
 ================
 */
-const char *aRcModelStatic::Name() const {
+const char *anModelStatic::Name() const {
 	return name;
 }
 
 /*
 ================
-aRcModelStatic::Timestamp
+anModelStatic::Timestamp
 ================
 */
-ARC_TIME_T aRcModelStatic::Timestamp() const {
+ARC_TIME_T anModelStatic::Timestamp() const {
 	return timeStamp;
 }
 
 /*
 ================
-aRcModelStatic::NumSurfaces
+anModelStatic::NumSurfaces
 ================
 */
-int aRcModelStatic::NumSurfaces() const {
+int anModelStatic::NumSurfaces() const {
 	return surfaces.Num();
 }
 
 /*
 ================
-aRcModelStatic::NumBaseSurfaces
+anModelStatic::NumBaseSurfaces
 ================
 */
-int aRcModelStatic::NumBaseSurfaces() const {
+int anModelStatic::NumBaseSurfaces() const {
 	return surfaces.Num() - overlaysAdded;
 }
 
 /*
 ================
-aRcModelStatic::Surface
+anModelStatic::Surface
 ================
 */
-const modelSurface_t *aRcModelStatic::Surface( int surfaceNum ) const {
+const modelSurface_t *anModelStatic::Surface( int surfaceNum ) const {
 	return &surfaces[surfaceNum];
 }
 
 /*
 ================
-aRcModelStatic::AllocSurfaceTriangles
+anModelStatic::AllocSurfaceTriangles
 ================
 */
-surfTriangles_t *aRcModelStatic::AllocSurfaceTriangles( int numVerts, int numIndexes ) const {
-	surfTriangles_t *tri = R_AllocStaticTriSurf();
+srfTriangles_t *anModelStatic::AllocSurfaceTriangles( int numVerts, int numIndexes ) const {
+	srfTriangles_t *tri = R_AllocStaticTriSurf();
 	R_AllocStaticTriSurfVerts( tri, numVerts );
 	R_AllocStaticTriSurfIndexes( tri, numIndexes );
 	return tri;
@@ -418,133 +386,133 @@ surfTriangles_t *aRcModelStatic::AllocSurfaceTriangles( int numVerts, int numInd
 
 /*
 ================
-aRcModelStatic::FreeSurfaceTriangles
+anModelStatic::FreeSurfaceTriangles
 ================
 */
-void aRcModelStatic::FreeSurfaceTriangles( surfTriangles_t *tris ) const {
+void anModelStatic::FreeSurfaceTriangles( srfTriangles_t *tris ) const {
 	R_FreeStaticTriSurf( tris );
 }
 
 /*
 ================
-aRcModelStatic::ShadowHull
+anModelStatic::ShadowHull
 ================
 */
-surfTriangles_t *aRcModelStatic::ShadowHull() const {
+srfTriangles_t *anModelStatic::ShadowHull() const {
 	return shadowHull;
 }
 
 /*
 ================
-aRcModelStatic::IsStaticWorldModel
+anModelStatic::IsStaticWorldModel
 ================
 */
-bool aRcModelStatic::IsStaticWorldModel() const {
+bool anModelStatic::IsStaticWorldModel() const {
 	return isStaticWorldModel;
 }
 
 /*
 ================
-aRcModelStatic::IsDynamicModel
+anModelStatic::IsDynamicModel
 ================
 */
-dynamicModel_t aRcModelStatic::IsDynamicModel() const {
+dynamicModel_t anModelStatic::IsDynamicModel() const {
 	// dynamic subclasses will override this
 	return DM_STATIC;
 }
 
 /*
 ================
-aRcModelStatic::IsReloadable
+anModelStatic::IsReloadable
 ================
 */
-bool aRcModelStatic::IsReloadable() const {
+bool anModelStatic::IsReloadable() const {
 	return reloadable;
 }
 
 /*
 ================
-aRcModelStatic::Bounds
+anModelStatic::Bounds
 ================
 */
-arcBounds aRcModelStatic::Bounds( const struct renderEntity_s *mdef ) const {
+anBounds anModelStatic::Bounds( const struct renderEntity_s *mdef ) const {
 	return bounds;
 }
 
 /*
 ================
-aRcModelStatic::DepthHack
+anModelStatic::DepthHack
 ================
 */
-float aRcModelStatic::DepthHack() const {
+float anModelStatic::DepthHack() const {
 	return 0.0f;
 }
 
 /*
 ================
-aRcModelStatic::InstantiateDynamicModel
+anModelStatic::InstantiateDynamicModel
 ================
 */
-ARCRenderModel *aRcModelStatic::InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel ) {
+anRenderModel *anModelStatic::InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel ) {
 	if ( cachedModel ) {
 		delete cachedModel;
-		cachedModel = NULL;
+		cachedModel = nullptr;
 	}
 	common->Error( "InstantiateDynamicModel called on static model '%s'", name.c_str() );
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-aRcModelStatic::NumJoints
+anModelStatic::NumJoints
 ================
 */
-int aRcModelStatic::NumJoints( void ) const {
+int anModelStatic::NumJoints( void ) const {
 	return 0;
 }
 
 /*
 ================
-aRcModelStatic::GetJoints
+anModelStatic::GetJoints
 ================
 */
-const aRcMD5Joint *aRcModelStatic::GetJoints( void ) const {
-	return NULL;
+const anM8DJoint *anModelStatic::GetJoints( void ) const {
+	return nullptr;
 }
 
 /*
 ================
-aRcModelStatic::GetJointHandle
+anModelStatic::GetJointHandle
 ================
 */
-jointHandle_t aRcModelStatic::GetJointHandle( const char *name ) const {
+jointHandle_t anModelStatic::GetJointHandle( const char *name ) const {
 	return INVALID_JOINT;
 }
 
 /*
 ================
-aRcModelStatic::GetJointName
+anModelStatic::GetJointName
 ================
 */
-const char * aRcModelStatic::GetJointName( jointHandle_t handle ) const {
+const char *anModelStatic::GetJointName( jointHandle_t handle ) const {
 	return "";
 }
 
 /*
 ================
-aRcModelStatic::GetDefaultPose
+anModelStatic::GetDefaultPose
 ================
 */
-const idJointQuat *aRcModelStatic::GetDefaultPose( void ) const {
-	return NULL;
+const anJointQuat *anModelStatic::GetDefaultPose( void ) const {
+	return nullptr;
 }
 
 /*
 ================
-aRcModelStatic::NearestJoint
+anModelStatic::NearestJoint
 ================
 */
-int aRcModelStatic::NearestJoint( int surfaceNum, int a, int b, int c ) const {
+int anModelStatic::NearestJoint( int surfaceNum, int a, int b, int c ) const {
 	return INVALID_JOINT;
 }
 
@@ -554,7 +522,7 @@ int aRcModelStatic::NearestJoint( int surfaceNum, int a, int b, int c ) const {
 
 /*
 ================
-aRcModelStatic::FinishSurfaces
+anModelStatic::FinishSurfaces
 
 The mergeShadows option allows surfaces with different textures to share
 silhouette edges for shadow calculation, instead of leaving shared edges
@@ -577,7 +545,7 @@ Extends the bounds of deformed surfaces so they don't cull incorrectly at screen
 
 ================
 */
-void aRcModelStatic::FinishSurfaces() {
+void anModelStatic::FinishSurfaces() {
 	int			i;
 	int			totalVerts, totalIndexes;
 
@@ -594,8 +562,7 @@ void aRcModelStatic::FinishSurfaces() {
 	if ( fastLoad ) {
 		bounds.Zero();
 		for ( i = 0; i < surfaces.Num(); i++ ) {
-			const modelSurface_t	*surf = &surfaces[i];
-
+			const modelSurface_t *surf = &surfaces[i];
 			R_BoundTriSurf( surf->geometry );
 			bounds.AddBounds( surf->geometry->bounds );
 		}
@@ -610,17 +577,16 @@ void aRcModelStatic::FinishSurfaces() {
 	// decide if we are going to merge all the surfaces into one shadower
 	int	numOriginalSurfaces = surfaces.Num();
 
-	// make sure there aren't any NULL shaders or geometry
+	// make sure there aren't any nullptr shaders or geometry
 	for ( i = 0; i < numOriginalSurfaces; i++ ) {
 		const modelSurface_t	*surf = &surfaces[i];
-
-		if ( surf->geometry == NULL || surf->shader == NULL ) {
+		if ( surf->geometry == nullptr || surf->shader == nullptr ) {
 			MakeDefaultModel();
-			common->Error( "Model %s, surface %i had NULL geometry", name.c_str(), i );
+			common->Error( "Model %s, surface %i had nullptr geometry", name.c_str(), i );
 		}
-		if ( surf->shader == NULL ) {
+		if ( surf->shader == nullptr ) {
 			MakeDefaultModel();
-			common->Error( "Model %s, surface %i had NULL shader", name.c_str(), i );
+			common->Error( "Model %s, surface %i had nullptr shader", name.c_str(), i );
 		}
 	}
 
@@ -631,17 +597,12 @@ void aRcModelStatic::FinishSurfaces() {
 	// add vertexes and indexes to the existing surface, because the
 	// tangent generation wouldn't like the acute shared edges
 	for ( i = 0; i < numOriginalSurfaces; i++ ) {
-		const modelSurface_t	*surf = &surfaces[i];
-
+		const modelSurface_t *surf = &surfaces[i];
 		if ( surf->shader->ShouldCreateBackSides() ) {
-			surfTriangles_t *newTri;
-
-			newTri = R_CopyStaticTriSurf( surf->geometry );
+			srfTriangles_t *newTri = R_CopyStaticTriSurf( surf->geometry );
 			R_ReverseTriangles( newTri );
 
-			modelSurface_t	newSurf;
-
-			newSurf.shader = surf->shader;
+			modelSurface_t newSurf.shader = surf->shader;
 			newSurf.geometry = newTri;
 
 			AddSurface( newSurf );
@@ -650,8 +611,7 @@ void aRcModelStatic::FinishSurfaces() {
 
 	// clean the surfaces
 	for ( i = 0; i < surfaces.Num(); i++ ) {
-		const modelSurface_t	*surf = &surfaces[i];
-
+		const modelSurface_t *surf = &surfaces[i];
 		R_CleanupTriangles( surf->geometry, surf->geometry->generateNormals, true, surf->shader->UseUnsmoothedTangents() );
 		if ( surf->shader->SurfaceCastsShadow() ) {
 			totalVerts += surf->geometry->numVerts;
@@ -661,13 +621,12 @@ void aRcModelStatic::FinishSurfaces() {
 
 	// add up the total surface area for development information
 	for ( i = 0; i < surfaces.Num(); i++ ) {
-		const modelSurface_t	*surf = &surfaces[i];
-		surfTriangles_t	*tri = surf->geometry;
-
+		const modelSurface_t *surf = &surfaces[i];
+		srfTriangles_t	*tri = surf->geometry;
 		for ( int j = 0; j < tri->numIndexes; j += 3 ) {
-			float	area = arcWinding::TriangleArea( tri->verts[tri->indexes[j]].xyz,
+			float	area = anWinding::TriangleArea( tri->verts[tri->indexes[j]].xyz,
 				 tri->verts[tri->indexes[j+1]].xyz,  tri->verts[tri->indexes[j+2]].xyz );
-			const_cast<arcMaterial *>(surf->shader)->AddToSurfaceArea( area );
+			const_cast<anMaterial *>( surf->shader)->AddToSurfaceArea( area );
 		}
 	}
 
@@ -686,8 +645,8 @@ void aRcModelStatic::FinishSurfaces() {
 			// Note that this doesn't handle deformations that are skinned in
 			// at run time...
 			if ( surf->shader->Deform() != DFRM_NONE ) {
-				surfTriangles_t	*tri = surf->geometry;
-				arcVec3	mid = ( tri->bounds[1] + tri->bounds[0] ) * 0.5f;
+				srfTriangles_t	*tri = surf->geometry;
+				anVec3	mid = ( tri->bounds[1] + tri->bounds[0] ) * 0.5f;
 				float	radius = ( tri->bounds[0] - mid ).Length();
 				radius += 20.0f;
 
@@ -702,29 +661,27 @@ void aRcModelStatic::FinishSurfaces() {
 
 			// add to the model bounds
 			bounds.AddBounds( surf->geometry->bounds );
-
 		}
 	}
 }
 
 /*
 =================
-aRcModelStatic::ConvertASEToModelSurfaces
+anModelStatic::ConvertASEToModelSurfaces
 =================
 */
 typedef struct matchVert_s {
 	struct matchVert_s	*next;
 	int		v, tv;
 	byte	color[4];
-	arcVec3	normal;
+	anVec3	normal;
 } matchVert_t;
-
-bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
+bool anModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 	aseObject_t *	object;
 	aseMesh_t *		mesh;
 	aseMaterial_t *	material;
-	const arcMaterial *im1, *im2;
-	surfTriangles_t *tri;
+	const anMaterial *im1, *im2;
+	srfTriangles_t *tri;
 	int				objectNum;
 	int				i, j, k;
 	int				v, tv;
@@ -734,7 +691,7 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 	matchVert_t **	mvHash;		// points inside mvTable for each xyz index
 	matchVert_t *	lastmv;
 	matchVert_t *	mv;
-	arcVec3			normal;
+	anVec3			normal;
 	float			uOffset, vOffset, textureSin, textureCos;
 	float			uTiling, vTiling;
 	int *			mergeTo;
@@ -754,8 +711,8 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 	// the modeling programs can save out multiple surfaces with a common
 	// material, but we would like to mege them together where possible
 	// meaning that this->NumSurfaces() <= ase->objects.currentElements
-	mergeTo = ( int * )_alloca( ase->objects.Num() * sizeof( *mergeTo ) );
-	surf.geometry = NULL;
+	mergeTo = ( int*)_alloca( ase->objects.Num() * sizeof( *mergeTo ) );
+	surf.geometry = nullptr;
 	if ( ase->materials.Num() == 0 ) {
 		// if we don't have any materials, dump everything into a single surface
 		surf.shader = tr.defaultMaterial;
@@ -804,8 +761,8 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 		}
 	}
 
-	arcVectorSubset<arcVec3, 3> vertexSubset;
-	arcVectorSubset<arcVec2, 2> texCoordSubset;
+	anVectorSubset<anVec3, 3> vertexSubset;
+	anVectorSubset<anVec2, 2> texCoordSubset;
 
 	// build the surfaces
 	for ( objectNum = 0; objectNum < ase->objects.Num(); objectNum++ ) {
@@ -829,7 +786,7 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 		// before doing this operation, because we can miss a slop combination
 		// if they are in different surfaces
 
-		vRemap = ( int * )R_StaticAlloc( mesh->numVertexes * sizeof( vRemap[0] ) );
+		vRemap = ( int*)R_StaticAlloc( mesh->numVertexes * sizeof( vRemap[0] ) );
 
 		if ( fastLoad ) {
 			// renderbump doesn't care about vertex count
@@ -839,18 +796,18 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 		} else {
 			float vertexEpsilon = r_slopVertex.GetFloat();
 			float expand = 2 * 32 * vertexEpsilon;
-			arcVec3 mins, maxs;
+			anVec3 mins, maxs;
 
 			SIMDProcessor->MinMax( mins, maxs, mesh->vertexes, mesh->numVertexes );
-			mins -= arcVec3( expand, expand, expand );
-			maxs += arcVec3( expand, expand, expand );
+			mins -= anVec3( expand, expand, expand );
+			maxs += anVec3( expand, expand, expand );
 			vertexSubset.Init( mins, maxs, 32, 1024 );
 			for ( j = 0; j < mesh->numVertexes; j++ ) {
 				vRemap[j] = vertexSubset.FindVector( mesh->vertexes, j, vertexEpsilon );
 			}
 		}
 
-		tvRemap = ( int * )R_StaticAlloc( mesh->numTVertexes * sizeof( tvRemap[0] ) );
+		tvRemap = ( int*)R_StaticAlloc( mesh->numTVertexes * sizeof( tvRemap[0] ) );
 
 		if ( fastLoad ) {
 			// renderbump doesn't care about vertex count
@@ -860,11 +817,11 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 		} else {
 			float texCoordEpsilon = r_slopTexCoord.GetFloat();
 			float expand = 2 * 32 * texCoordEpsilon;
-			arcVec2 mins, maxs;
+			anVec2 mins, maxs;
 
 			SIMDProcessor->MinMax( mins, maxs, mesh->tvertexes, mesh->numTVertexes );
-			mins -= arcVec2( expand, expand );
-			maxs += arcVec2( expand, expand );
+			mins -= anVec2( expand, expand );
+			maxs += anVec2( expand, expand );
 			texCoordSubset.Init( mins, maxs, 32, 1024 );
 			for ( j = 0; j < mesh->numTVertexes; j++ ) {
 				tvRemap[j] = texCoordSubset.FindVector( mesh->tvertexes, j, texCoordEpsilon );
@@ -926,7 +883,7 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 				}
 
 				// find a matching vert
-				for ( lastmv = NULL, mv = mvHash[v]; mv != NULL; lastmv = mv, mv = mv->next ) {
+				for ( lastmv = nullptr, mv = mvHash[v]; mv != nullptr; lastmv = mv, mv = mv->next ) {
 					if ( mv->tv != tv ) {
 						continue;
 					}
@@ -949,7 +906,7 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 					mv->tv = tv;
 					mv->normal = normal;
 					*(unsigned *)mv->color = *(unsigned *)color;
-					mv->next = NULL;
+					mv->next = nullptr;
 					if ( lastmv ) {
 						lastmv->next = mv;
 					} else {
@@ -983,8 +940,8 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 			vOffset = material->vOffset;
 			uTiling = material->uTiling;
 			vTiling = material->vTiling;
-			textureSin = arcMath::Sin( material->angle );
-			textureCos = arcMath::Cos( material->angle );
+			textureSin = anMath::Sin( material->angle );
+			textureCos = anMath::Cos( material->angle );
 		}
 
 		// now allocate and generate the combined vertexes
@@ -996,7 +953,7 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 			tri->verts[ j ].normal = mv->normal;
 			*(unsigned *)tri->verts[j].color = *(unsigned *)mv->color;
 			if ( mesh->numTVFaces == mesh->numFaces && mesh->numTVertexes != 0 ) {
-				const arcVec2 &tv = mesh->tvertexes[ mv->tv ];
+				const anVec2 &tv = mesh->tvertexes[ mv->tv ];
 				float u = tv.x * uTiling + uOffset;
 				float v = tv.y * vTiling + vOffset;
 				tri->verts[ j ].st[0] = u * textureCos + v * textureSin;
@@ -1011,7 +968,7 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 
 		// see if we need to merge with a previous surface of the same material
 		modelSurf = &this->surfaces[mergeTo[ objectNum ]];
-		surfTriangles_t	*mergeTri = modelSurf->geometry;
+		srfTriangles_t	*mergeTri = modelSurf->geometry;
 		if ( !mergeTri ) {
 			modelSurf->geometry = tri;
 		} else {
@@ -1026,25 +983,25 @@ bool aRcModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *ase ) {
 
 /*
 =================
-aRcModelStatic::ConvertLWOToModelSurfaces
+anModelStatic::ConvertLWOToModelSurfaces
 =================
 */
-bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) {
-	const arcMaterial *im1, *im2;
-	surfTriangles_t	*tri;
+bool anModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) {
+	const anMaterial *im1, *im2;
+	srfTriangles_t	*tri;
 	lwSurface *		lwoSurf;
 	int				numTVertexes;
 	int				i, j, k;
 	int				v, tv;
-	arcVec3 *		vList;
+	anVec3 *		vList;
 	int *			vRemap;
-	arcVec2 *		tvList;
+	anVec2 *		tvList;
 	int *			tvRemap;
 	matchVert_t *	mvTable;	// all of the match verts
 	matchVert_t **	mvHash;		// points inside mvTable for each xyz index
 	matchVert_t *	lastmv;
 	matchVert_t *	mv;
-	arcVec3			normal;
+	anVec3			normal;
 	int *			mergeTo;
 	byte			color[4];
 	modelSurface_t	surf, *modelSurf;
@@ -1052,7 +1009,7 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 	if ( !lwo ) {
 		return false;
 	}
-	if ( lwo->surf == NULL ) {
+	if ( lwo->surf == nullptr ) {
 		return false;
 	}
 
@@ -1066,7 +1023,7 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 
 	// the modeling programs can save out multiple surfaces with a common
 	// material, but we would like to merge them together where possible
-	mergeTo = ( int * )_alloca( i * sizeof( mergeTo[0] ) );
+	mergeTo = ( int*)_alloca( i * sizeof( mergeTo[0] ) );
 	memset( &surf, 0, sizeof( surf ) );
 
 	if ( !r_mergeModelSurfaces.GetBool() ) {
@@ -1105,8 +1062,8 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 		}
 	}
 
-	arcVectorSubset<arcVec3, 3> vertexSubset;
-	arcVectorSubset<arcVec2, 2> texCoordSubset;
+	anVectorSubset<anVec3, 3> vertexSubset;
+	anVectorSubset<anVec2, 2> texCoordSubset;
 
 	// we only ever use the first layer
 	lwLayer *layer = lwo->layer;
@@ -1117,7 +1074,7 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 		return false;
 	}
 
-	vList = (arcVec3 *)R_StaticAlloc( layer->point.count * sizeof( vList[0] ) );
+	vList = (anVec3 *)R_StaticAlloc( layer->point.count * sizeof( vList[0] ) );
 	for ( j = 0; j < layer->point.count; j++ ) {
 		vList[j].x = layer->point.pt[j].pos[0];
 		vList[j].y = layer->point.pt[j].pos[2];
@@ -1136,7 +1093,7 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 	}
 
 	if ( numTVertexes ) {
-		tvList = (arcVec2 *)Mem_Alloc( numTVertexes * sizeof( tvList[0] ) );
+		tvList = (anVec2 *)Mem_Alloc( numTVertexes * sizeof( tvList[0] ) );
 		int offset = 0;
 		for ( lwVMap *vm = layer->vmap; vm; vm = vm->next ) {
 			if ( vm->type == LWID_('T','X','U','V') ) {
@@ -1151,7 +1108,7 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 	} else {
 		common->Warning( "ConvertLWOToModelSurfaces: model \'%s\' has bad or missing uv data", name.c_str() );
 	  	numTVertexes = 1;
-		tvList = (arcVec2 *)Mem_ClearedAlloc( numTVertexes * sizeof( tvList[0] ) );
+		tvList = (anVec2 *)Mem_ClearedAlloc( numTVertexes * sizeof( tvList[0] ) );
 	}
 
 	// It seems like the tools our artists are using often generate
@@ -1160,7 +1117,7 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 	// before doing this operation, because we can miss a slop combination
 	// if they are in different surfaces
 
-	vRemap = ( int * )R_StaticAlloc( layer->point.count * sizeof( vRemap[0] ) );
+	vRemap = ( int*)R_StaticAlloc( layer->point.count * sizeof( vRemap[0] ) );
 
 	if ( fastLoad ) {
 		// renderbump doesn't care about vertex count
@@ -1170,18 +1127,18 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 	} else {
 		float vertexEpsilon = r_slopVertex.GetFloat();
 		float expand = 2 * 32 * vertexEpsilon;
-		arcVec3 mins, maxs;
+		anVec3 mins, maxs;
 
 		SIMDProcessor->MinMax( mins, maxs, vList, layer->point.count );
-		mins -= arcVec3( expand, expand, expand );
-		maxs += arcVec3( expand, expand, expand );
+		mins -= anVec3( expand, expand, expand );
+		maxs += anVec3( expand, expand, expand );
 		vertexSubset.Init( mins, maxs, 32, 1024 );
 		for ( j = 0; j < layer->point.count; j++ ) {
 			vRemap[j] = vertexSubset.FindVector( vList, j, vertexEpsilon );
 		}
 	}
 
-	tvRemap = ( int * )R_StaticAlloc( numTVertexes * sizeof( tvRemap[0] ) );
+	tvRemap = ( int*)R_StaticAlloc( numTVertexes * sizeof( tvRemap[0] ) );
 
 	if ( fastLoad ) {
 		// renderbump doesn't care about vertex count
@@ -1191,11 +1148,11 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 	} else {
 		float texCoordEpsilon = r_slopTexCoord.GetFloat();
 		float expand = 2 * 32 * texCoordEpsilon;
-		arcVec2 mins, maxs;
+		anVec2 mins, maxs;
 
 		SIMDProcessor->MinMax( mins, maxs, tvList, numTVertexes );
-		mins -= arcVec2( expand, expand );
-		maxs += arcVec2( expand, expand );
+		mins -= anVec2( expand, expand );
+		maxs += anVec2( expand, expand );
 		texCoordSubset.Init( mins, maxs, 32, 1024 );
 		for ( j = 0; j < numTVertexes; j++ ) {
 			tvRemap[j] = texCoordSubset.FindVector( tvList, j, texCoordEpsilon );
@@ -1298,7 +1255,7 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 				}
 
 				// find a matching vert
-				for ( lastmv = NULL, mv = mvHash[v]; mv != NULL; lastmv = mv, mv = mv->next ) {
+				for ( lastmv = nullptr, mv = mvHash[v]; mv != nullptr; lastmv = mv, mv = mv->next ) {
 					if ( mv->tv != tv ) {
 						continue;
 					}
@@ -1321,7 +1278,7 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 					mv->tv = tv;
 					mv->normal = normal;
 					*(unsigned *)mv->color = *(unsigned *)color;
-					mv->next = NULL;
+					mv->next = nullptr;
 					if ( lastmv ) {
 						lastmv->next = mv;
 					} else {
@@ -1358,8 +1315,8 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 		R_StaticFree( mvHash );
 
 		// see if we need to merge with a previous surface of the same material
-		modelSurf = &this->surfaces[mergeTo[ i ]];
-		surfTriangles_t	*mergeTri = modelSurf->geometry;
+		modelSurf = &this->surfaces[mergeTo[i]];
+		srfTriangles_t	*mergeTri = modelSurf->geometry;
 		if ( !mergeTri ) {
 			modelSurf->geometry = tri;
 		} else {
@@ -1379,18 +1336,18 @@ bool aRcModelStatic::ConvertLWOToModelSurfaces( const struct st_lwObject *lwo ) 
 
 /*
 =================
-aRcModelStatic::ConvertLWOToASE
+anModelStatic::ConvertLWOToASE
 =================
 */
-struct aseModel_s *aRcModelStatic::ConvertLWOToASE( const struct st_lwObject *obj, const char *fileName ) {
+struct aseModel_s *anModelStatic::ConvertLWOToASE( const struct st_lwObject *obj, const char *fileName ) {
 	int j, k;
 	aseModel_t *ase;
 
 	if ( !obj ) {
-		return NULL;
+		return nullptr;
 	}
 
-	// NOTE: using new operator because aseModel_t contains arcNetList class objects
+	// NOTE: using new operator because aseModel_t contains anList class objects
 	ase = new aseModel_t;
 	ase->timeStamp = obj->timeStamp;
 	ase->objects.Resize( obj->nlayers, obj->nlayers );
@@ -1418,7 +1375,7 @@ struct aseModel_s *aRcModelStatic::ConvertLWOToASE( const struct st_lwObject *ob
 		mesh->faces = (aseFace_t *)Mem_Alloc( mesh->numFaces  * sizeof( mesh->faces[0] ) );
 
 		mesh->numVertexes = layer->point.count;
-		mesh->vertexes = (arcVec3 *)Mem_Alloc( mesh->numVertexes * sizeof( mesh->vertexes[0] ) );
+		mesh->vertexes = (anVec3 *)Mem_Alloc( mesh->numVertexes * sizeof( mesh->vertexes[0] ) );
 
 		// vertex positions
 		if ( layer->point.count <= 0 ) {
@@ -1443,7 +1400,7 @@ struct aseModel_s *aRcModelStatic::ConvertLWOToASE( const struct st_lwObject *ob
 		}
 
 		if ( mesh->numTVertexes ) {
-		  	mesh->tvertexes = (arcVec2 *)Mem_Alloc( mesh->numTVertexes * sizeof( mesh->tvertexes[0] ) );
+		  	mesh->tvertexes = (anVec2 *)Mem_Alloc( mesh->numTVertexes * sizeof( mesh->tvertexes[0] ) );
 		  	int offset = 0;
 		  	for ( lwVMap *vm = layer->vmap; vm; vm = vm->next ) {
 				if ( vm->type == LWID_('T','X','U','V') ) {
@@ -1458,7 +1415,7 @@ struct aseModel_s *aRcModelStatic::ConvertLWOToASE( const struct st_lwObject *ob
 	  	} else {
 			common->Warning( "ConvertLWOToASE: model \'%s\' has bad or missing uv data", fileName );
 	  		mesh->numTVertexes = 1;
-	  		mesh->tvertexes = (arcVec2 *)Mem_ClearedAlloc( mesh->numTVertexes * sizeof( mesh->tvertexes[0] ) );
+	  		mesh->tvertexes = (anVec2 *)Mem_ClearedAlloc( mesh->numTVertexes * sizeof( mesh->tvertexes[0] ) );
 	  	}
 
 		mesh->normalsParsed = true;
@@ -1546,17 +1503,17 @@ struct aseModel_s *aRcModelStatic::ConvertLWOToASE( const struct st_lwObject *ob
 
 /*
 =================
-aRcModelStatic::ConvertMAToModelSurfaces
+anModelStatic::ConvertMAToModelSurfaces
 =================
 */
-bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
+bool anModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 
 	maObject_t *	object;
 	maMesh_t *		mesh;
 	maMaterial_t *	material;
 
-	const arcMaterial *im1, *im2;
-	surfTriangles_t *tri;
+	const anMaterial *im1, *im2;
+	srfTriangles_t *tri;
 	int				objectNum;
 	int				i, j, k;
 	int				v, tv;
@@ -1566,7 +1523,7 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 	matchVert_t **	mvHash;		// points inside mvTable for each xyz index
 	matchVert_t *	lastmv;
 	matchVert_t *	mv;
-	arcVec3			normal;
+	anVec3			normal;
 	float			uOffset, vOffset, textureSin, textureCos;
 	float			uTiling, vTiling;
 	int *			mergeTo;
@@ -1586,9 +1543,9 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 	// the modeling programs can save out multiple surfaces with a common
 	// material, but we would like to mege them together where possible
 	// meaning that this->NumSurfaces() <= ma->objects.currentElements
-	mergeTo = ( int * )_alloca( ma->objects.Num() * sizeof( *mergeTo ) );
+	mergeTo = ( int*)_alloca( ma->objects.Num() * sizeof( *mergeTo ) );
 
-	surf.geometry = NULL;
+	surf.geometry = nullptr;
 	if ( ma->materials.Num() == 0 ) {
 		// if we don't have any materials, dump everything into a single surface
 		surf.shader = tr.defaultMaterial;
@@ -1645,8 +1602,8 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 		}
 	}
 
-	arcVectorSubset<arcVec3, 3> vertexSubset;
-	arcVectorSubset<arcVec2, 2> texCoordSubset;
+	anVectorSubset<anVec3, 3> vertexSubset;
+	anVectorSubset<anVec2, 2> texCoordSubset;
 
 	// build the surfaces
 	for ( objectNum = 0; objectNum < ma->objects.Num(); objectNum++ ) {
@@ -1674,7 +1631,7 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 		// before doing this operation, because we can miss a slop combination
 		// if they are in different surfaces
 
-		vRemap = ( int * )R_StaticAlloc( mesh->numVertexes * sizeof( vRemap[0] ) );
+		vRemap = ( int*)R_StaticAlloc( mesh->numVertexes * sizeof( vRemap[0] ) );
 
 		if ( fastLoad ) {
 			// renderbump doesn't care about vertex count
@@ -1684,18 +1641,18 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 		} else {
 			float vertexEpsilon = r_slopVertex.GetFloat();
 			float expand = 2 * 32 * vertexEpsilon;
-			arcVec3 mins, maxs;
+			anVec3 mins, maxs;
 
 			SIMDProcessor->MinMax( mins, maxs, mesh->vertexes, mesh->numVertexes );
-			mins -= arcVec3( expand, expand, expand );
-			maxs += arcVec3( expand, expand, expand );
+			mins -= anVec3( expand, expand, expand );
+			maxs += anVec3( expand, expand, expand );
 			vertexSubset.Init( mins, maxs, 32, 1024 );
 			for ( j = 0; j < mesh->numVertexes; j++ ) {
 				vRemap[j] = vertexSubset.FindVector( mesh->vertexes, j, vertexEpsilon );
 			}
 		}
 
-		tvRemap = ( int * )R_StaticAlloc( mesh->numTVertexes * sizeof( tvRemap[0] ) );
+		tvRemap = ( int*)R_StaticAlloc( mesh->numTVertexes * sizeof( tvRemap[0] ) );
 
 		if ( fastLoad ) {
 			// renderbump doesn't care about vertex count
@@ -1705,11 +1662,11 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 		} else {
 			float texCoordEpsilon = r_slopTexCoord.GetFloat();
 			float expand = 2 * 32 * texCoordEpsilon;
-			arcVec2 mins, maxs;
+			anVec2 mins, maxs;
 
 			SIMDProcessor->MinMax( mins, maxs, mesh->tvertexes, mesh->numTVertexes );
-			mins -= arcVec2( expand, expand );
-			maxs += arcVec2( expand, expand );
+			mins -= anVec2( expand, expand );
+			maxs += anVec2( expand, expand );
 			texCoordSubset.Init( mins, maxs, 32, 1024 );
 			for ( j = 0; j < mesh->numTVertexes; j++ ) {
 				tvRemap[j] = texCoordSubset.FindVector( mesh->tvertexes, j, texCoordEpsilon );
@@ -1773,7 +1730,7 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 				}
 
 				// find a matching vert
-				for ( lastmv = NULL, mv = mvHash[v]; mv != NULL; lastmv = mv, mv = mv->next ) {
+				for ( lastmv = nullptr, mv = mvHash[v]; mv != nullptr; lastmv = mv, mv = mv->next ) {
 					if ( mv->tv != tv ) {
 						continue;
 					}
@@ -1796,7 +1753,7 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 					mv->tv = tv;
 					mv->normal = normal;
 					*(unsigned *)mv->color = *(unsigned *)color;
-					mv->next = NULL;
+					mv->next = nullptr;
 					if ( lastmv ) {
 						lastmv->next = mv;
 					} else {
@@ -1831,8 +1788,8 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 		//	vOffset = material->vOffset;
 		//	uTiling = material->uTiling;
 		//	vTiling = material->vTiling;
-		//	textureSin = arcMath::Sin( material->angle );
-		//	textureCos = arcMath::Cos( material->angle );
+		//	textureSin = anMath::Sin( material->angle );
+		//	textureCos = anMath::Cos( material->angle );
 		//}
 
 		// now allocate and generate the combined vertexes
@@ -1844,7 +1801,7 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 			tri->verts[ j ].normal = mv->normal;
 			*(unsigned *)tri->verts[j].color = *(unsigned *)mv->color;
 			if ( mesh->numTVertexes != 0 ) {
-				const arcVec2 &tv = mesh->tvertexes[ mv->tv ];
+				const anVec2 &tv = mesh->tvertexes[ mv->tv ];
 				float u = tv.x * uTiling + uOffset;
 				float v = tv.y * vTiling + vOffset;
 				tri->verts[ j ].st[0] = u * textureCos + v * textureSin;
@@ -1859,7 +1816,7 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 
 		// see if we need to merge with a previous surface of the same material
 		modelSurf = &this->surfaces[mergeTo[ objectNum ]];
-		surfTriangles_t	*mergeTri = modelSurf->geometry;
+		srfTriangles_t	*mergeTri = modelSurf->geometry;
 		if ( !mergeTri ) {
 			modelSurf->geometry = tri;
 		} else {
@@ -1874,14 +1831,14 @@ bool aRcModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma ) {
 
 /*
 =================
-aRcModelStatic::LoadASE
+anModelStatic::LoadASE
 =================
 */
-bool aRcModelStatic::LoadASE( const char *fileName ) {
+bool anModelStatic::LoadASE( const char *fileName ) {
 	aseModel_t *ase;
 
 	ase = ASE_Load( fileName );
-	if ( ase == NULL ) {
+	if ( ase == nullptr ) {
 		return false;
 	}
 
@@ -1894,16 +1851,16 @@ bool aRcModelStatic::LoadASE( const char *fileName ) {
 
 /*
 =================
-aRcModelStatic::LoadLWO
+anModelStatic::LoadLWO
 =================
 */
-bool aRcModelStatic::LoadLWO( const char *fileName ) {
+bool anModelStatic::LoadLWO( const char *fileName ) {
 	unsigned int failID;
 	int failPos;
 	lwObject *lwo;
 
 	lwo = lwGetObject( fileName, &failID, &failPos );
-	if ( lwo == NULL ) {
+	if ( lwo == nullptr ) {
 		return false;
 	}
 
@@ -1916,14 +1873,14 @@ bool aRcModelStatic::LoadLWO( const char *fileName ) {
 
 /*
 =================
-aRcModelStatic::LoadMA
+anModelStatic::LoadMA
 =================
 */
-bool aRcModelStatic::LoadMA( const char *fileName ) {
+bool anModelStatic::LoadMA( const char *fileName ) {
 	maModel_t *ma;
 
 	ma = MA_Load( fileName );
-	if ( ma == NULL ) {
+	if ( ma == nullptr ) {
 		return false;
 	}
 
@@ -1936,12 +1893,12 @@ bool aRcModelStatic::LoadMA( const char *fileName ) {
 
 /*
 =================
-aRcModelStatic::LoadFLT
+anModelStatic::LoadFLT
 
 USGS height map data for megaTexture experiments
 =================
 */
-bool aRcModelStatic::LoadFLT( const char *fileName ) {
+bool anModelStatic::LoadFLT( const char *fileName ) {
 	float	*data;
 	int		len;
 
@@ -1969,7 +1926,7 @@ bool aRcModelStatic::LoadFLT( const char *fileName ) {
 	}
 #if 1
 	// write out a gray scale height map
-	byte	*image = ( byte * )R_StaticAlloc( len );
+	byte	*image = (byte *)R_StaticAlloc( len );
 	byte	*image_p = image;
 	for ( int i = 0; i < len/4; i++ ) {
 		float v = ( data[i] - min ) / ( max - min );
@@ -1979,7 +1936,7 @@ bool aRcModelStatic::LoadFLT( const char *fileName ) {
 		image_p[3] = 255;
 		image_p += 4;
 	}
-	arcNetString	tgaName = fileName;
+	anString	tgaName = fileName;
 	tgaName.StripFileExtension();
 	tgaName += ".tga";
 	R_WriteTGA( tgaName.c_str(), image, size, size, false );
@@ -2041,7 +1998,7 @@ bool aRcModelStatic::LoadFLT( const char *fileName ) {
 
 //width /= 2;
 	// allocate triangle surface
-	surfTriangles_t *tri = R_AllocStaticTriSurf();
+	srfTriangles_t *tri = R_AllocStaticTriSurf();
 	tri->numVerts = width * height;
 	tri->numIndexes = ( width-1 ) * ( height-1 ) * 6;
 
@@ -2101,10 +2058,10 @@ bool aRcModelStatic::LoadFLT( const char *fileName ) {
 
 /*
 ================
-aRcModelStatic::PurgeModel
+anModelStatic::PurgeModel
 ================
 */
-void aRcModelStatic::PurgeModel() {
+void anModelStatic::PurgeModel() {
 	int		i;
 	modelSurface_t	*surf;
 
@@ -2122,35 +2079,35 @@ void aRcModelStatic::PurgeModel() {
 
 /*
 ==============
-aRcModelStatic::FreeVertexCache
+anModelStatic::FreeVertexCache
 
 We are about to restart the vertex cache, so dump everything
 ==============
 */
-void aRcModelStatic::FreeVertexCache( void ) {
+void anModelStatic::FreeVertexCache( void ) {
 	for ( int j = 0; j < surfaces.Num(); j++ ) {
-		surfTriangles_t *tri = surfaces[j].geometry;
+		srfTriangles_t *tri = surfaces[j].geometry;
 		if ( !tri ) {
 			continue;
 		}
 		if ( tri->ambientCache ) {
 			vertexCache.Free( tri->ambientCache );
-			tri->ambientCache = NULL;
+			tri->ambientCache = nullptr;
 		}
 		// static shadows may be present
 		if ( tri->shadowCache ) {
 			vertexCache.Free( tri->shadowCache );
-			tri->shadowCache = NULL;
+			tri->shadowCache = nullptr;
 		}
 	}
 }
 
 /*
 ================
-aRcModelStatic::ReadFromDemoFile
+anModelStatic::ReadFromDemoFile
 ================
 */
-void aRcModelStatic::ReadFromDemoFile( class ARCDemoFile *f ) {
+void anModelStatic::ReadFromDemoFile( class anDemoFile *f ) {
 	PurgeModel();
 
 	InitEmpty( f->ReadHashString() );
@@ -2163,7 +2120,7 @@ void aRcModelStatic::ReadFromDemoFile( class ARCDemoFile *f ) {
 
 		surf.shader = declManager->FindMaterial( f->ReadHashString() );
 
-		surfTriangles_t	*tri = R_AllocStaticTriSurf();
+		srfTriangles_t	*tri = R_AllocStaticTriSurf();
 
 		f->ReadInt( tri->numIndexes );
 		R_AllocStaticTriSurfIndexes( tri, tri->numIndexes );
@@ -2193,10 +2150,10 @@ void aRcModelStatic::ReadFromDemoFile( class ARCDemoFile *f ) {
 
 /*
 ================
-aRcModelStatic::WriteToDemoFile
+anModelStatic::WriteToDemoFile
 ================
 */
-void aRcModelStatic::WriteToDemoFile( class ARCDemoFile *f ) {
+void anModelStatic::WriteToDemoFile( class anDemoFile *f ) {
 	int	data[1];
 
 	// note that it has been updated
@@ -2214,7 +2171,7 @@ void aRcModelStatic::WriteToDemoFile( class ARCDemoFile *f ) {
 
 		f->WriteHashString( surf->shader->GetName() );
 
-		surfTriangles_t *tri = surf->geometry;
+		srfTriangles_t *tri = surf->geometry;
 		f->WriteInt( tri->numIndexes );
 		for ( j = 0; j < tri->numIndexes; ++j )
 			f->WriteInt( ( int&)tri->indexes[j] );
@@ -2235,37 +2192,37 @@ void aRcModelStatic::WriteToDemoFile( class ARCDemoFile *f ) {
 
 /*
 ================
-aRcModelStatic::IsLoaded
+anModelStatic::IsLoaded
 ================
 */
-bool aRcModelStatic::IsLoaded( void ) {
+bool anModelStatic::IsLoaded( void ) {
 	return !purged;
 }
 
 /*
 ================
-aRcModelStatic::SetLevelLoadReferenced
+anModelStatic::SetLevelLoadReferenced
 ================
 */
-void aRcModelStatic::SetLevelLoadReferenced( bool referenced ) {
+void anModelStatic::SetLevelLoadReferenced( bool referenced ) {
 	levelLoadReferenced = referenced;
 }
 
 /*
 ================
-aRcModelStatic::IsLevelLoadReferenced
+anModelStatic::IsLevelLoadReferenced
 ================
 */
-bool aRcModelStatic::IsLevelLoadReferenced( void ) {
+bool anModelStatic::IsLevelLoadReferenced( void ) {
 	return levelLoadReferenced;
 }
 
 /*
 =================
-aRcModelStatic::TouchData
+anModelStatic::TouchData
 =================
 */
-void aRcModelStatic::TouchData( void ) {
+void anModelStatic::TouchData( void ) {
 	for ( int i = 0; i < surfaces.Num(); i++ ) {
 		const modelSurface_t	*surf = &surfaces[i];
 
@@ -2277,10 +2234,10 @@ void aRcModelStatic::TouchData( void ) {
 
 /*
 =================
-aRcModelStatic::DeleteSurfaceWithId
+anModelStatic::DeleteSurfaceWithId
 =================
 */
-bool aRcModelStatic::DeleteSurfaceWithId( int id ) {
+bool anModelStatic::DeleteSurfaceWithId( int id ) {
 	int i;
 
 	for ( i = 0; i < surfaces.Num(); i++ ) {
@@ -2295,10 +2252,10 @@ bool aRcModelStatic::DeleteSurfaceWithId( int id ) {
 
 /*
 =================
-aRcModelStatic::DeleteSurfacesWithNegativeId
+anModelStatic::DeleteSurfacesWithNegativeId
 =================
 */
-void aRcModelStatic::DeleteSurfacesWithNegativeId( void ) {
+void anModelStatic::DeleteSurfacesWithNegativeId( void ) {
 	int i;
 
 	for ( i = 0; i < surfaces.Num(); i++ ) {
@@ -2312,10 +2269,10 @@ void aRcModelStatic::DeleteSurfacesWithNegativeId( void ) {
 
 /*
 =================
-aRcModelStatic::FindSurfaceWithId
+anModelStatic::FindSurfaceWithId
 =================
 */
-bool aRcModelStatic::FindSurfaceWithId( int id, int &surfaceNum ) {
+bool anModelStatic::FindSurfaceWithId( int id, int &surfaceNum ) {
 	int i;
 
 	for ( i = 0; i < surfaces.Num(); i++ ) {

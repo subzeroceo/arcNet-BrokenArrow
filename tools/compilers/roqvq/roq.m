@@ -195,7 +195,7 @@ TByteBitmapImageRep *newImage;
 
 	printf( "convertPlanertoPacked: converting\n" );
 
-		newImage = [[TByteBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
+		newImage = [[TByteBitmapImageRep alloc] initWithBitmapDataPlanes: nullptr
 					pixelsWide: pixelsWide
 					pixelsHigh: pixelsHigh
 					bitsPerSample: 8
@@ -438,7 +438,7 @@ int dx,dy,dxMean,dyMean,index2[256],index4[256], dimension;
 
 	for ( i=0; i<numQuadCels; i++ ) {
 	if ( pquad[i].size && pquad[i].size < 16 ) {
-		switch( pquad[i].status ) {
+		switch ( pquad[i].status ) {
 			case	SLD:
 				use4[pquad[i].patten[0]] = YES;
 				use2[codes[dimension*256+(pquad[i].patten[0]*4)+0]] = YES;
@@ -508,7 +508,7 @@ int dx,dy,dxMean,dyMean,index2[256],index4[256], dimension;
 	for ( i=0; i<numQuadCels; i++ ) {
 	if ( pquad[i].size && pquad[i].size < 16 ) {
 		code = -1;
-		switch( pquad[i].status ) {
+		switch ( pquad[i].status ) {
 			case	DEP:
 				code = 3;
 				break;
@@ -551,7 +551,7 @@ int dx,dy,dxMean,dyMean,index2[256],index4[256], dimension;
 
 		action = (action<<2)|code;
 		j++;
-		if (j == 8) {
+		if ( j == 8) {
 			j = 0;
 			cccList[onAction+0] = (action & 0xff);
 			cccList[onAction+1] = ((action >> 8) & 0xff);
@@ -614,7 +614,7 @@ int newv;
 	} else {
 		newy = [toscale pixelsHigh];
 	}
-	newImage = [[TByteBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
+	newImage = [[TByteBitmapImageRep alloc] initWithBitmapDataPlanes: nullptr
 				pixelsWide: newx
 				pixelsHigh: newy
 				bitsPerSample: 8
@@ -671,7 +671,7 @@ NSSize newSize;
 	strcpy( currentFile, filename );
 
 	image = [TByteBitmapImageRep alloc];
-	if ( !(secondFilename= strchr(filename,'\n') ))   {  //one filename, no compositing
+	if ( !(secondFilename= strchr(filename,'\n') ) )   {  //one filename, no compositing
 		[image initFromFile: filename ];
 	}
 	else {
@@ -771,7 +771,7 @@ NSSize newSize;
 	[eWindow flushWindow];
 
 	if ( !errImage) {
-		errImage = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
+		errImage = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nullptr
 				pixelsWide: 1
 				pixelsHigh: 1
 				bitsPerSample: 8

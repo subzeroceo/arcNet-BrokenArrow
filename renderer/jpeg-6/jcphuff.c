@@ -78,11 +78,11 @@ typedef phuff_entropy_encoder * phuff_entropy_ptr;
 #define ISHIFT_TEMPS	int ishift_temp;
 #define IRIGHT_SHIFT(x,shft)  \
 	((ishift_temp = (x) ) < 0 ? \
-	 (ishift_temp >> (shft) ) | ((~0 ) << (16-(shft) )) : \
-	 (ishift_temp >> (shft) ))
+	 (ishift_temp >> ( shft) ) | ((~0 ) << (16-( shft) ) ) : \
+	 (ishift_temp >> ( shft) ) )
 #else
 #define ISHIFT_TEMPS
-#define IRIGHT_SHIFT(x,shft)	((x) >> (shft) )
+#define IRIGHT_SHIFT(x,shft)	((x) >> ( shft) )
 #endif
 
 /* Forward declarations */
@@ -129,7 +129,7 @@ start_pass_phuff (j_compress_ptr cinfo, boolean gather_statistics)
     else {
       entropy->pub.encode_mcu = encode_mcu_AC_refine;
       /* AC refinement needs a correction bit buffer */
-      if (entropy->bit_buffer == NULL)
+      if (entropy->bit_buffer == nullptr )
 	entropy->bit_buffer = (char *)
 	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				      MAX_CORR_BITS * SIZEOF(char) );
@@ -154,18 +154,18 @@ start_pass_phuff (j_compress_ptr cinfo, boolean gather_statistics)
 	continue;
       tbl = compptr->dc_tbl_no;
       if (tbl < 0 || tbl >= NUM_HUFF_TBLS ||
-	  (cinfo->dc_huff_tbl_ptrs[tbl] == NULL && !gather_statistics) )
+	  (cinfo->dc_huff_tbl_ptrs[tbl] == nullptr && !gather_statistics) )
 	ERREXIT1(cinfo,JERR_NO_HUFF_TABLE, tbl);
     } else {
       entropy->ac_tbl_no = tbl = compptr->ac_tbl_no;
       if (tbl < 0 || tbl >= NUM_HUFF_TBLS ||
-          (cinfo->ac_huff_tbl_ptrs[tbl] == NULL && !gather_statistics) )
+          (cinfo->ac_huff_tbl_ptrs[tbl] == nullptr && !gather_statistics) )
         ERREXIT1(cinfo,JERR_NO_HUFF_TABLE, tbl);
     }
     if (gather_statistics) {
       /* Allocate and zero the statistics tables */
       /* Note that jpeg_gen_optimal_table expects 257 entries in each table! */
-      if (entropy->count_ptrs[tbl] == NULL)
+      if (entropy->count_ptrs[tbl] == nullptr )
 	entropy->count_ptrs[tbl] = (long *)
 	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				      257 * SIZEOF(long) );
@@ -240,7 +240,7 @@ emit_bits (phuff_entropy_ptr entropy, unsigned int code, int size)
   register int put_bits = entropy->put_bits;
 
   /* if size is 0, caller used an invalid Huffman table entry */
-  if (size == 0 )
+  if ( size == 0 )
     ERREXIT(entropy->cinfo, JERR_HUFF_MISSING_CODE);
 
   if (entropy->gather_statistics)
@@ -793,7 +793,7 @@ finish_pass_gather_phuff (j_compress_ptr cinfo)
         htblptr = & cinfo->dc_huff_tbl_ptrs[tbl];
       else
         htblptr = & cinfo->ac_huff_tbl_ptrs[tbl];
-      if (*htblptr == NULL)
+      if (*htblptr == nullptr )
         *htblptr = jpeg_alloc_huff_table((j_common_ptr) cinfo);
       jpeg_gen_optimal_table(cinfo, *htblptr, entropy->count_ptrs[tbl] );
       did[tbl] = TRUE;
@@ -815,15 +815,15 @@ jinit_phuff_encoder (j_compress_ptr cinfo)
   entropy = (phuff_entropy_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(phuff_entropy_encoder) );
-  cinfo->entropy = (struct jpeg_entropy_encoder *) entropy;
+  cinfo->entropy = ( struct jpeg_entropy_encoder *) entropy;
   entropy->pub.start_pass = start_pass_phuff;
 
   /* Mark tables unallocated */
   for ( i = 0; i < NUM_HUFF_TBLS; i++ ) {
-    entropy->derived_tbls[i] = NULL;
-    entropy->count_ptrs[i] = NULL;
+    entropy->derived_tbls[i] = nullptr;
+    entropy->count_ptrs[i] = nullptr;
   }
-  entropy->bit_buffer = NULL;	/* needed only in AC refinement scan */
+  entropy->bit_buffer = nullptr;	/* needed only in AC refinement scan */
 }
 
 #endif /* C_PROGRESSIVE_SUPPORTED */

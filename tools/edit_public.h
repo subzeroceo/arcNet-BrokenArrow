@@ -17,40 +17,40 @@ void	RadiantInit( void );
 void	RadiantShutdown( void );
 void	RadiantRun( void );
 void	RadiantPrint( const char *text );
-void	RadiantSync( const char *mapName, const arcVec3 &viewOrg, const arcAngles &viewAngles );
+void	RadiantSync( const char *mapName, const anVec3 &viewOrg, const anAngles &viewAngles );
 
 // in-game Light Editor
-void	LightEditorInit( const arcDictionary *spawnArgs );
+void	LightEditorInit( const anDict *spawnArgs );
 void	LightEditorShutdown( void );
 void	LightEditorRun( void );
 
 // in-game Sound Editor
-void	SoundEditorInit( const arcDictionary *spawnArgs );
+void	SoundEditorInit( const anDict *spawnArgs );
 void	SoundEditorShutdown( void );
 void	SoundEditorRun( void );
 
 // in-game Articulated Figure Editor
-void	AFEditorInit( const arcDictionary *spawnArgs );
+void	AFEditorInit( const anDict *spawnArgs );
 void	AFEditorShutdown( void );
 void	AFEditorRun( void );
 
 // in-game Particle Editor
-void	ParticleEditorInit( const arcDictionary *spawnArgs );
+void	ParticleEditorInit( const anDict *spawnArgs );
 void	ParticleEditorShutdown( void );
 void	ParticleEditorRun( void );
 
 // in-game PDA Editor
-void	PDAEditorInit( const arcDictionary *spawnArgs );
+void	PDAEditorInit( const anDict *spawnArgs );
 void	PDAEditorShutdown( void );
 void	PDAEditorRun( void );
 
 // in-game Script Editor
-void	ScriptEditorInit( const arcDictionary *spawnArgs );
+void	ScriptEditorInit( const anDict *spawnArgs );
 void	ScriptEditorShutdown( void );
 void	ScriptEditorRun( void );
 
 // in-game Declaration Browser
-void	DeclBrowserInit( const arcDictionary *spawnArgs );
+void	DeclBrowserInit( const anDict *spawnArgs );
 void	DeclBrowserShutdown( void );
 void	DeclBrowserRun( void );
 void	DeclBrowserReloadDeclarations( void );

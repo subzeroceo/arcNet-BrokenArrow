@@ -469,13 +469,13 @@ GLXPixmap glXCreateGLXPixmapMESA (Display *dpy, XVisualInfo *visual, Pixmap pixm
 #define GLX_RENDERER_OPENGL_COMPATIBILITY_PROFILE_VERSION_MESA 0x818B
 #define GLX_RENDERER_OPENGL_ES_PROFILE_VERSION_MESA 0x818C
 #define GLX_RENDERER_OPENGL_ES2_PROFILE_VERSION_MESA 0x818D
-typedef Bool ( *PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC) (int attribute, unsigned int *value);
-typedef const char *( *PFNGLXQUERYCURRENTRENDERERSTRINGMESAPROC) (int attribute);
+typedef Bool ( *PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC) ( intattribute, unsigned int *value);
+typedef const char *( *PFNGLXQUERYCURRENTRENDERERSTRINGMESAPROC) ( intattribute);
 typedef Bool ( *PFNGLXQUERYRENDERERINTEGERMESAPROC) (Display *dpy, int screen, int renderer, int attribute, unsigned int *value);
 typedef const char *( *PFNGLXQUERYRENDERERSTRINGMESAPROC) (Display *dpy, int screen, int renderer, int attribute);
 #ifdef GLX_GLXEXT_PROTOTYPES
-Bool glXQueryCurrentRendererIntegerMESA (int attribute, unsigned int *value);
-const char *glXQueryCurrentRendererStringMESA (int attribute);
+Bool glXQueryCurrentRendererIntegerMESA ( intattribute, unsigned int *value);
+const char *glXQueryCurrentRendererStringMESA ( intattribute);
 Bool glXQueryRendererIntegerMESA (Display *dpy, int screen, int renderer, int attribute, unsigned int *value);
 const char *glXQueryRendererStringMESA (Display *dpy, int screen, int renderer, int attribute);
 #endif
@@ -923,19 +923,19 @@ GLXDrawable glXGetCurrentReadDrawableSGI ( void );
 
 #ifndef GLX_SGI_swap_control
 #define GLX_SGI_swap_control 1
-typedef int ( *PFNGLXSWAPINTERVALSGIPROC) (int interval);
+typedef int ( *PFNGLXSWAPINTERVALSGIPROC) ( int interval);
 #ifdef GLX_GLXEXT_PROTOTYPES
-int glXSwapIntervalSGI (int interval);
+int glXSwapIntervalSGI ( int interval);
 #endif
 #endif /* GLX_SGI_swap_control */
 
 #ifndef GLX_SGI_video_sync
 #define GLX_SGI_video_sync 1
 typedef int ( *PFNGLXGETVIDEOSYNCSGIPROC) (unsigned int *count);
-typedef int ( *PFNGLXWAITVIDEOSYNCSGIPROC) (int divisor, int remainder, unsigned int *count);
+typedef int ( *PFNGLXWAITVIDEOSYNCSGIPROC) ( intdivisor, int remainder, unsigned int *count);
 #ifdef GLX_GLXEXT_PROTOTYPES
 int glXGetVideoSyncSGI (unsigned int *count);
-int glXWaitVideoSyncSGI (int divisor, int remainder, unsigned int *count);
+int glXWaitVideoSyncSGI ( intdivisor, int remainder, unsigned int *count);
 #endif
 #endif /* GLX_SGI_video_sync */
 

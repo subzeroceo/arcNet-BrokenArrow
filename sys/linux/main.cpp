@@ -14,8 +14,8 @@
 #include <mcheck.h>
 #endif
 
-static arcNetString	basepath;
-static arcNetString	savepath;
+static anString	basepath;
+static anString	savepath;
 
 void Sys_InitScanTable( void ) {
 	Printf( "TODO: Sys_InitScanTable\n" );
@@ -79,7 +79,7 @@ const char *Sys_DefaultSavePath( void ) {
 
 const char *Sys_EXEPath( void ) {
 	static char	buf[ 1024 ];
-	arcNetString		linkpath;
+	anString		linkpath;
 	int			len;
 
 	buf[ 0 ] = '\0';
@@ -100,7 +100,7 @@ const char *Sys_EXEPath( void ) {
 
 const char *Sys_DefaultBasePath( void ) {
 	struct stat st;
-	arcNetString testbase;
+	anString testbase;
 	basepath = Sys_EXEPath();
 	if ( basepath.Length() ) {
 		basepath.StripFilename();
@@ -197,7 +197,7 @@ double Sys_ClockTicksPerSecond( void ) {
 	pos = 0;
 
 	while ( pos < len ) {
-		if ( !arcNetString::Cmpn( buf + pos, "CPU MHz", 7 ) ) {
+		if ( !anString::Cmpn( buf + pos, "CPU MHz", 7 ) ) {
 			pos = strchr( buf + pos, ':' ) - buf + 2;
 			end = strchr( buf + pos, '\n' ) - buf;
 			if ( pos < len && end < len ) {
@@ -274,7 +274,7 @@ void Sys_DoStartProcess( const char *exeName, bool dofork ) {
 				_exit( 0 );
 			} else {
 				printf( "execl %s\n", exeName );
-				execl( exeName, exeName, NULL );
+				execl( exeName, exeName, nullptr );
 				printf( "execl failed: %s\n", strerror( errno ) );
 				_exit( -1 );
 			}
@@ -287,7 +287,7 @@ void Sys_DoStartProcess( const char *exeName, bool dofork ) {
 			sleep( 1 );	// on some systems I've seen that starting the new process and exiting this one should not be too close
 		} else {
 			printf( "execl %s\n", exeName );
-			execl( exeName, exeName, NULL );
+			execl( exeName, exeName, nullptr );
 			printf( "execl failed: %s\n", strerror( errno ) );
 		}
 		// terminate
@@ -295,9 +295,9 @@ void Sys_DoStartProcess( const char *exeName, bool dofork ) {
 	}
 }
 
-void arcSystemLocal::OpenURL( const char *url, bool quit ) {
+void anSystemLocal::OpenURL( const char *url, bool quit ) {
 	const char	*script_path;
-	arcNetFile		*script_file;
+	anFile		*script_file;
 	char		cmdline[ 1024 ];
 
 	static bool	quit_spamguard = false;
@@ -333,7 +333,7 @@ void arcSystemLocal::OpenURL( const char *url, bool quit ) {
 	Printf( "URL Script: %s\n", script_path );
 
 	// StartProcess is going to execute a system() call with that - hence the &
-	arcNetString::snPrintf( cmdline, 1024, "%s '%s' &",  script_path, url );
+	anString::snPrintf( cmdline, 1024, "%s '%s' &",  script_path, url );
 	sys->StartProcess( cmdline, quit );
 }
 
@@ -395,9 +395,9 @@ int main( int argc, const char **argv) {
 #endif
 	Posix_EarlyInit( );
 	if ( argc > 1 ) {
-		common->Init( argc-1, &argv[1], NULL );
+		common->Init( argc-1, &argv[1], nullptr );
 	} else {
-		common->Init( 0, NULL, NULL );
+		common->Init( 0, nullptr, nullptr );
 	}
 
 	Posix_LateInit( );

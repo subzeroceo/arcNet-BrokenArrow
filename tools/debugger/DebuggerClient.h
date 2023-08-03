@@ -32,16 +32,16 @@ class rvDebuggerCallstack
 {
 public:
 
-	arcNetString	mFilename;
+	anString	mFilename;
 	int		mLineNumber;
-	arcNetString	mFunction;
+	anString	mFunction;
 };
 
 class rvDebuggerThread
 {
 public:
 
-	arcNetString	mName;
+	anString	mName;
 	int		mID;
 	bool	mCurrent;
 	bool	mDying;
@@ -53,16 +53,16 @@ public:
 #include "DebuggerBreakpoint.h"
 #endif
 
-typedef arcNetList<rvDebuggerCallstack*>	rvDebuggerCallstackList;
-typedef arcNetList<rvDebuggerThread*>		rvDebuggerThreadList;
-typedef arcNetList<rvDebuggerBreakpoint*>	rvDebuggerBreakpointList;
+typedef anList<rvDebuggerCallstack*>	rvDebuggerCallstackList;
+typedef anList<rvDebuggerThread*>		rvDebuggerThreadList;
+typedef anList<rvDebuggerBreakpoint*>	rvDebuggerBreakpointList;
 
 class rvDebuggerClient
 {
 public:
 
-	rvDebuggerClient ( );
-	~rvDebuggerClient ( );
+	rvDebuggerClient();
+	~rvDebuggerClient();
 
 	bool						Initialize				( void );
 	void						Shutdown				( void );
@@ -109,9 +109,9 @@ protected:
 	bool						mBreak;
 	int							mBreakID;
 	int							mBreakLineNumber;
-	arcNetString						mBreakFilename;
+	anString						mBreakFilename;
 
-	arcDictionary						mVariables;
+	anDict						mVariables;
 
 	rvDebuggerCallstackList		mCallstack;
 	rvDebuggerThreadList		mThreads;
@@ -220,7 +220,7 @@ rvDebuggerClient::GetBreakpointCount
 */
 ARC_INLINE int rvDebuggerClient::GetBreakpointCount ( void )
 {
-	return mBreakpoints.Num ( );
+	return mBreakpoints.Num();
 }
 
 /*

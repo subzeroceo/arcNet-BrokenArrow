@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 /*
@@ -15,7 +15,7 @@ decl will look like a defaulted decl.
 Moving a decl from one file to another will not be handled correctly by a reload, the material
 will be defaulted.
 
-NULL or empty decl names will always return NULL
+nullptr or empty decl names will always return nullptr
 	Should probably make a default decl for this
 
 Decls are initially created without a textSource
@@ -36,29 +36,25 @@ missing reload over a previously explicit definition
 #define USE_COMPRESSED_DECLS
 //#define GET_HUFFMAN_FREQUENCIES
 // for the decl manager.. the type of decl and class along with folders it uses.
-class arcDeclClassType {
+class anDeclClassType {
 public:
-	arcNetString						typeName;
-	declType_t					type;
-	arcDecleration *					(*allocator)();
-/*};
-
-class arcDeclClassType {
-public:*/
-	arcNetString						folder;
-	arcNetString						extension;
-	declType_t					defaultType;
+	anString						typeName;
+	declType_t						type;
+	anDecl *				(*allocator)();
+	anString						folder;
+	anString						extension;
+	declType_t						defaultType;
 };
 
-class arcDeclerationFile;
+class anDeclFile;
 
-class arcDeclerationLocal : public arcDeclerationBase {
-	friend class arcDeclerationFile;
-	friend class arcDeclerationManagerLocal;
+class anDeclLocal : public anDeclBase {
+	friend class anDeclFile;
+	friend class anDeclManagerLocal;
 
 public:
-								arcDeclerationLocal();
-	virtual 					~arcDeclerationLocal() {};
+								anDeclLocal();
+	virtual 					~anDeclLocal() {};
 	virtual const char *		GetName() const;
 	virtual declType_t			GetType() const;
 	virtual declState_t			GetState() const;
@@ -102,13 +98,13 @@ protected:
 	void						SetTextLocal( const char *text, const int length );
 
 private:
-	arcDecleration				*self;
+	anDecl *					self;
 
-	arcNetString					name;					// name of the decl
-	char						*textSource;				// decl text definition
+	anString					name;					// name of the decl
+	char *						textSource;			// decl text definition
 	int							textLength;				// length of textSource
 	int							compressedLength;		// compressed length
-	arcDeclerationFile			*sourceFile;			// source file in which the decl was defined
+	anDeclFile *				sourceFile;				// source file in which the decl was defined
 	int							sourceTextOffset;		// offset in source file to decl text
 	int							sourceTextLength;		// length of decl text in source file
 	int							sourceLine;				// this is where the actual declaration token starts
@@ -122,19 +118,19 @@ private:
 	bool						referencedThisLevel;	// set to true when the decl is used for the current level
 	bool						redefinedInReload;		// used during file reloading to make sure a decl that has
 														// its source removed will be defaulted
-	arcDeclerationLocal			*nextInFile;			// next decl in the decl file
+	anDeclLocal *				nextInFile;			// next decl in the decl file
 };
 
-class arcDeclerationFile {
+class anDeclFile {
 public:
-								arcDeclerationFile();
-								arcDeclerationFile( const char *fileName, declType_t defaultType );
+								anDeclFile();
+								anDeclFile( const char *fileName, declType_t defaultType );
 
 	void						Reload( bool force );
 	int							LoadAndParse();
 
 public:
-	arcNetString					fileName;
+	anString					fileName;
 	declType_t					defaultType;
 
 	ARC_TIME_T					timestamp;
@@ -142,11 +138,11 @@ public:
 	int							fileSize;
 	int							numLines;
 
-	arcDeclerationLocal			*decls;
+	anDeclLocal *				decls;
 };
 
-class arcDeclerationManagerLocal : public arcDeclerationManager {
-	friend class arcDeclerationLocal;
+class anDeclManagerLocal : public anDeclManager {
+	friend class anDeclLocal;
 
 public:
 	virtual void					Init();
@@ -155,75 +151,75 @@ public:
 	virtual void					Reload( bool force );
 	virtual void					BeginLevelLoad();
 	virtual void					EndLevelLoad();
-	virtual void					RegisterDeclType( const char *typeName, declType_t type, arcDecleration *(*allocator)() );
+	virtual void					RegisterDeclType( const char *typeName, declType_t type, anDecl *(*allocator)() );
 	virtual void					RegisterDeclFolder( const char *folder, const char *extension, declType_t defaultType );
 	virtual int						GetChecksum() const;
 	virtual int						GetNumDeclTypes() const;
 	virtual int						GetNumDecls( declType_t type );
 	virtual const char *			GetDeclNameFromType( declType_t type ) const;
 	virtual declType_t				GetDeclTypeFromName( const char *typeName ) const;
-	virtual const arcDecleration *	FindType( declType_t type, const char *name, bool makeDefault = true );
-	virtual const arcDecleration *	DeclByIndex( declType_t type, int index, bool forceParse = true );
+	virtual const anDecl *			FindType( declType_t type, const char *name, bool makeDefault = true );
+	virtual const anDecl *			DeclByIndex( declType_t type, int index, bool forceParse = true );
 
-	virtual const arcDecleration*	FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault = true );
+	virtual const anDecl*			FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault = true );
 	virtual void					ReloadFile( const char* filename, bool force );
 
-	virtual void					ListType( const arcCommandArgs &args, declType_t type );
-	virtual void					PrintType( const arcCommandArgs &args, declType_t type );
+	virtual void					ListType( const anCommandArgs &args, declType_t type );
+	virtual void					PrintType( const anCommandArgs &args, declType_t type );
 
-	virtual arcDecleration *		CreateNewDecl( declType_t type, const char *name, const char *fileName );
+	virtual anDecl *		CreateNewDecl( declType_t type, const char *name, const char *fileName );
 
 	//BSM Added for the material editors rename capabilities
 	virtual bool					RenameDecl( declType_t type, const char* oldName, const char* newName );
 
 	virtual void					MediaPrint( VERIFY_FORMAT_STRING const char *fmt, ... );
-	virtual void					WritePrecacheCommands( arcNetFile *f );
+	virtual void					WritePrecacheCommands( anFile *f );
 
-	virtual const arcMaterial *		FindMaterial( const char *name, bool makeDefault = true );
-	virtual const arcDeclSkin *		FindSkin( const char *name, bool makeDefault = true );
-	virtual const arcSoundShader *	FindSound( const char *name, bool makeDefault = true );
+	virtual const anMaterial *		FindMaterial( const char *name, bool makeDefault = true );
+	virtual const anDeclSkin *		FindSkin( const char *name, bool makeDefault = true );
+	virtual const anSoundShader *	FindSound( const char *name, bool makeDefault = true );
 
-	virtual const arcMaterial *		MaterialByIndex( int index, bool forceParse = true );
-	virtual const arcDeclSkin *		SkinByIndex( int index, bool forceParse = true );
-	virtual const arcSoundShader *	SoundByIndex( int index, bool forceParse = true );
+	virtual const anMaterial *		MaterialByIndex( int index, bool forceParse = true );
+	virtual const anDeclSkin *		SkinByIndex( int index, bool forceParse = true );
+	virtual const anSoundShader *	SoundByIndex( int index, bool forceParse = true );
 
-	virtual void					Touch( const arcDecleration * decl );
+	virtual void					Touch( const anDecl * decl );
 
 public:
 	static void						MakeNameCanonical( const char *name, char *result, int maxLength );
-	arcDeclerationLocal *			FindTypeWithoutParsing( declType_t type, const char *name, bool makeDefault = true );
+	anDeclLocal *			FindTypeWithoutParsing( declType_t type, const char *name, bool makeDefault = true );
 
-	arcDeclClassType *				GetDeclType( int type ) const { return declTypes[type]; }
-	const arcDeclerationFile *		GetImplicitDeclFile() const { return &implicitDecls; }
+	anDeclClassType *				GetDeclType( int type ) const { return declTypes[type]; }
+	const anDeclFile *		GetImplicitDeclFile() const { return &implicitDecls; }
 
 private:
 	arcSysMutex						mutex;
 
-	arcNetList<arcDeclClassType *, TAG_LIBLIST_DECL> declTypes;
-	arcNetList<arcDeclClassType *, TAG_LIBLIST_DECL> declFolders;
+	anList<anDeclClassType *, TAG_LIBLIST_DECL> declTypes;
+	anList<anDeclClassType *, TAG_LIBLIST_DECL> declFolders;
 
-	arcNetList<arcDeclerationFile *, TAG_LIBLIST_DECL> loadedFiles;
-	ARCHashIndex					hashTables[DECL_MAX_TYPES];
-	arcNetList<arcDeclerationLocal *, TAG_LIBLIST_DECL> linearLists[DECL_MAX_TYPES];
-	arcDeclerationFile				implicitDecls;	// this holds all the decls that were created because explicit
-												// text definitions were not found. Decls that became default
-												// because of a parse error are not in this list.
+	anList<anDeclFile *, TAG_LIBLIST_DECL> loadedFiles;
+	anHashIndex						hashTables[DECL_MAX_TYPES];
+	anList<anDeclLocal *, TAG_LIBLIST_DECL> linearLists[DECL_MAX_TYPES];
+	anDeclFile						implicitDecls;	// this holds all the decls that were created because explicit
+													// text definitions were not found. Decls that became default
+													// because of a parse error are not in this list.
 	int								checksum;		// checksum of all loaded decl text
 	int								indent;			// for MediaPrint
 	bool							insideLevelLoad;
 
-	static arcCVarSystem					decl_show;
+	static anCVarSystem				decl_show;
 
 private:
-	static void						ListDecls_f( const arcCommandArgs &args );
-	static void						ReloadDecls_f( const arcCommandArgs &args );
-	static void						TouchDecl_f( const arcCommandArgs &args );
+	static void						ListDecls_f( const anCommandArgs &args );
+	static void						ReloadDecls_f( const anCommandArgs &args );
+	static void						TouchDecl_f( const anCommandArgs &args );
 };
 
-arcCVarSystem arcDeclerationManagerLocal::decl_show( "decl_show", "0", CVAR_SYSTEM, "set to 1 to print parses, 2 to also print references", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem anDeclManagerLocal::decl_show( "decl_show", "0", CVAR_SYSTEM, "set to 1 to print parses, 2 to also print references", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
 
-arcDeclerationManagerLocal		declManagerLocal;
-arcDeclerationManager			*declManager = &declManagerLocal;
+anDeclManagerLocal		declManagerLocal;
+anDeclManager			*declManager = &declManagerLocal;
 
 /*
 ====================================================================================
@@ -285,7 +281,7 @@ static int huffmanFrequencies[] = {
 };
 
 static huffmanCode_t huffmanCodes[MAX_HUFFMAN_SYMBOLS];
-static huffmanNode_t *huffmanTree = NULL;
+static huffmanNode_t *huffmanTree = nullptr;
 static int totalUncompressedLength = 0;
 static int totalCompressedLength = 0;
 static int maxHuffmanBits = 0;
@@ -309,7 +305,7 @@ InsertHuffmanNode
 huffmanNode_t *InsertHuffmanNode( huffmanNode_t *firstNode, huffmanNode_t *node ) {
 	huffmanNode_t *n;
 
-	huffmanNode_t *lastNode = NULL;
+	huffmanNode_t *lastNode = nullptr;
 	for ( n = firstNode; n; n = n->next ) {
 		if ( node->frequency <= n->frequency ) {
 			break;
@@ -367,7 +363,7 @@ HuffmanHeight_r
 ================
 */
 int HuffmanHeight_r( huffmanNode_t *node ) {
-	if ( node == NULL ) {
+	if ( node == nullptr ) {
 		return -1;
 	}
 	int left = HuffmanHeight_r( node->children[0] );
@@ -386,14 +382,14 @@ SetupHuffman
 void SetupHuffman() {
 	huffmanCode_t code;
 
-	huffmanNode_t *firstNode = NULL;
+	huffmanNode_t *firstNode = nullptr;
 	for ( int i = 0; i < MAX_HUFFMAN_SYMBOLS; i++ ) {
 		huffmanNode_t *node = new (TAG_DECL) huffmanNode_t;
 		node->symbol = i;
 		node->frequency = huffmanFrequencies[i];
-		node->next = NULL;
-		node->children[0] = NULL;
-		node->children[1] = NULL;
+		node->next = nullptr;
+		node->children[0] = nullptr;
+		node->children[1] = nullptr;
 		firstNode = InsertHuffmanNode( firstNode, node );
 	}
 
@@ -401,7 +397,7 @@ void SetupHuffman() {
 		node = new ( TAG_DECL ) huffmanNode_t;
 		node->symbol = -1;
 		node->frequency = firstNode->frequency + firstNode->next->frequency;
-		node->next = NULL;
+		node->next = nullptr;
 		node->children[0] = firstNode;
 		node->children[1] = firstNode->next;
 		firstNode = InsertHuffmanNode( firstNode->next->next, node );
@@ -436,7 +432,7 @@ HuffmanCompressText
 int HuffmanCompressText( const char *text, int textLength, byte *compressed, int maxCompressedSize ) {
 	totalUncompressedLength += textLength;
 
-	ARCBitMessage = msg.InitWrite( compressed, maxCompressedSize );
+	anBitMessage = msg.InitWrite( compressed, maxCompressedSize );
 	msg.BeginWriting();
 	for ( int i = 0; i < textLength; i++ ) {
 		const huffmanCode_t &code = huffmanCodes[(unsigned char)text[i]];
@@ -460,7 +456,7 @@ HuffmanDecompressText
 */
 int HuffmanDecompressText( char *text, int textLength, const byte *compressed, int compressedSize ) {
 	int i, bit;
-	ARCBitMessage msg;
+	anBitMessage msg;
 	huffmanNode_t *node;
 
 	msg.InitRead( compressed, compressedSize );
@@ -483,7 +479,7 @@ int HuffmanDecompressText( char *text, int textLength, const byte *compressed, i
 ListHuffmanFrequencies_f
 ================
 */
-void ListHuffmanFrequencies_f( const arcCommandArgs &args ) {
+void ListHuffmanFrequencies_f( const anCommandArgs &args ) {
 	int		i;
 	float compression;
 	compression = !totalUncompressedLength ? 100 : 100 * totalCompressedLength / totalUncompressedLength;
@@ -502,53 +498,53 @@ void ListHuffmanFrequencies_f( const arcCommandArgs &args ) {
 /*
 ====================================================================================
 
- arcDeclerationFile
+ anDeclFile
 
 ====================================================================================
 */
 
 /*
 ================
-arcDeclerationFile::arcDeclerationFile
+anDeclFile::anDeclFile
 ================
 */
-arcDeclerationFile::arcDeclerationFile( const char *fileName, declType_t defaultType ) {
+anDeclFile::anDeclFile( const char *fileName, declType_t defaultType ) {
 	this->fileName = fileName;
 	this->defaultType = defaultType;
 	this->timestamp = 0;
 	this->checksum = 0;
 	this->fileSize = 0;
 	this->numLines = 0;
-	this->decls = NULL;
+	this->decls = nullptr;
 }
 
 /*
 ================
-arcDeclerationFile::arcDeclerationFile
+anDeclFile::anDeclFile
 ================
 */
-arcDeclerationFile::arcDeclerationFile() {
+anDeclFile::anDeclFile() {
 	this->fileName = "<implicit file>";
 	this->defaultType = DECL_MAX_TYPES;
 	this->timestamp = 0;
 	this->checksum = 0;
 	this->fileSize = 0;
 	this->numLines = 0;
-	this->decls = NULL;
+	this->decls = nullptr;
 }
 
 /*
 ================
-arcDeclerationFile::Reload
+anDeclFile::Reload
 
 ForceReload will cause it to reload even if the timestamp hasn't changed
 ================
 */
-void arcDeclerationFile::Reload( bool force ) {
+void anDeclFile::Reload( bool force ) {
 	// check for an unchanged timestamp
 	if ( !force && timestamp != 0 ) {
 		ARC_TIME_T	testTimeStamp;
-		fileSystem->ReadFile( fileName, NULL, &testTimeStamp );
+		fileSystem->ReadFile( fileName, nullptr, &testTimeStamp );
 
 		if ( testTimeStamp == timestamp ) {
 			return;
@@ -561,23 +557,23 @@ void arcDeclerationFile::Reload( bool force ) {
 
 /*
 ================
-arcDeclerationFile::LoadAndParse
+anDeclFile::LoadAndParse
 
 This is used during both the initial load, and any reloads
 ================
 */
 int c_savedMemory = 0;
 
-int arcDeclerationFile::LoadAndParse() {
+int anDeclFile::LoadAndParse() {
 	int		numTypes;
-	arcLexer	src;
-	arcNetToken	token;
+	anLexer	src;
+	anToken	token;
 	int			startMarker;
 	char *		buffer;
 	int			length, size;
 	int			sourceLine;
-	arcNetString	name;
-	arcDeclerationLocal *newDecl;
+	anString	name;
+	anDeclLocal *newDecl;
 	bool		reparse;
 
 	// load the text
@@ -595,7 +591,7 @@ int arcDeclerationFile::LoadAndParse() {
 	}
 
 	// mark all the defs that were from the last reload of this file
-	for ( arcDeclerationLocal *decl = decls; decl; decl = decl->nextInFile ) {
+	for ( anDeclLocal *decl = decls; decl; decl = decl->nextInFile ) {
 		decl->redefinedInReload = false;
 	}
 
@@ -618,8 +614,8 @@ int arcDeclerationFile::LoadAndParse() {
 		// get the decl type from the type name
 		numTypes = declManagerLocal.GetNumDeclTypes();
 		for ( int i = 0; i < numTypes; i++ ) {
-			arcDeclClassType *typeInfo = declManagerLocal.GetDeclType( i );
-			if ( typeInfo != NULL && typeInfo->typeName.Icmp( token ) == 0 ) {
+			anDeclClassType *typeInfo = declManagerLocal.GetDeclType( i );
+			if ( typeInfo != nullptr && typeInfo->typeName.Icmp( token ) == 0 ) {
 				identifiedType = (declType_t) typeInfo->type;
 				break;
 			}
@@ -701,7 +697,7 @@ int arcDeclerationFile::LoadAndParse() {
 
 		if ( newDecl->textSource ) {
 			Mem_Free( newDecl->textSource );
-			newDecl->textSource = NULL;
+			newDecl->textSource = nullptr;
 		}
 
 		newDecl->SetTextLocal( buffer + startMarker, size );
@@ -721,7 +717,7 @@ int arcDeclerationFile::LoadAndParse() {
 	Mem_Free( buffer );
 
 	// any defs that weren't redefinedInReload should now be defaulted
-	for ( arcDeclerationLocal *decl = decls; decl; decl = decl->nextInFile ) {
+	for ( anDeclLocal *decl = decls; decl; decl = decl->nextInFile ) {
 		if ( decl->redefinedInReload == false ) {
 			decl->MakeDefault();
 			decl->sourceTextOffset = decl->sourceFile->fileSize;
@@ -736,19 +732,19 @@ int arcDeclerationFile::LoadAndParse() {
 /*
 ====================================================================================
 
- arcDeclerationManagerLocal
+ anDeclManagerLocal
 
 ====================================================================================
 */
 
-const char *listDeclStrings[] = { "current", "all", "ever", NULL };
+const char *listDeclStrings[] = { "current", "all", "ever", nullptr };
 
 /*
 ===================
-arcDeclerationManagerLocal::Init
+anDeclManagerLocal::Init
 ===================
 */
-void arcDeclerationManagerLocal::Init() {
+void anDeclManagerLocal::Init() {
 	common->Printf( "----- Initializing Decls -----\n" );
 	checksum = 0;
 #ifdef USE_COMPRESSED_DECLS
@@ -760,20 +756,18 @@ void arcDeclerationManagerLocal::Init() {
 #endif
 
 	// decls used throughout the engine
-	RegisterDeclType( "table",				DECL_TABLE,			arcDeclAllocator<arcDeclTable> );
-	RegisterDeclType( "material",			DECL_MATERIAL,		arcDeclAllocator<arcMaterial> );
-	RegisterDeclType( "skin",				DECL_SKIN,			arcDeclAllocator<arcDeclSkin> );
-	RegisterDeclType( "sound",				DECL_SOUND,			arcDeclAllocator<arcSoundShader> );
+	RegisterDeclType( "table",				DECL_TABLE,			anDeclAllocator<anDeclTable> );
+	RegisterDeclType( "material",			DECL_MATERIAL,		anDeclAllocator<anMaterial> );
+	RegisterDeclType( "skin",				DECL_SKIN,			anDeclAllocator<anDeclSkin> );
+	RegisterDeclType( "sound",				DECL_SOUND,			anDeclAllocator<anSoundShader> );
 
-	RegisterDeclType( "entityDef",			DECL_ENTITYDEF,		arcDeclAllocator<arcDeclEntityDef> );
-	RegisterDeclType( "mapDef",				DECL_MAPDEF,		arcDeclAllocator<arcDeclEntityDef> );
-	RegisterDeclType( "fx",					DECL_FX,			arcDeclAllocator<arcDeclFX> );
-	RegisterDeclType( "particle",			DECL_PARTICLE,		arcDeclAllocator<arcDeclParticle> );
-	RegisterDeclType( "articulatedFigure",	DECL_AF,			arcDeclAllocator<arcDeclAF> );
-	RegisterDeclType( "pda",				DECL_PDA,			arcDeclAllocator<arcDeclPDA> );
-	RegisterDeclType( "email",				DECL_EMAIL,			arcDeclAllocator<arcDeclEmail> );
-	RegisterDeclType( "video",				DECL_VIDEO,			arcDeclAllocator<arcDeclVideo> );
-	RegisterDeclType( "audio",				DECL_AUDIO,			arcDeclAllocator<arcDeclAudio> );
+	RegisterDeclType( "entityDef",			DECL_ENTITYDEF,		anDeclAllocator<anDeclEntityDef> );
+	RegisterDeclType( "mapDef",				DECL_MAPDEF,		anDeclAllocator<anDeclEntityDef> );
+	RegisterDeclType( "fx",					DECL_FX,			anDeclAllocator<anDeclFX> );
+	RegisterDeclType( "particle",			DECL_PARTICLE,		anDeclAllocator<anDeclParticle> );
+	RegisterDeclType( "articulatedFigure",	DECL_AF,			anDeclAllocator<anDeclAF> );
+
+	RegisterDeclType( "surfaceTypes",		".mstf",			DECL_SURFTYPE );
 
 	RegisterDeclFolder( "materials",		".mtr",				DECL_MATERIAL );
 
@@ -783,15 +777,15 @@ void arcDeclerationManagerLocal::Init() {
 	cmdSystem->AddCommand( "reloadDecls", ReloadDecls_f, CMD_FL_SYSTEM, "reloads decls" );
 	cmdSystem->AddCommand( "touch", TouchDecl_f, CMD_FL_SYSTEM, "touches a decl" );
 
-	cmdSystem->AddCommand( "listTables", arcListDecls_f<DECL_TABLE>, CMD_FL_SYSTEM, "lists tables", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listMaterials", arcListDecls_f<DECL_MATERIAL>, CMD_FL_SYSTEM, "lists materials", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listSkins", arcListDecls_f<DECL_SKIN>, CMD_FL_SYSTEM, "lists skins", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listSoundShaders", arcListDecls_f<DECL_SOUND>, CMD_FL_SYSTEM, "lists sound shaders", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
+	cmdSystem->AddCommand( "listTables", ListDecls_f<DECL_TABLE>, CMD_FL_SYSTEM, "lists tables", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
+	cmdSystem->AddCommand( "listMaterials", ListDecls_f<DECL_MATERIAL>, CMD_FL_SYSTEM, "lists materials", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
+	cmdSystem->AddCommand( "listSkins", ListDecls_f<DECL_SKIN>, CMD_FL_SYSTEM, "lists skins", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
+	cmdSystem->AddCommand( "listSoundShaders", ListDecls_f<DECL_SOUND>, CMD_FL_SYSTEM, "lists sound shaders", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
 
-	cmdSystem->AddCommand( "listEntityDefs", arcListDecls_f<DECL_ENTITYDEF>, CMD_FL_SYSTEM, "lists entity defs", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listFX", arcListDecls_f<DECL_FX>, CMD_FL_SYSTEM, "lists FX systems", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listParticles", arcListDecls_f<DECL_PARTICLE>, CMD_FL_SYSTEM, "lists particle systems", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listAF", arcListDecls_f<DECL_AF>, CMD_FL_SYSTEM, "lists articulated figures", arcCmdSystem::ArgCompletion_String<listDeclStrings>);
+	cmdSystem->AddCommand( "listEntityDefs", ListDecls_f<DECL_ENTITYDEF>, CMD_FL_SYSTEM, "lists entity defs", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
+	cmdSystem->AddCommand( "listFX", ListDecls_f<DECL_FX>, CMD_FL_SYSTEM, "lists FX systems", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
+	cmdSystem->AddCommand( "listParticles", ListDecls_f<DECL_PARTICLE>, CMD_FL_SYSTEM, "lists particle systems", arcCmdSystem::ArgCompletion_String<listDeclStrings> );
+	cmdSystem->AddCommand( "listAF", ListDecls_f<DECL_AF>, CMD_FL_SYSTEM, "lists articulated figures", arcCmdSystem::ArgCompletion_String<listDeclStrings>);
 
 	cmdSystem->AddCommand( "printTable", PrintDecls_f<DECL_TABLE>, CMD_FL_SYSTEM, "prints a table", arcCmdSystem::ArgCompletion_Decl<DECL_TABLE> );
 	cmdSystem->AddCommand( "printMaterial", PrintDecls_f<DECL_MATERIAL>, CMD_FL_SYSTEM, "prints a material", arcCmdSystem::ArgCompletion_Decl<DECL_MATERIAL> );
@@ -808,30 +802,30 @@ void arcDeclerationManagerLocal::Init() {
 	common->Printf( "------------------------------\n" );
 }
 
-void arcDeclerationManagerLocal::Init2() {
+void anDeclManagerLocal::Init2() {
 	RegisterDeclFolder( "skins",			".skn",		DECL_SKIN );
-	RegisterDeclFolder( "sound",			".sndfx",			DECL_SOUND );
+	RegisterDeclFolder( "sound",			".sndfx",	DECL_SOUND );
 }
 
 /*
 ===================
-arcDeclerationManagerLocal::Shutdown
+anDeclManagerLocal::Shutdown
 ===================
 */
-void arcDeclerationManagerLocal::Shutdown() {
-	arcDeclerationLocal *decl;
+void anDeclManagerLocal::Shutdown() {
+	anDeclLocal *decl;
 
 	// free decls
 	for ( int i = 0; i < DECL_MAX_TYPES; i++ ) {
 		for ( int j = 0; j < linearLists[i].Num(); j++ ) {
 			decl = linearLists[i][j];
-			if ( decl->self != NULL ) {
+			if ( decl->self != nullptr ) {
 				decl->self->FreeData();
 				delete decl->self;
 			}
 			if ( decl->textSource ) {
 				Mem_Free( decl->textSource );
-				decl->textSource = NULL;
+				decl->textSource = nullptr;
 			}
 			delete decl;
 		}
@@ -852,10 +846,10 @@ void arcDeclerationManagerLocal::Shutdown() {
 
 /*
 ===================
-arcDeclerationManagerLocal::Reload
+anDeclManagerLocal::Reload
 ===================
 */
-void arcDeclerationManagerLocal::Reload( bool force ) {
+void anDeclManagerLocal::Reload( bool force ) {
 	for ( int i = 0; i < loadedFiles.Num(); i++ ) {
 		loadedFiles[i]->Reload( force );
 	}
@@ -863,10 +857,10 @@ void arcDeclerationManagerLocal::Reload( bool force ) {
 
 /*
 ===================
-arcDeclerationManagerLocal::BeginLevelLoad
+anDeclManagerLocal::BeginLevelLoad
 ===================
 */
-void arcDeclerationManagerLocal::BeginLevelLoad() {
+void anDeclManagerLocal::BeginLevelLoad() {
 	insideLevelLoad = true;
 
 	// clear all the referencedThisLevel flags and purge all the data
@@ -874,7 +868,7 @@ void arcDeclerationManagerLocal::BeginLevelLoad() {
 	for ( int i = 0; i < DECL_MAX_TYPES; i++ ) {
 		int	num = linearLists[i].Num();
 		for ( int j = 0; j < num; j++ ) {
-			arcDeclerationLocal *decl = linearLists[i][j];
+			anDeclLocal *decl = linearLists[i][j];
 			decl->Purge();
 		}
 	}
@@ -882,10 +876,10 @@ void arcDeclerationManagerLocal::BeginLevelLoad() {
 
 /*
 ===================
-arcDeclerationManagerLocal::EndLevelLoad
+anDeclManagerLocal::EndLevelLoad
 ===================
 */
-void arcDeclerationManagerLocal::EndLevelLoad() {
+void anDeclManagerLocal::EndLevelLoad() {
 	insideLevelLoad = false;
 	// we don't need to do anything here, but the image manager, model manager,
 	// and sound sample manager will need to free media that was not referenced
@@ -893,36 +887,36 @@ void arcDeclerationManagerLocal::EndLevelLoad() {
 
 /*
 ===================
-arcDeclerationManagerLocal::RegisterDeclType
+anDeclManagerLocal::RegisterDeclType
 ===================
 */
-void arcDeclerationManagerLocal::RegisterDeclType( const char *typeName, declType_t type, arcDecleration *(*allocator)() ) {
+void anDeclManagerLocal::RegisterDeclType( const char *typeName, declType_t type, anDecl *(*allocator)() ) {
 	if ( type < declTypes.Num() && declTypes[( int )type] ) {
-		common->Warning( "arcDeclerationManager::RegisterDeclType: type '%s' already exists", typeName );
+		common->Warning( "anDeclManager::RegisterDeclType: type '%s' already exists", typeName );
 		return;
 	}
 
-	arcDeclClassType *declType = new (TAG_DECL) arcDeclClassType;
+	anDeclClassType *declType = new anDeclClassType;
 	declType->typeName = typeName;
 	declType->type = type;
 	declType->allocator = allocator;
 
 	if ( ( int )type + 1 > declTypes.Num() ) {
-		declTypes.AssureSize( ( int )type + 1, NULL );
+		declTypes.AssureSize( ( int )type + 1, nullptr );
 	}
-	declTypes[type] = declType;
+	declTypes[type] = declType;//std::move( declType );
 }
 
 /*
 ===================
-arcDeclerationManagerLocal::RegisterDeclFolder
+anDeclManagerLocal::RegisterDeclFolder
 ===================
 */
-void arcDeclerationManagerLocal::RegisterDeclFolder( const char *folder, const char *extension, declType_t defaultType ) {
-	arcNetString fileName;
-	arcDeclClassType *declFolder;
-	arcFileList *fileList;
-	arcDeclerationFile *df;
+void anDeclManagerLocal::RegisterDeclFolder( const char *folder, const char *extension, declType_t defaultType ) {
+	anString fileName;
+	anDeclClassType *declFolder;
+	anFileList *fileList;
+	anDeclFile *df;
 
 	// check whether this folder / extension combination already exists
 	for ( int i = 0; i < declFolders.Num(); i++ ) {
@@ -933,7 +927,7 @@ void arcDeclerationManagerLocal::RegisterDeclFolder( const char *folder, const c
 	if ( i < declFolders.Num() ) {
 		declFolder = declFolders[i];
 	} else {
-		declFolder = new (TAG_DECL) arcDeclClassType;
+		declFolder = new (TAG_DECL) anDeclClassType;
 		declFolder->folder = folder;
 		declFolder->extension = extension;
 		declFolder->defaultType = defaultType;
@@ -955,7 +949,7 @@ void arcDeclerationManagerLocal::RegisterDeclFolder( const char *folder, const c
 		if ( j < loadedFiles.Num() ) {
 			df = loadedFiles[j];
 		} else {
-			df = new (TAG_DECL) arcDeclerationFile( fileName, defaultType );
+			df = new (TAG_DECL) anDeclFile( fileName, defaultType );
 			loadedFiles.Append( df );
 		}
 		df->LoadAndParse();
@@ -966,10 +960,10 @@ void arcDeclerationManagerLocal::RegisterDeclFolder( const char *folder, const c
 
 /*
 ===================
-arcDeclerationManagerLocal::GetChecksum
+anDeclManagerLocal::GetChecksum
 ===================
 */
-int arcDeclerationManagerLocal::GetChecksum() const {
+int anDeclManagerLocal::GetChecksum() const {
 	int *checksumData;
 
 	// get the total number of decls
@@ -978,7 +972,7 @@ int arcDeclerationManagerLocal::GetChecksum() const {
 		total += linearLists[i].Num();
 	}
 
-	checksumData = ( int * ) _alloca16( total * 2 * sizeof( int ) );
+	checksumData = ( int*) _alloca16( total * 2 * sizeof( int ) );
 
 	total = 0;
 	for ( int i = 0; i < DECL_MAX_TYPES; i++ ) {
@@ -990,7 +984,7 @@ int arcDeclerationManagerLocal::GetChecksum() const {
 
 		int num = linearLists[i].Num();
 		for ( int j = 0; j < num; j++ ) {
-			arcDeclerationLocal *decl = linearLists[i][j];
+			anDeclLocal *decl = linearLists[i][j];
 			if ( decl->sourceFile == &implicitDecls ) {
 				continue;
 			}
@@ -1007,32 +1001,32 @@ int arcDeclerationManagerLocal::GetChecksum() const {
 
 /*
 ===================
-arcDeclerationManagerLocal::GetNumDeclTypes
+anDeclManagerLocal::GetNumDeclTypes
 ===================
 */
-int arcDeclerationManagerLocal::GetNumDeclTypes() const {
+int anDeclManagerLocal::GetNumDeclTypes() const {
 	return declTypes.Num();
 }
 
 /*
 ===================
-arcDeclerationManagerLocal::GetDeclNameFromType
+anDeclManagerLocal::GetDeclNameFromType
 ===================
 */
-const char * arcDeclerationManagerLocal::GetDeclNameFromType( declType_t type ) const {
+const char *anDeclManagerLocal::GetDeclNameFromType( declType_t type ) const {
 	int typeIndex = ( int )type;
-	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == NULL ) {
-		common->FatalError( "arcDeclerationManager::GetDeclNameFromType: bad type: %i", typeIndex );
+	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == nullptr ) {
+		common->FatalError( "anDeclManager::GetDeclNameFromType: bad type: %i", typeIndex );
 	}
 	return declTypes[typeIndex]->typeName;
 }
 
 /*
 ===================
-arcDeclerationManagerLocal::GetDeclTypeFromName
+anDeclManagerLocal::GetDeclTypeFromName
 ===================
 */
-declType_t arcDeclerationManagerLocal::GetDeclTypeFromName( const char *typeName ) const {
+declType_t anDeclManagerLocal::GetDeclTypeFromName( const char *typeName ) const {
 	for ( int i = 0; i < declTypes.Num(); i++ ) {
 		if ( declTypes[i] && declTypes[i]->typeName.Icmp( typeName ) == 0 ) {
 			return ( declType_t )declTypes[i]->type;
@@ -1043,33 +1037,33 @@ declType_t arcDeclerationManagerLocal::GetDeclTypeFromName( const char *typeName
 
 /*
 =================
-arcDeclerationManagerLocal::FindType
+anDeclManagerLocal::FindType
 
 External users will always cause the decl to be parsed before returning
 =================
 */
-const arcDecleration *arcDeclerationManagerLocal::FindType( declType_t type, const char *name, bool makeDefault ) {
-	arcDeclerationLocal *decl;
+const anDecl *anDeclManagerLocal::FindType( declType_t type, const char *name, bool makeDefault ) {
+	anDeclLocal *decl;
 	idScopedCriticalSection cs( mutex );
 
 	if ( !name || !name[0] ) {
 		name = "_emptyName";
-		//common->Warning( "arcDeclerationManager::FindType: empty %s name", GetDeclType( ( int )type )->typeName.c_str() );
+		//common->Warning( "anDeclManager::FindType: empty %s name", GetDeclType( ( int )type )->typeName.c_str() );
 	}
 
 	decl = FindTypeWithoutParsing( type, name, makeDefault );
 	if ( !decl ) {
-		return NULL;
+		return nullptr;
 	}
 
 	decl->AllocateSelf();
 
 	// if it hasn't been parsed yet, parse it now
 	if ( decl->declState == DS_UNPARSED ) {
-		if ( !arcLibrary::IsMainThread() ) {
+		if ( !anLibrary::IsMainThread() ) {
 			// we can't load images from a background thread on OpenGL,
 			// the renderer on the main thread should parse it if needed
-			arcLibrary::Error( "Attempted to load %s decl '%s' from game thread!", GetDeclNameFromType( type ), name );
+			anLibrary::Error( "Attempted to load %s decl '%s' from game thread!", GetDeclNameFromType( type ), name );
 		}
 		decl->ParseLocal();
 	}
@@ -1086,24 +1080,24 @@ const arcDecleration *arcDeclerationManagerLocal::FindType( declType_t type, con
 
 /*
 ===============
-arcDeclerationManagerLocal::FindDeclWithoutParsing
+anDeclManagerLocal::FindDeclWithoutParsing
 ===============
 */
-const arcDecleration* arcDeclerationManagerLocal::FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault) {
-	arcDeclerationLocal* decl;
+const anDecl* anDeclManagerLocal::FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault) {
+	anDeclLocal* decl;
 	decl = FindTypeWithoutParsing( type, name, makeDefault );
 	if ( decl ) {
 		return decl->self;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
 ===============
-arcDeclerationManagerLocal::ReloadFile
+anDeclManagerLocal::ReloadFile
 ===============
 */
-void arcDeclerationManagerLocal::ReloadFile( const char* filename, bool force ) {
+void anDeclManagerLocal::ReloadFile( const char* filename, bool force ) {
 	for ( int i = 0; i < loadedFiles.Num(); i++ ) {
 		if ( !loadedFiles[i]->fileName.Icmp( filename ) ) {
 			checksum ^= loadedFiles[i]->checksum;
@@ -1115,14 +1109,14 @@ void arcDeclerationManagerLocal::ReloadFile( const char* filename, bool force ) 
 
 /*
 ===================
-arcDeclerationManagerLocal::GetNumDecls
+anDeclManagerLocal::GetNumDecls
 ===================
 */
-int arcDeclerationManagerLocal::GetNumDecls( declType_t type ) {
+int anDeclManagerLocal::GetNumDecls( declType_t type ) {
 	int typeIndex = ( int )type;
 
-	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == NULL ) {
-		common->FatalError( "arcDeclerationManager::GetNumDecls: bad type: %i", typeIndex );
+	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == nullptr ) {
+		common->FatalError( "anDeclManager::GetNumDecls: bad type: %i", typeIndex );
 		return 0;
 	}
 	return linearLists[ typeIndex ].Num();
@@ -1130,20 +1124,20 @@ int arcDeclerationManagerLocal::GetNumDecls( declType_t type ) {
 
 /*
 ===================
-arcDeclerationManagerLocal::DeclByIndex
+anDeclManagerLocal::DeclByIndex
 ===================
 */
-const arcDecleration *arcDeclerationManagerLocal::DeclByIndex( declType_t type, int index, bool forceParse ) {
+const anDecl *anDeclManagerLocal::DeclByIndex( declType_t type, int index, bool forceParse ) {
 	int typeIndex = ( int )type;
 
-	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == NULL ) {
-		common->FatalError( "arcDeclerationManager::DeclByIndex: bad type: %i", typeIndex );
-		return NULL;
+	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == nullptr ) {
+		common->FatalError( "anDeclManager::DeclByIndex: bad type: %i", typeIndex );
+		return nullptr;
 	}
 	if ( index < 0 || index >= linearLists[ typeIndex ].Num() ) {
-		common->Error( "arcDeclerationManager::DeclByIndex: out of range" );
+		common->Error( "anDeclManager::DeclByIndex: out of range" );
 	}
-	arcDeclerationLocal *decl = linearLists[ typeIndex ][index];
+	anDeclLocal *decl = linearLists[ typeIndex ][index];
 
 	decl->AllocateSelf();
 
@@ -1156,7 +1150,7 @@ const arcDecleration *arcDeclerationManagerLocal::DeclByIndex( declType_t type, 
 
 /*
 ===================
-arcDeclerationManagerLocal::ListType
+anDeclManagerLocal::ListType
 
 list*
 Lists decls currently referenced
@@ -1170,15 +1164,15 @@ Lists every decl declared, even if it hasn't been referenced or parsed
 FIXME: alphabetized, wildcards?
 ===================
 */
-void arcDeclerationManagerLocal::ListType( const arcCommandArgs &args, declType_t type ) {
+void anDeclManagerLocal::ListType( const anCommandArgs &args, declType_t type ) {
 	bool all, ever;
 
-	if ( !arcNetString::Icmp( args.Argv( 1 ), "all" ) ) {
+	if ( !anString::Icmp( args.Argv( 1 ), "all" ) ) {
 		all = true;
 	} else {
 		all = false;
 	}
-	if ( !arcNetString::Icmp( args.Argv( 1 ), "ever" ) ) {
+	if ( !anString::Icmp( args.Argv( 1 ), "ever" ) ) {
 		ever = true;
 	} else {
 		ever = false;
@@ -1188,7 +1182,7 @@ void arcDeclerationManagerLocal::ListType( const arcCommandArgs &args, declType_
 	int printed = 0;
 	int	count = linearLists[ ( int )type ].Num();
 	for ( int i = 0; i < count; i++ ) {
-		arcDeclerationLocal *decl = linearLists[ ( int )type ][ i ];
+		anDeclLocal *decl = linearLists[ ( int )type ][i];
 		if ( !all && decl->declState == DS_UNPARSED ) {
 			continue;
 		}
@@ -1225,10 +1219,10 @@ void arcDeclerationManagerLocal::ListType( const arcCommandArgs &args, declType_
 
 /*
 ===================
-arcDeclerationManagerLocal::PrintType
+anDeclManagerLocal::PrintType
 ===================
 */
-void arcDeclerationManagerLocal::PrintType( const arcCommandArgs &args, declType_t type ) {
+void anDeclManagerLocal::PrintType( const anCommandArgs &args, declType_t type ) {
 	// individual decl types may use additional command parameters
 	if ( args.Argc() < 2 ) {
 		common->Printf( "USAGE: Print<decl type> <decl name> [type specific parms]\n" );
@@ -1236,7 +1230,7 @@ void arcDeclerationManagerLocal::PrintType( const arcCommandArgs &args, declType
 	}
 
 	// look it up, skipping the public path so it won't parse or reference
-	arcDeclerationLocal *decl = FindTypeWithoutParsing( type, args.Argv( 1 ), false );
+	anDeclLocal *decl = FindTypeWithoutParsing( type, args.Argv( 1 ), false );
 	if ( !decl ) {
 		common->Printf( "%s '%s' not found.\n", declTypes[ type ]->typeName.c_str(), args.Argv( 1 ) );
 		return;
@@ -1246,7 +1240,7 @@ void arcDeclerationManagerLocal::PrintType( const arcCommandArgs &args, declType
 	common->Printf( "%s %s:\n", declTypes[ type ]->typeName.c_str(), decl->name.c_str() );
 	common->Printf( "source: %s:%i\n", decl->sourceFile->fileName.c_str(), decl->sourceLine );
 	common->Printf( "----------\n" );
-	if ( decl->textSource != NULL ) {
+	if ( decl->textSource != nullptr ) {
 		char *declText = (char *)_alloca( decl->textLength + 1 );
 		decl->GetText( declText );
 		common->Printf( "%s\n", declText );
@@ -1254,7 +1248,7 @@ void arcDeclerationManagerLocal::PrintType( const arcCommandArgs &args, declType
 		common->Printf( "NO SOURCE\n" );
 	}
 	common->Printf( "----------\n" );
-	switch( decl->declState ) {
+	switch ( decl->declState ) {
 		case DS_UNPARSED:
 			common->Printf( "Unparsed.\n" );
 			break;
@@ -1275,29 +1269,29 @@ void arcDeclerationManagerLocal::PrintType( const arcCommandArgs &args, declType
 	}
 
 	// allow type-specific data to be printed
-	if ( decl->self != NULL ) {
+	if ( decl->self != nullptr ) {
 		decl->self->Print();
 	}
 }
 
 /*
 ===================
-arcDeclerationManagerLocal::CreateNewDecl
+anDeclManagerLocal::CreateNewDecl
 ===================
 */
-arcDecleration *arcDeclerationManagerLocal::CreateNewDecl( declType_t type, const char *name, const char *_fileName ) {
+anDecl *anDeclManagerLocal::CreateNewDecl( declType_t type, const char *name, const char *_fileName ) {
 	int typeIndex = ( int )type;
 
-	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == NULL || typeIndex >= DECL_MAX_TYPES ) {
-		common->FatalError( "arcDeclerationManager::CreateNewDecl: bad type: %i", typeIndex );
-		return NULL;
+	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == nullptr || typeIndex >= DECL_MAX_TYPES ) {
+		common->FatalError( "anDeclManager::CreateNewDecl: bad type: %i", typeIndex );
+		return nullptr;
 	}
 
 	char canonicalName[MAX_STRING_CHARS];
 
 	MakeNameCanonical( name, canonicalName, sizeof( canonicalName ) );
 
-	arcNetString fileName = _fileName;
+	anString fileName = _fileName;
 	fileName.BackSlashesToSlashes();
 
 	// see if it already exists
@@ -1309,7 +1303,7 @@ arcDecleration *arcDeclerationManagerLocal::CreateNewDecl( declType_t type, cons
 		}
 	}
 
-	arcDeclerationFile *sourceFile;
+	anDeclFile *sourceFile;
 
 	// find existing source file or create a new one
 	for ( int i = 0; i < loadedFiles.Num(); i++ ) {
@@ -1320,27 +1314,27 @@ arcDecleration *arcDeclerationManagerLocal::CreateNewDecl( declType_t type, cons
 	if ( i < loadedFiles.Num() ) {
 		sourceFile = loadedFiles[i];
 	} else {
-		sourceFile = new (TAG_DECL) arcDeclerationFile( fileName, type );
+		sourceFile = new (TAG_DECL) anDeclFile( fileName, type );
 		loadedFiles.Append( sourceFile );
 	}
 
-	arcDeclerationLocal *decl = new (TAG_DECL) arcDeclerationLocal;
+	anDeclLocal *decl = new (TAG_DECL) anDeclLocal;
 	decl->name = canonicalName;
 	decl->type = type;
 	decl->declState = DS_UNPARSED;
 	decl->AllocateSelf();
-	arcNetString header = declTypes[typeIndex]->typeName;
-	arcNetString defaultText = decl->self->DefaultDefinition();
+	anString header = declTypes[typeIndex]->typeName;
+	anString defaultText = decl->self->DefaultDefinition();
 
 
-	int size = header.Length() + 1 + arcNetString::Length( canonicalName ) + 1 + defaultText.Length();
+	int size = header.Length() + 1 + anString::Length( canonicalName ) + 1 + defaultText.Length();
 	char *declText = ( char * ) _alloca( size + 1 );
 
 	memcpy( declText, header, header.Length() );
 	declText[header.Length()] = ' ';
-	memcpy( declText + header.Length() + 1, canonicalName, arcNetString::Length( canonicalName ) );
-	declText[header.Length() + 1 + arcNetString::Length( canonicalName )] = ' ';
-	memcpy( declText + header.Length() + 1 + arcNetString::Length( canonicalName ) + 1, defaultText, defaultText.Length() + 1 );
+	memcpy( declText + header.Length() + 1, canonicalName, anString::Length( canonicalName ) );
+	declText[header.Length() + 1 + anString::Length( canonicalName )] = ' ';
+	memcpy( declText + header.Length() + 1 + anString::Length( canonicalName ) + 1, defaultText, defaultText.Length() + 1 );
 
 	decl->SetTextLocal( declText, size );
 	decl->sourceFile = sourceFile;
@@ -1363,17 +1357,17 @@ arcDecleration *arcDeclerationManagerLocal::CreateNewDecl( declType_t type, cons
 
 /*
 ===============
-arcDeclerationManagerLocal::RenameDecl
+anDeclManagerLocal::RenameDecl
 ===============
 */
-bool arcDeclerationManagerLocal::RenameDecl( declType_t type, const char* oldName, const char* newName ) {
+bool anDeclManagerLocal::RenameDecl( declType_t type, const char* oldName, const char* newName ) {
 	char canonicalOldName[MAX_STRING_CHARS];
 	MakeNameCanonical( oldName, canonicalOldName, sizeof( canonicalOldName ) );
 
 	char canonicalNewName[MAX_STRING_CHARS];
 	MakeNameCanonical( newName, canonicalNewName, sizeof( canonicalNewName ) );
 
-	arcDeclerationLocal	*decl = NULL;
+	anDeclLocal	*decl = nullptr;
 
 	// make sure it already exists
 	int typeIndex = ( int )type;
@@ -1409,12 +1403,12 @@ bool arcDeclerationManagerLocal::RenameDecl( declType_t type, const char* oldNam
 
 /*
 ===================
-arcDeclerationManagerLocal::MediaPrint
+anDeclManagerLocal::MediaPrint
 
 This is just used to nicely indent media caching prints
 ===================
 */
-void arcDeclerationManagerLocal::MediaPrint( const char *fmt, ... ) {
+void anDeclManagerLocal::MediaPrint( const char *fmt, ... ) {
 	if ( !decl_show.GetInteger() ) {
 		return;
 	}
@@ -1424,7 +1418,7 @@ void arcDeclerationManagerLocal::MediaPrint( const char *fmt, ... ) {
 	va_list argptr;
 	char buffer[1024];
 	va_start( argptr, fmt );
-	arcNetString::vsnPrintf( buffer, sizeof( buffer ), fmt, argptr );
+	anString::vsnPrintf( buffer, sizeof( buffer ), fmt, argptr );
 	va_end( argptr ) ;
 	buffer[sizeof( buffer )-1] = '\0';
 
@@ -1433,19 +1427,19 @@ void arcDeclerationManagerLocal::MediaPrint( const char *fmt, ... ) {
 
 /*
 ===================
-arcDeclerationManagerLocal::WritePrecacheCommands
+anDeclManagerLocal::WritePrecacheCommands
 ===================
 */
-void arcDeclerationManagerLocal::WritePrecacheCommands( arcNetFile *f ) {
+void anDeclManagerLocal::WritePrecacheCommands( anFile *f ) {
 	for ( int i = 0; i < declTypes.Num(); i++ ) {
-		if ( declTypes[i] == NULL ) {
+		if ( declTypes[i] == nullptr ) {
 			continue;
 		}
 
 		int num = linearLists[i].Num();
 
 		for ( int j = 0; j < num; j++ ) {
-			arcDeclerationLocal *decl = linearLists[i][j];
+			anDeclLocal *decl = linearLists[i][j];
 			if ( !decl->referencedThisLevel ) {
 				continue;
 			}
@@ -1457,36 +1451,36 @@ void arcDeclerationManagerLocal::WritePrecacheCommands( arcNetFile *f ) {
 		}
 	}
 }
-const arcMaterial *arcDeclerationManagerLocal::FindMaterial( const char *name, bool makeDefault ) {
-	return static_cast<const arcMaterial *>( FindType( DECL_MATERIAL, name, makeDefault ) );
+const anMaterial *anDeclManagerLocal::FindMaterial( const char *name, bool makeDefault ) {
+	return static_cast<const anMaterial *>( FindType( DECL_MATERIAL, name, makeDefault ) );
 }
 
-const arcMaterial *arcDeclerationManagerLocal::MaterialByIndex( int index, bool forceParse ) {
-	return static_cast<const arcMaterial *>( DeclByIndex( DECL_MATERIAL, index, forceParse ) );
+const anMaterial *anDeclManagerLocal::MaterialByIndex( int index, bool forceParse ) {
+	return static_cast<const anMaterial *>( DeclByIndex( DECL_MATERIAL, index, forceParse ) );
 }
 
-const arcDeclSkin *arcDeclerationManagerLocal::FindSkin( const char *name, bool makeDefault ) {
-	return static_cast<const arcDeclSkin *>( FindType( DECL_SKIN, name, makeDefault ) );
+const anDeclSkin *anDeclManagerLocal::FindSkin( const char *name, bool makeDefault ) {
+	return static_cast<const anDeclSkin *>( FindType( DECL_SKIN, name, makeDefault ) );
 }
 
-const arcDeclSkin *arcDeclerationManagerLocal::SkinByIndex( int index, bool forceParse ) {
-	return static_cast<const arcDeclSkin *>( DeclByIndex( DECL_SKIN, index, forceParse ) );
+const anDeclSkin *anDeclManagerLocal::SkinByIndex( int index, bool forceParse ) {
+	return static_cast<const anDeclSkin *>( DeclByIndex( DECL_SKIN, index, forceParse ) );
 }
 
-const arcSoundShader *arcDeclerationManagerLocal::FindSound( const char *name, bool makeDefault ) {
-	return static_cast<const arcSoundShader *>( FindType( DECL_SOUND, name, makeDefault ) );
+const anSoundShader *anDeclManagerLocal::FindSound( const char *name, bool makeDefault ) {
+	return static_cast<const anSoundShader *>( FindType( DECL_SOUND, name, makeDefault ) );
 }
 
-const arcSoundShader *arcDeclerationManagerLocal::SoundByIndex( int index, bool forceParse ) {
-	return static_cast<const arcSoundShader *>( DeclByIndex( DECL_SOUND, index, forceParse ) );
+const anSoundShader *anDeclManagerLocal::SoundByIndex( int index, bool forceParse ) {
+	return static_cast<const anSoundShader *>( DeclByIndex( DECL_SOUND, index, forceParse ) );
 }
 
 /*
 ===================
-arcDeclerationManagerLocal::Touch
+anDeclManagerLocal::Touch
 ===================
 */
-void arcDeclerationManagerLocal::Touch( const arcDecleration * decl ) {
+void anDeclManagerLocal::Touch( const anDecl * decl ) {
 	if ( decl->base->GetState() ==  DS_UNPARSED ) {
 		// This should parse the decl as well.
 		FindType( decl->GetType(), decl->GetName() );
@@ -1495,10 +1489,10 @@ void arcDeclerationManagerLocal::Touch( const arcDecleration * decl ) {
 
 /*
 ===================
-arcDeclerationManagerLocal::MakeNameCanonical
+anDeclManagerLocal::MakeNameCanonical
 ===================
 */
-void arcDeclerationManagerLocal::MakeNameCanonical( const char *name, char *result, int maxLength ) {
+void anDeclManagerLocal::MakeNameCanonical( const char *name, char *result, int maxLength ) {
 	int lastDot = -1;
 	for ( int i = 0; i < maxLength && name[i] != '\0'; i++ ) {
 		int c = name[i];
@@ -1508,7 +1502,7 @@ void arcDeclerationManagerLocal::MakeNameCanonical( const char *name, char *resu
 			lastDot = i;
 			result[i] = c;
 		} else {
-			result[i] = arcNetString::ToLower( c );
+			result[i] = anString::ToLower( c );
 		}
 	}
 	if ( lastDot != -1 ) {
@@ -1520,16 +1514,16 @@ void arcDeclerationManagerLocal::MakeNameCanonical( const char *name, char *resu
 
 /*
 ================
-arcDeclerationManagerLocal::ListDecls_f
+anDeclManagerLocal::ListDecls_f
 ================
 */
-void arcDeclerationManagerLocal::ListDecls_f( const arcCommandArgs &args ) {
+void anDeclManagerLocal::ListDecls_f( const anCommandArgs &args ) {
 	int		totalDecls = 0;
 	int		totalText = 0;
 	int		totalStructs = 0;
 
 	for ( int i = 0; i < declManagerLocal.declTypes.Num(); i++ ) {
-		if ( declManagerLocal.declTypes[i] == NULL ) {
+		if ( declManagerLocal.declTypes[i] == nullptr ) {
 			continue;
 		}
 
@@ -1539,7 +1533,7 @@ void arcDeclerationManagerLocal::ListDecls_f( const arcCommandArgs &args ) {
 		int size = 0;
 		for ( int j = 0; j < num; j++ ) {
 			size += declManagerLocal.linearLists[i][j]->Size();
-			if ( declManagerLocal.linearLists[i][j]->self != NULL ) {
+			if ( declManagerLocal.linearLists[i][j]->self != nullptr ) {
 				size += declManagerLocal.linearLists[i][j]->self->Size();
 			}
 		}
@@ -1548,7 +1542,7 @@ void arcDeclerationManagerLocal::ListDecls_f( const arcCommandArgs &args ) {
 	}
 
 	for ( int i = 0; i < declManagerLocal.loadedFiles.Num(); i++ ) {
-		arcDeclerationFile	*df = declManagerLocal.loadedFiles[i];
+		anDeclFile	*df = declManagerLocal.loadedFiles[i];
 		totalText += df->fileSize;
 	}
 
@@ -1558,7 +1552,7 @@ void arcDeclerationManagerLocal::ListDecls_f( const arcCommandArgs &args ) {
 
 /*
 ===================
-arcDeclerationManagerLocal::ReloadDecls_f
+anDeclManagerLocal::ReloadDecls_f
 
 Reload will not find any new files created in the directories, it
 will only reload existing files.
@@ -1566,8 +1560,8 @@ will only reload existing files.
 A reload will never cause anything to be purged.
 ===================
 */
-void arcDeclerationManagerLocal::ReloadDecls_f( const arcCommandArgs &args ) {
-	if ( !arcNetString::Icmp( args.Argv( 1 ), "all" ) ) {
+void anDeclManagerLocal::ReloadDecls_f( const anCommandArgs &args ) {
+	if ( !anString::Icmp( args.Argv( 1 ), "all" ) ) {
 		bool force = true;
 		common->Printf( "reloading all decl files:\n" );
 	} else {
@@ -1580,10 +1574,10 @@ void arcDeclerationManagerLocal::ReloadDecls_f( const arcCommandArgs &args ) {
 
 /*
 ===================
-arcDeclerationManagerLocal::TouchDecl_f
+anDeclManagerLocal::TouchDecl_f
 ===================
 */
-void arcDeclerationManagerLocal::TouchDecl_f( const arcCommandArgs &args ) {
+void anDeclManagerLocal::TouchDecl_f( const anCommandArgs &args ) {
 	if ( args.Argc() != 3 ) {
 		common->Printf( "usage: touch <type> <name>\n" );
 		common->Printf( "valid types: " );
@@ -1606,7 +1600,7 @@ void arcDeclerationManagerLocal::TouchDecl_f( const arcCommandArgs &args ) {
 		return;
 	}
 
-	const arcDecleration *decl = declManagerLocal.FindType( (declType_t)i, args.Argv( 2 ), false );
+	const anDecl *decl = declManagerLocal.FindType( (declType_t)i, args.Argv( 2 ), false );
 	if ( !decl ) {
 		common->Printf( "%s '%s' not found\n", declManagerLocal.declTypes[i]->typeName.c_str(), args.Argv( 2 ) );
 	}
@@ -1614,17 +1608,17 @@ void arcDeclerationManagerLocal::TouchDecl_f( const arcCommandArgs &args ) {
 
 /*
 ===================
-arcDeclerationManagerLocal::FindTypeWithoutParsing
+anDeclManagerLocal::FindTypeWithoutParsing
 
 This finds or creats the decl, but does not cause a parse.  This is only used internally.
 ===================
 */
-arcDeclerationLocal *arcDeclerationManagerLocal::FindTypeWithoutParsing( declType_t type, const char *name, bool makeDefault ) {
+anDeclLocal *anDeclManagerLocal::FindTypeWithoutParsing( declType_t type, const char *name, bool makeDefault ) {
 	int typeIndex = ( int )type;
 
-	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == NULL || typeIndex >= DECL_MAX_TYPES ) {
-		common->FatalError( "arcDeclerationManager::FindTypeWithoutParsing: bad type: %i", typeIndex );
-		return NULL;
+	if ( typeIndex < 0 || typeIndex >= declTypes.Num() || declTypes[typeIndex] == nullptr || typeIndex >= DECL_MAX_TYPES ) {
+		common->FatalError( "anDeclManager::FindTypeWithoutParsing: bad type: %i", typeIndex );
+		return nullptr;
 	}
 
 	char canonicalName[MAX_STRING_CHARS];
@@ -1644,15 +1638,15 @@ arcDeclerationLocal *arcDeclerationManagerLocal::FindTypeWithoutParsing( declTyp
 	}
 
 	if ( !makeDefault ) {
-		return NULL;
+		return nullptr;
 	}
 
-	arcDeclerationLocal *decl = new ( TAG_DECL ) arcDeclerationLocal;
-	decl->self = NULL;
+	anDeclLocal *decl = new ( TAG_DECL ) anDeclLocal;
+	decl->self = nullptr;
 	decl->name = canonicalName;
 	decl->type = type;
 	decl->declState = DS_UNPARSED;
-	decl->textSource = NULL;
+	decl->textSource = nullptr;
 	decl->textLength = 0;
 	decl->sourceFile = &implicitDecls;
 	decl->referencedThisLevel = false;
@@ -1669,22 +1663,22 @@ arcDeclerationLocal *arcDeclerationManagerLocal::FindTypeWithoutParsing( declTyp
 /*
 ====================================================================================
 
-	arcDeclerationLocal
+	anDeclLocal
 
 ====================================================================================
 */
 
 /*
 =================
-arcDeclerationLocal::arcDeclerationLocal
+anDeclLocal::anDeclLocal
 =================
 */
-arcDeclerationLocal::arcDeclerationLocal() {
+anDeclLocal::anDeclLocal() {
 	name = "unnamed";
-	textSource = NULL;
+	textSource = nullptr;
 	textLength = 0;
 	compressedLength = 0;
-	sourceFile = NULL;
+	sourceFile = nullptr;
 	sourceTextOffset = 0;
 	sourceTextLength = 0;
 	sourceLine = 0;
@@ -1696,69 +1690,69 @@ arcDeclerationLocal::arcDeclerationLocal() {
 	referencedThisLevel = false;
 	everReferenced = false;
 	redefinedInReload = false;
-	nextInFile = NULL;
+	nextInFile = nullptr;
 }
 
 /*
 =================
-arcDeclerationLocal::GetName
+anDeclLocal::GetName
 =================
 */
-const char *arcDeclerationLocal::GetName() const {
+const char *anDeclLocal::GetName() const {
 	return name.c_str();
 }
 
 /*
 =================
-arcDeclerationLocal::GetType
+anDeclLocal::GetType
 =================
 */
-declType_t arcDeclerationLocal::GetType() const {
+declType_t anDeclLocal::GetType() const {
 	return type;
 }
 
 /*
 =================
-arcDeclerationLocal::GetState
+anDeclLocal::GetState
 =================
 */
-declState_t arcDeclerationLocal::GetState() const {
+declState_t anDeclLocal::GetState() const {
 	return declState;
 }
 
 /*
 =================
-arcDeclerationLocal::IsImplicit
+anDeclLocal::IsImplicit
 =================
 */
-bool arcDeclerationLocal::IsImplicit() const {
+bool anDeclLocal::IsImplicit() const {
 	return ( sourceFile == declManagerLocal.GetImplicitDeclFile() );
 }
 
 /*
 =================
-arcDeclerationLocal::IsValid
+anDeclLocal::IsValid
 =================
 */
-bool arcDeclerationLocal::IsValid() const {
+bool anDeclLocal::IsValid() const {
 	return ( declState != DS_UNPARSED );
 }
 
 /*
 =================
-arcDeclerationLocal::Invalidate
+anDeclLocal::Invalidate
 =================
 */
-void arcDeclerationLocal::Invalidate() {
+void anDeclLocal::Invalidate() {
 	declState = DS_UNPARSED;
 }
 
 /*
 =================
-arcDeclerationLocal::EnsureNotPurged
+anDeclLocal::EnsureNotPurged
 =================
 */
-void arcDeclerationLocal::EnsureNotPurged() {
+void anDeclLocal::EnsureNotPurged() {
 	if ( declState == DS_UNPARSED ) {
 		ParseLocal();
 	}
@@ -1766,48 +1760,48 @@ void arcDeclerationLocal::EnsureNotPurged() {
 
 /*
 =================
-arcDeclerationLocal::Index
+anDeclLocal::Index
 =================
 */
-int arcDeclerationLocal::Index() const {
+int anDeclLocal::Index() const {
 	return index;
 }
 
 /*
 =================
-arcDeclerationLocal::GetLineNum
+anDeclLocal::GetLineNum
 =================
 */
-int arcDeclerationLocal::GetLineNum() const {
+int anDeclLocal::GetLineNum() const {
 	return sourceLine;
 }
 
 /*
 =================
-arcDeclerationLocal::GetFileName
+anDeclLocal::GetFileName
 =================
 */
-const char *arcDeclerationLocal::GetFileName() const {
+const char *anDeclLocal::GetFileName() const {
 	return ( sourceFile ) ? sourceFile->fileName.c_str() : "*invalid*";
 }
 
 /*
 =================
-arcDeclerationLocal::Size
+anDeclLocal::Size
 =================
 */
-size_t arcDeclerationLocal::Size() const {
-	return sizeof( arcDecleration ) + name.Allocated();
+size_t anDeclLocal::Size() const {
+	return sizeof( anDecl ) + name.Allocated();
 }
 
 /*
 =================
-arcDeclerationLocal::GetText
+anDeclLocal::GetText
 =================
 */
-void arcDeclerationLocal::GetText( char *text ) const {
+void anDeclLocal::GetText( char *text ) const {
 #ifdef USE_COMPRESSED_DECLS
-	HuffmanDecompressText( text, textLength, ( byte * )textSource, compressedLength );
+	HuffmanDecompressText( text, textLength, (byte *)textSource, compressedLength );
 #else
 	memcpy( text, textSource, textLength+1 );
 #endif
@@ -1815,28 +1809,28 @@ void arcDeclerationLocal::GetText( char *text ) const {
 
 /*
 =================
-arcDeclerationLocal::GetTextLength
+anDeclLocal::GetTextLength
 =================
 */
-int arcDeclerationLocal::GetTextLength() const {
+int anDeclLocal::GetTextLength() const {
 	return textLength;
 }
 
 /*
 =================
-arcDeclerationLocal::SetText
+anDeclLocal::SetText
 =================
 */
-void arcDeclerationLocal::SetText( const char *text ) {
-	SetTextLocal( text, arcNetString::Length( text ) );
+void anDeclLocal::SetText( const char *text ) {
+	SetTextLocal( text, anString::Length( text ) );
 }
 
 /*
 =================
-arcDeclerationLocal::SetTextLocal
+anDeclLocal::SetTextLocal
 =================
 */
-void arcDeclerationLocal::SetTextLocal( const char *text, const int length ) {
+void anDeclLocal::SetTextLocal( const char *text, const int length ) {
 	Mem_Free( textSource );
 	checksum = MD5_BlockChecksum( text, length );
 
@@ -1848,7 +1842,7 @@ void arcDeclerationLocal::SetTextLocal( const char *text, const int length ) {
 
 #ifdef USE_COMPRESSED_DECLS
 	int maxBytesPerCode = ( maxHuffmanBits + 7 ) >> 3;
-	byte *compressed = ( byte * )_alloca( length * maxBytesPerCode );
+	byte *compressed = (byte *)_alloca( length * maxBytesPerCode );
 	compressedLength = HuffmanCompressText( text, length, compressed, length * maxBytesPerCode );
 	textSource = (char *)Mem_Alloc( compressedLength, TAG_DECLTEXT );
 	memcpy( textSource, compressed, compressedLength );
@@ -1863,12 +1857,12 @@ void arcDeclerationLocal::SetTextLocal( const char *text, const int length ) {
 
 /*
 =================
-arcDeclerationLocal::ReplaceSourceFileText
+anDeclLocal::ReplaceSourceFileText
 =================
 */
-bool arcDeclerationLocal::ReplaceSourceFileText() {
+bool anDeclLocal::ReplaceSourceFileText() {
 	int oldFileLength, newFileLength;
-	arcNetFile *file;
+	anFile *file;
 
 	common->Printf( "Writing \'%s\' to \'%s\'...\n", GetName(), GetFileName() );
 
@@ -1923,10 +1917,10 @@ bool arcDeclerationLocal::ReplaceSourceFileText() {
 	// set new file size, checksum and timestamp
 	sourceFile->fileSize = newFileLength;
 	sourceFile->checksum = MD5_BlockChecksum( buffer.Ptr(), newFileLength );
-	fileSystem->ReadFile( GetFileName(), NULL, &sourceFile->timestamp );
+	fileSystem->ReadFile( GetFileName(), nullptr, &sourceFile->timestamp );
 
 	// move all decls in the same file
-	for ( arcDeclerationLocal *decl = sourceFile->decls; decl; decl = decl->nextInFile ) {
+	for ( anDeclLocal *decl = sourceFile->decls; decl; decl = decl->nextInFile ) {
 		if (decl->sourceTextOffset > sourceTextOffset) {
 			decl->sourceTextOffset += textLength - sourceTextLength;
 		}
@@ -1940,17 +1934,17 @@ bool arcDeclerationLocal::ReplaceSourceFileText() {
 
 /*
 =================
-arcDeclerationLocal::SourceFileChanged
+anDeclLocal::SourceFileChanged
 =================
 */
-bool arcDeclerationLocal::SourceFileChanged() const {
+bool anDeclLocal::SourceFileChanged() const {
 	ARC_TIME_T newTimestamp;
 
 	if ( sourceFile->fileSize <= 0 ) {
 		return false;
 	}
 
-	int newLength = fileSystem->ReadFile( GetFileName(), NULL, &newTimestamp );
+	int newLength = fileSystem->ReadFile( GetFileName(), nullptr, &newTimestamp );
 
 	if ( newLength != sourceFile->fileSize || newTimestamp != sourceFile->timestamp ) {
 		return true;
@@ -1961,10 +1955,10 @@ bool arcDeclerationLocal::SourceFileChanged() const {
 
 /*
 =================
-arcDeclerationLocal::MakeDefault
+anDeclLocal::MakeDefault
 =================
 */
-void arcDeclerationLocal::MakeDefault() {
+void anDeclLocal::MakeDefault() {
 	static int recursionLevel;
 	declManagerLocal.MediaPrint( "DEFAULTED\n" );
 	declState = DS_DEFAULTED;
@@ -1978,7 +1972,7 @@ void arcDeclerationLocal::MakeDefault() {
 	// still reference other default definitions, so we can't
 	// just dump out on the first recursion
 	if ( ++recursionLevel > 100 ) {
-		common->FatalError( "arcDecleration::MakeDefault: bad DefaultDefinition(): %s", defaultText );
+		common->FatalError( "anDecl::MakeDefault: bad DefaultDefinition(): %s", defaultText );
 	}
 
 	// always free data before parsing
@@ -1993,29 +1987,29 @@ void arcDeclerationLocal::MakeDefault() {
 
 /*
 =================
-arcDeclerationLocal::SetDefaultText
+anDeclLocal::SetDefaultText
 =================
 */
-bool arcDeclerationLocal::SetDefaultText() {
+bool anDeclLocal::SetDefaultText() {
 	return false;
 }
 
 /*
 =================
-arcDeclerationLocal::DefaultDefinition
+anDeclLocal::DefaultDefinition
 =================
 */
-const char *arcDeclerationLocal::DefaultDefinition() const {
+const char *anDeclLocal::DefaultDefinition() const {
 	return "{ }";
 }
 
 /*
 =================
-arcDeclerationLocal::Parse
+anDeclLocal::Parse
 =================
 */
-bool arcDeclerationLocal::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
-	arcLexer src;
+bool anDeclLocal::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+	anLexer src;
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( DECL_LEXER_FLAGS );
 	src.SkipUntilString( "{" );
@@ -2025,45 +2019,45 @@ bool arcDeclerationLocal::Parse( const char *text, const int textLength, bool al
 
 /*
 =================
-arcDeclerationLocal::FreeData
+anDeclLocal::FreeData
 =================
 */
-void arcDeclerationLocal::FreeData() {
+void anDeclLocal::FreeData() {
 }
 
 /*
 =================
-arcDeclerationLocal::List
+anDeclLocal::List
 =================
 */
-void arcDeclerationLocal::List() const {
+void anDeclLocal::List() const {
 	common->Printf( "%s\n", GetName() );
 }
 
 /*
 =================
-arcDeclerationLocal::Print
+anDeclLocal::Print
 =================
 */
-void arcDeclerationLocal::Print() const {
+void anDeclLocal::Print() const {
 }
 
 /*
 =================
-arcDeclerationLocal::Reload
+anDeclLocal::Reload
 =================
 */
-void arcDeclerationLocal::Reload() {
+void anDeclLocal::Reload() {
 	this->sourceFile->Reload( false );
 }
 
 /*
 =================
-arcDeclerationLocal::AllocateSelf
+anDeclLocal::AllocateSelf
 =================
 */
-void arcDeclerationLocal::AllocateSelf() {
-	if ( self == NULL ) {
+void anDeclLocal::AllocateSelf() {
+	if ( self == nullptr ) {
 		self = declManagerLocal.GetDeclType( ( int )type )->allocator();
 		self->base = this;
 	}
@@ -2071,10 +2065,10 @@ void arcDeclerationLocal::AllocateSelf() {
 
 /*
 =================
-arcDeclerationLocal::ParseLocal
+anDeclLocal::ParseLocal
 =================
 */
-void arcDeclerationLocal::ParseLocal() {
+void anDeclLocal::ParseLocal() {
 	bool generatedDefaultText = false;
 
 	AllocateSelf();
@@ -2085,7 +2079,7 @@ void arcDeclerationLocal::ParseLocal() {
 	declManagerLocal.MediaPrint( "parsing %s %s\n", declManagerLocal.declTypes[type]->typeName.c_str(), name.c_str() );
 
 	// if no text source try to generate default text
-	if ( textSource == NULL ) {
+	if ( textSource == nullptr ) {
 		generatedDefaultText = self->SetDefaultText();
 	}
 
@@ -2093,7 +2087,7 @@ void arcDeclerationLocal::ParseLocal() {
 	declManagerLocal.indent++;
 
 	// no text immediately causes a MakeDefault()
-	if ( textSource == NULL ) {
+	if ( textSource == nullptr ) {
 		MakeDefault();
 		declManagerLocal.indent--;
 		return;
@@ -2109,7 +2103,7 @@ void arcDeclerationLocal::ParseLocal() {
 	// free generated text
 	if ( generatedDefaultText ) {
 		Mem_Free( textSource );
-		textSource = NULL;
+		textSource = nullptr;
 		textLength = 0;
 	}
 
@@ -2118,10 +2112,10 @@ void arcDeclerationLocal::ParseLocal() {
 
 /*
 =================
-arcDeclerationLocal::Purge
+anDeclLocal::Purge
 =================
 */
-void arcDeclerationLocal::Purge() {
+void anDeclLocal::Purge() {
 	// never purge things that were referenced outside level load,
 	// like the console and menu graphics
 	if ( parsedOutsideLevelLoad ) {
@@ -2137,9 +2131,9 @@ void arcDeclerationLocal::Purge() {
 
 /*
 =================
-arcDeclerationLocal::EverReferenced
+anDeclLocal::EverReferenced
 =================
 */
-bool arcDeclerationLocal::EverReferenced() const {
+bool anDeclLocal::EverReferenced() const {
 	return everReferenced;
 }

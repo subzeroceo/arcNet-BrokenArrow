@@ -64,7 +64,7 @@ If you have questions concerning this license or the applicable additional terms
 #endif // GESTATUSBAR_H_
 
 // Utility functions
-const char *StringFromVec4	( arcVec4& vec );
+const char *StringFromVec4	( anVec4& vec );
 bool		IsExpression	( const char* s );
 
 
@@ -74,8 +74,8 @@ class rvGEApp
 {
 public:
 
-	rvGEApp ( );
-	~rvGEApp ( );
+	rvGEApp();
+	~rvGEApp();
 
 	bool				Initialize				( void );
 	void				RunFrame				( void );
@@ -83,7 +83,7 @@ public:
 
 	bool				TranslateAccelerator	( LPMSG msg );
 
-	rvGEWorkspace*		GetActiveWorkspace		( HWND* retwnd = NULL );
+	rvGEWorkspace*		GetActiveWorkspace		( HWND* retwnd = nullptr );
 	rvGENavigator&		GetNavigator			( void );
 	rvGEProperties&		GetProperties			( void );
 	rvGETransformer&	GetTransformer			( void );
@@ -130,8 +130,8 @@ protected:
 
 	rvGEViewer*				mViewer;
 
-	arcNetList<rvGEWorkspace*>	mWorkspaces;
-	arcNetList<HWND>			mToolWindows;
+	anList<rvGEWorkspace*>	mWorkspaces;
+	anList<HWND>			mToolWindows;
 
 private:
 

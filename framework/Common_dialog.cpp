@@ -1,18 +1,18 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Common_dialog.h"
 
-arcCVarSystem popupDialog_debug( "popupDialog_debug", "0", CVAR_BOOL | CVAR_ARCHIVE, "display debug spam" );
+anCVarSystem popupDialog_debug( "popupDialog_debug", "0", CVAR_BOOL | CVAR_ARCHIVE, "display debug spam" );
 
-extern arcCVarSystem g_demoMode;
+extern anCVarSystem g_demoMode;
 
-static const char * dialogStateToString[ GDM_MAX + 1 ] = {
+static const char *dialogStateToString[ GDM_MAX + 1 ] = {
 	ASSERT_ENUM_STRING( GDM_INVALID, 0 ),
 	ASSERT_ENUM_STRING( GDM_MAX, 139 )
 };
 
-arcCVarSystem dialog_saveClearLevel( "dialog_saveClearLevel", "1000", CVAR_INTEGER, "Time required to show long message" );
+anCVarSystem dialog_saveClearLevel( "dialog_saveClearLevel", "1000", CVAR_INTEGER, "Time required to show long message" );
 
 /*
 ========================
@@ -33,10 +33,10 @@ bool DialogMsgShouldWait( gameDialogMessages_t msg ) {
 
 /*
 ================================================
-arcCommonDlg::ClearDialogs
+anCommonDlg::ClearDialogs
 ================================================
 */
-void arcCommonDlg::ClearDialogs( bool forceClear ) {
+void anCommonDlg::ClearDialogs( bool forceClear ) {
 	bool topMessageCleared = false;
 	for ( int index = 0; index < messageList.Num(); ++index ) {
 		if ( !messageList[index].leaveOnClear || forceClear ) {
@@ -56,26 +56,26 @@ void arcCommonDlg::ClearDialogs( bool forceClear ) {
 
 /*
 ================================================
-arcCommonDlg::AddDialogIntVal
+anCommonDlg::AddDialogIntVal
 ================================================
 */
-void arcCommonDlg::AddDialogIntVal( const char * name, int val ) {
-	if ( dialog != NULL ) {
+void anCommonDlg::AddDialogIntVal( const char *name, int val ) {
+	if ( dialog != nullptr ) {
 		dialog->SetGlobal( name, val );
 	}
 }
 
 /*
 ================================================
-arcCommonDlg::AddDialog
+anCommonDlg::AddDialog
 ================================================
 */
-void arcCommonDlg::AddDialog( gameDialogMessages_t msg, dialogType_t type, idSWFScriptFunction * acceptCallback, idSWFScriptFunction * cancelCallback, bool pause, const char * location, int lineNumber, bool leaveOnMapHeapReset, bool waitOnAtlas, bool renderDuringLoad ) {
+void anCommonDlg::AddDialog( gameDialogMessages_t msg, dialogType_t type, idSWFScriptFunction * acceptCallback, idSWFScriptFunction * cancelCallback, bool pause, const char *location, int lineNumber, bool leaveOnMapHeapReset, bool waitOnAtlas, bool renderDuringLoad ) {
 	idKeyInput::ClearStates();
 	//sys->ClearEvents();
-	arcLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] msg: %s, pause: %d from: %s:%d\n", __FUNCTION__, dialogStateToString[msg], pause, location == NULL ? "NULL" : location, lineNumber );
+	anLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] msg: %s, pause: %d from: %s:%d\n", __FUNCTION__, dialogStateToString[msg], pause, location == nullptr ? "nullptr" : location, lineNumber );
 
-	if ( dialog == NULL ) {
+	if ( dialog == nullptr ) {
 		return;
 	}
 
@@ -96,11 +96,11 @@ void arcCommonDlg::AddDialog( gameDialogMessages_t msg, dialogType_t type, idSWF
 
 /*
 ========================
-arcCommonDlg::AddDynamicDialog
+anCommonDlg::AddDynamicDialog
 ========================
 */
-void arcCommonDlg::AddDynamicDialog( gameDialogMessages_t msg, const arcStaticList< idSWFScriptFunction *, 4 > & callbacks, const arcStaticList< idStrId, 4 > & optionText, bool pause, aRcStaticString< 256 > overrideMsg, bool leaveOnMapHeapReset, bool waitOnAtlas, bool renderDuringLoad ) {
-	if ( dialog == NULL ) {
+void anCommonDlg::AddDynamicDialog( gameDialogMessages_t msg, const arcStaticList< idSWFScriptFunction *, 4 > & callbacks, const arcStaticList< anStringId, 4 > & optionText, bool pause, anStaticString< 256 > overrideMsg, bool leaveOnMapHeapReset, bool waitOnAtlas, bool renderDuringLoad ) {
+	if ( dialog == nullptr ) {
 		return;
 	}
 
@@ -110,14 +110,14 @@ void arcCommonDlg::AddDynamicDialog( gameDialogMessages_t msg, const arcStaticLi
 	info.type = DIALOG_DYNAMIC;
 	info.pause = pause;
 	info.leaveOnClear = leaveOnMapHeapReset;
-	info.acceptCB = 0 < callbacks.Num() ? callbacks[0] : NULL;
-	info.cancelCB = 1 < callbacks.Num() ? callbacks[1] : NULL;
-	info.altCBOne = 2 < callbacks.Num() ? callbacks[2] : NULL;
-	info.altCBTwo = 3 < callbacks.Num() ? callbacks[3] : NULL;
-	info.txt1 = 0 < optionText.Num() ? optionText[0] : idStrId();
-	info.txt2 = 1 < optionText.Num() ? optionText[1] : idStrId();
-	info.txt3 = 2 < optionText.Num() ? optionText[2] : idStrId();
-	info.txt4 = 3 < optionText.Num() ? optionText[3] : idStrId();
+	info.acceptCB = 0 < callbacks.Num() ? callbacks[0] : nullptr;
+	info.cancelCB = 1 < callbacks.Num() ? callbacks[1] : nullptr;
+	info.altCBOne = 2 < callbacks.Num() ? callbacks[2] : nullptr;
+	info.altCBTwo = 3 < callbacks.Num() ? callbacks[3] : nullptr;
+	info.txt1 = 0 < optionText.Num() ? optionText[0] : anStringId();
+	info.txt2 = 1 < optionText.Num() ? optionText[1] : anStringId();
+	info.txt3 = 2 < optionText.Num() ? optionText[2] : anStringId();
+	info.txt4 = 3 < optionText.Num() ? optionText[3] : anStringId();
 	info.renderDuringLoad = renderDuringLoad;
 
 	info.clear = false;
@@ -129,41 +129,41 @@ void arcCommonDlg::AddDynamicDialog( gameDialogMessages_t msg, const arcStaticLi
 
 /*
 ========================
-arcCommonDlg::AddDialogInternal
+anCommonDlg::AddDialogInternal
 ========================
 */
-void arcCommonDlg::AddDialogInternal( idDialogInfo & info ) {
+void anCommonDlg::AddDialogInternal( idDialogInfo & info ) {
 	// don't add the dialog if it's already in the list, we never want to show a duplicate dialog
-	if ( HasDialogMsg( info.msg, NULL ) ) {
+	if ( HasDialogMsg( info.msg, nullptr ) ) {
 		return;
 	}
 
 	// Remove the delete confirmation if we remove the device and ask for a storage confirmation
 	if ( info.msg == GDM_STORAGE_REQUIRED ) {
-		if ( HasDialogMsg( GDM_DELETE_SAVE, NULL ) ) {
-			ClearDialog( GDM_DELETE_SAVE, NULL, 0 );
+		if ( HasDialogMsg( GDM_DELETE_SAVE, nullptr ) ) {
+			ClearDialog( GDM_DELETE_SAVE, nullptr, 0 );
 		}
-		if ( HasDialogMsg( GDM_DELETE_AUTOSAVE, NULL ) ) {
-			ClearDialog( GDM_DELETE_AUTOSAVE, NULL, 0 );
+		if ( HasDialogMsg( GDM_DELETE_AUTOSAVE, nullptr ) ) {
+			ClearDialog( GDM_DELETE_AUTOSAVE, nullptr, 0 );
 		}
-		if ( HasDialogMsg( GDM_LOAD_DAMAGED_FILE, NULL ) ) {
-			ClearDialog( GDM_LOAD_DAMAGED_FILE, NULL, 0 );
+		if ( HasDialogMsg( GDM_LOAD_DAMAGED_FILE, nullptr ) ) {
+			ClearDialog( GDM_LOAD_DAMAGED_FILE, nullptr, 0 );
 		}
 	}
 
-	if ( info.acceptCB != NULL ) {
+	if ( info.acceptCB != nullptr ) {
 		info.acceptCB->AddRef();
 	}
 
-	if ( info.cancelCB != NULL ) {
+	if ( info.cancelCB != nullptr ) {
 		info.cancelCB->AddRef();
 	}
 
-	if ( info.altCBOne != NULL ) {
+	if ( info.altCBOne != nullptr ) {
 		info.altCBOne->AddRef();
 	}
 
-	if ( info.altCBTwo != NULL ) {
+	if ( info.altCBTwo != nullptr ) {
 		info.altCBTwo->AddRef();
 	}
 
@@ -178,7 +178,7 @@ void arcCommonDlg::AddDialogInternal( idDialogInfo & info ) {
 		}
 
 		if ( messageList.Num() > 0 ) {
-			arcLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] msg: %s new dialog added over old\n", __FUNCTION__, dialogStateToString[info.msg] );
+			anLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] msg: %s new dialog added over old\n", __FUNCTION__, dialogStateToString[info.msg] );
 
 			dialog->Activate( false );
 			messageList.Insert( info, 0 );
@@ -192,23 +192,23 @@ void arcCommonDlg::AddDialogInternal( idDialogInfo & info ) {
 
 /*
 ========================
-arcCommonDlg::ActivateDialog
+anCommonDlg::ActivateDialog
 ========================
 */
-void arcCommonDlg::ActivateDialog( bool activate ) {
+void anCommonDlg::ActivateDialog( bool activate ) {
 	dialogInUse = activate;
-	if ( dialog != NULL ) {
+	if ( dialog != nullptr ) {
 		dialog->Activate( activate );
 	}
 }
 
 /*
 ================================================
-arcCommonDlg::ShowDialog
+anCommonDlg::ShowDialog
 ================================================
 */
-void arcCommonDlg::ShowDialog( const idDialogInfo & info ) {
-	arcLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] msg: %s, m.clear = %d, m.waitClear = %d, m.killTime = %d\n",
+void anCommonDlg::ShowDialog( const idDialogInfo & info ) {
+	anLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] msg: %s, m.clear = %d, m.waitClear = %d, m.killTime = %d\n",
 		__FUNCTION__, dialogStateToString[info.msg], info.clear, info.waitClear, info.killTime );
 
 	// here instead of add dialog to make sure we meet the TCR, otherwise it has a chance to be visible for less than 1 second
@@ -221,7 +221,7 @@ void arcCommonDlg::ShowDialog( const idDialogInfo & info ) {
 		dialog->Activate( false );
 	}
 
-	arcNetString message, title;
+	anString message, title;
 	GetDialogMsg( info.msg, message, title );
 
 	dialog->SetGlobal( "titleVal", title );
@@ -232,7 +232,7 @@ void arcCommonDlg::ShowDialog( const idDialogInfo & info ) {
 	}
 	dialog->SetGlobal( "infoType", info.type );
 
-	if ( info.acceptCB == NULL && ( info.type != DIALOG_WAIT && info.type != DIALOG_WAIT_BLACKOUT ) ) {
+	if ( info.acceptCB == nullptr && ( info.type != DIALOG_WAIT && info.type != DIALOG_WAIT_BLACKOUT ) ) {
 		class idSWFScriptFunction_Accept : public idSWFScriptFunction_RefCounted {
 		public:
 			idSWFScriptFunction_Accept( gameDialogMessages_t _msg ) {
@@ -265,10 +265,10 @@ void arcCommonDlg::ShowDialog( const idDialogInfo & info ) {
 
 /*
 ================================================
-arcCommonDlg::ShowNextDialog
+anCommonDlg::ShowNextDialog
 ================================================
 */
-void arcCommonDlg::ShowNextDialog() {
+void anCommonDlg::ShowNextDialog() {
 	for ( int index = 0; index < messageList.Num(); ++index ) {
 		if ( !messageList[index].clear ) {
 			idDialogInfo info = messageList[index];
@@ -280,16 +280,16 @@ void arcCommonDlg::ShowNextDialog() {
 
 /*
 ================================================
-arcCommonDlg::ShowSaveIndicator
+anCommonDlg::ShowSaveIndicator
 ================================================
 */
-void arcCommonDlg::ShowSaveIndicator( bool show ) {
-	arcLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s]\n", __FUNCTION__ );
+void anCommonDlg::ShowSaveIndicator( bool show ) {
+	anLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s]\n", __FUNCTION__ );
 
 	if ( show ) {
-		arcNetString msg = idStrId( "#str_saving" ).GetLocalizedString();
+		anString msg = anStringId( "#str_saving" ).GetLocalizedString();
 
-		common->Dialog().AddDialog( GDM_SAVING, DIALOG_WAIT, NULL, NULL, true, "", 0, false, true, true );
+		common->Dialog().AddDialog( GDM_SAVING, DIALOG_WAIT, nullptr, nullptr, true, "", 0, false, true, true );
 	} else {
 		common->Dialog().ClearDialog( GDM_SAVING );
 	}
@@ -297,7 +297,7 @@ void arcCommonDlg::ShowSaveIndicator( bool show ) {
 
 /*
 ========================
-arcCommonDlg::RemoveSaveDialog
+anCommonDlg::RemoveSaveDialog
 
 From TCR# 047
 Games must display a message during storage writes for the following conditions and the respective amount of time:
@@ -307,7 +307,7 @@ Games must display a message during storage writes for the following conditions 
 
 ========================
 */
-void arcCommonDlg::RemoveWaitDialogs() {
+void anCommonDlg::RemoveWaitDialogs() {
 	bool topMessageCleared = false;
 	for ( int index = 0; index < messageList.Num(); ++index ) {
 		if ( DialogMsgShouldWait( messageList[index].msg ) ) {
@@ -328,10 +328,10 @@ void arcCommonDlg::RemoveWaitDialogs() {
 
 /*
 ================================================
-arcCommonDlg::ClearAllDialogHack
+anCommonDlg::ClearAllDialogHack
 ================================================
 */
-void arcCommonDlg::ClearAllDialogHack() {
+void anCommonDlg::ClearAllDialogHack() {
 	for ( int index = 0; index < messageList.Num(); ++index ) {
 		messageList[index].clear = true;
 		messageList[index].waitClear = false;
@@ -340,22 +340,22 @@ void arcCommonDlg::ClearAllDialogHack() {
 
 /*
 ================================================
-arcCommonDlg::HasDialogMsg
+anCommonDlg::HasDialogMsg
 ================================================
 */
-bool arcCommonDlg::HasDialogMsg( gameDialogMessages_t msg, bool * isNowActive ) {
+bool anCommonDlg::HasDialogMsg( gameDialogMessages_t msg, bool * isNowActive ) {
 	for ( int index = 0; index < messageList.Num(); ++index ) {
 		idDialogInfo & info = messageList[index];
 
 		if ( info.msg == msg && !info.clear ) {
-			if ( isNowActive != NULL ) {
+			if ( isNowActive != nullptr ) {
 				*isNowActive = ( index == 0 );
 			}
 			return true;
 		}
 	}
 
-	if ( isNowActive != NULL ) {
+	if ( isNowActive != nullptr ) {
 		*isNowActive = false;
 	}
 
@@ -364,10 +364,10 @@ bool arcCommonDlg::HasDialogMsg( gameDialogMessages_t msg, bool * isNowActive ) 
 
 /*
 ================================================
-arcCommonDlg::ClearDialog
+anCommonDlg::ClearDialog
 ================================================
 */
-void arcCommonDlg::ClearDialog( gameDialogMessages_t msg, const char * location, int lineNumber ) {
+void anCommonDlg::ClearDialog( gameDialogMessages_t msg, const char *location, int lineNumber ) {
 	bool topMessageCleared = false;
 
 	for ( int index = 0; index < messageList.Num(); ++index ) {
@@ -399,8 +399,8 @@ void arcCommonDlg::ClearDialog( gameDialogMessages_t msg, const char * location,
 				}
 			}
 			assert( info.msg >= GDM_INVALID && info.msg < GDM_MAX );	// not sure why /analyze complains about this
-			arcLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] msg: %s, from: %s:%d, topMessageCleared = %d, m.clear = %d, m.waitClear = %d, m.killTime = %d\n",
-				__FUNCTION__, dialogStateToString[info.msg], location == NULL ? "NULL" : location, lineNumber,
+			anLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] msg: %s, from: %s:%d, topMessageCleared = %d, m.clear = %d, m.waitClear = %d, m.killTime = %d\n",
+				__FUNCTION__, dialogStateToString[info.msg], location == nullptr ? "nullptr" : location, lineNumber,
 				topMessageCleared, messageList[index].clear,
 				messageList[index].waitClear, messageList[index].killTime );
 			break;
@@ -414,42 +414,42 @@ void arcCommonDlg::ClearDialog( gameDialogMessages_t msg, const char * location,
 
 /*
 ================================================
-arcCommonDlg::ReleaseCallBacks
+anCommonDlg::ReleaseCallBacks
 ================================================
 */
-void arcCommonDlg::ReleaseCallBacks( int index ) {
+void anCommonDlg::ReleaseCallBacks( int index ) {
 	if ( index < messageList.Num() ) {
-		if ( messageList[index].acceptCB != NULL ) {
+		if ( messageList[index].acceptCB != nullptr ) {
 			messageList[index].acceptCB->Release();
-			messageList[index].acceptCB = NULL;
+			messageList[index].acceptCB = nullptr;
 		}
 
-		if ( messageList[index].cancelCB != NULL ) {
+		if ( messageList[index].cancelCB != nullptr ) {
 			messageList[index].cancelCB->Release();
-			messageList[index].cancelCB = NULL;
+			messageList[index].cancelCB = nullptr;
 		}
 
-		if ( messageList[index].altCBOne != NULL ) {
+		if ( messageList[index].altCBOne != nullptr ) {
 			messageList[index].altCBOne->Release();
-			messageList[index].altCBOne = NULL;
+			messageList[index].altCBOne = nullptr;
 		}
 
-		if ( messageList[index].altCBTwo != NULL ) {
+		if ( messageList[index].altCBTwo != nullptr ) {
 			messageList[index].altCBTwo->Release();
-			messageList[index].altCBTwo = NULL;
+			messageList[index].altCBTwo = nullptr;
 		}
 	}
 }
 
 /*
 ================================================
-arcCommonDlg::Render
+anCommonDlg::Render
 ================================================
 */
-void arcCommonDlg::Render( bool loading ) {
+void anCommonDlg::Render( bool loading ) {
 	dialogPause = false;
 
-	if ( dialog == NULL ) {
+	if ( dialog == nullptr ) {
 		return;
 	}
 
@@ -458,7 +458,7 @@ void arcCommonDlg::Render( bool loading ) {
 	bool pauseCheck = false;
 	for ( int index = 0; index < messageList.Num(); ++index ) {
 		if ( messageList[index].clear ) {
-			arcLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] removing %s\n", __FUNCTION__, dialogStateToString[messageList[index].msg] );
+			anLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s] removing %s\n", __FUNCTION__, dialogStateToString[messageList[index].msg] );
 			ReleaseCallBacks( index );
 			messageList.RemoveIndex( index );
 			index--;
@@ -490,13 +490,13 @@ void arcCommonDlg::Render( bool loading ) {
 		int timeRemaining = ( endTime - Sys_Milliseconds() ) / 1000;
 
 		if ( timeRemaining <= 0 ) {
-			if ( messageList[0].cancelCB != NULL ) {
+			if ( messageList[0].cancelCB != nullptr ) {
 				idSWFParmList parms;
-				messageList[0].cancelCB->Call( NULL, parms );
+				messageList[0].cancelCB->Call( nullptr, parms );
 			}
 			messageList[0].clear = true;
 		} else {
-			idStrId txtTime = idStrId( "#str_time_remaining" );
+			anStringId txtTime = anStringId( "#str_time_remaining" );
 			dialog->SetGlobal( "countdownInfo", va( txtTime.GetLocalizedString(), timeRemaining ) );
 		}
 	}
@@ -509,19 +509,19 @@ void arcCommonDlg::Render( bool loading ) {
 		dialog->Render( renderSystem, Sys_Microseconds() );
 	}
 
-	if ( saveIndicator != NULL && saveIndicator->IsActive() ) {
+	if ( saveIndicator != nullptr && saveIndicator->IsActive() ) {
 		saveIndicator->Render( renderSystem, Sys_Microseconds() );
 	}
 }
 
 /*
 ================================================
-arcCommonDlg::Init
+anCommonDlg::Init
 ================================================
 */
-void arcCommonDlg::Init() {
+void anCommonDlg::Init() {
 
-	arcLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s]\n", __FUNCTION__ );
+	anLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s]\n", __FUNCTION__ );
 
 	Shutdown();
 
@@ -529,7 +529,7 @@ void arcCommonDlg::Init() {
 	saveIndicator = new (TAG_SWF) idSWF( "save_indicator" );
 
 #define BIND_DIALOG_CONSTANT( x ) dialog->SetGlobal( #x, x )
-	if ( dialog != NULL ) {
+	if ( dialog != nullptr ) {
 		BIND_DIALOG_CONSTANT( DIALOG_ACCEPT );
 		BIND_DIALOG_CONSTANT( DIALOG_CONTINUE );
 		BIND_DIALOG_CONSTANT( DIALOG_ACCEPT_CANCEL );
@@ -549,47 +549,47 @@ void arcCommonDlg::Init() {
 
 /*
 ================================================
-arcCommonDlg::Shutdown
+anCommonDlg::Shutdown
 ================================================
 */
-void arcCommonDlg::Shutdown() {
-	arcLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s]\n", __FUNCTION__ );
+void anCommonDlg::Shutdown() {
+	anLibrary::PrintfIf( popupDialog_debug.GetBool(), "[%s]\n", __FUNCTION__ );
 
 	ClearDialogs();
 
 	delete dialog;
-	dialog = NULL;
+	dialog = nullptr;
 
 	delete saveIndicator;
-	saveIndicator = NULL;
+	saveIndicator = nullptr;
 }
 
 /*
 ========================
-arcCommonDlg::Restart
+anCommonDlg::Restart
 ========================
 */
-void arcCommonDlg::Restart() {
+void anCommonDlg::Restart() {
 	Shutdown();
 	Init();
 }
 
 /*
 ================================================
-arcCommonDlg::GetDialogMsg
+anCommonDlg::GetDialogMsg
 ================================================
 */
-arcNetString arcCommonDlg::GetDialogMsg( gameDialogMessages_t msg, arcNetString & message, arcNetString & title ) {
+anString anCommonDlg::GetDialogMsg( gameDialogMessages_t msg, anString & message, anString & title ) {
 	return message;
 }
 
 /*
 ================================================
-arcCommonDlg::HandleDialogEvent
+anCommonDlg::HandleDialogEvent
 ================================================
 */
-bool arcCommonDlg::HandleDialogEvent( const sysEvent_t * sev ) {
-	if ( dialog != NULL && dialog->IsLoaded() && dialog->IsActive() ) {
+bool anCommonDlg::HandleDialogEvent( const sysEvent_t * sev ) {
+	if ( dialog != nullptr && dialog->IsLoaded() && dialog->IsActive() ) {
 		if ( saveIndicator->IsActive() ) {
 			return false;
 		} else {
@@ -607,11 +607,11 @@ bool arcCommonDlg::HandleDialogEvent( const sysEvent_t * sev ) {
 
 /*
 ================================================
-arcCommonDlg::IsDialogActive
+anCommonDlg::IsDialogActive
 ================================================
 */
-bool arcCommonDlg::IsDialogActive() {
-	if ( dialog != NULL ) {
+bool anCommonDlg::IsDialogActive() {
+	if ( dialog != nullptr ) {
 		return dialog->IsActive();
 	}
 
@@ -624,7 +624,7 @@ CONSOLE_COMMAND( commonDialogClear, "clears all dialogs that may be hung", 0 ) {
 
 CONSOLE_COMMAND( testShowDialog, "show a dialog", 0 ) {
 	int dialogId = atoi( args.Argv( 1 ) );
-	common->Dialog().AddDialog( (gameDialogMessages_t)dialogId, DIALOG_ACCEPT, NULL, NULL, false );
+	common->Dialog().AddDialog( (gameDialogMessages_t)dialogId, DIALOG_ACCEPT, nullptr, nullptr, false );
 }
 
 CONSOLE_COMMAND( testShowDynamicDialog, "show a dynamic dialog", 0 ) {
@@ -637,21 +637,21 @@ CONSOLE_COMMAND( testShowDynamicDialog, "show a dynamic dialog", 0 ) {
 	};
 
 	arcStaticList< idSWFScriptFunction *, 4 > callbacks;
-	arcStaticList< idStrId, 4 > optionText;
+	arcStaticList< anStringId, 4 > optionText;
 	callbacks.Append( new (TAG_SWF) idSWFScriptFunction_Continue() );
-	optionText.Append( idStrId( "#str_swf_continue" ) );
+	optionText.Append( anStringId( "#str_swf_continue" ) );
 
 	// build custom space required string
 	// #str_dlg_space_required ~= "There is insufficient storage available.  Please free %s and try again."
-	arcNetString format = idStrId( "#str_dlg_space_required" ).GetLocalizedString();
-	arcNetString size;
+	anString format = anStringId( "#str_dlg_space_required" ).GetLocalizedString();
+	anString size;
 	int requiredSpaceInBytes = 150000;
 	if ( requiredSpaceInBytes > ( 1024 * 1024 ) ) {
 		size = va( "%.1f MB", ( float ) requiredSpaceInBytes / ( 1024.0f * 1024.0f ) );
 	} else {
 		size = va( "%.0f KB", ( float ) requiredSpaceInBytes / 1024.0f );
 	}
-	arcNetString msg = va( format.c_str(), size.c_str() );
+	anString msg = va( format.c_str(), size.c_str() );
 
 	common->Dialog().AddDynamicDialog( GDM_INSUFFICENT_STORAGE_SPACE, callbacks, optionText, true, msg );
 }
@@ -663,5 +663,5 @@ CONSOLE_COMMAND( testShowDialogBug, "show a dynamic dialog", 0 ) {
 	// This locks the game because it thinks it's paused because we're passing in pause = true but the
 	// dialog isn't ever added because of the abuse of dialog->isActive when the save indicator is shown.
 	int dialogId = atoi( args.Argv( 1 ) );
-	common->Dialog().AddDialog( (gameDialogMessages_t)dialogId, DIALOG_ACCEPT, NULL, NULL, true );
+	common->Dialog().AddDialog( (gameDialogMessages_t)dialogId, DIALOG_ACCEPT, nullptr, nullptr, true );
 }

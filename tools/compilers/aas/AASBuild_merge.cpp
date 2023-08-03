@@ -1,48 +1,19 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "AASBuild_local.h"
 
 /*
 ============
-idAASBuild::AllGapsLeadToOtherNode
+anSEASBuild::AllGapsLeadToOtherNode
 ============
 */
-bool idAASBuild::AllGapsLeadToOtherNode( idBrushBSPNode *nodeWithGaps, idBrushBSPNode *otherNode ) {
+bool anSEASBuild::AllGapsLeadToOtherNode( idBrushBSPNode *nodeWithGaps, idBrushBSPNode *otherNode ) {
 	int s;
 	idBrushBSPPortal *p;
 
 	for ( p = nodeWithGaps->GetPortals(); p; p = p->Next(s) ) {
 		s = (p->GetNode(1 ) == nodeWithGaps);
-
 		if ( !PortalIsGap( p, s ) ) {
 			continue;
 		}
@@ -56,10 +27,10 @@ bool idAASBuild::AllGapsLeadToOtherNode( idBrushBSPNode *nodeWithGaps, idBrushBS
 
 /*
 ============
-idAASBuild::MergeWithAdjacentLeafNodes
+anSEASBuild::MergeWithAdjacentLeafNodes
 ============
 */
-bool idAASBuild::MergeWithAdjacentLeafNodes( idBrushBSP &bsp, idBrushBSPNode *node ) {
+bool anSEASBuild::MergeWithAdjacentLeafNodes( idBrushBSP &bsp, idBrushBSPNode *node ) {
 	int s, numMerges = 0, otherNodeFlags;
 	idBrushBSPPortal *p;
 
@@ -84,8 +55,7 @@ bool idAASBuild::MergeWithAdjacentLeafNodes( idBrushBSP &bsp, idBrushBSPNode *no
 						continue;
 					}
 				}
-			}
-			else if ( node->GetFlags() & AREA_GAP ) {
+			} else if ( node->GetFlags() & AREA_GAP ) {
 				if ( p->GetNode( !s)->GetFlags() & AREA_FLOOR ) {
 					if ( !AllGapsLeadToOtherNode( node, p->GetNode( !s) ) ) {
 						continue;
@@ -107,7 +77,6 @@ bool idAASBuild::MergeWithAdjacentLeafNodes( idBrushBSP &bsp, idBrushBSPNode *no
 			}
 		}
 	} while( p );
-
 	if ( numMerges ) {
 		return true;
 	}
@@ -116,11 +85,10 @@ bool idAASBuild::MergeWithAdjacentLeafNodes( idBrushBSP &bsp, idBrushBSPNode *no
 
 /*
 ============
-idAASBuild::MergeLeafNodes_r
+anSEASBuild::MergeLeafNodes_r
 ============
 */
-void idAASBuild::MergeLeafNodes_r( idBrushBSP &bsp, idBrushBSPNode *node ) {
-
+void anSEASBuild::MergeLeafNodes_r( idBrushBSP &bsp, idBrushBSPNode *node ) {
 	if ( !node ) {
 		return;
 	}
@@ -147,17 +115,15 @@ void idAASBuild::MergeLeafNodes_r( idBrushBSP &bsp, idBrushBSPNode *node ) {
 
 /*
 ============
-idAASBuild::MergeLeafNodes
+anSEASBuild::MergeLeafNodes
 ============
 */
-void idAASBuild::MergeLeafNodes( idBrushBSP &bsp ) {
+void anSEASBuild::MergeLeafNodes( idBrushBSP &bsp ) {
 	numMergedLeafNodes = 0;
 
 	common->Printf( "[Merge Leaf Nodes]\n" );
-
 	MergeLeafNodes_r( bsp, bsp.GetRootNode() );
 	bsp.GetRootNode()->RemoveFlagRecurse( NODE_DONE );
 	bsp.PruneMergedTree_r( bsp.GetRootNode() );
-
 	common->Printf( "\r%6d leaf nodes merged\n", numMergedLeafNodes );
 }

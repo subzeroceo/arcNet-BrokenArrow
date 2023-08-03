@@ -1,11 +1,6 @@
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
-
-/*
-   CRC-32
-   Copyright (C) 1995-1998 Mark Adler
-*/
 
 #define CRC32_INIT_VALUE	0xffffffffL
 #define CRC32_XOR_VALUE		0xffffffffL
@@ -22,7 +17,7 @@ static unsigned long crctable[256];
    with the lowest powers in the most significant bit.  Then adding polynomials
    is just exclusive-or, and multiplying a polynomial by x is a right shift by
    one.  If we call the above polynomial p, and represent a byte as the
-   polynomial q, also with the lowest power in the most significant bit (so the
+   polynomial q, also with the lowest power in the most significant bit ( so the
    byte 0xb1 is the polynomial x^7+x^3+x^1+x^0 ), then the CRC is (q*x^32) mod p,
    where a mod b means the remainder after dividing a by b.
 
@@ -136,18 +131,21 @@ static unsigned long crctable[256] = {
 
 void CRC32_InitChecksum( unsigned long &crcvalue ) {
 	crcvalue = CRC32_INIT_VALUE;
+	//CRC32 = 0xFFFFFFFF;
 }
 
 void CRC32_Update( unsigned long &crcvalue, const byte data ) {
 	crcvalue = crctable[ ( crcvalue ^ data ) & 0xff ] ^ ( crcvalue >> 8 );
+//CRC32 = crctable[(CRC32 ^ data) & 0xFF] ^ (CRC32 >> 8);
+
 }
 
 void CRC32_UpdateChecksum( unsigned long &crcvalue, const void *data, int length ) {
 	unsigned long crc;
-	const unsigned char *buf = (const unsigned char *) data;
+	const unsigned char* buf = reinterpret_cast<const unsigned char *>(data);
 
 	crc = crcvalue;
-	while( length-- ) {
+	while ( length-- ) {
 		crc = crctable[ ( crc ^ ( *buf++ ) ) & 0xff ] ^ ( crc >> 8 );
 	}
 	crcvalue = crc;

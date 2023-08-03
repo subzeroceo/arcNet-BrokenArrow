@@ -12,7 +12,7 @@ public:
 	/**
 	* Constructor.
 	*/
-	MaterialView( void ) { materialDocManager = NULL; };
+	MaterialView( void ) { materialDocManager = nullptr; };
 	// Destructor.
 	virtual ~MaterialView( void ) {};
 

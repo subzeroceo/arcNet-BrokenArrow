@@ -56,7 +56,7 @@
  * space, processing the raw upsampled data without a color conversion step.
  * This allowed the color conversion math to be done only once per colormap
  * entry, not once per pixel.  However, that optimization precluded other
- * useful optimizations (such as merging color conversion with upsampling)
+ * useful optimizations ( such as merging color conversion with upsampling)
  * and it also interfered with desired capabilities such as quantizing to an
  * externally-supplied colormap.  We have therefore abandoned that approach.
  * The present code works in the post-conversion color space, typically RGB.
@@ -121,7 +121,7 @@
  * pointer corresponds to a C0 value (typically 2^5 = 32 pointers) and
  * each 2-D array has 2^6*2^5 = 2048 or 2^6*2^6 = 4096 entries.  Note that
  * on 80x86 machines, the pointer row is in near memory but the actual
- * arrays are in far memory (same arrangement as we use for image arrays).
+ * arrays are in far memory ( same arrangement as we use for image arrays).
  */
 
 #define MAXNUMCOLORS  (MAXJSAMPLE+1 ) /* maximum size of colormap */
@@ -217,7 +217,7 @@ typedef my_cquantizer * my_cquantize_ptr;
  * initialized to zeroes by start_pass.
  * An output_buf parameter is required by the method signature, but no data
  * is actually output (in fact the buffer controller is probably passing a
- * NULL pointer).
+ * nullptr pointer).
  */
 
 METHODDEF void
@@ -272,12 +272,12 @@ typedef box * boxptr;
 LOCAL boxptr
 find_biggest_color_pop (boxptr boxlist, int numboxes)
 /* Find the splittable box with the largest color population */
-/* Returns NULL if no splittable boxes remain */
+/* Returns nullptr if no splittable boxes remain */
 {
   register boxptr boxp;
   register int i;
   register long maxc = 0;
-  boxptr which = NULL;
+  boxptr which = nullptr;
 
   for ( i = 0, boxp = boxlist; i < numboxes; i++, boxp++ ) {
     if (boxp->colorcount > maxc && boxp->volume > 0 ) {
@@ -291,13 +291,13 @@ find_biggest_color_pop (boxptr boxlist, int numboxes)
 
 LOCAL boxptr
 find_biggest_volume (boxptr boxlist, int numboxes)
-/* Find the splittable box with the largest (scaled) volume */
-/* Returns NULL if no splittable boxes remain */
+/* Find the splittable box with the largest ( scaled) volume */
+/* Returns nullptr if no splittable boxes remain */
 {
   register boxptr boxp;
   register int i;
   register INT32 maxv = 0;
-  boxptr which = NULL;
+  boxptr which = nullptr;
 
   for ( i = 0, boxp = boxlist; i < numboxes; i++, boxp++ ) {
     if (boxp->volume > maxv) {
@@ -438,7 +438,7 @@ median_cut (j_decompress_ptr cinfo, boxptr boxlist, int numboxes,
     } else {
       b1 = find_biggest_volume(boxlist, numboxes);
     }
-    if (b1 == NULL)		/* no splittable boxes left! */
+    if (b1 == nullptr )		/* no splittable boxes left! */
       break;
     b2 = &boxlist[numboxes];	/* where new box will go */
     /* Copy the color bounds to the new box. */
@@ -646,7 +646,7 @@ LOCAL int
 find_nearby_colors (j_decompress_ptr cinfo, int minc0, int minc1, int minc2,
 		    JSAMPLE colorlist[] )
 /* Locate the colormap entries close enough to an update box to be candidates
- * for the nearest entry to some cell(s) in the update box.  The update box
+ * for the nearest entry to some cell( s) in the update box.  The update box
  * is specified by the center coordinates of its first cell.  The number of
  * candidate colormap entries is returned, and their colormap indexes are
  * placed in colorlist[].
@@ -810,7 +810,7 @@ find_best_colors (j_decompress_ptr cinfo, int minc0, int minc1, int minc2,
 
   for ( i = 0; i < numcolors; i++ ) {
     icolor = GETJSAMPLE(colorlist[i] );
-    /* Compute (square of) distance from minc0/c1/c2 to this color */
+    /* Compute ( square of) distance from minc0/c1/c2 to this color */
     inc0 = (minc0 - GETJSAMPLE(cinfo->colormap[0][icolor] ) ) * C0_SCALE;
     dist0 = inc0*inc0;
     inc1 = (minc1 - GETJSAMPLE(cinfo->colormap[1][icolor] ) ) * C1_SCALE;
@@ -1112,7 +1112,7 @@ init_error_limit (j_decompress_ptr cinfo)
   int * table;
   int in, out;
 
-  table = ( int * ) (*cinfo->mem->alloc_small)
+  table = ( int*) (*cinfo->mem->alloc_small)
     ((j_common_ptr) cinfo, JPOOL_IMAGE, (MAXJSAMPLE*2+1 ) * SIZEOF( int ) );
   table += MAXJSAMPLE;		/* so can index -MAXJSAMPLE .. +MAXJSAMPLE */
   cquantize->error_limiter = table;
@@ -1196,16 +1196,16 @@ start_pass_2_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
       ERREXIT1(cinfo, JERR_QUANT_MANY_COLORS, MAXNUMCOLORS);
 
     if (cinfo->dither_mode == JDITHER_FS) {
-      size_t arraysize = (size_t) ((cinfo->output_width + 2) *
-				   (3 * SIZEOF(FSERROR) ));
+      size_t arraysize = ( size_t) ((cinfo->output_width + 2) *
+				   (3 * SIZEOF(FSERROR) ) );
       /* Allocate Floyd-Steinberg workspace if we didn't already. */
-      if (cquantize->fserrors == NULL)
+      if (cquantize->fserrors == nullptr )
 	cquantize->fserrors = (FSERRPTR) (*cinfo->mem->alloc_large)
 	  ((j_common_ptr) cinfo, JPOOL_IMAGE, arraysize);
       /* Initialize the propagated errors to zero. */
       jzero_far((void FAR *) cquantize->fserrors, arraysize);
       /* Make the error-limit table if we didn't already. */
-      if (cquantize->error_limiter == NULL)
+      if (cquantize->error_limiter == nullptr )
 	init_error_limit(cinfo);
       cquantize->on_odd_row = FALSE;
     }
@@ -1249,11 +1249,11 @@ jinit_2pass_quantizer (j_decompress_ptr cinfo)
   cquantize = (my_cquantize_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_cquantizer) );
-  cinfo->cquantize = (struct jpeg_color_quantizer *) cquantize;
+  cinfo->cquantize = ( struct jpeg_color_quantizer *) cquantize;
   cquantize->pub.start_pass = start_pass_2_quant;
   cquantize->pub.new_color_map = new_color_map_2_quant;
-  cquantize->fserrors = NULL;	/* flag optional arrays not allocated */
-  cquantize->error_limiter = NULL;
+  cquantize->fserrors = nullptr;	/* flag optional arrays not allocated */
+  cquantize->error_limiter = nullptr;
 
   /* Make sure jdmaster didn't give me a case I can't handle */
   if (cinfo->out_color_components != 3)
@@ -1286,7 +1286,7 @@ jinit_2pass_quantizer (j_decompress_ptr cinfo)
       ((j_common_ptr) cinfo,JPOOL_IMAGE, (JDIMENSION) desired, (JDIMENSION) 3);
     cquantize->desired = desired;
   } else
-    cquantize->sv_colormap = NULL;
+    cquantize->sv_colormap = nullptr;
 
   /* Only F-S dithering or no dithering is supported. */
   /* If user asks for ordered dither, give him F-S. */
@@ -1301,7 +1301,7 @@ jinit_2pass_quantizer (j_decompress_ptr cinfo)
   if (cinfo->dither_mode == JDITHER_FS) {
     cquantize->fserrors = (FSERRPTR) (*cinfo->mem->alloc_large)
       ((j_common_ptr) cinfo, JPOOL_IMAGE,
-       (size_t) ((cinfo->output_width + 2) * (3 * SIZEOF(FSERROR) )) );
+       ( size_t) ((cinfo->output_width + 2) * (3 * SIZEOF(FSERROR) ) ) );
     /* Might as well create the error-limiting table too. */
     init_error_limit(cinfo);
   }

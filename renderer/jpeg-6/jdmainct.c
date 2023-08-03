@@ -44,7 +44,7 @@
  * row at the bottom of the image.
  *
  * Depending on the vertical scaling algorithm used, the upsampler may need
- * access to the sample row(s) above and below its current input row group.
+ * access to the sample row( s) above and below its current input row group.
  * The upsampler is required to set need_context_rows TRUE at global selection
  * time if so.  When need_context_rows is FALSE, this controller can simply
  * obtain one iMCU row at a time from the coefficient controller and dole it
@@ -52,7 +52,7 @@
  *
  * When need_context_rows is TRUE, this controller guarantees that the buffer
  * passed to postprocessing contains at least one row group's worth of samples
- * above and below the row group(s) being processed.  Note that the context
+ * above and below the row group( s) being processed.  Note that the context
  * rows "above" the first passed row group appear at negative row offsets in
  * the passed buffer.  At the top and bottom of the image, the required
  * context rows are manufactured by duplicating the first or last real sample
@@ -223,7 +223,7 @@ make_funny_pointers (j_decompress_ptr cinfo)
       xbuf1[rgroup*M + i] = buf[rgroup*(M-2) + i];
     }
     /* The wraparound pointers at top and bottom will be filled later
-     * (see set_wraparound_pointers, below).  Initially we want the "above"
+     * ( see set_wraparound_pointers, below).  Initially we want the "above"
      * pointers to duplicate the first actual data line.  This only needs
      * to happen in xbuffer[0].
      */
@@ -460,8 +460,8 @@ process_data_crank_post (j_decompress_ptr cinfo,
 			 JSAMPARRAY output_buf, JDIMENSION *out_row_ctr,
 			 JDIMENSION out_rows_avail)
 {
-  (*cinfo->post->post_process_data) (cinfo, (JSAMPIMAGE) NULL,
-				     (JDIMENSION *) NULL, (JDIMENSION) 0,
+  (*cinfo->post->post_process_data) (cinfo, (JSAMPIMAGE) nullptr,
+				     (JDIMENSION *) nullptr, (JDIMENSION) 0,
 				     output_buf, out_row_ctr, out_rows_avail);
 }
 
@@ -482,7 +482,7 @@ jinit_d_main_controller (j_decompress_ptr cinfo, boolean need_full_buffer)
   main = (my_main_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_main_controller) );
-  cinfo->main = (struct jpeg_d_main_controller *) main;
+  cinfo->main = ( struct jpeg_d_main_controller *) main;
   main->pub.start_pass = start_pass_main;
 
   if (need_full_buffer)		/* shouldn't happen */

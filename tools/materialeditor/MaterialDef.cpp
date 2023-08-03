@@ -1,8 +1,7 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "MaterialDef.h"
-
 
 /**
 * Constructor.
@@ -22,7 +21,7 @@ MaterialDef::~MaterialDef( void ) {
 * Returns view specific data associated with the material definition.
 */
 DWORD MaterialDef::GetViewData(const char* viewName) {
-	DWORD* value = NULL;
+	DWORD* value = nullptr;
 	viewData.Get(viewName, &value);
 	return *value;
 }
@@ -38,7 +37,6 @@ void MaterialDef::SetViewData(const char* viewName, DWORD value) {
 
 MaterialDefList MaterialDefManager::materialDefs[MaterialDefManager::MATERIAL_DEF_NUM];
 
-
 /**
 * Loads the material definition file instatiates MaterialDef objects for each definition
 * and groups the definitions.
@@ -53,7 +51,7 @@ void MaterialDefManager::InitializeMaterialDefLists() {
 		return;
 	}
 
-	arcLexer src;
+	anLexer src;
 	if ( !src.LoadMemory( buffer, length, MATERIAL_DEF_FILE ) ) {
 		common->Error( "Couldn't parse %s", MATERIAL_DEF_FILE );
 		fileSystem->FreeFile(buffer);
@@ -69,13 +67,13 @@ void MaterialDefManager::InitializeMaterialDefLists() {
 
 /**
 * Loads a single type of material attributes and adds them to the supplied MaterialDefList object.
-* @param src The arcLexer object that contains the file.
+* @param src The anLexer object that contains the file.
 * @param typeName The name of the attribute grouping to search for in the file.
 * @param list The MaterialDefList object to append the MaterialDef instances to.
 */
-void MaterialDefManager::InitializeMaterialDefList(arcLexer* src, const char* typeName, MaterialDefList* list) {
+void MaterialDefManager::InitializeMaterialDefList(anLexer* src, const char* typeName, MaterialDefList* list) {
 
-	arcNetToken token;
+	anToken token;
 
 	src->Reset();
 	src->SkipUntilString(typeName);
@@ -106,36 +104,35 @@ void MaterialDefManager::InitializeMaterialDefList(arcLexer* src, const char* ty
 		}
 
 		//Skip the ,
-		src->ReadToken(&token);
+		src->ReadToken( &token );
 
 		//Read Dict Name
-		src->ReadToken(&token);
+		src->ReadToken( &token );
 		newProp->dictName = token;
 
 		//Skip the ,
-		src->ReadToken(&token);
+		src->ReadToken( &token );
 
 		//Read Display Name
-		src->ReadToken(&token);
+		src->ReadToken( &token );
 		newProp->displayName = token;
 
 		//Skip the ,
-		src->ReadToken(&token);
+		src->ReadToken( &token );
 
 		//Read Display Info
-		src->ReadToken(&token);
+		src->ReadToken( &token );
 		newProp->displayInfo = token;
 
 		//Type Specific Data
 		if (newProp->type == MaterialDef::MATERIAL_DEF_TYPE_STRING) {
-
 			newProp->quotes = false;
 
 			//Skip the ,
-			src->ReadToken(&token);
+			src->ReadToken( &token );
 
 			//Read validate flag
-			src->ReadToken(&token);
+			src->ReadToken( &token );
 			if (token == "1" ) {
 				newProp->quotes = true;
 			}
@@ -151,7 +148,6 @@ void MaterialDefManager::InitializeMaterialDefList(arcLexer* src, const char* ty
 * Destroys all MaterialDef instances and clears the material attribute grouping lists.
 */
 void MaterialDefManager::DestroyMaterialDefLists() {
-
 	for ( int i = 0; i < MATERIAL_DEF_NUM; i++ ) {
 		for ( int j = 0; j < materialDefs[i].Num(); j++ ) {
 			delete materialDefs[i][j];
@@ -168,5 +164,5 @@ MaterialDefList* MaterialDefManager::GetMaterialDefs( int type) {
 	if (type >= 0 && type < MATERIAL_DEF_NUM) {
 		return &materialDefs[type];
 	}
-	return NULL;
+	return nullptr;
 }

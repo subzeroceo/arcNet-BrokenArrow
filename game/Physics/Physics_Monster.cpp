@@ -1,38 +1,38 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idPhysics_Actor, idPhysics_Monster )
+CLASS_DECLARATION( anPhysics_Actor, anPhysics_Monster )
 END_CLASS
 
 const float OVERCLIP = 1.001f;
 
 /*
 =====================
-idPhysics_Monster::CheckGround
+anPhysics_Monster::CheckGround
 =====================
 */
-void idPhysics_Monster::CheckGround( monsterPState_t &state ) {
+void anPhysics_Monster::CheckGround( monsterPState_t &state ) {
 	trace_t groundTrace;
-	arcVec3 down;
+	anVec3 down;
 
 	if ( gravityNormal == vec3_zero ) {
 		state.onGround = false;
-		groundEntityPtr = NULL;
+		groundEntityPtr = nullptr;
 		return;
 	}
 
 	down = state.origin + gravityNormal * CONTACT_EPSILON;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	gameLocal.Translation( self, groundTrace, state.origin, down, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 
 	if ( groundTrace.fraction == 1.0f ) {
 		state.onGround = false;
-		groundEntityPtr = NULL;
+		groundEntityPtr = nullptr;
 		return;
 	}
 
@@ -60,21 +60,21 @@ void idPhysics_Monster::CheckGround( monsterPState_t &state ) {
 
 /*
 =====================
-idPhysics_Monster::SlideMove
+anPhysics_Monster::SlideMove
 =====================
 */
-monsterMoveResult_t idPhysics_Monster::SlideMove( arcVec3 &start, arcVec3 &velocity, const arcVec3 &delta ) {
+monsterMoveResult_t anPhysics_Monster::SlideMove( anVec3 &start, anVec3 &velocity, const anVec3 &delta ) {
 	int i;
 	trace_t tr;
-	arcVec3 move;
+	anVec3 move;
 
-	blockingEntity = NULL;
+	blockingEntity = nullptr;
 	move = delta;
-	for( i = 0; i < 3; i++ ) {
-// RAVEN BEGIN
+	for ( i = 0; i < 3; i++ ) {
+
 // ddynerman: multiple collision worlds
 		gameLocal.Translation( self, tr, start, start + move, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 
 		start = tr.endpos;
 
@@ -99,15 +99,15 @@ monsterMoveResult_t idPhysics_Monster::SlideMove( arcVec3 &start, arcVec3 &veloc
 
 /*
 =====================
-idPhysics_Monster::StepMove
+anPhysics_Monster::StepMove
 
   move start into the delta direction
   the velocity is clipped conform any collisions
 =====================
 */
-monsterMoveResult_t idPhysics_Monster::StepMove( arcVec3 &start, arcVec3 &velocity, const arcVec3 &delta ) {
+monsterMoveResult_t anPhysics_Monster::StepMove( anVec3 &start, anVec3 &velocity, const anVec3 &delta ) {
 	trace_t tr;
-	arcVec3 up, down, noStepPos, noStepVel, stepPos, stepVel;
+	anVec3 up, down, noStepPos, noStepVel, stepPos, stepVel;
 	monsterMoveResult_t result1, result2;
 	float	stepdist;
 	float	nostepdist;
@@ -122,20 +122,20 @@ monsterMoveResult_t idPhysics_Monster::StepMove( arcVec3 &start, arcVec3 &veloci
 	result1 = SlideMove( noStepPos, noStepVel, delta );
 	if ( result1 == MM_OK ) {
 		velocity = noStepVel;
-// RAVEN BEGIN
+
 // bdube: dont step when there is no gravity
 		if ( gravityNormal == vec3_zero || forceDeltaMove ) {
-// RAVEN END
+
 			start = noStepPos;
 			return MM_OK;
 		}
 
 		// try to step down so that we walk down slopes and stairs at a normal rate
 		down = noStepPos + gravityNormal * maxStepHeight;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.Translation( self, tr, noStepPos, down, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 		if ( tr.fraction < 1.0f ) {
 			start = tr.endpos;
 			return MM_STEPPED;
@@ -145,16 +145,16 @@ monsterMoveResult_t idPhysics_Monster::StepMove( arcVec3 &start, arcVec3 &veloci
 		}
 	}
 
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-	if ( blockingEntity && blockingEntity->IsType( idActor::GetClassType() ) ) {
-// RAVEN END
+
+
+	if ( blockingEntity && blockingEntity->IsType( anActor::GetClassType() ) ) {
+
 		// try to step down in case walking into an actor while going down steps
 		down = noStepPos + gravityNormal * maxStepHeight;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.Translation( self, tr, noStepPos, down, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 		start = tr.endpos;
 		velocity = noStepVel;
 		return MM_BLOCKED;
@@ -166,10 +166,10 @@ monsterMoveResult_t idPhysics_Monster::StepMove( arcVec3 &start, arcVec3 &veloci
 
 	// try to step up
 	up = start - gravityNormal * maxStepHeight;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	gameLocal.Translation( self, tr, start, up, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 	if ( tr.fraction == 0.0f ) {
 		start = noStepPos;
 		velocity = noStepVel;
@@ -188,10 +188,10 @@ monsterMoveResult_t idPhysics_Monster::StepMove( arcVec3 &start, arcVec3 &veloci
 
 	// step down again
 	down = stepPos + gravityNormal * maxStepHeight;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	gameLocal.Translation( self, tr, stepPos, down, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 	stepPos = tr.endpos;
 
 	// if the move is further without stepping up, or the slope is too steap, don't step up
@@ -211,20 +211,20 @@ monsterMoveResult_t idPhysics_Monster::StepMove( arcVec3 &start, arcVec3 &veloci
 
 /*
 ================
-idPhysics_Monster::Activate
+anPhysics_Monster::Activate
 ================
 */
-void idPhysics_Monster::Activate( void ) {
+void anPhysics_Monster::Activate( void ) {
 	current.atRest = -1;
 	self->BecomeActive( TH_PHYSICS );
 }
 
 /*
 ================
-idPhysics_Monster::Rest
+anPhysics_Monster::Rest
 ================
 */
-void idPhysics_Monster::Rest( void ) {
+void anPhysics_Monster::Rest( void ) {
 	current.atRest = gameLocal.time;
 	current.velocity.Zero();
 	self->BecomeInactive( TH_PHYSICS );
@@ -232,19 +232,19 @@ void idPhysics_Monster::Rest( void ) {
 
 /*
 ================
-idPhysics_Monster::PutToRest
+anPhysics_Monster::PutToRest
 ================
 */
-void idPhysics_Monster::PutToRest( void ) {
+void anPhysics_Monster::PutToRest( void ) {
 	Rest();
 }
 
 /*
 ================
-idPhysics_Monster::idPhysics_Monster
+anPhysics_Monster::anPhysics_Monster
 ================
 */
-idPhysics_Monster::idPhysics_Monster( void ) {
+anPhysics_Monster::anPhysics_Monster( void ) {
 
 	memset( &current, 0, sizeof( current ) );
 	current.atRest = -1;
@@ -258,15 +258,15 @@ idPhysics_Monster::idPhysics_Monster( void ) {
 	fly = false;
 	useVelocityMove = false;
 	noImpact = false;
-	blockingEntity = NULL;
+	blockingEntity = nullptr;
 }
 
 /*
 ================
-idPhysics_Monster_SavePState
+anPhysics_Monster_SavePState
 ================
 */
-void idPhysics_Monster_SavePState( idSaveGame *savefile, const monsterPState_t &state ) {
+void anPhysics_Monster_SavePState( anSaveGame *savefile, const monsterPState_t &state ) {
 	savefile->WriteInt( state.atRest );
 	savefile->WriteBool( state.onGround );
 	savefile->WriteVec3( state.origin );
@@ -279,10 +279,10 @@ void idPhysics_Monster_SavePState( idSaveGame *savefile, const monsterPState_t &
 
 /*
 ================
-idPhysics_Monster_RestorePState
+anPhysics_Monster_RestorePState
 ================
 */
-void idPhysics_Monster_RestorePState( idRestoreGame *savefile, monsterPState_t &state ) {
+void anPhysics_Monster_RestorePState( anRestoreGame *savefile, monsterPState_t &state ) {
 	savefile->ReadInt( state.atRest );
 	savefile->ReadBool( state.onGround );
 	savefile->ReadVec3( state.origin );
@@ -290,18 +290,18 @@ void idPhysics_Monster_RestorePState( idRestoreGame *savefile, monsterPState_t &
 	savefile->ReadVec3( state.localOrigin );
 	savefile->ReadVec3( state.pushVelocity );
 
-	savefile->ReadVec3( state.lastPushVelocity );	// cnicholson: Added unrestored var
+	savefile->ReadVec3( state.lastPushVelocity );
 }
 
 /*
 ================
-idPhysics_Monster::Save
+anPhysics_Monster::Save
 ================
 */
-void idPhysics_Monster::Save( idSaveGame *savefile ) const {
+void anPhysics_Monster::Save( anSaveGame *savefile ) const {
 
-	idPhysics_Monster_SavePState( savefile, current );
-	idPhysics_Monster_SavePState( savefile, saved );
+	anPhysics_Monster_SavePState( savefile, current );
+	anPhysics_Monster_SavePState( savefile, saved );
 
 	savefile->WriteFloat( maxStepHeight );
 	savefile->WriteFloat( minFloorCosine );
@@ -318,13 +318,13 @@ void idPhysics_Monster::Save( idSaveGame *savefile ) const {
 
 /*
 ================
-idPhysics_Monster::Restore
+anPhysics_Monster::Restore
 ================
 */
-void idPhysics_Monster::Restore( idRestoreGame *savefile ) {
+void anPhysics_Monster::Restore( anRestoreGame *savefile ) {
 
-	idPhysics_Monster_RestorePState( savefile, current );
-	idPhysics_Monster_RestorePState( savefile, saved );
+	anPhysics_Monster_RestorePState( savefile, current );
+	anPhysics_Monster_RestorePState( savefile, saved );
 
 	savefile->ReadFloat( maxStepHeight );
 	savefile->ReadFloat( minFloorCosine );
@@ -335,16 +335,16 @@ void idPhysics_Monster::Restore( idRestoreGame *savefile ) {
 	savefile->ReadBool( useVelocityMove );
 	savefile->ReadBool( noImpact );
 
-	savefile->ReadInt( (int &)moveResult );
-	savefile->ReadObject( reinterpret_cast<idClass *&>( blockingEntity ) );
+	savefile->ReadInt( ( int&)moveResult );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( blockingEntity ) );
 }
 
 /*
 ================
-idPhysics_Monster::SetDelta
+anPhysics_Monster::SetDelta
 ================
 */
-void idPhysics_Monster::SetDelta( const arcVec3 &d ) {
+void anPhysics_Monster::SetDelta( const anVec3 &d ) {
 	delta = d;
 	if ( delta != vec3_origin ) {
 		Activate();
@@ -353,118 +353,118 @@ void idPhysics_Monster::SetDelta( const arcVec3 &d ) {
 
 /*
 ================
-idPhysics_Monster::SetMaxStepHeight
+anPhysics_Monster::SetMaxStepHeight
 ================
 */
-void idPhysics_Monster::SetMaxStepHeight( const float newMaxStepHeight ) {
+void anPhysics_Monster::SetMaxStepHeight( const float newMaxStepHeight ) {
 	maxStepHeight = newMaxStepHeight;
 }
 
 /*
 ================
-idPhysics_Monster::GetMaxStepHeight
+anPhysics_Monster::GetMaxStepHeight
 ================
 */
-float idPhysics_Monster::GetMaxStepHeight( void ) const {
+float anPhysics_Monster::GetMaxStepHeight( void ) const {
 	return maxStepHeight;
 }
 
 /*
 ================
-idPhysics_Monster::OnGround
+anPhysics_Monster::OnGround
 ================
 */
-bool idPhysics_Monster::OnGround( void ) const {
+bool anPhysics_Monster::OnGround( void ) const {
 	return current.onGround;
 }
 
 /*
 ================
-idPhysics_Monster::GetSlideMoveEntity
+anPhysics_Monster::GetSlideMoveEntity
 ================
 */
-idEntity *idPhysics_Monster::GetSlideMoveEntity( void ) const {
+anEntity *anPhysics_Monster::GetSlideMoveEntity( void ) const {
 	return blockingEntity;
 }
 
 /*
 ================
-idPhysics_Monster::GetMoveResult
+anPhysics_Monster::GetMoveResult
 ================
 */
-monsterMoveResult_t idPhysics_Monster::GetMoveResult( void ) const {
+monsterMoveResult_t anPhysics_Monster::GetMoveResult( void ) const {
 	return moveResult;
 }
 
 /*
 ================
-idPhysics_Monster::ForceDeltaMove
+anPhysics_Monster::ForceDeltaMove
 ================
 */
-void idPhysics_Monster::ForceDeltaMove( bool force ) {
+void anPhysics_Monster::ForceDeltaMove( bool force ) {
 	forceDeltaMove = force;
 }
 
 /*
 ================
-idPhysics_Monster::UseFlyMove
+anPhysics_Monster::UseFlyMove
 ================
 */
-void idPhysics_Monster::UseFlyMove( bool force ) {
+void anPhysics_Monster::UseFlyMove( bool force ) {
 	fly = force;
 }
 
 /*
 ================
-idPhysics_Monster::UseVelocityMove
+anPhysics_Monster::UseVelocityMove
 ================
 */
-void idPhysics_Monster::UseVelocityMove( bool force ) {
+void anPhysics_Monster::UseVelocityMove( bool force ) {
 	useVelocityMove = force;
 }
 
 /*
 ================
-idPhysics_Monster::EnableImpact
+anPhysics_Monster::EnableImpact
 ================
 */
-void idPhysics_Monster::EnableImpact( void ) {
+void anPhysics_Monster::EnableImpact( void ) {
 	noImpact = false;
 }
 
 /*
 ================
-idPhysics_Monster::DisableImpact
+anPhysics_Monster::DisableImpact
 ================
 */
-void idPhysics_Monster::DisableImpact( void ) {
+void anPhysics_Monster::DisableImpact( void ) {
 	noImpact = true;
 }
 
 /*
 ================
-idPhysics_Monster::Evaluate
+anPhysics_Monster::Evaluate
 ================
 */
-bool idPhysics_Monster::Evaluate( int timeStepMSec, int endTimeMSec ) {
-	arcVec3 masterOrigin, oldOrigin;
-	arcMat3 masterAxis;
+bool anPhysics_Monster::Evaluate( int timeStepMSec, int endTimeMSec ) {
+	anVec3 masterOrigin, oldOrigin;
+	anMat3 masterAxis;
 	float timeStep;
 
 	timeStep = MS2SEC( timeStepMSec );
 
 	moveResult = MM_OK;
-	blockingEntity = NULL;
+	blockingEntity = nullptr;
 	oldOrigin = current.origin;
 
 	// if bound to a master
 	if ( masterEntity ) {
 		self->GetMasterPosition( masterOrigin, masterAxis );
 		current.origin = masterOrigin + current.localOrigin * masterAxis;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
-// RAVEN END
+
 		current.velocity = ( current.origin - oldOrigin ) / timeStep;
 		masterDeltaYaw = masterYaw;
 		masterYaw = masterAxis[0].ToYaw();
@@ -485,7 +485,7 @@ bool idPhysics_Monster::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	clipModel->Unlink();
 
 	// check if on the ground
-	idPhysics_Monster::CheckGround( current );
+	anPhysics_Monster::CheckGround( current );
 
 	// if not on the ground or moving upwards
 	float upspeed;
@@ -504,7 +504,7 @@ bool idPhysics_Monster::Evaluate( int timeStepMSec, int endTimeMSec ) {
 		}
 		delta = current.velocity * timeStep;
 		if ( delta != vec3_origin ) {
-			moveResult = idPhysics_Monster::SlideMove( current.origin, current.velocity, delta );
+			moveResult = anPhysics_Monster::SlideMove( current.origin, current.velocity, delta );
             delta.Zero();
 		}
 
@@ -524,22 +524,22 @@ bool idPhysics_Monster::Evaluate( int timeStepMSec, int endTimeMSec ) {
 			Rest();
 		} else {
 			// try moving into the desired direction
-// RAVEN BEGIN
+
 // jshepard: flying creatures, even if not using fly move, shouldn't use step move
-			if( self->IsType( idAI::GetClassType() ) && ((idAI*)self)->move.moveType == MOVETYPE_FLY ) {
-				moveResult = idPhysics_Monster::SlideMove( current.origin, current.velocity, delta );
+			if ( self->IsType( anSAAI::GetClassType() ) && ((anSAAI*)self)->move.moveType == MOVETYPE_FLY ) {
+				moveResult = anPhysics_Monster::SlideMove( current.origin, current.velocity, delta );
 			} else {
-				moveResult = idPhysics_Monster::StepMove( current.origin, current.velocity, delta );
+				moveResult = anPhysics_Monster::StepMove( current.origin, current.velocity, delta );
 			}
 			delta.Zero();
-// RAVEN END
+
 			current.velocity -= ( current.velocity * gravityNormal ) * gravityNormal;
 		}
 	}
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
-// RAVEN END
+
 
 	// get all the ground contacts
 	EvaluateContacts();
@@ -554,35 +554,35 @@ bool idPhysics_Monster::Evaluate( int timeStepMSec, int endTimeMSec ) {
 		Rest();
 	}
 
-// RAVEN BEGIN
+
 // bdube: determine if we moved this frame
 	return true;
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Monster::UpdateTime
+anPhysics_Monster::UpdateTime
 ================
 */
-void idPhysics_Monster::UpdateTime( int endTimeMSec ) {
+void anPhysics_Monster::UpdateTime( int endTimeMSec ) {
 }
 
 /*
 ================
-idPhysics_Monster::GetTime
+anPhysics_Monster::GetTime
 ================
 */
-int idPhysics_Monster::GetTime( void ) const {
+int anPhysics_Monster::GetTime( void ) const {
 	return gameLocal.time;
 }
 
 /*
 ================
-idPhysics_Monster::GetImpactInfo
+anPhysics_Monster::GetImpactInfo
 ================
 */
-void idPhysics_Monster::GetImpactInfo( const int id, const arcVec3 &point, impactInfo_t *info ) const {
+void anPhysics_Monster::GetImpactInfo( const int id, const anVec3 &point, impactInfo_t *info ) const {
 	info->invMass = invMass;
 	info->invInertiaTensor.Zero();
 	info->position.Zero();
@@ -591,10 +591,10 @@ void idPhysics_Monster::GetImpactInfo( const int id, const arcVec3 &point, impac
 
 /*
 ================
-idPhysics_Monster::ApplyImpulse
+anPhysics_Monster::ApplyImpulse
 ================
 */
-void idPhysics_Monster::ApplyImpulse( const int id, const arcVec3 &point, const arcVec3 &impulse ) {
+void anPhysics_Monster::ApplyImpulse( const int id, const anVec3 &point, const anVec3 &impulse ) {
 	if ( noImpact ) {
 		return;
 	}
@@ -604,54 +604,54 @@ void idPhysics_Monster::ApplyImpulse( const int id, const arcVec3 &point, const 
 
 /*
 ================
-idPhysics_Monster::IsAtRest
+anPhysics_Monster::IsAtRest
 ================
 */
-bool idPhysics_Monster::IsAtRest( void ) const {
+bool anPhysics_Monster::IsAtRest( void ) const {
 	return current.atRest >= 0;
 }
 
 /*
 ================
-idPhysics_Monster::GetRestStartTime
+anPhysics_Monster::GetRestStartTime
 ================
 */
-int idPhysics_Monster::GetRestStartTime( void ) const {
+int anPhysics_Monster::GetRestStartTime( void ) const {
 	return current.atRest;
 }
 
 /*
 ================
-idPhysics_Monster::SaveState
+anPhysics_Monster::SaveState
 ================
 */
-void idPhysics_Monster::SaveState( void ) {
+void anPhysics_Monster::SaveState( void ) {
 	saved = current;
 }
 
 /*
 ================
-idPhysics_Monster::RestoreState
+anPhysics_Monster::RestoreState
 ================
 */
-void idPhysics_Monster::RestoreState( void ) {
+void anPhysics_Monster::RestoreState( void ) {
 	current = saved;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
-// RAVEN END
+
 
 	EvaluateContacts();
 }
 
 /*
 ================
-idPhysics_Player::SetOrigin
+anPhysics_Player::SetOrigin
 ================
 */
-void idPhysics_Monster::SetOrigin( const arcVec3 &newOrigin, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Monster::SetOrigin( const anVec3 &newOrigin, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.localOrigin = newOrigin;
 	if ( masterEntity ) {
@@ -661,50 +661,50 @@ void idPhysics_Monster::SetOrigin( const arcVec3 &newOrigin, int id ) {
 	else {
 		current.origin = newOrigin;
 	}
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	clipModel->Link( self, 0, newOrigin, clipModel->GetAxis() );
-// RAVEN END
+
 	Activate();
 }
 
 /*
 ================
-idPhysics_Player::SetAxis
+anPhysics_Player::SetAxis
 ================
 */
-void idPhysics_Monster::SetAxis( const arcMat3 &newAxis, int id ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+void anPhysics_Monster::SetAxis( const anMat3 &newAxis, int id ) {
+
+
 	clipModel->Link( self, 0, clipModel->GetOrigin(), newAxis );
-// RAVEN END
+
 	Activate();
 }
 
 /*
 ================
-idPhysics_Monster::Translate
+anPhysics_Monster::Translate
 ================
 */
-void idPhysics_Monster::Translate( const arcVec3 &translation, int id ) {
+void anPhysics_Monster::Translate( const anVec3 &translation, int id ) {
 
 	current.localOrigin += translation;
 	current.origin += translation;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	clipModel->Link( self, 0, current.origin, clipModel->GetAxis() );
-// RAVEN END
+
 	Activate();
 }
 
 /*
 ================
-idPhysics_Monster::Rotate
+anPhysics_Monster::Rotate
 ================
 */
-void idPhysics_Monster::Rotate( const idRotation &rotation, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Monster::Rotate( const anRotation &rotation, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.origin *= rotation;
 	if ( masterEntity ) {
@@ -714,61 +714,61 @@ void idPhysics_Monster::Rotate( const idRotation &rotation, int id ) {
 	else {
 		current.localOrigin = current.origin;
 	}
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	clipModel->Link( self, 0, current.origin, clipModel->GetAxis() * rotation.ToMat3() );
-// RAVEN END
+
 	Activate();
 }
 
 /*
 ================
-idPhysics_Monster::SetLinearVelocity
+anPhysics_Monster::SetLinearVelocity
 ================
 */
-void idPhysics_Monster::SetLinearVelocity( const arcVec3 &newLinearVelocity, int id ) {
+void anPhysics_Monster::SetLinearVelocity( const anVec3 &newLinearVelocity, int id ) {
 	current.velocity = newLinearVelocity;
 	Activate();
 }
 
 /*
 ================
-idPhysics_Monster::GetLinearVelocity
+anPhysics_Monster::GetLinearVelocity
 ================
 */
-const arcVec3 &idPhysics_Monster::GetLinearVelocity( int id ) const {
+const anVec3 &anPhysics_Monster::GetLinearVelocity( int id ) const {
 	return current.velocity;
 }
 
 /*
 ================
-idPhysics_Monster::SetPushed
+anPhysics_Monster::SetPushed
 ================
 */
-void idPhysics_Monster::SetPushed( int deltaTime ) {
+void anPhysics_Monster::SetPushed( int deltaTime ) {
 	// velocity with which the monster is pushed
-	current.pushVelocity += ( current.origin - saved.origin ) / ( deltaTime * arcMath::M_MS2SEC );
+	current.pushVelocity += ( current.origin - saved.origin ) / ( deltaTime * anMath::M_MS2SEC );
 }
 
 /*
 ================
-idPhysics_Monster::GetPushedLinearVelocity
+anPhysics_Monster::GetPushedLinearVelocity
 ================
 */
-const arcVec3 &idPhysics_Monster::GetPushedLinearVelocity( const int id ) const {
+const anVec3 &anPhysics_Monster::GetPushedLinearVelocity( const int id ) const {
 	return current.lastPushVelocity;
 }
 
 /*
 ================
-idPhysics_Monster::SetMaster
+anPhysics_Monster::SetMaster
 
   the binding is never orientated
 ================
 */
-void idPhysics_Monster::SetMaster( idEntity *master, const bool orientated ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Monster::SetMaster( anEntity *master, const bool orientated ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	if ( master ) {
 		if ( !masterEntity ) {
@@ -782,7 +782,7 @@ void idPhysics_Monster::SetMaster( idEntity *master, const bool orientated ) {
 	}
 	else {
 		if ( masterEntity ) {
-			masterEntity = NULL;
+			masterEntity = nullptr;
 			Activate();
 		}
 	}
@@ -790,15 +790,15 @@ void idPhysics_Monster::SetMaster( idEntity *master, const bool orientated ) {
 
 const float	MONSTER_VELOCITY_MAX			= 4000;
 const int	MONSTER_VELOCITY_TOTAL_BITS		= 16;
-const int	MONSTER_VELOCITY_EXPONENT_BITS	= arcMath::BitsForInteger( arcMath::BitsForFloat( MONSTER_VELOCITY_MAX ) ) + 1;
+const int	MONSTER_VELOCITY_EXPONENT_BITS	= anMath::BitsForInteger( anMath::BitsForFloat( MONSTER_VELOCITY_MAX ) ) + 1;
 const int	MONSTER_VELOCITY_MANTISSA_BITS	= MONSTER_VELOCITY_TOTAL_BITS - 1 - MONSTER_VELOCITY_EXPONENT_BITS;
 
 /*
 ================
-idPhysics_Monster::WriteToSnapshot
+anPhysics_Monster::WriteToSnapshot
 ================
 */
-void idPhysics_Monster::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void anPhysics_Monster::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	msg.WriteFloat( current.origin[0] );
 	msg.WriteFloat( current.origin[1] );
 	msg.WriteFloat( current.origin[2] );
@@ -817,10 +817,10 @@ void idPhysics_Monster::WriteToSnapshot( idBitMsgDelta &msg ) const {
 
 /*
 ================
-idPhysics_Monster::ReadFromSnapshot
+anPhysics_Monster::ReadFromSnapshot
 ================
 */
-void idPhysics_Monster::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void anPhysics_Monster::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	current.origin[0] = msg.ReadFloat();
 	current.origin[1] = msg.ReadFloat();
 	current.origin[2] = msg.ReadFloat();

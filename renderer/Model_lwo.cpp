@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Model_lwo.h"
@@ -22,7 +22,7 @@ void lwFreeClip( lwClip *clip ) {
    if ( clip ) {
       lwListFree( clip->ifilter, (void (__cdecl *)(void *) )lwFreePlugin );
       lwListFree( clip->pfilter, (void (__cdecl *)(void *) )lwFreePlugin );
-	  switch( clip->type ) {
+	  switch ( clip->type ) {
 		case ID_STIL: {
 	      if ( clip->source.still.name ) Mem_Free( clip->source.still.name );
 		  break;
@@ -58,7 +58,7 @@ lwGetClip()
 Read image references from a CLIP chunk in an LWO2 file.
 ====================================================================== */
 
-lwClip *lwGetClip( arcNetFile *fp, int cksize ) {
+lwClip *lwGetClip( anFile *fp, int cksize ) {
    lwClip *clip;
    lwPlugin *filt;
    unsigned int id;
@@ -243,7 +243,7 @@ lwClip *lwGetClip( arcNetFile *fp, int cksize ) {
 
 Fail:
    lwFreeClip( clip );
-   return NULL;
+   return nullptr;
 }
 
 
@@ -299,7 +299,7 @@ lwGetEnvelope()
 Read an ENVL chunk from an LWO2 file.
 ====================================================================== */
 
-lwEnvelope *lwGetEnvelope( arcNetFile *fp, int cksize ) {
+lwEnvelope *lwGetEnvelope( anFile *fp, int cksize ) {
    lwEnvelope *env;
    lwKey *key;
    lwPlugin *plug;
@@ -367,7 +367,7 @@ lwEnvelope *lwGetEnvelope( arcNetFile *fp, int cksize ) {
             nparams = ( sz - 4 ) / 4;
             if ( nparams > 4 ) nparams = 4;
             for ( i = 0; i < nparams; i++ )
-               f[ i ] = getF4( fp );
+               f[i] = getF4( fp );
 
             switch ( key->shape ) {
                case ID_TCB:
@@ -380,7 +380,7 @@ lwEnvelope *lwGetEnvelope( arcNetFile *fp, int cksize ) {
                case ID_HERM:
                case ID_BEZ2:
                   for ( i = 0; i < nparams; i++ )
-                     key->param[ i ] = f[ i ];
+                     key->param[i] = f[i];
                   break;
             }
             break;
@@ -429,7 +429,7 @@ lwEnvelope *lwGetEnvelope( arcNetFile *fp, int cksize ) {
 
 Fail:
    lwFreeEnvelope( env );
-   return NULL;
+   return nullptr;
 }
 
 
@@ -458,7 +458,7 @@ lwEnvelope *lwFindEnvelope( lwEnvelope *list, int index )
 range()
 
 Given the value v of a periodic function, returns the equivalent value
-v2 in the principal interval [lo, hi].  If i isn't NULL, it receives
+v2 in the principal interval [lo, hi].  If i isn't nullptr, it receives
 the number of wavelengths between v and v2.
 
    v2 = v - i * (hi - lo)
@@ -542,7 +542,7 @@ static float bez2_time( float x0, float x1, float x2, float x3, float time,
 
    t = *t0 + ( *t1 - *t0 ) * 0.5f;
    v = bezier( x0, x1, x2, x3, t );
-   if ( arcMath::Fabs( time - v ) > .0001f ) {
+   if ( anMath::Fabs( time - v ) > .0001f ) {
       if ( v > time )
          *t1 = t;
       else
@@ -633,7 +633,7 @@ static float outgoing( lwKey *key0, lwKey *key1 )
 
       case ID_BEZ2:
          out = key0->param[ 3 ] * ( key1->time - key0->time );
-         if ( arcMath::Fabs( key0->param[ 2 ] ) > 1e-5f )
+         if ( anMath::Fabs( key0->param[ 2 ] ) > 1e-5f )
             out /= key0->param[ 2 ];
          else
             out *= 1e5f;
@@ -700,7 +700,7 @@ static float incoming( lwKey *key0, lwKey *key1 )
 
       case ID_BEZ2:
          in = key1->param[ 1 ] * ( key1->time - key0->time );
-         if ( arcMath::Fabs( key1->param[ 0 ] ) > 1e-5f )
+         if ( anMath::Fabs( key1->param[ 0 ] ) > 1e-5f )
             in /= key1->param[ 0 ];
          else
             in *= 1e5f;
@@ -757,7 +757,7 @@ float evalEnvelope( lwEnvelope *env, float time )
             return skey->value;
 
          case BEH_REPEAT:
-            time = range( time, skey->time, ekey->time, NULL );
+            time = range( time, skey->time, ekey->time, nullptr );
             break;
 
          case BEH_OSCILLATE:
@@ -790,7 +790,7 @@ float evalEnvelope( lwEnvelope *env, float time )
             return ekey->value;
 
          case BEH_REPEAT:
-            time = range( time, skey->time, ekey->time, NULL );
+            time = range( time, skey->time, ekey->time, nullptr );
             break;
 
          case BEH_OSCILLATE:
@@ -921,7 +921,7 @@ void lwListInsert( void **vlist, void *vitem, int ( *compare )( void *, void * )
    list = ( lwNode ** ) vlist;
    item = ( lwNode * ) vitem;
    node = *list;
-   prev = NULL;
+   prev = nullptr;
 
    while ( node ) {
       if ( 0 < compare( node, item ) ) break;
@@ -965,24 +965,24 @@ void set_flen( int i ) { flen = i; }
 
 int get_flen( void ) { return flen; }
 
-void *getbytes( arcNetFile *fp, int size )
+void *getbytes( anFile *fp, int size )
 {
    void *data;
 
-   if ( flen == FLEN_ERROR ) return NULL;
+   if ( flen == FLEN_ERROR ) return nullptr;
    if ( size < 0 ) {
       flen = FLEN_ERROR;
-      return NULL;
+      return nullptr;
    }
    data = Mem_ClearedAlloc( size );
    if ( !data ) {
       flen = FLEN_ERROR;
-      return NULL;
+      return nullptr;
    }
    if ( size != fp->Read( data, size ) ) {
       flen = FLEN_ERROR;
       Mem_Free( data );
-      return NULL;
+      return nullptr;
    }
 
    flen += size;
@@ -990,7 +990,7 @@ void *getbytes( arcNetFile *fp, int size )
 }
 
 
-void skipbytes( arcNetFile *fp, int n )
+void skipbytes( anFile *fp, int n )
 {
    if ( flen == FLEN_ERROR ) return;
    if ( fp->Seek( n, FS_SEEK_CUR ) )
@@ -1000,7 +1000,7 @@ void skipbytes( arcNetFile *fp, int n )
 }
 
 
-int getI1( arcNetFile *fp )
+int getI1( anFile *fp )
 {
    int i, c;
 
@@ -1017,7 +1017,7 @@ int getI1( arcNetFile *fp )
 }
 
 
-short getI2( arcNetFile *fp )
+short getI2( anFile *fp )
 {
    short i;
 
@@ -1032,7 +1032,7 @@ short getI2( arcNetFile *fp )
 }
 
 
-int getI4( arcNetFile *fp )
+int getI4( anFile *fp )
 {
    int i;
 
@@ -1047,7 +1047,7 @@ int getI4( arcNetFile *fp )
 }
 
 
-unsigned char getU1( arcNetFile *fp )
+unsigned char getU1( anFile *fp )
 {
    int i, c;
 
@@ -1063,7 +1063,7 @@ unsigned char getU1( arcNetFile *fp )
 }
 
 
-unsigned short getU2( arcNetFile *fp )
+unsigned short getU2( anFile *fp )
 {
    unsigned short i;
 
@@ -1078,7 +1078,7 @@ unsigned short getU2( arcNetFile *fp )
 }
 
 
-unsigned int getU4( arcNetFile *fp )
+unsigned int getU4( anFile *fp )
 {
    unsigned int i;
 
@@ -1093,7 +1093,7 @@ unsigned int getU4( arcNetFile *fp )
 }
 
 
-int getVX( arcNetFile *fp )
+int getVX( anFile *fp )
 {
     byte c;
    int i;
@@ -1137,7 +1137,7 @@ int getVX( arcNetFile *fp )
 }
 
 
-float getF4( arcNetFile *fp )
+float getF4( anFile *fp )
 {
    float f;
 
@@ -1156,19 +1156,19 @@ float getF4( arcNetFile *fp )
 }
 
 
-char *getS0( arcNetFile *fp )
+char *getS0( anFile *fp )
 {
    char *s;
    int i, c, len, pos;
 
-   if ( flen == FLEN_ERROR ) return NULL;
+   if ( flen == FLEN_ERROR ) return nullptr;
 
    pos = fp->Tell();
    for ( i = 1;; i++ ) {
 	   c = 0;
 	   if (fp->Read(&c, 1 ) == -1 ) {
 		   flen = FLEN_ERROR;
-		   return NULL;
+		   return nullptr;
 	   }
 	   if ( c == 0 ) break;
    }
@@ -1178,23 +1178,23 @@ char *getS0( arcNetFile *fp )
          flen = FLEN_ERROR;
       else
          flen += 2;
-      return NULL;
+      return nullptr;
    }
 
    len = i + ( i & 1 );
    s = (char*)Mem_ClearedAlloc( len );
    if ( !s ) {
       flen = FLEN_ERROR;
-      return NULL;
+      return nullptr;
    }
 
    if ( fp->Seek( pos, FS_SEEK_SET ) ) {
       flen = FLEN_ERROR;
-      return NULL;
+      return nullptr;
    }
    if ( len != fp->Read( s, len ) ) {
       flen = FLEN_ERROR;
-      return NULL;
+      return nullptr;
    }
 
    flen += len;
@@ -1323,19 +1323,19 @@ char *sgetS0( unsigned char **bp )
    unsigned char *buf = *bp;
    int len;
 
-   if ( flen == FLEN_ERROR ) return NULL;
+   if ( flen == FLEN_ERROR ) return nullptr;
 
    len = strlen( (const char*)buf ) + 1;
    if ( len == 1 ) {
       flen += 2;
       *bp += 2;
-      return NULL;
+      return nullptr;
    }
    len += len & 1;
    s = (char*)Mem_ClearedAlloc( len );
    if ( !s ) {
       flen = FLEN_ERROR;
-      return NULL;
+      return nullptr;
    }
 
    memcpy( s, buf, len );
@@ -1388,7 +1388,7 @@ void lwFreeObject( lwObject *object )
 lwGetObject()
 
 Returns the contents of a LightWave object, given its filename, or
-NULL if the file couldn't be loaded.  On failure, failID and failpos
+nullptr if the file couldn't be loaded.  On failure, failID and failpos
 can be used to diagnose the cause.
 
 1.  If the file isn't an LWO2 or an LWOB, failpos will contain 12 and
@@ -1401,12 +1401,12 @@ can be used to diagnose the cause.
 3.  If the file couldn't be opened, or an error occurs while reading
     the first 12 bytes, both failID and failpos will be unchanged.
 
-If you don't need this information, failID and failpos can be NULL.
+If you don't need this information, failID and failpos can be nullptr.
 ====================================================================== */
 
 lwObject *lwGetObject( const char *filename, unsigned int *failID, int *failpos )
 {
-   arcNetFile *fp = NULL;
+   anFile *fp = nullptr;
    lwObject *object;
    lwLayer *layer;
    lwNode *node;
@@ -1415,7 +1415,7 @@ lwObject *lwGetObject( const char *filename, unsigned int *failID, int *failpos 
 
    fp = fileSystem->OpenFileRead( filename );
    if ( !fp ) {
-	   return NULL;
+	   return nullptr;
    }
 
    /* read the first 12 bytes */
@@ -1426,7 +1426,7 @@ lwObject *lwGetObject( const char *filename, unsigned int *failID, int *failpos 
    type     = getU4( fp );
    if ( 12 != get_flen() ) {
       fileSystem->CloseFile( fp );
-      return NULL;
+      return nullptr;
    }
 
    /* is this a LW object? */
@@ -1434,7 +1434,7 @@ lwObject *lwGetObject( const char *filename, unsigned int *failID, int *failpos 
    if ( id != ID_FORM ) {
       fileSystem->CloseFile( fp );
       if ( failpos ) *failpos = 12;
-      return NULL;
+      return nullptr;
    }
 
    if ( type != ID_LWO2 ) {
@@ -1443,7 +1443,7 @@ lwObject *lwGetObject( const char *filename, unsigned int *failID, int *failpos 
          return lwGetObject5( filename, failID, failpos );
       else {
          if ( failpos ) *failpos = 12;
-         return NULL;
+         return nullptr;
       }
    }
 
@@ -1525,7 +1525,7 @@ lwObject *lwGetObject( const char *filename, unsigned int *failID, int *failpos 
          case ID_BBOX:
             set_flen( 0 );
             for ( i = 0; i < 6; i++ )
-               layer->bbox[ i ] = getF4( fp );
+               layer->bbox[i] = getF4( fp );
             rlen = get_flen();
             if ( rlen < 0 || rlen > cksize ) goto Fail;
             if ( rlen < cksize )
@@ -1579,7 +1579,7 @@ lwObject *lwGetObject( const char *filename, unsigned int *failID, int *failpos 
    }
 
    fileSystem->CloseFile( fp );
-   fp = NULL;
+   fp = nullptr;
 
    if ( object->nlayers == 0 )
       object->nlayers = 1;
@@ -1606,7 +1606,7 @@ Fail:
       fileSystem->CloseFile( fp );
    }
    lwFreeObject( object );
-   return NULL;
+   return nullptr;
 }
 
 
@@ -1665,7 +1665,7 @@ static int add_clip( char *s, lwClip **clist, int *nclips )
    clip->saturation.val = 1.0f;
    clip->gamma.val = 1.0f;
 
-   if ( p = strstr( s, "(sequence)" ) ) {
+   if ( p = strstr( s, "( sequence)" ) ) {
       p[ -1 ] = 0;
       clip->type = ID_ISEQ;
       clip->source.seq.prefix = s;
@@ -1706,10 +1706,10 @@ static int add_tvel( float pos[], float vel[], lwEnvelope **elist, int *nenvs )
       if ( !env || !key0 || !key1 ) return 0;
 
       key0->next = key1;
-      key0->value = pos[ i ];
+      key0->value = pos[i];
       key0->time = 0.0f;
       key1->prev = key0;
-      key1->value = pos[ i ] + vel[ i ] * 30.0f;
+      key1->value = pos[i] + vel[i] * 30.0f;
       key1->time = 1.0f;
       key0->shape = key1->shape = ID_LINE;
 
@@ -1745,7 +1745,7 @@ static lwTexture *get_texture( char *s )
    lwTexture *tex;
 
    tex = (lwTexture*)Mem_ClearedAlloc( sizeof( lwTexture ) );
-   if ( !tex ) return NULL;
+   if ( !tex ) return nullptr;
 
    tex->tmap.size.val[ 0 ] =
    tex->tmap.size.val[ 1 ] =
@@ -1780,7 +1780,7 @@ lwGetSurface5()
 Read an lwSurface from an LWOB file.
 ====================================================================== */
 
-lwSurface *lwGetSurface5( arcNetFile *fp, int cksize, lwObject *obj )
+lwSurface *lwGetSurface5( anFile *fp, int cksize, lwObject *obj )
 {
    lwSurface *surf;
    lwTexture *tex;
@@ -1969,22 +1969,22 @@ lwSurface *lwGetSurface5( arcNetFile *fp, int cksize, lwObject *obj )
 
          case ID_TSIZ:
             for ( i = 0; i < 3; i++ )
-               tex->tmap.size.val[ i ] = getF4( fp );
+               tex->tmap.size.val[i] = getF4( fp );
             break;
 
          case ID_TCTR:
             for ( i = 0; i < 3; i++ )
-               tex->tmap.center.val[ i ] = getF4( fp );
+               tex->tmap.center.val[i] = getF4( fp );
             break;
 
          case ID_TFAL:
             for ( i = 0; i < 3; i++ )
-               tex->tmap.falloff.val[ i ] = getF4( fp );
+               tex->tmap.falloff.val[i] = getF4( fp );
             break;
 
          case ID_TVEL:
             for ( i = 0; i < 3; i++ )
-               v[ i ] = getF4( fp );
+               v[i] = getF4( fp );
             tex->tmap.center.eindex = add_tvel( tex->tmap.center.val, v,
                &obj->env, &obj->nenvs );
             break;
@@ -1992,7 +1992,7 @@ lwSurface *lwGetSurface5( arcNetFile *fp, int cksize, lwObject *obj )
          case ID_TCLR:
             if ( tex->type == ID_PROC )
                for ( i = 0; i < 3; i++ )
-                  tex->param.proc.value[ i ] = getU1( fp ) / 255.0f;
+                  tex->param.proc.value[i] = getU1( fp ) / 255.0f;
             break;
 
          case ID_TVAL:
@@ -2075,7 +2075,7 @@ lwSurface *lwGetSurface5( arcNetFile *fp, int cksize, lwObject *obj )
 
 Fail:
    if ( surf ) lwFreeSurface( surf );
-   return NULL;
+   return nullptr;
 }
 
 
@@ -2087,7 +2087,7 @@ Read polygon records from a POLS chunk in an LWOB file.  The polygons
 are added to the array in the lwPolygonList.
 ====================================================================== */
 
-int lwGetPolygons5( arcNetFile *fp, int cksize, lwPolygonList *plist, int ptoffset )
+int lwGetPolygons5( anFile *fp, int cksize, lwPolygonList *plist, int ptoffset )
 {
    lwPolygon *pp;
    lwPolVert *pv;
@@ -2161,7 +2161,7 @@ Fail:
 ======================================================================
 getLWObject5()
 
-Returns the contents of an LWOB, given its filename, or NULL if the
+Returns the contents of an LWOB, given its filename, or nullptr if the
 file couldn't be loaded.  On failure, failID and failpos can be used
 to diagnose the cause.
 
@@ -2175,12 +2175,12 @@ to diagnose the cause.
 3.  If the file couldn't be opened, or an error occurs while reading
     the first 12 bytes, both failID and failpos will be unchanged.
 
-If you don't need this information, failID and failpos can be NULL.
+If you don't need this information, failID and failpos can be nullptr.
 ====================================================================== */
 
 lwObject *lwGetObject5( const char *filename, unsigned int *failID, int *failpos )
 {
-   arcNetFile *fp = NULL;
+   anFile *fp = nullptr;
    lwObject *object;
    lwLayer *layer;
    lwNode *node;
@@ -2190,12 +2190,12 @@ lwObject *lwGetObject5( const char *filename, unsigned int *failID, int *failpos
    /* open the file */
 
    //fp = fopen( filename, "rb" );
-   //if ( !fp ) return NULL;
+   //if ( !fp ) return nullptr;
 
    /* read the first 12 bytes */
    fp = fileSystem->OpenFileRead( filename );
    if ( !fp ) {
-	   return NULL;
+	   return nullptr;
    }
 
    set_flen( 0 );
@@ -2204,7 +2204,7 @@ lwObject *lwGetObject5( const char *filename, unsigned int *failID, int *failpos
    type     = getU4( fp );
    if ( 12 != get_flen() ) {
       fileSystem->CloseFile( fp );
-      return NULL;
+      return nullptr;
    }
 
    /* LWOB? */
@@ -2212,7 +2212,7 @@ lwObject *lwGetObject5( const char *filename, unsigned int *failID, int *failpos
    if ( id != ID_FORM || type != ID_LWOB ) {
       fileSystem->CloseFile( fp );
       if ( failpos ) *failpos = 12;
-      return NULL;
+      return nullptr;
    }
 
    /* allocate an object and a default layer */
@@ -2279,7 +2279,7 @@ lwObject *lwGetObject5( const char *filename, unsigned int *failID, int *failpos
    }
 
    fileSystem->CloseFile( fp );
-   fp = NULL;
+   fp = nullptr;
 
    lwGetBoundingBox( &layer->point, layer->bbox );
    lwGetPolyNormals( &layer->point, &layer->polygon );
@@ -2297,7 +2297,7 @@ Fail2:
       fileSystem->CloseFile( fp );
    }
    lwFreeObject( object );
-   return NULL;
+   return nullptr;
 }
 
 /*
@@ -2314,8 +2314,8 @@ void lwFreePoints( lwPointList *point )
    if ( point ) {
       if ( point->pt ) {
          for ( i = 0; i < point->count; i++ ) {
-            if ( point->pt[ i ].pol ) Mem_Free( point->pt[ i ].pol );
-            if ( point->pt[ i ].vm ) Mem_Free( point->pt[ i ].vm );
+            if ( point->pt[i].pol ) Mem_Free( point->pt[i].pol );
+            if ( point->pt[i].vm ) Mem_Free( point->pt[i].vm );
          }
          Mem_Free( point->pt );
       }
@@ -2338,10 +2338,10 @@ void lwFreePolygons( lwPolygonList *plist )
    if ( plist ) {
       if ( plist->pol ) {
          for ( i = 0; i < plist->count; i++ ) {
-            if ( plist->pol[ i ].v ) {
-               for ( j = 0; j < plist->pol[ i ].nverts; j++ )
-                  if ( plist->pol[ i ].v[ j ].vm )
-                     Mem_Free( plist->pol[ i ].v[ j ].vm );
+            if ( plist->pol[i].v ) {
+               for ( j = 0; j < plist->pol[i].nverts; j++ )
+                  if ( plist->pol[i].v[ j ].vm )
+                     Mem_Free( plist->pol[i].v[ j ].vm );
             }
          }
          if ( plist->pol[ 0 ].v )
@@ -2361,7 +2361,7 @@ Read point records from a PNTS chunk in an LWO2 file.  The points are
 added to the array in the lwPointList.
 ====================================================================== */
 
-int lwGetPoints( arcNetFile *fp, int cksize, lwPointList *point )
+int lwGetPoints( anFile *fp, int cksize, lwPointList *point )
 {
 	float *f;
 	int np, i, j;
@@ -2391,9 +2391,9 @@ int lwGetPoints( arcNetFile *fp, int cksize, lwPointList *point )
 	/* assign position values */
 
 	for ( i = 0, j = 0; i < np; i++, j += 3 ) {
-		point->pt[ i ].pos[ 0 ] = f[ j ];
-		point->pt[ i ].pos[ 1 ] = f[ j + 1 ];
-		point->pt[ i ].pos[ 2 ] = f[ j + 2 ];
+		point->pt[i].pos[ 0 ] = f[ j ];
+		point->pt[i].pos[ 1 ] = f[ j + 1 ];
+		point->pt[i].pos[ 2 ] = f[ j + 2 ];
 	}
 
 	Mem_Free( f );
@@ -2416,16 +2416,16 @@ void lwGetBoundingBox( lwPointList *point, float bbox[] )
 	if ( point->count == 0 ) return;
 
 	for ( i = 0; i < 6; i++ )
-		if ( bbox[ i ] != 0.0f ) return;
+		if ( bbox[i] != 0.0f ) return;
 
 	bbox[ 0 ] = bbox[ 1 ] = bbox[ 2 ] = 1e20f;
 	bbox[ 3 ] = bbox[ 4 ] = bbox[ 5 ] = -1e20f;
 	for ( i = 0; i < point->count; i++ ) {
 		for ( j = 0; j < 3; j++ ) {
-			if ( bbox[ j ] > point->pt[ i ].pos[ j ] )
-			bbox[ j ] = point->pt[ i ].pos[ j ];
-			if ( bbox[ j + 3 ] < point->pt[ i ].pos[ j ] )
-			bbox[ j + 3 ] = point->pt[ i ].pos[ j ];
+			if ( bbox[ j ] > point->pt[i].pos[ j ] )
+			bbox[ j ] = point->pt[i].pos[ j ];
+			if ( bbox[ j + 3 ] < point->pt[i].pos[ j ] )
+			bbox[ j + 3 ] = point->pt[i].pos[ j ];
 		}
 	}
 }
@@ -2467,7 +2467,7 @@ int lwAllocPolygons( lwPolygonList *plist, int npols, int nverts )
 	/* fix up the old vertex pointers */
 
 	for ( i = 1; i < plist->offset; i++ )
-		plist->pol[ i ].v = plist->pol[ i - 1 ].v + plist->pol[ i - 1 ].nverts;
+		plist->pol[i].v = plist->pol[ i - 1 ].v + plist->pol[ i - 1 ].nverts;
 
 	return 1;
 }
@@ -2481,7 +2481,7 @@ Read polygon records from a POLS chunk in an LWO2 file.  The polygons
 are added to the array in the lwPolygonList.
 ====================================================================== */
 
-int lwGetPolygons( arcNetFile *fp, int cksize, lwPolygonList *plist, int ptoffset )
+int lwGetPolygons( anFile *fp, int cksize, lwPolygonList *plist, int ptoffset )
 {
    lwPolygon *pp;
    lwPolVert *pv;
@@ -2564,13 +2564,13 @@ void lwGetPolyNormals( lwPointList *point, lwPolygonList *polygon )
    float p1[ 3 ], p2[ 3 ], pn[ 3 ], v1[ 3 ], v2[ 3 ];
 
    for ( i = 0; i < polygon->count; i++ ) {
-      if ( polygon->pol[ i ].nverts < 3 ) continue;
+      if ( polygon->pol[i].nverts < 3 ) continue;
       for ( j = 0; j < 3; j++ ) {
 
 		  // FIXME: track down why indexes are way out of range
-         p1[ j ] = point->pt[ polygon->pol[ i ].v[ 0 ].index ].pos[ j ];
-         p2[ j ] = point->pt[ polygon->pol[ i ].v[ 1 ].index ].pos[ j ];
-         pn[ j ] = point->pt[ polygon->pol[ i ].v[ polygon->pol[ i ].nverts - 1 ].index ].pos[ j ];
+         p1[ j ] = point->pt[ polygon->pol[i].v[ 0 ].index ].pos[ j ];
+         p2[ j ] = point->pt[ polygon->pol[i].v[ 1 ].index ].pos[ j ];
+         pn[ j ] = point->pt[ polygon->pol[i].v[ polygon->pol[i].nverts - 1 ].index ].pos[ j ];
       }
 
       for ( j = 0; j < 3; j++ ) {
@@ -2578,8 +2578,8 @@ void lwGetPolyNormals( lwPointList *point, lwPolygonList *polygon )
          v2[ j ] = pn[ j ] - p1[ j ];
       }
 
-      cross( v1, v2, polygon->pol[ i ].norm );
-      normalize( polygon->pol[ i ].norm );
+      cross( v1, v2, polygon->pol[i].norm );
+      normalize( polygon->pol[i].norm );
    }
 }
 
@@ -2600,23 +2600,23 @@ int lwGetPointPolygons( lwPointList *point, lwPolygonList *polygon )
    /* count the number of polygons per point */
 
    for ( i = 0; i < polygon->count; i++ )
-      for ( j = 0; j < polygon->pol[ i ].nverts; j++ )
-         ++point->pt[ polygon->pol[ i ].v[ j ].index ].npols;
+      for ( j = 0; j < polygon->pol[i].nverts; j++ )
+         ++point->pt[ polygon->pol[i].v[ j ].index ].npols;
 
    /* alloc per-point polygon arrays */
 
    for ( i = 0; i < point->count; i++ ) {
-      if ( point->pt[ i ].npols == 0 ) continue;
-      point->pt[ i ].pol = ( int*)Mem_ClearedAlloc( point->pt[ i ].npols * sizeof( int ) );
-      if ( !point->pt[ i ].pol ) return 0;
-      point->pt[ i ].npols = 0;
+      if ( point->pt[i].npols == 0 ) continue;
+      point->pt[i].pol = ( int*)Mem_ClearedAlloc( point->pt[i].npols * sizeof( int ) );
+      if ( !point->pt[i].pol ) return 0;
+      point->pt[i].npols = 0;
    }
 
    /* fill in polygon array for each point */
 
    for ( i = 0; i < polygon->count; i++ ) {
-      for ( j = 0; j < polygon->pol[ i ].nverts; j++ ) {
-         k = polygon->pol[ i ].v[ j ].index;
+      for ( j = 0; j < polygon->pol[i].nverts; j++ ) {
+         k = polygon->pol[i].v[ j ].index;
          point->pt[ k ].pol[ point->pt[ k ].npols ] = i;
          ++point->pt[ k ].npols;
       }
@@ -2649,8 +2649,8 @@ int lwResolvePolySurfaces( lwPolygonList *polygon, lwTagList *tlist,
    for ( i = 0; i < tlist->count; i++ ) {
       st = *surf;
       while ( st ) {
-         if ( !strcmp( st->name, tlist->tag[ i ] ) ) {
-            s[ i ] = st;
+         if ( !strcmp( st->name, tlist->tag[i] ) ) {
+            s[i] = st;
             break;
          }
          st = st->next;
@@ -2658,7 +2658,7 @@ int lwResolvePolySurfaces( lwPolygonList *polygon, lwTagList *tlist,
    }
 
    for ( i = 0; i < polygon->count; i++ ) {
-      index = ( int ) polygon->pol[ i ].surf;
+      index = ( int ) polygon->pol[i].surf;
       if ( index < 0 || index > tlist->count ) return 0;
       if ( !s[index] ) {
          s[index] = lwDefaultSurface();
@@ -2669,7 +2669,7 @@ int lwResolvePolySurfaces( lwPolygonList *polygon, lwTagList *tlist,
          lwListAdd( (void**)surf, s[index] );
          *nsurfs = *nsurfs + 1;
       }
-      polygon->pol[ i ].surf = s[index];
+      polygon->pol[i].surf = s[index];
    }
 
    Mem_Free( s );
@@ -2739,8 +2739,8 @@ void lwFreeTags( lwTagList *tlist )
 	if ( tlist ) {
 		if ( tlist->tag ) {
 			for ( i = 0; i < tlist->count; i++ )
-				if ( tlist->tag[ i ] ) {
-					Mem_Free( tlist->tag[ i ] );
+				if ( tlist->tag[i] ) {
+					Mem_Free( tlist->tag[i] );
 				}
 			Mem_Free( tlist->tag );
 		}
@@ -2757,7 +2757,7 @@ Read tag strings from a TAGS chunk in an LWO2 file.  The tags are
 added to the lwTagList array.
 ====================================================================== */
 
-int lwGetTags( arcNetFile *fp, int cksize, lwTagList *tlist )
+int lwGetTags( anFile *fp, int cksize, lwTagList *tlist )
 {
 	char *buf, *bp;
 	int i, len, ntags;
@@ -2816,7 +2816,7 @@ lwGetPolygonTags()
 Read polygon tags from a PTAG chunk in an LWO2 file.
 ====================================================================== */
 
-int lwGetPolygonTags( arcNetFile *fp, int cksize, lwTagList *tlist, lwPolygonList *plist )
+int lwGetPolygonTags( anFile *fp, int cksize, lwTagList *tlist, lwPolygonList *plist )
 {
 	unsigned int type;
 	int rlen = 0, i, j;
@@ -2838,9 +2838,9 @@ int lwGetPolygonTags( arcNetFile *fp, int cksize, lwTagList *tlist, lwPolygonLis
 		if ( rlen < 0 || rlen > cksize ) return 0;
 
 		switch ( type ) {
-			case ID_SURF:  plist->pol[ i ].surf = ( lwSurface * ) j;  break;
-			case ID_PART:  plist->pol[ i ].part = j;  break;
-			case ID_SMGP:  plist->pol[ i ].smoothgrp = j;  break;
+			case ID_SURF:  plist->pol[i].surf = ( lwSurface * ) j;  break;
+			case ID_PART:  plist->pol[i].part = j;  break;
+			case ID_SMGP:  plist->pol[i].smoothgrp = j;  break;
 		}
 	}
 
@@ -2936,7 +2936,7 @@ the first subchunk in a BLOK, and its contents are common to all three
 texture types.
 ====================================================================== */
 
-int lwGetTHeader( arcNetFile *fp, int hsz, lwTexture *tex )
+int lwGetTHeader( anFile *fp, int hsz, lwTexture *tex )
 {
 	unsigned int id;
 	unsigned short sz;
@@ -3027,7 +3027,7 @@ Read a texture map from a SURF.BLOK in an LWO2 file.  The TMAP
 defines the mapping from texture to world or object coordinates.
 ====================================================================== */
 
-int lwGetTMap( arcNetFile *fp, int tmapsz, lwTMap *tmap )
+int lwGetTMap( anFile *fp, int tmapsz, lwTMap *tmap )
 {
 	unsigned int id;
 	unsigned short sz;
@@ -3045,26 +3045,26 @@ int lwGetTMap( arcNetFile *fp, int tmapsz, lwTMap *tmap )
 		switch ( id ) {
 			case ID_SIZE:
 				for ( i = 0; i < 3; i++ )
-				tmap->size.val[ i ] = getF4( fp );
+				tmap->size.val[i] = getF4( fp );
 				tmap->size.eindex = getVX( fp );
 				break;
 
 			case ID_CNTR:
 				for ( i = 0; i < 3; i++ )
-				tmap->center.val[ i ] = getF4( fp );
+				tmap->center.val[i] = getF4( fp );
 				tmap->center.eindex = getVX( fp );
 				break;
 
 			case ID_ROTA:
 				for ( i = 0; i < 3; i++ )
-				tmap->rotate.val[ i ] = getF4( fp );
+				tmap->rotate.val[i] = getF4( fp );
 				tmap->rotate.eindex = getVX( fp );
 				break;
 
 			case ID_FALL:
 				tmap->fall_type = getU2( fp );
 				for ( i = 0; i < 3; i++ )
-				tmap->falloff.val[ i ] = getF4( fp );
+				tmap->falloff.val[i] = getF4( fp );
 				tmap->falloff.eindex = getVX( fp );
 				break;
 
@@ -3115,7 +3115,7 @@ lwGetImageMap()
 Read an lwImageMap from a SURF.BLOK in an LWO2 file.
 ====================================================================== */
 
-int lwGetImageMap( arcNetFile *fp, int rsz, lwTexture *tex )
+int lwGetImageMap( anFile *fp, int rsz, lwTexture *tex )
 {
 	unsigned int id;
 	unsigned short sz;
@@ -3224,7 +3224,7 @@ lwGetProcedural()
 Read an lwProcedural from a SURF.BLOK in an LWO2 file.
 ====================================================================== */
 
-int lwGetProcedural( arcNetFile *fp, int rsz, lwTexture *tex )
+int lwGetProcedural( anFile *fp, int rsz, lwTexture *tex )
 {
    unsigned int id;
    unsigned short sz;
@@ -3299,7 +3299,7 @@ lwGetGradient()
 Read an lwGradient from a SURF.BLOK in an LWO2 file.
 ====================================================================== */
 
-int lwGetGradient( arcNetFile *fp, int rsz, lwTexture *tex )
+int lwGetGradient( anFile *fp, int rsz, lwTexture *tex )
 {
    unsigned int id;
    unsigned short sz;
@@ -3344,18 +3344,18 @@ int lwGetGradient( arcNetFile *fp, int rsz, lwTexture *tex )
             tex->param.grad.key = (lwGradKey*)Mem_ClearedAlloc( nkeys * sizeof( lwGradKey ) );
             if ( !tex->param.grad.key ) return 0;
             for ( i = 0; i < nkeys; i++ ) {
-               tex->param.grad.key[ i ].value = getF4( fp );
+               tex->param.grad.key[i].value = getF4( fp );
                for ( j = 0; j < 4; j++ )
-                  tex->param.grad.key[ i ].rgba[ j ] = getF4( fp );
+                  tex->param.grad.key[i].rgba[ j ] = getF4( fp );
             }
             break;
 
          case ID_IKEY:
             nkeys = sz / 2;
-            tex->param.grad.ikey = (short*)Mem_ClearedAlloc( nkeys * sizeof( short ) );
+            tex->param.grad.ikey = ( short*)Mem_ClearedAlloc( nkeys * sizeof( short ) );
             if ( !tex->param.grad.ikey ) return 0;
             for ( i = 0; i < nkeys; i++ )
-               tex->param.grad.ikey[ i ] = getU2( fp );
+               tex->param.grad.ikey[i] = getU2( fp );
             break;
 
          default:
@@ -3397,14 +3397,14 @@ lwGetTexture()
 Read an lwTexture from a SURF.BLOK in an LWO2 file.
 ====================================================================== */
 
-lwTexture *lwGetTexture( arcNetFile *fp, int bloksz, unsigned int type )
+lwTexture *lwGetTexture( anFile *fp, int bloksz, unsigned int type )
 {
    lwTexture *tex;
    unsigned short sz;
    int ok;
 
    tex = (lwTexture*)Mem_ClearedAlloc( sizeof( lwTexture ) );
-   if ( !tex ) return NULL;
+   if ( !tex ) return nullptr;
 
    tex->type = type;
    tex->tmap.size.val[ 0 ] =
@@ -3416,7 +3416,7 @@ lwTexture *lwGetTexture( arcNetFile *fp, int bloksz, unsigned int type )
    sz = getU2( fp );
    if ( !lwGetTHeader( fp, sz, tex ) ) {
       Mem_Free( tex );
-      return NULL;
+      return nullptr;
    }
 
    sz = bloksz - sz - 6;
@@ -3430,7 +3430,7 @@ lwTexture *lwGetTexture( arcNetFile *fp, int bloksz, unsigned int type )
 
    if ( !ok ) {
       lwFreeTexture( tex );
-      return NULL;
+      return nullptr;
    }
 
    set_flen( bloksz );
@@ -3445,7 +3445,7 @@ lwGetShader()
 Read a shader record from a SURF.BLOK in an LWO2 file.
 ====================================================================== */
 
-lwPlugin *lwGetShader( arcNetFile *fp, int bloksz )
+lwPlugin *lwGetShader( anFile *fp, int bloksz )
 {
    lwPlugin *shdr;
    unsigned int id;
@@ -3453,7 +3453,7 @@ lwPlugin *lwGetShader( arcNetFile *fp, int bloksz )
    int hsz, rlen, pos;
 
    shdr = (lwPlugin*)Mem_ClearedAlloc( sizeof( lwPlugin ) );
-   if ( !shdr ) return NULL;
+   if ( !shdr ) return nullptr;
 
    pos = fp->Tell();
    set_flen( 0 );
@@ -3524,7 +3524,7 @@ lwPlugin *lwGetShader( arcNetFile *fp, int bloksz )
 
 Fail:
    lwFreePlugin( shdr );
-   return NULL;
+   return nullptr;
 }
 
 
@@ -3592,7 +3592,7 @@ lwSurface *lwDefaultSurface( void )
    lwSurface *surf;
 
    surf = (lwSurface*)Mem_ClearedAlloc( sizeof( lwSurface ) );
-   if ( !surf ) return NULL;
+   if ( !surf ) return nullptr;
 
    surf->color.rgb[ 0 ] = 0.78431f;
    surf->color.rgb[ 1 ] = 0.78431f;
@@ -3614,7 +3614,7 @@ lwGetSurface()
 Read an lwSurface from an LWO2 file.
 ====================================================================== */
 
-lwSurface *lwGetSurface( arcNetFile *fp, int cksize )
+lwSurface *lwGetSurface( anFile *fp, int cksize )
 {
    lwSurface *surf;
    lwTexture *tex;
@@ -3838,7 +3838,7 @@ lwSurface *lwGetSurface( arcNetFile *fp, int cksize )
 
 Fail:
    if ( surf ) lwFreeSurface( surf );
-   return NULL;
+   return nullptr;
 }
 
 
@@ -3860,7 +3860,7 @@ void normalize( float v[] )
 {
    float r;
 
-   r = ( float ) arcMath::Sqrt( dot( v, v ) );
+   r = ( float ) anMath::Sqrt( dot( v, v ) );
    if ( r > 0 ) {
       v[ 0 ] /= r;
       v[ 1 ] /= r;
@@ -3897,7 +3897,7 @@ lwGetVMap()
 Read an lwVMap from a VMAP or VMAD chunk in an LWO2.
 ====================================================================== */
 
-lwVMap *lwGetVMap( arcNetFile *fp, int cksize, int ptoffset, int poloffset,
+lwVMap *lwGetVMap( anFile *fp, int cksize, int ptoffset, int poloffset,
    int perpoly )
 {
    unsigned char *buf, *bp;
@@ -3910,12 +3910,12 @@ lwVMap *lwGetVMap( arcNetFile *fp, int cksize, int ptoffset, int poloffset,
 
    set_flen( 0 );
    buf = (unsigned char*)getbytes( fp, cksize );
-   if ( !buf ) return NULL;
+   if ( !buf ) return nullptr;
 
    vmap = (lwVMap*)Mem_ClearedAlloc( sizeof( lwVMap ) );
    if ( !vmap ) {
       Mem_Free( buf );
-      return NULL;
+      return nullptr;
    }
 
    /* initialize the vmap */
@@ -3956,18 +3956,18 @@ lwVMap *lwGetVMap( arcNetFile *fp, int cksize, int ptoffset, int poloffset,
       f = (float*)Mem_ClearedAlloc( npts * vmap->dim * sizeof( float ) );
       if ( !f ) goto Fail;
       for ( i = 0; i < npts; i++ )
-         vmap->val[ i ] = f + i * vmap->dim;
+         vmap->val[i] = f + i * vmap->dim;
    }
 
    /* fill in the vmap values */
 
    bp = buf + rlen;
    for ( i = 0; i < npts; i++ ) {
-      vmap->vindex[ i ] = sgetVX( &bp );
+      vmap->vindex[i] = sgetVX( &bp );
       if ( perpoly )
-         vmap->pindex[ i ] = sgetVX( &bp );
+         vmap->pindex[i] = sgetVX( &bp );
       for ( j = 0; j < vmap->dim; j++ )
-         vmap->val[ i ][ j ] = sgetF4( &bp );
+         vmap->val[i][ j ] = sgetF4( &bp );
    }
 
    Mem_Free( buf );
@@ -3976,7 +3976,7 @@ lwVMap *lwGetVMap( arcNetFile *fp, int cksize, int ptoffset, int poloffset,
 Fail:
    if ( buf ) Mem_Free( buf );
    lwFreeVMap( vmap );
-   return NULL;
+   return nullptr;
 }
 
 
@@ -3998,17 +3998,17 @@ int lwGetPointVMaps( lwPointList *point, lwVMap *vmap )
    while ( vm ) {
       if ( !vm->perpoly )
          for ( i = 0; i < vm->nverts; i++ )
-            ++point->pt[ vm->vindex[ i ]].nvmaps;
+            ++point->pt[ vm->vindex[i]].nvmaps;
       vm = vm->next;
    }
 
    /* allocate vmap references for each mapped point */
 
    for ( i = 0; i < point->count; i++ ) {
-      if ( point->pt[ i ].nvmaps ) {
-         point->pt[ i ].vm = (lwVMapPt*)Mem_ClearedAlloc( point->pt[ i ].nvmaps * sizeof( lwVMapPt ) );
-         if ( !point->pt[ i ].vm ) return 0;
-         point->pt[ i ].nvmaps = 0;
+      if ( point->pt[i].nvmaps ) {
+         point->pt[i].vm = (lwVMapPt*)Mem_ClearedAlloc( point->pt[i].nvmaps * sizeof( lwVMapPt ) );
+         if ( !point->pt[i].vm ) return 0;
+         point->pt[i].nvmaps = 0;
       }
    }
 
@@ -4018,7 +4018,7 @@ int lwGetPointVMaps( lwPointList *point, lwVMap *vmap )
    while ( vm ) {
       if ( !vm->perpoly ) {
          for ( i = 0; i < vm->nverts; i++ ) {
-            j = vm->vindex[ i ];
+            j = vm->vindex[i];
             n = point->pt[ j ].nvmaps;
             point->pt[ j ].vm[ n ].vmap = vm;
             point->pt[ j ].vm[ n ].index = i;
@@ -4051,9 +4051,9 @@ int lwGetPolyVMaps( lwPolygonList *polygon, lwVMap *vmap )
    while ( vm ) {
       if ( vm->perpoly ) {
          for ( i = 0; i < vm->nverts; i++ ) {
-            for ( j = 0; j < polygon->pol[ vm->pindex[ i ]].nverts; j++ ) {
-               pv = &polygon->pol[ vm->pindex[ i ]].v[ j ];
-               if ( vm->vindex[ i ] == pv->index ) {
+            for ( j = 0; j < polygon->pol[ vm->pindex[i]].nverts; j++ ) {
+               pv = &polygon->pol[ vm->pindex[i]].v[ j ];
+               if ( vm->vindex[i] == pv->index ) {
                   ++pv->nvmaps;
                   break;
                }
@@ -4066,8 +4066,8 @@ int lwGetPolyVMaps( lwPolygonList *polygon, lwVMap *vmap )
    /* allocate vmap references for each mapped vertex */
 
    for ( i = 0; i < polygon->count; i++ ) {
-      for ( j = 0; j < polygon->pol[ i ].nverts; j++ ) {
-         pv = &polygon->pol[ i ].v[ j ];
+      for ( j = 0; j < polygon->pol[i].nverts; j++ ) {
+         pv = &polygon->pol[i].v[ j ];
          if ( pv->nvmaps ) {
             pv->vm = (lwVMapPt*)Mem_ClearedAlloc( pv->nvmaps * sizeof( lwVMapPt ) );
             if ( !pv->vm ) return 0;
@@ -4082,9 +4082,9 @@ int lwGetPolyVMaps( lwPolygonList *polygon, lwVMap *vmap )
    while ( vm ) {
       if ( vm->perpoly ) {
          for ( i = 0; i < vm->nverts; i++ ) {
-            for ( j = 0; j < polygon->pol[ vm->pindex[ i ]].nverts; j++ ) {
-               pv = &polygon->pol[ vm->pindex[ i ]].v[ j ];
-               if ( vm->vindex[ i ] == pv->index ) {
+            for ( j = 0; j < polygon->pol[ vm->pindex[i]].nverts; j++ ) {
+               pv = &polygon->pol[ vm->pindex[i]].v[ j ];
+               if ( vm->vindex[i] == pv->index ) {
                   pv->vm[ pv->nvmaps ].vmap = vm;
                   pv->vm[ pv->nvmaps ].index = i;
                   ++pv->nvmaps;

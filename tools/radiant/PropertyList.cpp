@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -45,7 +45,7 @@ static char THIS_FILE[] = __FILE__;
 // CPropertyList
 
 CPropertyList::CPropertyList() {
-	measureItem = NULL;
+	measureItem = nullptr;
 	updateInspectors = false;
 }
 
@@ -147,7 +147,7 @@ void CPropertyList::DrawItem(LPDRAWITEMSTRUCT lpDIS) {
 }
 
 int CPropertyList::AddItem(CString txt) {
-	measureItem = NULL;
+	measureItem = nullptr;
 	int nIndex = AddString(txt);
 	return nIndex;
 }
@@ -156,10 +156,10 @@ int CPropertyList::AddPropItem(CPropertyItem* pItem) {
 	if (pItem->m_nItemType == PIT_VAR) {
 		measureItem = pItem;
 	} else {
-		measureItem = NULL;
+		measureItem = nullptr;
 	}
 	int nIndex = AddString(_T( "" ) );
-	measureItem = NULL;
+	measureItem = nullptr;
 	SetItemDataPtr(nIndex,pItem);
 	return nIndex;
 }
@@ -341,7 +341,7 @@ void CPropertyList::OnButton() {
 	//display the appropriate common dialog depending on what type
 	//of chooser is associated with the property
 	if (pItem->m_nItemType == PIT_COLOR) {
-		arcVec3 color;
+		anVec3 color;
 		sscanf(pItem->m_curValue, "%f %f %f", &color.x, &color.y, &color.z);
 
 		COLORREF cr = ( int )(color.x * 255) + (( ( int )(color.y * 255) )<<8) + (( ( int )(color.z * 255) )<<16);
@@ -365,7 +365,7 @@ void CPropertyList::OnButton() {
 		CString SelectedFile;
 		CString Filter( "Gif Files (*.gif)|*.gif||" );
 
-		CFileDialog FileDlg(TRUE, NULL, NULL, NULL,	Filter);
+		CFileDialog FileDlg(TRUE, nullptr, nullptr, nullptr,	Filter);
 
 		CString currPath = pItem->m_curValue;
 		FileDlg.m_ofn.lpstrTitle = "Select file";
@@ -380,7 +380,7 @@ void CPropertyList::OnButton() {
 			Invalidate();
 		}
 	} else if (pItem->m_nItemType == PIT_FONT) {
-		CFontDialog FontDlg(NULL,CF_EFFECTS | CF_SCREENFONTS,NULL,this);
+		CFontDialog FontDlg(nullptr,CF_EFFECTS | CF_SCREENFONTS,nullptr,this);
 		if (IDOK == FontDlg.DoModal() ) {
 			CString faceName = FontDlg.GetFaceName();
 			m_btnCtrl.ShowWindow(SW_HIDE);
@@ -432,7 +432,7 @@ void CPropertyList::OnLButtonUp(UINT nFlags, CPoint point) {
 			::ReleaseCapture();
 		}
 
-		::ClipCursor(NULL);
+		::ClipCursor(nullptr );
 
 		CClientDC dc( this );
 		InvertLine(&dc,CPoint(point.x,m_nDivTop),CPoint(point.x,m_nDivBtm) );

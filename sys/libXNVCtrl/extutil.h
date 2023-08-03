@@ -171,7 +171,7 @@ extern XExtDisplayInfo *XextFindDisplay(
 #endif
 );
 
-#define XextHasExtension( i ) (( i ) && (( i )->codes) )
+#define XextHasExtension( i ) ( ( i ) && ( ( i )->codes) )
 #define XextCheckExtension(dpy,i,name,val) \
   if ( !XextHasExtension( i ) ) { XMissingExtension (dpy, name); return val; }
 #define XextSimpleCheckExtension(dpy,i,name) \
@@ -188,8 +188,8 @@ extern XExtDisplayInfo *XextFindDisplay(
 XExtDisplayInfo *proc (Display *dpy) \
 { \
     XExtDisplayInfo *dpyinfo; \
-    if ( !extinfo) { if ( !(extinfo = XextCreateExtension() )) return NULL; } \
-    if ( !(dpyinfo = XextFindDisplay (extinfo, dpy) )) \
+    if ( !extinfo) { if ( !(extinfo = XextCreateExtension() ) ) return nullptr; } \
+    if ( !(dpyinfo = XextFindDisplay (extinfo, dpy) ) ) \
       dpyinfo = XextAddDisplay (extinfo,dpy,extname,hooks,nev,data); \
     return dpyinfo; \
 }

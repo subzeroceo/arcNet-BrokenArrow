@@ -6,7 +6,7 @@
 ===============================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "CollisionModel_local.h"
@@ -21,10 +21,10 @@ Trace through the spatial subdivision
 
 /*
 ================
-arcCollisionModelManagerLocal::TraceTrmThroughNode
+anSoftBodiesPhysicsManager::TraceTrmThroughNode
 ================
 */
-void arcCollisionModelManagerLocal::TraceTrmThroughNode( cm_traceWork_t *tw, cm_node_t *node ) {
+void anSoftBodiesPhysicsManager::TraceTrmThroughNode( cm_traceWork_t *tw, cm_node_t *node ) {
 	// position test
 	if ( tw->positionTest ) {
 		// if already stuck in solid
@@ -33,7 +33,7 @@ void arcCollisionModelManagerLocal::TraceTrmThroughNode( cm_traceWork_t *tw, cm_
 		}
 		// test if any of the trm vertices is inside a brush
 		for ( cm_brushRef_t *bref = node->brushes; bref; bref = bref->next ) {
-			if ( arcCollisionModelManagerLocal::TestTrmVertsInBrush( tw, bref->b ) ) {
+			if ( anSoftBodiesPhysicsManager::TestTrmVertsInBrush( tw, bref->b ) ) {
 				return;
 			}
 		}
@@ -43,21 +43,21 @@ void arcCollisionModelManagerLocal::TraceTrmThroughNode( cm_traceWork_t *tw, cm_
 		}
 		// test if the trm is stuck in any polygons
 		for ( cm_polygonRef_t *pref = node->polygons; pref; pref = pref->next ) {
-			if ( arcCollisionModelManagerLocal::TestTrmInPolygon( tw, pref->p ) ) {
+			if ( anSoftBodiesPhysicsManager::TestTrmInPolygon( tw, pref->p ) ) {
 				return;
 			}
 		}
 	} else if ( tw->rotation ) {
 		// rotate through all polygons in this leaf
 		for ( cm_polygonRef_t *pref = node->polygons; pref; pref = pref->next ) {
-			if ( arcCollisionModelManagerLocal::RotateTrmThroughPolygon( tw, pref->p ) ) {
+			if ( anSoftBodiesPhysicsManager::RotateTrmThroughPolygon( tw, pref->p ) ) {
 				return;
 			}
 		}
 	} else {
 		// trace through all polygons in this leaf
 		for ( cm_polygonRef_t *pref = node->polygons; pref; pref = pref->next ) {
-			if ( arcCollisionModelManagerLocal::TranslateTrmThroughPolygon( tw, pref->p ) ) {
+			if ( anSoftBodiesPhysicsManager::TranslateTrmThroughPolygon( tw, pref->p ) ) {
 				return;
 			}
 		}
@@ -66,12 +66,12 @@ void arcCollisionModelManagerLocal::TraceTrmThroughNode( cm_traceWork_t *tw, cm_
 
 /*
 ================
-arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r
+anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r
 ================
 */
 //#define NO_SPATIAL_SUBDIVISION
 
-void arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( cm_traceWork_t *tw, cm_node_t *node, float p1f, float p2f, arcVec3 &p1, arcVec3 &p2) {
+void anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( cm_traceWork_t *tw, cm_node_t *node, float p1f, float p2f, anVec3 &p1, anVec3 &p2) {
 	float		midf;
 
 	if ( !node ) {
@@ -85,7 +85,7 @@ void arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( cm_traceWork_t *
 	// if we need to test this node for collisions
 	if ( node->polygons || (tw->positionTest && node->brushes) ) {
 		// trace through node with collision data
-		arcCollisionModelManagerLocal::TraceTrmThroughNode( tw, node );
+		anSoftBodiesPhysicsManager::TraceTrmThroughNode( tw, node );
 	}
 	// if already stuck in solid
 	if ( tw->positionTest && tw->trace.fraction == 0.0f && node->planeType == -1 ) {// if this is a leaf node
@@ -93,8 +93,8 @@ void arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( cm_traceWork_t *
 	}
 
 #ifdef NO_SPATIAL_SUBDIVISION
-	arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( tw, node->children[0], p1f, p2f, p1, p2 );
-	arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( tw, node->children[1], p1f, p2f, p1, p2 );
+	anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( tw, node->children[0], p1f, p2f, p1, p2 );
+	anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( tw, node->children[1], p1f, p2f, p1, p2 );
 	return;
 #endif
 	// distance from plane for trace start and end
@@ -104,12 +104,12 @@ void arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( cm_traceWork_t *
 	float offset = tw->extents[node->planeType];
 	// see which sides we need to consider
 	if ( t1 >= offset && t2 >= offset ) {
-		arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( tw, node->children[0], p1f, p2f, p1, p2 );
+		anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( tw, node->children[0], p1f, p2f, p1, p2 );
 		return;
 	}
 
 	if ( t1 < -offset && t2 < -offset ) {
-		arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( tw, node->children[1], p1f, p2f, p1, p2 );
+		anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( tw, node->children[1], p1f, p2f, p1, p2 );
 		return;
 	}
 
@@ -142,7 +142,7 @@ void arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( cm_traceWork_t *
 	mid[1] = p1[1] + frac*( p2[1] - p1[1] );
 	mid[2] = p1[2] + frac*( p2[2] - p1[2] );
 
-	arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( tw, node->children[side], p1f, midf, p1, mid );
+	anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( tw, node->children[side], p1f, midf, p1, mid );
 
 
 	// go past the node
@@ -158,18 +158,18 @@ void arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( cm_traceWork_t *
 	mid[1] = p1[1] + frac2*(p2[1] - p1[1]);
 	mid[2] = p1[2] + frac2*(p2[2] - p1[2]);
 
-	arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( tw, node->children[side^1], midf, p2f, mid, p2 );
+	anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( tw, node->children[side^1], midf, p2f, mid, p2 );
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::TraceThroughModel
+anSoftBodiesPhysicsManager::TraceThroughModel
 ================
 */
-void arcCollisionModelManagerLocal::TraceThroughModel( cm_traceWork_t *tw ) {
+void anSoftBodiesPhysicsManager::TraceThroughModel( cm_traceWork_t *tw ) {
 	if ( !tw->rotation ) {
 		// trace through spatial subdivision and then through leafs
-		arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( tw, tw->model->node, 0, 1, tw->start, tw->end );
+		anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( tw, tw->model->node, 0, 1, tw->start, tw->end );
 	} else {
 		// approximate the rotation with a series of straight line movements
 		// total length covered along circle
@@ -179,24 +179,24 @@ void arcCollisionModelManagerLocal::TraceThroughModel( cm_traceWork_t *tw ) {
 			// number of steps for the approximation
 			int numSteps = ( int )( CIRCLE_APPROXIMATION_LENGTH / d );
 			// start of approximation
-			arcVec3 start = tw->start;
+			anVec3 start = tw->start;
 			// trace circle approximation steps through the BSP tree
 			for ( int i = 0; i < numSteps; i++ ) {
 				// calculate next point on approximated circle
-				arcMat3 rot.Set( tw->origin, tw->axis, tw->angle * ( ( float ) ( i+1 ) / numSteps ) );
-				arcVec3 end = start * rot;
+				anMat3 rot.Set( tw->origin, tw->axis, tw->angle * ( ( float ) ( i+1 ) / numSteps ) );
+				anVec3 end = start * rot;
 				// trace through spatial subdivision and then through leafs
-				arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( tw, tw->model->node, 0, 1, start, end );
+				anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( tw, tw->model->node, 0, 1, start, end );
 				// no need to continue if something was hit already
 				if ( tw->trace.fraction < 1.0f ) {
 					return;
 				}
-				arcVec3 start = end;
+				anVec3 start = end;
 			}
 		} else {
-			 arcVec3 start = tw->start;
+			 anVec3 start = tw->start;
 		}
 		// last step of the approximation
-		arcCollisionModelManagerLocal::TraceThroughAxialBSPTree_r( tw, tw->model->node, 0, 1, start, tw->end );
+		anSoftBodiesPhysicsManager::TraceThroughAxialBSPTree_r( tw, tw->model->node, 0, 1, start, tw->end );
 	}
 }

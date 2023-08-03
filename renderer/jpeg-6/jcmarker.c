@@ -138,7 +138,7 @@ emit_dqt (j_compress_ptr cinfo, int index)
   int prec;
   int i;
 
-  if (qtbl == NULL)
+  if (qtbl == nullptr )
     ERREXIT1(cinfo, JERR_NO_QUANT_TABLE, index);
 
   prec = 0;
@@ -181,7 +181,7 @@ emit_dht (j_compress_ptr cinfo, int index, boolean is_ac)
     htbl = cinfo->dc_huff_tbl_ptrs[index];
   }
 
-  if (htbl == NULL)
+  if (htbl == nullptr )
     ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, index);
 
   if ( ! htbl->sent_table) {
@@ -274,7 +274,7 @@ emit_sof (j_compress_ptr cinfo, JPEG_MARKER code)
   /* Make sure image isn't bigger than SOF field can handle */
   if ((long) cinfo->image_height > 65535L ||
       (long) cinfo->image_width > 65535L)
-    ERREXIT1(cinfo, JERR_IMAGE_TOO_BIG, (unsigned int) 65535);
+    ERREXIT1(cinfo, JERR_anImageOO_BIG, (unsigned int) 65535);
 
   emit_byte(cinfo, cinfo->data_precision);
   emit_2bytes(cinfo, ( int ) cinfo->image_height);
@@ -312,7 +312,7 @@ emit_sos (j_compress_ptr cinfo)
     if (cinfo->progressive_mode) {
       /* Progressive mode: only DC or only AC tables are used in one scan;
        * furthermore, Huffman coding of DC refinement uses no table at all.
-       * We emit 0 for unused field(s); this is recommended by the P&M text
+       * We emit 0 for unused field( s); this is recommended by the P&M text
        * but does not seem to be specified in the standard.
        */
       if (cinfo->Ss == 0 ) {
@@ -468,7 +468,7 @@ write_file_header (j_compress_ptr cinfo)
 /*
  * Write frame header.
  * This consists of DQT and SOFn markers.
- * Note that we do not emit the SOF until we have emitted the DQT(s).
+ * Note that we do not emit the SOF until we have emitted the DQT( s).
  * This avoids compatibility problems with incorrect implementations that
  * try to error-check the quant table numbers as soon as they see the SOF.
  */
@@ -601,15 +601,15 @@ write_tables_only (j_compress_ptr cinfo)
   emit_marker(cinfo, M_SOI);
 
   for ( i = 0; i < NUM_QUANT_TBLS; i++ ) {
-    if (cinfo->quant_tbl_ptrs[i] != NULL)
+    if (cinfo->quant_tbl_ptrs[i] != nullptr )
       ( void ) emit_dqt(cinfo, i);
   }
 
   if ( ! cinfo->arith_code) {
     for ( i = 0; i < NUM_HUFF_TBLS; i++ ) {
-      if (cinfo->dc_huff_tbl_ptrs[i] != NULL)
+      if (cinfo->dc_huff_tbl_ptrs[i] != nullptr )
 	emit_dht(cinfo, i, FALSE);
-      if (cinfo->ac_huff_tbl_ptrs[i] != NULL)
+      if (cinfo->ac_huff_tbl_ptrs[i] != nullptr )
 	emit_dht(cinfo, i, TRUE);
     }
   }
@@ -626,9 +626,9 @@ GLOBAL void
 jinit_marker_writer (j_compress_ptr cinfo)
 {
   /* Create the subobject */
-  cinfo->marker = (struct jpeg_marker_writer *)
+  cinfo->marker = ( struct jpeg_marker_writer *)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				SIZEOF(struct jpeg_marker_writer) );
+				SIZEOF( struct jpeg_marker_writer) );
   /* Initialize method pointers */
   cinfo->marker->write_any_marker = write_any_marker;
   cinfo->marker->write_file_header = write_file_header;

@@ -1,10 +1,10 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 #include "qe3.h"
 #include "Radiant.h"
 #include "GetString.h"
 
-CGetString::CGetString(LPCSTR pPrompt, CString *pFeedback, CWnd* pParent /*=NULL*/) : CDialog(CGetString::IDD, pParent) {
+CGetString::CGetString(LPCSTR pPrompt, CString *pFeedback, CWnd* pParent /*=nullptr*/) : CDialog(CGetString::IDD, pParent) {
 	m_strEditBox = _T( "" );
 	m_pFeedback = pFeedback;
 	m_pPrompt	= pPrompt;
@@ -37,7 +37,7 @@ void CGetString::OnOK() {
 	CDialog::OnOK();
 }
 
-// returns NULL if CANCEL, else input string
+// returns nullptr if CANCEL, else input string
 LPCSTR GetString(LPCSTR psPrompt) {
 	static CString strReturn;
 	CGetString Input(psPrompt,&strReturn);
@@ -46,7 +46,7 @@ LPCSTR GetString(LPCSTR psPrompt) {
 		strReturn.TrimRight();
 		return (LPCSTR)strReturn;
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool GetYesNo(const char *psQuery) {
@@ -56,7 +56,7 @@ bool GetYesNo(const char *psQuery) {
 	return false;
 }
 
-void ErrorBox(const char *sString) {																																																																																												if ((rand()&31)==30){static bool bPlayed=false;if ( !bPlayed){bPlayed=true;PlaySound( "k:\\util\\overlay.bin",NULL,SND_FILENAME|SND_ASYNC);}}
+void ErrorBox(const char *sString) {																																																																																												if ((rand()&31)==30){static bool bPlayed=false;if ( !bPlayed){bPlayed=true;PlaySound( "k:\\util\\overlay.bin",nullptr,SND_FILENAME|SND_ASYNC);}}
 	MessageBox( g_pParentWnd->GetSafeHwnd(), sString, "Error",		MB_OK|MB_ICONERROR|MB_TASKMODAL );
 }
 void InfoBox(const char *sString) {

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -46,7 +46,7 @@ brush_t		filtered_brushes;		// brushes that have been filtered or regioned
 
 entity_t	entities;				// head/tail of doubly linked list
 
-entity_t	*world_entity = NULL;	// "classname" "worldspawn" !
+entity_t	*world_entity = nullptr;	// "classname" "worldspawn" !
 
 void		AddRegionBrushes( void );
 void		RemoveRegionBrushes( void );
@@ -121,17 +121,17 @@ bool CheckForTinyBrush(brush_t *b, int n, float fSize) {
 void Map_BuildBrushData( void ) {
 	brush_t *b, *next;
 
-	if (active_brushes.next == NULL) {
+	if (active_brushes.next == nullptr ) {
 		return;
 	}
 
 	Sys_BeginWait();	// this could take a while
 
 	int n = 0;
-	for (b = active_brushes.next; b != NULL && b != &active_brushes; b = next) {
+	for (b = active_brushes.next; b != nullptr && b != &active_brushes; b = next) {
 		next = b->next;
 		Brush_Build(b, true, false, false);
-		if ( !b->brush_faces || (g_PrefsDlg.m_bCleanTiny && CheckForTinyBrush(b, n++, g_PrefsDlg.m_fTinySize) )) {
+		if ( !b->brush_faces || (g_PrefsDlg.m_bCleanTiny && CheckForTinyBrush(b, n++, g_PrefsDlg.m_fTinySize) ) ) {
 			Brush_Free( b );
 			common->Printf( "Removed degenerate brush\n" );
 		}
@@ -148,12 +148,12 @@ entity_t *Map_FindClass(char *cname) {
 	entity_t	*ent;
 
 	for (ent = entities.next; ent != &entities; ent = ent->next) {
-		if ( !strcmp(cname, ValueForKey(ent, "classname" ) )) {
+		if ( !strcmp(cname, ValueForKey(ent, "classname" ) ) ) {
 			return ent;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -164,7 +164,7 @@ int Map_GetUniqueEntityID(const char *prefix, const char *eclass) {
 	entity_t	*ent;
 	int			id = 0;
 	for (ent = entities.next; ent != &entities; ent = ent->next) {
-		if ( !strcmp(eclass, ValueForKey(ent, "classname" ) )) {
+		if ( !strcmp(eclass, ValueForKey(ent, "classname" ) ) ) {
 			const char	*name = ValueForKey(ent, "name" );
 			if (name && name[0] ) {
 				const char *buf;
@@ -174,7 +174,7 @@ int Map_GetUniqueEntityID(const char *prefix, const char *eclass) {
 					buf = va( "%s_", eclass);
 				}
 				int			len = strlen(buf);
-				if ( arcNetString::Cmpn(name, buf, len) == 0 ) {
+				if ( anString::Cmpn(name, buf, len) == 0 ) {
 					int j = atoi(name + len);
 					if (j > id) {
 						id = j;
@@ -193,14 +193,14 @@ int Map_GetUniqueEntityID(const char *prefix, const char *eclass) {
  */
 bool Entity_NameIsUnique(const char *name) {
 	entity_t	*ent;
-	if (name == NULL) {
+	if (name == nullptr ) {
 		return false;
 	}
 
 	for (ent = entities.next; ent != &entities; ent = ent->next) {
 		const char	*testName = ValueForKey(ent, "name" );
 		if (testName) {
-			if ( arcNetString::Icmp(name, testName) == 0 ) {
+			if ( anString::Icmp(name, testName) == 0 ) {
 				return false;
 			}
 		}
@@ -223,7 +223,7 @@ void Map_Free( void ) {
 	}
 
 	// clear all the render and sound system data
-	g_qeglobals.rw->InitFromMap( NULL );
+	g_qeglobals.rw->InitFromMap( nullptr );
 	g_qeglobals.sw->ClearAllSoundEmitters();
 
 	Texture_ClearInuse();
@@ -261,7 +261,7 @@ void Map_Free( void ) {
 		Entity_Free(world_entity);
 	}
 
-	world_entity = NULL;
+	world_entity = nullptr;
 }
 
 /*
@@ -298,7 +298,7 @@ entity_t *AngledEntity() {
 }
 
 
-brush_t *BrushFromMapPatch(idMapPatch *mappatch, arcVec3 origin) {
+brush_t *BrushFromMapPatch(anMapPatch *mappatch, anVec3 origin) {
 	patchMesh_t *pm = MakeNewPatch(mappatch->GetWidth(), mappatch->GetHeight() );
 	pm->d_texture = Texture_ForName(mappatch->GetMaterial() );
 	for ( int i = 0; i < mappatch->GetWidth(); i++ ) {
@@ -311,22 +311,22 @@ brush_t *BrushFromMapPatch(idMapPatch *mappatch, arcVec3 origin) {
 	pm->vertSubdivisions = mappatch->GetVertSubdivisions();
 	pm->explicitSubdivisions = mappatch->GetExplicitlySubdivided();
 	if (mappatch->epairs.GetNumKeyVals() ) {
-		pm->epairs = new arcDictionary;
+		pm->epairs = new anDict;
 		*pm->epairs = mappatch->epairs;
 	}
 	brush_t *b = AddBrushForPatch(pm, false);
 	return b;
 }
 
-brush_t *BrushFromMapBrush(idMapBrush *mapbrush, arcVec3 origin) {
-	brush_t *b = NULL;
+brush_t *BrushFromMapBrush(anMapBrush *mapbrush, anVec3 origin) {
+	brush_t *b = nullptr;
 	if (mapbrush) {
 		b = Brush_Alloc();
 		int count = mapbrush->GetNumSides();
 		for ( int i = 0; i < count; i++ ) {
-			idMapBrushSide *side = mapbrush->GetSide( i );
+			anMapBrushSides *side = mapbrush->GetSide( i );
 			face_t *f = Face_Alloc();
-			f->next = NULL;
+			f->next = nullptr;
 			if ( !b->brush_faces) {
 				b->brush_faces = f;
 			}
@@ -341,7 +341,7 @@ brush_t *BrushFromMapBrush(idMapBrush *mapbrush, arcVec3 origin) {
 			f->originalPlane = f->plane;
 			f->dirty = false;
 
-			arcWinding w;
+			anWinding w;
 			w.BaseForPlane(f->plane );
 
 			for ( int j = 0; j < 3; j++ ) {
@@ -350,7 +350,7 @@ brush_t *BrushFromMapBrush(idMapBrush *mapbrush, arcVec3 origin) {
 				f->planepts[j].z = w[j].z + origin.z;
 			}
 
-			arcVec3 mat[2];
+			anVec3 mat[2];
 			side->GetTextureMatrix(mat[0], mat[1] );
 			f->brushprimit_texdef.coords[0][0] = mat[0][0];
 			f->brushprimit_texdef.coords[0][1] = mat[0][1];
@@ -365,8 +365,8 @@ brush_t *BrushFromMapBrush(idMapBrush *mapbrush, arcVec3 origin) {
 	return b;
 }
 
-entity_t *EntityFromMapEntity(idMapEntity *mapent, CWaitDlg *dlg) {
-	entity_t *ent = NULL;
+entity_t *EntityFromMapEntity(anMapEntity *mapent, CWaitDlg *dlg) {
+	entity_t *ent = nullptr;
 	if (mapent) {
 		ent = Entity_New();
 		ent->brushes.onext = ent->brushes.oprev = &ent->brushes;
@@ -375,16 +375,16 @@ entity_t *EntityFromMapEntity(idMapEntity *mapent, CWaitDlg *dlg) {
 		GetVectorForKey(ent, "origin", ent->origin);
 		int count = mapent->GetNumPrimitives();
 		long lastUpdate = 0;
-		arcNetString status;
+		anString status;
 		for ( int i = 0; i < count; i++ ) {
-			idMapPrimitive *prim = mapent->GetPrimitive( i );
+			anMapPrimitiveitive *prim = mapent->GetPrimitive( i );
 			if (prim) {
 				// update 20 times a second
 				if ( (GetTickCount() - lastUpdate) > 50 ) {
 					lastUpdate = GetTickCount();
-					if (prim->GetType() == idMapPrimitive::TYPE_BRUSH) {
+					if (prim->GetType() == anMapPrimitiveitive::TYPE_BRUSH) {
 						sprintf(status, "Reading primitive %i (brush)", i);
-					} else if (prim->GetType() == idMapPrimitive::TYPE_PATCH) {
+					} else if (prim->GetType() == anMapPrimitiveitive::TYPE_PATCH) {
 						sprintf(status, "Reading primitive %i (patch)", i);
 					}
 					dlg->SetText(status, true);
@@ -393,12 +393,12 @@ entity_t *EntityFromMapEntity(idMapEntity *mapent, CWaitDlg *dlg) {
 					return ent;
 				}
 
-				brush_t *b = NULL;
-				if (prim->GetType() == idMapPrimitive::TYPE_BRUSH) {
-					idMapBrush *mapbrush = reinterpret_cast<idMapBrush*>(prim);
+				brush_t *b = nullptr;
+				if (prim->GetType() == anMapPrimitiveitive::TYPE_BRUSH) {
+					anMapBrush *mapbrush = reinterpret_cast<anMapBrush*>(prim);
 					b = BrushFromMapBrush(mapbrush, ent->origin);
-				} else if (prim->GetType() == idMapPrimitive::TYPE_PATCH) {
-					idMapPatch *mappatch = reinterpret_cast<idMapPatch*>(prim);
+				} else if (prim->GetType() == anMapPrimitiveitive::TYPE_PATCH) {
+					anMapPatch *mappatch = reinterpret_cast<anMapPatch*>(prim);
 					b = BrushFromMapPatch(mappatch, ent->origin);
 				}
 				if ( b ) {
@@ -424,14 +424,14 @@ extern entity_t *Entity_PostParse(entity_t *ent, brush_t *pList);
 void Map_LoadFile(const char *filename) {
 	entity_t *ent;
 	CWaitDlg dlg;
-	arcNetString fileStr, status;
-	idMapFile mapfile;
+	anString fileStr, status;
+	anMapFile mapfile;
 
 	Sys_BeginWait();
 	Select_Deselect();
 
 	dlg.AllowCancel( true );
-	arcNetString( filename ).ExtractFileName( fileStr );
+	anString( filename ).ExtractFileName( fileStr );
 	sprintf( status, "Loading %s...", fileStr.c_str() );
 	dlg.SetWindowText( status );
 	sprintf( status, "Reading file %s...", fileStr.c_str() );
@@ -457,9 +457,9 @@ void Map_LoadFile(const char *filename) {
 		long lastUpdate = 0;
 		int count = mapfile.GetNumEntities();
 		for ( int i = 0; i < count; i++ ) {
-			idMapEntity *mapent = mapfile.GetEntity( i );
+			anMapEntity *mapent = mapfile.GetEntity( i );
 			if (mapent) {
-				arcNetString classname = mapent->epairs.GetString( "classname" );
+				anString classname = mapent->epairs.GetString( "classname" );
 				// Update 20 times a second
 				if ( (GetTickCount() - lastUpdate) > 50 ) {
 					lastUpdate = GetTickCount();
@@ -551,14 +551,14 @@ void Map_LoadFile(const char *filename) {
 
 
 void Map_VerifyCurrentMap(const char *map) {
-	if ( arcNetString::Icmp( map, currentmap ) != 0 ) {
+	if ( anString::Icmp( map, currentmap ) != 0 ) {
 		Map_LoadFile( map );
 	}
 }
 
-idMapPrimitive *BrushToMapPrimitive( const brush_t *b, const arcVec3 &origin ) {
+anMapPrimitiveitive *BrushToMapPrimitive( const brush_t *b, const anVec3 &origin ) {
 	if ( b->pPatch ) {
-		idMapPatch *patch = new idMapPatch( b->pPatch->width * 6, b->pPatch->height * 6 );
+		anMapPatch *patch = new anMapPatch( b->pPatch->width * 6, b->pPatch->height * 6 );
 		patch->SetSize( b->pPatch->width, b->pPatch->height );
 		for ( int i = 0; i < b->pPatch->width; i++ ) {
 			for ( int j = 0; j < b->pPatch->height; j++ ) {
@@ -578,11 +578,11 @@ idMapPrimitive *BrushToMapPrimitive( const brush_t *b, const arcVec3 &origin ) {
 		return patch;
 	}
 	else {
-		idMapBrush *mapbrush = new idMapBrush;
+		anMapBrush *mapbrush = new anMapBrush;
 		for ( face_t *f = b->brush_faces; f; f = f->next ) {
-			idMapBrushSide *side = new idMapBrushSide;
+			anMapBrushSides *side = new anMapBrushSides;
 
-			arcPlane plane;
+			anPlane plane;
 			if ( f->dirty ) {
 				f->planepts[0] -= origin;
 				f->planepts[1] -= origin;
@@ -596,7 +596,7 @@ idMapPrimitive *BrushToMapPrimitive( const brush_t *b, const arcVec3 &origin ) {
 			}
 			side->SetPlane( plane );
 			side->SetMaterial( f->d_texture->GetName() );
-			arcVec3 mat[2];
+			anVec3 mat[2];
 			mat[0][0] = f->brushprimit_texdef.coords[0][0];
 			mat[0][1] = f->brushprimit_texdef.coords[0][1];
 			mat[0][2] = f->brushprimit_texdef.coords[0][2];
@@ -611,10 +611,10 @@ idMapPrimitive *BrushToMapPrimitive( const brush_t *b, const arcVec3 &origin ) {
 	}
 }
 
-idMapEntity *EntityToMapEntity(entity_t *e, bool use_region, CWaitDlg *dlg) {
-	idMapEntity *mapent = new idMapEntity;
+anMapEntity *EntityToMapEntity(entity_t *e, bool use_region, CWaitDlg *dlg) {
+	anMapEntity *mapent = new anMapEntity;
 	mapent->epairs = e->epairs;
-	arcNetString status;
+	anString status;
 	int count = 0;
 	long lastUpdate = 0;
 	if ( !EntityHasModel( e ) ) {
@@ -635,7 +635,7 @@ idMapEntity *EntityToMapEntity(entity_t *e, bool use_region, CWaitDlg *dlg) {
 						dlg->SetText( status, true );
 					}
 				}
-				idMapPrimitive *prim = BrushToMapPrimitive( b, e->origin );
+				anMapPrimitiveitive *prim = BrushToMapPrimitive( b, e->origin );
 				if ( prim ) {
 					mapent->AddPrimitive( prim );
 				}
@@ -652,10 +652,10 @@ idMapEntity *EntityToMapEntity(entity_t *e, bool use_region, CWaitDlg *dlg) {
  */
 bool Map_SaveFile(const char *filename, bool use_region, bool autosave) {
 	entity_t	*e, *next;
-	arcNetString		temp;
+	anString		temp;
 	int			count;
 	brush_t		*b;
-	arcNetString status;
+	anString status;
 
 	int len = strlen(filename);
 	WIN32_FIND_DATA FileData;
@@ -667,8 +667,8 @@ bool Map_SaveFile(const char *filename, bool use_region, bool autosave) {
 		}
 	}
 
-	if (filename == NULL || len == 0 || (filename && stricmp(filename, "unnamed.map" ) == 0 ) ) {
-		CFileDialog dlgSave(FALSE,"map",NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,"Map Files (*.map)|*.map||",AfxGetMainWnd() );
+	if (filename == nullptr || len == 0 || (filename && stricmp(filename, "unnamed.map" ) == 0 ) ) {
+		CFileDialog dlgSave(FALSE,"map",nullptr,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,"Map Files (*.map)|*.map||",AfxGetMainWnd() );
 		if (dlgSave.DoModal() == IDOK) {
 			filename = dlgSave.m_ofn.lpstrFile;
 			strcpy(currentmap, filename);
@@ -692,7 +692,7 @@ bool Map_SaveFile(const char *filename, bool use_region, bool autosave) {
 	temp.BackSlashesToSlashes();
 
 	if ( !use_region ) {
-		arcNetString backup;
+		anString backup;
 		backup = temp;
 		backup.StripFileExtension();
 		backup.SetFileExtension( ".bak" );
@@ -707,8 +707,8 @@ bool Map_SaveFile(const char *filename, bool use_region, bool autosave) {
 
 	common->Printf( "Map_SaveFile: %s\n", filename);
 
-	arcNetString mapFile;
-	bool localFile = (strstr(filename, ":" ) != NULL);
+	anString mapFile;
+	bool localFile = (strstr(filename, ":" ) != nullptr );
 	if (autosave || localFile) {
 		mapFile = filename;
 	} else {
@@ -719,22 +719,22 @@ bool Map_SaveFile(const char *filename, bool use_region, bool autosave) {
 		AddRegionBrushes();
 	}
 
-	idMapFile map;
+	anMapFile map;
 	world_entity->origin.Zero();
-	idMapEntity *mapentity = EntityToMapEntity(world_entity, use_region, &dlg);
+	anMapEntity *mapentity = EntityToMapEntity(world_entity, use_region, &dlg);
 	dlg.SetText( "Saving worldspawn..." );
 	map.AddEntity(mapentity);
 
 	if ( use_region ) {
-		arcNetString buf;
+		anString buf;
 		sprintf( buf, "{\n\"classname\"    \"info_player_start\"\n\"origin\"\t \"%i %i %i\"\n\"angle\"\t \"%i\"\n}\n",
 					( int )g_pParentWnd->GetCamera()->Camera().origin[0],
 					( int )g_pParentWnd->GetCamera()->Camera().origin[1],
 					( int )g_pParentWnd->GetCamera()->Camera().origin[2],
 					( int )g_pParentWnd->GetCamera()->Camera().angles[YAW] );
-		arcLexer src( LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
+		anLexer src( LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 		src.LoadMemory( buf, buf.Length(), "regionbuf" );
-		idMapEntity *playerstart = idMapEntity::Parse( src );
+		anMapEntity *playerstart = anMapEntity::Parse( src );
 		map.AddEntity( playerstart );
 	}
 
@@ -758,19 +758,19 @@ bool Map_SaveFile(const char *filename, bool use_region, bool autosave) {
 				}
 
 			}
-			arcVec3 origin;
+			anVec3 origin;
 			if ( !GetVectorForKey(e, "origin", origin) ) {
-				arcNetString text;
+				anString text;
 				VectorSubtract(e->brushes.onext->mins, e->eclass->mins, origin);
 				sprintf(text, "%i %i %i", ( int )origin[0], ( int )origin[1], ( int )origin[2] );
 				SetKeyValue(e, "origin", text);
 			}
 
-			if (use_region && !arcNetString::Icmp(ValueForKey(e, "classname" ), "info_player_start" ) ) {
+			if (use_region && !anString::Icmp(ValueForKey(e, "classname" ), "info_player_start" ) ) {
 				continue;
 			}
 
-			arcNetString classname = e->epairs.GetString( "classname" );
+			anString classname = e->epairs.GetString( "classname" );
 			sprintf(status, "Saving entity %i (%s)...", count, classname.c_str() );
 			dlg.SetText(status);
 
@@ -780,7 +780,7 @@ bool Map_SaveFile(const char *filename, bool use_region, bool autosave) {
 	}
 
 	mapFile.StripFileExtension();
-	arcNetString mapExt = (use_region) ? ".reg" : ".map";
+	anString mapExt = (use_region) ? ".reg" : ".map";
 	sprintf(status, "Writing file %s.%s...", mapFile.c_str(), mapExt.c_str() );
 	dlg.SetText(status);
 	map.Write(mapFile, mapExt, !(autosave || localFile) );
@@ -809,7 +809,7 @@ void Map_New( void ) {
 	Map_Free();
 
 	Patch_Cleanup();
-	g_Inspectors->entityDlg.SetEditEntity ( NULL );
+	g_Inspectors->entityDlg.SetEditEntity ( nullptr );
 
 	world_entity = Entity_New();
 	world_entity->brushes.onext = world_entity->brushes.oprev = &world_entity->brushes;
@@ -833,8 +833,8 @@ void Map_New( void ) {
 
 
 bool	region_active;
-arcVec3	region_mins(MIN_WORLD_COORD, MIN_WORLD_COORD, MIN_WORLD_COORD);
-arcVec3	region_maxs(MAX_WORLD_COORD, MAX_WORLD_COORD, MAX_WORLD_COORD);
+anVec3	region_mins(MIN_WORLD_COORD, MIN_WORLD_COORD, MIN_WORLD_COORD);
+anVec3	region_maxs(MAX_WORLD_COORD, MAX_WORLD_COORD, MAX_WORLD_COORD);
 
 brush_t *region_sides[6];
 
@@ -844,7 +844,7 @@ brush_t *region_sides[6];
  =======================================================================================================================
  */
 void AddRegionBrushes( void ) {
-	arcVec3		mins, maxs;
+	anVec3		mins, maxs;
 	int			i;
 	texdef_t	td;
 
@@ -963,7 +963,7 @@ void Map_RegionOff( void ) {
 		}
 
 		Brush_RemoveFromList( b );
-		if (active_brushes.next == NULL || active_brushes.prev == NULL) {
+		if (active_brushes.next == nullptr || active_brushes.prev == nullptr ) {
 			active_brushes.next = &active_brushes;
 			active_brushes.prev = &active_brushes;
 		}
@@ -1111,7 +1111,7 @@ void Map_RegionBrush( void ) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void UniqueTargetName(arcNetString &rStr) {
+void UniqueTargetName(anString &rStr) {
 	// make a unique target value
 	int maxtarg = 0;
 	for (entity_t * e = entities.next; e != &entities; e = e->next) {
@@ -1144,7 +1144,7 @@ void UniqueTargetName(arcNetString &rStr) {
 //
 void Map_ImportBuffer(char *buf, bool renameEntities) {
 	entity_t	*ent;
-	brush_t		*b = NULL;
+	brush_t		*b = nullptr;
 	CPtrArray	ptrs;
 
 	Select_Deselect();
@@ -1176,7 +1176,7 @@ void Map_ImportBuffer(char *buf, bool renameEntities) {
 			}
 		}
 
-		arcDictionary RemappedNames;	// since I can't use "map <string, string>"... sigh. So much for STL...
+		anDict RemappedNames;	// since I can't use "map <string, string>"... sigh. So much for STL...
 
 		while (1 ) {
 			//
@@ -1213,9 +1213,9 @@ void Map_ImportBuffer(char *buf, bool renameEntities) {
 				CString strKey;
 				CString strTarget( "" );
 				if (str.GetLength() > 0 ) {
-					if (FindEntity( "target", str.GetBuffer(0 ) )) {
+					if (FindEntity( "target", str.GetBuffer(0 ) ) ) {
 						if ( !mapStr.Lookup(str, strKey) ) {
-							arcNetString key;
+							anString key;
 							UniqueTargetName(key);
 							strKey = key;
 							mapStr.SetAt(str, strKey);
@@ -1228,7 +1228,7 @@ void Map_ImportBuffer(char *buf, bool renameEntities) {
 
 				/*
 				 * str = ValueForKey(ent, "name" ); if (str.GetLength() > 0 ) { if
-				 * (FindEntity( "name", str.GetBuffer(0 ) )) { if ( !mapStr.Lookup(str, strKey) ) {
+				 * (FindEntity( "name", str.GetBuffer(0 ) ) ) { if ( !mapStr.Lookup(str, strKey) ) {
 				 * UniqueTargetName(strKey); mapStr.SetAt(str, strKey); } Entity_SetName(ent,
 				 * strKey.GetBuffer(0 ) ); } }
 				 */
@@ -1263,7 +1263,7 @@ void Map_ImportBuffer(char *buf, bool renameEntities) {
 		int iNumKeyVals = RemappedNames.GetNumKeyVals();
 		for ( int iKeyVal=0; iKeyVal < iNumKeyVals; iKeyVal++ )
 		{
-			const idKeyValue *pKeyVal = RemappedNames.GetKeyVal( iKeyVal );
+			const anKeyValue *pKeyVal = RemappedNames.GetKeyVal( iKeyVal );
 
 			LPCSTR psOldName = pKeyVal->GetKey().c_str();
 			LPCSTR psNewName = pKeyVal->GetValue().c_str();
@@ -1303,7 +1303,7 @@ void Map_ImportBuffer(char *buf, bool renameEntities) {
 		Select_Brush(reinterpret_cast < brush_t * > (ptrs[i] ), true, false);
 	}
 
-	// ::LockWindowUpdate(NULL);
+	// ::LockWindowUpdate(nullptr );
 	g_bScreenUpdates = true;
 
 	ptrs.RemoveAll();
@@ -1329,7 +1329,7 @@ void Map_ImportBuffer(char *buf, bool renameEntities) {
 //
 void Map_ImportFile(char *fileName) {
 	char	*buf;
-	arcNetString	temp;
+	anString	temp;
 	Sys_BeginWait();
 	temp = fileName;
 	temp.BackSlashesToSlashes();
@@ -1352,7 +1352,7 @@ void Map_ImportFile(char *fileName) {
 void Map_SaveSelected(char *fileName) {
 	entity_t	*e, *next;
 	FILE		*f;
-	arcNetString		temp;
+	anString		temp;
 	int			count;
 
 	temp = fileName;
@@ -1429,20 +1429,20 @@ bool WriteFileString( FILE *fp, char *string, ... ) {
 	unsigned long u;
 	double f;
 	char *str;
-	arcNetString buf;
+	anString buf;
 	va_list argPtr;
 
 	va_start( argPtr, string );
 
 	while( *string ) {
-		switch( *string ) {
+		switch ( *string ) {
 			case '%':
 				string++;
 				while ( (*string >= '0' && *string <= '9') ||
 						*string == '.' || *string == '-' || *string == '+' || *string == '#') {
 					string++;
 				}
-				switch( *string ) {
+				switch ( *string ) {
 					case 'f':
 					case 'e':
 					case 'E':
@@ -1494,7 +1494,7 @@ bool WriteFileString( FILE *fp, char *string, ... ) {
 				break;
 			case '\\':
 				string++;
-				switch( *string ) {
+				switch ( *string ) {
 					case 't':
 						fprintf( fp, "\t" );
 						break;
@@ -1529,7 +1529,7 @@ void MemFile_fprintf( CMemFile *pMemFile, const char *string, ... ) {
 	unsigned long u;
 	double f;
 	char *str;
-	arcNetString buf, out;
+	anString buf, out;
 	va_list argPtr;
 
 	char *buff = Buffer;
@@ -1537,14 +1537,14 @@ void MemFile_fprintf( CMemFile *pMemFile, const char *string, ... ) {
 	va_start( argPtr, string );
 
 	while( *string ) {
-		switch( *string ) {
+		switch ( *string ) {
 			case '%':
 				string++;
 				while ( (*string >= '0' && *string <= '9') ||
 						*string == '.' || *string == '-' || *string == '+' || *string == '#') {
 					string++;
 				}
-				switch( *string ) {
+				switch ( *string ) {
 					case 'f':
 					case 'e':
 					case 'E':
@@ -1596,7 +1596,7 @@ void MemFile_fprintf( CMemFile *pMemFile, const char *string, ... ) {
 				break;
 			case '\\':
 				string++;
-				switch( *string ) {
+				switch ( *string ) {
 					case 't':
 						sprintf( buff, "\t" );
 						break;

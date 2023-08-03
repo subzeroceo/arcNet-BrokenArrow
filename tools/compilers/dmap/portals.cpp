@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "dmap.h"
@@ -148,10 +148,10 @@ void RemovePortalFromNode (uPortal_t  *portal, node_t *l)
 
 	if ( portal->nodes[0] == l ) {
 		*pp = portal->next[0];
-		portal->nodes[0] = NULL;
+		portal->nodes[0] = nullptr;
 	} else if ( portal->nodes[1] == l ) {
 		*pp = portal->next[1];
-		portal->nodes[1] = NULL;
+		portal->nodes[1] = nullptr;
 	} else {
 		common->Error( "RemovePortalFromNode: mislinked" );
 	}
@@ -162,7 +162,7 @@ void RemovePortalFromNode (uPortal_t  *portal, node_t *l)
 void PrintPortal (uPortal_t *p)
 {
 	int			i;
-	arcWinding	*w;
+	anWinding	*w;
 
 	w = p->winding;
 	for ( i = 0; i < w->GetNumPoints(); i++ )
@@ -178,17 +178,17 @@ The created portals will face the global outside_node
 */
 #define	SIDESPACE	8
 static void MakeHeadnodePortals( tree_t *tree ) {
-	arcBounds	bounds;
+	anBounds	bounds;
 	int			i, j, n;
 	uPortal_t	*p, *portals[6];
-	arcPlane		bplanes[6], *pl;
+	anPlane		bplanes[6], *pl;
 	node_t *node;
 
 	node = tree->headnode;
 
 	tree->outside_node.planenum = PLANENUM_LEAF;
-	tree->outside_node.brushlist = NULL;
-	tree->outside_node.portals = NULL;
+	tree->outside_node.brushlist = nullptr;
+	tree->outside_node.portals = nullptr;
 	tree->outside_node.opaque = false;
 
 	// if no nodes, don't go any farther
@@ -206,7 +206,7 @@ static void MakeHeadnodePortals( tree_t *tree ) {
 	}
 
 	for ( i = 0; i<3; i++ ) {
-		for (j = 0; j<2; j++ ) {
+		for ( j = 0; j<2; j++ ) {
 			n = j*3 + i;
 
 			p = AllocPortal ();
@@ -222,15 +222,15 @@ static void MakeHeadnodePortals( tree_t *tree ) {
 				(*pl)[3] = -bounds[j][i];
 			}
 			p->plane = *pl;
-			p->winding = new arcWinding( *pl );
+			p->winding = new anWinding( *pl );
 			AddPortalToNodes (p, node, &tree->outside_node);
 		}
 	}
 
 	// clip the basewindings by all the other planes
 	for ( i = 0; i<6; i++ ) {
-		for (j = 0; j<6; j++ ) {
-			if (j == i) {
+		for ( j = 0; j<6; j++ ) {
+			if ( j == i) {
 				continue;
 			}
 			portals[i]->winding = portals[i]->winding->Clip( bplanes[j], ON_EPSILON );
@@ -249,22 +249,22 @@ BaseWindingForNode
 #define	BASE_WINDING_EPSILON	0.001f
 #define	SPLIT_WINDING_EPSILON	0.001f
 
-arcWinding *BaseWindingForNode (node_t *node) {
-	arcWinding	*w;
+anWinding *BaseWindingForNode (node_t *node) {
+	anWinding	*w;
 	node_t		*n;
 
-	w = new arcWinding( dmapGlobals.mapPlanes[node->planenum] );
+	w = new anWinding( dmapGlobals.mapPlanes[node->planenum] );
 
 	// clip by all the parents
 	for ( n = node->parent; n && w; ) {
-		arcPlane &plane = dmapGlobals.mapPlanes[n->planenum];
+		anPlane &plane = dmapGlobals.mapPlanes[n->planenum];
 
 		if ( n->children[0] == node ) {
 			// take front
 			w = w->Clip( plane, BASE_WINDING_EPSILON );
 		} else {
 			// take back
-			arcPlane	back = -plane;
+			anPlane	back = -plane;
 			w = w->Clip( back, BASE_WINDING_EPSILON );
 		}
 		node = n;
@@ -286,8 +286,8 @@ and clipping it by all of parents of this node
 */
 static void MakeNodePortal( node_t *node ) {
 	uPortal_t	*new_portal, *p;
-	arcWinding	*w;
-	arcVec3		normal;
+	anWinding	*w;
+	anVec3		normal;
 	int			side;
 
 	w = BaseWindingForNode (node);
@@ -295,7 +295,7 @@ static void MakeNodePortal( node_t *node ) {
 	// clip the portal by all the other portals in the node
 	for (p = node->portals; p && w; p = p->next[side] )
 	{
-		arcPlane	plane;
+		anPlane	plane;
 
 		if (p->nodes[0] == node)
 		{
@@ -348,8 +348,8 @@ static void SplitNodePortals( node_t *node ) {
 	uPortal_t	*p, *next_portal, *new_portal;
 	node_t		*f, *b, *other_node;
 	int			side;
-	arcPlane		*plane;
-	arcWinding	*frontwinding, *backwinding;
+	anPlane		*plane;
+	anWinding	*frontwinding, *backwinding;
 
 	plane = &dmapGlobals.mapPlanes[node->planenum];
 	f = node->children[0];
@@ -378,14 +378,14 @@ static void SplitNodePortals( node_t *node ) {
 		if ( frontwinding && frontwinding->IsTiny() )
 		{
 			delete frontwinding;
-			frontwinding = NULL;
+			frontwinding = nullptr;
 			c_tinyportals++;
 		}
 
 		if ( backwinding && backwinding->IsTiny() )
 		{
 			delete backwinding;
-			backwinding = NULL;
+			backwinding = nullptr;
 			c_tinyportals++;
 		}
 
@@ -432,7 +432,7 @@ static void SplitNodePortals( node_t *node ) {
 		}
 	}
 
-	node->portals = NULL;
+	node->portals = nullptr;
 }
 
 
@@ -543,10 +543,10 @@ void FloodPortals_r (node_t *node, int dist) {
 PlaceOccupant
 =============
 */
-bool PlaceOccupant( node_t *headnode, arcVec3 origin, uEntity_t *occupant ) {
+bool PlaceOccupant( node_t *headnode, anVec3 origin, uEntity_t *occupant ) {
 	node_t	*node;
 	float	d;
-	arcPlane	*plane;
+	anPlane	*plane;
 
 	// find the leaf to start in
 	node = headnode;
@@ -579,7 +579,7 @@ Marks all nodes that can be reached by entites
 */
 bool FloodEntities( tree_t *tree ) {
 	int		i;
-	arcVec3	origin;
+	anVec3	origin;
 	const char	*cl;
 	bool	inside;
 	node_t *headnode;
@@ -592,7 +592,7 @@ bool FloodEntities( tree_t *tree ) {
 	c_floodedleafs = 0;
 	bool errorShown = false;
 	for ( i=1; i<dmapGlobals.num_entities; i++ ) {
-		idMapEntity	*mapEnt;
+		anMapEntity	*mapEnt;
 
 		mapEnt = dmapGlobals.uEntities[i].mapEntity;
 		if ( !mapEnt->epairs.GetVector( "origin", "", origin) ) {
@@ -620,7 +620,7 @@ bool FloodEntities( tree_t *tree ) {
 			// have origins outside the light
 			mapEnt->epairs.GetString( "texture", "", &v);
 			if ( v[0] ) {
-				const arcMaterial *mat = declManager->FindMaterial( v );
+				const anMaterial *mat = declManager->FindMaterial( v );
 				if ( mat->IsFogLight() ) {
 					continue;
 				}
@@ -640,7 +640,7 @@ bool FloodEntities( tree_t *tree ) {
 			common->Printf( "Entity classname was: %s\n", p);
 			mapEnt->epairs.GetString( "name", "", &p);
 			common->Printf( "Entity name was: %s\n", p);
-			arcVec3 origin;
+			anVec3 origin;
 			if ( mapEnt->epairs.GetVector( "origin", "", origin) ) {
 				common->Printf( "Entity origin is: %f %f %f\n\n\n", origin.x, origin.y, origin.z);
 			}
@@ -709,7 +709,7 @@ static side_t	*FindSideForPortal( uPortal_t *p ) {
 						continue;
 					}
 					s2 = orig->sides + k;
-					if ( s2->visibleHull == NULL ) {
+					if ( s2->visibleHull == nullptr ) {
 						continue;
 					}
 					if ( !( s2->material->GetContentFlags() & CONTENTS_AREAPORTAL ) ) {
@@ -717,13 +717,13 @@ static side_t	*FindSideForPortal( uPortal_t *p ) {
 					}
 					common->Warning( "brush has multiple area portal sides at %s", s2->visibleHull->GetCenter().ToString() );
 					delete s2->visibleHull;
-					s2->visibleHull = NULL;
+					s2->visibleHull = nullptr;
 				}
 				return s;
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -839,7 +839,7 @@ static void FindInterAreaPortals_r( node_t *node ) {
 	uPortal_t	*p;
 	int			s;
 	int			i;
-	arcWinding	*w;
+	anWinding	*w;
 	interAreaPortal_t	*iap;
 	side_t		*side;
 

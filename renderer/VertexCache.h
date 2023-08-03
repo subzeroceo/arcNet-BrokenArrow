@@ -1,4 +1,4 @@
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 
 // vertex cache calls should only be made by the front end
 
@@ -56,10 +56,10 @@ typedef struct vertCache_s {
 
 typedef struct srfVert_t {
     float					xyz[3];  // Position coordinates (x, y, z)
-    float					st[2];   // Texture coordinates (s, t)
+    float					st[2];   // Texture coordinates ( s, t)
 };
 
-class ARCVertCache {
+class anVertexCache {
 public:
 	void			Init();
 	void			Shutdown();
@@ -86,7 +86,7 @@ public:
 	static vertCacheHandle_t AllocStaticVertex( const void *data, int bytes );
 	static vertCacheHandle_t AllocStaticIndex( const void *data, int bytes );
 
-	// This will be a real pointer with virtual memory,
+	// This will be a real pointer with memory,
 	// but it will be an int offset cast to a pointer of ARB_vertex_buffer_object
 	void *			Position( vertCache_t *buffer );
 
@@ -97,7 +97,7 @@ public:
 	// automatically freed at the end of the next frame
 	// used for specular texture coordinates and gui drawing, which
 	// will change every frame.
-	// will return NULL if the vertex cache is completely full
+	// will return nullptr if the vertex cache is completely full
 	// As with Position(), this may not actually be a pointer you can access.
 	vertCache_t	*	AllocFrameTemp( void *data, int bytes );
 
@@ -122,8 +122,8 @@ private:
 	void			InitMemoryBlocks( int size );
 	void			ActuallyFree( vertCache_t *block );
 
-	static arcCVarSystem	r_showVertexCache;
-	static arcCVarSystem	r_vertexBufferMegs;
+	static anCVarSystem	r_showVertexCache;
+	static anCVarSystem	r_vertexBufferMegs;
 
 	int				staticCountTotal;
 	int				staticAllocTotal;		// for end of frame purging
@@ -143,7 +143,7 @@ private:
 	vertCache_t		*tempBuffers[NUM_VERTEX_FRAMES];		// allocated at startup
 	bool			tempOverflow;			// had to alloc a temp in static memory
 
-	arcBlockAlloc<vertCache_t,1024>	headerAllocator;
+	anBlockAlloc<vertCache_t,1024>	headerAllocator;
 
 	vertCache_t		freeStaticHeaders;		// head of doubly linked list
 	vertCache_t		freeDynamicHeaders;		// head of doubly linked list
@@ -153,12 +153,12 @@ private:
 											// staticHeaders.next is most recently used
 	vertCache_t		freeDynamicHeaders;
 
-	arcGraphicsBuffer staticData;
-	arcGraphicsBuffer frameData[VERTCACHE_NUM_FRAMES];
+	anRenderCache staticData;
+	anRenderCache frameData[VERTCACHE_NUM_FRAMES];
 	int				frameBytes;				// for each of NUM_VERTEX_FRAMES frames
 };
 
-extern	ARCVertCache	vertexCache;
+extern	anVertexCache	vertexCache;
 
 
 /*
@@ -212,7 +212,7 @@ typedef struct {
 	GLenum				buffer;
 	GLint				frameCount; // was int
 	GLint				x, y, imageWidth, imageHeight;
-	ARCImage *			image;
+	anImage *			image;
 	int					cubeFace;	// when copying to a cubeMap
 	viewDef_t			*viewDef;
 	int					size;
@@ -228,8 +228,8 @@ typedef struct {
 	// alloc will point somewhere into the memory chain
 	frameData_t	*		alloc;
 
-	surfTriangles_t		*firstDeferredFreeTriSurf;
-	surfTriangles_t		*lastDeferredFreeTriSurf;
+	srfTriangles_t		*firstDeferredFreeTriSurf;
+	srfTriangles_t		*lastDeferredFreeTriSurf;
 
 	int					memoryHighwater;	// max used on any frame
 
@@ -238,49 +238,49 @@ typedef struct {
 	// dynamically generated textures
 	setBufferCommand_t		*cmdHead, *cmdTail;		// may be of other command type based on commandId
 } frameData_t;
-extern	frameData_t		*frameData;
+extern frameData_t		*frameData;
 
-class ARCGraphicsBuffer {
+class anRenderCache {
 public:
-						    Init() = 0;
+	void					    Init();
 
-							~ARCGraphicsBuffer() {DeleteFrameBuffer();DeleteVertexBuffer();DeleteIndexBuffer();DeleteVertexArrayObject();}
+						~anRenderCache() {DeleteFrameBuffer();DeleteVertexBuffer();DeleteIndexBuffer();DeleteVertexArrayObject();}
 
 	void				R_InitFrameData( void );
 
-	virtual void		InitFrameBuffer() = 0;
-	virtual void		InitVertexBuffer() = 0;
-	virtual void		InitIndexBuffer() = 0;
-	virtual void		InitVertexArrayObject() = 0;
+	void		InitFrameBuffer();
+	void		InitVertexBuffer();
+	void		InitIndexBuffer();
+	void		InitVertexArrayObject();
 
-	virtual void		AllocVertexBuffer( GLuint size ) = 0;
+	void				AllocVertexBuffer( GLuint size );
 
 	void *				GetAPIObject() const { return base; }
 	int					GetSize() const { return ( size ); }
 
-	virtual void		BindFrameBuffer() = 0;
-	virtual void		BindVertexBuffer() = 0;
-	virtual void		BindIndexBuffer() = 0;
-	virtual void		BindVertexArrayObject() = 0;
+	void		BindFrameBuffer();
+	void		BindVertexBuffer();
+	void		BindIndexBuffer();
+	void		BindVertexArrayObject();
 
-	virtual void		UnbindFrameBuffer() = 0;
-	virtual void		UnbindVertexBuffer() = 0;
-	virtual void		UnbindIndexBuffer() = 0;
-	virtual void		UnbindVertexArrayObject() = 0;
+	void		UnbindFrameBuffer();
+	void		UnbindVertexBuffer();
+	void		UnbindIndexBuffer();
+	void		UnbindVertexArrayObject();
 
-	virtual void		ActuallyFreeVertexBuffers() = 0;
+	void		ActuallyFreeVertexBuffers();
 
-	virtual void		DeleteFrameBuffer() = 0;
-	virtual void		DeleteVertexBuffer() = 0;
-	virtual void		DeleteIndexBuffer() = 0;
-	virtual void		DeleteVertexArrayObject() = 0;
+	void		DeleteFrameBuffer();
+	void		DeleteVertexBuffer();
+	void		DeleteIndexBuffer();
+	void		DeleteVertexArrayObject();
 
 	void				ShutdownFrameData( void );
 
 	//void				Swap()
 	// we can now begin to get this stuff out of tr_backend and tr_render slowly get this more organized.
 	// we we need execute buffers and the others for backend rendering stuff moved in here.
-	virtual void		SwapBuffers();
+	void		SwapBuffers();
 
 
 	int 				CountFrameData( void );
@@ -293,9 +293,9 @@ public:
 	void 				*ClearedStaticAlloc( int bytes );	// with memset
 	void 				StaticFree( void *data );
 
-	virtual void		RenderView( viewDef_t *parms ) = 0;
-	virtual void		RenderBuffers() = 0;
-	virtual void		ClearWithoutFreeing();
+	void		RenderView( viewDef_t *parms );
+	void		RenderBuffers();
+	void		ClearWithoutFreeing();
 private:
 	int					size;					// size in bytes
 	int					offsetInOtherBuffer;	// offset in bytes
@@ -305,9 +305,105 @@ private:
     frameData_t			vertexBuffer;
     GLuint				indexBuffer;
     GLuint				vertexArrayObject;
+
+	char            name[MAX_QPATH];
+
+	int             index;
+
+	uint32_t        colorBuffers[16];
+	int             colorFormat;
+	struct image_s  *colorImage[16];
+
+	uint32_t        depthBuffer;
+	int             depthFormat;
+
+	uint32_t        stencilBuffer;
+	int             stencilFormat;
+
+	uint32_t        packedDepthStencilBuffer;
+	int             packedDepthStencilFormat;
+
+	int             width;
+	int             height;
 };
 
-extern ARCGraphicsBuffer renderCache;
+extern anRenderCache *renderCache;
+
+
+class ImprovedVertexCache {
+private:
+    struct vertCacheBlock {
+		vertCacheBlock** user;
+		vertCacheBlock* next;
+		vertCacheBlock* prev;
+		vertBlockTag_t tag;
+        void *virtMem;
+        int offset;
+        int tags;
+        int frameUsed;
+        bool indexBuffer;
+        bool virtMemDirty;
+        int size;
+        void *usr;
+        GLuint vbo;
+};
+
+
+    vertCacheBlock *staticHeaders;
+    vertCacheBlock *freeStaticHeaders;
+    vertCacheBlock *freeDynamicHeaders;
+    bool virtualMemory;
+    int currentFrame;
+    int listNum;
+    int frameBytes;
+
+public:
+    ImprovedVertexCache() {
+        // Initialize member variables and allocate initial cache blocks
+        staticHeaders = new vertCacheBlock();
+        freeStaticHeaders = new vertCacheBlock();
+        freeDynamicHeaders = new vertCacheBlock();
+        virtualMemory = false;
+        currentFrame = 0;
+        listNum = 0;
+        frameBytes = 0;
+    }
+
+    ~ImprovedVertexCache() {
+        // Clean up allocated cache blocks and any other resources
+        delete staticHeaders;
+        delete freeStaticHeaders;
+        delete freeDynamicHeaders;
+    }
+
+    void List() {
+        // Implementation of the List() function goes here
+        // You can refer to the previous implementation and modify it as needed
+        // Don't forget to update the function signature if needed
+    }
+
+        // This function should allocate a temporary cache block with the given size and return its handle
+    vertCacheBlock *CreateTempVbo( int bytes, bool indexBuffer ) {
+        // Implementation of the CreateTempVbo() function goes here
+        // You can refer to the previous implementation and modify it as needed
+        // Don't forget to update the function signature and return type if needed
+        // You'll also need to handle memory allocation and deallocation for the cache blocks
+        // using appropriate memory management mechanisms for the Doom 3 engine
+	}
+
+    int GetNextListNum() const {
+        // Implementation of the GetNextListNum() function goes here
+        // You can refer to the previous implementation and modify it as needed
+        // Don't forget to update the function signature and return type if needed
+    }
+
+    bool IsFast() {
+        // Implementation of the IsFast() function goes here
+        // You can refer to the previous implementation and modify it as needed
+        // Don't forget to update the function signature and return type if needed
+    }
+};
+
 
 /*
 ====================================================================
@@ -373,13 +469,13 @@ void R_LockSurfaceScene( viewDef_t *parms );
 void R_ClearCommandChain( void );
 void R_AddDrawViewCmd( viewDef_t *parms );
 
-void R_ReloadGuis_f( const arcCommandArgs &args );
-void R_ListGuis_f( const arcCommandArgs &args );
+void R_ReloadGuis_f( const anCommandArgs &args );
+void R_ListGuis_f( const anCommandArgs &args );
 
 void *R_GetCommandBuffer( int bytes );
 
 // this allows a global override of all materials
-bool R_GlobalShaderOverride( const arcMaterial **shader );
+bool R_GlobalShaderOverride( const anMaterial **shader );
 
-// this does various checks before calling the arcDeclSkin
-const arcMaterial *R_RemapShaderBySkin( const arcMaterial *shader, const arcDeclSkin *customSkin, const arcMaterial *customShader );
+// this does various checks before calling the anDeclSkin
+const anMaterial *R_RemapShaderBySkin( const anMaterial *shader, const anDeclSkin *customSkin, const anMaterial *customShader );

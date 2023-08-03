@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "snd_local.h"
@@ -60,7 +60,7 @@ idEFXFile::~idEFXFile( void ) {
 idEFXFile::FindEffect
 ===============
 */
-bool idEFXFile::FindEffect( arcNetString &name, idSoundEffect **effect, int *index ) {
+bool idEFXFile::FindEffect( anString &name, idSoundEffect **effect, int *index ) {
 	int i;
 
 	for ( i = 0; i < effects.Num(); i++ ) {
@@ -78,8 +78,8 @@ bool idEFXFile::FindEffect( arcNetString &name, idSoundEffect **effect, int *ind
 idEFXFile::ReadEffect
 ===============
 */
-bool idEFXFile::ReadEffect( arcLexer &src, idSoundEffect *effect ) {
-	arcNetToken name, token;
+bool idEFXFile::ReadEffect( anLexer &src, idSoundEffect *effect ) {
+	anToken name, token;
 
 	if ( !src.ReadToken( &token ) )
 		return false;
@@ -194,8 +194,8 @@ idEFXFile::LoadFile
 ===============
 */
 bool idEFXFile::LoadFile( const char *filename, bool OSPath ) {
-	arcLexer src( LEXFL_NOSTRINGCONCAT );
-	arcNetToken token;
+	anLexer src( LEXFL_NOSTRINGCONCAT );
+	anToken token;
 
 	src.LoadFile( filename, OSPath );
 	if ( !src.IsLoaded() ) {
@@ -203,7 +203,7 @@ bool idEFXFile::LoadFile( const char *filename, bool OSPath ) {
 	}
 
 	if ( !src.ExpectTokenString( "Version" ) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( src.ParseInt() != 1 ) {

@@ -1,7 +1,7 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
-ARCBox box_zero( vec3_zero, vec3_zero, mat3_identity );
+anBox box_zero( vec3_zero, vec3_zero, mat3_identity );
 
 /*
             4---{4}---5
@@ -87,8 +87,7 @@ static int boxEdgeVerts[12][2] = {
 	{ 1, 5 },
 	{ 2, 6 },
 	{ 3, 7 }
-};
-*/
+};*/
 
 static int boxPlaneBitsSilVerts[64][7] = {
 	{ 0, 0, 0, 0, 0, 0, 0 }, // 000000 = 0
@@ -157,15 +156,14 @@ static int boxPlaneBitsSilVerts[64][7] = {
 	{ 0, 0, 0, 0, 0, 0, 0 }, // 111111 = 63
 };
 
-
 /*
 ============
-ARCBox::AddPoint
+anBox::AddPoint
 ============
 */
-bool ARCBox::AddPoint( const arcVec3 &v ) {
-	arcMat3 axis2;
-	arcBounds bounds1, bounds2;
+bool anBox::AddPoint( const anVec3 &v ) {
+	anMat3 axis2;
+	anBounds bounds1, bounds2;
 
 	if ( extents[0] < 0.0f ) {
 		extents.Zero();
@@ -179,7 +177,7 @@ bool ARCBox::AddPoint( const arcVec3 &v ) {
 	bounds1[0][2] = bounds1[1][2] = center * axis[2];
 	bounds1[0] -= extents;
 	bounds1[1] += extents;
-	if ( !bounds1.AddPoint( arcVec3( v * axis[0], v * axis[1], v * axis[2] ) ) ) {
+	if ( !bounds1.AddPoint( anVec3( v * axis[0], v * axis[1], v * axis[2] ) ) ) {
 		// point is contained in the box
 		return false;
 	}
@@ -192,15 +190,14 @@ bool ARCBox::AddPoint( const arcVec3 &v ) {
 	axis2[2].Cross( axis2[0], axis2[1] );
 
 	AxisProjection( axis2, bounds2 );
-	bounds2.AddPoint( arcVec3( v * axis2[0], v * axis2[1], v * axis2[2] ) );
+	bounds2.AddPoint( anVec3( v * axis2[0], v * axis2[1], v * axis2[2] ) );
 
 	// create new box based on the smallest bounds
 	if ( bounds1.GetVolume() < bounds2.GetVolume() ) {
 		center = ( bounds1[0] + bounds1[1] ) * 0.5f;
 		extents = bounds1[1] - center;
 		center *= axis;
-	}
-	else {
+	} else {
 		center = ( bounds2[0] + bounds2[1] ) * 0.5f;
 		extents = bounds2[1] - center;
 		center *= axis2;
@@ -211,24 +208,21 @@ bool ARCBox::AddPoint( const arcVec3 &v ) {
 
 /*
 ============
-ARCBox::AddBox
+anBox::AddBox
 ============
 */
-bool ARCBox::AddBox( const ARCBox &a ) {
-	int i, besti;
-	float v, bestv;
-	arcVec3 dir;
-	arcMat3 ax[4];
-	arcBounds bounds[4], b;
+bool anBox::AddBox( const anBox &a ) {
+	anMat3 ax[4];
+	anBounds bounds[4], b;
 
 	if ( a.extents[0] < 0.0f ) {
 		return false;
 	}
 
 	if ( extents[0] < 0.0f ) {
-		center = a.center;
-		extents = a.extents;
-		axis = a.axis;
+		anVec3 center = a.center;
+		anVec3 extents = a.extents;
+		anVec3 axis = a.axis;
 		return true;
 	}
 
@@ -255,16 +249,16 @@ bool ARCBox::AddBox( const ARCBox &a ) {
 	AxisProjection( ax[1], b );
 	if ( !bounds[1].AddBounds( b ) ) {
 		// this box is contained in the other box
-		center = a.center;
-		extents = a.extents;
-		axis = a.axis;
+		anVec3 center = a.center;
+		anVec3 extents = a.extents;
+		anVec3 axis = a.axis;
 		return true;
 	}
 
 	// test axes aligned with the vector between the box centers and one of the box axis
-	dir = a.center - center;
+	anVec3 dir = a.center - center;
 	dir.Normalize();
-	for ( i = 2; i < 4; i++ ) {
+	for ( int i = 2; i < 4; i++ ) {
 		ax[i][0] = dir;
 		ax[i][1] = ax[i-2][ Min3Index( dir * ax[i-2][0], dir * ax[i-2][1], dir * ax[i-2][2] ) ];
 		ax[i][1] = ax[i][1] - ( ax[i][1] * dir ) * dir;
@@ -277,10 +271,10 @@ bool ARCBox::AddBox( const ARCBox &a ) {
 	}
 
 	// get the bounds with the smallest volume
-	bestv = arcMath::INFINITY;
-	besti = 0;
-	for ( i = 0; i < 4; i++ ) {
-		v = bounds[i].GetVolume();
+	float bestv = anMath::INFINITY;
+	int besti = 0;
+	for ( int i = 0; i < 4; i++ ) {
+		float v = bounds[i].GetVolume();
 		if ( v < bestv ) {
 			bestv = v;
 			besti = i;
@@ -288,26 +282,24 @@ bool ARCBox::AddBox( const ARCBox &a ) {
 	}
 
 	// create a box from the smallest bounds axis pair
-	center = ( bounds[besti][0] + bounds[besti][1] ) * 0.5f;
-	extents = bounds[besti][1] - center;
+	anVec3 center = ( bounds[besti][0] + bounds[besti][1] ) * 0.5f;
+	anVec3 extents = bounds[besti][1] - center;
 	center *= ax[besti];
-	axis = ax[besti];
+	anVec3 axis = ax[besti];
 
 	return false;
 }
 
 /*
 ================
-ARCBox::PlaneDistance
+anBox::PlaneDistance
 ================
 */
-float ARCBox::PlaneDistance( const arcPlane &plane ) const {
-	float d1, d2;
-
-	d1 = plane.Distance( center );
-	d2 = arcMath::Fabs( extents[0] * plane.Normal()[0] ) +
-			arcMath::Fabs( extents[1] * plane.Normal()[1] ) +
-				arcMath::Fabs( extents[2] * plane.Normal()[2] );
+float anBox::PlaneDistance( const anPlane &plane ) const {
+	float d1 = plane.Distance( center );
+	float d2 = anMath::Fabs( extents[0] * plane.Normal()[0] ) +
+			anMath::Fabs( extents[1] * plane.Normal()[1] ) +
+				anMath::Fabs( extents[2] * plane.Normal()[2] );
 
 	if ( d1 - d2 > 0.0f ) {
 		return d1 - d2;
@@ -320,16 +312,14 @@ float ARCBox::PlaneDistance( const arcPlane &plane ) const {
 
 /*
 ================
-ARCBox::PlaneSide
+anBox::PlaneSide
 ================
 */
-int ARCBox::PlaneSide( const arcPlane &plane, const float epsilon ) const {
-	float d1, d2;
-
-	d1 = plane.Distance( center );
-	d2 = arcMath::Fabs( extents[0] * plane.Normal()[0] ) +
-			arcMath::Fabs( extents[1] * plane.Normal()[1] ) +
-				arcMath::Fabs( extents[2] * plane.Normal()[2] );
+int anBox::PlaneSide( const anPlane &plane, const float epsilon ) const {
+	float d1 = plane.Distance( center );
+	float d2 = anMath::Fabs( extents[0] * plane.Normal()[0] ) +
+			anMath::Fabs( extents[1] * plane.Normal()[1] ) +
+				anMath::Fabs( extents[2] * plane.Normal()[2] );
 
 	if ( d1 - d2 > epsilon ) {
 		return PLANESIDE_FRONT;
@@ -342,30 +332,30 @@ int ARCBox::PlaneSide( const arcPlane &plane, const float epsilon ) const {
 
 /*
 ============
-ARCBox::IntersectsBox
+anBox::IntersectsBox
 ============
 */
-bool ARCBox::IntersectsBox( const ARCBox &a ) const {
-    arcVec3 dir;			// vector between centers
+bool anBox::IntersectsBox( const anBox &a ) const {
     float c[3][3];		// matrix c = axis.Transpose() * a.axis
     float ac[3][3];		// absolute values of c
     float axisdir[3];	// axis[i] * dir
-    float d, e0, e1;	// distance between centers and projected extents
 
-	dir = a.center - center;
+	// vector between centers
+	anVec3 dir = a.center - center;
 
     // axis C0 + t * A0
     c[0][0] = axis[0] * a.axis[0];
     c[0][1] = axis[0] * a.axis[1];
     c[0][2] = axis[0] * a.axis[2];
     axisdir[0] = axis[0] * dir;
-    ac[0][0] = arcMath::Fabs( c[0][0] );
-    ac[0][1] = arcMath::Fabs( c[0][1] );
-    ac[0][2] = arcMath::Fabs( c[0][2] );
+    ac[0][0] = anMath::Fabs( c[0][0] );
+    ac[0][1] = anMath::Fabs( c[0][1] );
+    ac[0][2] = anMath::Fabs( c[0][2] );
 
-    d = arcMath::Fabs( axisdir[0] );
-	e0 = extents[0];
-    e1 = a.extents[0] * ac[0][0] + a.extents[1] * ac[0][1] + a.extents[2] * ac[0][2];
+	// distance between centers and projected extents
+    float d = anMath::Fabs( axisdir[0] );
+	float e0 = extents[0];
+    float e1 = a.extents[0] * ac[0][0] + a.extents[1] * ac[0][1] + a.extents[2] * ac[0][2];
 	if ( d > e0 + e1 ) {
         return false;
 	}
@@ -375,11 +365,11 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
     c[1][1] = axis[1] * a.axis[1];
     c[1][2] = axis[1] * a.axis[2];
     axisdir[1] = axis[1] * dir;
-    ac[1][0] = arcMath::Fabs( c[1][0] );
-    ac[1][1] = arcMath::Fabs( c[1][1] );
-    ac[1][2] = arcMath::Fabs( c[1][2] );
+    ac[1][0] = anMath::Fabs( c[1][0] );
+    ac[1][1] = anMath::Fabs( c[1][1] );
+    ac[1][2] = anMath::Fabs( c[1][2] );
 
-    d = arcMath::Fabs( axisdir[1] );
+    d = anMath::Fabs( axisdir[1] );
 	e0 = extents[1];
     e1 = a.extents[0] * ac[1][0] + a.extents[1] * ac[1][1] + a.extents[2] * ac[1][2];
 	if ( d > e0 + e1 ) {
@@ -391,11 +381,11 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
     c[2][1] = axis[2] * a.axis[1];
     c[2][2] = axis[2] * a.axis[2];
     axisdir[2] = axis[2] * dir;
-    ac[2][0] = arcMath::Fabs( c[2][0] );
-    ac[2][1] = arcMath::Fabs( c[2][1] );
-    ac[2][2] = arcMath::Fabs( c[2][2] );
+    ac[2][0] = anMath::Fabs( c[2][0] );
+    ac[2][1] = anMath::Fabs( c[2][1] );
+    ac[2][2] = anMath::Fabs( c[2][2] );
 
-    d = arcMath::Fabs( axisdir[2] );
+    d = anMath::Fabs( axisdir[2] );
 	e0 = extents[2];
     e1 = a.extents[0] * ac[2][0] + a.extents[1] * ac[2][1] + a.extents[2] * ac[2][2];
 	if ( d > e0 + e1 ) {
@@ -403,7 +393,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * B0
-    d = arcMath::Fabs( a.axis[0] * dir );
+    d = anMath::Fabs( a.axis[0] * dir );
     e0 = extents[0] * ac[0][0] + extents[1] * ac[1][0] + extents[2] * ac[2][0];
 	e1 = a.extents[0];
 	if ( d > e0 + e1 ) {
@@ -411,7 +401,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * B1
-    d = arcMath::Fabs( a.axis[1] * dir );
+    d = anMath::Fabs( a.axis[1] * dir );
     e0 = extents[0] * ac[0][1] + extents[1] * ac[1][1] + extents[2] * ac[2][1];
 	e1 = a.extents[1];
 	if ( d > e0 + e1 ) {
@@ -419,7 +409,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * B2
-    d = arcMath::Fabs( a.axis[2] * dir );
+    d = anMath::Fabs( a.axis[2] * dir );
     e0 = extents[0] * ac[0][2] + extents[1] * ac[1][2] + extents[2] * ac[2][2];
 	e1 = a.extents[2];
 	if ( d > e0 + e1 ) {
@@ -427,7 +417,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * A0xB0
-    d = arcMath::Fabs( axisdir[2] * c[1][0] - axisdir[1] * c[2][0] );
+    d = anMath::Fabs( axisdir[2] * c[1][0] - axisdir[1] * c[2][0] );
     e0 = extents[1] * ac[2][0] + extents[2] * ac[1][0];
     e1 = a.extents[1] * ac[0][2] + a.extents[2] * ac[0][1];
 	if ( d > e0 + e1 ) {
@@ -435,7 +425,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * A0xB1
-    d = arcMath::Fabs( axisdir[2] * c[1][1] - axisdir[1] * c[2][1] );
+    d = anMath::Fabs( axisdir[2] * c[1][1] - axisdir[1] * c[2][1] );
     e0 = extents[1] * ac[2][1] + extents[2] * ac[1][1];
     e1 = a.extents[0] * ac[0][2] + a.extents[2] * ac[0][0];
 	if ( d > e0 + e1 ) {
@@ -443,7 +433,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * A0xB2
-    d = arcMath::Fabs( axisdir[2] * c[1][2] - axisdir[1] * c[2][2] );
+    d = anMath::Fabs( axisdir[2] * c[1][2] - axisdir[1] * c[2][2] );
     e0 = extents[1] * ac[2][2] + extents[2] * ac[1][2];
     e1 = a.extents[0] * ac[0][1] + a.extents[1] * ac[0][0];
     if ( d > e0 + e1 ) {
@@ -451,7 +441,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * A1xB0
-    d = arcMath::Fabs( axisdir[0] * c[2][0] - axisdir[2] * c[0][0] );
+    d = anMath::Fabs( axisdir[0] * c[2][0] - axisdir[2] * c[0][0] );
     e0 = extents[0] * ac[2][0] + extents[2] * ac[0][0];
     e1 = a.extents[1] * ac[1][2] + a.extents[2] * ac[1][1];
 	if ( d > e0 + e1 ) {
@@ -459,7 +449,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * A1xB1
-    d = arcMath::Fabs( axisdir[0] * c[2][1] - axisdir[2] * c[0][1] );
+    d = anMath::Fabs( axisdir[0] * c[2][1] - axisdir[2] * c[0][1] );
     e0 = extents[0] * ac[2][1] + extents[2] * ac[0][1];
     e1 = a.extents[0] * ac[1][2] + a.extents[2] * ac[1][0];
 	if ( d > e0 + e1 ) {
@@ -467,7 +457,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * A1xB2
-    d = arcMath::Fabs( axisdir[0] * c[2][2] - axisdir[2] * c[0][2] );
+    d = anMath::Fabs( axisdir[0] * c[2][2] - axisdir[2] * c[0][2] );
     e0 = extents[0] * ac[2][2] + extents[2] * ac[0][2];
     e1 = a.extents[0] * ac[1][1] + a.extents[1] * ac[1][0];
 	if ( d > e0 + e1 ) {
@@ -475,7 +465,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * A2xB0
-    d = arcMath::Fabs( axisdir[1] * c[0][0] - axisdir[0] * c[1][0] );
+    d = anMath::Fabs( axisdir[1] * c[0][0] - axisdir[0] * c[1][0] );
     e0 = extents[0] * ac[1][0] + extents[1] * ac[0][0];
     e1 = a.extents[1] * ac[2][2] + a.extents[2] * ac[2][1];
 	if ( d > e0 + e1 ) {
@@ -483,7 +473,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * A2xB1
-    d = arcMath::Fabs( axisdir[1] * c[0][1] - axisdir[0] * c[1][1] );
+    d = anMath::Fabs( axisdir[1] * c[0][1] - axisdir[0] * c[1][1] );
     e0 = extents[0] * ac[1][1] + extents[1] * ac[0][1];
     e1 = a.extents[0] * ac[2][2] + a.extents[2] * ac[2][0];
 	if ( d > e0 + e1 ) {
@@ -491,7 +481,7 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 	}
 
     // axis C0 + t * A2xB2
-    d = arcMath::Fabs( axisdir[1] * c[0][2] - axisdir[0] * c[1][2] );
+    d = anMath::Fabs( axisdir[1] * c[0][2] - axisdir[0] * c[1][2] );
     e0 = extents[0] * ac[1][2] + extents[1] * ac[0][2];
     e1 = a.extents[0] * ac[2][1] + a.extents[1] * ac[2][0];
 	if ( d > e0 + e1 ) {
@@ -502,43 +492,43 @@ bool ARCBox::IntersectsBox( const ARCBox &a ) const {
 
 /*
 ============
-ARCBox::LineIntersection
+anBox::LineIntersection
 
   Returns true if the line intersects the box between the start and end point.
 ============
 */
-bool ARCBox::LineIntersection( const arcVec3 &start, const arcVec3 &end ) const {
+bool anBox::LineIntersection( const anVec3 &start, const anVec3 &end ) const {
     float ld[3];
-    arcVec3 lineDir = 0.5f * ( end - start );
-    arcVec3 lineCenter = start + lineDir;
-    arcVec3 dir = lineCenter - center;
+    anVec3 lineDir = 0.5f * ( end - start );
+    anVec3 lineCenter = start + lineDir;
+    anVec3 dir = lineCenter - center;
 
-    ld[0] = arcMath::Fabs( lineDir * axis[0] );
-	if ( arcMath::Fabs( dir * axis[0] ) > extents[0] + ld[0] ) {
+    ld[0] = anMath::Fabs( lineDir * axis[0] );
+	if ( anMath::Fabs( dir * axis[0] ) > extents[0] + ld[0] ) {
         return false;
 	}
 
-    ld[1] = arcMath::Fabs( lineDir * axis[1] );
-	if ( arcMath::Fabs( dir * axis[1] ) > extents[1] + ld[1] ) {
+    ld[1] = anMath::Fabs( lineDir * axis[1] );
+	if ( anMath::Fabs( dir * axis[1] ) > extents[1] + ld[1] ) {
         return false;
 	}
 
-    ld[2] = arcMath::Fabs( lineDir * axis[2] );
-	if ( arcMath::Fabs( dir * axis[2] ) > extents[2] + ld[2] ) {
+    ld[2] = anMath::Fabs( lineDir * axis[2] );
+	if ( anMath::Fabs( dir * axis[2] ) > extents[2] + ld[2] ) {
         return false;
 	}
 
-    arcVec3 cross = lineDir.Cross( dir );
+    anVec3 cross = lineDir.Cross( dir );
 
-	if ( arcMath::Fabs( cross * axis[0] ) > extents[1] * ld[2] + extents[2] * ld[1] ) {
+	if ( anMath::Fabs( cross * axis[0] ) > extents[1] * ld[2] + extents[2] * ld[1] ) {
         return false;
 	}
 
-	if ( arcMath::Fabs( cross * axis[1] ) > extents[0] * ld[2] + extents[2] * ld[0] ) {
+	if ( anMath::Fabs( cross * axis[1] ) > extents[0] * ld[2] + extents[2] * ld[0] ) {
         return false;
 	}
 
-	if ( arcMath::Fabs( cross * axis[2] ) > extents[0] * ld[1] + extents[1] * ld[0] ) {
+	if ( anMath::Fabs( cross * axis[2] ) > extents[0] * ld[1] + extents[1] * ld[0] ) {
         return false;
 	}
 
@@ -559,8 +549,7 @@ static bool BoxPlaneClip( const float denom, const float numer, float &scale0, f
 			scale0 = numer / denom;
 		}
 		return true;
-	}
-	else if ( denom < 0.0f ) {
+	} else if ( denom < 0.0f ) {
 		if ( numer > denom * scale0 ) {
 			return false;
 		}
@@ -568,29 +557,26 @@ static bool BoxPlaneClip( const float denom, const float numer, float &scale0, f
 			scale1 = numer / denom;
 		}
 		return true;
-	}
-	else {
+	} else {
 		return ( numer <= 0.0f );
 	}
 }
 
 /*
 ============
-ARCBox::RayIntersection
+anBox::RayIntersection
 
   Returns true if the ray intersects the box.
   The ray can intersect the box in both directions from the start point.
   If start is inside the box then scale1 < 0 and scale2 > 0.
 ============
 */
-bool ARCBox::RayIntersection( const arcVec3 &start, const arcVec3 &dir, float &scale1, float &scale2 ) const {
-	arcVec3 localStart, localDir;
+bool anBox::RayIntersection( const anVec3 &start, const anVec3 &dir, float &scale1, float &scale2 ) const {
+	anVec3 localStart = ( start - center ) * axis.Transpose();
+	anVec3 localDir = dir * axis.Transpose();
 
-	localStart = ( start - center ) * axis.Transpose();
-	localDir = dir * axis.Transpose();
-
-	scale1 = -arcMath::INFINITY;
-	scale2 = arcMath::INFINITY;
+	scale1 = -anMath::INFINITY;
+	scale2 = anMath::INFINITY;
     return	BoxPlaneClip(  localDir.x, -localStart.x - extents[0], scale1, scale2 ) &&
 			BoxPlaneClip( -localDir.x,  localStart.x - extents[0], scale1, scale2 ) &&
 			BoxPlaneClip(  localDir.y, -localStart.y - extents[1], scale1, scale2 ) &&
@@ -601,32 +587,25 @@ bool ARCBox::RayIntersection( const arcVec3 &start, const arcVec3 &dir, float &s
 
 /*
 ============
-ARCBox::FromPoints
+anBox::FromPoints
 
   Tight box for a collection of points.
 ============
 */
-void ARCBox::FromPoints( const arcVec3 *points, const int numPoints ) {
-	int i;
-	float invNumPoints, sumXX, sumXY, sumXZ, sumYY, sumYZ, sumZZ;
-	arcVec3 dir;
-	arcBounds bounds;
-	arcMatX eigenVectors;
-	arcVecX eigenValues;
-
+void anBox::FromPoints( const anVec3 *points, const int numPoints ) {
 	// compute mean of points
 	center = points[0];
-	for ( i = 1; i < numPoints; i++ ) {
+	for ( int i = 1; i < numPoints; i++ ) {
 		center += points[i];
 	}
-	invNumPoints = 1.0f / numPoints;
+	float invNumPoints = 1.0f / numPoints;
 	center *= invNumPoints;
 
 	// compute covariances of points
-	sumXX = 0.0f; sumXY = 0.0f; sumXZ = 0.0f;
-	sumYY = 0.0f; sumYZ = 0.0f; sumZZ = 0.0f;
-	for ( i = 0; i < numPoints; i++ ) {
-		dir = points[i] - center;
+	float sumXX = 0.0f; float sumXY = 0.0f; float sumXZ = 0.0f;
+	float sumYY = 0.0f; float sumYZ = 0.0f; float sumZZ = 0.0f;
+	for ( int i = 0; i < numPoints; i++ ) {
+		anVec3 dir = points[i] - center;
 		sumXX += dir.x * dir.x;
 		sumXY += dir.x * dir.y;
 		sumXZ += dir.x * dir.z;
@@ -640,6 +619,9 @@ void ARCBox::FromPoints( const arcVec3 *points, const int numPoints ) {
 	sumYY *= invNumPoints;
 	sumYZ *= invNumPoints;
 	sumZZ *= invNumPoints;
+
+	anMatX eigenVectors;
+	anVecX eigenValues;
 
 	// compute eigenvectors for covariance matrix
 	eigenValues.SetData( 3, VECX_ALLOCA( 3 ) );
@@ -672,9 +654,9 @@ void ARCBox::FromPoints( const arcVec3 *points, const int numPoints ) {
 	extents[2] = eigenValues[0];
 
 	// refine by calculating the bounds of the points projected onto the axis and adjusting the center and extents
-	bounds.Clear();
-    for ( i = 0; i < numPoints; i++ ) {
-		bounds.AddPoint( arcVec3( points[i] * axis[0], points[i] * axis[1], points[i] * axis[2] ) );
+	anBounds bounds.Clear();
+    for ( int i = 0; i < numPoints; i++ ) {
+		bounds.AddPoint( anVec3( points[i] * axis[0], points[i] * axis[1], points[i] * axis[2] ) );
     }
 	center = ( bounds[0] + bounds[1] ) * 0.5f;
 	extents = bounds[1] - center;
@@ -683,60 +665,94 @@ void ARCBox::FromPoints( const arcVec3 *points, const int numPoints ) {
 
 /*
 ============
-ARCBox::FromPointTranslation
+anBox::FromPointTranslation
 
-  Most tight box for the translational movement of the given point.
+Most tight box for the translational movement of the given point.
 ============
 */
-void ARCBox::FromPointTranslation( const arcVec3 &point, const arcVec3 &translation ) {
-	// FIXME: implement
+void anBox::FromPointTranslation( const anVec3 &point, const anVec3 &translation ) {
+    // Calculate the new minimum and maximum coordinates
+    anVec3 newMin = GetMin() + translation;
+    anVec3 newMax = GetMax() + translation;
+
+    // Set the new minimum and maximum coordinates
+    SetBounds( newMin, newMax );
 }
 
 /*
 ============
-ARCBox::FromBoxTranslation
+anBox::FromBoxTranslation
 
-  Most tight box for the translational movement of the given box.
+Most tight box for the translational movement of the given box.
 ============
 */
-void ARCBox::FromBoxTranslation( const ARCBox &box, const arcVec3 &translation ) {
-	// FIXME: implement
+void anBox::FromBoxTranslation( const anBox &box, const anVec3 &translation ) {
+    // Calculate the new minimum and maximum coordinates
+    anVec3 newMin = box.GetMin() + translation;
+    anVec3 newMax = box.GetMax() + translation;
+
+    // Set the new minimum and maximum coordinates
+    SetBounds( newMin, newMax );
 }
 
 /*
 ============
-ARCBox::FromPointRotation
+anBox::FromPointRotation
 
-  Most tight bounds for the rotational movement of the given point.
+Most tight bounds for the rotational movement of the given point.
 ============
 */
-void ARCBox::FromPointRotation( const arcVec3 &point, const arcRotate &rotation ) {
-	// FIXME: implement
+void anBox::FromPointRotation( const anVec3 &point, const anRotation &rotation ) {
+	// Calculate the new minimum and maximum coordinates
+	anVec3 newMin = GetMin() + rotation * point;
+	anVec3 newMax = GetMax() + rotation * point;
+	anVec3 newMax = ( newMax + newMin ) * 0.5f;
+	anVec3 newAxis = newMax - newCenter;
+	//anVec3 axisdir = 0.5f * ( newMax - newMin );
+	// Set the new minimum and maximum coordinates
+	SetBounds( newMin, newMax );
+	SetAxis( axisdir );
 }
 
 /*
 ============
-ARCBox::FromBoxRotation
+anBox::FromBoxRotation
 
-  Most tight box for the rotational movement of the given box.
+Most tight box for the rotational movement of the given box.
+This function calculates the most tight box for the rotational movement of the given box.
 ============
 */
-void ARCBox::FromBoxRotation( const ARCBox &box, const arcRotate &rotation ) {
-	// FIXME: implement
+void anBox::FromBoxRotation( const anBox &box, const anRotation &rotation ) {
+    // TODO: Implement the code to calculate the tight box for rotational movement
+    // Get the dimensions of the input box
+    const float width = box.GetWidth();
+    const float height = box.GetHeight();
+    const float depth = box.GetDepth();
+
+    // Get the rotation angles
+    const float roll = rotation.GetRoll();
+    const float pitch = rotation.GetPitch();
+    const float yaw = rotation.GetYaw();
+
+    // Calculate the new dimensions of the box
+    const float newWidth = anMath::Abs( anMath::Cos( roll ) * width ) + anMath::Abs( anMath::Sin( roll ) * height ) + anMath::Abs( cos( pitch ) * depth );
+    const float newHeight = anMath::Abs( anMath::Sin( pitch ) * width ) + anMath::Abs( anMath::Cos( pitch ) * height ) + anMath::Abs( sin( roll ) * depth );
+    const float newDepth = anMath::Abs( anMath::Cos( yaw ) * depth ) + anMath::Abs( anMath::Sin( yaw ) * width ) + anMath::Abs( sin( pitch ) * height );
+
+    // Set the dimensions of the tight box
+    SetDimensions( newWidth, newHeight, newDepth );
 }
 
 /*
 ============
-ARCBox::ToPoints
+anBox::ToPoints
 ============
 */
-void ARCBox::ToPoints( arcVec3 points[8] ) const {
-	arcMat3 ax;
-	arcVec3 temp[4];
-
-	ax[0] = extents[0] * axis[0];
-	ax[1] = extents[1] * axis[1];
-	ax[2] = extents[2] * axis[2];
+void anBox::ToPoints( anVec3 points[8] ) const {
+	anVec3 temp[4];
+	anMat3 ax[0] = extents[0] * axis[0];
+	anMat3 ax[1] = extents[1] * axis[1];
+	anMat3 ax[2] = extents[2] * axis[2];
 	temp[0] = center - ax[0];
 	temp[1] = center + ax[0];
 	temp[2] = ax[1] - ax[2];
@@ -753,33 +769,31 @@ void ARCBox::ToPoints( arcVec3 points[8] ) const {
 
 /*
 ============
-ARCBox::GetProjectionSilhouetteVerts
+anBox::GetProjectionSilhouetteVerts
 ============
 */
-int ARCBox::GetProjectionSilhouetteVerts( const arcVec3 &projectionOrigin, arcVec3 silVerts[6] ) const {
-	float f;
-	int i, planeBits, *index;
-	arcVec3 points[8], dir1, dir2;
+int anBox::GetProjectionSilhouetteVerts( const anVec3 &projectionOrigin, anVec3 silVerts[6] ) const {
+	anVec3 points[8];
 
 	ToPoints( points );
 
-	dir1 = points[0] - projectionOrigin;
-	dir2 = points[6] - projectionOrigin;
-	f = dir1 * axis[0];
-	planeBits = FLOATSIGNBITNOTSET( f );
-	f = dir2 * axis[0];
+	anVec3 dir1 = points[0] - projectionOrigin;
+	anVec3 dir2 = points[6] - projectionOrigin;
+	float f = dir1 * axis[0];
+	int planeBits = FLOATSIGNBITNOTSET( f );
+	float f = dir2 * axis[0];
 	planeBits |= FLOATSIGNBITSET( f ) << 1;
-	f = dir1 * axis[1];
+	float f = dir1 * axis[1];
 	planeBits |= FLOATSIGNBITNOTSET( f ) << 2;
-	f = dir2 * axis[1];
+	float f = dir2 * axis[1];
 	planeBits |= FLOATSIGNBITSET( f ) << 3;
-	f = dir1 * axis[2];
+	float f = dir1 * axis[2];
 	planeBits |= FLOATSIGNBITNOTSET( f ) << 4;
-	f = dir2 * axis[2];
+	float f = dir2 * axis[2];
 	planeBits |= FLOATSIGNBITSET( f ) << 5;
 
-	index = boxPlaneBitsSilVerts[planeBits];
-	for ( i = 0; i < index[0]; i++ ) {
+	int *index = boxPlaneBitsSilVerts[planeBits];
+	for ( int i = 0; i < index[0]; i++ ) {
 		silVerts[i] = points[index[i+1]];
 	}
 
@@ -788,32 +802,30 @@ int ARCBox::GetProjectionSilhouetteVerts( const arcVec3 &projectionOrigin, arcVe
 
 /*
 ============
-ARCBox::GetParallelProjectionSilhouetteVerts
+anBox::ParallelProjSilhouetteVerts
 ============
 */
-int ARCBox::GetParallelProjectionSilhouetteVerts( const arcVec3 &projectionDir, arcVec3 silVerts[6] ) const {
-	float f;
-	int i, planeBits, *index;
-	arcVec3 points[8];
+int anBox::ParallelProjSilhouetteVerts( const anVec3 &projectionDir, anVec3 silVerts[6] ) const {
+	anVec3 points[8];
 
 	ToPoints( points );
 
-	planeBits = 0;
-	f = projectionDir * axis[0];
+	int planeBits = 0;
+	float f = projectionDir * axis[0];
 	if ( FLOATNOTZERO( f ) ) {
 		planeBits = 1 << FLOATSIGNBITSET( f );
 	}
-	f = projectionDir * axis[1];
+	float f = projectionDir * axis[1];
 	if ( FLOATNOTZERO( f ) ) {
 		planeBits |= 4 << FLOATSIGNBITSET( f );
 	}
-	f = projectionDir * axis[2];
+	float f = projectionDir * axis[2];
 	if ( FLOATNOTZERO( f ) ) {
 		planeBits |= 16 << FLOATSIGNBITSET( f );
 	}
 
-	index = boxPlaneBitsSilVerts[planeBits];
-	for ( i = 0; i < index[0]; i++ ) {
+	int *index = boxPlaneBitsSilVerts[planeBits];
+	for ( int i = 0; i < index[0]; i++ ) {
 		silVerts[i] = points[index[i+1]];
 	}
 

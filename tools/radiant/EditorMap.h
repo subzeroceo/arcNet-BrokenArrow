@@ -45,7 +45,7 @@ extern	entity_t	*world_entity;	// the world entity is NOT included in
 
 extern	int modified;		// for quit confirmations
 
-extern	arcVec3	region_mins, region_maxs;
+extern	anVec3	region_mins, region_maxs;
 extern	bool	region_active;
 
 void 	Map_LoadFile (const char *filename);
@@ -60,8 +60,8 @@ void	Map_RegionBrush ( void );
 void	Map_RegionSelectedBrushes ( void );
 bool	Map_IsBrushFiltered (brush_t *b);
 
-void	Map_SaveSelected(CMemFile* pMemFile, CMemFile* pPatchFile = NULL);
+void	Map_SaveSelected(CMemFile* pMemFile, CMemFile* pPatchFile = nullptr );
 void	Map_ImportBuffer (char* buf, bool renameEntities = true);
 int		Map_GetUniqueEntityID(const char *prefix, const char *eclass);
 
-idMapPrimitive *BrushToMapPrimitive( const brush_t *b, const arcVec3 &origin );
+anMapPrimitiveitive *BrushToMapPrimitive( const brush_t *b, const anVec3 &origin );

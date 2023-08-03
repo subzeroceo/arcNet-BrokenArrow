@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/guied_resource.h"
@@ -61,9 +61,9 @@ static INT_PTR CALLBACK GEOptionsDlg_GeneralProc ( HWND hwnd, UINT msg, WPARAM w
 					CHOOSECOLOR col;
 					ZeroMemory ( &col, sizeof(col) );
 					col.lStructSize = sizeof(col);
-					col.lpCustColors = gApp.GetOptions().GetCustomColors ( );
+					col.lpCustColors = gApp.GetOptions().GetCustomColors();
 					col.hwndOwner = hwnd;
-					col.hInstance = NULL;
+					col.hInstance = nullptr;
 					col.Flags = CC_RGBINIT;
 					col.rgbResult = ColorButton_GetColor ( GetDlgItem ( hwnd, IDC_GUIED_SELECTIONCOLOR ) );
 					if ( ChooseColor ( &col ) )
@@ -108,8 +108,8 @@ static INT_PTR CALLBACK GEOptionsDlg_GridProc ( HWND hwnd, UINT msg, WPARAM wPar
 		case WM_INITDIALOG:
 			// Copy the options information to the dialog controls
 			ColorButton_SetColor ( GetDlgItem ( hwnd, IDC_GUIED_GRIDCOLOR ), RGB(gApp.GetOptions().GetGridColor()[0]*255,gApp.GetOptions().GetGridColor()[1]*255,gApp.GetOptions().GetGridColor()[2]*255) );
-			SetWindowText ( GetDlgItem ( hwnd, IDC_GUIED_SPACINGWIDTH ), va( "%d", gApp.GetOptions().GetGridWidth ( ) ) );
-			SetWindowText ( GetDlgItem ( hwnd, IDC_GUIED_SPACINGHEIGHT ), va( "%d", gApp.GetOptions().GetGridHeight ( ) ) );
+			SetWindowText ( GetDlgItem ( hwnd, IDC_GUIED_SPACINGWIDTH ), va( "%d", gApp.GetOptions().GetGridWidth() ) );
+			SetWindowText ( GetDlgItem ( hwnd, IDC_GUIED_SPACINGHEIGHT ), va( "%d", gApp.GetOptions().GetGridHeight() ) );
 			CheckDlgButton ( hwnd, IDC_GUIED_GRIDVISIBLE, gApp.GetOptions().GetGridVisible()?BST_CHECKED:BST_UNCHECKED );
 			CheckDlgButton ( hwnd, IDC_GUIED_GRIDSNAP, gApp.GetOptions().GetGridSnap()?BST_CHECKED:BST_UNCHECKED );
 			return TRUE;
@@ -146,9 +146,9 @@ static INT_PTR CALLBACK GEOptionsDlg_GridProc ( HWND hwnd, UINT msg, WPARAM wPar
 					CHOOSECOLOR col;
 					ZeroMemory ( &col, sizeof(col) );
 					col.lStructSize = sizeof(col);
-					col.lpCustColors = gApp.GetOptions().GetCustomColors ( );
+					col.lpCustColors = gApp.GetOptions().GetCustomColors();
 					col.hwndOwner = hwnd;
-					col.hInstance = NULL;
+					col.hInstance = nullptr;
 					col.Flags = CC_RGBINIT;
 					col.rgbResult = RGB(gApp.GetOptions().GetGridColor()[0]*255,gApp.GetOptions().GetGridColor()[1]*255,gApp.GetOptions().GetGridColor()[2]*255);
 					if ( ChooseColor ( &col ) )
@@ -193,7 +193,7 @@ bool GEOptionsDlg_DoModal ( HWND parent )
 	propsp[1].lParam		= 0;
 
 	propsh.dwSize			= sizeof(PROPSHEETHEADER);
-	propsh.nStartPage		= gApp.GetOptions().GetLastOptionsPage ( );
+	propsh.nStartPage		= gApp.GetOptions().GetLastOptionsPage();
 	propsh.dwFlags			= PSH_PROPSHEETPAGE|PSH_NOAPPLYNOW|PSH_NOCONTEXTHELP;
 	propsh.hwndParent		= parent;
 	propsh.pszCaption		= "Options";
@@ -202,7 +202,7 @@ bool GEOptionsDlg_DoModal ( HWND parent )
 
 	if ( PropertySheet ( &propsh ) )
 	{
-		gApp.GetOptions().Save ( );
+		gApp.GetOptions().Save();
 		return true;
 	}
 

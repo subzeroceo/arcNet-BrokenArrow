@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 //#pragma optimize( "", off )
@@ -47,7 +47,7 @@ If you have questions concerning this license or the applicable additional terms
 
 */
 
-arcBounds	optBounds;
+anBounds	optBounds;
 
 #define	MAX_OPT_VERTEXES	0x10000
 int			numOptVerts;
@@ -183,7 +183,7 @@ static	void LinkEdge( optEdge_t *e ) {
 
 #ifdef __linux__
 
-optVertex_t *FindOptVertex( arcDrawVert *v, optimizeGroup_t *opt );
+optVertex_t *FindOptVertex( anDrawVertex *v, optimizeGroup_t *opt );
 
 #else
 
@@ -192,7 +192,7 @@ optVertex_t *FindOptVertex( arcDrawVert *v, optimizeGroup_t *opt );
 FindOptVertex
 ================
 */
-static optVertex_t *FindOptVertex( arcDrawVert *v, optimizeGroup_t *opt ) {
+static optVertex_t *FindOptVertex( anDrawVertex *v, optimizeGroup_t *opt ) {
 	int		i;
 	float	x, y;
 	optVertex_t	*vert;
@@ -210,7 +210,7 @@ static optVertex_t *FindOptVertex( arcDrawVert *v, optimizeGroup_t *opt ) {
 
 	if ( numOptVerts >= MAX_OPT_VERTEXES ) {
 		common->Error( "MAX_OPT_VERTEXES" );
-		return NULL;
+		return nullptr;
 	}
 
 	numOptVerts++;
@@ -245,7 +245,7 @@ static	void DrawAllEdges( void ) {
 
 	qglBegin( GL_LINES );
 	for ( i = 0; i < numOptEdges; i++ ) {
-		if ( optEdges[i].v1 == NULL ) {
+		if ( optEdges[i].v1 == nullptr ) {
 			continue;
 		}
 		qglColor3f( 1, 0, 0 );
@@ -300,7 +300,7 @@ static	void DrawEdges( optIsland_t *island ) {
 
 	qglBegin( GL_LINES );
 	for ( edge = island->edges; edge; edge = edge->islandLink ) {
-		if ( edge->v1 == NULL ) {
+		if ( edge->v1 == nullptr ) {
 			continue;
 		}
 		qglColor3f( 1, 0, 0 );
@@ -322,7 +322,7 @@ VertexBetween
 =================
 */
 static bool VertexBetween( const optVertex_t *p1, const optVertex_t *v1, const optVertex_t *v2 ) {
-	arcVec3	d1, d2;
+	anVec3	d1, d2;
 	float	d;
 
 	d1 = p1->pv - v1->pv;
@@ -342,14 +342,14 @@ EdgeIntersection
 Creates a new optVertex_t where the line segments cross.
 This should only be called if PointsStraddleLine returned true
 
-Will return NULL if the lines are colinear
+Will return nullptr if the lines are colinear
 ====================
 */
 static	optVertex_t *EdgeIntersection( const optVertex_t *p1, const optVertex_t *p2,
 									  const optVertex_t *l1, const optVertex_t *l2, optimizeGroup_t *opt ) {
 	float	f;
-	arcDrawVert	*v;
-	arcVec3	dir1, dir2, cross1, cross2;
+	anDrawVertex	*v;
+	anVec3	dir1, dir2, cross1, cross2;
 
 	dir1 = p1->pv - l1->pv;
 	dir2 = p1->pv - l2->pv;
@@ -360,13 +360,13 @@ static	optVertex_t *EdgeIntersection( const optVertex_t *p1, const optVertex_t *
 	cross2 = dir1.Cross( dir2 );
 
 	if ( cross1[2] - cross2[2] == 0 ) {
-		return NULL;
+		return nullptr;
 	}
 
 	f = cross1[2] / ( cross1[2] - cross2[2] );
 
 	// FIXME: how are we freeing this, since it doesn't belong to a tri?
-	v = (arcDrawVert *)Mem_Alloc( sizeof( *v ) );
+	v = (anDrawVertex *)Mem_Alloc( sizeof( *v ) );
 	memset( v, 0, sizeof( *v ) );
 
 	v->xyz = p1->v.xyz * ( 1.0 - f ) + p2->v.xyz * f;
@@ -560,7 +560,7 @@ static	void AddInteriorEdges( optIsland_t *island ) {
 			continue;
 		}
 		for ( vert2 = vert->islandLink; vert2; vert2 = vert2->islandLink ) {
-			arcVec3		dir;
+			anVec3		dir;
 
 			if ( !vert2->edges ) {
 				continue;
@@ -607,17 +607,17 @@ RemoveIfColinear
 static	void RemoveIfColinear( optVertex_t *ov, optIsland_t *island ) {
 	optEdge_t	*e, *e1, *e2;
 	optVertex_t *v1, *v2, *v3;
-	arcVec3		dir1, dir2;
+	anVec3		dir1, dir2;
 	float		len, dist;
-	arcVec3		point;
-	arcVec3		offset;
+	anVec3		point;
+	anVec3		offset;
 	float		off;
 
 	v2 = ov;
 
 	// we must find exactly two edges before testing for colinear
-	e1 = NULL;
-	e2 = NULL;
+	e1 = nullptr;
+	e2 = nullptr;
 	for ( e = ov->edges; e; ) {
 		if ( !e1 ) {
 			e1 = e;
@@ -791,7 +791,7 @@ static void FreeOptTriangles( optIsland_t *island ) {
 		Mem_Free( opt );
 	}
 
-	island->tris = NULL;
+	island->tris = nullptr;
 }
 
 
@@ -806,7 +806,7 @@ consider it invalid if any one of the possibilities is invalid.
 =================
 */
 static bool IsTriangleValid( const optVertex_t *v1, const optVertex_t *v2, const optVertex_t *v3 ) {
-	arcVec3	d1, d2, normal;
+	anVec3	d1, d2, normal;
 
 	d1 = v2->pv - v1->pv;
 	d2 = v3->pv - v1->pv;
@@ -842,7 +842,7 @@ Returns false if it is either front or back facing
 */
 static bool IsTriangleDegenerate( const optVertex_t *v1, const optVertex_t *v2, const optVertex_t *v3 ) {
 #if 1
-	arcVec3	d1, d2, normal;
+	anVec3	d1, d2, normal;
 
 	d1 = v2->pv - v1->pv;
 	d2 = v3->pv - v1->pv;
@@ -864,8 +864,8 @@ PointInTri
 Tests if a 2D point is inside an original triangle
 ==================
 */
-static bool PointInTri( const arcVec3 &p, const mapTri_t *tri, optIsland_t *island ) {
-	arcVec3	d1, d2, normal;
+static bool PointInTri( const anVec3 &p, const mapTri_t *tri, optIsland_t *island ) {
+	anVec3	d1, d2, normal;
 
 	// the normal[2] == 0 case is not uncommon when a square is triangulated in
 	// the opposite manner to the original
@@ -1061,7 +1061,7 @@ static void CreateOptTri( optVertex_t *first, optEdge_t *e1, optEdge_t *e2, optI
 static void ReportNearbyVertexes( const optVertex_t *v, const optIsland_t *island ) {
 	const optVertex_t	*ov;
 	float		d;
-	arcVec3		vec;
+	anVec3		vec;
 
 	common->Printf( "verts near 0x%p (%f, %f)\n", v,  v->pv[0], v->pv[1] );
 	for ( ov = island->verts; ov; ov = ov->islandLink ) {
@@ -1099,7 +1099,7 @@ static void BuildOptTriangles( optIsland_t *island ) {
 
 	// clear the edge triangle links
 	for ( check = island->edges; check; check = check->islandLink ) {
-		check->frontTri = check->backTri = NULL;
+		check->frontTri = check->backTri = nullptr;
 	}
 
 	// check all possible triangle made up out of the
@@ -1235,7 +1235,7 @@ static	void	RegenerateTriangles( optIsland_t *island ) {
 		tri->v[1] = optTri->v[1]->v;
 		tri->v[2] = optTri->v[2]->v;
 
-		arcPlane plane;
+		anPlane plane;
 		PlaneForTri( tri, plane );
 		if ( plane.Normal() * dmapGlobals.mapPlanes[ island->group->planeNum ].Normal() <= 0 ) {
 			// this can happen reasonably when a triangle is nearly degenerate in
@@ -1340,7 +1340,7 @@ void AddEdgeIfNotAlready( optVertex_t *v1, optVertex_t *v2 ) {
 	e->v1 = v1;
 	e->v2 = v2;
 
-	e->islandLink = NULL;
+	e->islandLink = nullptr;
 
 	// link the edge to its verts
 	LinkEdge( e );
@@ -1753,7 +1753,7 @@ static void AddVertexToIsland_r( optVertex_t *vert, optIsland_t *island ) {
 	optEdge_t	*e;
 
 	// we can't just check islandLink, because the
-	// last vert will have a NULL
+	// last vert will have a nullptr
 	if ( vert->addedToIsland ) {
 		return;
 	}
@@ -1854,8 +1854,8 @@ This is a sloppy bounding box check
 */
 static bool PointInSourceTris( float x, float y, float z, optimizeGroup_t *opt ) {
 	mapTri_t	*tri;
-	arcBounds	b;
-	arcVec3		p;
+	anBounds	b;
+	anVec3		p;
 
 	if ( !opt->material->IsDrawn() ) {
 		return false;
@@ -1889,7 +1889,7 @@ static	void OptimizeOptList( optimizeGroup_t *opt ) {
 	// so we can match edges
 	// can we avoid doing this if colinear vertexes break edges?
 	oldNext = opt->nextGroup;
-	opt->nextGroup = NULL;
+	opt->nextGroup = nullptr;
 	FixAreaGroupsTjunctions( opt );
 	opt->nextGroup = oldNext;
 
@@ -1913,7 +1913,7 @@ static	void OptimizeOptList( optimizeGroup_t *opt ) {
 	// free the original list and use the new one
 	FreeTriList( opt->triList );
 	opt->triList = opt->regeneratedTris;
-	opt->regeneratedTris = NULL;
+	opt->regeneratedTris = nullptr;
 }
 
 

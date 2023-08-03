@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "MaterialEditView.h"
@@ -73,8 +73,8 @@ void MaterialEditView::MV_OnMaterialNameChanged(MaterialDoc* pMaterial, const ch
 /**
 * Returns the current source text in the source edit control.
 */
-arcNetString MaterialEditView::GetSourceText() {
-	arcNetString text;
+anString MaterialEditView::GetSourceText() {
+	anString text;
 	m_textView.GetText(text);
 
 	text.Replace( "\n", "" );
@@ -100,7 +100,7 @@ void MaterialEditView::GetMaterialSource() {
 	if (materialDocManager) {
 		MaterialDoc* material = materialDocManager->GetCurrentMaterialDoc();
 		if (material) {
-			arcNetString text = material->GetEditSourceText();
+			anString text = material->GetEditSourceText();
 
 			// clean up new-line crapola
 			text.Replace( "\r", "" );
@@ -127,7 +127,7 @@ void MaterialEditView::ApplyMaterialSource() {
 	MaterialDoc* material = materialDocManager->CreateMaterialDoc(currentMaterialName);
 
 	if (material) {
-		arcNetString text = GetSourceText();
+		anString text = GetSourceText();
 		material->ApplySourceModify(text);
 	}
 
@@ -171,12 +171,12 @@ int MaterialEditView::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 
 	m_editSplitter.CreateStatic(this, 1, 2);
 
-	if ( !m_editSplitter.CreateView(0, 0, RUNTIME_CLASS(StageView), CSize(200, 200), NULL) ) {
+	if ( !m_editSplitter.CreateView(0, 0, RUNTIME_CLASS(StageView), CSize(200, 200), nullptr ) ) {
 		TRACE0( "Failed to create stage property pane\n" );
 		return -1;
 	}
 
-	if ( !m_editSplitter.CreateView(0, 1, RUNTIME_CLASS(MaterialPropTreeView), CSize(500, 200), NULL) ) {
+	if ( !m_editSplitter.CreateView(0, 1, RUNTIME_CLASS(MaterialPropTreeView), CSize(500, 200), nullptr ) ) {
 		TRACE0( "Failed to create property pane\n" );
 		return -1;
 	}
@@ -231,7 +231,7 @@ void MaterialEditView::OnSize(UINT nType, int cx, int cy) {
 void MaterialEditView::OnTcnSelChange(NMHDR *pNMHDR, LRESULT *pResult) {
 	int sel = m_tabs.GetCurSel();
 
-	switch(sel) {
+	switch (sel) {
 		case 0:
 			m_editSplitter.ShowWindow(SW_SHOW);
 			m_textView.ShowWindow(SW_HIDE);

@@ -26,11 +26,11 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
-#include "AASFile.h"
-#include "AASFile_local.h"
+#include "SEASFile.h"
+#include "SEASFile_local.h"
 
 /*
 ===============================================================================
@@ -40,37 +40,37 @@ If you have questions concerning this license or the applicable additional terms
 ===============================================================================
 */
 
-class idAASFileManagerLocal : public idAASFileManager {
+class anSEASFileManagerLocal : public anSEASFileManager {
 public:
-	virtual						~idAASFileManagerLocal( void ) {}
+	virtual						~anSEASFileManagerLocal( void ) {}
 
-	virtual idAASFile *			LoadAAS( const char *fileName, unsigned int mapFileCRC );
-	virtual void				FreeAAS( idAASFile *file );
+	virtual anSEASFile *			LoadSEAS( const char *fileName, unsigned int mapFileCRC );
+	virtual void				FreeSEAS( anSEASFile *file );
 };
 
-idAASFileManagerLocal			AASFileManagerLocal;
-idAASFileManager *				AASFileManager = &AASFileManagerLocal;
+anSEASFileManagerLocal			SEASFileManagerLocal;
+anSEASFileManager *				SEASFileManager = &SEASFileManagerLocal;
 
 
 /*
 ================
-idAASFileManagerLocal::LoadAAS
+anSEASFileManagerLocal::LoadSEAS
 ================
 */
-idAASFile *idAASFileManagerLocal::LoadAAS( const char *fileName, unsigned int mapFileCRC ) {
-	idAASFileLocal *file = new idAASFileLocal();
+anSEASFile *anSEASFileManagerLocal::LoadSEAS( const char *fileName, unsigned int mapFileCRC ) {
+	anSEASFileLocal *file = new anSEASFileLocal();
 	if ( !file->Load( fileName, mapFileCRC ) ) {
 		delete file;
-		return NULL;
+		return nullptr;
 	}
 	return file;
 }
 
 /*
 ================
-idAASFileManagerLocal::FreeAAS
+anSEASFileManagerLocal::FreeSEAS
 ================
 */
-void idAASFileManagerLocal::FreeAAS( idAASFile *file ) {
+void anSEASFileManagerLocal::FreeSEAS( anSEASFile *file ) {
 	delete file;
 }

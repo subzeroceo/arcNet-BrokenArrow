@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "snd_local.h"
@@ -44,7 +44,7 @@ If you have questions concerning this license or the applicable additional terms
 ===================================================================================
 */
 
-arcDynamicBlockAlloc<byte, 1<<20, 128>		decoderMemoryAllocator;
+anDynamicBlockAlloc<byte, 1<<20, 128>		decoderMemoryAllocator;
 
 const int MIN_OGGVORBIS_MEMORY				= 768 * 1024;
 
@@ -57,25 +57,25 @@ extern "C" {
 
 void *_decoder_malloc( size_t size ) {
 	void *ptr = decoderMemoryAllocator.Alloc( size );
-	assert( size == 0 || ptr != NULL );
+	assert( size == 0 || ptr != nullptr );
 	return ptr;
 }
 
 void *_decoder_calloc( size_t num, size_t size ) {
 	void *ptr = decoderMemoryAllocator.Alloc( num * size );
-	assert( ( num * size ) == 0 || ptr != NULL );
+	assert( ( num * size ) == 0 || ptr != nullptr );
 	memset( ptr, 0, num * size );
 	return ptr;
 }
 
 void *_decoder_realloc( void *memblock, size_t size ) {
-	void *ptr = decoderMemoryAllocator.Resize( ( byte * )memblock, size );
-	assert( size == 0 || ptr != NULL );
+	void *ptr = decoderMemoryAllocator.Resize( (byte *)memblock, size );
+	assert( size == 0 || ptr != nullptr );
 	return ptr;
 }
 
 void _decoder_free( void *memblock ) {
-	decoderMemoryAllocator.Free( ( byte * )memblock );
+	decoderMemoryAllocator.Free( (byte *)memblock );
 }
 
 
@@ -93,7 +93,7 @@ FS_ReadOGG
 ====================
 */
 size_t FS_ReadOGG( void *dest, size_t size1, size_t size2, void *fh ) {
-	arcNetFile *f = reinterpret_cast<arcNetFile *>(fh);
+	anFile *f = reinterpret_cast<anFile *>(fh);
 	return f->Read( dest, size1 * size2 );
 }
 
@@ -114,7 +114,7 @@ int FS_SeekOGG( void *fh, ogg_int64_t to, int type ) {
 	} else {
 		common->FatalError( "fs_seekOGG: seek without type\n" );
 	}
-	arcNetFile *f = reinterpret_cast<arcNetFile *>(fh);
+	anFile *f = reinterpret_cast<anFile *>(fh);
 	return f->Seek( to, retype );
 }
 
@@ -133,7 +133,7 @@ FS_TellOGG
 ====================
 */
 long FS_TellOGG( void *fh ) {
-	arcNetFile *f = reinterpret_cast<arcNetFile *>(fh);
+	anFile *f = reinterpret_cast<anFile *>(fh);
 	return f->Tell();
 }
 
@@ -142,7 +142,7 @@ long FS_TellOGG( void *fh ) {
 ov_openFile
 ====================
 */
-int ov_openFile( arcNetFile *f, OggVorbis_File *vf ) {
+int ov_openFile( anFile *f, OggVorbis_File *vf ) {
 	ov_callbacks callbacks;
 
 	memset( vf, 0, sizeof( OggVorbis_File ) );
@@ -151,7 +151,7 @@ int ov_openFile( arcNetFile *f, OggVorbis_File *vf ) {
 	callbacks.seek_func = FS_SeekOGG;
 	callbacks.close_func = FS_CloseOGG;
 	callbacks.tell_func = FS_TellOGG;
-	return ov_open_callbacks((void *)f, vf, NULL, -1, callbacks);
+	return ov_open_callbacks((void *)f, vf, nullptr, -1, callbacks);
 }
 
 /*
@@ -177,7 +177,7 @@ int idWaveFile::OpenOGG( const char* strFileName, waveformatex_t *pwfx ) {
 		delete ov;
 		Sys_LeaveCriticalSection( CRITICAL_SECTION_ONE );
 		fileSystem->CloseFile( mhmmio );
-		mhmmio = NULL;
+		mhmmio = nullptr;
 		return -1;
 	}
 
@@ -187,7 +187,7 @@ int idWaveFile::OpenOGG( const char* strFileName, waveformatex_t *pwfx ) {
 
 	mpwfx.Format.nSamplesPerSec = vi->rate;
 	mpwfx.Format.nChannels = vi->channels;
-	mpwfx.Format.wBitsPerSample = sizeof(short) * 8;
+	mpwfx.Format.wBitsPerSample = sizeof( short) * 8;
 	mdwSize = ov_pcm_total( ov, -1 ) * vi->channels;	// pcm samples * num channels
 	mbIsReadingFromMemory = false;
 
@@ -195,7 +195,7 @@ int idWaveFile::OpenOGG( const char* strFileName, waveformatex_t *pwfx ) {
 
 		ov_clear( ov );
 		fileSystem->CloseFile( mhmmio );
-		mhmmio = NULL;
+		mhmmio = nullptr;
 		delete ov;
 
 		mpwfx.Format.wFormatTag = WAVE_FORMAT_TAG_OGG;
@@ -241,9 +241,9 @@ int idWaveFile::ReadOGG( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead ) {
 		total -= ret;
 	} while( total > 0 );
 
-	dwSizeToRead = ( byte * )bufferPtr - pBuffer;
+	dwSizeToRead = (byte *)bufferPtr - pBuffer;
 
-	if ( pdwSizeRead != NULL ) {
+	if ( pdwSizeRead != nullptr ) {
 		*pdwSizeRead = dwSizeToRead;
 	}
 
@@ -257,14 +257,14 @@ idWaveFile::CloseOGG
 */
 int idWaveFile::CloseOGG( void ) {
 	OggVorbis_File *ov = (OggVorbis_File *) ogg;
-	if ( ov != NULL ) {
+	if ( ov != nullptr ) {
 		Sys_EnterCriticalSection( CRITICAL_SECTION_ONE );
 		ov_clear( ov );
 		delete ov;
 		Sys_LeaveCriticalSection( CRITICAL_SECTION_ONE );
 		fileSystem->CloseFile( mhmmio );
-		mhmmio = NULL;
-		ogg = NULL;
+		mhmmio = nullptr;
+		ogg = nullptr;
 		return 0;
 	}
 	return -1;
@@ -296,12 +296,12 @@ private:
 	idSoundSample *			lastSample;			// last sample being decoded
 	int						lastSampleOffset;	// last offset into the decoded sample
 	int						lastDecodeTime;		// last time decoding sound
-	aRcFileMemory			file;				// encoded file in memory
+	anFileMemory			file;				// encoded file in memory
 
 	OggVorbis_File			ogg;				// OggVorbis file
 };
 
-arcBlockAlloc<idSampleDecoderLocal, 64>		sampleDecoderAllocator;
+anBlockAlloc<idSampleDecoderLocal, 64>		sampleDecoderAllocator;
 
 /*
 ====================
@@ -372,7 +372,7 @@ idSampleDecoderLocal::Clear
 void idSampleDecoderLocal::Clear( void ) {
 	failed = false;
 	lastFormat = WAVE_FORMAT_TAG_PCM;
-	lastSample = NULL;
+	lastSample = nullptr;
 	lastSampleOffset = 0;
 	lastDecodeTime = 0;
 }
@@ -385,7 +385,7 @@ idSampleDecoderLocal::ClearDecoder
 void idSampleDecoderLocal::ClearDecoder( void ) {
 	Sys_EnterCriticalSection( CRITICAL_SECTION_ONE );
 
-	switch( lastFormat ) {
+	switch ( lastFormat ) {
 		case WAVE_FORMAT_TAG_PCM: {
 			break;
 		}
@@ -441,7 +441,7 @@ void idSampleDecoderLocal::Decode( idSoundSample *sample, int sampleOffset44k, i
 	// samples can be decoded both from the sound thread and the main thread for shakes
 	Sys_EnterCriticalSection( CRITICAL_SECTION_ONE );
 
-	switch( sample->objectInfo.wFormatTag ) {
+	switch ( sample->objectInfo.wFormatTag ) {
 		case WAVE_FORMAT_TAG_PCM: {
 			readSamples44k = DecodePCM( sample, sampleOffset44k, sampleCount44k, dest );
 			break;
@@ -479,7 +479,7 @@ int idSampleDecoderLocal::DecodePCM( idSoundSample *sample, int sampleOffset44k,
 	int sampleOffset = sampleOffset44k >> shift;
 	int sampleCount = sampleCount44k >> shift;
 
-	if ( sample->nonCacheData == NULL ) {
+	if ( sample->nonCacheData == nullptr ) {
 		assert( false );	// this should never happen ( note: I've seen that happen with the main thread down in idGameLocal::MapClear clearing entities - TTimo )
 		failed = true;
 		return 0;
@@ -515,12 +515,12 @@ int idSampleDecoderLocal::DecodeOGG( idSoundSample *sample, int sampleOffset44k,
 	int sampleCount = sampleCount44k >> shift;
 
 	// open OGG file if not yet opened
-	if ( lastSample == NULL ) {
+	if ( lastSample == nullptr ) {
 		// make sure there is enough space for another decoder
 		if ( decoderMemoryAllocator.GetFreeBlockMemory() < MIN_OGGVORBIS_MEMORY ) {
 			return 0;
 		}
-		if ( sample->nonCacheData == NULL ) {
+		if ( sample->nonCacheData == nullptr ) {
 			assert( false );	// this should never happen
 			failed = true;
 			return 0;

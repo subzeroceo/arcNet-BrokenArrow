@@ -3,20 +3,20 @@
 #define __DECLMATCLASS_H__
 
 // Defines a material type - such as concrete, metal, glass etc
-class arcDeclSurfType : public arcDecl {
+class anDeclSurfaceType : public arcDecl {
 public:
-						arcDeclSurfType();
-						arcDeclSurfType( void ) { *( ulong *)mTint = 0; }
-						~arcDeclSurfType( void ) {}
+						anDeclSurfaceType();
+						anDeclSurfaceType( void ) { *(unsigned long *)mTint = 0; }
+						~anDeclSurfaceType( void ) {}
 // allow exporting of this decl type in a preparsed form
 	virtual void		Write( SerialOutputStream &stream ) const;
 	virtual void		AddReferences() const;
 
-	void				SetDescription( arcNetString &desc ) { mDescription = desc; }
-	const arcNetString &GetDescription( void ) const { return( mDescription ); }
+	void				SetDescription( anString &desc ) { mDescription = desc; }
+	const anString &	GetDescription( void ) const { return( mDescription ); }
 
-	void				SetTint( byte tint[4] ) { *( ulong *)mTint = *( ulong *)tint; }
-	int					GetTint( void ) const { return ( *( int *)mTint ); }
+	void				SetTint( byte tint[4] ) { *(unsigned long *)mTint = *(unsigned long *)tint; }
+	int					GetTint( void ) const { return ( *( int*)mTint ); }
 
 	float				GetRed( void ) const { return ( mTint[0] / 255.0f ); }
 	float				GetGreen( void ) const { return ( mTint[1] / 255.0f ); }
@@ -26,38 +26,44 @@ public:
 	virtual bool		Parse( const char *text, const int textLength );
 	virtual void		FreeData( void );
 	virtual size_t		Size( void ) const;
-	virtual size_t		Size( void ) const { return sizeof( arcDeclSurfType ); }
-	const arcDict		&GetProperties( void ) const { return properties; }
+	virtual size_t		Size( void ) const { return sizeof( anDeclSurfaceType ); }
+
+	int					GetNumImages( void ) const { return images.Num(); }
+	const an2DBounds &	GetImage( int index ) const { return images[index]; }
+
+	const anDict &		GetProperties( void ) const { return properties; }
 	virtual	bool		RebuildTextSource( void ) { return false; }
-	virtual bool		Validate( const char *psText, int iTextLength, arcNetString &strReportTo ) const;
+	virtual bool		Validate( const char *psText, int iTextLength, anString &strReportTo ) const;
 
 private:
-	arcNetString				mDescription;
-	byte						mTint[4];
-	arcNetString				type;
-	arcDict						properties;
+	anString				mDescription;
+	GLbyte					mTint[4];
+	anString				type;
+	anDict					properties;
+	const anMaterial *		material;
+	anList<an2DBounds>		images;
 };
 
-byte *MT_GetMaterialTypeArray( arcNetString image, int &width, int &height );
+byte *ST_GetSurfaceTypeArray( anString image, int &width, int &height );
 
 
 /*
 =======================
-arcDeclSurfType::DefaultDefinition
+anDeclSurfaceType::DefaultDefinition
 =======================
 */
-const char* arcDeclSurfType::DefaultDefinition( void ) const {
+const char *anDeclSurfaceType::DefaultDefinition( void ) const {
 	return "{ description \"<DEFAULTED>\" rgb 0,0,0 }";
 }
 
 /*
 =======================
-arcDeclSurfType::Parse
+anDeclSurfaceType::Parse
 =======================
 */
-bool arcDeclSurfType::Parse( const char* text, const int textLength ) {
-	arcLexer src;
-	arcNetToken token, token2;
+bool anDeclSurfaceType::Parse( const char *text, const int textLength ) {
+	anLexer src;
+	anToken token, token2;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( DECL_LEXER_FLAGS );
@@ -68,7 +74,7 @@ bool arcDeclSurfType::Parse( const char* text, const int textLength ) {
 			break;
 		}
 
-		if ( !token.Icmp( "}" )) {
+		if ( !token.Icmp( "}" ) ) {
 			break;
 		} else if (token == "rgb" ) {
 			mTint[0] = src.ParseInt();
@@ -92,14 +98,6 @@ bool arcDeclSurfType::Parse( const char* text, const int textLength ) {
 		}
 	}
 	return true;
-}
-
-/*
-=======================
-arcDeclSurfType::FreeData
-=======================
-*/
-void arcDeclSurfType::FreeData( void ) {
 }
 
 #endif

@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -16,17 +16,17 @@
 //#pragma warning( disable : 4786)
 
 #undef strnicmp
-#define strnicmp		arcNetString::Icmpn
+#define strnicmp		anString::Icmpn
 
 #if 1
-//extern void ClearBounds( arcVec3 mins, arcVec3 maxs );
-//extern void AddPointToBounds( const arcVec3 v, arcVec3 mins, arcVec3 maxs );
-void ClearBounds( arcVec3 &mins, arcVec3 &maxs ) {
+//extern void ClearBounds( anVec3 mins, anVec3 maxs );
+//extern void AddPointToBounds( const anVec3 v, anVec3 mins, anVec3 maxs );
+void ClearBounds( anVec3 &mins, anVec3 &maxs ) {
 	mins[0] = mins[1] = mins[2] = 99999;
 	maxs[0] = maxs[1] = maxs[2] = -99999;
 }
 
-void AddPointToBounds( const arcVec3 &v, arcVec3 &mins, arcVec3 &maxs ) {
+void AddPointToBounds( const anVec3 &v, anVec3 &mins, anVec3 &maxs ) {
 	for ( int i = 0; i < 3; i++ ) {
 		float val = v[i];
 		if ( val < mins[i] ) {
@@ -40,7 +40,7 @@ void AddPointToBounds( const arcVec3 &v, arcVec3 &mins, arcVec3 &maxs ) {
 }
 
 
-static void FloorBounds( arcVec3 &mins, arcVec3 &maxs ) {
+static void FloorBounds( anVec3 &mins, anVec3 &maxs ) {
 	for ( int i = 0; i < 3; i++ ) {
 		mins[i] = floor( mins[i] + 0.5f );
 		maxs[i] = floor( maxs[i] + 0.5f );
@@ -48,14 +48,14 @@ static void FloorBounds( arcVec3 &mins, arcVec3 &maxs ) {
 }
 
 
-static LPCSTR vtos( arcVec3 &v3 ) {
+static LPCSTR vtos( anVec3 &v3 ) {
 	return va( "%.3ff,%.3f,%.3f", v3[0], v3[1], v3[2] );
 }
 struct PairBrushFace_t {
 	face_t*		pFace;
 	brush_t*	pBrush;
 };
-arcNetList < PairBrushFace_t > FacesToCaulk;
+anList < PairBrushFace_t > FacesToCaulk;
 void Select_AutoCaulk() {
 	/*Sys_Printf*/common->Printf( "Caulking...\n" );
 	FacesToCaulk.Clear();
@@ -96,10 +96,10 @@ void Select_AutoCaulk() {
 		  		if (FilterBrush(pScannedBrush) )
 					continue;
 
-// arcMaterial stuff no longer support this, not sure what else to do.
+// anMaterial stuff no longer support this, not sure what else to do.
 //   Searching for other occurences of QER_NOCARVE just shows people REMing the code and ignoring ths issue...
 //
-//				if (pScannedBrush->brush_faces->d_texture->bFromShader && (pScannedBrush->brush_faces->d_texture->TestMaterialFlag(QER_NOCARVE) ))
+//				if (pScannedBrush->brush_faces->d_texture->bFromShader && (pScannedBrush->brush_faces->d_texture->TestMaterialFlag(QER_NOCARVE) ) )
 //					continue;
 
 				// basic-reject first to see if brushes can even possibly touch (coplanar counts as touching)
@@ -118,7 +118,7 @@ void Select_AutoCaulk() {
 				//	or equal to the face they're coplanar with...
 				//
 				for (pSelectedFace = pSelectedBrush->brush_faces; pSelectedFace; pSelectedFace = pSelectedFace->next) {
-					arcWinding *pSelectedWinding = pSelectedFace->face_winding;
+					anWinding *pSelectedWinding = pSelectedFace->face_winding;
 
 					if ( !pSelectedWinding )
 						continue;	// freed face, probably won't happen here, but who knows with this program?
@@ -137,7 +137,7 @@ void Select_AutoCaulk() {
 						if (pScannedFace->d_texture->TestMaterialFlag(QER_TRANS) )
 							continue;
 
-						arcWinding *pScannedWinding = pScannedFace->face_winding;
+						anWinding *pScannedWinding = pScannedFace->face_winding;
 
 						if ( !pScannedWinding)
 							continue;	// freed face, probably won't happen here, but who knows with this program?
@@ -155,8 +155,8 @@ void Select_AutoCaulk() {
 							//	are opposite, by adding them together and testing for zero...
 							// (if normals are opposite, then faces can be against/touching each other?)
 							//
-							arcVec3 v3ZeroTest;
-							arcVec3 v3Zero;v3Zero.Zero();	//static arcVec3 v3Zero={0,0,0};
+							anVec3 v3ZeroTest;
+							anVec3 v3Zero;v3Zero.Zero();	//static anVec3 v3Zero={0,0,0};
 
 							VectorAdd( pSelectedFace->plane.Normal(),pScannedFace->plane.Normal(),v3ZeroTest );
 							if ( v3ZeroTest == v3Zero ) {
@@ -179,7 +179,7 @@ void Select_AutoCaulk() {
 								//
 								// work out the bounds first...
 								//
-								arcVec3 v3ScannedBoundsMins, v3ScannedBoundsMaxs;
+								anVec3 v3ScannedBoundsMins, v3ScannedBoundsMaxs;
 								ClearBounds (v3ScannedBoundsMins, v3ScannedBoundsMaxs);
 								int iPoint;
 								for (iPoint=0; iPoint<pScannedWinding->GetNumPoints(); iPoint++ ) {
@@ -224,7 +224,7 @@ void Select_AutoCaulk() {
 	int iFacesCaulked = 0;
 	if ( FacesToCaulk.Num() ) {
 		LPCSTR psCaulkName = "textures/common/caulk";
-		const arcMaterial *pCaulk = Texture_ForName( psCaulkName );
+		const anMaterial *pCaulk = Texture_ForName( psCaulkName );
 		if ( pCaulk ) {
 			//
 			// and call some other junk that Radiant wants so so we can use it later...

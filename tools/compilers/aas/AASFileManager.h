@@ -2,9 +2,9 @@
 ===========================================================================
 
 Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
+This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
 
 Doom 3 Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#ifndef __AASFILEMANAGER_H__
-#define __AASFILEMANAGER_H__
+#ifndef __SEASFILEMANAGER_H__
+#define __SEASFILEMANAGER_H__
 
 /*
 ===============================================================================
@@ -37,14 +37,14 @@ If you have questions concerning this license or the applicable additional terms
 ===============================================================================
 */
 
-class idAASFileManager {
+class anSEASFileManager {
 public:
-	virtual						~idAASFileManager( void ) {}
+	virtual						~anSEASFileManager( void ) {}
 
-	virtual idAASFile *			LoadAAS( const char *fileName, unsigned int mapFileCRC ) = 0;
-	virtual void				FreeAAS( idAASFile *file ) = 0;
+	virtual anSEASFile *			LoadSEAS( const char *fileName, unsigned int mapFileCRC ) = 0;
+	virtual void				FreeSEAS( anSEASFile *file ) = 0;
 };
 
-extern idAASFileManager *		AASFileManager;
+extern anSEASFileManager *		SEASFileManager;
 
-#endif /* !__AASFILEMANAGER_H__ */
+#endif /* !__SEASFILEMANAGER_H__ */

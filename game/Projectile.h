@@ -23,13 +23,13 @@ extern const arcEventDef EV_DelayedLaunch;
 
 class sdProjectileNetworkData : public sdEntityStateNetworkData {
 public:
-								sdProjectileNetworkData( void ) : physicsData( NULL ) { ; }
+								sdProjectileNetworkData( void ) : physicsData( nullptr ) { ; }
 	virtual						~sdProjectileNetworkData( void );
 
 	virtual void				MakeDefault( void );
 
-	virtual void				Write( arcNetFile* file ) const;
-	virtual void				Read( arcNetFile* file );
+	virtual void				Write( anFile* file ) const;
+	virtual void				Read( anFile* file );
 
 	sdEntityStateNetworkData*	physicsData;
 	sdScriptObjectNetworkData	scriptData;
@@ -37,13 +37,13 @@ public:
 
 class sdProjectileBroadcastData : public sdEntityStateNetworkData {
 public:
-								sdProjectileBroadcastData( void ) : physicsData( NULL ), team( NULL ) { ; }
+								sdProjectileBroadcastData( void ) : physicsData( nullptr ), team( nullptr ) { ; }
 	virtual						~sdProjectileBroadcastData( void );
 
 	virtual void				MakeDefault( void );
 
-	virtual void				Write( arcNetFile* file ) const;
-	virtual void				Read( arcNetFile* file );
+	virtual void				Write( anFile* file ) const;
+	virtual void				Read( anFile* file );
 
 	sdEntityStateNetworkData*	physicsData;
 	sdScriptObjectNetworkData	scriptData;
@@ -53,7 +53,7 @@ public:
 	int							enemyId;
 	int							launchTime;
 	float						launchSpeed;
-	arcNetList< int >				owners;
+	anList< int >				owners;
 	bool						hidden;
 	sdBindNetworkData			bindData;
 };
@@ -67,22 +67,22 @@ public :
 
 	void					Spawn( void );
 
-	virtual void			Create( arcEntity *owner, const arcVec3 &start, const arcVec3 &dir );
-	virtual void			Launch( const arcVec3 &start, const arcVec3 &dir, const arcVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float launchPower = 1.0f, const float dmgPower = 1.0f );
+	virtual void			Create( arcEntity *owner, const anVec3 &start, const anVec3 &dir );
+	virtual void			Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float launchPower = 1.0f, const float dmgPower = 1.0f );
 
 	virtual void			InitPhysics( void );
-	virtual void			InitLaunchPhysics( float launchPower, const arcVec3& origin, const arcMat3& axes, const arcVec3& pushVelocity );
-	void					LaunchDelayed( int delay, arcEntity* owner, const arcVec3& org, const arcVec3& dir, const arcVec3& push );
+	virtual void			InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity );
+	void					LaunchDelayed( int delay, arcEntity* owner, const anVec3& org, const anVec3& dir, const anVec3& push );
 
 	arcEntity *				GetOwner( void ) const;
 	virtual bool			IsOwner( arcEntity* other ) const;
 
 	virtual void			Think( void );
 	virtual void					PostThink( void );
-	virtual idLinkList<arcEntity>*	GetPostThinkNode( void );
+	virtual anLinkList<arcEntity>*	GetPostThinkNode( void );
 
-	virtual void			Killed( arcEntity *inflictor, arcEntity *attacker, int damage, const arcVec3 &dir, int location, const sdDeclDamage* damageDecl );
-	virtual bool			Collide( const trace_t &collision, const arcVec3 &velocity, int bodyId );
+	virtual void			Killed( arcEntity *inflictor, arcEntity *attacker, int damage, const anVec3 &dir, int location, const sdDeclDamage* damageDecl );
+	virtual bool			Collide( const trace_t &collision, const anVec3 &velocity, int bodyId );
 
 	void					Thrust( void );
 	void					UpdateTargeting( void );
@@ -94,7 +94,7 @@ public :
 	virtual bool			CanCollide( const arcEntity* other, int traceId ) const;
 
 	virtual void			SetEnemy( arcEntity* _enemy );
-	virtual void			SetTarget( const arcVec3& target ) { }
+	virtual void			SetTarget( const anVec3& target ) { }
 
 	bool					SetState( const sdProgram::sdFunction* newState );
 	void					UpdateScript( void );
@@ -110,8 +110,8 @@ public :
 	virtual bool			ShouldConstructScriptObjectAtSpawn( void ) const { return false; }
 
 	virtual void						ApplyNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& newState );
-	virtual void						ReadNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, const idBitMsg& msg ) const;
-	virtual void						WriteNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, idBitMsg& msg ) const;
+	virtual void						ReadNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, const anBitMsg& msg ) const;
+	virtual void						WriteNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, anBitMsg& msg ) const;
 	virtual bool						CheckNetworkStateChanges( networkStateMode_t mode, const sdEntityStateNetworkData& baseState ) const;
 	virtual sdEntityStateNetworkData*	CreateNetworkStructure( networkStateMode_t mode ) const;
 
@@ -130,7 +130,7 @@ public :
 
 protected:
 	arcEntityPtr< arcEntity >				owner;
-	arcNetList< arcEntityPtr< arcEntity > >	owners;
+	anList< arcEntityPtr< arcEntity > >	owners;
 	arcEntityPtr< arcEntity >				enemy;
 
 	typedef struct projectileFlags_s {
@@ -157,7 +157,7 @@ protected:
 	int						health;
 	int						maxHealth;
 
-	arcMat3					visualAxes;
+	anMat3					visualAxes;
 
 	sdTeamInfo*				team;
 
@@ -169,18 +169,18 @@ protected:
 	const sdProgram::sdFunction*		targetingFunction;
 
 	const sdProgram::sdFunction*		onPostThink;
-	idLinkList< arcEntity >				postThinkEntNode;
+	anLinkList< arcEntity >				postThinkEntNode;
 
 protected:
 
 	void					Event_SetState( const char* stateName );
 	void					Event_Fizzle( void );
-	void					Event_DelayedLaunch( arcEntity* owner, const arcVec3 &org, arcVec3 const &dir, arcVec3 const &push );
+	void					Event_DelayedLaunch( arcEntity* owner, const anVec3 &org, anVec3 const &dir, anVec3 const &push );
 	void					Event_GetDamagePower( void );
 	void					Event_GetOwner( void );
 	void					Event_SetOwner( arcEntity* _owner );
 	void					Event_GetLaunchTime( void );
-	void					Event_Launch( const arcVec3& velocity );
+	void					Event_Launch( const anVec3& velocity );
 	void					Event_AddOwner( arcEntity* other );
 	void					Event_SetEnemy( arcEntity* other );
 	void					Event_IsOwner( arcEntity* other );
@@ -204,11 +204,11 @@ public :
 
 	virtual void			Spawn( void );
 	virtual void			InitPhysics( void );
-	virtual void			InitLaunchPhysics( float launchPower, const arcVec3& origin, const arcMat3& axes, const arcVec3& pushVelocity );
+	virtual void			InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity );
 
 	virtual bool			StartSynced( void ) const { return true; }
 
-	virtual void			CheckWater( const arcVec3& waterBodyOrg, const arcMat3& waterBodyAxis, arcCollisionModel* waterBodyModel );
+	virtual void			CheckWater( const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel );
 
 protected:
 	sdPhysics_SimpleRigidBody		physicsObj;
@@ -232,11 +232,11 @@ public :
 
 	virtual void			Spawn( void );
 	virtual void			InitPhysics( void );
-	virtual void			InitLaunchPhysics( float launchPower, const arcVec3& origin, const arcMat3& axes, const arcVec3& pushVelocity );
+	virtual void			InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity );
 
 	virtual bool			StartSynced( void ) const { return true; }
 
-	virtual void			CheckWater( const arcVec3& waterBodyOrg, const arcMat3& waterBodyAxis, arcCollisionModel* waterBodyModel );
+	virtual void			CheckWater( const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel );
 
 protected:
 	sdPhysics_Parabola		physicsObj;

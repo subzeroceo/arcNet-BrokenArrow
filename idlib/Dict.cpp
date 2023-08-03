@@ -1,17 +1,17 @@
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
-arcStringPool		arcDictionary::globalKeys;
-arcStringPool		arcDictionary::globalValues;
+anStringPool		anDict::globalKeys;
+anStringPool		anDict::globalValues;
 
 /*
 ================
-arcDictionary::operator=
+anDict::operator=
 
   clear existing key/value pairs and copy all key/value pairs from other
 ================
 */
-arcDictionary &arcDictionary::operator=( const arcDictionary &other ) {
+anDict &anDict::operator=( const anDict &other ) {
 	int i;
 
 	// check for assignment to self
@@ -34,14 +34,14 @@ arcDictionary &arcDictionary::operator=( const arcDictionary &other ) {
 
 /*
 ================
-arcDictionary::Copy
+anDict::Copy
 
   copy all key value pairs without removing existing key/value pairs not present in the other dict
 ================
 */
-void arcDictionary::Copy( const arcDictionary &other ) {
+void anDict::Copy( const anDict &other ) {
 	int i, n, *found;
-	idKeyValue kv;
+	anKeyValue kv;
 
 	// check for assignment to self
 	if ( this == &other ) {
@@ -51,12 +51,12 @@ void arcDictionary::Copy( const arcDictionary &other ) {
 	n = other.args.Num();
 
 	if ( args.Num() ) {
-		found = ( int * ) _alloca16( other.args.Num() * sizeof( int ) );
+		found = ( int*) _alloca16( other.args.Num() * sizeof( int ) );
         for ( i = 0; i < n; i++ ) {
 			found[i] = FindKeyIndex( other.args[i].GetKey() );
 		}
 	} else {
-		found = NULL;
+		found = nullptr;
 	}
 
 	for ( i = 0; i < n; i++ ) {
@@ -75,12 +75,12 @@ void arcDictionary::Copy( const arcDictionary &other ) {
 
 /*
 ================
-arcDictionary::TransferKeyValues
+anDict::TransferKeyValues
 
   clear existing key/value pairs and transfer key/value pairs from other
 ================
 */
-void arcDictionary::TransferKeyValues( arcDictionary &other ) {
+void anDict::TransferKeyValues( anDict &other ) {
 	int i, n;
 
 	if ( this == &other ) {
@@ -88,7 +88,7 @@ void arcDictionary::TransferKeyValues( arcDictionary &other ) {
 	}
 
 	if ( other.args.Num() && other.args[0].key->GetPool() != &globalKeys ) {
-		common->FatalError( "arcDictionary::TransferKeyValues: can't transfer values across a DLL boundary" );
+		common->FatalError( "anDict::TransferKeyValues: can't transfer values across a DLL boundary" );
 		return;
 	}
 
@@ -108,12 +108,12 @@ void arcDictionary::TransferKeyValues( arcDictionary &other ) {
 
 /*
 ================
-arcDictionary::Parse
+anDict::Parse
 ================
 */
-bool arcDictionary::Parse( ARCParser &parser ) {
-	arcNetToken	token;
-	arcNetToken	token2;
+bool anDict::Parse( anParser &parser ) {
+	anToken	token;
+	anToken	token2;
 
 	bool errors = false;
 
@@ -144,13 +144,13 @@ bool arcDictionary::Parse( ARCParser &parser ) {
 
 /*
 ================
-arcDictionary::SetDefaults
+anDict::SetDefaults
 ================
 */
-void arcDictionary::SetDefaults( const arcDictionary *dict ) {
+void anDict::SetDefaults( const anDict *dict ) {
 	int i, n;
-	const idKeyValue *kv, *def;
-	idKeyValue newkv;
+	const anKeyValue *kv, *def;
+	anKeyValue newkv;
 
 	n = dict->args.Num();
 	for ( i = 0; i < n; i++ ) {
@@ -166,10 +166,10 @@ void arcDictionary::SetDefaults( const arcDictionary *dict ) {
 
 /*
 ================
-arcDictionary::Clear
+anDict::Clear
 ================
 */
-void arcDictionary::Clear( void ) {
+void anDict::Clear( void ) {
 	int i;
 
 	for ( i = 0; i < args.Num(); i++ ) {
@@ -183,33 +183,33 @@ void arcDictionary::Clear( void ) {
 
 /*
 ================
-arcDictionary::Print
+anDict::Print
 ================
 */
-void arcDictionary::Print() const {
+void anDict::Print() const {
 	int i;
 	int n;
 
 	n = args.Num();
 	for ( i = 0; i < n; i++ ) {
-		arcLibrary::common->Printf( "%s = %s\n", args[i].GetKey().c_str(), args[i].GetValue().c_str() );
+		anLibrary::common->Printf( "%s = %s\n", args[i].GetKey().c_str(), args[i].GetValue().c_str() );
 	}
 }
 
-int KeyCompare( const idKeyValue *a, const idKeyValue *b ) {
-	return arcNetString::Cmp( a->GetKey(), b->GetKey() );
+int KeyCompare( const anKeyValue *a, const anKeyValue *b ) {
+	return anString::Cmp( a->GetKey(), b->GetKey() );
 }
 
 /*
 ================
-arcDictionary::Checksum
+anDict::Checksum
 ================
 */
-int	arcDictionary::Checksum( void ) const {
+int	anDict::Checksum( void ) const {
 	unsigned long ret;
 	int i, n;
 
-	arcNetList<idKeyValue> sorted = args;
+	anList<anKeyValue> sorted = args;
 	sorted.Sort( KeyCompare );
 	n = sorted.Num();
 	CRC32_InitChecksum( ret );
@@ -223,10 +223,10 @@ int	arcDictionary::Checksum( void ) const {
 
 /*
 ================
-arcDictionary::Allocated
+anDict::Allocated
 ================
 */
-size_t arcDictionary::Allocated( void ) const {
+size_t anDict::Allocated( void ) const {
 	int		i;
 	size_t	size;
 
@@ -240,14 +240,14 @@ size_t arcDictionary::Allocated( void ) const {
 
 /*
 ================
-arcDictionary::Set
+anDict::Set
 ================
 */
-void arcDictionary::Set( const char *key, const char *value ) {
+void anDict::Set( const char *key, const char *value ) {
 	int i;
-	idKeyValue kv;
+	anKeyValue kv;
 
-	if ( key == NULL || key[0] == '\0' ) {
+	if ( key == nullptr || key[0] == '\0' ) {
 		return;
 	}
 
@@ -266,10 +266,10 @@ void arcDictionary::Set( const char *key, const char *value ) {
 
 /*
 ================
-arcDictionary::GetFloat
+anDict::GetFloat
 ================
 */
-bool arcDictionary::GetFloat( const char *key, const char *defaultString, float &out ) const {
+bool anDict::GetFloat( const char *key, const char *defaultString, float &out ) const {
 	const char	*s;
 	bool		found;
 
@@ -280,10 +280,10 @@ bool arcDictionary::GetFloat( const char *key, const char *defaultString, float 
 
 /*
 ================
-arcDictionary::GetInt
+anDict::GetInt
 ================
 */
-bool arcDictionary::GetInt( const char *key, const char *defaultString, int &out ) const {
+bool anDict::GetInt( const char *key, const char *defaultString, int &out ) const {
 	const char	*s;
 	bool		found;
 
@@ -294,10 +294,10 @@ bool arcDictionary::GetInt( const char *key, const char *defaultString, int &out
 
 /*
 ================
-arcDictionary::GetBool
+anDict::GetBool
 ================
 */
-bool arcDictionary::GetBool( const char *key, const char *defaultString, bool &out ) const {
+bool anDict::GetBool( const char *key, const char *defaultString, bool &out ) const {
 	const char	*s;
 	bool		found;
 
@@ -308,10 +308,10 @@ bool arcDictionary::GetBool( const char *key, const char *defaultString, bool &o
 
 /*
 ================
-arcDictionary::GetAngles
+anDict::GetAngles
 ================
 */
-bool arcDictionary::GetAngles( const char *key, const char *defaultString, arcAngles &out ) const {
+bool anDict::GetAngles( const char *key, const char *defaultString, anAngles &out ) const {
 	bool		found;
 	const char	*s;
 
@@ -327,10 +327,10 @@ bool arcDictionary::GetAngles( const char *key, const char *defaultString, arcAn
 
 /*
 ================
-arcDictionary::GetVector
+anDict::GetVector
 ================
 */
-bool arcDictionary::GetVector( const char *key, const char *defaultString, arcVec3 &out ) const {
+bool anDict::GetVector( const char *key, const char *defaultString, anVec3 &out ) const {
 	bool		found;
 	const char	*s;
 
@@ -346,10 +346,10 @@ bool arcDictionary::GetVector( const char *key, const char *defaultString, arcVe
 
 /*
 ================
-arcDictionary::GetVec2
+anDict::GetVec2
 ================
 */
-bool arcDictionary::GetVec2( const char *key, const char *defaultString, arcVec2 &out ) const {
+bool anDict::GetVec2( const char *key, const char *defaultString, anVec2 &out ) const {
 	bool		found;
 	const char	*s;
 
@@ -365,10 +365,10 @@ bool arcDictionary::GetVec2( const char *key, const char *defaultString, arcVec2
 
 /*
 ================
-arcDictionary::GetVec4
+anDict::GetVec4
 ================
 */
-bool arcDictionary::GetVec4( const char *key, const char *defaultString, arcVec4 &out ) const {
+bool anDict::GetVec4( const char *key, const char *defaultString, anVec4 &out ) const {
 	bool		found;
 	const char	*s;
 
@@ -384,10 +384,10 @@ bool arcDictionary::GetVec4( const char *key, const char *defaultString, arcVec4
 
 /*
 ================
-arcDictionary::GetMatrix
+anDict::GetMatrix
 ================
 */
-bool arcDictionary::GetMatrix( const char *key, const char *defaultString, arcMat3 &out ) const {
+bool anDict::GetMatrix( const char *key, const char *defaultString, anMat3 &out ) const {
 	const char	*s;
 	bool		found;
 
@@ -406,25 +406,25 @@ bool arcDictionary::GetMatrix( const char *key, const char *defaultString, arcMa
 WriteString
 ================
 */
-static void WriteString( const char *s, arcNetFile *f ) {
+static void WriteString( const char *s, anFile *f ) {
 	int	len = strlen( s );
 	if ( len >= MAX_STRING_CHARS-1 ) {
-		arcLibrary::common->Error( "arcDictionary::WriteToFileHandle: bad string" );
+		anLibrary::common->Error( "anDict::WriteToFileHandle: bad string" );
 	}
-	f->Write( s, strlen(s) + 1 );
+	f->Write( s, strlen( s) + 1 );
 }
 
 /*
 ================
-arcDictionary::FindKey
+anDict::FindKey
 ================
 */
-const idKeyValue *arcDictionary::FindKey( const char *key ) const {
+const anKeyValue *anDict::FindKey( const char *key ) const {
 	int i, hash;
 
-	if ( key == NULL || key[0] == '\0' ) {
-		arcLibrary::common->DWarning( "arcDictionary::FindKey: empty key" );
-		return NULL;
+	if ( key == nullptr || key[0] == '\0' ) {
+		anLibrary::common->DWarning( "anDict::FindKey: empty key" );
+		return nullptr;
 	}
 
 	hash = argHash.GenerateKey( key, false );
@@ -434,18 +434,18 @@ const idKeyValue *arcDictionary::FindKey( const char *key ) const {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-arcDictionary::FindKeyIndex
+anDict::FindKeyIndex
 ================
 */
-int arcDictionary::FindKeyIndex( const char *key ) const {
-	if ( key == NULL || key[0] == '\0' ) {
-		arcLibrary::common->DWarning( "arcDictionary::FindKeyIndex: empty key" );
-		return NULL;
+int anDict::FindKeyIndex( const char *key ) const {
+	if ( key == nullptr || key[0] == '\0' ) {
+		anLibrary::common->DWarning( "anDict::FindKeyIndex: empty key" );
+		return nullptr;
 	}
 
 	int hash = argHash.GenerateKey( key, false );
@@ -460,10 +460,10 @@ int arcDictionary::FindKeyIndex( const char *key ) const {
 
 /*
 ================
-arcDictionary::Delete
+anDict::Delete
 ================
 */
-void arcDictionary::Delete( const char *key ) {
+void anDict::Delete( const char *key ) {
 	int hash, i;
 
 	hash = argHash.GenerateKey( key, false );
@@ -480,17 +480,17 @@ void arcDictionary::Delete( const char *key ) {
 #if 0
 	// make sure all keys can still be found in the hash index
 	for ( i = 0; i < args.Num(); i++ ) {
-		assert( FindKey( args[i].GetKey() ) != NULL );
+		assert( FindKey( args[i].GetKey() ) != nullptr );
 	}
 #endif
 }
 
 /*
 ================
-arcDictionary::MatchPrefix
+anDict::MatchPrefix
 ================
 */
-const idKeyValue *arcDictionary::MatchPrefix( const char *prefix, const idKeyValue *lastMatch ) const {
+const anKeyValue *anDict::MatchPrefix( const char *prefix, const anKeyValue *lastMatch ) const {
 	int	i;
 	int len;
 	int start;
@@ -512,19 +512,19 @@ const idKeyValue *arcDictionary::MatchPrefix( const char *prefix, const idKeyVal
 			return &args[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-arcDictionary::RandomPrefix
+anDict::RandomPrefix
 ================
 */
-const char *arcDictionary::RandomPrefix( const char *prefix, arcRandom &random ) const {
+const char *anDict::RandomPrefix( const char *prefix, arcRandom &random ) const {
 	int count;
 	const int MAX_RANDOM_KEYS = 2048;
 	const char *list[MAX_RANDOM_KEYS];
-	const idKeyValue *kv;
+	const anKeyValue *kv;
 
 	list[0] = "";
 	for ( count = 0, kv = MatchPrefix( prefix ); kv && count < MAX_RANDOM_KEYS; kv = MatchPrefix( prefix, kv ) ) {
@@ -535,10 +535,10 @@ const char *arcDictionary::RandomPrefix( const char *prefix, arcRandom &random )
 
 /*
 ================
-arcDictionary::WriteToFileHandle
+anDict::WriteToFileHandle
 ================
 */
-void arcDictionary::WriteToFileHandle( arcNetFile *f ) const {
+void anDict::WriteToFileHandle( anFile *f ) const {
 	int c = LittleLong( args.Num() );
 	f->Write( &c, sizeof( c ) );
 	for ( int i = 0; i < args.Num(); i++ ) {	// don't loop on the swapped count use the original
@@ -552,7 +552,7 @@ void arcDictionary::WriteToFileHandle( arcNetFile *f ) const {
 ReadString
 ================
 */
-static arcNetString ReadString( arcNetFile *f ) {
+static anString ReadString( anFile *f ) {
 	char	str[MAX_STRING_CHARS];
 	int		len;
 
@@ -563,20 +563,20 @@ static arcNetString ReadString( arcNetFile *f ) {
 		}
 	}
 	if ( len == MAX_STRING_CHARS ) {
-		arcLibrary::common->Error( "arcDictionary::ReadFromFileHandle: bad string" );
+		anLibrary::common->Error( "anDict::ReadFromFileHandle: bad string" );
 	}
 
-	return arcNetString( str );
+	return anString( str );
 }
 
 /*
 ================
-arcDictionary::ReadFromFileHandle
+anDict::ReadFromFileHandle
 ================
 */
-void arcDictionary::ReadFromFileHandle( arcNetFile *f ) {
+void anDict::ReadFromFileHandle( anFile *f ) {
 	int c;
-	arcNetString key, val;
+	anString key, val;
 
 	Clear();
 
@@ -591,37 +591,37 @@ void arcDictionary::ReadFromFileHandle( arcNetFile *f ) {
 
 /*
 ================
-arcDictionary::Init
+anDict::Init
 ================
 */
-void arcDictionary::Init( void ) {
+void anDict::Init( void ) {
 	globalKeys.SetCaseSensitive( false );
 	globalValues.SetCaseSensitive( true );
 }
 
 /*
 ================
-arcDictionary::Shutdown
+anDict::Shutdown
 ================
 */
-void arcDictionary::Shutdown( void ) {
+void anDict::Shutdown( void ) {
 	globalKeys.Clear();
 	globalValues.Clear();
 }
 
 /*
 ================
-arcDictionary::ShowMemoryUsage_f
+anDict::ShowMemoryUsage_f
 ================
 */
-void arcDictionary::ShowMemoryUsage_f( const arcCommandArgs &args ) {
-	arcLibrary::common->Printf( "%5d KB in %d keys\n", globalKeys.Size() >> 10, globalKeys.Num() );
-	arcLibrary::common->Printf( "%5d KB in %d values\n", globalValues.Size() >> 10, globalValues.Num() );
+void anDict::ShowMemoryUsage_f( const anCommandArgs &args ) {
+	anLibrary::common->Printf( "%5d KB in %d keys\n", globalKeys.Size() >> 10, globalKeys.Num() );
+	anLibrary::common->Printf( "%5d KB in %d values\n", globalValues.Size() >> 10, globalValues.Num() );
 }
 
 /*
 ================
-arcDictStringSortCmp
+anDictStringSortCmp
 ================
 */
 // NOTE: the const wonkyness is required to make msvc happy
@@ -632,38 +632,38 @@ ARC_INLINE int arcListSortCompare( const ARCPoolString * const *a, const ARCPool
 
 /*
 ================
-arcDictionary::ListKeys_f
+anDict::ListKeys_f
 ================
 */
-void arcDictionary::ListKeys_f( const arcCommandArgs &args ) {
+void anDict::ListKeys_f( const anCommandArgs &args ) {
 	int i;
-	arcNetList<const ARCPoolString *> keyStrings;
+	anList<const ARCPoolString *> keyStrings;
 
 	for ( i = 0; i < globalKeys.Num(); i++ ) {
 		keyStrings.Append( globalKeys[i] );
 	}
 	keyStrings.Sort();
 	for ( i = 0; i < keyStrings.Num(); i++ ) {
-		arcLibrary::common->Printf( "%s\n", keyStrings[i]->c_str() );
+		anLibrary::common->Printf( "%s\n", keyStrings[i]->c_str() );
 	}
-	arcLibrary::common->Printf( "%5d keys\n", keyStrings.Num() );
+	anLibrary::common->Printf( "%5d keys\n", keyStrings.Num() );
 }
 
 /*
 ================
-arcDictionary::ListValues_f
+anDict::ListValues_f
 ================
 */
-void arcDictionary::ListValues_f( const arcCommandArgs &args ) {
+void anDict::ListValues_f( const anCommandArgs &args ) {
 	int i;
-	arcNetList<const ARCPoolString *> valueStrings;
+	anList<const ARCPoolString *> valueStrings;
 
 	for ( i = 0; i < globalValues.Num(); i++ ) {
 		valueStrings.Append( globalValues[i] );
 	}
 	valueStrings.Sort();
 	for ( i = 0; i < valueStrings.Num(); i++ ) {
-		arcLibrary::common->Printf( "%s\n", valueStrings[i]->c_str() );
+		anLibrary::common->Printf( "%s\n", valueStrings[i]->c_str() );
 	}
-	arcLibrary::common->Printf( "%5d values\n", valueStrings.Num() );
+	anLibrary::common->Printf( "%5d values\n", valueStrings.Num() );
 }

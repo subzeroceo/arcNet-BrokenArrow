@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #ifdef ID_DEBUG_MEMORY
@@ -16,7 +16,7 @@
 #define DIST(r1,g1,b1,r2,g2,b2) \
 	    (long) (3L*(long)((r1)-(r2) )*(long)((r1)-(r2) ) + \
 		    4L*(long)((g1)-(g2) )*(long)((g1)-(g2) ) + \
-		    2L*(long)((b1)-(b2) )*(long)((b1)-(b2) ))
+		    2L*(long)((b1)-(b2) )*(long)((b1)-(b2) ) )
 
 
 static unsigned char masktable[] = { 0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01 };
@@ -24,8 +24,8 @@ static unsigned char masktable[] = { 0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01 };
 
 
 CDIB::CDIB(HANDLE hDib,int nBits) {
-	m_pVoid = NULL;
-	m_pLinePtr = NULL;
+	m_pVoid = nullptr;
+	m_pLinePtr = nullptr;
 	m_bUseGamma=FALSE;
 	width=height=0;
 	if (hDib)
@@ -40,9 +40,9 @@ CDIB::~CDIB() {
 
 void CDIB::DestroyDIB() {
 	if (m_pVoid) free(m_pVoid);
-	m_pVoid = NULL;
+	m_pVoid = nullptr;
 	if (m_pLinePtr) free(m_pLinePtr);
-	m_pLinePtr = NULL;
+	m_pLinePtr = nullptr;
 }
 
 
@@ -129,7 +129,7 @@ int CDIB::GetPaletteSize() {
 
 
 int CDIB::GetPaletteSize(BITMAPINFOHEADER& bmInfo) {
-	switch(bmInfo.biBitCount)
+	switch (bmInfo.biBitCount)
 	{
 	case 1:
 			return 2;
@@ -187,7 +187,7 @@ CBitmap *CDIB::GetTempBitmap(CDC& dc)
 {
 HBITMAP hBitmap;
 CBitmap *temp;
-	ASSERT(m_pVoid != NULL);
+	ASSERT(m_pVoid != nullptr );
 	hBitmap = CreateDIBitmap(dc.m_hDC,
 				(PBITMAPINFOHEADER)m_pInfo,
 				CBM_INIT,
@@ -195,7 +195,7 @@ CBitmap *temp;
 				m_pInfo,
 				DIB_RGB_COLORS);
 
-	if (hBitmap == NULL) return NULL;
+	if (hBitmap == nullptr ) return nullptr;
 	temp = CBitmap::FromHandle(hBitmap);
 	return temp;
 }
@@ -204,7 +204,7 @@ CBitmap *CDIB::GetBitmap(CDC& dc)
 {
 HBITMAP hBitmap;
 CBitmap *temp;
-	ASSERT(m_pVoid != NULL);
+	ASSERT(m_pVoid != nullptr );
 	hBitmap = CreateDIBitmap(dc.m_hDC,
 				(PBITMAPINFOHEADER)m_pInfo,
 				CBM_INIT,
@@ -212,7 +212,7 @@ CBitmap *temp;
 				m_pInfo,
 				DIB_RGB_COLORS);
 
-	if (hBitmap == NULL) return NULL;
+	if (hBitmap == nullptr ) return nullptr;
 	temp = CBitmap::FromHandle(hBitmap);
 	if (temp)
 	{
@@ -220,7 +220,7 @@ CBitmap *temp;
 		LPVOID lpVoid;
 		temp->GetBitmap(&bmp);
 		lpVoid = malloc(bmp.bmWidthBytes*bmp.bmHeight);
-		if ( !lpVoid) return NULL;
+		if ( !lpVoid) return nullptr;
 		temp->GetBitmapBits(bmp.bmWidthBytes*bmp.bmHeight,lpVoid);
 		CBitmap *newBmp = new CBitmap;
 		newBmp->CreateBitmapIndirect(&bmp);
@@ -228,7 +228,7 @@ CBitmap *temp;
 		free(lpVoid);
 		return newBmp;
 	}
-	else return NULL;
+	else return nullptr;
 
 }
 
@@ -257,7 +257,7 @@ unsigned char *ptr;
 		for ( i=0,ptr = m_pBits; i < height; i++ )
 		{
 			ptr = m_pBits + i*bytes;
-			for (j = 0; j < width; j++,ptr+=3)
+			for ( j = 0; j < width; j++,ptr+=3)
 			{
 				memcpy(ptr,col,3);
 			}
@@ -320,19 +320,19 @@ int i,j,k;
 	{
 		srcPtr = dibSrc.GetLinePtr(ySrc) + xSrc;
 		ptr = buffer;
-		for (j = 0; j < xNum; j++,ptr+=xRatio)
+		for ( j = 0; j < xNum; j++,ptr+=xRatio)
 		{
 			memset(ptr,*(srcPtr+j ),xRatio);
 			k=*(srcPtr+j );
 		}
 		memset(ptr,(unsigned char)k,xErr);
-		for (j = 0; j < yRatio; j++,nYDest++ )
+		for ( j = 0; j < yRatio; j++,nYDest++ )
 		{
 			destPtr = GetLinePtr(nYDest) + nXDest;
 			memcpy(destPtr,buffer,nDWidth);
 		}
 	}
-	for (j = 0; j < yErr; j++,nYDest++ )
+	for ( j = 0; j < yErr; j++,nYDest++ )
 	{
 		destPtr = GetLinePtr(nYDest) + nXDest;
 		memcpy(destPtr,buffer,nDWidth);
@@ -484,7 +484,7 @@ unsigned char *srcPtr,*destPtr;
 			{
 				srcPtr = dibSrc.GetLinePtr(k)+nXDest;
 				destPtr = GetLinePtr(l)+nSrcX;
-				for (j = 0; j < nWidth; j++,srcPtr++,destPtr++ )
+				for ( j = 0; j < nWidth; j++,srcPtr++,destPtr++ )
 				{
 					if (colors[*srcPtr] ) *destPtr=*srcPtr;
 				}
@@ -519,7 +519,7 @@ unsigned char *ptr;
 	for ( i=0; i < height; i++ )
 	{
 		ptr = GetLinePtr( i );
-		for (j = 0; j < width; j++ )
+		for ( j = 0; j < width; j++ )
 		{
 			if (ptr[j] == oldColor) ptr[j] = newColor;
 		}
@@ -560,7 +560,7 @@ int nSize;
 HANDLE hMem;
 	nSize = sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)*GetPaletteSize() + bytes*height;
 	hMem = GlobalAlloc(GMEM_DDESHARE | GMEM_MOVEABLE,nSize);
-	if (hMem  == NULL) return NULL;
+	if (hMem  == nullptr ) return nullptr;
 UCHAR *lpVoid,*pBits;
 LPBITMAPINFOHEADER pHead;
 RGBQUAD *pRgb;
@@ -647,7 +647,7 @@ int nBits;
 	ASSERT(Width() == dib.Width() );
 	ASSERT(Height() == dib.Height() );
 	nBits = dib.GetBitCount();
-	switch(nBits)
+	switch (nBits)
 	{
 	case 1:
 		return SwitchFromOne(dib);
@@ -679,7 +679,7 @@ unsigned char *sPtr,*dPtr;
 	{
 		dPtr = GetLinePtr( i );
 		sPtr = dib.GetLinePtr( i );
-		for (j = 0; j < w; j++,dPtr++,sPtr+=3)
+		for ( j = 0; j < w; j++,dPtr++,sPtr+=3)
 		{
 			*dPtr = ClosestColor((RGBQUAD *)sPtr);
 		}
@@ -703,7 +703,7 @@ unsigned char cols[2];
 	{
 		dPtr = GetLinePtr( i );
 		sPtr = dib.GetLinePtr( i );
-		for (j = 0; j < w; j++,dPtr++ )
+		for ( j = 0; j < w; j++,dPtr++ )
 		{
 			if ( !(sPtr[j>>3] & masktable[j&7] ) ) *dPtr = cols[0];
 			else *dPtr = cols[1];
@@ -728,7 +728,7 @@ unsigned char cols[16];
 	{
 		dPtr = GetLinePtr( i );
 		sPtr = dib.GetLinePtr( i );
-		for (j = 0; j < w; j++,dPtr++ )
+		for ( j = 0; j < w; j++,dPtr++ )
 		{
 			if ( !(j&1 ) ) n = (*sPtr & 0xf0)>>4;
 			else
@@ -758,7 +758,7 @@ unsigned char cols[256];
 	{
 		dPtr = GetLinePtr( i );
 		sPtr = dib.GetLinePtr( i );
-		for (j = 0; j < w; j++,sPtr++,dPtr++ )
+		for ( j = 0; j < w; j++,sPtr++,dPtr++ )
 		{
 			*dPtr = cols[*sPtr];
 		}
@@ -833,7 +833,7 @@ CFile file;
 		return FALSE;
 	}
 	file.Close();
-	switch(type)
+	switch (type)
 	{
 	case BMP:
 			return SaveBMP(csFileName);
@@ -903,7 +903,7 @@ int nNum=0,i,j,w,d;
 	for ( i=0; i < d; i++ )
 	{
 		ptr = GetLinePtr( i );
-		for (j = 0; j < w; j++,ptr++ )
+		for ( j = 0; j < w; j++,ptr++ )
 		{
 			if ( !colors[*ptr] )
 			{
@@ -926,7 +926,7 @@ int nNum=0,i,j,w,d;
 	for ( i=0; i < d; i++ )
 	{
 		ptr = GetLinePtr( i );
-		for (j = 0; j < w; j++,ptr++ )
+		for ( j = 0; j < w; j++,ptr++ )
 		{
 			if ( !array[*ptr] )
 			{
@@ -949,7 +949,7 @@ BOOL CDIB::SwitchFrom24(CDIB& dib)
 {
 int i,j,w,h,c;
 unsigned char *sPtr,*dPtr;
-BYTE *index_ptr=NULL;
+BYTE *index_ptr=nullptr;
 RGBQUAD rgb;
 	w = Width();
 	h = Height();
@@ -967,7 +967,7 @@ RGBQUAD rgb;
 	{
 		dPtr = GetLinePtr( i );
 		sPtr = dib.GetLinePtr( i );
-		for (j = 0; j < w; j++,dPtr++,sPtr+=3)
+		for ( j = 0; j < w; j++,dPtr++,sPtr+=3)
 		{
 			c = (*sPtr >> 3) | ((*(sPtr+1 ) >> 3) << 5) | ((*(sPtr+2) >> 3) << 10);
 			*dPtr = index_ptr[c];

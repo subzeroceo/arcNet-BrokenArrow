@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "MEOptions.h"
@@ -6,7 +6,7 @@
 /**
 * Constructor for MEOptions.
 */
-MEOptions::MEOptions ( ) {
+MEOptions::MEOptions() {
 	registry.Init( "Software\\id Software\\DOOM3\\Tools\\MaterialEditor" );
 	materialTreeWidth = 0;
 	stageWidth = 0;

@@ -10,14 +10,14 @@ further changes to the system possible.
 ===============================================================================
 */
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 #include "AI.h"
 #include "AI_Manager.h"
 #include "AI_Util.h"
-#include "AAS_Find.h"
+#include "SEAS_Find.h"
 
 /*
 ===============================================================================
@@ -38,7 +38,7 @@ idMoveState::idMoveState() {
 	moveStatus			= MOVE_STATUS_DONE;
 	moveDest.Zero();
 	moveDir.Set( 1.0f, 0.0f, 0.0f );
-	goalEntity			= NULL;
+	goalEntity			= nullptr;
 	goalEntityOrigin.Zero();
 	toAreaNum			= 0;
 	startTime			= 0;
@@ -48,7 +48,7 @@ idMoveState::idMoveState() {
 	wanderYaw			= 0;
 	nextWanderTime		= 0;
 	blockTime			= 0;
-	obstacle			= NULL;
+	obstacle			= nullptr;
 	lastMoveOrigin		= vec3_origin;
 	lastMoveTime		= 0;
 	anim				= 0;
@@ -93,7 +93,7 @@ idMoveState::idMoveState() {
 idMoveState::Spawn
 =====================
 */
-void idMoveState::Spawn( idDict &spawnArgs ) {
+void idMoveState::Spawn( anDict &spawnArgs ) {
 	memset ( &fl, 0, sizeof(fl) );
 	fl.allowAnimMove		= true;
 	fl.allowPrevAnimMove	= false;
@@ -141,7 +141,7 @@ void idMoveState::Spawn( idDict &spawnArgs ) {
 idMoveState::Save
 =====================
 */
-void idMoveState::Save( idSaveGame *savefile ) const {
+void idMoveState::Save( anSaveGame *savefile ) const {
 	int i;
 
 	savefile->Write ( &fl, sizeof(fl) );
@@ -215,7 +215,7 @@ void idMoveState::Save( idSaveGame *savefile ) const {
 
 	savefile->WriteInt( (int) MAX_PATH_LEN );	// cnicholson: Added unsaved vars
 	for (i=0; i< MAX_PATH_LEN; ++i) {
-		// TOSAVE: idReachability*		reach;
+		// TOSAVE: anReachability*		reach;
 		savefile->WriteVec3( path[i].seekPos );
 	}
 
@@ -231,7 +231,7 @@ void idMoveState::Save( idSaveGame *savefile ) const {
 idMoveState::Restore
 =====================
 */
-void idMoveState::Restore( idRestoreGame *savefile ) {
+void idMoveState::Restore( anRestoreGame *savefile ) {
 	int i, num;
 
 	savefile->Read ( &fl, sizeof(fl) );
@@ -298,20 +298,20 @@ void idMoveState::Restore( idRestoreGame *savefile ) {
 	goalEntity.Restore ( savefile );
 	savefile->ReadVec3( goalEntityOrigin );
 
-	savefile->ReadVec3( myPos );	// cnicholson: Added unrestored var
-	savefile->ReadInt( myArea );	// cnicholson: Added unrestored var
+	savefile->ReadVec3( myPos );
+	savefile->ReadInt( myArea );
 
 	savefile->ReadVec3 ( seekPos );
 
 	savefile->ReadInt( num );
 	for (i=0; i< num; ++i) {
-		// TOSAVE: idReachability*		reach;
+		// TOSAVE: anReachability*		reach;
 		savefile->ReadVec3( path[i].seekPos );
 	}
 
-	savefile->ReadInt( pathLen );		// cnicholson: Added unrestored var
-	savefile->ReadInt( pathArea );		// cnicholson: Added unrestored var
-	savefile->ReadInt( pathTime );		// cnicholson: Added unrestored var
+	savefile->ReadInt( pathLen );
+	savefile->ReadInt( pathArea );
+	savefile->ReadInt( pathTime );
 
 	savefile->ReadVec3( addVelocity );
 }
@@ -319,10 +319,10 @@ void idMoveState::Restore( idRestoreGame *savefile ) {
 
 /*
 ============
-idAI::SetMoveType
+anSAAI::SetMoveType
 ============
 */
-void idAI::SetMoveType ( moveType_t moveType ) {
+void anSAAI::SetMoveType ( moveType_t moveType ) {
 	if ( move.moveType == moveType ) {
 		return;
 	}
@@ -336,7 +336,7 @@ void idAI::SetMoveType ( moveType_t moveType ) {
 
 		case MOVETYPE_FLY:
 			move.travelFlags = TFL_FLY|TFL_WALK|TFL_AIR;
-			StartSound ( "snd_fly", SND_CHANNEL_HEART, 0, false, NULL );
+			StartSound ( "snd_fly", SND_CHANNEL_HEART, 0, false, nullptr );
 			break;
 
 		case MOVETYPE_ANIM:
@@ -353,22 +353,22 @@ void idAI::SetMoveType ( moveType_t moveType ) {
 
 /*
 =====================
-idAI::Event_SaveMove
+anSAAI::Event_SaveMove
 =====================
 */
-void idAI::Event_SaveMove( void ) {
+void anSAAI::Event_SaveMove( void ) {
 	savedMove = move;
 }
 
 /*
 =====================
-idAI::Event_RestoreMove
+anSAAI::Event_RestoreMove
 =====================
 */
-void idAI::Event_RestoreMove( void ) {
-	arcVec3 dest;
+void anSAAI::Event_RestoreMove( void ) {
+	anVec3 dest;
 
-	switch( savedMove.moveCommand ) {
+	switch ( savedMove.moveCommand ) {
 	case MOVE_NONE :
 		StopMove( savedMove.moveStatus );
 		break;
@@ -421,20 +421,20 @@ void idAI::Event_RestoreMove( void ) {
 
 /*
 ============
-idAI::KickObstacles
+anSAAI::KickObstacles
 ============
 */
-void idAI::KickObstacles( const arcVec3 &dir, float force, idEntity *alwaysKick ) {
+void anSAAI::KickObstacles( const anVec3 &dir, float force, anEntity *alwaysKick ) {
 	int i, numListedClipModels;
-	arcBounds clipBounds;
-	idEntity *obEnt;
-	idClipModel *clipModel;
-	idClipModel *clipModelList[ MAX_GENTITIES ];
+	anBounds clipBounds;
+	anEntity *obEnt;
+	anClipModel *clipModel;
+	anClipModel *clipModelList[ MAX_GENTITIES ];
 	int clipmask;
-	arcVec3 org;
-	arcVec3 forceVec;
-	arcVec3 delta;
-	arcVec2 perpendicular;
+	anVec3 org;
+	anVec3 forceVec;
+	anVec3 delta;
+	anVec2 perpendicular;
 
 	org = physicsObj.GetOrigin();
 
@@ -444,10 +444,10 @@ void idAI::KickObstacles( const arcVec3 &dir, float force, idEntity *alwaysKick 
 	clipBounds.ExpandSelf( 8.0f );
 	clipBounds.AddPoint( org );
 	clipmask = physicsObj.GetClipMask();
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	numListedClipModels = gameLocal.ClipModelsTouchingBounds( this, clipBounds, clipmask, clipModelList, MAX_GENTITIES );
-// RAVEN END
+
 	for ( i = 0; i < numListedClipModels; i++ ) {
 		clipModel = clipModelList[i];
 		obEnt = clipModel->GetEntity();
@@ -460,10 +460,10 @@ void idAI::KickObstacles( const arcVec3 &dir, float force, idEntity *alwaysKick 
 			continue;
 		}
 
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-		if (( obEnt->IsType( idMoveable::GetClassType() ) || obEnt->IsType( idAFAttachment::GetClassType() )) && obEnt->GetPhysics()->IsPushable() ) {
-// RAVEN END
+
+
+		if ( ( obEnt->IsType( idMoveable::GetClassType() ) || obEnt->IsType( idAFAttachment::GetClassType() ) ) && obEnt->GetPhysics()->IsPushable() ) {
+
 			delta = obEnt->GetPhysics()->GetOrigin() - org;
 			delta.NormalizeFast();
 			perpendicular.x = -delta.y;
@@ -493,7 +493,7 @@ void idAI::KickObstacles( const arcVec3 &dir, float force, idEntity *alwaysKick 
 ValidForBounds
 ============
 */
-bool ValidForBounds( const idAASSettings *settings, const arcBounds &bounds ) {
+bool ValidForBounds( const anSEASSettings *settings, const anBounds &bounds ) {
 	int i;
 
 	for ( i = 0; i < 3; i++ ) {
@@ -509,22 +509,22 @@ bool ValidForBounds( const idAASSettings *settings, const arcBounds &bounds ) {
 
 /*
 =====================
-idAI::SetAAS
+anSAAI::SetAAS
 =====================
 */
-void idAI::SetAAS( void ) {
-	idStr use_aas;
+void anSAAI::SetAAS( void ) {
+	anString use_aas;
 
-	spawnArgs.GetString( "use_aas", NULL, use_aas );
+	spawnArgs.GetString( "use_aas", nullptr, use_aas );
 	if ( !use_aas || !use_aas[0] ) {
 		//don't intend to use AAS at all?
 		//no warning - lack of AAS intentional
-		aas = NULL;
+		aas = nullptr;
 		return;
 	}
 	aas = gameLocal.GetAAS( use_aas );
 	if ( aas ) {
-		const idAASSettings *settings = aas->GetSettings();
+		const anSEASSettings *settings = aas->GetSettings();
 		if ( settings ) {
 			if ( !ValidForBounds( settings, physicsObj.GetBounds() ) ) {
 				gameLocal.Error( "%s cannot use use_aas %s\n", name.c_str(), use_aas.c_str() );
@@ -533,7 +533,7 @@ void idAI::SetAAS( void ) {
 			physicsObj.SetMaxStepHeight( height );
 			return;
 		} else {
-			aas = NULL;
+			aas = nullptr;
 		}
 	}
 	gameLocal.Printf( "WARNING: %s has no AAS file\n", name.c_str() );
@@ -541,10 +541,10 @@ void idAI::SetAAS( void ) {
 
 /*
 =====================
-idAI::ReachedPos
+anSAAI::ReachedPos
 =====================
 */
-bool idAI::ReachedPos( const arcVec3 &pos, const aiMoveCommand_t moveCommand, float range ) const {
+bool anSAAI::ReachedPos( const anVec3 &pos, const aiMoveCommand_t moveCommand, float range ) const {
 	// When moving towards the enemy just see if our bounding box touches the desination
 	if ( moveCommand == MOVE_TO_ENEMY ) {
 		if ( !enemy.ent || physicsObj.GetAbsBounds().IntersectsBounds( enemy.ent->GetPhysics()->GetAbsBounds().Expand( range ) ) ) {
@@ -562,8 +562,8 @@ bool idAI::ReachedPos( const arcVec3 &pos, const aiMoveCommand_t moveCommand, fl
 			offset = move.fly_offset;
 		}
 
-		arcBounds bnds;
-		bnds = arcBounds ( arcVec3(-range,-range,-range), arcVec3(range,range,range+offset) );
+		anBounds bnds;
+		bnds = anBounds ( anVec3(-range,-range,-range), anVec3(range,range,range+offset) );
 		bnds.TranslateSelf( physicsObj.GetOrigin() );
 		return bnds.ContainsPoint( pos );
 	}
@@ -579,28 +579,28 @@ bool idAI::ReachedPos( const arcVec3 &pos, const aiMoveCommand_t moveCommand, fl
 	// Excluded z height when determining reached
 	if ( move.toAreaNum > 0 ) {
 		if ( PointReachableAreaNum( physicsObj.GetOrigin() ) == move.toAreaNum ) {
-			arcBounds bnds;
-			bnds = arcBounds ( arcVec3(-range,-range,-4096.0f), arcVec3(range,range,4096.0f) );
+			anBounds bnds;
+			bnds = anBounds ( anVec3(-range,-range,-4096.0f), anVec3(range,range,4096.0f) );
 			bnds.TranslateSelf( physicsObj.GetOrigin() );
 			return bnds.ContainsPoint( pos );
 		}
 	}
 
-	arcBounds bnds;
-	bnds = arcBounds ( arcVec3(-range,-range,-16.0f), arcVec3(range,range,64.0f) );
+	anBounds bnds;
+	bnds = anBounds ( anVec3(-range,-range,-16.0f), anVec3(range,range,64.0f) );
 	bnds.TranslateSelf( physicsObj.GetOrigin() );
 	return bnds.ContainsPoint( pos );
 }
 
 /*
 =====================
-idAI::PointReachableAreaNum
+anSAAI::PointReachableAreaNum
 =====================
 */
-int idAI::PointReachableAreaNum( const arcVec3 &pos, const float boundsScale ) const {
+int anSAAI::PointReachableAreaNum( const anVec3 &pos, const float boundsScale ) const {
 	int areaNum;
-	arcVec3 size;
-	arcBounds bounds;
+	anVec3 size;
+	anBounds bounds;
 
 	if ( !aas ) {
 		return 0;
@@ -622,12 +622,12 @@ int idAI::PointReachableAreaNum( const arcVec3 &pos, const float boundsScale ) c
 
 /*
 =====================
-idAI::PathToGoal
+anSAAI::PathToGoal
 =====================
 */
-bool idAI::PathToGoal( aasPath_t &path, int areaNum, const arcVec3 &origin, int goalAreaNum, const arcVec3 &goalOrigin ) const {
-	arcVec3 org;
-	arcVec3 goal;
+bool anSAAI::PathToGoal( seasPath_t &path, int areaNum, const anVec3 &origin, int goalAreaNum, const anVec3 &goalOrigin ) const {
+	anVec3 org;
+	anVec3 goal;
 
 	if ( !aas ) {
 		return false;
@@ -669,7 +669,7 @@ bool idAI::PathToGoal( aasPath_t &path, int areaNum, const arcVec3 &origin, int 
 
 /*
 =====================
-idAI::TravelDistance
+anSAAI::TravelDistance
 
 Returns the approximate travel distance from one position to the goal, or if no AAS, the straight line distance.
 
@@ -677,12 +677,12 @@ This is feakin' slow, so it's not good to do it too many times per frame.  It al
 are from the goal, so try to break the goals up into shorter distances.
 =====================
 */
-float idAI::TravelDistance( const arcVec3 &start, const arcVec3 &end ) const {
+float anSAAI::TravelDistance( const anVec3 &start, const anVec3 &end ) const {
 	int			fromArea;
 	int			toArea;
 	float		dist;
-	arcVec2		delta;
-	aasPath_t	path;
+	anVec2		delta;
+	seasPath_t	path;
 
 	if ( !aas ) {
 		// no aas, so just take the straight line distance
@@ -718,7 +718,7 @@ float idAI::TravelDistance( const arcVec3 &start, const arcVec3 &end ) const {
 		return dist;
 	}
 
-	idReachability *reach;
+	anReachability *reach;
 	int travelTime;
 	if ( !aas->RouteToGoalArea( fromArea, start, toArea, move.travelFlags, travelTime, &reach ) ) {
 		return -1;
@@ -735,26 +735,26 @@ float idAI::TravelDistance( const arcVec3 &start, const arcVec3 &end ) const {
 	return travelTime;
 }
 
-float idAI::TravelDistance ( idEntity *ent ) const {
+float anSAAI::TravelDistance ( anEntity *ent ) const {
 	return TravelDistance ( physicsObj.GetOrigin(), ent->GetPhysics()->GetOrigin() );
 }
 
-float idAI::TravelDistance( idEntity* start, idEntity* end ) const {
+float anSAAI::TravelDistance( anEntity* start, anEntity* end ) const {
 	assert( start );
 	assert( end );
 	return TravelDistance( start->GetPhysics()->GetOrigin(), end->GetPhysics()->GetOrigin() );
 }
 
-float idAI::TravelDistance( const arcVec3 &pos ) const {
+float anSAAI::TravelDistance( const anVec3 &pos ) const {
 	return TravelDistance( physicsObj.GetOrigin(), pos );
 }
 
 /*
 ============
-idAI::ScriptedPlaybackMove
+anSAAI::ScriptedPlaybackMove
 ============
 */
-void idAI::ScriptedPlaybackMove ( const char* playback, int flags, int numFrames ) {
+void anSAAI::ScriptedPlaybackMove ( const char* playback, int flags, int numFrames ) {
 	// Start the scripted sequence
 	if ( !ScriptedBegin ( false ) ) {
 		return;
@@ -762,11 +762,11 @@ void idAI::ScriptedPlaybackMove ( const char* playback, int flags, int numFrames
 
 	// Start the playback
 	if ( !mPlayback.Start( spawnArgs.GetString ( playback ), this, flags, numFrames ) ) {
-		ScriptedEnd ( );
+		ScriptedEnd();
 		return;
 	}
 
-	move.goalEntity		= NULL;
+	move.goalEntity		= nullptr;
 	move.moveCommand	= MOVE_RV_PLAYBACK;
 	move.moveType		= MOVETYPE_PLAYBACK;
 	move.fl.done		= false;
@@ -778,13 +778,13 @@ void idAI::ScriptedPlaybackMove ( const char* playback, int flags, int numFrames
 
 /*
 =====================
-idAI::FaceEnemy
+anSAAI::FaceEnemy
 
 Continually face the enemy's last known position.  MoveDone is always true in this case.
 =====================
 */
-bool idAI::FaceEnemy( void ) {
- 	idEntity *enemyEnt = enemy.ent;
+bool anSAAI::FaceEnemy( void ) {
+ 	anEntity *enemyEnt = enemy.ent;
 	if ( !enemyEnt ) {
 		StopMove( MOVE_STATUS_DEST_NOT_FOUND );
 		return false;
@@ -808,18 +808,18 @@ bool idAI::FaceEnemy( void ) {
 
 /*
 =====================
-idAI::FaceEntity
+anSAAI::FaceEntity
 
 Continually face the entity position.  MoveDone will never be true in this case.
 =====================
 */
-bool idAI::FaceEntity( idEntity *ent ) {
+bool anSAAI::FaceEntity( anEntity *ent ) {
 	if ( !ent ) {
 		StopMove( MOVE_STATUS_DEST_NOT_FOUND );
 		return false;
 	}
 
-	arcVec3 entityOrg = ent->GetPhysics()->GetOrigin();
+	anVec3 entityOrg = ent->GetPhysics()->GetOrigin();
 	TurnToward( entityOrg );
 	move.goalEntity		= ent;
 	move.moveDest		= physicsObj.GetOrigin();
@@ -838,19 +838,19 @@ bool idAI::FaceEntity( idEntity *ent ) {
 
 /*
 =====================
-idAI::StartMove
+anSAAI::StartMove
 
 Initialize a new movement by setting up the movement structure
 =====================
 */
-bool idAI::StartMove ( aiMoveCommand_t command, const arcVec3& goalOrigin, int goalArea, idEntity* goalEntity, aasFeature_t* feature, float range ) {
+bool anSAAI::StartMove ( aiMoveCommand_t command, const anVec3& goalOrigin, int goalArea, anEntity* goalEntity, seasFeature_t* feature, float range ) {
 	// If we are already there then we are done
 	if ( ReachedPos( goalOrigin, command ) ) {
 		StopMove( MOVE_STATUS_DONE );
 		return true;
 	}
 
-	move.lastMoveOrigin		= physicsObj.GetOrigin ( );
+	move.lastMoveOrigin		= physicsObj.GetOrigin();
 
 	move.seekPos = move.goalPos = move.moveDest	= goalOrigin;
 	move.toAreaNum			= goalArea;
@@ -867,17 +867,17 @@ bool idAI::StartMove ( aiMoveCommand_t command, const arcVec3& goalOrigin, int g
 
 	aasSensor->Reserve ( feature );
 
-	OnStartMoving ( );
+	OnStartMoving();
 
 	return true;
 }
 
 /*
 =====================
-idAI::StopMove
+anSAAI::StopMove
 =====================
 */
-void idAI::StopMove( moveStatus_t status ) {
+void anSAAI::StopMove( moveStatus_t status ) {
 	aiMoveCommand_t oldCommand = move.moveCommand;
 	float saveZ = 0.0f;
 
@@ -896,7 +896,7 @@ void idAI::StopMove( moveStatus_t status ) {
 	move.moveCommand		= MOVE_NONE;
 	move.moveStatus			= status;
 	move.toAreaNum			= 0;
-	move.goalEntity			= NULL;
+	move.goalEntity			= nullptr;
 	move.moveDest			= physicsObj.GetOrigin();
 	move.moveDest.z			+= saveZ;
 	move.startTime			= gameLocal.time;
@@ -917,11 +917,11 @@ void idAI::StopMove( moveStatus_t status ) {
 
 /*
 =====================
-idAI::MoveToTether
+anSAAI::MoveToTether
 =====================
 */
-bool idAI::MoveToTether ( rvAITether* tether ) {
-	aasGoal_t	goal;
+bool anSAAI::MoveToTether ( anSAAITether* tether ) {
+	seasGoal_t	goal;
 
 	// find a goal using the currently active tether
 	if ( !aas || !tether ) {
@@ -930,7 +930,7 @@ bool idAI::MoveToTether ( rvAITether* tether ) {
 
 	if ( !tether->FindGoal ( this, goal ) ) {
 		//This is extremely bad - if 2 guys both try to get to the center of a tether, they get hosed.
-		return MoveTo ( tether->GetPhysics()->GetOrigin ( ), tether->GetOriginReachedRange() );
+		return MoveTo ( tether->GetPhysics()->GetOrigin(), tether->GetOriginReachedRange() );
 	}
 
 	if ( move.moveType == MOVETYPE_FLY ) {
@@ -939,33 +939,33 @@ bool idAI::MoveToTether ( rvAITether* tether ) {
 		goal.origin.z = tether->GetPhysics()->GetOrigin().z;
 	}
 
-	return StartMove ( MOVE_TO_TETHER, goal.origin, goal.areaNum, NULL, NULL, AI_TETHER_MINRANGE );
+	return StartMove ( MOVE_TO_TETHER, goal.origin, goal.areaNum, nullptr, nullptr, AI_TETHER_MINRANGE );
 }
 
 /*
 =====================
-idAI::MoveToAttack
+anSAAI::MoveToAttack
 =====================
 */
-bool idAI::MoveToAttack ( idEntity *ent, int attack_anim ) {
-	aasObstacle_t	obstacle;
-	aasGoal_t		goal;
-	arcBounds		bounds;
-	arcVec3			pos;
+bool anSAAI::MoveToAttack ( anEntity *ent, int attack_anim ) {
+	seasObstructs_t	obstacle;
+	seasGoal_t		goal;
+	anBounds		bounds;
+	anVec3			pos;
 
 	if ( !aas || !ent ) {
 		return false;
 	}
 
-	const arcVec3 &org  = physicsObj.GetOrigin();
+	const anVec3 &org  = physicsObj.GetOrigin();
 	obstacle.absBounds = ent->GetPhysics()->GetAbsBounds();
 	pos				   = LastKnownPosition ( ent );
 
 	// if we havent started a find yet or the current find is something other than a attack find then start a new one
-	if ( !aasFind || !dynamic_cast<rvAASFindGoalForAttack*>(aasFind) ) {
+	if ( !aasFind || !dynamic_cast<anAASHolstileCoordnation*>(aasFind) ) {
 		// Allocate the new aas find
 		delete aasFind;
-		aasFind = new rvAASFindGoalForAttack ( this );
+		aasFind = new anAASHolstileCoordnation ( this );
 
 		// Find a goal that gives us a viable attack position on our enemy
 		aas->FindNearestGoal( goal, PointReachableAreaNum( org ), org, pos, move.travelFlags, IsTethered()?0:move.searchRange[0], move.searchRange[1], &obstacle, 1, *aasFind );
@@ -974,10 +974,10 @@ bool idAI::MoveToAttack ( idEntity *ent, int attack_anim ) {
 	assert ( aasFind );
 
 	// Test some more points with the existing find
-	rvAASFindGoalForAttack* aasFindAttack = static_cast<rvAASFindGoalForAttack*>(aasFind);
+	anAASHolstileCoordnation* aasFindAttack = static_cast<anAASHolstileCoordnation*>(aasFind);
 	if ( !aasFindAttack->TestCachedGoals ( aifl.simpleThink ? 1 : 4, goal ) ) {
 		delete aasFind;
-		aasFind = NULL;
+		aasFind = nullptr;
 		return false;
 	}
 
@@ -988,7 +988,7 @@ bool idAI::MoveToAttack ( idEntity *ent, int attack_anim ) {
 
 	// Dont need the find anymore
 	delete aasFind;
-	aasFind = NULL;
+	aasFind = nullptr;
 
 	if ( move.moveType == MOVETYPE_FLY ) {
 		//float up above the ground?
@@ -1009,25 +1009,25 @@ bool idAI::MoveToAttack ( idEntity *ent, int attack_anim ) {
 		}
 	}
 
-	return StartMove ( MOVE_TO_ATTACK, goal.origin, goal.areaNum, ent, NULL, move.attackPositionRange?move.attackPositionRange:8.0f );
+	return StartMove ( MOVE_TO_ATTACK, goal.origin, goal.areaNum, ent, nullptr, move.attackPositionRange?move.attackPositionRange:8.0f );
 }
 
 /*
 =====================
-idAI::MoveToEnemy
+anSAAI::MoveToEnemy
 =====================
 */
-bool idAI::MoveToEnemy( void ) {
+bool anSAAI::MoveToEnemy( void ) {
 	int			areaNum;
-	aasPath_t	path;
-	arcVec3		pos;
+	seasPath_t	path;
+	anVec3		pos;
 
 	if ( !enemy.ent ) {
 		return false;
 	}
 
 //	pos = LastKnownPosition ( enemy.ent );
-	pos = enemy.ent->GetPhysics()->GetOrigin ( );
+	pos = enemy.ent->GetPhysics()->GetOrigin();
 
 	// If we are already moving to the entity and its position hasnt changed then we are done
 	if ( move.moveCommand == MOVE_TO_ENEMY && move.goalEntity == enemy.ent && move.goalEntityOrigin == pos ) {
@@ -1077,18 +1077,18 @@ bool idAI::MoveToEnemy( void ) {
 		return true;
 	}
 
-	return StartMove ( MOVE_TO_ENEMY, pos, areaNum, enemy.ent, NULL, 8.0f );
+	return StartMove ( MOVE_TO_ENEMY, pos, areaNum, enemy.ent, nullptr, 8.0f );
 }
 
 /*
 =====================
-idAI::MoveToEntity
+anSAAI::MoveToEntity
 =====================
 */
-bool idAI::MoveToEntity( idEntity *ent, float range ) {
+bool anSAAI::MoveToEntity( anEntity *ent, float range ) {
 	int			areaNum;
-	aasPath_t	path;
-	arcVec3		pos;
+	seasPath_t	path;
+	anVec3		pos;
 
 	if ( !ent ) {
 		return false;
@@ -1134,26 +1134,26 @@ bool idAI::MoveToEntity( idEntity *ent, float range ) {
 		return true;
 	}
 
-	return StartMove ( MOVE_TO_ENTITY, pos, areaNum, ent, NULL, range <= 0.0f ? 8.0f : range );
+	return StartMove ( MOVE_TO_ENTITY, pos, areaNum, ent, nullptr, range <= 0.0f ? 8.0f : range );
 }
 
 /*
 =====================
-idAI::MoveOutOfRange
+anSAAI::MoveOutOfRange
 =====================
 */
-bool idAI::MoveOutOfRange( idEntity *ent, float range, float minRange ) {
-	aasObstacle_t	obstacle;
-	aasGoal_t		goal;
-	arcBounds		bounds;
-	arcVec3			pos;
+bool anSAAI::MoveOutOfRange( anEntity *ent, float range, float minRange ) {
+	seasObstructs_t	obstacle;
+	seasGoal_t		goal;
+	anBounds		bounds;
+	anVec3			pos;
 	int				obstacles;
 
 	if ( !aas || !ent ) {
 		return false;
 	}
 
-	const arcVec3 &org = physicsObj.GetOrigin();
+	const anVec3 &org = physicsObj.GetOrigin();
 
 	// consider the entity the monster is getting close to as an obstacle
 	if ( ent != this ) {
@@ -1166,23 +1166,23 @@ bool idAI::MoveOutOfRange( idEntity *ent, float range, float minRange ) {
 	pos = LastKnownPosition ( ent );
 
 	// Find a goal out of range of where we are
-	rvAASFindGoalOutOfRange findGoal( this );
+	anAASTargetOutOfRange findGoal( this );
 	if ( !aas->FindNearestGoal( goal, PointReachableAreaNum( org ), org, pos, move.travelFlags, minRange, range, &obstacle, obstacles, findGoal ) ) {
 		return false;
 	}
 
-	return StartMove ( MOVE_OUT_OF_RANGE, goal.origin, goal.areaNum, ent, NULL, 8.0f );
+	return StartMove ( MOVE_OUT_OF_RANGE, goal.origin, goal.areaNum, ent, nullptr, 8.0f );
 }
 
 /*
 =====================
-idAI::MoveTo
+anSAAI::MoveTo
 =====================
 */
-bool idAI::MoveTo ( const arcVec3 &pos, float range ) {
-	arcVec3		org;
+bool anSAAI::MoveTo ( const anVec3 &pos, float range ) {
+	anVec3		org;
 	int			areaNum;
-	aasPath_t	path;
+	seasPath_t	path;
 
 	if ( !aas ) {
 		return false;
@@ -1201,20 +1201,20 @@ bool idAI::MoveTo ( const arcVec3 &pos, float range ) {
 	}
 
 	// Start moving
-	return StartMove ( MOVE_TO_POSITION, org, areaNum, NULL, NULL, range );
+	return StartMove ( MOVE_TO_POSITION, org, areaNum, nullptr, nullptr, range );
 }
 
 /*
 =====================
-idAI::MoveToCover
+anSAAI::MoveToCover
 =====================
 */
-bool idAI::MoveToCover( float minRange, float maxRange, aiTactical_t coverType ) {
-	arcVec3				org;
+bool anSAAI::MoveToCover( float minRange, float maxRange, aiTactical_t coverType ) {
+	anVec3				org;
 	int					areaNum;
-	aasPath_t			path;
-	aasFeature_t*		feature = 0;
-	arcVec3				featureOrigin;
+	seasPath_t			path;
+	seasFeature_t*		feature = 0;
+	anVec3				featureOrigin;
 
 	if ( !aas ) {
 		return false;
@@ -1233,12 +1233,12 @@ bool idAI::MoveToCover( float minRange, float maxRange, aiTactical_t coverType )
 			break;
 	}
 
-	if ( !aasSensor->FeatureCount ( ) ) {
+	if ( !aasSensor->FeatureCount() ) {
 		return false;
 	}
 
 	feature		  = aasSensor->Feature ( 0 );
-	featureOrigin = feature->Origin ( );
+	featureOrigin = feature->Origin();
 	org			  = featureOrigin;
 	areaNum		  = 0;
 
@@ -1264,48 +1264,48 @@ bool idAI::MoveToCover( float minRange, float maxRange, aiTactical_t coverType )
 
 /*
 =====================
-idAI::MoveToHide
+anSAAI::MoveToHide
 =====================
 */
-bool idAI::MoveToHide ( void ) {
-	aasObstacle_t	obstacle;
-	aasGoal_t		goal;
-	arcBounds		bounds;
-	arcVec3			pos;
+bool anSAAI::MoveToHide ( void ) {
+	seasObstructs_t	obstacle;
+	seasGoal_t		goal;
+	anBounds		bounds;
+	anVec3			pos;
 
 	// Need an enemy to hide from
 	if ( !aas || !enemy.ent ) {
 		return false;
 	}
 
-	const arcVec3& org  = physicsObj.GetOrigin();
+	const anVec3& org  = physicsObj.GetOrigin();
 	obstacle.absBounds = enemy.ent->GetPhysics()->GetAbsBounds();
 	pos				   = LastKnownPosition ( enemy.ent );
 
 	// Search aas for a suitable goal
-	rvAASFindGoalForHide findGoal( pos );
+	anSEASTacticalManager findGoal( pos );
 	if ( !aas->FindNearestGoal( goal, PointReachableAreaNum( org ), org, pos, move.travelFlags, 0.0f, 0.0f, &obstacle, 1, findGoal ) ) {
 		return false;
 	}
 
 	// Start the movement
-	return StartMove ( MOVE_TO_HIDE, goal.origin, goal.areaNum, enemy.ent, NULL, 0.0f );
+	return StartMove ( MOVE_TO_HIDE, goal.origin, goal.areaNum, enemy.ent, nullptr, 0.0f );
 }
 
 /*
 =====================
-idAI::SlideToPosition
+anSAAI::SlideToPosition
 =====================
 */
-bool idAI::SlideToPosition( const arcVec3 &pos, float time ) {
+bool anSAAI::SlideToPosition( const anVec3 &pos, float time ) {
 	StopMove( MOVE_STATUS_DONE );
 
 	move.moveDest		= pos;
-	move.goalEntity		= NULL;
+	move.goalEntity		= nullptr;
 	move.moveCommand	= MOVE_SLIDE_TO_POSITION;
 	move.moveStatus		= MOVE_STATUS_MOVING;
 	move.startTime		= gameLocal.time;
-	move.duration		= idPhysics::SnapTimeToPhysicsFrame( SEC2MS( time ) );
+	move.duration		= anPhysics::SnapTimeToPhysicsFrame( SEC2MS( time ) );
 
 	move.fl.done			= false;
 	move.fl.goalUnreachable	= false;
@@ -1327,11 +1327,11 @@ bool idAI::SlideToPosition( const arcVec3 &pos, float time ) {
 
 /*
 =====================
-idAI::WanderAround
+anSAAI::WanderAround
 =====================
 */
-bool idAI::WanderAround( void ) {
-	arcVec3 dest;
+bool anSAAI::WanderAround( void ) {
+	anVec3 dest;
 
 	StopMove( MOVE_STATUS_DONE );
 
@@ -1342,24 +1342,24 @@ bool idAI::WanderAround( void ) {
 		return false;
 	}
 
-	return StartMove ( MOVE_WANDER, dest, 0, NULL, NULL, 0.0f );
+	return StartMove ( MOVE_WANDER, dest, 0, nullptr, nullptr, 0.0f );
 }
 
 /*
 ================
-idAI::StepDirection
+anSAAI::StepDirection
 ================
 */
-bool idAI::StepDirection( float dir ) {
+bool anSAAI::StepDirection( float dir ) {
 	predictedPath_t path;
-	arcVec3 org;
+	anVec3 org;
 
 	move.wanderYaw = dir;
-	move.moveDir = idAngles( 0, move.wanderYaw, 0 ).ToForward();
+	move.moveDir = anAngles( 0, move.wanderYaw, 0 ).ToForward();
 
 	org = physicsObj.GetOrigin();
 
-	idAI::PredictPath( this, aas, org, move.moveDir * 48.0f, 1000, 1000, ( move.moveType == MOVETYPE_FLY ) ? SE_BLOCKED : ( SE_ENTER_OBSTACLE | SE_BLOCKED | SE_ENTER_LEDGE_AREA ), path );
+	anSAAI::PredictPath( this, aas, org, move.moveDir * 48.0f, 1000, 1000, ( move.moveType == MOVETYPE_FLY ) ? SE_BLOCKED : ( SE_ENTER_OBSTACLE | SE_BLOCKED | SE_ENTER_LEDGE_AREA ), path );
 
 	if ( path.blockingEntity && ( ( move.moveCommand == MOVE_TO_ENEMY ) || ( move.moveCommand == MOVE_TO_ENTITY ) ) && ( path.blockingEntity == move.goalEntity.GetEntity() ) ) {
 		// don't report being blocked if we ran into our goal entity
@@ -1372,22 +1372,22 @@ bool idAI::StepDirection( float dir ) {
 		move.moveDir = path.endVelocity * 1.0f / 48.0f;
 
 		// trace down to the floor and see if we can go forward
-		idAI::PredictPath( this, aas, org, arcVec3( 0.0f, 0.0f, -1024.0f ), 1000, 1000, SE_BLOCKED, path );
+		anSAAI::PredictPath( this, aas, org, anVec3( 0.0f, 0.0f, -1024.0f ), 1000, 1000, SE_BLOCKED, path );
 
-		arcVec3 floorPos = path.endPos;
-		idAI::PredictPath( this, aas, floorPos, move.moveDir * 48.0f, 1000, 1000, SE_BLOCKED, path );
+		anVec3 floorPos = path.endPos;
+		anSAAI::PredictPath( this, aas, floorPos, move.moveDir * 48.0f, 1000, 1000, SE_BLOCKED, path );
 		if ( !path.endEvent ) {
 			move.moveDir.z = -1.0f;
 			return true;
 		}
 
 		// trace up to see if we can go over something and go forward
-		idAI::PredictPath( this, aas, org, arcVec3( 0.0f, 0.0f, 256.0f ), 1000, 1000, SE_BLOCKED, path );
+		anSAAI::PredictPath( this, aas, org, anVec3( 0.0f, 0.0f, 256.0f ), 1000, 1000, SE_BLOCKED, path );
 
-		arcVec3 ceilingPos = path.endPos;
+		anVec3 ceilingPos = path.endPos;
 
-		for( z = org.z; z <= ceilingPos.z + 64.0f; z += 64.0f ) {
-			arcVec3 start;
+		for ( z = org.z; z <= ceilingPos.z + 64.0f; z += 64.0f ) {
+			anVec3 start;
 			if ( z <= ceilingPos.z ) {
 				start.x = org.x;
 				start.y = org.y;
@@ -1395,7 +1395,7 @@ bool idAI::StepDirection( float dir ) {
 			} else {
 				start = ceilingPos;
 			}
-			idAI::PredictPath( this, aas, start, move.moveDir * 48.0f, 1000, 1000, SE_BLOCKED, path );
+			anSAAI::PredictPath( this, aas, start, move.moveDir * 48.0f, 1000, 1000, SE_BLOCKED, path );
 			if ( !path.endEvent ) {
 				move.moveDir.z = 1.0f;
 				return true;
@@ -1409,20 +1409,20 @@ bool idAI::StepDirection( float dir ) {
 
 /*
 ================
-idAI::NewWanderDir
+anSAAI::NewWanderDir
 ================
 */
-bool idAI::NewWanderDir( const arcVec3 &dest ) {
+bool anSAAI::NewWanderDir( const anVec3 &dest ) {
 	float	deltax, deltay;
 	float	d[ 3 ];
 	float	tdir, olddir, turnaround;
 
 	move.nextWanderTime = gameLocal.time + ( gameLocal.random.RandomFloat() * 500 + 500 );
 
-	olddir = arcMath::AngleNormalize360( ( int )( move.current_yaw / 45 ) * 45 );
-	turnaround = arcMath::AngleNormalize360( olddir - 180 );
+	olddir = anMath::AngleNormalize360( ( int )( move.current_yaw / 45 ) * 45 );
+	turnaround = anMath::AngleNormalize360( olddir - 180 );
 
-	arcVec3 org = physicsObj.GetOrigin();
+	anVec3 org = physicsObj.GetOrigin();
 	deltax = dest.x - org.x;
 	deltay = dest.y - org.y;
 	if ( deltax > 10 ) {
@@ -1476,7 +1476,7 @@ bool idAI::NewWanderDir( const arcVec3 &dest ) {
 
 	 // randomly determine direction of search
 	if ( gameLocal.random.RandomInt() & 1 ) {
-		for( tdir = 0; tdir <= 315; tdir += 45 ) {
+		for ( tdir = 0; tdir <= 315; tdir += 45 ) {
 			if ( tdir != turnaround && StepDirection( tdir ) ) {
                 return true;
 			}
@@ -1500,26 +1500,26 @@ bool idAI::NewWanderDir( const arcVec3 &dest ) {
 
 /*
 =====================
-idAI::GetMovePos
+anSAAI::GetMovePos
 =====================
 */
-bool idAI::GetMovePos( arcVec3 &seekPos, idReachability** seekReach ) {
+bool anSAAI::GetMovePos( anVec3 &seekPos, anReachability** seekReach ) {
 	int			areaNum;
-	aasPath_t	path;
+	seasPath_t	path;
 	bool		result;
-	arcVec3		org;
+	anVec3		org;
 
 	org = physicsObj.GetOrigin();
 	seekPos = org;
 
- 	// RAVEN BEGIN
+
  	// cdr: Alternate Routes Bug
- 	if (seekReach) {
+ 	if ( seekReach) {
  		(*seekReach) = 0;
  	}
- 	// RAVEN END
 
-	switch( move.moveCommand ) {
+
+	switch ( move.moveCommand ) {
 		case MOVE_NONE :
 			seekPos = move.moveDest;
 			return false;
@@ -1586,10 +1586,10 @@ bool idAI::GetMovePos( arcVec3 &seekPos, idReachability** seekReach ) {
 			if ( aas->GetFile() ) {
 				//we have AAS
 				if ( move.fly_offset > 0 ) {
-					if ( (seekPos-move.moveDest).LengthSqr() > 10.0f ) {
+					if ( ( seekPos-move.moveDest).LengthSqr() > 10.0f ) {
 						//not heading to final dest, that already has offset in it
 						float areaTop = aas->AreaCeiling(path.moveAreaNum)-GetPhysics()->GetBounds()[1][2];
-						if ( (seekPos.z+move.fly_offset) > areaTop ) {
+						if ( ( seekPos.z+move.fly_offset) > areaTop ) {
 							seekPos.z = areaTop;
 						} else {
 							seekPos.z += move.fly_offset;
@@ -1598,12 +1598,12 @@ bool idAI::GetMovePos( arcVec3 &seekPos, idReachability** seekReach ) {
 				}
 			}
 
- 			// RAVEN BEGIN
+
  			// cdr: Alternate Routes Bug
- 			if (seekReach) {
- 				(*seekReach) = (idReachability*)(path.reachability);
+ 			if ( seekReach) {
+ 				(*seekReach) = (anReachability*)(path.reachability);
  			}
- 			// RAVEN END
+
 
 			result = true;
 			move.nextWanderTime = 0;
@@ -1645,16 +1645,16 @@ bool idAI::GetMovePos( arcVec3 &seekPos, idReachability** seekReach ) {
 
 /*
 =====================
-idAI::BlockedFailSafe
+anSAAI::BlockedFailSafe
 =====================
 */
-void idAI::BlockedFailSafe( void ) {
+void anSAAI::BlockedFailSafe( void ) {
 /*	move.fl.blocked = false;
 
 	if ( !ai_blockedFailSafe.GetBool() || move.blockedRadius < 0.0f ) {
 		return;
 	}
-	if ( !physicsObj.OnGround() || enemy.GetEntity() == NULL ||
+	if ( !physicsObj.OnGround() || enemy.GetEntity() == nullptr ||
 			( physicsObj.GetOrigin() - move.lastMoveOrigin ).LengthSqr() > Square( move.blockedRadius ) ) {
 		move.lastMoveOrigin = physicsObj.GetOrigin();
 		move.lastMoveTime = gameLocal.time;
@@ -1675,31 +1675,31 @@ void idAI::BlockedFailSafe( void ) {
 
 /*
 =====================
-idAI::TurnToward
+anSAAI::TurnToward
 =====================
 */
-bool idAI::TurnToward( float yaw ) {
-	move.ideal_yaw = arcMath::AngleNormalize180( yaw );
+bool anSAAI::TurnToward( float yaw ) {
+	move.ideal_yaw = anMath::AngleNormalize180( yaw );
 	bool result = FacingIdeal();
 	return result;
 }
 
 /*
 =====================
-idAI::TurnToward
+anSAAI::TurnToward
 =====================
 */
-bool idAI::TurnToward( const arcVec3 &pos ) {
-	arcVec3 dir;
-	arcVec3 local_dir;
+bool anSAAI::TurnToward( const anVec3 &pos ) {
+	anVec3 dir;
+	anVec3 local_dir;
 	float lengthSqr;
 
 	dir = pos - physicsObj.GetOrigin();
 	physicsObj.GetGravityAxis().ProjectVector( dir, local_dir );
 	local_dir.z = 0.0f;
 	lengthSqr = local_dir.LengthSqr();
-	if ( lengthSqr > Square( 2.0f ) || ( lengthSqr > Square( 0.1f ) && enemy.ent  == NULL ) ) {
-		move.ideal_yaw = arcMath::AngleNormalize180( local_dir.ToYaw() );
+	if ( lengthSqr > Square( 2.0f ) || ( lengthSqr > Square( 0.1f ) && enemy.ent  == nullptr ) ) {
+		move.ideal_yaw = anMath::AngleNormalize180( local_dir.ToYaw() );
 	}
 
 	return FacingIdeal();
@@ -1707,27 +1707,27 @@ bool idAI::TurnToward( const arcVec3 &pos ) {
 
 /*
 =====================
-idAI::TurnTowardLeader
+anSAAI::TurnTowardLeader
 =====================
 */
-bool idAI::TurnTowardLeader( bool faceLeaderByDefault ) {
+bool anSAAI::TurnTowardLeader( bool faceLeaderByDefault ) {
 	if ( !leader.GetEntity() ) {
 		return false;
 	}
 	//see if there's a wall in the direction the player's looking
 	trace_t tr;
 
-	arcVec3 leaderLookDest = leader->GetPhysics()->GetOrigin() + (( (leader.GetEntity() && leader.GetEntity()->IsType( idPlayer::GetClassType() )) ? ((idPlayer*)leader.GetEntity())->intentDir:leader->viewAxis[0])*300.0f);
-	arcVec3 myLookDir = leaderLookDest-GetPhysics()->GetOrigin();
+	anVec3 leaderLookDest = leader->GetPhysics()->GetOrigin() + ( ( (leader.GetEntity() && leader.GetEntity()->IsType( anBasePlayer::GetClassType() ) ) ? ((anBasePlayer*)leader.GetEntity())->intentDir:leader->viewAxis[0])*300.0f);
+	anVec3 myLookDir = leaderLookDest-GetPhysics()->GetOrigin();
 	myLookDir.Normalize();
-	arcVec3 start = GetPhysics()->GetOrigin();
+	anVec3 start = GetPhysics()->GetOrigin();
 	start.z += EyeHeight();
-	arcVec3 end = start + (myLookDir*128.0f);
+	anVec3 end = start + (myLookDir*128.0f);
 	end.z = start.z;
-	arcVec3 currentLookDir = viewAxis[0];
+	anVec3 currentLookDir = viewAxis[0];
 	currentLookDir.Normalize();
 
-	if ( !GetEnemy() && (!leader->IsType(idPlayer::GetClassType()) || !((idPlayer*)leader.GetEntity())->IsFlashlightOn()) ) {
+	if ( !GetEnemy() && ( !leader->IsType(anBasePlayer::GetClassType()) || !((anBasePlayer*)leader.GetEntity())->IsFlashlightOn()) ) {
 		//Not in combat and leader isn't looking around with flashlight
 		if ( myLookDir*currentLookDir > 0.666f ) {
 			//new dir isn't different enough from current dir for me to care
@@ -1735,7 +1735,7 @@ bool idAI::TurnTowardLeader( bool faceLeaderByDefault ) {
 		}
 	}
 	gameLocal.TracePoint( this, tr, start, end, MASK_OPAQUE, this );
-	idEntity* traceEnt = gameLocal.entities[ tr.c.entityNum ];
+	anEntity* traceEnt = gameLocal.entities[ tr.c.entityNum ];
 	if ( tr.fraction < 1.0f
 		&& (tr.fraction<0.5f||!traceEnt||!traceEnt->IsType(idDoor::GetClassType())) ) {
 		//wall there - NOTE: okay to look at doors
@@ -1747,7 +1747,7 @@ bool idAI::TurnTowardLeader( bool faceLeaderByDefault ) {
 		//just keep looking in the last valid dir
 		if ( FacingIdeal() ) {
 			//make sure it's still valid
-			arcVec3 end = start + (viewAxis[0]*128.0f);
+			anVec3 end = start + (viewAxis[0]*128.0f);
 			end.z = start.z;
 			gameLocal.TracePoint( this, tr, start, end, MASK_OPAQUE, this );
 			traceEnt = gameLocal.entities[ tr.c.entityNum ];
@@ -1766,12 +1766,12 @@ bool idAI::TurnTowardLeader( bool faceLeaderByDefault ) {
 
 /*
 ============
-idAI::DirectionalTurnToward
+anSAAI::DirectionalTurnToward
 
 Turn toward the given point using directional movement
 ============
 */
-bool idAI::DirectionalTurnToward ( const arcVec3 &pos ) {
+bool anSAAI::DirectionalTurnToward ( const anVec3 &pos ) {
 	static float moveDirOffset [ MOVEDIR_MAX ] = {
 		0.0f, 180.0f, -90.0f, 90.0f
 	};
@@ -1779,7 +1779,7 @@ bool idAI::DirectionalTurnToward ( const arcVec3 &pos ) {
 	// Issue standard TurnToward if we are not currently eligible for directional movement
 	if ( combat.tacticalCurrent != AITACTICAL_MOVE_PLAYERPUSH ) {
 		//always move directionally when getting out of the player's way
-		if( !combat.fl.aware || focusType < AIFOCUS_USE_DIRECTIONAL_MOVE || !move.fl.moving || move.moveCommand == MOVE_TO_ENEMY || !move.fl.allowDirectional ) {
+		if ( !combat.fl.aware || focusType < AIFOCUS_USE_DIRECTIONAL_MOVE || !move.fl.moving || move.moveCommand == MOVE_TO_ENEMY || !move.fl.allowDirectional ) {
 			move.idealDirection = MOVEDIR_FORWARD;
 			return TurnToward ( pos );
 		}
@@ -1795,13 +1795,13 @@ bool idAI::DirectionalTurnToward ( const arcVec3 &pos ) {
 
 	// Check for a direction change only when we can no longer see
 	// where we need to look and where we are looking is greater than 3/4ths the maximum look
-	if ( (pos - GetPhysics()->GetOrigin()).LengthFast ( ) > 8.0f )
-	if ( !FacingIdeal ( ) )
-	if ( fabs ( arcMath::AngleNormalize180 ( move.ideal_yaw - move.current_yaw ) ) >= fabs(lookMax[YAW]) ||
-	     fabs ( arcMath::AngleNormalize180 ( arcMath::AngleNormalize180 ( moveDirOffset[move.idealDirection] + moveYaw ) - move.current_yaw ) ) >= 80.0f ) {
+	if ( (pos - GetPhysics()->GetOrigin()).LengthFast() > 8.0f )
+	if ( !FacingIdeal() )
+	if ( fabs ( anMath::AngleNormalize180 ( move.ideal_yaw - move.current_yaw ) ) >= fabs(lookMax[YAW]) ||
+	     fabs ( anMath::AngleNormalize180 ( anMath::AngleNormalize180 ( moveDirOffset[move.idealDirection] + moveYaw ) - move.current_yaw ) ) >= 80.0f ) {
 
 		float diffYaw;
-		diffYaw = arcMath::AngleNormalize180 ( move.ideal_yaw - moveYaw );
+		diffYaw = anMath::AngleNormalize180 ( move.ideal_yaw - moveYaw );
 
 		if ( diffYaw > -45.0f && diffYaw < 45.0f ) {
 			move.idealDirection = MOVEDIR_FORWARD;
@@ -1814,22 +1814,22 @@ bool idAI::DirectionalTurnToward ( const arcVec3 &pos ) {
 		}
 	}
 
-	return TurnToward( arcMath::AngleNormalize180 ( moveDirOffset[move.idealDirection] + moveYaw ) );
+	return TurnToward( anMath::AngleNormalize180 ( moveDirOffset[move.idealDirection] + moveYaw ) );
 }
 
 /*
 =====================
-idAI::Turn
+anSAAI::Turn
 =====================
 */
-void idAI::Turn( void ) {
+void anSAAI::Turn( void ) {
 	float diff;
 	float diff2;
 	float turnAmount;
 	animFlags_t animflags;
 
 	// If cant turn or turning is disabled just bail
-	if ( !CanTurn ( ) ) {
+	if ( !CanTurn() ) {
 		return;
 	}
 
@@ -1844,7 +1844,7 @@ void idAI::Turn( void ) {
 	}
 
 	if ( move.anim_turn_angles && animflags.anim_turn ) {
-		arcMat3 rotateAxis;
+		anMat3 rotateAxis;
 
 		// set the blend between no turn and full turn
 		float frac = move.anim_turn_amount / move.anim_turn_angles;
@@ -1855,9 +1855,9 @@ void idAI::Turn( void ) {
 
 		// get the total rotation from the start of the anim
 		animator.GetDeltaRotation( 0, gameLocal.time, rotateAxis );
-		move.current_yaw = arcMath::AngleNormalize180( move.anim_turn_yaw + rotateAxis[ 0 ].ToYaw() );
+		move.current_yaw = anMath::AngleNormalize180( move.anim_turn_yaw + rotateAxis[ 0 ].ToYaw() );
 	} else {
-		diff = arcMath::AngleNormalize180( move.ideal_yaw - move.current_yaw );
+		diff = anMath::AngleNormalize180( move.ideal_yaw - move.current_yaw );
 
 		if ( move.currentDirection != move.idealDirection ) {
 			move.turnVel += (AI_TURN_SCALE * 2.0f)* diff * MS2SEC( gameLocal.msec );
@@ -1882,41 +1882,41 @@ void idAI::Turn( void ) {
 			move.turnVel = diff / MS2SEC( gameLocal.msec );
 			turnAmount = diff;
 		}
-		move.current_yaw = arcMath::AngleNormalize180( move.current_yaw + turnAmount );
-		diff2 = arcMath::AngleNormalize180( move.ideal_yaw - move.current_yaw );
+		move.current_yaw = anMath::AngleNormalize180( move.current_yaw + turnAmount );
+		diff2 = anMath::AngleNormalize180( move.ideal_yaw - move.current_yaw );
 
-		if ( arcMath::Fabs( diff2 ) < 0.1f ) {
+		if ( anMath::Fabs( diff2 ) < 0.1f ) {
 			move.current_yaw = move.ideal_yaw;
 		}
 	}
 
-	viewAxis = idAngles( 0, move.current_yaw, 0 ).ToMat3();
+	viewAxis = anAngles( 0, move.current_yaw, 0 ).ToMat3();
 
 //	if ( DebugFilter(ai_debugMove) ) { // RED = ideal_yaw, GREEN = current_yaw,  YELLOW = current+velocity
-//		const arcVec3 &org = physicsObj.GetOrigin();
-//		gameRenderWorld->DebugLine( colorRed, org, org + idAngles( 0, move.ideal_yaw, 0 ).ToForward() * 64, gameLocal.msec );
-//		gameRenderWorld->DebugLine( colorGreen, org, org + idAngles( 0, move.current_yaw, 0 ).ToForward() * 48, gameLocal.msec );
-//		gameRenderWorld->DebugLine( colorYellow, org, org + idAngles( 0, move.current_yaw + move.turnVel, 0 ).ToForward() * 32, gameLocal.msec );
+//		const anVec3 &org = physicsObj.GetOrigin();
+//		gameRenderWorld->DebugLine( colorRed, org, org + anAngles( 0, move.ideal_yaw, 0 ).ToForward() * 64, gameLocal.msec );
+//		gameRenderWorld->DebugLine( colorGreen, org, org + anAngles( 0, move.current_yaw, 0 ).ToForward() * 48, gameLocal.msec );
+//		gameRenderWorld->DebugLine( colorYellow, org, org + anAngles( 0, move.current_yaw + move.turnVel, 0 ).ToForward() * 32, gameLocal.msec );
 //		if ( move.anim_turn_angles && animflags.anim_turn ) {
-//			gameRenderWorld->DebugLine( colorOrange, org, org + idAngles( 0, move.anim_turn_yaw, 0 ).ToForward() * 32, gameLocal.msec );
+//			gameRenderWorld->DebugLine( colorOrange, org, org + anAngles( 0, move.anim_turn_yaw, 0 ).ToForward() * 32, gameLocal.msec );
 //		}
 //	}
 }
 
 /*
 =====================
-idAI::FacingIdeal
+anSAAI::FacingIdeal
 =====================
 */
-bool idAI::FacingIdeal( void ) {
+bool anSAAI::FacingIdeal( void ) {
 	float diff;
 
 	if ( !move.turnRate ) {
 		return true;
 	}
 
-	diff = arcMath::AngleDelta ( move.current_yaw, move.ideal_yaw );
-	if ( arcMath::Fabs( diff ) < 0.01f ) {
+	diff = anMath::AngleDelta ( move.current_yaw, move.ideal_yaw );
+	if ( anMath::Fabs( diff ) < 0.01f ) {
 		// force it to be exact
 		move.current_yaw = move.ideal_yaw;
 		return true;
@@ -1927,10 +1927,10 @@ bool idAI::FacingIdeal( void ) {
 
 /*
 ================
-idAI::AnimTurn
+anSAAI::AnimTurn
 ================
 */
-void idAI::AnimTurn ( float angles, bool force ) {
+void anSAAI::AnimTurn ( float angles, bool force ) {
 	move.turnVel = 0.0f;
 	move.anim_turn_angles = angles;
 	if ( angles ) {
@@ -1939,7 +1939,7 @@ void idAI::AnimTurn ( float angles, bool force ) {
 		if ( force ) {
 			move.anim_turn_amount = angles;
 		} else {
-			move.anim_turn_amount = arcMath::Fabs( arcMath::AngleNormalize180( move.current_yaw - move.ideal_yaw ) );
+			move.anim_turn_amount = anMath::Fabs( anMath::AngleNormalize180( move.current_yaw - move.ideal_yaw ) );
 			if ( move.anim_turn_amount > move.anim_turn_angles ) {
 				move.anim_turn_amount = move.anim_turn_angles;
 			}
@@ -1961,26 +1961,26 @@ void idAI::AnimTurn ( float angles, bool force ) {
 
 /*
 ================
-idAI::ApplyImpulse
+anSAAI::ApplyImpulse
 ================
 */
-void idAI::ApplyImpulse( idEntity *ent, int id, const arcVec3 &point, const arcVec3 &impulse, bool splash ) {
+void anSAAI::ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &impulse, bool splash ) {
 	// FIXME: Jim take a look at this and see if this is a reasonable thing to do
 	// instead of a spawnArg flag.. Sabaoth is the only slide monster ( and should be the only one for D3 )
 	// and we don't want him taking physics impulses as it can knock him off the path
 	if ( move.moveType != MOVETYPE_STATIC && move.moveType != MOVETYPE_SLIDE ) {
-		idActor::ApplyImpulse( ent, id, point, impulse );
+		anActor::ApplyImpulse( ent, id, point, impulse );
 	}
 }
 
 /*
 =====================
-idAI::GetAnimMoveDelta
+anSAAI::GetAnimMoveDelta
 =====================
 */
-void idAI::GetAnimMoveDelta( const arcMat3 &oldaxis, const arcMat3 &axis, arcVec3 &delta ) {
-	arcVec3 oldModelOrigin;
-	arcVec3 modelOrigin;
+void anSAAI::GetAnimMoveDelta( const anMat3 &oldaxis, const anMat3 &axis, anVec3 &delta ) {
+	anVec3 oldModelOrigin;
+	anVec3 modelOrigin;
 
 	animator.GetDelta( gameLocal.time - gameLocal.msec, gameLocal.time, delta );
 	delta = axis * delta;
@@ -2005,16 +2005,16 @@ TestTeammateCollisions
 =====================
 */
 
-void TestTeammateCollisions(idAI* owner) {
-	idActor*		teammate;
-	arcVec3			teammateDirection;
-	arcVec3			teammateVelocity;
+void TestTeammateCollisions(anSAAI* owner) {
+	anActor*		teammate;
+	anVec3			teammateDirection;
+	anVec3			teammateVelocity;
 	float			teammateDirectionDot;
 	float			teammateDistance;
 	float			teammateSpeed;
-	const arcVec3&	myOrigin	= owner->GetPhysics()->GetOrigin();
-	const arcBounds&	myBounds	= owner->GetPhysics()->GetBounds();
-	arcVec3			myVelocity	= owner->GetPhysics()->GetLinearVelocity();
+	const anVec3&	myOrigin	= owner->GetPhysics()->GetOrigin();
+	const anBounds&	myBounds	= owner->GetPhysics()->GetBounds();
+	anVec3			myVelocity	= owner->GetPhysics()->GetLinearVelocity();
 	float			mySpeed		= myVelocity.NormalizeFast();
 
 	// Don't Bother, We're Blocked Or Not Moving
@@ -2101,14 +2101,14 @@ void TestTeammateCollisions(idAI* owner) {
 
 /*
 =====================
-idAI::CheckObstacleAvoidance
+anSAAI::CheckObstacleAvoidance
 =====================
 */
-void idAI::CheckObstacleAvoidance( const arcVec3 &goalPos, arcVec3 &seekPos, idReachability* goalReach ) {
+void anSAAI::CheckObstacleAvoidance( const anVec3 &goalPos, anVec3 &seekPos, anReachability* goalReach ) {
 
 	move.fl.blocked				= false;	// Makes Character Stop Moving
 	move.fl.obstacleInPath		= false;	// Makes Character Walk
-	move.obstacle				= NULL;
+	move.obstacle				= nullptr;
 	seekPos						= goalPos;
 
 	if (move.fl.ignoreObstacles) {
@@ -2121,7 +2121,7 @@ void idAI::CheckObstacleAvoidance( const arcVec3 &goalPos, arcVec3 &seekPos, idR
 	// Test For Path Around Obstacles
 	//--------------------------------
 	obstaclePath_t	path;
-	move.fl.blocked				= !FindPathAroundObstacles( &physicsObj, aas, move.moveCommand == MOVE_TO_ENEMY ? enemy.ent : NULL, physicsObj.GetOrigin(), goalPos, path );
+	move.fl.blocked				= !FindPathAroundObstacles( &physicsObj, aas, move.moveCommand == MOVE_TO_ENEMY ? enemy.ent : nullptr, physicsObj.GetOrigin(), goalPos, path );
 	move.fl.obstacleInPath		= (path.firstObstacle || path.seekPosObstacle || path.startPosObstacle);
 	move.obstacle				= (path.firstObstacle)?(path.firstObstacle):(path.seekPosObstacle);
 	seekPos						= path.seekPos;
@@ -2143,7 +2143,7 @@ void idAI::CheckObstacleAvoidance( const arcVec3 &goalPos, arcVec3 &seekPos, idR
 		float dist;
 
 		dist = seekPos.DistToLineSeg(physicsObj.GetOrigin(), goalPos, scale);
-		if (scale<0.95f && dist>50.0f) {
+		if ( scale<0.95f && dist>50.0f) {
 			aiManager.MarkReachBlocked(aas, goalReach, path.allObstacles);
 		}
  	}
@@ -2153,27 +2153,27 @@ void idAI::CheckObstacleAvoidance( const arcVec3 &goalPos, arcVec3 &seekPos, idR
 
 
 	if ( DebugFilter(ai_showObstacleAvoidance) ) {
-		gameRenderWorld->DebugLine( colorBlue, goalPos + arcVec3( 1.0f, 1.0f, 0.0f ), goalPos + arcVec3( 1.0f, 1.0f, 64.0f ), gameLocal.msec );
-		gameRenderWorld->DebugLine( !move.fl.blocked ? colorYellow : colorRed, path.seekPos, path.seekPos + arcVec3( 0.0f, 0.0f, 64.0f ), gameLocal.msec );
+		gameRenderWorld->DebugLine( colorBlue, goalPos + anVec3( 1.0f, 1.0f, 0.0f ), goalPos + anVec3( 1.0f, 1.0f, 64.0f ), gameLocal.msec );
+		gameRenderWorld->DebugLine( !move.fl.blocked ? colorYellow : colorRed, path.seekPos, path.seekPos + anVec3( 0.0f, 0.0f, 64.0f ), gameLocal.msec );
 	}
 }
 
 /*
 ============
-idAI::TestAnimMove
+anSAAI::TestAnimMove
 ============
 */
-bool idAI::TestAnimMove ( int animNum, idEntity *ignore, arcVec3 *pMoveVec ) {
+bool anSAAI::TestAnimMove ( int animNum, anEntity *ignore, anVec3 *pMoveVec ) {
 	const idAnim*	anim;
 	predictedPath_t path;
-	arcVec3			moveVec;
+	anVec3			moveVec;
 
 	anim = GetAnimator()->GetAnim ( animNum );
 	assert ( anim );
 
-//	moveVec = anim->TotalMovementDelta() * idAngles( 0.0f, move.ideal_yaw, 0.0f ).ToMat3() * physicsObj.GetGravityAxis();
-	moveVec = anim->TotalMovementDelta() * idAngles( 0.0f, move.current_yaw, 0.0f ).ToMat3() * physicsObj.GetGravityAxis();
-	idAI::PredictPath( this, aas, physicsObj.GetOrigin(), moveVec / MS2SEC( anim->Length() ), anim->Length(), 200, SE_BLOCKED | SE_ENTER_LEDGE_AREA, path, ignore );
+//	moveVec = anim->TotalMovementDelta() * anAngles( 0.0f, move.ideal_yaw, 0.0f ).ToMat3() * physicsObj.GetGravityAxis();
+	moveVec = anim->TotalMovementDelta() * anAngles( 0.0f, move.current_yaw, 0.0f ).ToMat3() * physicsObj.GetGravityAxis();
+	anSAAI::PredictPath( this, aas, physicsObj.GetOrigin(), moveVec / MS2SEC( anim->Length() ), anim->Length(), 200, SE_BLOCKED | SE_ENTER_LEDGE_AREA, path, ignore );
 
 	if ( DebugFilter(ai_debugMove) ) { // TestAnimMove
 		gameRenderWorld->DebugLine( colorGreen, physicsObj.GetOrigin(), physicsObj.GetOrigin() + moveVec, anim->Length() );
@@ -2191,10 +2191,10 @@ bool idAI::TestAnimMove ( int animNum, idEntity *ignore, arcVec3 *pMoveVec ) {
 Seek
 =====================
 */
-arcVec3 Seek( arcVec3 &vel, const arcVec3 &org, const arcVec3 &goal, float prediction ) {
-	arcVec3 predictedPos;
-	arcVec3 goalDelta;
-	arcVec3 seekVel;
+anVec3 Seek( anVec3 &vel, const anVec3 &org, const anVec3 &goal, float prediction ) {
+	anVec3 predictedPos;
+	anVec3 goalDelta;
+	anVec3 seekVel;
 
 	// predict our position
 	predictedPos = org + vel * prediction;
@@ -2213,16 +2213,16 @@ arcVec3 Seek( arcVec3 &vel, const arcVec3 &org, const arcVec3 &goal, float predi
 
 /*
 =====================
-idAI::DeadMove
+anSAAI::DeadMove
 =====================
 */
-void idAI::DeadMove( void ) {
-	arcVec3				delta;
+void anSAAI::DeadMove( void ) {
+	anVec3				delta;
 	monsterMoveResult_t	moveResult;
 
-	DeathPush ( );
+	DeathPush();
 
-	arcVec3 org = physicsObj.GetOrigin();
+	anVec3 org = physicsObj.GetOrigin();
 
 	GetAnimMoveDelta( viewAxis, viewAxis, delta );
 	physicsObj.SetDelta( delta );
@@ -2235,11 +2235,11 @@ void idAI::DeadMove( void ) {
 
 /*
 =====================
-idAI::AdjustFlyingAngles
+anSAAI::AdjustFlyingAngles
 =====================
 */
-void idAI::AdjustFlyingAngles( void ) {
-	arcVec3	vel;
+void anSAAI::AdjustFlyingAngles( void ) {
+	anVec3	vel;
 	float 	speed;
 	float 	roll;
 	float 	pitch;
@@ -2270,27 +2270,27 @@ void idAI::AdjustFlyingAngles( void ) {
 	move.fly_pitch = move.fly_pitch * 0.95f + pitch * 0.05f;
 
 	if ( move.flyTiltJoint != INVALID_JOINT ) {
-		animator.SetJointAxis( move.flyTiltJoint, JOINTMOD_WORLD, idAngles( move.fly_pitch, 0.0f, move.fly_roll ).ToMat3() );
+		animator.SetJointAxis( move.flyTiltJoint, JOINTMOD_WORLD, anAngles( move.fly_pitch, 0.0f, move.fly_roll ).ToMat3() );
 	} else {
-		viewAxis = idAngles( move.fly_pitch, move.current_yaw, move.fly_roll ).ToMat3();
+		viewAxis = anAngles( move.fly_pitch, move.current_yaw, move.fly_roll ).ToMat3();
 	}
 }
 
 /*
 =====================
-idAI::AddFlyBob
+anSAAI::AddFlyBob
 =====================
 */
-void idAI::AddFlyBob( arcVec3 &vel ) {
-	arcVec3	fly_bob_add;
+void anSAAI::AddFlyBob( anVec3 &vel ) {
+	anVec3	fly_bob_add;
 	float	t;
 
 	if ( move.fly_bob_strength ) {
 		t = MS2SEC( gameLocal.time + entityNumber * 497 );
-		fly_bob_add = ( viewAxis[ 1 ] * arcMath::Sin16( t * move.fly_bob_horz ) + viewAxis[ 2 ] * arcMath::Sin16( t * move.fly_bob_vert ) ) * move.fly_bob_strength;
+		fly_bob_add = ( viewAxis[ 1 ] * anMath::Sin16( t * move.fly_bob_horz ) + viewAxis[ 2 ] * anMath::Sin16( t * move.fly_bob_vert ) ) * move.fly_bob_strength;
 		vel += fly_bob_add * MS2SEC( gameLocal.msec );
 		if ( DebugFilter(ai_debugMove) ) { // FlyBob
-			const arcVec3 &origin = physicsObj.GetOrigin();
+			const anVec3 &origin = physicsObj.GetOrigin();
 			gameRenderWorld->DebugArrow( colorOrange, origin, origin + fly_bob_add, 0 );
 		}
 	}
@@ -2298,14 +2298,14 @@ void idAI::AddFlyBob( arcVec3 &vel ) {
 
 /*
 =====================
-idAI::AdjustFlyHeight
+anSAAI::AdjustFlyHeight
 =====================
 */
-void idAI::AdjustFlyHeight( arcVec3 &vel, const arcVec3 &goalPos ) {
-	const arcVec3	&origin = physicsObj.GetOrigin();
+void anSAAI::AdjustFlyHeight( anVec3 &vel, const anVec3 &goalPos ) {
+	const anVec3	&origin = physicsObj.GetOrigin();
 	predictedPath_t path;
-	arcVec3			end;
-	arcVec3			dest;
+	anVec3			end;
+	anVec3			dest;
 	trace_t			trace;
 	bool			goLower;
 
@@ -2317,7 +2317,7 @@ void idAI::AdjustFlyHeight( arcVec3 &vel, const arcVec3 &goalPos ) {
 	if ( origin.z > goalPos.z ) {
 		dest = goalPos;
 		dest.z = origin.z + 128.0f;
-		idAI::PredictPath( this, aas, goalPos, dest - origin, 1000, 1000, SE_BLOCKED, path, move.goalEntity.GetEntity() );
+		anSAAI::PredictPath( this, aas, goalPos, dest - origin, 1000, 1000, SE_BLOCKED, path, move.goalEntity.GetEntity() );
 		if ( path.endPos.z < origin.z ) {
 
 			//Hmm, should we make sure the path.endPos is high enough off the ground?
@@ -2334,7 +2334,7 @@ void idAI::AdjustFlyHeight( arcVec3 &vel, const arcVec3 &goalPos ) {
 				}
 			}
 
-			arcVec3 addVel = Seek( vel, origin, path.endPos, AI_SEEK_PREDICTION );
+			anVec3 addVel = Seek( vel, origin, path.endPos, AI_SEEK_PREDICTION );
 			vel.z += addVel.z;
 			goLower = true;
 		}
@@ -2355,9 +2355,9 @@ void idAI::AdjustFlyHeight( arcVec3 &vel, const arcVec3 &goalPos ) {
 			end.z = goalPos.z;// + move.fly_offset;
 		}
 
-// RAVEN BEGIN
+
 // ddynerman: multiple collision world
-		arcVec3 cappedEnd = (end-origin);
+		anVec3 cappedEnd = (end-origin);
 		if ( cappedEnd.LengthFast() > 1024.0f ) {
 			//don't do translation predictions over 1024
 			cappedEnd.Normalize();
@@ -2365,18 +2365,18 @@ void idAI::AdjustFlyHeight( arcVec3 &vel, const arcVec3 &goalPos ) {
 		}
 		cappedEnd += origin;
 		gameLocal.Translation( this, trace, origin, cappedEnd, physicsObj.GetClipModel(), mat3_identity, MASK_MONSTERSOLID, this );
-// RAVEN END
+
 		vel += Seek( vel, origin, trace.endpos, AI_SEEK_PREDICTION );
 	}
 }
 
 /*
 =====================
-idAI::FlySeekGoal
+anSAAI::FlySeekGoal
 =====================
 */
-void idAI::FlySeekGoal( arcVec3 &vel, arcVec3 &goalPos ) {
-	arcVec3 seekVel;
+void anSAAI::FlySeekGoal( anVec3 &vel, anVec3 &goalPos ) {
+	anVec3 seekVel;
 
 	// seek the goal position
 	seekVel = Seek( vel, physicsObj.GetOrigin(), goalPos, AI_SEEK_PREDICTION );
@@ -2388,18 +2388,18 @@ void idAI::FlySeekGoal( arcVec3 &vel, arcVec3 &goalPos ) {
 
 /*
 =====================
-idAI::AdjustFlySpeed
+anSAAI::AdjustFlySpeed
 =====================
 */
-void idAI::AdjustFlySpeed( arcVec3 &vel ) {
+void anSAAI::AdjustFlySpeed( anVec3 &vel ) {
 	float goalSpeed;
 
 	// Slow down movespeed when we close to goal (this is similar to how AnimMove ai will
 	// switch to walking when they are close, it allows for more fine control of movement)
 	if ( move.walkRange > 0.0f ) {
 		float distSqr;
-		distSqr	  = (physicsObj.GetOrigin ( ) - move.moveDest).LengthSqr ( );
-		goalSpeed = move.speed * arcMath::ClampFloat ( 0.1f, 1.0f, distSqr / Square ( move.walkRange ) );
+		distSqr	  = (physicsObj.GetOrigin() - move.moveDest).LengthSqr();
+		goalSpeed = move.speed * anMath::ClampFloat ( 0.1f, 1.0f, distSqr / Square ( move.walkRange ) );
 	} else {
 		goalSpeed = move.speed;
 	}
@@ -2421,17 +2421,17 @@ void idAI::AdjustFlySpeed( arcVec3 &vel ) {
 
 		vel *= speed;
 //	} else {
-//		vel.Normalize ( );
+//		vel.Normalize();
 //		vel *= goalSpeed;
 //	}
 }
 
 /*
 =====================
-idAI::FlyTurn
+anSAAI::FlyTurn
 =====================
 */
-void idAI::FlyTurn( void ) {
+void anSAAI::FlyTurn( void ) {
 	if ( move.moveCommand == MOVE_FACE_ENEMY || ForceFaceEnemy() ) {
 		TurnToward( enemy.lastKnownPosition );
 	} else if ( ( move.moveCommand == MOVE_FACE_ENTITY ) && move.goalEntity.GetEntity() ) {
@@ -2439,7 +2439,7 @@ void idAI::FlyTurn( void ) {
 	} else if ( focusType != AIFOCUS_NONE && move.fl.allowDirectional ) {
 		DirectionalTurnToward ( currentFocusPos );
 	} else if ( move.speed > 0.0f ) {
-		const arcVec3 &vel = physicsObj.GetLinearVelocity();
+		const anVec3 &vel = physicsObj.GetLinearVelocity();
 		if ( vel.ToVec2().LengthSqr() > 0.1f ) {
 			TurnToward( vel.ToYaw() );
 		}
@@ -2450,12 +2450,12 @@ void idAI::FlyTurn( void ) {
 
 /*
 =====================
-idAI::FlyMove
+anSAAI::FlyMove
 =====================
 */
-void idAI::FlyMove( void ) {
-	arcVec3	oldorigin;
-	arcVec3	newDest;
+void anSAAI::FlyMove( void ) {
+	anVec3	oldorigin;
+	anVec3	newDest;
 
 	move.fl.blocked = false;
 	if ( ( move.moveCommand >= NUM_NONMOVING_COMMANDS ) && ReachedPos( move.moveDest, move.moveCommand, move.range ) ) {
@@ -2467,13 +2467,13 @@ void idAI::FlyMove( void ) {
 	}
 
 	// Dont move when movement is disabled
-	if ( !CanMove() || legsAnim.Disabled ( ) ) {
+	if ( !CanMove() || legsAnim.Disabled() ) {
 		// Still allow turning though
-		FlyTurn ( );
+		FlyTurn();
 
 		if ( (aifl.action || aifl.scripted ) && legsAnim.Disabled () && move.fl.allowAnimMove ) {
-			arcMat3 oldaxis = viewAxis;
-			arcVec3 delta;
+			anMat3 oldaxis = viewAxis;
+			anVec3 delta;
 			GetAnimMoveDelta( oldaxis, viewAxis, delta );
 			physicsObj.UseFlyMove( false );
 			if ( spawnArgs.GetBool( "alwaysBob" ) ) {
@@ -2484,7 +2484,7 @@ void idAI::FlyMove( void ) {
 
 			RunPhysics();
 		} else if ( spawnArgs.GetBool( "alwaysBob" ) ) {
-			arcVec3 vel = physicsObj.GetLinearVelocity();
+			anVec3 vel = physicsObj.GetLinearVelocity();
 			AddFlyBob( vel );
 			physicsObj.SetLinearVelocity( vel );
 
@@ -2497,12 +2497,12 @@ void idAI::FlyMove( void ) {
 			RunPhysics();
 		}
 
-		UpdateAnimationControllers ( );
+		UpdateAnimationControllers();
 		return;
 	}
 
 	if ( move.moveCommand != MOVE_TO_POSITION_DIRECT ) {
-		arcVec3 vel = physicsObj.GetLinearVelocity();
+		anVec3 vel = physicsObj.GetLinearVelocity();
 
 		if ( GetMovePos( move.seekPos ) ) {
 			CheckObstacleAvoidance( move.seekPos, newDest );
@@ -2541,7 +2541,7 @@ void idAI::FlyMove( void ) {
 	RunPhysics();
 
 	monsterMoveResult_t	moveResult = physicsObj.GetMoveResult();
-	idEntity *blockEnt = physicsObj.GetSlideMoveEntity();
+	anEntity *blockEnt = physicsObj.GetSlideMoveEntity();
 	if ( blockEnt && blockEnt->IsType( idMoveable::GetClassType() ) && blockEnt->GetPhysics()->IsPushable() ) {
 		KickObstacles( viewAxis[ 0 ], move.kickForce, blockEnt );
 	} else if ( moveResult == MM_BLOCKED ) {
@@ -2549,7 +2549,7 @@ void idAI::FlyMove( void ) {
 		move.fl.blocked = true;
 	}
 
-	arcVec3 org = physicsObj.GetOrigin();
+	anVec3 org = physicsObj.GetOrigin();
 	if ( oldorigin != org ) {
 		TouchTriggers();
 	}
@@ -2560,22 +2560,22 @@ void idAI::FlyMove( void ) {
 		gameRenderWorld->DebugBounds( colorMagenta, physicsObj.GetBounds(), move.moveDest, gameLocal.msec );
 		gameRenderWorld->DebugLine( colorRed, org, org + physicsObj.GetLinearVelocity(), gameLocal.msec, true );
 		gameRenderWorld->DebugLine( colorBlue, org, move.seekPos, gameLocal.msec, true );
-		gameRenderWorld->DebugLine( colorYellow, GetEyePosition ( ), GetEyePosition ( ) + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
+		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
 		DrawRoute();
 	}
 }
 
 /*
 ============
-idAI::UpdatePlayback
+anSAAI::UpdatePlayback
 ============
 */
-void idAI::UpdatePlayback ( arcVec3 &goalPos, arcVec3 &delta, arcVec3 &oldorigin, arcMat3 &oldaxis ) {
+void anSAAI::UpdatePlayback ( anVec3 &goalPos, anVec3 &delta, anVec3 &oldorigin, anMat3 &oldaxis ) {
 	rvDeclPlaybackData	pbd;
 	bool				atDest;
 
 	// New playback stuff
-	if( !mPlayback.IsActive() ) {
+	if ( !mPlayback.IsActive() ) {
 		return;
 	}
 
@@ -2586,33 +2586,33 @@ void idAI::UpdatePlayback ( arcVec3 &goalPos, arcVec3 &delta, arcVec3 &oldorigin
 	viewAxis = pbd.GetAngles().ToMat3();
 
 	// Keep the yaw updated
-	arcVec3 local_dir;
+	anVec3 local_dir;
 	physicsObj.GetGravityAxis().ProjectVector( viewAxis[ 0 ], local_dir );
 	move.current_yaw		= local_dir.ToYaw();
-	move.ideal_yaw		= arcMath::AngleNormalize180( move.current_yaw );
+	move.ideal_yaw		= anMath::AngleNormalize180( move.current_yaw );
 
 	OnUpdatePlayback ( pbd );
 }
 
 /*
 ============
-idAI::
+anSAAI::
 ============
 */
 
-void idAI::PlaybackMove( void ){
-	arcVec3				goalPos;
-	arcVec3				delta;
-	arcVec3				goalDelta;
+void anSAAI::PlaybackMove( void ){
+	anVec3				goalPos;
+	anVec3				delta;
+	anVec3				goalDelta;
 	monsterMoveResult_t	moveResult;
-	arcVec3				newDest;
+	anVec3				newDest;
 
-	arcVec3 oldorigin = physicsObj.GetOrigin();
-	arcMat3 oldaxis = viewAxis;
+	anVec3 oldorigin = physicsObj.GetOrigin();
+	anMat3 oldaxis = viewAxis;
 
 	move.fl.blocked = false;
 
-	move.obstacle = NULL;
+	move.obstacle = nullptr;
 
 	goalPos = oldorigin;
 
@@ -2630,11 +2630,11 @@ void idAI::PlaybackMove( void ){
 	RunPhysics();
 
 	moveResult = physicsObj.GetMoveResult();
-	idEntity *blockEnt = physicsObj.GetSlideMoveEntity();
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
+	anEntity *blockEnt = physicsObj.GetSlideMoveEntity();
+
+
 	if ( blockEnt && blockEnt->IsType( idMoveable::GetClassType() ) && blockEnt->GetPhysics()->IsPushable() ) {
-// RAVEN END
+
 		KickObstacles( viewAxis[ 0 ], move.kickForce, blockEnt );
 	} else {
 		move.fl.blocked = true;
@@ -2644,7 +2644,7 @@ void idAI::PlaybackMove( void ){
 
 	move.fl.onGround = physicsObj.OnGround();
 
-	arcVec3 org = physicsObj.GetOrigin();
+	anVec3 org = physicsObj.GetOrigin();
 	if ( oldorigin != org ) {
 		TouchTriggers();
 	}
@@ -2659,11 +2659,11 @@ void idAI::PlaybackMove( void ){
 
 /*
 =====================
-idAI::StaticMove
+anSAAI::StaticMove
 =====================
 */
-void idAI::StaticMove( void ) {
-	idEntity* enemyEnt = enemy.ent;
+void anSAAI::StaticMove( void ) {
+	anEntity* enemyEnt = enemy.ent;
 
 	if ( aifl.dead ) {
 		return;
@@ -2684,7 +2684,7 @@ void idAI::StaticMove( void ) {
 	move.fl.onGround = false;
 
 	if ( DebugFilter(ai_debugMove) ) { // Static Move
-		const arcVec3 &org = physicsObj.GetOrigin();
+		const anVec3 &org = physicsObj.GetOrigin();
 		gameRenderWorld->DebugBounds( colorMagenta, physicsObj.GetBounds(), org, gameLocal.msec );
 		gameRenderWorld->DebugLine( colorBlue, org, move.moveDest, gameLocal.msec, true );
 		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
@@ -2693,18 +2693,18 @@ void idAI::StaticMove( void ) {
 
 /*
 =====================
-idAI::SlideMove
+anSAAI::SlideMove
 =====================
 */
-void idAI::SlideMove( void ) {
-	arcVec3				delta;
-	arcVec3				goalDelta;
+void anSAAI::SlideMove( void ) {
+	anVec3				delta;
+	anVec3				goalDelta;
 	float				goalDist;
 	monsterMoveResult_t	moveResult;
-	arcVec3				newDest;
+	anVec3				newDest;
 
-	arcVec3 oldorigin = physicsObj.GetOrigin();
-	arcMat3 oldaxis = viewAxis;
+	anVec3 oldorigin = physicsObj.GetOrigin();
+	anMat3 oldaxis = viewAxis;
 
 	move.fl.blocked = false;
 
@@ -2713,7 +2713,7 @@ void idAI::SlideMove( void ) {
 		move.lastMoveTime = gameLocal.time;
 	}
 
-	move.obstacle = NULL;
+	move.obstacle = nullptr;
 	if ( ( move.moveCommand == MOVE_FACE_ENEMY || ForceFaceEnemy() ) && enemy.ent ) {
 		TurnToward( enemy.lastKnownPosition );
 		move.seekPos = move.moveDest;
@@ -2746,9 +2746,9 @@ void idAI::SlideMove( void ) {
 		}
 	}
 
-	arcVec3 vel = physicsObj.GetLinearVelocity();
+	anVec3 vel = physicsObj.GetLinearVelocity();
 	float z = vel.z;
-	arcVec3  predictedPos = oldorigin + vel * AI_SEEK_PREDICTION;
+	anVec3  predictedPos = oldorigin + vel * AI_SEEK_PREDICTION;
 
 	// seek the goal position
 	goalDelta = move.seekPos - predictedPos;
@@ -2778,11 +2778,11 @@ void idAI::SlideMove( void ) {
 	}
 
 	moveResult = physicsObj.GetMoveResult();
-	idEntity *blockEnt = physicsObj.GetSlideMoveEntity();
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
+	anEntity *blockEnt = physicsObj.GetSlideMoveEntity();
+
+
 	if ( blockEnt && blockEnt->IsType( idMoveable::GetClassType() ) && blockEnt->GetPhysics()->IsPushable() ) {
-// RAVEN END
+
 		KickObstacles( viewAxis[ 0 ], move.kickForce, blockEnt );
 	}
 
@@ -2790,7 +2790,7 @@ void idAI::SlideMove( void ) {
 
 	move.fl.onGround = physicsObj.OnGround();
 
-	arcVec3 org = physicsObj.GetOrigin();
+	anVec3 org = physicsObj.GetOrigin();
 	if ( oldorigin != org ) {
 		TouchTriggers();
 	}
@@ -2805,35 +2805,35 @@ void idAI::SlideMove( void ) {
 
 /*
 =====================
-idAI::AnimMove
+anSAAI::AnimMove
 =====================
 */
-void idAI::AnimMove( void ) {
+void anSAAI::AnimMove( void ) {
 
-	if ( ai_useRVMasterMove.GetBool ( ) ) {
+	if ( ai_useRVMasterMove.GetBool() ) {
 		RVMasterMove();
 		return;
 	}
 
-	arcVec3				delta;
-	arcVec3				goalDelta;
+	anVec3				delta;
+	anVec3				goalDelta;
 	float				goalDist;
 	monsterMoveResult_t	moveResult;
-	arcVec3				newDest;
-	// RAVEN BEGIN
-	// cdr: Alternate Routes Bug
-	idReachability*		goalReach;
-	// RAVEN END
+	anVec3				newDest;
 
-	arcVec3 oldorigin = physicsObj.GetOrigin();
-	arcMat3 oldaxis = viewAxis;
+	// cdr: Alternate Routes Bug
+	anReachability*		goalReach;
+
+
+	anVec3 oldorigin = physicsObj.GetOrigin();
+	anMat3 oldaxis = viewAxis;
 
 	if ( move.moveCommand < NUM_NONMOVING_COMMANDS ){
 		move.lastMoveOrigin.Zero();
 		//move.lastMoveTime = gameLocal.time;
 	}
 
-	move.obstacle = NULL;
+	move.obstacle = nullptr;
 	if ( move.moveCommand == MOVE_FACE_ENEMY && enemy.ent ) {
 		TurnToward( enemy.lastKnownPosition );
 		move.goalPos = oldorigin;
@@ -2904,11 +2904,11 @@ void idAI::AnimMove( void ) {
 
 
 	moveResult = physicsObj.GetMoveResult();
-	idEntity *blockEnt = physicsObj.GetSlideMoveEntity();
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
+	anEntity *blockEnt = physicsObj.GetSlideMoveEntity();
+
+
 	if ( blockEnt && blockEnt->IsType( idMoveable::GetClassType() ) && blockEnt->GetPhysics()->IsPushable() ) {
-// RAVEN END
+
 		KickObstacles( viewAxis[ 0 ], move.kickForce, blockEnt );
 	}
 
@@ -2916,7 +2916,7 @@ void idAI::AnimMove( void ) {
 
 	move.fl.onGround = physicsObj.OnGround();
 
-	const arcVec3& org = physicsObj.GetOrigin();
+	const anVec3& org = physicsObj.GetOrigin();
 	if ( oldorigin != org ) {
 		TouchTriggers();
 	}
@@ -2924,7 +2924,7 @@ void idAI::AnimMove( void ) {
 	if ( DebugFilter(ai_debugMove) ) { // AnimMove : GREEN / RED Bounds & Move Dest
 		gameRenderWorld->DebugLine(		colorCyan, oldorigin, org, 5000 );
 		gameRenderWorld->DebugBounds(	(team==0)?(colorGreen):(colorRed), physicsObj.GetBounds(), org, gameLocal.msec );
-		if (!ReachedPos( move.moveDest, move.moveCommand, move.range )) {
+		if ( !ReachedPos( move.moveDest, move.moveCommand, move.range ) ) {
 			gameRenderWorld->DebugBounds(	(team==0)?(colorGreen):(colorRed), physicsObj.GetBounds(), move.moveDest, gameLocal.msec );
 			gameRenderWorld->DebugArrow(	(team==0)?(colorGreen):(colorRed), org, move.moveDest, 4, gameLocal.msec );
 		}
@@ -2934,10 +2934,10 @@ void idAI::AnimMove( void ) {
 
 /*
 =====================
-idAI::CustomMove
+anSAAI::CustomMove
 =====================
 */
-void idAI::CustomMove( void ) {
+void anSAAI::CustomMove( void ) {
 	// derived class must implement this
 }
 
@@ -2964,7 +2964,7 @@ const float		REACHED_RADIUS_SQUARE	= REACHED_RADIUS*REACHED_RADIUS;
 LineIntersection2D
 =====================
 */
-bool  LineIntersection2D(const arcVec3& A, const arcVec3& B, const arcVec3& C, const arcVec3& D, arcVec3& contactPoint) {
+bool  LineIntersection2D(const anVec3& A, const anVec3& B, const anVec3& C, const anVec3& D, anVec3& contactPoint) {
 
 	// Test If Parallel
 	//------------------
@@ -2976,10 +2976,10 @@ bool  LineIntersection2D(const arcVec3& A, const arcVec3& B, const arcVec3& C, c
 	// Test CD Edge
 	//--------------
 	float s = (((A.y-C.y)*(B.x-A.x))-((A.x-C.x)*(B.y-A.y))) / q;
-	if (s<0.0f) {
+	if ( s<0.0f) {
 		return false;
 	}
-	if (s>1.0f) {
+	if ( s>1.0f) {
 		return false;
 	}
 
@@ -3013,8 +3013,8 @@ Clockwise winding with a simple line intersection test
 =====================
 */
 struct rvWindingBox {
-	arcVec3				verts[4];
-	aasArea_t*			areas[4];
+	anVec3				verts[4];
+	seasArea_t*			areas[4];
 	rvObstacle*			obstacles[4];	// CDR_TODO: Should be a list of obstacles for each vertex
 
 
@@ -3024,10 +3024,10 @@ struct rvWindingBox {
 	=====================
 	*/
 	void Initialize() {
-		for (int i=0; i<4; i++) {
+		for ( int i=0; i<4; i++ ) {
 			verts[i]		= vec3_zero;
-			areas[i]		= NULL;
-			obstacles[i]	= NULL;
+			areas[i]		= nullptr;
+			obstacles[i]	= nullptr;
 		}
 	}
 
@@ -3036,7 +3036,7 @@ struct rvWindingBox {
 	FromBounds
 	=====================
 	*/
-	void FromBounds(const arcBounds& b) {
+	void FromBounds(const anBounds& b) {
 		verts[0].x	= b[0].x;
 		verts[0].y	= b[0].y;
 		verts[0].z	= b[0].z;
@@ -3059,12 +3059,12 @@ struct rvWindingBox {
 	LineIntersection
 	=====================
 	*/
-	bool  LineIntersection(const arcVec3& start, const arcVec3& end, arcVec3& contactPoint, int& v1, int& v2) const  {
-		for (int i=0; i<4; i++) {
+	bool  LineIntersection(const anVec3& start, const anVec3& end, anVec3& contactPoint, int& v1, int& v2) const  {
+		for ( int i=0; i<4; i++ ) {
 			v1 = i;
 			v2 = (i<3)?(i+1):(0);
 
-			if (start.IsLeftOf(verts[v1], verts[v2]) && LineIntersection2D(start, end, verts[v1], verts[v2], contactPoint)) {
+			if ( start.IsLeftOf(verts[v1], verts[v2]) && LineIntersection2D( start, end, verts[v1], verts[v2], contactPoint)) {
 				return true;
 			}
 		}
@@ -3076,10 +3076,10 @@ struct rvWindingBox {
 	PointInside
 	=====================
 	*/
-	bool PointInside(const arcVec3& point) const {
-		for (int i=0; i<4; i++) {
-			const arcVec3& vert1 = verts[i];
-			const arcVec3& vert2 = verts[(i<3)?(i+1):(0)];
+	bool PointInside(const anVec3& point) const {
+		for ( int i=0; i<4; i++ ) {
+			const anVec3& vert1 = verts[i];
+			const anVec3& vert2 = verts[(i<3)?(i+1):(0)];
 
 			if (point.IsLeftOf(vert1, vert2)) {
 				return false;
@@ -3094,13 +3094,13 @@ struct rvWindingBox {
 	=====================
 	*/
 	bool DrawDebugGraphics() const  {
-		for (int i=0; i<4; i++) {
-			const arcVec3& vert1 = verts[i];
-			const arcVec3& vert2 = verts[(i<3)?(i+1):(0)];
+		for ( int i=0; i<4; i++ ) {
+			const anVec3& vert1 = verts[i];
+			const anVec3& vert2 = verts[(i<3)?(i+1):(0)];
 
 			gameRenderWorld->DebugLine(colorYellow, vert1, vert2, gameLocal.msec);
-			if (!areas[i] || obstacles[i]) {
-				gameRenderWorld->DebugLine(colorRed, vert1, vert1+arcVec3(0.0f,0.0f,16.0f), gameLocal.msec);
+			if ( !areas[i] || obstacles[i]) {
+				gameRenderWorld->DebugLine(colorRed, vert1, vert1+anVec3(0.0f,0.0f,16.0f), gameLocal.msec);
 			} else if (areas[i]) {
 			//	gameRenderWorld->DebugLine(colorYellow, vert1, areas[i]->center, gameLocal.msec);
 			}
@@ -3114,7 +3114,7 @@ struct rvWindingBox {
 
 /*
 =====================
-rvMarker
+anMarker
 
 A marker represents an obstacle within
 an area.  Any single obstacle can have
@@ -3122,13 +3122,13 @@ any number of markers in any number of
 areas that it touches
 =====================
 */
-struct rvMarker {
+struct anMarker {
 	rvObstacle*			obstacle;
-	aasArea_t*			area;
-	rvMarker*			prev;
-	rvMarker*			next;
+	seasArea_t*			area;
+	anMarker*			prev;
+	anMarker*			next;
 };
-rvPool<rvMarker, 255> markerPool;
+rvPool<anMarker, 255> markerPool;
 
 /*
 =====================
@@ -3136,32 +3136,32 @@ rvObstacle
 =====================
 */
 struct rvObstacle {
-	static idAASFile*	searchFile;
-	static arcBounds		searchBounds;
+	static anSEASFile*	searchFile;
+	static anBounds		searchBounds;
 
 	entityPointer_t		entity;
-	arcVec3				origin;
-	arcVec3				originFuture;
+	anVec3				origin;
+	anVec3				originFuture;
 	int					lastTimeMoved;
 	bool				pendingUpdate;
 
 	rvWindingBox		windings[3];
-	idList<rvMarker*>	markers;
-	idList<aasArea_t*>	areas;
+	anList<anMarker*>	markers;
+	anList<seasArea_t*>	areas;
 
 	/*
 	============
 	Initialize
 	============
 	*/
-	void Initialize(idEntity* ent) {
+	void Initialize(anEntity* ent) {
 		entity			= ent;
 		origin			= vec3_zero;
 		originFuture	= vec3_zero;
 		lastTimeMoved	= 0;
 		pendingUpdate	= true;
 
-		for (int i=0; i<3; i++) {
+		for ( int i=0; i<3; i++ ) {
 			windings[i].Initialize();
 		}
 		markers.Clear();
@@ -3187,9 +3187,9 @@ struct rvObstacle {
 	============
 	*/
 	void RemoveMarkers() {
-		static rvMarker*	marker;
+		static anMarker*	marker;
 
-		for (int i=0; i<markers.Num(); i++) {
+		for ( int i=0; i<markers.Num(); i++ ) {
 			marker = markers[i];
 			assert(marker->obstacle==this);
 
@@ -3203,7 +3203,7 @@ struct rvObstacle {
 				marker->next->prev = marker->prev;
 			}
 
-			marker->obstacle	= NULL;
+			marker->obstacle	= nullptr;
 
 			markerPool.free(marker);
 		}
@@ -3216,7 +3216,7 @@ struct rvObstacle {
 	*/
 	void SearchAreas_r( int nodeNum ) {
 		int side;
-		const aasNode_t *node;
+		const seasNode_t *node;
 
 		while( nodeNum != 0 ) {
 
@@ -3247,15 +3247,15 @@ struct rvObstacle {
 	PointInsideArea
 	============
 	*/
-	bool PointInsideArea( const arcVec3& point, aasArea_t* area ) {
+	bool PointInsideArea( const anVec3& point, seasArea_t* area ) {
 		int i, faceNum;
 
 		for ( i = 0; i < area->numFaces; i++ ) {
 			faceNum = searchFile->GetFaceIndex(area->firstFace + i);
 
-			const aasFace_t& face = searchFile->GetFace(abs( faceNum ));
-			if (!(face.flags & FACE_FLOOR)) {
-				const idPlane& plane = searchFile->GetPlane(face.planeNum ^ INTSIGNBITSET( faceNum ));
+			const seasFace_t& face = searchFile->GetFace(abs( faceNum ) );
+			if ( !(face.flags & FACE_FLOOR)) {
+				const anPlane& plane = searchFile->GetPlane(face.planeNum ^ INTSIGNBITSET( faceNum ) );
 				if (plane.Side(point) == PLANESIDE_BACK) {
 					return false;
 				}
@@ -3270,21 +3270,21 @@ struct rvObstacle {
 	============
 	*/
 	void AddMarkers() {
-		static rvMarker*	marker;
+		static anMarker*	marker;
 
-		for (int i=0; i<areas.Num() && !markerPool.full(); i++) {
+		for ( int i=0; i<areas.Num() && !markerPool.full(); i++ ) {
 
 			// Allocate A Marker
 			//-------------------
 			marker	= markerPool.alloc();
-		//	assert(marker->obstacle==NULL);
+		//	assert(marker->obstacle== nullptr );
 
 			// Setup The New Marker
 			//----------------------
 			marker->obstacle	= this;
 			marker->area		= areas[i];
-			marker->next		= NULL;
-			marker->prev		= NULL;
+			marker->next		= nullptr;
+			marker->prev		= nullptr;
 
 
 			// Fixup Any Existing Linked List (First Marker)
@@ -3310,21 +3310,21 @@ struct rvObstacle {
 	============
 	*/
 	bool Update() {
-		static rvMarker*			marker;
+		static anMarker*			marker;
 		static rvObstacle*			obstacle;
-		static aasArea_t*			area;
-		static arcVec3				expand;
+		static seasArea_t*			area;
+		static anVec3				expand;
 		static float				speed;
 		static float				distance;
-		static arcVec3				direction;
+		static anVec3				direction;
 		static int					aasFileNum, t, v, a;
-		static idList<rvObstacle*>	touched;
+		static anList<rvObstacle*>	touched;
 		static rvWindingBox*		myWinding;
 
 
 		pendingUpdate = false;
-		idEntity* ent = entity.GetEntity();
-		if (!ent || ent->health<=0 || ent->fl.hidden || !ent->GetPhysics()) {
+		anEntity* ent = entity.GetEntity();
+		if ( !ent || ent->health<=0 || ent->fl.hidden || !ent->GetPhysics()) {
 			RemoveMarkers();
 			return false;	// Means This Obstacle Structure Should Be Retired
 		}
@@ -3332,20 +3332,20 @@ struct rvObstacle {
 
 		// Only Update If We've Moved Far Enough
 		//---------------------------------------
-		idPhysics* physics = ent->GetPhysics();
+		anPhysics* physics = ent->GetPhysics();
 		if (origin.Dist2XY(physics->GetOrigin())<100.0f) {	// CDR_TODO: Scale This By Distance To Player, Other Obstacles Near...
 			return true;
 		}
 
 		// Get The Obstacle's Seek Direction & Speed
 		//-------------------------------------------
-		if (ent->IsType(idAI::GetClassType())) {
-			speed				= (((idAI*)ent)->move.fl.done)?(0.0f):(physics->GetLinearVelocity().LengthFast()) * 2.5f;
-			direction			= (((idAI*)ent)->move.seekPos - physics->GetOrigin());
+		if (ent->IsType(anSAAI::GetClassType())) {
+			speed				= (((anSAAI*)ent)->move.fl.done)?(0.0f):(physics->GetLinearVelocity().LengthFast()) * 2.5f;
+			direction			= (((anSAAI*)ent)->move.seekPos - physics->GetOrigin());
 			distance			= direction.NormalizeFast();
 
 			// Cap The Projection To The Seek Position
-			if (speed > distance) {
+			if ( speed > distance) {
 				speed = distance;
 			}
 		} else {
@@ -3365,8 +3365,8 @@ struct rvObstacle {
 
 		// Get The Entity's Bounds And Areas That These Bounds Cover
 		//-----------------------------------------------------------
-		for (aasFileNum=0; aasFileNum<gameLocal.GetNumAAS() && aasFileNum<3; aasFileNum++) {
-			if (!gameLocal.GetAAS(aasFileNum)) {
+		for (aasFileNum=0; aasFileNum<gameLocal.GetNumAAS() && aasFileNum<3; aasFileNum++ ) {
+			if ( !gameLocal.GetAAS(aasFileNum)) {
 				continue;
 			}
 
@@ -3384,27 +3384,27 @@ struct rvObstacle {
 			expand[1]		+= REACHED_RADIUS;
 
 			searchBounds.ExpandSelf(expand);
-			SearchAreas_r(1);
+			SearchAreas_r( 1 );
 
 			// Setup The Winding From The Bounds
 			//-----------------------------------
-			myWinding->FromBounds(searchBounds);
+			myWinding->FromBounds( searchBounds);
 
 			// Setup Each Vertex On The Winding
 			//----------------------------------
-			for (v=0; v<4; v++) {
-				const arcVec3& myVertex = myWinding->verts[v];
+			for (v=0; v<4; v++ ) {
+				const anVec3& myVertex = myWinding->verts[v];
 
-				myWinding->areas[v] = NULL;
-				for (a=0; a<areas.Num(); a++) {
-					aasArea_t* area = areas[a];
+				myWinding->areas[v] = nullptr;
+				for (a=0; a<areas.Num(); a++ ) {
+					seasArea_t* area = areas[a];
 					if (PointInsideArea(myVertex, area)) {
 						myWinding->areas[v] = area;
 
 
 						// Search This Area For All Obstacles That May Contain This Vertex
 						//-----------------------------------------------------------------
-						obstacle = NULL;
+						obstacle = nullptr;
 						for (marker=area->firstMarker; marker; marker=marker->next) {
 							if (marker->obstacle->windings[aasFileNum].PointInside(myVertex)) {
 								obstacle = marker->obstacle;
@@ -3429,13 +3429,13 @@ struct rvObstacle {
 
 			// Touched Obstacles Need To Test Their Verts Against This Winding
 			//-----------------------------------------------------------------
-			for (t=0; t<touched.Num(); t++) {
+			for (t=0; t<touched.Num(); t++ ) {
 				obstacle = touched[t];
-				for (v=0; v<4; v++) {
+				for (v=0; v<4; v++ ) {
 					if (myWinding->PointInside(obstacle->windings[aasFileNum].verts[v])) {
 						obstacle->windings[aasFileNum].obstacles[v] = this;
 					} else if (obstacle->windings[aasFileNum].obstacles[v]==this) {
-						obstacle->windings[aasFileNum].obstacles[v] = NULL;
+						obstacle->windings[aasFileNum].obstacles[v] = nullptr;
 					}
 				}
 			}
@@ -3453,8 +3453,8 @@ struct rvObstacle {
 	VertexValid
 	=====================
 	*/
-	static bool VertexValid(const rvWindingBox& bounds, int v, const aasArea_t* inArea, const idEntity* ignore)  {
-		return (bounds.areas[v] && (bounds.obstacles[v]==NULL || bounds.obstacles[v]->entity.GetEntity()==ignore));
+	static bool VertexValid(const rvWindingBox& bounds, int v, const seasArea_t* inArea, const anEntity* ignore)  {
+		return (bounds.areas[v] && (bounds.obstacles[v]== nullptr || bounds.obstacles[v]->entity.GetEntity()==ignore));
 	}
 
 	/*
@@ -3462,21 +3462,21 @@ struct rvObstacle {
 	MovedRecently
 	============
 	*/
-	bool MovedRecently(int time=800) {
+	bool MovedRecently( inttime=800) {
  		if ((gameLocal.time - lastTimeMoved) < time) {
 			return true;
 		}
-	//	idEntity* ent = entity.GetEntity();
-	//	if (ent && ent->IsType(idAI::GetClassType())) {
-	//		return !((idAI*)ent)->move.fl.done;
+	//	anEntity* ent = entity.GetEntity();
+	//	if (ent && ent->IsType(anSAAI::GetClassType())) {
+	//		return !((anSAAI*)ent)->move.fl.done;
 	//	}
 		return false;
 	}
 };
 rvIndexPool<rvObstacle, 50, MAX_GENTITIES> obstaclePool;
 
-idAASFile*		rvObstacle::searchFile;
-arcBounds		rvObstacle::searchBounds;
+anSEASFile*		rvObstacle::searchFile;
+anBounds		rvObstacle::searchBounds;
 
 
 
@@ -3489,13 +3489,13 @@ rvObstacleFinder
 =====================
 */
 struct rvObstacleFinder {
-	idList<rvObstacle*>	obstaclesPendingUpdate;
+	anList<rvObstacle*>	obstaclesPendingUpdate;
 	int					obstaclesUpdateTime;
 
 
 	struct traceResult_t {
 		rvObstacle*		obstacle;
-		arcVec3			endPoint;
+		anVec3			endPoint;
 		float			distance;
 		int				v1;
 		int				v2;
@@ -3522,11 +3522,11 @@ struct rvObstacleFinder {
 
 		// Clear All The Marker Pointers In Any Areas
 		//--------------------------------------------
-		for (int i=0; i<gameLocal.GetNumAAS(); i++) {
-			if (gameLocal.GetAAS(i)) {
-				idAASFile* file = gameLocal.GetAAS(i)->GetFile();
-				for (int a=0; a<file->GetNumAreas(); a++) {
-					file->GetArea(a).firstMarker = NULL;
+		for ( int i=0; i<gameLocal.GetNumAAS(); i++ ) {
+			if (gameLocal.GetAAS( i )) {
+				anSEASFile* file = gameLocal.GetAAS( i )->GetFile();
+				for ( inta=0; a<file->GetNumAreas(); a++ ) {
+					file->GetArea(a).firstMarker = nullptr;
 				}
 			}
 		}
@@ -3545,8 +3545,8 @@ struct rvObstacleFinder {
 		}
 		nextDrawTime = gameLocal.time;
 
-		for (int i=0; i<MAX_GENTITIES; i++) {
-			if (obstaclePool.valid(i)) {
+		for ( int i=0; i<MAX_GENTITIES; i++ ) {
+			if (obstaclePool.valid( i )) {
 				obstaclePool[i]->DrawDebugGraphics();
 			}
 		}
@@ -3569,7 +3569,7 @@ struct rvObstacleFinder {
 				obstacle = obstaclesPendingUpdate.StackTop();
 				obstaclesPendingUpdate.StackPop();
 
-				if (!obstacle->Update()) {
+				if ( !obstacle->Update()) {
 					obstaclePool.free(obstacle->entity.GetEntityNum());
 				}
 			}
@@ -3581,11 +3581,11 @@ struct rvObstacleFinder {
 	MarkEntityForUpdate
 	============
 	*/
-	void MarkEntityForUpdate(idEntity* ent) {
+	void MarkEntityForUpdate(anEntity* ent) {
 
 		// Ignore Non Physics Entities
 		//-----------------------------
-		if (!ent || !ent->GetPhysics()) {
+		if ( !ent || !ent->GetPhysics()) {
 			return;
 		}
 
@@ -3595,7 +3595,7 @@ struct rvObstacleFinder {
 			return;
 		}
 
-		if (!obstaclePool.valid(ent->entityNumber)) {
+		if ( !obstaclePool.valid(ent->entityNumber)) {
 
 			// If No More Obstacles Are Available, Ignore This One
 			//-----------------------------------------------------
@@ -3617,9 +3617,9 @@ struct rvObstacleFinder {
 	RecordContact
 	============
 	*/
-	void RecordContact(float maxDistance, const arcVec3& start, rvObstacle* obstacle, const arcVec3& point, int vert1=-1, int vert2=-1) {
+	void RecordContact(float maxDistance, const anVec3& start, rvObstacle* obstacle, const anVec3& point, int vert1=-1, int vert2=-1) {
 		static float distance;
-		distance = point.DistXY(start);
+		distance = point.DistXY( start);
 		if ((maxDistance==0.0f || distance<maxDistance) && (contact.distance > distance || !contact.obstacle)) {
 			contact.obstacle	= obstacle;
 			contact.endPoint	= point;
@@ -3634,29 +3634,29 @@ struct rvObstacleFinder {
 	RayTrace
 	============
 	*/
-	bool RayTrace(float maxDistance, const aasArea_t* area, const arcVec3& start, const arcVec3& stop, int aasNum, const idEntity* ignore1, const idEntity* ignore2=NULL, const idEntity* ignore3=NULL) {
-		static rvMarker*	marker;
-		static arcVec3		p;
+	bool RayTrace(float maxDistance, const seasArea_t* area, const anVec3& start, const anVec3& stop, int aasNum, const anEntity* ignore1, const anEntity* ignore2=nullptr, const anEntity* ignore3=nullptr ) {
+		static anMarker*	marker;
+		static anVec3		p;
 		static int			v1;
 		static int			v2;
 		static rvObstacle*	ignoreA;
 		static rvObstacle*	ignoreB;
 		static rvObstacle*	ignoreC;
-		static idEntity*	ent;
-		static arcVec3		startBack;
-		static arcVec3		direction;
+		static anEntity*	ent;
+		static anVec3		startBack;
+		static anVec3		direction;
 		static bool			pulledBack;
 
-		ignoreA = (ignore1 && obstaclePool.valid(ignore1->entityNumber))?(obstaclePool[ignore1->entityNumber]):(NULL);
-		ignoreB = (ignore2 && obstaclePool.valid(ignore2->entityNumber))?(obstaclePool[ignore2->entityNumber]):(NULL);
-		ignoreC = (ignore3 && obstaclePool.valid(ignore3->entityNumber))?(obstaclePool[ignore3->entityNumber]):(NULL);
+		ignoreA = (ignore1 && obstaclePool.valid(ignore1->entityNumber))?(obstaclePool[ignore1->entityNumber]):(nullptr );
+		ignoreB = (ignore2 && obstaclePool.valid(ignore2->entityNumber))?(obstaclePool[ignore2->entityNumber]):(nullptr );
+		ignoreC = (ignore3 && obstaclePool.valid(ignore3->entityNumber))?(obstaclePool[ignore3->entityNumber]):(nullptr );
 
-		contact.obstacle	= NULL;
+		contact.obstacle	= nullptr;
 		pulledBack			= false;
 
 
 		for (marker=area->firstMarker; marker; marker=marker->next) {
-			if (marker->obstacle==NULL || marker->obstacle==ignoreA || marker->obstacle==ignoreB || marker->obstacle==ignoreC) {
+			if (marker->obstacle== nullptr || marker->obstacle==ignoreA || marker->obstacle==ignoreB || marker->obstacle==ignoreC) {
 				continue;
 			}
 
@@ -3667,13 +3667,13 @@ struct rvObstacleFinder {
 				// Ignore Moving Actors With Higher Entity Numbers
 				//-------------------------------------------------
 				ent = marker->obstacle->entity.GetEntity();
-				if (ent && ignore1 && ent->entityNumber>ignore1->entityNumber && ent->IsType(idActor::GetClassType())) {
+				if (ent && ignore1 && ent->entityNumber>ignore1->entityNumber && ent->IsType(anActor::GetClassType())) {
 					continue;
 				}
 
 				// Pull The Start Back To Avoid Starting "In Solid"
 				//--------------------------------------------------
-				if (!pulledBack) {
+				if ( !pulledBack) {
 					pulledBack = true;
 					direction = stop - start;
 					direction.Normalize();
@@ -3682,7 +3682,7 @@ struct rvObstacleFinder {
 
 				// Record Contact With The Moving Obstacle's Predicted Path
 				//----------------------------------------------------------
-				if (LineIntersection2D(startBack, stop, marker->obstacle->origin, marker->obstacle->originFuture, p)) {
+				if (LineIntersection2D( startBack, stop, marker->obstacle->origin, marker->obstacle->originFuture, p)) {
 					RecordContact(maxDistance, startBack, marker->obstacle, p);
 				}
 
@@ -3697,7 +3697,7 @@ struct rvObstacleFinder {
 
 				// Pull The Start Back To Avoid Starting "In Solid"
 				//--------------------------------------------------
-				if (!pulledBack) {
+				if ( !pulledBack) {
 					pulledBack = true;
 					direction = stop - start;
 					direction.Normalize();
@@ -3706,7 +3706,7 @@ struct rvObstacleFinder {
 
 				// Record Contact With The Stationary Obstacle's Position
 				//--------------------------------------------------------
-				if (marker->obstacle->windings[aasNum].LineIntersection(startBack, stop, p, v1, v2)) {
+				if (marker->obstacle->windings[aasNum].LineIntersection( startBack, stop, p, v1, v2)) {
 					RecordContact(maxDistance, startBack, marker->obstacle, p, v1, v2);
 				}
 			}
@@ -3749,7 +3749,7 @@ public:
 		float				travelCost;
 		bool				closed;
 		int					vertexNum;
-		idReachability*		reach;
+		anReachability*		reach;
 		visitNode*			from;
 
 		float cost() {
@@ -3769,12 +3769,12 @@ public:
 		MAX_PENDING			= 60,
 	};
 
-	idAAS*				myAAS;
+	anSEAS*				myAAS;
 	float				myRadius;
 	idMoveState*		myMove;
 	int					myTeam;
-	const idEntity*		myIgnoreEntity;
-	const idEntity*		myIgnoreEntity2;
+	const anEntity*		myIgnoreEntity;
+	const anEntity*		myIgnoreEntity2;
 	bool				drawVisitTree;
 
 	visitNode*			next;
@@ -3789,8 +3789,8 @@ public:
 
 	visitNode			visited[MAX_VISITED];
 	int					visitedCount;
-	idHashIndex			visitedIndexReach;
-	idHashIndex			visitedIndexVert;
+	anHashIndex			visitedIndexReach;
+	anHashIndex			visitedIndexVert;
 
 
 
@@ -3805,11 +3805,11 @@ public:
 		openCount = 0;
 		openListUpdate = false;
 		pendingCount = 0;
-		pendingBest = NULL;
+		pendingBest = nullptr;
 		visitedCount = 0;
 		visitedIndexReach.Clear();
 		visitedIndexVert.Clear();
-		next = NULL;
+		next = nullptr;
 	}
 
 
@@ -3828,10 +3828,10 @@ public:
 	=====================
 	*/
 	void	DrawVisitTree() {
-	 	for (int i=0; i<visitedCount; i++) {
-			const arcVec3&	start		= (visited[i].from)?(GetSeekPosition(visited[i].from)):(myMove->myPos);
-			const arcVec3&	stop		= (GetSeekPosition(&visited[i]));
-			const arcVec4&	color		= (visited[i].closed)?(colorOrange):(colorYellow);
+	 	for ( int i=0; i<visitedCount; i++ ) {
+			const anVec3&	start		= (visited[i].from)?(GetSeekPosition(visited[i].from)):(myMove->myPos);
+			const anVec3&	stop		= (GetSeekPosition(&visited[i]));
+			const anVec4&	color		= (visited[i].closed)?(colorOrange):(colorYellow);
 			const int		duration	= (visited[i].closed)?(3000):(500);
 
 			gameRenderWorld->DebugArrow(color, start, stop, 3, duration);
@@ -3843,11 +3843,11 @@ public:
 	XYLineIntersection
 	=====================
 	*/
-	bool  XYLineIntersection(const arcVec3& A, const arcVec3& B, const arcVec3& C, const arcVec3& D, arcVec3& P) {
+	bool  XYLineIntersection(const anVec3& A, const anVec3& B, const anVec3& C, const anVec3& D, anVec3& P) {
 		float q = (((B.x-A.x)*(D.y-C.y))-((B.y-A.y)*(D.x-C.x)));
 		if (fabsf(q)>0.01f) {
 			float s = (((A.y-C.y)*(B.x-A.x))-((A.x-C.x)*(B.y-A.y))) / q;
-			if (s<0.0f || s>1.0f) {
+			if ( s<0.0f || s>1.0f) {
 				return false;
 			}
 
@@ -3874,7 +3874,7 @@ public:
 	GetSeekPosition
 	=====================
 	*/
-	const arcVec3& GetSeekPosition(idReachability* reach, int vertexNum) {
+	const anVec3& GetSeekPosition(anReachability* reach, int vertexNum) {
 		return ((vertexNum)?(myAAS->GetFile()->GetVertex(vertexNum)):(reach->start));
 	}
 
@@ -3883,7 +3883,7 @@ public:
 	GetSeekPosition
 	=====================
 	*/
-	const arcVec3& GetSeekPosition(visitNode* node) {
+	const anVec3& GetSeekPosition(visitNode* node) {
 		return  GetSeekPosition(node->reach, node->vertexNum);
 	}
 
@@ -3893,19 +3893,19 @@ public:
 	=====================
 	*/
 	bool	Success(visitNode* node) {
-		static arcVec3		edgeA;
-		static arcVec3		edgeB;
-		static arcVec3		intersect;
-		static arcVec3		direction;
-		static arcVec3		smoothedPos;
+		static anVec3		edgeA;
+		static anVec3		edgeB;
+		static anVec3		intersect;
+		static anVec3		direction;
+		static anVec3		smoothedPos;
 		static int			at;
 		static int			count;
-		static rvMarker*	marker;
+		static anMarker*	marker;
 		static bool			isCorner;
 
 		// Always Add The Goal Pos At The End Of The Path
 		//------------------------------------------------
-		myMove->path[myMove->pathLen].reach		= NULL;
+		myMove->path[myMove->pathLen].reach		= nullptr;
 		myMove->path[myMove->pathLen].seekPos	= myMove->goalPos;
 		myMove->pathLen ++;
 
@@ -3933,24 +3933,24 @@ public:
 			// Smooth The Path One Pass
 			//--------------------------
 			if (pathAt.reach->travelType==TFL_WALK) {
-				const arcVec3& walkA = (at==count) ?		(myMove->myPos)		:(pathPrev.seekPos);
-				const arcVec3& walkB = (at==0) ?			(myMove->goalPos)	:(pathNext.seekPos);
+				const anVec3& walkA = (at==count) ?		(myMove->myPos)		:(pathPrev.seekPos);
+				const anVec3& walkB = (at==0) ?			(myMove->goalPos)	:(pathNext.seekPos);
 
 				isCorner = !XYLineIntersection(edgeA, edgeB, walkA, walkB, smoothedPos);
 
 
 				// If The Smoothed Position Is Not Blocked By An Obstacle
 				//--------------------------------------------------------
-				aasArea_t* area = &myAAS->GetFile()->GetArea(pathAt.reach->toAreaNum);
+				seasArea_t* area = &myAAS->GetFile()->GetArea(pathAt.reach->toAreaNum);
 				for (marker=area->firstMarker; marker; marker=marker->next) {
-					if (!marker->obstacle || marker->obstacle->entity.GetEntity()==myIgnoreEntity || marker->obstacle->entity.GetEntity()==myIgnoreEntity2) {
+					if ( !marker->obstacle || marker->obstacle->entity.GetEntity()==myIgnoreEntity || marker->obstacle->entity.GetEntity()==myIgnoreEntity2) {
 						continue;
 					}
-					if (marker->obstacle->windings[0/*CDR_TODO: use aasNum*/].PointInside(smoothedPos)) {
+					if (marker->obstacle->windings[0/*CDR_TODO: use aasNum*/].PointInside( smoothedPos)) {
 						break;
 					}
 				}
-				if (!marker) {
+				if ( !marker) {
 					pathAt.seekPos = smoothedPos;
 
 					// Push Away From The Corner A Bit
@@ -4004,9 +4004,9 @@ public:
 	=====================
 	*/
 	visitNode*	SelectNextVisitedNode() {
-		if (pendingBest && (!openCount || open[openCount-1]->cost() > pendingBest->cost())) {
+		if (pendingBest && ( !openCount || open[openCount-1]->cost() > pendingBest->cost())) {
 			next = pendingBest;
-			pendingBest = NULL;
+			pendingBest = nullptr;
 			openListUpdate = true;
 			return next;
 		}
@@ -4015,7 +4015,7 @@ public:
 			openCount--;
 		    return open[openCount];
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	/*
@@ -4029,7 +4029,7 @@ public:
 		// If This Node Is Cheaper Than The Existing Best Open Node, Add It To The End Of The Open List
 		//----------------------------------------------------------------------------------------------
 		if (openCount<MAX_OPEN) {
-			if (!openCount || (node->cost() < open[openCount-1]->cost())) {
+			if ( !openCount || (node->cost() < open[openCount-1]->cost())) {
 				open[openCount] = node;
 				openCount++;
 				return;
@@ -4042,7 +4042,7 @@ public:
 			pending[pendingCount] = node;
 			pendingCount++;
 
-			if (!pendingBest || (node->cost() < pendingBest->cost())) {
+			if ( !pendingBest || (node->cost() < pendingBest->cost())) {
 				pendingBest = node;
 			}
 		}
@@ -4061,19 +4061,19 @@ public:
 
 		// Add All Pending Nodes To The Open List
 		//----------------------------------------
-		for (int i=0; i<pendingCount; i++) {
+		for ( int i=0; i<pendingCount; i++ ) {
 			if (openCount<MAX_OPEN && pending[i] && !pending[i]->closed) {
 				open[openCount] = pending[i];
 				openCount ++;
 			}
 		}
 		pendingCount = 0;
-		pendingBest = NULL;
+		pendingBest = nullptr;
 
 
 		// Sort The Open List
 		//--------------------
-		qsort( (void*)open, (size_t)openCount, (size_t)sizeof(visitNode*), visitSort );
+		qsort( (void*)open, ( size_t)openCount, ( size_t)sizeof(visitNode*), visitSort );
 	}
 
 	/*
@@ -4081,13 +4081,13 @@ public:
 	WasVisited
 	=====================
 	*/
-	visitNode*	WasVisited(idReachability* reach) {
-		for (int i=visitedIndexReach.First(abs(reach->edgeNum)); i>=0; i=visitedIndexReach.Next(i)) {
+	visitNode*	WasVisited(anReachability* reach) {
+		for ( int i=visitedIndexReach.First(abs(reach->edgeNum)); i>=0; i=visitedIndexReach.Next( i )) {
 			if (visited[i].reach==reach) {
 				return &visited[i];
 			}
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	/*
@@ -4095,13 +4095,13 @@ public:
 	WasVisited
 	=====================
 	*/
-	visitNode*	WasVisited(int vertexNum) {
-		for (int i=visitedIndexVert.First(vertexNum); i>=0; i=visitedIndexVert.Next(i)) {
+	visitNode*	WasVisited( intvertexNum) {
+		for ( int i=visitedIndexVert.First(vertexNum); i>=0; i=visitedIndexVert.Next( i )) {
 			if (visited[i].vertexNum==vertexNum) {
 				return &visited[i];
 			}
 		}
-		return NULL;
+		return nullptr;
 	}
 
 
@@ -4110,27 +4110,27 @@ public:
 	TravelCost
 	=====================
 	*/
-	float	TravelCost(idReachability* reach, int vertexNum, visitNode* from) {
+	float	TravelCost(anReachability* reach, int vertexNum, visitNode* from) {
 		static float		distance;
 
-		const arcVec3&		start	= (from)?(GetSeekPosition(from)):(myMove->myPos);
-		const arcVec3&		stop	= GetSeekPosition(reach, vertexNum);
+		const anVec3&		start	= (from)?(GetSeekPosition(from)):(myMove->myPos);
+		const anVec3&		stop	= GetSeekPosition(reach, vertexNum);
 
 
 		// Test For Any Obstacles In The Way
 		//-----------------------------------
-		const aasArea_t*	area	= &myAAS->GetFile()->GetArea((from)?(from->reach->toAreaNum):(myMove->myArea));
+		const seasArea_t*	area	= &myAAS->GetFile()->GetArea((from)?(from->reach->toAreaNum):(myMove->myArea));
 		if (obstacleFinder.RayTrace(0.0f, area, start, stop, 0/*CDR_TODO: Get myAASNum*/, myIgnoreEntity, myIgnoreEntity2)) {
 
 			// If It Is Not Possible To Steer Around, Then This Edge Is Completely Invalid
 			//-----------------------------------------------------------------------------
-			if (!obstacleFinder.contact.v1Valid && !obstacleFinder.contact.v2Valid) {
+			if ( !obstacleFinder.contact.v1Valid && !obstacleFinder.contact.v2Valid) {
 				return 0.0f;
 			}
 
 			// Completely Disable Any Points Completely Covered By An Obstacle
 			//-----------------------------------------------------------------
-			if (obstacleFinder.contact.obstacle->windings[0/*CDR_TODO: Get myAASNum*/].PointInside(stop)) {
+			if (obstacleFinder.contact.obstacle->windings[0/*CDR_TODO: Get myAASNum*/].PointInside( stop)) {
 				return 0.0f;
 			}
 			distance += 128.0f;
@@ -4139,7 +4139,7 @@ public:
 
 		// Compute Standard Distance
 		//---------------------------
-		distance = start.Dist(stop);
+		distance = start.Dist( stop);
 		if (from) {
 			distance += from->travelCost + from->reach->travelTime;
 		}
@@ -4153,7 +4153,7 @@ public:
 	Visit
 	=====================
 	*/
-	void	Visit(idReachability* reach, int vertexNum, visitNode* from) {
+	void	Visit(anReachability* reach, int vertexNum, visitNode* from) {
 		static visitNode*	visit;
 		static float		travelCost;
 
@@ -4195,7 +4195,7 @@ public:
 		//-------------------------------------------------------------------
 		} else {
 
-			const arcVec3& pos	= GetSeekPosition(reach, vertexNum);
+			const anVec3& pos	= GetSeekPosition(reach, vertexNum);
 
 			// Constant Data (Will Never Change)
 			//-----------------------------------
@@ -4212,7 +4212,7 @@ public:
 
 			// Add It To The Hash Table To Be Found Later
 			//--------------------------------------------
-			if (!vertexNum) {
+			if ( !vertexNum) {
 				visitedIndexReach.Add(abs(reach->edgeNum),	visitedCount);
 			} else {
 				visitedIndexVert.Add(vertexNum,				visitedCount);
@@ -4234,11 +4234,11 @@ public:
 	path, it visits the verts as well
 	=====================
 	*/
-	void	VisitReach(idReachability *reach, visitNode* from) {
+	void	VisitReach(anReachability *reach, visitNode* from) {
 		static int			verts[2];
 		static int			vertexNum;
-		static arcVec3		start;
-		static arcVec3		stop;
+		static anVec3		start;
+		static anVec3		stop;
 
 
 		// If Full, Stop Visiting Anything
@@ -4255,7 +4255,7 @@ public:
 
 		// Ignore Any Reach That Does Not Match Our Travel Flags
 		//-------------------------------------------------------
-		if (reach->travelType&TFL_INVALID || !(reach->travelType&myMove->travelFlags)) {
+		if (reach->travelType&TFL_INVALID || !(reach->travelType&myMove->travelFlags )) {
 			return;
 		}
 
@@ -4266,13 +4266,13 @@ public:
 
 		// If Running Low On Visit Space, Stop Adding Verts
 		//--------------------------------------------------
-		if (visitedCount>=(int)((float)MAX_VISITED * 0.85f)) {
+		if (visitedCount>=(int)(( float )MAX_VISITED * 0.85f)) {
 			return;
 		}
 
 		// If Edge Is Far From Start and Goal, Don't Add Verts
 		//-----------------------------------------------------
-		if (!reach->fromAreaNum!=myMove->myArea &&
+		if ( !reach->fromAreaNum!=myMove->myArea &&
 			!reach->toAreaNum!=myMove->myArea &&
 			!reach->fromAreaNum!=myMove->goalArea &&
 			!reach->toAreaNum!=myMove->goalArea &&
@@ -4283,14 +4283,14 @@ public:
 		// If This Edge Is Small Enough, Just Skip The Verts
 		//---------------------------------------------------
 		myAAS->GetEdge(reach->edgeNum, start, stop);
-		if (start.Dist2XY(stop)<6400.0f/*(80*80)*/) {
+		if ( start.Dist2XY( stop)<6400.0f/*(80*80)*/) {
 			return;
 		}
 
 		// Ok, So Visit The Verts Too
 		//----------------------------
 		myAAS->GetEdgeVertexNumbers(reach->edgeNum, verts);
-		for (int i=0; i<2 && visitedCount<MAX_VISITED; i++) {
+		for ( int i=0; i<2 && visitedCount<MAX_VISITED; i++ ) {
  			Visit(reach, verts[i], from);
 		}
 	}
@@ -4303,9 +4303,9 @@ public:
 	VisitArea
 	=====================
 	*/
-	void	VisitArea(int areaNum, visitNode* from=NULL) {
-		idReachability*		reach;
-		const aasArea_t&	area = myAAS->GetFile()->GetArea(areaNum);
+	void	VisitArea( intareaNum, visitNode* from=nullptr ) {
+		anReachability*		reach;
+		const seasArea_t&	area = myAAS->GetFile()->GetArea(areaNum);
 
 		// If Visiting From Another Node, Close That Node Now
 		//----------------------------------------------------
@@ -4348,7 +4348,7 @@ public:
 	FindPath
 	=====================
 	*/
-	bool	FindPath(idAAS* aas, idMoveState& move, float radius, bool inDebugMode, idEntity* ignoreEntity, idEntity* ignoreEntity2) {
+	bool	FindPath(anSEAS* aas, idMoveState& move, float radius, bool inDebugMode, anEntity* ignoreEntity, anEntity* ignoreEntity2) {
 		myAAS				= aas;
 		myMove				= &move;
 		myRadius			= radius;
@@ -4363,18 +4363,18 @@ public:
 		openCount			= 0;
 		openListUpdate		= false;
 		pendingCount		= 0;
-		pendingBest			= NULL;
+		pendingBest			= nullptr;
 		visitedCount		= 0;
 		visitedIndexReach.Clear();
 		visitedIndexVert.Clear();
 
 
 
-		if (!myMove->myArea) {
+		if ( !myMove->myArea) {
 			return ErrorCondition();
 		}
-		const aasArea_t*	myArea = &myAAS->GetFile()->GetArea(myMove->myArea);
-		const aasArea_t*	goalArea = &myAAS->GetFile()->GetArea(myMove->goalArea);
+		const seasArea_t*	myArea = &myAAS->GetFile()->GetArea(myMove->myArea);
+		const seasArea_t*	goalArea = &myAAS->GetFile()->GetArea(myMove->goalArea);
 
 
 		// Special Case For Starting In The Goal Area
@@ -4383,14 +4383,14 @@ public:
 
 			// Test For Any Obstacles In The Way
 			//-----------------------------------
-			if (!obstacleFinder.RayTrace(0.0f, myArea, myMove->myPos, myMove->goalPos, 0/*CDR_TODO: Get myAASNum*/, myIgnoreEntity, myIgnoreEntity2)) {
-				return Success(NULL);
+			if ( !obstacleFinder.RayTrace(0.0f, myArea, myMove->myPos, myMove->goalPos, 0/*CDR_TODO: Get myAASNum*/, myIgnoreEntity, myIgnoreEntity2)) {
+				return Success(nullptr );
 			}
 
 			// If There Is An Obstacle But We Think We Can Steer Around It, Then We've Still Succeeded
 			//-----------------------------------------------------------------------------------------
 			if (obstacleFinder.contact.v1Valid || obstacleFinder.contact.v2Valid) {
-				return Success(NULL);
+				return Success(nullptr );
 			}
 		}
 
@@ -4408,7 +4408,7 @@ public:
 			// Select Next Visited Node
 			//--------------------------
 			next = SelectNextVisitedNode();
-			if (!next) {
+			if ( !next) {
 				return ErrorCondition();
 			}
 
@@ -4419,7 +4419,7 @@ public:
 
 				// Test For Any Obstacles In The Way
 				//-----------------------------------
-				if (!obstacleFinder.RayTrace(0.0f, goalArea, GetSeekPosition(next), myMove->goalPos, 0/*CDR_TODO: Get myAASNum*/, myIgnoreEntity, myIgnoreEntity2)) {
+				if ( !obstacleFinder.RayTrace(0.0f, goalArea, GetSeekPosition(next), myMove->goalPos, 0/*CDR_TODO: Get myAASNum*/, myIgnoreEntity, myIgnoreEntity2)) {
 					return Success(next);
 				}
 
@@ -4444,7 +4444,7 @@ rvPathFinder	pathFinder;
 
 
 
-void AI_EntityMoved(idEntity* ent) {
+void AI_EntityMoved(anEntity* ent) {
 	obstacleFinder.MarkEntityForUpdate(ent);
 }
 void AI_MoveInitialize() {
@@ -4460,17 +4460,17 @@ void AI_MoveInitialize() {
 
 /*
 =====================
-idAI::NewCombinedMove
+anSAAI::NewCombinedMove
 =====================
 */
-void idAI::RVMasterMove( void ) {
-	static arcVec3				mySeekDelta;
-	static arcVec3				mySeekDirection;
+void anSAAI::RVMasterMove( void ) {
+	static anVec3				mySeekDelta;
+	static anVec3				mySeekDirection;
 	static float				mySeekDistance;
 
 	static float				moveDistance;
-	static arcVec3				moveDelta;
-	static idEntity*			moveBlockEnt;
+	static anVec3				moveDelta;
+	static anEntity*			moveBlockEnt;
 	static monsterMoveResult_t	moveResult;
 
 
@@ -4482,15 +4482,15 @@ void idAI::RVMasterMove( void ) {
 	bool						seekMove	= CanMove() && move.moveCommand>=NUM_NONMOVING_COMMANDS;
 	bool						seekTurn	= CanTurn() && move.moveCommand> MOVE_NONE;
 
-	arcMat3						myAxis		= viewAxis;
-	const arcVec3&				myPos		= physicsObj.GetOrigin();
-	const arcBounds&				myBounds	= physicsObj.GetBounds();
+	anMat3						myAxis		= viewAxis;
+	const anVec3&				myPos		= physicsObj.GetOrigin();
+	const anBounds&				myBounds	= physicsObj.GetBounds();
 	float						myRadius	= myBounds.Size().x / 2.0f;
-	arcVec3						myPosOld	= move.myPos;	// only used for debug graphics
+	anVec3						myPosOld	= move.myPos;	// only used for debug graphics
 	bool						myPosMoved	= false;		// only used for debug graphics
 
-	const idEntity*				goalEntity	= move.goalEntity.GetEntity();
-	const arcVec3&				goalPos		= (goalEntity)?(LastKnownPosition(goalEntity)):(move.moveDest);
+	const anEntity*				goalEntity	= move.goalEntity.GetEntity();
+	const anVec3&				goalPos		= (goalEntity)?(LastKnownPosition(goalEntity)):(move.moveDest);
 
 
 
@@ -4502,18 +4502,18 @@ void idAI::RVMasterMove( void ) {
 		move.myArea			= PointReachableAreaNum(move.myPos);
 		myPosMoved			= true;
 	}
-	aasArea_t*					myArea		= &aas->GetFile()->GetArea(move.myArea);
+	seasArea_t*					myArea		= &aas->GetFile()->GetArea(move.myArea);
 
 	// Update Goal Position And Area
 	//-------------------------------
-	if ((seekMove || seekTurn) && move.goalPos.Dist2XY(goalPos)>20.0f) {
+	if (( seekMove || seekTurn) && move.goalPos.Dist2XY(goalPos)>20.0f) {
 		move.goalPos		= goalPos;
 		move.goalArea		= PointReachableAreaNum(move.goalPos);
 	}
 
 	// If Reached The Goal Position, Then Stop Moving
 	//------------------------------------------------
-	if (seekMove && ReachedPos( move.goalPos, move.moveCommand, move.range )) {
+	if ( seekMove && ReachedPos( move.goalPos, move.moveCommand, move.range ) ) {
 		StopMove( MOVE_STATUS_DONE );
 		seekMove = false;
 		move.pathLen = 0;
@@ -4531,11 +4531,11 @@ void idAI::RVMasterMove( void ) {
 	//   a pathfinding search to get to the goal area.  This operation
 	//   will alter the seek position
 	//====================================================================
-	if (seekMove) {
+	if ( seekMove) {
 
 		// If No Path Exists, Find One
 		//-----------------------------
-		if (move.pathArea!=move.goalArea || (!move.pathLen && move.pathTime < (gameLocal.time-10000))) {
+		if (move.pathArea!=move.goalArea || ( !move.pathLen && move.pathTime < (gameLocal.time-10000))) {
 			pathFinder.FindPath(aas, move, myRadius, DebugFilter(ai_debugMove), this, move.goalEntity.GetEntity());
 		}
 
@@ -4582,7 +4582,7 @@ void idAI::RVMasterMove( void ) {
 	move.fl.obstacleInPath		= false;	// Makes Character Walk
 	move.fl.blocked				= false;	// Makes Character Stop Moving
 
-	if (seekMove) {
+	if ( seekMove) {
 		mySeekDelta				= move.seekPos - move.myPos;
 		mySeekDirection			= mySeekDelta;
 		mySeekDistance			= mySeekDirection.NormalizeFast();
@@ -4627,7 +4627,7 @@ void idAI::RVMasterMove( void ) {
 
 				// If Neither Vertex Is Valid, Need To Refind Path
 				//-------------------------------------------------
-				if (!tr.v1Valid && !tr.v2Valid) {
+				if ( !tr.v1Valid && !tr.v2Valid) {
 					move.fl.blocked		= true;
 					move.blockTime		= gameLocal.time + 3250;
 					move.pathArea		= 0;	// force a refind path next update
@@ -4638,9 +4638,9 @@ void idAI::RVMasterMove( void ) {
 
 					// Otherwise, Choose The Best Valid Vertex
 					//-----------------------------------------
-					if (!tr.v2Valid || bounds.areas[tr.v2]!=myArea) {
+					if ( !tr.v2Valid || bounds.areas[tr.v2]!=myArea) {
 						vertex	= tr.v1;
-					} else if (!tr.v1Valid || bounds.areas[tr.v2]!=myArea) {
+					} else if ( !tr.v1Valid || bounds.areas[tr.v2]!=myArea) {
 						vertex	= tr.v2;
 					} else {
 						// CDRTODO: Record clockwise / counter clockwise and only test this once.
@@ -4676,7 +4676,7 @@ void idAI::RVMasterMove( void ) {
 	//   Having finialized our seek position, it is now time to turn
 	//   toward it.
 	//====================================================================
-	if (seekTurn) {
+	if ( seekTurn) {
 		DirectionalTurnToward(move.seekPos);
 	}
 	Turn();
@@ -4700,14 +4700,14 @@ void idAI::RVMasterMove( void ) {
 
 	// If Doing Seek Move, Cap The Delta To Avoid Overshooting The Seek Position
 	//---------------------------------------------------------------------------
-	if (seekMove && moveDelta!=vec3_zero) {
+	if ( seekMove && moveDelta!=vec3_zero) {
 		moveDistance = moveDelta.LengthFast();
 
 		if (mySeekDistance<0.5f) {
 			moveDelta = vec3_zero;
 		} else if (mySeekDistance<moveDistance) {
 			moveDelta = mySeekDelta;
-		} else if (mySeekDistance<64.0f || (!move.fl.allowAnimMove && move.fl.allowPrevAnimMove)) {
+		} else if (mySeekDistance<64.0f || ( !move.fl.allowAnimMove && move.fl.allowPrevAnimMove)) {
 			moveDelta = mySeekDelta * (moveDistance/mySeekDistance);
 		}
 	}
@@ -4748,10 +4748,10 @@ void idAI::RVMasterMove( void ) {
 	//====================================================================
 	// DEBUG GRAPHICS
 	//====================================================================
-	arcVec3 origin	= physicsObj.GetOrigin();
+	anVec3 origin	= physicsObj.GetOrigin();
 	if (DebugFilter(ai_debugMove)) {
-		static const arcVec3	upPole(0.0f, 0.0f, 60.0f);
-		static const arcVec3	upSeek(0.0f, 0.0f, 3.0f);
+		static const anVec3	upPole(0.0f, 0.0f, 60.0f);
+		static const anVec3	upSeek(0.0f, 0.0f, 3.0f);
 
 		gameRenderWorld->DebugBounds(colorMagenta,		physicsObj.GetBounds(), origin,				gameLocal.msec);	// Bounds: MAGENTA
 		gameRenderWorld->DebugArrow(colorGreen,			origin+upSeek,	move.seekPos + upSeek,	5,	gameLocal.msec);	// Seek: GREEN
@@ -4762,7 +4762,7 @@ void idAI::RVMasterMove( void ) {
 		}
 
 		if (move.pathLen) {
-			for (int i=move.pathLen-1; i>=0; i--) {
+			for ( int i=move.pathLen-1; i>=0; i--) {
 				gameRenderWorld->DebugLine(colorBlue,	origin,			move.path[i].seekPos,		gameLocal.msec);	// FoundPath: BLUE
 				origin = move.path[i].seekPos;
 			}
@@ -4772,10 +4772,10 @@ void idAI::RVMasterMove( void ) {
 	}
 
 	if (DebugFilter(ai_showObstacleAvoidance)) {
-		static const arcVec3	upSeek(0.0f, 0.0f, 3.0f);
-		const arcVec3& obstaclePos = (move.obstacle.GetEntity())?(move.obstacle->GetPhysics()->GetOrigin()):(move.seekPos);
+		static const anVec3	upSeek(0.0f, 0.0f, 3.0f);
+		const anVec3& obstaclePos = (move.obstacle.GetEntity())?(move.obstacle->GetPhysics()->GetOrigin()):(move.seekPos);
 
-		if (!DebugFilter(ai_debugMove)) {
+		if ( !DebugFilter(ai_debugMove)) {
 			gameRenderWorld->DebugArrow(colorGreen,		origin+upSeek,	move.seekPos + upSeek,	5,	gameLocal.msec);	// Seek: GREEN
 		}
 
@@ -4793,15 +4793,15 @@ void idAI::RVMasterMove( void ) {
 
 /*
 =====================
-idAI::Move
+anSAAI::Move
 =====================
 */
-void idAI::Move	( void ) {
-	if ( ai_speeds.GetBool ( ) ) {
-		aiManager.timerMove.Start ( );
+void anSAAI::Move	( void ) {
+	if ( ai_speeds.GetBool() ) {
+		aiManager.timerMove.Start();
 	}
 
-	switch( move.moveType ) {
+	switch ( move.moveType ) {
 	case MOVETYPE_DEAD:
 		DeadMove();
 		break;
@@ -4825,8 +4825,8 @@ void idAI::Move	( void ) {
 		break;
 	}
 
-	if ( ai_speeds.GetBool ( ) ) {
-		aiManager.timerMove.Stop ( );
+	if ( ai_speeds.GetBool() ) {
+		aiManager.timerMove.Stop();
 	}
 }
 

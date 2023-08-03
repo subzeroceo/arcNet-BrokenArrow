@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "Simd_Generic.h"
@@ -33,7 +33,7 @@
 idSIMD_SSE::GetName
 ============
 */
-const char * idSIMD_SSE::GetName( void ) const {
+const char *idSIMD_SSE::GetName( void ) const {
 	return "MMX & SSE";
 }
 
@@ -44,7 +44,7 @@ idSIMD_SSE::Dot
   dst[i] = constant.Normal() * src[i].xyz + constant[3];
 ============
 */
-void VPCALL idSIMD_SSE::Dot( float *dst, const arcPlane &constant, const arcDrawVert *src, const int count ) {
+void VPCALL idSIMD_SSE::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
 	// 0,  1,  2
 	// 3,  4,  5
 	// 6,  7,  8
@@ -64,8 +64,8 @@ void VPCALL idSIMD_SSE::Dot( float *dst, const arcPlane &constant, const arcDraw
 	char *src_p = (char *) src;                             // src_p = esi
 	char *dst_p = (char *) dst;                             // dst_p = ecx
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	/*
 		and			eax, ~3
@@ -110,16 +110,16 @@ void VPCALL idSIMD_SSE::Dot( float *dst, const arcPlane &constant, const arcDraw
 		movhps		xmm0, [esi+eax+0*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0]	//  3,  X,  0,  1
 		movaps		xmm1, xmm0												//  3,  X,  0,  1
 	*/
-			xmm0 = _mm_load_ss((float *) (src_p+count_l4+1*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0 ) );        // 3,  X,  X,  X
-			xmm2 = _mm_load_ss((float *) (src_p+count_l4+0*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+8) );        // 2,  X,  X,  X
-			xmm0 = _mm_loadh_pi(xmm0, (__m64 *) (src_p+count_l4+0*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0 ) ); // 3,  X,  0,  1
+			xmm0 = _mm_load_ss((float *) ( src_p+count_l4+1*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0 ) );        // 3,  X,  X,  X
+			xmm2 = _mm_load_ss((float *) ( src_p+count_l4+0*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+8) );        // 2,  X,  X,  X
+			xmm0 = _mm_loadh_pi(xmm0, (__m64 *) ( src_p+count_l4+0*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0 ) ); // 3,  X,  0,  1
 			xmm1 = xmm0;							                                                    // 3,  X,  0,  1
 
 	/*
 		movlps		xmm1, [esi+eax+1*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+4]	//  4,  5,  0,  1
 		shufps		xmm2, xmm1, R_SHUFFLEPS( 0, 1, 0, 1 )					//  2,  X,  4,  5
 	*/
-			xmm1 = _mm_loadl_pi(xmm1, (__m64 *) (src_p+count_l4+1*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+4) ); // 4,  5,  0,  1
+			xmm1 = _mm_loadl_pi(xmm1, (__m64 *) ( src_p+count_l4+1*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+4) ); // 4,  5,  0,  1
 			xmm2 = _mm_shuffle_ps(xmm2, xmm1, R_SHUFFLEPS( 0, 1, 0, 1 ) );                               // 2,  X,  4,  5
 
 	/*
@@ -127,20 +127,20 @@ void VPCALL idSIMD_SSE::Dot( float *dst, const arcPlane &constant, const arcDraw
 		movhps		xmm3, [esi+eax+2*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0]	//  9,  X,  6,  7
 		shufps		xmm0, xmm3, R_SHUFFLEPS( 2, 0, 2, 0 )					//  0,  3,  6,  9
 	*/
-			xmm3 = _mm_load_ss((float *) (src_p+count_l4+3*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0 ) );        // 9,  X,  X,  X
-			xmm3 = _mm_loadh_pi(xmm3, (__m64 *) (src_p+count_l4+2*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0 ) ); // 9,  X,  6,  7
+			xmm3 = _mm_load_ss((float *) ( src_p+count_l4+3*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0 ) );        // 9,  X,  X,  X
+			xmm3 = _mm_loadh_pi(xmm3, (__m64 *) ( src_p+count_l4+2*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+0 ) ); // 9,  X,  6,  7
 			xmm0 = _mm_shuffle_ps(xmm0, xmm3, R_SHUFFLEPS( 2, 0, 2, 0 ) );                               // 0,  3,  6,  9
 	/*
 		movlps		xmm3, [esi+eax+3*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+4]	// 10, 11,  6,  7
 		shufps		xmm1, xmm3, R_SHUFFLEPS( 3, 0, 3, 0 )					//  1,  4,  7, 10
 	*/
-			xmm3 = _mm_loadl_pi(xmm3, (__m64 *)(src_p+count_l4+3*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+4) );  // 10, 11, 6,  7
+			xmm3 = _mm_loadl_pi(xmm3, (__m64 *)( src_p+count_l4+3*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+4) );  // 10, 11, 6,  7
 			xmm1 = _mm_shuffle_ps(xmm1, xmm3, R_SHUFFLEPS( 3, 0, 3, 0 ) );                               // 1,  4,  7,  10
 	/*
 		movhps		xmm3, [esi+eax+2*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+8]	// 10, 11,  8,  X
 		shufps		xmm2, xmm3, R_SHUFFLEPS( 0, 3, 2, 1 )					//  2,  5,  8, 11
 	*/
-			xmm3 = _mm_loadh_pi(xmm3, (__m64 *)(src_p+count_l4+2*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+8) );  // 10, 11, 8,  X
+			xmm3 = _mm_loadh_pi(xmm3, (__m64 *)( src_p+count_l4+2*DRAWVERT_SIZE+DRAWVERT_XYZ_OFFSET+8) );  // 10, 11, 8,  X
 			xmm2 = _mm_shuffle_ps(xmm2, xmm3, R_SHUFFLEPS( 0, 3, 2, 1 ) );                               // 2,  5,  8,  11
 
 	/*
@@ -200,9 +200,9 @@ void VPCALL idSIMD_SSE::Dot( float *dst, const arcPlane &constant, const arcDraw
 		jnz			loopVert1
 	*/
 		do {
-			xmm0 = _mm_load_ss((float *) (src_p+count_l4+DRAWVERT_XYZ_OFFSET+0 ) );
-			xmm1 = _mm_load_ss((float *) (src_p+count_l4+DRAWVERT_XYZ_OFFSET+4) );
-			xmm2 = _mm_load_ss((float *) (src_p+count_l4+DRAWVERT_XYZ_OFFSET+8) );
+			xmm0 = _mm_load_ss((float *) ( src_p+count_l4+DRAWVERT_XYZ_OFFSET+0 ) );
+			xmm1 = _mm_load_ss((float *) ( src_p+count_l4+DRAWVERT_XYZ_OFFSET+4) );
+			xmm2 = _mm_load_ss((float *) ( src_p+count_l4+DRAWVERT_XYZ_OFFSET+8) );
 			xmm0 = _mm_mul_ss(xmm0, xmm4);
 			xmm1 = _mm_mul_ss(xmm1, xmm5);
 			xmm2 = _mm_mul_ss(xmm2, xmm6);
@@ -225,9 +225,9 @@ void VPCALL idSIMD_SSE::Dot( float *dst, const arcPlane &constant, const arcDraw
 idSIMD_SSE::MinMax
 ============
 */
-void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *src, const int *indexes, const int count ) {
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+void VPCALL idSIMD_SSE::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	__m128 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
 	char *indexes_p;
@@ -238,14 +238,14 @@ void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *s
 	char *max_p;
 
 	/*
-		movss		xmm0, arcMath::INFINITY
+		movss		xmm0, anMath::INFINITY
 		xorps		xmm1, xmm1
 		shufps		xmm0, xmm0, R_SHUFFLEPS( 0, 0, 0, 0 )
 		subps		xmm1, xmm0
 		movaps		xmm2, xmm0
 		movaps		xmm3, xmm1
 	*/
-		xmm0 = _mm_load_ss(&arcMath::INFINITY);
+		xmm0 = _mm_load_ss(&anMath::INFINITY);
 		// To satisfy the compiler use xmm0 instead.
 		xmm1 = _mm_xor_ps(xmm0, xmm0);
 		xmm0 = _mm_shuffle_ps(xmm0, xmm0, R_SHUFFLEPS( 0, 0, 0, 0 ) );
@@ -289,8 +289,8 @@ void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *s
 	*/
 			edx = *(( int*)(indexes_p+count_l+0 ) );
 			edx = edx * DRAWVERT_SIZE;
-			xmm4 = _mm_load_ss((float *) (src_p+edx+DRAWVERT_XYZ_OFFSET+8) );
-			xmm4 = _mm_loadh_pi(xmm4, (__m64 *) (src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
+			xmm4 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+8) );
+			xmm4 = _mm_loadh_pi(xmm4, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
 			xmm0 = _mm_min_ps(xmm0, xmm4);
 			xmm1 = _mm_max_ps(xmm1, xmm4);
 
@@ -304,8 +304,8 @@ void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *s
 	*/
 			edx = *(( int*)(indexes_p+count_l+4) );
 			edx = edx * DRAWVERT_SIZE;
-			xmm5 = _mm_load_ss((float *) (src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
-			xmm5 = _mm_loadh_pi(xmm5, (__m64 *) (src_p+edx+DRAWVERT_XYZ_OFFSET+4) );
+			xmm5 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
+			xmm5 = _mm_loadh_pi(xmm5, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+4) );
 			xmm2 = _mm_min_ps(xmm2, xmm5);
 			xmm3 = _mm_max_ps(xmm3, xmm5);
 
@@ -319,8 +319,8 @@ void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *s
 	*/
 			edx = *(( int*)(indexes_p+count_l+8) );
 			edx = edx * DRAWVERT_SIZE;
-			xmm6 = _mm_load_ss((float *) (src_p+edx+DRAWVERT_XYZ_OFFSET+8) );
-			xmm6 = _mm_loadh_pi(xmm6, (__m64 *) (src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
+			xmm6 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+8) );
+			xmm6 = _mm_loadh_pi(xmm6, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
 			xmm0 = _mm_min_ps(xmm0, xmm6);
 			xmm1 = _mm_max_ps(xmm1, xmm6);
 
@@ -334,8 +334,8 @@ void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *s
 	*/
 			edx = *(( int*)(indexes_p+count_l+12) );
 			edx = edx * DRAWVERT_SIZE;
-			xmm7 = _mm_load_ss((float *) (src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
-			xmm7 = _mm_loadh_pi(xmm7, (__m64 *) (src_p+edx+DRAWVERT_XYZ_OFFSET+4) );
+			xmm7 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
+			xmm7 = _mm_loadh_pi(xmm7, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+4) );
 			xmm2 = _mm_min_ps(xmm2, xmm7);
 			xmm3 = _mm_max_ps(xmm3, xmm7);
 
@@ -377,8 +377,8 @@ void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *s
 	*/
 			edx = *(( int*)(indexes_p+count_l+0 ) );
 			edx = edx * DRAWVERT_SIZE;
-			xmm4 = _mm_load_ss((float *) (src_p+edx+DRAWVERT_XYZ_OFFSET+8) );
-			xmm4 = _mm_loadh_pi(xmm4, (__m64 *) (src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
+			xmm4 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+8) );
+			xmm4 = _mm_loadh_pi(xmm4, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
 			xmm0 = _mm_min_ps(xmm0, xmm4);
 			xmm1 = _mm_max_ps(xmm1, xmm4);
 
@@ -423,7 +423,7 @@ idSIMD_SSE::Dot
   dst[i] = constant * src[i].Normal() + src[i][3];
 ============
 */
-void VPCALL idSIMD_SSE::Dot( float *dst, const arcVec3 &constant, const arcPlane *src, const int count ) {
+void VPCALL idSIMD_SSE::Dot( float *dst, const anVec3 &constant, const anPlane *src, const int count ) {
 	int count_l4;
 	int count_l1;
 	char *constant_p;
@@ -493,14 +493,14 @@ void VPCALL idSIMD_SSE::Dot( float *dst, const arcVec3 &constant, const arcPlane
 		shufps		xmm2, xmm4, R_SHUFFLEPS( 0, 2, 0, 2 )
 		shufps		xmm3, xmm4, R_SHUFFLEPS( 1, 3, 1, 3 )
 	*/
-			xmm1 = _mm_loadl_pi(xmm1, (__m64 *)(src_p+count_l4+ 0 ) );
-			xmm3 = _mm_loadl_pi(xmm3, (__m64 *)(src_p+count_l4+ 8) );
-			xmm1 = _mm_loadh_pi(xmm1, (__m64 *)(src_p+count_l4+16) );
-			xmm3 = _mm_loadh_pi(xmm3, (__m64 *)(src_p+count_l4+24) );
-			xmm2 = _mm_loadl_pi(xmm2, (__m64 *)(src_p+count_l4+32) );
-			xmm4 = _mm_loadl_pi(xmm4, (__m64 *)(src_p+count_l4+40) );
-			xmm2 = _mm_loadh_pi(xmm2, (__m64 *)(src_p+count_l4+48) );
-			xmm4 = _mm_loadh_pi(xmm4, (__m64 *)(src_p+count_l4+56) );
+			xmm1 = _mm_loadl_pi(xmm1, (__m64 *)( src_p+count_l4+ 0 ) );
+			xmm3 = _mm_loadl_pi(xmm3, (__m64 *)( src_p+count_l4+ 8) );
+			xmm1 = _mm_loadh_pi(xmm1, (__m64 *)( src_p+count_l4+16) );
+			xmm3 = _mm_loadh_pi(xmm3, (__m64 *)( src_p+count_l4+24) );
+			xmm2 = _mm_loadl_pi(xmm2, (__m64 *)( src_p+count_l4+32) );
+			xmm4 = _mm_loadl_pi(xmm4, (__m64 *)( src_p+count_l4+40) );
+			xmm2 = _mm_loadh_pi(xmm2, (__m64 *)( src_p+count_l4+48) );
+			xmm4 = _mm_loadh_pi(xmm4, (__m64 *)( src_p+count_l4+56) );
 
 			xmm0 = xmm1;
 			xmm0 = _mm_shuffle_ps(xmm0, xmm2, R_SHUFFLEPS( 0, 2, 0, 2 ) );
@@ -569,10 +569,10 @@ void VPCALL idSIMD_SSE::Dot( float *dst, const arcVec3 &constant, const arcPlane
 		movss		[ecx-4], xmm0
 		jnz			loopVert1
 	*/
-			xmm0 = _mm_load_ss((float *) (src_p+count_l4+ 0 ) );
-			xmm1 = _mm_load_ss((float *) (src_p+count_l4+ 4) );
-			xmm2 = _mm_load_ss((float *) (src_p+count_l4+ 8) );
-			xmm3 = _mm_load_ss((float *) (src_p+count_l4+12) );
+			xmm0 = _mm_load_ss((float *) ( src_p+count_l4+ 0 ) );
+			xmm1 = _mm_load_ss((float *) ( src_p+count_l4+ 4) );
+			xmm2 = _mm_load_ss((float *) ( src_p+count_l4+ 8) );
+			xmm3 = _mm_load_ss((float *) ( src_p+count_l4+12) );
 
 			xmm0 = _mm_mul_ss(xmm0, xmm5);
 			xmm1 = _mm_mul_ss(xmm1, xmm6);
@@ -1007,11 +1007,11 @@ ALIGN4_INIT1( float SIMD_SP_three, 3.0f );
 ALIGN4_INIT1( float SIMD_SP_four, 4.0f );
 ALIGN4_INIT1( float SIMD_SP_maxShort, (1<<15) );
 ALIGN4_INIT1( float SIMD_SP_tiny, 1e-10f );
-ALIGN4_INIT1( float SIMD_SP_PI, arcMath::PI );
-ALIGN4_INIT1( float SIMD_SP_halfPI, arcMath::HALF_PI );
-ALIGN4_INIT1( float SIMD_SP_twoPI, arcMath::TWO_PI );
-ALIGN4_INIT1( float SIMD_SP_oneOverTwoPI, 1.0f / arcMath::TWO_PI );
-ALIGN4_INIT1( float SIMD_SP_infinity, arcMath::INFINITY );
+ALIGN4_INIT1( float SIMD_SP_PI, anMath::PI );
+ALIGN4_INIT1( float SIMD_SP_halfPI, anMath::HALF_PI );
+ALIGN4_INIT1( float SIMD_SP_twoPI, anMath::TWO_PI );
+ALIGN4_INIT1( float SIMD_SP_oneOverTwoPI, 1.0f / anMath::TWO_PI );
+ALIGN4_INIT1( float SIMD_SP_infinity, anMath::INFINITY );
 ALIGN4_INIT4( float SIMD_SP_lastOne, 0.0f, 0.0f, 0.0f, 1.0f );
 
 ALIGN4_INIT1( float SIMD_SP_rsqrt_c0,  3.0f );
@@ -1091,7 +1091,7 @@ float SSE_SinZeroHalfPI( float a ) {
 
 	float t;
 
-	assert( a >= 0.0f && a <= arcMath::HALF_PI );
+	assert( a >= 0.0f && a <= anMath::HALF_PI );
 
 	__asm {
 		movss		xmm0, a
@@ -1118,7 +1118,7 @@ float SSE_SinZeroHalfPI( float a ) {
 
 	float s, t;
 
-	assert( a >= 0.0f && a <= arcMath::HALF_PI );
+	assert( a >= 0.0f && a <= anMath::HALF_PI );
 
 	s = a * a;
 	t = -2.39e-08f;
@@ -1198,11 +1198,11 @@ float SSE_Sin( float a ) {
 		andps		xmm1, SIMD_SP_signBitMask	// xmm1 = signbit( PI - a )
 		movss		xmm2, xmm0					// xmm2 = PI - a
 		xorps		xmm2, xmm1					// xmm2 = fabs( PI - a )
-		cmpnltss	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
+		cmpnltss	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
 		movss		xmm3, SIMD_SP_PI			// xmm3 = PI
 		xorps		xmm3, xmm1					// xmm3 = PI ^ signbit( PI - a )
-		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
-		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
+		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
+		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
 		xorps		xmm0, xmm2
 		addps		xmm0, xmm3
 
@@ -1229,13 +1229,13 @@ float SSE_Sin( float a ) {
 
 	float s, t;
 
-	if ( ( a < 0.0f ) || ( a >= arcMath::TWO_PI ) ) {
-		a -= floorf( a / arcMath::TWO_PI ) * arcMath::TWO_PI;
+	if ( ( a < 0.0f ) || ( a >= anMath::TWO_PI ) ) {
+		a -= floorf( a / anMath::TWO_PI ) * anMath::TWO_PI;
 	}
 
-	a = arcMath::PI - a;
-	if ( fabs( a ) >= arcMath::HALF_PI ) {
-		a = ( ( a < 0.0f ) ? -arcMath::PI : arcMath::PI ) - a;
+	a = anMath::PI - a;
+	if ( fabs( a ) >= anMath::HALF_PI ) {
+		a = ( ( a < 0.0f ) ? -anMath::PI : anMath::PI ) - a;
 	}
 
 	s = a * a;
@@ -1294,11 +1294,11 @@ void SSE_Sin4( float a[4], float s[4] ) {
 		andps		xmm1, SIMD_SP_signBitMask	// xmm1 = signbit( PI - a )
 		movaps		xmm2, xmm0					// xmm2 = PI - a
 		xorps		xmm2, xmm1					// xmm2 = fabs( PI - a )
-		cmpnltps	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
+		cmpnltps	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
 		movaps		xmm3, SIMD_SP_PI			// xmm3 = PI
 		xorps		xmm3, xmm1					// xmm3 = PI ^ signbit( PI - a )
-		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
-		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
+		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
+		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
 		xorps		xmm0, xmm2
 		addps		xmm0, xmm3
 
@@ -1332,7 +1332,7 @@ float SSE_CosZeroHalfPI( float a ) {
 
 	float t;
 
-	assert( a >= 0.0f && a <= arcMath::HALF_PI );
+	assert( a >= 0.0f && a <= anMath::HALF_PI );
 
 	__asm {
 		movss		xmm0, a
@@ -1357,7 +1357,7 @@ float SSE_CosZeroHalfPI( float a ) {
 
 	float s, t;
 
-	assert( a >= 0.0f && a <= arcMath::HALF_PI );
+	assert( a >= 0.0f && a <= anMath::HALF_PI );
 
 	s = a * a;
 	t = -2.605e-07f;
@@ -1434,11 +1434,11 @@ float SSE_Cos( float a ) {
 		andps		xmm1, SIMD_SP_signBitMask	// xmm1 = signbit( PI - a )
 		movss		xmm2, xmm0					// xmm2 = PI - a
 		xorps		xmm2, xmm1					// xmm2 = fabs( PI - a )
-		cmpnltss	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
+		cmpnltss	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
 		movss		xmm3, SIMD_SP_PI			// xmm3 = PI
 		xorps		xmm3, xmm1					// xmm3 = PI ^ signbit( PI - a )
-		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
-		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
+		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
+		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
 		xorps		xmm0, xmm2
 		addps		xmm0, xmm3
 
@@ -1465,13 +1465,13 @@ float SSE_Cos( float a ) {
 
 	float s, t;
 
-	if ( ( a < 0.0f ) || ( a >= arcMath::TWO_PI ) ) {
-		a -= floorf( a / arcMath::TWO_PI ) * arcMath::TWO_PI;
+	if ( ( a < 0.0f ) || ( a >= anMath::TWO_PI ) ) {
+		a -= floorf( a / anMath::TWO_PI ) * anMath::TWO_PI;
 	}
 
-	a = arcMath::PI - a;
-	if ( fabs( a ) >= arcMath::HALF_PI ) {
-		a = ( ( a < 0.0f ) ? -arcMath::PI : arcMath::PI ) - a;
+	a = anMath::PI - a;
+	if ( fabs( a ) >= anMath::HALF_PI ) {
+		a = ( ( a < 0.0f ) ? -anMath::PI : anMath::PI ) - a;
 		d = 1.0f;
 	} else {
 		d = -1.0f;
@@ -1533,11 +1533,11 @@ void SSE_Cos4( float a[4], float c[4] ) {
 		andps		xmm1, SIMD_SP_signBitMask	// xmm1 = signbit( PI - a )
 		movaps		xmm2, xmm0					// xmm2 = PI - a
 		xorps		xmm2, xmm1					// xmm2 = fabs( PI - a )
-		cmpnltps	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
+		cmpnltps	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
 		movaps		xmm3, SIMD_SP_PI			// xmm3 = PI
 		xorps		xmm3, xmm1					// xmm3 = PI ^ signbit( PI - a )
-		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
-		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
+		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
+		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
 		xorps		xmm0, xmm2
 		addps		xmm0, xmm3
 
@@ -1586,11 +1586,11 @@ void SSE_SinCos( float a, float &s, float &c ) {
 		andps		xmm1, SIMD_SP_signBitMask	// xmm1 = signbit( PI - a )
 		movss		xmm2, xmm0					// xmm2 = PI - a
 		xorps		xmm2, xmm1					// xmm2 = fabs( PI - a )
-		cmpnltss	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
+		cmpnltss	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
 		movss		xmm3, SIMD_SP_PI			// xmm3 = PI
 		xorps		xmm3, xmm1					// xmm3 = PI ^ signbit( PI - a )
-		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
-		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
+		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
+		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
 		xorps		xmm0, xmm2
 		addps		xmm0, xmm3
 
@@ -1664,11 +1664,11 @@ void SSE_SinCos4( float a[4], float s[4], float c[4] ) {
 		andps		xmm1, SIMD_SP_signBitMask	// xmm1 = signbit( PI - a )
 		movaps		xmm2, xmm0					// xmm2 = PI - a
 		xorps		xmm2, xmm1					// xmm2 = fabs( PI - a )
-		cmpnltps	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
+		cmpnltps	xmm2, SIMD_SP_halfPI		// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? 0xFFFFFFFF : 0x00000000
 		movaps		xmm3, SIMD_SP_PI			// xmm3 = PI
 		xorps		xmm3, xmm1					// xmm3 = PI ^ signbit( PI - a )
-		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
-		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= arcMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
+		andps		xmm3, xmm2					// xmm3 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? ( PI ^ signbit( PI - a ) ) : 0.0f
+		andps		xmm2, SIMD_SP_signBitMask	// xmm2 = ( fabs( PI - a ) >= anMath::HALF_PI ) ? SIMD_SP_signBitMask : 0.0f
 		xorps		xmm0, xmm2
 		addps		xmm0, xmm3
 
@@ -1770,7 +1770,7 @@ float SSE_ATanPositive( float y, float x ) {
 
 	if ( y > x ) {
 		a = -x / y;
-		d = arcMath::HALF_PI;
+		d = anMath::HALF_PI;
 	} else {
 		a = y / x;
 		d = 0.0f;
@@ -1920,7 +1920,7 @@ float SSE_ATan( float y, float x ) {
 
 	if ( fabs( y ) > fabs( x ) ) {
 		a = -x / y;
-		d = arcMath::HALF_PI;
+		d = anMath::HALF_PI;
 		*((unsigned long *)&d) ^= ( *((unsigned long *)&x) ^ *((unsigned long *)&y) ) & (1<<31);
 	} else {
 		a = y / x;
@@ -2021,7 +2021,7 @@ void SSE_TestTrigonometry( void ) {
 	float a, s1, s2, c1, c2;
 
 	for ( i = 0; i < 100; i++ ) {
-		a = i * arcMath::HALF_PI / 100.0f;
+		a = i * anMath::HALF_PI / 100.0f;
 
 		s1 = sin( a );
 		s2 = SSE_SinZeroHalfPI( a );
@@ -2039,7 +2039,7 @@ void SSE_TestTrigonometry( void ) {
 	}
 
 	for ( i = -200; i < 200; i++ ) {
-		a = i * arcMath::TWO_PI / 100.0f;
+		a = i * anMath::TWO_PI / 100.0f;
 
 		s1 = sin( a );
 		s2 = SSE_Sin( a );
@@ -2067,7 +2067,7 @@ void SSE_TestTrigonometry( void ) {
 idSIMD_SSE::GetName
 ============
 */
-const char * idSIMD_SSE::GetName( void ) const {
+const char *idSIMD_SSE::GetName( void ) const {
 	return "MMX & SSE";
 }
 
@@ -2388,7 +2388,7 @@ static void Simd_MulAdd( float *dst, const float constant, const float *src, con
 }
 
 #define MULADD_FEW( OPER )																				\
-switch( count ) {																						\
+switch ( count ) {																						\
 	case 0:																								\
 		return;																							\
 	case 1:																								\
@@ -2495,7 +2495,7 @@ idSIMD_SSE::Dot
   dst[i] = constant * src[i];
 ============
 */
-void VPCALL idSIMD_SSE::Dot( float *dst, const arcVec3 &constant, const arcVec3 *src, const int count ) {
+void VPCALL idSIMD_SSE::Dot( float *dst, const anVec3 &constant, const anVec3 *src, const int count ) {
 	__asm
 	{
 		mov			eax, count
@@ -2570,7 +2570,7 @@ idSIMD_SSE::Dot
   dst[i] = constant * src[i].Normal() + src[i][3];
 ============
 */
-void VPCALL idSIMD_SSE::Dot( float *dst, const arcVec3 &constant, const arcPlane *src, const int count ) {
+void VPCALL idSIMD_SSE::Dot( float *dst, const anVec3 &constant, const anPlane *src, const int count ) {
 	__asm {
 		mov			eax, count
 		mov			edi, constant
@@ -2653,10 +2653,10 @@ idSIMD_SSE::Dot
   dst[i] = constant * src[i].xyz;
 ============
 */
-void VPCALL idSIMD_SSE::Dot( float *dst, const arcVec3 &constant, const arcDrawVert *src, const int count ) {
+void VPCALL idSIMD_SSE::Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) {
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	// 0,  1,  2
 	// 3,  4,  5
@@ -2745,7 +2745,7 @@ idSIMD_SSE::Dot
   dst[i] = constant.Normal() * src[i] + constant[3];
 ============
 */
-void VPCALL idSIMD_SSE::Dot( float *dst, const arcPlane &constant, const arcVec3 *src, const int count ) {
+void VPCALL idSIMD_SSE::Dot( float *dst, const anPlane &constant, const anVec3 *src, const int count ) {
 	__asm
 	{
 		mov			eax, count
@@ -2827,7 +2827,7 @@ idSIMD_SSE::Dot
   dst[i] = constant.Normal() * src[i].Normal() + constant[3] * src[i][3];
 ============
 */
-void VPCALL idSIMD_SSE::Dot( float *dst, const arcPlane &constant, const arcPlane *src, const int count ) {
+void VPCALL idSIMD_SSE::Dot( float *dst, const anPlane &constant, const anPlane *src, const int count ) {
 
 #define SINGLE_OP(SRC, DEST)							\
 	__asm	movlps		xmm0,[SRC]						\
@@ -2950,10 +2950,10 @@ idSIMD_SSE::Dot
   dst[i] = constant.Normal() * src[i].xyz + constant[3];
 ============
 */
-void VPCALL idSIMD_SSE::Dot( float *dst, const arcPlane &constant, const arcDrawVert *src, const int count ) {
+void VPCALL idSIMD_SSE::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	// 0,  1,  2
 	// 3,  4,  5
@@ -3046,7 +3046,7 @@ idSIMD_SSE::Dot
   dst[i] = src0[i] * src1[i];
 ============
 */
-void VPCALL idSIMD_SSE::Dot( float *dst, const arcVec3 *src0, const arcVec3 *src1, const int count ) {
+void VPCALL idSIMD_SSE::Dot( float *dst, const anVec3 *src0, const anVec3 *src1, const int count ) {
 	__asm
 	{
 		mov			eax, count
@@ -3128,7 +3128,7 @@ idSIMD_SSE::Dot
 ============
 */
 void VPCALL idSIMD_SSE::Dot( float &dot, const float *src1, const float *src2, const int count ) {
-	switch( count ) {
+	switch ( count ) {
 		case 0:
 			dot = 0.0f;
 			return;
@@ -3191,7 +3191,7 @@ void VPCALL idSIMD_SSE::Dot( float &dot, const float *src1, const float *src2, c
 				jl			loopAlignedDot
 			doneDot:
 			}
-			switch( count & 3 ) {
+			switch ( count & 3 ) {
 				case 1:
 					__asm {
 						movss	xmm1, [ecx]
@@ -3527,7 +3527,7 @@ idSIMD_SSE::MinMax
 void VPCALL idSIMD_SSE::MinMax( float &min, float &max, const float *src, const int count ) {
 	int i, pre, post;
 
-	min = arcMath::INFINITY; max = -arcMath::INFINITY;
+	min = anMath::INFINITY; max = -anMath::INFINITY;
 
 	__asm
 	{
@@ -3615,11 +3615,11 @@ done:
 idSIMD_SSE::MinMax
 ============
 */
-void VPCALL idSIMD_SSE::MinMax( arcVec2 &min, arcVec2 &max, const arcVec2 *src, const int count ) {
+void VPCALL idSIMD_SSE::MinMax( anVec2 &min, anVec2 &max, const anVec2 *src, const int count ) {
 	__asm {
 		mov			eax, count
 		test		eax, eax
-		movss		xmm0, arcMath::INFINITY
+		movss		xmm0, anMath::INFINITY
 		xorps		xmm1, xmm1
 		shufps		xmm0, xmm0, R_SHUFFLEPS( 0, 0, 0, 0 )
 		subps		xmm1, xmm0
@@ -3664,10 +3664,10 @@ void VPCALL idSIMD_SSE::MinMax( arcVec2 &min, arcVec2 &max, const arcVec2 *src, 
 idSIMD_SSE::MinMax
 ============
 */
-void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcVec3 *src, const int count ) {
+void VPCALL idSIMD_SSE::MinMax( anVec3 &min, anVec3 &max, const anVec3 *src, const int count ) {
 	__asm {
 
-		movss		xmm0, arcMath::INFINITY
+		movss		xmm0, anMath::INFINITY
 		xorps		xmm1, xmm1
 		shufps		xmm0, xmm0, R_SHUFFLEPS( 0, 0, 0, 0 )
 		subps		xmm1, xmm0
@@ -3744,14 +3744,14 @@ void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcVec3 *src, 
 idSIMD_SSE::MinMax
 ============
 */
-void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *src, const int count ) {
+void VPCALL idSIMD_SSE::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) {
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	__asm {
 
-		movss		xmm0, arcMath::INFINITY
+		movss		xmm0, anMath::INFINITY
 		xorps		xmm1, xmm1
 		shufps		xmm0, xmm0, R_SHUFFLEPS( 0, 0, 0, 0 )
 		subps		xmm1, xmm0
@@ -3828,14 +3828,14 @@ void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *s
 idSIMD_SSE::MinMax
 ============
 */
-void VPCALL idSIMD_SSE::MinMax( arcVec3 &min, arcVec3 &max, const arcDrawVert *src, const int *indexes, const int count ) {
+void VPCALL idSIMD_SSE::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	__asm {
 
-		movss		xmm0, arcMath::INFINITY
+		movss		xmm0, anMath::INFINITY
 		xorps		xmm1, xmm1
 		shufps		xmm0, xmm0, R_SHUFFLEPS( 0, 0, 0, 0 )
 		subps		xmm1, xmm0
@@ -4363,7 +4363,7 @@ idSIMD_SSE::MatX_MultiplyVecX
 	with N in the range [1-6]
 ============
 */
-void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) {
+void VPCALL idSIMD_SSE::MatX_MultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 #define STORE1( offset, reg1, reg2 )		\
 	__asm movss		[eax+offset], reg1
 #define STORE2LO( offset, reg1, reg2 )		\
@@ -4386,9 +4386,9 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 	vPtr = vec.ToFloatPtr();
 	dstPtr = dst.ToFloatPtr();
 	numRows = mat.GetNumRows();
-	switch( mat.GetNumColumns() ) {
+	switch ( mat.GetNumColumns() ) {
 		case 1: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 1: {		// 1x1 * 1x1
 					__asm {
 						mov			esi, vPtr
@@ -4426,7 +4426,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 			break;
 		}
 		case 2: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 2: {		// 2x2 * 2x1
 					__asm {
 						mov			esi, vPtr
@@ -4483,7 +4483,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 			break;
 		}
 		case 3: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 3: {		// 3x3 * 3x1
 					__asm {
 						mov			esi, vPtr
@@ -4576,7 +4576,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 			break;
 		}
 		case 4: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 4: {		// 4x4 * 4x1
 					__asm {
 						mov			esi, vPtr
@@ -4661,7 +4661,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 			break;
 		}
 		case 5: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 5: {		// 5x5 * 5x1
 					__asm {
 						mov			esi, vPtr
@@ -4792,7 +4792,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 			break;
 		}
 		case 6: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 1: {		// 1x6 * 6x1
 					__asm {
 						mov			esi, vPtr
@@ -4827,7 +4827,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -4858,7 +4858,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -4901,7 +4901,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -4946,7 +4946,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyVecX( arcVecX &dst, const arcMatX &mat, con
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -5100,7 +5100,7 @@ idSIMD_SSE::MatX_MultiplyAddVecX
 	with N in the range [1-6]
 ============
 */
-void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) {
+void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 #define STORE1( offset, reg1, reg2 )		\
 	__asm movss		reg2, [eax+offset]		\
 	__asm addss		reg2, reg1				\
@@ -5132,9 +5132,9 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 	vPtr = vec.ToFloatPtr();
 	dstPtr = dst.ToFloatPtr();
 	numRows = mat.GetNumRows();
-	switch( mat.GetNumColumns() ) {
+	switch ( mat.GetNumColumns() ) {
 		case 1: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 1: {		// 1x1 * 1x1
 					__asm {
 						mov			esi, vPtr
@@ -5172,7 +5172,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 2: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 2: {		// 2x2 * 2x1
 					__asm {
 						mov			esi, vPtr
@@ -5229,7 +5229,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 3: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 3: {		// 3x3 * 3x1
 					__asm {
 						mov			esi, vPtr
@@ -5322,7 +5322,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 4: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 4: {		// 4x4 * 4x1
 					__asm {
 						mov			esi, vPtr
@@ -5407,7 +5407,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 5: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 5: {		// 5x5 * 5x1
 					__asm {
 						mov			esi, vPtr
@@ -5538,7 +5538,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 6: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 1: {		// 1x6 * 6x1
 					__asm {
 						mov			esi, vPtr
@@ -5573,7 +5573,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -5604,7 +5604,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -5647,7 +5647,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -5692,7 +5692,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyAddVecX( arcVecX &dst, const arcMatX &mat, 
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -5846,7 +5846,7 @@ idSIMD_SSE::MatX_MultiplySubVecX
 	with N in the range [1-6]
 ============
 */
-void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) {
+void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 #define STORE1( offset, reg1, reg2 )		\
 	__asm movss		reg2, [eax+offset]		\
 	__asm subss		reg2, reg1				\
@@ -5878,9 +5878,9 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 	vPtr = vec.ToFloatPtr();
 	dstPtr = dst.ToFloatPtr();
 	numRows = mat.GetNumRows();
-	switch( mat.GetNumColumns() ) {
+	switch ( mat.GetNumColumns() ) {
 		case 1: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 1: {		// 1x1 * 1x1
 					__asm {
 						mov			esi, vPtr
@@ -5918,7 +5918,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 2: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 2: {		// 2x2 * 2x1
 					__asm {
 						mov			esi, vPtr
@@ -5975,7 +5975,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 3: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 3: {		// 3x3 * 3x1
 					__asm {
 						mov			esi, vPtr
@@ -6068,7 +6068,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 4: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 4: {		// 4x4 * 4x1
 					__asm {
 						mov			esi, vPtr
@@ -6153,7 +6153,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 5: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 5: {		// 5x5 * 5x1
 					__asm {
 						mov			esi, vPtr
@@ -6284,7 +6284,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 			break;
 		}
 		case 6: {
-			switch( numRows ) {
+			switch ( numRows ) {
 				case 1: {		// 1x6 * 6x1
 					__asm {
 						mov			esi, vPtr
@@ -6319,7 +6319,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -6350,7 +6350,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -6393,7 +6393,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -6438,7 +6438,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplySubVecX( arcVecX &dst, const arcMatX &mat, 
 						mov			esi, vPtr
 						mov			edi, mPtr
 						mov			eax, dstPtr
-						// load arcVecX
+						// load anVecX
 						movlps		xmm4, [esi]
 						movhps		xmm4, [esi+8]
 						movlps		xmm5, [esi+16]
@@ -6591,7 +6591,7 @@ idSIMD_SSE::MatX_TransposeMultiplyVecX
 	with N in the range [1-6]
 ============
 */
-void VPCALL idSIMD_SSE::MatX_TransposeMultiplyVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) {
+void VPCALL idSIMD_SSE::MatX_TransposeMultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 #define STORE1( offset, reg1, reg2 )		\
 	__asm movss		[eax+offset], reg1
 #define STORE2LO( offset, reg1, reg2 )		\
@@ -6614,9 +6614,9 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyVecX( arcVecX &dst, const arcMatX 
 	vPtr = vec.ToFloatPtr();
 	dstPtr = dst.ToFloatPtr();
 	numColumns = mat.GetNumColumns();
-	switch( mat.GetNumRows() ) {
+	switch ( mat.GetNumRows() ) {
 		case 1:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 1x6 * 1x1
 					__asm {
 						mov			esi, vPtr
@@ -6642,7 +6642,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyVecX( arcVecX &dst, const arcMatX 
 			}
 			break;
 		case 2:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 2x6 * 2x1
 					__asm {
 						mov			esi, vPtr
@@ -6679,7 +6679,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyVecX( arcVecX &dst, const arcMatX 
 			}
 			break;
 		case 3:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 3x6 * 3x1
 					__asm {
 						mov			esi, vPtr
@@ -6727,7 +6727,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyVecX( arcVecX &dst, const arcMatX 
 			}
 			break;
 		case 4:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 4x6 * 4x1
 					__asm {
 						mov			esi, vPtr
@@ -6783,7 +6783,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyVecX( arcVecX &dst, const arcMatX 
 			}
 			break;
 		case 5:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 5x6 * 5x1
 					__asm {
 						mov			esi, vPtr
@@ -6845,7 +6845,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyVecX( arcVecX &dst, const arcMatX 
 			}
 			break;
 		case 6:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 1: {		// 6x1 * 6x1
 					__asm {
 						mov			esi, vPtr
@@ -7146,7 +7146,7 @@ idSIMD_SSE::MatX_TransposeMultiplyAddVecX
 	with N in the range [1-6]
 ============
 */
-void VPCALL idSIMD_SSE::MatX_TransposeMultiplyAddVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) {
+void VPCALL idSIMD_SSE::MatX_TransposeMultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 #define STORE1( offset, reg1, reg2 )		\
 	__asm movss		reg2, [eax+offset]		\
 	__asm addss		reg2, reg1				\
@@ -7178,9 +7178,9 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyAddVecX( arcVecX &dst, const arcMa
 	vPtr = vec.ToFloatPtr();
 	dstPtr = dst.ToFloatPtr();
 	numColumns = mat.GetNumColumns();
-	switch( mat.GetNumRows() ) {
+	switch ( mat.GetNumRows() ) {
 		case 1:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 1x6 * 1x1
 					__asm {
 						mov			esi, vPtr
@@ -7206,7 +7206,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyAddVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 2:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 2x6 * 2x1
 					__asm {
 						mov			esi, vPtr
@@ -7243,7 +7243,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyAddVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 3:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 3x6 * 3x1
 					__asm {
 						mov			esi, vPtr
@@ -7291,7 +7291,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyAddVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 4:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 4x6 * 4x1
 					__asm {
 						mov			esi, vPtr
@@ -7347,7 +7347,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyAddVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 5:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 5x6 * 5x1
 					__asm {
 						mov			esi, vPtr
@@ -7409,7 +7409,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyAddVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 6:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 1: {		// 6x1 * 6x1
 					__asm {
 						mov			esi, vPtr
@@ -7710,7 +7710,7 @@ void idSIMD_SSE::MatX_TransposeMultiplySubVecX
 	with N in the range [1-6]
 ============
 */
-void VPCALL idSIMD_SSE::MatX_TransposeMultiplySubVecX( arcVecX &dst, const arcMatX &mat, const arcVecX &vec ) {
+void VPCALL idSIMD_SSE::MatX_TransposeMultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 #define STORE1( offset, reg1, reg2 )		\
 	__asm movss		reg2, [eax+offset]		\
 	__asm subss		reg2, reg1				\
@@ -7742,9 +7742,9 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplySubVecX( arcVecX &dst, const arcMa
 	vPtr = vec.ToFloatPtr();
 	dstPtr = dst.ToFloatPtr();
 	numColumns = mat.GetNumColumns();
-	switch( mat.GetNumRows() ) {
+	switch ( mat.GetNumRows() ) {
 		case 1:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 1x6 * 1x1
 					__asm {
 						mov			esi, vPtr
@@ -7770,7 +7770,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplySubVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 2:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 2x6 * 2x1
 					__asm {
 						mov			esi, vPtr
@@ -7807,7 +7807,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplySubVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 3:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 3x6 * 3x1
 					__asm {
 						mov			esi, vPtr
@@ -7855,7 +7855,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplySubVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 4:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 4x6 * 4x1
 					__asm {
 						mov			esi, vPtr
@@ -7911,7 +7911,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplySubVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 5:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 6: {		// 5x6 * 5x1
 					__asm {
 						mov			esi, vPtr
@@ -7973,7 +7973,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplySubVecX( arcVecX &dst, const arcMa
 			}
 			break;
 		case 6:
-			switch( numColumns ) {
+			switch ( numColumns ) {
 				case 1: {		// 6x1 * 6x1
 					__asm {
 						mov			esi, vPtr
@@ -8280,7 +8280,7 @@ idSIMD_SSE::MatX_MultiplyMatX
 	the results are poor probably due to memory access.
 ============
 */
-void VPCALL idSIMD_SSE::MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, const arcMatX &m2 ) {
+void VPCALL idSIMD_SSE::MatX_MultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 ) {
 	int i, j, k, l, n;
 	float *dstPtr;
 	const float *m1Ptr, *m2Ptr;
@@ -8295,10 +8295,10 @@ void VPCALL idSIMD_SSE::MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, cons
 	l = m2.GetNumColumns();
 	n = m1.GetNumColumns();
 
-	switch( n ) {
+	switch ( n ) {
 		case 1: {
 			if ( !(l^6) ) {
-				switch( k ) {
+				switch ( k ) {
 					case 1:	{			// 1x1 * 1x6, no precision loss compared to FPU version
 						__asm {
 							mov			esi, m2Ptr
@@ -8382,7 +8382,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, cons
 		}
 		case 2: {
 			if ( !(l^6) ) {
-				switch( k ) {
+				switch ( k ) {
 					case 2: {			// 2x2 * 2x6
 
 						#define MUL_Nx2_2x6_INIT								\
@@ -8460,7 +8460,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, cons
 		}
 		case 3: {
 			if ( !(l^6) ) {
-				switch( k ) {
+				switch ( k ) {
 					case 3: {			// 3x3 * 3x6
 						__asm {
 							mov		esi, m2Ptr
@@ -8647,7 +8647,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, cons
 		}
 		case 4: {
 			if ( !(l^6) ) {
-				switch( k ) {
+				switch ( k ) {
 					case 4: {			// 4x4 * 4x6
 
 						#define MUL_Nx4_4x6_FIRST4COLUMNS_INIT						\
@@ -8755,7 +8755,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, cons
 		}
 		case 5: {
 			if ( !(l^6) ) {
-				switch( k ) {
+				switch ( k ) {
 					case 5: {			// 5x5 * 5x6
 
 						#define MUL_Nx5_5x6_FIRST4COLUMNS_INIT						\
@@ -8894,7 +8894,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, cons
 			break;
 		}
 		case 6: {
-			switch( k ) {
+			switch ( k ) {
 				case 1: {
 					if ( !(l^1 ) ) {		// 1x6 * 6x1
 						dstPtr[0] = m1Ptr[0] * m2Ptr[0] + m1Ptr[1] * m2Ptr[1] + m1Ptr[2] * m2Ptr[2] +
@@ -9131,7 +9131,7 @@ void VPCALL idSIMD_SSE::MatX_MultiplyMatX( arcMatX &dst, const arcMatX &m1, cons
 					break;
 				}
 				case 6: {
-					switch( l ) {
+					switch ( l ) {
 						case 1: {		// 6x6 * 6x1
 							__asm {
 								mov			esi, m2Ptr
@@ -9575,7 +9575,7 @@ idSIMD_SSE::MatX_TransposeMultiplyMatX
 	with N in the range [1-6].
 ============
 */
-void VPCALL idSIMD_SSE::MatX_TransposeMultiplyMatX( arcMatX &dst, const arcMatX &m1, const arcMatX &m2 ) {
+void VPCALL idSIMD_SSE::MatX_TransposeMultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 ) {
 	int i, j, k, l, n;
 	float *dstPtr;
 	const float *m1Ptr, *m2Ptr;
@@ -9589,7 +9589,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyMatX( arcMatX &dst, const arcMatX 
 	k = m1.GetNumColumns();
 	l = m2.GetNumColumns();
 
-	switch( m1.GetNumRows() ) {
+	switch ( m1.GetNumRows() ) {
 		case 1:
 			if ( !((k^6)|(l^1 ) ) ) {			// 1x6 * 1x1
 				__asm {
@@ -9886,7 +9886,7 @@ void VPCALL idSIMD_SSE::MatX_TransposeMultiplyMatX( arcMatX &dst, const arcMatX 
 			break;
 		case 6:
 			if ( !(l^6) ) {
-				switch( k ) {
+				switch ( k ) {
 					case 1: {					// 6x1 * 6x6
 						#define MUL_6xN_6x6_FIRST4COLUMNS_INIT					\
 						__asm mov		esi, m2Ptr								\
@@ -10112,7 +10112,7 @@ idSIMD_SSE::MatX_LowerTriangularSolve
   x == b is allowed
 ============
 */
-void VPCALL idSIMD_SSE::MatX_LowerTriangularSolve( const arcMatX &L, float *x, const float *b, const int n, int skip ) {
+void VPCALL idSIMD_SSE::MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip ) {
 	int nc;
 	const float *lptr;
 
@@ -10125,8 +10125,8 @@ void VPCALL idSIMD_SSE::MatX_LowerTriangularSolve( const arcMatX &L, float *x, c
 
 	// unrolled cases for n < 8
 	if ( n < 8 ) {
-		#define NSKIP( n, s )	((n<<3)|(s&7) )
-		switch( NSKIP( n, skip ) ) {
+		#define NSKIP( n, s )	((n<<3)|( s&7) )
+		switch ( NSKIP( n, skip ) ) {
 			case NSKIP( 1, 0 ): x[0] = b[0];
 				return;
 			case NSKIP( 2, 0 ): x[0] = b[0];
@@ -10167,7 +10167,7 @@ void VPCALL idSIMD_SSE::MatX_LowerTriangularSolve( const arcMatX &L, float *x, c
 	}
 
 	// process first 4 rows
-	switch( skip ) {
+	switch ( skip ) {
 		case 0: x[0] = b[0];
 		case 1: x[1] = b[1] - lptr[1*nc+0] * x[0];
 		case 2: x[2] = b[2] - lptr[2*nc+0] * x[0] - lptr[2*nc+1] * x[1];
@@ -10344,7 +10344,7 @@ idSIMD_SSE::MatX_LowerTriangularSolveTranspose
   x == b is allowed
 ============
 */
-void VPCALL idSIMD_SSE::MatX_LowerTriangularSolveTranspose( const arcMatX &L, float *x, const float *b, const int n ) {
+void VPCALL idSIMD_SSE::MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n ) {
 	int nc;
 	const float *lptr;
 
@@ -10353,7 +10353,7 @@ void VPCALL idSIMD_SSE::MatX_LowerTriangularSolveTranspose( const arcMatX &L, fl
 
 	// unrolled cases for n < 8
 	if ( n < 8 ) {
-		switch( n ) {
+		switch ( n ) {
 			case 0:
 				return;
 			case 1:
@@ -10789,7 +10789,7 @@ idSIMD_SSE::MatX_LDLTFactor
   currently assumes the number of columns of mat is a multiple of 4
 ============
 */
-bool VPCALL idSIMD_SSE::MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, const int n ) {
+bool VPCALL idSIMD_SSE::MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, const int n ) {
 #if 1
 
 	int j, nc;
@@ -11183,7 +11183,7 @@ bool VPCALL idSIMD_SSE::MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, const i
 			v[k+2] = diag[k+2] * mptr[k+2]; s2 += v[k+2] * mptr[k+2];
 			v[k+3] = diag[k+3] * mptr[k+3]; s3 += v[k+3] * mptr[k+3];
 		}
-		switch( i - k ) {
+		switch ( i - k ) {
 			case 3: v[k+2] = diag[k+2] * mptr[k+2]; s0 += v[k+2] * mptr[k+2];
 			case 2: v[k+1] = diag[k+1] * mptr[k+1]; s1 += v[k+1] * mptr[k+1];
 			case 1: v[k+0] = diag[k+0] * mptr[k+0]; s2 += v[k+0] * mptr[k+0];
@@ -11222,7 +11222,7 @@ bool VPCALL idSIMD_SSE::MatX_LDLTFactor( arcMatX &mat, arcVecX &invDiag, const i
 				s2 += mptr[k+6] * v[k+6];
 				s3 += mptr[k+7] * v[k+7];
 			}
-			switch( i - k ) {
+			switch ( i - k ) {
 				case 7: s0 += mptr[k+6] * v[k+6];
 				case 6: s1 += mptr[k+5] * v[k+5];
 				case 5: s2 += mptr[k+4] * v[k+4];
@@ -11252,7 +11252,7 @@ idSIMD_SSE::BlendJoints
 */
 #define REFINE_BLENDJOINTS_RECIPROCAL
 
-void VPCALL idSIMD_SSE::BlendJoints( idJointQuat *joints, const idJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) {
+void VPCALL idSIMD_SSE::BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) {
 	int i;
 
 	if ( lerp <= 0.0f ) {
@@ -11540,10 +11540,10 @@ void VPCALL idSIMD_SSE::BlendJoints( idJointQuat *joints, const idJointQuat *ble
 		scale0[2] = ( scale0[2] <= 0.0f ) ? SIMD_SP_tiny[2] : scale0[2];
 		scale0[3] = ( scale0[3] <= 0.0f ) ? SIMD_SP_tiny[3] : scale0[3];
 
-		sinom[0] = arcMath::RSqrt( scale0[0] );
-		sinom[1] = arcMath::RSqrt( scale0[1] );
-		sinom[2] = arcMath::RSqrt( scale0[2] );
-		sinom[3] = arcMath::RSqrt( scale0[3] );
+		sinom[0] = anMath::RSqrt( scale0[0] );
+		sinom[1] = anMath::RSqrt( scale0[1] );
+		sinom[2] = anMath::RSqrt( scale0[2] );
+		sinom[3] = anMath::RSqrt( scale0[3] );
 
 		scale0[0] *= sinom[0];
 		scale0[1] *= sinom[1];
@@ -11619,15 +11619,15 @@ void VPCALL idSIMD_SSE::BlendJoints( idJointQuat *joints, const idJointQuat *ble
 	for (; i < numJoints; i++ ) {
 		int n = index[i];
 
-		arcVec3 &jointVert = joints[n].t;
-		const arcVec3 &blendVert = blendJoints[n].t;
+		anVec3 &jointVert = joints[n].t;
+		const anVec3 &blendVert = blendJoints[n].t;
 
 		jointVert[0] += lerp * ( blendVert[0] - jointVert[0] );
 		jointVert[1] += lerp * ( blendVert[1] - jointVert[1] );
 		jointVert[2] += lerp * ( blendVert[2] - jointVert[2] );
 
-		arcQuats &jointQuat = joints[n].q;
-		const arcQuats &blendQuat = blendJoints[n].q;
+		anQuats &jointQuat = joints[n].q;
+		const anQuats &blendQuat = blendJoints[n].q;
 
 		float cosom;
 		float sinom;
@@ -11644,10 +11644,10 @@ void VPCALL idSIMD_SSE::BlendJoints( idJointQuat *joints, const idJointQuat *ble
 
 		scale0 = 1.0f - cosom * cosom;
 		scale0 = ( scale0 <= 0.0f ) ? SIMD_SP_tiny[0] : scale0;
-		sinom = arcMath::InvSqrt( scale0 );
-		omega = arcMath::ATan16( scale0 * sinom, cosom );
-		scale0 = arcMath::Sin16( ( 1.0f - lerp ) * omega ) * sinom;
-		scale1 = arcMath::Sin16( lerp * omega ) * sinom;
+		sinom = anMath::InvSqrt( scale0 );
+		omega = anMath::ATan16( scale0 * sinom, cosom );
+		scale0 = anMath::Sin16( ( 1.0f - lerp ) * omega ) * sinom;
+		scale1 = anMath::Sin16( lerp * omega ) * sinom;
 
 		(*(unsigned long *)&scale1) ^= signBit;
 
@@ -11663,11 +11663,11 @@ void VPCALL idSIMD_SSE::BlendJoints( idJointQuat *joints, const idJointQuat *ble
 idSIMD_SSE::ConvertJointQuatsToJointMats
 ============
 */
-void VPCALL idSIMD_SSE::ConvertJointQuatsToJointMats( arcJointMat *jointMats, const idJointQuat *jointQuats, const int numJoints ) {
+void VPCALL idSIMD_SSE::ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) {
 
-	assert( sizeof( idJointQuat ) == JOINTQUAT_SIZE );
+	assert( sizeof( anJointQuat ) == JOINTQUAT_SIZE );
 	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
-	assert( ( int )(&((idJointQuat *)0 )->t) == ( int )(&((idJointQuat *)0 )->q) + ( int )sizeof( ((idJointQuat *)0 )->q ) );
+	assert( ( int )(&((anJointQuat *)0 )->t) == ( int )(&((anJointQuat *)0 )->q) + ( int )sizeof( ((anJointQuat *)0 )->q ) );
 
 	for ( int i = 0; i < numJoints; i++ ) {
 
@@ -11723,11 +11723,11 @@ void VPCALL idSIMD_SSE::ConvertJointQuatsToJointMats( arcJointMat *jointMats, co
 idSIMD_SSE::ConvertJointMatsToJointQuats
 ============
 */
-void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( idJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) {
+void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) {
 
-	assert( sizeof( idJointQuat ) == JOINTQUAT_SIZE );
+	assert( sizeof( anJointQuat ) == JOINTQUAT_SIZE );
 	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
-	assert( ( int )(&((idJointQuat *)0 )->t) == ( int )(&((idJointQuat *)0 )->q) + ( int )sizeof( ((idJointQuat *)0 )->q ) );
+	assert( ( int )(&((anJointQuat *)0 )->t) == ( int )(&((anJointQuat *)0 )->q) + ( int )sizeof( ((anJointQuat *)0 )->q ) );
 
 #if 1
 
@@ -12166,7 +12166,7 @@ void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( idJointQuat *jointQuats, c
 		}
 
 		float t = s0 * m[0 * 4 + 0] + s1 * m[1 * 4 + 1] + s2 * m[2 * 4 + 2] + 1.0f;
-		float s = arcMath::InvSqrt( t ) * 0.5f;
+		float s = anMath::InvSqrt( t ) * 0.5f;
 
 		q[k0] = s * t;
 		q[k1] = ( m[0 * 4 + 1] - s2 * m[1 * 4 + 0] ) * s;
@@ -12188,7 +12188,7 @@ void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( idJointQuat *jointQuats, c
 		if ( m[0 * 4 + 0] + m[1 * 4 + 1] + m[2 * 4 + 2] > 0.0f ) {
 
 			float t = + m[0 * 4 + 0] + m[1 * 4 + 1] + m[2 * 4 + 2] + 1.0f;
-			float s = arcMath::InvSqrt( t ) * 0.5f;
+			float s = anMath::InvSqrt( t ) * 0.5f;
 
 			q[3] = s * t;
 			q[2] = ( m[0 * 4 + 1] - m[1 * 4 + 0] ) * s;
@@ -12198,7 +12198,7 @@ void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( idJointQuat *jointQuats, c
 		} else if ( m[0 * 4 + 0] > m[1 * 4 + 1] && m[0 * 4 + 0] > m[2 * 4 + 2] ) {
 
 			float t = + m[0 * 4 + 0] - m[1 * 4 + 1] - m[2 * 4 + 2] + 1.0f;
-			float s = arcMath::InvSqrt( t ) * 0.5f;
+			float s = anMath::InvSqrt( t ) * 0.5f;
 
 			q[0] = s * t;
 			q[1] = ( m[0 * 4 + 1] + m[1 * 4 + 0] ) * s;
@@ -12208,7 +12208,7 @@ void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( idJointQuat *jointQuats, c
 		} else if ( m[1 * 4 + 1] > m[2 * 4 + 2] ) {
 
 			float t = - m[0 * 4 + 0] + m[1 * 4 + 1] - m[2 * 4 + 2] + 1.0f;
-			float s = arcMath::InvSqrt( t ) * 0.5f;
+			float s = anMath::InvSqrt( t ) * 0.5f;
 
 			q[1] = s * t;
 			q[0] = ( m[0 * 4 + 1] + m[1 * 4 + 0] ) * s;
@@ -12218,7 +12218,7 @@ void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( idJointQuat *jointQuats, c
 		} else {
 
 			float t = - m[0 * 4 + 0] - m[1 * 4 + 1] + m[2 * 4 + 2] + 1.0f;
-			float s = arcMath::InvSqrt( t ) * 0.5f;
+			float s = anMath::InvSqrt( t ) * 0.5f;
 
 			q[2] = s * t;
 			q[3] = ( m[0 * 4 + 1] - m[1 * 4 + 0] ) * s;
@@ -12450,12 +12450,12 @@ void VPCALL idSIMD_SSE::UntransformJoints( arcJointMat *jointMats, const int *pa
 idSIMD_SSE::TransformVerts
 ============
 */
-void VPCALL idSIMD_SSE::TransformVerts( arcDrawVert *verts, const int numVerts, const arcJointMat *joints, const arcVec4 *weights, const int *index, const int numWeights ) {
+void VPCALL idSIMD_SSE::TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights ) {
 #if 1
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
-	assert( sizeof( arcVec4 ) == JOINTWEIGHT_SIZE );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anVec4 ) == JOINTWEIGHT_SIZE );
 	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
 
 	__asm
@@ -12537,10 +12537,10 @@ void VPCALL idSIMD_SSE::TransformVerts( arcDrawVert *verts, const int numVerts, 
 #else
 
 	int i, j;
-	const byte *jointsPtr = ( byte * )joints;
+	const byte *jointsPtr = (byte *)joints;
 
 	for ( j = i = 0; i < numVerts; i++ ) {
-		arcVec3 v;
+		anVec3 v;
 
 		v = ( *(arcJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
 		while( index[j*2+1] == 0 ) {
@@ -12560,11 +12560,11 @@ void VPCALL idSIMD_SSE::TransformVerts( arcDrawVert *verts, const int numVerts, 
 idSIMD_SSE::TracePointCull
 ============
 */
-void VPCALL idSIMD_SSE::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) {
+void VPCALL idSIMD_SSE::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 #if 1
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	__asm {
 		push		ebx
@@ -12640,7 +12640,7 @@ void VPCALL idSIMD_SSE::TracePointCull( byte *cullBits, byte &totalOr, const flo
 	for ( i = 0; i < numVerts; i++ ) {
 		byte bits;
 		float d0, d1, d2, d3, t;
-		const arcVec3 &v = verts[i].xyz;
+		const anVec3 &v = verts[i].xyz;
 
 		d0 = planes[0][0] * v[0] + planes[0][1] * v[1] + planes[0][2] * v[2] + planes[0][3];
 		d1 = planes[1][0] * v[0] + planes[1][1] * v[1] + planes[1][2] * v[2] + planes[1][3];
@@ -12681,7 +12681,7 @@ void VPCALL idSIMD_SSE::TracePointCull( byte *cullBits, byte &totalOr, const flo
 idSIMD_SSE::DecalPointCull
 ============
 */
-void VPCALL idSIMD_SSE::DecalPointCull( byte *cullBits, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) {
+void VPCALL idSIMD_SSE::DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 #if 1
 
 	ALIGN16( float p0[4] );
@@ -12693,8 +12693,8 @@ void VPCALL idSIMD_SSE::DecalPointCull( byte *cullBits, const arcPlane *planes, 
 	ALIGN16( float p6[4] );
 	ALIGN16( float p7[4] );
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	__asm {
 		mov			ecx, planes
@@ -12860,8 +12860,8 @@ void VPCALL idSIMD_SSE::DecalPointCull( byte *cullBits, const arcPlane *planes, 
 	for ( i = 0; i < numVerts; i += 2 ) {
 		unsigned short bits0, bits1;
 		float d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11;
-		const arcVec3 &v0 = verts[i+0].xyz;
-		const arcVec3 &v1 = verts[i+1].xyz;
+		const anVec3 &v0 = verts[i+0].xyz;
+		const anVec3 &v1 = verts[i+1].xyz;
 
 		d0  = planes[0][0] * v0[0] + planes[0][1] * v0[1] + planes[0][2] * v0[2] + planes[0][3];
 		d1  = planes[1][0] * v0[0] + planes[1][1] * v0[1] + planes[1][2] * v0[2] + planes[1][3];
@@ -12898,7 +12898,7 @@ void VPCALL idSIMD_SSE::DecalPointCull( byte *cullBits, const arcPlane *planes, 
 	if ( numVerts & 1 ) {
 		byte bits;
 		float d0, d1, d2, d3, d4, d5;
-		const arcVec3 &v = verts[numVerts - 1].xyz;
+		const anVec3 &v = verts[numVerts - 1].xyz;
 
 		d0 = planes[0][0] * v[0] + planes[0][1] * v[1] + planes[0][2] * v[2] + planes[0][3];
 		d1 = planes[1][0] * v[0] + planes[1][1] * v[1] + planes[1][2] * v[2] + planes[1][3];
@@ -12927,11 +12927,11 @@ void VPCALL idSIMD_SSE::DecalPointCull( byte *cullBits, const arcPlane *planes, 
 idSIMD_SSE::OverlayPointCull
 ============
 */
-void VPCALL idSIMD_SSE::OverlayPointCull( byte *cullBits, arcVec2 *texCoords, const arcPlane *planes, const arcDrawVert *verts, const int numVerts ) {
+void VPCALL idSIMD_SSE::OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 #if 1
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	__asm {
 		mov			eax, numVerts
@@ -13023,15 +13023,15 @@ void VPCALL idSIMD_SSE::OverlayPointCull( byte *cullBits, arcVec2 *texCoords, co
 
 #else
 
-	const arcPlane &p0 = planes[0];
-	const arcPlane &p1 = planes[1];
+	const anPlane &p0 = planes[0];
+	const anPlane &p1 = planes[1];
 
 	for ( int i = 0; i < numVerts - 1; i += 2 ) {
 		unsigned short bits;
 		float d0, d1, d2, d3;
 
-		const arcVec3 &v0 = verts[i+0].xyz;
-		const arcVec3 &v1 = verts[i+1].xyz;
+		const anVec3 &v0 = verts[i+0].xyz;
+		const anVec3 &v1 = verts[i+1].xyz;
 
 		d0 = p0[0] * v0[0] + p0[1] * v0[1] + p0[2] * v0[2] + p0[3];
 		d1 = p1[0] * v0[0] + p1[1] * v0[1] + p1[2] * v0[2] + p1[3];
@@ -13065,9 +13065,9 @@ void VPCALL idSIMD_SSE::OverlayPointCull( byte *cullBits, arcVec2 *texCoords, co
 		byte bits;
 		float d0, d1;
 
-		const arcPlane &p0 = planes[0];
-		const arcPlane &p1 = planes[1];
-		const arcVec3 &v0 = verts[numVerts - 1].xyz;
+		const anPlane &p0 = planes[0];
+		const anPlane &p1 = planes[1];
+		const anVec3 &v0 = verts[numVerts - 1].xyz;
 
 		d0 = p0[0] * v0[0] + p0[1] * v0[1] + p0[2] * v0[2] + p0[3];
 		d1 = p1[0] * v0[0] + p1[1] * v0[1] + p1[2] * v0[2] + p1[3];
@@ -13095,11 +13095,11 @@ void VPCALL idSIMD_SSE::OverlayPointCull( byte *cullBits, arcVec2 *texCoords, co
 idSIMD_SSE::DeriveTriPlanes
 ============
 */
-void VPCALL idSIMD_SSE::DeriveTriPlanes( arcPlane *planes, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL idSIMD_SSE::DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 #if 1
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 
 	__asm {
 		mov			eax, numIndexes
@@ -13468,7 +13468,7 @@ void VPCALL idSIMD_SSE::DeriveTriPlanes( arcPlane *planes, const arcDrawVert *ve
 		ALIGN16( float n2[4] );
 
 		for ( j = 0; j < 4; j++ ) {
-			const arcDrawVert *a, *b, *c;
+			const anDrawVertex *a, *b, *c;
 
 			a = verts + indexes[i + j * 3 + 0];
 			b = verts + indexes[i + j * 3 + 1];
@@ -13530,10 +13530,10 @@ void VPCALL idSIMD_SSE::DeriveTriPlanes( arcPlane *planes, const arcDrawVert *ve
 		tmp[2] += n2[2] * n2[2];
 		tmp[3] += n2[3] * n2[3];
 
-		tmp[0] = arcMath::RSqrt( tmp[0] );
-		tmp[1] = arcMath::RSqrt( tmp[1] );
-		tmp[2] = arcMath::RSqrt( tmp[2] );
-		tmp[3] = arcMath::RSqrt( tmp[3] );
+		tmp[0] = anMath::RSqrt( tmp[0] );
+		tmp[1] = anMath::RSqrt( tmp[1] );
+		tmp[2] = anMath::RSqrt( tmp[2] );
+		tmp[3] = anMath::RSqrt( tmp[3] );
 
 		n0[0] *= tmp[0];
 		n0[1] *= tmp[1];
@@ -13552,7 +13552,7 @@ void VPCALL idSIMD_SSE::DeriveTriPlanes( arcPlane *planes, const arcDrawVert *ve
 
 
 		for ( j = 0; j < 4; j++ ) {
-			const arcDrawVert *a;
+			const anDrawVertex *a;
 
 			a = verts + indexes[i + j * 3];
 
@@ -13565,7 +13565,7 @@ void VPCALL idSIMD_SSE::DeriveTriPlanes( arcPlane *planes, const arcDrawVert *ve
 	}
 
 	for (; i < numIndexes; i += 3 ) {
-		const arcDrawVert *a, *b, *c;
+		const anDrawVertex *a, *b, *c;
 		float d0, d1, d2, d3, d4, d5;
 		float n0, n1, n2;
 
@@ -13587,7 +13587,7 @@ void VPCALL idSIMD_SSE::DeriveTriPlanes( arcPlane *planes, const arcDrawVert *ve
 		n1 = d5 * d0 - d3 * d2;
 		n2 = d3 * d1 - d4 * d0;
 
-		tmp = arcMath::RSqrt( n0 * n0 + n1 * n1 + n2 * n2 );
+		tmp = anMath::RSqrt( n0 * n0 + n1 * n1 + n2 * n2 );
 
 		n0 *= tmp;
 		n1 *= tmp;
@@ -13611,16 +13611,16 @@ idSIMD_SSE::DeriveTangents
 //#define REFINE_TANGENT_SQUAREROOT
 #define FIX_DEGENERATE_TANGENT
 
-void VPCALL idSIMD_SSE::DeriveTangents( arcPlane *planes, arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL idSIMD_SSE::DeriveTangents( anPlane *planes, anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 	int i;
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->normal == DRAWVERT_NORMAL_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->tangents[0] == DRAWVERT_TANGENT0_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->tangents[1] == DRAWVERT_TANGENT1_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->normal == DRAWVERT_NORMAL_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->tangents[0] == DRAWVERT_TANGENT0_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->tangents[1] == DRAWVERT_TANGENT1_OFFSET );
 
-	assert( planes != NULL );
-	assert( verts != NULL );
+	assert( planes != nullptr );
+	assert( verts != nullptr );
 	assert( numVerts >= 0 );
 
 #ifdef REFINE_TANGENT_SQUAREROOT
@@ -13634,7 +13634,7 @@ void VPCALL idSIMD_SSE::DeriveTangents( arcPlane *planes, arcDrawVert *verts, co
 	memset( used, 0, numVerts * sizeof( used[0] ) );
 
 	for ( i = 0; i <= numIndexes - 12; i += 12 ) {
-		arcDrawVert *a, *b, *c;
+		anDrawVertex *a, *b, *c;
 		ALIGN16( unsigned long signBit[4] );
 		ALIGN16( float d0[4] );
 		ALIGN16( float d1[4] );
@@ -13907,10 +13907,10 @@ void VPCALL idSIMD_SSE::DeriveTangents( arcPlane *planes, arcDrawVert *verts, co
 		tmp[2] += n2[2] * n2[2];
 		tmp[3] += n2[3] * n2[3];
 
-		tmp[0] = arcMath::RSqrt( tmp[0] );
-		tmp[1] = arcMath::RSqrt( tmp[1] );
-		tmp[2] = arcMath::RSqrt( tmp[2] );
-		tmp[3] = arcMath::RSqrt( tmp[3] );
+		tmp[0] = anMath::RSqrt( tmp[0] );
+		tmp[1] = anMath::RSqrt( tmp[1] );
+		tmp[2] = anMath::RSqrt( tmp[2] );
+		tmp[3] = anMath::RSqrt( tmp[3] );
 
 		n0[0] *= tmp[0];
 		n0[1] *= tmp[1];
@@ -13989,10 +13989,10 @@ void VPCALL idSIMD_SSE::DeriveTangents( arcPlane *planes, arcDrawVert *verts, co
 		tmp[2] += t2[2] * t2[2];
 		tmp[3] += t2[3] * t2[3];
 
-		tmp[0] = arcMath::RSqrt( tmp[0] );
-		tmp[1] = arcMath::RSqrt( tmp[1] );
-		tmp[2] = arcMath::RSqrt( tmp[2] );
-		tmp[3] = arcMath::RSqrt( tmp[3] );
+		tmp[0] = anMath::RSqrt( tmp[0] );
+		tmp[1] = anMath::RSqrt( tmp[1] );
+		tmp[2] = anMath::RSqrt( tmp[2] );
+		tmp[3] = anMath::RSqrt( tmp[3] );
 
 		*(unsigned long *)&tmp[0] ^= signBit[0];
 		*(unsigned long *)&tmp[1] ^= signBit[1];
@@ -14060,10 +14060,10 @@ void VPCALL idSIMD_SSE::DeriveTangents( arcPlane *planes, arcDrawVert *verts, co
 		tmp[2] += t5[2] * t5[2];
 		tmp[3] += t5[3] * t5[3];
 
-		tmp[0] = arcMath::RSqrt( tmp[0] );
-		tmp[1] = arcMath::RSqrt( tmp[1] );
-		tmp[2] = arcMath::RSqrt( tmp[2] );
-		tmp[3] = arcMath::RSqrt( tmp[3] );
+		tmp[0] = anMath::RSqrt( tmp[0] );
+		tmp[1] = anMath::RSqrt( tmp[1] );
+		tmp[2] = anMath::RSqrt( tmp[2] );
+		tmp[3] = anMath::RSqrt( tmp[3] );
 
 		*(unsigned long *)&tmp[0] ^= signBit[0];
 		*(unsigned long *)&tmp[1] ^= signBit[1];
@@ -14190,7 +14190,7 @@ void VPCALL idSIMD_SSE::DeriveTangents( arcPlane *planes, arcDrawVert *verts, co
 	}
 
 	for (; i < numIndexes; i += 3 ) {
-		arcDrawVert *a, *b, *c;
+		anDrawVertex *a, *b, *c;
 		ALIGN16( unsigned long signBit[4] );
 		float d0, d1, d2, d3, d4;
 		float d5, d6, d7, d8, d9;
@@ -14409,7 +14409,7 @@ void VPCALL idSIMD_SSE::DeriveTangents( arcPlane *planes, arcDrawVert *verts, co
 		n1 = d7 * d0 - d5 * d2;
 		n2 = d5 * d1 - d6 * d0;
 
-		tmp = arcMath::RSqrt( n0 * n0 + n1 * n1 + n2 * n2 );
+		tmp = anMath::RSqrt( n0 * n0 + n1 * n1 + n2 * n2 );
 
 		n0 *= tmp;
 		n1 *= tmp;
@@ -14424,7 +14424,7 @@ void VPCALL idSIMD_SSE::DeriveTangents( arcPlane *planes, arcDrawVert *verts, co
 		t1 = d1 * d9 - d4 * d6;
 		t2 = d2 * d9 - d4 * d7;
 
-		tmp = arcMath::RSqrt( t0 * t0 + t1 * t1 + t2 * t2 );
+		tmp = anMath::RSqrt( t0 * t0 + t1 * t1 + t2 * t2 );
 		*(unsigned long *)&tmp ^= signBit[0];
 
 		t0 *= tmp;
@@ -14436,7 +14436,7 @@ void VPCALL idSIMD_SSE::DeriveTangents( arcPlane *planes, arcDrawVert *verts, co
 		t4 = d3 * d6 - d1 * d8;
 		t5 = d3 * d7 - d2 * d8;
 
-		tmp = arcMath::RSqrt( t3 * t3 + t4 * t4 + t5 * t5 );
+		tmp = anMath::RSqrt( t3 * t3 + t4 * t4 + t5 * t5 );
 		*(unsigned long *)&tmp ^= signBit[0];
 
 		t3 *= tmp;
@@ -14544,7 +14544,7 @@ idSIMD_SSE::DeriveUnsmoothedTangents
 */
 #define DERIVE_UNSMOOTHED_BITANGENT
 
-void VPCALL idSIMD_SSE::DeriveUnsmoothedTangents( arcDrawVert *verts, const dominantTri_s *dominantTris, const int numVerts ) {
+void VPCALL idSIMD_SSE::DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) {
 	int i, j;
 
 	for ( i = 0; i <= numVerts - 4; i += 4 ) {
@@ -14572,7 +14572,7 @@ void VPCALL idSIMD_SSE::DeriveUnsmoothedTangents( arcDrawVert *verts, const domi
 		ALIGN16( float t5[4] );
 
 		for ( j = 0; j < 4; j++ ) {
-			const arcDrawVert *a, *b, *c;
+			const anDrawVertex *a, *b, *c;
 
 			const dominantTri_s &dt = dominantTris[i+j];
 
@@ -14870,7 +14870,7 @@ void VPCALL idSIMD_SSE::DeriveUnsmoothedTangents( arcDrawVert *verts, const domi
 #endif
 
 		for ( j = 0; j < 4; j++ ) {
-			arcDrawVert *a;
+			anDrawVertex *a;
 
 			a = verts + i + j;
 
@@ -14889,7 +14889,7 @@ void VPCALL idSIMD_SSE::DeriveUnsmoothedTangents( arcDrawVert *verts, const domi
 	}
 
 	for (; i < numVerts; i++ ) {
-		arcDrawVert *a, *b, *c;
+		anDrawVertex *a, *b, *c;
 		float d0, d1, d2, d3, d4;
 		float d5, d6, d7, d8, d9;
 		float s0, s1, s2;
@@ -15062,15 +15062,15 @@ void VPCALL idSIMD_SSE::DeriveUnsmoothedTangents( arcDrawVert *verts, const domi
 idSIMD_SSE::NormalizeTangents
 ============
 */
-void VPCALL idSIMD_SSE::NormalizeTangents( arcDrawVert *verts, const int numVerts ) {
+void VPCALL idSIMD_SSE::NormalizeTangents( anDrawVertex *verts, const int numVerts ) {
 	ALIGN16( float normal[12] );
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->normal == DRAWVERT_NORMAL_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->tangents[0] == DRAWVERT_TANGENT0_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->tangents[1] == DRAWVERT_TANGENT1_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->normal == DRAWVERT_NORMAL_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->tangents[0] == DRAWVERT_TANGENT0_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->tangents[1] == DRAWVERT_TANGENT1_OFFSET );
 
-	assert( verts != NULL );
+	assert( verts != nullptr );
 	assert( numVerts >= 0 );
 
 	__asm {
@@ -15095,7 +15095,7 @@ void VPCALL idSIMD_SSE::NormalizeTangents( arcDrawVert *verts, const int numVert
 
 		sub			eax, DRAWVERT_SIZE*4
 
-		// normalize 4 arcDrawVert::normal
+		// normalize 4 anDrawVertex::normal
 
 		movss		xmm0, [esi+eax+DRAWVERT_SIZE*0+DRAWVERT_NORMAL_OFFSET+0]	//  0,  X,  X,  X
 		movhps		xmm0, [esi+eax+DRAWVERT_SIZE*1+DRAWVERT_NORMAL_OFFSET+0]	//  0,  X,  3,  4
@@ -15139,7 +15139,7 @@ void VPCALL idSIMD_SSE::NormalizeTangents( arcDrawVert *verts, const int numVert
 		mulps		xmm1, xmm3
 		mulps		xmm2, xmm3
 
-		// save the 4 arcDrawVert::normal to project the tangents
+		// save the 4 anDrawVertex::normal to project the tangents
 
 		movaps		[normal+ 0], xmm0
 		movaps		[normal+16], xmm1
@@ -15173,7 +15173,7 @@ void VPCALL idSIMD_SSE::NormalizeTangents( arcDrawVert *verts, const int numVert
 		movss		[esi+eax+DRAWVERT_SIZE*3+DRAWVERT_NORMAL_OFFSET+4], xmm1
 		movss		[esi+eax+DRAWVERT_SIZE*3+DRAWVERT_NORMAL_OFFSET+8], xmm2
 
-		// project and normalize 4 arcDrawVert::tangent[0]
+		// project and normalize 4 anDrawVertex::tangent[0]
 
 		movss		xmm0, [esi+eax+DRAWVERT_SIZE*0+DRAWVERT_TANGENT0_OFFSET+0]	//  0,  X,  X,  X
 		movhps		xmm0, [esi+eax+DRAWVERT_SIZE*1+DRAWVERT_TANGENT0_OFFSET+0]	//  0,  X,  3,  4
@@ -15264,7 +15264,7 @@ void VPCALL idSIMD_SSE::NormalizeTangents( arcDrawVert *verts, const int numVert
 		movss		[esi+eax+DRAWVERT_SIZE*3+DRAWVERT_TANGENT0_OFFSET+4], xmm1
 		movss		[esi+eax+DRAWVERT_SIZE*3+DRAWVERT_TANGENT0_OFFSET+8], xmm2
 
-		// project and normalize 4 arcDrawVert::tangent[1]
+		// project and normalize 4 anDrawVertex::tangent[1]
 
 		movss		xmm0, [esi+eax+DRAWVERT_SIZE*0+DRAWVERT_TANGENT1_OFFSET+0]	//  0,  X,  X,  X
 		movhps		xmm0, [esi+eax+DRAWVERT_SIZE*1+DRAWVERT_TANGENT1_OFFSET+0]	//  0,  X,  3,  4
@@ -15364,7 +15364,7 @@ void VPCALL idSIMD_SSE::NormalizeTangents( arcDrawVert *verts, const int numVert
 
 	loopVert1:
 
-		// normalize one arcDrawVert::normal
+		// normalize one anDrawVertex::normal
 
 		movss		xmm0, [esi+eax+DRAWVERT_NORMAL_OFFSET+0]
 		movss		xmm1, [esi+eax+DRAWVERT_NORMAL_OFFSET+4]
@@ -15398,7 +15398,7 @@ void VPCALL idSIMD_SSE::NormalizeTangents( arcDrawVert *verts, const int numVert
 		movss		[esi+eax+DRAWVERT_NORMAL_OFFSET+4], xmm1
 		movss		[esi+eax+DRAWVERT_NORMAL_OFFSET+8], xmm2
 
-		// project and normalize one arcDrawVert::tangent[0]
+		// project and normalize one anDrawVertex::tangent[0]
 
 		movss		xmm0, [esi+eax+DRAWVERT_TANGENT0_OFFSET+0]
 		movss		xmm1, [esi+eax+DRAWVERT_TANGENT0_OFFSET+4]
@@ -15451,7 +15451,7 @@ void VPCALL idSIMD_SSE::NormalizeTangents( arcDrawVert *verts, const int numVert
 		movss		[esi+eax+DRAWVERT_TANGENT0_OFFSET+4], xmm1
 		movss		[esi+eax+DRAWVERT_TANGENT0_OFFSET+8], xmm2
 
-		// project and normalize one arcDrawVert::tangent[1]
+		// project and normalize one anDrawVertex::tangent[1]
 
 		movss		xmm0, [esi+eax+DRAWVERT_TANGENT1_OFFSET+0]
 		movss		xmm1, [esi+eax+DRAWVERT_TANGENT1_OFFSET+4]
@@ -15516,13 +15516,13 @@ void VPCALL idSIMD_SSE::NormalizeTangents( arcDrawVert *verts, const int numVert
 idSIMD_SSE::CreateTextureSpaceLightVectors
 ============
 */
-void VPCALL idSIMD_SSE::CreateTextureSpaceLightVectors( arcVec3 *lightVectors, const arcVec3 &lightOrigin, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL idSIMD_SSE::CreateTextureSpaceLightVectors( anVec3 *lightVectors, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->normal == DRAWVERT_NORMAL_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->tangents[0] == DRAWVERT_TANGENT0_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->tangents[1] == DRAWVERT_TANGENT1_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->normal == DRAWVERT_NORMAL_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->tangents[0] == DRAWVERT_TANGENT0_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->tangents[1] == DRAWVERT_TANGENT1_OFFSET );
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
 	memset( used, 0, numVerts * sizeof( used[0] ) );
@@ -15610,8 +15610,8 @@ void VPCALL idSIMD_SSE::CreateTextureSpaceLightVectors( arcVec3 *lightVectors, c
 			continue;
 		}
 
-		const arcDrawVert *v = &verts[i];
-		arcVec3 lightDir;
+		const anDrawVertex *v = &verts[i];
+		anVec3 lightDir;
 
 		lightDir[0] = lightOrigin[0] - v->xyz[0];
 		lightDir[1] = lightOrigin[1] - v->xyz[1];
@@ -15637,7 +15637,7 @@ void VPCALL idSIMD_SSE::CreateTextureSpaceLightVectors( arcVec3 *lightVectors, c
 	ALIGN16( float tangent3[4] );
 	ALIGN16( float tangent4[4] );
 	ALIGN16( float tangent5[4] );
-	arcVec3 localLightOrigin = lightOrigin;
+	anVec3 localLightOrigin = lightOrigin;
 
 	__asm {
 
@@ -15844,7 +15844,7 @@ void VPCALL idSIMD_SSE::CreateTextureSpaceLightVectors( arcVec3 *lightVectors, c
 			continue;
 		}
 
-		const arcDrawVert *v = &verts[i];
+		const anDrawVertex *v = &verts[i];
 
 		lightDir0[numUsedVerts] = lightOrigin[0] - v->xyz[0];
 		lightDir1[numUsedVerts] = lightOrigin[1] - v->xyz[1];
@@ -15944,13 +15944,13 @@ void VPCALL idSIMD_SSE::CreateTextureSpaceLightVectors( arcVec3 *lightVectors, c
 idSIMD_SSE::CreateSpecularTextureCoords
 ============
 */
-void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( arcVec4 *texCoords, const arcVec3 &lightOrigin, const arcVec3 &viewOrigin, const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( anVec4 *texCoords, const anVec3 &lightOrigin, const anVec3 &viewOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
-	assert( sizeof( arcDrawVert ) == DRAWVERT_SIZE );
-	assert( ( int )&((arcDrawVert *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->normal == DRAWVERT_NORMAL_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->tangents[0] == DRAWVERT_TANGENT0_OFFSET );
-	assert( ( int )&((arcDrawVert *)0 )->tangents[1] == DRAWVERT_TANGENT1_OFFSET );
+	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
+	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->normal == DRAWVERT_NORMAL_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->tangents[0] == DRAWVERT_TANGENT0_OFFSET );
+	assert( ( int )&((anDrawVertex *)0 )->tangents[1] == DRAWVERT_TANGENT1_OFFSET );
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
 	memset( used, 0, numVerts * sizeof( used[0] ) );
@@ -16067,19 +16067,19 @@ void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( arcVec4 *texCoords, const a
 			continue;
 		}
 
-		const arcDrawVert *v = &verts[i];
+		const anDrawVertex *v = &verts[i];
 
-		arcVec3 lightDir = lightOrigin - v->xyz;
-		arcVec3 viewDir = viewOrigin - v->xyz;
+		anVec3 lightDir = lightOrigin - v->xyz;
+		anVec3 viewDir = viewOrigin - v->xyz;
 
 		float ilength;
 
-		ilength = arcMath::RSqrt( lightDir[0] * lightDir[0] + lightDir[1] * lightDir[1] + lightDir[2] * lightDir[2] );
+		ilength = anMath::RSqrt( lightDir[0] * lightDir[0] + lightDir[1] * lightDir[1] + lightDir[2] * lightDir[2] );
 		lightDir[0] *= ilength;
 		lightDir[1] *= ilength;
 		lightDir[2] *= ilength;
 
-		ilength = arcMath::RSqrt( viewDir[0] * viewDir[0] + viewDir[1] * viewDir[1] + viewDir[2] * viewDir[2] );
+		ilength = anMath::RSqrt( viewDir[0] * viewDir[0] + viewDir[1] * viewDir[1] + viewDir[2] * viewDir[2] );
 		viewDir[0] *= ilength;
 		viewDir[1] *= ilength;
 		viewDir[2] *= ilength;
@@ -16111,8 +16111,8 @@ void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( arcVec4 *texCoords, const a
 	ALIGN16( float tangent3[4] );
 	ALIGN16( float tangent4[4] );
 	ALIGN16( float tangent5[4] );
-	arcVec3 localLightOrigin = lightOrigin;
-	arcVec3 localViewOrigin = viewOrigin;
+	anVec3 localLightOrigin = lightOrigin;
+	anVec3 localViewOrigin = viewOrigin;
 
 	__asm {
 
@@ -16408,8 +16408,8 @@ void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( arcVec4 *texCoords, const a
 	ALIGN16( float texCoords0[4] );
 	ALIGN16( float texCoords1[4] );
 	ALIGN16( float texCoords2[4] );
-	arcVec3 localLightOrigin = lightOrigin;
-	arcVec3 localViewOrigin = viewOrigin;
+	anVec3 localLightOrigin = lightOrigin;
+	anVec3 localViewOrigin = viewOrigin;
 	int numUsedVerts = 0;
 
 	for ( int i = 0; i < numVerts; i++ ) {
@@ -16417,7 +16417,7 @@ void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( arcVec4 *texCoords, const a
 			continue;
 		}
 
-		const arcDrawVert *v = &verts[i];
+		const anDrawVertex *v = &verts[i];
 
 		lightDir0[numUsedVerts] = localLightOrigin[0] - v->xyz[0];
 		lightDir1[numUsedVerts] = localLightOrigin[1] - v->xyz[1];
@@ -16461,10 +16461,10 @@ void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( arcVec4 *texCoords, const a
 		temp[2] += lightDir2[2] * lightDir2[2];
 		temp[3] += lightDir2[3] * lightDir2[3];
 
-		temp[0] = arcMath::RSqrt( temp[0] );
-		temp[1] = arcMath::RSqrt( temp[1] );
-		temp[2] = arcMath::RSqrt( temp[2] );
-		temp[3] = arcMath::RSqrt( temp[3] );
+		temp[0] = anMath::RSqrt( temp[0] );
+		temp[1] = anMath::RSqrt( temp[1] );
+		temp[2] = anMath::RSqrt( temp[2] );
+		temp[3] = anMath::RSqrt( temp[3] );
 
 		lightDir0[0] *= temp[0];
 		lightDir0[1] *= temp[1];
@@ -16496,10 +16496,10 @@ void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( arcVec4 *texCoords, const a
 		temp[2] += viewDir2[2] * viewDir2[2];
 		temp[3] += viewDir2[3] * viewDir2[3];
 
-		temp[0] = arcMath::RSqrt( temp[0] );
-		temp[1] = arcMath::RSqrt( temp[1] );
-		temp[2] = arcMath::RSqrt( temp[2] );
-		temp[3] = arcMath::RSqrt( temp[3] );
+		temp[0] = anMath::RSqrt( temp[0] );
+		temp[1] = anMath::RSqrt( temp[1] );
+		temp[2] = anMath::RSqrt( temp[2] );
+		temp[3] = anMath::RSqrt( temp[3] );
 
 		viewDir0[0] *= temp[0];
 		viewDir0[1] *= temp[1];
@@ -16592,14 +16592,14 @@ void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( arcVec4 *texCoords, const a
 		float temp;
 
 		temp = lightDir0[i] * lightDir0[i] + lightDir1[i] * lightDir1[i] + lightDir2[i] * lightDir2[i];
-		temp = arcMath::RSqrt( temp );
+		temp = anMath::RSqrt( temp );
 
 		lightDir0[i] *= temp;
 		lightDir1[i] *= temp;
 		lightDir2[i] *= temp;
 
 		temp = viewDir0[i] * viewDir0[i] + viewDir1[i] * viewDir1[i] + viewDir2[i] * viewDir2[i];
-		temp = arcMath::RSqrt( temp );
+		temp = anMath::RSqrt( temp );
 
 		viewDir0[i] *= temp;
 		viewDir1[i] *= temp;
@@ -16628,7 +16628,7 @@ void VPCALL idSIMD_SSE::CreateSpecularTextureCoords( arcVec4 *texCoords, const a
 idSIMD_SSE::CreateShadowCache
 ============
 */
-int VPCALL idSIMD_SSE::CreateShadowCache( arcVec4 *vertexCache, int *vertRemap, const arcVec3 &lightOrigin, const arcDrawVert *verts, const int numVerts ) {
+int VPCALL idSIMD_SSE::CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) {
 #if 1
 	int outVerts;
 
@@ -16792,7 +16792,7 @@ int VPCALL idSIMD_SSE::CreateShadowCache( arcVec4 *vertexCache, int *vertRemap, 
 idSIMD_SSE::CreateVertexProgramShadowCache
 ============
 */
-int VPCALL idSIMD_SSE::CreateVertexProgramShadowCache( arcVec4 *vertexCache, const arcDrawVert *verts, const int numVerts ) {
+int VPCALL idSIMD_SSE::CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) {
 #if 1
 
 	__asm {
@@ -18048,7 +18048,7 @@ void VPCALL idSIMD_SSE::MixedSoundToSamples( short *samples, const float *mixBuf
 		} else if ( mixBuffer[i] >= 32767.0f ) {
 			samples[i] = 32767;
 		} else {
-			samples[i] = (short) mixBuffer[i];
+			samples[i] = ( short) mixBuffer[i];
 		}
 	}
 

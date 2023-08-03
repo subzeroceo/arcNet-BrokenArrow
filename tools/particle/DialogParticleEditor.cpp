@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../game/game.h"
@@ -101,31 +101,31 @@ const int EditEnableID[] = {
 
 const int EditIDCount = sizeof ( EditEnableID ) / sizeof ( const int );
 
-CDialogParticleEditor *g_ParticleDialog = NULL;
+CDialogParticleEditor *g_ParticleDialog = nullptr;
 
 /*
 ================
 ParticleEditorInit
 ================
 */
-void ParticleEditorInit( const arcDictionary *spawnArgs ) {
+void ParticleEditorInit( const anDict *spawnArgs ) {
 	if ( renderSystem->IsFullScreen() ) {
 		common->Printf( "Cannot run the particle editor in fullscreen mode.\n"
 			"Set r_fullscreen to 0 and vid_restart.\n" );
 		return;
 	}
 
-	if ( g_ParticleDialog == NULL ) {
+	if ( g_ParticleDialog == nullptr ) {
 		InitAfx();
 		g_ParticleDialog = new CDialogParticleEditor();
 	}
 
-	if ( g_ParticleDialog->GetSafeHwnd() == NULL) {
+	if ( g_ParticleDialog->GetSafeHwnd() == nullptr ) {
 		g_ParticleDialog->Create( IDD_DIALOG_PARTICLE_EDITOR );
 		/*
 		// FIXME: restore position
 		CRect rct;
-		g_AFDialog->SetWindowPos( NULL, rct.left, rct.top, 0, 0, SWP_NOSIZE );
+		g_AFDialog->SetWindowPos( nullptr, rct.left, rct.top, 0, 0, SWP_NOSIZE );
 		*/
 	}
 
@@ -135,7 +135,7 @@ void ParticleEditorInit( const arcDictionary *spawnArgs ) {
 	g_ParticleDialog->SetFocus();
 
 	if ( spawnArgs ) {
-		arcNetString str = spawnArgs->GetString( "model" );
+		anString str = spawnArgs->GetString( "model" );
 		str.StripFileExtension();
 		g_ParticleDialog->SelectParticle( str );
 		g_ParticleDialog->SetParticleVisualization( static_cast<int>( CDialogParticleEditor::SELECTED ) );
@@ -156,7 +156,7 @@ void ParticleEditorRun( void ) {
 	MSG *msg = &m_msgCur;
 #endif
 
-	while( ::PeekMessage(msg, NULL, NULL, NULL, PM_NOREMOVE) ) {
+	while( ::PeekMessage(msg, nullptr, nullptr, nullptr, PM_NOREMOVE) ) {
 		// pump message
 		if ( !AfxGetApp()->PumpMessage() ) {
 		}
@@ -170,13 +170,13 @@ ParticleEditorShutdown
 */
 void ParticleEditorShutdown( void ) {
 	delete g_ParticleDialog;
-	g_ParticleDialog = NULL;
+	g_ParticleDialog = nullptr;
 }
 
 // CDialogParticleEditor dialog
 
 IMPLEMENT_DYNAMIC(CDialogParticleEditor, CDialog)
-CDialogParticleEditor::CDialogParticleEditor(CWnd* pParent /*=NULL*/)
+CDialogParticleEditor::CDialogParticleEditor(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDialogParticleEditor::IDD, pParent)
 	, matName(_T( "" ) )
 	, animFrames(_T( "" ) )
@@ -354,8 +354,8 @@ void CDialogParticleEditor::OnBnClickedParticleMode() {
 
 
 void CDialogParticleEditor::OnBnClickedButtonSaveAs() {
-	arcDeclParticle *idp = GetCurParticle();
-	if ( idp == NULL ) {
+	anDeclParticle *idp = GetCurParticle();
+	if ( idp == nullptr ) {
 		return;
 	}
 	DialogName dlg( "New Particle" );
@@ -364,16 +364,16 @@ void CDialogParticleEditor::OnBnClickedButtonSaveAs() {
 			MessageBox( "Particle already exists!", "Particle exists", MB_OK );
 			return;
 		}
-		CFileDialog dlgSave( TRUE, "prt", NULL, OFN_CREATEPROMPT, "Particle Files (*.prt)|*.prt||All Files (*.*)|*.*||", AfxGetMainWnd() );
+		CFileDialog dlgSave( TRUE, "prt", nullptr, OFN_CREATEPROMPT, "Particle Files (*.prt)|*.prt||All Files (*.*)|*.*||", AfxGetMainWnd() );
 		if ( dlgSave.DoModal() == IDOK ) {
-			arcNetString fileName;
+			anString fileName;
 			fileName = fileSystem->OSPathToRelativePath( dlgSave.m_ofn.lpstrFile );
-			arcDeclParticle *decl = dynamic_cast<arcDeclParticle*>( declManager->CreateNewDecl( DECL_PARTICLE, dlg.m_strName, fileName ) );
+			anDeclParticle *decl = dynamic_cast<anDeclParticle*>( declManager->CreateNewDecl( DECL_PARTICLE, dlg.m_strName, fileName ) );
 			if ( decl ) {
 				decl->stages.DeleteContents( true );
 				decl->depthHack = idp->depthHack;
 				for ( int i = 0; i < idp->stages.Num(); i++ ) {
-					arcParticleStage *stage = new arcParticleStage();
+					anParticleStage *stage = new anParticleStage();
 					*stage = *idp->stages[i];
 					decl->stages.Append( stage );
 				}
@@ -421,8 +421,8 @@ void CDialogParticleEditor::OnBnClickedButtonBrowsematerial() {
 void CDialogParticleEditor::OnBnClickedButtonBrowsecolor() {
 	int r, g, b;
 	float ob;
-	arcParticleStage *ps = GetCurStage();
-	if ( ps == NULL ) {
+	anParticleStage *ps = GetCurStage();
+	if ( ps == nullptr ) {
 		return;
 	}
 	r = ps->color.x * 255.0f;
@@ -439,17 +439,17 @@ void CDialogParticleEditor::OnBnClickedButtonBrowsecolor() {
 void CDialogParticleEditor::OnBnClickedButtonBrowseEntitycolor() {
 	int r, g, b;
 	float ob;
-	arcNetList<arcEntity*> list;
-	arcDictionary dict2;
-	arcNetString str;
+	anList<arcEntity*> list;
+	anDict dict2;
+	anString str;
 	list.SetNum( 128 );
 	int count = engineEdit->GetSelectedEntities( list.Ptr(), list.Num() );
 	list.SetNum( count );
 
 	if ( count ) {
-		const arcDictionary *dict = engineEdit->EntityGetSpawnArgs( list[0] );
+		const anDict *dict = engineEdit->EntityGetSpawnArgs( list[0] );
 		if ( dict ) {
-			arcVec3 clr = dict->GetVector( "_color", "1 1 1" );
+			anVec3 clr = dict->GetVector( "_color", "1 1 1" );
 			r = clr.x * 255.0f;
 			g = clr.y * 255.0f;
 			b = clr.z * 255.0f;
@@ -460,7 +460,7 @@ void CDialogParticleEditor::OnBnClickedButtonBrowseEntitycolor() {
 					const char *name = dict->GetString( "name" );
 					arcEntity *ent = engineEdit->FindEntity( name );
 					if ( ent ) {
-						engineEdit->EntitySetColor( ent, arcVec3( ( float )r / 255.0f, ( float )g / 255.0f, ( float )b / 255.0f ) );
+						engineEdit->EntitySetColor( ent, anVec3( ( float )r / 255.0f, ( float )g / 255.0f, ( float )b / 255.0f ) );
 						str = va( "%f %f %f", ( float )r / 255.0f, ( float )g / 255.0f, ( float )b / 255.0f );
 						dict2.Clear();
 						dict2.Set( "_color", str );
@@ -481,8 +481,8 @@ void CDialogParticleEditor::OnBnClickedButtonBrowseEntitycolor() {
 void CDialogParticleEditor::OnBnClickedButtonBrowsefadecolor() {
 	int r, g, b;
 	float ob;
-	arcParticleStage *ps = GetCurStage();
-	if ( ps == NULL ) {
+	anParticleStage *ps = GetCurStage();
+	if ( ps == nullptr ) {
 		return;
 	}
 	r = ps->fadeColor.x * 255.0f;
@@ -510,20 +510,20 @@ void CDialogParticleEditor::SelectParticle( const char *name ) {
 	}
 }
 
-arcDeclParticle *CDialogParticleEditor::GetCurParticle() {
+anDeclParticle *CDialogParticleEditor::GetCurParticle() {
 	int sel = comboParticle.GetCurSel();
 	if ( sel == CB_ERR ) {
-		return NULL;
+		return nullptr;
 	}
 	int index = comboParticle.GetItemData( sel );
-	return static_cast<arcDeclParticle *>( const_cast<arcDecleration *>( declManager->DeclByIndex( DECL_PARTICLE, index ) ) );
+	return static_cast<anDeclParticle *>( const_cast<anDecl *>( declManager->DeclByIndex( DECL_PARTICLE, index ) ) );
 }
 
 void CDialogParticleEditor::UpdateParticleData() {
 
 	listStages.ResetContent();
-	arcDeclParticle *idp = GetCurParticle();
-	if ( idp == NULL ) {
+	anDeclParticle *idp = GetCurParticle();
+	if ( idp == nullptr ) {
 		return;
 	}
 	for ( int i = 0; i < idp->stages.Num(); i++ ) {
@@ -571,8 +571,8 @@ void CDialogParticleEditor::UpdateControlInfo() {
 		wnd->EnableWindow( orientation == 1 );
 	}
 
-	arcParticleStage *ps = GetCurStage();
-	if ( ps == NULL ) {
+	anParticleStage *ps = GetCurStage();
+	if ( ps == nullptr ) {
 		return;
 	}
 	sliderBunching.SetValuePos( ps->spawnBunching );
@@ -698,12 +698,12 @@ void CDialogParticleEditor::SetParticleVisualization( int i ) {
 }
 
 void CDialogParticleEditor::SetParticleView() {
-	arcDeclParticle *idp = GetCurParticle();
-	if ( idp == NULL ) {
+	anDeclParticle *idp = GetCurParticle();
+	if ( idp == nullptr ) {
 		return;
 	}
 	cmdSystem->BufferCommandText( CMD_EXEC_NOW, "testmodel" );
-	arcNetString str;
+	anString str;
 	switch ( visualization ) {
 		case TESTMODEL :
 			str = idp->GetName();
@@ -738,8 +738,8 @@ void CDialogParticleEditor::SetParticleView() {
 }
 
 void CDialogParticleEditor::SetSelectedModel( const char *val ) {
-	arcNetList<arcEntity*> list;
-	arcMat3 axis;
+	anList<arcEntity*> list;
+	anMat3 axis;
 
 	list.SetNum( 128 );
 	int count = engineEdit->GetSelectedEntities( list.Ptr(), list.Num() );
@@ -747,8 +747,8 @@ void CDialogParticleEditor::SetSelectedModel( const char *val ) {
 
 	if ( count ) {
 		for ( int i = 0; i < count; i++ ) {
-			const arcDictionary *dict = engineEdit->EntityGetSpawnArgs( list[i] );
-			if ( dict == NULL ) {
+			const anDict *dict = engineEdit->EntityGetSpawnArgs( list[i] );
+			if ( dict == nullptr ) {
 				continue;
 			}
 			const char *name = dict->GetString( "name" );
@@ -790,16 +790,16 @@ void CDialogParticleEditor::OnBnClickedEntityColor() {
 
 void CDialogParticleEditor::AddStage() {
 
-	arcDeclParticle *idp = GetCurParticle();
-	if ( idp == NULL ) {
+	anDeclParticle *idp = GetCurParticle();
+	if ( idp == nullptr ) {
 		return;
 	}
 
-	arcParticleStage *stage = new arcParticleStage;
+	anParticleStage *stage = new anParticleStage;
 
 	if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) ) {
-		arcParticleStage *source = GetCurStage();
-		if ( source == NULL ) {
+		anParticleStage *source = GetCurStage();
+		if ( source == nullptr ) {
 			delete stage;
 			return;
 		}
@@ -816,8 +816,8 @@ void CDialogParticleEditor::AddStage() {
 }
 
 void CDialogParticleEditor::RemoveStage() {
-	arcDeclParticle *idp = GetCurParticle();
-	if ( idp == NULL ) {
+	anDeclParticle *idp = GetCurParticle();
+	if ( idp == nullptr ) {
 		return;
 	}
 
@@ -845,8 +845,8 @@ void CDialogParticleEditor::RemoveStage() {
 }
 
 void CDialogParticleEditor::ShowStage() {
-	arcParticleStage *ps = GetCurStage();
-	if ( ps == NULL ) {
+	anParticleStage *ps = GetCurStage();
+	if ( ps == nullptr ) {
 		return;
 	}
 	ps->hidden = false;
@@ -860,8 +860,8 @@ void CDialogParticleEditor::ShowStage() {
 }
 
 void CDialogParticleEditor::HideStage() {
-	arcParticleStage *ps = GetCurStage();
-	if ( ps == NULL ) {
+	anParticleStage *ps = GetCurStage();
+	if ( ps == nullptr ) {
 		return;
 	}
 	ps->hidden = true;
@@ -874,12 +874,12 @@ void CDialogParticleEditor::HideStage() {
 	EnableStageControls();
 }
 
-arcParticleStage *CDialogParticleEditor::GetCurStage() {
-	arcDeclParticle *idp = GetCurParticle();
+anParticleStage *CDialogParticleEditor::GetCurStage() {
+	anDeclParticle *idp = GetCurParticle();
 	int sel = listStages.GetCurSel();
 	int index = listStages.GetItemData( sel );
-	if ( idp == NULL || sel == LB_ERR || index >= idp->stages.Num() ) {
-		return NULL;
+	if ( idp == nullptr || sel == LB_ERR || index >= idp->stages.Num() ) {
+		return nullptr;
 	}
 	return idp->stages[index];
 }
@@ -930,15 +930,15 @@ void CDialogParticleEditor::ClearDlgVars() {
 
 void CDialogParticleEditor::CurStageToDlgVars() {
 	// go ahead and get the two system vars too
-	arcDeclParticle *idp = GetCurParticle();
-	if ( idp == NULL ) {
+	anDeclParticle *idp = GetCurParticle();
+	if ( idp == nullptr ) {
 		return;
 	}
 
 	depthHack = va( "%.3f", idp->depthHack );
 
-	arcParticleStage *ps = GetCurStage();
-	if ( ps == NULL ) {
+	anParticleStage *ps = GetCurStage();
+	if ( ps == nullptr ) {
 		return;
 	}
 	matName = ps->material->GetName();
@@ -993,14 +993,14 @@ void CDialogParticleEditor::CurStageToDlgVars() {
 
 void CDialogParticleEditor::DlgVarsToCurStage() {
 	// go ahead and set the two system vars too
-	arcDeclParticle *idp = GetCurParticle();
-	if ( idp == NULL ) {
+	anDeclParticle *idp = GetCurParticle();
+	if ( idp == nullptr ) {
 		return;
 	}
 	idp->depthHack = atof( depthHack );
 
-	arcParticleStage *ps = GetCurStage();
-	if ( ps == NULL ) {
+	anParticleStage *ps = GetCurStage();
+	if ( ps == nullptr ) {
 		return;
 	}
 	ps->material = declManager->FindMaterial( matName );
@@ -1055,8 +1055,8 @@ void CDialogParticleEditor::DlgVarsToCurStage() {
 
 void CDialogParticleEditor::ShowCurrentStage() {
 	ClearDlgVars();
-	arcParticleStage *ps = GetCurStage();
-	if ( ps == NULL ) {
+	anParticleStage *ps = GetCurStage();
+	if ( ps == nullptr ) {
 		return;
 	}
 	CurStageToDlgVars();
@@ -1071,15 +1071,15 @@ void CDialogParticleEditor::OnLbnSelchangeListStages() {
 void CDialogParticleEditor::OnBnClickedButtonNew() {
 	DialogName dlg( "New Particle" );
 	if (dlg.DoModal() == IDOK) {
-		CFileDialog dlgSave( TRUE, "prt", NULL, OFN_CREATEPROMPT, "Particle Files (*.prt)|*.prt||All Files (*.*)|*.*||", AfxGetMainWnd() );
+		CFileDialog dlgSave( TRUE, "prt", nullptr, OFN_CREATEPROMPT, "Particle Files (*.prt)|*.prt||All Files (*.*)|*.*||", AfxGetMainWnd() );
 		if ( dlgSave.DoModal() == IDOK ) {
 			if ( declManager->FindType( DECL_PARTICLE, dlg.m_strName, false ) ) {
 				MessageBox( "Particle already exists!", "Particle exists", MB_OK );
 				return;
 			}
-			arcNetString fileName;
+			anString fileName;
 			fileName = fileSystem->OSPathToRelativePath( dlgSave.m_ofn.lpstrFile );
-			arcDecleration *decl = declManager->CreateNewDecl( DECL_PARTICLE, dlg.m_strName, fileName );
+			anDecl *decl = declManager->CreateNewDecl( DECL_PARTICLE, dlg.m_strName, fileName );
 			if ( decl ) {
 				if ( MessageBox( "Copy current particle?", "Copy current", MB_YESNO | MB_ICONQUESTION ) == IDYES ) {
 					MessageBox( "Copy current particle not implemented yet.. Stay tuned" );
@@ -1097,16 +1097,16 @@ void CDialogParticleEditor::OnBnClickedButtonNew() {
 }
 
 void CDialogParticleEditor::OnBnClickedButtonSave() {
-	arcDeclParticle *idp = GetCurParticle();
-	if ( idp == NULL ) {
+	anDeclParticle *idp = GetCurParticle();
+	if ( idp == nullptr ) {
 		return;
 	}
 
 	if ( strstr( idp->GetFileName(), "implicit" ) ) {
 		// defaulted, need to choose a file
-		CFileDialog dlgSave( FALSE, "prt", NULL, OFN_OVERWRITEPROMPT, "Particle Files (*.prt)|*.prt||All Files (*.*)|*.*||", AfxGetMainWnd() );
+		CFileDialog dlgSave( FALSE, "prt", nullptr, OFN_OVERWRITEPROMPT, "Particle Files (*.prt)|*.prt||All Files (*.*)|*.*||", AfxGetMainWnd() );
 		if ( dlgSave.DoModal() == IDOK ) {
-			arcNetString fileName;
+			anString fileName;
 			fileName = fileSystem->OSPathToRelativePath( dlgSave.m_ofn.lpstrFile );
 			idp->Save( fileName );
 			EnumParticles();
@@ -1121,7 +1121,7 @@ void CDialogParticleEditor::EnumParticles() {
 	CWaitCursor cursor;
 	comboParticle.ResetContent();
 	for ( int i = 0; i < declManager->GetNumDecls( DECL_PARTICLE ); i++ ) {
-		const arcDecleration *idp = declManager->DeclByIndex( DECL_PARTICLE, i );
+		const anDecl *idp = declManager->DeclByIndex( DECL_PARTICLE, i );
 		int index = comboParticle.AddString( idp->GetName() );
 		if ( index >= 0 ) {
 			comboParticle.SetItemData( index, i );
@@ -1136,15 +1136,15 @@ void CDialogParticleEditor::OnDestroy() {
 	return CDialog::OnDestroy();
 }
 
-void VectorCallBack( arcQuats rotation ) {
+void VectorCallBack( anQuats rotation ) {
 	if ( g_ParticleDialog && g_ParticleDialog->GetSafeHwnd() ) {
 		g_ParticleDialog->SetVectorControlUpdate( rotation );
 	}
 }
 
-void CDialogParticleEditor::SetVectorControlUpdate( arcQuats rotation ) {
+void CDialogParticleEditor::SetVectorControlUpdate( anQuats rotation ) {
 	if ( particleMode ) {
-		arcNetList<arcEntity*> list;
+		anList<arcEntity*> list;
 
 		list.SetNum( 128 );
 		int count = engineEdit->GetSelectedEntities( list.Ptr(), list.Num() );
@@ -1152,8 +1152,8 @@ void CDialogParticleEditor::SetVectorControlUpdate( arcQuats rotation ) {
 
 		if ( count ) {
 			for ( int i = 0; i < count; i++ ) {
-				const arcDictionary *dict = engineEdit->EntityGetSpawnArgs( list[i] );
-				if ( dict == NULL ) {
+				const anDict *dict = engineEdit->EntityGetSpawnArgs( list[i] );
+				if ( dict == nullptr ) {
 					continue;
 				}
 				const char *name = dict->GetString( "name" );
@@ -1313,7 +1313,7 @@ BOOL CDialogParticleEditor::PreTranslateMessage(MSG *pMsg) {
 }
 
 void CDialogParticleEditor::EnableStageControls() {
-	arcParticleStage *stage = GetCurStage();
+	anParticleStage *stage = GetCurStage();
 	bool b = ( stage && stage->hidden ) ? false : true;
 	for ( int i = 0; i < StageIDCount; i++ ) {
 		CWnd *wnd = GetDlgItem( StageEnableID[ i ] );
@@ -1333,9 +1333,9 @@ void CDialogParticleEditor::EnableEditControls() {
 }
 
 void CDialogParticleEditor::UpdateSelectedOrigin( float x, float y, float z ) {
-	arcNetList<arcEntity*> list;
-	arcVec3 origin;
-	arcVec3 vec( x, y, z );
+	anList<arcEntity*> list;
+	anVec3 origin;
+	anVec3 vec( x, y, z );
 
 	list.SetNum( 128 );
 	int count = engineEdit->GetSelectedEntities( list.Ptr(), list.Num() );
@@ -1343,8 +1343,8 @@ void CDialogParticleEditor::UpdateSelectedOrigin( float x, float y, float z ) {
 
 	if ( count ) {
 		for ( int i = 0; i < count; i++ ) {
-			const arcDictionary *dict = engineEdit->EntityGetSpawnArgs( list[i] );
-			if ( dict == NULL ) {
+			const anDict *dict = engineEdit->EntityGetSpawnArgs( list[i] );
+			if ( dict == nullptr ) {
 				continue;
 			}
 			const char *name = dict->GetString( "name" );
@@ -1384,12 +1384,12 @@ void CDialogParticleEditor::OnBtnZdn() {
 }
 
 void CDialogParticleEditor::OnBtnDrop() {
-	arcNetString		classname;
-	arcNetString		key;
-	arcNetString		value;
-	arcVec3		org;
-	arcDictionary		args;
-	arcAngles	viewAngles;
+	anString		classname;
+	anString		key;
+	anString		value;
+	anVec3		org;
+	anDict		args;
+	anAngles	viewAngles;
 
 	if ( !engineEdit->PlayerIsValid() ) {
 		return;
@@ -1398,21 +1398,21 @@ void CDialogParticleEditor::OnBtnDrop() {
 	engineEdit->PlayerGetViewAngles( viewAngles );
 	engineEdit->PlayerGetEyePosition( org );
 
-	org += arcAngles( 0, viewAngles.yaw, 0 ).ToForward() * 80 + arcVec3( 0, 0, 1 );
+	org += anAngles( 0, viewAngles.yaw, 0 ).ToForward() * 80 + anVec3( 0, 0, 1 );
 	args.Set( "origin", org.ToString() );
 	args.Set( "classname", "func_emitter" );
 	args.Set( "angle", va( "%f", viewAngles.yaw + 180 ) );
 
-	arcDeclParticle *idp = GetCurParticle();
-	if ( idp == NULL ) {
+	anDeclParticle *idp = GetCurParticle();
+	if ( idp == nullptr ) {
 		return;
 	}
-	arcNetString str = idp->GetName();
+	anString str = idp->GetName();
 	str.SetFileExtension( ".prt" );
 
 	args.Set( "model", str);
 
-	arcNetString name = engineEdit->GetUniqueEntityName( "func_emitter" );
+	anString name = engineEdit->GetUniqueEntityName( "func_emitter" );
 	bool nameValid = false;
 	while ( !nameValid) {
 		DialogName dlg( "Name Particle", this);
@@ -1432,10 +1432,10 @@ void CDialogParticleEditor::OnBtnDrop() {
 
 	args.Set( "name", name.c_str() );
 
-	arcEntity *ent = NULL;
+	arcEntity *ent = nullptr;
 	engineEdit->SpawnEntityDef( args, &ent );
 	if (ent) {
-		engineEdit->EntityUpdateChangeableSpawnArgs( ent, NULL );
+		engineEdit->EntityUpdateChangeableSpawnArgs( ent, nullptr );
 		engineEdit->ClearEntitySelection();
 		engineEdit->AddSelectedEntity( ent );
 	}

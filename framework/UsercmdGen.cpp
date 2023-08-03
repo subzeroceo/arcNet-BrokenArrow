@@ -1,27 +1,27 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
-arcCVarSystem joy_mergedThreshold( "joy_mergedThreshold", "1", CVAR_BOOL | CVAR_ARCHIVE, "If the thresholds aren't merged, you drift more off center" );
-arcCVarSystem joy_newCode( "joy_newCode", "1", CVAR_BOOL | CVAR_ARCHIVE, "Use the new codepath" );
-arcCVarSystem joy_triggerThreshold( "joy_triggerThreshold", "0.05", CVAR_FLOAT | CVAR_ARCHIVE, "how far the joystick triggers have to be pressed before they register as down" );
-arcCVarSystem joy_deadZone( "joy_deadZone", "0.2", CVAR_FLOAT | CVAR_ARCHIVE, "specifies how large the dead-zone is on the joystick" );
-arcCVarSystem joy_range( "joy_range", "1.0", CVAR_FLOAT | CVAR_ARCHIVE, "allow full range to be mapped to a smaller offset" );
-arcCVarSystem joy_gammaLook( "joy_gammaLook", "1", CVAR_INTEGER | CVAR_ARCHIVE, "use a log curve instead of a power curve for movement" );
-arcCVarSystem joy_powerScale( "joy_powerScale", "2", CVAR_FLOAT | CVAR_ARCHIVE, "Raise joystick values to this power" );
-arcCVarSystem joy_pitchSpeed( "joy_pitchSpeed", "100",	CVAR_ARCHIVE | CVAR_FLOAT, "pitch speed when pressing up or down on the joystick", 60, 600 );
-arcCVarSystem joy_yawSpeed( "joy_yawSpeed", "240",	CVAR_ARCHIVE | CVAR_FLOAT, "pitch speed when pressing left or right on the joystick", 60, 600 );
+anCVarSystem joy_mergedThreshold( "joy_mergedThreshold", "1", CVAR_BOOL | CVAR_ARCHIVE, "If the thresholds aren't merged, you drift more off center" );
+anCVarSystem joy_newCode( "joy_newCode", "1", CVAR_BOOL | CVAR_ARCHIVE, "Use the new codepath" );
+anCVarSystem joy_triggerThreshold( "joy_triggerThreshold", "0.05", CVAR_FLOAT | CVAR_ARCHIVE, "how far the joystick triggers have to be pressed before they register as down" );
+anCVarSystem joy_deadZone( "joy_deadZone", "0.2", CVAR_FLOAT | CVAR_ARCHIVE, "specifies how large the dead-zone is on the joystick" );
+anCVarSystem joy_range( "joy_range", "1.0", CVAR_FLOAT | CVAR_ARCHIVE, "allow full range to be mapped to a smaller offset" );
+anCVarSystem joy_gammaLook( "joy_gammaLook", "1", CVAR_INTEGER | CVAR_ARCHIVE, "use a log curve instead of a power curve for movement" );
+anCVarSystem joy_powerScale( "joy_powerScale", "2", CVAR_FLOAT | CVAR_ARCHIVE, "Raise joystick values to this power" );
+anCVarSystem joy_pitchSpeed( "joy_pitchSpeed", "100",	CVAR_ARCHIVE | CVAR_FLOAT, "pitch speed when pressing up or down on the joystick", 60, 600 );
+anCVarSystem joy_yawSpeed( "joy_yawSpeed", "240",	CVAR_ARCHIVE | CVAR_FLOAT, "pitch speed when pressing left or right on the joystick", 60, 600 );
 
 // these were a bad idea!
-arcCVarSystem joy_dampenLook( "joy_dampenLook", "1", CVAR_BOOL | CVAR_ARCHIVE, "Do not allow full acceleration on look" );
-arcCVarSystem joy_deltaPerMSLook( "joy_deltaPerMSLook", "0.003", CVAR_FLOAT | CVAR_ARCHIVE, "Max amount to be added on look per MS" );
+anCVarSystem joy_dampenLook( "joy_dampenLook", "1", CVAR_BOOL | CVAR_ARCHIVE, "Do not allow full acceleration on look" );
+anCVarSystem joy_deltaPerMSLook( "joy_deltaPerMSLook", "0.003", CVAR_FLOAT | CVAR_ARCHIVE, "Max amount to be added on look per MS" );
 
-arcCVarSystem in_mouseSpeed( "in_mouseSpeed", "1",	CVAR_ARCHIVE | CVAR_FLOAT, "speed at which the mouse moves", 0.25f, 4.0f );
-arcCVarSystem in_alwaysRun( "in_alwaysRun", "1", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "always run (reverse _speed button) - only in MP" );
+anCVarSystem in_mouseSpeed( "in_mouseSpeed", "1",	CVAR_ARCHIVE | CVAR_FLOAT, "speed at which the mouse moves", 0.25f, 4.0f );
+anCVarSystem in_alwaysRun( "in_alwaysRun", "1", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "always run (reverse _speed button) - only in MP" );
 
-arcCVarSystem in_useJoystick( "in_useJoystick", "0", CVAR_ARCHIVE | CVAR_BOOL, "enables/disables the gamepad for PC use" );
-arcCVarSystem in_joystickRumble( "in_joystickRumble", "1", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "enable joystick rumble" );
-arcCVarSystem in_invertLook( "in_invertLook", "0", CVAR_ARCHIVE | CVAR_BOOL, "inverts the look controls so the forward looks up (flight controls) - the proper way to play games!" );
-arcCVarSystem in_mouseInvertLook( "in_mouseInvertLook", "0", CVAR_ARCHIVE | CVAR_BOOL, "inverts the look controls so the forward looks up (flight controls) - the proper way to play games!" );
+anCVarSystem in_useJoystick( "in_useJoystick", "0", CVAR_ARCHIVE | CVAR_BOOL, "enables/disables the gamepad for PC use" );
+anCVarSystem in_joystickRumble( "in_joystickRumble", "1", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "enable joystick rumble" );
+anCVarSystem in_invertLook( "in_invertLook", "0", CVAR_ARCHIVE | CVAR_BOOL, "inverts the look controls so the forward looks up (flight controls) - the proper way to play games!" );
+anCVarSystem in_mouseInvertLook( "in_mouseInvertLook", "0", CVAR_ARCHIVE | CVAR_BOOL, "inverts the look controls so the forward looks up (flight controls) - the proper way to play games!" );
 
 /*
 ================
@@ -131,7 +131,7 @@ userCmdString_t	userCmdStrings[] = {
 	{ "_impulse30",		UB_IMPULSE30 },
 	{ "_impulse31",		UB_IMPULSE31 },
 
-	{ NULL,				UB_NONE },
+	{ nullptr,				UB_NONE },
 };
 
  class buttonState_t {
@@ -225,7 +225,7 @@ private:
 
 	void			Key( int keyNum, bool down );
 
-	arcVec3			viewangles;
+	anVec3			viewangles;
 	int				impulseSequence;
 	int				impulse;
 
@@ -254,30 +254,30 @@ private:
 	float			lastLookValuePitch;
 	float			lastLookValueYaw;
 
-	static arcCVarSystem	in_yawSpeed;
-	static arcCVarSystem	in_pitchSpeed;
-	static arcCVarSystem	in_angleSpeedKey;
-	static arcCVarSystem	in_toggleRun;
-	static arcCVarSystem	in_toggleCrouch;
-	static arcCVarSystem	in_toggleZoom;
-	static arcCVarSystem	sensitivity;
-	static arcCVarSystem	m_pitch;
-	static arcCVarSystem	m_yaw;
-	static arcCVarSystem	m_smooth;
-	static arcCVarSystem	m_showMouseRate;
+	static anCVarSystem	in_yawSpeed;
+	static anCVarSystem	in_pitchSpeed;
+	static anCVarSystem	in_angleSpeedKey;
+	static anCVarSystem	in_toggleRun;
+	static anCVarSystem	in_toggleCrouch;
+	static anCVarSystem	in_toggleZoom;
+	static anCVarSystem	sensitivity;
+	static anCVarSystem	m_pitch;
+	static anCVarSystem	m_yaw;
+	static anCVarSystem	m_smooth;
+	static anCVarSystem	m_showMouseRate;
 };
 
-arcCVarSystem idUsercmdGenLocal::in_yawSpeed( "in_yawspeed", "140", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "yaw change speed when holding down _left or _right button" );
-arcCVarSystem idUsercmdGenLocal::in_pitchSpeed( "in_pitchspeed", "140", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "pitch change speed when holding down look _lookUp or _lookDown button" );
-arcCVarSystem idUsercmdGenLocal::in_angleSpeedKey( "in_anglespeedkey", "1.5", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "angle change scale when holding down _speed button" );
-arcCVarSystem idUsercmdGenLocal::in_toggleRun( "in_toggleRun", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _speed button toggles run on/off - only in MP" );
-arcCVarSystem idUsercmdGenLocal::in_toggleCrouch( "in_toggleCrouch", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _movedown button toggles player crouching/standing" );
-arcCVarSystem idUsercmdGenLocal::in_toggleZoom( "in_toggleZoom", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _zoom button toggles zoom on/off" );
-arcCVarSystem idUsercmdGenLocal::sensitivity( "sensitivity", "5", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse view sensitivity" );
-arcCVarSystem idUsercmdGenLocal::m_pitch( "m_pitch", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse pitch scale" );
-arcCVarSystem idUsercmdGenLocal::m_yaw( "m_yaw", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse yaw scale" );
-arcCVarSystem idUsercmdGenLocal::m_smooth( "m_smooth", "1", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "number of samples blended for mouse viewing", 1, 8, arcCmdSystem::ArgCompletion_Integer<1,8> );
-arcCVarSystem idUsercmdGenLocal::m_showMouseRate( "m_showMouseRate", "0", CVAR_SYSTEM | CVAR_BOOL, "shows mouse movement" );
+anCVarSystem idUsercmdGenLocal::in_yawSpeed( "in_yawspeed", "140", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "yaw change speed when holding down _left or _right button" );
+anCVarSystem idUsercmdGenLocal::in_pitchSpeed( "in_pitchspeed", "140", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "pitch change speed when holding down look _lookUp or _lookDown button" );
+anCVarSystem idUsercmdGenLocal::in_angleSpeedKey( "in_anglespeedkey", "1.5", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "angle change scale when holding down _speed button" );
+anCVarSystem idUsercmdGenLocal::in_toggleRun( "in_toggleRun", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _speed button toggles run on/off - only in MP" );
+anCVarSystem idUsercmdGenLocal::in_toggleCrouch( "in_toggleCrouch", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _movedown button toggles player crouching/standing" );
+anCVarSystem idUsercmdGenLocal::in_toggleZoom( "in_toggleZoom", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _zoom button toggles zoom on/off" );
+anCVarSystem idUsercmdGenLocal::sensitivity( "sensitivity", "5", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse view sensitivity" );
+anCVarSystem idUsercmdGenLocal::m_pitch( "m_pitch", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse pitch scale" );
+anCVarSystem idUsercmdGenLocal::m_yaw( "m_yaw", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse yaw scale" );
+anCVarSystem idUsercmdGenLocal::m_smooth( "m_smooth", "1", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "number of samples blended for mouse viewing", 1, 8, arcCmdSystem::ArgCompletion_Integer<1,8> );
+anCVarSystem idUsercmdGenLocal::m_showMouseRate( "m_showMouseRate", "0", CVAR_SYSTEM | CVAR_BOOL, "shows mouse movement" );
 
 static idUsercmdGenLocal localUsercmdGen;
 idUsercmdGen	*usercmdGen = &localUsercmdGen;
@@ -401,8 +401,8 @@ void idUsercmdGenLocal::KeyMove() {
 	forward += KEY_MOVESPEED * ButtonState( UB_MOVEFORWARD );
 	forward -= KEY_MOVESPEED * ButtonState( UB_MOVEBACK );
 
-	cmd.forwardmove += arcMath::ClampChar( forward );
-	cmd.rightmove += arcMath::ClampChar( side );
+	cmd.forwardmove += anMath::ClampChar( forward );
+	cmd.rightmove += anMath::ClampChar( side );
 }
 
 /*
@@ -438,7 +438,7 @@ void idUsercmdGenLocal::MouseMove() {
 
 	historyCounter++;
 
-	if ( arcMath::Fabs( mx ) > 1000 || arcMath::Fabs( my ) > 1000 ) {
+	if ( anMath::Fabs( mx ) > 1000 || anMath::Fabs( my ) > 1000 ) {
 		Sys_DebugPrintf( "idUsercmdGenLocal::MouseMove: Ignoring ridiculous mouse delta.\n" );
 		mx = my = 0;
 	}
@@ -490,7 +490,7 @@ void idUsercmdGenLocal::CircleToSquare( float & axis_x, float & axis_y ) const {
 	}
 
 	// length ( max 1.0f at the unit circle)
-	float len = arcMath::Sqrt( axis_x * axis_x + axis_y * axis_y );
+	float len = anMath::Sqrt( axis_x * axis_x + axis_y * axis_y );
 	if ( len > 1.0f ) {
 		len = 1.0f;
 	}
@@ -531,10 +531,10 @@ void idUsercmdGenLocal::HandleJoystickAxis( int keyNum, float unclampedValue, fl
 	float value = 0.0f;
 	bool pressed = false;
 	if ( unclampedValue > threshold ) {
-		value = arcMath::Fabs( ( unclampedValue - threshold ) / ( 1.0f - threshold ) );
+		value = anMath::Fabs( ( unclampedValue - threshold ) / ( 1.0f - threshold ) );
 		pressed = true;
 	} else if ( unclampedValue < -threshold ) {
-		value = arcMath::Fabs( ( unclampedValue + threshold ) / ( 1.0f - threshold ) );
+		value = anMath::Fabs( ( unclampedValue + threshold ) / ( 1.0f - threshold ) );
 		pressed = true;
 	}
 
@@ -549,35 +549,35 @@ void idUsercmdGenLocal::HandleJoystickAxis( int keyNum, float unclampedValue, fl
 
 	float lookValue = 0.0f;
 	if ( joy_gammaLook.GetBool() ) {
-		lookValue = arcMath::Pow( 1.04712854805f, value * 100.0f ) * 0.01f;
+		lookValue = anMath::Pow( 1.04712854805f, value * 100.0f ) * 0.01f;
 	} else {
-		lookValue = arcMath::Pow( value, joy_powerScale.GetFloat() );
+		lookValue = anMath::Pow( value, joy_powerScale.GetFloat() );
 	}
 
 	ARCEngine * game = common->Game();
-	if ( game != NULL ) {
+	if ( game != nullptr ) {
 		lookValue *= game->GetAimAssistSensitivity();
 	}
 
 	switch ( action ) {
 		case UB_MOVEFORWARD: {
 			float move = ( float )cmd.forwardmove + ( KEY_MOVESPEED * value );
-			cmd.forwardmove = arcMath::ClampChar( arcMath::Ftoi( move ) );
+			cmd.forwardmove = anMath::ClampChar( anMath::Ftoi( move ) );
 			break;
 		}
 		case UB_MOVEBACK: {
 			float move = ( float )cmd.forwardmove - ( KEY_MOVESPEED * value );
-			cmd.forwardmove = arcMath::ClampChar( arcMath::Ftoi( move ) );
+			cmd.forwardmove = anMath::ClampChar( anMath::Ftoi( move ) );
 			break;
 		}
 		case UB_MOVELEFT: {
 			float move = ( float )cmd.rightmove - ( KEY_MOVESPEED * value );
-			cmd.rightmove = arcMath::ClampChar( arcMath::Ftoi( move ) );
+			cmd.rightmove = anMath::ClampChar( anMath::Ftoi( move ) );
 			break;
 		}
 		case UB_MOVERIGHT: {
 			float move = ( float )cmd.rightmove + ( KEY_MOVESPEED * value );
-			cmd.rightmove = arcMath::ClampChar( arcMath::Ftoi( move ) );
+			cmd.rightmove = anMath::ClampChar( anMath::Ftoi( move ) );
 			break;
 		}
 		case UB_LOOKUP: {
@@ -661,8 +661,8 @@ enum transferFunction_t {
 JoypadFunction
 =================
 */
-arcVec2 JoypadFunction(
-	const arcVec2 raw,
+anVec2 JoypadFunction(
+	const anVec2 raw,
 	const float	aimAssistScale,
 	const float threshold,
 	const float range,
@@ -670,10 +670,10 @@ arcVec2 JoypadFunction(
 	const bool	mergedThreshold ) {
 
 	if ( range <= threshold ) {
-		return arcVec2( 0.0f, 0.0f );
+		return anVec2( 0.0f, 0.0f );
 	}
 
-	arcVec2	threshed;
+	anVec2	threshed;
 	if ( !mergedThreshold ) {
 		// if the thresholding is performed independently, you can more easily move
 		// or look in a pure axial direction without drifting
@@ -694,7 +694,7 @@ arcVec2 JoypadFunction(
 		const float	rawLength = raw.Length();
 		const float	afterThreshold = Max( 0.0f, rawLength - threshold );
 
-		arcVec2 rawDir = raw;
+		anVec2 rawDir = raw;
 		rawDir.Normalize();
 
 		threshed = rawDir * afterThreshold;
@@ -703,13 +703,13 @@ arcVec2 JoypadFunction(
 	// threshold and range reduce the range of raw values, but we
 	// scale them back up to the full 0.0 - 1.0 range
 	const float rangeScale = 1.0f / ( range - threshold );
-	arcVec2 reScaled = threshed * rangeScale;
+	anVec2 reScaled = threshed * rangeScale;
 
 	const float rescaledLen = reScaled.Length();
 
 	// if inside the deadband area, return a solid 0,0
 	if ( rescaledLen <= 0.0f ) {
-		return arcVec2( 0.0f, 0.0f );
+		return anVec2( 0.0f, 0.0f );
 	}
 
 	reScaled.Normalize();
@@ -718,10 +718,10 @@ arcVec2 JoypadFunction(
 	float accelerated;
 
 	if ( shape == FUNC_EXPONENTIAL ) {
-		accelerated = arcMath::Pow( 1.04712854805f, rescaledLen * 100.0f ) * 0.01f;
+		accelerated = anMath::Pow( 1.04712854805f, rescaledLen * 100.0f ) * 0.01f;
 	} else if ( shape == FUNC_LOGARITHMIC ) {
 		const float power = 2.0f;
-		accelerated = arcMath::Pow( rescaledLen, power );
+		accelerated = anMath::Pow( rescaledLen, power );
 	} else {	// FUNC_LINEAR
 		accelerated = rescaledLen;
 	}
@@ -745,7 +745,7 @@ void	DrawJoypadTexture(
 	const int	size,
 	byte	image[],
 
-	const arcVec2 raw,
+	const anVec2 raw,
 
 	const float threshold,
 	const float range,
@@ -753,7 +753,7 @@ void	DrawJoypadTexture(
 	const bool	mergedThreshold ) {
 
 //	assert( raw.x >= -1.0f && raw.x <= 1.0f && raw.y >= -1.0f && raw.y <= 1.0f );
-	arcVec2	clamped;
+	anVec2	clamped;
 	for ( int i = 0; i < 2; i++ ) {
 		clamped[i] = Max( -1.0f, Min( raw[i], 1.0f ) );
 	}
@@ -767,10 +767,10 @@ void	DrawJoypadTexture(
 	float	ringValue[NUM_RINGS] = { 0.0f, 0.25f, 0.5f, 0.75f, 0.99f };
 	int		ringNum = 0;
 	for ( int i = 1; i < size; i++ ) {
-		const float	v = ( float )i / (size-1 );
+		const float	v = ( float )i / ( size-1 );
 
-		const arcVec2 mapped = JoypadFunction(
-			arcVec2( v, 0.0f ), 1.0f, threshold, range, shape, mergedThreshold );
+		const anVec2 mapped = JoypadFunction(
+			anVec2( v, 0.0f ), 1.0f, threshold, range, shape, mergedThreshold );
 		if ( mapped.x > ringValue[ ringNum ] ) {
 			ringSizes[ ringNum ] = v * halfSize;
 			ringNum++;
@@ -781,8 +781,8 @@ void	DrawJoypadTexture(
 	}
 
 	memset( image, 0, size * size * 4 );
-#define PLOT(x,y) (( int * )image)[( int )(y)*size+( int )(x)]=0xffffffff
-#define CPLOT(x,y) (( int * )image)[( int )(halfSize+y)*size+( int )(halfSize+x)]=0xffffffff
+#define PLOT(x,y) ( ( int*)image)[( int )(y)*size+( int )(x)]=0xffffffff
+#define CPLOT(x,y) ( ( int*)image)[( int )(halfSize+y)*size+( int )(halfSize+x)]=0xffffffff
 
 	int	clampedX = halfSize + Min( halfSize-1, ( int )(halfSize * clamped.x) );
 	int	clampedY = halfSize + Min( halfSize-1, ( int )(halfSize * clamped.y) );
@@ -815,14 +815,14 @@ void	DrawJoypadTexture(
 	// I'm not going to bother writing a proper circle drawing algorithm...
 	const int octantPoints = size * 2;
 	float rad = 0.0f;
-	float radStep = arcMath::PI / ( 4 * octantPoints );
+	float radStep = anMath::PI / ( 4 * octantPoints );
 	for ( int point = 0; point < octantPoints; point++, rad += radStep ) {
 		float	s, c;
-		arcMath::SinCos( rad, s, c );
+		anMath::SinCos( rad, s, c );
 		for ( int ringNum = 0; ringNum < NUM_RINGS; ringNum++ ) {
 			const float ringSize = ringSizes[ ringNum ];
-			const int	ix = arcMath::Floor( ringSize * c );
-			const int	iy = arcMath::Floor( ringSize * s );
+			const int	ix = anMath::Floor( ringSize * c );
+			const int	iy = anMath::Floor( ringSize * s );
 #if 0
 			if ( !mergedThreshold && ( ix < iThresh || iy < iThresh ) ) {
 				continue;
@@ -842,7 +842,7 @@ void	DrawJoypadTexture(
 #undef PLOT
 }
 
-static arcVec2	lastLookJoypad;
+static anVec2	lastLookJoypad;
 
 /*
 =================
@@ -876,14 +876,14 @@ void idUsercmdGenLocal::JoystickMove2() {
 	const float yawSpeed =			joy_yawSpeed.GetFloat();
 
 	ARCEngine * game = common->Game();
-	const float aimAssist = game != NULL ? game->GetAimAssistSensitivity() : 1.0f;
+	const float aimAssist = game != nullptr ? game->GetAimAssistSensitivity() : 1.0f;
 
-	arcVec2 leftRaw( joystickAxis[ AXIS_LEFT_X ], joystickAxis[ AXIS_LEFT_Y ] );
-	arcVec2 rightRaw( joystickAxis[ AXIS_RIGHT_X ], joystickAxis[ AXIS_RIGHT_Y ] );
+	anVec2 leftRaw( joystickAxis[ AXIS_LEFT_X ], joystickAxis[ AXIS_LEFT_Y ] );
+	anVec2 rightRaw( joystickAxis[ AXIS_RIGHT_X ], joystickAxis[ AXIS_RIGHT_Y ] );
 
 	// optional stick swap
 	if ( idKeyInput::GetUsercmdAction( K_JOY_STICK1_LEFT ) == UB_LOOKLEFT ) {
-		const arcVec2	temp = leftRaw;
+		const anVec2	temp = leftRaw;
 		leftRaw = rightRaw;
 		rightRaw = temp;
 	}
@@ -896,16 +896,16 @@ void idUsercmdGenLocal::JoystickMove2() {
 	// save for visualization
 	lastLookJoypad = rightRaw;
 
-	arcVec2 leftMapped = JoypadFunction( leftRaw, 1.0f, threshold, range, shape, mergedThreshold );
-	arcVec2 rightMapped = JoypadFunction( rightRaw, aimAssist, threshold, range, shape, mergedThreshold );
+	anVec2 leftMapped = JoypadFunction( leftRaw, 1.0f, threshold, range, shape, mergedThreshold );
+	anVec2 rightMapped = JoypadFunction( rightRaw, aimAssist, threshold, range, shape, mergedThreshold );
 
-	// because arcPhysics_Player::CmdScale scales mvoement values down so that 1,1 = sqrt(2), sqrt(2),
+	// because anPhysics_Player::CmdScale scales mvoement values down so that 1,1 = sqrt(2), sqrt(2),
 	// we need to expand our circular values out to a square
 	CircleToSquare( leftMapped.x, leftMapped.y );
 
 	// add on top of mouse / keyboard move values
-	cmd.forwardmove = arcMath::ClampChar( cmd.forwardmove + KEY_MOVESPEED * -leftMapped.y );
-	cmd.rightmove = arcMath::ClampChar( cmd.rightmove + KEY_MOVESPEED * leftMapped.x );
+	cmd.forwardmove = anMath::ClampChar( cmd.forwardmove + KEY_MOVESPEED * -leftMapped.y );
+	cmd.rightmove = anMath::ClampChar( cmd.rightmove + KEY_MOVESPEED * leftMapped.x );
 
 	viewangles[PITCH] += MS2SEC( pollTime - lastPollTime ) * rightMapped.y * pitchSpeed;
 	viewangles[YAW] += MS2SEC( pollTime - lastPollTime ) * -rightMapped.x * yawSpeed;
@@ -973,7 +973,7 @@ creates the current command for this frame
 ================
 */
 void idUsercmdGenLocal::MakeCurrent() {
-	arcVec3 oldAngles = viewangles;
+	anVec3 oldAngles = viewangles;
 
 	if ( !Inhibited() ) {
 		// update toggled key states
@@ -1034,10 +1034,10 @@ idUsercmdGenLocal::AimAssist
 */
 void idUsercmdGenLocal::AimAssist() {
 	// callback to the game to update the aim assist for the current device
-	arcAngles aimAssistAngles( 0.0f, 0.0f, 0.0f );
+	anAngles aimAssistAngles( 0.0f, 0.0f, 0.0f );
 
 	ARCEngine * game = common->Game();
-	if ( game != NULL ) {
+	if ( game != nullptr ) {
 		game->GetAimAssistAngles( aimAssistAngles );
 	}
 
@@ -1058,7 +1058,7 @@ Returns the button if the command string is used by the usercmd generator.
 */
 int	idUsercmdGenLocal::CommandStringUsercmdData( const char *cmdString ) {
 	for ( userCmdString_t *ucs = userCmdStrings; ucs->string; ucs++ ) {
-		if ( arcNetString::Icmp( cmdString, ucs->string ) == 0 ) {
+		if ( anString::Icmp( cmdString, ucs->string ) == 0 ) {
 			return ucs->button;
 		}
 	}

@@ -1,5 +1,5 @@
 #pragma hdrstop
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #include "ConsoleHistory.h"
 #include "../renderer/ResolutionScale.h"
 #include "Common_local.h"
@@ -12,7 +12,7 @@
 #define	COMMAND_HISTORY	64
 
 struct overlayText_t {
-	arcNetString				text;
+	anString				text;
 	justify_t			justify;
 	int					time;
 };
@@ -95,7 +95,7 @@ private:
 
 	int					times[NUM_CON_TIMES];	// cls.realtime time the line was generated
 									// for transparent notify lines
-	arcVec4				color;
+	anVec4				color;
 
 	arcEditField			historyEditLines[COMMAND_HISTORY];
 
@@ -105,23 +105,23 @@ private:
 
 	arcEditField			consoleField;
 
-	arcNetList< overlayText_t >overlayText;
-	arcNetList< arcDebugGraph *>debugGraphs;
+	anList< overlayText_t >overlayText;
+	anList< arcDebugGraph *>debugGraphs;
 
-	static arcCVarSystem		con_speed;
-	static arcCVarSystem		con_notifyTime;
-	static arcCVarSystem		con_noPrint;
+	static anCVarSystem		con_speed;
+	static anCVarSystem		con_notifyTime;
+	static anCVarSystem		con_noPrint;
 };
 
 static aRcConsoleLocal localConsole;
 aRcConsole * console = &localConsole;
 
-arcCVarSystem aRcConsoleLocal::con_speed( "con_speed", "3", CVAR_SYSTEM, "speed at which the console moves up and down" );
-arcCVarSystem aRcConsoleLocal::con_notifyTime( "con_notifyTime", "3", CVAR_SYSTEM, "time messages are displayed onscreen when console is pulled up" );
+anCVarSystem aRcConsoleLocal::con_speed( "con_speed", "3", CVAR_SYSTEM, "speed at which the console moves up and down" );
+anCVarSystem aRcConsoleLocal::con_notifyTime( "con_notifyTime", "3", CVAR_SYSTEM, "time messages are displayed onscreen when console is pulled up" );
 #ifdef DEBUG
-arcCVarSystem aRcConsoleLocal::con_noPrint( "con_noPrint", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "print on the console but not onscreen when console is pulled up" );
+anCVarSystem aRcConsoleLocal::con_noPrint( "con_noPrint", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "print on the console but not onscreen when console is pulled up" );
 #else
-arcCVarSystem aRcConsoleLocal::con_noPrint( "con_noPrint", "1", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "print on the console but not onscreen when console is pulled up" );
+anCVarSystem aRcConsoleLocal::con_noPrint( "con_noPrint", "1", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "print on the console but not onscreen when console is pulled up" );
 #endif
 
 /*
@@ -142,7 +142,7 @@ void aRcConsoleLocal::DrawTextLeftAlign( float x, float &y, const char *text, ..
 	va_list argptr;
 
 	va_start( argptr, text );
-	arcNetString::vsnPrintf( string, sizeof( string ), text, argptr );
+	anString::vsnPrintf( string, sizeof( string ), text, argptr );
 	va_end( argptr );
 
 	renderSystem->DrawSmallStringExt( x, y + 2, string, colorWhite, true );
@@ -159,7 +159,7 @@ void aRcConsoleLocal::DrawTextRightAlign( float x, float &y, const char *text, .
 	char string[MAX_STRING_CHARS];
 	va_list argptr;
 	va_start( argptr, text );
-	int i = arcNetString::vsnPrintf( string, sizeof( string ), text, argptr );
+	int i = anString::vsnPrintf( string, sizeof( string ), text, argptr );
 	va_end( argptr );
 	renderSystem->DrawSmallStringExt( x - i * SMALLCHAR_WIDTH, y + 2, string, colorWhite, true );
 	y += SMALLCHAR_HEIGHT + 4;
@@ -196,19 +196,19 @@ float aRcConsoleLocal::DrawFPS( float y ) {
 		int fps = 1000000 * FPS_FRAMES / total;
 		fps = ( fps + 500 ) / 1000;
 
-		const char * s = va( "%ifps", fps );
+		const char *s = va( "%ifps", fps );
 		int w = strlen( s ) * BIGCHAR_WIDTH;
 
-		renderSystem->DrawBigStringExt( LOCALSAFE_RIGHT - w, arcMath::Ftoi( y ) + 2, s, colorWhite, true );
+		renderSystem->DrawBigStringExt( LOCALSAFE_RIGHT - w, anMath::Ftoi( y ) + 2, s, colorWhite, true );
 	}
 
 	y += BIGCHAR_HEIGHT + 4;
 
 	// print the resolution scale so we can tell when we are at reduced resolution
-	arcNetString resolutionText;
+	anString resolutionText;
 	resolutionScale.GetConsoleText( resolutionText );
 	int w = resolutionText.Length() * BIGCHAR_WIDTH;
-	renderSystem->DrawBigStringExt( LOCALSAFE_RIGHT - w, arcMath::Ftoi( y ) + 2, resolutionText.c_str(), colorWhite, true );
+	renderSystem->DrawBigStringExt( LOCALSAFE_RIGHT - w, anMath::Ftoi( y ) + 2, resolutionText.c_str(), colorWhite, true );
 
 	const int gameThreadTotalTime = commonLocal.GetGameThreadTotalTime();
 	const int gameThreadGameTime = commonLocal.GetGameThreadGameTime();
@@ -220,40 +220,40 @@ float aRcConsoleLocal::DrawFPS( float y ) {
 	const int maxTime = 16;
 
 	y += SMALLCHAR_HEIGHT + 4;
-	arcNetString timeStr;
+	anString timeStr;
 	timeStr.Format( "%sG+RF: %4d", gameThreadTotalTime > maxTime ? S_COLOR_RED : "", gameThreadTotalTime );
 	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, arcMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
+	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, anMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
 	y += SMALLCHAR_HEIGHT + 4;
 
 	timeStr.Format( "%sG: %4d", gameThreadGameTime > maxTime ? S_COLOR_RED : "", gameThreadGameTime );
 	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, arcMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
+	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, anMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
 	y += SMALLCHAR_HEIGHT + 4;
 
 	timeStr.Format( "%sRF: %4d", gameThreadRenderTime > maxTime ? S_COLOR_RED : "", gameThreadRenderTime );
 	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, arcMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
+	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, anMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
 	y += SMALLCHAR_HEIGHT + 4;
 
 	timeStr.Format( "%sRB: %4.1f", rendererBackEndTime > maxTime * 1000 ? S_COLOR_RED : "", rendererBackEndTime / 1000.0f );
 	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, arcMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
+	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, anMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
 	y += SMALLCHAR_HEIGHT + 4;
 
 	timeStr.Format( "%sSV: %4.1f", rendererShadowsTime > maxTime * 1000 ? S_COLOR_RED : "", rendererShadowsTime / 1000.0f );
 	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, arcMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
+	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, anMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
 	y += SMALLCHAR_HEIGHT + 4;
 
 	timeStr.Format( "%sIDLE: %4.1f", rendererGPUIdleTime > maxTime * 1000 ? S_COLOR_RED : "", rendererGPUIdleTime / 1000.0f );
 	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, arcMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
+	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, anMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
 	y += SMALLCHAR_HEIGHT + 4;
 
 	timeStr.Format( "%sGPU: %4.1f", rendererGPUTime > maxTime * 1000 ? S_COLOR_RED : "", rendererGPUTime / 1000.0f );
 	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, arcMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
+	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, anMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
 
 	return y + BIGCHAR_HEIGHT + 4;
 }
@@ -341,7 +341,7 @@ float aRcConsoleLocal::DrawMemoryUsage( float y ) {
 Con_Clear_f
 ==============
 */
-static void Con_Clear_f( const arcCommandArgs &args ) {
+static void Con_Clear_f( const anCommandArgs &args ) {
 	localConsole.Clear();
 }
 
@@ -350,13 +350,13 @@ static void Con_Clear_f( const arcCommandArgs &args ) {
 Con_Dump_f
 ==============
 */
-static void Con_Dump_f( const arcCommandArgs &args ) {
+static void Con_Dump_f( const anCommandArgs &args ) {
 	if ( args.Argc() != 2 ) {
 		common->Printf( "usage: conDump <filename>\n" );
 		return;
 	}
 
-	arcNetString fileName = args.Argv( 1 );
+	anString fileName = args.Argv( 1 );
 	fileName.DefaultFileExtension( ".txt" );
 
 	common->Printf( "Dumped console text to %s.\n", fileName.c_str() );
@@ -454,7 +454,7 @@ void aRcConsoleLocal::Clear() {
 	int		i;
 
 	for ( i = 0; i < CON_TEXTSIZE; i++ ) {
-		text[i] = (arcNetString::ColorIndex(C_COLOR_CYAN)<<8) | ' ';
+		text[i] = (anString::ColorIndex(C_COLOR_CYAN)<<8) | ' ';
 	}
 
 	Bottom();		// go to end
@@ -470,7 +470,7 @@ Save the console contents out to a file
 void aRcConsoleLocal::Dump( const char *fileName ) {
 	int		l, x, i;
 	short *	line;
-	arcNetFile *f;
+	anFile *f;
 	char	* buffer = (char *)alloca( LINE_WIDTH + 3 );
 
 	f = fileSystem->OpenFileWrite( fileName );
@@ -621,7 +621,7 @@ void aRcConsoleLocal::KeyDownEvent( int key ) {
 	// command history (ctrl-p ctrl-n for unix style)
 	if ( ( key == K_UPARROW ) ||
 		 ( key == K_P && ( idKeyInput::IsDown( K_LCTRL ) || idKeyInput::IsDown( K_RCTRL ) ) ) ) {
-		arcNetString hist = consoleHistory.RetrieveFromHistory( true );
+		anString hist = consoleHistory.RetrieveFromHistory( true );
 		if ( !hist.IsEmpty() ) {
 			consoleField.SetBuffer( hist );
 		}
@@ -630,7 +630,7 @@ void aRcConsoleLocal::KeyDownEvent( int key ) {
 
 	if ( ( key == K_DOWNARROW ) ||
 		 ( key == K_N && ( idKeyInput::IsDown( K_LCTRL ) || idKeyInput::IsDown( K_RCTRL ) ) ) ) {
-		arcNetString hist = consoleHistory.RetrieveFromHistory( false );
+		anString hist = consoleHistory.RetrieveFromHistory( false );
 		if ( !hist.IsEmpty() ) {
 			consoleField.SetBuffer( hist );
 		}
@@ -834,7 +834,7 @@ void aRcConsoleLocal::Linefeed() {
 	current++;
 	for ( i = 0; i < LINE_WIDTH; i++ ) {
 		int offset = ( ( unsigned int )current % TOTAL_LINES ) * LINE_WIDTH + i;
-		text[offset] = ( arcNetString::ColorIndex( C_COLOR_CYAN )<<8 ) | ' ';
+		text[offset] = ( anString::ColorIndex( C_COLOR_CYAN )<<8 ) | ' ';
 	}
 }
 
@@ -856,14 +856,14 @@ void aRcConsoleLocal::Print( const char *txt ) {
 		return;
 	}
 
-	color = arcNetString::ColorIndex( C_COLOR_CYAN );
+	color = anString::ColorIndex( C_COLOR_CYAN );
 
 	while ( (c = *( const unsigned char* )txt) != 0 ) {
-		if ( arcNetString::IsColor( txt ) ) {
+		if ( anString::IsColor( txt ) ) {
 			if ( *(txt+1 ) == C_COLOR_DEFAULT ) {
-				color = arcNetString::ColorIndex( C_COLOR_CYAN );
+				color = anString::ColorIndex( C_COLOR_CYAN );
 			} else {
-				color = arcNetString::ColorIndex( *( txt+1 ) );
+				color = anString::ColorIndex( *( txt+1 ) );
 			}
 			txt += 2;
 			continue;
@@ -889,7 +889,7 @@ void aRcConsoleLocal::Print( const char *txt ) {
 
 		txt++;
 
-		switch( c ) {
+		switch ( c ) {
 			case '\n':
 				Linefeed ();
 				break;
@@ -945,11 +945,11 @@ void aRcConsoleLocal::DrawInput() {
 	if ( consoleField.GetAutoCompleteLength() != 0 ) {
 		autoCompleteLength = strlen( consoleField.GetBuffer() ) - consoleField.GetAutoCompleteLength();
 		if ( autoCompleteLength > 0 ) {
-			renderSystem->DrawFilled( arcVec4( 0.8f, 0.2f, 0.2f, 0.45f ), LOCALSAFE_LEFT + 2 * SMALLCHAR_WIDTH + consoleField.GetAutoCompleteLength() * SMALLCHAR_WIDTH, y + 2, autoCompleteLength * SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT - 2 );
+			renderSystem->DrawFilled( anVec4( 0.8f, 0.2f, 0.2f, 0.45f ), LOCALSAFE_LEFT + 2 * SMALLCHAR_WIDTH + consoleField.GetAutoCompleteLength() * SMALLCHAR_WIDTH, y + 2, autoCompleteLength * SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT - 2 );
 		}
 	}
 
-	renderSystem->SetColor( arcNetString::ColorForIndex( C_COLOR_CYAN ) );
+	renderSystem->SetColor( anString::ColorForIndex( C_COLOR_CYAN ) );
 
 	renderSystem->DrawSmallChar( LOCALSAFE_LEFT + 1 * SMALLCHAR_WIDTH, y, ']' );
 	consoleField.Draw( LOCALSAFE_LEFT + 2 * SMALLCHAR_WIDTH, y, SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, true );
@@ -974,8 +974,8 @@ void aRcConsoleLocal::DrawNotify() {
 		return;
 	}
 
-	currentColor = arcNetString::ColorIndex( C_COLOR_WHITE );
-	renderSystem->SetColor( arcNetString::ColorForIndex( currentColor ) );
+	currentColor = anString::ColorIndex( C_COLOR_WHITE );
+	renderSystem->SetColor( anString::ColorForIndex( currentColor ) );
 
 	v = 0;
 
@@ -997,9 +997,9 @@ void aRcConsoleLocal::DrawNotify() {
 			if ( ( text_p[x] & 0xff ) == ' ' ) {
 				continue;
 			}
-			if ( arcNetString::ColorIndex(text_p[x]>>8) != currentColor ) {
-				currentColor = arcNetString::ColorIndex(text_p[x]>>8);
-				renderSystem->SetColor( arcNetString::ColorForIndex( currentColor ) );
+			if ( anString::ColorIndex(text_p[x]>>8) != currentColor ) {
+				currentColor = anString::ColorIndex(text_p[x]>>8);
+				renderSystem->SetColor( anString::ColorForIndex( currentColor ) );
 			}
 			renderSystem->DrawSmallChar( LOCALSAFE_LEFT + ( x + 1 )*SMALLCHAR_WIDTH, v, text_p[x] & 0xff );
 		}
@@ -1026,7 +1026,7 @@ void aRcConsoleLocal::DrawSolidConsole( float frac ) {
 	int				lines;
 	int				currentColor;
 
-	lines = arcMath::Ftoi( SCREEN_HEIGHT * frac );
+	lines = anMath::Ftoi( SCREEN_HEIGHT * frac );
 	if ( lines <= 0 ) {
 		return;
 	}
@@ -1040,16 +1040,16 @@ void aRcConsoleLocal::DrawSolidConsole( float frac ) {
 	if ( y < 1.0f ) {
 		y = 0.0f;
 	} else {
-		renderSystem->DrawFilled( arcVec4( 0.0f, 0.0f, 0.0f, 0.75f ), 0, 0, SCREEN_WIDTH, y );
+		renderSystem->DrawFilled( anVec4( 0.0f, 0.0f, 0.0f, 0.75f ), 0, 0, SCREEN_WIDTH, y );
 	}
 
 	renderSystem->DrawFilled( colorCyan, 0, y, SCREEN_WIDTH, 2 );
 
 	// draw the version number
 
-	renderSystem->SetColor( arcNetString::ColorForIndex( C_COLOR_CYAN ) );
+	renderSystem->SetColor( anString::ColorForIndex( C_COLOR_CYAN ) );
 
-	arcNetString version = va( "%s.%i.%i", ENGINE_VERSION, BUILD_NUMBER, BUILD_NUMBER_MINOR );
+	anString version = va( "%s.%i.%i", ENGINE_VERSION, BUILD_NUMBER, BUILD_NUMBER_MINOR );
 	i = version.Length();
 
 	for ( x = 0; x < i; x++ ) {
@@ -1068,9 +1068,9 @@ void aRcConsoleLocal::DrawSolidConsole( float frac ) {
 	// draw from the bottom up
 	if ( display != current ) {
 		// draw arrows to show the buffer is backscrolled
-		renderSystem->SetColor( arcNetString::ColorForIndex( C_COLOR_CYAN ) );
+		renderSystem->SetColor( anString::ColorForIndex( C_COLOR_CYAN ) );
 		for ( x = 0; x < LINE_WIDTH; x += 4 ) {
-			renderSystem->DrawSmallChar( LOCALSAFE_LEFT + ( x+1 )*SMALLCHAR_WIDTH, arcMath::Ftoi( y ), '^' );
+			renderSystem->DrawSmallChar( LOCALSAFE_LEFT + ( x+1 )*SMALLCHAR_WIDTH, anMath::Ftoi( y ), '^' );
 		}
 		y -= SMALLCHAR_HEIGHT;
 		rows--;
@@ -1082,8 +1082,8 @@ void aRcConsoleLocal::DrawSolidConsole( float frac ) {
 		row--;
 	}
 
-	currentColor = arcNetString::ColorIndex( C_COLOR_WHITE );
-	renderSystem->SetColor( arcNetString::ColorForIndex( currentColor ) );
+	currentColor = anString::ColorIndex( C_COLOR_WHITE );
+	renderSystem->SetColor( anString::ColorForIndex( currentColor ) );
 
 	for ( i = 0; i < rows; i++, y -= SMALLCHAR_HEIGHT, row-- ) {
 		if ( row < 0 ) {
@@ -1101,11 +1101,11 @@ void aRcConsoleLocal::DrawSolidConsole( float frac ) {
 				continue;
 			}
 
-			if ( arcNetString::ColorIndex( text_p[x]>>8 ) != currentColor ) {
-				currentColor = arcNetString::ColorIndex( text_p[x]>>8 );
-				renderSystem->SetColor( arcNetString::ColorForIndex( currentColor ) );
+			if ( anString::ColorIndex( text_p[x]>>8 ) != currentColor ) {
+				currentColor = anString::ColorIndex( text_p[x]>>8 );
+				renderSystem->SetColor( anString::ColorForIndex( currentColor ) );
 			}
-			renderSystem->DrawSmallChar( LOCALSAFE_LEFT + ( x + 1 )*SMALLCHAR_WIDTH, arcMath::Ftoi( y ), text_p[x] & 0xff );
+			renderSystem->DrawSmallChar( LOCALSAFE_LEFT + ( x + 1 )*SMALLCHAR_WIDTH, anMath::Ftoi( y ), text_p[x] & 0xff );
 		}
 	}
 
@@ -1176,7 +1176,7 @@ void aRcConsoleLocal::PrintOverlay( idOverlayHandle &handle, justify_t justify, 
 	char string[MAX_PRINT_MSG];
 	va_list argptr;
 	va_start( argptr, text );
-	arcNetString::vsnPrintf( string, sizeof( string ), text, argptr );
+	anString::vsnPrintf( string, sizeof( string ), text, argptr );
 	va_end( argptr );
 
 	overlayText_t &overlay = overlayText.Alloc();
@@ -1195,7 +1195,7 @@ aRcConsoleLocal::DrawOverlayText
 */
 void aRcConsoleLocal::DrawOverlayText( float & leftY, float & rightY, float & centerY ) {
 	for ( int i = 0; i < overlayText.Num(); i++ ) {
-		const arcNetString & text = overlayText[i].text;
+		const anString & text = overlayText[i].text;
 
 		int maxWidth = 0;
 		int numLines = 0;
@@ -1210,7 +1210,7 @@ void aRcConsoleLocal::DrawOverlayText( float & leftY, float & rightY, float & ce
 			}
 		}
 
-		arcVec4 bgColor( 0.0f, 0.0f, 0.0f, 0.75f );
+		anVec4 bgColor( 0.0f, 0.0f, 0.0f, 0.75f );
 
 		const float width = maxWidth * SMALLCHAR_WIDTH;
 		const float height = numLines * ( SMALLCHAR_HEIGHT + 4 );
@@ -1225,7 +1225,7 @@ void aRcConsoleLocal::DrawOverlayText( float & leftY, float & rightY, float & ce
 			assert( false );
 		}
 
-		arcNetString singleLine;
+		anString singleLine;
 		for ( int j = 0; j < text.Length(); j += singleLine.Length() + 1 ) {
 			singleLine = "";
 			for ( int k = j; k < text.Length() && text[k] != '\n'; k++ ) {

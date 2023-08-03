@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -60,7 +60,7 @@ c_type_t constraintTypes[] = {
 	{ DECLAF_CONSTRAINT_HINGE, "hinge" },
 	{ DECLAF_CONSTRAINT_SLIDER, "slider" },
 	{ DECLAF_CONSTRAINT_SPRING, "spring" },
-	{ DECLAF_CONSTRAINT_INVALID, NULL }
+	{ DECLAF_CONSTRAINT_INVALID, nullptr }
 };
 
 
@@ -75,7 +75,7 @@ const char *ConstraintTypeToString( declAFConstraintType_t type ) {
 
 declAFConstraintType_t StringToConstraintType( const char *str ) {
 	for ( int i = 0; constraintTypes[i].name; i++ ) {
-		if ( arcNetString::Icmp( constraintTypes[i].name, str ) == 0 ) {
+		if ( anString::Icmp( constraintTypes[i].name, str ) == 0 ) {
 			return constraintTypes[i].type;
 		}
 	}
@@ -94,7 +94,7 @@ toolTip_t DialogAFConstraint::toolTips[] = {
 	{ IDC_COMBO_CONSTRAINT_BODY1, "first constrained body" },
 	{ IDC_COMBO_CONSTRAINT_BODY2, "second constrained body" },
 	{ IDC_EDIT_CONSTRAINT_FRICTION, "constraint friction" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 IMPLEMENT_DYNAMIC(DialogAFConstraint, CDialog)
@@ -104,12 +104,12 @@ IMPLEMENT_DYNAMIC(DialogAFConstraint, CDialog)
 DialogAFConstraint::DialogAFConstraint
 ================
 */
-DialogAFConstraint::DialogAFConstraint( CWnd* pParent /*=NULL*/ )
+DialogAFConstraint::DialogAFConstraint( CWnd* pParent /*=nullptr*/ )
 	: CDialog(DialogAFConstraint::IDD, pParent)
 	, m_friction(0 )
-	, constraint(NULL)
-	, file(NULL)
-	, constraintDlg(NULL)
+	, constraint(nullptr )
+	, file(nullptr )
+	, constraintDlg(nullptr )
 {
 	Create( IDD_DIALOG_AF_CONSTRAINT, pParent );
 	EnableToolTips( TRUE );
@@ -181,7 +181,7 @@ void DialogAFConstraint::InitConstraintTypeDlg( void ) {
 	}
 
 	GetSafeComboBoxSelection( &m_comboConstraintType, str, -1 );
-	switch( StringToConstraintType( str ) ) {
+	switch ( StringToConstraintType( str ) ) {
 		case DECLAF_CONSTRAINT_FIXED:
 			fixedDlg->LoadConstraint( constraint );
 			constraintDlg = fixedDlg;
@@ -262,9 +262,9 @@ void DialogAFConstraint::InitNewRenameDeleteButtons( void ) {
 DialogAFConstraint::LoadFile
 ================
 */
-void DialogAFConstraint::LoadFile( arcDeclAF *af ) {
+void DialogAFConstraint::LoadFile( anDeclAF *af ) {
 	file = af;
-	constraint = NULL;
+	constraint = nullptr;
 	ballAndSocketDlg->LoadFile( af );
 	universalDlg->LoadFile( af );
 	hingeDlg->LoadFile( af );
@@ -305,14 +305,14 @@ void DialogAFConstraint::LoadConstraint( const char *name ) {
 	}
 	constraint = file->constraints[i];
 
-	// load the constraint type from the current arcDeclAF_Constraint
+	// load the constraint type from the current anDeclAF_Constraint
 	SetSafeComboBoxSelection( &m_comboConstraintType, ConstraintTypeToString( constraint->type ), -1 );
 
-	// load constrained bodies from the current arcDeclAF_Constraint
+	// load constrained bodies from the current anDeclAF_Constraint
 	s1 = SetSafeComboBoxSelection( &m_comboBody1List, constraint->body1.c_str(), -1 );
 	s2 = SetSafeComboBoxSelection( &m_comboBody2List, constraint->body2.c_str(), s1 );
 
-	// load friction from the current arcDeclAF_Constraint
+	// load friction from the current anDeclAF_Constraint
 	m_friction = constraint->friction;
 
 	// update displayed values
@@ -340,17 +340,17 @@ void DialogAFConstraint::SaveConstraint( void ) {
 	}
 	UpdateData( TRUE );
 
-	// save constraint type to the current arcDeclAF_Constraint
+	// save constraint type to the current anDeclAF_Constraint
 	GetSafeComboBoxSelection( &m_comboConstraintType, str, -1 );
 	constraint->type = StringToConstraintType( str );
 
-	// save constrained bodies to the current arcDeclAF_Constraint
+	// save constrained bodies to the current anDeclAF_Constraint
 	s1 = GetSafeComboBoxSelection( &m_comboBody1List, str, -1 );
 	constraint->body1 = str;
 	s2 = GetSafeComboBoxSelection( &m_comboBody2List, str, s1 );
 	constraint->body2 = str;
 
-	// save friction to the current arcDeclAF_Constraint
+	// save friction to the current anDeclAF_Constraint
 	constraint->friction = m_friction;
 
 	AFDialogSetFileModified();
@@ -401,7 +401,7 @@ BOOL DialogAFConstraint::OnInitDialog()  {
 	springDlg = new DialogAFConstraintSpring( this );
 	springDlg->ShowWindow( SW_HIDE );
 
-	constraintDlg = NULL;
+	constraintDlg = nullptr;
 
 	InitNewRenameDeleteButtons();
 
@@ -515,7 +515,7 @@ void DialogAFConstraint::OnBnClickedButtonDeleteconstraint() {
 			m_comboConstraintList.GetLBText( i, str );
 			// delete current constraint
 			file->DeleteConstraint( str );
-			constraint = NULL;
+			constraint = nullptr;
 			m_comboConstraintList.DeleteString( i );
 			OnCbnSelchangeComboConstraints();
 			engineEdit->AF_UpdateEntities( file->GetName() );

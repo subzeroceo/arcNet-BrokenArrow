@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include <windowsx.h>
@@ -68,10 +68,10 @@ LPMRUMENU lpMruMenu;
   lpMruMenu->wMaxSizeLruItem = wMaxSizeLruItemInit;
   lpMruMenu->lpMRU = (LPSTR)GlobalAllocPtr(GHND,
                       lpMruMenu->wNbLruMenu*(UINT)lpMruMenu->wMaxSizeLruItem);
-  if (lpMruMenu->lpMRU == NULL)
+  if (lpMruMenu->lpMRU == nullptr )
      {
        GlobalFreePtr(lpMruMenu);
-       lpMruMenu =  NULL;
+       lpMruMenu =  nullptr;
      }
   return lpMruMenu;
 }
@@ -278,14 +278,14 @@ WORD i,j;
         // Shift the other items
         for (j=i;j>0;j--)
          lstrcpy((lpMruMenu->lpMRU) + (lpMruMenu->wMaxSizeLruItem * (UINT)j),
-                 (lpMruMenu->lpMRU) + (lpMruMenu->wMaxSizeLruItem * (UINT)(j-1 ) ));
+                 (lpMruMenu->lpMRU) + (lpMruMenu->wMaxSizeLruItem * (UINT)(j-1 ) ) );
         _fstrncpy(lpMruMenu->lpMRU,lpItem,lpMruMenu->wMaxSizeLruItem-1 );
         return ;
       }
   lpMruMenu->wNbItemFill = min(lpMruMenu->wNbItemFill+1,lpMruMenu->wNbLruMenu);
   for ( i=lpMruMenu->wNbItemFill-1;i>0;i--)
      lstrcpy(lpMruMenu->lpMRU + (lpMruMenu->wMaxSizeLruItem * (UINT)i),
-             lpMruMenu->lpMRU + (lpMruMenu->wMaxSizeLruItem * (UINT)( i-1 ) ));
+             lpMruMenu->lpMRU + (lpMruMenu->wMaxSizeLruItem * (UINT)( i-1 ) ) );
   _fstrncpy(lpMruMenu->lpMRU,lpItem,lpMruMenu->wMaxSizeLruItem-1 );
 }
 
@@ -325,7 +325,7 @@ WORD i;
   lpMruMenu->wNbItemFill--;
   for ( i=wItem;i<lpMruMenu->wNbItemFill;i++ )
      lstrcpy(lpMruMenu->lpMRU + (lpMruMenu->wMaxSizeLruItem * (UINT)i),
-             lpMruMenu->lpMRU + (lpMruMenu->wMaxSizeLruItem * (UINT)( i+1 ) ));
+             lpMruMenu->lpMRU + (lpMruMenu->wMaxSizeLruItem * (UINT)( i+1 ) ) );
   return TRUE;
 }
 
@@ -354,7 +354,7 @@ WORD i;
 void PlaceMenuMRUItem(LPMRUMENU lpMruMenu,HMENU hMenu,UINT uiItem) {
 int  i;
 WORD wNbShow;
-  if (hMenu == NULL)
+  if (hMenu == nullptr )
     return;
   // remove old MRU in menu
   for ( i=0;i<=( int )(lpMruMenu->wNbLruMenu);i++ )
@@ -364,7 +364,7 @@ WORD wNbShow;
     return;
 
   // If they are item, insert a separator before the files
-  InsertMenu(hMenu,uiItem,MF_SEPARATOR,lpMruMenu->wIdMru,NULL);
+  InsertMenu(hMenu,uiItem,MF_SEPARATOR,lpMruMenu->wIdMru,nullptr );
 
   wNbShow = min(lpMruMenu->wNbItemFill,lpMruMenu->wNbLruShow);
   for ( i=( int )wNbShow-1;i>=0;i--)
@@ -417,7 +417,7 @@ LPSTR lpTxt;
 WORD i;
 
   lpTxt = (LPSTR)GlobalAllocPtr(GHND,lpMruMenu->wMaxSizeLruItem + 20);
-  if (lpTxt == NULL)
+  if (lpTxt == nullptr )
     return FALSE;
 
   for ( i=0;i<lpMruMenu->wNbLruMenu;i++ )
@@ -429,7 +429,7 @@ WORD i;
       WritePrivateProfileString(lpszSection,szEntry,lpTxt,lpszFile);
     }
   GlobalFreePtr(lpTxt);
-  WritePrivateProfileString(NULL,NULL,NULL,lpszFile); // flush cache
+  WritePrivateProfileString(nullptr,nullptr,nullptr,lpszFile); // flush cache
   return TRUE;
 }
 
@@ -464,7 +464,7 @@ BOOL LoadMruInIni(LPMRUMENU lpMruMenu,LPSTR lpszSection,LPSTR lpszFile) {
 LPSTR lpTxt;
 WORD i;
   lpTxt = (LPSTR)GlobalAllocPtr(GHND,lpMruMenu->wMaxSizeLruItem + 20);
-  if (lpTxt == NULL)
+  if (lpTxt == nullptr )
     return FALSE;
 
   for ( i=0;i<lpMruMenu->wNbLruMenu;i++ )
@@ -527,11 +527,11 @@ HKEY hCurKey;
 DWORD dwDisp;
 
   lpTxt = (LPSTR)GlobalAllocPtr(GHND,lpMruMenu->wMaxSizeLruItem + 20);
-  if (lpTxt == NULL)
+  if (lpTxt == nullptr )
     return FALSE;
 
-  RegCreateKeyEx(HKEY_CURRENT_USER,lpszKey,0,NULL,
-                  REG_OPTION_NON_VOLATILE,KEY_ALL_ACCESS,NULL,&hCurKey,&dwDisp);
+  RegCreateKeyEx(HKEY_CURRENT_USER,lpszKey,0,nullptr,
+                  REG_OPTION_NON_VOLATILE,KEY_ALL_ACCESS,nullptr,&hCurKey,&dwDisp);
 
   for ( i=0;i<lpMruMenu->wNbLruMenu;i++ )
     {
@@ -578,7 +578,7 @@ WORD i;
 HKEY hCurKey;
 DWORD dwType;
   lpTxt = (LPSTR)GlobalAllocPtr(GHND,lpMruMenu->wMaxSizeLruItem + 20);
-  if (lpTxt == NULL)
+  if (lpTxt == nullptr )
     return FALSE;
 
   RegOpenKeyEx(HKEY_CURRENT_USER,lpszKey,0,KEY_READ,&hCurKey);
@@ -591,7 +591,7 @@ DWORD dwType;
       wsprintf(szEntry,"File%lu",(DWORD)i+1 );
       *lpTxt = '\0';
       dwSizeBuf = lpMruMenu->wMaxSizeLruItem + 10;
-      RegQueryValueEx(hCurKey,szEntry,NULL,&dwType,(LPBYTE)lpTxt,&dwSizeBuf);
+      RegQueryValueEx(hCurKey,szEntry,nullptr,&dwType,(LPBYTE)lpTxt,&dwSizeBuf);
       *(lpTxt+dwSizeBuf)='\0';
       if (*lpTxt == '\0')
         break;

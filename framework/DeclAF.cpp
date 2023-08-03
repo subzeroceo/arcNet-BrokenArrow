@@ -1,10 +1,10 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 /*
 ===============================================================================
 
-	arcDeclAF
+	anDeclAF
 
 ===============================================================================
 */
@@ -25,8 +25,8 @@ arcAFVector::arcAFVector() {
 arcAFVector::Parse
 ================
 */
-bool arcAFVector::Parse( arcLexer &src ) {
-	arcNetToken token;
+bool arcAFVector::Parse( anLexer &src ) {
+	anToken token;
 
 	if ( !src.ReadToken( &token ) ) {
 		return false;
@@ -87,10 +87,10 @@ arcAFVector::Finish
 ================
 */
 bool arcAFVector::Finish( const char *fileName, const getJointTransform_t GetJointTransform, const arcJointMat *frame, void *model ) const {
-	arcMat3 axis;
-	arcVec3 start, end;
+	anMat3 axis;
+	anVec3 start, end;
 
-	switch( type ) {
+	switch ( type ) {
 		case arcAFVector::VEC_COORDS: {
 			break;
 		}
@@ -143,11 +143,11 @@ bool arcAFVector::Finish( const char *fileName, const getJointTransform_t GetJoi
 arcAFVector::Write
 ================
 */
-bool arcAFVector::Write( arcNetFile *f ) const {
+bool arcAFVector::Write( anFile *f ) const {
 	if ( negate ) {
 		f->WriteFloatString( "-" );
 	}
-	switch( type ) {
+	switch ( type ) {
 		case arcAFVector::VEC_COORDS: {
 			f->WriteFloatString( "( %f, %f, %f )", vec.x, vec.y, vec.z );
 			break;
@@ -176,8 +176,8 @@ bool arcAFVector::Write( arcNetFile *f ) const {
 arcAFVector::ToString
 ================
 */
-const char *arcAFVector::ToString( arcNetString &str, const int precision ) {
-	switch( type ) {
+const char *arcAFVector::ToString( anString &str, const int precision ) {
+	switch ( type ) {
 		case arcAFVector::VEC_COORDS: {
 			char format[128];
 			sprintf( format, "( %%.%df, %%.%df, %%.%df )", precision, precision, precision );
@@ -208,10 +208,10 @@ const char *arcAFVector::ToString( arcNetString &str, const int precision ) {
 
 /*
 ================
-arcDeclAF_Body::SetDefault
+anDeclAF_Body::SetDefault
 ================
 */
-void arcDeclAF_Body::SetDefault( const arcDeclAF *file ) {
+void anDeclAF_Body::SetDefault( const anDeclAF *file ) {
 	name = "noname";
 	modelType = TRM_BOX;
 	v1.type = arcAFVector::VEC_COORDS;
@@ -238,10 +238,10 @@ void arcDeclAF_Body::SetDefault( const arcDeclAF *file ) {
 
 /*
 ================
-arcDeclAF_Constraint::SetDefault
+anDeclAF_Constraint::SetDefault
 ================
 */
-void arcDeclAF_Constraint::SetDefault( const arcDeclAF *file ) {
+void anDeclAF_Constraint::SetDefault( const anDeclAF *file ) {
 	name = "noname";
 	type = DECLAF_CONSTRAINT_UNIVERSALJOINT;
 	if ( file->bodies.Num() ) {
@@ -257,7 +257,7 @@ void arcDeclAF_Constraint::SetDefault( const arcDeclAF *file ) {
 	axis.ToVec3().Set( 1.0f, 0.0f, 0.0f );
 	shaft[0].ToVec3().Set( 0.0f, 0.0f, -1.0f );
 	shaft[1].ToVec3().Set( 0.0f, 0.0f, 1.0f );
-	limit = arcDeclAF_Constraint::LIMIT_NONE;
+	limit = anDeclAF_Constraint::LIMIT_NONE;
 	limitAngles[0] =
 	limitAngles[1] =
 	limitAngles[2] = 0.0f;
@@ -266,16 +266,16 @@ void arcDeclAF_Constraint::SetDefault( const arcDeclAF *file ) {
 
 /*
 ================
-arcDeclAF::WriteBody
+anDeclAF::WriteBody
 ================
 */
-bool arcDeclAF::WriteBody( arcNetFile *f, const arcDeclAF_Body &body ) const {
-	arcNetString str;
+bool anDeclAF::WriteBody( anFile *f, const anDeclAF_Body &body ) const {
+	anString str;
 
 	f->WriteFloatString( "\nbody \"%s\" {\n", body.name.c_str() );
 	f->WriteFloatString( "\tjoint \"%s\"\n", body.jointName.c_str() );
 	f->WriteFloatString( "\tmod %s\n", JointModToString( body.jointMod ) );
-	switch( body.modelType ) {
+	switch ( body.modelType ) {
 		case TRM_BOX: {
 	        f->WriteFloatString( "\tmodel box( " );
 			body.v1.Write( f );
@@ -336,7 +336,7 @@ bool arcDeclAF::WriteBody( arcNetFile *f, const arcDeclAF_Body &body ) const {
 	}
 	f->WriteFloatString( "\tdensity %f\n", body.density );
 	if ( body.inertiaScale != mat3_identity ) {
-		const arcMat3 &ic = body.inertiaScale;
+		const anMat3 &ic = body.inertiaScale;
 		f->WriteFloatString( "\tinertiaScale (%f %f %f %f %f %f %f %f %f)\n",
 												ic[0][0], ic[0][1], ic[0][2],
 												ic[1][0], ic[1][1], ic[1][2],
@@ -365,10 +365,10 @@ bool arcDeclAF::WriteBody( arcNetFile *f, const arcDeclAF_Body &body ) const {
 
 /*
 ================
-arcDeclAF::WriteFixed
+anDeclAF::WriteFixed
 ================
 */
-bool arcDeclAF::WriteFixed( arcNetFile *f, const arcDeclAF_Constraint &c ) const {
+bool anDeclAF::WriteFixed( anFile *f, const anDeclAF_Constraint &c ) const {
 	f->WriteFloatString( "\nfixed \"%s\" {\n", c.name.c_str() );
 	f->WriteFloatString( "\tbody1 \"%s\"\n", c.body1.c_str() );
 	f->WriteFloatString( "\tbody2 \"%s\"\n", c.body2.c_str() );
@@ -378,10 +378,10 @@ bool arcDeclAF::WriteFixed( arcNetFile *f, const arcDeclAF_Constraint &c ) const
 
 /*
 ================
-arcDeclAF::WriteBallAndSocketJoint
+anDeclAF::WriteBallAndSocketJoint
 ================
 */
-bool arcDeclAF::WriteBallAndSocketJoint( arcNetFile *f, const arcDeclAF_Constraint &c ) const {
+bool anDeclAF::WriteBallAndSocketJoint( anFile *f, const anDeclAF_Constraint &c ) const {
 	f->WriteFloatString( "\nballAndSocketJoint \"%s\" {\n", c.name.c_str() );
 	f->WriteFloatString( "\tbody1 \"%s\"\n", c.body1.c_str() );
 	f->WriteFloatString( "\tbody2 \"%s\"\n", c.body2.c_str() );
@@ -389,13 +389,13 @@ bool arcDeclAF::WriteBallAndSocketJoint( arcNetFile *f, const arcDeclAF_Constrai
 	c.anchor.Write( f );
 	f->WriteFloatString( "\n" );
 	f->WriteFloatString( "\tfriction %f\n", c.friction );
-	if ( c.limit == arcDeclAF_Constraint::LIMIT_CONE ) {
+	if ( c.limit == anDeclAF_Constraint::LIMIT_CONE ) {
 		f->WriteFloatString( "\tconeLimit " );
 		c.limitAxis.Write( f );
 		f->WriteFloatString( ", %f, ", c.limitAngles[0] );
 		c.shaft[0].Write( f );
 		f->WriteFloatString( "\n" );
-	} else if ( c.limit == arcDeclAF_Constraint::LIMIT_PYRAMID ) {
+	} else if ( c.limit == anDeclAF_Constraint::LIMIT_PYRAMID ) {
 		f->WriteFloatString( "\tpyramidLimit " );
 		c.limitAxis.Write( f );
 		f->WriteFloatString( ", %f, %f, %f, ", c.limitAngles[0], c.limitAngles[1], c.limitAngles[2] );
@@ -408,10 +408,10 @@ bool arcDeclAF::WriteBallAndSocketJoint( arcNetFile *f, const arcDeclAF_Constrai
 
 /*
 ================
-arcDeclAF::WriteUniversalJoint
+anDeclAF::WriteUniversalJoint
 ================
 */
-bool arcDeclAF::WriteUniversalJoint( arcNetFile *f, const arcDeclAF_Constraint &c ) const {
+bool anDeclAF::WriteUniversalJoint( anFile *f, const anDeclAF_Constraint &c ) const {
 	f->WriteFloatString( "\nuniversalJoint \"%s\" {\n", c.name.c_str() );
 	f->WriteFloatString( "\tbody1 \"%s\"\n", c.body1.c_str() );
 	f->WriteFloatString( "\tbody2 \"%s\"\n", c.body2.c_str() );
@@ -424,11 +424,11 @@ bool arcDeclAF::WriteUniversalJoint( arcNetFile *f, const arcDeclAF_Constraint &
 	c.shaft[1].Write( f );
 	f->WriteFloatString( "\n" );
 	f->WriteFloatString( "\tfriction %f\n", c.friction );
-	if ( c.limit == arcDeclAF_Constraint::LIMIT_CONE ) {
+	if ( c.limit == anDeclAF_Constraint::LIMIT_CONE ) {
 		f->WriteFloatString( "\tconeLimit " );
 		c.limitAxis.Write( f );
 		f->WriteFloatString( ", %f\n", c.limitAngles[0] );
-	} else if ( c.limit == arcDeclAF_Constraint::LIMIT_PYRAMID ) {
+	} else if ( c.limit == anDeclAF_Constraint::LIMIT_PYRAMID ) {
 		f->WriteFloatString( "\tpyramidLimit " );
 		c.limitAxis.Write( f );
 		f->WriteFloatString( ", %f, %f, %f\n", c.limitAngles[0], c.limitAngles[1], c.limitAngles[2] );
@@ -439,10 +439,10 @@ bool arcDeclAF::WriteUniversalJoint( arcNetFile *f, const arcDeclAF_Constraint &
 
 /*
 ================
-arcDeclAF::WriteHinge
+anDeclAF::WriteHinge
 ================
 */
-bool arcDeclAF::WriteHinge( arcNetFile *f, const arcDeclAF_Constraint &c ) const {
+bool anDeclAF::WriteHinge( anFile *f, const anDeclAF_Constraint &c ) const {
 	f->WriteFloatString( "\nhinge \"%s\" {\n", c.name.c_str() );
 	f->WriteFloatString( "\tbody1 \"%s\"\n", c.body1.c_str() );
 	f->WriteFloatString( "\tbody2 \"%s\"\n", c.body2.c_str() );
@@ -453,7 +453,7 @@ bool arcDeclAF::WriteHinge( arcNetFile *f, const arcDeclAF_Constraint &c ) const
 	c.axis.Write( f );
 	f->WriteFloatString( "\n" );
 	f->WriteFloatString( "\tfriction %f\n", c.friction );
-	if ( c.limit == arcDeclAF_Constraint::LIMIT_CONE ) {
+	if ( c.limit == anDeclAF_Constraint::LIMIT_CONE ) {
 		f->WriteFloatString( "\tlimit " );
 		f->WriteFloatString( "%f, %f, %f", c.limitAngles[0], c.limitAngles[1], c.limitAngles[2] );
 		f->WriteFloatString( "\n" );
@@ -464,10 +464,10 @@ bool arcDeclAF::WriteHinge( arcNetFile *f, const arcDeclAF_Constraint &c ) const
 
 /*
 ================
-arcDeclAF::WriteSlider
+anDeclAF::WriteSlider
 ================
 */
-bool arcDeclAF::WriteSlider( arcNetFile *f, const arcDeclAF_Constraint &c ) const {
+bool anDeclAF::WriteSlider( anFile *f, const anDeclAF_Constraint &c ) const {
 	f->WriteFloatString( "\nslider \"%s\" {\n", c.name.c_str() );
 	f->WriteFloatString( "\tbody1 \"%s\"\n", c.body1.c_str() );
 	f->WriteFloatString( "\tbody2 \"%s\"\n", c.body2.c_str() );
@@ -481,10 +481,10 @@ bool arcDeclAF::WriteSlider( arcNetFile *f, const arcDeclAF_Constraint &c ) cons
 
 /*
 ================
-arcDeclAF::WriteSpring
+anDeclAF::WriteSpring
 ================
 */
-bool arcDeclAF::WriteSpring( arcNetFile *f, const arcDeclAF_Constraint &c ) const {
+bool anDeclAF::WriteSpring( anFile *f, const anDeclAF_Constraint &c ) const {
 	f->WriteFloatString( "\nspring \"%s\" {\n", c.name.c_str() );
 	f->WriteFloatString( "\tbody1 \"%s\"\n", c.body1.c_str() );
 	f->WriteFloatString( "\tbody2 \"%s\"\n", c.body2.c_str() );
@@ -507,11 +507,11 @@ bool arcDeclAF::WriteSpring( arcNetFile *f, const arcDeclAF_Constraint &c ) cons
 
 /*
 ================
-arcDeclAF::WriteConstraint
+anDeclAF::WriteConstraint
 ================
 */
-bool arcDeclAF::WriteConstraint( arcNetFile *f, const arcDeclAF_Constraint &c ) const {
-	switch( c.type ) {
+bool anDeclAF::WriteConstraint( anFile *f, const anDeclAF_Constraint &c ) const {
+	switch ( c.type ) {
 		case DECLAF_CONSTRAINT_FIXED:
 			return WriteFixed( f, c );
 		case DECLAF_CONSTRAINT_BALLANDSOCKETJOINT:
@@ -532,11 +532,11 @@ bool arcDeclAF::WriteConstraint( arcNetFile *f, const arcDeclAF_Constraint &c ) 
 
 /*
 ================
-arcDeclAF::WriteSettings
+anDeclAF::WriteSettings
 ================
 */
-bool arcDeclAF::WriteSettings( arcNetFile *f ) const {
-	arcNetString str;
+bool anDeclAF::WriteSettings( anFile *f ) const {
+	anString str;
 
 	f->WriteFloatString( "\nsettings {\n" );
 	f->WriteFloatString( "\tmodel \"%s\"\n", model.c_str() );
@@ -559,12 +559,12 @@ bool arcDeclAF::WriteSettings( arcNetFile *f ) const {
 
 /*
 ================
-arcDeclAF::RebuildTextSource
+anDeclAF::RebuildTextSource
 ================
 */
-bool arcDeclAF::RebuildTextSource() {
+bool anDeclAF::RebuildTextSource() {
 	int i;
-	aRcFileMemory f;
+	anFileMemory f;
 
 	f.WriteFloatString( "\n\n/*\n"
 						"\tGenerated by the Articulated Figure Editor.\n"
@@ -598,10 +598,10 @@ bool arcDeclAF::RebuildTextSource() {
 
 /*
 ================
-arcDeclAF::Save
+anDeclAF::Save
 ================
 */
-bool arcDeclAF::Save() {
+bool anDeclAF::Save() {
 	RebuildTextSource();
 	ReplaceSourceFileText();
 	modified = false;
@@ -610,13 +610,13 @@ bool arcDeclAF::Save() {
 
 /*
 ================
-arcDeclAF::ContentsFromString
+anDeclAF::ContentsFromString
 ================
 */
-int arcDeclAF::ContentsFromString( const char *str ) {
+int anDeclAF::ContentsFromString( const char *str ) {
 	int c;
-	arcNetToken token;
-	arcLexer src( str, arcNetString::Length( str ), "arcDeclAF::ContentsFromString" );
+	anToken token;
+	anLexer src( str, anString::Length( str ), "anDeclAF::ContentsFromString" );
 
 	c = 0;
 	while( src.ReadToken( &token ) ) {
@@ -627,7 +627,7 @@ int arcDeclAF::ContentsFromString( const char *str ) {
 			c |= CONTENTS_SOLID;
 		}
 		else if ( token.Icmp( "body" ) == 0 ) {
-			c |= CONTENTS_BODY;
+			c |= CONTENTS_ACTORBODY;
 		}
 		else if ( token.Icmp( "corpse" ) == 0 ) {
 			c |= CONTENTS_CORPSE;
@@ -650,16 +650,16 @@ int arcDeclAF::ContentsFromString( const char *str ) {
 
 /*
 ================
-arcDeclAF::ContentsToString
+anDeclAF::ContentsToString
 ================
 */
-const char *arcDeclAF::ContentsToString( const int contents, arcNetString &str ) {
+const char *anDeclAF::ContentsToString( const int contents, anString &str ) {
 	str = "";
 	if ( contents & CONTENTS_SOLID ) {
 		if ( str.Length() ) str += ", ";
 		str += "solid";
 	}
-	if ( contents & CONTENTS_BODY ) {
+	if ( contents & CONTENTS_ACTORBODY ) {
 		if ( str.Length() ) str += ", ";
 		str += "body";
 	}
@@ -683,17 +683,17 @@ const char *arcDeclAF::ContentsToString( const int contents, arcNetString &str )
 
 /*
 ================
-arcDeclAF::JointModFromString
+anDeclAF::JointModFromString
 ================
 */
-declAFJointMod_t arcDeclAF::JointModFromString( const char *str ) {
-	if ( arcNetString::Icmp( str, "orientation" ) == 0 ) {
+declAFJointMod_t anDeclAF::JointModFromString( const char *str ) {
+	if ( anString::Icmp( str, "orientation" ) == 0 ) {
 		return DECLAF_JOINTMOD_AXIS;
 	}
-	if ( arcNetString::Icmp( str, "position" ) == 0 ) {
+	if ( anString::Icmp( str, "position" ) == 0 ) {
 		return DECLAF_JOINTMOD_ORIGIN;
 	}
-	if ( arcNetString::Icmp( str, "both" ) == 0 ) {
+	if ( anString::Icmp( str, "both" ) == 0 ) {
 		return DECLAF_JOINTMOD_BOTH;
 	}
 	return DECLAF_JOINTMOD_AXIS;
@@ -701,11 +701,11 @@ declAFJointMod_t arcDeclAF::JointModFromString( const char *str ) {
 
 /*
 ================
-arcDeclAF::JointModToString
+anDeclAF::JointModToString
 ================
 */
-const char * arcDeclAF::JointModToString( declAFJointMod_t jointMod ) {
-	switch( jointMod ) {
+const char *anDeclAF::JointModToString( declAFJointMod_t jointMod ) {
+	switch ( jointMod ) {
 		case DECLAF_JOINTMOD_AXIS: {
 			return "orientation";
 		}
@@ -721,21 +721,21 @@ const char * arcDeclAF::JointModToString( declAFJointMod_t jointMod ) {
 
 /*
 =================
-arcDeclAF::Size
+anDeclAF::Size
 =================
 */
-size_t arcDeclAF::Size() const {
-	return sizeof( arcDeclAF );
+size_t anDeclAF::Size() const {
+	return sizeof( anDeclAF );
 }
 
 /*
 ================
-arcDeclAF::ParseContents
+anDeclAF::ParseContents
 ================
 */
-bool arcDeclAF::ParseContents( arcLexer &src, int &c ) const {
-	arcNetToken token;
-	arcNetString str;
+bool anDeclAF::ParseContents( anLexer &src, int &c ) const {
+	anToken token;
+	anString str;
 
 	while( src.ReadToken( &token ) ) {
 		str += token;
@@ -750,14 +750,14 @@ bool arcDeclAF::ParseContents( arcLexer &src, int &c ) const {
 
 /*
 ================
-arcDeclAF::ParseBody
+anDeclAF::ParseBody
 ================
 */
-bool arcDeclAF::ParseBody( arcLexer &src ) {
+bool anDeclAF::ParseBody( anLexer &src ) {
 	bool hasJoint = false;
-	arcNetToken token;
+	anToken token;
 	arcAFVector angles;
-	arcDeclAF_Body *body = new (TAG_DECL) arcDeclAF_Body;
+	anDeclAF_Body *body = new (TAG_DECL) anDeclAF_Body;
 
 	bodies.Alloc() = body;
 
@@ -861,7 +861,7 @@ bool arcDeclAF::ParseBody( arcLexer &src ) {
 			if ( !angles.Parse( src ) ) {
 				return false;
 			}
-			body->angles = arcAngles( angles.ToVec3().x, angles.ToVec3().y, angles.ToVec3().z );
+			body->angles = anAngles( angles.ToVec3().x, angles.ToVec3().y, angles.ToVec3().z );
 		} else if ( !token.Icmp( "joint" ) ) {
 			if ( !src.ExpectTokenType( TT_STRING, 0, &token ) ) {
 				return false;
@@ -928,12 +928,12 @@ bool arcDeclAF::ParseBody( arcLexer &src ) {
 
 /*
 ================
-arcDeclAF::ParseFixed
+anDeclAF::ParseFixed
 ================
 */
-bool arcDeclAF::ParseFixed( arcLexer &src ) {
-	arcNetToken token;
-	arcDeclAF_Constraint *constraint = new (TAG_DECL) arcDeclAF_Constraint;
+bool anDeclAF::ParseFixed( anLexer &src ) {
+	anToken token;
+	anDeclAF_Constraint *constraint = new (TAG_DECL) anDeclAF_Constraint;
 
 	constraint->SetDefault( this );
 	constraints.Alloc() = constraint;
@@ -967,12 +967,12 @@ bool arcDeclAF::ParseFixed( arcLexer &src ) {
 
 /*
 ================
-arcDeclAF::ParseBallAndSocketJoint
+anDeclAF::ParseBallAndSocketJoint
 ================
 */
-bool arcDeclAF::ParseBallAndSocketJoint( arcLexer &src ) {
-	arcNetToken token;
-	arcDeclAF_Constraint *constraint = new (TAG_DECL) arcDeclAF_Constraint;
+bool anDeclAF::ParseBallAndSocketJoint( anLexer &src ) {
+	anToken token;
+	anDeclAF_Constraint *constraint = new (TAG_DECL) anDeclAF_Constraint;
 
 	constraint->SetDefault( this );
 	constraints.Alloc() = constraint;
@@ -983,7 +983,7 @@ bool arcDeclAF::ParseBallAndSocketJoint( arcLexer &src ) {
 	}
 
 	constraint->type = DECLAF_CONSTRAINT_BALLANDSOCKETJOINT;
-	constraint->limit = arcDeclAF_Constraint::LIMIT_NONE;
+	constraint->limit = anDeclAF_Constraint::LIMIT_NONE;
 	constraint->name = token;
 	constraint->friction = 0.5f;
 	constraint->anchor.ToVec3().Zero();
@@ -1011,7 +1011,7 @@ bool arcDeclAF::ParseBallAndSocketJoint( arcLexer &src ) {
 				!constraint->shaft[0].Parse( src ) ) {
 				return false;
 			}
-			constraint->limit = arcDeclAF_Constraint::LIMIT_CONE;
+			constraint->limit = anDeclAF_Constraint::LIMIT_CONE;
 		} else if ( !token.Icmp( "pyramidlimit" ) ) {
 			if ( !constraint->limitAxis.Parse( src ) ||
 				!src.ExpectTokenString( "," ) ) {
@@ -1030,7 +1030,7 @@ bool arcDeclAF::ParseBallAndSocketJoint( arcLexer &src ) {
 				!constraint->shaft[0].Parse( src ) ) {
 				return false;
 			}
-			constraint->limit = arcDeclAF_Constraint::LIMIT_PYRAMID;
+			constraint->limit = anDeclAF_Constraint::LIMIT_PYRAMID;
 		} else if ( !token.Icmp( "friction" ) ) {
 			constraint->friction = src.ParseFloat();
 		} else if ( token == "}" ) {
@@ -1046,12 +1046,12 @@ bool arcDeclAF::ParseBallAndSocketJoint( arcLexer &src ) {
 
 /*
 ================
-arcDeclAF::ParseUniversalJoint
+anDeclAF::ParseUniversalJoint
 ================
 */
-bool arcDeclAF::ParseUniversalJoint( arcLexer &src ) {
-	arcNetToken token;
-	arcDeclAF_Constraint *constraint = new (TAG_DECL) arcDeclAF_Constraint;
+bool anDeclAF::ParseUniversalJoint( anLexer &src ) {
+	anToken token;
+	anDeclAF_Constraint *constraint = new (TAG_DECL) anDeclAF_Constraint;
 
 	constraint->SetDefault( this );
 	constraints.Alloc() = constraint;
@@ -1062,7 +1062,7 @@ bool arcDeclAF::ParseUniversalJoint( arcLexer &src ) {
 	}
 
 	constraint->type = DECLAF_CONSTRAINT_UNIVERSALJOINT;
-	constraint->limit = arcDeclAF_Constraint::LIMIT_NONE;
+	constraint->limit = anDeclAF_Constraint::LIMIT_NONE;
 	constraint->name = token;
 	constraint->friction = 0.5f;
 	constraint->anchor.ToVec3().Zero();
@@ -1093,7 +1093,7 @@ bool arcDeclAF::ParseUniversalJoint( arcLexer &src ) {
 					return false;
 			}
 			constraint->limitAngles[0] = src.ParseFloat();
-			constraint->limit = arcDeclAF_Constraint::LIMIT_CONE;
+			constraint->limit = anDeclAF_Constraint::LIMIT_CONE;
 		} else if ( !token.Icmp( "pyramidlimit" ) ) {
 			if ( !constraint->limitAxis.Parse( src ) ||
 				!src.ExpectTokenString( "," ) ) {
@@ -1108,7 +1108,7 @@ bool arcDeclAF::ParseUniversalJoint( arcLexer &src ) {
 				return false;
 			}
 			constraint->limitAngles[2] = src.ParseFloat();
-			constraint->limit = arcDeclAF_Constraint::LIMIT_PYRAMID;
+			constraint->limit = anDeclAF_Constraint::LIMIT_PYRAMID;
 		} else if ( !token.Icmp( "friction" ) ) {
 			constraint->friction = src.ParseFloat();
 		} else if ( token == "}" ) {
@@ -1124,12 +1124,12 @@ bool arcDeclAF::ParseUniversalJoint( arcLexer &src ) {
 
 /*
 ================
-arcDeclAF::ParseHinge
+anDeclAF::ParseHinge
 ================
 */
-bool arcDeclAF::ParseHinge( arcLexer &src ) {
-	arcNetToken token;
-	arcDeclAF_Constraint *constraint = new (TAG_DECL) arcDeclAF_Constraint;
+bool anDeclAF::ParseHinge( anLexer &src ) {
+	anToken token;
+	anDeclAF_Constraint *constraint = new (TAG_DECL) anDeclAF_Constraint;
 
 	constraint->SetDefault( this );
 	constraints.Alloc() = constraint;
@@ -1140,7 +1140,7 @@ bool arcDeclAF::ParseHinge( arcLexer &src ) {
 	}
 
 	constraint->type = DECLAF_CONSTRAINT_HINGE;
-	constraint->limit = arcDeclAF_Constraint::LIMIT_NONE;
+	constraint->limit = anDeclAF_Constraint::LIMIT_NONE;
 	constraint->name = token;
 	constraint->friction = 0.5f;
 	constraint->anchor.ToVec3().Zero();
@@ -1172,7 +1172,7 @@ bool arcDeclAF::ParseHinge( arcLexer &src ) {
 				return false;
 			}
 			constraint->limitAngles[2] = src.ParseFloat();
-			constraint->limit = arcDeclAF_Constraint::LIMIT_CONE;
+			constraint->limit = anDeclAF_Constraint::LIMIT_CONE;
 		} else if ( !token.Icmp( "friction" ) ) {
 			constraint->friction = src.ParseFloat();
 		} else if ( token == "}" ) {
@@ -1188,12 +1188,12 @@ bool arcDeclAF::ParseHinge( arcLexer &src ) {
 
 /*
 ================
-arcDeclAF::ParseSlider
+anDeclAF::ParseSlider
 ================
 */
-bool arcDeclAF::ParseSlider( arcLexer &src ) {
-	arcNetToken token;
-	arcDeclAF_Constraint *constraint = new (TAG_DECL) arcDeclAF_Constraint;
+bool anDeclAF::ParseSlider( anLexer &src ) {
+	anToken token;
+	anDeclAF_Constraint *constraint = new (TAG_DECL) anDeclAF_Constraint;
 
 	constraint->SetDefault( this );
 	constraints.Alloc() = constraint;
@@ -1204,7 +1204,7 @@ bool arcDeclAF::ParseSlider( arcLexer &src ) {
 	}
 
 	constraint->type = DECLAF_CONSTRAINT_SLIDER;
-	constraint->limit = arcDeclAF_Constraint::LIMIT_NONE;
+	constraint->limit = anDeclAF_Constraint::LIMIT_NONE;
 	constraint->name = token;
 	constraint->friction = 0.5f;
 
@@ -1235,12 +1235,12 @@ bool arcDeclAF::ParseSlider( arcLexer &src ) {
 
 /*
 ================
-arcDeclAF::ParseSpring
+anDeclAF::ParseSpring
 ================
 */
-bool arcDeclAF::ParseSpring( arcLexer &src ) {
-	arcNetToken token;
-	arcDeclAF_Constraint *constraint = new (TAG_DECL) arcDeclAF_Constraint;
+bool anDeclAF::ParseSpring( anLexer &src ) {
+	anToken token;
+	anDeclAF_Constraint *constraint = new (TAG_DECL) anDeclAF_Constraint;
 
 	constraint->SetDefault( this );
 	constraints.Alloc() = constraint;
@@ -1251,7 +1251,7 @@ bool arcDeclAF::ParseSpring( arcLexer &src ) {
 	}
 
 	constraint->type = DECLAF_CONSTRAINT_SPRING;
-	constraint->limit = arcDeclAF_Constraint::LIMIT_NONE;
+	constraint->limit = anDeclAF_Constraint::LIMIT_NONE;
 	constraint->name = token;
 	constraint->friction = 0.5f;
 
@@ -1298,11 +1298,11 @@ bool arcDeclAF::ParseSpring( arcLexer &src ) {
 
 /*
 ================
-arcDeclAF::ParseSettings
+anDeclAF::ParseSettings
 ================
 */
-bool arcDeclAF::ParseSettings( arcLexer &src ) {
-	arcNetToken token;
+bool anDeclAF::ParseSettings( anLexer &src ) {
+	anToken token;
 
 	if ( !src.ExpectTokenString( "{" ) ) {
 		return false;
@@ -1389,13 +1389,13 @@ bool arcDeclAF::ParseSettings( arcLexer &src ) {
 
 /*
 ================
-arcDeclAF::Parse
+anDeclAF::Parse
 ================
 */
-bool arcDeclAF::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool anDeclAF::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
 	int i, j;
-	arcLexer src;
-	arcNetToken token;
+	anLexer src;
+	anToken token;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( DECL_LEXER_FLAGS );
@@ -1472,7 +1472,7 @@ bool arcDeclAF::Parse( const char *text, const int textLength, bool allowBinaryV
 	for ( i = 0; i < bodies.Num(); i++ ) {
 		if ( bodies[i]->jointName == "origin" ) {
 			if ( i != 0 ) {
-				arcDeclAF_Body *b = bodies[0];
+				anDeclAF_Body *b = bodies[0];
 				bodies[0] = bodies[i];
 				bodies[i] = b;
 			}
@@ -1485,10 +1485,10 @@ bool arcDeclAF::Parse( const char *text, const int textLength, bool allowBinaryV
 
 /*
 ================
-arcDeclAF::DefaultDefinition
+anDeclAF::DefaultDefinition
 ================
 */
-const char *arcDeclAF::DefaultDefinition() const {
+const char *anDeclAF::DefaultDefinition() const {
 	return
 		"{\n"
 	"\t"	"settings {\n"
@@ -1523,10 +1523,10 @@ const char *arcDeclAF::DefaultDefinition() const {
 
 /*
 ================
-arcDeclAF::FreeData
+anDeclAF::FreeData
 ================
 */
-void arcDeclAF::FreeData() {
+void anDeclAF::FreeData() {
 	modified = false;
 	defaultLinearFriction = 0.01f;
 	defaultAngularFriction = 0.01f;
@@ -1549,15 +1549,15 @@ void arcDeclAF::FreeData() {
 
 /*
 ================
-arcDeclAF::Finish
+anDeclAF::Finish
 ================
 */
-void arcDeclAF::Finish( const getJointTransform_t GetJointTransform, const arcJointMat *frame, void *model ) const {
+void anDeclAF::Finish( const getJointTransform_t GetJointTransform, const arcJointMat *frame, void *model ) const {
 	int i;
 
 	const char *name = GetName();
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		arcDeclAF_Body *body = bodies[i];
+		anDeclAF_Body *body = bodies[i];
 		body->v1.Finish( name, GetJointTransform, frame, model );
 		body->v2.Finish( name, GetJointTransform, frame, model );
 		body->origin.Finish( name, GetJointTransform, frame, model );
@@ -1565,7 +1565,7 @@ void arcDeclAF::Finish( const getJointTransform_t GetJointTransform, const arcJo
 		body->contactMotorDirection.Finish( name, GetJointTransform, frame, model );
 	}
 	for ( i = 0; i < constraints.Num(); i++ ) {
-		arcDeclAF_Constraint *constraint = constraints[i];
+		anDeclAF_Constraint *constraint = constraints[i];
 		constraint->anchor.Finish( name, GetJointTransform, frame, model );
 		constraint->anchor2.Finish( name, GetJointTransform, frame, model );
 		constraint->shaft[0].Finish( name, GetJointTransform, frame, model );
@@ -1577,13 +1577,13 @@ void arcDeclAF::Finish( const getJointTransform_t GetJointTransform, const arcJo
 
 /*
 ================
-arcDeclAF::NewBody
+anDeclAF::NewBody
 ================
 */
-void arcDeclAF::NewBody( const char *name ) {
-	arcDeclAF_Body *body;
+void anDeclAF::NewBody( const char *name ) {
+	anDeclAF_Body *body;
 
-	body = new (TAG_DECL) arcDeclAF_Body();
+	body = new (TAG_DECL) anDeclAF_Body();
 	body->SetDefault( this );
 	body->name = name;
 	bodies.Append( body );
@@ -1591,13 +1591,13 @@ void arcDeclAF::NewBody( const char *name ) {
 
 /*
 ================
-arcDeclAF::RenameBody
+anDeclAF::RenameBody
 
   rename the body with the given name and rename
   all constraint body references
 ================
 */
-void arcDeclAF::RenameBody( const char *oldName, const char *newName ) {
+void anDeclAF::RenameBody( const char *oldName, const char *newName ) {
 	int i;
 
 	for ( i = 0; i < bodies.Num(); i++ ) {
@@ -1617,13 +1617,13 @@ void arcDeclAF::RenameBody( const char *oldName, const char *newName ) {
 
 /*
 ================
-arcDeclAF::DeleteBody
+anDeclAF::DeleteBody
 
   delete the body with the given name and delete
   all constraints that reference the body
 ================
 */
-void arcDeclAF::DeleteBody( const char *name ) {
+void anDeclAF::DeleteBody( const char *name ) {
 	int i;
 
 	for ( i = 0; i < bodies.Num(); i++ ) {
@@ -1645,13 +1645,13 @@ void arcDeclAF::DeleteBody( const char *name ) {
 
 /*
 ================
-arcDeclAF::NewConstraint
+anDeclAF::NewConstraint
 ================
 */
-void arcDeclAF::NewConstraint( const char *name ) {
-	arcDeclAF_Constraint *constraint;
+void anDeclAF::NewConstraint( const char *name ) {
+	anDeclAF_Constraint *constraint;
 
-	constraint = new (TAG_DECL) arcDeclAF_Constraint;
+	constraint = new (TAG_DECL) anDeclAF_Constraint;
 	constraint->SetDefault( this );
 	constraint->name = name;
 	constraints.Append( constraint );
@@ -1659,10 +1659,10 @@ void arcDeclAF::NewConstraint( const char *name ) {
 
 /*
 ================
-arcDeclAF::RenameConstraint
+anDeclAF::RenameConstraint
 ================
 */
-void arcDeclAF::RenameConstraint( const char *oldName, const char *newName ) {
+void anDeclAF::RenameConstraint( const char *oldName, const char *newName ) {
 	int i;
 
 	for ( i = 0; i < constraints.Num(); i++ ) {
@@ -1675,10 +1675,10 @@ void arcDeclAF::RenameConstraint( const char *oldName, const char *newName ) {
 
 /*
 ================
-arcDeclAF::DeleteConstraint
+anDeclAF::DeleteConstraint
 ================
 */
-void arcDeclAF::DeleteConstraint( const char *name ) {
+void anDeclAF::DeleteConstraint( const char *name ) {
 	int i;
 
 	for ( i = 0; i < constraints.Num(); i++ ) {
@@ -1692,19 +1692,19 @@ void arcDeclAF::DeleteConstraint( const char *name ) {
 
 /*
 ================
-arcDeclAF::arcDeclAF
+anDeclAF::anDeclAF
 ================
 */
-arcDeclAF::arcDeclAF() {
+anDeclAF::anDeclAF() {
 	FreeData();
 }
 
 /*
 ================
-arcDeclAF::~arcDeclAF
+anDeclAF::~anDeclAF
 ================
 */
-arcDeclAF::~arcDeclAF() {
+anDeclAF::~anDeclAF() {
 	bodies.DeleteContents( true );
 	constraints.DeleteContents( true );
 }

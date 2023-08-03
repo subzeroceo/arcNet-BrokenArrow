@@ -8,7 +8,7 @@
 * Dictionary representation of a Material Stage.
 */
 typedef struct {
-	arcDictionary				stageData;
+	anDict				stageData;
 	bool				enabled;
 } MEStage_t;
 
@@ -16,8 +16,8 @@ typedef struct {
 * Dictionary representation of a material.
 */
 typedef struct {
-	arcDictionary				materialData;
-	arcNetList<MEStage_t*>	stages;
+	anDict				materialData;
+	anList<MEStage_t*>	stages;
 } MEMaterial_t;
 
 /**
@@ -29,7 +29,7 @@ public:
 	SourceModifyOwner() {};
 	virtual ~SourceModifyOwner() {};
 
-	virtual arcNetString GetSourceText() { return ""; };
+	virtual anString GetSourceText() { return ""; };
 };
 
 class MaterialDocManager;
@@ -41,8 +41,8 @@ class MaterialDoc {
 
 public:
 	MaterialDocManager*		manager;
-	arcNetString					name;
-	arcMaterial*				renderMaterial;
+	anString					name;
+	anMaterial*				renderMaterial;
 	MEMaterial_t			editMaterial;
 
 	bool					modified;
@@ -65,7 +65,7 @@ public:
 	};
 
 	//Initialization Methods
-	void			SetRenderMaterial(arcMaterial* material, bool parseMaterial = true, bool parseRenderMatierial = false);
+	void			SetRenderMaterial(anMaterial* material, bool parseMaterial = true, bool parseRenderMatierial = false);
 
 	//Stage Info Methods
 	int				GetStageCount();
@@ -87,12 +87,12 @@ public:
 	void			SetAttributeFloat( int stage, const char* attribName, float value, bool addUndo = true);
 	void			SetAttributeBool( int stage, const char* attribName, bool value, bool addUndo = true);
 	void			SetMaterialName(const char* materialName, bool addUndo = true);
-	void			SetData( int stage, arcDictionary* data);
+	void			SetData( int stage, anDict* data);
 
 	//Source Editing Methods
 	void			SourceModify(SourceModifyOwner* owner);
 	bool			IsSourceModified();
-	void			ApplySourceModify(arcNetString& text);
+	void			ApplySourceModify(anString& text);
 	const char*		GetEditSourceText();
 
 	//Stage Modification Methods
@@ -113,17 +113,17 @@ protected:
 
 	//Load Material Methods
 	void			ParseMaterialText(const char* source);
-	void			ParseMaterial(arcLexer* src);
-	void			ParseStage(arcLexer* src);
+	void			ParseMaterial(anLexer* src);
+	void			ParseStage(anLexer* src);
 	void			AddSpecialMapStage(const char* stageName, const char* map);
-	bool			ParseMaterialDef(arcNetToken* token, arcLexer* src, int type, arcDictionary* dict);
+	bool			ParseMaterialDef(anToken* token, anLexer* src, int type, anDict* dict);
 	void			ClearEditMaterial();
 
 	//Save/Apply Material Methods
 	const char*		GenerateSourceText();
 	void			ReplaceSourceText();
-	void			WriteStage( int stage, aRcFileMemory* file);
-	void			WriteSpecialMapStage( int stage, aRcFileMemory* file);
-	void			WriteMaterialDef( int stage, aRcFileMemory* file, int type, int indent);
+	void			WriteStage( int stage, anFileMemory* file);
+	void			WriteSpecialMapStage( int stage, anFileMemory* file);
+	void			WriteMaterialDef( int stage, anFileMemory* file, int type, int indent);
 };
 

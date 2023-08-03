@@ -9,7 +9,7 @@
 ===============================================================================
 */
 
-#define idStack( type, next )		arcStackTemplate<type, ( int )&(((type*)NULL)->next)>
+#define idStack( type, next )		arcStackTemplate<type, ( int )&(((type*)nullptr )->next)>
 
 template< class type, int nextOffset >
 class arcStackTemplate {
@@ -28,7 +28,7 @@ private:
 
 template< class type, int nextOffset >
 arcStackTemplate<type,nextOffset>::arcStackTemplate( void ) {
-	top = bottom = NULL;
+	top = bottom = nullptr;
 }
 
 template< class type, int nextOffset >
@@ -48,9 +48,9 @@ type *arcStackTemplate<type,nextOffset>::Get( void ) {
 	if ( element ) {
 		top = STACK_NEXT_PTR(top);
 		if ( bottom == element ) {
-			bottom = NULL;
+			bottom = nullptr;
 		}
-		STACK_NEXT_PTR(element) = NULL;
+		STACK_NEXT_PTR(element) = nullptr;
 	}
 	return element;
 }

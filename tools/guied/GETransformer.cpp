@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/guied_resource.h"
@@ -6,13 +6,13 @@
 #include "GEApp.h"
 #include "../common/MaskEdit.h"
 
-HHOOK	gTransHook	 = NULL;
-HWND	gTransDlg	 = NULL;
+HHOOK	gTransHook	 = nullptr;
+HWND	gTransDlg	 = nullptr;
 
-rvGETransformer::rvGETransformer ( )
+rvGETransformer::rvGETransformer()
 {
-	mWnd		= NULL;
-	mWorkspace	= NULL;
+	mWnd		= nullptr;
+	mWorkspace	= nullptr;
 }
 
 bool rvGETransformer::Create ( HWND parent, bool visible )
@@ -23,8 +23,8 @@ bool rvGETransformer::Create ( HWND parent, bool visible )
 	wndClass.lpszClassName = "GUIEDITOR_TRANSFORMER_CLASS";
 	wndClass.lpfnWndProc = rvGETransformer::WndProc;
 	wndClass.hbrBackground = (HBRUSH)GetStockObject( LTGRAY_BRUSH );;
-	wndClass.hCursor       = LoadCursor((HINSTANCE) NULL, IDC_ARROW);
-	wndClass.lpszMenuName  = NULL;
+	wndClass.hCursor       = LoadCursor((HINSTANCE) nullptr, IDC_ARROW);
+	wndClass.lpszMenuName  = nullptr;
 	wndClass.hInstance     = win32.hInstance;
 	RegisterClassEx ( &wndClass );
 
@@ -34,7 +34,7 @@ bool rvGETransformer::Create ( HWND parent, bool visible )
 							WS_SYSMENU|WS_CAPTION|WS_POPUP|WS_OVERLAPPED|WS_BORDER|WS_CLIPSIBLINGS|WS_CHILD,
 							0, 0, 200,100,
 							parent,
-							NULL,
+							nullptr,
 							win32.hInstance,
 							this );
 
@@ -50,7 +50,7 @@ bool rvGETransformer::Create ( HWND parent, bool visible )
 
 		GetWindowRect ( parent, &rParent );
 		GetWindowRect ( mWnd, &rTrans );
-		SetWindowPos ( mWnd, NULL,
+		SetWindowPos ( mWnd, nullptr,
 					rParent.right - 10 - (rTrans.right-rTrans.left),
 					rParent.bottom - 10 - (rTrans.bottom-rTrans.top),
 					0,0,
@@ -103,7 +103,7 @@ LRESULT CALLBACK rvGETransformer::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, 
 			GetClientRect ( trans->mWnd, &rClient );
 			GetWindowRect ( trans->mDlg, &rDlg );
 
-			SetWindowPos ( trans->mWnd, NULL, 0, 0,
+			SetWindowPos ( trans->mWnd, nullptr, 0, 0,
 						   (rWindow.right-rWindow.left)-(rClient.right-rClient.left) + (rDlg.right-rDlg.left),
 						   (rWindow.bottom-rWindow.top)-(rClient.bottom-rClient.top) + (rDlg.bottom-rDlg.top),
 						   SWP_NOZORDER );
@@ -129,7 +129,7 @@ INT_PTR CALLBACK rvGETransformer::DlgProc ( HWND hWnd, UINT msg, WPARAM wParam, 
 			{
 				UnhookWindowsHookEx( gTransHook );
 			}
-			gTransDlg = NULL;
+			gTransDlg = nullptr;
 			break;
 
 		case WM_INITDIALOG:
@@ -141,7 +141,7 @@ INT_PTR CALLBACK rvGETransformer::DlgProc ( HWND hWnd, UINT msg, WPARAM wParam, 
 			NumberEdit_Attach ( GetDlgItem ( hWnd, IDC_GUIED_ITEMRECTW ) );
 			NumberEdit_Attach ( GetDlgItem ( hWnd, IDC_GUIED_ITEMRECTH ) );
 			gTransDlg = hWnd;
-			gTransHook = SetWindowsHookEx( WH_GETMESSAGE, GetMsgProc, NULL, GetCurrentThreadId() );
+			gTransHook = SetWindowsHookEx( WH_GETMESSAGE, GetMsgProc, nullptr, GetCurrentThreadId() );
 			break;
 
 		case WM_COMMAND:
@@ -156,14 +156,14 @@ INT_PTR CALLBACK rvGETransformer::DlgProc ( HWND hWnd, UINT msg, WPARAM wParam, 
 				GetWindowText ( GetDlgItem ( hWnd, LOWORD(wParam) ), temp, 64 );
 				value = atoi ( temp );
 
-				idRectangle rect = trans->mWorkspace->GetSelectionMgr().GetRect ( );
+				idRectangle rect = trans->mWorkspace->GetSelectionMgr().GetRect();
 				trans->mWorkspace->WindowToWorkspace ( rect );
 
 				// The transformer coords are relative to the botto most selected window's parent so
 				// adjust the rect accordingly
 				if ( trans->mRelative )
 				{
-					idRectangle& screenRect = rvGEWindowWrapper::GetWrapper ( trans->mRelative )->GetScreenRect ( );
+					idRectangle& screenRect = rvGEWindowWrapper::GetWrapper ( trans->mRelative )->GetScreenRect();
 					rect.x -= screenRect.x;
 					rect.y -= screenRect.y;
 				}
@@ -216,7 +216,7 @@ void rvGETransformer::Show ( bool visible )
 {
 	gApp.GetOptions().SetTransformerVisible ( visible );
 	ShowWindow ( mWnd, visible?SW_SHOW:SW_HIDE );
-	Update ( );
+	Update();
 }
 
 /*
@@ -230,7 +230,7 @@ void rvGETransformer::SetWorkspace ( rvGEWorkspace* workspace )
 {
 	mWorkspace = workspace;
 
-	Update ( );
+	Update();
 }
 
 /*
@@ -245,21 +245,21 @@ void rvGETransformer::Update ( void )
 {
 	bool state = false;
 
-	mRelative = NULL;
+	mRelative = nullptr;
 
-	if ( mWorkspace && mWorkspace->GetSelectionMgr ( ).Num ( ) )
+	if ( mWorkspace && mWorkspace->GetSelectionMgr().Num() )
 	{
 		state = true;
-		mRelative = mWorkspace->GetSelectionMgr().GetBottomMost ( );
-		mRelative = mRelative->GetParent ( );
+		mRelative = mWorkspace->GetSelectionMgr().GetBottomMost();
+		mRelative = mRelative->GetParent();
 
-		idRectangle rect = mWorkspace->GetSelectionMgr ( ).GetRect ( );
+		idRectangle rect = mWorkspace->GetSelectionMgr().GetRect();
 		mWorkspace->WindowToWorkspace ( rect );
 
 		// Make the rectangle relative to the given parent
 		if ( mRelative )
 		{
-			idRectangle& screenRect = rvGEWindowWrapper::GetWrapper ( mRelative )->GetScreenRect ( );
+			idRectangle& screenRect = rvGEWindowWrapper::GetWrapper ( mRelative )->GetScreenRect();
 			rect.x -= screenRect.x;
 			rect.y -= screenRect.y;
 		}

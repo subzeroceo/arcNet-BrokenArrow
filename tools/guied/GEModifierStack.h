@@ -36,8 +36,8 @@ class rvGEModifierStack
 {
 public:
 
-	rvGEModifierStack ( );
-	~rvGEModifierStack ( );
+	rvGEModifierStack();
+	~rvGEModifierStack();
 
 	void			BlockNextMerge	( void );
 
@@ -55,7 +55,7 @@ public:
 
 protected:
 
-	arcNetList<rvGEModifier*>	mModifiers;
+	anList<rvGEModifier*>	mModifiers;
 	int						mCurrentModifier;
 	bool					mMergeBlock;
 };
@@ -77,13 +77,13 @@ ARC_INLINE void rvGEModifierStack::BlockNextMerge ( void )
 
 ARC_INLINE rvGEModifier* rvGEModifierStack::GetUndoModifier ( void )
 {
-	assert ( CanUndo ( ) );
+	assert ( CanUndo() );
 	return mModifiers[mCurrentModifier];
 }
 
 ARC_INLINE rvGEModifier* rvGEModifierStack::GetRedoModifier ( void )
 {
-	assert ( CanRedo ( ) );
+	assert ( CanRedo() );
 	return mModifiers[mCurrentModifier+1];
 }
 

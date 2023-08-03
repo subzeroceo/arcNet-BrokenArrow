@@ -11,7 +11,7 @@
 
 // screenBlob_t are for the on-screen damage claw marks, etc
 typedef struct {
-	const arcMaterial *	material;
+	const anMaterial *	material;
 	float				x, y, w, h;
 	float				s1, t1, s2, t2;
 	int					finishTime;
@@ -32,23 +32,23 @@ public:
 
 	void				ClearEffects( void );
 
-	void				DamageImpulse( arcVec3 localKickDir, const arcDict *damageDef );
+	void				DamageImpulse( anVec3 localKickDir, const anDict *damageDef );
 
-	void				WeaponFireFeedback( const arcDict *weaponDef );
+	void				WeaponFireFeedback( const anDict *weaponDef );
 
-	arcAngles			AngleOffset( void ) const;			// returns the current kick angle
+	anAngles			AngleOffset( void ) const;			// returns the current kick angle
 
-	arcMat3				ShakeAxis( void ) const;			// returns the current shake angle
+	anMat3				ShakeAxis( void ) const;			// returns the current shake angle
 
 	void				CalculateShake( void );
 
 	// this may involve rendering to a texture and displaying
 	// that with a warp model or in double vision mode
-	void				RenderPlayerView( idUserInterface *hud );
+	void				RenderPlayerView( anUserInterface *hud );
 
-	void				Fade( arcVec4 color, int time );
+	void				Fade( anVec4 color, int time );
 
-	void				Flash( arcVec4 color, int time );
+	void				Flash( anVec4 color, int time );
 
 	void				AddBloodSpray( float duration );
 
@@ -56,8 +56,8 @@ public:
 	void				EnableBFGVision( bool b ) { bfgVision = b; };
 
 private:
-	void				SingleView( idUserInterface *hud, const renderView_t *view );
-	void				DoubleVision( idUserInterface *hud, const renderView_t *view, int offset );
+	void				SingleView( anUserInterface *hud, const renderView_t *view );
+	void				DoubleVision( anUserInterface *hud, const renderView_t *view, int offset );
 	void				ScreenFade();
 
 	screenBlob_t *		GetScreenBlob();
@@ -65,23 +65,23 @@ private:
 	screenBlob_t		screenBlobs[MAX_SCREEN_BLOBS];
 
 	int					dvFinishTime;		// double vision will be stopped at this time
-	const arcMaterial *	dvMaterial;			// material to take the double vision screen shot
+	const anMaterial *	dvMaterial;			// material to take the double vision screen shot
 
 	int					kickFinishTime;		// view kick will be stopped at this time
-	arcAngles			kickAngles;
+	anAngles			kickAngles;
 
-	const arcMaterial *	armorMaterial;		// armor damage view effect
-	const arcMaterial *	irGogglesMaterial;	// ir effect
-	const arcMaterial *	bloodSprayMaterial; // blood spray
+	const anMaterial *	armorMaterial;		// armor damage view effect
+	const anMaterial *	irGogglesMaterial;	// ir effect
+	const anMaterial *	bloodSprayMaterial; // blood spray
 	float				lastDamageTime;		// accentuate the tunnel effect for a while
 
-	arcVec4				fadeColor;			// fade color
-	arcVec4				fadeToColor;		// color to fade to
-	arcVec4				fadeFromColor;		// color to fade from
+	anVec4				fadeColor;			// fade color
+	anVec4				fadeToColor;		// color to fade to
+	anVec4				fadeFromColor;		// color to fade from
 	float				fadeRate;			// fade rate
 	int					fadeTime;			// fade time
 
-	arcAngles			shakeAng;			// from the sound sources
+	anAngles			shakeAng;			// from the sound sources
 
 	arcNetBasePlayer *			player;
 	renderView_t		view;

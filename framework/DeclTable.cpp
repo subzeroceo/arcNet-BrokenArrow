@@ -1,13 +1,13 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 
 /*
 =================
-arcDeclTable::TableLookup
+anDeclTable::TableLookup
 =================
 */
-float arcDeclTable::TableLookup( float index ) const {
+float anDeclTable::TableLookup( float index ) const {
 	int iIndex;
 	float iFrac;
 
@@ -24,16 +24,16 @@ float arcDeclTable::TableLookup( float index ) const {
 		} else if ( index <= 0 ) {
 			return values[0];
 		}
-		iIndex = arcMath::Ftoi( index );
+		iIndex = anMath::Ftoi( index );
 		iFrac = index - iIndex;
 	} else {
 		index *= domain;
 
 		if ( index < 0 ) {
-			index += domain * arcMath::Ceil( -index / domain );
+			index += domain * anMath::Ceil( -index / domain );
 		}
 
-		iIndex = arcMath::Ftoi( arcMath::Floor( index ) );
+		iIndex = anMath::Ftoi( anMath::Floor( index ) );
 		iFrac = index - iIndex;
 		iIndex = iIndex % domain;
 	}
@@ -49,19 +49,19 @@ float arcDeclTable::TableLookup( float index ) const {
 
 /*
 =================
-arcDeclTable::Size
+anDeclTable::Size
 =================
 */
-size_t arcDeclTable::Size() const {
-	return sizeof( arcDeclTable ) + values.Allocated();
+size_t anDeclTable::Size() const {
+	return sizeof( anDeclTable ) + values.Allocated();
 }
 
 /*
 =================
-arcDeclTable::FreeData
+anDeclTable::FreeData
 =================
 */
-void arcDeclTable::FreeData() {
+void anDeclTable::FreeData() {
 	snap = false;
 	clamp = false;
 	values.Clear();
@@ -69,21 +69,21 @@ void arcDeclTable::FreeData() {
 
 /*
 =================
-arcDeclTable::DefaultDefinition
+anDeclTable::DefaultDefinition
 =================
 */
-const char *arcDeclTable::DefaultDefinition() const {
+const char *anDeclTable::DefaultDefinition() const {
 	return "{ { 0 } }";
 }
 
 /*
 =================
-arcDeclTable::Parse
+anDeclTable::Parse
 =================
 */
-bool arcDeclTable::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
-	arcLexer src;
-	arcNetToken token;
+bool anDeclTable::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+	anLexer src;
+	anToken token;
 	float v;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
@@ -107,6 +107,12 @@ bool arcDeclTable::Parse( const char *text, const int textLength, bool allowBina
 			snap = true;
 		} else if ( token.Icmp( "clamp" ) == 0 ) {
 			clamp = true;
+		} else if ( token.Icmp( "isLinear" ) == 0 ) {
+			isLinear = true;
+		} else if ( token.Icmp( "minValue" == 0 ) ) {
+			minValue = src.ParseFloat();
+		} else if ( token.Icmp( "maxValue" == 0 ) ) {
+			maxValue = src.ParseFloat();
 		} else if ( token.Icmp( "{" ) == 0 ) {
 			while ( 1 ) {
 				bool errorFlag;

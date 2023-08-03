@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -12,18 +12,18 @@ R_LocalTrace
 If we resort the vertexes so all silverts come first, we can save some work here.
 =================
 */
-localTrace_t R_LocalTrace( const arcVec3 &start, const arcVec3 &end, const float radius, const surfTriangles_t *tri ) {
+localTrace_t R_LocalTrace( const anVec3 &start, const anVec3 &end, const float radius, const srfTriangles_t *tri ) {
 	int			i, j;
 	byte *		cullBits;
-	arcPlane		planes[4];
+	anPlane		planes[4];
 	localTrace_t	hit;
 	int			c_testEdges, c_testPlanes, c_intersect;
-	arcVec3		startDir;
+	anVec3		startDir;
 	byte		totalOr;
 	float		radiusSqr;
 
 #ifdef TEST_TRACE
-	ARCTimer		trace_timer;
+	anTimer		trace_timer;
 	trace_timer.Start();
 #endif
 
@@ -43,7 +43,7 @@ localTrace_t R_LocalTrace( const arcVec3 &start, const arcVec3 &end, const float
 	planes[3][3] = - end * planes[3].Normal();
 
 	// catagorize each point against the four planes
-	cullBits = ( byte * ) _alloca16( tri->numVerts );
+	cullBits = (byte *) _alloca16( tri->numVerts );
 	SIMDProcessor->TracePointCull( cullBits, totalOr, radius, planes, tri->verts, tri->numVerts );
 
 	// if we don't have points on both sides of both the ray planes, no intersection
@@ -67,17 +67,17 @@ localTrace_t R_LocalTrace( const arcVec3 &start, const arcVec3 &end, const float
 	startDir = end - start;
 
 	if ( !tri->facePlanes || !tri->facePlanesCalculated ) {
-		R_DeriveFacePlanes( const_cast<surfTriangles_t *>( tri ) );
+		R_DeriveFacePlanes( const_cast<srfTriangles_t *>( tri ) );
 	}
 
 	for ( i = 0, j = 0; i < tri->numIndexes; i += 3, j++ ) {
 		float		d1, d2, f, d;
 		float		edgeLengthSqr;
-		arcPlane *	plane;
-		arcVec3		point;
-		arcVec3		dir[3];
-		arcVec3		cross;
-		arcVec3		edge;
+		anPlane *	plane;
+		anVec3		point;
+		anVec3		dir[3];
+		anVec3		cross;
+		anVec3		edge;
 		byte		triOr;
 
 		// get sidedness info for the triangle
@@ -252,12 +252,12 @@ localTrace_t R_LocalTrace( const arcVec3 &start, const arcVec3 &end, const float
 RB_DrawExpandedTriangles
 =================
 */
-void RB_DrawExpandedTriangles( const surfTriangles_t *tri, const float radius, const arcVec3 &vieworg ) {
+void RB_DrawExpandedTriangles( const srfTriangles_t *tri, const float radius, const anVec3 &vieworg ) {
 	int i, j, k;
-	arcVec3 dir[6], normal, point;
+	anVec3 dir[6], normal, point;
 
 	for ( i = 0; i < tri->numIndexes; i += 3 ) {
-		arcVec3 p[3] = { tri->verts[ tri->indexes[ i + 0 ] ].xyz, tri->verts[ tri->indexes[ i + 1 ] ].xyz, tri->verts[ tri->indexes[ i + 2 ] ].xyz };
+		anVec3 p[3] = { tri->verts[ tri->indexes[ i + 0 ] ].xyz, tri->verts[ tri->indexes[ i + 1 ] ].xyz, tri->verts[ tri->indexes[ i + 2 ] ].xyz };
 
 		dir[0] = p[0] - p[1];
 		dir[1] = p[1] - p[2];
@@ -320,10 +320,10 @@ Debug visualization
 */
 void RB_ShowTrace( drawSurf_t **drawSurfs, int numDrawSurfs ) {
 	int						i;
-	const surfTriangles_t	*tri;
+	const srfTriangles_t	*tri;
 	const drawSurf_t		*surf;
-	arcVec3					start, end;
-	arcVec3					localStart, localEnd;
+	anVec3					start, end;
+	anVec3					localStart, localEnd;
 	localTrace_t			hit;
 	float					radius;
 
@@ -351,7 +351,7 @@ void RB_ShowTrace( drawSurf_t **drawSurfs, int numDrawSurfs ) {
 	for ( i = 0; i < numDrawSurfs; i++ ) {
 		surf = drawSurfs[i];
 		tri = surf->geo;
-		if ( tri == NULL || tri->verts == NULL ) {
+		if ( tri == nullptr || tri->verts == nullptr ) {
 			continue;
 		}
 
@@ -388,7 +388,7 @@ void RB_ShowTrace( drawSurf_t **drawSurfs, int numDrawSurfs ) {
 		hit = R_LocalTrace( localStart, localEnd, radius, tri );
 		if ( hit.fraction < 1.0 ) {
 			qglColor4f( 1, 1, 1, 1 );
-			RB_DrawBounds( arcBounds( hit.point ).Expand( 1 ) );
+			RB_DrawBounds( anBounds( hit.point ).Expand( 1 ) );
 		}
 	}
 }

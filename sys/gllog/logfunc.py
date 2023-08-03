@@ -13,7 +13,7 @@ def do_logfunc(f_in, f_out):
 		for t in l:
 			# process ret type to strip trailing spaces
 			t[0] = string.strip(t[0])
-			f_out.write('static %s APIENTRY log%s(%s) {\n' % ( t[0], t[2], t[3] ))
+			f_out.write('static %s APIENTRY log%s(%s) {\n' % ( t[0], t[2], t[3] ) )
 			# work on parameters
 			base_params = string.split(t[3], ',')
 			#f_out.write('// %s\n' % repr(base_params))
@@ -25,8 +25,8 @@ def do_logfunc(f_in, f_out):
 			names = []
 			for i in base_params:
 				regex = re.compile('([a-zA-Z0-9]*)$')
-				name = regex.search(i).group(1)
-				type = string.strip(i[0:len(i)-len(name)])				
+				name = regex.search( i ).group( 1 )
+				type = string.strip(i[0:len( i )-len(name)])				
 				# catch type with no name
 				if (len(type) == 0):
 					type = name
@@ -63,13 +63,13 @@ def do_logfunc(f_in, f_out):
 				f_out.write('\tdll%s(' % t[2])
 			started = 0
 			for i in names:
-				if (started):
+				if ( started):
 					f_out.write(', ')
 				else:
 					started = 1
-				f_out.write(i)
+				f_out.write( i )
 			f_out.write(');\n')
 			f_out.write('}\n\n')
 			
 if __name__ == '__main__':
-	do_logfunc(sys.stdin, sys.stdout)
+	do_logfunc( sys.stdin, sys.stdout)

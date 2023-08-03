@@ -1,9 +1,9 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
-void idTokenParser::LoadFromParser( ARCParser &parser, const char *guiName ) {
-	arcNetToken tok;
-	idTokenIndexes tokIdxs;
+void anTokenParser::LoadFromParser( anParser &parser, const char *guiName ) {
+	anToken tok;
+	anTokenIndexes tokIdxs;
 	tokIdxs.SetName( guiName );
 	while ( parser.ReadToken( &tok ) ) {
 		tokIdxs.Append( tokens.AddUnique( idBinaryToken( tok ) ) );
@@ -12,48 +12,48 @@ void idTokenParser::LoadFromParser( ARCParser &parser, const char *guiName ) {
 	currentToken = 0;
 }
 
-void idTokenParser::LoadFromFile( const char *filename ) {
+void anTokenParser::LoadFromFile( const char *filename ) {
 	Clear();
-	arcNetFile *inFile = fileSystem->OpenFileReadMemory( filename );
-	if ( inFile != NULL ) {
+	anFile *inFile = fileSystem->OpenFileReadMemory( filename );
+	if ( inFile != nullptr ) {
 		int num;
 		inFile->ReadBig( num );
 		guiTokenIndexes.SetNum( num );
 		for ( int i = 0; i < num; i++ ) {
-			guiTokenIndexes[ i ].Read( inFile );
+			guiTokenIndexes[i].Read( inFile );
 		}
 		inFile->ReadBig( num );
 		tokens.SetNum( num );
 		for ( int i = 0; i < num; i++ ) {
-			tokens[ i ].Read( inFile );
+			tokens[i].Read( inFile );
 		}
 	}
 	delete inFile;
 	preloaded = ( tokens.Num() > 0 );
 }
 
-void idTokenParser::WriteToFile( const char *filename ) {
+void anTokenParser::WriteToFile( const char *filename ) {
 	if ( preloaded ) {
 		return;
 	}
-	arcNetFile *outFile = fileSystem->OpenFileWrite( filename, "fs_basepath" );
-	if ( outFile != NULL ) {
+	anFile *outFile = fileSystem->OpenFileWrite( filename, "fs_basepath" );
+	if ( outFile != nullptr ) {
 		outFile->WriteBig( ( int )guiTokenIndexes.Num() );
 		for ( int i = 0; i < guiTokenIndexes.Num(); i++ ) {
-			guiTokenIndexes[ i ].Write( outFile );
+			guiTokenIndexes[i].Write( outFile );
 		}
 		outFile->WriteBig( ( int )tokens.Num() );
 		for ( int i = 0; i < tokens.Num(); i++ ) {
-			tokens[ i ].Write( outFile );
+			tokens[i].Write( outFile );
 		}
 	}
 	delete outFile;
 }
 
-bool idTokenParser::StartParsing( const char * filename ) {
+bool anTokenParser::StartParsing( const char *filename ) {
 	currentTokenList = -1;
 	for ( int i = 0; i < guiTokenIndexes.Num(); i++ ) {
-		if ( arcNetString::Icmp( filename, guiTokenIndexes[ i ].GetName() ) == 0 ) {
+		if ( anString::Icmp( filename, guiTokenIndexes[i].GetName() ) == 0 ) {
 			currentTokenList = i;
 			break;
 		}
@@ -62,7 +62,7 @@ bool idTokenParser::StartParsing( const char * filename ) {
 	return ( currentTokenList != -1 );
 }
 
-bool idTokenParser::ReadToken( arcNetToken * tok ) {
+bool anTokenParser::ReadToken( anToken * tok ) {
 	if ( currentToken >= 0 && currentToken < guiTokenIndexes[ currentTokenList ].Num() ) {
 		tok->Clear();
 		idBinaryToken &btok = tokens[ guiTokenIndexes[ currentTokenList ][ currentToken ] ];
@@ -74,8 +74,8 @@ bool idTokenParser::ReadToken( arcNetToken * tok ) {
 	}
 	return false;
 }
-int	idTokenParser::ExpectTokenString( const char *string ) {
-	arcNetToken token;
+int	anTokenParser::ExpectTokenString( const char *string ) {
+	anToken token;
 	if ( !ReadToken( &token ) ) {
 		Error( "couldn't find expected '%s'", string );
 		return 0;
@@ -87,8 +87,8 @@ int	idTokenParser::ExpectTokenString( const char *string ) {
 	return 1;
 }
 // expect a certain token type
-int	idTokenParser::ExpectTokenType( int type, int subtype, arcNetToken *token ) {
-	arcNetString str;
+int	anTokenParser::ExpectTokenType( int type, int subtype, anToken *token ) {
+	anString str;
 
 	if ( !ReadToken( token ) ) {
 		Error( "couldn't read expected token" );
@@ -96,7 +96,7 @@ int	idTokenParser::ExpectTokenType( int type, int subtype, arcNetToken *token ) 
 	}
 
 	if ( token->type != type ) {
-		switch( type ) {
+		switch ( type ) {
 		case TT_STRING: str = "string"; break;
 		case TT_LITERAL: str = "literal"; break;
 		case TT_NUMBER: str = "number"; break;
@@ -129,14 +129,14 @@ int	idTokenParser::ExpectTokenType( int type, int subtype, arcNetToken *token ) 
 			return 0;
 		}
 		if ( token->subtype != subtype ) {
-			//Error( "expected '%s' but found '%s'", arcLexer::GetPunctuationFromId( subtype ), token->c_str() );
+			//Error( "expected '%s' but found '%s'", anLexer::GetPunctuationFromId( subtype ), token->c_str() );
 			return 0;
 		}
 	}
 	return 1;
 }
 // expect a token
-int idTokenParser::ExpectAnyToken( arcNetToken *token ) {
+int anTokenParser::ExpectAnyToken( anToken *token ) {
 	if ( !ReadToken( token ) ) {
 		Error( "couldn't read expected token" );
 		return 0;
@@ -144,13 +144,13 @@ int idTokenParser::ExpectAnyToken( arcNetToken *token ) {
 	return 1;
 }
 
-void idTokenParser::UnreadToken( const arcNetToken *token ) {
+void anTokenParser::UnreadToken( const anToken *token ) {
 	if ( currentToken == 0 || currentToken >=  guiTokenIndexes[ currentTokenList ].Num() ) {
-		arcLibrary::common->FatalError( "idTokenParser::unreadToken, unread token twice\n" );
+		anLibrary::common->FatalError( "anTokenParser::unreadToken, unread token twice\n" );
 	}
 	currentToken--;
 }
-void idTokenParser::Error( VERIFY_FORMAT_STRING const char *str, ... ) {
+void anTokenParser::Error( VERIFY_FORMAT_STRING const char *str, ... ) {
 	char text[MAX_STRING_CHARS];
 	va_list ap;
 
@@ -158,9 +158,9 @@ void idTokenParser::Error( VERIFY_FORMAT_STRING const char *str, ... ) {
 	vsprintf(text, str, ap);
 	va_end(ap);
 
-	arcLibrary::common->Warning( text );
+	anLibrary::common->Warning( text );
 }
-void idTokenParser::Warning( VERIFY_FORMAT_STRING const char *str, ... ) {
+void anTokenParser::Warning( VERIFY_FORMAT_STRING const char *str, ... ) {
 	char text[MAX_STRING_CHARS];
 	va_list ap;
 
@@ -168,35 +168,35 @@ void idTokenParser::Warning( VERIFY_FORMAT_STRING const char *str, ... ) {
 	vsprintf(text, str, ap);
 	va_end(ap);
 
-	arcLibrary::common->Warning( text );
+	anLibrary::common->Warning( text );
 }
-int idTokenParser::ParseInt() {
-	arcNetToken token;
+int anTokenParser::ParseInt() {
+	anToken token;
 	if ( !ReadToken( &token ) ) {
 		Error( "couldn't read expected integer" );
 		return 0;
 	}
 	if ( token.type == TT_PUNCTUATION && token == "-" ) {
 		ExpectTokenType( TT_NUMBER, TT_INTEGER, &token );
-		return -((signed int) token.GetIntValue() );
+		return -(( signed int) token.GetIntValue() );
 	} else if ( token.type != TT_NUMBER || token.subtype == TT_FLOAT ) {
 		Error( "expected integer value, found '%s'", token.c_str() );
 	}
 	return token.GetIntValue();
 }
 // read a boolean
-bool idTokenParser::ParseBool() {
-	arcNetToken token;
+bool anTokenParser::ParseBool() {
+	anToken token;
 	if ( !ExpectTokenType( TT_NUMBER, 0, &token ) ) {
 		Error( "couldn't read expected boolean" );
 		return false;
 	}
 	return ( token.GetIntValue() != 0 );
 }
-// read a floating point number.  If errorFlag is NULL, a non-numeric token will
-// issue an Error().  If it isn't NULL, it will issue a Warning() and set *errorFlag = true
-float idTokenParser::ParseFloat( bool *errorFlag ) {
-	arcNetToken token;
+// read a floating point number.  If errorFlag is nullptr, a non-numeric token will
+// issue an Error().  If it isn't nullptr, it will issue a Warning() and set *errorFlag = true
+float anTokenParser::ParseFloat( bool *errorFlag ) {
+	anToken token;
 	if ( errorFlag ) {
 		*errorFlag = false;
 	}

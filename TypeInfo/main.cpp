@@ -1,18 +1,18 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #include "../sys/sys_local.h"
 #pragma hdrstop
 
 #include "TypeInfoGen.h"
 
-arcDeclerationManager *		declManager = NULL;
-arcEventLoop *		eventLoop = NULL;
+anDeclManager *		declManager = nullptr;
+anEventLoop *		eventLoop = nullptr;
 
-int arcEventLoop::JournalLevel( void ) const { return 0; }
+int anEventLoop::JournalLevel( void ) const { return 0; }
 
 /*
 ==============================================================
 
-	arcCommon
+	anCommon
 
 ==============================================================
 */
@@ -26,9 +26,9 @@ int arcEventLoop::JournalLevel( void ) const { return 0; }
 	va_end( argptr )
 
 
-class arcCommonLocal : public arcCommon {
+class anCommonLocal : public anCommon {
 public:
-							arcCommonLocal( void ) {}
+							anCommonLocal( void ) {}
 
 	virtual void			Init( int argc, const char **argv, const char *cmdline ) {}
 	virtual void			Shutdown( void ) {}
@@ -38,11 +38,11 @@ public:
 	virtual void			GUIFrame( bool execCmd, bool network  ) {}
 	virtual void			Async( void ) {}
 	virtual void			StartupVariable( const char *match, bool once ) {}
-	virtual void			InitTool( const toolFlag_t tool, const arcDictionary *dict ) {}
+	virtual void			InitTool( const toolFlag_t tool, const anDict *dict ) {}
 	virtual void			ActivateTool( bool active ) {}
 	virtual void			WriteConfigToFile( const char *filename ) {}
 	virtual void			WriteFlaggedCVarsToFile( const char *filename, int flags, const char *setCmd ) {}
-	virtual void			BeginRedirect( char *buffer, int buffersize, void (*flush)( const char * ) ) {}
+	virtual void			BeginRedirect( char *buffer, int buffersize, void (*flush)( const char *) ) {}
 	virtual void			EndRedirect( void ) {}
 	virtual void			SetRefreshOnPrint( bool set ) {}
 	virtual void			Printf( const char *fmt, ... ) { STDIO_PRINT( "", "" ); }
@@ -54,27 +54,27 @@ public:
 	virtual void			ClearWarnings( const char *reason ) {}
 	virtual void			Error( const char *fmt, ... ) { STDIO_PRINT( "ERROR: ", "\n" ); exit(0 ); }
 	virtual void			FatalError( const char *fmt, ... ) { STDIO_PRINT( "FATAL ERROR: ", "\n" ); exit(0 ); }
-	virtual const arcLangDictionary *GetLanguageDict() { return NULL; }
-	//virtual const char *	KeysFromBinding( const char *bind ) { return NULL; }
-	//virtual const char *	BindingFromKey( const char *key ) { return NULL; }
-	virtual const char *	KeysFromBinding( const char *bind, int layer ) { return NULL; }
-	virtual const char *	BindingFromKey( const char *key, int layer ) { return NULL; }
+	virtual const anLangDict *GetLanguageDict() { return nullptr; }
+	//virtual const char *	KeysFromBinding( const char *bind ) { return nullptr; }
+	//virtual const char *	BindingFromKey( const char *key ) { return nullptr; }
+	virtual const char *	KeysFromBinding( const char *bind, int layer ) { return nullptr; }
+	virtual const char *	BindingFromKey( const char *key, int layer ) { return nullptr; }
 	virtual int				ButtonState( int key ) { return 0; }
 	virtual int				KeyState( int key ) { return 0; }
 
 	virtual void InputInit( void ) {}
 	virtual void Shutdown( void ) {}
 	virtual	void LoadGraphics( void ) {}
-	virtual void PrintMsg(const char * in_msg) {}
+	virtual void PrintMsg(const char *in_msg) {}
 	virtual void DrawMsgs( void ) {}
 	virtual void ClearMsgs( void ) {}
 	virtual int GetComFrameTime( void ) { return 0; }
 };
 
-arcCVarSystem com_developer( "developer", "0", CVAR_BOOL|CVAR_SYSTEM, "developer mode" );
+anCVarSystem com_developer( "developer", "0", CVAR_BOOL|CVAR_SYSTEM, "developer mode" );
 
-arcCommonLocal		commonLocal;
-arcCommon *			common = &commonLocal;
+anCommonLocal		commonLocal;
+anCommon *			common = &commonLocal;
 
 /*
 ==============================================================
@@ -84,10 +84,10 @@ arcCommon *			common = &commonLocal;
 ==============================================================
 */
 
-void			Sys_Mkdir( const char *path ) {}
+void				Sys_Mkdir( const char *path ) {}
 ARC_TIME_T			Sys_FileTimeStamp( FILE *fp ) { return 0; }
 
-#ifdef _WIN32
+//#ifdef _WIN32
 
 #include <io.h>
 #include <direct.h>
@@ -98,7 +98,7 @@ const char *Sys_Cwd( void ) {
 	_getcwd( cwd, sizeof( cwd ) - 1 );
 	cwd[sizeof( cwd ) - 1] = 0;
 
-	int i = arcNetString::FindText( cwd, CD_BASEDIR, false );
+	int i = anString::FindText( cwd, CD_BASEDIR, false );
 	if ( i >= 0 ) {
 		cwd[i + strlen( CD_BASEDIR )] = '\0';
 	}
@@ -122,8 +122,8 @@ const char *Sys_EXEPath( void ) {
 	return "";
 }
 
-int Sys_ListFiles( const char *directory, const char *extension, arcStringList &list ) {
-	arcNetString		search;
+int Sys_ListFiles( const char *directory, const char *extension, anStringList &list ) {
+	anString		search;
 	struct _finddata_t findinfo;
 	int			findhandle;
 	int			flag;
@@ -166,7 +166,7 @@ int Sys_ListFiles( const char *directory, const char *extension, arcStringList &
 const char *	Sys_DefaultCDPath( void ) { return ""; }
 const char *	Sys_DefaultBasePath( void ) { return ""; }
 const char *	Sys_DefaultSavePath( void ) { return ""; }
-int				Sys_ListFiles( const char *directory, const char *extension, arcStringList &list ) { return 0; }
+int				Sys_ListFiles( const char *directory, const char *extension, anStringList &list ) { return 0; }
 
 #endif
 
@@ -184,44 +184,44 @@ void			Sys_TriggerEvent( int index ) {}
 
 /*
 ==============
-arcSystemLocal stub
+anSystemLocal stub
 ==============
 */
-void			arcSystemLocal::DebugPrintf( const char *fmt, ... ) {}
-void			arcSystemLocal::DebugVPrintf( const char *fmt, va_list arg ) {}
+void			anSystemLocal::DebugPrintf( const char *fmt, ... ) {}
+void			anSystemLocal::DebugVPrintf( const char *fmt, va_list arg ) {}
 
-double			arcSystemLocal::GetClockTicks( void ) { return 0.0; }
-double			arcSystemLocal::ClockTicksPerSecond( void ) { return 1.0; }
-cpuid_t			arcSystemLocal::GetProcessorId( void ) { return ( cpuid_t )0; }
-const char *	arcSystemLocal::GetProcessorString( void ) { return ""; }
-const char *	arcSystemLocal::FPU_GetState( void ) { return ""; }
-bool			arcSystemLocal::FPU_StackIsEmpty( void ) { return true; }
-void			arcSystemLocal::FPU_SetFTZ( bool enable ) {}
-void			arcSystemLocal::FPU_SetDAZ( bool enable ) {}
+double			anSystemLocal::GetClockTicks( void ) { return 0.0; }
+double			anSystemLocal::ClockTicksPerSecond( void ) { return 1.0; }
+cpuid_t			anSystemLocal::GetProcessorId( void ) { return ( cpuid_t )0; }
+const char *	anSystemLocal::GetProcessorString( void ) { return ""; }
+const char *	anSystemLocal::FPU_GetState( void ) { return ""; }
+bool			anSystemLocal::FPU_StackIsEmpty( void ) { return true; }
+void			anSystemLocal::FPU_SetFTZ( bool enable ) {}
+void			anSystemLocal::FPU_SetDAZ( bool enable ) {}
 
-bool			arcSystemLocal::LockMemory( void *ptr, int bytes ) { return false; }
-bool			arcSystemLocal::UnlockMemory( void *ptr, int bytes ) { return false; }
+bool			anSystemLocal::LockMemory( void *ptr, int bytes ) { return false; }
+bool			anSystemLocal::UnlockMemory( void *ptr, int bytes ) { return false; }
 
-void			arcSystemLocal::GetCallStack( address_t *callStack, const int callStackSize ) { memset( callStack, 0, callStackSize * sizeof( callStack[0] ) ); }
-const char *	arcSystemLocal::GetCallStackStr( const address_t *callStack, const int callStackSize ) { return ""; }
-const char *	arcSystemLocal::GetCallStackCurStr( int depth ) { return ""; }
-void			arcSystemLocal::ShutdownSymbols( void ) {}
+void			anSystemLocal::GetCallStack( address_t *callStack, const int callStackSize ) { memset( callStack, 0, callStackSize * sizeof( callStack[0] ) ); }
+const char *	anSystemLocal::GetCallStackStr( const address_t *callStack, const int callStackSize ) { return ""; }
+const char *	anSystemLocal::GetCallStackCurStr( int depth ) { return ""; }
+void			anSystemLocal::ShutdownSymbols( void ) {}
 
-int				arcSystemLocal::DLL_Load( const char *dllName ) { return 0; }
-void *			arcSystemLocal::DLL_GetProcAddress( int dllHandle, const char *procName ) { return NULL; }
-void			arcSystemLocal::DLL_Unload( int dllHandle ) { }
-void			arcSystemLocal::DLL_GetFileName( const char *baseName, char *dllName, int maxLength ) { }
+int				anSystemLocal::DLL_Load( const char *dllName ) { return 0; }
+void *			anSystemLocal::DLL_GetProcAddress( int dllHandle, const char *procName ) { return nullptr; }
+void			anSystemLocal::DLL_Unload( int dllHandle ) { }
+void			anSystemLocal::DLL_GetFileName( const char *baseName, char *dllName, int maxLength ) { }
 
-sysEvent_t		arcSystemLocal::GenerateMouseButtonEvent( int button, bool down ) { sysEvent_t ev; memset( &ev, 0, sizeof( ev ) ); return ev; }
-sysEvent_t		arcSystemLocal::GenerateMouseMoveEvent( int deltax, int deltay ) { sysEvent_t ev; memset( &ev, 0, sizeof( ev ) ); return ev; }
+sysEvent_t		anSystemLocal::GenerateMouseButtonEvent( int button, bool down ) { sysEvent_t ev; memset( &ev, 0, sizeof( ev ) ); return ev; }
+sysEvent_t		anSystemLocal::GenerateMouseMoveEvent( int deltax, int deltay ) { sysEvent_t ev; memset( &ev, 0, sizeof( ev ) ); return ev; }
 
-void			arcSystemLocal::OpenURL( const char *url, bool quit ) { }
-void			arcSystemLocal::StartProcess( const char *exeName, bool quit ) { }
+void			anSystemLocal::OpenURL( const char *url, bool quit ) { }
+void			anSystemLocal::StartProcess( const char *exeName, bool quit ) { }
 
-void			arcSystemLocal::FPU_EnableExceptions( int exceptions ) { }
+void			anSystemLocal::FPU_EnableExceptions( int exceptions ) { }
 
-arcSystemLocal		sysLocal;
-arcSystem *			sys = &sysLocal;
+anSystemLocal	sysLocal;
+arcSystem *		sys = &sysLocal;
 
 
 /*
@@ -233,25 +233,25 @@ arcSystem *			sys = &sysLocal;
 */
 
 int main( int argc, char** argv ) {
-	arcNetString fileName, sourcePath;
-	ARCInfoGen *generator;
+	anString fileName, sourcePath;
+	anInfoGen *generator;
 
-	arcLibrary::common = common;
-	arcLibrary::cvarSystem = cvarSystem;
-	arcLibrary::fileSystem = fileSystem;
-	arcLibrary::sys = sys;
+	anLibrary::common = common;
+	anLibrary::cvarSystem = cvarSystem;
+	anLibrary::fileSystem = fileSystem;
+	anLibrary::sys = sys;
 
-	arcLibrary::Init();
+	anLibrary::Init();
 	cmdSystem->Init();
 	cvarSystem->Init();
-	arcCVarSystem::RegisterStaticVars();
+	anCVarSystem::RegisterStaticVars();
 	fileSystem->Init();
 
-	generator = new ARCInfoGen;
+	generator = new anInfoGen;
 
 
 	if ( argc > 1 ) {
-		sourcePath = arcNetString( "../" SOURCE_CODE_BASE_FOLDER"/" ) + argv[1];
+		sourcePath = anString( "../" SOURCE_CODE_BASE_FOLDER"/" ) + argv[1];
 	//} else {
 		//sourcePath = "../" SOURCE_FOLDER"/game";
 	}
@@ -260,7 +260,7 @@ int main( int argc, char** argv ) {
 	} else {
 		generator->AddDefine( "__cplusplus" );
 		generator->AddDefine( "ENGINE_DLL" );
-		generator->AddDefine( "ID_TYPEINFO" );
+		generator->AddDefine( "ARC_TYPEINFO" );
 	}
 
 	generator->CreateTypeInfo( sourcePath );
@@ -274,7 +274,7 @@ int main( int argc, char** argv ) {
 	fileSystem->Shutdown( false );
 	cvarSystem->Shutdown();
 	cmdSystem->Shutdown();
-	arcLibrary::ShutDown();
+	anLibrary::ShutDown();
 
 	return 0;
 }

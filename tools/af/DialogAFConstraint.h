@@ -41,9 +41,9 @@ class DialogAFConstraint : public CDialog {
 	DECLARE_DYNAMIC(DialogAFConstraint)
 
 public:
-						DialogAFConstraint( CWnd* pParent = NULL );   // standard constructor
+						DialogAFConstraint( CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogAFConstraint();
-	void				LoadFile( arcDeclAF *af );
+	void				LoadFile( anDeclAF *af );
 	void				SaveFile( void );
 	void				LoadConstraint( const char *name );
 	void				SaveConstraint( void );
@@ -70,8 +70,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	arcDeclAF *			file;
-	arcDeclAF_Constraint*constraint;
+	anDeclAF *			file;
+	anDeclAF_Constraint*constraint;
 	CDialog *			constraintDlg;
 	DialogAFConstraintFixed *fixedDlg;
 	DialogAFConstraintBallAndSocket *ballAndSocketDlg;

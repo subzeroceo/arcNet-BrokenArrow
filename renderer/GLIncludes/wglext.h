@@ -308,9 +308,9 @@ typedef BOOL (WINAPI * PFNWGLRESTOREBUFFERREGIONARBPROC) (HANDLE hRegion, int x,
 #ifndef WGL_ARB_extensions_string
 #define WGL_ARB_extensions_string 1
 #ifdef WGL_WGLEXT_PROTOTYPES
-extern const char * WINAPI wglGetExtensionsStringARB (HDC);
+extern const char *WINAPI wglGetExtensionsStringARB (HDC);
 #endif
-typedef const char * (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
+typedef const char *(WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
 #endif
 
 #ifndef WGL_ARB_pixel_format
@@ -380,9 +380,9 @@ typedef VOID (WINAPI * PFNWGLDESTROYDISPLAYCOLORTABLEEXTPROC) ( GLushort id);
 #ifndef WGL_EXT_extensions_string
 #define WGL_EXT_extensions_string 1
 #ifdef WGL_WGLEXT_PROTOTYPES
-extern const char * WINAPI wglGetExtensionsStringEXT ( void );
+extern const char *WINAPI wglGetExtensionsStringEXT ( void );
 #endif
-typedef const char * (WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC) ( void );
+typedef const char *(WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC) ( void );
 #endif
 
 #ifndef WGL_EXT_make_current_read
@@ -535,7 +535,7 @@ extern BOOL WINAPI wglDestroyImageBufferI3D(HDC, LPVOID);
 extern BOOL WINAPI wglAssociateImageBufferEventsI3D(HDC, const HANDLE *, const LPVOID *, const DWORD *, UINT);
 extern BOOL WINAPI wglReleaseImageBufferEventsI3D(HDC, const LPVOID *, UINT);
 #endif
-typedef LPVOID (WINAPI * PFNWGLCREATEIMAGEBUFFERI3DPROC) (HDC hDC, DWORD dwSize, UINT uFlags);
+typedef LPVOID (WINAPI * PFNWGLCREATEIMAGEBUFFERI3DPROC) (HDC hDC, DWORD dwSize, UINT uFlags );
 typedef BOOL (WINAPI * PFNWGLDESTROYIMAGEBUFFERI3DPROC) (HDC hDC, LPVOID pAddress);
 typedef BOOL (WINAPI * PFNWGLASSOCIATEIMAGEBUFFEREVENTSI3DPROC) (HDC hDC, const HANDLE *pEvent, const LPVOID *pAddress, const DWORD *pSize, UINT count);
 typedef BOOL (WINAPI * PFNWGLRELEASEIMAGEBUFFEREVENTSI3DPROC) (HDC hDC, const LPVOID *pAddress, UINT count);

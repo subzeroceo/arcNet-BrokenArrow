@@ -36,7 +36,7 @@ class CCommentsDlg : public CDialog
 	DECLARE_DYNAMIC(CCommentsDlg)
 
 public:
-	CCommentsDlg(CWnd* pParent = NULL);   // standard constructor
+	CCommentsDlg(CWnd* pParent = nullptr );   // standard constructor
 	virtual ~CCommentsDlg();
 
 // Dialog Data

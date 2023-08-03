@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -28,7 +28,7 @@ void CFindTextureDlg::updateTextures(const char *p) {
   }
 }
 
-CFindTextureDlg::CFindTextureDlg(CWnd* pParent /*=NULL*/)
+CFindTextureDlg::CFindTextureDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CFindTextureDlg::IDD, pParent) {
 	//{{AFX_DATA_INIT(CFindTextureDlg)
 	m_bSelectedOnly = FALSE;
@@ -77,7 +77,7 @@ void CFindTextureDlg::OnOK() {
 }
 
 void CFindTextureDlg::show() {
-  if (g_dlgFind.GetSafeHwnd() == NULL || IsWindow(g_dlgFind.GetSafeHwnd() ) == FALSE) {
+  if (g_dlgFind.GetSafeHwnd() == nullptr || IsWindow(g_dlgFind.GetSafeHwnd() ) == FALSE) {
     g_dlgFind.Create(IDD_DIALOG_FINDREPLACE);
     g_dlgFind.ShowWindow(SW_SHOW);
   } else {
@@ -86,15 +86,15 @@ void CFindTextureDlg::show() {
   CRect rct;
   LONG lSize = sizeof(rct);
   if (LoadRegistryInfo( "Radiant::TextureFindWindow", &rct, &lSize) )
-    g_dlgFind.SetWindowPos(NULL, rct.left, rct.top, 0,0, SWP_NOSIZE | SWP_SHOWWINDOW);
+    g_dlgFind.SetWindowPos(nullptr, rct.left, rct.top, 0,0, SWP_NOSIZE | SWP_SHOWWINDOW);
 }
 
 
 bool CFindTextureDlg::isOpen() {
-  return (g_dlgFind.GetSafeHwnd() == NULL || ::IsWindowVisible(g_dlgFind.GetSafeHwnd() ) == FALSE) ? false : true;
+  return (g_dlgFind.GetSafeHwnd() == nullptr || ::IsWindowVisible(g_dlgFind.GetSafeHwnd() ) == FALSE) ? false : true;
 }
 
-void CFindTextureDlg::setFindStr(const char * p) {
+void CFindTextureDlg::setFindStr(const char *p) {
   g_dlgFind.UpdateData(TRUE);
   if (g_dlgFind.m_bLive) {
     g_dlgFind.m_strFind = p;
@@ -102,7 +102,7 @@ void CFindTextureDlg::setFindStr(const char * p) {
   }
 }
 
-void CFindTextureDlg::setReplaceStr(const char * p) {
+void CFindTextureDlg::setReplaceStr(const char *p) {
   g_dlgFind.UpdateData(TRUE);
   if (g_dlgFind.m_bLive) {
     g_dlgFind.m_strReplace = p;

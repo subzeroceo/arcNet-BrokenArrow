@@ -1,50 +1,50 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idForce, idForce_Constant )
+CLASS_DECLARATION( anForce, anForce_Constant )
 END_CLASS
 
 /*
 ================
-idForce_Constant::idForce_Constant
+anForce_Constant::anForce_Constant
 ================
 */
-idForce_Constant::idForce_Constant( void ) {
+anForce_Constant::anForce_Constant( void ) {
 	force		= vec3_zero;
-	physics		= NULL;
+	physics		= nullptr;
 	id			= 0;
 	point		= vec3_zero;
 }
 
 /*
 ================
-idForce_Constant::~idForce_Constant
+anForce_Constant::~anForce_Constant
 ================
 */
-idForce_Constant::~idForce_Constant( void ) {
+anForce_Constant::~anForce_Constant( void ) {
 }
 
 /*
 ================
-idForce_Constant::Save
+anForce_Constant::Save
 ================
 */
-void idForce_Constant::Save( idSaveGame *savefile ) const {
+void anForce_Constant::Save( anSaveGame *savefile ) const {
 	savefile->WriteVec3( force );
-	// TOSAVE: idPhysics *		physics
+	// TOSAVE: anPhysics *		physics
 	savefile->WriteInt( id );
 	savefile->WriteVec3( point );
 }
 
 /*
 ================
-idForce_Constant::Restore
+anForce_Constant::Restore
 ================
 */
-void idForce_Constant::Restore( idRestoreGame *savefile ) {
+void anForce_Constant::Restore( anRestoreGame *savefile ) {
 	// Owner needs to call SetPhysics!!
 	savefile->ReadVec3( force );
 	savefile->ReadInt( id );
@@ -53,10 +53,10 @@ void idForce_Constant::Restore( idRestoreGame *savefile ) {
 
 /*
 ================
-idForce_Constant::SetPosition
+anForce_Constant::SetPosition
 ================
 */
-void idForce_Constant::SetPosition( idPhysics *physics, int id, const arcVec3 &point ) {
+void anForce_Constant::SetPosition( anPhysics *physics, int id, const anVec3 &point ) {
 	this->physics = physics;
 	this->id = id;
 	this->point = point;
@@ -64,29 +64,29 @@ void idForce_Constant::SetPosition( idPhysics *physics, int id, const arcVec3 &p
 
 /*
 ================
-idForce_Constant::SetForce
+anForce_Constant::SetForce
 ================
 */
-void idForce_Constant::SetForce( const arcVec3 &force ) {
+void anForce_Constant::SetForce( const anVec3 &force ) {
 	this->force = force;
 }
 
 /*
 ================
-idForce_Constant::SetPhysics
+anForce_Constant::SetPhysics
 ================
 */
-void idForce_Constant::SetPhysics( idPhysics *physics ) {
+void anForce_Constant::SetPhysics( anPhysics *physics ) {
 	this->physics = physics;
 }
 
 /*
 ================
-idForce_Constant::Evaluate
+anForce_Constant::Evaluate
 ================
 */
-void idForce_Constant::Evaluate( int time ) {
-	arcVec3 p;
+void anForce_Constant::Evaluate( int time ) {
+	anVec3 p;
 
 	if ( !physics ) {
 		return;
@@ -99,11 +99,11 @@ void idForce_Constant::Evaluate( int time ) {
 
 /*
 ================
-idForce_Constant::RemovePhysics
+anForce_Constant::RemovePhysics
 ================
 */
-void idForce_Constant::RemovePhysics( const idPhysics *phys ) {
+void anForce_Constant::RemovePhysics( const anPhysics *phys ) {
 	if ( physics == phys ) {
-		physics = NULL;
+		physics = nullptr;
 	}
 }

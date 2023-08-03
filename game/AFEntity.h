@@ -24,12 +24,12 @@ public:
 	virtual void			Present( void );
 
 protected:
-	arcPhysics_AF			physicsObj;
+	anPhysics_AF			physicsObj;
 
-	void					SetModelForId( int id, const idStr &modelName );
+	void					SetModelForId( int id, const anString &modelName );
 
 private:
-	arcList<idRenderModel *>	modelHandles;
+	arcList<anRenderModel *>	modelHandles;
 	arcList<int>				modelDefHandles;
 };
 
@@ -50,7 +50,7 @@ public:
 	void					Spawn( void );
 
 protected:
-	void					BuildChain( const idStr &name, const arcVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld = true );
+	void					BuildChain( const anString &name, const anVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld = true );
 };
 
 /*
@@ -84,21 +84,21 @@ public:
 
 	void					PlayIdleAnim( int blendTime );
 
-	virtual void			GetImpactInfo( arcEntity *ent, int id, const arcVec3 &point, impactInfo_t *info );
-	virtual void			ApplyImpulse( arcEntity *ent, int id, const arcVec3 &point, const arcVec3 &impulse );
-	virtual void			AddForce( arcEntity *ent, int id, const arcVec3 &point, const arcVec3 &force );
+	virtual void			GetImpactInfo( arcEntity *ent, int id, const anVec3 &point, impactInfo_t *info );
+	virtual void			ApplyImpulse( arcEntity *ent, int id, const anVec3 &point, const anVec3 &impulse );
+	virtual void			AddForce( arcEntity *ent, int id, const anVec3 &point, const anVec3 &force );
 
-	virtual	void			Damage( arcEntity *inflictor, arcEntity *attacker, const arcVec3 &dir, const char *damageDefName, const float damageScale, const int location );
-	virtual void			AddDamageEffect( const trace_t &collision, const arcVec3 &velocity, const char *damageDefName );
+	virtual	void			Damage( arcEntity *inflictor, arcEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
+	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName );
 
 	void					SetCombatModel( void );
-	arcClipModel *			GetCombatModel( void ) const;
+	anClipModel *			GetCombatModel( void ) const;
 	virtual void			LinkCombat( void );
 	virtual void			UnlinkCombat( void );
 
 protected:
 	arcEntity *				body;
-	arcClipModel *			combatModel;	// render model for hit detection of head
+	anClipModel *			combatModel;	// render model for hit detection of head
 	int						idleAnim;
 	jointHandle_t			attachJoint;
 };
@@ -124,21 +124,21 @@ public:
 	void					Restore( arcRestoreGame *savefile );
 
 	virtual void			Think( void );
-	virtual void			GetImpactInfo( arcEntity *ent, int id, const arcVec3 &point, impactInfo_t *info );
-	virtual void			ApplyImpulse( arcEntity *ent, int id, const arcVec3 &point, const arcVec3 &impulse );
-	virtual void			AddForce( arcEntity *ent, int id, const arcVec3 &point, const arcVec3 &force );
-	virtual bool			Collide( const trace_t &collision, const arcVec3 &velocity );
-	virtual bool			GetPhysicsToVisualTransform( arcVec3 &origin, arcMat3 &axis );
+	virtual void			GetImpactInfo( arcEntity *ent, int id, const anVec3 &point, impactInfo_t *info );
+	virtual void			ApplyImpulse( arcEntity *ent, int id, const anVec3 &point, const anVec3 &impulse );
+	virtual void			AddForce( arcEntity *ent, int id, const anVec3 &point, const anVec3 &force );
+	virtual bool			Collide( const trace_t &collision, const anVec3 &velocity );
+	virtual bool			GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis );
 	virtual bool			UpdateAnimationControllers( void );
 	virtual void			FreeModelDef( void );
 
 	virtual bool			LoadAF( void );
 	bool					IsActiveAF( void ) const { return af.IsActive(); }
 	const char *			GetAFName( void ) const { return af.GetName(); }
-	arcPhysics_AF *			GetAFPhysics( void ) { return af.GetPhysics(); }
+	anPhysics_AF *			GetAFPhysics( void ) { return af.GetPhysics(); }
 
 	void					SetCombatModel( void );
-	arcClipModel *			GetCombatModel( void ) const;
+	anClipModel *			GetCombatModel( void ) const;
 							// contents of combatModel can be set to 0 or re-enabled (mp)
 	void					SetCombatContents( bool enable );
 	virtual void			LinkCombat( void );
@@ -146,8 +146,8 @@ public:
 
 	int						BodyForClipModelId( int id ) const;
 
-	void					SaveState( arcDict &args ) const;
-	void					LoadState( const arcDict &args );
+	void					SaveState( anDict &args ) const;
+	void					LoadState( const anDict &args );
 
 	void					AddBindConstraints( void );
 	void					RemoveBindConstraints( void );
@@ -158,13 +158,13 @@ public:
 
 protected:
 	arcAF					af;				// articulated figure
-	arcClipModel *			combatModel;	// render model for hit detection
+	anClipModel *			combatModel;	// render model for hit detection
 	int						combatModelContents;
-	arcVec3					spawnOrigin;	// spawn origin
-	arcMat3					spawnAxis;		// rotation axis used when spawned
+	anVec3					spawnOrigin;	// spawn origin
+	anMat3					spawnAxis;		// rotation axis used when spawned
 	int						nextSoundTime;	// next time this can make a sound
 
-	void					Event_SetConstraintPosition( const char *name, const arcVec3 &pos );
+	void					Event_SetConstraintPosition( const char *name, const anVec3 &pos );
 };
 
 /*
@@ -189,15 +189,15 @@ public:
 	void					Save( arcSaveGame *savefile ) const;
 	void					Restore( arcRestoreGame *savefile );
 	virtual void			Present( void );
-	virtual	void			Damage( arcEntity *inflictor, arcEntity *attacker, const arcVec3 &dir, const char *damageDefName, const float damageScale, const int location );
-	virtual void			SpawnGibs( const arcVec3 &dir, const char *damageDefName );
+	virtual	void			Damage( arcEntity *inflictor, arcEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
+	virtual void			SpawnGibs( const anVec3 &dir, const char *damageDefName );
 
 protected:
-	idRenderModel *			skeletonModel;
+	anRenderModel *			skeletonModel;
 	int						skeletonModelDefHandle;
 	bool					gibbed;
 
-	virtual void			Gib( const arcVec3 &dir, const char *damageDefName );
+	virtual void			Gib( const anVec3 &dir, const char *damageDefName );
 	void					InitSkeletonModel( void );
 
 	void					Event_Gib( const char *damageDefName );
@@ -258,13 +258,13 @@ public:
 
 	virtual void			Hide( void );
 	virtual void			Show( void );
-	virtual void			ProjectOverlay( const arcVec3 &origin, const arcVec3 &dir, float size, const char *material );
+	virtual void			ProjectOverlay( const anVec3 &origin, const anVec3 &dir, float size, const char *material );
 
 	virtual void			LinkCombat( void );
 	virtual void			UnlinkCombat( void );
 
 protected:
-	virtual void			Gib( const arcVec3 &dir, const char *damageDefName );
+	virtual void			Gib( const anVec3 &dir, const char *damageDefName );
 
 private:
 	arcEntityPtr<arcAFAttachment>	head;
@@ -297,7 +297,7 @@ protected:
 	float					wheelRadius;
 	float					steerAngle;
 	float					steerSpeed;
-	const arcDeclParticle *	dustSmoke;
+	const anDeclParticle *	dustSmoke;
 
 	float					GetSteerAngle( void );
 };
@@ -321,7 +321,7 @@ public:
 	virtual void			Think( void );
 
 protected:
-	arcClipModel *			wheelModel;
+	anClipModel *			wheelModel;
 	arcAFConstraint_Suspension *	suspension[4];
 	jointHandle_t			wheelJoints[4];
 	float					wheelAngles[4];

@@ -1,52 +1,51 @@
 #include "Heap.h"
 #include "math/Matrix.h"
 #include "math/Vector.h"
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 #if !defined( ARC_REDIRECT_NEWDELETE ) && !defined( MACOS_X )
 	#define USE_STRING_DATA_ALLOCATOR
 #endif
-
 #ifdef USE_STRING_DATA_ALLOCATOR
-static arcDynamicBlockAlloc<char, 1<<18, 128>	stringDataAllocator;
+static anDynamicBlockAlloc<char, 1<<18, 128>	stringDataAllocator;
 #endif
 
-arcNetString::HMSTimeFormat_t	arcNetString::defaultHMSFormat;
+anString::HMSTimeFormat_t	anString::defaultHMSFormat;
 
-strColor_t g_color_table[COLOR_BITS+1] = {
-	{ arcVec4( 0.0f,		0.0f,		0.0f,  1.0f ), "^0" },			// 0 - S_COLOR_DEFAULT			0
-	{ arcVec4( 1.0f,		0.0f,		0.0f,  1.0f ), "^1" }, 			// 1 - S_COLOR_RED				1
-	{ arcVec4( 0.0f,		1.0f,		0.0f,  1.0f ), "^2" }, 			// 2 - S_COLOR_GREEN			2
-	{ arcVec4( 1.0f,		1.0f,		0.0f,  1.0f ), "^3" }, 			// 3 - S_COLOR_YELLOW			3
-	{ arcVec4( 0.0f,		0.0f,		1.0f,  1.0f ), "^4" }, 			// 4 - S_COLOR_BLUE				4
-	{ arcVec4( 0.0f,		1.0f,		1.0f,  1.0f ), "^5" }, 			// 5 - S_COLOR_CYAN				5
-	{ arcVec4( 1.0f,		0.0f,		1.0f,  1.0f ), "^6" }, 			// 6 - S_COLOR_MAGENTA			6
-	{ arcVec4( 1.0f,		1.0f,		1.0f,  1.0f ), "^7" }, 			// 7 - S_COLOR_WHITE			7
-	{ arcVec4( 0.5f,		0.5f,		0.5f,  1.0f ), "^8" }, 			// 8 - S_COLOR_GRAY				8
-	{ arcVec4( 0.15f,	0.15f,		0.15f, 1.0f ), "^9" }, 			// 9 - S_COLOR_BLACK			9
-	{ arcVec4( 0.75f,	0.75f,		0.75f, 1.0f ), "^:" }, 			// : - lt.grey					10
-	{ arcVec4( 0.25f,	0.25f,		0.25f, 1.0f ), "^;" }, 			// ; - dk.grey					11
-	{ arcVec4( 0.0f,		0.5f,		0.0f,  1.0f ), "^<" }, 			// < - md.green					12
-	{ arcVec4( 0.5f,		0.5f,		0.0f,  1.0f ), "^=" }, 			// = - md.yellow				13
-	{ arcVec4( 0.0f,		0.0f,		0.5f,  1.0f ), "^>" }, 			// > - md.blue					14
-	{ arcVec4( 0.5f,		0.0f,		0.0f,  1.0f ), "^?" }, 			// ? - md.red					15
-	{ arcVec4( 0.5f,		0.25,		0.0f,  1.0f ), "^@" }, 			// @ - md.orange				16
-	{ arcVec4( 1.0f,		0.6f,		0.1f,  1.0f ), "^A" }, 			// A - lt.orange				17
-	{ arcVec4( 0.0f,		0.5f,		0.5f,  1.0f ), "^B" }, 			// B - md.cyan					18
-	{ arcVec4( 0.5f,		0.0f,		0.5f,  1.0f ), "^C" }, 			// C - md.purple				19
-	{ arcVec4( 1.0f,		0.5f,		0.0f,  1.0f ), "^D" }, 			// D - orange					20
-	{ arcVec4( 0.5f,		0.0f,		1.0f,  1.0f ), "^E" }, 			// E							21
-	{ arcVec4( 0.2f,		0.6f,		0.8f,  1.0f ), "^F" }, 			// F							22
-	{ arcVec4( 0.8f,		1.0f,		0.8f,  1.0f ), "^G" }, 			// G							23
-	{ arcVec4( 0.0f,		0.4f,		0.2f,  1.0f ), "^H" }, 			// H							24
-	{ arcVec4( 1.0f,		0.0f,		0.2f,  1.0f ), "^I" }, 			// I							25
-	{ arcVec4( 0.7f,		0.1f,		0.1f,  1.0f ), "^J" }, 			// J							26
-	{ arcVec4( 0.6f,		0.2f,		0.0f,  1.0f ), "^K" }, 			// K							27
-	{ arcVec4( 0.8f,		0.6f,		0.2f,  1.0f ), "^L" }, 			// L							28
-	{ arcVec4( 0.6f,		0.6f,		0.2f,  1.0f ), "^M" }, 			// M							29
-	{ arcVec4( 1.0f,		1.0f,		0.75f, 1.0f ), "^N" }, 			// N							30
-	{ arcVec4( 1.0f,		1.0f,		0.5f,  1.0f ), "^O" }, 			// O							31
+strColor_t g_color_table[COLOR_BITS+1] = 
+	{ anVec4( 0.0f,		0.0f,		0.0f,  1.0f ), "^0" },			// 0 - S_COLOR_DEFAULT			0
+	{ anVec4( 1.0f,		0.0f,		0.0f,  1.0f ), "^1" }, 			// 1 - S_COLOR_RED				1
+	{ anVec4( 0.0f,		1.0f,		0.0f,  1.0f ), "^2" }, 			// 2 - S_COLOR_GREEN			2
+	{ anVec4( 1.0f,		1.0f,		0.0f,  1.0f ), "^3" }, 			// 3 - S_COLOR_YELLOW			3
+	{ anVec4( 0.0f,		0.0f,		1.0f,  1.0f ), "^4" }, 			// 4 - S_COLOR_BLUE				4
+	{ anVec4( 0.0f,		1.0f,		1.0f,  1.0f ), "^5" }, 			// 5 - S_COLOR_CYAN				5
+	{ anVec4( 1.0f,		0.0f,		1.0f,  1.0f ), "^6" }, 			// 6 - S_COLOR_MAGENTA			6
+	{ anVec4( 1.0f,		1.0f,		1.0f,  1.0f ), "^7" }, 			// 7 - S_COLOR_WHITE			7
+	{ anVec4( 0.5f,		0.5f,		0.5f,  1.0f ), "^8" }, 			// 8 - S_COLOR_GRAY				8
+	{ anVec4( 0.15f,	0.15f,		0.15f, 1.0f ), "^9" }, 			// 9 - S_COLOR_BLACK			9
+	{ anVec4( 0.75f,	0.75f,		0.75f, 1.0f ), "^:" }, 			// : - lt.grey					10
+	{ anVec4( 0.25f,	0.25f,		0.25f, 1.0f ), "^;" }, 			// ; - dk.grey					11
+	{ anVec4( 0.0f,		0.5f,		0.0f,  1.0f ), "^<" }, 			// < - md.green					12
+	{ anVec4( 0.5f,		0.5f,		0.0f,  1.0f ), "^=" }, 			// = - md.yellow				13
+	{ anVec4( 0.0f,		0.0f,		0.5f,  1.0f ), "^>" }, 			// > - md.blue					14
+	{ anVec4( 0.5f,		0.0f,		0.0f,  1.0f ), "^?" }, 			// ? - md.red					15
+	{ anVec4( 0.5f,		0.25,		0.0f,  1.0f ), "^@" }, 			// @ - md.orange				16
+	{ anVec4( 1.0f,		0.6f,		0.1f,  1.0f ), "^A" }, 			// A - lt.orange				17
+	{ anVec4( 0.0f,		0.5f,		0.5f,  1.0f ), "^B" }, 			// B - md.cyan					18
+	{ anVec4( 0.5f,		0.0f,		0.5f,  1.0f ), "^C" }, 			// C - md.purple				19
+	{ anVec4( 1.0f,		0.5f,		0.0f,  1.0f ), "^D" }, 			// D - orange					20
+	{ anVec4( 0.5f,		0.0f,		1.0f,  1.0f ), "^E" }, 			// E							21
+	{ anVec4( 0.2f,		0.6f,		0.8f,  1.0f ), "^F" }, 			// F							22
+	{ anVec4( 0.8f,		1.0f,		0.8f,  1.0f ), "^G" }, 			// G							23
+	{ anVec4( 0.0f,		0.4f,		0.2f,  1.0f ), "^H" }, 			// H							24
+	{ anVec4( 1.0f,		0.0f,		0.2f,  1.0f ), "^I" }, 			// I							25
+	{ anVec4( 0.7f,		0.1f,		0.1f,  1.0f ), "^J" }, 			// J							26
+	{ anVec4( 0.6f,		0.2f,		0.0f,  1.0f ), "^K" }, 			// K							27
+	{ anVec4( 0.8f,		0.6f,		0.2f,  1.0f ), "^L" }, 			// L							28
+	{ anVec4( 0.6f,		0.6f,		0.2f,  1.0f ), "^M" }, 			// M							29
+	{ anVec4( 1.0f,		1.0f,		0.75f, 1.0f ), "^N" }, 			// N							30
+	{ anVec4( 1.0f,		1.0f,		0.5f,  1.0f ), "^O" }, 			// O							31
 };
 
 const char *units[2][4] = {
@@ -55,37 +54,37 @@ const char *units[2][4] = {
 };
 /*
 ============
-arcNetString::ColorForIndex
+anString::ColorForIndex
 ============
 */
-const arcVec4 &arcNetString::ColorForIndex( int i ) {
+const anVec4 &anString::ColorForIndex( int i ) {
 	return g_color_table[ i & COLOR_BITS ].color;
 }
 
 /*
 ============
-arcNetString::ColorForIndex
+anString::ColorForIndex
 ============
 */
-const arcVec4 &arcNetString::ColorForChar( int c ) {
+const anVec4 &anString::ColorForChar( int c ) {
 	return g_color_table[ ColorIndex( c ) ].color;
 }
 
 /*
 ============
-arcNetString::ColorForIndex
+anString::ColorForIndex
 ============
 */
-const char *arcNetString::StrForColorIndex( int i ) {
+const char *anString::StrForColorIndex( int i ) {
 	return g_color_table[ i & COLOR_BITS ].str; //return g_color_table[ i & 15 ];
 }
 
 /*
 ============
-arcNetString::ReAllocate
+anString::ReAllocate
 ============
 */
-void arcNetString::ReAllocate( int amount, bool keepOld ) {
+void anString::ReAllocate( int amount, bool keepOld ) {
 	assert( amount > 0 );
 
 	int mod = amount % STR_ALLOC_GRAN;
@@ -114,10 +113,10 @@ void arcNetString::ReAllocate( int amount, bool keepOld ) {
 
 /*
 ============
-arcNetString::FreeData
+anString::FreeData
 ============
 */
-void arcNetString::FreeData( void ) {
+void anString::FreeData( void ) {
 	if ( data && data != baseBuffer ) {
 		stringDataAllocator.Free( data );
 		//delete[] data;
@@ -127,16 +126,16 @@ void arcNetString::FreeData( void ) {
 
 /*
 ============
-arcNetString::operator=
+anString::operator=
 ============
 */
-void arcNetString::operator=( const char *text ) {
+void anString::operator=( const char *text ) {
 	int l;
 	int diff;
 	int i;
 
 	if ( !text ) {
-		// safe behaviour if NULL
+		// safe behaviour if nullptr
 		EnsureAlloced( 1, false );
 		data[ 0 ] = '\0';
 		len = 0;
@@ -153,11 +152,11 @@ void arcNetString::operator=( const char *text ) {
 
 		assert( strlen( text ) < (unsigned)len );
 
-		for ( i = 0; text[ i ]; i++ ) {
-			data[ i ] = text[ i ];
+		for ( i = 0; text[i]; i++ ) {
+			data[i] = text[i];
 		}
 
-		data[ i ] = '\0';
+		data[i] = '\0';
 
 		len -= diff;
 
@@ -172,12 +171,12 @@ void arcNetString::operator=( const char *text ) {
 
 /*
 ============
-arcNetString::FindChar
+anString::FindChar
 
 returns -1 if not found otherwise the index of the char
 ============
 */
-int arcNetString::FindChar( const char *str, const char c, int start, int end ) {
+int anString::FindChar( const char *str, const char c, int start, int end ) {
 	if ( end == -1 ) {
 		end = strlen( str ) - 1;
 	}
@@ -191,12 +190,12 @@ int arcNetString::FindChar( const char *str, const char c, int start, int end ) 
 
 /*
 ============
-arcNetString::FindText
+anString::FindText
 
 returns -1 if not found otherwise the index of the text
 ============
 */
-int arcNetString::FindText( const char *str, const char *text, bool casesensitive, int start, int end ) {
+int anString::FindText( const char *str, const char *text, bool casesensitive, int start, int end ) {
 	int l, i, j;
 
 	if ( end == -1 ) {
@@ -226,7 +225,7 @@ int arcNetString::FindText( const char *str, const char *text, bool casesensitiv
 
 /*
 ============
-arcNetString::Filter
+anString::Filter
 
 Returns true if the string conforms the given filter.
 Several metacharacter may be used in the filter.
@@ -238,8 +237,8 @@ Several metacharacter may be used in the filter.
 
 ============
 */
-bool arcNetString::Filter( const char *filter, const char *name, bool casesensitive ) {
-	arcNetString buf;
+bool anString::Filter( const char *filter, const char *name, bool casesensitive ) {
+	anString buf;
 	int i, found, index;
 
 	while(*filter) {
@@ -257,7 +256,7 @@ bool arcNetString::Filter( const char *filter, const char *name, bool casesensit
 				filter++;
 			}
 			if ( buf.Length() ) {
-				index = arcNetString( name ).Find( buf.c_str(), casesensitive );
+				index = anString( name ).Find( buf.c_str(), casesensitive );
 				if ( index == -1 ) {
 					return false;
 				}
@@ -335,12 +334,12 @@ bool arcNetString::Filter( const char *filter, const char *name, bool casesensit
 
 /*
 =============
-arcNetString::StripMediaName
+anString::StripMediaName
 
   makes the string lower case, replaces backslashes with forward slashes, and removes extension
 =============
 */
-void arcNetString::StripMediaName( const char *name, arcNetString &mediaName ) {
+void anString::StripMediaName( const char *name, anString &mediaName ) {
 	char c;
 
 	mediaName.Empty();
@@ -354,17 +353,17 @@ void arcNetString::StripMediaName( const char *name, arcNetString &mediaName ) {
 		if ( c == '\\' ) {
 			mediaName.Append( '/' );
 		} else {
-			mediaName.Append( arcNetString::ToLower( c ) );
+			mediaName.Append( anString::ToLower( c ) );
 		}
 	}
 }
 
 /*
 =============
-arcNetString::CheckExtension
+anString::CheckExtension
 =============
 */
-bool arcNetString::CheckExtension( const char *name, const char *ext ) {
+bool anString::CheckExtension( const char *name, const char *ext ) {
 	const char *s1 = name + Length( name ) - 1;
 	const char *s2 = ext + Length( ext ) - 1;
 	int c1, c2, d;
@@ -396,10 +395,10 @@ bool arcNetString::CheckExtension( const char *name, const char *ext ) {
 
 /*
 =============
-arcNetString::FloatArrayToString
+anString::FloatArrayToString
 =============
 */
-const char *arcNetString::FloatArrayToString( const float *array, const int length, const int precision ) {
+const char *anString::FloatArrayToString( const float *array, const int length, const int precision ) {
 	static int index = 0;
 	static char str[4][16384];	// in case called by nested functions
 	int i, n;
@@ -409,15 +408,15 @@ const char *arcNetString::FloatArrayToString( const float *array, const int leng
 	s = str[index];
 	index = (index + 1 ) & 3;
 
-	arcNetString::snPrintf( format, sizeof( format ), "%%.%df", precision );
-	n = arcNetString::snPrintf( s, sizeof( str[0] ), format, array[0] );
+	anString::snPrintf( format, sizeof( format ), "%%.%df", precision );
+	n = anString::snPrintf( s, sizeof( str[0] ), format, array[0] );
 	if ( precision > 0 ) {
 		while( n > 0 && s[n-1] == '0' ) s[--n] = '\0';
 		while( n > 0 && s[n-1] == '.' ) s[--n] = '\0';
 	}
-	arcNetString::snPrintf( format, sizeof( format ), " %%.%df", precision );
+	anString::snPrintf( format, sizeof( format ), " %%.%df", precision );
 	for ( i = 1; i < length; i++ ) {
-		n += arcNetString::snPrintf( s + n, sizeof( str[0] ) - n, format, array[i] );
+		n += anString::snPrintf( s + n, sizeof( str[0] ) - n, format, array[i] );
 		if ( precision > 0 ) {
 			while( n > 0 && s[n-1] == '0' ) s[--n] = '\0';
 			while( n > 0 && s[n-1] == '.' ) s[--n] = '\0';
@@ -428,12 +427,12 @@ const char *arcNetString::FloatArrayToString( const float *array, const int leng
 
 /*
 ============
-arcNetString::Last
+anString::Last
 
 returns -1 if not found otherwise the index of the char
 ============
 */
-int arcNetString::Last( const char c ) const {
+int anString::Last( const char c ) const {
 	int i;
 
 	for ( i = Length(); i > 0; i-- ) {
@@ -447,10 +446,10 @@ int arcNetString::Last( const char c ) const {
 
 /*
 ============
-arcNetString::StripLeading
+anString::StripLeading
 ============
 */
-void arcNetString::StripLeading( const char c ) {
+void anString::StripLeading( const char c ) {
 	while( data[ 0 ] == c ) {
 		memmove( &data[ 0 ], &data[ 1 ], len );
 		len--;
@@ -459,10 +458,10 @@ void arcNetString::StripLeading( const char c ) {
 
 /*
 ============
-arcNetString::StripLeading
+anString::StripLeading
 ============
 */
-void arcNetString::StripLeading( const char *string ) {
+void anString::StripLeading( const char *string ) {
 	int l;
 
 	l = strlen( string );
@@ -476,10 +475,10 @@ void arcNetString::StripLeading( const char *string ) {
 
 /*
 ============
-arcNetString::StripLeadingOnce
+anString::StripLeadingOnce
 ============
 */
-bool arcNetString::StripLeadingOnce( const char *string ) {
+bool anString::StripLeadingOnce( const char *string ) {
 	int l;
 
 	l = strlen( string );
@@ -493,10 +492,10 @@ bool arcNetString::StripLeadingOnce( const char *string ) {
 
 /*
 ============
-arcNetString::StripTrailing
+anString::StripTrailing
 ============
 */
-void arcNetString::StripTrailing( const char c ) {
+void anString::StripTrailing( const char c ) {
 	int i;
 
 	for ( i = Length(); i > 0 && data[ i - 1 ] == c; i-- ) {
@@ -507,10 +506,10 @@ void arcNetString::StripTrailing( const char c ) {
 
 /*
 ============
-arcNetString::StripLeading
+anString::StripLeading
 ============
 */
-void arcNetString::StripTrailing( const char *string ) {
+void anString::StripTrailing( const char *string ) {
 	int l;
 
 	l = strlen( string );
@@ -524,10 +523,10 @@ void arcNetString::StripTrailing( const char *string ) {
 
 /*
 ============
-arcNetString::StripTrailingOnce
+anString::StripTrailingOnce
 ============
 */
-bool arcNetString::StripTrailingOnce( const char *string ) {
+bool anString::StripTrailingOnce( const char *string ) {
 	int l;
 
 	l = strlen( string );
@@ -541,12 +540,12 @@ bool arcNetString::StripTrailingOnce( const char *string ) {
 
 /*
 ============
-arcNetString::Replace
+anString::Replace
 ============
 */
-void arcNetString::Replace( const char *old, const char *nw ) {
+void anString::Replace( const char *old, const char *nw ) {
 	int		oldLen, newLen, i, j, count;
-	arcNetString	oldString( data );
+	anString	oldString( data );
 
 	oldLen = strlen( old );
 	newLen = strlen( nw );
@@ -554,7 +553,7 @@ void arcNetString::Replace( const char *old, const char *nw ) {
 	// Work out how big the new string will be
 	count = 0;
 	for ( i = 0; i < oldString.Length(); i++ ) {
-		if ( !arcNetString::Cmpn( &oldString[i], old, oldLen ) ) {
+		if ( !anString::Cmpn( &oldString[i], old, oldLen ) ) {
 			count++;
 			i += oldLen - 1;
 		}
@@ -565,7 +564,7 @@ void arcNetString::Replace( const char *old, const char *nw ) {
 
 		// Replace the old data with the new data
 		for ( i = 0, j = 0; i < oldString.Length(); i++ ) {
-			if ( !arcNetString::Cmpn( &oldString[i], old, oldLen ) ) {
+			if ( !anString::Cmpn( &oldString[i], old, oldLen ) ) {
 				memcpy( data + j, nw, newLen );
 				i += oldLen - 1;
 				j += newLen;
@@ -581,17 +580,17 @@ void arcNetString::Replace( const char *old, const char *nw ) {
 
 /*
 ============
-arcNetString::Mid
+anString::Mid
 ============
 */
-const char *arcNetString::Mid( int start, int len, arcNetString &result ) const {
+const char *anString::Mid( int start, int len, anString &result ) const {
 	int i;
 
 	result.Empty();
 
 	i = Length();
 	if ( i == 0 || len <= 0 || start >= i ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( start + len >= i ) {
@@ -604,12 +603,12 @@ const char *arcNetString::Mid( int start, int len, arcNetString &result ) const 
 
 /*
 ============
-arcNetString::Mid
+anString::Mid
 ============
 */
-arcNetString arcNetString::Mid( int start, int len ) const {
+anString anString::Mid( int start, int len ) const {
 	int i;
-	arcNetString result;
+	anString result;
 
 	i = Length();
 	if ( i == 0 || len <= 0 || start >= i ) {
@@ -626,10 +625,10 @@ arcNetString arcNetString::Mid( int start, int len ) const {
 
 /*
 ============
-arcNetString::StripTrailingWhitespace
+anString::StripTrailingWhitespace
 ============
 */
-void arcNetString::StripTrailingWhitespace( void ) {
+void anString::StripTrailingWhitespace( void ) {
 	int i;
 
 	// cast to unsigned char to prevent stripping off high-ASCII characters
@@ -641,12 +640,12 @@ void arcNetString::StripTrailingWhitespace( void ) {
 
 /*
 ============
-arcNetString::StripQuotes
+anString::StripQuotes
 
 Removes the quotes from the beginning and end of the string
 ============
 */
-arcNetString& arcNetString::StripQuotes( void ) {
+anString& anString::StripQuotes( void ) {
 	if ( data[0] != '\"' ) {
 		return *this;
 	}
@@ -675,10 +674,10 @@ arcNetString& arcNetString::StripQuotes( void ) {
 
 /*
 ============
-arcNetString::FileNameHash
+anString::FileNameHash
 ============
 */
-int arcNetString::FileNameHash( void ) const {
+int anString::FileNameHash( void ) const {
 	int		i;
 	long	hash;
 	char	letter;
@@ -686,7 +685,7 @@ int arcNetString::FileNameHash( void ) const {
 	hash = 0;
 	i = 0;
 	while( data[i] != '\0' ) {
-		letter = arcNetString::ToLower( data[i] );
+		letter = anString::ToLower( data[i] );
 		if ( letter == '.' ) {
 			break;				// don't include extension
 		}
@@ -702,15 +701,15 @@ int arcNetString::FileNameHash( void ) const {
 
 /*
 ============
-arcNetString::BackSlashesToSlashes
+anString::BackSlashesToSlashes
 ============
 */
-arcNetString &arcNetString::BackSlashesToSlashes( void ) {
+anString &anString::BackSlashesToSlashes( void ) {
 	int i;
 
 	for ( i = 0; i < len; i++ ) {
-		if ( data[ i ] == '\\' ) {
-			data[ i ] = '/';
+		if ( data[i] == '\\' ) {
+			data[i] = '/';
 		}
 	}
 	return *this;
@@ -718,10 +717,10 @@ arcNetString &arcNetString::BackSlashesToSlashes( void ) {
 
 /*
 ============
-arcNetString::SetFileExtension
+anString::SetFileExtension
 ============
 */
-arcNetString &arcNetString::SetFileExtension( const char *extension ) {
+anString &anString::SetFileExtension( const char *extension ) {
 	StripFileExtension();
 	if ( *extension != '.' ) {
 		Append( '.' );
@@ -732,10 +731,10 @@ arcNetString &arcNetString::SetFileExtension( const char *extension ) {
 
 /*
 ============
-arcNetString::StripFileExtension
+anString::StripFileExtension
 ============
 */
-arcNetString &arcNetString::StripFileExtension( void ) {
+anString &anString::StripFileExtension( void ) {
 	int i;
 
 	for ( i = len-1; i >= 0; i-- ) {
@@ -750,10 +749,10 @@ arcNetString &arcNetString::StripFileExtension( void ) {
 
 /*
 ============
-arcNetString::StripAbsoluteFileExtension
+anString::StripAbsoluteFileExtension
 ============
 */
-arcNetString &arcNetString::StripAbsoluteFileExtension( void ) {
+anString &anString::StripAbsoluteFileExtension( void ) {
 	int i;
 
 	for ( i = 0; i < len; i++ ) {
@@ -769,10 +768,10 @@ arcNetString &arcNetString::StripAbsoluteFileExtension( void ) {
 
 /*
 ==================
-arcNetString::DefaultFileExtension
+anString::DefaultFileExtension
 ==================
 */
-arcNetString &arcNetString::DefaultFileExtension( const char *extension ) {
+anString &anString::DefaultFileExtension( const char *extension ) {
 	int i;
 
 	// do nothing if the string already has an extension
@@ -790,10 +789,10 @@ arcNetString &arcNetString::DefaultFileExtension( const char *extension ) {
 
 /*
 ==================
-arcNetString::DefaultPath
+anString::DefaultPath
 ==================
 */
-arcNetString &arcNetString::DefaultPath( const char *basepath ) {
+anString &anString::DefaultPath( const char *basepath ) {
 	if ( ( ( *this )[ 0 ] == '/' ) || ( ( *this )[ 0 ] == '\\' ) ) {
 		// absolute path location
 		return *this;
@@ -805,10 +804,10 @@ arcNetString &arcNetString::DefaultPath( const char *basepath ) {
 
 /*
 ====================
-arcNetString::AppendPath
+anString::AppendPath
 ====================
 */
-void arcNetString::AppendPath( const char *text ) {
+void anString::AppendPath( const char *text ) {
 	int pos;
 	int i = 0;
 
@@ -825,11 +824,11 @@ void arcNetString::AppendPath( const char *text ) {
 			i++;
 		}
 
-		for (; text[ i ]; i++ ) {
-			if ( text[ i ] == '\\' ) {
+		for (; text[i]; i++ ) {
+			if ( text[i] == '\\' ) {
 				data[ pos++ ] = '/';
 			} else {
-				data[ pos++ ] = text[ i ];
+				data[ pos++ ] = text[i];
 			}
 		}
 		len = pos;
@@ -839,10 +838,10 @@ void arcNetString::AppendPath( const char *text ) {
 
 /*
 ==================
-arcNetString::StripFilename
+anString::StripFilename
 ==================
 */
-arcNetString &arcNetString::StripFilename( void ) {
+anString &anString::StripFilename( void ) {
 	int pos;
 
 	pos = Length() - 1;
@@ -860,10 +859,10 @@ arcNetString &arcNetString::StripFilename( void ) {
 
 /*
 ==================
-arcNetString::StripPath
+anString::StripPath
 ==================
 */
-arcNetString &arcNetString::StripPath( void ) {
+anString &anString::StripPath( void ) {
 	int pos;
 
 	pos = Length();
@@ -877,10 +876,10 @@ arcNetString &arcNetString::StripPath( void ) {
 
 /*
 ====================
-arcNetString::ExtractFilePath
+anString::ExtractFilePath
 ====================
 */
-void arcNetString::ExtractFilePath( arcNetString &dest ) const {
+void anString::ExtractFilePath( anString &dest ) const {
 	int pos;
 
 	//
@@ -896,10 +895,10 @@ void arcNetString::ExtractFilePath( arcNetString &dest ) const {
 
 /*
 ====================
-arcNetString::ExtractFileName
+anString::ExtractFileName
 ====================
 */
-void arcNetString::ExtractFileName( arcNetString &dest ) const {
+void anString::ExtractFileName( anString &dest ) const {
 	int pos;
 
 	//
@@ -915,10 +914,10 @@ void arcNetString::ExtractFileName( arcNetString &dest ) const {
 
 /*
 ====================
-arcNetString::ExtractFileBase
+anString::ExtractFileBase
 ====================
 */
-void arcNetString::ExtractFileBase( arcNetString &dest ) const {
+void anString::ExtractFileBase( anString &dest ) const {
 	int pos;
 	int start;
 
@@ -940,10 +939,10 @@ void arcNetString::ExtractFileBase( arcNetString &dest ) const {
 
 /*
 ====================
-arcNetString::ExtractFileExtension
+anString::ExtractFileExtension
 ====================
 */
-void arcNetString::ExtractFileExtension( arcNetString &dest ) const {
+void anString::ExtractFileExtension( anString &dest ) const {
 	int pos;
 
 	//
@@ -973,12 +972,12 @@ void arcNetString::ExtractFileExtension( arcNetString &dest ) const {
 
 /*
 ============
-arcNetString::IsNumeric
+anString::IsNumeric
 
 Checks a string to see if it contains only numerical values.
 ============
 */
-bool arcNetString::IsNumeric( const char *s ) {
+bool anString::IsNumeric( const char *s ) {
 	int		i;
 	bool	dot;
 
@@ -989,7 +988,7 @@ bool arcNetString::IsNumeric( const char *s ) {
 	dot = false;
 	for ( i = 0; s[i]; i++ ) {
 		if ( !isdigit( s[i] ) ) {
-			if ( ( s[ i ] == '.' ) && !dot ) {
+			if ( ( s[i] == '.' ) && !dot ) {
 				dot = true;
 				continue;
 			}
@@ -1002,12 +1001,12 @@ bool arcNetString::IsNumeric( const char *s ) {
 
 /*
 ============
-arcNetString::HasLower
+anString::HasLower
 
 Checks if a string has any lowercase chars
 ============
 */
-bool arcNetString::HasLower( const char *s ) {
+bool anString::HasLower( const char *s ) {
 	if ( !s ) {
 		return false;
 	}
@@ -1024,12 +1023,12 @@ bool arcNetString::HasLower( const char *s ) {
 
 /*
 ============
-arcNetString::HasUpper
+anString::HasUpper
 
 Checks if a string has any uppercase chars
 ============
 */
-bool arcNetString::HasUpper( const char *s ) {
+bool anString::HasUpper( const char *s ) {
 	if ( !s ) {
 		return false;
 	}
@@ -1046,10 +1045,10 @@ bool arcNetString::HasUpper( const char *s ) {
 
 /*
 ================
-arcNetString::Cmp
+anString::Cmp
 ================
 */
-int arcNetString::Cmp( const char *s1, const char *s2 ) {
+int anString::Cmp( const char *s1, const char *s2 ) {
 	int c1, c2, d;
 
 	do {
@@ -1067,10 +1066,10 @@ int arcNetString::Cmp( const char *s1, const char *s2 ) {
 
 /*
 ================
-arcNetString::Cmpn
+anString::Cmpn
 ================
 */
-int arcNetString::Cmpn( const char *s1, const char *s2, int n ) {
+int anString::Cmpn( const char *s1, const char *s2, int n ) {
 	int c1, c2, d;
 
 	assert( n >= 0 );
@@ -1094,10 +1093,10 @@ int arcNetString::Cmpn( const char *s1, const char *s2, int n ) {
 
 /*
 ================
-arcNetString::Icmp
+anString::Icmp
 ================
 */
-int arcNetString::Icmp( const char *s1, const char *s2 ) {
+int anString::Icmp( const char *s1, const char *s2 ) {
 	int c1, c2, d;
 
 	do {
@@ -1127,10 +1126,10 @@ int arcNetString::Icmp( const char *s1, const char *s2 ) {
 
 /*
 ================
-arcNetString::Icmpn
+anString::Icmpn
 ================
 */
-int arcNetString::Icmpn( const char *s1, const char *s2, int n ) {
+int anString::Icmpn( const char *s1, const char *s2, int n ) {
 	int c1, c2, d;
 
 	assert( n >= 0 );
@@ -1165,17 +1164,17 @@ int arcNetString::Icmpn( const char *s1, const char *s2, int n ) {
 
 /*
 ================
-arcNetString::Icmp
+anString::Icmp
 ================
 */
-int arcNetString::IcmpNoColor( const char *s1, const char *s2 ) {
+int anString::IcmpNoColor( const char *s1, const char *s2 ) {
 	int c1, c2, d;
 
 	do {
-		while ( arcNetString::IsColor( s1 ) ) {
+		while ( anString::IsColor( s1 ) ) {
 			s1 += 2;
 		}
-		while ( arcNetString::IsColor( s2 ) ) {
+		while ( anString::IsColor( s2 ) ) {
 			s2 += 2;
 		}
 		c1 = *s1++;
@@ -1204,15 +1203,15 @@ int arcNetString::IcmpNoColor( const char *s1, const char *s2 ) {
 
 /*
 ================
-arcNetString::IcmpPath
+anString::IcmpPath
 ================
 */
-int arcNetString::IcmpPath( const char *s1, const char *s2 ) {
+int anString::IcmpPath( const char *s1, const char *s2 ) {
 	int c1, c2, d;
 
 #if 0
 //#if !defined( _WIN32 )
-	arcLibrary::common->Printf( "WARNING: IcmpPath used on a case-sensitive filesystem?\n" );
+	anLibrary::common->Printf( "WARNING: IcmpPath used on a case-sensitive filesystem?\n" );
 #endif
 
 	do {
@@ -1273,15 +1272,15 @@ int arcNetString::IcmpPath( const char *s1, const char *s2 ) {
 
 /*
 ================
-arcNetString::IcmpnPath
+anString::IcmpnPath
 ================
 */
-int arcNetString::IcmpnPath( const char *s1, const char *s2, int n ) {
+int anString::IcmpnPath( const char *s1, const char *s2, int n ) {
 	int c1, c2, d;
 
 #if 0
 //#if !defined( _WIN32 )
-	arcLibrary::common->Printf( "WARNING: IcmpPath used on a case-sensitive filesystem?\n" );
+	anLibrary::common->Printf( "WARNING: IcmpPath used on a case-sensitive filesystem?\n" );
 #endif
 
 	assert( n >= 0 );
@@ -1348,18 +1347,18 @@ int arcNetString::IcmpnPath( const char *s1, const char *s2, int n ) {
 
 /*
 =============
-arcNetString::Copynz
+anString::Copynz
 
 Safe strncpy that ensures a trailing zero
 =============
 */
-void arcNetString::Copynz( char *dest, const char *src, int destsize ) {
+void anString::Copynz( char *dest, const char *src, int destsize ) {
 	if ( !src ) {
-		arcLibrary::common->Warning( "arcNetString::Copynz: NULL src" );
+		anLibrary::common->Warning( "anString::Copynz: nullptr src" );
 		return;
 	}
 	if ( destsize < 1 ) {
-		arcLibrary::common->Warning( "arcNetString::Copynz: destsize < 1" );
+		anLibrary::common->Warning( "anString::Copynz: destsize < 1" );
 		return;
 	}
 
@@ -1369,27 +1368,27 @@ void arcNetString::Copynz( char *dest, const char *src, int destsize ) {
 
 /*
 ================
-arcNetString::Append
+anString::Append
 
   never goes past bounds or leaves without a terminating 0
 ================
 */
-void arcNetString::Append( char *dest, int size, const char *src ) {
+void anString::Append( char *dest, int size, const char *src ) {
 	int		l1;
 
 	l1 = strlen( dest );
 	if ( l1 >= size ) {
-		arcLibrary::common->Error( "arcNetString::Append: already overflowed" );
+		anLibrary::common->Error( "anString::Append: already overflowed" );
 	}
-	arcNetString::Copynz( dest + l1, src, size - l1 );
+	anString::Copynz( dest + l1, src, size - l1 );
 }
 
 /*
 ================
-arcNetString::LengthWithoutColors
+anString::LengthWithoutColors
 ================
 */
-int arcNetString::LengthWithoutColors( const char *s ) {
+int anString::LengthWithoutColors( const char *s ) {
 	int len;
 	const char *p;
 
@@ -1400,7 +1399,7 @@ int arcNetString::LengthWithoutColors( const char *s ) {
 	len = 0;
 	p = s;
 	while( *p ) {
-		if ( arcNetString::IsColor( p ) ) {
+		if ( anString::IsColor( p ) ) {
 			p += 2;
 			continue;
 		}
@@ -1413,10 +1412,10 @@ int arcNetString::LengthWithoutColors( const char *s ) {
 
 /*
 ================
-arcNetString::RemoveColors
+anString::RemoveColors
 ================
 */
-char *arcNetString::RemoveColors( char *string ) {
+char *anString::RemoveColors( char *string ) {
 	char *d;
 	char *s;
 	int c;
@@ -1424,7 +1423,7 @@ char *arcNetString::RemoveColors( char *string ) {
 	s = string;
 	d = string;
 	while( (c = *s) != 0 ) {
-		if ( arcNetString::IsColor( s ) ) {
+		if ( anString::IsColor( s ) ) {
 			s++;
 		}
 		else {
@@ -1439,10 +1438,10 @@ char *arcNetString::RemoveColors( char *string ) {
 
 /*
 ================
-arcNetString::snPrintf
+anString::snPrintf
 ================
 */
-int arcNetString::snPrintf( char *dest, int size, const char *fmt, ...) {
+int anString::snPrintf( char *dest, int size, const char *fmt, ...) {
 	int len;
 	va_list argptr;
 	char buffer[32000];	// big, but small enough to fit in PPC stack
@@ -1451,19 +1450,19 @@ int arcNetString::snPrintf( char *dest, int size, const char *fmt, ...) {
 	len = vsprintf( buffer, fmt, argptr );
 	va_end( argptr );
 	if ( len >= sizeof( buffer ) ) {
-		arcLibrary::common->Error( "arcNetString::snPrintf: overflowed buffer" );
+		anLibrary::common->Error( "anString::snPrintf: overflowed buffer" );
 	}
 	if ( len >= size ) {
-		arcLibrary::common->Warning( "arcNetString::snPrintf: overflow of %i in %i\n", len, size );
+		anLibrary::common->Warning( "anString::snPrintf: overflow of %i in %i\n", len, size );
 		len = size;
 	}
-	arcNetString::Copynz( dest, buffer, size );
+	anString::Copynz( dest, buffer, size );
 	return len;
 }
 
 /*
 ============
-arcNetString::vsnPrintf
+anString::vsnPrintf
 
 vsnprintf portability:
 
@@ -1475,21 +1474,21 @@ win32: _vsnprintf returns the number of characters written, not including the te
 or a negative value if an output error occurs. If the number of characters to write exceeds count, then count
 characters are written and -1 is returned and no trailing '\0' is added.
 
-arcNetString::vsnPrintf: always appends a trailing '\0', returns number of characters written (not including terminal \0 )
+anString::vsnPrintf: always appends a trailing '\0', returns number of characters written (not including terminal \0 )
 or returns -1 on failure or if the buffer would be overflowed.
 ============
 */
-int arcNetString::vsnPrintf( char *dest, int size, const char *fmt, va_list argptr ) {
+int anString::vsnPrintf( char *dest, int size, const char *fmt, va_list argptr ) {
 	int ret;
 
 #ifdef _WIN32
 #undef _vsnprintf
 	ret = _vsnprintf( dest, size-1, fmt, argptr );
-#define _vsnprintf	use_arcStr_vsnPrintf
+#define _vsnprintf	use_anStr_vsnPrintf
 #else
 #undef vsnprintf
 	ret = vsnprintf( dest, size, fmt, argptr );
-#define vsnprintf	use_arcStr_vsnPrintf
+#define vsnprintf	use_anStr_vsnPrintf
 #endif
 	dest[size-1] = '\0';
 	if ( ret < 0 || ret >= size ) {
@@ -1505,13 +1504,13 @@ sprintf
 Sets the value of the string using a printf interface.
 ============
 */
-int sprintf( arcNetString &string, const char *fmt, ... ) {
+int sprintf( anString &string, const char *fmt, ... ) {
 	int l;
 	va_list argptr;
 	char buffer[32000];
 
 	va_start( argptr, fmt );
-	l = arcNetString::vsnPrintf( buffer, sizeof(buffer)-1, fmt, argptr );
+	l = anString::vsnPrintf( buffer, sizeof(buffer)-1, fmt, argptr );
 	va_end( argptr );
 	buffer[sizeof(buffer)-1] = '\0';
 
@@ -1526,11 +1525,11 @@ vsprintf
 Sets the value of the string using a vprintf interface.
 ============
 */
-int vsprintf( arcNetString &string, const char *fmt, va_list argptr ) {
+int vsprintf( anString &string, const char *fmt, va_list argptr ) {
 	int l;
 	char buffer[32000];
 
-	l = arcNetString::vsnPrintf( buffer, sizeof(buffer)-1, fmt, argptr );
+	l = anString::vsnPrintf( buffer, sizeof(buffer)-1, fmt, argptr );
 	buffer[sizeof(buffer)-1] = '\0';
 
 	string = buffer;
@@ -1563,10 +1562,10 @@ char *va( const char *fmt, ... ) {
 
 /*
 ============
-arcNetString::BestUnit
+anString::BestUnit
 ============
 */
-int arcNetString::BestUnit( const char *format, float value, Measure_t measure ) {
+int anString::BestUnit( const char *format, float value, Measure_t measure ) {
 	int unit = 1;
 	while ( unit <= 3 && ( 1 << ( unit * 10 ) < value ) ) {
 		unit++;
@@ -1581,10 +1580,10 @@ int arcNetString::BestUnit( const char *format, float value, Measure_t measure )
 
 /*
 ============
-arcNetString::SetUnit
+anString::SetUnit
 ============
 */
-void arcNetString::SetUnit( const char *format, float value, int unit, Measure_t measure ) {
+void anString::SetUnit( const char *format, float value, int unit, Measure_t measure ) {
 	value /= 1 << ( unit * 10 );
 	sprintf( *this, format, value );
 	*this += " ";
@@ -1593,10 +1592,10 @@ void arcNetString::SetUnit( const char *format, float value, int unit, Measure_t
 
 /*
 ================
-arcNetString::InitMemory
+anString::InitMemory
 ================
 */
-void arcNetString::InitMemory( void ) {
+void anString::InitMemory( void ) {
 #ifdef USE_STRING_DATA_ALLOCATOR
 	stringDataAllocator.Init();
 #endif
@@ -1604,10 +1603,10 @@ void arcNetString::InitMemory( void ) {
 
 /*
 ================
-arcNetString::ShutdownMemory
+anString::ShutdownMemory
 ================
 */
-void arcNetString::ShutdownMemory( void ) {
+void anString::ShutdownMemory( void ) {
 #ifdef USE_STRING_DATA_ALLOCATOR
 	stringDataAllocator.Shutdown();
 #endif
@@ -1615,10 +1614,10 @@ void arcNetString::ShutdownMemory( void ) {
 
 /*
 ================
-arcNetString::PurgeMemory
+anString::PurgeMemory
 ================
 */
-void arcNetString::PurgeMemory( void ) {
+void anString::PurgeMemory( void ) {
 #ifdef USE_STRING_DATA_ALLOCATOR
 	stringDataAllocator.FreeEmptyBaseBlocks();
 #endif
@@ -1626,12 +1625,12 @@ void arcNetString::PurgeMemory( void ) {
 
 /*
 ================
-arcNetString::ShowMemoryUsage_f
+anString::ShowMemoryUsage_f
 ================
 */
-void arcNetString::ShowMemoryUsage_f( const arcCommandArgs &args ) {
+void anString::ShowMemoryUsage_f( const anCommandArgs &args ) {
 #ifdef USE_STRING_DATA_ALLOCATOR
-	arcLibrary::common->Printf( "%6d KB string memory (%d KB free in %d blocks, %d empty base blocks)\n",
+	anLibrary::common->Printf( "%6d KB string memory (%d KB free in %d blocks, %d empty base blocks)\n",
 		stringDataAllocator.GetBaseBlockMemory() >> 10, stringDataAllocator.GetFreeBlockMemory() >> 10,
 			stringDataAllocator.GetNumFreeBlocks(), stringDataAllocator.GetNumEmptyBaseBlocks() );
 #endif
@@ -1639,7 +1638,7 @@ void arcNetString::ShowMemoryUsage_f( const arcCommandArgs &args ) {
 
 /*
 ================
-arcNetString::FormatNumber
+anString::FormatNumber
 ================
 */
 struct formatList_t {
@@ -1657,8 +1656,8 @@ formatList_t formatList[] = {
 int numFormatList = sizeof(formatList) / sizeof( formatList[0] );
 
 
-arcNetString arcNetString::FormatNumber( int number ) {
-	arcNetString string;
+anString anString::FormatNumber( int number ) {
+	anString string;
 	bool hit;
 
 	// reset

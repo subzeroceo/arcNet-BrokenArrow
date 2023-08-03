@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "CSyntaxRichEditCtrl.h"
@@ -56,7 +56,7 @@ const COLORREF MULTILINE_COMMENT_BACK_COLOR		= SRE_COLOR_WHITE - 1;
 #define IDC_EDITBOX_FUNCPARMS			701
 
 static keyWord_t defaultKeyWords[] = {
-	{ NULL, SRE_COLOR_BLACK, "" }
+	{ nullptr, SRE_COLOR_BLACK, "" }
 };
 
 BEGIN_MESSAGE_MAP(CSyntaxRichEditCtrl, CRichEditCtrl)
@@ -84,10 +84,10 @@ CSyntaxRichEditCtrl::CSyntaxRichEditCtrl
 ================
 */
 CSyntaxRichEditCtrl::CSyntaxRichEditCtrl( void ) {
-	m_TextDoc = NULL;
+	m_TextDoc = nullptr;
 	keyWords = defaultKeyWords;
-	keyWordColors = NULL;
-	keyWordLengths = NULL;
+	keyWordColors = nullptr;
+	keyWordLengths = nullptr;
 	caseSensitive = false;
 	allowPathNames = true;
 	keyWordAutoCompletion = true;
@@ -100,14 +100,14 @@ CSyntaxRichEditCtrl::CSyntaxRichEditCtrl( void ) {
 	funcParmToolTipStart = -1;
 	bracedSection[0] = -1;
 	bracedSection[1] = -1;
-	GetObjectMembers = NULL;
-	GetFunctionParms = NULL;
-	GetToolTip = NULL;
+	GetObjectMembers = nullptr;
+	GetFunctionParms = nullptr;
+	GetToolTip = nullptr;
 	mousePoint.x = 0;
 	mousePoint.y = 0;
-	keyWordToolTip = NULL;
-	m_pchTip = NULL;
-	m_pwchTip = NULL;
+	keyWordToolTip = nullptr;
+	m_pchTip = nullptr;
+	m_pwchTip = nullptr;
 }
 
 /*
@@ -230,8 +230,8 @@ void CSyntaxRichEditCtrl::Init( void ) {
 	// get the Rich Edit ITextDocument to use the wonky TOM interface
 	IRichEditOle *ire = GetIRichEditOle();
 	IUnknown *iu = (IUnknown *)ire;
-	if ( iu == NULL || iu->QueryInterface( tom::IID_ITextDocument, (void**) &m_TextDoc ) != S_OK ) {
-		m_TextDoc = NULL;
+	if ( iu == nullptr || iu->QueryInterface( tom::IID_ITextDocument, (void**) &m_TextDoc ) != S_OK ) {
+		m_TextDoc = nullptr;
 	}
 
 	InitFont();
@@ -263,20 +263,20 @@ ARC_INLINE int CSyntaxRichEditCtrl::FindKeyWord( const char *keyWord, int length
 	int i, hash;
 
 	if ( caseSensitive ) {
-		hash = arcNetString::Hash( keyWord, length );
+		hash = anString::Hash( keyWord, length );
 	} else {
-		hash = arcNetString::IHash( keyWord, length );
+		hash = anString::IHash( keyWord, length );
 	}
 	for ( i = keyWordHash.First( hash ); i != -1; i = keyWordHash.Next( i ) ) {
 		if ( length != keyWordLengths[i] ) {
 			continue;
 		}
 		if ( caseSensitive ) {
-			if ( arcNetString::Cmpn( keyWords[i].keyWord, keyWord, length ) != 0 ) {
+			if ( anString::Cmpn( keyWords[i].keyWord, keyWord, length ) != 0 ) {
 				continue;
 			}
 		} else {
-			if ( arcNetString::Icmpn( keyWords[i].keyWord, keyWord, length ) != 0 ) {
+			if ( anString::Icmpn( keyWords[i].keyWord, keyWord, length ) != 0 ) {
 				continue;
 			}
 		}
@@ -309,15 +309,15 @@ void CSyntaxRichEditCtrl::SetKeyWords( const keyWord_t kws[] ) {
 	keyWordLengths = new int[numKeyWords];
 
 	for ( i = 0; i < numKeyWords; i++ ) {
-		keyWordLengths[i] = arcNetString::Length( keyWords[i].keyWord );
+		keyWordLengths[i] = anString::Length( keyWords[i].keyWord );
 	}
 
 	keyWordHash.Clear( 1024, 1024 );
 	for ( i = 0; i < numKeyWords; i++ ) {
 		if ( caseSensitive ) {
-			hash = arcNetString::Hash( keyWords[i].keyWord, keyWordLengths[i] );
+			hash = anString::Hash( keyWords[i].keyWord, keyWordLengths[i] );
 		} else {
-			hash = arcNetString::IHash( keyWords[i].keyWord, keyWordLengths[i] );
+			hash = anString::IHash( keyWords[i].keyWord, keyWordLengths[i] );
 		}
 		keyWordHash.Add( hash, i );
 	}
@@ -329,8 +329,8 @@ CSyntaxRichEditCtrl::LoadKeyWordsFromFile
 ================
 */
 bool CSyntaxRichEditCtrl::LoadKeyWordsFromFile( const char *fileName ) {
-	ARCParser src;
-	arcNetToken token, name, description;
+	anParser src;
+	anToken token, name, description;
 	byte red, green, blue;
 	keyWord_t keyword;
 
@@ -382,9 +382,9 @@ bool CSyntaxRichEditCtrl::LoadKeyWordsFromFile( const char *fileName ) {
 		}
 	}
 
-	keyword.keyWord = NULL;
+	keyword.keyWord = nullptr;
 	keyword.color = RGB( 255, 255, 255 );
-	keyword.description = NULL;
+	keyword.description = nullptr;
 	keyWordsFromFile.Append( keyword );
 
 	SetKeyWords( keyWordsFromFile.Ptr() );
@@ -546,9 +546,9 @@ void CSyntaxRichEditCtrl::SetDefaultFont( int startCharIndex, int endCharIndex )
 
 	m_TextDoc->Range( startCharIndex, endCharIndex, &range );
 
-	m_TextDoc->Undo( tom::tomSuspend, NULL );
+	m_TextDoc->Undo( tom::tomSuspend, nullptr );
 	range->put_Font( m_DefaultFont );
-	m_TextDoc->Undo( tom::tomResume, NULL );
+	m_TextDoc->Undo( tom::tomResume, nullptr );
 
 	range->Release();
 
@@ -659,14 +659,14 @@ void CSyntaxRichEditCtrl::HighlightSyntax( int startCharIndex, int endCharIndex 
 
 	// move the start index to the beginning of the line
 	for (; startCharIndex > 0; startCharIndex-- ) {
-		if ( arcNetString::CharIsNewLine( text[startCharIndex-1] ) ) {
+		if ( anString::CharIsNewLine( text[startCharIndex-1] ) ) {
 			break;
 		}
 	}
 
 	// move the end index to the end of the line
 	for (; endCharIndex < textLength - 1; endCharIndex++ ) {
-		if ( arcNetString::CharIsNewLine( text[endCharIndex+1] ) ) {
+		if ( anString::CharIsNewLine( text[endCharIndex+1] ) ) {
 			break;
 		}
 	}
@@ -722,9 +722,9 @@ void CSyntaxRichEditCtrl::HighlightSyntax( int startCharIndex, int endCharIndex 
 	for ( charIndex = startCharIndex; charIndex <= endCharIndex; charIndex++ ) {
 
 		t = charType[text[charIndex]];
-		switch( t ) {
+		switch ( t ) {
 			case CT_WHITESPACE: {
-				if ( arcNetString::CharIsNewLine( text[charIndex] ) ) {
+				if ( anString::CharIsNewLine( text[charIndex] ) ) {
 					line++;
 				}
 				break;
@@ -735,7 +735,7 @@ void CSyntaxRichEditCtrl::HighlightSyntax( int startCharIndex, int endCharIndex 
 					// single line comment
 					syntaxStart = charIndex;
 					for ( charIndex += 2; charIndex < textLength; charIndex++ ) {
-						if ( arcNetString::CharIsNewLine( text[charIndex] ) ) {
+						if ( anString::CharIsNewLine( text[charIndex] ) ) {
 							break;
 						}
 					}
@@ -764,7 +764,7 @@ void CSyntaxRichEditCtrl::HighlightSyntax( int startCharIndex, int endCharIndex 
 					if ( charType[c] == CT_STRING && text[charIndex-1] != '\\' ) {
 						break;
 					}
-					if ( arcNetString::CharIsNewLine( c ) ) {
+					if ( anString::CharIsNewLine( c ) ) {
 						line++;
 						break;
 					}
@@ -780,7 +780,7 @@ void CSyntaxRichEditCtrl::HighlightSyntax( int startCharIndex, int endCharIndex 
 					if ( charType[c] == CT_LITERAL && text[charIndex-1] != '\\' ) {
 						break;
 					}
-					if ( arcNetString::CharIsNewLine( c ) ) {
+					if ( anString::CharIsNewLine( c ) ) {
 						line++;
 						break;
 					}
@@ -857,7 +857,7 @@ void CSyntaxRichEditCtrl::UpdateVisibleRange( void ) {
 			update = true;
 			break;
 		}
-		if ( range->Move( tom::tomCharFormat, 1, NULL ) != S_OK ) {
+		if ( range->Move( tom::tomCharFormat, 1, nullptr ) != S_OK ) {
 			break;
 		}
 	}
@@ -884,7 +884,7 @@ void CSyntaxRichEditCtrl::GetCursorPos( int &line, int &column, int &character )
 	start -= LineIndex( line );
 	GetLine( line, buffer, sizeof( buffer ) );
 	for ( column = 1, character = 0; character < start; character++ ) {
-		if ( arcNetString::CharIsTab( buffer[character] ) ) {
+		if ( anString::CharIsTab( buffer[character] ) ) {
 			column += TAB_SIZE;
 			column -= column % TAB_SIZE;
 		} else {
@@ -899,7 +899,7 @@ void CSyntaxRichEditCtrl::GetCursorPos( int &line, int &column, int &character )
 CSyntaxRichEditCtrl::GetText
 ================
 */
-void CSyntaxRichEditCtrl::GetText( arcNetString &text ) const {
+void CSyntaxRichEditCtrl::GetText( anString &text ) const {
 	GetText( text, 0, GetTextLength() );
 }
 
@@ -908,7 +908,7 @@ void CSyntaxRichEditCtrl::GetText( arcNetString &text ) const {
 CSyntaxRichEditCtrl::GetText
 ================
 */
-void CSyntaxRichEditCtrl::GetText( arcNetString &text, int startCharIndex, int endCharIndex ) const {
+void CSyntaxRichEditCtrl::GetText( anString &text, int startCharIndex, int endCharIndex ) const {
 	tom::ITextRange *range;
 	BSTR bstr;
 	USES_CONVERSION;
@@ -960,7 +960,7 @@ bool CSyntaxRichEditCtrl::FindNext( const char *find, bool matchCase, bool match
 
 	if ( range->FindShit( A2BSTR(find), search, flags, &length ) == S_OK ) {
 
-		m_TextDoc->Freeze( NULL );
+		m_TextDoc->Freeze( nullptr );
 
 		range->get_Start( &start );
 		range->Release();
@@ -972,7 +972,7 @@ bool CSyntaxRichEditCtrl::FindNext( const char *find, bool matchCase, bool match
 
 		UpdateVisibleRange();
 
-		m_TextDoc->Unfreeze( NULL );
+		m_TextDoc->Unfreeze( nullptr );
 		return true;
 	} else {
 		range->Release();
@@ -995,7 +995,7 @@ int CSyntaxRichEditCtrl::ReplaceAll( const char *find, const char *replace, bool
 		return 0;
 	}
 
-	m_TextDoc->Freeze( NULL );
+	m_TextDoc->Freeze( nullptr );
 
 	GetSel( selStart, selEnd );
 
@@ -1015,7 +1015,7 @@ int CSyntaxRichEditCtrl::ReplaceAll( const char *find, const char *replace, bool
 
 	range->Release();
 
-	m_TextDoc->Unfreeze( NULL );
+	m_TextDoc->Unfreeze( nullptr );
 
 	return numReplaced;
 }
@@ -1062,7 +1062,7 @@ CSyntaxRichEditCtrl::AutoCompleteUpdate
 void CSyntaxRichEditCtrl::AutoCompleteUpdate( void ) {
 	long selStart, selEnd;
 	int index;
-	arcNetString text;
+	anString text;
 
 	GetSel( selStart, selEnd );
 	GetText( text, autoCompleteStart, selStart );
@@ -1154,7 +1154,7 @@ CSyntaxRichEditCtrl::BracedSectionStart
 bool CSyntaxRichEditCtrl::BracedSectionStart( char braceStartChar, char braceEndChar ) {
 	long selStart, selEnd;
 	int brace, i;
-	arcNetString text;
+	anString text;
 
 	GetSel( selStart, selEnd );
 	GetText( text, 0, GetTextLength() );
@@ -1186,7 +1186,7 @@ CSyntaxRichEditCtrl::BracedSectionEnd
 bool CSyntaxRichEditCtrl::BracedSectionEnd( char braceStartChar, char braceEndChar ) {
 	long selStart, selEnd;
 	int brace, i;
-	arcNetString text;
+	anString text;
 
 	GetSel( selStart, selEnd );
 	GetText( text, 0, GetTextLength() );
@@ -1220,12 +1220,12 @@ CSyntaxRichEditCtrl::BracedSectionAdjustEndTabs
 void CSyntaxRichEditCtrl::BracedSectionAdjustEndTabs( void ) {
 	int line, lineIndex, length, column, numTabs, i;
 	char buffer[1024];
-	arcNetString text;
+	anString text;
 
 	line = LineFromChar( bracedSection[0] );
 	length = GetLine( line, buffer, sizeof( buffer ) );
 	for ( numTabs = 0; numTabs < length; numTabs++ ) {
-		if ( !arcNetString::CharIsTab( buffer[numTabs] ) ) {
+		if ( !anString::CharIsTab( buffer[numTabs] ) ) {
 			break;
 		}
 		text.Append( '\t' );
@@ -1309,9 +1309,9 @@ bool CSyntaxRichEditCtrl::GetNameBeforeCurrentSelection( CString &name, int &cha
 CSyntaxRichEditCtrl::GetNameForMousePosition
 ================
 */
-bool CSyntaxRichEditCtrl::GetNameForMousePosition( arcNetString &name ) const {
+bool CSyntaxRichEditCtrl::GetNameForMousePosition( anString &name ) const {
 	int charIndex, startCharIndex, endCharIndex, type;
-	arcNetString text;
+	anString text;
 
 	charIndex = CharFromPos( mousePoint );
 
@@ -1345,11 +1345,11 @@ void CSyntaxRichEditCtrl::GoToLine( int line ) {
 
 	int index = LineIndex( line );
 
-	m_TextDoc->Freeze( NULL );
+	m_TextDoc->Freeze( nullptr );
 
 	SetSel( index, index );
 
-	m_TextDoc->Unfreeze( NULL );
+	m_TextDoc->Unfreeze( nullptr );
 
 	UpdateVisibleRange();
 
@@ -1385,12 +1385,12 @@ BOOL CSyntaxRichEditCtrl::OnToolTipNotify( UINT id, NMHDR *pNMHDR, LRESULT *pRes
 
 	*pResult = 0;
 
-	arcNetString name;
+	anString name;
 
 	if ( GetNameForMousePosition( name ) ) {
 		CString toolTip;
 
-		if ( GetToolTip == NULL || !GetToolTip( name, toolTip ) ) {
+		if ( GetToolTip == nullptr || !GetToolTip( name, toolTip ) ) {
 
 			int keyWordIndex = FindKeyWord( name, name.Length() );
 
@@ -1457,14 +1457,14 @@ CSyntaxRichEditCtrl::OnKeyDown
 */
 void CSyntaxRichEditCtrl::OnKeyDown( UINT nKey, UINT nRepCnt, UINT nFlags ) {
 
-	if ( m_TextDoc == NULL ) {
+	if ( m_TextDoc == nullptr ) {
 		return;
 	}
 
 	if ( autoCompleteStart >= 0 ) {
 		int sel;
 
-		switch( nKey ) {
+		switch ( nKey ) {
 			case VK_UP: {		// up arrow
 				sel = Max( 0, autoCompleteListBox.GetCurSel() - 1 );
 				autoCompleteListBox.SetCurSel( sel );
@@ -1510,7 +1510,7 @@ void CSyntaxRichEditCtrl::OnKeyDown( UINT nKey, UINT nRepCnt, UINT nFlags ) {
 
 	BracedSectionHide();
 
-	switch( nKey ) {
+	switch ( nKey ) {
 		case VK_TAB: {		// multi-line tabs
 			long selStart, selEnd;
 
@@ -1523,15 +1523,15 @@ void CSyntaxRichEditCtrl::OnKeyDown( UINT nKey, UINT nRepCnt, UINT nFlags ) {
 				text = GetSelText();
 
 				if ( GetAsyncKeyState( VK_SHIFT ) & 0x8000 ) {
-					if ( arcNetString::CharIsTab( text[0] ) ) {
+					if ( anString::CharIsTab( text[0] ) ) {
 						text.Delete( 0, 1 );
 					}
 					for ( int i = 0; i < text.GetLength() - 2; i++ ) {
-						if ( arcNetString::CharIsNewLine( text[i] ) ) {
+						if ( anString::CharIsNewLine( text[i] ) ) {
 							do {
 								i++;
-							} while( arcNetString::CharIsNewLine( text[i] ) );
-							if ( arcNetString::CharIsTab( text[i] ) ) {
+							} while( anString::CharIsNewLine( text[i] ) );
+							if ( anString::CharIsTab( text[i] ) ) {
 								text.Delete( i, 1 );
 							}
 						}
@@ -1539,10 +1539,10 @@ void CSyntaxRichEditCtrl::OnKeyDown( UINT nKey, UINT nRepCnt, UINT nFlags ) {
 				} else {
 					text.Insert( 0, '\t' );
 					for ( int i = 0; i < text.GetLength() - 1; i++ ) {
-						if ( arcNetString::CharIsNewLine( text[i] ) ) {
+						if ( anString::CharIsNewLine( text[i] ) ) {
 							do {
 								i++;
-							} while( arcNetString::CharIsNewLine( text[i] ) );
+							} while( anString::CharIsNewLine( text[i] ) );
 							text.Insert( i, '\t' );
 						}
 					}
@@ -1559,13 +1559,13 @@ void CSyntaxRichEditCtrl::OnKeyDown( UINT nKey, UINT nRepCnt, UINT nFlags ) {
 			long selStart, selEnd;
 			int line, length, numTabs, i;
 			char buffer[1024];
-			arcNetString text;
+			anString text;
 
 			GetSel( selStart, selEnd );
 			line = LineFromChar( selStart );
 			length = GetLine( line, buffer, sizeof( buffer ) );
 			for ( numTabs = 0; numTabs < length; numTabs++ ) {
-				if ( !arcNetString::CharIsTab( buffer[numTabs] ) ) {
+				if ( !anString::CharIsTab( buffer[numTabs] ) ) {
 					break;
 				}
 			}
@@ -1587,13 +1587,13 @@ void CSyntaxRichEditCtrl::OnKeyDown( UINT nKey, UINT nRepCnt, UINT nFlags ) {
 		}
 	}
 
-	m_TextDoc->Freeze( NULL );
+	m_TextDoc->Freeze( nullptr );
 
 	CRichEditCtrl::OnKeyDown( nKey, nRepCnt, nFlags );
 
 	UpdateVisibleRange();
 
-	m_TextDoc->Unfreeze( NULL );
+	m_TextDoc->Unfreeze( nullptr );
 }
 
 /*
@@ -1748,13 +1748,13 @@ BOOL CSyntaxRichEditCtrl::OnMouseWheel( UINT nFlags, short zDelta, CPoint pt ) {
 		return TRUE;
 	}
 
-	m_TextDoc->Freeze( NULL );
+	m_TextDoc->Freeze( nullptr );
 
 	LineScroll( -3 * ( ( int ) zDelta ) / WHEEL_DELTA, 0 );
 
 	UpdateVisibleRange();
 
-	m_TextDoc->Unfreeze( NULL );
+	m_TextDoc->Unfreeze( nullptr );
 
 	return TRUE;
 }
@@ -1784,11 +1784,11 @@ CSyntaxRichEditCtrl::OnSize
 ================
 */
 void CSyntaxRichEditCtrl::OnSize( UINT nType, int cx, int cy ) {
-	m_TextDoc->Freeze( NULL );
+	m_TextDoc->Freeze( nullptr );
 
 	CRichEditCtrl::OnSize( nType, cx, cy );
 
-	m_TextDoc->Unfreeze( NULL );
+	m_TextDoc->Unfreeze( nullptr );
 
 	UpdateVisibleRange();
 }
@@ -1799,7 +1799,7 @@ CSyntaxRichEditCtrl::OnVScroll
 ================
 */
 void CSyntaxRichEditCtrl::OnVScroll( UINT nSBCode, UINT nPos, CScrollBar* pScrollBar ) {
-	m_TextDoc->Freeze( NULL );
+	m_TextDoc->Freeze( nullptr );
 
 	CRichEditCtrl::OnVScroll( nSBCode, nPos, pScrollBar );
 
@@ -1807,7 +1807,7 @@ void CSyntaxRichEditCtrl::OnVScroll( UINT nSBCode, UINT nPos, CScrollBar* pScrol
 
 	UpdateVisibleRange();
 
-	m_TextDoc->Unfreeze( NULL );
+	m_TextDoc->Unfreeze( nullptr );
 }
 
 /*
@@ -1822,7 +1822,7 @@ void CSyntaxRichEditCtrl::OnProtected( NMHDR *pNMHDR, LRESULT *pResult ) {
 
 	updateRange = pEP->chrg;
 
-	switch( pEP->msg ) {
+	switch ( pEP->msg ) {
 		case WM_MOUSEMOVE: {
 			break;
 		}

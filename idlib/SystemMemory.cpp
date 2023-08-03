@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #ifdef _SYSMEM_
@@ -11,11 +11,11 @@ aRcSecondaryHeapArena mainHeapArena;
 aRcSecondaryHeapArena *currentHeapArena;		// this is the main heap arena that all other heaps use
 aRcSecondaryHeap defaultHeap;					// this is the default system heap
 
-static aRcSecondaryHeap *systemHeapArray[MAX_SYSTEM_HEAPS];		// array of pointers to idHeapSecondarys that are common to arcLibrary, Game, and executable
+static aRcSecondaryHeap *systemHeapArray[MAX_SYSTEM_HEAPS];		// array of pointers to idHeapSecondarys that are common to anLibrary, Game, and executable
 
 #if defined(_WIN32)
-static LPVOID sharedMem = NULL;      // pointer to shared memory
-static HANDLE hMapObject = NULL;	// handle to file mapping
+static LPVOID sharedMem = nullptr;      // pointer to shared memory
+static HANDLE hMapObject = nullptr;	// handle to file mapping
 #endif
 
 // Descriptions that go with each tag.  When updating the tag enum in Heap.h please
@@ -25,7 +25,7 @@ char *TagNames[] = {
 	"none",
 	"New operation",
 	"default",
-	"Lexer",
+	"anBinaryLexer",
 	"Parser",
 	"blank",
 	"blank",
@@ -71,7 +71,7 @@ TagTableCheck<sizeof(TagNames)/sizeof(char*) == MA_MAX> TagTableCheckedHere;
 TagTableCheck<MA_DO_NOT_USE<32> TagMaxCheckedHere;
 
 #ifndef ENABLE_INTEL_SMP
-MemScopedTag* MemScopedTag::mTop = NULL;
+MemScopedTag* MemScopedTag::mTop = nullptr;
 #endif
 
 /*
@@ -97,7 +97,7 @@ sets the system heap that is associated with the given heap ID value
 */
 void idSetSystemHeap( sysHeap_ID_t sysHeapID, aRcSecondaryHeap *heapPtr ) {
 	assert( ( uint ) sysHeapID < ( uint ) maxHeapCount );
-	if ( NULL == heapPtr ) {
+	if ( nullptr == heapPtr ) {
 		// set the system heap back to the default heap
 		systemHeapArray[ ( uint ) sysHeapID ] = &defaultHeap;
 	} else {
@@ -114,7 +114,7 @@ pushes the system heap associated with the given identifier to the top of the ar
 */
 void idPushSystemHeap( sysHeap_ID_t sysHeapID) {
 	assert( ( uint ) sysHeapID < ( uint ) maxHeapCount );
-	assert( systemHeapArray[ ( uint ) sysHeapID ] != NULL );
+	assert( systemHeapArray[ ( uint ) sysHeapID ] != nullptr );
 	systemHeapArray[ ( uint ) sysHeapID ]->PushCurrent();
 }
 
@@ -128,10 +128,10 @@ enters the heap arena critical section.
 void EnterArenaCriticalSection() {
 	// the following is necessary for memory allocations that take place
 	// in static/global object constructors
-	if ( NULL == currentHeapArena ) {
+	if ( nullptr == currentHeapArena ) {
 		Mem_Init();
 	}
-	assert( currentHeapArena != NULL );
+	assert( currentHeapArena != nullptr );
 	currentHeapArena->EnterArenaCriticalSection();
 }
 
@@ -143,7 +143,7 @@ exits the heap arena critical section
 ==================
 */
 void ExitArenaCriticalSection() {
-	assert( currentHeapArena != NULL );
+	assert( currentHeapArena != nullptr );
 	currentHeapArena->ExitArenaCriticalSection();
 }
 
@@ -155,10 +155,10 @@ initializes the memory system for use
 ==================
 */
 void Mem_Init( void ) {
-	if ( NULL == currentHeapArena ) {
+	if ( nullptr == currentHeapArena ) {
 #if defined(_WIN32)
-        hMapObject = CreateFileMapping( INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof( systemHeapArray )+sizeof( currentHeapArena ), "teck4share" );		// name of map object
-        if ( hMapObject == NULL ) {
+        hMapObject = CreateFileMapping( INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, sizeof( systemHeapArray )+sizeof( currentHeapArena ), "teck4share" );		// name of map object
+        if ( hMapObject == nullptr ) {
             return;
 		}
 
@@ -167,7 +167,7 @@ void Mem_Init( void ) {
 
         // Get a pointer to the file-mapped shared memory.
         sharedMem = MapViewOfFile( hMapObject, FILE_MAP_WRITE, 0,0,0 0 );
-        if ( sharedMem == NULL ) {
+        if ( sharedMem == nullptr ) {
             return;
 		}
 
@@ -178,8 +178,8 @@ void Mem_Init( void ) {
 			UnmapViewOfFile( sharedMem );
 			CloseHandle( hMapObject );
 
-			sharedMem = NULL;
-			hMapObject = NULL;
+			sharedMem = nullptr;
+			hMapObject = nullptr;
 			return;
 		}
 #endif
@@ -196,7 +196,7 @@ void Mem_Init( void ) {
 		idSetSystemHeap( TIDHEAP_ID_SINGLE_FRAME, &defaultHeap );
 		idSetSystemHeap( TIDHEAP_ID_TEMPORARY, &defaultHeap );
 		idSetSystemHeap( TIDHEAP_ID_IO_TEMP, &defaultHeap );
-		RV_PUSH_SYS_HEAP_ID( TIDHEAP_ID_DEFAULT );
+		PUSH_SYS_HEAP_ID( TIDHEAP_ID_DEFAULT );
 
 #if defined(_WIN32)
 		memcpy( sharedMem,  &currentHeapArena, sizeof( currentHeapArena ) );
@@ -214,11 +214,11 @@ Shuts down the memory system from all further use
 */
 void Mem_Shutdown( void ) {
 #if defined(_WIN32) && !defined(_XENON)
-	if ( sharedMem != NULL ) {
+	if ( sharedMem != nullptr ) {
 		UnmapViewOfFile( sharedMem );
 		CloseHandle( hMapObject );
-		sharedMem = NULL;
-		hMapObject = NULL;
+		sharedMem = nullptr;
+		hMapObject = nullptr;
 	}
 #endif
 
@@ -311,7 +311,7 @@ void Mem_AllocDefragBlock( void ) {
 Mem_ShowMemAlloc_f
 ==================
 */
-void Mem_ShowMemAlloc_f( const arcCommandArgs &args ) {
+void Mem_ShowMemAlloc_f( const anCommandArgs &args ) {
 	const char *tagName;
 	int tag, num, size, peak;
 	DWORD totalOutstanding = 0;
@@ -319,14 +319,14 @@ void Mem_ShowMemAlloc_f( const arcCommandArgs &args ) {
 	for ( tag = 1; tag < MA_DO_NOT_USE; tag++ ) {
 		tagName = GetMemAllocStats( tag, num, size, peak );
 		if ( size || peak ) {
-			arcLibrary::common->Printf( "%-25s peak %9d curr %9d count %9d\n", tagName, peak, size, num );
+			anLibrary::common->Printf( "%-25s peak %9d curr %9d count %9d\n", tagName, peak, size, num );
 			totalOutstanding += size;
 		}
 	}
-	arcLibrary::common->Printf( "Mem_Alloc Outstanding: %d\n", totalOutstanding );
+	anLibrary::common->Printf( "Mem_Alloc Outstanding: %d\n", totalOutstanding );
 }
 
-#ifdef ID_DEBUG_MEMORY
+#ifdef ARC_DEBUG_MEMORY
 
 #undef		Mem_Alloc
 #undef		Mem_ClearedAlloc
@@ -351,7 +351,7 @@ typedef struct debugMemory_s {
 	struct debugMemory_s *	next;
 } debugMemory_t;
 
-static debugMemory_t *	mem_debugMemory = NULL;
+static debugMemory_t *	mem_debugMemory = nullptr;
 static char				mem_leakName[256] = "";
 
 /*
@@ -361,7 +361,7 @@ Mem_CleanupFileName
 */
 const char *Mem_CleanupFileName( const char *fileName ) {
 	int i1, i2;
-	arcNetString newFileName;
+	anString newFileName;
 	static char newFileNames[4][MAX_STRING_CHARS];
 	static int index;
 
@@ -405,7 +405,7 @@ void Mem_Dump( const char *fileName ) {
 	int i, numBlocks, totalSize;
 	char dump[32], *ptr;
 	debugMemory_t *b;
-	arcNetString module, funcName;
+	anString module, funcName;
 	FILE *f;
 
 	f = fopen( fileName, "wb" );
@@ -417,7 +417,7 @@ void Mem_Dump( const char *fileName ) {
 	for ( numBlocks = 0, b = mem_debugMemory; b; b = b->next, numBlocks++ ) {
 		ptr = ((char *) b) + sizeof(debugMemory_t);
 		totalSize += b->size;
-		for ( i = 0; i < (sizeof(dump)-1 ) && i < b->size; i++ ) {
+		for ( i = 0; i < ( sizeof(dump)-1 ) && i < b->size; i++ ) {
 			if ( ptr[i] >= 32 && ptr[i] < 127 ) {
 				dump[i] = ptr[i];
 			} else {
@@ -428,13 +428,13 @@ void Mem_Dump( const char *fileName ) {
 		dump[i] = '\0';
 
 		if ( ( b->size >> 10 ) != 0 ) {
-			fprintf( f, "size: %6d KB: %s, line: %d [%s], call stack: %s\r\n", ( b->size >> 10 ), Mem_CleanupFileName(b->fileName), b->lineNumber, dump, arcLibrary::sys->GetCallStackStr( b->callStack, MAX_CALLSTACK_DEPTH ) );
+			fprintf( f, "size: %6d KB: %s, line: %d [%s], call stack: %s\r\n", ( b->size >> 10 ), Mem_CleanupFileName(b->fileName), b->lineNumber, dump, anLibrary::sys->GetCallStackStr( b->callStack, MAX_CALLSTACK_DEPTH ) );
 		} else {
-			fprintf( f, "size: %7d B: %s, line: %d [%s], call stack: %s\r\n", b->size, Mem_CleanupFileName(b->fileName), b->lineNumber, dump, arcLibrary::sys->GetCallStackStr( b->callStack, MAX_CALLSTACK_DEPTH ) );
+			fprintf( f, "size: %7d B: %s, line: %d [%s], call stack: %s\r\n", b->size, Mem_CleanupFileName(b->fileName), b->lineNumber, dump, anLibrary::sys->GetCallStackStr( b->callStack, MAX_CALLSTACK_DEPTH ) );
 		}
 	}
 
-	arcLibrary::sys->ShutdownSymbols();
+	anLibrary::sys->ShutdownSymbols();
 
 	fprintf( f, "%8d total memory blocks allocated\r\n", numBlocks );
 	fprintf( f, "%8d KB memory allocated\r\n", ( totalSize >> 10 ) );
@@ -447,7 +447,7 @@ void Mem_Dump( const char *fileName ) {
 Mem_Dump_f
 ==================
 */
-void Mem_Dump_f( const arcCommandArgs &args )  {
+void Mem_Dump_f( const anCommandArgs &args )  {
 	const char *fileName;
 
 	if ( args.Argc() >= 2 ) {
@@ -487,16 +487,16 @@ Mem_DumpCompressed
 void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sortCallStack, int numFrames, bool verbose  ) {
 	int numBlocks, totalSize, r, j;
 	debugMemory_t *b;
-	allocInfo_t *a, *nexta, *allocInfo = NULL, *sortedAllocInfo = NULL, *prevSorted, *nextSorted;
-	arcNetString module, funcName;
+	allocInfo_t *a, *nexta, *allocInfo = nullptr, *sortedAllocInfo = nullptr, *prevSorted, *nextSorted;
+	anString module, funcName;
 
 	// build list with memory allocations
 	totalSize = 0;
 	numBlocks = 0;
-	nextSorted = NULL;
+	nextSorted = nullptr;
 
 	for ( b = mem_debugMemory; b; b = b->next ) {
-		if ( numFrames && b->frameNumber < arcLibrary::frameNumber - numFrames ) {
+		if ( numFrames && b->frameNumber < anLibrary::frameNumber - numFrames ) {
 			continue;
 		}
 
@@ -517,7 +517,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 			if ( j < MAX_CALLSTACK_DEPTH ) {
 				continue;
 			}
-			if ( arcNetString::Cmp( a->fileName, b->fileName ) != 0 ) {
+			if ( anString::Cmp( a->fileName, b->fileName ) != 0 ) {
 				continue;
 			}
 
@@ -550,8 +550,8 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 	// sort list
 	for ( a = allocInfo; a; a = nexta ) {
 		nexta = a->next;
-		prevSorted = NULL;
-		switch( memSort ) {
+		prevSorted = nullptr;
+		switch ( memSort ) {
 			// sort on size
 			case MEMSORT_SIZE: {
 				for ( nextSorted = sortedAllocInfo; nextSorted; nextSorted = nextSorted->next ) {
@@ -565,7 +565,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 			// sort on file name and line number
 			case MEMSORT_LOCATION: {
 				for ( nextSorted = sortedAllocInfo; nextSorted; nextSorted = nextSorted->next ) {
-					r = arcNetString::Cmp( Mem_CleanupFileName( a->fileName ), Mem_CleanupFileName( nextSorted->fileName ) );
+					r = anString::Cmp( Mem_CleanupFileName( a->fileName ), Mem_CleanupFileName( nextSorted->fileName ) );
 					if ( r < 0 || ( r == 0 && a->lineNumber < nextSorted->lineNumber ) ) {
 						break;
 					}
@@ -622,13 +622,13 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 		nexta = a->next;
 
 		if ((a->size >> 10) > 0 ) {
-			arcNetString::snPrintf(buff, sizeof(buff), "%6d K",( a->size >> 10) );
+			anString::snPrintf(buff, sizeof(buff), "%6d K",( a->size >> 10) );
 		} else {
-			arcNetString::snPrintf(buff, sizeof(buff), "%6d B", a->size);
+			anString::snPrintf(buff, sizeof(buff), "%6d B", a->size);
 		}
 
 		if ( verbose || ((a->size >> 10) > 0 ) ) {
-				arcLibrary::common->Printf( "size: %s, allocs: %5d: %s, line: %d, heap: %d, call stack: %s\r\n", buff, a->numAllocs, Mem_CleanupFileName(a->fileName), a->lineNumber, a->heapId, arcLibrary::sys->GetCallStackStr( a->callStack, MAX_CALLSTACK_DEPTH ) );
+				anLibrary::common->Printf( "size: %s, allocs: %5d: %s, line: %d, heap: %d, call stack: %s\r\n", buff, a->numAllocs, Mem_CleanupFileName(a->fileName), a->lineNumber, a->heapId, anLibrary::sys->GetCallStackStr( a->callStack, MAX_CALLSTACK_DEPTH ) );
 		} else {
 			notShownSize+=( unsigned int )a->size;
 			notShownNumAllocs+=( unsigned int )a->numAllocs;
@@ -637,11 +637,11 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 		currentHeapArena->Free( a );
 	}
 
-	arcLibrary::sys->ShutdownSymbols();
+	anLibrary::sys->ShutdownSymbols();
 
-	arcLibrary::common->Printf( "%8d bytes in %d allocs not shown\r\n", notShownSize, notShownNumAllocs );
-	arcLibrary::common->Printf( "%8d total memory blocks allocated\r\n", numBlocks );
-	arcLibrary::common->Printf( "%8d KB memory allocated\r\n", ( totalSize >> 10 ) );
+	anLibrary::common->Printf( "%8d bytes in %d allocs not shown\r\n", notShownSize, notShownNumAllocs );
+	anLibrary::common->Printf( "%8d total memory blocks allocated\r\n", numBlocks );
+	anLibrary::common->Printf( "%8d KB memory allocated\r\n", ( totalSize >> 10 ) );
 
 	FILE *f;
 
@@ -655,11 +655,11 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 	for ( a = sortedAllocInfo; a; a = nexta ) {
 		nexta = a->next;
 		fprintf( f, "size: %6d KB, allocs: %5d: %s, line: %d, call stack: %s\r\n",
-					(a->size >> 10), a->numAllocs, Mem_CleanupFileName(a->fileName),	a->lineNumber, arcLibrary::sys->GetCallStackStr( a->callStack, MAX_CALLSTACK_DEPTH ) );
+					(a->size >> 10), a->numAllocs, Mem_CleanupFileName(a->fileName),	a->lineNumber, anLibrary::sys->GetCallStackStr( a->callStack, MAX_CALLSTACK_DEPTH ) );
 		currentHeapArena->Free( a );
 	}
 
-	arcLibrary::sys->ShutdownSymbols();
+	anLibrary::sys->ShutdownSymbols();
 
 	fprintf( f, "%8d total memory blocks allocated\r\n", numBlocks );
 	fprintf( f, "%8d KB memory allocated\r\n", ( totalSize >> 10 ) );
@@ -672,7 +672,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 Mem_DumpCompressed_f
 ==================
 */
-void Mem_DumpCompressed_f( const arcCommandArgs &args ) {
+void Mem_DumpCompressed_f( const anCommandArgs &args ) {
 	int argNum;
 	const char *arg, *fileName;
 	memorySortType_t memSort = MEMSORT_LOCATION;
@@ -684,29 +684,29 @@ void Mem_DumpCompressed_f( const arcCommandArgs &args ) {
 	arg = args.Argv( argNum );
 	while( arg[0] == '-' ) {
 		arg = args.Argv( ++argNum );
-		if ( arcNetString::Icmp( arg, "s" ) == 0 ) {
+		if ( anString::Icmp( arg, "s" ) == 0 ) {
 			memSort = MEMSORT_SIZE;
-		} else if ( arcNetString::Icmp( arg, "l" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "l" ) == 0 ) {
 			memSort = MEMSORT_LOCATION;
-		} else if ( arcNetString::Icmp( arg, "a" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "a" ) == 0 ) {
 			memSort = MEMSORT_NUMALLOCS;
-		} else if ( arcNetString::Icmp( arg, "cs1" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "cs1" ) == 0 ) {
 			memSort = MEMSORT_CALLSTACK;
 			sortCallStack = 2;
-		} else if ( arcNetString::Icmp( arg, "cs2" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "cs2" ) == 0 ) {
 			memSort = MEMSORT_CALLSTACK;
 			sortCallStack = 1;
-		} else if ( arcNetString::Icmp( arg, "cs3" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "cs3" ) == 0 ) {
 			memSort = MEMSORT_CALLSTACK;
 			sortCallStack = 0;
-		} else if ( arcNetString::Icmp( arg, "h" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "h" ) == 0 ) {
 			memSort = MEMSORT_HEAPID;
-		} else if ( arcNetString::Icmp( arg, "v" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "v" ) == 0 ) {
 			verbose = true;
 		} else if ( arg[0] == 'f' ) {
 			numFrames = atoi( arg + 1 );
 		} else {
-			arcLibrary::common->Printf( "memoryDumpCompressed [options] [filename]\n"
+			anLibrary::common->Printf( "memoryDumpCompressed [options] [filename]\n"
 						"options:\n"
 						"  -s     sort on size\n"
 						"  -l     sort on location\n"
@@ -742,7 +742,7 @@ void *Mem_AllocDebugMemory( const int size, const char *fileName, const int line
 
 	// the following is necessary for memory allocations that take place
 	// in static/global object constructors
-	if ( NULL == currentHeapArena ) {
+	if ( nullptr == currentHeapArena ) {
 		Mem_Init();
 	}
 
@@ -752,8 +752,8 @@ void *Mem_AllocDebugMemory( const int size, const char *fileName, const int line
 		p = currentHeapArena->Allocate( size + sizeof( debugMemory_t ), tag );
 	}
 
-	if ( NULL == p ) {
-		return NULL;
+	if ( nullptr == p ) {
+		return nullptr;
 	}
 
 	Mem_UpdateAllocStats( currentHeapArena->Msize( p ) );
@@ -763,22 +763,22 @@ void *Mem_AllocDebugMemory( const int size, const char *fileName, const int line
 	m->lineNumber = lineNumber;
 	m->heapId = currentHeapArena->GetHeap(p)->DebugID();
 	m->memTag = tag;
-	m->frameNumber = arcLibrary::frameNumber;
+	m->frameNumber = anLibrary::frameNumber;
 	m->size = size;
 	m->next = mem_debugMemory;
-	m->prev = NULL;
+	m->prev = nullptr;
 	if ( mem_debugMemory ) {
 		mem_debugMemory->prev = m;
 	}
 	mem_debugMemory = m;
 
-	if ( arcLibrary::sys != NULL ) {
-		arcLibrary::sys->GetCallStack( m->callStack, MAX_CALLSTACK_DEPTH );
+	if ( anLibrary::sys != nullptr ) {
+		anLibrary::sys->GetCallStack( m->callStack, MAX_CALLSTACK_DEPTH );
 	} else {
 		memset( m->callStack, 0, sizeof(m->callStack ) );
 	}
 
-	return ( ( ( byte * ) p ) + sizeof( debugMemory_t ) );
+	return ( ( (byte *) p ) + sizeof( debugMemory_t ) );
 }
 
 /*
@@ -793,10 +793,10 @@ void Mem_FreeDebugMemory( void *p, const char *fileName, const int lineNumber, c
 		return;
 	}
 
-	m = (debugMemory_t *) ( ( ( byte * ) p ) - sizeof( debugMemory_t ) );
+	m = (debugMemory_t *) ( ( (byte *) p ) - sizeof( debugMemory_t ) );
 
 	if ( m->size < 0 ) {
-		arcLibrary::common->FatalError( "memory freed twice, first from %s, now from %s", arcLibrary::sys->GetCallStackStr( m->callStack, MAX_CALLSTACK_DEPTH ), arcLibrary::sys->GetCallStackCurStr( MAX_CALLSTACK_DEPTH ) );
+		anLibrary::common->FatalError( "memory freed twice, first from %s, now from %s", anLibrary::sys->GetCallStackStr( m->callStack, MAX_CALLSTACK_DEPTH ), anLibrary::sys->GetCallStackCurStr( MAX_CALLSTACK_DEPTH ) );
 	}
 
 	Mem_UpdateFreeStats( currentHeapArena->Msize( m ) );
@@ -813,11 +813,11 @@ void Mem_FreeDebugMemory( void *p, const char *fileName, const int lineNumber, c
 
 	m->fileName = fileName;
 	m->lineNumber = lineNumber;
-	m->frameNumber = arcLibrary::frameNumber;
+	m->frameNumber = anLibrary::frameNumber;
 	m->size = -m->size;
-	arcLibrary::sys->GetCallStack( m->callStack, MAX_CALLSTACK_DEPTH );
+	anLibrary::sys->GetCallStack( m->callStack, MAX_CALLSTACK_DEPTH );
 
-	assert( currentHeapArena != NULL );
+	assert( currentHeapArena != nullptr );
 	currentHeapArena->Free( m );
 }
 
@@ -876,10 +876,10 @@ Mem_ClearedAlloc
 void *Mem_ClearedAlloc( const int size, const char *fileName, const int lineNumber, byte tag ) {
 	void *mem = Mem_Alloc( size, fileName, lineNumber, tag );
 
-	if ( mem != NULL ) {
+	if ( mem != nullptr ) {
 		SIMDProcessor->Memset( mem, 0, size );
 	} else  {
-		arcLibrary::common->FatalError( "Ran out of memory during a cleared allocation" );
+		anLibrary::common->FatalError( "Ran out of memory during a cleared allocation" );
 	}
 	return mem;
 }
@@ -906,16 +906,16 @@ int Mem_Size( void *ptr ) {
 	if ( !ptr ) {
 		return 0;
 	}
-	assert( currentHeapArena != NULL );
+	assert( currentHeapArena != nullptr );
 	return currentHeapArena->Msize( (byte*)ptr - sizeof( debugMemory_t ) );
 }
 
-#else	// #ifdef ID_DEBUG_MEMORY
+#else	// #ifdef ARC_DEBUG_MEMORY
 
-void Mem_Dump_f( const class arcCommandArgs &args ) {
+void Mem_Dump_f( const class anCommandArgs &args ) {
 }
 
-void Mem_DumpCompressed_f( const class arcCommandArgs &args )
+void Mem_DumpCompressed_f( const class anCommandArgs &args )
 {
 
 }
@@ -932,13 +932,13 @@ void *Mem_Alloc( const int size, byte tag ) {
 
 	// the following is necessary for memory allocations that take place
 	// in static/global object constructors
-	if ( NULL == currentHeapArena ) {
+	if ( nullptr == currentHeapArena ) {
 		Mem_Init();
 	}
 
 	p = currentHeapArena->Allocate( size, tag );
-	if ( NULL == p ) {
-		return NULL;
+	if ( nullptr == p ) {
+		return nullptr;
 	}
 
 	Mem_UpdateAllocStats( currentHeapArena->Msize( p ) );
@@ -955,17 +955,17 @@ void *Mem_Alloc( const int size, byte tag ) {
 // Allocate memory from the heap at the top of the current arena stack,
 // clear that memory to zero before returning it.
 void *Mem_ClearedAlloc( const int size, byte tag ) {
-	byte *allocation = ( byte * ) Mem_Alloc( size, tag );
+	byte *allocation = (byte *) Mem_Alloc( size, tag );
 
 #if defined( _XENON ) && !defined( _FINAL )
 	MemTracker::OnAlloc(allocation, size);
 #endif
 
-	if ( allocation != NULL )
+	if ( allocation != nullptr )
 	{
 		SIMDProcessor->Memset( allocation, 0, size );
 	} else {
-		arcLibrary::common->FatalError( "Ran out of memory during a cleared allocation" );
+		anLibrary::common->FatalError( "Ran out of memory during a cleared allocation" );
 	}
 	return allocation;
 
@@ -980,7 +980,7 @@ void Mem_Free( void *ptr ) {
 	if ( !ptr )  {
 		return;
 	}
-	assert( currentHeapArena != NULL );
+	assert( currentHeapArena != nullptr );
 
 #if defined( _XENON ) && !defined( _FINAL )
 	MemTracker::OnDelete(ptr);
@@ -1003,10 +1003,10 @@ char *Mem_CopyString( const char *in ) {
 	char *out;
 
 	out = (char *)Mem_Alloc( strlen(in) + 1, MA_STRING );
-	if ( out != NULL ) {
+	if ( out != nullptr ) {
 		strcpy( out, in );
 	} else  {
-		arcLibrary::common->FatalError( "Ran out of memory during string copy allocation" );
+		anLibrary::common->FatalError( "Ran out of memory during string copy allocation" );
 	}
 	return out;
 }
@@ -1022,7 +1022,7 @@ stack that is aligned on a 16-byte boundary.
 void *Mem_Alloc16( const int size, byte tag ) {
 	// the following is necessary for memory allocations that take place
 	// in static/global object constructors
-	if ( NULL == currentHeapArena ) {
+	if ( nullptr == currentHeapArena ) {
 		Mem_Init();
 	}
 	void *mem = currentHeapArena->Allocate16( size, tag );
@@ -1043,7 +1043,7 @@ void Mem_Free16( void *ptr ) {
 	if ( !ptr ) {
 		return;
 	}
-	assert( currentHeapArena != NULL );
+	assert( currentHeapArena != nullptr );
 	currentHeapArena->Free( ptr );
 
 #if defined( _XENON ) && !defined( _FINAL )
@@ -1060,11 +1060,11 @@ int Mem_Size( void *ptr ) {
 	if ( !ptr ) {
 		return 0;
 	}
-	assert( currentHeapArena != NULL );
+	assert( currentHeapArena != nullptr );
 	return currentHeapArena->Msize( ptr );
 }
 
-#endif	// #else #ifdef ID_DEBUG_MEMORY
+#endif	// #else #ifdef ARC_DEBUG_MEMORY
 
 /*
 ==================
@@ -1154,7 +1154,7 @@ or scale the input sizes down by that alignment and scale the outputPositions ba
 
 */
 
-float RectPackingFraction( const arcNetList<arcVec2i> &inputSizes, const arcVec2i totalSize ) {
+float RectPackingFraction( const anList<anVec2i> &inputSizes, const anVec2i totalSize ) {
 	int	totalArea = totalSize.Area();
 	if ( totalArea == 0 ) {
 		return 0;
@@ -1166,9 +1166,9 @@ float RectPackingFraction( const arcNetList<arcVec2i> &inputSizes, const arcVec2
 	return ( float )inputArea / totalArea;
 }
 
-class idSortrects : public ARCSortQuick< int, idSortrects > {
+class idSortrects : public anSortQuick< int, idSortrects > {
 public:
-	int SizeMetric( arcVec2i v ) const {
+	int SizeMetric( anVec2i v ) const {
 		// skinny rects will sort earlier than square ones, because
 		// they are more likely to grow the entire region
 		return v.x * v.x + v.y * v.y;
@@ -1176,17 +1176,17 @@ public:
 	int Compare( const int & a, const int & b ) const {
 		return SizeMetric( (*inputSizes)[b] ) - SizeMetric( (*inputSizes)[a] );
 	}
-	const arcNetList<arcVec2i> *inputSizes;
+	const anList<anVec2i> *inputSizes;
 };
 
-void RectAllocator( const arcNetList<arcVec2i> &inputSizes, arcNetList<arcVec2i> &outputPositions, arcVec2i &totalSize ) {
+void RectAllocator( const anList<anVec2i> &inputSizes, anList<anVec2i> &outputPositions, anVec2i &totalSize ) {
 	outputPositions.SetNum( inputSizes.Num() );
 	if ( inputSizes.Num() == 0 ) {
 		totalSize.Set( 0, 0 );
 		return;
 	}
 
-	arcNetList<int> sizeRemap;
+	anList<int> sizeRemap;
 	sizeRemap.SetNum( inputSizes.Num() );
 
 	for ( int i = 0; i < inputSizes.Num(); i++ ) {
@@ -1210,17 +1210,17 @@ void RectAllocator( const arcNetList<arcVec2i> &inputSizes, arcNetList<arcVec2i>
 	// still does a pretty good job.
 	static const int START_MAX = 1<<14;
 	for ( int i = 1; i < inputSizes.Num(); i++ ) {
-		arcVec2i	best( 0, 0 );
-		arcVec2i	bestMax( START_MAX, START_MAX );
-		arcVec2i	size = inputSizes[sizeRemap[i]];
+		anVec2i	best( 0, 0 );
+		anVec2i	bestMax( START_MAX, START_MAX );
+		anVec2i	size = inputSizes[sizeRemap[i]];
 		for ( int j = 0; j < i; j++ ) {
 			for ( int k = 1;  k < 4; k++ ) {
-				arcVec2i	test;
+				anVec2i	test;
 				for ( int n = 0; n < 2; n++ ) {
 					test[n] = outputPositions[sizeRemap[j]][n] + ( ( k >> n ) & 1 ) * inputSizes[sizeRemap[j]][n];
 				}
 
-				arcVec2i	newMax;
+				anVec2i	newMax;
 				for ( int n = 0; n < 2; n++ ) {
 					newMax[n] = Max( totalSize[n], test[n] + size[n] );
 				}
@@ -1252,8 +1252,8 @@ void RectAllocator( const arcNetList<arcVec2i> &inputSizes, arcNetList<arcVec2i>
 				// see if this spot overlaps any already allocated rect
 				int n = 0;
 				for (; n < i; n++ ) {
-					const arcVec2i &check = outputPositions[sizeRemap[n]];
-					const arcVec2i &checkSize = inputSizes[sizeRemap[n]];
+					const anVec2i &check = outputPositions[sizeRemap[n]];
+					const anVec2i &checkSize = inputSizes[sizeRemap[n]];
 					if ( test.x + size.x > check.x && test.y + size.y > check.y && test.x < check.x + checkSize.x && test.y < check.y + checkSize.y ) {
 						break;
 					}
@@ -1267,7 +1267,7 @@ void RectAllocator( const arcNetList<arcVec2i> &inputSizes, arcNetList<arcVec2i>
 			}
 		}
 		if ( bestMax[0] == START_MAX ) {	// FIXME: return an error code
-			arcLibrary::FatalError( "RectAllocator: couldn't fit everything" );
+			anLibrary::FatalError( "RectAllocator: couldn't fit everything" );
 		}
 		outputPositions[sizeRemap[i]] = best;
 		totalSize = bestMax;

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/guied_resource.h"
@@ -51,7 +51,7 @@ class rvGEItemPropsImagePage : public rvGEPropertyPage
 {
 public:
 
-	rvGEItemPropsImagePage ( arcDictionary* dictValues );
+	rvGEItemPropsImagePage ( anDict* dictValues );
 
 	virtual bool	Init			( void );
 	virtual bool	SetActive		( void );
@@ -62,10 +62,10 @@ protected:
 
 	void			UpdateCheckedStates		( void );
 
-	arcDictionary*		mDict;
+	anDict*		mDict;
 };
 
-rvGEItemPropsImagePage::rvGEItemPropsImagePage ( arcDictionary* dict )
+rvGEItemPropsImagePage::rvGEItemPropsImagePage ( anDict* dict )
 {
 	mDict = dict;
 }
@@ -98,7 +98,7 @@ void rvGEItemPropsImagePage::UpdateCheckedStates ( void )
 	char temp[64];
 	bool state;
 	bool rstate;
-	arcNetString result;
+	anString result;
 	bool  enable;
 
 	enable = !IsExpression ( mDict->GetString ( "backcolor", "1,1,1,1" ) );
@@ -157,7 +157,7 @@ int rvGEItemPropsImagePage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPar
 				case IDC_GUIED_ITEMBORDERSIZE:
 					if ( HIWORD(wParam) == EN_CHANGE )
 					{
-						UpdateCheckedStates ( );
+						UpdateCheckedStates();
 					}
 					break;
 
@@ -165,7 +165,7 @@ int rvGEItemPropsImagePage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPar
 				case IDC_GUIED_USEBORDERMATERIAL:
 				case IDC_GUIED_USEBACKCOLOR:
 				case IDC_GUIED_USEMATERIAL:
-					UpdateCheckedStates ( );
+					UpdateCheckedStates();
 					break;
 
 				case IDC_GUIED_ITEMBACKCOLORALPHA:
@@ -183,9 +183,9 @@ int rvGEItemPropsImagePage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPar
 					CHOOSECOLOR col;
 					ZeroMemory ( &col, sizeof(col) );
 					col.lStructSize = sizeof(col);
-					col.lpCustColors = gApp.GetOptions().GetCustomColors ( );
+					col.lpCustColors = gApp.GetOptions().GetCustomColors();
 					col.hwndOwner = mPage;
-					col.hInstance = NULL;
+					col.hInstance = nullptr;
 					col.Flags = CC_RGBINIT;
 					col.rgbResult = ColorButton_GetColor ( GetDlgItem ( mPage, LOWORD(wParam) ) );
 					if ( ChooseColor ( &col ) )
@@ -222,22 +222,22 @@ bool rvGEItemPropsImagePage::SetActive ( void )
 	ColorButton_SetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMBORDERCOLOR ), mDict->GetString ( "bordercolor", "0,0,0,1" ) );
 	AlphaButton_SetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMBORDERCOLORALPHA ), mDict->GetString ( "bordercolor", "0,0,0,1" ) );
 
-	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMBACKGROUND ), arcNetString(mDict->GetString ( "background", "" ) ).StripQuotes ( ) );
-	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMBORDERMATERIAL ), arcNetString(mDict->GetString ( "borderShader", "" ) ).StripQuotes ( ) );
-	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMBORDERSIZE ), arcNetString(mDict->GetString ( "bordersize", "0" ) ).StripQuotes ( ) );
+	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMBACKGROUND ), anString(mDict->GetString ( "background", "" ) ).StripQuotes() );
+	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMBORDERMATERIAL ), anString(mDict->GetString ( "borderShader", "" ) ).StripQuotes() );
+	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMBORDERSIZE ), anString(mDict->GetString ( "bordersize", "0" ) ).StripQuotes() );
 
-	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMMATSCALEX ), arcNetString(mDict->GetString ( "matscalex", "1" ) ).StripQuotes ( ) );
-	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMMATSCALEY ), arcNetString(mDict->GetString ( "matscaley", "1" ) ).StripQuotes ( ) );
+	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMMATSCALEX ), anString(mDict->GetString ( "matscalex", "1" ) ).StripQuotes() );
+	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMMATSCALEY ), anString(mDict->GetString ( "matscaley", "1" ) ).StripQuotes() );
 
 	CheckDlgButton ( mPage, IDC_GUIED_ITEMVARIABLEBACKGROUND, mDict->GetBool ( "variablebackground", "0" ) );
 
-	CheckDlgButton ( mPage, IDC_GUIED_USEMATERIAL, arcNetString(mDict->GetString ( "background", "" ) ).StripQuotes ( ).Length()?BST_CHECKED:BST_UNCHECKED );
-	CheckDlgButton ( mPage, IDC_GUIED_USEBACKCOLOR, arcNetString(mDict->GetString ( "backcolor", "" ) ).StripQuotes ( ).Length()?BST_CHECKED:BST_UNCHECKED );
+	CheckDlgButton ( mPage, IDC_GUIED_USEMATERIAL, anString(mDict->GetString ( "background", "" ) ).StripQuotes().Length()?BST_CHECKED:BST_UNCHECKED );
+	CheckDlgButton ( mPage, IDC_GUIED_USEBACKCOLOR, anString(mDict->GetString ( "backcolor", "" ) ).StripQuotes().Length()?BST_CHECKED:BST_UNCHECKED );
 
 	CheckRadioButton ( mPage, IDC_GUIED_USEBORDERCOLOR, IDC_GUIED_USEBORDERMATERIAL,
-					   arcNetString(mDict->GetString( "borderShader","" ) ).Length()?IDC_GUIED_USEBORDERMATERIAL:IDC_GUIED_USEBORDERCOLOR );
+					   anString(mDict->GetString( "borderShader","" ) ).Length()?IDC_GUIED_USEBORDERMATERIAL:IDC_GUIED_USEBORDERCOLOR );
 
-	UpdateCheckedStates ( );
+	UpdateCheckedStates();
 
 	return true;
 }
@@ -253,7 +253,7 @@ bool rvGEItemPropsImagePage::KillActive ( void )
 {
 	char	temp[1024];
 	bool	matcolor = false;
-	arcNetString	s;
+	anString	s;
 
 	if ( IsDlgButtonChecked ( mPage, IDC_GUIED_USEMATERIAL ) )
 	{
@@ -274,7 +274,7 @@ bool rvGEItemPropsImagePage::KillActive ( void )
 		}
 		else
 		{
-			mDict->Set ( "matscalex", arcNetString::FloatArrayToString( &val, 1, 8 ) );
+			mDict->Set ( "matscalex", anString::FloatArrayToString( &val, 1, 8 ) );
 		}
 
 		GetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMMATSCALEY ), temp, 1024 );
@@ -285,7 +285,7 @@ bool rvGEItemPropsImagePage::KillActive ( void )
 		}
 		else
 		{
-			mDict->Set ( "matscaley", arcNetString::FloatArrayToString( &val, 1, 8 ) );
+			mDict->Set ( "matscaley", anString::FloatArrayToString( &val, 1, 8 ) );
 		}
 
 		if ( IsDlgButtonChecked ( mPage, IDC_GUIED_ITEMVARIABLEBACKGROUND ) )
@@ -311,7 +311,7 @@ bool rvGEItemPropsImagePage::KillActive ( void )
 		{
 			COLORREF color = ColorButton_GetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMBACKCOLOR ) );
 			COLORREF alpha = ColorButton_GetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMBACKCOLORALPHA ) );
-			mDict->Set ( "backcolor", StringFromVec4 ( arcVec4(( float )GetRValue ( color ) / 255.0f, ( float )GetGValue ( color ) / 255.0f, ( float )GetBValue ( color ) / 255.0f, ( float )GetRValue(alpha )/255.0f ) ) );
+			mDict->Set ( "backcolor", StringFromVec4 ( anVec4(( float )GetRValue ( color ) / 255.0f, ( float )GetGValue ( color ) / 255.0f, ( float )GetBValue ( color ) / 255.0f, ( float )GetRValue(alpha )/255.0f ) ) );
 		}
 	}
 	else
@@ -333,7 +333,7 @@ bool rvGEItemPropsImagePage::KillActive ( void )
 			{
 				COLORREF color = ColorButton_GetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMBORDERCOLOR ) );
 				COLORREF alpha = ColorButton_GetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMBORDERCOLORALPHA ) );
-				mDict->Set ( "bordercolor", StringFromVec4 ( arcVec4(( float )GetRValue ( color ) / 255.0f, ( float )GetGValue ( color ) / 255.0f, ( float )GetBValue ( color ) / 255.0f, ( float )GetRValue(alpha )/255.0f ) ) );
+				mDict->Set ( "bordercolor", StringFromVec4 ( anVec4(( float )GetRValue ( color ) / 255.0f, ( float )GetGValue ( color ) / 255.0f, ( float )GetBValue ( color ) / 255.0f, ( float )GetRValue(alpha )/255.0f ) ) );
 			}
 			mDict->Delete ( "borderShader" );
 		}
@@ -361,7 +361,7 @@ bool rvGEItemPropsImagePage::KillActive ( void )
 		{
 			COLORREF color = ColorButton_GetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMMATCOLOR ) );
 			COLORREF alpha = ColorButton_GetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMMATCOLORALPHA ) );
-			mDict->Set ( "matcolor", StringFromVec4 ( arcVec4(( float )GetRValue ( color ) / 255.0f, ( float )GetGValue ( color ) / 255.0f, ( float )GetBValue ( color ) / 255.0f, ( float )GetRValue(alpha )/255.0f ) ) );
+			mDict->Set ( "matcolor", StringFromVec4 ( anVec4(( float )GetRValue ( color ) / 255.0f, ( float )GetGValue ( color ) / 255.0f, ( float )GetBValue ( color ) / 255.0f, ( float )GetRValue(alpha )/255.0f ) ) );
 		}
 	}
 	else
@@ -376,7 +376,7 @@ class rvGEItemPropsTextPage : public rvGEPropertyPage
 {
 public:
 
-	rvGEItemPropsTextPage ( arcDictionary* dictValues );
+	rvGEItemPropsTextPage ( anDict* dictValues );
 
 	virtual bool	Init			( void );
 	virtual bool	SetActive		( void );
@@ -387,10 +387,10 @@ protected:
 
 	void			UpdateCheckedStates		( void );
 
-	arcDictionary*		mDict;
+	anDict*		mDict;
 };
 
-rvGEItemPropsTextPage::rvGEItemPropsTextPage ( arcDictionary* dict )
+rvGEItemPropsTextPage::rvGEItemPropsTextPage ( anDict* dict )
 {
 	mDict = dict;
 }
@@ -414,7 +414,7 @@ bool rvGEItemPropsTextPage::Init ( void )
 
 	SendMessage ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTFONT ), CB_ADDSTRING, 0, (LONG)"<default>" );
 
-	arcFileList *folders;
+	anFileList *folders;
 	int		  i;
 
 	folders = fileSystem->ListFiles( "fonts", "/" );
@@ -442,7 +442,7 @@ Updates the enabled state of all the controls that are linked to a checkbox
 void rvGEItemPropsTextPage::UpdateCheckedStates ( void )
 {
 	bool	state;
-	arcNetString	result;
+	anString	result;
 	bool	enable;
 
 	state = IsDlgButtonChecked ( mPage, IDC_GUIED_USETEXT ) != 0;
@@ -490,7 +490,7 @@ int rvGEItemPropsTextPage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPara
 					break;
 
 				case IDC_GUIED_USETEXT:
-					UpdateCheckedStates ( );
+					UpdateCheckedStates();
 					break;
 
 				case IDC_GUIED_ITEMFORECOLORALPHA:
@@ -502,9 +502,9 @@ int rvGEItemPropsTextPage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPara
 					CHOOSECOLOR col;
 					ZeroMemory ( &col, sizeof(col) );
 					col.lStructSize = sizeof(col);
-					col.lpCustColors = gApp.GetOptions().GetCustomColors ( );
+					col.lpCustColors = gApp.GetOptions().GetCustomColors();
 					col.hwndOwner = mPage;
-					col.hInstance = NULL;
+					col.hInstance = nullptr;
 					col.Flags = CC_RGBINIT;
 					col.rgbResult = ColorButton_GetColor ( GetDlgItem ( mPage, LOWORD(wParam) ) );
 					if ( ChooseColor ( &col ) )
@@ -535,7 +535,7 @@ bool rvGEItemPropsTextPage::SetActive ( void )
 	ColorButton_SetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMFORECOLOR ), mDict->GetString ( "forecolor", "1,1,1,1" ) );
 	AlphaButton_SetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMFORECOLORALPHA ), mDict->GetString ( "forecolor", "1,1,1,1" ) );
 
-	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXT ), arcNetString(mDict->GetString ( "text", "" ) ).StripQuotes ( ) );
+	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXT ), anString(mDict->GetString ( "text", "" ) ).StripQuotes() );
 	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTSCALE ), mDict->GetString ( "textscale", "1.0" ) );
 	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTALIGNX ), mDict->GetString ( "textalignx", "0" ) );
 	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTALIGNY ), mDict->GetString ( "textaligny", "0" ) );
@@ -543,18 +543,18 @@ bool rvGEItemPropsTextPage::SetActive ( void )
 	SendMessage ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTALIGN ), CB_SETCURSEL, atoi(mDict->GetString( "textalign", "0" ) ), 0 );
 
 	// Figure out which font to select
-	arcNetString font = mDict->GetString ( "font", "" );
+	anString font = mDict->GetString ( "font", "" );
 	int   fontSel;
-	font.StripQuotes ( );
-	font.StripPath ( );
+	font.StripQuotes();
+	font.StripPath();
 	fontSel = SendMessage ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTFONT ), CB_FINDSTRING, -1, (LONG)font.c_str () );
 	SendMessage ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTFONT ), CB_SETCURSEL, 0, 0 );
 	SendMessage ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTFONT ), CB_SETCURSEL, fontSel==-1?0:fontSel, 0 );
 
-	CheckDlgButton ( mPage, IDC_GUIED_USETEXT, arcNetString(mDict->GetString ( "text", "" ) ).Length()?BST_CHECKED:BST_UNCHECKED );
-	CheckDlgButton ( mPage, IDC_GUIED_ITEMTEXTNOWRAP, atoi(arcNetString(mDict->GetString ( "nowrap", "0" ) ).StripQuotes() )?BST_CHECKED:BST_UNCHECKED );
+	CheckDlgButton ( mPage, IDC_GUIED_USETEXT, anString(mDict->GetString ( "text", "" ) ).Length()?BST_CHECKED:BST_UNCHECKED );
+	CheckDlgButton ( mPage, IDC_GUIED_ITEMTEXTNOWRAP, atoi(anString(mDict->GetString ( "nowrap", "0" ) ).StripQuotes() )?BST_CHECKED:BST_UNCHECKED );
 
-	UpdateCheckedStates ( );
+	UpdateCheckedStates();
 
 	return true;
 }
@@ -568,7 +568,7 @@ Applys the settings currently stored in the property page back into the attached
 */
 bool rvGEItemPropsTextPage::KillActive ( void )
 {
-	arcNetString	s;
+	anString	s;
 	char	temp[1024];
 	int		i;
 	float	f;
@@ -579,7 +579,7 @@ bool rvGEItemPropsTextPage::KillActive ( void )
 		{
 			COLORREF color = ColorButton_GetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMFORECOLOR ) );
 			COLORREF alpha = ColorButton_GetColor ( GetDlgItem ( mPage, IDC_GUIED_ITEMFORECOLORALPHA ) );
-			mDict->Set ( "forecolor", StringFromVec4 ( arcVec4(( float )GetRValue ( color ) / 255.0f, ( float )GetGValue ( color ) / 255.0f, ( float )GetBValue ( color ) / 255.0f, ( float )GetRValue(alpha )/255.0f ) ) );
+			mDict->Set ( "forecolor", StringFromVec4 ( anVec4(( float )GetRValue ( color ) / 255.0f, ( float )GetGValue ( color ) / 255.0f, ( float )GetBValue ( color ) / 255.0f, ( float )GetRValue(alpha )/255.0f ) ) );
 		}
 
 		GetWindowText ( GetDlgItem(mPage,IDC_GUIED_ITEMTEXT), temp, 1024 );
@@ -590,7 +590,7 @@ bool rvGEItemPropsTextPage::KillActive ( void )
 
 		GetWindowText ( GetDlgItem(mPage,IDC_GUIED_ITEMTEXTSCALE), temp, 1024 );
 		f = atof( temp );
-		mDict->Set ( "textscale", arcNetString::FloatArrayToString( &f, 1, 8 ) );
+		mDict->Set ( "textscale", anString::FloatArrayToString( &f, 1, 8 ) );
 
 		i = SendMessage ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTALIGN ), CB_GETCURSEL, 0, 0 );
 		s = va( "%d", i );
@@ -634,7 +634,7 @@ bool rvGEItemPropsTextPage::KillActive ( void )
 		{
 			char fontName[MAX_PATH];
 			SendMessage ( GetDlgItem ( mPage, IDC_GUIED_ITEMTEXTFONT ), CB_GETLBTEXT, fontSel, (LONG)fontName );
-			mDict->Set ( "font", arcNetString( "\"fonts/" ) + arcNetString(fontName) + arcNetString( "\"" ) );
+			mDict->Set ( "font", anString( "\"fonts/" ) + anString(fontName) + anString( "\"" ) );
 		}
 
 		if ( IsDlgButtonChecked ( mPage, IDC_GUIED_ITEMTEXTNOWRAP ) )
@@ -664,7 +664,7 @@ class rvGEItemPropsKeysPage : public rvGEPropertyPage
 {
 public:
 
-	rvGEItemPropsKeysPage ( arcDictionary* dictValues, rvGEWindowWrapper* wrapper );
+	rvGEItemPropsKeysPage ( anDict* dictValues, rvGEWindowWrapper* wrapper );
 
 	virtual bool	Init			( void );
 	virtual bool	SetActive		( void );
@@ -672,11 +672,11 @@ public:
 
 protected:
 
-	arcDictionary*				mDict;
+	anDict*				mDict;
 	rvGEWindowWrapper*	mWrapper;
 };
 
-rvGEItemPropsKeysPage::rvGEItemPropsKeysPage ( arcDictionary* dict, rvGEWindowWrapper* wrapper )
+rvGEItemPropsKeysPage::rvGEItemPropsKeysPage ( anDict* dict, rvGEWindowWrapper* wrapper )
 {
 	mDict = dict;
 	mWrapper = wrapper;
@@ -688,12 +688,12 @@ INT_PTR CALLBACK ModifyItemKeyDlg_WndProc ( HWND hwnd, UINT msg, WPARAM wParam, 
 	{
 		case WM_INITDIALOG:
 		{
-			const idKeyValue* keyValue = (const idKeyValue*) lParam;
+			const anKeyValue* keyValue = (const anKeyValue*) lParam;
 			MaskEdit_Attach ( GetDlgItem ( hwnd, IDC_GUIED_ITEMKEY ), " \t\r\n" );
-			SetWindowText ( GetDlgItem ( hwnd, IDC_GUIED_ITEMVALUE ), arcNetString(keyValue->GetValue() ).StripQuotes ( ) );
-			if ( arcNetString::Icmp ( keyValue->GetKey(), "guied_temp" ) )
+			SetWindowText ( GetDlgItem ( hwnd, IDC_GUIED_ITEMVALUE ), anString(keyValue->GetValue() ).StripQuotes() );
+			if ( anString::Icmp ( keyValue->GetKey(), "guied_temp" ) )
 			{
-				if ( !arcNetString::Icmp ( keyValue->GetKey(), "name" ) || !arcNetString::Icmp ( keyValue->GetKey(), "rect" ) )
+				if ( !anString::Icmp ( keyValue->GetKey(), "name" ) || !anString::Icmp ( keyValue->GetKey(), "rect" ) )
 				{
 					// Dont allow editing the name keyname
 					EnableWindow ( GetDlgItem ( hwnd, IDC_GUIED_ITEMKEY ), FALSE );
@@ -718,7 +718,7 @@ INT_PTR CALLBACK ModifyItemKeyDlg_WndProc ( HWND hwnd, UINT msg, WPARAM wParam, 
 					char key[1024];
 					char value[1024];
 
-					const idKeyValue* keyValue = (const idKeyValue*) GetWindowLong ( hwnd, GWL_USERDATA );
+					const anKeyValue* keyValue = (const anKeyValue*) GetWindowLong ( hwnd, GWL_USERDATA );
 
 					GetWindowText ( GetDlgItem ( hwnd, IDC_GUIED_ITEMKEY ), key, 1024 );
 					GetWindowText ( GetDlgItem ( hwnd, IDC_GUIED_ITEMVALUE ), value, 1024 );
@@ -764,10 +764,10 @@ int rvGEItemPropsKeysPage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPara
 				NMLISTVIEW* nmlv = (NMLISTVIEW*) nm;
 				if ( nmlv->uNewState & LVIS_SELECTED )
 				{
-					const idKeyValue* keyValue = (idKeyValue*) nmlv->lParam;
+					const anKeyValue* keyValue = (anKeyValue*) nmlv->lParam;
 					assert( keyValue );
 
-					if ( !arcNetString::Icmp ( keyValue->GetKey(), "name" ) || !arcNetString::Icmp ( keyValue->GetKey(), "rect" ) )
+					if ( !anString::Icmp ( keyValue->GetKey(), "name" ) || !anString::Icmp ( keyValue->GetKey(), "rect" ) )
 					{
 						EnableWindow ( GetDlgItem ( mPage, IDC_GUIED_DELETEKEY ), FALSE );
 					}
@@ -787,14 +787,14 @@ int rvGEItemPropsKeysPage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPara
 				{
 					HWND list = GetDlgItem ( mPage, IDC_GUIED_ITEMKEYS );
 					mDict->Set( "guied_temp", "" );
-					const idKeyValue* key = mDict->FindKey ( "guied_temp" );
+					const anKeyValue* key = mDict->FindKey ( "guied_temp" );
 
-					arcNetString old = key->GetValue();
+					anString old = key->GetValue();
 					while ( 1 )
 					{
 						if ( DialogBoxParam ( gApp.GetInstance (), MAKEINTRESOURCE(IDD_GUIED_ITEMKEY), mPage, ModifyItemKeyDlg_WndProc, (LPARAM)key ) )
 						{
-							arcNetString finalValue;
+							anString finalValue;
 
 							finalValue = key->GetValue();
 							if ( !mWrapper->VerfiyStateKey ( key->GetKey(), finalValue ) )
@@ -815,12 +815,12 @@ int rvGEItemPropsKeysPage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPara
 							ZeroMemory ( &item, sizeof(item) );
 							item.mask = LVIF_TEXT|LVIF_PARAM;
 							item.iItem = ListView_GetItemCount ( list );
-							item.pszText = (LPSTR)key->GetKey().c_str ( );
+							item.pszText = (LPSTR)key->GetKey().c_str();
 							item.lParam = (LONG) key;
 							int index = ListView_InsertItem ( list, &item );
 
-							finalValue.StripQuotes ( );
-							ListView_SetItemText ( list, index, 1, (LPSTR)finalValue.c_str ( ) );
+							finalValue.StripQuotes();
+							ListView_SetItemText ( list, index, 1, (LPSTR)finalValue.c_str() );
 
 							break;
 						}
@@ -843,14 +843,14 @@ int rvGEItemPropsKeysPage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPara
 						item.iItem = index;
 						item.mask = LVIF_PARAM;
 						ListView_GetItem ( list, &item );
-						const idKeyValue* key = (const idKeyValue*)item.lParam;
+						const anKeyValue* key = (const anKeyValue*)item.lParam;
 						assert ( key );
 
 						while ( 1 )
 						{
 							if ( DialogBoxParam ( gApp.GetInstance (), MAKEINTRESOURCE(IDD_GUIED_ITEMKEY), mPage, ModifyItemKeyDlg_WndProc, (LPARAM)key ) )
 							{
-								arcNetString finalValue;
+								anString finalValue;
 
 								finalValue = key->GetValue();
 								if ( !mWrapper->VerfiyStateKey ( key->GetKey(), finalValue ) )
@@ -871,7 +871,7 @@ int rvGEItemPropsKeysPage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPara
 
 								ListView_SetItemText ( list, index, 0, (LPSTR)key->GetKey().c_str() );
 
-								finalValue.StripQuotes ( );
+								finalValue.StripQuotes();
 								ListView_SetItemText ( list, index, 1, (LPSTR)finalValue.c_str() );
 								break;
 							}
@@ -890,7 +890,7 @@ int rvGEItemPropsKeysPage::HandleMessage ( UINT msg, WPARAM wParam, LPARAM lPara
 						item.iItem = index;
 						item.mask = LVIF_PARAM;
 						ListView_GetItem ( list, &item );
-						const idKeyValue* key = (const idKeyValue*)item.lParam;
+						const anKeyValue* key = (const anKeyValue*)item.lParam;
 						assert ( key );
 
 						mDict->Delete ( key->GetKey() );
@@ -968,7 +968,7 @@ bool rvGEItemPropsKeysPage::SetActive ( void )
 	// Add each key in the properties dictionary
 	for ( i = 0; i < mDict->GetNumKeyVals(); i ++ )
 	{
-		const idKeyValue* key = mDict->GetKeyVal ( i );
+		const anKeyValue* key = mDict->GetKeyVal ( i );
 		assert ( key );
 
 		// Add the item
@@ -976,13 +976,13 @@ bool rvGEItemPropsKeysPage::SetActive ( void )
 		ZeroMemory ( &item, sizeof(item) );
 		item.mask = LVIF_TEXT|LVIF_PARAM;
 		item.iItem = ListView_GetItemCount ( list );
-		item.pszText = (LPSTR)key->GetKey().c_str ( );
+		item.pszText = (LPSTR)key->GetKey().c_str();
 		item.lParam = (LONG) key;
 		int index = ListView_InsertItem ( list, &item );
 
-		arcNetString value;
+		anString value;
 		value = key->GetValue();
-		value.StripQuotes ( );
+		value.StripQuotes();
 		ListView_SetItemText ( list, index, 1, (LPSTR)value.c_str() );
 	}
 
@@ -993,7 +993,7 @@ class rvGEItemPropsGeneralPage : public rvGEPropertyPage
 {
 public:
 
-	rvGEItemPropsGeneralPage ( arcDictionary* dict, rvGEWindowWrapper::EWindowType type );
+	rvGEItemPropsGeneralPage ( anDict* dict, rvGEWindowWrapper::EWindowType type );
 
 	virtual bool	SetActive		( void );
 	virtual	bool	KillActive		( void );
@@ -1004,11 +1004,11 @@ protected:
 
 	void			UpdateCheckedStates		( void );
 
-	arcDictionary*	mDict;
-	arcNetString	mType;
+	anDict*	mDict;
+	anString	mType;
 };
 
-rvGEItemPropsGeneralPage::rvGEItemPropsGeneralPage ( arcDictionary* dict, rvGEWindowWrapper::EWindowType type )
+rvGEItemPropsGeneralPage::rvGEItemPropsGeneralPage ( anDict* dict, rvGEWindowWrapper::EWindowType type )
 {
 	mDict = dict;
 	mType = rvGEWindowWrapper::WindowTypeToString ( type );
@@ -1073,35 +1073,35 @@ window into the controls
 bool rvGEItemPropsGeneralPage::SetActive ( void )
 {
 	bool  enable;
-	arcNetString result;
+	anString result;
 
 	gApp.GetOptions().SetLastOptionsPage ( RVITEMPROPS_GENERAL );
 
-	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMNAME ), arcNetString(mDict->GetString ( "name", "unnamed" ) ).StripQuotes ( ) );
+	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_ITEMNAME ), anString(mDict->GetString ( "name", "unnamed" ) ).StripQuotes() );
 
 	enable = !IsExpression ( mDict->GetString ( "visible", "1" ) );
-	CheckDlgButton ( mPage, IDC_GUIED_ITEMVISIBLE, atol(arcNetString(mDict->GetString ( "visible", "1" ) ).StripQuotes ( ) )?BST_CHECKED:BST_UNCHECKED );
+	CheckDlgButton ( mPage, IDC_GUIED_ITEMVISIBLE, atol(anString(mDict->GetString ( "visible", "1" ) ).StripQuotes() )?BST_CHECKED:BST_UNCHECKED );
 	EnableWindow ( GetDlgItem ( mPage, IDC_GUIED_ITEMVISIBLE ), enable );
 
 	enable = !IsExpression ( mDict->GetString ( "notime", "0" ) );
-	CheckDlgButton ( mPage, IDC_GUIED_ITEMNOTIME, atol(arcNetString(mDict->GetString ( "notime", "0" ) ).StripQuotes ( ) )?BST_CHECKED:BST_UNCHECKED );
+	CheckDlgButton ( mPage, IDC_GUIED_ITEMNOTIME, atol(anString(mDict->GetString ( "notime", "0" ) ).StripQuotes() )?BST_CHECKED:BST_UNCHECKED );
 	EnableWindow ( GetDlgItem ( mPage, IDC_GUIED_ITEMNOTIME ), enable );
 
 	enable = !IsExpression ( mDict->GetString ( "noevents", "0" ) );
-	CheckDlgButton ( mPage, IDC_GUIED_ITEMNOEVENTS, atol(arcNetString(mDict->GetString ( "noevents", "0" ) ).StripQuotes ( ) )?BST_CHECKED:BST_UNCHECKED );
+	CheckDlgButton ( mPage, IDC_GUIED_ITEMNOEVENTS, atol(anString(mDict->GetString ( "noevents", "0" ) ).StripQuotes() )?BST_CHECKED:BST_UNCHECKED );
 	EnableWindow ( GetDlgItem ( mPage, IDC_GUIED_ITEMNOEVENTS ), enable );
 
 	enable = !IsExpression ( mDict->GetString ( "noclip", "0" ) );
-	CheckDlgButton ( mPage, IDC_GUIED_ITEMNOCLIP, atol(arcNetString(mDict->GetString ( "noclip", "0" ) ).StripQuotes ( ) )?BST_CHECKED:BST_UNCHECKED );
+	CheckDlgButton ( mPage, IDC_GUIED_ITEMNOCLIP, atol(anString(mDict->GetString ( "noclip", "0" ) ).StripQuotes() )?BST_CHECKED:BST_UNCHECKED );
 	EnableWindow ( GetDlgItem ( mPage, IDC_GUIED_ITEMNOCLIP ), enable );
 
 	enable = !IsExpression ( mDict->GetString ( "nocursor", "0" ) );
 	EnableWindow ( GetDlgItem ( mPage, IDC_GUIED_ITEMNOCURSOR  ), enable );
-	CheckDlgButton ( mPage, IDC_GUIED_ITEMNOCURSOR, atol(arcNetString(mDict->GetString ( "nocursor", "0" ) ).StripQuotes ( ) )?BST_CHECKED:BST_UNCHECKED );
+	CheckDlgButton ( mPage, IDC_GUIED_ITEMNOCURSOR, atol(anString(mDict->GetString ( "nocursor", "0" ) ).StripQuotes() )?BST_CHECKED:BST_UNCHECKED );
 
 	SetWindowText ( GetDlgItem ( mPage, IDC_GUIED_TYPE ), mType );
 
-	UpdateCheckedStates ( );
+	UpdateCheckedStates();
 
 	return true;
 }
@@ -1191,7 +1191,7 @@ GEItemPropsDlg_DoModal
 Starts the item properties dialog
 ================
 */
-bool GEItemPropsDlg_DoModal ( HWND parent, idWindow* window, arcDictionary& dict )
+bool GEItemPropsDlg_DoModal ( HWND parent, idWindow* window, anDict& dict )
 {
 	PROPSHEETHEADER		propsh;
 	PROPSHEETPAGE		propsp[4];
@@ -1202,8 +1202,8 @@ bool GEItemPropsDlg_DoModal ( HWND parent, idWindow* window, arcDictionary& dict
 	assert ( wrapper );
 
 	// Start the destination dictionary with the values in the window dictionary
-	dict.Clear ( );
-	dict.Copy ( wrapper->GetStateDict ( ) );
+	dict.Clear();
+	dict.Copy ( wrapper->GetStateDict() );
 
 	propsp[RVITEMPROPS_GENERAL].dwSize		= sizeof(PROPSHEETPAGE);
 	propsp[RVITEMPROPS_GENERAL].dwFlags		= PSP_USETITLE;
@@ -1211,7 +1211,7 @@ bool GEItemPropsDlg_DoModal ( HWND parent, idWindow* window, arcDictionary& dict
 	propsp[RVITEMPROPS_GENERAL].pszTemplate	= MAKEINTRESOURCE(IDD_GUIED_ITEMPROPS_GENERAL);
 	propsp[RVITEMPROPS_GENERAL].pfnDlgProc	= rvGEPropertyPage::WndProc;
 	propsp[RVITEMPROPS_GENERAL].pszTitle	= "General";
-	propsp[RVITEMPROPS_GENERAL].lParam		= (LONG)new rvGEItemPropsGeneralPage ( &dict, wrapper->GetWindowType ( ) );
+	propsp[RVITEMPROPS_GENERAL].lParam		= (LONG)new rvGEItemPropsGeneralPage ( &dict, wrapper->GetWindowType() );
 
 	propsp[RVITEMPROPS_IMAGE].dwSize		= sizeof(PROPSHEETPAGE);
 	propsp[RVITEMPROPS_IMAGE].dwFlags		= PSP_USETITLE;
@@ -1238,7 +1238,7 @@ bool GEItemPropsDlg_DoModal ( HWND parent, idWindow* window, arcDictionary& dict
 	propsp[RVITEMPROPS_KEYS].lParam			= (LONG)new rvGEItemPropsKeysPage ( &dict, wrapper );
 
 	propsh.dwSize			= sizeof(PROPSHEETHEADER);
-	propsh.nStartPage		= gApp.GetOptions().GetLastOptionsPage ( );
+	propsh.nStartPage		= gApp.GetOptions().GetLastOptionsPage();
 	propsh.dwFlags			= PSH_PROPSHEETPAGE|PSH_NOAPPLYNOW|PSH_NOCONTEXTHELP;
 	propsh.hwndParent		= parent;
 	propsh.pszCaption		= "Item Properties";
@@ -1246,7 +1246,7 @@ bool GEItemPropsDlg_DoModal ( HWND parent, idWindow* window, arcDictionary& dict
 	propsh.ppsp				= (LPCPROPSHEETPAGE)&propsp;
 
 	// Bring up the item properties dialog now
-	result = PropertySheet ( &propsh ) != NULL;
+	result = PropertySheet ( &propsh ) != nullptr;
 
 	// Cleanup
 	delete (rvGEItemPropsGeneralPage*) propsp[0].lParam;

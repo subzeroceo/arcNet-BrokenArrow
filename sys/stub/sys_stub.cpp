@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include <sys/types.h>
@@ -71,7 +71,7 @@ void Sys_Error( const char *error, ... ) {
 	char		text[4096];
 
 	va_start (argptr, error);
-	vprintf (error, argptr);
+	vprintf ( error, argptr);
 	va_end (argptr);
 	printf( "\n" );
 
@@ -83,7 +83,7 @@ void Sys_Quit( void ) {
 }
 
 char *Sys_GetClipboardData( void ) {
-	return NULL;
+	return nullptr;
 }
 
 void Sys_GenerateEvents( void ) {
@@ -107,9 +107,9 @@ void idPort::SendPacket( const netadr_t to, const void *data, int size ) {
 
 //==========================================================
 
-double	idTimer::base;
+double	anTimer::base;
 
-void idTimer::InitBaseClockTicks( void ) const {
+void anTimer::InitBaseClockTicks( void ) const {
 }
 
 //==========================================================
@@ -144,8 +144,7 @@ const char *Sys_DefaultBasePath(void) {
 	return "";
 }
 
-int Sys_ListFiles( const char *directory, const char *extension, idStrList &list )
-{
+int Sys_ListFiles( const char *directory, const char *extension, anStringList &list ) {
 	struct dirent *d;
 	DIR		*fdir;
 	bool dironly = false;
@@ -164,30 +163,30 @@ int Sys_ListFiles( const char *directory, const char *extension, idStrList &list
 	}
 
 	// search
-	if ((fdir = opendir(directory)) == NULL) {
+	if ((fdir = opendir(directory)) == nullptr ) {
 		return 0;
 	}
 
-	while ((d = readdir(fdir)) != NULL) {
-		arcNetString::snprintf( search, sizeof(search), "%s/%s", directory, d->d_name );
-		if (stat(search, &st) == -1)
+	while ((d = readdir(fdir)) != nullptr ) {
+		anString::snprintf( search, sizeof( search), "%s/%s", directory, d->d_name );
+		if ( stat( search, &st ) == -1 )
 			continue;
 		if ( !dironly) {
-		    arcNetString look(search);
-		    arcNetString ext;
+		    anString look( search);
+		    anString ext;
 		    look.ExtractFileExtension( ext );
 		    if ( extension && extension[0] && ext.Icmp( &extension[1] ) != 0 ) {
 			continue;
 		    }
 		}
-		if ((dironly && !(st.st_mode & S_IFDIR)) ||
-			( !dironly && (st.st_mode & S_IFDIR)))
+		if ((dironly && !( st.st_mode & S_IFDIR)) ||
+			( !dironly && ( st.st_mode & S_IFDIR)))
 			continue;
 
 		list.Append( d->d_name );
 	}
 
-	closedir(fdir);
+	closedir( fdir );
 
 	return list.Num();
 }
@@ -203,9 +202,9 @@ const char *Sys_NetAdrToString( const netadr_t a ) {
 	static char s[64];
 
 	if ( a.type == NA_LOOPBACK ) {
-		arcNetString::snPrintf( s, sizeof(s), "localhost" );
+		anString::snPrintf( s, sizeof( s), "localhost" );
 	} else if ( a.type == NA_IP ) {
-		arcNetString::snPrintf( s, sizeof(s), "%i.%i.%i.%i:%i",
+		anString::snPrintf( s, sizeof( s), "%i.%i.%i.%i:%i",
 			a.ip[0], a.ip[1], a.ip[2], a.ip[3], BigShort(a.port) );
 	}
 	return s;

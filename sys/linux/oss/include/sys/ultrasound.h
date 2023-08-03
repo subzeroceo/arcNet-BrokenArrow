@@ -13,7 +13,7 @@
  *	Format:
  *		byte 0 		- SEQ_PRIVATE (0xfe)
  *		byte 1 		- Synthesizer device number (0-N)
- *		byte 2 		- Command (see below)
+ *		byte 2 		- Command ( see below)
  *		byte 3 		- Voice number (0-31)
  *		bytes 4 and 5	- parameter P1 (unsigned short)
  *		bytes 6 and 7	- parameter P2 (unsigned short)
@@ -28,7 +28,7 @@
  *		_GUS_VOICEFADE	- Stops the voice smoothly.
  *		_GUS_VOICEMODE	- Alters the voice mode, don't start or stop voice (P1=voice mode)
  *		_GUS_VOICEBALA	- Sets voice balence (P1, 0=left, 7=middle and 15=right, default 7)
- *		_GUS_VOICEFREQ	- Sets voice (sample) playback frequency (P1=Hz)
+ *		_GUS_VOICEFREQ	- Sets voice ( sample) playback frequency (P1=Hz)
  *		_GUS_VOICEVOL	- Sets voice volume (P1=volume, 0xfff=max, 0xeff=half, 0x000=off)
  *		_GUS_VOICEVOL2	- Sets voice volume (P1=volume, 0xfff=max, 0xeff=half, 0x000=off)
  *				  (Like GUS_VOICEVOL but doesn't change the hw

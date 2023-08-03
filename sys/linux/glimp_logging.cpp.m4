@@ -1,4 +1,4 @@
-#include "arcLibrary/precompiled.h"
+#include "idlib/Lib.h"
 #include "renderer/tr_local.h"
 #include "sys/linux/local.h"
 #include "glimp_local.h"
@@ -33,7 +33,7 @@ typedef struct {
 #define	DEF(x) { x, #x },
 glEnumName_t	glEnumNames[] = {
 #include "sys/linux/glimp_glenum.h"
-{ 0, NULL }};
+{ 0, nullptr }};
 
 static const char *EnumString( GLenum t ) {
 	static char buffer[8][1024];
@@ -92,7 +92,7 @@ forloop(`i', glX_start, glX_end, `assign_funcptr(indir(`f'i`_name') )')
 
 void GLimp_EnableLogging(bool enable) {
 	static bool		isEnabled = false;
-	static arcNetString	ospath;
+	static anString	ospath;
 	static int		initialFrames;
 
 	// return if we're already active
@@ -110,7 +110,7 @@ void GLimp_EnableLogging(bool enable) {
 		fclose( tr.logFile );
 #endif
 		enable = false;
-		tr.logFile = NULL;
+		tr.logFile = nullptr;
 	}
 
 	// return if we're already disabled
@@ -124,7 +124,7 @@ void GLimp_EnableLogging(bool enable) {
 		if ( !tr.logFile ) {
 			struct tm		*newtime;
 			time_t			aclock;
-			arcNetString			qpath;
+			anString			qpath;
 			int				i;
 
 			initialFrames = r_logFile.GetInteger();
@@ -135,7 +135,7 @@ void GLimp_EnableLogging(bool enable) {
 			// scan for an unused filename
 			for ( i = 0; i < 9999; i++ ) {
 				sprintf( qpath, "renderlog_%i.txt", i );
-				if ( fileSystem->ReadFile( qpath, NULL, NULL ) == -1 ) {
+				if ( fileSystem->ReadFile( qpath, nullptr, nullptr ) == -1 ) {
 					break;		// use this name
 				}
 			}

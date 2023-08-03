@@ -8,6 +8,9 @@
 
 ===============================================================================
 */
+class anFile;
+class anFileSystem;
+class anFileSystem;
 
 typedef enum {
 	DS_FINISHED,
@@ -16,10 +19,10 @@ typedef enum {
 	DS_VERSION
 } demoSystem_t;
 
-class ARCDemoFile : public arcNetFile {
+class anDemoFile : public anFile {
 public:
-					ARCDemoFile();
-					~ARCDemoFile();
+					anDemoFile();
+					~anDemoFile();
 
 	const char *	GetName() { return (f?f->GetName():"" ); }
 	const char *	GetFullPath() { return (f?f->GetFullPath():"" ); }
@@ -33,28 +36,28 @@ public:
 	const char *	ReadHashString();
 	void			WriteHashString( const char *str );
 
-	void			ReadDict( arcDictionary &dict );
-	void			WriteDict( const arcDictionary &dict );
+	void			ReadDict( anDict &dict );
+	void			WriteDict( const anDict &dict );
 
 	int				Read( void *buffer, int len );
 	int				Write( const void *buffer, int len );
 
 private:
-	static idCompressor *AllocCompressor( int type );
+	static anCompressor *AllocCompressor( int type );
 
 	bool			writing;
 	byte *			fileImage;
-	arcNetFile *		f;
-	idCompressor *	compressor;
+	anFile *		f;
+	anCompressor *	compressor;
 
-	arcNetList<arcNetString*>	demoStrings;
-	arcNetFile *		fLog;
+	anList<anString*>	demoStrings;
+	anFile *		fLog;
 	bool			log;
-	arcNetString			logStr;
+	anString			logStr;
 
-	static arcCVarSystem	com_logDemos;
-	static arcCVarSystem	com_compressDemos;
-	static arcCVarSystem	com_preloadDemos;
+	static anCVarSystem	com_logDemos;
+	static anCVarSystem	com_compressDemos;
+	static anCVarSystem	com_preloadDemos;
 };
 
-#endif /* !__DEMOFILE_H__ */
+#endif // !__DEMOFILE_H__

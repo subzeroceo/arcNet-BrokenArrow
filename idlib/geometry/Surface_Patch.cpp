@@ -1,19 +1,19 @@
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 
 /*
 =================
-arcSurface_Patch::SetSize
+anSurface_Patch::SetSize
 =================
 */
-void arcSurface_Patch::SetSize( int patchWidth, int patchHeight ) {
+void anSurface_Patch::SetSize( int patchWidth, int patchHeight ) {
 	if ( patchWidth < 1 || patchWidth > maxWidth ) {
-		arcLibrary::common->FatalError( "arcSurface_Patch::SetSize: invalid patchWidth" );
+		anLibrary::common->FatalError( "anSurface_Patch::SetSize: invalid patchWidth" );
 	}
 	if ( patchHeight < 1 || patchHeight > maxHeight ) {
-		arcLibrary::common->FatalError( "arcSurface_Patch::SetSize: invalid patchHeight" );
+		anLibrary::common->FatalError( "anSurface_Patch::SetSize: invalid patchHeight" );
 	}
 	width = patchWidth;
 	height = patchHeight;
@@ -22,14 +22,14 @@ void arcSurface_Patch::SetSize( int patchWidth, int patchHeight ) {
 
 /*
 =================
-arcSurface_Patch::PutOnCurve
+anSurface_Patch::PutOnCurve
 
 Expects an expanded patch.
 =================
 */
-void arcSurface_Patch::PutOnCurve( void ) {
+void anSurface_Patch::PutOnCurve( void ) {
 	int i, j;
-	arcDrawVert prev, next;
+	anDrawVertex prev, next;
 
 	assert( expanded == true );
 	// put all the approximating points on the curve
@@ -52,11 +52,11 @@ void arcSurface_Patch::PutOnCurve( void ) {
 
 /*
 ================
-arcSurface_Patch::ProjectPointOntoVector
+anSurface_Patch::ProjectPointOntoVector
 ================
 */
-void arcSurface_Patch::ProjectPointOntoVector( const arcVec3 &point, const arcVec3 &vStart, const arcVec3 &vEnd, arcVec3 &vProj ) {
-	arcVec3 pVec, vec;
+void anSurface_Patch::ProjectPointOntoVector( const anVec3 &point, const anVec3 &vStart, const anVec3 &vEnd, anVec3 &vProj ) {
+	anVec3 pVec, vec;
 
 	pVec = point - vStart;
 	vec = vEnd - vStart;
@@ -67,21 +67,21 @@ void arcSurface_Patch::ProjectPointOntoVector( const arcVec3 &point, const arcVe
 
 /*
 ================
-arcSurface_Patch::RemoveLinearColumnsRows
+anSurface_Patch::RemoveLinearColumnsRows
 
 Expects an expanded patch.
 ================
 */
-void arcSurface_Patch::RemoveLinearColumnsRows( void ) {
+void anSurface_Patch::RemoveLinearColumnsRows( void ) {
 	int i, j, k;
 	float len, maxLength;
-	arcVec3 proj, dir;
+	anVec3 proj, dir;
 
 	assert( expanded == true );
 	for ( j = 1; j < width - 1; j++ ) {
 		maxLength = 0;
 		for ( i = 0; i < height; i++ ) {
-			arcSurface_Patch::ProjectPointOntoVector( verts[i*maxWidth + j].xyz,
+			anSurface_Patch::ProjectPointOntoVector( verts[i*maxWidth + j].xyz,
 									verts[i*maxWidth + j-1].xyz, verts[i*maxWidth + j+1].xyz, proj);
 			dir = verts[i*maxWidth + j].xyz - proj;
 			len = dir.LengthSqr();
@@ -102,7 +102,7 @@ void arcSurface_Patch::RemoveLinearColumnsRows( void ) {
 	for ( j = 1; j < height - 1; j++ ) {
 		maxLength = 0;
 		for ( i = 0; i < width; i++ ) {
-			arcSurface_Patch::ProjectPointOntoVector( verts[j*maxWidth + i].xyz,
+			anSurface_Patch::ProjectPointOntoVector( verts[j*maxWidth + i].xyz,
 									verts[(j-1 )*maxWidth + i].xyz, verts[(j+1 )*maxWidth + i].xyz, proj);
 			dir = verts[j*maxWidth + i].xyz - proj;
 			len = dir.LengthSqr();
@@ -124,10 +124,10 @@ void arcSurface_Patch::RemoveLinearColumnsRows( void ) {
 
 /*
 ================
-arcSurface_Patch::ResizeExpanded
+anSurface_Patch::ResizeExpanded
 ================
 */
-void arcSurface_Patch::ResizeExpanded( int newHeight, int newWidth ) {
+void anSurface_Patch::ResizeExpanded( int newHeight, int newWidth ) {
 	int i, j;
 
 	assert( expanded == true );
@@ -149,14 +149,14 @@ void arcSurface_Patch::ResizeExpanded( int newHeight, int newWidth ) {
 
 /*
 ================
-arcSurface_Patch::Collapse
+anSurface_Patch::Collapse
 ================
 */
-void arcSurface_Patch::Collapse( void ) {
+void anSurface_Patch::Collapse( void ) {
 	int i, j;
 
 	if ( !expanded ) {
-		arcLibrary::common->FatalError( "arcSurface_Patch::Collapse: patch not expanded" );
+		anLibrary::common->FatalError( "anSurface_Patch::Collapse: patch not expanded" );
 	}
 	expanded = false;
 	if ( width != maxWidth ) {
@@ -171,14 +171,14 @@ void arcSurface_Patch::Collapse( void ) {
 
 /*
 ================
-arcSurface_Patch::Expand
+anSurface_Patch::Expand
 ================
 */
-void arcSurface_Patch::Expand( void ) {
+void anSurface_Patch::Expand( void ) {
 	int i, j;
 
 	if ( expanded ) {
-		arcLibrary::common->FatalError( "arcSurface_Patch::Expand: patch alread expanded" );
+		anLibrary::common->FatalError( "anSurface_Patch::Expand: patch alread expanded" );
 	}
 	expanded = true;
 	verts.SetNum( maxWidth * maxHeight, false );
@@ -193,10 +193,10 @@ void arcSurface_Patch::Expand( void ) {
 
 /*
 ============
-arcSurface_Patch::LerpVert
+anSurface_Patch::LerpVert
 ============
 */
-void arcSurface_Patch::LerpVert( const arcDrawVert &a, const arcDrawVert &b, arcDrawVert &out ) const {
+void anSurface_Patch::LerpVert( const anDrawVertex &a, const anDrawVertex &b, anDrawVertex &out ) const {
 	out.xyz[0] = 0.5f * ( a.xyz[0] + b.xyz[0] );
 	out.xyz[1] = 0.5f * ( a.xyz[1] + b.xyz[1] );
 	out.xyz[2] = 0.5f * ( a.xyz[2] + b.xyz[2] );
@@ -209,7 +209,7 @@ void arcSurface_Patch::LerpVert( const arcDrawVert &a, const arcDrawVert &b, arc
 
 /*
 =================
-arcSurface_Patch::GenerateNormals
+anSurface_Patch::GenerateNormals
 
 Handles all the complicated wrapping and degenerate cases
 Expects a Not expanded patch.
@@ -217,15 +217,15 @@ Expects a Not expanded patch.
 */
 #define	COPLANAR_EPSILON	0.1f
 
-void arcSurface_Patch::GenerateNormals( void ) {
+void anSurface_Patch::GenerateNormals( void ) {
 	int			i, j, k, dist;
-	arcVec3		norm;
-	arcVec3		sum;
+	anVec3		norm;
+	anVec3		sum;
 	int			count;
-	arcVec3		base;
-	arcVec3		delta;
+	anVec3		base;
+	anVec3		delta;
 	int			x, y;
-	arcVec3		around[8], temp;
+	anVec3		around[8], temp;
 	bool		good[8];
 	bool		wrapWidth, wrapHeight;
 	static int	neighbors[8][2] = {
@@ -237,7 +237,7 @@ void arcSurface_Patch::GenerateNormals( void ) {
 	//
 	// if all points are coplanar, set all normals to that plane
 	//
-	arcVec3		extent[3];
+	anVec3		extent[3];
 	float		offset;
 
 	extent[0] = verts[width - 1].xyz - verts[0].xyz;
@@ -258,7 +258,7 @@ void arcSurface_Patch::GenerateNormals( void ) {
 		offset = verts[0].xyz * norm;
 		for ( i = 1; i < width * height; i++ ) {
 			float d = verts[i].xyz * norm;
-			if ( arcMath::Fabs( d - offset ) > COPLANAR_EPSILON ) {
+			if ( anMath::Fabs( d - offset ) > COPLANAR_EPSILON ) {
 				break;
 			}
 		}
@@ -348,7 +348,7 @@ void arcSurface_Patch::GenerateNormals( void ) {
 				count++;
 			}
 			if ( count == 0 ) {
-				//arcLibrary::common->Printf( "bad normal\n" );
+				//anLibrary::common->Printf( "bad normal\n" );
 				count = 1;
 			}
 			verts[j * width + i].normal = sum;
@@ -359,10 +359,10 @@ void arcSurface_Patch::GenerateNormals( void ) {
 
 /*
 =================
-arcSurface_Patch::GenerateIndexes
+anSurface_Patch::GenerateIndexes
 =================
 */
-void arcSurface_Patch::GenerateIndexes( void ) {
+void anSurface_Patch::GenerateIndexes( void ) {
 	int i, j, v1, v2, v3, v4, index;
 
 	indexes.SetNum( ( width-1 ) * ( height-1 ) * 2 * 3, false );
@@ -387,10 +387,10 @@ void arcSurface_Patch::GenerateIndexes( void ) {
 
 /*
 ===============
-arcSurface_Patch::SampleSinglePatchPoint
+anSurface_Patch::SampleSinglePatchPoint
 ===============
 */
-void arcSurface_Patch::SampleSinglePatchPoint( const arcDrawVert ctrl[3][3], float u, float v, arcDrawVert *out ) const {
+void anSurface_Patch::SampleSinglePatchPoint( const anDrawVertex ctrl[3][3], float u, float v, anDrawVertex *out ) const {
 	float	vCtrl[3][8];
 	int		vPoint;
 	int		axis;
@@ -444,10 +444,10 @@ void arcSurface_Patch::SampleSinglePatchPoint( const arcDrawVert ctrl[3][3], flo
 
 /*
 ===================
-arcSurface_Patch::SampleSinglePatch
+anSurface_Patch::SampleSinglePatch
 ===================
 */
-void arcSurface_Patch::SampleSinglePatch( const arcDrawVert ctrl[3][3], int baseCol, int baseRow, int width, int horzSub, int vertSub, arcDrawVert *outVerts ) const {
+void anSurface_Patch::SampleSinglePatch( const anDrawVertex ctrl[3][3], int baseCol, int baseRow, int width, int horzSub, int vertSub, anDrawVertex *outVerts ) const {
 	int		i, j;
 	float	u, v;
 
@@ -464,15 +464,15 @@ void arcSurface_Patch::SampleSinglePatch( const arcDrawVert ctrl[3][3], int base
 
 /*
 =================
-arcSurface_Patch::SubdivideExplicit
+anSurface_Patch::SubdivideExplicit
 =================
 */
-void arcSurface_Patch::SubdivideExplicit( int horzSubdivisions, int vertSubdivisions, bool genNormals, bool removeLinear ) {
+void anSurface_Patch::SubdivideExplicit( int horzSubdivisions, int vertSubdivisions, bool genNormals, bool removeLinear ) {
 	int i, j, k, l;
-	arcDrawVert sample[3][3];
+	anDrawVertex sample[3][3];
 	int outWidth = ((width - 1 ) / 2 * horzSubdivisions) + 1;
 	int outHeight = ((height - 1 ) / 2 * vertSubdivisions) + 1;
-	arcDrawVert *dv = new arcDrawVert[ outWidth * outHeight ];
+	anDrawVertex *dv = new anDrawVertex[ outWidth * outHeight ];
 
 	// generate normals for the control mesh
 	if ( genNormals ) {
@@ -522,14 +522,14 @@ void arcSurface_Patch::SubdivideExplicit( int horzSubdivisions, int vertSubdivis
 
 /*
 =================
-arcSurface_Patch::Subdivide
+anSurface_Patch::Subdivide
 =================
 */
-void arcSurface_Patch::Subdivide( float maxHorizontalError, float maxVerticalError, float maxLength, bool genNormals ) {
+void anSurface_Patch::Subdivide( float maxHorizontalError, float maxVerticalError, float maxLength, bool genNormals ) {
 	int			i, j, k, l;
-	arcDrawVert	prev, next, mid;
-	arcVec3		prevxyz, nextxyz, midxyz;
-	arcVec3		delta;
+	anDrawVertex	prev, next, mid;
+	anVec3		prevxyz, nextxyz, midxyz;
+	anVec3		delta;
 	float		maxHorizontalErrorSqr, maxVerticalErrorSqr, maxLengthSqr;
 
 	// generate normals for the control mesh
@@ -579,9 +579,9 @@ void arcSurface_Patch::Subdivide( float maxHorizontalError, float maxVerticalErr
 		width += 2;
 
 		for ( i = 0; i < height; i++ ) {
-			arcSurface_Patch::LerpVert( verts[i*maxWidth + j  ], verts[i*maxWidth + j+1], prev );
-			arcSurface_Patch::LerpVert( verts[i*maxWidth + j+1], verts[i*maxWidth + j+2], next );
-			arcSurface_Patch::LerpVert( prev, next, mid );
+			anSurface_Patch::LerpVert( verts[i*maxWidth + j  ], verts[i*maxWidth + j+1], prev );
+			anSurface_Patch::LerpVert( verts[i*maxWidth + j+1], verts[i*maxWidth + j+2], next );
+			anSurface_Patch::LerpVert( prev, next, mid );
 
 			for ( k = width - 1; k > j + 3; k-- ) {
 				verts[i*maxWidth + k] = verts[i*maxWidth + k-2];

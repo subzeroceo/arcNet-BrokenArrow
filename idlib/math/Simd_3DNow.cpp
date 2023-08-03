@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "Simd_Generic.h"
@@ -19,7 +19,7 @@
 idSIMD_3DNow::GetName
 ============
 */
-const char * idSIMD_3DNow::GetName( void ) const {
+const char *idSIMD_3DNow::GetName( void ) const {
 	return "MMX & 3DNow!";
 }
 

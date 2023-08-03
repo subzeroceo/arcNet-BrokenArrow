@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
 */
 typedef struct {
 	bool		searched;
-	arcNetString		searchText;
+	anString		searchText;
 	int			nameOnly;
 	int			searchScope;
 } MaterialSearchData_t;

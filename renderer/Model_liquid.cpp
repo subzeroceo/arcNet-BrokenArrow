@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -9,10 +9,10 @@
 
 /*
 ====================
-ARCLiquidModel::ARCLiquidModel
+anLiquidModel::anLiquidModel
 ====================
 */
-ARCLiquidModel::ARCLiquidModel() {
+anLiquidModel::anLiquidModel() {
 	verts_x		= 32;
 	verts_y		= 32;
 	scale_x		= 256.0f;
@@ -22,7 +22,7 @@ ARCLiquidModel::ARCLiquidModel() {
 	drop_height = 4;
 	drop_radius = 4;
 	drop_delay	= 1000;
-    shader		= declManager->FindMaterial( NULL );
+    shader		= declManager->FindMaterial( nullptr );
 	update_tics	= 33;  // ~30 hz
 	time		= 0;
 	seed		= 0;
@@ -32,20 +32,20 @@ ARCLiquidModel::ARCLiquidModel() {
 
 /*
 ====================
-ARCLiquidModel::GenerateSurface
+anLiquidModel::GenerateSurface
 ====================
 */
-modelSurface_t ARCLiquidModel::GenerateSurface( float lerp ) {
-	surfTriangles_t	*tri;
+modelSurface_t anLiquidModel::GenerateSurface( float lerp ) {
+	srfTriangles_t	*tri;
 	int				i, base;
-	arcDrawVert		*vert;
+	anDrawVertex		*vert;
 	modelSurface_t	surf;
 	float			inv_lerp;
 
 	inv_lerp = 1.0f - lerp;
 	vert = verts.Ptr();
 	for ( i = 0; i < verts.Num(); i++, vert++ ) {
-		vert->xyz.z = page1[ i ] * lerp + page2[ i ] * inv_lerp;
+		vert->xyz.z = page1[i] * lerp + page2[i] * inv_lerp;
 	}
 
 	tr.pc.deformedSurfaces++;
@@ -97,10 +97,10 @@ modelSurface_t ARCLiquidModel::GenerateSurface( float lerp ) {
 
 /*
 ====================
-ARCLiquidModel::WaterDrop
+anLiquidModel::WaterDrop
 ====================
 */
-void ARCLiquidModel::WaterDrop( int x, int y, float *page ) {
+void anLiquidModel::WaterDrop( int x, int y, float *page ) {
 	int		cx, cy;
 	int		left,top,right,bottom;
 	int		square;
@@ -120,24 +120,24 @@ void ARCLiquidModel::WaterDrop( int x, int y, float *page ) {
 
 	// Perform edge clipping...
 	if ( x - drop_radius < 1 ) {
-		left -= (x-drop_radius-1 );
+		left -= ( x-drop_radius-1 );
 	}
 	if ( y - drop_radius < 1 ) {
-		top -= (y-drop_radius-1 );
+		top -= ( y-drop_radius-1 );
 	}
 	if ( x + drop_radius > verts_x - 1 ) {
-		right -= (x+drop_radius-verts_x+1 );
+		right -= ( x+drop_radius-verts_x+1 );
 	}
 	if ( y + drop_radius > verts_y - 1 ) {
-		bottom-= (y+drop_radius-verts_y+1 );
+		bottom-= ( y+drop_radius-verts_y+1 );
 	}
 
 	for ( cy = top; cy < bottom; cy++ ) {
 		for ( cx = left; cx < right; cx++ ) {
 			square = cy*cy + cx*cx;
 			if ( square < radsquare ) {
-				dist = arcMath::Sqrt( ( float )square * invlength );
-				page[verts_x*(cy+y) + cx+x] += arcMath::Cos16( dist * arcMath::PI * 0.5f ) * drop_height;
+				dist = anMath::Sqrt( ( float )square * invlength );
+				page[verts_x*( cy+y ) + cx+x] += anMath::Cos16( dist * anMath::PI * 0.5f ) * drop_height;
 			}
 		}
 	}
@@ -145,10 +145,10 @@ void ARCLiquidModel::WaterDrop( int x, int y, float *page ) {
 
 /*
 ====================
-ARCLiquidModel::IntersectBounds
+anLiquidModel::IntersectBounds
 ====================
 */
-void ARCLiquidModel::IntersectBounds( const arcBounds &bounds, float displacement ) {
+void anLiquidModel::IntersectBounds( const anBounds &bounds, float displacement ) {
 	int		cx, cy;
 	int		left,top,right,bottom;
 	float	up, down;
@@ -191,10 +191,10 @@ void ARCLiquidModel::IntersectBounds( const arcBounds &bounds, float displacemen
 
 /*
 ====================
-ARCLiquidModel::Update
+anLiquidModel::Update
 ====================
 */
-void ARCLiquidModel::Update( void ) {
+void anLiquidModel::Update( void ) {
 	int		x, y;
 	float	*p2;
 	float	*p1;
@@ -202,7 +202,7 @@ void ARCLiquidModel::Update( void ) {
 
 	time += update_tics;
 
-	idSwap( page1, page2 );
+	anSwap( page1, page2 );
 
 	if ( time > nextDropTime ) {
 		WaterDrop( -1, -1, page2 );
@@ -214,7 +214,7 @@ void ARCLiquidModel::Update( void ) {
 	p1 = page1;
 	p2 = page2;
 
-	switch( liquid_type ) {
+	switch ( liquid_type ) {
 	case 0 :
 		for ( y = 1; y < verts_y - 1; y++ ) {
 			p2 += verts_x;
@@ -283,10 +283,10 @@ void ARCLiquidModel::Update( void ) {
 
 /*
 ====================
-ARCLiquidModel::Reset
+anLiquidModel::Reset
 ====================
 */
-void ARCLiquidModel::Reset() {
+void anLiquidModel::Reset() {
 	int	i, x, y;
 
 	if ( pages.Num() < 2 * verts_x * verts_y ) {
@@ -302,23 +302,23 @@ void ARCLiquidModel::Reset() {
 
 	for ( i = 0, y = 0; y < verts_y; y++ ) {
 		for ( x = 0; x < verts_x; x++, i++ ) {
-			page1[ i ] = 0.0f;
-			page2[ i ] = 0.0f;
-			verts[ i ].xyz.z = 0.0f;
+			page1[i] = 0.0f;
+			page2[i] = 0.0f;
+			verts[i].xyz.z = 0.0f;
 		}
 	}
 }
 
 /*
 ====================
-ARCLiquidModel::InitFromFile
+anLiquidModel::InitFromFile
 ====================
 */
-void ARCLiquidModel::InitFromFile( const char *fileName ) {
+void anLiquidModel::InitFromFile( const char *fileName ) {
 	int				i, x, y;
-	arcNetToken			token;
-	ARCParser		parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS );
-	arcNetList<int>		tris;
+	anToken			token;
+	anParser		parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS );
+	anList<int>		tris;
 	float			size_x, size_y;
 	float			rate;
 
@@ -398,11 +398,11 @@ void ARCLiquidModel::InitFromFile( const char *fileName ) {
 	verts.SetNum( verts_x * verts_y );
 	for ( i = 0, y = 0; y < verts_y; y++ ) {
 		for ( x = 0; x < verts_x; x++, i++ ) {
-			page1[ i ] = 0.0f;
-			page2[ i ] = 0.0f;
-			verts[ i ].Clear();
-			verts[ i ].xyz.Set( x * scale_x, y * scale_y, 0.0f );
-			verts[ i ].st.Set( ( float ) x / ( float )( verts_x - 1 ), ( float ) -y / ( float )( verts_y - 1 ) );
+			page1[i] = 0.0f;
+			page2[i] = 0.0f;
+			verts[i].Clear();
+			verts[i].xyz.Set( x * scale_x, y * scale_y, 0.0f );
+			verts[i].st.Set( ( float ) x / ( float )( verts_x - 1 ), ( float ) -y / ( float )( verts_y - 1 ) );
 		}
 	}
 
@@ -424,33 +424,33 @@ void ARCLiquidModel::InitFromFile( const char *fileName ) {
 	deformInfo = R_BuildDeformInfo( verts.Num(), verts.Ptr(), tris.Num(), tris.Ptr(), true );
 
 	bounds.Clear();
-	bounds.AddPoint( arcVec3( 0.0f, 0.0f, drop_height * -10.0f ) );
-	bounds.AddPoint( arcVec3( ( verts_x - 1 ) * scale_x, ( verts_y - 1 ) * scale_y, drop_height * 10.0f ) );
+	bounds.AddPoint( anVec3( 0.0f, 0.0f, drop_height * -10.0f ) );
+	bounds.AddPoint( anVec3( ( verts_x - 1 ) * scale_x, ( verts_y - 1 ) * scale_y, drop_height * 10.0f ) );
 
 	// set the timestamp for reloadmodels
-	fileSystem->ReadFile( name, NULL, &timeStamp );
+	fileSystem->ReadFile( name, nullptr, &timeStamp );
 
 	Reset();
 }
 
 /*
 ====================
-ARCLiquidModel::InstantiateDynamicModel
+anLiquidModel::InstantiateDynamicModel
 ====================
 */
-ARCRenderModel *ARCLiquidModel::InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel ) {
-	aRcModelStatic	*staticModel;
+anRenderModel *anLiquidModel::InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel ) {
+	anModelStatic	*staticModel;
 	int		frames;
 	int		t;
 	float	lerp;
 
 	if ( cachedModel ) {
 		delete cachedModel;
-		cachedModel = NULL;
+		cachedModel = nullptr;
 	}
 
 	if ( !deformInfo ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( !view ) {
@@ -477,7 +477,7 @@ ARCRenderModel *ARCLiquidModel::InstantiateDynamicModel( const struct renderEnti
 	lerp = ( float )( t - time ) / ( float )update_tics;
 	modelSurface_t surf = GenerateSurface( lerp );
 
-	staticModel = new aRcModelStatic;
+	staticModel = new anModelStatic;
 	staticModel->AddSurface( surf );
 	staticModel->bounds = surf.geometry->bounds;
 
@@ -486,19 +486,19 @@ ARCRenderModel *ARCLiquidModel::InstantiateDynamicModel( const struct renderEnti
 
 /*
 ====================
-ARCLiquidModel::IsDynamicModel
+anLiquidModel::IsDynamicModel
 ====================
 */
-dynamicModel_t ARCLiquidModel::IsDynamicModel() const {
+dynamicModel_t anLiquidModel::IsDynamicModel() const {
 	return DM_CONTINUOUS;
 }
 
 /*
 ====================
-ARCLiquidModel::Bounds
+anLiquidModel::Bounds
 ====================
 */
-arcBounds ARCLiquidModel::Bounds(const struct renderEntity_s *ent) const {
+anBounds anLiquidModel::Bounds(const struct renderEntity_s *ent) const {
 	// FIXME: need to do this better
 	return bounds;
 }

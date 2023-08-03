@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -9,7 +9,7 @@
 #include <GL/glu.h>
 
 #include "../../renderer/tr_local.h"
-#include "../../renderer/model_local.h"	// for idRenderModelMD5
+#include "../../renderer/model_local.h"	// for anRenderModelM8D
 
 #ifdef _DEBUG
 	#define new DEBUG_NEW
@@ -42,12 +42,12 @@ void ValidateAxialPoints() {
 IMPLEMENT_DYNCREATE(CCamWnd, CWnd);
 
 CCamWnd::CCamWnd() {
-	m_pXYFriend = NULL;
+	m_pXYFriend = nullptr;
 	memset( &m_Camera, 0, sizeof( camera_t ) );
-	m_pSide_select = NULL;
+	m_pSide_select = nullptr;
 	m_bClipMode = false;
 	worldDirty = true;
-	worldModel = NULL;
+	worldModel = nullptr;
 	renderMode = false;
 	rebuildMode = false;
 	entityMode = false;
@@ -118,7 +118,7 @@ BOOL CCamWnd::PreCreateWindow( CREATESTRUCT &cs ) {
 		// wc.style = CS_NOCLOSE | CS_OWNDC;
 		wc.style = CS_NOCLOSE;
 		wc.lpszClassName = CAMERA_WINDOW_CLASS;
-		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 		wc.lpfnWndProc = CamWndProc;
 		if (AfxRegisterClass(&wc) == FALSE) {
 			Error( "CCamWnd RegisterClass: failed" );
@@ -144,7 +144,7 @@ void CCamWnd::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
 	g_pParentWnd->HandleKey(nChar, nRepCnt, nFlags);
 }
 
-brush_t *g_pSplitList = NULL;
+brush_t *g_pSplitList = nullptr;
 
 void CCamWnd::OnPaint() {
 	CPaintDC	dc( this );	// device context for painting
@@ -155,7 +155,7 @@ void CCamWnd::OnPaint() {
 		common->Printf( "Please restart " EDITOR_WINDOWTEXT " if the camera view is not working\n" );
 	} else {
 		QE_CheckOpenGLForErrors();
-		g_pSplitList = NULL;
+		g_pSplitList = nullptr;
 		if (g_bClipMode) {
 			if (g_Clip1.Set() && g_Clip2.Set() ) {
 				g_pSplitList = ((g_pParentWnd->ActiveXY()->GetViewType() == XZ) ? !g_bSwitch : g_bSwitch) ? &g_brBackSplits : &g_brFrontSplits;
@@ -184,7 +184,7 @@ extern void Select_RotateTexture(float amt, bool absolute);
 void CCamWnd::OnMouseMove(UINT nFlags, CPoint point) {
 	CRect	r;
 	GetClientRect(r);
-	if	(GetCapture() == this && (GetAsyncKeyState(VK_MENU) & 0x8000) && !((GetAsyncKeyState(VK_SHIFT) & 0x8000) || (GetAsyncKeyState(VK_CONTROL) & 0x8000) )) {
+	if	(GetCapture() == this && (GetAsyncKeyState(VK_MENU) & 0x8000) && !((GetAsyncKeyState(VK_SHIFT) & 0x8000) || (GetAsyncKeyState(VK_CONTROL) & 0x8000) ) ) {
 		if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
 			Select_RotateTexture(( float )point.y - m_ptLastCursor.y);
 		} else if (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
@@ -271,7 +271,7 @@ int CCamWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 		if ( !qwglUseFontBitmaps(hDC, 0, 255, g_qeglobals.d_font_list) ) {
 			common->Warning( "wglUseFontBitmaps failed again (%d).  Trying outlines.", GetLastError() );
 
-			if ( !qwglUseFontOutlines(hDC, 0, 255, g_qeglobals.d_font_list, 0.0f, 0.1f, WGL_FONT_LINES, NULL) ) {
+			if ( !qwglUseFontOutlines(hDC, 0, 255, g_qeglobals.d_font_list, 0.0f, 0.1f, WGL_FONT_LINES, nullptr ) ) {
 				common->Warning( "wglUseFontOutlines also failed (%d), no coordinate text will be visible.", GetLastError() );
 			}
 		}
@@ -296,7 +296,7 @@ void CCamWnd::OriginalMouseUp(UINT nFlags, CPoint point) {
 	CRect	r;
 	GetClientRect(r);
 	Cam_MouseUp(point.x, r.bottom - 1 - point.y, nFlags);
-	if ( !(nFlags & (MK_LBUTTON | MK_RBUTTON | MK_MBUTTON) )) {
+	if ( !(nFlags & (MK_LBUTTON | MK_RBUTTON | MK_MBUTTON) ) ) {
 		ReleaseCapture();
 	}
 }
@@ -327,8 +327,8 @@ void CCamWnd::Cam_BuildMatrix() {
 	float	matrix[4][4];
 	int		i;
 
-	xa = ((renderMode) ? -m_Camera.angles[PITCH] : m_Camera.angles[PITCH] ) * arcMath::M_DEG2RAD;
-	ya = m_Camera.angles[YAW] * arcMath::M_DEG2RAD;
+	xa = ((renderMode) ? -m_Camera.angles[PITCH] : m_Camera.angles[PITCH] ) * anMath::M_DEG2RAD;
+	ya = m_Camera.angles[YAW] * anMath::M_DEG2RAD;
 
 	// the movement matrix is kept 2d
 	m_Camera.forward[0] = cos(ya);
@@ -353,7 +353,7 @@ void CCamWnd::Cam_BuildMatrix() {
 void CCamWnd::Cam_ChangeFloor(bool up) {
 	brush_t *b;
 	float	d, bestd, current;
-	arcVec3	start, dir;
+	anVec3	start, dir;
 
 	start[0] = m_Camera.origin[0];
 	start[1] = m_Camera.origin[1];
@@ -457,7 +457,7 @@ void CCamWnd::Cam_MouseControl(float dtime) {
 	} else
 #endif
 	{
-		xf *= 1.0f - arcMath::Fabs(yf);
+		xf *= 1.0f - anMath::Fabs(yf);
 		if ( xf < 0.0f ) {
 			xf += 0.1f;
 			if ( xf > 0.0f ) {
@@ -481,7 +481,7 @@ void CCamWnd::Cam_MouseControl(float dtime) {
 }
 
 void CCamWnd::Cam_MouseDown( int x, int y, int buttons) {
-	arcVec3	dir;
+	anVec3	dir;
 	float	f, r, u;
 	int		i;
 
@@ -519,7 +519,7 @@ void CCamWnd::Cam_MouseDown( int x, int y, int buttons) {
 		(buttons == (nMouseButton | MK_CONTROL) ) ||
 		(buttons == (nMouseButton | MK_SHIFT | MK_CONTROL) )
 	) {
-		if (g_PrefsDlg.m_nMouseButtons == 2 && (buttons == (MK_RBUTTON | MK_SHIFT) )) {
+		if (g_PrefsDlg.m_nMouseButtons == 2 && (buttons == (MK_RBUTTON | MK_SHIFT) ) ) {
 			Cam_MouseControl( 0.1f );
 		}
 		else {
@@ -592,7 +592,7 @@ void CCamWnd::InitCull() {
 
 bool CCamWnd::CullBrush(brush_t *b, bool cubicOnly) {
 	int		i;
-	arcVec3	point;
+	anVec3	point;
 	float	d;
 
 	if ( b->forceVisibile ) {
@@ -602,7 +602,7 @@ bool CCamWnd::CullBrush(brush_t *b, bool cubicOnly) {
 	if (g_PrefsDlg.m_bCubicClipping) {
 		float distance = g_PrefsDlg.m_nCubicScale * 64;
 
-		arcVec3 mid;
+		anVec3 mid;
 		for ( int i = 0; i < 3; i++ ) {
 			mid[i] = (b->mins[i] + ((b->maxs[i] - b->mins[i] ) / 2) );
 		}
@@ -697,13 +697,13 @@ void setGLMode( int mode) {
 }
 
 
-extern void glLabeledPoint(arcVec4 &color, arcVec3 &point, float size, const char *label);
+extern void glLabeledPoint(anVec4 &color, anVec3 &point, float size, const char *label);
 void DrawAxial(face_t *selFace) {
 	if (g_bAxialMode) {
-		arcVec3 points[4];
+		anVec3 points[4];
 
 		for ( int j = 0; j < selFace->face_winding->GetNumPoints(); j++ ) {
-			glLabeledPoint(arcVec4( 1, 1, 1, 1 ), (*selFace->face_winding)[j].ToVec3(), 3, va( "%i", j) );
+			glLabeledPoint(anVec4( 1, 1, 1, 1 ), (*selFace->face_winding)[j].ToVec3(), 3, va( "%i", j) );
 		}
 
 		ValidateAxialPoints();
@@ -713,8 +713,8 @@ void DrawAxial(face_t *selFace) {
 		points[3] = (*selFace->face_winding)[g_axialDest].ToVec3();
 		VectorMA (points[3], 1, selFace->plane, points[3] );
 		VectorMA (points[3], 4, selFace->plane, points[2] );
-		glLabeledPoint(arcVec4( 1, 0, 0, 1 ), points[1], 3, "Anchor" );
-		glLabeledPoint(arcVec4( 1, 1, 0, 1 ), points[2], 3, "Dest" );
+		glLabeledPoint(anVec4( 1, 0, 0, 1 ), points[1], 3, "Anchor" );
+		glLabeledPoint(anVec4( 1, 1, 0, 1 ), points[2], 3, "Dest" );
 		qglBegin ( GL_LINE_STRIP );
 		qglVertex3fv( points[0].ToFloatPtr() );
 		qglVertex3fv( points[1].ToFloatPtr() );
@@ -726,7 +726,7 @@ void DrawAxial(face_t *selFace) {
 
 void CCamWnd::SetProjectionMatrix() {
 	float xfov = 90;
-	float yfov = 2 * atan(( float )m_Camera.height / m_Camera.width) * arcMath::M_RAD2DEG;
+	float yfov = 2 * atan(( float )m_Camera.height / m_Camera.width) * anMath::M_RAD2DEG;
 #if 0
 	float screenaspect = ( float )m_Camera.width / m_Camera.height;
 	qglLoadIdentity();
@@ -742,10 +742,10 @@ void CCamWnd::SetProjectionMatrix() {
 	//
 	zNear	= r_znear.GetFloat();
 
-	yMax = zNear * tan( yfov * arcMath::PI / 360.0f );
+	yMax = zNear * tan( yfov * anMath::PI / 360.0f );
 	yMin = -yMax;
 
-	xMax = zNear * tan( xfov * arcMath::PI / 360.0f );
+	xMax = zNear * tan( xfov * anMath::PI / 360.0f );
 	xMin = -xMax;
 
 	width = xMax - xMin;
@@ -789,7 +789,7 @@ void CCamWnd::Cam_Draw() {
 
 	// set the sound origin for both simple draw and rendered mode
 	// the editor uses opposite pitch convention
-	arcMat3	axis = arcAngles( -m_Camera.angles.pitch, m_Camera.angles.yaw, m_Camera.angles.roll ).ToMat3();
+	anMat3	axis = anAngles( -m_Camera.angles.pitch, m_Camera.angles.yaw, m_Camera.angles.roll ).ToMat3();
 	g_qeglobals.sw->PlaceListener( m_Camera.origin, axis, 0, Sys_Milliseconds(), "Undefined" );
 
 	if (renderMode) {
@@ -979,7 +979,7 @@ void CCamWnd::OnSize(UINT nType, int cx, int cy) {
 	GetClientRect(rect);
 	m_Camera.width = rect.right;
 	m_Camera.height = rect.bottom;
-	InvalidateRect(NULL, false);
+	InvalidateRect(nullptr, false);
 }
 
 void CCamWnd::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags) {
@@ -993,8 +993,8 @@ void CCamWnd::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags) {
 //
 void CCamWnd::ShiftTexture_BrushPrimit(face_t *f, int x, int y) {
 /*
-	arcVec3	texS, texT;
-	arcVec3	viewX, viewY;
+	anVec3	texS, texT;
+	anVec3	viewX, viewY;
 	int		XS, XT, YS, YT;
 	int		outS, outT;
 #ifdef _DEBUG
@@ -1049,12 +1049,12 @@ BuildEntityRenderState
 Creates or updates modelDef and lightDef for an entity
 ================
 */
-int Brush_ToTris(brush_t *brush, aRcTriangleList *tris, arcMatList *mats, bool models, bool bmodel);
+int Brush_ToTris(brush_t *brush, anTriangleList *tris, anMatList *mats, bool models, bool bmodel);
 
 void CCamWnd::BuildEntityRenderState( entity_t *ent, bool update) {
 	const char	*v;
-	arcDictionary		spawnArgs;
-	const char	*name = NULL;
+	anDict		spawnArgs;
+	const char	*name = nullptr;
 
 	Entity_UpdateSoundEmitter( ent );
 
@@ -1096,8 +1096,8 @@ void CCamWnd::BuildEntityRenderState( entity_t *ent, bool update) {
 
 		if ( !stricmp( name, v ) ) {
 			// build the model from brushes
-			aRcTriangleList tris(1024);
-			arcMatList mats(1024);
+			anTriangleList tris(1024);
+			anMatList mats(1024);
 
 			for (brush_t *b = ent->brushes.onext; b != &ent->brushes; b = b->onext) {
 				Brush_ToTris( b, &tris, &mats, false, true);
@@ -1108,7 +1108,7 @@ void CCamWnd::BuildEntityRenderState( entity_t *ent, bool update) {
 				ent->modelDef = -1;
 			}
 
-			ARCRenderModel *bmodel = renderModelManager->FindModel( name );
+			anRenderModel *bmodel = renderModelManager->FindModel( name );
 
 			if ( bmodel ) {
 				renderModelManager->RemoveModel( bmodel );
@@ -1139,9 +1139,9 @@ void CCamWnd::BuildEntityRenderState( entity_t *ent, bool update) {
 			// use the game's epair parsing code so
 			// we can use the same renderEntity generation
 			engineEdit->ParseSpawnArgsToRenderEntity( &spawnArgs, &refent );
-			idRenderModelMD5 *md5 = dynamic_cast<idRenderModelMD5 *>( refent.hModel );
+			anRenderModelM8D *md5 = dynamic_cast<anRenderModelM8D *>( refent.hModel );
 			if (md5) {
-				arcNetString str;
+				anString str;
 				spawnArgs.GetString( "anim", "idle", str);
 				refent.numJoints = md5->NumJoints();
 				if ( update && refent.joints ) {
@@ -1153,7 +1153,7 @@ void CCamWnd::BuildEntityRenderState( entity_t *ent, bool update) {
 				if ( frame < 1 ) {
 					frame = 1;
 				}
-				const arcVec3 &offset = engineEdit->ANIM_GetModelOffsetFromEntityDef( spawnArgs.GetString( "classname" ) );
+				const anVec3 &offset = engineEdit->ANIM_GetModelOffsetFromEntityDef( spawnArgs.GetString( "classname" ) );
 				engineEdit->ANIM_CreateAnimFrame( md5, anim, refent.numJoints, refent.joints, ( frame * 1000 ) / 24, offset, false );
 			}
 			if (ent->modelDef >= 0 ) {
@@ -1190,29 +1190,29 @@ void CCamWnd::BuildEntityRenderState( entity_t *ent, bool update) {
 
 }
 
-void Tris_ToOBJ(const char *outFile, aRcTriangleList *tris, arcMatList *mats) {
-	arcNetFile *f = fileSystem->OpenExplicitFileWrite( outFile );
+void Tris_ToOBJ(const char *outFile, anTriangleList *tris, anMatList *mats) {
+	anFile *f = fileSystem->OpenExplicitFileWrite( outFile );
 	if ( f ) {
 		char out[1024];
 		strcpy(out, outFile);
 		StripExtension(out);
 
-		arcNetList<arcNetString*> matNames;
+		anList<anString*> matNames;
 		int i, j, k;
 		int indexBase = 1;
-		arcNetString lastMaterial( "" );
+		anString lastMaterial( "" );
 		int matCount = 0;
-		//arcNetString basePath = cvarSystem->GetCVarString( "fs_savepath" );
+		//anString basePath = cvarSystem->GetCVarString( "fs_savepath" );
 		f->Printf( "mtllib %s.mtl\n", out );
 		for ( i = 0; i < tris->Num(); i++ ) {
-			surfTriangles_t *tri = (*tris)[i];
-			for (j = 0; j < tri->numVerts; j++ ) {
+			srfTriangles_t *tri = (*tris)[i];
+			for ( j = 0; j < tri->numVerts; j++ ) {
 				f->Printf( "v %f %f %f\n", tri->verts[j].xyz.x, tri->verts[j].xyz.z, -tri->verts[j].xyz.y );
 			}
-			for (j = 0; j < tri->numVerts; j++ ) {
+			for ( j = 0; j < tri->numVerts; j++ ) {
 				f->Printf( "vt %f %f\n", tri->verts[j].st.x, 1.0f - tri->verts[j].st.y );
 			}
-			for (j = 0; j < tri->numVerts; j++ ) {
+			for ( j = 0; j < tri->numVerts; j++ ) {
 				f->Printf( "vn %f %f %f\n", tri->verts[j].normal.x, tri->verts[j].normal.y, tri->verts[j].normal.z );
 			}
 
@@ -1221,7 +1221,7 @@ void Tris_ToOBJ(const char *outFile, aRcTriangleList *tris, arcMatList *mats) {
 
 				bool found = false;
 				for (k = 0; k < matNames.Num(); k++ ) {
-					if ( arcNetString::Icmp(matNames[k]->c_str(), lastMaterial.c_str() ) == 0 ) {
+					if ( anString::Icmp(matNames[k]->c_str(), lastMaterial.c_str() ) == 0 ) {
 						found = true;
 						// f->Printf( "usemtl m%i\n", k );
 						f->Printf( "usemtl %s\n", lastMaterial.c_str() );
@@ -1232,7 +1232,7 @@ void Tris_ToOBJ(const char *outFile, aRcTriangleList *tris, arcMatList *mats) {
 				if ( !found) {
 					// f->Printf( "usemtl m%i\n", matCount++ );
 					f->Printf( "usemtl %s\n", lastMaterial.c_str() );
-					matNames.Append(new arcNetString(lastMaterial) );
+					matNames.Append(new anString(lastMaterial) );
 				}
 			}
 
@@ -1262,10 +1262,10 @@ void Tris_ToOBJ(const char *outFile, aRcTriangleList *tris, arcMatList *mats) {
 	}
 }
 
-int Brush_TransformModel(brush_t *brush, aRcTriangleList *tris, arcMatList *mats) {
+int Brush_TransformModel(brush_t *brush, anTriangleList *tris, anMatList *mats) {
 	int ret = 0;
 	if (brush->modelHandle > 0 ) {
-		ARCRenderModel *model = brush->modelHandle;
+		anRenderModel *model = brush->modelHandle;
 		if (model) {
 			float	a = FloatForKey(brush->owner, "angle" );
 			float	s, c;
@@ -1275,7 +1275,7 @@ int Brush_TransformModel(brush_t *brush, aRcTriangleList *tris, arcMatList *mats
 				s = sin( DEG2RAD( a ) );
 				c = cos( DEG2RAD( a ) );
 			}
-			arcMat3 mat;
+			anMat3 mat;
 			if (GetMatrixForKey(brush->owner, "rotation", mat) ) {
 				matrix = true;
 			}
@@ -1283,10 +1283,10 @@ int Brush_TransformModel(brush_t *brush, aRcTriangleList *tris, arcMatList *mats
 
 			for ( int i = 0; i < model->NumSurfaces(); i++ ) {
 				const modelSurface_t	*surf = model->Surface( i );
-				surfTriangles_t	*tri = surf->geometry;
-				surfTriangles_t *tri2 = R_CopyStaticTriSurf(tri);
+				srfTriangles_t	*tri = surf->geometry;
+				srfTriangles_t *tri2 = R_CopyStaticTriSurf(tri);
 				for ( int j = 0; j < tri2->numVerts; j++ ) {
-					arcVec3	v;
+					anVec3	v;
 					if (matrix) {
 						v = tri2->verts[j].xyz * brush->owner->rotation + brush->owner->origin;
 					} else {
@@ -1316,9 +1316,9 @@ int Brush_TransformModel(brush_t *brush, aRcTriangleList *tris, arcMatList *mats
 
 
 #define	MAX_TRI_SURFACES 16384
-int Brush_ToTris(brush_t *brush, aRcTriangleList *tris, arcMatList *mats, bool models, bool bmodel) {
+int Brush_ToTris(brush_t *brush, anTriangleList *tris, anMatList *mats, bool models, bool bmodel) {
 	int i, j;
-	surfTriangles_t	*tri;
+	srfTriangles_t	*tri;
 	//
 	// patches
 	//
@@ -1333,7 +1333,7 @@ int Brush_ToTris(brush_t *brush, aRcTriangleList *tris, arcMatList *mats, bool m
 	int numSurfaces = 0;
 
 	if ( brush->owner->eclass->fixedsize && !brush->entityModel) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( brush->pPatch ) {
@@ -1343,7 +1343,7 @@ int Brush_ToTris(brush_t *brush, aRcTriangleList *tris, arcMatList *mats, bool m
 		pm = brush->pPatch;
 
 		// build a patch mesh
-		arcSurface_Patch *cp = new arcSurface_Patch( pm->width * 6, pm->height * 6 );
+		anSurface_Patch *cp = new anSurface_Patch( pm->width * 6, pm->height * 6 );
 		cp->SetSize( pm->width, pm->height );
 		for ( i = 0; i < pm->width; i++ ) {
 			for ( j = 0; j < pm->height; j++ ) {
@@ -1399,7 +1399,7 @@ int Brush_ToTris(brush_t *brush, aRcTriangleList *tris, arcMatList *mats, bool m
 	// normal brush
 	//
 	for ( face_t *face = brush->brush_faces; face; face = face->next ) {
-		arcWinding *w;
+		anWinding *w;
 
 		w = face->face_winding;
 		if ( !w) {
@@ -1446,10 +1446,10 @@ int Brush_ToTris(brush_t *brush, aRcTriangleList *tris, arcMatList *mats, bool m
 
 void Select_ToOBJ() {
 	int i;
-	CFileDialog dlgFile(FALSE, "obj", NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, "Wavefront object files (*.obj)|*.obj||", g_pParentWnd);
+	CFileDialog dlgFile(FALSE, "obj", nullptr, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, "Wavefront object files (*.obj)|*.obj||", g_pParentWnd);
 	if (dlgFile.DoModal() == IDOK) {
-		aRcTriangleList tris(1024);
-		arcMatList mats(1024);
+		anTriangleList tris(1024);
+		anMatList mats(1024);
 
 		for (brush_t *b = selected_brushes.next; b != &selected_brushes; b = b->next) {
 			if ( b->hiddenBrush ) {
@@ -1473,16 +1473,16 @@ void Select_ToOBJ() {
 }
 
 void Select_ToCM() {
-	CFileDialog dlgFile( FALSE, "lwo, ase", NULL, 0, "(*.lwo)|*.lwo|(*.ase)|*.ase|(*.ma)|*.ma||", g_pParentWnd );
+	CFileDialog dlgFile( FALSE, "lwo, ase", nullptr, 0, "(*.lwo)|*.lwo|(*.ase)|*.ase|(*.ma)|*.ma||", g_pParentWnd );
 	if ( dlgFile.DoModal() == IDOK ) {
-		idMapEntity *mapEnt;
-		idMapPrimitive *p;
-		arcNetString name;
+		anMapEntity *mapEnt;
+		anMapPrimitiveitive *p;
+		anString name;
 
 		name = fileSystem->OSPathToRelativePath( dlgFile.GetPathName() );
 		name.BackSlashesToSlashes();
 
-		mapEnt = new idMapEntity();
+		mapEnt = new anMapEntity();
 		mapEnt->epairs.Set( "name", name.c_str() );
 
 		for ( brush_t *b = selected_brushes.next; b != &selected_brushes; b = b->next ) {
@@ -1523,7 +1523,7 @@ void CCamWnd::BuildRendererState() {
 	FreeRendererState();
 
 	// the renderWorld holds all the references and defs
-	g_qeglobals.rw->InitFromMap( NULL );
+	g_qeglobals.rw->InitFromMap( nullptr );
 
 	// create the raw model for all the brushes
 	int numBrushes = 0;
@@ -1534,7 +1534,7 @@ void CCamWnd::BuildRendererState() {
 	worldModel->InitEmpty( "EditorWorldModel" );
 
 	for ( brush_t *brushList = &active_brushes; brushList ;
-		brushList = (brushList == &active_brushes) ? &selected_brushes : NULL ) {
+		brushList = (brushList == &active_brushes) ? &selected_brushes : nullptr ) {
 		for (brush = brushList->next; brush != brushList; brush = brush->next) {
 			if ( brush->hiddenBrush ) {
 				continue;
@@ -1548,8 +1548,8 @@ void CCamWnd::BuildRendererState() {
 				continue;
 			}
 
-			aRcTriangleList tris(1024);
-			arcMatList mats(1024);
+			anTriangleList tris(1024);
+			anMatList mats(1024);
 
 			if ( !IsBModel(brush) ) {
 				numSurfaces += Brush_ToTris( brush, &tris, &mats, false, false );
@@ -1645,11 +1645,11 @@ void CCamWnd::FreeRendererState() {
 			if ( refent ) {
 				if ( refent->callbackData ) {
 					Mem_Free( refent->callbackData );
-					refent->callbackData = NULL;
+					refent->callbackData = nullptr;
 				}
 				if ( refent->joints ) {
 					Mem_Free16(refent->joints);
-					refent->joints = NULL;
+					refent->joints = nullptr;
 				}
 			}
 			g_qeglobals.rw->FreeEntityDef( ent->modelDef );
@@ -1659,7 +1659,7 @@ void CCamWnd::FreeRendererState() {
 
 	if ( worldModel ) {
 		renderModelManager->FreeModel( worldModel );
-		worldModel = NULL;
+		worldModel = nullptr;
 	}
 }
 
@@ -1671,7 +1671,7 @@ CCamWnd::UpdateCaption
 ========================
 */
 void CCamWnd::UpdateCaption() {
-	arcNetString strCaption;
+	anString strCaption;
 
 	if (worldDirty) {
 		strCaption = "*";
@@ -1735,7 +1735,7 @@ CCamWnd::ToggleRenderMode
 void CCamWnd::ToggleAnimationMode() {
 	animationMode ^= 1;
 	if (animationMode)  {
-		SetTimer(0, 10, NULL);
+		SetTimer(0, 10, nullptr );
 	} else {
 		KillTimer(0 );
 	}
@@ -1791,7 +1791,7 @@ CCamWnd::DrawEntityData
   Draws entity data ( experimental )
 =========================
 */
-extern void QGLBox(arcVec4 &color, arcVec3 &point, float size);
+extern void QGLBox(anVec4 &color, anVec3 &point, float size);
 void CCamWnd::DrawEntityData() {
 	qglMatrixMode( GL_MODELVIEW );
 	qglLoadIdentity();
@@ -1816,7 +1816,7 @@ void CCamWnd::DrawEntityData() {
 	qglDisable( GL_DEPTH_TEST);
 	qglPolygonMode( GL_FRONT_AND_BACK, GL_LINE);
 	globalImages->BindNull();
-	arcVec3 color(0, 1, 0 );
+	anVec3 color(0, 1, 0 );
 	qglColor3fv( color.ToFloatPtr() );
 
 	brush_t *brushList = &active_brushes;
@@ -1836,7 +1836,7 @@ void CCamWnd::DrawEntityData() {
 			}
 
 		}
-		brushList = (brushList == &active_brushes) ? &selected_brushes : NULL;
+		brushList = (brushList == &active_brushes) ? &selected_brushes : nullptr;
 		color.x = 1;
 		color.y = 0;
 		pass++;
@@ -1884,12 +1884,12 @@ void CCamWnd::Cam_Render() {
 	refdef.vieworg = m_Camera.origin;
 
 	// the editor uses opposite pitch convention
-	refdef.viewAxis = arcAngles( -m_Camera.angles.pitch, m_Camera.angles.yaw, m_Camera.angles.roll ).ToMat3();
+	refdef.viewAxis = anAngles( -m_Camera.angles.pitch, m_Camera.angles.yaw, m_Camera.angles.roll ).ToMat3();
 
 	refdef.width = SCREEN_WIDTH;
 	refdef.height = SCREEN_HEIGHT;
 	refdef.fov_x = 90;
-	refdef.fov_y = 2 * atan(( float )m_Camera.height / m_Camera.width) * arcMath::M_RAD2DEG;
+	refdef.fov_y = 2 * atan(( float )m_Camera.height / m_Camera.width) * anMath::M_RAD2DEG;
 
 	// only set in animation mode to give a consistent look
 	if (animationMode) {
@@ -1940,9 +1940,9 @@ void CCamWnd::UpdateCameraView() {
 					saveAng = m_Camera.angles;
 					saveValid = true;
 				}
-				arcVec3 v = b->owner->origin - ent->origin;
+				anVec3 v = b->owner->origin - ent->origin;
 				v.Normalize();
-				arcAngles ang = v.ToMat3().ToAngles();
+				anAngles ang = v.ToMat3().ToAngles();
 				ang.pitch = -ang.pitch;
 				ang.roll = 0.0f;
                 SetView( ent->origin, ang );

@@ -4,7 +4,7 @@
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
+This file is part of the Doom 3 BFG Edition GPL Source Code ( "Doom 3 BFG Edition Source Code" ).
 
 Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #pragma hdrstop
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 
 
 #include "../Game_local.h"
 
-idCVar binaryLoadAnim( "binaryLoadAnim", "1", 0, "enable binary load/write of idMD5Anim" );
+anCVar binaryLoadAnim( "binaryLoadAnim", "1", 0, "enable binary load/write of anM8DAnim" );
 
 static const byte B_ANIM_MD5_VERSION = 101;
 static const unsigned int B_ANIM_MD5_MAGIC = ( 'B' << 24 ) | ( 'M' << 16 ) | ( 'D' << 8 ) | B_ANIM_MD5_VERSION;
@@ -43,16 +43,16 @@ bool arcAnimManager::forceExport = false;
 
 /***********************************************************************
 
-	idMD5Anim
+	anM8DAnim
 
 ***********************************************************************/
 
 /*
 ====================
-idMD5Anim::idMD5Anim
+anM8DAnim::anM8DAnim
 ====================
 */
-idMD5Anim::idMD5Anim() {
+anM8DAnim::anM8DAnim() {
 	ref_count	= 0;
 	numFrames	= 0;
 	numJoints	= 0;
@@ -64,19 +64,19 @@ idMD5Anim::idMD5Anim() {
 
 /*
 ====================
-idMD5Anim::idMD5Anim
+anM8DAnim::anM8DAnim
 ====================
 */
-idMD5Anim::~idMD5Anim() {
+anM8DAnim::~anM8DAnim() {
 	Free();
 }
 
 /*
 ====================
-idMD5Anim::Free
+anM8DAnim::Free
 ====================
 */
-void idMD5Anim::Free() {
+void anM8DAnim::Free() {
 	numFrames	= 0;
 	numJoints	= 0;
 	frameRate	= 24;
@@ -93,56 +93,56 @@ void idMD5Anim::Free() {
 
 /*
 ====================
-idMD5Anim::NumFrames
+anM8DAnim::NumFrames
 ====================
 */
-int	idMD5Anim::NumFrames() const {
+int	anM8DAnim::NumFrames() const {
 	return numFrames;
 }
 
 /*
 ====================
-idMD5Anim::NumJoints
+anM8DAnim::NumJoints
 ====================
 */
-int	idMD5Anim::NumJoints() const {
+int	anM8DAnim::NumJoints() const {
 	return numJoints;
 }
 
 /*
 ====================
-idMD5Anim::Length
+anM8DAnim::Length
 ====================
 */
-int idMD5Anim::Length() const {
+int anM8DAnim::Length() const {
 	return animLength;
 }
 
 /*
 =====================
-idMD5Anim::TotalMovementDelta
+anM8DAnim::TotalMovementDelta
 =====================
 */
-const arcVec3 &idMD5Anim::TotalMovementDelta() const {
+const anVec3 &anM8DAnim::TotalMovementDelta() const {
 	return totaldelta;
 }
 
 /*
 =====================
-idMD5Anim::TotalMovementDelta
+anM8DAnim::TotalMovementDelta
 =====================
 */
-const char *idMD5Anim::Name() const {
+const char *anM8DAnim::Name() const {
 	return name;
 }
 
 /*
 ====================
-idMD5Anim::Reload
+anM8DAnim::Reload
 ====================
 */
-bool idMD5Anim::Reload() {
-	arcNetString filename;
+bool anM8DAnim::Reload() {
+	anString filename;
 
 	filename = name;
 	Free();
@@ -152,32 +152,32 @@ bool idMD5Anim::Reload() {
 
 /*
 ====================
-idMD5Anim::Allocated
+anM8DAnim::Allocated
 ====================
 */
-size_t idMD5Anim::Allocated() const {
+size_t anM8DAnim::Allocated() const {
 	size_t	size = bounds.Allocated() + jointInfo.Allocated() + componentFrames.Allocated() + name.Allocated();
 	return size;
 }
 
 /*
 ====================
-idMD5Anim::LoadAnim
+anM8DAnim::LoadAnim
 ====================
 */
-bool idMD5Anim::LoadAnim( const char * filename ) {
+bool anM8DAnim::LoadAnim( const char *filename ) {
 
-	idLexer	parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
-	arcNetToken	token;
+	anLexer	parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
+	anToken	token;
 
-	arcNetString generatedFileName = "generated/anim/";
+	anString generatedFileName = "generated/anim/";
 	generatedFileName.AppendPath( filename );
 	generatedFileName.SetFileExtension( ".bMD5anim" );
 
 	// Get the timestamp on the original file, if it's newer than what is stored in binary model, regenerate it
-	ID_TIME_T sourceTimeStamp = fileSystem->GetTimestamp( filename );
+	ARC_TIME_T sourceTimeStamp = fileSystem->GetTimestamp( filename );
 
-	arcFileLocal file( fileSystem->OpenFileReadMemory( generatedFileName ) );
+	anFileLocal file( fileSystem->OpenFileReadMemory( generatedFileName ) );
 	if ( binaryLoadAnim.GetBool() && LoadBinary( file, sourceTimeStamp ) ) {
 		name = filename;
 		if ( cvarSystem->GetCVarBool( "fs_buildresources" ) ) {
@@ -240,28 +240,28 @@ bool idMD5Anim::LoadAnim( const char * filename ) {
 	parser.ExpectTokenString( "{" );
 	for ( int i = 0; i < numJoints; i++ ) {
 		parser.ReadToken( &token );
-		jointInfo[ i ].nameIndex = animationLib.JointIndex( token );
+		jointInfo[i].nameIndex = animationLib.JointIndex( token );
 
 		// parse parent num
-		jointInfo[ i ].parentNum = parser.ParseInt();
-		if ( jointInfo[ i ].parentNum >= i ) {
-			parser.Error( "Invalid parent num: %d", jointInfo[ i ].parentNum );
+		jointInfo[i].parentNum = parser.ParseInt();
+		if ( jointInfo[i].parentNum >= i ) {
+			parser.Error( "Invalid parent num: %d", jointInfo[i].parentNum );
 		}
 
-		if ( ( i != 0 ) && ( jointInfo[ i ].parentNum < 0 ) ) {
+		if ( ( i != 0 ) && ( jointInfo[i].parentNum < 0 ) ) {
 			parser.Error( "Animations may have only one root joint" );
 		}
 
 		// parse anim bits
-		jointInfo[ i ].animBits = parser.ParseInt();
-		if ( jointInfo[ i ].animBits & ~63 ) {
-			parser.Error( "Invalid anim bits: %d", jointInfo[ i ].animBits );
+		jointInfo[i].animBits = parser.ParseInt();
+		if ( jointInfo[i].animBits & ~63 ) {
+			parser.Error( "Invalid anim bits: %d", jointInfo[i].animBits );
 		}
 
 		// parse first component
-		jointInfo[ i ].firstComponent = parser.ParseInt();
-		if ( ( numAnimatedComponents > 0 ) && ( ( jointInfo[ i ].firstComponent < 0 ) || ( jointInfo[ i ].firstComponent >= numAnimatedComponents ) ) ) {
-			parser.Error( "Invalid first component: %d", jointInfo[ i ].firstComponent );
+		jointInfo[i].firstComponent = parser.ParseInt();
+		if ( ( numAnimatedComponents > 0 ) && ( ( jointInfo[i].firstComponent < 0 ) || ( jointInfo[i].firstComponent >= numAnimatedComponents ) ) ) {
+			parser.Error( "Invalid first component: %d", jointInfo[i].firstComponent );
 		}
 	}
 
@@ -273,8 +273,8 @@ bool idMD5Anim::LoadAnim( const char * filename ) {
 	bounds.SetGranularity( 1 );
 	bounds.SetNum( numFrames );
 	for ( int i = 0; i < numFrames; i++ ) {
-		parser.Parse1DMatrix( 3, bounds[ i ][ 0 ].ToFloatPtr() );
-		parser.Parse1DMatrix( 3, bounds[ i ][ 1 ].ToFloatPtr() );
+		parser.Parse1DMatrix( 3, bounds[i][ 0 ].ToFloatPtr() );
+		parser.Parse1DMatrix( 3, bounds[i][ 1 ].ToFloatPtr() );
 	}
 	parser.ExpectTokenString( "}" );
 
@@ -284,11 +284,11 @@ bool idMD5Anim::LoadAnim( const char * filename ) {
 	parser.ExpectTokenString( "baseframe" );
 	parser.ExpectTokenString( "{" );
 	for ( int i = 0; i < numJoints; i++ ) {
-		idCQuat q;
-		parser.Parse1DMatrix( 3, baseFrame[ i ].t.ToFloatPtr() );
-		parser.Parse1DMatrix( 3, q.ToFloatPtr() );//baseFrame[ i ].q.ToFloatPtr() );
-		baseFrame[ i ].q = q.ToQuat();//.w = baseFrame[ i ].q.CalcW();
-		baseFrame[ i ].w = 0.0f;
+		anCQuat q;
+		parser.Parse1DMatrix( 3, baseFrame[i].t.ToFloatPtr() );
+		parser.Parse1DMatrix( 3, q.ToFloatPtr() );//baseFrame[i].q.ToFloatPtr() );
+		baseFrame[i].q = q.ToQuat();//.w = baseFrame[i].q.CalcW();
+		baseFrame[i].w = 0.0f;
 	}
 	parser.ExpectTokenString( "}" );
 
@@ -351,8 +351,8 @@ bool idMD5Anim::LoadAnim( const char * filename ) {
 	animLength = ( ( numFrames - 1 ) * 1000 + frameRate - 1 ) / frameRate;
 
 	if ( binaryLoadAnim.GetBool() ) {
-		idLib::Printf( "Writing %s\n", generatedFileName.c_str() );
-		arcFileLocal outputFile( fileSystem->OpenFileWrite( generatedFileName, "fs_basepath" ) );
+		anLib::Printf( "Writing %s\n", generatedFileName.c_str() );
+		anFileLocal outputFile( fileSystem->OpenFileWrite( generatedFileName, "fs_basepath" ) );
 		WriteBinary( outputFile, sourceTimeStamp );
 	}
 
@@ -362,12 +362,12 @@ bool idMD5Anim::LoadAnim( const char * filename ) {
 
 /*
 ========================
-idMD5Anim::LoadBinary
+anM8DAnim::LoadBinary
 ========================
 */
-bool idMD5Anim::LoadBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
+bool anM8DAnim::LoadBinary( anFile * file, ARC_TIME_T sourceTimeStamp ) {
 
-	if ( file == NULL ) {
+	if ( file == nullptr ) {
 		return false;
 	}
 
@@ -377,7 +377,7 @@ bool idMD5Anim::LoadBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
 		return false;
 	}
 
-	ID_TIME_T loadedTimeStamp;
+	ARC_TIME_T loadedTimeStamp;
 	file->ReadBig( loadedTimeStamp );
 	if ( !fileSystem->InProductionMode() && sourceTimeStamp != loadedTimeStamp ) {
 		return false;
@@ -393,7 +393,7 @@ bool idMD5Anim::LoadBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
 	file->ReadBig( num );
 	bounds.SetNum( num );
 	for ( int i = 0; i < num; i++ ) {
-		arcBounds & b = bounds[i];
+		anBounds & b = bounds[i];
 		file->ReadBig( b[0] );
 		file->ReadBig( b[1] );
 	}
@@ -403,7 +403,7 @@ bool idMD5Anim::LoadBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
 	for ( int i = 0; i < num; i++ ) {
 		jointAnimInfo_t & j = jointInfo[i];
 
-		arcNetString jointName;
+		anString jointName;
 		file->ReadString( jointName );
 		if ( jointName.IsEmpty() ) {
 			j.nameIndex = -1;
@@ -419,7 +419,7 @@ bool idMD5Anim::LoadBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
 	file->ReadBig( num );
 	baseFrame.SetNum( num );
 	for ( int i = 0; i < num; i++ ) {
-		idJointQuat & j = baseFrame[i];
+		anJointQuat & j = baseFrame[i];
 		file->ReadBig( j.q.x );
 		file->ReadBig( j.q.y );
 		file->ReadBig( j.q.z );
@@ -443,12 +443,12 @@ bool idMD5Anim::LoadBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
 
 /*
 ========================
-idMD5Anim::WriteBinary
+anM8DAnim::WriteBinary
 ========================
 */
-void idMD5Anim::WriteBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
+void anM8DAnim::WriteBinary( anFile * file, ARC_TIME_T sourceTimeStamp ) {
 
-	if ( file == NULL ) {
+	if ( file == nullptr ) {
 		return;
 	}
 
@@ -463,7 +463,7 @@ void idMD5Anim::WriteBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
 
 	file->WriteBig( bounds.Num() );
 	for ( int i = 0; i < bounds.Num(); i++ ) {
-		arcBounds & b = bounds[i];
+		anBounds & b = bounds[i];
 		file->WriteBig( b[0] );
 		file->WriteBig( b[1] );
 	}
@@ -471,7 +471,7 @@ void idMD5Anim::WriteBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
 	file->WriteBig( jointInfo.Num() );
 	for ( int i = 0; i < jointInfo.Num(); i++ ) {
 		jointAnimInfo_t & j = jointInfo[i];
-		arcNetString jointName = animationLib.JointName( j.nameIndex );
+		anString jointName = animationLib.JointName( j.nameIndex );
 		file->WriteString( jointName );
 		file->WriteBig( j.parentNum );
 		file->WriteBig( j.animBits );
@@ -480,7 +480,7 @@ void idMD5Anim::WriteBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
 
 	file->WriteBig( baseFrame.Num() );
 	for ( int i = 0; i < baseFrame.Num(); i++ ) {
-		idJointQuat & j = baseFrame[i];
+		anJointQuat & j = baseFrame[i];
 		file->WriteBig( j.q.x );
 		file->WriteBig( j.q.y );
 		file->WriteBig( j.q.z );
@@ -500,37 +500,37 @@ void idMD5Anim::WriteBinary( arcNetFile * file, ID_TIME_T sourceTimeStamp ) {
 
 /*
 ====================
-idMD5Anim::IncreaseRefs
+anM8DAnim::IncreaseRefs
 ====================
 */
-void idMD5Anim::IncreaseRefs() const {
+void anM8DAnim::IncreaseRefs() const {
 	ref_count++;
 }
 
 /*
 ====================
-idMD5Anim::DecreaseRefs
+anM8DAnim::DecreaseRefs
 ====================
 */
-void idMD5Anim::DecreaseRefs() const {
+void anM8DAnim::DecreaseRefs() const {
 	ref_count--;
 }
 
 /*
 ====================
-idMD5Anim::NumRefs
+anM8DAnim::NumRefs
 ====================
 */
-int idMD5Anim::NumRefs() const {
+int anM8DAnim::NumRefs() const {
 	return ref_count;
 }
 
 /*
 ====================
-idMD5Anim::GetFrameBlend
+anM8DAnim::GetFrameBlend
 ====================
 */
-void idMD5Anim::GetFrameBlend( int framenum, frameBlend_t &frame ) const {
+void anM8DAnim::GetFrameBlend( int framenum, frameBlend_t &frame ) const {
 	frame.cycleCount	= 0;
 	frame.backlerp		= 0.0f;
 	frame.frontlerp		= 1.0f;
@@ -549,10 +549,10 @@ void idMD5Anim::GetFrameBlend( int framenum, frameBlend_t &frame ) const {
 
 /*
 ====================
-idMD5Anim::ConvertTimeToFrame
+anM8DAnim::ConvertTimeToFrame
 ====================
 */
-void idMD5Anim::ConvertTimeToFrame( int time, int cyclecount, frameBlend_t &frame ) const {
+void anM8DAnim::ConvertTimeToFrame( int time, int cyclecount, frameBlend_t &frame ) const {
 	int frameTime;
 	int frameNum;
 
@@ -599,10 +599,10 @@ void idMD5Anim::ConvertTimeToFrame( int time, int cyclecount, frameBlend_t &fram
 
 /*
 ====================
-idMD5Anim::GetOrigin
+anM8DAnim::GetOrigin
 ====================
 */
-void idMD5Anim::GetOrigin( arcVec3 &offset, int time, int cyclecount ) const {
+void anM8DAnim::GetOrigin( anVec3 &offset, int time, int cyclecount ) const {
 	offset = baseFrame[ 0 ].t;
 	if ( !( jointInfo[ 0 ].animBits & ( ANIM_TX | ANIM_TY | ANIM_TZ ) ) ) {
 		// just use the baseframe
@@ -638,10 +638,10 @@ void idMD5Anim::GetOrigin( arcVec3 &offset, int time, int cyclecount ) const {
 
 /*
 ====================
-idMD5Anim::GetOriginRotation
+anM8DAnim::GetOriginRotation
 ====================
 */
-void idMD5Anim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) const {
+void anM8DAnim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) const {
 	int animBits = jointInfo[ 0 ].animBits;
 	if ( !( animBits & ( ANIM_QX | ANIM_QY | ANIM_QZ ) ) ) {
 		// just use the baseframe
@@ -673,7 +673,7 @@ void idMD5Anim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) 
 	idQuat q1;
 	idQuat q2;
 
-	switch( animBits & (ANIM_QX|ANIM_QY|ANIM_QZ) ) {
+	switch ( animBits & (ANIM_QX|ANIM_QY|ANIM_QZ) ) {
 		case ANIM_QX:
 			q1.x = jointframe1[0];
 			q2.x = jointframe2[0];
@@ -751,10 +751,10 @@ void idMD5Anim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) 
 
 /*
 ====================
-idMD5Anim::GetBounds
+anM8DAnim::GetBounds
 ====================
 */
-void idMD5Anim::GetBounds( arcBounds &bnds, int time, int cyclecount ) const {
+void anM8DAnim::GetBounds( anBounds &bnds, int time, int cyclecount ) const {
 	frameBlend_t frame;
 	ConvertTimeToFrame( time, cyclecount, frame );
 
@@ -762,7 +762,7 @@ void idMD5Anim::GetBounds( arcBounds &bnds, int time, int cyclecount ) const {
 	bnds.AddBounds( bounds[ frame.frame2 ] );
 
 	// origin position
-	arcVec3 offset = baseFrame[ 0 ].t;
+	anVec3 offset = baseFrame[ 0 ].t;
 	if ( jointInfo[ 0 ].animBits & ( ANIM_TX | ANIM_TY | ANIM_TZ ) ) {
 		const float *componentPtr1 = &componentFrames[ numAnimatedComponents * frame.frame1 + jointInfo[ 0 ].firstComponent ];
 		const float *componentPtr2 = &componentFrames[ numAnimatedComponents * frame.frame2 + jointInfo[ 0 ].firstComponent ];
@@ -794,7 +794,7 @@ DecodeInterpolatedFrames
 
 ====================
 */
-int DecodeInterpolatedFrames( idJointQuat * joints, idJointQuat * blendJoints, int * lerpIndex, const float * frame1, const float * frame2,
+int DecodeInterpolatedFrames( anJointQuat * joints, anJointQuat * blendJoints, int * lerpIndex, const float * frame1, const float * frame2,
 							const jointAnimInfo_t * jointInfo, const int * index, const int numIndexes ) {
 	int numLerpJoints = 0;
 	for ( int i = 0; i < numIndexes; i++ ) {
@@ -806,8 +806,8 @@ int DecodeInterpolatedFrames( idJointQuat * joints, idJointQuat * blendJoints, i
 
 			lerpIndex[numLerpJoints++] = j;
 
-			idJointQuat * jointPtr = &joints[j];
-			idJointQuat * blendPtr = &blendJoints[j];
+			anJointQuat * jointPtr = &joints[j];
+			anJointQuat * blendPtr = &blendJoints[j];
 
 			*blendPtr = *jointPtr;
 
@@ -852,10 +852,10 @@ int DecodeInterpolatedFrames( idJointQuat * joints, idJointQuat * blendJoints, i
 
 /*
 ====================
-idMD5Anim::GetInterpolatedFrame
+anM8DAnim::GetInterpolatedFrame
 ====================
 */
-void idMD5Anim::GetInterpolatedFrame( frameBlend_t &frame, idJointQuat *joints, const int *index, int numIndexes ) const {
+void anM8DAnim::GetInterpolatedFrame( frameBlend_t &frame, anJointQuat *joints, const int *index, int numIndexes ) const {
 	// copy the baseframe
 	SIMDProcessor->Memcpy( joints, baseFrame.Ptr(), baseFrame.Num() * sizeof( baseFrame[ 0 ] ) );
 
@@ -864,8 +864,8 @@ void idMD5Anim::GetInterpolatedFrame( frameBlend_t &frame, idJointQuat *joints, 
 		return;
 	}
 
-	idJointQuat * blendJoints = (idJointQuat *)_alloca16( baseFrame.Num() * sizeof( blendJoints[ 0 ] ) );
-	int * lerpIndex = (int *)_alloca16( baseFrame.Num() * sizeof( lerpIndex[ 0 ] ) );
+	anJointQuat * blendJoints = (anJointQuat *)_alloca16( baseFrame.Num() * sizeof( blendJoints[ 0 ] ) );
+	int * lerpIndex = ( int*)_alloca16( baseFrame.Num() * sizeof( lerpIndex[ 0 ] ) );
 
 	const float * frame1 = &componentFrames[frame.frame1 * numAnimatedComponents];
 	const float * frame2 = &componentFrames[frame.frame2 * numAnimatedComponents];
@@ -885,7 +885,7 @@ DecodeSingleFrame
 
 ====================
 */
-void DecodeSingleFrame( idJointQuat * joints, const float * frame,
+void DecodeSingleFrame( anJointQuat * joints, const float * frame,
 						const jointAnimInfo_t * jointInfo, const int * index, const int numIndexes ) {
 	for ( int i = 0; i < numIndexes; i++ ) {
 		const int j = index[i];
@@ -894,7 +894,7 @@ void DecodeSingleFrame( idJointQuat * joints, const float * frame,
 		const int animBits = infoPtr->animBits;
 		if ( animBits != 0 ) {
 
-			idJointQuat * jointPtr = &joints[j];
+			anJointQuat * jointPtr = &joints[j];
 
 			const float * jointframe = frame + infoPtr->firstComponent;
 
@@ -928,10 +928,10 @@ void DecodeSingleFrame( idJointQuat * joints, const float * frame,
 
 /*
 ====================
-idMD5Anim::GetSingleFrame
+anM8DAnim::GetSingleFrame
 ====================
 */
-void idMD5Anim::GetSingleFrame( int framenum, idJointQuat *joints, const int *index, int numIndexes ) const {
+void anM8DAnim::GetSingleFrame( int framenum, anJointQuat *joints, const int *index, int numIndexes ) const {
 	// copy the baseframe
 	SIMDProcessor->Memcpy( joints, baseFrame.Ptr(), baseFrame.Num() * sizeof( baseFrame[ 0 ] ) );
 
@@ -947,10 +947,10 @@ void idMD5Anim::GetSingleFrame( int framenum, idJointQuat *joints, const int *in
 
 /*
 ====================
-idMD5Anim::CheckModelHierarchy
+anM8DAnim::CheckModelHierarchy
 ====================
 */
-void idMD5Anim::CheckModelHierarchy( const idRenderModel *model ) const {
+void anM8DAnim::CheckModelHierarchy( const anRenderModel *model ) const {
 	if ( jointInfo.Num() != model->NumJoints() ) {
 		if ( !fileSystem->InProductionMode() ) {
 			gameLocal.Warning( "Model '%s' has different # of joints than anim '%s'", model->Name(), name.c_str() );
@@ -962,17 +962,17 @@ void idMD5Anim::CheckModelHierarchy( const idRenderModel *model ) const {
 
 	const idMD5Joint *modelJoints = model->GetJoints();
 	for ( int i = 0; i < jointInfo.Num(); i++ ) {
-		int jointNum = jointInfo[ i ].nameIndex;
-		if ( modelJoints[ i ].name != animationLib.JointName( jointNum ) ) {
+		int jointNum = jointInfo[i].nameIndex;
+		if ( modelJoints[i].name != animationLib.JointName( jointNum ) ) {
 			gameLocal.Error( "Model '%s''s joint names don't match anim '%s''s", model->Name(), name.c_str() );
 		}
 		int parent;
-		if ( modelJoints[ i ].parent ) {
-			parent = modelJoints[ i ].parent - modelJoints;
+		if ( modelJoints[i].parent ) {
+			parent = modelJoints[i].parent - modelJoints;
 		} else {
 			parent = -1;
 		}
-		if ( parent != jointInfo[ i ].parentNum ) {
+		if ( parent != jointInfo[i].parentNum ) {
 			gameLocal.Error( "Model '%s' has different joint hierarchy than anim '%s'", model->Name(), name.c_str() );
 		}
 	}
@@ -1017,28 +1017,28 @@ void arcAnimManager::Shutdown() {
 arcAnimManager::GetAnim
 ====================
 */
-idMD5Anim *arcAnimManager::GetAnim( const char *name ) {
-	idMD5Anim **animptrptr;
-	idMD5Anim *anim;
+anM8DAnim *arcAnimManager::GetAnim( const char *name ) {
+	anM8DAnim **animptrptr;
+	anM8DAnim *anim;
 
 	// see if it has been asked for before
-	animptrptr = NULL;
+	animptrptr = nullptr;
 	if ( animations.Get( name, &animptrptr ) ) {
 		anim = *animptrptr;
 	} else {
-		arcNetString extension;
-		arcNetString filename = name;
+		anString extension;
+		anString filename = name;
 
 		filename.ExtractFileExtension( extension );
 		if ( extension != MD5_ANIM_EXT ) {
-			return NULL;
+			return nullptr;
 		}
 
-		anim = new (TAG_ANIM) idMD5Anim();
+		anim = new (TAG_ANIM) anM8DAnim();
 		if ( !anim->LoadAnim( filename ) ) {
 			gameLocal.Warning( "Couldn't load anim: '%s'", filename.c_str() );
 			delete anim;
-			anim = NULL;
+			anim = nullptr;
 		}
 		animations.Set( filename, anim );
 	}
@@ -1076,11 +1076,11 @@ arcAnimManager::ReloadAnims
 */
 void arcAnimManager::ReloadAnims() {
 	int			i;
-	idMD5Anim	**animptr;
+	anM8DAnim	**animptr;
 
 	for ( i = 0; i < animations.Num(); i++ ) {
 		animptr = animations.GetIndex( i );
-		if ( animptr != NULL && *animptr != NULL ) {
+		if ( animptr != nullptr && *animptr != nullptr ) {
 			( *animptr )->Reload();
 		}
 	}
@@ -1122,8 +1122,8 @@ arcAnimManager::ListAnims
 */
 void arcAnimManager::ListAnims() const {
 	int			i;
-	idMD5Anim	**animptr;
-	idMD5Anim	*anim;
+	anM8DAnim	**animptr;
+	anM8DAnim	*anim;
 	size_t		size;
 	size_t		s;
 	size_t		namesize;
@@ -1133,7 +1133,7 @@ void arcAnimManager::ListAnims() const {
 	size = 0;
 	for ( i = 0; i < animations.Num(); i++ ) {
 		animptr = animations.GetIndex( i );
-		if ( animptr != NULL && *animptr != NULL ) {
+		if ( animptr != nullptr && *animptr != nullptr ) {
 			anim = *animptr;
 			s = anim->Size();
 			gameLocal.Printf( "%8d bytes : %2d refs : %s\n", s, anim->NumRefs(), anim->Name() );
@@ -1144,7 +1144,7 @@ void arcAnimManager::ListAnims() const {
 
 	namesize = jointnames.Size() + jointnamesHash.Size();
 	for ( i = 0; i < jointnames.Num(); i++ ) {
-		namesize += jointnames[ i ].Size();
+		namesize += jointnames[i].Size();
 	}
 
 	gameLocal.Printf( "\n%d memory used in %d anims\n", size, num );
@@ -1158,12 +1158,12 @@ arcAnimManager::FlushUnusedAnims
 */
 void arcAnimManager::FlushUnusedAnims() {
 	int						i;
-	idMD5Anim				**animptr;
-	arcNetList<idMD5Anim *>		removeAnims;
+	anM8DAnim				**animptr;
+	anList<anM8DAnim *>		removeAnims;
 
 	for ( i = 0; i < animations.Num(); i++ ) {
 		animptr = animations.GetIndex( i );
-		if ( animptr != NULL && *animptr != NULL ) {
+		if ( animptr != nullptr && *animptr != nullptr ) {
 			if ( ( *animptr )->NumRefs() <= 0 ) {
 				removeAnims.Append( *animptr );
 			}
@@ -1171,7 +1171,7 @@ void arcAnimManager::FlushUnusedAnims() {
 	}
 
 	for ( i = 0; i < removeAnims.Num(); i++ ) {
-		animations.Remove( removeAnims[ i ]->Name() );
-		delete removeAnims[ i ];
+		animations.Remove( removeAnims[i]->Name() );
+		delete removeAnims[i];
 	}
 }

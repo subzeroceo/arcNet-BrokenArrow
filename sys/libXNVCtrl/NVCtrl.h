@@ -41,7 +41,7 @@
  * 1: native (the driver will use the panel's scaler, if possible)
  * 2: scaled (the driver will use the GPU's scaler, if possible)
  * 3: centered (the driver will center the image)
- * 4: aspect scaled (scale with the GPU's scaler, but keep the aspect
+ * 4: aspect scaled ( scale with the GPU's scaler, but keep the aspect
  *    ratio correct)
  */
 

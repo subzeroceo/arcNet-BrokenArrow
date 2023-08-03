@@ -1,5 +1,5 @@
 #pragma hdrstop
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 
 #include "File_SaveGame.h"
 
@@ -23,62 +23,62 @@ void ZlibFree( void *opaque, void * address ) {
 	Mem_Free( address );
 }
 
-arcCVarSystem sgf_threads( "sgf_threads", "2", CVAR_INTEGER, "0 = all foreground, 1 = background write, 2 = background write + compress" );
-arcCVarSystem sgf_checksums( "sgf_checksums", "1", CVAR_BOOL, "enable save game file checksums" );
-arcCVarSystem sgf_testCorruption( "sgf_testCorruption", "-1", CVAR_INTEGER, "test corruption at the 128 kB compressed block" );
+anCVarSystem sgf_threads( "sgf_threads", "2", CVAR_INTEGER, "0 = all foreground, 1 = background write, 2 = background write + compress" );
+anCVarSystem sgf_checksums( "sgf_checksums", "1", CVAR_BOOL, "enable save game file checksums" );
+anCVarSystem sgf_testCorruption( "sgf_testCorruption", "-1", CVAR_INTEGER, "test corruption at the 128 kB compressed block" );
 
 // this is supposed to get faster going from -15 to -9, but it gets slower as well as worse compression
-arcCVarSystem sgf_windowBits( "sgf_windowBits", "-15", CVAR_INTEGER, "zlib window bits" );
+anCVarSystem sgf_windowBits( "sgf_windowBits", "-15", CVAR_INTEGER, "zlib window bits" );
 
-bool arcFile_SaveGamePipelined::cancelToTerminate = false;
+bool anFile_SGPipelined::cancelToTerminate = false;
 
-class idSGFcompressThread : public arcSysThread {
+class idSGFcompressThread : public anSysThread {
 public:
 	virtual int			Run() { sgf->CompressBlock(); return 0; }
-	arcFile_SaveGamePipelined * sgf;
+	anFile_SGPipelined * sgf;
 };
-class idSGFdecompressThread : public arcSysThread {
+class idSGFdecompressThread : public anSysThread {
 public:
 	virtual int			Run() { sgf->DecompressBlock(); return 0; }
-	arcFile_SaveGamePipelined * sgf;
+	anFile_SGPipelined * sgf;
 };
-class idSGFwriteThread : public arcSysThread {
+class anSGFwriteThread : public anSysThread {
 public:
 	virtual int			Run() { sgf->WriteBlock(); return 0; }
-	arcFile_SaveGamePipelined * sgf;
+	anFile_SGPipelined * sgf;
 };
-class idSGFreadThread : public arcSysThread {
+class anSGFreedThread : public anSysThread {
 public:
 	virtual int			Run() { sgf->ReadBlock(); return 0; }
-	arcFile_SaveGamePipelined * sgf;
+	anFile_SGPipelined * sgf;
 };
 
 /*
 ============================
-arcFile_SaveGamePipelined::arcFile_SaveGamePipelined
+anFile_SGPipelined::anFile_SGPipelined
 ============================
 */
-arcFile_SaveGamePipelined::arcFile_SaveGamePipelined() :
+anFile_SGPipelined::anFile_SGPipelined() :
 		mode( CLOSED ),
 		compressedLength( 0 ),
 		uncompressedProducedBytes( 0 ),
 		uncompressedConsumedBytes( 0 ),
 		compressedProducedBytes( 0 ),
 		compressedConsumedBytes( 0 ),
-		dataZlib( NULL ),
+		dataZlib( nullptr ),
 		bytesZlib( 0 ),
-		dataIO( NULL ),
+		dataIO( nullptr ),
 		bytesIO( 0 ),
 		zLibFlushType( Z_NO_FLUSH ),
 		zStreamEndHit( false ),
 		numChecksums( 0 ),
-		nativeFile( NULL ),
+		nativeFile( nullptr ),
 		nativeFileEndHit( false ),
 		finished( false ),
-		readThread( NULL ),
-		writeThread( NULL ),
-		decompressThread( NULL ),
-		compressThread( NULL ),
+		readThread( nullptr ),
+		writeThread( nullptr ),
+		decompressThread( nullptr ),
+		compressThread( nullptr ),
 		blockFinished( true ),
 		buildVersion( "" ),
 		saveFormatVersion( 0 ) {
@@ -92,55 +92,55 @@ arcFile_SaveGamePipelined::arcFile_SaveGamePipelined() :
 
 /*
 ============================
-arcFile_SaveGamePipelined::~arcFile_SaveGamePipelined
+anFile_SGPipelined::~anFile_SGPipelined
 ============================
 */
-arcFile_SaveGamePipelined::~arcFile_SaveGamePipelined() {
+anFile_SGPipelined::~anFile_SGPipelined() {
 	Finish();
 
 	// free the threads
-	if ( compressThread != NULL ) {
+	if ( compressThread != nullptr ) {
 		delete compressThread;
-		compressThread = NULL;
+		compressThread = nullptr;
 	}
-	if ( decompressThread != NULL ) {
+	if ( decompressThread != nullptr ) {
 		delete decompressThread;
-		decompressThread = NULL;
+		decompressThread = nullptr;
 	}
-	if ( readThread != NULL ) {
+	if ( readThread != nullptr ) {
 		delete readThread;
-		readThread = NULL;
+		readThread = nullptr;
 	}
-	if ( writeThread != NULL ) {
+	if ( writeThread != nullptr ) {
 		delete writeThread;
-		writeThread = NULL;
+		writeThread = nullptr;
 	}
 
 	// close the native file
-/*	if ( nativeFile != NULL ) {
+/*	if ( nativeFile != nullptr ) {
 		delete nativeFile;
-		nativeFile = NULL;
+		nativeFile = nullptr;
 	} */
 
-	dataZlib = NULL;
-	dataIO = NULL;
+	dataZlib = nullptr;
+	dataIO = nullptr;
 }
 
 /*
 ========================
-arcFile_SaveGamePipelined::ReadBuildVersion
+anFile_SGPipelined::ReadBuildVersion
 ========================
 */
-bool arcFile_SaveGamePipelined::ReadBuildVersion() {
+bool anFile_SGPipelined::ReadBuildVersion() {
 	return ReadString( buildVersion ) != 0;
 }
 
 /*
 ========================
-arcFile_SaveGamePipelined::ReadSaveFormatVersion
+anFile_SGPipelined::ReadSaveFormatVersion
 ========================
 */
-bool arcFile_SaveGamePipelined::ReadSaveFormatVersion() {
+bool anFile_SGPipelined::ReadSaveFormatVersion() {
 	if ( ReadBig( pointerSize ) <= 0 ) {
 		return false;
 	}
@@ -149,10 +149,10 @@ bool arcFile_SaveGamePipelined::ReadSaveFormatVersion() {
 
 /*
 ========================
-arcFile_SaveGamePipelined::GetPointerSize
+anFile_SGPipelined::GetPointerSize
 ========================
 */
-int arcFile_SaveGamePipelined::GetPointerSize() const {
+int anFile_SGPipelined::GetPointerSize() const {
 	if ( pointerSize == 0 ) {
 		// in original savegames we weren't saving the pointer size, so the 2 high bytes of the save version will be 0
 		return 4;
@@ -163,13 +163,13 @@ int arcFile_SaveGamePipelined::GetPointerSize() const {
 
 /*
 ============================
-arcFile_SaveGamePipelined::Finish
+anFile_SGPipelined::Finish
 ============================
 */
-void arcFile_SaveGamePipelined::Finish() {
+void anFile_SGPipelined::Finish() {
 	if ( mode == WRITE ) {
 		// wait for the compression thread to complete, which may kick off a write
-		if ( compressThread != NULL ) {
+		if ( compressThread != nullptr ) {
 			compressThread->WaitForThread();
 		}
 
@@ -177,14 +177,14 @@ void arcFile_SaveGamePipelined::Finish() {
 		zLibFlushType = Z_FINISH;
 		FlushUncompressedBlock();
 
-		if ( compressThread != NULL ) {
+		if ( compressThread != nullptr ) {
 			compressThread->WaitForThread();
 		}
 
-		if ( writeThread != NULL ) {
+		if ( writeThread != nullptr ) {
 			// wait for the IO thread to exit
 			writeThread->WaitForThread();
-		} else if ( nativeFile == NULL && !nativeFileEndHit ) {
+		} else if ( nativeFile == nullptr && !nativeFileEndHit ) {
 			// wait for the last block to be consumed
 			blockRequested.Wait();
 			finished = true;
@@ -196,14 +196,14 @@ void arcFile_SaveGamePipelined::Finish() {
 		deflateEnd( &zStream );
 	} else if ( mode == READ ) {
 		// wait for the decompression thread to complete, which may kick off a read
-		if ( decompressThread != NULL ) {
+		if ( decompressThread != nullptr ) {
 			decompressThread->WaitForThread();
 		}
 
-		if ( readThread != NULL ) {
+		if ( readThread != nullptr ) {
 			// wait for the IO thread to exit
 			readThread->WaitForThread();
-		} else if ( nativeFile == NULL && !nativeFileEndHit ) {
+		} else if ( nativeFile == nullptr && !nativeFileEndHit ) {
 			// wait for the last block to be consumed
 			blockAvailable.Wait();
 			finished = true;
@@ -220,35 +220,35 @@ void arcFile_SaveGamePipelined::Finish() {
 
 /*
 ============================
-arcFile_SaveGamePipelined::Abort
+anFile_SGPipelined::Abort
 ============================
 */
-void arcFile_SaveGamePipelined::Abort() {
+void anFile_SGPipelined::Abort() {
 	if ( mode == WRITE ) {
 
-		if ( compressThread != NULL ) {
+		if ( compressThread != nullptr ) {
 			compressThread->WaitForThread();
 		}
-		if ( writeThread != NULL ) {
+		if ( writeThread != nullptr ) {
 			writeThread->WaitForThread();
-		} else if ( nativeFile == NULL && !nativeFileEndHit ) {
+		} else if ( nativeFile == nullptr && !nativeFileEndHit ) {
 			blockRequested.Wait();
 			finished = true;
-			dataIO = NULL;
+			dataIO = nullptr;
 			bytesIO = 0;
 			blockAvailable.Raise();
 			blockFinished.Wait();
 		}
 	} else if ( mode == READ ) {
-		if ( decompressThread != NULL ) {
+		if ( decompressThread != nullptr ) {
 			decompressThread->WaitForThread();
 		}
-		if ( readThread != NULL ) {
+		if ( readThread != nullptr ) {
 			readThread->WaitForThread();
-		} else if ( nativeFile == NULL && !nativeFileEndHit ) {
+		} else if ( nativeFile == nullptr && !nativeFileEndHit ) {
 			blockAvailable.Wait();
 			finished = true;
-			dataIO = NULL;
+			dataIO = nullptr;
 			bytesIO = 0;
 			blockRequested.Raise();
 			blockFinished.Wait();
@@ -268,21 +268,21 @@ WRITE PATH
 
 /*
 ============================
-arcFile_SaveGamePipelined::OpenForWriting
+anFile_SGPipelined::OpenForWriting
 ============================
 */
-bool arcFile_SaveGamePipelined::OpenForWriting( const char * const filename, bool useNativeFile ) {
+bool anFile_SGPipelined::OpenForWriting( const char *const filename, bool useNativeFile ) {
 	assert( mode == CLOSED );
 
 	name = filename;
 	osPath = filename;
 	mode = WRITE;
-	nativeFile = NULL;
+	nativeFile = nullptr;
 	numChecksums = 0;
 
 	if ( useNativeFile ) {
 		nativeFile = fileSystem->OpenFileWrite( filename );
-		if ( nativeFile == NULL ) {
+		if ( nativeFile == nullptr ) {
 			return false;
 		}
 	}
@@ -294,7 +294,7 @@ bool arcFile_SaveGamePipelined::OpenForWriting( const char * const filename, boo
 	int status = deflateInit2( &zStream, Z_BEST_SPEED, Z_DEFLATED, sgf_windowBits.GetInteger(), 9, Z_DEFAULT_STRATEGY );
 	//mem.PopHeap();
 	if ( status != Z_OK ) {
-		arcLibrary::FatalError( "arcFile_SaveGamePipelined::OpenForWriting: deflateInit2() error %i", status );
+		anLibrary::FatalError( "anFile_SGPipelined::OpenForWriting: deflateInit2() error %i", status );
 	}
 
 	// initial buffer setup
@@ -310,8 +310,8 @@ bool arcFile_SaveGamePipelined::OpenForWriting( const char * const filename, boo
 		compressThread->sgf = this;
 		compressThread->StartWorkerThread( "SGF_CompressThread", CORE_2B, THREAD_NORMAL );
 	}
-	if ( nativeFile != NULL && sgf_threads.GetInteger() >= 2 ) {
-		writeThread = new (TAG_IDFILE) idSGFwriteThread();
+	if ( nativeFile != nullptr && sgf_threads.GetInteger() >= 2 ) {
+		writeThread = new (TAG_IDFILE) anSGFwriteThread();
 		writeThread->sgf = this;
 		writeThread->StartWorkerThread( "SGF_WriteThread", CORE_2A, THREAD_NORMAL );
 	}
@@ -321,13 +321,13 @@ bool arcFile_SaveGamePipelined::OpenForWriting( const char * const filename, boo
 
 /*
 ============================
-arcFile_SaveGamePipelined::OpenForWriting
+anFile_SGPipelined::OpenForWriting
 ============================
 */
-bool arcFile_SaveGamePipelined::OpenForWriting( arcNetFile * file )  {
+bool anFile_SGPipelined::OpenForWriting( anFile * file )  {
 	assert( mode == CLOSED );
 
-	if ( file == NULL ) {
+	if ( file == nullptr ) {
 		return false;
 	}
 
@@ -345,7 +345,7 @@ bool arcFile_SaveGamePipelined::OpenForWriting( arcNetFile * file )  {
 	int status = deflateInit2( &zStream, Z_BEST_SPEED, Z_DEFLATED, sgf_windowBits.GetInteger(), 9, Z_DEFAULT_STRATEGY );
 	//mem.PopHeap();
 	if ( status != Z_OK ) {
-		arcLibrary::FatalError( "arcFile_SaveGamePipelined::OpenForWriting: deflateInit2() error %i", status );
+		anLibrary::FatalError( "anFile_SGPipelined::OpenForWriting: deflateInit2() error %i", status );
 	}
 
 	// initial buffer setup
@@ -361,8 +361,8 @@ bool arcFile_SaveGamePipelined::OpenForWriting( arcNetFile * file )  {
 		compressThread->sgf = this;
 		compressThread->StartWorkerThread( "SGF_CompressThread", CORE_2B, THREAD_NORMAL );
 	}
-	if ( nativeFile != NULL && sgf_threads.GetInteger() >= 2 ) {
-		writeThread = new (TAG_IDFILE) idSGFwriteThread();
+	if ( nativeFile != nullptr && sgf_threads.GetInteger() >= 2 ) {
+		writeThread = new (TAG_IDFILE) anSGFwriteThread();
 		writeThread->sgf = this;
 		writeThread->StartWorkerThread( "SGF_WriteThread", CORE_2A, THREAD_NORMAL );
 	}
@@ -372,14 +372,14 @@ bool arcFile_SaveGamePipelined::OpenForWriting( arcNetFile * file )  {
 
 /*
 ============================
-arcFile_SaveGamePipelined::NextWriteBlock
+anFile_SGPipelined::NextWriteBlock
 
 Modifies:
 	dataIO
 	bytesIO
 ============================
 */
-bool arcFile_SaveGamePipelined::NextWriteBlock( blockForIO_t * block ) {
+bool anFile_SGPipelined::NextWriteBlock( blockForIO_t * block ) {
 	assert( mode == WRITE );
 
 	blockRequested.Raise();		// the background thread is done with the last block
@@ -390,7 +390,7 @@ bool arcFile_SaveGamePipelined::NextWriteBlock( blockForIO_t * block ) {
 
 	blockAvailable.Wait();	// wait for a new block to come through the pipeline
 
-	if ( finished || block == NULL ) {
+	if ( finished || block == nullptr ) {
 		nativeFileEndHit = true;
 		blockRequested.Raise();
 		blockFinished.Raise();
@@ -402,7 +402,7 @@ bool arcFile_SaveGamePipelined::NextWriteBlock( blockForIO_t * block ) {
 	block->data = dataIO;
 	block->bytes = bytesIO;
 
-	dataIO = NULL;
+	dataIO = nullptr;
 	bytesIO = 0;
 
 	return true;
@@ -410,7 +410,7 @@ bool arcFile_SaveGamePipelined::NextWriteBlock( blockForIO_t * block ) {
 
 /*
 ============================
-arcFile_SaveGamePipelined::WriteBlock
+anFile_SGPipelined::WriteBlock
 
 Modifies:
 	dataIO
@@ -418,20 +418,20 @@ Modifies:
 	nativeFile
 ============================
 */
-void arcFile_SaveGamePipelined::WriteBlock() {
-	assert( nativeFile != NULL );
+void anFile_SGPipelined::WriteBlock() {
+	assert( nativeFile != nullptr );
 
 	compressedLength += bytesIO;
 
 	nativeFile->Write( dataIO, bytesIO );
 
-	dataIO = NULL;
+	dataIO = nullptr;
 	bytesIO = 0;
 }
 
 /*
 ============================
-arcFile_SaveGamePipelined::FlushCompressedBlock
+anFile_SGPipelined::FlushCompressedBlock
 
 Called when a compressed block fills up, and also to flush the final partial block.
 Flushes everything from [compressedConsumedBytes -> compressedProducedBytes)
@@ -446,11 +446,11 @@ Modifies:
 	compressedConsumedBytes
 ============================
 */
-void arcFile_SaveGamePipelined::FlushCompressedBlock() {
+void anFile_SGPipelined::FlushCompressedBlock() {
 	// block until the background thread is done with the last block
-	if ( writeThread != NULL ) {
+	if ( writeThread != nullptr ) {
 		writeThread->WaitForThread();
-	} if ( nativeFile == NULL ) {
+	} if ( nativeFile == nullptr ) {
 		if ( !nativeFileEndHit ) {
 			blockRequested.Wait();
 		}
@@ -461,10 +461,10 @@ void arcFile_SaveGamePipelined::FlushCompressedBlock() {
 	bytesIO = compressedProducedBytes - compressedConsumedBytes;
 	compressedConsumedBytes = compressedProducedBytes;
 
-	if ( writeThread != NULL ) {
+	if ( writeThread != nullptr ) {
 		// signal a new block is available to be written out
 		writeThread->SignalWork();
-	} else if ( nativeFile != NULL ) {
+	} else if ( nativeFile != nullptr ) {
 		// write syncronously
 		WriteBlock();
 	} else {
@@ -475,7 +475,7 @@ void arcFile_SaveGamePipelined::FlushCompressedBlock() {
 
 /*
 ============================
-arcFile_SaveGamePipelined::CompressBlock
+anFile_SGPipelined::CompressBlock
 
 Called when an uncompressed block fills up, and also to flush the final partial block.
 Flushes everything from [uncompressedConsumedBytes -> uncompressedProducedBytes)
@@ -489,11 +489,11 @@ Modifies:
 	zStreamEndHit
 ============================
 */
-void arcFile_SaveGamePipelined::CompressBlock() {
+void anFile_SGPipelined::CompressBlock() {
 	zStream.next_in = (Bytef * )dataZlib;
 	zStream.avail_in = (uInt) bytesZlib;
 
-	dataZlib = NULL;
+	dataZlib = nullptr;
 	bytesZlib = 0;
 
 	// if this is the finish block, we may need to write
@@ -503,7 +503,7 @@ void arcFile_SaveGamePipelined::CompressBlock() {
 		const int zstat = deflate( &zStream, zLibFlushType );
 
 		if ( zstat != Z_OK && zstat != Z_STREAM_END ) {
-			arcLibrary::FatalError( "arcFile_SaveGamePipelined::CompressBlock: deflate() returned %i", zstat );
+			anLibrary::FatalError( "anFile_SGPipelined::CompressBlock: deflate() returned %i", zstat );
 		}
 
 		if ( zStream.avail_out == 0 || zLibFlushType == Z_FINISH ) {
@@ -541,7 +541,7 @@ void arcFile_SaveGamePipelined::CompressBlock() {
 
 /*
 ============================
-arcFile_SaveGamePipelined::FlushUncompressedBlock
+anFile_SGPipelined::FlushUncompressedBlock
 
 Called when an uncompressed block fills up, and also to flush the final partial block.
 Flushes everything from [uncompressedConsumedBytes -> uncompressedProducedBytes)
@@ -556,9 +556,9 @@ Modifies:
 	uncompressedConsumedBytes
 ============================
 */
-void arcFile_SaveGamePipelined::FlushUncompressedBlock() {
+void anFile_SGPipelined::FlushUncompressedBlock() {
 	// block until the background thread has completed
-	if ( compressThread != NULL ) {
+	if ( compressThread != nullptr ) {
 		// make sure thread has completed the last work
 		compressThread->WaitForThread();
 	}
@@ -568,7 +568,7 @@ void arcFile_SaveGamePipelined::FlushUncompressedBlock() {
 	bytesZlib = uncompressedProducedBytes - uncompressedConsumedBytes;
 	uncompressedConsumedBytes = uncompressedProducedBytes;
 
-	if ( compressThread != NULL ) {
+	if ( compressThread != nullptr ) {
 		// signal thread for more work
 		compressThread->SignalWork();
 	} else {
@@ -579,15 +579,15 @@ void arcFile_SaveGamePipelined::FlushUncompressedBlock() {
 
 /*
 ============================
-arcFile_SaveGamePipelined::Write
+anFile_SGPipelined::Write
 
 Modifies:
 	uncompressed
 	uncompressedProducedBytes
 ============================
 */
-int arcFile_SaveGamePipelined::Write( const void * buffer, int length ) {
-	if ( buffer == NULL || length <= 0 ) {
+int anFile_SGPipelined::Write( const void * buffer, int length ) {
+	if ( buffer == nullptr || length <= 0 ) {
 		return 0;
 	}
 
@@ -632,21 +632,21 @@ READ PATH
 
 /*
 ============================
-arcFile_SaveGamePipelined::OpenForReading
+anFile_SGPipelined::OpenForReading
 ============================
 */
-bool arcFile_SaveGamePipelined::OpenForReading( const char * const filename, bool useNativeFile ) {
+bool anFile_SGPipelined::OpenForReading( const char *const filename, bool useNativeFile ) {
 	assert( mode == CLOSED );
 
 	name = filename;
 	osPath = filename;
 	mode = READ;
-	nativeFile = NULL;
+	nativeFile = nullptr;
 	numChecksums = 0;
 
 	if ( useNativeFile ) {
 		nativeFile = fileSystem->OpenFileRead( filename );
-		if ( nativeFile == NULL ) {
+		if ( nativeFile == nullptr ) {
 			return false;
 		}
 	}
@@ -656,7 +656,7 @@ bool arcFile_SaveGamePipelined::OpenForReading( const char * const filename, boo
 	int status = inflateInit2( &zStream, sgf_windowBits.GetInteger() );
 	//mem.PopHeap();
 	if ( status != Z_OK ) {
-		arcLibrary::FatalError( "arcFile_SaveGamePipelined::OpenForReading: inflateInit2() error %i", status );
+		anLibrary::FatalError( "anFile_SGPipelined::OpenForReading: inflateInit2() error %i", status );
 	}
 
 	// spawn threads
@@ -665,8 +665,8 @@ bool arcFile_SaveGamePipelined::OpenForReading( const char * const filename, boo
 		decompressThread->sgf = this;
 		decompressThread->StartWorkerThread( "SGF_DecompressThread", CORE_2B, THREAD_NORMAL );
 	}
-	if ( nativeFile != NULL && sgf_threads.GetInteger() >= 2 ) {
-		readThread = new (TAG_IDFILE) idSGFreadThread();
+	if ( nativeFile != nullptr && sgf_threads.GetInteger() >= 2 ) {
+		readThread = new (TAG_IDFILE) anSGFreedThread();
 		readThread->sgf = this;
 		readThread->StartWorkerThread( "SGF_ReadThread", CORE_2A, THREAD_NORMAL );
 	}
@@ -677,13 +677,13 @@ bool arcFile_SaveGamePipelined::OpenForReading( const char * const filename, boo
 
 /*
 ============================
-arcFile_SaveGamePipelined::OpenForReading
+anFile_SGPipelined::OpenForReading
 ============================
 */
-bool arcFile_SaveGamePipelined::OpenForReading( arcNetFile * file ) {
+bool anFile_SGPipelined::OpenForReading( anFile * file ) {
 	assert( mode == CLOSED );
 
-	if ( file == NULL ) {
+	if ( file == nullptr ) {
 		return false;
 	}
 
@@ -698,7 +698,7 @@ bool arcFile_SaveGamePipelined::OpenForReading( arcNetFile * file ) {
 	int status = inflateInit2( &zStream, sgf_windowBits.GetInteger() );
 	//mem.PopHeap();
 	if ( status != Z_OK ) {
-		arcLibrary::FatalError( "arcFile_SaveGamePipelined::OpenForReading: inflateInit2() error %i", status );
+		anLibrary::FatalError( "anFile_SGPipelined::OpenForReading: inflateInit2() error %i", status );
 	}
 
 	// spawn threads
@@ -707,8 +707,8 @@ bool arcFile_SaveGamePipelined::OpenForReading( arcNetFile * file ) {
 		decompressThread->sgf = this;
 		decompressThread->StartWorkerThread( "SGF_DecompressThread", CORE_1B, THREAD_NORMAL );
 	}
-	if ( nativeFile != NULL && sgf_threads.GetInteger() >= 2 ) {
-		readThread = new (TAG_IDFILE) idSGFreadThread();
+	if ( nativeFile != nullptr && sgf_threads.GetInteger() >= 2 ) {
+		readThread = new (TAG_IDFILE) anSGFreedThread();
 		readThread->sgf = this;
 		readThread->StartWorkerThread( "SGF_ReadThread", CORE_1A, THREAD_NORMAL );
 	}
@@ -719,7 +719,7 @@ bool arcFile_SaveGamePipelined::OpenForReading( arcNetFile * file ) {
 
 /*
 ============================
-arcFile_SaveGamePipelined::NextReadBlock
+anFile_SGPipelined::NextReadBlock
 
 Reads the next data block from the filesystem into the memory buffer.
 
@@ -729,10 +729,10 @@ Modifies:
 	nativeFileEndHit
 ============================
 */
-bool arcFile_SaveGamePipelined::NextReadBlock( blockForIO_t * block, size_t lastReadBytes ) {
+bool anFile_SGPipelined::NextReadBlock( blockForIO_t * block, size_t lastReadBytes ) {
 	assert( mode == READ );
 
-	assert( ( lastReadBytes & ( COMPRESSED_BLOCK_SIZE - 1 ) ) == 0 || block == NULL );
+	assert( ( lastReadBytes & ( COMPRESSED_BLOCK_SIZE - 1 ) ) == 0 || block == nullptr );
 	compressedProducedBytes += lastReadBytes;
 
 	blockAvailable.Raise();		// a new block is available for the pipeline to consume
@@ -743,7 +743,7 @@ bool arcFile_SaveGamePipelined::NextReadBlock( blockForIO_t * block, size_t last
 
 	blockRequested.Wait();		// wait for the last block to be consumed by the pipeline
 
-	if ( finished || block == NULL ) {
+	if ( finished || block == nullptr ) {
 		nativeFileEndHit = true;
 		blockAvailable.Raise();
 		blockFinished.Raise();
@@ -759,7 +759,7 @@ bool arcFile_SaveGamePipelined::NextReadBlock( blockForIO_t * block, size_t last
 
 /*
 ============================
-arcFile_SaveGamePipelined::ReadBlock
+anFile_SGPipelined::ReadBlock
 
 Reads the next data block from the filesystem into the memory buffer.
 
@@ -770,8 +770,8 @@ Modifies:
 	nativeFileEndHit
 ============================
 */
-void arcFile_SaveGamePipelined::ReadBlock() {
-	assert( nativeFile != NULL );
+void anFile_SGPipelined::ReadBlock() {
+	assert( nativeFile != nullptr );
 	// normally run in a separate thread
 	if ( nativeFileEndHit ) {
 		return;
@@ -788,7 +788,7 @@ void arcFile_SaveGamePipelined::ReadBlock() {
 
 /*
 ============================
-arcFile_SaveGamePipelined::PumpCompressedBlock
+anFile_SGPipelined::PumpCompressedBlock
 
 Reads:
 	compressed
@@ -800,11 +800,11 @@ Modifies:
 	compressedConsumedBytes
 ============================
 */
-void arcFile_SaveGamePipelined::PumpCompressedBlock() {
+void anFile_SGPipelined::PumpCompressedBlock() {
 	// block until the background thread is done with the last block
-	if ( readThread != NULL ) {
+	if ( readThread != nullptr ) {
 		readThread->WaitForThread();
-	} else if ( nativeFile == NULL ) {
+	} else if ( nativeFile == nullptr ) {
 		if ( !nativeFileEndHit ) {
 			blockAvailable.Wait();
 		}
@@ -815,10 +815,10 @@ void arcFile_SaveGamePipelined::PumpCompressedBlock() {
 	bytesIO = compressedProducedBytes - compressedConsumedBytes;
 	compressedConsumedBytes = compressedProducedBytes;
 
-	if ( readThread != NULL ) {
+	if ( readThread != nullptr ) {
 		// signal read thread to read another block
 		readThread->SignalWork();
-	} else if ( nativeFile != NULL ) {
+	} else if ( nativeFile != nullptr ) {
 		// run syncronously
 		ReadBlock();
 	} else {
@@ -829,7 +829,7 @@ void arcFile_SaveGamePipelined::PumpCompressedBlock() {
 
 /*
 ============================
-arcFile_SaveGamePipelined::DecompressBlock
+anFile_SGPipelined::DecompressBlock
 
 Decompresses the next data block from the memory buffer
 
@@ -853,7 +853,7 @@ Modifies:
 	zStream
 ============================
 */
-void arcFile_SaveGamePipelined::DecompressBlock() {
+void anFile_SGPipelined::DecompressBlock() {
 	if ( zStreamEndHit ) {
 		return;
 	}
@@ -876,7 +876,7 @@ void arcFile_SaveGamePipelined::DecompressBlock() {
 			zStream.next_in = (Bytef *) dataIO;
 			zStream.avail_in = (uInt) bytesIO;
 
-			dataIO = NULL;
+			dataIO = nullptr;
 			bytesIO = 0;
 
 			if ( sgf_checksums.GetBool() ) {
@@ -907,7 +907,7 @@ void arcFile_SaveGamePipelined::DecompressBlock() {
 			return;
 		}
 		if ( zstat != Z_OK ) {
-			arcLibrary::Warning( "arcFile_SaveGamePipelined::DecompressBlock: inflate() returned %i", zstat );
+			anLibrary::Warning( "anFile_SGPipelined::DecompressBlock: inflate() returned %i", zstat );
 			zStreamEndHit = true;
 			return;
 		}
@@ -918,7 +918,7 @@ void arcFile_SaveGamePipelined::DecompressBlock() {
 
 /*
 ============================
-arcFile_SaveGamePipelined::PumpUncompressedBlock
+anFile_SGPipelined::PumpUncompressedBlock
 
 Called when an uncompressed block is drained.
 
@@ -932,8 +932,8 @@ Modifies:
 	uncompressedConsumedBytes
 ============================
 */
-void arcFile_SaveGamePipelined::PumpUncompressedBlock() {
-	if ( decompressThread != NULL ) {
+void anFile_SGPipelined::PumpUncompressedBlock() {
+	if ( decompressThread != nullptr ) {
 		// make sure thread has completed the last work
 		decompressThread->WaitForThread();
 	}
@@ -943,7 +943,7 @@ void arcFile_SaveGamePipelined::PumpUncompressedBlock() {
 	bytesZlib = uncompressedProducedBytes - uncompressedConsumedBytes;
 	uncompressedConsumedBytes = uncompressedProducedBytes;
 
-	if ( decompressThread != NULL ) {
+	if ( decompressThread != nullptr ) {
 		// signal thread for more work
 		decompressThread->SignalWork();
 	} else {
@@ -954,15 +954,15 @@ void arcFile_SaveGamePipelined::PumpUncompressedBlock() {
 
 /*
 ============================
-arcFile_SaveGamePipelined::Read
+anFile_SGPipelined::Read
 
 Modifies:
 	dataZlib
 	bytesZlib
 ============================
 */
-int arcFile_SaveGamePipelined::Read( void * buffer, int length ) {
-	if ( buffer == NULL || length <= 0 ) {
+int anFile_SGPipelined::Read( void * buffer, int length ) {
+	if ( buffer == nullptr || length <= 0 ) {
 		return 0;
 	}
 
@@ -970,7 +970,7 @@ int arcFile_SaveGamePipelined::Read( void * buffer, int length ) {
 
 	size_t ioCount = 0;
 	size_t lengthRemaining = length;
-	byte * buffer_p = ( byte * )buffer;
+	byte * buffer_p = (byte *)buffer;
 	while ( lengthRemaining > 0 ) {
 		while ( bytesZlib == 0 ) {
 			PumpUncompressedBlock();
@@ -1005,14 +1005,14 @@ TEST CODE
 TestProcessFile
 ============================
 */
-static void TestProcessFile( const char * const filename ) {
-	arcLibrary::Printf( "Processing %s:\n", filename );
+static void TestProcessFile( const char *const filename ) {
+	anLibrary::Printf( "Processing %s:\n", filename );
 	// load some test data
 	void *testData;
-	const int testDataLength = fileSystem->ReadFile( filename, &testData, NULL );
+	const int testDataLength = fileSystem->ReadFile( filename, &testData, nullptr );
 
-	const char * const outFileName = "junk/savegameTest.bin";
-	arcFile_SaveGamePipelined *saveFile = new (TAG_IDFILE) arcFile_SaveGamePipelined;
+	const char *const outFileName = "junk/savegameTest.bin";
+	anFile_SGPipelined *saveFile = new (TAG_IDFILE) anFile_SGPipelined;
 	saveFile->OpenForWriting( outFileName, true );
 
 	const uint64 startWriteMicroseconds = Sys_Microseconds();
@@ -1024,14 +1024,14 @@ static void TestProcessFile( const char * const filename ) {
 	const uint64 endWriteMicroseconds = Sys_Microseconds();
 	const uint64 writeMicroseconds = endWriteMicroseconds - startWriteMicroseconds;
 
-	arcLibrary::Printf( "%lld microseconds to compress %i bytes to %i written bytes = %4.1f MB/s\n",
+	anLibrary::Printf( "%lld microseconds to compress %i bytes to %i written bytes = %4.1f MB/s\n",
 		writeMicroseconds, testDataLength, readDataLength, ( float )readDataLength / writeMicroseconds );
 
 	void * readData = (void *)Mem_Alloc( testDataLength, TAG_SAVEGAMES );
 
 	const uint64 startReadMicroseconds = Sys_Microseconds();
 
-	arcFile_SaveGamePipelined *loadFile = new (TAG_IDFILE) arcFile_SaveGamePipelined;
+	anFile_SGPipelined *loadFile = new (TAG_IDFILE) anFile_SGPipelined;
 	loadFile->OpenForReading( outFileName, true );
 	loadFile->Read( readData, testDataLength );
 	delete loadFile;
@@ -1039,19 +1039,19 @@ static void TestProcessFile( const char * const filename ) {
 	const uint64 endReadMicroseconds = Sys_Microseconds();
 	const uint64 readMicroseconds = endReadMicroseconds - startReadMicroseconds;
 
-	arcLibrary::Printf( "%lld microseconds to decompress = %4.1f MB/s\n", readMicroseconds, ( float )testDataLength / readMicroseconds );
+	anLibrary::Printf( "%lld microseconds to decompress = %4.1f MB/s\n", readMicroseconds, ( float )testDataLength / readMicroseconds );
 
 	int comparePoint;
 	for ( comparePoint = 0; comparePoint < testDataLength; comparePoint++ ) {
-		if ( ( ( byte * )readData)[comparePoint] != (( byte * )testData)[comparePoint] ) {
+		if ( ( (byte *)readData)[comparePoint] != ( (byte *)testData)[comparePoint] ) {
 			break;
 		}
 	}
 	if ( comparePoint != testDataLength ) {
-		arcLibrary::Printf( "Compare failed at %i.\n", comparePoint );
+		anLibrary::Printf( "Compare failed at %i.\n", comparePoint );
 		assert( 0 );
 	} else {
-		arcLibrary::Printf( "Compare succeeded.\n" );
+		anLibrary::Printf( "Compare succeeded.\n" );
 	}
 	Mem_Free( readData );
 	Mem_Free( testData );
@@ -1067,7 +1067,7 @@ CONSOLE_COMMAND( TestSaveGameFile, "Exercises the pipelined savegame code", 0 ) 
 	TestProcessFile( "maps/game/wasteland1/wasteland1.map" );
 #else
 	// test every file in base (found a fencepost error >100 files in originally!)
-	arcFileList * fileList = fileSystem->ListFiles( "", "" );
+	anFileList * fileList = fileSystem->ListFiles( "", "" );
 	for ( int i = 0; i < fileList->GetNumFiles(); i++ ) {
 		TestProcessFile( fileList->GetFile( i ) );
 		common->UpdateConsoleDisplay();
@@ -1082,18 +1082,18 @@ TestCompressionSpeeds
 ============================
 */
 CONSOLE_COMMAND( TestCompressionSpeeds, "Compares zlib and our code", 0 ) {
-	const char * const filename = "-colorMap.tga";
+	const char *const filename = "-colorMap.tga";
 
-	arcLibrary::Printf( "Processing %s:\n", filename );
+	anLibrary::Printf( "Processing %s:\n", filename );
 	// load some test data
 	void *testData;
-	const int testDataLength = fileSystem->ReadFile( filename, &testData, NULL );
+	const int testDataLength = fileSystem->ReadFile( filename, &testData, nullptr );
 
 	const int startWriteMicroseconds = Sys_Microseconds();
 
-	idCompressor *compressor = idCompressor::AllocLZW();
-//	arcNetFile *f = fileSystem->OpenFileWrite( "junk/lzwTest.bin" );
-	aRcFileMemory *f = new (TAG_IDFILE) aRcFileMemory( "junk/lzwTest.bin" );
+	anCompressor *compressor = anCompressor::AllocLZW();
+//	anFile *f = fileSystem->OpenFileWrite( "junk/lzwTest.bin" );
+	anFileMemory *f = new (TAG_IDFILE) anFileMemory( "junk/lzwTest.bin" );
 	compressor->Init( f, true, 8 );
 
 	compressor->Write( testData, testDataLength );
@@ -1106,7 +1106,7 @@ CONSOLE_COMMAND( TestCompressionSpeeds, "Compares zlib and our code", 0 ) {
 	const int endWriteMicroseconds = Sys_Microseconds();
 	const int writeMicroseconds = endWriteMicroseconds - startWriteMicroseconds;
 
-	arcLibrary::Printf( "%i microseconds to compress %i bytes to %i written bytes = %4.1f MB/s\n",
+	anLibrary::Printf( "%i microseconds to compress %i bytes to %i written bytes = %4.1f MB/s\n",
 		writeMicroseconds, testDataLength, readDataLength, ( float )readDataLength / writeMicroseconds );
 
 }

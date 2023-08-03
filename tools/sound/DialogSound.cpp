@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../game/game.h"
@@ -23,9 +23,9 @@ extern HTREEITEM FindTreeItem(CTreeCtrl *tree, HTREEITEM root, const char *text,
 
 /////////////////////////////////////////////////////////////////////////////
 // CDialogSound dialog
-CDialogSound *g_SoundDialog = NULL;
+CDialogSound *g_SoundDialog = nullptr;
 
-CDialogSound::CDialogSound(CWnd* pParent /*=NULL*/)
+CDialogSound::CDialogSound(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDialogSound::IDD, pParent) {
 	//{{AFX_DATA_INIT(CDialogSound)
 	strName = _T( "" );
@@ -41,7 +41,7 @@ CDialogSound::CDialogSound(CWnd* pParent /*=NULL*/)
 	bOcclusion = FALSE;
 	leadThrough = 0.0f;
 	plain = FALSE;
-	inUseTree = NULL;
+	inUseTree = nullptr;
 	random = 0.0f;
 	wait = 0.0f;
 	shakes = 0.0f;
@@ -114,7 +114,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CDialogSound message handlers
 
-void SoundEditorInit( const arcDictionary *spawnArgs ) {
+void SoundEditorInit( const anDict *spawnArgs ) {
 
 	if ( renderSystem->IsFullScreen() ) {
 		common->Printf( "Cannot run the sound editor in fullscreen mode.\n"
@@ -122,17 +122,17 @@ void SoundEditorInit( const arcDictionary *spawnArgs ) {
 		return;
 	}
 
-	if ( g_SoundDialog == NULL ) {
+	if ( g_SoundDialog == nullptr ) {
 		InitAfx();
 		g_SoundDialog = new CDialogSound();
 	}
 
-	if ( g_SoundDialog->GetSafeHwnd() == NULL ) {
+	if ( g_SoundDialog->GetSafeHwnd() == nullptr ) {
 		g_SoundDialog->Create(IDD_DIALOG_SOUND);
 /*
 		// FIXME: restore position
 		CRect rct;
-		g_SoundDialog->SetWindowPos( NULL, rct.left, rct.top, 0,0, SWP_NOSIZE );
+		g_SoundDialog->SetWindowPos( nullptr, rct.left, rct.top, 0,0, SWP_NOSIZE );
 */
 	}
 
@@ -143,7 +143,7 @@ void SoundEditorInit( const arcDictionary *spawnArgs ) {
 
 	if ( spawnArgs ) {
 		const char *name = spawnArgs->GetString( "name" );
-		const arcDictionary *dict = engineEdit->MapGetEntityDict( name );
+		const anDict *dict = engineEdit->MapGetEntityDict( name );
 		g_SoundDialog->Set( dict );
 	}
 }
@@ -155,7 +155,7 @@ void SoundEditorRun( void ) {
 	MSG *msg = &m_msgCur;
 #endif
 
-	while( ::PeekMessage(msg, NULL, NULL, NULL, PM_NOREMOVE) ) {
+	while( ::PeekMessage(msg, nullptr, nullptr, nullptr, PM_NOREMOVE) ) {
 		// pump message
 		if ( !AfxGetApp()->PumpMessage() ) {
 		}
@@ -164,7 +164,7 @@ void SoundEditorRun( void ) {
 
 void SoundEditorShutdown( void ) {
 	delete g_SoundDialog;
-	g_SoundDialog = NULL;
+	g_SoundDialog = nullptr;
 }
 
 void CDialogSound::OnActivate( UINT nState, CWnd *pWndOther, BOOL bMinimized ) {
@@ -189,8 +189,8 @@ void CDialogSound::OnDestroy() {
 	return CDialog::OnDestroy();
 }
 
-void CDialogSound::Set( const arcDictionary *source ) {
-	if ( source == NULL ) {
+void CDialogSound::Set( const anDict *source ) {
+	if ( source == nullptr ) {
 		return;
 	}
 
@@ -219,9 +219,9 @@ void CDialogSound::Set( const arcDictionary *source ) {
 	UpdateData(FALSE);
 }
 
-void CDialogSound::Get( arcDictionary *source ) {
+void CDialogSound::Get( anDict *source ) {
 
-	if ( source == NULL ) {
+	if ( source == nullptr ) {
 		return;
 	}
 	UpdateData( TRUE );
@@ -256,7 +256,7 @@ void CDialogSound::OnBtnSwitchtogame()
 }
 
 void CDialogSound::SetVolume( float vol ) {
-	arcNetList<arcEntity*> list;
+	anList<arcEntity*> list;
 	list.SetNum( 128 );
 	int count = engineEdit->GetSelectedEntities( list.Ptr(), list.Num() );
 	list.SetNum( count );
@@ -269,12 +269,12 @@ void CDialogSound::SetVolume( float vol ) {
 		}
 
 		for ( int i = 0; i < count; i++ ) {
-			const arcDictionary *dict = engineEdit->EntityGetSpawnArgs( list[i] );
-			if ( dict == NULL ) {
+			const anDict *dict = engineEdit->EntityGetSpawnArgs( list[i] );
+			if ( dict == nullptr ) {
 				continue;
 			}
 			const char *name = dict->GetString( "name" );
-			const arcDictionary *dict2 = engineEdit->MapGetEntityDict( name );
+			const anDict *dict2 = engineEdit->MapGetEntityDict( name );
 			if ( dict2 ) {
 				engineEdit->MapSetEntityKeyVal( name, "s_volume", va( "%f", vol ) );
 				engineEdit->MapSetEntityKeyVal( name, "s_justVolume", "1" );
@@ -287,7 +287,7 @@ void CDialogSound::SetVolume( float vol ) {
 }
 
 void CDialogSound::ApplyChanges( bool volumeOnly, bool updateInUseTree ) {
-	arcNetList<arcEntity*> list;
+	anList<arcEntity*> list;
 	float vol;
 
 	vol = fVolume;
@@ -304,12 +304,12 @@ void CDialogSound::ApplyChanges( bool volumeOnly, bool updateInUseTree ) {
 		}
 
 		for ( int i = 0; i < count; i++ ) {
-			const arcDictionary *dict = engineEdit->EntityGetSpawnArgs( list[i] );
-			if ( dict == NULL ) {
+			const anDict *dict = engineEdit->EntityGetSpawnArgs( list[i] );
+			if ( dict == nullptr ) {
 				continue;
 			}
 			const char *name = dict->GetString( "name" );
-			const arcDictionary *dict2 = engineEdit->MapGetEntityDict( name );
+			const anDict *dict2 = engineEdit->MapGetEntityDict( name );
 			if ( dict2 ) {
 				if ( volumeOnly ) {
 					float f = dict2->GetFloat( "s_volume" );
@@ -320,7 +320,7 @@ void CDialogSound::ApplyChanges( bool volumeOnly, bool updateInUseTree ) {
 					fVolume = f;
 					UpdateData( FALSE );
 				} else {
-					arcDictionary src;
+					anDict src;
 					src.SetFloat( "s_volume", dict2->GetFloat( "s_volume" ) );
 					Get( &src );
 					src.SetBool( "s_justVolume", true );
@@ -353,8 +353,8 @@ void CDialogSound::OnChangeEditVolume() {
 
 }
 
-HTREEITEM CDialogSound::AddStrList(const char *root, const arcStringList &list, int id) {
-	arcNetString		out;
+HTREEITEM CDialogSound::AddStrList(const char *root, const anStringList &list, int id) {
+	anString		out;
 
 	HTREEITEM	base = treeSounds.InsertItem(root);
 	HTREEITEM	item = base;
@@ -362,9 +362,9 @@ HTREEITEM CDialogSound::AddStrList(const char *root, const arcStringList &list, 
 
 	int count = list.Num();
 
-	arcNetString	last, path, path2;
+	anString	last, path, path2;
 	for ( int i = 0; i < count; i++ ) {
-		arcNetString name = list[i];
+		anString name = list[i];
 
 		// now break the name down convert to slashes
 		name.BackSlashesToSlashes();
@@ -377,7 +377,7 @@ HTREEITEM CDialogSound::AddStrList(const char *root, const arcStringList &list, 
 			if (index >= 0 ) {
 				name.Left(index, last);
 			}
-		} else if (arcNetString::Icmpn(last, name, len) == 0 && name.Last('/') <= len) {
+		} else if (anString::Icmpn(last, name, len) == 0 && name.Last('/') <= len) {
 			name.Right(name.Length() - len - 1, out);
 			add = treeSounds.InsertItem(out, item);
 			quickTree.Set(name, add);
@@ -395,8 +395,8 @@ HTREEITEM CDialogSound::AddStrList(const char *root, const arcStringList &list, 
 		while (index >= 0 ) {
 			index = name.Find('/');
 			if (index >= 0 ) {
-				HTREEITEM newItem = NULL;
-				HTREEITEM *check = NULL;
+				HTREEITEM newItem = nullptr;
+				HTREEITEM *check = nullptr;
 				name.Left( index, out );
 				path += out;
 				if (quickTree.Get(path, &check) ) {
@@ -404,7 +404,7 @@ HTREEITEM CDialogSound::AddStrList(const char *root, const arcStringList &list, 
 				}
 
 				//HTREEITEM newItem = FindTreeItem(&treeSounds, item, name.Left(index, out), item);
-				if (newItem == NULL) {
+				if (newItem == nullptr ) {
 					newItem = treeSounds.InsertItem(out, item);
 					quickTree.Set(path, newItem);
 					treeSounds.SetItemData(newItem, WAVEDIR);
@@ -429,12 +429,12 @@ HTREEITEM CDialogSound::AddStrList(const char *root, const arcStringList &list, 
 
 void CDialogSound::AddSounds(bool rootItems) {
 	int i, j;
-	arcStringList list(1024);
-	arcStringList list2(1024);
+	anStringList list(1024);
+	anStringList list2(1024);
 	HTREEITEM base = treeSounds.InsertItem( "Sound Shaders" );
 
 	for ( i = 0; i < declManager->GetNumDecls( DECL_SOUND ); i++ ) {
-		const arcSoundShader *poo = declManager->SoundByIndex( i, false);
+		const anSoundShader *poo = declManager->SoundByIndex( i, false);
 		list.AddUnique( poo->GetFileName() );
 	}
 	list.Sort();
@@ -444,21 +444,21 @@ void CDialogSound::AddSounds(bool rootItems) {
 		treeSounds.SetItemData(child, SOUNDPARENT);
 		treeSounds.SetItemImage(child, 0, 1 );
 		list2.Clear();
-		for (j = 0; j < declManager->GetNumDecls( DECL_SOUND ); j++ ) {
-			const arcSoundShader *poo = declManager->SoundByIndex(j, false);
-			if ( arcNetString::Icmp( list[i], poo->GetFileName() ) == 0 ) {
+		for ( j = 0; j < declManager->GetNumDecls( DECL_SOUND ); j++ ) {
+			const anSoundShader *poo = declManager->SoundByIndex(j, false);
+			if ( anString::Icmp( list[i], poo->GetFileName() ) == 0 ) {
 				list2.Append( poo->GetName() );
 			}
 		}
 		list2.Sort();
-		for (j = 0; j < list2.Num(); j++ ) {
+		for ( j = 0; j < list2.Num(); j++ ) {
 			HTREEITEM child2 = treeSounds.InsertItem( list2[j], child );
 			treeSounds.SetItemData(child2, SOUNDS);
 			treeSounds.SetItemImage(child2, 2, 2);
 		}
 	}
 
-	arcFileList *files;
+	anFileList *files;
 	files = fileSystem->ListFilesTree( "sound", ".wav|.ogg", true );
     AddStrList( "Wave files", files->GetList(), WAVES );
 	fileSystem->FreeFileList( files );
@@ -466,10 +466,10 @@ void CDialogSound::AddSounds(bool rootItems) {
 
 void CDialogSound::AddGroups() {
 	comboGroups.ResetContent();
-	arcNetString work;
+	anString work;
 	CWaitCursor cursor;
 
-	arcNetList<const char*> list;
+	anList<const char*> list;
 	list.SetNum( 1024 );
 	int count = engineEdit->MapGetUniqueMatchingKeyVals( "soundgroup", list.Ptr(), list.Num() );
 	for ( int i = 0; i < count; i++ ) {
@@ -480,15 +480,15 @@ void CDialogSound::AddGroups() {
 void CDialogSound::AddInUseSounds() {
 	if ( inUseTree ) {
 		treeSounds.DeleteItem( inUseTree );
-		inUseTree = NULL;
+		inUseTree = nullptr;
 	}
 	inUseTree = treeSounds.InsertItem( "Sounds in use" );
-	arcNetList< const char *> list;
+	anList< const char *> list;
 	list.SetNum( 512 );
 	int i, count = engineEdit->MapGetEntitiesMatchingClassWithString( "speaker", "", list.Ptr(), list.Num() );
-	arcStringList list2;
+	anStringList list2;
 	for ( i = 0; i < count; i++ ) {
-		const arcDictionary *dict = engineEdit->MapGetEntityDict( list[i] );
+		const anDict *dict = engineEdit->MapGetEntityDict( list[i] );
 		if ( dict ) {
 			const char *p = dict->GetString( "s_shader" );
 			if ( p && *p ) {
@@ -510,7 +510,7 @@ void CDialogSound::AddSpeakers() {
 	comboSpeakers.ResetContent();
 
 	CWaitCursor cursor;
-	arcNetList< const char *> list;
+	anList< const char *> list;
 	list.SetNum( 512 );
 
 	CString group( "" );
@@ -530,7 +530,7 @@ BOOL CDialogSound::OnInitDialog() {
 	// Indicate the sound dialog is opened
 	com_editors |= EDITOR_SOUND;
 
-	inUseTree = NULL;
+	inUseTree = nullptr;
 	AddSounds(true);
 	AddGroups();
 	AddSpeakers();
@@ -604,7 +604,7 @@ void CDialogSound::OnSelchangedTreeSounds(NMHDR* pNMHDR, LRESULT* pResult) {
 			}
 		} else if (dw == WAVES) {
 			playSound = RebuildItemName( "Wave Files", item);
-			float size = fileSystem->ReadFile( playSound, NULL );
+			float size = fileSystem->ReadFile( playSound, nullptr );
 			SetWaveSize( va( "%0.2f mb", size / ( 1024 * 1024)  ) );
 			if (bPlay){
 				OnBtnPlaysound();
@@ -620,31 +620,31 @@ void CDialogSound::OnCheckPlay() {
 }
 
 void CDialogSound::OnBtnEdit() {
-	const arcDecleration *decl = declManager->FindDeclWithoutParsing( DECL_SOUND, strShader, false );
+	const anDecl *decl = declManager->FindDeclWithoutParsing( DECL_SOUND, strShader, false );
 
 	if ( decl ) {
 		DialogDeclEditor *declEditor;
 
 		declEditor = new DialogDeclEditor;
 		declEditor->Create( IDD_DIALOG_DECLEDITOR, GetParent() );
-		declEditor->LoadDecl( const_cast<arcDecleration *>( decl ) );
+		declEditor->LoadDecl( const_cast<anDecl *>( decl ) );
 		declEditor->ShowWindow( SW_SHOW );
 		declEditor->SetFocus();
 	}
 }
 
 void CDialogSound::OnBtnDrop() {
-	arcNetString		classname;
-	arcNetString		key;
-	arcNetString		value;
-	arcVec3		org;
-	arcDictionary		args;
-	arcAngles	viewAngles;
+	anString		classname;
+	anString		key;
+	anString		value;
+	anVec3		org;
+	anDict		args;
+	anAngles	viewAngles;
 
 
 	engineEdit->PlayerGetViewAngles( viewAngles );
 	engineEdit->PlayerGetEyePosition( org );
-	org += arcAngles( 0, viewAngles.yaw, 0 ).ToForward() * 80 + arcVec3( 0, 0, 1 );
+	org += anAngles( 0, viewAngles.yaw, 0 ).ToForward() * 80 + anVec3( 0, 0, 1 );
 	args.Set( "origin", org.ToString() );
 	args.Set( "classname", "speaker" );
 	args.Set( "angle", va( "%f", viewAngles.yaw + 180 ) );
@@ -653,7 +653,7 @@ void CDialogSound::OnBtnDrop() {
 	args.Set( "s_shakes", "0" );
 
 
-	arcNetString name = engineEdit->GetUniqueEntityName( "speaker" );
+	anString name = engineEdit->GetUniqueEntityName( "speaker" );
 	bool nameValid = false;
 	while ( !nameValid) {
 		DialogName dlg( "Name Speaker", this);
@@ -673,16 +673,16 @@ void CDialogSound::OnBtnDrop() {
 
 	args.Set( "name", name.c_str() );
 
-	arcEntity *ent = NULL;
+	arcEntity *ent = nullptr;
 	engineEdit->SpawnEntityDef( args, &ent );
 	if (ent) {
-		engineEdit->EntityUpdateChangeableSpawnArgs( ent, NULL );
+		engineEdit->EntityUpdateChangeableSpawnArgs( ent, nullptr );
 		engineEdit->ClearEntitySelection();
 		engineEdit->AddSelectedEntity( ent );
 	}
 
 	engineEdit->MapAddEntity( &args );
-	const arcDictionary *dict = engineEdit->MapGetEntityDict( args.GetString( "name" ) );
+	const anDict *dict = engineEdit->MapGetEntityDict( args.GetString( "name" ) );
 	Set( dict );
 	AddGroups();
 	AddSpeakers();
@@ -690,7 +690,7 @@ void CDialogSound::OnBtnDrop() {
 
 void CDialogSound::OnBtnGroup()
 {
-	arcNetList<arcEntity*> list;
+	anList<arcEntity*> list;
 
 	list.SetNum( 128 );
 	int count = engineEdit->GetSelectedEntities( list.Ptr(), list.Num() );
@@ -699,8 +699,8 @@ void CDialogSound::OnBtnGroup()
 	bool removed = false;
 	if (count) {
 		for ( int i = 0; i < count; i++ ) {
-			const arcDictionary *dict = engineEdit->EntityGetSpawnArgs( list[i] );
-			if ( dict == NULL ) {
+			const anDict *dict = engineEdit->EntityGetSpawnArgs( list[i] );
+			if ( dict == nullptr ) {
 				continue;
 			}
 			const char *name = dict->GetString( "name" );
@@ -727,23 +727,23 @@ void CDialogSound::OnBtnGroup()
 }
 
 void CDialogSound::OnBtnSavemapas() {
-	CFileDialog dlgSave(FALSE,"map",NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,"Map Files (*.map)|*.map||",AfxGetMainWnd() );
+	CFileDialog dlgSave(FALSE,"map",nullptr,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,"Map Files (*.map)|*.map||",AfxGetMainWnd() );
 	if (dlgSave.DoModal() == IDOK) {
 		OnBtnApply();
-		arcNetString work;
+		anString work;
 		work = fileSystem->OSPathToRelativePath( dlgSave.m_ofn.lpstrFile );
 		engineEdit->MapSave( work );
 	}
 }
 
-arcNetString CDialogSound::RebuildItemName(const char *root, HTREEITEM item) {
+anString CDialogSound::RebuildItemName(const char *root, HTREEITEM item) {
 	// have to build the name back up
-	arcNetString strParent;
+	anString strParent;
 	HTREEITEM parent = treeSounds.GetParentItem(item);
-	arcNetString name = treeSounds.GetItemText(item);
+	anString name = treeSounds.GetItemText(item);
 	while (true && parent) {
-		arcNetString test = treeSounds.GetItemText(parent);
-		if ( arcNetString::Icmp(test, root) == 0 ) {
+		anString test = treeSounds.GetItemText(parent);
+		if ( anString::Icmp(test, root) == 0 ) {
 			break;
 		}
 		strParent = test;
@@ -751,7 +751,7 @@ arcNetString CDialogSound::RebuildItemName(const char *root, HTREEITEM item) {
 		strParent += name;
 		name = strParent;
 		parent = treeSounds.GetParentItem(parent);
-		if (parent == NULL) {
+		if (parent == nullptr ) {
 			break;
 		}
 	}
@@ -760,9 +760,9 @@ arcNetString CDialogSound::RebuildItemName(const char *root, HTREEITEM item) {
 
 
 void CDialogSound::UpdateSelectedOrigin( float x, float y, float z ) {
-	arcNetList<arcEntity*> list;
-	arcVec3 origin;
-	arcVec3 vec( x, y, z );
+	anList<arcEntity*> list;
+	anVec3 origin;
+	anVec3 vec( x, y, z );
 
 	list.SetNum( 128 );
 	int count = engineEdit->GetSelectedEntities( list.Ptr(), list.Num() );
@@ -770,8 +770,8 @@ void CDialogSound::UpdateSelectedOrigin( float x, float y, float z ) {
 
 	if ( count ) {
 		for ( int i = 0; i < count; i++ ) {
-			const arcDictionary *dict = engineEdit->EntityGetSpawnArgs( list[i] );
-			if ( dict == NULL ) {
+			const anDict *dict = engineEdit->EntityGetSpawnArgs( list[i] );
+			if ( dict == nullptr ) {
 				continue;
 			}
 			const char *name = dict->GetString( "name" );
@@ -825,7 +825,7 @@ void CDialogSound::OnSelchangeComboGroups() {
 		CString group;
 		comboGroups.GetLBText( comboGroups.GetCurSel(), group );
 
-		arcNetList< const char *> list;
+		anList< const char *> list;
 		list.SetNum( 512 );
 		int count = engineEdit->MapGetEntitiesMatchingClassWithString( "speaker", group, list.Ptr(), list.Num() );
 		for ( int i = 0; i < count; i++ ) {
@@ -845,7 +845,7 @@ void CDialogSound::OnSelchangeComboSpeakers() {
 	if ( comboSpeakers.GetCurSel() >= 0 ) {
 		CString speaker;
 		comboSpeakers.GetLBText( comboSpeakers.GetCurSel(), speaker );
-		arcNetList< const char *> list;
+		anList< const char *> list;
 		list.SetNum( 512 );
 		int count = engineEdit->MapGetEntitiesMatchingClassWithString( "speaker", speaker, list.Ptr(), list.Num() );
 		for ( int i = 0; i < count; i++ ) {
@@ -878,9 +878,9 @@ void CDialogSound::OnBtnRefreshspeakers() {
 void CDialogSound::OnBtnRefreshwave() {
 	HTREEITEM	item = treeSounds.GetSelectedItem();
 	if (item && treeSounds.GetItemData( item ) == WAVEDIR) {
-		arcNetString path = "sound/";
+		anString path = "sound/";
 		path += RebuildItemName( "sound", item);
-		arcFileList *files;
+		anFileList *files;
 		files = fileSystem->ListFilesTree( path, ".wav" );
 		HTREEITEM child = treeSounds.GetChildItem(item);
 		while (child) {
@@ -892,7 +892,7 @@ void CDialogSound::OnBtnRefreshwave() {
 		}
 		int c = files->GetNumFiles();
 		for ( int i = 0; i < c; i++ ) {
-			arcNetString work = files->GetFile( i );
+			anString work = files->GetFile( i );
 			work.StripPath();
 			child = treeSounds.InsertItem(work, item);
 			treeSounds.SetItemData( child, WAVES );

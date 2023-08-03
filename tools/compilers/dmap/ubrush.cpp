@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "dmap.h"
@@ -205,7 +205,7 @@ returns false if the brush doesn't enclose a valid volume
 */
 bool BoundBrush (uBrush_t *brush) {
 	int			i, j;
-	arcWinding	*w;
+	anWinding	*w;
 
 	brush->bounds.Clear();
 	for ( i = 0; i < brush->numsides; i++ ) {
@@ -236,14 +236,14 @@ returns false if the brush doesn't enclose a valid volume
 */
 bool CreateBrushWindings (uBrush_t *brush) {
 	int			i, j;
-	arcWinding	*w;
-	arcPlane		*plane;
+	anWinding	*w;
+	anPlane		*plane;
 	side_t		*side;
 
 	for ( i = 0; i < brush->numsides; i++ ) {
 		side = &brush->sides[i];
 		plane = &dmapGlobals.mapPlanes[side->planenum];
-		w = new arcWinding( *plane );
+		w = new anWinding( *plane );
 		for ( j = 0; j < brush->numsides && w; j++ ) {
 			if ( i == j ) {
 				continue;
@@ -270,10 +270,10 @@ BrushFromBounds
 Creates a new axial brush
 ==================
 */
-uBrush_t	*BrushFromBounds( const arcBounds &bounds ) {
+uBrush_t	*BrushFromBounds( const anBounds &bounds ) {
 	uBrush_t	*b;
 	int			i;
-	arcPlane		plane;
+	anPlane		plane;
 
 	b = AllocBrush (6);
 	b->numsides = 6;
@@ -301,17 +301,17 @@ BrushVolume
 */
 float BrushVolume (uBrush_t *brush) {
 	int			i;
-	arcWinding	*w;
-	arcVec3		corner;
+	anWinding	*w;
+	anVec3		corner;
 	float		d, area, volume;
-	arcPlane		*plane;
+	anPlane		*plane;
 
 	if ( !brush)
 		return 0;
 
 	// grab the first valid point as the corner
 
-	w = NULL;
+	w = nullptr;
 	for ( i = 0; i < brush->numsides; i++ ) {
 		w = brush->sides[i].winding;
 		if (w)
@@ -349,10 +349,10 @@ FIXME: use new brush format
 ==================
 */
 void WriteBspBrushMap( const char *name, uBrush_t *list ) {
-	arcNetFile *	f;
+	anFile *	f;
 	side_t *	s;
 	int			i;
-	arcWinding *	w;
+	anWinding *	w;
 
 	common->Printf ( "writing %s\n", name);
 	f = fileSystem->OpenFileWrite( name );
@@ -368,7 +368,7 @@ void WriteBspBrushMap( const char *name, uBrush_t *list ) {
 		f->Printf( "{\n" );
 		for ( i=0,s=list->sides; i<list->numsides; i++,s++ )
 		{
-			w = new arcWinding( dmapGlobals.mapPlanes[s->planenum] );
+			w = new anWinding( dmapGlobals.mapPlanes[s->planenum] );
 
 			f->Printf ( "( %i %i %i ) ", ( int )( *w )[0][0], ( int )( *w )[0][1], ( int )( *w )[0][2] );
 			f->Printf ( "( %i %i %i ) ", ( int )( *w )[1][0], ( int )( *w )[1][1], ( int )( *w )[1][2] );
@@ -502,9 +502,9 @@ BrushMostlyOnSide
 
 ==================
 */
-int BrushMostlyOnSide (uBrush_t *brush, arcPlane &plane ) {
+int BrushMostlyOnSide (uBrush_t *brush, anPlane &plane ) {
 	int			i, j;
-	arcWinding	*w;
+	anWinding	*w;
 	float		d, max;
 	int			side;
 
@@ -543,12 +543,12 @@ unchanged
 void SplitBrush (uBrush_t *brush, int planenum, uBrush_t **front, uBrush_t **back) {
 	uBrush_t	*b[2];
 	int			i, j;
-	arcWinding	*w, *cw[2], *midwinding;
+	anWinding	*w, *cw[2], *midwinding;
 	side_t		*s, *cs;
 	float		d, d_front, d_back;
 
-	*front = *back = NULL;
-	arcPlane &plane = dmapGlobals.mapPlanes[planenum];
+	*front = *back = nullptr;
+	anPlane &plane = dmapGlobals.mapPlanes[planenum];
 
 	// check all points
 	d_front = d_back = 0;
@@ -579,9 +579,9 @@ void SplitBrush (uBrush_t *brush, int planenum, uBrush_t **front, uBrush_t **bac
 
 	// create a new winding from the split plane
 
-	w = new arcWinding( plane );
+	w = new anWinding( plane );
 	for ( i = 0; i < brush->numsides && w; i++ ) {
-		arcPlane &plane2 = dmapGlobals.mapPlanes[brush->sides[i].planenum ^ 1];
+		anPlane &plane2 = dmapGlobals.mapPlanes[brush->sides[i].planenum ^ 1];
 		w = w->Clip( plane2, 0 ); // PLANESIDE_EPSILON);
 	}
 
@@ -609,7 +609,7 @@ void SplitBrush (uBrush_t *brush, int planenum, uBrush_t **front, uBrush_t **bac
 		b[i] = AllocBrush (brush->numsides+1 );
 		memcpy( b[i], brush, sizeof( uBrush_t ) - sizeof( brush->sides ) );
 		b[i]->numsides = 0;
-		b[i]->next = NULL;
+		b[i]->next = nullptr;
 		b[i]->original = brush->original;
 	}
 
@@ -651,7 +651,7 @@ void SplitBrush (uBrush_t *brush, int planenum, uBrush_t **front, uBrush_t **bac
 		if ( b[i]->numsides < 3 )
 		{
 			FreeBrush (b[i] );
-			b[i] = NULL;
+			b[i] = nullptr;
 		}
 	}
 
@@ -681,7 +681,7 @@ void SplitBrush (uBrush_t *brush, int planenum, uBrush_t **front, uBrush_t **bac
 		b[i]->numsides++;
 
 		cs->planenum = planenum^i^1;
-		cs->material = NULL;
+		cs->material = nullptr;
 		if ( i==0 )
 			cs->winding = midwinding->Copy();
 		else
@@ -698,7 +698,7 @@ void SplitBrush (uBrush_t *brush, int planenum, uBrush_t **front, uBrush_t **bac
 		if (v1 < 1.0 )
 		{
 			FreeBrush (b[i] );
-			b[i] = NULL;
+			b[i] = nullptr;
 //			common->Printf ( "tiny volume after clip\n" );
 		}
 	}

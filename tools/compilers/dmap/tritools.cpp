@@ -26,14 +26,14 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "dmap.h"
 
 /*
 
-  All triangle list functions should behave reasonably with NULL lists.
+  All triangle list functions should behave reasonably with nullptr lists.
 
 */
 
@@ -104,7 +104,7 @@ mapTri_t	*CopyTriList( const mapTri_t *a ) {
 	mapTri_t	*testList;
 	const mapTri_t	*tri;
 
-	testList = NULL;
+	testList = nullptr;
 	for ( tri = a; tri; tri = tri->next ) {
 		mapTri_t	*copy;
 
@@ -155,7 +155,7 @@ MapTriArea
 ===============
 */
 float MapTriArea( const mapTri_t *tri ) {
-	return arcWinding::TriangleArea( tri->v[0].xyz, tri->v[1].xyz, tri->v[2].xyz );
+	return anWinding::TriangleArea( tri->v[0].xyz, tri->v[1].xyz, tri->v[2].xyz );
 }
 
 /*
@@ -170,7 +170,7 @@ mapTri_t	*RemoveBadTris( const mapTri_t *list ) {
 	mapTri_t	*copy;
 	const mapTri_t	*tri;
 
-	newList = NULL;
+	newList = nullptr;
 
 	for ( tri = list; tri; tri = tri->next ) {
 		if ( MapTriArea( tri ) > 0 ) {
@@ -188,7 +188,7 @@ mapTri_t	*RemoveBadTris( const mapTri_t *list ) {
 BoundTriList
 ================
 */
-void BoundTriList( const mapTri_t *list, arcBounds &b ) {
+void BoundTriList( const mapTri_t *list, anBounds &b ) {
 	b.Clear();
 	for (; list; list = list->next ) {
 		b.AddPoint( list->v[0].xyz );
@@ -203,7 +203,7 @@ DrawTri
 ================
 */
 void DrawTri( const mapTri_t *tri ) {
-	arcWinding w;
+	anWinding w;
 
 	w.SetNumPoints( 3 );
 	VectorCopy( tri->v[0].xyz, w[0] );
@@ -224,7 +224,7 @@ void	FlipTriList( mapTri_t *tris ) {
 	mapTri_t	*tri;
 
 	for ( tri = tris; tri; tri = tri->next ) {
-		arcDrawVert	v;
+		anDrawVertex	v;
 		const struct hashVert_s *hv;
 		struct optVertex_s	*ov;
 
@@ -247,10 +247,10 @@ void	FlipTriList( mapTri_t *tris ) {
 WindingForTri
 ================
 */
-arcWinding *WindingForTri( const mapTri_t *tri ) {
-	arcWinding	*w;
+anWinding *WindingForTri( const mapTri_t *tri ) {
+	anWinding	*w;
 
-	w = new arcWinding( 3 );
+	w = new anWinding( 3 );
 	w->SetNumPoints( 3 );
 	VectorCopy( tri->v[0].xyz, ( *w )[0] );
 	VectorCopy( tri->v[1].xyz, ( *w )[1] );
@@ -270,7 +270,7 @@ void		TriVertsFromOriginal( mapTri_t *tri, const mapTri_t *original ) {
 	int		i, j;
 	float	denom;
 
-	denom = arcWinding::TriangleArea( original->v[0].xyz, original->v[1].xyz, original->v[2].xyz );
+	denom = anWinding::TriangleArea( original->v[0].xyz, original->v[1].xyz, original->v[2].xyz );
 	if ( denom == 0 ) {
 		return;		// original was degenerate, so it doesn't matter
 	}
@@ -279,9 +279,9 @@ void		TriVertsFromOriginal( mapTri_t *tri, const mapTri_t *original ) {
 		float	a, b, c;
 
 		// find the barycentric coordinates
-		a = arcWinding::TriangleArea( tri->v[i].xyz, original->v[1].xyz, original->v[2].xyz ) / denom;
-		b = arcWinding::TriangleArea( tri->v[i].xyz, original->v[2].xyz, original->v[0].xyz ) / denom;
-		c = arcWinding::TriangleArea( tri->v[i].xyz, original->v[0].xyz, original->v[1].xyz ) / denom;
+		a = anWinding::TriangleArea( tri->v[i].xyz, original->v[1].xyz, original->v[2].xyz ) / denom;
+		b = anWinding::TriangleArea( tri->v[i].xyz, original->v[2].xyz, original->v[0].xyz ) / denom;
+		c = anWinding::TriangleArea( tri->v[i].xyz, original->v[0].xyz, original->v[1].xyz ) / denom;
 
 		// regenerate the interpolated values
 		tri->v[i].st[0] = a * original->v[0].st[0]
@@ -304,20 +304,20 @@ WindingToTriList
 Generates a new list of triangles with proper texcoords from a winding
 created by clipping the originalTri
 
-OriginalTri can be NULL if you don't care about texCoords
+OriginalTri can be nullptr if you don't care about texCoords
 ================
 */
-mapTri_t *WindingToTriList( const arcWinding *w, const mapTri_t *originalTri ) {
+mapTri_t *WindingToTriList( const anWinding *w, const mapTri_t *originalTri ) {
 	mapTri_t	*tri;
 	mapTri_t	*triList;
 	int			i, j;
-	const arcVec3	*vec;
+	const anVec3	*vec;
 
 	if ( !w ) {
-		return NULL;
+		return nullptr;
 	}
 
-	triList = NULL;
+	triList = nullptr;
 	for ( i = 2; i < w->GetNumPoints(); i++ ) {
 		tri = AllocTri();
 		if ( !originalTri ) {
@@ -353,14 +353,14 @@ mapTri_t *WindingToTriList( const arcWinding *w, const mapTri_t *originalTri ) {
 ClipTriList
 ==================
 */
-void	ClipTriList( const mapTri_t *list, const arcPlane &plane, float epsilon,
+void	ClipTriList( const mapTri_t *list, const anPlane &plane, float epsilon,
 						mapTri_t **front, mapTri_t **back ) {
 	const mapTri_t *tri;
 	mapTri_t		*newList;
-	arcWinding		*w, *frontW, *backW;
+	anWinding		*w, *frontW, *backW;
 
-	*front = NULL;
-	*back = NULL;
+	*front = nullptr;
+	*back = nullptr;
 
 	for ( tri = list; tri; tri = tri->next ) {
 		w = WindingForTri( tri );
@@ -382,6 +382,6 @@ void	ClipTriList( const mapTri_t *list, const arcPlane &plane, float epsilon,
 PlaneForTri
 ==================
 */
-void	PlaneForTri( const mapTri_t *tri, arcPlane &plane ) {
+void	PlaneForTri( const mapTri_t *tri, anPlane &plane ) {
 	plane.FromPoints( tri->v[0].xyz, tri->v[1].xyz, tri->v[2].xyz );
 }

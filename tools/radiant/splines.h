@@ -29,8 +29,8 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef __SPLINES_H__
 #define __SPLINES_H__
 
-extern void QGLBox(arcVec4 &color, arcVec3 &point, float size);
-extern void glLabeledPoint(arcVec4 &color, arcVec3 &point, float size, const char *label);
+extern void QGLBox(anVec4 &color, anVec3 &point, float size);
+extern void glLabeledPoint(anVec4 &color, anVec3 &point, float size, const char *label);
 
 
 class idPointListInterface {
@@ -40,53 +40,53 @@ public:
 
 	virtual int			numPoints() { return 0; }
 	virtual void		addPoint( const float x, const float y, const float z ) {}
-	virtual void		addPoint( const arcVec3 &v ) {}
+	virtual void		addPoint( const anVec3 &v ) {}
 	virtual void		removePoint( int index ) {}
-	virtual arcVec3 *	getPoint( int index ) { return NULL; }
+	virtual anVec3 *	getPoint( int index ) { return nullptr; }
 
 	int					numSelectedPoints() { return selectedPoints.Num(); }
-	arcVec3 *			getSelectedPoint( int index );
-	int					selectPointByRay( const arcVec3 &origin, const arcVec3 &direction, bool single );
+	anVec3 *			getSelectedPoint( int index );
+	int					selectPointByRay( const anVec3 &origin, const anVec3 &direction, bool single );
 	int					isPointSelected( int index );
 	int					selectPoint( int index, bool single );
 	void				selectAll();
 	void				deselectAll();
-	virtual void		UpdateSelection( const arcVec3 &move );
+	virtual void		UpdateSelection( const anVec3 &move );
 	void				drawSelection();
 
 protected:
-	arcNetList<int>			selectedPoints;
+	anList<int>			selectedPoints;
 };
 
 
-class idSplineList {
+class anSplineList {
 	friend class		idCamera;
 
 public:
 
-						idSplineList() { clear(); }
-						idSplineList( const char *p ) { clear(); name = p; }
-						~idSplineList() { clear(); }
+						anSplineList() { clear(); }
+						anSplineList( const char *p ) { clear(); name = p; }
+						~anSplineList() { clear(); }
 
 	void				clearControl();
 	void				clearSpline();
-	void				Parse( ARCParser *src );
-	void				write( arcNetFile *f, const char *name );
+	void				Parse( anParser *src );
+	void				write( anFile *f, const char *name );
 
 	void				clear();
 	void				initPosition( long startTime, long totalTime );
-	const arcVec3 *		GetPosition( long time );
+	const anVec3 *		GetPosition( long time );
 
 	void				draw( bool editMode );
 	void				addToRenderer();
 
-	void				SetSelectedPoint( arcVec3 *p );
-	arcVec3 *			getSelectedPoint() { return selected; }
+	void				SetSelectedPoint( anVec3 *p );
+	anVec3 *			getSelectedPoint() { return selected; }
 
-	void				addPoint( const arcVec3 &v ) { controlPoints.Append(new arcVec3( v) ); dirty = true; }
-	void				addPoint( float x, float y, float z ) { controlPoints.Append(new arcVec3( x, y, z ) ); dirty = true; }
+	void				addPoint( const anVec3 &v ) { controlPoints.Append(new anVec3( v) ); dirty = true; }
+	void				addPoint( float x, float y, float z ) { controlPoints.Append(new anVec3( x, y, z ) ); dirty = true; }
 
-	void				UpdateSelection(const arcVec3 &move);
+	void				UpdateSelection(const anVec3 &move);
 	void				startEdit() { editMode = true; }
 	void				stopEdit() { editMode = false; }
 	void				buildSpline();
@@ -94,18 +94,18 @@ public:
 	float				getGranularity() { return granularity; }
 
 	int					numPoints() { return controlPoints.Num(); }
-	arcVec3 *			getPoint( int index ) { assert(index >= 0 && index < controlPoints.Num() ); return controlPoints[index]; }
-	arcVec3 *			getSegmentPoint( int index ) { assert(index >= 0 && index < splinePoints.Num() ); return splinePoints[index]; }
+	anVec3 *			getPoint( int index ) { assert(index >= 0 && index < controlPoints.Num() ); return controlPoints[index]; }
+	anVec3 *			getSegmentPoint( int index ) { assert(index >= 0 && index < splinePoints.Num() ); return splinePoints[index]; }
 	void				setSegmentTime( int index, int time) { assert(index >= 0 && index < splinePoints.Num() ); splineTime[index] = time; }
 	int					getSegmentTime( int index ) { assert(index >= 0 && index < splinePoints.Num() ); return splineTime[index]; }
 	void				addSegmentTime( int index, int time) { assert(index >= 0 && index < splinePoints.Num() ); splineTime[index] += time; }
 	float				totalDistance();
 
 	int					getActiveSegment() { return activeSegment; }
-	void				setActiveSegment( int i ) { /* assert( i >= 0 && (splinePoints.Num() > 0 && i < splinePoints.Num() )); */ activeSegment = i; }
+	void				setActiveSegment( int i ) { /* assert( i >= 0 && (splinePoints.Num() > 0 && i < splinePoints.Num() ) ); */ activeSegment = i; }
 	int					numSegments() { return splinePoints.Num(); }
 
-	void				setColors(arcVec4 &path, arcVec4 &segment, arcVec4 &control, arcVec4 &active);
+	void				setColors(anVec4 &path, anVec4 &segment, anVec4 &control, anVec4 &active);
 
 	const char *		getName() { return name.c_str(); }
 	void				setName( const char *p ) { name = p; }
@@ -115,13 +115,13 @@ public:
 	void				setBaseTime( long t ) { baseTime = t; }
 
 protected:
-	arcNetString				name;
+	anString				name;
 	float				CalcSpline( int step, float tension);
-	arcNetList<arcVec3*>		controlPoints;
-	arcNetList<arcVec3*>		splinePoints;
-	arcNetList<double>		splineTime;
-	arcVec3 *			selected;
-	arcVec4				pathColor, segmentColor, controlColor, activeColor;
+	anList<anVec3*>		controlPoints;
+	anList<anVec3*>		splinePoints;
+	anList<double>		splineTime;
+	anVec3 *			selected;
+	anVec4				pathColor, segmentColor, controlColor, activeColor;
 	float				granularity;
 	bool				editMode;
 	bool				dirty;
@@ -166,11 +166,11 @@ public:
 	float				getVelocity( long t );
 	float				getBaseVelocity() { return baseVelocity; }
 	void				addVelocity( long start, long duration, float speed ) { velocities.Append(new idVelocity(start, duration, speed) ); }
-	virtual const arcVec3 *GetPosition( long t ) { return NULL; }
+	virtual const anVec3 *GetPosition( long t ) { return nullptr; }
 	virtual void		draw( bool editMode ) {};
-	virtual void		Parse( ARCParser *src ) {};
-	virtual void		write( arcNetFile *f, const char *name);
-	virtual bool		parseToken( const arcNetString &key, ARCParser *src );
+	virtual void		Parse( anParser *src ) {};
+	virtual void		write( anFile *f, const char *name);
+	virtual bool		parseToken( const anString &key, anParser *src );
 	const char *		getName() { return name.c_str(); }
 	void				setName( const char *p ) { name = p; }
 	virtual void		startEdit() { editMode = true; }
@@ -184,9 +184,9 @@ protected:
 	long				startTime;
 	long				time;
 	positionType		type;
-	arcNetString				name;
+	anString				name;
 	bool				editMode;
-	arcNetList<idVelocity*> velocities;
+	anList<idVelocity*> velocities;
 	float				baseVelocity;
 };
 
@@ -194,46 +194,46 @@ class ARCFixedPos : public ARCCameraPos {
 public:
 
 						ARCFixedPos() : ARCCameraPos() { init(); }
-						ARCFixedPos(arcVec3 p) : ARCCameraPos() { init(); pos = p; }
+						ARCFixedPos(anVec3 p) : ARCCameraPos() { init(); pos = p; }
 						~ARCFixedPos() { }
 
 	void				init() { pos.Zero(); type = ARCCameraPos::FIXED; }
 
-	virtual void		addPoint( const arcVec3 &v ) { pos = v; }
+	virtual void		addPoint( const anVec3 &v ) { pos = v; }
 	virtual void		addPoint( const float x, const float y, const float z ) { pos.Set( x, y, z ); }
-	virtual const arcVec3 *GetPosition( long t ) { return &pos; }
-	void				Parse( ARCParser *src );
-	void				write( arcNetFile *f, const char *name );
+	virtual const anVec3 *GetPosition( long t ) { return &pos; }
+	void				Parse( anParser *src );
+	void				write( anFile *f, const char *name );
 	virtual int			numPoints() { return 1; }
-	virtual arcVec3 *	getPoint( int index ) { assert( index == 0 ); return &pos; }
+	virtual anVec3 *	getPoint( int index ) { assert( index == 0 ); return &pos; }
 	virtual void		draw( bool editMode ) { glLabeledPoint(colorBlue, pos, ( editMode ) ? 5 : 3, "Fixed point" ); }
 
 protected:
-	arcVec3				pos;
+	anVec3				pos;
 };
 
 class idInterpolatedPosition : public ARCCameraPos {
 public:
 						idInterpolatedPosition() : ARCCameraPos() { init(); }
-						idInterpolatedPosition( arcVec3 start, arcVec3 end, long time ) : ARCCameraPos( time ) { init(); startPos = start; endPos = end; }
+						idInterpolatedPosition( anVec3 start, anVec3 end, long time ) : ARCCameraPos( time ) { init(); startPos = start; endPos = end; }
 						~idInterpolatedPosition() { }
 
 	void				init() { type = ARCCameraPos::INTERPOLATED; first = true; startPos.Zero(); endPos.Zero(); }
 
-	virtual const arcVec3 *GetPosition(long t);
-	void				Parse( ARCParser *src );
-	void				write( arcNetFile *f, const char *name );
+	virtual const anVec3 *GetPosition(long t);
+	void				Parse( anParser *src );
+	void				write( anFile *f, const char *name );
 	virtual int			numPoints() { return 2; }
-	virtual arcVec3 *	getPoint( int index );
+	virtual anVec3 *	getPoint( int index );
 	virtual void		addPoint( const float x, const float y, const float z );
-	virtual void		addPoint( const arcVec3 &v );
+	virtual void		addPoint( const anVec3 &v );
 	virtual void		draw( bool editMode );
 	virtual void		start( long t );
 
 protected:
 	bool				first;
-	arcVec3				startPos;
-	arcVec3				endPos;
+	anVec3				startPos;
+	anVec3				endPos;
 	long				lastTime;
 	float				distSoFar;
 };
@@ -247,18 +247,18 @@ public:
 
 	void				init() { type = ARCCameraPos::SPLINE; }
 	virtual void		start( long t );
-	virtual const arcVec3 *GetPosition( long t );
-	void				addControlPoint( arcVec3 &v ) { target.addPoint( v); }
-	void				Parse( ARCParser *src );
-	void				write( arcNetFile *f, const char *name );
+	virtual const anVec3 *GetPosition( long t );
+	void				addControlPoint( anVec3 &v ) { target.addPoint( v); }
+	void				Parse( anParser *src );
+	void				write( anFile *f, const char *name );
 	virtual int			numPoints() { return target.numPoints(); }
-	virtual arcVec3 *	getPoint( int index ) { return target.getPoint( index ); }
-	virtual void		addPoint( const arcVec3 &v ) { target.addPoint( v ); }
+	virtual anVec3 *	getPoint( int index ) { return target.getPoint( index ); }
+	virtual void		addPoint( const anVec3 &v ) { target.addPoint( v ); }
 	virtual void		draw( bool editMode ) { target.draw( editMode ); }
-	virtual void		UpdateSelection( const arcVec3 &move ) { ARCCameraPos::UpdateSelection(move); target.buildSpline(); }
+	virtual void		UpdateSelection( const anVec3 &move ) { ARCCameraPos::UpdateSelection(move); target.buildSpline(); }
 
 protected:
-	idSplineList		target;
+	anSplineList		target;
 	long				lastTime;
 	float				distSoFar;
 };
@@ -274,8 +274,8 @@ public:
 	float				GetFOV( long t );
 	void				start( long t ) { startTime = t; }
 	void				reset( float startfov, float endfov, int start, int len );
-	void				Parse( ARCParser *src );
-	void				write( arcNetFile *f, const char *name );
+	void				Parse( anParser *src );
+	void				write( anFile *f, const char *name );
 
 protected:
 	float				fov;
@@ -315,8 +315,8 @@ public:
 	const char *		getParam() { return paramStr.c_str(); }
 	long				getTime() { return time; }
 	void				setTime(long n) { time = n; }
-	void				Parse( ARCParser *src );
-	void				write( arcNetFile *f, const char *name );
+	void				Parse( anParser *src );
+	void				write( anFile *f, const char *name );
 	void				setTriggered( bool b ) { triggered = b; }
 	bool				getTriggered() { return triggered; }
 
@@ -324,7 +324,7 @@ public:
 
 protected:
 	eventType			type;
-	arcNetString				paramStr;
+	anString				paramStr;
 	long				time;
 	bool				triggered;
 
@@ -332,7 +332,7 @@ protected:
 
 class aRCCameraDef {
 public:
-						aRCCameraDef() { cameraPosition = NULL; clear(); }
+						aRCCameraDef() { cameraPosition = nullptr; clear(); }
 						~aRCCameraDef() { clear(); }
 
 	void				clear();
@@ -342,7 +342,7 @@ public:
 	static int			sortEvents( const void *p1, const void *p2 );
 	int					numEvents() { return events.Num(); }
 	aRCCameraEvent *		getEvent( int index ) { assert(index >= 0 && index < events.Num() ); return events[index]; }
-	void				Parse( ARCParser *src );
+	void				Parse( anParser *src );
 	bool				load( const char *filename );
 	void				save( const char *filename );
 	void				buildCamera();
@@ -360,11 +360,11 @@ public:
 	float				getTotalTime() { return totalTime; }
 	void				startCamera( long t );
 	void				stopCamera() { cameraRunning = true; }
-	void				getActiveSegmentInfo( int segment, arcVec3 &origin, arcVec3 &direction, float *fv);
-	bool				getCameraInfo(long time, arcVec3 &origin, arcVec3 &direction, float *fv);
+	void				getActiveSegmentInfo( int segment, anVec3 &origin, anVec3 &direction, float *fv);
+	bool				getCameraInfo(long time, anVec3 &origin, anVec3 &direction, float *fv);
 	void				draw( bool editMode );
 	int					numPoints();
-	const arcVec3 *		getPoint( int index );
+	const anVec3 *		getPoint( int index );
 	void				stopEdit();
 	void				startEdit( bool camera );
 	bool				waitEvent( int index );
@@ -375,13 +375,13 @@ public:
 	static ARCCameraPos *newFromType( ARCCameraPos::positionType t );
 
 protected:
-	arcNetString				name;
+	anString				name;
 	int					currentCameraPosition;
-	arcVec3				lastDirection;
+	anVec3				lastDirection;
 	bool				cameraRunning;
 	ARCCameraPos *	cameraPosition;
-	arcNetList<ARCCameraPos*> targetPositions;
-	arcNetList<aRCCameraEvent*> events;
+	anList<ARCCameraPos*> targetPositions;
+	anList<aRCCameraEvent*> events;
 	ARCCamFOV			fov;
 	int					activeTarget;
 	float				totalTime;

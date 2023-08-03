@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Common_local.h"
@@ -8,12 +8,12 @@
 FindUnusedFileName
 ================
 */
-static arcNetString FindUnusedFileName( const char *format ) {
-	arcNetString filename;
+static anString FindUnusedFileName( const char *format ) {
+	anString filename;
 
 	for ( int i = 0; i < 999; i++ ) {
 		filename.Format( format, i );
-		int len = fileSystem->ReadFile( filename, NULL, NULL );
+		int len = fileSystem->ReadFile( filename, nullptr, nullptr );
 		if ( len <= 0 ) {
 			return filename;	// file doesn't exist
 		}
@@ -24,10 +24,10 @@ static arcNetString FindUnusedFileName( const char *format ) {
 
 /*
 ================
-arcCommonLocal::StartRecordingRenderDemo
+anCommonLocal::StartRecordingRenderDemo
 ================
 */
-void arcCommonLocal::StartRecordingRenderDemo( const char *demoName ) {
+void anCommonLocal::StartRecordingRenderDemo( const char *demoName ) {
 	if ( writeDemo ) {
 		// allow it to act like a toggle
 		StopRecordingRenderDemo();
@@ -41,11 +41,11 @@ void arcCommonLocal::StartRecordingRenderDemo( const char *demoName ) {
 
 	console->Close();
 
-	writeDemo = new (TAG_SYSTEM) ARCDemoFile;
+	writeDemo = new (TAG_SYSTEM) anDemoFile;
 	if ( !writeDemo->OpenForWriting( demoName ) ) {
 		common->Printf( "error opening %s\n", demoName );
 		delete writeDemo;
-		writeDemo = NULL;
+		writeDemo = nullptr;
 		return;
 	}
 
@@ -61,12 +61,12 @@ void arcCommonLocal::StartRecordingRenderDemo( const char *demoName ) {
 
 /*
 ================
-arcCommonLocal::StopRecordingRenderDemo
+anCommonLocal::StopRecordingRenderDemo
 ================
 */
-void arcCommonLocal::StopRecordingRenderDemo() {
+void anCommonLocal::StopRecordingRenderDemo() {
 	if ( !writeDemo ) {
-		common->Printf( "arcCommonLocal::StopRecordingRenderDemo: not recording\n" );
+		common->Printf( "anCommonLocal::StopRecordingRenderDemo: not recording\n" );
 		return;
 	}
 	soundWorld->StopWritingDemo();
@@ -75,17 +75,17 @@ void arcCommonLocal::StopRecordingRenderDemo() {
 	writeDemo->Close();
 	common->Printf( "stopped recording %s.\n", writeDemo->GetName() );
 	delete writeDemo;
-	writeDemo = NULL;
+	writeDemo = nullptr;
 }
 
 /*
 ================
-arcCommonLocal::StopPlayingRenderDemo
+anCommonLocal::StopPlayingRenderDemo
 
 Reports timeDemo numbers and finishes any avi recording
 ================
 */
-void arcCommonLocal::StopPlayingRenderDemo() {
+void anCommonLocal::StopPlayingRenderDemo() {
 	if ( !readDemo ) {
 		timeDemo = TD_NO;
 		return;
@@ -103,13 +103,13 @@ void arcCommonLocal::StopPlayingRenderDemo() {
 
 	common->Printf( "stopped playing %s.\n", readDemo->GetName() );
 	delete readDemo;
-	readDemo = NULL;
+	readDemo = nullptr;
 
 	if ( timeDemo ) {
 		// report the stats
 		float	demoSeconds = ( timeDemoStopTime - timeDemoStartTime ) * 0.001f;
 		float	demoFPS = numDemoFrames / demoSeconds;
-		arcNetString	message = va( "%i frames rendered in %3.1f seconds = %3.1f fps\n", numDemoFrames, demoSeconds, demoFPS );
+		anString	message = va( "%i frames rendered in %3.1f seconds = %3.1f fps\n", numDemoFrames, demoSeconds, demoFPS );
 
 		common->Printf( message );
 		if ( timeDemo == TD_YES_THEN_QUIT ) {
@@ -121,12 +121,12 @@ void arcCommonLocal::StopPlayingRenderDemo() {
 
 /*
 ================
-arcCommonLocal::DemoShot
+anCommonLocal::DemoShot
 
 A demoShot is a single frame demo
 ================
 */
-void arcCommonLocal::DemoShot( const char *demoName ) {
+void anCommonLocal::DemoShot( const char *demoName ) {
 	StartRecordingRenderDemo( demoName );
 
 	// force draw one frame
@@ -138,12 +138,12 @@ void arcCommonLocal::DemoShot( const char *demoName ) {
 
 /*
 ================
-arcCommonLocal::StartPlayingRenderDemo
+anCommonLocal::StartPlayingRenderDemo
 ================
 */
-void arcCommonLocal::StartPlayingRenderDemo( arcNetString demoName ) {
+void anCommonLocal::StartPlayingRenderDemo( anString demoName ) {
 	if ( !demoName[0] ) {
-		common->Printf( "arcCommonLocal::StartPlayingRenderDemo: no name specified\n" );
+		common->Printf( "anCommonLocal::StartPlayingRenderDemo: no name specified\n" );
 		return;
 	}
 
@@ -159,12 +159,12 @@ void arcCommonLocal::StartPlayingRenderDemo( arcNetString demoName ) {
 	// automatically put the console away
 	console->Close();
 
-	readDemo = new (TAG_SYSTEM) ARCDemoFile;
+	readDemo = new (TAG_SYSTEM) anDemoFile;
 	demoName.DefaultFileExtension( ".demo" );
 	if ( !readDemo->OpenForReading( demoName ) ) {
 		common->Printf( "couldn't open %s\n", demoName.c_str() );
 		delete readDemo;
-		readDemo = NULL;
+		readDemo = nullptr;
 		Stop();
 		StartMenu();
 		return;
@@ -182,11 +182,11 @@ void arcCommonLocal::StartPlayingRenderDemo( arcNetString demoName ) {
 
 /*
 ================
-arcCommonLocal::TimeRenderDemo
+anCommonLocal::TimeRenderDemo
 ================
 */
-void arcCommonLocal::TimeRenderDemo( const char *demoName, bool twice, bool quit ) {
-	arcNetString demo = demoName;
+void anCommonLocal::TimeRenderDemo( const char *demoName, bool twice, bool quit ) {
+	anString demo = demoName;
 
 	StartPlayingRenderDemo( demo );
 
@@ -214,11 +214,11 @@ void arcCommonLocal::TimeRenderDemo( const char *demoName, bool twice, bool quit
 
 /*
 ================
-arcCommonLocal::BeginAVICapture
+anCommonLocal::BeginAVICapture
 ================
 */
-void arcCommonLocal::BeginAVICapture( const char *demoName ) {
-	arcNetString name = demoName;
+void anCommonLocal::BeginAVICapture( const char *demoName ) {
+	anString name = demoName;
 	name.ExtractFileBase( aviDemoShortName );
 	aviCaptureMode = true;
 	aviDemoFrameCount = 0;
@@ -227,10 +227,10 @@ void arcCommonLocal::BeginAVICapture( const char *demoName ) {
 
 /*
 ================
-arcCommonLocal::EndAVICapture
+anCommonLocal::EndAVICapture
 ================
 */
-void arcCommonLocal::EndAVICapture() {
+void anCommonLocal::EndAVICapture() {
 	if ( !aviCaptureMode ) {
 		return;
 	}
@@ -238,7 +238,7 @@ void arcCommonLocal::EndAVICapture() {
 	soundWorld->AVIClose();
 
 	// write a .roqParam file so the demo can be converted to a roq file
-	arcNetFile *f = fileSystem->OpenFileWrite( va( "demos/%s/%s.roqParam",
+	anFile *f = fileSystem->OpenFileWrite( va( "demos/%s/%s.roqParam",
 		aviDemoShortName.c_str(), aviDemoShortName.c_str() ) );
 	f->Printf( "INPUT_DIR demos/%s\n", aviDemoShortName.c_str() );
 	f->Printf( "FILENAME demos/%s/%s.RoQ\n", aviDemoShortName.c_str(), aviDemoShortName.c_str() );
@@ -255,11 +255,11 @@ void arcCommonLocal::EndAVICapture() {
 
 /*
 ================
-arcCommonLocal::AVIRenderDemo
+anCommonLocal::AVIRenderDemo
 ================
 */
-void arcCommonLocal::AVIRenderDemo( const char *_demoName ) {
-	arcNetString	demoName = _demoName;	// copy off from va() buffer
+void anCommonLocal::AVIRenderDemo( const char *_demoName ) {
+	anString	demoName = _demoName;	// copy off from va() buffer
 
 	StartPlayingRenderDemo( demoName );
 	if ( !readDemo ) {
@@ -276,12 +276,12 @@ void arcCommonLocal::AVIRenderDemo( const char *_demoName ) {
 
 /*
 ================
-arcCommonLocal::AVIGame
+anCommonLocal::AVIGame
 
 Start AVI recording the current game session
 ================
 */
-void arcCommonLocal::AVIGame( const char *demoName ) {
+void anCommonLocal::AVIGame( const char *demoName ) {
 	if ( aviCaptureMode ) {
 		EndAVICapture();
 		return;
@@ -292,7 +292,7 @@ void arcCommonLocal::AVIGame( const char *demoName ) {
 	}
 
 	if ( !demoName || !demoName[0] ) {
-		arcNetString filename = FindUnusedFileName( "demos/game%03i.avi" );
+		anString filename = FindUnusedFileName( "demos/game%03i.avi" );
 		demoName = filename.c_str();
 
 		// write a one byte stub .game file just so the FindUnusedFileName works,
@@ -304,23 +304,23 @@ void arcCommonLocal::AVIGame( const char *demoName ) {
 
 /*
 ================
-arcCommonLocal::CompressDemoFile
+anCommonLocal::CompressDemoFile
 ================
 */
-void arcCommonLocal::CompressDemoFile( const char *scheme, const char *demoName ) {
-	arcNetString	fullDemoName = "demos/";
+void anCommonLocal::CompressDemoFile( const char *scheme, const char *demoName ) {
+	anString	fullDemoName = "demos/";
 	fullDemoName += demoName;
 	fullDemoName.DefaultFileExtension( ".avi" );
-	arcNetString compressedName = fullDemoName;
+	anString compressedName = fullDemoName;
 	compressedName.StripFileExtension();
 	compressedName.Append( "_compressed.avi" );
 
 	int savedCompression = cvarSystem->GetCVarInteger( "com_compressDemos" );
 	bool savedPreload = cvarSystem->GetCVarBool( "com_preloadDemos" );
 	cvarSystem->SetCVarBool( "com_preloadDemos", false );
-	cvarSystem->SetCVarInteger( "com_compressDemos", atoi(scheme) );
+	cvarSystem->SetCVarInteger( "com_compressDemos", atoi( scheme) );
 
-	ARCDemoFile demoread, demowrite;
+	anDemoFile demoread, demowrite;
 	if ( !demoread.OpenForReading( fullDemoName ) ) {
 		common->Printf( "Could not open %s for reading\n", fullDemoName.c_str() );
 		return;
@@ -356,10 +356,10 @@ void arcCommonLocal::CompressDemoFile( const char *scheme, const char *demoName 
 
 /*
 ===============
-arcCommonLocal::AdvanceRenderDemo
+anCommonLocal::AdvanceRenderDemo
 ===============
 */
-void arcCommonLocal::AdvanceRenderDemo( bool singleFrameOnly ) {
+void anCommonLocal::AdvanceRenderDemo( bool singleFrameOnly ) {
 	int	ds = DS_FINISHED;
 	readDemo->ReadInt( ds );
 
@@ -391,9 +391,9 @@ void arcCommonLocal::AdvanceRenderDemo( bool singleFrameOnly ) {
 Common_DemoShot_f
 ================
 */
-CONSOLE_COMMAND( demoShot, "writes a screenshot as a demo", NULL ) {
+CONSOLE_COMMAND( demoShot, "writes a screenshot as a demo", nullptr ) {
 	if ( args.Argc() != 2 ) {
-		arcNetString filename = FindUnusedFileName( "demos/shot%03i.avi" );
+		anString filename = FindUnusedFileName( "demos/shot%03i.avi" );
 		commonLocal.DemoShot( filename );
 	} else {
 		commonLocal.DemoShot( va( "demos/shot_%s.avi", args.Argv(1 ) ) );
@@ -405,9 +405,9 @@ CONSOLE_COMMAND( demoShot, "writes a screenshot as a demo", NULL ) {
 Common_RecordDemo_f
 ================
 */
-CONSOLE_COMMAND( recordDemo, "records a demo", NULL ) {
+CONSOLE_COMMAND( recordDemo, "records a demo", nullptr ) {
 	if ( args.Argc() != 2 ) {
-		arcNetString filename = FindUnusedFileName( "demos/demo%03i.avi" );
+		anString filename = FindUnusedFileName( "demos/demo%03i.avi" );
 		commonLocal.StartRecordingRenderDemo( filename );
 	} else {
 		commonLocal.StartRecordingRenderDemo( va( "demos/%s.avi", args.Argv(1 ) ) );
@@ -434,7 +434,7 @@ CONSOLE_COMMAND( compressDemo, "compresses a demo file", arcCmdSystem::ArgComple
 Common_StopRecordingDemo_f
 ================
 */
-CONSOLE_COMMAND( stopRecording, "stops demo recording", NULL ) {
+CONSOLE_COMMAND( stopRecording, "stops demo recording", nullptr ) {
 	commonLocal.StopRecordingRenderDemo();
 }
 
@@ -483,6 +483,6 @@ CONSOLE_COMMAND( aviDemo, "writes AVIs for a demo", arcCmdSystem::ArgCompletion_
 Common_AVIGame_f
 ================
 */
-CONSOLE_COMMAND( aviGame, "writes AVIs for the current game", NULL ) {
+CONSOLE_COMMAND( aviGame, "writes AVIs for the current game", nullptr ) {
 	commonLocal.AVIGame( args.Argv(1 ) );
 }

@@ -6,7 +6,7 @@ public:
 	virtual void Init( void ) = 0;
 	virtual void Shutdown( void ) = 0;
 
-	virtual bool AddFootPrint( const arcVec3 &point, const arcVec3 &forward, const arcVec3 &up, bool right ) = 0;
+	virtual bool AddFootPrint( const anVec3 &point, const anVec3 &forward, const anVec3 &up, bool right ) = 0;
 
 	virtual void Think( void ) = 0;
 

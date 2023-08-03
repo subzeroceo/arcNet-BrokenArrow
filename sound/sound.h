@@ -75,10 +75,10 @@ const int		SOUND_MAX_CLASSES		= 4;
 
 // it is somewhat tempting to make this a virtual class to hide the private
 // details here, but that doesn't fit easily with the decl manager at the moment.
-class arcSoundShader : public arcDecleration {
+class anSoundShader : public anDecl {
 public:
-							arcSoundShader( void );
-	virtual					~arcSoundShader( void );
+							anSoundShader( void );
+	virtual					~anSoundShader( void );
 
 	virtual size_t			Size( void ) const;
 	virtual bool			SetDefaultText( void );
@@ -94,9 +94,9 @@ public:
 	virtual float			GetMinDistance() const;		// FIXME: replace this with a GetSoundShaderParms()
 	virtual float			GetMaxDistance() const;
 
-	// returns NULL if an AltSound isn't defined in the shader.
+	// returns nullptr if an AltSound isn't defined in the shader.
 	// we use this for pairing a specific broken light sound with a normal light sound
-	virtual const arcSoundShader *GetAltSound() const;
+	virtual const anSoundShader *GetAltSound() const;
 
 	virtual bool			HasDefaultSound() const;
 
@@ -108,7 +108,7 @@ public:
 
 private:
 	friend class idSoundWorldLocal;
-	friend class arcAudioSystemLocal;
+	friend class anAudioSystemLocal;
 	friend class idSoundChannel;
 	friend class idSoundCache;
 
@@ -117,8 +117,8 @@ private:
 
 	bool					onDemand;					// only load when played, and free when finished
 	int						speakerMask;
-	const arcSoundShader *	altSound;
-	arcNetString					desc;						// description
+	const anSoundShader *	altSound;
+	anString					desc;						// description
 	bool					errorDuringParse;
 	float					leadinVolume;				// allows light breaking leadin sounds to be much louder than the broken loop
 
@@ -129,7 +129,7 @@ private:
 
 private:
 	void					Init( void );
-	bool					ParseShader( arcLexer &src );
+	bool					ParseShader( anLexer &src );
 };
 
 /*
@@ -157,16 +157,16 @@ public:
 	virtual void			Free( bool immediate ) = 0;
 
 	// the parms specified will be the default overrides for all sounds started on this emitter.
-	// NULL is acceptable for parms
-	virtual void			UpdateEmitter( const arcVec3 &origin, int listenerId, const soundShaderParms_t *parms ) = 0;
+	// nullptr is acceptable for parms
+	virtual void			UpdateEmitter( const anVec3 &origin, int listenerId, const soundShaderParms_t *parms ) = 0;
 
 	// returns the length of the started sound in msec
-	virtual int				StartSound( const arcSoundShader *shader, const s_channelType channel, float diversity = 0, int shaderFlags = 0, bool allowSlow = true ) = 0;
+	virtual int				StartSound( const anSoundShader *shader, const s_channelType channel, float diversity = 0, int shaderFlags = 0, bool allowSlow = true ) = 0;
 
 	// pass SCHANNEL_ANY to effect all channels
 	virtual void			ModifySound( const s_channelType channel, const soundShaderParms_t *parms ) = 0;
 	virtual void			StopSound( const s_channelType channel ) = 0;
-	// to is in Db (sigh), over is in seconds
+	// to is in Db ( sigh), over is in seconds
 	virtual void			FadeSound( const s_channelType channel, float to, float over ) = 0;
 
 	// returns true if there are any sounds playing from this emitter.  There is some conservative
@@ -205,31 +205,31 @@ public:
 	// get a new emitter that can play sounds in this world
 	virtual ARCSoundEmitter *AllocSoundEmitter( void ) = 0;
 
-	// for load games, index 0 will return NULL
+	// for load games, index 0 will return nullptr
 	virtual ARCSoundEmitter *EmitterForIndex( int index ) = 0;
 
 	// query sound samples from all emitters reaching a given position
-	virtual	float			CurrentShakeAmplitudeForPosition( const int time, const arcVec3 &listenerPosition ) = 0;
+	virtual	float			CurrentShakeAmplitudeForPosition( const int time, const anVec3 &listenerPosition ) = 0;
 
 	// where is the camera/microphone
 	// listenerId allows listener-private and antiPrivate sounds to be filtered
 	// gameTime is in msec, and is used to time sound queries and removals so that they are independent
 	// of any race conditions with the async update
-	virtual	void			PlaceListener( const arcVec3 &origin, const arcMat3 &axis, const int listenerId, const int gameTime, const arcNetString& areaName ) = 0;
+	virtual	void			PlaceListener( const anVec3 &origin, const anMat3 &axis, const int listenerId, const int gameTime, const anString& areaName ) = 0;
 
 	// fade all sounds in the world with a given shader soundClass
-	// to is in Db (sigh), over is in seconds
+	// to is in Db ( sigh), over is in seconds
 	virtual void			FadeSoundClasses( const int soundClass, const float to, const float over ) = 0;
 
 	// background music
 	virtual	void			PlayShaderDirectly( const char *name, int channel = -1 ) = 0;
 
 	// dumps the current state and begins archiving commands
-	virtual void			StartWritingDemo( ARCDemoFile *demo ) = 0;
+	virtual void			StartWritingDemo( anDemoFile *demo ) = 0;
 	virtual void			StopWritingDemo() = 0;
 
 	// read a sound command from a demo file
-	virtual void			ProcessDemoCommand( ARCDemoFile *demo ) = 0;
+	virtual void			ProcessDemoCommand( anDemoFile *demo ) = 0;
 
 	// pause and unpause the sound world
 	virtual void			Pause( void ) = 0;
@@ -249,8 +249,8 @@ public:
 	virtual void			AVIClose( void ) = 0;
 
 	// SaveGame / demo Support
-	virtual void			WriteToSaveGame( arcNetFile *savefile ) = 0;
-	virtual void			ReadFromSaveGame( arcNetFile *savefile ) = 0;
+	virtual void			WriteToSaveGame( anFile *savefile ) = 0;
+	virtual void			ReadFromSaveGame( anFile *savefile ) = 0;
 
 	virtual void			SetSlowmo( bool active ) = 0;
 	virtual void			SetSlowmoSpeed( float speed ) = 0;
@@ -267,8 +267,8 @@ public:
 */
 
 typedef struct {
-	arcNetString					name;
-	arcNetString					format;
+	anString					name;
+	anString					format;
 	int						numChannels;
 	int						numSamplesPerSecond;
 	int						num44kHzSamples;
@@ -316,14 +316,14 @@ public:
 	// get sound decoder info
 	virtual int				GetSoundDecoderInfo( int index, soundDecoderInfo_t &decoderInfo ) = 0;
 
-	// if rw == NULL, no portal occlusion or rendered debugging is available
-	virtual ARCSoundWorld *	AllocSoundWorld( ARCRenderWorld *rw ) = 0;
+	// if rw == nullptr, no portal occlusion or rendered debugging is available
+	virtual ARCSoundWorld *	AllocSoundWorld( anRenderWorld *rw ) = 0;
 
-	// specifying NULL will cause silence to be played
+	// specifying nullptr will cause silence to be played
 	virtual void			SetPlayingSoundWorld( ARCSoundWorld *soundWorld ) = 0;
 
 	// some tools, like the sound dialog, may be used in both the game and the editor
-	// This can return NULL, so check!
+	// This can return nullptr, so check!
 	virtual ARCSoundWorld *	GetPlayingSoundWorld( void ) = 0;
 
 	// Mark all soundSamples as currently unused,

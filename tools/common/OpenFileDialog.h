@@ -36,10 +36,10 @@ protected:
 	HBITMAP			mBackBitmap;
 
 	static char		mLookin[ MAX_OSPATH ];
-	arcNetString			mFilename;
-	arcNetString			mTitle;
-	arcNetString			mOKTitle;
-	arcStringList		mFilters;
+	anString			mFilename;
+	anString			mTitle;
+	anString			mOKTitle;
+	anStringList		mFilters;
 
 	int				mFlags;
 
@@ -53,7 +53,7 @@ private:
 };
 
 ARC_INLINE const char* rvOpenFileDialog::GetFilename ( void ) {
-	return mFilename.c_str ( );
+	return mFilename.c_str();
 }
 
 ARC_INLINE void rvOpenFileDialog::SetTitle ( const char* title ) {
@@ -65,11 +65,11 @@ ARC_INLINE void rvOpenFileDialog::SetOKTitle ( const char* title ) {
 }
 
 ARC_INLINE void rvOpenFileDialog::SetInitialPath ( const char* path ) {
-	if ( !arcNetString::Cmpn( mLookin, path, strlen( path ) )  {
+	if ( !anString::Cmpn( mLookin, path, strlen( path ) )  {
 		return;
 	}
 
-	arcNetString::Copynz( mLookin, path, sizeof( mLookin ) );
+	anString::Copynz( mLookin, path, sizeof( mLookin ) );
 }
 
 ARC_INLINE void rvOpenFileDialog::SetFlags ( int flags ) {

@@ -26,17 +26,17 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
 #include "../../renderer/tr_local.h"
-#include "../../renderer/model_local.h"	// for idRenderModelMD5
+#include "../../renderer/model_local.h"	// for anRenderModelM8D
 int g_entityId = 1;
 
 #define CURVE_TAG "curve_"
 
-extern void Brush_Resize(brush_t *b, arcVec3 vMin, arcVec3 vMax);
+extern void Brush_Resize(brush_t *b, anVec3 vMin, anVec3 vMax);
 
 int	GetNumKeys(entity_t *ent)
 {
@@ -59,7 +59,7 @@ const char *GetKeyString(entity_t *ent, int iIndex)
 //	}
 //
 //	assert(0 );
-//	return NULL;
+//	return nullptr;
 
 	if ( iIndex < GetNumKeys(ent) )
 	{
@@ -67,7 +67,7 @@ const char *GetKeyString(entity_t *ent, int iIndex)
 	}
 
 	assert(0 );
-	return NULL;
+	return nullptr;
 }
 
 
@@ -84,7 +84,7 @@ const char *ValueForKey(entity_t *ent, const char *key) {
  =======================================================================================================================
  */
 void TrackMD3Angles(entity_t *e, const char *key, const char *value) {
-	if ( arcNetString::Icmp(key, "angle" ) != 0 ) {
+	if ( anString::Icmp(key, "angle" ) != 0 ) {
 		return;
 	}
 
@@ -92,7 +92,7 @@ void TrackMD3Angles(entity_t *e, const char *key, const char *value) {
 		float	a = FloatForKey(e, "angle" );
 		float	b = atof(value);
 		if (a != b) {
-			arcVec3	vAngle;
+			anVec3	vAngle;
 			vAngle[0] = vAngle[1] = 0;
 			vAngle[2] = -a;
 			Brush_Rotate(e->brushes.onext, vAngle, e->origin, true);
@@ -107,7 +107,7 @@ void TrackMD3Angles(entity_t *e, const char *key, const char *value) {
  =======================================================================================================================
  */
 void SetKeyValue(entity_t *ent, const char *key, const char *value, bool trackAngles) {
-	if (ent == NULL) {
+	if (ent == nullptr ) {
 		return;
 	}
 
@@ -130,8 +130,8 @@ void SetKeyValue(entity_t *ent, const char *key, const char *value, bool trackAn
  =======================================================================================================================
  =======================================================================================================================
  */
-void SetKeyVec3(entity_t *ent, const char *key, arcVec3 v) {
-	if (ent == NULL) {
+void SetKeyVec3(entity_t *ent, const char *key, anVec3 v) {
+	if (ent == nullptr ) {
 		return;
 	}
 
@@ -139,7 +139,7 @@ void SetKeyVec3(entity_t *ent, const char *key, arcVec3 v) {
 		return;
 	}
 
-	arcNetString str;
+	anString str;
 	sprintf(str, "%g %g %g", v.x, v.y, v.z);
 	ent->epairs.Set(key, str);
 	GetVectorForKey(ent, "origin", ent->origin);
@@ -149,8 +149,8 @@ void SetKeyVec3(entity_t *ent, const char *key, arcVec3 v) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void SetKeyMat3(entity_t *ent, const char *key, arcMat3 m) {
-	if (ent == NULL) {
+void SetKeyMat3(entity_t *ent, const char *key, anMat3 m) {
+	if (ent == nullptr ) {
 		return;
 	}
 
@@ -158,7 +158,7 @@ void SetKeyMat3(entity_t *ent, const char *key, arcMat3 m) {
 		return;
 	}
 
-	arcNetString str;
+	anString str;
 
 	sprintf(str, "%g %g %g %g %g %g %g %g %g",m[0][0],m[0][1],m[0][2],m[1][0],m[1][1],m[1][2],m[2][0],m[2][1],m[2][2] );
 
@@ -209,7 +209,7 @@ int IntForKey(entity_t *ent, const char *key) {
  =======================================================================================================================
  =======================================================================================================================
  */
-bool GetVectorForKey(entity_t *ent, const char *key, arcVec3 &vec) {
+bool GetVectorForKey(entity_t *ent, const char *key, anVec3 &vec) {
 	const char	*k;
 	k = ValueForKey(ent, key);
 	if (k && strlen(k) > 0 ) {
@@ -227,7 +227,7 @@ bool GetVectorForKey(entity_t *ent, const char *key, arcVec3 &vec) {
  =======================================================================================================================
  =======================================================================================================================
  */
-bool GetVector4ForKey(entity_t *ent, const char *key, arcVec4 &vec) {
+bool GetVector4ForKey(entity_t *ent, const char *key, anVec4 &vec) {
 	const char	*k;
 	k = ValueForKey(ent, key);
 	if (k && strlen(k) > 0 ) {
@@ -261,7 +261,7 @@ bool GetFloatForKey(entity_t *ent, const char *key, float *f) {
  =======================================================================================================================
  =======================================================================================================================
  */
-bool GetMatrixForKey(entity_t *ent, const char *key, arcMat3 &mat) {
+bool GetMatrixForKey(entity_t *ent, const char *key, anMat3 &mat) {
 	const char	*k;
 	k = ValueForKey(ent, key);
 	if (k && strlen(k) > 0 ) {
@@ -325,7 +325,7 @@ void Entity_RemoveFromList(entity_t *e) {
 
 	e->next->prev = e->prev;
 	e->prev->next = e->next;
-	e->next = e->prev = NULL;
+	e->next = e->prev = nullptr;
 }
 
 /*
@@ -398,19 +398,19 @@ const EpairFixup FloatFixups[] = {
 
 const int FixupCount = sizeof(FloatFixups) / sizeof(EpairFixup);
 
-void FixFloats(arcDictionary *dict) {
+void FixFloats(anDict *dict) {
 	int count = dict->GetNumKeyVals();
 	for ( int i = 0; i < count; i++ ) {
-		const idKeyValue *kv = dict->GetKeyVal( i );
+		const anKeyValue *kv = dict->GetKeyVal( i );
 		for ( int j = 0; j < FixupCount; j++ ) {
 			if (kv->GetKey().Icmp(FloatFixups[j].name) == 0 ) {
-				arcNetString val;
+				anString val;
 				if (FloatFixups[j].type == 1 ) {
-					arcVec3 v;
+					anVec3 v;
 					sscanf(kv->GetValue().c_str(), "%f %f %f", &v.x, &v.y, &v.z);
 					sprintf(val, "%g %g %g", v.x, v.y, v.z);
 				} else if (FloatFixups[j].type == 2) {
-					arcMat3 mat;
+					anMat3 mat;
 					sscanf(kv->GetValue().c_str(),	"%f %f %f %f %f %f %f %f %f ",&mat[0][0],&mat[0][1],&mat[0][2],&mat[1][0],&mat[1][1],&mat[1][2],&mat[2][0],&mat[2][1],&mat[2][2] );
 					sprintf(val, "%g %g %g %g %g %g %g %g %g",mat[0][0],mat[0][1],mat[0][2],mat[1][0],mat[1][1],mat[1][2],mat[2][0],mat[2][1],mat[2][2] );
 				} else {
@@ -424,10 +424,10 @@ void FixFloats(arcDictionary *dict) {
 	}
 }
 
-void ParseEpair(arcDictionary *dict) {
-	arcNetString key = token;
+void ParseEpair(anDict *dict) {
+	anString key = token;
 	GetToken(false);
-	arcNetString val = token;
+	anString val = token;
 
 	if (key.Length() > 0 ) {
 		dict->Set(key, val);
@@ -443,7 +443,7 @@ bool EntityHasModel(entity_t *ent) {
 		const char	*model = ValueForKey(ent, "model" );
 		const char	*name = ValueForKey(ent, "name" );
 		if (model && *model) {
-			if ( arcNetString::Icmp(model, name) ) {
+			if ( anString::Icmp(model, name) ) {
 				return true;
 			}
 		}
@@ -459,38 +459,38 @@ bool EntityHasModel(entity_t *ent) {
 entity_t *Entity_New() {
 	entity_t *ent = new entity_t;
 
-	ent->prev = ent->next = NULL;
-	ent->brushes.prev = ent->brushes.next = NULL;
-	ent->brushes.oprev = ent->brushes.onext = NULL;
-	ent->brushes.owner = NULL;
+	ent->prev = ent->next = nullptr;
+	ent->brushes.prev = ent->brushes.next = nullptr;
+	ent->brushes.oprev = ent->brushes.onext = nullptr;
+	ent->brushes.owner = nullptr;
 	ent->undoId = 0;
 	ent->redoId = 0;
 	ent->entityId = g_entityId++;
 	ent->origin.Zero();
-	ent->eclass = NULL;
-	ent->md3Class = NULL;
+	ent->eclass = nullptr;
+	ent->md3Class = nullptr;
 	ent->lightOrigin.Zero();
 	ent->lightRotation.Identity();
 	ent->trackLightOrigin = false;
 	ent->rotation.Identity();
 	ent->lightDef = -1;
 	ent->modelDef = -1;
-	ent->soundEmitter = NULL;
-	ent->curve = NULL;
+	ent->soundEmitter = nullptr;
+	ent->curve = nullptr;
 	return ent;
 }
 
 void Entity_UpdateCurveData( entity_t *ent ) {
 
-	if ( ent == NULL || ent->curve == NULL ) {
+	if ( ent == nullptr || ent->curve == nullptr ) {
 		return;
 	}
 
-	const idKeyValue *kv = ent->epairs.MatchPrefix( CURVE_TAG );
-	if ( kv == NULL ) {
+	const anKeyValue *kv = ent->epairs.MatchPrefix( CURVE_TAG );
+	if ( kv == nullptr ) {
 		if ( ent->curve ) {
 			delete ent->curve;
-			ent->curve = NULL;
+			ent->curve = nullptr;
 			if ( g_qeglobals.d_select_mode == sel_editpoint ) {
 				g_qeglobals.d_select_mode = sel_brush;
 			}
@@ -499,8 +499,8 @@ void Entity_UpdateCurveData( entity_t *ent ) {
 	}
 
 	int c = ent->curve->GetNumValues();
-	arcNetString str = va( "%i ( ", c );
-	arcVec3 v;
+	anString str = va( "%i ( ", c );
+	anVec3 v;
 	for ( int i = 0; i < c; i++ ) {
 		v = ent->curve->GetValue( i );
 		str += " ";
@@ -513,25 +513,25 @@ void Entity_UpdateCurveData( entity_t *ent ) {
 
 }
 
-aRcnicalCurve<arcVec3> *Entity_MakeCurve( entity_t *ent ) {
-	const idKeyValue *kv = ent->epairs.MatchPrefix( CURVE_TAG );
+anCurve<anVec3> *Entity_MakeCurve( entity_t *ent ) {
+	const anKeyValue *kv = ent->epairs.MatchPrefix( CURVE_TAG );
 	if ( kv ) {
-		arcNetString str = kv->GetKey().Right( kv->GetKey().Length() - strlen( CURVE_TAG ) );
+		anString str = kv->GetKey().Right( kv->GetKey().Length() - strlen( CURVE_TAG ) );
 		if ( str.Icmp( "CatmullRomSpline" ) == 0 ) {
-			return new idCurve_CatmullRomSpline<arcVec3>();
+			return new anCurve_CatmullRomSpline<anVec3>();
 		} else if ( str.Icmp( "Nurbs" ) == 0 ) {
-			return new idCurve_NURBS<arcVec3>();
+			return new anCurve_NURBS<anVec3>();
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void Entity_SetCurveData( entity_t *ent ) {
 
 	ent->curve = Entity_MakeCurve( ent );
-	const idKeyValue *kv = ent->epairs.MatchPrefix( CURVE_TAG );
+	const anKeyValue *kv = ent->epairs.MatchPrefix( CURVE_TAG );
 	if ( kv && ent->curve ) {
-		arcLexer lex;
+		anLexer lex;
 		lex.LoadMemory( kv->GetValue(), kv->GetValue().Length(), "_curve" );
 		int numPoints = lex.ParseInt();
 		if ( numPoints > 0 ) {
@@ -539,7 +539,7 @@ void Entity_SetCurveData( entity_t *ent ) {
 			lex.Parse1DMatrix( numPoints * 3, fp );
 			int time = 0;
 			for ( int i = 0; i < numPoints * 3; i += 3 ) {
-				arcVec3 v;
+				anVec3 v;
 				v.x = fp[i];
 				v.y = fp[i+1];
 				v.z = fp[i+2];
@@ -556,8 +556,8 @@ entity_t *Entity_PostParse(entity_t *ent, brush_t *pList) {
 	bool		has_brushes;
 	eclass_t	*e;
 	brush_t		*b;
-	arcVec3		mins, maxs, zero;
-	arcBounds bo;
+	anVec3		mins, maxs, zero;
+	anBounds bo;
 
 	zero.Zero();
 
@@ -594,9 +594,9 @@ entity_t *Entity_PostParse(entity_t *ent, brush_t *pList) {
 		}
 	}
 
-	arcNetString str;
+	anString str;
 
-	if (e->defArgs.GetString( "model", "", str) && e->entityModel == NULL) {
+	if (e->defArgs.GetString( "model", "", str) && e->entityModel == nullptr ) {
 		e->entityModel = engineEdit->ANIM_GetModelFromEntityDef( &e->defArgs );
 	}
 
@@ -630,11 +630,11 @@ entity_t *Entity_PostParse(entity_t *ent, brush_t *pList) {
 		}
 	} else if ( e->nShowFlags & ECLASS_ENV ) {
 		// need to create an origin from the bones here
-		arcVec3 org;
-		arcAngles ang;
+		anVec3 org;
+		anAngles ang;
 		bo.Clear();
 		bool hasBody = false;
-		const idKeyValue *arg = ent->epairs.MatchPrefix( "body ", NULL );
+		const anKeyValue *arg = ent->epairs.MatchPrefix( "body ", nullptr );
 		while ( arg ) {
 			sscanf( arg->GetValue(), "%f %f %f %f %f %f", &org.x, &org.y, &org.z, &ang.pitch, &ang.yaw, &ang.roll );
 			bo.AddPoint( org );
@@ -655,13 +655,13 @@ entity_t *Entity_PostParse(entity_t *ent, brush_t *pList) {
 
 		if (hasModel) {
 			// model entity
-			ARCRenderModel *modelHandle = renderModelManager->FindModel( pModel );
+			anRenderModel *modelHandle = renderModelManager->FindModel( pModel );
 
-			if ( dynamic_cast<idRenderModelPrt*>( modelHandle ) || dynamic_cast<ARCLiquidModel*>( modelHandle ) ) {
+			if ( dynamic_cast<idRenderModelPrt*>( modelHandle ) || dynamic_cast<anLiquidModel*>( modelHandle ) ) {
 				bo.Zero();
 				bo.ExpandSelf( 12.0f );
 			} else {
-				bo = modelHandle->Bounds( NULL );
+				bo = modelHandle->Bounds( nullptr );
 			}
 
 			VectorCopy(bo[0], mins);
@@ -679,16 +679,16 @@ entity_t *Entity_PostParse(entity_t *ent, brush_t *pList) {
 
 			float		yaw = 0;
 			bool		convertAngles = GetFloatForKey(ent, "angle", &yaw);
-			extern void Brush_Rotate(brush_t *b, arcMat3 matrix, arcVec3 origin, bool bBuild);
-			extern void Brush_Rotate(brush_t *b, arcVec3 rot, arcVec3 origin, bool bBuild);
+			extern void Brush_Rotate(brush_t *b, anMat3 matrix, anVec3 origin, bool bBuild);
+			extern void Brush_Rotate(brush_t *b, anVec3 rot, anVec3 origin, bool bBuild);
 
 			if (convertAngles) {
-				arcVec3	rot(0, 0, yaw);
+				anVec3	rot(0, 0, yaw);
 				Brush_Rotate(b, rot, ent->origin, false);
 			}
 
 			if (GetMatrixForKey(ent, "rotation", ent->rotation) ) {
-				arcBounds bo2;
+				anBounds bo2;
 				bo2.FromTransformedBounds(bo, ent->origin, ent->rotation);
 				b->owner = ent;
 				Brush_Resize(b, bo2[0], bo2[1] );
@@ -710,7 +710,7 @@ entity_t *Entity_PostParse(entity_t *ent, brush_t *pList) {
 			GetMatrixForKey(ent, "rotation", ent->rotation);
 			Entity_LinkBrush(ent, b);
 			b->trackLightOrigin = ent->trackLightOrigin;
-			if ( e->texdef.name == NULL ) {
+			if ( e->texdef.name == nullptr ) {
 				brushprimit_texdef_t bp;
 				texdef_t td;
 				td.SetName( ent->eclass->defMaterial );
@@ -723,9 +723,9 @@ entity_t *Entity_PostParse(entity_t *ent, brush_t *pList) {
 		}
 
 		if ( !needsOrigin) {
-			arcNetString cn = ValueForKey(ent, "classname" );
-			arcNetString name = ValueForKey(ent, "name" );
-			arcNetString model = ValueForKey(ent, "model" );
+			anString cn = ValueForKey(ent, "classname" );
+			anString name = ValueForKey(ent, "name" );
+			anString model = ValueForKey(ent, "model" );
 			if (cn.Icmp( "func_static" ) == 0 ) {
 				if (name.Icmp(model) == 0 ) {
 					needsOrigin = true;
@@ -734,7 +734,7 @@ entity_t *Entity_PostParse(entity_t *ent, brush_t *pList) {
 		}
 
 		if (needsOrigin) {
-			arcVec3	mins, maxs, mid;
+			anVec3	mins, maxs, mid;
 			int		i;
 			char	text[32];
 			mins[0] = mins[1] = mins[2] = 999999;
@@ -763,7 +763,7 @@ entity_t *Entity_PostParse(entity_t *ent, brush_t *pList) {
 		}
 
 		if ( !(e->nShowFlags & ECLASS_WORLDSPAWN) ) {
-			if (e->defArgs.FindKey( "model" ) == NULL && (pModel == NULL || (pModel && strlen(pModel) == 0 ) )) {
+			if (e->defArgs.FindKey( "model" ) == nullptr && (pModel == nullptr || (pModel && strlen(pModel) == 0 ) ) ) {
 				SetKeyValue(ent, "model", ValueForKey(ent, "name" ) );
 			}
 		}
@@ -798,7 +798,7 @@ entity_t *Entity_Parse(bool onlypairs, brush_t *pList) {
 	entity_t	*ent;
 
 	if ( !GetToken(true) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (strcmp(token, "{" ) ) {
@@ -813,7 +813,7 @@ entity_t *Entity_Parse(bool onlypairs, brush_t *pList) {
 	do {
 		if ( !GetToken(true) ) {
 			Warning( "ParseEntity: EOF without closing brace" );
-			return NULL;
+			return nullptr;
 		}
 
 		if ( !strcmp(token, "}" ) ) {
@@ -823,7 +823,7 @@ entity_t *Entity_Parse(bool onlypairs, brush_t *pList) {
 		if ( !strcmp(token, "{" ) ) {
 			GetVectorForKey(ent, "origin", ent->origin);
 			brush_t *b = Brush_Parse(ent->origin);
-			if (b != NULL) {
+			if (b != nullptr ) {
 				b->owner = ent;
 
 				// add to the end of the entity chain
@@ -852,7 +852,7 @@ entity_t *Entity_Parse(bool onlypairs, brush_t *pList) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void VectorMidpoint(arcVec3 va, arcVec3 vb, arcVec3 &out) {
+void VectorMidpoint(anVec3 va, anVec3 vb, anVec3 &out) {
 	for ( int i = 0; i < 3; i++ ) {
 		out[i] = va[i] + ((vb[i] - va[i] ) / 2);
 	}
@@ -865,7 +865,7 @@ void VectorMidpoint(arcVec3 va, arcVec3 vb, arcVec3 &out) {
  */
 void Entity_Write(entity_t *e, FILE *f, bool use_region) {
 	brush_t *b;
-	arcVec3	origin;
+	anVec3	origin;
 	char	text[128];
 	int		count;
 
@@ -944,7 +944,7 @@ void Entity_Write(entity_t *e, FILE *f, bool use_region) {
  =======================================================================================================================
  */
 bool IsBrushSelected(brush_t *bSel) {
-	for (brush_t * b = selected_brushes.next; b != NULL && b != &selected_brushes; b = b->next) {
+	for (brush_t * b = selected_brushes.next; b != nullptr && b != &selected_brushes; b = b->next) {
 		if (b == bSel) {
 			return true;
 		}
@@ -960,7 +960,7 @@ bool IsBrushSelected(brush_t *bSel) {
 //
 void Entity_WriteSelected(entity_t *e, FILE *f) {
 	brush_t *b;
-	arcVec3	origin;
+	anVec3	origin;
 	char	text[128];
 	int		count;
 
@@ -1014,7 +1014,7 @@ void Entity_WriteSelected(entity_t *e, FILE *f) {
 //
 void Entity_WriteSelected(entity_t *e, CMemFile *pMemFile) {
 	brush_t *b;
-	arcVec3	origin;
+	anVec3	origin;
 	char	text[128];
 	int		count;
 
@@ -1095,7 +1095,7 @@ void Entity_Name(entity_t *e, bool force) {
 	if (name[0] ) {
 		const char	*model = ValueForKey(e, "model" );
 		if (model[0] ) {
-			if ( arcNetString::Icmp(model, name) == 0 ) {
+			if ( anString::Icmp(model, name) == 0 ) {
 				setModel = true;
 			}
 		}
@@ -1103,7 +1103,7 @@ void Entity_Name(entity_t *e, bool force) {
 
 	const char *eclass = ValueForKey(e, "classname" );
 	if (eclass && eclass[0] ) {
-		arcNetString str = cvarSystem->GetCVarString( "radiant_nameprefix" );
+		anString str = cvarSystem->GetCVarString( "radiant_nameprefix" );
 		int id = Map_GetUniqueEntityID(str, eclass);
 		if (str.Length() ) {
 			SetKeyValue(e, "name", va( "%s_%s_%i", str.c_str(), eclass, id) );
@@ -1129,7 +1129,7 @@ void Entity_Name(entity_t *e, bool force) {
 entity_t *Entity_Create(eclass_t *c, bool forceFixed) {
 	entity_t	*e;
 	brush_t		*b;
-	arcVec3		mins, maxs, origin;
+	anVec3		mins, maxs, origin;
 	char		text[32];
 	texdef_t td;
 	brushprimit_texdef_t bp;
@@ -1139,12 +1139,12 @@ entity_t *Entity_Create(eclass_t *c, bool forceFixed) {
 		if (b->owner != world_entity) {
 			Sys_Status( "Entity NOT created, brushes not all from world\n" );
 			Sys_Beep();
-			return NULL;
+			return nullptr;
 		}
 	}
 
-	arcNetString str;
-	if (c->defArgs.GetString( "model", "", str) && c->entityModel == NULL) {
+	anString str;
+	if (c->defArgs.GetString( "model", "", str) && c->entityModel == nullptr ) {
 		c->entityModel = engineEdit->ANIM_GetModelFromEntityDef( &c->defArgs );
 	}
 
@@ -1261,8 +1261,8 @@ void Entity_UnlinkBrush(brush_t *b) {
 
 	b->onext->oprev = b->oprev;
 	b->oprev->onext = b->onext;
-	b->onext = b->oprev = NULL;
-	b->owner = NULL;
+	b->onext = b->oprev = nullptr;
+	b->owner = nullptr;
 }
 
 /*
@@ -1301,7 +1301,7 @@ int GetUniqueTargetId( int iHint) {
 	iMin = 0;
 	iMax = 0;
 
-	for (; pe != NULL && pe != &entities; pe = pe->next) {
+	for (; pe != nullptr && pe != &entities; pe = pe->next) {
 		i = IntForKey(pe, "target" );
 		if ( i ) {
 			iMin = Min( i, iMin);
@@ -1329,13 +1329,13 @@ entity_t *FindEntity(const char *pszKey, const char *pszValue) {
 
 	pe = entities.next;
 
-	for (; pe != NULL && pe != &entities; pe = pe->next) {
+	for (; pe != nullptr && pe != &entities; pe = pe->next) {
 		if ( !strcmp(ValueForKey(pe, pszKey), pszValue) ) {
 			return pe;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1347,13 +1347,13 @@ entity_t *FindEntityInt(const char *pszKey, int iValue) {
 
 	pe = entities.next;
 
-	for (; pe != NULL && pe != &entities; pe = pe->next) {
+	for (; pe != nullptr && pe != &entities; pe = pe->next) {
 		if (IntForKey(pe, pszKey) == iValue) {
 			return pe;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1394,7 +1394,7 @@ void Entity_UpdateSoundEmitter( entity_t *ent ) {
 	// delete the soundEmitter if not used
 	if ( !playing && ent->soundEmitter ) {
 		ent->soundEmitter->Free( true );
-		ent->soundEmitter = NULL;
+		ent->soundEmitter = nullptr;
 	}
 
 }

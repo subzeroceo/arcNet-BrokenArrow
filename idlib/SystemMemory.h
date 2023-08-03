@@ -67,7 +67,7 @@ public:
 
 //
 //	PUSH_HEAP_PTR()
-//	Local heaps used mainly by executable (arcLibrary and Main frontend game would use these only
+//	Local heaps used mainly by executable (anLibrary and Main frontend game would use these only
 //	if heap was passed in)
 //
 #define PUSH_HEAP_PTR( heapPtr )				( ( heapPtr )->PushCurrent() )

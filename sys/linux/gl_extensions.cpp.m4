@@ -16,7 +16,7 @@ typedef struct {
 	const char *ext_name;
 } glExtName_t;
 
-glExtName_t glExtNames[] = { NULL };
+glExtName_t glExtNames[] = { nullptr };
 static void StubFunction( void ) { }
 
 GLExtension_t GLimp_ExtensionPointer( const char *name ) {

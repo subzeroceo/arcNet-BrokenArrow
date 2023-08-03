@@ -26,17 +26,17 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
-#include "AASFile.h"
-#include "AASFile_local.h"
+#include "SEASFile.h"
+#include "SEASFile_local.h"
 
 
 /*
 ===============================================================================
 
-	idReachability
+	anReachability
 
 ===============================================================================
 */
@@ -46,7 +46,7 @@ If you have questions concerning this license or the applicable additional terms
 Reachability_Write
 ================
 */
-bool Reachability_Write( arcNetFile *fp, idReachability *reach ) {
+bool Reachability_Write( anFile *fp, anReachability *reach ) {
 	fp->WriteFloatString( "\t\t%d %d (%f %f %f) (%f %f %f) %d %d",
 				( int ) reach->travelType, ( int ) reach->toAreaNum, reach->start.x, reach->start.y, reach->start.z,
 				reach->end.x, reach->end.y, reach->end.z, reach->edgeNum, ( int ) reach->travelTime );
@@ -58,7 +58,7 @@ bool Reachability_Write( arcNetFile *fp, idReachability *reach ) {
 Reachability_Read
 ================
 */
-bool Reachability_Read( arcLexer &src, idReachability *reach ) {
+bool Reachability_Read( anLexer &src, anReachability *reach ) {
 	reach->travelType = src.ParseInt();
 	reach->toAreaNum = src.ParseInt();
 	src.Parse1DMatrix( 3, reach->start.ToFloatPtr() );
@@ -70,10 +70,10 @@ bool Reachability_Read( arcLexer &src, idReachability *reach ) {
 
 /*
 ================
-idReachability::CopyBase
+anReachability::CopyBase
 ================
 */
-void idReachability::CopyBase( idReachability &reach ) {
+void anReachability::CopyBase( anReachability &reach ) {
 	travelType = reach.travelType;
 	toAreaNum = reach.toAreaNum;
 	start = reach.start;
@@ -86,7 +86,7 @@ void idReachability::CopyBase( idReachability &reach ) {
 /*
 ===============================================================================
 
-	idReachability_Special
+	anReachability_Special
 
 ===============================================================================
 */
@@ -96,9 +96,9 @@ void idReachability::CopyBase( idReachability &reach ) {
 Reachability_Special_Write
 ================
 */
-bool Reachability_Special_Write( arcNetFile *fp, idReachability_Special *reach ) {
+bool Reachability_Special_Write( anFile *fp, anReachability_Special *reach ) {
 	int i;
-	const idKeyValue *keyValue;
+	const anKeyValue *keyValue;
 
 	fp->WriteFloatString( "\n\t\t{\n" );
 	for ( i = 0; i < reach->dict.GetNumKeyVals(); i++ ) {
@@ -115,8 +115,8 @@ bool Reachability_Special_Write( arcNetFile *fp, idReachability_Special *reach )
 Reachability_Special_Read
 ================
 */
-bool Reachability_Special_Read( arcLexer &src, idReachability_Special *reach ) {
-	arcNetToken key, value;
+bool Reachability_Special_Read( anLexer &src, anReachability_Special *reach ) {
+	anToken key, value;
 
 	src.ExpectTokenString( "{" );
 	while( src.ReadToken( &key ) ) {
@@ -132,19 +132,19 @@ bool Reachability_Special_Read( arcLexer &src, idReachability_Special *reach ) {
 /*
 ===============================================================================
 
-	idAASSettings
+	anSEASSettings
 
 ===============================================================================
 */
 
 /*
 ============
-idAASSettings::idAASSettings
+anSEASSettings::anSEASSettings
 ============
 */
-idAASSettings::idAASSettings( void ) {
+anSEASSettings::anSEASSettings( void ) {
 	numBoundingBoxes = 1;
-	boundingBoxes[0] = arcBounds( arcVec3( -16, -16, 0 ), arcVec3( 16, 16, 72 ) );
+	boundingBoxes[0] = anBounds( anVec3( -16, -16, 0 ), anVec3( 16, 16, 72 ) );
 	usePatches = false;
 	writeBrushMap = false;
 	playerFlood = false;
@@ -153,7 +153,7 @@ idAASSettings::idAASSettings( void ) {
 	allowFlyReachabilities = false;
 	fileExtension = "aas48";
 	// physics settings
-	gravity = arcVec3( 0, 0, -1066 );
+	gravity = anVec3( 0, 0, -1066 );
 	gravityDir = gravity;
 	gravityValue = gravityDir.Normalize();
 	invGravityDir = -gravityDir;
@@ -171,10 +171,10 @@ idAASSettings::idAASSettings( void ) {
 
 /*
 ============
-idAASSettings::ParseBool
+anSEASSettings::ParseBool
 ============
 */
-bool idAASSettings::ParseBool( arcLexer &src, bool &b ) {
+bool anSEASSettings::ParseBool( anLexer &src, bool &b ) {
 	if ( !src.ExpectTokenString( "=" ) ) {
 		return false;
 	}
@@ -184,10 +184,10 @@ bool idAASSettings::ParseBool( arcLexer &src, bool &b ) {
 
 /*
 ============
-idAASSettings::ParseInt
+anSEASSettings::ParseInt
 ============
 */
-bool idAASSettings::ParseInt( arcLexer &src, int &i ) {
+bool anSEASSettings::ParseInt( anLexer &src, int &i ) {
 	if ( !src.ExpectTokenString( "=" ) ) {
 		return false;
 	}
@@ -197,10 +197,10 @@ bool idAASSettings::ParseInt( arcLexer &src, int &i ) {
 
 /*
 ============
-idAASSettings::ParseFloat
+anSEASSettings::ParseFloat
 ============
 */
-bool idAASSettings::ParseFloat( arcLexer &src, float &f ) {
+bool anSEASSettings::ParseFloat( anLexer &src, float &f ) {
 	if ( !src.ExpectTokenString( "=" ) ) {
 		return false;
 	}
@@ -210,10 +210,10 @@ bool idAASSettings::ParseFloat( arcLexer &src, float &f ) {
 
 /*
 ============
-idAASSettings::ParseVector
+anSEASSettings::ParseVector
 ============
 */
-bool idAASSettings::ParseVector( arcLexer &src, arcVec3 &vec ) {
+bool anSEASSettings::ParseVector( anLexer &src, anVec3 &vec ) {
 	if ( !src.ExpectTokenString( "=" ) ) {
 		return false;
 	}
@@ -222,12 +222,12 @@ bool idAASSettings::ParseVector( arcLexer &src, arcVec3 &vec ) {
 
 /*
 ============
-idAASSettings::ParseBBoxes
+anSEASSettings::ParseBBoxes
 ============
 */
-bool idAASSettings::ParseBBoxes( arcLexer &src ) {
-	arcNetToken token;
-	arcBounds bounds;
+bool anSEASSettings::ParseBBoxes( anLexer &src ) {
+	anToken token;
+	anBounds bounds;
 
 	numBoundingBoxes = 0;
 
@@ -252,11 +252,11 @@ bool idAASSettings::ParseBBoxes( arcLexer &src ) {
 
 /*
 ============
-idAASSettings::FromParser
+anSEASSettings::FromParser
 ============
 */
-bool idAASSettings::FromParser( arcLexer &src ) {
-	arcNetToken token;
+bool anSEASSettings::FromParser( anLexer &src ) {
+	anToken token;
 
 	if ( !src.ExpectTokenString( "{" ) ) {
 		return false;
@@ -342,12 +342,12 @@ bool idAASSettings::FromParser( arcLexer &src ) {
 
 /*
 ============
-idAASSettings::FromFile
+anSEASSettings::FromFile
 ============
 */
-bool idAASSettings::FromFile( const arcNetString &fileName ) {
-	arcLexer src( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
-	arcNetString name;
+bool anSEASSettings::FromFile( const anString &fileName ) {
+	anLexer src( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
+	anString name;
 
 	name = fileName;
 
@@ -373,11 +373,11 @@ bool idAASSettings::FromFile( const arcNetString &fileName ) {
 
 /*
 ============
-idAASSettings::FromDict
+anSEASSettings::FromDict
 ============
 */
-bool idAASSettings::FromDict( const char *name, const arcDictionary *dict ) {
-	arcBounds bounds;
+bool anSEASSettings::FromDict( const char *name, const anDict *dict ) {
+	anBounds bounds;
 
 	if ( !dict->GetVector( "mins", "0 0 0", bounds[ 0 ] ) ) {
 		common->Error( "Missing 'mins' in entityDef '%s'", name );
@@ -462,10 +462,10 @@ bool idAASSettings::FromDict( const char *name, const arcDictionary *dict ) {
 
 /*
 ============
-idAASSettings::WriteToFile
+anSEASSettings::WriteToFile
 ============
 */
-bool idAASSettings::WriteToFile( arcNetFile *fp ) const {
+bool anSEASSettings::WriteToFile( anFile *fp ) const {
 	int i;
 
 	fp->WriteFloatString( "{\n" );
@@ -497,10 +497,10 @@ bool idAASSettings::WriteToFile( arcNetFile *fp ) const {
 
 /*
 ============
-idAASSettings::ValidForBounds
+anSEASSettings::ValidForBounds
 ============
 */
-bool idAASSettings::ValidForBounds( const arcBounds &bounds ) const {
+bool anSEASSettings::ValidForBounds( const anBounds &bounds ) const {
 	int i;
 
 	for ( i = 0; i < 3; i++ ) {
@@ -516,13 +516,13 @@ bool idAASSettings::ValidForBounds( const arcBounds &bounds ) const {
 
 /*
 ============
-idAASSettings::ValarcEntity
+anSEASSettings::ValarcEntity
 ============
 */
-bool idAASSettings::ValarcEntity( const char *classname ) const {
-	arcNetString			use_aas;
-	arcVec3			size;
-	arcBounds		bounds;
+bool anSEASSettings::ValarcEntity( const char *classname ) const {
+	anString			use_aas;
+	anVec3			size;
+	anBounds		bounds;
 
 	if ( playerFlood ) {
 		if ( !strcmp( classname, "info_player_start" ) || !strcmp( classname , "info_player_deathmatch" ) || !strcmp( classname, "func_teleporter" ) ) {
@@ -530,11 +530,11 @@ bool idAASSettings::ValarcEntity( const char *classname ) const {
 		}
 	}
 
-	const arcDeclEntityDef *decl = static_cast<const arcDeclEntityDef *>( declManager->FindType( DECL_ENTITYDEF, classname, false ) );
-	if ( decl && decl->dict.GetString( "use_aas", NULL, use_aas ) && !fileExtension.Icmp( use_aas ) ) {
-		if ( decl->dict.GetVector( "mins", NULL, bounds[0] ) ) {
-			decl->dict.GetVector( "maxs", NULL, bounds[1] );
-		} else if ( decl->dict.GetVector( "size", NULL, size ) ) {
+	const anDeclEntityDef *decl = static_cast<const anDeclEntityDef *>( declManager->FindType( DECL_ENTITYDEF, classname, false ) );
+	if ( decl && decl->dict.GetString( "use_aas", nullptr, use_aas ) && !fileExtension.Icmp( use_aas ) ) {
+		if ( decl->dict.GetVector( "mins", nullptr, bounds[0] ) ) {
+			decl->dict.GetVector( "maxs", nullptr, bounds[1] );
+		} else if ( decl->dict.GetVector( "size", nullptr, size ) ) {
 			bounds[ 0 ].Set( size.x * -0.5f, size.y * -0.5f, 0.0f );
 			bounds[ 1 ].Set( size.x * 0.5f, size.y * 0.5f, size.z );
 		}
@@ -553,44 +553,44 @@ bool idAASSettings::ValarcEntity( const char *classname ) const {
 /*
 ===============================================================================
 
-	idAASFileLocal
+	anSEASFileLocal
 
 ===============================================================================
 */
 
-#define AAS_LIST_GRANULARITY	1024
-#define AAS_INDEX_GRANULARITY	4096
-#define AAS_PLANE_GRANULARITY	4096
-#define AAS_VERTEX_GRANULARITY	4096
-#define AAS_EDGE_GRANULARITY	4096
+#define SEAS_LIST_GRANULARITY	1024
+#define SEAS_INDEX_GRANULARITY	4096
+#define SEAS_PLANE_GRANULARITY	4096
+#define SEAS_VERTEX_GRANULARITY	4096
+#define SEAS_EDGE_GRANULARITY	4096
 
 /*
 ================
-idAASFileLocal::idAASFileLocal
+anSEASFileLocal::anSEASFileLocal
 ================
 */
-idAASFileLocal::idAASFileLocal( void ) {
-	planeList.SetGranularity( AAS_PLANE_GRANULARITY );
-	vertices.SetGranularity( AAS_VERTEX_GRANULARITY );
-	edges.SetGranularity( AAS_EDGE_GRANULARITY );
-	edgeIndex.SetGranularity( AAS_INDEX_GRANULARITY );
-	faces.SetGranularity( AAS_LIST_GRANULARITY );
-	faceIndex.SetGranularity( AAS_INDEX_GRANULARITY );
-	areas.SetGranularity( AAS_LIST_GRANULARITY );
-	nodes.SetGranularity( AAS_LIST_GRANULARITY );
-	portals.SetGranularity( AAS_LIST_GRANULARITY );
-	portalIndex.SetGranularity( AAS_INDEX_GRANULARITY );
-	clusters.SetGranularity( AAS_LIST_GRANULARITY );
+anSEASFileLocal::anSEASFileLocal( void ) {
+	planeList.SetGranularity( SEAS_PLANE_GRANULARITY );
+	vertices.SetGranularity( SEAS_VERTEX_GRANULARITY );
+	edges.SetGranularity( SEAS_EDGE_GRANULARITY );
+	edgeIndex.SetGranularity( SEAS_INDEX_GRANULARITY );
+	faces.SetGranularity( SEAS_LIST_GRANULARITY );
+	faceIndex.SetGranularity( SEAS_INDEX_GRANULARITY );
+	areas.SetGranularity( SEAS_LIST_GRANULARITY );
+	nodes.SetGranularity( SEAS_LIST_GRANULARITY );
+	portals.SetGranularity( SEAS_LIST_GRANULARITY );
+	portalIndex.SetGranularity( SEAS_INDEX_GRANULARITY );
+	clusters.SetGranularity( SEAS_LIST_GRANULARITY );
 }
 
 /*
 ================
-idAASFileLocal::~idAASFileLocal
+anSEASFileLocal::~anSEASFileLocal
 ================
 */
-idAASFileLocal::~idAASFileLocal( void ) {
+anSEASFileLocal::~anSEASFileLocal( void ) {
 	int i;
-	idReachability *reach, *next;
+	anReachability *reach, *next;
 
 	for ( i = 0; i < areas.Num(); i++ ) {
 		for ( reach = areas[i].reach; reach; reach = next ) {
@@ -602,10 +602,10 @@ idAASFileLocal::~idAASFileLocal( void ) {
 
 /*
 ================
-idAASFileLocal::Clear
+anSEASFileLocal::Clear
 ================
 */
-void idAASFileLocal::Clear( void ) {
+void anSEASFileLocal::Clear( void ) {
 	planeList.Clear();
 	vertices.Clear();
 	edges.Clear();
@@ -621,13 +621,13 @@ void idAASFileLocal::Clear( void ) {
 
 /*
 ================
-idAASFileLocal::Write
+anSEASFileLocal::Write
 ================
 */
-bool idAASFileLocal::Write( const arcNetString &fileName, unsigned int mapFileCRC ) {
+bool anSEASFileLocal::Write( const anString &fileName, unsigned int mapFileCRC ) {
 	int i, num;
-	arcNetFile *aasFile;
-	idReachability *reach;
+	anFile *aasFile;
+	anReachability *reach;
 
 	common->Printf( "[Write AAS]\n" );
 	common->Printf( "writing %s\n", fileName.c_str() );
@@ -641,7 +641,7 @@ bool idAASFileLocal::Write( const arcNetString &fileName, unsigned int mapFileCR
 		return false;
 	}
 
-	aasFile->WriteFloatString( "%s \"%s\"\n\n", AAS_FILEID, AAS_FILEVERSION );
+	aasFile->WriteFloatString( "%s \"%s\"\n\n", SEAS_FILEID, SEAS_FILEVERSION );
 	aasFile->WriteFloatString( "%u\n\n", mapFileCRC );
 
 	// write out the settings
@@ -702,9 +702,9 @@ bool idAASFileLocal::Write( const arcNetString &fileName, unsigned int mapFileCR
 						areas[i].firstFace, areas[i].numFaces, areas[i].cluster, areas[i].clusterAreaNum, num );
 		for ( reach = areas[i].reach; reach; reach = reach->next ) {
 			Reachability_Write( aasFile, reach );
-			switch( reach->travelType ) {
+			switch ( reach->travelType ) {
 				case TFL_SPECIAL:
-					Reachability_Special_Write( aasFile, static_cast<idReachability_Special *>(reach) );
+					Reachability_Special_Write( aasFile, static_cast<anReachability_Special *>(reach) );
 					break;
 			}
 			aasFile->WriteFloatString( "\n" );
@@ -753,12 +753,12 @@ bool idAASFileLocal::Write( const arcNetString &fileName, unsigned int mapFileCR
 
 /*
 ================
-idAASFileLocal::ParseIndex
+anSEASFileLocal::ParseIndex
 ================
 */
-bool idAASFileLocal::ParseIndex( arcLexer &src, arcNetList<aasIndex_t> &indexes ) {
+bool anSEASFileLocal::ParseIndex( anLexer &src, anList<seasIndex_t> &indexes ) {
 	int numIndexes, i;
-	aasIndex_t index;
+	seasIndex_t index;
 
 	numIndexes = src.ParseInt();
 	indexes.Resize( numIndexes );
@@ -780,13 +780,13 @@ bool idAASFileLocal::ParseIndex( arcLexer &src, arcNetList<aasIndex_t> &indexes 
 
 /*
 ================
-idAASFileLocal::ParsePlanes
+anSEASFileLocal::ParsePlanes
 ================
 */
-bool idAASFileLocal::ParsePlanes( arcLexer &src ) {
+bool anSEASFileLocal::ParsePlanes( anLexer &src ) {
 	int numPlanes, i;
-	arcPlane plane;
-	arcVec4 vec;
+	anPlane plane;
+	anVec4 vec;
 
 	numPlanes = src.ParseInt();
 	planeList.Resize( numPlanes );
@@ -810,12 +810,12 @@ bool idAASFileLocal::ParsePlanes( arcLexer &src ) {
 
 /*
 ================
-idAASFileLocal::ParseVertices
+anSEASFileLocal::ParseVertices
 ================
 */
-bool idAASFileLocal::ParseVertices( arcLexer &src ) {
+bool anSEASFileLocal::ParseVertices( anLexer &src ) {
 	int numVertices, i;
-	arcVec3 vec;
+	anVec3 vec;
 
 	numVertices = src.ParseInt();
 	vertices.Resize( numVertices );
@@ -837,12 +837,12 @@ bool idAASFileLocal::ParseVertices( arcLexer &src ) {
 
 /*
 ================
-idAASFileLocal::ParseEdges
+anSEASFileLocal::ParseEdges
 ================
 */
-bool idAASFileLocal::ParseEdges( arcLexer &src ) {
+bool anSEASFileLocal::ParseEdges( anLexer &src ) {
 	int numEdges, i;
-	aasEdge_t edge;
+	seasEdge_t edge;
 
 	numEdges = src.ParseInt();
 	edges.Resize( numEdges );
@@ -865,12 +865,12 @@ bool idAASFileLocal::ParseEdges( arcLexer &src ) {
 
 /*
 ================
-idAASFileLocal::ParseFaces
+anSEASFileLocal::ParseFaces
 ================
 */
-bool idAASFileLocal::ParseFaces( arcLexer &src ) {
+bool anSEASFileLocal::ParseFaces( anLexer &src ) {
 	int numFaces, i;
-	aasFace_t face;
+	seasFace_t face;
 
 	numFaces = src.ParseInt();
 	faces.Resize( numFaces );
@@ -897,31 +897,31 @@ bool idAASFileLocal::ParseFaces( arcLexer &src ) {
 
 /*
 ================
-idAASFileLocal::ParseReachabilities
+anSEASFileLocal::ParseReachabilities
 ================
 */
-bool idAASFileLocal::ParseReachabilities( arcLexer &src, int areaNum ) {
+bool anSEASFileLocal::ParseReachabilities( anLexer &src, int areaNum ) {
 	int num, j;
-	aasArea_t *area;
-	idReachability reach, *newReach;
-	idReachability_Special *special;
+	seasArea_t *area;
+	anReachability reach, *newReach;
+	anReachability_Special *special;
 
 	area = &areas[areaNum];
 
 	num = src.ParseInt();
 	src.ExpectTokenString( "{" );
-	area->reach = NULL;
-	area->rev_reach = NULL;
+	area->reach = nullptr;
+	area->rev_reach = nullptr;
 	area->travelFlags = AreaContentsTravelFlags( areaNum );
 	for ( j = 0; j < num; j++ ) {
 		Reachability_Read( src, &reach );
-		switch( reach.travelType ) {
+		switch ( reach.travelType ) {
 			case TFL_SPECIAL:
-				newReach = special = new idReachability_Special();
+				newReach = special = new anReachability_Special();
 				Reachability_Special_Read( src, special );
 				break;
 			default:
-				newReach = new idReachability();
+				newReach = new anReachability();
 				break;
 		}
 		newReach->CopyBase( reach );
@@ -935,12 +935,12 @@ bool idAASFileLocal::ParseReachabilities( arcLexer &src, int areaNum ) {
 
 /*
 ================
-idAASFileLocal::LinkReversedReachability
+anSEASFileLocal::LinkReversedReachability
 ================
 */
-void idAASFileLocal::LinkReversedReachability( void ) {
+void anSEASFileLocal::LinkReversedReachability( void ) {
 	int i;
-	idReachability *reach;
+	anReachability *reach;
 
 	// link reversed reachabilities
 	for ( i = 0; i < areas.Num(); i++ ) {
@@ -953,12 +953,12 @@ void idAASFileLocal::LinkReversedReachability( void ) {
 
 /*
 ================
-idAASFileLocal::ParseAreas
+anSEASFileLocal::ParseAreas
 ================
 */
-bool idAASFileLocal::ParseAreas( arcLexer &src ) {
+bool anSEASFileLocal::ParseAreas( anLexer &src ) {
 	int numAreas, i;
-	aasArea_t area;
+	seasArea_t area;
 
 	numAreas = src.ParseInt();
 	areas.Resize( numAreas );
@@ -989,12 +989,12 @@ bool idAASFileLocal::ParseAreas( arcLexer &src ) {
 
 /*
 ================
-idAASFileLocal::ParseNodes
+anSEASFileLocal::ParseNodes
 ================
 */
-bool idAASFileLocal::ParseNodes( arcLexer &src ) {
+bool anSEASFileLocal::ParseNodes( anLexer &src ) {
 	int numNodes, i;
-	aasNode_t node;
+	seasNode_t node;
 
 	numNodes = src.ParseInt();
 	nodes.Resize( numNodes );
@@ -1018,12 +1018,12 @@ bool idAASFileLocal::ParseNodes( arcLexer &src ) {
 
 /*
 ================
-idAASFileLocal::ParsePortals
+anSEASFileLocal::ParsePortals
 ================
 */
-bool idAASFileLocal::ParsePortals( arcLexer &src ) {
+bool anSEASFileLocal::ParsePortals( anLexer &src ) {
 	int numPortals, i;
-	aasPortal_t portal;
+	seasPortal_t portal;
 
 	numPortals = src.ParseInt();
 	portals.Resize( numPortals );
@@ -1049,12 +1049,12 @@ bool idAASFileLocal::ParsePortals( arcLexer &src ) {
 
 /*
 ================
-idAASFileLocal::ParseClusters
+anSEASFileLocal::ParseClusters
 ================
 */
-bool idAASFileLocal::ParseClusters( arcLexer &src ) {
+bool anSEASFileLocal::ParseClusters( anLexer &src ) {
 	int numClusters, i;
-	aasCluster_t cluster;
+	seasCluster_t cluster;
 
 	numClusters = src.ParseInt();
 	clusters.Resize( numClusters );
@@ -1079,10 +1079,10 @@ bool idAASFileLocal::ParseClusters( arcLexer &src ) {
 
 /*
 ================
-idAASFileLocal::FinishAreas
+anSEASFileLocal::FinishAreas
 ================
 */
-void idAASFileLocal::FinishAreas( void ) {
+void anSEASFileLocal::FinishAreas( void ) {
 	int i;
 
 	for ( i = 0; i < areas.Num(); i++ ) {
@@ -1093,12 +1093,12 @@ void idAASFileLocal::FinishAreas( void ) {
 
 /*
 ================
-idAASFileLocal::Load
+anSEASFileLocal::Load
 ================
 */
-bool idAASFileLocal::Load( const arcNetString &fileName, unsigned int mapFileCRC ) {
-	arcLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWPATHNAMES );
-	arcNetToken token;
+bool anSEASFileLocal::Load( const anString &fileName, unsigned int mapFileCRC ) {
+	anLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWPATHNAMES );
+	anToken token;
 	int depth;
 	unsigned int c;
 
@@ -1112,13 +1112,13 @@ bool idAASFileLocal::Load( const arcNetString &fileName, unsigned int mapFileCRC
 		return false;
 	}
 
-	if ( !src.ExpectTokenString( AAS_FILEID ) ) {
+	if ( !src.ExpectTokenString( SEAS_FILEID ) ) {
 		common->Warning( "Not an AAS file: '%s'", name.c_str() );
 		return false;
 	}
 
-	if ( !src.ReadToken( &token ) || token != AAS_FILEVERSION ) {
-		common->Warning( "AAS file '%s' has version %s instead of %s", name.c_str(), token.c_str(), AAS_FILEVERSION );
+	if ( !src.ReadToken( &token ) || token != SEAS_FILEVERSION ) {
+		common->Warning( "AAS file '%s' has version %s instead of %s", name.c_str(), token.c_str(), SEAS_FILEVERSION );
 		return false;
 	}
 
@@ -1179,7 +1179,7 @@ bool idAASFileLocal::Load( const arcNetString &fileName, unsigned int mapFileCRC
 			if ( !ParseClusters( src ) ) { return false; }
 		}
 		else {
-			src.Error( "idAASFileLocal::Load: bad token \"%s\"", token.c_str() );
+			src.Error( "anSEASFileLocal::Load: bad token \"%s\"", token.c_str() );
 			return false;
 		}
 	}
@@ -1187,8 +1187,8 @@ bool idAASFileLocal::Load( const arcNetString &fileName, unsigned int mapFileCRC
 	FinishAreas();
 
 	depth = MaxTreeDepth();
-	if ( depth > MAX_AAS_TREE_DEPTH ) {
-		src.Error( "idAASFileLocal::Load: tree depth = %d", depth );
+	if ( depth > SEAS_MAX_TREE_DEPTH ) {
+		src.Error( "anSEASFileLocal::Load: tree depth = %d", depth );
 	}
 
 	common->Printf( "done.\n" );
@@ -1198,10 +1198,10 @@ bool idAASFileLocal::Load( const arcNetString &fileName, unsigned int mapFileCRC
 
 /*
 ================
-idAASFileLocal::MemorySize
+anSEASFileLocal::MemorySize
 ================
 */
-int idAASFileLocal::MemorySize( void ) const {
+int anSEASFileLocal::MemorySize( void ) const {
 	int size;
 
 	size = planeList.Size();
@@ -1215,17 +1215,17 @@ int idAASFileLocal::MemorySize( void ) const {
 	size += portals.Size();
 	size += portalIndex.Size();
 	size += clusters.Size();
-	size += sizeof( idReachability_Walk ) * NumReachabilities();
+	size += sizeof( anReachability_Walk ) * NumReachabilities();
 
 	return size;
 }
 
 /*
 ================
-idAASFileLocal::PrintInfo
+anSEASFileLocal::PrintInfo
 ================
 */
-void idAASFileLocal::PrintInfo( void ) const {
+void anSEASFileLocal::PrintInfo( void ) const {
 	common->Printf( "%6d KB file size\n", MemorySize() >> 10 );
 	common->Printf( "%6d areas\n", areas.Num() );
 	common->Printf( "%6d max tree depth\n", MaxTreeDepth() );
@@ -1234,12 +1234,12 @@ void idAASFileLocal::PrintInfo( void ) const {
 
 /*
 ================
-idAASFileLocal::NumReachabilities
+anSEASFileLocal::NumReachabilities
 ================
 */
-int idAASFileLocal::NumReachabilities( void ) const {
+int anSEASFileLocal::NumReachabilities( void ) const {
 	int i, num;
-	idReachability *reach;
+	anReachability *reach;
 
 	num = 0;
 	for ( i = 0; i < areas.Num(); i++ ) {
@@ -1252,10 +1252,10 @@ int idAASFileLocal::NumReachabilities( void ) const {
 
 /*
 ================
-idAASFileLocal::ReportRoutingEfficiency
+anSEASFileLocal::ReportRoutingEfficiency
 ================
 */
-void idAASFileLocal::ReportRoutingEfficiency( void ) const {
+void anSEASFileLocal::ReportRoutingEfficiency( void ) const {
 	int numReachableAreas, total, i, n;
 
 	numReachableAreas = 0;
@@ -1274,31 +1274,31 @@ void idAASFileLocal::ReportRoutingEfficiency( void ) const {
 
 /*
 ================
-idAASFileLocal::DeleteReachabilities
+anSEASFileLocal::DeleteReachabilities
 ================
 */
-void idAASFileLocal::DeleteReachabilities( void ) {
+void anSEASFileLocal::DeleteReachabilities( void ) {
 	int i;
-	idReachability *reach, *nextReach;
+	anReachability *reach, *nextReach;
 
 	for ( i = 0; i < areas.Num(); i++ ) {
 		for ( reach = areas[i].reach; reach; reach = nextReach ) {
 			nextReach = reach->next;
 			delete reach;
 		}
-		areas[i].reach = NULL;
-		areas[i].rev_reach = NULL;
+		areas[i].reach = nullptr;
+		areas[i].rev_reach = nullptr;
 	}
 }
 
 /*
 ================
-idAASFileLocal::DeleteClusters
+anSEASFileLocal::DeleteClusters
 ================
 */
-void idAASFileLocal::DeleteClusters( void ) {
-	aasPortal_t portal;
-	aasCluster_t cluster;
+void anSEASFileLocal::DeleteClusters( void ) {
+	seasPortal_t portal;
+	seasCluster_t cluster;
 
 	portals.Clear();
 	portalIndex.Clear();

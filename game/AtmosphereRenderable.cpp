@@ -6,7 +6,7 @@ WARNING: This is included by the radiant project as well... don't try to use any
 ================================================================================================================================
 */
 
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -24,27 +24,27 @@ static char THIS_FILE[] = __FILE__;
 
 #include "../decllib/declAtmosphere.h"
 
-idCVar sdAtmosphereRenderable::a_sun(						"a_sun",						"85",		CVAR_GAME | CVAR_FLOAT,	"" );
-idCVar sdAtmosphereRenderable::a_glowScale(					"a_glowScale",					"0.25",		CVAR_GAME | CVAR_FLOAT,	"Blurred image contribution factor" );
-idCVar sdAtmosphereRenderable::a_glowBaseScale(				"a_glowBaseScale",				"0.21",		CVAR_GAME | CVAR_FLOAT,	"Original image contribution factor" );
-idCVar sdAtmosphereRenderable::a_glowThresh(				"a_glowThresh",					"0.0",		CVAR_GAME | CVAR_FLOAT,	"Threshold above which part of the scene starts glowing" );
-idCVar sdAtmosphereRenderable::a_glowLuminanceDependency(	"a_glowLuminanceDependency",	"1.0",		CVAR_GAME | CVAR_FLOAT,	"Dependency of the glow on the luminance(brightness)" );
-idCVar sdAtmosphereRenderable::a_glowSunPower(				"a_glowSunPower",				"16",		CVAR_GAME | CVAR_FLOAT,	"Power to raise to sun factor to" );
-idCVar sdAtmosphereRenderable::a_glowSunScale(				"a_glowSunScale",				"0.0",		CVAR_GAME | CVAR_FLOAT,	"Factor to scale to sun factor with" );
-idCVar sdAtmosphereRenderable::a_glowSunBaseScale(			"a_glowSunBaseScale",			"0.0",		CVAR_GAME | CVAR_FLOAT,	"Factor to scale to sun factor with" );
+anCVar sdAtmosphereRenderable::a_sun(						"a_sun",						"85",		CVAR_GAME | CVAR_FLOAT,	"" );
+anCVar sdAtmosphereRenderable::a_glowScale(					"a_glowScale",					"0.25",		CVAR_GAME | CVAR_FLOAT,	"Blurred image contribution factor" );
+anCVar sdAtmosphereRenderable::a_glowBaseScale(				"a_glowBaseScale",				"0.21",		CVAR_GAME | CVAR_FLOAT,	"Original image contribution factor" );
+anCVar sdAtmosphereRenderable::a_glowThresh(				"a_glowThresh",					"0.0",		CVAR_GAME | CVAR_FLOAT,	"Threshold above which part of the scene starts glowing" );
+anCVar sdAtmosphereRenderable::a_glowLuminanceDependency(	"a_glowLuminanceDependency",	"1.0",		CVAR_GAME | CVAR_FLOAT,	"Dependency of the glow on the luminance(brightness)" );
+anCVar sdAtmosphereRenderable::a_glowSunPower(				"a_glowSunPower",				"16",		CVAR_GAME | CVAR_FLOAT,	"Power to raise to sun factor to" );
+anCVar sdAtmosphereRenderable::a_glowSunScale(				"a_glowSunScale",				"0.0",		CVAR_GAME | CVAR_FLOAT,	"Factor to scale to sun factor with" );
+anCVar sdAtmosphereRenderable::a_glowSunBaseScale(			"a_glowSunBaseScale",			"0.0",		CVAR_GAME | CVAR_FLOAT,	"Factor to scale to sun factor with" );
 
 /*
 ================
 sdAtmosphereRenderable::sdAtmosphereRenderable
 ================
 */
-sdAtmosphereRenderable::sdAtmosphereRenderable( idRenderWorld* renderWorld ) {
+sdAtmosphereRenderable::sdAtmosphereRenderable( anRenderWorld* renderWorld ) {
 	this->renderWorld = renderWorld;
 
 	//
 	// Setup the celestial body light source
 	//
-	memset( &skyLight, 0, sizeof(skyLight) );
+	memset( &skyLight, 0, sizeof( skyLight) );
 	skyLight.flags.pointLight						= true;
 	skyLight.flags.atmosphereLight					= true;
 	skyLight.flags.parallel							= true;
@@ -165,7 +165,7 @@ void sdAtmosphereRenderable::UpdateCelestialBody( parms_t& parms ) {
 	// Update lightsource
 	//
 	float sunIntensity							= Min( 1.f, ( 0.3f + ( ( a_sun.GetFloat() / 80.f ) ) ) );
-	arcVec3 sunColor								= parms.atmosphere->GetSunColor() * sunIntensity;
+	anVec3 sunColor								= parms.atmosphere->GetSunColor() * sunIntensity;
 	skyLight.lightCenter						= parms.atmosphere->GetSunDirection() /** 100000.f*/;
 	skyLight.minSpecShadowColor					= sdColor4::PackColor( parms.atmosphere->GetMinSpecShadowColor(), 1.f );
 	skyLight.shaderParms[ SHADERPARM_RED ]		= sunColor[ 0 ];
@@ -178,16 +178,16 @@ void sdAtmosphereRenderable::UpdateCelestialBody( parms_t& parms ) {
 	if ( parms.mapId != 0 ) {
 		skyLight.mapId = parms.mapId;
 		skyLight.numPrelightModels = 0;
-		while ( renderModelManager->CheckModel( arcNetString( va( "_prelightatmosphere_%d_%d", parms.mapId, skyLight.numPrelightModels ) ) ) ) {
+		while ( renderModelManager->CheckModel( anString( va( "_prelightatmosphere_%d_%d", parms.mapId, skyLight.numPrelightModels ) ) ) ) {
 			skyLight.numPrelightModels++;
 		}
 		if ( skyLight.numPrelightModels > MAX_PRELIGHTS ) {
 			common->Warning( "Max number of prelights reached for atmosphere against areas" );
 		}
 		skyLight.numPrelightModels = Min( skyLight.numPrelightModels, MAX_PRELIGHTS );
-		for (int i=0; i<skyLight.numPrelightModels; i++) {
-			skyLight.prelightModels[i] = renderModelManager->CheckModel( arcNetString( va( "_prelightatmosphere_%d_%d", parms.mapId, i ) ) );
-			assert( skyLight.prelightModels[i] != NULL );
+		for ( int i=0; i<skyLight.numPrelightModels; i++ ) {
+			skyLight.prelightModels[i] = renderModelManager->CheckModel( anString( va( "_prelightatmosphere_%d_%d", parms.mapId, i ) ) );
+			assert( skyLight.prelightModels[i] != nullptr );
 		}
 	}
 
@@ -205,7 +205,7 @@ void sdAtmosphereRenderable::UpdateCelestialBody( parms_t& parms ) {
 
 	skyLightSprite.origin = parms.skyOrigin;
 
-	arcVec3 dir = parms.atmosphere->GetSunDirection();
+	anVec3 dir = parms.atmosphere->GetSunDirection();
 	//-dir.Normalize();
 	skyLightSprite.axis = dir.ToMat3();
 
@@ -243,12 +243,12 @@ void sdAtmosphereRenderable::UpdateCelestialBody( parms_t& parms ) {
 	skyLightGlowSprite.origin = parms.skyOrigin;
 
 	if ( parms.atmosphere->EnableSunFlareAziZen() ) {
-		arcVec3 sunFlareDir;
+		anVec3 sunFlareDir;
 		float azs, azc;
 		float zes, zec;
 
-		arcMath::SinCos( DEG2RAD( parms.atmosphere->GetSunFlareAzi() ), azs, azc );
-		arcMath::SinCos( DEG2RAD( parms.atmosphere->GetSunFlareZen() ), zes, zec );
+		anMath::SinCos( DEG2RAD( parms.atmosphere->GetSunFlareAzi() ), azs, azc );
+		anMath::SinCos( DEG2RAD( parms.atmosphere->GetSunFlareZen() ), zes, zec );
 
 		sunFlareDir.x = azs * zec;
 		sunFlareDir.y = azc * zec;
@@ -304,7 +304,7 @@ sdAtmosphereRenderable::UpdateCloudLayers
 ================
 */
 void sdAtmosphereRenderable::UpdateCloudLayers( parms_t& parms ) {
-	const arcNetList< sdCloudLayer >& cloudLayers = parms.atmosphere->GetCloudLayers();
+	const anList< sdCloudLayer >& cloudLayers = parms.atmosphere->GetCloudLayers();
 
 	// If number of layers has changed free render ents and realloc
 	if ( renderEnts.Num() != cloudLayers.Num() ) {
@@ -350,13 +350,13 @@ void sdAtmosphereRenderable::UpdateCloudLayers( parms_t& parms ) {
 }
 
 
-idCVar a_glowSpriteMin(	"a_glowSpriteMin",				"0",		CVAR_GAME,	"" );
-idCVar a_glowSpriteSize( "a_glowSpriteSize",				"100",		CVAR_GAME | CVAR_FLOAT,	"" );
-//idCVar a_glowSpriteMaxSize( "a_glowSpriteMaxSize",			"2",		CVAR_GAME | CVAR_FLOAT,	"" );
-//idCVar a_glowSpriteAlpha( "a_glowSpriteAlpha",				"100",		CVAR_GAME | CVAR_FLOAT,	"" );
-//idCVar a_glowSpriteMaxAlpha( "a_glowSpriteMaxAlpha",		"0.1",		CVAR_GAME | CVAR_FLOAT,	"" );
-//idCVar a_glowSpriteSizeSpeed( "a_glowSpriteSizeSpeed",				"0.5",		CVAR_GAME | CVAR_FLOAT,	"" );
-//idCVar a_glowSpriteAlphaSpeed( "a_glowSpriteAlphaSpeed",				"0.99",		CVAR_GAME | CVAR_FLOAT,	"" );
+anCVar a_glowSpriteMin(	"a_glowSpriteMin",				"0",		CVAR_GAME,	"" );
+anCVar a_glowSpriteSize( "a_glowSpriteSize",				"100",		CVAR_GAME | CVAR_FLOAT,	"" );
+//anCVar a_glowSpriteMaxSize( "a_glowSpriteMaxSize",			"2",		CVAR_GAME | CVAR_FLOAT,	"" );
+//anCVar a_glowSpriteAlpha( "a_glowSpriteAlpha",				"100",		CVAR_GAME | CVAR_FLOAT,	"" );
+//anCVar a_glowSpriteMaxAlpha( "a_glowSpriteMaxAlpha",		"0.1",		CVAR_GAME | CVAR_FLOAT,	"" );
+//anCVar a_glowSpriteSizeSpeed( "a_glowSpriteSizeSpeed",				"0.5",		CVAR_GAME | CVAR_FLOAT,	"" );
+//anCVar a_glowSpriteAlphaSpeed( "a_glowSpriteAlphaSpeed",				"0.99",		CVAR_GAME | CVAR_FLOAT,	"" );
 
 
 /*
@@ -369,7 +369,7 @@ bool sdAtmosphereRenderable::_glowSpriteCB( renderEntity_t *re, const renderView
 	def.view = v->viewID;
 	def.bb.Zero();
 	def.bb.ExpandSelf( 1000.f );
-	def.bb.TranslateSelf( arcVec3( re->shaderParms[ SHADERPARM_SPRITE_OFFSET ], 0.0f, 0.0f ) );
+	def.bb.TranslateSelf( anVec3( re->shaderParms[ SHADERPARM_SPRITE_OFFSET ], 0.0f, 0.0f ) );
 	def.origin = re->origin;
 	def.axis = re->axis;
 	if ( occtestHandle < 0 ) {
@@ -446,9 +446,9 @@ bool sdAtmosphereRenderable::glowSpriteCB( renderEntity_t *re, const renderView_
 	if ( v ) {
 #pragma warning( push )
 #pragma warning( disable: 4311 )
-		sdAtmosphereRenderable *atmos = static_cast<sdAtmosphereRenderable *>(renderSystem->PtrForUID( (int)re->callbackData ));
+		sdAtmosphereRenderable *atmos = static_cast<sdAtmosphereRenderable *>(renderSystem->PtrForUID( (int)re->callbackData ) );
 #pragma warning( pop )
-		if ( atmos != NULL ) {
+		if ( atmos != nullptr ) {
 			return atmos->_glowSpriteCB( re, v, lastModifiedGameTime );
 		} else {
 			return false;

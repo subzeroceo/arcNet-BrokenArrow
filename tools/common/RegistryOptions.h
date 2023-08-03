@@ -58,7 +58,7 @@ public:
 	void			SetLong					( const char* name, long v );
 	void			SetBool					( const char* name, bool v );
 	void			SetString				( const char* name, const char* v );
-	void			SetVec4					( const char* name, arcVec4& v );
+	void			SetVec4					( const char* name, anVec4& v );
 	void			SetBinary				( const char* name, const unsigned char* data, int size );
 
 	// Get routines
@@ -66,7 +66,7 @@ public:
 	long			GetLong					( const char* name );
 	bool			GetBool					( const char* name );
 	const char*		GetString				( const char* name );
-	arcVec4			GetVec4					( const char* name );
+	anVec4			GetVec4					( const char* name );
 	void			GetBinary				( const char* name, unsigned char* data, int size );
 
 	// MRU related methods
@@ -76,9 +76,9 @@ public:
 
 private:
 
-	arcNetList<arcNetString>	mRecentFiles;
-	arcDictionary			mValues;
-	arcNetString			mBaseKey;
+	anList<anString>	mRecentFiles;
+	anDict			mValues;
+	anString			mBaseKey;
 };
 
 ARC_INLINE void rvRegistryOptions::SetFloat ( const char* name, float v )
@@ -101,7 +101,7 @@ ARC_INLINE void rvRegistryOptions::SetString ( const char* name, const char* v )
 	mValues.Set ( name, v );
 }
 
-ARC_INLINE void rvRegistryOptions::SetVec4 ( const char* name, arcVec4& v )
+ARC_INLINE void rvRegistryOptions::SetVec4 ( const char* name, anVec4& v )
 {
 	mValues.SetVec4 ( name, v );
 }
@@ -126,19 +126,19 @@ ARC_INLINE const char* rvRegistryOptions::GetString ( const char* name )
 	return mValues.GetString ( name );
 }
 
-ARC_INLINE arcVec4 rvRegistryOptions::GetVec4 ( const char* name )
+ARC_INLINE anVec4 rvRegistryOptions::GetVec4 ( const char* name )
 {
 	return mValues.GetVec4 ( name );
 }
 
 ARC_INLINE int rvRegistryOptions::GetRecentFileCount ( void )
 {
-	return mRecentFiles.Num ( );
+	return mRecentFiles.Num();
 }
 
 ARC_INLINE const char* rvRegistryOptions::GetRecentFile ( int index )
 {
-	return mRecentFiles[index].c_str ( );
+	return mRecentFiles[index].c_str();
 }
 
 #endif // REGISTRYOPTIONS_H_

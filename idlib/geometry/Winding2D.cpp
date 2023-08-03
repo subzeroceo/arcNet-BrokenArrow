@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "Winding2D.h"
@@ -9,9 +9,9 @@
 GetAxialBevel
 ============
 */
-bool GetAxialBevel( const arcVec3 &plane1, const arcVec3 &plane2, const arcVec2 &point, arcVec3 &bevel ) {
+bool GetAxialBevel( const anVec3 &plane1, const anVec3 &plane2, const anVec2 &point, anVec3 &bevel ) {
 	if ( FLOATSIGNBITSET( plane1.x ) ^ FLOATSIGNBITSET( plane2.x ) ) {
-		if ( arcMath::Fabs( plane1.x ) > 0.1f && arcMath::Fabs( plane2.x ) > 0.1f ) {
+		if ( anMath::Fabs( plane1.x ) > 0.1f && anMath::Fabs( plane2.x ) > 0.1f ) {
 			bevel.x = 0.0f;
 			if ( FLOATSIGNBITSET( plane1.y ) ) {
 				bevel.y = -1.0f;
@@ -24,7 +24,7 @@ bool GetAxialBevel( const arcVec3 &plane1, const arcVec3 &plane2, const arcVec2 
 		}
 	}
 	if ( FLOATSIGNBITSET( plane1.y ) ^ FLOATSIGNBITSET( plane2.y ) ) {
-		if ( arcMath::Fabs( plane1.y ) > 0.1f && arcMath::Fabs( plane2.y ) > 0.1f ) {
+		if ( anMath::Fabs( plane1.y ) > 0.1f && anMath::Fabs( plane2.y ) > 0.1f ) {
 			bevel.y = 0.0f;
 			if ( FLOATSIGNBITSET( plane1.x ) ) {
 				bevel.x = -1.0f;
@@ -44,10 +44,10 @@ bool GetAxialBevel( const arcVec3 &plane1, const arcVec3 &plane2, const arcVec2 
 idWinding2D::ExpandForAxialBox
 ============
 */
-void idWinding2D::ExpandForAxialBox( const arcVec2 bounds[2] ) {
+void idWinding2D::ExpandForAxialBox( const anVec2 bounds[2] ) {
 	int i, j, numPlanes;
-	arcVec2 v;
-	arcVec3 planes[MAX_POINTS_ON_WINDING_2D], plane, bevel;
+	anVec2 v;
+	anVec3 planes[MAX_POINTS_ON_WINDING_2D], plane, bevel;
 
 	// get planes for the edges and add bevels
 	for ( numPlanes = i = 0; i < numPoints; i++ ) {
@@ -90,11 +90,11 @@ idWinding2D::Expand
 */
 void idWinding2D::Expand( const float d ) {
 	int i;
-	arcVec2 edgeNormals[MAX_POINTS_ON_WINDING_2D];
+	anVec2 edgeNormals[MAX_POINTS_ON_WINDING_2D];
 
 	for ( i = 0; i < numPoints; i++ ) {
-		arcVec2 &start = p[i];
-		arcVec2 &end = p[( i+1 )%numPoints];
+		anVec2 &start = p[i];
+		anVec2 &end = p[( i+1 )%numPoints];
 		edgeNormals[i].x = start.y - end.y;
 		edgeNormals[i].y = end.x - start.x;
 		edgeNormals[i].Normalize();
@@ -111,14 +111,14 @@ void idWinding2D::Expand( const float d ) {
 idWinding2D::Split
 =============
 */
-int idWinding2D::Split( const arcVec3 &plane, const float epsilon, idWinding2D **front, idWinding2D **back ) const {
+int idWinding2D::Split( const anVec3 &plane, const float epsilon, idWinding2D **front, idWinding2D **back ) const {
 	float			dists[MAX_POINTS_ON_WINDING_2D];
 	byte			sides[MAX_POINTS_ON_WINDING_2D];
 	int				counts[3];
 	float			dot;
 	int				i, j;
-	const arcVec2 *	p1, *p2;
-	arcVec2			mid;
+	const anVec2 *	p1, *p2;
+	anVec2			mid;
 	idWinding2D *	f;
 	idWinding2D *	b;
 	int				( maxPts );
@@ -140,7 +140,7 @@ int idWinding2D::Split( const arcVec3 &plane, const float epsilon, idWinding2D *
 	sides[i] = sides[0];
 	dists[i] = dists[0];
 
-	*front = *back = NULL;
+	*front = *back = nullptr;
 
 	// if nothing at the front of the clipping plane
 	if ( !counts[SIDE_FRONT] ) {
@@ -228,11 +228,11 @@ int idWinding2D::Split( const arcVec3 &plane, const float epsilon, idWinding2D *
 idWinding2D::ClipInPlace
 ============
 */
-bool idWinding2D::ClipInPlace( const arcVec3 &plane, const float epsilon, const bool keepOn ) {
+bool idWinding2D::ClipInPlace( const anVec3 &plane, const float epsilon, const bool keepOn ) {
 	int i, j, ( maxPts ), newNumPoints;
 	int sides[MAX_POINTS_ON_WINDING_2D+1], counts[3];
 	float dot, dists[MAX_POINTS_ON_WINDING_2D+1];
-	arcVec2 *p1, *p2, mid, newPoints[MAX_POINTS_ON_WINDING_2D+4];
+	anVec2 *p1, *p2, mid, newPoints[MAX_POINTS_ON_WINDING_2D+4];
 
 	counts[SIDE_FRONT] = counts[SIDE_BACK] = counts[SIDE_ON] = 0;
 
@@ -315,7 +315,7 @@ bool idWinding2D::ClipInPlace( const arcVec3 &plane, const float epsilon, const 
 	}
 
 	numPoints = newNumPoints;
-	memcpy( p, newPoints, newNumPoints * sizeof(arcVec2) );
+	memcpy( p, newPoints, newNumPoints * sizeof(anVec2) );
 
 	return true;
 }
@@ -358,7 +358,7 @@ idWinding2D::GetArea
 */
 float idWinding2D::GetArea( void ) const {
 	int i;
-	arcVec2 d1, d2;
+	anVec2 d1, d2;
 	float total;
 
 	total = 0.0f;
@@ -375,9 +375,9 @@ float idWinding2D::GetArea( void ) const {
 idWinding2D::GetCenter
 ============
 */
-arcVec2 idWinding2D::GetCenter( void ) const {
+anVec2 idWinding2D::GetCenter( void ) const {
 	int i;
-	arcVec2 center;
+	anVec2 center;
 
 	center.Zero();
 	for ( i = 0; i < numPoints; i++ ) {
@@ -392,10 +392,10 @@ arcVec2 idWinding2D::GetCenter( void ) const {
 idWinding2D::GetRadius
 ============
 */
-float idWinding2D::GetRadius( const arcVec2 &center ) const {
+float idWinding2D::GetRadius( const anVec2 &center ) const {
 	int i;
 	float radius, r;
-	arcVec2 dir;
+	anVec2 dir;
 
 	radius = 0.0f;
 	for ( i = 0; i < numPoints; i++ ) {
@@ -405,7 +405,7 @@ float idWinding2D::GetRadius( const arcVec2 &center ) const {
 			radius = r;
 		}
 	}
-	return arcMath::Sqrt( radius );
+	return anMath::Sqrt( radius );
 }
 
 /*
@@ -413,12 +413,12 @@ float idWinding2D::GetRadius( const arcVec2 &center ) const {
 idWinding2D::GetBounds
 ============
 */
-void idWinding2D::GetBounds( arcVec2 bounds[2] ) const {
+void idWinding2D::GetBounds( anVec2 bounds[2] ) const {
 	int i;
 
 	if ( !numPoints ) {
-		bounds[0].x = bounds[0].y = arcMath::INFINITY;
-		bounds[1].x = bounds[1].y = -arcMath::INFINITY;
+		bounds[0].x = bounds[0].y = anMath::INFINITY;
+		bounds[1].x = bounds[1].y = -anMath::INFINITY;
 		return;
 	}
 	bounds[0] = bounds[1] = p[0];
@@ -446,7 +446,7 @@ idWinding2D::IsTiny
 bool idWinding2D::IsTiny( void ) const {
 	int		i;
 	float	len;
-	arcVec2	delta;
+	anVec2	delta;
 	int		edges;
 
 	edges = 0;
@@ -489,7 +489,7 @@ void idWinding2D::Print( void ) const {
 	int i;
 
 	for ( i = 0; i < numPoints; i++ ) {
-		arcLibrary::common->Printf( "(%5.1f, %5.1f)\n", p[i][0], p[i][1] );
+		anLibrary::common->Printf( "(%5.1f, %5.1f)\n", p[i][0], p[i][1] );
 	}
 }
 
@@ -498,11 +498,11 @@ void idWinding2D::Print( void ) const {
 idWinding2D::PlaneDistance
 =============
 */
-float idWinding2D::PlaneDistance( const arcVec3 &plane ) const {
+float idWinding2D::PlaneDistance( const anVec3 &plane ) const {
 	int		i;
 	float	d, min, max;
 
-	min = arcMath::INFINITY;
+	min = anMath::INFINITY;
 	max = -min;
 	for ( i = 0; i < numPoints; i++ ) {
 		d = plane.x * p[i].x + plane.y * p[i].y + plane.z;
@@ -533,7 +533,7 @@ float idWinding2D::PlaneDistance( const arcVec3 &plane ) const {
 idWinding2D::PlaneSide
 =============
 */
-int idWinding2D::PlaneSide( const arcVec3 &plane, const float epsilon ) const {
+int idWinding2D::PlaneSide( const anVec3 &plane, const float epsilon ) const {
 	bool	front, back;
 	int		i;
 	float	d;
@@ -572,10 +572,10 @@ int idWinding2D::PlaneSide( const arcVec3 &plane, const float epsilon ) const {
 idWinding2D::PointInside
 ============
 */
-bool idWinding2D::PointInside( const arcVec2 &point, const float epsilon ) const {
+bool idWinding2D::PointInside( const anVec2 &point, const float epsilon ) const {
 	int i;
 	float d;
-	arcVec3 plane;
+	anVec3 plane;
 
 	for ( i = 0; i < numPoints; i++ ) {
 		plane = Plane2DFromPoints( p[i], p[( i+1 ) % numPoints] );
@@ -592,11 +592,11 @@ bool idWinding2D::PointInside( const arcVec2 &point, const float epsilon ) const
 idWinding2D::LineIntersection
 ============
 */
-bool idWinding2D::LineIntersection( const arcVec2 &start, const arcVec2 &end ) const {
+bool idWinding2D::LineIntersection( const anVec2 &start, const anVec2 &end ) const {
 	int i, numEdges;
 	int sides[MAX_POINTS_ON_WINDING_2D+1], counts[3];
 	float d1, d2, epsilon = 0.1f;
-	arcVec3 plane, edges[2];
+	anVec3 plane, edges[2];
 
 	counts[SIDE_FRONT] = counts[SIDE_BACK] = counts[SIDE_ON] = 0;
 
@@ -654,11 +654,11 @@ bool idWinding2D::LineIntersection( const arcVec2 &start, const arcVec2 &end ) c
 idWinding2D::RayIntersection
 ============
 */
-bool idWinding2D::RayIntersection( const arcVec2 &start, const arcVec2 &dir, float &scale1, float &scale2, int *edgeNums ) const {
+bool idWinding2D::RayIntersection( const anVec2 &start, const anVec2 &dir, float &scale1, float &scale2, int *edgeNums ) const {
 	int i, numEdges, localEdgeNums[2];
 	int sides[MAX_POINTS_ON_WINDING_2D+1], counts[3];
 	float d1, d2, epsilon = 0.1f;
-	arcVec3 plane, edges[2];
+	anVec3 plane, edges[2];
 
 	scale1 = scale2 = 0.0f;
 	counts[SIDE_FRONT] = counts[SIDE_BACK] = counts[SIDE_ON] = 0;
@@ -713,9 +713,9 @@ bool idWinding2D::RayIntersection( const arcVec2 &start, const arcVec2 &dir, flo
 	}
 	scale2 = d1 / d2;
 
-	if ( arcMath::Fabs( scale1 ) > arcMath::Fabs( scale2 ) ) {
-		idSwap( scale1, scale2 );
-		idSwap( localEdgeNums[0], localEdgeNums[1] );
+	if ( anMath::Fabs( scale1 ) > anMath::Fabs( scale2 ) ) {
+		anSwap( scale1, scale2 );
+		anSwap( localEdgeNums[0], localEdgeNums[1] );
 	}
 
 	if ( edgeNums ) {

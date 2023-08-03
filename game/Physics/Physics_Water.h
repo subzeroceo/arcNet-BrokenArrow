@@ -10,7 +10,7 @@
 ===============================================================================
 */
 
-class arcPhysics_WaterBase {
+class anPhysics_WaterBase {
 public:
 
 private:
@@ -18,7 +18,7 @@ private:
 
 private:
 	void			SaveEntityPosition( arcEntity *ent );
-	bool			RotateEntityToAxial( arcEntity *ent, arcVec3 rotationPoint );
+	bool			RotateEntityToAxial( arcEntity *ent, anVec3 rotationPoint );
 #ifdef NEW_PUSH
 	bool			CanEntityFloat( arcEntity *ent, arcEntity *pusher, arcEntity *initialPusher, const int flags );
 	void			AddEntityToBouyGroup( arcEntity *ent, float fraction, bool waterContact );

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/Common_resource.h"
@@ -47,7 +47,7 @@ IMPLEMENT_DYNAMIC(DialogGoToLine, CDialog)
 DialogGoToLine::DialogGoToLine
 ================
 */
-DialogGoToLine::DialogGoToLine( CWnd* pParent /*=NULL*/ )
+DialogGoToLine::DialogGoToLine( CWnd* pParent /*=nullptr*/ )
 	: CDialog(DialogGoToLine::IDD, pParent)
 	, firstLine(0 )
 	, lastLine(0 )
@@ -129,6 +129,6 @@ DialogGoToLine::OnBnClickedOk
 void DialogGoToLine::OnBnClickedOk() {
 	CString text;
 	numberEdit.GetWindowText( text );
-	line = arcMath::ClampInt( firstLine, lastLine, atoi( text ) );
+	line = anMath::ClampInt( firstLine, lastLine, atoi( text ) );
 	OnOK();
 }

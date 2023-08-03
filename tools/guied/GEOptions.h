@@ -51,9 +51,9 @@ public:
 	// Read the options from the registry
 	bool			Load					( void );
 
-	void			SetSelectionColor		( arcVec4& color );
+	void			SetSelectionColor		( anVec4& color );
 	void			SetSelectionColor		( COLORREF color );
-	void			SetGridColor			( arcVec4& color );
+	void			SetGridColor			( anVec4& color );
 	void			SetGridColor			( COLORREF color );
 	void			SetGridWidth			( int width );
 	void			SetGridHeight			( int height );
@@ -70,17 +70,17 @@ public:
 	int				GetRecentFileCount		( void );
 	const char*		GetRecentFile			( int index );
 
-	arcVec4&			GetGridColor			( void );
+	anVec4&			GetGridColor			( void );
 	int				GetGridWidth			( void );
 	int				GetGridHeight			( void );
 	bool			GetGridVisible			( void );
 	bool			GetGridSnap				( void );
 	int				GetLastOptionsPage		( void );
-	arcVec4&			GetWorkspaceColor		( void );
+	anVec4&			GetWorkspaceColor		( void );
 	bool			GetNavigatorVisible		( void );
 	bool			GetTransformerVisible	( void );
 	bool			GetPropertiesVisible	( void );
-	arcVec4&			GetSelectionColor		( void );
+	anVec4&			GetSelectionColor		( void );
 	COLORREF*		GetCustomColors			( void );
 	bool			GetIgnoreDesktopSelect	( void );
 	bool			GetStatusBarVisible		( void );
@@ -92,20 +92,20 @@ public:
 
 protected:
 
-	void				ConvertColor		( COLORREF src, arcVec4& dest );
+	void				ConvertColor		( COLORREF src, anVec4& dest );
 	void				SetModified			( bool mod );
 
 	bool				mModified;
 	int					mLastOptionsPage;
 
-	arcVec4				mGridColor;
+	anVec4				mGridColor;
 	int					mGridWidth;
 	int					mGridHeight;
 	bool				mGridSnap;
 	bool				mGridVisible;
 
-	arcVec4				mWorkspaceColor;
-	arcVec4				mSelectionColor;
+	anVec4				mWorkspaceColor;
+	anVec4				mSelectionColor;
 
 	bool				mNavigatorVisible;
 	bool				mPropertiesVisible;
@@ -113,7 +113,7 @@ protected:
 	bool				mStatusBarVisible;
 	bool				mIgnoreDesktopSelect;
 
-	arcNetList<arcNetString>		mRecentFiles;
+	anList<anString>		mRecentFiles;
 
 	COLORREF			mCustomColors[16];
 
@@ -125,7 +125,7 @@ ARC_INLINE void rvGEOptions::SetModified ( bool mod )
 	mModified = mod;
 }
 
-ARC_INLINE void rvGEOptions::ConvertColor ( COLORREF src, arcVec4& dest )
+ARC_INLINE void rvGEOptions::ConvertColor ( COLORREF src, anVec4& dest )
 {
 	dest[0] = ( float )GetRValue ( src ) / 255.0f;
 	dest[1] = ( float )GetGValue ( src ) / 255.0f;
@@ -169,7 +169,7 @@ ARC_INLINE void rvGEOptions::SetGridColor ( COLORREF color )
 	SetModified ( true );
 }
 
-ARC_INLINE void rvGEOptions::SetSelectionColor ( arcVec4& color )
+ARC_INLINE void rvGEOptions::SetSelectionColor ( anVec4& color )
 {
 	VectorCopy ( color, mSelectionColor );
 	SetModified ( true );
@@ -181,7 +181,7 @@ ARC_INLINE void rvGEOptions::SetSelectionColor ( COLORREF color )
 	SetModified ( true );
 }
 
-ARC_INLINE void rvGEOptions::SetGridColor ( arcVec4& color )
+ARC_INLINE void rvGEOptions::SetGridColor ( anVec4& color )
 {
 	VectorCopy ( color, mGridColor );
 	SetModified ( true );
@@ -205,7 +205,7 @@ ARC_INLINE void rvGEOptions::SetTransformerVisible ( bool vis )
 	SetModified ( true );
 }
 
-ARC_INLINE arcVec4& rvGEOptions::GetGridColor ( void )
+ARC_INLINE anVec4& rvGEOptions::GetGridColor ( void )
 {
 	return mGridColor;
 }
@@ -230,7 +230,7 @@ ARC_INLINE bool rvGEOptions::GetGridSnap ( void )
 	return mGridSnap;
 }
 
-ARC_INLINE arcVec4& rvGEOptions::GetWorkspaceColor ( void )
+ARC_INLINE anVec4& rvGEOptions::GetWorkspaceColor ( void )
 {
 	return mWorkspaceColor;
 }
@@ -265,7 +265,7 @@ ARC_INLINE bool rvGEOptions::GetStatusBarVisible ( void )
 	return mStatusBarVisible;
 }
 
-ARC_INLINE arcVec4& rvGEOptions::GetSelectionColor ( void )
+ARC_INLINE anVec4& rvGEOptions::GetSelectionColor ( void )
 {
 	return mSelectionColor;
 }
@@ -302,7 +302,7 @@ ARC_INLINE void rvGEOptions::AddRecentFile ( const char* filename )
 
 ARC_INLINE int rvGEOptions::GetRecentFileCount ( void )
 {
-	return mRegistry.GetRecentFileCount ( );
+	return mRegistry.GetRecentFileCount();
 }
 
 ARC_INLINE const char* rvGEOptions::GetRecentFile ( int index )

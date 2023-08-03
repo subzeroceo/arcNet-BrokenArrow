@@ -5,7 +5,7 @@ class CMediaPreviewDlg : public CDialog {
 
 public:
 	enum { MATERIALS, GUIS };
-	CMediaPreviewDlg(CWnd* pParent = NULL);   // standard constructor
+	CMediaPreviewDlg(CWnd* pParent = nullptr );   // standard constructor
 	virtual ~CMediaPreviewDlg();
 
 	void SetMode( int _mode) {
@@ -23,7 +23,7 @@ protected:
 	idGLDrawableMaterial drawMaterial;
 	idGLWidget wndPreview;
 	int mode;
-	arcNetString media;
+	anString media;
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 

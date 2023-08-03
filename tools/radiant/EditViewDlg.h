@@ -37,7 +37,7 @@ class CEditViewDlg : public CDialog
 
 public:
 	enum {MATERIALS, GUIS};
-	CEditViewDlg(CWnd* pParent = NULL);   // standard constructor
+	CEditViewDlg(CWnd* pParent = nullptr );   // standard constructor
 	virtual ~CEditViewDlg();
 
 	void SetMode( int _mode) {
@@ -56,10 +56,10 @@ protected:
 	CFindReplaceDialog *findDlg;
 	CMediaPreviewDlg mediaPreview;
 	int mode;
-	arcNetString fileName;
-	arcNetString matName;
-	arcNetString editText;
-	arcNetString findStr;
+	anString fileName;
+	anString matName;
+	anString editText;
+	anString findStr;
 	int line;
 	CEdit editInfo;
 

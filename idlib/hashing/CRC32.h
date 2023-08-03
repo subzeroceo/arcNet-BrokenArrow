@@ -15,4 +15,4 @@ void CRC32_UpdateChecksum( unsigned long &crcvalue, const void *data, int length
 void CRC32_FinishChecksum( unsigned long &crcvalue );
 unsigned long CRC32_BlockChecksum( const void *data, int length );
 
-#endif /* !__CRC32_H__ */
+#endif // !__CRC32_H__

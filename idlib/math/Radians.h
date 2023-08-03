@@ -10,9 +10,10 @@
 #ifndef M_PI
 #  define M_PI (3.1415926536f)
 #endif
+#define RAD_EPSILON (0.01f)
 
-class arcVec3;
-class arcMat3;
+class anVec3;
+class anMat3;
 
 class arcRandom {
 public:
@@ -22,7 +23,7 @@ public:
 
 						arcRandom( void ) {}
 						arcRandom( float pitch, float yaw, float roll );
-	explicit			arcRandom( const arcVec3 &v );
+	explicit			arcRandom( const anVec3 &v );
 
 	void 				RadianSet( float pitch, float yaw, float roll );
 	arcRandom &			RadianZero( void );
@@ -31,20 +32,20 @@ public:
 	float &				operator[]( int index );
 	arcRandom 			operator-() const;
 	arcRandom &			operator=( const arcRandom &a );
-	arcRandom &			operator=( const arcVec3 &a );
+	arcRandom &			operator=( const anVec3 &a );
 	arcRandom 			operator+( const arcRandom &a ) const;
-	arcRandom 			operator+( const arcVec3 &a ) const;
+	arcRandom 			operator+( const anVec3 &a ) const;
 	arcRandom &			operator+=( const arcRandom &a );
-	arcRandom &			operator+=( const arcVec3 &a );
+	arcRandom &			operator+=( const anVec3 &a );
 	arcRandom 			operator-( const arcRandom &a ) const;
-	arcRandom 			operator-( const arcVec3 &a ) const;
+	arcRandom 			operator-( const anVec3 &a ) const;
 	arcRandom &			operator-=( const arcRandom &a );
-	arcRandom &			operator-=( const arcVec3 &a );
+	arcRandom &			operator-=( const anVec3 &a );
 	arcRandom 			operator*( const float a ) const;
 	arcRandom &			operator*=( const float a );
 
-	friend arcRandom 	operator+( const arcVec3 &a, const arcRandom &b );
-	friend arcRandom	operator-( const arcVec3 &a, const arcRandom &b );
+	friend arcRandom 	operator+( const anVec3 &a, const arcRandom &b );
+	friend arcRandom	operator-( const anVec3 &a, const arcRandom &b );
 	friend arcRandom 	operator*( const float a, const arcRandom &b );
 
 	bool				RadianCompare( const arcRandom &a ) const;
@@ -55,17 +56,17 @@ public:
 	arcRandom &			RadianCompleteNormalize( void );
 	arcRandom &			RadianHalfNormalize( void );
 
-	void				RadianToVectors( arcVec3 *forward, arcVec3 *right = NULL, arcVec3 *up = NULL ) const;
-	arcRotate	RadianToRotation( void ) const;
-	arcRotate	AngularToRotation( const float angVel ) const;
-	arcVec3				RadianToForward( void ) const;
-	arcMat3 &			RadianToMat3( arcMat3 &mat ) const;
-	arcMat3				RadianToMat4( void ) const;
+	void				RadianToVectors( anVec3 *forward, anVec3 *right = nullptr, anVec3 *up = nullptr ) const;
+	anRotation	RadianToRotation( void ) const;
+	anRotation	AngularToRotation( const float angVel ) const;
+	anVec3				RadianToForward( void ) const;
+	anMat3 &			RadianToMat3( anMat3 &mat ) const;
+	anMat3				RadianToMat4( void ) const;
 
-	arcQuats		RadianToQuat( void ) const;
+	anQuats		RadianToQuat( void ) const;
 	double				RadianToAngularVelocity( const double radSeconds, const double mass ) const;
 
-	arcVec3				AngularToRadianVelocity( const float angVel, const double mass ) const;
+	anVec3				AngularToRadianVelocity( const float angVel, const double mass ) const;
 
 
 	const float *		RadianToFloatPtr( void ) const { return ( &pitch ); }
@@ -78,7 +79,7 @@ ARC_INLINE arcRandom::arcRandom( float pitch, float yaw, float roll ) {
 	this->roll	= roll;
 }
 
-ARC_INLINE arcRandom::arcRandom( const arcVec3 &v ) {
+ARC_INLINE arcRandom::arcRandom( const anVec3 &v ) {
 	this->pitch = v[0];
 	this->yaw	= v[1];
 	this->roll	= v[2];
@@ -118,7 +119,7 @@ ARC_INLINE arcRandom &arcRandom::operator=( const arcRandom &a ) {
 	return ( *this );
 }
 
-ARC_INLINE arcRandom &arcRandom::operator=( const arcVec3 &a ) {
+ARC_INLINE arcRandom &arcRandom::operator=( const anVec3 &a ) {
 	pitch	= a.x;
 	yaw		= a.y;
 	roll	= a.z;
@@ -129,7 +130,7 @@ ARC_INLINE arcRandom arcRandom::operator+( const arcRandom &a ) const {
 	return ( arcRandom( pitch + a.pitch, yaw + a.yaw, roll + a.roll ) );
 }
 
-ARC_INLINE arcRandom arcRandom::operator+( const arcVec3 &a ) const {
+ARC_INLINE arcRandom arcRandom::operator+( const anVec3 &a ) const {
 	return ( arcRandom( pitch + a.x, yaw + a.y, roll + a.z ) );
 }
 
@@ -140,7 +141,7 @@ ARC_INLINE arcRandom &arcRandom::operator+=( const arcRandom &a ) {
 	return ( *this );
 }
 
-ARC_INLINE arcRandom &arcRandom::operator+=( const arcVec3 &a ) {
+ARC_INLINE arcRandom &arcRandom::operator+=( const anVec3 &a ) {
 	pitch	+= a.x;
 	yaw		+= a.y;
 	roll	+= a.z;
@@ -159,7 +160,7 @@ ARC_INLINE arcRandom arcRandom::operator-( const arcRandom &a ) const {
 	return ( arcRandom( pitch - a.pitch, yaw - a.yaw, roll - a.roll ) );
 }
 
-ARC_INLINE arcRandom arcRandom::operator-( const arcVec3 &a ) const {
+ARC_INLINE arcRandom arcRandom::operator-( const anVec3 &a ) const {
 	return ( arcRandom( pitch - a.x, yaw - a.y, roll - a.z ) );
 }
 
@@ -170,7 +171,7 @@ ARC_INLINE arcRandom &arcRandom::operator-=( const arcRandom &a ) {
 	return ( *this );
 }
 
-ARC_INLINE arcRandom &arcRandom::operator-=( const arcVec3 &a ) {
+ARC_INLINE arcRandom &arcRandom::operator-=( const anVec3 &a ) {
 	pitch	-= a.x;
 	yaw		-= a.y;
 	roll	-= a.z;
@@ -188,11 +189,11 @@ ARC_INLINE arcRandom &arcRandom::operator*=( float a ) {
 	return ( *this );
 }
 
-ARC_INLINE arcRandom operator+( const arcVec3 &a, const arcRandom &b ) {
+ARC_INLINE arcRandom operator+( const anVec3 &a, const arcRandom &b ) {
 	return ( arcRandom( a.x + b.pitch, a.y + b.yaw, a.z + b.roll ) );
 }
 
-ARC_INLINE arcRandom operator-( const arcVec3 &a, const arcRandom &b ) {
+ARC_INLINE arcRandom operator-( const anVec3 &a, const arcRandom &b ) {
 	return ( arcRandom( a.x - b.pitch, a.y - b.yaw, a.z - b.roll ) );
 }
 
@@ -205,15 +206,15 @@ ARC_INLINE bool arcRandom::RadianCompare( const arcRandom &a ) const {
 }
 
 ARC_INLINE bool arcRandom::RadianCompare( const arcRandom &a, const float epsilon ) const {
-	if ( arcMath::Fabs( pitch - a.pitch ) > epsilon ) {
+	if ( anMath::Fabs( pitch - a.pitch ) > epsilon ) {
 		return ( false );
 	}
 
-	if ( arcMath::Fabs( yaw - a.yaw ) > epsilon ) {
+	if ( anMath::Fabs( yaw - a.yaw ) > epsilon ) {
 		return ( false );
 	}
 
-	if ( arcMath::Fabs( roll - a.roll ) > epsilon ) {
+	if ( anMath::Fabs( roll - a.roll ) > epsilon ) {
 		return ( false );
 	}
 

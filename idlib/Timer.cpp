@@ -1,15 +1,15 @@
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
-double ARCTimer::base = -1.0;
+double anTimer::base = -1.0;
 
 /*
 =================
-ARCTimer::InitBaseClockTicks
+anTimer::InitBaseClockTicks
 =================
 */
-void ARCTimer::InitBaseClockTicks( void ) const {
-	ARCTimer timer;
+void anTimer::InitBaseClockTicks( void ) const {
+	anTimer timer;
 	double ct, b;
 	int i;
 
@@ -61,7 +61,7 @@ arcTimerReport::AddReport
 int arcTimerReport::AddReport( const char *name ) {
 	if ( name && *name ) {
 		names.Append( name );
-		return timers.Append( new ARCTimer() );
+		return timers.Append( new anTimer() );
 	}
 	return -1;
 }
@@ -94,7 +94,7 @@ void arcTimerReport::Reset() {
 arcTimerReport::AddTime
 =================
 */
-void arcTimerReport::AddTime( const char *name, ARCTimer *time ) {
+void arcTimerReport::AddTime( const char *name, anTimer *time ) {
 	assert ( timers.Num() == names.Num() );
 	int i;
 	for ( i = 0; i < names.Num(); i++ ) {
@@ -119,12 +119,12 @@ arcTimerReport::PrintReport
 */
 void arcTimerReport::PrintReport() {
 	assert( timers.Num() == names.Num() );
-	arcLibrary::common->Printf( "Timing Report for %s\n", reportName.c_str() );
-	arcLibrary::common->Printf( "-------------------------------\n" );
+	anLibrary::common->Printf( "Timing Report for %s\n", reportName.c_str() );
+	anLibrary::common->Printf( "-------------------------------\n" );
 	float total = 0.0f;
 	for ( int i = 0; i < names.Num(); i++ ) {
-		arcLibrary::common->Printf( "%s consumed %5.2f seconds\n", names[i].c_str(), timers[i]->Milliseconds() * 0.001f );
+		anLibrary::common->Printf( "%s consumed %5.2f seconds\n", names[i].c_str(), timers[i]->Milliseconds() * 0.001f );
 		total += timers[i]->Milliseconds();
 	}
-	arcLibrary::common->Printf( "Total time for report %s was %5.2f\n\n", reportName.c_str(), total * 0.001f );
+	anLibrary::common->Printf( "Total time for report %s was %5.2f\n\n", reportName.c_str(), total * 0.001f );
 }

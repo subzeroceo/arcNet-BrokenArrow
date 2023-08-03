@@ -1,31 +1,4 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "roq.h"
@@ -33,8 +6,7 @@ If you have questions concerning this license or the applicable additional terms
 
 roq		*theRoQ;				// current roq file
 
-roq::roq( void )
-{
+roq::roq( void ) {
 	image = 0;
 	quietMode = false;
 	encoder = 0;
@@ -43,77 +15,63 @@ roq::roq( void )
 	dataStuff=false;
 }
 
-roq::~roq( void )
-{
+roq::~roq( void ) {
 	if (image) delete image;
 	if (encoder) delete encoder;
 	return;
 }
 
-void roq::EncodeQuietly( bool which )
-{
+void roq::EncodeQuietly( bool which ) {
 	quietMode = which;
 }
 
-bool roq::IsQuiet( void )
-{
+bool roq::IsQuiet( void ) {
 	return quietMode;
 }
 
-bool roq::IsLastFrame( void )
-{
+bool roq::IsLastFrame( void ) {
 	return lastFrame;
 }
 
-bool roq::Scaleable( void )
-{
+bool roq::Scaleable( void ) {
 	return paramFile->IsScaleable();
 }
 
-bool roq::ParamNoAlpha( void )
-{
+bool roq::ParamNoAlpha( void ) {
 	return paramFile->NoAlpha();
 }
 
-bool roq::MakingVideo( void )
-{
+bool roq::MakingVideo( void ) {
 	return true;	//paramFile->timecode];
 }
 
-bool roq::SearchType( void )
-{
+bool roq::SearchType( void ) {
 	return	paramFile->SearchType();
 }
 
-bool roq::HasSound( void )
-{
+bool roq::HasSound( void ){
 	return	paramFile->HasSound();
 }
 
-int roq::PreviousFrameSize( void )
-{
+int roq::PreviousFrameSize( void ){
 	return	previousSize;
 }
 
-int roq::FirstFrameSize( void )
-{
+int roq::FirstFrameSize( void ){
 	return paramFile->FirstFrameSize();
 }
 
-int roq::NormalFrameSize( void )
-{
+int roq::NormalFrameSize( void ){
 	return	paramFile->NormalFrameSize();
 }
 
-const char * roq::CurrentFilename( void )
-{
+const char *roq::CurrentFilename( void ){
 	return currentFile.c_str();
 }
 
-void roq::EncodeStream( const char *paramInputFile )
-{
+void roq::EncodeStream( const char *paramInputFile ){
 	int		onFrame;
-	arcNetString	f0, f1, f2;
+	anString	f0, f1, f2;
 	int		morestuff;
 
 	onFrame = 1;
@@ -176,8 +134,7 @@ void roq::EncodeStream( const char *paramInputFile )
 	CloseRoQFile();
 }
 
-void roq::Write16Word( word *aWord, arcNetFile *stream )
-{
+void roq::Write16Word( word *aWord, anFile *stream ){
 	byte	a, b;
 
 	a = *aWord & 0xff;
@@ -187,8 +144,7 @@ void roq::Write16Word( word *aWord, arcNetFile *stream )
 	stream->Write( &b, 1 );
 }
 
-void roq::Write32Word( unsigned int *aWord, arcNetFile *stream )
-{
+void roq::Write32Word( unsigned int *aWord, anFile *stream ){
 	byte	a, b, c, d;
 
 	a = *aWord & 0xff;
@@ -202,8 +158,7 @@ void roq::Write32Word( unsigned int *aWord, arcNetFile *stream )
 	stream->Write( &d, 1 );
 }
 
-int roq::SizeFile( arcNetFile *ftosize )
-{
+int roq::SizeFile( anFile *ftosize ){
 	return ftosize->Length();
 }
 
@@ -259,7 +214,6 @@ boolean roq::JPEGEmptyOutputBuffer (j_compress_ptr cinfo) {
   return true;
 }
 
-
 /*
  * Compression initialization.
  * Before calling this, all parameters and a data destination must be set up.
@@ -296,7 +250,6 @@ void roq::JPEGStartCompress (j_compress_ptr cinfo, bool write_all_tables) {
   cinfo->global_state = (cinfo->raw_data_in ? CSTATE_RAW_OK : CSTATE_SCANNING);
 }
 
-
 /*
  * Write some scanlines of data to the JPEG compressor.
  *
@@ -321,7 +274,7 @@ JDIMENSION roq::JPEGWriteScanlines (j_compress_ptr cinfo, JSAMPARRAY scanlines, 
     WARNMS(cinfo, JWRN_TOO_MUCH_DATA);
 
   /* Call progress monitor hook if present */
-  if (cinfo->progress != NULL) {
+  if (cinfo->progress != nullptr ) {
     cinfo->progress->pass_counter = (long) cinfo->next_scanline;
     cinfo->progress->pass_limit = (long) cinfo->image_height;
     (*cinfo->progress->progress_monitor) ((j_common_ptr) cinfo);
@@ -379,7 +332,7 @@ void roq::JPEGDest (j_compress_ptr cinfo, byte* outfile, int size) {
    * manager serially with the same JPEG object, because their private object
    * sizes may be different.  Caveat programmer.
    */
-  if (cinfo->dest == NULL) {	/* first time for this JPEG object? */
+  if (cinfo->dest == nullptr ) {	/* first time for this JPEG object? */
     cinfo->dest = (struct jpeg_destination_mgr *)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
 				  sizeof(my_destination_mgr) );
@@ -653,7 +606,7 @@ int dx,dy,dxMean,dyMean,index2[256],index4[256], dimension;
 
 	for ( i=0; i<numQuadCels; i++ ) {
 	if ( pquad[i].size && pquad[i].size < 16 ) {
-		switch( pquad[i].status ) {
+		switch ( pquad[i].status ) {
 			case	SLD:
 				use4[pquad[i].patten[0]] = true;
 				use2[codes[dimension*256+(pquad[i].patten[0]*4)+0]] = true;
@@ -723,7 +676,7 @@ int dx,dy,dxMean,dyMean,index2[256],index4[256], dimension;
 	for ( i=0; i<numQuadCels; i++ ) {
 	if ( pquad[i].size && pquad[i].size < 16 ) {
 		code = -1;
-		switch( pquad[i].status ) {
+		switch ( pquad[i].status ) {
 			case	DEP:
 				code = 3;
 				break;
@@ -764,7 +717,7 @@ int dx,dy,dxMean,dyMean,index2[256],index4[256], dimension;
 
 		action = (action<<2)|code;
 		j++;
-		if (j == 8) {
+		if ( j == 8) {
 			j = 0;
 			cccList[onAction+0] = (action & 0xff);
 			cccList[onAction+1] = ((action >> 8) & 0xff);
@@ -807,7 +760,7 @@ int dx,dy,dxMean,dyMean,index2[256],index4[256], dimension;
 //
 // load a frame, create a window (if neccesary) and display the frame
 //
-void roq::LoadAndDisplayImage( const char * filename )
+void roq::LoadAndDisplayImage( const char *filename )
 {
 	if (image) delete image;
 
@@ -841,7 +794,7 @@ int roq::NumberOfFrames( void ) {
 	return numberOfFrames;
 }
 
-void RoQFileEncode_f( const arcCommandArgs &args ) {
+void RoQFileEncode_f( const anCommandArgs &args ) {
 	if ( args.Argc() != 2 ) {
 		common->Printf( "Usage: roq <paramfile>\n" );
 		return;

@@ -1,5 +1,5 @@
 #pragma hdrstop
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 #include "PlayerProfile.h"
 
@@ -102,7 +102,7 @@ bool arcNetBasePlayerProfile::Serialize( idSerializer & ser ) {
 	}
 
 	// Archived cvars (all the menu settings for Doom3 are archived cvars)
-	arcDictionary cvarDict;
+	anDict cvarDict;
 	cvarSystem->MoveCVarsToDict( CVAR_ARCHIVE, cvarDict );
 	cvarDict.Serialize( ser );
 	if ( ser.IsReading() ) {
@@ -112,7 +112,7 @@ bool arcNetBasePlayerProfile::Serialize( idSerializer & ser ) {
 		cvarDict.Delete( "r_multisamples" );
 		cvarDict.Delete( "com_engineHz" );
 		cvarSystem->SetCVarsFromDict( cvarDict );
-		common->StartupVariable( NULL );
+		common->StartupVariable( nullptr );
 	}
 
 	ser.Serialize( configSet );
@@ -124,7 +124,7 @@ bool arcNetBasePlayerProfile::Serialize( idSerializer & ser ) {
 
 		if ( customConfig ) {
 			for ( int i = 0; i < K_LAST_KEY; ++i ) {
-				arcNetString bind;
+				anString bind;
 				ser.SerializeString( bind );
 				idKeyInput::SetBinding( i, bind.c_str() );
 			}
@@ -138,7 +138,7 @@ bool arcNetBasePlayerProfile::Serialize( idSerializer & ser ) {
 		ser.Serialize( customConfig );
 
 		for ( int i = 0; i < K_LAST_KEY; ++i ) {
-			arcNetString bind = idKeyInput::GetBinding( i );
+			anString bind = idKeyInput::GetBinding( i );
 			ser.SerializeString( bind );
 		}
 	}

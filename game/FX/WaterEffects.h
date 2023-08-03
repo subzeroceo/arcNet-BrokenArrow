@@ -22,10 +22,10 @@ public:
 	~sdWaterEffects( void );
 
 	// Both can be Null if not wanted, making sure they are precached is up to the user.
-	void Init( const char *splashEffectName, const char *wakeEffectName, arcVec3 &offset, const arcDict &wakeArgs );
+	void Init( const char *splashEffectName, const char *wakeEffectName, anVec3 &offset, const anDict &wakeArgs );
 
 	// Check the object against the water collision model, updating effects and splashes if needed
-	void CheckWater( arcEntity *ent, const arcVec3& waterBodyOrg, const arcMat3& waterBodyAxis, arcCollisionModel* waterBodyModel, bool showWake = true );
+	void CheckWater( arcEntity *ent, const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel, bool showWake = true );
 
 	// Skips some checks if the user already has this data
 	void CheckWater( arcEntity *ent, bool newWaterState, float waterlevel, bool submerged, bool showWake = true );
@@ -34,12 +34,12 @@ public:
 	void CheckWaterEffectsOnly( void );
 
 	// Set the origin where the effects need to be spawned
-	void SetOrigin( const arcVec3 &origin );
+	void SetOrigin( const anVec3 &origin );
 
 	// Set the axis of the spawning object
-	void SetAxis( const arcMat3 &axis );
+	void SetAxis( const anMat3 &axis );
 
-	void SetVelocity( const arcVec3 &velocity );
+	void SetVelocity( const anVec3 &velocity );
 
 	// This velocity will cause the atten of the effects to go to 1
 	void SetMaxVelocity( float max) {
@@ -55,19 +55,19 @@ public:
 	void ResetWaterState() { inWater = false; }
 
 	// Convenience
-	static sdWaterEffects *SetupFromSpawnArgs( const arcDict &args  );
+	static sdWaterEffects *SetupFromSpawnArgs( const anDict &args  );
 
 protected:
 	sdEffect	splash;//Damage!
 	sdEffect	wake;
-	arcVec3		origin;
-	arcVec3		offset;	// Allows a constant offset (in object local space) from the vehicle origin (for stuff like boats that float high in the water)
-	arcMat3		axis;
+	anVec3		origin;
+	anVec3		offset;	// Allows a constant offset (in object local space) from the vehicle origin (for stuff like boats that float high in the water)
+	anMat3		axis;
 	bool		inWater;
 	float		atten;
 	float		maxVelocity;
 	bool		wakeStopped;
-	arcVec3		velocity;
+	anVec3		velocity;
 	int			wakeHandle;
 	sdWakeParms	wakeParms;
 };

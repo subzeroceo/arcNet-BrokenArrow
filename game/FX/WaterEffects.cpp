@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -18,7 +18,7 @@ WaterFX::WaterFX ( void ) {
 WaterFX::~WaterFX( void ) {
 }
 
-void WaterFX::Init( const char *splashEffectName, const char *wakeEffectName, arcVec3 &offset, const arcDictonary &wakeArgs ) {
+void WaterFX::Init( const char *splashEffectName, const char *wakeEffectName, anVec3 &offset, const anDictonary &wakeArgs ) {
 	renderEffect_t &wakeEffect = wake.GetRenderEffect();
 	if ( wakeEffectName ) {
 		wakeEffect.declEffect	= gameLocal.FindEffect( wakeEffectName );
@@ -32,7 +32,7 @@ void WaterFX::Init( const char *splashEffectName, const char *wakeEffectName, ar
 		wakeEffect.shaderParms[SHADERPARM_ALPHA]		= 1.0f;
 		wakeEffect.shaderParms[SHADERPARM_BRIGHTNESS]	= 1.0f;
 	} else {
-		wakeEffect.declEffect	= NULL;
+		wakeEffect.declEffect	= nullptr;
 	}
 
 	renderEffect_t &splashEffect = splash.GetRenderEffect();
@@ -48,7 +48,7 @@ void WaterFX::Init( const char *splashEffectName, const char *wakeEffectName, ar
 		splashEffect.shaderParms[SHADERPARM_ALPHA]		= 1.0f;
 		splashEffect.shaderParms[SHADERPARM_BRIGHTNESS]	= 1.0f;
 	} else {
-		splashEffect.declEffect	= NULL;
+		splashEffect.declEffect	= nullptr;
 	}
 
 	inWater = false;
@@ -61,21 +61,21 @@ void WaterFX::Init( const char *splashEffectName, const char *wakeEffectName, ar
 	wakeParms.ParseFromDict( wakeArgs );
 }
 
-void WaterFX::CheckWater( arcEntity *ent, const arcVec3 &waterBodyOrg, const arcMat3 &waterBodyAxis, arcCollisionModel *waterBodyModel, bool showWake ) {
+void WaterFX::CheckWater( arcEntity *ent, const anVec3 &waterBodyOrg, const anMat3 &waterBodyAxis, arcCollisionModel *waterBodyModel, bool showWake ) {
 	if ( !gameLocal.isNewFrame ) {
 		return;
 	}
 
-	const arcBounds& waterBounds = waterBodyModel->GetBounds();
-	arcVec3 pos = origin + axis * offset;
+	const anBounds& waterBounds = waterBodyModel->GetBounds();
+	anVec3 pos = origin + axis * offset;
 	pos -= waterBodyOrg;
 	pos *= waterBodyAxis.Transpose();
 	bool newInWater = waterBounds.ContainsPoint( pos );
 
-	arcBounds bodybb;
+	anBounds bodybb;
 	bool submerged = false;
 	bodybb = ent->GetPhysics()->GetBounds();
-	arcBounds worldbb;
+	anBounds worldbb;
 	worldbb.FromTransformedBounds( bodybb, ent->GetPhysics()->GetOrigin(), ent->GetPhysics()->GetAxis() );
 	submerged = worldbb.GetMaxs()[2] < (waterBounds.GetMaxs()[2] + waterBodyOrg.z);
 
@@ -108,7 +108,7 @@ void WaterFX::CheckWater( arcEntity *ent, bool newInWater, float waterlevel, boo
 	}
 
 	if ( newInWater ) {
-		arcVec3 wakeOrigin = origin;
+		anVec3 wakeOrigin = origin;
 		wakeOrigin.z = waterlevel + 10.0f;
 		if ( !submerged && showWake ) {
 			if ( wakeHandle < 0 ) {
@@ -153,16 +153,16 @@ void WaterFX::CheckWaterEffectsOnly( void ) {
 	wake.Update();
 }
 
-void WaterFX::SetOrigin( const arcVec3 &origin ) {
+void WaterFX::SetOrigin( const anVec3 &origin ) {
 	this->origin = origin;
 }
 
-void WaterFX::SetAxis( const arcMat3 &axis ) {
+void WaterFX::SetAxis( const anMat3 &axis ) {
 	this->axis = axis;
 }
 
 // Velocity to scale effects
-void WaterFX::SetVelocity( const arcVec3 &velocity ) {
+void WaterFX::SetVelocity( const anVec3 &velocity ) {
 	this->velocity = velocity;
 
 	float size = velocity.Length();
@@ -181,15 +181,15 @@ void WaterFX::SetVelocity( const arcVec3 &velocity ) {
 	}
 }
 
-WaterFX *WaterFX::SetupFromSpawnArgs( const arcDictonary &args  ) {
-	const char *wakeKey = args.GetString( "fx_wake", NULL );
-	const char *splashKey = args.GetString( "fx_splash", NULL );
-	arcVec3 offset = args.GetVector( "water_offset", "0 0 0" );
+WaterFX *WaterFX::SetupFromSpawnArgs( const anDictonary &args  ) {
+	const char *wakeKey = args.GetString( "fx_wake", nullptr );
+	const char *splashKey = args.GetString( "fx_splash", nullptr );
+	anVec3 offset = args.GetVector( "water_offset", "0 0 0" );
 	if ( wakeKey || splashKey ) {
 		WaterFX *waterEffects = new WaterFX();
 		waterEffects->Init( splashKey, wakeKey, offset, args );
 		return waterEffects;
 	} else {
-		return  NULL;
+		return  nullptr;
 	}
 }

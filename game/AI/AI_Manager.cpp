@@ -1,13 +1,13 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 #include "AI.h"
 #include "AI_Manager.h"
 
-arcVec4 aiTeamColor[AITEAM_NUM] = { arcVec4 ( 0.0f, 1.0f, 0.0f, 1.0f ),
-								   arcVec4 ( 1.0f, 0.0f, 0.0f, 1.0f ) };
+anVec4 aiTeamColor[AITEAM_NUM] = { anVec4 ( 0.0f, 1.0f, 0.0f, 1.0f ),
+								   anVec4 ( 1.0f, 0.0f, 0.0f, 1.0f ) };
 
 rvAIManager aiManager;
 
@@ -26,7 +26,7 @@ rvAIManager::IsActive
 ================
 */
 bool rvAIManager::IsActive( void ){
-	if( gameLocal.isMultiplayer ){
+	if ( gameLocal.isMultiplayer ){
 		return false;
 	}
 
@@ -45,11 +45,11 @@ void rvAIManager::RunFrame ( void ){
 
 	// Pop the top simple think off the list
 	if ( !simpleThink.IsListEmpty() ) {
-		simpleThink.Next()->simpleThinkNode.Remove ( );
+		simpleThink.Next()->simpleThinkNode.Remove();
 	}
 
 	// Display current ai speeds
-	if ( ai_speeds.GetBool ( ) && thinkCount > 0 ) {
+	if ( ai_speeds.GetBool() && thinkCount > 0 ) {
 		gameLocal.Printf ( "ai:%6i  n:%2i s:%2i all:%5.2f t:%5.2f e:%5.2f m:%5.f\n",
 			gameLocal.framenum, thinkCount, simpleThinkCount,
 			timerThink.Milliseconds(),
@@ -58,7 +58,7 @@ void rvAIManager::RunFrame ( void ){
 			timerMove.Milliseconds() );
 	}
 
-	// RAVEN BEGIN
+
 	// cdr: Alternate Routes Bug
 	int i;
 	int j;
@@ -72,12 +72,12 @@ void rvAIManager::RunFrame ( void ){
 				break;
 			}
 
-			idEntityPtr<idEntity> blockent = b.blockers[j];
-			if (!blockent.IsValid() || blockent->DistanceTo(b.positions[j])>10.0f) {
+			anEntityPtr<anEntity> blockent = b.blockers[j];
+			if ( !blockent.IsValid() || blockent->DistanceTo(b.positions[j])>10.0f) {
 				break;
 			}
-			if (blockent->IsType(idAI::GetClassType())) {
-				idAI* blockentAI = static_cast<idAI*>(blockent.GetEntity());
+			if (blockent->IsType(anSAAI::GetClassType())) {
+				anSAAI* blockentAI = static_cast<anSAAI*>(blockent.GetEntity());
 				if (blockentAI->move.moveDest.Dist2XY(b.positions[j])>100.0f) {
 					break;
 				}
@@ -87,13 +87,13 @@ void rvAIManager::RunFrame ( void ){
 		// if any one of the blockers moved or no longer exists, re-enable this reach
 		if ( !b.blockers.Num() || j<b.blockers.Num() ) {
 			b.aas->SetReachabilityState(b.reach, true);
-			blockedReaches.RemoveIndex(i);
+			blockedReaches.RemoveIndex( i );
 			break;
 		}
 
 		// DEBUG GRAPHICS
  		if ( ai_debugMove.GetBool() ) {
- 			gameRenderWorld->DebugLine( colorRed, b.reach->start, b.reach->start + arcVec3(0,0,40.0f), gameLocal.msec );
+ 			gameRenderWorld->DebugLine( colorRed, b.reach->start, b.reach->start + anVec3(0,0,40.0f), gameLocal.msec );
 			for ( j=0; j<b.blockers.Num(); j++ ) {
 				if (b.blockers[j].IsValid()) {
  					gameRenderWorld->DebugArrow( colorRed, b.blockers[j]->GetPhysics()->GetOrigin(), b.reach->start, 8, gameLocal.msec );
@@ -101,12 +101,12 @@ void rvAIManager::RunFrame ( void ){
 			}
  		}
 	}
-	// RAVEN END
 
-	timerThink.Clear ( );
-	timerTactical.Clear ( );
-	timerFindEnemy.Clear ( );
-	timerMove.Clear ( );
+
+	timerThink.Clear();
+	timerTactical.Clear();
+	timerFindEnemy.Clear();
+	timerMove.Clear();
 
 	gameDebug.SetStatInt( "ai_thinkCount", thinkCount );
 
@@ -114,7 +114,7 @@ void rvAIManager::RunFrame ( void ){
 	simpleThinkCount = 0;
 
 	// Draw any debugging information
-	DebugDraw ( );
+	DebugDraw();
 }
 
 /*
@@ -125,15 +125,15 @@ rvAIManager::Clear
 void rvAIManager::Clear( void ) {
 	thinkCount = 0;
 	simpleThinkCount = 0;
-	timerThink.Clear ( );
-	timerFindEnemy.Clear ( );
-	timerTactical.Clear ( );
-	timerMove.Clear ( );
+	timerThink.Clear();
+	timerFindEnemy.Clear();
+	timerTactical.Clear();
+	timerMove.Clear();
 
-	blockedReaches.Clear ( );
-	helpers.Clear ( );
-	simpleThink.Clear ( );
-	avoids.Clear ( );
+	blockedReaches.Clear();
+	helpers.Clear();
+	simpleThink.Clear();
+	avoids.Clear();
 
 	memset ( &teamTimers, 0, sizeof(teamTimers) );
 }
@@ -167,16 +167,16 @@ void rvAIManager::ReMarkAllReachBlocked( void )
 rvAIManager::MarkReachBlocked
 ================
 */
-void rvAIManager::MarkReachBlocked(idAAS* aas, idReachability* reach, const idList<idEntity*>& blockers) {
+void rvAIManager::MarkReachBlocked(anSEAS* aas, anReachability* reach, const anList<anEntity*>& blockers) {
 
 	// only if not already blocked
-	if (!(reach->travelType&TFL_INVALID)) {
+	if ( !(reach->travelType&TFL_INVALID)) {
 		aiBlocked_t blocked;
 		blocked.aas = aas;
 		blocked.reach = reach;
 		blocked.time = gameLocal.GetTime() + 5000.0f;
 
-		for (int i=0; i<blockers.Num(); i++) {
+		for ( int i=0; i<blockers.Num(); i++ ) {
 			if (blockers[i] && blockers[i]->GetPhysics() && (blockers[i]->GetPhysics()->IsAtRest() || blockers[i]->GetPhysics()->GetLinearVelocity().LengthSqr()<2500.0f)) {
 				blocked.blockers.Append(blockers[i]);
 				blocked.positions.Append(blockers[i]->GetPhysics()->GetOrigin());
@@ -195,22 +195,22 @@ void rvAIManager::MarkReachBlocked(idAAS* aas, idReachability* reach, const idLi
 rvAIManager::ReactToPlayerAttack
 ================
 */
-void rvAIManager::ReactToPlayerAttack ( idPlayer* player, const arcVec3 &origin, const arcVec3 &dir ){
-	idActor* actor;
+void rvAIManager::ReactToPlayerAttack ( anBasePlayer* player, const anVec3 &origin, const anVec3 &dir ){
+	anActor* actor;
 	float expandSize;
 
 	// Check all enemies and see if they need to react
 	for ( actor = GetEnemyTeam ( (aiTeam_t)player->team ); actor; actor = actor->teamNode.Next() ) {
 		// Skip non ai entities
-		if ( !actor->IsType ( idAI::Type ) ) {
+		if ( !actor->IsType ( anSAAI::Type ) ) {
 			continue;
 		}
 
-		idAI *curAI = static_cast<idAI*>(actor);
+		anSAAI *curAI = static_cast<anSAAI*>(actor);
 
 		// See if it will pass through an expanded bounding box
 		expandSize = curAI->spawnArgs.GetFloat( "shotAtReactionRange", "16" );
-		if ( !curAI->GetPhysics()->GetAbsBounds ( ).Expand(expandSize).LineIntersection ( origin, origin + dir * curAI->combat.visRange ) ) {
+		if ( !curAI->GetPhysics()->GetAbsBounds().Expand(expandSize).LineIntersection ( origin, origin + dir * curAI->combat.visRange ) ) {
 			 continue;
 		}
 
@@ -223,15 +223,15 @@ void rvAIManager::ReactToPlayerAttack ( idPlayer* player, const arcVec3 &origin,
 rvAIManager::Save
 ================
 */
-void rvAIManager::Save( idSaveGame *savefile ) const {
+void rvAIManager::Save( anSaveGame *savefile ) const {
 	int i;
 	int j;
 
 	// Write out team list
 	for ( i = 0; i < AITEAM_NUM; i ++ ) {
-		idActor* actor;
+		anActor* actor;
 		savefile->WriteInt( teams[i].Num() );
-		for( actor = teams[i].Next(); actor != NULL; actor = actor->teamNode.Next() ) {
+		for ( actor = teams[i].Next(); actor != nullptr; actor = actor->teamNode.Next() ) {
 			savefile->WriteObject( actor );
 		}
 	}
@@ -244,8 +244,8 @@ void rvAIManager::Save( idSaveGame *savefile ) const {
 	}
 
 	// Write out team timers
-	savefile->WriteInt ( avoids.Num ( ) );
-	for ( i = 0; i < avoids.Num ( ); i ++ ) {
+	savefile->WriteInt ( avoids.Num() );
+	for ( i = 0; i < avoids.Num(); i ++ ) {
 		savefile->WriteVec3 ( avoids[i].origin );
 		savefile->WriteFloat ( avoids[i].radius );
 		savefile->WriteInt ( avoids[i].team );
@@ -257,18 +257,18 @@ void rvAIManager::Save( idSaveGame *savefile ) const {
 rvAIManager::Restore
 ================
 */
-void rvAIManager::Restore( idRestoreGame *savefile ){
+void rvAIManager::Restore( anRestoreGame *savefile ){
 	int i;
 	int j;
 
-	Clear ( );
+	Clear();
 
 	// Write out team list
  	for ( i = 0; i < AITEAM_NUM; i ++ ) {
-		idActor* actor;
+		anActor* actor;
 		savefile->ReadInt( j );
 		for ( ; j > 0; j -- ) {
-			savefile->ReadObject ( reinterpret_cast<idClass *&>( actor ) );
+			savefile->ReadObject ( reinterpret_cast<anClass *&>( actor ) );
 			if ( actor ) {
 				actor->teamNode.AddToEnd ( teams[i] );
 			}
@@ -298,11 +298,11 @@ void rvAIManager::Restore( idRestoreGame *savefile ){
 rvAIManager::AddTeammate
 =====================
 */
-void rvAIManager::AddTeammate ( idActor* actor ) {
+void rvAIManager::AddTeammate ( anActor* actor ) {
 	// If its already in a team least then ignore the call.
 	// NOTE: You have to call removeteammate before addteammate to switch the
 	//       actor from one team to another
-	if ( actor->teamNode.InList ( ) ) {
+	if ( actor->teamNode.InList() ) {
 		return;
 	}
 	actor->teamNode.AddToEnd ( teams[actor->team] );
@@ -313,8 +313,8 @@ void rvAIManager::AddTeammate ( idActor* actor ) {
 rvAIManager::RemoveTeammate
 =====================
 */
-void rvAIManager::RemoveTeammate ( idActor* actor ) {
-	actor->teamNode.Remove ( );
+void rvAIManager::RemoveTeammate ( anActor* actor ) {
+	actor->teamNode.Remove();
 }
 
 /*
@@ -324,7 +324,7 @@ rvAIManager::IsSimpleThink
 Determines whether or not the given AI entity should be simple thinking this frame
 =====================
 */
-bool rvAIManager::IsSimpleThink ( idAI* ai ) {
+bool rvAIManager::IsSimpleThink ( anSAAI* ai ) {
 
 	// no simple think if simple thinking is disabled or we are the head node
 	if ( ai_disableSimpleThink.GetBool() ) {
@@ -332,12 +332,12 @@ bool rvAIManager::IsSimpleThink ( idAI* ai ) {
 	}
 
 	// Add to simple think list
-	if ( !ai->simpleThinkNode.InList ( ) ) {
+	if ( !ai->simpleThinkNode.InList() ) {
 		ai->simpleThinkNode.AddToEnd ( simpleThink );
 	}
 
 	// If head of list then its a complex think
-	if ( ai->simpleThinkNode.Prev() == NULL ) {
+	if ( ai->simpleThinkNode.Prev() == nullptr ) {
 		return false;
 	}
 
@@ -349,14 +349,14 @@ bool rvAIManager::IsSimpleThink ( idAI* ai ) {
 rvAIManager::GetEnemyTeam
 ================
 */
-idActor* rvAIManager::GetEnemyTeam ( aiTeam_t team ) {
+anActor* rvAIManager::GetEnemyTeam ( aiTeam_t team ) {
 	switch ( team ) {
 		case AITEAM_MARINE:
 			return teams[AITEAM_STROGG].Next();
 		case AITEAM_STROGG:
 			return teams[AITEAM_MARINE].Next();
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -364,14 +364,14 @@ idActor* rvAIManager::GetEnemyTeam ( aiTeam_t team ) {
 rvAIManager::GetAllyTeam
 ================
 */
-idActor* rvAIManager::GetAllyTeam ( aiTeam_t team ) {
+anActor* rvAIManager::GetAllyTeam ( aiTeam_t team ) {
 	switch ( team ) {
 		case AITEAM_MARINE:
 			return teams[AITEAM_MARINE].Next();
 		case AITEAM_STROGG:
 			return teams[AITEAM_STROGG].Next();
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -381,29 +381,29 @@ rvAIManager::ValidateDestination
 Validate whether or not the destinations is a destination
 ================
 */
-bool rvAIManager::ValidateDestination ( idAI* ai, const arcVec3& dest, bool skipCurrent, idActor* skipActor ) const {
+bool rvAIManager::ValidateDestination ( anSAAI* ai, const anVec3& dest, bool skipCurrent, anActor* skipActor ) const {
 	int			i;
-	arcBounds	bounds;
-	idAI*		ignore;
+	anBounds	bounds;
+	anSAAI*		ignore;
 
-	ignore = (!skipCurrent && ai && !ai->SkipCurrentDestination ( )) ? ai : NULL;
+	ignore = ( !skipCurrent && ai && !ai->SkipCurrentDestination()) ? ai : nullptr;
 
- 	bounds = ai->GetPhysics()->GetBounds ( );
+ 	bounds = ai->GetPhysics()->GetBounds();
 	bounds.TranslateSelf ( dest );
 	bounds.ExpandSelf ( 16.0f );
 
 	// All teams and all actors on those teams
 	for ( i = 0; i < AITEAM_NUM; i ++ ) {
-		idActor* actor;
+		anActor* actor;
 		for ( actor = teams[i].Next(); actor; actor = actor->teamNode.Next() ) {
 			// Ignored?
-			if ( actor == ignore || actor == skipActor || actor->IsHidden ( ) ) {
+			if ( actor == ignore || actor == skipActor || actor->IsHidden() ) {
 				continue;
 			}
 
 			// If the actor is AI that is moving we should check their destination rather than where they are now
-			if ( actor->IsType ( idAI::Type ) ) {
-				idAI* aiactor = static_cast<idAI*>(actor);
+			if ( actor->IsType ( anSAAI::Type ) ) {
+				anSAAI* aiactor = static_cast<anSAAI*>(actor);
 				if ( aiactor->move.moveCommand >= NUM_NONMOVING_COMMANDS ) {
 					if ( bounds.IntersectsBounds ( aiactor->GetPhysics()->GetBounds().Translate ( aiactor->move.moveDest ) ) ) {
 						return false;
@@ -413,7 +413,7 @@ bool rvAIManager::ValidateDestination ( idAI* ai, const arcVec3& dest, bool skip
 			}
 
 			// Does the destination overlap this actor?
-			if ( bounds.IntersectsBounds ( actor->GetPhysics()->GetAbsBounds ( ) ) ) {
+			if ( bounds.IntersectsBounds ( actor->GetPhysics()->GetAbsBounds() ) ) {
 				return false;
 			}
 		}
@@ -427,9 +427,9 @@ bool rvAIManager::ValidateDestination ( idAI* ai, const arcVec3& dest, bool skip
 			continue;
 		}
 		// Skip if within range of the avoid
-		if ( (avoid.origin - dest).LengthSqr ( ) < Square ( avoid.radius ) ) {
+		if ( (avoid.origin - dest).LengthSqr() < Square ( avoid.radius ) ) {
 			if ( ai_debugMove.GetBool() || ai_debugTactical.GetBool() ) {
-				gameRenderWorld->DebugCircle( colorRed, avoid.origin, arcVec3(0,0,1), avoid.radius, 25 );
+				gameRenderWorld->DebugCircle( colorRed, avoid.origin, anVec3(0,0,1), avoid.radius, 25 );
 			}
 			return false;
 		}
@@ -445,9 +445,9 @@ rvAIManager::NearestTeammateToPoint
 Returns the teammate closest to the given point with the given parameters
 ================
 */
-idActor* rvAIManager::NearestTeammateToPoint ( idActor* from, arcVec3 point, bool nonPlayer, float maxRange, bool checkFOV, bool checkLOS ) {
-	idActor* actor = NULL;
-	idActor* closestActor = NULL;
+anActor* rvAIManager::NearestTeammateToPoint ( anActor* from, anVec3 point, bool nonPlayer, float maxRange, bool checkFOV, bool checkLOS ) {
+	anActor* actor = nullptr;
+	anActor* closestActor = nullptr;
 	float	distSqr;
 	float	bestDistSqr;
 
@@ -455,7 +455,7 @@ idActor* rvAIManager::NearestTeammateToPoint ( idActor* from, arcVec3 point, boo
 	bestDistSqr  = Square ( maxRange );
 
 	// Iterate through all teammates
-	for( actor = aiManager.GetAllyTeam ( (aiTeam_t)from->team ); actor; actor = actor->teamNode.Next() ) {
+	for ( actor = aiManager.GetAllyTeam ( (aiTeam_t)from->team ); actor; actor = actor->teamNode.Next() ) {
 		//Hidden?
 		if ( actor->fl.hidden )	{
 			continue;
@@ -465,7 +465,7 @@ idActor* rvAIManager::NearestTeammateToPoint ( idActor* from, arcVec3 point, boo
 			continue;
 		}
 		//Player?
-		if ( nonPlayer && actor->IsType( idPlayer::GetClassType() ) ) {
+		if ( nonPlayer && actor->IsType( anBasePlayer::GetClassType() ) ) {
 			continue;
 		}
 		//Dead?
@@ -484,7 +484,7 @@ idActor* rvAIManager::NearestTeammateToPoint ( idActor* from, arcVec3 point, boo
 			continue;
 		}
 		//actor has clear LOS to point?
-		if ( checkLOS && !actor->CanSeeFrom ( from->GetEyePosition ( ), point, false ) ) {
+		if ( checkLOS && !actor->CanSeeFrom ( from->GetEyePosition(), point, false ) ) {
 			continue;
 		}
 		// New best actor
@@ -501,23 +501,23 @@ rvAIManager::NearestTeammateEnemy
 Returns the closest enemy of an ally.
 ================
 */
-idEntity* rvAIManager::NearestTeammateEnemy( idActor* from, float maxRange, bool checkFOV, bool checkLOS, idActor** closestAllyWithEnemy ) {
-	idActor*	actor;
-	idAI*		allyAI;
-	idEntity*	allyEnemy;
-	idEntity*	closestAllyEnemy;
+anEntity* rvAIManager::NearestTeammateEnemy( anActor* from, float maxRange, bool checkFOV, bool checkLOS, anActor** closestAllyWithEnemy ) {
+	anActor*	actor;
+	anSAAI*		allyAI;
+	anEntity*	allyEnemy;
+	anEntity*	closestAllyEnemy;
 	float		distSqr;
 	float		bestDistSqr;
 
 	bestDistSqr			= Square ( maxRange );
-	closestAllyEnemy	= NULL;
+	closestAllyEnemy	= nullptr;
 
 	// Optionally return the ally whos enemy it is
 	if ( closestAllyWithEnemy ) {
-		*closestAllyWithEnemy = NULL;
+		*closestAllyWithEnemy = nullptr;
 	}
 
-	for( actor = aiManager.GetAllyTeam ( (aiTeam_t)from->team ); actor; actor = actor->teamNode.Next() ) 	{
+	for ( actor = aiManager.GetAllyTeam ( (aiTeam_t)from->team ); actor; actor = actor->teamNode.Next() ) 	{
 		//Hidden?
 		if ( actor->fl.hidden )	{
 			continue;
@@ -531,7 +531,7 @@ idEntity* rvAIManager::NearestTeammateEnemy( idActor* from, float maxRange, bool
 			continue;
 		}
 
-		allyAI = dynamic_cast<idAI*>(actor);
+		allyAI = dynamic_cast<anSAAI*>(actor);
 		if ( !allyAI ) {
 			//player?
 			allyEnemy = actor->EnemyWithMostHealth();
@@ -554,7 +554,7 @@ idEntity* rvAIManager::NearestTeammateEnemy( idActor* from, float maxRange, bool
 		}
 
 		//Calc Range and check to see if closer before doing any complicated checks
-		distSqr = (actor->GetPhysics()->GetOrigin() - from->GetPhysics()->GetOrigin()).LengthSqr ( );
+		distSqr = (actor->GetPhysics()->GetOrigin() - from->GetPhysics()->GetOrigin()).LengthSqr();
 		if ( distSqr >= bestDistSqr ) {
 			continue;
 		}
@@ -589,8 +589,8 @@ rvAIManager::LocalTeamHasEnemies
 Returns true if nearby members of my team have any enemies or if any nearby enemies have enemies that are nearby members of my team
 ================
 */
-bool rvAIManager::LocalTeamHasEnemies ( idAI* self, float maxBuddyRange, float maxEnemyRange, bool checkPVS ) {
-	idActor* actor = NULL;
+bool rvAIManager::LocalTeamHasEnemies ( anSAAI* self, float maxBuddyRange, float maxEnemyRange, bool checkPVS ) {
+	anActor* actor = nullptr;
 	pvsHandle_t pvs;
 
 	if ( !self ) {
@@ -598,7 +598,7 @@ bool rvAIManager::LocalTeamHasEnemies ( idAI* self, float maxBuddyRange, float m
 	}
 
 	// Iterate through all teammates
-	for( actor = aiManager.GetAllyTeam ( (aiTeam_t)self->team ); actor; actor = actor->teamNode.Next() ) {
+	for ( actor = aiManager.GetAllyTeam ( (aiTeam_t)self->team ); actor; actor = actor->teamNode.Next() ) {
 		//Hidden?
 		if ( actor->fl.hidden )	{
 			continue;
@@ -607,9 +607,9 @@ bool rvAIManager::LocalTeamHasEnemies ( idAI* self, float maxBuddyRange, float m
 		if ( actor->health <= 0 ) {
 			continue;
 		}
-		if ( actor->IsType( idAI::GetClassType() ) ) {
+		if ( actor->IsType( anSAAI::GetClassType() ) ) {
 			//Has an enemy?
-			if ( !((idAI*)actor)->GetEnemy() ) {
+			if ( !((anSAAI*)actor)->GetEnemy() ) {
 				continue;
 			}
 			//Has an enemy
@@ -619,7 +619,7 @@ bool rvAIManager::LocalTeamHasEnemies ( idAI* self, float maxBuddyRange, float m
 				// If this enemy isnt in the same pvps then use them as a backup
 				if ( pvs.i > 0
 					&& pvs.i < MAX_CURRENT_PVS
-					&& !gameLocal.pvs.InCurrentPVS( pvs, ((idAI*)actor)->GetEnemy()->GetPVSAreas(), ((idAI*)actor)->GetEnemy()->GetNumPVSAreas() ) ) {
+					&& !gameLocal.pvs.InCurrentPVS( pvs, ((anSAAI*)actor)->GetEnemy()->GetPVSAreas(), ((anSAAI*)actor)->GetEnemy()->GetNumPVSAreas() ) ) {
 					gameLocal.pvs.FreeCurrentPVS( pvs );
 					continue;
 				}
@@ -647,8 +647,8 @@ rvAIManager::ActorIsBehindActor
 Returns true if the given 'ambuser' is behind the given 'victim'
 ================
 */
-bool rvAIManager::ActorIsBehindActor( idActor* ambusher, idActor* victim ) {
-	arcVec3 dir2Ambusher = ambusher->GetPhysics()->GetOrigin() - victim->GetPhysics()->GetOrigin();
+bool rvAIManager::ActorIsBehindActor( anActor* ambusher, anActor* victim ) {
+	anVec3 dir2Ambusher = ambusher->GetPhysics()->GetOrigin() - victim->GetPhysics()->GetOrigin();
 	float dist = dir2Ambusher.Normalize();
 	if ( DotProduct(dir2Ambusher, victim->viewAxis[0] ) < 0  && dist < 200.0f ) {
 		return true;
@@ -669,9 +669,9 @@ bool rvAIManager::ActorIsBehindActor( idActor* ambusher, idActor* victim ) {
 rvAIManager::RegisterHelper
 =====================
 */
-void rvAIManager::RegisterHelper ( rvAIHelper* helper ) {
+void rvAIManager::RegisterHelper ( anSAAIHelper* helper ) {
 	helper->helperNode.AddToEnd ( helpers );
-	UpdateHelpers ( );
+	UpdateHelpers();
 }
 
 /*
@@ -679,9 +679,9 @@ void rvAIManager::RegisterHelper ( rvAIHelper* helper ) {
 rvAIManager::UnregisterHelper
 =====================
 */
-void rvAIManager::UnregisterHelper ( rvAIHelper* helper ) {
-	helper->helperNode.Remove ( );
-	UpdateHelpers ( );
+void rvAIManager::UnregisterHelper ( anSAAIHelper* helper ) {
+	helper->helperNode.Remove();
+	UpdateHelpers();
 }
 
 /*
@@ -689,16 +689,16 @@ void rvAIManager::UnregisterHelper ( rvAIHelper* helper ) {
 rvAIManager::FindClosestHelper
 =====================
 */
-rvAIHelper* rvAIManager::FindClosestHelper ( const arcVec3& origin ) {
-	rvAIHelper* helper;
-	rvAIHelper*	bestHelper;
+anSAAIHelper* rvAIManager::FindClosestHelper ( const anVec3& origin ) {
+	anSAAIHelper* helper;
+	anSAAIHelper*	bestHelper;
 	float		bestDist;
 	float		dist;
 
-	bestDist   = arcMath::INFINITY;
-	bestHelper = NULL;
+	bestDist   = anMath::INFINITY;
+	bestHelper = nullptr;
 	for ( helper = helpers.Next(); helper; helper = helper->helperNode.Next( ) ) {
-		dist = (origin - helper->GetPhysics()->GetOrigin()).LengthFast ( );
+		dist = (origin - helper->GetPhysics()->GetOrigin()).LengthFast();
 		if ( dist < bestDist ) {
 			bestDist = dist;
 			bestHelper = helper;
@@ -716,12 +716,12 @@ void rvAIManager::UpdateHelpers ( void ) {
 	int	i;
 
 	for ( i = 0; i < AITEAM_NUM; i ++ ) {
-		idActor* actor;
+		anActor* actor;
 		for ( actor = teams[i].Next(); actor; actor = actor->teamNode.Next() ) {
-			if ( actor->IsHidden ( ) || !actor->IsType ( idAI::Type ) ) {
+			if ( actor->IsHidden() || !actor->IsType ( anSAAI::Type ) ) {
 				continue;
 			}
-			static_cast<idAI*>(actor)->UpdateHelper ( );
+			static_cast<anSAAI*>(actor)->UpdateHelper();
 		}
 	}
 }
@@ -741,13 +741,13 @@ rvAIManager::DebugDraw
 */
 void rvAIManager::DebugDraw ( void ) {
 	// Draw helpers?
-	if ( ai_debugHelpers.GetBool ( ) ) {
-		DebugDrawHelpers ( );
+	if ( ai_debugHelpers.GetBool() ) {
+		DebugDrawHelpers();
 
 		int i;
 		for ( i = 0; i < avoids.Num(); i ++ ) {
 			const aiAvoid_t& avoid = avoids[i];
-			gameRenderWorld->DebugCircle ( colorOrange, avoid.origin, arcVec3(0,0,1), avoid.radius, 10, 0 );
+			gameRenderWorld->DebugCircle ( colorOrange, avoid.origin, anVec3(0,0,1), avoid.radius, 10, 0 );
 		}
 	}
 
@@ -760,8 +760,8 @@ rvAIManager::DebugDrawHelpers
 ================
 */
 void rvAIManager::DebugDrawHelpers ( void ) {
-	rvAIHelper* helper;
+	anSAAIHelper* helper;
 	for ( helper = helpers.Next(); helper; helper = helper->helperNode.Next( ) ) {
-		helper->DrawDebugEntityInfo ( );
+		helper->DrawDebugEntityInfo();
 	}
 }

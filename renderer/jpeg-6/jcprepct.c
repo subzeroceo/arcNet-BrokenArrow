@@ -341,7 +341,7 @@ jinit_c_prep_controller (j_compress_ptr cinfo, boolean need_full_buffer)
   prep = (my_prep_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_prep_controller) );
-  cinfo->prep = (struct jpeg_c_prep_controller *) prep;
+  cinfo->prep = ( struct jpeg_c_prep_controller *) prep;
   prep->pub.start_pass = start_pass_prep;
 
   /* Allocate the color conversion buffer.

@@ -13,11 +13,11 @@ const int MAX_SPAWN_TYPES	= 32;
 
 class rvSpawner;
 
-typedef void (*spawnerCallbackProc_t) ( rvSpawner* spawner, idEntity* spawned, int userdata );
+typedef void (*spawnerCallbackProc_t) ( rvSpawner* spawner, anEntity* spawned, int userdata );
 
 typedef struct {
-	idEntityPtr<idEntity>	ent;
-	idStr					event;
+	anEntityPtr<anEntity>	ent;
+	anString					event;
 } spawnerCallback_t;
 
 /*
@@ -27,33 +27,33 @@ typedef struct {
 
 ===============================================================================
 */
-class rvSpawner : public idEntity {
+class rvSpawner : public anEntity {
 public:
 	CLASS_PROTOTYPE( rvSpawner );
 
 	void				Spawn					( void );
 	void				Think					( void );
 
-	void				Attach					( idEntity* ent );
-	void				Detach					( idEntity* ent );
+	void				Attach					( anEntity* ent );
+	void				Detach					( anEntity* ent );
 
-	void				Save					( idSaveGame *savefile ) const;
-	void				Restore					( idRestoreGame *savefile );
+	void				Save					( anSaveGame *savefile ) const;
+	void				Restore					( anRestoreGame *savefile );
 
-	void				AddSpawnPoint			( idEntity* point );
-	void				RemoveSpawnPoint		( idEntity* point );
+	void				AddSpawnPoint			( anEntity* point );
+	void				RemoveSpawnPoint		( anEntity* point );
 
 	int					GetNumSpawnPoints		( void ) const;
 	int					GetNumActive			( void ) const;
 	int					GetMaxActive			( void ) const;
-	idEntity*			GetSpawnPoint			( int index );
+	anEntity*			GetSpawnPoint			( int index );
 
 	virtual void		FindTargets				( void );
 	bool				ActiveListChanged		( void );
 
-	void				CallScriptEvents		( const char* prefixKey, idEntity* parm );
+	void				CallScriptEvents		( const char* prefixKey, anEntity* parm );
 
-	void				AddCallback				( idEntity* owner, const idEventDef* ev );
+	void				AddCallback				( anEntity* owner, const anEventDef* ev );
 
 protected:
 
@@ -61,15 +61,15 @@ protected:
 	int								maxToSpawn;
 	float							nextSpawnTime;
 	int								maxActive;
-	idList< idEntityPtr<idEntity> >	currentActive;
+	anList< anEntityPtr<anEntity> >	currentActive;
 	int								spawnWaves;
 	int								spawnDelay;
 	bool							skipVisible;
-	idStrList						spawnTypes;
+	anStringList						spawnTypes;
 
-	idList< idEntityPtr<idEntity> >	spawnPoints;
+	anList< anEntityPtr<anEntity> >	spawnPoints;
 
-	idList< spawnerCallback_t >		callbacks;
+	anList< spawnerCallback_t >		callbacks;
 
 	// Check to see if its time to spawn
 	void				CheckSpawn				( void );
@@ -81,20 +81,20 @@ protected:
 	void				FindSpawnTypes			( void );
 
 	// Get a random spawnpoint to spawn at
-	idEntity*			GetSpawnPoint			( void );
+	anEntity*			GetSpawnPoint			( void );
 
 	// Get a random spawn type
-	const char*			GetSpawnType			( idEntity* spawnPoint );
+	const char*			GetSpawnType			( anEntity* spawnPoint );
 
 	// Validate the given spawn point for spawning
-	bool				ValidateSpawnPoint		( const arcVec3 origin, const arcBounds &bounds );
+	bool				ValidateSpawnPoint		( const anVec3 origin, const anBounds &bounds );
 
 	// Copy key/values from the given entity to the given dictionary using the specified prefix
-	void				CopyPrefixedSpawnArgs	( idEntity *src, const char *prefix, idDict &args );
+	void				CopyPrefixedSpawnArgs	( anEntity *src, const char *prefix, anDict &args );
 
 private:
 
-	void				Event_Activate			( idEntity *activator );
+	void				Event_Activate			( anEntity *activator );
 	void				Event_RemoveNullActiveEntities( void );
 	void				Event_NumActiveEntities	( void );
 	void				Event_GetActiveEntity	( int index );
@@ -102,10 +102,10 @@ private:
 
 
 ARC_INLINE int rvSpawner::GetNumSpawnPoints( void ) const {
-	return spawnPoints.Num ( );
+	return spawnPoints.Num();
 }
 
-ARC_INLINE idEntity* rvSpawner::GetSpawnPoint( int index ) {
+ARC_INLINE anEntity* rvSpawner::GetSpawnPoint( int index ) {
 	return spawnPoints[index];
 }
 

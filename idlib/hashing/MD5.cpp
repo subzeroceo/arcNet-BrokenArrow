@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 typedef struct {
@@ -9,7 +9,7 @@ typedef struct {
 
 // The four core functions - F1 is optimized somewhat
 // #define F1( x, y, z ) (x & y | ~x & z)
-#define F1( x, y, z ) (z ^ (x & (y ^ z) ))
+#define F1( x, y, z ) (z ^ (x & (y ^ z) ) )
 #define F2( x, y, z ) F1(z, x, y)
 #define F3( x, y, z ) (x ^ y ^ z)
 #define F4( x, y, z ) (y ^ (x | ~z) )

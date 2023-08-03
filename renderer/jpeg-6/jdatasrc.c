@@ -106,7 +106,7 @@ fill_input_buffer (j_decompress_ptr cinfo)
 
 /*
  * Skip data --- used to skip over a potentially large amount of
- * uninteresting data (such as an APPn marker).
+ * uninteresting data ( such as an APPn marker).
  *
  * Writers of suspendable-input applications must note that skip_input_data
  * is not granted the right to give a suspension return.  If the skip extends
@@ -133,8 +133,8 @@ skip_input_data (j_decompress_ptr cinfo, long num_bytes)
        * so suspension need not be handled.
        */
     }
-    src->pub.next_input_byte += (size_t) num_bytes;
-    src->pub.bytes_in_buffer -= (size_t) num_bytes;
+    src->pub.next_input_byte += ( size_t) num_bytes;
+    src->pub.bytes_in_buffer -= ( size_t) num_bytes;
   }
 }
 
@@ -182,8 +182,8 @@ jpeg_stdio_src (j_decompress_ptr cinfo, unsigned char *infile)
    * This makes it unsafe to use this manager and a different source
    * manager serially with the same JPEG object.  Caveat programmer.
    */
-  if (cinfo->src == NULL) {	/* first time for this JPEG object? */
-    cinfo->src = (struct jpeg_source_mgr *)
+  if (cinfo->src == nullptr ) {	/* first time for this JPEG object? */
+    cinfo->src = ( struct jpeg_source_mgr *)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
 				  SIZEOF(my_source_mgr) );
     src = (my_src_ptr) cinfo->src;
@@ -200,5 +200,5 @@ jpeg_stdio_src (j_decompress_ptr cinfo, unsigned char *infile)
   src->pub.term_source = term_source;
   src->infile = infile;
   src->pub.bytes_in_buffer = 0; /* forces fill_input_buffer on first read */
-  src->pub.next_input_byte = NULL; /* until buffer loaded */
+  src->pub.next_input_byte = nullptr; /* until buffer loaded */
 }

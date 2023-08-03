@@ -1,4 +1,4 @@
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Maya5.0/maya.h"
@@ -6,7 +6,7 @@
 #include "exporter.h"
 #include "maya_main.h"
 
-arcNetString	errorMessage;
+anString	errorMessage;
 bool	initialized = false;
 
 #define DEFAULT_ANIM_EPSILON	0.125f
@@ -19,9 +19,9 @@ const char *componentNames[ 6 ] = { "Tx", "Ty", "Tz", "Qx", "Qy", "Qz" };
 
 arcSys *			sys = NULL;
 idCommon *		common = NULL;
-arcCVarSystem *	cvarSystem = NULL;
+anCVarSystem *	cvarSystem = NULL;
 
-arcCVarSystem *		arcCVarSystem::staticVars = NULL;
+anCVarSystem *		anCVarSystem::staticVars = NULL;
 
 /*
 =================
@@ -33,7 +33,7 @@ void MayaError( const char *fmt, ... ) {
 	char	text[ 8192 ];
 
 	va_start( argptr, fmt );
-	arcNetString::vsnPrintf( text, sizeof( text ), fmt, argptr );
+	anString::vsnPrintf( text, sizeof( text ), fmt, argptr );
 	va_end( argptr );
 
 	throw arcException( text );
@@ -51,7 +51,7 @@ static int WriteFloatString( FILE *file, const char *fmt, ... ) {
 	double f;
 	char *str;
 	int index;
-	arcNetString tmp, format;
+	anString tmp, format;
 	va_list argPtr;
 
 	va_start( argPtr, fmt );
@@ -161,7 +161,7 @@ Returns false if the osPath tree doesn't match any of the existing
 search paths.
 ================
 */
-bool OSPathToRelativePath( const char *osPath, arcNetString &qpath, const char *game ) {
+bool OSPathToRelativePath( const char *osPath, anString &qpath, const char *game ) {
 	char *s, *base;
 
 	// skip a drive letter?
@@ -205,8 +205,8 @@ bool OSPathToRelativePath( const char *osPath, arcNetString &qpath, const char *
 ConvertFromIdSpace
 ===============
 */
-arcMat3 ConvertFromIdSpace( const arcMat3 &idmat ) {
-	arcMat3 mat;
+anMat3 ConvertFromIdSpace( const anMat3 &idmat ) {
+	anMat3 mat;
 
 	mat[ 0 ][ 0 ] = idmat[ 0 ][ 0 ];
 	mat[ 0 ][ 2 ] = -idmat[ 0 ][ 1 ];
@@ -228,8 +228,8 @@ arcMat3 ConvertFromIdSpace( const arcMat3 &idmat ) {
 ConvertFromIdSpace
 ===============
 */
-arcVec3 ConvertFromIdSpace( const arcVec3 &idpos ) {
-	arcVec3 pos;
+anVec3 ConvertFromIdSpace( const anVec3 &idpos ) {
+	anVec3 pos;
 
 	pos.x = idpos.x;
 	pos.z = -idpos.y;
@@ -243,8 +243,8 @@ arcVec3 ConvertFromIdSpace( const arcVec3 &idpos ) {
 ConvertToIdSpace
 ===============
 */
-arcMat3 ConvertToIdSpace( const arcMat3 &mat ) {
-	arcMat3 idmat;
+anMat3 ConvertToIdSpace( const anMat3 &mat ) {
+	anMat3 idmat;
 
 	idmat[ 0 ][ 0 ] = mat[ 0 ][ 0 ];
 	idmat[ 0 ][ 1 ] = -mat[ 0 ][ 2 ];
@@ -266,8 +266,8 @@ arcMat3 ConvertToIdSpace( const arcMat3 &mat ) {
 ConvertToIdSpace
 ===============
 */
-arcVec3 ConvertToIdSpace( const arcVec3 &pos ) {
-	arcVec3 idpos;
+anVec3 ConvertToIdSpace( const anVec3 &pos ) {
+	anVec3 idpos;
 
 	idpos.x = pos.x;
 	idpos.y = -pos.z;
@@ -278,30 +278,30 @@ arcVec3 ConvertToIdSpace( const arcVec3 &pos ) {
 
 /*
 ===============
-arcVec3
+anVec3
 ===============
 */
-arcVec3 arcVec3( const MFloatPoint &point ) {
-	return arcVec3( point[ 0 ], point[ 1 ], point[ 2 ] );
+anVec3 anVec3( const MFloatPoint &point ) {
+	return anVec3( point[ 0 ], point[ 1 ], point[ 2 ] );
 }
 
 /*
 ===============
-arcVec3
+anVec3
 ===============
 */
-arcVec3 arcVec3( const MMatrix &matrix ) {
-	return arcVec3( matrix[ 3 ][ 0 ], matrix[ 3 ][ 1 ], matrix[ 3 ][ 2 ] );
+anVec3 anVec3( const MMatrix &matrix ) {
+	return anVec3( matrix[ 3 ][ 0 ], matrix[ 3 ][ 1 ], matrix[ 3 ][ 2 ] );
 }
 
 /*
 ===============
-arcMat
+anMat
 ===============
 */
-arcMat3 arcMat( const MMatrix &matrix ) {
+anMat3 anMat( const MMatrix &matrix ) {
 	int		j, k;
-	arcMat3	mat;
+	anMat3	mat;
 
 	for ( j = 0; j < 3; j++ ) {
 		for ( k = 0; k < 3; k++ ) {
@@ -379,7 +379,7 @@ int arcTokenizer::SetTokens( const char *buffer ) {
 			break;
 		}
 
-		arcNetString &current = tokens.Alloc();
+		anString &current = tokens.Alloc();
 		while( *cmd && !isspace( *cmd ) ) {
 			current += *cmd;
 			cmd++;
@@ -458,12 +458,12 @@ arcExportOptions::arcExportOptions
 ====================
 */
 arcExportOptions::arcExportOptions( const char *commandline, const char *ospath ) {
-	arcNetString		token;
+	anString		token;
 	arcNamePair	joints;
 	int			i;
 	arcAnimGroup	*group;
-	arcNetString		sourceDir;
-	arcNetString		destDir;
+	anString		sourceDir;
+	anString		destDir;
 
 	Reset( commandline );
 
@@ -767,7 +767,7 @@ arcExportMesh
 
 void arcExportMesh::ShareVerts( void ) {
 	exportVertex_t vert;
-	arcNetList<exportVertex_t> v;
+	anList<exportVertex_t> v;
 
 	v = verts;
 	verts.Clear();
@@ -845,10 +845,10 @@ void arcExportMesh::Merge( arcExportMesh *mesh ) {
 	}
 }
 
-void arcExportMesh::GetBounds( arcBounds &bounds ) const {
+void arcExportMesh::GetBounds( anBounds &bounds ) const {
 	int						i;
 	int						j;
-	arcVec3					pos;
+	anVec3					pos;
 	const exportWeight_t	*weight;
 	const exportVertex_t	*vert;
 
@@ -937,14 +937,14 @@ bool arcExportModel::WriteMesh( const char *filename, arcExportOptions &options 
 	}
 
 	for ( arcExportJoint *joint = exportHead.GetNext(); joint != NULL; joint = joint->exportNode.GetNext() ) {
-		arcNetList<arcExportJoint *> jointList.Append( joint );
+		anList<arcExportJoint *> jointList.Append( joint );
 	}
 
 	for ( int i = 0; i < jointList.Num(); i++ ) {
 		joint = jointList[ i ];
 		sibling = joint->exportNode.GetSibling();
 		while( sibling ) {
-			if ( arcNetString::Cmp( joint->name, sibling->name ) > 0 ) {
+			if ( anString::Cmp( joint->name, sibling->name ) > 0 ) {
 				joint->exportNode.MakeSiblingAfter( sibling->exportNode );
 				sibling = joint->exportNode.GetSibling();
 			} else {
@@ -987,7 +987,7 @@ bool arcExportModel::WriteMesh( const char *filename, arcExportOptions &options 
 			parentName = "";
 		}
 
-		arcCQuats	bindQuat = joint->bindmat.ToQuat().ToCQuat();
+		anCQuats	bindQuat = joint->bindmat.ToQuat().ToCQuat();
 		WriteFloatString( file, "\t\"%s\"\t%d ( %f %f %f ) ( %f %f %f )\t\t// %s\n", joint->name.c_str(), parentNum,
 			joint->bindpos.x, joint->bindpos.y, joint->bindpos.z, bindQuat[ 0 ], bindQuat[ 1 ], bindQuat[ 2 ], parentName );
 	}
@@ -1040,7 +1040,7 @@ bool arcExportModel::WriteAnim( const char *filename, arcExportOptions &options 
 	jointFrame_t	*frame;
 	FILE			*file;
 	int				numAnimatedComponents;
-	arcNetList<arcExportJoint *> jointList;
+	anList<arcExportJoint *> jointList;
 
 	file = fopen( filename, "w" );
 	if ( !file ) {
@@ -1055,7 +1055,7 @@ bool arcExportModel::WriteAnim( const char *filename, arcExportOptions &options 
 		joint = jointList[ i ];
 		sibling = joint->exportNode.GetSibling();
 		while( sibling ) {
-			if ( arcNetString::Cmp( joint->name, sibling->name ) > 0 ) {
+			if ( anString::Cmp( joint->name, sibling->name ) > 0 ) {
 				joint->exportNode.MakeSiblingAfter( sibling->exportNode );
 				sibling = joint->exportNode.GetSibling();
 			} else {
@@ -1138,7 +1138,7 @@ bool arcExportModel::WriteAnim( const char *filename, arcExportOptions &options 
 					WriteFloatString( file, "%s ", componentNames[ j ] );
 				}
 			}
-			WriteFloatString( file, ")\n" );
+			WriteFloatString( file, " )\n" );
 		}
 	}
 	WriteFloatString( file, "}\n" );
@@ -1321,7 +1321,7 @@ void arcMayaExport::SetFrame( int num ) {
 arcMayaExport::PruneJoints
 ===============
 */
-void arcMayaExport::PruneJoints( arcStringList &keepjoints, arcNetString &prefix ) {
+void arcMayaExport::PruneJoints( anStringList &keepjoints, anString &prefix ) {
 	int				i;
 	int				j;
 	arcExportMesh	*mesh;
@@ -1477,8 +1477,8 @@ void arcMayaExport::GetBindPose( MObject &jointNode, arcExportJoint *joint, floa
 					MFnMatrixData	dMatrix( worldMatrix );
 					MMatrix			wMatrix = dMatrix.matrix( &status );
 
-					joint->bindmat = ConvertToIdSpace( arcMat( wMatrix ) );
-					joint->bindpos = ConvertToIdSpace( arcVec3( wMatrix ) ) * scale;
+					joint->bindmat = ConvertToIdSpace( anMat( wMatrix ) );
+					joint->bindpos = ConvertToIdSpace( anVec3( wMatrix ) ) * scale;
 					if ( !options.ignoreScale ) {
 						joint->bindpos *= joint->scale;
 					} else {
@@ -1499,7 +1499,7 @@ void arcMayaExport::GetBindPose( MObject &jointNode, arcExportJoint *joint, floa
 arcMayaExport::GetLocalTransform
 ===============
 */
-void arcMayaExport::GetLocalTransform( arcExportJoint *joint, arcVec3 &pos, arcMat3 &mat ) {
+void arcMayaExport::GetLocalTransform( arcExportJoint *joint, anVec3 &pos, anMat3 &mat ) {
 	MStatus		status;
 	MDagPath	dagPath;
 
@@ -1525,8 +1525,8 @@ void arcMayaExport::GetLocalTransform( arcExportJoint *joint, arcVec3 &pos, arcM
 		return;
 	}
 
-	pos = arcVec3( transform.transformationMatrix() );
-	mat = arcMat( transform.transformationMatrix() );
+	pos = anVec3( transform.transformationMatrix() );
+	mat = anMat( transform.transformationMatrix() );
 }
 
 /*
@@ -1534,7 +1534,7 @@ void arcMayaExport::GetLocalTransform( arcExportJoint *joint, arcVec3 &pos, arcM
 arcMayaExport::GetWorldTransform
 ===============
 */
-void arcMayaExport::GetWorldTransform( arcExportJoint *joint, arcVec3 &pos, arcMat3 &mat, float scale ) {
+void arcMayaExport::GetWorldTransform( arcExportJoint *joint, anVec3 &pos, anMat3 &mat, float scale ) {
 	arcExportJoint *parent;
 
 	GetLocalTransform( joint, pos, mat );
@@ -1543,8 +1543,8 @@ void arcMayaExport::GetWorldTransform( arcExportJoint *joint, arcVec3 &pos, arcM
 
 	parent = joint->mayaNode.GetParent();
 	if ( parent ) {
-		arcVec3 parentpos;
-		arcMat3 parentmat;
+		anVec3 parentpos;
+		anMat3 parentmat;
 
 		GetWorldTransform( parent, parentpos, parentmat, scale );
 
@@ -1651,7 +1651,7 @@ void arcMayaExport::CreateJoints( float scale ) {
 arcMayaExport::RenameJoints
 ===============
 */
-void arcMayaExport::RenameJoints( arcNetList<arcNamePair> &renamejoints, arcNetString &prefix ) {
+void arcMayaExport::RenameJoints( anList<arcNamePair> &renamejoints, anString &prefix ) {
 	int				i;
 	arcExportJoint	*joint;
 
@@ -1680,7 +1680,7 @@ void arcMayaExport::RenameJoints( arcNetList<arcNamePair> &renamejoints, arcNetS
 arcMayaExport::RemapParents
 ===============
 */
-bool arcMayaExport::RemapParents( arcNetList<arcNamePair> &remapjoints ) {
+bool arcMayaExport::RemapParents( anList<arcNamePair> &remapjoints ) {
 	int				i;
 	arcExportJoint	*joint;
 	arcExportJoint	*parent;
@@ -1836,7 +1836,7 @@ void arcMayaExport::GetTextureForMesh( arcExportMesh *mesh, MFnDagNode &dagNode 
 			continue;
 		}
 
-		MPlug colorPlug = MFnDependencyNode(shaderNode).findPlug("color", &status);
+		MPlug colorPlug = MFnDependencyNode(shaderNode).findPlug( "color", &status);
 		if ( status == MS::kFailure ) {
 			continue;
 		}
@@ -1887,7 +1887,7 @@ arcExportMesh *arcMayaExport::CopyMesh( MFnSkinCluster &skinCluster, float scale
 	int				i, j, k;
 	arcExportMesh	*mesh;
 	float			uv_u, uv_v;
-	arcNetString			name, altname;
+	anString			name, altname;
 	int				pos;
 
 	status = skinCluster.getInputGeometry( objarray );
@@ -1988,7 +1988,7 @@ arcExportMesh *arcMayaExport::CopyMesh( MFnSkinCluster &skinCluster, float scale
 
 		for ( j = 0; j < v; j++ ) {
 			memset( &mesh->verts[ j ], 0, sizeof( mesh->verts[ j ] ) );
-			mesh->verts[ j ].pos = ConvertToIdSpace( arcVec3( vertexArray[ j ] ) ) * scale;
+			mesh->verts[ j ].pos = ConvertToIdSpace( anVec3( vertexArray[ j ] ) ) * scale;
 		}
 
 		MIntArray vertexList;
@@ -2091,7 +2091,7 @@ void arcMayaExport::CreateMesh( float scale ) {
 			MItGeometry gIter( skinPath );
 
 			// print out the influence objects
-			arcNetList<arcExportJoint *> joints;
+			anList<arcExportJoint *> joints;
 			arcExportJoint			*joint;
 			exportVertex_t			*vert;
 
@@ -2196,7 +2196,7 @@ void arcMayaExport::CombineMeshes( void ) {
 	int						count;
 	arcExportMesh			*mesh;
 	arcExportMesh			*combine;
-	arcNetList<arcExportMesh *>	oldmeshes;
+	anList<arcExportMesh *>	oldmeshes;
 
 	oldmeshes = model.meshes;
 	model.meshes.Clear();
@@ -2239,11 +2239,11 @@ void arcMayaExport::CombineMeshes( void ) {
 arcMayaExport::GetAlignment
 ===============
 */
-void arcMayaExport::GetAlignment( arcNetString &alignName, arcMat3 &align, float rotate, int startframe ) {
-	arcVec3			pos;
+void arcMayaExport::GetAlignment( anString &alignName, anMat3 &align, float rotate, int startframe ) {
+	anVec3			pos;
 	arcExportJoint	*joint;
-	arcAngles		ang( 0, rotate, 0 );
-	arcMat3			mat;
+	anAngles		ang( 0, rotate, 0 );
+	anMat3			mat;
 
 	align.Identity();
 
@@ -2348,10 +2348,10 @@ float arcMayaExport::GetCameraFov( arcExportJoint *joint ) {
 arcMayaExport::GetCameraFrame
 ===============
 */
-void arcMayaExport::GetCameraFrame( arcExportJoint *camera, arcMat3 &align, cameraFrame_t *cam ) {
-	arcMat3 mat;
-	arcMat3 axis;
-	arcVec3 pos;
+void arcMayaExport::GetCameraFrame( arcExportJoint *camera, anMat3 &align, cameraFrame_t *cam ) {
+	anMat3 mat;
+	anMat3 axis;
+	anVec3 pos;
 
 	// get the worldspace positions of the joint
 	GetWorldTransform( camera, pos, axis, 1.0f );
@@ -2375,7 +2375,7 @@ void arcMayaExport::GetCameraFrame( arcExportJoint *camera, arcMat3 &align, came
 arcMayaExport::CreateCameraAnim
 ===============
 */
-void arcMayaExport::CreateCameraAnim( arcMat3 &align ) {
+void arcMayaExport::CreateCameraAnim( anMat3 &align ) {
 	float				start, end;
 	MDagPath			dagPath;
 	int					frameNum;
@@ -2384,8 +2384,8 @@ void arcMayaExport::CreateCameraAnim( arcMat3 &align ) {
 	cameraFrame_t		cam;
 	arcExportJoint		*refCam;
 	arcExportJoint		*camJoint;
-	arcNetString				currentCam;
-	arcNetString				newCam;
+	anString				currentCam;
+	anString				newCam;
 	MPlug				plug;
 	MFnEnumAttribute	cameraAttribute;
 
@@ -2494,15 +2494,15 @@ void arcMayaExport::CreateCameraAnim( arcMat3 &align ) {
 arcMayaExport::GetDefaultPose
 ===============
 */
-void arcMayaExport::GetDefaultPose( arcMat3 &align ) {
+void arcMayaExport::GetDefaultPose( anMat3 &align ) {
 	float			start;
 	MDagPath		dagPath;
-	arcMat3			jointaxis;
-	arcVec3			jointpos;
+	anMat3			jointaxis;
+	anVec3			jointpos;
 	arcExportJoint	*joint, *parent;
-	arcBounds		bnds;
-	arcBounds		meshBounds;
-	arcNetList<jointFrame_t> frame;
+	anBounds		bnds;
+	anBounds		meshBounds;
+	anList<jointFrame_t> frame;
 
 	start = TimeForFrame( options.startframe );
 
@@ -2584,20 +2584,20 @@ void arcMayaExport::GetDefaultPose( arcMat3 &align ) {
 arcMayaExport::CreateAnimation
 ===============
 */
-void arcMayaExport::CreateAnimation( arcMat3 &align ) {
+void arcMayaExport::CreateAnimation( anMat3 &align ) {
 	int				i;
 	float			start, end;
 	MDagPath		dagPath;
-	arcMat3			jointaxis;
-	arcVec3			jointpos;
+	anMat3			jointaxis;
+	anVec3			jointpos;
 	int				frameNum;
 	arcExportJoint	*joint, *parent;
-	arcBounds		bnds;
-	arcBounds		meshBounds;
+	anBounds		bnds;
+	anBounds		meshBounds;
 	jointFrame_t	*frame;
 	int				cycleStart;
-	arcVec3			totalDelta;
-	arcNetList<jointFrame_t>	copyFrames;
+	anVec3			totalDelta;
+	anList<jointFrame_t>	copyFrames;
 
 	start = TimeForFrame( options.startframe );
 	end   = TimeForFrame( options.endframe );
@@ -2677,7 +2677,7 @@ void arcMayaExport::CreateAnimation( arcMat3 &align ) {
 	joint = model.FindJoint( "origin" );
 	if ( joint ) {
 		frame = model.frames[ 0 ];
-		arcVec3 origin = frame[ joint->index ].t;
+		anVec3 origin = frame[ joint->index ].t;
 
 		frame = model.frames[ model.numFrames - 1 ];
 		totalDelta = frame[ joint->index ].t - origin;
@@ -2706,7 +2706,7 @@ void arcMayaExport::CreateAnimation( arcMat3 &align ) {
 	if ( joint ) {
 		// relocate origin to start at 0, 0, 0 for first frame
 		frame = model.frames[ 0 ];
-		arcVec3 origin = frame[ joint->index ].t;
+		anVec3 origin = frame[ joint->index ].t;
 		for ( i = 0; i < model.numFrames; i++ ) {
 			frame = model.frames[ i ];
 			frame[ joint->index ].t -= origin;
@@ -2754,7 +2754,7 @@ arcMayaExport::ConvertModel
 */
 void arcMayaExport::ConvertModel( void ) {
 	MStatus	status;
-	arcMat3	align;
+	anMat3	align;
 
 	common->Printf( "Converting %s to %s...\n", options.src.c_str(), options.dest.c_str() );
 
@@ -3067,7 +3067,7 @@ const char *Maya_ConvertModel( const char *ospath, const char *commandline ) {
 dllEntry
 ===============
 */
-bool dllEntry( int version, arcCommon *common, arcSys *sys ) {
+bool dllEntry( int version, anCommon *common, arcSys *sys ) {
 
 	if ( !common || !sys ) {
 		return false;
@@ -3077,12 +3077,12 @@ bool dllEntry( int version, arcCommon *common, arcSys *sys ) {
 	::sys = sys;
 	::cvarSystem = NULL;
 
-	arcLibrary::sys			= sys;
-	arcLibrary::common		= common;
-	arcLibrary::cvarSystem	= NULL;
-	arcLibrary::fileSystem	= NULL;
+	anLibrary::sys			= sys;
+	anLibrary::common		= common;
+	anLibrary::cvarSystem	= NULL;
+	anLibrary::fileSystem	= NULL;
 
-	arcLibrary::Init();
+	anLibrary::Init();
 
 	if ( version != MD5_VERSION ) {
 		common->Printf( "Error initializing Maya exporter: DLL version %d different from .exe version %d\n", MD5_VERSION, version );

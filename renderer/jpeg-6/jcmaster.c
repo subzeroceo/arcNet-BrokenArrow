@@ -59,7 +59,7 @@ initial_setup (j_compress_ptr cinfo)
   /* Make sure image isn't bigger than I can handle */
   if ((long) cinfo->image_height > (long) JPEG_MAX_DIMENSION ||
       (long) cinfo->image_width > (long) JPEG_MAX_DIMENSION)
-    ERREXIT1(cinfo, JERR_IMAGE_TOO_BIG, (unsigned int) JPEG_MAX_DIMENSION);
+    ERREXIT1(cinfo, JERR_anImageOO_BIG, (unsigned int) JPEG_MAX_DIMENSION);
 
   /* Width of an input scanline must be representable as JDIMENSION. */
   samplesperrow = (long) cinfo->image_width * (long) cinfo->input_components;
@@ -149,7 +149,7 @@ validate_script (j_compress_ptr cinfo)
    * for progressive JPEG, no scan can have this.
    */
   scanptr = cinfo->scan_info;
-  if (scanptr->Ss != 0 || scanptr->Se != DCTSIZE2-1 ) {
+  if ( scanptr->Ss != 0 || scanptr->Se != DCTSIZE2-1 ) {
 #ifdef C_PROGRESSIVE_SUPPORTED
     cinfo->progressive_mode = TRUE;
     last_bitpos_ptr = & last_bitpos[0][0];
@@ -165,7 +165,7 @@ validate_script (j_compress_ptr cinfo)
       component_sent[ci] = FALSE;
   }
 
-  for (scanno = 1; scanno <= cinfo->num_scans; scanptr++, scanno++ ) {
+  for ( scanno = 1; scanno <= cinfo->num_scans; scanptr++, scanno++ ) {
     /* Validate component indexes */
     ncomps = scanptr->comps_in_scan;
     if (ncomps <= 0 || ncomps > MAX_COMPS_IN_SCAN)
@@ -258,7 +258,7 @@ select_scan_parameters (j_compress_ptr cinfo)
   int ci;
 
 #ifdef C_MULTISCAN_FILES_SUPPORTED
-  if (cinfo->scan_info != NULL) {
+  if (cinfo->scan_info != nullptr ) {
     /* Prepare for current scan --- the script is already validated */
     my_master_ptr master = (my_master_ptr) cinfo->master;
     const jpeg_scan_info * scanptr = cinfo->scan_info + master->scan_number;
@@ -302,7 +302,7 @@ per_scan_setup (j_compress_ptr cinfo)
 
   if (cinfo->comps_in_scan == 1 ) {
 
-    /* Noninterleaved (single-component) scan */
+    /* Noninterleaved ( single-component) scan */
     compptr = cinfo->cur_comp_info[0];
 
     /* Overall image size in MCUs */
@@ -456,7 +456,7 @@ prepare_for_pass (j_compress_ptr cinfo)
   master->pub.is_last_pass = (master->pass_number == master->total_passes-1 );
 
   /* Set up progress monitor's pass info if present */
-  if (cinfo->progress != NULL) {
+  if (cinfo->progress != nullptr ) {
     cinfo->progress->completed_passes = master->pass_number;
     cinfo->progress->total_passes = master->total_passes;
   }
@@ -535,7 +535,7 @@ jinit_c_master_control (j_compress_ptr cinfo, boolean transcode_only)
   master = (my_master_ptr)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				  SIZEOF(my_comp_master) );
-  cinfo->master = (struct jpeg_comp_master *) master;
+  cinfo->master = ( struct jpeg_comp_master *) master;
   master->pub.prepare_for_pass = prepare_for_pass;
   master->pub.pass_startup = pass_startup;
   master->pub.finish_pass = finish_pass_master;
@@ -544,7 +544,7 @@ jinit_c_master_control (j_compress_ptr cinfo, boolean transcode_only)
   /* Validate parameters, determine derived values */
   initial_setup(cinfo);
 
-  if (cinfo->scan_info != NULL) {
+  if (cinfo->scan_info != nullptr ) {
 #ifdef C_MULTISCAN_FILES_SUPPORTED
     validate_script(cinfo);
 #else

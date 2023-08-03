@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #define POLYTOPE_VERTEX_EPSILON		0.1f
@@ -6,17 +6,17 @@
 
 /*
 ====================
-arcSurface_Polytope::FromPlanes
+anSurface_Polytope::FromPlanes
 ====================
 */
-void arcSurface_Polytope::FromPlanes( const arcPlane *planes, const int numPlanes ) {
-	arcDrawVert newVert;
+void anSurface_Polytope::FromPlanes( const anPlane *planes, const int numPlanes ) {
+	anDrawVertex newVert;
 
-	int *windingVerts = ( int * ) _alloca( MAX_POINTS_ON_WINDING * sizeof( int ) );
+	int *windingVerts = ( int*) _alloca( MAX_POINTS_ON_WINDING * sizeof( int ) );
 	memset( &newVert, 0, sizeof( newVert ) );
 
 	for ( int i = 0; i < numPlanes; i++ ) {
-		arcFixedWinding w.BaseForPlane( planes[i] );
+		anFixedWinding w.BaseForPlane( planes[i] );
 		for ( int j = 0; j < numPlanes; j++ ) {
 			if ( j == i ) {
 				continue;
@@ -54,22 +54,22 @@ void arcSurface_Polytope::FromPlanes( const arcPlane *planes, const int numPlane
 
 /*
 ====================
-arcSurface_Polytope::SetupTetrahedron
+anSurface_Polytope::SetupTetrahedron
 ====================
 */
-void arcSurface_Polytope::SetupTetrahedron( const arcBounds &bounds ) {
+void anSurface_Polytope::SetupTetrahedron( const anBounds &bounds ) {
 	float c1 = 0.4714045207f;
 	float c2 = 0.8164965809f;
 	float c3 = -0.3333333333f;
 
-	arcVec3 center = bounds.GetCenter();
-	arcVec3 scale = bounds[1] - center;
+	anVec3 center = bounds.GetCenter();
+	anVec3 scale = bounds[1] - center;
 
 	verts.SetNum( 4 );
-	verts[0].xyz = center + arcVec3( 0.0f, 0.0f, scale.z );
-	verts[1].xyz = center + arcVec3( 2.0f * c1 * scale.x, 0.0f, c3 * scale.z );
-	verts[2].xyz = center + arcVec3( -c1 * scale.x, c2 * scale.y, c3 * scale.z );
-	verts[3].xyz = center + arcVec3( -c1 * scale.x, -c2 * scale.y, c3 * scale.z );
+	verts[0].xyz = center + anVec3( 0.0f, 0.0f, scale.z );
+	verts[1].xyz = center + anVec3( 2.0f * c1 * scale.x, 0.0f, c3 * scale.z );
+	verts[2].xyz = center + anVec3( -c1 * scale.x, c2 * scale.y, c3 * scale.z );
+	verts[3].xyz = center + anVec3( -c1 * scale.x, -c2 * scale.y, c3 * scale.z );
 
 	indexes.SetNum( 4*3 );
 	indexes[0*3+0] = 0;
@@ -90,22 +90,22 @@ void arcSurface_Polytope::SetupTetrahedron( const arcBounds &bounds ) {
 
 /*
 ====================
-arcSurface_Polytope::SetupHexahedron
+anSurface_Polytope::SetupHexahedron
 ====================
 */
-void arcSurface_Polytope::SetupHexahedron( const arcBounds &bounds ) {
-	arcVec3 center = bounds.GetCenter();
-	arcVec3 scale = bounds[1] - center;
+void anSurface_Polytope::SetupHexahedron( const anBounds &bounds ) {
+	anVec3 center = bounds.GetCenter();
+	anVec3 scale = bounds[1] - center;
 
 	verts.SetNum( 8 );
-	verts[0].xyz = center + arcVec3( -scale.x, -scale.y, -scale.z );
-	verts[1].xyz = center + arcVec3(  scale.x, -scale.y, -scale.z );
-	verts[2].xyz = center + arcVec3(  scale.x,  scale.y, -scale.z );
-	verts[3].xyz = center + arcVec3( -scale.x,  scale.y, -scale.z );
-	verts[4].xyz = center + arcVec3( -scale.x, -scale.y,  scale.z );
-	verts[5].xyz = center + arcVec3(  scale.x, -scale.y,  scale.z );
-	verts[6].xyz = center + arcVec3(  scale.x,  scale.y,  scale.z );
-	verts[7].xyz = center + arcVec3( -scale.x,  scale.y,  scale.z );
+	verts[0].xyz = center + anVec3( -scale.x, -scale.y, -scale.z );
+	verts[1].xyz = center + anVec3(  scale.x, -scale.y, -scale.z );
+	verts[2].xyz = center + anVec3(  scale.x,  scale.y, -scale.z );
+	verts[3].xyz = center + anVec3( -scale.x,  scale.y, -scale.z );
+	verts[4].xyz = center + anVec3( -scale.x, -scale.y,  scale.z );
+	verts[5].xyz = center + anVec3(  scale.x, -scale.y,  scale.z );
+	verts[6].xyz = center + anVec3(  scale.x,  scale.y,  scale.z );
+	verts[7].xyz = center + anVec3( -scale.x,  scale.y,  scale.z );
 
 	indexes.SetNum( 12*3 );
 	indexes[ 0*3+0] = 0;
@@ -150,20 +150,20 @@ void arcSurface_Polytope::SetupHexahedron( const arcBounds &bounds ) {
 
 /*
 ====================
-arcSurface_Polytope::SetupOctahedron
+anSurface_Polytope::SetupOctahedron
 ====================
 */
-void arcSurface_Polytope::SetupOctahedron( const arcBounds &bounds ) {
-	arcVec3 center = bounds.GetCenter();
-	arcVec3 scale = bounds[1] - center;
+void anSurface_Polytope::SetupOctahedron( const anBounds &bounds ) {
+	anVec3 center = bounds.GetCenter();
+	anVec3 scale = bounds[1] - center;
 
 	verts.SetNum( 6 );
-	verts[0].xyz = center + arcVec3(  scale.x, 0.0f, 0.0f );
-	verts[1].xyz = center + arcVec3( -scale.x, 0.0f, 0.0f );
-	verts[2].xyz = center + arcVec3( 0.0f,  scale.y, 0.0f );
-	verts[3].xyz = center + arcVec3( 0.0f, -scale.y, 0.0f );
-	verts[4].xyz = center + arcVec3( 0.0f, 0.0f,  scale.z );
-	verts[5].xyz = center + arcVec3( 0.0f, 0.0f, -scale.z );
+	verts[0].xyz = center + anVec3(  scale.x, 0.0f, 0.0f );
+	verts[1].xyz = center + anVec3( -scale.x, 0.0f, 0.0f );
+	verts[2].xyz = center + anVec3( 0.0f,  scale.y, 0.0f );
+	verts[3].xyz = center + anVec3( 0.0f, -scale.y, 0.0f );
+	verts[4].xyz = center + anVec3( 0.0f, 0.0f,  scale.z );
+	verts[5].xyz = center + anVec3( 0.0f, 0.0f, -scale.z );
 
 	indexes.SetNum( 8*3 );
 	indexes[0*3+0] = 4;
@@ -196,60 +196,60 @@ void arcSurface_Polytope::SetupOctahedron( const arcBounds &bounds ) {
 
 /*
 ====================
-arcSurface_Polytope::SetupDodecahedron
+anSurface_Polytope::SetupDodecahedron
 ====================
 */
-void arcSurface_Polytope::SetupDodecahedron( const arcBounds &bounds ) {
+void anSurface_Polytope::SetupDodecahedron( const anBounds &bounds ) {
 }
 
 /*
 ====================
-arcSurface_Polytope::SetupIcosahedron
+anSurface_Polytope::SetupIcosahedron
 ====================
 */
-void arcSurface_Polytope::SetupIcosahedron( const arcBounds &bounds ) {
+void anSurface_Polytope::SetupIcosahedron( const anBounds &bounds ) {
 }
 
 /*
 ====================
-arcSurface_Polytope::SetupCylinder
+anSurface_Polytope::SetupCylinder
 ====================
 */
-void arcSurface_Polytope::SetupCylinder( const arcBounds &bounds, const int numSides ) {
+void anSurface_Polytope::SetupCylinder( const anBounds &bounds, const int numSides ) {
 }
 
 /*
 ====================
-arcSurface_Polytope::SetupCone
+anSurface_Polytope::SetupCone
 ====================
 */
-void arcSurface_Polytope::SetupCone( const arcBounds &bounds, const int numSides ) {
+void anSurface_Polytope::SetupCone( const anBounds &bounds, const int numSides ) {
 }
 
 /*
 ====================
-arcSurface_Polytope::SplitPolytope
+anSurface_Polytope::SplitPolytope
 ====================
 */
-int arcSurface_Polytope::SplitPolytope( const arcPlane &plane, const float epsilon, arcSurface_Polytope **front, arcSurface_Polytope **back ) const {
-	arcSurface *surface[2];
-	arcSurface_Polytope *polytopeSurfaces[2], *surf;
+int anSurface_Polytope::SplitPolytope( const anPlane &plane, const float epsilon, anSurface_Polytope **front, anSurface_Polytope **back ) const {
+	anSurface *surface[2];
+	anSurface_Polytope *polytopeSurfaces[2], *surf;
 	int *onPlaneEdges[2];
 
-	onPlaneEdges[0] = ( int * ) _alloca( indexes.Num() / 3 * sizeof( int ) );
-	onPlaneEdges[1] = ( int * ) _alloca( indexes.Num() / 3 * sizeof( int ) );
+	onPlaneEdges[0] = ( int*) _alloca( indexes.Num() / 3 * sizeof( int ) );
+	onPlaneEdges[1] = ( int*) _alloca( indexes.Num() / 3 * sizeof( int ) );
 
 	int side = Split( plane, epsilon, &surface[0], &surface[1], onPlaneEdges[0], onPlaneEdges[1] );
 
-	*front = polytopeSurfaces[0] = new arcSurface_Polytope;
-	*back = polytopeSurfaces[1] = new arcSurface_Polytope;
+	*front = polytopeSurfaces[0] = new anSurface_Polytope;
+	*back = polytopeSurfaces[1] = new anSurface_Polytope;
 
 	for ( int s = 0; s < 2; s++ ) {
 		if ( surface[s] ) {
-			polytopeSurfaces[s] = new arcSurface_Polytope;
+			polytopeSurfaces[s] = new anSurface_Polytope;
 			polytopeSurfaces[s]->SwapTriangles( *surface[s] );
 			delete surface[s];
-			surface[s] = NULL;
+			surface[s] = nullptr;
 		}
 	}
 
@@ -273,7 +273,7 @@ int arcSurface_Polytope::SplitPolytope( const arcPlane &plane, const float epsil
 				edgeNum = surf->edgeIndexes[onPlaneEdges[s][j]];
 				if ( int v1 == surf->edges[abs( edgeNum )].verts[INTSIGNBITSET( edgeNum )] ) {
 					v1 = surf->edges[abs( edgeNum )].verts[INTSIGNBITNOTSET( edgeNum )];
-					idSwap( onPlaneEdges[s][i], onPlaneEdges[s][j] );
+					anSwap( onPlaneEdges[s][i], onPlaneEdges[s][j] );
 					break;
 				}
 			}

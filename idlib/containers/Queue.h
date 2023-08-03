@@ -9,7 +9,7 @@
 ===============================================================================
 */
 
-#define arcQueue( type, next ) arcQueueTemplate<type, ( int )&(((type*)NULL)->next)>
+#define arcQueue( type, next ) arcQueueTemplate<type, ( int )&(((type*)nullptr )->next)>
 
 template< class type, int nextOffset >
 class arcQueueTemplate {
@@ -24,16 +24,16 @@ private:
 	type *					last;
 };
 
-#define QUEUE_NEXT_PTR( element )		(*((type**)(((byte*)element)+nextOffset) ))
+#define QUEUE_NEXT_PTR( element )		(*((type**)(((byte*)element)+nextOffset) ) )
 
 template< class type, int nextOffset >
 arcQueueTemplate<type,nextOffset>::arcQueueTemplate( void ) {
-	first = last = NULL;
+	first = last = nullptr;
 }
 
 template< class type, int nextOffset >
 void arcQueueTemplate<type,nextOffset>::Add( type *element ) {
-	QUEUE_NEXT_PTR(element) = NULL;
+	QUEUE_NEXT_PTR(element) = nullptr;
 	if ( last ) {
 		QUEUE_NEXT_PTR(last) = element;
 	} else {
@@ -50,9 +50,9 @@ type *arcQueueTemplate<type,nextOffset>::Get( void ) {
 	if ( element ) {
 		first = QUEUE_NEXT_PTR(first);
 		if ( last == element ) {
-			last = NULL;
+			last = nullptr;
 		}
-		QUEUE_NEXT_PTR(element) = NULL;
+		QUEUE_NEXT_PTR(element) = nullptr;
 	}
 	return element;
 }

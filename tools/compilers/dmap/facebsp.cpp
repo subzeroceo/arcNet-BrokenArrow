@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "dmap.h"
@@ -38,11 +38,11 @@ extern	int	c_nodes;
 
 void RemovePortalFromNode( uPortal_t *portal, node_t *l );
 
-node_t *NodeForPoint( node_t *node, arcVec3 origin ) {
+node_t *NodeForPoint( node_t *node, anVec3 origin ) {
 	float	d;
 
 	while( node->planenum != PLANENUM_LEAF ) {
-		arcPlane &plane = dmapGlobals.mapPlanes[node->planenum];
+		anPlane &plane = dmapGlobals.mapPlanes[node->planenum];
 		d = plane.Distance( origin );
 		if ( d >= 0 ) {
 			node = node->children[0];
@@ -82,7 +82,7 @@ void FreeTreePortals_r (node_t *node)
 		RemovePortalFromNode (p, p->nodes[!s] );
 		FreePortal (p);
 	}
-	node->portals = NULL;
+	node->portals = nullptr;
 }
 
 /*
@@ -134,7 +134,7 @@ void PrintTree_r (node_t *node, int depth)
 	if (node->planenum == PLANENUM_LEAF)
 	{
 		if ( !node->brushlist)
-			common->Printf( "NULL\n" );
+			common->Printf( "nullptr\n" );
 		else
 		{
 			for (bb=node->brushlist; bb; bb=bb->next)
@@ -144,7 +144,7 @@ void PrintTree_r (node_t *node, int depth)
 		return;
 	}
 
-	arcPlane &plane = dmapGlobals.mapPlanes[node->planenum];
+	anPlane &plane = dmapGlobals.mapPlanes[node->planenum];
 	common->Printf( "#%i (%5.2f %5.2f %5.2f %5.2f)\n", node->planenum,
 					plane[0], plane[1], plane[2], plane[3] );
 	PrintTree_r( node->children[0], depth+1 );
@@ -190,13 +190,13 @@ int SelectSplitPlaneNum( node_t *node, bspface_t *list ) {
 	bspface_t	*bestSplit;
 	int			splits, facing, front, back;
 	int			side;
-	arcPlane		*mapPlane;
+	anPlane		*mapPlane;
 	int			value, bestValue;
-	arcPlane		plane;
+	anPlane		plane;
 	int			planenum;
 	bool	havePortals;
 	float		dist;
-	arcVec3		halfSize;
+	anVec3		halfSize;
 
 	// if it is crossing a 1k block boundary, force a split
 	// this prevents epsilon problems from extending an
@@ -289,7 +289,7 @@ void	BuildFaceTree_r( node_t *node, bspface_t *list ) {
 	int			side;
 	bspface_t	*newFace;
 	bspface_t	*childLists[2];
-	arcWinding	*frontWinding, *backWinding;
+	anWinding	*frontWinding, *backWinding;
 	int			i;
 	int			splitPlaneNum;
 
@@ -303,9 +303,9 @@ void	BuildFaceTree_r( node_t *node, bspface_t *list ) {
 
 	// partition the list
 	node->planenum = splitPlaneNum;
-	arcPlane &plane = dmapGlobals.mapPlanes[ splitPlaneNum ];
-	childLists[0] = NULL;
-	childLists[1] = NULL;
+	anPlane &plane = dmapGlobals.mapPlanes[ splitPlaneNum ];
+	childLists[0] = nullptr;
+	childLists[1] = nullptr;
 	for ( split = list; split; split = next ) {
 		next = split->next;
 
@@ -352,7 +352,7 @@ void	BuildFaceTree_r( node_t *node, bspface_t *list ) {
 
 	// split the bounds if we have a nice axial plane
 	for ( i = 0; i < 3; i++ ) {
-		if ( arcMath::Fabs( plane[i] - 1.0 ) < 0.001 ) {
+		if ( anMath::Fabs( plane[i] - 1.0 ) < 0.001 ) {
 			node->children[0]->bounds[0][i] = plane.Dist();
 			node->children[1]->bounds[1][i] = plane.Dist();
 			break;
@@ -421,10 +421,10 @@ bspface_t	*MakeStructuralBspFaceList( primitive_t *list ) {
 	uBrush_t	*b;
 	int			i;
 	side_t		*s;
-	arcWinding	*w;
+	anWinding	*w;
 	bspface_t	*f, *flist;
 
-	flist = NULL;
+	flist = nullptr;
 	for (; list; list = list->next ) {
 		b = list->brush;
 		if ( !b ) {
@@ -465,10 +465,10 @@ bspface_t	*MakeVisibleBspFaceList( primitive_t *list ) {
 	uBrush_t	*b;
 	int			i;
 	side_t		*s;
-	arcWinding	*w;
+	anWinding	*w;
 	bspface_t	*f, *flist;
 
-	flist = NULL;
+	flist = nullptr;
 	for (; list; list = list->next ) {
 		b = list->brush;
 		if ( !b ) {

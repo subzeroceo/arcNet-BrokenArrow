@@ -17,7 +17,7 @@
 //	useful.
 
 //#include "stdafx.h"
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "PropTree.h"
@@ -62,11 +62,11 @@ static void _DrawExpand(HDC hdc, LONG x, LONG y, BOOL bExpand, BOOL bFill)
 
 	if ( !bExpand)
 	{
-		MoveToEx(hdc, x + PROPTREEITEM_EXPANDBOXHALF, y + 2, NULL);
+		MoveToEx(hdc, x + PROPTREEITEM_EXPANDBOXHALF, y + 2, nullptr );
 		LineTo(hdc, x + PROPTREEITEM_EXPANDBOXHALF, y + PROPTREEITEM_EXPANDBOX - 2);
 	}
 
-	MoveToEx(hdc, x + 2, y + PROPTREEITEM_EXPANDBOXHALF, NULL);
+	MoveToEx(hdc, x + 2, y + PROPTREEITEM_EXPANDBOXHALF, nullptr );
 	LineTo(hdc, x + PROPTREEITEM_EXPANDBOX - 2, y + PROPTREEITEM_EXPANDBOXHALF);
 
 	SelectObject(hdc, oPen);
@@ -79,7 +79,7 @@ static void _DrawExpand(HDC hdc, LONG x, LONG y, BOOL bExpand, BOOL bFill)
 //
 
 CPropTreeItem::CPropTreeItem() :
-	m_pProp(NULL),
+	m_pProp(nullptr ),
 	m_sLabel(_T( "" ) ),
 	m_sInfo(_T( "" ) ),
 	m_loc(0,0 ),
@@ -92,10 +92,10 @@ CPropTreeItem::CPropTreeItem() :
 	m_rcExpand(0,0,0,0 ),
 	m_rcCheckbox(0,0,0,0 ),
 	m_rcButton(0,0,0,0 ),
-	m_pParent(NULL),
-	m_pSibling(NULL),
-	m_pChild(NULL),
-	m_pVis(NULL)
+	m_pParent(nullptr ),
+	m_pSibling(nullptr ),
+	m_pChild(nullptr ),
+	m_pVis(nullptr )
 {
 }
 
@@ -200,7 +200,7 @@ BOOL CPropTreeItem::HitCheckBox(const POINT& pt)
 
 BOOL CPropTreeItem::IsRootLevel()
 {
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 	return GetParent() == m_pProp->GetRootItem();
 }
 
@@ -313,7 +313,7 @@ void CPropTreeItem::CommitChanges()
 
 	m_bCommitOnce = TRUE;
 
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	OnCommit();
 
@@ -394,7 +394,7 @@ LONG CPropTreeItem::DrawItem(CDC* pDC, const RECT& rc, LONG x, LONG y)
 	LONG nTotal, nCol, ey;
 	CRect drc, ir;
 
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	// Add TreeItem the list of visble items
 	m_pProp->AddToVisibleList( this );
@@ -461,7 +461,7 @@ LONG CPropTreeItem::DrawItem(CDC* pDC, const RECT& rc, LONG x, LONG y)
 	else
 		m_rcCheckbox.SetRectEmpty();
 
-	HRGN hRgn = NULL;
+	HRGN hRgn = nullptr;
 
 	// create a clipping region for the label
 	if ( !IsRootLevel() )
@@ -526,7 +526,7 @@ LONG CPropTreeItem::DrawItem(CDC* pDC, const RECT& rc, LONG x, LONG y)
 	// remove clip region
 	if (hRgn)
 	{
-		SelectClipRgn(pDC->m_hDC, NULL);
+		SelectClipRgn(pDC->m_hDC, nullptr );
 		DeleteObject(hRgn);
 	}
 
@@ -561,7 +561,7 @@ LONG CPropTreeItem::DrawItem(CDC* pDC, const RECT& rc, LONG x, LONG y)
 
 		DrawAttribute(pDC, m_rc);
 
-		SelectClipRgn(pDC->m_hDC, NULL);
+		SelectClipRgn(pDC->m_hDC, nullptr );
 		DeleteObject(hRgn);
 	}
 

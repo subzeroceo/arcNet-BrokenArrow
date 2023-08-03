@@ -92,7 +92,7 @@ rgb_ycc_start (j_compress_ptr cinfo)
   /* Allocate and fill in the conversion tables. */
   cconvert->rgb_ycc_tab = rgb_ycc_tab = (INT32 *)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				(TABLE_SIZE * SIZEOF(INT32) ));
+				(TABLE_SIZE * SIZEOF(INT32) ) );
 
   for ( i = 0; i <= MAXJSAMPLE; i++ ) {
     rgb_ycc_tab[i+R_Y_OFF] = FIX(0.29900) * i;
@@ -273,7 +273,7 @@ cmyk_ycck_convert (j_compress_ptr cinfo,
 /*
  * Convert some rows of samples to the JPEG colorspace.
  * This version handles grayscale output with no conversion.
- * The source can be either plain grayscale or YCbCr (since Y == gray).
+ * The source can be either plain grayscale or YCbCr ( since Y == gray).
  */
 
 METHODDEF void
@@ -356,7 +356,7 @@ jinit_color_converter (j_compress_ptr cinfo)
   cconvert = (my_cconvert_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_color_converter) );
-  cinfo->cconvert = (struct jpeg_color_converter *) cconvert;
+  cinfo->cconvert = ( struct jpeg_color_converter *) cconvert;
   /* set start_pass to null method until we find out differently */
   cconvert->pub.start_pass = null_method;
 

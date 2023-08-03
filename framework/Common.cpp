@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Common_local.h"
@@ -18,49 +18,49 @@ struct version_s {
 	char	string[256];
 } version;
 
-arcCVarSystem com_version( "si_version", version.string, CVAR_SYSTEM|CVAR_ROM|CVAR_SERVERINFO, "engine version" );
-arcCVarSystem com_forceGenericSIMD( "com_forceGenericSIMD", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "force generic platform independent SIMD" );
+anCVarSystem com_version( "si_version", version.string, CVAR_SYSTEM|CVAR_ROM|CVAR_SERVERINFO, "engine version" );
+anCVarSystem com_forceGenericSIMD( "com_forceGenericSIMD", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "force generic platform independent SIMD" );
 
 #ifdef ID_RETAIL
-arcCVarSystem com_allowConsole( "com_allowConsole", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_INIT, "allow toggling console with the tilde key" );
+anCVarSystem com_allowConsole( "com_allowConsole", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_INIT, "allow toggling console with the tilde key" );
 #else
-arcCVarSystem com_allowConsole( "com_allowConsole", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_INIT, "allow toggling console with the tilde key" );
+anCVarSystem com_allowConsole( "com_allowConsole", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_INIT, "allow toggling console with the tilde key" );
 #endif
 
-arcCVarSystem com_developer( "developer", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "developer mode" );
-arcCVarSystem com_speeds( "com_speeds", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "show engine timings" );
-arcCVarSystem com_showFPS( "com_showFPS", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_ARCHIVE|CVAR_NOCHEAT, "show frames rendered per second" );
-arcCVarSystem com_showMemoryUsage( "com_showMemoryUsage", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "show total and per frame memory usage" );
-arcCVarSystem com_updateLoadSize( "com_updateLoadSize", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "update the load size after loading a map" );
+anCVarSystem com_developer( "developer", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "developer mode" );
+anCVarSystem com_speeds( "com_speeds", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "show engine timings" );
+anCVarSystem com_showFPS( "com_showFPS", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_ARCHIVE|CVAR_NOCHEAT, "show frames rendered per second" );
+anCVarSystem com_showMemoryUsage( "com_showMemoryUsage", "0", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "show total and per frame memory usage" );
+anCVarSystem com_updateLoadSize( "com_updateLoadSize", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "update the load size after loading a map" );
 
-arcCVarSystem com_productionMode( "com_productionMode", "0", CVAR_SYSTEM | CVAR_BOOL, "0 - no special behavior, 1 - building a production build, 2 - running a production build" );
-arcCVarSystem preload_CommonAssets( "preload_CommonAssets", "1", CVAR_SYSTEM | CVAR_BOOL, "preload common assets" );
+anCVarSystem com_productionMode( "com_productionMode", "0", CVAR_SYSTEM | CVAR_BOOL, "0 - no special behavior, 1 - building a production build, 2 - running a production build" );
+anCVarSystem preload_CommonAssets( "preload_CommonAssets", "1", CVAR_SYSTEM | CVAR_BOOL, "preload common assets" );
 
-extern arcCVarSystem g_demoMode;
+extern anCVarSystem g_demoMode;
 
-arcCVarSystem com_engineHz( "com_engineHz", "60", CVAR_FLOAT | CVAR_ARCHIVE, "Frames per second the engine runs at", 10.0f, 1024.0f );
+anCVarSystem com_engineHz( "com_engineHz", "60", CVAR_FLOAT | CVAR_ARCHIVE, "Frames per second the engine runs at", 10.0f, 1024.0f );
 float com_engineHz_latched = 60.0f; // Latched version of cvar, updated between map loads
 int64 com_engineHz_numerator = 100LL * 1000LL;
 int64 com_engineHz_denominator = 100LL * 60LL;
 
-HWND com_hwndMsg = NULL;
+HWND com_hwndMsg = nullptr;
 
 #ifdef __ARCENGINE_DLL__
-ARCEngine *		game = NULL;
-aRcEngineEditors *engineEdit = NULL;
+ARCEngine *		game = nullptr;
+aRcEngineEditors *engineEdit = nullptr;
 #endif
 
-arcCommonLocal	commonLocal;
-arcCommon *		common = &commonLocal;
+anCommonLocal	commonLocal;
+anCommon *		common = &commonLocal;
 
-arcCVarSystem com_skipIntroVideos( "com_skipIntroVideos", "0", CVAR_BOOL , "skips intro videos" );
+anCVarSystem com_skipIntroVideos( "com_skipIntroVideos", "0", CVAR_BOOL , "skips intro videos" );
 
 /*
 ==================
-arcCommonLocal::arcCommonLocal
+anCommonLocal::anCommonLocal
 ==================
 */
-arcCommonLocal::arcCommonLocal() :
+anCommonLocal::anCommonLocal() :
 	readSnapshotIndex( 0 ),
 	writeSnapshotIndex( 0 ),
 	optimalTimeBuffered( 0.0f ),
@@ -80,33 +80,33 @@ arcCommonLocal::arcCommonLocal() :
 	com_errorEntered = ERP_NONE;
 	com_shuttingDown = false;
 
-	logFile = NULL;
+	logFile = nullptr;
 
 	strcpy( errorMessage, "" );
 
-	rd_buffer = NULL;
+	rd_buffer = nullptr;
 	rd_buffersize = 0;
-	rd_flush = NULL;
+	rd_flush = nullptr;
 
 	engineDLL = 0;
 
-	loadGUI = NULL;
+	loadGUI = nullptr;
 	nextLoadTip = 0;
 	wipeForced = false;
 	defaultLoadscreen = false;
 
-	menuSoundWorld = NULL;
+	menuSoundWorld = nullptr;
 
 	insideUpdateScreen = false;
 	insideExecuteMapChange = false;
 
-	mapSpawnData.savegameFile = NULL;
+	mapSpawnData.savegameFile = nullptr;
 
 	currentMapName.Clear();
 
-	renderWorld = NULL;
-	soundWorld = NULL;
-	menuSoundWorld = NULL;
+	renderWorld = nullptr;
+	soundWorld = nullptr;
+	menuSoundWorld = nullptr;
 
 	engineFrame = 0;
 	engineTimeResidual = 0;
@@ -118,18 +118,18 @@ arcCommonLocal::arcCommonLocal() :
 
 	//clientPrediction = 0;
 
-	saveFile = NULL;
-	stringsFile = NULL;
+	saveFile = nullptr;
+	stringsFile = nullptr;
 
 	ClearWipe();
 }
 
 /*
 ==================
-arcCommonLocal::Quit
+anCommonLocal::Quit
 ==================
 */
-void arcCommonLocal::Quit() {
+void anCommonLocal::Quit() {
 	// don't try to shutdown if we are in a recursive error
 	if ( !com_errorEntered ) {
 		Shutdown();
@@ -156,44 +156,44 @@ doom set test blah + map test
 
 #define		MAX_CONSOLE_LINES	32
 int			com_numConsoleLines;
-arcCommandArgs	com_consoleLines[MAX_CONSOLE_LINES];
+anCommandArgs	com_consoleLines[MAX_CONSOLE_LINES];
 
 /*
 ==================
-arcCommonLocal::ParseCommandLine
+anCommonLocal::ParseCommandLine
 ==================
 */
-void arcCommonLocal::ParseCommandLine( int argc, const char * const * argv ) {
+void anCommonLocal::ParseCommandLine( int argc, const char *const * argv ) {
 	com_numConsoleLines = 0;
 	int current_count = 0;
 
 	// API says no program path
 	for ( int i = 0; i < argc; i++ ) {
-	if ( argv[ i ][ 0 ] == '+' ) {
+	if ( argv[i][ 0 ] == '+' ) {
 			com_numConsoleLines++;
-			com_consoleLines[ com_numConsoleLines-1 ].AppendArg( argv[ i ] + 1 );
+			com_consoleLines[ com_numConsoleLines-1 ].AppendArg( argv[i] + 1 );
 		} else {
 			if ( !com_numConsoleLines ) {
 				com_numConsoleLines++;
 			}
-			com_consoleLines[ com_numConsoleLines-1 ].AppendArg( argv[ i ] );
+			com_consoleLines[ com_numConsoleLines-1 ].AppendArg( argv[i] );
 		}
 	}
 }
 
 /*
 ==================
-arcCommonLocal::SafeMode
+anCommonLocal::SafeMode
 
 Check for "safe" on the command line, which will
 skip loading of config file (DoomConfig.cfg)
 ==================
 */
-bool arcCommonLocal::SafeMode() {
+bool anCommonLocal::SafeMode() {
 	for ( int i = 0; i < com_numConsoleLines; i++ ) {
-		if ( !arcNetString::Icmp( com_consoleLines[ i ].Argv(0 ), "safe" )
-			|| !arcNetString::Icmp( com_consoleLines[ i ].Argv(0 ), "cvar_restart" ) ) {
-			com_consoleLines[ i ].Clear();
+		if ( !anString::Icmp( com_consoleLines[i].Argv(0 ), "safe" )
+			|| !anString::Icmp( com_consoleLines[i].Argv(0 ), "cvar_restart" ) ) {
+			com_consoleLines[i].Clear();
 			return true;
 		}
 	}
@@ -202,26 +202,26 @@ bool arcCommonLocal::SafeMode() {
 
 /*
 ==================
-arcCommonLocal::StartupVariable
+anCommonLocal::StartupVariable
 
 Searches for command line parameters that are set commands.
-If match is not NULL, only that cvar will be looked for.
+If match is not nullptr, only that cvar will be looked for.
 That is necessary because cddir and basedir need to be set
 before the filesystem is started, but all other sets should
 be after execing the config and default.
 ==================
 */
-void arcCommonLocal::StartupVariable( const char *match ) {
+void anCommonLocal::StartupVariable( const char *match ) {
 	int i = 0;
 	while (	i < com_numConsoleLines ) {
-		if ( strcmp( com_consoleLines[ i ].Argv( 0 ), "set" ) != 0 ) {
+		if ( strcmp( com_consoleLines[i].Argv( 0 ), "set" ) != 0 ) {
 			i++;
 			continue;
 		}
-		const char * s = com_consoleLines[ i ].Argv(1 );
+		const char *s = com_consoleLines[i].Argv(1 );
 
-		if ( !match || !arcNetString::Icmp( s, match ) ) {
-			cvarSystem->SetCVarString( s, com_consoleLines[ i ].Argv( 2 ) );
+		if ( !match || !anString::Icmp( s, match ) ) {
+			cvarSystem->SetCVarString( s, com_consoleLines[i].Argv( 2 ) );
 		}
 		i++;
 	}
@@ -229,7 +229,7 @@ void arcCommonLocal::StartupVariable( const char *match ) {
 
 /*
 ==================
-arcCommonLocal::AddStartupCommands
+anCommonLocal::AddStartupCommands
 
 Adds command line parameters as script statements
 Commands are separated by + signs
@@ -238,7 +238,7 @@ Returns true if any late commands were added, which
 will keep the demoloop from immediately starting
 ==================
 */
-void arcCommonLocal::AddStartupCommands() {
+void anCommonLocal::AddStartupCommands() {
 	// quote every token, so args with semicolons can work
 	for ( int i = 0; i < com_numConsoleLines; i++ ) {
 		if ( !com_consoleLines[i].Argc() ) {
@@ -251,11 +251,11 @@ void arcCommonLocal::AddStartupCommands() {
 
 /*
 ==================
-arcCommonLocal::WriteConfigToFile
+anCommonLocal::WriteConfigToFile
 ==================
 */
-void arcCommonLocal::WriteConfigToFile( const char *filename ) {
-	arcNetFile * f = fileSystem->OpenFileWrite( filename );
+void anCommonLocal::WriteConfigToFile( const char *filename ) {
+	anFile * f = fileSystem->OpenFileWrite( filename );
 	if ( !f ) {
 		Printf ( "Couldn't write %s.\n", filename );
 		return;
@@ -268,12 +268,12 @@ void arcCommonLocal::WriteConfigToFile( const char *filename ) {
 
 /*
 ===============
-arcCommonLocal::WriteConfiguration
+anCommonLocal::WriteConfiguration
 
 Writes key bindings and archived cvars to config file if modified
 ===============
 */
-void arcCommonLocal::WriteConfiguration() {
+void anCommonLocal::WriteConfiguration() {
 	// if we are quiting without fully initializing, make sure
 	// we don't write out anything
 	if ( !com_fullyInitialized ) {
@@ -287,7 +287,7 @@ void arcCommonLocal::WriteConfiguration() {
 
 	// save to the profile
 	idLocalUser * user = session->GetSignInManager().GetMasterLocalUser();
-	if ( user != NULL ) {
+	if ( user != nullptr ) {
 		user->SaveProfileSettings();
 	}
 
@@ -309,7 +309,7 @@ KeysFromBinding()
 Returns the key bound to the command
 ===============
 */
-const char* arcCommonLocal::KeysFromBinding( const char *bind ) {
+const char* anCommonLocal::KeysFromBinding( const char *bind ) {
 	return idKeyInput::KeysFromBinding( bind );
 }
 
@@ -319,7 +319,7 @@ BindingFromKey()
 Returns the binding bound to key
 ===============
 */
-const char* arcCommonLocal::BindingFromKey( const char *key ) {
+const char* anCommonLocal::BindingFromKey( const char *key ) {
 	return idKeyInput::BindingFromKey( key );
 }
 
@@ -329,7 +329,7 @@ ButtonState()
 Returns the state of the button
 ===============
 */
-int	arcCommonLocal::ButtonState( int key ) {
+int	anCommonLocal::ButtonState( int key ) {
 	return usercmdGen->ButtonState(key);
 }
 
@@ -339,7 +339,7 @@ ButtonState()
 Returns the state of the key
 ===============
 */
-int	arcCommonLocal::KeyState( int key ) {
+int	anCommonLocal::KeyState( int key ) {
 	return usercmdGen->KeyState(key);
 }
 
@@ -350,7 +350,7 @@ ARCCmdSysLocal::PrintMemInfo_f
 This prints out memory debugging data
 ============
 */
-CONSOLE_COMMAND( printMemInfo, "prints memory debugging data", NULL ) {
+CONSOLE_COMMAND( printMemInfo, "prints memory debugging data", nullptr ) {
 	MemInfo_t mi;
 	memset( &mi, 0, sizeof( mi ) );
 	mi.filebase = commonLocal.GetCurrentMapName();
@@ -358,27 +358,27 @@ CONSOLE_COMMAND( printMemInfo, "prints memory debugging data", NULL ) {
 	renderSystem->PrintMemInfo( &mi ); // textures and models
 	soundSystem->PrintMemInfo( &mi ); // sounds
 
-	common->Printf( " Used image memory: %s bytes\n", arcNetString::FormatNumber( mi.imageAssetsTotal ).c_str() );
+	common->Printf( " Used image memory: %s bytes\n", anString::FormatNumber( mi.imageAssetsTotal ).c_str() );
 	mi.assetTotals += mi.imageAssetsTotal;
 
-	common->Printf( " Used model memory: %s bytes\n", arcNetString::FormatNumber( mi.modelAssetsTotal ).c_str() );
+	common->Printf( " Used model memory: %s bytes\n", anString::FormatNumber( mi.modelAssetsTotal ).c_str() );
 	mi.assetTotals += mi.modelAssetsTotal;
 
-	common->Printf( " Used sound memory: %s bytes\n", arcNetString::FormatNumber( mi.soundAssetsTotal ).c_str() );
+	common->Printf( " Used sound memory: %s bytes\n", anString::FormatNumber( mi.soundAssetsTotal ).c_str() );
 	mi.assetTotals += mi.soundAssetsTotal;
 
-	common->Printf( " Used asset memory: %s bytes\n", arcNetString::FormatNumber( mi.assetTotals ).c_str() );
+	common->Printf( " Used asset memory: %s bytes\n", anString::FormatNumber( mi.assetTotals ).c_str() );
 
 	// write overview file
-	arcNetFile *f;
+	anFile *f;
 
 	f = fileSystem->OpenFileAppend( "maps/printmeminfo.txt" );
 	if ( !f ) {
 		return;
 	}
 
-	f->Printf( "total(%s ) image(%s ) model(%s ) sound(%s ): %s\n", arcNetString::FormatNumber( mi.assetTotals ).c_str(), arcNetString::FormatNumber( mi.imageAssetsTotal ).c_str(),
-		arcNetString::FormatNumber( mi.modelAssetsTotal ).c_str(), arcNetString::FormatNumber( mi.soundAssetsTotal ).c_str(), mi.filebase.c_str() );
+	f->Printf( "total(%s ) image(%s ) model(%s ) sound(%s ): %s\n", anString::FormatNumber( mi.assetTotals ).c_str(), anString::FormatNumber( mi.imageAssetsTotal ).c_str(),
+		anString::FormatNumber( mi.modelAssetsTotal ).c_str(), anString::FormatNumber( mi.soundAssetsTotal ).c_str(), mi.filebase.c_str() );
 
 	fileSystem->CloseFile( f );
 }
@@ -390,7 +390,7 @@ Com_Error_f
 Just throw a fatal error to test error shutdown procedures.
 ==================
 */
-CONSOLE_COMMAND( error, "causes an error", NULL ) {
+CONSOLE_COMMAND( error, "causes an error", nullptr ) {
 	if ( !com_developer.GetBool() ) {
 		commonLocal.Printf( "error may only be used in developer mode\n" );
 		return;
@@ -410,7 +410,7 @@ Com_Freeze_f
 Just freeze in place for a given number of seconds to test error recovery.
 ==================
 */
-CONSOLE_COMMAND( freeze, "freezes the game for a number of seconds", NULL ) {
+CONSOLE_COMMAND( freeze, "freezes the game for a number of seconds", nullptr ) {
 	float	s;
 	int		start, now;
 
@@ -443,13 +443,13 @@ Com_Crash_f
 A way to force a bus error for development reasons
 =================
 */
-CONSOLE_COMMAND( crash, "causes a crash", NULL ) {
+CONSOLE_COMMAND( crash, "causes a crash", nullptr ) {
 	if ( !com_developer.GetBool() ) {
 		commonLocal.Printf( "crash may only be used in developer mode\n" );
 		return;
 	}
 
-	* ( int * ) 0 = 0x12345678;
+	* ( int*) 0 = 0x12345678;
 }
 
 /*
@@ -457,10 +457,10 @@ CONSOLE_COMMAND( crash, "causes a crash", NULL ) {
 Com_Quit_f
 =================
 */
-CONSOLE_COMMAND_SHIP( quit, "quits the game", NULL ) {
+CONSOLE_COMMAND_SHIP( quit, "quits the game", nullptr ) {
 	commonLocal.Quit();
 }
-CONSOLE_COMMAND_SHIP( exit, "exits the game", NULL ) {
+CONSOLE_COMMAND_SHIP( exit, "exits the game", nullptr ) {
 	commonLocal.Quit();
 }
 
@@ -471,8 +471,8 @@ Com_WriteConfig_f
 Write the config file to a specific name
 ===============
 */
-CONSOLE_COMMAND( writeConfig, "writes a config file", NULL ) {
-	arcNetString	filename;
+CONSOLE_COMMAND( writeConfig, "writes a config file", nullptr ) {
+	anString	filename;
 
 	if ( args.Argc() != 2 ) {
 		commonLocal.Printf( "Usage: writeconfig <filename>\n" );
@@ -487,10 +487,10 @@ CONSOLE_COMMAND( writeConfig, "writes a config file", NULL ) {
 
 /*
 ========================
-arcCommonLocal::CheckStartupStorageRequirements
+anCommonLocal::CheckStartupStorageRequirements
 ========================
 */
-void arcCommonLocal::CheckStartupStorageRequirements() {
+void anCommonLocal::CheckStartupStorageRequirements() {
 	int64 availableSpace = 0;
 	// ------------------------------------------------------------------------
 	// Savegame and Profile required storage
@@ -499,9 +499,9 @@ void arcCommonLocal::CheckStartupStorageRequirements() {
 		// Make sure the save path exists in case it was deleted.
 		// If the path cannot be created we can safely assume there is no
 		// free space because in that case nothing can be saved anyway.
-		const char * savepath = cvarSystem->GetCVarString( "fs_savepath" );
-		arcNetString directory = savepath;
-		//arcNetString directory = fs_savepath.GetString();
+		const char *savepath = cvarSystem->GetCVarString( "fs_savepath" );
+		anString directory = savepath;
+		//anString directory = fs_savepath.GetString();
 		directory += "\\";	// so it doesn't think the last part is a file and ignores in the directory creation
 		fileSystem->CreateOSPath( directory );
 
@@ -511,7 +511,7 @@ void arcCommonLocal::CheckStartupStorageRequirements() {
 		// If free space fails then get space on drive as a fall back
 		// (the directory will be created later anyway)
 		if ( availableSpace <= 1 ) {
-			arcNetString savePath( savepath );
+			anString savePath( savepath );
 			if ( savePath.Length() >= 3 ) {
 				if ( savePath[ 1 ] == ':' && savePath[ 2 ] == '\\' &&
 					( ( savePath[ 0 ] >= 'A' && savePath[ 0 ] <= 'Z' ) ||
@@ -528,7 +528,7 @@ void arcCommonLocal::CheckStartupStorageRequirements() {
 
 	uint64 requiredSizeBytes = MIN_SAVE_STORAGE_SAVEGAME + MIN_SAVE_STORAGE_PROFILE;
 
-	arcLibrary::Printf( "requiredSizeBytes: %lld\n", requiredSizeBytes );
+	anLibrary::Printf( "requiredSizeBytes: %lld\n", requiredSizeBytes );
 
 	if ( ( int64 )( requiredSizeBytes - availableSpace ) > 0 ) {
 		class idSWFScriptFunction_Continue : public idSWFScriptFunction_RefCounted {
@@ -542,20 +542,20 @@ void arcCommonLocal::CheckStartupStorageRequirements() {
 		};
 
 		arcStaticList< idSWFScriptFunction *, 4 > callbacks;
-		arcStaticList< idStrId, 4 > optionText;
+		arcStaticList< anStringId, 4 > optionText;
 		callbacks.Append( new (TAG_SWF) idSWFScriptFunction_Continue() );
-		optionText.Append( idStrId( "#STR_SWF_ACCEPT" ) );
+		optionText.Append( anStringId( "#STR_SWF_ACCEPT" ) );
 
 		// build custom space required string
 		// #str_dlg_space_required ~= "There is insufficient storage available.  Please free %s and try again."
-		arcNetString format = idStrId( "#str_dlg_startup_insufficient_storage" ).GetLocalizedString();
-		arcNetString size;
+		anString format = anStringId( "#str_dlg_startup_insufficient_storage" ).GetLocalizedString();
+		anString size;
 		if ( requiredSizeBytes > ( 1024 * 1024 ) ) {
 			size = va( "%.1f MB", ( float )requiredSizeBytes / ( 1024.0f * 1024.0f ) + 0.1f );	// +0.1 to avoid truncation
 		} else {
 			size = va( "%.1f KB", ( float )requiredSizeBytes / 1024.0f + 0.1f );
 		}
-		arcNetString msg = va( format.c_str(), size.c_str() );
+		anString msg = va( format.c_str(), size.c_str() );
 
 		common->Dialog().AddDynamicDialog( GDM_INSUFFICENT_STORAGE_SPACE, callbacks, optionText, true, msg );
 	}
@@ -563,16 +563,16 @@ void arcCommonLocal::CheckStartupStorageRequirements() {
 
 /*
 ===============
-arcCommonLocal::FilterLangList
+anCommonLocal::FilterLangList
 ===============
 */
-void arcCommonLocal::FilterLangList( arcStringList* list, arcNetString lang ) {
-	arcNetString temp;
+void anCommonLocal::FilterLangList( anStringList* list, anString lang ) {
+	anString temp;
 	for ( int i = 0; i < list->Num(); i++ ) {
 		temp = ( *list )[i];
 		temp = temp.Right( temp.Length()-strlen( "strings/" ) );
 		temp = temp.Left( lang.Length() );
-		if ( arcNetString::Icmp( temp, lang ) != 0 ) {
+		if ( anString::Icmp( temp, lang ) != 0 ) {
 			list->RemoveIndex( i );
 			i--;
 		}
@@ -581,24 +581,24 @@ void arcCommonLocal::FilterLangList( arcStringList* list, arcNetString lang ) {
 
 /*
 ===============
-arcCommonLocal::InitLanguageDict
+anCommonLocal::InitLanguageDict
 ===============
 */
-extern arcCVarSystem sys_lang;
-void arcCommonLocal::InitLanguageDict() {
-	arcNetString fileName;
+extern anCVarSystem sys_lang;
+void anCommonLocal::InitLanguageDict() {
+	anString fileName;
 
 	//D3XP: Instead of just loading a single lang file for each language
 	//we are going to load all files that begin with the language name
 	//similar to the way pak files work. So you can place english001.lang
 	//to add new strings to the english language dictionary
-	arcFileList*	langFiles;
+	anFileList*	langFiles;
 	langFiles =  fileSystem->ListFilesTree( "strings", ".lang", true );
 
-	arcStringList langList = langFiles->GetList();
+	anStringList langList = langFiles->GetList();
 
 	// Loop through the list and filter
-	arcStringList currentLangList = langList;
+	anStringList currentLangList = langList;
 	FilterLangList( &currentLangList, sys_lang.GetString() );
 
 	if ( currentLangList.Num() == 0 ) {
@@ -611,7 +611,7 @@ void arcCommonLocal::InitLanguageDict() {
 	ARCLocalization::ClearDictionary();
 	for ( int i = 0; i < currentLangList.Num(); i++ ) {
 		//common->Printf( "%s\n", currentLangList[i].c_str() );
-		const byte * buffer = NULL;
+		const byte * buffer = nullptr;
 		int len = fileSystem->ReadFile( currentLangList[i], (void**)&buffer );
 		if ( len <= 0 ) {
 			assert( false && "couldn't read the language dict file" );
@@ -629,7 +629,7 @@ void arcCommonLocal::InitLanguageDict() {
 ReloadLanguage_f
 =================
 */
-CONSOLE_COMMAND( reloadLanguage, "reload language dict", NULL ) {
+CONSOLE_COMMAND( reloadLanguage, "reload language dict", nullptr ) {
 	commonLocal.InitLanguageDict();
 }
 
@@ -640,7 +640,7 @@ CONSOLE_COMMAND( reloadLanguage, "reload language dict", NULL ) {
 Com_StartBuild_f
 =================
 */
-CONSOLE_COMMAND( startBuild, "prepares to make a build", NULL ) {
+CONSOLE_COMMAND( startBuild, "prepares to make a build", nullptr ) {
 	globalImages->StartBuild();
 }
 
@@ -649,19 +649,19 @@ CONSOLE_COMMAND( startBuild, "prepares to make a build", NULL ) {
 Com_FinishBuild_f
 =================
 */
-CONSOLE_COMMAND( finishBuild, "finishes the build process", NULL ) {
+CONSOLE_COMMAND( finishBuild, "finishes the build process", nullptr ) {
 	if ( game ) {
-		game->CacheDictionaryMedia( NULL );
+		game->CacheDictionaryMedia( nullptr );
 	}
 	globalImages->FinishBuild( ( args.Argc() > 1 ) );
 }
 
 /*
 =================
-arcCommonLocal::RenderSplash
+anCommonLocal::RenderSplash
 =================
 */
-void arcCommonLocal::RenderSplash() {
+void anCommonLocal::RenderSplash() {
 	const float sysWidth = renderSystem->GetWidth() * renderSystem->GetPixelAspect();
 	const float sysHeight = renderSystem->GetHeight();
 	const float sysAspect = sysWidth / sysHeight;
@@ -688,20 +688,20 @@ void arcCommonLocal::RenderSplash() {
 
 /*
 =================
-arcCommonLocal::InitSIMD
+anCommonLocal::InitSIMD
 =================
 */
-void arcCommonLocal::InitSIMD() {
+void anCommonLocal::InitSIMD() {
 	arcSIMD::InitProcessor( "SIMD", com_forceGenericSIMD.GetBool() );
 	com_forceGenericSIMD.ClearModified();
 }
 
 /*
 =================
-arcCommonLocal::LoadARCEngineDLL
+anCommonLocal::LoadARCEngineDLL
 =================
 */
-void arcCommonLocal::LoadARCEngineDLL() {
+void anCommonLocal::LoadARCEngineDLL() {
 #ifdef __ARCENGINE_DLL__
 	char			dllPath[ MAX_OSPATH ];
 
@@ -722,11 +722,11 @@ void arcCommonLocal::LoadARCEngineDLL() {
 		return;
 	}
 
-	const char * functionName = "GetEnginesAPI";
+	const char *functionName = "GetEnginesAPI";
 	GetEngineAPI = (GetGameAPI_t) Sys_DLL_GetProcAddress( engineDLL, functionName );
 	if ( !GetEngineAPI ) {
 		Sys_DLL_Unload( engineDLL );
-		engineDLL = NULL;
+		engineDLL = nullptr;
 		common->FatalError( "couldn't find Engine DLL API" );
 		return;
 	}
@@ -742,14 +742,14 @@ void arcCommonLocal::LoadARCEngineDLL() {
 	engineImport.renderModelManager		= ::renderModelManager;
 	engineImport.uiManager				= ::uiManager;
 	engineImport.declManager				= ::declManager;
-	engineImport.AASFileManager			= ::AASFileManager;
+	engineImport.SEASFileManager			= ::SEASFileManager;
 	engineImport.collisionModelManager	= ::collisionModelManager;
 
 	engineExport							= *GetEngineAPI( &engineImport );
 
 	if ( engineExport.version != ARCENGINE_API_VERSION ) {
 		Sys_DLL_Unload( engineDLL );
-		engineDLL = NULL;
+		engineDLL = nullptr;
 		common->FatalError( "wrong Engine DLL API version" );
 		return;
 	}
@@ -759,47 +759,47 @@ void arcCommonLocal::LoadARCEngineDLL() {
 #endif
 
 	// initialize the game object
-	if ( game != NULL ) {
+	if ( game != nullptr ) {
 		game->Init();
 	}
 }
 
 /*
 =================
-arcCommonLocal::UnloadARCEngineDLL
+anCommonLocal::UnloadARCEngineDLL
 =================
 */
-void arcCommonLocal::CleanupShell() {
-	if ( game != NULL ) {
+void anCommonLocal::CleanupShell() {
+	if ( game != nullptr ) {
 		game->Shell_Cleanup();
 	}
 }
 
 /*
 =================
-arcCommonLocal::UnloadARCEngineDLL
+anCommonLocal::UnloadARCEngineDLL
 =================
 */
-void arcCommonLocal::UnloadARCEngineDLL() {
+void anCommonLocal::UnloadARCEngineDLL() {
 	// shut down the game object
-	if ( game != NULL ) {
+	if ( game != nullptr ) {
 		game->Shutdown();
 	}
 
 	if ( engineDLL ) {
 		Sys_DLL_Unload( engineDLL );
-		engineDLL = NULL;
+		engineDLL = nullptr;
 	}
-	game = NULL;
-	engineEdit = NULL;
+	game = nullptr;
+	engineEdit = nullptr;
 }
 
 /*
 =================
-arcCommonLocal::IsInitialized
+anCommonLocal::IsInitialized
 =================
 */
-bool arcCommonLocal::IsInitialized() const {
+bool anCommonLocal::IsInitialized() const {
 	return com_fullyInitialized;
 }
 
@@ -807,27 +807,27 @@ bool arcCommonLocal::IsInitialized() const {
 
 /*
 =================
-arcCommonLocal::Init
+anCommonLocal::Init
 =================
 */
-void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdline ) {
+void anCommonLocal::Init( int argc, const char *const * argv, const char *cmdline ) {
 	try {
-		// set interface pointers used by arcLibrary
-		arcLibrary::sys			= sys;
-		arcLibrary::common		= common;
-		arcLibrary::cvarSystem	= cvarSystem;
-		arcLibrary::fileSystem	= fileSystem;
+		// set interface pointers used by anLibrary
+		anLibrary::sys			= sys;
+		anLibrary::common		= common;
+		anLibrary::cvarSystem	= cvarSystem;
+		anLibrary::fileSystem	= fileSystem;
 
-		// initialize arcLibrary
-		arcLibrary::Init();
+		// initialize anLibrary
+		anLibrary::Init();
 
 		// clear warning buffer
 		ClearWarnings( GAME_NAME " initialization" );
 
-		arcLibrary::Printf( va( "Command line: %s\n", cmdline ) );
-		//::MessageBox( NULL, cmdline, "blah", MB_OK );
+		anLibrary::Printf( va( "Command line: %s\n", cmdline ) );
+		//::MessageBox( nullptr, cmdline, "blah", MB_OK );
 		// parse command line options
-		arcCommandArgs args;
+		anCommandArgs args;
 		if ( cmdline ) {
 			// tokenize if the OS doesn't do it for us
 			args.TokenizeString( cmdline, true );
@@ -842,9 +842,9 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 		cvarSystem->Init();
 
 		// register all static CVars
-		arcCVarSystem::RegisterStaticVars();
+		anCVarSystem::RegisterStaticVars();
 
-		arcLibrary::Printf( "QA Timing INIT: %06dms\n", Sys_Milliseconds() );
+		anLibrary::Printf( "QA Timing INIT: %06dms\n", Sys_Milliseconds() );
 
 		// print engine version
 		Printf( "%s\n", version.string );
@@ -859,7 +859,7 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 		Sys_Init();
 
 		// override cvars from command line
-		StartupVariable( NULL );
+		StartupVariable( nullptr );
 
 		consoleUsed = com_allowConsole.GetBool();
 
@@ -873,7 +873,7 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 		// initialize the file system
 		fileSystem->Init();
 
-		const char * defaultLang = Sys_DefaultLanguage();
+		const char *defaultLang = Sys_DefaultLanguage();
 
 		// Allow the system to set a default lanugage
 		Sys_SetLanguageFromSystem();
@@ -913,7 +913,7 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 		cmdSystem->ExecuteCommandBuffer();
 
 		// re-override anything from the config files with command line args
-		StartupVariable( NULL );
+		StartupVariable( nullptr );
 
 		// if any archived cvars are modified after this, we will trigger a writing of the config file
 		cvarSystem->ClearModifiedFlags( CVAR_ARCHIVE );
@@ -933,9 +933,9 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 
 		whiteMaterial = declManager->FindMaterial( "_white" );
 
-		if ( arcNetString::Icmp( sys_lang.GetString(), ID_LANG_GERMAN ) == 0 ) {
+		if ( anString::Icmp( sys_lang.GetString(), ID_LANG_GERMAN ) == 0 ) {
 			splashScreen = declManager->FindMaterial( "guis/assets/splash/" );
-		} else if ( arcNetString::Icmp( defaultLang, ID_LANG_GERMAN ) == 0 ) {
+		} else if ( anString::Icmp( defaultLang, ID_LANG_GERMAN ) == 0 ) {
 			splashScreen = declManager->FindMaterial( "guis/assets/splash/legal_figs" );
 		} else {
 			// Otherwise show it in english
@@ -949,7 +949,7 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 			RenderSplash();
 			RenderSplash();
 		} else {
-			arcLibrary::Printf( "Skipping Intro Videos!\n" );
+			anLibrary::Printf( "Skipping Intro Videos!\n" );
 			// display the legal splash screen
 			// No clue why we have to render this twice to show up...
 			RenderSplash();
@@ -994,13 +994,13 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 
 		fileSystem->UnloadResourceContainer( "_ordered" );
 
-		// the same ARCRenderWorld will be used for all games
+		// the same anRenderWorld will be used for all games
 		// and demos, insuring that level specific models
 		// will be freed
 		renderWorld = renderSystem->AllocRenderWorld();
 		soundWorld = soundSystem->AllocSoundWorld( renderWorld );
 
-		menuSoundWorld = soundSystem->AllocSoundWorld( NULL );
+		menuSoundWorld = soundSystem->AllocSoundWorld( nullptr );
 		menuSoundWorld->PlaceListener( vec3_origin, mat3_identity, 0 );
 
 		// init the session
@@ -1033,7 +1033,7 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 		CheckStartupStorageRequirements();
 
 		if ( preload_CommonAssets.GetBool() && fileSystem->UsingResourceFiles() ) {
-			aRcPreloadManifest manifest;
+			anPreloadManifest manifest;
 			manifest.LoadManifest( "_common.preload" );
 			globalImages->Preload( manifest, false );
 			soundSystem->Preload( manifest );
@@ -1043,10 +1043,10 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 
 		com_fullyInitialized = true;
 		// No longer need the splash screen
-		if ( splashScreen != NULL ) {
+		if ( splashScreen != nullptr ) {
 			for ( int i = 0; i < splashScreen->GetNumStages(); i++ ) {
-				ARCImage * image = splashScreen->GetStage( i )->texture.image;
-				if ( image != NULL ) {
+				anImage * image = splashScreen->GetStage( i )->texture.image;
+				if ( image != nullptr ) {
 					image->PurgeImage();
 				}
 			}
@@ -1054,7 +1054,7 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 
 		Printf( "--- Common Initialization Complete ---\n" );
 
-		arcLibrary::Printf( "Teck Engine Timing IIS: %06dms\n", Sys_Milliseconds() );
+		anLibrary::Printf( "Teck Engine Timing IIS: %06dms\n", Sys_Milliseconds() );
 	} catch( arcExceptions & ) {
 		Sys_Error( "ERROR: Initialization" );
 	}
@@ -1062,10 +1062,10 @@ void arcCommonLocal::Init( int argc, const char * const * argv, const char *cmdl
 
 /*
 =================
-arcCommonLocal::Shutdown
+anCommonLocal::Shutdown
 =================
 */
-void arcCommonLocal::Shutdown() {
+void anCommonLocal::Shutdown() {
 	if ( com_shuttingDown ) {
 		return;
 	}
@@ -1087,19 +1087,19 @@ void arcCommonLocal::Shutdown() {
 
 	printf( "delete loadGUI;\n" );
 	delete loadGUI;
-	loadGUI = NULL;
+	loadGUI = nullptr;
 
 	printf( "delete renderWorld;\n" );
 	delete renderWorld;
-	renderWorld = NULL;
+	renderWorld = nullptr;
 
 	printf( "delete soundWorld;\n" );
 	delete soundWorld;
-	soundWorld = NULL;
+	soundWorld = nullptr;
 
 	printf( "delete menuSoundWorld;\n" );
 	delete menuSoundWorld;
-	menuSoundWorld = NULL;
+	menuSoundWorld = nullptr;
 
 	// shut down the user interfaces
 	printf( "uiManager->Shutdown();\n" );
@@ -1173,18 +1173,18 @@ void arcCommonLocal::Shutdown() {
 	printf( "errorList.Clear();\n" );
 	errorList.Clear();
 
-	// shutdown arcLibrary
-	printf( "arcLibrary::ShutDown();\n" );
-	arcLibrary::ShutDown();
+	// shutdown anLibrary
+	printf( "anLibrary::ShutDown();\n" );
+	anLibrary::ShutDown();
 }
 
 /*
 ========================
-arcCommonLocal::CreateMainMenu
+anCommonLocal::CreateMainMenu
 ========================
 */
-void arcCommonLocal::CreateMainMenu() {
-	if ( game != NULL ) {
+void anCommonLocal::CreateMainMenu() {
+	if ( game != nullptr ) {
 		// note which media we are going to need to load
 		declManager->BeginLevelLoad();
 		renderSystem->BeginLevelLoad();
@@ -1207,12 +1207,12 @@ void arcCommonLocal::CreateMainMenu() {
 
 /*
 ===============
-arcCommonLocal::Stop
+anCommonLocal::Stop
 
 called on errors and game exits
 ===============
 */
-void arcCommonLocal::Stop( bool resetSession ) {
+void anCommonLocal::Stop( bool resetSession ) {
 	ClearWipe();
 
 	// clear mapSpawned and demo playing flags
@@ -1229,10 +1229,10 @@ void arcCommonLocal::Stop( bool resetSession ) {
 
 /*
 ===============
-arcCommonLocal::BusyWait
+anCommonLocal::BusyWait
 ===============
 */
-void arcCommonLocal::BusyWait() {
+void anCommonLocal::BusyWait() {
 	Sys_GenerateEvents();
 
 	const bool captureToImage = false;
@@ -1242,10 +1242,10 @@ void arcCommonLocal::BusyWait() {
 
 /*
 ========================
-arcCommonLocal::LeaveGame
+anCommonLocal::LeaveGame
 ========================
 */
-void arcCommonLocal::LeaveGame() {
+void anCommonLocal::LeaveGame() {
 	const bool captureToImage = false;
 	UpdateScreen( captureToImage );
 
@@ -1258,10 +1258,10 @@ void arcCommonLocal::LeaveGame() {
 
 /*
 ===============
-arcCommonLocal::ProcessEvent
+anCommonLocal::ProcessEvent
 ===============
 */
-bool arcCommonLocal::ProcessEvent( const sysEvent_t *event ) {
+bool anCommonLocal::ProcessEvent( const sysEvent_t *event ) {
 	// hitting escape anywhere brings up the menu
 	if ( game && game->IsInGame() ) {
 		if ( event->evType == SE_KEY && event->evValue2 == 1 && ( event->evValue == K_ESCAPE || event->evValue == K_JOY9 ) ) {
@@ -1323,37 +1323,37 @@ bool arcCommonLocal::ProcessEvent( const sysEvent_t *event ) {
 
 /*
 ========================
-arcCommonLocal::ResetPlayerInput
+anCommonLocal::ResetPlayerInput
 ========================
 */
-void arcCommonLocal::ResetPlayerInput( int playerIndex ) {
+void anCommonLocal::ResetPlayerInput( int playerIndex ) {
 	userCmdMgr.ResetPlayer( playerIndex );
 }
 
 /*
 ========================
-arcCommonLocal::SwitchToGame
+anCommonLocal::SwitchToGame
 ========================
 */
-void arcCommonLocal::SwitchToGame( currentGame_t newGame ) {
+void anCommonLocal::SwitchToGame( currentGame_t newGame ) {
 	idealCurrentGame = newGame;
 }
 
 /*
 ========================
-arcCommonLocal::PerformGameSwitch
+anCommonLocal::PerformGameSwitch
 ========================
 */
-void arcCommonLocal::PerformGameSwitch() {
+void anCommonLocal::PerformGameswitch () {
 		// Pause sound.
-	if ( menuSoundWorld != NULL ) {
+	if ( menuSoundWorld != nullptr ) {
 			menuSoundWorld->Pause();
 	}
 
 	// The classics use the usercmd manager too, clear it.
 	userCmdMgr.SetDefaults();
 
-	if ( menuSoundWorld != NULL ) {
+	if ( menuSoundWorld != nullptr ) {
 		menuSoundWorld->UnPause();
 	}
 	currentGame = idealCurrentGame;
@@ -1364,14 +1364,14 @@ void arcCommonLocal::PerformGameSwitch() {
 Common_WritePrecache_f
 ==================
 */
-CONSOLE_COMMAND( writePrecache, "writes precache commands", NULL ) {
+CONSOLE_COMMAND( writePrecache, "writes precache commands", nullptr ) {
 	if ( args.Argc() != 2 ) {
 		common->Printf( "USAGE: writePrecache <execFile>\n" );
 		return;
 	}
-	arcNetString	str = args.Argv(1 );
+	anString	str = args.Argv(1 );
 	str.DefaultFileExtension( ".cfg" );
-	arcNetFile *f = fileSystem->OpenFileWrite( str );
+	anFile *f = fileSystem->OpenFileWrite( str );
 	declManager->WritePrecacheCommands( f );
 	renderModelManager->WritePrecacheCommands( f );
 	uiManager->WritePrecacheCommands( f );
@@ -1384,7 +1384,7 @@ CONSOLE_COMMAND( writePrecache, "writes precache commands", NULL ) {
 Common_Disconnect_f
 ================
 */
-CONSOLE_COMMAND_SHIP( disconnect, "disconnects", NULL ) {
+CONSOLE_COMMAND_SHIP( disconnect, "disconnects", nullptr ) {
 }
 
 /*
@@ -1392,7 +1392,7 @@ CONSOLE_COMMAND_SHIP( disconnect, "disconnects", NULL ) {
 Common_Hitch_f
 ===============
 */
-CONSOLE_COMMAND( hitch, "hitches the game", NULL ) {
+CONSOLE_COMMAND( hitch, "hitches the game", nullptr ) {
 	if ( args.Argc() == 2 ) {
 		Sys_Sleep( atoi(args.Argv(1 ) ) );
 	} else {
@@ -1400,18 +1400,18 @@ CONSOLE_COMMAND( hitch, "hitches the game", NULL ) {
 	}
 }
 
-CONSOLE_COMMAND( showStringMemory, "shows memory used by strings", NULL ) {
-	arcNetString::ShowMemoryUsage_f( args );
+CONSOLE_COMMAND( showStringMemory, "shows memory used by strings", nullptr ) {
+	anString::ShowMemoryUsage_f( args );
 }
-CONSOLE_COMMAND( showDictMemory, "shows memory used by dictionaries", NULL ) {
-	arcDictionary::ShowMemoryUsage_f( args );
+CONSOLE_COMMAND( showDictMemory, "shows memory used by dictionaries", nullptr ) {
+	anDict::ShowMemoryUsage_f( args );
 }
-CONSOLE_COMMAND( listDictKeys, "lists all keys used by dictionaries", NULL ) {
-	arcDictionary::ListKeys_f( args );
+CONSOLE_COMMAND( listDictKeys, "lists all keys used by dictionaries", nullptr ) {
+	anDict::ListKeys_f( args );
 }
-CONSOLE_COMMAND( listDictValues, "lists all values used by dictionaries", NULL ) {
-	arcDictionary::ListValues_f( args );
+CONSOLE_COMMAND( listDictValues, "lists all values used by dictionaries", nullptr ) {
+	anDict::ListValues_f( args );
 }
-CONSOLE_COMMAND( testSIMD, "test SIMD code", NULL ) {
+CONSOLE_COMMAND( testSIMD, "test SIMD code", nullptr ) {
 	arcSIMD::Test_f( args );
 }

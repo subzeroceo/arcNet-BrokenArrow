@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "Simd_Generic.h"
@@ -17,7 +17,7 @@
 arcSIMD_MMX::GetName
 ============
 */
-const char * arcSIMD_MMX::GetName( void ) const {
+const char *arcSIMD_MMX::GetName( void ) const {
 	return "MMX";
 }
 
@@ -30,7 +30,7 @@ const char * arcSIMD_MMX::GetName( void ) const {
 arcSIMD_MMX::GetName
 ============
 */
-const char * arcSIMD_MMX::GetName( void ) const {
+const char *arcSIMD_MMX::GetName( void ) const {
 	return "MMX";
 }
 
@@ -111,7 +111,7 @@ MMX_Memcpy2kB
 ================
 */
 void MMX_Memcpy2kB( void *dest, const void *src, const int count ) {
-	byte *tbuf = ( byte * )_alloca16(2048);
+	byte *tbuf = (byte *)_alloca16(2048);
 	__asm {
 		push	ebx
         mov		esi, src
@@ -198,8 +198,8 @@ arcSIMD_MMX::Memcpy
 void VPCALL arcSIMD_MMX::Memcpy( void *dest0, const void *src0, const int count0 ) {
 	// if copying more than 16 bytes and we can copy 8 byte aligned
 	if ( count0 > 16 && !( ( ( int )dest0 ^ ( int )src0 ) & 7 ) ) {
-		byte *dest = ( byte * )dest0;
-		byte *src = ( byte * )src0;
+		byte *dest = (byte *)dest0;
+		byte *src = (byte *)src0;
 
 		// copy up to the first 8 byte aligned boundary
 		int count = ( ( int )dest) & 7;
@@ -257,10 +257,10 @@ void VPCALL arcSIMD_MMX::Memset( void* dest0, const int val, const int count0 ) 
 		dword	dwords[2];
 	} dat;
 
-	byte *dest = ( byte * )dest0;
+	byte *dest = (byte *)dest0;
 	int count = count0;
 
-	while ( count > 0 && (( ( int )dest) & 7) ) {
+	while ( count > 0 && ( ( ( int )dest) & 7) ) {
 		*dest = val;
 		dest++;
 		count--;

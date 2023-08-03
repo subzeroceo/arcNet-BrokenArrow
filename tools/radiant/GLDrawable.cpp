@@ -45,7 +45,7 @@ void idGLDrawable::mouseMove( float x, float y ) {
 			float *px = &x;
 			float *px2 = &pressX;
 
-			if (arcMath::Diff(y, pressY) > arcMath::Diff(x, pressX) ) {
+			if (anMath::Diff(y, pressY) > anMath::Diff(x, pressX) ) {
 				px = &y;
 				px2 = &pressY;
 			}
@@ -111,8 +111,8 @@ void idGLDrawable::draw( int x, int y, int w, int h ) {
 }
 
 idGLDrawableWorld::idGLDrawableWorld() {
-	world = NULL;
-	worldModel = NULL;
+	world = nullptr;
+	worldModel = nullptr;
 	InitWorld();
 }
 
@@ -120,7 +120,7 @@ idGLDrawableWorld::~idGLDrawableWorld() {
 	delete world;
 }
 
-void idGLDrawableWorld::AddTris( surfTriangles_t *tris, const arcMaterial *mat ) {
+void idGLDrawableWorld::AddTris( srfTriangles_t *tris, const anMaterial *mat ) {
 	modelSurface_t	surf;
 	surf.geometry = tris;
 	surf.shader = mat;
@@ -131,23 +131,23 @@ void idGLDrawableWorld::draw( int x, int y, int w, int h ) {
 }
 
 void idGLDrawableWorld::InitWorld() {
-	if (world == NULL) {
+	if (world == nullptr ) {
 		world = renderSystem->AllocRenderWorld();
 	}
-	if (worldModel == NULL) {
+	if (worldModel == nullptr ) {
 		worldModel = renderModelManager->AllocModel();
 	}
-	world->InitFromMap( NULL );
+	world->InitFromMap( nullptr );
 	worldModel->InitEmpty( va( "GLWorldModel_%i", Sys_Milliseconds() ) );
 }
 
-void idGLDrawableWorld::InitLight( const arcVec3& position ) {
+void idGLDrawableWorld::InitLight( const anVec3& position ) {
 	renderLight_t	parms;
-	arcDictionary spawnArgs;
+	anDict spawnArgs;
 	spawnArgs.Set( "classname", "light" );
 	spawnArgs.Set( "name", "light_1" );
 	spawnArgs.SetVector( "origin", position );
-	arcNetString str;
+	anString str;
 	sprintf( str, "%f %f %f", light, light, light );
 	spawnArgs.Set( "_color", str );
 	engineEdit->ParseSpawnArgsToRenderLight( &spawnArgs, &parms );
@@ -160,18 +160,18 @@ void idGLDrawableWorld::mouseMove( float x, float y ) {
 		if (button == MouseButton::Left) {
 			float cury = ( float )(2 * x - rect.z) / rect.z;
 			float curx = ( float )(2 * y - rect.w) / rect.w;
-			arcVec3 to( -curx, -cury, 0.0f );
+			anVec3 to( -curx, -cury, 0.0f );
 			to.ProjectSelfOntoSphere( radius );
 			lastPress.ProjectSelfOntoSphere( radius );
-			arcVec3 axis;
+			anVec3 axis;
 			axis.Cross( to, lastPress );
 			float len = (lastPress - to).Length() / (2.0f * radius);
-			len = arcMath::ClampFloat( -1.0f, 1.0f, len );
+			len = anMath::ClampFloat( -1.0f, 1.0f, len );
 			float phi = 2.0f * asin( len );
 
 			axis.Normalize();
 			axis *= sin( phi / 2.0f );
-			arcQuats rot( axis.z, axis.y, axis.x, cos( phi / 2.0f ) );
+			anQuats rot( axis.z, axis.y, axis.x, cos( phi / 2.0f ) );
 			rot.Normalize();
 
 			rotation *= rot;
@@ -187,7 +187,7 @@ void idGLDrawableWorld::mouseMove( float x, float y ) {
 				float *px = &x;
 				float *px2 = &pressX;
 
-				if (arcMath::Diff(y, pressY) > arcMath::Diff(x, pressX) ) {
+				if (anMath::Diff(y, pressY) > anMath::Diff(x, pressX) ) {
 					px = &y;
 					px2 = &pressY;
 				}
@@ -245,7 +245,7 @@ void idGLDrawableWorld::buttonDown( MouseButton button, float x, float y ) {
 }
 
 void idGLDrawableMaterial::draw( int x, int y, int w, int h ) {
-	const arcMaterial *mat = material;
+	const anMaterial *mat = material;
 	if (mat) {
 		glViewport( x, y, w, h );
 		glScissor( x, y, w, h );
@@ -255,11 +255,11 @@ void idGLDrawableMaterial::draw( int x, int y, int w, int h ) {
 
 		if (worldDirty) {
 			InitWorld();
-			InitLight( arcVec3( 0, 0, 0 ) );
+			InitLight( anVec3( 0, 0, 0 ) );
 
-			ARCImage *img = (mat->GetNumStages() > 0 ) ? mat->GetStage( 0 )->texture.image : mat->GetEditorImage();
+			anImage *img = (mat->GetNumStages() > 0 ) ? mat->GetStage( 0 )->texture.image : mat->GetEditorImage();
 
-			if (img == NULL) {
+			if (img == nullptr ) {
 				common->Warning( "Unable to load image for preview for %s", mat->GetName() );
 				return;
 			}
@@ -270,7 +270,7 @@ void idGLDrawableMaterial::draw( int x, int y, int w, int h ) {
 			width *= scale;
 			height *= scale;
 
-			surfTriangles_t *tris = worldModel->AllocSurfaceTriangles( 4, 6 );
+			srfTriangles_t *tris = worldModel->AllocSurfaceTriangles( 4, 6 );
 			tris->numVerts = 4;
 			tris->numIndexes = 6;
 
@@ -334,7 +334,7 @@ void idGLDrawableMaterial::draw( int x, int y, int w, int h ) {
 		memset( &refdef, 0, sizeof( refdef ) );
 		refdef.vieworg.Set( viewAngle, 0, 0 );
 
-		refdef.viewAxis = arcAngles( 0, 0, 0 ).ToMat3();
+		refdef.viewAxis = anAngles( 0, 0, 0 ).ToMat3();
 		refdef.shaderParms[0] = 1;
 		refdef.shaderParms[1] = 1;
 		refdef.shaderParms[2] = 1;
@@ -343,7 +343,7 @@ void idGLDrawableMaterial::draw( int x, int y, int w, int h ) {
 		refdef.width = SCREEN_WIDTH;
 		refdef.height = SCREEN_HEIGHT;
 		refdef.fov_x = 90;
-		refdef.fov_y = 2 * atan( ( float )h / w ) * arcMath::M_RAD2DEG;
+		refdef.fov_y = 2 * atan( ( float )h / w ) * anMath::M_RAD2DEG;
 
 		refdef.time = eventLoop->Milliseconds();
 
@@ -357,11 +357,11 @@ void idGLDrawableMaterial::draw( int x, int y, int w, int h ) {
 }
 
 void idGLDrawableMaterial::setMedia( const char *name ) {
-	ARCImage *img = NULL;
+	anImage *img = nullptr;
 	if (name && *name) {
 		material = declManager->FindMaterial( name );
 		if (material) {
-			const materialStage_t *stage = ( material->GetNumStages() > 0 ) ? material->GetStage( 0 ) : NULL;
+			const materialStage_t *stage = ( material->GetNumStages() > 0 ) ? material->GetStage( 0 ) : nullptr;
 			if (stage) {
 				img = stage->texture.image;
 			} else {
@@ -369,7 +369,7 @@ void idGLDrawableMaterial::setMedia( const char *name ) {
 			}
 		}
 	} else {
-		material = NULL;
+		material = nullptr;
 	}
 	// set scale to get a good fit
 	if (material && img) {
@@ -428,10 +428,10 @@ void idGLDrawableModel::draw( int x, int y, int w, int h ) {
 
 	if (worldDirty) {
 		//InitWorld();
-		world->InitFromMap( NULL );
-		InitLight( arcVec3( -128, 0, 0 ) );
+		world->InitFromMap( nullptr );
+		InitLight( anVec3( -128, 0, 0 ) );
 
-		arcDictionary spawnArgs;
+		anDict spawnArgs;
 		renderEntity_t worldEntity;
 		memset( &worldEntity, 0, sizeof( worldEntity ) );
 		spawnArgs.Clear();
@@ -461,7 +461,7 @@ void idGLDrawableModel::draw( int x, int y, int w, int h ) {
 	memset( &refdef, 0, sizeof( refdef ) );
 	refdef.vieworg.Set( zOffset, xOffset, -yOffset );
 
-	refdef.viewAxis = arcAngles( 0, 0, 0 ).ToMat3();
+	refdef.viewAxis = anAngles( 0, 0, 0 ).ToMat3();
 	refdef.shaderParms[0] = 1;
 	refdef.shaderParms[1] = 1;
 	refdef.shaderParms[2] = 1;
@@ -470,7 +470,7 @@ void idGLDrawableModel::draw( int x, int y, int w, int h ) {
 	refdef.width = SCREEN_WIDTH;
 	refdef.height = SCREEN_HEIGHT;
 	refdef.fov_x = 90;
-	refdef.fov_y = 2 * atan( ( float )h / w ) * arcMath::M_RAD2DEG;
+	refdef.fov_y = 2 * atan( ( float )h / w ) * anMath::M_RAD2DEG;
 
 	refdef.time = eventLoop->Milliseconds();
 

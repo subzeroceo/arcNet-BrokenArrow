@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/common_resource.h"
@@ -20,12 +20,12 @@ CDlgCamera g_dlgCamera;
 
 
 void showCameraInspector() {
-	if (g_dlgCamera.GetSafeHwnd() == NULL) {
+	if (g_dlgCamera.GetSafeHwnd() == nullptr ) {
 		g_dlgCamera.Create(IDD_DLG_CAMERA);
 		CRect rct;
 		LONG lSize = sizeof(rct);
 		if (LoadRegistryInfo( "Radiant::CameraInspector", &rct, &lSize) ) {
-			g_dlgCamera.SetWindowPos(NULL, rct.left, rct.top, 0,0, SWP_NOSIZE | SWP_SHOWWINDOW);
+			g_dlgCamera.SetWindowPos(nullptr, rct.left, rct.top, 0,0, SWP_NOSIZE | SWP_SHOWWINDOW);
 		}
 		Sys_UpdateWindows(W_ALL);
 	}
@@ -36,7 +36,7 @@ void showCameraInspector() {
 // CDlgCamera dialog
 
 
-CDlgCamera::CDlgCamera(CWnd* pParent /*=NULL*/)
+CDlgCamera::CDlgCamera(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgCamera::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgCamera)
@@ -163,7 +163,7 @@ void CDlgCamera::OnDblclkListEvents() {
 void CDlgCamera::setupFromCamera() {
 	if (m_wndSplines.GetSafeHwnd() ) {
 		int i;
-		arcNetString str;
+		anString str;
 		m_strName = g_splineList->getName();
 		m_strType = g_splineList->getPositionObj()->typeStr();
 		m_wndSplines.ResetContent();
@@ -266,7 +266,7 @@ void CDlgCamera::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) {
 		p *= g_splineList->getTotalTime() * 1000;
 		g_splineList->startCamera(0 );
 		g_splineList->buildCamera();
-		arcVec3 dir;
+		anVec3 dir;
 		float fov;
 		g_splineList->getCameraInfo(p, g_pParentWnd->GetCamera()->Camera().origin, dir, &fov);
 		g_pParentWnd->GetCamera()->Camera().angles[1] = atan2 (dir[1], dir[0] )*180/3.14159;

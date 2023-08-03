@@ -1,3 +1,4 @@
+#include "../Lib.h"
 #ifndef __MATH_VECTOR_H__
 #define __MATH_VECTOR_H__
 
@@ -9,158 +10,171 @@
 ===============================================================================
 */
 
-#include "Math.h"
+#include "Angles.h"
+#include "./Math.h"
+#include <cstdlib>
 #define VECTOR_EPSILON		0.001f
 
-class arcAngles;
-class idPolar3;
-class arcMat3;
+class anAngles;
+class anPolar3;
+class anMat3;
 
 //===============================================================
 //
-//	arcVec2 - 2D vector
+//	anVec2 - 2D vector
 //
 //===============================================================
+#define vec2_zero vec2_origin
 
-class arcVec2 {
+class anVec2 {
 public:
+	//anVec2 			vec2_origin;
 	float			x;
 	float			y;
 
-					arcVec2( void );
-					explicit arcVec2( const float x, const float y );
+					anVec2( void );
+					explicit anVec2( const float x, const float y );
 
 	void 			Set( const float x, const float y );
 	void			Zero( void );
+	bool			IsZero( void ) const;
 
 	float			operator[]( int index ) const;
 	float &			operator[]( int index );
-	arcVec2		operator-() const;
-	float			operator*( const arcVec2 &a ) const;
-	arcVec2		oerator*( const float a ) const;
-	arcVec2		operator/( const float a ) const;
-	arcVec2		operator+( const arcVec2 &a ) const;
-	arcVec2		operator-( const arcVec2 &a ) const;
-	arcVec2 &		operator+=( const arcVec2 &a );
-	arcVec2 &		operator-=( const arcVec2 &a );
-	arcVec2 &		operator/=( const arcVec2 &a );
-	arcVec2 &		operator/=( const float a );
-	arcVec2 &		operator*=( const float a );
+	anVec2			operator-() const;
+	float			operator*( const anVec2 &a ) const;
+	anVec2			operator*( const float a ) const;
+	anVec2			operator/( const float a ) const;
+	anVec2			operator+( const anVec2 &a ) const;
+	anVec2			operator-( const anVec2 &a ) const;
+	anVec2 &		operator+=( const anVec2 &a );
+	anVec2 &		operator-=( const anVec2 &a );
+	anVec2 &		operator/=( const anVec2 &a );
+	anVec2 &		operator/=( const float a );
+	anVec2 &		operator*=( const float a );
 
-	friend arcVec2	operator*( const float a, const arcVec2 b );
+	friend anVec2	operator*( const float a, const anVec2 b );
 
-	bool			Compare( const arcVec2 &a ) const;							// exact compare, no epsilon
-	bool			Compare( const arcVec2 &a, const float epsilon ) const;		// compare with epsilon
-	bool			operator==(	const arcVec2 &a ) const;						// exact compare, no epsilon
-	bool			operator!=(	const arcVec2 &a ) const;						// exact compare, no epsilon
+	bool			Compare( const anVec2 &a ) const;							// exact compare, no epsilon
+	bool			Compare( const anVec2 &a, const float epsilon ) const;		// compare with epsilon
+	bool			operator==(	const anVec2 &a ) const;						// exact compare, no epsilon
+	bool			operator!=(	const anVec2 &a ) const;						// exact compare, no epsilon
 
 	float			Length( void ) const;
 	float			LengthFast( void ) const;
 	float			LengthSqr( void ) const;
 	float			Normalize( void );			// returns length
 	float			NormalizeFast( void );		// returns length
-	arcVec2 &		Truncate( float length );	// cap length
-	void			Clamp( const arcVec2 &min, const arcVec2 &max );
+	anVec2 &		Truncate( float length );	// cap length
+	void			Clamp( const anVec2 &min, const anVec2 &max );
 	void			Snap( void );				// snap to closest integer value
 	void			SnapInt( void );			// snap towards integer (floor)
+    static void		Barycentric( const anVec2 &v1, const anVec2 &v2, const anVec2 &v3, float f, float g, anVec2 &result );
+    static anVec2	Barycentric( const anVec2 &v1, const anVec2 &v2, const anVec2 &v3, float f, float g );
 
 	int				GetDimension( void ) const;
-
+	void 			Copy( vec3_origin *in, vec3_origin *out );
 	const float *	ToFloatPtr( void ) const;
 	float *			ToFloatPtr( void );
 	const char *	ToString( int precision = 2 ) const;
 
-	void			Lerp( const arcVec2 &v1, const arcVec2 &v2, const float l );
+	void			Lerp( const anVec2 &v1, const anVec2 &v2, const float l );
+	void			EnsureIncremental( void );
 };
+extern anVec2 vec2_origin;
+// t = (t > 1.0f) ? 1.0f : ((t < 0.0f) ? 0.0f : t);  // Clamp value to 0 to 1
+//    t = t*t*(3.f - 2.f*t);
 
-extern arcVec2 vec2_origin;
-#define vec2_zero vec2_origin
 
-ARC_INLINE arcVec2::arcVec2( void ) {
+ARC_INLINE anVec2::anVec2( void ) {
 }
 
-ARC_INLINE arcVec2::arcVec2( const float x, const float y ) {
+ARC_INLINE anVec2::anVec2( const float x, const float y ) {
 	this->x = x;
 	this->y = y;
 }
 
-ARC_INLINE void arcVec2::Set( const float x, const float y ) {
+ARC_INLINE void anVec2::Set( const float x, const float y ) {
 	this->x = x;
 	this->y = y;
 }
 
-ARC_INLINE void arcVec2::Zero( void ) {
+ARC_INLINE void anVec2::Zero( void ) {
 	x = y = 0.0f;
 }
 
-ARC_INLINE bool arcVec2::Compare( const arcVec2 &a ) const {
+ARC_INLINE bool anVec2::IsZero( void ) const {
+   return ( ( ( *(const unsigned int *)&( x ) ) | ( *(const unsigned int *)&( y ) ) ) & ~( 1<<31 ) ) == 0;
+}
+
+ARC_INLINE bool anVec2::Compare( const anVec2 &a ) const {
 	return ( ( x == a.x ) && ( y == a.y ) );
 }
 
-ARC_INLINE bool arcVec2::Compare( const arcVec2 &a, const float epsilon ) const {
-	if ( arcMath::Fabs( x - a.x ) > epsilon ) {
+ARC_INLINE bool anVec2::Compare( const anVec2 &a, const float epsilon ) const {
+	if ( anMath::Fabs( x - a.x ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( y - a.y ) > epsilon ) {
+	if ( anMath::Fabs( y - a.y ) > epsilon ) {
 		return false;
 	}
 
 	return true;
 }
 
-ARC_INLINE bool arcVec2::operator==( const arcVec2 &a ) const {
+ARC_INLINE bool anVec2::operator==( const anVec2 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool arcVec2::operator!=( const arcVec2 &a ) const {
+ARC_INLINE bool anVec2::operator!=( const anVec2 &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE float arcVec2::operator[]( int index ) const {
+ARC_INLINE float anVec2::operator[]( int index ) const {
 	return ( &x )[index];
 }
 
-ARC_INLINE float& arcVec2::operator[]( int index ) {
+ARC_INLINE float& anVec2::operator[]( int index ) {
 	return ( &x )[index];
 }
 
-ARC_INLINE float arcVec2::Length( void ) const {
-	return ( float )arcMath::Sqrt( x * x + y * y );
+ARC_INLINE float anVec2::Length( void ) const {
+	return ( float )anMath::Sqrt( x * x + y * y );
 }
 
-ARC_INLINE float arcVec2::LengthFast( void ) const {
+ARC_INLINE float anVec2::LengthFast( void ) const {
 	float sqrLength;
 
 	sqrLength = x * x + y * y;
-	return sqrLength * arcMath::RSqrt( sqrLength );
+	return sqrLength * anMath::RSqrt( sqrLength );
 }
 
-ARC_INLINE float arcVec2::LengthSqr( void ) const {
+ARC_INLINE float anVec2::LengthSqr( void ) const {
 	return ( x * x + y * y );
 }
 
-ARC_INLINE float arcVec2::Normalize( void ) {
+ARC_INLINE float anVec2::Normalize( void ) {
 	float sqrLength, invLength;
 
 	sqrLength = x * x + y * y;
-	invLength = arcMath::InvSqrt( sqrLength );
+	invLength = anMath::InvSqrt( sqrLength );
 	x *= invLength;
 	y *= invLength;
 	return invLength * sqrLength;
 }
 
-ARC_INLINE float arcVec2::NormalizeFast( void ) {
+ARC_INLINE float anVec2::NormalizeFast( void ) {
 	float lengthSqr, invLength;
 
 	lengthSqr = x * x + y * y;
-	invLength = arcMath::RSqrt( lengthSqr );
+	invLength = anMath::RSqrt( lengthSqr );
 	x *= invLength;
 	y *= invLength;
 	return invLength * lengthSqr;
 }
 
-ARC_INLINE arcVec2 &arcVec2::Truncate( float length ) {
+ARC_INLINE anVec2 &anVec2::Truncate( float length ) {
 	float length2;
 	float ilength;
 
@@ -169,7 +183,7 @@ ARC_INLINE arcVec2 &arcVec2::Truncate( float length ) {
 	} else {
 		length2 = LengthSqr();
 		if ( length2 > length * length ) {
-			ilength = length * arcMath::InvSqrt( length2 );
+			ilength = length * anMath::InvSqrt( length2 );
 			x *= ilength;
 			y *= ilength;
 		}
@@ -178,7 +192,7 @@ ARC_INLINE arcVec2 &arcVec2::Truncate( float length ) {
 	return *this;
 }
 
-ARC_INLINE void arcVec2::Clamp( const arcVec2 &min, const arcVec2 &max ) {
+ARC_INLINE void anVec2::Clamp( const anVec2 &min, const anVec2 &max ) {
 	if ( x < min.x ) {
 		x = min.x;
 	} else if ( x > max.x ) {
@@ -191,60 +205,60 @@ ARC_INLINE void arcVec2::Clamp( const arcVec2 &min, const arcVec2 &max ) {
 	}
 }
 
-ARC_INLINE void arcVec2::Snap( void ) {
+ARC_INLINE void anVec2::Snap( void ) {
 	x = floor( x + 0.5f );
 	y = floor( y + 0.5f );
 }
 
-ARC_INLINE void arcVec2::SnapInt( void ) {
+ARC_INLINE void anVec2::SnapInt( void ) {
 	x = float( int( x ) );
 	y = float( int( y ) );
 }
 
-ARC_INLINE arcVec2 arcVec2::operator-() const {
-	return arcVec2( -x, -y );
+ARC_INLINE anVec2 anVec2::operator-() const {
+	return anVec2( -x, -y );
 }
 
-ARC_INLINE arcVec2 arcVec2::operator-( const arcVec2 &a ) const {
-	return arcVec2( x - a.x, y - a.y );
+ARC_INLINE anVec2 anVec2::operator-( const anVec2 &a ) const {
+	return anVec2( x - a.x, y - a.y );
 }
 
-ARC_INLINE float arcVec2::operator*( const arcVec2 &a ) const {
+ARC_INLINE float anVec2::operator*( const anVec2 &a ) const {
 	return x * a.x + y * a.y;
 }
 
-ARC_INLINE arcVec2 arcVec2::operator*( const float a ) const {
-	return arcVec2( x * a, y * a );
+ARC_INLINE anVec2 anVec2::operator*( const float a ) const {
+	return anVec2( x * a, y * a );
 }
 
-ARC_INLINE arcVec2 arcVec2::operator/( const float a ) const {
+ARC_INLINE anVec2 anVec2::operator/( const float a ) const {
 	float inva = 1.0f / a;
-	return arcVec2( x * inva, y * inva );
+	return anVec2( x * inva, y * inva );
 }
 
-ARC_INLINE arcVec2 operator*( const float a, const arcVec2 b ) {
-	return arcVec2( b.x * a, b.y * a );
+ARC_INLINE anVec2 operator*( const float a, const anVec2 b ) {
+	return anVec2( b.x * a, b.y * a );
 }
 
-ARC_INLINE arcVec2 arcVec2::operator+( const arcVec2 &a ) const {
-	return arcVec2( x + a.x, y + a.y );
+ARC_INLINE anVec2 anVec2::operator+( const anVec2 &a ) const {
+	return anVec2( x + a.x, y + a.y );
 }
 
-ARC_INLINE arcVec2 &arcVec2::operator+=( const arcVec2 &a ) {
+ARC_INLINE anVec2 &anVec2::operator+=( const anVec2 &a ) {
 	x += a.x;
 	y += a.y;
 
 	return *this;
 }
 
-ARC_INLINE arcVec2 &arcVec2::operator/=( const arcVec2 &a ) {
+ARC_INLINE anVec2 &anVec2::operator/=( const anVec2 &a ) {
 	x /= a.x;
 	y /= a.y;
 
 	return *this;
 }
 
-ARC_INLINE arcVec2 &arcVec2::operator/=( const float a ) {
+ARC_INLINE anVec2 &anVec2::operator/=( const float a ) {
 	float inva = 1.0f / a;
 	x *= inva;
 	y *= inva;
@@ -252,141 +266,171 @@ ARC_INLINE arcVec2 &arcVec2::operator/=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE arcVec2 &arcVec2::operator-=( const arcVec2 &a ) {
+ARC_INLINE anVec2 &anVec2::operator-=( const anVec2 &a ) {
 	x -= a.x;
 	y -= a.y;
 
 	return *this;
 }
 
-ARC_INLINE arcVec2 &arcVec2::operator*=( const float a ) {
+ARC_INLINE anVec2 &anVec2::operator*=( const float a ) {
 	x *= a;
 	y *= a;
 
 	return *this;
 }
 
-ARC_INLINE int arcVec2::GetDimension( void ) const {
+ARC_INLINE int anVec2::GetDimension( void ) const {
 	return 2;
 }
 
-ARC_INLINE const float *arcVec2::ToFloatPtr( void ) const {
+ARC_INLINE const float *anVec2::ToFloatPtr( void ) const {
 	return &x;
 }
 
-ARC_INLINE float *arcVec2::ToFloatPtr( void ) {
+ARC_INLINE float *anVec2::ToFloatPtr( void ) {
 	return &x;
+}
+
+ARC_INLINE void anVec2::EnsureIncremental( void ) {
+	if ( x < y ) {
+		return;
+	}
+	float temp = x;
+	x = y;
+	y = temp;
 }
 
 //===============================================================
 //
-//	arcVec3 - 3D vector
+//	anVec3 - 3D vector
 //
 //===============================================================
-#define idVec3 arcVec3
+#define anVec3 anVec3
 
-class arcVec3 {
+class anVec3 {
 public:
 	float			x;
 	float			y;
 	float			z;
 
-					arcVec3( void );
-					explicit arcVec3( const float x, const float y, const float z );
+					anVec3( void );
+					explicit anVec3( const float x, const float y, const float z );
 
 	void 			Set( const float x, const float y, const float z );
 	void			Zero( void );
+	bool			IsZero( void ) const;
 
 	float			operator[]( const int index ) const;
 	float &			operator[]( const int index );
-	arcVec3			operator-() const;
-	arcVec3 &		operator=( const arcVec3 &a );		// required because of a msvc 6 & 7 bug
-	float			operator*( const arcVec3 &a ) const;
-	arcVec3			operator*( const float a ) const;
-	arcVec3			operator/( const float a ) const;
-	arcVec3			operator+( const arcVec3 &a ) const;
-	arcVec3			operator-( const arcVec3 &a ) const;
-	arcVec3 &		operator+=( const arcVec3 &a );
-	arcVec3 &		operator-=( const arcVec3 &a );
-	arcVec3 &		operator/=( const arcVec3 &a );
-	arcVec3 &		operator/=( const float a );
-	arcVec3 &		operator*=( const float a );
+	anVec3			operator-() const;
+	anVec3 &		operator=( const anVec3 &a );		// required because of a msvc 6 & 7 bug
+	anVec3 &		operator=( const anVec2 &a );
+	anVec3 &		operator*=( const anVec3 &a );
+	float			operator*( const anVec3 &a ) const;
+	anVec3			operator*( const float a ) const;
+	anVec3			operator/( const float a ) const;
+	anVec3			operator+( const anVec3 &a ) const;
+	anVec3			operator-( const anVec3 &a ) const;
+	anVec3 &		operator+=( const anVec3 &a );
+	anVec3 &		operator-=( const anVec3 &a );
+	anVec3 &		operator/=( const anVec3 &a );
+	anVec3 &		operator/=( const float a );
+	anVec3 &		operator*=( const float a );
 
-	friend arcVec3	operator*( const float a, const arcVec3 b );
+	friend anVec3	operator*( const float a, const anVec3 b );
 
-	bool			Compare( const arcVec3 &a ) const;							// exact compare, no epsilon
-	bool			Compare( const arcVec3 &a, const float epsilon ) const;		// compare with epsilon
-	bool			operator==(	const arcVec3 &a ) const;						// exact compare, no epsilon
-	bool			operator!=(	const arcVec3 &a ) const;						// exact compare, no epsilon
+	bool			Compare( const anVec3 &a ) const;							// exact compare, no epsilon
+	bool			Compare( const anVec3 &a, const float epsilon ) const;		// compare with epsilon
+	bool			operator==(	const anVec3 &a ) const;						// exact compare, no epsilon
+	bool			operator!=(	const anVec3 &a ) const;						// exact compare, no epsilon
+
+	void			Get( void );
 
 	bool			FixDegenerateNormal( void );	// fix degenerate axial cases
 	bool			FixDenormals( void );			// change tiny numbers to zero
+	bool			FixDenormals( float epsilon = idMath::FLT_EPSILON );		// change tiny numbers to zero
 
-	arcVec3			Cross( const arcVec3 &a ) const;
-	arcVec3 &		Cross( const arcVec3 &a, const arcVec3 &b );
-	arcVec3			Dot( const arcVec3 v1, const arcVec3 v2 );
+	bool			InBounds( const anVec3 &bounds ) const;
+
+	anVec3			Cross( const anVec3 &a ) const;
+	anVec3 &		Cross( const anVec3 &a, const anVec3 &b );
+	float 			Dot( const anVec3 &v1, const anVec3 &v2 ) const;
+	anVec3			Dot( const anVec3 v1, const anVec3 v2 );
 	float			Length( void ) const;
 	float			LengthSqr( void ) const;
 	float			LengthFast( void ) const;
 	float			Normalize( void );				// returns length
 	float			NormalizeFast( void );			// returns length
-	arcVec3 		VectorNormalize( arcVec3 v );
-	arcVec3 &		Truncate( float length );		// cap length
-	void			Clamp( const arcVec3 &min, const arcVec3 &max );
+	anVec3 			NormalizeVector( anVec3 v );
+	anVec3 &		Truncate( float length );		// cap length
+	void			Clamp( const anVec3 &min, const anVec3 &max );
 	void			Snap( void );					// snap to closest integer value
 	void			SnapInt( void );				// snap towards integer (floor)
 
 	int				GetDimension( void ) const;
 
-	void			Rotate( arcVec3 in, arcMat3 matrix[3], arcVec3 out );
+	anAngles		ToRadians( void ) const;
+	void			Rotate( anVec3 in, anMat3 matrix[3], anVec3 out );
 	float			ToYaw( void ) const;
 	float			ToPitch( void ) const;
-	arcAngles		ToAngles( void ) const;
-	idPolar3		ToPolar( void ) const;
-	arcMat3			ToMat3( void ) const;		// vector should be normalized
-	const arcVec2 &	ToVec2( void ) const;
-	arcVec2 &		ToVec2( void );
+	anAngles		ToAngles( void ) const;
+	anPolar3		ToPolar( void ) const;
+	anMat3			ToMat3( void ) const;		// vector should be normalized
+	anMat3 &		ToMat3( anMat3 &mat ) const;
+	anMat4			ToMat4( void ) const;
+	const anVec2 &	ToVec2( void ) const;
+	anVec2 &		ToVec2( void );
+	anVec4 &		ToVec4( void );
 	const float *	ToFloatPtr( void ) const;
 	float *			ToFloatPtr( void );
 	const char *	ToString( int precision = 2 ) const;
 
-	void			NormalVectors( arcVec3 &left, arcVec3 &down ) const;	// vector should be normalized
-	void			OrthogonalBasis( arcVec3 &left, arcVec3 &up ) const;
+	void			SmoothStep( const anVec3 &v1, const anVec3 &v2, const anVec3 &v1, const anVec3 &v2, float t ) const;
+	void			CatmullRom( const anVec3 &v1, const anVec3 &v2, const anVec3 &v1, const anVec3 &v2, float t ) const;
+	anVec3			Barycentric( const anVec3 &v1, const anVec3 &v2, const anVec3 &v3, float f, float g );
 
-	void			ProjectOntoPlane( const arcVec3 &normal, const float overBounce = 1.0f );
-	bool			ProjectAlongPlane( const arcVec3 &normal, const float epsilon, const float overBounce = 1.0f );
+	void			NormalVectors( anVec3 &left, anVec3 &down ) const;	// vector should be normalized
+
+	void			OrthogonalBasis( anVec3 &left, anVec3 &up ) const;
+
+	void			ProjectOntoPlane( const anVec3 &normal, const float overBounce = 1.0f );
+	bool			ProjectAlongPlane( const anVec3 &normal, const float epsilon, const float overBounce = 1.0f );
 	void			ProjectSelfOntoSphere( const float radius );
 
-	void			Lerp( const arcVec3 &v1, const arcVec3 &v2, const float l );
-	void			SLerp( const arcVec3 &v1, const arcVec3 &v2, const float l );
+	void			Lerp( const anVec3 &v1, const anVec3 &v2, const float l );
+	void			SLerp( const anVec3 &v1, const anVec3 &v2, const float l );
 	float			LerpAngle( const float from, const float to, const float frac );
-	void			Inverse( const arcVec3 v );
-	void 			MA( const arcVec3 a, float scale, const arcVec3 b, arcVec3 c );
-	void			Subtract( const arcVec3 a, const arcVec3 b, arcVec3 out );
-	void			Add( const arcVec3 a, const arcVec3 b, arcVec3 out );
-	void			Copy( const arcVec3 in, arcVec3 out );
-	void			Scale( const arcVec3 in, const arcVec3 scale, arcVec3 out );
+	void			Inverse( const anVec3 v );
+	void 			MultiplyAdd( const anVec3 a, float scale, const anVec3 b, anVec3 c );
+	void			Subtract( const anVec3 a, const anVec3 b, anVec3 out );
+	void			Add( const anVec3 a, const anVec3 b, anVec3 out );
+	void			Copy( const anVec3 in, anVec3 out );
+	void			Scale( const anVec3 in, const anVec3 scale, anVec3 out );
 
-	//bool  			ProjectAlongPlane( const arcVec3 &normal, const float epsilon, const float overBounce ) const;
-	//void			ProjectOntoPlane( const arcVec3 &normal, const float overBounce );
+	anVec2			Octahedron( void );
 
-	arcVec2			Octahedron( void );
-
-	arcVec3			OctahedronDecode( const arcVec2 &oct );
-	arcVec3			Octahedron_Tangent( const float sign ) const;
-
-
-	arcVec3			Octahedron_TangentDecode( const arcVec2 &oct, float *sign );
+	anVec3			OctahedronDecode( const anVec2 &oct );
+	anVec3			Octahedron_Tangent( const float sign ) const;
+	void			EnsureIncremental( void );
+	int				GetLargestAxis( void ) const;
+	anVec3			Octahedron_TangentDecode( const anVec2 &oct, float *sign );
 
  	bool			IsFinite() const;
+	float			Dist( const anVec3 &Pt ) const {anVec3 delta( x, y, z );delta = delta - Pt;return delta.LengthFast();}
+	anVec3			ToMaya( void ) const;
+	anVec3 &		ToMayaSelf( void );
+	anVec3			FromMaya( void ) const;
+	anVec3 &		FromMayaSelf( void );
+
+	static float	BiTangentSign( const anVec3 &normal, const anVec3 &tang0, const anVec3 &tang1 );
 };
 
-#define arcVec3_x Vector( -1, -1, -1 )
-#define arcVec3_y Vector( -2, -1, -1 )
-#define arcVec3_z Vector( -3, -1, -1 )
+#define anVec3_x Vector( -1, -1, -1 )
+#define anVec3_y Vector( -2, -1, -1 )
+#define anVec3_z Vector( -3, -1, -1 )
 
 #define VectorSet( v, x, y, z ) ( v.x = ( x ), v.y = ( y ), v.z = ( z ) )
-#define VectorSet( v, x, y, z ) ( v.x = ( ( x ) < ( y )? x : y ), v.y = ( ( y ) < ( z )? y : z ), v.z = ( ( z ) < ( x )? z : x ) )
 #define VectorZero( v ) ( v.x = v.y = v.z = 0.0f )
 
 #define Vector4Set( v, x, y, z, w ) ( v.x = ( x ), v.y = ( y ), v.z = ( z ), v.w = ( w ) )
@@ -400,130 +444,152 @@ public:
 #define Vector4DDivide( v1, v2, v3 ) ( v1.x /= v2.x, v1.y /= v2.y, v1.z /= v2.z, v1.w /= v2.w )
 #define Vector4DIsZero( v ) ( ( v ).x > -0.0001f && ( v ).x < 0.0001f && ( v ).y > -0.0001f && ( v ).y < 0.0001f && ( v ).z > -0.0001f && ( v ).z < 0.0001f && ( v ).w > -0.0001f && ( v ).w < 0.0001f )
 
-extern arcVec3 vec3_origin;
+extern anVec3 vec3_origin;
 #define vec3_zero vec3_origin
 
-ARC_INLINE arcVec3::arcVec3( void ) {
+ARC_INLINE anVec3::anVec3( void ) {
 }
 
-ARC_INLINE arcVec3::arcVec3( const float x, const float y, const float z ) {
+ARC_INLINE anVec3::anVec3( const float x, const float y, const float z ) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 }
 
-ARC_INLINE float arcVec3::operator[]( const int index ) const {
+ARC_INLINE float anVec3::operator[]( const int index ) const {
+	assert( index >= 0 && index < 3 );
 	return ( &x )[index];
 }
 
-ARC_INLINE float &arcVec3::operator[]( const int index ) {
+ARC_INLINE float &anVec3::operator[]( const int index ) {
+	assert( index >= 0 && index < 3 );
 	return ( &x )[index];
 }
 
-ARC_INLINE void arcVec3::Set( const float x, const float y, const float z ) {
+ARC_INLINE void anVec3::Get( void ) {
+	anVec3();
+}
+
+ARC_INLINE void anVec3::Set( const float x, const float y, const float z ) {
 	this->x = x; this->y = y; this->z = z;
 }
 
-ARC_INLINE void arcVec3::Zero( void ) {
+ARC_INLINE void anVec3::Zero( void ) {
 	x = y = z = 0.0f;
 }
 
-ARC_INLINE arcVec3 arcVec3::operator-() const {
-	return arcVec3( -x, -y, -z );
+ARC_INLINE bool anVec3::IsZero( void ) const {
+   return ( ( (*(const unsigned int *)&( x ) ) | ( *(const unsigned int *)&( y ) ) | ( *(const unsigned int *)&( z )  ) ) & ~( 1<<31 ) ) == 0;
 }
 
-ARC_INLINE arcVec3 &arcVec3::operator=( const arcVec3 &a ) {
+ARC_INLINE anVec3 anVec3::operator-() const {
+	return anVec3( -x, -y, -z );
+}
+
+ARC_INLINE anVec3 &anVec3::operator=( const anVec3 &a ) {
 	x = a.x; y = a.y; z = a.z;
 	return *this;
 }
 
-ARC_INLINE arcVec3 arcVec3::operator-( const arcVec3 &a ) const {
-	return arcVec3( x - a.x, y - a.y, z - a.z );
+ARC_INLINE anVec3 &anVec3::operator=( const anVec2 &a ) {
+	x = a.x; y = a.y;
+	return *this;
 }
 
-ARC_INLINE float arcVec3::operator*( const arcVec3 &a ) const {
+ARC_INLINE anVec3 &anVec3::operator*=( const anVec3 &a ) {
+	x *= a.x;
+	y *= a.y;
+	z *= a.z;
+	return *this;
+}
+
+ARC_INLINE anVec3 anVec3::operator-( const anVec3 &a ) const {
+	return anVec3( x - a.x, y - a.y, z - a.z );
+}
+
+ARC_INLINE float anVec3::operator*( const anVec3 &a ) const {
 	return x * a.x + y * a.y + z * a.z;
 }
 
-ARC_INLINE arcVec3 arcVec3::operator*( const float a ) const {
-	return arcVec3( x * a, y * a, z * a );
+ARC_INLINE anVec3 anVec3::operator*( const float a ) const {
+	return anVec3( x * a, y * a, z * a );
 }
 
-ARC_INLINE arcVec3 arcVec3::operator/( const float a ) const {
+ARC_INLINE anVec3 anVec3::operator/( const float a ) const {
 	float inva = 1.0f / a;
-	return arcVec3( x * inva, y * inva, z * inva );
+	return anVec3( x * inva, y * inva, z * inva );
 }
 
-ARC_INLINE arcVec3 operator*( const float a, const arcVec3 b ) {
-	return arcVec3( b.x * a, b.y * a, b.z * a );
+ARC_INLINE anVec3 operator*( const float a, const anVec3 b ) {
+	return anVec3( b.x * a, b.y * a, b.z * a );
 }
 
-ARC_INLINE arcVec3 arcVec3::operator+( const arcVec3 &a ) const {
-	return arcVec3( x + a.x, y + a.y, z + a.z );
+ARC_INLINE anVec3 anVec3::operator+( const anVec3 &a ) const {
+	return anVec3( x + a.x, y + a.y, z + a.z );
 }
 
-ARC_INLINE arcVec3 &arcVec3::operator+=( const arcVec3 &a ) {
+ARC_INLINE anVec3 &anVec3::operator+=( const anVec3 &a ) {
 	x += a.x; y += a.y; z += a.z;
 	return *this;
 }
 
-ARC_INLINE arcVec3 &arcVec3::operator/=( const arcVec3 &a ) {
+ARC_INLINE anVec3 &anVec3::operator/=( const anVec3 &a ) {
 	x /= a.x; y /= a.y; z /= a.z;
 	return *this;
 }
 
-ARC_INLINE arcVec3 &arcVec3::operator/=( const float a ) {
+ARC_INLINE anVec3 &anVec3::operator/=( const float a ) {
 	float inva = 1.0f / a;
 	x *= inva; y *= inva; z *= inva;
 	return *this;
 }
 
-ARC_INLINE arcVec3 &arcVec3::operator-=( const arcVec3 &a ) {
+ARC_INLINE anVec3 &anVec3::operator-=( const anVec3 &a ) {
 	x -= a.x; y -= a.y; z -= a.z;
 	return *this;
 }
 
-ARC_INLINE arcVec3 &arcVec3::operator*=( const float a ) {
+ARC_INLINE anVec3 &anVec3::operator*=( const float a ) {
 	x *= a; y *= a; z *= a;
 	return *this;
 }
 
-ARC_INLINE bool arcVec3::Compare( const arcVec3 &a ) const {
+ARC_INLINE bool anVec3::Compare( const anVec3 &a ) const {
 	return ( ( x == a.x ) && ( y == a.y ) && ( z == a.z ) );
 }
 
-ARC_INLINE bool arcVec3::Compare( const arcVec3 &a, const float epsilon ) const {
-	if ( arcMath::Fabs( x - a.x ) > epsilon ) {
+ARC_INLINE bool anVec3::Compare( const anVec3 &a, const float epsilon ) const {
+	if ( anMath::Fabs( x - a.x ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( y - a.y ) > epsilon ) {
+	if ( anMath::Fabs( y - a.y ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( z - a.z ) > epsilon ) {
+	if ( anMath::Fabs( z - a.z ) > epsilon ) {
 		return false;
 	}
 
 	return true;
 }
 
-ARC_INLINE bool arcVec3::operator==( const arcVec3 &a ) const {
+ARC_INLINE bool anVec3::operator==( const anVec3 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool arcVec3::operator!=( const arcVec3 &a ) const {
+ARC_INLINE bool anVec3::operator!=( const anVec3 &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE float arcVec3::NormalizeFast( void ) {
+ARC_INLINE float anVec3::NormalizeFast( void ) {
 	float sqrLength = x * x + y * y + z * z;
-	float invLength = arcMath::RSqrt( sqrLength );
+	float invLength = anMath::RSqrt( sqrLength );
 	x *= invLength; y *= invLength; z *= invLength;
 	return invLength * sqrLength;
 }
 
-ARC_INLINE bool arcVec3::FixDegenerateNormal( void ) {
+ARC_INLINE bool anVec3::FixDegenerateNormal( void ) {
 	if ( x == 0.0f ) {
 		if ( y == 0.0f ) {
 			if ( z > 0.0f ) {
@@ -568,19 +634,19 @@ ARC_INLINE bool arcVec3::FixDegenerateNormal( void ) {
 			return false;
 		}
 	}
-	if ( arcMath::Fabs( x ) == 1.0f ) {
+	if ( anMath::Fabs( x ) == 1.0f ) {
 		if ( y != 0.0f || z != 0.0f ) {
 			y = z = 0.0f;
 			return true;
 		}
 		return false;
-	} else if ( arcMath::Fabs( y ) == 1.0f ) {
+	} else if ( anMath::Fabs( y ) == 1.0f ) {
 		if ( x != 0.0f || z != 0.0f ) {
 			x = z = 0.0f;
 			return true;
 		}
 		return false;
-	} else if ( arcMath::Fabs( z ) == 1.0f ) {
+	} else if ( anMath::Fabs( z ) == 1.0f ) {
 		if ( x != 0.0f || y != 0.0f ) {
 			x = y = 0.0f;
 			return true;
@@ -590,7 +656,7 @@ ARC_INLINE bool arcVec3::FixDegenerateNormal( void ) {
 	return false;
 }
 
-ARC_INLINE bool arcVec3::FixDenormals( void ) {
+ARC_INLINE bool anVec3::FixDenormals( void ) {
 	bool denormal = false;
 	if ( fabs( x ) < 1e-30f ) {
 		x = 0.0f;
@@ -607,51 +673,73 @@ ARC_INLINE bool arcVec3::FixDenormals( void ) {
 	return denormal;
 }
 
-ARC_INLINE arcVec3 arcVec3::Cross( const arcVec3 &a ) const {
-	return arcVec3( y * a.z - z * a.y, z * a.x - x * a.z, x * a.y - y * a.x );
+ARC_INLINE bool anVec3::FixDenormals( float epsilon ) {
+	bool denormal = false;
+	if ( fabs( x ) < epsilon ) {
+		x = 0.0f;
+		denormal = true;
+	}
+	if ( fabs( y ) < epsilon ) {
+		y = 0.0f;
+		denormal = true;
+	}
+	if ( fabs( z ) < epsilon ) {
+		z = 0.0f;
+		denormal = true;
+	}
+	return denormal;
+}
+// Calculate the cross product of two vectors
+ARC_INLINE anVec3 anVec3::Cross( const anVec3 &a ) const {
+	return anVec3( y * a.z - z * a.y, z * a.x - x * a.z, x * a.y - y * a.x );
 }
 
-ARC_INLINE arcVec3 &arcVec3::Cross( const arcVec3 &a, const arcVec3 &b ) {
+ARC_INLINE anVec3 &anVec3::Cross( const anVec3 &a, const anVec3 &b ) {
 	x = a.y * b.z - a.z * b.y;
 	y = a.z * b.x - a.x * b.z;
 	z = a.x * b.y - a.y * b.x;
 	return *this;
 }
 
-ARC_INLINE arcVec3 arcVec3::Dot( const arcVec3 v1, const arcVec3 v2 ) {
+// Calculate the dot product of two vectors
+ARC_INLINE float anVec3::Dot( const anVec3 &v1, const anVec3 &v2 ) const {
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+ARC_INLINE anVec3 anVec3::Dot( const anVec3 v1, const anVec3 v2 ) {
 	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
 
-ARC_INLINE float arcVec3::Length( void ) const {
-	return ( float )arcMath::Sqrt( x * x + y * y + z * z );
+ARC_INLINE float anVec3::Length( void ) const {
+	return ( float )anMath::Sqrt( x * x + y * y + z * z );
 }
 
-ARC_INLINE float arcVec3::LengthSqr( void ) const {
+ARC_INLINE float anVec3::LengthSqr( void ) const {
 	return ( x * x + y * y + z * z );
 }
 
-ARC_INLINE float arcVec3::LengthFast( void ) const {
+ARC_INLINE float anVec3::LengthFast( void ) const {
 	float sqrLength;
 	sqrLength = x * x + y * y + z * z;
-	return sqrLength * arcMath::RSqrt( sqrLength );
+	return sqrLength * anMath::RSqrt( sqrLength );
 }
 
-ARC_INLINE float arcVec3::Normalize( void ) {
+ARC_INLINE float anVec3::Normalize( void ) {
 	float sqrLength = x * x + y * y + z * z;
-	float invLength = arcMath::InvSqrt( sqrLength );
+	float invLength = anMath::InvSqrt( sqrLength );
 	x *= invLength;
 	y *= invLength;
 	z *= invLength;
 	return invLength * sqrLength;
 }
 
-ARC_INLINE arcVec3 &arcVec3::Truncate( float length ) {
+ARC_INLINE anVec3 &anVec3::Truncate( float length ) {
 	if ( !length ) {
 		Zero();
 	} else {
 		float length2 = LengthSqr();
 		if ( length2 > length * length ) {
-			float ilength = length * arcMath::InvSqrt( length2 );
+			float ilength = length * anMath::InvSqrt( length2 );
 			x *= ilength;
 			y *= ilength;
 			z *= ilength;
@@ -661,7 +749,7 @@ ARC_INLINE arcVec3 &arcVec3::Truncate( float length ) {
 	return *this;
 }
 
-ARC_INLINE void arcVec3::Clamp( const arcVec3 &min, const arcVec3 &max ) {
+ARC_INLINE void anVec3::Clamp( const anVec3 &min, const anVec3 &max ) {
 	if ( x < min.x ) {
 		x = min.x;
 	} else if ( x > max.x ) {
@@ -679,46 +767,79 @@ ARC_INLINE void arcVec3::Clamp( const arcVec3 &min, const arcVec3 &max ) {
 	}
 }
 
-ARC_INLINE void arcVec3::Snap( void ) {
-	x = floor( x + 0.5f );
-	y = floor( y + 0.5f );
-	z = floor( z + 0.5f );
+ARC_INLINE void anVec3::Snap( void ) {
+	x = anMath::Floor( x + 0.5f );
+	y = anMath::Floor( y + 0.5f );
+	z = anMath::Floor( z + 0.5f );
 }
 
-ARC_INLINE void arcVec3::SnapInt( void ) {
+ARC_INLINE void anVec3::SnapInt( void ) {
+	x = idMath::Floor( x );
+	y = idMath::Floor( y );
+	z = idMath::Floor( z );
+}
+
+ARC_INLINE void anVec3::SnapInt( void ) {
 	x = float( int( x ) );
 	y = float( int( y ) );
 	z = float( int( z ) );
 }
 
-ARC_INLINE int arcVec3::GetDimension( void ) const {
+ARC_INLINE int anVec3::GetDimension( void ) const {
 	return 3;
 }
 
-ARC_INLINE const arcVec2 &arcVec3::ToVec2( void ) const {
-	return *reinterpret_cast<const arcVec2 *>( this );
+ARC_INLINE const anVec2 &anVec3::ToVec2( void ) const {
+	return *reinterpret_cast<const anVec2 *>( this );
 }
 
-ARC_INLINE arcVec2 &arcVec3::ToVec2( void ) {
-	return *reinterpret_cast<arcVec2 *>( this );
+ARC_INLINE anVec2 &anVec3::ToVec2( void ) {
+	return *reinterpret_cast<anVec2 *>( this );
 }
 
-ARC_INLINE const float *arcVec3::ToFloatPtr( void ) const {
+ARC_INLINE const float *anVec3::ToFloatPtr( void ) const {
 	return &x;
 }
 
-ARC_INLINE float *arcVec3::ToFloatPtr( void ) {
+ARC_INLINE float *anVec3::ToFloatPtr( void ) {
 	return &x;
 }
 
-ARC_INLINE void arcVec3::NormalVectors( arcVec3 &left, arcVec3 &down ) const {
+ARC_INLINE void anVec3::SmoothStep( const anVec3 &v1, const anVec3 &v2, const anVec3 &v1, const anVec3 &v2, float t ) const {
+	//anVec3 result = v1 + ( v2 - v1 ) * t;
+    // t = ( t > 1.0f ) ? 1.0f : ( ( t < 0.0f ) ? 0.0f : t );  // Clamp value to 0 to 1
+	// t = t * t *( 3.0f - 2.0f * t );
+    t = anMath::Clamp( t, 0.0f, 1.0f );
+    t = t * t * ( 3.0f - 2.0f * t );
+    v1 = v1 + ( v2 - v1 ) * t;
+}
+
+ARC_INLINE void anVec3::CatmullRom( const anVec3 &v0, const anVec3 &v1, const anVec3 &v2, const anVec3 &v3, float t ) const {
+    float t2 = t * t;
+    float t3 = t2 * t;
+
+    float c0 = -0.5f * t3 + t2 - 0.5f * t;
+    float c1 = 1.5f * t3 - 2.5f * t2 + 1.0f;
+    float c2 = -1.5f * t3 + 2.0f * t2 + 0.5f * t;
+    float c3 = 0.5f * t3 - 0.5f * t2;
+
+    anVec3 interpolatedPoint = c0 * v0 + c1 * v1 + c2 * v2 + c3 * v3;
+    return interpolatedPoint;
+}
+
+ARC_INLINE anVec3 anVec3::Barycentric( const anVec3 &v1, const anVec3 &v2, const anVec3 &v3, float f, float g ) {
+	float w = 1.0f - f - g;
+	return ( v1 * w ) + ( v2 * f ) + ( v3 * g );
+}
+
+ARC_INLINE void anVec3::NormalVectors( anVec3 &left, anVec3 &down ) const {
 	float d = x * x + y * y;
 	if ( !d ) {
 		left[0] = 1;
 		left[1] = 0;
 		left[2] = 0;
 	} else {
-		d = arcMath::InvSqrt( d );
+		d = anMath::InvSqrt( d );
 		left[0] = -y * d;
 		left[1] = x * d;
 		left[2] = 0;
@@ -726,10 +847,10 @@ ARC_INLINE void arcVec3::NormalVectors( arcVec3 &left, arcVec3 &down ) const {
 	down = left.Cross( *this );
 }
 
-ARC_INLINE void arcVec3::OrthogonalBasis( arcVec3 &left, arcVec3 &up ) const {
-	if ( arcMath::Fabs( z ) > 0.7f ) {
+ARC_INLINE void anVec3::OrthogonalBasis( anVec3 &left, anVec3 &up ) const {
+	if ( anMath::Fabs( z ) > 0.7f ) {
 		float l = y * y + z * z;
-		float s = arcMath::InvSqrt( l );
+		float s = anMath::InvSqrt( l );
 		up[0] = 0;
 		up[1] = z * s;
 		up[2] = -y * s;
@@ -738,7 +859,7 @@ ARC_INLINE void arcVec3::OrthogonalBasis( arcVec3 &left, arcVec3 &up ) const {
 		left[2] = x * up[1];
 	} else {
 		float l = x * x + y * y;
-		float s = arcMath::InvSqrt( l );
+		float s = anMath::InvSqrt( l );
 		left[0] = -y * s;
 		left[1] = x * s;
 		left[2] = 0;
@@ -748,11 +869,11 @@ ARC_INLINE void arcVec3::OrthogonalBasis( arcVec3 &left, arcVec3 &up ) const {
 	}
 }
 
-ARC_INLINE void arcVec3::ProjectOntoPlane( const arcVec3 &normal, const float overBounce ) {
+ARC_INLINE void anVec3::ProjectOntoPlane( const anVec3 &normal, const float overBounce ) {
 	float backoff = *this * normal;
 
-	if ( overBounce != 1.0 ) {
-		if ( backoff < 0 ) {
+	if ( overBounce != 1.0f ) {
+		if ( backoff < 0.0f ) {
 			backoff *= overBounce;
 		} else {
 			backoff /= overBounce;
@@ -762,12 +883,12 @@ ARC_INLINE void arcVec3::ProjectOntoPlane( const arcVec3 &normal, const float ov
 	*this -= backoff * normal;
 }
 
-ARC_INLINE bool arcVec3::ProjectAlongPlane( const arcVec3 &normal, const float epsilon, const float overBounce ) const {
-	arcVec3 cross = this->Cross( normal ).Cross( (* this) );
+ARC_INLINE bool anVec3::ProjectAlongPlane( const anVec3 &normal, const float epsilon, const float overBounce ) const {
+	anVec3 cross = this->Cross( normal ).Cross( (* this) );
 	// normalize so a fixed epsilon can be used
 	cross.Normalize();
 	float len = normal * cross;
-	if ( arcMath::Fabs( len ) < epsilon ) {
+	if ( anMath::Fabs( len ) < epsilon ) {
 		return false;
 	}
 	cross *= overBounce * ( normal * (*this) ) / len;
@@ -775,93 +896,151 @@ ARC_INLINE bool arcVec3::ProjectAlongPlane( const arcVec3 &normal, const float e
 	return true;
 }
 
-ARC_INLINE arcVec3 arcVec3::OctahedronDecode( const arcVec2 &oct ) {
-	arcVec2 f( oct.x * 2.0f - 1.0f, oct.y * 2.0f - 1.0f );
-	arcVec3 n( f.x, f.y, 1.0f - arcMath::Abs( f.x ) - arcMath::Abs( f.y ) );
+ARC_INLINE anVec3 anVec3::OctahedronDecode( const anVec2 &oct ) {
+	anVec2 f( oct.x * 2.0f - 1.0f, oct.y * 2.0f - 1.0f );
+	anVec3 n( f.x, f.y, 1.0f - anMath::Abs( f.x ) - anMath::Abs( f.y ) );
 	float t = Clamp( -n.z, 0.0f, 1.0f );
 	n.x += n.x >= 0 ? -t : t;
 	n.y += n.y >= 0 ? -t : t;
 	return n.normalized();
 }
 
-ARC_INLINE arcVec2 arcVec3::Octahedron_Tangent( const float sign ) const {
+ARC_INLINE anVec2 anVec3::Octahedron_Tangent( const float sign ) const {
 	const float bias = 1.0f / 32767.0f;
-	arcVec2 res = this->Octahedron();
+	anVec2 res = this->Octahedron();
 	res.y = Max( res.y, bias );
 	res.y = res.y * 0.5f + 0.5f;
 	res.y = sign >= 0.0f ? res.y : 1 - res.y;
 	return res;
 }
 
-ARC_INLINE arcVec3 arcVec3::Octahedron_TangentDecode( const arcVec2 &oct, float *sign ) {
-	arcVec2 compressed = oct;
-	compressed.y = compressed.y * 2 - 1;
+ARC_INLINE anVec3 anVec3::Octahedron_TangentDecode( const anVec2 &oct, float *sign ) {
+	anVec2 compressed = oct;
+	compressed.y = compressed.y * 2.0f - 1.0f;
 	*sign = compressed.y >= 0.0f ? 1.0f : -1.0f;
-	compressed.y = arcMath::abs( compressed.y );
-	arcVec3 res = arcVec3::OctahedronDecode( compressed );
+	compressed.y = anMath::abs( compressed.y );
+	anVec3 res = anVec3::OctahedronDecode( compressed );
 	return res;
 }
 
-
-ARC_INLINE arcVec2 arcVec3::Octahedron( void ) {
-	arcVec3 n = *this;
-	n /= arcMath::Abs( n.x ) + arcMath::Abs( n.y ) + arcMath::Abs( n.z );
+ARC_INLINE anVec2 anVec3::Octahedron( void ) {
+	anVec3 n = *this;
+	n /= anMath::Abs( n.x ) + anMath::Abs( n.y ) + anMath::Abs( n.z );
 	if ( n.z >= 0.0f ) {
-		arcVec2 o.x = n.x;
-		arcVec2 o.y = n.y;
+		anVec2 o.x = n.x;
+		anVec2 o.y = n.y;
 	} else {
-		arcVec2 o.x = ( 1.0f - arcMath::Abs( n.y ) ) * ( n.x >= 0.0f ? 1.0f : -1.0f );
-		arcVec2 o.y = ( 1.0f - arcMath::Abs( n.x ) ) * ( n.y >= 0.0f ? 1.0f : -1.0f );
+		anVec2 o.x = ( 1.0f - anMath::Abs( n.y ) ) * ( n.x >= 0.0f ? 1.0f : -1.0f );
+		anVec2 o.y = ( 1.0f - anMath::Abs( n.x ) ) * ( n.y >= 0.0f ? 1.0f : -1.0f );
 	}
-	arcVec2 o.x = o.x * 0.5f + 0.5f;
-	arcVec2 o.y = o.y * 0.5f + 0.5f;
+	anVec2 o.x = o.x * 0.5f + 0.5f;
+	anVec2 o.y = o.y * 0.5f + 0.5f;
 	return o;
 }
 
-ARC_INLINE bool arcVec3::IsFinite() const {
-	return arcMath::IsFinite( x ) && arcMath::IsFinite( y ) && arcMath::IsFinite( z );
+ARC_INLINE bool anVec3::IsFinite() const {
+	return anMath::IsFinite( x ) && anMath::IsFinite( y ) && anMath::IsFinite( z );
+}
+
+ARC_INLINE void anVec3::EnsureIncremental( void ) {
+	if ( y < x ) {
+		anSwap( x, y );
+	}
+
+	if ( z < y ) {
+		anSwap( x, z );
+	}
+
+	if ( y < x ) {
+		anSwap( x, y );
+	}
+}
+
+ARC_INLINE int anVec3::GetLargestAxis( void ) const {
+	float a = anMath::Fabs( x );
+	float b = anMath::Fabs( y );
+	float c = anMath::Fabs( z );
+
+	if ( a >= b && a >= c ) {
+		return ( 0 );
+	}
+	if ( b >= a && b >= c ) {
+		return ( 1 );
+	}
+	if ( c >= a && c >= b ) {
+		return ( 2 );
+	}
+	return ( 0 );
+}
+
+ARC_INLINE anVec3 anVec3::ToMaya( void ) const {
+	anVec3 vecMaya = *this;
+	vecMaya.ToMayaSelf();
+	return vecMaya;
+}
+
+ARC_INLINE anVec3 &anVec3::ToMayaSelf( void ) {
+	anSwap( y, z );
+	z = -z;
+	return (* this);
+}
+
+ARC_INLINE anVec3 anVec3::FromMaya( void ) const {
+	anVec3 vecId = *this;
+	vecId.FromMayaSelf();
+	return vecId;
+}
+
+ARC_INLINE anVec3 &anVec3::FromMayaSelf( void ) {
+	anSwap( y, z );
+	y = -y;
+	return (* this);
+}
+
+ARC_INLINE float anVec3::BiTangentSign( const anVec3 &normal, const anVec3 &tang0, const anVec3 &tang1 ) {
+	anVec3 bitangent.Cross( normal, tang0 );
+	return ( bitangent.x * tang1.x + bitangent.y * tang1.y + bitangent.z * tang1.z ) > 0.0f ? 1.0f : -1.0f;
 }
 
 //===============================================================
 //
-//	arcVec4 - 4D vector
+//	anVec4 - 4D vector
 //
 //===============================================================
-#define idVec4 arcVec4
+#define anVec4 anVec4
 
-class arcVec4 {
+class anVec4 {
 public:
 	float			x;
 	float			y;
 	float			z;
 	float			w;
 
-					arcVec4( void );
-					explicit arcVec4( const float x, const float y, const float z, const float w );
-
-	void 			Set( const float x, const float y, const float z, const float w );
-	void			Zero( void );
+					anVec4( void );
+					anVec4( float red, float green, float blue, float opacity )
+        : x( red ), y( green ), z( blue ), w( opacity ) {}
+					explicit anVec4( const float x, const float y, const float z, const float w );
 
 	float			operator[]( const int index ) const;
 	float &			operator[]( const int index );
-	arcVec4			operator-() const;
-	float			operator*( const arcVec4 &a ) const;
-	arcVec4			operator*( const float a ) const;
-	arcVec4			operator/( const float a ) const;
-	arcVec4			operator+( const arcVec4 &a ) const;
-	arcVec4			operator-( const arcVec4 &a ) const;
-	arcVec4 &		operator+=( const arcVec4 &a );
-	arcVec4 &		operator-=( const arcVec4 &a );
-	arcVec4 &		operator/=( const arcVec4 &a );
-	arcVec4 &		operator/=( const float a );
-	arcVec4 &		operator*=( const float a );
+	anVec4			operator-() const;
+	float			operator*( const anVec4 &a ) const;
+	anVec4			operator*( const float a ) const;
+	anVec4			operator/( const float a ) const;
+	anVec4			operator+( const anVec4 &a ) const;
+	anVec4			operator-( const anVec4 &a ) const;
+	anVec4 &		operator+=( const anVec4 &a );
+	anVec4 &		operator-=( const anVec4 &a );
+	anVec4 &		operator/=( const anVec4 &a );
+	anVec4 &		operator/=( const float a );
+	anVec4 &		operator*=( const float a );
 
-	friend arcVec4	operator*( const float a, const arcVec4 b );
+	friend anVec4	operator*( const float a, const anVec4 b );
 
-	bool			Compare( const arcVec4 &a ) const;							// exact compare, no epsilon
-	bool			Compare( const arcVec4 &a, const float epsilon ) const;		// compare with epsilon
-	bool			operator==(	const arcVec4 &a ) const;						// exact compare, no epsilon
-	bool			operator!=(	const arcVec4 &a ) const;						// exact compare, no epsilon
+	bool			Compare( const anVec4 &a ) const;							// exact compare, no epsilon
+	bool			Compare( const anVec4 &a, const float epsilon ) const;		// compare with epsilon
+	bool			operator==(	const anVec4 &a ) const;						// exact compare, no epsilon
+	bool			operator!=(	const anVec4 &a ) const;						// exact compare, no epsilon
 
 	float			Length( void ) const;
 	float			LengthSqr( void ) const;
@@ -869,172 +1048,268 @@ public:
 	float			NormalizeFast( void );		// returns length
 
 	int				GetDimension( void ) const;
+	void			SetDimension( const int dimension );
 
-	const arcVec2 &	ToVec2( void ) const;
-	arcVec2 &		ToVec2( void );
-	const arcVec3 &	ToVec3( void ) const;
-	arcVec3 &		ToVec3( void );
-	arcVec3 &		4ToVec3( const arcVec4 & v );
+	float			GetOpacity() const;
+	void 			SetOpacityPercentage( float percentage ) const;
+	void			SetOpacity( anVec4 rgba, float opacity ) const;
+	void 			SetRGB(float red, float green, float blue ) const;
+	float 			GetRed()const;
+	float			GetGreen() const;
+	float			GetBlue() const;
+
+    // Increase or decrease the RGB color components by a specified amount
+	void 			AdjustRGB( float deltaRed, float deltaGreen, float deltaBlue ) const;
+	anVec3			GetRGB() const;
+
+	anVec4 &		Get( const float x, const float y, const float z, const float w  ) const;
+	anVec4 &		Get() const;
+	void 			Set( const float x, const float y, const float z, const float w ) const;
+	void			Zero( void );
+	bool			IsZero( void ) const;
+
+	const anVec2 &	ToVec2( void ) const;
+	anVec2 &		ToVec2( void );
+	const anVec3 &	ToVec3( void ) const;
+	anVec3 &		ToVec3( void );
+	anVec3 &		Vec4ToVec3( const anVec4 &v );
 	const float *	ToFloatPtr( void ) const;
 	float *			ToFloatPtr( void );
 	const char *	ToString( int precision = 2 ) const;
 
-	void			Lerp( const arcVec4 &v1, const arcVec4 &v2, const float l );
-	void			Scale( const arcVec4 in, const arcVec4 scale, arcVec4 out );
+	void			Lerp( const anVec4 &v1, const anVec4 &v2, const float l );
+	void			Scale( const anVec4 in, const anVec4 scale, anVec4 out );
+	void			SetOpacity() const;
+
+	bool			ContainsPoint( const float xTest, const float yTest ) const;
+	bool			ContainsPoint( const idVec2& testPoint ) const;
 };
 
-extern arcVec4 vec4_origin;
+extern anVec4 vec4_origin;
 #define vec4_zero vec4_origin
 
-ARC_INLINE arcVec4::arcVec4( void ) {
+
+ARC_INLINE anVec4::anVec4( void ) {
 }
 
-ARC_INLINE arcVec4::arcVec4( const float x, const float y, const float z, const float w ) {
+ARC_INLINE anVec4::anVec4( const float x, const float y, const float z, const float w ) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 	this->w = w;
 }
 
-ARC_INLINE void arcVec4::Set( const float x, const float y, const float z, const float w ) {
+// Set the opacity using a percentage value
+ARC_INLINE void anVec4::SetOpacityPercentage( float percentage ) const {
+	// Convert the percentage value to a range between 0 and 1
+	opacity = percentage / 100.0f;
+	w = opacity;
+}
+
+ARC_INLINE void anVec4::SetOpacity( anVec4 rgba, float opacity ) const {
+	rgba.w = opacity;//anVec4();
+}
+
+ARC_INLINE void anVec4::AdjustOpacity( float deltaOpacity ) const {
+	w += deltaOpacity;
+}
+
+ARC_INLINE void anVec4::SetRGB( float red, float green, float blue ) const {
+	x = red;
+	y = green;
+	z = blue;
+}
+ARC_INLINE float anVec4::GetOpacity() const {
+	return w;
+}
+
+ARC_INLINE void anVec4::AdjustRGB( float deltaRed, float deltaGreen, float deltaBlue ) const {
+	x += deltaRed;
+	y += deltaGreen;
+	z += deltaBlue;
+}
+
+ARC_INLINE float anVec4::GetRed() const {
+	return x;
+}
+
+ARC_INLINE float anVec4::GetGreen() const {
+	return y;
+}
+
+ARC_INLINE float anVec4::GetBlue() const {
+	return z;
+}
+
+ARC_INLINE float anVec4::GetOpacity() const {
+	return w;
+}
+
+ARC_INLINE anVec3 anVec4::GetRGB() const {
+	return anVec3( x, y, z );
+}
+
+ARC_INLINE anVec4 &anVec4::Get( const float xyzw ) const {
+	return anVec4( xyzw );
+}
+
+ARC_INLINE anVec4 &anVec4::Get( const float x, const float y, const float z, const float w  ) const {
+	return anVec4( x, y, z, w );
+}
+
+ARC_INLINE void anVec4::Set( const float x, const float y, const float z, const float w ) const {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 	this->w = w;
 }
 
-ARC_INLINE void arcVec4::Zero( void ) {
+/*
+vector 4 is also anColor, basically heres the lazy layout so i didnt
+need to cahnge x, y, z, w, to r, g, b, a.  below is everything you need to know.
+r = x,
+g = y,
+b = z,
+a = w = %;
+*/
+ARC_INLINE void anVec4::Zero( void ) {
 	x = y = z = w = 0.0f;
 }
 
-ARC_INLINE float arcVec4::operator[]( int index ) const {
+ARC_INLINE bool anVec4::IsZero( void ) const {
+   return ( ( ( *(const unsigned int *)&( x )  ) | ( *(const unsigned int *)&( y ) )  | ( *(const unsigned int *)&( z ) ) | ( *(const unsigned int *)&( w ) ) ) & ~( 1<<31 ) ) == 0;
+}
+
+ARC_INLINE float anVec4::operator[]( int index ) const {
 	return ( &x )[index];
 }
 
-ARC_INLINE float& arcVec4::operator[]( int index ) {
+ARC_INLINE float &anVec4::operator[]( int index ) {
 	return ( &x )[index];
 }
 
-ARC_INLINE arcVec4 arcVec4::operator-() const {
-	return arcVec4( -x, -y, -z, -w );
+ARC_INLINE anVec4 anVec4::operator-() const {
+	return anVec4( -x, -y, -z, -w );
 }
 
-ARC_INLINE arcVec4 arcVec4::operator-( const arcVec4 &a ) const {
-	return arcVec4( x - a.x, y - a.y, z - a.z, w - a.w );
+ARC_INLINE anVec4 anVec4::operator-( const anVec4 &a ) const {
+	return anVec4( x - a.x, y - a.y, z - a.z, w - a.w );
 }
 
-ARC_INLINE float arcVec4::operator*( const arcVec4 &a ) const {
+ARC_INLINE float anVec4::operator*( const anVec4 &a ) const {
 	return x * a.x + y * a.y + z * a.z + w * a.w;
 }
 
-ARC_INLINE arcVec4 arcVec4::operator*( const float a ) const {
-	return arcVec4( x * a, y * a, z * a, w * a );
+ARC_INLINE anVec4 anVec4::operator*( const float a ) const {
+	return anVec4( x * a, y * a, z * a, w * a );
 }
 
-ARC_INLINE arcVec4 arcVec4::operator/( const float a ) const {
+ARC_INLINE anVec4 anVec4::operator/( const float a ) const {
 	float inva = 1.0f / a;
-	return arcVec4( x * inva, y * inva, z * inva, w * inva );
+	return anVec4( x * inva, y * inva, z * inva, w * inva );
 }
 
-ARC_INLINE arcVec4 operator*( const float a, const arcVec4 b ) {
-	return arcVec4( b.x * a, b.y * a, b.z * a, b.w * a );
+ARC_INLINE anVec4 operator*( const float a, const anVec4 b ) {
+	return anVec4( b.x * a, b.y * a, b.z * a, b.w * a );
 }
 
-ARC_INLINE arcVec4 arcVec4::operator+( const arcVec4 &a ) const {
-	return arcVec4( x + a.x, y + a.y, z + a.z, w + a.w );
+ARC_INLINE anVec4 anVec4::operator+( const anVec4 &a ) const {
+	return anVec4( x + a.x, y + a.y, z + a.z, w + a.w );
 }
 
-ARC_INLINE arcVec4 &arcVec4::operator+=( const arcVec4 &a ) {
+ARC_INLINE anVec4 &anVec4::operator+=( const anVec4 &a ) {
 	x += a.x;
 	y += a.y;
 	z += a.z;
 	w += a.w;
-
 	return *this;
 }
 
-ARC_INLINE arcVec4 &arcVec4::operator/=( const arcVec4 &a ) {
+ARC_INLINE anVec4 &anVec4::operator/=( const anVec4 &a ) {
 	x /= a.x;
 	y /= a.y;
 	z /= a.z;
 	w /= a.w;
-
 	return *this;
 }
 
-ARC_INLINE arcVec4 &arcVec4::operator/=( const float a ) {
+ARC_INLINE anVec4 &anVec4::operator/=( const float a ) {
 	float inva = 1.0f / a;
 	x *= inva;
 	y *= inva;
 	z *= inva;
 	w *= inva;
-
 	return *this;
 }
 
-ARC_INLINE arcVec4 &arcVec4::operator-=( const arcVec4 &a ) {
+ARC_INLINE anVec4 &anVec4::operator-=( const anVec4 &a ) {
 	x -= a.x;
 	y -= a.y;
 	z -= a.z;
 	w -= a.w;
-
 	return *this;
 }
 
-ARC_INLINE arcVec4 &arcVec4::operator*=( const float a ) {
+ARC_INLINE anVec4 &anVec4::operator*=( const float a ) {
 	x *= a;
 	y *= a;
 	z *= a;
 	w *= a;
-
 	return *this;
 }
 
-ARC_INLINE bool arcVec4::Compare( const arcVec4 &a ) const {
+ARC_INLINE bool anVec4::Compare( const anVec4 &a ) const {
 	return ( ( x == a.x ) && ( y == a.y ) && ( z == a.z ) && w == a.w );
 }
 
-ARC_INLINE bool arcVec4::Compare( const arcVec4 &a, const float epsilon ) const {
-	if ( arcMath::Fabs( x - a.x ) > epsilon ) {
+ARC_INLINE bool anVec4::Compare( const anVec4 &a, const float epsilon ) const {
+	if ( anMath::Fabs( x - a.x ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( y - a.y ) > epsilon ) {
+	if ( anMath::Fabs( y - a.y ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( z - a.z ) > epsilon ) {
+	if ( anMath::Fabs( z - a.z ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( w - a.w ) > epsilon ) {
+	if ( anMath::Fabs( w - a.w ) > epsilon ) {
 		return false;
 	}
 
 	return true;
 }
 
-ARC_INLINE bool arcVec4::operator==( const arcVec4 &a ) const {
+ARC_INLINE bool anVec4::operator==( const anVec4 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool arcVec4::operator!=( const arcVec4 &a ) const {
+ARC_INLINE bool anVec4::operator!=( const anVec4 &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE float arcVec4::Length( void ) const {
-	return ( float )arcMath::Sqrt( x * x + y * y + z * z + w * w );
+ARC_INLINE float anVec4::Length( void ) const {
+	return ( float )anMath::Sqrt( x * x + y * y + z * z + w * w );
 }
 
-ARC_INLINE float arcVec4::LengthSqr( void ) const {
+ARC_INLINE float anVec4::LengthSqr( void ) const {
 	return ( x * x + y * y + z * z + w * w );
 }
 
-ARC_INLINE float arcVec4::Normalize( void ) {
+ARC_INLINE void anVec4::NormalizeRGB( float scaleFactor ) {
+	x = idMath::ClampFloat( 0.0f, 1.0f, r * scaleFactor );
+	y = idMath::ClampFloat( 0.0f, 1.0f, g * scaleFactor );
+	z = idMath::ClampFloat( 0.0f, 1.0f, b * scaleFactor );
+	w += scaleFactor;
+}
+
+ARC_INLINE float anVec4::Normalize( void ) {
 	float sqrLength, invLength;
 
 	sqrLength = x * x + y * y + z * z + w * w;
-	invLength = arcMath::InvSqrt( sqrLength );
+	invLength = anMath::InvSqrt( sqrLength );
 	x *= invLength;
 	y *= invLength;
 	z *= invLength;
@@ -1042,11 +1317,11 @@ ARC_INLINE float arcVec4::Normalize( void ) {
 	return invLength * sqrLength;
 }
 
-ARC_INLINE float arcVec4::NormalizeFast( void ) {
+ARC_INLINE float anVec4::NormalizeFast( void ) {
 	float sqrLength, invLength;
 
 	sqrLength = x * x + y * y + z * z + w * w;
-	invLength = arcMath::RSqrt( sqrLength );
+	invLength = anMath::RSqrt( sqrLength );
 	x *= invLength;
 	y *= invLength;
 	z *= invLength;
@@ -1054,46 +1329,53 @@ ARC_INLINE float arcVec4::NormalizeFast( void ) {
 	return invLength * sqrLength;
 }
 
-ARC_INLINE int arcVec4::GetDimension( void ) const {
+ARC_INLINE int anVec4::GetDimension( void ) const {
 	return 4;
 }
 
-ARC_INLINE const arcVec2 &arcVec4::ToVec2( void ) const {
-	return *reinterpret_cast<const arcVec2 *>( this );
+ARC_INLINE const anVec2 &anVec4::ToVec2( void ) const {
+	return *reinterpret_cast<const anVec2 *>( this );
 }
 
-ARC_INLINE arcVec2 &arcVec4::ToVec2( void ) {
-	return *reinterpret_cast<arcVec2 *>( this );
+ARC_INLINE anVec2 &anVec4::ToVec2( void ) {
+	return *reinterpret_cast<anVec2 *>( this );
 }
 
-ARC_INLINE const arcVec3 &arcVec4::ToVec3( void ) const {
-	return *reinterpret_cast<const arcVec3 *>( this );
+ARC_INLINE const anVec3 &anVec4::ToVec3( void ) const {
+	return *reinterpret_cast<const anVec3 *>( this );
 }
 
-ARC_INLINE arcVec3 &arcVec4::ToVec3( void ) {
-	return *reinterpret_cast<arcVec3 *>( this );
+ARC_INLINE anVec3 &anVec4::ToVec3( void ) {
+	return *reinterpret_cast<anVec3 *>( this );
 }
 
-ARC_INLINE arcVec3 &arcVec4::4ToVec3( const arcVec4 & v ) {
-	return arcVec3( v.x / v.w, v.y / v.w, v.z / v.w );
+ARC_INLINE anVec3 &anVec4::Vec4ToVec3( const anVec4 &v ) {
+	return anVec3( v.x / v.w, v.y / v.w, v.z / v.w );
 }
 
-ARC_INLINE const float *arcVec4::ToFloatPtr( void ) const {
+ARC_INLINE const float *anVec4::ToFloatPtr( void ) const {
 	return &x;
 }
 
-ARC_INLINE float *arcVec4::ToFloatPtr( void ) {
+ARC_INLINE float *anVec4::ToFloatPtr( void ) {
 	return &x;
 }
 
+ARC_INLINE bool anVec4::ContainsPoint( const anVec2 &testPoint ) const {
+	return !( ( ( testPoint.x < x ) || ( testPoint.x > x + z ) ) || ( ( testPoint.y < y ) || ( testPoint.y > y + w ) ) );
+}
+
+ARC_INLINE bool anVec4::ContainsPoint( const float xTest, const float yTest ) const {
+	return !( ( ( xTest < x ) || ( xTest > x + z ) ) || ( ( yTest < y ) || ( yTest > y + w ) ) );
+}
 
 //===============================================================
 //
-//	arcVec5 - 5D vector
+//	anVec5 - 5D vector
 //
 //===============================================================
 
-class arcVec5 {
+class anVec5 {
 public:
 	float			x;
 	float			y;
@@ -1101,32 +1383,36 @@ public:
 	float			s;
 	float			t;
 
-					arcVec5( void );
-					explicit arcVec5( const arcVec3 ( &xyz ), const arcVec2 &st );
-					explicit arcVec5( const float x, const float y, const float z, const float s, const float t );
+					anVec5( void );
+					explicit anVec5( const anVec3 ( &xyz ), const anVec2 &st );
+					explicit anVec5( const float x, const float y, const float z, const float s, const float t );
 
 	float			operator[]( int index ) const;
 	float &			operator[]( int index );
-	arcVec5 &		operator=( const arcVec3 &a );
+	anVec5 &		operator=( const anVec3 &a );
 
 	int				GetDimension( void ) const;
 
-	const arcVec3 &	ToVec3( void ) const;
-	arcVec3 &		ToVec3( void );
+	const idVec2 &	ToVec2( void ) const;
+	idVec2 &		ToVec2( void );
+
+	const anVec3 &	ToVec3( void ) const;
+	anVec3 &		ToVec3( void );
 	const float *	ToFloatPtr( void ) const;
 	float *			ToFloatPtr( void );
 	const char *	ToString( int precision = 2 ) const;
 
-	void			Lerp( const arcVec5 &v1, const arcVec5 &v2, const float l );
+	void			Lerp( const anVec5 &v1, const anVec5 &v2, const float l );
+	void			Set( const anVec3 &xyz, const anVec2 &st );
 };
 
-extern arcVec5 vec5_origin;
+extern anVec5 vec5_origin;
 #define vec5_zero vec5_origin
 
-ARC_INLINE arcVec5::arcVec5( void ) {
+ARC_INLINE anVec5::anVec5( void ) {
 }
 
-ARC_INLINE arcVec5::arcVec5( const arcVec3 ( &xyz ), const arcVec2 &st ) {
+ARC_INLINE anVec5::anVec5( const anVec3 ( &xyz ), const anVec2 &st ) {
 	x = xyz.x;
 	y = xyz.y;
 	z = xyz.z;
@@ -1134,7 +1420,7 @@ ARC_INLINE arcVec5::arcVec5( const arcVec3 ( &xyz ), const arcVec2 &st ) {
 	t = st[1];
 }
 
-ARC_INLINE arcVec5::arcVec5( const float x, const float y, const float z, const float s, const float t ) {
+ARC_INLINE anVec5::anVec5( const float x, const float y, const float z, const float s, const float t ) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
@@ -1142,15 +1428,15 @@ ARC_INLINE arcVec5::arcVec5( const float x, const float y, const float z, const 
 	this->t = t;
 }
 
-ARC_INLINE float arcVec5::operator[]( int index ) const {
+ARC_INLINE float anVec5::operator[]( int index ) const {
 	return ( &x )[index];
 }
 
-ARC_INLINE float& arcVec5::operator[]( int index ) {
+ARC_INLINE float& anVec5::operator[]( int index ) {
 	return ( &x )[index];
 }
 
-ARC_INLINE arcVec5 &arcVec5::operator=( const arcVec3 &a ) {
+ARC_INLINE anVec5 &anVec5::operator=( const anVec3 &a ) {
 	x = a.x;
 	y = a.y;
 	z = a.z;
@@ -1158,61 +1444,76 @@ ARC_INLINE arcVec5 &arcVec5::operator=( const arcVec3 &a ) {
 	return *this;
 }
 
-ARC_INLINE int arcVec5::GetDimension( void ) const {
+ARC_INLINE int anVec5::GetDimension( void ) const {
 	return 5;
 }
 
-ARC_INLINE const arcVec3 &arcVec5::ToVec3( void ) const {
-	return *reinterpret_cast<const arcVec3 *>( this );
+ARC_INLINE const anVec2 &anVec5::ToVec2( void ) const {
+	return *reinterpret_cast<const anVec2 *>( &s );
 }
 
-ARC_INLINE arcVec3 &arcVec5::ToVec3( void ) {
-	return *reinterpret_cast<arcVec3 *>( this );
+ARC_INLINE anVec2 &anVec5::ToVec2( void ) {
+	return *reinterpret_cast<anVec2 *>( &s );
 }
 
-ARC_INLINE const float *arcVec5::ToFloatPtr( void ) const {
+ARC_INLINE const anVec3 &anVec5::ToVec3( void ) const {
+	return *reinterpret_cast<const anVec3 *>( this );
+}
+
+ARC_INLINE anVec3 &anVec5::ToVec3( void ) {
+	return *reinterpret_cast<anVec3 *>( this );
+}
+
+ARC_INLINE const float *anVec5::ToFloatPtr( void ) const {
 	return &x;
 }
 
-ARC_INLINE float *arcVec5::ToFloatPtr( void ) {
+ARC_INLINE float *anVec5::ToFloatPtr( void ) {
 	return &x;
 }
 
+ARC_INLINEARC_INLINE void anVec5::Set( const anVec3 &xyz, const anVec2 &st ) {
+	x = xyz.x;
+	y = xyz.y;
+	z = xyz.z;
+	s = st.x;
+	t = st.y;
+}
 
 //===============================================================
 //
-//	arcVec6 - 6D vector
+//	anVec6 - 6D vector
 //
 //===============================================================
 
-class arcVec6 {
+class anVec6 {
 public:
-					arcVec6( void );
-					explicit arcVec6( const float *a );
-					explicit arcVec6( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 );
+					anVec6( void );
+					explicit anVec6( const float *a );
+					explicit anVec6( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 );
 
 	void 			Set( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 );
 	void			Zero( void );
 
 	float			operator[]( const int index ) const;
 	float &			operator[]( const int index );
-	arcVec6			operator-() const;
-	arcVec6			operator*( const float a ) const;
-	arcVec6			operator/( const float a ) const;
-	float			operator*( const arcVec6 &a ) const;
-	arcVec6			operator-( const arcVec6 &a ) const;
-	arcVec6			operator+( const arcVec6 &a ) const;
-	arcVec6 &		operator*=( const float a );
-	arcVec6 &		operator/=( const float a );
-	arcVec6 &		operator+=( const arcVec6 &a );
-	arcVec6 &		operator-=( const arcVec6 &a );
+	anVec6			operator-() const;
+	anVec6			operator*( const float a ) const;
+	anVec6			operator/( const float a ) const;
+	float			operator*( const anVec6 &a ) const;
+	anVec6			operator-( const anVec6 &a ) const;
+	anVec6			operator+( const anVec6 &a ) const;
+	anVec6 &		operator*=( const float a );
+	anVec6 &		operator/=( const float a );
+	anVec6 &		operator+=( const anVec6 &a );
+	anVec6 &		operator-=( const anVec6 &a );
 
-	friend arcVec6	operator*( const float a, const arcVec6 b );
+	friend anVec6	operator*( const float a, const anVec6 b );
 
-	bool			Compare( const arcVec6 &a ) const;							// exact compare, no epsilon
-	bool			Compare( const arcVec6 &a, const float epsilon ) const;		// compare with epsilon
-	bool			operator==(	const arcVec6 &a ) const;						// exact compare, no epsilon
-	bool			operator!=(	const arcVec6 &a ) const;						// exact compare, no epsilon
+	bool			Compare( const anVec6 &a ) const;							// exact compare, no epsilon
+	bool			Compare( const anVec6 &a, const float epsilon ) const;		// compare with epsilon
+	bool			operator==(	const anVec6 &a ) const;						// exact compare, no epsilon
+	bool			operator!=(	const anVec6 &a ) const;						// exact compare, no epsilon
 
 	float			Length( void ) const;
 	float			LengthSqr( void ) const;
@@ -1221,8 +1522,8 @@ public:
 
 	int				GetDimension( void ) const;
 
-	const arcVec3 &	SubVec3( int index ) const;
-	arcVec3 &		SubVec3( int index );
+	const anVec3 &	SubVec3( int index ) const;
+	anVec3 &		SubVec3( int index );
 	const float *	ToFloatPtr( void ) const;
 	float *			ToFloatPtr( void );
 	const char *	ToString( int precision = 2 ) const;
@@ -1231,18 +1532,18 @@ private:
 	float			p[6];
 };
 
-extern arcVec6 vec6_origin;
+extern anVec6 vec6_origin;
 #define vec6_zero vec6_origin
-extern arcVec6 vec6_infinity;
+extern anVec6 vec6_infinity;
 
-ARC_INLINE arcVec6::arcVec6( void ) {
+ARC_INLINE anVec6::anVec6( void ) {
 }
 
-ARC_INLINE arcVec6::arcVec6( const float *a ) {
+ARC_INLINE anVec6::anVec6( const float *a ) {
 	memcpy( p, a, 6 * sizeof( float ) );
 }
 
-ARC_INLINE arcVec6::arcVec6( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 ) {
+ARC_INLINE anVec6::anVec6( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 ) {
 	p[0] = a1;
 	p[1] = a2;
 	p[2] = a3;
@@ -1251,43 +1552,43 @@ ARC_INLINE arcVec6::arcVec6( const float a1, const float a2, const float a3, con
 	p[5] = a6;
 }
 
-ARC_INLINE arcVec6 arcVec6::operator-() const {
-	return arcVec6( -p[0], -p[1], -p[2], -p[3], -p[4], -p[5] );
+ARC_INLINE anVec6 anVec6::operator-() const {
+	return anVec6( -p[0], -p[1], -p[2], -p[3], -p[4], -p[5] );
 }
 
-ARC_INLINE float arcVec6::operator[]( const int index ) const {
+ARC_INLINE float anVec6::operator[]( const int index ) const {
 	return p[index];
 }
 
-ARC_INLINE float &arcVec6::operator[]( const int index ) {
+ARC_INLINE float &anVec6::operator[]( const int index ) {
 	return p[index];
 }
 
-ARC_INLINE arcVec6 arcVec6::operator*( const float a ) const {
-	return arcVec6( p[0]*a, p[1]*a, p[2]*a, p[3]*a, p[4]*a, p[5]*a );
+ARC_INLINE anVec6 anVec6::operator*( const float a ) const {
+	return anVec6( p[0]*a, p[1]*a, p[2]*a, p[3]*a, p[4]*a, p[5]*a );
 }
 
-ARC_INLINE float arcVec6::operator*( const arcVec6 &a ) const {
+ARC_INLINE float anVec6::operator*( const anVec6 &a ) const {
 	return p[0] * a[0] + p[1] * a[1] + p[2] * a[2] + p[3] * a[3] + p[4] * a[4] + p[5] * a[5];
 }
 
-ARC_INLINE arcVec6 arcVec6::operator/( const float a ) const {
+ARC_INLINE anVec6 anVec6::operator/( const float a ) const {
 	float inva;
 
 	assert( a != 0.0f );
 	inva = 1.0f / a;
-	return arcVec6( p[0]*inva, p[1]*inva, p[2]*inva, p[3]*inva, p[4]*inva, p[5]*inva );
+	return anVec6( p[0]*inva, p[1]*inva, p[2]*inva, p[3]*inva, p[4]*inva, p[5]*inva );
 }
 
-ARC_INLINE arcVec6 arcVec6::operator+( const arcVec6 &a ) const {
-	return arcVec6( p[0] + a[0], p[1] + a[1], p[2] + a[2], p[3] + a[3], p[4] + a[4], p[5] + a[5] );
+ARC_INLINE anVec6 anVec6::operator+( const anVec6 &a ) const {
+	return anVec6( p[0] + a[0], p[1] + a[1], p[2] + a[2], p[3] + a[3], p[4] + a[4], p[5] + a[5] );
 }
 
-ARC_INLINE arcVec6 arcVec6::operator-( const arcVec6 &a ) const {
-	return arcVec6( p[0] - a[0], p[1] - a[1], p[2] - a[2], p[3] - a[3], p[4] - a[4], p[5] - a[5] );
+ARC_INLINE anVec6 anVec6::operator-( const anVec6 &a ) const {
+	return anVec6( p[0] - a[0], p[1] - a[1], p[2] - a[2], p[3] - a[3], p[4] - a[4], p[5] - a[5] );
 }
 
-ARC_INLINE arcVec6 &arcVec6::operator*=( const float a ) {
+ARC_INLINE anVec6 &anVec6::operator*=( const float a ) {
 	p[0] *= a;
 	p[1] *= a;
 	p[2] *= a;
@@ -1297,7 +1598,7 @@ ARC_INLINE arcVec6 &arcVec6::operator*=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE arcVec6 &arcVec6::operator/=( const float a ) {
+ARC_INLINE anVec6 &anVec6::operator/=( const float a ) {
 	float inva;
 
 	assert( a != 0.0f );
@@ -1311,7 +1612,7 @@ ARC_INLINE arcVec6 &arcVec6::operator/=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE arcVec6 &arcVec6::operator+=( const arcVec6 &a ) {
+ARC_INLINE anVec6 &anVec6::operator+=( const anVec6 &a ) {
 	p[0] += a[0];
 	p[1] += a[1];
 	p[2] += a[2];
@@ -1321,7 +1622,7 @@ ARC_INLINE arcVec6 &arcVec6::operator+=( const arcVec6 &a ) {
 	return *this;
 }
 
-ARC_INLINE arcVec6 &arcVec6::operator-=( const arcVec6 &a ) {
+ARC_INLINE anVec6 &anVec6::operator-=( const anVec6 &a ) {
 	p[0] -= a[0];
 	p[1] -= a[1];
 	p[2] -= a[2];
@@ -1331,52 +1632,52 @@ ARC_INLINE arcVec6 &arcVec6::operator-=( const arcVec6 &a ) {
 	return *this;
 }
 
-ARC_INLINE arcVec6 operator*( const float a, const arcVec6 b ) {
+ARC_INLINE anVec6 operator*( const float a, const anVec6 b ) {
 	return b * a;
 }
 
-ARC_INLINE bool arcVec6::Compare( const arcVec6 &a ) const {
+ARC_INLINE bool anVec6::Compare( const anVec6 &a ) const {
 	return ( ( p[0] == a[0] ) && ( p[1] == a[1] ) && ( p[2] == a[2] ) &&
 			( p[3] == a[3] ) && ( p[4] == a[4] ) && ( p[5] == a[5] ) );
 }
 
-ARC_INLINE bool arcVec6::Compare( const arcVec6 &a, const float epsilon ) const {
-	if ( arcMath::Fabs( p[0] - a[0] ) > epsilon ) {
+ARC_INLINE bool anVec6::Compare( const anVec6 &a, const float epsilon ) const {
+	if ( anMath::Fabs( p[0] - a[0] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[1] - a[1] ) > epsilon ) {
+	if ( anMath::Fabs( p[1] - a[1] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[2] - a[2] ) > epsilon ) {
+	if ( anMath::Fabs( p[2] - a[2] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[3] - a[3] ) > epsilon ) {
+	if ( anMath::Fabs( p[3] - a[3] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[4] - a[4] ) > epsilon ) {
+	if ( anMath::Fabs( p[4] - a[4] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[5] - a[5] ) > epsilon ) {
+	if ( anMath::Fabs( p[5] - a[5] ) > epsilon ) {
 		return false;
 	}
 
 	return true;
 }
 
-ARC_INLINE bool arcVec6::operator==( const arcVec6 &a ) const {
+ARC_INLINE bool anVec6::operator==( const anVec6 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool arcVec6::operator!=( const arcVec6 &a ) const {
+ARC_INLINE bool anVec6::operator!=( const anVec6 &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void arcVec6::Set( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 ) {
+ARC_INLINE void anVec6::Set( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 ) {
 	p[0] = a1;
 	p[1] = a2;
 	p[2] = a3;
@@ -1385,23 +1686,23 @@ ARC_INLINE void arcVec6::Set( const float a1, const float a2, const float a3, co
 	p[5] = a6;
 }
 
-ARC_INLINE void arcVec6::Zero( void ) {
+ARC_INLINE void anVec6::Zero( void ) {
 	p[0] = p[1] = p[2] = p[3] = p[4] = p[5] = 0.0f;
 }
 
-ARC_INLINE float arcVec6::Length( void ) const {
-	return ( float )arcMath::Sqrt( p[0] * p[0] + p[1] * p[1] + p[2] * p[2] + p[3] * p[3] + p[4] * p[4] + p[5] * p[5] );
+ARC_INLINE float anVec6::Length( void ) const {
+	return ( float )anMath::Sqrt( p[0] * p[0] + p[1] * p[1] + p[2] * p[2] + p[3] * p[3] + p[4] * p[4] + p[5] * p[5] );
 }
 
-ARC_INLINE float arcVec6::LengthSqr( void ) const {
+ARC_INLINE float anVec6::LengthSqr( void ) const {
 	return ( p[0] * p[0] + p[1] * p[1] + p[2] * p[2] + p[3] * p[3] + p[4] * p[4] + p[5] * p[5] );
 }
 
-ARC_INLINE float arcVec6::Normalize( void ) {
+ARC_INLINE float anVec6::Normalize( void ) {
 	float sqrLength, invLength;
 
 	sqrLength = p[0] * p[0] + p[1] * p[1] + p[2] * p[2] + p[3] * p[3] + p[4] * p[4] + p[5] * p[5];
-	invLength = arcMath::InvSqrt( sqrLength );
+	invLength = anMath::InvSqrt( sqrLength );
 	p[0] *= invLength;
 	p[1] *= invLength;
 	p[2] *= invLength;
@@ -1411,11 +1712,11 @@ ARC_INLINE float arcVec6::Normalize( void ) {
 	return invLength * sqrLength;
 }
 
-ARC_INLINE float arcVec6::NormalizeFast( void ) {
+ARC_INLINE float anVec6::NormalizeFast( void ) {
 	float sqrLength, invLength;
 
 	sqrLength = p[0] * p[0] + p[1] * p[1] + p[2] * p[2] + p[3] * p[3] + p[4] * p[4] + p[5] * p[5];
-	invLength = arcMath::RSqrt( sqrLength );
+	invLength = anMath::RSqrt( sqrLength );
 	p[0] *= invLength;
 	p[1] *= invLength;
 	p[2] *= invLength;
@@ -1425,34 +1726,34 @@ ARC_INLINE float arcVec6::NormalizeFast( void ) {
 	return invLength * sqrLength;
 }
 
-ARC_INLINE int arcVec6::GetDimension( void ) const {
+ARC_INLINE int anVec6::GetDimension( void ) const {
 	return 6;
 }
 
-ARC_INLINE const arcVec3 &arcVec6::SubVec3( int index ) const {
-	return *reinterpret_cast<const arcVec3 *>(p + index * 3);
+ARC_INLINE const anVec3 &anVec6::SubVec3( int index ) const {
+	return *reinterpret_cast<const anVec3 *>(p + index * 3);
 }
 
-ARC_INLINE arcVec3 &arcVec6::SubVec3( int index ) {
-	return *reinterpret_cast<arcVec3 *>(p + index * 3);
+ARC_INLINE anVec3 &anVec6::SubVec3( int index ) {
+	return *reinterpret_cast<anVec3 *>(p + index * 3);
 }
 
-ARC_INLINE const float *arcVec6::ToFloatPtr( void ) const {
+ARC_INLINE const float *anVec6::ToFloatPtr( void ) const {
 	return p;
 }
 
-ARC_INLINE float *arcVec6::ToFloatPtr( void ) {
+ARC_INLINE float *anVec6::ToFloatPtr( void ) {
 	return p;
 }
 
 
 //===============================================================
 //
-//	arcVecX - arbitrary sized vector
+//	anVecX - arbitrary sized vector
 //
 //  The vector lives on 16 byte aligned and 16 byte padded memory.
 //
-//	NOTE: due to the temporary memory pool arcVecX cannot be used by multiple threads
+//	NOTE: due to the temporary memory pool anVecX cannot be used by multiple threads
 //
 //===============================================================
 
@@ -1462,35 +1763,38 @@ ARC_INLINE float *arcVec6::ToFloatPtr( void ) {
 #define VECX_ALLOCA( n )	( (float *) _alloca16( VECX_QUAD( n ) ) )
 #define VECX_SIMD
 
-class arcVecX {
-	friend class arcMatX;
+class anVecX {
+	friend class anMatX;
 
 public:
-					arcVecX( void );
-					explicit arcVecX( int length );
-					explicit arcVecX( int length, float *data );
-					~arcVecX( void );
+					anVecX( void );
+					explicit anVecX( int length );
+					explicit anVecX( int length, float *data );
+					~anVecX( void );
+
+	float			Get( int index ) const;
+	float &			Get( int index );
 
 	float			operator[]( const int index ) const;
 	float &			operator[]( const int index );
-	arcVecX			operator-() const;
-	arcVecX &		operator=( const arcVecX &a );
-	arcVecX			operator*( const float a ) const;
-	arcVecX			operator/( const float a ) const;
-	float			operator*( const arcVecX &a ) const;
-	arcVecX			operator-( const arcVecX &a ) const;
-	arcVecX			operator+( const arcVecX &a ) const;
-	arcVecX &		operator*=( const float a );
-	arcVecX &		operator/=( const float a );
-	arcVecX &		operator+=( const arcVecX &a );
-	arcVecX &		operator-=( const arcVecX &a );
+	anVecX			operator-() const;
+	anVecX &		operator=( const anVecX &a );
+	anVecX			operator*( const float a ) const;
+	anVecX			operator/( const float a ) const;
+	float			operator*( const anVecX &a ) const;
+	anVecX			operator-( const anVecX &a ) const;
+	anVecX			operator+( const anVecX &a ) const;
+	anVecX &		operator*=( const float a );
+	anVecX &		operator/=( const float a );
+	anVecX &		operator+=( const anVecX &a );
+	anVecX &		operator-=( const anVecX &a );
 
-	friend arcVecX	operator*( const float a, const arcVecX b );
+	friend anVecX	operator*( const float a, const anVecX b );
 
-	bool			Compare( const arcVecX &a ) const;							// exact compare, no epsilon
-	bool			Compare( const arcVecX &a, const float epsilon ) const;		// compare with epsilon
-	bool			operator==(	const arcVecX &a ) const;						// exact compare, no epsilon
-	bool			operator!=(	const arcVecX &a ) const;						// exact compare, no epsilon
+	bool			Compare( const anVecX &a ) const;							// exact compare, no epsilon
+	bool			Compare( const anVecX &a, const float epsilon ) const;		// compare with epsilon
+	bool			operator==(	const anVecX &a ) const;						// exact compare, no epsilon
+	bool			operator!=(	const anVecX &a ) const;						// exact compare, no epsilon
 
 	void			SetSize( int size );
 	void			ChangeSize( int size, bool makeZero = false );
@@ -1502,19 +1806,19 @@ public:
 	void			Random( int length, int seed, float l = 0.0f, float u = 1.0f );
 	void			Negate( void );
 	void			Clamp( float min, float max );
-	arcVecX &		SwapElements( int e1, int e2 );
+	anVecX &		SwapElements( int e1, int e2 );
 
 	float			Length( void ) const;
 	float			LengthSqr( void ) const;
-	arcVecX			Normalize( void ) const;
+	anVecX			Normalize( void ) const;
 	float			NormalizeSelf( void );
 
 	int				GetDimension( void ) const;
 
-	const arcVec3 &	SubVec3( int index ) const;
-	arcVec3 &		SubVec3( int index );
-	const arcVec6 &	SubVec6( int index ) const;
-	arcVec6 &		SubVec6( int index );
+	const anVec3 &	SubVec3( int index ) const;
+	anVec3 &		SubVec3( int index );
+	const anVec6 &	SubVec6( int index ) const;
+	anVec6 &		SubVec6( int index );
 	const float *	ToFloatPtr( void ) const;
 	float *			ToFloatPtr( void );
 	const char *	ToString( int precision = 2 ) const;
@@ -1533,64 +1837,71 @@ private:
 };
 
 
-ARC_INLINE arcVecX::arcVecX( void ) {
+ARC_INLINE anVecX::anVecX( void ) {
 	size = alloced = 0;
-	p = NULL;
+	p = nullptr;
 }
 
-ARC_INLINE arcVecX::arcVecX( int length ) {
+ARC_INLINE anVecX::anVecX( int length ) {
 	size = alloced = 0;
-	p = NULL;
+	p = nullptr;
 	SetSize( length );
 }
 
-ARC_INLINE arcVecX::arcVecX( int length, float *data ) {
+ARC_INLINE anVecX::anVecX( int length, float *data ) {
 	size = alloced = 0;
-	p = NULL;
+	p = nullptr;
 	SetData( length, data );
 }
 
-ARC_INLINE arcVecX::~arcVecX( void ) {
+ARC_INLINE anVecX::~anVecX( void ) {
 	// if not temp memory
-	if ( p && ( p < arcVecX::tempPtr || p >= arcVecX::tempPtr + VECX_MAX_TEMP ) && alloced != -1 ) {
+	if ( p && ( p < anVecX::tempPtr || p >= anVecX::tempPtr + VECX_MAX_TEMP ) && alloced != -1 ) {
 		Mem_Free16( p );
 	}
 }
 
-ARC_INLINE float arcVecX::operator[]( const int index ) const {
+ARC_INLINE float anVecX::Get( int index ) const {
 	assert( index >= 0 && index < size );
 	return p[index];
 }
 
-ARC_INLINE float &arcVecX::operator[]( const int index ) {
+ARC_INLINE float & anVecX::Get( int index ) {
 	assert( index >= 0 && index < size );
 	return p[index];
 }
 
-ARC_INLINE arcVecX arcVecX::operator-() const {
-	int i;
-	arcVecX m;
+ARC_INLINE float anVecX::operator[]( const int index ) const {
+	assert( index >= 0 && index < size );
+	return p[index];
+}
 
-	m.SetTempSize( size );
+ARC_INLINE float &anVecX::operator[]( const int index ) {
+	assert( index >= 0 && index < size );
+	return p[index];
+}
+
+ARC_INLINE anVecX anVecX::operator-() const {
+	anVecX m.SetTempSize( size );
 	for ( int i = 0; i < size; i++ ) {
 		m.p[i] = -p[i];
 	}
 	return m;
 }
 
-ARC_INLINE arcVecX &arcVecX::operator=( const arcVecX &a ) {
+ARC_INLINE anVecX &anVecX::operator=( const anVecX &a ) {
 	SetSize( a.size );
 #ifdef VECX_SIMD
 	SIMDProcessor->Copy16( p, a.p, a.size );
 #else
 	memcpy( p, a.p, a.size * sizeof( float ) );
 #endif
-	arcVecX::tempIndex = 0;
+	anVecX::tempIndex = 0;
 	return *this;
 }
 
-ARC_INLINE arcVecX arcVecX::operator+( const arcVecX &a ) const {
-	arcVecX m;
+ARC_INLINE anVecX anVecX::operator+( const anVecX &a ) const {
+	anVecX m;
 
 	assert( size == a.size );
 	m.SetTempSize( size );
@@ -1604,8 +1915,8 @@ ARC_INLINE arcVecX arcVecX::operator+( const arcVecX &a ) const {
 	return m;
 }
 
-ARC_INLINE arcVecX arcVecX::operator-( const arcVecX &a ) const {
-	arcVecX m;
+ARC_INLINE anVecX anVecX::operator-( const anVecX &a ) const {
+	anVecX m;
 
 	assert( size == a.size );
 	m.SetTempSize( size );
@@ -1619,7 +1930,7 @@ ARC_INLINE arcVecX arcVecX::operator-( const arcVecX &a ) const {
 	return m;
 }
 
-ARC_INLINE arcVecX &arcVecX::operator+=( const arcVecX &a ) {
+ARC_INLINE anVecX &anVecX::operator+=( const anVecX &a ) {
 	assert( size == a.size );
 #ifdef VECX_SIMD
 	SIMDProcessor->AddAssign16( p, a.p, size );
@@ -1628,11 +1939,11 @@ ARC_INLINE arcVecX &arcVecX::operator+=( const arcVecX &a ) {
 		p[i] += a.p[i];
 	}
 #endif
-	arcVecX::tempIndex = 0;
+	anVecX::tempIndex = 0;
 	return *this;
 }
 
-ARC_INLINE arcVecX &arcVecX::operator-=( const arcVecX &a ) {
+ARC_INLINE anVecX &anVecX::operator-=( const anVecX &a ) {
 	assert( size == a.size );
 #ifdef VECX_SIMD
 	SIMDProcessor->SubAssign16( p, a.p, size );
@@ -1641,12 +1952,12 @@ ARC_INLINE arcVecX &arcVecX::operator-=( const arcVecX &a ) {
 		p[i] -= a.p[i];
 	}
 #endif
-	arcVecX::tempIndex = 0;
+	anVecX::tempIndex = 0;
 	return *this;
 }
 
-ARC_INLINE arcVecX arcVecX::operator*( const float a ) const {
-	arcVecX m;
+ARC_INLINE anVecX anVecX::operator*( const float a ) const {
+	anVecX m;
 
 	m.SetTempSize( size );
 #ifdef VECX_SIMD
@@ -1659,7 +1970,7 @@ ARC_INLINE arcVecX arcVecX::operator*( const float a ) const {
 	return m;
 }
 
-ARC_INLINE arcVecX &arcVecX::operator*=( const float a ) {
+ARC_INLINE anVecX &anVecX::operator*=( const float a ) {
 #ifdef VECX_SIMD
 	SIMDProcessor->MulAssign16( p, a, size );
 #else
@@ -1670,22 +1981,22 @@ ARC_INLINE arcVecX &arcVecX::operator*=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE arcVecX arcVecX::operator/( const float a ) const {
+ARC_INLINE anVecX anVecX::operator/( const float a ) const {
 	assert( a != 0.0f );
 	return (*this) * ( 1.0f / a );
 }
 
-ARC_INLINE arcVecX &arcVecX::operator/=( const float a ) {
+ARC_INLINE anVecX &anVecX::operator/=( const float a ) {
 	assert( a != 0.0f );
 	(*this) *= ( 1.0f / a );
 	return *this;
 }
 
-ARC_INLINE arcVecX operator*( const float a, const arcVecX b ) {
+ARC_INLINE anVecX operator*( const float a, const anVecX b ) {
 	return b * a;
 }
 
-ARC_INLINE float arcVecX::operator*( const arcVecX &a ) const {
+ARC_INLINE float anVecX::operator*( const anVecX &a ) const {
 	float sum = 0.0f;
 
 	assert( size == a.size );
@@ -1695,7 +2006,7 @@ ARC_INLINE float arcVecX::operator*( const arcVecX &a ) const {
 	return sum;
 }
 
-ARC_INLINE bool arcVecX::Compare( const arcVecX &a ) const {
+ARC_INLINE bool anVecX::Compare( const anVecX &a ) const {
 	assert( size == a.size );
 	for ( int i = 0; i < size; i++ ) {
 		if ( p[i] != a.p[i] ) {
@@ -1705,25 +2016,25 @@ ARC_INLINE bool arcVecX::Compare( const arcVecX &a ) const {
 	return true;
 }
 
-ARC_INLINE bool arcVecX::Compare( const arcVecX &a, const float epsilon ) const {
+ARC_INLINE bool anVecX::Compare( const anVecX &a, const float epsilon ) const {
 	assert( size == a.size );
 	for ( int i = 0; i < size; i++ ) {
-		if ( arcMath::Fabs( p[i] - a.p[i] ) > epsilon ) {
+		if ( anMath::Fabs( p[i] - a.p[i] ) > epsilon ) {
 			return false;
 		}
 	}
 	return true;
 }
 
-ARC_INLINE bool arcVecX::operator==( const arcVecX &a ) const {
+ARC_INLINE bool anVecX::operator==( const anVecX &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool arcVecX::operator!=( const arcVecX &a ) const {
+ARC_INLINE bool anVecX::operator!=( const anVecX &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void arcVecX::SetSize( int newSize ) {
+ARC_INLINE void anVecX::SetSize( int newSize ) {
 	int alloc = ( newSize + 3 ) & ~3;
 	if ( alloc > alloced && alloced != -1 ) {
 		if ( p ) {
@@ -1736,7 +2047,7 @@ ARC_INLINE void arcVecX::SetSize( int newSize ) {
 	VECX_CLEAREND();
 }
 
-ARC_INLINE void arcVecX::ChangeSize( int newSize, bool makeZero ) {
+ARC_INLINE void anVecX::ChangeSize( int newSize, bool makeZero ) {
 	int alloc = ( newSize + 3 ) & ~3;
 	if ( alloc > alloced && alloced != -1 ) {
 		float *oldVec = p;
@@ -1759,20 +2070,20 @@ ARC_INLINE void arcVecX::ChangeSize( int newSize, bool makeZero ) {
 	VECX_CLEAREND();
 }
 
-ARC_INLINE void arcVecX::SetTempSize( int newSize ) {
+ARC_INLINE void anVecX::SetTempSize( int newSize ) {
 	size = newSize;
 	alloced = ( newSize + 3 ) & ~3;
 	assert( alloced < VECX_MAX_TEMP );
-	if ( arcVecX::tempIndex + alloced > VECX_MAX_TEMP ) {
-		arcVecX::tempIndex = 0;
+	if ( anVecX::tempIndex + alloced > VECX_MAX_TEMP ) {
+		anVecX::tempIndex = 0;
 	}
-	p = arcVecX::tempPtr + arcVecX::tempIndex;
-	arcVecX::tempIndex += alloced;
+	p = anVecX::tempPtr + anVecX::tempIndex;
+	anVecX::tempIndex += alloced;
 	VECX_CLEAREND();
 }
 
-ARC_INLINE void arcVecX::SetData( int length, float *data ) {
-	if ( p && ( p < arcVecX::tempPtr || p >= arcVecX::tempPtr + VECX_MAX_TEMP ) && alloced != -1 ) {
+ARC_INLINE void anVecX::SetData( int length, float *data ) {
+	if ( p && ( p < anVecX::tempPtr || p >= anVecX::tempPtr + VECX_MAX_TEMP ) && alloced != -1 ) {
 		Mem_Free16( p );
 	}
 	assert( ( ( ( int ) data ) & 15 ) == 0 ); // data must be 16 byte aligned
@@ -1782,7 +2093,7 @@ ARC_INLINE void arcVecX::SetData( int length, float *data ) {
 	VECX_CLEAREND();
 }
 
-ARC_INLINE void arcVecX::Zero( void ) {
+ARC_INLINE void anVecX::Zero( void ) {
 #ifdef VECX_SIMD
 	SIMDProcessor->Zero16( p, size );
 #else
@@ -1790,7 +2101,7 @@ ARC_INLINE void arcVecX::Zero( void ) {
 #endif
 }
 
-ARC_INLINE void arcVecX::Zero( int length ) {
+ARC_INLINE void anVecX::Zero( int length ) {
 	SetSize( length );
 #ifdef VECX_SIMD
 	SIMDProcessor->Zero16( p, length );
@@ -1799,7 +2110,7 @@ ARC_INLINE void arcVecX::Zero( int length ) {
 #endif
 }
 
-ARC_INLINE void arcVecX::Random( int seed, float l, float u ) {
+ARC_INLINE void anVecX::Random( int seed, float l, float u ) {
 	float c;
 	arcRandom rnd( seed );
 
@@ -1809,7 +2120,7 @@ ARC_INLINE void arcVecX::Random( int seed, float l, float u ) {
 	}
 }
 
-ARC_INLINE void arcVecX::Random( int length, int seed, float l, float u ) {
+ARC_INLINE void anVecX::Random( int length, int seed, float l, float u ) {
 	arcRandom rnd( seed );
 
 	SetSize( length );
@@ -1819,7 +2130,7 @@ ARC_INLINE void arcVecX::Random( int length, int seed, float l, float u ) {
 	}
 }
 
-ARC_INLINE void arcVecX::Negate( void ) {
+ARC_INLINE void anVecX::Negate( void ) {
 #ifdef VECX_SIMD
 	SIMDProcessor->Negate16( p, size );
 #else
@@ -1829,7 +2140,7 @@ ARC_INLINE void arcVecX::Negate( void ) {
 #endif
 }
 
-ARC_INLINE void arcVecX::Clamp( float min, float max ) {
+ARC_INLINE void anVecX::Clamp( float min, float max ) {
 	for ( int i = 0; i < size; i++ ) {
 		if ( p[i] < min ) {
 			p[i] = min;
@@ -1839,23 +2150,23 @@ ARC_INLINE void arcVecX::Clamp( float min, float max ) {
 	}
 }
 
-ARC_INLINE arcVecX &arcVecX::SwapElements( int e1, int e2 ) {
+ARC_INLINE anVecX &anVecX::SwapElements( int e1, int e2 ) {
 	float tmp = p[e1];
 	p[e1] = p[e2];
 	p[e2] = tmp;
 	return *this;
 }
 
-ARC_INLINE float arcVecX::Length( void ) const {
+ARC_INLINE float anVecX::Length( void ) const {
 	float sum = 0.0f;
 
 	for ( int i = 0; i < size; i++ ) {
 		sum += p[i] * p[i];
 	}
-	return arcMath::Sqrt( sum );
+	return anMath::Sqrt( sum );
 }
 
-ARC_INLINE float arcVecX::LengthSqr( void ) const {
+ARC_INLINE float anVecX::LengthSqr( void ) const {
 	float sum = 0.0f;
 
 	for ( int i = 0; i < size; i++ ) {
@@ -1864,130 +2175,130 @@ ARC_INLINE float arcVecX::LengthSqr( void ) const {
 	return sum;
 }
 
-ARC_INLINE arcVecX arcVecX::Normalize( void ) const {
+ARC_INLINE anVecX anVecX::Normalize( void ) const {
 	float invSqrt, sum = 0.0f;
 
-	arcVecX m.SetTempSize( size );
+	anVecX m.SetTempSize( size );
 	for ( int i = 0; i < size; i++ ) {
 		sum += p[i] * p[i];
 	}
-	invSqrt = arcMath::InvSqrt( sum );
+	invSqrt = anMath::InvSqrt( sum );
 	for ( int i = 0; i < size; i++ ) {
 		m.p[i] = p[i] * invSqrt;
 	}
 	return m;
 }
 
-ARC_INLINE float arcVecX::NormalizeSelf( void ) {
+ARC_INLINE float anVecX::NormalizeSelf( void ) {
 	float invSqrt, sum = 0.0f;
 
-	//invSqrt = arcMath::InvSqrt( LengthSqr() );
+	//invSqrt = anMath::InvSqrt( LengthSqr() );
 	for ( int i = 0; i < size; i++ ) {
 		sum += p[i] * p[i];
 	}
-	invSqrt = arcMath::InvSqrt( sum );
+	invSqrt = anMath::InvSqrt( sum );
 	for ( int i = 0; i < size; i++ ) {
 		p[i] *= invSqrt;
 	}
 	return invSqrt * sum;
 }
 
-ARC_INLINE int arcVecX::GetDimension( void ) const {
+ARC_INLINE int anVecX::GetDimension( void ) const {
 	return size;
 }
 
-ARC_INLINE arcVec3 &arcVecX::SubVec3( int index ) {
+ARC_INLINE anVec3 &anVecX::SubVec3( int index ) {
 	assert( index >= 0 && index * 3 + 3 <= size );
-	return *reinterpret_cast<arcVec3 *>( p + index * 3 );
+	return *reinterpret_cast<anVec3 *>( p + index * 3 );
 }
 
-ARC_INLINE const arcVec3 &arcVecX::SubVec3( int index ) const {
+ARC_INLINE const anVec3 &anVecX::SubVec3( int index ) const {
 	assert( index >= 0 && index * 3 + 3 <= size );
-	return *reinterpret_cast<const arcVec3 *>(p + index * 3);
+	return *reinterpret_cast<const anVec3 *>(p + index * 3);
 }
 
-ARC_INLINE arcVec6 &arcVecX::SubVec6( int index ) {
+ARC_INLINE anVec6 &anVecX::SubVec6( int index ) {
 	assert( index >= 0 && index * 6 + 6 <= size );
-	return *reinterpret_cast<arcVec6 *>( p + index * 6 );
+	return *reinterpret_cast<anVec6 *>( p + index * 6 );
 }
 
-ARC_INLINE const arcVec6 &arcVecX::SubVec6( int index ) const {
+ARC_INLINE const anVec6 &anVecX::SubVec6( int index ) const {
 	assert( index >= 0 && index * 6 + 6 <= size );
-	return *reinterpret_cast<const arcVec6 *>( p + index * 6 );
+	return *reinterpret_cast<const anVec6 *>( p + index * 6 );
 }
 
-ARC_INLINE const float *arcVecX::ToFloatPtr( void ) const {
+ARC_INLINE const float *anVecX::ToFloatPtr( void ) const {
 	return p;
 }
 
-ARC_INLINE float *arcVecX::ToFloatPtr( void ) {
+ARC_INLINE float *anVecX::ToFloatPtr( void ) {
 	return p;
 }
 
 //===============================================================
 //
-//	idPolar3
+//	anPolar3
 //
 //===============================================================
 
-class idPolar3 {
+class anPolar3 {
 public:
 	float			radius, theta, phi;
 
-					idPolar3( void );
-					explicit idPolar3( const float radius, const float theta, const float phi );
+					anPolar3( void );
+					explicit anPolar3( const float radius, const float theta, const float phi );
 
 	void 			Set( const float radius, const float theta, const float phi );
 
 	float			operator[]( const int index ) const;
 	float &			operator[]( const int index );
-	idPolar3		operator-() const;
-	idPolar3 &		operator=( const idPolar3 &a );
+	anPolar3		operator-() const;
+	anPolar3 &		operator=( const anPolar3 &a );
 
-	arcVec3			ToVec3( void ) const;
+	anVec3			ToVec3( void ) const;
 };
 
-ARC_INLINE idPolar3::idPolar3( void ) {
+ARC_INLINE anPolar3::anPolar3( void ) {
 }
 
-ARC_INLINE idPolar3::idPolar3( const float radius, const float theta, const float phi ) {
+ARC_INLINE anPolar3::anPolar3( const float radius, const float theta, const float phi ) {
 	assert( radius > 0 );
 	this->radius = radius;
 	this->theta = theta;
 	this->phi = phi;
 }
 
-ARC_INLINE void idPolar3::Set( const float radius, const float theta, const float phi ) {
+ARC_INLINE void anPolar3::Set( const float radius, const float theta, const float phi ) {
 	assert( radius > 0 );
 	this->radius = radius;
 	this->theta = theta;
 	this->phi = phi;
 }
 
-ARC_INLINE float idPolar3::operator[]( const int index ) const {
+ARC_INLINE float anPolar3::operator[]( const int index ) const {
 	return ( &radius )[index];
 }
 
-ARC_INLINE float &idPolar3::operator[]( const int index ) {
+ARC_INLINE float &anPolar3::operator[]( const int index ) {
 	return ( &radius )[index];
 }
 
-ARC_INLINE idPolar3 idPolar3::operator-() const {
-	return idPolar3( radius, -theta, -phi );
+ARC_INLINE anPolar3 anPolar3::operator-() const {
+	return anPolar3( radius, -theta, -phi );
 }
 
-ARC_INLINE idPolar3 &idPolar3::operator=( const idPolar3 &a ) {
+ARC_INLINE anPolar3 &anPolar3::operator=( const anPolar3 &a ) {
 	radius = a.radius;
 	theta = a.theta;
 	phi = a.phi;
 	return *this;
 }
 
-ARC_INLINE arcVec3 idPolar3::ToVec3( void ) const {
+ARC_INLINE anVec3 anPolar3::ToVec3( void ) const {
 	float sp, cp, st, ct;
-	arcMath::SinCos( phi, sp, cp );
-	arcMath::SinCos( theta, st, ct );
- 	return arcVec3( cp * radius * ct, cp * radius * st, radius * sp );
+	anMath::SinCos( phi, sp, cp );
+	anMath::SinCos( theta, st, ct );
+ 	return anVec3( cp * radius * ct, cp * radius * st, radius * sp );
 }
 
 
@@ -2002,8 +2313,8 @@ ARC_INLINE arcVec3 idPolar3::ToVec3( void ) const {
 #define DotProduct( a, b)			( ( a )[0]*( b )[0]+( a )[1]*( b )[1]+( a )[2]*( b )[2] )
 #define VectorSubtract( a, b, c )	( ( c )[0]=( a )[0]-( b )[0],( c )[1]=( a )[1]-( b )[1],( c )[2]=( a )[2]-( b )[2] )
 #define VectorAdd( a, b, c )		( ( c )[0]=( a )[0]+( b )[0],( c )[1]=( a )[1]+( b )[1],( c )[2]=( a )[2]+( b )[2] )
-#define	VectorScale( v, s, o )		((o)[0]=( v)[0]*(s),(o)[1]=( v)[1]*(s),(o)[2]=( v)[2]*(s) )
-#define	VectorMA( v, s, b, o )		((o)[0]=( v)[0]+( b )[0]*(s),(o)[1]=( v)[1]+( b )[1]*(s),(o)[2]=( v)[2]+( b )[2]*(s) )
+#define	VectorScale( v, s, o )		((o)[0]=( v)[0]*( s),(o)[1]=( v)[1]*( s),(o)[2]=( v)[2]*( s) )
+#define	VectorMA( v, s, b, o )		((o)[0]=( v)[0]+( b )[0]*( s),(o)[1]=( v)[1]+( b )[1]*( s),(o)[2]=( v)[2]+( b )[2]*( s) )
 #define VectorCopy( a, b )			( ( b )[0]=( a )[0],( b )[1]=( a )[1],( b )[2]=( a )[2] )
 
 

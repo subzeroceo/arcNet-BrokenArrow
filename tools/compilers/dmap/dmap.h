@@ -32,7 +32,7 @@ If you have questions concerning this license or the applicable additional terms
 typedef struct primitive_s {
 	struct primitive_s *next;
 
-	// only one of these will be non-NULL
+	// only one of these will be non-nullptr
 	struct bspbrush_s *	brush;
 	struct mapTri_s *	tris;
 } primitive_t;
@@ -44,9 +44,9 @@ typedef struct {
 } uArea_t;
 
 typedef struct {
-	idMapEntity *		mapEntity;		// points into mapFile_t data
+	anMapEntity *		mapEntity;		// points into mapFile_t data
 
-	arcVec3				origin;
+	anVec3				origin;
 	primitive_t *		primitives;
 	struct tree_s *		tree;
 
@@ -59,12 +59,12 @@ typedef struct {
 typedef struct mapTri_s {
 	struct mapTri_s *	next;
 
-	const arcMaterial *	material;
+	const anMaterial *	material;
 	void *				mergeGroup;		// we want to avoid merging triangles
 											// from different fixed groups, like guiSurfaces and mirrors
 	int					planeNum;			// not set universally, just in some areas
 
-	arcDrawVert			v[3];
+	anDrawVertex			v[3];
 	const struct hashVert_s *hashVert[3];
 	struct optVertex_s *optVert[3];
 } mapTri_t;
@@ -72,7 +72,7 @@ typedef struct mapTri_s {
 
 typedef struct {
 	int					width, height;
-	arcDrawVert *		verts;
+	anDrawVertex *		verts;
 } mesh_t;
 
 
@@ -83,7 +83,7 @@ typedef struct {
 typedef struct parseMesh_s {
 	struct parseMesh_s *next;
 	mesh_t				mesh;
-	const arcMaterial *	material;
+	const anMaterial *	material;
 } parseMesh_t;
 
 typedef struct bspface_s {
@@ -92,21 +92,21 @@ typedef struct bspface_s {
 	bool				portal;			// all portals will be selected before
 										// any non-portals
 	bool				checked;		// used by SelectSplitPlaneNum()
-	arcWinding *			w;
+	anWinding *			w;
 } bspface_t;
 
 typedef struct {
-	arcVec4		v[2];		// the offset value will always be in the 0.0 to 1.0 range
+	anVec4		v[2];		// the offset value will always be in the 0.0 to 1.0 range
 } textureVectors_t;
 
 typedef struct side_s {
 	int					planenum;
 
-	const arcMaterial *	material;
+	const anMaterial *	material;
 	textureVectors_t	texVec;
 
-	arcWinding *			winding;		// only clipped to the other sides of the brush
-	arcWinding *			visibleHull;	// also clipped to the solid parts of the world
+	anWinding *			winding;		// only clipped to the other sides of the brush
+	anWinding *			visibleHull;	// also clipped to the solid parts of the world
 } side_t;
 
 
@@ -117,13 +117,13 @@ typedef struct bspbrush_s {
 	int					entitynum;			// editor numbering for messages
 	int					brushnum;			// editor numbering for messages
 
-	const arcMaterial *	contentShader;	// one face's shader will determine the volume attributes
+	const anMaterial *	contentShader;	// one face's shader will determine the volume attributes
 
 	int					contents;
 	bool				opaque;
 	int					outputNumber;		// set when the brush is written to the file list
 
-	arcBounds			bounds;
+	anBounds			bounds;
 	int					numsides;
 	side_t				sides[6];			// variably sized
 } uBrush_t;
@@ -139,7 +139,7 @@ typedef struct node_s {
 	// both leafs and nodes
 	int					planenum;	// -1 = leaf node
 	struct node_s *		parent;
-	arcBounds			bounds;		// valid after portalization
+	anBounds			bounds;		// valid after portalization
 
 	// nodes only
 	side_t *			side;		// the side that created the node
@@ -161,26 +161,26 @@ typedef struct node_s {
 
 
 typedef struct uPortal_s {
-	arcPlane		plane;
-	node_t		*onnode;		// NULL = outside box
+	anPlane		plane;
+	node_t		*onnode;		// nullptr = outside box
 	node_t		*nodes[2];		// [0] = front side of plane
 	struct uPortal_s	*next[2];
-	arcWinding	*winding;
+	anWinding	*winding;
 } uPortal_t;
 
 // a tree_t is created by FaceBSP()
 typedef struct tree_s {
 	node_t		*headnode;
 	node_t		outside_node;
-	arcBounds	bounds;
+	anBounds	bounds;
 } tree_t;
 
 #define	MAX_QPATH			256			// max length of a game pathname
 
 typedef struct {
-	ARCRenderLightsLocal	def;
+	anRenderLightsLocal	def;
 	char		name[MAX_QPATH];		// for naming the shadow volume surface and interactions
-	surfTriangles_t	*shadowTris;
+	srfTriangles_t	*shadowTris;
 } mapLight_t;
 
 #define	MAX_GROUP_LIGHTS	16
@@ -188,13 +188,13 @@ typedef struct {
 typedef struct optimizeGroup_s {
 	struct optimizeGroup_s	*nextGroup;
 
-	arcBounds			bounds;			// set in CarveGroupsByLight
+	anBounds			bounds;			// set in CarveGroupsByLight
 
 	// all of these must match to add a triangle to the triList
 	bool				smoothed;				// curves will never merge with brushes
 	int					planeNum;
 	int					areaNum;
-	const arcMaterial *	material;
+	const anMaterial *	material;
 	int					numGroupLights;
 	mapLight_t *		groupLights[MAX_GROUP_LIGHTS];	// lights effecting this list
 	void *				mergeGroup;		// if this differs (guiSurfaces, mirrors, etc), the
@@ -206,7 +206,7 @@ typedef struct optimizeGroup_s {
 
 	mapTri_t *			triList;
 	mapTri_t *			regeneratedTris;	// after each island optimization
-	arcVec3				axis[2];			// orthogonal to the plane, so optimization can be 2D
+	anVec3				axis[2];			// orthogonal to the plane, so optimization can be 2D
 } optimizeGroup_t;
 
 // all primitives from the map are added to optimzeGroups, creating new ones as needed
@@ -234,7 +234,7 @@ typedef struct {
 	// mapFileBase will contain the qpath without any extension: "maps/test_box"
 	char		mapFileBase[1024];
 
-	idMapFile	*dmapFile;
+	anMapFile	*dmapFile;
 
 	aRcPlaneSet	mapPlanes;
 
@@ -243,7 +243,7 @@ typedef struct {
 
 	int			entityNum;
 
-	arcNetList<mapLight_t*>	mapLights;
+	anList<mapLight_t*>	mapLights;
 
 	bool	verbose;
 
@@ -261,7 +261,7 @@ typedef struct {
 	shadowOptLevel_t	shadowOptLevel;
 	bool	noShadow;			// don't create optimized shadow volumes
 
-	arcBounds	drawBounds;
+	anBounds	drawBounds;
 	bool	drawflag;
 
 	int		totalShadowTriangles;
@@ -270,7 +270,7 @@ typedef struct {
 
 extern dmapGlobals_t dmapGlobals;
 
-int FindFloatPlane( const arcPlane &plane, bool *fixedDegeneracies = NULL );
+int FindFloatPlane( const anPlane &plane, bool *fixedDegeneracies = nullptr );
 
 
 //=============================================================================
@@ -295,7 +295,7 @@ void DrawBrushList (uBrush_t *brush);
 void PrintBrush (uBrush_t *brush);
 bool BoundBrush (uBrush_t *brush);
 bool CreateBrushWindings (uBrush_t *brush);
-uBrush_t	*BrushFromBounds( const arcBounds &bounds );
+uBrush_t	*BrushFromBounds( const anBounds &bounds );
 float BrushVolume (uBrush_t *brush);
 void WriteBspBrushMap( const char *name, uBrush_t *list );
 
@@ -318,13 +318,13 @@ void		FreeDMapFile( void );
 // draw.cpp -- draw debug views either directly, or through glserv.exe
 
 void Draw_ClearWindow( void );
-void DrawWinding( const arcWinding *w );
-void DrawAuxWinding( const arcWinding *w );
+void DrawWinding( const anWinding *w );
+void DrawAuxWinding( const anWinding *w );
 
-void DrawLine( arcVec3 v1, arcVec3 v2, int color );
+void DrawLine( anVec3 v1, anVec3 v2, int color );
 
 void GLS_BeginScene( void );
-void GLS_Winding( const arcWinding *w, int code );
+void GLS_Winding( const anWinding *w, int code );
 void GLS_Triangle( const mapTri_t *tri, int code );
 void GLS_EndScene( void );
 
@@ -354,7 +354,7 @@ void FreePortal( uPortal_t *p );
 
 // glfile.cpp -- write a debug file to be viewd with glview.exe
 
-void OutputWinding( arcWinding *w, arcNetFile *glview );
+void OutputWinding( anWinding *w, anFile *glview );
 void WriteGLView( tree_t *tree, char *source );
 
 //=============================================================================
@@ -393,7 +393,7 @@ void	Prelight( uEntity_t *e );
 
 // tritjunction.cpp
 
-struct hashVert_s	*GetHashVert( arcVec3 &v );
+struct hashVert_s	*GetHashVert( anVec3 &v );
 void	HashTriangles( optimizeGroup_t *groupList );
 void	FreeTJunctionHash( void );
 int		CountGroupListTris( const optimizeGroup_t *groupList );
@@ -410,8 +410,8 @@ void	FixGlobalTjunctions( uEntity_t *e );
 
 
 typedef struct optVertex_s {
-	arcDrawVert	v;
-	arcVec3	pv;					// projected against planar axis, third value is 0
+	anDrawVertex	v;
+	anVec3	pv;					// projected against planar axis, third value is 0
 	struct optEdge_s *edges;
 	struct optVertex_s	*islandLink;
 	bool	addedToIsland;
@@ -430,7 +430,7 @@ typedef struct optEdge_s {
 
 typedef struct optTri_s {
 	struct optTri_s	*next;
-	arcVec3		midpoint;
+	anVec3		midpoint;
 	optVertex_t	*v[3];
 	bool	filled;
 } optTri_t;
@@ -459,27 +459,27 @@ void		FreeTriList( mapTri_t *a );
 mapTri_t	*CopyMapTri( const mapTri_t *tri );
 float		MapTriArea( const mapTri_t *tri );
 mapTri_t	*RemoveBadTris( const mapTri_t *tri );
-void		BoundTriList( const mapTri_t *list, arcBounds &b );
+void		BoundTriList( const mapTri_t *list, anBounds &b );
 void		DrawTri( const mapTri_t *tri );
 void		FlipTriList( mapTri_t *tris );
 void		TriVertsFromOriginal( mapTri_t *tri, const mapTri_t *original );
-void		PlaneForTri( const mapTri_t *tri, arcPlane &plane );
-arcWinding	*WindingForTri( const mapTri_t *tri );
-mapTri_t	*WindingToTriList( const arcWinding *w, const mapTri_t *originalTri );
-void		ClipTriList( const mapTri_t *list, const arcPlane &plane, float epsilon, mapTri_t **front, mapTri_t **back );
+void		PlaneForTri( const mapTri_t *tri, anPlane &plane );
+anWinding	*WindingForTri( const mapTri_t *tri );
+mapTri_t	*WindingToTriList( const anWinding *w, const mapTri_t *originalTri );
+void		ClipTriList( const mapTri_t *list, const anPlane &plane, float epsilon, mapTri_t **front, mapTri_t **back );
 
 //=============================================================================
 
 // output.cpp
 
-surfTriangles_t	*ShareMapTriVerts( const mapTri_t *tris );
+srfTriangles_t	*ShareMapTriVerts( const mapTri_t *tris );
 void WriteOutputFile( void );
 
 //=============================================================================
 
 // shadowopt.cpp
 
-surfTriangles_t *CreateLightShadow( optimizeGroup_t *shadowerGroups, const mapLight_t *light );
+srfTriangles_t *CreateLightShadow( optimizeGroup_t *shadowerGroups, const mapLight_t *light );
 void		FreeBeamTree( struct beamTree_s *beamTree );
 
 void		CarveTriByBeamTree( const struct beamTree_s *beamTree, const mapTri_t *tri, mapTri_t **lit, mapTri_t **unLit );

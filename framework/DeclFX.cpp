@@ -1,26 +1,26 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 /*
 =================
-arcDeclFX::Size
+anDeclFX::Size
 =================
 */
-size_t arcDeclFX::Size() const {
-	return sizeof( arcDeclFX );
+size_t anDeclFX::Size() const {
+	return sizeof( anDeclFX );
 }
 
 /*
 ===============
-arcDeclFX::Print
+anDeclFX::Print
 ===============
 */
-void arcDeclFX::Print() const {
-	const arcDeclFX *list = this;
+void anDeclFX::Print() const {
+	const anDeclFX *list = this;
 
 	common->Printf( "%d events\n", list->events.Num() );
 	for ( int i = 0; i < list->events.Num(); i++ ) {
-		switch( list->events[i].type ) {
+		switch ( list->events[i].type ) {
 			case FX_LIGHT:
 				common->Printf( "FX_LIGHT %s\n", list->events[i].data.c_str() );
 				break;
@@ -57,20 +57,20 @@ void arcDeclFX::Print() const {
 
 /*
 ===============
-arcDeclFX::List
+anDeclFX::List
 ===============
 */
-void arcDeclFX::List() const {
+void anDeclFX::List() const {
 	common->Printf( "%s, %d stages\n", GetName(), events.Num() );
 }
 
 /*
 ================
-arcDeclFX::ParseSingleFXAction
+anDeclFX::ParseSingleFXAction
 ================
 */
-void arcDeclFX::ParseSingleFXAction( arcLexer &src, idFXSingleAction& FXAction ) {
-	arcNetToken token;
+void anDeclFX::ParseSingleFXAction( anLexer &src, idFXSingleAction& FXAction ) {
+	anToken token;
 
 	FXAction.type = -1;
 	FXAction.sibling = -1;
@@ -205,7 +205,7 @@ void arcDeclFX::ParseSingleFXAction( arcLexer &src, idFXSingleAction& FXAction )
 		}
 
 		if ( !token.Icmp( "axis" ) ) {
-			arcVec3 v;
+			anVec3 v;
 			v.x = src.ParseFloat();
 			src.ExpectTokenString( "," );
 			v.y = src.ParseFloat();
@@ -218,7 +218,7 @@ void arcDeclFX::ParseSingleFXAction( arcLexer &src, idFXSingleAction& FXAction )
 		}
 
 		if ( !token.Icmp( "angle" ) ) {
-			arcAngles a;
+			anAngles a;
 			a[0] = src.ParseFloat();
 			src.ExpectTokenString( "," );
 			a[1] = src.ParseFloat();
@@ -376,12 +376,12 @@ void arcDeclFX::ParseSingleFXAction( arcLexer &src, idFXSingleAction& FXAction )
 
 /*
 ================
-arcDeclFX::Parse
+anDeclFX::Parse
 ================
 */
-bool arcDeclFX::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
-	arcLexer src;
-	arcNetToken token;
+bool anDeclFX::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+	anLexer src;
+	anToken token;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( DECL_LEXER_FLAGS );
@@ -421,10 +421,10 @@ bool arcDeclFX::Parse( const char *text, const int textLength, bool allowBinaryV
 
 /*
 ===================
-arcDeclFX::DefaultDefinition
+anDeclFX::DefaultDefinition
 ===================
 */
-const char *arcDeclFX::DefaultDefinition() const {
+const char *anDeclFX::DefaultDefinition() const {
 	return
 		"{\n"
 	"\t"	"{\n"
@@ -436,9 +436,9 @@ const char *arcDeclFX::DefaultDefinition() const {
 
 /*
 ===================
-arcDeclFX::FreeData
+anDeclFX::FreeData
 ===================
 */
-void arcDeclFX::FreeData() {
+void anDeclFX::FreeData() {
 	events.Clear();
 }

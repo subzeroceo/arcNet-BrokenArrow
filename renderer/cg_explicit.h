@@ -426,7 +426,7 @@ typedef enum {
 		 typedef  CGcontext  (*PFNCGCREATECONTEXTPROC)( void );
 		 typedef  void  (*PFNCGDESTROYCONTEXTPROC)(CGcontext ctx);
 		 typedef  CGbool  (*PFNCGISCONTEXTPROC)(CGcontext ctx);
-		 typedef  const char * (*PFNCGGETLASTLISTINGPROC)(CGcontext ctx);
+		 typedef  const char *(*PFNCGGETLASTLISTINGPROC)(CGcontext ctx);
 		 typedef  CGprogram (*PFNCGCREATEPROGRAMPROC)(CGcontext ctx,
 				 CGenum program_type,
 				 const char *program,
@@ -447,7 +447,7 @@ typedef enum {
 		 typedef  CGbool  (*PFNCGISPROGRAMPROC)(CGprogram program);
 		 typedef  void  (*PFNCGCOMPILEPROGRAMPROC)(CGprogram program);
 		 typedef  CGbool  (*PFNCGISPROGRAMCOMPILEDPROC)(CGprogram program);
-		 typedef  const char * (*PFNCGGETPROGRAMSTRINGPROC)(CGprogram prog, CGenum pname);
+		 typedef  const char *(*PFNCGGETPROGRAMSTRINGPROC)(CGprogram prog, CGenum pname);
 		 typedef  CGprofile  (*PFNCGGETPROGRAMPROFILEPROC)(CGprogram prog);
 		 typedef  CGparameter  (*PFNCGGETNAMEDPARAMETERPROC)(CGprogram prog, const char *name);
 		 typedef  CGparameter  (*PFNCGGETFIRSTPARAMETERPROC)(CGprogram prog, CGenum name_space);
@@ -461,9 +461,9 @@ typedef enum {
 		 typedef  int  (*PFNCGGETARRAYSIZEPROC)(CGparameter param, int dimension);
 		 typedef  CGprogram  (*PFNCGGETPARAMETERPROGRAMPROC)(CGparameter prog);
 		 typedef  CGbool  (*PFNCGISPARAMETERPROC)(CGparameter param);
-		 typedef  const char * (*PFNCGGETPARAMETERNAMEPROC)(CGparameter param);
+		 typedef  const char *(*PFNCGGETPARAMETERNAMEPROC)(CGparameter param);
 		 typedef  CGtype  (*PFNCGGETPARAMETERTYPEPROC)(CGparameter param);
-		 typedef  const char * (*PFNCGGETPARAMETERSEMANTICPROC)(CGparameter param);
+		 typedef  const char *(*PFNCGGETPARAMETERSEMANTICPROC)(CGparameter param);
 		 typedef  CGresource  (*PFNCGGETPARAMETERRESOURCEPROC)(CGparameter param);
 		 typedef  CGresource  (*PFNCGGETPARAMETERBASERESOURCEPROC)(CGparameter param);
 		 typedef  unsigned long  (*PFNCGGETPARAMETERRESOURCEINDEXPROC)(CGparameter param);
@@ -473,14 +473,14 @@ typedef enum {
 		 typedef  void (*PFNCGGETPARAMETERVALUESPROC)(CGparameter param,
 				 CGenum value_type,
 				 int *nvalues);
-		 typedef  const char * (*PFNCGGETTYPESTRINGPROC)(CGtype type);
+		 typedef  const char *(*PFNCGGETTYPESTRINGPROC)(CGtype type);
 		 typedef  CGtype  (*PFNCGGETTYPEPROC)(const char *type_string);
-		 typedef  const char * (*PFNCGGETRESOURCESTRINGPROC)(CGresource resource);
+		 typedef  const char *(*PFNCGGETRESOURCESTRINGPROC)(CGresource resource);
 		 typedef  CGresource  (*PFNCGGETRESOURCEPROC)(const char *resource_string);
-		 typedef  const char * (*PFNCGGETPROFILESTRINGPROC)(CGprofile profile);
+		 typedef  const char *(*PFNCGGETPROFILESTRINGPROC)(CGprofile profile);
 		 typedef  CGprofile  (*PFNCGGETPROFILEPROC)(const char *profile_string);
 		 typedef  CGerror  (*PFNCGGETERRORPROC)( void );
-		 typedef  const char * (*PFNCGGETERRORSTRINGPROC)(CGerror error);
+		 typedef  const char *(*PFNCGGETERRORSTRINGPROC)(CGerror error);
 		 typedef  void  (*PFNCGSETERRORCALLBACKPROC)(CGerrorCallbackFunc func);
 		 typedef  CGerrorCallbackFunc  (*PFNCGGETERRORCALLBACKPROC)( void );
 

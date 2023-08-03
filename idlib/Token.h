@@ -4,7 +4,7 @@
 /*
 ===============================================================================
 
-	arcNetToken is a token read from a file or memory with arcLexer or ARCParser
+	anToken is a token read from a file or memory with anLexer or anParser
 
 ===============================================================================
 */
@@ -40,10 +40,9 @@
 // punctuation sub type is the punctuation id
 // name sub type is the length of the name
 
-class arcNetToken : public arcNetString {
-
-	friend class ARCParser;
-	friend class arcLexer;
+class anToken : public anString {
+	friend class anParser;
+	friend class anLexer;
 
 public:
 	int				type;								// token type
@@ -53,11 +52,11 @@ public:
 	int				flags;								// token flags, used for recursive defines
 
 public:
-					arcNetToken( void );
-					arcNetToken( const arcNetToken *token );
-					~arcNetToken( void );
+					anToken( void );
+					anToken( const anToken *token );
+					~anToken( void );
 
-	void			operator=( const arcNetString& text );
+	void			operator=( const anString& text );
 	void			operator=( const char *text );
 
 	double			GetDoubleValue( void );				// double value of TT_NUMBER
@@ -72,46 +71,47 @@ public:
 private:
 	unsigned long	intvalue;							// integer value
 	double			floatvalue;							// floating point value
-	const char *	whiteSpaceStart_p;					// start of white space before token, only used by arcLexer
-	const char *	whiteSpaceEnd_p;					// end of white space before token, only used by arcLexer
-	arcNetToken *		next;								// next token in chain, only used by ARCParser
+	const char *	whiteSpaceStart_p;					// start of white space before token, only used by anLexer
+	const char *	whiteSpaceEnd_p;					// end of white space before token, only used by anLexer
+	anToken *		next;								// next token in chain, only used by anParser
 
 	void			AppendDirty( const char a );		// append character without adding trailing zero
 };
+extern anToken;
 
-ARC_INLINE arcNetToken::arcNetToken( void ) {
+ARC_INLINE anToken::anToken( void ) {
 }
 
-ARC_INLINE arcNetToken::arcNetToken( const arcNetToken *token ) {
+ARC_INLINE anToken::anToken( const anToken *token ) {
 	*this = *token;
 }
 
-ARC_INLINE arcNetToken::~arcNetToken( void ) {
+ARC_INLINE anToken::~anToken( void ) {
 }
 
-ARC_INLINE void arcNetToken::operator=( const char *text) {
-	*static_cast<arcNetString *>( this ) = text;
+ARC_INLINE void anToken::operator=( const char *text) {
+	*static_cast<anString *>( this ) = text;
 }
 
-ARC_INLINE void arcNetToken::operator=( const arcNetString& text ) {
-	*static_cast<arcNetString *>( this ) = text;
+ARC_INLINE void anToken::operator=( const anString& text ) {
+	*static_cast<anString *>( this ) = text;
 }
 
-ARC_INLINE double arcNetToken::GetDoubleValue( void ) {
+ARC_INLINE double anToken::GetDoubleValue( void ) {
 	if ( type != TT_NUMBER ) {
 		return 0.0;
 	}
-	if ( !(subtype & TT_VALUESVALID) ) {
+	if ( !( subtype & TT_VALUESVALID) ) {
 		NumberValue();
 	}
 	return floatvalue;
 }
 
-ARC_INLINE float arcNetToken::GetFloatValue( void ) {
+ARC_INLINE float anToken::GetFloatValue( void ) {
 	return ( float ) GetDoubleValue();
 }
 
-ARC_INLINE unsigned long	arcNetToken::GetUnsignedLongValue( void ) {
+ARC_INLINE unsigned long	anToken::GetUnsignedLongValue( void ) {
 	if ( type != TT_NUMBER ) {
 		return 0;
 	}
@@ -121,15 +121,15 @@ ARC_INLINE unsigned long	arcNetToken::GetUnsignedLongValue( void ) {
 	return intvalue;
 }
 
-ARC_INLINE int arcNetToken::GetIntValue( void ) {
+ARC_INLINE int anToken::GetIntValue( void ) {
 	return ( int ) GetUnsignedLongValue();
 }
 
-ARC_INLINE int arcNetToken::WhiteSpaceBeforeToken( void ) const {
+ARC_INLINE int anToken::WhiteSpaceBeforeToken( void ) const {
 	return ( whiteSpaceEnd_p > whiteSpaceStart_p );
 }
 
-ARC_INLINE void arcNetToken::AppendDirty( const char a ) {
+ARC_INLINE void anToken::AppendDirty( const char a ) {
 	EnsureAlloced( len + 2, true );
 	data[len++] = a;
 }

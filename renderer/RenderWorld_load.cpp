@@ -1,14 +1,14 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
 
 /*
 ================
-ARCRenderWorldLocal::FreeWorld
+anRenderWorldLocal::FreeWorld
 ================
 */
-void ARCRenderWorldLocal::FreeWorld() {
+void anRenderWorldLocal::FreeWorld() {
 	// this will free all the lightDefs and entityDefs
 	FreeDefs();
 
@@ -35,21 +35,21 @@ void ARCRenderWorldLocal::FreeWorld() {
 
 	if ( portalAreas ) {
 		R_StaticFree( portalAreas );
-		portalAreas = NULL;
+		portalAreas = nullptr;
 		numPortalAreas = 0;
 		R_StaticFree( areaScreenRect );
-		areaScreenRect = NULL;
+		areaScreenRect = nullptr;
 	}
 
 	if ( doublePortals ) {
 		R_StaticFree( doublePortals );
-		doublePortals = NULL;
+		doublePortals = nullptr;
 		numInterAreaPortals = 0;
 	}
 
 	if ( areaNodes ) {
 		R_StaticFree( areaNodes );
-		areaNodes = NULL;
+		areaNodes = nullptr;
 	}
 
 	// free all the inline idRenderModels
@@ -68,10 +68,10 @@ void ARCRenderWorldLocal::FreeWorld() {
 
 /*
 ================
-ARCRenderWorldLocal::TouchWorldModels
+anRenderWorldLocal::TouchWorldModels
 ================
 */
-void ARCRenderWorldLocal::TouchWorldModels( void ) {
+void anRenderWorldLocal::TouchWorldModels( void ) {
 	for ( int i = 0; i < localModels.Num(); i++ ) {
 		renderModelManager->CheckModel( localModels[i]->Name() );
 	}
@@ -79,17 +79,17 @@ void ARCRenderWorldLocal::TouchWorldModels( void ) {
 
 /*
 ================
-ARCRenderWorldLocal::ParseModel
+anRenderWorldLocal::ParseModel
 ================
 */
-ARCRenderModel *ARCRenderWorldLocal::ParseModel( arcLexer *src ) {
-	arcNetToken token;
+anRenderModel *anRenderWorldLocal::ParseModel( anLexer *src ) {
+	anToken token;
 
 	// parse the name
 	src->ExpectTokenString( "{" );
 	src->ExpectAnyToken( &token );
 
-	ARCRenderModel *model = renderModelManager->AllocModel();
+	anRenderModel *model = renderModelManager->AllocModel();
 	model->InitEmpty( token );
 
 	int numSurfaces = src->ParseInt();
@@ -102,9 +102,9 @@ ARCRenderModel *ARCRenderWorldLocal::ParseModel( arcLexer *src ) {
 		src->ExpectAnyToken( &token );
 
 		modelSurface_t surf.shader = declManager->FindMaterial( token );
-		( (arcMaterial*)surf.shader )->AddReference();
+		( (anMaterial*)surf.shader )->AddReference();
 
-		surfTriangles_t *tri = R_AllocStaticTriSurf();
+		srfTriangles_t *tri = R_AllocStaticTriSurf();
 		surf.geometry = tri;
 
 		tri->numVerts = src->ParseInt();
@@ -132,7 +132,7 @@ ARCRenderModel *ARCRenderWorldLocal::ParseModel( arcLexer *src ) {
 		src->ExpectTokenString( "}" );
 
 		// add the completed surface to the model
-		ARCRenderModel *model->AddSurface( surf );
+		anRenderModel *model->AddSurface( surf );
 	}
 
 	src->ExpectTokenString( "}" );
@@ -143,23 +143,23 @@ ARCRenderModel *ARCRenderWorldLocal::ParseModel( arcLexer *src ) {
 
 /*
 ================
-ARCRenderWorldLocal::ParseShadowModel
+anRenderWorldLocal::ParseShadowModel
 ================
 */
-ARCRenderModel *ARCRenderWorldLocal::ParseShadowModel( arcLexer *src ) {
-	arcNetToken			token;
+anRenderModel *anRenderWorldLocal::ParseShadowModel( anLexer *src ) {
+	anToken			token;
 
 	src->ExpectTokenString( "{" );
 
 	// parse the name
 	src->ExpectAnyToken( &token );
 
-	ARCRenderModel *model = renderModelManager->AllocModel();
+	anRenderModel *model = renderModelManager->AllocModel();
 	model->InitEmpty( token );
 
 	modelSurface_t surf.shader = tr.defaultMaterial;
 
-	surfTriangles_t *tri = R_AllocStaticTriSurf();
+	srfTriangles_t *tri = R_AllocStaticTriSurf();
 	surf.geometry = tri;
 
 	tri->numVerts = src->ParseInt();
@@ -200,10 +200,10 @@ ARCRenderModel *ARCRenderWorldLocal::ParseShadowModel( arcLexer *src ) {
 
 /*
 ================
-ARCRenderWorldLocal::SetupAreaRefs
+anRenderWorldLocal::SetupAreaRefs
 ================
 */
-void ARCRenderWorldLocal::SetupAreaRefs() {
+void anRenderWorldLocal::SetupAreaRefs() {
 	connectedAreaNum = 0;
 	for ( int i = 0; i < numPortalAreas; i++ ) {
 		portalAreas[i].areaNum = i;
@@ -218,10 +218,10 @@ void ARCRenderWorldLocal::SetupAreaRefs() {
 
 /*
 ================
-ARCRenderWorldLocal::ParseInterAreaPortals
+anRenderWorldLocal::ParseInterAreaPortals
 ================
 */
-void ARCRenderWorldLocal::ParseInterAreaPortals( arcLexer *src ) {
+void anRenderWorldLocal::ParseInterAreaPortals( anLexer *src ) {
 	src->ExpectTokenString( "{" );
 	numPortalAreas = src->ParseInt();
 	if ( numPortalAreas < 0 ) {
@@ -229,7 +229,7 @@ void ARCRenderWorldLocal::ParseInterAreaPortals( arcLexer *src ) {
 		return;
 	}
 	portalAreas = (portalArea_t *)R_ClearedStaticAlloc( numPortalAreas * sizeof( portalAreas[0] ) );
-	areaScreenRect = (ARCScreenRect *) R_ClearedStaticAlloc( numPortalAreas * sizeof( ARCScreenRect ) );
+	areaScreenRect = (anScreenRect *) R_ClearedStaticAlloc( numPortalAreas * sizeof( anScreenRect ) );
 
 	// set the doubly linked lists
 	SetupAreaRefs();
@@ -256,7 +256,7 @@ void ARCRenderWorldLocal::ParseInterAreaPortals( arcLexer *src ) {
 		int a1 = src->ParseInt();
 		int a2 = src->ParseInt();
 
-		arcWinding *w = new arcWinding( numPoints );
+		anWinding *w = new anWinding( numPoints );
 		w->SetNumPoints( numPoints );
 		for ( int j = 0; j < numPoints; j++ ) {
 			src->Parse1DMatrix( 3, ( *w )[j].ToFloatPtr() );
@@ -295,10 +295,10 @@ void ARCRenderWorldLocal::ParseInterAreaPortals( arcLexer *src ) {
 
 /*
 ================
-ARCRenderWorldLocal::ParseNodes
+anRenderWorldLocal::ParseNodes
 ================
 */
-void ARCRenderWorldLocal::ParseNodes( arcLexer *src ) {
+void anRenderWorldLocal::ParseNodes( anLexer *src ) {
 	src->ExpectTokenString( "{" );
 
 	numAreaNodes = src->ParseInt();
@@ -320,10 +320,10 @@ void ARCRenderWorldLocal::ParseNodes( arcLexer *src ) {
 
 /*
 ================
-ARCRenderWorldLocal::CommonChildrenArea_r
+anRenderWorldLocal::CommonChildrenArea_r
 ================
 */
-int ARCRenderWorldLocal::CommonChildrenArea_r( areaNode_t *node ) {
+int anRenderWorldLocal::CommonChildrenArea_r( areaNode_t *node ) {
 	int	nums[2];
 
 	for ( int i = 0; i < 2; i++ ) {
@@ -355,15 +355,15 @@ int ARCRenderWorldLocal::CommonChildrenArea_r( areaNode_t *node ) {
 
 /*
 =================
-ARCRenderWorldLocal::ClearWorld
+anRenderWorldLocal::ClearWorld
 
 Sets up for a single area world
 =================
 */
-void ARCRenderWorldLocal::ClearWorld() {
+void anRenderWorldLocal::ClearWorld() {
 	numPortalAreas = 1;
 	portalAreas = (portalArea_t *)R_ClearedStaticAlloc( sizeof( portalAreas[0] ) );
-	areaScreenRect = (ARCScreenRect *) R_ClearedStaticAlloc( sizeof( ARCScreenRect ) );
+	areaScreenRect = (anScreenRect *) R_ClearedStaticAlloc( sizeof( anScreenRect ) );
 
 	SetupAreaRefs();
 
@@ -378,48 +378,48 @@ void ARCRenderWorldLocal::ClearWorld() {
 
 /*
 =================
-ARCRenderWorldLocal::FreeDefs
+anRenderWorldLocal::FreeDefs
 
 dump all the interactions
 =================
 */
-void ARCRenderWorldLocal::FreeDefs() {
+void anRenderWorldLocal::FreeDefs() {
 	generateAllInteractionsCalled = false;
 
 	if ( interactionTable ) {
 		R_StaticFree( interactionTable );
-		interactionTable = NULL;
+		interactionTable = nullptr;
 	}
 
 	// free all lightDefs
 	for ( int i = 0; i < lightDefs.Num(); i++ ) {
-		ARCRenderLightsLocal *light = lightDefs[i];
+		anRenderLightsLocal *light = lightDefs[i];
 		if ( light && light->world == this ) {
 			FreeLightDef( i );
-			lightDefs[i] = NULL;
+			lightDefs[i] = nullptr;
 		}
 	}
 
 	// free all entityDefs
 	for ( i = 0; i < entityDefs.Num(); i++ ) {
-		ARCRenderEntityLocal	*mod = entityDefs[i];
+		anRenderEntityLocal	*mod = entityDefs[i];
 		if ( mod && mod->world == this ) {
 			FreeEntityDef( i );
-			entityDefs[i] = NULL;
+			entityDefs[i] = nullptr;
 		}
 	}
 }
 
 /*
 =================
-ARCRenderWorldLocal::InitFromMap
+anRenderWorldLocal::InitFromMap
 
-A NULL or empty name will make a world without a map model, which
+A nullptr or empty name will make a world without a map model, which
 is still useful for displaying a bare model
 =================
 */
-bool ARCRenderWorldLocal::InitFromMap( const char *name ) {
-	arcNetToken			token;
+bool anRenderWorldLocal::InitFromMap( const char *name ) {
+	anToken			token;
 
 	// if this is an empty world, initialize manually
 	if ( !name || !name[0] ) {
@@ -430,31 +430,31 @@ bool ARCRenderWorldLocal::InitFromMap( const char *name ) {
 	}
 
 	// load it
-	arcNetString filename = name;
+	anString filename = name;
 	filename.SetFileExtension( PROC_FILE_EXT );
 
 	// if we are reloading the same map, check the timestamp
 	// and try to skip all the work
 	ARC_TIME_T currentTimeStamp;
-	fileSystem->ReadFile( filename, NULL, &currentTimeStamp );
+	fileSystem->ReadFile( filename, nullptr, &currentTimeStamp );
 
 	if ( name == mapName ) {
 		if ( currentTimeStamp != FILE_NOT_FOUND_TIMESTAMP && currentTimeStamp == mapTimeStamp ) {
-			common->Printf( "ARCRenderWorldLocal::InitFromMap: retaining existing map\n" );
+			common->Printf( "anRenderWorldLocal::InitFromMap: retaining existing map\n" );
 			FreeDefs();
 			TouchWorldModels();
 			AddWorldModelEntities();
 			ClearPortalStates();
 			return true;
 		}
-		common->Printf( "ARCRenderWorldLocal::InitFromMap: timestamp has changed, reloading.\n" );
+		common->Printf( "anRenderWorldLocal::InitFromMap: timestamp has changed, reloading.\n" );
 	}
 
 	FreeWorld();
 
-	arcLexer *src = new arcLexer( filename, LEXFL_NOSTRINGCONCAT | LEXFL_NODOLLARPRECOMPILE );
+	anLexer *src = new anLexer( filename, LEXFL_NOSTRINGCONCAT | LEXFL_NODOLLARPRECOMPILE );
 	if ( !src->IsLoaded() ) {
-		common->Printf( "ARCRenderWorldLocal::InitFromMap: %s not found\n", filename.c_str() );
+		common->Printf( "anRenderWorldLocal::InitFromMap: %s not found\n", filename.c_str() );
 		ClearWorld();
 		return false;
 	}
@@ -464,7 +464,7 @@ bool ARCRenderWorldLocal::InitFromMap( const char *name ) {
 	mapTimeStamp = currentTimeStamp;
 
 	if ( !src->ReadToken( &token ) || token.Icmp( PROC_FILE_ID ) ) {
-		common->Printf( "ARCRenderWorldLocal::InitFromMap: bad id '%s' instead of '%s'\n", token.c_str(), PROC_FILE_ID );
+		common->Printf( "anRenderWorldLocal::InitFromMap: bad id '%s' instead of '%s'\n", token.c_str(), PROC_FILE_ID );
 		delete src;
 		return false;
 	}
@@ -487,7 +487,7 @@ bool ARCRenderWorldLocal::InitFromMap( const char *name ) {
 		}
 
 		if ( token == "shadowModel" ) {
-			ARCRenderModel *lastModel = ParseShadowModel( src );
+			anRenderModel *lastModel = ParseShadowModel( src );
 
 			// add it to the model manager list
 			renderModelManager->AddModel( lastModel );
@@ -507,7 +507,7 @@ bool ARCRenderWorldLocal::InitFromMap( const char *name ) {
 			continue;
 		}
 
-		src->Error( "ARCRenderWorldLocal::InitFromMap: bad token \"%s\"", token.c_str() );
+		src->Error( "anRenderWorldLocal::InitFromMap: bad token \"%s\"", token.c_str() );
 	}
 
 	delete src;
@@ -529,10 +529,10 @@ bool ARCRenderWorldLocal::InitFromMap( const char *name ) {
 
 /*
 =====================
-ARCRenderWorldLocal::ClearPortalStates
+anRenderWorldLocal::ClearPortalStates
 =====================
 */
-void ARCRenderWorldLocal::ClearPortalStates() {
+void anRenderWorldLocal::ClearPortalStates() {
 	// all portals start off open
 	for ( int i = 0; i < numInterAreaPortals; i++ ) {
 		doublePortals[i].blockingBits = PS_BLOCK_NONE;
@@ -549,15 +549,15 @@ void ARCRenderWorldLocal::ClearPortalStates() {
 
 /*
 =====================
-ARCRenderWorldLocal::AddWorldModelEntities
+anRenderWorldLocal::AddWorldModelEntities
 =====================
 */
-void ARCRenderWorldLocal::AddWorldModelEntities() {
+void anRenderWorldLocal::AddWorldModelEntities() {
 	// add the world model for each portal area
 	// we can't just call AddEntityDef, because that would place the references
 	// based on the bounding box, rather than explicitly into the correct area
 	for ( int i = 0; i < numPortalAreas; i++ ) {
-		ARCRenderEntityLocal	*def = new ARCRenderEntityLocal;
+		anRenderEntityLocal	*def = new anRenderEntityLocal;
 
 		// try and reuse a free spot
 		index = entityDefs.FindNull();
@@ -572,14 +572,14 @@ void ARCRenderWorldLocal::AddWorldModelEntities() {
 
 		def->parms.hModel = renderModelManager->FindModel( va( "_area%i", i ) );
 		if ( def->parms.hModel->IsDefaultModel() || !def->parms.hModel->IsStaticWorldModel() ) {
-			common->Error( "ARCRenderWorldLocal::InitFromMap: bad area model lookup" );
+			common->Error( "anRenderWorldLocal::InitFromMap: bad area model lookup" );
 		}
 
-		ARCRenderModel *hModel = def->parms.hModel;
+		anRenderModel *hModel = def->parms.hModel;
 
 		for ( int j = 0; j < hModel->NumSurfaces(); j++ ) {
 			const modelSurface_t *surf = hModel->Surface( j );
-			if ( surf->shader->GetName() == arcNetString( "textures/smf/portal_sky" ) ) {
+			if ( surf->shader->GetName() == anString( "textures/smf/portal_sky" ) ) {
 				def->needsPortalSky = true;
 			}
 		}
@@ -608,7 +608,7 @@ void ARCRenderWorldLocal::AddWorldModelEntities() {
 CheckAreaForPortalSky
 =====================
 */
-bool ARCRenderWorldLocal::CheckAreaForPortalSky( int areaNum ) {
+bool anRenderWorldLocal::CheckAreaForPortalSky( int areaNum ) {
 	assert( areaNum >= 0 && areaNum < numPortalAreas );
 
 	for ( areaReference_t *ref = portalAreas[areaNum].entityRefs.areaNext; ref->entity; ref = ref->areaNext ) {

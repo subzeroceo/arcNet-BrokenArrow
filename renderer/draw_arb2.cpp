@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -159,13 +159,13 @@ void RB_ARB2_CreateDrawInteractions( const drawSurf_t *surf ) {
 	for (; surf; surf=surf->nextOnLight ) {
 		// perform setup here that will not change over multiple interaction passes
 		// set the vertex pointers
-		arcDrawVert	*ac = (arcDrawVert *)vertexCache.Position( surf->geo->ambientCache );
-		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( arcDrawVert ), ac->color );
-		qglVertexAttribPointerARB( 11, 3, GL_FLOAT, false, sizeof( arcDrawVert ), ac->normal.ToFloatPtr() );
-		qglVertexAttribPointerARB( 10, 3, GL_FLOAT, false, sizeof( arcDrawVert ), ac->tangents[1].ToFloatPtr() );
-		qglVertexAttribPointerARB( 9, 3, GL_FLOAT, false, sizeof( arcDrawVert ), ac->tangents[0].ToFloatPtr() );
-		qglVertexAttribPointerARB( 8, 2, GL_FLOAT, false, sizeof( arcDrawVert ), ac->st.ToFloatPtr() );
-		qglVertexPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), ac->xyz.ToFloatPtr() );
+		anDrawVertex	*ac = (anDrawVertex *)vertexCache.Position( surf->geo->ambientCache );
+		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( anDrawVertex ), ac->color );
+		qglVertexAttribPointerARB( 11, 3, GL_FLOAT, false, sizeof( anDrawVertex ), ac->normal.ToFloatPtr() );
+		qglVertexAttribPointerARB( 10, 3, GL_FLOAT, false, sizeof( anDrawVertex ), ac->tangents[1].ToFloatPtr() );
+		qglVertexAttribPointerARB( 9, 3, GL_FLOAT, false, sizeof( anDrawVertex ), ac->tangents[0].ToFloatPtr() );
+		qglVertexAttribPointerARB( 8, 2, GL_FLOAT, false, sizeof( anDrawVertex ), ac->st.ToFloatPtr() );
+		qglVertexPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), ac->xyz.ToFloatPtr() );
 
 		// this may cause RB_ARB2_DrawInteraction to be exacuted multiple
 		// times with different colors and images if the surface or light have multiple layers
@@ -212,7 +212,7 @@ RB_ARB2_DrawInteractions
 */
 void RB_ARB2_DrawInteractions( void ) {
 	viewLight_t		*vLight;
-	const arcMaterial	*lightShader;
+	const anMaterial	*lightShader;
 
 	GL_SetCurrentTextureUnit( 0 );
 	qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
@@ -334,7 +334,7 @@ R_LoadARBProgram
 void R_LoadARBProgram( int progIndex ) {
 	int		ofs;
 	int		err;
-	arcNetString	fullPath = "glprogs/";
+	anString	fullPath = "glprogs/";
 	fullPath += progs[progIndex].name;
 	char	*fileBuffer;
 	char	*buffer;
@@ -344,7 +344,7 @@ void R_LoadARBProgram( int progIndex ) {
 
 	// load the program even if we don't support it, so
 	// fs_copyfiles can generate cross-platform data dumps
-	fileSystem->ReadFile( fullPath.c_str(), (void **)&fileBuffer, NULL );
+	fileSystem->ReadFile( fullPath.c_str(), (void **)&fileBuffer, nullptr );
 	if ( !fileBuffer ) {
 		common->Printf( ": File not found\n" );
 		return;
@@ -434,7 +434,7 @@ a text file if it hasn't already been loaded.
 */
 int R_FindARBProgram( GLenum target, const char *program ) {
 	int		i;
-	arcNetString	stripped = program;
+	anString	stripped = program;
 
 	stripped.StripFileExtension();
 
@@ -444,10 +444,10 @@ int R_FindARBProgram( GLenum target, const char *program ) {
 			continue;
 		}
 
-		arcNetString	compare = progs[i].name;
+		anString	compare = progs[i].name;
 		compare.StripFileExtension();
 
-		if ( !arcNetString::Icmp( stripped.c_str(), compare.c_str() ) ) {
+		if ( !anString::Icmp( stripped.c_str(), compare.c_str() ) ) {
 			return progs[i].ident;
 		}
 	}
@@ -471,7 +471,7 @@ int R_FindARBProgram( GLenum target, const char *program ) {
 R_ReloadARBPrograms_f
 ==================
 */
-void R_ReloadARBPrograms_f( const arcCommandArgs &args ) {
+void R_ReloadARBPrograms_f( const anCommandArgs &args ) {
 	common->Printf( "----- R_ReloadARBPrograms -----\n" );
 	for ( int i = 0; progs[i].name[0]; i++ ) {
 		R_LoadARBProgram( i );

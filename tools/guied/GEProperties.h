@@ -40,7 +40,7 @@ class rvGEProperties
 {
 public:
 
-	rvGEProperties ( );
+	rvGEProperties();
 
 	bool	Create				( HWND parent, bool visible );
 	void	Show				( bool visibile );
@@ -71,7 +71,7 @@ ARC_INLINE HWND rvGEProperties::GetWindow ( void )
 ARC_INLINE void rvGEProperties::SetWorkspace ( rvGEWorkspace* workspace )
 {
 	mWorkspace = workspace;
-	Update ( );
+	Update();
 }
 
 #endif // GEPROPERTIES_H_

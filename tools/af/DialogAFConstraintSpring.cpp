@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -61,7 +61,7 @@ toolTip_t DialogAFConstraintSpring::toolTips[] = {
 	{ IDC_RADIO_SPRING_NO_MAX_LENGTH, "no maximum length" },
 	{ IDC_RADIO_SPRING_MAX_LENGTH, "maximum length" },
 	{ IDC_EDIT_SPRING_MAX_LENGTH, "maximum length" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 IMPLEMENT_DYNAMIC(DialogAFConstraintSpring, CDialog)
@@ -71,7 +71,7 @@ IMPLEMENT_DYNAMIC(DialogAFConstraintSpring, CDialog)
 DialogAFConstraintSpring::DialogAFConstraintSpring
 ================
 */
-DialogAFConstraintSpring::DialogAFConstraintSpring(CWnd* pParent /*=NULL*/)
+DialogAFConstraintSpring::DialogAFConstraintSpring(CWnd* pParent /*=nullptr*/)
 	: CDialog(DialogAFConstraintSpring::IDD, pParent)
 	, m_anchor_x(0 )
 	, m_anchor_y(0 )
@@ -85,8 +85,8 @@ DialogAFConstraintSpring::DialogAFConstraintSpring(CWnd* pParent /*=NULL*/)
 	, m_restLength(0 )
 	, m_minLength(0 )
 	, m_maxLength(0 )
-	, constraint(NULL)
-	, file(NULL)
+	, constraint(nullptr )
+	, file(nullptr )
 {
 	Create( IDD_DIALOG_AF_CONSTRAINT_SPRING, pParent );
 	EnableToolTips( TRUE );
@@ -138,7 +138,7 @@ void DialogAFConstraintSpring::InitJointLists( void ) {
 		return;
 	}
 
-	const ARCRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
+	const anRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
 	if ( !model ) {
 		return;
 	}
@@ -156,9 +156,9 @@ void DialogAFConstraintSpring::InitJointLists( void ) {
 DialogAFConstraintSpring::LoadFile
 ================
 */
-void DialogAFConstraintSpring::LoadFile( arcDeclAF *af ) {
+void DialogAFConstraintSpring::LoadFile( anDeclAF *af ) {
 	file = af;
-	constraint = NULL;
+	constraint = nullptr;
 	InitJointLists();
 }
 
@@ -176,12 +176,12 @@ void DialogAFConstraintSpring::SaveFile( void ) {
 DialogAFConstraintSpring::LoadConstraint
 ================
 */
-void DialogAFConstraintSpring::LoadConstraint( arcDeclAF_Constraint *c ) {
+void DialogAFConstraintSpring::LoadConstraint( anDeclAF_Constraint *c ) {
 	int i;
 
 	constraint = c;
 
-	// load first anchor from the current arcDeclAF_Constraint
+	// load first anchor from the current anDeclAF_Constraint
 	SetSafeComboBoxSelection( &m_comboAnchorJoint, constraint->anchor.joint1.c_str(), -1 );
 	m_anchor_x = constraint->anchor.ToVec3().x;
 	m_anchor_y = constraint->anchor.ToVec3().y;
@@ -194,7 +194,7 @@ void DialogAFConstraintSpring::LoadConstraint( arcDeclAF_Constraint *c ) {
 	}
 	CheckRadioButton( IDC_RADIO_ANCHOR_JOINT, IDC_RADIO_ANCHOR_COORDINATES, i );
 
-	// load second anchor from the current arcDeclAF_Constraint
+	// load second anchor from the current anDeclAF_Constraint
 	SetSafeComboBoxSelection( &m_comboAnchor2Joint, constraint->anchor2.joint1.c_str(), -1 );
 	m_anchor2_x = constraint->anchor2.ToVec3().x;
 	m_anchor2_y = constraint->anchor2.ToVec3().y;
@@ -249,14 +249,14 @@ void DialogAFConstraintSpring::SaveConstraint( void ) {
 	}
 	UpdateData( TRUE );
 
-	// save first anchor to the current arcDeclAF_Constraint
+	// save first anchor to the current anDeclAF_Constraint
 	GetSafeComboBoxSelection( &m_comboAnchorJoint, str, -1 );
 	constraint->anchor.joint1 = str;
 	constraint->anchor.ToVec3().x = m_anchor_x;
 	constraint->anchor.ToVec3().y = m_anchor_y;
 	constraint->anchor.ToVec3().z = m_anchor_z;
 
-	// save second anchor to the current arcDeclAF_Constraint
+	// save second anchor to the current anDeclAF_Constraint
 	GetSafeComboBoxSelection( &m_comboAnchor2Joint, str, -1 );
 	constraint->anchor2.joint1 = str;
 	constraint->anchor2.ToVec3().x = m_anchor2_x;

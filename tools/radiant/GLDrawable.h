@@ -49,7 +49,7 @@ class idGLDrawableWorld : public idGLDrawable {
 public:
 	idGLDrawableWorld();
 	~idGLDrawableWorld();
-	void AddTris( surfTriangles_t *tris, const arcMaterial *mat );
+	void AddTris( srfTriangles_t *tris, const anMaterial *mat );
 	virtual void draw( int x, int y, int w, int h ) override;
 	virtual void mouseMove( float x, float y ) override;
 	virtual void Update() override { worldDirty = true; };
@@ -57,10 +57,10 @@ public:
 	void InitWorld();
 protected:
 
-	void InitLight( const arcVec3& position );
+	void InitLight( const anVec3& position );
 
-	ARCRenderWorld *world;
-	ARCRenderModel *worldModel;
+	anRenderWorld *world;
+	anRenderModel *worldModel;
 	arcNetHandle_t	worldModelDef;
 	arcNetHandle_t	lightDef;
 	arcNetHandle_t   modelDef;
@@ -68,16 +68,16 @@ protected:
 
 	//model
 	bool worldDirty;
-	arcNetString skinStr;
-	arcQuats rotation;
-	arcVec3 lastPress;
+	anString skinStr;
+	anQuats rotation;
+	anVec3 lastPress;
 	float radius;
-	arcVec4 rect;
+	anVec4 rect;
 };
 
 class idGLDrawableMaterial : public idGLDrawableWorld {
 public:
-	idGLDrawableMaterial( const arcMaterial *mat ) {
+	idGLDrawableMaterial( const anMaterial *mat ) {
 		material = mat;
 		scale = 2.0;
 		light = 1.0;
@@ -85,7 +85,7 @@ public:
 	}
 
 	idGLDrawableMaterial() {
-		material = NULL;
+		material = nullptr;
 		light = 1.0;
 		worldDirty = true;
 		realTime = 50;
@@ -95,7 +95,7 @@ public:
 	virtual void draw( int x, int y, int w, int h ) override;
 
 	//protected:
-	const arcMaterial *material;
+	const anMaterial *material;
 };
 
 class idGLDrawableModel : public idGLDrawableWorld {

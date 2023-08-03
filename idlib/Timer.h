@@ -9,16 +9,16 @@
 ===============================================================================
 */
 
-class ARCTimer {
+class anTimer {
 public:
-					ARCTimer( void );
-					ARCTimer( double clockTicks );
-					~ARCTimer( void );
+					anTimer( void );
+					anTimer( double clockTicks );
+					~anTimer( void );
 
-	ARCTimer			operator+( const ARCTimer &t ) const;
-	ARCTimer			operator-( const ARCTimer &t ) const;
-	ARCTimer &		operator+=( const ARCTimer &t );
-	ARCTimer &		operator-=( const ARCTimer &t );
+	anTimer			operator+( const anTimer &t ) const;
+	anTimer			operator-( const anTimer &t ) const;
+	anTimer &		operator+=( const anTimer &t );
+	anTimer &		operator-=( const anTimer &t );
 
 	void			Start( void );
 	void			Stop( void );
@@ -40,58 +40,58 @@ private:
 
 /*
 =================
-ARCTimer::ARCTimer
+anTimer::anTimer
 =================
 */
-ARC_INLINE ARCTimer::ARCTimer( void ) {
+ARC_INLINE anTimer::anTimer( void ) {
 	state = TS_STOPPED;
 	clockTicks = 0.0;
 }
 
 /*
 =================
-ARCTimer::ARCTimer
+anTimer::anTimer
 =================
 */
-ARC_INLINE ARCTimer::ARCTimer( double _clockTicks ) {
+ARC_INLINE anTimer::anTimer( double _clockTicks ) {
 	state = TS_STOPPED;
 	clockTicks = _clockTicks;
 }
 
 /*
 =================
-ARCTimer::~ARCTimer
+anTimer::~anTimer
 =================
 */
-ARC_INLINE ARCTimer::~ARCTimer( void ) {
+ARC_INLINE anTimer::~anTimer( void ) {
 }
 
 /*
 =================
-ARCTimer::operator+
+anTimer::operator+
 =================
 */
-ARC_INLINE ARCTimer ARCTimer::operator+( const ARCTimer &t ) const {
+ARC_INLINE anTimer anTimer::operator+( const anTimer &t ) const {
 	assert( state == TS_STOPPED && t.state == TS_STOPPED );
-	return ARCTimer( clockTicks + t.clockTicks );
+	return anTimer( clockTicks + t.clockTicks );
 }
 
 /*
 =================
-ARCTimer::operator-
+anTimer::operator-
 =================
 */
-ARC_INLINE ARCTimer ARCTimer::operator-( const ARCTimer &t ) const {
+ARC_INLINE anTimer anTimer::operator-( const anTimer &t ) const {
 	assert( state == TS_STOPPED && t.state == TS_STOPPED );
-	return ARCTimer( clockTicks - t.clockTicks );
+	return anTimer( clockTicks - t.clockTicks );
 }
 
 /*
 =================
-ARCTimer::operator+=
+anTimer::operator+=
 =================
 */
-ARC_INLINE ARCTimer &ARCTimer::operator+=( const ARCTimer &t ) {
+ARC_INLINE anTimer &anTimer::operator+=( const anTimer &t ) {
 	assert( state == TS_STOPPED && t.state == TS_STOPPED );
 	clockTicks += t.clockTicks;
 	return *this;
@@ -99,10 +99,10 @@ ARC_INLINE ARCTimer &ARCTimer::operator+=( const ARCTimer &t ) {
 
 /*
 =================
-ARCTimer::operator-=
+anTimer::operator-=
 =================
 */
-ARC_INLINE ARCTimer &ARCTimer::operator-=( const ARCTimer &t ) {
+ARC_INLINE anTimer &anTimer::operator-=( const anTimer &t ) {
 	assert( state == TS_STOPPED && t.state == TS_STOPPED );
 	clockTicks -= t.clockTicks;
 	return *this;
@@ -110,23 +110,23 @@ ARC_INLINE ARCTimer &ARCTimer::operator-=( const ARCTimer &t ) {
 
 /*
 =================
-ARCTimer::Start
+anTimer::Start
 =================
 */
-ARC_INLINE void ARCTimer::Start( void ) {
+ARC_INLINE void anTimer::Start( void ) {
 	assert( state == TS_STOPPED );
 	state = TS_STARTED;
-	start = arcLibrary::sys->GetClockTicks();
+	start = anLibrary::sys->GetClockTicks();
 }
 
 /*
 =================
-ARCTimer::Stop
+anTimer::Stop
 =================
 */
-ARC_INLINE void ARCTimer::Stop( void ) {
+ARC_INLINE void anTimer::Stop( void ) {
 	assert( state == TS_STARTED );
-	clockTicks += arcLibrary::sys->GetClockTicks() - start;
+	clockTicks += anLibrary::sys->GetClockTicks() - start;
 	if ( base < 0.0 ) {
 		InitBaseClockTicks();
 	}
@@ -138,31 +138,31 @@ ARC_INLINE void ARCTimer::Stop( void ) {
 
 /*
 =================
-ARCTimer::Clear
+anTimer::Clear
 =================
 */
-ARC_INLINE void ARCTimer::Clear( void ) {
+ARC_INLINE void anTimer::Clear( void ) {
 	clockTicks = 0.0;
 }
 
 /*
 =================
-ARCTimer::ClockTicks
+anTimer::ClockTicks
 =================
 */
-ARC_INLINE double ARCTimer::ClockTicks( void ) const {
+ARC_INLINE double anTimer::ClockTicks( void ) const {
 	assert( state == TS_STOPPED );
 	return clockTicks;
 }
 
 /*
 =================
-ARCTimer::Milliseconds
+anTimer::Milliseconds
 =================
 */
-ARC_INLINE double ARCTimer::Milliseconds( void ) const {
+ARC_INLINE double anTimer::Milliseconds( void ) const {
 	assert( state == TS_STOPPED );
-	return clockTicks / ( arcLibrary::sys->ClockTicksPerSecond() * 0.001 );
+	return clockTicks / ( anLibrary::sys->ClockTicksPerSecond() * 0.001 );
 }
 
 
@@ -184,12 +184,12 @@ public:
 	void			Clear( void );
 	void			Reset( void );
 	void			PrintReport( void );
-	void			AddTime( const char *name, ARCTimer *time );
+	void			AddTime( const char *name, anTimer *time );
 
 private:
-	arcNetList<ARCTimer*>timers;
-	arcStringList		names;
-	arcNetString			reportName;
+	anList<anTimer*>timers;
+	anStringList		names;
+	anString			reportName;
 };
 
 #endif /* !__TIMER_H__ */

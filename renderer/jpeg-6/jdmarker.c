@@ -238,7 +238,7 @@ get_sof (j_decompress_ptr cinfo, boolean is_prog, boolean is_arith)
   if (length != (cinfo->num_components * 3) )
     ERREXIT(cinfo, JERR_BAD_LENGTH);
 
-  if (cinfo->comp_info == NULL)	/* do only once, even if suspend */
+  if (cinfo->comp_info == nullptr )	/* do only once, even if suspend */
     cinfo->comp_info = (jpeg_component_info *) (*cinfo->mem->alloc_small)
 			((j_common_ptr) cinfo, JPOOL_IMAGE,
 			 cinfo->num_components * SIZEOF(jpeg_component_info) );
@@ -530,7 +530,7 @@ get_dht (j_decompress_ptr cinfo)
     if (index < 0 || index >= NUM_HUFF_TBLS)
       ERREXIT1(cinfo, JERR_DHT_INDEX, index);
 
-    if (*htblptr == NULL)
+    if (*htblptr == nullptr )
       *htblptr = jpeg_alloc_huff_table((j_common_ptr) cinfo);
 
     MEMCOPY((*htblptr)->bits, bits, SIZEOF((*htblptr)->bits) );
@@ -565,7 +565,7 @@ get_dqt (j_decompress_ptr cinfo)
     if (n >= NUM_QUANT_TBLS)
       ERREXIT1(cinfo, JERR_DQT_INDEX, n);
 
-    if (cinfo->quant_tbl_ptrs[n] == NULL)
+    if (cinfo->quant_tbl_ptrs[n] == nullptr )
       cinfo->quant_tbl_ptrs[n] = jpeg_alloc_quant_table((j_common_ptr) cinfo);
     quant_ptr = cinfo->quant_tbl_ptrs[n];
 
@@ -979,10 +979,10 @@ jpeg_resync_to_restart (j_decompress_ptr cinfo, int desired)
       action = 3;		/* valid non-restart marker */
     else {
       if (marker == ( ( int ) M_RST0 + ((desired+1 ) & 7) ) ||
-	  marker == ( ( int ) M_RST0 + ((desired+2) & 7) ))
+	  marker == ( ( int ) M_RST0 + ((desired+2) & 7) ) )
 	action = 3;		/* one of the next two expected restarts */
       else if (marker == ( ( int ) M_RST0 + ((desired-1 ) & 7) ) ||
-	       marker == ( ( int ) M_RST0 + ((desired-2) & 7) ))
+	       marker == ( ( int ) M_RST0 + ((desired-2) & 7) ) )
 	action = 2;		/* a prior restart, so advance */
       else
 	action = 1;		/* desired restart or too far away */
@@ -1015,7 +1015,7 @@ jpeg_resync_to_restart (j_decompress_ptr cinfo, int desired)
 METHODDEF void
 reset_marker_reader (j_decompress_ptr cinfo)
 {
-  cinfo->comp_info = NULL;		/* until allocated by get_sof */
+  cinfo->comp_info = nullptr;		/* until allocated by get_sof */
   cinfo->input_scan_number = 0;		/* no SOS seen yet */
   cinfo->unread_marker = 0;		/* no pending marker */
   cinfo->marker->saw_SOI = FALSE;	/* set internal state too */
@@ -1035,9 +1035,9 @@ jinit_marker_reader (j_decompress_ptr cinfo)
   int i;
 
   /* Create subobject in permanent pool */
-  cinfo->marker = (struct jpeg_marker_reader *)
+  cinfo->marker = ( struct jpeg_marker_reader *)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-				SIZEOF(struct jpeg_marker_reader) );
+				SIZEOF( struct jpeg_marker_reader) );
   /* Initialize method pointers */
   cinfo->marker->reset_marker_reader = reset_marker_reader;
   cinfo->marker->read_markers = read_markers;

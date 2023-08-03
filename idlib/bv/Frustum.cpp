@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 //#define FRUSTUM_DEBUG
@@ -27,9 +27,9 @@ static int boxVertPlanes[8] = {
 BoxToPoints
 ============
 */
-void BoxToPoints( const arcVec3 &center, const arcVec3 &extents, const arcMat3 &axis, arcVec3 points[8] ) {
-	arcMat3 ax;
-	arcVec3 temp[4];
+void BoxToPoints( const anVec3 &center, const anVec3 &extents, const anMat3 &axis, anVec3 points[8] ) {
+	anMat3 ax;
+	anVec3 temp[4];
 
 	ax[0] = extents[0] * axis[0];
 	ax[1] = extents[1] * axis[1];
@@ -49,11 +49,27 @@ void BoxToPoints( const arcVec3 &center, const arcVec3 &extents, const arcMat3 &
 }
 
 /*
+============
+IsPointInsideFrustum
+
+Check if a point is inside a frustum
+============
+*/
+bool anFrustum::IsPointInsideFrustum( const anFrustum& frustum, const anVec3 &point ) {
+    for ( const Plane& plane : frustum.planes ) {
+        if ( plane.distanceToPoint( point ) < 0 ) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/*
 ================
-ARCFrustum::PlaneDistance
+anFrustum::PlaneDistance
 ================
 */
-float ARCFrustum::PlaneDistance( const arcPlane &plane ) const {
+float anFrustum::PlaneDistance( const anPlane &plane ) const {
 	float min, max;
 
 	AxisProjection( plane.Normal(), min, max );
@@ -68,10 +84,10 @@ float ARCFrustum::PlaneDistance( const arcPlane &plane ) const {
 
 /*
 ================
-ARCFrustum::PlaneSide
+anFrustum::PlaneSide
 ================
 */
-int ARCFrustum::PlaneSide( const arcPlane &plane, const float epsilon ) const {
+int anFrustum::PlaneSide( const anPlane &plane, const float epsilon ) const {
 	float min, max;
 
 	AxisProjection( plane.Normal(), min, max );
@@ -86,24 +102,23 @@ int ARCFrustum::PlaneSide( const arcPlane &plane, const float epsilon ) const {
 
 /*
 ============
-ARCFrustum::CullPoint
+anFrustum::CullPoint
 ============
 */
-bool ARCFrustum::CullPoint( const arcVec3 &point ) const {
-	arcVec3 p;
+bool anFrustum::CullPoint( const anVec3 &point ) const {
 	float scale;
 
 	// transform point to frustum space
-	p = ( point - origin ) * axis.Transpose();
+	anVec3 p = ( point - origin ) * axis.Transpose();
 	// test whether or not the point is within the frustum
 	if ( p.x < dNear || p.x > dFar ) {
 		return true;
 	}
 	scale = p.x * invFar;
-	if ( arcMath::Fabs( p.y ) > dLeft * scale ) {
+	if ( anMath::Fabs( p.y ) > dLeft * scale ) {
 		return true;
 	}
-	if ( arcMath::Fabs( p.z ) > dUp * scale ) {
+	if ( anMath::Fabs( p.z ) > dUp * scale ) {
 		return true;
 	}
 	return false;
@@ -111,24 +126,20 @@ bool ARCFrustum::CullPoint( const arcVec3 &point ) const {
 
 /*
 ============
-ARCFrustum::CullLocalBox
+anFrustum::CullLocalBox
 
-  Tests if any of the planes of the frustum can be used as a separating plane.
+Tests if any of the planes of the frustum can be used as a separating plane.
 
-   3 muls best case
-  25 muls worst case
+3 muls best case
+25 muls worst case
 ============
 */
-bool ARCFrustum::CullLocalBox( const arcVec3 &localOrigin, const arcVec3 &extents, const arcMat3 &localAxis ) const {
-	float d1, d2;
-	arcVec3 testOrigin;
-	arcMat3 testAxis;
-
+bool anFrustum::CullLocalBox( const anVec3 &localOrigin, const anVec3 &extents, const anMat3 &localAxis ) const {
 	// near plane
-	d1 = dNear - localOrigin.x;
-	d2 = arcMath::Fabs( extents[0] * localAxis[0][0] ) +
-				arcMath::Fabs( extents[1] * localAxis[1][0] ) +
-						arcMath::Fabs( extents[2] * localAxis[2][0] );
+	float d1 = dNear - localOrigin.x;
+	float d2 = anMath::Fabs( extents[0] * localAxis[0][0] ) +
+				anMath::Fabs( extents[1] * localAxis[1][0] ) +
+						anMath::Fabs( extents[2] * localAxis[2][0] );
 	if ( d1 - d2 > 0.0f ) {
 		return true;
 	}
@@ -139,8 +150,8 @@ bool ARCFrustum::CullLocalBox( const arcVec3 &localOrigin, const arcVec3 &extent
 		return true;
 	}
 
-	testOrigin = localOrigin;
-	testAxis = localAxis;
+	anVec3 testOrigin = localOrigin;
+	anMat3 testAxis = localAxis;
 
 	if ( testOrigin.y < 0.0f ) {
 		testOrigin.y = -testOrigin.y;
@@ -151,9 +162,9 @@ bool ARCFrustum::CullLocalBox( const arcVec3 &localOrigin, const arcVec3 &extent
 
 	// test left/right planes
 	d1 = dFar * testOrigin.y - dLeft * testOrigin.x;
-	d2 = arcMath::Fabs( extents[0] * ( dFar * testAxis[0][1] - dLeft * testAxis[0][0] ) ) +
-				arcMath::Fabs( extents[1] * ( dFar * testAxis[1][1] - dLeft * testAxis[1][0] ) ) +
-					arcMath::Fabs( extents[2] * ( dFar * testAxis[2][1] - dLeft * testAxis[2][0] ) );
+	d2 = anMath::Fabs( extents[0] * ( dFar * testAxis[0][1] - dLeft * testAxis[0][0] ) ) +
+				anMath::Fabs( extents[1] * ( dFar * testAxis[1][1] - dLeft * testAxis[1][0] ) ) +
+					anMath::Fabs( extents[2] * ( dFar * testAxis[2][1] - dLeft * testAxis[2][0] ) );
 	if ( d1 - d2 > 0.0f ) {
 		return true;
 	}
@@ -167,9 +178,9 @@ bool ARCFrustum::CullLocalBox( const arcVec3 &localOrigin, const arcVec3 &extent
 
 	// test up/down planes
 	d1 = dFar * testOrigin.z - dUp * testOrigin.x;
-	d2 = arcMath::Fabs( extents[0] * ( dFar * testAxis[0][2] - dUp * testAxis[0][0] ) ) +
-				arcMath::Fabs( extents[1] * ( dFar * testAxis[1][2] - dUp * testAxis[1][0] ) ) +
-					arcMath::Fabs( extents[2] * ( dFar * testAxis[2][2] - dUp * testAxis[2][0] ) );
+	d2 = anMath::Fabs( extents[0] * ( dFar * testAxis[0][2] - dUp * testAxis[0][0] ) ) +
+				anMath::Fabs( extents[1] * ( dFar * testAxis[1][2] - dUp * testAxis[1][0] ) ) +
+					anMath::Fabs( extents[2] * ( dFar * testAxis[2][2] - dUp * testAxis[2][0] ) );
 	if ( d1 - d2 > 0.0f ) {
 		return true;
 	}
@@ -179,52 +190,46 @@ bool ARCFrustum::CullLocalBox( const arcVec3 &localOrigin, const arcVec3 &extent
 
 /*
 ============
-ARCFrustum::CullBounds
+anFrustum::CullBounds
 
-  Tests if any of the planes of the frustum can be used as a separating plane.
+Tests if any of the planes of the frustum can be used as a separating plane.
 
-  24 muls best case
-  37 muls worst case
+24 muls best case
+37 muls worst case
 ============
 */
-bool ARCFrustum::CullBounds( const arcBounds &bounds ) const {
-	arcVec3 localOrigin, center, extents;
-	arcMat3 localAxis;
-
-	center = ( bounds[0] + bounds[1] ) * 0.5f;
-	extents = bounds[1] - center;
+bool anFrustum::CullBounds( const anBounds &bounds ) const {
+	anVec3 center = ( bounds[0] + bounds[1] ) * 0.5f;
+	anVec3 extents = bounds[1] - center;
 
 	// transform the bounds into the space of this frustum
-	localOrigin = ( center - origin ) * axis.Transpose();
-	localAxis = axis.Transpose();
+	anVec3 localOrigin = ( center - origin ) * axis.Transpose();
+	anMat3 localAxis = axis.Transpose();
 
 	return CullLocalBox( localOrigin, extents, localAxis );
 }
 
 /*
 ============
-ARCFrustum::CullBounds
+anFrustum::CullBounds
 
-  Tests if any of the planes of the frustum can be used as a separating plane.
+Tests if any of the planes of the frustum can be used as a separating plane.
 
-  39 muls best case
-  61 muls worst case
+39 muls best case
+61 muls worst case
 ============
 */
-bool ARCFrustum::CullBox( const ARCBox &box ) const {
-	arcVec3 localOrigin;
-	arcMat3 localAxis;
-
+bool anFrustum::CullBox( const anBox &box ) const {
 	// transform the box into the space of this frustum
-	localOrigin = ( box.GetCenter() - origin ) * axis.Transpose();
-	localAxis = box.GetAxis() * axis.Transpose();
+	anVec3 localOrigin = ( box.GetCenter() - origin ) * axis.Transpose();
+	anMat3 localAxis = box.GetAxis() * axis.Transpose();
 
 	return CullLocalBox( localOrigin, box.GetExtents(), localAxis );
 }
 
 /*
 ============
-ARCFrustum::CullSphere
+anFrustum::CullSphere
 
   Tests if any of the planes of the frustum can be used as a separating plane.
 
@@ -232,12 +237,9 @@ ARCFrustum::CullSphere
   21 muls worst case
 ============
 */
-bool ARCFrustum::CullSphere( const ARCSphere &sphere ) const {
-	float d, r, rs, sFar;
-	arcVec3 center;
-
-	center = ( sphere.GetOrigin() - origin ) * axis.Transpose();
-	r = sphere.GetRadius();
+bool anFrustum::CullSphere( const anSphere &sphere ) const {
+	anVec3 center = ( sphere.GetOrigin() - origin ) * axis.Transpose();
+	float r = sphere.GetRadius();
 
 	// test near plane
 	if ( dNear - center.x > r ) {
@@ -249,17 +251,17 @@ bool ARCFrustum::CullSphere( const ARCSphere &sphere ) const {
 		return true;
 	}
 
-	rs = r * r;
-	sFar = dFar * dFar;
+	float rs = r * r;
+	float sFar = dFar * dFar;
 
 	// test left/right planes
-	d = dFar * arcMath::Fabs( center.y ) - dLeft * center.x;
+	float d = dFar * anMath::Fabs( center.y ) - dLeft * center.x;
 	if ( ( d * d ) > rs * ( sFar + dLeft * dLeft ) ) {
 		return true;
 	}
 
 	// test up/down planes
-	d = dFar * arcMath::Fabs( center.z ) - dUp * center.x;
+	float d = dFar * anMath::Fabs( center.z ) - dUp * center.x;
 	if ( ( d * d ) > rs * ( sFar + dUp * dUp ) ) {
 		return true;
 	}
@@ -269,7 +271,7 @@ bool ARCFrustum::CullSphere( const ARCSphere &sphere ) const {
 
 /*
 ============
-ARCFrustum::CullLocalFrustum
+anFrustum::CullLocalFrustum
 
   Tests if any of the planes of this frustum can be used as a separating plane.
 
@@ -277,15 +279,15 @@ ARCFrustum::CullLocalFrustum
   30 muls worst case
 ============
 */
-bool ARCFrustum::CullLocalFrustum( const ARCFrustum &localFrustum, const arcVec3 indexPoints[8], const arcVec3 cornerVecs[4] ) const {
+bool anFrustum::CullLocalFrustum( const anFrustum &localFrustum, const anVec3 indexPoints[8], const anVec3 cornerVecs[4] ) const {
 	int index;
 	float dx, dy, dz, leftScale, upScale;
 
 	// test near plane
-	dy = -localFrustum.axis[1].x;
-	dz = -localFrustum.axis[2].x;
+	float dy = -localFrustum.axis[1].x;
+	float dz = -localFrustum.axis[2].x;
 	index = ( FLOATSIGNBITSET( dy ) << 1 ) | FLOATSIGNBITSET( dz );
-	dx = -cornerVecs[index].x;
+	float dx = -cornerVecs[index].x;
 	index |= ( FLOATSIGNBITSET( dx ) << 2 );
 
 	if ( indexPoints[index].x < dNear ) {
@@ -356,7 +358,7 @@ bool ARCFrustum::CullLocalFrustum( const ARCFrustum &localFrustum, const arcVec3
 
 /*
 ============
-ARCFrustum::CullFrustum
+anFrustum::CullFrustum
 
   Tests if any of the planes of this frustum can be used as a separating plane.
 
@@ -364,12 +366,11 @@ ARCFrustum::CullFrustum
   88 muls worst case
 ============
 */
-bool ARCFrustum::CullFrustum( const ARCFrustum &frustum ) const {
-	ARCFrustum localFrustum;
-	arcVec3 indexPoints[8], cornerVecs[4];
+bool anFrustum::CullFrustum( const anFrustum &frustum ) const {
+	anVec3 indexPoints[8], cornerVecs[4];
 
 	// transform the given frustum into the space of this frustum
-	localFrustum = frustum;
+	anFrustum localFrustum = frustum;
 	localFrustum.origin = ( frustum.origin - origin ) * axis.Transpose();
 	localFrustum.axis = frustum.axis * axis.Transpose();
 
@@ -380,30 +381,29 @@ bool ARCFrustum::CullFrustum( const ARCFrustum &frustum ) const {
 
 /*
 ============
-ARCFrustum::CullLocalWinding
+anFrustum::CullLocalWinding
 ============
 */
-bool ARCFrustum::CullLocalWinding( const arcVec3 *points, const int numPoints, int *pointCull ) const {
-	int i, pCull, culled;
+bool anFrustum::CullLocalWinding( const anVec3 *points, const int numPoints, int *pointCull ) const {
+	int pCull;
 	float leftScale, upScale;
 
 	leftScale = dLeft * invFar;
 	upScale = dUp * invFar;
 
-	culled = -1;
-	for ( i = 0; i < numPoints; i++ ) {
-		const arcVec3 &p = points[i];
+	int culled = -1;
+	for ( int i = 0; i < numPoints; i++ ) {
+		const anVec3 &p = points[i];
 		pCull = 0;
 		if ( p.x < dNear ) {
 			pCull = 1;
-		}
-		else if ( p.x > dFar ) {
+		} else if ( p.x > dFar ) {
 			pCull = 2;
 		}
-		if ( arcMath::Fabs( p.y ) > p.x * leftScale ) {
+		if ( anMath::Fabs( p.y ) > p.x * leftScale ) {
 			pCull |= 4 << FLOATSIGNBITSET( p.y );
 		}
-		if ( arcMath::Fabs( p.z ) > p.x * upScale ) {
+		if ( anMath::Fabs( p.z ) > p.x * upScale ) {
 			pCull |= 16 << FLOATSIGNBITSET( p.z );
 		}
 		culled &= pCull;
@@ -415,19 +415,15 @@ bool ARCFrustum::CullLocalWinding( const arcVec3 *points, const int numPoints, i
 
 /*
 ============
-ARCFrustum::CullWinding
+anFrustum::CullWinding
 ============
 */
-bool ARCFrustum::CullWinding( const arcWinding &winding ) const {
-	int i, *pointCull;
-	arcVec3 *localPoints;
-	arcMat3 transpose;
+bool anFrustum::CullWinding( const anWinding &winding ) const {
+	anVec3 *localPoints = (anVec3 *) _alloca16( winding.GetNumPoints() * sizeof( anVec3 ) );
+	int *pointCull = ( int*) _alloca16( winding.GetNumPoints() * sizeof( int ) );
 
-	localPoints = (arcVec3 *) _alloca16( winding.GetNumPoints() * sizeof( arcVec3 ) );
-	pointCull = ( int * ) _alloca16( winding.GetNumPoints() * sizeof( int ) );
-
-	transpose = axis.Transpose();
-	for ( i = 0; i < winding.GetNumPoints(); i++ ) {
+	anMat3 transpose = axis.Transpose();
+	for ( int i = 0; i < winding.GetNumPoints(); i++ ) {
 		localPoints[i] = ( winding[i].ToVec3() - origin ) * transpose;
 	}
 
@@ -436,12 +432,12 @@ bool ARCFrustum::CullWinding( const arcWinding &winding ) const {
 
 /*
 ============
-ARCFrustum::BoundsCullLocalFrustum
+anFrustum::BoundsCullLocalFrustum
 
   Tests if any of the bounding box planes can be used as a separating plane.
 ============
 */
-bool ARCFrustum::BoundsCullLocalFrustum( const arcBounds &bounds, const ARCFrustum &localFrustum, const arcVec3 indexPoints[8], const arcVec3 cornerVecs[4] ) const {
+bool anFrustum::BoundsCullLocalFrustum( const anBounds &bounds, const anFrustum &localFrustum, const anVec3 indexPoints[8], const anVec3 cornerVecs[4] ) const {
 	int index;
 	float dx, dy, dz;
 
@@ -510,21 +506,19 @@ bool ARCFrustum::BoundsCullLocalFrustum( const arcBounds &bounds, const ARCFrust
 
 /*
 ============
-ARCFrustum::LocalLineIntersection
+anFrustum::LocalLineIntersection
 
-   7 divs
-  30 muls
+7 divs
+30 muls
 ============
 */
-bool ARCFrustum::LocalLineIntersection( const arcVec3 &start, const arcVec3 &end ) const {
-	arcVec3 dir;
+bool anFrustum::LocalLineIntersection( const anVec3 &start, const anVec3 &end ) const {
 	float d1, d2, fstart, fend, lstart, lend, f, x;
-	float leftScale, upScale;
 	int startInside = 1;
 
-	leftScale = dLeft * invFar;
-	upScale = dUp * invFar;
-	dir = end - start;
+	float leftScale = dLeft * invFar;
+	float upScale = dUp * invFar;
+	anVec3 dir = end - start;
 
 	// test near plane
 	if ( dNear > 0.0f ) {
@@ -534,8 +528,8 @@ bool ARCFrustum::LocalLineIntersection( const arcVec3 &start, const arcVec3 &end
 			d2 = dNear - end.x;
 			if ( FLOATSIGNBITSET( d1 ) ^ FLOATSIGNBITSET( d2 ) ) {
 				f = d1 / ( d1 - d2 );
-				if ( arcMath::Fabs( start.y + f * dir.y ) <= dNear * leftScale ) {
-					if ( arcMath::Fabs( start.z + f * dir.z ) <= dNear * upScale ) {
+				if ( anMath::Fabs( start.y + f * dir.y ) <= dNear * leftScale ) {
+					if ( anMath::Fabs( start.z + f * dir.z ) <= dNear * upScale ) {
 						return true;
 					}
 				}
@@ -550,8 +544,8 @@ bool ARCFrustum::LocalLineIntersection( const arcVec3 &start, const arcVec3 &end
 		d2 = end.x - dFar;
 		if ( FLOATSIGNBITSET( d1 ) ^ FLOATSIGNBITSET( d2 ) ) {
 			f = d1 / ( d1 - d2 );
-			if ( arcMath::Fabs( start.y + f * dir.y ) <= dFar * leftScale ) {
-				if ( arcMath::Fabs( start.z + f * dir.z ) <= dFar * upScale ) {
+			if ( anMath::Fabs( start.y + f * dir.y ) <= dFar * leftScale ) {
+				if ( anMath::Fabs( start.z + f * dir.z ) <= dFar * upScale ) {
 					return true;
 				}
 			}
@@ -572,7 +566,7 @@ bool ARCFrustum::LocalLineIntersection( const arcVec3 &start, const arcVec3 &end
 			f = d1 / ( d1 - d2 );
 			x = start.x + f * dir.x;
 			if ( x >= dNear && x <= dFar ) {
-				if ( arcMath::Fabs( start.z + f * dir.z ) <= x * upScale ) {
+				if ( anMath::Fabs( start.z + f * dir.z ) <= x * upScale ) {
 					return true;
 				}
 			}
@@ -588,7 +582,7 @@ bool ARCFrustum::LocalLineIntersection( const arcVec3 &start, const arcVec3 &end
 			f = d1 / ( d1 - d2 );
 			x = start.x + f * dir.x;
 			if ( x >= dNear && x <= dFar ) {
-				if ( arcMath::Fabs( start.z + f * dir.z ) <= x * upScale ) {
+				if ( anMath::Fabs( start.z + f * dir.z ) <= x * upScale ) {
 					return true;
 				}
 			}
@@ -609,7 +603,7 @@ bool ARCFrustum::LocalLineIntersection( const arcVec3 &start, const arcVec3 &end
 			f = d1 / ( d1 - d2 );
 			x = start.x + f * dir.x;
 			if ( x >= dNear && x <= dFar ) {
-				if ( arcMath::Fabs( start.y + f * dir.y ) <= x * leftScale ) {
+				if ( anMath::Fabs( start.y + f * dir.y ) <= x * leftScale ) {
 					return true;
 				}
 			}
@@ -625,7 +619,7 @@ bool ARCFrustum::LocalLineIntersection( const arcVec3 &start, const arcVec3 &end
 			f = d1 / ( d1 - d2 );
 			x = start.x + f * dir.x;
 			if ( x >= dNear && x <= dFar ) {
-				if ( arcMath::Fabs( start.y + f * dir.y ) <= x * leftScale ) {
+				if ( anMath::Fabs( start.y + f * dir.y ) <= x * leftScale ) {
 					return true;
 				}
 			}
@@ -637,14 +631,14 @@ bool ARCFrustum::LocalLineIntersection( const arcVec3 &start, const arcVec3 &end
 
 /*
 ============
-ARCFrustum::LocalRayIntersection
+anFrustum::LocalRayIntersection
 
-  Returns true if the ray starts inside the frustum.
-  If there was an intersection scale1 <= scale2
+Returns true if the ray starts inside the frustum.
+If there was an intersection scale1 <= scale2
 ============
 */
-bool ARCFrustum::LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir, float &scale1, float &scale2 ) const {
-	arcVec3 end;
+bool anFrustum::LocalRayIntersection( const anVec3 &start, const anVec3 &dir, float &scale1, float &scale2 ) const {
+	anVec3 end;
 	float d1, d2, fstart, fend, lstart, lend, f, x;
 	float leftScale, upScale;
 	int startInside = 1;
@@ -653,8 +647,8 @@ bool ARCFrustum::LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir,
 	upScale = dUp * invFar;
 	end = start + dir;
 
-	scale1 = arcMath::INFINITY;
-	scale2 = -arcMath::INFINITY;
+	scale1 = anMath::INFINITY;
+	scale2 = -anMath::INFINITY;
 
 	// test near plane
 	if ( dNear > 0.0f ) {
@@ -663,8 +657,8 @@ bool ARCFrustum::LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir,
 		d2 = dNear - end.x;
 		if ( d1 != d2 ) {
 			f = d1 / ( d1 - d2 );
-			if ( arcMath::Fabs( start.y + f * dir.y ) <= dNear * leftScale ) {
-				if ( arcMath::Fabs( start.z + f * dir.z ) <= dNear * upScale ) {
+			if ( anMath::Fabs( start.y + f * dir.y ) <= dNear * leftScale ) {
+				if ( anMath::Fabs( start.z + f * dir.z ) <= dNear * upScale ) {
 					if ( f < scale1 ) scale1 = f;
 					if ( f > scale2 ) scale2 = f;
 				}
@@ -678,8 +672,8 @@ bool ARCFrustum::LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir,
 	d2 = end.x - dFar;
 	if ( d1 != d2 ) {
 		f = d1 / ( d1 - d2 );
-		if ( arcMath::Fabs( start.y + f * dir.y ) <= dFar * leftScale ) {
-			if ( arcMath::Fabs( start.z + f * dir.z ) <= dFar * upScale ) {
+		if ( anMath::Fabs( start.y + f * dir.y ) <= dFar * leftScale ) {
+			if ( anMath::Fabs( start.z + f * dir.z ) <= dFar * upScale ) {
 				if ( f < scale1 ) scale1 = f;
 				if ( f > scale2 ) scale2 = f;
 			}
@@ -699,7 +693,7 @@ bool ARCFrustum::LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir,
 		f = d1 / ( d1 - d2 );
 		x = start.x + f * dir.x;
 		if ( x >= dNear && x <= dFar ) {
-			if ( arcMath::Fabs( start.z + f * dir.z ) <= x * upScale ) {
+			if ( anMath::Fabs( start.z + f * dir.z ) <= x * upScale ) {
 				if ( f < scale1 ) scale1 = f;
 				if ( f > scale2 ) scale2 = f;
 			}
@@ -714,7 +708,7 @@ bool ARCFrustum::LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir,
 		f = d1 / ( d1 - d2 );
 		x = start.x + f * dir.x;
 		if ( x >= dNear && x <= dFar ) {
-			if ( arcMath::Fabs( start.z + f * dir.z ) <= x * upScale ) {
+			if ( anMath::Fabs( start.z + f * dir.z ) <= x * upScale ) {
 				if ( f < scale1 ) scale1 = f;
 				if ( f > scale2 ) scale2 = f;
 			}
@@ -734,7 +728,7 @@ bool ARCFrustum::LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir,
 		f = d1 / ( d1 - d2 );
 		x = start.x + f * dir.x;
 		if ( x >= dNear && x <= dFar ) {
-			if ( arcMath::Fabs( start.y + f * dir.y ) <= x * leftScale ) {
+			if ( anMath::Fabs( start.y + f * dir.y ) <= x * leftScale ) {
 				if ( f < scale1 ) scale1 = f;
 				if ( f > scale2 ) scale2 = f;
 			}
@@ -749,7 +743,7 @@ bool ARCFrustum::LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir,
 		f = d1 / ( d1 - d2 );
 		x = start.x + f * dir.x;
 		if ( x >= dNear && x <= dFar ) {
-			if ( arcMath::Fabs( start.y + f * dir.y ) <= x * leftScale ) {
+			if ( anMath::Fabs( start.y + f * dir.y ) <= x * leftScale ) {
 				if ( f < scale1 ) scale1 = f;
 				if ( f > scale2 ) scale2 = f;
 			}
@@ -761,23 +755,21 @@ bool ARCFrustum::LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir,
 
 /*
 ============
-ARCFrustum::ContainsPoint
+anFrustum::ContainsPoint
 ============
 */
-bool ARCFrustum::ContainsPoint( const arcVec3 &point ) const {
+bool anFrustum::ContainsPoint( const anVec3 &point ) const {
 	return !CullPoint( point );
 }
 
 /*
 ============
-ARCFrustum::LocalFrustumIntersectsFrustum
+anFrustum::LocalFrustumIntersectsFrustum
 ============
 */
-bool ARCFrustum::LocalFrustumIntersectsFrustum( const arcVec3 points[8], const bool testFirstSide ) const {
-	int i;
-
+bool anFrustum::LocalFrustumIntersectsFrustum( const anVec3 points[8], const bool testFirstSide ) const {
 	// test if any edges of the other frustum intersect this frustum
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		if ( LocalLineIntersection( points[i], points[4+i] ) ) {
 			return true;
 		}
@@ -789,7 +781,7 @@ bool ARCFrustum::LocalFrustumIntersectsFrustum( const arcVec3 points[8], const b
 			}
 		}
 	}
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		if ( LocalLineIntersection( points[4+i], points[4+(( i+1 )&3)] ) ) {
 			return true;
 		}
@@ -800,14 +792,12 @@ bool ARCFrustum::LocalFrustumIntersectsFrustum( const arcVec3 points[8], const b
 
 /*
 ============
-ARCFrustum::LocalFrustumIntersectsBounds
+anFrustum::LocalFrustumIntersectsBounds
 ============
 */
-bool ARCFrustum::LocalFrustumIntersectsBounds( const arcVec3 points[8], const arcBounds &bounds ) const {
-	int i;
-
+bool anFrustum::LocalFrustumIntersectsBounds( const anVec3 points[8], const anBounds &bounds ) const {
 	// test if any edges of the other frustum intersect this frustum
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		if ( bounds.LineIntersection( points[i], points[4+i] ) ) {
 			return true;
 		}
@@ -819,7 +809,7 @@ bool ARCFrustum::LocalFrustumIntersectsBounds( const arcVec3 points[8], const ar
 			}
 		}
 	}
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		if ( bounds.LineIntersection( points[4+i], points[4+(( i+1 )&3)] ) ) {
 			return true;
 		}
@@ -830,24 +820,21 @@ bool ARCFrustum::LocalFrustumIntersectsBounds( const arcVec3 points[8], const ar
 
 /*
 ============
-ARCFrustum::IntersectsBounds
+anFrustum::IntersectsBounds
 ============
 */
-bool ARCFrustum::IntersectsBounds( const arcBounds &bounds ) const {
-	arcVec3 localOrigin, center, extents;
-	arcMat3 localAxis;
+bool anFrustum::IntersectsBounds( const anBounds &bounds ) const {
+	anVec3 center = ( bounds[0] + bounds[1] ) * 0.5f;
+	anVec3 extents = bounds[1] - center;
 
-	center = ( bounds[0] + bounds[1] ) * 0.5f;
-	extents = bounds[1] - center;
-
-	localOrigin = ( center - origin ) * axis.Transpose();
-	localAxis = axis.Transpose();
+	anVec3 localOrigin = ( center - origin ) * axis.Transpose();
+	anMat3 localAxis = axis.Transpose();
 
 	if ( CullLocalBox( localOrigin, extents, localAxis ) ) {
 		return false;
 	}
 
-	arcVec3 indexPoints[8], cornerVecs[4];
+	anVec3 indexPoints[8], cornerVecs[4];
 
 	ToIndexPointsAndCornerVecs( indexPoints, cornerVecs );
 
@@ -855,8 +842,8 @@ bool ARCFrustum::IntersectsBounds( const arcBounds &bounds ) const {
 		return false;
 	}
 
-	idSwap( indexPoints[2], indexPoints[3] );
-	idSwap( indexPoints[6], indexPoints[7] );
+	anSwap( indexPoints[2], indexPoints[3] );
+	anSwap( indexPoints[6], indexPoints[7] );
 
 	if ( LocalFrustumIntersectsBounds( indexPoints, bounds ) ) {
 		return true;
@@ -873,36 +860,33 @@ bool ARCFrustum::IntersectsBounds( const arcBounds &bounds ) const {
 
 /*
 ============
-ARCFrustum::IntersectsBox
+anFrustum::IntersectsBox
 ============
 */
-bool ARCFrustum::IntersectsBox( const ARCBox &box ) const {
-	arcVec3 localOrigin;
-	arcMat3 localAxis;
-
-	localOrigin = ( box.GetCenter() - origin ) * axis.Transpose();
-	localAxis = box.GetAxis() * axis.Transpose();
+bool anFrustum::IntersectsBox( const anBox &box ) const {
+	anVec3 localOrigin = ( box.GetCenter() - origin ) * axis.Transpose();
+	anMat3 localAxis = box.GetAxis() * axis.Transpose();
 
 	if ( CullLocalBox( localOrigin, box.GetExtents(), localAxis ) ) {
 		return false;
 	}
 
-	arcVec3 indexPoints[8], cornerVecs[4];
-	ARCFrustum localFrustum;
+	anVec3 indexPoints[8], cornerVecs[4];
+	anFrustum localFrustum;
 
 	localFrustum = *this;
 	localFrustum.origin = ( origin - box.GetCenter() ) * box.GetAxis().Transpose();
 	localFrustum.axis = axis * box.GetAxis().Transpose();
 	localFrustum.ToIndexPointsAndCornerVecs( indexPoints, cornerVecs );
 
-	if ( BoundsCullLocalFrustum( arcBounds( -box.GetExtents(), box.GetExtents() ), localFrustum, indexPoints, cornerVecs ) ) {
+	if ( BoundsCullLocalFrustum( anBounds( -box.GetExtents(), box.GetExtents() ), localFrustum, indexPoints, cornerVecs ) ) {
 		return false;
 	}
 
-	idSwap( indexPoints[2], indexPoints[3] );
-	idSwap( indexPoints[6], indexPoints[7] );
+	anSwap( indexPoints[2], indexPoints[3] );
+	anSwap( indexPoints[6], indexPoints[7] );
 
-	if ( LocalFrustumIntersectsBounds( indexPoints, arcBounds( -box.GetExtents(), box.GetExtents() ) ) ) {
+	if ( LocalFrustumIntersectsBounds( indexPoints, anBounds( -box.GetExtents(), box.GetExtents() ) ) ) {
 		return true;
 	}
 
@@ -917,17 +901,16 @@ bool ARCFrustum::IntersectsBox( const ARCBox &box ) const {
 
 /*
 ============
-ARCFrustum::IntersectsSphere
+anFrustum::IntersectsSphere
 
-  FIXME: test this
+FIXME: test this
 ============
 */
-#define VORONOI_INDEX( x, y, z )	( x + y * 3 + z * 9 )
-
-bool ARCFrustum::IntersectsSphere( const ARCSphere &sphere ) const {
+#define VORONOI_INDEX( x, y, z )( x + y * 3 + z * 9 )
+bool anFrustum::IntersectsSphere( const anSphere &sphere ) const {
 	int index, x, y, z;
 	float scale, r, d;
-	arcVec3 p, dir, points[8];
+	anVec3 p, dir, points[8];
 
 	if ( CullSphere( sphere ) ) {
 		return false;
@@ -940,17 +923,15 @@ bool ARCFrustum::IntersectsSphere( const ARCSphere &sphere ) const {
 
 	if ( p.x <= dNear ) {
 		scale = dNear * invFar;
-		dir.y = arcMath::Fabs( p.y ) - dLeft * scale;
-		dir.z = arcMath::Fabs( p.z ) - dUp * scale;
-	}
-	else if ( p.x >= dFar ) {
-		dir.y = arcMath::Fabs( p.y ) - dLeft;
-		dir.z = arcMath::Fabs( p.z ) - dUp;
-	}
-	else {
+		dir.y = anMath::Fabs( p.y ) - dLeft * scale;
+		dir.z = anMath::Fabs( p.z ) - dUp * scale;
+	} else if ( p.x >= dFar ) {
+		dir.y = anMath::Fabs( p.y ) - dLeft;
+		dir.z = anMath::Fabs( p.z ) - dUp;
+	} else {
 		scale = p.x * invFar;
-		dir.y = arcMath::Fabs( p.y ) - dLeft * scale;
-		dir.z = arcMath::Fabs( p.z ) - dUp * scale;
+		dir.y = anMath::Fabs( p.y ) - dLeft * scale;
+		dir.z = anMath::Fabs( p.z ) - dUp * scale;
 	}
 	if ( dir.y > 0.0f ) {
 		y = ( 1 + FLOATSIGNBITNOTSET( p.y ) );
@@ -966,22 +947,19 @@ bool ARCFrustum::IntersectsSphere( const ARCSphere &sphere ) const {
 				x = 1;
 			}
 		}
-	}
-	else {
+	} else {
 		if ( p.x > dFar ) {
 			x = 2;
-		}
-		else if ( p.x > dFar + ( dLeft - p.y ) * dLeft * invFar ) {
+		} else if ( p.x > dFar + ( dLeft - p.y ) * dLeft * invFar ) {
 			x = 2;
-		}
-		else if ( p.x > dFar + ( dUp - p.z ) * dUp * invFar ) {
+		} else if ( p.x > dFar + ( dUp - p.z ) * dUp * invFar ) {
 			x = 2;
 		}
 	}
 
 	r = sphere.GetRadius();
 	index = VORONOI_INDEX( x, y, z );
-	switch( index ) {
+	switch ( index ) {
 		case VORONOI_INDEX( 0, 0, 0 ): return true;
 		case VORONOI_INDEX( 1, 0, 0 ): return ( dNear - p.x < r );
 		case VORONOI_INDEX( 2, 0, 0 ): return ( p.x - dFar < r );
@@ -991,7 +969,7 @@ bool ARCFrustum::IntersectsSphere( const ARCSphere &sphere ) const {
 		case VORONOI_INDEX( 0, 0, 2 ): d = -dFar * p.z - dUp * p.x; return ( d * d < r * r * ( dFar * dFar + dUp * dUp ) );
 		default: {
 			ToIndexPoints( points );
-			switch( index ) {
+			switch ( index ) {
 				case VORONOI_INDEX( 1, 1, 1 ): return sphere.ContainsPoint( points[0] );
 				case VORONOI_INDEX( 2, 1, 1 ): return sphere.ContainsPoint( points[4] );
 				case VORONOI_INDEX( 1, 2, 1 ): return sphere.ContainsPoint( points[1] );
@@ -1021,14 +999,12 @@ bool ARCFrustum::IntersectsSphere( const ARCSphere &sphere ) const {
 
 /*
 ============
-ARCFrustum::IntersectsFrustum
+anFrustum::IntersectsFrustum
 ============
 */
-bool ARCFrustum::IntersectsFrustum( const ARCFrustum &frustum ) const {
-	arcVec3 indexPoints2[8], cornerVecs2[4];
-	ARCFrustum localFrustum2;
-
-	localFrustum2 = frustum;
+bool anFrustum::IntersectsFrustum( const anFrustum &frustum ) const {
+	anVec3 indexPoints2[8], cornerVecs2[4];
+	anFrustum localFrustum2 = frustum;
 	localFrustum2.origin = ( frustum.origin - origin ) * axis.Transpose();
 	localFrustum2.axis = frustum.axis * axis.Transpose();
 	localFrustum2.ToIndexPointsAndCornerVecs( indexPoints2, cornerVecs2 );
@@ -1037,8 +1013,8 @@ bool ARCFrustum::IntersectsFrustum( const ARCFrustum &frustum ) const {
 		return false;
 	}
 
-	arcVec3 indexPoints1[8], cornerVecs1[4];
-	ARCFrustum localFrustum1;
+	anVec3 indexPoints1[8], cornerVecs1[4];
+	anFrustum localFrustum1;
 
 	localFrustum1 = *this;
 	localFrustum1.origin = ( origin - frustum.origin ) * frustum.axis.Transpose();
@@ -1049,15 +1025,15 @@ bool ARCFrustum::IntersectsFrustum( const ARCFrustum &frustum ) const {
 		return false;
 	}
 
-	idSwap( indexPoints2[2], indexPoints2[3] );
-	idSwap( indexPoints2[6], indexPoints2[7] );
+	anSwap( indexPoints2[2], indexPoints2[3] );
+	anSwap( indexPoints2[6], indexPoints2[7] );
 
 	if ( LocalFrustumIntersectsFrustum( indexPoints2, ( localFrustum2.dNear > 0.0f ) ) ) {
 		return true;
 	}
 
-	idSwap( indexPoints1[2], indexPoints1[3] );
-	idSwap( indexPoints1[6], indexPoints1[7] );
+	anSwap( indexPoints1[2], indexPoints1[3] );
+	anSwap( indexPoints1[6], indexPoints1[7] );
 
 	if ( frustum.LocalFrustumIntersectsFrustum( indexPoints1, ( localFrustum1.dNear > 0.0f ) ) ) {
 		return true;
@@ -1068,21 +1044,19 @@ bool ARCFrustum::IntersectsFrustum( const ARCFrustum &frustum ) const {
 
 /*
 ============
-ARCFrustum::IntersectsWinding
+anFrustum::IntersectsWinding
 ============
 */
-bool ARCFrustum::IntersectsWinding( const arcWinding &winding ) const {
-	int i, j, *pointCull;
+bool anFrustum::IntersectsWinding( const anWinding &winding ) const {
 	float min, max;
-	arcVec3 *localPoints, indexPoints[8], cornerVecs[4];
-	arcMat3 transpose;
-	arcPlane plane;
+	anVec3 indexPoints[8], cornerVecs[4];
+	anPlane plane;
 
-	localPoints = (arcVec3 *) _alloca16( winding.GetNumPoints() * sizeof( arcVec3 ) );
-	pointCull = ( int * ) _alloca16( winding.GetNumPoints() * sizeof( int ) );
+	anVec3 *localPoints = (anVec3 *) _alloca16( winding.GetNumPoints() * sizeof( anVec3 ) );
+	int *pointCull = ( int*) _alloca16( winding.GetNumPoints() * sizeof( int ) );
 
-	transpose = axis.Transpose();
-	for ( i = 0; i < winding.GetNumPoints(); i++ ) {
+	anMat3 transpose = axis.Transpose();
+	for ( int i = 0; i < winding.GetNumPoints(); i++ ) {
 		localPoints[i] = ( winding[i].ToVec3() - origin ) * transpose;
 	}
 
@@ -1102,8 +1076,8 @@ bool ARCFrustum::IntersectsWinding( const arcWinding &winding ) const {
 	}
 
 	// test if any of the winding edges goes through the frustum
-	for ( i = 0; i < winding.GetNumPoints(); i++ ) {
-		j = ( i+1 )%winding.GetNumPoints();
+	for ( int i = 0; i < winding.GetNumPoints(); i++ ) {
+		int j = ( i+1 )%winding.GetNumPoints();
 		if ( !( pointCull[i] & pointCull[j] ) ) {
 			if ( LocalLineIntersection( localPoints[i], localPoints[j] ) ) {
 				return true;
@@ -1111,23 +1085,23 @@ bool ARCFrustum::IntersectsWinding( const arcWinding &winding ) const {
 		}
 	}
 
-	idSwap( indexPoints[2], indexPoints[3] );
-	idSwap( indexPoints[6], indexPoints[7] );
+	anSwap( indexPoints[2], indexPoints[3] );
+	anSwap( indexPoints[6], indexPoints[7] );
 
 	// test if any edges of the frustum intersect the winding
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		if ( winding.LineIntersection( plane, indexPoints[i], indexPoints[4+i] ) ) {
 			return true;
 		}
 	}
 	if ( dNear > 0.0f ) {
-		for ( i = 0; i < 4; i++ ) {
+		for ( int i = 0; i < 4; i++ ) {
 			if ( winding.LineIntersection( plane, indexPoints[i], indexPoints[( i+1 )&3] ) ) {
 				return true;
 			}
 		}
 	}
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		if ( winding.LineIntersection( plane, indexPoints[4+i], indexPoints[4+(( i+1 )&3)] ) ) {
 			return true;
 		}
@@ -1138,25 +1112,25 @@ bool ARCFrustum::IntersectsWinding( const arcWinding &winding ) const {
 
 /*
 ============
-ARCFrustum::LineIntersection
+anFrustum::LineIntersection
 
   Returns true if the line intersects the box between the start and end point.
 ============
 */
-bool ARCFrustum::LineIntersection( const arcVec3 &start, const arcVec3 &end ) const {
+bool anFrustum::LineIntersection( const anVec3 &start, const anVec3 &end ) const {
 	return LocalLineIntersection( ( start - origin ) * axis.Transpose(), ( end - origin ) * axis.Transpose() );
 }
 
 /*
 ============
-ARCFrustum::RayIntersection
+anFrustum::RayIntersection
 
   Returns true if the ray intersects the bounds.
   The ray can intersect the bounds in both directions from the start point.
   If start is inside the frustum then scale1 < 0 and scale2 > 0.
 ============
 */
-bool ARCFrustum::RayIntersection( const arcVec3 &start, const arcVec3 &dir, float &scale1, float &scale2 ) const {
+bool anFrustum::RayIntersection( const anVec3 &start, const anVec3 &dir, float &scale1, float &scale2 ) const {
 	if ( LocalRayIntersection( ( start - origin ) * axis.Transpose(), dir * axis.Transpose(), scale1, scale2 ) ) {
 		return true;
 	}
@@ -1168,40 +1142,36 @@ bool ARCFrustum::RayIntersection( const arcVec3 &start, const arcVec3 &dir, floa
 
 /*
 ============
-ARCFrustum::FromProjection
+anFrustum::FromProjection
 
   Creates a frustum which contains the projection of the bounds.
 ============
 */
-bool ARCFrustum::FromProjection( const arcBounds &bounds, const arcVec3 &projectionOrigin, const float dFar ) {
-	return FromProjection( ARCBox( bounds, vec3_origin, mat3_identity ), projectionOrigin, dFar );
+bool anFrustum::FromProjection( const anBounds &bounds, const anVec3 &projectionOrigin, const float dFar ) {
+	return FromProjection( anBox( bounds, vec3_origin, mat3_identity ), projectionOrigin, dFar );
 }
 
 /*
 ============
-ARCFrustum::FromProjection
+anFrustum::FromProjection
 
   Creates a frustum which contains the projection of the box.
 ============
 */
-bool ARCFrustum::FromProjection( const ARCBox &box, const arcVec3 &projectionOrigin, const float dFar ) {
-	int i, bestAxis;
-	float value, bestValue;
-	arcVec3 dir;
-
+bool anFrustum::FromProjection( const anBox &box, const anVec3 &projectionOrigin, const float dFar ) {
 	assert( dFar > 0.0f );
 
 	this->dNear = this->dFar = this->invFar = 0.0f;
 
-	dir = box.GetCenter() - projectionOrigin;
+	anVec3 dir = box.GetCenter() - projectionOrigin;
 	if ( dir.Normalize() == 0.0f ) {
 		return false;
 	}
 
-	bestAxis = 0;
-	bestValue = arcMath::Fabs( box.GetAxis()[0] * dir );
-	for ( i = 1; i < 3; i++ ) {
-		value = arcMath::Fabs( box.GetAxis()[i] * dir );
+	int bestAxis = 0;
+	float bestValue = anMath::Fabs( box.GetAxis()[0] * dir );
+	for ( int i = 1; i < 3; i++ ) {
+		float value = anMath::Fabs( box.GetAxis()[i] * dir );
 		if ( value * box.GetExtents()[bestAxis] * box.GetExtents()[bestAxis] < bestValue * box.GetExtents()[i] * box.GetExtents()[i] ) {
 			bestValue = value;
 			bestAxis = i;
@@ -1209,14 +1179,12 @@ bool ARCFrustum::FromProjection( const ARCBox &box, const arcVec3 &projectionOri
 	}
 
 #if 1
-
-	int j, minX, minY, maxY, minZ, maxZ;
-	arcVec3 points[8];
+	int minX, minY, maxY, minZ, maxZ;
+	anVec3 points[8];
 
 	minX = minY = maxY = minZ = maxZ = 0;
 
-	for ( j = 0; j < 2; j++ ) {
-
+	for ( int j = 0; j < 2; j++ ) {
 		axis[0] = dir;
 		axis[1] = box.GetAxis()[bestAxis] - ( box.GetAxis()[bestAxis] * axis[0] ) * axis[0];
 		axis[1].Normalize();
@@ -1229,7 +1197,7 @@ bool ARCFrustum::FromProjection( const ARCBox &box, const arcVec3 &projectionOri
 		}
 
 		minX = minY = maxY = minZ = maxZ = 0;
-		for ( i = 1; i < 8; i++ ) {
+		for ( int i = 1; i < 8; i++ ) {
 			if ( points[i].x <= 1.0f ) {
 				return false;
 			}
@@ -1248,9 +1216,9 @@ bool ARCFrustum::FromProjection( const ARCBox &box, const arcVec3 &projectionOri
 			}
 		}
 
-		if ( j == 0 ) {
-			dir += arcMath::Tan16( 0.5f * ( arcMath::ATan16( points[minY].y, points[minY].x ) + arcMath::ATan16( points[maxY].y, points[maxY].x ) ) ) * axis[1];
-			dir += arcMath::Tan16( 0.5f * ( arcMath::ATan16( points[minZ].z, points[minZ].x ) + arcMath::ATan16( points[maxZ].z, points[maxZ].x ) ) ) * axis[2];
+		if ( int j == 0 ) {
+			dir += anMath::Tan16( 0.5f * ( anMath::ATan16( points[minY].y, points[minY].x ) + anMath::ATan16( points[maxY].y, points[maxY].x ) ) ) * axis[1];
+			dir += anMath::Tan16( 0.5f * ( anMath::ATan16( points[minZ].z, points[minZ].x ) + anMath::ATan16( points[maxZ].z, points[maxZ].x ) ) ) * axis[2];
 			dir.Normalize();
 		}
 	}
@@ -1258,19 +1226,15 @@ bool ARCFrustum::FromProjection( const ARCBox &box, const arcVec3 &projectionOri
 	this->origin = projectionOrigin;
 	this->dNear = points[minX].x;
 	this->dFar = dFar;
-	this->dLeft = Max( arcMath::Fabs( points[minY].y / points[minY].x ), arcMath::Fabs( points[maxY].y / points[maxY].x ) ) * dFar;
-	this->dUp = Max( arcMath::Fabs( points[minZ].z / points[minZ].x ), arcMath::Fabs( points[maxZ].z / points[maxZ].x ) ) * dFar;
+	this->dLeft = Max( anMath::Fabs( points[minY].y / points[minY].x ), anMath::Fabs( points[maxY].y / points[maxY].x ) ) * dFar;
+	this->dUp = Max( anMath::Fabs( points[minZ].z / points[minZ].x ), anMath::Fabs( points[maxZ].z / points[maxZ].x ) ) * dFar;
 	this->invFar = 1.0f / dFar;
-
 #elif 1
-
-	int j;
 	float f, x;
-	arcBounds b;
-	arcVec3 points[8];
+	anBounds b;
+	anVec3 points[8];
 
-	for ( j = 0; j < 2; j++ ) {
-
+	for ( int j = 0; j < 2; j++ ) {
 		axis[0] = dir;
 		axis[1] = box.GetAxis()[bestAxis] - ( box.GetAxis()[bestAxis] * axis[0] ) * axis[0];
 		axis[1].Normalize();
@@ -1291,8 +1255,8 @@ bool ARCFrustum::FromProjection( const ARCBox &box, const arcVec3 &projectionOri
 		}
 
 		if ( j == 0 ) {
-			dir += arcMath::Tan16( 0.5f * ( arcMath::ATan16( b[1][1] ) + arcMath::ATan16( b[0][1] ) ) ) * axis[1];
-			dir += arcMath::Tan16( 0.5f * ( arcMath::ATan16( b[1][2] ) + arcMath::ATan16( b[0][2] ) ) ) * axis[2];
+			dir += anMath::Tan16( 0.5f * ( anMath::ATan16( b[1][1] ) + anMath::ATan16( b[0][1] ) ) ) * axis[1];
+			dir += anMath::Tan16( 0.5f * ( anMath::ATan16( b[1][2] ) + anMath::ATan16( b[0][2] ) ) ) * axis[2];
 			dir.Normalize();
 		}
 	}
@@ -1300,24 +1264,22 @@ bool ARCFrustum::FromProjection( const ARCBox &box, const arcVec3 &projectionOri
 	this->origin = projectionOrigin;
 	this->dNear = b[0][0];
 	this->dFar = dFar;
-	this->dLeft = Max( arcMath::Fabs( b[0][1] ), arcMath::Fabs( b[1][1] ) ) * dFar;
-	this->dUp = Max( arcMath::Fabs( b[0][2] ), arcMath::Fabs( b[1][2] ) ) * dFar;
+	this->dLeft = Max( anMath::Fabs( b[0][1] ), anMath::Fabs( b[1][1] ) ) * dFar;
+	this->dUp = Max( anMath::Fabs( b[0][2] ), anMath::Fabs( b[1][2] ) ) * dFar;
 	this->invFar = 1.0f / dFar;
-
 #else
-
 	float dist;
-	arcVec3 org;
+	anVec3 org;
 
 	axis[0] = dir;
 	axis[1] = box.GetAxis()[bestAxis] - ( box.GetAxis()[bestAxis] * axis[0] ) * axis[0];
 	axis[1].Normalize();
 	axis[2].Cross( axis[0], axis[1] );
 
-	for ( i = 0; i < 3; i++ ) {
-		dist[i] = arcMath::Fabs( box.GetExtents()[0] * ( axis[i] * box.GetAxis()[0] ) ) +
-					arcMath::Fabs( box.GetExtents()[1] * ( axis[i] * box.GetAxis()[1] ) ) +
-						arcMath::Fabs( box.GetExtents()[2] * ( axis[i] * box.GetAxis()[2] ) );
+	for ( int i = 0; i < 3; i++ ) {
+		dist[i] = anMath::Fabs( box.GetExtents()[0] * ( axis[i] * box.GetAxis()[0] ) ) +
+				anMath::Fabs( box.GetExtents()[1] * ( axis[i] * box.GetAxis()[1] ) ) +
+				anMath::Fabs( box.GetExtents()[2] * ( axis[i] * box.GetAxis()[2] ) );
 	}
 
 	dist[0] = axis[0] * ( box.GetCenter() - projectionOrigin ) - dist[0];
@@ -1332,26 +1294,23 @@ bool ARCFrustum::FromProjection( const ARCBox &box, const arcVec3 &projectionOri
 	this->dLeft = dist[1] * invDist * dFar;
 	this->dUp = dist[2] * invDist * dFar;
 	this->invFar = 1.0f / dFar;
-
 #endif
-
 	return true;
 }
 
 /*
 ============
-ARCFrustum::FromProjection
+anFrustum::FromProjection
 
-  Creates a frustum which contains the projection of the sphere.
+Creates a frustum which contains the projection of the sphere.
 ============
 */
-bool ARCFrustum::FromProjection( const ARCSphere &sphere, const arcVec3 &projectionOrigin, const float dFar ) {
-	arcVec3 dir;
+bool anFrustum::FromProjection( const anSphere &sphere, const anVec3 &projectionOrigin, const float dFar ) {
 	float d, r, s, x, y;
 
 	assert( dFar > 0.0f );
 
-	dir = sphere.GetOrigin() - projectionOrigin;
+	anVec3 dir = sphere.GetOrigin() - projectionOrigin;
 	d = dir.Normalize();
 	r = sphere.GetRadius();
 
@@ -1363,9 +1322,9 @@ bool ARCFrustum::FromProjection( const ARCSphere &sphere, const arcVec3 &project
 	origin = projectionOrigin;
 	axis = dir.ToMat3();
 
-	s = arcMath::Sqrt( d * d - r * r );
+	s = anMath::Sqrt( d * d - r * r );
 	x = r / d * s;
-	y = arcMath::Sqrt( s * s - x * x );
+	y = anMath::Sqrt( s * s - x * x );
 
 	this->dNear = d - r;
 	this->dFar = dFar;
@@ -1378,16 +1337,16 @@ bool ARCFrustum::FromProjection( const ARCSphere &sphere, const arcVec3 &project
 
 /*
 ============
-ARCFrustum::ConstrainToBounds
+anFrustum::ConstrainToBounds
 
   Returns false if no part of the bounds extends beyond the near plane.
 ============
 */
-bool ARCFrustum::ConstrainToBounds( const arcBounds &bounds ) {
-	float min, max, newdFar;
+bool anFrustum::ConstrainToBounds( const anBounds &bounds ) {
+	float min, max;
 
 	bounds.AxisProjection( axis[0], min, max );
-	newdFar = max - axis[0] * origin;
+	float newdFar = max - axis[0] * origin;
 	if ( newdFar <= dNear ) {
 		MoveFarDistance( dNear + 1.0f );
 		return false;
@@ -1398,16 +1357,16 @@ bool ARCFrustum::ConstrainToBounds( const arcBounds &bounds ) {
 
 /*
 ============
-ARCFrustum::ConstrainToBox
+anFrustum::ConstrainToBox
 
   Returns false if no part of the box extends beyond the near plane.
 ============
 */
-bool ARCFrustum::ConstrainToBox( const ARCBox &box ) {
-	float min, max, newdFar;
+bool anFrustum::ConstrainToBox( const anBox &box ) {
+	float min, max;
 
 	box.AxisProjection( axis[0], min, max );
-	newdFar = max - axis[0] * origin;
+	float newdFar = max - axis[0] * origin;
 	if ( newdFar <= dNear ) {
 		MoveFarDistance( dNear + 1.0f );
 		return false;
@@ -1418,16 +1377,16 @@ bool ARCFrustum::ConstrainToBox( const ARCBox &box ) {
 
 /*
 ============
-ARCFrustum::ConstrainToSphere
+anFrustum::ConstrainToSphere
 
   Returns false if no part of the sphere extends beyond the near plane.
 ============
 */
-bool ARCFrustum::ConstrainToSphere( const ARCSphere &sphere ) {
-	float min, max, newdFar;
+bool anFrustum::ConstrainToSphere( const anSphere &sphere ) {
+	float min, max;
 
 	sphere.AxisProjection( axis[0], min, max );
-	newdFar = max - axis[0] * origin;
+	float newdFar = max - axis[0] * origin;
 	if ( newdFar <= dNear ) {
 		MoveFarDistance( dNear + 1.0f );
 		return false;
@@ -1438,16 +1397,16 @@ bool ARCFrustum::ConstrainToSphere( const ARCSphere &sphere ) {
 
 /*
 ============
-ARCFrustum::ConstrainToFrustum
+anFrustum::ConstrainToFrustum
 
   Returns false if no part of the frustum extends beyond the near plane.
 ============
 */
-bool ARCFrustum::ConstrainToFrustum( const ARCFrustum &frustum ) {
-	float min, max, newdFar;
+bool anFrustum::ConstrainToFrustum( const anFrustum &frustum ) {
+	float min, max;
 
 	frustum.AxisProjection( axis[0], min, max );
-	newdFar = max - axis[0] * origin;
+	float newdFar = max - axis[0] * origin;
 	if ( newdFar <= dNear ) {
 		MoveFarDistance( dNear + 1.0f );
 		return false;
@@ -1458,15 +1417,14 @@ bool ARCFrustum::ConstrainToFrustum( const ARCFrustum &frustum ) {
 
 /*
 ============
-ARCFrustum::ToPlanes
+anFrustum::ToPlanes
 
   planes point outwards
 ============
 */
-void ARCFrustum::ToPlanes( arcPlane planes[6] ) const {
-	int i;
-	arcVec3 scaled[2];
-	arcVec3 points[4];
+void anFrustum::ToPlanes( anPlane planes[6] ) const {
+	anVec3 scaled[2];
+	anVec3 points[4];
 
 	planes[0].Normal() = -axis[0];
 	planes[0].SetDist( -dNear );
@@ -1480,7 +1438,7 @@ void ARCFrustum::ToPlanes( arcPlane planes[6] ) const {
 	points[2] = -scaled[0] - scaled[1];
 	points[3] = scaled[0] - scaled[1];
 
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		planes[i+2].Normal() = points[i].Cross( points[( i+1 )&3] - points[i] );
 		planes[i+2].Normalize();
 		planes[i+2].FitThroughPoint( points[i] );
@@ -1489,11 +1447,11 @@ void ARCFrustum::ToPlanes( arcPlane planes[6] ) const {
 
 /*
 ============
-ARCFrustum::ToPoints
+anFrustum::ToPoints
 ============
 */
-void ARCFrustum::ToPoints( arcVec3 points[8] ) const {
-	arcMat3 scaled;
+void anFrustum::ToPoints( anVec3 points[8] ) const {
+	anMat3 scaled;
 
 	scaled[0] = origin + axis[0] * dNear;
 	scaled[1] = axis[1] * ( dLeft * dNear * invFar );
@@ -1520,11 +1478,11 @@ void ARCFrustum::ToPoints( arcVec3 points[8] ) const {
 
 /*
 ============
-ARCFrustum::ToClippedPoints
+anFrustum::ToClippedPoints
 ============
 */
-void ARCFrustum::ToClippedPoints( const float fractions[4], arcVec3 points[8] ) const {
-	arcMat3 scaled;
+void anFrustum::ToClippedPoints( const float fractions[4], anVec3 points[8] ) const {
+	anMat3 scaled;
 
 	scaled[0] = origin + axis[0] * dNear;
 	scaled[1] = axis[1] * ( dLeft * dNear * invFar );
@@ -1556,11 +1514,11 @@ void ARCFrustum::ToClippedPoints( const float fractions[4], arcVec3 points[8] ) 
 
 /*
 ============
-ARCFrustum::ToIndexPoints
+anFrustum::ToIndexPoints
 ============
 */
-void ARCFrustum::ToIndexPoints( arcVec3 indexPoints[8] ) const {
-	arcMat3 scaled;
+void anFrustum::ToIndexPoints( anVec3 indexPoints[8] ) const {
+	anMat3 scaled;
 
 	scaled[0] = origin + axis[0] * dNear;
 	scaled[1] = axis[1] * ( dLeft * dNear * invFar );
@@ -1587,13 +1545,13 @@ void ARCFrustum::ToIndexPoints( arcVec3 indexPoints[8] ) const {
 
 /*
 ============
-ARCFrustum::ToIndexPointsAndCornerVecs
+anFrustum::ToIndexPointsAndCornerVecs
 
   22 muls
 ============
 */
-void ARCFrustum::ToIndexPointsAndCornerVecs( arcVec3 indexPoints[8], arcVec3 cornerVecs[4] ) const {
-	arcMat3 scaled;
+void anFrustum::ToIndexPointsAndCornerVecs( anVec3 indexPoints[8], anVec3 cornerVecs[4] ) const {
+	anMat3 scaled;
 
 	scaled[0] = origin + axis[0] * dNear;
 	scaled[1] = axis[1] * ( dLeft * dNear * invFar );
@@ -1625,19 +1583,16 @@ void ARCFrustum::ToIndexPointsAndCornerVecs( arcVec3 indexPoints[8], arcVec3 cor
 
 /*
 ============
-ARCFrustum::AxisProjection
+anFrustum::AxisProjection
 
   18 muls
 ============
 */
-void ARCFrustum::AxisProjection( const arcVec3 indexPoints[8], const arcVec3 cornerVecs[4], const arcVec3 &dir, float &min, float &max ) const {
-	float dx, dy, dz;
-	int index;
-
-	dy = dir.x * axis[1].x + dir.y * axis[1].y + dir.z * axis[1].z;
-	dz = dir.x * axis[2].x + dir.y * axis[2].y + dir.z * axis[2].z;
-	index = ( FLOATSIGNBITSET( dy ) << 1 ) | FLOATSIGNBITSET( dz );
-	dx = dir.x * cornerVecs[index].x + dir.y * cornerVecs[index].y + dir.z * cornerVecs[index].z;
+void anFrustum::AxisProjection( const anVec3 indexPoints[8], const anVec3 cornerVecs[4], const anVec3 &dir, float &min, float &max ) const {
+	float dy = dir.x * axis[1].x + dir.y * axis[1].y + dir.z * axis[1].z;
+	float dz = dir.x * axis[2].x + dir.y * axis[2].y + dir.z * axis[2].z;
+	int index = ( FLOATSIGNBITSET( dy ) << 1 ) | FLOATSIGNBITSET( dz );
+	float dx = dir.x * cornerVecs[index].x + dir.y * cornerVecs[index].y + dir.z * cornerVecs[index].z;
 	index |= ( FLOATSIGNBITSET( dx ) << 2 );
 	min = indexPoints[index] * dir;
 	index = ~index & 3;
@@ -1648,28 +1603,26 @@ void ARCFrustum::AxisProjection( const arcVec3 indexPoints[8], const arcVec3 cor
 
 /*
 ============
-ARCFrustum::AxisProjection
+anFrustum::AxisProjection
 
-  40 muls
+40 muls
 ============
 */
-void ARCFrustum::AxisProjection( const arcVec3 &dir, float &min, float &max ) const {
-	arcVec3 indexPoints[8], cornerVecs[4];
-
+void anFrustum::AxisProjection( const anVec3 &dir, float &min, float &max ) const {
+	anVec3 indexPoints[8], cornerVecs[4];
 	ToIndexPointsAndCornerVecs( indexPoints, cornerVecs );
 	AxisProjection( indexPoints, cornerVecs, dir, min, max );
 }
 
 /*
 ============
-ARCFrustum::AxisProjection
+anFrustum::AxisProjection
 
-  76 muls
+76 muls
 ============
 */
-void ARCFrustum::AxisProjection( const arcMat3 &ax, arcBounds &bounds ) const {
-	arcVec3 indexPoints[8], cornerVecs[4];
-
+void anFrustum::AxisProjection( const anMat3 &ax, anBounds &bounds ) const {
+	anVec3 indexPoints[8], cornerVecs[4];
 	ToIndexPointsAndCornerVecs( indexPoints, cornerVecs );
 	AxisProjection( indexPoints, cornerVecs, ax[0], bounds[0][0], bounds[1][0] );
 	AxisProjection( indexPoints, cornerVecs, ax[1], bounds[0][1], bounds[1][1] );
@@ -1678,43 +1631,39 @@ void ARCFrustum::AxisProjection( const arcMat3 &ax, arcBounds &bounds ) const {
 
 /*
 ============
-ARCFrustum::AddLocalLineToProjectionBoundsSetCull
+anFrustum::AddLocalLineToProjectionBoundsSetCull
 ============
 */
-void ARCFrustum::AddLocalLineToProjectionBoundsSetCull( const arcVec3 &start, const arcVec3 &end, int &startCull, int &endCull, arcBounds &bounds ) const {
-	arcVec3 dir, p;
-	float d1, d2, fstart, fend, lstart, lend, f;
-	float leftScale, upScale;
-	int cull1, cull2;
-
+void anFrustum::AddLocalLineToProjectionBoundsSetCull( const anVec3 &start, const anVec3 &end, int &startCull, int &endCull, anBounds &bounds ) const {
+	anVec3 p;
 #ifdef FRUSTUM_DEBUG
-	static arcCVarSystem r_showInteractionScissors( "r_showInteractionScissors", "0", CVAR_RENDERER | CVAR_INTEGER, "", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+	static anCVarSystem r_showInteractionScissors( "r_showInteractionScissors", "0", CVAR_RENDERER | CVAR_INTEGER, "", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
 	if ( r_showInteractionScissors.GetInteger() > 1 ) {
-		session->rw->DebugLine( colorGreen, origin + start * axis, origin + end * axis );
+		rw->DebugLine( colorGreen, origin + start * axis, origin + end * axis );
 	}
 #endif
 
-	leftScale = dLeft * invFar;
-	upScale = dUp * invFar;
-	dir = end - start;
+	float leftScale = dLeft * invFar;
+	float upScale = dUp * invFar;
+	anVec3 dir = end - start;
 
-	fstart = dFar * start.y;
-	fend = dFar * end.y;
-	lstart = dLeft * start.x;
-	lend = dLeft * end.x;
+	float fstart = dFar * start.y;
+	float fend = dFar * end.y;
+	float lstart = dLeft * start.x;
+	float lend = dLeft * end.x;
 
 	// test left plane
-	d1 = -fstart + lstart;
-	d2 = -fend + lend;
-	cull1 = FLOATSIGNBITSET( d1 );
-	cull2 = FLOATSIGNBITSET( d2 );
+	float d1 = -fstart + lstart;
+	float d2 = -fend + lend;
+	int cull1 = FLOATSIGNBITSET( d1 );
+	int cull2 = FLOATSIGNBITSET( d2 );
 	if ( FLOATNOTZERO( d1 ) ) {
 		if ( FLOATSIGNBITSET( d1 ) ^ FLOATSIGNBITSET( d2 ) ) {
-			f = d1 / ( d1 - d2 );
+			float f = d1 / ( d1 - d2 );
 			p.x = start.x + f * dir.x;
 			if ( p.x > 0.0f ) {
 				p.z = start.z + f * dir.z;
-				if ( arcMath::Fabs( p.z ) <= p.x * upScale ) {
+				if ( anMath::Fabs( p.z ) <= p.x * upScale ) {
 					p.y = 1.0f;
 					p.z = p.z * dFar / ( p.x * dUp );
 					bounds.AddPoint( p );
@@ -1730,11 +1679,11 @@ void ARCFrustum::AddLocalLineToProjectionBoundsSetCull( const arcVec3 &start, co
 	cull2 |= FLOATSIGNBITSET( d2 ) << 1;
 	if ( FLOATNOTZERO( d1 ) ) {
 		if ( FLOATSIGNBITSET( d1 ) ^ FLOATSIGNBITSET( d2 ) ) {
-			f = d1 / ( d1 - d2 );
+			float f = d1 / ( d1 - d2 );
 			p.x = start.x + f * dir.x;
 			if ( p.x > 0.0f ) {
 				p.z = start.z + f * dir.z;
-				if ( arcMath::Fabs( p.z  ) <= p.x * upScale ) {
+				if ( anMath::Fabs( p.z  ) <= p.x * upScale ) {
 					p.y = -1.0f;
 					p.z = p.z * dFar / ( p.x * dUp );
 					bounds.AddPoint( p );
@@ -1755,11 +1704,11 @@ void ARCFrustum::AddLocalLineToProjectionBoundsSetCull( const arcVec3 &start, co
 	cull2 |= FLOATSIGNBITSET( d2 ) << 2;
 	if ( FLOATNOTZERO( d1 ) ) {
 		if ( FLOATSIGNBITSET( d1 ) ^ FLOATSIGNBITSET( d2 ) ) {
-			f = d1 / ( d1 - d2 );
+			float f = d1 / ( d1 - d2 );
 			p.x = start.x + f * dir.x;
 			if ( p.x > 0.0f ) {
 				p.y = start.y + f * dir.y;
-				if ( arcMath::Fabs( p.y ) <= p.x * leftScale ) {
+				if ( anMath::Fabs( p.y ) <= p.x * leftScale ) {
 					p.y = p.y * dFar / ( p.x * dLeft );
 					p.z = 1.0f;
 					bounds.AddPoint( p );
@@ -1775,11 +1724,11 @@ void ARCFrustum::AddLocalLineToProjectionBoundsSetCull( const arcVec3 &start, co
 	cull2 |= FLOATSIGNBITSET( d2 ) << 3;
 	if ( FLOATNOTZERO( d1 ) ) {
 		if ( FLOATSIGNBITSET( d1 ) ^ FLOATSIGNBITSET( d2 ) ) {
-			f = d1 / ( d1 - d2 );
+			float f = d1 / ( d1 - d2 );
 			p.x = start.x + f * dir.x;
 			if ( p.x > 0.0f ) {
 				p.y = start.y + f * dir.y;
-				if ( arcMath::Fabs( p.y ) <= p.x * leftScale ) {
+				if ( anMath::Fabs( p.y ) <= p.x * leftScale ) {
 					p.y = p.y * dFar / ( p.x * dLeft );
 					p.z = -1.0f;
 					bounds.AddPoint( p );
@@ -1817,11 +1766,11 @@ void ARCFrustum::AddLocalLineToProjectionBoundsSetCull( const arcVec3 &start, co
 
 /*
 ============
-ARCFrustum::AddLocalLineToProjectionBoundsUseCull
+anFrustum::AddLocalLineToProjectionBoundsUseCull
 ============
 */
-void ARCFrustum::AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, const arcVec3 &end, int startCull, int endCull, arcBounds &bounds ) const {
-	arcVec3 dir, p;
+void anFrustum::AddLocalLineToProjectionBoundsUseCull( const anVec3 &start, const anVec3 &end, int startCull, int endCull, anBounds &bounds ) const {
+	anVec3 dir, p;
 	float d1, d2, fstart, fend, lstart, lend, f;
 	float leftScale, upScale;
 	int clip;
@@ -1832,9 +1781,9 @@ void ARCFrustum::AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, co
 	}
 
 #ifdef FRUSTUM_DEBUG
-	static arcCVarSystem r_showInteractionScissors( "r_showInteractionScissors", "0", CVAR_RENDERER | CVAR_INTEGER, "", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+	static anCVarSystem r_showInteractionScissors( "r_showInteractionScissors", "0", CVAR_RENDERER | CVAR_INTEGER, "", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
 	if ( r_showInteractionScissors.GetInteger() > 1 ) {
-		session->rw->DebugLine( colorGreen, origin + start * axis, origin + end * axis );
+		rw->DebugLine( colorGreen, origin + start * axis, origin + end * axis );
 	}
 #endif
 
@@ -1843,12 +1792,10 @@ void ARCFrustum::AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, co
 	dir = end - start;
 
 	if ( clip & (1|2) ) {
-
 		fstart = dFar * start.y;
 		fend = dFar * end.y;
 		lstart = dLeft * start.x;
 		lend = dLeft * end.x;
-
 		if ( clip & 1 ) {
 			// test left plane
 			d1 = -fstart + lstart;
@@ -1859,7 +1806,7 @@ void ARCFrustum::AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, co
 					p.x = start.x + f * dir.x;
 					if ( p.x > 0.0f ) {
 						p.z = start.z + f * dir.z;
-						if ( arcMath::Fabs( p.z ) <= p.x * upScale ) {
+						if ( anMath::Fabs( p.z ) <= p.x * upScale ) {
 							p.y = 1.0f;
 							p.z = p.z * dFar / ( p.x * dUp );
 							bounds.AddPoint( p );
@@ -1879,7 +1826,7 @@ void ARCFrustum::AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, co
 					p.x = start.x + f * dir.x;
 					if ( p.x > 0.0f ) {
 						p.z = start.z + f * dir.z;
-						if ( arcMath::Fabs( p.z  ) <= p.x * upScale ) {
+						if ( anMath::Fabs( p.z  ) <= p.x * upScale ) {
 							p.y = -1.0f;
 							p.z = p.z * dFar / ( p.x * dUp );
 							bounds.AddPoint( p );
@@ -1890,8 +1837,7 @@ void ARCFrustum::AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, co
 		}
 	}
 
-	if ( clip & (4|8) ) {
-
+	if ( clip & ( 4|8 ) ) {
 		fstart = dFar * start.z;
 		fend = dFar * end.z;
 		lstart = dUp * start.x;
@@ -1907,7 +1853,7 @@ void ARCFrustum::AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, co
 					p.x = start.x + f * dir.x;
 					if ( p.x > 0.0f ) {
 						p.y = start.y + f * dir.y;
-						if ( arcMath::Fabs( p.y ) <= p.x * leftScale ) {
+						if ( anMath::Fabs( p.y ) <= p.x * leftScale ) {
 							p.y = p.y * dFar / ( p.x * dLeft );
 							p.z = 1.0f;
 							bounds.AddPoint( p );
@@ -1927,7 +1873,7 @@ void ARCFrustum::AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, co
 					p.x = start.x + f * dir.x;
 					if ( p.x > 0.0f ) {
 						p.y = start.y + f * dir.y;
-						if ( arcMath::Fabs( p.y ) <= p.x * leftScale ) {
+						if ( anMath::Fabs( p.y ) <= p.x * leftScale ) {
 							p.y = p.y * dFar / ( p.x * dLeft );
 							p.z = -1.0f;
 							bounds.AddPoint( p );
@@ -1941,19 +1887,19 @@ void ARCFrustum::AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, co
 
 /*
 ============
-ARCFrustum::BoundsRayIntersection
+anFrustum::BoundsRayIntersection
 
-  Returns true if the ray starts inside the bounds.
-  If there was an intersection scale1 <= scale2
+Returns true if the ray starts inside the bounds.
+If there was an intersection scale1 <= scale2
 ============
 */
-bool ARCFrustum::BoundsRayIntersection( const arcBounds &bounds, const arcVec3 &start, const arcVec3 &dir, float &scale1, float &scale2 ) const {
-	arcVec3 end, p;
+bool anFrustum::BoundsRayIntersection( const anBounds &bounds, const anVec3 &start, const anVec3 &dir, float &scale1, float &scale2 ) const {
+	anVec3 end, p;
 	float d1, d2, f;
 	int i, startInside = 1;
 
-	scale1 = arcMath::INFINITY;
-	scale2 = -arcMath::INFINITY;
+	scale1 = anMath::INFINITY;
+	scale2 = -anMath::INFINITY;
 
 	end = start + dir;
 
@@ -2009,27 +1955,26 @@ bool ARCFrustum::BoundsRayIntersection( const arcBounds &bounds, const arcVec3 &
 
 /*
 ============
-ARCFrustum::ProjectionBounds
+anFrustum::ProjectionBounds
 ============
 */
-bool ARCFrustum::ProjectionBounds( const arcBounds &bounds, arcBounds &projectionBounds ) const {
-	return ProjectionBounds( ARCBox( bounds, vec3_origin, mat3_identity ), projectionBounds );
+bool anFrustum::ProjectionBounds( const anBounds &bounds, anBounds &projectionBounds ) const {
+	return ProjectionBounds( anBox( bounds, vec3_origin, mat3_identity ), projectionBounds );
 }
 
 #ifndef __linux__
-
 /*
 ============
-ARCFrustum::ProjectionBounds
+anFrustum::ProjectionBounds
 ============
 */
-bool ARCFrustum::ProjectionBounds( const ARCBox &box, arcBounds &projectionBounds ) const {
+bool anFrustum::ProjectionBounds( const anBox &box, anBounds &projectionBounds ) const {
 	int i, p1, p2, pointCull[8], culled, outside;
 	float scale1, scale2;
-	ARCFrustum localFrustum;
-	arcVec3 points[8], localOrigin;
-	arcMat3 localAxis, localScaled;
-	arcBounds bounds( -box.GetExtents(), box.GetExtents() );
+	anFrustum localFrustum;
+	anVec3 points[8], localOrigin;
+	anMat3 localAxis, localScaled;
+	anBounds bounds( -box.GetExtents(), box.GetExtents() );
 
 	// if the frustum origin is inside the bounds
 	if ( bounds.ContainsPoint( ( origin - box.GetCenter() ) * box.GetAxis().Transpose() ) ) {
@@ -2084,79 +2029,72 @@ bool ARCFrustum::ProjectionBounds( const ARCBox &box, arcBounds &projectionBound
 
 	for ( i = 0; i < 4; i++ ) {
 		p1 = 4 + i;
-		p2 = 4 + (( i+1 )&3);
+		p2 = 4 + ( ( i+1 )&3);
 		AddLocalLineToProjectionBoundsUseCull( points[p1], points[p2], pointCull[p1], pointCull[p2], projectionBounds );
 	}
 
 	// if the bounds extend beyond two or more boundaries of this frustum
 	if ( outside != 1 && outside != 2 && outside != 4 && outside != 8 ) {
-
 		localOrigin = ( origin - box.GetCenter() ) * box.GetAxis().Transpose();
 		localScaled = axis * box.GetAxis().Transpose();
 		localScaled[0] *= dFar;
 		localScaled[1] *= dLeft;
 		localScaled[2] *= dUp;
-
 		// test the outer edges of this frustum for intersection with the bounds
 		if ( (outside & 2) && (outside & 8) ) {
 			BoundsRayIntersection( bounds, localOrigin, localScaled[0] - localScaled[1] - localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, -1.0f, -1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, -1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, -1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, -1.0f, -1.0f ) );
 			}
 		}
 		if ( (outside & 2) && (outside & 4) ) {
 			BoundsRayIntersection( bounds, localOrigin, localScaled[0] - localScaled[1] + localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f  ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, -1.0f, 1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, -1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, -1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, -1.0f, 1.0f ) );
 			}
 		}
 		if ( (outside & 1 ) && (outside & 8) ) {
 			BoundsRayIntersection( bounds, localOrigin, localScaled[0] + localScaled[1] - localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f  ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, 1.0f, -1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, 1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, 1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, 1.0f, -1.0f ) );
 			}
 		}
 		if ( (outside & 1 ) && (outside & 2) ) {
 			BoundsRayIntersection( bounds, localOrigin, localScaled[0] + localScaled[1] + localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f  ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, 1.0f, 1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, 1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, 1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, 1.0f, 1.0f ) );
 			}
 		}
 	}
-
 	return true;
 }
-
 #endif
 
 /*
 ============
-ARCFrustum::ProjectionBounds
+anFrustum::ProjectionBounds
 ============
 */
-bool ARCFrustum::ProjectionBounds( const ARCSphere &sphere, arcBounds &projectionBounds ) const {
-	float d, r, rs, sFar;
-	arcVec3 center;
-
+bool anFrustum::ProjectionBounds( const anSphere &sphere, anBounds &projectionBounds ) const {
 	projectionBounds.Clear();
 
-	center = ( sphere.GetOrigin() - origin ) * axis.Transpose();
-	r = sphere.GetRadius();
-	rs = r * r;
-	sFar = dFar * dFar;
+	anVec3 center = ( sphere.GetOrigin() - origin ) * axis.Transpose();
+	float r = sphere.GetRadius();
+	float rs = r * r;
+	float sFar = dFar * dFar;
 
 	// test left/right planes
-	d = dFar * arcMath::Fabs( center.y ) - dLeft * center.x;
+	float d = dFar * anMath::Fabs( center.y ) - dLeft * center.x;
 	if ( ( d * d ) > rs * ( sFar + dLeft * dLeft ) ) {
 		return false;
 	}
 
 	// test up/down planes
-	d = dFar * arcMath::Fabs( center.z ) - dUp * center.x;
+	d = dFar * anMath::Fabs( center.z ) - dUp * center.x;
 	if ( ( d * d ) > rs * ( sFar + dUp * dUp ) ) {
 		return false;
 	}
@@ -2171,15 +2109,15 @@ bool ARCFrustum::ProjectionBounds( const ARCSphere &sphere, arcBounds &projectio
 
 /*
 ============
-ARCFrustum::ProjectionBounds
+anFrustum::ProjectionBounds
 ============
 */
-bool ARCFrustum::ProjectionBounds( const ARCFrustum &frustum, arcBounds &projectionBounds ) const {
+bool anFrustum::ProjectionBounds( const anFrustum &frustum, anBounds &projectionBounds ) const {
 	int i, p1, p2, pointCull[8], culled, outside;
 	float scale1, scale2;
-	ARCFrustum localFrustum;
-	arcVec3 points[8], localOrigin;
-	arcMat3 localScaled;
+	anFrustum localFrustum;
+	anVec3 points[8], localOrigin;
+	anMat3 localScaled;
 
 	// if the frustum origin is inside the other frustum
 	if ( frustum.ContainsPoint( origin ) ) {
@@ -2236,46 +2174,44 @@ bool ARCFrustum::ProjectionBounds( const ARCFrustum &frustum, arcBounds &project
 
 	for ( i = 0; i < 4; i++ ) {
 		p1 = 4 + i;
-		p2 = 4 + (( i+1 )&3);
+		p2 = 4 + ( ( i+1 )&3);
 		AddLocalLineToProjectionBoundsUseCull( points[p1], points[p2], pointCull[p1], pointCull[p2], projectionBounds );
 	}
 
 	// if the other frustum extends beyond two or more boundaries of this frustum
 	if ( outside != 1 && outside != 2 && outside != 4 && outside != 8 ) {
-
 		localOrigin = ( origin - frustum.origin ) * frustum.axis.Transpose();
 		localScaled = axis * frustum.axis.Transpose();
 		localScaled[0] *= dFar;
 		localScaled[1] *= dLeft;
 		localScaled[2] *= dUp;
-
 		// test the outer edges of this frustum for intersection with the other frustum
 		if ( (outside & 2) && (outside & 8) ) {
 			frustum.LocalRayIntersection( localOrigin, localScaled[0] - localScaled[1] - localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, -1.0f, -1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, -1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, -1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, -1.0f, -1.0f ) );
 			}
 		}
 		if ( (outside & 2) && (outside & 4) ) {
 			frustum.LocalRayIntersection( localOrigin, localScaled[0] - localScaled[1] + localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f  ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, -1.0f, 1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, -1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, -1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, -1.0f, 1.0f ) );
 			}
 		}
 		if ( (outside & 1 ) && (outside & 8) ) {
 			frustum.LocalRayIntersection( localOrigin, localScaled[0] + localScaled[1] - localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f  ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, 1.0f, -1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, 1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, 1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, 1.0f, -1.0f ) );
 			}
 		}
 		if ( (outside & 1 ) && (outside & 2) ) {
 			frustum.LocalRayIntersection( localOrigin, localScaled[0] + localScaled[1] + localScaled[2], scale1, scale2 );
 			if ( scale1 <= scale2 && scale1 >= 0.0f  ) {
-				projectionBounds.AddPoint( arcVec3( scale1 * dFar, 1.0f, 1.0f ) );
-				projectionBounds.AddPoint( arcVec3( scale2 * dFar, 1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale1 * dFar, 1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale2 * dFar, 1.0f, 1.0f ) );
 			}
 		}
 	}
@@ -2285,20 +2221,20 @@ bool ARCFrustum::ProjectionBounds( const ARCFrustum &frustum, arcBounds &project
 
 /*
 ============
-ARCFrustum::ProjectionBounds
+anFrustum::ProjectionBounds
 ============
 */
-bool ARCFrustum::ProjectionBounds( const arcWinding &winding, arcBounds &projectionBounds ) const {
+bool anFrustum::ProjectionBounds( const anWinding &winding, anBounds &projectionBounds ) const {
 	int i, p1, p2, *pointCull, culled, outside;
 	float scale;
-	arcVec3 *localPoints;
-	arcMat3 transpose, scaled;
-	arcPlane plane;
+	anVec3 *localPoints;
+	anMat3 transpose, scaled;
+	anPlane plane;
 
 	projectionBounds.Clear();
 
 	// transform the winding points into the space of this frustum
-	localPoints = (arcVec3 *) _alloca16( winding.GetNumPoints() * sizeof( arcVec3 ) );
+	localPoints = (anVec3 *) _alloca16( winding.GetNumPoints() * sizeof( anVec3 ) );
 	transpose = axis.Transpose();
 	for ( i = 0; i < winding.GetNumPoints(); i++ ) {
 		localPoints[i] = ( winding[i].ToVec3() - origin ) * transpose;
@@ -2307,7 +2243,7 @@ bool ARCFrustum::ProjectionBounds( const arcWinding &winding, arcBounds &project
 	// test the winding edges
 	culled = -1;
 	outside = 0;
-	pointCull = ( int * ) _alloca16( winding.GetNumPoints() * sizeof( int ) );
+	pointCull = ( int*) _alloca16( winding.GetNumPoints() * sizeof( int ) );
 	for ( i = 0; i < winding.GetNumPoints(); i += 2 ) {
 		p1 = i;
 		p2 = ( i+1 )%winding.GetNumPoints();
@@ -2344,22 +2280,22 @@ bool ARCFrustum::ProjectionBounds( const arcWinding &winding, arcBounds &project
 		// test the outer edges of this frustum for intersection with the winding
 		if ( (outside & 2) && (outside & 8) ) {
 			if ( winding.RayIntersection( plane, origin, scaled[0] - scaled[1] - scaled[2], scale ) ) {
-				projectionBounds.AddPoint( arcVec3( scale * dFar, -1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale * dFar, -1.0f, -1.0f ) );
 			}
 		}
 		if ( (outside & 2) && (outside & 4) ) {
 			if ( winding.RayIntersection( plane, origin, scaled[0] - scaled[1] + scaled[2], scale ) ) {
-				projectionBounds.AddPoint( arcVec3( scale * dFar, -1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale * dFar, -1.0f, 1.0f ) );
 			}
 		}
 		if ( (outside & 1 ) && (outside & 8) ) {
 			if ( winding.RayIntersection( plane, origin, scaled[0] + scaled[1] - scaled[2], scale ) ) {
-				projectionBounds.AddPoint( arcVec3( scale * dFar, 1.0f, -1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale * dFar, 1.0f, -1.0f ) );
 			}
 		}
 		if ( (outside & 1 ) && (outside & 2) ) {
 			if ( winding.RayIntersection( plane, origin, scaled[0] + scaled[1] + scaled[2], scale ) ) {
-				projectionBounds.AddPoint( arcVec3( scale * dFar, 1.0f, 1.0f ) );
+				projectionBounds.AddPoint( anVec3( scale * dFar, 1.0f, 1.0f ) );
 			}
 		}
 	}
@@ -2369,17 +2305,17 @@ bool ARCFrustum::ProjectionBounds( const arcWinding &winding, arcBounds &project
 
 /*
 ============
-ARCFrustum::ClipFrustumToBox
+anFrustum::ClipFrustumToBox
 
-  Clips the frustum far extents to the box.
+Clips the frustum far extents to the box.
 ============
 */
-void ARCFrustum::ClipFrustumToBox( const ARCBox &box, float clipFractions[4], int clipPlanes[4] ) const {
-	int i, index;
+void anFrustum::ClipFrustumToBox( const anBox &box, float clipFractions[4], int clipPlanes[4] ) const {
+	int index;
 	float f, minf;
-	arcMat3 scaled, localAxis, transpose;
-	arcVec3 localOrigin, cornerVecs[4];
-	arcBounds bounds;
+	anMat3 scaled, localAxis, transpose;
+	anVec3 localOrigin, cornerVecs[4];
+	anBounds bounds;
 
 	transpose = box.GetAxis();
 	transpose.TransposeSelf();
@@ -2401,8 +2337,7 @@ void ARCFrustum::ClipFrustumToBox( const ARCBox &box, float clipFractions[4], in
 
 	minf = ( dNear + 1.0f ) * invFar;
 
-	for ( i = 0; i < 4; i++ ) {
-
+	for ( int i = 0; i < 4; i++ ) {
 		index = FLOATSIGNBITNOTSET( cornerVecs[i].x );
 		f = ( bounds[index].x - localOrigin.x ) / cornerVecs[i].x;
 		clipFractions[i] = f;
@@ -2431,18 +2366,18 @@ void ARCFrustum::ClipFrustumToBox( const ARCBox &box, float clipFractions[4], in
 
 /*
 ============
-ARCFrustum::ClipLine
+anFrustum::ClipLine
 
   Returns true if part of the line is inside the frustum.
   Does not clip to the near and far plane.
 ============
 */
-bool ARCFrustum::ClipLine( const arcVec3 localPoints[8], const arcVec3 points[8], int startIndex, int endIndex, arcVec3 &start, arcVec3 &end, int &startClip, int &endClip ) const {
+bool anFrustum::ClipLine( const anVec3 localPoints[8], const anVec3 points[8], int startIndex, int endIndex, anVec3 &start, anVec3 &end, int &startClip, int &endClip ) const {
 	float d1, d2, fstart, fend, lstart, lend, f, x;
 	float leftScale, upScale;
 	float scale1, scale2;
 	int startCull, endCull;
-	arcVec3 localStart, localEnd, localDir;
+	anVec3 localStart, localEnd, localDir;
 
 	leftScale = dLeft * invFar;
 	upScale = dUp * invFar;
@@ -2452,8 +2387,8 @@ bool ARCFrustum::ClipLine( const arcVec3 localPoints[8], const arcVec3 points[8]
 	localDir = localEnd - localStart;
 
 	startClip = endClip = -1;
-	scale1 = arcMath::INFINITY;
-	scale2 = -arcMath::INFINITY;
+	scale1 = anMath::INFINITY;
+	scale2 = -anMath::INFINITY;
 
 	fstart = dFar * localStart.y;
 	fend = dFar * localEnd.y;
@@ -2470,7 +2405,7 @@ bool ARCFrustum::ClipLine( const arcVec3 localPoints[8], const arcVec3 points[8]
 			f = d1 / ( d1 - d2 );
 			x = localStart.x + f * localDir.x;
 			if ( x >= 0.0f ) {
-				if ( arcMath::Fabs( localStart.z + f * localDir.z ) <= x * upScale ) {
+				if ( anMath::Fabs( localStart.z + f * localDir.z ) <= x * upScale ) {
 					if ( f < scale1 ) { scale1 = f; startClip = 0; }
 					if ( f > scale2 ) { scale2 = f; endClip = 0; }
 				}
@@ -2488,7 +2423,7 @@ bool ARCFrustum::ClipLine( const arcVec3 localPoints[8], const arcVec3 points[8]
 			f = d1 / ( d1 - d2 );
 			x = localStart.x + f * localDir.x;
 			if ( x >= 0.0f ) {
-				if ( arcMath::Fabs( localStart.z + f * localDir.z ) <= x * upScale ) {
+				if ( anMath::Fabs( localStart.z + f * localDir.z ) <= x * upScale ) {
 					if ( f < scale1 ) { scale1 = f; startClip = 1; }
 					if ( f > scale2 ) { scale2 = f; endClip = 1; }
 				}
@@ -2511,7 +2446,7 @@ bool ARCFrustum::ClipLine( const arcVec3 localPoints[8], const arcVec3 points[8]
 			f = d1 / ( d1 - d2 );
 			x = localStart.x + f * localDir.x;
 			if ( x >= 0.0f ) {
-				if ( arcMath::Fabs( localStart.y + f * localDir.y ) <= x * leftScale ) {
+				if ( anMath::Fabs( localStart.y + f * localDir.y ) <= x * leftScale ) {
 					if ( f < scale1 ) { scale1 = f; startClip = 2; }
 					if ( f > scale2 ) { scale2 = f; endClip = 2; }
 				}
@@ -2529,7 +2464,7 @@ bool ARCFrustum::ClipLine( const arcVec3 localPoints[8], const arcVec3 points[8]
 			f = d1 / ( d1 - d2 );
 			x = localStart.x + f * localDir.x;
 			if ( x >= 0.0f ) {
-				if ( arcMath::Fabs( localStart.y + f * localDir.y ) <= x * leftScale ) {
+				if ( anMath::Fabs( localStart.y + f * localDir.y ) <= x * leftScale ) {
 					if ( f < scale1 ) { scale1 = f; startClip = 3; }
 					if ( f > scale2 ) { scale2 = f; endClip = 3; }
 				}
@@ -2542,20 +2477,17 @@ bool ARCFrustum::ClipLine( const arcVec3 localPoints[8], const arcVec3 points[8]
 		start = points[startIndex];
 		end = points[endIndex];
 		return true;
-	}
-	else if ( scale1 <= scale2 ) {
+	} else if ( scale1 <= scale2 ) {
 		if ( !startCull ) {
 			start = points[startIndex];
 			startClip = -1;
-		}
-		else {
+		} else {
 			start = points[startIndex] + scale1 * ( points[endIndex] - points[startIndex] );
 		}
 		if ( !endCull ) {
 			end = points[endIndex];
 			endClip = -1;
-		}
-		else {
+		} else {
 			end = points[startIndex] + scale2 * ( points[endIndex] - points[startIndex] );
 		}
 		return true;
@@ -2565,7 +2497,7 @@ bool ARCFrustum::ClipLine( const arcVec3 localPoints[8], const arcVec3 points[8]
 
 /*
 ============
-ARCFrustum::AddLocalCapsToProjectionBounds
+anFrustum::AddLocalCapsToProjectionBounds
 ============
 */
 static int capPointIndex[4][2] = {
@@ -2575,7 +2507,7 @@ static int capPointIndex[4][2] = {
 	{ 2, 3 }
 };
 
-ARC_INLINE bool ARCFrustum::AddLocalCapsToProjectionBounds( const arcVec3 endPoints[4], const int endPointCull[4], const arcVec3 &point, int pointCull, int pointClip, arcBounds &projectionBounds ) const {
+ARC_INLINE bool anFrustum::AddLocalCapsToProjectionBounds( const anVec3 endPoints[4], const int endPointCull[4], const anVec3 &point, int pointCull, int pointClip, anBounds &projectionBounds ) const {
 	int *p;
 
 	if ( pointClip < 0 ) {
@@ -2589,17 +2521,17 @@ ARC_INLINE bool ARCFrustum::AddLocalCapsToProjectionBounds( const arcVec3 endPoi
 
 /*
 ============
-ARCFrustum::ClippedProjectionBounds
+anFrustum::ClippedProjectionBounds
 ============
 */
-bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBox &clipBox, arcBounds &projectionBounds ) const {
-	int i, p1, p2, clipPointCull[8], clipPlanes[4], usedClipPlanes, nearCull, farCull, outside;
+bool anFrustum::ClippedProjectionBounds( const anFrustum &frustum, const anBox &clipBox, anBounds &projectionBounds ) const {
+	int p1, p2, clipPointCull[8], clipPlanes[4], usedClipPlanes, nearCull, farCull, outside;
 	int pointCull[2], startClip, endClip, boxPointCull[8];
 	float clipFractions[4], s1, s2, t1, t2, leftScale, upScale;
-	ARCFrustum localFrustum;
-	arcVec3 clipPoints[8], localPoints1[8], localPoints2[8], localOrigin1, localOrigin2, start, end;
-	arcMat3 localAxis1, localAxis2, transpose;
-	arcBounds clipBounds;
+	anFrustum localFrustum;
+	anVec3 clipPoints[8], localPoints1[8], localPoints2[8], localOrigin1, localOrigin2, start, end;
+	anMat3 localAxis1, localAxis2, transpose;
+	anBounds clipBounds;
 
 	// if the frustum origin is inside the other frustum
 	if ( frustum.ContainsPoint( origin ) ) {
@@ -2632,7 +2564,7 @@ bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBo
 	localFrustum.ToClippedPoints( clipFractions, clipPoints );
 
 	// test outer four edges of the clipped frustum
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		p1 = i;
 		p2 = 4 + i;
 		AddLocalLineToProjectionBoundsSetCull( clipPoints[p1], clipPoints[p2], clipPointCull[p1], clipPointCull[p2], projectionBounds );
@@ -2659,7 +2591,7 @@ bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBo
 		if ( !farCull ) {
 			for ( i = 0; i < 4; i++ ) {
 				p1 = 4 + i;
-				p2 = 4 + (( i+1 )&3);
+				p2 = 4 + ( ( i+1 )&3 );
 				AddLocalLineToProjectionBoundsUseCull( clipPoints[p1], clipPoints[p2], clipPointCull[p1], clipPointCull[p2], projectionBounds );
 			}
 		}
@@ -2681,16 +2613,15 @@ bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBo
 		leftScale = frustum.dLeft * frustum.invFar;
 		upScale = frustum.dUp * frustum.invFar;
 		for ( i = 0; i < 8; i++ ) {
-			arcVec3 &p = localPoints1[i];
+			anVec3 &p = localPoints1[i];
 			if ( !( boxVertPlanes[i] & usedClipPlanes ) || p.x <= 0.0f ) {
 				boxPointCull[i] = 1|2|4|8;
-			}
-			else {
+			} else {
 				boxPointCull[i] = 0;
-				if ( arcMath::Fabs( p.y ) > p.x * leftScale ) {
+				if ( anMath::Fabs( p.y ) > p.x * leftScale ) {
 					boxPointCull[i] |= 1 << FLOATSIGNBITSET( p.y );
 				}
-				if ( arcMath::Fabs( p.z ) > p.x * upScale ) {
+				if ( anMath::Fabs( p.z ) > p.x * upScale ) {
 					boxPointCull[i] |= 4 << FLOATSIGNBITSET( p.z );
 				}
 			}
@@ -2732,7 +2663,7 @@ bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBo
 
 		for ( i = 0; i < 4; i++ ) {
 			p1 = 4 + i;
-			p2 = 4 + (( i+1 )&3);
+			p2 = 4 + ( ( i+1 )&3);
 			if ( !( boxPointCull[p1] & boxPointCull[p2] ) ) {
 				if ( frustum.ClipLine( localPoints1, localPoints2, p1, p2, start, end, startClip, endClip ) ) {
 					AddLocalLineToProjectionBoundsSetCull( start, end, pointCull[0], pointCull[1], projectionBounds );
@@ -2746,7 +2677,6 @@ bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBo
 
 	// if the clipped frustum extends beyond two or more boundaries of this frustum
 	if ( outside != 1 && outside != 2 && outside != 4 && outside != 8 ) {
-
 		// transform this frustum into the space of the other frustum
 		transpose = frustum.axis;
 		transpose.TransposeSelf();
@@ -2769,13 +2699,13 @@ bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBo
 		clipBounds[1] = clipBox.GetExtents();
 
 		// test the outer edges of this frustum for intersection with both the other frustum and the clip bounds
-		if ( (outside & 2) && (outside & 8) ) {
+		if ( ( outside & 2 ) && ( outside & 8 ) ) {
 			frustum.LocalRayIntersection( localOrigin1, localAxis1[0] - localAxis1[1] - localAxis1[2], s1, s2 );
 			if ( s1 <= s2 && s1 >= 0.0f ) {
 				BoundsRayIntersection( clipBounds, localOrigin2, localAxis2[0] - localAxis2[1] - localAxis2[2], t1, t2 );
 				if ( t1 <= t2 && t2 > s1 && t1 < s2 ) {
-					projectionBounds.AddPoint( arcVec3( s1 * dFar, -1.0f, -1.0f ) );
-					projectionBounds.AddPoint( arcVec3( s2 * dFar, -1.0f, -1.0f ) );
+					projectionBounds.AddPoint( anVec3( s1 * dFar, -1.0f, -1.0f ) );
+					projectionBounds.AddPoint( anVec3( s2 * dFar, -1.0f, -1.0f ) );
 				}
 			}
 		}
@@ -2784,8 +2714,8 @@ bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBo
 			if ( s1 <= s2 && s1 >= 0.0f ) {
 				BoundsRayIntersection( clipBounds, localOrigin2, localAxis2[0] - localAxis2[1] + localAxis2[2], t1, t2 );
 				if ( t1 <= t2 && t2 > s1 && t1 < s2 ) {
-					projectionBounds.AddPoint( arcVec3( s1 * dFar, -1.0f, 1.0f ) );
-					projectionBounds.AddPoint( arcVec3( s2 * dFar, -1.0f, 1.0f ) );
+					projectionBounds.AddPoint( anVec3( s1 * dFar, -1.0f, 1.0f ) );
+					projectionBounds.AddPoint( anVec3( s2 * dFar, -1.0f, 1.0f ) );
 				}
 			}
 		}
@@ -2794,8 +2724,8 @@ bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBo
 			if ( s1 <= s2 && s1 >= 0.0f ) {
 				BoundsRayIntersection( clipBounds, localOrigin2, localAxis2[0] + localAxis2[1] - localAxis2[2], t1, t2 );
 				if ( t1 <= t2 && t2 > s1 && t1 < s2 ) {
-					projectionBounds.AddPoint( arcVec3( s1 * dFar, 1.0f, -1.0f ) );
-					projectionBounds.AddPoint( arcVec3( s2 * dFar, 1.0f, -1.0f ) );
+					projectionBounds.AddPoint( anVec3( s1 * dFar, 1.0f, -1.0f ) );
+					projectionBounds.AddPoint( anVec3( s2 * dFar, 1.0f, -1.0f ) );
 				}
 			}
 		}
@@ -2804,8 +2734,8 @@ bool ARCFrustum::ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBo
 			if ( s1 <= s2 && s1 >= 0.0f ) {
 				BoundsRayIntersection( clipBounds, localOrigin2, localAxis2[0] + localAxis2[1] + localAxis2[2], t1, t2 );
 				if ( t1 <= t2 && t2 > s1 && t1 < s2 ) {
-					projectionBounds.AddPoint( arcVec3( s1 * dFar, 1.0f, 1.0f ) );
-					projectionBounds.AddPoint( arcVec3( s2 * dFar, 1.0f, 1.0f ) );
+					projectionBounds.AddPoint( anVec3( s1 * dFar, 1.0f, 1.0f ) );
+					projectionBounds.AddPoint( anVec3( s2 * dFar, 1.0f, 1.0f ) );
 				}
 			}
 		}

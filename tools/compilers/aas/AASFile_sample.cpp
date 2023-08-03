@@ -26,11 +26,11 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
-#include "AASFile.h"
-#include "AASFile_local.h"
+#include "SEASFile.h"
+#include "SEASFile_local.h"
 
 
 //===============================================================
@@ -41,25 +41,25 @@ If you have questions concerning this license or the applicable additional terms
 
 /*
 ================
-idAASFileLocal::EdgeCenter
+anSEASFileLocal::EdgeCenter
 ================
 */
-arcVec3 idAASFileLocal::EdgeCenter( int edgeNum ) const {
-	const aasEdge_t *edge;
+anVec3 anSEASFileLocal::EdgeCenter( int edgeNum ) const {
+	const seasEdge_t *edge;
 	edge = &edges[edgeNum];
 	return ( vertices[edge->vertexNum[0]] + vertices[edge->vertexNum[1]] ) * 0.5f;
 }
 
 /*
 ================
-idAASFileLocal::FaceCenter
+anSEASFileLocal::FaceCenter
 ================
 */
-arcVec3 idAASFileLocal::FaceCenter( int faceNum ) const {
+anVec3 anSEASFileLocal::FaceCenter( int faceNum ) const {
 	int i, edgeNum;
-	const aasFace_t *face;
-	const aasEdge_t *edge;
-	arcVec3 center;
+	const seasFace_t *face;
+	const seasEdge_t *edge;
+	anVec3 center;
 
 	center = vec3_origin;
 
@@ -77,13 +77,13 @@ arcVec3 idAASFileLocal::FaceCenter( int faceNum ) const {
 
 /*
 ================
-idAASFileLocal::AreaCenter
+anSEASFileLocal::AreaCenter
 ================
 */
-arcVec3 idAASFileLocal::AreaCenter( int areaNum ) const {
+anVec3 anSEASFileLocal::AreaCenter( int areaNum ) const {
 	int i, faceNum;
-	const aasArea_t *area;
-	arcVec3 center;
+	const seasArea_t *area;
+	anVec3 center;
 
 	center = vec3_origin;
 
@@ -100,15 +100,15 @@ arcVec3 idAASFileLocal::AreaCenter( int areaNum ) const {
 
 /*
 ============
-idAASFileLocal::AreaReachableGoal
+anSEASFileLocal::AreaReachableGoal
 ============
 */
-arcVec3 idAASFileLocal::AreaReachableGoal( int areaNum ) const {
+anVec3 anSEASFileLocal::AreaReachableGoal( int areaNum ) const {
 	int i, faceNum, numFaces;
-	const aasArea_t *area;
-	arcVec3 center;
-	arcVec3 start, end;
-	aasTrace_t trace;
+	const seasArea_t *area;
+	anVec3 center;
+	anVec3 start, end;
+	seasTrace_t trace;
 
 	area = &areas[areaNum];
 
@@ -140,12 +140,12 @@ arcVec3 idAASFileLocal::AreaReachableGoal( int areaNum ) const {
 
 /*
 ================
-idAASFileLocal::EdgeBounds
+anSEASFileLocal::EdgeBounds
 ================
 */
-arcBounds idAASFileLocal::EdgeBounds( int edgeNum ) const {
-	const aasEdge_t *edge;
-	arcBounds bounds;
+anBounds anSEASFileLocal::EdgeBounds( int edgeNum ) const {
+	const seasEdge_t *edge;
+	anBounds bounds;
 
 	edge = &edges[ abs( edgeNum ) ];
 	bounds[0] = bounds[1] = vertices[ edge->vertexNum[0] ];
@@ -155,14 +155,14 @@ arcBounds idAASFileLocal::EdgeBounds( int edgeNum ) const {
 
 /*
 ================
-idAASFileLocal::FaceBounds
+anSEASFileLocal::FaceBounds
 ================
 */
-arcBounds idAASFileLocal::FaceBounds( int faceNum ) const {
+anBounds anSEASFileLocal::FaceBounds( int faceNum ) const {
 	int i, edgeNum;
-	const aasFace_t *face;
-	const aasEdge_t *edge;
-	arcBounds bounds;
+	const seasFace_t *face;
+	const seasEdge_t *edge;
+	anBounds bounds;
 
 	face = &faces[faceNum];
 	bounds.Clear();
@@ -177,13 +177,13 @@ arcBounds idAASFileLocal::FaceBounds( int faceNum ) const {
 
 /*
 ================
-idAASFileLocal::AreaBounds
+anSEASFileLocal::AreaBounds
 ================
 */
-arcBounds idAASFileLocal::AreaBounds( int areaNum ) const {
+anBounds anSEASFileLocal::AreaBounds( int areaNum ) const {
 	int i, faceNum;
-	const aasArea_t *area;
-	arcBounds bounds;
+	const seasArea_t *area;
+	anBounds bounds;
 
 	area = &areas[areaNum];
 	bounds.Clear();
@@ -197,12 +197,12 @@ arcBounds idAASFileLocal::AreaBounds( int areaNum ) const {
 
 /*
 ============
-idAASFileLocal::PointAreaNum
+anSEASFileLocal::PointAreaNum
 ============
 */
-int idAASFileLocal::PointAreaNum( const arcVec3 &origin ) const {
+int anSEASFileLocal::PointAreaNum( const anVec3 &origin ) const {
 	int nodeNum;
-	const aasNode_t *node;
+	const seasNode_t *node;
 
 	nodeNum = 1;
 	do {
@@ -223,14 +223,14 @@ int idAASFileLocal::PointAreaNum( const arcVec3 &origin ) const {
 
 /*
 ============
-idAASFileLocal::PointReachableAreaNum
+anSEASFileLocal::PointReachableAreaNum
 ============
 */
-int idAASFileLocal::PointReachableAreaNum( const arcVec3 &origin, const arcBounds &searchBounds, const int areaFlags, const int excludeTravelFlags ) const {
+int anSEASFileLocal::PointReachableAreaNum( const anVec3 &origin, const anBounds &searchBounds, const int areaFlags, const int excludeTravelFlags ) const {
 	int areaList[32], areaNum, i;
-	arcVec3 start, end, pointList[32];
-	aasTrace_t trace;
-	arcBounds bounds;
+	anVec3 start, end, pointList[32];
+	seasTrace_t trace;
+	anBounds bounds;
 	float frac;
 
 	start = origin;
@@ -286,12 +286,12 @@ int idAASFileLocal::PointReachableAreaNum( const arcVec3 &origin, const arcBound
 
 /*
 ============
-idAASFileLocal::BoundsReachableAreaNum_r
+anSEASFileLocal::BoundsReachableAreaNum_r
 ============
 */
-int idAASFileLocal::BoundsReachableAreaNum_r( int nodeNum, const arcBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const {
+int anSEASFileLocal::BoundsReachableAreaNum_r( int nodeNum, const anBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const {
 	int res;
-	const aasNode_t *node;
+	const seasNode_t *node;
 
 	while( nodeNum ) {
 		if ( nodeNum < 0 ) {
@@ -322,23 +322,23 @@ int idAASFileLocal::BoundsReachableAreaNum_r( int nodeNum, const arcBounds &boun
 
 /*
 ============
-idAASFileLocal::BoundsReachableAreaNum
+anSEASFileLocal::BoundsReachableAreaNum
 ============
 */
-int idAASFileLocal::BoundsReachableAreaNum( const arcBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const {
+int anSEASFileLocal::BoundsReachableAreaNum( const anBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const {
 
 	return BoundsReachableAreaNum_r( 1, bounds, areaFlags, excludeTravelFlags );
 }
 
 /*
 ============
-idAASFileLocal::PushPointIntoAreaNum
+anSEASFileLocal::PushPointIntoAreaNum
 ============
 */
-void idAASFileLocal::PushPointIntoAreaNum( int areaNum, arcVec3 &point ) const {
+void anSEASFileLocal::PushPointIntoAreaNum( int areaNum, anVec3 &point ) const {
 	int i, faceNum;
-	const aasArea_t *area;
-	const aasFace_t *face;
+	const seasArea_t *area;
+	const seasFace_t *face;
 
 	area = &areas[areaNum];
 
@@ -347,7 +347,7 @@ void idAASFileLocal::PushPointIntoAreaNum( int areaNum, arcVec3 &point ) const {
 		faceNum = faceIndex[area->firstFace + i];
 		face = &faces[abs( faceNum )];
 
-		const arcPlane &plane = planeList[face->planeNum ^ INTSIGNBITSET( faceNum )];
+		const anPlane &plane = planeList[face->planeNum ^ INTSIGNBITSET( faceNum )];
 		float dist = plane.Distance( point );
 
 		// project the point onto the face plane if it is on the wrong side
@@ -359,27 +359,27 @@ void idAASFileLocal::PushPointIntoAreaNum( int areaNum, arcVec3 &point ) const {
 
 /*
 ============
-idAASFileLocal::Trace
+anSEASFileLocal::Trace
 ============
 */
 #define TRACEPLANE_EPSILON		0.125f
 
 typedef struct aasTraceStack_s
 {
-	arcVec3			start;
-	arcVec3			end;
+	anVec3			start;
+	anVec3			end;
 	int				planeNum;
 	int				nodeNum;
 } aasTraceStack_t;
 
-bool idAASFileLocal::Trace( aasTrace_t &trace, const arcVec3 &start, const arcVec3 &end ) const {
+bool anSEASFileLocal::Trace( seasTrace_t &trace, const anVec3 &start, const anVec3 &end ) const {
 	int side, nodeNum, tmpPlaneNum;
 	double front, back, frac;
-	arcVec3 cur_start, cur_end, cur_mid, v1, v2;
-	aasTraceStack_t tracestack[MAX_AAS_TREE_DEPTH];
+	anVec3 cur_start, cur_end, cur_mid, v1, v2;
+	aasTraceStack_t tracestack[SEAS_MAX_TREE_DEPTH];
 	aasTraceStack_t *tstack_p;
-	const aasNode_t *node;
-	const arcPlane *plane;
+	const seasNode_t *node;
+	const anPlane *plane;
 
 	trace.numAreas = 0;
 	trace.lastAreaNum = 0;
@@ -493,8 +493,8 @@ bool idAASFileLocal::Trace( aasTrace_t &trace, const arcVec3 &start, const arcVe
 			// keep the current start and end point on the stack and go down the tree with the front child
 			tstack_p->nodeNum = node->children[0];
 			tstack_p++;
-			if ( tstack_p >= &tracestack[MAX_AAS_TREE_DEPTH] ) {
-				common->Error( "idAASFileLocal::Trace: stack overflow\n" );
+			if ( tstack_p >= &tracestack[SEAS_MAX_TREE_DEPTH] ) {
+				common->Error( "anSEASFileLocal::Trace: stack overflow\n" );
 				return false;
 			}
 		}
@@ -504,8 +504,8 @@ bool idAASFileLocal::Trace( aasTrace_t &trace, const arcVec3 &start, const arcVe
 			// keep the current start and end point on the stack and go down the tree with the back child
 			tstack_p->nodeNum = node->children[1];
 			tstack_p++;
-			if ( tstack_p >= &tracestack[MAX_AAS_TREE_DEPTH] ) {
-				common->Error( "idAASFileLocal::Trace: stack overflow\n" );
+			if ( tstack_p >= &tracestack[SEAS_MAX_TREE_DEPTH] ) {
+				common->Error( "anSEASFileLocal::Trace: stack overflow\n" );
 				return false;
 			}
 		}
@@ -538,8 +538,8 @@ bool idAASFileLocal::Trace( aasTrace_t &trace, const arcVec3 &start, const arcVe
 			tstack_p->planeNum = node->planeNum;
 			tstack_p->nodeNum = node->children[!side];
 			tstack_p++;
-			if ( tstack_p >= &tracestack[MAX_AAS_TREE_DEPTH] ) {
-				common->Error( "idAASFileLocal::Trace: stack overflow\n" );
+			if ( tstack_p >= &tracestack[SEAS_MAX_TREE_DEPTH] ) {
+				common->Error( "anSEASFileLocal::Trace: stack overflow\n" );
 				return false;
 			}
 			// now put the part near the start of the line on the stack so we will
@@ -549,8 +549,8 @@ bool idAASFileLocal::Trace( aasTrace_t &trace, const arcVec3 &start, const arcVe
 			tstack_p->planeNum = tmpPlaneNum;
 			tstack_p->nodeNum = node->children[side];
 			tstack_p++;
-			if ( tstack_p >= &tracestack[MAX_AAS_TREE_DEPTH] ) {
-				common->Error( "idAASFileLocal::Trace: stack overflow\n" );
+			if ( tstack_p >= &tracestack[SEAS_MAX_TREE_DEPTH] ) {
+				common->Error( "anSEASFileLocal::Trace: stack overflow\n" );
 				return false;
 			}
 		}
@@ -560,10 +560,10 @@ bool idAASFileLocal::Trace( aasTrace_t &trace, const arcVec3 &start, const arcVe
 
 /*
 ============
-idAASLocal::AreaContentsTravelFlags
+anSEASLocal::AreaContentsTravelFlags
 ============
 */
-int idAASFileLocal::AreaContentsTravelFlags( int areaNum ) const {
+int anSEASFileLocal::AreaContentsTravelFlags( int areaNum ) const {
 	if ( areas[areaNum].contents & AREACONTENTS_WATER ) {
 		return TFL_WATER;
 	}
@@ -572,11 +572,11 @@ int idAASFileLocal::AreaContentsTravelFlags( int areaNum ) const {
 
 /*
 ============
-idAASFileLocal::MaxTreeDepth_r
+anSEASFileLocal::MaxTreeDepth_r
 ============
 */
-void idAASFileLocal::MaxTreeDepth_r( int nodeNum, int &depth, int &maxDepth ) const {
-	const aasNode_t *node;
+void anSEASFileLocal::MaxTreeDepth_r( int nodeNum, int &depth, int &maxDepth ) const {
+	const seasNode_t *node;
 
 	if ( nodeNum <= 0 ) {
 		return;
@@ -596,10 +596,10 @@ void idAASFileLocal::MaxTreeDepth_r( int nodeNum, int &depth, int &maxDepth ) co
 
 /*
 ============
-idAASFileLocal::MaxTreeDepth
+anSEASFileLocal::MaxTreeDepth
 ============
 */
-int idAASFileLocal::MaxTreeDepth( void ) const {
+int anSEASFileLocal::MaxTreeDepth( void ) const {
 	int depth, maxDepth;
 
 	depth = maxDepth = 0;

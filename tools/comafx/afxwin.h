@@ -41,7 +41,7 @@
 #endif
 
 #ifndef _AFX_NOFORCE_LIBS
-#pragma comment(lib, "uuid.lib")
+#pragma comment(lib, "uuid.lib" )
 #endif
 
 #ifdef _INC_WINDOWSX
@@ -146,7 +146,7 @@ public:
     // construct an uninitialized size
     CSize();
     // create from two integers
-    CSize(int initCX, int initCY);
+    CSize( int initCX, int initCY);
     // create from another size
     CSize(SIZE initSize);
     // create from a point
@@ -185,7 +185,7 @@ public:
     // create an uninitialized point
     CPoint();
     // create from two integers
-    CPoint(int initX, int initY);
+    CPoint( int initX, int initY);
     // create from another point
     CPoint(POINT initPt);
     // create from a size
@@ -196,7 +196,7 @@ public:
 // Operations
 
 // translate the point
-    void Offset(int xOffset, int yOffset);
+    void Offset( intxOffset, int yOffset);
     void Offset(POINT point);
     void Offset(SIZE size);
 
@@ -235,7 +235,7 @@ public:
     // uninitialized rectangle
     CRect();
     // from left, top, right, and bottom
-    CRect(int l, int t, int r, int b);
+    CRect( intl, int t, int r, int b);
     // copy constructor
     CRect(const RECT& srcRect);
     // from a pointer to another rect
@@ -281,7 +281,7 @@ public:
 // Operations
 
     // set rectangle from left, top, right, and bottom
-    void SetRect(int x1, int y1, int x2, int y2);
+    void SetRect( intx1, int y1, int x2, int y2);
     void SetRect(POINT topLeft, POINT bottomRight);
     // empty the rectangle
     void SetRectEmpty();
@@ -292,19 +292,19 @@ public:
 
     // inflate rectangle's width and height without
     // moving its top or left
-    void InflateRect(int x, int y);
+    void InflateRect( intx, int y);
     void InflateRect(SIZE size);
     void InflateRect(LPCRECT lpRect);
-    void InflateRect(int l, int t, int r, int b);
+    void InflateRect( intl, int t, int r, int b);
     // deflate the rectangle's width and height without
     // moving its top or left
-    void DeflateRect(int x, int y);
+    void DeflateRect( intx, int y);
     void DeflateRect(SIZE size);
     void DeflateRect(LPCRECT lpRect);
-    void DeflateRect(int l, int t, int r, int b);
+    void DeflateRect( intl, int t, int r, int b);
 
     // translate the rectangle by moving its top and left
-    void OffsetRect(int x, int y);
+    void OffsetRect( intx, int y);
     void OffsetRect(SIZE size);
     void OffsetRect(POINT point);
     void NormalizeRect();
@@ -340,7 +340,7 @@ public:
     CRect operator-(LPCRECT lpRect) const;
     CRect operator&(const RECT& rect2) const;
     CRect operator|(const RECT& rect2) const;
-    CRect MulDiv(int nMultiplier, int nDivisor) const;
+    CRect MulDiv( intnMultiplier, int nDivisor) const;
 };
 
 #ifdef _DEBUG
@@ -413,9 +413,9 @@ public:
     BOOL DeleteObject();
 
 // Operations
-    int GetObject(int nCount, LPVOID lpObject) const;
+    int GetObject( intnCount, LPVOID lpObject) const;
     UINT GetObjectType() const;
-    BOOL CreateStockObject(int nIndex);
+    BOOL CreateStockObject( intnIndex);
     BOOL UnrealizeObject();
     BOOL operator==(const CGdiObject& obj) const;
     BOOL operator!=(const CGdiObject& obj) const;
@@ -441,12 +441,12 @@ public:
 
 // Constructors
     CPen();
-    CPen(int nPenStyle, int nWidth, COLORREF crColor);
-    CPen(int nPenStyle, int nWidth, const LOGBRUSH* pLogBrush,
-            int nStyleCount = 0, const DWORD* lpStyle = NULL);
-    BOOL CreatePen(int nPenStyle, int nWidth, COLORREF crColor);
-    BOOL CreatePen(int nPenStyle, int nWidth, const LOGBRUSH* pLogBrush,
-            int nStyleCount = 0, const DWORD* lpStyle = NULL);
+    CPen( intnPenStyle, int nWidth, COLORREF crColor);
+    CPen( intnPenStyle, int nWidth, const LOGBRUSH* pLogBrush,
+            int nStyleCount = 0, const DWORD* lpStyle = nullptr );
+    BOOL CreatePen( intnPenStyle, int nWidth, COLORREF crColor);
+    BOOL CreatePen( intnPenStyle, int nWidth, const LOGBRUSH* pLogBrush,
+            int nStyleCount = 0, const DWORD* lpStyle = nullptr );
     BOOL CreatePenIndirect(LPLOGPEN lpLogPen);
 
 // Attributes
@@ -472,16 +472,16 @@ public:
 // Constructors
     CBrush();
     CBrush(COLORREF crColor);             // CreateSolidBrush
-    CBrush(int nIndex, COLORREF crColor); // CreateHatchBrush
+    CBrush( intnIndex, COLORREF crColor); // CreateHatchBrush
     CBrush(CBitmap* pBitmap);          // CreatePatternBrush
 
     BOOL CreateSolidBrush(COLORREF crColor);
-    BOOL CreateHatchBrush(int nIndex, COLORREF crColor);
+    BOOL CreateHatchBrush( intnIndex, COLORREF crColor);
     BOOL CreateBrushIndirect(const LOGBRUSH* lpLogBrush);
     BOOL CreatePatternBrush(CBitmap* pBitmap);
     BOOL CreateDIBPatternBrush(HGLOBAL hPackedDIB, UINT nUsage);
     BOOL CreateDIBPatternBrush(const void* lpPackedDIB, UINT nUsage);
-    BOOL CreateSysColorBrush(int nIndex);
+    BOOL CreateSysColorBrush( intnIndex);
 
 // Attributes
     operator HBRUSH() const;
@@ -505,13 +505,13 @@ public:
 // Constructors
     CFont();
     BOOL CreateFontIndirect(const LOGFONT* lpLogFont);
-    BOOL CreateFont(int nHeight, int nWidth, int nEscapement,
+    BOOL CreateFont( intnHeight, int nWidth, int nEscapement,
                     int nOrientation, int nWeight, BYTE bItalic, BYTE bUnderline,
                     BYTE cStrikeOut, BYTE nCharSet, BYTE nOutPrecision,
                     BYTE nClipPrecision, BYTE nQuality, BYTE nPitchAndFamily,
                     LPCTSTR lpszFacename);
-    BOOL CreatePointFont(int nPointSize, LPCTSTR lpszFaceName, CDC* pDC = NULL);
-    BOOL CreatePointFontIndirect(const LOGFONT* lpLogFont, CDC* pDC = NULL);
+    BOOL CreatePointFont( intnPointSize, LPCTSTR lpszFaceName, CDC* pDC = nullptr );
+    BOOL CreatePointFontIndirect(const LOGFONT* lpLogFont, CDC* pDC = nullptr );
 
 // Attributes
     operator HFONT() const;
@@ -539,8 +539,8 @@ public:
     BOOL LoadBitmap(UINT nIDResource);
     BOOL LoadOEMBitmap(UINT nIDBitmap); // for OBM_/OCR_/OIC_
     BOOL LoadMappedBitmap(UINT nIDBitmap, UINT nFlags = 0,
-            LPCOLORMAP lpColorMap = NULL, int nMapSize = 0);
-    BOOL CreateBitmap(int nWidth, int nHeight, UINT nPlanes, UINT nBitcount,
+            LPCOLORMAP lpColorMap = nullptr, int nMapSize = 0);
+    BOOL CreateBitmap( intnWidth, int nHeight, UINT nPlanes, UINT nBitcount,
                     const void* lpBits);
     BOOL CreateBitmapIndirect(LPBITMAP lpBitmap);
     BOOL CreateCompatibleBitmap(CDC* pDC, int nWidth, int nHeight);
@@ -553,7 +553,7 @@ public:
 // Operations
     DWORD SetBitmapBits(DWORD dwCount, const void* lpBits);
     DWORD GetBitmapBits(DWORD dwCount, LPVOID lpBits) const;
-    CSize SetBitmapDimension(int nWidth, int nHeight);
+    CSize SetBitmapDimension( intnWidth, int nHeight);
     CSize GetBitmapDimension() const;
 
 // Implementation
@@ -604,28 +604,28 @@ public:
 
 // Constructors
     CRgn();
-    BOOL CreateRectRgn(int x1, int y1, int x2, int y2);
+    BOOL CreateRectRgn( intx1, int y1, int x2, int y2);
     BOOL CreateRectRgnIndirect(LPCRECT lpRect);
-    BOOL CreateEllipticRgn(int x1, int y1, int x2, int y2);
+    BOOL CreateEllipticRgn( intx1, int y1, int x2, int y2);
     BOOL CreateEllipticRgnIndirect(LPCRECT lpRect);
     BOOL CreatePolygonRgn(LPPOINT lpPoints, int nCount, int nMode);
     BOOL CreatePolyPolygonRgn(LPPOINT lpPoints, LPINT lpPolyCounts,
                     int nCount, int nPolyFillMode);
-    BOOL CreateRoundRectRgn(int x1, int y1, int x2, int y2, int x3, int y3);
+    BOOL CreateRoundRectRgn( intx1, int y1, int x2, int y2, int x3, int y3);
     BOOL CreateFromPath(CDC* pDC);
     BOOL CreateFromData(const XFORM* lpXForm, int nCount,
             const RGNDATA* pRgnData);
 
 // Operations
-    void SetRectRgn(int x1, int y1, int x2, int y2);
+    void SetRectRgn( intx1, int y1, int x2, int y2);
     void SetRectRgn(LPCRECT lpRect);
     int CombineRgn(CRgn* pRgn1, CRgn* pRgn2, int nCombineMode);
     int CopyRgn(CRgn* pRgnSrc);
     BOOL EqualRgn(CRgn* pRgn) const;
-    int OffsetRgn(int x, int y);
+    int OffsetRgn( intx, int y);
     int OffsetRgn(POINT point);
     int GetRgnBox(LPRECT lpRect) const;
-    BOOL PtInRegion(int x, int y) const;
+    BOOL PtInRegion( intx, int y) const;
     BOOL PtInRegion(POINT point) const;
     BOOL RectInRegion(LPCRECT lpRect) const;
     int GetRegionData(LPRGNDATA lpRgnData, int nCount) const;
@@ -685,22 +685,22 @@ public:
 
 // Device-Context Functions
     virtual int SaveDC();
-    virtual BOOL RestoreDC(int nSavedDC);
-    int GetDeviceCaps(int nIndex) const;
+    virtual BOOL RestoreDC( intnSavedDC);
+    int GetDeviceCaps( intnIndex) const;
     UINT SetBoundsRect(LPCRECT lpRectBounds, UINT flags);
     UINT GetBoundsRect(LPRECT lpRectBounds, UINT flags);
     BOOL ResetDC(const DEVMODE* lpDevMode);
 
 // Drawing-Tool Functions
     CPoint GetBrushOrg() const;
-    CPoint SetBrushOrg(int x, int y);
+    CPoint SetBrushOrg( intx, int y);
     CPoint SetBrushOrg(POINT point);
-    int EnumObjects(int nObjectType,
+    int EnumObjects( intnObjectType,
                     int (CALLBACK* lpfn)(LPVOID, LPARAM), LPARAM lpData);
 
 // Type-safe selection helpers
 public:
-    virtual CGdiObject* SelectStockObject(int nIndex);
+    virtual CGdiObject* SelectStockObject( intnIndex);
     CPen* SelectObject(CPen* pPen);
     CBrush* SelectObject(CBrush* pBrush);
     virtual CFont* SelectObject(CFont* pFont);
@@ -724,10 +724,10 @@ public:
     COLORREF GetTextColor() const;
 
     virtual COLORREF SetBkColor(COLORREF crColor);
-    int SetBkMode(int nBkMode);
-    int SetPolyFillMode(int nPolyFillMode);
-    int SetROP2(int nDrawMode);
-    int SetStretchBltMode(int nStretchMode);
+    int SetBkMode( intnBkMode);
+    int SetPolyFillMode( intnPolyFillMode);
+    int SetROP2( intnDrawMode);
+    int SetStretchBltMode( intnStretchMode);
     virtual COLORREF SetTextColor(COLORREF crColor);
 
     BOOL GetColorAdjustment(LPCOLORADJUSTMENT lpColorAdjust) const;
@@ -736,29 +736,29 @@ public:
 // Mapping Functions
     int GetMapMode() const;
     CPoint GetViewportOrg() const;
-    virtual int SetMapMode(int nMapMode);
+    virtual int SetMapMode( intnMapMode);
     // Viewport Origin
-    virtual CPoint SetViewportOrg(int x, int y);
+    virtual CPoint SetViewportOrg( intx, int y);
                     CPoint SetViewportOrg(POINT point);
-    virtual CPoint OffsetViewportOrg(int nWidth, int nHeight);
+    virtual CPoint OffsetViewportOrg( intnWidth, int nHeight);
 
     // Viewport Extent
     CSize GetViewportExt() const;
-    virtual CSize SetViewportExt(int cx, int cy);
+    virtual CSize SetViewportExt( intcx, int cy);
                     CSize SetViewportExt(SIZE size);
-    virtual CSize ScaleViewportExt(int xNum, int xDenom, int yNum, int yDenom);
+    virtual CSize ScaleViewportExt( intxNum, int xDenom, int yNum, int yDenom);
 
     // Window Origin
     CPoint GetWindowOrg() const;
-    CPoint SetWindowOrg(int x, int y);
+    CPoint SetWindowOrg( intx, int y);
     CPoint SetWindowOrg(POINT point);
-    CPoint OffsetWindowOrg(int nWidth, int nHeight);
+    CPoint OffsetWindowOrg( intnWidth, int nHeight);
 
     // Window extent
     CSize GetWindowExt() const;
-    virtual CSize SetWindowExt(int cx, int cy);
+    virtual CSize SetWindowExt( intcx, int cy);
                     CSize SetWindowExt(SIZE size);
-    virtual CSize ScaleWindowExt(int xNum, int xDenom, int yNum, int yDenom);
+    virtual CSize ScaleWindowExt( intxNum, int xDenom, int yNum, int yDenom);
 
 // Coordinate Functions
     void DPtoLP(LPPOINT lpPoints, int nCount = 1) const;
@@ -782,34 +782,34 @@ public:
 
 // Clipping Functions
     virtual int GetClipBox(LPRECT lpRect) const;
-    virtual BOOL PtVisible(int x, int y) const;
+    virtual BOOL PtVisible( intx, int y) const;
                     BOOL PtVisible(POINT point) const;
     virtual BOOL RectVisible(LPCRECT lpRect) const;
                     int SelectClipRgn(CRgn* pRgn);
-                    int ExcludeClipRect(int x1, int y1, int x2, int y2);
+                    int ExcludeClipRect( intx1, int y1, int x2, int y2);
                     int ExcludeClipRect(LPCRECT lpRect);
                     int ExcludeUpdateRgn(CWnd* pWnd);
-                    int IntersectClipRect(int x1, int y1, int x2, int y2);
+                    int IntersectClipRect( intx1, int y1, int x2, int y2);
                     int IntersectClipRect(LPCRECT lpRect);
-                    int OffsetClipRgn(int x, int y);
+                    int OffsetClipRgn( intx, int y);
                     int OffsetClipRgn(SIZE size);
     int SelectClipRgn(CRgn* pRgn, int nMode);
 
 // Line-Output Functions
     CPoint GetCurrentPosition() const;
-    CPoint MoveTo(int x, int y);
+    CPoint MoveTo( intx, int y);
     CPoint MoveTo(POINT point);
-    BOOL LineTo(int x, int y);
+    BOOL LineTo( intx, int y);
     BOOL LineTo(POINT point);
-    BOOL Arc(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
+    BOOL Arc( intx1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
     BOOL Arc(LPCRECT lpRect, POINT ptStart, POINT ptEnd);
     BOOL Polyline(LPPOINT lpPoints, int nCount);
 
-    BOOL AngleArc(int x, int y, int nRadius, float fStartAngle, float fSweepAngle);
-    BOOL ArcTo(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
+    BOOL AngleArc( intx, int y, int nRadius, float fStartAngle, float fSweepAngle);
+    BOOL ArcTo( intx1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
     BOOL ArcTo(LPCRECT lpRect, POINT ptStart, POINT ptEnd);
     int GetArcDirection() const;
-    int SetArcDirection(int nArcDirection);
+    int SetArcDirection( intnArcDirection);
 
     BOOL PolyDraw(const POINT* lpPoints, const BYTE* lpTypes, int nCount);
     BOOL PolylineTo(const POINT* lpPoints, int nCount);
@@ -823,73 +823,73 @@ public:
     void FillRect(LPCRECT lpRect, CBrush* pBrush);
     void FrameRect(LPCRECT lpRect, CBrush* pBrush);
     void InvertRect(LPCRECT lpRect);
-    BOOL DrawIcon(int x, int y, HICON hIcon);
+    BOOL DrawIcon( intx, int y, HICON hIcon);
     BOOL DrawIcon(POINT point, HICON hIcon);
 #if (WINVER >= 0x400)
     BOOL DrawState(CPoint pt, CSize size, HBITMAP hBitmap, UINT nFlags,
-            HBRUSH hBrush = NULL);
+            HBRUSH hBrush = nullptr );
     BOOL DrawState(CPoint pt, CSize size, CBitmap* pBitmap, UINT nFlags,
-            CBrush* pBrush = NULL);
+            CBrush* pBrush = nullptr );
     BOOL DrawState(CPoint pt, CSize size, HICON hIcon, UINT nFlags,
-            HBRUSH hBrush = NULL);
+            HBRUSH hBrush = nullptr );
     BOOL DrawState(CPoint pt, CSize size, HICON hIcon, UINT nFlags,
-            CBrush* pBrush = NULL);
+            CBrush* pBrush = nullptr );
     BOOL DrawState(CPoint pt, CSize size, LPCTSTR lpszText, UINT nFlags,
-            BOOL bPrefixText = TRUE, int nTextLen = 0, HBRUSH hBrush = NULL);
+            BOOL bPrefixText = TRUE, int nTextLen = 0, HBRUSH hBrush = nullptr );
     BOOL DrawState(CPoint pt, CSize size, LPCTSTR lpszText, UINT nFlags,
-            BOOL bPrefixText = TRUE, int nTextLen = 0, CBrush* pBrush = NULL);
+            BOOL bPrefixText = TRUE, int nTextLen = 0, CBrush* pBrush = nullptr );
     BOOL DrawState(CPoint pt, CSize size, DRAWSTATEPROC lpDrawProc,
-            LPARAM lData, UINT nFlags, HBRUSH hBrush = NULL);
+            LPARAM lData, UINT nFlags, HBRUSH hBrush = nullptr );
     BOOL DrawState(CPoint pt, CSize size, DRAWSTATEPROC lpDrawProc,
-            LPARAM lData, UINT nFlags, CBrush* pBrush = NULL);
+            LPARAM lData, UINT nFlags, CBrush* pBrush = nullptr );
 #endif
 
 // Ellipse and Polygon Functions
-    BOOL Chord(int x1, int y1, int x2, int y2, int x3, int y3,
+    BOOL Chord( intx1, int y1, int x2, int y2, int x3, int y3,
             int x4, int y4);
     BOOL Chord(LPCRECT lpRect, POINT ptStart, POINT ptEnd);
     void DrawFocusRect(LPCRECT lpRect);
-    BOOL Ellipse(int x1, int y1, int x2, int y2);
+    BOOL Ellipse( intx1, int y1, int x2, int y2);
     BOOL Ellipse(LPCRECT lpRect);
-    BOOL Pie(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
+    BOOL Pie( intx1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
     BOOL Pie(LPCRECT lpRect, POINT ptStart, POINT ptEnd);
     BOOL Polygon(LPPOINT lpPoints, int nCount);
     BOOL PolyPolygon(LPPOINT lpPoints, LPINT lpPolyCounts, int nCount);
-    BOOL Rectangle(int x1, int y1, int x2, int y2);
+    BOOL Rectangle( intx1, int y1, int x2, int y2);
     BOOL Rectangle(LPCRECT lpRect);
-    BOOL RoundRect(int x1, int y1, int x2, int y2, int x3, int y3);
+    BOOL RoundRect( intx1, int y1, int x2, int y2, int x3, int y3);
     BOOL RoundRect(LPCRECT lpRect, POINT point);
 
 // Bitmap Functions
-    BOOL PatBlt(int x, int y, int nWidth, int nHeight, DWORD dwRop);
-    BOOL BitBlt(int x, int y, int nWidth, int nHeight, CDC* pSrcDC,
+    BOOL PatBlt( intx, int y, int nWidth, int nHeight, DWORD dwRop);
+    BOOL BitBlt( intx, int y, int nWidth, int nHeight, CDC* pSrcDC,
             int xSrc, int ySrc, DWORD dwRop);
-    BOOL StretchBlt(int x, int y, int nWidth, int nHeight, CDC* pSrcDC,
+    BOOL StretchBlt( intx, int y, int nWidth, int nHeight, CDC* pSrcDC,
             int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, DWORD dwRop);
-    COLORREF GetPixel(int x, int y) const;
+    COLORREF GetPixel( intx, int y) const;
     COLORREF GetPixel(POINT point) const;
-    COLORREF SetPixel(int x, int y, COLORREF crColor);
+    COLORREF SetPixel( intx, int y, COLORREF crColor);
     COLORREF SetPixel(POINT point, COLORREF crColor);
-    BOOL FloodFill(int x, int y, COLORREF crColor);
-    BOOL ExtFloodFill(int x, int y, COLORREF crColor, UINT nFillType);
-    BOOL MaskBlt(int x, int y, int nWidth, int nHeight, CDC* pSrcDC,
+    BOOL FloodFill( intx, int y, COLORREF crColor);
+    BOOL ExtFloodFill( intx, int y, COLORREF crColor, UINT nFillType);
+    BOOL MaskBlt( intx, int y, int nWidth, int nHeight, CDC* pSrcDC,
             int xSrc, int ySrc, CBitmap& maskBitmap, int xMask, int yMask,
             DWORD dwRop);
     BOOL PlgBlt(LPPOINT lpPoint, CDC* pSrcDC, int xSrc, int ySrc,
             int nWidth, int nHeight, CBitmap& maskBitmap, int xMask, int yMask);
-    BOOL SetPixelV(int x, int y, COLORREF crColor);
+    BOOL SetPixelV( intx, int y, COLORREF crColor);
     BOOL SetPixelV(POINT point, COLORREF crColor);
 
 // Text Functions
-    virtual BOOL TextOut(int x, int y, LPCTSTR lpszString, int nCount);
-                    BOOL TextOut(int x, int y, const CString& str);
-    virtual BOOL ExtTextOut(int x, int y, UINT nOptions, LPCRECT lpRect,
+    virtual BOOL TextOut( intx, int y, LPCTSTR lpszString, int nCount);
+                    BOOL TextOut( intx, int y, const CString& str);
+    virtual BOOL ExtTextOut( intx, int y, UINT nOptions, LPCRECT lpRect,
                             LPCTSTR lpszString, UINT nCount, LPINT lpDxWidths);
-                    BOOL ExtTextOut(int x, int y, UINT nOptions, LPCRECT lpRect,
+                    BOOL ExtTextOut( intx, int y, UINT nOptions, LPCRECT lpRect,
                             const CString& str, LPINT lpDxWidths);
-    virtual CSize TabbedTextOut(int x, int y, LPCTSTR lpszString, int nCount,
+    virtual CSize TabbedTextOut( intx, int y, LPCTSTR lpszString, int nCount,
                             int nTabPositions, LPINT lpnTabStopPositions, int nTabOrigin);
-                    CSize TabbedTextOut(int x, int y, const CString& str,
+                    CSize TabbedTextOut( intx, int y, const CString& str,
                             int nTabPositions, LPINT lpnTabStopPositions, int nTabOrigin);
     virtual int DrawText(LPCTSTR lpszString, int nCount, LPRECT lpRect,
                             UINT nFormat);
@@ -911,13 +911,13 @@ public:
                     int nCount, int x, int y, int nWidth, int nHeight);
     UINT GetTextAlign() const;
     UINT SetTextAlign(UINT nFlags);
-    int GetTextFace(int nCount, LPTSTR lpszFacename) const;
+    int GetTextFace( intnCount, LPTSTR lpszFacename) const;
     int GetTextFace(CString& rString) const;
     BOOL GetTextMetrics(LPTEXTMETRIC lpMetrics) const;
     BOOL GetOutputTextMetrics(LPTEXTMETRIC lpMetrics) const;
-    int SetTextJustification(int nBreakExtra, int nBreakCount);
+    int SetTextJustification( intnBreakExtra, int nBreakCount);
     int GetTextCharacterExtra() const;
-    int SetTextCharacterExtra(int nCharExtra);
+    int SetTextCharacterExtra( intnCharExtra);
 
 // Advanced Drawing
 #if (WINVER >= 0x400)
@@ -926,7 +926,7 @@ public:
 #endif
 
 // Scrolling Functions
-    BOOL ScrollDC(int dx, int dy, LPCRECT lpRectScroll, LPCRECT lpRectClip,
+    BOOL ScrollDC( intdx, int dy, LPCRECT lpRectScroll, LPCRECT lpRectClip,
             CRgn* pRgnUpdate, LPRECT lpRectUpdate);
 
 // Font Functions
@@ -937,7 +937,7 @@ public:
 
     BOOL GetCharABCWidths(UINT nFirstChar, UINT nLastChar, LPABC lpabc) const;
     DWORD GetFontData(DWORD dwTable, DWORD dwOffset, LPVOID lpData, DWORD cbData) const;
-    int GetKerningPairs(int nPairs, LPKERNINGPAIR lpkrnpair) const;
+    int GetKerningPairs( intnPairs, LPKERNINGPAIR lpkrnpair) const;
     UINT GetOutlineTextMetrics(UINT cbData, LPOUTLINETEXTMETRIC lpotm) const;
     DWORD GetGlyphOutline(UINT nChar, UINT nFormat, LPGLYPHMETRICS lpgm,
             DWORD cbBuffer, LPVOID lpBuffer, const MAT2* lpmat2) const;
@@ -948,11 +948,11 @@ public:
             float* lpFloatBuffer) const;
 
 // Printer/Device Escape Functions
-    virtual int Escape(int nEscape, int nCount,
+    virtual int Escape( intnEscape, int nCount,
             LPCSTR lpszInData, LPVOID lpOutData);
-    int Escape(int nEscape, int nInputSize, LPCSTR lpszInputData,
+    int Escape( intnEscape, int nInputSize, LPCSTR lpszInputData,
             int nOutputSize, LPSTR lpszOutputData);
-    int DrawEscape(int nEscape, int nInputSize, LPCSTR lpszInputData);
+    int DrawEscape( intnEscape, int nInputSize, LPCSTR lpszInputData);
 
     // Escape helpers
     int StartDoc(LPCTSTR lpszDocName);  // old Win3.0 version
@@ -982,17 +982,17 @@ public:
     float GetMiterLimit() const;
     BOOL SetMiterLimit(float fMiterLimit);
     int GetPath(LPPOINT lpPoints, LPBYTE lpTypes, int nCount) const;
-    BOOL SelectClipPath(int nMode);
+    BOOL SelectClipPath( intnMode);
 
 // Misc Helper Functions
     static CBrush* PASCAL GetHalftoneBrush();
     void DrawDragRect(LPCRECT lpRect, SIZE size,
             LPCRECT lpRectLast, SIZE sizeLast,
-            CBrush* pBrush = NULL, CBrush* pBrushLast = NULL);
+            CBrush* pBrush = nullptr, CBrush* pBrushLast = nullptr );
     void FillSolidRect(LPCRECT lpRect, COLORREF clr);
-    void FillSolidRect(int x, int y, int cx, int cy, COLORREF clr);
+    void FillSolidRect( intx, int y, int cx, int cy, COLORREF clr);
     void Draw3dRect(LPCRECT lpRect, COLORREF clrTopLeft, COLORREF clrBottomRight);
-    void Draw3dRect(int x, int y, int cx, int cy,
+    void Draw3dRect( intx, int y, int cx, int cy,
             COLORREF clrTopLeft, COLORREF clrBottomRight);
 
 // Implementation
@@ -1117,12 +1117,12 @@ public:
 
 // CMenuItem Operations
     BOOL AppendMenu(UINT nFlags, UINT_PTR nIDNewItem = 0,
-                                    LPCTSTR lpszNewItem = NULL);
+                                    LPCTSTR lpszNewItem = nullptr );
     BOOL AppendMenu(UINT nFlags, UINT_PTR nIDNewItem, const CBitmap* pBmp);
     UINT CheckMenuItem(UINT nIDCheckItem, UINT nCheck);
     UINT EnableMenuItem(UINT nIDEnableItem, UINT nEnable);
     UINT GetMenuItemCount() const;
-    UINT GetMenuItemID(int nPos) const;
+    UINT GetMenuItemID( intnPos) const;
     UINT GetMenuState(UINT nID, UINT nFlags) const;
     int GetMenuString(UINT nIDItem, LPTSTR lpString, int nMaxCount,
                                     UINT nFlags) const;
@@ -1131,13 +1131,13 @@ public:
 	BOOL GetMenuItemInfo(UINT nIDItem, LPMENUITEMINFO lpMenuItemInfo,
 					BOOL fByPos = FALSE);
 #endif
-    CMenu* GetSubMenu(int nPos) const;
+    CMenu* GetSubMenu( intnPos) const;
     BOOL InsertMenu(UINT nPosition, UINT nFlags, UINT_PTR nIDNewItem = 0,
-                                    LPCTSTR lpszNewItem = NULL);
+                                    LPCTSTR lpszNewItem = nullptr );
     BOOL InsertMenu(UINT nPosition, UINT nFlags, UINT_PTR nIDNewItem,
                                     const CBitmap* pBmp);
     BOOL ModifyMenu(UINT nPosition, UINT nFlags, UINT_PTR nIDNewItem = 0,
-                                    LPCTSTR lpszNewItem = NULL);
+                                    LPCTSTR lpszNewItem = nullptr );
     BOOL ModifyMenu(UINT nPosition, UINT nFlags, UINT_PTR nIDNewItem,
                                     const CBitmap* pBmp);
     BOOL RemoveMenu(UINT nPosition, UINT nFlags);
@@ -1242,12 +1242,12 @@ public:
     CWnd* m_pDlgWnd;           // container usually a dialog
 
 // Operations (for implementors of DDX and DDV procs)
-    HWND PrepareCtrl(int nIDC);     // return HWND of control
-    HWND PrepareEditCtrl(int nIDC); // return HWND of control
+    HWND PrepareCtrl( intnIDC);     // return HWND of control
+    HWND PrepareEditCtrl( intnIDC); // return HWND of control
     void Fail();                    // will throw exception
 
 #ifndef _AFX_NO_OCC_SUPPORT
-    CWnd* PrepareOleCtrl(int nIDC); // for OLE controls in dialog
+    CWnd* PrepareOleCtrl( intnIDC); // for OLE controls in dialog
 #endif
 
 // Implementation
@@ -1326,14 +1326,14 @@ class CTypeLibCache;        // cache for OLE type libraries
 
 struct AFX_INTERFACEMAP_ENTRY
 {
-    const void* piid;       // the interface id (IID) (NULL for aggregate)
+    const void* piid;       // the interface id (IID) (nullptr for aggregate)
     size_t nOffset;         // offset of the interface vtable from m_unknown
 };
 
 struct AFX_INTERFACEMAP
 {
 #ifdef _AFXDLL
-    const AFX_INTERFACEMAP* (PASCAL* pfnGetBaseMap)(); // NULL is root class
+    const AFX_INTERFACEMAP* (PASCAL* pfnGetBaseMap)(); // nullptr is root class
 #else
     const AFX_INTERFACEMAP* pBaseMap;
 #endif
@@ -1470,7 +1470,7 @@ protected: \
 #endif
 
 #define END_OLECMD_MAP() \
-            {NULL, 0, 0} \
+            {nullptr, 0, 0} \
     }; \
 
 class COleCmdUI;
@@ -1532,7 +1532,7 @@ struct AFX_CONNECTIONMAP_ENTRY
 struct AFX_CONNECTIONMAP
 {
 #ifdef _AFXDLL
-    const AFX_CONNECTIONMAP* (PASCAL* pfnGetBaseMap)(); // NULL is root class
+    const AFX_CONNECTIONMAP* (PASCAL* pfnGetBaseMap)(); // nullptr is root class
 #else
     const AFX_CONNECTIONMAP* pBaseMap;
 #endif
@@ -1672,7 +1672,7 @@ protected:
 public:
     // data used when CCmdTarget is made OLE aware
     long m_dwRef;
-    LPUNKNOWN m_pOuterUnknown;  // external controlling unknown if != NULL
+    LPUNKNOWN m_pOuterUnknown;  // external controlling unknown if != nullptr
     DWORD_PTR m_xInnerUnknown;  // place-holder for inner controlling unknown
 
 public:
@@ -1778,16 +1778,16 @@ public:
     UINT m_nIndex;          // menu item or other index
 
     // if a menu item
-    CMenu* m_pMenu;         // NULL if not a menu
+    CMenu* m_pMenu;         // nullptr if not a menu
     CMenu* m_pSubMenu;      // sub containing menu item
                                                     // if a popup sub menu - ID is for first in popup
 
     // if from some other window
-    CWnd* m_pOther;         // NULL if a menu or not a CWnd
+    CWnd* m_pOther;         // nullptr if a menu or not a CWnd
 
 // Operations to do in ON_UPDATE_COMMAND_UI
     virtual void Enable(BOOL bOn = TRUE);
-    virtual void SetCheck(int nCheck = 1);   // 0, 1 or 2 (indeterminate)
+    virtual void SetCheck( intnCheck = 1);   // 0, 1 or 2 (indeterminate)
     virtual void SetRadio(BOOL bOn = TRUE);
     virtual void SetText(LPCTSTR lpszText);
 
@@ -1800,7 +1800,7 @@ public:
     BOOL m_bContinueRouting;
     UINT m_nIndexMax;       // last + 1 for iterating m_nIndex
 
-    CMenu* m_pParentMenu;   // NULL if parent menu not easily determined
+    CMenu* m_pParentMenu;   // nullptr if parent menu not easily determined
                                                     //  (probably a secondary popup menu)
 
     BOOL DoUpdate(CCmdTarget* pTarget, BOOL bDisableIfNoHndler);
@@ -1967,34 +1967,34 @@ public:
             LPCTSTR lpszWindowName, DWORD dwStyle,
             const RECT& rect,
             CWnd* pParentWnd, UINT nID,
-            CCreateContext* pContext = NULL);
+            CCreateContext* pContext = nullptr );
 
     // advanced creation (allows access to extended styles)
     BOOL CreateEx(DWORD dwExStyle, LPCTSTR lpszClassName,
             LPCTSTR lpszWindowName, DWORD dwStyle,
             int x, int y, int nWidth, int nHeight,
-            HWND hWndParent, HMENU nIDorHMenu, LPVOID lpParam = NULL);
+            HWND hWndParent, HMENU nIDorHMenu, LPVOID lpParam = nullptr );
 
     BOOL CreateEx(DWORD dwExStyle, LPCTSTR lpszClassName,
             LPCTSTR lpszWindowName, DWORD dwStyle,
             const RECT& rect,
             CWnd* pParentWnd, UINT nID,
-            LPVOID lpParam = NULL);
+            LPVOID lpParam = nullptr );
 
 #ifndef _AFX_NO_OCC_SUPPORT
     // for wrapping OLE controls
     BOOL CreateControl(REFCLSID clsid, LPCTSTR pszWindowName, DWORD dwStyle,
-            const RECT& rect, CWnd* pParentWnd, UINT nID, CFile* pPersist=NULL,
-            BOOL bStorage=FALSE, BSTR bstrLicKey=NULL);
+            const RECT& rect, CWnd* pParentWnd, UINT nID, CFile* pPersist=nullptr,
+            BOOL bStorage=FALSE, BSTR bstrLicKey=nullptr );
 
     BOOL CreateControl(LPCTSTR pszClass, LPCTSTR pszWindowName, DWORD dwStyle,
-            const RECT& rect, CWnd* pParentWnd, UINT nID, CFile* pPersist=NULL,
-            BOOL bStorage=FALSE, BSTR bstrLicKey=NULL);
+            const RECT& rect, CWnd* pParentWnd, UINT nID, CFile* pPersist=nullptr,
+            BOOL bStorage=FALSE, BSTR bstrLicKey=nullptr );
 #if _MFC_VER >= 0x0600
     // Another overload for creating controls that use default extents.
     BOOL CreateControl( REFCLSID clsid, LPCTSTR pszWindowName, DWORD dwStyle,
        const POINT* ppt, const SIZE* psize, CWnd* pParentWnd, UINT nID,
-       CFile* pPersist = NULL, BOOL bStorage = FALSE, BSTR bstrLicKey = NULL );
+       CFile* pPersist = nullptr, BOOL bStorage = FALSE, BSTR bstrLicKey = nullptr );
 #endif
 
     LPUNKNOWN GetControlUnknown();
@@ -2012,13 +2012,13 @@ public:
 
 // Window tree access
     int GetDlgCtrlID() const;
-    int SetDlgCtrlID(int nID);
+    int SetDlgCtrlID( intnID);
             // get and set window ID, for child windows only
-    CWnd* GetDlgItem(int nID) const;
+    CWnd* GetDlgItem( intnID) const;
             // get immediate child with given ID
-    void GetDlgItem(int nID, HWND* phWnd) const;
+    void GetDlgItem( intnID, HWND* phWnd) const;
             // as above, but returns HWND
-    CWnd* GetDescendantWindow(int nID, BOOL bOnlyPerm = FALSE) const;
+    CWnd* GetDescendantWindow( intnID, BOOL bOnlyPerm = FALSE) const;
             // like GetDlgItem but recursive
     void SendMessageToDescendants(UINT message, WPARAM wParam = 0,
             LPARAM lParam = 0, BOOL bDeep = TRUE, BOOL bOnlyPerm = FALSE);
@@ -2027,14 +2027,14 @@ public:
     CWnd* GetTopLevelOwner() const;
     CWnd* GetParentOwner() const;
     CFrameWnd* GetTopLevelFrame() const;
-    static CWnd* PASCAL GetSafeOwner(CWnd* pParent = NULL, HWND* pWndTop = NULL);
+    static CWnd* PASCAL GetSafeOwner(CWnd* pParent = nullptr, HWND* pWndTop = nullptr );
 
 // Message Functions
     LRESULT SendMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
     BOOL PostMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
 
     BOOL SendNotifyMessage(UINT message, WPARAM wParam, LPARAM lParam);
-    BOOL SendChildNotifyLastMsg(LRESULT* pResult = NULL);
+    BOOL SendChildNotifyLastMsg(LRESULT* pResult = nullptr );
 
 // Message processing for modeless dialog-like windows
     BOOL IsDialogMessage(LPMSG lpMsg);
@@ -2057,7 +2057,7 @@ public:
 // Window Size and Position Functions
     BOOL IsIconic() const;
     BOOL IsZoomed() const;
-    void MoveWindow(int x, int y, int nWidth, int nHeight,
+    void MoveWindow( intx, int y, int nWidth, int nHeight,
                             BOOL bRepaint = TRUE);
     void MoveWindow(LPCRECT lpRect, BOOL bRepaint = TRUE);
     int SetWindowRgn(HRGN hRgn, BOOL bRedraw);
@@ -2104,17 +2104,17 @@ public:
     void InvalidateRgn(CRgn* pRgn, BOOL bErase = TRUE);
     void ValidateRect(LPCRECT lpRect);
     void ValidateRgn(CRgn* pRgn);
-    BOOL ShowWindow(int nCmdShow);
+    BOOL ShowWindow( intnCmdShow);
     BOOL IsWindowVisible() const;
     void ShowOwnedPopups(BOOL bShow = TRUE);
 
     CDC* GetDCEx(CRgn* prgnClip, DWORD flags);
     BOOL LockWindowUpdate();    // for backward compatibility
     void UnlockWindowUpdate();
-    BOOL RedrawWindow(LPCRECT lpRectUpdate = NULL,
-            CRgn* prgnUpdate = NULL,
+    BOOL RedrawWindow(LPCRECT lpRectUpdate = nullptr,
+            CRgn* prgnUpdate = nullptr,
             UINT flags = RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE);
-    BOOL EnableScrollBar(int nSBFlags, UINT nArrowFlags = ESB_ENABLE_BOTH);
+    BOOL EnableScrollBar( intnSBFlags, UINT nArrowFlags = ESB_ENABLE_BOTH);
 
 // Timer Functions
     UINT_PTR SetTimer(UINT_PTR nIDEvent, UINT nElapse,
@@ -2158,10 +2158,10 @@ public:
 
 // Dialog-Box Item Functions
 // (NOTE: Dialog-Box Items/Controls are not necessarily in dialog boxes!)
-    void CheckDlgButton(int nIDButton, UINT nCheck);
-    void CheckRadioButton(int nIDFirstButton, int nIDLastButton,
+    void CheckDlgButton( intnIDButton, UINT nCheck);
+    void CheckRadioButton( intnIDFirstButton, int nIDLastButton,
                                     int nIDCheckButton);
-    int GetCheckedRadioButton(int nIDFirstButton, int nIDLastButton);
+    int GetCheckedRadioButton( intnIDFirstButton, int nIDLastButton);
     int DlgDirList(LPTSTR lpPathSpec, int nIDListBox,
                                     int nIDStaticPath, UINT nFileType);
     int DlgDirListComboBox(LPTSTR lpPathSpec, int nIDComboBox,
@@ -2169,40 +2169,40 @@ public:
     BOOL DlgDirSelect(LPTSTR lpString, int nIDListBox);
     BOOL DlgDirSelectComboBox(LPTSTR lpString, int nIDComboBox);
 
-    UINT GetDlgItemInt(int nID, BOOL* lpTrans = NULL,
+    UINT GetDlgItemInt( intnID, BOOL* lpTrans = nullptr,
                                     BOOL bSigned = TRUE) const;
-    int GetDlgItemText(int nID, __out_ecount(nMaxCount) LPTSTR lpStr, int nMaxCount) const;
-    int GetDlgItemText(int nID, CString& rString) const;
+    int GetDlgItemText( intnID, __out_ecount(nMaxCount) LPTSTR lpStr, int nMaxCount) const;
+    int GetDlgItemText( intnID, CString& rString) const;
     CWnd* GetNextDlgGroupItem(CWnd* pWndCtl, BOOL bPrevious = FALSE) const;
 
     CWnd* GetNextDlgTabItem(CWnd* pWndCtl, BOOL bPrevious = FALSE) const;
-    UINT IsDlgButtonChecked(int nIDButton) const;
-    LRESULT SendDlgItemMessage(int nID, UINT message,
+    UINT IsDlgButtonChecked( intnIDButton) const;
+    LRESULT SendDlgItemMessage( intnID, UINT message,
                                     WPARAM wParam = 0, LPARAM lParam = 0);
-    void SetDlgItemInt(int nID, UINT nValue, BOOL bSigned = TRUE);
-    void SetDlgItemText(int nID, LPCTSTR lpszString);
+    void SetDlgItemInt( intnID, UINT nValue, BOOL bSigned = TRUE);
+    void SetDlgItemText( intnID, LPCTSTR lpszString);
 
 // Scrolling Functions
-    int GetScrollPos(int nBar) const;
-    void GetScrollRange(int nBar, LPINT lpMinPos, LPINT lpMaxPos) const;
-    void ScrollWindow(int xAmount, int yAmount,
-                                    LPCRECT lpRect = NULL,
-                                    LPCRECT lpClipRect = NULL);
-    int SetScrollPos(int nBar, int nPos, BOOL bRedraw = TRUE);
-    void SetScrollRange(int nBar, int nMinPos, int nMaxPos,
+    int GetScrollPos( intnBar) const;
+    void GetScrollRange( intnBar, LPINT lpMinPos, LPINT lpMaxPos) const;
+    void ScrollWindow( intxAmount, int yAmount,
+                                    LPCRECT lpRect = nullptr,
+                                    LPCRECT lpClipRect = nullptr );
+    int SetScrollPos( intnBar, int nPos, BOOL bRedraw = TRUE);
+    void SetScrollRange( intnBar, int nMinPos, int nMaxPos,
                     BOOL bRedraw = TRUE);
     void ShowScrollBar(UINT nBar, BOOL bShow = TRUE);
-    void EnableScrollBarCtrl(int nBar, BOOL bEnable = TRUE);
-    virtual CScrollBar* GetScrollBarCtrl(int nBar) const;
-                    // return sibling scrollbar control (or NULL if none)
+    void EnableScrollBarCtrl( intnBar, BOOL bEnable = TRUE);
+    virtual CScrollBar* GetScrollBarCtrl( intnBar) const;
+                    // return sibling scrollbar control (or nullptr if none)
 
-    int ScrollWindowEx(int dx, int dy,
+    int ScrollWindowEx( intdx, int dy,
                             LPCRECT lpRectScroll, LPCRECT lpRectClip,
                             CRgn* prgnUpdate, LPRECT lpRectUpdate, UINT flags);
-    BOOL SetScrollInfo(int nBar, LPSCROLLINFO lpScrollInfo,
+    BOOL SetScrollInfo( intnBar, LPSCROLLINFO lpScrollInfo,
             BOOL bRedraw = TRUE);
-    BOOL GetScrollInfo(int nBar, LPSCROLLINFO lpScrollInfo, UINT nMask = SIF_ALL);
-    int GetScrollLimit(int nBar);
+    BOOL GetScrollInfo( intnBar, LPSCROLLINFO lpScrollInfo, UINT nMask = SIF_ALL);
+    int GetScrollLimit( intnBar);
 
 // Window Access Functions
     CWnd* ChildWindowFromPoint(POINT point) const;
@@ -2221,7 +2221,7 @@ public:
 
 // Alert Functions
     BOOL FlashWindow(BOOL bInvert);
-    int MessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption = NULL,
+    int MessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption = nullptr,
                     UINT nType = MB_OK);
 
 // Clipboard Functions
@@ -2234,8 +2234,8 @@ public:
 
 // Caret Functions
     void CreateCaret(CBitmap* pBitmap);
-    void CreateSolidCaret(int nWidth, int nHeight);
-    void CreateGrayCaret(int nWidth, int nHeight);
+    void CreateSolidCaret( intnWidth, int nHeight);
+    void CreateGrayCaret( intnWidth, int nHeight);
     static CPoint PASCAL GetCaretPos();
     static void PASCAL SetCaretPos(POINT point);
     void HideCaret();
@@ -2270,15 +2270,15 @@ public:
     enum RepositionFlags
             { reposDefault = 0, reposQuery = 1, reposExtra = 2 };
     void RepositionBars(UINT nIDFirst, UINT nIDLast, UINT nIDLeftOver,
-            UINT nFlag = reposDefault, LPRECT lpRectParam = NULL,
-            LPCRECT lpRectClient = NULL, BOOL bStretch = TRUE);
+            UINT nFlag = reposDefault, LPRECT lpRectParam = nullptr,
+            LPCRECT lpRectClient = nullptr, BOOL bStretch = TRUE);
 
     // dialog support
     void UpdateDialogControls(CCmdTarget* pTarget, BOOL bDisableIfNoHndler);
-    void CenterWindow(CWnd* pAlternateOwner = NULL);
+    void CenterWindow(CWnd* pAlternateOwner = nullptr );
     int RunModalLoop(DWORD dwFlags = 0);
     virtual BOOL ContinueModal();
-    virtual void EndModalLoop(int nResult);
+    virtual void EndModalLoop( intnResult);
 
 #ifndef _AFX_NO_OCC_SUPPORT
 // OLE control wrapper functions
@@ -2319,7 +2319,7 @@ protected:
     afx_msg void OnKillFocus(CWnd* pNewWnd);
     afx_msg LRESULT OnMenuChar(UINT nChar, UINT nFlags, CMenu* pMenu);
     afx_msg void OnMenuSelect(UINT nItemID, UINT nFlags, HMENU hSysMenu);
-    afx_msg void OnMove(int x, int y);
+    afx_msg void OnMove( intx, int y);
     afx_msg void OnPaint();
     afx_msg void OnParentNotify(UINT message, LPARAM lParam);
     afx_msg HCURSOR OnQueryDragIcon();
@@ -2409,11 +2409,11 @@ protected:
     afx_msg void OnVScrollClipboard(CWnd* pClipAppWnd, UINT nSBCode, UINT nPos);
 
 // Control message handler member functions
-    afx_msg int OnCompareItem(int nIDCtl, LPCOMPAREITEMSTRUCT lpCompareItemStruct);
-    afx_msg void OnDeleteItem(int nIDCtl, LPDELETEITEMSTRUCT lpDeleteItemStruct);
-    afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
+    afx_msg int OnCompareItem( intnIDCtl, LPCOMPAREITEMSTRUCT lpCompareItemStruct);
+    afx_msg void OnDeleteItem( intnIDCtl, LPDELETEITEMSTRUCT lpDeleteItemStruct);
+    afx_msg void OnDrawItem( intnIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
     afx_msg UINT OnGetDlgCode();
-    afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
+    afx_msg void OnMeasureItem( intnIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
     afx_msg int OnCharToItem(UINT nChar, CListBox* pListBox, UINT nIndex);
     afx_msg int OnVKeyToItem(UINT nKey, CListBox* pListBox, UINT nIndex);
 
@@ -2426,8 +2426,8 @@ protected:
     afx_msg void OnExitMenuLoop(BOOL bIsTrackPopupMenu);
 
 // Win4 messages
-    afx_msg void OnStyleChanged(int nStyleType, LPSTYLESTRUCT lpStyleStruct);
-    afx_msg void OnStyleChanging(int nStyleType, LPSTYLESTRUCT lpStyleStruct);
+    afx_msg void OnStyleChanged( intnStyleType, LPSTYLESTRUCT lpStyleStruct);
+    afx_msg void OnStyleChanging( intnStyleType, LPSTYLESTRUCT lpStyleStruct);
     afx_msg void OnSizing(UINT nSide, LPRECT lpRect);
     afx_msg void OnMoving(UINT nSide, LPRECT lpRect);
     afx_msg void OnCaptureChanged(CWnd* pWnd);
@@ -2471,7 +2471,7 @@ protected:
     virtual BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
             // return TRUE if parent should not process this message
     BOOL ReflectChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-    static BOOL PASCAL ReflectLastMsg(HWND hWndChild, LRESULT* pResult = NULL);
+    static BOOL PASCAL ReflectLastMsg(HWND hWndChild, LRESULT* pResult = nullptr );
 
 // Implementation
 public:
@@ -2483,7 +2483,7 @@ public:
 #endif
 #ifndef _AFX_NO_CTL3D_SUPPORT
     // 3D support (these APIs will be obsolete with next version of Windows)
-    BOOL SubclassCtl3d(int nControlType = -1);
+    BOOL SubclassCtl3d( intnControlType = -1);
             // see CTL3D.H for list of control types
     BOOL SubclassDlg3d(DWORD dwMask = 0xFFFF /*CTL3D_ALL*/);
             // see CTL3D.H for list of mask values
@@ -2603,19 +2603,19 @@ class CDialog : public CWnd
 public:
     CDialog();
 
-    BOOL Create(LPCTSTR lpszTemplateName, CWnd* pParentWnd = NULL);
-    BOOL Create(UINT nIDTemplate, CWnd* pParentWnd = NULL);
-    BOOL CreateIndirect(LPCDLGTEMPLATE lpDialogTemplate, CWnd* pParentWnd = NULL,
-            void* lpDialogInit = NULL);
-    BOOL CreateIndirect(HGLOBAL hDialogTemplate, CWnd* pParentWnd = NULL);
+    BOOL Create(LPCTSTR lpszTemplateName, CWnd* pParentWnd = nullptr );
+    BOOL Create(UINT nIDTemplate, CWnd* pParentWnd = nullptr );
+    BOOL CreateIndirect(LPCDLGTEMPLATE lpDialogTemplate, CWnd* pParentWnd = nullptr,
+            void* lpDialogInit = nullptr );
+    BOOL CreateIndirect(HGLOBAL hDialogTemplate, CWnd* pParentWnd = nullptr );
 
     // Modal construct
 public:
-    CDialog(LPCTSTR lpszTemplateName, CWnd* pParentWnd = NULL);
-    CDialog(UINT nIDTemplate, CWnd* pParentWnd = NULL);
-    BOOL InitModalIndirect(LPCDLGTEMPLATE lpDialogTemplate, CWnd* pParentWnd = NULL,
-            void* lpDialogInit = NULL);
-    BOOL InitModalIndirect(HGLOBAL hDialogTemplate, CWnd* pParentWnd = NULL);
+    CDialog(LPCTSTR lpszTemplateName, CWnd* pParentWnd = nullptr );
+    CDialog(UINT nIDTemplate, CWnd* pParentWnd = nullptr );
+    BOOL InitModalIndirect(LPCDLGTEMPLATE lpDialogTemplate, CWnd* pParentWnd = nullptr,
+            void* lpDialogInit = nullptr );
+    BOOL InitModalIndirect(HGLOBAL hDialogTemplate, CWnd* pParentWnd = nullptr );
 
 // Attributes
 public:
@@ -2637,7 +2637,7 @@ public:
     DWORD GetDefID() const;
 
     // termination
-    void EndDialog(int nResult);
+    void EndDialog( intnResult);
 
 // Overridables (special message map entries)
     virtual BOOL OnInitDialog();
@@ -2663,8 +2663,8 @@ protected:
 
     // parameters for 'DoModal'
     LPCTSTR m_lpszTemplateName;     // name or MAKEINTRESOURCE
-    HGLOBAL m_hDialogTemplate;      // indirect (m_lpDialogTemplate == NULL)
-    LPCDLGTEMPLATE m_lpDialogTemplate;  // indirect if (m_lpszTemplateName == NULL)
+    HGLOBAL m_hDialogTemplate;      // indirect (m_lpDialogTemplate == nullptr )
+    LPCDLGTEMPLATE m_lpDialogTemplate;  // indirect if (m_lpszTemplateName == nullptr )
     void* m_lpDialogInit;           // DLGINIT resource data
     CWnd* m_pParentWnd;             // parent/owner window
     HWND m_hWndTop;                 // top level parent window (may be disabled)
@@ -2745,7 +2745,7 @@ public:
     UINT GetState() const;
     void SetState(BOOL bHighlight);
     int GetCheck() const;
-    void SetCheck(int nCheck);
+    void SetCheck( intnCheck);
     UINT GetButtonStyle() const;
     void SetButtonStyle(UINT nStyle, BOOL bRedraw = TRUE);
 
@@ -2782,60 +2782,60 @@ public:
     // for entire listbox
     int GetCount() const;
     int GetHorizontalExtent() const;
-    void SetHorizontalExtent(int cxExtent);
+    void SetHorizontalExtent( intcxExtent);
     int GetTopIndex() const;
-    int SetTopIndex(int nIndex);
+    int SetTopIndex( intnIndex);
     LCID GetLocale() const;
     LCID SetLocale(LCID nNewLocale);
 #if (WINVER >= 0x400)
-    int InitStorage(int nItems, UINT nBytes);
+    int InitStorage( intnItems, UINT nBytes);
     UINT ItemFromPoint(CPoint pt, BOOL& bOutside) const;
 #endif
     // for single-selection listboxes
     int GetCurSel() const;
-    int SetCurSel(int nSelect);
+    int SetCurSel( intnSelect);
 
     // for multiple-selection listboxes
-    int GetSel(int nIndex) const;           // also works for single-selection
-    int SetSel(int nIndex, BOOL bSelect = TRUE);
+    int GetSel( intnIndex) const;           // also works for single-selection
+    int SetSel( intnIndex, BOOL bSelect = TRUE);
     int GetSelCount() const;
-    int GetSelItems(int nMaxItems, LPINT rgIndex) const;
-    void SetAnchorIndex(int nIndex);
+    int GetSelItems( intnMaxItems, LPINT rgIndex) const;
+    void SetAnchorIndex( intnIndex);
     int GetAnchorIndex() const;
 
     // for listbox items
-    DWORD_PTR GetItemData(int nIndex) const;
-    int SetItemData(int nIndex, DWORD_PTR dwItemData);
-    void* GetItemDataPtr(int nIndex) const;
-    int SetItemDataPtr(int nIndex, void* pData);
-    int GetItemRect(int nIndex, LPRECT lpRect) const;
-    int GetText(int nIndex, LPTSTR lpszBuffer) const;
-    void GetText(int nIndex, CString& rString) const;
-    int GetTextLen(int nIndex) const;
+    DWORD_PTR GetItemData( intnIndex) const;
+    int SetItemData( intnIndex, DWORD_PTR dwItemData);
+    void* GetItemDataPtr( intnIndex) const;
+    int SetItemDataPtr( intnIndex, void* pData);
+    int GetItemRect( intnIndex, LPRECT lpRect) const;
+    int GetText( intnIndex, LPTSTR lpszBuffer) const;
+    void GetText( intnIndex, CString& rString) const;
+    int GetTextLen( intnIndex) const;
 
     // Settable only attributes
-    void SetColumnWidth(int cxWidth);
-    BOOL SetTabStops(int nTabStops, LPINT rgTabStops);
+    void SetColumnWidth( intcxWidth);
+    BOOL SetTabStops( intnTabStops, LPINT rgTabStops);
     void SetTabStops();
     BOOL SetTabStops(const int& cxEachStop);    // takes an 'int'
 
-    int SetItemHeight(int nIndex, UINT cyItemHeight);
-    int GetItemHeight(int nIndex) const;
-    int FindStringExact(int nIndexStart, LPCTSTR lpszFind) const;
+    int SetItemHeight( intnIndex, UINT cyItemHeight);
+    int GetItemHeight( intnIndex) const;
+    int FindStringExact( intnIndexStart, LPCTSTR lpszFind) const;
     int GetCaretIndex() const;
-    int SetCaretIndex(int nIndex, BOOL bScroll = TRUE);
+    int SetCaretIndex( intnIndex, BOOL bScroll = TRUE);
 
 // Operations
     // manipulating listbox items
     int AddString(LPCTSTR lpszItem);
     int DeleteString(UINT nIndex);
-    int InsertString(int nIndex, LPCTSTR lpszItem);
+    int InsertString( intnIndex, LPCTSTR lpszItem);
     void ResetContent();
     int Dir(UINT attr, LPCTSTR lpszWildCard);
 
     // selection helpers
-    int FindString(int nStartAfter, LPCTSTR lpszItem) const;
-    int SelectString(int nStartAfter, LPCTSTR lpszItem);
+    int FindString( intnStartAfter, LPCTSTR lpszItem) const;
+    int SelectString( intnStartAfter, LPCTSTR lpszItem);
     int SelItemRange(BOOL bSelect, int nFirstItem, int nLastItem);
 
 // Overridables (must override draw, measure and compare for owner draw)
@@ -2865,10 +2865,10 @@ public:
 // Attributes
     void SetCheckStyle(UINT nStyle);
     UINT GetCheckStyle();
-    void SetCheck(int nIndex, int nCheck);
-    int GetCheck(int nIndex);
-    void Enable(int nIndex, BOOL bEnabled = TRUE);
-    BOOL IsEnabled(int nIndex);
+    void SetCheck( intnIndex, int nCheck);
+    int GetCheck( intnIndex);
+    void Enable( intnIndex, BOOL bEnabled = TRUE);
+    BOOL IsEnabled( intnIndex);
 
     virtual CRect OnGetCheckPosition(CRect rectItem, CRect rectCheckBox);
 
@@ -2894,8 +2894,8 @@ protected:
 #endif
 
     int CalcMinimumItemHeight();
-    void InvalidateCheck(int nIndex);
-    void InvalidateItem(int nIndex);
+    void InvalidateCheck( intnIndex);
+    void InvalidateItem( intnIndex);
     int CheckFromPoint(CPoint point, BOOL& bInCheck);
 
     int m_cyText;
@@ -2935,13 +2935,13 @@ public:
     // for entire combo box
     int GetCount() const;
     int GetCurSel() const;
-    int SetCurSel(int nSelect);
+    int SetCurSel( intnSelect);
     LCID GetLocale() const;
     LCID SetLocale(LCID nNewLocale);
 // Win4
     int GetTopIndex() const;
-    int SetTopIndex(int nIndex);
-    int InitStorage(int nItems, UINT nBytes);
+    int SetTopIndex( intnIndex);
+    int InitStorage( intnItems, UINT nBytes);
     void SetHorizontalExtent(UINT nExtent);
     UINT GetHorizontalExtent() const;
     int SetDroppedWidth(UINT nWidth);
@@ -2949,21 +2949,21 @@ public:
 
     // for edit control
     DWORD GetEditSel() const;
-    BOOL LimitText(int nMaxChars);
-    BOOL SetEditSel(int nStartChar, int nEndChar);
+    BOOL LimitText( intnMaxChars);
+    BOOL SetEditSel( intnStartChar, int nEndChar);
 
     // for combobox item
-    DWORD_PTR GetItemData(int nIndex) const;
-    int SetItemData(int nIndex, DWORD_PTR dwItemData);
-    void* GetItemDataPtr(int nIndex) const;
-    int SetItemDataPtr(int nIndex, void* pData);
-    int GetLBText(int nIndex, LPTSTR lpszText) const;
-    void GetLBText(int nIndex, CString& rString) const;
-    int GetLBTextLen(int nIndex) const;
+    DWORD_PTR GetItemData( intnIndex) const;
+    int SetItemData( intnIndex, DWORD_PTR dwItemData);
+    void* GetItemDataPtr( intnIndex) const;
+    int SetItemDataPtr( intnIndex, void* pData);
+    int GetLBText( intnIndex, LPTSTR lpszText) const;
+    void GetLBText( intnIndex, CString& rString) const;
+    int GetLBTextLen( intnIndex) const;
 
-    int SetItemHeight(int nIndex, UINT cyItemHeight);
-    int GetItemHeight(int nIndex) const;
-    int FindStringExact(int nIndexStart, LPCTSTR lpszFind) const;
+    int SetItemHeight( intnIndex, UINT cyItemHeight);
+    int GetItemHeight( intnIndex) const;
+    int FindStringExact( intnIndexStart, LPCTSTR lpszFind) const;
     int SetExtendedUI(BOOL bExtended = TRUE);
     BOOL GetExtendedUI() const;
     void GetDroppedControlRect(LPRECT lprect) const;
@@ -2976,13 +2976,13 @@ public:
     // manipulating listbox items
     int AddString(LPCTSTR lpszString);
     int DeleteString(UINT nIndex);
-    int InsertString(int nIndex, LPCTSTR lpszString);
+    int InsertString( intnIndex, LPCTSTR lpszString);
     void ResetContent();
     int Dir(UINT attr, LPCTSTR lpszWildCard);
 
     // selection helpers
-    int FindString(int nStartAfter, LPCTSTR lpszString) const;
-    int SelectString(int nStartAfter, LPCTSTR lpszString);
+    int FindString( intnStartAfter, LPCTSTR lpszString) const;
+    int SelectString( intnStartAfter, LPCTSTR lpszString);
 
     // Clipboard operations
     void Clear();
@@ -3047,18 +3047,18 @@ public:
     void EmptyUndoBuffer();
     BOOL FmtLines(BOOL bAddEOL);
 
-    void LimitText(int nChars = 0);
-    int LineFromChar(int nIndex = -1) const;
-    int LineIndex(int nLine = -1) const;
-    int LineLength(int nLine = -1) const;
-    void LineScroll(int nLines, int nChars = 0);
+    void LimitText( intnChars = 0);
+    int LineFromChar( intnIndex = -1) const;
+    int LineIndex( intnLine = -1) const;
+    int LineLength( intnLine = -1) const;
+    void LineScroll( intnLines, int nChars = 0);
     void ReplaceSel(LPCTSTR lpszNewText, BOOL bCanUndo = FALSE);
     void SetPasswordChar(TCHAR ch);
     void SetRect(LPCRECT lpRect);
     void SetRectNP(LPCRECT lpRect);
     void SetSel(DWORD dwSelection, BOOL bNoScroll = FALSE);
-    void SetSel(int nStartChar, int nEndChar, BOOL bNoScroll = FALSE);
-    BOOL SetTabStops(int nTabStops, LPINT rgTabStops);
+    void SetSel( intnStartChar, int nEndChar, BOOL bNoScroll = FALSE);
+    BOOL SetTabStops( intnTabStops, LPINT rgTabStops);
     void SetTabStops();
     BOOL SetTabStops(const int& cxEachStop);    // takes an 'int'
 
@@ -3089,9 +3089,9 @@ public:
 
 // Attributes
     int GetScrollPos() const;
-    int SetScrollPos(int nPos, BOOL bRedraw = TRUE);
+    int SetScrollPos( intnPos, BOOL bRedraw = TRUE);
     void GetScrollRange(LPINT lpMinPos, LPINT lpMaxPos) const;
-    void SetScrollRange(int nMinPos, int nMaxPos, BOOL bRedraw = TRUE);
+    void SetScrollRange( intnMinPos, int nMaxPos, BOOL bRedraw = TRUE);
     void ShowScrollBar(BOOL bShow = TRUE);
 
     BOOL EnableScrollBar(UINT nArrowFlags = ESB_ENABLE_BOTH);
@@ -3139,16 +3139,16 @@ public:
                             LPCTSTR lpszWindowName,
                             DWORD dwStyle = WS_OVERLAPPEDWINDOW,
                             const RECT& rect = rectDefault,
-                            CWnd* pParentWnd = NULL,        // != NULL for popups
-                            LPCTSTR lpszMenuName = NULL,
+                            CWnd* pParentWnd = nullptr,        // != nullptr for popups
+                            LPCTSTR lpszMenuName = nullptr,
                             DWORD dwExStyle = 0,
-                            CCreateContext* pContext = NULL);
+                            CCreateContext* pContext = nullptr );
 
     // dynamic creation - load frame and associated resources
     virtual BOOL LoadFrame(UINT nIDResource,
                             DWORD dwDefaultStyle = WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE,
-                            CWnd* pParentWnd = NULL,
-                            CCreateContext* pContext = NULL);
+                            CWnd* pParentWnd = nullptr,
+                            CCreateContext* pContext = nullptr );
 
     // special helper for view creation
     CWnd* CreateView(CCreateContext* pContext, UINT nID = AFX_IDW_PANE_FIRST);
@@ -3157,9 +3157,9 @@ public:
     virtual CDocument* GetActiveDocument();
 
     // Active child view maintenance
-    CView* GetActiveView() const;           // active view or NULL
+    CView* GetActiveView() const;           // active view or nullptr
     void SetActiveView(CView* pViewNew, BOOL bNotify = TRUE);
-            // active view or NULL, bNotify == FALSE if focus should not be set
+            // active view or nullptr, bNotify == FALSE if focus should not be set
 
     // Active frame (for frames within frames -- MDI)
     virtual CFrameWnd* GetActiveFrame();
@@ -3174,7 +3174,7 @@ public:
 
 // Operations
     virtual void RecalcLayout(BOOL bNotify = TRUE);
-    virtual void ActivateFrame(int nCmdShow = -1);
+    virtual void ActivateFrame( intnCmdShow = -1);
     void InitialUpdateFrame(CDocument* pDoc, BOOL bMakeVisible);
 #if _MFC_VER >= 0x0600
 	void SetTitle(LPCTSTR lpszTitle);
@@ -3188,7 +3188,7 @@ public:
     // control bar docking
     void EnableDocking(DWORD dwDockStyle);
     void DockControlBar(CControlBar* pBar, UINT nDockBarID = 0,
-            LPCRECT lpRect = NULL);
+            LPCRECT lpRect = nullptr );
     void FloatControlBar(CControlBar* pBar, CPoint point,
             DWORD dwStyle = CBRS_ALIGN_TOP);
     CControlBar* GetControlBar(UINT nID);
@@ -3245,13 +3245,13 @@ public:
 
     CMiniDockFrameWnd* CreateFloatingFrame(DWORD dwStyle);
     DWORD CanDock(CRect rect, DWORD dwDockStyle,
-            CDockBar** ppDockBar = NULL); // called by CDockContext
+            CDockBar** ppDockBar = nullptr ); // called by CDockContext
     void AddControlBar(CControlBar *pBar);
     void RemoveControlBar(CControlBar *pBar);
     void DockControlBar(CControlBar* pBar, CDockBar* pDockBar,
-            LPCRECT lpRect = NULL);
+            LPCRECT lpRect = nullptr );
     void ReDockControlBar(CControlBar* pBar, CDockBar* pDockBar,
-            LPCRECT lpRect = NULL);
+            LPCRECT lpRect = nullptr );
     void NotifyFloatingWindows(DWORD dwFlags);
     void DestroyDockBars();
 
@@ -3263,7 +3263,7 @@ protected:
     BOOL (CALLBACK* m_lpfnCloseProc)(CFrameWnd* pFrameWnd);
     UINT m_cModalStack;         // BeginModalState depth
     HWND* m_phWndDisable;       // windows disabled because of BeginModalState
-    HMENU m_hMenuAlt;           // menu to update to (NULL means default)
+    HMENU m_hMenuAlt;           // menu to update to (nullptr means default)
     CString m_strTitle;         // default title (original)
     BOOL m_bInRecalcLayout;     // avoid recursion in RecalcLayout
     CRuntimeClass* m_pFloatingFrameClass;
@@ -3307,7 +3307,7 @@ protected:
     virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
     virtual void PostNcDestroy();   // default to delete this.
     int OnCreateHelper(LPCREATESTRUCT lpcs, CCreateContext* pContext);
-    void BringToTop(int nCmdShow);
+    void BringToTop( intnCmdShow);
             // bring window to top for SW_ commands which affect z-order
 
     // implementation helpers for Shift+F1 help mode
@@ -3391,7 +3391,7 @@ public:
 
 // Operations
     void MDIActivate(CWnd* pWndActivate);
-    CMDIChildWnd* MDIGetActive(BOOL* pbMaximized = NULL) const;
+    CMDIChildWnd* MDIGetActive(BOOL* pbMaximized = nullptr ) const;
     void MDIIconArrange();
     void MDIMaximize(CWnd* pWnd);
     void MDINext();
@@ -3399,11 +3399,11 @@ public:
     CMenu* MDISetMenu(CMenu* pFrameMenu, CMenu* pWindowMenu);
     void MDITile();
     void MDICascade();
-    void MDITile(int nType);
-    void MDICascade(int nType);
+    void MDITile( intnType);
+    void MDICascade( intnType);
 #if _MFC_VER >= 0x0600
 	CMDIChildWnd* CreateNewChild(CRuntimeClass* pClass,	UINT nResource,
-		HMENU hMenu = NULL, HACCEL hAccel = NULL);
+		HMENU hMenu = nullptr, HACCEL hAccel = nullptr );
 #endif
 
 // Overridables
@@ -3423,8 +3423,8 @@ public:
     virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
     virtual BOOL LoadFrame(UINT nIDResource,
                             DWORD dwDefaultStyle = WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE,
-                            CWnd* pParentWnd = NULL,
-                            CCreateContext* pContext = NULL);
+                            CWnd* pParentWnd = nullptr,
+                            CCreateContext* pContext = nullptr );
     virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
     virtual BOOL PreTranslateMessage(MSG* pMsg);
     virtual void OnUpdateFrameTitle(BOOL bAddToTitle);
@@ -3467,8 +3467,8 @@ public:
                             LPCTSTR lpszWindowName,
                             DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
                             const RECT& rect = rectDefault,
-                            CMDIFrameWnd* pParentWnd = NULL,
-                            CCreateContext* pContext = NULL);
+                            CMDIFrameWnd* pParentWnd = nullptr,
+                            CCreateContext* pContext = nullptr );
 
 // Attributes
     CMDIFrameWnd* GetMDIFrame();
@@ -3494,11 +3494,11 @@ public:
 
     virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
     virtual BOOL LoadFrame(UINT nIDResource, DWORD dwDefaultStyle,
-                                    CWnd* pParentWnd, CCreateContext* pContext = NULL);
+                                    CWnd* pParentWnd, CCreateContext* pContext = nullptr );
             // 'pParentWnd' parameter is required for MDI Child
     virtual BOOL DestroyWindow();
     virtual BOOL PreTranslateMessage(MSG* pMsg);
-    virtual void ActivateFrame(int nCmdShow = -1);
+    virtual void ActivateFrame( intnCmdShow = -1);
     virtual void OnUpdateFrameMenu(BOOL bActive, CWnd* pActivateWnd,
             HMENU hMenuAlt);
 
@@ -3509,7 +3509,7 @@ protected:
     virtual CWnd* GetMessageBar();
     virtual void OnUpdateFrameTitle(BOOL bAddToTitle);
     virtual LRESULT DefWindowProc(UINT nMsg, WPARAM wParam, LPARAM lParam);
-    BOOL UpdateClientEdge(LPRECT lpRect = NULL);
+    BOOL UpdateClientEdge(LPRECT lpRect = nullptr );
 
     //{{AFX_MSG(CMDIChildWnd)
     afx_msg void OnMDIActivate(BOOL bActivate, CWnd*, CWnd*);
@@ -3546,10 +3546,10 @@ public:
     CMiniFrameWnd();
     BOOL Create(LPCTSTR lpClassName, LPCTSTR lpWindowName,
             DWORD dwStyle, const RECT& rect,
-            CWnd* pParentWnd = NULL, UINT nID = 0);
+            CWnd* pParentWnd = nullptr, UINT nID = 0);
     BOOL CreateEx(DWORD dwExStyle, LPCTSTR lpClassName, LPCTSTR lpWindowName,
             DWORD dwStyle, const RECT& rect,
-            CWnd* pParentWnd = NULL, UINT nID = 0);
+            CWnd* pParentWnd = nullptr, UINT nID = 0);
 
 // Implementation
 public:
@@ -3647,7 +3647,7 @@ public:
             DROPEFFECT dropDefault, DROPEFFECT dropList, CPoint point);
     virtual DROPEFFECT OnDragScroll(DWORD dwKeyState, CPoint point);
 
-    virtual void OnPrepareDC(CDC* pDC, CPrintInfo* pInfo = NULL);
+    virtual void OnPrepareDC(CDC* pDC, CPrintInfo* pInfo = nullptr );
 
     virtual void OnInitialUpdate(); // called first time after construct
 
@@ -3687,7 +3687,7 @@ public:
 
     virtual void CalcWindowRect(LPRECT lpClientRect,
             UINT nAdjustType = adjustBorder);
-    virtual CScrollBar* GetScrollBarCtrl(int nBar) const;
+    virtual CScrollBar* GetScrollBarCtrl( intnBar) const;
     static CSplitterWnd* PASCAL GetParentSplitter(
             const CWnd* pWnd, BOOL bAnyState);
 
@@ -3786,7 +3786,7 @@ public:
 
     // in logical units - call one of the following Set routines
     void SetScaleToFitSize(SIZE sizeTotal);
-    void SetScrollSizes(int nMapMode, SIZE sizeTotal,
+    void SetScrollSizes( intnMapMode, SIZE sizeTotal,
                             const SIZE& sizePage = sizeDefault,
                             const SIZE& sizeLine = sizeDefault);
 
@@ -3838,7 +3838,7 @@ public:
 #endif //_DEBUG
     virtual void CalcWindowRect(LPRECT lpClientRect,
             UINT nAdjustType = adjustBorder);
-    virtual void OnPrepareDC(CDC* pDC, CPrintInfo* pInfo = NULL);
+    virtual void OnPrepareDC(CDC* pDC, CPrintInfo* pInfo = nullptr );
 
     // scrolling implementation support for OLE
     virtual BOOL OnScroll(UINT nScrollCode, UINT nPos, BOOL bDoScroll = TRUE);
@@ -3868,7 +3868,7 @@ public:
 // Constructors
     CWinThread();
     BOOL CreateThread(DWORD dwCreateFlags = 0, UINT nStackSize = 0,
-            LPSECURITY_ATTRIBUTES lpSecurityAttrs = NULL);
+            LPSECURITY_ATTRIBUTES lpSecurityAttrs = nullptr );
 
 // Attributes
     CWnd* m_pMainWnd;       // main window (usually same AfxGetApp()->m_pMainWnd)
@@ -3881,7 +3881,7 @@ public:
     DWORD m_nThreadID;      // this thread's ID
 
     int GetThreadPriority();
-    BOOL SetThreadPriority(int nPriority);
+    BOOL SetThreadPriority( intnPriority);
 
 // Operations
     DWORD SuspendThread();
@@ -3906,7 +3906,7 @@ public:
     virtual LRESULT ProcessWndProcException(CException* e, const MSG* pMsg);
 
     // Advanced: handling messages sent to message filter hook
-    virtual BOOL ProcessMessageFilter(int code, LPMSG lpMsg);
+    virtual BOOL ProcessMessageFilter( intcode, LPMSG lpMsg);
 
     // Advanced: virtual access to m_pMainWnd
     virtual CWnd* GetMainWnd();
@@ -3949,16 +3949,16 @@ protected:
 
 CWinThread* AFXAPI AfxBeginThread(AFX_THREADPROC pfnThreadProc, LPVOID pParam,
     int nPriority = THREAD_PRIORITY_NORMAL, UINT nStackSize = 0,
-    DWORD dwCreateFlags = 0, LPSECURITY_ATTRIBUTES lpSecurityAttrs = NULL);
+    DWORD dwCreateFlags = 0, LPSECURITY_ATTRIBUTES lpSecurityAttrs = nullptr );
 CWinThread* AFXAPI AfxBeginThread(CRuntimeClass* pThreadClass,
     int nPriority = THREAD_PRIORITY_NORMAL, UINT nStackSize = 0,
-    DWORD dwCreateFlags = 0, LPSECURITY_ATTRIBUTES lpSecurityAttrs = NULL);
+    DWORD dwCreateFlags = 0, LPSECURITY_ATTRIBUTES lpSecurityAttrs = nullptr );
 
 CWinThread* AFXAPI AfxGetThread();
 void AFXAPI AfxEndThread(UINT nExitCode, BOOL bDelete = TRUE);
 
 void AFXAPI AfxInitThread();
-void AFXAPI AfxTermThread(HINSTANCE hInstTerm = NULL);
+void AFXAPI AfxTermThread(HINSTANCE hInstTerm = nullptr );
 
 /////////////////////////////////////////////////////////////////////////////
 // Global functions for access to the one and only CWinApp
@@ -3988,7 +3988,7 @@ void AFXAPI AfxSetResourceHandle(HINSTANCE hInstResource);
 LPCTSTR AFXAPI AfxGetAppName();
 
 // Use instead of PostQuitMessage in OLE server applications
-void AFXAPI AfxPostQuitMessage(int nExitCode);
+void AFXAPI AfxPostQuitMessage( intnExitCode);
 
 // Use AfxFindResourceHandle to find resource in chain of extension DLLs
 #ifndef _AFXDLL
@@ -4115,7 +4115,7 @@ class CWinApp : public CWinThread
 public:
 
 // Constructor
-    CWinApp(LPCTSTR lpszAppName = NULL);     // app name defaults to EXE name
+    CWinApp(LPCTSTR lpszAppName = nullptr );     // app name defaults to EXE name
 
 // Attributes
     // Startup args (do not change)
@@ -4152,7 +4152,7 @@ protected:
     void SetRegistryKey(LPCTSTR lpszRegistryKey);
     void SetRegistryKey(UINT nIDRegistryKey);
             // enables app settings in registry instead of INI files
-            //  (registry key is usually a "company name")
+            //  (registry key is usually a "company name" )
 
 #if !defined( _AFX_NO_CTL3D_SUPPORT ) && !defined( _WIN64 )
     BOOL Enable3dControls(); // use CTL3D32.DLL for 3D controls in dialogs
@@ -4185,7 +4185,7 @@ public:
     UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault);
     BOOL WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue);
     CString GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry,
-                            LPCTSTR lpszDefault = NULL);
+                            LPCTSTR lpszDefault = nullptr );
     BOOL WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry,
                             LPCTSTR lpszValue);
     BOOL GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry,
@@ -4233,7 +4233,7 @@ public:
 
     // Advanced: to override message boxes and other hooks
     virtual int DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt);
-    virtual void DoWaitCursor(int nCode); // 0 => restore, 1=> begin, -1=> end
+    virtual void DoWaitCursor( intnCode); // 0 => restore, 1=> begin, -1=> end
 
     // Advanced: process async DDE request
     virtual BOOL OnDDECommand(__in_z LPTSTR lpszCommand);
@@ -4360,7 +4360,7 @@ public:
 
     // setup for OLE servers
     void SetServerInfo(UINT nIDOleEmbedding, UINT nIDOleInPlaceServer = 0,
-            CRuntimeClass* pOleFrameClass = NULL, CRuntimeClass* pOleViewClass = NULL);
+            CRuntimeClass* pOleFrameClass = nullptr, CRuntimeClass* pOleViewClass = nullptr );
 
     // iterating over open documents
     virtual POSITION GetFirstDocPosition() const = 0;
@@ -4410,7 +4410,7 @@ public:
     virtual CDocument* OpenDocumentFile(
             LPCTSTR lpszPathName, BOOL bMakeVisible = TRUE) = 0;
                                     // open named file
-                                    // if lpszPathName == NULL => create new file with this type
+                                    // if lpszPathName == nullptr => create new file with this type
     virtual void SetDefaultTitle(CDocument* pDocument) = 0;
 
 // Implementation
@@ -4418,7 +4418,7 @@ public:
     BOOL m_bAutoDelete;
     virtual ~CDocTemplate();
 
-    // back pointer to OLE or other server (NULL if none or disabled)
+    // back pointer to OLE or other server (nullptr if none or disabled)
     CObject* m_pAttachedFactory;
 
     // menu & accelerator resources for in-place container
@@ -4558,7 +4558,7 @@ public:
 
     // Update Views (simple update - DAG only)
     void UpdateAllViews(CView* pSender, LPARAM lHint = 0L,
-            CObject* pHint = NULL);
+            CObject* pHint = nullptr );
 
 // Overridables
     // Special notifications

@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/debugger_resource.h"
@@ -32,9 +32,9 @@ Constructor
 ================
 */
 rvDebuggerWindow::rvDebuggerWindow() {
-	mWnd		   = NULL;
-	mWndScript	   = NULL;
-	mInstance	   = NULL;
+	mWnd		   = nullptr;
+	mWndScript	   = nullptr;
+	mInstance	   = nullptr;
 	mZoomScaleNum  = 0;
 	mZoomScaleDem  = 0;
 	mWindowMenuPos = 0;
@@ -43,8 +43,8 @@ rvDebuggerWindow::rvDebuggerWindow() {
 	mLastActiveScript = -1;
 	mCurrentStackDepth = 0;
 	mRecentFileInsertPos = 0;
-	mRecentFileMenu = NULL;
-	mClient = NULL;
+	mRecentFileMenu = nullptr;
+	mClient = nullptr;
 }
 
 /*
@@ -86,12 +86,12 @@ bool rvDebuggerWindow::RegisterClass( void ) {
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
 	wcex.hInstance		= mInstance;
-	wcex.hIcon			= NULL;
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
+	wcex.hIcon			= nullptr;
+	wcex.hCursor		= LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_APPWORKSPACE+1 );
 	wcex.lpszMenuName	= MAKEINTRESOURCE(IDR_DBG_MAIN);
 	wcex.lpszClassName	= DEBUGGERWINDOWCLASS;
-	wcex.hIconSm		= NULL;
+	wcex.hIconSm		= nullptr;
 
 	return RegisterClassEx(&wcex) ? true : false;
 }
@@ -114,7 +114,7 @@ bool rvDebuggerWindow::Create( HINSTANCE instance ) {
 	mClient = &gDebuggerApp.GetClient();
 
 	// Create the debugger window
-	mWnd = CreateWindow( DEBUGGERWINDOWCLASS, "", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, mInstance, this);
+	mWnd = CreateWindow( DEBUGGERWINDOWCLASS, "", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, mInstance, this);
 
 	if ( !mWnd ) {
 		return false;
@@ -212,7 +212,7 @@ LRESULT CALLBACK rvDebuggerWindow::ScriptWndProc( HWND wnd, UINT msg, WPARAM wpa
 			SendMessage( wnd, WM_LBUTTONDOWN, wparam, lparam );
 			menu = LoadMenu( window->mInstance, MAKEINTRESOURCE(IDR_DBG_SCRIPT_POPUP) );
 			ClientToScreen( wnd, &point );
-			TrackPopupMenu( GetSubMenu( menu, 0 ), TPM_RIGHTBUTTON|TPM_LEFTALIGN, point.x, point.y, 0, window->mWnd, NULL );
+			TrackPopupMenu( GetSubMenu( menu, 0 ), TPM_RIGHTBUTTON|TPM_LEFTALIGN, point.x, point.y, 0, window->mWnd, nullptr );
 			DestroyMenu( menu );
 			return 0;
 		}
@@ -271,7 +271,7 @@ LRESULT CALLBACK rvDebuggerWindow::ScriptWndProc( HWND wnd, UINT msg, WPARAM wpa
 			ti.cbSize   = sizeof(TOOLINFO);
 			ti.uFlags   = TTF_SUBCLASS;
 			ti.hwnd     = wnd;
-			ti.hinst    = (HINSTANCE)GetModuleHandle(NULL);
+			ti.hinst    = (HINSTANCE)GetModuleHandle(nullptr );
 			ti.uId      = 0;
 			ti.lpszText = (LPSTR)window->mTooltipVar.c_str();
 
@@ -336,7 +336,7 @@ LRESULT CALLBACK rvDebuggerWindow::MarginWndProc( HWND wnd, UINT msg, WPARAM wpa
 					rvDebuggerBreakpoint* bp = window->mClient->GetBreakpoint( i );
 					assert( bp );
 
-					if ( !arcNetString::Icmp( window->mScripts[window->mActiveScript]->GetFilename(), bp->GetFilename() ) ) {
+					if ( !anString::Icmp( window->mScripts[window->mActiveScript]->GetFilename(), bp->GetFilename() ) ) {
 						int		c;
 						POINTL	pos;
 
@@ -347,7 +347,7 @@ LRESULT CALLBACK rvDebuggerWindow::MarginWndProc( HWND wnd, UINT msg, WPARAM wpa
 				}
 
 				if ( window->mClient->IsStopped() ) {
-					if ( !arcNetString::Icmp( window->mClient->GetBreakFilename(),
+					if ( !anString::Icmp( window->mClient->GetBreakFilename(),
 										window->mScripts[window->mActiveScript]->GetFilename() ) ) {
 						int		c;
 						POINTL	pos;
@@ -374,7 +374,7 @@ LRESULT CALLBACK rvDebuggerWindow::MarginWndProc( HWND wnd, UINT msg, WPARAM wpa
 			rect.left = rect.right + 1;
 			HPEN pen = CreatePen( PS_SOLID, 1, GetSysColor( COLOR_3DSHADOW ) );
 			HPEN old = (HPEN)SelectObject( dc, pen );
-			MoveToEx( dc, rect.right, rect.top, NULL );
+			MoveToEx( dc, rect.right, rect.top, nullptr );
 			LineTo( dc, rect.right, rect.bottom );
 			SelectObject( dc, old );
 			DeleteObject( pen );
@@ -394,7 +394,7 @@ Updates the window title of the script debugger to show a few states
 ================
 */
 void rvDebuggerWindow::UpdateTitle( void ) {
-	arcNetString title;
+	anString title;
 
 	title = " Script Debugger - ";
 
@@ -410,7 +410,7 @@ void rvDebuggerWindow::UpdateTitle( void ) {
 
 	if ( mScripts.Num() ) {
 		title += " - [";
-		title += arcNetString( mScripts[mActiveScript]->GetFilename() ).StripPath();
+		title += anString( mScripts[mActiveScript]->GetFilename() ).StripPath();
 		title += "]";
 	}
 
@@ -468,10 +468,10 @@ void rvDebuggerWindow::UpdateWindowMenu( void ) {
 
 	int i;
 	for ( i = 0; i < mScripts.Num(); i ++ ) {
-		arcNetString name;
+		anString name;
 		name = mScripts[i]->GetFilename();
 		name.StripPath();
-		name = arcNetString(va( "&%d ", i + 1 ) ) + name;
+		name = anString(va( "&%d ", i + 1 ) ) + name;
 		AppendMenu( mWindowMenu, MF_STRING, ID_DBG_WINDOWMIN + i, name );
 	}
 }
@@ -516,7 +516,7 @@ void rvDebuggerWindow::UpdateWatch( void ) {
 		mClient->InspectVariable( mWatches[i]->mVariable, mCurrentStackDepth );
 	}
 
-	InvalidateRect( mWndWatch, NULL, FALSE );
+	InvalidateRect( mWndWatch, nullptr, FALSE );
 	UpdateWindow( mWndWatch );
 }
 
@@ -565,7 +565,7 @@ int rvDebuggerWindow::HandleInitMenu( WPARAM wParam, LPARAM lParam ) {
 		switch { id ) {
 			case ID_DBG_DEBUG_RUN: {
 				MENUITEMINFO info;
-				arcNetString run;
+				anString run;
 
 				info.cbSize = sizeof(info);
 				info.fMask = MIIM_TYPE|MIIM_STATE;
@@ -676,17 +676,17 @@ int rvDebuggerWindow::HandleCreate( WPARAM wparam, LPARAM lparam )  {
 	SendMessage( mWndConsole, EM_SETMARGINS, EC_LEFTMARGIN|EC_RIGHTMARGIN, MAKELONG(18,10) );
 	SendMessage( mWndConsole, EM_SETBKGNDCOLOR, 0, GetSysColor( COLOR_3DFACE ) );
 
-	mWndMargin = CreateWindow( "STATIC", "", WS_VISIBLE|WS_CHILD, 0, 0, 0, 0, mWndScript, (HMENU)IDC_DBG_SPLITTER, mInstance, NULL );
+	mWndMargin = CreateWindow( "STATIC", "", WS_VISIBLE|WS_CHILD, 0, 0, 0, 0, mWndScript, (HMENU)IDC_DBG_SPLITTER, mInstance, nullptr );
 	SetWindowLong( mWndMargin, GWL_USERDATA, (LONG)this );
 	SetWindowLong( mWndMargin, GWL_WNDPROC, (LONG)MarginWndProc );
 
-	mWndBorder = CreateWindow( "STATIC", "", WS_VISIBLE|WS_CHILD|SS_GRAYFRAME, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_BORDER, mInstance, NULL );
+	mWndBorder = CreateWindow( "STATIC", "", WS_VISIBLE|WS_CHILD|SS_GRAYFRAME, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_BORDER, mInstance, nullptr );
 
 	GetClientRect( mWnd, &mSplitterRect );
 	mSplitterRect.top = (mSplitterRect.bottom-mSplitterRect.top) / 2;
 	mSplitterRect.bottom = mSplitterRect.top + 4;
 
-	mWndTabs = CreateWindow( WC_TABCONTROL, "", TCS_BOTTOM|WS_CHILD|WS_VISIBLE|TCS_FOCUSNEVER, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_TABS, mInstance, NULL );
+	mWndTabs = CreateWindow( WC_TABCONTROL, "", TCS_BOTTOM|WS_CHILD|WS_VISIBLE|TCS_FOCUSNEVER, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_TABS, mInstance, nullptr );
 	lf.lfHeight = -MulDiv(8, GetDeviceCaps(dc, LOGPIXELSY), 72);
 	strcpy( lf.lfFaceName, "Arial" );
 	SendMessage( mWndTabs, WM_SETFONT, (WPARAM)CreateFontIndirect( &lf ), 0 );
@@ -705,9 +705,9 @@ int rvDebuggerWindow::HandleCreate( WPARAM wparam, LPARAM lparam )  {
 	item.pszText = "Threads";
 	TabCtrl_InsertItem( mWndTabs, 4, &item );
 
-	mWndCallstack = CreateWindow( WC_LISTVIEW, "", LVS_REPORT|WS_CHILD|LVS_SHAREIMAGELISTS, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_CALLSTACK, mInstance, NULL );
-	mWndWatch     = CreateWindow( WC_LISTVIEW, "", LVS_REPORT|WS_CHILD|LVS_EDITLABELS|LVS_OWNERDRAWFIXED, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_WATCH, mInstance, NULL );
-	mWndThreads   = CreateWindow( WC_LISTVIEW, "", LVS_REPORT|WS_CHILD|LVS_SHAREIMAGELISTS, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_THREADS, mInstance, NULL );
+	mWndCallstack = CreateWindow( WC_LISTVIEW, "", LVS_REPORT|WS_CHILD|LVS_SHAREIMAGELISTS, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_CALLSTACK, mInstance, nullptr );
+	mWndWatch     = CreateWindow( WC_LISTVIEW, "", LVS_REPORT|WS_CHILD|LVS_EDITLABELS|LVS_OWNERDRAWFIXED, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_WATCH, mInstance, nullptr );
+	mWndThreads   = CreateWindow( WC_LISTVIEW, "", LVS_REPORT|WS_CHILD|LVS_SHAREIMAGELISTS, 0, 0, 0, 0, mWnd, (HMENU)IDC_DBG_THREADS, mInstance, nullptr );
 
 	LVCOLUMN col;
 	col.mask = LVCF_WIDTH|LVCF_TEXT;
@@ -763,7 +763,7 @@ int rvDebuggerWindow::HandleCreate( WPARAM wparam, LPARAM lparam )  {
 	gDebuggerApp.GetOptions().GetColumnWidths( "cw_threads", mWndThreads );
 	gDebuggerApp.GetOptions().GetColumnWidths( "cw_watch", mWndWatch );
 
-	mWndToolTips = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, mWnd, NULL, mInstance, NULL );
+	mWndToolTips = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, nullptr, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, mWnd, nullptr, mInstance, nullptr );
 
 	SendMessage( mWndToolTips, TTM_SETDELAYTIME, TTDT_INITIAL, MAKELONG(400,0 ) );
 	SendMessage( mWndToolTips, TTM_SETDELAYTIME, TTDT_RESHOW, MAKELONG(400,0 ) );
@@ -817,7 +817,7 @@ int rvDebuggerWindow::HandleCommand( WPARAM wparam, LPARAM lparam ) {
 
 	// The recent file list needs to be handled specially
 	if ( LOWORD(wparam) >= ID_DBG_FILE_MRU1 && LOWORD(wparam) < ID_DBG_FILE_MRU1 + rvRegistryOptions::MAX_MRU_SIZE ) {
-		arcNetString filename;
+		anString filename;
 		filename = gDebuggerApp.GetOptions().GetRecentFile( gDebuggerApp.GetOptions().GetRecentFileCount() - (LOWORD(wparam)-ID_DBG_FILE_MRU1) - 1 );
 		if ( !OpenScript( filename ) )
 		{
@@ -828,14 +828,14 @@ int rvDebuggerWindow::HandleCommand( WPARAM wparam, LPARAM lparam ) {
 
 	switch { id ) {
 		case ID_DBG_EDIT_FINDSELECTED: {
-			arcNetString text;
+			anString text;
 			GetSelectedText( text );
 			FindNext( text );
 			break;
 		}
 
 		case ID_DBG_EDIT_FINDSELECTEDPREV: {
-			arcNetString text;
+			anString text;
 			GetSelectedText( text );
 			FindPrev( text );
 			break;
@@ -850,7 +850,7 @@ int rvDebuggerWindow::HandleCommand( WPARAM wparam, LPARAM lparam ) {
 			break;
 
 		case ID_DBG_DEBUG_QUICKWATCH: {
-			arcNetString text;
+			anString text;
 
 			GetSelectedText( text );
 			rvDebuggerQuickWatchDlg dlg;
@@ -890,10 +890,10 @@ int rvDebuggerWindow::HandleCommand( WPARAM wparam, LPARAM lparam ) {
 
 				GetCurrentDirectory( MAX_PATH, curDir );
 
-				GetModuleFileName( NULL, exeFile, MAX_PATH );
-				const char* s = va( "%s +set fs_game %s +set fs_cdpath %s", exeFile, cvarSystem->GetCVarString( "fs_game" ), cvarSystem->GetCVarString( "fs_cdpath" ) );
-				CreateProcess( NULL, (LPSTR)s,
-				NULL, NULL, FALSE, 0, NULL, curDir, &startup, &process );
+				GetModuleFileName( nullptr, exeFile, MAX_PATH );
+				const char* s = va( "%s +set fs_enginepath %s +set fs_cdpath %s", exeFile, cvarSystem->GetCVarString( "fs_enginepath" ), cvarSystem->GetCVarString( "fs_cdpath" ) );
+				CreateProcess( nullptr, (LPSTR)s,
+				nullptr, nullptr, FALSE, 0, nullptr, curDir, &startup, &process );
 
 				CloseHandle( process.hThread );
 				CloseHandle( process.hProcess );
@@ -902,7 +902,7 @@ int rvDebuggerWindow::HandleCommand( WPARAM wparam, LPARAM lparam ) {
 				mClient->Resume();
 				UpdateToolbar();
 				UpdateTitle();
-				InvalidateRect( mWnd, NULL, FALSE );
+				InvalidateRect( mWnd, nullptr, FALSE );
 			}
 			break;
 		case IDC_DBG_SCRIPT: {
@@ -917,7 +917,7 @@ int rvDebuggerWindow::HandleCommand( WPARAM wparam, LPARAM lparam ) {
 				GetClientRect( mWndScript, &t );
 				SendMessage( mWnd, WM_SIZE, 0, MAKELPARAM(t.right-t.left,t.bottom-t.top) );
 			} else {
-				InvalidateRect( mWndMargin, NULL, TRUE );
+				InvalidateRect( mWndMargin, nullptr, TRUE );
 			}
 			break;
 		}
@@ -1019,7 +1019,7 @@ LRESULT CALLBACK rvDebuggerWindow::WndProc( HWND wnd, UINT msg, WPARAM wparam, L
 			}
 			gDebuggerApp.GetOptions().SetString( va( "watch%d", i ), "" );
 
-			window->mWnd = NULL;
+			window->mWnd = nullptr;
 			SetWindowLong( wnd, GWL_USERDATA, 0 );
 			break;
 		}
@@ -1037,7 +1037,7 @@ LRESULT CALLBACK rvDebuggerWindow::WndProc( HWND wnd, UINT msg, WPARAM wparam, L
 			ScreenToClient( wnd, &point );
 			if ( PtInRect( &window->mSplitterRect, point ) )
 			{
-				SetCursor( LoadCursor( NULL, IDC_SIZENS ) );
+				SetCursor( LoadCursor( nullptr, IDC_SIZENS ) );
 				return true;
 			}
 			break;
@@ -1109,7 +1109,7 @@ LRESULT CALLBACK rvDebuggerWindow::WndProc( HWND wnd, UINT msg, WPARAM wparam, L
 				GetClientRect( wnd, &client );
 				SendMessage( wnd, WM_SIZE, 0, MAKELPARAM(client.right-client.left,client.bottom-client.top) );
 
-				InvalidateRect( wnd, NULL, TRUE );
+				InvalidateRect( wnd, nullptr, TRUE );
 
 				ReleaseCapture();
 			}
@@ -1319,7 +1319,7 @@ bool rvDebuggerWindow::Activate( void )
 {
 	HWND find;
 
-	find = FindWindow( DEBUGGERWINDOWCLASS, NULL );
+	find = FindWindow( DEBUGGERWINDOWCLASS, nullptr );
 	if ( !find ) {
 		return false;
 	}
@@ -1512,14 +1512,14 @@ bool rvDebuggerWindow::OpenScript( const char* filename, int lineNumber )
 {
 	int i;
 
-	SetCursor( LoadCursor( NULL, IDC_WAIT ) );
+	SetCursor( LoadCursor( nullptr, IDC_WAIT ) );
 
 	mActiveScript = -1;
 
 	// See if the script is already loaded
 	for ( i = 0; i < mScripts.Num(); i ++ )
 	{
-		if ( !arcNetString::Icmp( mScripts[i]->GetFilename(), filename ) )
+		if ( !anString::Icmp( mScripts[i]->GetFilename(), filename ) )
 		{
 			if ( mActiveScript != i )
 			{
@@ -1538,7 +1538,7 @@ bool rvDebuggerWindow::OpenScript( const char* filename, int lineNumber )
 		if ( !script->Load( filename ) )
 		{
 			delete script;
-			SetCursor( LoadCursor( NULL, IDC_ARROW ) );
+			SetCursor( LoadCursor( nullptr, IDC_ARROW ) );
 			return false;
 		}
 
@@ -1589,7 +1589,7 @@ bool rvDebuggerWindow::OpenScript( const char* filename, int lineNumber )
 	ShowWindow( mWndScript, SW_SHOW );
 	UpdateWindow( mWndScript );
 
-	SetCursor( LoadCursor( NULL, IDC_ARROW ) );
+	SetCursor( LoadCursor( nullptr, IDC_ARROW ) );
 
 	return true;
 }
@@ -1631,7 +1631,7 @@ void rvDebuggerWindow::ToggleBreakpoint( void )
 	}
 
 	// Force a repaint of the script window
-	InvalidateRect( mWndScript, NULL, FALSE );
+	InvalidateRect( mWndScript, nullptr, FALSE );
 }
 
 /*
@@ -1663,7 +1663,7 @@ Create the toolbar and and all of its buttons
 void rvDebuggerWindow::CreateToolbar( void )
 {
 	// Create the toolbar control
-	mWndToolbar = CreateWindowEx( 0, TOOLBARCLASSNAME, "", WS_CHILD|WS_VISIBLE,0,0,0,0, mWnd, (HMENU)IDC_DBG_TOOLBAR, mInstance, NULL );
+	mWndToolbar = CreateWindowEx( 0, TOOLBARCLASSNAME, "", WS_CHILD|WS_VISIBLE,0,0,0,0, mWnd, (HMENU)IDC_DBG_TOOLBAR, mInstance, nullptr );
 
 	// Initialize the toolbar
 	SendMessage( mWndToolbar, TB_BUTTONSTRUCTSIZE,( WPARAM )sizeof( TBBUTTON ), 0 );
@@ -1791,7 +1791,7 @@ int rvDebuggerWindow::HandleActivate( WPARAM wparam, LPARAM lparam )
 					rvDebuggerBreakpoint* bp = mClient->GetBreakpoint( b );
 					assert( bp );
 
-					if ( !arcNetString::Icmp( bp->GetFilename(), mScripts[i]->GetFilename() ) )
+					if ( !anString::Icmp( bp->GetFilename(), mScripts[i]->GetFilename() ) )
 					{
 						if ( !mScripts[i]->IsLineCode( bp->GetLineNumber() ) )
 						{
@@ -1917,7 +1917,7 @@ void rvDebuggerWindow::UpdateRecentFiles( void )
 		GetMenuItemInfo( mRecentFileMenu, mRecentFileInsertPos+1,TRUE, &info );
 		if ( !(info.fType & MFT_SEPARATOR ) )
 		{
-			InsertMenu( mRecentFileMenu, mRecentFileInsertPos, MF_BYPOSITION|MF_SEPARATOR|MF_ENABLED, 0, NULL );
+			InsertMenu( mRecentFileMenu, mRecentFileInsertPos, MF_BYPOSITION|MF_SEPARATOR|MF_ENABLED, 0, nullptr );
 		}
 	}
 
@@ -1925,7 +1925,7 @@ void rvDebuggerWindow::UpdateRecentFiles( void )
 	for ( j = 0, i = gDebuggerApp.GetOptions().GetRecentFileCount() - 1; i >= 0; i --, j++ )
 	{
 		UINT id = ID_DBG_FILE_MRU1 + j;
-		arcNetString str = va( "&%d ", j+1 );
+		anString str = va( "&%d ", j+1 );
 		str.Append( gDebuggerApp.GetOptions().GetRecentFile( i ) );
 		InsertMenu( mRecentFileMenu, mRecentFileInsertPos+j+1, MF_BYPOSITION|MF_STRING|MF_ENABLED, id, str );
 	}
@@ -1939,7 +1939,7 @@ Function to retrieve the text that is currently selected in the
 script control
 ================
 */
-int rvDebuggerWindow::GetSelectedText( arcNetString& text )
+int rvDebuggerWindow::GetSelectedText( anString& text )
 {
 	TEXTRANGE	range;
 	int			start;
@@ -1976,7 +1976,7 @@ int rvDebuggerWindow::GetSelectedText( arcNetString& text )
 rvDebuggerWindow::FindNext
 
 Finds the next match of the find text in the active script.  The next is
-always relative to the current selection.  If the text parameter is NULL
+always relative to the current selection.  If the text parameter is nullptr
 then the last text used will be searched for.
 ================
 */
@@ -2030,7 +2030,7 @@ bool rvDebuggerWindow::FindNext( const char* text )
 rvDebuggerWindow::FindPrev
 
 Finds the previous match of the find text in the active script.  The previous is
-always relative to the current selection.  If the text parameter is NULL
+always relative to the current selection.  If the text parameter is nullptr
 then the last text used will be searched for.
 ================
 */
@@ -2094,7 +2094,7 @@ int rvDebuggerWindow::HandleDrawItem( WPARAM wparam, LPARAM lparam )
 	DRAWITEMSTRUCT*		dis;
 	LVCOLUMN			col;
 	int					index;
-	arcNetString				widths;
+	anString				widths;
 	RECT				rect;
 	rvDebuggerWatch*	watch;
 	bool				selected;

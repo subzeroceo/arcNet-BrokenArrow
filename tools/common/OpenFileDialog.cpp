@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/win_local.h"
@@ -15,10 +15,10 @@ constructor
 ================
 */
 rvOpenFileDialog::rvOpenFileDialog( void ) {
-	mWnd		= NULL;
-	mInstance	= NULL;
-	mBackBitmap = NULL;
-	mImageList	= NULL;
+	mWnd		= nullptr;
+	mInstance	= nullptr;
+	mBackBitmap = nullptr;
+	mImageList	= nullptr;
 	mFlags		= 0;
 }
 
@@ -67,8 +67,8 @@ Updates the lookin combo box with the current lookin state
 */
 void rvOpenFileDialog::UpdateLookIn ( void ) {
 	COMBOBOXEXITEM	item;
-	arcNetString			file;
-	arcNetString			path;
+	anString			file;
+	anString			path;
 
 	// Reset the combo box
 	SendMessage ( mWndLookin, CB_RESETCONTENT, 0, 0 );
@@ -85,16 +85,16 @@ void rvOpenFileDialog::UpdateLookIn ( void ) {
 	// to the combo box
 	path = mLookin;
 
-	while ( path.Length ( ) ) {
+	while ( path.Length() ) {
 		int slash = path.Find ( "/" );
 
 		// Parse out the next subfolder
 		if ( slash != -1 ) {
 			file = path.Left ( slash );
-			path = path.Right ( path.Length ( ) - slash - 1 );
+			path = path.Right ( path.Length() - slash - 1 );
 		} else {
 			file = path;
-			path.Empty ( );
+			path.Empty();
 		}
 
 		// Add the sub folder
@@ -118,7 +118,7 @@ look in directory
 */
 void rvOpenFileDialog::UpdateFileList ( void ) {
 	const char *basepath = mLookin;
-	arcFileList *files;
+	anFileList *files;
 	HWND		list = GetDlgItem ( mWnd, IDC_TOOLS_FILELIST );
 	int			i;
 	int			filter;
@@ -201,24 +201,24 @@ void rvOpenFileDialog::HandleCommandOK ( void ) {
 	{
 		if ( strlen( mLookin ) )
 		{
-			arcNetString::snPrintf( mLookin, sizeof( mLookin ), "%s/%s", mLookin, temp );
+			anString::snPrintf( mLookin, sizeof( mLookin ), "%s/%s", mLookin, temp );
 		} else {
-			arcNetString::Copynz( mLookin, temp, sizeof( mLookin ) );
+			anString::Copynz( mLookin, temp, sizeof( mLookin ) );
 		}
-		UpdateLookIn ( );
-		UpdateFileList ( );
+		UpdateLookIn();
+		UpdateFileList();
 	}
 	// If the item is a file then build the filename and end the dialog
 	else if ( item.iImage == 2 ) {
 		mFilename = mLookin;
-		if ( mFilename.Length ( ) ) {
+		if ( mFilename.Length() ) {
 			mFilename.Append ( "/" );
 		}
 		mFilename.Append ( temp );
 
 		// Make sure the file exists
 		if ( mFlags & OFD_MUSTEXIST ) {
-			arcNetFile*	file;
+			anFile*	file;
 			file = fileSystem->OpenFileRead ( mFilename );
 			if ( !file )
 			{
@@ -261,25 +261,25 @@ void rvOpenFileDialog::HandleInitDialog ( void ) {
 	SetWindowText ( mWnd, mTitle );
 
 	// Custom ok button title
-	if ( mOKTitle.Length ( ) ) {
+	if ( mOKTitle.Length() ) {
 		SetWindowText ( GetDlgItem ( mWnd, IDOK ), mOKTitle );
 	}
 
 	// See if there is a filename in the lookin
-	arcNetString temp;
-	arcNetString filename = mLookin;
+	anString temp;
+	anString filename = mLookin;
 	filename.ExtractFileExtension ( temp );
-	if ( temp.Length ( ) )
+	if ( temp.Length() )
 	{
 		filename.ExtractFileName ( temp );
 		SetWindowText ( GetDlgItem ( mWnd, IDC_TOOLS_FILENAME ), temp );
-		filename.StripFilename ( );
-		arcNetString::snPrintf( mLookin, sizeof( mLookin ), "%s", filename.c_str() );
+		filename.StripFilename();
+		anString::snPrintf( mLookin, sizeof( mLookin ), "%s", filename.c_str() );
 	}
 
 	// Update our controls
-	UpdateLookIn ( );
-	UpdateFileList ( );
+	UpdateLookIn();
+	UpdateFileList();
 }
 
 /*
@@ -293,7 +293,7 @@ void rvOpenFileDialog::HandleLookInChange ( void ) {
 	char	temp[256];
 	int		sel;
 	int		i;
-	arcNetString	lookin;
+	anString	lookin;
 
 	temp[0] = 0;
 
@@ -303,19 +303,19 @@ void rvOpenFileDialog::HandleLookInChange ( void ) {
 	// and build the new lookin path
 	if ( sel >= 1 ) {
 		SendMessage ( mWndLookin, CB_GETLBTEXT, 1, (LPARAM)temp );
-		arcNetString::snPrintf( mLookin, sizeof( mLookin ), "%s", temp );
+		anString::snPrintf( mLookin, sizeof( mLookin ), "%s", temp );
 		for ( i = 2; i <= sel; i ++ )
 		{
 			SendMessage ( mWndLookin, CB_GETLBTEXT, i, (LPARAM)temp );
-			arcNetString::snPrintf( mLookin, sizeof( mLookin ), "%s/%s", mLookin, temp );
+			anString::snPrintf( mLookin, sizeof( mLookin ), "%s/%s", mLookin, temp );
 		}
 	} else {
 		mLookin[0] = 0;
 	}
 
 	// Update the controls with the new lookin path
-	UpdateLookIn ( );
-	UpdateFileList ( );
+	UpdateLookIn();
+	UpdateFileList();
 }
 
 /*
@@ -326,17 +326,17 @@ Set the extensions available in the dialog
 ================
 */
 void rvOpenFileDialog::SetFilter( const char* s ) {
-	arcNetString filters = s;
-	arcNetString filter;
+	anString filters = s;
+	anString filter;
 
-	while ( filters.Length ( ) ) {
+	while ( filters.Length() ) {
 		int semi = filters.Find ( ';' );
 		if ( semi != -1 ) {
 			filter  = filters.Left ( semi );
-			filters = filters.Right ( filters.Length ( ) - semi );
+			filters = filters.Right ( filters.Length() - semi );
 		} else {
 			filter = filters;
-			filters.Empty ( );
+			filters.Empty();
 		}
 
 		mFilters.Append ( filter.c_str() + (filter[0] == '*' ? 1 : 0 ) );
@@ -358,7 +358,7 @@ INT_PTR rvOpenFileDialog::DlgProc ( HWND wnd, UINT msg, WPARAM wparam, LPARAM lp
 			dlg = (rvOpenFileDialog*) lparam;
 			SetWindowLong ( wnd, GWL_USERDATA, lparam );
 			dlg->mWnd = wnd;
-			dlg->HandleInitDialog ( );
+			dlg->HandleInitDialog();
 			return TRUE;
 
 		case WM_NOTIFY: {
@@ -388,7 +388,7 @@ INT_PTR rvOpenFileDialog::DlgProc ( HWND wnd, UINT msg, WPARAM wparam, LPARAM lp
 						}
 
 						case NM_DBLCLK:
-							dlg->HandleCommandOK ( );
+							dlg->HandleCommandOK();
 							break;
 					}
 					break;
@@ -401,7 +401,7 @@ INT_PTR rvOpenFileDialog::DlgProc ( HWND wnd, UINT msg, WPARAM wparam, LPARAM lp
 			{
 				case IDOK:
 				{
-					dlg->HandleCommandOK ( );
+					dlg->HandleCommandOK();
 					break;
 				}
 
@@ -416,7 +416,7 @@ INT_PTR rvOpenFileDialog::DlgProc ( HWND wnd, UINT msg, WPARAM wparam, LPARAM lp
 					{
 						sel--;
 						SendMessage ( GetDlgItem ( wnd, IDC_TOOLS_LOOKIN ), CB_SETCURSEL, sel, 0 );
-						dlg->HandleLookInChange ( );
+						dlg->HandleLookInChange();
 					}
 
 					break;
@@ -425,7 +425,7 @@ INT_PTR rvOpenFileDialog::DlgProc ( HWND wnd, UINT msg, WPARAM wparam, LPARAM lp
 				case IDC_TOOLS_LOOKIN:
 					if ( HIWORD ( wparam ) == CBN_SELCHANGE )
 					{
-						dlg->HandleLookInChange ( );
+						dlg->HandleLookInChange();
 					}
 					break;
 			}

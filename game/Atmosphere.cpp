@@ -7,7 +7,7 @@ Atmosphere class
 The level designer places this entity class in his level if he wants an atmosphere.
 */
 
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -100,9 +100,9 @@ void sdAbstractTemplatedParticlePrecipitationSystem::FreeRenderEntity( void ) {
 ===============================================================================
 */
 
-static idCVar g_skipPrecipitation( "g_skipPrecipitation", "0",	CVAR_GAME | CVAR_BOOL,	"Enable/disable precipitation effects" );
-idCVar g_skipLocalizedPrecipitation( "g_skipLocalizedPrecipitation", "0",	CVAR_GAME | CVAR_BOOL,	"Enable/disable precipitation effects" );
-//static idCVar g_skipPrecipitation( "g_skipPrecipitation", "0",	CVAR_GAME | CVAR_BOOL,	"Enable/disable precipitation effects" );
+static anCVar g_skipPrecipitation( "g_skipPrecipitation", "0",	CVAR_GAME | CVAR_BOOL,	"Enable/disable precipitation effects" );
+anCVar g_skipLocalizedPrecipitation( "g_skipLocalizedPrecipitation", "0",	CVAR_GAME | CVAR_BOOL,	"Enable/disable precipitation effects" );
+//static anCVar g_skipPrecipitation( "g_skipPrecipitation", "0",	CVAR_GAME | CVAR_BOOL,	"Enable/disable precipitation effects" );
 
 
 static sdHeightMapInstance defaultHeightMapInst;
@@ -112,10 +112,10 @@ static sdHeightMap defaultHeightMap;
 sdAtmosphereInstance::sdAtmosphereInstance
 ============
 */
-sdAtmosphereInstance::sdAtmosphereInstance( arcDict &spawnArgs ) {
-	renderable = NULL;
+sdAtmosphereInstance::sdAtmosphereInstance( anDict &spawnArgs ) {
+	renderable = nullptr;
 	for ( int i = 0; i < sdDeclAtmosphere::NUM_PRECIP_LAYERS; i++ ) {
-		precipitation[ i ] = NULL;
+		precipitation[i] = nullptr;
 	}
 	active = false;
 
@@ -129,7 +129,7 @@ sdAtmosphereInstance::sdAtmosphereInstance( arcDict &spawnArgs ) {
 
 	renderable = new sdAtmosphereRenderable( gameRenderWorld );
 
-	arcBounds bb;
+	anBounds bb;
 	bb.Zero();
 	bb.ExpandSelf( 32000.0f );
 	defaultHeightMap.Init( 8, 8, 0 );
@@ -145,7 +145,7 @@ sdAtmosphereInstance::~sdAtmosphereInstance
 sdAtmosphereInstance::~sdAtmosphereInstance() {
 	delete renderable;
 	for ( int i = 0; i < sdDeclAtmosphere::NUM_PRECIP_LAYERS; i++ ) {
-		delete precipitation[ i ];
+		delete precipitation[i];
 	}
 }
 
@@ -175,11 +175,11 @@ void sdAtmosphereInstance::DeActivate() {
 	renderable->FreeModelDef();
 	renderable->FreeLightDef();
 	for ( int i = 0; i < sdDeclAtmosphere::NUM_PRECIP_LAYERS; i++ ) {
-		if ( precipitation[ i ] ) {
-			precipitation[ i ]->FreeRenderEntity();
+		if ( precipitation[i] ) {
+			precipitation[i]->FreeRenderEntity();
 		}
-		delete precipitation[ i ];
-		precipitation[ i ] = NULL;
+		delete precipitation[i];
+		precipitation[i] = nullptr;
 	}
 }
 
@@ -192,20 +192,20 @@ void sdAtmosphereInstance::UpdatePrecipitationParms( bool force ) {
 	const sdHeightMapInstance* newHeightMap = &defaultHeightMapInst;
 
 	arcNetBasePlayer* player = gameLocal.GetLocalViewPlayer();
-	if ( player != NULL ) {
+	if ( player != nullptr ) {
 		const sdPlayZone* pz = gameLocal.GetPlayZone( player->renderView.vieworg, sdPlayZone::PZF_HEIGHTMAP );
-		if ( pz != NULL ) {
+		if ( pz != nullptr ) {
 			newHeightMap = &pz->GetHeightMap();
 		}
 	}
 
 	if ( force || newHeightMap != cachedHeightMap ) {
-		if ( newHeightMap != NULL && newHeightMap->IsValid() ) {
+		if ( newHeightMap != nullptr && newHeightMap->IsValid() ) {
 			SetupPrecipitation( newHeightMap, newHeightMap != cachedHeightMap );
 		} else {
 			for ( int i = 0; i < sdDeclAtmosphere::NUM_PRECIP_LAYERS; i++ ) {
-				delete precipitation[ i ];
-				precipitation[ i ] = NULL;
+				delete precipitation[i];
+				precipitation[i] = nullptr;
 			}
 		}
 		cachedHeightMap = newHeightMap;
@@ -221,8 +221,8 @@ void sdAtmosphereInstance::Think( void ) {
 	UpdatePrecipitationParms( false );
 
 	for ( int i = 0; i < sdDeclAtmosphere::NUM_PRECIP_LAYERS; i++ ) {
-		if ( precipitation[ i ] ) {
-			precipitation[ i ]->Update();
+		if ( precipitation[i] ) {
+			precipitation[i]->Update();
 		}
 	}
 }
@@ -238,57 +238,57 @@ void sdAtmosphereInstance::SetupPrecipitation( const sdHeightMapInstance* height
 
 		// If we switched it off, remove it
 		if ( newParms.preType == sdPrecipitationParameters::PT_NONE || g_skipPrecipitation.GetBool() ) {
-			delete precipitation[ i ];
-			precipitation[ i ] = NULL;
-			precParms[ i ] = newParms;
+			delete precipitation[i];
+			precipitation[i] = nullptr;
+			precParms[i] = newParms;
 			continue;
 		}
 
-		if ( precipitation[ i ] != NULL ) {
+		if ( precipitation[i] != nullptr ) {
 			// Gordon: urgh.. add an operator== or something...
 			// It it didn't change, do nothing
 			if (
 				!force &&
-				precParms[ i ].preType == newParms.preType &&
-				precParms[ i ].maxParticles == newParms.maxParticles &&
-				precParms[ i ].heightMin == newParms.heightMin &&
-				precParms[ i ].heightMax == newParms.heightMax &&
-				precParms[ i ].weightMin == newParms.weightMin &&
-				precParms[ i ].weightMax == newParms.weightMax &&
-				precParms[ i ].timeMin == newParms.timeMin &&
-				precParms[ i ].timeMax == newParms.timeMax &&
-				precParms[ i ].precipitationDistance == newParms.precipitationDistance &&
-				precParms[ i ].windScale == newParms.windScale &&
-				precParms[ i ].gustWindScale == newParms.gustWindScale &&
-				precParms[ i ].fallMin == newParms.fallMin &&
-				precParms[ i ].fallMax == newParms.fallMax &&
-				precParms[ i ].tumbleStrength == newParms.tumbleStrength &&
-				precParms[ i ].material == newParms.material &&
-				precParms[ i ].model == newParms.model &&
-				precParms[ i ].effect == newParms.effect ) {
+				precParms[i].preType == newParms.preType &&
+				precParms[i].maxParticles == newParms.maxParticles &&
+				precParms[i].heightMin == newParms.heightMin &&
+				precParms[i].heightMax == newParms.heightMax &&
+				precParms[i].weightMin == newParms.weightMin &&
+				precParms[i].weightMax == newParms.weightMax &&
+				precParms[i].timeMin == newParms.timeMin &&
+				precParms[i].timeMax == newParms.timeMax &&
+				precParms[i].precipitationDistance == newParms.precipitationDistance &&
+				precParms[i].windScale == newParms.windScale &&
+				precParms[i].gustWindScale == newParms.gustWindScale &&
+				precParms[i].fallMin == newParms.fallMin &&
+				precParms[i].fallMax == newParms.fallMax &&
+				precParms[i].tumbleStrength == newParms.tumbleStrength &&
+				precParms[i].material == newParms.material &&
+				precParms[i].model == newParms.model &&
+				precParms[i].effect == newParms.effect ) {
 				continue;
 			}
 		}
-		precParms[ i ] = newParms;
+		precParms[i] = newParms;
 
 		// Instantiate and setup the right class
-		delete precipitation[ i ];
+		delete precipitation[i];
 
-		switch ( precParms[ i ].preType ) {
+		switch ( precParms[i].preType ) {
 		case sdPrecipitationParameters::PT_RAIN:
-			precipitation[ i ] = new sdAbstractTemplatedParticlePrecipitationSystem( sdPrecipitationSystem< sdDrop >::SetupSystem( precParms[ i ], heightMap ) );
+			precipitation[i] = new sdAbstractTemplatedParticlePrecipitationSystem( sdPrecipitationSystem< sdDrop >::SetupSystem( precParms[i], heightMap ) );
 			break;
 		case sdPrecipitationParameters::PT_SNOW:
-			precipitation[ i ] = new sdAbstractTemplatedParticlePrecipitationSystem( sdPrecipitationSystem< sdFlake >::SetupSystem( precParms[ i ], heightMap ) );
+			precipitation[i] = new sdAbstractTemplatedParticlePrecipitationSystem( sdPrecipitationSystem< sdFlake >::SetupSystem( precParms[i], heightMap ) );
 			break;
 		case sdPrecipitationParameters::PT_SPLASH:
-			precipitation[ i ] = new sdAbstractTemplatedParticlePrecipitationSystem( sdPrecipitationSystem< sdSplash >::SetupSystem( precParms[ i ], heightMap ) );
+			precipitation[i] = new sdAbstractTemplatedParticlePrecipitationSystem( sdPrecipitationSystem< sdSplash >::SetupSystem( precParms[i], heightMap ) );
 			break;
 		case sdPrecipitationParameters::PT_MODELRAIN:
-			precipitation[ i ] = new sdRainPrecipitation( precParms[ i ] );
+			precipitation[i] = new sdRainPrecipitation( precParms[i] );
 			break;
 		case sdPrecipitationParameters::PT_MODELSNOW:
-			precipitation[ i ] = new sdSnowPrecipitation( precParms[ i ] );
+			precipitation[i] = new sdSnowPrecipitation( precParms[i] );
 			break;
 		default:
 			assert( !"Unknown precip type" );
@@ -305,17 +305,17 @@ void sdAtmosphereInstance::SetupPrecipitation( const sdHeightMapInstance* height
 ===============================================================================
 */
 
-const arcEventDef EV_Atmosphere_resetPostProcess( "resetPostProcess", '\0', DOC_TEXT( "Resets post process settings back to their default settings." ), 0, NULL );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessSaturation( "getDefaultPostProcessSaturation", 'f', DOC_TEXT( "Returns the default saturation value for the current atmosphere." ), 0, NULL );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareSourceBrightness( "getDefaultPostProcessGlareSourceBrightness", 'f', DOC_TEXT( "Returns the default glare source brightness value for the current atmosphere." ), 0, NULL );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareBlurBrightness( "getDefaultPostProcessGlareBlurBrightness", 'f', DOC_TEXT( "Returns the default glare blur value for the current atmosphere." ), 0, NULL );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareBrightnessThreshold( "getDefaultPostProcessGlareBrightnessThreshold", 'f', DOC_TEXT( "Returns the default glare brightness threshold for the current atmosphere." ), 0, NULL );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareThresholdDependency( "getDefaultPostProcessGlareThresholdDependency", 'f', DOC_TEXT( "Returns the default glare threshold dependency for the current atmosphere." ), 0, NULL );
-const arcEventDef EV_Atmosphere_setPostProcessTint( "setPostProcessTint", '\0', DOC_TEXT( "Overrides the post process tint value." ), 1, NULL, "v", "tint", "Tint value to override with." );
-const arcEventDef EV_Atmosphere_setPostProcessSaturation( "setPostProcessSaturation", '\0', DOC_TEXT( "Overrides the post process saturation value." ), 1, NULL, "f", "saturation", "Saturation value to override with." );
-const arcEventDef EV_Atmosphere_setPostProcessContrast( "setPostProcessContrast", '\0', DOC_TEXT( "Overrides the post process constrast value." ), 1, NULL, "f", "cotrast", "Cotrast value to override with." );
-const arcEventDef EV_Atmosphere_setPostProcessGlareParms( "setPostProcessGlareParms", '\0', DOC_TEXT( "Overries the post process glare parms." ), 4, NULL, "f", "sourceBrightness", "Source brightness to override with.", "f", "blurBrightness", "Blur brightness to override with.", "f", "brightnessThreshold", "Brightness threshold to override with.", "f", "thresholdDependency", "Threshold dependency to override with." );
-const arcEventDef EV_Atmosphere_isNight( "isNight", 'b', DOC_TEXT( "Returns whether the current $decl:atmosphere$ is marked as being at night" ), 0, NULL );
+const arcEventDef EV_Atmosphere_resetPostProcess( "resetPostProcess", '\0', DOC_TEXT( "Resets post process settings back to their default settings." ), 0, nullptr );
+const arcEventDef EV_Atmosphere_getDefaultPostProcessSaturation( "getDefaultPostProcessSaturation", 'f', DOC_TEXT( "Returns the default saturation value for the current atmosphere." ), 0, nullptr );
+const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareSourceBrightness( "getDefaultPostProcessGlareSourceBrightness", 'f', DOC_TEXT( "Returns the default glare source brightness value for the current atmosphere." ), 0, nullptr );
+const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareBlurBrightness( "getDefaultPostProcessGlareBlurBrightness", 'f', DOC_TEXT( "Returns the default glare blur value for the current atmosphere." ), 0, nullptr );
+const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareBrightnessThreshold( "getDefaultPostProcessGlareBrightnessThreshold", 'f', DOC_TEXT( "Returns the default glare brightness threshold for the current atmosphere." ), 0, nullptr );
+const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareThresholdDependency( "getDefaultPostProcessGlareThresholdDependency", 'f', DOC_TEXT( "Returns the default glare threshold dependency for the current atmosphere." ), 0, nullptr );
+const arcEventDef EV_Atmosphere_setPostProcessTint( "setPostProcessTint", '\0', DOC_TEXT( "Overrides the post process tint value." ), 1, nullptr, "v", "tint", "Tint value to override with." );
+const arcEventDef EV_Atmosphere_setPostProcessSaturation( "setPostProcessSaturation", '\0', DOC_TEXT( "Overrides the post process saturation value." ), 1, nullptr, "f", "saturation", "Saturation value to override with." );
+const arcEventDef EV_Atmosphere_setPostProcessContrast( "setPostProcessContrast", '\0', DOC_TEXT( "Overrides the post process constrast value." ), 1, nullptr, "f", "cotrast", "Cotrast value to override with." );
+const arcEventDef EV_Atmosphere_setPostProcessGlareParms( "setPostProcessGlareParms", '\0', DOC_TEXT( "Overries the post process glare parms." ), 4, nullptr, "f", "sourceBrightness", "Source brightness to override with.", "f", "blurBrightness", "Blur brightness to override with.", "f", "brightnessThreshold", "Brightness threshold to override with.", "f", "thresholdDependency", "Threshold dependency to override with." );
+const arcEventDef EV_Atmosphere_isNight( "isNight", 'b', DOC_TEXT( "Returns whether the current $decl:atmosphere$ is marked as being at night" ), 0, nullptr );
 
 CLASS_DECLARATION( arcEntity, sdAtmosphere )
 	EVENT( EV_Atmosphere_resetPostProcess,			sdAtmosphere::Event_ResetPostProcess )
@@ -334,16 +334,16 @@ CLASS_DECLARATION( arcEntity, sdAtmosphere )
 	EVENT( EV_Atmosphere_isNight, sdAtmosphere::Event_IsNight )
 END_CLASS
 
-idCVar sdAtmosphere::a_windTimeScale(			"a_windTimeScale",				"0.00005",	CVAR_GAME | CVAR_FLOAT,	"Speed at which wind effects change" );
+anCVar sdAtmosphere::a_windTimeScale(			"a_windTimeScale",				"0.00005",	CVAR_GAME | CVAR_FLOAT,	"Speed at which wind effects change" );
 
-sdAtmosphere* sdAtmosphere::currentAtmosphere = NULL;
+sdAtmosphere* sdAtmosphere::currentAtmosphere = nullptr;
 
 /*
 ================
 sdAtmosphere::FloodAmbientCubeMap
 ================
 */
-void sdAtmosphere::FloodAmbientCubeMap( const arcVec3 &origin, const sdDeclAmbientCubeMap *ambientCubeMap ) {
+void sdAtmosphere::FloodAmbientCubeMap( const anVec3 &origin, const sdDeclAmbientCubeMap *ambientCubeMap ) {
 	int areaNum = gameRenderWorld->PointInArea( origin );
 
 	// flood to all connected areas
@@ -359,16 +359,16 @@ void sdAtmosphere::FloodAmbientCubeMap( const arcVec3 &origin, const sdDeclAmbie
 sdAtmosphere::GetAtmosphereLightDetails_f
 ================
 */
-void sdAtmosphere::GetAtmosphereLightDetails_f( const idCmdArgs &args ) {
+void sdAtmosphere::GetAtmosphereLightDetails_f( const anCommandArgs &args ) {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
 
-	if ( atm == NULL ) {
+	if ( atm == nullptr ) {
 		gameLocal.Printf( "No atmosphere present.\n" );
 		return;
 	}
 
-	arcVec3 sunDir = atm->GetSunDirection();	// direction from origin TO sun, not direction sun is shining in
-	arcVec3 sunColor = atm->GetSunColor();
+	anVec3 sunDir = atm->GetSunDirection();	// direction from origin TO sun, not direction sun is shining in
+	anVec3 sunColor = atm->GetSunColor();
 
 	if ( atm->GetSunDirection().z > 0.000001f ) {
 		sunDir.Normalize();
@@ -388,7 +388,7 @@ void sdAtmosphere::GetAtmosphereLightDetails_f( const idCmdArgs &args ) {
 sdAtmosphere::SetAtmosphere_f
 ================
 */
-void sdAtmosphere::SetAtmosphere_f( const idCmdArgs &args ) {
+void sdAtmosphere::SetAtmosphere_f( const anCommandArgs &args ) {
 	if ( args.Argc() != 2 ) {
 		common->Printf( "Usage: SetAtmosphere [Atmosphere Name]\n" );
 		return;
@@ -396,10 +396,10 @@ void sdAtmosphere::SetAtmosphere_f( const idCmdArgs &args ) {
 
 	const sdDeclAtmosphere *atm = declHolder.FindAtmosphere( args.Argv( 1 ), false );
 
-	if ( atm == NULL ) {
+	if ( atm == nullptr ) {
 		return;
 	}
-	if ( currentAtmosphere == NULL ) {
+	if ( currentAtmosphere == nullptr ) {
 		return;
 	}
 
@@ -449,17 +449,17 @@ void sdAtmosphere::Spawn( void ) {
 	FloodAmbientCubeMap( GetPhysics()->GetOrigin(), ambientCubeMap );
 
 	// The currentAtmosphere is the single entity that will remain so we need to add it tho the areas of that entity!
-	if ( currentAtmosphere == NULL ) {
+	if ( currentAtmosphere == nullptr ) {
 		// default globally to the first atmosphere found.
 		areaAtmospheres = new sdAtmosphereInstance*[ gameRenderWorld->NumAreas() ];
 		for ( int i = 0; i < gameRenderWorld->NumAreas(); i++ ) {
-			areaAtmospheres[ i ] = instance;
+			areaAtmospheres[i] = instance;
 		}
 	} else {
 		// flood to all connected areas
 		for ( int i = 0; i < gameRenderWorld->NumAreas(); i++ ) {
 			if ( i == areaNum || gameRenderWorld->AreasAreConnected( areaNum, i ) ) {
-				currentAtmosphere->areaAtmospheres[ i ] = instance;
+				currentAtmosphere->areaAtmospheres[i] = instance;
 			}
 		}
 	}
@@ -486,9 +486,9 @@ sdAtmosphere::sdAtmosphere
 */
 sdAtmosphere::sdAtmosphere() :
 	forceUpdate( false ) {
-	currentAtmosphereInstance = NULL;
-	glowPostProcessMaterial = NULL;
-	areaAtmospheres = NULL;
+	currentAtmosphereInstance = nullptr;
+	glowPostProcessMaterial = nullptr;
+	areaAtmospheres = nullptr;
 	windVector.Zero();
 	windVectorRB = declHolder.FindRenderBinding( "windWorld", false );
 }
@@ -507,7 +507,7 @@ sdAtmosphere::~sdAtmosphere() {
 	delete [] areaAtmospheres;
 
 	if ( currentAtmosphere == this ) {
-		currentAtmosphere = NULL;
+		currentAtmosphere = nullptr;
 	}
 }
 
@@ -541,20 +541,20 @@ sdAtmosphere::Think
 */
 void sdAtmosphere::Think( void ) {
 
-	renderView_t* useView = NULL;
+	renderView_t* useView = nullptr;
 
 	renderView_t view;
 	if ( sdDemoManager::GetInstance().CalculateRenderView( &view ) ) {
 		useView = &view;
 	} else {
 		arcNetBasePlayer* player = gameLocal.GetLocalViewPlayer();
-		if ( player != NULL ) {
+		if ( player != nullptr ) {
 			useView = player->GetRenderView();
 		}
 	}
 
 	// Switch atmospheres if needed
-	if ( useView != NULL && areaAtmospheres != NULL ) {
+	if ( useView != nullptr && areaAtmospheres != nullptr ) {
 		int areaNum = gameRenderWorld->PointInArea( useView->vieworg );
 		if ( areaNum >= 0 && areaNum < gameRenderWorld->NumAreas() ) {
 			sdAtmosphereInstance* instance = areaAtmospheres[ areaNum ];
@@ -572,7 +572,7 @@ void sdAtmosphere::Think( void ) {
 
 	const sdDeclAtmosphere* atm = currentAtmosphereInstance->GetDecl();
 	// only update if it changed
-	if ( atm != NULL && atm->IsModified() || g_skipPrecipitation.IsModified() || forceUpdate ) {
+	if ( atm != nullptr && atm->IsModified() || g_skipPrecipitation.IsModified() || forceUpdate ) {
 		forceUpdate = false;
 
 		currentAtmosphereInstance->Activate();
@@ -591,18 +591,18 @@ sdAtmosphere::UpdateWeather
 void sdAtmosphere::UpdateWeather() {
 	const sdDeclAtmosphere* atm = currentAtmosphereInstance->GetDecl();
 
-	float lerp = arcMath::Sin( gameLocal.time * a_windTimeScale.GetFloat() );
+	float lerp = anMath::Sin( gameLocal.time * a_windTimeScale.GetFloat() );
 	windAngle = atm->GetWindAngle() + lerp * atm->GetWindAngleDev();
 
 	float s, c;
-	arcMath::SinCos( DEG2RAD( windAngle ), s, c );
+	anMath::SinCos( DEG2RAD( windAngle ), s, c );
 
 	windVector.Set( c, s, 0.0f );
-	lerp = arcMath::Sin( gameLocal.time * a_windTimeScale.GetFloat() + 1.23f );
+	lerp = anMath::Sin( gameLocal.time * a_windTimeScale.GetFloat() + 1.23f );
 	windStrength = atm->GetWindStrength() + lerp * atm->GetWindStrengthDev();
 	windVector *= windStrength;
 
-	if ( windVectorRB != NULL ) {
+	if ( windVectorRB != nullptr ) {
 		windVectorRB->Set( windVector );
 	}
 }
@@ -612,8 +612,8 @@ void sdAtmosphere::UpdateWeather() {
 sdAtmosphere::GetFogColor
 ================
 */
-arcVec3 sdAtmosphere::GetFogColor() {
-	if ( currentAtmosphereInstance != NULL ) {
+anVec3 sdAtmosphere::GetFogColor() {
+	if ( currentAtmosphereInstance != nullptr ) {
 		return currentAtmosphereInstance->GetDecl()->GetFogColor();
 	} else {
 		return colorBlack.ToVec3();
@@ -628,7 +628,7 @@ sdAtmosphere::Event_ResetPostProcess
 */
 void sdAtmosphere::Event_ResetPostProcess() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		atm->GetPostProcessParms() = atm->GetDefaultPostProcessParms();
 	}
 }
@@ -640,7 +640,7 @@ sdAtmosphere::Event_GetDefaultPostProcessSaturation
 */
 void sdAtmosphere::Event_GetDefaultPostProcessSaturation() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().saturation );
 	}
 }
@@ -652,7 +652,7 @@ sdAtmosphere::Event_GetDefaultPostProcessGlareSourceBrightness
 */
 void sdAtmosphere::Event_GetDefaultPostProcessGlareSourceBrightness() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[ 0 ] );
 	}
 }
@@ -664,7 +664,7 @@ sdAtmosphere::Event_GetDefaultPostProcessGlareBlurBrightness
 */
 void sdAtmosphere::Event_GetDefaultPostProcessGlareBlurBrightness() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[ 1 ] );
 	}
 }
@@ -676,7 +676,7 @@ sdAtmosphere::Event_GetDefaultPostProcessGlareBrightnessThreshold
 */
 void sdAtmosphere::Event_GetDefaultPostProcessGlareBrightnessThreshold() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[ 2 ] );
 	}
 }
@@ -688,7 +688,7 @@ sdAtmosphere::Event_GetDefaultPostProcessGlareThresholdDependency
 */
 void sdAtmosphere::Event_GetDefaultPostProcessGlareThresholdDependency() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[ 3 ] );
 	}
 }
@@ -698,9 +698,9 @@ void sdAtmosphere::Event_GetDefaultPostProcessGlareThresholdDependency() {
 sdAtmosphere::Event_SetPostProcessTint
 ================
 */
-void sdAtmosphere::Event_SetPostProcessTint( const arcVec3& tint ) {
+void sdAtmosphere::Event_SetPostProcessTint( const anVec3& tint ) {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		atm->GetPostProcessParms().tint = tint;
 	}
 }
@@ -712,7 +712,7 @@ sdAtmosphere::Event_SetPostProcessSaturation
 */
 void sdAtmosphere::Event_SetPostProcessSaturation( float saturation ) {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		atm->GetPostProcessParms().saturation = saturation;
 	}
 }
@@ -724,7 +724,7 @@ sdAtmosphere::Event_SetPostProcessContrast
 */
 void sdAtmosphere::Event_SetPostProcessContrast( float contrast ) {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		atm->GetPostProcessParms().contrast = contrast;
 	}
 }
@@ -736,7 +736,7 @@ sdAtmosphere::Event_SetPostProcessGlareParms
 */
 void sdAtmosphere::Event_SetPostProcessGlareParms( float sourceBrightness, float blurBrightness, float brightnessThreshold, float thresholdDep ) {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
-	if ( atm != NULL ) {
+	if ( atm != nullptr ) {
 		atm->GetPostProcessParms().glareParms[ 0 ] = sourceBrightness;
 		atm->GetPostProcessParms().glareParms[ 1 ] = blurBrightness;
 		atm->GetPostProcessParms().glareParms[ 2 ] = brightnessThreshold;
@@ -759,7 +759,7 @@ sdAtmosphere::DrawPostProcess
 ================
 */
 void sdAtmosphere::DrawPostProcess( sdUserInterfaceLocal* ui, float x, float y, float w, float h ) {
-	if ( currentAtmosphere == NULL ) {
+	if ( currentAtmosphere == nullptr ) {
 		return;
 	}
 

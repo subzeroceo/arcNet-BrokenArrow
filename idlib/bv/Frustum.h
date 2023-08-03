@@ -9,20 +9,20 @@
 ===============================================================================
 */
 
-class ARCFrustum {
+class anFrustum {
 public:
-					ARCFrustum( void );
+					anFrustum( void );
 
-	void			SetOrigin( const arcVec3 &origin );
-	void			SetAxis( const arcMat3 &axis );
+	void			SetOrigin( const anVec3 &origin );
+	void			SetAxis( const anMat3 &axis );
 	void			SetSize( float dNear, float dFar, float dLeft, float dUp );
 	void			SetPyramid( float dNear, float dFar );
 	void			MoveNearDistance( float dNear );
 	void			MoveFarDistance( float dFar );
 
-	const arcVec3 &	GetOrigin( void ) const;						// returns frustum origin
-	const arcMat3 &	GetAxis( void ) const;							// returns frustum orientation
-	arcVec3			GetCenter( void ) const;						// returns center of frustum
+	const anVec3 &	GetOrigin( void ) const;						// returns frustum origin
+	const anMat3 &	GetAxis( void ) const;							// returns frustum orientation
+	anVec3			GetCenter( void ) const;						// returns center of frustum
 
 	bool			IsValid( void ) const;							// returns true if the frustum is valid
 	float			GetNearDistance( void ) const;					// returns distance to near plane
@@ -30,65 +30,65 @@ public:
 	float			GetLeft( void ) const;							// returns left vector length
 	float			GetUp( void ) const;							// returns up vector length
 
-	ARCFrustum		Expand( const float d ) const;					// returns frustum expanded in all directions with the given value
-	ARCFrustum &	ExpandSelf( const float d );					// expands frustum in all directions with the given value
-	ARCFrustum		Translate( const arcVec3 &translation ) const;	// returns translated frustum
-	ARCFrustum &	TranslateSelf( const arcVec3 &translation );		// translates frustum
-	ARCFrustum		Rotate( const arcMat3 &rotation ) const;			// returns rotated frustum
-	ARCFrustum &	RotateSelf( const arcMat3 &rotation );			// rotates frustum
+	anFrustum		Expand( const float d ) const;					// returns frustum expanded in all directions with the given value
+	anFrustum &	ExpandSelf( const float d );					// expands frustum in all directions with the given value
+	anFrustum		Translate( const anVec3 &translation ) const;	// returns translated frustum
+	anFrustum &	TranslateSelf( const anVec3 &translation );		// translates frustum
+	anFrustum		Rotate( const anMat3 &rotation ) const;			// returns rotated frustum
+	anFrustum &	RotateSelf( const anMat3 &rotation );			// rotates frustum
 
-	float			PlaneDistance( const arcPlane &plane ) const;
-	int				PlaneSide( const arcPlane &plane, const float epsilon = ON_EPSILON ) const;
+	float			PlaneDistance( const anPlane &plane ) const;
+	int				PlaneSide( const anPlane &plane, const float epsilon = ON_EPSILON ) const;
 
 					// fast culling but might not cull everything outside the frustum
-	bool			CullPoint( const arcVec3 &point ) const;
-	bool			CullBounds( const arcBounds &bounds ) const;
-	bool			CullBox( const ARCBox &box ) const;
-	bool			CullSphere( const ARCSphere &sphere ) const;
-	bool			CullFrustum( const ARCFrustum &frustum ) const;
-	bool			CullWinding( const class arcWinding &winding ) const;
+	bool			CullPoint( const anVec3 &point ) const;
+	bool			CullBounds( const anBounds &bounds ) const;
+	bool			CullBox( const anBox &box ) const;
+	bool			CullSphere( const anSphere &sphere ) const;
+	bool			CullFrustum( const anFrustum &frustum ) const;
+	bool			CullWinding( const class anWinding &winding ) const;
 
 					// exact intersection tests
-	bool			ContainsPoint( const arcVec3 &point ) const;
-	bool			IntersectsBounds( const arcBounds &bounds ) const;
-	bool			IntersectsBox( const ARCBox &box ) const;
-	bool			IntersectsSphere( const ARCSphere &sphere ) const;
-	bool			IntersectsFrustum( const ARCFrustum &frustum ) const;
-	bool			IntersectsWinding( const arcWinding &winding ) const;
-	bool			LineIntersection( const arcVec3 &start, const arcVec3 &end ) const;
-	bool			RayIntersection( const arcVec3 &start, const arcVec3 &dir, float &scale1, float &scale2 ) const;
+	bool			ContainsPoint( const anVec3 &point ) const;
+	bool			IntersectsBounds( const anBounds &bounds ) const;
+	bool			IntersectsBox( const anBox &box ) const;
+	bool			IntersectsSphere( const anSphere &sphere ) const;
+	bool			IntersectsFrustum( const anFrustum &frustum ) const;
+	bool			IntersectsWinding( const anWinding &winding ) const;
+	bool			LineIntersection( const anVec3 &start, const anVec3 &end ) const;
+	bool			RayIntersection( const anVec3 &start, const anVec3 &dir, float &scale1, float &scale2 ) const;
 
 					// returns true if the projection origin is far enough away from the bounding volume to create a valid frustum
-	bool			FromProjection( const arcBounds &bounds, const arcVec3 &projectionOrigin, const float dFar );
-	bool			FromProjection( const ARCBox &box, const arcVec3 &projectionOrigin, const float dFar );
-	bool			FromProjection( const ARCSphere &sphere, const arcVec3 &projectionOrigin, const float dFar );
+	bool			FromProjection( const anBounds &bounds, const anVec3 &projectionOrigin, const float dFar );
+	bool			FromProjection( const anBox &box, const anVec3 &projectionOrigin, const float dFar );
+	bool			FromProjection( const anSphere &sphere, const anVec3 &projectionOrigin, const float dFar );
 
 					// moves the far plane so it extends just beyond the bounding volume
-	bool			ConstrainToBounds( const arcBounds &bounds );
-	bool			ConstrainToBox( const ARCBox &box );
-	bool			ConstrainToSphere( const ARCSphere &sphere );
-	bool			ConstrainToFrustum( const ARCFrustum &frustum );
+	bool			ConstrainToBounds( const anBounds &bounds );
+	bool			ConstrainToBox( const anBox &box );
+	bool			ConstrainToSphere( const anSphere &sphere );
+	bool			ConstrainToFrustum( const anFrustum &frustum );
 
-	void			ToPlanes( arcPlane planes[6] ) const;			// planes point outwards
-	void			ToPoints( arcVec3 points[8] ) const;				// 8 corners of the frustum
+	void			ToPlanes( anPlane planes[6] ) const;			// planes point outwards
+	void			ToPoints( anVec3 points[8] ) const;				// 8 corners of the frustum
 
 					// calculates the projection of this frustum onto the given axis
-	void			AxisProjection( const arcVec3 &dir, float &min, float &max ) const;
-	void			AxisProjection( const arcMat3 &ax, arcBounds &bounds ) const;
+	void			AxisProjection( const anVec3 &dir, float &min, float &max ) const;
+	void			AxisProjection( const anMat3 &ax, anBounds &bounds ) const;
 
 					// calculates the bounds for the projection in this frustum
-	bool			ProjectionBounds( const arcBounds &bounds, arcBounds &projectionBounds ) const;
-	bool			ProjectionBounds( const ARCBox &box, arcBounds &projectionBounds ) const;
-	bool			ProjectionBounds( const ARCSphere &sphere, arcBounds &projectionBounds ) const;
-	bool			ProjectionBounds( const ARCFrustum &frustum, arcBounds &projectionBounds ) const;
-	bool			ProjectionBounds( const arcWinding &winding, arcBounds &projectionBounds ) const;
+	bool			ProjectionBounds( const anBounds &bounds, anBounds &projectionBounds ) const;
+	bool			ProjectionBounds( const anBox &box, anBounds &projectionBounds ) const;
+	bool			ProjectionBounds( const anSphere &sphere, anBounds &projectionBounds ) const;
+	bool			ProjectionBounds( const anFrustum &frustum, anBounds &projectionBounds ) const;
+	bool			ProjectionBounds( const anWinding &winding, anBounds &projectionBounds ) const;
 
 					// calculates the bounds for the projection in this frustum of the given frustum clipped to the given box
-	bool			ClippedProjectionBounds( const ARCFrustum &frustum, const ARCBox &clipBox, arcBounds &projectionBounds ) const;
+	bool			ClippedProjectionBounds( const anFrustum &frustum, const anBox &clipBox, anBounds &projectionBounds ) const;
 
 private:
-	arcVec3			origin;		// frustum origin
-	arcMat3			axis;		// frustum orientation
+	anVec3			origin;		// frustum origin
+	anMat3			axis;		// frustum orientation
 	float			dNear;		// distance of near plane, dNear >= 0.0f
 	float			dFar;		// distance of far plane, dFar > dNear
 	float			dLeft;		// half the width at the far plane
@@ -96,40 +96,39 @@ private:
 	float			invFar;		// 1.0f / dFar
 
 private:
-	bool			CullLocalBox( const arcVec3 &localOrigin, const arcVec3 &extents, const arcMat3 &localAxis ) const;
-	bool			CullLocalFrustum( const ARCFrustum &localFrustum, const arcVec3 indexPoints[8], const arcVec3 cornerVecs[4] ) const;
-	bool			CullLocalWinding( const arcVec3 *points, const int numPoints, int *pointCull ) const;
-	bool			BoundsCullLocalFrustum( const arcBounds &bounds, const ARCFrustum &localFrustum, const arcVec3 indexPoints[8], const arcVec3 cornerVecs[4] ) const;
-	bool			LocalLineIntersection( const arcVec3 &start, const arcVec3 &end ) const;
-	bool			LocalRayIntersection( const arcVec3 &start, const arcVec3 &dir, float &scale1, float &scale2 ) const;
-	bool			LocalFrustumIntersectsFrustum( const arcVec3 points[8], const bool testFirstSide ) const;
-	bool			LocalFrustumIntersectsBounds( const arcVec3 points[8], const arcBounds &bounds ) const;
-	void			ToClippedPoints( const float fractions[4], arcVec3 points[8] ) const;
-	void			ToIndexPoints( arcVec3 indexPoints[8] ) const;
-	void			ToIndexPointsAndCornerVecs( arcVec3 indexPoints[8], arcVec3 cornerVecs[4] ) const;
-	void			AxisProjection( const arcVec3 indexPoints[8], const arcVec3 cornerVecs[4], const arcVec3 &dir, float &min, float &max ) const;
-	void			AddLocalLineToProjectionBoundsSetCull( const arcVec3 &start, const arcVec3 &end, int &startCull, int &endCull, arcBounds &bounds ) const;
-	void			AddLocalLineToProjectionBoundsUseCull( const arcVec3 &start, const arcVec3 &end, int startCull, int endCull, arcBounds &bounds ) const;
-	bool			AddLocalCapsToProjectionBounds( const arcVec3 endPoints[4], const int endPointCull[4], const arcVec3 &point, int pointCull, int pointClip, arcBounds &projectionBounds ) const;
-	bool			BoundsRayIntersection( const arcBounds &bounds, const arcVec3 &start, const arcVec3 &dir, float &scale1, float &scale2 ) const;
-	void			ClipFrustumToBox( const ARCBox &box, float clipFractions[4], int clipPlanes[4] ) const;
-	bool			ClipLine( const arcVec3 localPoints[8], const arcVec3 points[8], int startIndex, int endIndex, arcVec3 &start, arcVec3 &end, int &startClip, int &endClip ) const;
+	bool			CullLocalBox( const anVec3 &localOrigin, const anVec3 &extents, const anMat3 &localAxis ) const;
+	bool			CullLocalFrustum( const anFrustum &localFrustum, const anVec3 indexPoints[8], const anVec3 cornerVecs[4] ) const;
+	bool			CullLocalWinding( const anVec3 *points, const int numPoints, int *pointCull ) const;
+	bool			BoundsCullLocalFrustum( const anBounds &bounds, const anFrustum &localFrustum, const anVec3 indexPoints[8], const anVec3 cornerVecs[4] ) const;
+	bool			LocalLineIntersection( const anVec3 &start, const anVec3 &end ) const;
+	bool			LocalRayIntersection( const anVec3 &start, const anVec3 &dir, float &scale1, float &scale2 ) const;
+	bool			LocalFrustumIntersectsFrustum( const anVec3 points[8], const bool testFirstSide ) const;
+	bool			LocalFrustumIntersectsBounds( const anVec3 points[8], const anBounds &bounds ) const;
+	void			ToClippedPoints( const float fractions[4], anVec3 points[8] ) const;
+	void			ToIndexPoints( anVec3 indexPoints[8] ) const;
+	void			ToIndexPointsAndCornerVecs( anVec3 indexPoints[8], anVec3 cornerVecs[4] ) const;
+	void			AxisProjection( const anVec3 indexPoints[8], const anVec3 cornerVecs[4], const anVec3 &dir, float &min, float &max ) const;
+	void			AddLocalLineToProjectionBoundsSetCull( const anVec3 &start, const anVec3 &end, int &startCull, int &endCull, anBounds &bounds ) const;
+	void			AddLocalLineToProjectionBoundsUseCull( const anVec3 &start, const anVec3 &end, int startCull, int endCull, anBounds &bounds ) const;
+	bool			AddLocalCapsToProjectionBounds( const anVec3 endPoints[4], const int endPointCull[4], const anVec3 &point, int pointCull, int pointClip, anBounds &projectionBounds ) const;
+	bool			BoundsRayIntersection( const anBounds &bounds, const anVec3 &start, const anVec3 &dir, float &scale1, float &scale2 ) const;
+	void			ClipFrustumToBox( const anBox &box, float clipFractions[4], int clipPlanes[4] ) const;
+	bool			ClipLine( const anVec3 localPoints[8], const anVec3 points[8], int startIndex, int endIndex, anVec3 &start, anVec3 &end, int &startClip, int &endClip ) const;
 };
 
-
-ARC_INLINE ARCFrustum::ARCFrustum( void ) {
+ARC_INLINE anFrustum::anFrustum( void ) {
 	dNear = dFar = 0.0f;
 }
 
-ARC_INLINE void ARCFrustum::SetOrigin( const arcVec3 &origin ) {
+ARC_INLINE void anFrustum::SetOrigin( const anVec3 &origin ) {
 	this->origin = origin;
 }
 
-ARC_INLINE void ARCFrustum::SetAxis( const arcMat3 &axis ) {
+ARC_INLINE void anFrustum::SetAxis( const anMat3 &axis ) {
 	this->axis = axis;
 }
 
-ARC_INLINE void ARCFrustum::SetSize( float dNear, float dFar, float dLeft, float dUp ) {
+ARC_INLINE void anFrustum::SetSize( float dNear, float dFar, float dLeft, float dUp ) {
 	assert( dNear >= 0.0f && dFar > dNear && dLeft > 0.0f && dUp > 0.0f );
 	this->dNear = dNear;
 	this->dFar = dFar;
@@ -138,7 +137,7 @@ ARC_INLINE void ARCFrustum::SetSize( float dNear, float dFar, float dLeft, float
 	this->invFar = 1.0f / dFar;
 }
 
-ARC_INLINE void ARCFrustum::SetPyramid( float dNear, float dFar ) {
+ARC_INLINE void anFrustum::SetPyramid( float dNear, float dFar ) {
 	assert( dNear >= 0.0f && dFar > dNear );
 	this->dNear = dNear;
 	this->dFar = dFar;
@@ -147,12 +146,12 @@ ARC_INLINE void ARCFrustum::SetPyramid( float dNear, float dFar ) {
 	this->invFar = 1.0f / dFar;
 }
 
-ARC_INLINE void ARCFrustum::MoveNearDistance( float dNear ) {
+ARC_INLINE void anFrustum::MoveNearDistance( float dNear ) {
 	assert( dNear >= 0.0f );
 	this->dNear = dNear;
 }
 
-ARC_INLINE void ARCFrustum::MoveFarDistance( float dFar ) {
+ARC_INLINE void anFrustum::MoveFarDistance( float dFar ) {
 	assert( dFar > this->dNear );
 	float scale = dFar / this->dFar;
 	this->dFar = dFar;
@@ -161,40 +160,40 @@ ARC_INLINE void ARCFrustum::MoveFarDistance( float dFar ) {
 	this->invFar = 1.0f / dFar;
 }
 
-ARC_INLINE const arcVec3 &ARCFrustum::GetOrigin( void ) const {
+ARC_INLINE const anVec3 &anFrustum::GetOrigin( void ) const {
 	return origin;
 }
 
-ARC_INLINE const arcMat3 &ARCFrustum::GetAxis( void ) const {
+ARC_INLINE const anMat3 &anFrustum::GetAxis( void ) const {
 	return axis;
 }
 
-ARC_INLINE arcVec3 ARCFrustum::GetCenter( void ) const {
+ARC_INLINE anVec3 anFrustum::GetCenter( void ) const {
 	return ( origin + axis[0] * ( ( dFar - dNear ) * 0.5f ) );
 }
 
-ARC_INLINE bool ARCFrustum::IsValid( void ) const {
+ARC_INLINE bool anFrustum::IsValid( void ) const {
 	return ( dFar > dNear );
 }
 
-ARC_INLINE float ARCFrustum::GetNearDistance( void ) const {
+ARC_INLINE float anFrustum::GetNearDistance( void ) const {
 	return dNear;
 }
 
-ARC_INLINE float ARCFrustum::GetFarDistance( void ) const {
+ARC_INLINE float anFrustum::GetFarDistance( void ) const {
 	return dFar;
 }
 
-ARC_INLINE float ARCFrustum::GetLeft( void ) const {
+ARC_INLINE float anFrustum::GetLeft( void ) const {
 	return dLeft;
 }
 
-ARC_INLINE float ARCFrustum::GetUp( void ) const {
+ARC_INLINE float anFrustum::GetUp( void ) const {
 	return dUp;
 }
 
-ARC_INLINE ARCFrustum ARCFrustum::Expand( const float d ) const {
-	ARCFrustum f = *this;
+ARC_INLINE anFrustum anFrustum::Expand( const float d ) const {
+	anFrustum f = *this;
 	f.origin -= d * f.axis[0];
 	f.dFar += 2.0f * d;
 	f.dLeft = f.dFar * dLeft * invFar;
@@ -203,7 +202,7 @@ ARC_INLINE ARCFrustum ARCFrustum::Expand( const float d ) const {
 	return f;
 }
 
-ARC_INLINE ARCFrustum &ARCFrustum::ExpandSelf( const float d ) {
+ARC_INLINE anFrustum &anFrustum::ExpandSelf( const float d ) {
 	origin -= d * axis[0];
 	dFar += 2.0f * d;
 	dLeft = dFar * dLeft * invFar;
@@ -212,26 +211,26 @@ ARC_INLINE ARCFrustum &ARCFrustum::ExpandSelf( const float d ) {
 	return *this;
 }
 
-ARC_INLINE ARCFrustum ARCFrustum::Translate( const arcVec3 &translation ) const {
-	ARCFrustum f = *this;
+ARC_INLINE anFrustum anFrustum::Translate( const anVec3 &translation ) const {
+	anFrustum f = *this;
 	f.origin += translation;
 	return f;
 }
 
-ARC_INLINE ARCFrustum &ARCFrustum::TranslateSelf( const arcVec3 &translation ) {
+ARC_INLINE anFrustum &anFrustum::TranslateSelf( const anVec3 &translation ) {
 	origin += translation;
 	return *this;
 }
 
-ARC_INLINE ARCFrustum ARCFrustum::Rotate( const arcMat3 &rotation ) const {
-	ARCFrustum f = *this;
+ARC_INLINE anFrustum anFrustum::Rotate( const anMat3 &rotation ) const {
+	anFrustum f = *this;
 	f.axis *= rotation;
 	return f;
 }
 
-ARC_INLINE ARCFrustum &ARCFrustum::RotateSelf( const arcMat3 &rotation ) {
+ARC_INLINE anFrustum &anFrustum::RotateSelf( const anMat3 &rotation ) {
 	axis *= rotation;
 	return *this;
 }
 
-#endif /* !__BV_FRUSTUM_H__ */
+#endif // !__BV_FRUSTUM_H__

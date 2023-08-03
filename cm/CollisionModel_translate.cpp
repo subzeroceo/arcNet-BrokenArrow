@@ -6,7 +6,7 @@
 ===============================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "idlib/Lib.h"
 #pragma hdrstop
 
 #include "CollisionModel_local.h"
@@ -21,12 +21,12 @@ Collision detection for translational motion
 
 /*
 ================
-aRcCollisionModelDetectionLocal::TranslateEdgeThroughEdge
+anCollisionModelDetectLocal::TranslateEdgeThroughEdge
 
   calculates fraction of the translation completed at which the edges collide
 ================
 */
-ARC_INLINE int aRcCollisionModelDetectionLocal::TranslateEdgeThroughEdge( arcVec3 &cross, aRcPluecker &l1, aRcPluecker &l2, float *fraction ) {
+ARC_INLINE int anCollisionModelDetectLocal::TranslateEdgeThroughEdge( anVec3 &cross, anPluecker &l1, anPluecker &l2, float *fraction ) {
 	float d, t;
 
 	/*
@@ -169,7 +169,7 @@ CM_SetVertexSidedness
   stores for the given model vertex at which side of one of the trm edges it passes
 ================
 */
-ARC_INLINE void CM_SetVertexSidedness( cm_vertex_t *v, const aRcPluecker &vpl, const aRcPluecker &epl, const int bitNum ) {
+ARC_INLINE void CM_SetVertexSidedness( cm_vertex_t *v, const anPluecker &vpl, const anPluecker &epl, const int bitNum ) {
 	if ( !( v->sideSet & ( 1<<bitNum ) ) ) {
 		float fl;
 		fl = vpl.PermutedInnerProduct( epl );
@@ -185,8 +185,8 @@ CM_SetEdgeSidedness
   stores for the given model edge at which side one of the trm vertices
 ================
 */
-ARC_INLINE void CM_SetEdgeSidedness( cm_edge_t *edge, const aRcPluecker &vpl, const aRcPluecker &epl, const int bitNum ) {
-	if ( !( edge->sideSet & (1<<bitNum )) ) {
+ARC_INLINE void CM_SetEdgeSidedness( cm_edge_t *edge, const anPluecker &vpl, const anPluecker &epl, const int bitNum ) {
+	if ( !( edge->sideSet & (1<<bitNum ) ) ) {
 		float fl;
 		fl = vpl.PermutedInnerProduct( epl );
 		edge->side = (edge->side & ~(1<<bitNum) ) | (FLOATSIGNBITSET(fl) << bitNum);
@@ -196,23 +196,23 @@ ARC_INLINE void CM_SetEdgeSidedness( cm_edge_t *edge, const aRcPluecker &vpl, co
 
 /*
 ================
-aRcCollisionModelDetectionLocal::TranslateTrmEdgeThroughPolygon
+anCollisionModelDetectLocal::TranslateTrmEdgeThroughPolygon
 ================
 */
-void aRcCollisionModelDetectionLocal::TranslateTrmEdgeThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmEdge_t *trmEdge ) {
+void anCollisionModelDetectLocal::TranslateTrmEdgeThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmEdge_t *trmEdge ) {
 	int i, edgeNum;
 	float f1, f2, dist, d1, d2;
-	arcVec3 start, end, normal;
+	anVec3 start, end, normal;
 	cm_edge_t *edge;
 	cm_vertex_t *v1, *v2;
-	aRcPluecker *pl, epsPl;
+	anPluecker *pl, epsPl;
 
 	// check edges for a collision
-	for ( i = 0; i < poly->numEdges; i++) {
+	for ( i = 0; i < poly->numEdges; i++ ) {
 		edgeNum = poly->edges[i];
 		edge = tw->model->edges + abs( edgeNum );
 		// if this edge is already checked
-		if ( edge->checkcount == aRcCollisionModelDetectionLocal::checkCount ) {
+		if ( edge->checkcount == anCollisionModelDetectLocal::checkCount ) {
 			continue;
 		}
 		// can never collide with internal edges
@@ -237,7 +237,7 @@ void aRcCollisionModelDetectionLocal::TranslateTrmEdgeThroughPolygon( cm_traceWo
 			continue;
 		}
 		// if there is no possible collision between the trm edge and the polygon edge
-		if ( !aRcCollisionModelDetectionLocal::TranslateEdgeThroughEdge( trmEdge->cross, trmEdge->pl, *pl, &f1 ) ) {
+		if ( !anCollisionModelDetectLocal::TranslateEdgeThroughEdge( trmEdge->cross, trmEdge->pl, *pl, &f1 ) ) {
 			continue;
 		}
 		// if moving away from edge
@@ -249,7 +249,7 @@ void aRcCollisionModelDetectionLocal::TranslateTrmEdgeThroughPolygon( cm_traceWo
 		epsPl.FromLine( tw->model->vertices[edge->vertexNum[0]].p + edge->normal * CM_CLIP_EPSILON,
 						tw->model->vertices[edge->vertexNum[1]].p + edge->normal * CM_CLIP_EPSILON );
 		// calculate collision fraction with epsilon expanded edge
-		if ( !aRcCollisionModelDetectionLocal::TranslateEdgeThroughEdge( trmEdge->cross, trmEdge->pl, epsPl, &f2 ) ) {
+		if ( !anCollisionModelDetectLocal::TranslateEdgeThroughEdge( trmEdge->cross, trmEdge->pl, epsPl, &f2 ) ) {
 			continue;
 		}
 		// if no collision with epsilon edge or moving away from edge
@@ -306,7 +306,7 @@ CM_TranslationPlaneFraction
 
 #if 0
 
-float CM_TranslationPlaneFraction( arcPlane &plane, arcVec3 &start, arcVec3 &end ) {
+float CM_TranslationPlaneFraction( anPlane &plane, anVec3 &start, anVec3 &end ) {
 	float d1, d2;
 
 	d2 = plane.Distance( end );
@@ -329,20 +329,20 @@ float CM_TranslationPlaneFraction( arcPlane &plane, arcVec3 &start, arcVec3 &end
 
 #else
 
-float CM_TranslationPlaneFraction( arcPlane &plane, arcVec3 &start, arcVec3 &end ) {
+float CM_TranslationPlaneFraction( anPlane &plane, anVec3 &start, anVec3 &end ) {
 	float d1, d2, d2eps;
 
 	d2 = plane.Distance( end );
 	// if the end point is closer to the plane than an epsilon we still take it for a collision
 	// if ( d2 >= CM_CLIP_EPSILON ) {
 	d2eps = d2 - CM_CLIP_EPSILON;
-	if ( FLOATSIGNBITNOTSET(d2eps) ) {
+	if ( FLOATSIGNBITNOTSET( d2eps ) ) {
 		return 1.0f;
 	}
 	d1 = plane.Distance( start );
 
 	// if completely behind the polygon
-	if ( FLOATSIGNBITSET(d1) ) {
+	if ( FLOATSIGNBITSET( d1 ) ) {
 		return 1.0f;
 	}
 	// if going towards the front of the plane and
@@ -359,10 +359,10 @@ float CM_TranslationPlaneFraction( arcPlane &plane, arcVec3 &start, arcVec3 &end
 
 /*
 ================
-aRcCollisionModelDetectionLocal::TranslateTrmVertexThroughPolygon
+anCollisionModelDetectLocal::TranslateTrmVertexThroughPolygon
 ================
 */
-void aRcCollisionModelDetectionLocal::TranslateTrmVertexThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmVertex_t *v, int bitNum ) {
+void anCollisionModelDetectLocal::TranslateTrmVertexThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmVertex_t *v, int bitNum ) {
 	int i, edgeNum;
 	float f;
 	cm_edge_t *edge;
@@ -401,14 +401,14 @@ void aRcCollisionModelDetectionLocal::TranslateTrmVertexThroughPolygon( cm_trace
 
 /*
 ================
-aRcCollisionModelDetectionLocal::TranslatePointThroughPolygon
+anCollisionModelDetectLocal::TranslatePointThroughPolygon
 ================
 */
-void aRcCollisionModelDetectionLocal::TranslatePointThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmVertex_t *v ) {
+void anCollisionModelDetectLocal::TranslatePointThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmVertex_t *v ) {
 	int i, edgeNum;
 	float f;
 	cm_edge_t *edge;
-	aRcPluecker pl;
+	anPluecker pl;
 
 	f = CM_TranslationPlaneFraction( poly->plane, v->p, v->endp );
 	if ( f < tw->trace.fraction ) {
@@ -416,9 +416,9 @@ void aRcCollisionModelDetectionLocal::TranslatePointThroughPolygon( cm_traceWork
 			edgeNum = poly->edges[i];
 			edge = tw->model->edges + abs( edgeNum );
 			// if we didn't yet calculate the sidedness for this edge
-			if ( edge->checkcount != aRcCollisionModelDetectionLocal::checkCount ) {
+			if ( edge->checkcount != anCollisionModelDetectLocal::checkCount ) {
 				float fl;
-				edge->checkcount = aRcCollisionModelDetectionLocal::checkCount;
+				edge->checkcount = anCollisionModelDetectLocal::checkCount;
 				pl.FromLine(tw->model->vertices[edge->vertexNum[0]].p, tw->model->vertices[edge->vertexNum[1]].p);
 				fl = v->pl.PermutedInnerProduct( pl );
 				edge->side = FLOATSIGNBITSET(fl);
@@ -453,10 +453,10 @@ void aRcCollisionModelDetectionLocal::TranslatePointThroughPolygon( cm_traceWork
 
 /*
 ================
-aRcCollisionModelDetectionLocal::TranslateVertexThroughTrmPolygon
+anCollisionModelDetectLocal::TranslateVertexThroughTrmPolygon
 ================
 */
-void aRcCollisionModelDetectionLocal::TranslateVertexThroughTrmPolygon( cm_traceWork_t *tw, cm_trmPolygon_t *trmpoly, cm_polygon_t *poly, cm_vertex_t *v, arcVec3 &endp, aRcPluecker &pl ) {
+void anCollisionModelDetectLocal::TranslateVertexThroughTrmPolygon( cm_traceWork_t *tw, cm_trmPolygon_t *trmpoly, cm_polygon_t *poly, cm_vertex_t *v, anVec3 &endp, anPluecker &pl ) {
 	int i, edgeNum;
 	float f;
 	cm_trmEdge_t *edge;
@@ -493,16 +493,16 @@ void aRcCollisionModelDetectionLocal::TranslateVertexThroughTrmPolygon( cm_trace
 
 /*
 ================
-aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon
+anCollisionModelDetectLocal::TranslateTrmThroughPolygon
 
   returns true if the polygon blocks the complete translation
 ================
 */
-bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *p ) {
+bool anCollisionModelDetectLocal::TranslateTrmThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *p ) {
 	int i, j, k, edgeNum;
 	float fraction, d;
-	arcVec3 endp;
-	aRcPluecker *pl;
+	anVec3 endp;
+	anPluecker *pl;
 	cm_trmVertex_t *bv;
 	cm_trmEdge_t *be;
 	cm_trmPolygon_t *bp;
@@ -510,10 +510,10 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 	cm_edge_t *e;
 
 	// if already checked this polygon
-	if ( p->checkcount == aRcCollisionModelDetectionLocal::checkCount ) {
+	if ( p->checkcount == anCollisionModelDetectLocal::checkCount ) {
 		return false;
 	}
-	p->checkcount = aRcCollisionModelDetectionLocal::checkCount;
+	p->checkcount = anCollisionModelDetectLocal::checkCount;
 
 	// if this polygon does not have the right contents behind it
 	if ( !(p->contents & tw->contents) ) {
@@ -532,20 +532,20 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 
 	// if the polygon is too far from the first heart plane
 	d = p->bounds.PlaneDistance( tw->heartPlane1 );
-	if ( arcMath::Fabs(d) > tw->maxDistFromHeartPlane1 ) {
+	if ( anMath::Fabs(d) > tw->maxDistFromHeartPlane1 ) {
 		return false;
 	}
 
 	// if the polygon is too far from the second heart plane
 	d = p->bounds.PlaneDistance( tw->heartPlane2 );
-	if ( arcMath::Fabs(d) > tw->maxDistFromHeartPlane2 ) {
+	if ( anMath::Fabs(d) > tw->maxDistFromHeartPlane2 ) {
 		return false;
 	}
 	fraction = tw->trace.fraction;
 
 	// fast point trace
 	if ( tw->pointTrace ) {
-		aRcCollisionModelDetectionLocal::TranslatePointThroughPolygon( tw, p, &tw->vertices[0] );
+		anCollisionModelDetectLocal::TranslatePointThroughPolygon( tw, p, &tw->vertices[0] );
 	}
 	else {
 
@@ -567,7 +567,7 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 			edgeNum = p->edges[i];
 			e = tw->model->edges + abs( edgeNum );
 			// reset sidedness cache if this is the first time we encounter this edge during this trace
-			if ( e->checkcount != aRcCollisionModelDetectionLocal::checkCount ) {
+			if ( e->checkcount != anCollisionModelDetectLocal::checkCount ) {
 				e->sideSet = 0;
 			}
 			// pluecker coordinate for edge
@@ -576,7 +576,7 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 
 			v = &tw->model->vertices[e->vertexNum[INTSIGNBITSET( edgeNum )]];
 			// reset sidedness cache if this is the first time we encounter this vertex during this trace
-			if ( v->checkcount != aRcCollisionModelDetectionLocal::checkCount ) {
+			if ( v->checkcount != anCollisionModelDetectLocal::checkCount ) {
 				v->sideSet = 0;
 			}
 			// pluecker coordinate for vertex movement vector
@@ -589,7 +589,7 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 		for ( i = 0; i < tw->numVerts; i++ ) {
 			bv = tw->vertices + i;
 			if ( bv->used ) {
-				aRcCollisionModelDetectionLocal::TranslateTrmVertexThroughPolygon( tw, p, bv, i );
+				anCollisionModelDetectLocal::TranslateTrmVertexThroughPolygon( tw, p, bv, i );
 			}
 		}
 
@@ -597,7 +597,7 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 		for ( i = 1; i <= tw->numEdges; i++ ) {
 			be = tw->edges + i;
 			if ( be->used ) {
-				aRcCollisionModelDetectionLocal::TranslateTrmEdgeThroughPolygon( tw, p, be);
+				anCollisionModelDetectLocal::TranslateTrmEdgeThroughPolygon( tw, p, be);
 			}
 		}
 
@@ -605,11 +605,11 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 		for ( i = 0; i < p->numEdges; i++ ) {
 			edgeNum = p->edges[i];
 			e = tw->model->edges + abs( edgeNum );
-			if ( e->checkcount == aRcCollisionModelDetectionLocal::checkCount ) {
+			if ( e->checkcount == anCollisionModelDetectLocal::checkCount ) {
 				continue;
 			}
 			// set edge check count
-			e->checkcount = aRcCollisionModelDetectionLocal::checkCount;
+			e->checkcount = anCollisionModelDetectLocal::checkCount;
 			// can never collide with internal edges
 			if ( e->internal ) {
 				continue;
@@ -618,11 +618,11 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 			for ( k = 0; k < 2; k++ ) {
 				v = tw->model->vertices + e->vertexNum[k ^ INTSIGNBITSET( edgeNum )];
 				// if this vertex is already checked
-				if ( v->checkcount == aRcCollisionModelDetectionLocal::checkCount ) {
+				if ( v->checkcount == anCollisionModelDetectLocal::checkCount ) {
 					continue;
 				}
 				// set vertex check count
-				v->checkcount = aRcCollisionModelDetectionLocal::checkCount;
+				v->checkcount = anCollisionModelDetectLocal::checkCount;
 
 				// if the vertex is outside the trace bounds
 				if ( !tw->bounds.ContainsPoint( v->p ) ) {
@@ -637,7 +637,7 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 				for ( j = 0; j < tw->numPolys; j++ ) {
 					bp = tw->polys + j;
 					if ( bp->used ) {
-						aRcCollisionModelDetectionLocal::TranslateVertexThroughTrmPolygon( tw, bp, p, v, endp, *pl );
+						anCollisionModelDetectLocal::TranslateVertexThroughTrmPolygon( tw, bp, p, v, endp, *pl );
 					}
 				}
 			}
@@ -666,10 +666,10 @@ bool aRcCollisionModelDetectionLocal::TranslateTrmThroughPolygon( cm_traceWork_t
 
 /*
 ================
-aRcCollisionModelDetectionLocal::SetupTrm
+anCollisionModelDetectLocal::SetupTrm
 ================
 */
-void aRcCollisionModelDetectionLocal::SetupTrm( cm_traceWork_t *tw, const arcTraceModel *trm ) {
+void anCollisionModelDetectLocal::SetupTrm( cm_traceWork_t *tw, const anTraceModel *trm ) {
 	// vertices
 	tw->numVerts = trm->numVerts;
 	for ( int i = 0; i < trm->numVerts; i++ ) {
@@ -699,11 +699,11 @@ void aRcCollisionModelDetectionLocal::SetupTrm( cm_traceWork_t *tw, const arcTra
 
 /*
 ================
-aRcCollisionModelDetectionLocal::SetupTranslationHeartPlanes
+anCollisionModelDetectLocal::SetupTranslationHeartPlanes
 ================
 */
-void aRcCollisionModelDetectionLocal::SetupTranslationHeartPlanes( cm_traceWork_t *tw ) {
-	arcVec3 dir, normal1, normal2;
+void anCollisionModelDetectLocal::SetupTranslationHeartPlanes( cm_traceWork_t *tw ) {
+	anVec3 dir, normal1, normal2;
 
 	// calculate trace heart planes
 	dir = tw->dir;
@@ -717,45 +717,45 @@ void aRcCollisionModelDetectionLocal::SetupTranslationHeartPlanes( cm_traceWork_
 
 /*
 ================
-aRcCollisionModelDetectionLocal::Translation
+anCollisionModelDetectLocal::Translation
 ================
 */
 #ifdef _DEBUG
 static int entered = 0;
 #endif
 
-void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVec3 &start, const arcVec3 &end,
-										const arcTraceModel *trm, const arcMat3 &trmAxis, int contentMask,
-										cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
+void anCollisionModelDetectLocal::Translation( trace_t *results, const anVec3 &start, const anVec3 &end,
+										const anTraceModel *trm, const anMat3 &trmAxis, int contentMask,
+										cmHandle_t model, const anVec3 &modelOrigin, const anMat3 &modelAxis ) {
 
 	int i, j;
 	float dist;
 	bool model_rotated, trm_rotated;
-	arcVec3 dir1, dir2, dir;
-	arcMat3 invModelAxis, tmpAxis;
+	anVec3 dir1, dir2, dir;
+	anMat3 invModelAxis, tmpAxis;
 	cm_trmPolygon_t *poly;
 	cm_trmEdge_t *edge;
 	cm_trmVertex_t *vert;
 	ALIGN16( static cm_traceWork_t tw );
 
-	assert( ((byte *)&start) < ((byte *)results) || ((byte *)&start) >= (((byte *)results) + sizeof( trace_t )) );
-	assert( ((byte *)&end) < ((byte *)results) || ((byte *)&end) >= (((byte *)results) + sizeof( trace_t )) );
-	assert( ((byte *)&trmAxis) < ((byte *)results) || ((byte *)&trmAxis) >= (((byte *)results) + sizeof( trace_t )) );
+	assert( ((byte *)&start) < ((byte *)results) || ((byte *)&start) >= (((byte *)results) + sizeof( trace_t ) ) );
+	assert( ((byte *)&end) < ((byte *)results) || ((byte *)&end) >= (((byte *)results) + sizeof( trace_t ) ) );
+	assert( ((byte *)&trmAxis) < ((byte *)results) || ((byte *)&trmAxis) >= (((byte *)results) + sizeof( trace_t ) ) );
 
 	memset( results, 0, sizeof( *results ) );
 
-	if ( model < 0 || model > MAX_SUBMODELS || model > aRcCollisionModelDetectionLocal::maxModels ) {
-		common->Printf( "aRcCollisionModelDetectionLocal::Translation: invalid model handle\n" );
+	if ( model < 0 || model > MAX_SUBMODELS || model > anCollisionModelDetectLocal::maxModels ) {
+		common->Printf( "anCollisionModelDetectLocal::Translation: invalid model handle\n" );
 		return;
 	}
-	if ( !aRcCollisionModelDetectionLocal::models[model] ) {
-		common->Printf( "aRcCollisionModelDetectionLocal::Translation: invalid model\n" );
+	if ( !anCollisionModelDetectLocal::models[model] ) {
+		common->Printf( "anCollisionModelDetectLocal::Translation: invalid model\n" );
 		return;
 	}
 
 	// if case special position test
 	if ( start[0] == end[0] && start[1] == end[1] && start[2] == end[2] ) {
-		aRcCollisionModelDetectionLocal::ContentsTrm( results, start, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
+		anCollisionModelDetectLocal::ContentsTrm( results, start, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
 		return;
 	}
 
@@ -763,10 +763,10 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 	bool startsolid = false;
 	// test whether or not stuck to begin with
 	if ( cm_debugCollision.GetBool() ) {
-		if ( !entered && !aRcCollisionModelDetectionLocal::getContacts ) {
+		if ( !entered && !anCollisionModelDetectLocal::getContacts ) {
 			entered = 1;
 			// if already messed up to begin with
-			if ( aRcCollisionModelDetectionLocal::Contents( start, trm, trmAxis, -1, model, modelOrigin, modelAxis ) & contentMask ) {
+			if ( anCollisionModelDetectLocal::Contents( start, trm, trmAxis, -1, model, modelOrigin, modelAxis ) & contentMask ) {
 				startsolid = true;
 			}
 			entered = 0;
@@ -774,7 +774,7 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 	}
 #endif
 
-	aRcCollisionModelDetectionLocal::checkCount++;
+	anCollisionModelDetectLocal::checkCount++;
 
 	tw.trace.fraction = 1.0f;
 	tw.trace.c.contents = 0;
@@ -784,11 +784,11 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 	tw.rotation = false;
 	tw.positionTest = false;
 	tw.quickExit = false;
-	tw.getContacts = aRcCollisionModelDetectionLocal::getContacts;
-	tw.contacts = aRcCollisionModelDetectionLocal::contacts;
-	tw.maxContacts = aRcCollisionModelDetectionLocal::maxContacts;
+	tw.getContacts = anCollisionModelDetectLocal::getContacts;
+	tw.contacts = anCollisionModelDetectLocal::contacts;
+	tw.maxContacts = anCollisionModelDetectLocal::maxContacts;
 	tw.numContacts = 0;
-	tw.model = aRcCollisionModelDetectionLocal::models[model];
+	tw.model = anCollisionModelDetectLocal::models[model];
 	tw.start = start - modelOrigin;
 	tw.end = end - modelOrigin;
 	tw.dir = end - start;
@@ -824,7 +824,7 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 		tw.size.Zero();
 
 		// setup trace heart planes
-		aRcCollisionModelDetectionLocal::SetupTranslationHeartPlanes( &tw );
+		anCollisionModelDetectLocal::SetupTranslationHeartPlanes( &tw );
 		tw.maxDistFromHeartPlane1 = CM_BOX_EPSILON;
 		tw.maxDistFromHeartPlane2 = CM_BOX_EPSILON;
 		// collision with single point
@@ -835,7 +835,7 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 		tw.numEdges = tw.numPolys = 0;
 		tw.pointTrace = true;
 		// trace through the model
-		aRcCollisionModelDetectionLocal::TraceThroughModel( &tw );
+		anCollisionModelDetectLocal::TraceThroughModel( &tw );
 		// store results
 		*results = tw.trace;
 		results->endpos = start + results->fraction * (end - start);
@@ -850,7 +850,7 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 			results->c.point += modelOrigin;
 			results->c.dist += modelOrigin * results->c.normal;
 		}
-		aRcCollisionModelDetectionLocal::numContacts = tw.numContacts;
+		anCollisionModelDetectLocal::numContacts = tw.numContacts;
 		return;
 	}
 
@@ -860,12 +860,12 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 		results->endpos = start;
 		results->endAxis = trmAxis;
 		results->c.normal = vec3_origin;
-		results->c.material = NULL;
+		results->c.material = nullptr;
 		results->c.point = start;
 		if ( session->rw ) {
 			session->rw->DebugArrow( colorRed, start, end, 1 );
 		}
-		common->Printf( "aRcCollisionModelDetectionLocal::Translation: huge translation\n" );
+		common->Printf( "anCollisionModelDetectLocal::Translation: huge translation\n" );
 		return;
 	}
 
@@ -873,7 +873,7 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 	tw.size.Clear();
 
 	// setup trm structure
-	aRcCollisionModelDetectionLocal::SetupTrm( &tw, trm );
+	anCollisionModelDetectLocal::SetupTrm( &tw, trm );
 
 	trm_rotated = trmAxis.IsRotated();
 
@@ -990,15 +990,15 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 			tw.bounds[0][i] = tw.end[i] + tw.size[0][i] - CM_BOX_EPSILON;
 			tw.bounds[1][i] = tw.start[i] + tw.size[1][i] + CM_BOX_EPSILON;
 		}
-		if ( arcMath::Fabs( tw.size[0][i] ) > arcMath::Fabs( tw.size[1][i] ) ) {
-			tw.extents[i] = arcMath::Fabs( tw.size[0][i] ) + CM_BOX_EPSILON;
+		if ( anMath::Fabs( tw.size[0][i] ) > anMath::Fabs( tw.size[1][i] ) ) {
+			tw.extents[i] = anMath::Fabs( tw.size[0][i] ) + CM_BOX_EPSILON;
 		} else {
-			tw.extents[i] = arcMath::Fabs( tw.size[1][i] ) + CM_BOX_EPSILON;
+			tw.extents[i] = anMath::Fabs( tw.size[1][i] ) + CM_BOX_EPSILON;
 		}
 	}
 
 	// setup trace heart planes
-	aRcCollisionModelDetectionLocal::SetupTranslationHeartPlanes( &tw );
+	anCollisionModelDetectLocal::SetupTranslationHeartPlanes( &tw );
 	tw.maxDistFromHeartPlane1 = 0;
 	tw.maxDistFromHeartPlane2 = 0;
 	// calculate maximum trm vertex distance from both heart planes
@@ -1006,11 +1006,11 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 		if ( !vert->used ) {
 			continue;
 		}
-		dist = arcMath::Fabs( tw.heartPlane1.Distance( vert->p ) );
+		dist = anMath::Fabs( tw.heartPlane1.Distance( vert->p ) );
 		if ( dist > tw.maxDistFromHeartPlane1 ) {
 			tw.maxDistFromHeartPlane1 = dist;
 		}
-		dist = arcMath::Fabs( tw.heartPlane2.Distance( vert->p ) );
+		dist = anMath::Fabs( tw.heartPlane2.Distance( vert->p ) );
 		if ( dist > tw.maxDistFromHeartPlane2 ) {
 			tw.maxDistFromHeartPlane2 = dist;
 		}
@@ -1020,7 +1020,7 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 	tw.maxDistFromHeartPlane2 += CM_BOX_EPSILON;
 
 	// trace through the model
-	aRcCollisionModelDetectionLocal::TraceThroughModel( &tw );
+	anCollisionModelDetectLocal::TraceThroughModel( &tw );
 
 	// if we're getting contacts
 	if ( tw.getContacts ) {
@@ -1037,7 +1037,7 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 				tw.contacts[i].dist += modelOrigin * tw.contacts[i].normal;
 			}
 		}
-		aRcCollisionModelDetectionLocal::numContacts = tw.numContacts;
+		anCollisionModelDetectLocal::numContacts = tw.numContacts;
 	} else {
 		// store results
 		*results = tw.trace;
@@ -1062,16 +1062,16 @@ void aRcCollisionModelDetectionLocal::Translation( trace_t *results, const arcVe
 #ifdef _DEBUG
 	// test for missed collisions
 	if ( cm_debugCollision.GetBool() ) {
-		if ( !entered && !aRcCollisionModelDetectionLocal::getContacts ) {
+		if ( !entered && !anCollisionModelDetectLocal::getContacts ) {
 			entered = 1;
 			// if the trm is stuck in the model
-			if ( aRcCollisionModelDetectionLocal::Contents( results->endpos, trm, trmAxis, -1, model, modelOrigin, modelAxis ) & contentMask ) {
+			if ( anCollisionModelDetectLocal::Contents( results->endpos, trm, trmAxis, -1, model, modelOrigin, modelAxis ) & contentMask ) {
 				trace_t tr;
 
 				// test where the trm is stuck in the model
-				aRcCollisionModelDetectionLocal::Contents( results->endpos, trm, trmAxis, -1, model, modelOrigin, modelAxis );
+				anCollisionModelDetectLocal::Contents( results->endpos, trm, trmAxis, -1, model, modelOrigin, modelAxis );
 				// re-run collision detection to find out where it failed
-				aRcCollisionModelDetectionLocal::Translation( &tr, start, end, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
+				anCollisionModelDetectLocal::Translation( &tr, start, end, trm, trmAxis, contentMask, model, modelOrigin, modelAxis );
 			}
 			entered = 0;
 		}

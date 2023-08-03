@@ -1,32 +1,5 @@
-/*
-===========================================================================
 
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "AASBuild_local.h"
@@ -42,37 +15,37 @@ If you have questions concerning this license or the applicable additional terms
 #define AAS_PLANE_DIST_EPSILON			0.01f
 
 
-ARCHashIndex *aas_vertexHash;
-ARCHashIndex *aas_edgeHash;
-arcBounds aas_vertexBounds;
+anHashIndex *aas_vertexHash;
+anHashIndex *aas_edgeHash;
+anBounds aas_vertexBounds;
 int aas_vertexShift;
 
 /*
 ================
-idAASBuild::SetupHash
+anSEASBuild::SetupHash
 ================
 */
-void idAASBuild::SetupHash( void ) {
-	aas_vertexHash = new ARCHashIndex( VERTEX_HASH_SIZE, 1024 );
-	aas_edgeHash = new ARCHashIndex( EDGE_HASH_SIZE, 1024 );
+void anSEASBuild::SetupHash( void ) {
+	aas_vertexHash = new anHashIndex( VERTEX_HASH_SIZE, 1024 );
+	aas_edgeHash = new anHashIndex( EDGE_HASH_SIZE, 1024 );
 }
 
 /*
 ================
-idAASBuild::ShutdownHash
+anSEASBuild::ShutdownHash
 ================
 */
-void idAASBuild::ShutdownHash( void ) {
+void anSEASBuild::ShutdownHash( void ) {
 	delete aas_vertexHash;
 	delete aas_edgeHash;
 }
 
 /*
 ================
-idAASBuild::ClearHash
+anSEASBuild::ClearHash
 ================
 */
-void idAASBuild::ClearHash( const arcBounds &bounds ) {
+void anSEASBuild::ClearHash( const anBounds &bounds ) {
 	int i;
 	float f, max;
 
@@ -98,10 +71,10 @@ void idAASBuild::ClearHash( const arcBounds &bounds ) {
 
 /*
 ================
-idAASBuild::HashVec
+anSEASBuild::HashVec
 ================
 */
-ARC_INLINE int idAASBuild::HashVec( const arcVec3 &vec ) {
+ARC_INLINE int anSEASBuild::HashVec( const anVec3 &vec ) {
 	int x, y;
 
 	x = (( ( int ) (vec[0] - aas_vertexBounds[0].x + 0.5) ) + 2) >> 2;
@@ -111,30 +84,30 @@ ARC_INLINE int idAASBuild::HashVec( const arcVec3 &vec ) {
 
 /*
 ================
-idAASBuild::GetVertex
+anSEASBuild::GetVertex
 ================
 */
-bool idAASBuild::GetVertex( const arcVec3 &v, int *vertexNum ) {
+bool anSEASBuild::GetVertex( const anVec3 &v, int *vertexNum ) {
 	int i, hashKey, vn;
-	aasVertex_t vert, *p;
+	seasVertex_t vert, *p;
 
 	for ( i = 0; i < 3; i++ ) {
-		if ( arcMath::Fabs( v[i] - arcMath::Rint( v[i] ) ) < INTEGRAL_EPSILON ) {
-			vert[i] = arcMath::Rint( v[i] );
+		if ( anMath::Fabs( v[i] - anMath::Rint( v[i] ) ) < INTEGRAL_EPSILON ) {
+			vert[i] = anMath::Rint( v[i] );
 		}
 		else {
 			vert[i] = v[i];
 		}
 	}
 
-	hashKey = idAASBuild::HashVec( vert );
+	hashKey = anSEASBuild::HashVec( vert );
 
 	for ( vn = aas_vertexHash->First( hashKey ); vn >= 0; vn = aas_vertexHash->Next( vn ) ) {
 		p = &file->vertices[vn];
 		// first compare z-axis because hash is based on x-y plane
-		if (arcMath::Fabs( vert.z - p->z ) < VERTEX_EPSILON &&
-			arcMath::Fabs( vert.x - p->x ) < VERTEX_EPSILON &&
-			arcMath::Fabs( vert.y - p->y ) < VERTEX_EPSILON )
+		if (anMath::Fabs( vert.z - p->z ) < VERTEX_EPSILON &&
+			anMath::Fabs( vert.x - p->x ) < VERTEX_EPSILON &&
+			anMath::Fabs( vert.y - p->y ) < VERTEX_EPSILON )
 		{
 			*vertexNum = vn;
 			return true;
@@ -150,13 +123,13 @@ bool idAASBuild::GetVertex( const arcVec3 &v, int *vertexNum ) {
 
 /*
 ================
-idAASBuild::GetEdge
+anSEASBuild::GetEdge
 ================
 */
-bool idAASBuild::GetEdge( const arcVec3 &v1, const arcVec3 &v2, int *edgeNum, int v1num ) {
+bool anSEASBuild::GetEdge( const anVec3 &v1, const anVec3 &v2, int *edgeNum, int v1num ) {
 	int v2num, hashKey, e;
 	int *vertexNum;
-	aasEdge_t edge;
+	seasEdge_t edge;
 	bool found;
 
 	if ( v1num != -1 ) {
@@ -210,14 +183,14 @@ bool idAASBuild::GetEdge( const arcVec3 &v1, const arcVec3 &v2, int *edgeNum, in
 
 /*
 ================
-idAASBuild::GetFaceForPortal
+anSEASBuild::GetFaceForPortal
 ================
 */
-bool idAASBuild::GetFaceForPortal( idBrushBSPPortal *portal, int side, int *faceNum ) {
+bool anSEASBuild::GetFaceForPortal( idBrushBSPPortal *portal, int side, int *faceNum ) {
 	int i, j, v1num;
 	int numFaceEdges, faceEdges[MAX_POINTS_ON_WINDING];
-	arcWinding *w;
-	aasFace_t face;
+	anWinding *w;
+	seasFace_t face;
 
 	if ( portal->GetFaceNum() > 0 ) {
 		if ( side ) {
@@ -283,13 +256,13 @@ bool idAASBuild::GetFaceForPortal( idBrushBSPPortal *portal, int side, int *face
 
 /*
 ================
-idAASBuild::GetAreaForLeafNode
+anSEASBuild::GetAreaForLeafNode
 ================
 */
-bool idAASBuild::GetAreaForLeafNode( idBrushBSPNode *node, int *areaNum ) {
+bool anSEASBuild::GetAreaForLeafNode( idBrushBSPNode *node, int *areaNum ) {
 	int s, faceNum;
 	idBrushBSPPortal *p;
-	aasArea_t area;
+	seasArea_t area;
 
 	if ( node->GetAreaNum() ) {
 		*areaNum = -node->GetAreaNum();
@@ -301,8 +274,8 @@ bool idAASBuild::GetAreaForLeafNode( idBrushBSPNode *node, int *areaNum ) {
 	area.contents = node->GetContents();
 	area.firstFace = file->faceIndex.Num();
 	area.numFaces = 0;
-	area.reach = NULL;
-	area.rev_reach = NULL;
+	area.reach = nullptr;
+	area.rev_reach = nullptr;
 
 	for ( p = node->GetPortals(); p; p = p->Next(s) ) {
 		s = (p->GetNode(1 ) == node);
@@ -338,12 +311,12 @@ bool idAASBuild::GetAreaForLeafNode( idBrushBSPNode *node, int *areaNum ) {
 
 /*
 ================
-idAASBuild::StoreTree_r
+anSEASBuild::StoreTree_r
 ================
 */
-int idAASBuild::StoreTree_r( idBrushBSPNode *node ) {
+int anSEASBuild::StoreTree_r( idBrushBSPNode *node ) {
 	int areaNum, nodeNum, child0, child1;
-	aasNode_t aasNode;
+	seasNode_t aasNode;
 
 	if ( !node ) {
 		return 0;
@@ -381,7 +354,7 @@ int idAASBuild::StoreTree_r( idBrushBSPNode *node ) {
 
 /*
 ================
-idAASBuild::GetSizeEstimate_r
+anSEASBuild::GetSizeEstimate_r
 ================
 */
 typedef struct sizeEstimate_s {
@@ -391,7 +364,7 @@ typedef struct sizeEstimate_s {
 	int			numNodes;
 } sizeEstimate_t;
 
-void idAASBuild::GetSizeEstimate_r( idBrushBSPNode *parent, idBrushBSPNode *node, struct sizeEstimate_s &size ) {
+void anSEASBuild::GetSizeEstimate_r( idBrushBSPNode *parent, idBrushBSPNode *node, struct sizeEstimate_s &size ) {
 	idBrushBSPPortal *p;
 	int s;
 
@@ -424,10 +397,10 @@ void idAASBuild::GetSizeEstimate_r( idBrushBSPNode *parent, idBrushBSPNode *node
 
 /*
 ================
-idAASBuild::SetSizeEstimate
+anSEASBuild::SetSizeEstimate
 ================
 */
-void idAASBuild::SetSizeEstimate( const idBrushBSP &bsp, idAASFileLocal *file ) {
+void anSEASBuild::SetSizeEstimate( const idBrushBSP &bsp, anSEASFileLocal *file ) {
 	sizeEstimate_t size;
 
 	size.numEdgeIndexes = 1;
@@ -435,7 +408,7 @@ void idAASBuild::SetSizeEstimate( const idBrushBSP &bsp, idAASFileLocal *file ) 
 	size.numAreas = 1;
 	size.numNodes = 1;
 
-	GetSizeEstimate_r( NULL, bsp.GetRootNode(), size );
+	GetSizeEstimate_r( nullptr, bsp.GetRootNode(), size );
 
 	file->planeList.Resize( size.numNodes / 2, 1024 );
 	file->vertices.Resize( size.numEdgeIndexes / 3, 1024 );
@@ -449,21 +422,21 @@ void idAASBuild::SetSizeEstimate( const idBrushBSP &bsp, idAASFileLocal *file ) 
 
 /*
 ================
-idAASBuild::StoreFile
+anSEASBuild::StoreFile
 ================
 */
-bool idAASBuild::StoreFile( const idBrushBSP &bsp ) {
-	aasEdge_t edge;
-	aasFace_t face;
-	aasArea_t area;
-	aasNode_t node;
+bool anSEASBuild::StoreFile( const idBrushBSP &bsp ) {
+	seasEdge_t edge;
+	seasFace_t face;
+	seasArea_t area;
+	seasNode_t node;
 
 	common->Printf( "[Store AAS]\n" );
 
 	SetupHash();
 	ClearHash( bsp.GetTreeBounds() );
 
-	file = new idAASFileLocal();
+	file = new anSEASFileLocal();
 
 	file->Clear();
 

@@ -71,7 +71,7 @@ typedef INT32 bit_buf_type;	/* type of bit-extraction buffer */
 /* If long is > 32 bits on your machine, and shifting/masking longs is
  * reasonably fast, making bit_buf_type be long and setting BIT_BUF_SIZE
  * appropriately should be a win.  Unfortunately we can't do this with
- * something like  #define BIT_BUF_SIZE (sizeof(bit_buf_type)*8)
+ * something like  #define BIT_BUF_SIZE ( sizeof(bit_buf_type)*8)
  * because not all machines measure sizeof in 8-bit bytes.
  */
 
@@ -124,7 +124,7 @@ typedef struct {		/* Bitreading working state within an MCU */
  * before using GET_BITS, PEEK_BITS, or DROP_BITS.
  * The variables get_buffer and bits_left are assumed to be locals,
  * but the state struct might not be (jpeg_huff_decode needs this).
- *	CHECK_BIT_BUFFER(state,n,action);
+ *	CHECK_BIT_BUFFER( state,n,action);
  *		Ensure there are N bits in get_buffer; if suspend, take action.
  *      val = GET_BITS(n);
  *		Fetch next N bits.
@@ -136,17 +136,17 @@ typedef struct {		/* Bitreading working state within an MCU */
  * is evaluated multiple times.
  */
 
-#define CHECK_BIT_BUFFER(state,nbits,action) \
+#define CHECK_BIT_BUFFER( state,nbits,action) \
 	{ if (bits_left < (nbits) ) {  \
-	    if ( ! jpeg_fill_bit_buffer(&(state),get_buffer,bits_left,nbits) )  \
+	    if ( ! jpeg_fill_bit_buffer(&( state),get_buffer,bits_left,nbits) )  \
 	      { action; }  \
-	    get_buffer = (state).get_buffer; bits_left = (state).bits_left; } }
+	    get_buffer = ( state).get_buffer; bits_left = ( state).bits_left; } }
 
 #define GET_BITS(nbits) \
-	(( ( int ) (get_buffer >> (bits_left -= (nbits) )) ) & ((1<<(nbits) )-1 ) )
+	(( ( int ) (get_buffer >> (bits_left -= (nbits) ) ) ) & ((1<<(nbits) )-1 ) )
 
 #define PEEK_BITS(nbits) \
-	(( ( int ) (get_buffer >> (bits_left -  (nbits) )) ) & ((1<<(nbits) )-1 ) )
+	(( ( int ) (get_buffer >> (bits_left -  (nbits) ) ) ) & ((1<<(nbits) )-1 ) )
 
 #define DROP_BITS(nbits) \
 	(bits_left -= (nbits) )

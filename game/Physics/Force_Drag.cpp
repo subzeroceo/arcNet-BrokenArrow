@@ -1,21 +1,20 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idForce, idForce_Drag )
-END_CLASS
+CLASS_DECLARATION( anForce, anForce_Drag )END_CLASS
 
 /*
 ================
-idForce_Drag::idForce_Drag
+anForce_Drag::anForce_Drag
 ================
 */
-idForce_Drag::idForce_Drag( void ) {
+anForce_Drag::anForce_Drag( void ) {
 	damping			= 0.5f;
 	dragPosition	= vec3_zero;
-	physics			= NULL;
+	physics			= nullptr;
 	id				= 0;
 	p				= vec3_zero;
 	dragPosition	= vec3_zero;
@@ -23,18 +22,18 @@ idForce_Drag::idForce_Drag( void ) {
 
 /*
 ================
-idForce_Drag::~idForce_Drag
+anForce_Drag::~anForce_Drag
 ================
 */
-idForce_Drag::~idForce_Drag( void ) {
+anForce_Drag::~anForce_Drag( void ) {
 }
 
 /*
 ================
-idForce_Drag::Init
+anForce_Drag::Init
 ================
 */
-void idForce_Drag::Init( float damping ) {
+void anForce_Drag::Init( float damping ) {
 	if ( damping >= 0.0f && damping < 1.0f ) {
 		this->damping = damping;
 	}
@@ -42,10 +41,10 @@ void idForce_Drag::Init( float damping ) {
 
 /*
 ================
-idForce_Drag::SetPhysics
+anForce_Drag::SetPhysics
 ================
 */
-void idForce_Drag::SetPhysics( idPhysics *phys, int id, const arcVec3 &p ) {
+void anForce_Drag::SetPhysics( anPhysics *phys, int id, const anVec3 &p ) {
 	this->physics = phys;
 	this->id = id;
 	this->p = p;
@@ -53,49 +52,49 @@ void idForce_Drag::SetPhysics( idPhysics *phys, int id, const arcVec3 &p ) {
 
 /*
 ================
-idForce_Drag::SetDragPosition
+anForce_Drag::SetDragPosition
 ================
 */
-void idForce_Drag::SetDragPosition( const arcVec3 &pos ) {
+void anForce_Drag::SetDragPosition( const anVec3 &pos ) {
 	this->dragPosition = pos;
 }
 
 /*
 ================
-idForce_Drag::GetDragPosition
+anForce_Drag::GetDragPosition
 ================
 */
-const arcVec3 &idForce_Drag::GetDragPosition( void ) const {
+const anVec3 &anForce_Drag::GetDragPosition( void ) const {
 	return this->dragPosition;
 }
 
 /*
 ================
-idForce_Drag::GetDraggedPosition
+anForce_Drag::GetDraggedPosition
 ================
 */
-const arcVec3 idForce_Drag::GetDraggedPosition( void ) const {
+const anVec3 anForce_Drag::GetDraggedPosition( void ) const {
 	return ( physics->GetOrigin( id ) + p * physics->GetAxis( id ) );
 }
 
 /*
 ================
-idForce_Drag::Evaluate
+anForce_Drag::Evaluate
 ================
 */
-void idForce_Drag::Evaluate( int time ) {
+void anForce_Drag::Evaluate( int time ) {
 	float l1, l2, mass;
-	arcVec3 dragOrigin, dir1, dir2, velocity, centerOfMass;
-	arcMat3 inertiaTensor;
-	idRotation rotation;
-	idClipModel *clipModel;
+	anVec3 dragOrigin, dir1, dir2, velocity, centerOfMass;
+	anMat3 inertiaTensor;
+	anRotation rotation;
+	anClipModel *clipModel;
 
 	if ( !physics ) {
 		return;
 	}
 
 	clipModel = physics->GetClipModel( id );
-	if ( clipModel != NULL && clipModel->IsTraceModel() ) {
+	if ( clipModel != nullptr && clipModel->IsTraceModel() ) {
 		clipModel->GetMassProperties( 1.0f, mass, centerOfMass, inertiaTensor );
 	} else {
 		centerOfMass.Zero();
@@ -109,23 +108,23 @@ void idForce_Drag::Evaluate( int time ) {
 	l1 = dir1.Normalize();
 	l2 = dir2.Normalize();
 
-	rotation.Set( centerOfMass, dir2.Cross( dir1 ), RAD2DEG( arcMath::ACos( dir1 * dir2 ) ) );
+	rotation.Set( centerOfMass, dir2.Cross( dir1 ), RAD2DEG( anMath::ACos( dir1 * dir2 ) ) );
 	physics->SetAngularVelocity( rotation.ToAngularVelocity() / MS2SEC( gameLocal.GetMSec() ), id );
 
-// RAVEN BEGIN
+
 // bdube: use GetMSec access rather than USERCMD_TIME
-	velocity = physics->GetLinearVelocity( id ) * damping + dir1 * ( ( l1 - l2 ) * ( 1.0f - damping ) / MS2SEC( gameLocal.GetMSec ( ) ) );
-// RAVEN END
+	velocity = physics->GetLinearVelocity( id ) * damping + dir1 * ( ( l1 - l2 ) * ( 1.0f - damping ) / MS2SEC( gameLocal.GetMSec() ) );
+
 	physics->SetLinearVelocity( velocity, id );
 }
 
 /*
 ================
-idForce_Drag::RemovePhysics
+anForce_Drag::RemovePhysics
 ================
 */
-void idForce_Drag::RemovePhysics( const idPhysics *phys ) {
+void anForce_Drag::RemovePhysics( const anPhysics *phys ) {
 	if ( physics == phys ) {
-		physics = NULL;
+		physics = nullptr;
 	}
 }

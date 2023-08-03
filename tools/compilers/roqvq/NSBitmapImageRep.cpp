@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "roq.h"
@@ -33,7 +33,7 @@ If you have questions concerning this license or the applicable additional terms
 void R_LoadImage( const char *name, byte **pic, int *width, int *height, ARC_TIME_T *timestamp, bool makePowerOf2 );
 
 NSBitmapImageRep::NSBitmapImageRep( void ) {
-	bmap = NULL;
+	bmap = nullptr;
 	width = 0;
 	height = 0;
 	timestamp = 0;
@@ -57,7 +57,7 @@ void R_StaticFree( void *data );
 
 NSBitmapImageRep::~NSBitmapImageRep() {
 	R_StaticFree( bmap );
-	bmap = NULL;
+	bmap = nullptr;
 }
 
 int NSBitmapImageRep::samplesPerPixel( void ) {

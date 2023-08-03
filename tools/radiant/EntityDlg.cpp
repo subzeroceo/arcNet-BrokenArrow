@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -44,12 +44,12 @@ void	Select_Ungroup();
 // CEntityDlg dialog
 
 IMPLEMENT_DYNAMIC(CEntityDlg, CDialog)
-CEntityDlg::CEntityDlg(CWnd* pParent /*=NULL*/)
+CEntityDlg::CEntityDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CEntityDlg::IDD, pParent)
 {
-	editEntity = NULL;
+	editEntity = nullptr;
 	multipleEntities = false;
-	currentAnimation = NULL;
+	currentAnimation = nullptr;
 }
 
 CEntityDlg::~CEntityDlg()
@@ -158,7 +158,7 @@ END_MESSAGE_MAP()
 
 void CEntityDlg::OnSize(UINT nType, int cx, int cy)
 {
-	if (staticTitle.GetSafeHwnd() == NULL) {
+	if (staticTitle.GetSafeHwnd() == nullptr ) {
 		return;
 	}
 	CDialog::OnSize(nType, cx, cy);
@@ -166,38 +166,38 @@ void CEntityDlg::OnSize(UINT nType, int cx, int cy)
 	GetClientRect(rect);
 	int bh = ( float )rect.Height() * (rect.Height() - 210) / rect.Height() / 2;
 	staticTitle.GetWindowRect(crect);
-	staticTitle.SetWindowPos(NULL, 4, 4, rect.Width() -8, crect.Height(), SWP_SHOWWINDOW);
+	staticTitle.SetWindowPos(nullptr, 4, 4, rect.Width() -8, crect.Height(), SWP_SHOWWINDOW);
 	int top = 4 + crect.Height() + 4;
 	comboClass.GetWindowRect(crect);
 	btnCreate.GetWindowRect(crect2);
-	comboClass.SetWindowPos(NULL, 4, top, rect.Width() - 12 - crect2.Width(), crect.Height(), SWP_SHOWWINDOW);
-	btnCreate.SetWindowPos(NULL, rect.Width() - crect2.Width() - 4, top, crect2.Width(), crect.Height(), SWP_SHOWWINDOW);
+	comboClass.SetWindowPos(nullptr, 4, top, rect.Width() - 12 - crect2.Width(), crect.Height(), SWP_SHOWWINDOW);
+	btnCreate.SetWindowPos(nullptr, rect.Width() - crect2.Width() - 4, top, crect2.Width(), crect.Height(), SWP_SHOWWINDOW);
 	top += crect.Height() + 4;
-	listVars.SetWindowPos(NULL, 4, top, rect.Width() - 8, bh, SWP_SHOWWINDOW);
+	listVars.SetWindowPos(nullptr, 4, top, rect.Width() - 8, bh, SWP_SHOWWINDOW);
 	top += bh + 4;
-	listKeyVal.SetWindowPos(NULL, 4, top, rect.Width() - 8, bh, SWP_SHOWWINDOW);
+	listKeyVal.SetWindowPos(nullptr, 4, top, rect.Width() - 8, bh, SWP_SHOWWINDOW);
 	top += bh + 4;
 	staticKey.GetWindowRect(crect);
-	staticKey.SetWindowPos(NULL, 4, top + 2, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
+	staticKey.SetWindowPos(nullptr, 4, top + 2, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
 	int left = 4 + crect.Width() + 4;
 	int pad = crect.Width();
 	editKey.GetWindowRect(crect);
-	editKey.SetWindowPos(NULL, left, top, rect.Width() - 12 - pad, crect.Height(), SWP_SHOWWINDOW);
+	editKey.SetWindowPos(nullptr, left, top, rect.Width() - 12 - pad, crect.Height(), SWP_SHOWWINDOW);
 	top += crect.Height() + 4;
 	staticVal.GetWindowRect(crect);
-	staticVal.SetWindowPos(NULL, 4, top + 2, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
+	staticVal.SetWindowPos(nullptr, 4, top + 2, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
 	editVal.GetWindowRect(crect);
 	bh = crect.Height();
-	editVal.SetWindowPos(NULL, left, top, rect.Width() - 16 - bh - pad, crect.Height(), SWP_SHOWWINDOW);
-	btnBrowse.SetWindowPos(NULL, rect.right - 4 - bh, top, bh, bh, SWP_SHOWWINDOW);
+	editVal.SetWindowPos(nullptr, left, top, rect.Width() - 16 - bh - pad, crect.Height(), SWP_SHOWWINDOW);
+	btnBrowse.SetWindowPos(nullptr, rect.right - 4 - bh, top, bh, bh, SWP_SHOWWINDOW);
 	top += crect.Height() + 8;
 	btnModel.GetWindowRect(crect);
-	btnModel.SetWindowPos(NULL, rect.right - 4 - crect.Width(), top + 8, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
-	btnSound.SetWindowPos(NULL, rect.right - 4 - crect.Width(), top + 12 + crect.Height(), crect.Width(), crect.Height(), SWP_SHOWWINDOW);
-	btnGui.SetWindowPos(NULL, rect.right - 4 - crect.Width(), top + 16 + crect.Height() * 2, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
-	btnParticle.SetWindowPos(NULL, rect.right - 8 - (crect.Width() * 2), top + 16 + crect.Height() * 2, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
-	btnSkin.SetWindowPos( NULL, rect.right - 8 - ( crect.Width() * 2 ), top + 12 + crect.Height(), crect.Width(), crect.Height(), SWP_SHOWWINDOW );
-	btnCurve.SetWindowPos( NULL, rect.right - 8 - ( crect.Width() * 2 ), top + 8, crect.Width(), crect.Height(), SWP_SHOWWINDOW );
+	btnModel.SetWindowPos(nullptr, rect.right - 4 - crect.Width(), top + 8, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
+	btnSound.SetWindowPos(nullptr, rect.right - 4 - crect.Width(), top + 12 + crect.Height(), crect.Width(), crect.Height(), SWP_SHOWWINDOW);
+	btnGui.SetWindowPos(nullptr, rect.right - 4 - crect.Width(), top + 16 + crect.Height() * 2, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
+	btnParticle.SetWindowPos(nullptr, rect.right - 8 - (crect.Width() * 2), top + 16 + crect.Height() * 2, crect.Width(), crect.Height(), SWP_SHOWWINDOW);
+	btnSkin.SetWindowPos( nullptr, rect.right - 8 - ( crect.Width() * 2 ), top + 12 + crect.Height(), crect.Width(), crect.Height(), SWP_SHOWWINDOW );
+	btnCurve.SetWindowPos( nullptr, rect.right - 8 - ( crect.Width() * 2 ), top + 8, crect.Width(), crect.Height(), SWP_SHOWWINDOW );
 
 	//*************************************
 	//animation controls
@@ -205,25 +205,25 @@ void CEntityDlg::OnSize(UINT nType, int cx, int cy)
 	int rightAnimAreaBorder = rect.right - 75 - crect.Width (); /*models, etc button width*/
 
 	btnStopAnim.GetWindowRect(crect);
-	btnStopAnim.SetWindowPos(NULL,rightAnimAreaBorder - crect.Width (),
+	btnStopAnim.SetWindowPos(nullptr,rightAnimAreaBorder - crect.Width (),
 		top + 8  ,crect.Width(),crect.Height(),SWP_SHOWWINDOW);
 
 	left = rightAnimAreaBorder - crect.Width() - 4;
 	btnPlayAnim.GetWindowRect(crect);
-	btnPlayAnim.SetWindowPos(NULL,left-crect.Width () ,top + 8 , crect.Width(),crect.Height(),SWP_SHOWWINDOW);
+	btnPlayAnim.SetWindowPos(nullptr,left-crect.Width () ,top + 8 , crect.Width(),crect.Height(),SWP_SHOWWINDOW);
 
 	left -= crect.Width() + 4;
 	cbAnimations.GetWindowRect(crect);
-	cbAnimations.SetWindowPos(NULL,left-crect.Width (),top + 8  ,crect.Width(),crect.Height(),SWP_SHOWWINDOW);
+	cbAnimations.SetWindowPos(nullptr,left-crect.Width (),top + 8  ,crect.Width(),crect.Height(),SWP_SHOWWINDOW);
 
 	staticFrame.GetWindowRect(crect);
-	staticFrame.SetWindowPos(NULL,rightAnimAreaBorder - crect.Width (),
+	staticFrame.SetWindowPos(nullptr,rightAnimAreaBorder - crect.Width (),
 		top + 34  ,crect.Width(),crect.Height(),SWP_SHOWWINDOW);
 
 	left = rightAnimAreaBorder - crect.Width () - 4;
 
 	slFrameSlider.GetWindowRect(crect);
-	slFrameSlider.SetWindowPos(NULL,left - crect.Width (),
+	slFrameSlider.SetWindowPos(nullptr,left - crect.Width (),
 	top + 32  ,crect.Width(),crect.Height(),SWP_SHOWWINDOW);
 
 	//*************************************
@@ -231,18 +231,18 @@ void CEntityDlg::OnSize(UINT nType, int cx, int cy)
 
 	btn135.GetWindowRect(crect);
 	bh = crect.Width();
-	btn135.SetWindowPos(NULL, 4, top, bh, bh, SWP_SHOWWINDOW);
-	btn90.SetWindowPos(NULL, 4 + 2 + bh, top, bh, bh, SWP_SHOWWINDOW);
-	btn45.SetWindowPos(NULL, 4 + 2 + 2 + bh * 2, top, bh, bh, SWP_SHOWWINDOW);
-	btnUp.SetWindowPos(NULL, 4 + 2 + 2 + 6 + bh * 3, top + bh / 2,bh,bh, SWP_SHOWWINDOW);
-	btnDown.SetWindowPos(NULL, 4 + 2 + 2 + 6 + bh *3, top + bh / 2 + bh + 2,bh,bh, SWP_SHOWWINDOW);
+	btn135.SetWindowPos(nullptr, 4, top, bh, bh, SWP_SHOWWINDOW);
+	btn90.SetWindowPos(nullptr, 4 + 2 + bh, top, bh, bh, SWP_SHOWWINDOW);
+	btn45.SetWindowPos(nullptr, 4 + 2 + 2 + bh * 2, top, bh, bh, SWP_SHOWWINDOW);
+	btnUp.SetWindowPos(nullptr, 4 + 2 + 2 + 6 + bh * 3, top + bh / 2,bh,bh, SWP_SHOWWINDOW);
+	btnDown.SetWindowPos(nullptr, 4 + 2 + 2 + 6 + bh *3, top + bh / 2 + bh + 2,bh,bh, SWP_SHOWWINDOW);
 	top += bh + 2;
-	btn180.SetWindowPos(NULL, 4, top, bh, bh, SWP_SHOWWINDOW);
-	btn360.SetWindowPos(NULL, 4 + 2 + 2 + bh * 2, top, bh, bh, SWP_SHOWWINDOW);
+	btn180.SetWindowPos(nullptr, 4, top, bh, bh, SWP_SHOWWINDOW);
+	btn360.SetWindowPos(nullptr, 4 + 2 + 2 + bh * 2, top, bh, bh, SWP_SHOWWINDOW);
 	top += bh + 2;
-	btn225.SetWindowPos(NULL, 4, top, bh, bh, SWP_SHOWWINDOW);
-	btn270.SetWindowPos(NULL, 4 + 2 + bh, top, bh, bh, SWP_SHOWWINDOW);
-	btn315.SetWindowPos(NULL, 4 + 2 + 2 + bh * 2, top, bh, bh, SWP_SHOWWINDOW);
+	btn225.SetWindowPos(nullptr, 4, top, bh, bh, SWP_SHOWWINDOW);
+	btn270.SetWindowPos(nullptr, 4 + 2 + bh, top, bh, bh, SWP_SHOWWINDOW);
+	btn315.SetWindowPos(nullptr, 4 + 2 + 2 + bh * 2, top, bh, bh, SWP_SHOWWINDOW);
 	Invalidate();
 }
 
@@ -306,7 +306,7 @@ const char *CEntityDlg::TranslateString(const char *buf) {
 }
 
 void CEntityDlg::UpdateFromListBox() {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	int c = listKeyVal.GetCount();
@@ -324,7 +324,7 @@ void CEntityDlg::SetKeyValPairs( bool updateAnims ) {
 		listKeyVal.ResetContent();
 		int c = editEntity->epairs.GetNumKeyVals();
 		for ( int i = 0; i < c; i++ ) {
-			const idKeyValue *kv = editEntity->epairs.GetKeyVal( i );
+			const anKeyValue *kv = editEntity->epairs.GetKeyVal( i );
 			CPropertyItem *pi = new CPropertyItem(kv->GetKey().c_str(), kv->GetValue().c_str(), PIT_EDIT, "" );
 			bool found = false;
 			int vc = editEntity->eclass->vars.Num();
@@ -392,7 +392,7 @@ void CEntityDlg::SetKeyValPairs( bool updateAnims ) {
 				cbAnimations.AddString( engineEdit->ANIM_GetAnimNameFromEntityDef( &editEntity->eclass->defArgs, i ) );
 			}
 
-			const idKeyValue* kv = editEntity->epairs.FindKey ( "anim" );
+			const anKeyValue* kv = editEntity->epairs.FindKey ( "anim" );
 			if ( kv ) {
 				int selIndex = cbAnimations.FindStringExact( 0 , kv->GetValue().c_str() );
 				if ( selIndex != -1 ) {
@@ -424,12 +424,12 @@ void CEntityDlg::OnLbnSelchangeListkeyval()
 		for ( i = 0; str[i] != '\t' && str[i] != '\0'; i++ ) {
 		}
 
-		arcNetString key = str.Left( i );
+		anString key = str.Left( i );
 		while (str[i] == '\t' && str[i] != '\0') {
 			i++;
 		}
 
-		arcNetString val = str.Right(str.GetLength() - i);
+		anString val = str.Right(str.GetLength() - i);
 
 		editKey.SetWindowText(key);
 		editVal.SetWindowText(val);
@@ -465,7 +465,7 @@ int TabCount = sizeof(TabOrder) / sizeof( int );
 void CEntityDlg::DelProp() {
 	CString key;
 
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 
@@ -595,7 +595,7 @@ BOOL CEntityDlg::PreTranslateMessage(MSG* pMsg)
  */
 void CEntityDlg::AddProp() {
 
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 
@@ -605,7 +605,7 @@ void CEntityDlg::AddProp() {
 
 	bool isName = (stricmp(Key, "name" ) == 0 );
 	bool isModel = static_cast<bool>((stricmp(Key, "model" ) == 0 && Value.GetLength() > 0 ) );
-	bool isOrigin = ( arcNetString::Icmp( Key, "origin" ) == 0 );
+	bool isOrigin = ( anString::Icmp( Key, "origin" ) == 0 );
 
 	if (multipleEntities) {
 		brush_t *b;
@@ -629,15 +629,15 @@ void CEntityDlg::AddProp() {
 		}
 
 		if ( isModel && !( editEntity->eclass->nShowFlags & ECLASS_WORLDSPAWN ) ) {
-			arcBounds	bo;
-			arcVec3	mins, maxs;
+			anBounds	bo;
+			anVec3	mins, maxs;
 
 			selected_brushes.next->modelHandle = renderModelManager->FindModel( Value );
-			if ( dynamic_cast<idRenderModelPrt*>( selected_brushes.next->modelHandle ) || dynamic_cast<ARCLiquidModel*>( selected_brushes.next->modelHandle ) ) {
+			if ( dynamic_cast<idRenderModelPrt*>( selected_brushes.next->modelHandle ) || dynamic_cast<anLiquidModel*>( selected_brushes.next->modelHandle ) ) {
 				bo.Zero();
 				bo.ExpandSelf( 12.0f );
 			} else {
-				bo = selected_brushes.next->modelHandle->Bounds( NULL );
+				bo = selected_brushes.next->modelHandle->Bounds( nullptr );
 			}
 
 			VectorCopy(bo[0], mins);
@@ -656,7 +656,7 @@ void CEntityDlg::AddProp() {
 }
 
 const char *CEntityDlg::AngleKey() {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return "";
 	}
 
@@ -670,7 +670,7 @@ const char *CEntityDlg::AngleKey() {
 
 void CEntityDlg::OnBnClickedE135()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -680,7 +680,7 @@ void CEntityDlg::OnBnClickedE135()
 
 void CEntityDlg::OnBnClickedE90()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -690,7 +690,7 @@ void CEntityDlg::OnBnClickedE90()
 
 void CEntityDlg::OnBnClickedE45()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -700,7 +700,7 @@ void CEntityDlg::OnBnClickedE45()
 
 void CEntityDlg::OnBnClickedE180()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -710,7 +710,7 @@ void CEntityDlg::OnBnClickedE180()
 
 void CEntityDlg::OnBnClickedE0()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -720,7 +720,7 @@ void CEntityDlg::OnBnClickedE0()
 
 void CEntityDlg::OnBnClickedE225()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -730,7 +730,7 @@ void CEntityDlg::OnBnClickedE225()
 
 void CEntityDlg::OnBnClickedE270()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -740,7 +740,7 @@ void CEntityDlg::OnBnClickedE270()
 
 void CEntityDlg::OnBnClickedE315()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -750,7 +750,7 @@ void CEntityDlg::OnBnClickedE315()
 
 void CEntityDlg::OnBnClickedEUp()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -760,7 +760,7 @@ void CEntityDlg::OnBnClickedEUp()
 
 void CEntityDlg::OnBnClickedEDown()
 {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	editKey.SetWindowText(AngleKey() );
@@ -772,7 +772,7 @@ CPreviewDlg *CEntityDlg::ShowModelChooser() {
 	static CPreviewDlg modelDlg;
 	modelDlg.SetMode(CPreviewDlg::MODELS);
 	modelDlg.SetModal();
-	if (modelDlg.GetSafeHwnd() == NULL) {
+	if (modelDlg.GetSafeHwnd() == nullptr ) {
 		modelDlg.Create(MAKEINTRESOURCE(IDD_DIALOG_PREVIEW) );
 	}
 	modelDlg.ShowWindow( SW_SHOW );
@@ -786,7 +786,7 @@ CPreviewDlg *CEntityDlg::ShowParticleChooser() {
 	static CPreviewDlg modelDlg;
 	modelDlg.SetMode(CPreviewDlg::PARTICLES);
 	modelDlg.SetModal();
-	if (modelDlg.GetSafeHwnd() == NULL) {
+	if (modelDlg.GetSafeHwnd() == nullptr ) {
 		modelDlg.Create(MAKEINTRESOURCE(IDD_DIALOG_PREVIEW) );
 	}
 	modelDlg.ShowWindow(SW_SHOW);
@@ -800,7 +800,7 @@ CPreviewDlg *CEntityDlg::ShowSkinChooser(entity_t *ent) {
 	static CPreviewDlg modelDlg;
 	modelDlg.SetMode(CPreviewDlg::SKINS);
 	modelDlg.SetModal();
-	if (modelDlg.GetSafeHwnd() == NULL) {
+	if (modelDlg.GetSafeHwnd() == nullptr ) {
 		modelDlg.Create(MAKEINTRESOURCE(IDD_DIALOG_PREVIEW) );
 	}
 	modelDlg.RebuildTree( ( ent ) ? ent->epairs.GetString( "model" ) : "" );
@@ -815,7 +815,7 @@ CPreviewDlg *CEntityDlg::ShowGuiChooser() {
 	static CPreviewDlg guiDlg;
 	guiDlg.SetMode(CPreviewDlg::GUIS);
 	guiDlg.SetModal();
-	if (guiDlg.GetSafeHwnd() == NULL) {
+	if (guiDlg.GetSafeHwnd() == nullptr ) {
 		guiDlg.Create(MAKEINTRESOURCE(IDD_DIALOG_PREVIEW) );
 	}
 	guiDlg.ShowWindow(SW_SHOW);
@@ -829,7 +829,7 @@ CPreviewDlg *CEntityDlg::ShowSoundChooser() {
 	static CPreviewDlg soundDlg;
 	soundDlg.SetMode(CPreviewDlg::SOUNDS);
 	soundDlg.SetModal();
-	if (soundDlg.GetSafeHwnd() == NULL) {
+	if (soundDlg.GetSafeHwnd() == nullptr ) {
 		soundDlg.Create(MAKEINTRESOURCE(IDD_DIALOG_PREVIEW) );
 	}
 	soundDlg.ShowWindow(SW_SHOW);
@@ -842,7 +842,7 @@ CPreviewDlg *CEntityDlg::ShowMaterialChooser() {
 	static CPreviewDlg matDlg;
 	matDlg.SetMode(CPreviewDlg::MATERIALS);
 	matDlg.SetModal();
-	if (matDlg.GetSafeHwnd() == NULL) {
+	if (matDlg.GetSafeHwnd() == nullptr ) {
 		matDlg.Create(MAKEINTRESOURCE(IDD_DIALOG_PREVIEW) );
 	}
 	matDlg.ShowWindow(SW_SHOW);
@@ -906,9 +906,9 @@ void CEntityDlg::OnBnClickedButtonCurve() {
 	CCurveDlg dlg;
 	if ( dlg.DoModal() == IDOK ) {
 		if ( editEntity ) {
-			arcNetString str = "curve_" + dlg.strCurveType;
+			anString str = "curve_" + dlg.strCurveType;
 			editKey.SetWindowText( str );
-			arcVec3 org = editEntity->origin;
+			anVec3 org = editEntity->origin;
 			str = "3 ( ";
 			str += org.ToString();
 			org.x += 64;
@@ -987,7 +987,7 @@ extern void Brush_CopyList(brush_t *pFrom, brush_t *pTo);
 		Brush_CopyList(&selected_brushes, &temp_brushes);
 		Select_Deselect();
 		brush_t *pBrush = temp_brushes.next;
-		while (pBrush != NULL && pBrush != &temp_brushes) {
+		while (pBrush != nullptr && pBrush != &temp_brushes) {
 			brush_t *pNext = pBrush->next;
 			Brush_RemoveFromList(pBrush);
 			Brush_AddToList(pBrush, &selected_brushes);
@@ -1002,7 +1002,7 @@ extern void Brush_CopyList(brush_t *pFrom, brush_t *pTo);
 		petNew = Entity_Create(pecNew, forceFixed);
 	}
 
-	if (petNew == NULL) {
+	if (petNew == nullptr ) {
 		MessageBox( "Failed to create entity.", "info", 0 );
 		return;
 	}
@@ -1028,13 +1028,13 @@ void CEntityDlg::OnBnClickedButtonCreate()
 void CEntityDlg::OnLbnDblclkListkeyval()
 {
 	CString Key, Value;
-	arcNetString work;
+	anString work;
 	editKey.GetWindowText( Key );
 	editVal.GetWindowText( Value );
 	if ( stricmp( Key, "script" ) == 0 ) {
 		Key = Value;
 		Value = "script/" + Key;
-		if ( fileSystem->ReadFile( Value, NULL, NULL ) == -1 ) {
+		if ( fileSystem->ReadFile( Value, nullptr, nullptr ) == -1 ) {
 			sprintf( work, "// Script for %s\n// \n\nvoid main() {\n\n}\n\n", currentmap );
 			fileSystem->WriteFile( Value, work.c_str(), work.Length(), "fs_devpath" );
 		}
@@ -1048,13 +1048,13 @@ void CEntityDlg::OnLbnSelchangeListVars() {
 }
 
 void CEntityDlg::OnLbnDblclkListVars() {
-	if (editEntity == NULL) {
+	if (editEntity == nullptr ) {
 		return;
 	}
 	int sel = listVars.GetCurSel();
 	CPropertyItem *pi = (CPropertyItem*)listVars.GetItemDataPtr(sel);
 	if (pi) {
-		if (editEntity->epairs.FindKey(pi->m_propName) == NULL) {
+		if (editEntity->epairs.FindKey(pi->m_propName) == nullptr ) {
 			editKey.SetWindowText(pi->m_propName);
 			editVal.SetWindowText( "" );
 			editVal.SetFocus();
@@ -1108,7 +1108,7 @@ void CEntityDlg::OnCbnAnimationChange ()
 
 	int sel = cbAnimations.GetCurSel();
 	CString animName;
-	currentAnimation = NULL;
+	currentAnimation = nullptr;
 	int currFrame = 0;
 
 	if ( sel != -1 ) {
@@ -1140,7 +1140,7 @@ void CEntityDlg::OnBnClickedStartAnimation()
 	if ( !editEntity) {
 		return;
 	}
-	SetTimer ( 0 , 1000/24 , NULL );
+	SetTimer ( 0 , 1000/24 , nullptr );
 }
 
 void CEntityDlg::OnBnClickedStopAnimation()
@@ -1166,18 +1166,18 @@ void CEntityDlg::OnTimer(UINT nIDEvent)
 }
 
 void CEntityDlg::AddCurvePoints() {
-	if ( editEntity == NULL || editEntity->curve == NULL ) {
+	if ( editEntity == nullptr || editEntity->curve == nullptr ) {
 		return;
 	}
 
 	// add one point 64 units from the direction of the two points int he curve
 	int c = editEntity->curve->GetNumValues();
-	arcVec3 start;
-	arcVec3 end;
+	anVec3 start;
+	anVec3 end;
 	if ( c > 1 ) {
 		start = editEntity->curve->GetValue( c - 2 );
 		end = editEntity->curve->GetValue( c - 1 );
-		arcVec3 dir = end - start;
+		anVec3 dir = end - start;
 		dir.Normalize();
 		start = end + 64 * dir;
 	} else  if ( c > 0 ) {
@@ -1201,7 +1201,7 @@ void CEntityDlg::AddCurvePoints() {
 
 void CEntityDlg::EditCurvePoints() {
 
-	if ( editEntity == NULL || editEntity->curve == NULL ) {
+	if ( editEntity == nullptr || editEntity->curve == nullptr ) {
 		return;
 	}
 
@@ -1225,7 +1225,7 @@ void CEntityDlg::EditCurvePoints() {
 }
 
 void CEntityDlg::InsertCurvePoint() {
-	if ( editEntity == NULL || editEntity->curve == NULL ) {
+	if ( editEntity == nullptr || editEntity->curve == nullptr ) {
 		return;
 	}
 
@@ -1243,16 +1243,16 @@ void CEntityDlg::InsertCurvePoint() {
 				// just do an add
 				AddCurvePoints();
 			} else {
-				aRcnicalCurve<arcVec3> *newCurve = Entity_MakeCurve( editEntity );
+				anCurve<anVec3> *newCurve = Entity_MakeCurve( editEntity );
 
-				if ( newCurve == NULL ) {
+				if ( newCurve == nullptr ) {
 					return;
 				}
 
 				for ( int j = 0; j < editEntity->curve->GetNumValues(); j++ ) {
 					if ( j == i ) {
-						arcVec3 start;
-						arcVec3 end;
+						anVec3 start;
+						anVec3 end;
 						if ( i > 0 ) {
 							start = editEntity->curve->GetValue( i - 1 );
 							end = editEntity->curve->GetValue( i );
@@ -1263,7 +1263,7 @@ void CEntityDlg::InsertCurvePoint() {
 							if ( editEntity->curve->GetNumValues() > 1 ) {
 								end = start;
 								start = editEntity->curve->GetValue ( 1 );
-								arcVec3 dir = end - start;
+								anVec3 dir = end - start;
 								dir.Normalize();
 								start = end + 64 * dir;
 							} else {
@@ -1291,7 +1291,7 @@ void CEntityDlg::InsertCurvePoint() {
 
 void CEntityDlg::DeleteCurvePoint() {
 
-	if ( editEntity == NULL || editEntity->curve == NULL ) {
+	if ( editEntity == nullptr || editEntity->curve == nullptr ) {
 		return;
 	}
 
@@ -1320,7 +1320,7 @@ void CEntityDlg::DeleteCurvePoint() {
 
 void CEntityDlg::UpdateEntityCurve() {
 
-	if ( editEntity == NULL ) {
+	if ( editEntity == nullptr ) {
 		return;
 	}
 
@@ -1340,12 +1340,12 @@ void CEntityDlg::UpdateEntityCurve() {
 }
 
 
-void CEntityDlg::SelectCurvePointByRay(const arcVec3 &org, const arcVec3 &dir, int buttons) {
+void CEntityDlg::SelectCurvePointByRay(const anVec3 &org, const anVec3 &dir, int buttons) {
 	int		i, besti;
 	float	d, bestd;
-	arcVec3	temp;
+	anVec3	temp;
 
-	if ( editEntity == NULL ) {
+	if ( editEntity == nullptr ) {
 		return;
 	}
 	// find the point closest to the ray

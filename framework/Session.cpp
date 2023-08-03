@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Session_local.h"
@@ -11,10 +11,10 @@
 SteamAPIDebugTextHook
 ========================
 */
-extern "C" void __cdecl SteamAPIDebugTextHook( int nSeverity, const char * pchDebugText ) {
+extern "C" void __cdecl SteamAPIDebugTextHook( int nSeverity, const char *pchDebugText ) {
 	// if you're running in the debugger, only warnings (nSeverity >= 1 ) will be sent
 	// if you add -debug_steamapi to the command-line, a lot of extra informational messages will also be sent
-	arcLibrary::Printf( "%s", pchDebugText );
+	anLibrary::Printf( "%s", pchDebugText );
 
 	if ( nSeverity >= 1 ) {
 		// place to set a breakpoint for catching API errors
@@ -47,7 +47,7 @@ idSessionLocal::~idSessionLocal
 ===============
 */
 idSessionLocal::~idSessionLocal() {
-	if ( sessionCallbacks != NULL ) {
+	if ( sessionCallbacks != nullptr ) {
 		delete sessionCallbacks;
 	}
 }
@@ -86,7 +86,7 @@ idSessionLocal::Shutdown
 void idSessionLocal::Shutdown() {
 	delete signInManager;
 
-	if ( achievementSystem != NULL ) {
+	if ( achievementSystem != nullptr ) {
 		achievementSystem->Shutdown();
 		delete achievementSystem;
 	}
@@ -135,7 +135,7 @@ void idSessionLocal::InitSteam() {
 
 	if ( steamFailed ) {
 		if ( net_usePlatformBackend.GetBool() ) {
-			arcLibrary::Warning( "Steam failed to initialize.  Usually this happens because the Steam client isn't running." );
+			anLibrary::Warning( "Steam failed to initialize.  Usually this happens because the Steam client isn't running." );
 			// Turn off the usage of steam if it fails to initialize
 			// FIXME: We'll want to bail (nicely) in the shipping product most likely
 			net_usePlatformBackend.SetBool( false );
@@ -177,7 +177,7 @@ void idSessionLocal::MoveToPressStart( gameDialogMessages_t msg ) {
 		MoveToPressStart();
 
 		common->Dialog().ClearDialogs();
-		common->Dialog().AddDialog( msg, DIALOG_ACCEPT, NULL, NULL, false, "", 0, true );
+		common->Dialog().AddDialog( msg, DIALOG_ACCEPT, nullptr, nullptr, false, "", 0, true );
 	}
 }
 
@@ -236,7 +236,7 @@ idSessionLocal::sessionState_t idSessionLocal::GetState() const {
 		//case STATE_CONNECT_AND_MOVE_TO_GAME_STATE:		return CONNECTING;
 		case STATE_BUSY:								return BUSY;
 		default: {
-			arcLibrary::Error( "GetState: Unknown state in idSessionLocal" );
+			anLibrary::Error( "GetState: Unknown state in idSessionLocal" );
 			return IDLE;
 		}
 	};
@@ -253,7 +253,7 @@ void idSessionLocal::Pump() {
 
 	idLocalUser * masterUser = GetSignInManager().GetMasterLocalUser();
 
-	if ( masterUser != NULL && localState == STATE_PRESS_START ) {
+	if ( masterUser != nullptr && localState == STATE_PRESS_START ) {
 		// If we have a master user, and we are at press start, move to the menu area
 		SetState( STATE_IDLE );
 
@@ -277,7 +277,7 @@ void idSessionLocal::OnMasterLocalUserSignin() {
 idSessionLocal::LoadGame
 ========================
 */
-saveGameHandle_t idSessionLocal::LoadGame( const char * name, const arcNetList< idSaveFileEntry > & files ) {
+saveGameHandle_t idSessionLocal::LoadGame( const char *name, const anList< idSaveFileEntry > & files ) {
 	if ( processorLoadFiles.InitLoadFiles( name, files ) ) {
 		return saveGameManager.ExecuteProcessor( &processorLoadFiles );
 	} else {
@@ -290,12 +290,12 @@ saveGameHandle_t idSessionLocal::LoadGame( const char * name, const arcNetList< 
 idSessionLocal::SaveGame
 ========================
 */
-saveGameHandle_t idSessionLocal::SaveGame( const char * name, const arcNetList< idSaveFileEntry > & files, const arcSaveGameDetails & description, uint64 skipErrorMask ) {
+saveGameHandle_t idSessionLocal::SaveGame( const char *name, const anList< idSaveFileEntry > & files, const arcSaveGameDetails & description, uint64 skipErrorMask ) {
 	saveGameHandle_t ret = 0;
 
 	// serialize the description file behind their back...
-	arcNetList< idSaveFileEntry > filesWithDetails( files );
-	aRcFileMemory * gameDetailsFile = new aRcFileMemory( SAVEGAME_DETAILS_FILENAME );
+	anList< idSaveFileEntry > filesWithDetails( files );
+	anFileMemory * gameDetailsFile = new anFileMemory( SAVEGAME_DETAILS_FILENAME );
 	//gameDetailsFile->MakeWritable();
 	description.descriptors.WriteToIniFile( gameDetailsFile );
 	filesWithDetails.Append( idSaveFileEntry( gameDetailsFile, SAVEGAMEFILE_TEXT | SAVEGAMEFILE_AUTO_DELETE, SAVEGAME_DETAILS_FILENAME ) );
@@ -330,7 +330,7 @@ saveGameHandle_t idSessionLocal::EnumerateSaveGames( uint64 skipErrorMask ) {
 idSessionLocal::DeleteSaveGame
 ========================
 */
-saveGameHandle_t idSessionLocal::DeleteSaveGame( const char * name, uint64 skipErrorMask ) {
+saveGameHandle_t idSessionLocal::DeleteSaveGame( const char *name, uint64 skipErrorMask ) {
 	saveGameHandle_t ret = 0;
 	if ( processorDelete.InitDelete( name ) ) {
 		processorDelete.SetSkipSystemErrorDialogMask( skipErrorMask );
@@ -384,7 +384,7 @@ const leaderboardDefinition_t * Sys_FindLeaderboardDef( int id ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -401,7 +401,7 @@ idLobby *	idSessionLocal::GetActiveLobby() {
 		return &GetPartyLobby();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -418,7 +418,7 @@ const idLobby * idSessionLocal::GetActiveLobby() const {
 		return &GetPartyLobby();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -430,7 +430,7 @@ This returns the base version for the ARCSession version
 idLobbyBase & idSessionLocal::GetActiveLobbyBase() {
 	idLobby * activeLobby = GetActiveLobby();
 
-	if ( activeLobby != NULL ) {
+	if ( activeLobby != nullptr ) {
 		return *activeLobby;
 	}
 
@@ -447,8 +447,8 @@ Call PickNewHostInternal to continue on with the host picking process.
 void idSessionLocal::PrePickNewHost( idLobby & lobby, bool forceMe, bool inviteOldHost ) {
 	NET_VERBOSE_PRINT( "idSessionLocal::PrePickNewHost: (%s)\n", lobby.GetLobbyName() );
 
-	if ( GetActiveLobby() == NULL ) {
-		NET_VERBOSE_PRINT( "idSessionLocal::PrePickNewHost: GetActiveLobby() == NULL (%s)\n", lobby.GetLobbyName() );
+	if ( GetActiveLobby() == nullptr ) {
+		NET_VERBOSE_PRINT( "idSessionLocal::PrePickNewHost: GetActiveLobby() == nullptr (%s)\n", lobby.GetLobbyName() );
 		return;
 	}
 
@@ -464,10 +464,10 @@ void idSessionLocal::PrePickNewHost( idLobby & lobby, bool forceMe, bool inviteO
 		// Throw up the appropriate dialog message so the player knows what happeend
 		if ( localState >= STATE_LOADING ) {
 			NET_VERBOSE_PRINT( "idSessionLocal::PrePickNewHost: localState >= idSessionLocal::STATE_LOADING (%s)\n", lobby.GetLobbyName() );
-			common->Dialog().AddDialog( GDM_BECAME_HOST_GAME_STATS_DROPPED, DIALOG_ACCEPT, NULL, NULL, false, __FUNCTION__, __LINE__, true );
+			common->Dialog().AddDialog( GDM_BECAME_HOST_GAME_STATS_DROPPED, DIALOG_ACCEPT, nullptr, nullptr, false, __FUNCTION__, __LINE__, true );
 		} else {
 			NET_VERBOSE_PRINT( "idSessionLocal::PrePickNewHost: localState < idSessionLocal::STATE_LOADING (%s)\n", lobby.GetLobbyName() );
-			common->Dialog().AddDialog( GDM_LOBBY_BECAME_HOST_GAME, DIALOG_ACCEPT, NULL, NULL, false, __FUNCTION__, __LINE__, true  );
+			common->Dialog().AddDialog( GDM_LOBBY_BECAME_HOST_GAME, DIALOG_ACCEPT, nullptr, nullptr, false, __FUNCTION__, __LINE__, true  );
 		}
 
 		CreateMatch( GetActiveLobby()->parms );
@@ -500,7 +500,7 @@ void idSessionLocal::PrePickNewHost( idLobby & lobby, bool forceMe, bool inviteO
 	} else {
 		NET_VERBOSE_PRINT( "idSessionLocal::PrePickNewHost: GetBackState() < idSessionLocal::PARTY_LOBBY && GetState() != ARCSession::PARTY_LOBBY (%s)\n", lobby.GetLobbyName() );
 		if ( localState >= STATE_LOADING ) {
-			common->Dialog().AddDialog( GDM_HOST_QUIT, DIALOG_ACCEPT, NULL, NULL, false, __FUNCTION__, __LINE__, true  );		// The host has quit the session. Returning to the main menu.
+			common->Dialog().AddDialog( GDM_HOST_QUIT, DIALOG_ACCEPT, nullptr, nullptr, false, __FUNCTION__, __LINE__, true  );		// The host has quit the session. Returning to the main menu.
 		}
 
 		// Go back to main menu
@@ -518,7 +518,7 @@ If we return false, the invite will be ignored
 */
 bool idSessionLocal::PreMigrateInvite( idLobby & lobby )
 {
-	if ( GetActiveLobby() == NULL ) {
+	if ( GetActiveLobby() == nullptr ) {
 		return false;
 	}
 
@@ -558,7 +558,7 @@ bool idSessionLocal::PreMigrateInvite( idLobby & lobby )
 idSessionLocal::HandleDedicatedServerQueryRequest
 ========================
 */
-void idSessionLocal::HandleDedicatedServerQueryRequest( lobbyAddress_t & remoteAddr, ARCBitMessage & msg, int msgType ) {
+void idSessionLocal::HandleDedicatedServerQueryRequest( lobbyAddress_t & remoteAddr, anBitMessage & msg, int msgType ) {
 	NET_VERBOSE_PRINT( "HandleDedicatedServerQueryRequest from %s\n", remoteAddr.ToString() );
 
 	bool canJoin = true;
@@ -578,7 +578,7 @@ void idSessionLocal::HandleDedicatedServerQueryRequest( lobbyAddress_t & remoteA
 	}
 
 	// Make sure there is a session active
-	if ( GetActiveLobby() == NULL ) {
+	if ( GetActiveLobby() == nullptr ) {
 		canJoin = false;
 	}
 
@@ -594,12 +594,12 @@ void idSessionLocal::HandleDedicatedServerQueryRequest( lobbyAddress_t & remoteA
 
 	// Buffer to hold reply msg
 	byte buffer[ idPacketProcessor::MAX_PACKET_SIZE - 2 ];
-	ARCBitMessage retmsg;
+	anBitMessage retmsg;
 	retmsg.InitWrite( buffer, sizeof( buffer ) );
 
 	idLocalUser * masterUser = GetSignInManager().GetMasterLocalUser();
 
-	if ( masterUser == NULL ) {
+	if ( masterUser == nullptr ) {
 		canJoin = false;
 	}
 
@@ -636,7 +636,7 @@ void idSessionLocal::HandleDedicatedServerQueryRequest( lobbyAddress_t & remoteA
 idSessionLocal::HandleDedicatedServerQueryAck
 ========================
 */
-void idSessionLocal::HandleDedicatedServerQueryAck( lobbyAddress_t & remoteAddr, ARCBitMessage & msg ) {
+void idSessionLocal::HandleDedicatedServerQueryAck( lobbyAddress_t & remoteAddr, anBitMessage & msg ) {
 	NET_VERBOSE_PRINT( "HandleDedicatedServerQueryAck from %s\n", remoteAddr.ToString() );
 }
 
@@ -646,11 +646,11 @@ idSessionLocal::StartSessions
 ========================
 */
 void idSessionLocal::StartSessions() {
-	if ( GetPartyLobby().lobbyBackend != NULL ) {
+	if ( GetPartyLobby().lobbyBackend != nullptr ) {
 		GetPartyLobby().lobbyBackend->StartSession();
 	}
 
-	if ( GetGameLobby().lobbyBackend != NULL ) {
+	if ( GetGameLobby().lobbyBackend != nullptr ) {
 		GetGameLobby().lobbyBackend->StartSession();
 	}
 
@@ -663,11 +663,11 @@ idSessionLocal::EndSessions
 ========================
 */
 void idSessionLocal::EndSessions() {
-	if ( GetPartyLobby().lobbyBackend != NULL ) {
+	if ( GetPartyLobby().lobbyBackend != nullptr ) {
 		GetPartyLobby().lobbyBackend->EndSession();
 	}
 
-	if ( GetGameLobby().lobbyBackend != NULL ) {
+	if ( GetGameLobby().lobbyBackend != nullptr ) {
 		GetGameLobby().lobbyBackend->EndSession();
 	}
 
@@ -682,12 +682,12 @@ idSessionLocal::SetLobbiesAreJoinable
 void idSessionLocal::SetLobbiesAreJoinable( bool joinable ) {
 	// NOTE - We don't manipulate the joinable state when we are supporting join in progress
 	// Lobbies will naturally be non searchable when there are no free slots
-	if ( GetPartyLobby().lobbyBackend != NULL && !MatchTypeIsJoinInProgress( GetPartyLobby().parms.GetSessionMatchFlags() ) ) {
+	if ( GetPartyLobby().lobbyBackend != nullptr && !MatchTypeIsJoinInProgress( GetPartyLobby().parms.GetSessionMatchFlags() ) ) {
 		NET_VERBOSE_PRINT( "Party lobbyBackend SetIsJoinable: %d\n", joinable );
 		GetPartyLobby().lobbyBackend->SetIsJoinable( joinable );
 	}
 
-	if ( GetGameLobby().lobbyBackend != NULL && !MatchTypeIsJoinInProgress( GetGameLobby().parms.GetSessionMatchFlags() ) ) {
+	if ( GetGameLobby().lobbyBackend != nullptr && !MatchTypeIsJoinInProgress( GetGameLobby().parms.GetSessionMatchFlags() ) ) {
 		GetGameLobby().lobbyBackend->SetIsJoinable( joinable );
 		NET_VERBOSE_PRINT( "Game lobbyBackend SetIsJoinable: %d\n", joinable );
 
@@ -724,7 +724,7 @@ idSessionLocal::GoodbyeFromHost
 */
 void idSessionLocal::GoodbyeFromHost( idLobby & lobby, int peerNum, const lobbyAddress_t & remoteAddress, int msgType ) {
 	if ( !verify( localState > STATE_IDLE ) ) {
-		arcLibrary::Printf( "NET: Got disconnected from host %s on session %s when we were not in a lobby or game.\n", remoteAddress.ToString(), lobby.GetLobbyName() );
+		anLibrary::Printf( "NET: Got disconnected from host %s on session %s when we were not in a lobby or game.\n", remoteAddress.ToString(), lobby.GetLobbyName() );
 		MoveToMainMenu();
 		return;		// Ignore if we are not past the main menu
 	}
@@ -732,12 +732,12 @@ void idSessionLocal::GoodbyeFromHost( idLobby & lobby, int peerNum, const lobbyA
 	// Goodbye from host.  See if we were connecting vs connected
 	if ( ( localState == STATE_CONNECT_AND_MOVE_TO_PARTY || localState == STATE_CONNECT_AND_MOVE_TO_GAME ) && lobby.peers[peerNum].GetConnectionState() == idLobby::CONNECTION_CONNECTING ) {
 		// We were denied a connection attempt
-		arcLibrary::Printf( "NET: Denied connection attempt from host %s on session %s. MsgType %i.\n", remoteAddress.ToString(), lobby.GetLobbyName(), msgType );
+		anLibrary::Printf( "NET: Denied connection attempt from host %s on session %s. MsgType %i.\n", remoteAddress.ToString(), lobby.GetLobbyName(), msgType );
 		// This will try to move to the next connection if one exists, otherwise will create a match
 		HandleConnectionFailed( lobby, msgType == idLobby::OOB_GOODBYE_FULL );
 	} else {
 		// We were disconnected from a server we were previously connected to
-		arcLibrary::Printf( "NET: Disconnected from host %s on session %s. MsgType %i.\n", remoteAddress.ToString(), lobby.GetLobbyName(), msgType );
+		anLibrary::Printf( "NET: Disconnected from host %s on session %s. MsgType %i.\n", remoteAddress.ToString(), lobby.GetLobbyName(), msgType );
 
 		const bool leaveGameWithParty = ( msgType == idLobby::OOB_GOODBYE_W_PARTY );
 
@@ -766,17 +766,17 @@ bool idSessionLocal::HandlePackets() {
 
 	while ( ReadRawPacket( remoteAddress, packetBuffer, recvSize, sizeof( packetBuffer ) ) && recvSize > 0 ) {
 		// fragMsg will hold the raw packet
-		ARCBitMessage fragMsg;
+		anBitMessage fragMsg;
 		fragMsg.InitRead( packetBuffer, recvSize );
 
 		// Peek at the session ID
 		idPacketProcessor::sessionId_t sessionID = idPacketProcessor::GetSessionID( fragMsg );
 
-		// arcLibrary::Printf( "NET: HandlePackets - session %d, size %d \n", sessionID, recvSize );
+		// anLibrary::Printf( "NET: HandlePackets - session %d, size %d \n", sessionID, recvSize );
 
 		// Make sure it's valid
 		if ( sessionID == idPacketProcessor::SESSION_ID_INVALID ) {
-			arcLibrary::Printf( "NET: Invalid sessionID %s.\n", remoteAddress.ToString() );
+			anLibrary::Printf( "NET: Invalid sessionID %s.\n", remoteAddress.ToString() );
 			continue;
 		}
 
@@ -791,8 +791,8 @@ bool idSessionLocal::HandlePackets() {
 	return false;
 }
 
-arcCVarSystem net_connectTimeoutInSeconds( "net_connectTimeoutInSeconds", "15", CVAR_INTEGER, "timeout (in seconds) while connecting" );
-arcCVarSystem net_testPartyMemberConnectFail( "net_testPartyMemberConnectFail", "-1", CVAR_INTEGER, "Force this party member index to fail to connect to games." );
+anCVarSystem net_connectTimeoutInSeconds( "net_connectTimeoutInSeconds", "15", CVAR_INTEGER, "timeout (in seconds) while connecting" );
+anCVarSystem net_testPartyMemberConnectFail( "net_testPartyMemberConnectFail", "-1", CVAR_INTEGER, "Force this party member index to fail to connect to games." );
 
 /*
 ========================
@@ -867,7 +867,7 @@ bool idSessionLocal::HandleConnectAndMoveToLobby( idLobby & lobby ) {
 
 			// Let all the party members know everyone made it, and it's ok to stay at this server
 			for ( int i = 0; i < GetPartyLobby().peers.Num(); i++ ) {
-				if ( GetPartyLobby().peers[ i ].IsConnected() ) {
+				if ( GetPartyLobby().peers[i].IsConnected() ) {
 					GetPartyLobby().QueueReliableMessage( i, idLobby::RELIABLE_PARTY_CONNECT_OK );
 				}
 			}
@@ -924,7 +924,7 @@ void idSessionLocal::HandleConnectionFailed( idLobby & lobby, bool wasFull ) {
 	bool canPlayOnline = true;
 
 	// Check for online status (this is only a problem on the PS3 at the moment. The 360 LIVE system handles this for us
-	if ( GetSignInManager().GetMasterLocalUser() != NULL ) {
+	if ( GetSignInManager().GetMasterLocalUser() != nullptr ) {
 		canPlayOnline = GetSignInManager().GetMasterLocalUser()->CanPlayOnline();
 	}
 
@@ -952,15 +952,15 @@ void idSessionLocal::HandleConnectionFailed( idLobby & lobby, bool wasFull ) {
 		}
 
 		if ( wasFull ) {
-			common->Dialog().AddDialog( GDM_LOBBY_FULL, DIALOG_ACCEPT, NULL, NULL, false );
+			common->Dialog().AddDialog( GDM_LOBBY_FULL, DIALOG_ACCEPT, nullptr, nullptr, false );
 		} else if ( !canPlayOnline ) {
-			common->Dialog().AddDialog( GDM_PLAY_ONLINE_NO_PROFILE, DIALOG_ACCEPT, NULL, NULL, false );
+			common->Dialog().AddDialog( GDM_PLAY_ONLINE_NO_PROFILE, DIALOG_ACCEPT, nullptr, nullptr, false );
 		} else {
 			// TEMP HACK: We detect the steam lobby is full in idLobbyBackendWin, and then STATE_FAILED, which brings us here. Need to find a way to notify
 			// session local that the game was full so we don't do this check here
 			// eeubanks: Pollard, how do you think we should handle this?
-			if ( !common->Dialog().HasDialogMsg( GDM_LOBBY_FULL, NULL ) ) {
-			common->Dialog().AddDialog( GDM_INVALID_INVITE, DIALOG_ACCEPT, NULL, NULL, false );
+			if ( !common->Dialog().HasDialogMsg( GDM_LOBBY_FULL, nullptr ) ) {
+			common->Dialog().AddDialog( GDM_INVALID_INVITE, DIALOG_ACCEPT, nullptr, nullptr, false );
 		}
 		}
 		MoveToMainMenu();
@@ -1013,7 +1013,7 @@ void idSessionLocal::ConnectAndMoveToLobby( idLobby & lobby, const lobbyConnectI
 idSessionLocal::WriteLeaderboardToMsg
 ========================
 */
-void idSessionLocal::WriteLeaderboardToMsg( ARCBitMessage & msg, const leaderboardDefinition_t * leaderboard, const column_t * stats ) {
+void idSessionLocal::WriteLeaderboardToMsg( anBitMessage & msg, const leaderboardDefinition_t * leaderboard, const column_t * stats ) {
 	assert( Sys_FindLeaderboardDef( leaderboard->id ) == leaderboard );
 
 	msg.WriteLong( leaderboard->id );
@@ -1021,7 +1021,7 @@ void idSessionLocal::WriteLeaderboardToMsg( ARCBitMessage & msg, const leaderboa
 	for ( int i = 0; i < leaderboard->numColumns; ++i ) {
 		uint64 value = stats[i].value;
 
-		//arcLibrary::Printf( "value = %i\n", (int32)value );
+		//anLibrary::Printf( "value = %i\n", (int32)value );
 
 		for ( int j = 0; j < leaderboard->columnDefs[i].bits; j++ ) {
 			msg.WriteBits( value & 1, 1 );
@@ -1036,14 +1036,14 @@ void idSessionLocal::WriteLeaderboardToMsg( ARCBitMessage & msg, const leaderboa
 idSessionLocal::ReadLeaderboardFromMsg
 ========================
 */
-const leaderboardDefinition_t * idSessionLocal::ReadLeaderboardFromMsg( ARCBitMessage & msg, column_t * stats ) {
+const leaderboardDefinition_t * idSessionLocal::ReadLeaderboardFromMsg( anBitMessage & msg, column_t * stats ) {
 	int id = msg.ReadLong();
 
 	const leaderboardDefinition_t * leaderboard = Sys_FindLeaderboardDef( id );
 
-	if ( leaderboard == NULL ) {
-		arcLibrary::Printf( "NET: Invalid leaderboard id: %i\n", id );
-		return NULL;
+	if ( leaderboard == nullptr ) {
+		anLibrary::Printf( "NET: Invalid leaderboard id: %i\n", id );
+		return nullptr;
 	}
 
 	for ( int i = 0; i < leaderboard->numColumns; ++i ) {
@@ -1055,7 +1055,7 @@ const leaderboardDefinition_t * idSessionLocal::ReadLeaderboardFromMsg( ARCBitMe
 
 		stats[i].value = value;
 
-		//arcLibrary::Printf( "value = %i\n", (int32)value );
+		//anLibrary::Printf( "value = %i\n", (int32)value );
 		//msg.ReadData( &stats[i].value, sizeof( stats[i].value ) );
 	}
 
@@ -1075,7 +1075,7 @@ void idSessionLocal::EndMatchInternal( bool premature/*=false*/ ) {
 		// If we are the host, increment the session ID.  The client will use a rolling check to catch it
 		if ( GetGameLobby().IsHost() ) {
 			if ( GetGameLobby().peers[p].IsConnected() ) {
-				if ( GetGameLobby().peers[p].packetProc != NULL ) {
+				if ( GetGameLobby().peers[p].packetProc != nullptr ) {
 					GetGameLobby().peers[p].packetProc->VerifyEmptyReliableQueue( idLobby::RELIABLE_GAME_DATA, idLobby::RELIABLE_DUMMY_MSG );
 				}
 				GetGameLobby().peers[p].sessionID = GetGameLobby().IncrementSessionID( GetGameLobby().peers[p].sessionID );
@@ -1118,7 +1118,7 @@ void idSessionLocal::EndMatchInternal( bool premature/*=false*/ ) {
 	} else if ( premature ) {
 		// Notify client that host left early and thats why we are back in the lobby
 		bool stats = MatchTypeHasStats( GetGameLobby().GetMatchParms().GetSessionMatchFlags() ) && ( GetFlushedStats() == false );
-		common->Dialog().AddDialog( stats ? GDM_HOST_RETURNED_TO_LOBBY_STATS_DROPPED : GDM_HOST_RETURNED_TO_LOBBY, DIALOG_ACCEPT, NULL, NULL, false, __FUNCTION__, __LINE__, true );
+		common->Dialog().AddDialog( stats ? GDM_HOST_RETURNED_TO_LOBBY_STATS_DROPPED : GDM_HOST_RETURNED_TO_LOBBY, DIALOG_ACCEPT, nullptr, nullptr, false, __FUNCTION__, __LINE__, true );
 	}
 }
 
@@ -1127,11 +1127,11 @@ void idSessionLocal::EndMatchInternal( bool premature/*=false*/ ) {
 idSessionLocal::HandleOobVoiceAudio
 ========================
 */
-void idSessionLocal::HandleOobVoiceAudio( const lobbyAddress_t & from, const ARCBitMessage & msg ) {
+void idSessionLocal::HandleOobVoiceAudio( const lobbyAddress_t & from, const anBitMessage & msg ) {
 
 	idLobby * activeLobby = GetActiveLobby();
 
-	if ( activeLobby == NULL ) {
+	if ( activeLobby == nullptr ) {
 		return;
 	}
 
@@ -1160,21 +1160,21 @@ idSessionLocal::SendLeaderboardStatsToPlayer
 void idSessionLocal::SendLeaderboardStatsToPlayer( int sessionUserIndex, const leaderboardDefinition_t * leaderboard, const column_t * stats ) {
 
 	if ( GetGameLobby().IsLobbyUserDisconnected( sessionUserIndex ) ) {
-		arcLibrary::Warning( "Tried to tell disconnected user to report stats" );
+		anLibrary::Warning( "Tried to tell disconnected user to report stats" );
 		return;
 	}
 
 	const int peerIndex = GetGameLobby().PeerIndexFromLobbyUserIndex( sessionUserIndex );
 
 	if ( peerIndex == -1 ) {
-		arcLibrary::Warning( "Tried to tell invalid peer index to report stats" );
+		anLibrary::Warning( "Tried to tell invalid peer index to report stats" );
 		return;
 	}
 
 	if ( !verify( GetGameLobby().IsHost() ) ||
 		!verify( peerIndex < GetGameLobby().peers.Num() ) ||
 		!verify( GetGameLobby().peers[ peerIndex ].IsConnected() ) ) {
-		arcLibrary::Warning( "Tried to tell invalid peer to report stats" );
+		anLibrary::Warning( "Tried to tell invalid peer to report stats" );
 		return;
 	}
 
@@ -1182,12 +1182,12 @@ void idSessionLocal::SendLeaderboardStatsToPlayer( int sessionUserIndex, const l
 
 	lobbyUser_t * gameUser = GetGameLobby().GetLobbyUser( sessionUserIndex );
 
-	if ( !verify( gameUser != NULL ) ) {
+	if ( !verify( gameUser != nullptr ) ) {
 		return;
 	}
 
 	byte buffer[ idPacketProcessor::MAX_PACKET_SIZE ];
-	ARCBitMessage msg;
+	anBitMessage msg;
 	msg.InitWrite( buffer, sizeof( buffer ) );
 
 	// Use the user ID
@@ -1203,7 +1203,7 @@ void idSessionLocal::SendLeaderboardStatsToPlayer( int sessionUserIndex, const l
 idSessionLocal::RecvLeaderboardStatsForPlayer
 ========================
 */
-void idSessionLocal::RecvLeaderboardStatsForPlayer( ARCBitMessage & msg ) {
+void idSessionLocal::RecvLeaderboardStatsForPlayer( anBitMessage & msg ) {
 	column_t stats[ MAX_LEADERBOARD_COLUMNS ];
 
 	int userID = msg.ReadLong();
@@ -1212,8 +1212,8 @@ void idSessionLocal::RecvLeaderboardStatsForPlayer( ARCBitMessage & msg ) {
 
 	const leaderboardDefinition_t * leaderboard = ReadLeaderboardFromMsg( msg, stats );
 
-	if ( leaderboard == NULL ) {
-		arcLibrary::Printf( "RecvLeaderboardStatsForPlayer: Invalid lb.\n" );
+	if ( leaderboard == nullptr ) {
+		anLibrary::Printf( "RecvLeaderboardStatsForPlayer: Invalid lb.\n" );
 		return;
 	}
 

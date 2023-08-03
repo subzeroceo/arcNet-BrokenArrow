@@ -37,33 +37,33 @@ If you have questions concerning this license or the applicable additional terms
 ===============================================================================
 */
 
-class idAASFileLocal : public idAASFile {
-	friend class idAASBuild;
-	friend class idAASReach;
-	friend class idAASCluster;
+class anSEASFileLocal : public anSEASFile {
+	friend class anSEASBuild;
+	friend class anSEASReach;
+	friend class anSEASCluster;
 public:
-								idAASFileLocal( void );
-	virtual 					~idAASFileLocal( void );
+								anSEASFileLocal( void );
+	virtual 					~anSEASFileLocal( void );
 
 public:
-	virtual arcVec3				EdgeCenter( int edgeNum ) const;
-	virtual arcVec3				FaceCenter( int faceNum ) const;
-	virtual arcVec3				AreaCenter( int areaNum ) const;
+	virtual anVec3				EdgeCenter( int edgeNum ) const;
+	virtual anVec3				FaceCenter( int faceNum ) const;
+	virtual anVec3				AreaCenter( int areaNum ) const;
 
-	virtual arcBounds			EdgeBounds( int edgeNum ) const;
-	virtual arcBounds			FaceBounds( int faceNum ) const;
-	virtual arcBounds			AreaBounds( int areaNum ) const;
+	virtual anBounds			EdgeBounds( int edgeNum ) const;
+	virtual anBounds			FaceBounds( int faceNum ) const;
+	virtual anBounds			AreaBounds( int areaNum ) const;
 
-	virtual int					PointAreaNum( const arcVec3 &origin ) const;
-	virtual int					PointReachableAreaNum( const arcVec3 &origin, const arcBounds &searchBounds, const int areaFlags, const int excludeTravelFlags ) const;
-	virtual int					BoundsReachableAreaNum( const arcBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const;
-	virtual void				PushPointIntoAreaNum( int areaNum, arcVec3 &point ) const;
-	virtual bool				Trace( aasTrace_t &trace, const arcVec3 &start, const arcVec3 &end ) const;
+	virtual int					PointAreaNum( const anVec3 &origin ) const;
+	virtual int					PointReachableAreaNum( const anVec3 &origin, const anBounds &searchBounds, const int areaFlags, const int excludeTravelFlags ) const;
+	virtual int					BoundsReachableAreaNum( const anBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const;
+	virtual void				PushPointIntoAreaNum( int areaNum, anVec3 &point ) const;
+	virtual bool				Trace( seasTrace_t &trace, const anVec3 &start, const anVec3 &end ) const;
 	virtual void				PrintInfo( void ) const;
 
 public:
-	bool						Load( const arcNetString &fileName, unsigned int mapFileCRC );
-	bool						Write( const arcNetString &fileName, unsigned int mapFileCRC );
+	bool						Load( const anString &fileName, unsigned int mapFileCRC );
+	bool						Write( const anString &fileName, unsigned int mapFileCRC );
 
 	int							MemorySize( void ) const;
 	void						ReportRoutingEfficiency( void ) const;
@@ -76,23 +76,23 @@ public:
 	void						DeleteClusters( void );
 
 private:
-	bool						ParseIndex( arcLexer &src, arcNetList<aasIndex_t> &indexes );
-	bool						ParsePlanes( arcLexer &src );
-	bool						ParseVertices( arcLexer &src );
-	bool						ParseEdges( arcLexer &src );
-	bool						ParseFaces( arcLexer &src );
-	bool						ParseReachabilities( arcLexer &src, int areaNum );
-	bool						ParseAreas( arcLexer &src );
-	bool						ParseNodes( arcLexer &src );
-	bool						ParsePortals( arcLexer &src );
-	bool						ParseClusters( arcLexer &src );
+	bool						ParseIndex( anLexer &src, anList<seasIndex_t> &indexes );
+	bool						ParsePlanes( anLexer &src );
+	bool						ParseVertices( anLexer &src );
+	bool						ParseEdges( anLexer &src );
+	bool						ParseFaces( anLexer &src );
+	bool						ParseReachabilities( anLexer &src, int areaNum );
+	bool						ParseAreas( anLexer &src );
+	bool						ParseNodes( anLexer &src );
+	bool						ParsePortals( anLexer &src );
+	bool						ParseClusters( anLexer &src );
 
 private:
-	int							BoundsReachableAreaNum_r( int nodeNum, const arcBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const;
+	int							BoundsReachableAreaNum_r( int nodeNum, const anBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const;
 	void						MaxTreeDepth_r( int nodeNum, int &depth, int &maxDepth ) const;
 	int							MaxTreeDepth( void ) const;
 	int							AreaContentsTravelFlags( int areaNum ) const;
-	arcVec3						AreaReachableGoal( int areaNum ) const;
+	anVec3						AreaReachableGoal( int areaNum ) const;
 	int							NumReachabilities( void ) const;
 };
 

@@ -2,7 +2,7 @@
 #ifndef __COLORSPACE_H__
 #define __COLORSPACE_H__
 
-namespace arcColorSpaces {
+namespace anColorSpaces {
 	void	ConvertRGBToYCoCg( byte *dst, const byte *src, int width, int height );
 	void	ConvertYCoCgToRGB( byte *dst, const byte *src, int width, int height );
 
@@ -29,18 +29,18 @@ namespace arcColorSpaces {
 	void	ConvertMonochromeToRGB( byte *rgb, const byte *mono, int width, int height );
 };
 
-ARC_INLINE aRCColorRGB_t::ColorRGB_t() :
+ARC_INLINE anColorRGB_t::ColorRGB_t() :
 r( 255 ), g( 255 ), b( 255 ){}
 
-ARC_INLINE arcVec4 aRCColorRGB_t::ToVec4() const {
-	return arcVec4( r * ( 1.0f / 255.0f ), g * ( 1.0f / 255.0f ), b * ( 1.0f / 255.0f ), 1.0f );
+ARC_INLINE anVec4 anColorRGB_t::ToVec4() const {
+	return anVec4( r * ( 1.0f / 255.0f ), g * ( 1.0f / 255.0f ), b * ( 1.0f / 255.0f ), 1.0f );
 }
 
-ARC_INLINE aRCColorRGBA_t::aRcColorRGBA_t() :
+ARC_INLINE anColorRGBA_t::anColorRGBA_t() :
 a( 255 ){}
 
-ARC_INLINE arcVec4 aRCColorRGBA_t::ToVec4() const {
-	return arcVec4( r * ( 1.0f / 255.0f ), g * ( 1.0f / 255.0f ), b * ( 1.0f / 255.0f ), a * ( 1.0f / 255.0f ) );
+ARC_INLINE anVec4 anColorRGBA_t::ToVec4() const {
+	return anVec4( r * ( 1.0f / 255.0f ), g * ( 1.0f / 255.0f ), b * ( 1.0f / 255.0f ), a * ( 1.0f / 255.0f ) );
 }
 
 #endif

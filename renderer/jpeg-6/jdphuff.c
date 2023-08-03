@@ -40,15 +40,15 @@ typedef struct {
  */
 
 #ifndef NO_STRUCT_ASSIGN
-#define ASSIGN_STATE(dest,src)  ((dest) = (src) )
+#define ASSIGN_STATE(dest,src)  ((dest) = ( src) )
 #else
 #if MAX_COMPS_IN_SCAN == 4
 #define ASSIGN_STATE(dest,src)  \
-	((dest).EOBRUN = (src).EOBRUN, \
-	 (dest).last_dc_val[0] = (src).last_dc_val[0], \
-	 (dest).last_dc_val[1] = (src).last_dc_val[1], \
-	 (dest).last_dc_val[2] = (src).last_dc_val[2], \
-	 (dest).last_dc_val[3] = (src).last_dc_val[3] )
+	((dest).EOBRUN = ( src).EOBRUN, \
+	 (dest).last_dc_val[0] = ( src).last_dc_val[0], \
+	 (dest).last_dc_val[1] = ( src).last_dc_val[1], \
+	 (dest).last_dc_val[2] = ( src).last_dc_val[2], \
+	 (dest).last_dc_val[3] = ( src).last_dc_val[3] )
 #endif
 #endif
 
@@ -161,7 +161,7 @@ start_pass_phuff_decoder (j_decompress_ptr cinfo)
       if (cinfo->Ah == 0 ) {	/* DC refinement needs no table */
 	tbl = compptr->dc_tbl_no;
 	if (tbl < 0 || tbl >= NUM_HUFF_TBLS ||
-	    cinfo->dc_huff_tbl_ptrs[tbl] == NULL)
+	    cinfo->dc_huff_tbl_ptrs[tbl] == nullptr )
 	  ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, tbl);
 	jpeg_make_d_derived_tbl(cinfo, cinfo->dc_huff_tbl_ptrs[tbl],
 				& entropy->derived_tbls[tbl] );
@@ -169,7 +169,7 @@ start_pass_phuff_decoder (j_decompress_ptr cinfo)
     } else {
       tbl = compptr->ac_tbl_no;
       if (tbl < 0 || tbl >= NUM_HUFF_TBLS ||
-          cinfo->ac_huff_tbl_ptrs[tbl] == NULL)
+          cinfo->ac_huff_tbl_ptrs[tbl] == nullptr )
         ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, tbl);
       jpeg_make_d_derived_tbl(cinfo, cinfo->ac_huff_tbl_ptrs[tbl],
 			      & entropy->derived_tbls[tbl] );
@@ -200,7 +200,7 @@ start_pass_phuff_decoder (j_decompress_ptr cinfo)
 
 #ifdef AVOID_TABLES
 
-#define HUFF_EXTEND(x,s)  ((x) < (1<<((s)-1 ) ) ? (x) + (((-1 )<<(s) ) + 1 ) : (x) )
+#define HUFF_EXTEND(x,s)  ((x) < (1<<(( s)-1 ) ) ? (x) + (((-1 )<<( s) ) + 1 ) : (x) )
 
 #else
 
@@ -299,7 +299,7 @@ decode_mcu_DC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 
   /* Load up working state */
   BITREAD_LOAD_STATE(cinfo,entropy->bitstate);
-  ASSIGN_STATE(state, entropy->saved);
+  ASSIGN_STATE( state, entropy->saved);
 
   /* Outer loop handles each block in the MCU */
 
@@ -312,10 +312,10 @@ decode_mcu_DC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
     /* Decode a single block's worth of coefficients */
 
     /* Section F.2.2.1: decode the DC coefficient difference */
-    HUFF_DECODE(s, br_state, tbl, return FALSE, label1);
-    if (s) {
+    HUFF_DECODE( s, br_state, tbl, return FALSE, label1);
+    if ( s) {
       CHECK_BIT_BUFFER(br_state, s, return FALSE);
-      r = GET_BITS(s);
+      r = GET_BITS( s);
       s = HUFF_EXTEND(r, s);
     }
 
@@ -323,7 +323,7 @@ decode_mcu_DC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
     s += state.last_dc_val[ci];
     state.last_dc_val[ci] = s;
     /* Scale and output the DC coefficient (assumes jpeg_natural_order[0]=0 ) */
-    (*block)[0] = (JCOEF) (s << Al);
+    (*block)[0] = (JCOEF) ( s << Al);
   }
 
   /* Completed MCU, so update state */
@@ -376,16 +376,16 @@ decode_mcu_AC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
     tbl = entropy->ac_derived_tbl;
 
     for (k = cinfo->Ss; k <= Se; k++ ) {
-      HUFF_DECODE(s, br_state, tbl, return FALSE, label2);
+      HUFF_DECODE( s, br_state, tbl, return FALSE, label2);
       r = s >> 4;
       s &= 15;
-      if (s) {
+      if ( s) {
         k += r;
         CHECK_BIT_BUFFER(br_state, s, return FALSE);
-        r = GET_BITS(s);
+        r = GET_BITS( s);
         s = HUFF_EXTEND(r, s);
 	/* Scale and output coefficient in natural (dezigzagged) order */
-        (*block)[jpeg_natural_order[k]] = (JCOEF) (s << Al);
+        (*block)[jpeg_natural_order[k]] = (JCOEF) ( s << Al);
       } else {
         if (r == 15) {		/* ZRL */
           k += 15;		/* skip 15 zeroes in band */
@@ -510,11 +510,11 @@ decode_mcu_AC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 
   if (EOBRUN == 0 ) {
     for (; k <= Se; k++ ) {
-      HUFF_DECODE(s, br_state, tbl, goto undoit, label3);
+      HUFF_DECODE( s, br_state, tbl, goto undoit, label3);
       r = s >> 4;
       s &= 15;
-      if (s) {
-	if (s != 1 )		/* size of new coef should always be 1 */
+      if ( s) {
+	if ( s != 1 )		/* size of new coef should always be 1 */
 	  WARNMS(cinfo, JWRN_HUFF_BAD_CODE);
         CHECK_BIT_BUFFER(br_state, 1, goto undoit);
         if (GET_BITS(1 ) )
@@ -555,7 +555,7 @@ decode_mcu_AC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	}
 	k++;
       } while (k <= Se);
-      if (s) {
+      if ( s) {
 	int pos = jpeg_natural_order[k];
 	/* Output newly nonzero coefficient */
 	(*block)[pos] = (JCOEF) s;
@@ -621,12 +621,12 @@ jinit_phuff_decoder (j_decompress_ptr cinfo)
   entropy = (phuff_entropy_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(phuff_entropy_decoder) );
-  cinfo->entropy = (struct jpeg_entropy_decoder *) entropy;
+  cinfo->entropy = ( struct jpeg_entropy_decoder *) entropy;
   entropy->pub.start_pass = start_pass_phuff_decoder;
 
   /* Mark derived tables unallocated */
   for ( i = 0; i < NUM_HUFF_TBLS; i++ ) {
-    entropy->derived_tbls[i] = NULL;
+    entropy->derived_tbls[i] = nullptr;
   }
 
   /* Create progression status table */

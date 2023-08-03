@@ -25,17 +25,17 @@ typedef void (PFNPathCallback)(bool, int);
 class CClipPoint {
 public:
   CClipPoint(){ Reset(); };
-  void Reset(){ m_ptClip[0] = m_ptClip[1] = m_ptClip[2] = 0.0; m_bSet = false; m_pVec3 = NULL;};
+  void Reset(){ m_ptClip[0] = m_ptClip[1] = m_ptClip[2] = 0.0; m_bSet = false; m_pVec3 = nullptr;};
   bool Set(){ return m_bSet; };
   void Set(bool b) { m_bSet = b; };
   void UpdatePointPtr() { if (m_pVec3) VectorCopy(m_ptClip, *m_pVec3); };
-  void SetPointPtr(arcVec3* p) { m_pVec3 = p; };
-  arcVec3 m_ptClip;      // the 3d point
-  arcVec3* m_pVec3;      // optional ptr for 3rd party updates
+  void SetPointPtr(anVec3* p) { m_pVec3 = p; };
+  anVec3 m_ptClip;      // the 3d point
+  anVec3* m_pVec3;      // optional ptr for 3rd party updates
   CPoint m_ptScreen;    // the onscreen xy point (for mousability)
   bool m_bSet;
-  operator arcVec3&() {return m_ptClip;};
-  operator arcVec3*() {return &m_ptClip;};
+  operator anVec3&() {return m_ptClip;};
+  operator anVec3*() {return &m_ptClip;};
   operator float*() {return m_ptClip.ToFloatPtr();};
 };
 
@@ -61,8 +61,8 @@ public:
 // Implementation
 public:
   bool AreaSelectOK();
-  arcVec3& RotateOrigin();
-  arcVec3& Rotation();
+  anVec3& RotateOrigin();
+  anVec3& Rotation();
   void UndoClear();
   bool UndoAvailable();
   void KillPathMode();
@@ -71,13 +71,13 @@ public:
   void Copy();
   void Paste();
   void Redraw(unsigned int nBits);
-  void VectorCopyXY( const arcVec3 &in, arcVec3 &out );
+  void VectorCopyXY( const anVec3 &in, anVec3 &out );
 	void PositionView();
 	void FlipClip();
 	void SplitClip();
 	void Clip();
-	arcVec3& GetOrigin();
-	void SetOrigin(arcVec3 org);		// PGM
+	anVec3& GetOrigin();
+	void SetOrigin(anVec3 org);		// PGM
 	void XY_Init();
   void XY_Draw();
   void DrawZIcon();
@@ -87,12 +87,12 @@ public:
   void XY_DrawGrid();
   bool XY_MouseMoved ( int x, int y, int buttons);
   void NewBrushDrag ( int x, int y);
-  bool DragDelta ( int x, int y, arcVec3 &move);
+  bool DragDelta ( int x, int y, anVec3 &move);
   void XY_MouseUp( int x, int y, int buttons);
   void XY_MouseDown ( int x, int y, int buttons);
-  void XY_ToGridPoint ( int x, int y, arcVec3 &point);
-  void XY_ToPoint ( int x, int y, arcVec3 &point);
-  void SnapToPoint ( int x, int y, arcVec3 &point);
+  void XY_ToGridPoint ( int x, int y, anVec3 &point);
+  void XY_ToPoint ( int x, int y, anVec3 &point);
+  void SnapToPoint ( int x, int y, anVec3 &point);
   void SetActive(bool b) {m_bActive = b;};
   bool Active() {return m_bActive;};
   void DropClipPoint(UINT nFlags, CPoint point);
@@ -116,7 +116,7 @@ public:
   void DropPathPoint(UINT nFlags, CPoint point);
 
   bool PointMode();
-  void AddPointPoint(UINT nFlags, arcVec3* pVec);
+  void AddPointPoint(UINT nFlags, anVec3* pVec);
   void SetPointMode(bool b);
 
 
@@ -155,14 +155,14 @@ protected:
 	float	m_TopClip;
   float m_BottomClip;
   bool m_bDirty;
-	arcVec3 m_vOrigin;
+	anVec3 m_vOrigin;
 	CPoint m_ptCursor;
   bool m_bRButtonDown;
 
   int	m_nButtonstate;
   int m_nPressx;
   int m_nPressy;
-  arcVec3 m_vPressdelta;
+  anVec3 m_vPressdelta;
   bool m_bPress_selection;
 
 	int m_axisHoriz; //  <axisHoriz> and <axisVert> are one of AXIS_X, AXIS_Y, AXIS_Z and
@@ -194,8 +194,8 @@ protected:
   void ProduceSplits(brush_t** pFront, brush_t** pBack);
   void ProduceSplitLists();
   void HandleDrop();
-  void PaintSizeInfo( int nDim1, int nDim2, arcVec3 vMinBounds, arcVec3 vMaxBounds);
-	void DrawSelectedCentroid( int nDim1, int nDim2, arcVec3 vMinBounds, arcVec3 vMaxBounds );
+  void PaintSizeInfo( int nDim1, int nDim2, anVec3 vMinBounds, anVec3 vMaxBounds);
+	void DrawSelectedCentroid( int nDim1, int nDim2, anVec3 vMinBounds, anVec3 vMaxBounds );
 
   void OnEntityCreate(unsigned int nID);
   CPoint m_ptDown;

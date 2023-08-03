@@ -26,8 +26,8 @@
 ==============================================================================
 */
 
-template< class type >
-class arcQuadTree {
+template<class type>
+class anQuadTree {
 public:
 	typedef struct nodePosition_s {
 		int		level;
@@ -37,32 +37,32 @@ public:
 
 	typedef type dataType;
 
-	class arcQuadNode {
+	class anQuadNode {
 	public:
-								arcQuadNode( void ) {
-									parent = NULL;
+								anQuadNode( void ) {
+									parent = nullptr;
 									memset( children, 0, sizeof( children ) );
 									memset( neighbors, 0, sizeof( neighbors ) );
-									data = NULL;
+									data = nullptr;
 									bounds.Clear();
 								}
-								explicit arcQuadNode( const arcBounds &bounds ) {
-									parent = NULL;
+								explicit anQuadNode( const anBounds &bounds ) {
+									parent = nullptr;
 									memset( children, 0, sizeof( children ) );
 									memset( neighbors, 0, sizeof( neighbors ) );
-									data = NULL;
+									data = nullptr;
 									this->bounds = bounds;
 								}
-								explicit arcQuadNode( type *data, const arcBounds &bounds ) {
-									assert( data != NULL );
-									parent = NULL;
+								explicit anQuadNode( type *data, const anBounds &bounds ) {
+									assert( data != nullptr );
+									parent = nullptr;
 									memset( children, 0, sizeof( children ) );
 									memset( neighbors, 0, sizeof( neighbors ) );
 									this->data = data;
 									this->bounds = bounds;
 								}
-		virtual					~arcQuadNode( void ) {
-									assert( data == NULL );
+		virtual					~anQuadNode( void ) {
+									assert( data == nullptr );
 								}
 
 		void					SetData( type *data ) {
@@ -72,33 +72,33 @@ public:
 									return data;
 								}
 
-		void					SetParent( arcQuadNode &parent ) {
+		void					SetParent( anQuadNode &parent ) {
 									this->parent = &parent;
 								}
-		void					SetChild( arcQuadNode &child, const int index ) {
+		void					SetChild( anQuadNode &child, const int index ) {
 									assert( index >= 0 && index < 4 );
 									children[ index ] = &child;
 								}
-		void					SetNeighbor( arcQuadNode &neighbor, const int index ) {
+		void					SetNeighbor( anQuadNode &neighbor, const int index ) {
 									assert( index >= 0 && index < 4 );
 									neighbors[ index ] = &neighbor;
 								}
-		void					SetBounds( const arcBounds &bounds ) {
+		void					SetBounds( const anBounds &bounds ) {
 									this->bounds = bounds;
 								}
 
-		arcQuadNode *			GetParent( void ) const {
+		anQuadNode *			GetParent( void ) const {
 									return parent;
 								}
-		arcQuadNode *			GetChild( const int index ) const {
+		anQuadNode *			GetChild( const int index ) const {
 									assert( index >= 0 && index < 4 );
 									return children[ index ];
 								}
-		arcQuadNode *			GetNeighbor( const int index ) const {
+		anQuadNode *			GetNeighbor( const int index ) const {
 									assert( index >= 0 && index < 4 );
 									return neighbors[ index ];
 								}
-		arcBounds &				GetBounds( void ) {
+		anBounds &				GetBounds( void ) {
 									return bounds;
 								}
 
@@ -119,46 +119,46 @@ public:
 								}
 
 	private:
-		arcQuadNode *	parent;
-		arcQuadNode *	children[4];
-		arcQuadNode *	neighbors[4];
+		anQuadNode *	parent;
+		anQuadNode *	children[4];
+		anQuadNode *	neighbors[4];
 		type *			data;
 
-		arcBounds		bounds;
+		anBounds		bounds;
 
 		// keep track of the position in the tree
 		nodePosition_t	nodePosition;
 	};
 
-						explicit arcQuadTree( const arcBounds &bounds, const int depth = 6 );
-	virtual				~arcQuadTree( void );
+						explicit anQuadTree( const anBounds &bounds, const int depth = 6 );
+	virtual				~anQuadTree( void );
 
 	void				BuildQuadTree( void );
-	void				BuildQuadTree( arcQuadNode &node );
+	void				BuildQuadTree( anQuadNode &node );
 
 	const int			GetDepth( void ) const { return depth; }
 	const int			GetUsedDepth( void ) const;
 
-	const arcQuadNode *	GetHeadNode( void ) const { return headNode; }
-	arcQuadNode *		GetHeadNode( void ) { return headNode; }
+	const anQuadNode *	GetHeadNode( void ) const { return headNode; }
+	anQuadNode *		GetHeadNode( void ) { return headNode; }
 
-	arcQuadNode *		FindNode( const arcVec3 &point );
+	anQuadNode *		FindNode( const anVec3 &point );
 
-	arcQuadNode *		GetNode( const arcBounds &bounds );
-	arcQuadNode *		GetNode( const nodePosition_t &nodePosition );
-	arcQuadNode **		GetNodes( const int nodeLevel, int &numNodes ) {
+	anQuadNode *		GetNode( const anBounds &bounds );
+	anQuadNode *		GetNode( const nodePosition_t &nodePosition );
+	anQuadNode **		GetNodes( const int nodeLevel, int &numNodes ) {
 							assert( nodeLevel >=0 && nodeLevel < depth );
-							numNodes = arcMath::Pow( 2, nodeLevel * 2 );
+							numNodes = anMath::Pow( 2, nodeLevel * 2 );
 							return nodes[ nodeLevel ];
 						}
 
 	const int			GetNumLeafNodes( void ) const;
 
-	void				CreateChildren( arcQuadNode &parent );
-	void				FreeChildren( arcQuadNode &parent ) {
+	void				CreateChildren( anQuadNode &parent );
+	void				FreeChildren( anQuadNode &parent ) {
 							for ( int i = 0; i < 4; i++ ) {
-								if ( parent.GetChild(i) ) {
-									FreeNode( *parent.GetChild(i) );
+								if ( parent.GetChild( i ) ) {
+									FreeNode( *parent.GetChild( i ) );
 								}
 							}
 
@@ -166,34 +166,34 @@ public:
 						}
 
 private:
-	void				GetUsedDepth_r( arcQuadNode &node, const int currentDepth, int *maxReachedDepth ) const;
-	void				GetNumLeafNodes_r( arcQuadNode &node, int *numLeafNodes ) const;
-	arcQuadNode *		AllocNode( arcQuadNode **node, int nodeLevel, int x, int y );
-	void				FindChildren_r( arcQuadNode &parent, const int nodeLevel );
-	void				FindChildren_r( arcQuadNode &parent, const int nodeLevel, const int parentX, const int parentY );
+	void				GetUsedDepth_r( anQuadNode &node, const int currentDepth, int *maxReachedDepth ) const;
+	void				GetNumLeafNodes_r( anQuadNode &node, int *numLeafNodes ) const;
+	anQuadNode *		AllocNode( anQuadNode **node, int nodeLevel, int x, int y );
+	void				FindChildren_r( anQuadNode &parent, const int nodeLevel );
+	void				FindChildren_r( anQuadNode &parent, const int nodeLevel, const int parentX, const int parentY );
 	void				FindNeighbors_r( const int nodeLevel );
 
-	void				FreeNode( arcQuadNode &node ) {
-							nodes[ node.GetNodePosition().level ][ ( node.GetNodePosition().y << ( node.GetNodePosition().level ) ) + node.GetNodePosition().x ] = NULL;
+	void				FreeNode( anQuadNode &node ) {
+							nodes[ node.GetNodePosition().level ][ ( node.GetNodePosition().y << ( node.GetNodePosition().level ) ) + node.GetNodePosition().x ] = nullptr;
 							delete &node;
 						}
 
 private:
-	arcQuadNode *		headNode;
-	arcQuadNode ***		nodes;
+	anQuadNode *		headNode;
+	anQuadNode ***		nodes;
 
 	int					depth;
-	arcBounds			bounds;
-	arcVec2				nodeScale;
+	anBounds			bounds;
+	anVec2				nodeScale;
 };
 
 /*
 ================
-arcQuadTree<type>::arcQuadTree( const int depth )
+anQuadTree<type>::anQuadTree( const int depth )
 ================
 */
-template< class type >
-ARC_INLINE arcQuadTree<type>::arcQuadTree( const arcBounds &bounds, const int depth ) {
+template<class type>
+ARC_INLINE anQuadTree<type>::anQuadTree( const anBounds &bounds, const int depth ) {
 	assert( depth > 0 );
 
 	this->depth = depth;
@@ -202,20 +202,20 @@ ARC_INLINE arcQuadTree<type>::arcQuadTree( const arcBounds &bounds, const int de
 	// expand by 1 unit so everything fits completely in it
 	this->bounds.ExpandSelf( 1.f );
 
-	nodeScale.x = arcMath::Pow( 2, depth - 1 ) / ( this->bounds[ 1 ].x - this->bounds[ 0 ].x );
-	nodeScale.y = arcMath::Pow( 2, depth - 1 ) / ( this->bounds[ 1 ].y - this->bounds[ 0 ].y );
+	nodeScale.x = anMath::Pow( 2, depth - 1 ) / ( this->bounds[ 1 ].x - this->bounds[ 0 ].x );
+	nodeScale.y = anMath::Pow( 2, depth - 1 ) / ( this->bounds[ 1 ].y - this->bounds[ 0 ].y );
 
-	nodes = new arcQuadNode** [ depth ];
+	nodes = new anQuadNode** [ depth ];
 
 	for ( int i = 0; i < depth; i++ ) {
-		int nCells = arcMath::Pow( 2, i * 2 );
+		int nCells = anMath::Pow( 2, i * 2 );
 
-		nodes[ i ] = new arcQuadNode* [ nCells ];
-		memset( nodes[ i ], 0, nCells * sizeof( arcQuadNode* ) );
+		nodes[i] = new anQuadNode* [ nCells ];
+		memset( nodes[i], 0, nCells * sizeof( anQuadNode* ) );
 	}
 
 	// create head node
-	headNode = new arcQuadNode;
+	headNode = new anQuadNode;
 	headNode->SetBounds( bounds );
 
 	// put in node array
@@ -224,21 +224,21 @@ ARC_INLINE arcQuadTree<type>::arcQuadTree( const arcBounds &bounds, const int de
 
 /*
 ================
-arcQuadTree<type>::~arcQuadTree
+anQuadTree<type>::~anQuadTree
 ================
 */
-template< class type >
-ARC_INLINE arcQuadTree<type>::~arcQuadTree( void ) {
+template<class type>
+ARC_INLINE anQuadTree<type>::~anQuadTree( void ) {
 	if ( nodes ) {
 		for ( int i = 0; i < depth; i++ ) {
-			int nCells = static_cast< int >( arcMath::Pow( 2.f, i * 2.f ) );
+			int nCells = static_cast< int >( anMath::Pow( 2.f, i * 2.f ) );
 
 			for ( int j = 0; j < nCells; j++ ) {
-				if ( nodes[ i ][ j ] ) {
-					delete nodes[ i ][ j ];
+				if ( nodes[i][ j ] ) {
+					delete nodes[i][ j ];
 				}
 			}
-			delete [] nodes[ i ];
+			delete [] nodes[i];
 		}
 		delete [] nodes;
 	}
@@ -246,17 +246,17 @@ ARC_INLINE arcQuadTree<type>::~arcQuadTree( void ) {
 
 /*
 ================
-arcQuadTree<type>::GetUsedDepth_r
+anQuadTree<type>::GetUsedDepth_r
 ================
 */
-template< class type >
-void arcQuadTree<type>::GetUsedDepth_r( arcQuadNode &node, const int currentDepth, int *maxReachedDepth ) const {
+template<class type>
+void anQuadTree<type>::GetUsedDepth_r( anQuadNode &node, const int currentDepth, int *maxReachedDepth ) const {
 	if ( currentDepth > *maxReachedDepth ) {
 		*maxReachedDepth = currentDepth;
 	}
 
 	for ( int i = 0; i < 4; i++ ) {
-		arcQuadNode *child = node.GetChild( i );
+		anQuadNode *child = node.GetChild( i );
 		if ( child ) {
 			if ( currentDepth + 1 < depth ) {
 				GetUsedDepth_r( *child, currentDepth + 1, maxReachedDepth );
@@ -267,11 +267,11 @@ void arcQuadTree<type>::GetUsedDepth_r( arcQuadNode &node, const int currentDept
 
 /*
 ================
-arcQuadTree<type>::GetUsedDepth
+anQuadTree<type>::GetUsedDepth
 ================
 */
-template< class type >
-ARC_INLINE const int arcQuadTree<type>::GetUsedDepth( void ) const {
+template<class type>
+ARC_INLINE const int anQuadTree<type>::GetUsedDepth( void ) const {
 	int maxReachedDepth = 0;
 	GetUsedDepth_r( *headNode, 1, &maxReachedDepth );
 	return maxReachedDepth + 1;
@@ -279,11 +279,11 @@ ARC_INLINE const int arcQuadTree<type>::GetUsedDepth( void ) const {
 
 /*
 ================
-arcQuadTree<type>::BuildQuadTree
+anQuadTree<type>::BuildQuadTree
 ================
 */
-template< class type >
-ARC_INLINE void arcQuadTree<type>::BuildQuadTree( void ) {
+template<class type>
+ARC_INLINE void anQuadTree<type>::BuildQuadTree( void ) {
 #if 1
 	FindChildren_r( *headNode, 1, 0, 0 );
 #else
@@ -294,46 +294,46 @@ ARC_INLINE void arcQuadTree<type>::BuildQuadTree( void ) {
 
 /*
 ================
-arcQuadTree<type>::BuildQuadTree
+anQuadTree<type>::BuildQuadTree
 ================
 */
-template< class type >
-ARC_INLINE void arcQuadTree<type>::BuildQuadTree( typename arcQuadTree<type>::arcQuadNode &node ) {
+template<class type>
+ARC_INLINE void anQuadTree<type>::BuildQuadTree( typename anQuadTree<type>::anQuadNode &node ) {
 	// TODO
 }
 
 /*
 ================
-arcQuadTree<type>::FindNode
+anQuadTree<type>::FindNode
 ================
 */
-template< class type >
-ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::FindNode( const arcVec3 &point ) {
+template<class type>
+ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::FindNode( const anVec3 &point ) {
 	if ( !bounds.ContainsPoint( point ) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	int x = (int)( ( point.x - bounds[ 0 ].x ) * nodeScale.x );
 	int y = (int)( ( point.y - bounds[ 0 ].y ) * nodeScale.y );
 
 	for ( int nodeDepth = depth - 1; nodeDepth >= 0; nodeDepth--, x >>= 1, y >>= 1 ) {
-		arcQuadNode	*node = nodes[ nodeDepth ][ ( y << nodeDepth ) + x ];
+		anQuadNode	*node = nodes[ nodeDepth ][ ( y << nodeDepth ) + x ];
 		if ( node ) {
 			return node;
 		}
 	}
 
 	// should never happen
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-arcQuadTree<type>::GetNode( const arcBounds & )
+anQuadTree<type>::GetNode( const anBounds & )
 ================
 */
-template< class type >
-ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::GetNode( const arcBounds &bounds ) {
+template<class type>
+ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::GetNode( const anBounds &bounds ) {
 	int x = (int)( ( bounds[ 0 ].x - this->bounds[ 0 ].x ) * nodeScale.x );
 	int y = (int)( ( bounds[ 0 ].y - this->bounds[ 0 ].y ) * nodeScale.y );
 	int xR = x ^ (int)( ( bounds[ 1 ].x - this->bounds[ 0 ].x ) * nodeScale.x );
@@ -354,7 +354,7 @@ ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::GetNode(
 	x >>= shifted;
 	y >>= shifted;
 
-	arcQuadNode** node = &nodes[ nodeDepth - 1 ][ ( y << ( nodeDepth - 1 ) ) + x ];
+	anQuadNode** node = &nodes[ nodeDepth - 1 ][ ( y << ( nodeDepth - 1 ) ) + x ];
 
 	if ( *node ) {
 		return *node;
@@ -365,12 +365,12 @@ ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::GetNode(
 
 /*
 ================
-arcQuadTree<type>::GetNode( const nodePosition_t &nodePosition  )
+anQuadTree<type>::GetNode( const nodePosition_t &nodePosition  )
 ================
 */
-template< class type >
-ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::GetNode( const nodePosition_t &nodePosition ) {
-	arcQuadNode** node = &nodes[ nodePosition.level ][ ( nodePosition.y << ( nodePosition.level ) ) + nodePosition.x ];
+template<class type>
+ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::GetNode( const nodePosition_t &nodePosition ) {
+	anQuadNode** node = &nodes[ nodePosition.level ][ ( nodePosition.y << ( nodePosition.level ) ) + nodePosition.x ];
 
 	if ( *node ) {
 		return *node;
@@ -381,18 +381,18 @@ ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::GetNode(
 
 /*
 ================
-arcQuadTree<type>::GetNumLeafNodes_r
+anQuadTree<type>::GetNumLeafNodes_r
 ================
 */
-template< class type >
-void arcQuadTree<type>::GetNumLeafNodes_r( arcQuadNode &node, int *numLeafNodes ) const {
+template<class type>
+void anQuadTree<type>::GetNumLeafNodes_r( anQuadNode &node, int *numLeafNodes ) const {
 	if ( !node.HasChildren() ) {
 		(*numLeafNodes)++;
 		return;
 	}
 
 	for ( int i = 0; i < 4; i++ ) {
-		arcQuadNode *child = node.GetChild(i);
+		anQuadNode *child = node.GetChild( i );
 		if ( child ) {
 			GetNumLeafNodes_r( *child, numLeafNodes );
 		}
@@ -401,11 +401,11 @@ void arcQuadTree<type>::GetNumLeafNodes_r( arcQuadNode &node, int *numLeafNodes 
 
 /*
 ================
-arcQuadTree<type>::GetNumLeafNodes
+anQuadTree<type>::GetNumLeafNodes
 ================
 */
-template< class type >
-const int arcQuadTree<type>::GetNumLeafNodes( void ) const {
+template<class type>
+const int anQuadTree<type>::GetNumLeafNodes( void ) const {
 	int	numLeafNodes = 0;
 	GetNumLeafNodes_r( *headNode, &numLeafNodes );
 	return numLeafNodes;
@@ -413,27 +413,27 @@ const int arcQuadTree<type>::GetNumLeafNodes( void ) const {
 
 /*
 ================
-arcQuadTree<type>::AllocNode
+anQuadTree<type>::AllocNode
 ================
 */
-template< class type >
-ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::AllocNode( arcQuadNode **node, int nodeLevel, int x, int y ) {
-	int levelDimensions = arcMath::Pow( 2, nodeLevel );
-	arcVec2 cellSize( ( headNode->GetBounds()[ 1 ].x - headNode->GetBounds()[ 0 ].x ) / levelDimensions,
-	arcVec2 pCellsize;
+template<class type>
+ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::AllocNode( anQuadNode **node, int nodeLevel, int x, int y ) {
+	int levelDimensions = anMath::Pow( 2, nodeLevel );
+	anVec2 cellSize( ( headNode->GetBounds()[ 1 ].x - headNode->GetBounds()[ 0 ].x ) / levelDimensions,
+	anVec2 pCellsize;
 
 	// create the new node
-	arcVec2 nodeBounds.Clear();
-	arcVec2 nodeMins.Set( headNode->GetBounds()[ 0 ].x + x * cellSize.x, headNode->GetBounds()[ 0 ].y + y * cellSize.y );
-	arcBounds nodeBounds.AddPoint( arcVec3( nodeMins.x, nodeMins.y, 0.f ) );
-	arcBounds nodeBounds.AddPoint( arcVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
-	*node = new arcQuadNode( nodeBounds );
+	anVec2 nodeBounds.Clear();
+	anVec2 nodeMins.Set( headNode->GetBounds()[ 0 ].x + x * cellSize.x, headNode->GetBounds()[ 0 ].y + y * cellSize.y );
+	anBounds nodeBounds.AddPoint( anVec3( nodeMins.x, nodeMins.y, 0.f ) );
+	anBounds nodeBounds.AddPoint( anVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
+	*node = new anQuadNode( nodeBounds );
 
 	(*node)->SetNodePosition( nodeLevel, x, y );
 
 	// find (and create) all its parents
-	arcQuadNode** parent;
-	arcQuadNode** child = node;
+	anQuadNode** parent;
+	anQuadNode** child = node;
 	int pX = x;
 	int pY = y;
 	int pNodeLevel = nodeLevel;
@@ -445,16 +445,16 @@ ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::AllocNod
 		parent = &nodes[ pNodeLevel ][ ( pY << ( pNodeLevel ) ) + pX ];
 
 		if ( !(*parent) ) {
-			levelDimensions = arcMath::Pow( 2, pNodeLevel );
+			levelDimensions = anMath::Pow( 2, pNodeLevel );
 			pCellsize.Set( ( headNode->GetBounds()[ 1 ].x - headNode->GetBounds()[ 0 ].x ) / levelDimensions,
 						   ( headNode->GetBounds()[ 1 ].y - headNode->GetBounds()[ 0 ].y ) / levelDimensions );
 
 			// create the new node
 			nodeBounds.Clear();
 			nodeMins.Set( headNode->GetBounds()[ 0 ].x + pX * pCellsize.x, headNode->GetBounds()[ 0 ].y + pY * pCellsize.y );
-			nodeBounds.AddPoint( arcVec3( nodeMins.x, nodeMins.y, 0.f ) );
-			nodeBounds.AddPoint( arcVec3( nodeMins.x + pCellsize.x, nodeMins.y + pCellsize.y, 0.f ) );
-			*parent = new arcQuadNode( nodeBounds );
+			nodeBounds.AddPoint( anVec3( nodeMins.x, nodeMins.y, 0.f ) );
+			nodeBounds.AddPoint( anVec3( nodeMins.x + pCellsize.x, nodeMins.y + pCellsize.y, 0.f ) );
+			*parent = new anQuadNode( nodeBounds );
 
 			(*parent)->SetNodePosition( pNodeLevel, pX, pY );
 		}
@@ -469,7 +469,7 @@ ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::AllocNod
 	pY = y & ~1;
 	for ( x = pX; x < pX + 2; x++ ) {
 		for ( y = pY; y < pY + 2; y++ ) {
-			arcQuadNode** sibling = &nodes[ nodeLevel ][ ( y << nodeLevel ) + x ];
+			anQuadNode** sibling = &nodes[ nodeLevel ][ ( y << nodeLevel ) + x ];
 			if ( sibling == node ) {
 				continue;
 			}
@@ -477,9 +477,9 @@ ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::AllocNod
 			// create the new node
 			nodeBounds.Clear();
 			nodeMins.Set( headNode->GetBounds()[ 0 ].x + x * cellSize.x, headNode->GetBounds()[ 0 ].y + y * cellSize.y );
-			nodeBounds.AddPoint( arcVec3( nodeMins.x, nodeMins.y, 0.f ) );
-			nodeBounds.AddPoint( arcVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
-			*sibling = new arcQuadNode( nodeBounds );
+			nodeBounds.AddPoint( anVec3( nodeMins.x, nodeMins.y, 0.f ) );
+			nodeBounds.AddPoint( anVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
+			*sibling = new anQuadNode( nodeBounds );
 			(*sibling)->SetParent( *((*node)->GetParent()) );
 			(*sibling)->SetNodePosition( nodeLevel, x, y );
 		}
@@ -490,17 +490,17 @@ ARC_INLINE typename arcQuadTree<type>::arcQuadNode * arcQuadTree<type>::AllocNod
 
 /*
 ================
-arcQuadTree<type>::FindChildren_r
+anQuadTree<type>::FindChildren_r
 ================
 */
-template< class type >
-void arcQuadTree<type>::FindChildren_r( arcQuadNode &parent, const int nodeLevel ) {
-	int levelDimensions = arcMath::Pow( 2, nodeLevel );
+template<class type>
+void anQuadTree<type>::FindChildren_r( anQuadNode &parent, const int nodeLevel ) {
+	int levelDimensions = anMath::Pow( 2, nodeLevel );
 
 	// find all nodes with this node as a parent
 	for ( int x = 0; x < levelDimensions; x++ ) {
 		for ( int y = 0; y < levelDimensions; y++ ) {
-			arcQuadNode *child = nodes[ nodeLevel ][ ( y << nodeLevel ) + x ];
+			anQuadNode *child = nodes[ nodeLevel ][ ( y << nodeLevel ) + x ];
 			if ( child && child->GetParent() == &parent ) {
 				parent.SetChild( *child, (y % 2) * 2 + (x % 2) );
 				if ( nodeLevel + 1 < depth ) {
@@ -513,15 +513,15 @@ void arcQuadTree<type>::FindChildren_r( arcQuadNode &parent, const int nodeLevel
 
 /*
 ================
-arcQuadTree<type>::FindChildren_r
+anQuadTree<type>::FindChildren_r
 ================
 */
-template< class type >
-void arcQuadTree<type>::FindChildren_r( arcQuadNode &parent, const int nodeLevel, const int parentX, const int parentY ) {
+template<class type>
+void anQuadTree<type>::FindChildren_r( anQuadNode &parent, const int nodeLevel, const int parentX, const int parentY ) {
 	// find all nodes with this node as a parent
 	for ( int x = parentX; x < parentX + 2; x++ ) {
 		for ( int y = parentY; y < parentY + 2; y++ ) {
-			arcQuadNode *child = nodes[ nodeLevel ][ ( y << nodeLevel ) + x ];
+			anQuadNode *child = nodes[ nodeLevel ][ ( y << nodeLevel ) + x ];
 			if ( child ) {
 				parent.SetChild( *child, ( ( y - parentY ) << 1 ) + ( x - parentX ) );
 
@@ -536,12 +536,12 @@ void arcQuadTree<type>::FindChildren_r( arcQuadNode &parent, const int nodeLevel
 
 /*
 ================
-arcQuadTree<type>::FindNeighbors_r
+anQuadTree<type>::FindNeighbors_r
 ================
 */
-template< class type >
-void arcQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
-	int levelDimensions = arcMath::Pow( 2, nodeLevel );
+template<class type>
+void anQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
+	int levelDimensions = anMath::Pow( 2, nodeLevel );
 
 	for ( int x = 0; x < levelDimensions; x++ ) {
 		for ( int y = 0; y < levelDimensions; y++ ) {
@@ -555,7 +555,7 @@ void arcQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
 				int nbX = x;
 				int nbY = y - 1;
 
-				arcQuadNode *neighbor = nodes[ nodeLevel ][ ( nbY << nodeLevel ) + nbX ];
+				anQuadNode *neighbor = nodes[ nodeLevel ][ ( nbY << nodeLevel ) + nbX ];
 
 				// first see if we have a neighbor on this level
 				if ( neighbor ) {
@@ -572,12 +572,12 @@ void arcQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
 				}
 			}
 
-            // left neighbor (1)
+            // left neighbor ( 1 )
 			if ( x > 0 ) {
 				int nbX = x - 1;
 				int nbY = y;
 
-				arcQuadNode	*neighbor = nodes[ nodeLevel ][ ( nbY << nodeLevel ) + nbX ];
+				anQuadNode	*neighbor = nodes[ nodeLevel ][ ( nbY << nodeLevel ) + nbX ];
 
 				// first see if we have a neighbor on this level
 				if ( neighbor ) {
@@ -599,7 +599,7 @@ void arcQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
 				int nbX = x + 1;
 				int nbY = y;
 
-				arcQuadNode	*neighbor = nodes[ nodeLevel ][ ( nbY << nodeLevel ) + nbX ];
+				anQuadNode	*neighbor = nodes[ nodeLevel ][ ( nbY << nodeLevel ) + nbX ];
 
 				// first see if we have a neighbor on this level
 				if ( neighbor ) {
@@ -621,7 +621,7 @@ void arcQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
 				int nbX = x;
 				int nbY = y + 1;
 
-				arcQuadNode	*neighbor = nodes[ nodeLevel ][ ( nbY << nodeLevel ) + nbX ];
+				anQuadNode	*neighbor = nodes[ nodeLevel ][ ( nbY << nodeLevel ) + nbX ];
 
 				// first see if we have a neighbor on this level
 				if ( neighbor ) {
@@ -647,11 +647,11 @@ void arcQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
 
 /*
 ================
-arcQuadTree<type>::FindNeighbors_r
+anQuadTree<type>::FindNeighbors_r
 ================
 */
-template< class type >
-void arcQuadTree<type>::CreateChildren( arcQuadNode &parent ) {
+template<class type>
+void anQuadTree<type>::CreateChildren( anQuadNode &parent ) {
 	int				parentX, parentY;
 	nodePosition_t	parentNodePosition = parent.GetNodePosition();
 
@@ -665,7 +665,7 @@ void arcQuadTree<type>::CreateChildren( arcQuadNode &parent ) {
 	// create all the nodes children
 	for ( int x = parentX; x < parentX + 2; x++ ) {
 		for ( int y = parentY; y < parentY + 2; y++ ) {
-			arcQuadNode **child = &nodes[ parentNodePosition.level + 1 ][ ( y << (parentNodePosition.level + 1) ) + x ];
+			anQuadNode **child = &nodes[ parentNodePosition.level + 1 ][ ( y << (parentNodePosition.level + 1) ) + x ];
 
 			if ( !(*child) ) {
 				AllocNode( child, parentNodePosition.level + 1 , x, y );

@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../ui/Window.h"
@@ -46,7 +46,7 @@ bool rvGEOptions::Save( void ) {
 	mRegistry.SetLong( "lastOptionsPage", mLastOptionsPage );
 
 	// Write the grid settings
-	mRegistry.SetVec4( "gridColor", arcVec4(mGridColor[0],mGridColor[1],mGridColor[2],1.0f) );
+	mRegistry.SetVec4( "gridColor", anVec4(mGridColor[0],mGridColor[1],mGridColor[2],1.0f) );
 	mRegistry.SetLong( "gridWidth", mGridWidth );
 	mRegistry.SetLong( "gridHeight", mGridHeight );
 	mRegistry.SetBool( "gridSnap", mGridSnap );

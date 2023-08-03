@@ -46,7 +46,7 @@ If you have questions concerning this license or the applicable additional terms
 class idBrush;
 class idBrushList;
 
-void DisplayRealTimeString( char *string, ... ) arc_attribute((format(printf,1,2) ));
+void DisplayRealTimeString( char *string, ... ) an_attribute((format(printf,1,2) ) );
 
 
 //===============================================================
@@ -66,24 +66,24 @@ class idBrushSide {
 
 public:
 							idBrushSide( void );
-							idBrushSide( const arcPlane &plane, int planeNum );
+							idBrushSide( const anPlane &plane, int planeNum );
 							~idBrushSide( void );
 
 	int						GetFlags( void ) const { return flags; }
 	void					SetFlag( int flag ) { flags |= flag; }
 	void					RemoveFlag( int flag ) { flags &= ~flag; }
-	const arcPlane &			GetPlane( void ) const { return plane; }
+	const anPlane &			GetPlane( void ) const { return plane; }
 	void					SetPlaneNum( int num ) { planeNum = num; }
 	int						GetPlaneNum( void ) { return planeNum; }
-	const arcWinding *		GetWinding( void ) const { return winding; }
+	const anWinding *		GetWinding( void ) const { return winding; }
 	idBrushSide *			Copy( void ) const;
-	int						Split( const arcPlane &splitPlane, idBrushSide **front, idBrushSide **back ) const;
+	int						Split( const anPlane &splitPlane, idBrushSide **front, idBrushSide **back ) const;
 
 private:
 	int						flags;
 	int						planeNum;
-	arcPlane					plane;
-	arcWinding *				winding;
+	anPlane					plane;
+	anWinding *				winding;
 };
 
 
@@ -110,25 +110,25 @@ public:
 	void					SetPrimitiveNum( int num ) { primitiveNum = num; }
 	void					SetContents( int contents ) { this->contents = contents; }
 	int						GetContents( void ) const { return contents; }
-	const arcBounds &		GetBounds( void ) const { return bounds; }
+	const anBounds &		GetBounds( void ) const { return bounds; }
 	float					GetVolume( void ) const;
 	int						GetNumSides( void ) const { return sides.Num(); }
 	idBrushSide *			GetSide( int i ) const { return sides[i]; }
 	void					SetPlaneSide( int s ) { planeSide = s; }
 	void					SavePlaneSide( void ) { savedPlaneSide = planeSide; }
 	int						GetSavedPlaneSide( void ) const { return savedPlaneSide; }
-	bool					FromSides( arcNetList<idBrushSide *> &sideList );
-	bool					FromWinding( const arcWinding &w, const arcPlane &windingPlane );
-	bool					FromBounds( const arcBounds &bounds );
-	void					Transform( const arcVec3 &origin, const arcMat3 &axis );
+	bool					FromSides( anList<idBrushSide *> &sideList );
+	bool					FromWinding( const anWinding &w, const anPlane &windingPlane );
+	bool					FromBounds( const anBounds &bounds );
+	void					Transform( const anVec3 &origin, const anMat3 &axis );
 	idBrush *				Copy( void ) const;
 	bool					TryMerge( const idBrush *brush, const aRcPlaneSet &planeList );
 							// returns true if the brushes did intersect
 	bool					Subtract( const idBrush *b, idBrushList &list ) const;
 							// split the brush into a front and back brush
-	int						Split( const arcPlane &plane, int planeNum, idBrush **front, idBrush **back ) const;
+	int						Split( const anPlane &plane, int planeNum, idBrush **front, idBrush **back ) const;
 							// expand the brush for an axial bounding box
-	void					ExpandForAxialBox( const arcBounds &bounds );
+	void					ExpandForAxialBox( const anBounds &bounds );
 							// next brush in list
 	idBrush *				Next( void ) const { return next; }
 
@@ -141,12 +141,12 @@ private:
 	int						contents;			// contents of brush
 	int						planeSide;			// side of a plane this brush is on
 	int						savedPlaneSide;		// saved plane side
-	arcBounds				bounds;				// brush bounds
-	arcNetList<idBrushSide *>	sides;				// list with sides
+	anBounds				bounds;				// brush bounds
+	anList<idBrushSide *>	sides;				// list with sides
 
 private:
 	bool					CreateWindings( void );
-	void					BoundBrush( const idBrush *original = NULL );
+	void					BoundBrush( const idBrush *original = nullptr );
 	void					AddBevelsForAxialBox( void );
 	bool					RemoveSidesWithoutWinding( void );
 };
@@ -167,9 +167,9 @@ public:
 	int						NumSides( void ) const { return numBrushSides; }
 	idBrush *				Head( void ) const { return head; }
 	idBrush *				Tail( void ) const { return tail; }
-	void					Clear( void ) { head = tail = NULL; numBrushes = 0; }
+	void					Clear( void ) { head = tail = nullptr; numBrushes = 0; }
 	bool					IsEmpty( void ) const { return (numBrushes == 0 ); }
-	arcBounds				GetBounds( void ) const;
+	anBounds				GetBounds( void ) const;
 							// add brush to the tail of the list
 	void					AddToTail( idBrush *brush );
 							// add list to the tail of the list
@@ -187,17 +187,17 @@ public:
 							// delete all brushes in the list
 	void					Free( void );
 							// split the brushes in the list into two lists
-	void					Split( const arcPlane &plane, int planeNum, idBrushList &frontList, idBrushList &backList, bool useBrushSavedPlaneSide = false );
+	void					Split( const anPlane &plane, int planeNum, idBrushList &frontList, idBrushList &backList, bool useBrushSavedPlaneSide = false );
 							// chop away all brush overlap
 	void					Chop( bool (*ChopAllowed)( idBrush *b1, idBrush *b2 ) );
 							// merge brushes
 	void					Merge( bool (*MergeAllowed)( idBrush *b1, idBrush *b2 ) );
 							// set the given flag on all brush sides facing the plane
-	void					SetFlagOnFacingBrushSides( const arcPlane &plane, int flag );
+	void					SetFlagOnFacingBrushSides( const anPlane &plane, int flag );
 							// get a list with planes for all brushes in the list
 	void					CreatePlaneList( aRcPlaneSet &planeList ) const;
 							// write a brush map with the brushes in the list
-	void					WriteBrushMap( const arcNetString &fileName, const arcNetString &ext ) const;
+	void					WriteBrushMap( const anString &fileName, const anString &ext ) const;
 
 private:
 	idBrush *				head;
@@ -216,15 +216,15 @@ private:
 class idBrushMap {
 
 public:
-							idBrushMap( const arcNetString &fileName, const arcNetString &ext );
+							idBrushMap( const anString &fileName, const anString &ext );
 							~idBrushMap( void );
-	void					SetTexture( const arcNetString &textureName ) { texture = textureName; }
+	void					SetTexture( const anString &textureName ) { texture = textureName; }
 	void					WriteBrush( const idBrush *brush );
 	void					WriteBrushList( const idBrushList &brushList );
 
 private:
-	arcNetFile *				fp;
-	arcNetString					texture;
+	anFile *				fp;
+	anString					texture;
 	int						brushCount;
 };
 

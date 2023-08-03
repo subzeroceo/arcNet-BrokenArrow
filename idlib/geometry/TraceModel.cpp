@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "TraceModel.h"
@@ -10,22 +10,22 @@
 
 /*
 ====================
-arcSurface_Traceable::TraceableTriHash::TraceableTriHash
+anSurface_Traceable::TraceableTriHash::TraceableTriHash
 ====================
 */
-arcSurface_Traceable::TraceableTriHash( arcSurface_Traceable& surface, const int binsPerAxis, const int snapFractions ) {
+anSurface_Traceable::TraceableTriHash( anSurface_Traceable& surface, const int binsPerAxis, const int snapFractions ) {
 	this->binsPerAxis = binsPerAxis;
 	this->snapFractions = snapFractions;
 	bounds = surface.GetBounds();
 
 	// spread the bounds so it will never have a zero size
 	for ( int i = 0; i < 3; i++ ) {
-		bounds[0][i] = arcMath::Floor( bounds[0][i] - 1 );
-		bounds[1][i] = arcMath::Ceil( bounds[1][i] + 1 );
+		bounds[0][i] = anMath::Floor( bounds[0][i] - 1 );
+		bounds[1][i] = anMath::Ceil( bounds[1][i] + 1 );
 		scale[i] = ( bounds[1][i] - bounds[0][i] ) / binsPerAxis;
 
-		intMins[i] = arcMath::Ftoi( bounds[0][i] * snapFractions );
-		intScale[i] = arcMath::Ftoi( scale[i] * snapFractions );
+		intMins[i] = anMath::Ftoi( bounds[0][i] * snapFractions );
+		intScale[i] = anMath::Ftoi( scale[i] * snapFractions );
 		if ( intScale[i] < 1 ) {
 			intScale[i] = 1;
 		}
@@ -35,16 +35,16 @@ arcSurface_Traceable::TraceableTriHash( arcSurface_Traceable& surface, const int
 
     // insert triangles into bins
 	int					triBins[2][3];
-	const arcDrawVert *	verts = surface.GetVertices();
+	const anDrawVertex *	verts = surface.GetVertices();
 	const vertIndex_t *	indexes = surface.GetIndexes();
 
 	for ( int i = 0; i < surface.GetNumIndexes(); i += 3 ) {
-		arcBounds triBounds.Clear();
+		anBounds triBounds.Clear();
 		for ( int k = 0; k < 3; k++ ) {
 			triBounds.AddPoint( verts[ indexes[ i + k ] ].xyz );
 		}
 		for ( int k = 0; k < 3; k++ ) {
-			triBins[0][ k ] = arcMath::Ftoi( arcMath::Floor( ( triBounds[0][ k ] + .5f / snapFractions ) * snapFractions ) );
+			triBins[0][ k ] = anMath::Ftoi( anMath::Floor( ( triBounds[0][ k ] + .5f / snapFractions ) * snapFractions ) );
 			triBins[0][ k ] = ( triBins[0][ k ] - intMins[ k ] ) / intScale[ k ];
 			if ( triBins[0][ k ] < 0 ) {
 				triBins[0][ k ] = 0;
@@ -52,7 +52,7 @@ arcSurface_Traceable::TraceableTriHash( arcSurface_Traceable& surface, const int
 				triBins[0][ k ] = binsPerAxis - 1;
 			}
 
-			triBins[1][ k ] = arcMath::Ftoi(arcMath::Ceil( ( triBounds[1][ k ] + .5f / snapFractions ) * snapFractions ) );
+			triBins[1][ k ] = anMath::Ftoi(anMath::Ceil( ( triBounds[1][ k ] + .5f / snapFractions ) * snapFractions ) );
 			triBins[1][ k ] = ( triBins[1][ k ] - intMins[ k ] ) / intScale[ k ];
 			if ( triBins[1][ k ] < 0 ) {
 				triBins[1][ k ] = 0;
@@ -76,10 +76,10 @@ arcSurface_Traceable::TraceableTriHash( arcSurface_Traceable& surface, const int
 
 /*
 ====================
-arcSurface_Traceable::RayIntersection
+anSurface_Traceable::RayIntersection
 ====================
 */
-bool arcSurface_Traceable::RayIntersection( /*arcList< int >& tracedTris,*/ const arcVec3& start, const arcVec3& dir, float& scale, arcDrawVert& dv, bool backFaceCull ) const {
+bool anSurface_Traceable::RayIntersection( /*arcList< int >& tracedTris,*/ const anVec3& start, const anVec3& dir, float& scale, anDrawVertex& dv, bool backFaceCull ) const {
 	//tracedTris.Clear();
 	if ( !hash ) {
 		return false;
@@ -91,7 +91,7 @@ bool arcSurface_Traceable::RayIntersection( /*arcList< int >& tracedTris,*/ cons
 
 	traceCount++;
 
-	arcVec3 point = start + dir * scale;
+	anVec3 point = start + dir * scale;
 
 	int edgeIndex[3];
 	int side[3];
@@ -99,7 +99,7 @@ bool arcSurface_Traceable::RayIntersection( /*arcList< int >& tracedTris,*/ cons
 	float d;
 	arcBitField_Stack sidedness;
 	arcBitField_Stack sidednessCalculated;
-	arcPluecker rayPl, pl;
+	anPluecker rayPl, pl;
 
 	int sizeForEdges = arcBitField_Stack::GetSizeForMaxBits( edges.Num() );
 
@@ -113,7 +113,7 @@ bool arcSurface_Traceable::RayIntersection( /*arcList< int >& tracedTris,*/ cons
 	//const int RAY_STEPS = 400;
 	const int RAY_STEPS = 1000;
 
-	arcVec3 step = dir * ( 2.f / static_cast< float >( RAY_STEPS ) ) * traceDist;
+	anVec3 step = dir * ( 2.f / static_cast< float >( RAY_STEPS ) ) * traceDist;
 
 	for ( int i = 0; i < RAY_STEPS; i++, point += step ) {
 		TraceableTriHash::hashBin_t *bin = hash->GetHashBin( point );
@@ -146,7 +146,7 @@ bool arcSurface_Traceable::RayIntersection( /*arcList< int >& tracedTris,*/ cons
 					GenerateIntersectionDrawVert( start + dir * scale, tri->triIndex, dv );
 					return true;
 				}
-			} else if ( !backFaceCull && !(side[0] | side[1] | side[2]) ) {
+			} else if ( !backFaceCull && !( side[0] | side[1] | side[2]) ) {
 				if ( triPlanes[tri->triIndex / 3].RayIntersection( start, dir, scale ) && !FLOATSIGNBITSET( scale ) ) {
 					GenerateIntersectionDrawVert( start + dir * scale, tri->triIndex, dv );
 					return true;
@@ -161,13 +161,13 @@ bool arcSurface_Traceable::RayIntersection( /*arcList< int >& tracedTris,*/ cons
 
 /*
 ====================
-arcSurface_Traceable::RayIntersection
+anSurface_Traceable::RayIntersection
 ====================
 */
-void arcSurface_Traceable::GenerateIntersectionDrawVert( const arcVec3 &intersection, const int intersectedTriIndex, arcDrawVert &dv ) const {
-	const arcDrawVert *v0 = &verts[indexes[intersectedTriIndex + 0]];
-	const arcDrawVert *v1 = &verts[indexes[intersectedTriIndex + 1]];
-	const arcDrawVert *v2 = &verts[indexes[intersectedTriIndex + 2]];
+void anSurface_Traceable::GenerateIntersectionDrawVert( const anVec3 &intersection, const int intersectedTriIndex, anDrawVertex &dv ) const {
+	const anDrawVertex *v0 = &verts[indexes[intersectedTriIndex + 0]];
+	const anDrawVertex *v1 = &verts[indexes[intersectedTriIndex + 1]];
+	const anDrawVertex *v2 = &verts[indexes[intersectedTriIndex + 2]];
 
 	// find the barycentric coordinates
 	float denom = idWinding::TriangleArea( v0->xyz, v1->xyz, v2->xyz );
@@ -185,20 +185,20 @@ void arcSurface_Traceable::GenerateIntersectionDrawVert( const arcVec3 &intersec
 	}
 
 #if defined( SD_USE_DRAWVERT_SIZE_32 )
-	arcVec3 normal;
-	arcVec3 normal0 = v0->GetNormal();
-	arcVec3 normal1 = v1->GetNormal();
-	arcVec3 normal2 = v2->GetNormal();
+	anVec3 normal;
+	anVec3 normal0 = v0->GetNormal();
+	anVec3 normal1 = v1->GetNormal();
+	anVec3 normal2 = v2->GetNormal();
 	for ( int i = 0; i < 3; i++ ) {
 		normal[i] = a * normal0[i] + b * nnormal1[i] + c * normal2[i];
 	}
 	normal.Normalize();
 	dv.SetNormal( n );
 
-	arcVec3 tangent;
-	arcVec3 tangent0 = v0->GetTangent();
-	arcVec3 tangent1 = v1->GetTangent();
-	arcVec3 tangent2 = v2->GetTangent();
+	anVec3 tangent;
+	anVec3 tangent0 = v0->GetTangent();
+	anVec3 tangent1 = v1->GetTangent();
+	anVec3 tangent2 = v2->GetTangent();
 	for ( int i = 0; i < 3; i++ ) {
 		tangent[i] = a * tangent0[i] + b * tangent1[i] + c * tangent2[i];
 	}
@@ -223,7 +223,7 @@ void arcSurface_Traceable::GenerateIntersectionDrawVert( const arcVec3 &intersec
 #endif
 
 	for ( int i = 0; i < 4; i++ ) {
-		dv.color[i] = arcMath::Ftob( a * v0->color[i] + b * v1->color[i] + c * v2->color[i] );
+		dv.color[i] = anMath::Ftob( a * v0->color[i] + b * v1->color[i] + c * v2->color[i] );
 	}
 }
 /*====================================================================================================================*
@@ -234,10 +234,10 @@ void arcSurface_Traceable::GenerateIntersectionDrawVert( const arcVec3 &intersec
 
 /*
 ============
-arcTraceModel::SetupBox
+anTraceModel::SetupBox
 ============
 */
-void arcTraceModel::SetupBox( const arcBounds &boxBounds ) {
+void anTraceModel::SetupBox( const anBounds &boxBounds ) {
 	int i;
 
 	if ( type != TRM_BOX ) {
@@ -274,13 +274,13 @@ void arcTraceModel::SetupBox( const arcBounds &boxBounds ) {
 
 /*
 ============
-arcTraceModel::SetupBox
+anTraceModel::SetupBox
 
   The origin is placed at the center of the cube.
 ============
 */
-void arcTraceModel::SetupBox( const float size ) {
-	arcBounds boxBounds;
+void anTraceModel::SetupBox( const float size ) {
+	anBounds boxBounds;
 	float halfSize;
 
 	halfSize = size * 0.5f;
@@ -291,12 +291,12 @@ void arcTraceModel::SetupBox( const float size ) {
 
 /*
 ============
-arcTraceModel::InitBox
+anTraceModel::InitBox
 
   Initialize size independent box.
 ============
 */
-void arcTraceModel::InitBox( void ) {
+void anTraceModel::InitBox( void ) {
 	int i;
 
 	type = TRM_BOX;
@@ -309,7 +309,7 @@ void arcTraceModel::InitBox( void ) {
 		edges[ i + 1 ].v[0] = i;
 		edges[ i + 1 ].v[1] = ( i + 1 ) & 3;
 		edges[ i + 5 ].v[0] = 4 + i;
-		edges[ i + 5 ].v[1] = 4 + (( i + 1 ) & 3);
+		edges[ i + 5 ].v[1] = 4 + ( ( i + 1 ) & 3);
 		edges[ i + 9 ].v[0] = i;
 		edges[ i + 9 ].v[1] = 4 + i;
 	}
@@ -365,12 +365,12 @@ void arcTraceModel::InitBox( void ) {
 
 /*
 ============
-arcTraceModel::SetupOctahedron
+anTraceModel::SetupOctahedron
 ============
 */
-void arcTraceModel::SetupOctahedron( const arcBounds &octBounds ) {
+void anTraceModel::SetupOctahedron( const anBounds &octBounds ) {
 	int i, e0, e1, v0, v1, v2;
-	arcVec3 v;
+	anVec3 v;
 
 	if ( type != TRM_OCTAHEDRON ) {
 		InitOctahedron();
@@ -414,13 +414,13 @@ void arcTraceModel::SetupOctahedron( const arcBounds &octBounds ) {
 
 /*
 ============
-arcTraceModel::SetupOctahedron
+anTraceModel::SetupOctahedron
 
   The origin is placed at the center of the octahedron.
 ============
 */
-void arcTraceModel::SetupOctahedron( const float size ) {
-	arcBounds octBounds;
+void anTraceModel::SetupOctahedron( const float size ) {
+	anBounds octBounds;
 	float halfSize;
 
 	halfSize = size * 0.5f;
@@ -431,12 +431,12 @@ void arcTraceModel::SetupOctahedron( const float size ) {
 
 /*
 ============
-arcTraceModel::InitOctahedron
+anTraceModel::InitOctahedron
 
   Initialize size independent octahedron.
 ============
 */
-void arcTraceModel::InitOctahedron( void ) {
+void anTraceModel::InitOctahedron( void ) {
 	type = TRM_OCTAHEDRON;
 	numVerts = 6;
 	numEdges = 12;
@@ -503,13 +503,13 @@ void arcTraceModel::InitOctahedron( void ) {
 
 /*
 ============
-arcTraceModel::SetupDodecahedron
+anTraceModel::SetupDodecahedron
 ============
 */
-void arcTraceModel::SetupDodecahedron( const arcBounds &dodBounds ) {
+void anTraceModel::SetupDodecahedron( const anBounds &dodBounds ) {
 	int i, e0, e1, e2, e3, v0, v1, v2, v3, v4;
 	float s, d;
-	arcVec3 a, b, c;
+	anVec3 a, b, c;
 
 	if ( type != TRM_DODECAHEDRON ) {
 		InitDodecahedron();
@@ -587,13 +587,13 @@ void arcTraceModel::SetupDodecahedron( const arcBounds &dodBounds ) {
 
 /*
 ============
-arcTraceModel::SetupDodecahedron
+anTraceModel::SetupDodecahedron
 
   The origin is placed at the center of the octahedron.
 ============
 */
-void arcTraceModel::SetupDodecahedron( const float size ) {
-	arcBounds dodBounds;
+void anTraceModel::SetupDodecahedron( const float size ) {
+	anBounds dodBounds;
 	float halfSize;
 
 	halfSize = size * 0.5f;
@@ -604,12 +604,12 @@ void arcTraceModel::SetupDodecahedron( const float size ) {
 
 /*
 ============
-arcTraceModel::InitDodecahedron
+anTraceModel::InitDodecahedron
 
   Initialize size independent dodecahedron.
 ============
 */
-void arcTraceModel::InitDodecahedron( void ) {
+void anTraceModel::InitDodecahedron( void ) {
 
 	type = TRM_DODECAHEDRON;
 	numVerts = 20;
@@ -739,28 +739,28 @@ void arcTraceModel::InitDodecahedron( void ) {
 
 /*
 ============
-arcTraceModel::SetupCylinder
+anTraceModel::SetupCylinder
 ============
 */
-void arcTraceModel::SetupCylinder( const arcBounds &cylBounds, const int numSides ) {
+void anTraceModel::SetupCylinder( const anBounds &cylBounds, const int numSides ) {
 	int i, n, ii, n2;
 	float angle;
-	arcVec3 halfSize;
+	anVec3 halfSize;
 
 	n = numSides;
 	if ( n < 3 ) {
 		n = 3;
 	}
 	if ( n * 2 > MAX_TRACEMODEL_VERTS ) {
-		arcLibrary::common->Printf( "WARNING: arcTraceModel::SetupCylinder: too many vertices\n" );
+		anLibrary::common->Printf( "WARNING: anTraceModel::SetupCylinder: too many vertices\n" );
 		n = MAX_TRACEMODEL_VERTS / 2;
 	}
 	if ( n * 3 > MAX_TRACEMODEL_EDGES ) {
-		arcLibrary::common->Printf( "WARNING: arcTraceModel::SetupCylinder: too many sides\n" );
+		anLibrary::common->Printf( "WARNING: anTraceModel::SetupCylinder: too many sides\n" );
 		n = MAX_TRACEMODEL_EDGES / 3;
 	}
 	if ( n + 2 > MAX_TRACEMODEL_POLYS ) {
-		arcLibrary::common->Printf( "WARNING: arcTraceModel::SetupCylinder: too many polygons\n" );
+		anLibrary::common->Printf( "WARNING: anTraceModel::SetupCylinder: too many polygons\n" );
 		n = MAX_TRACEMODEL_POLYS - 2;
 	}
 
@@ -772,7 +772,7 @@ void arcTraceModel::SetupCylinder( const arcBounds &cylBounds, const int numSide
 	halfSize = cylBounds[1] - offset;
 	for ( i = 0; i < n; i++ ) {
 		// verts
-		angle = arcMath::TWO_PI * i / n;
+		angle = anMath::TWO_PI * i / n;
 		verts[i].x = cos( angle ) * halfSize.x + offset.x;
 		verts[i].y = sin( angle ) * halfSize.y + offset.y;
 		verts[i].z = -halfSize.z + offset.z;
@@ -834,13 +834,13 @@ void arcTraceModel::SetupCylinder( const arcBounds &cylBounds, const int numSide
 
 /*
 ============
-arcTraceModel::SetupCylinder
+anTraceModel::SetupCylinder
 
   The origin is placed at the center of the cylinder.
 ============
 */
-void arcTraceModel::SetupCylinder( const float height, const float width, const int numSides ) {
-	arcBounds cylBounds;
+void anTraceModel::SetupCylinder( const float height, const float width, const int numSides ) {
+	anBounds cylBounds;
 	float halfHeight, halfWidth;
 
 	halfHeight = height * 0.5f;
@@ -852,28 +852,28 @@ void arcTraceModel::SetupCylinder( const float height, const float width, const 
 
 /*
 ============
-arcTraceModel::SetupCone
+anTraceModel::SetupCone
 ============
 */
-void arcTraceModel::SetupCone( const arcBounds &coneBounds, const int numSides ) {
+void anTraceModel::SetupCone( const anBounds &coneBounds, const int numSides ) {
 	int i, n, ii;
 	float angle;
-	arcVec3 halfSize;
+	anVec3 halfSize;
 
 	n = numSides;
 	if ( n < 2 ) {
 		n = 3;
 	}
 	if ( n + 1 > MAX_TRACEMODEL_VERTS ) {
-		arcLibrary::common->Printf( "WARNING: arcTraceModel::SetupCone: too many vertices\n" );
+		anLibrary::common->Printf( "WARNING: anTraceModel::SetupCone: too many vertices\n" );
 		n = MAX_TRACEMODEL_VERTS - 1;
 	}
 	if ( n * 2 > MAX_TRACEMODEL_EDGES ) {
-		arcLibrary::common->Printf( "WARNING: arcTraceModel::SetupCone: too many edges\n" );
+		anLibrary::common->Printf( "WARNING: anTraceModel::SetupCone: too many edges\n" );
 		n = MAX_TRACEMODEL_EDGES / 2;
 	}
 	if ( n + 1 > MAX_TRACEMODEL_POLYS ) {
-		arcLibrary::common->Printf( "WARNING: arcTraceModel::SetupCone: too many polygons\n" );
+		anLibrary::common->Printf( "WARNING: anTraceModel::SetupCone: too many polygons\n" );
 		n = MAX_TRACEMODEL_POLYS - 1;
 	}
 
@@ -886,7 +886,7 @@ void arcTraceModel::SetupCone( const arcBounds &coneBounds, const int numSides )
 	verts[n].Set( 0.0f, 0.0f, halfSize.z + offset.z );
 	for ( i = 0; i < n; i++ ) {
 		// verts
-		angle = arcMath::TWO_PI * i / n;
+		angle = anMath::TWO_PI * i / n;
 		verts[i].x = cos( angle ) * halfSize.x + offset.x;
 		verts[i].y = sin( angle ) * halfSize.y + offset.y;
 		verts[i].z = -halfSize.z + offset.z;
@@ -935,13 +935,13 @@ void arcTraceModel::SetupCone( const arcBounds &coneBounds, const int numSides )
 
 /*
 ============
-arcTraceModel::SetupCone
+anTraceModel::SetupCone
 
   The origin is placed at the apex of the cone.
 ============
 */
-void arcTraceModel::SetupCone( const float height, const float width, const int numSides ) {
-	arcBounds coneBounds;
+void anTraceModel::SetupCone( const float height, const float width, const int numSides ) {
+	anBounds coneBounds;
 	float halfWidth;
 
 	halfWidth = width * 0.5f;
@@ -952,12 +952,12 @@ void arcTraceModel::SetupCone( const float height, const float width, const int 
 
 /*
 ============
-arcTraceModel::SetupBone
+anTraceModel::SetupBone
 
   The origin is placed at the center of the bone.
 ============
 */
-void arcTraceModel::SetupBone( const float length, const float width ) {
+void anTraceModel::SetupBone( const float length, const float width ) {
 	int i, j, edgeNum;
 	float halfLength = length * 0.5f;
 
@@ -999,12 +999,12 @@ void arcTraceModel::SetupBone( const float length, const float width ) {
 
 /*
 ============
-arcTraceModel::InitBone
+anTraceModel::InitBone
 
   Initialize size independent bone.
 ============
 */
-void arcTraceModel::InitBone( void ) {
+void anTraceModel::InitBone( void ) {
 	int i;
 
 	type = TRM_BONE;
@@ -1017,7 +1017,7 @@ void arcTraceModel::InitBone( void ) {
 		edges[ i + 1 ].v[0] = 0;
 		edges[ i + 1 ].v[1] = i + 1;
 		edges[ i + 4 ].v[0] = 1 + i;
-		edges[ i + 4 ].v[1] = 1 + (( i + 1 ) % 3);
+		edges[ i + 4 ].v[1] = 1 + ( ( i + 1 ) % 3);
 		edges[ i + 7 ].v[0] = i + 1;
 		edges[ i + 7 ].v[1] = 4;
 	}
@@ -1059,18 +1059,18 @@ void arcTraceModel::InitBone( void ) {
 
 /*
 ============
-arcTraceModel::SetupPolygon
+anTraceModel::SetupPolygon
 ============
 */
-void arcTraceModel::SetupPolygon( const arcVec3 *v, const int count ) {
+void anTraceModel::SetupPolygon( const anVec3 *v, const int count ) {
 	int i, j;
-	arcVec3 mid;
+	anVec3 mid;
 
 	type = TRM_POLYGON;
 	numVerts = count;
 	// times three because we need to be able to turn the polygon into a volume
 	if ( numVerts * 3 > MAX_TRACEMODEL_EDGES ) {
-		arcLibrary::common->Printf( "WARNING: arcTraceModel::SetupPolygon: too many vertices\n" );
+		anLibrary::common->Printf( "WARNING: anTraceModel::SetupPolygon: too many vertices\n" );
 		numVerts = MAX_TRACEMODEL_EDGES / 3;
 	}
 
@@ -1112,14 +1112,14 @@ void arcTraceModel::SetupPolygon( const arcVec3 *v, const int count ) {
 
 /*
 ============
-arcTraceModel::SetupPolygon
+anTraceModel::SetupPolygon
 ============
 */
-void arcTraceModel::SetupPolygon( const arcWinding &w ) {
+void anTraceModel::SetupPolygon( const anWinding &w ) {
 	int i;
-	arcVec3 *verts;
+	anVec3 *verts;
 
-	verts = (arcVec3 *) _alloca16( w.GetNumPoints() * sizeof( arcVec3 ) );
+	verts = (anVec3 *) _alloca16( w.GetNumPoints() * sizeof( anVec3 ) );
 	for ( i = 0; i < w.GetNumPoints(); i++ ) {
 		verts[i] = w[i].ToVec3();
 	}
@@ -1128,10 +1128,10 @@ void arcTraceModel::SetupPolygon( const arcWinding &w ) {
 
 /*
 ============
-arcTraceModel::VolumeFromPolygon
+anTraceModel::VolumeFromPolygon
 ============
 */
-void arcTraceModel::VolumeFromPolygon( arcTraceModel &trm, float thickness ) const {
+void anTraceModel::VolumeFromPolygon( anTraceModel &trm, float thickness ) const {
 	int i;
 
 	trm = *this;
@@ -1162,15 +1162,15 @@ void arcTraceModel::VolumeFromPolygon( arcTraceModel &trm, float thickness ) con
 
 /*
 ============
-arcTraceModel::GenerateEdgeNormals
+anTraceModel::GenerateEdgeNormals
 ============
 */
 #define SHARP_EDGE_DOT	-0.7f
 
-int arcTraceModel::GenerateEdgeNormals( void ) {
+int anTraceModel::GenerateEdgeNormals( void ) {
 	int i, j, edgeNum, numSharpEdges;
 	float dot;
-	arcVec3 dir;
+	anVec3 dir;
 	traceModelPoly_t *poly;
 	traceModelEdge_t *edge;
 
@@ -1208,10 +1208,10 @@ int arcTraceModel::GenerateEdgeNormals( void ) {
 
 /*
 ============
-arcTraceModel::Translate
+anTraceModel::Translate
 ============
 */
-void arcTraceModel::Translate( const arcVec3 &translation ) {
+void anTraceModel::Translate( const anVec3 &translation ) {
 	int i;
 
 	for ( i = 0; i < numVerts; i++ ) {
@@ -1229,10 +1229,10 @@ void arcTraceModel::Translate( const arcVec3 &translation ) {
 
 /*
 ============
-arcTraceModel::Rotate
+anTraceModel::Rotate
 ============
 */
-void arcTraceModel::Rotate( const arcMat3 &rotation ) {
+void anTraceModel::Rotate( const anMat3 &rotation ) {
 	int i, j, edgeNum;
 
 	for ( i = 0; i < numVerts; i++ ) {
@@ -1257,13 +1257,13 @@ void arcTraceModel::Rotate( const arcMat3 &rotation ) {
 
 /*
 ============
-arcTraceModel::Shrink
+anTraceModel::Shrink
 ============
 */
-void arcTraceModel::Shrink( const float m ) {
+void anTraceModel::Shrink( const float m ) {
 	int i, j, edgeNum;
 	traceModelEdge_t *edge;
-	arcVec3 dir;
+	anVec3 dir;
 
 	if ( type == TRM_POLYGON ) {
 		for ( i = 0; i < numEdges; i++ ) {
@@ -1293,10 +1293,10 @@ void arcTraceModel::Shrink( const float m ) {
 
 /*
 ============
-arcTraceModel::Compare
+anTraceModel::Compare
 ============
 */
-bool arcTraceModel::Compare( const arcTraceModel &trm ) const {
+bool anTraceModel::Compare( const anTraceModel &trm ) const {
 	int i;
 
 	if ( type != trm.type || numVerts != trm.numVerts ||
@@ -1307,7 +1307,7 @@ bool arcTraceModel::Compare( const arcTraceModel &trm ) const {
 		return false;
 	}
 
-	switch( type ) {
+	switch ( type ) {
 		case TRM_INVALID:
 		case TRM_BOX:
 		case TRM_OCTAHEDRON:
@@ -1331,12 +1331,12 @@ bool arcTraceModel::Compare( const arcTraceModel &trm ) const {
 
 /*
 ============
-arcTraceModel::GetPolygonArea
+anTraceModel::GetPolygonArea
 ============
 */
-float arcTraceModel::GetPolygonArea( int polyNum ) const {
+float anTraceModel::GetPolygonArea( int polyNum ) const {
 	int i;
-	arcVec3 base, v1, v2, cross;
+	anVec3 base, v1, v2, cross;
 	float total;
 	const traceModelPoly_t *poly;
 
@@ -1357,10 +1357,10 @@ float arcTraceModel::GetPolygonArea( int polyNum ) const {
 
 /*
 ============
-arcTraceModel::GetOrderedSilhouetteEdges
+anTraceModel::GetOrderedSilhouetteEdges
 ============
 */
-int arcTraceModel::GetOrderedSilhouetteEdges( const int edgeIsSilEdge[MAX_TRACEMODEL_EDGES+1], int silEdges[MAX_TRACEMODEL_EDGES] ) const {
+int anTraceModel::GetOrderedSilhouetteEdges( const int edgeIsSilEdge[MAX_TRACEMODEL_EDGES+1], int silEdges[MAX_TRACEMODEL_EDGES] ) const {
 	int i, j, edgeNum, numSilEdges, nextSilVert;
 	int unsortedSilEdges[MAX_TRACEMODEL_EDGES];
 
@@ -1400,17 +1400,17 @@ int arcTraceModel::GetOrderedSilhouetteEdges( const int edgeIsSilEdge[MAX_TRACEM
 
 /*
 ============
-arcTraceModel::GetProjectionSilhouetteEdges
+anTraceModel::GetProjectionSilhouetteEdges
 ============
 */
-int arcTraceModel::GetProjectionSilhouetteEdges( const arcVec3 &projectionOrigin, int silEdges[MAX_TRACEMODEL_EDGES] ) const {
+int anTraceModel::GetProjectionSilhouetteEdges( const anVec3 &projectionOrigin, int silEdges[MAX_TRACEMODEL_EDGES] ) const {
 	int edgeIsSilEdge[MAX_TRACEMODEL_EDGES+1];
 	memset( edgeIsSilEdge, 0, sizeof( edgeIsSilEdge ) );
 
 	for ( int i = 0; i < numPolys; i++ ) {
 		const traceModelPoly_t *poly = &polys[i];
 		int edgeNum = poly->edges[0];
-		arcVec3 dir = verts[ edges[abs( edgeNum )].v[ INTSIGNBITSET( edgeNum ) ] ] - projectionOrigin;
+		anVec3 dir = verts[ edges[abs( edgeNum )].v[ INTSIGNBITSET( edgeNum ) ] ] - projectionOrigin;
 		if ( dir * poly->normal < 0.0f ) {
 			for ( int j = 0; j < poly->numEdges; j++ ) {
 				int edgeNum = poly->edges[j];
@@ -1424,10 +1424,10 @@ int arcTraceModel::GetProjectionSilhouetteEdges( const arcVec3 &projectionOrigin
 
 /*
 ============
-arcTraceModel::GetParallelProjectionSilhouetteEdges
+anTraceModel::GetParallelProjectionSilhouetteEdges
 ============
 */
-int arcTraceModel::GetParallelProjectionSilhouetteEdges( const arcVec3 &projectionDir, int silEdges[MAX_TRACEMODEL_EDGES] ) const {
+int anTraceModel::GetParallelProjectionSilhouetteEdges( const anVec3 &projectionDir, int silEdges[MAX_TRACEMODEL_EDGES] ) const {
 	int edgeIsSilEdge[MAX_TRACEMODEL_EDGES+1];
 	memset( edgeIsSilEdge, 0, sizeof( edgeIsSilEdge ) );
 
@@ -1460,16 +1460,16 @@ typedef struct projectionIntegrals_s {
 
 /*
 ============
-arcTraceModel::ProjectionIntegrals
+anTraceModel::ProjectionIntegrals
 ============
 */
-void arcTraceModel::ProjectionIntegrals( int polyNum, int a, int b, struct projectionIntegrals_s &integrals ) const {
+void anTraceModel::ProjectionIntegrals( int polyNum, int a, int b, struct projectionIntegrals_s &integrals ) const {
 	memset( &integrals, 0, sizeof( projectionIntegrals_t ) );
 	const traceModelPoly_t *poly = &polys[polyNum];
 	for ( int i = 0; i < poly->numEdges; i++ ) {
 		int edgeNum = poly->edges[i];
-		arcVec3 v1 = verts[ edges[ abs( edgeNum ) ].v[ edgeNum < 0 ] ];
-		arcVec3 v2 = verts[ edges[ abs( edgeNum ) ].v[ edgeNum > 0 ] ];
+		anVec3 v1 = verts[ edges[ abs( edgeNum ) ].v[ edgeNum < 0 ] ];
+		anVec3 v2 = verts[ edges[ abs( edgeNum ) ].v[ edgeNum > 0 ] ];
 		float a0 = v1[a];
 		float b0 = v1[b];
 		float a1 = v2[a];
@@ -1534,14 +1534,14 @@ typedef struct polygonIntegrals_s {
 
 /*
 ============
-arcTraceModel::PolygonIntegrals
+anTraceModel::PolygonIntegrals
 ============
 */
-void arcTraceModel::PolygonIntegrals( int polyNum, int a, int b, int c, struct polygonIntegrals_s &integrals ) const {
+void anTraceModel::PolygonIntegrals( int polyNum, int a, int b, int c, struct polygonIntegrals_s &integrals ) const {
 	projectionIntegrals_t pi;
 	ProjectionIntegrals( polyNum, a, b, pi );
 
-	arcVec3 n = polys[polyNum].normal;
+	anVec3 n = polys[polyNum].normal;
 	float w = -polys[polyNum].dist;
 	float k1 = 1 / n[c];
 	float k2 = k1 * k1;
@@ -1572,17 +1572,17 @@ void arcTraceModel::PolygonIntegrals( int polyNum, int a, int b, int c, struct p
 
 typedef struct volumeIntegrals_s {
 	float T0;
-	arcVec3 T1;
-	arcVec3 T2;
-	arcVec3 TP;
+	anVec3 T1;
+	anVec3 T2;
+	anVec3 TP;
 } volumeIntegrals_t;
 
 /*
 ============
-arcTraceModel::VolumeIntegrals
+anTraceModel::VolumeIntegrals
 ============
 */
-void arcTraceModel::VolumeIntegrals( struct volumeIntegrals_s &integrals ) const {
+void anTraceModel::VolumeIntegrals( struct volumeIntegrals_s &integrals ) const {
 	const traceModelPoly_t *poly;
 	polygonIntegrals_t pi;
 	int i, a, b, c;
@@ -1592,9 +1592,9 @@ void arcTraceModel::VolumeIntegrals( struct volumeIntegrals_s &integrals ) const
 	for ( int i = 0; i < numPolys; i++ ) {
 		poly = &polys[i];
 
-		nx = arcMath::Fabs( poly->normal[0] );
-		ny = arcMath::Fabs( poly->normal[1] );
-		nz = arcMath::Fabs( poly->normal[2] );
+		nx = anMath::Fabs( poly->normal[0] );
+		ny = anMath::Fabs( poly->normal[1] );
+		nz = anMath::Fabs( poly->normal[2] );
 		if ( nx > ny && nx > nz ) {
 			c = 0;
 		} else {
@@ -1625,15 +1625,15 @@ void arcTraceModel::VolumeIntegrals( struct volumeIntegrals_s &integrals ) const
 
 /*
 ============
-arcTraceModel::GetMassProperties
+anTraceModel::GetMassProperties
 ============
 */
-void arcTraceModel::GetMassProperties( const float density, float &mass, arcVec3 &centerOfMass, arcMat3 &inertiaTensor ) const {
+void anTraceModel::GetMassProperties( const float density, float &mass, anVec3 &centerOfMass, anMat3 &inertiaTensor ) const {
 	volumeIntegrals_t integrals;
 
 	// if polygon trace model
 	if ( type == TRM_POLYGON ) {
-		arcTraceModel trm;
+		anTraceModel trm;
 		VolumeFromPolygon( trm, 1.0f );
 		trm.GetMassProperties( density, mass, centerOfMass, inertiaTensor );
 		return;

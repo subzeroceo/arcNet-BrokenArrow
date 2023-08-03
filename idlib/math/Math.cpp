@@ -1,45 +1,45 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
-const float	arcMath::PI				= 3.14159265358979323846f;
-const float	arcMath::TWO_PI			= 2.0f * PI;
-const float	arcMath::HALF_PI		= 0.5f * PI;
-const float	arcMath::ONEFOURTH_PI	= 0.25f * PI;
-const float	arcMath::THREEFOURTHS_PI= 0.75f * PI;
+const float	anMath::PI				= 3.14159265358979323846f;
+const float	anMath::TWO_PI			= 2.0f * PI;
+const float	anMath::HALF_PI			= 0.5f * PI;
+const float	anMath::ONEFOURTH_PI	= 0.25f * PI;
+const float	anMath::THREEFOURTHS_PI= 0.75f * PI;
 
-const float arcMath::E				= 2.71828182845904523536f;
-const float	aRCMath::EXP			= 2.718281828459045f;
+const float anMath::E				= 2.71828182845904523536f;
+const float	anMath::EXP				= 2.718281828459045f;
 
-const float arcMath::SQRT_TWO		= 1.41421356237309504880f;
-const float arcMath::SQRT_THREE		= 1.73205080756887729352f;
+const float anMath::SQRT_TWO		= 1.41421356237309504880f;
+const float anMath::SQRT_THREE		= 1.73205080756887729352f;
 
-const float	arcMath::SQRT_1OVER2	= 0.70710678118654752440f;
-const float	arcMath::SQRT_1OVER3	= 0.57735026918962576450f;
+const float	anMath::SQRT_1OVER2		= 0.70710678118654752440f;
+const float	anMath::SQRT_1OVER3		= 0.57735026918962576450f;
 
-const float	arcMath::M_DEG2RAD		= PI / 180.0f;
-const float	arcMath::M_RAD2DEG		= 180.0f / PI;
+const float	anMath::M_DEG2RAD		= PI / 180.0f;
+const float	anMath::M_RAD2DEG		= 180.0f / PI;
 
-const float	arcMath::M_SEC2MS		= 1000.0f;
-const float	arcMath::M_MS2SEC		= 0.001f;
-const float	arcMath::INFINITY		= 1e30f;
+const float	anMath::M_SEC2MS		= 1000.0f;
+const float	anMath::M_MS2SEC		= 0.001f;
+const float	anMath::INFINITY		= 1e30f;
 
-const float arcMath::FLT_EPSILON	= 1.192092896e-07f;
-const float arcMath::FLOAT_EPSILON	= 1.192092896e-07f;
-const int	arcMath::INT_MIN		= (-2147483647 - 1 );
-const int	arcMath::INT_MAX		= 2147483647;
+const float anMath::FLT_EPSILON		= 1.192092896e-07f;
+const float anMath::FLOAT_EPSILON	= 1.192092896e-07f;
+const int	anMath::INT_MIN			= (-2147483647 - 1 );
+const int	anMath::INT_MAX			= 2147483647;
 
-bool		arcMath::initialized	= false;
-dword		arcMath::iSqrt[SQRT_TABLE_SIZE];		// inverse square root lookup table
+bool		anMath::initialized	= false;
+dword		anMath::iSqrt[SQRT_TABLE_SIZE];		// inverse square root lookup table
 
-const float arcMath::SSE_FLOAT_ZERO	= 0.0f;
-const float arcMath::SSE_FLOAT_255	= 255.0f;
+const float anMath::SSE_FLOAT_ZERO	= 0.0f;
+const float anMath::SSE_FLOAT_255	= 255.0f;
 
 /*
 ===============
-arcMath::Init
+anMath::Init
 ===============
 */
-void arcMath::Init( void ) {
+void anMath::Init( void ) {
     union _flint fi, fo;
 
     for ( int i = 0; i < SQRT_TABLE_SIZE; i++ ) {
@@ -55,10 +55,10 @@ void arcMath::Init( void ) {
 
 /*
 ================
-arcMath::FloatToBits
+anMath::FloatToBits
 ================
 */
-int arcMath::FloatToBits( float f, int exponentBits, int mantissaBits ) {
+int anMath::FloatToBits( float f, int exponentBits, int mantissaBits ) {
 	int i, sign, exponent, mantissa, value;
 
 	assert( exponentBits >= 2 && exponentBits <= 8 );
@@ -97,10 +97,10 @@ int arcMath::FloatToBits( float f, int exponentBits, int mantissaBits ) {
 
 /*
 ================
-arcMath::BitsToFloat
+anMath::BitsToFloat
 ================
 */
-float arcMath::BitsToFloat( int i, int exponentBits, int mantissaBits ) {
+float anMath::BitsToFloat( int i, int exponentBits, int mantissaBits ) {
 	static int exponentSign[2] = { 1, -1 };
 	int sign, exponent, mantissa, value;
 
@@ -117,10 +117,10 @@ float arcMath::BitsToFloat( int i, int exponentBits, int mantissaBits ) {
 
 /*
 ================
-arcMath::BitCheck
+anMath::BitCheck
 ================
 */
-bool arcMath::BitCheck( const int array[], int bitNum ) {
+bool anMath::BitCheck( const int array[], int bitNum ) {
 	int i;
 
 	i = 0;
@@ -134,10 +134,10 @@ bool arcMath::BitCheck( const int array[], int bitNum ) {
 
 /*
 ================
-arcMath::BitSet
+anMath::BitSet
 ================
 */
-void arcMath::BitSet( int array[], int bitNum ) {
+void anMath::BitSet( int array[], int bitNum ) {
 	int i = 0;
 
 	while ( bitNum > 31 ) {
@@ -150,10 +150,10 @@ void arcMath::BitSet( int array[], int bitNum ) {
 
 /*
 ================
-arcMath::BitClear
+anMath::BitClear
 ================
 */
-void arcMath::BitClear( int array[], int bitNum ) {
+void anMath::BitClear( int array[], int bitNum ) {
 	int i = 0;
 
 	while ( bitNum > 31 ) {
@@ -164,7 +164,7 @@ void arcMath::BitClear( int array[], int bitNum ) {
 	array[i] &= ~( 1 << bitNum );
 }
 
-static int arcMath::IsFinite( float f ) {
+static int anMath::IsFinite( float f ) {
 	floatint_t fi;
 	fi.f = f;
 
@@ -180,32 +180,32 @@ static int arcMath::IsFinite( float f ) {
 
 /*
 ===============
-aRCMath::Pow
+anMath::Pow
 
 This calculates the fractional part of a given float number.
 It takes a float number A as input and returns the fractional part of that number.
 ===============
 */
-float arcMath::FractionalPart( const float a ) {
+float anMath::FractionalPart( const float a ) {
 	// Subtracting the integer part of A from a gives us the fractional part.
 	return a - static_cast<int>( a );//return a - ( ( int )a );
 }
 
 /*
 ===============
-aRCMath::Pow
+anMath::Pow
 ===============
 */
-float arcMath::CalcPow( const float num, const float exp ) {
+float anMath::CalcPow( const float num, const float exp ) {
 	return pow( num, exp );
 }
 
 /*
 ===============
-aRCMath::ArbitraryBase
+anMath::ArbitraryBase
 ===============
 */
-float arcMath::ArbitraryBase( float base, float x ) {
+float anMath::ArbitraryBase( float base, float x ) {
 	// Compute algorithm for arbitrary base by equation:
 	// Lx = Lx / log10f(B)
 	//    b         c         c			for c
@@ -214,14 +214,14 @@ float arcMath::ArbitraryBase( float base, float x ) {
 
 /*
 ================
-arcMath::ArtesianFromPolar
+anMath::ArtesianFromPolar
 ================
 */
-void arcMath::ArtesianFromPolar( arcVec3 &result, arcVec3 view ) {
+void anMath::ArtesianFromPolar( anVec3 &result, anVec3 view ) {
 	float	s1, c1, s2, c2;
 
-	arcMath::SinCos( view[1], s1, c1 );
-	arcMath::SinCos( view[2], s2, c2 );
+	anMath::SinCos( view[1], s1, c1 );
+	anMath::SinCos( view[2], s2, c2 );
 
 	result[0] = c1 * s2 * view[0];
 	result[1] = s1 * s2 * view[0];
@@ -230,25 +230,25 @@ void arcMath::ArtesianFromPolar( arcVec3 &result, arcVec3 view ) {
 
 /*
 ================
-arcMath::PolarFromArtesian
+anMath::PolarFromArtesian
 ================
 */
-void arcMath::PolarFromArtesian( arcVec3 &view, arcVec3 artesian ) {
+void anMath::PolarFromArtesian( anVec3 &view, anVec3 artesian ) {
 	view[0] = artesian.Length();
-	view[1] = arcMath::ATan( artesian[1], artesian[0] );
+	view[1] = anMath::ATan( artesian[1], artesian[0] );
 
 	float length = sqrtf( ( artesian[0] * artesian[0] ) + ( artesian[1] * artesian[1] ) );
 
-	view[2] = arcMath::ATan( length, artesian[2] );
+	view[2] = anMath::ATan( length, artesian[2] );
 }
 
 /*
 ================
-arcMath::FloatRand
+anMath::FloatRand
 ================
 */
-unsigned long arcMath::mSeed;
-float arcMath::FloatRand( float min, float max ) {
+unsigned long anMath::mSeed;
+float anMath::FloatRand( float min, float max ) {
 	mSeed = ( mSeed * 214013L ) + 2531011;
 
 	// Note: the shift and divide cannot be combined as this breaks the routine
@@ -260,24 +260,24 @@ float arcMath::FloatRand( float min, float max ) {
 
 /*
 ================
-arcMath::FloatRand
+anMath::FloatRand
 ================
 */
-float arcMath::FloatRand() {
+float anMath::FloatRand() {
 	return FloatRand( 0.0f, 1.0f );
 }
 
-float arcMath::FloatRand( const arcVec2& v ) {
+float anMath::FloatRand( const anVec2& v ) {
 	return FloatRand( v[0], v[1] );
 }
 
 +
 /*
 ================
-arcMath::IntRand
+anMath::IntRand
 ================
 */
-int arcMath::IntRand( int min, int max ) {
+int anMath::IntRand( int min, int max ) {
 	max++;
 
 	mSeed = ( mSeed * 214013L ) + 2531011;
@@ -290,10 +290,10 @@ int arcMath::IntRand( int min, int max ) {
 
 /*
 ================
-arcMath::Init
+anMath::Init
 ================
 */
-int arcMath::InitSeed( void ) {
+int anMath::InitSeed( void ) {
 	mSeed *= ( unsigned long )sys->Milliseconds();
 
 	return ( mSeed );
@@ -301,13 +301,13 @@ int arcMath::InitSeed( void ) {
 
 /*
 ================
-arcMath::BarycentricTriArea
+anMath::BarycentricTriArea
 ================
 */
-float arcMath::BarycentricTriArea( const arcVec3 &normal, const arcVec3 &a, const arcVec3 &b, const arcVec3 &c ) {
-	arcVec3 v1 = b - a;
-	arcVec3 v2 = c - a;
-	arcVec3 cross = v1.Cross( v2 );
+float anMath::BarycentricTriArea( const anVec3 &normal, const anVec3 &a, const anVec3 &b, const anVec3 &c ) {
+	anVec3 v1 = b - a;
+	anVec3 v2 = c - a;
+	anVec3 cross = v1.Cross( v2 );
 	float area = 0.5f * v1.Dot( cross, normal );
 
 	return area;
@@ -315,13 +315,13 @@ float arcMath::BarycentricTriArea( const arcVec3 &normal, const arcVec3 &a, cons
 
 /*
 ================
-arcMath::BarycentricEvaluate
+anMath::BarycentricEvaluate
 ================
 */
-void arcMath::BarycentricEvaluate( arcVec2 &result, const arcVec3 &point, const arcVec3 &normal, const float area, const arcVec3 t[3], const arcVec2 tc[3] ) {
-	float b1 = arcMath::BarycentricTriArea( normal, point, t[1], t[2] ) / area;
-	float b2 = arcMath::BarycentricTriArea( normal, t[0], point, t[2] ) / area;
-	float b3 = arcMath::BarycentricTriArea( normal, t[0], t[1], point ) / area;
+void anMath::BarycentricEvaluate( anVec2 &result, const anVec3 &point, const anVec3 &normal, const float area, const anVec3 t[3], const anVec2 tc[3] ) {
+	float b1 = anMath::BarycentricTriArea( normal, point, t[1], t[2] ) / area;
+	float b2 = anMath::BarycentricTriArea( normal, t[0], point, t[2] ) / area;
+	float b3 = anMath::BarycentricTriArea( normal, t[0], t[1], point ) / area;
 
 	result[0] = ( b1 * tc[0][0] ) + ( b2 * tc[1][0] ) + ( b3 * tc[2][0] );
 	result[1] = ( b1 * tc[0][1] ) + ( b2 * tc[1][1] ) + ( b3 * tc[2][1] );
@@ -329,13 +329,13 @@ void arcMath::BarycentricEvaluate( arcVec2 &result, const arcVec3 &point, const 
 
 /*
 ================
-arcMath::BarycentricTriArea
+anMath::BarycentricTriArea
 ================
 */
 
-float BarycentricTriArea2D( const arcVec3 &normal, const arcVec3 &a, const arcVec3 &b, const arcVec3 &c ) {
-	arcVec2 v1 = b - a;
-	arcVec2 v2 = c - a;
+float BarycentricTriArea2D( const anVec3 &normal, const anVec3 &a, const anVec3 &b, const anVec3 &c ) {
+	anVec2 v1 = b - a;
+	anVec2 v2 = c - a;
 	float cross = v1.x * v2.y - v1.y * v2.x;
 	float area = 0.5f * cross;
 
@@ -344,13 +344,13 @@ float BarycentricTriArea2D( const arcVec3 &normal, const arcVec3 &a, const arcVe
 
 /*
 ================
-arcMath::BarycentricEvaluate
+anMath::BarycentricEvaluate
 ================
 */
-void BarycentricEvaluate2D( arcVec2 &result, const arcVec2 &point, const arcVec2 &normal, const float area, const arcVec2 t[3], const arcVec2 tc[3] ) {
-	float b1 = arcMath::BarycentricTriArea2D( normal, point, t[1], t[2] ) / area;
-	float b2 = arcMath::BarycentricTriArea2D( normal, t[0], point, t[2] ) / area;
-	float b3 = arcMath::BarycentricTriArea2D( normal, t[0], t[1], point ) / area;
+void BarycentricEvaluate2D( anVec2 &result, const anVec2 &point, const anVec2 &normal, const float area, const anVec2 t[3], const anVec2 tc[3] ) {
+	float b1 = anMath::BarycentricTriArea2D( normal, point, t[1], t[2] ) / area;
+	float b2 = anMath::BarycentricTriArea2D( normal, t[0], point, t[2] ) / area;
+	float b3 = anMath::BarycentricTriArea2D( normal, t[0], t[1], point ) / area;
 
 	result.x = ( b1 * tc[0][0] ) + ( b2 * tc[1][0] ) + ( b3 * tc[2][0] );
 	result.y = ( b1 * tc[0][1] ) + ( b2 * tc[1][1] ) + ( b3 * tc[2][1] );
@@ -358,10 +358,10 @@ void BarycentricEvaluate2D( arcVec2 &result, const arcVec2 &point, const arcVec2
 
 /*
 ================
-arcMath::Lerp
+anMath::Lerp
 ================
 */
-float arcMath::DifferentialValueLerp( float start, float end, float frac ) {
+float anMath::DifferentialValueLerp( float start, float end, float frac ) {
 	if ( frac >= 1.0f ) {
 		return end;
 	}
@@ -375,19 +375,19 @@ float arcMath::DifferentialValueLerp( float start, float end, float frac ) {
 
 /*
 ================
-arcMath::Lerp
+anMath::Lerp
 ================
 */
-float arcMath::DifferentialValueLerp2( const arcVec2& range, float frac ) {
+float anMath::DifferentialValueLerp2( const anVec2& range, float frac ) {
 	return Lerp( range[0], range[1], frac );
 }
 
 /*
 ================
-arcMath::MidPointToLerp
+anMath::MidPointToLerp
 ================
 */
-float arcMath::MidPointToLerp( float start, float mid, float end, float frac ) {
+float anMath::MidPointToLerp( float start, float mid, float end, float frac ) {
 	if ( frac < 0.5f ) {
 		return Lerp( start, mid, 2.0f * frac );
 	}
@@ -397,10 +397,10 @@ float arcMath::MidPointToLerp( float start, float mid, float end, float frac ) {
 
 /*
 ================
-arcMath::MidPointToLerp
+anMath::MidPointToLerp
 ================
 */
-float arcMath::NewMidPointLerp( const float startVal, const float midVal, const float endVal, const float frac ) {
+float anMath::NewMidPointLerp( const float startVal, const float midVal, const float endVal, const float frac ) {
 	if ( frac <= 0.0f ) {
 		return startVal;
 	}
@@ -414,10 +414,10 @@ float arcMath::NewMidPointLerp( const float startVal, const float midVal, const 
 
 /*
 ================
-arcMath::DBToScale
+anMath::DBToScale
 ================
 */
-float arcMath::DBToScale( float db ) {
+float anMath::DBToScale( float db ) {
 	if ( db < -60.0f ) {
 		return ( 0.0f );
 	} else {
@@ -427,23 +427,23 @@ float arcMath::DBToScale( float db ) {
 
 /*
 ================
-arcMath::ScaleToDb
+anMath::ScaleToDb
 ================
 */
-float arcMath::ScaleToDb( float scale ) {
+float anMath::ScaleToDb( float scale ) {
 	if ( scale <= 0.0f ) {
 		return ( -60.0f );
 	} else {
-		return ( 6.0f * arcMath::Log( scale ) / arcMath::Log( 2 ) );
+		return ( 6.0f * anMath::Log( scale ) / anMath::Log( 2 ) );
 	}
 }
 
 /*
 ================
-arcMath::TestDBToScale
+anMath::TestDBToScale
 ================
 */
-float arcMath::TstDBToScale( float dB ) {
+float anMath::TstDBToScale( float dB ) {
 	if ( dB == 0.0f ) {
 		return 1.0f;
 	} else if ( dB <= -60.0f ) {
@@ -454,24 +454,24 @@ float arcMath::TstDBToScale( float dB ) {
 
 /*
 ================
-arcMath::ScaleToDb
+anMath::ScaleToDb
 ================
 */
-float arcMath::TstScaleToDB( float scale ) {
+float anMath::TstScaleToDB( float scale ) {
 	if ( scale <= 0.0f ) {
 		return -60.0f;
 	} else if ( scale == 1.0f ) {
 		return 0.0f;
 	}
-	return 6.0f * arcMath::ArbitraryBase( scale ) / arcMath::ArbitraryBase( 2.0f, scale );
+	return 6.0f * anMath::ArbitraryBase( scale ) / anMath::ArbitraryBase( 2.0f, scale );
 }
 
 /*
 ================
-arcMath::NormalToLatLong
+anMath::NormalToLatLong
 ================
 */
-void arcMath::NormalToLatLong( const vec3_origin &normal, byte bytes[2] ) {
+void anMath::NormalToLatLong( const vec3_origin &normal, byte bytes[2] ) {
 	// check for singularities
 	if ( normal[0] == 0 && normal[1] == 0 ) {
 		if ( normal[2] > 0 ) {
@@ -483,7 +483,7 @@ void arcMath::NormalToLatLong( const vec3_origin &normal, byte bytes[2] ) {
 		}
 	} else {
 		// use a suitable quake style polar coordinate system
-		//arcVec3 normal2, latLong;
+		//anVec3 normal2, latLong;
 
 		//normal2[0] = dv->normal[0] * cos( DEG2RAD( normal[2] ) );
 		//normal2[1] = dv->normal[0] * sin( DEG2RAD( normal[2] ) );
@@ -500,17 +500,17 @@ void arcMath::NormalToLatLong( const vec3_origin &normal, byte bytes[2] ) {
 }
 
 // TODO: place this in bounds class
-arcVec3	aRCMath::NearestBoundaryPoint( const arcVec3 &pt, const arcBounds &bounds ) {
-	arcVec3 ul = bounds[0];
-	arcVec3 lr = bounds[1];
+anVec3	anMath::NearestBoundaryPoint( const anVec3 &pt, const anBounds &bounds ) {
+	anVec3 ul = bounds[0];
+	anVec3 lr = bounds[1];
 
 	// We are INSIDE looking for closest boundary
 	if ( bounds.ContainsPoint( pt ) ) {
-		arcVec3 nearPt = pt;
+		anVec3 nearPt = pt;
 		int nearestSideToPt[3];
 		float nearestSideDistFromPt[3];
 		// Find side nearest to point
-		for ( int i = 1; i < 3; i++) {
+		for ( int i = 1; i < 3; i++ ) {
 			float ulDist = pt[i] - ul[i];
 			float lrDist = lr[i] - pt[i];
 			nearestSideToPt[i] = ( ulDist < lrDist ) ? 0 : 1;
@@ -527,7 +527,7 @@ arcVec3	aRCMath::NearestBoundaryPoint( const arcVec3 &pt, const arcBounds &bound
 
         nearPt[nearestAxis] = ( nearestSideToPt[nearestAxis] == 0 ) ? ul[nearestAxis] : lr[nearestAxis];
     } else {
-        for (int i = 0; i < 3; i++) {
+        for ( int i = 0; i < 3; i++ ) {
             nearPt[i] = ( pt[i] < ul[i] ) ? ul[i] : ( ( pt[i] > lr[i] ) ? lr[i] : pt[i] );
         }
     }
@@ -537,11 +537,11 @@ arcVec3	aRCMath::NearestBoundaryPoint( const arcVec3 &pt, const arcBounds &bound
 
 /*
 ================
-aRCMath::ProjectPointOntoLine
+anMath::ProjectPointOntoLine
 ================
 */
-arcVec3 arcMath::ProjectPointOntoLine( const arcVec3& point, const arcVec3& line, const arcVec3& lineStartPoint ) {
-	arcVec3 lineDir = line;
+anVec3 anMath::ProjectPointOntoLine( const anVec3& point, const anVec3& line, const anVec3& lineStartPoint ) {
+	anVec3 lineDir = line;
 	lineDir.Normalize();
 	float dot = ( point - lineStartPoint ) * lineDir;
 
@@ -550,10 +550,10 @@ arcVec3 arcMath::ProjectPointOntoLine( const arcVec3& point, const arcVec3& line
 
 /*
 ================
-aRCMath::DistFromPointToLine
+anMath::DistFromPointToLine
 ================
 */
-float arcMath::DistFromPointToLine( const arcVec3& point, const arcVec3& line, const arcVec3& lineStartPoint ) {
+float anMath::DistFromPointToLine( const anVec3& point, const anVec3& line, const anVec3& lineStartPoint ) {
 	assert( line.Length() );
 
 	return ( ( point - lineStartPoint ).Cross( line ) ).Length() / line.Length();
@@ -562,12 +562,12 @@ float arcMath::DistFromPointToLine( const arcVec3& point, const arcVec3& line, c
 
 /*
 ================
-arcMat3::RotatryMatrix
+anMat3::RotatryMatrix
 
 TODO: move this to Matrix 3 class
 ================
 */
-void arcMath::RotatryMatrix( float phi, int axis, arcMat3 &mat ) {
+void anMath::RotatryMatrix( float phi, int axis, anMat3 &mat ) {
 	mat.Identity();
 
 	switch ( axis ) {

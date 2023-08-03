@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "win_local.h"
@@ -44,7 +44,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <comutil.h>
 #include <Wbemidl.h>
 
-#pragma comment (lib, "wbemuuid.lib")
+#pragma comment (lib, "wbemuuid.lib" )
 #endif
 
 /*
@@ -115,9 +115,9 @@ int Sys_GetVideoRam( void ) {
 #else
 	unsigned int retSize = 64;
 
-	CComPtr<IWbemLocator> spLoc = NULL;
+	CComPtr<IWbemLocator> spLoc = nullptr;
 	HRESULT hr = CoCreateInstance( CLSID_WbemLocator, 0, CLSCTX_SERVER, IID_IWbemLocator, ( LPVOID * ) &spLoc );
-	if ( hr != S_OK || spLoc == NULL ) {
+	if ( hr != S_OK || spLoc == nullptr ) {
 		return retSize;
 	}
 
@@ -125,26 +125,26 @@ int Sys_GetVideoRam( void ) {
 	CComPtr<IWbemServices> spServices;
 
 	// Connect to CIM
-	hr = spLoc->ConnectServer( bstrNamespace, NULL, NULL, 0, NULL, 0, 0, &spServices );
+	hr = spLoc->ConnectServer( bstrNamespace, nullptr, nullptr, 0, nullptr, 0, 0, &spServices );
 	if ( hr != WBEM_S_NO_ERROR ) {
 		return retSize;
 	}
 
 	// Switch the security level to IMPERSONATE so that provider will grant access to system-level objects.
-	hr = CoSetProxyBlanket( spServices, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, NULL, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE );
+	hr = CoSetProxyBlanket( spServices, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE );
 	if ( hr != S_OK ) {
 		return retSize;
 	}
 
 	// Get the vid controller
-	CComPtr<IEnumWbemClassObject> spEnumInst = NULL;
-	hr = spServices->CreateInstanceEnum( CComBSTR( "Win32_VideoController" ), WBEM_FLAG_SHALLOW, NULL, &spEnumInst );
-	if ( hr != WBEM_S_NO_ERROR || spEnumInst == NULL ) {
+	CComPtr<IEnumWbemClassObject> spEnumInst = nullptr;
+	hr = spServices->CreateInstanceEnum( CComBSTR( "Win32_VideoController" ), WBEM_FLAG_SHALLOW, nullptr, &spEnumInst );
+	if ( hr != WBEM_S_NO_ERROR || spEnumInst == nullptr ) {
 		return retSize;
 	}
 
 	ULONG uNumOfInstances = 0;
-	CComPtr<IWbemClassObject> spInstance = NULL;
+	CComPtr<IWbemClassObject> spInstance = nullptr;
 	hr = spEnumInst->Next( 10000, 1, &spInstance, &uNumOfInstances );
 
 	if ( hr == S_OK && spInstance ) {
@@ -361,12 +361,12 @@ void Sym_Init( long addr ) {
 	module->name = (char *) malloc( strlen( moduleName ) + 1 );
 	strcpy( module->name, moduleName );
 	module->address = (int)mbi.AllocationBase;
-	module->symbols = NULL;
+	module->symbols = nullptr;
 	module->next = modules;
 	modules = module;
 
 	FILE *fp = fopen( moduleName, "rb" );
-	if ( fp == NULL ) {
+	if ( fp == nullptr ) {
 		return;
 	}
 
@@ -385,7 +385,7 @@ void Sym_Init( long addr ) {
 	// skip up to " Address" on a new line
 	while( *ptr != '\0' ) {
 		SkipWhiteSpace( &ptr );
-		if ( arcNetString::Cmpn( ptr, "Address", 7 ) == 0 ) {
+		if ( anString::Cmpn( ptr, "Address", 7 ) == 0 ) {
 			SkipRestOfLine( &ptr );
 			break;
 		}
@@ -429,7 +429,7 @@ void Sym_Init( long addr ) {
 
 		SkipRestOfLine( &ptr );
 
-		symbol = (symbol_t *) malloc( sizeof( symbol_t ) );
+		symbol = ( symbol_t *) malloc( sizeof( symbol_t ) );
 		symbol->name = (char *) malloc( symbolLength );
 		strcpy( symbol->name, symbolName );
 		symbol->address = symbolAddress;
@@ -449,9 +449,9 @@ void Sym_Shutdown( void ) {
 	module_t *m;
 	symbol_t *s;
 
-	for ( m = modules; m != NULL; m = modules ) {
+	for ( m = modules; m != nullptr; m = modules ) {
 		modules = m->next;
-		for ( s = m->symbols; s != NULL; s = m->symbols ) {
+		for ( s = m->symbols; s != nullptr; s = m->symbols ) {
 			m->symbols = s->next;
 			free( s->name );
 			free( s );
@@ -459,7 +459,7 @@ void Sym_Shutdown( void ) {
 		free( m->name );
 		free( m );
 	}
-	modules = NULL;
+	modules = nullptr;
 }
 
 /*
@@ -467,14 +467,14 @@ void Sym_Shutdown( void ) {
 Sym_GetFuncInfo
 ==================
 */
-void Sym_GetFuncInfo( long addr, arcNetString &module, arcNetString &funcName ) {
+void Sym_GetFuncInfo( long addr, anString &module, anString &funcName ) {
 	MEMORY_BASIC_INFORMATION mbi;
 	module_t *m;
 	symbol_t *s;
 
 	VirtualQuery( (void*)addr, &mbi, sizeof(mbi) );
 
-	for ( m = modules; m != NULL; m = m->next ) {
+	for ( m = modules; m != nullptr; m = m->next ) {
 		if ( m->address == (int) mbi.AllocationBase ) {
 			break;
 		}
@@ -484,7 +484,7 @@ void Sym_GetFuncInfo( long addr, arcNetString &module, arcNetString &funcName ) 
 		m = modules;
 	}
 
-	for ( s = m->symbols; s != NULL; s = s->next ) {
+	for ( s = m->symbols; s != nullptr; s = s->next ) {
 		if ( s->address == addr ) {
 
 			char undName[MAX_STRING_CHARS];
@@ -512,7 +512,7 @@ void Sym_GetFuncInfo( long addr, arcNetString &module, arcNetString &funcName ) 
 
 DWORD lastAllocationBase = -1;
 HANDLE processHandle;
-arcNetString lastModule;
+anString lastModule;
 
 /*
 ==================
@@ -531,14 +531,14 @@ void Sym_Init( long addr ) {
 	VirtualQuery( (void*)addr, &mbi, sizeof(mbi) );
 
 	GetModuleFileName( (HMODULE)mbi.AllocationBase, moduleName, sizeof( moduleName ) );
-	_splitpath( moduleName, NULL, NULL, modShortNameBuf, NULL );
+	_splitpath( moduleName, nullptr, nullptr, modShortNameBuf, nullptr );
 	lastModule = modShortNameBuf;
 
 	processHandle = GetCurrentProcess();
-	if ( !SymInitialize( processHandle, NULL, FALSE ) ) {
+	if ( !SymInitialize( processHandle, nullptr, FALSE ) ) {
 		return;
 	}
-	if ( !SymLoadModule( processHandle, NULL, moduleName, NULL, (DWORD)mbi.AllocationBase, 0 ) ) {
+	if ( !SymLoadModule( processHandle, nullptr, moduleName, nullptr, (DWORD)mbi.AllocationBase, 0 ) ) {
 		SymCleanup( processHandle );
 		return;
 	}
@@ -564,7 +564,7 @@ void Sym_Shutdown( void ) {
 Sym_GetFuncInfo
 ==================
 */
-void Sym_GetFuncInfo( long addr, arcNetString &module, arcNetString &funcName ) {
+void Sym_GetFuncInfo( long addr, anString &module, anString &funcName ) {
 	MEMORY_BASIC_INFORMATION mbi;
 
 	VirtualQuery( (void*)addr, &mbi, sizeof(mbi) );
@@ -575,7 +575,7 @@ void Sym_GetFuncInfo( long addr, arcNetString &module, arcNetString &funcName ) 
 
 	BYTE symbolBuffer[ sizeof(IMAGEHLP_SYMBOL) + MAX_STRING_CHARS ];
 	PIMAGEHLP_SYMBOL pSymbol = (PIMAGEHLP_SYMBOL)&symbolBuffer[0];
-	pSymbol->SizeOfStruct = sizeof(symbolBuffer);
+	pSymbol->SizeOfStruct = sizeof( symbolBuffer);
 	pSymbol->MaxNameLength = 1023;
 	pSymbol->Address = 0;
 	pSymbol->Flags = 0;
@@ -595,12 +595,12 @@ void Sym_GetFuncInfo( long addr, arcNetString &module, arcNetString &funcName ) 
 	else {
 		LPVOID lpMsgBuf;
 		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-						NULL,
+						nullptr,
 						GetLastError(),
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 						(LPTSTR) &lpMsgBuf,
 						0,
-						NULL
+						nullptr
 						);
 		LocalFree( lpMsgBuf );
 
@@ -633,7 +633,7 @@ void Sym_Shutdown( void ) {
 Sym_GetFuncInfo
 ==================
 */
-void Sym_GetFuncInfo( long addr, arcNetString &module, arcNetString &funcName ) {
+void Sym_GetFuncInfo( long addr, anString &module, anString &funcName ) {
 	module = "";
 	sprintf( funcName, "0x%08x", addr );
 }
@@ -725,7 +725,7 @@ Sys_GetCallStackStr
 const char *Sys_GetCallStackStr( const address_t *callStack, const int callStackSize ) {
 	static char string[MAX_STRING_CHARS*2];
 	int index, i;
-	arcNetString module, funcName;
+	anString module, funcName;
 
 	index = 0;
 	for ( i = callStackSize-1; i >= 0; i-- ) {

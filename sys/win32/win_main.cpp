@@ -1,4 +1,4 @@
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include <errno.h>
@@ -20,19 +20,19 @@
 #include "rc/CreateResourceIDs.h"
 #include "../../renderer/tr_local.h"
 
-idCVar Win32Vars_t::sys_arch( "sys_arch", "", CVAR_SYSTEM | CVAR_INIT, "" );
-idCVar Win32Vars_t::sys_cpustring( "sys_cpustring", "detect", CVAR_SYSTEM | CVAR_INIT, "" );
-idCVar Win32Vars_t::in_mouse( "in_mouse", "1", CVAR_SYSTEM | CVAR_BOOL, "enable mouse input" );
-idCVar Win32Vars_t::win_allowAltTab( "win_allowAltTab", "0", CVAR_SYSTEM | CVAR_BOOL, "allow Alt-Tab when fullscreen" );
-idCVar Win32Vars_t::win_notaskkeys( "win_notaskkeys", "0", CVAR_SYSTEM | CVAR_INTEGER, "disable windows task keys" );
-idCVar Win32Vars_t::win_username( "win_username", "", CVAR_SYSTEM | CVAR_INIT, "windows user name" );
-idCVar Win32Vars_t::win_xpos( "win_xpos", "3", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "horizontal position of window" );
-idCVar Win32Vars_t::win_ypos( "win_ypos", "22", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "vertical position of window" );
-idCVar Win32Vars_t::win_outputDebugString( "win_outputDebugString", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
-idCVar Win32Vars_t::win_outputEditString( "win_outputEditString", "1", CVAR_SYSTEM | CVAR_BOOL, "" );
-idCVar Win32Vars_t::win_viewlog( "win_viewlog", "0", CVAR_SYSTEM | CVAR_INTEGER, "" );
-idCVar Win32Vars_t::win_timerUpdate( "win_timerUpdate", "0", CVAR_SYSTEM | CVAR_BOOL, "allows the game to be updated while dragging the window" );
-idCVar Win32Vars_t::win_allowMultipleInstances( "win_allowMultipleInstances", "0", CVAR_SYSTEM | CVAR_BOOL, "allow multiple instances running concurrently" );
+anCVar Win32Vars_t::sys_arch( "sys_arch", "", CVAR_SYSTEM | CVAR_INIT, "" );
+anCVar Win32Vars_t::sys_cpustring( "sys_cpustring", "detect", CVAR_SYSTEM | CVAR_INIT, "" );
+anCVar Win32Vars_t::in_mouse( "in_mouse", "1", CVAR_SYSTEM | CVAR_BOOL, "enable mouse input" );
+anCVar Win32Vars_t::win_allowAltTab( "win_allowAltTab", "0", CVAR_SYSTEM | CVAR_BOOL, "allow Alt-Tab when fullscreen" );
+anCVar Win32Vars_t::win_notaskkeys( "win_notaskkeys", "0", CVAR_SYSTEM | CVAR_INTEGER, "disable windows task keys" );
+anCVar Win32Vars_t::win_username( "win_username", "", CVAR_SYSTEM | CVAR_INIT, "windows user name" );
+anCVar Win32Vars_t::win_xpos( "win_xpos", "3", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "horizontal position of window" );
+anCVar Win32Vars_t::win_ypos( "win_ypos", "22", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "vertical position of window" );
+anCVar Win32Vars_t::win_outputDebugString( "win_outputDebugString", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
+anCVar Win32Vars_t::win_outputEditString( "win_outputEditString", "1", CVAR_SYSTEM | CVAR_BOOL, "" );
+anCVar Win32Vars_t::win_viewlog( "win_viewlog", "0", CVAR_SYSTEM | CVAR_INTEGER, "" );
+anCVar Win32Vars_t::win_timerUpdate( "win_timerUpdate", "0", CVAR_SYSTEM | CVAR_BOOL, "allows the game to be updated while dragging the window" );
+anCVar Win32Vars_t::win_allowMultipleInstances( "win_allowMultipleInstances", "0", CVAR_SYSTEM | CVAR_BOOL, "allow multiple instances running concurrently" );
 
 Win32Vars_t	win32;
 
@@ -63,7 +63,7 @@ Sys_Createthread
 ==================
 */
 void Sys_CreateThread(  xthread_t function, void *parms, xthreadPriority priority, xthreadInfo &info, const char *name, xthreadInfo *threads[MAX_THREADS], int *thread_count ) {
-	HANDLE temp = CreateThread(	NULL,	// LPSECURITY_ATTRIBUTES lpsa,
+	HANDLE temp = CreateThread(	nullptr,	// LPSECURITY_ATTRIBUTES lpsa,
 									0,		// DWORD cbStack,
 									(LPTHREAD_START_ROUTINE)function,	// LPTHREAD_START_ROUTINE lpStartAddr,
 									parms,	// LPVOID lpvThreadParm,
@@ -79,7 +79,7 @@ void Sys_CreateThread(  xthread_t function, void *parms, xthreadPriority priorit
 	if ( *thread_count < MAX_THREADS ) {
 		threads[(*thread_count)++] = &info;
 	} else {
-		common->DPrintf("WARNING: MAX_THREADS reached\n");
+		common->DPrintf( "WARNING: MAX_THREADS reached\n" );
 	}
 }
 
@@ -108,7 +108,7 @@ void Sys_Sentry() {
 Sys_GetThreadName
 ==================
 */
-const char* Sys_GetThreadName(int *index) {
+const char* Sys_GetThreadName( int*index) {
 	int id = GetCurrentThreadId();
 	for ( int i = 0; i < g_thread_count; i++ ) {
 		if ( id == g_threads[i]->threadId ) {
@@ -156,7 +156,7 @@ Sys_WaitForEvent
 void Sys_WaitForEvent( int index ) {
 	assert( index == 0 );
 	if ( !win32.backgroundDownloadSemaphore ) {
-		win32.backgroundDownloadSemaphore = CreateEvent( NULL, TRUE, FALSE, NULL );
+		win32.backgroundDownloadSemaphore = CreateEvent( nullptr, TRUE, FALSE, nullptr );
 	}
 	WaitForSingleObject( win32.backgroundDownloadSemaphore, INFINITE );
 	ResetEvent( win32.backgroundDownloadSemaphore );
@@ -186,7 +186,7 @@ static unsigned int debug_current_alloc_count = 0;
 static unsigned int debug_frame_alloc = 0;
 static unsigned int debug_frame_alloc_count = 0;
 
-idCVar sys_showMallocs( "sys_showMallocs", "0", CVAR_SYSTEM, "" );
+anCVar sys_showMallocs( "sys_showMallocs", "0", CVAR_SYSTEM, "" );
 
 // _HOOK_ALLOC, _HOOK_REALLOC, _HOOK_FREE
 
@@ -222,11 +222,11 @@ int Sys_AllocHook( int nAllocType, void *pvData, size_t nSize, int nBlockUse, lo
 	}
 
 	// get a pointer to memory block header
-	temp = ( byte * )pvData;
+	temp = (byte *)pvData;
 	temp -= 32;
 	pHead = ( CrtMemBlockHeader * )temp;
 
-	switch( nAllocType ) {
+	switch ( nAllocType ) {
 		case	_HOOK_ALLOC:
 			debug_total_alloc += nSize;
 			debug_current_alloc += nSize;
@@ -277,7 +277,7 @@ Sys_MemFrame
 */
 void Sys_MemFrame( void ) {
 	if ( sys_showMallocs.GetInteger() ) {
-		common->Printf("Frame: %8dk in %5d blocks\n", debug_frame_alloc / 1024, debug_frame_alloc_count );
+		common->Printf( "Frame: %8dk in %5d blocks\n", debug_frame_alloc / 1024, debug_frame_alloc_count );
 	}
 
 	debug_frame_alloc = 0;
@@ -327,7 +327,7 @@ void Sys_Error( const char *error, ... ) {
 
 	// wait for the user to quit
 	while ( 1 ) {
-		if ( !GetMessage( &msg, NULL, 0, 0 ) ) {
+		if ( !GetMessage( &msg, nullptr, 0, 0 ) ) {
 			common->Quit();
 		}
 		TranslateMessage( &msg );
@@ -336,7 +336,7 @@ void Sys_Error( const char *error, ... ) {
 
 	Sys_DestroyConsole();
 
-	exit (1);
+	exit ( 1 );
 }
 
 /*
@@ -363,7 +363,7 @@ void Sys_Printf( const char *fmt, ... ) {
 
 	va_list argptr;
 	va_start(argptr, fmt);
-	arcNetString::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
+	anString::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
 	va_end(argptr);
 	msg[sizeof(msg)-1] = '\0';
 
@@ -386,7 +386,7 @@ void Sys_DebugPrintf( const char *fmt, ... ) {
 
 	va_list argptr;
 	va_start( argptr, fmt );
-	arcNetString::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
+	anString::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
 	msg[ sizeof(msg)-1 ] = '\0';
 	va_end( argptr );
 
@@ -401,7 +401,7 @@ Sys_DebugVPrintf
 void Sys_DebugVPrintf( const char *fmt, va_list arg ) {
 	char msg[MAXPRINTMSG];
 
-	arcNetString::vsnPrintf( msg, MAXPRINTMSG-1, fmt, arg );
+	anString::vsnPrintf( msg, MAXPRINTMSG-1, fmt, arg );
 	msg[ sizeof(msg)-1 ] = '\0';
 
 	OutputDebugString( msg );
@@ -448,7 +448,7 @@ void Sys_Mkdir( const char *path ) {
 Sys_FileTimeStamp
 =================
 */
-ID_TIME_T Sys_FileTimeStamp( FILE *fp ) {
+ARC_TIME_T Sys_FileTimeStamp( FILE *fp ) {
 	struct _stat st;
 	_fstat( _fileno( fp ), &st );
 	return (long) st.st_mtime;
@@ -502,7 +502,7 @@ Sys_EXEPath
 */
 const char *Sys_EXEPath( void ) {
 	static char exe[ MAX_OSPATH ];
-	GetModuleFileName( NULL, exe, sizeof( exe ) - 1 );
+	GetModuleFileName( nullptr, exe, sizeof( exe ) - 1 );
 	return exe;
 }
 
@@ -511,8 +511,8 @@ const char *Sys_EXEPath( void ) {
 Sys_ListFiles
 ==============
 */
-int Sys_ListFiles( const char *directory, const char *extension, idStrList &list ) {
-	arcNetString		search;
+int Sys_ListFiles( const char *directory, const char *extension, anStringList &list ) {
+	anString		search;
 	struct _finddata_t findinfo;
 	int			findhandle;
 	int			flag;
@@ -557,10 +557,10 @@ Sys_GetClipboardData
 ================
 */
 char *Sys_GetClipboardData( void ) {
-	char *data = NULL;
+	char *data = nullptr;
 	char *cliptext;
 
-	if ( OpenClipboard( NULL ) != 0 ) {
+	if ( OpenClipboard( nullptr ) != 0 ) {
 		HANDLE hClipboardData;
 
 		if ( ( hClipboardData = GetClipboardData( CF_TEXT ) ) != 0 ) {
@@ -588,12 +588,12 @@ void Sys_SetClipboardData( const char *string ) {
 
 	// allocate memory block
 	HMem = (char *)::GlobalAlloc( GMEM_MOVEABLE | GMEM_DDESHARE, strlen( string ) + 1 );
-	if ( HMem == NULL ) {
+	if ( HMem == nullptr ) {
 		return;
 	}
 	// lock allocated memory and obtain a pointer
 	PMem = (char *)::GlobalLock( HMem );
-	if ( PMem == NULL ) {
+	if ( PMem == nullptr ) {
 		return;
 	}
 	// copy text into allocated memory block
@@ -634,7 +634,7 @@ int Sys_DLL_Load( const char *dllName ) {
 		// since we can't have LoadLibrary load only from the specified path, check it did the right thing
 		char loadedPath[ MAX_OSPATH ];
 		GetModuleFileName( libHandle, loadedPath, sizeof( loadedPath ) - 1 );
-		if ( arcNetString::IcmpPath( dllName, loadedPath ) ) {
+		if ( anString::IcmpPath( dllName, loadedPath ) ) {
 			Sys_Printf( "ERROR: LoadLibrary '%s' wants to load '%s'\n", dllName, loadedPath );
 			Sys_DLL_Unload( (int)libHandle );
 			return 0;
@@ -666,12 +666,12 @@ void Sys_DLL_Unload( int dllHandle ) {
 		LPVOID lpMsgBuf;
 		FormatMessage(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER,
-		    NULL,
+		    nullptr,
 			lastError,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 			(LPTSTR) &lpMsgBuf,
 			0,
-			NULL
+			nullptr
 		);
 		Sys_Error( "Sys_DLL_Unload: FreeLibrary failed - %s (%d)", lpMsgBuf, lastError );
 	}
@@ -706,7 +706,7 @@ void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptr
 	ev = &eventQue[ eventHead & MASK_QUED_EVENTS ];
 
 	if ( eventHead - eventTail >= MAX_QUED_EVENTS ) {
-		common->Printf("Sys_QueEvent: overflow\n");
+		common->Printf( "Sys_QueEvent: overflow\n" );
 		// we are discarding an event, but don't leak memory
 		if ( ev->evPtr ) {
 			Mem_Free( ev->evPtr );
@@ -734,8 +734,8 @@ void Sys_PumpEvents( void ) {
     MSG msg;
 
 	// pump the message loop
-	while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) ) {
-		if ( !GetMessage( &msg, NULL, 0, 0 ) ) {
+	while( PeekMessage( &msg, nullptr, 0, 0, PM_NOREMOVE ) ) {
+		if ( !GetMessage( &msg, nullptr, 0, 0 ) ) {
 			common->Quit();
 		}
 
@@ -831,7 +831,7 @@ Sys_In_Restart_f
 Restart the input subsystem
 =================
 */
-void Sys_In_Restart_f( const idCmdArgs &args ) {
+void Sys_In_Restart_f( const anCommandArgs &args ) {
 	Sys_ShutdownInput();
 	Sys_InitInput();
 }
@@ -883,16 +883,16 @@ Start the thread that will call idCommon::Async()
 */
 void Sys_StartAsyncThread( void ) {
 	// create an auto-reset event that happens 60 times a second
-	hTimer = CreateWaitableTimer( NULL, false, NULL );
+	hTimer = CreateWaitableTimer( nullptr, false, nullptr );
 	if ( !hTimer ) {
 		common->Error( "idPacketServer::Spawn: CreateWaitableTimer failed" );
 	}
 
 	LARGE_INTEGER	t;
 	t.HighPart = t.LowPart = 0;
-	SetWaitableTimer( hTimer, &t, USERCMD_MSEC, NULL, NULL, TRUE );
+	SetWaitableTimer( hTimer, &t, USERCMD_MSEC, nullptr, nullptr, TRUE );
 
-	Sys_CreateThread( (xthread_t)Sys_AsyncThread, NULL, THREAD_ABOVE_NORMAL, threadInfo, "Async", g_threads,  &g_thread_count );
+	Sys_CreateThread( (xthread_t)Sys_AsyncThread, nullptr, THREAD_ABOVE_NORMAL, threadInfo, "Async", g_threads,  &g_thread_count );
 
 #ifdef SET_THREAD_AFFINITY
 	// give the async thread an affinity for the second cpu
@@ -914,7 +914,7 @@ returns true if there is a copy of D3 running already
 bool Sys_AlreadyRunning( void ) {
 #ifndef DEBUG
 	if ( !win32.win_allowMultipleInstances.GetBool() ) {
-		HANDLE hMutexOneInstance = ::CreateMutex( NULL, FALSE, "DOOM3" );
+		HANDLE hMutexOneInstance = ::CreateMutex( nullptr, FALSE, "DOOM3" );
 		if ( ::GetLastError() == ERROR_ALREADY_EXISTS || ::GetLastError() == ERROR_ACCESS_DENIED ) {
 			return true;
 		}
@@ -935,14 +935,14 @@ The cvar system must already be setup
 
 void Sys_Init( void ) {
 
-	CoInitialize( NULL );
+	CoInitialize( nullptr );
 
 	// make sure the timer is high precision, otherwise
 	// NT gets 18ms resolution
 	timeBeginPeriod( 1 );
 
 	// get WM_TIMER messages pumped every millisecond
-//	SetTimer( NULL, 0, 100, NULL );
+//	SetTimer( nullptr, 0, 100, nullptr );
 
 	cmdSystem->AddCommand( "in_restart", Sys_In_Restart_f, CMD_FL_SYSTEM, "restarts the input system" );
 #ifdef DEBUG
@@ -1012,8 +1012,8 @@ void Sys_Init( void ) {
 	//
 	// CPU type
 	//
-	if ( !arcNetString::Icmp( win32.sys_cpustring.GetString(), "detect" ) ) {
-		arcNetString string;
+	if ( !anString::Icmp( win32.sys_cpustring.GetString(), "detect" ) ) {
+		anString string;
 
 		common->Printf( "%1.0f MHz ", Sys_ClockTicksPerSecond() / 1000000.0f );
 
@@ -1055,8 +1055,8 @@ void Sys_Init( void ) {
 		win32.sys_cpustring.SetString( string );
 	} else {
 		common->Printf( "forcing CPU type to " );
-		idLexer src( win32.sys_cpustring.GetString(), arcNetString::Length( win32.sys_cpustring.GetString() ), "sys_cpustring" );
-		arcNetToken token;
+		anLexer src( win32.sys_cpustring.GetString(), anString::Length( win32.sys_cpustring.GetString() ), "sys_cpustring" );
+		anToken token;
 
 		int id = CPUID_NONE;
 		while( src.ReadToken( &token ) ) {
@@ -1162,7 +1162,7 @@ void HackChkStk( void ) {
 	DWORD	old;
 	VirtualProtect( _chkstk, 6, PAGE_EXECUTE_READWRITE, &old );
 	*(byte *)_chkstk = 0xe9;
-	*(int *)((int)_chkstk+1) = (int)clrstk - (int)_chkstk - 5;
+	*( int*)((int)_chkstk+1) = (int)clrstk - (int)_chkstk - 5;
 
 	TestChkStk();
 }
@@ -1173,7 +1173,7 @@ GetExceptionCodeInfo
 ====================
 */
 const char *GetExceptionCodeInfo( UINT code ) {
-	switch( code ) {
+	switch ( code ) {
 		case EXCEPTION_ACCESS_VIOLATION: return "The thread tried to read from or write to a virtual address for which it does not have the appropriate access.";
 		case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: return "The thread tried to access an array element that is out of bounds and the underlying hardware supports bounds checking.";
 		case EXCEPTION_BREAKPOINT: return "A breakpoint was encountered.";
@@ -1353,7 +1353,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 #endif
 
 	win32.hInstance = hInstance;
-	arcNetString::Copynz( sys_cmdline, lpCmdLine, sizeof( sys_cmdline ) );
+	anString::Copynz( sys_cmdline, lpCmdLine, sizeof( sys_cmdline ) );
 
 	// done before Com/Sys_Init since we need this for error output
 	Sys_CreateConsole();
@@ -1376,7 +1376,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 //	Sys_FPU_EnableExceptions( TEST_FPU_EXCEPTIONS );
 	Sys_FPU_SetPrecision( FPU_PRECISION_DOUBLE_EXTENDED );
 
-	common->Init( 0, NULL, lpCmdLine );
+	common->Init( 0, nullptr, lpCmdLine );
 
 #if TEST_FPU_EXCEPTIONS != 0
 	common->Printf( Sys_FPU_GetState() );
@@ -1527,9 +1527,9 @@ void idSysLocal::OpenURL( const char *url, bool doexit ) {
 		return;
 	}
 
-	common->Printf("Open URL: %s\n", url);
+	common->Printf( "Open URL: %s\n", url);
 
-	if ( !ShellExecute( NULL, "open", url, NULL, NULL, SW_RESTORE ) ) {
+	if ( !ShellExecute( nullptr, "open", url, nullptr, nullptr, SW_RESTORE ) ) {
 		common->Error( "Could not open url: '%s' ", url );
 		return;
 	}
@@ -1555,12 +1555,12 @@ void idSysLocal::StartProcess( const char *exePath, bool doexit ) {
 	STARTUPINFO			si;
 	PROCESS_INFORMATION	pi;
 
-	ZeroMemory( &si, sizeof(si) );
-	si.cb = sizeof(si);
+	ZeroMemory( &si, sizeof( si) );
+	si.cb = sizeof( si);
 
 	strncpy( szPathOrig, exePath, _MAX_PATH );
 
-	if ( !CreateProcess( NULL, szPathOrig, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi ) ) {
+	if ( !CreateProcess( nullptr, szPathOrig, nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi ) ) {
         common->Error( "Could not start process: '%s' ", szPathOrig );
 	    return;
 	}

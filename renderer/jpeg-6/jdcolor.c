@@ -74,10 +74,10 @@ build_ycc_rgb_table (j_decompress_ptr cinfo)
   INT32 x;
   SHIFT_TEMPS
 
-  cconvert->Cr_r_tab = ( int * )
+  cconvert->Cr_r_tab = ( int*)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				(MAXJSAMPLE+1 ) * SIZEOF( int ) );
-  cconvert->Cb_b_tab = ( int * )
+  cconvert->Cb_b_tab = ( int*)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				(MAXJSAMPLE+1 ) * SIZEOF( int ) );
   cconvert->Cr_g_tab = (INT32 *)
@@ -248,7 +248,7 @@ ycck_cmyk_convert (j_decompress_ptr cinfo,
       outptr[0] = range_limit[MAXJSAMPLE - (y + Crrtab[cr] )];	/* red */
       outptr[1] = range_limit[MAXJSAMPLE - (y +			/* green */
 			      ( ( int ) RIGHT_SHIFT(Cbgtab[cb] + Crgtab[cr],
-						 SCALEBITS) ))];
+						 SCALEBITS) ) )];
       outptr[2] = range_limit[MAXJSAMPLE - (y + Cbbtab[cb] )];	/* blue */
       /* K passes through unchanged */
       outptr[3] = inptr3[col];	/* don't need GETJSAMPLE here */
@@ -282,7 +282,7 @@ jinit_color_deconverter (j_decompress_ptr cinfo)
   cconvert = (my_cconvert_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_color_deconverter) );
-  cinfo->cconvert = (struct jpeg_color_deconverter *) cconvert;
+  cinfo->cconvert = ( struct jpeg_color_deconverter *) cconvert;
   cconvert->pub.start_pass = start_pass_dcolor;
 
   /* Make sure num_components agrees with jpeg_color_space */

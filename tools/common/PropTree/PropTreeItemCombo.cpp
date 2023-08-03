@@ -17,7 +17,7 @@
 //	useful.
 
 //#include "stdafx.h"
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "PropTree.h"
@@ -59,7 +59,7 @@ END_MESSAGE_MAP()
 
 void CPropTreeItemCombo::DrawAttribute(CDC* pDC, const RECT& rc)
 {
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	// verify the window has been created
 	if ( !IsWindow(m_hWnd) )
@@ -101,7 +101,7 @@ void CPropTreeItemCombo::SetItemValue(LPARAM lParam)
 void CPropTreeItemCombo::OnMove()
 {
 	if (IsWindow(m_hWnd) && IsWindowVisible() )
-		SetWindowPos(NULL, m_rc.left, m_rc.top, m_rc.Width() + 1, m_rc.Height(), SWP_NOZORDER|SWP_SHOWWINDOW);
+		SetWindowPos(nullptr, m_rc.left, m_rc.top, m_rc.Width() + 1, m_rc.Height(), SWP_NOZORDER|SWP_SHOWWINDOW);
 }
 
 
@@ -131,7 +131,7 @@ void CPropTreeItemCombo::OnCommit()
 void CPropTreeItemCombo::OnActivate( int activateType, CPoint point)
 {
 	// activate the combo box
-	SetWindowPos(NULL, m_rc.left, m_rc.top, m_rc.Width() + 1, m_rc.Height() + m_nDropHeight, SWP_NOZORDER|SWP_SHOWWINDOW);
+	SetWindowPos(nullptr, m_rc.left, m_rc.top, m_rc.Width() + 1, m_rc.Height() + m_nDropHeight, SWP_NOZORDER|SWP_SHOWWINDOW);
 	SetFocus();
 
 	if (GetCount() )
@@ -141,7 +141,7 @@ void CPropTreeItemCombo::OnActivate( int activateType, CPoint point)
 
 BOOL CPropTreeItemCombo::CreateComboBox(DWORD dwStyle)
 {
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	if (IsWindow(m_hWnd) )
 		DestroyWindow();
@@ -149,7 +149,7 @@ BOOL CPropTreeItemCombo::CreateComboBox(DWORD dwStyle)
 	// force as not visible child window
 	dwStyle = (WS_CHILD|WS_VSCROLL|dwStyle) & ~WS_VISIBLE;
 
-	if ( !Create(dwStyle, CRect(0,0,0,0 ), m_pProp->GetCtrlParent(), GetCtrlID() ))
+	if ( !Create(dwStyle, CRect(0,0,0,0 ), m_pProp->GetCtrlParent(), GetCtrlID() ) )
 	{
 		TRACE0( "CPropTreeItemCombo::CreateComboBox() - failed to create combo box\n" );
 		return FALSE;
@@ -163,7 +163,7 @@ BOOL CPropTreeItemCombo::CreateComboBox(DWORD dwStyle)
 
 BOOL CPropTreeItemCombo::CreateComboBoxBool()
 {
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	if (IsWindow(m_hWnd) )
 		DestroyWindow();
@@ -171,7 +171,7 @@ BOOL CPropTreeItemCombo::CreateComboBoxBool()
 	// force as a non-visible child window
 	DWORD dwStyle = WS_CHILD|WS_VSCROLL|CBS_SORT|CBS_DROPDOWNLIST;
 
-	if ( !Create(dwStyle, CRect(0,0,0,0 ), m_pProp->GetCtrlParent(), GetCtrlID() ))
+	if ( !Create(dwStyle, CRect(0,0,0,0 ), m_pProp->GetCtrlParent(), GetCtrlID() ) )
 	{
 		TRACE0( "CPropTreeItemCombo::CreateComboBoxBool() - failed to create combo box\n" );
 		return FALSE;

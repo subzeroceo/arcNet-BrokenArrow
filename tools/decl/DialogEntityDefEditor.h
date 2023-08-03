@@ -40,10 +40,10 @@ class DialogEntityDefEditor : public CDialog {
 	DECLARE_DYNAMIC(DialogEntityDefEditor)
 
 public:
-						DialogEntityDefEditor( CWnd* pParent = NULL );   // standard constructor
+						DialogEntityDefEditor( CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogEntityDefEditor();
 
-	void				LoadDecl( arcDeclEntityDef *decl );
+	void				LoadDecl( anDeclEntityDef *decl );
 
 	//{{AFX_VIRTUAL(DialogEntityDefEditor)
 	virtual BOOL		OnInitDialog();
@@ -103,14 +103,14 @@ private:
 
 	HACCEL				m_hAccel;
 	CRect				initialRect;
-	arcDeclEntityDef *	decl;
+	anDeclEntityDef *	decl;
 	int					firstLine;
 
 private:
-	void				PopulateLists(arcNetString &declText);
-	void				SetInherit(arcNetString &inherit);
-	void				BuildDeclText(arcNetString &declText);
-	bool				TestDecl( const arcNetString &declText );
+	void				PopulateLists(anString &declText);
+	void				SetInherit(anString &inherit);
+	void				BuildDeclText(anString &declText);
+	bool				TestDecl( const anString &declText );
 	void				UpdateStatusBar( void );
 };
 

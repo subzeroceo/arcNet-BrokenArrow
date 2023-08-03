@@ -1,29 +1,29 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 
 /*
 ================================================================================================
 
-aRcPreloadManifest
+anPreloadManifest
 
 ================================================================================================
 */
 
 /*
 ========================
-aRcPreloadManifest::LoadManifest
+anPreloadManifest::LoadManifest
 ========================
 */
-bool aRcPreloadManifest::LoadManifest( const char *fileName ) {
-	arcNetFile * inFile = fileSystem->OpenFileReadMemory( fileName );
-	if ( inFile != NULL ) {
+bool anPreloadManifest::LoadManifest( const char *fileName ) {
+	anFile * inFile = fileSystem->OpenFileReadMemory( fileName );
+	if ( inFile != nullptr ) {
 		int numEntries;
 		inFile->ReadBig( numEntries );
 		inFile->ReadString( filename );
 		entries.SetNum( numEntries );
 		for ( int i = 0; i < numEntries; i++ ) {
-			entries[ i ].Read( inFile );
+			entries[i].Read( inFile );
 		}
 delete inFile;
 		return true;
@@ -34,18 +34,18 @@ delete inFile;
 /*
 ================================================================================================
 
-aRcManifest
+anManifest
 
 ================================================================================================
 */
 /*
 ========================
-aRcManifest::LoadManifest
+anManifest::LoadManifest
 ========================
 */
-bool aRcManifest::LoadManifest( const char *_fileName ) {
-	arcNetFile *file = fileSystem->OpenFileRead( _fileName , false );
-	if ( file != NULL ) {
+bool anManifest::LoadManifest( const char *_fileName ) {
+	anFile *file = fileSystem->OpenFileRead( _fileName , false );
+	if ( file != nullptr ) {
 		return LoadManifestFromFile( file );
 	}
 	return false;
@@ -53,25 +53,25 @@ bool aRcManifest::LoadManifest( const char *_fileName ) {
 
 /*
 ========================
-aRcManifest::LoadManifestFromFile
+anManifest::LoadManifestFromFile
 
 // this will delete the file when finished
 ========================
 */
-bool aRcManifest::LoadManifestFromFile( arcNetFile *file ) {
-	if ( file == NULL ) {
+bool anManifest::LoadManifestFromFile( anFile *file ) {
+	if ( file == nullptr ) {
 		return false;
 	}
 	filename = file->GetName();
-	arcNetString str;
+	anString str;
 	int num;
 	file->ReadBig( num );
 	cacheTable.SetNum( num );
 	for ( int i = 0; i < num; i++ ) {
-		file->ReadString( cacheTable[ i ] );
-		//if ( FindFile( cacheTable[ i ].filename ) == NULL ) {
+		file->ReadString( cacheTable[i] );
+		//if ( FindFile( cacheTable[i].filename ) == nullptr ) {
 			// we only care about the first usage
-			const int key = cacheHash.GenerateKey( cacheTable[ i ], false );
+			const int key = cacheHash.GenerateKey( cacheTable[i], false );
 			cacheHash.Add( key, i );
 		//}
 	}
@@ -81,31 +81,31 @@ bool aRcManifest::LoadManifestFromFile( arcNetFile *file ) {
 
 /*
 ========================
-aRcManifest::WriteManifestFile
+anManifest::WriteManifestFile
 ========================
 */
-void aRcManifest::WriteManifestFile( const char *fileName ) {
-	arcNetFile *file = fileSystem->OpenFileWrite( fileName );
-	if ( file == NULL ) {
+void anManifest::WriteManifestFile( const char *fileName ) {
+	anFile *file = fileSystem->OpenFileWrite( fileName );
+	if ( file == nullptr ) {
 		return;
 	}
-	arcNetString str;
+	anString str;
 	int num = cacheTable.Num();
 	file->WriteBig( num );
 	for ( int i = 0; i < num; i++ ) {
-		file->WriteString( cacheTable[ i ] );
+		file->WriteString( cacheTable[i] );
 	}
 	delete file;
 }
 
 /*
 ========================
-aRcPreloadManifest::WriteManifestFile
+anPreloadManifest::WriteManifestFile
 ========================
 */
-void aRcPreloadManifest::WriteManifest( const char *fileName ) {
-	arcNetFile *file = fileSystem->OpenFileWrite( fileName, "fs_savepath" );
-	if ( file != NULL ) {
+void anPreloadManifest::WriteManifest( const char *fileName ) {
+	anFile *file = fileSystem->OpenFileWrite( fileName, "fs_savepath" );
+	if ( file != nullptr ) {
 		WriteManifestToFile( file );
 		delete file;
 	}
@@ -113,13 +113,13 @@ void aRcPreloadManifest::WriteManifest( const char *fileName ) {
 
 /*
 ========================
-aRcManifest::FindFile
+anManifest::FindFile
 ========================
 */
-int aRcManifest::FindFile( const char *fileName ) {
-	const int key =cacheHash.GenerateKey( fileName, false );
-	for ( int index = cacheHash.GetFirst( key ); index != ARCHashIndex::NULL_INDEX; index = cacheHash.GetNext( index ) ) {
-		if ( arcNetString::Icmp( cacheTable[index], fileName ) == 0 ) {
+int anManifest::FindFile( const char *fileName ) {
+	const int key = cacheHash.GenerateKey( fileName, false );
+	for ( int index = cacheHash.GetFirst( key ); index != anHashIndex::NULL_INDEX; index = cacheHash.GetNext( index ) ) {
+		if ( anString::Icmp( cacheTable[index], fileName ) == 0 ) {
 			return index;
 		}
 	}
@@ -128,13 +128,13 @@ int aRcManifest::FindFile( const char *fileName ) {
 
 /*
 ========================
-aRcManifest::RemoveAll
+anManifest::RemoveAll
 ========================
 */
-void aRcManifest::RemoveAll( const char * _fileName ) {
+void anManifest::RemoveAll( const char *_fileName ) {
 	for ( int i = 0; i < cacheTable.Num(); i++ ) {
-		if ( cacheTable[ i ].Icmp( _fileName ) == 0 ) {
-			const int key =cacheHash.GenerateKey( cacheTable[ i ], false );
+		if ( cacheTable[i].Icmp( _fileName ) == 0 ) {
+			const int key =cacheHash.GenerateKey( cacheTable[i], false );
 			cacheTable.RemoveIndex( i );
 			cacheHash.RemoveIndex( key, i );
 			i--;
@@ -144,26 +144,23 @@ void aRcManifest::RemoveAll( const char * _fileName ) {
 
 /*
 ========================
-aRcManifest::GetFileNameByIndex
+anManifest::GetFileNameByIndex
 ========================
 */
-const arcNetString & aRcManifest::GetFileNameByIndex( int idx ) const {
+const anString &anManifest::GetFileNameByIndex( int idx ) const {
 	return cacheTable[ idx ];
 }
 
 /*
 =========================
-aRcManifest::AddFile
+anManifest::AddFile
 =========================
 */
-void aRcManifest::AddFile( const char *fileName ) {
-	//if ( FindFile( fileName ) == NULL ) {
+void anManifest::AddFile( const char *fileName ) {
+	//if ( FindFile( fileName ) == nullptr ) {
 		// we only care about the first usage
 		const int key = cacheHash.GenerateKey( fileName, false );
 		int idx = cacheTable.Append( fileName );
 		cacheHash.Add( key, idx );
 	//}
 }
-
-
-

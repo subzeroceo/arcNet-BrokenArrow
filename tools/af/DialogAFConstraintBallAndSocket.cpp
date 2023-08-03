@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -64,7 +64,7 @@ toolTip_t DialogAFConstraintBallAndSocket::toolTips[] = {
 	{ IDC_COMBO_BAS_LIMIT_AXIS_JOINT2, "bone end joint" },
 	{ IDC_EDIT_BAS_LIMIT_AXIS_PITCH, "pitch angle" },
 	{ IDC_EDIT_BAS_LIMIT_AXIS_YAW, "yaw angle" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 IMPLEMENT_DYNAMIC(DialogAFConstraintBallAndSocket, CDialog)
@@ -74,7 +74,7 @@ IMPLEMENT_DYNAMIC(DialogAFConstraintBallAndSocket, CDialog)
 DialogAFConstraintBallAndSocket::DialogAFConstraintBallAndSocket
 ================
 */
-DialogAFConstraintBallAndSocket::DialogAFConstraintBallAndSocket(CWnd* pParent /*=NULL*/)
+DialogAFConstraintBallAndSocket::DialogAFConstraintBallAndSocket(CWnd* pParent /*=nullptr*/)
 	: CDialog(DialogAFConstraintBallAndSocket::IDD, pParent)
 	, m_anchor_x(0 )
 	, m_anchor_y(0 )
@@ -87,8 +87,8 @@ DialogAFConstraintBallAndSocket::DialogAFConstraintBallAndSocket(CWnd* pParent /
 	, m_limitRoll(0 )
 	, m_limitAxisPitch(0 )
 	, m_limitAxisYaw(0 )
-	, constraint(NULL)
-	, file(NULL)
+	, constraint(nullptr )
+	, file(nullptr )
 {
 	Create( IDD_DIALOG_AF_CONSTRAINT_BALLANDSOCKET, pParent );
 	EnableToolTips( TRUE );
@@ -145,7 +145,7 @@ void DialogAFConstraintBallAndSocket::InitJointLists( void ) {
 		return;
 	}
 
-	const ARCRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
+	const anRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
 	if ( !model ) {
 		return;
 	}
@@ -166,9 +166,9 @@ void DialogAFConstraintBallAndSocket::InitJointLists( void ) {
 DialogAFConstraintBallAndSocket::LoadFile
 ================
 */
-void DialogAFConstraintBallAndSocket::LoadFile( arcDeclAF *af ) {
+void DialogAFConstraintBallAndSocket::LoadFile( anDeclAF *af ) {
 	file = af;
-	constraint = NULL;
+	constraint = nullptr;
 	InitJointLists();
 }
 
@@ -186,9 +186,9 @@ void DialogAFConstraintBallAndSocket::SaveFile( void ) {
 DialogAFConstraintBallAndSocket::LoadConstraint
 ================
 */
-void DialogAFConstraintBallAndSocket::LoadConstraint( arcDeclAF_Constraint *c ) {
+void DialogAFConstraintBallAndSocket::LoadConstraint( anDeclAF_Constraint *c ) {
 	int i, s1, s2;
-	arcAngles angles;
+	anAngles angles;
 
 	constraint = c;
 
@@ -206,10 +206,10 @@ void DialogAFConstraintBallAndSocket::LoadConstraint( arcDeclAF_Constraint *c ) 
 	CheckRadioButton( IDC_RADIO_ANCHOR_JOINT, IDC_RADIO_ANCHOR_COORDINATES, i );
 
 	// limit
-	if ( constraint->limit == arcDeclAF_Constraint::LIMIT_CONE ) {
+	if ( constraint->limit == anDeclAF_Constraint::LIMIT_CONE ) {
 		i = IDC_RADIO_BAS_LIMIT_CONE;
 	}
-	else if ( constraint->limit == arcDeclAF_Constraint::LIMIT_PYRAMID ) {
+	else if ( constraint->limit == anDeclAF_Constraint::LIMIT_PYRAMID ) {
 		i = IDC_RADIO_BAS_LIMIT_PYRAMID;
 	}
 	else {
@@ -262,7 +262,7 @@ DialogAFConstraintBallAndSocket::SaveConstraint
 void DialogAFConstraintBallAndSocket::SaveConstraint( void ) {
 	int s1, s2;
 	CString str;
-	arcAngles angles;
+	anAngles angles;
 
 	if ( !file || !constraint ) {
 		return;
@@ -277,7 +277,7 @@ void DialogAFConstraintBallAndSocket::SaveConstraint( void ) {
 	constraint->anchor.ToVec3().z = m_anchor_z;
 
 	// limit
-	if ( constraint->limit == arcDeclAF_Constraint::LIMIT_CONE ) {
+	if ( constraint->limit == anDeclAF_Constraint::LIMIT_CONE ) {
 		constraint->limitAngles[0] = m_coneAngle;
 	}
 	else {
@@ -302,7 +302,7 @@ void DialogAFConstraintBallAndSocket::SaveConstraint( void ) {
 		constraint->shaft[0].joint2 = str;
 	}
 	else {
-		constraint->shaft[0].ToVec3() = arcAngles( m_limitAxisPitch, m_limitAxisYaw, 0.0f ).ToForward();
+		constraint->shaft[0].ToVec3() = anAngles( m_limitAxisPitch, m_limitAxisYaw, 0.0f ).ToForward();
 	}
 
 	AFDialogSetFileModified();
@@ -470,7 +470,7 @@ void DialogAFConstraintBallAndSocket::OnDeltaposSpinAnchorZ(NMHDR *pNMHDR, LRESU
 void DialogAFConstraintBallAndSocket::OnBnClickedRadioBasLimitNone() {
 	if ( IsDlgButtonChecked( IDC_RADIO_BAS_LIMIT_NONE ) ) {
 		if ( constraint ) {
-			constraint->limit = arcDeclAF_Constraint::LIMIT_NONE;
+			constraint->limit = anDeclAF_Constraint::LIMIT_NONE;
 			UpdateFile();
 		}
 	}
@@ -479,7 +479,7 @@ void DialogAFConstraintBallAndSocket::OnBnClickedRadioBasLimitNone() {
 void DialogAFConstraintBallAndSocket::OnBnClickedRadioBasLimitCone() {
 	if ( IsDlgButtonChecked( IDC_RADIO_BAS_LIMIT_CONE ) ) {
 		if ( constraint ) {
-			constraint->limit = arcDeclAF_Constraint::LIMIT_CONE;
+			constraint->limit = anDeclAF_Constraint::LIMIT_CONE;
 			UpdateFile();
 		}
 	}
@@ -488,7 +488,7 @@ void DialogAFConstraintBallAndSocket::OnBnClickedRadioBasLimitCone() {
 void DialogAFConstraintBallAndSocket::OnBnClickedRadioBasLimitPyramid() {
 	if ( IsDlgButtonChecked( IDC_RADIO_BAS_LIMIT_PYRAMID ) ) {
 		if ( constraint ) {
-			constraint->limit = arcDeclAF_Constraint::LIMIT_PYRAMID;
+			constraint->limit = anDeclAF_Constraint::LIMIT_PYRAMID;
 			UpdateFile();
 		}
 	}

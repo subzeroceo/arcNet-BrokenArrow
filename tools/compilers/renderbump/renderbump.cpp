@@ -1,4 +1,4 @@
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #ifdef WIN32
@@ -48,7 +48,7 @@ typedef struct {
 #define	MAX_LINKS_PER_BLOCK		0x100000
 #define	MAX_LINK_BLOCKS			0x100
 typedef struct {
-	arcBounds	bounds;
+	anBounds	bounds;
 	float		binSize[3];
 	int			numLinkBlocks;
 	triLink_t	*linkBlocks[MAX_LINK_BLOCKS];
@@ -69,8 +69,8 @@ typedef struct {
 	bool	saveColorMap;
 	float	traceFrac;
 	float	traceDist;
-	surfTriangles_t	*mesh;			// high poly mesh
-	ARCRenderModel	*highModel;
+	srfTriangles_t	*mesh;			// high poly mesh
+	anRenderModel	*highModel;
 	triHash_t	*hash;
 } renderBump_t;
 
@@ -160,7 +160,7 @@ an alpha test map.
 static void OutlineNormalMap( byte *data, int width, int height, int emptyR, int emptyG, int emptyB ) {
 	byte	*orig;
 	int		i, j, k, l;
-	arcVec3	normal;
+	anVec3	normal;
 	byte	*out;
 
 	orig = ( byte * )Mem_Alloc( width * height * 4 );
@@ -215,7 +215,7 @@ an alpha test map.
 static void OutlineColorMap( byte *data, int width, int height, int emptyR, int emptyG, int emptyB ) {
 	byte	*orig;
 	int		i, j, k, l;
-	arcVec3	normal;
+	anVec3	normal;
 	byte	*out;
 
 	orig = ( byte * )Mem_Alloc( width * height * 4 );
@@ -280,10 +280,10 @@ static void FreeTriHash( triHash_t *hash ) {
 CreateTriHash
 ================
 */
-static triHash_t *CreateTriHash( const surfTriangles_t *highMesh ) {
+static triHash_t *CreateTriHash( const srfTriangles_t *highMesh ) {
 	triHash_t	*hash;
 	int			i, j, k, l;
-	arcBounds	bounds, triBounds;
+	anBounds	bounds, triBounds;
 	int			iBounds[2][3];
 	int			maxLinks, numLinks;
 
@@ -376,9 +376,9 @@ Returns the distance from the point to the intersection, or DIST_NO_INTERSECTION
 =================
 */
 #define	DIST_NO_INTERSECTION	-999999999.0f
-static float TraceToMeshFace( const surfTriangles_t *highMesh, int faceNum, float minDist, float maxDist, const arcVec3 &point, const arcVec3 &normal, arcVec3 &sampledNormal, byte sampledColor[4] ) {
-	const arcVec3	*v[3];
-	arcVec3	dir[3];
+static float TraceToMeshFace( const srfTriangles_t *highMesh, int faceNum, float minDist, float maxDist, const anVec3 &point, const anVec3 &normal, anVec3 &sampledNormal, byte sampledColor[4] ) {
+	const anVec3	*v[3];
+	anVec3	dir[3];
 	float	bary[3];
 
 	// ---- arC-Net -- added change to use plane->Normal()
@@ -389,14 +389,14 @@ static float TraceToMeshFace( const surfTriangles_t *highMesh, int faceNum, floa
 	v[1] = &highMesh->verts[ highMesh->indexes[ faceNum * 3 + 1 ] ].xyz;
 	v[2] = &highMesh->verts[ highMesh->indexes[ faceNum * 3 + 2 ] ].xyz;
 
-	arcPlane *plane = highMesh->facePlanes + faceNum;
+	anPlane *plane = highMesh->facePlanes + faceNum;
 	// ---- arC-Net -- added change to use plane->Normal()
 	// and indexOffset to calc indexes.
 	if ( plane->Normal() * normal <= 0.0001f ) {
 		return DIST_NO_INTERSECTION;
 	}
 
-	if ( !arcCVariables::var_useOldRenderBump ) {
+	if ( !anCVariables::var_useOldRenderBump ) {
 		float dist = plane->Distance( point ) / (-plane->Normal() * normal );
 		if ( dist > maxDist || dist < minDist ) {
 			return DIST_NO_INTERSECTION;
@@ -418,36 +418,36 @@ static float TraceToMeshFace( const surfTriangles_t *highMesh, int faceNum, floa
         return DIST_NO_INTERSECTION;
     }
 
-	arcVec3 testVert = point + dist * normal;
+	anVec3 testVert = point + dist * normal;
 // ----arC-Net -- End //
 
 	// if normal is inside all edge planes, this face is hit
-	arcVec3::Subtract( *v[0], point, dir[0] );
-	arcVec3::Subtract( *v[1], point, dir[1] );
-	arcVec3 edge = dir[0].Cross( dir[1] );
-	float d = arcVec3::Dot( normal, edge );
+	anVec3::Subtract( *v[0], point, dir[0] );
+	anVec3::Subtract( *v[1], point, dir[1] );
+	anVec3 edge = dir[0].Cross( dir[1] );
+	float d = anVec3::Dot( normal, edge );
 	if ( d > 0.0f ) {
 		return DIST_NO_INTERSECTION;
 	}
-	arcVec3::Subtract( *v[2], point, dir[2] );
+	anVec3::Subtract( *v[2], point, dir[2] );
 	edge = dir[1].Cross( dir[2] );
-	float d = arcVec3::Dot( normal, edge );
+	float d = anVec3::Dot( normal, edge );
 	if ( d > 0.0f ) {
 		return DIST_NO_INTERSECTION;
 	}
 	edge = dir[2].Cross( dir[0] );
-	float d = arcVec3::Dot( normal, edge );
+	float d = anVec3::Dot( normal, edge );
 	if ( d > 0.0f ) {
 		return DIST_NO_INTERSECTION;
 	}
 
 	// calculate barycentric coordinates of the impact point
 	// on the high poly triangle
-	bary[0] = arcWinding::TriangleArea( testVert, *v[1], *v[2] );
-	bary[1] = arcWinding::TriangleArea( *v[0], testVert, *v[2] );
-	bary[2] = arcWinding::TriangleArea( *v[0], *v[1], testVert );
+	bary[0] = anWinding::TriangleArea( testVert, *v[1], *v[2] );
+	bary[1] = anWinding::TriangleArea( *v[0], testVert, *v[2] );
+	bary[2] = anWinding::TriangleArea( *v[0], *v[1], testVert );
 
-	float baseArea = arcWinding::TriangleArea( *v[0], *v[1], *v[2] );
+	float baseArea = anWinding::TriangleArea( *v[0], *v[1], *v[2] );
 	bary[0] /= baseArea;
 	bary[1] /= baseArea;
 	bary[2] /= baseArea;
@@ -485,8 +485,8 @@ for a ray coming from the surface of the low poly mesh
 Returns false if the trace doesn't hit anything
 ================
 */
-static bool SampleHighMesh( const renderBump_t *rb,  const arcVec3 &point, const arcVec3 &direction, arcVec3 &sampledNormal, byte sampledColor[4] ) {
-	arcVec3	p;
+static bool SampleHighMesh( const renderBump_t *rb,  const anVec3 &point, const anVec3 &direction, anVec3 &sampledNormal, byte sampledColor[4] ) {
+	anVec3	p;
 	binLink_t	*bl;
 	int			linkNum;
 	int		faceNum;
@@ -495,7 +495,7 @@ static bool SampleHighMesh( const renderBump_t *rb,  const arcVec3 &point, const
 	float	maxDist;
 	int		c_hits;
 	int		i;
-	arcVec3	normal;
+	anVec3	normal;
 
 	// we allow non-normalized directions on input
 	normal = direction;
@@ -567,7 +567,7 @@ This may be negatove
 =============
 */
 static float TriTextureArea( const float a[2], const float b[2], const float c[2] ) {
-	arcVec3	d1, d2;
+	anVec3	d1, d2;
 
 	d1[0] = b[0] - a[0];
 	d1[1] = b[1] - a[1];
@@ -577,7 +577,7 @@ static float TriTextureArea( const float a[2], const float b[2], const float c[2
 	d2[1] = c[1] - a[1];
 	d2[2] = 0;
 
-	arcVec3 cross = d1.Cross( d2 );
+	anVec3 cross = d1.Cross( d2 );
 	float area = 0.5 * cross.Length();
 
 	if ( cross[2] < 0 ) {
@@ -595,7 +595,7 @@ It is ok for the texcoords to wrap around, the rasterization
 will deal with it properly.
 ================
 */
-static void RasterizeTriangle( const surfTriangles_t *lowMesh, const arcVec3 *lowMeshNormals, int lowFaceNum, renderBump_t *rb ) {
+static void RasterizeTriangle( const srfTriangles_t *lowMesh, const anVec3 *lowMeshNormals, int lowFaceNum, renderBump_t *rb ) {
 	int		i, j, k;
 	float	bounds[2][2];
 	float	ibounds[2][2];
@@ -604,12 +604,12 @@ static void RasterizeTriangle( const surfTriangles_t *lowMesh, const arcVec3 *lo
 	float	bary[3];
 	byte	*localDest, *globalDest, *colorDest;
 	float	edge[3][3];
-	arcVec3	sampledNormal;
+	anVec3	sampledNormal;
 	byte	sampledColor[4];
-	arcVec3	point, normal, traceNormal, tangents[2];
+	anVec3	point, normal, traceNormal, tangents[2];
 	float	baseArea, totalArea;
 	int		r, g, b;
-	arcVec3	localNormal;
+	anVec3	localNormal;
 
 	// this is a brain-dead rasterizer, but compared to the ray trace,
 	// nothing we do here is going to matter performance-wise
@@ -788,7 +788,7 @@ static void RasterizeTriangle( const surfTriangles_t *lowMesh, const arcVec3 *lo
 			globalDest[3] = 255;
 
 			// transform to local tangent space
-			arcMat3	mat;
+			anMat3	mat;
 			mat[0] = tangents[0];
 			mat[1] = tangents[1];
 			mat[2] = normal;
@@ -823,7 +823,7 @@ Frees the model and returns a new model with all triangles combined
 into one surface
 ================
 */
-static ARCRenderModel *CombineModelSurfaces( ARCRenderModel *model ) {
+static anRenderModel *CombineModelSurfaces( anRenderModel *model ) {
 	int		totalVerts;
 	int		totalIndexes;
 	int		numIndexes;
@@ -840,7 +840,7 @@ static ARCRenderModel *CombineModelSurfaces( ARCRenderModel *model ) {
 		totalIndexes += surf->geometry->numIndexes;
 	}
 
-	surfTriangles_t *newTri = R_AllocStaticTriSurf();
+	srfTriangles_t *newTri = R_AllocStaticTriSurf();
 	R_AllocStaticTriSurfVerts( newTri, totalVerts );
 	R_AllocStaticTriSurfIndexes( newTri, totalIndexes );
 
@@ -849,13 +849,13 @@ static ARCRenderModel *CombineModelSurfaces( ARCRenderModel *model ) {
 
 	newTri->bounds.Clear();
 
-	arcDrawVert *verts = newTri->verts;
+	anDrawVertex *verts = newTri->verts;
 	qglIndex_t *indexes = newTri->indexes;
 	numIndexes = 0;
 	numVerts = 0;
 	for ( i = 0; i < model->NumSurfaces(); i++ ) {
 		const modelSurface_t *surf = model->Surface( i );
-		const surfTriangles_t *tri = surf->geometry;
+		const srfTriangles_t *tri = surf->geometry;
 
 		memcpy( verts + numVerts, tri->verts, tri->numVerts * sizeof( tri->verts[0] ) );
 		for ( j = 0; j < tri->numIndexes; j++ ) {
@@ -872,7 +872,7 @@ static ARCRenderModel *CombineModelSurfaces( ARCRenderModel *model ) {
 	surf.geometry = newTri;
 	surf.shader = tr.defaultMaterial;
 
-	ARCRenderModel *newModel = renderModelManager->AllocModel();
+	anRenderModel *newModel = renderModelManager->AllocModel();
 	newModel->AddSurface( surf );
 
 	renderModelManager->FreeModel( model );
@@ -886,7 +886,7 @@ RenderBumpTriangles
 
 ==============
 */
-static void RenderBumpTriangles( surfTriangles_t *lowMesh, renderBump_t *rb ) {
+static void RenderBumpTriangles( srfTriangles_t *lowMesh, renderBump_t *rb ) {
 	RB_SetGL2D();
 
 	qglDisable( GL_CULL_FACE );
@@ -913,12 +913,12 @@ static void RenderBumpTriangles( surfTriangles_t *lowMesh, renderBump_t *rb ) {
 	// normal from a single triangle.  We need properly smoothed
 	// normals to make sure that the traces always go off normal
 	// to the true surface.
-	arcVec3	*lowMeshNormals = (arcVec3 *)Mem_ClearedAlloc( lowMesh->numVerts * sizeof( *lowMeshNormals ) );
+	anVec3	*lowMeshNormals = (anVec3 *)Mem_ClearedAlloc( lowMesh->numVerts * sizeof( *lowMeshNormals ) );
 
 	R_DeriveFacePlanes( lowMesh );
 	R_CreateSilIndexes( lowMesh );	// recreate, merging the mirrored verts back together
 
-	const arcPlane *planes = lowMesh->facePlanes;
+	const anPlane *planes = lowMesh->facePlanes;
 
 	for ( int i = 0; i < lowMesh->numIndexes; i += 3, planes++ ) {
 		for ( int j = 0; j < 3; j++ ) {
@@ -960,7 +960,7 @@ WriteRenderBump
 static void WriteRenderBump( renderBump_t *rb, int outLinePixels ) {
 	int		width, height;
 	int		i;
-	arcNetString	filename;
+	anString	filename;
 
 	renderModelManager->FreeModel( rb->highModel );
 
@@ -1040,8 +1040,8 @@ InitRenderBump
 ===============
 */
 static void InitRenderBump( renderBump_t *rb ) {
-	surfTriangles_t	*mesh;
-	arcBounds	bounds;
+	srfTriangles_t	*mesh;
+	anBounds	bounds;
 	int			i, c;
 
 	// load the ase file
@@ -1125,9 +1125,9 @@ RenderBump_f
 
 ==============
 */
-void RenderBump_f( const arcCommandArgs &args ) {
-	ARCRenderModel	*lowPoly;
-	arcNetString	source;
+void RenderBump_f( const anCommandArgs &args ) {
+	anRenderModel	*lowPoly;
+	anString	source;
 	int		i, j;
 	const char	*cmdLine;
 	int		numRenderBumps;
@@ -1178,7 +1178,7 @@ void RenderBump_f( const arcCommandArgs &args ) {
 			continue;
 		}
 
-		arcCommandArgs localArgs;
+		anCommandArgs localArgs;
 		localArgs.TokenizeString( cmdLine, false );
 
 		if ( localArgs.Argc() < 2 ) {
@@ -1200,7 +1200,7 @@ void RenderBump_f( const arcCommandArgs &args ) {
 				}
 			}
 
-			if ( !arcNetString::Icmp( s, "size" ) ) {
+			if ( !anString::Icmp( s, "size" ) ) {
 				if ( j + 2 >= localArgs.Argc() ) {
 					j = localArgs.Argc();
 					break;
@@ -1208,17 +1208,17 @@ void RenderBump_f( const arcCommandArgs &args ) {
 				opt.width = atoi( localArgs.Argv( j + 1 ) );
 				opt.height = atoi( localArgs.Argv( j + 2 ) );
 				j += 2;
-			} else if ( !arcNetString::Icmp( s, "trace" ) ) {
+			} else if ( !anString::Icmp( s, "trace" ) ) {
 				opt.traceFrac = atof( localArgs.Argv( j + 1 ) );
 				j += 1;
-			} else if ( !arcNetString::Icmp( s, "globalMap" ) ) {
+			} else if ( !anString::Icmp( s, "globalMap" ) ) {
 				opt.saveGlobalMap = true;
-			} else if ( !arcNetString::Icmp( s, "colorMap" ) ) {
+			} else if ( !anString::Icmp( s, "colorMap" ) ) {
 				opt.saveColorMap = true;
-			} else if ( !arcNetString::Icmp( s, "outline" ) ) {
+			} else if ( !anString::Icmp( s, "outline" ) ) {
 				opt.outline = atoi( localArgs.Argv( j + 1 ) );
 				j += 1;
-			} else if ( !arcNetString::Icmp( s, "aa" ) ) {
+			} else if ( !anString::Icmp( s, "aa" ) ) {
 				opt.antiAlias = atoi( localArgs.Argv( j + 1 ) );
 				j += 1;
 			} else {
@@ -1230,8 +1230,8 @@ void RenderBump_f( const arcCommandArgs &args ) {
 		if ( j != ( localArgs.Argc() - 2 ) ) {
 			common->Error( "usage: renderBump [-size width height] [-aa <1-2>] [globalMap] [colorMap] [-trace <0.01 - 1.0>] normalMapImageFile highPolyAseFile" );
 		}
-		arcNetString::Copynz( opt.outputName, localArgs.Argv( j ), sizeof( opt.outputName ) );
-		arcNetString::Copynz( opt.highName, localArgs.Argv( j + 1 ), sizeof( opt.highName ) );
+		anString::Copynz( opt.outputName, localArgs.Argv( j ), sizeof( opt.outputName ) );
+		anString::Copynz( opt.highName, localArgs.Argv( j + 1 ), sizeof( opt.highName ) );
 
 		// adjust size for anti-aliasing
 		opt.width <<= opt.antiAlias;
@@ -1241,11 +1241,11 @@ void RenderBump_f( const arcCommandArgs &args ) {
 		for ( j = 0; j < numRenderBumps; j++ ) {
 			rb = &renderBumps[j];
 
-			if ( arcNetString::Icmp( rb->outputName, opt.outputName ) ) {
+			if ( anString::Icmp( rb->outputName, opt.outputName ) ) {
 				continue;
 			}
 			// all the other parameters must match, or it is an error
-			if ( arcNetString::Icmp( rb->highName, opt.highName) || rb->width != opt.width ||
+			if ( anString::Icmp( rb->highName, opt.highName) || rb->width != opt.width ||
 				rb->height != opt.height || rb->antiAlias != opt.antiAlias ||
 				rb->traceFrac != opt.traceFrac ) {
 				common->Error( "mismatched renderbump parameters on image %s", rb->outputName );
@@ -1306,12 +1306,12 @@ RenderBumpFlat_f
 
 ==============
 */
-void RenderBumpFlat_f( const arcCommandArgs &args ) {
+void RenderBumpFlat_f( const anCommandArgs &args ) {
 	int		width, height;
-	arcNetString	source;
+	anString	source;
 	int		i;
-	arcBounds	bounds;
-	surfTriangles_t	*mesh;
+	anBounds	bounds;
+	srfTriangles_t	*mesh;
 	float	boundsScale;
 
 	// update the screen as we print
@@ -1330,7 +1330,7 @@ void RenderBumpFlat_f( const arcCommandArgs &args ) {
 			s = args.Argv( i );
 		}
 
-		if ( !arcNetString::Icmp( s, "size" ) ) {
+		if ( !anString::Icmp( s, "size" ) ) {
 			if ( i + 2 >= args.Argc() ) {
 				i = args.Argc();
 				break;
@@ -1354,7 +1354,7 @@ void RenderBumpFlat_f( const arcCommandArgs &args ) {
 	// need tangent and shadow information
 	source = args.Argv( i );
 
-	ARCRenderModel *highPolyModel = renderModelManager->AllocModel();
+	anRenderModel *highPolyModel = renderModelManager->AllocModel();
 
 	highPolyModel->PartialInitFromFile( source );
 
@@ -1404,18 +1404,18 @@ void RenderBumpFlat_f( const arcCommandArgs &args ) {
 
 	// flat maps are automatically anti-aliased
 
-	arcNetString	filename;
+	anString	filename;
 	int		j, k, c;
 	byte	*buffer;
 	int		*sumBuffer, *colorSumBuffer;
 	bool	flat;
 	int		sample;
 
-	sumBuffer = ( int * )Mem_Alloc( width * height * 4 * 4 );
+	sumBuffer = ( int*)Mem_Alloc( width * height * 4 * 4 );
 	memset( sumBuffer, 0, width * height * 4 * 4 );
 	buffer = ( byte * )Mem_Alloc( width * height * 4 );
 
-	colorSumBuffer = ( int * )Mem_Alloc( width * height * 4 * 4 );
+	colorSumBuffer = ( int*)Mem_Alloc( width * height * 4 * 4 );
 	memset( sumBuffer, 0, width * height * 4 * 4 );
 
 	flat = false;
@@ -1456,8 +1456,8 @@ void RenderBumpFlat_f( const arcCommandArgs &args ) {
 					// or smooth shade from the vertex normals
 					for ( j = 0; j < mesh->numIndexes; j+=3 ) {
 						if ( flat ) {
-							arcPlane		plane;
-							arcVec3		*a, *b, *c;
+							anPlane		plane;
+							anVec3		*a, *b, *c;
 							int			v1, v2, v3;
 
 							v1 = mesh->indexes[j+0];
@@ -1524,7 +1524,7 @@ void RenderBumpFlat_f( const arcCommandArgs &args ) {
 				// normalize
 				c = width * height;
 				for ( i = 0; i < c; i++ ) {
-					arcVec3	v;
+					anVec3	v;
 
 					v[0] = ( buffer[i*4+0] - 128 ) / 127.0;
 					v[1] = ( buffer[i*4+1] - 128 ) / 127.0;

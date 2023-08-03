@@ -1,57 +1,57 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
-arcCVarSystem ARCDemoFile::com_logDemos( "com_logDemos", "0", CVAR_SYSTEM | CVAR_BOOL, "Write demo.log with debug information in it" );
-arcCVarSystem ARCDemoFile::com_compressDemos( "com_compressDemos", "1", CVAR_SYSTEM | CVAR_INTEGER | CVAR_ARCHIVE, "Compression scheme for demo files\n0: None    (Fast, large files)\n1: LZW     (Fast to compress, Fast to decompress, medium/small files)\n2: LZSS    (Slow to compress, Fast to decompress, small files)\n3: Huffman (Fast to compress, Slow to decompress, medium files)\nSee also: The 'CompressDemo' command" );
-arcCVarSystem ARCDemoFile::com_preloadDemos( "com_preloadDemos", "0", CVAR_SYSTEM | CVAR_BOOL | CVAR_ARCHIVE, "Load the whole demo in to RAM before running it" );
+anCVarSystem anDemoFile::com_logDemos( "com_logDemos", "0", CVAR_SYSTEM | CVAR_BOOL, "Write demo.log with debug information in it" );
+anCVarSystem anDemoFile::com_compressDemos( "com_compressDemos", "1", CVAR_SYSTEM | CVAR_INTEGER | CVAR_ARCHIVE, "Compression scheme for demo files\n0: None    (Fast, large files)\n1: LZW     (Fast to compress, Fast to decompress, medium/small files)\n2: LZSS    (Slow to compress, Fast to decompress, small files)\n3: Huffman (Fast to compress, Slow to decompress, medium files)\nSee also: The 'CompressDemo' command" );
+anCVarSystem anDemoFile::com_preloadDemos( "com_preloadDemos", "0", CVAR_SYSTEM | CVAR_BOOL | CVAR_ARCHIVE, "Load the whole demo in to RAM before running it" );
 
 #define DEMO_MAGIC GAME_NAME " RDEMO"
 
 /*
 ================
-ARCDemoFile::ARCDemoFile
+anDemoFile::anDemoFile
 ================
 */
-ARCDemoFile::ARCDemoFile() {
-	f = NULL;
-	fLog = NULL;
+anDemoFile::anDemoFile() {
+	f = nullptr;
+	fLog = nullptr;
 	log = false;
-	fileImage = NULL;
-	compressor = NULL;
+	fileImage = nullptr;
+	compressor = nullptr;
 	writing = false;
 }
 
 /*
 ================
-ARCDemoFile::~ARCDemoFile
+anDemoFile::~anDemoFile
 ================
 */
-ARCDemoFile::~ARCDemoFile() {
+anDemoFile::~anDemoFile() {
 	Close();
 }
 
 /*
 ================
-ARCDemoFile::AllocCompressor
+anDemoFile::AllocCompressor
 ================
 */
-idCompressor *ARCDemoFile::AllocCompressor( int type ) {
+anCompressor *anDemoFile::AllocCompressor( int type ) {
 	switch ( type ) {
-	case 0: return idCompressor::AllocNoCompression();
+	case 0: return anCompressor::AllocNoCompression();
 	default:
-	case 1: return idCompressor::AllocLZW();
-	case 2: return idCompressor::AllocLZSS();
-	case 3: return idCompressor::AllocHuffman();
+	case 1: return anCompressor::AllocLZW();
+	case 2: return anCompressor::AllocLZSS();
+	case 3: return anCompressor::AllocHuffman();
 	}
 }
 
 /*
 ================
-ARCDemoFile::OpenForReading
+anDemoFile::OpenForReading
 ================
 */
-bool ARCDemoFile::OpenForReading( const char *fileName ) {
-	static const int magicLen = sizeof(DEMO_MAGIC) / sizeof(DEMO_MAGIC[0] );
+bool anDemoFile::OpenForReading( const char *fileName ) {
+	static const int magicLen = sizeof(DEMO_Magic ) / sizeof(DEMO_MAGIC[0] );
 	char magicBuffer[magicLen];
 	int compression;
 	int fileLength;
@@ -66,10 +66,10 @@ bool ARCDemoFile::OpenForReading( const char *fileName ) {
 	fileLength = f->Length();
 
 	if ( com_preloadDemos.GetBool() ) {
-		fileImage = ( byte * )Mem_Alloc( fileLength, TAG_CRAP );
+		fileImage = (byte *)Mem_Alloc( fileLength, TAG_CRAP );
 		f->Read( fileImage, fileLength );
 		fileSystem->CloseFile( f );
-		f = new (TAG_SYSTEM) aRcFileMemory( va( "preloaded(%s)", fileName ), (const char *)fileImage, fileLength );
+		f = new (TAG_SYSTEM) anFileMemory( va( "preloaded(%s)", fileName ), (const char *)fileImage, fileLength );
 	}
 
 	if ( com_logDemos.GetBool() ) {
@@ -96,10 +96,10 @@ bool ARCDemoFile::OpenForReading( const char *fileName ) {
 
 /*
 ================
-ARCDemoFile::SetLog
+anDemoFile::SetLog
 ================
 */
-void ARCDemoFile::SetLog(bool b, const char *p) {
+void anDemoFile::SetLog(bool b, const char *p) {
 	log = b;
 	if (p) {
 		logStr = p;
@@ -108,10 +108,10 @@ void ARCDemoFile::SetLog(bool b, const char *p) {
 
 /*
 ================
-ARCDemoFile::Log
+anDemoFile::Log
 ================
 */
-void ARCDemoFile::Log(const char *p) {
+void anDemoFile::Log(const char *p) {
 	if ( fLog && p && *p ) {
 		fLog->Write( p, strlen(p) );
 	}
@@ -119,14 +119,14 @@ void ARCDemoFile::Log(const char *p) {
 
 /*
 ================
-ARCDemoFile::OpenForWriting
+anDemoFile::OpenForWriting
 ================
 */
-bool ARCDemoFile::OpenForWriting( const char *fileName ) {
+bool anDemoFile::OpenForWriting( const char *fileName ) {
 	Close();
 
 	f = fileSystem->OpenFileWrite( fileName );
-	if ( f == NULL ) {
+	if ( f == nullptr ) {
 		return false;
 	}
 
@@ -136,7 +136,7 @@ bool ARCDemoFile::OpenForWriting( const char *fileName ) {
 
 	writing = true;
 
-	f->Write(DEMO_MAGIC, sizeof(DEMO_MAGIC) );
+	f->Write(DEMO_MAGIC, sizeof(DEMO_Magic ) );
 	f->WriteInt( com_compressDemos.GetInteger() );
 	f->Flush();
 
@@ -148,29 +148,29 @@ bool ARCDemoFile::OpenForWriting( const char *fileName ) {
 
 /*
 ================
-ARCDemoFile::Close
+anDemoFile::Close
 ================
 */
-void ARCDemoFile::Close() {
+void anDemoFile::Close() {
 	if ( writing && compressor ) {
 		compressor->FinishCompress();
 	}
 
 	if ( f ) {
 		fileSystem->CloseFile( f );
-		f = NULL;
+		f = nullptr;
 	}
 	if ( fLog ) {
 		fileSystem->CloseFile( fLog );
-		fLog = NULL;
+		fLog = nullptr;
 	}
 	if ( fileImage ) {
 		Mem_Free( fileImage );
-		fileImage = NULL;
+		fileImage = nullptr;
 	}
 	if ( compressor ) {
 		delete compressor;
-		compressor = NULL;
+		compressor = nullptr;
 	}
 
 	demoStrings.DeleteContents( true );
@@ -178,10 +178,10 @@ void ARCDemoFile::Close() {
 
 /*
 ================
-ARCDemoFile::ReadHashString
+anDemoFile::ReadHashString
 ================
 */
-const char *ARCDemoFile::ReadHashString() {
+const char *anDemoFile::ReadHashString() {
 	int		index;
 
 	if ( log && fLog ) {
@@ -193,9 +193,9 @@ const char *ARCDemoFile::ReadHashString() {
 
 	if ( index == -1 ) {
 		// read a new string for the table
-		arcNetString	*str = new (TAG_SYSTEM) arcNetString;
+		anString	*str = new (TAG_SYSTEM) anString;
 
-		arcNetString data;
+		anString data;
 		ReadString( data );
 		*str = data;
 
@@ -214,10 +214,10 @@ const char *ARCDemoFile::ReadHashString() {
 
 /*
 ================
-ARCDemoFile::WriteHashString
+anDemoFile::WriteHashString
 ================
 */
-void ARCDemoFile::WriteHashString( const char *str ) {
+void anDemoFile::WriteHashString( const char *str ) {
 	if ( log && fLog ) {
 		const char *text = va( "%s > Writing hash string\n", logStr.c_str() );
 		fLog->Write( text, strlen( text ) );
@@ -231,7 +231,7 @@ void ARCDemoFile::WriteHashString( const char *str ) {
 	}
 
 	// add it to our table and the demo table
-	arcNetString	*copy = new (TAG_SYSTEM) arcNetString( str );
+	anString	*copy = new (TAG_SYSTEM) anString( str );
 //common->Printf( "hash:%i = %s\n", demoStrings.Num(), str );
 	demoStrings.Append( copy );
 	int cmd = -1;
@@ -241,12 +241,12 @@ void ARCDemoFile::WriteHashString( const char *str ) {
 
 /*
 ================
-ARCDemoFile::ReadDict
+anDemoFile::ReadDict
 ================
 */
-void ARCDemoFile::ReadDict( arcDictionary &dict ) {
+void anDemoFile::ReadDict( anDict &dict ) {
 	int i, c;
-	arcNetString key, val;
+	anString key, val;
 
 	dict.Clear();
 	ReadInt( c );
@@ -259,10 +259,10 @@ void ARCDemoFile::ReadDict( arcDictionary &dict ) {
 
 /*
 ================
-ARCDemoFile::WriteDict
+anDemoFile::WriteDict
 ================
 */
-void ARCDemoFile::WriteDict( const arcDictionary &dict ) {
+void anDemoFile::WriteDict( const anDict &dict ) {
 	int i, c;
 
 	c = dict.GetNumKeyVals();
@@ -275,10 +275,10 @@ void ARCDemoFile::WriteDict( const arcDictionary &dict ) {
 
 /*
  ================
- ARCDemoFile::Read
+ anDemoFile::Read
  ================
  */
-int ARCDemoFile::Read( void *buffer, int len ) {
+int anDemoFile::Read( void *buffer, int len ) {
 	int read = compressor->Read( buffer, len );
 	if ( read == 0 && len >= 4 ) {
 		*(demoSystem_t *)buffer = DS_FINISHED;
@@ -288,10 +288,10 @@ int ARCDemoFile::Read( void *buffer, int len ) {
 
 /*
  ================
- ARCDemoFile::Write
+ anDemoFile::Write
  ================
  */
-int ARCDemoFile::Write( const void *buffer, int len ) {
+int anDemoFile::Write( const void *buffer, int len ) {
 	return compressor->Write( buffer, len );
 }
 

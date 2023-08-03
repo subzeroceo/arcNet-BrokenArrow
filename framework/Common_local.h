@@ -9,7 +9,7 @@ static const int initialBaseTicksPerSec = initialHz * initialBaseTicks;
 static const int LOAD_TIP_CHANGE_INTERVAL = 12000;
 static const int LOAD_TIP_COUNT = 26;
 
-class idGameThread : public arcSysThread {
+class idGameThread : public anSysThread {
 public:
 	idGameThread() :
 		gameTime(),
@@ -17,7 +17,7 @@ public:
 		threadTime(),
 		threadGameTime(),
 		threadRenderTime(),
-		userCmdMgr( NULL ),
+		userCmdMgr( nullptr ),
 		ret(),
 		numGameFrames(),
 		isClient()
@@ -85,11 +85,11 @@ struct frameTiming_t {
 #define SAVEGAME_DESCRIPTION_FILENAME		"gamedata.txt"
 #define SAVEGAME_STRINGS_FILENAME			"gamedata.strings"
 
-class arcCommonLocal : public arcCommon {
+class anCommonLocal : public anCommon {
 public:
-								arcCommonLocal();
+								anCommonLocal();
 
-	virtual void				Init( int argc, const char * const * argv, const char *cmdline );
+	virtual void				Init( int argc, const char *const * argv, const char *cmdline );
 	virtual void				Shutdown();
 	virtual	void				CreateMainMenu();
 	virtual void				Quit();
@@ -124,38 +124,38 @@ public:
 
 	virtual bool				ProcessEvent( const sysEvent_t *event );
 
-	virtual bool				LoadGame( const char * saveName );
-	virtual bool				SaveGame( const char * saveName );
+	virtual bool				LoadGame( const char *saveName );
+	virtual bool				SaveGame( const char *saveName );
 
 	virtual int					ButtonState( int key );
 	virtual int					KeyState( int key );
 
-	virtual ARCDemoFile *		ReadDemo() { return readDemo; }
-	virtual ARCDemoFile *		WriteDemo() { return writeDemo; }
+	virtual anDemoFile *		ReadDemo() { return readDemo; }
+	virtual anDemoFile *		WriteDemo() { return writeDemo; }
 
 	virtual ARCEngine *			Game() { return game; }
-	virtual ARCRenderWorld *	RW() { return renderWorld; }
+	virtual anRenderWorld *	RW() { return renderWorld; }
 	virtual ARCSoundWorld *		SW() { return soundWorld; }
 	virtual ARCSoundWorld *		MenuSW() { return menuSoundWorld; }
-	virtual arcCommonDlg &		Dialog() { return commonDialog; }
+	virtual anCommonDlg &		Dialog() { return commonDialog; }
 
 	virtual void				OnSaveCompleted( ARCSaveLoadParms & parms );
 	virtual void				OnLoadCompleted( ARCSaveLoadParms & parms );
 	virtual void				OnLoadFilesCompleted( ARCSaveLoadParms & parms );
 	virtual void				OnEnumerationCompleted( ARCSaveLoadParms & parms );
 	virtual void				OnDeleteCompleted( ARCSaveLoadParms & parms );
-	virtual void				TriggerScreenWipe( const char * _wipeMaterial, bool hold );
+	virtual void				TriggerScreenWipe( const char *_wipeMaterial, bool hold );
 
-	virtual void				OnStartHosting( arcMatchParameters & parms );
+	virtual void				OnStartHosting( anMatchParameters & parms );
 
 	virtual int					GetGameFrame() { return gameFrame; }
 
-	virtual void				LaunchExternalTitle( int titleIndex, int device, const lobbyConnectInfo_t * const connectInfo ); // For handling invitations. NULL if no invitation used.
+	virtual void				LaunchExternalTitle( int titleIndex, int device, const lobbyConnectInfo_t * const connectInfo ); // For handling invitations. nullptr if no invitation used.
 
 	virtual void				InitializeMPMapsModes();
-	virtual const arcStringList &GetModeList() const { return mpGameModes; }
-	virtual const arcStringList &GetModeDisplayList() const { return mpDisplayGameModes; }
-	virtual const arcNetList<mpMap_t> &GetMapList() const { return mpGameMaps; }
+	virtual const anStringList &GetModeList() const { return mpGameModes; }
+	virtual const anStringList &GetModeDisplayList() const { return mpDisplayGameModes; }
+	virtual const anList<mpMap_t> &GetMapList() const { return mpGameMaps; }
 
 	virtual void				ResetPlayerInput( int playerIndex );
 
@@ -180,16 +180,16 @@ public:
 
 public:	// These are public because they are called directly by static functions in this file
 
-	const char * GetCurrentMapName() { return currentMapName.c_str(); }
+	const char *GetCurrentMapName() { return currentMapName.c_str(); }
 
 	// loads a map and starts a new game on it
-	void	StartNewGame( const char * mapName, bool devmap, int gameMode );
+	void	StartNewGame( const char *mapName, bool devmap, int gameMode );
 	void	LeaveGame();
 
 	void	DemoShot( const char *name );
 	void	StartRecordingRenderDemo( const char *name );
 	void	StopRecordingRenderDemo();
-	void	StartPlayingRenderDemo( arcNetString name );
+	void	StartPlayingRenderDemo( anString name );
 	void	StopPlayingRenderDemo();
 	void	CompressDemoFile( const char *scheme, const char *name );
 	void	TimeRenderDemo( const char *name, bool twice = false, bool quit = false );
@@ -198,9 +198,9 @@ public:	// These are public because they are called directly by static functions
 
 	// localization
 	void	InitLanguageDict();
-	void	LocalizeGui( const char *fileName, arcLangDictionary &langDict );
-	void	LocalizeMapData( const char *fileName, arcLangDictionary &langDict );
-	void	LocalizeSpecificMapData( const char *fileName, arcLangDictionary &langDict, const arcLangDictionary &replaceArgs );
+	void	LocalizeGui( const char *fileName, anLangDict &langDict );
+	void	LocalizeMapData( const char *fileName, anLangDict &langDict );
+	void	LocalizeSpecificMapData( const char *fileName, anLangDict &langDict, const anLangDict &replaceArgs );
 
 	arcUserCmdMgr & GetUCmdMgr() { return userCmdMgr; }
 
@@ -210,7 +210,7 @@ private:
 	errorParm_t					com_errorEntered;
 	bool						com_shuttingDown;
 
-	arcNetFile *					logFile;
+	anFile *					logFile;
 
 	char						errorMessage[MAX_PRINT_MSG_SIZE];
 
@@ -218,26 +218,26 @@ private:
 	int							rd_buffersize;
 	void						(*rd_flush)( const char *buffer );
 
-	arcNetString						warningCaption;
-	arcStringList					warningList;
-	arcStringList					errorList;
+	anString						warningCaption;
+	anStringList					warningList;
+	anStringList					errorList;
 
 	int							engineDLL;
 
-	arcCommonDlg				commonDialog;
+	anCommonDlg				commonDialog;
 
-	arcFile_SaveGame 			saveFile;
-	arcFile_SaveGame 			stringsFile;
-	arcFile_SaveGamePipelined 	*pipelineFile;
+	anFile_SaveGame 			saveFile;
+	anFile_SaveGame 			stringsFile;
+	anFile_SGPipelined 	*pipelineFile;
 
 	// The main render world and sound world
-	ARCRenderWorld *			renderWorld;
+	anRenderWorld *			renderWorld;
 	ARCSoundWorld *				soundWorld;
 
 	// The renderer and sound system will write changes to writeDemo.
 	// Demos can be recorded and played at the same time when splicing.
-	ARCDemoFile *				readDemo;
-	ARCDemoFile *				writeDemo;
+	anDemoFile *				readDemo;
+	anDemoFile *				writeDemo;
 
 	bool						menuActive;
 	ARCSoundWorld *				menuSoundWorld;			// so the game soundWorld can be muted
@@ -250,14 +250,14 @@ private:
 	// This additional information is required for ExecuteMapChange for SP games ONLY
 	// This data is cleared after ExecuteMapChange
 	struct mapSpawnData_t {
-		arcFile_SaveGame *		savegameFile;				// Used for loading a save game
-		arcFile_SaveGame *		stringTableFile;			// String table read from save game loaded
-		arcFile_SaveGamePipelined *pipelineFile;
+		anFile_SaveGame *		savegameFile;				// Used for loading a save game
+		anFile_SaveGame *		stringTableFile;			// String table read from save game loaded
+		anFile_SGPipelined *pipelineFile;
 		int						savegameVersion;			// Version of the save game we're loading
-		arcDictionary				persistentPlayerInfo;		// Used for transitioning from map to map
+		anDict				persistentPlayerInfo;		// Used for transitioning from map to map
 	};
 	mapSpawnData_t				mapSpawnData;
-	arcNetString					currentMapName;			// for checking reload on same level
+	anString					currentMapName;			// for checking reload on same level
 	bool						mapSpawned;				// cleared on Stop()
 
 	bool						insideUpdateScreen;		// true while inside ::UpdateScreen()
@@ -274,7 +274,7 @@ private:
 		int dataSize;
 		byte * data;
 	};
-	arcNetList<reliableMsg_t> reliableQueue;
+	anList<reliableMsg_t> reliableQueue;
 
 	// Snapshot interpolation
 	ARCSnapShot		oldss;				// last local snapshot
@@ -317,7 +317,7 @@ private:
 	bool				syncNextEngineFrame;
 
 	bool				aviCaptureMode;		// if true, screenshots will be taken and sound captured
-	arcNetString			aviDemoShortName;	//
+	anString			aviDemoShortName;	//
 	int					aviDemoFrameCount;
 
 	enum timeDemo_t {
@@ -337,11 +337,11 @@ private:
 	bool				defaultLoadscreen;
 	arcStaticList<int, LOAD_TIP_COUNT> loadTipList;
 
-	const arcMaterial *	splashScreen;
+	const anMaterial *	splashScreen;
 
-	const arcMaterial *	whiteMaterial;
+	const anMaterial *	whiteMaterial;
 
-	const arcMaterial *	wipeMaterial;
+	const anMaterial *	wipeMaterial;
 	int					wipeStartTime;
 	int					wipeStopTime;
 	bool				wipeHold;
@@ -368,7 +368,7 @@ private:
 	void	InitCommands();
 	void	InitSIMD();
 	void	AddStartupCommands();
-	void	ParseCommandLine( int argc, const char * const * argv );
+	void	ParseCommandLine( int argc, const char *const * argv );
 	bool	SafeMode();
 	void	CloseLogFile();
 	void	WriteConfiguration();
@@ -376,9 +376,9 @@ private:
 	void	LoadARCEngineDLL();
 	void	UnloadARCEngineDLL();
 	void	CleanupShell();
-	void	RenderBink( const char * path );
+	void	RenderBink( const char *path );
 	void	RenderSplash();
-	void	FilterLangList( arcStringList* list, arcNetString lang );
+	void	FilterLangList( anStringList* list, anString lang );
 	void	CheckStartupStorageRequirements();
 
 	void	ExitMenu();
@@ -424,11 +424,11 @@ private:
 	void	CompleteWipe();
 	void	ClearWipe();
 
-	void	MoveToNewMap( const char * mapName, bool devmap );
+	void	MoveToNewMap( const char *mapName, bool devmap );
 
 	void	PlayIntroGui();
 
-	void	ScrubSaveGameFileName( arcNetString &saveFileName ) const;
+	void	ScrubSaveGameFileName( anString &saveFileName ) const;
 };
 
-extern arcCommonLocal commonLocal;
+extern anCommonLocal commonLocal;

@@ -37,8 +37,8 @@ If you have questions concerning this license or the applicable additional terms
 ===============================================================================
 */
 
-#define AAS_FILEID					"DewmAAS"
-#define AAS_FILEVERSION				"1.07"
+#define SEAS_FILEID					"DewmAAS"
+#define SEAS_FILEVERSION				"1.07"
 
 // travel flags
 #define TFL_INVALID					BIT(0 )		// not valid
@@ -85,111 +85,111 @@ If you have questions concerning this license or the applicable additional terms
 #define AREACONTENTS_BBOX_BIT		24
 
 #define MAX_REACH_PER_AREA			256
-#define MAX_AAS_TREE_DEPTH			128
+#define SEAS_MAX_TREE_DEPTH			128
 
-#define MAX_AAS_BOUNDING_BOXES		4
+#define SEAS_MAX_BOUNDING_BOXES		4
 
 // reachability to another area
-class idReachability {
+class anReachability {
 public:
 	int							travelType;			// type of travel required to get to the area
 	short						toAreaNum;			// number of the reachable area
 	short						fromAreaNum;		// number of area the reachability starts
-	arcVec3						start;				// start point of inter area movement
-	arcVec3						end;				// end point of inter area movement
+	anVec3						start;				// start point of inter area movement
+	anVec3						end;				// end point of inter area movement
 	int							edgeNum;			// edge crossed by this reachability
 	unsigned short				travelTime;			// travel time of the inter area movement
 	byte						number;				// reachability number within the fromAreaNum (must be < 256)
 	byte						disableCount;		// number of times this reachability has been disabled
-	idReachability *			next;				// next reachability in list
-	idReachability *			rev_next;			// next reachability in reversed list
+	anReachability *			next;				// next reachability in list
+	anReachability *			rev_next;			// next reachability in reversed list
 	unsigned short *			areaTravelTimes;	// travel times within the fromAreaNum from reachabilities that lead towards this area
 public:
-	void						CopyBase( idReachability &reach );
+	void						CopyBase( anReachability &reach );
 };
 
-class idReachability_Walk : public idReachability {
+class anReachability_Walk : public anReachability {
 };
 
-class idReachability_BarrierJump : public idReachability {
+class anReachability_BarrierJump : public anReachability {
 };
 
-class idReachability_WaterJump : public idReachability {
+class anReachability_WaterJump : public anReachability {
 };
 
-class idReachability_WalkOffLedge : public idReachability {
+class anReachability_WalkOffLedge : public anReachability {
 };
 
-class idReachability_Swim : public idReachability {
+class anReachability_Swim : public anReachability {
 };
 
-class idReachability_Fly : public idReachability {
+class anReachability_Fly : public anReachability {
 };
 
-class idReachability_Special : public idReachability {
+class anReachability_Special : public anReachability {
 public:
-	arcDictionary						dict;
+	anDict						dict;
 };
 
 // index
-typedef int aasIndex_t;
+typedef int seasIndex_t;
 
 // vertex
-typedef arcVec3 aasVertex_t;
+typedef anVec3 seasVertex_t;
 
 // edge
-typedef struct aasEdge_s {
+typedef struct seasEdge_s {
 	int							vertexNum[2];		// numbers of the vertexes of this edge
-} aasEdge_t;
+} seasEdge_t;
 
 // area boundary face
-typedef struct aasFace_s {
+typedef struct seasFace_s {
 	unsigned short				planeNum;			// number of the plane this face is on
 	unsigned short				flags;				// face flags
 	int							numEdges;			// number of edges in the boundary of the face
 	int							firstEdge;			// first edge in the edge index
 	short						areas[2];			// area at the front and back of this face
-} aasFace_t;
+} seasFace_t;
 
 // area with a boundary of faces
-typedef struct aasArea_s {
+typedef struct seasArea_s {
 	int							numFaces;			// number of faces used for the boundary of the area
 	int							firstFace;			// first face in the face index used for the boundary of the area
-	arcBounds					bounds;				// bounds of the area
-	arcVec3						center;				// center of the area an AI can move towards
+	anBounds					bounds;				// bounds of the area
+	anVec3						center;				// center of the area an AI can move towards
 	unsigned short				flags;				// several area flags
 	unsigned short				contents;			// contents of the area
 	short						cluster;			// cluster the area belongs to, if negative it's a portal
 	short						clusterAreaNum;		// number of the area in the cluster
 	int							travelFlags;		// travel flags for traveling through this area
-	idReachability *			reach;				// reachabilities that start from this area
-	idReachability *			rev_reach;			// reachabilities that lead to this area
-} aasArea_t;
+	anReachability *			reach;				// reachabilities that start from this area
+	anReachability *			rev_reach;			// reachabilities that lead to this area
+} seasArea_t;
 
 // nodes of the bsp tree
-typedef struct aasNode_s {
+typedef struct seasNode_s {
 	unsigned short				planeNum;			// number of the plane that splits the subspace at this node
 	int							children[2];		// child nodes, zero is solid, negative is -(area number)
-} aasNode_t;
+} seasNode_t;
 
 // cluster portal
-typedef struct aasPortal_s {
+typedef struct seasPortal_s {
 	short						areaNum;			// number of the area that is the actual portal
 	short						clusters[2];		// number of cluster at the front and back of the portal
 	short						clusterAreaNum[2];	// number of this portal area in the front and back cluster
 	unsigned short				maxAreaTravelTime;	// maximum travel time through the portal area
-} aasPortal_t;
+} seasPortal_t;
 
 // cluster
-typedef struct aasCluster_s {
+typedef struct seasCluster_s {
 	int							numAreas;			// number of areas in the cluster
 	int							numReachableAreas;	// number of areas with reachabilities
 	int							numPortals;			// number of cluster portals
 	int							firstPortal;		// first cluster portal in the index
-} aasCluster_t;
+} seasCluster_t;
 
 // trace through the world
-typedef struct aasTrace_s {
+typedef struct seasTrace_s {
 								// parameters
 	int							flags;				// areas with these flags block the trace
 	int							travelFlags;		// areas with these travel flags block the trace
@@ -197,33 +197,33 @@ typedef struct aasTrace_s {
 	int							getOutOfSolid;		// trace out of solid if the trace starts in solid
 								// output
 	float						fraction;			// fraction of trace completed
-	arcVec3						endpos;				// end position of trace
+	anVec3						endpos;				// end position of trace
 	int							planeNum;			// plane hit
 	int							lastAreaNum;		// number of last area the trace went through
 	int							blockingAreaNum;	// area that could not be entered
 	int							numAreas;			// number of areas the trace went through
 	int *						areas;				// array to store areas the trace went through
-	arcVec3 *					points;				// points where the trace entered each new area
-								aasTrace_s( void ) { areas = NULL; points = NULL; getOutOfSolid = false; flags = travelFlags = maxAreas = 0; }
-} aasTrace_t;
+	anVec3 *					points;				// points where the trace entered each new area
+								seasTrace_s( void ) { areas = nullptr; points = nullptr; getOutOfSolid = false; flags = travelFlags = maxAreas = 0; }
+} seasTrace_t;
 
 // settings
-class idAASSettings {
+class anSEASSettings {
 public:
 								// collision settings
 	int							numBoundingBoxes;
-	arcBounds					boundingBoxes[MAX_AAS_BOUNDING_BOXES];
+	anBounds					boundingBoxes[SEAS_MAX_BOUNDING_BOXES];
 	bool						usePatches;
 	bool						writeBrushMap;
 	bool						playerFlood;
 	bool						noOptimize;
 	bool						allowSwimReachabilities;
 	bool						allowFlyReachabilities;
-	arcNetString						fileExtension;
+	anString						fileExtension;
 								// physics settings
-	arcVec3						gravity;
-	arcVec3						gravityDir;
-	arcVec3						invGravityDir;
+	anVec3						gravity;
+	anVec3						gravityDir;
+	anVec3						invGravityDir;
 	float						gravityValue;
 	float						maxStepHeight;
 	float						maxBarrierHeight;
@@ -237,21 +237,21 @@ public:
 	int							tt_startWalkOffLedge;
 
 public:
-								idAASSettings( void );
+								anSEASSettings( void );
 
-	bool						FromFile( const arcNetString &fileName );
-	bool						FromParser( arcLexer &src );
-	bool						FromDict( const char *name, const arcDictionary *dict );
-	bool						WriteToFile( arcNetFile *fp ) const;
-	bool						ValidForBounds( const arcBounds &bounds ) const;
+	bool						FromFile( const anString &fileName );
+	bool						FromParser( anLexer &src );
+	bool						FromDict( const char *name, const anDict *dict );
+	bool						WriteToFile( anFile *fp ) const;
+	bool						ValidForBounds( const anBounds &bounds ) const;
 	bool						ValarcEntity( const char *classname ) const;
 
 private:
-	bool						ParseBool( arcLexer &src, bool &b );
-	bool						ParseInt( arcLexer &src, int &i );
-	bool						ParseFloat( arcLexer &src, float &f );
-	bool						ParseVector( arcLexer &src, arcVec3 &vec );
-	bool						ParseBBoxes( arcLexer &src );
+	bool						ParseBool( anLexer &src, bool &b );
+	bool						ParseInt( anLexer &src, int &i );
+	bool						ParseFloat( anLexer &src, float &f );
+	bool						ParseVector( anLexer &src, anVec3 &vec );
+	bool						ParseBBoxes( anLexer &src );
 };
 
 
@@ -279,73 +279,73 @@ private:
 */
 
 
-class idAASFile {
+class anSEASFile {
 public:
-	virtual 					~idAASFile( void ) {}
+	virtual 					~anSEASFile( void ) {}
 
 	const char *				GetName( void ) const { return name.c_str(); }
 	unsigned int				GetCRC( void ) const { return crc; }
 
 	int							GetNumPlanes( void ) const { return planeList.Num(); }
-	const arcPlane &				GetPlane( int index ) const { return planeList[index]; }
+	const anPlane &				GetPlane( int index ) const { return planeList[index]; }
 	int							GetNumVertices( void ) const { return vertices.Num(); }
-	const aasVertex_t &			GetVertex( int index ) const { return vertices[index]; }
+	const seasVertex_t &			GetVertex( int index ) const { return vertices[index]; }
 	int							GetNumEdges( void ) const { return edges.Num(); }
-	const aasEdge_t &			GetEdge( int index ) const { return edges[index]; }
+	const seasEdge_t &			GetEdge( int index ) const { return edges[index]; }
 	int							GetNumEdgeIndexes( void ) const { return edgeIndex.Num(); }
-	const aasIndex_t &			GetEdgeIndex( int index ) const { return edgeIndex[index]; }
+	const seasIndex_t &			GetEdgeIndex( int index ) const { return edgeIndex[index]; }
 	int							GetNumFaces( void ) const { return faces.Num(); }
-	const aasFace_t &			GetFace( int index ) const { return faces[index]; }
+	const seasFace_t &			GetFace( int index ) const { return faces[index]; }
 	int							GetNumFaceIndexes( void ) const { return faceIndex.Num(); }
-	const aasIndex_t &			GetFaceIndex( int index ) const { return faceIndex[index]; }
+	const seasIndex_t &			GetFaceIndex( int index ) const { return faceIndex[index]; }
 	int							GetNumAreas( void ) const { return areas.Num(); }
-	const aasArea_t &			GetArea( int index ) { return areas[index]; }
+	const seasArea_t &			GetArea( int index ) { return areas[index]; }
 	int							GetNumNodes( void ) const { return nodes.Num(); }
-	const aasNode_t &			GetNode( int index ) const { return nodes[index]; }
+	const seasNode_t &			GetNode( int index ) const { return nodes[index]; }
 	int							GetNumPortals( void ) const { return portals.Num(); }
-	const aasPortal_t &			GetPortal( int index ) { return portals[index]; }
+	const seasPortal_t &			GetPortal( int index ) { return portals[index]; }
 	int							GetNumPortalIndexes( void ) const { return portalIndex.Num(); }
-	const aasIndex_t &			GetPortalIndex( int index ) const { return portalIndex[index]; }
+	const seasIndex_t &			GetPortalIndex( int index ) const { return portalIndex[index]; }
 	int							GetNumClusters( void ) const { return clusters.Num(); }
-	const aasCluster_t &		GetCluster( int index ) const { return clusters[index]; }
+	const seasCluster_t &		GetCluster( int index ) const { return clusters[index]; }
 
-	const idAASSettings &		GetSettings( void ) const { return settings; }
+	const anSEASSettings &		GetSettings( void ) const { return settings; }
 
 	void						SetPortalMaxTravelTime( int index, int time ) { portals[index].maxAreaTravelTime = time; }
 	void						SetAreaTravelFlag( int index, int flag ) { areas[index].travelFlags |= flag; }
 	void						RemoveAreaTravelFlag( int index, int flag ) { areas[index].travelFlags &= ~flag; }
 
-	virtual arcVec3				EdgeCenter( int edgeNum ) const = 0;
-	virtual arcVec3				FaceCenter( int faceNum ) const = 0;
-	virtual arcVec3				AreaCenter( int areaNum ) const = 0;
+	virtual anVec3				EdgeCenter( int edgeNum ) const = 0;
+	virtual anVec3				FaceCenter( int faceNum ) const = 0;
+	virtual anVec3				AreaCenter( int areaNum ) const = 0;
 
-	virtual arcBounds			EdgeBounds( int edgeNum ) const = 0;
-	virtual arcBounds			FaceBounds( int faceNum ) const = 0;
-	virtual arcBounds			AreaBounds( int areaNum ) const = 0;
+	virtual anBounds			EdgeBounds( int edgeNum ) const = 0;
+	virtual anBounds			FaceBounds( int faceNum ) const = 0;
+	virtual anBounds			AreaBounds( int areaNum ) const = 0;
 
-	virtual int					PointAreaNum( const arcVec3 &origin ) const = 0;
-	virtual int					PointReachableAreaNum( const arcVec3 &origin, const arcBounds &searchBounds, const int areaFlags, const int excludeTravelFlags ) const = 0;
-	virtual int					BoundsReachableAreaNum( const arcBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const = 0;
-	virtual void				PushPointIntoAreaNum( int areaNum, arcVec3 &point ) const = 0;
-	virtual bool				Trace( aasTrace_t &trace, const arcVec3 &start, const arcVec3 &end ) const = 0;
+	virtual int					PointAreaNum( const anVec3 &origin ) const = 0;
+	virtual int					PointReachableAreaNum( const anVec3 &origin, const anBounds &searchBounds, const int areaFlags, const int excludeTravelFlags ) const = 0;
+	virtual int					BoundsReachableAreaNum( const anBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const = 0;
+	virtual void				PushPointIntoAreaNum( int areaNum, anVec3 &point ) const = 0;
+	virtual bool				Trace( seasTrace_t &trace, const anVec3 &start, const anVec3 &end ) const = 0;
 	virtual void				PrintInfo( void ) const = 0;
 
 protected:
-	arcNetString						name;
+	anString						name;
 	unsigned int				crc;
 
 	aRcPlaneSet					planeList;
-	arcNetList<aasVertex_t>			vertices;
-	arcNetList<aasEdge_t>			edges;
-	arcNetList<aasIndex_t>			edgeIndex;
-	arcNetList<aasFace_t>			faces;
-	arcNetList<aasIndex_t>			faceIndex;
-	arcNetList<aasArea_t>			areas;
-	arcNetList<aasNode_t>			nodes;
-	arcNetList<aasPortal_t>			portals;
-	arcNetList<aasIndex_t>			portalIndex;
-	arcNetList<aasCluster_t>		clusters;
-	idAASSettings				settings;
+	anList<seasVertex_t>			vertices;
+	anList<seasEdge_t>			edges;
+	anList<seasIndex_t>			edgeIndex;
+	anList<seasFace_t>			faces;
+	anList<seasIndex_t>			faceIndex;
+	anList<seasArea_t>			areas;
+	anList<seasNode_t>			nodes;
+	anList<seasPortal_t>			portals;
+	anList<seasIndex_t>			portalIndex;
+	anList<seasCluster_t>		clusters;
+	anSEASSettings				settings;
 };
 
 #endif /* !__AASFILE_H__ */

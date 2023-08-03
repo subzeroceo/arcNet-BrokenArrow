@@ -4,7 +4,7 @@
 // Copyright 2002-2004 Raven Software
 //----------------------------------------------------------------
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include <cfloat>
@@ -15,7 +15,7 @@
 #include "VehicleAI.h"
 #endif
 
-CLASS_DECLARATION( idAI, rvVehicleAI )
+CLASS_DECLARATION( anSAAI, rvVehicleAI )
 	EVENT( VD_ChoosePathTarget, rvVehicleAI::Event_ChoosePathTarget )
 END_CLASS
 
@@ -50,7 +50,7 @@ void rvVehicleAI::Spawn ( void ) {
 rvVehicleAI::Save
 ================
 */
-void rvVehicleAI::Save ( idSaveGame *savefile ) const {
+void rvVehicleAI::Save ( anSaveGame *savefile ) const {
 	driver.Save ( savefile );
 	savefile->WriteInt ( flags );
 }
@@ -60,7 +60,7 @@ void rvVehicleAI::Save ( idSaveGame *savefile ) const {
 rvVehicleAI::Restore
 ================
 */
-void rvVehicleAI::Restore ( idRestoreGame *savefile ) {
+void rvVehicleAI::Restore ( anRestoreGame *savefile ) {
 	driver.Restore ( savefile );
 	savefile->ReadInt ( flags );
 }
@@ -71,7 +71,7 @@ rvVehicleAI::SetVehicle
 ================
 */
 void rvVehicleAI::SetVehicle ( rvVehicleMonster * vehicle ) {
-	const idKeyValue * val = spawnArgs.MatchPrefix( "target", 0 );
+	const anKeyValue * val = spawnArgs.MatchPrefix( "target", 0 );
 
 	if ( !driver ) {
 		return;
@@ -95,24 +95,24 @@ void rvVehicleAI::SetVehicle ( rvVehicleMonster * vehicle ) {
 rvVehicleAI::Event_ChoosePathTarget
 ================
 */
-void rvVehicleAI::Event_ChoosePathTarget ( idEntity * current ) {
+void rvVehicleAI::Event_ChoosePathTarget ( anEntity * current ) {
 	if ( !current ) {
-		current = const_cast<idEntity*>( FindClosestNode() );
+		current = const_cast<anEntity*>( FindClosestNode() );
 	}
 
 	if ( ( flags & VAIF_Freeze ) == 0 ) {
-		const arcVec3 & playerOrigin = gameLocal.GetLocalPlayer()->GetPhysics()->GetOrigin();
+		const anVec3 & playerOrigin = gameLocal.GetLocalPlayer()->GetPhysics()->GetOrigin();
 		switch ( flags & 0x03 ) {
 		case 1 :
-			idThread::ReturnEntity(	MoveCloserTo( playerOrigin, current ) );
+			anThread::ReturnEntity(	MoveCloserTo( playerOrigin, current ) );
 			break;
 
 		case 2 :
-			idThread::ReturnEntity(	MoveAwayFrom( playerOrigin, current ) );
+			anThread::ReturnEntity(	MoveAwayFrom( playerOrigin, current ) );
 			break;
 
 		default:
-			idThread::ReturnEntity(	NULL );
+			anThread::ReturnEntity(	nullptr );
 		}
 	}
 
@@ -144,19 +144,19 @@ void rvVehicleAI::CustomMove ( void ) {
 rvVehicleAI::MoveCloserTo
 ================
 */
-const idEntity * rvVehicleAI::MoveCloserTo ( const arcVec3 & point, idEntity * current ) {
-	const idEntity * best	= NULL;
+const anEntity * rvVehicleAI::MoveCloserTo ( const anVec3 & point, anEntity * current ) {
+	const anEntity * best	= nullptr;
 
 	if ( current && current->targets.Num() ) {
-		const idEntity & target	= *current;
+		const anEntity & target	= *current;
 		float shortestDistance	= FLT_MAX;
 
 		for ( int i = target.targets.Num() - 1; i; i -- ) {
-			float distance = ( target.targets[ i ]->GetPhysics()->GetOrigin() - point ).LengthSqr();
+			float distance = ( target.targets[i]->GetPhysics()->GetOrigin() - point ).LengthSqr();
 
 			if ( shortestDistance > distance ) {
 				shortestDistance = distance;
-				best = target.targets[ i ];
+				best = target.targets[i];
 			}
 		}
 	}
@@ -169,19 +169,19 @@ const idEntity * rvVehicleAI::MoveCloserTo ( const arcVec3 & point, idEntity * c
 rvVehicleAI::MoveAwayFrom
 ================
 */
-const idEntity * rvVehicleAI::MoveAwayFrom ( const arcVec3 & point, idEntity * current ) {
-	const idEntity * best	= NULL;
+const anEntity * rvVehicleAI::MoveAwayFrom ( const anVec3 & point, anEntity * current ) {
+	const anEntity * best	= nullptr;
 
 	if ( current && current->targets.Num() ) {
-		const idEntity & target	= *current;
+		const anEntity & target	= *current;
 		float longestDistance	= FLT_MIN;
 
 		for ( int i = target.targets.Num() - 1; i; i -- ) {
-			float distance = ( target.targets[ i ]->GetPhysics()->GetOrigin() - point ).LengthSqr();
+			float distance = ( target.targets[i]->GetPhysics()->GetOrigin() - point ).LengthSqr();
 
 			if ( longestDistance < distance ) {
 				longestDistance = distance;
-				best = target.targets[ i ];
+				best = target.targets[i];
 			}
 		}
 	}
@@ -194,9 +194,9 @@ const idEntity * rvVehicleAI::MoveAwayFrom ( const arcVec3 & point, idEntity * c
 rvVehicleAI::FindClosestNode
 ================
 */
-const idEntity * rvVehicleAI::FindClosestNode ( void ) const {
-	idEntity * current = 0;
-	const idEntity * best = 0;
+const anEntity * rvVehicleAI::FindClosestNode ( void ) const {
+	anEntity * current = 0;
+	const anEntity * best = 0;
 	float bestDistance = FLT_MAX;
 
 	for (;;) {
@@ -223,7 +223,7 @@ rvVehicleAI::Think
 ================
 */
 void rvVehicleAI::Think ( void ) {
-	idAI::Think();
+	anSAAI::Think();
 
 	// Keep the enemy status up to date
 	if ( !enemy.ent || enemy.fl.dead ) {

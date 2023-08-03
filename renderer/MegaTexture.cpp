@@ -1,14 +1,14 @@
 
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
 
-arcCVar idMegaTexture::r_megaTextureLevel( "r_megaTextureLevel", "0", CVAR_RENDERER | CVAR_INTEGER, "draw only a specific level" );
-arcCVar idMegaTexture::r_showMegaTexture( "r_showMegaTexture", "0", CVAR_RENDERER | CVAR_BOOL, "display all the level images" );
-arcCVar idMegaTexture::r_showMegaTextureLabels( "r_showMegaTextureLabels", "0", CVAR_RENDERER | CVAR_BOOL, "draw colored blocks in each tile" );
-arcCVar idMegaTexture::r_skipMegaTexture( "r_skipMegaTexture", "0", CVAR_RENDERER | CVAR_INTEGER, "only use the lowest level image" );
-arcCVar idMegaTexture::r_terrainScale( "r_terrainScale", "3", CVAR_RENDERER | CVAR_INTEGER, "vertically scale USGS data" );
+anCVar idMegaTexture::r_megaTextureLevel( "r_megaTextureLevel", "0", CVAR_RENDERER | CVAR_INTEGER, "draw only a specific level" );
+anCVar idMegaTexture::r_showMegaTexture( "r_showMegaTexture", "0", CVAR_RENDERER | CVAR_BOOL, "display all the level images" );
+anCVar idMegaTexture::r_showMegaTextureLabels( "r_showMegaTextureLabels", "0", CVAR_RENDERER | CVAR_BOOL, "draw colored blocks in each tile" );
+anCVar idMegaTexture::r_skipMegaTexture( "r_skipMegaTexture", "0", CVAR_RENDERER | CVAR_INTEGER, "only use the lowest level image" );
+anCVar idMegaTexture::r_terrainScale( "r_terrainScale", "3", CVAR_RENDERER | CVAR_INTEGER, "vertically scale USGS data" );
 
 /*
 
@@ -38,12 +38,12 @@ static byte	colors[8][4] = {
 	{ 255, 255, 255, 255 }
 };
 
-static void R_EmptyLevelImage( arcImage *image ) {
+static void R_EmptyLevelImage( anImage *image ) {
 	int	c = MAX_LEVEL_WIDTH * MAX_LEVEL_WIDTH;
 	byte *data = (byte *)_alloca( c*4 );
 
 	for ( int i = 0 ; i < c ; i++ ) {
-		( (int *)data )[i] = fillColor.intVal;
+		( ( int*)data )[i] = fillColor.intVal;
 	}
 
 	// FIXME: this won't live past vid mode changes
@@ -56,30 +56,28 @@ InitFromMegaFile
 ====================
 */
 bool idMegaTexture::InitFromMegaFile( const char *fileBase ) {
-	arcNetString	name = "megaTexture/";
+	anString	name = "megaTexture/";
 	name += fileBase;
 	name.StripFileExtension();
-	name += ".mega";
-
-	int		width, height;
+	name += ".mgat";
 
 	fileHandle = fileSystem->OpenFileRead( name.c_str() );
 	if ( !fileHandle ) {
-		common->Printf( "idMegaTexture: failed to open %s\n", name.c_str() );
+		common->Printf( "[idMegaTexture] Failed to open %s\n", name.c_str() );
 		return false;
 	}
 
 	fileHandle->Read( &header, sizeof( header ) );
 	if ( header.tileSize < 64 || header.tilesWide < 1 || header.tilesHigh < 1 ) {
-		common->Printf( "idMegaTexture: bad header on %s\n", name.c_str() );
+		common->Printf( "[idMegaTexture] bad header on %s\n", name.c_str() );
 		return false;
 	}
 
-	currentTriMapping = NULL;
+	currentTriMapping = nullptr;
 
 	numLevels = 0;
-	width = header.tilesWide;
-	height = header.tilesHigh;
+	int width = header.tilesWide;
+	int height = header.tilesHigh;
 
 	int	tileOffset = 1;					// just past the header
 
@@ -94,13 +92,13 @@ bool idMegaTexture::InitFromMegaFile( const char *fileBase ) {
 		level->parms[0] = -1;		// initially mask everything
 		level->parms[1] = 0;
 		level->parms[2] = 0;
-		level->parms[3] = (float)width / TILE_PER_LEVEL;
+		level->parms[3] = ( float )width / TILE_PER_LEVEL;
 		level->Invalidate();
 
 		tileOffset += level->tilesWide * level->tilesHigh;
 
-		char	str[1024];
-		sprintf( str, "MEGA_%s_%i", fileBase, numLevels );
+		char str[1024];
+		sprintf( str, "mgat_%s_%i", fileBase, numLevels );
 
 		// give each level a default fill color
 		for ( int i = 0 ; i < 4 ; i++ ) {
@@ -126,6 +124,89 @@ bool idMegaTexture::InitFromMegaFile( const char *fileBase ) {
 }
 
 /*
+===========================
+rvmMegaTextureFile::LoadMegaTextureFile
+===========================
+*/
+idMegaTextureFile *idMegaTextureFile::LoadMegaTextureFile( const char *name ) {
+	int width, height;
+	idMegaTextureFile *megaTextureFile = new idMegaTextureFile();
+
+	megaTextureFile->fileHandle = fileSystem->OpenFileRead( name );
+	if ( !megaTextureFile->fileHandle) {
+		common->Printf( "idMegaTextureFile: failed to open %s\n", name );
+		delete megaTextureFile;
+		return nullptr;
+	}
+
+	megaTextureFile->fileHandle->Read( &megaTextureFile->header, sizeof (megaTextureFile->header ) );
+	if ( megaTextureFile->header.tileSize < 64 || megaTextureFile->header.tilesWide < 1 || megaTextureFile->header.tilesHigh < 1 ) {
+		common->Printf( "idMegaTexture: bad header on %s\n", name );
+		delete megaTextureFile;
+		return nullptr;
+	}
+
+	megaTextureFile->numLevels = 0;
+	width = megaTextureFile->header.tilesWide;
+	height = megaTextureFile->header.tilesHigh;
+
+	int	tileOffset = 1;					// just past the header
+
+	memset( megaTextureFile->levels, 0, sizeof( levels ));
+	while ( 1 ) {
+		idTextureLevel *level = &megaTextureFile->levels[megaTextureFile->numLevels];
+
+		level->mega = megaTextureFile;
+		level->tileOffset = tileOffset;
+		level->tilesWide = width;
+		level->tilesHigh = height;
+		level->parms[0] = -1;		// initially mask everything
+		level->parms[1] = 0;
+		level->parms[2] = 0;
+		level->parms[3] = ( float )width / ( float )TILE_PER_LEVEL;
+		level->Invalidate();
+
+		tileOffset += level->tilesWide * level->tilesHigh;
+
+		char str[1024];
+		sprintf( str, "_mega_%i", megaTextureFile->numLevels );
+
+		// give each level a default fill color
+		for ( int i = 0; i < 4; i++ ) {
+			fillColor.color[i] = colors[megaTextureFile->numLevels + 1][i];
+		}
+		// jmarshall - adapted to idTech 5 image code from BFG
+		idImageOpts opts;
+		opts.format = FMT_DXT5;
+		opts.colorFormat = CFM_DEFAULT;
+		opts.gammaMips = 0;
+		opts.width = MAX_LEVEL_WIDTH;
+		opts.height = MAX_LEVEL_WIDTH;
+		opts.textureType = TT_2D;
+		opts.isPersistant = true;
+		opts.numMSAASamples = 0;
+		opts.numLevels = 1;
+
+		anTempArray<byte>data( MAX_LEVEL_WIDTH * MAX_LEVEL_WIDTH * 4 );
+
+		for ( inti = 0; i < MAX_LEVEL_WIDTH * MAX_LEVEL_WIDTH; i++ ) {
+			( ( int*)data.Ptr())[i] = fillColor.intVal;
+		}
+
+		megaTextureFile->levels[megaTextureFile->numLevels].image = globalImages->ScratchImage( str, &opts, TF_LINEAR, TR_REPEAT, TD_DIFFUSE );
+		megaTextureFile->levels[megaTextureFile->numLevels].image->UploadScratch( data.Ptr(), MAX_LEVEL_WIDTH, MAX_LEVEL_WIDTH );
+		megaTextureFile->numLevels++;
+
+		if ( width <= TILE_PER_LEVEL && height <= TILE_PER_LEVEL ) {
+			break;
+		}
+		width = ( width + 1 ) >> 1;
+		height = ( height + 1 ) >> 1;
+	}
+
+	return megaTextureFile;
+}
+/*
 ====================
 SetMappingForSurface
 
@@ -143,7 +224,7 @@ void idMegaTexture::SetMappingForSurface( const srfTriangles_t *tri ) {
 		return;
 	}
 
-	arcDrawVert	origin, axis[2];
+	anDrawVertex origin, axis[2];
 
 	origin.st[0] = 1.0;
 	origin.st[1] = 1.0;
@@ -155,7 +236,7 @@ void idMegaTexture::SetMappingForSurface( const srfTriangles_t *tri ) {
 	axis[1].st[1] = 0;
 
 	for ( int i = 0 ; i < tri->numVerts ; i++ ) {
-		arcDrawVert	*v = &tri->verts[i];
+		anDrawVertex *v = &tri->verts[i];
 		if ( v->st[0] <= origin.st[0] && v->st[1] <= origin.st[1] ) {
 			origin = *v;
 		}
@@ -168,7 +249,7 @@ void idMegaTexture::SetMappingForSurface( const srfTriangles_t *tri ) {
 	}
 
 	for ( int i = 0 ; i < 2 ; i++ ) {
-		arcVec3	dir = axis[i].xyz - origin.xyz;
+		anVec3	dir = axis[i].xyz - origin.xyz;
 		float texLen = axis[i].st[i] - origin.st[i];
 		float spaceLen = ( axis[i].xyz - origin.xyz ).Length();
 
@@ -189,7 +270,7 @@ void idMegaTexture::SetMappingForSurface( const srfTriangles_t *tri ) {
 BindForViewOrigin
 ====================
 */
-void idMegaTexture::BindForViewOrigin( const arcVec3 viewOrigin ) {
+void idMegaTexture::BindForViewOrigin( const anVec3 viewOrigin ) {
 	SetViewOrigin( viewOrigin );
 
 	// borderClamp image goes in texture 0
@@ -205,7 +286,6 @@ void idMegaTexture::BindForViewOrigin( const arcVec3 viewOrigin ) {
 			qglProgramLocalParameter4fvARB( GL_VERTEX_PROGRAM_ARB, i, parms );
 		} else {
 			idTextureLevel *level = &levels[ numLevels-1-i ];
-
 			if ( r_showMegaTexture.GetBool() ) {
 				if ( i & 1 ) {
 					globalImages->blackImage->Bind();
@@ -253,26 +333,26 @@ void idMegaTexture::Unbind( void ) {
 SetViewOrigin
 ====================
 */
-void idMegaTexture::SetViewOrigin( const arcVec3 viewOrigin ) {
+void idMegaTexture::SetViewOrigin( const anVec3 viewOrig ) {
 	if ( r_showMegaTextureLabels.IsModified() ) {
 		r_showMegaTextureLabels.ClearModified();
-		currentViewOrigin[0] = viewOrigin[0] + 0.1;	// force a change
-		for ( int i = 0 ; i < numLevels ; i++ ) {
+		currentViewOrigin[0] = viewOrigin[0] + 0.1f;	// force a change
+		for ( int i = 0; i < numLevels; i++ ) {
 			levels[i].Invalidate();
 		}
 	}
 
-	if ( viewOrigin == currentViewOrigin || r_skipMegaTexture.GetBool() ) {
+	if ( viewOrig == currentViewOrigin || r_skipMegaTexture.GetBool() ) {
 		return;
 	}
 
-	currentViewOrigin = viewOrigin;
+	currentViewOrigin = viewOrig;
 
 	float texCenter[2];
 
 	// convert the viewOrigin to a texture center, which will
 	// be a different conversion for each megaTexture
-	for ( int i = 0 ; i < 2 ; i++ ) {
+	for ( int i = 0; i < 2; i++ ) {
 		texCenter[i] =
 			viewOrigin[0] * localViewToTextureCenter[i][0] +
 			viewOrigin[1] * localViewToTextureCenter[i][1] +
@@ -280,15 +360,38 @@ void idMegaTexture::SetViewOrigin( const arcVec3 viewOrigin ) {
 			localViewToTextureCenter[i][3];
 	}
 
-	for ( int i = 0 ; i < numLevels ; i++ ) {
+	for ( int i = 0; i < numLevels; i++ ) {
 		levels[i].UpdateForCenter( texCenter );
 	}
 }
+/*
+========================
+idMegaTextureFile::ReadTile
+========================
+*/
+void idMegaTextureFile::ReadTile( byte *tileBuffer, int tileNum ) {
+	int tileSize = TILE_SIZE * TILE_SIZE;
 
+	fileHandle->Seek( tileNum * tileSize, FS_SEEK_SET );
+	//memset(data, 128, sizeof(data));
+	fileHandle->Read( tileBuffer, tileSize );
+}
+
+/*
+===========================
+idMegaTextureFile::UpdateForCenter
+===========================
+*/
+void idMegaTextureFile::UpdateForCenter( float texCenter[2] ) {
+	for ( int i = 0; i < numLevels; i++ ) {
+		levels[i].UpdateForCenter( texCenter );
+	}
+}
 /*
 ====================
 UpdateTile
 
+//int	byteSize = size * 4;
 A local tile will only be mapped to globalTile[ localTile + X * TILE_PER_LEVEL ] for some x
 ====================
 */
@@ -298,7 +401,9 @@ void idTextureLevel::UpdateTile( int localX, int localY, int globalX, int global
 	if ( tile->x == globalX && tile->y == globalY ) {
 		return;
 	}
-	if ( ( globalX & ( TILE_PER_LEVEL-1 ) ) != localX || (g lobalY & ( TILE_PER_LEVEL-1 ) ) != localY ) {
+
+    if ( ( globalX & static_cast<int>( TILE_PER_LEVEL - 1 ) ) != localX || ( globalY & static_cast<int>( TILE_PER_LEVEL - 1 ) ) != localY ) {
+	//if ( ( globalX & ( TILE_PER_LEVEL-1 ) ) != localX || ( g lobalY & ( TILE_PER_LEVEL-1 ) ) != localY ) {
 		common->Error( "idTextureLevel::UpdateTile: bad coordinate mod" );
 	}
 
@@ -314,18 +419,16 @@ void idTextureLevel::UpdateTile( int localX, int localY, int globalX, int global
 		// extract the data from the full image (FIXME: background load from disk)
 		int tileNum = tileOffset + tile->y * tilesWide + tile->x;
 		int tileSize = TILE_SIZE * TILE_SIZE * 4;
-
 		mega->fileHandle->Seek( tileNum * tileSize, FS_SEEK_SET );
 		memset( data, 128, sizeof( data ) );
 		mega->fileHandle->Read( data, tileSize );
-	}
-
-	if ( idMegaTexture::r_showMegaTextureLabels.GetBool() ) {
-		// put a color marker in it
-		byte color[4] = { 255 * localX / TILE_PER_LEVEL, 255 * localY / TILE_PER_LEVEL, 0, 0 };
-		for ( int x = 0 ; x < 8 ; x++ ) {
-			for ( int y = 0 ; y < 8 ; y++ ) {
-				*(int *)&data[ ( ( y + TILE_SIZE/2 - 4 ) * TILE_SIZE + x + TILE_SIZE/2 - 4 ) * 4 ] = *(int *)color;
+		if ( idMegaTexture::r_showMegaTextureLabels.GetBool() ) {
+			// put a color marker in it
+			byte color[4] = { static_cast<byte>( 255 * localX / TILE_PER_LEVEL ), static_cast<byte>( 255 * localY / TILE_PER_LEVEL ), 0, 0};
+			for ( int x = 0; x < 8; x++ ) {
+				for ( int y = 0; y < 8; y++ ) {
+					*( int*) & data[ ( ( y + TILE_SIZE / 2 - 4 ) * TILE_SIZE + x + TILE_SIZE / 2 - 4 ) * 4 ] = *( int*)color;
+				}
 			}
 		}
 	}
@@ -333,31 +436,97 @@ void idTextureLevel::UpdateTile( int localX, int localY, int globalX, int global
 	// upload all the mip-map levels
 	int	level = 0;
 	int size = TILE_SIZE;
-	while ( 1 ) {
+	while ( size > 0 ) {
 		qglTexSubImage2D( GL_TEXTURE_2D, level, localX * size, localY * size, size, size, GL_RGBA, GL_UNSIGNED_BYTE, data );
 		size >>= 1;
 		level++;
 		if ( size == 0 ) {
 			break;
 		}
+	}
 
-		int	byteSize = size * 4;
+	/*if ( r_useOptimizedCode.GetBool() )
+	for ( int y = 0; y < size; y++ ) {
+		byte *in = data + y * size * 16;
+		byte *in2 = in + size * 8;
+		byte *out = data + y * size * 4;
+		for ( int x = 0; x < size; x++ ) {
+			for ( int c = 0; c < 4; c++ ) {
+				int sum = 0;
+				sum += in[x * 8 + c];
+				sum += in[x * 8 + 4 + c];
+				sum += in2[x * 8 + c];
+				sum += in2[x * 8 + 4 + c];
+				out[x * 4 + c] = sum >> 2;
+		}*/
 		// mip-map in place
-		for ( int y = 0 ; y < size ; y++ ) {
-			byte	*in, *in2, *out;
-			in = data + y * size * 16;
-			in2 = in + size * 8;
-			out = data + y * size * 4;
-			for ( int x = 0 ; x < size ; x++ ) {
-				out[x*4+0] = ( in[x*8+0] + in[x*8+4+0] + in2[x*8+0] + in2[x*8+4+0] ) >> 2;
-				out[x*4+1] = ( in[x*8+1] + in[x*8+4+1] + in2[x*8+1] + in2[x*8+4+1] ) >> 2;
-				out[x*4+2] = ( in[x*8+2] + in[x*8+4+2] + in2[x*8+2] + in2[x*8+4+2] ) >> 2;
-				out[x*4+3] = ( in[x*8+3] + in[x*8+4+3] + in2[x*8+3] + in2[x*8+4+3] ) >> 2;
-			}
+	for ( int y = 0; y < size; y++ ) {
+		byte *in, *in2, *out;
+		in = data + y * size * 16;
+		in2 = in + size * 8;
+		out = data + y * size * 4;
+		for ( int x = 0; x < size; x++ ) {
+			out[x*4+0] = ( in[x*8+0] + in[x*8+4+0] + in2[x*8+0] + in2[x*8+4+0] ) >> 2;
+			out[x*4+1] = ( in[x*8+1] + in[x*8+4+1] + in2[x*8+1] + in2[x*8+4+1] ) >> 2;
+			out[x*4+2] = ( in[x*8+2] + in[x*8+4+2] + in2[x*8+2] + in2[x*8+4+2] ) >> 2;
+			out[x*4+3] = ( in[x*8+3] + in[x*8+4+3] + in2[x*8+3] + in2[x*8+4+3] ) >> 2;
 		}
 	}
 }
+/*void idTextureLevel::UpdateTile( intlocalX, int localY, int globalX, int globalY) {
+    idTextureTile *tile = &tileMap[localX][localY];
 
+    if (tile->x == globalX && tile->y == globalY) {
+        return;
+    }
+
+    if ((globalX & (TILE_PER_LEVEL - 1)) != localX || (globalY & (TILE_PER_LEVEL - 1)) != localY) {
+        common->Error( "idTextureLevel::UpdateTile: bad coordinate mod" );
+    }
+
+    tile->x = globalX;
+    tile->y = globalY;
+
+    byte data[TILE_SIZE * TILE_SIZE * 4];
+
+    if (globalX >= tilesWide || globalX < 0 || globalY >= tilesHigh || globalY < 0) {
+        memset(data, 0, sizeof(data));
+    } else {
+        int tileNum = tileOffset + tile->y * tilesWide + tile->x;
+        int tileSize = TILE_SIZE * TILE_SIZE * 4;
+
+        mega->fileHandle->Seek(tileNum * tileSize, FS_SEEK_SET);
+        memset(data, 128, sizeof(data));
+        mega->fileHandle->Read(data, tileSize);
+    }
+
+    if (idMegaTexture::r_showMegaTextureLabels.GetBool()) {
+        byte color[4] = {255 * localX / TILE_PER_LEVEL, 255 * localY / TILE_PER_LEVEL, 0, 0};
+        for ( intx = 0; x < 8; x++ ) {
+            for ( inty = 0; y < 8; y++ ) {
+                *( int*)&data[((y + TILE_SIZE / 2 - 4) * TILE_SIZE + x + TILE_SIZE / 2 - 4) * 4] = *( int*)color;
+            }
+        }
+    }
+
+    int level = 0;
+    int size = TILE_SIZE;
+    while ( size > 0) {
+        qglTexSubImage2D(GL_TEXTURE_2D, level, localX * size, localY * size, size, size, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        size >>= 1;
+        level++;
+
+        int byteSize = size * 4;
+        for ( inty = 0; y < size; y++ ) {
+            byte *in = data + y * size * 16;
+            byte *in2 = in + size * 8;
+            byte *out = data + y * size * 4;
+            for ( intx = 0; x < size; x++ ) {
+                out[x * 4 + 0] = (in[x * 8 + 0] + in[x * 8 + 4 + 0] + in2[x * 8 + 0] + in2[x * 8 + 4 + 0]) >> 2;
+                out[x * 4 + 1] = (in[x * 8 + 1] + in[x * 8 + 4 + 1] + in2[x * 8 + 1] + in2[x * 8 + 4 + 1]) >> 2;
+                out[x * 4 + 2] = (in[x * 8 + 2] + in[x * 8 + 4 + 2] + in2[x * 8 + 2] + in2[x * 8 + 4 + 2]) >> 2;
+                out[x * 4 + 3] = (in[x * 8 + 3] + in[x * 8 + 4 + 3] + in2[x * 8 + 3] + in2[x * 8 + 4 + 3])
+*/
 /*
 ====================
 UpdateForCenter
@@ -427,22 +596,22 @@ void idTextureLevel::Invalidate() {
 //===================================================================================================
 
 typedef struct _TargaHeader {
-	unsigned char 	id_length, colormap_type, image_type;
-	unsigned short	colormapIndex, colormapLength;
-	unsigned char	colormapSize;
-	unsigned short	x_origin, y_origin, width, height;
+	unsigned char 	idLength, colorMapType, imageType;
+	unsigned short	colorMapIndex, colormapLength;
+	unsigned char	colorMapSize;
+	unsigned short	xOrigin, yOrigin, width, height;
 	unsigned char	pixelSize, attributes;
 	unsigned char	pixSize;
 } TargaHeader;
 
 
-static byte ReadByte( arcNetFile *f ) {
+static byte ReadByte( anFile *f ) {
 	byte b;
 	f->Read( &b, 1 );
 	return b;
 }
 
-static short ReadShort( arcNetFile *f ) {
+static short ReadShort( anFile *f ) {
 	byte b[2];
 	f->Read( &b, 2 );
 	return b[0] + ( b[1] << 8 );
@@ -453,11 +622,11 @@ static short ReadShort( arcNetFile *f ) {
 GenerateMegaMipMaps
 ====================
 */
-void idMegaTexture::GenerateMegaMipMaps( megaTextureHeader_t *header, arcNetFile *outFile ) {
+void idMegaTexture::GenerateMegaMipMaps( megaTextureHeader_t *header, anFile *outFile ) {
 	outFile->Flush();
 
 	// out fileSystem doesn't allow read / write access...
-	arcNetFile	*inFile = fileSystem->OpenFileRead( outFile->GetName() );
+	anFile	*inFile = fileSystem->OpenFileRead( outFile->GetName() );
 
 	int	tileOffset = 1;
 	int	width = header->tilesWide, height = header->tilesHigh;
@@ -469,8 +638,8 @@ void idMegaTexture::GenerateMegaMipMaps( megaTextureHeader_t *header, arcNetFile
 	while ( width > 1 || height > 1 ) {
 		int newHeight = int newWidth = ( ( height + 1 ) >> 1 ), ( ( width + 1 ) >> 1 ) ;
 		if ( newHeight < 1 || newWidth < 1 ) {
-			newHeight = arcMath::Max( newHeight, 1 );
-			newWidth = arcMath::Max( newWidth, 1 );
+			newHeight = anMath::Max( newHeight, 1 );
+			newWidth = anMath::Max( newWidth, 1 );
 		}
 		common->Printf( "generating %i x %i block mip level\n", newWidth, newHeight );
 
@@ -530,14 +699,13 @@ Make a 2k x 2k preview image for a mega texture that can be used in modeling pro
 */
 void idMegaTexture::GenerateMegaPreview( const char *fileName ) {
 	// open the file
-	arcNetFile	*fileHandle = fileSystem->OpenFileRead( fileName );
-	if ( !fileHandle ) {
+	anFile	*fileHandle = fileSystem->OpenFileRead( fileName );
 	if ( !fileHandle ) {
 		common->Printf( "idMegaTexture: failed to open %s\n", fileName );
 		return;
 	}
 
-	arcNetString	outName = fileName;
+	anString	outName = fileName;
 	outName.StripFileExtension();
 	outName += "_preview.tga";
 
@@ -566,8 +734,8 @@ void idMegaTexture::GenerateMegaPreview( const char *fileName ) {
 			width >>= 1;
 			height = 1;
 			 height >>= 1;
-			//newHeight = arcMath::Max( newHeight, 1 );
-			//newWidth = arcMath::Max( newWidth, 1 );
+			//newHeight = anMath::Max( newHeight, 1 );
+			//newWidth = anMath::Max( newWidth, 1 );
 		}
 	}
 
@@ -586,13 +754,13 @@ void idMegaTexture::GenerateMegaPreview( const char *fileName ) {
 	}
 
 	R_WriteTGA( outName.c_str(), pic, width * tileSize, height * tileSize, false );
-
 	R_WriteTGA( fileName, pic, width * tileSize, height * tileSize, false );
-
 	R_StaticFree( pic );
 
 	delete fileHandle;
-}#include <iostream>
+}
+
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -605,7 +773,7 @@ void idMegaTexture::GenerateMegaPreview(const std::string &fileName) {
    }
 
    std::string outName = fileName;
-   outName.erase(outName.find_last_of("."));
+   outName.erase(outName.find_last_of( "." ) );
    outName += "_preview.tga";
 
    std::cout << "Creating " << outName << std::endl;
@@ -622,14 +790,14 @@ MakeMegaTexture_f
 Incrementally load a giant tga file and process into the mega texture block format
 ====================
 */
-void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
+void idMegaTexture::MakeMegaTexture_f( const anCommandArgs &args ) {
 	if ( args.Argc() != 2 ) {
 		common->Printf( "USAGE: makeMegaTexture <filebase>\n" );
 		return;
 	}
 
-	arcNetString name_s = "megaTexture/";
-	name_s += args.Argv(1);
+	anString name_s = "megaTexture/";
+	name_s += args.Argv( 1 );
 	name_s.StripFileExtension();
 	name_s += ".tga";
 
@@ -639,8 +807,8 @@ void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
 	// open the file
 	//
 	common->Printf( "Opening %s.\n", name );
-	int fileSize = fileSystem->ReadFile( name, NULL, NULL );
-	arcNetFile	*file = fileSystem->OpenFileRead( name );
+	int fileSize = fileSystem->ReadFile( name, nullptr, nullptr );
+	anFile	*file = fileSystem->OpenFileRead( name );
 
 	if ( !file ) {
 		common->Printf( "Couldn't open %s\n", name );
@@ -648,35 +816,35 @@ void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
 	}
 
 	TargaHeader tgaHeader;
-	tgaHeader.id_length = ReadByte( file );
-	tgaHeader.colormap_type = ReadByte( file );
-	tgaHeader.image_type = ReadByte( file );
+	tgaHeader.idLength = ReadByte( file );
+	tgaHeader.colorMapType = ReadByte( file );
+	tgaHeader.imageType = ReadByte( file );
 
-	tgaHeader.colormapIndex = ReadShort( file );
+	tgaHeader.colorMapIndex = ReadShort( file );
 	tgaHeader.colormapLength = ReadShort( file );
-	tgaHeader.colormapSize = ReadByte( file );
-	tgaHeader.x_origin = ReadShort( file );
-	tgaHeader.y_origin = ReadShort( file );
+	tgaHeader.colorMapSize = ReadByte( file );
+	tgaHeader.xOrigin = ReadShort( file );
+	tgaHeader.yOrigin = ReadShort( file );
 	tgaHeader.width = ReadShort( file );
 	tgaHeader.height = ReadShort( file );
 	tgaHeader.pixelSize = ReadByte( file );
 	tgaHeader.attributes = ReadByte( file );
 
-	if ( tgaHeader.image_type != 2 && tgaHeader.image_type != 10 && tgaHeader.image_type != 3 ) {
+	if ( tgaHeader.imageType != 2 && tgaHeader.imageType != 10 && tgaHeader.imageType != 3 ) {
 		common->Error( "LoadTGA( %s ): Only type 2 (RGB), 3 (gray), and 10 (RGB) TGA images supported\n", name );
 	}
 
-	if ( tgaHeader.colormap_type != 0 ) {
+	if ( tgaHeader.colorMapType != 0 ) {
 		common->Error( "LoadTGA( %s ): colormaps not supported\n", name );
 	}
 
-	if ( ( tgaHeader.pixelSize != 32 && tgaHeader.pixelSize != 24 ) && tgaHeader.image_type != 3 ) {
+	if ( ( tgaHeader.pixelSize != 32 && tgaHeader.pixelSize != 24 ) && tgaHeader.imageType != 3 ) {
 		common->Error( "LoadTGA( %s ): Only 32 or 24 bit images supported (no colormaps)\n", name );
 	}
 
-	if ( tgaHeader.image_type == 2 || tgaHeader.image_type == 3 ) {
+	if ( tgaHeader.imageType == 2 || tgaHeader.imageType == 3 ) {
 		int numBytes = tgaHeader.width * tgaHeader.height * ( tgaHeader.pixelSize >> 3 );
-		if ( numBytes > fileSize - 18 - tgaHeader.id_length ) {
+		if ( numBytes > fileSize - 18 - tgaHeader.idLength ) {
 			common->Error( "LoadTGA( %s ): incomplete file\n", name );
 		}
 	}
@@ -685,8 +853,8 @@ void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
 	int rows = tgaHeader.height;
 
 	// skip TARGA image comment
-	if ( tgaHeader.id_length != 0 ) {
-		file->Seek( tgaHeader.id_length, FS_SEEK_CUR );
+	if ( tgaHeader.idLength != 0 ) {
+		file->Seek( tgaHeader.idLength, FS_SEEK_CUR );
 	}
 
 	megaTextureHeader_t		mtHeader;
@@ -695,14 +863,14 @@ void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
 	mtHeader.tilesWide = RoundDownToPowerOfTwo( tgaHeader.width ) / TILE_SIZE;
 	mtHeader.tilesHigh = RoundDownToPowerOfTwo( tgaHeader.height ) / TILE_SIZE;
 
-	arcNetString	outName = name;
+	anString	outName = name;
 	outName.StripFileExtension();
-	outName += ".mega";
+	outName += ".mgat";
 
 	common->Printf( "Writing %i x %i size %i tiles to %s.\n", mtHeader.tilesWide, mtHeader.tilesHigh, mtHeader.tileSize, outName.c_str() );
 
 	// open the output megatexture file
-	arcNetFile	*out = fileSystem->OpenFileWrite( outName.c_str() );
+	anFile	*out = fileSystem->OpenFileWrite( outName.c_str() );
 
 	out->Write( &mtHeader, sizeof( mtHeader ) );
 	out->Seek( TILE_SIZE * TILE_SIZE * 4, FS_SEEK_SET );
@@ -715,11 +883,11 @@ void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
 	while ( blockRowsRemaining-- ) {
 		common->Printf( "%i blockRowsRemaining\n", blockRowsRemaining );
 		//session->UpdateScreen();
-		if ( tgaHeader.image_type == 2 || tgaHeader.image_type == 3 ) {
+		if ( tgaHeader.imageType == 2 || tgaHeader.imageType == 3 ) {
 			// Uncompressed RGB or gray scale image
 			for ( int row = 0 ; row < TILE_SIZE ; row++ ) {
 				byte *pixBuf = tgaRGBA + row*columns*4;
-				for ( int column = 0; column < columns; column++) {
+				for ( int column = 0; column < columns; column++ ) {
 					unsigned char red, green, blue, alphaByte;
 					switch ( tgaHeader.pixelSize ) {
 					case 8:
@@ -757,7 +925,7 @@ void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
 					}
 				}
 			}
-		} else if ( tgaHeader.image_type == 10 ) {   // Runlength encoded RGB images
+		} else if ( tgaHeader.imageType == 10 ) {   // Runlength encoded RGB images
 			unsigned char packetHeader, packetSize, j;
 
 			unsigned char red = 0;
@@ -771,7 +939,7 @@ void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
 					packetHeader = ReadByte( file );
 					packetSize = 1 + ( packetHeader & 0x7f );
 					if ( packetHeader & 0x80 ) {        // run-length packet
-						switch( tgaHeader.pixelSize ) {
+						switch ( tgaHeader.pixelSize ) {
 							case 24:
 									blue = ReadByte( file );
 									green = ReadByte( file );
@@ -809,7 +977,7 @@ void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
 						}
 					} else {                            // non run-length packet
 						for ( j = 0; j < packetSize; j++ ) {
-							switch( tgaHeader.pixelSize ) {
+							switch ( tgaHeader.pixelSize ) {
 								case 24:
 										blue = ReadByte( file );
 										green = ReadByte( file );
@@ -869,7 +1037,7 @@ void idMegaTexture::MakeMegaTexture_f( const arcCommandArgs &args ) {
 
 	GenerateMegaPreview( outName.c_str() );
 #if 0
-	if ( (tgaHeader.attributes & ( 1<<5 ) ) ) {			// image flp bit
+	if ( ( tgaHeader.attributes & ( 1<<5 ) ) ) {			// image flp bit
 		R_VerticalFlip( *pic, *width, *height );
 	}
 #endif
@@ -884,35 +1052,35 @@ static char THIS_FILE[] = __FILE__;
 /*
 ===============================================================================
 
-	arcHeightMap
+	anHeightMap
 
 ===============================================================================
 */
 
 /*
 ==============
-arcHeightMap::arcHeightMap
+anHeightMap::anHeightMap
 ==============
 */
-arcHeightMap::arcHeightMap( void ) {
+anHeightMap::anHeightMap( void ) {
 	Clear();
 }
 
 /*
 ==============
-arcHeightMap::~arcHeightMap
+anHeightMap::~anHeightMap
 ==============
 */
-arcHeightMap::~arcHeightMap( void ) {
+anHeightMap::~anHeightMap( void ) {
 	Clear();
 }
 
 /*
 ==============
-arcHeightMap::Clear
+anHeightMap::Clear
 ==============
 */
-void arcHeightMap::Clear( void ) {
+void anHeightMap::Clear( void ) {
 	data.Clear();
 
 	dimensions[0] = 0;
@@ -921,16 +1089,16 @@ void arcHeightMap::Clear( void ) {
 
 /*
 ==============
-arcHeightMap::Init
+anHeightMap::Init
 ==============
 */
-void arcHeightMap::Init( int w, int h, byte height ) {
+void anHeightMap::Init( int w, int h, byte height ) {
 	dimensions[0] = w;
 	dimensions[1] = h;
 
 	data.AssureSize( dimensions[0] * dimensions[1], 0 );
-	for (int i=0; i<w; i++) {
-		for (int j=0; j<h; j++) {
+	for ( int i=0; i<w; i++ ) {
+		for ( intj=0; j<h; j++ ) {
 			data[ i * h + j ] = height;
 		}
 	}
@@ -938,10 +1106,10 @@ void arcHeightMap::Init( int w, int h, byte height ) {
 
 /*
 ==============
-arcHeightMap::Load
+anHeightMap::Load
 ==============
 */
-void arcHeightMap::Load( const char *filename ) {
+void anHeightMap::Load( const char *filename ) {
 	Clear();
 
 	if ( !filename || !*filename ) {
@@ -969,22 +1137,22 @@ void arcHeightMap::Load( const char *filename ) {
 
 /*
 ==============
-arcHeightMap::GetInterpolatedHeight
+anHeightMap::GetInterpolatedHeight
 ==============
 */
-float arcHeightMap::GetInterpolatedHeight( const arcVec3 &pos, const arcHeightMapScaleData &scale ) const {
+float anHeightMap::GetInterpolatedHeight( const anVec3 &pos, const anHeightMapScaleData &scale ) const {
 	// find which points to sample
 	int minCoords[2];
 	int maxCoords[2];
 	float blendValues[2];
 
 	for ( int i = 0; i < 2; i ++ ) {
-		float posCoord = arcMath::ClampFloat( 0.0f, 1.0f, ( pos[i] - scale.mins[i] ) * scale.invSize[i] ) * ( dimensions[i] - 1 );
+		float posCoord = anMath::ClampFloat( 0.0f, 1.0f, ( pos[i] - scale.mins[i] ) * scale.invSize[i] ) * ( dimensions[i] - 1 );
 		float intCoord = ( int )posCoord;
 		float coordLeftover = posCoord - intCoord;
 
 		minCoords[i] = intCoord;
-		maxCoords[i] = arcMath::ClampInt( 0, dimensions[i] - 1, intCoord + 1 );
+		maxCoords[i] = anMath::ClampInt( 0, dimensions[i] - 1, intCoord + 1 );
 		blendValues[i] = coordLeftover;
 	}
 
@@ -1003,10 +1171,10 @@ float arcHeightMap::GetInterpolatedHeight( const arcVec3 &pos, const arcHeightMa
 
 /*
 ==============
-arcHeightMap::GetHeight
+anHeightMap::GetHeight
 ==============
 */
-void arcHeightMap::GetHeight( const arcBounds &in, arcVec2 &out, const arcHeightMapScaleData &scale ) const {
+void anHeightMap::GetHeight( const anBounds &in, anVec2 &out, const anHeightMapScaleData &scale ) const {
 	if ( data.Num() == 0 ) {
 		common->Warning( "[HeightMap::GetHeight] - no heightmap data!" );
 		out[0] = 0.0f;
@@ -1017,18 +1185,18 @@ void arcHeightMap::GetHeight( const arcBounds &in, arcVec2 &out, const arcHeight
 	int minCoords[2];
 	int maxCoords[2];
 
-	minCoords[0] = ( arcMath::ClampFloat( 0.0f, 1.0f, ( in.GetMins()[0] - scale.mins[0] ) * scale.invSize[0] ) * ( dimensions[0] - 1 ) );
-	minCoords[1] = ( arcMath::ClampFloat( 0.0f, 1.0f, ( in.GetMins()[1] - scale.mins[1] ) * scale.invSize[1] ) * ( dimensions[1] - 1 ) );
+	minCoords[0] = ( anMath::ClampFloat( 0.0f, 1.0f, ( in.GetMins()[0] - scale.mins[0] ) * scale.invSize[0] ) * ( dimensions[0] - 1 ) );
+	minCoords[1] = ( anMath::ClampFloat( 0.0f, 1.0f, ( in.GetMins()[1] - scale.mins[1] ) * scale.invSize[1] ) * ( dimensions[1] - 1 ) );
 
-	maxCoords[0] = ( arcMath::ClampFloat( 0.0f, 1.0f, ( in.GetMaxs()[0] - scale.mins[0] ) * scale.invSize[0] ) * ( dimensions[0] - 1 ) ) + 1;
-	maxCoords[1] = ( arcMath::ClampFloat( 0.0f, 1.0f, ( in.GetMaxs()[1] - scale.mins[1] ) * scale.invSize[1] ) * ( dimensions[1] - 1 ) ) + 1;
+	maxCoords[0] = ( anMath::ClampFloat( 0.0f, 1.0f, ( in.GetMaxs()[0] - scale.mins[0] ) * scale.invSize[0] ) * ( dimensions[0] - 1 ) ) + 1;
+	maxCoords[1] = ( anMath::ClampFloat( 0.0f, 1.0f, ( in.GetMaxs()[1] - scale.mins[1] ) * scale.invSize[1] ) * ( dimensions[1] - 1 ) ) + 1;
 
 	int x;
 	int y;
 	float value;
 
-	out[0] = arcMath::INFINITY;
-	out[1] = -arcMath::INFINITY;
+	out[0] = anMath::INFINITY;
+	out[1] = -anMath::INFINITY;
 
 	for ( x = minCoords[0]; x < maxCoords[0]; x++ ) {
 		for ( y = minCoords[1]; y < maxCoords[1]; y++ ) {
@@ -1045,10 +1213,10 @@ void arcHeightMap::GetHeight( const arcBounds &in, arcVec2 &out, const arcHeight
 
 /*
 ==============
-arcHeightMap::GetHeight
+anHeightMap::GetHeight
 ==============
 */
-float arcHeightMap::GetHeight( const arcVec3 &start, const arcVec3 &end, const arcHeightMapScaleData &scale ) const {
+float anHeightMap::GetHeight( const anVec3 &start, const anVec3 &end, const anHeightMapScaleData &scale ) const {
 	if ( data.Num() == 0 ) {
 		common->Warning( "[HeightMap::TracePoint] - no heightmap data!" );
 		return 0.0f;
@@ -1077,13 +1245,13 @@ float arcHeightMap::GetHeight( const arcVec3 &start, const arcVec3 &end, const a
 	int startCoordsY = static_cast<int>( startCoords[1] );
 	startCoordsX = ClipCoord( startCoordsX, left, right );
 	startCoordsY = ClipCoord( startCoordsY, top, bottom );
-	startCoords = arcVec2( startCoordsX, startCoordsY );
+	startCoords = anVec2( startCoordsX, startCoordsY );
 
 	int endCoordsX = static_cast<int>( endCoords[0] );
 	int endCoordsY = static_cast<int>( endCoords[1] );
 	endCoordsX = ClipCoord( endCoordsX, left, right );
 	endCoordsY = ClipCoord( endCoordsY, top, bottom );
-	endCoords = arcVec2( endCoordsX, endCoordsY );
+	endCoords = anVec2( endCoordsX, endCoordsY );
 
 	// clip the start & end coords to the dimensions of the map whilst keeping the same slopes
 	startCoords[0] = ( startCoords[0] < left ) ? ( startCoords[0] + static_cast<int>( ( left - startCoords[0] ) / direction[0] ) * direction[0] ) : startCoords[0];
@@ -1100,18 +1268,18 @@ float arcHeightMap::GetHeight( const arcVec3 &start, const arcVec3 &end, const a
 	coordDelta = endCoords - startCoords;
 
 	// check if the trace is a vertical one
-	if ( arcMath::Fabs( coordDelta[0] ) < 1.0f && arcMath::Fabs( coordDelta[1] ) < 1.0f ) {
+	if ( anMath::Fabs( coordDelta[0] ) < 1.0f && anMath::Fabs( coordDelta[1] ) < 1.0f ) {
 		return GetHeight( start, scale );
 	}
 
 	// find the step to go by
 	int mostSignificantAxis = 0;
-	if ( arcMath::Fabs( direction[1] ) > arcMath::Fabs( direction[0] ) ) {
+	if ( anMath::Fabs( direction[1] ) > anMath::Fabs( direction[0] ) ) {
 		mostSignificantAxis = 1;
 	}
 
-	float axisStep = arcMath::Fabs( direction[ mostSignificantAxis ] );
-	arcVec2 step = direction /  axisStep;
+	float axisStep = anMath::Fabs( direction[ mostSignificantAxis ] );
+	anVec2 step = direction /  axisStep;
 	if ( step[ mostSignificantAxis ] > 0.0f ) {
 		step[ mostSignificantAxis ] = 1.0f;		// paranoid
 	} else {
@@ -1119,7 +1287,7 @@ float arcHeightMap::GetHeight( const arcVec3 &start, const arcVec3 &end, const a
 	}
 
 	int fullDistance = static_cast<int>( endCoords[mostSignificantAxis] ) - static_cast<int>( startCoords[mostSignificantAxis] );
-	fullDistance = arcMath::Abs( fullDistance );
+	fullDistance = anMath::Abs( fullDistance );
 	byte maxHeight = 0;
 
     int intTestCoords[2];
@@ -1127,7 +1295,7 @@ float arcHeightMap::GetHeight( const arcVec3 &start, const arcVec3 &end, const a
     intTestCoords[1] = static_cast<int>( startCoords[1] );
 
 	// TODO: Could optimize this a lot by using ints only in here
-	arcVec2 testCoords = startCoords;
+	anVec2 testCoords = startCoords;
 	for ( int travelled = 0; travelled < fullDistance; travelled++ ) {
 		byte height = data[intTestCoords[0] + ( intTestCoords[1] * width )];
 		maxHeight = ( height > maxHeight ) ? height : maxHeight;
@@ -1141,10 +1309,10 @@ float arcHeightMap::GetHeight( const arcVec3 &start, const arcVec3 &end, const a
 
 /*
 ==============
-arcHeightMap::TracePoint
+anHeightMap::TracePoint
 ==============
 */
-float arcHeightMap::TracePoint( const arcVec3& start, const arcVec3& end, arcVec3& result, float heightOffset, const arcHeightMapScaleData& scale ) const {
+float anHeightMap::TracePoint( const anVec3& start, const anVec3& end, anVec3& result, float heightOffset, const anHeightMapScaleData& scale ) const {
 	result = end;
 	if ( data.Num() == 0 ) {
 		gameLocal.Warning( "[HeightMap::TracePoint] - no heightmap data!" );
@@ -1152,8 +1320,8 @@ float arcHeightMap::TracePoint( const arcVec3& start, const arcVec3& end, arcVec
 	}
 
 	// find the start & end points in heightmap coordinates
-	arcVec3 startCoords, unclippedStartCoords;
-	arcVec3 endCoords, unclippedEndCoords;
+	anVec3 startCoords, unclippedStartCoords;
+	anVec3 endCoords, unclippedEndCoords;
 	startCoords[0] = ( start[0] - scale.mins[0] ) * ( scale.invSize[0] * ( dimensions[0] - 1 ) );
 	startCoords[1] = ( start[1] - scale.mins[1] ) * ( scale.invSize[1] * ( dimensions[1] - 1 ) );
 	startCoords[2] = ( ( start[2] - heightOffset ) - scale.heightOffset ) / scale.heightScale;
@@ -1180,8 +1348,8 @@ float arcHeightMap::TracePoint( const arcVec3& start, const arcVec3& end, arcVec
 		return 1.0f;
 	}
 
-	arcVec3 coordDelta = endCoords - startCoords;
-	arcVec3 direction = coordDelta;
+	anVec3 coordDelta = endCoords - startCoords;
+	anVec3 direction = coordDelta;
 	direction.Normalize();
 
 	// clip the start & end coords to the dimensions of the map whilst keeping the same slopes
@@ -1204,9 +1372,9 @@ float arcHeightMap::TracePoint( const arcVec3& start, const arcVec3& end, arcVec
 	coordDelta = endCoords - startCoords;
 
 	// check if the trace is a vertical one
-	if ( arcMath::Fabs( coordDelta[0] ) < 1.0f && arcMath::Fabs( coordDelta[1] ) < 1.0f ) {
+	if ( anMath::Fabs( coordDelta[0] ) < 1.0f && anMath::Fabs( coordDelta[1] ) < 1.0f ) {
 		// not tracing far enough to do anything
-		if ( arcMath::Fabs( coordDelta[2] ) < 1.0f ) {
+		if ( anMath::Fabs( coordDelta[2] ) < 1.0f ) {
 			return 1.0f;
 		}
 
@@ -1234,17 +1402,17 @@ float arcHeightMap::TracePoint( const arcVec3& start, const arcVec3& end, arcVec
 	// loop along the path & find where this crosses the map
 	int mostSignificantAxis = 0;
 	int mostSignificantFractionAxis = 0;
-	if ( arcMath::Fabs( direction[1] ) > arcMath::Fabs( direction[0] ) ) {
+	if ( anMath::Fabs( direction[1] ) > anMath::Fabs( direction[0] ) ) {
 		mostSignificantAxis = 1;
 		mostSignificantFractionAxis = 1;
 	}
-	if ( arcMath::Fabs( direction[2] ) > arcMath::Fabs( direction[ mostSignificantFractionAxis ] ) ) {
+	if ( anMath::Fabs( direction[2] ) > anMath::Fabs( direction[ mostSignificantFractionAxis ] ) ) {
 		mostSignificantFractionAxis = 2;
 	}
 
 	// find the step to go by
-	float axisStep = arcMath::Fabs( direction[ mostSignificantAxis ] );
-	arcVec3 step = direction /  axisStep;
+	float axisStep = anMath::Fabs( direction[ mostSignificantAxis ] );
+	anVec3 step = direction /  axisStep;
 	if ( step[ mostSignificantAxis ] > 0.0f ) {
 		step[ mostSignificantAxis ] = 1.0f;		// paranoid
 	} else {
@@ -1255,10 +1423,10 @@ float arcHeightMap::TracePoint( const arcVec3& start, const arcVec3& end, arcVec
 	bool wasAbove;
 	int travelled = 0;
 	int fullDistance = ( int )endCoords[ mostSignificantAxis ] - ( int )startCoords[ mostSignificantAxis ];
-	fullDistance = arcMath::Abs( fullDistance );
+	fullDistance = anMath::Abs( fullDistance );
 
 	// TODO: Could optimize this a lot by using ints only in here
-	arcVec3 testCoords = startCoords;
+	anVec3 testCoords = startCoords;
 	for ( int travelled = 0; travelled < fullDistance; travelled++ ) {
 		int intTestCoords[ 3 ];
 		intTestCoords[0] = testCoords[0];
@@ -1330,8 +1498,8 @@ sdDeclHeightMap::Parse
 ================
 */
 bool sdDeclHeightMap::Parse( const char *text, const int textLength ) {
-	arcNetToken token;
-	idParser src;
+	anToken token;
+	anParser src;
 
 	src.SetFlags( DECL_LEXER_FLAGS );
 //	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
@@ -1340,7 +1508,7 @@ bool sdDeclHeightMap::Parse( const char *text, const int textLength ) {
 
 	src.SkipUntilString( "{", &token );
 
-	arcDict temp;
+	anDict temp;
 	while ( true ) {
 		if ( !src.ReadToken( &token ) ) {
 			return false;
@@ -1365,7 +1533,7 @@ bool sdDeclHeightMap::Parse( const char *text, const int textLength ) {
 		}
 	}
 	heightMap					= data.GetString( "megatexturehm" );
-	location					= data.GetVec2( "location", arcVec2( SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f ).ToString() );
+	location					= data.GetVec2( "location", anVec2( SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f ).ToString() );
 	serverShot					= data.GetString( "mtr_serverShot", "levelshots/generic" );
 
 	return true;
@@ -1389,9 +1557,9 @@ void sdDeclHeightMap::FreeData( void ) {
 sdDeclHeightMap::CacheFromDict
 ================
 */
-void sdDeclHeightMap::CacheFromDict( const arcDict& dict ) {
-	const idKeyValue *kv;
-	kv = NULL;
+void sdDeclHeightMap::CacheFromDict( const anDict& dict ) {
+	const anKeyValue *kv;
+	kv = nullptr;
 	while( kv = dict.MatchPrefix( "hm_", kv ) ) {
 		if ( kv->GetValue().Length() ) {
 			gameLocal.declHeightMapType[ kv->GetValue() ];
@@ -1412,9 +1580,9 @@ void sdDeclHeightMap::CacheFromDict( const arcDict& dict ) {
 sdHeightMapInstance::Init
 ================
 */
-void arcHeightMapInstance::Init( const char *declName, const arcBounds &bounds ) {
-	const arcHeightMap *declHeightMap = declHeightMapType[ declName ];
-	if ( heightMap == NULL ) {
+void anHeightMapInstance::Init( const char *declName, const anBounds &bounds ) {
+	const anHeightMap *declHeightMap = declHeightMapType[ declName ];
+	if ( heightMap == nullptr ) {
 		arcLib::Error( "HeightMapInstance::Init Invalid Heightmap '%s'", declName );
 	}
 
@@ -1422,7 +1590,7 @@ void arcHeightMapInstance::Init( const char *declName, const arcBounds &bounds )
 	heightMapData.Init( bounds );
 }
 
-void arcHeightMapInstance::Init( const sdHeightMap *map, const arcBounds& bounds ) {
+void anHeightMapInstance::Init( const sdHeightMap *map, const anBounds& bounds ) {
 	heightMap = map;
 	heightMapData.Init( bounds );
 }

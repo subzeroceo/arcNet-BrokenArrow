@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 // TearoffContainerWindow.cpp : implementation file
@@ -42,8 +42,8 @@ IMPLEMENT_DYNAMIC(CTearoffContainerWindow, CWnd)
 CTearoffContainerWindow::CTearoffContainerWindow()
 {
 	m_DragPreviewActive = false;
-	m_ContainedDialog = NULL;
-	m_DockManager = NULL;
+	m_ContainedDialog = nullptr;
+	m_DockManager = nullptr;
 }
 
 CTearoffContainerWindow::~CTearoffContainerWindow()

@@ -68,9 +68,9 @@ const int DECL_LEXER_FLAGS	=	LEXFL_NOSTRINGCONCAT |				// multiple strings seper
 								LEXFL_NOFATALERRORS;				// just set a flag instead of fatal erroring
 
 
-class arcDeclerationBase {
+class anDeclBase {
 public:
-	virtual 				~arcDeclerationBase() {};
+	virtual 				~anDeclBase() {};
 	virtual const char *	GetName() const = 0;
 	virtual declType_t		GetType() const = 0;
 	virtual declState_t		GetState() const = 0;
@@ -99,12 +99,12 @@ public:
 };
 
 
-class arcDecleration {
+class anDecl {
 public:
 							// The constructor should initialize variables such that
 							// an immediate call to FreeData() does no harm.
-							arcDecleration() { base = NULL; }
-	virtual 				~arcDecleration() {};
+							anDecl() { base = nullptr; }
+	virtual 				~anDecl() {};
 
 							// Returns the name of the decl.
 	const char *			GetName() const { return base->GetName(); }
@@ -203,22 +203,21 @@ public:
 	virtual void			Print() const { base->Print(); }
 
 public:
-	arcDeclerationBase *			base;
+	anDeclBase *			base;
 };
 
-
-template< class type >
-ARC_INLINE arcDecleration *arcDeclAllocator() {
+template<class type>
+ARC_INLINE anDecl *anDeclAllocator() {
 	return new ( TAG_DECL )type;
 }
 
-class arcMaterial;
-class arcDeclSkin;
-class arcSoundShader;
+class anMaterial;
+class anDeclSkin;
+class anSoundShader;
 
-class arcDeclerationManager {
+class anDeclManager {
 public:
-	virtual					~arcDeclerationManager() {}
+	virtual					~anDeclManager() {}
 
 	virtual void					Init() = 0;
 	virtual void					Init2() = 0;
@@ -229,7 +228,7 @@ public:
 	virtual void					EndLevelLoad() = 0;
 
 							// Registers a new decl type.
-	virtual void					RegisterDeclType( const char *typeName, declType_t type, arcDecleration *(*allocator)() ) = 0;
+	virtual void					RegisterDeclType( const char *typeName, declType_t type, anDecl *(*allocator)() ) = 0;
 
 							// Registers a new folder with decl files.
 	virtual void					RegisterDeclFolder( const char *folder, const char *extension, declType_t defaultType ) = 0;
@@ -247,11 +246,11 @@ public:
 	virtual declType_t				GetDeclTypeFromName( const char *typeName ) const = 0;
 
 							// If makeDefault is true, a default decl of appropriate type will be created
-							// if an explicit one isn't found. If makeDefault is false, NULL will be returned
+							// if an explicit one isn't found. If makeDefault is false, nullptr will be returned
 							// if the decl wasn't explcitly defined.
-	virtual const arcDecleration *	FindType( declType_t type, const char *name, bool makeDefault = true ) = 0;
+	virtual const anDecl *	FindType( declType_t type, const char *name, bool makeDefault = true ) = 0;
 
-	virtual const arcDecleration *	FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault = true ) = 0;
+	virtual const anDecl *	FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault = true ) = 0;
 
 	virtual void					ReloadFile( const char* filename, bool force ) = 0;
 
@@ -261,15 +260,15 @@ public:
 							// The complete lists of decls can be walked to populate editor browsers.
 							// If forceParse is set false, you can get the decl to check name / filename / etc.
 							// without causing it to parse the source and load media.
-	virtual const arcDecleration *	DeclByIndex( declType_t type, int index, bool forceParse = true ) = 0;
+	virtual const anDecl *	DeclByIndex( declType_t type, int index, bool forceParse = true ) = 0;
 
 							// List and print decls.
-	virtual void					ListType( const arcCommandArgs &args, declType_t type ) = 0;
-	virtual void					PrintType( const arcCommandArgs &args, declType_t type ) = 0;
+	virtual void					ListType( const anCommandArgs &args, declType_t type ) = 0;
+	virtual void					PrintType( const anCommandArgs &args, declType_t type ) = 0;
 
 							// Creates a new default decl of the given type with the given name in
 							// the given file used by editors to create a new decls.
-	virtual arcDecleration *		CreateNewDecl( declType_t type, const char *name, const char *fileName ) = 0;
+	virtual anDecl *		CreateNewDecl( declType_t type, const char *name, const char *fileName ) = 0;
 
 							// BSM - Added for the material editors rename capabilities
 	virtual bool					RenameDecl( declType_t type, const char* oldName, const char* newName ) = 0;
@@ -278,30 +277,30 @@ public:
 							// proper indentation if decl_show is set
 	virtual void					MediaPrint( VERIFY_FORMAT_STRING const char *fmt, ... ) = 0;
 
-	virtual void					WritePrecacheCommands( arcNetFile *f ) = 0;
+	virtual void					WritePrecacheCommands( anFile *f ) = 0;
 
 									// Convenience functions for specific types.
-	virtual	const arcMaterial *		FindMaterial( const char *name, bool makeDefault = true ) = 0;
-	virtual const arcDeclSkin *		FindSkin( const char *name, bool makeDefault = true ) = 0;
-	virtual const arcSoundShader *	FindSound( const char *name, bool makeDefault = true ) = 0;
+	virtual	const anMaterial *		FindMaterial( const char *name, bool makeDefault = true ) = 0;
+	virtual const anDeclSkin *		FindSkin( const char *name, bool makeDefault = true ) = 0;
+	virtual const anSoundShader *	FindSound( const char *name, bool makeDefault = true ) = 0;
 
-	virtual const arcMaterial *		MaterialByIndex( int index, bool forceParse = true ) = 0;
-	virtual const arcDeclSkin *		SkinByIndex( int index, bool forceParse = true ) = 0;
-	virtual const arcSoundShader *	SoundByIndex( int index, bool forceParse = true ) = 0;
+	virtual const anMaterial *		MaterialByIndex( int index, bool forceParse = true ) = 0;
+	virtual const anDeclSkin *		SkinByIndex( int index, bool forceParse = true ) = 0;
+	virtual const anSoundShader *	SoundByIndex( int index, bool forceParse = true ) = 0;
 
-	virtual void					Touch( const arcDecleration * decl ) = 0;
+	virtual void					Touch( const anDecl * decl ) = 0;
 };
 
-extern arcDeclerationManager		*declManager;
+extern anDeclManager		*declManager;
 
-template< declType_t type >
-ARC_INLINE void arcListDecls_f( const arcCommandArgs &args ) {
+template<declType_t type>
+ARC_INLINE void ListDecls_f( const anCommandArgs &args ) {
 	declManager->ListType( args, type );
 }
 
-template< declType_t type >
-ARC_INLINE void PrintDecls_f( const arcCommandArgs &args ) {
+template<declType_t type>
+ARC_INLINE void PrintDecls_f( const anCommandArgs &args ) {
 	declManager->PrintType( args, type );
 }
 
-#endif /* !__DECLMANAGER_H__ */
+#endif // !__DECLMANAGER_H__

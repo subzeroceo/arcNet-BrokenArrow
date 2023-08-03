@@ -3,6 +3,6 @@
 
 void	D_DrawDebugLines( void );
 void	Cmd_DoSay( arcWStr &text );
-void	Cmd_Say( const arcCommandArgs &args );
+void	Cmd_Say( const anCommandArgs &args );
 
 #endif // !__SYS_CMDS_H__

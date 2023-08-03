@@ -16,7 +16,7 @@
 /*
  * To define the enum list of message codes, include this file without
  * defining macro JMESSAGE.  To create a message string table, include it
- * again with a suitable JMESSAGE definition (see jerror.c for an example).
+ * again with a suitable JMESSAGE definition ( see jerror.c for an example).
  */
 #ifndef JMESSAGE
 #ifndef JERROR_H
@@ -79,7 +79,7 @@ JMESSAGE(JERR_FILE_WRITE, "Output file write error --- out of disk space?" )
 JMESSAGE(JERR_FRACT_SAMPLE_NOTIMPL, "Fractional sampling not implemented yet" )
 JMESSAGE(JERR_HUFF_CLEN_OVERFLOW, "Huffman code size table overflow" )
 JMESSAGE(JERR_HUFF_MISSING_CODE, "Missing Huffman code table entry" )
-JMESSAGE(JERR_IMAGE_TOO_BIG, "Maximum supported image dimension is %u pixels" )
+JMESSAGE(JERR_anImageOO_BIG, "Maximum supported image dimension is %u pixels" )
 JMESSAGE(JERR_INPUT_EMPTY, "Empty input file" )
 JMESSAGE(JERR_INPUT_EOF, "Premature end of input file" )
 JMESSAGE(JERR_MISMATCHED_QUANT_TABLE,
@@ -192,35 +192,35 @@ JMESSAGE(JWRN_TOO_MUCH_DATA, "Application transferred too many scanlines" )
 /* Fatal errors (print message and exit) */
 #define ERREXIT(cinfo,code)  \
   ((cinfo)->err->msg_code = (code), \
-   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ))
+   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ) )
 #define ERREXIT1(cinfo,code,p1)  \
   ((cinfo)->err->msg_code = (code), \
    (cinfo)->err->msg_parm.i[0] = ( p1 ), \
-   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ))
+   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ) )
 #define ERREXIT2(cinfo,code,p1,p2)  \
   ((cinfo)->err->msg_code = (code), \
    (cinfo)->err->msg_parm.i[0] = ( p1 ), \
    (cinfo)->err->msg_parm.i[1] = ( p2 ), \
-   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ))
+   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ) )
 #define ERREXIT3(cinfo,code,p1,p2,p3)  \
   ((cinfo)->err->msg_code = (code), \
    (cinfo)->err->msg_parm.i[0] = ( p1 ), \
    (cinfo)->err->msg_parm.i[1] = ( p2 ), \
    (cinfo)->err->msg_parm.i[2] = (p3), \
-   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ))
+   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ) )
 #define ERREXIT4(cinfo,code,p1,p2,p3,p4)  \
   ((cinfo)->err->msg_code = (code), \
    (cinfo)->err->msg_parm.i[0] = ( p1 ), \
    (cinfo)->err->msg_parm.i[1] = ( p2 ), \
    (cinfo)->err->msg_parm.i[2] = (p3), \
    (cinfo)->err->msg_parm.i[3] = (p4), \
-   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ))
+   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ) )
 #define ERREXITS(cinfo,code,str)  \
   ((cinfo)->err->msg_code = (code), \
-   strncpy((cinfo)->err->msg_parm.s, (str), JMSG_STR_PARM_MAX), \
-   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ))
+   strncpy((cinfo)->err->msg_parm.s, ( str), JMSG_STR_PARM_MAX), \
+   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo) ) )
 
-#define MAKESTMT(stuff)		do { stuff } while (0 )
+#define MAKESTMT( stuff)		do { stuff } while (0 )
 
 /* Nonfatal errors (we can keep going, but the data is probably corrupt) */
 #define WARNMS(cinfo,code)  \
@@ -239,16 +239,16 @@ JMESSAGE(JWRN_TOO_MUCH_DATA, "Application transferred too many scanlines" )
 /* Informational/debugging messages */
 #define TRACEMS(cinfo,lvl,code)  \
   ((cinfo)->err->msg_code = (code), \
-   (*(cinfo)->err->emit_message) ((j_common_ptr) (cinfo), (lvl) ))
+   (*(cinfo)->err->emit_message) ((j_common_ptr) (cinfo), (lvl) ) )
 #define TRACEMS1(cinfo,lvl,code,p1)  \
   ((cinfo)->err->msg_code = (code), \
    (cinfo)->err->msg_parm.i[0] = ( p1 ), \
-   (*(cinfo)->err->emit_message) ((j_common_ptr) (cinfo), (lvl) ))
+   (*(cinfo)->err->emit_message) ((j_common_ptr) (cinfo), (lvl) ) )
 #define TRACEMS2(cinfo,lvl,code,p1,p2)  \
   ((cinfo)->err->msg_code = (code), \
    (cinfo)->err->msg_parm.i[0] = ( p1 ), \
    (cinfo)->err->msg_parm.i[1] = ( p2 ), \
-   (*(cinfo)->err->emit_message) ((j_common_ptr) (cinfo), (lvl) ))
+   (*(cinfo)->err->emit_message) ((j_common_ptr) (cinfo), (lvl) ) )
 #define TRACEMS3(cinfo,lvl,code,p1,p2,p3)  \
   MAKESTMT( int * _mp = (cinfo)->err->msg_parm.i; \
 	   _mp[0] = ( p1 ); _mp[1] = ( p2 ); _mp[2] = (p3); \
@@ -267,7 +267,7 @@ JMESSAGE(JWRN_TOO_MUCH_DATA, "Application transferred too many scanlines" )
 	   (*(cinfo)->err->emit_message) ((j_common_ptr) (cinfo), (lvl) ); )
 #define TRACEMSS(cinfo,lvl,code,str)  \
   ((cinfo)->err->msg_code = (code), \
-   strncpy((cinfo)->err->msg_parm.s, (str), JMSG_STR_PARM_MAX), \
-   (*(cinfo)->err->emit_message) ((j_common_ptr) (cinfo), (lvl) ))
+   strncpy((cinfo)->err->msg_parm.s, ( str), JMSG_STR_PARM_MAX), \
+   (*(cinfo)->err->emit_message) ((j_common_ptr) (cinfo), (lvl) ) )
 
 #endif /* JERROR_H */

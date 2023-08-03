@@ -13,46 +13,46 @@
 */
 
 typedef struct {
-	const char * name;
-	const char * type;
-	const char * value;
+	const char *name;
+	const char *type;
+	const char *value;
 } constantInfo_t;
 
 typedef struct {
-	const char * name;
+	const char *name;
 	int value;
 } enumValueInfo_t;
 
 typedef struct {
-	const char * typeName;
+	const char *typeName;
 	const enumValueInfo_t * values;
 } enumTypeInfo_t;
 
 typedef struct {
-	const char * type;
-	const char * name;
+	const char *type;
+	const char *name;
 	int offset;
 	int size;
 } classVariableInfo_t;
 
 typedef struct {
-	const char * typeName;
-	const char * superType;
+	const char *typeName;
+	const char *superType;
 	int size;
 	const classVariableInfo_t * variables;
 } classTypeInfo_t;
 
 
 static constantInfo_t constantInfo[] = {
-	{ NULL, NULL, NULL }
+	{ nullptr, nullptr, nullptr }
 };
 
 static enumTypeInfo_t enumTypeInfo[] = {
-	{ NULL, NULL }
+	{ nullptr, nullptr }
 };
 
 static classTypeInfo_t classTypeInfo[] = {
-	{ NULL, NULL, 0, NULL }
+	{ nullptr, nullptr, 0, nullptr }
 };
 
 #endif /* !__GAMETYPEINFO_H__ */

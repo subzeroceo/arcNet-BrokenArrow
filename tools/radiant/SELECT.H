@@ -16,25 +16,25 @@ typedef enum {
 
 class CDragPoint {
 public:
-	arcVec3 vec;
+	anVec3 vec;
 	brush_t *pBrush;
 	int nType;
 	bool priority;
 	CDragPoint() {};
-	CDragPoint(brush_t *b, arcVec3 v, int type, bool p) {
+	CDragPoint(brush_t *b, anVec3 v, int type, bool p) {
 		pBrush = b;
 		VectorCopy( v, ve );
 		nType = type;
 		priority = p;
 	}
 
-	void Set(brush_t *b, arcVec3 v, int type) {
+	void Set(brush_t *b, anVec3 v, int type) {
 		pBrush = b;
 		VectorCopy( v, vec );
 		nType = type;
 	}
 
-	bool PointWithin( arcVec3 p, int nView = -1 );
+	bool PointWithin( anVec3 p, int nView = -1 );
 };
 
 
@@ -55,20 +55,20 @@ typedef struct {
 #define SF_CYCLE           0x20
 
 
-qertrace_t Test_Ray( const arcVec3 &origin, const arcVec3 &dir, int flags );
-CDragPoint *PointRay( const arcVec3 &org, const arcVec3 &dir, float *dist);
-void SelectCurvePointByRay( const arcVec3 &org, const arcVec3 &dir, int buttons);
-void SelectSplinePointByRay( const arcVec3 &org, const arcVec3 &dir, int buttons);
+qertrace_t Test_Ray( const anVec3 &origin, const anVec3 &dir, int flags );
+CDragPoint *PointRay( const anVec3 &org, const anVec3 &dir, float *dist);
+void SelectCurvePointByRay( const anVec3 &org, const anVec3 &dir, int buttons);
+void SelectSplinePointByRay( const anVec3 &org, const anVec3 &dir, int buttons);
 
-void Select_GetBounds(arcVec3 &mins, arcVec3 &maxs);
+void Select_GetBounds(anVec3 &mins, anVec3 &maxs);
 void Select_Brush(brush_t *b, bool bComplete = true, bool bStatus = true);
-void Select_Ray(arcVec3 origin, arcVec3 dir, int flags);
+void Select_Ray(anVec3 origin, anVec3 dir, int flags);
 void Select_Delete( void );
 void Select_Deselect(bool bDeselectFaces = true);
 void Select_Invert( void );
 void Select_Clone( void );
-void Select_Move(arcVec3 delta, bool bSnap = true);
-void WINAPI Select_SetTexture (texdef_t *texdef, brushprimit_texdef_t *brushprimit_texdef, bool bFitScale = false, void* pPlugTexdef = NULL, bool update = true);
+void Select_Move(anVec3 delta, bool bSnap = true);
+void WINAPI Select_SetTexture (texdef_t *texdef, brushprimit_texdef_t *brushprimit_texdef, bool bFitScale = false, void* pPlugTexdef = nullptr, bool update = true);
 void Select_FlipAxis( int axis);
 void Select_RotateAxis( int axis, float deg, bool bPaint = true, bool bMouse = false);
 void Select_CompleteTall( void );
@@ -84,16 +84,16 @@ void Select_FinalizeRotation();
 
 // absolute texture coordinates
 // TTimo NOTE: this is stuff for old brushes format and rotation texture lock .. sort of in-between with bush primitives
-void ComputeAbsolute(face_t* f, arcVec3& p1, arcVec3& p2, arcVec3& p3);
-void AbsoluteToLocal( const arcPlane &normal2, face_t* f, arcVec3& p1, arcVec3& p2, arcVec3& p3);
+void ComputeAbsolute(face_t* f, anVec3& p1, anVec3& p2, anVec3& p3);
+void AbsoluteToLocal( const anPlane &normal2, face_t* f, anVec3& p1, anVec3& p2, anVec3& p3);
 void Select_Hide(bool invert = false);
 void Select_ShowAllHidden();
 void Select_WireFrame( bool wireFrame );
 void Select_ForceVisible( bool visible );
 void Select_Name(const char *pName);
 void Select_AddProjectedLight();
-void Select_GetMid (arcVec3 &mid);
-void Select_SetDefaultTexture(const arcMaterial *mat, bool fitScale, bool setTexture);
+void Select_GetMid (anVec3 &mid);
+void Select_SetDefaultTexture(const anMaterial *mat, bool fitScale, bool setTexture);
 void Select_UpdateTextureName(const char *name);
 
 void Select_FlipTexture(bool y);
@@ -107,7 +107,7 @@ void Select_RotateTexture(float amt, bool absolute = false);
 void Select_ScaleTexture(float x, float y, bool update = true, bool absolute = true);
 void Select_DefaultTextureScale(bool horz, bool vert, bool update = true);
 void Select_ShiftTexture(float x, float y, bool autoAdjust = false);
-void Select_GetTrueMid (arcVec3 &mid);
+void Select_GetTrueMid (anVec3 &mid);
 void Select_Scale(float x, float y, float z);
 
 

@@ -1,10 +1,10 @@
 #pragma hdrstop
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #include "ConsoleHistory.h"
 
 idConsoleHistory consoleHistory;
 
-const char * HISTORY_FILE_NAME = "consoleHistory.txt";
+const char *HISTORY_FILE_NAME = "consoleHistory.txt";
 
 /*
 ========================
@@ -13,7 +13,7 @@ idConsoleHistory::AddToHistory
 */
 void idConsoleHistory::AddToHistory( const char *line, bool writeHistoryFile ) {
 	// empty lines never modify history
-	if ( line == NULL ) {
+	if ( line == nullptr ) {
 		return;
 	}
 	const char *s;
@@ -51,8 +51,8 @@ void idConsoleHistory::AddToHistory( const char *line, bool writeHistoryFile ) {
 
 	// write the history file to disk
 	if ( writeHistoryFile ) {
-		arcNetFile *f = fileSystem->OpenFileWrite( HISTORY_FILE_NAME );
-		if ( f != NULL ) {
+		anFile *f = fileSystem->OpenFileWrite( HISTORY_FILE_NAME );
+		if ( f != nullptr ) {
 			for ( int i = numHistory - COMMAND_HISTORY; i < numHistory; i++ ) {
 				if ( i < 0 ) {
 					continue;
@@ -69,22 +69,22 @@ void idConsoleHistory::AddToHistory( const char *line, bool writeHistoryFile ) {
 idConsoleHistory::RetrieveFromHistory
 ========================
 */
-arcNetString idConsoleHistory::RetrieveFromHistory( bool backward ) {
+anString idConsoleHistory::RetrieveFromHistory( bool backward ) {
 	// if there are no commands in the history
 	if ( numHistory == 0 ) {
-		return arcNetString( "" );
+		return anString( "" );
 	}
 	// move the history point
 	if ( backward ) {
 		if ( upPoint < numHistory - COMMAND_HISTORY || upPoint < 0 ) {
-			return arcNetString( "" );
+			return anString( "" );
 		}
 		returnLine = upPoint;
 		downPoint = upPoint + 1;
 		upPoint--;
 	} else {
 		if ( downPoint >= numHistory ) {
-			return arcNetString( "" );
+			return anString( "" );
 		}
 		returnLine = downPoint;
 		upPoint = downPoint - 1;
@@ -99,10 +99,10 @@ idConsoleHistory::LoadHistoryFile
 ========================
 */
 void idConsoleHistory::LoadHistoryFile() {
-	arcLexer lex;
+	anLexer lex;
 	if ( lex.LoadFile( HISTORY_FILE_NAME, false ) ) {
 		while( 1 ) {
-			arcNetString	line;
+			anString	line;
 			lex.ParseCompleteLine( line );
 			if ( line.IsEmpty() ) {
 				break;
@@ -123,7 +123,7 @@ void idConsoleHistory::PrintHistory() {
 		if ( i < 0 ) {
 			continue;
 		}
-		arcLibrary::Printf( "%c%c%c%4i: %s\n", i == upPoint ? 'U' : ' ', i == downPoint ? 'D' : ' ', i == returnLine ? 'R' : ' ',
+		anLibrary::Printf( "%c%c%c%4i: %s\n", i == upPoint ? 'U' : ' ', i == downPoint ? 'D' : ' ', i == returnLine ? 'R' : ' ',
 			i, historyLines[i & ( COMMAND_HISTORY - 1 )].c_str() );
 	}
 }

@@ -1,7 +1,9 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Unzip.h"
+
+#define	MAX_PRINT_MSG		4096
 
 /*
 =================
@@ -14,12 +16,12 @@ int FS_WriteFloatString( char *buf, const char *fmt, va_list argPtr ) {
 	double f;
 	char *str;
 	int index;
-	arcNetString tmp, format;
+	anString tmp, format;
 
 	index = 0;
 
-	while( *fmt ) {
-		switch( *fmt ) {
+	while ( *fmt ) {
+		switch ( *fmt ) {
 			case '%':
 				format = "";
 				format += *fmt++;
@@ -28,7 +30,7 @@ int FS_WriteFloatString( char *buf, const char *fmt, va_list argPtr ) {
 					format += *fmt++;
 				}
 				format += *fmt;
-				switch( *fmt ) {
+				switch ( *fmt ) {
 					case 'f':
 					case 'e':
 					case 'E':
@@ -41,8 +43,7 @@ int FS_WriteFloatString( char *buf, const char *fmt, va_list argPtr ) {
 							tmp.StripTrailing( '0' );
 							tmp.StripTrailing( '.' );
 							index += sprintf( buf+index, "%s", tmp.c_str() );
-						}
-						else {
+						} else {
 							index += sprintf( buf+index, format.c_str(), f );
 						}
 						break;
@@ -76,7 +77,7 @@ int FS_WriteFloatString( char *buf, const char *fmt, va_list argPtr ) {
 						index += sprintf( buf+index, format.c_str(), str );
 						break;
 					case '%':
-						index += sprintf( buf+index, format.c_str() ); //-V618
+						index += sprintf( buf+index, format.c_str() );
 						break;
 					default:
 						common->Error( "FS_WriteFloatString: invalid format %s", format.c_str() );
@@ -86,7 +87,7 @@ int FS_WriteFloatString( char *buf, const char *fmt, va_list argPtr ) {
 				break;
 			case '\\':
 				fmt++;
-				switch( *fmt ) {
+				switch ( *fmt ) {
 					case 't':
 						index += sprintf( buf+index, "\t" );
 						break;
@@ -118,150 +119,155 @@ int FS_WriteFloatString( char *buf, const char *fmt, va_list argPtr ) {
 /*
 =================================================================================
 
-arcNetFile
+anFile
 
 =================================================================================
 */
 
 /*
 =================
-arcNetFile::GetName
+anFile::GetName
 =================
 */
-const char *arcNetFile::GetName() const {
+const char *anFile::GetName( void ) {
 	return "";
 }
 
 /*
 =================
-arcNetFile::GetFullPath
+anFile::GetFullPath
 =================
 */
-const char *arcNetFile::GetFullPath() const {
+const char *anFile::GetFullPath( void ) {
 	return "";
 }
 
 /*
 =================
-arcNetFile::Read
+anFile::Read
 =================
 */
-int arcNetFile::Read( void *buffer, int len ) {
-	common->FatalError( "arcNetFile::Read: cannot read from arcNetFile" );
+int anFile::Read( void *buffer, int len ) {
+	common->FatalError( "anFile::Read: cannot read from anFile" );
 	return 0;
 }
 
 /*
 =================
-arcNetFile::Write
+anFile::Write
 =================
 */
-int arcNetFile::Write( const void *buffer, int len ) {
-	common->FatalError( "arcNetFile::Write: cannot write to arcNetFile" );
+int anFile::Write( const void *buffer, int len ) {
+	common->FatalError( "anFile::Write: cannot write to anFile" );
 	return 0;
 }
 
 /*
 =================
-arcNetFile::Length
+anFile::Length
 =================
 */
-int arcNetFile::Length() const {
+int anFile::Length( void ) {
+	anFile *h;
+	long pos = Tell( h ) ;
+	Seek( h, 0, SEEK_END );
+	long end = Tell( h );
+	Seek( h, pos, SEEK_SET );
+	return end;//0;
+}
+
+/*
+=================
+anFile::Timestamp
+=================
+*/
+ARC_TIME_T anFile::Timestamp( void ) {
 	return 0;
 }
 
 /*
 =================
-arcNetFile::Timestamp
+anFile::Tell
 =================
 */
-ARC_TIME_T arcNetFile::Timestamp() const {
+int anFile::Tell( void ) {
 	return 0;
 }
 
 /*
 =================
-arcNetFile::Tell
+anFile::ForceFlush
 =================
 */
-int arcNetFile::Tell() const {
-	return 0;
+void anFile::ForceFlush( void ) {
 }
 
 /*
 =================
-arcNetFile::ForceFlush
+anFile::Flush
 =================
 */
-void arcNetFile::ForceFlush() {
+void anFile::Flush( void ) {
 }
 
 /*
 =================
-arcNetFile::Flush
+anFile::Seek
 =================
 */
-void arcNetFile::Flush() {
-}
-
-/*
-=================
-arcNetFile::Seek
-=================
-*/
-int arcNetFile::Seek( long offset, fsOrigin_t origin ) {
+int anFile::Seek( long offset, fsOrigin_t origin ) {
 	return -1;
 }
 
 /*
 =================
-arcNetFile::Rewind
+anFile::Rewind
 =================
 */
-void arcNetFile::Rewind() {
+void anFile::Rewind( void ) {
 	Seek( 0, FS_SEEK_SET );
 }
 
 /*
 =================
-arcNetFile::Printf
+anFile::Printf
 =================
 */
-int arcNetFile::Printf( const char *fmt, ... ) {
+int anFile::Printf( const char *fmt, ... ) {
 	char buf[MAX_PRINT_MSG];
 	int length;
 	va_list argptr;
 
 	va_start( argptr, fmt );
-	length = arcNetString::vsnPrintf( buf, MAX_PRINT_MSG-1, fmt, argptr );
+	length = anString::vsnPrintf( buf, MAX_PRINT_MSG-1, fmt, argptr );
 	va_end( argptr );
 
 	// so notepad formats the lines correctly
-  	arcNetString	work( buf );
+  	anString	work( buf );
  	work.Replace( "\n", "\r\n" );
-
+  
   	return Write( work.c_str(), work.Length() );
 }
 
 /*
 =================
-arcNetFile::VPrintf
+anFile::VPrintf
 =================
 */
-int arcNetFile::VPrintf( const char *fmt, va_list args ) {
+int anFile::VPrintf( const char *fmt, va_list args ) {
 	char buf[MAX_PRINT_MSG];
 	int length;
 
-	length = arcNetString::vsnPrintf( buf, MAX_PRINT_MSG-1, fmt, args );
+	length = anString::vsnPrintf( buf, MAX_PRINT_MSG-1, fmt, args );
 	return Write( buf, length );
 }
 
 /*
 =================
-arcNetFile::WriteFloatString
+anFile::WriteFloatString
 =================
 */
-int arcNetFile::WriteFloatString( const char *fmt, ... ) {
+int anFile::WriteFloatString( const char *fmt, ... ) {
 	char buf[MAX_PRINT_MSG];
 	int len;
 	va_list argPtr;
@@ -275,83 +281,83 @@ int arcNetFile::WriteFloatString( const char *fmt, ... ) {
 
 /*
  =================
- arcNetFile::ReadInt
+ anFile::ReadInt
  =================
  */
-int arcNetFile::ReadInt( int &value ) {
+int anFile::ReadInt( int &value ) {
 	int result = Read( &value, sizeof( value ) );
-	value = LittleLong(value);
+	value = LittleLong( value );
 	return result;
 }
 
 /*
  =================
- arcNetFile::ReadUnsignedInt
+ anFile::ReadUnsignedInt
  =================
  */
-int arcNetFile::ReadUnsignedInt( unsigned int &value ) {
+int anFile::ReadUnsignedInt( unsigned int &value ) {
 	int result = Read( &value, sizeof( value ) );
-	value = LittleLong(value);
+	value = LittleLong( value );
 	return result;
 }
 
 /*
  =================
- arcNetFile::ReadShort
+ anFile::ReadShort
  =================
  */
-int arcNetFile::ReadShort( short &value ) {
+int anFile::ReadShort( short &value ) {
 	int result = Read( &value, sizeof( value ) );
-	value = LittleShort(value);
+	value = LittleShort( value );
 	return result;
 }
 
 /*
  =================
- arcNetFile::ReadUnsignedShort
+ anFile::ReadUnsignedShort
  =================
  */
-int arcNetFile::ReadUnsignedShort( unsigned short &value ) {
+int anFile::ReadUnsignedShort( unsigned short &value ) {
 	int result = Read( &value, sizeof( value ) );
-	value = LittleShort(value);
+	value = LittleShort( value );
 	return result;
 }
 
 /*
  =================
- arcNetFile::ReadChar
+ anFile::ReadChar
  =================
  */
-int arcNetFile::ReadChar( char &value ) {
+int anFile::ReadChar( char &value ) {
 	return Read( &value, sizeof( value ) );
 }
 
 /*
  =================
- arcNetFile::ReadUnsignedChar
+ anFile::ReadUnsignedChar
  =================
  */
-int arcNetFile::ReadUnsignedChar( unsigned char &value ) {
+int anFile::ReadUnsignedChar( unsigned char &value ) {
 	return Read( &value, sizeof( value ) );
 }
 
 /*
  =================
- arcNetFile::ReadFloat
+ anFile::ReadFloat
  =================
  */
-int arcNetFile::ReadFloat( float &value ) {
+int anFile::ReadFloat( float &value ) {
 	int result = Read( &value, sizeof( value ) );
-	value = LittleFloat(value);
+	value = LittleFloat( value );
 	return result;
 }
 
 /*
  =================
- arcNetFile::ReadBool
+ anFile::ReadBool
  =================
  */
-int arcNetFile::ReadBool( bool &value ) {
+int anFile::ReadBool( bool &value ) {
 	unsigned char c;
 	int result = ReadUnsignedChar( c );
 	value = c ? true : false;
@@ -360,13 +366,13 @@ int arcNetFile::ReadBool( bool &value ) {
 
 /*
  =================
- arcNetFile::ReadString
+ anFile::ReadString
  =================
  */
-int arcNetFile::ReadString( arcNetString &string ) {
+int anFile::ReadString( anString &string ) {
 	int len;
 	int result = 0;
-
+	
 	ReadInt( len );
 	if ( len >= 0 ) {
 		string.Fill( ' ', len );
@@ -377,207 +383,209 @@ int arcNetFile::ReadString( arcNetString &string ) {
 
 /*
  =================
- arcNetFile::ReadVec2
+ anFile::ReadVec2
  =================
  */
-int arcNetFile::ReadVec2( arcVec2 &vec ) {
+int anFile::ReadVec2( anVec2 &vec ) {
 	int result = Read( &vec, sizeof( vec ) );
-	LittleRevBytes( &vec, sizeof( float ), sizeof(vec)/sizeof( float ) );
+	LittleRevBytes( &vec, sizeof( float ), sizeof( vec )/sizeof( float ) );
 	return result;
 }
 
 /*
  =================
- arcNetFile::ReadVec3
+ anFile::ReadVec3
  =================
  */
-int arcNetFile::ReadVec3( arcVec3 &vec ) {
+int anFile::ReadVec3( anVec3 &vec ) {
 	int result = Read( &vec, sizeof( vec ) );
-	LittleRevBytes( &vec, sizeof( float ), sizeof(vec)/sizeof( float ) );
+	LittleRevBytes( &vec, sizeof( float ), sizeof( vec )/sizeof( float ) );
 	return result;
 }
 
 /*
  =================
- arcNetFile::ReadVec4
+ anFile::ReadVec4
  =================
  */
-int arcNetFile::ReadVec4( arcVec4 &vec ) {
+int anFile::ReadVec4( anVec4 &vec ) {
 	int result = Read( &vec, sizeof( vec ) );
-	LittleRevBytes( &vec, sizeof( float ), sizeof(vec)/sizeof( float ) );
+	LittleRevBytes( &vec, sizeof( float ), sizeof( vec )/sizeof( float ) );
 	return result;
 }
 
 /*
  =================
- arcNetFile::ReadVec6
+ anFile::ReadVec6
  =================
  */
-int arcNetFile::ReadVec6( arcVec6 &vec ) {
+int anFile::ReadVec6( anVec6 &vec ) {
 	int result = Read( &vec, sizeof( vec ) );
-	LittleRevBytes( &vec, sizeof( float ), sizeof(vec)/sizeof( float ) );
+	LittleRevBytes( &vec, sizeof( float ), sizeof( vec )/sizeof( float ) );
 	return result;
 }
 
 /*
  =================
- arcNetFile::ReadMat3
+ anFile::ReadMat3
  =================
  */
-int arcNetFile::ReadMat3( arcMat3 &mat ) {
+int anFile::ReadMat3( anMat3 &mat ) {
 	int result = Read( &mat, sizeof( mat ) );
-	LittleRevBytes( &mat, sizeof( float ), sizeof(mat)/sizeof( float ) );
+	LittleRevBytes( &mat, sizeof( float ), sizeof( mat )/sizeof( float ) );
 	return result;
 }
 
 /*
  =================
- arcNetFile::WriteInt
+ anFile::WriteInt
  =================
  */
-int arcNetFile::WriteInt( const int value ) {
-	int v = LittleLong(value);
+int anFile::WriteInt( const int value ) {
+	int v = LittleLong( value );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
  =================
- arcNetFile::WriteUnsignedInt
+ anFile::WriteUnsignedInt
  =================
  */
-int arcNetFile::WriteUnsignedInt( const unsigned int value ) {
-	unsigned int v = LittleLong(value);
+int anFile::WriteUnsignedInt( const unsigned int value ) {
+	unsigned int v = LittleLong( value );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
  =================
- arcNetFile::WriteShort
+ anFile::WriteShort
  =================
  */
-int arcNetFile::WriteShort( const short value ) {
-	short v = LittleShort(value);
+int anFile::WriteShort( const short value ) {
+	short v = LittleShort( value );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
  =================
- arcNetFile::WriteUnsignedShort
+ anFile::WriteUnsignedShort
  =================
  */
-int arcNetFile::WriteUnsignedShort( const unsigned short value ) {
-	unsigned short v = LittleShort(value);
+int anFile::WriteUnsignedShort( const unsigned short value ) {
+	unsigned short v = LittleShort( value );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
  =================
- arcNetFile::WriteChar
+ anFile::WriteChar
  =================
  */
-int arcNetFile::WriteChar( const char value ) {
+int anFile::WriteChar( const char value ) {
 	return Write( &value, sizeof( value ) );
 }
 
 /*
  =================
- arcNetFile::WriteUnsignedChar
+ anFile::WriteUnsignedChar
  =================
  */
-int arcNetFile::WriteUnsignedChar( const unsigned char value ) {
+int anFile::WriteUnsignedChar( const unsigned char value ) {
 	return Write( &value, sizeof( value ) );
 }
 
 /*
  =================
- arcNetFile::WriteFloat
+ anFile::WriteFloat
  =================
  */
-int arcNetFile::WriteFloat( const float value ) {
-	float v = LittleFloat(value);
+int anFile::WriteFloat( const float value ) {
+	float v = LittleFloat( value );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
  =================
- arcNetFile::WriteBool
+ anFile::WriteBool
  =================
  */
-int arcNetFile::WriteBool( const bool value ) {
+int anFile::WriteBool( const bool value ) {
 	unsigned char c = value;
 	return WriteUnsignedChar( c );
 }
 
 /*
  =================
- arcNetFile::WriteString
+ anFile::WriteString
  =================
  */
-int arcNetFile::WriteString( const char *value ) {
-	int len = strlen( value );
+int anFile::WriteString( const char *value ) {
+	int len;
+	
+	len = strlen( value );
 	WriteInt( len );
     return Write( value, len );
 }
 
 /*
  =================
- arcNetFile::WriteVec2
+ anFile::WriteVec2
  =================
  */
-int arcNetFile::WriteVec2( const arcVec2 &vec ) {
-	arcVec2 v = vec;
-	LittleRevBytes( &v, sizeof( float ), sizeof( v)/sizeof( float ) );
+int anFile::WriteVec2( const anVec2 &vec ) {
+	anVec2 v = vec;
+	LittleRevBytes( &v, sizeof( float ), sizeof(v)/sizeof( float ) );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
  =================
- arcNetFile::WriteVec3
+ anFile::WriteVec3
  =================
  */
-int arcNetFile::WriteVec3( const arcVec3 &vec ) {
-	arcVec3 v = vec;
-	LittleRevBytes( &v, sizeof( float ), sizeof( v)/sizeof( float ) );
+int anFile::WriteVec3( const anVec3 &vec ) {
+	anVec3 v = vec;
+	LittleRevBytes( &v, sizeof( float ), sizeof(v)/sizeof( float ) );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
  =================
- arcNetFile::WriteVec4
+ anFile::WriteVec4
  =================
  */
-int arcNetFile::WriteVec4( const arcVec4 &vec ) {
-	arcVec4 v = vec;
-	LittleRevBytes( &v, sizeof( float ), sizeof( v)/sizeof( float ) );
+int anFile::WriteVec4( const anVec4 &vec ) {
+	anVec4 v = vec;
+	LittleRevBytes( &v, sizeof( float ), sizeof(v)/sizeof( float ) );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
  =================
- arcNetFile::WriteVec6
+ anFile::WriteVec6
  =================
  */
-int arcNetFile::WriteVec6( const arcVec6 &vec ) {
-	arcVec6 v = vec;
-	LittleRevBytes( &v, sizeof( float ), sizeof( v)/sizeof( float ) );
+int anFile::WriteVec6( const anVec6 &vec ) {
+	anVec6 v = vec;
+	LittleRevBytes( &v, sizeof( float ), sizeof( v )/sizeof( float ) );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
  =================
- arcNetFile::WriteMat3
+ anFile::WriteMat3
  =================
  */
-int arcNetFile::WriteMat3( const arcMat3 &mat ) {
-	arcMat3 v = mat;
-	LittleRevBytes(&v, sizeof( float ), sizeof( v)/sizeof( float ) );
+int anFile::WriteMat3( const anMat3 &mat ) {
+	anMat3 v = mat;
+	LittleRevBytes( &v, sizeof( float ), sizeof( v )/sizeof( float ) );
 	return Write( &v, sizeof( v ) );
 }
 
 /*
 =================================================================================
 
-aRcFileMemory
+anFileMemory
 
 =================================================================================
 */
@@ -585,10 +593,10 @@ aRcFileMemory
 
 /*
 =================
-aRcFileMemory::aRcFileMemory
+anFileMemory::anFileMemory
 =================
 */
-aRcFileMemory::aRcFileMemory() {
+anFileMemory::anFileMemory( void ) {
 	name = "*unknown*";
 	maxSize = 0;
 	fileSize = 0;
@@ -596,16 +604,16 @@ aRcFileMemory::aRcFileMemory() {
 	granularity = 16384;
 
 	mode = ( 1 << FS_WRITE );
-	filePtr = NULL;
-	curPtr = NULL;
+	filePtr = nullptrptr;
+	curPtr = nullptrptr;
 }
 
 /*
 =================
-aRcFileMemory::aRcFileMemory
+anFileMemory::anFileMemory
 =================
 */
-aRcFileMemory::aRcFileMemory( const char *name ) {
+anFileMemory::anFileMemory( const char *name ) {
 	this->name = name;
 	maxSize = 0;
 	fileSize = 0;
@@ -613,16 +621,16 @@ aRcFileMemory::aRcFileMemory( const char *name ) {
 	granularity = 16384;
 
 	mode = ( 1 << FS_WRITE );
-	filePtr = NULL;
-	curPtr = NULL;
+	filePtr = nullptrptr;
+	curPtr = nullptrptr;
 }
 
 /*
 =================
-aRcFileMemory::aRcFileMemory
+anFileMemory::anFileMemory
 =================
 */
-aRcFileMemory::aRcFileMemory( const char *name, char *data, int length ) {
+anFileMemory::anFileMemory( const char *name, char *data, int length ) {
 	this->name = name;
 	maxSize = length;
 	fileSize = 0;
@@ -636,10 +644,10 @@ aRcFileMemory::aRcFileMemory( const char *name, char *data, int length ) {
 
 /*
 =================
-aRcFileMemory::aRcFileMemory
+anFileMemory::anFileMemory
 =================
 */
-aRcFileMemory::aRcFileMemory( const char *name, const char *data, int length ) {
+anFileMemory::anFileMemory( const char *name, const char *data, int length ) {
 	this->name = name;
 	maxSize = 0;
 	fileSize = length;
@@ -647,31 +655,16 @@ aRcFileMemory::aRcFileMemory( const char *name, const char *data, int length ) {
 	granularity = 16384;
 
 	mode = ( 1 << FS_READ );
-	filePtr = const_cast<char *>( data);
-	curPtr = const_cast<char *>( data);
+	filePtr = const_cast<char *>( data );
+	curPtr = data;
 }
 
 /*
 =================
-aRcFileMemory::TakeDataOwnership
-
-this also makes the file read only
+anFileMemory::~anFileMemory
 =================
 */
-void aRcFileMemory::TakeDataOwnership() {
-	if ( filePtr != NULL && fileSize > 0 ) {
-		maxSize = 0;
-		mode = ( 1 << FS_READ );
-		allocated = fileSize;
-	}
-}
-
-/*
-=================
-aRcFileMemory::~aRcFileMemory
-=================
-*/
-aRcFileMemory::~aRcFileMemory() {
+anFileMemory::~anFileMemory( void ) {
 	if ( filePtr && allocated > 0 && maxSize == 0 ) {
 		Mem_Free( filePtr );
 	}
@@ -679,13 +672,12 @@ aRcFileMemory::~aRcFileMemory() {
 
 /*
 =================
-aRcFileMemory::Read
+anFileMemory::Read
 =================
 */
-int aRcFileMemory::Read( void *buffer, int len ) {
-
+int anFileMemory::Read( void *buffer, int len ) {
 	if ( !( mode & ( 1 << FS_READ ) ) ) {
-		common->FatalError( "aRcFileMemory::Read: %s not opened in read mode", name.c_str() );
+		common->FatalError( "anFileMemory::Read: %s not opened in read mode", name.c_str() );
 		return 0;
 	}
 
@@ -697,88 +689,36 @@ int aRcFileMemory::Read( void *buffer, int len ) {
 	return len;
 }
 
-arcCVarSystem memcpyImpl( "memcpyImpl", "0", 0, "Which implementation of memcpy to use for aRcFileMemory::Write() [0/1 - standard (1 eliminates branch misprediction), 2 - auto-vectorized]" );
-void * memcpy2( void * __restrict b, const void * __restrict a, size_t n ) {
-	char * s1 = (char *)b;
-	const char * s2 = (const char *)a;
-	for (; 0 < n; --n ) {
-		*s1++ = *s2++;
-	}
-	return b;
-}
-
 /*
 =================
-aRcFileMemory::Write
+anFileMemory::Write
 =================
 */
-idHashTableT< int, int > histogram;
-CONSOLE_COMMAND( outputHistogram, "", 0 ) {
-	for ( int i = 0; i < histogram.Num(); i++ ) {
-		int key;
-		histogram.GetIndexKey( i, key );
-		int * value = histogram.GetIndex( i );
-
-		arcLibrary::Printf( "%d\t%d\n", key, *value );
-	}
-}
-
-CONSOLE_COMMAND( clearHistogram, "", 0 ) {
-	histogram.Clear();
-}
-
-int aRcFileMemory::Write( const void *buffer, int len ) {
-	if ( len == 0 ) {
-		// ~4% falls into this case for some reason...
-		return 0;
-	}
-
+int anFileMemory::Write( const void *buffer, int len ) {
 	if ( !( mode & ( 1 << FS_WRITE ) ) ) {
-		common->FatalError( "aRcFileMemory::Write: %s not opened in write mode", name.c_str() );
+		common->FatalError( "anFileMemory::Write: %s not opened in write mode", name.c_str() );
 		return 0;
 	}
 
 	int alloc = curPtr + len + 1 - filePtr - allocated; // need room for len+1
 	if ( alloc > 0 ) {
 		if ( maxSize != 0 ) {
-			common->Error( "aRcFileMemory::Write: exceeded maximum size %d", maxSize );
+			common->Error( "anFileMemory::Write: exceeded maximum size %d", maxSize );
 			return 0;
 		}
 		int extra = granularity * ( 1 + alloc / granularity );
-		char *newPtr = (char *) Mem_Alloc( allocated + extra, TAG_IDFILE );
+		char *newPtr = (char *) Mem_Alloc( allocated + extra );
 		if ( allocated ) {
 			memcpy( newPtr, filePtr, allocated );
 		}
 		allocated += extra;
-		curPtr = newPtr + ( curPtr - filePtr );
+		curPtr = newPtr + ( curPtr - filePtr );		
 		if ( filePtr ) {
 			Mem_Free( filePtr );
 		}
 		filePtr = newPtr;
 	}
-
-	//memcpy( curPtr, buffer, len );
-	memcpy2( curPtr, buffer, len );
-
-#if 0
-	if ( memcpyImpl.GetInteger() == 0 ) {
-		memcpy( curPtr, buffer, len );
-	} else if ( memcpyImpl.GetInteger() == 1 ) {
-		memcpy( curPtr, buffer, len );
-	} else if ( memcpyImpl.GetInteger() == 2 ) {
-		memcpy2( curPtr, buffer, len );
-	}
-#endif
-
-#if 0
-	int * value;
-	if ( histogram.Get( len, &value ) && value != NULL ) {
-		(*value)++;
-	} else {
-		histogram.Set( len, 1 );
-	}
-#endif
-
+	memcpy( curPtr, buffer, len );
 	curPtr += len;
 	fileSize += len;
 	filePtr[ fileSize ] = 0; // len + 1
@@ -787,90 +727,58 @@ int aRcFileMemory::Write( const void *buffer, int len ) {
 
 /*
 =================
-aRcFileMemory::Length
+anFileMemory::Length
 =================
 */
-int aRcFileMemory::Length() const {
+int anFileMemory::Length( void ) {
 	return fileSize;
 }
 
 /*
-========================
-aRcFileMemory::SetLength
-========================
-*/
-void aRcFileMemory::SetLength( size_t len ) {
-	PreAllocate( len );
-	fileSize = len;
-}
-
-/*
-========================
-aRcFileMemory::PreAllocate
-========================
-*/
-void aRcFileMemory::PreAllocate( size_t len ) {
-	if ( len > allocated ) {
-		if ( maxSize != 0 ) {
-			arcLibrary::Error( "aRcFileMemory::SetLength: exceeded maximum size %d", maxSize );
-		}
-		char * newPtr = (char *)Mem_Alloc( len, TAG_IDFILE );
-		if ( allocated > 0 ) {
-			memcpy( newPtr, filePtr, allocated );
-		}
-		allocated = len;
-		curPtr = newPtr + ( curPtr - filePtr );
-		if ( filePtr != NULL ) {
-			Mem_Free( filePtr );
-		}
-		filePtr = newPtr;
-	}
-}
-
-/*
 =================
-aRcFileMemory::Timestamp
+anFileMemory::Timestamp
 =================
 */
-ARC_TIME_T aRcFileMemory::Timestamp() const {
+ARC_TIME_T anFileMemory::Timestamp( void ) {
 	return 0;
 }
 
 /*
 =================
-aRcFileMemory::Tell
+anFileMemory::Tell
 =================
 */
-int aRcFileMemory::Tell() const {
+int anFileMemory::Tell( void ) {
 	return ( curPtr - filePtr );
 }
 
 /*
 =================
-aRcFileMemory::ForceFlush
+anFileMemory::ForceFlush
 =================
 */
-void aRcFileMemory::ForceFlush() {
+void anFileMemory::ForceFlush( void ) {
 }
 
 /*
 =================
-aRcFileMemory::Flush
+anFileMemory::Flush
 =================
 */
-void aRcFileMemory::Flush() {
+void anFileMemory::Flush( void ) {
+	anFile *file = FS_FileForHandle( f );
+	setvbuf( file, nullptrptr, _IONBF, 0 );
 }
 
 /*
 =================
-aRcFileMemory::Seek
+anFileMemory::Seek
 
-  returns zero on success and -1 on failure
+returns zero on success and -1 on failure
 =================
 */
-int aRcFileMemory::Seek( long offset, fsOrigin_t origin ) {
-
-	switch( origin ) {
+int anFileMemory::Seek( long offset, fsOrigin_t origin ) {
+	switch ( origin ) {
 		case FS_SEEK_CUR: {
 			curPtr += offset;
 			break;
@@ -884,7 +792,7 @@ int aRcFileMemory::Seek( long offset, fsOrigin_t origin ) {
 			break;
 		}
 		default: {
-			common->FatalError( "aRcFileMemory::Seek: bad origin for %s\n", name.c_str() );
+			common->FatalError( "anFileMemory::Seek: bad origin for %s\n", name.c_str() );
 			return -1;
 		}
 	}
@@ -900,52 +808,28 @@ int aRcFileMemory::Seek( long offset, fsOrigin_t origin ) {
 }
 
 /*
-========================
-aRcFileMemory::SetMaxLength
-========================
-*/
-void aRcFileMemory::SetMaxLength( size_t len ) {
-	size_t oldLength = fileSize;
-
-	SetLength( len );
-
-	maxSize = len;
-	fileSize = oldLength;
-}
-
-/*
 =================
-aRcFileMemory::MakeReadOnly
+anFileMemory::MakeReadOnly
 =================
 */
-void aRcFileMemory::MakeReadOnly() {
+void anFileMemory::MakeReadOnly( void ) {
 	mode = ( 1 << FS_READ );
 	Rewind();
 }
 
 /*
-========================
-aRcFileMemory::MakeWritable
-========================
-*/
-void aRcFileMemory::MakeWritable() {
-	mode = ( 1 << FS_WRITE );
-	Rewind();
-}
-
-/*
 =================
-aRcFileMemory::Clear
+anFileMemory::Clear
 =================
 */
-void aRcFileMemory::Clear( bool freeMemory ) {
+void anFileMemory::Clear( bool freeMemory ) {
 	fileSize = 0;
 	granularity = 16384;
 	if ( freeMemory ) {
 		allocated = 0;
 		Mem_Free( filePtr );
-		filePtr = NULL;
-		curPtr = NULL;
+		filePtr = nullptrptr;
+		curPtr = nullptrptr;
 	} else {
 		curPtr = filePtr;
 	}
@@ -953,47 +837,33 @@ void aRcFileMemory::Clear( bool freeMemory ) {
 
 /*
 =================
-aRcFileMemory::SetData
+anFileMemory::SetData
 =================
 */
-void aRcFileMemory::SetData( const char *data, int length ) {
-	maxSize = 0;
+void anFileMemory::SetData( const char *data, int length ) {
 	fileSize = length;
+	maxSize = 0;
 	allocated = 0;
 	granularity = 16384;
-
-	mode = ( 1 << FS_READ );
-	filePtr = const_cast<char *>( data);
-	curPtr = const_cast<char *>( data);
-}
-
-/*
-========================
-aRcFileMemory::TruncateData
-========================
-*/
-void aRcFileMemory::TruncateData( size_t len ) {
-	if ( len > allocated ) {
-		arcLibrary::Error( "aRcFileMemory::TruncateData: len (%d) exceeded allocated size (%d)", len, allocated );
-	} else {
-		fileSize = len;
-	}
+	mode = 1 << FS_READ;
+	filePtr = const_cast<char *>( data );
+	curPtr = filePtr;
 }
 
 /*
 =================================================================================
 
-arcFile_BitMsg
+anFileBitMsg
 
 =================================================================================
 */
 
 /*
 =================
-arcFile_BitMsg::arcFile_BitMsg
+anFileBitMsg::anFileBitMsg
 =================
 */
-arcFile_BitMsg::arcFile_BitMsg( ARCBitMessage &msg ) {
+anFileBitMsg::anFileBitMsg( anBitMsg &msg ) {
 	name = "*unknown*";
 	mode = ( 1 << FS_WRITE );
 	this->msg = &msg;
@@ -1001,32 +871,31 @@ arcFile_BitMsg::arcFile_BitMsg( ARCBitMessage &msg ) {
 
 /*
 =================
-arcFile_BitMsg::arcFile_BitMsg
+anFileBitMsg::anFileBitMsg
 =================
 */
-arcFile_BitMsg::arcFile_BitMsg( const ARCBitMessage &msg ) {
+anFileBitMsg::anFileBitMsg( const anBitMsg &msg ) {
 	name = "*unknown*";
 	mode = ( 1 << FS_READ );
-	this->msg = const_cast<ARCBitMessage *>(&msg);
+	this->msg = const_cast<anBitMsg *>( &msg );
 }
 
 /*
 =================
-arcFile_BitMsg::~arcFile_BitMsg
+anFileBitMsg::~anFileBitMsg
 =================
 */
-arcFile_BitMsg::~arcFile_BitMsg() {
+anFileBitMsg::~anFileBitMsg( void ) {
 }
 
 /*
 =================
-arcFile_BitMsg::Read
+anFileBitMsg::Read
 =================
 */
-int arcFile_BitMsg::Read( void *buffer, int len ) {
-
+int anFileBitMsg::Read( void *buffer, int len ) {
 	if ( !( mode & ( 1 << FS_READ ) ) ) {
-		common->FatalError( "arcFile_BitMsg::Read: %s not opened in read mode", name.c_str() );
+		common->FatalError( "anFileBitMsg::Read: %s not opened in read mode", name.c_str() );
 		return 0;
 	}
 
@@ -1035,13 +904,12 @@ int arcFile_BitMsg::Read( void *buffer, int len ) {
 
 /*
 =================
-arcFile_BitMsg::Write
+anFileBitMsg::Write
 =================
 */
-int arcFile_BitMsg::Write( const void *buffer, int len ) {
-
+int anFileBitMsg::Write( const void *buffer, int len ) {
 	if ( !( mode & ( 1 << FS_WRITE ) ) ) {
-		common->FatalError( "aRcFileMemory::Write: %s not opened in write mode", name.c_str() );
+		common->FatalError( "anFileMemory::Write: %s not opened in write mode", name.c_str() );
 		return 0;
 	}
 
@@ -1051,29 +919,29 @@ int arcFile_BitMsg::Write( const void *buffer, int len ) {
 
 /*
 =================
-arcFile_BitMsg::Length
+anFileBitMsg::Length
 =================
 */
-int arcFile_BitMsg::Length() const {
+int anFileBitMsg::Length( void ) {
 	return msg->GetSize();
 }
 
 /*
 =================
-arcFile_BitMsg::Timestamp
+anFileBitMsg::Timestamp
 =================
 */
-ARC_TIME_T arcFile_BitMsg::Timestamp() const {
+ARC_TIME_T anFileBitMsg::Timestamp( void ) {
 	return 0;
 }
 
 /*
 =================
-arcFile_BitMsg::Tell
+anFileBitMsg::Tell
 =================
 */
-int arcFile_BitMsg::Tell() const {
-	if ( mode == FS_READ ) {
+int anFileBitMsg::Tell( void ) {
+	if ( mode & FS_READ ) {
 		return msg->GetReadCount();
 	} else {
 		return msg->GetSize();
@@ -1082,28 +950,28 @@ int arcFile_BitMsg::Tell() const {
 
 /*
 =================
-arcFile_BitMsg::ForceFlush
+anFileBitMsg::ForceFlush
 =================
 */
-void arcFile_BitMsg::ForceFlush() {
+void anFileBitMsg::ForceFlush( void ) {
 }
 
 /*
 =================
-arcFile_BitMsg::Flush
+anFileBitMsg::Flush
 =================
 */
-void arcFile_BitMsg::Flush() {
+void anFileBitMsg::Flush( void ) {
 }
 
 /*
 =================
-arcFile_BitMsg::Seek
+anFileBitMsg::Seek
 
   returns zero on success and -1 on failure
 =================
 */
-int arcFile_BitMsg::Seek( long offset, fsOrigin_t origin ) {
+int anFileBitMsg::Seek( long offset, fsOrigin_t origin ) {
 	return -1;
 }
 
@@ -1111,19 +979,19 @@ int arcFile_BitMsg::Seek( long offset, fsOrigin_t origin ) {
 /*
 =================================================================================
 
-arcFile_Permanent
+anFilePermanent
 
 =================================================================================
 */
 
 /*
 =================
-arcFile_Permanent::arcFile_Permanent
+anFilePermanent::anFilePermanent
 =================
 */
-arcFile_Permanent::arcFile_Permanent() {
+anFilePermanent::anFilePermanent( void ) {
 	name = "invalid";
-	o = NULL;
+	o = nullptr;
 	mode = 0;
 	fileSize = 0;
 	handleSync = false;
@@ -1131,30 +999,30 @@ arcFile_Permanent::arcFile_Permanent() {
 
 /*
 =================
-arcFile_Permanent::~arcFile_Permanent
+anFilePermanent::~anFilePermanent
 =================
 */
-arcFile_Permanent::~arcFile_Permanent() {
+anFilePermanent::~anFilePermanent( void ) {
 	if ( o ) {
-		CloseHandle( o );
+		fclose( o );
 	}
 }
 
 /*
 =================
-arcFile_Permanent::Read
+anFilePermanent::Read
 
 Properly handles partial reads
 =================
 */
-int arcFile_Permanent::Read( void *buffer, int len ) {
+int anFilePermanent::Read( void *buffer, int len ) {
 	int		block, remaining;
 	int		read;
 	byte *	buf;
 	int		tries;
 
-	if ( !(mode & ( 1 << FS_READ ) ) ) {
-		common->FatalError( "arcFile_Permanent::Read: %s not opened in read mode", name.c_str() );
+	if ( !( mode & ( 1 << FS_READ ) ) ) {
+		common->FatalError( "anFilePermanent::Read: %s not opened in read mode", name.c_str() );
 		return 0;
 	}
 
@@ -1162,53 +1030,50 @@ int arcFile_Permanent::Read( void *buffer, int len ) {
 		return 0;
 	}
 
-	buf = ( byte * )buffer;
+	buf = (byte *)buffer;
 
 	remaining = len;
 	tries = 0;
-	while( remaining ) {
+	while ( remaining ) {
 		block = remaining;
-		DWORD bytesRead;
-		if ( !ReadFile( o, buf, block, &bytesRead, NULL ) ) {
-			arcLibrary::Warning( "arcFile_Permanent::Read failed with %d from %s", GetLastError(), name.c_str() );
-		}
-		read = bytesRead;
+		read = fread( buf, 1, block, o );
 		if ( read == 0 ) {
 			// we might have been trying to read from a CD, which
 			// sometimes returns a 0 read on windows
 			if ( !tries ) {
 				tries = 1;
-			}
-			else {
+			} else {
+				fileSystem->AddToReadCount( len - remaining );
 				return len-remaining;
 			}
 		}
 
 		if ( read == -1 ) {
-			common->FatalError( "arcFile_Permanent::Read: -1 bytes read from %s", name.c_str() );
+			common->FatalError( "anFilePermanent::Read: -1 bytes read from %s", name.c_str() );
 		}
 
 		remaining -= read;
 		buf += read;
 	}
+	fileSystem->AddToReadCount( len );
 	return len;
 }
 
 /*
 =================
-arcFile_Permanent::Write
+anFilePermanent::Write
 
 Properly handles partial writes
 =================
 */
-int arcFile_Permanent::Write( const void *buffer, int len ) {
+int anFilePermanent::Write( const void *buffer, int len ) {
 	int		block, remaining;
 	int		written;
 	byte *	buf;
 	int		tries;
 
 	if ( !( mode & ( 1 << FS_WRITE ) ) ) {
-		common->FatalError( "arcFile_Permanent::Write: %s not opened in write mode", name.c_str() );
+		common->FatalError( "anFilePermanent::Write: %s not opened in write mode", name.c_str() );
 		return 0;
 	}
 
@@ -1216,27 +1081,25 @@ int arcFile_Permanent::Write( const void *buffer, int len ) {
 		return 0;
 	}
 
-	buf = ( byte * )buffer;
+	buf = (byte *)buffer;
 
 	remaining = len;
 	tries = 0;
 	while( remaining ) {
 		block = remaining;
-		DWORD bytesWritten;
-		WriteFile( o, buf, block, &bytesWritten, NULL );
-		written = bytesWritten;
+		written = fwrite( buf, 1, block, o );
 		if ( written == 0 ) {
 			if ( !tries ) {
 				tries = 1;
 			}
 			else {
-				common->Printf( "arcFile_Permanent::Write: 0 bytes written to %s\n", name.c_str() );
+				common->Printf( "anFilePermanent::Write: 0 bytes written to %s\n", name.c_str() );
 				return 0;
 			}
 		}
 
 		if ( written == -1 ) {
-			common->Printf( "arcFile_Permanent::Write: -1 bytes written to %s\n", name.c_str() );
+			common->Printf( "anFilePermanent::Write: -1 bytes written to %s\n", name.c_str() );
 			return 0;
 		}
 
@@ -1245,190 +1108,104 @@ int arcFile_Permanent::Write( const void *buffer, int len ) {
 		fileSize += written;
 	}
 	if ( handleSync ) {
-		Flush();
+		fflush( o );
 	}
 	return len;
 }
 
 /*
 =================
-arcFile_Permanent::ForceFlush
+anFilePermanent::ForceFlush
 =================
 */
-void arcFile_Permanent::ForceFlush() {
-	FlushFileBuffers( o );
+void anFilePermanent::ForceFlush( void ) {
+	setvbuf( o, nullptr, _IONBF, 0 );
 }
 
 /*
 =================
-arcFile_Permanent::Flush
+anFilePermanent::Flush
 =================
 */
-void arcFile_Permanent::Flush() {
-	FlushFileBuffers( o );
+void anFilePermanent::Flush( void ) {
+	fflush( o );
 }
 
 /*
 =================
-arcFile_Permanent::Tell
+anFilePermanent::Tell
 =================
 */
-int arcFile_Permanent::Tell() const {
-	return SetFilePointer( o, 0, NULL, FILE_CURRENT );
+int anFilePermanent::Tell( void ) {
+	return ftell( o );
 }
 
 /*
 ================
-arcFile_Permanent::Length
+anFilePermanent::Length
 ================
 */
-int arcFile_Permanent::Length() const {
+int anFilePermanent::Length( void ) {
 	return fileSize;
 }
 
 /*
 ================
-arcFile_Permanent::Timestamp
+anFilePermanent::Timestamp
 ================
 */
-ARC_TIME_T arcFile_Permanent::Timestamp() const {
-	ARC_TIME_T ts = Sys_FileTimeStamp( o );
-	return ts;
+ARC_TIME_T anFilePermanent::Timestamp( void ) {
+	return Sys_FileTimeStamp( o );
 }
 
 /*
 =================
-arcFile_Permanent::Seek
+anFilePermanent::Seek
 
   returns zero on success and -1 on failure
 =================
 */
-int arcFile_Permanent::Seek( long offset, fsOrigin_t origin ) {
-	int retVal = INVALID_SET_FILE_POINTER;
-	switch( origin ) {
-		case FS_SEEK_CUR: retVal = SetFilePointer( o, offset, NULL, FILE_CURRENT ); break;
-		case FS_SEEK_END: retVal = SetFilePointer( o, offset, NULL, FILE_END ); break;
-		case FS_SEEK_SET: retVal = SetFilePointer( o, offset, NULL, FILE_BEGIN ); break;
-	}
-	return ( retVal == INVALID_SET_FILE_POINTER ) ? -1 : 0;
-}
+int anFilePermanent::Seek( long offset, fsOrigin_t origin ) {
+	int _origin;
 
-#if 1
-/*
-=================================================================================
-
-arcFile_Cached
-
-=================================================================================
-*/
-
-/*
-=================
-arcFile_Cached::arcFile_Cached
-=================
-*/
-arcFile_Cached::arcFile_Cached() : arcFile_Permanent() {
-	internalFilePos = 0;
-	bufferedStartOffset = 0;
-	bufferedEndOffset = 0;
-	buffered = NULL;
-}
-
-/*
-=================
-arcFile_Cached::~arcFile_Cached
-=================
-*/
-arcFile_Cached::~arcFile_Cached() {
-	Mem_Free( buffered );
-}
-
-/*
-=================
-arcFile_ReadBuffered::BufferData
-
-Buffer a section of the file
-=================
-*/
-void arcFile_Cached::CacheData( uint64 offset, uint64 length ) {
-	Mem_Free( buffered );
-	bufferedStartOffset = offset;
-	bufferedEndOffset = offset + length;
-	buffered = ( byte* )Mem_Alloc( length, TAG_RESOURCE );
-	if ( buffered == NULL ) {
-		return;
-	}
-	int internalFilePos = arcFile_Permanent::Tell();
-	arcFile_Permanent::Seek( offset, FS_SEEK_SET );
-	arcFile_Permanent::Read( buffered, length );
-	arcFile_Permanent::Seek( internalFilePos, FS_SEEK_SET );
-}
-
-/*
-=================
-arcFile_ReadBuffered::Read
-
-=================
-*/
-int arcFile_Cached::Read( void *buffer, int len ) {
-	if ( internalFilePos >= bufferedStartOffset && internalFilePos + len < bufferedEndOffset ) {
-		// this is in the buffer
-		memcpy( buffer, (void*)&buffered[ internalFilePos - bufferedStartOffset ], len );
-		internalFilePos += len;
-		return len;
-	}
-	int read = arcFile_Permanent::Read( buffer, len );
-	if ( read != -1 ) {
-		internalFilePos += ( int64 )read;
-	}
-	return read;
-}
-
-
-
-/*
-=================
-arcFile_Cached::Tell
-=================
-*/
-int arcFile_Cached::Tell() const {
-	return internalFilePos;
-}
-
-/*
-=================
-arcFile_Cached::Seek
-
-  returns zero on success and -1 on failure
-=================
-*/
-int arcFile_Cached::Seek( long offset, fsOrigin_t origin ) {
-	if ( origin == FS_SEEK_SET && offset >= bufferedStartOffset && offset < bufferedEndOffset ) {
-		// don't do anything to the actual file ptr, just update or internal position
-		internalFilePos = offset;
-		return 0;
+	switch ( origin ) {
+		case FS_SEEK_CUR: {
+			_origin = SEEK_CUR;
+			break;
+		}
+		case FS_SEEK_END: {
+			_origin = SEEK_END;
+			break;
+		}
+		case FS_SEEK_SET: {
+			_origin = SEEK_SET;
+			break;
+		}
+		default: {
+			_origin = SEEK_CUR;
+			common->FatalError( "anFilePermanent::Seek: bad origin for %s\n", name.c_str() );
+			break;
+		}
 	}
 
-	int retVal = arcFile_Permanent::Seek( offset, origin );
-	internalFilePos = arcFile_Permanent::Tell();
-	return retVal;
+	return fseek( o, offset, _origin );
 }
-#endif
+
 
 /*
 =================================================================================
 
-arcFile_InZip
+anCompressedArchive
 
 =================================================================================
 */
 
 /*
 =================
-arcFile_InZip::arcFile_InZip
+anCompressedArchive::anCompressedArchive
 =================
 */
-arcFile_InZip::arcFile_InZip() {
+anCompressedArchive::anCompressedArchive( void ) {
 	name = "invalid";
 	zipFilePos = 0;
 	fileSize = 0;
@@ -1437,102 +1214,103 @@ arcFile_InZip::arcFile_InZip() {
 
 /*
 =================
-arcFile_InZip::~arcFile_InZip
+anCompressedArchive::~anCompressedArchive
 =================
 */
-arcFile_InZip::~arcFile_InZip() {
-	unzCloseCurrentFile( z );
-	unzClose( z );
+anCompressedArchive::~anCompressedArchive( void ) {
+	PAK_CloseCurrentFile( z );
+	PAK_Close( z );
 }
 
 /*
 =================
-arcFile_InZip::Read
+anCompressedArchive::Read
 
 Properly handles partial reads
 =================
 */
-int arcFile_InZip::Read( void *buffer, int len ) {
+int anCompressedArchive::Read( void *buffer, int len ) {
 	int l = unzReadCurrentFile( z, buffer, len );
+	fileSystem->AddToReadCount( l );
 	return l;
 }
 
 /*
 =================
-arcFile_InZip::Write
+anCompressedArchive::Write
 =================
 */
-int arcFile_InZip::Write( const void *buffer, int len ) {
-	common->FatalError( "arcFile_InZip::Write: cannot write to the zipped file %s", name.c_str() );
+int anCompressedArchive::Write( const void *buffer, int len ) {
+	common->FatalError( "anCompressedArchive::Write: cannot write to the zipped file %s", name.c_str() );
 	return 0;
 }
 
 /*
 =================
-arcFile_InZip::ForceFlush
+anCompressedArchive::ForceFlush
 =================
 */
-void arcFile_InZip::ForceFlush() {
-	common->FatalError( "arcFile_InZip::ForceFlush: cannot flush the zipped file %s", name.c_str() );
+void anCompressedArchive::ForceFlush( void ) {
+	common->FatalError( "anCompressedArchive::ForceFlush: cannot flush the zipped file %s", name.c_str() );
 }
 
 /*
 =================
-arcFile_InZip::Flush
+anCompressedArchive::Flush
 =================
 */
-void arcFile_InZip::Flush() {
-	common->FatalError( "arcFile_InZip::Flush: cannot flush the zipped file %s", name.c_str() );
+void anCompressedArchive::Flush( void ) {
+	common->FatalError( "anCompressedArchive::Flush: cannot flush the zipped file %s", name.c_str() );
 }
 
 /*
 =================
-arcFile_InZip::Tell
+anCompressedArchive::Tell
 =================
 */
-int arcFile_InZip::Tell() const {
-	return unztell( z );
+int anCompressedArchive::Tell( void ) {
+	return PAK_Tell( z );
 }
 
 /*
 ================
-arcFile_InZip::Length
+anCompressedArchive::Length
 ================
 */
-int arcFile_InZip::Length() const {
+int anCompressedArchive::Length( void ) {
 	return fileSize;
 }
 
 /*
 ================
-arcFile_InZip::Timestamp
+anCompressedArchive::Timestamp
 ================
 */
-ARC_TIME_T arcFile_InZip::Timestamp() const {
+ARC_TIME_T anCompressedArchive::Timestamp( void ) {
 	return 0;
 }
 
 /*
 =================
-arcFile_InZip::Seek
+anCompressedArchive::Seek
 
   returns zero on success and -1 on failure
 =================
 */
 #define ZIP_SEEK_BUF_SIZE	(1<<15)
 
-int arcFile_InZip::Seek( long offset, fsOrigin_t origin ) {
+int anCompressedArchive::Seek( long offset, fsOrigin_t origin ) {
 	int res, i;
 	char *buf;
 
-	switch( origin ) {
+	switch ( origin ) {
 		case FS_SEEK_END: {
 			offset = fileSize - offset;
 		}
 		case FS_SEEK_SET: {
 			// set the file position in the zip file (also sets the current file info)
-			unzSetCurrentFileInfoPosition( z, zipFilePos );
-			unzOpenCurrentFile( z );
+			PAK_SetFileDataLocation( z, zipFilePos );
+			PAK_OpenCurrentFile( z );
 			if ( offset <= 0 ) {
 				return 0;
 			}
@@ -1549,232 +1327,9 @@ int arcFile_InZip::Seek( long offset, fsOrigin_t origin ) {
 			return ( res == offset ) ? 0 : -1;
 		}
 		default: {
-			common->FatalError( "arcFile_InZip::Seek: bad origin for %s\n", name.c_str() );
+			common->FatalError( "anCompressedArchive::Seek: bad origin for %s\n", name.c_str() );
 			break;
 		}
 	}
 	return -1;
 }
-
-#if 1
-
-/*
-=================================================================================
-
-arcFile_InnerResource
-
-=================================================================================
-*/
-
-/*
-=================
-arcFile_InnerResource::arcFile_InnerResource
-=================
-*/
-arcFile_InnerResource::arcFile_InnerResource( const char *_name, arcNetFile *rezFile, int _offset, int _len ) {
-	name = _name;
-	offset = _offset;
-	length = _len;
-	resourceFile = rezFile;
-	internalFilePos = 0;
-	resourceBuffer = NULL;
-}
-
-/*
-=================
-arcFile_InnerResource::~arcFile_InnerResource
-=================
-*/
-arcFile_InnerResource::~arcFile_InnerResource() {
-	if ( resourceBuffer != NULL ) {
-		fileSystem->FreeResourceBuffer();
-	}
-}
-
-/*
-=================
-arcFile_InnerResource::Read
-
-Properly handles partial reads
-=================
-*/
-int arcFile_InnerResource::Read( void *buffer, int len ) {
-	if ( resourceFile == NULL ) {
-		return 0;
-	}
-
-	if ( internalFilePos + len > length ) {
-		len = length - internalFilePos;
-	}
-
-	int read = 0; //fileSystem->ReadFromBGL( resourceFile, (byte*)buffer, offset + internalFilePos, len );
-
-	if ( read != len ) {
-		if ( resourceBuffer != NULL ) {
-			memcpy( buffer, &resourceBuffer[ internalFilePos ], len );
-			read = len;
-		} else {
-			read = fileSystem->ReadFromBGL( resourceFile, buffer, offset + internalFilePos, len );
-		}
-	}
-
-	internalFilePos += read;
-
-	return read;
-}
-
-/*
-=================
-arcFile_InnerResource::Tell
-=================
-*/
-int arcFile_InnerResource::Tell() const {
-	return internalFilePos;
-}
-
-
-/*
-=================
-arcFile_InnerResource::Seek
-
-  returns zero on success and -1 on failure
-=================
-*/
-
-int arcFile_InnerResource::Seek( long offset, fsOrigin_t origin ) {
-	switch( origin ) {
-		case FS_SEEK_END: {
-			internalFilePos = length - offset - 1;
-			return 0;
-		}
-		case FS_SEEK_SET: {
-			internalFilePos = offset;
-			if ( internalFilePos >= 0 && internalFilePos < length ) {
-				return 0;
-			}
-			return -1;
-		}
-		case FS_SEEK_CUR: {
-			internalFilePos += offset;
-			if ( internalFilePos >= 0 && internalFilePos < length ) {
-				return 0;
-			}
-			return -1;
-		}
-		default: {
-			common->FatalError( "arcFile_InnerResource::Seek: bad origin for %s\n", name.c_str() );
-			break;
-		}
-	}
-	return -1;
-}
-#endif
-
-/*
-================================================================================================
-
-arcFileLocal
-
-================================================================================================
-*/
-
-/*
-========================
-arcFileLocal::~arcFileLocal
-
-Destructor that will destroy (close) the managed file when this wrapper class goes out of scope.
-========================
-*/
-arcFileLocal::~arcFileLocal() {
-	if ( file != NULL ) {
-		delete file;
-		file = NULL;
-	}
-}
-
-static const char * testEndianNessFilename = "temp.bin";
-struct testEndianNess_t {
-	testEndianNess_t() {
-		a = 0x12345678;
-		b = 0x12345678;
-		c = 3.0f;
-		d = -4.0f;
-		e = "test";
-		f = arcVec3( 1.0f, 2.0f, -3.0f );
-		g = false;
-		h = true;
-		for ( int index = 0; index < sizeof( i ); index++ ) {
-			i[index] = 0x37;
-		}
-	}
-	bool operator==( testEndianNess_t & test ) const {
-		return a == test.a &&
-			b == test.b &&
-			c == test.c &&
-			d == test.d &&
-			e == test.e &&
-			f == test.f &&
-			g == test.g &&
-			h == test.h &&
-			( memcmp( i, test.i, sizeof( i ) ) == 0 );
-	}
-	int				a;
-	unsigned int	b;
-	float			c;
-	float			d;
-	arcNetString			e;
-	arcVec3			f;
-	bool			g;
-	bool			h;
-	byte			i[10];
-};
-CONSOLE_COMMAND( testEndianNessWrite, "Tests the read/write compatibility between platforms", 0 ) {
-	arcFileLocal file( fileSystem->OpenFileWrite( testEndianNessFilename ) );
-	if ( file == NULL ) {
-		arcLibrary::Printf( "Couldn't open the %s testfile.\n", testEndianNessFilename );
-		return;
-	}
-
-	testEndianNess_t testData;
-
-	file->WriteBig( testData.a );
-	file->WriteBig( testData.b );
-	file->WriteFloat( testData.c );
-	file->WriteFloat( testData.d );
-	file->WriteString( testData.e );
-	file->WriteVec3( testData.f );
-	file->WriteBig( testData.g );
-	file->WriteBig( testData.h );
-	file->Write( testData.i, sizeof( testData.i )/ sizeof( testData.i[0] ) );
-}
-
-CONSOLE_COMMAND( testEndianNessRead, "Tests the read/write compatibility between platforms", 0 ) {
-	arcFileLocal file( fileSystem->OpenFileRead( testEndianNessFilename ) );
-	if ( file == NULL ) {
-		arcLibrary::Printf( "Couldn't find the %s testfile.\n", testEndianNessFilename );
-		return;
-	}
-
-	testEndianNess_t srcData;
-	testEndianNess_t testData;
-
-	memset( &testData, 0, sizeof( testData ) );
-
-	file->ReadBig( testData.a );
-	file->ReadBig( testData.b );
-	file->ReadFloat( testData.c );
-	file->ReadFloat( testData.d );
-	file->ReadString( testData.e );
-	file->ReadVec3( testData.f );
-	file->ReadBig( testData.g );
-	file->ReadBig( testData.h );
-	file->Read( testData.i, sizeof( testData.i )/ sizeof( testData.i[0] ) );
-
-	assert( srcData == testData );
-}
-
-CONSOLE_COMMAND( testEndianNessReset, "Tests the read/write compatibility between platforms", 0 ) {
-	fileSystem->RemoveFile( testEndianNessFilename );
-}
-
-

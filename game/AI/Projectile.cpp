@@ -1,9 +1,9 @@
-// RAVEN BEGIN
+
 // bdube: note that this file is no longer merged with Doom3 updates
 //
 // MERGE_DATE 09/30/2004
 
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Game_local.h"
@@ -22,12 +22,12 @@
 static const float BOUNCE_SOUND_MIN_VELOCITY	= 200.0f;
 static const float BOUNCE_SOUND_MAX_VELOCITY	= 400.0f;
 
-const idEventDef EV_Explode( "<explode>", NULL );
-const idEventDef EV_Fizzle( "<fizzle>", NULL );
-const idEventDef EV_RadiusDamage( "<radiusdmg>", "E" );
-const idEventDef EV_ResidualDamage ( "<residualdmg>", "E" );
+const anEventDef EV_Explode( "<explode>", nullptr );
+const anEventDef EV_Fizzle( "<fizzle>", nullptr );
+const anEventDef EV_RadiusDamage( "<radiusdmg>", "E" );
+const anEventDef EV_ResidualDamage ( "<residualdmg>", "E" );
 
-CLASS_DECLARATION( idEntity, idProjectile )
+CLASS_DECLARATION( anEntity, idProjectile )
 	EVENT( EV_Explode,			idProjectile::Event_Explode )
 	EVENT( EV_Fizzle,			idProjectile::Event_Fizzle )
 	EVENT( EV_Touch,			idProjectile::Event_Touch )
@@ -42,7 +42,7 @@ idProjectile::idProjectile
 */
 idProjectile::idProjectile( void ) {
 	methodOfDeath		= -1;
-	owner				= NULL;
+	owner				= nullptr;
 	memset( &projectileFlags, 0, sizeof( projectileFlags ) );
 	damagePower			= 1.0f;
 
@@ -61,7 +61,7 @@ idProjectile::idProjectile( void ) {
 
 	rotation.Init( 0, 0.0f, mat3_identity.ToQuat(), mat3_identity.ToQuat() );
 
-	flyEffect			= NULL;
+	flyEffect			= nullptr;
 	flyEffectAttenuateSpeed = 0.0f;
 	bounceCount			= 0;
 	hitCount			= 0;
@@ -86,15 +86,15 @@ idProjectile::Spawn
 */
 void idProjectile::Spawn( void ) {
  	physicsObj.SetSelf( this );
-// RAVEN BEGIN
+
 // mwhitlock: Dynamic memory consolidation
-	RV_PUSH_HEAP_MEM(this);
-// RAVEN END
- 	physicsObj.SetClipModel( new idClipModel( GetPhysics()->GetClipModel() ), 1.0f );
-// RAVEN BEGIN
+	PUSH_HEAP_MEM(this);
+
+ 	physicsObj.SetClipModel( new anClipModel( GetPhysics()->GetClipModel() ), 1.0f );
+
 // mwhitlock: Dynamic memory consolidation
-	RV_POP_HEAP();
-// RAVEN END
+	POP_HEAP();
+
  	physicsObj.SetContents( 0 );
  	physicsObj.SetClipMask( 0 );
  	physicsObj.PutToRest();
@@ -112,7 +112,7 @@ void idProjectile::Spawn( void ) {
 idProjectile::Save
 ================
 */
-void idProjectile::Save( idSaveGame *savefile ) const {
+void idProjectile::Save( anSaveGame *savefile ) const {
 
 	savefile->WriteInt( methodOfDeath );				// cnicholson: Added unsaved var
 	owner.Save( savefile );
@@ -154,18 +154,18 @@ void idProjectile::Save( idSaveGame *savefile ) const {
 idProjectile::Restore
 ================
 */
-void idProjectile::Restore( idRestoreGame *savefile ) {
+void idProjectile::Restore( anRestoreGame *savefile ) {
 	float	fset;
-	arcVec3	temp;
+	anVec3	temp;
 
-	savefile->ReadInt( methodOfDeath );					// cnicholson: Added unrestored var
+	savefile->ReadInt( methodOfDeath );
 	owner.Restore( savefile );
 	savefile->Read( &projectileFlags, sizeof( projectileFlags ) );
 	savefile->ReadFloat( damagePower );
 
 	savefile->ReadRenderLight( renderLight );
 
-	savefile->ReadInt( (int &)lightDefHandle );
+	savefile->ReadInt( ( int&)lightDefHandle );
 	if ( lightDefHandle != -1 ) {
 		//get the handle again as it's out of date after a restore!
 		lightDefHandle = gameRenderWorld->AddLightDef( &renderLight );
@@ -200,7 +200,7 @@ void idProjectile::Restore( idRestoreGame *savefile ) {
 	savefile->ReadInt ( bounceCount );
 	savefile->ReadInt ( hitCount );
 
-	savefile->ReadInt( (int &)state );
+	savefile->ReadInt( ( int&)state );
 }
 
 /*
@@ -208,7 +208,7 @@ void idProjectile::Restore( idRestoreGame *savefile ) {
 idProjectile::GetOwner
 ================
 */
-idEntity *idProjectile::GetOwner( void ) const {
+anEntity *idProjectile::GetOwner( void ) const {
 	return owner.GetEntity();
 }
 
@@ -218,7 +218,7 @@ idProjectile::SetSpeed
 ================
 */
 void idProjectile::SetSpeed( float s, int accelTime ) {
-	arcVec3 vel;
+	anVec3 vel;
 	vel = physicsObj.GetLinearVelocity();
 	vel.Normalize();
 	speed.Init( gameLocal.time, accelTime, speed.GetCurrentValue(gameLocal.time), s );
@@ -238,13 +238,13 @@ void idProjectile::SetSpeed( float s, int accelTime ) {
 idProjectile::Create
 ================
 */
-void idProjectile::Create( idEntity* _owner, const arcVec3 &start, const arcVec3 &dir, idEntity* ignore, idEntity* extraPassEntity ) {
-	idDict		args;
-	idStr		shaderName;
-	arcVec3		light_color;
-	arcVec3		light_offset;
-	arcVec3		tmp;
-	arcMat3		axis;
+void idProjectile::Create( anEntity* _owner, const anVec3 &start, const anVec3 &dir, anEntity* ignore, anEntity* extraPassEntity ) {
+	anDict		args;
+	anString		shaderName;
+	anVec3		light_color;
+	anVec3		light_offset;
+	anVec3		tmp;
+	anMat3		axis;
 
 	Unbind();
 
@@ -271,12 +271,12 @@ void idProjectile::Create( idEntity* _owner, const arcVec3 &start, const arcVec3
 		renderLight.shaderParms[1] = light_color[1];
 		renderLight.shaderParms[2] = light_color[2];
 		renderLight.shaderParms[3] = 1.0f;
-// RAVEN BEGIN
+
 // dluetscher: added detail levels to render lights
 		renderLight.detailLevel = DEFAULT_LIGHT_DETAIL_LEVEL;
 // dluetscher: set the projectile lights to be no shadows
-		renderLight.noShadows = cvarSystem->GetCVarInteger("com_machineSpec") < 3;
-// RAVEN END
+		renderLight.noShadows = cvarSystem->GetCVarInteger( "com_machineSpec" ) < 3;
+
 	}
 
 	spawnArgs.GetVector( "light_offset", "0 0 0", lightOffset );
@@ -299,7 +299,7 @@ idProjectile::~idProjectile
 idProjectile::~idProjectile() {
 	StopSound( SND_CHANNEL_ANY, false );
 	FreeLightDef();
-	SetPhysics( NULL );
+	SetPhysics( nullptr );
 }
 
 /*
@@ -319,9 +319,9 @@ void idProjectile::FreeLightDef( void ) {
 idProjectile::Launch
 =================
 */
-void idProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const arcVec3 &pushVelocity, const float timeSinceFire, const float dmgPower ) {
+void idProjectile::Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire, const float dmgPower ) {
 	float			fuse;
-	arcVec3			velocity;
+	anVec3			velocity;
 	float			linear_friction;
 	float			angular_friction;
 	float			contact_friction;
@@ -329,13 +329,13 @@ void idProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const arcVe
 	float			mass;
 	float			gravity;
 	float			temp, temp2;
-	arcVec3			gravVec;
-	arcVec3			tmp;
+	anVec3			gravVec;
+	anVec3			tmp;
 	int				contents;
  	int				clipMask;
 
  	// allow characters to throw projectiles during cinematics, but not the player
- 	if ( owner.GetEntity() && !owner.GetEntity()->IsType( idPlayer::GetClassType() ) ) {
+ 	if ( owner.GetEntity() && !owner.GetEntity()->IsType( anBasePlayer::GetClassType() ) ) {
  		cinematic = owner.GetEntity()->cinematic;
  	} else {
  		cinematic = false;
@@ -379,11 +379,11 @@ void idProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const arcVe
 	bounceCount			= spawnArgs.GetInt( "bounce_count", "-1" );
 
 	//spawn impact entity information
-	impactEntity				= spawnArgs.GetString("def_impactEntity","");
-	numImpactEntities			= spawnArgs.GetInt("numImpactEntities","0");
-	ieMinPitch					= spawnArgs.GetInt("ieMinPitch","0");
-	ieMaxPitch					= spawnArgs.GetInt("ieMaxPitch","0");
-	ieSlicePercentage			= spawnArgs.GetFloat("ieSlicePercentage","0.0");
+	impactEntity				= spawnArgs.GetString( "def_impactEntity","" );
+	numImpactEntities			= spawnArgs.GetInt( "numImpactEntities","0" );
+	ieMinPitch					= spawnArgs.GetInt( "ieMinPitch","0" );
+	ieMaxPitch					= spawnArgs.GetInt( "ieMaxPitch","0" );
+	ieSlicePercentage			= spawnArgs.GetFloat( "ieSlicePercentage","0.0" );
 
 	projectileFlags.detonate_on_world	= spawnArgs.GetBool( "detonate_on_world" );
 	projectileFlags.detonate_on_actor	= spawnArgs.GetBool( "detonate_on_actor" );
@@ -399,10 +399,10 @@ void idProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const arcVe
 		fl.takedamage = true;
 	}
 
-// RAVEN BEGIN
+
 // abahr:
-	gravVec = ( arcMath::Fabs(gravity) > VECTOR_EPSILON ) ? gameLocal.GetCurrentGravity(this) * gravity : vec3_zero;
-// RAVEN END
+	gravVec = ( anMath::Fabs(gravity) > VECTOR_EPSILON ) ? gameLocal.GetCurrentGravity(this) * gravity : vec3_zero;
+
 
 	Unbind();
 
@@ -424,7 +424,7 @@ void idProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const arcVe
 	}
 
 	if ( spawnArgs.GetBool( "detonate_on_trigger" ) ) {
-		contents |= CONTENTS_TRIGGER;
+		contents |= CONTENTS_TRIGGER_SEAS;
 	}
 
  	if ( !spawnArgs.GetBool( "no_contents", "1" ) ) {
@@ -473,9 +473,9 @@ void idProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const arcVe
 	rotation.Init( gameLocal.GetTime(), 0.0f, q, q );
 
 	if ( projectileFlags.isTracer ) {
-		StartSound( "snd_tracer", SND_CHANNEL_BODY, 0, false, NULL );
+		StartSound( "snd_tracer", SND_CHANNEL_BODY, 0, false, nullptr );
 	} else {
-		StartSound( "snd_fly", SND_CHANNEL_BODY, 0, false, NULL );
+		StartSound( "snd_fly", SND_CHANNEL_BODY, 0, false, nullptr );
 	}
 
 	// used for the plasma bolts but may have other uses as well
@@ -522,9 +522,9 @@ void idProjectile::Think( void ) {
 
 		// Update the velocity to match the changing speed
 		if ( updateVelocity ) {
-			arcVec3 vel;
-			vel = physicsObj.GetLinearVelocity ( );
-			vel.Normalize ( );
+			anVec3 vel;
+			vel = physicsObj.GetLinearVelocity();
+			vel.Normalize();
 			physicsObj.SetLinearVelocity ( speed.GetCurrentValue ( gameLocal.time ) * vel );
 			if ( speed.IsDone ( gameLocal.time ) ) {
 				updateVelocity = false;
@@ -551,10 +551,10 @@ void idProjectile::Think( void ) {
 		if ( flyEffect && flyEffectAttenuateSpeed > 0.0f ) {
 			if ( physicsObj.IsAtRest( ) ) {
 				flyEffect->Stop( );
-				flyEffect = NULL;
+				flyEffect = nullptr;
 			} else {
 				float speed;
-				speed = arcMath::ClampFloat( 0, flyEffectAttenuateSpeed, physicsObj.GetLinearVelocity ( ).LengthFast ( ) );
+				speed = anMath::ClampFloat( 0, flyEffectAttenuateSpeed, physicsObj.GetLinearVelocity().LengthFast() );
 				flyEffect->Attenuate( speed / flyEffectAttenuateSpeed );
 			}
 		}
@@ -570,7 +570,7 @@ void idProjectile::Think( void ) {
 		renderLight.axis = GetPhysics()->GetAxis();
 		if ( ( lightDefHandle != -1 ) ) {
 			if ( lightEndTime > 0 && gameLocal.time <= lightEndTime + gameLocal.GetMSec() ) {
-				arcVec3 color( 0, 0, 0 );
+				anVec3 color( 0, 0, 0 );
 				if ( gameLocal.time < lightEndTime ) {
 					float frac = ( float )( gameLocal.time - lightStartTime ) / ( float )( lightEndTime - lightStartTime );
 					color.Lerp( lightColor, color, frac );
@@ -592,22 +592,22 @@ idProjectile::UpdateVisualAngles
 =================
 */
 void idProjectile::UpdateVisualAngles() {
-	arcVec3 linearVelocity( GetPhysics()->GetLinearVelocity() );
+	anVec3 linearVelocity( GetPhysics()->GetLinearVelocity() );
 
-	if( angularVelocity.Compare(ang_zero, VECTOR_EPSILON) ) {
+	if ( angularVelocity.Compare(ang_zero, VECTOR_EPSILON) ) {
 		rotation.Init( gameLocal.GetTime(), 0.0f, rotation.GetCurrentValue(gameLocal.GetTime()), linearVelocity.ToNormal().ToMat3().ToQuat()  );
 		return;
 	}
 
-	if( physicsObj.GetNumContacts() ) {
+	if ( physicsObj.GetNumContacts() ) {
 		return;
 	}
 
-	if( !rotation.IsDone(gameLocal.GetTime()) ) {
+	if ( !rotation.IsDone(gameLocal.GetTime()) ) {
 		return;
 	}
 
-	if( linearVelocity.Length() <= BOUNCE_SOUND_MIN_VELOCITY ) {
+	if ( linearVelocity.Length() <= BOUNCE_SOUND_MIN_VELOCITY ) {
 		return;
 	}
 
@@ -621,17 +621,17 @@ void idProjectile::UpdateVisualAngles() {
 idProjectile::Collide
 =================
 */
-bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity ) {
+bool idProjectile::Collide( const trace_t &collision, const anVec3 &velocity ) {
 	bool dummy = false;
 	return Collide( collision, velocity, dummy );
 }
 
-bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, bool &hitTeleporter ) {
- 	idEntity*	ent;
-	idEntity*	actualHitEnt = NULL;
- 	idEntity*	ignore;
+bool idProjectile::Collide( const trace_t &collision, const anVec3 &velocity, bool &hitTeleporter ) {
+ 	anEntity*	ent;
+	anEntity*	actualHitEnt = nullptr;
+ 	anEntity*	ignore;
  	const char*	damageDefName;
- 	arcVec3		dir;
+ 	anVec3		dir;
  	bool		canDamage;
 
  	hitTeleporter = false;
@@ -642,10 +642,10 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 
 	// allow projectiles to hit triggers (teleports)
 	// predict this on a client
-	if( collision.c.contents & CONTENTS_TRIGGER ) {
-		idEntity* trigger = gameLocal.entities[ collision.c.entityNum ];
+	if ( collision.c.contents & CONTENTS_TRIGGER_SEAS ) {
+		anEntity* trigger = gameLocal.entities[ collision.c.entityNum ];
 
-		if( trigger ) {
+		if ( trigger ) {
 			if ( trigger->RespondsTo( EV_Touch ) || trigger->HasSignal( SIG_TOUCH ) ) {
 
 				hitTeleporter = true;
@@ -657,7 +657,7 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 
 				trace.c.contents = collision.c.contents;
 				trace.c.entityNum = collision.c.entityNum;
-				if( trigger->GetPhysics()->GetClipModel() ) {
+				if ( trigger->GetPhysics()->GetClipModel() ) {
 					trace.c.id = trigger->GetPhysics()->GetClipModel()->GetId();
 				} else {
 					trace.c.id = 0;
@@ -670,44 +670,44 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 		}
 
 		// when we hit a trigger, align our velocity to the trigger's coordinate plane
-		if( gameLocal.isServer ) {
-			arcVec3 up( 0.0f, 0.0f, 1.0f );
-			arcVec3 right = collision.c.normal.Cross( up );
-			arcMat3 mat( collision.c.normal, right, up );
+		if ( gameLocal.isServer ) {
+			anVec3 up( 0.0f, 0.0f, 1.0f );
+			anVec3 right = collision.c.normal.Cross( up );
+			anMat3 mat( collision.c.normal, right, up );
 
 			physicsObj.SetLinearVelocity( -1.0f * (physicsObj.GetLinearVelocity() * mat.Transpose()) );
-			physicsObj.SetLinearVelocity( arcVec3( physicsObj.GetLinearVelocity()[ 0 ], -1.0 *physicsObj.GetLinearVelocity()[ 1 ], -1.0 * physicsObj.GetLinearVelocity()[ 2 ] ) );
+			physicsObj.SetLinearVelocity( anVec3( physicsObj.GetLinearVelocity()[ 0 ], -1.0 *physicsObj.GetLinearVelocity()[ 1 ], -1.0 * physicsObj.GetLinearVelocity()[ 2 ] ) );
 
 			// update the projectile's launchdir and launch origin
 			// this will propagate the change to the clients for prediction
 			// re-launch the projectile
 
-			arcVec3 newDir = physicsObj.GetLinearVelocity();
+			anVec3 newDir = physicsObj.GetLinearVelocity();
 			newDir.Normalize();
 			launchTime = gameLocal.time;
 			launchDir = newDir;
-			physicsObj.SetOrigin( physicsObj.GetOrigin() + arcVec3( 0.0f, 0.0f, 32.0f ) );
+			physicsObj.SetOrigin( physicsObj.GetOrigin() + anVec3( 0.0f, 0.0f, 32.0f ) );
 			physicsObj.SetAxis( newDir.ToMat3() );
 			launchOrig = physicsObj.GetOrigin();
 		}
 
-		if( !(collision.c.contents & CONTENTS_SOLID) || hitTeleporter ) {
+		if ( !(collision.c.contents & CONTENTS_SOLID) || hitTeleporter ) {
 			return false;
 		}
 	}
 
 	// don't predict collisions on projectiles that need their physics synced (e.g. grenades)
-	if ( gameLocal.isClient && (!g_clientProjectileCollision.GetBool() || syncPhysics) ) {
+	if ( gameLocal.isClient && ( !g_clientProjectileCollision.GetBool() || syncPhysics) ) {
 		// optionally do not try to predict detonates, that causes projectiles disappearing
 		// but most of the time works well to stop projectiles clipping through geometry onc lients
 		return false;
 	}
 
  	// remove projectile when a 'noimpact' surface is hit
- 	if ( ( collision.c.material != NULL ) && ( collision.c.material->GetSurfaceFlags() & SURF_NOIMPACT ) ) {
+ 	if ( ( collision.c.material != nullptr ) && ( collision.c.material->GetSurfaceFlags() & SURF_NOIMPACT ) ) {
  		PostEventMS( &EV_Remove, 0 );
 		StopEffect( "fx_fly" );
-		if( flyEffect)	{
+		if ( flyEffect)	{
 			//flyEffect->Event_Remove();
 		}
  		return true;
@@ -721,43 +721,43 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 	}
 
  	// just get rid of the projectile when it hits a player in noclip
- 	if ( ent->IsType( idPlayer::GetClassType() ) && static_cast<idPlayer *>( ent )->noclip ) {
+ 	if ( ent->IsType( anBasePlayer::GetClassType() ) && static_cast<anBasePlayer *>( ent )->noclip ) {
    		PostEventMS( &EV_Remove, 0 );
   		common->DPrintf( "Projectile collision no impact\n" );
    		return true;
    	}
 
 	// If the hit entity is bound to an actor use the actor instead
-	if ( ent->GetTeamMaster( ) && ent->GetTeamMaster( )->IsType ( idActor::GetClassType() ) ) {
+	if ( ent->GetTeamMaster( ) && ent->GetTeamMaster( )->IsType ( anActor::GetClassType() ) ) {
 		actualHitEnt = ent;
 		ent = ent->GetTeamMaster( );
 	}
 
 	// Can the projectile damage?
-	canDamage = ent->fl.takedamage && !(( collision.c.material != NULL ) && ( collision.c.material->GetSurfaceFlags() & SURF_NODAMAGE ));
+	canDamage = ent->fl.takedamage && !(( collision.c.material != nullptr ) && ( collision.c.material->GetSurfaceFlags() & SURF_NODAMAGE ) );
 
  	// direction of projectile
  	dir = velocity;
  	dir.Normalize();
 
  	// projectiles can apply an additional impulse next to the rigid body physics impulse
-// RAVEN BEGIN
+
 // abahr: added call to SkipDamageImpulse changed where push comes from
-	damageDefName = NULL;
+	damageDefName = nullptr;
 	if ( collision.c.materialType ) {
-		damageDefName = spawnArgs.GetString( va("def_damage_%s", collision.c.materialType->GetName()) );
+		damageDefName = spawnArgs.GetString( va( "def_damage_%s", collision.c.materialType->GetName()) );
 	}
 	if ( !damageDefName || !*damageDefName ) {
 		damageDefName = spawnArgs.GetString ( "def_damage" );
 	}
 
-	if( damageDefName && damageDefName[0] ) {
-		const idDict* dict = gameLocal.FindEntityDefDict( damageDefName, false );
+	if ( damageDefName && damageDefName[0] ) {
+		const anDict* dict = gameLocal.FindEntityDefDict( damageDefName, false );
 		if ( dict ) {
  			ent->ApplyImpulse( this, collision.c.id, collision.endpos, dir, dict );
  		}
 	}
-// RAVEN END
+
 
 	//Spawn any impact entities if necessary.
 	SpawnImpactEntities(collision, velocity);
@@ -774,13 +774,13 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 	if ( ent->GetPhysics()->GetContents() & CONTENTS_WATER ) {
 		if ( !physicsObj.IsInWater( ) ) {
 			StopEffect( "fx_fly" );
-			if( flyEffect)	{
+			if ( flyEffect)	{
 				//flyEffect->Event_Remove();
 			}
 		}
 		// Pass through water
 		return false;
-	} else if ( canDamage && ent->IsType( idActor::GetClassType() ) ) {
+	} else if ( canDamage && ent->IsType( anActor::GetClassType() ) ) {
 		if ( !projectileFlags.detonate_on_actor ) {
 			return false;
 		}
@@ -800,37 +800,37 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 				bounceCount--;
 			}
 
-			StartSound( "snd_ricochet", SND_CHANNEL_ITEM, 0, true, NULL );
+			StartSound( "snd_ricochet", SND_CHANNEL_ITEM, 0, true, nullptr );
 
 			float len = velocity.Length();
 			if ( len > BOUNCE_SOUND_MIN_VELOCITY ) {
-				if ( ent->IsType ( idMover::GetClassType ( ) ) ) {
+				if ( ent->IsType ( anMover::GetClassType() ) ) {
 					ent->PlayEffect(
-						gameLocal.GetEffect(spawnArgs,"fx_bounce",collision.c.materialType),
+						gameLocal.GetEffect( spawnArgs,"fx_bounce",collision.c.materialType),
 						collision.c.point, collision.c.normal.ToMat3(),
 						false, vec3_origin, true );
 				} else {
 					gameLocal.PlayEffect(
-						gameLocal.GetEffect(spawnArgs,"fx_bounce",collision.c.materialType),
+						gameLocal.GetEffect( spawnArgs,"fx_bounce",collision.c.materialType),
 						collision.c.point, collision.c.normal.ToMat3(),
 						false, vec3_origin, true );
 				}
 			} else {
 				// FIXME: clean up
-				arcMat3 axis( rotation.GetCurrentValue(gameLocal.GetTime()).ToMat3() );
+				anMat3 axis( rotation.GetCurrentValue(gameLocal.GetTime()).ToMat3() );
 				axis[0].ProjectOntoPlane( collision.c.normal );
 				axis[0].Normalize();
 				axis[2] = collision.c.normal;
 				axis[1] = axis[2].Cross( axis[0] ).ToNormal();
 
-				rotation.Init( gameLocal.GetTime(), SEC2MS(spawnArgs.GetFloat("settle_duration")), rotation.GetCurrentValue(gameLocal.GetTime()), axis.ToQuat() );
+				rotation.Init( gameLocal.GetTime(), SEC2MS( spawnArgs.GetFloat( "settle_duration" ) ), rotation.GetCurrentValue(gameLocal.GetTime()), axis.ToQuat() );
 			}
 			if ( actualHitEnt
 				&& actualHitEnt != ent
 				&& actualHitEnt->spawnArgs.GetBool( "takeBounceDamage" ) )
 			{//bleh...
  				if ( damageDefName[0] != '\0' ) {
-					arcVec3 dir = velocity;
+					anVec3 dir = velocity;
 					dir.Normalize();
 					actualHitEnt->Damage( this, owner, dir, damageDefName, damagePower, CLIPMODEL_ID_TO_JOINT_HANDLE( collision.c.id ) );
 				}
@@ -845,56 +845,56 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 	// unlink the clip model because we no longer need it
 	GetPhysics()->UnlinkClip();
 
-	ignore = NULL;
+	ignore = nullptr;
 
-// RAVEN BEGIN
+
 // jshepard: Single Player- if the the player is the attacker and the victim is teammate, don't play any blood effects.
 	bool willPlayDamageEffect = true;
 
-// jnewquist: Use accessor for static class type
-		if ( owner.GetEntity() && owner.GetEntity()->IsType( idPlayer::GetClassType() ) ) {
+
+		if ( owner.GetEntity() && owner.GetEntity()->IsType( anBasePlayer::GetClassType() ) ) {
 			// if the projectile hit an ai
-			if ( ent->IsType( idAI::GetClassType() ) ) {
-				idPlayer *player = static_cast<idPlayer *>( owner.GetEntity() );
+			if ( ent->IsType( anSAAI::GetClassType() ) ) {
+				anBasePlayer *player = static_cast<anBasePlayer *>( owner.GetEntity() );
 				player->AddProjectileHits( 1 );
 
 // jshepard: Single Player- if the the player is the attacker and the victim is teammate, don't play any blood effects.
-				idAI * ai_ent = static_cast<idAI* >(ent);
-				if( ai_ent->team == player->team)	{
+				anSAAI * ai_ent = static_cast<anSAAI* >(ent);
+				if ( ai_ent->team == player->team)	{
 					willPlayDamageEffect = false;
 				}
 			}
 		}
 
-// RAVEN END
+
 
 	// if the hit entity takes damage
 	if ( canDamage ) {
 
  		if ( damageDefName[0] != '\0' ) {
-			arcVec3 dir = velocity;
+			anVec3 dir = velocity;
 			dir.Normalize();
-// RAVEN BEGIN
+
 // jdischler: code from the 'other' project..to ensure that if an attached head is hit, the body will use the head joint
 //	otherwise damage zones for head attachments no-worky
 			int hitJoint = CLIPMODEL_ID_TO_JOINT_HANDLE(collision.c.id);
-			if ( ent->IsType(idActor::GetClassType()) )
+			if ( ent->IsType(anActor::GetClassType()) )
 			{
-				idActor* entActor = static_cast<idActor*>(ent);
+				anActor* entActor = static_cast<anActor*>(ent);
 				if ( entActor && entActor->GetHead() && entActor->GetHead()->IsType(idAFAttachment::GetClassType()) )
 				{
 					idAFAttachment* headEnt = static_cast<idAFAttachment*>(entActor->GetHead());
 					if ( headEnt && headEnt->entityNumber == collision.c.entityNum )
 					{//hit ent's head, get the proper joint for the head
-						hitJoint = entActor->GetAnimator()->GetJointHandle("head");
+						hitJoint = entActor->GetAnimator()->GetJointHandle( "head" );
 					}
 				}
 			}
-// RAVEN END
+
  			ent->Damage( this, owner, dir, damageDefName, damagePower, hitJoint );
 
-			if( owner && owner->IsType( idPlayer::GetClassType() ) && ent->IsType( idActor::GetClassType() ) ) {
-				statManager->WeaponHit( (const idActor*)(owner.GetEntity()), ent, methodOfDeath, hitCount == 0 );
+			if ( owner && owner->IsType( anBasePlayer::GetClassType() ) && ent->IsType( anActor::GetClassType() ) ) {
+				statManager->WeaponHit( (const anActor*)(owner.GetEntity()), ent, methodOfDeath, hitCount == 0 );
 				hitCount++;
 			}
 		}
@@ -905,13 +905,13 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 	// TODO: fixme
 	ent->AddDamageEffect ( collision, velocity, damageDefName, owner );
 
-// RAVEN BEGIN
+
 // jshepard: Single Player- if the the player is the attacker and the victim is teammate, don't play any effects.
 // this should make sure that only explosion effects play when the player shoots his comrades.
-	if( willPlayDamageEffect || spawnArgs.GetBool( "friendly_impact") )	{
+	if ( willPlayDamageEffect || spawnArgs.GetBool( "friendly_impact" ) )	{
 		DefaultDamageEffect( collision, velocity, damageDefName );
 	}
-// RAVEN END
+
 
 /*
 	// if the projectile causes a damage effect
@@ -928,7 +928,7 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 */
 
 	// don't predict explosions on clients
-	if( gameLocal.isClient ) {
+	if ( gameLocal.isClient ) {
 		return true;
 	}
 
@@ -937,26 +937,26 @@ bool idProjectile::Collide( const trace_t &collision, const arcVec3 &velocity, b
 	return true;
 }
 
-void idProjectile::SpawnImpactEntities(const trace_t& collision, const arcVec3 velocity)
+void idProjectile::SpawnImpactEntities(const trace_t& collision, const anVec3 velocity)
 {
-	if( impactEntity.Length() == 0 || numImpactEntities == 0 )
+	if ( impactEntity.Length() == 0 || numImpactEntities == 0 )
 		return;
 
-	const idDict* impactEntityDict = gameLocal.FindEntityDefDict(impactEntity);
-	if(impactEntityDict == NULL)
+	const anDict* impactEntityDict = gameLocal.FindEntityDefDict(impactEntity);
+	if (impactEntityDict == nullptr )
 		return;
 
-	arcVec3 tempDirection;
-	arcVec3 direction;
+	anVec3 tempDirection;
+	anVec3 direction;
 	direction.Zero();
 
-	arcVec3 up = collision.c.normal;
+	anVec3 up = collision.c.normal;
 
 	//Calculate the axes for that are oriented to the impact point.
-	arcMat3 impactAxes;
+	anMat3 impactAxes;
 
-	arcVec3 right = velocity.Cross(up);
-	arcVec3 forward = up.Cross(right);
+	anVec3 right = velocity.Cross(up);
+	anVec3 forward = up.Cross(right);
 
 	right.Normalize();
 	forward.Normalize();
@@ -965,8 +965,8 @@ void idProjectile::SpawnImpactEntities(const trace_t& collision, const arcVec3 v
 	impactAxes[2] = up;
 
 	//Calculate the reflection vector by calculating the forward component and up component of the projectile direction
-	//arcVec3 reflectionVelocity = (forward * (velocity*0.33f * forward));// - (up * (velocity * up));
-	arcVec3 reflectionVelocity = up * 0.01f;
+	//anVec3 reflectionVelocity = (forward * (velocity*0.33f * forward));// - (up * (velocity * up));
+	anVec3 reflectionVelocity = up * 0.01f;
 
 	//The algorithm below will launch entities at a random pitch and somewhat random yaw.
 	//The yaw is calculated by dividing 360 by the number of entities to spawn. This creates
@@ -976,29 +976,29 @@ void idProjectile::SpawnImpactEntities(const trace_t& collision, const arcVec3 v
 
 	//Calculate the slice size and pick a random start position.
     int sliceSize = 360 / numImpactEntities;
-	int startPosition = rvRandom::irand(0, 360);
+	int startPosition = anRandom::irand(0, 360);
 
 	//Move the origin away from the collision point. This prevents the projectiles
 	//from colliding with the surface.
-	arcVec3 origin = collision.endpos;
+	anVec3 origin = collision.endpos;
 	origin += 10.0f * collision.c.normal;
-	for(int i = 0;i < numImpactEntities; i++)
+	for ( int i = 0;i < numImpactEntities; i++ )
 	{
-		idProjectile* spawnProjectile = NULL;
-		gameLocal.SpawnEntityDef(*impactEntityDict,(idEntity**)&spawnProjectile);
-		if(spawnProjectile != NULL)
+		idProjectile* spawnProjectile = nullptr;
+		gameLocal.SpawnEntityDef(*impactEntityDict,(anEntity**)&spawnProjectile);
+		if ( spawnProjectile != nullptr )
 		{
-			int pitch = rvRandom::irand(ieMinPitch, ieMaxPitch);
+			int pitch = anRandom::irand(ieMinPitch, ieMaxPitch);
 			int sliceMiddle = (i * sliceSize) + startPosition;
-			int sliceSloppiness = (sliceSize * ieSlicePercentage) / 2;
+			int sliceSloppiness = ( sliceSize * ieSlicePercentage) / 2;
 
-			int yaw = rvRandom::irand(sliceMiddle - sliceSloppiness, sliceMiddle + sliceSloppiness);
+			int yaw = anRandom::irand( sliceMiddle - sliceSloppiness, sliceMiddle + sliceSloppiness);
 			yaw = yaw % 360;
 
-			float cosPitch = arcMath::Cos(DEG2RAD(pitch));
-			tempDirection.x = cosPitch * arcMath::Cos(DEG2RAD(yaw));
-			tempDirection.y = cosPitch * arcMath::Sin(DEG2RAD(yaw));
-			tempDirection.z = arcMath::Sin(DEG2RAD(pitch));
+			float cosPitch = anMath::Cos(DEG2RAD(pitch));
+			tempDirection.x = cosPitch * anMath::Cos(DEG2RAD(yaw));
+			tempDirection.y = cosPitch * anMath::Sin(DEG2RAD(yaw));
+			tempDirection.z = anMath::Sin(DEG2RAD(pitch));
 
 			spawnProjectile->SetOwner(owner);
 
@@ -1014,23 +1014,23 @@ void idProjectile::SpawnImpactEntities(const trace_t& collision, const arcVec3 v
 idProjectile::DefaultDamageEffect
 =================
 */
-void idProjectile::DefaultDamageEffect( const trace_t &tr, const arcVec3 &velocity, const char *damageDefName ) {
-	idEntity* ent;
-	arcMat3	  axis;
+void idProjectile::DefaultDamageEffect( const trace_t &tr, const anVec3 &velocity, const char *damageDefName ) {
+	anEntity* ent;
+	anMat3	  axis;
 	ent = gameLocal.entities[ tr.c.entityNum ];
 
 	// Make sure we want to play effects
-	if  ( (!*spawnArgs.GetString( "def_splash_damage" ) || spawnArgs.GetBool( "bloodyImpactEffect" ))
+	if  ( ( !*spawnArgs.GetString( "def_splash_damage" ) || spawnArgs.GetBool( "bloodyImpactEffect" ) )
 		&& owner.GetEntity( ) && !ent->CanPlayImpactEffect( owner, ent ) ) {
 		return;
 	}
 
 	// Effect axis when hitting actors is along the direction of impact because actor models are
 	// very detailed.
-	if ( ent->IsType( idActor::GetClassType() ) || ent->IsType( idAFAttachment::GetClassType() ) ) {
-		arcVec3 dir;
+	if ( ent->IsType( anActor::GetClassType() ) || ent->IsType( idAFAttachment::GetClassType() ) ) {
+		anVec3 dir;
 		dir = velocity;
-		dir.Normalize ( );
+		dir.Normalize();
 		axis = ((-dir + tr.c.normal) * 0.5f).ToMat3();
 
 		// Play an actor specific impact effect?
@@ -1044,7 +1044,7 @@ void idProjectile::DefaultDamageEffect( const trace_t &tr, const arcVec3 &veloci
 	}
 
 	// Play an impact effect on the entity that got hit
-	if ( ent->IsType( idMover::GetClassType ( ) ) ) {
+	if ( ent->IsType( anMover::GetClassType() ) ) {
 		ent->PlayEffect( gameLocal.GetEffect( spawnArgs, "fx_impact", tr.c.materialType ), tr.c.point, axis, false, vec3_origin, true );
 	} else {
 		gameLocal.PlayEffect( gameLocal.GetEffect( spawnArgs, "fx_impact", tr.c.materialType ), tr.c.point, axis, false, vec3_origin, true );
@@ -1056,9 +1056,9 @@ void idProjectile::DefaultDamageEffect( const trace_t &tr, const arcVec3 &veloci
 idProjectile::Killed
 ================
 */
-void idProjectile::Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location ) {
+void idProjectile::Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location ) {
 	if ( spawnArgs.GetBool( "detonate_on_death" ) ) {
-		Explode( NULL, true );
+		Explode( nullptr, true );
 		physicsObj.ClearContacts();
 		physicsObj.PutToRest();
 	} else {
@@ -1078,7 +1078,7 @@ void idProjectile::Fizzle( void ) {
 	}
 
 	StopSound( SND_CHANNEL_BODY, false );
-	StartSound( "snd_fizzle", SND_CHANNEL_BODY, 0, false, NULL );
+	StartSound( "snd_fizzle", SND_CHANNEL_BODY, 0, false, nullptr );
 
 	gameLocal.PlayEffect( spawnArgs, "fx_fuse", GetPhysics()->GetOrigin(), GetPhysics()->GetAxis() );
 
@@ -1089,7 +1089,7 @@ void idProjectile::Fizzle( void ) {
 
 	// No more fly effects
 	StopEffect( "fx_fly" );
-	if( flyEffect)	{
+	if ( flyEffect)	{
 		//flyEffect->Event_Remove();
 	}
 
@@ -1107,7 +1107,7 @@ void idProjectile::Fizzle( void ) {
 idProjectile::Event_RadiusDamage
 ================
 */
-void idProjectile::Event_RadiusDamage( idEntity *ignore ) {
+void idProjectile::Event_RadiusDamage( anEntity *ignore ) {
 	const char *splash_damage = spawnArgs.GetString( "def_splash_damage" );
 	if ( splash_damage[0] != '\0' ) {
 		gameLocal.RadiusDamage( physicsObj.GetOrigin(), this, owner, ignore, this, splash_damage, damagePower, &hitCount );
@@ -1119,7 +1119,7 @@ void idProjectile::Event_RadiusDamage( idEntity *ignore ) {
 idProjectile::Event_ResidualDamage
 ================
 */
-void idProjectile::Event_ResidualDamage ( idEntity* ignore ) {
+void idProjectile::Event_ResidualDamage ( anEntity* ignore ) {
 	const char *residual_damage = spawnArgs.GetString( "def_residual_damage" );
 	if ( residual_damage[0] != '\0' ) {
 		gameLocal.RadiusDamage( physicsObj.GetOrigin(), this, owner, ignore, this, residual_damage, damagePower, &hitCount );
@@ -1134,8 +1134,8 @@ void idProjectile::Event_ResidualDamage ( idEntity* ignore ) {
 idProjectile::Explode
 ================
 */
-void idProjectile::Explode( const trace_t *collision, const bool showExplodeFX, idEntity *ignore, const char *sndExplode ) {
-	arcVec3		normal, endpos;
+void idProjectile::Explode( const trace_t *collision, const bool showExplodeFX, anEntity *ignore, const char *sndExplode ) {
+	anVec3		normal, endpos;
 	int			removeTime;
 
 	if ( state == EXPLODED || state == FIZZLED ) {
@@ -1145,7 +1145,7 @@ void idProjectile::Explode( const trace_t *collision, const bool showExplodeFX, 
 	if ( spawnArgs.GetVector( "detonation_axis", "", normal ) ) {
 		GetPhysics()->SetAxis( normal.ToMat3() );
 	} else {
-		normal = collision ? collision->c.normal : arcVec3( 0, 0, 1 );
+		normal = collision ? collision->c.normal : anVec3( 0, 0, 1 );
 	}
 	endpos = ( collision ) ? collision->endpos : GetPhysics()->GetOrigin();
 
@@ -1153,10 +1153,10 @@ void idProjectile::Explode( const trace_t *collision, const bool showExplodeFX, 
 
 	// play sound
 	StopSound( SND_CHANNEL_BODY, false );
-	StartSound( sndExplode, SND_CHANNEL_BODY, 0, false, NULL );
+	StartSound( sndExplode, SND_CHANNEL_BODY, 0, false, nullptr );
 
 	if ( showExplodeFX ) {
-		arcVec3 fxDir;
+		anVec3 fxDir;
 		if ( physicsObj.GetGravityNormal( ) != vec3_zero ) {
 			fxDir = -physicsObj.GetGravityNormal( );
 		} else {
@@ -1169,7 +1169,7 @@ void idProjectile::Explode( const trace_t *collision, const bool showExplodeFX, 
 
 	// Stop the fly effect without destroying particles to ensure the trail within can persist.
 	StopEffect( "fx_fly" );
-	if( flyEffect)	{
+	if ( flyEffect)	{
 		//flyEffect->Event_Remove();
 	}
 
@@ -1232,10 +1232,10 @@ void idProjectile::Explode( const trace_t *collision, const bool showExplodeFX, 
 idProjectile::GetVelocity
 ================
 */
-arcVec3 idProjectile::GetVelocity( const idDict *projectile ) {
-	arcVec3 velocity;
+anVec3 idProjectile::GetVelocity( const anDict *projectile ) {
+	anVec3 velocity;
 
-	velocity.Zero ( );
+	velocity.Zero();
 	if ( projectile && !projectile->GetFloat ( "speed", "0", velocity.x ) ) {
 		projectile->GetVector( "velocity", "0 0 0", velocity );
 	}
@@ -1247,9 +1247,9 @@ arcVec3 idProjectile::GetVelocity( const idDict *projectile ) {
 idProjectile::GetGravity
 ================
 */
-arcVec3 idProjectile::GetGravity( const idDict *projectile ) {
+anVec3 idProjectile::GetGravity( const anDict *projectile ) {
 	if ( projectile ) {
-		return gameLocal.GetGravity ( ) * projectile->GetFloat( "gravity" );
+		return gameLocal.GetGravity() * projectile->GetFloat( "gravity" );
 	}
 	return vec3_origin;
 }
@@ -1259,7 +1259,7 @@ arcVec3 idProjectile::GetGravity( const idDict *projectile ) {
 idProjectile::PlayPainEffect
 ================
 */
-void idProjectile::PlayPainEffect ( idEntity* ent, int damage, const rvDeclMatType* materialType, const arcVec3& origin, const arcVec3& dir )  {
+void idProjectile::PlayPainEffect ( anEntity* ent, int damage, const rvDeclMatType* materialType, const anVec3& origin, const anVec3& dir )  {
 	static int  damageTable[] = { 100, 50, 25, 10, 0 };
 	int			index;
 
@@ -1284,11 +1284,11 @@ void idProjectile::PlayPainEffect ( idEntity* ent, int damage, const rvDeclMatTy
 idProjectile::PlayDetonateEffect
 ================
 */
-void idProjectile::PlayDetonateEffect( const arcVec3& origin, const arcMat3& axis ) {
-	if( physicsObj.HasGroundContacts() ) {
+void idProjectile::PlayDetonateEffect( const anVec3& origin, const anMat3& axis ) {
+	if ( physicsObj.HasGroundContacts() ) {
 		if ( spawnArgs.GetBool( "detonateTestGroundMaterial" ) ) {
 			trace_t tr;
-			arcVec3 down;
+			anVec3 down;
 			down = GetPhysics()->GetOrigin() + GetPhysics()->GetGravityNormal()*8.0f;
 			gameLocal.Translation( this, tr, GetPhysics()->GetOrigin(), down, GetPhysics()->GetClipModel(), GetPhysics()->GetClipModel()->GetAxis(), GetPhysics()->GetClipMask(), this );
 			gameLocal.PlayEffect( gameLocal.GetEffect( spawnArgs, "fx_impact", tr.c.materialType ), origin, axis, false, vec3_origin, true );
@@ -1308,9 +1308,9 @@ idProjectile::Event_Explode
 */
 void idProjectile::Event_Explode( void ) {
 	// events are processed outside of the think loop, so set the current thinking ent appropriately
-	idEntity* think = gameLocal.currentThinkingEntity;
+	anEntity* think = gameLocal.currentThinkingEntity;
 	gameLocal.currentThinkingEntity = this;
-	Explode( NULL, true );
+	Explode( nullptr, true );
 	gameLocal.currentThinkingEntity = think;
 }
 
@@ -1320,7 +1320,7 @@ idProjectile::Event_Fizzle
 ================
 */
 void idProjectile::Event_Fizzle( void ) {
-	idEntity* think = gameLocal.currentThinkingEntity;
+	anEntity* think = gameLocal.currentThinkingEntity;
 	gameLocal.currentThinkingEntity = this;
 	Fizzle();
 	gameLocal.currentThinkingEntity = think;
@@ -1331,13 +1331,13 @@ void idProjectile::Event_Fizzle( void ) {
 idProjectile::Event_Touch
 ================
 */
-void idProjectile::Event_Touch( idEntity *other, trace_t *trace ) {
+void idProjectile::Event_Touch( anEntity *other, trace_t *trace ) {
 	if ( IsHidden() ) {
 		return;
 	}
 
 	if ( other != owner.GetEntity() ) {
-		idEntity* think = gameLocal.currentThinkingEntity;
+		anEntity* think = gameLocal.currentThinkingEntity;
 		gameLocal.currentThinkingEntity = this;
 
 		trace_t collision;
@@ -1345,8 +1345,8 @@ void idProjectile::Event_Touch( idEntity *other, trace_t *trace ) {
 		memset( &collision, 0, sizeof( collision ) );
 		collision.c.point = GetPhysics()->GetOrigin();
 		collision.c.normal.Set( 0, 0, 1 );
-		DefaultDamageEffect( collision, collision.c.normal, NULL );
-		Explode( NULL, true );
+		DefaultDamageEffect( collision, collision.c.normal, nullptr );
+		Explode( nullptr, true );
 
 		gameLocal.currentThinkingEntity = think;
 	}
@@ -1362,8 +1362,8 @@ void idProjectile::ClientPredictionThink( void ) {
 		return;
 	}
 	if ( !syncPhysics && state == LAUNCHED ) {
-		arcMat3 axis = launchDir.ToMat3();
-		arcVec3 origin( launchOrig );
+		anMat3 axis = launchDir.ToMat3();
+		anVec3 origin( launchOrig );
 		origin += ( ( gameLocal.time - launchTime ) / 1000.0f ) * launchSpeed * launchDir;
 		physicsObj.SetAxis( axis );
 		physicsObj.SetOrigin( origin );
@@ -1377,7 +1377,7 @@ void idProjectile::ClientPredictionThink( void ) {
 idProjectile::WriteToSnapshot
 ================
 */
-void idProjectile::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void idProjectile::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	if ( syncPhysics ) {
 		physicsObj.WriteToSnapshot( msg );
 	}
@@ -1399,7 +1399,7 @@ void idProjectile::WriteToSnapshot( idBitMsgDelta &msg ) const {
 idProjectile::ReadFromSnapshot
 ================
 */
-void idProjectile::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void idProjectile::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	projectileState_t newState;
 
 	if ( syncPhysics ) {
@@ -1421,7 +1421,7 @@ void idProjectile::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	if ( newState != state ) {
 		switch ( newState ) {
 		case LAUNCHED:
-			Create( NULL, launchOrig, launchDir );
+			Create( nullptr, launchOrig, launchDir );
 			Launch( launchOrig, launchDir, vec3_origin );
 			Show();
 			break;
@@ -1439,9 +1439,9 @@ void idProjectile::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	}
 
 	if ( msg.HasChanged() ) {
-		if( !syncPhysics && state == LAUNCHED ) {
-			arcMat3 axis = launchDir.ToMat3();
-			arcVec3 origin( launchOrig );
+		if ( !syncPhysics && state == LAUNCHED ) {
+			anMat3 axis = launchDir.ToMat3();
+			anVec3 origin( launchOrig );
 			origin += ( ( gameLocal.time - launchTime ) / 1000.0f ) * launchSpeed * launchDir;
 			physicsObj.SetAxis( axis );
 			physicsObj.SetOrigin( origin );
@@ -1468,7 +1468,7 @@ bool idProjectile::ClientStale( void ) {
 idProjectile::GetPhysicsToVisualTransform
 ================
 */
-bool idProjectile::GetPhysicsToVisualTransform( arcVec3 &origin, arcMat3 &axis ) {
+bool idProjectile::GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis ) {
 	axis = rotation.GetCurrentValue( gameLocal.GetTime() ).ToMat3() * GetPhysics()->GetAxis().Transpose();
 
 	origin.Zero();
@@ -1509,7 +1509,7 @@ idGuidedProjectile::~idGuidedProjectile() {
 idGuidedProjectile::Save
 ================
 */
-void idGuidedProjectile::Save( idSaveGame *savefile ) const {
+void idGuidedProjectile::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt ( guideType );
 	guideEnt.Save( savefile );
 	savefile->WriteVec3 ( guideDir );
@@ -1541,20 +1541,20 @@ void idGuidedProjectile::Save( idSaveGame *savefile ) const {
 idGuidedProjectile::Restore
 ================
 */
-void idGuidedProjectile::Restore( idRestoreGame *savefile ) {
+void idGuidedProjectile::Restore( anRestoreGame *savefile ) {
 	float set;
 	savefile->ReadInt ( guideType );
 	guideEnt.Restore( savefile );
 	savefile->ReadVec3 ( guideDir );
 	savefile->ReadVec3 ( guidePos );
 	savefile->ReadJoint ( guideJoint );
-	savefile->ReadFloat( guideMinDist ); // cnicholson: Added unrestored var
+	savefile->ReadFloat( guideMinDist );
 
 	savefile->ReadInt ( driftTime );
 	savefile->ReadInt ( driftRate );
 	savefile->ReadFloat ( driftRange );
 	savefile->ReadFloat ( driftRadius );
-	savefile->ReadFloat ( driftDiversity ); // cnicholson: Added unrestored var
+	savefile->ReadFloat ( driftDiversity );
 	savefile->ReadFloat ( driftAngle );
 	savefile->ReadFloat ( driftAngleStep );
 	savefile->ReadFloat ( driftProjectRange );
@@ -1578,7 +1578,7 @@ void idGuidedProjectile::Restore( idRestoreGame *savefile ) {
 idGuidedProjectile::GetGuideDir
 ================
 */
-bool idGuidedProjectile::GetGuideDir ( arcVec3 &outDir, float& outDist  ) {
+bool idGuidedProjectile::GetGuideDir ( anVec3 &outDir, float& outDist  ) {
 	// Dont start guiding immeidately?
 	if ( gameLocal.GetTime() - launchTime < guideDelay ) {
 		return false;
@@ -1587,13 +1587,13 @@ bool idGuidedProjectile::GetGuideDir ( arcVec3 &outDir, float& outDist  ) {
 	switch ( guideType ) {
 		case GUIDE_ENTITY:
 			// If the guide entity is gone or dead then cancel the guide
-			if ( !guideEnt.GetEntity ( ) || (guideEnt->fl.takedamage && guideEnt->health <= 0 ) ) {
-				CancelGuide ( );
+			if ( !guideEnt.GetEntity() || (guideEnt->fl.takedamage && guideEnt->health <= 0 ) ) {
+				CancelGuide();
 				return false;
 			}
 			// Use eye position for actors and center of bounds for everything else
 			if ( guideJoint != INVALID_JOINT ) {
-				arcMat3 jointAxis;
+				anMat3 jointAxis;
 				guideEnt->GetAnimator()->GetJointTransform( guideJoint, gameLocal.GetTime(), outDir, jointAxis );
 				outDir = guideEnt->GetRenderEntity()->origin + (outDir*guideEnt->GetRenderEntity()->axis);
 				if ( !guidePos.Compare( vec3_origin ) ) {
@@ -1604,8 +1604,8 @@ bool idGuidedProjectile::GetGuideDir ( arcVec3 &outDir, float& outDist  ) {
 				}
 			} else {
 				outDir = guideEnt->GetPhysics()->GetAbsBounds().GetCenter();
-				if ( guideEnt->IsType( idActor::GetClassType() ) ) {
-					outDir += static_cast<idActor *>(guideEnt.GetEntity())->GetEyePosition();
+				if ( guideEnt->IsType( anActor::GetClassType() ) ) {
+					outDir += static_cast<anActor *>(guideEnt.GetEntity())->GetEyePosition();
 					outDir *= 0.5f;
 				}
 			}
@@ -1630,29 +1630,29 @@ bool idGuidedProjectile::GetGuideDir ( arcVec3 &outDir, float& outDist  ) {
 
 	// Add drifting
 	if ( driftRate && gameLocal.GetTime() - launchTime > driftDelay ) {
-		arcMat3 axis;
+		anMat3 axis;
 
 		outDist = outDir.NormalizeFast();
 		axis    = outDir.ToMat3();
 
 		if ( gameLocal.time > driftTime ) {
-			driftRadius	= driftRange + gameLocal.random.RandomFloat ( ) * driftRange * driftDiversity;
+			driftRadius	= driftRange + gameLocal.random.RandomFloat() * driftRange * driftDiversity;
 			driftTime	= gameLocal.time + driftRate;
 		} else {
 			driftAngle += driftAngleStep * MS2SEC ( gameLocal.msec );
-			arcMath::AngleNormalize360 ( driftAngle );
+			anMath::AngleNormalize360 ( driftAngle );
 		}
 
 		float angle;
 		angle = DEG2RAD ( driftAngle );
-		outDir = physicsObj.GetOrigin ( ) + outDir * Min( outDist, driftProjectRange );
-		outDir += axis[2] * (driftRadius * arcMath::Sin ( angle ));
-		outDir += axis[1] * (driftRadius * arcMath::Cos ( angle ));
+		outDir = physicsObj.GetOrigin() + outDir * Min( outDist, driftProjectRange );
+		outDir += axis[2] * (driftRadius * anMath::Sin ( angle ) );
+		outDir += axis[1] * (driftRadius * anMath::Cos ( angle ) );
 
 		outDir -= physicsObj.GetOrigin();
 	}
 
-	outDist = outDir.Normalize ( );
+	outDist = outDir.Normalize();
 
 	return true;
 }
@@ -1665,11 +1665,11 @@ idGuidedProjectile::Think
 void idGuidedProjectile::Think( void ) {
 
 	if ( state == LAUNCHED ) {
-		arcVec3	dir;
-		arcVec3	vel;
+		anVec3	dir;
+		anVec3	vel;
 		float	angle;
 		float	maxangle;
-		arcMat3	axis;
+		anMat3	axis;
 		float	dist;
 
 		// crank up to normal speed ?
@@ -1695,7 +1695,7 @@ void idGuidedProjectile::Think( void ) {
 		vel.Normalize();
 
 		// Calculate the angle between the current projectile direction and where we want to go
-		angle = RAD2DEG( arcMath::ACos( dir * vel ) );
+		angle = RAD2DEG( anMath::ACos( dir * vel ) );
 
 		// Make sure the angle doesnt cross our max turn radius
 		maxangle = turn_max.GetCurrentValue( gameLocal.time );
@@ -1706,20 +1706,20 @@ void idGuidedProjectile::Think( void ) {
 		}
 
 		// Debug information
-		if ( g_debugWeapon.GetBool ( ) ) {
+		if ( g_debugWeapon.GetBool() ) {
 			gameRenderWorld->DebugArrow( colorCyan, physicsObj.GetOrigin(), physicsObj.GetOrigin() + vel * 50.0f, 10.0f );
 			gameRenderWorld->DebugArrow( colorMagenta, physicsObj.GetOrigin(), physicsObj.GetOrigin() + dir * 50.0f, 10.0f );
 		}
 
 		// Calculate the new axis by rotating the current forward vector around the cross of the forward
 		// vector and the direction vector.
-		vel = vel * idRotation( vec3_origin, dir.Cross ( vel ), angle );
-		physicsObj.SetLinearVelocity( vel * GetSpeed ( ) );
+		vel = vel * anRotation( vec3_origin, dir.Cross ( vel ), angle );
+		physicsObj.SetLinearVelocity( vel * GetSpeed() );
 
 		// If within the minium distance to the target anything over a 45 degree change will cancel the guide
 		if ( guideMinDist != 0.0f && dist < guideMinDist ) {
 			// Stop guiding if we have passed our target
-			vel = physicsObj.GetLinearVelocity ( );
+			vel = physicsObj.GetLinearVelocity();
 			vel.Normalize( );
 			if ( vel * dir < 0.7f ) {
 				guideType = GUIDE_NONE;
@@ -1737,19 +1737,19 @@ void idGuidedProjectile::Think( void ) {
 idGuidedProjectile::Launch
 =================
 */
-void idGuidedProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const arcVec3 &pushVelocity, const float timeSinceFire, float dmgPower ) {
+void idGuidedProjectile::Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire, float dmgPower ) {
 	idProjectile::Launch( start, dir, pushVelocity, timeSinceFire, dmgPower );
 
 	launchTime = gameLocal.GetTime();
 
 	if ( owner.GetEntity() ) {
-		if ( owner.GetEntity()->IsType( idAI::GetClassType() ) ) {
-			GuideTo ( static_cast<idAI *>( owner.GetEntity() )->GetEnemy() );
+		if ( owner.GetEntity()->IsType( anSAAI::GetClassType() ) ) {
+			GuideTo ( static_cast<anSAAI *>( owner.GetEntity() )->GetEnemy() );
 		}
 	}
 
 	guideMinDist	= spawnArgs.GetFloat ( "min_dist", "128" );
-	guideDelay		= SEC2MS(spawnArgs.GetFloat ( "delayGuide" ) + ( gameLocal.random.RandomFloat ( ) * spawnArgs.GetFloat ( "delayGuide_random")) );
+	guideDelay		= SEC2MS( spawnArgs.GetFloat ( "delayGuide" ) + ( gameLocal.random.RandomFloat() * spawnArgs.GetFloat ( "delayGuide_random" ) ) );
 
 	if ( guideDelay ) {
 		float delaySpeed;
@@ -1769,16 +1769,16 @@ void idGuidedProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const
 	driftRate		= SEC2MS ( spawnArgs.GetFloat ( "driftRate", "0" ) );
 	driftRange		= spawnArgs.GetFloat ( "driftRange" );
 	driftDiversity	= spawnArgs.GetFloat ( "driftDiversity", ".5" );
-	driftAngle		= gameLocal.random.RandomFloat ( ) * 360.0f;
+	driftAngle		= gameLocal.random.RandomFloat() * 360.0f;
 	driftAngleStep	= spawnArgs.GetFloat ( "driftRotate" );
-	driftAngleStep += gameLocal.random.CRandomFloat ( ) * (driftAngleStep * driftDiversity) * (gameLocal.random.RandomFloat()<0.5f?-1.0f:1.0f);
-	driftDelay		= SEC2MS(spawnArgs.GetFloat ( "driftDelay" ));
+	driftAngleStep += gameLocal.random.CRandomFloat() * (driftAngleStep * driftDiversity) * (gameLocal.random.RandomFloat()<0.5f?-1.0f:1.0f);
+	driftDelay		= SEC2MS( spawnArgs.GetFloat ( "driftDelay" ) );
 
 	driftProjectRange = spawnArgs.GetFloat ( "driftProjectRange", "128" );
 
 	// Turn rate can be ramped up over time
 	turn_max.Init ( gameLocal.time,
-					SEC2MS(spawnArgs.GetFloat ( "turn_accel", "0" )),
+					SEC2MS( spawnArgs.GetFloat ( "turn_accel", "0" ) ),
 					0,
 					spawnArgs.GetFloat( "turn_max", "180" ) / ( float )gameLocal.GetMHz() );
 
@@ -1790,9 +1790,9 @@ void idGuidedProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const
 idGuidedProjectile::Launch
 =================
 */
-void idGuidedProjectile::Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location ) {
+void idGuidedProjectile::Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location ) {
 	if ( guideEnt.IsValid() ) {
-		guideEnt->GuidedProjectileIncoming( NULL );
+		guideEnt->GuidedProjectileIncoming( nullptr );
 	}
 	idProjectile::Killed( inflictor, attacker, damage, dir, location );
 }
@@ -1829,7 +1829,7 @@ rvDriftingProjectile::~rvDriftingProjectile ( void ) {
 rvDriftingProjectile::Save
 ================
 */
-void rvDriftingProjectile::Save( idSaveGame *savefile ) const {
+void rvDriftingProjectile::Save( anSaveGame *savefile ) const {
 	savefile->WriteVec3 ( startDir );
 	savefile->WriteVec3 ( startOrigin );
 	savefile->WriteMat3 ( startAxis );
@@ -1839,7 +1839,7 @@ void rvDriftingProjectile::Save( idSaveGame *savefile ) const {
 	savefile->WriteFloat ( driftTime );
 
 	savefile->WriteInterpolate( driftSpeed );
-	for( int ix = 0; ix < 2; ++ix ) {
+	for ( int ix = 0; ix < 2; ++ix ) {
 		savefile->WriteInterpolate( driftOffset[ix] );
 	}
 }
@@ -1849,7 +1849,7 @@ void rvDriftingProjectile::Save( idSaveGame *savefile ) const {
 rvDriftingProjectile::Restore
 ================
 */
-void rvDriftingProjectile::Restore( idRestoreGame *savefile ) {
+void rvDriftingProjectile::Restore( anRestoreGame *savefile ) {
 	savefile->ReadVec3 ( startDir );
 	savefile->ReadVec3 ( startOrigin );
 	savefile->ReadMat3 ( startAxis );
@@ -1859,7 +1859,7 @@ void rvDriftingProjectile::Restore( idRestoreGame *savefile ) {
 	savefile->ReadFloat ( driftTime );
 
 	savefile->ReadInterpolate( driftSpeed );
-	for( int ix = 0; ix < 2; ++ix ) {
+	for ( int ix = 0; ix < 2; ++ix ) {
 		savefile->ReadInterpolate( driftOffset[ix] );
 	}
 }
@@ -1870,16 +1870,16 @@ rvDriftingProjectile::Think
 ================
 */
 void rvDriftingProjectile::Think( void ) {
-	arcVec3 diff;
-	arcVec3 origin;
-	arcVec3 oldOrigin;
-	arcVec3 dir;
+	anVec3 diff;
+	anVec3 origin;
+	anVec3 oldOrigin;
+	anVec3 dir;
 	float  dist;
 
-	oldOrigin = GetPhysics()->GetOrigin ( );
+	oldOrigin = GetPhysics()->GetOrigin();
 
 	diff   = oldOrigin - startOrigin;
-	dist   = diff.Length ( );
+	dist   = diff.Length();
 	origin = startOrigin + startDir * dist;
 
 	if ( driftSpeed.IsDone ( gameLocal.time ) ) {
@@ -1903,15 +1903,15 @@ void rvDriftingProjectile::Think( void ) {
 	origin += startAxis[1] * driftOffset[0].GetCurrentValue ( gameLocal.time );
 	origin += startAxis[2] * driftOffset[1].GetCurrentValue ( gameLocal.time );
 
-	GetPhysics ( )->SetOrigin ( origin );
-	GetPhysics ( )->SetLinearVelocity ( startDir * (startSpeed + driftSpeed.GetCurrentValue ( gameLocal.time )) );
+	GetPhysics()->SetOrigin ( origin );
+	GetPhysics()->SetLinearVelocity ( startDir * ( startSpeed + driftSpeed.GetCurrentValue ( gameLocal.time ) ) );
 
 	idProjectile::Think();
 
 	// Now orient the projectile using the old origin
 	dir = GetPhysics()->GetOrigin() - oldOrigin;
-	dir.Normalize ( );
-	GetPhysics ( )->SetAxis ( dir.ToMat3 ( ) );
+	dir.Normalize();
+	GetPhysics()->SetAxis ( dir.ToMat3() );
 }
 
 /*
@@ -1919,7 +1919,7 @@ void rvDriftingProjectile::Think( void ) {
 rvDriftingProjectile::Launch
 =================
 */
-void rvDriftingProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, const arcVec3 &pushVelocity, const float timeSinceFire, float dmgPower) {
+void rvDriftingProjectile::Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire, float dmgPower) {
 	startDir	= dir;
 	startOrigin = start;
 	startAxis   = dir.ToMat3();
@@ -1930,7 +1930,7 @@ void rvDriftingProjectile::Launch( const arcVec3 &start, const arcVec3 &dir, con
 
 	idProjectile::Launch ( start, dir, pushVelocity, timeSinceFire, dmgPower );
 
-	startSpeed = GetPhysics()->GetLinearVelocity().Length ( );
+	startSpeed = GetPhysics()->GetLinearVelocity().Length();
 }
 
 /*
@@ -2000,9 +2000,9 @@ rvSpawnerProjectile::Think
 =================
 */
 void rvSpawnerProjectile::Think ( void ) {
-	idProjectile::Think ( );
+	idProjectile::Think();
 
-	if ( physicsObj.IsAtRest ( ) ) {
+	if ( physicsObj.IsAtRest() ) {
 		if ( spawnState == STATE_NONE && spawner ) {
 			spawner->AddSpawnPoint ( this );
 			spawnState = STATE_ADDED;
@@ -2019,12 +2019,12 @@ void rvSpawnerProjectile::Event_PostSpawn ( void ) {
 	const char* temp;
 	temp = spawnArgs.GetString ( "spawner" );
 	if ( temp && *temp ) {
-		idEntity* ent;
+		anEntity* ent;
 		ent = gameLocal.FindEntity ( temp );
 		if ( !ent ) {
-			gameLocal.Warning ( "spawner entity ('%s') not found for rvSpawnerProjectile '%s'", temp, GetName ( ) );
+			gameLocal.Warning ( "spawner entity ('%s') not found for rvSpawnerProjectile '%s'", temp, GetName() );
 		} else if ( !ent->IsType ( rvSpawner::GetClassType() ) )  {
-			gameLocal.Warning ( "spawner entity ('%s') is not of type rvSpawner for rvSpawnerProjectile '%s'", temp, GetName ( ) );
+			gameLocal.Warning ( "spawner entity ('%s') is not of type rvSpawner for rvSpawnerProjectile '%s'", temp, GetName() );
 		} else {
 			SetSpawner ( static_cast<rvSpawner*>(ent) );
 		}
@@ -2039,7 +2039,7 @@ void rvSpawnerProjectile::Event_PostSpawn ( void ) {
 
 ===============================================================================
 */
-idEventDef		EV_LaunchWarheads( "launchWarheads" );
+anEventDef		EV_LaunchWarheads( "launchWarheads" );
 
 CLASS_DECLARATION( idProjectile, rvMIRVProjectile )
 	EVENT( EV_LaunchWarheads,		rvMIRVProjectile::Event_LaunchWarheads )
@@ -2070,7 +2070,7 @@ void rvMIRVProjectile::Spawn( void )
 */
 void rvMIRVProjectile::Spawn( void ) {
 
-	float launchDelay = spawnArgs.GetFloat("warhead_fuse", "0");
+	float launchDelay = spawnArgs.GetFloat( "warhead_fuse", "0" );
 	//post event for warhead launch
 	PostEventSec( &EV_LaunchWarheads, launchDelay );
 }
@@ -2085,25 +2085,25 @@ void rvMIRVProjectile::Event_LaunchWarheads( void ) {
 	const char* warhead;
 	int count;
 
-	warhead = spawnArgs.GetString("def_warhead","");
-	count = spawnArgs.GetFloat("warhead_count","0");
+	warhead = spawnArgs.GetString( "def_warhead","" );
+	count = spawnArgs.GetFloat( "warhead_count","0" );
 
-	if( warhead && warhead[0] )	{
+	if ( warhead && warhead[0] )	{
 
 		//start launching!
 		float angle = (360.0f / count);
-		arcMat3 normalMat = this->GetPhysics()->GetAxis( );
-		arcVec3 normal = normalMat[0];
-		arcVec3 axis = normalMat[1];
+		anMat3 normalMat = this->GetPhysics()->GetAxis( );
+		anVec3 normal = normalMat[0];
+		anVec3 axis = normalMat[1];
 
 		float t;
-		arcMat3 axisMat;
+		anMat3 axisMat;
 		idProjectile * warheadEntity;
 
 		//hey how 'bout that.
 		normal.Normalize();
 
-		for( t = 0; t< count; t++)	{
+		for ( t = 0; t< count; t++ )	{
 
 			//rotate axis around normal by angle degrees.
 			axisMat = axis.ToMat3();
@@ -2121,4 +2121,4 @@ void rvMIRVProjectile::Event_LaunchWarheads( void ) {
 
 
 }
-// RAVEN END
+

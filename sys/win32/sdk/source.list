@@ -28,8 +28,8 @@ idlib/Heap.cpp
 idlib/Heap.h
 idlib/LangDict.cpp
 idlib/LangDict.h
-idlib/Lexer.cpp
-idlib/Lexer.h
+idlib/anBinaryLexer.cpp
+idlib/anBinaryLexer.h
 idlib/Lib.cpp
 idlib/Lib.h
 idlib/Parser.cpp

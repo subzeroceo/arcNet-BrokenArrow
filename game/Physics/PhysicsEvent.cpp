@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -12,17 +12,17 @@ static char THIS_FILE[] = __FILE__;
 /*
 ===============================================================================
 
-	arcPhysicsEvent
+	anPhysicsEvent
 
 ===============================================================================
 */
 
 /*
 ================
-arcPhysicsEvent::arcPhysicsEvent
+anPhysicsEvent::anPhysicsEvent
 ================
 */
-arcPhysicsEvent::arcPhysicsEvent( nodeType_t &list ) : _creationTime( gameLocal.time ) {
+anPhysicsEvent::anPhysicsEvent( nodeType_t &list ) : _creationTime( gameLocal.time ) {
 	_node.SetOwner( this );
 	_node.AddToEnd( list );
 }
@@ -30,7 +30,7 @@ arcPhysicsEvent::arcPhysicsEvent( nodeType_t &list ) : _creationTime( gameLocal.
 /*
 ===============================================================================
 
-	arcPhysicsEvent_RadiusPush
+	anPhysicsEvent_RadiusPush
 
 ===============================================================================
 */
@@ -40,7 +40,7 @@ arcPhysicsEvent::arcPhysicsEvent( nodeType_t &list ) : _creationTime( gameLocal.
 sdPhysicsEvent_RadiusPush::sdPhysicsEvent_RadiusPush
 ================
 */
-arcPhysicsEvent_RadiusPush::arcPhysicsEvent_RadiusPush( nodeType_t &list, const arcVec3 &origin, float radius, const arcDeclDamage *damageDecl, float push, const arcEntity *inflictor, const arcEntity *ignore, int flags ) : arcPhysicsEvent( list ) {
+anPhysicsEvent_RadiusPush::anPhysicsEvent_RadiusPush( nodeType_t &list, const anVec3 &origin, float radius, const arcDeclDamage *damageDecl, float push, const arcEntity *inflictor, const arcEntity *ignore, int flags ) : anPhysicsEvent( list ) {
 	_origin = origin;
 	_radius = radius;
 	_push = push;
@@ -52,9 +52,9 @@ arcPhysicsEvent_RadiusPush::arcPhysicsEvent_RadiusPush( nodeType_t &list, const 
 
 /*
 ================
-arcPhysicsEvent_RadiusPush::Apply
+anPhysicsEvent_RadiusPush::Apply
 ================
 */
-void arcPhysicsEvent_RadiusPush::Apply( void ) const {
+void anPhysicsEvent_RadiusPush::Apply( void ) const {
 	gameLocal.RadiusPush( _origin, _radius, _damageDecl, _push, _inflictor, _ignore, _flags, false );
 }

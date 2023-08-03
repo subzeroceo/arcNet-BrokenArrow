@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -660,25 +660,25 @@ static void RB_NV20_CreateDrawInteractions( const drawSurf_t *surf ) {
 
 	for (; surf; surf=surf->nextOnLight ) {
 		// set the vertex pointers
-		arcDrawVert	*ac = (arcDrawVert *)vertexCache.Position( surf->geo->ambientCache );
-		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( arcDrawVert ), ac->color );
+		anDrawVertex	*ac = (anDrawVertex *)vertexCache.Position( surf->geo->ambientCache );
+		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( anDrawVertex ), ac->color );
 #ifdef MACOS_X
 		GL_SetCurrentTextureUnit( 0 );
-		qglTexCoordPointer( 2, GL_FLOAT, sizeof( arcDrawVert ), ac->st.ToFloatPtr() );
+		qglTexCoordPointer( 2, GL_FLOAT, sizeof( anDrawVertex ), ac->st.ToFloatPtr() );
 		GL_SetCurrentTextureUnit( 1 );
-		qglTexCoordPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), ac->tangents[0].ToFloatPtr() );
+		qglTexCoordPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), ac->tangents[0].ToFloatPtr() );
 		GL_SetCurrentTextureUnit( 2 );
-		qglTexCoordPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), ac->tangents[1].ToFloatPtr() );
+		qglTexCoordPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), ac->tangents[1].ToFloatPtr() );
 		GL_SetCurrentTextureUnit( 3 );
-		qglTexCoordPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), ac->normal.ToFloatPtr() );
+		qglTexCoordPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), ac->normal.ToFloatPtr() );
 		GL_SetCurrentTextureUnit( 0 );
 #else
-		qglVertexAttribPointerARB( 11, 3, GL_FLOAT, false, sizeof( arcDrawVert ), ac->normal.ToFloatPtr() );
-		qglVertexAttribPointerARB( 10, 3, GL_FLOAT, false, sizeof( arcDrawVert ), ac->tangents[1].ToFloatPtr() );
-		qglVertexAttribPointerARB( 9, 3, GL_FLOAT, false, sizeof( arcDrawVert ), ac->tangents[0].ToFloatPtr() );
-		qglVertexAttribPointerARB( 8, 2, GL_FLOAT, false, sizeof( arcDrawVert ), ac->st.ToFloatPtr() );
+		qglVertexAttribPointerARB( 11, 3, GL_FLOAT, false, sizeof( anDrawVertex ), ac->normal.ToFloatPtr() );
+		qglVertexAttribPointerARB( 10, 3, GL_FLOAT, false, sizeof( anDrawVertex ), ac->tangents[1].ToFloatPtr() );
+		qglVertexAttribPointerARB( 9, 3, GL_FLOAT, false, sizeof( anDrawVertex ), ac->tangents[0].ToFloatPtr() );
+		qglVertexAttribPointerARB( 8, 2, GL_FLOAT, false, sizeof( anDrawVertex ), ac->st.ToFloatPtr() );
 #endif
-		qglVertexPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), ac->xyz.ToFloatPtr() );
+		qglVertexPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), ac->xyz.ToFloatPtr() );
 
 		RB_CreateSingleDrawInteractions( surf, RB_NV20_DrawInteraction );
 	}

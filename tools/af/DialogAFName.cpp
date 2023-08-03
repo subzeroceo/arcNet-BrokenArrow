@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -43,9 +43,9 @@ IMPLEMENT_DYNAMIC(DialogAFName, CDialog)
 DialogAFName::DialogAFName
 ================
 */
-DialogAFName::DialogAFName(CWnd* pParent /*=NULL*/)
+DialogAFName::DialogAFName(CWnd* pParent /*=nullptr*/)
 	: CDialog(DialogAFName::IDD, pParent)
-	, m_combo(NULL)
+	, m_combo(nullptr )
 {
 }
 

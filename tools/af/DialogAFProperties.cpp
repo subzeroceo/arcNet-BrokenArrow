@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -60,7 +60,7 @@ toolTip_t DialogAFProperties::toolTips[] = {
 	{ IDC_EDIT_MAXIMUM_MOVE_TIME, "always suspend simulation after running for this many seconds" },
 	{ IDC_EDIT_LINEAR_TOLERANCE, "maximum translation considered no movement" },
 	{ IDC_EDIT_ANGULAR_TOLERANCE, "maximum rotation considered no movement" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 IMPLEMENT_DYNAMIC(DialogAFProperties, CDialog)
@@ -70,7 +70,7 @@ IMPLEMENT_DYNAMIC(DialogAFProperties, CDialog)
 DialogAFProperties::DialogAFProperties
 ================
 */
-DialogAFProperties::DialogAFProperties(CWnd* pParent /*=NULL*/)
+DialogAFProperties::DialogAFProperties(CWnd* pParent /*=nullptr*/)
 	: CDialog(DialogAFProperties::IDD, pParent)
 	, m_selfCollision(false)
 	, m_linearFriction(0 )
@@ -87,7 +87,7 @@ DialogAFProperties::DialogAFProperties(CWnd* pParent /*=NULL*/)
 	, m_maxMoveTime(0 )
 	, m_linearTolerance(0 )
 	, m_angularTolerance(0 )
-	, file(NULL)
+	, file(nullptr )
 {
 	Create( IDD_DIALOG_AF_PROPERTIES, pParent );
 	EnableToolTips( TRUE );
@@ -136,8 +136,8 @@ void DialogAFProperties::DoDataExchange(CDataExchange* pDX) {
 DialogAFProperties::LoadFile
 ================
 */
-void DialogAFProperties::LoadFile( arcDeclAF *af ) {
-	arcNetString str;
+void DialogAFProperties::LoadFile( anDeclAF *af ) {
+	anString str;
 
 	file = af;
 
@@ -148,9 +148,9 @@ void DialogAFProperties::LoadFile( arcDeclAF *af ) {
 	m_editModel.SetWindowText( file->model.c_str() );
 	m_editSkin.SetWindowText( file->skin.c_str() );
 	m_selfCollision = file->selfCollision;
-	arcDeclAF::ContentsToString( file->contents, str );
+	anDeclAF::ContentsToString( file->contents, str );
 	m_editContents.SetWindowText( str );
-	arcDeclAF::ContentsToString( file->clipMask, str );
+	anDeclAF::ContentsToString( file->clipMask, str );
 	m_editClipMask.SetWindowText( str );
 	m_linearFriction = file->defaultLinearFriction;
 	m_angularFriction = file->defaultAngularFriction;
@@ -187,9 +187,9 @@ void DialogAFProperties::SaveFile( void ) {
 	file->skin = str;
 	file->selfCollision = ( m_selfCollision != FALSE );
 	m_editContents.GetWindowText( str );
-	file->contents = arcDeclAF::ContentsFromString( str );
+	file->contents = anDeclAF::ContentsFromString( str );
 	m_editClipMask.GetWindowText( str );
-	file->clipMask = arcDeclAF::ContentsFromString( str );
+	file->clipMask = anDeclAF::ContentsFromString( str );
 	file->defaultLinearFriction = m_linearFriction;
 	file->defaultAngularFriction = m_angularFriction;
 	file->defaultContactFriction = m_contactFriction;

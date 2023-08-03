@@ -18,64 +18,64 @@
 typedef struct parametricPState_s {
 	int										time;					// physics time
 	int										atRest;					// set when simulation is suspended
-	arcVec3									origin;					// world origin
-	idAngles								angles;					// world angles
-	arcMat3									axis;					// world axis
-	arcVec3									localOrigin;			// local origin
-	idAngles								localAngles;			// local angles
-	idExtrapolate<arcVec3>					linearExtrapolation;	// extrapolation based description of the position over time
-	idExtrapolate<idAngles>					angularExtrapolation;	// extrapolation based description of the orientation over time
-	idInterpolateAccelDecelLinear<arcVec3>	linearInterpolation;	// interpolation based description of the position over time
-	idInterpolateAccelDecelLinear<idAngles>	angularInterpolation;	// interpolation based description of the orientation over time
-	idCurve_Spline<arcVec3> *				spline;					// spline based description of the position over time
+	anVec3									origin;					// world origin
+	anAngles								angles;					// world angles
+	anMat3									axis;					// world axis
+	anVec3									localOrigin;			// local origin
+	anAngles								localAngles;			// local angles
+	idExtrapolate<anVec3>					linearExtrapolation;	// extrapolation based description of the position over time
+	idExtrapolate<anAngles>					angularExtrapolation;	// extrapolation based description of the orientation over time
+	idInterpolateAccelDecelLinear<anVec3>	linearInterpolation;	// interpolation based description of the position over time
+	idInterpolateAccelDecelLinear<anAngles>	angularInterpolation;	// interpolation based description of the orientation over time
+	anCurve_Spline<anVec3> *				spline;					// spline based description of the position over time
 	idInterpolateAccelDecelLinear<float>	splineInterpolate;		// position along the spline over time
 	bool									useSplineAngles;		// set the orientation using the spline
 } parametricPState_t;
 
-class idPhysics_Parametric : public idPhysics_Base {
+class anPhysics_Parametric : public anPhysics_Base {
 
 public:
-	CLASS_PROTOTYPE( idPhysics_Parametric );
+	CLASS_PROTOTYPE( anPhysics_Parametric );
 
-							idPhysics_Parametric( void );
-							~idPhysics_Parametric( void );
+							anPhysics_Parametric( void );
+							~anPhysics_Parametric( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	void					SetPusher( int flags );
 	bool					IsPusher( void ) const;
 
-	void					SetLinearExtrapolation( extrapolation_t type, int time, int duration, const arcVec3 &base, const arcVec3 &speed, const arcVec3 &baseSpeed );
-	void					SetAngularExtrapolation( extrapolation_t type, int time, int duration, const idAngles &base, const idAngles &speed, const idAngles &baseSpeed );
+	void					SetLinearExtrapolation( extrapolation_t type, int time, int duration, const anVec3 &base, const anVec3 &speed, const anVec3 &baseSpeed );
+	void					SetAngularExtrapolation( extrapolation_t type, int time, int duration, const anAngles &base, const anAngles &speed, const anAngles &baseSpeed );
 	extrapolation_t			GetLinearExtrapolationType( void ) const;
 	extrapolation_t			GetAngularExtrapolationType( void ) const;
 
-	void					SetLinearInterpolation( int time, int accelTime, int decelTime, int duration, const arcVec3 &startPos, const arcVec3 &endPos );
-	void					SetAngularInterpolation( int time, int accelTime, int decelTime, int duration, const idAngles &startAng, const idAngles &endAng );
+	void					SetLinearInterpolation( int time, int accelTime, int decelTime, int duration, const anVec3 &startPos, const anVec3 &endPos );
+	void					SetAngularInterpolation( int time, int accelTime, int decelTime, int duration, const anAngles &startAng, const anAngles &endAng );
 
-	void					SetSpline( idCurve_Spline<arcVec3> *spline, int accelTime, int decelTime, bool useSplineAngles );
-	idCurve_Spline<arcVec3> *GetSpline( void ) const;
+	void					SetSpline( anCurve_Spline<anVec3> *spline, int accelTime, int decelTime, bool useSplineAngles );
+	anCurve_Spline<anVec3> *GetSpline( void ) const;
 	int						GetSplineAcceleration( void ) const;
 	int						GetSplineDeceleration( void ) const;
 	bool					UsingSplineAngles( void ) const;
 
-	void					GetLocalOrigin( arcVec3 &curOrigin ) const;
-	void					GetLocalAngles( idAngles &curAngles ) const;
+	void					GetLocalOrigin( anVec3 &curOrigin ) const;
+	void					GetLocalAngles( anAngles &curAngles ) const;
 
-	void					GetAngles( idAngles &curAngles ) const;
+	void					GetAngles( anAngles &curAngles ) const;
 
-// RAVEN BEGIN
+
 // abahr: a method for hiding gimblelock
-	void					SetAxisOffset( const arcMat3& offset ) { axisOffset = offset; useAxisOffset = true; }
-	const arcMat3&			GetAxisOffset() const { return axisOffset; }
-	arcMat3&					GetAxisOffset() { return axisOffset; }
+	void					SetAxisOffset( const anMat3& offset ) { axisOffset = offset; useAxisOffset = true; }
+	const anMat3&			GetAxisOffset() const { return axisOffset; }
+	anMat3&					GetAxisOffset() { return axisOffset; }
 	bool					UseAxisOffset() const { return useAxisOffset; }
-// RAVEN END
+
 
 public:	// common physics interface
-	void					SetClipModel( idClipModel *model, float density, int id = 0, bool freeOld = true );
-	idClipModel *			GetClipModel( int id = 0 ) const;
+	void					SetClipModel( anClipModel *model, float density, int id = 0, bool freeOld = true );
+	anClipModel *			GetClipModel( int id = 0 ) const;
 	int						GetNumClipModels( void ) const;
 
 	void					SetMass( float mass, int id = -1 );
@@ -84,8 +84,8 @@ public:	// common physics interface
 	void					SetContents( int contents, int id = -1 );
 	int						GetContents( int id = -1 ) const;
 
-	const arcBounds &		GetBounds( int id = -1 ) const;
-	const arcBounds &		GetAbsBounds( int id = -1 ) const;
+	const anBounds &		GetBounds( int id = -1 ) const;
+	const anBounds &		GetAbsBounds( int id = -1 ) const;
 
 	bool					Evaluate( int timeStepMSec, int endTimeMSec );
 	void					UpdateTime( int endTimeMSec );
@@ -99,20 +99,20 @@ public:	// common physics interface
 	void					SaveState( void );
 	void					RestoreState( void );
 
-	void					SetOrigin( const arcVec3 &newOrigin, int id = -1 );
-	void					SetAxis( const arcMat3 &newAxis, int id = -1 );
+	void					SetOrigin( const anVec3 &newOrigin, int id = -1 );
+	void					SetAxis( const anMat3 &newAxis, int id = -1 );
 
-	void					Translate( const arcVec3 &translation, int id = -1 );
-	void					Rotate( const idRotation &rotation, int id = -1 );
+	void					Translate( const anVec3 &translation, int id = -1 );
+	void					Rotate( const anRotation &rotation, int id = -1 );
 
-	const arcVec3 &			GetOrigin( int id = 0 ) const;
-	const arcMat3 &			GetAxis( int id = 0 ) const;
+	const anVec3 &			GetOrigin( int id = 0 ) const;
+	const anMat3 &			GetAxis( int id = 0 ) const;
 
-	void					SetLinearVelocity( const arcVec3 &newLinearVelocity, int id = 0 );
-	void					SetAngularVelocity( const arcVec3 &newAngularVelocity, int id = 0 );
+	void					SetLinearVelocity( const anVec3 &newLinearVelocity, int id = 0 );
+	void					SetAngularVelocity( const anVec3 &newAngularVelocity, int id = 0 );
 
-	const arcVec3 &			GetLinearVelocity( int id = 0 ) const;
-	const arcVec3 &			GetAngularVelocity( int id = 0 ) const;
+	const anVec3 &			GetLinearVelocity( int id = 0 ) const;
+	const anVec3 &			GetAngularVelocity( int id = 0 ) const;
 
 	void					DisableClip( void );
 	void					EnableClip( void );
@@ -120,16 +120,16 @@ public:	// common physics interface
 	void					UnlinkClip( void );
 	void					LinkClip( void );
 
-	void					SetMaster( idEntity *master, const bool orientated = true );
+	void					SetMaster( anEntity *master, const bool orientated = true );
 
 	const trace_t *			GetBlockingInfo( void ) const;
-	idEntity *				GetBlockingEntity( void ) const;
+	anEntity *				GetBlockingEntity( void ) const;
 
 	int						GetLinearEndTime( void ) const;
 	int						GetAngularEndTime( void ) const;
 
-	void					WriteToSnapshot( idBitMsgDelta &msg ) const;
-	void					ReadFromSnapshot( const idBitMsgDelta &msg );
+	void					WriteToSnapshot( anBitMsgDelta &msg ) const;
+	void					ReadFromSnapshot( const anBitMsgDelta &msg );
 
 private:
 	// parametric physics state
@@ -138,7 +138,7 @@ private:
 
 	// pusher
 	bool					isPusher;
-	idClipModel *			clipModel;
+	anClipModel *			clipModel;
 	int						pushFlags;
 
 	// results of last evaluate
@@ -149,11 +149,11 @@ private:
 	bool					hasMaster;
 	bool					isOrientated;
 
-// RAVEN BEGIN
+
 // abahr: a method for hiding gimblelock
 	bool					useAxisOffset;
-	arcMat3					axisOffset;
-// RAVEN END
+	anMat3					axisOffset;
+
 
 private:
 	bool					TestIfAtRest( void ) const;

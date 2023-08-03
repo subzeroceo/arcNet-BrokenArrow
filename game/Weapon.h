@@ -29,7 +29,7 @@ class idWeapon;
 
 class sdWeaponNetworkInterface : public sdNetworkInterface {
 public:
-										sdWeaponNetworkInterface( void ) { owner = NULL; }
+										sdWeaponNetworkInterface( void ) { owner = nullptr; }
 
 	void								Init( idWeapon* _owner ) { owner = _owner; }
 
@@ -42,9 +42,9 @@ protected:
 
 class sdWeaponLockInfo {
 public:
-							sdWeaponLockInfo( void ) { lockingSound = NULL; lockedSound = NULL; lockDistance = 0.f; supported = false; lockFriendly = false; sticky = false; }
+							sdWeaponLockInfo( void ) { lockingSound = nullptr; lockedSound = nullptr; lockDistance = 0.f; supported = false; lockFriendly = false; sticky = false; }
 
-	void					Load( const arcDict& dict );
+	void					Load( const anDict& dict );
 
 	void					SetSupported( bool value ) { supported = value; }
 
@@ -77,7 +77,7 @@ class sdPlayerStatEntry;
 extern const arcEventDef EV_Weapon_LaunchProjectiles;
 
 typedef struct modInfo_s {
-	const arcDeclEntityDef*	projectileDef;
+	const anDeclEntityDef*	projectileDef;
 	const char*				clientProjectileScript;
 	ammoType_t				ammoType;
 	int						ammoRequired;		// amount of ammo to use each shot.  0 means weapon doesn't need ammo.
@@ -108,7 +108,7 @@ struct weaponAimValues_t {
 
 struct weaponFeedback_t {
 	int						recoilTime;
-	arcAngles				recoilAngles;
+	anAngles				recoilAngles;
 	float					kickback;
 	float					kickbackProne;
 };
@@ -167,7 +167,7 @@ public:
 	void					LogTimeUsed( void );
 
 	virtual void			SetModel( const char *modelname );
-	bool					GetGlobalJointTransform( bool viewModel, const jointHandle_t jointHandle, arcVec3 &offset, arcMat3 &axis );
+	bool					GetGlobalJointTransform( bool viewModel, const jointHandle_t jointHandle, anVec3 &offset, anMat3 &axis );
 
 	void					UpdateShadows( void );
 
@@ -185,15 +185,15 @@ public:
 	void					EndAttack( void );
 
 	void					UpdateSpreadValue( void );
-	void					UpdateSpreadValue( const arcVec3& velocity, const arcAngles& angles, const arcAngles& oldAngles );
+	void					UpdateSpreadValue( const anVec3& velocity, const anAngles& angles, const anAngles& oldAngles );
 
-	virtual bool			ClientReceiveEvent( int event, int time, const idBitMsg &msg );
-	virtual	bool			ClientReceiveUnreliableEvent( int event, int time, const idBitMsg &msg );
+	virtual bool			ClientReceiveEvent( int event, int time, const anBitMsg &msg );
+	virtual	bool			ClientReceiveUnreliableEvent( int event, int time, const anBitMsg &msg );
 
 	void					DoStanceTransition( weaponSpreadValueIndex_t oldStanceState );
 
-	void					BeginModeSwitch( void );
-	void					EndModeSwitch( void );
+	void					BeginModeswitch ( void );
+	void					EndModeswitch ( void );
 
 	void					BeginAltFire( void );
 	void					EndAltFire( void );
@@ -201,12 +201,12 @@ public:
 	bool					IsReady( void ) const;
 	bool					IsReloading( void ) const;
 	bool					IsHolstered( void ) const;
-	void					InstantSwitch( void );
+	void					Instantswitch ( void );
 	bool					CanAttack( void );
 
 	bool					IsAttacking( void ) const;
 
-	const arcVec3&			GetViewOffset( void ) const { return viewOffset; }
+	const anVec3&			GetViewOffset( void ) const { return viewOffset; }
 
 	float					GetLargeFOVScale( void ) const { return largeFOVScale; }
 
@@ -230,7 +230,7 @@ public:
 	virtual void			Present( void );
 	virtual void			FreeModelDef( void );
 	void					PresentWeapon( void );
-	void					SwayAngles( arcAngles& angles ) const;
+	void					SwayAngles( anAngles& angles ) const;
 
 	// Ammo
 	static ammoType_t		GetAmmoType( const char *ammoname );
@@ -252,7 +252,7 @@ public:
 
 	const sdWeaponLockInfo*	GetLockInfo( void ) const { return &lockInfo; }
 
-	void					ClampAngles( arcAngles& angles, const arcAngles& oldAngles ) const;
+	void					ClampAngles( anAngles& angles, const anAngles& oldAngles ) const;
 
 	float					GetDriftScale( void ) const { return driftScale; }
 
@@ -287,8 +287,8 @@ private:
 
 	sdProgramThread*		thread;
 
-	arcNetString					state;
-	arcNetString					idealState;
+	anString					state;
+	anString					idealState;
 
 	int						animBlendFrames;
 	int						animDoneTime;
@@ -321,8 +321,8 @@ private:
 
 	arcNetBasePlayer*										owner;
 
-	arcNetList< rvClientEntityPtr< sdClientAnimated > >	worldModels;
-	arcNetList< jointHandle_t >							barrelJointsWorld;
+	anList< rvClientEntityPtr< sdClientAnimated > >	worldModels;
+	anList< jointHandle_t >							barrelJointsWorld;
 
 	// hiding (for GUIs and NPCs)
 	int						hideTime;
@@ -343,17 +343,17 @@ private:
 	bool					usesStroyent;
 
 	// these are the player render view parms, which include bobbing
-	arcVec3					playerViewOrigin;
-	arcMat3					playerViewAxis;
+	anVec3					playerViewOrigin;
+	anMat3					playerViewAxis;
 
 	// the view weapon render entity parms
-	arcVec3					viewWeaponOrigin;
-	arcMat3					viewWeaponAxis;
+	anVec3					viewWeaponOrigin;
+	anMat3					viewWeaponAxis;
 
-	arcVec3					viewOffset;
+	anVec3					viewOffset;
 
 	float					viewForeShorten;
-	arcMat3					viewForeShortenAxis;
+	anMat3					viewForeShortenAxis;
 
 	idInterpolate< float >	zoomFov;
 
@@ -392,8 +392,8 @@ private:
 	int						kick_endtime;
 	int						muzzle_kick_time;
 	int						muzzle_kick_maxtime;
-	arcAngles				muzzle_kick_angles;
-	arcVec3					muzzle_kick_offset;
+	anAngles				muzzle_kick_angles;
+	anVec3					muzzle_kick_offset;
 
 	// zoom
 
@@ -407,7 +407,7 @@ private:
 	angleClamp_t			clampPitch;
 	angleClamp_t			clampYaw;
 	bool					clampEnabled;
-	arcAngles				clampBaseAngles;
+	anAngles				clampBaseAngles;
 
 	int						tracerCounter;
 
@@ -417,19 +417,19 @@ private:
 
 	renderEntity_t			dofRenderEntity;
 	int						dofModelDefHandle;
-	const arcDeclSkin*		dofSkin;
+	const anDeclSkin*		dofSkin;
 
-	const arcDeclSkin*		climateSkin;
+	const anDeclSkin*		climateSkin;
 
 	weaponFeedback_t		feedback;
 
 	// Visual presentation
 	void					InitWorldModel( int index );
-	void					MuzzleRise( arcVec3 &origin, arcMat3 &axis );
+	void					MuzzleRise( anVec3 &origin, anMat3 &axis );
 
 	void					SetupStats( const char* statName );
 
-	virtual void			SetSkin( const arcDeclSkin* skin );
+	virtual void			SetSkin( const anDeclSkin* skin );
 
 	// script events
 	void					Event_Clear( void );
@@ -457,7 +457,7 @@ private:
 	void					Event_GetBlendFrames( animChannel_t channel );
 	void					Event_Next( void );
 	void					Event_LaunchProjectiles( int numProjectiles, int projectileIndex, float spread, float fuseOffset, float launchPower, float dmgPower );
-	void					Event_DoProjectileTracer( int projectileIndex, const arcVec3& start, const arcVec3& end );
+	void					Event_DoProjectileTracer( int projectileIndex, const anVec3& start, const anVec3& end );
 	void					Event_CreateProjectile( int projectileIndex );
 	void					Event_Melee( int contentMask, float distance, bool ignoreOwner, bool useAntiLag );
 	void					Event_MeleeAttack( float damageScale );
@@ -481,7 +481,7 @@ private:
 	void					Event_SetFovStart( float startFov, float endFov, float startTime, float duration );
 	void					Event_ClearFov( void );
 	void					Event_GetFov( void );
-	void					Event_EnableClamp( const arcAngles& baseAngles );
+	void					Event_EnableClamp( const anAngles& baseAngles );
 	void					Event_DisableClamp( void );
 	void					Event_GetSpreadValue( void );
 	void					Event_IncreaseSpreadValue( void );
@@ -499,7 +499,7 @@ private:
 	void					Event_HasWeaponAnim( const char* anim );
 	void					Event_SetStatName( const char* statName );
 
-	void					Event_SendTracerMessage( const arcVec3& start, const arcVec3& end, float strength );
+	void					Event_SendTracerMessage( const anVec3& start, const anVec3& end, float strength );
 
 	enum {
 		EVENT_RELOAD = arcEntity::EVENT_MAXEVENTS,

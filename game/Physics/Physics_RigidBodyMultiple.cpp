@@ -2,7 +2,7 @@
 //
 
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
@@ -49,8 +49,8 @@ arcRigidBodyMulti_Body::arcRigidBodyMulti_Body
 ================
 */
 arcRigidBodyMulti_Body::arcRigidBodyMulti_Body( void ) {
-	clipModel = NULL;
-	centeredClipModel = new arcClipModel();
+	clipModel = nullptr;
+	centeredClipModel = new anClipModel();
 
 	Init();
 }
@@ -71,7 +71,7 @@ arcRigidBodyMulti_Body::DebugDrawMass
 ================
 */
 void arcRigidBodyMulti_Body::DebugDrawMass( void ) {
-	if ( clipModel == NULL ) {
+	if ( clipModel == nullptr ) {
 		return;
 	}
 
@@ -101,8 +101,8 @@ void arcRigidBodyMulti_Body::Init( void ) {
 arcRigidBodyMulti_Body::SetClipModel
 ================
 */
-void arcRigidBodyMulti_Body::SetClipModel( arcClipModel* _clipModel, float density, int id, bool freeOld ) {
-	if ( freeOld && clipModel != NULL && ( clipModel != _clipModel ) ) {
+void arcRigidBodyMulti_Body::SetClipModel( anClipModel* _clipModel, float density, int id, bool freeOld ) {
+	if ( freeOld && clipModel != nullptr && ( clipModel != _clipModel ) ) {
 		gameLocal.clip.DeleteClipModel( clipModel );
 	}
 	clipModel = _clipModel;
@@ -112,7 +112,7 @@ void arcRigidBodyMulti_Body::SetClipModel( arcClipModel* _clipModel, float densi
 
 		// get mass properties from the trace model
 		clipModel->GetMassProperties( density, mass, centerOfMass, inertiaTensor );
-		if ( mass < arcMath::FLT_EPSILON || FLOAT_IS_NAN( mass ) ) {
+		if ( mass < anMath::FLT_EPSILON || FLOAT_IS_NAN( mass ) ) {
 			gameLocal.Warning( "arcRigidBodyMulti_Body::SetClipModel: invalid mass" );
 			Init();
 		}
@@ -127,11 +127,11 @@ void arcRigidBodyMulti_Body::SetClipModel( arcClipModel* _clipModel, float densi
 arcRigidBodyMulti_Body::SetMainCenterOfMass
 ================
 */
-void arcRigidBodyMulti_Body::SetMainCenterOfMass( const arcVec3& com ) {
+void arcRigidBodyMulti_Body::SetMainCenterOfMass( const anVec3& com ) {
 	if ( clipModel ) {
-		assert( clipModel->GetTraceModel() != NULL );
+		assert( clipModel->GetTraceModel() != nullptr );
 
-		arcTraceModel tempTrace = *clipModel->GetTraceModel();
+		anTraceModel tempTrace = *clipModel->GetTraceModel();
 		tempTrace.Translate( localOrigin - com );
 		centeredClipModel->LoadTraceModel( tempTrace, false );
 	}
@@ -147,7 +147,7 @@ void arcRigidBodyMulti_Body::Link( arcEntity* self, const rigidBodyPState_t& cur
 		return;
 	}
 
-	arcVec3 org = current.i.position + ( localOrigin * current.i.orientation );
+	anVec3 org = current.i.position + ( localOrigin * current.i.orientation );
 	clipModel->Link( gameLocal.clip, self, clipModel->GetId(), org, current.i.orientation );
 }
 
@@ -181,18 +181,18 @@ RigidBodyDerivatives_Multi
 ================
 */
 void RigidBodyDerivatives_Multi( const float t, const void *clientData, const float *state, float *derivatives ) {
-	const arcPhysics_RigidBodyMultiple* p = reinterpret_cast< const arcPhysics_RigidBodyMultiple* >( clientData );
+	const anPhysics_RigidBodyMultiple* p = reinterpret_cast< const anPhysics_RigidBodyMultiple* >( clientData );
 	const rigidBodyIState_t *s = reinterpret_cast< const rigidBodyIState_t* >( state );
 
 	struct rigidBodyDerivatives_s {
-		arcVec3				linearVelocity;
-		arcMat3				angularMatrix;
-		arcVec3				force;
-		arcVec3				torque;
+		anVec3				linearVelocity;
+		anMat3				angularMatrix;
+		anVec3				force;
+		anVec3				torque;
 	} *d = ( struct rigidBodyDerivatives_s* ) derivatives;
 
-	arcVec3 angularVelocity;
-	arcMat3 inverseWorldInertiaTensor;
+	anVec3 angularVelocity;
+	anMat3 inverseWorldInertiaTensor;
 
 	inverseWorldInertiaTensor = s->orientation * p->GetMainInverseInertiaTensor() * s->orientation.Transpose();
 	angularVelocity = inverseWorldInertiaTensor * s->angularMomentum;
@@ -213,20 +213,20 @@ void RigidBodyDerivatives_Multi( const float t, const void *clientData, const fl
 /*
 ===============================================================
 
-	arcPhysics_RigidBodyMultiple
+	anPhysics_RigidBodyMultiple
 
 ===============================================================
 */
 
-CLASS_DECLARATION( arcPhysics_Base, arcPhysics_RigidBodyMultiple )
+CLASS_DECLARATION( anPhysics_Base, anPhysics_RigidBodyMultiple )
 END_CLASS
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::arcPhysics_RigidBodyMultiple
+anPhysics_RigidBodyMultiple::anPhysics_RigidBodyMultiple
 ================
 */
-arcPhysics_RigidBodyMultiple::arcPhysics_RigidBodyMultiple( void ) {
+anPhysics_RigidBodyMultiple::anPhysics_RigidBodyMultiple( void ) {
 	// set default rigid body properties
 	SetBouncyness( 0.6f );
 	SetFriction( 0.6f, 0.6f );
@@ -262,13 +262,13 @@ arcPhysics_RigidBodyMultiple::arcPhysics_RigidBodyMultiple( void ) {
 	activateEndTime = 0;
 
 	// use the least expensive euler integrator
-	integrator = new idODE_Euler( sizeof( rigidBodyIState_t ) / sizeof( float ), RigidBodyDerivatives_Multi, this );
+	integrator = new anODE_Euler( sizeof( rigidBodyIState_t ) / sizeof( float ), RigidBodyDerivatives_Multi, this );
 
 	lcp = idLCP::AllocSymmetric();
 
-	masterEntity = NULL;
-	mainClipModel = new arcClipModel();
-	centeredMainClipModel = new arcClipModel();
+	masterEntity = nullptr;
+	mainClipModel = new anClipModel();
+	centeredMainClipModel = new anClipModel();
 
 	flags.noImpact			= false;
 	flags.noContact			= false;
@@ -286,10 +286,10 @@ arcPhysics_RigidBodyMultiple::arcPhysics_RigidBodyMultiple( void ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::~arcPhysics_RigidBodyMultiple
+anPhysics_RigidBodyMultiple::~anPhysics_RigidBodyMultiple
 ================
 */
-arcPhysics_RigidBodyMultiple::~arcPhysics_RigidBodyMultiple( void ) {
+anPhysics_RigidBodyMultiple::~anPhysics_RigidBodyMultiple( void ) {
 	delete integrator;
 	delete lcp;
 	gameLocal.clip.DeleteClipModel( mainClipModel );
@@ -298,19 +298,19 @@ arcPhysics_RigidBodyMultiple::~arcPhysics_RigidBodyMultiple( void ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::CalculateMassProperties
+anPhysics_RigidBodyMultiple::CalculateMassProperties
 ================
 */
-void arcPhysics_RigidBodyMultiple::CalculateMassProperties( void ) {
+void anPhysics_RigidBodyMultiple::CalculateMassProperties( void ) {
 	int i;
 
 	mainMass = 0;
 
-	arcVec3 moments;
+	anVec3 moments;
 	moments.Zero();
 
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		arcRigidBodyMulti_Body& body = bodies[ i ];
+		arcRigidBodyMulti_Body& body = bodies[i];
 		if ( !body.GetClipModel() ) {
 			continue;
 		}
@@ -327,13 +327,13 @@ void arcPhysics_RigidBodyMultiple::CalculateMassProperties( void ) {
 		mainCenterOfMass.Zero();
 	}
 
-	arcMat3 oldMainInertiaTensor = mainInertiaTensor;
+	anMat3 oldMainInertiaTensor = mainInertiaTensor;
 
 	mainInertiaTensor.Zero();
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		arcRigidBodyMulti_Body& body = bodies[ i ];
+		arcRigidBodyMulti_Body& body = bodies[i];
 
-		arcMat3 localInertiaTensor = body.GetInertiaTensor();
+		anMat3 localInertiaTensor = body.GetInertiaTensor();
 		localInertiaTensor.InertiaTranslateSelf( body.GetMass(), body.GetCenterOfMass() + body.GetOffset(), mainCenterOfMass - ( body.GetCenterOfMass() + body.GetOffset() ) );
 		mainInertiaTensor += localInertiaTensor;
 
@@ -350,26 +350,26 @@ void arcPhysics_RigidBodyMultiple::CalculateMassProperties( void ) {
 		mainInverseInertiaTensor.Zero();
 	}
 
-	arcMat3 axis = mat3_identity;
+	anMat3 axis = mat3_identity;
 
 	mainBounds.Clear();
 	totalBounds.Clear();
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		arcClipModel* clipModel = bodies[ i ].GetClipModel();
+		anClipModel* clipModel = bodies[i].GetClipModel();
 		if ( !clipModel ) {
 			continue;
 		}
-		arcBounds bounds = clipModel->GetBounds();
-		bounds.TranslateSelf( bodies[ i ].GetOffset() );
+		anBounds bounds = clipModel->GetBounds();
+		bounds.TranslateSelf( bodies[i].GetOffset() );
 
 		totalBounds += bounds;
 
-		if ( bodies[ i ].GetClipMask() && clipModel->GetContents() != MASK_HURTZONE ) {
+		if ( bodies[i].GetClipMask() && clipModel->GetContents() != MASK_HURTZONE ) {
 			mainBounds += bounds;
 		}
 	}
 
-	arcTraceModel trm( mainBounds );
+	anTraceModel trm( mainBounds );
 	if ( !mainBounds.IsCleared() ) {
 		mainClipModel->LoadTraceModel( trm, false );
 
@@ -379,16 +379,16 @@ void arcPhysics_RigidBodyMultiple::CalculateMassProperties( void ) {
 
 	mainClipMask = 0;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		mainClipMask |= bodies[ i ].GetClipMask();
+		mainClipMask |= bodies[i].GetClipMask();
 	}
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetBodyOffset
+anPhysics_RigidBodyMultiple::SetBodyOffset
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetBodyOffset( int id, const arcVec3& offset ) {
+void anPhysics_RigidBodyMultiple::SetBodyOffset( int id, const anVec3& offset ) {
 	assert( id >= 0 && id < bodies.Num() );
 
 	arcRigidBodyMulti_Body& body = bodies[ id ];
@@ -398,10 +398,10 @@ void arcPhysics_RigidBodyMultiple::SetBodyOffset( int id, const arcVec3& offset 
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetBodyBuoyancy
+anPhysics_RigidBodyMultiple::SetBodyBuoyancy
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetBodyBuoyancy( int id, float buoyancy ) {
+void anPhysics_RigidBodyMultiple::SetBodyBuoyancy( int id, float buoyancy ) {
 	assert( id >= 0 && id < bodies.Num() );
 
 	arcRigidBodyMulti_Body& body = bodies[ id ];
@@ -410,10 +410,10 @@ void arcPhysics_RigidBodyMultiple::SetBodyBuoyancy( int id, float buoyancy ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetBodyWaterDrag
+anPhysics_RigidBodyMultiple::SetBodyWaterDrag
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetBodyWaterDrag( int id, float drag ) {
+void anPhysics_RigidBodyMultiple::SetBodyWaterDrag( int id, float drag ) {
 	assert( id >= 0 && id < bodies.Num() );
 
 	arcRigidBodyMulti_Body& body = bodies[ id ];
@@ -422,22 +422,22 @@ void arcPhysics_RigidBodyMultiple::SetBodyWaterDrag( int id, float drag ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::ClearClipModels
+anPhysics_RigidBodyMultiple::ClearClipModels
 ================
 */
-void arcPhysics_RigidBodyMultiple::ClearClipModels( void ) {
+void anPhysics_RigidBodyMultiple::ClearClipModels( void ) {
 	for ( int i = 0; i < bodies.Num(); i++ ) {
-		bodies[ i ].SetClipModel( NULL, 1.f, i, true );
+		bodies[i].SetClipModel( nullptr, 1.f, i, true );
 	}
 	bodies.Clear();
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetClipModel
+anPhysics_RigidBodyMultiple::SetClipModel
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetClipModel( arcClipModel *model, float density, int id, bool freeOld ) {
+void anPhysics_RigidBodyMultiple::SetClipModel( anClipModel *model, float density, int id, bool freeOld ) {
 	assert( self );
 	assert( model );					// we need a clip model
 	assert( model->IsTraceModel() );	// and it should be a trace model
@@ -461,31 +461,31 @@ void arcPhysics_RigidBodyMultiple::SetClipModel( arcClipModel *model, float dens
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetClipModel
+anPhysics_RigidBodyMultiple::GetClipModel
 ================
 */
-arcClipModel* arcPhysics_RigidBodyMultiple::GetClipModel( int id ) const {
+anClipModel* anPhysics_RigidBodyMultiple::GetClipModel( int id ) const {
 	if ( id < 0 || id >= bodies.Num() ) {
-		return NULL;
+		return nullptr;
 	}
 	return bodies[ id ].GetClipModel();
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetNumClipModels
+anPhysics_RigidBodyMultiple::GetNumClipModels
 ================
 */
-int arcPhysics_RigidBodyMultiple::GetNumClipModels( void ) const {
+int anPhysics_RigidBodyMultiple::GetNumClipModels( void ) const {
 	return bodies.Num();
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetBouncyness
+anPhysics_RigidBodyMultiple::SetBouncyness
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetBouncyness( const float b ) {
+void anPhysics_RigidBodyMultiple::SetBouncyness( const float b ) {
 	if ( b < 0.0f || b > 1.0f ) {
 		return;
 	}
@@ -494,21 +494,21 @@ void arcPhysics_RigidBodyMultiple::SetBouncyness( const float b ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetWaterRestThreshold
+anPhysics_RigidBodyMultiple::SetWaterRestThreshold
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetWaterRestThreshold( float threshold ) {
+void anPhysics_RigidBodyMultiple::SetWaterRestThreshold( float threshold ) {
 	waterRestThreshold = threshold;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetFriction
+anPhysics_RigidBodyMultiple::SetFriction
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetFriction( const float linear, const float angular ) {
+void anPhysics_RigidBodyMultiple::SetFriction( const float linear, const float angular ) {
 	if ( linear < 0.0f || linear > 1.0f || angular < 0.0f || angular > 1.0f ) {
-		gameLocal.Warning( "arcPhysics_RigidBodyMultiple::SetFriction: friction out of range, linear = %.1f, angular = %.1f", linear, angular );
+		gameLocal.Warning( "anPhysics_RigidBodyMultiple::SetFriction: friction out of range, linear = %.1f, angular = %.1f", linear, angular );
 		return;
 	}
 
@@ -518,10 +518,10 @@ void arcPhysics_RigidBodyMultiple::SetFriction( const float linear, const float 
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetWaterFriction
+anPhysics_RigidBodyMultiple::SetWaterFriction
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetWaterFriction( const float linear, const float angular ) {
+void anPhysics_RigidBodyMultiple::SetWaterFriction( const float linear, const float angular ) {
 	if ( linear < 0.0f || linear > 1.0f || angular < 0.0f || angular > 1.0f ) {
 		return;
 	}
@@ -532,10 +532,10 @@ void arcPhysics_RigidBodyMultiple::SetWaterFriction( const float linear, const f
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetContactFriction
+anPhysics_RigidBodyMultiple::SetContactFriction
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetContactFriction( const int id, const arcVec3& contact ) {
+void anPhysics_RigidBodyMultiple::SetContactFriction( const int id, const anVec3& contact ) {
 	assert( id >= 0 && id < bodies.Num() );
 	if ( !( id >= 0 && id < bodies.Num() ) ) {
 		return;
@@ -546,22 +546,22 @@ void arcPhysics_RigidBodyMultiple::SetContactFriction( const int id, const arcVe
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::Freeze
+anPhysics_RigidBodyMultiple::Freeze
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetFrozen( bool freeze ) {
+void anPhysics_RigidBodyMultiple::SetFrozen( bool freeze ) {
 	flags.frozen = freeze;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::Integrate
+anPhysics_RigidBodyMultiple::Integrate
 
   Calculate next state from the current state using an integrator.
 ================
 */
-void arcPhysics_RigidBodyMultiple::Integrate( float deltaTime ) {
-	arcVec3 position( current->i.position );
+void anPhysics_RigidBodyMultiple::Integrate( float deltaTime ) {
+	anVec3 position( current->i.position );
 	current->i.position += mainCenterOfMass * current->i.orientation;
 
 	current->i.orientation.TransposeSelf();
@@ -584,7 +584,7 @@ void arcPhysics_RigidBodyMultiple::Integrate( float deltaTime ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::CollisionImpulse
+anPhysics_RigidBodyMultiple::CollisionImpulse
 
   Calculates the collision impulse using the velocity relative to the collision object.
   The current state should be set to the moment of impact.
@@ -592,31 +592,31 @@ arcPhysics_RigidBodyMultiple::CollisionImpulse
 */
 #define DEBOUNCE_FACTOR		1.0f
 
-bool arcPhysics_RigidBodyMultiple::CollisionImpulse( const trace_t& collision, arcVec3& impulse, arcVec3& relativeVelocity, bool noCollisionDamage ) {
+bool anPhysics_RigidBodyMultiple::CollisionImpulse( const trace_t& collision, anVec3& impulse, anVec3& relativeVelocity, bool noCollisionDamage ) {
 	// get info from other entity involved
 	impactInfo_t info;
 	arcEntity* ent = gameLocal.entities[collision.c.entityNum];
-	arcPhysics* phys = ent->GetPhysics();
+	anPhysics* phys = ent->GetPhysics();
 	ent->GetImpactInfo( self, collision.c.id, collision.c.point, &info );
 
 
 	// gather information
 	float	e		= bouncyness;
-	arcVec3	normal	= collision.c.normal;
+	anVec3	normal	= collision.c.normal;
 
-	arcVec3	v1A		= mainInverseMass * current->i.linearMomentum;
-	arcMat3	invIA	= current->i.orientation.Transpose() * mainInverseInertiaTensor * current->i.orientation;
-	arcVec3	w1A		= invIA * current->i.angularMomentum;
-	arcVec3	rAP		= collision.c.point - ( current->i.position + mainCenterOfMass * current->i.orientation );
+	anVec3	v1A		= mainInverseMass * current->i.linearMomentum;
+	anMat3	invIA	= current->i.orientation.Transpose() * mainInverseInertiaTensor * current->i.orientation;
+	anVec3	w1A		= invIA * current->i.angularMomentum;
+	anVec3	rAP		= collision.c.point - ( current->i.position + mainCenterOfMass * current->i.orientation );
 	v1A = v1A + w1A.Cross( rAP );
 
 	float	normalVel	= v1A * normal;
 
-	arcMat3	invIB	= info.invInertiaTensor;
-	arcVec3	rBP		= info.position;
-	arcVec3	v1B		= info.velocity;
+	anMat3	invIB	= info.invInertiaTensor;
+	anVec3	rBP		= info.position;
+	anVec3	v1B		= info.velocity;
 
-	arcVec3	v1AB	= v1A - v1B;
+	anVec3	v1AB	= v1A - v1B;
 	relativeVelocity = v1AB;
 
 	float j = STOP_SPEED;
@@ -633,8 +633,8 @@ bool arcPhysics_RigidBodyMultiple::CollisionImpulse( const trace_t& collision, a
 
 		float	invMassSum			= invMassA + invMassB;
 
-		arcVec3	radiusFactorA		= ( invIA * rAP.Cross( normal ) ).Cross( rAP );
-		arcVec3	radiusFactorB		= ( invIB * rBP.Cross( normal ) ).Cross( rBP );
+		anVec3	radiusFactorA		= ( invIA * rAP.Cross( normal ) ).Cross( rAP );
+		anVec3	radiusFactorB		= ( invIB * rBP.Cross( normal ) ).Cross( rBP );
 		float	radiusFactors		= ( radiusFactorA + radiusFactorB ) * normal;
 
 		float	numerator			= -( 1.0f + e ) * vNorm;
@@ -680,12 +680,12 @@ bool arcPhysics_RigidBodyMultiple::CollisionImpulse( const trace_t& collision, a
 	}
 
 	// decide which entity hit which - otherwise it is entity update order dependant :(
-	arcVec3 rdA = rAP; rdA.NormalizeFast();
-	arcVec3 rdB = rBP; rdB.NormalizeFast();
+	anVec3 rdA = rAP; rdA.NormalizeFast();
+	anVec3 rdB = rBP; rdB.NormalizeFast();
 	float inVel = rdA * v1AB;
 	float AVel = rdA * v1A;
 	float BVel = rdB * v1B;
-	if ( arcMath::Fabs( AVel ) > arcMath::Fabs( BVel )  ) {
+	if ( anMath::Fabs( AVel ) > anMath::Fabs( BVel )  ) {
 		// this entity hit the other
 		if ( noCollisionDamage ) {
 			// HACK: Zero the velocity to make no collision damage be done
@@ -715,32 +715,32 @@ bool arcPhysics_RigidBodyMultiple::CollisionImpulse( const trace_t& collision, a
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::CheckForCollisions
+anPhysics_RigidBodyMultiple::CheckForCollisions
 
   Check for collisions between the current and next state.
   If there is a collision the next state is set to the state at the moment of impact.
 ================
 */
-bool arcPhysics_RigidBodyMultiple::CheckForCollisions( trace_t &collision ) {
+bool anPhysics_RigidBodyMultiple::CheckForCollisions( trace_t &collision ) {
 	collision.fraction = 1.0f;
 
 	// don't do anything if the position & orientation aren't changing!
-	if ( current->i.position.Compare( next->i.position, arcMath::FLT_EPSILON ) ) {
-		if ( current->i.orientation.Compare( next->i.orientation, arcMath::FLT_EPSILON ) ) {
+	if ( current->i.position.Compare( next->i.position, anMath::FLT_EPSILON ) ) {
+		if ( current->i.orientation.Compare( next->i.orientation, anMath::FLT_EPSILON ) ) {
 			return false;
 		}
 	}
 
-	arcMat3 axis;
-	idRotation rotation;
+	anMat3 axis;
+	anRotation rotation;
 	bool collided = false;
 	int i;
 
 	if ( flags.useFastPath && !mainBounds.IsCleared() && bodies.Num() > 1 ) {
 		if ( !GetTraceCollection().Contents( CLIP_DEBUG_PARMS_ENTINFO( self ) current->i.position, mainClipModel, current->i.orientation, mainClipMask ) ) {
 			// calculate the position of the center of mass at current and next
-			arcVec3 CoMstart = current->i.position + mainCenterOfMass * current->i.orientation;
-			arcVec3 CoMend = next->i.position + mainCenterOfMass * next->i.orientation;
+			anVec3 CoMstart = current->i.position + mainCenterOfMass * current->i.orientation;
+			anVec3 CoMend = next->i.position + mainCenterOfMass * next->i.orientation;
 
 			TransposeMultiply( current->i.orientation, next->i.orientation, axis );
 			rotation = axis.ToRotation();
@@ -756,20 +756,20 @@ bool arcPhysics_RigidBodyMultiple::CheckForCollisions( trace_t &collision ) {
 	}
 
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		arcRigidBodyMulti_Body& body = bodies[ i ];
+		arcRigidBodyMulti_Body& body = bodies[i];
 		if ( body.GetClipMask() == 0 || body.GetClipMask() == MASK_HURTZONE ) {
 			continue;
 		}
 
-		arcClipModel* clipModel = body.GetClipModel();
+		anClipModel* clipModel = body.GetClipModel();
 		if ( !clipModel ) {
 			continue;
 		}
 
-		const arcVec3 worldBodyOffset = body.GetOffset() * current->i.orientation;
+		const anVec3 worldBodyOffset = body.GetOffset() * current->i.orientation;
 
-		arcVec3 start = current->i.position + worldBodyOffset;
-		arcVec3 end = next->i.position + worldBodyOffset;
+		anVec3 start = current->i.position + worldBodyOffset;
+		anVec3 end = next->i.position + worldBodyOffset;
 
 		trace_t tr;
 		if ( GetTraceCollection().Translation( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, start, end, clipModel, current->i.orientation, body.GetClipMask() ) ) {
@@ -786,21 +786,21 @@ bool arcPhysics_RigidBodyMultiple::CheckForCollisions( trace_t &collision ) {
 	}
 
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		arcRigidBodyMulti_Body& body = bodies[ i ];
+		arcRigidBodyMulti_Body& body = bodies[i];
 		if ( body.GetClipMask() == 0 || body.GetClipMask() == MASK_HURTZONE ) {
 			continue;
 		}
 
-		const arcClipModel* clipModel = body.GetCenteredClipModel();
+		const anClipModel* clipModel = body.GetCenteredClipModel();
 		if ( !clipModel ) {
 			continue;
 		}
 
-		arcVec3 end = next->i.position + mainCenterOfMass * current->i.orientation;
+		anVec3 end = next->i.position + mainCenterOfMass * current->i.orientation;
 
 		TransposeMultiply( current->i.orientation, next->i.orientation, axis );
 		rotation = axis.ToRotation();
-		if ( arcMath::Fabs( rotation.GetAngle() ) < arcMath::FLT_EPSILON ) {
+		if ( anMath::Fabs( rotation.GetAngle() ) < anMath::FLT_EPSILON ) {
 			continue;
 		}
 		rotation.SetOrigin( next->i.position );
@@ -824,16 +824,16 @@ bool arcPhysics_RigidBodyMultiple::CheckForCollisions( trace_t &collision ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::CheckForCollisions_Simple
+anPhysics_RigidBodyMultiple::CheckForCollisions_Simple
 
   Rough version of CheckForCollisions that only uses the bounds for tracing
 ================
 */
-bool arcPhysics_RigidBodyMultiple::CheckForCollisions_Simple( trace_t &collision ) {
+bool anPhysics_RigidBodyMultiple::CheckForCollisions_Simple( trace_t &collision ) {
 	collision.fraction = 1.0f;
 	// don't do anything if the position & orientation aren't changing!
-	if ( current->i.position.Compare( next->i.position, arcMath::FLT_EPSILON ) ) {
-		if ( current->i.orientation.Compare( next->i.orientation, arcMath::FLT_EPSILON ) ) {
+	if ( current->i.position.Compare( next->i.position, anMath::FLT_EPSILON ) ) {
+		if ( current->i.orientation.Compare( next->i.orientation, anMath::FLT_EPSILON ) ) {
 			return false;
 		}
 	}
@@ -842,13 +842,13 @@ bool arcPhysics_RigidBodyMultiple::CheckForCollisions_Simple( trace_t &collision
 		int tempClipMask = mainClipMask & ( ~GetVPushClipMask() );
 
 		// calculate the position of the center of mass at current and next
-		arcVec3 CoMstart = current->i.position + mainCenterOfMass * current->i.orientation;
-		arcVec3 CoMend = next->i.position + mainCenterOfMass * next->i.orientation;
+		anVec3 CoMstart = current->i.position + mainCenterOfMass * current->i.orientation;
+		anVec3 CoMend = next->i.position + mainCenterOfMass * next->i.orientation;
 
-		arcMat3 axis;
+		anMat3 axis;
 		TransposeMultiply( current->i.orientation, next->i.orientation, axis );
 
-		idRotation rotation;
+		anRotation rotation;
 		rotation = axis.ToRotation();
 		rotation.SetOrigin( CoMstart );
 
@@ -869,56 +869,56 @@ bool arcPhysics_RigidBodyMultiple::CheckForCollisions_Simple( trace_t &collision
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions_Simple
+anPhysics_RigidBodyMultiple::CheckForPlayerCollisions_Simple
 
   Rough version of CheckForPlayerCollisions that only uses the bounds for tracing
 ================
 */
-bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions_Simple( float timeDelta, trace_t &collision, bool& noCollisionDamage ) {
+bool anPhysics_RigidBodyMultiple::CheckForPlayerCollisions_Simple( float timeDelta, trace_t &collision, bool& noCollisionDamage ) {
 	// TODO: Implement me!
 	return false;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetupVPushCollection
+anPhysics_RigidBodyMultiple::SetupVPushCollection
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetupVPushCollection( void ) {
+void anPhysics_RigidBodyMultiple::SetupVPushCollection( void ) {
 	GetTraceCollection();
 
 	// find which ones to ignore for various reasons
 	vpushCollection.Clear();
 	vpushCollection.SetSelf( self );
-	arcNetList< const arcClipModel* >& collection = traceCollection.GetCollection();
+	anList< const anClipModel* >& collection = traceCollection.GetCollection();
 	int vpushClipMask = GetVPushClipMask();
 
 	for ( int i = 0; i < collection.Num(); i++ ) {
-		const arcClipModel* otherModel = collection[ i ];
+		const anClipModel* otherModel = collection[i];
 		if ( !( otherModel->GetContents() & vpushClipMask ) ) {
 			continue;
 		}
 
 		arcEntity* other = otherModel->GetEntity();
-		if ( other == NULL ) {
+		if ( other == nullptr ) {
 			continue;
 		}
 		if ( !other->IsCollisionPushable() ) {
 			continue;
 		}
 
-		arcPhysics* otherPhysics = other->GetPhysics();
-		arcPhysics_Actor* actorPhysics = otherPhysics->Cast< arcPhysics_Actor >();
+		anPhysics* otherPhysics = other->GetPhysics();
+		anPhysics_Actor* actorPhysics = otherPhysics->Cast< anPhysics_Actor >();
 
-		if ( actorPhysics == NULL ) {
+		if ( actorPhysics == nullptr ) {
 			// only actor-derived things may be vpushed
 			continue;
 		}
 
 		arcNetBasePlayer* playerOther = other->Cast< arcNetBasePlayer >();
-		if ( playerOther != NULL ) {
+		if ( playerOther != nullptr ) {
 			// can't run over players that are our passenger, or the leg model of proned players
-			if ( playerOther->GetProxyEntity()->Cast< sdTransport >() != NULL || otherModel->GetId() != 0 ) {
+			if ( playerOther->GetProxyEntity()->Cast< sdTransport >() != nullptr || otherModel->GetId() != 0 ) {
 				// don't want these to touch the normal collision path either
 				traceCollection.RemoveClipModel( otherModel );
 				i--;
@@ -935,7 +935,7 @@ void arcPhysics_RigidBodyMultiple::SetupVPushCollection( void ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions
+anPhysics_RigidBodyMultiple::CheckForPlayerCollisions
 
   Check for collisions against players only between the current and next state, by
   hurtzone bodies. These then immediately have the callbacks executed so the players
@@ -943,22 +943,22 @@ arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions
 ================
 */
 #define RBM_MAX_CLIP_MODELS_COLLECTED	128
-bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, trace_t& collision, bool& noCollisionDamage ) {
+bool anPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, trace_t& collision, bool& noCollisionDamage ) {
 	// don't do anything if the position & orientation aren't changing!
-	if ( current->i.position.Compare( next->i.position, arcMath::FLT_EPSILON ) ) {
-		if ( current->i.orientation.Compare( next->i.orientation, arcMath::FLT_EPSILON ) ) {
+	if ( current->i.position.Compare( next->i.position, anMath::FLT_EPSILON ) ) {
+		if ( current->i.orientation.Compare( next->i.orientation, anMath::FLT_EPSILON ) ) {
 			return false;
 		}
 	}
 
 	int vpushClipMask = GetVPushClipMask();
 
-	arcVec3 currentPosition = current->i.position;
-	arcVec3 nextPosition = next->i.position;
-	arcMat3 currentOrientation = current->i.orientation;
-	arcMat3 nextOrientation = next->i.orientation;
+	anVec3 currentPosition = current->i.position;
+	anVec3 nextPosition = next->i.position;
+	anMat3 currentOrientation = current->i.orientation;
+	anMat3 nextOrientation = next->i.orientation;
 
-	arcNetList< const arcClipModel* >& clipModelList = vpushCollection.GetCollection();
+	anList< const anClipModel* >& clipModelList = vpushCollection.GetCollection();
 	int numClipModels = vpushCollection.GetCollection().Num();
 
 	if ( numClipModels == 0 ) {
@@ -967,8 +967,8 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 
 	bool isSquisher = false;
 	sdTransport* transportSelf = self->Cast< sdTransport >();
-	sdTransportPositionManager* positionManager = NULL;
-	if ( transportSelf != NULL ) {
+	sdTransportPositionManager* positionManager = nullptr;
+	if ( transportSelf != nullptr ) {
 		isSquisher = transportSelf->GetVehicleControl()->IsSquisher();
 		positionManager = &transportSelf->GetPositionManager();
 	}
@@ -978,39 +978,39 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 	// treat the final location of the true collision as the full distance travelled
 	blockingTrace.fraction = 1.0f;
 
-	arcVec3 velocity		= mainInverseMass * current->i.linearMomentum;
-	arcMat3 invIA		= currentOrientation.Transpose() * mainInverseInertiaTensor * currentOrientation;
-	arcVec3 angVelocity	= invIA * current->i.angularMomentum;
-	arcVec3 currentCoM	= currentPosition + mainCenterOfMass * currentOrientation;
-	arcVec3 nextCoM		= nextPosition + mainCenterOfMass * nextOrientation;
-	arcVec3 CoMdelta		= nextCoM - currentCoM;
+	anVec3 velocity		= mainInverseMass * current->i.linearMomentum;
+	anMat3 invIA		= currentOrientation.Transpose() * mainInverseInertiaTensor * currentOrientation;
+	anVec3 angVelocity	= invIA * current->i.angularMomentum;
+	anVec3 currentCoM	= currentPosition + mainCenterOfMass * currentOrientation;
+	anVec3 nextCoM		= nextPosition + mainCenterOfMass * nextOrientation;
+	anVec3 CoMdelta		= nextCoM - currentCoM;
 
 	// check each of our hurtzone bodies against each of the clip models that belong to players
 	// (ie, don't care about rigidbodymultiple->rigidbodymultiple collisions)
 	for ( int bodyIndex = 0; bodyIndex < bodies.Num(); bodyIndex++ ) {
 		arcRigidBodyMulti_Body& body = bodies[ bodyIndex ];
 
-		arcClipModel* clipModel = body.GetClipModel();
-		if ( clipModel == NULL ) {
+		anClipModel* clipModel = body.GetClipModel();
+		if ( clipModel == nullptr ) {
 			continue;
 		}
 
-		arcVec3 start = currentPosition + ( body.GetOffset() * currentOrientation );
-		arcVec3 end = nextPosition + ( body.GetOffset() * currentOrientation );
-		arcVec3 delta = end - start;
-		arcVec3 direction = delta;
+		anVec3 start = currentPosition + ( body.GetOffset() * currentOrientation );
+		anVec3 end = nextPosition + ( body.GetOffset() * currentOrientation );
+		anVec3 delta = end - start;
+		anVec3 direction = delta;
 		float distance = direction.Normalize();
 
 		for ( int otherIndex = 0; otherIndex < numClipModels; otherIndex++ ) {
-			int result = arcPhysics_Actor::VPUSH_OK;
+			int result = anPhysics_Actor::VPUSH_OK;
 
-			const arcClipModel* otherModel = clipModelList[ otherIndex ];
+			const anClipModel* otherModel = clipModelList[ otherIndex ];
 			assert( otherModel );
 			arcEntity* other = otherModel->GetEntity();
 
 			// paranoid check a bunch of assumptions
-			if ( other == NULL || !other->IsCollisionPushable() || other->GetPhysics() == NULL || self == NULL ) {
-				gameLocal.Warning( "arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions NULL entity" );
+			if ( other == nullptr || !other->IsCollisionPushable() || other->GetPhysics() == nullptr || self == nullptr ) {
+				gameLocal.Warning( "anPhysics_RigidBodyMultiple::CheckForPlayerCollisions nullptr entity" );
 				assert( false );
 				continue;
 			}
@@ -1018,13 +1018,13 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 			arcNetBasePlayer* playerOther = other->Cast< arcNetBasePlayer >();
 			// purely PLAYERCLIP bodies only check against players
 			if ( body.GetClipMask() == MASK_HURTZONE ) {
-				if ( playerOther == NULL ) {
+				if ( playerOther == nullptr ) {
 					continue;
 				}
 			}
 
 			bool noCollide = false;
-			if ( playerOther != NULL ) {
+			if ( playerOther != nullptr ) {
 				if ( gameLocal.time - positionManager->GetPlayerExitTime( playerOther ) < 1000 ) {
  					noCollide = true;
 				}
@@ -1038,8 +1038,8 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 												otherModel->GetOrigin(), otherModel->GetAxis() );
 			if ( tr.fraction < 1.0f ) {
 				// do collision damage and stuff
-				arcVec3 radius = tr.c.point - ( currentCoM + CoMdelta * tr.fraction + mainCenterOfMass * currentOrientation );
-				arcVec3 hitVelocity = velocity + angVelocity.Cross( radius );
+				anVec3 radius = tr.c.point - ( currentCoM + CoMdelta * tr.fraction + mainCenterOfMass * currentOrientation );
+				anVec3 hitVelocity = velocity + angVelocity.Cross( radius );
 
 				tr.c.selfId = bodyIndex;
 				tr.c.id = 0;
@@ -1050,27 +1050,27 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 				}
 
 				if ( body.GetClipMask() != MASK_HURTZONE ) {
-					arcPhysics* otherPhysics = other->GetPhysics();
-					arcPhysics_Actor* actorPhysics = otherPhysics->Cast< arcPhysics_Actor >();
-					assert( actorPhysics != NULL );
+					anPhysics* otherPhysics = other->GetPhysics();
+					anPhysics_Actor* actorPhysics = otherPhysics->Cast< anPhysics_Actor >();
+					assert( actorPhysics != nullptr );
 
-					if ( actorPhysics != NULL ) {
+					if ( actorPhysics != nullptr ) {
 						if ( tr.fraction > 0.0f  ) {
 							// try to push the player
 							// increase the remaining delta a bit, just to provide a bit of an epsilon
 							float fractionLeft = 1.0f - tr.fraction;
-							arcVec3 remainingDelta = ( fractionLeft * ( distance + 1.0f ) ) * direction;
+							anVec3 remainingDelta = ( fractionLeft * ( distance + 1.0f ) ) * direction;
 							result = actorPhysics->VehiclePush( false, timeDelta * fractionLeft, remainingDelta, clipModel, 0 );
 						} else if ( tr.fraction == 0.0f ) {
 							// the player is *inside* this clip model
-							arcVec3 remainingDelta = delta;
+							anVec3 remainingDelta = delta;
 							result = actorPhysics->VehiclePush( true, timeDelta, remainingDelta, clipModel, 0 );
 						}
 					}
 				}
 			}
 
-			if ( result != arcPhysics_Actor::VPUSH_OK ) {
+			if ( result != anPhysics_Actor::VPUSH_OK ) {
 				if ( isSquisher && other->fl.takedamage && ( !playerOther || !playerOther->GetGodMode() ) ) {
 					self->CollideFatal( other );
 				} else {
@@ -1094,31 +1094,31 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 	for ( int bodyIndex = 0; bodyIndex < bodies.Num(); bodyIndex++ ) {
 		arcRigidBodyMulti_Body& body = bodies[ bodyIndex ];
 
-		arcClipModel* clipModel = body.GetCenteredClipModel();
-		arcClipModel* normalClipModel = body.GetClipModel();
+		anClipModel* clipModel = body.GetCenteredClipModel();
+		anClipModel* normalClipModel = body.GetClipModel();
 		if ( !clipModel || !normalClipModel ) {
 			continue;
 		}
 
 		bool doPush = body.GetClipMask() != MASK_HURTZONE;
 
-		arcVec3 end = nextPosition + mainCenterOfMass * currentOrientation;
+		anVec3 end = nextPosition + mainCenterOfMass * currentOrientation;
 
-		arcMat3 axis;
+		anMat3 axis;
 		TransposeMultiply( currentOrientation, nextOrientation, axis );
-		idRotation rotation = axis.ToRotation();
+		anRotation rotation = axis.ToRotation();
 		rotation.SetOrigin( nextPosition );
 
 		for ( int otherIndex = 0; otherIndex < numClipModels; otherIndex++ ) {
-			int result = arcPhysics_Actor::VPUSH_OK;
+			int result = anPhysics_Actor::VPUSH_OK;
 
-			const arcClipModel* otherModel = clipModelList[ otherIndex ];
+			const anClipModel* otherModel = clipModelList[ otherIndex ];
 			assert( otherModel );
 			arcEntity* other = otherModel->GetEntity();
 
 			// paranoid check a bunch of assumptions
-			if ( other == NULL || !other->IsCollisionPushable() || other->GetPhysics() == NULL || self == NULL ) {
-				gameLocal.Warning( "arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions NULL entity" );
+			if ( other == nullptr || !other->IsCollisionPushable() || other->GetPhysics() == nullptr || self == nullptr ) {
+				gameLocal.Warning( "anPhysics_RigidBodyMultiple::CheckForPlayerCollisions nullptr entity" );
 				assert( false );
 				continue;
 			}
@@ -1126,13 +1126,13 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 			arcNetBasePlayer* playerOther = other->Cast< arcNetBasePlayer >();
 			// purely PLAYERCLIP bodies only check against players
 			if ( body.GetClipMask() == MASK_HURTZONE ) {
-				if ( playerOther == NULL ) {
+				if ( playerOther == nullptr ) {
 					continue;
 				}
 			}
 
 			bool noCollide = false;
-			if ( playerOther != NULL ) {
+			if ( playerOther != nullptr ) {
 				if ( gameLocal.time - positionManager->GetPlayerExitTime( playerOther ) < 1000 ) {
 					noCollide = true;
 				}
@@ -1143,27 +1143,27 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 
 			if ( gameLocal.clip.ContentsModel( CLIP_DEBUG_PARMS_ENTINFO( self ) normalClipModel->GetOrigin(), normalClipModel, currentOrientation, -1, otherModel, otherModel->GetOrigin(), otherModel->GetAxis() ) ) {
 				// stuck inside it
-				arcVec3 radius = otherModel->GetOrigin() - ( currentCoM + mainCenterOfMass * currentOrientation );
-				arcVec3 hitVelocity = velocity + angVelocity.Cross( radius );
+				anVec3 radius = otherModel->GetOrigin() - ( currentCoM + mainCenterOfMass * currentOrientation );
+				anVec3 hitVelocity = velocity + angVelocity.Cross( radius );
 
-				arcPhysics* otherPhysics = other->GetPhysics();
-				arcPhysics_Actor* actorPhysics = otherPhysics->Cast< arcPhysics_Actor >();
-				assert( actorPhysics != NULL );
+				anPhysics* otherPhysics = other->GetPhysics();
+				anPhysics_Actor* actorPhysics = otherPhysics->Cast< anPhysics_Actor >();
+				assert( actorPhysics != nullptr );
 
-				result = arcPhysics_Actor::VPUSH_BLOCKED;
-				if ( doPush && actorPhysics != NULL ) {
-					arcVec3 delta = hitVelocity * timeDelta;
+				result = anPhysics_Actor::VPUSH_BLOCKED;
+				if ( doPush && actorPhysics != nullptr ) {
+					anVec3 delta = hitVelocity * timeDelta;
 					// the player is *inside* this clip model
-					arcVec3 remainingDelta = delta;
+					anVec3 remainingDelta = delta;
 					result = actorPhysics->VehiclePush( true, timeDelta, remainingDelta, normalClipModel, 0 );
 
 					// check if its STILL inside
 					if ( gameLocal.clip.ContentsModel( CLIP_DEBUG_PARMS_ENTINFO( self ) normalClipModel->GetOrigin(), normalClipModel, currentOrientation, -1, otherModel, otherModel->GetOrigin(), otherModel->GetAxis() ) ) {
-						result = arcPhysics_Actor::VPUSH_BLOCKED;
+						result = anPhysics_Actor::VPUSH_BLOCKED;
 					}
 				}
 
-				if ( result != arcPhysics_Actor::VPUSH_OK ) {
+				if ( result != anPhysics_Actor::VPUSH_OK ) {
 					if ( isSquisher && other->fl.takedamage && ( !playerOther || !playerOther->GetGodMode() ) ) {
 						self->CollideFatal( other );
 					}
@@ -1173,18 +1173,18 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 					// car-surfing
 					// try moving the entity
 					if ( body.GetClipMask() != MASK_HURTZONE ) {
-						arcPhysics* otherPhysics = other->GetPhysics();
-						arcPhysics_Actor* actorPhysics = otherPhysics->Cast< arcPhysics_Actor >();
-						assert( actorPhysics != NULL );
+						anPhysics* otherPhysics = other->GetPhysics();
+						anPhysics_Actor* actorPhysics = otherPhysics->Cast< anPhysics_Actor >();
+						assert( actorPhysics != nullptr );
 
-						if ( actorPhysics != NULL ) {
-							arcVec3 remainingDelta;
+						if ( actorPhysics != nullptr ) {
+							anVec3 remainingDelta;
 							GetPointVelocity( otherPhysics->GetOrigin(), remainingDelta );
 							remainingDelta *= timeDelta;
 							result = actorPhysics->VehiclePush( false, timeDelta, remainingDelta, clipModel, 0 );
 						}
 					}
-					if ( result != arcPhysics_Actor::VPUSH_OK ) {
+					if ( result != anPhysics_Actor::VPUSH_OK ) {
 						if ( isSquisher && other->fl.takedamage && ( !playerOther || !playerOther->GetGodMode() ) ) {
 							self->CollideFatal( other );
 						}
@@ -1194,8 +1194,8 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 					gameLocal.clip.Rotation( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, end, rotation, clipModel, currentOrientation, vpushClipMask, self );
 					if ( tr.fraction < 1.0f ) {
 						// do collision damage and stuff
-						arcVec3 radius = tr.c.point - ( currentCoM + CoMdelta * tr.fraction + mainCenterOfMass * tr.endAxis );
-						arcVec3 hitVelocity = velocity + angVelocity.Cross( radius );
+						anVec3 radius = tr.c.point - ( currentCoM + CoMdelta * tr.fraction + mainCenterOfMass * tr.endAxis );
+						anVec3 hitVelocity = velocity + angVelocity.Cross( radius );
 
 						tr.c.selfId = bodyIndex;
 						tr.c.id = 0;
@@ -1206,29 +1206,29 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 						}
 
 						// pushing
-						arcPhysics* otherPhysics = other->GetPhysics();
-						arcPhysics_Actor* actorPhysics = otherPhysics->Cast< arcPhysics_Actor >();
-						assert( actorPhysics != NULL );
+						anPhysics* otherPhysics = other->GetPhysics();
+						anPhysics_Actor* actorPhysics = otherPhysics->Cast< anPhysics_Actor >();
+						assert( actorPhysics != nullptr );
 
-						if ( actorPhysics != NULL ) {
-							arcVec3 delta = hitVelocity * timeDelta;
+						if ( actorPhysics != nullptr ) {
+							anVec3 delta = hitVelocity * timeDelta;
 							if ( tr.fraction > 0.0f  ) {
 								// try to push the player
 								// increase the remaining delta a bit, just to provide a bit of an epsilon
-								arcVec3 direction = delta;
+								anVec3 direction = delta;
 								float distance = direction.Normalize();
 								float fractionLeft = 1.0f - tr.fraction;
-								arcVec3 remainingDelta = ( fractionLeft * ( distance + 1.0f ) ) * direction;
+								anVec3 remainingDelta = ( fractionLeft * ( distance + 1.0f ) ) * direction;
 								result = actorPhysics->VehiclePush( false, timeDelta * fractionLeft, remainingDelta, normalClipModel, 0 );
 							} else if ( tr.fraction == 0.0f ) {
 								// the player is *inside* this clip model
-								arcVec3 remainingDelta = delta;
+								anVec3 remainingDelta = delta;
 								result = actorPhysics->VehiclePush( true, timeDelta, remainingDelta, normalClipModel, 0 );
 							}
 						}
 					}
 
-					if ( result != arcPhysics_Actor::VPUSH_OK ) {
+					if ( result != anPhysics_Actor::VPUSH_OK ) {
 						if ( isSquisher && other->fl.takedamage && ( !playerOther || !playerOther->GetGodMode() ) ) {
 							self->CollideFatal( other );
 						} else {
@@ -1261,31 +1261,31 @@ bool arcPhysics_RigidBodyMultiple::CheckForPlayerCollisions( float timeDelta, tr
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SolveLCPConstraints
+anPhysics_RigidBodyMultiple::SolveLCPConstraints
 ================
 */
-bool arcPhysics_RigidBodyMultiple::SolveLCPConstraints( constraintInfo_t* constraints, int numConstraints, float deltaTime ) const {
-	arcMatX jmk;
-	arcVecX rhs, w, lm, lo, hi;
+bool anPhysics_RigidBodyMultiple::SolveLCPConstraints( constraintInfo_t* constraints, int numConstraints, float deltaTime ) const {
+	anMatX jmk;
+	anVecX rhs, w, lm, lo, hi;
 	int* boxIndex;
 
 	assert( constraints && numConstraints );
 
 	jmk.SetData( numConstraints, ( ( numConstraints + 3 ) & ~3 ), MATX_ALLOCA( numConstraints * ( ( numConstraints + 3 ) & ~3 ) ) );
 
-	arcMat3 inverseWorldInertiaTensor;
+	anMat3 inverseWorldInertiaTensor;
 
 	inverseWorldInertiaTensor = current->i.orientation.Transpose() * mainInverseInertiaTensor * current->i.orientation;
 
 	int i;
 	for ( i = 0; i < numConstraints; i++ ) {
-		constraintInfo_t& constraint = constraints[ i ];
+		constraintInfo_t& constraint = constraints[i];
 
-		arcVec6 t;
+		anVec6 t;
 		t.SubVec3( 0 ) = mainInverseMass * constraint.j.SubVec3( 0 );
 		t.SubVec3( 1 ) = inverseWorldInertiaTensor * constraint.j.SubVec3( 1 );
 
-		float* dstPtr = jmk[ i ];
+		float* dstPtr = jmk[i];
 
 		int n;
 		for ( n = 0; n < numConstraints; n++ ) {
@@ -1297,7 +1297,7 @@ bool arcPhysics_RigidBodyMultiple::SolveLCPConstraints( constraintInfo_t* constr
 
 	float invDelta = 1.f / deltaTime;
 
-	arcVec6 acc;
+	anVec6 acc;
 	acc.SubVec3( 0 ) = ( mainInverseMass * current->i.linearMomentum * invDelta );
 	acc.SubVec3( 1 ) = ( ( inverseWorldInertiaTensor * current->i.angularMomentum ) * invDelta );
 
@@ -1312,21 +1312,21 @@ bool arcPhysics_RigidBodyMultiple::SolveLCPConstraints( constraintInfo_t* constr
 	boxIndex = ( int* ) _alloca16( numConstraints * sizeof( int ) );
 
 	for ( i = 0; i < numConstraints; i++ ) {
-		constraintInfo_t& constraint = constraints[ i ];
+		constraintInfo_t& constraint = constraints[i];
 
 		float* ptr = acc.ToFloatPtr();
 		float* j1 = constraint.j.ToFloatPtr();
 
-		rhs[ i ] = j1[ 0 ] * ptr[ 0 ] + j1[ 1 ] * ptr[ 1 ] + j1[ 2 ] * ptr[ 2 ] + j1[ 3 ] * ptr[ 3 ] + j1[ 4 ] * ptr[ 4 ] + j1[ 5 ] * ptr[ 5 ];
-		rhs[ i ] += constraint.c * invDelta;
+		rhs[i] = j1[ 0 ] * ptr[ 0 ] + j1[ 1 ] * ptr[ 1 ] + j1[ 2 ] * ptr[ 2 ] + j1[ 3 ] * ptr[ 3 ] + j1[ 4 ] * ptr[ 4 ] + j1[ 5 ] * ptr[ 5 ];
+		rhs[i] += constraint.c * invDelta;
 
-		rhs[ i ] = -rhs[ i ];
-		lo[ i ] = constraint.lo;
-		hi[ i ] = constraint.hi;
+		rhs[i] = -rhs[i];
+		lo[i] = constraint.lo;
+		hi[i] = constraint.hi;
 
-		boxIndex[ i ] = constraint.boxIndex;
+		boxIndex[i] = constraint.boxIndex;
 
-		jmk[ i ][ i ] += constraint.error * invDelta;
+		jmk[i][i] += constraint.error * invDelta;
 	}
 
 	if ( !lcp->Solve( jmk, lm, rhs, lo, hi, boxIndex ) ) {
@@ -1334,8 +1334,8 @@ bool arcPhysics_RigidBodyMultiple::SolveLCPConstraints( constraintInfo_t* constr
 	}
 
 	for ( i = 0; i < numConstraints; i++ ) {
-		constraintInfo_t& constraint = constraints[ i ];
-		constraint.lm = lm[ i ];
+		constraintInfo_t& constraint = constraints[i];
+		constraint.lm = lm[i];
 	}
 
 	return true;
@@ -1343,12 +1343,12 @@ bool arcPhysics_RigidBodyMultiple::SolveLCPConstraints( constraintInfo_t* constr
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::ContactFriction
+anPhysics_RigidBodyMultiple::ContactFriction
 ================
 */
-void arcPhysics_RigidBodyMultiple::ContactFriction( float deltaTime, bool addEntityConstraints ) {
+void anPhysics_RigidBodyMultiple::ContactFriction( float deltaTime, bool addEntityConstraints ) {
 	int i;
-	arcVec3 massCenter, r;
+	anVec3 massCenter, r;
 
 	massCenter = current->i.position + ( mainCenterOfMass * current->i.orientation );
 
@@ -1359,8 +1359,8 @@ void arcPhysics_RigidBodyMultiple::ContactFriction( float deltaTime, bool addEnt
 	for ( i = 0; i < contacts.Num(); i++ ) {
 		int startIndex = numConstraints;
 
-		contactInfo_t& contact = contacts[ i ];
-		contactInfoExt_t& contactExt = contactInfoExt[ i ];
+		contactInfo_t& contact = contacts[i];
+		contactInfoExt_t& contactExt = contactInfoExt[i];
 
 		constraintInfo_t& info = constraintInfo[ numConstraints++ ];
 
@@ -1373,7 +1373,7 @@ void arcPhysics_RigidBodyMultiple::ContactFriction( float deltaTime, bool addEnt
 		info.error			= CONTACT_LCP_EPSILON;
 		info.pos			= contact.point;
 		if ( contact.selfId >= 0 ) {
-			info.hi			= arcMath::INFINITY;
+			info.hi			= anMath::INFINITY;
 			info.c			= 0;
 		} else {
 			info.hi			= contactExt.contactForceMax;
@@ -1383,11 +1383,11 @@ void arcPhysics_RigidBodyMultiple::ContactFriction( float deltaTime, bool addEnt
 
 		if ( contact.selfId >= 0 ) {
 			arcRigidBodyMulti_Body& body = bodies[ contact.selfId ];
-			const arcMat3& axes = current->i.orientation;
+			const anMat3& axes = current->i.orientation;
 
 			int j;
 			for ( j = 0; j < 3; j++ ) {
-				arcVec3 dir1 = axes[ j ];
+				anVec3 dir1 = axes[ j ];
 				float strength = body.GetContactFriction()[ j ];
 				if ( contact.surfaceType ) {
 					strength *= idGameLocal::GetSurfaceTypeForIndex( contact.surfaceType->Index() ).friction;
@@ -1408,11 +1408,11 @@ void arcPhysics_RigidBodyMultiple::ContactFriction( float deltaTime, bool addEnt
 				}
 			}
 		} else {
-			arcMat3 axes = contactExt.frictionAxes * current->i.orientation;
+			anMat3 axes = contactExt.frictionAxes * current->i.orientation;
 
 			int j;
 			for ( j = 0; j < 3; j++ ) {
-				const arcVec3& dir1 = axes[ j ];
+				const anVec3& dir1 = axes[ j ];
 
 				float strength = contactExt.contactFriction[ j ];
 				if ( contact.surfaceType ) {
@@ -1435,7 +1435,7 @@ void arcPhysics_RigidBodyMultiple::ContactFriction( float deltaTime, bool addEnt
 			}
 
 			if ( contactExt.motorForce ) {
-				arcVec3 dir1 = contactExt.motorDirection * current->i.orientation;
+				anVec3 dir1 = contactExt.motorDirection * current->i.orientation;
 				dir1 = dir1 - ( ( dir1 * contact.normal ) * contact.normal );
 
 				dir1.Normalize();
@@ -1473,7 +1473,7 @@ void arcPhysics_RigidBodyMultiple::ContactFriction( float deltaTime, bool addEnt
 	}
 
 	for ( i = 0; i < numConstraints; i++ ) {
-		constraintInfo_t& constraint = constraintInfo[ i ];
+		constraintInfo_t& constraint = constraintInfo[i];
 
 		current->i.linearMomentum += constraint.j.SubVec3( 0 ) * constraint.lm * deltaTime;
 		current->i.angularMomentum += constraint.j.SubVec3( 1 ) * constraint.lm * deltaTime;
@@ -1482,13 +1482,13 @@ void arcPhysics_RigidBodyMultiple::ContactFriction( float deltaTime, bool addEnt
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::TestIfAtRest
+anPhysics_RigidBodyMultiple::TestIfAtRest
 
   Returns true if the body is considered at rest.
   Does not catch all cases where the body is at rest but is generally good enough.
 ================
 */
-bool arcPhysics_RigidBodyMultiple::TestIfAtRest( void ) const {
+bool anPhysics_RigidBodyMultiple::TestIfAtRest( void ) const {
 	if ( gameLocal.time < activateEndTime ) {
 		return false;
 	}
@@ -1498,16 +1498,16 @@ bool arcPhysics_RigidBodyMultiple::TestIfAtRest( void ) const {
 	}
 
 	float gv;
-	arcVec3 normal, point;
+	anVec3 normal, point;
 
-	idFixedWinding contactWinding;
+	anFixedWinding contactWinding;
 
 	bool inWater = waterLevel > waterRestThreshold;
 	bool needsGroundToRest = true;
 	sdTransport* transportSelf = self->Cast< sdTransport >();
-	if ( transportSelf != NULL ) {
+	if ( transportSelf != nullptr ) {
 		const sdVehicleControlBase* control = transportSelf->GetVehicleControl();
-		if ( control != NULL ) {
+		if ( control != nullptr ) {
 			needsGroundToRest = control->RestNeedsGround();
 		}
 	}
@@ -1535,7 +1535,7 @@ bool arcPhysics_RigidBodyMultiple::TestIfAtRest( void ) const {
 	contactWinding.Clear();
 
 	// linear velocity of body
-	arcVec3 v = GetLinearVelocity();
+	anVec3 v = GetLinearVelocity();
 
 	// linear velocity in gravity direction
 	gv = v * gravityNormal;
@@ -1569,8 +1569,8 @@ bool arcPhysics_RigidBodyMultiple::TestIfAtRest( void ) const {
 	bool moving = speed > Square( 0.1 );
 
 	for ( int i = 0; i < contacts.Num(); i++ ) {
-		if ( contacts[ i ].selfId == -1 ) {
-			if ( ( moving && !contactInfoExt[ i ].rested ) || ( contactInfoExt[ i ].motorForce && contactInfoExt[ i ].motorSpeed != 0.0f ) ) {
+		if ( contacts[i].selfId == -1 ) {
+			if ( ( moving && !contactInfoExt[i].rested ) || ( contactInfoExt[i].motorForce && contactInfoExt[i].motorSpeed != 0.0f ) ) {
 				return false;
 			}
 		}
@@ -1605,13 +1605,13 @@ bool arcPhysics_RigidBodyMultiple::TestIfAtRest( void ) const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::DebugDraw
+anPhysics_RigidBodyMultiple::DebugDraw
 ================
 */
-void arcPhysics_RigidBodyMultiple::DebugDraw( void ) {
+void anPhysics_RigidBodyMultiple::DebugDraw( void ) {
 	for ( int i = 0; i < bodies.Num(); i++ ) {
-		arcRigidBodyMulti_Body& body = bodies[ i ];
-		arcClipModel* clipModel = body.GetClipModel();
+		arcRigidBodyMulti_Body& body = bodies[i];
+		anClipModel* clipModel = body.GetClipModel();
 		if ( !clipModel ) {
 			continue;
 		}
@@ -1635,9 +1635,9 @@ void arcPhysics_RigidBodyMultiple::DebugDraw( void ) {
 
 	if ( rb_showContacts.GetBool() ) {
 		for ( int i = 0; i < contacts.Num(); i++ ) {
-			contactInfo_t& contact = contacts[ i ];
+			contactInfo_t& contact = contacts[i];
 
-			arcVec3 x, y;
+			anVec3 x, y;
 			contact.normal.NormalVectors( x, y );
 			gameRenderWorld->DebugLine( colorBlue, contact.point, contact.point + 12.0f * contact.normal );
 			gameRenderWorld->DebugLine( colorBlue, contact.point - 4.0f * x, contact.point + 4.0f * x );
@@ -1651,17 +1651,17 @@ void arcPhysics_RigidBodyMultiple::DebugDraw( void ) {
 	if ( rb_showMass.GetBool() ) {
 		gameRenderWorld->DrawText( va( "\n%1.2f", mainMass ), current->i.position, 0.08f, colorCyan, gameLocal.GetLocalPlayer()->viewAngles.ToMat3(), 1 );
 
-		gameRenderWorld->DebugCircle( colorYellow, current->i.position + ( mainCenterOfMass * current->i.orientation ), arcVec3( 0.f, 0.f, 1.f ), 16, 16 );
-		gameRenderWorld->DebugCircle( colorYellow, current->i.position + ( mainCenterOfMass * current->i.orientation ), arcVec3( 0.f, 1.f, 0.f ), 16, 16 );
-		gameRenderWorld->DebugCircle( colorYellow, current->i.position + ( mainCenterOfMass * current->i.orientation ), arcVec3( 1.f, 0.f, 0.f ), 16, 16 );
+		gameRenderWorld->DebugCircle( colorYellow, current->i.position + ( mainCenterOfMass * current->i.orientation ), anVec3( 0.f, 0.f, 1.f ), 16, 16 );
+		gameRenderWorld->DebugCircle( colorYellow, current->i.position + ( mainCenterOfMass * current->i.orientation ), anVec3( 0.f, 1.f, 0.f ), 16, 16 );
+		gameRenderWorld->DebugCircle( colorYellow, current->i.position + ( mainCenterOfMass * current->i.orientation ), anVec3( 1.f, 0.f, 0.f ), 16, 16 );
 
 		for ( int i = 0; i < bodies.Num(); i++ ) {
-			bodies[ i ].DebugDrawMass();
+			bodies[i].DebugDrawMass();
 		}
 	}
 
 	if ( rb_showInertia.GetBool() ) {
-		arcMat3 &I = mainInertiaTensor;
+		anMat3 &I = mainInertiaTensor;
 		gameRenderWorld->DrawText( va( "\n\n\n( %.1f %.1f %.1f )\n( %.1f %.1f %.1f )\n( %.1f %.1f %.1f )",
 									I[0].x, I[0].y, I[0].z,
 									I[1].x, I[1].y, I[1].z,
@@ -1672,10 +1672,10 @@ void arcPhysics_RigidBodyMultiple::DebugDraw( void ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetMass
+anPhysics_RigidBodyMultiple::SetMass
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetMass( float mass, int id ) {
+void anPhysics_RigidBodyMultiple::SetMass( float mass, int id ) {
 	assert( id >= 0 && id < bodies.Num() );
 
 	if ( id < 0 || id >= bodies.Num() ) {
@@ -1687,10 +1687,10 @@ void arcPhysics_RigidBodyMultiple::SetMass( float mass, int id ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetMass
+anPhysics_RigidBodyMultiple::GetMass
 ================
 */
-float arcPhysics_RigidBodyMultiple::GetMass( int id ) const {
+float anPhysics_RigidBodyMultiple::GetMass( int id ) const {
 	if ( id < 0 || id >= bodies.Num() ) {
 		return mainMass;
 	}
@@ -1700,10 +1700,10 @@ float arcPhysics_RigidBodyMultiple::GetMass( int id ) const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetInertiaTensor
+anPhysics_RigidBodyMultiple::GetInertiaTensor
 ================
 */
-const arcMat3& arcPhysics_RigidBodyMultiple::GetInertiaTensor( int id ) const {
+const anMat3& anPhysics_RigidBodyMultiple::GetInertiaTensor( int id ) const {
 	if ( id < 0 || id >= bodies.Num() ) {
 		return mainInertiaTensor;
 	}
@@ -1713,10 +1713,10 @@ const arcMat3& arcPhysics_RigidBodyMultiple::GetInertiaTensor( int id ) const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetInertiaTensor
+anPhysics_RigidBodyMultiple::SetInertiaTensor
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetInertiaTensor( const arcMat3& itt ) {
+void anPhysics_RigidBodyMultiple::SetInertiaTensor( const anMat3& itt ) {
 	mainInertiaTensor = itt;
 	mainInverseInertiaTensor = mainInertiaTensor.Inverse() * ( 1.f / 6.f );
 	customInertiaTensor = true;
@@ -1724,10 +1724,10 @@ void arcPhysics_RigidBodyMultiple::SetInertiaTensor( const arcMat3& itt ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::Rest
+anPhysics_RigidBodyMultiple::Rest
 ================
 */
-void arcPhysics_RigidBodyMultiple::Rest( int time ) {
+void anPhysics_RigidBodyMultiple::Rest( int time ) {
   	current->atRest = time;
 	current->i.linearMomentum.Zero();
 	current->i.angularMomentum.Zero();
@@ -1736,28 +1736,28 @@ void arcPhysics_RigidBodyMultiple::Rest( int time ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::PutToRest
+anPhysics_RigidBodyMultiple::PutToRest
 ================
 */
-void arcPhysics_RigidBodyMultiple::PutToRest( void ) {
+void anPhysics_RigidBodyMultiple::PutToRest( void ) {
 	Rest( gameLocal.time );
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::NoContact
+anPhysics_RigidBodyMultiple::NoContact
 ================
 */
-void arcPhysics_RigidBodyMultiple::NoContact( void ) {
+void anPhysics_RigidBodyMultiple::NoContact( void ) {
 	flags.noContact = true;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::Activate
+anPhysics_RigidBodyMultiple::Activate
 ================
 */
-void arcPhysics_RigidBodyMultiple::Activate( void ) {
+void anPhysics_RigidBodyMultiple::Activate( void ) {
 	if ( !IsAtRest() ) {
 		return;
 	}
@@ -1768,19 +1768,19 @@ void arcPhysics_RigidBodyMultiple::Activate( void ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::EnableImpact
+anPhysics_RigidBodyMultiple::EnableImpact
 ================
 */
-void arcPhysics_RigidBodyMultiple::EnableImpact( void ) {
+void anPhysics_RigidBodyMultiple::EnableImpact( void ) {
 	flags.noImpact = false;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::DisableImpact
+anPhysics_RigidBodyMultiple::DisableImpact
 ================
 */
-void arcPhysics_RigidBodyMultiple::DisableImpact( void ) {
+void anPhysics_RigidBodyMultiple::DisableImpact( void ) {
 	flags.noImpact = true;
 }
 
@@ -1820,17 +1820,17 @@ void arcPhysics_RigidBodyMultiple::DisableImpact( void ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetContents
+anPhysics_RigidBodyMultiple::SetContents
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetContents( int contents, int id ) {
+void anPhysics_RigidBodyMultiple::SetContents( int contents, int id ) {
 	assert( id >=0 && id < bodies.Num() );
 
 	if ( id < 0 || id > bodies.Num() ) {
 		return;
 	}
 
-	arcClipModel* clipModel = bodies[ id ].GetClipModel();
+	anClipModel* clipModel = bodies[ id ].GetClipModel();
 	if ( clipModel ) {
 		clipModel->SetContents( contents );
 	}
@@ -1838,17 +1838,17 @@ void arcPhysics_RigidBodyMultiple::SetContents( int contents, int id ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetContents
+anPhysics_RigidBodyMultiple::GetContents
 ================
 */
-int arcPhysics_RigidBodyMultiple::GetContents( int id ) const {
+int anPhysics_RigidBodyMultiple::GetContents( int id ) const {
 //	assert( id >=0 && id < bodies.Num() );
 
 	if ( id < 0 || id > bodies.Num() ) {
 		return 0;
 	}
 
-	arcClipModel* clipModel = bodies[ id ].GetClipModel();
+	anClipModel* clipModel = bodies[ id ].GetClipModel();
 	if ( !clipModel ) {
 		return 0;
 	}
@@ -1858,10 +1858,10 @@ int arcPhysics_RigidBodyMultiple::GetContents( int id ) const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetBounds
+anPhysics_RigidBodyMultiple::GetBounds
 ================
 */
-const arcBounds& arcPhysics_RigidBodyMultiple::GetBounds( int id ) const {
+const anBounds& anPhysics_RigidBodyMultiple::GetBounds( int id ) const {
 	if ( id >= 0 && id < bodies.Num() ) {
 		return bodies[ id ].GetClipModel()->GetBounds();
 	}
@@ -1871,11 +1871,11 @@ const arcBounds& arcPhysics_RigidBodyMultiple::GetBounds( int id ) const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetAbsBounds
+anPhysics_RigidBodyMultiple::GetAbsBounds
 ================
 */
-const arcBounds &arcPhysics_RigidBodyMultiple::GetAbsBounds( int id ) const {
-	static arcBounds absBounds;
+const anBounds &anPhysics_RigidBodyMultiple::GetAbsBounds( int id ) const {
+	static anBounds absBounds;
 
 	if ( id >= 0 && id < bodies.Num() ) {
 		return bodies[ id ].GetClipModel()->GetAbsBounds();
@@ -1887,14 +1887,14 @@ const arcBounds &arcPhysics_RigidBodyMultiple::GetAbsBounds( int id ) const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::Evaluate
+anPhysics_RigidBodyMultiple::Evaluate
 
   Evaluate the impulse based rigid body physics.
   When a collision occurs an impulse is applied at the moment of impact but
   the remaining time after the collision is ignored.
 ================
 */
-bool arcPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec ) {
+bool anPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 	// eliminate any values that are too small - little bit of a hack, but prevents denormals
 	current->i.angularMomentum.FixDenormals();
@@ -1902,17 +1902,17 @@ bool arcPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec )
 	current->i.orientation.FixDenormals();
 	current->i.position.FixDenormals();
 
-	if ( masterEntity != NULL ) {
+	if ( masterEntity != nullptr ) {
 		if ( timeStepMSec <= 0 ) {
 			return true;
 		}
 
 		float timeStep = MS2SEC( timeStepMSec );
 
-		arcVec3 masterOrigin;
-		arcMat3 masterAxis;
-		arcVec3 oldOrigin = current->i.position;
-		arcMat3 oldAxis = current->i.orientation;
+		anVec3 masterOrigin;
+		anMat3 masterAxis;
+		anVec3 oldOrigin = current->i.position;
+		anMat3 oldAxis = current->i.orientation;
 		self->GetMasterPosition( masterOrigin, masterAxis );
 		current->i.position = masterOrigin + localOrigin * masterAxis;
 		if ( flags.isOrientated ) {
@@ -1923,7 +1923,7 @@ bool arcPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec )
 
 		int i;
 		for ( i = 0; i < bodies.Num(); i++ ) {
-			bodies[ i ].Link( self, *current );
+			bodies[i].Link( self, *current );
 		}
 
 		current->i.linearMomentum = mainMass * ( ( current->i.position - oldOrigin ) / timeStep );
@@ -1956,7 +1956,7 @@ bool arcPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec )
 	//		  and is not at rest
 	if ( current->atRest < 0 ) {
 		sdTransport* transportSelf = self->Cast< sdTransport >();
-		if ( transportSelf != NULL ) {
+		if ( transportSelf != nullptr ) {
 			if ( !transportSelf->GetPositionManager().IsEmpty() ) {
 				maxRepetitions = 5;
 			}
@@ -1970,15 +1970,15 @@ bool arcPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec )
 		maxRepetitions = 1;
 	}
 
-	arcVec3 initialPosition = current->i.position;
+	anVec3 initialPosition = current->i.position;
 
 	// HACK - add back in the velocity from gravity that we took off after our last evaluation
-	arcVec3 gravityMomentum = mainMass * GetGravity() * timeStep;
+	anVec3 gravityMomentum = mainMass * GetGravity() * timeStep;
 	current->i.linearMomentum += gravityMomentum;
 
-	const arcClipModel *water = NULL;
+	const anClipModel *water = nullptr;
 	do {
-		arcVec3 impulse;
+		anVec3 impulse;
 		arcEntity *ent;
 		bool collided = false;
 		bool cameToRest = false;
@@ -2001,8 +2001,8 @@ bool arcPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec )
 		//
 		SetupVPushCollection();
 
-		const arcClipModel * possWater = CheckWater();
-		if ( possWater != NULL ) {
+		const anClipModel * possWater = CheckWater();
+		if ( possWater != nullptr ) {
 			water = possWater;
 		}
 
@@ -2093,7 +2093,7 @@ bool arcPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec )
 
 		// update the position of the clip models
 		for ( i = 0; i < bodies.Num(); i++ ) {
-			bodies[ i ].Link( self, *current );
+			bodies[i].Link( self, *current );
 		}
 
 		current->externalForce.Zero();
@@ -2157,18 +2157,18 @@ bool arcPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec )
 	// HACK - remove the gravity contribution from momentum outside of evaluation
 	current->i.linearMomentum -= gravityMomentum;
 
-	arcVec3 finalPosition = current->i.position;
+	anVec3 finalPosition = current->i.position;
 
 	if ( !gameLocal.isClient ) {
 		// HACK: see if a pusher is blocked somehow
 		bool blocked = false;
 		if ( !self->IsCollisionPushable() && lastCollision.time == gameLocal.time ) {
 			arcEntity* lastCollideEnt = gameLocal.entities[ lastCollision.trace.c.entityNum ];
-			if ( lastCollideEnt != NULL && lastCollideEnt->fl.takedamage ) {
-				arcVec3 effectiveVelocity = ( finalPosition - initialPosition ) / MS2SEC( gameLocal.msec );
+			if ( lastCollideEnt != nullptr && lastCollideEnt->fl.takedamage ) {
+				anVec3 effectiveVelocity = ( finalPosition - initialPosition ) / MS2SEC( gameLocal.msec );
 				float desiredSpeed = GetLinearVelocity().LengthSqr();
 				float apparentSpeed = effectiveVelocity.LengthSqr();
-				if ( desiredSpeed > arcMath::FLT_EPSILON ) {
+				if ( desiredSpeed > anMath::FLT_EPSILON ) {
 					float speedFraction = apparentSpeed / desiredSpeed;
 					if ( speedFraction < 0.01f ) {
 						if ( blockedTime > 200 ) {
@@ -2203,20 +2203,20 @@ bool arcPhysics_RigidBodyMultiple::Evaluate( int timeStepMSec, int endTimeMSec )
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::UpdateTime
+anPhysics_RigidBodyMultiple::UpdateTime
 ================
 */
-void arcPhysics_RigidBodyMultiple::UpdateTime( int endTimeMSec ) {
+void anPhysics_RigidBodyMultiple::UpdateTime( int endTimeMSec ) {
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetImpactInfo
+anPhysics_RigidBodyMultiple::GetImpactInfo
 ================
 */
-void arcPhysics_RigidBodyMultiple::GetImpactInfo( const int id, const arcVec3 &point, impactInfo_t *info ) const {
-	arcVec3 linearVelocity, angularVelocity;
-	arcMat3 inverseWorldInertiaTensor;
+void anPhysics_RigidBodyMultiple::GetImpactInfo( const int id, const anVec3 &point, impactInfo_t *info ) const {
+	anVec3 linearVelocity, angularVelocity;
+	anMat3 inverseWorldInertiaTensor;
 
 	linearVelocity = mainInverseMass * current->i.linearMomentum;
 	inverseWorldInertiaTensor = current->i.orientation.Transpose() * mainInverseInertiaTensor * current->i.orientation;
@@ -2230,10 +2230,10 @@ void arcPhysics_RigidBodyMultiple::GetImpactInfo( const int id, const arcVec3 &p
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::ApplyImpulse
+anPhysics_RigidBodyMultiple::ApplyImpulse
 ================
 */
-void arcPhysics_RigidBodyMultiple::ApplyImpulse( const int id, const arcVec3 &point, const arcVec3 &impulse ) {
+void anPhysics_RigidBodyMultiple::ApplyImpulse( const int id, const anVec3 &point, const anVec3 &impulse ) {
 	if ( flags.noImpact ) {
 		return;
 	}
@@ -2256,10 +2256,10 @@ void arcPhysics_RigidBodyMultiple::ApplyImpulse( const int id, const arcVec3 &po
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::AddForce
+anPhysics_RigidBodyMultiple::AddForce
 ================
 */
-void arcPhysics_RigidBodyMultiple::AddForce( const int id, const arcVec3 &point, const arcVec3 &force ) {
+void anPhysics_RigidBodyMultiple::AddForce( const int id, const anVec3 &point, const anVec3 &force ) {
 	if ( flags.noImpact ) {
 		return;
 	}
@@ -2269,17 +2269,17 @@ void arcPhysics_RigidBodyMultiple::AddForce( const int id, const arcVec3 &point,
 	}
 	current->externalForce += force;
 
-	arcVec3 comWorld = current->i.position + ( mainCenterOfMass * current->i.orientation );
+	anVec3 comWorld = current->i.position + ( mainCenterOfMass * current->i.orientation );
 	current->externalTorque += ( point - comWorld ).Cross( force );
 	Activate();
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::AddForce
+anPhysics_RigidBodyMultiple::AddForce
 ================
 */
-void arcPhysics_RigidBodyMultiple::AddForce( const arcVec3& force ) {
+void anPhysics_RigidBodyMultiple::AddForce( const anVec3& force ) {
 	if ( flags.noImpact ) {
 		return;
 	}
@@ -2294,10 +2294,10 @@ void arcPhysics_RigidBodyMultiple::AddForce( const arcVec3& force ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::AddLocalForce
+anPhysics_RigidBodyMultiple::AddLocalForce
 ================
 */
-void arcPhysics_RigidBodyMultiple::AddLocalForce( const int id, const arcVec3 &point, const arcVec3 &force ) {
+void anPhysics_RigidBodyMultiple::AddLocalForce( const int id, const anVec3 &point, const anVec3 &force ) {
 	if ( flags.noImpact ) {
 		return;
 	}
@@ -2313,47 +2313,47 @@ void arcPhysics_RigidBodyMultiple::AddLocalForce( const int id, const arcVec3 &p
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::AddTorque
+anPhysics_RigidBodyMultiple::AddTorque
 ================
 */
-void arcPhysics_RigidBodyMultiple::AddTorque( const arcVec3& torque ) {
+void anPhysics_RigidBodyMultiple::AddTorque( const anVec3& torque ) {
 	current->externalTorque += torque;
 	Activate();
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::IsAtRest
+anPhysics_RigidBodyMultiple::IsAtRest
 ================
 */
-bool arcPhysics_RigidBodyMultiple::IsAtRest( void ) const {
+bool anPhysics_RigidBodyMultiple::IsAtRest( void ) const {
 	return current->atRest >= 0;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetRestStartTime
+anPhysics_RigidBodyMultiple::GetRestStartTime
 ================
 */
-int arcPhysics_RigidBodyMultiple::GetRestStartTime( void ) const {
+int anPhysics_RigidBodyMultiple::GetRestStartTime( void ) const {
 	return current->atRest;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::Pushable
+anPhysics_RigidBodyMultiple::Pushable
 ================
 */
-bool arcPhysics_RigidBodyMultiple::IsPushable( void ) const {
+bool anPhysics_RigidBodyMultiple::IsPushable( void ) const {
 	return ( !flags.noImpact && !masterEntity );
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetVPushClipMask
+anPhysics_RigidBodyMultiple::GetVPushClipMask
 ================
 */
-int arcPhysics_RigidBodyMultiple::GetVPushClipMask() const {
+int anPhysics_RigidBodyMultiple::GetVPushClipMask() const {
 	int vpushClipMask = CONTENTS_SLIDEMOVER;
 	if ( !self->IsCollisionPushable() ) {
 		vpushClipMask |= CONTENTS_MONSTER;
@@ -2364,11 +2364,11 @@ int arcPhysics_RigidBodyMultiple::GetVPushClipMask() const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::EvaluateContacts
+anPhysics_RigidBodyMultiple::EvaluateContacts
 ================
 */
-bool arcPhysics_RigidBodyMultiple::EvaluateContacts( bool addEntityContacts ) {
-	arcVec3 dir;
+bool anPhysics_RigidBodyMultiple::EvaluateContacts( bool addEntityContacts ) {
+	anVec3 dir;
 	int num;
 
 	ClearContacts();
@@ -2384,7 +2384,7 @@ bool arcPhysics_RigidBodyMultiple::EvaluateContacts( bool addEntityContacts ) {
 
 	int count = 0;
 
-	arcEntity* collisionEnt = NULL;
+	arcEntity* collisionEnt = nullptr;
 	if ( lastCollision.time >= gameLocal.time - gameLocal.msec ) {
 		collisionEnt = gameLocal.entities[ lastCollision.trace.c.entityNum ];
 	}
@@ -2392,23 +2392,23 @@ bool arcPhysics_RigidBodyMultiple::EvaluateContacts( bool addEntityContacts ) {
 	int vpushClipMask = GetVPushClipMask();
 
 	for ( int i = 0; i < bodies.Num() && count < RBM_MAX_CONTACTS; i++ ) {
-		arcRigidBodyMulti_Body& body = bodies[ i ];
-		arcClipModel* clipModel = body.GetClipModel();
+		arcRigidBodyMulti_Body& body = bodies[i];
+		anClipModel* clipModel = body.GetClipModel();
 
 		if ( body.GetClipMask() == MASK_HURTZONE ) {
 			continue;
 		}
 
-		num = GetTraceCollection().Contacts( CLIP_DEBUG_PARMS_ENTINFO( self ) &contacts[ count ], RBM_MAX_CONTACTS - count, clipModel->GetOrigin(), NULL, /*CONTACT_EPSILON*/ 1.0f, clipModel, clipModel->GetAxis(), body.GetClipMask() );
+		num = GetTraceCollection().Contacts( CLIP_DEBUG_PARMS_ENTINFO( self ) &contacts[ count ], RBM_MAX_CONTACTS - count, clipModel->GetOrigin(), nullptr, /*CONTACT_EPSILON*/ 1.0f, clipModel, clipModel->GetAxis(), body.GetClipMask() );
 
 		count += num;
 
 		// add contacts from any slidemovers we may be blocked by
-		if ( collisionEnt != NULL ) {
+		if ( collisionEnt != nullptr ) {
 			int contents = collisionEnt->GetPhysics()->GetContents();
 			if ( contents & vpushClipMask ) {
-				arcClipModel* otherClip = collisionEnt->GetPhysics()->GetClipModel();
-				if ( otherClip != NULL ) {
+				anClipModel* otherClip = collisionEnt->GetPhysics()->GetClipModel();
+				if ( otherClip != nullptr ) {
 					num = gameLocal.clip.ContactsModel( CLIP_DEBUG_PARMS_ENTINFO( self ) &contacts[ count ], RBM_MAX_CONTACTS - count,
 														clipModel->GetOrigin(), &dir, CONTACT_EPSILON, clipModel,
 														clipModel->GetAxis(), body.GetClipMask(), otherClip,
@@ -2430,7 +2430,7 @@ bool arcPhysics_RigidBodyMultiple::EvaluateContacts( bool addEntityContacts ) {
 	// otherwise the LCP solver will push us away from the entity a bit, slowing us down :(
 	if ( !self->IsCollisionPushable() ) {
 		for ( int i = 0; i < count; i++ ) {
-			arcEntity* ent = gameLocal.entities[ contacts[ i ].entityNum ];
+			arcEntity* ent = gameLocal.entities[ contacts[i].entityNum ];
 			if ( ent->GetPhysics()->IsPushable() && ent->IsCollisionPushable() ) {
 				contacts.RemoveIndex( i );
 				i--;
@@ -2452,24 +2452,24 @@ bool arcPhysics_RigidBodyMultiple::EvaluateContacts( bool addEntityContacts ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SaveState
+anPhysics_RigidBodyMultiple::SaveState
 ================
 */
-void arcPhysics_RigidBodyMultiple::SaveState( void ) {
+void anPhysics_RigidBodyMultiple::SaveState( void ) {
 	saved = *current;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::RestoreState
+anPhysics_RigidBodyMultiple::RestoreState
 ================
 */
-void arcPhysics_RigidBodyMultiple::RestoreState( void ) {
+void anPhysics_RigidBodyMultiple::RestoreState( void ) {
 	*current = saved;
 
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		bodies[ i ].Link( self, *current );
+		bodies[i].Link( self, *current );
 	}
 
 	EvaluateContacts( true );
@@ -2477,14 +2477,14 @@ void arcPhysics_RigidBodyMultiple::RestoreState( void ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetOrigin
+anPhysics_RigidBodyMultiple::SetOrigin
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetOrigin( const arcVec3 &newOrigin, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_RigidBodyMultiple::SetOrigin( const anVec3 &newOrigin, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
-	if ( masterEntity != NULL ) {
+	if ( masterEntity != nullptr ) {
 		self->GetMasterPosition( masterOrigin, masterAxis );
 		current->i.position = masterOrigin + newOrigin * masterAxis;
 		localOrigin = newOrigin;
@@ -2494,7 +2494,7 @@ void arcPhysics_RigidBodyMultiple::SetOrigin( const arcVec3 &newOrigin, int id )
 
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		bodies[ i ].Link( self, *current );
+		bodies[i].Link( self, *current );
 	}
 
 	Activate();
@@ -2502,14 +2502,14 @@ void arcPhysics_RigidBodyMultiple::SetOrigin( const arcVec3 &newOrigin, int id )
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetAxis
+anPhysics_RigidBodyMultiple::SetAxis
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetAxis( const arcMat3 &newAxis, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_RigidBodyMultiple::SetAxis( const anMat3 &newAxis, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
-	if ( masterEntity != NULL ) {
+	if ( masterEntity != nullptr ) {
 		if ( flags.isOrientated ) {
 			self->GetMasterPosition( masterOrigin, masterAxis );
 			current->i.orientation = newAxis * masterAxis;
@@ -2522,7 +2522,7 @@ void arcPhysics_RigidBodyMultiple::SetAxis( const arcMat3 &newAxis, int id ) {
 
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		bodies[ i ].Link( self, *current );
+		bodies[i].Link( self, *current );
 	}
 
 	Activate();
@@ -2530,19 +2530,19 @@ void arcPhysics_RigidBodyMultiple::SetAxis( const arcMat3 &newAxis, int id ) {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::Move
+anPhysics_RigidBodyMultiple::Move
 ================
 */
-void arcPhysics_RigidBodyMultiple::Translate( const arcVec3 &translation, int id ) {
+void anPhysics_RigidBodyMultiple::Translate( const anVec3 &translation, int id ) {
 
-	if ( masterEntity != NULL ) {
+	if ( masterEntity != nullptr ) {
 		localOrigin += translation;
 	}
 	current->i.position += translation;
 
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		bodies[ i ].Link( self, *current );
+		bodies[i].Link( self, *current );
 	}
 
 	Activate();
@@ -2550,17 +2550,17 @@ void arcPhysics_RigidBodyMultiple::Translate( const arcVec3 &translation, int id
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::Rotate
+anPhysics_RigidBodyMultiple::Rotate
 ================
 */
-void arcPhysics_RigidBodyMultiple::Rotate( const idRotation &rotation, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_RigidBodyMultiple::Rotate( const anRotation &rotation, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current->i.orientation *= rotation.ToMat3();
 	current->i.position *= rotation;
 
-	if ( masterEntity != NULL ) {
+	if ( masterEntity != nullptr ) {
 		self->GetMasterPosition( masterOrigin, masterAxis );
 		localAxis *= rotation.ToMat3();
 		localOrigin = ( current->i.position - masterOrigin ) * masterAxis.Transpose();
@@ -2568,7 +2568,7 @@ void arcPhysics_RigidBodyMultiple::Rotate( const idRotation &rotation, int id ) 
 
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		bodies[ i ].Link( self, *current );
+		bodies[i].Link( self, *current );
 	}
 
 	Activate();
@@ -2576,10 +2576,10 @@ void arcPhysics_RigidBodyMultiple::Rotate( const idRotation &rotation, int id ) 
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetBodyOffset
+anPhysics_RigidBodyMultiple::GetBodyOffset
 ================
 */
-const arcVec3& arcPhysics_RigidBodyMultiple::GetBodyOffset( int id ) const {
+const anVec3& anPhysics_RigidBodyMultiple::GetBodyOffset( int id ) const {
 	assert( id >= 0 && id < bodies.Num() );
 
 	if ( id < 0 || id >= bodies.Num() ) {
@@ -2591,10 +2591,10 @@ const arcVec3& arcPhysics_RigidBodyMultiple::GetBodyOffset( int id ) const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetOrigin
+anPhysics_RigidBodyMultiple::GetOrigin
 ================
 */
-void arcPhysics_RigidBodyMultiple::GetBodyOrigin( arcVec3& org, int id ) const {
+void anPhysics_RigidBodyMultiple::GetBodyOrigin( anVec3& org, int id ) const {
 	assert( id >= 0 && id < bodies.Num() );
 
 	if ( id < 0 || id >= bodies.Num() ) {
@@ -2607,61 +2607,61 @@ void arcPhysics_RigidBodyMultiple::GetBodyOrigin( arcVec3& org, int id ) const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetOrigin
+anPhysics_RigidBodyMultiple::GetOrigin
 ================
 */
-const arcVec3& arcPhysics_RigidBodyMultiple::GetOrigin( int id ) const {
+const anVec3& anPhysics_RigidBodyMultiple::GetOrigin( int id ) const {
 	return current->i.position;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetAxis
+anPhysics_RigidBodyMultiple::GetAxis
 ================
 */
-const arcMat3& arcPhysics_RigidBodyMultiple::GetAxis( int id ) const {
+const anMat3& anPhysics_RigidBodyMultiple::GetAxis( int id ) const {
 	return current->i.orientation;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetLinearVelocity
+anPhysics_RigidBodyMultiple::SetLinearVelocity
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetLinearVelocity( const arcVec3 &newLinearVelocity, int id ) {
+void anPhysics_RigidBodyMultiple::SetLinearVelocity( const anVec3 &newLinearVelocity, int id ) {
 	current->i.linearMomentum = newLinearVelocity * mainMass;
 	Activate();
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetAngularVelocity
+anPhysics_RigidBodyMultiple::SetAngularVelocity
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetAngularVelocity( const arcVec3 &newAngularVelocity, int id ) {
-	arcMat3 worldInertiaTensor = 6.0f * ( current->i.orientation.Transpose() * mainInertiaTensor * current->i.orientation );
+void anPhysics_RigidBodyMultiple::SetAngularVelocity( const anVec3 &newAngularVelocity, int id ) {
+	anMat3 worldInertiaTensor = 6.0f * ( current->i.orientation.Transpose() * mainInertiaTensor * current->i.orientation );
 	current->i.angularMomentum = worldInertiaTensor * newAngularVelocity;
 	Activate();
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetLinearVelocity
+anPhysics_RigidBodyMultiple::GetLinearVelocity
 ================
 */
-const arcVec3& arcPhysics_RigidBodyMultiple::GetLinearVelocity( int id ) const {
-	static arcVec3 curLinearVelocity;
+const anVec3& anPhysics_RigidBodyMultiple::GetLinearVelocity( int id ) const {
+	static anVec3 curLinearVelocity;
 	curLinearVelocity = current->i.linearMomentum * mainInverseMass;
 	return curLinearVelocity;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetPointVelocity
+anPhysics_RigidBodyMultiple::GetPointVelocity
 ================
 */
-const arcVec3& arcPhysics_RigidBodyMultiple::GetPointVelocity( const arcVec3& point, arcVec3& velocity ) const {
-	arcVec3 comWorld = current->i.position + ( mainCenterOfMass * current->i.orientation );
+const anVec3& anPhysics_RigidBodyMultiple::GetPointVelocity( const anVec3& point, anVec3& velocity ) const {
+	anVec3 comWorld = current->i.position + ( mainCenterOfMass * current->i.orientation );
 	velocity = ( current->i.linearMomentum * mainInverseMass );
 	velocity += GetAngularVelocity().Cross( point - comWorld );
 	return velocity;
@@ -2669,12 +2669,12 @@ const arcVec3& arcPhysics_RigidBodyMultiple::GetPointVelocity( const arcVec3& po
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetAngularVelocity
+anPhysics_RigidBodyMultiple::GetAngularVelocity
 ================
 */
-const arcVec3& arcPhysics_RigidBodyMultiple::GetAngularVelocity( int id ) const {
-	static arcVec3 curAngularVelocity;
-	arcMat3 inverseWorldInertiaTensor;
+const anVec3& anPhysics_RigidBodyMultiple::GetAngularVelocity( int id ) const {
+	static anVec3 curAngularVelocity;
+	anMat3 inverseWorldInertiaTensor;
 
 	inverseWorldInertiaTensor = current->i.orientation.Transpose() * mainInverseInertiaTensor * current->i.orientation;
 	curAngularVelocity = inverseWorldInertiaTensor * current->i.angularMomentum;
@@ -2683,10 +2683,10 @@ const arcVec3& arcPhysics_RigidBodyMultiple::GetAngularVelocity( int id ) const 
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::ClipTranslation
+anPhysics_RigidBodyMultiple::ClipTranslation
 ================
 */
-void arcPhysics_RigidBodyMultiple::ClipTranslation( trace_t &results, const arcVec3 &translation, const arcClipModel *model ) const {
+void anPhysics_RigidBodyMultiple::ClipTranslation( trace_t &results, const anVec3 &translation, const anClipModel *model ) const {
 	int i;
 	trace_t tr;
 
@@ -2694,15 +2694,15 @@ void arcPhysics_RigidBodyMultiple::ClipTranslation( trace_t &results, const arcV
 	results.fraction = 1.f;
 
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		arcClipModel* clipModel = bodies[ i ].GetClipModel();
+		anClipModel* clipModel = bodies[i].GetClipModel();
 		if ( !clipModel ) {
 			continue;
 		}
 
 		if ( model ) {
-			gameLocal.clip.TranslationModel( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, clipModel->GetOrigin(), clipModel->GetOrigin() + translation, clipModel, clipModel->GetAxis(), bodies[ i ].GetClipMask(), model, model->GetOrigin(), model->GetAxis() );
+			gameLocal.clip.TranslationModel( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, clipModel->GetOrigin(), clipModel->GetOrigin() + translation, clipModel, clipModel->GetAxis(), bodies[i].GetClipMask(), model, model->GetOrigin(), model->GetAxis() );
 		} else {
-			gameLocal.clip.Translation( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, clipModel->GetOrigin(), clipModel->GetOrigin() + translation, clipModel, clipModel->GetAxis(), bodies[ i ].GetClipMask(), self );
+			gameLocal.clip.Translation( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, clipModel->GetOrigin(), clipModel->GetOrigin() + translation, clipModel, clipModel->GetAxis(), bodies[i].GetClipMask(), self );
 		}
 
 		if ( tr.fraction < results.fraction ) {
@@ -2717,27 +2717,27 @@ void arcPhysics_RigidBodyMultiple::ClipTranslation( trace_t &results, const arcV
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::ClipRotation
+anPhysics_RigidBodyMultiple::ClipRotation
 ================
 */
-void arcPhysics_RigidBodyMultiple::ClipRotation( trace_t &results, const idRotation &rotation, const arcClipModel *model ) const {
+void anPhysics_RigidBodyMultiple::ClipRotation( trace_t &results, const anRotation &rotation, const anClipModel *model ) const {
 	int i;
 	trace_t tr;
-	idRotation partialRotation;
+	anRotation partialRotation;
 
 	memset( &results, 0, sizeof( results ) );
 	results.fraction = 1.f;
 
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		arcClipModel* clipModel = bodies[ i ].GetClipModel();
+		anClipModel* clipModel = bodies[i].GetClipModel();
 		if ( !clipModel ) {
 			continue;
 		}
 
 		if ( model ) {
-			gameLocal.clip.RotationModel( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, clipModel->GetOrigin(), rotation, clipModel, clipModel->GetAxis(), bodies[ i ].GetClipMask(), model, model->GetOrigin(), model->GetAxis() );
+			gameLocal.clip.RotationModel( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, clipModel->GetOrigin(), rotation, clipModel, clipModel->GetAxis(), bodies[i].GetClipMask(), model, model->GetOrigin(), model->GetAxis() );
 		} else {
-			gameLocal.clip.Rotation( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, clipModel->GetOrigin(), rotation, clipModel, clipModel->GetAxis(), bodies[ i ].GetClipMask(), self );
+			gameLocal.clip.Rotation( CLIP_DEBUG_PARMS_ENTINFO( self ) tr, clipModel->GetOrigin(), rotation, clipModel, clipModel->GetAxis(), bodies[i].GetClipMask(), self );
 		}
 
 		if ( tr.fraction < results.fraction ) {
@@ -2752,15 +2752,15 @@ void arcPhysics_RigidBodyMultiple::ClipRotation( trace_t &results, const idRotat
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::ClipContents
+anPhysics_RigidBodyMultiple::ClipContents
 ================
 */
-int arcPhysics_RigidBodyMultiple::ClipContents( const arcClipModel *model ) const {
+int anPhysics_RigidBodyMultiple::ClipContents( const anClipModel *model ) const {
 	int contents = 0;
 	int i;
 
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		arcClipModel* clipModel = bodies[ i ].GetClipModel();
+		anClipModel* clipModel = bodies[i].GetClipModel();
 		if ( !clipModel ) {
 			continue;
 		}
@@ -2768,7 +2768,7 @@ int arcPhysics_RigidBodyMultiple::ClipContents( const arcClipModel *model ) cons
 		if ( model ) {
 			contents |= gameLocal.clip.ContentsModel( CLIP_DEBUG_PARMS_ENTINFO( self ) clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1, model, model->GetOrigin(), model->GetAxis() );
 		} else {
-			contents |= gameLocal.clip.Contents( CLIP_DEBUG_PARMS_ENTINFO( self ) clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1, NULL );
+			contents |= gameLocal.clip.Contents( CLIP_DEBUG_PARMS_ENTINFO( self ) clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1, nullptr );
 		}
 	}
 
@@ -2777,12 +2777,12 @@ int arcPhysics_RigidBodyMultiple::ClipContents( const arcClipModel *model ) cons
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetMaster
+anPhysics_RigidBodyMultiple::SetMaster
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetMaster( arcEntity *master, const bool orientated ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_RigidBodyMultiple::SetMaster( arcEntity *master, const bool orientated ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	if ( master ) {
 		if ( !masterEntity ) {
@@ -2803,7 +2803,7 @@ void arcPhysics_RigidBodyMultiple::SetMaster( arcEntity *master, const bool orie
 		localAxis = mat3_identity;
 
 		if ( masterEntity ) {
-			masterEntity = NULL;
+			masterEntity = nullptr;
 			Activate();
 		}
 	}
@@ -2811,50 +2811,50 @@ void arcPhysics_RigidBodyMultiple::SetMaster( arcEntity *master, const bool orie
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetPushed
+anPhysics_RigidBodyMultiple::SetPushed
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetPushed( int deltaTime ) {
-	idRotation rotation;
+void anPhysics_RigidBodyMultiple::SetPushed( int deltaTime ) {
+	anRotation rotation;
 
 	rotation = ( saved.i.orientation * current->i.orientation ).ToRotation();
 
 	// velocity with which the af is pushed
 	current->pushVelocity.SubVec3(0) += ( current->i.position - saved.i.position ) / ( MS2SEC( deltaTime ) );
-	current->pushVelocity.SubVec3(1) += rotation.GetVec() * -DEG2RAD( rotation.GetAngle() ) / ( MS2SEC( deltaTime ) );
+	current->pushVelocity.SubVec3( 1 ) += rotation.GetVec() * -DEG2RAD( rotation.GetAngle() ) / ( MS2SEC( deltaTime ) );
 	next->pushVelocity = current->pushVelocity;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetPushedLinearVelocity
+anPhysics_RigidBodyMultiple::GetPushedLinearVelocity
 ================
 */
-const arcVec3 &arcPhysics_RigidBodyMultiple::GetPushedLinearVelocity( const int id ) const {
+const anVec3 &anPhysics_RigidBodyMultiple::GetPushedLinearVelocity( const int id ) const {
 	return current->pushVelocity.SubVec3(0);
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetPushedAngularVelocity
+anPhysics_RigidBodyMultiple::GetPushedAngularVelocity
 ================
 */
-const arcVec3 &arcPhysics_RigidBodyMultiple::GetPushedAngularVelocity( const int id ) const {
-	return current->pushVelocity.SubVec3(1);
+const anVec3 &anPhysics_RigidBodyMultiple::GetPushedAngularVelocity( const int id ) const {
+	return current->pushVelocity.SubVec3( 1 );
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::SetClipMask
+anPhysics_RigidBodyMultiple::SetClipMask
 ================
 */
-void arcPhysics_RigidBodyMultiple::SetClipMask( int mask, int id ) {
+void anPhysics_RigidBodyMultiple::SetClipMask( int mask, int id ) {
 	if ( id >= 0 && id < bodies.Num() ) {
 		bodies[ id ].SetClipMask( mask );
 	} else {
 		int i;
 		for ( i = 0; i < bodies.Num(); i++ ) {
-			bodies[ i ].SetClipMask( mask );
+			bodies[i].SetClipMask( mask );
 		}
 	}
 
@@ -2862,16 +2862,16 @@ void arcPhysics_RigidBodyMultiple::SetClipMask( int mask, int id ) {
 
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		mainClipMask |= bodies[ i ].GetClipMask();
+		mainClipMask |= bodies[i].GetClipMask();
 	}
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetClipMask
+anPhysics_RigidBodyMultiple::GetClipMask
 ================
 */
-int arcPhysics_RigidBodyMultiple::GetClipMask( int id ) const {
+int anPhysics_RigidBodyMultiple::GetClipMask( int id ) const {
 	int contents = 0;
 
 	if ( id >= 0 && id < bodies.Num() ) {
@@ -2879,7 +2879,7 @@ int arcPhysics_RigidBodyMultiple::GetClipMask( int id ) const {
 	} else {
 		int i;
 		for ( i = 0; i < bodies.Num(); i++ ) {
-			contents |= bodies[ i ].GetClipMask();
+			contents |= bodies[i].GetClipMask();
 		}
 	}
 
@@ -2888,10 +2888,10 @@ int arcPhysics_RigidBodyMultiple::GetClipMask( int id ) const {
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetBodyContacts
+anPhysics_RigidBodyMultiple::GetBodyContacts
 ================
 */
-int arcPhysics_RigidBodyMultiple::GetBodyContacts( const int id, const contactInfo_t** _contacts, int maxContacts ) const {
+int anPhysics_RigidBodyMultiple::GetBodyContacts( const int id, const contactInfo_t** _contacts, int maxContacts ) const {
 	int i;
 	int num = 0;
 
@@ -2901,8 +2901,8 @@ int arcPhysics_RigidBodyMultiple::GetBodyContacts( const int id, const contactIn
 	}
 
 	for ( i = 0; i < contacts.Num(); i++ ) {
-		if ( id == -1 || contacts[ i ].selfId == id ) {
-			_contacts[ num ] = &contacts[ i ];
+		if ( id == -1 || contacts[i].selfId == id ) {
+			_contacts[ num ] = &contacts[i];
 			num++;
 			if ( num >= maxContacts ) {
 				return num;
@@ -2915,10 +2915,10 @@ int arcPhysics_RigidBodyMultiple::GetBodyContacts( const int id, const contactIn
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::GetBodyGroundContacts
+anPhysics_RigidBodyMultiple::GetBodyGroundContacts
 ================
 */
-int arcPhysics_RigidBodyMultiple::GetBodyGroundContacts( const int id, const contactInfo_t** _contacts, int maxContacts ) const {
+int anPhysics_RigidBodyMultiple::GetBodyGroundContacts( const int id, const contactInfo_t** _contacts, int maxContacts ) const {
 	int i;
 	int num = 0;
 
@@ -2928,12 +2928,12 @@ int arcPhysics_RigidBodyMultiple::GetBodyGroundContacts( const int id, const con
 	}
 
 	for ( i = 0; i < contacts.Num(); i++ ) {
-		if ( id == -1 || contacts[ i ].selfId == id ) {
-			if ( contacts[ i ].normal * -gravityNormal <= 0.0f ) {
+		if ( id == -1 || contacts[i].selfId == id ) {
+			if ( contacts[i].normal * -gravityNormal <= 0.0f ) {
 				continue;
 			}
 
-			_contacts[ num ] = &contacts[ i ];
+			_contacts[ num ] = &contacts[i];
 			num++;
 			if ( num >= maxContacts ) {
 				return num;
@@ -2946,96 +2946,96 @@ int arcPhysics_RigidBodyMultiple::GetBodyGroundContacts( const int id, const con
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::ApplyImpulse
+anPhysics_RigidBodyMultiple::ApplyImpulse
 ================
 */
-void arcPhysics_RigidBodyMultiple::ApplyImpulse( const arcVec3& linearImpulse, const arcVec3& angularImpulse ) {
+void anPhysics_RigidBodyMultiple::ApplyImpulse( const anVec3& linearImpulse, const anVec3& angularImpulse ) {
 	current->i.linearMomentum += linearImpulse;
 	current->i.angularMomentum += angularImpulse;
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::UnlinkClip
+anPhysics_RigidBodyMultiple::UnlinkClip
 ================
 */
-void arcPhysics_RigidBodyMultiple::UnlinkClip( void ) {
+void anPhysics_RigidBodyMultiple::UnlinkClip( void ) {
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		bodies[ i ].UnLink();
+		bodies[i].UnLink();
 	}
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::LinkClip
+anPhysics_RigidBodyMultiple::LinkClip
 ================
 */
-void arcPhysics_RigidBodyMultiple::LinkClip( void ) {
+void anPhysics_RigidBodyMultiple::LinkClip( void ) {
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		bodies[ i ].Link( self, *current );
+		bodies[i].Link( self, *current );
 	}
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::EnableClip
+anPhysics_RigidBodyMultiple::EnableClip
 ================
 */
-void arcPhysics_RigidBodyMultiple::EnableClip( void ) {
+void anPhysics_RigidBodyMultiple::EnableClip( void ) {
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
-		bodies[ i ].GetClipModel()->Enable();
+		bodies[i].GetClipModel()->Enable();
 	}
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::DisableClip
+anPhysics_RigidBodyMultiple::DisableClip
 ================
 */
-void arcPhysics_RigidBodyMultiple::DisableClip( bool activateContacting ) {
+void anPhysics_RigidBodyMultiple::DisableClip( bool activateContacting ) {
 	int i;
 	for ( i = 0; i < bodies.Num(); i++ ) {
 		if ( activateContacting ) {
-			WakeEntitiesContacting( self, bodies[ i ].GetClipModel() );
+			WakeEntitiesContacting( self, bodies[i].GetClipModel() );
 		}
-		bodies[ i ].GetClipModel()->Disable();
+		bodies[i].GetClipModel()->Disable();
 	}
 }
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::CheckWater
+anPhysics_RigidBodyMultiple::CheckWater
 ================
 */
 
-const arcClipModel* arcPhysics_RigidBodyMultiple::CheckWater( void ) {
+const anClipModel* anPhysics_RigidBodyMultiple::CheckWater( void ) {
 	waterLevel = 0.0f;
 
-	arcBounds absBounds;
+	anBounds absBounds;
 	absBounds.FromTransformedBounds( totalBounds, current->i.position, current->i.orientation );
 
-	const arcClipModel* clipModel;
-	int count = gameLocal.clip.ClipModelsTouchingBounds( CLIP_DEBUG_PARMS_ENTINFO( self ) absBounds, CONTENTS_WATER, &clipModel, 1, NULL );
+	const anClipModel* clipModel;
+	int count = gameLocal.clip.ClipModelsTouchingBounds( CLIP_DEBUG_PARMS_ENTINFO( self ) absBounds, CONTENTS_WATER, &clipModel, 1, nullptr );
 	if ( !count ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( !clipModel->GetNumCollisionModels() ) {
-		return NULL;
+		return nullptr;
 	}
 
-	arcVec3 waterCurrent;
+	anVec3 waterCurrent;
 	clipModel->GetEntity()->GetWaterCurrent( waterCurrent );
 
 	arcCollisionModel* model = clipModel->GetCollisionModel( 0 );
 	int numPlanes = model->GetNumBrushPlanes();
 	if ( !numPlanes ) {
-		return NULL;
+		return nullptr;
 	}
-	const arcBounds& modelBounds = model->GetBounds();
+	const anBounds& modelBounds = model->GetBounds();
 
 	//self->CheckWater( clipModel->GetOrigin(), clipModel->GetAxis(), model );
 
@@ -3045,7 +3045,7 @@ const arcClipModel* arcPhysics_RigidBodyMultiple::CheckWater( void ) {
 		float velocityScratch[ MAX_TRACEMODEL_WATER_POINTS ];
 		float waterVolume = 0.0f;
 		float totalVolume = 0.0f;
-		arcVec3 comWorld = mainCenterOfMass * current->i.orientation + current->i.position;
+		anVec3 comWorld = mainCenterOfMass * current->i.orientation + current->i.position;
 
 		for ( int j = 0; j < bodies.Num(); j++ ) {
 			bool doBuoyancy = bodies[ j ].GetBuoyancy() > 0.0f;
@@ -3054,65 +3054,65 @@ const arcClipModel* arcPhysics_RigidBodyMultiple::CheckWater( void ) {
 				continue;
 			}
 
-			arcClipModel* bodyClip = bodies[ j ].GetClipModel();
+			anClipModel* bodyClip = bodies[ j ].GetClipModel();
 			const traceModelWater_t* waterPoints = bodyClip->GetWaterPoints();
 			float volume = bodyClip->GetTraceModelVolume();
 			totalVolume += volume;
 
-			const arcMat3 transpose = bodyClip->GetAxis().Transpose();
-			const arcVec3 localAngularVelocity = GetAngularVelocity() * transpose;
-			const arcVec3 localLinearVelocity = GetLinearVelocity() * transpose;
-			const arcVec3 localGravity = gravityNormal * transpose;
-			const arcVec3 localCenterOfMass = ( comWorld - bodyClip->GetOrigin() ) * transpose;
+			const anMat3 transpose = bodyClip->GetAxis().Transpose();
+			const anVec3 localAngularVelocity = GetAngularVelocity() * transpose;
+			const anVec3 localLinearVelocity = GetLinearVelocity() * transpose;
+			const anVec3 localGravity = gravityNormal * transpose;
+			const anVec3 localCenterOfMass = ( comWorld - bodyClip->GetOrigin() ) * transpose;
 
 			float bodyDrag = bodies[ j ].GetWaterDrag();
 
 			for ( int i = 0; i < MAX_TRACEMODEL_WATER_POINTS; i++ ) {
-				scratch[ i ] = waterPoints[ i ].weight * volume;
+				scratch[i] = waterPoints[i].weight * volume;
 			}
 
 			for ( int l = 0; l < numPlanes; l++ ) {
-				arcPlane plane = model->GetBrushPlane( l );
+				anPlane plane = model->GetBrushPlane( l );
 				plane.TranslateSelf( clipModel->GetOrigin() - bodyClip->GetOrigin() );
 				plane.Normal() *= clipModel->GetAxis();
 				plane.Normal() *= transpose;
 
 				for ( int i = 0; i < MAX_TRACEMODEL_WATER_POINTS; i++ ) {
-					if ( plane.Distance( waterPoints[ i ].xyz ) > 0.0f ) {
-						scratch[ i ] = 0.0f;
-						velocityScratch[ i ] = 0.0f;
+					if ( plane.Distance( waterPoints[i].xyz ) > 0.0f ) {
+						scratch[i] = 0.0f;
+						velocityScratch[i] = 0.0f;
 					} else if ( doDrag ) {
 						// this is calculated here as it is fairly expensive
-						velocityScratch[ i ] = localGravity * ( localAngularVelocity.Cross( waterPoints[ i ].xyz - localCenterOfMass ) + localLinearVelocity );
+						velocityScratch[i] = localGravity * ( localAngularVelocity.Cross( waterPoints[i].xyz - localCenterOfMass ) + localLinearVelocity );
 					}
 				}
 			}
 
 			float height = clipModel->GetOrigin().z - bodyClip->GetOrigin().z + modelBounds.GetMaxs().z;
-			arcPlane plane( transpose[ 2 ], height );
+			anPlane plane( transpose[ 2 ], height );
 
 			for ( int i = 0; i < MAX_TRACEMODEL_WATER_POINTS; i++ ) {
-				if ( scratch[ i ] == 0.0f || velocityScratch[ i ] == 0.0f ) {
+				if ( scratch[i] == 0.0f || velocityScratch[i] == 0.0f ) {
 					continue;
 				}
 
-				arcVec3 org = bodyClip->GetOrigin() + ( bodyClip->GetAxis() * waterPoints[ i ].xyz );
-				arcVec3 mainSpaceOrg = org  - (current->i.position + mainCenterOfMass * current->i.orientation );
+				anVec3 org = bodyClip->GetOrigin() + ( bodyClip->GetAxis() * waterPoints[i].xyz );
+				anVec3 mainSpaceOrg = org  - (current->i.position + mainCenterOfMass * current->i.orientation );
 
 				if ( doBuoyancy ) {
-					scratch[ i ] *= Min( -plane.Distance( waterPoints[ i ].xyz ) / 16.0f, 1.0f );
+					scratch[i] *= Min( -plane.Distance( waterPoints[i].xyz ) / 16.0f, 1.0f );
 
-					arcVec3 impulse = scratch[ i ] * ( ( -gravityNormal * bodies[ j ].GetBuoyancy() ) + ( waterCurrent * mainInverseMass ) );
+					anVec3 impulse = scratch[i] * ( ( -gravityNormal * bodies[ j ].GetBuoyancy() ) + ( waterCurrent * mainInverseMass ) );
 
 					current->i.linearMomentum += impulse;
 					current->i.angularMomentum += ( mainSpaceOrg ).Cross( impulse );
 
-					waterVolume += scratch[ i ];
+					waterVolume += scratch[i];
 				}
 
 				if ( doDrag ) {
-					float drag = -waterPoints[ i ].weight * velocityScratch[ i ];
-					arcVec3 impulse = bodyDrag * drag * gravityNormal * mainMass;
+					float drag = -waterPoints[i].weight * velocityScratch[i];
+					anVec3 impulse = bodyDrag * drag * gravityNormal * mainMass;
 
 					current->i.linearMomentum += impulse;
 					current->i.angularMomentum += ( mainSpaceOrg ).Cross( impulse );
@@ -3120,7 +3120,7 @@ const arcClipModel* arcPhysics_RigidBodyMultiple::CheckWater( void ) {
 			}
 		}
 
-		if ( totalVolume > arcMath::FLT_EPSILON ) {
+		if ( totalVolume > anMath::FLT_EPSILON ) {
 			waterLevel = waterVolume / totalVolume;
 		}
 	}
@@ -3130,32 +3130,32 @@ const arcClipModel* arcPhysics_RigidBodyMultiple::CheckWater( void ) {
 
 const float	RB_ORIGIN_MAX				= 32767;
 const int	RB_ORIGIN_TOTAL_BITS		= 24;
-const int	RB_ORIGIN_EXPONENT_BITS		= arcMath::BitsForInteger( arcMath::BitsForFloat( RB_ORIGIN_MAX ) ) + 1;
+const int	RB_ORIGIN_EXPONENT_BITS		= anMath::BitsForInteger( anMath::BitsForFloat( RB_ORIGIN_MAX ) ) + 1;
 const int	RB_ORIGIN_MANTISSA_BITS		= RB_ORIGIN_TOTAL_BITS - 1 - RB_ORIGIN_EXPONENT_BITS;
 
 const float	RB_LINEAR_VELOCITY_MIN				= 0.05f;
 const float	RB_LINEAR_VELOCITY_MAX				= 8192.0f;
 const int	RB_LINEAR_VELOCITY_TOTAL_BITS		= 20;
-const int	RB_LINEAR_VELOCITY_EXPONENT_BITS	= arcMath::BitsForInteger( arcMath::BitsForFloat( RB_LINEAR_VELOCITY_MAX, RB_LINEAR_VELOCITY_MIN ) ) + 1;
+const int	RB_LINEAR_VELOCITY_EXPONENT_BITS	= anMath::BitsForInteger( anMath::BitsForFloat( RB_LINEAR_VELOCITY_MAX, RB_LINEAR_VELOCITY_MIN ) ) + 1;
 const int	RB_LINEAR_VELOCITY_MANTISSA_BITS	= RB_LINEAR_VELOCITY_TOTAL_BITS - 1 - RB_LINEAR_VELOCITY_EXPONENT_BITS;
 
 const float	RB_ANGULAR_VELOCITY_MIN				= 0.00001f;
-const float	RB_ANGULAR_VELOCITY_MAX				= arcMath::PI * 8.0f;
+const float	RB_ANGULAR_VELOCITY_MAX				= anMath::PI * 8.0f;
 const int	RB_ANGULAR_VELOCITY_TOTAL_BITS		= 20;
-const int	RB_ANGULAR_VELOCITY_EXPONENT_BITS	= arcMath::BitsForInteger( arcMath::BitsForFloat( RB_ANGULAR_VELOCITY_MAX, RB_ANGULAR_VELOCITY_MIN ) ) + 1;
+const int	RB_ANGULAR_VELOCITY_EXPONENT_BITS	= anMath::BitsForInteger( anMath::BitsForFloat( RB_ANGULAR_VELOCITY_MAX, RB_ANGULAR_VELOCITY_MIN ) ) + 1;
 const int	RB_ANGULAR_VELOCITY_MANTISSA_BITS	= RB_ANGULAR_VELOCITY_TOTAL_BITS - 1 - RB_ANGULAR_VELOCITY_EXPONENT_BITS;
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::CheckNetworkStateChanges
+anPhysics_RigidBodyMultiple::CheckNetworkStateChanges
 ================
 */
-bool arcPhysics_RigidBodyMultiple::CheckNetworkStateChanges( networkStateMode_t mode, const sdEntityStateNetworkData& baseState ) const {
+bool anPhysics_RigidBodyMultiple::CheckNetworkStateChanges( networkStateMode_t mode, const sdEntityStateNetworkData& baseState ) const {
 	if ( mode == NSM_VISIBLE ) {
 		NET_GET_BASE( sdRBMultipleNetworkState );
 
-		arcVec3 angularVelocity = GetAngularVelocity();
-		arcVec3 linearVelocity = GetLinearVelocity();
+		anVec3 angularVelocity = GetAngularVelocity();
+		anVec3 linearVelocity = GetLinearVelocity();
 
 		NET_CHECK_FIELD( angularVelocity, angularVelocity );
 		NET_CHECK_FIELD( linearVelocity, linearVelocity );
@@ -3180,10 +3180,10 @@ bool arcPhysics_RigidBodyMultiple::CheckNetworkStateChanges( networkStateMode_t 
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::WriteNetworkState
+anPhysics_RigidBodyMultiple::WriteNetworkState
 ================
 */
-void arcPhysics_RigidBodyMultiple::WriteNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, idBitMsg& msg ) const {
+void anPhysics_RigidBodyMultiple::WriteNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, anBitMsg& msg ) const {
 	if ( mode == NSM_VISIBLE ) {
 		NET_GET_STATES( sdRBMultipleNetworkState );
 
@@ -3217,10 +3217,10 @@ void arcPhysics_RigidBodyMultiple::WriteNetworkState( networkStateMode_t mode, c
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::ApplyNetworkState
+anPhysics_RigidBodyMultiple::ApplyNetworkState
 ================
 */
-void arcPhysics_RigidBodyMultiple::ApplyNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& newState ) {
+void anPhysics_RigidBodyMultiple::ApplyNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& newState ) {
 	traceCollection.ForceNextUpdate();
 	if ( mode == NSM_VISIBLE ) {
 		NET_GET_NEW( sdRBMultipleNetworkState );
@@ -3232,7 +3232,7 @@ void arcPhysics_RigidBodyMultiple::ApplyNetworkState( networkStateMode_t mode, c
 
 		self->UpdateVisuals();
 		for ( int i = 0; i < bodies.Num(); i++ ) {
-			bodies[ i ].Link( self, *current );
+			bodies[i].Link( self, *current );
 		}
 		return;
 	}
@@ -3257,10 +3257,10 @@ void arcPhysics_RigidBodyMultiple::ApplyNetworkState( networkStateMode_t mode, c
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::ReadNetworkState
+anPhysics_RigidBodyMultiple::ReadNetworkState
 ================
 */
-void arcPhysics_RigidBodyMultiple::ReadNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, const idBitMsg& msg ) const {
+void anPhysics_RigidBodyMultiple::ReadNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, const anBitMsg& msg ) const {
 	if ( mode == NSM_VISIBLE ) {
 		NET_GET_STATES( sdRBMultipleNetworkState );
 
@@ -3293,15 +3293,15 @@ void arcPhysics_RigidBodyMultiple::ReadNetworkState( networkStateMode_t mode, co
 
 /*
 ================
-arcPhysics_RigidBodyMultiple::CreateNetworkStructure
+anPhysics_RigidBodyMultiple::CreateNetworkStructure
 ================
 */
-sdEntityStateNetworkData* arcPhysics_RigidBodyMultiple::CreateNetworkStructure( networkStateMode_t mode ) const {
+sdEntityStateNetworkData* anPhysics_RigidBodyMultiple::CreateNetworkStructure( networkStateMode_t mode ) const {
 	if ( mode == NSM_VISIBLE ) {
 		return new sdRBMultipleNetworkState();
 	}
 	if ( mode == NSM_BROADCAST ) {
 		return new sdRBMultipleBroadcastState();
 	}
-	return NULL;
+	return nullptr;
 }

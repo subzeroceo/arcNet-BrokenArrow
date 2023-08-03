@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "ConsoleView.h"
@@ -40,7 +40,7 @@ void ConsoleView::AddText( const char *msg ) {
 	if ( !editConsole.GetSafeHwnd() )
 		return;
 
-	arcNetString work;
+	anString work;
 	CString work2;
 
 	work = msg;
@@ -65,7 +65,7 @@ void ConsoleView::AddText( const char *msg ) {
 * Replaces the text in the console window with the specified text.
 * @param text The text to place in the console window.
 */
-void ConsoleView::SetConsoleText ( const arcNetString& text ) {
+void ConsoleView::SetConsoleText ( const anString& text ) {
 	editInput.Clear ();
 	editInput.SetWindowText ( text.c_str() );
 }
@@ -77,7 +77,7 @@ void ConsoleView::SetConsoleText ( const arcNetString& text ) {
 * @param cmd The text to execute. If this string is empty then the
 * input edit box text is used.
 */
-void ConsoleView::ExecuteCommand ( const arcNetString& cmd ) {
+void ConsoleView::ExecuteCommand ( const anString& cmd ) {
 
 	CString str;
 	if ( cmd.Length() > 0 ) {

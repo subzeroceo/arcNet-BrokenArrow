@@ -4,18 +4,18 @@
 /*
 ===============================================================================
 
-	arcDeclParticle
+	anDeclParticle
 
 ===============================================================================
 */
 
 static const int MAX_PARTICLE_STAGES	= 32;
 
-class idParticleParm {
+class anParticleParm {
 public:
-							idParticleParm() { table = NULL; from = to = 0.0f; }
+							anParticleParm() { table = nullptr; from = to = 0.0f; }
 
-	const arcDeclTable *		table;
+	const anDeclTable *		table;
 	float					from;
 	float					to;
 
@@ -62,8 +62,8 @@ typedef struct {
 	int						index;				// particle number in the system
 	float					frac;				// 0.0 to 1.0
 	arcRandom				random;
-	arcVec3					origin;				// dynamic smoke particles can have individual origins and axis
-	arcMat3					axis;
+	anVec3					origin;				// dynamic smoke particles can have individual origins and axis
+	anMat3					axis;
 
 
 	float					age;				// in seconds, calculated as fraction * stage->particleLife
@@ -75,31 +75,31 @@ typedef struct {
 //
 // single particle stage
 //
-class arcParticleStage {
+class anParticleStage {
 public:
-							arcParticleStage();
-							~arcParticleStage() {}
+							anParticleStage();
+							~anParticleStage() {}
 
 	void					Default();
 	int						NumQuadsPerParticle() const;	// includes trails and cross faded animations
 	// returns the number of verts created, which will range from 0 to 4*NumQuadsPerParticle()
-	int						CreateParticle( particleGen_t *g, arcDrawVert *verts ) const;
+	int						CreateParticle( particleGen_t *g, anDrawVertex *verts ) const;
 
-	void					ParticleOrigin( particleGen_t *g, arcVec3 &origin ) const;
-	int						ParticleVerts( particleGen_t *g, const arcVec3 origin, arcDrawVert *verts ) const;
-	void					ParticleTexCoords( particleGen_t *g, arcDrawVert *verts ) const;
-	void					ParticleColors( particleGen_t *g, arcDrawVert *verts ) const;
+	void					ParticleOrigin( particleGen_t *g, anVec3 &origin ) const;
+	int						ParticleVerts( particleGen_t *g, const anVec3 origin, anDrawVertex *verts ) const;
+	void					ParticleTexCoords( particleGen_t *g, anDrawVertex *verts ) const;
+	void					ParticleColors( particleGen_t *g, anDrawVertex *verts ) const;
 
 	const char *			GetCustomPathName();
 	const char *			GetCustomPathDesc();
 	int						NumCustomPathParms();
 	void					SetCustomPathType( const char *p );
-	void					operator=( const arcParticleStage &src );
+	void					operator=( const anParticleStage &src );
 
 
 	//------------------------------
 
-	const arcMaterial *		material;
+	const anMaterial *		material;
 
 	int						totalParticles;		// total number of particles, although some may be invisible at a given time
 	float					cycles;				// allows things to oneShot ( 1 cycle ) or run for a set number of cycles
@@ -120,7 +120,7 @@ public:
 	prtDirection_t			directionType;
 	float					directionParms[4];
 
-	idParticleParm			speed;
+	anParticleParm			speed;
 	float					gravity;				// can be negative to float up
 	bool					worldGravity;			// apply gravity in world space
 	bool					randomDistribution;		// randomly orient the quad on emission ( defaults to true )
@@ -133,22 +133,22 @@ public:
 
 	//--------------------------------
 
-	arcVec3					offset;				// offset from origin to spawn all particles, also applies to customPath
+	anVec3					offset;				// offset from origin to spawn all particles, also applies to customPath
 
 	int						animationFrames;	// if > 1, subdivide the texture S axis into frames and crossfade
 	float					animationRate;		// frames per second
 
 	float					initialAngle;		// in degrees, random angle is used if zero ( default )
-	idParticleParm			rotationSpeed;		// half the particles will have negative rotation speeds
+	anParticleParm			rotationSpeed;		// half the particles will have negative rotation speeds
 
 	prtOrientation_t		orientation;	// view, aimed, or axis fixed
 	float					orientationParms[4];
 
-	idParticleParm			size;
-	idParticleParm			aspect;				// greater than 1 makes the T axis longer
+	anParticleParm			size;
+	anParticleParm			aspect;				// greater than 1 makes the T axis longer
 
-	arcVec4					color;
-	arcVec4					fadeColor;			// either 0 0 0 0 for additive, or 1 1 1 0 for blended materials
+	anVec4					color;
+	anVec4					fadeColor;			// either 0 0 0 0 for additive, or 1 1 1 0 for blended materials
 	float					fadeInFraction;		// in 0.0 to 1.0 range
 	float					fadeOutFraction;	// in 0.0 to 1.0 range
 	float					fadeIndexFraction;	// in 0.0 to 1.0 range, causes later index smokes to be more faded
@@ -158,14 +158,14 @@ public:
 
 	float					boundsExpansion;	// user tweak to fix poorly calculated bounds
 
-	arcBounds				bounds;				// derived
+	anBounds				bounds;				// derived
 };
 
 
 //
 // group of particle stages
 //
-class arcDeclParticle : public arcDecleration {
+class anDeclParticle : public anDecl {
 public:
 
 	virtual size_t			Size() const;
@@ -173,24 +173,24 @@ public:
 	virtual bool			Parse( const char *text, const int textLength, bool allowBinaryVersion );
 	virtual void			FreeData();
 
-	bool					Save( const char *fileName = NULL );
+	bool					Save( const char *fileName = nullptr );
 
 	// Loaded instead of re-parsing, written if MD5 hash different
-	bool					LoadBinary( arcNetFile * file, unsigned int checksum );
-	void					WriteBinary( arcNetFile * file, unsigned int checksum );
+	bool					LoadBinary( anFile * file, unsigned int checksum );
+	void					WriteBinary( anFile * file, unsigned int checksum );
 
-	arcNetList<arcParticleStage *, TAG_LIBLIST_DECL>stages;
-	arcBounds				bounds;
+	anList<anParticleStage *, TAG_LIBLIST_DECL>stages;
+	anBounds				bounds;
 	float					depthHack;
 
 private:
 	bool					RebuildTextSource();
-	void					GetStageBounds( arcParticleStage *stage );
-	arcParticleStage *		ParseParticleStage( arcLexer &src );
-	void					ParseParms( arcLexer &src, float *parms, int maxParms );
-	void					ParseParametric( arcLexer &src, idParticleParm *parm );
-	void					WriteStage( arcNetFile *f, arcParticleStage *stage );
-	void					WriteParticleParm( arcNetFile *f, idParticleParm *parm, const char *name );
+	void					GetStageBounds( anParticleStage *stage );
+	anParticleStage *		ParseParticleStage( anLexer &src );
+	void					ParseParms( anLexer &src, float *parms, int maxParms );
+	void					ParseParametric( anLexer &src, anParticleParm *parm );
+	void					WriteStage( anFile *f, anParticleStage *stage );
+	void					WriteParticleParm( anFile *f, anParticleParm *parm, const char *name );
 };
 
 #endif /* !__DECLPARTICLE_H__ */

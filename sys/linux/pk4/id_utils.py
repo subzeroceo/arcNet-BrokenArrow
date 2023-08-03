@@ -35,7 +35,7 @@ def list_files_in_paks( path ):
 		files.sort()
 		return files
 
-# build a dictionary of names -> ( pak name, md5 ) from a path of pk4s
+# build a dictionary of names -> ( pak name, md5 ) from a path of pk5s
 def md5_in_paks( path ):
 	ret = {}
 	zippies = list_paks( path )

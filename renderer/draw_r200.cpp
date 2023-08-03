@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -93,9 +93,9 @@ static void RB_R200_ARB_DrawInteraction( const drawInteraction_t *din ) {
 	qglProgramEnvParameter4fvARB( GL_VERTEX_PROGRAM_ARB, PP_SPECULAR_MATRIX_S, din->diffuseMatrix[0].ToFloatPtr() );
 	qglProgramEnvParameter4fvARB( GL_VERTEX_PROGRAM_ARB, PP_SPECULAR_MATRIX_T, din->diffuseMatrix[1].ToFloatPtr() );
 
-	const surfTriangles_t	*tri = din->surf->geo;
-	arcDrawVert	*ac = (arcDrawVert *)vertexCache.Position( tri->ambientCache );
-	qglVertexPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), (void *)&ac->xyz );
+	const srfTriangles_t	*tri = din->surf->geo;
+	anDrawVertex	*ac = (anDrawVertex *)vertexCache.Position( tri->ambientCache );
+	qglVertexPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), (void *)&ac->xyz );
 
 	static const float zero[4] = { 0, 0, 0, 0 };
 	static const float one[4] = { 1, 1, 1, 1 };
@@ -136,25 +136,25 @@ static void RB_R200_ARB_DrawInteraction( const drawInteraction_t *din ) {
 
 	GL_SetCurrentTextureUnit( 3 );
 	din->specularImage->Bind();
-	qglTexCoordPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), (void *)&ac->normal );
+	qglTexCoordPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), (void *)&ac->normal );
 
 	GL_SetCurrentTextureUnit( 2 );
 	din->diffuseImage->Bind();
-	qglTexCoordPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), (void *)&ac->tangents[1][0] );
+	qglTexCoordPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), (void *)&ac->tangents[1][0] );
 
 	GL_SetCurrentTextureUnit( 1 );
 	din->lightFalloffImage->Bind();
-	qglTexCoordPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), (void *)&ac->tangents[0][0] );
+	qglTexCoordPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), (void *)&ac->tangents[0][0] );
 
 	GL_SetCurrentTextureUnit( 0 );
 	din->lightImage->Bind();
-	qglTexCoordPointer( 2, GL_FLOAT, sizeof( arcDrawVert ), (void *)&ac->st[0] );
+	qglTexCoordPointer( 2, GL_FLOAT, sizeof( anDrawVertex ), (void *)&ac->st[0] );
 
 	qglSetFragmentShaderConstantATI( GL_CON_0_ATI, din->diffuseColor.ToFloatPtr() );
 	qglSetFragmentShaderConstantATI( GL_CON_1_ATI, din->specularColor.ToFloatPtr() );
 
 	if ( din->vertexColor != SVC_IGNORE ) {
-		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof(arcDrawVert), (void *)&ac->color );
+		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof(anDrawVertex), (void *)&ac->color );
 		qglEnableClientState( GL_COLOR_ARRAY );
 
 		RB_DrawElementsWithCounters( tri );
@@ -177,7 +177,7 @@ static void RB_R200_ARB_CreateDrawInteractions( const drawSurf_t *surf ) {
 	}
 
 	// force a space calculation for light vectors
-	backEnd.currentSpace = NULL;
+	backEnd.currentSpace = nullptr;
 
 	// set the depth test
 	if ( surf->material->Coverage() == MC_TRANSLUCENT /* != C_PERFORATED */ ) {

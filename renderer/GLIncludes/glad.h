@@ -71,7 +71,7 @@ typedef void* (* GLADloadproc)(const char *name);
 #    endif
 #   endif
 #  elif defined(__GNUC__) && defined(GLAD_GLAPI_EXPORT_BUILD)
-#   define GLAPI __attribute__ ((visibility ("default"))) extern
+#   define GLAPI __attribute__ ((visibility ( "default" ) )) extern
 #  else
 #   define GLAPI extern
 #  endif
@@ -1720,9 +1720,9 @@ typedef void (APIENTRY *GLVULKANPROCNV)(void);
 #define GL_READ_PIXELS_FORMAT 0x828D
 #define GL_READ_PIXELS_TYPE 0x828E
 #define GL_TEXTURE_IMAGE_FORMAT 0x828F
-#define GL_TEXTURE_IMAGE_TYPE 0x8290
+#define GL_TEXTURE_anImageYPE 0x8290
 #define GL_GET_TEXTURE_IMAGE_FORMAT 0x8291
-#define GL_GET_TEXTURE_IMAGE_TYPE 0x8292
+#define GL_GET_TEXTURE_anImageYPE 0x8292
 #define GL_MIPMAP 0x8293
 #define GL_MANUAL_GENERATE_MIPMAP 0x8294
 #define GL_AUTO_GENERATE_MIPMAP 0x8295
@@ -1742,7 +1742,7 @@ typedef void (APIENTRY *GLVULKANPROCNV)(void);
 #define GL_SHADER_IMAGE_LOAD 0x82A4
 #define GL_SHADER_IMAGE_STORE 0x82A5
 #define GL_SHADER_IMAGE_ATOMIC 0x82A6
-#define GL_IMAGE_TEXEL_SIZE 0x82A7
+#define GL_anImageEXEL_SIZE 0x82A7
 #define GL_IMAGE_COMPATIBILITY_CLASS 0x82A8
 #define GL_IMAGE_PIXEL_FORMAT 0x82A9
 #define GL_IMAGE_PIXEL_TYPE 0x82AA

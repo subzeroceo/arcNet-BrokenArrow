@@ -2600,11 +2600,11 @@ extern "C" {
 #define GL_FOG_OFFSET_VALUE_SGIX          0x8199
 #endif
 
-#ifndef GL_HP_image_transform
+#ifndef GL_HP_anImageransform
 #define GL_IMAGE_SCALE_X_HP               0x8155
 #define GL_IMAGE_SCALE_Y_HP               0x8156
-#define GL_IMAGE_TRANSLATE_X_HP           0x8157
-#define GL_IMAGE_TRANSLATE_Y_HP           0x8158
+#define GL_anImageRANSLATE_X_HP           0x8157
+#define GL_anImageRANSLATE_Y_HP           0x8158
 #define GL_IMAGE_ROTATE_ANGLE_HP          0x8159
 #define GL_IMAGE_ROTATE_ORIGIN_X_HP       0x815A
 #define GL_IMAGE_ROTATE_ORIGIN_Y_HP       0x815B
@@ -2613,9 +2613,9 @@ extern "C" {
 #define GL_IMAGE_CUBIC_WEIGHT_HP          0x815E
 #define GL_CUBIC_HP                       0x815F
 #define GL_AVERAGE_HP                     0x8160
-#define GL_IMAGE_TRANSFORM_2D_HP          0x8161
-#define GL_POST_IMAGE_TRANSFORM_COLOR_TABLE_HP 0x8162
-#define GL_PROXY_POST_IMAGE_TRANSFORM_COLOR_TABLE_HP 0x8163
+#define GL_anImageRANSFORM_2D_HP          0x8161
+#define GL_POST_anImageRANSFORM_COLOR_TABLE_HP 0x8162
+#define GL_PROXY_POST_anImageRANSFORM_COLOR_TABLE_HP 0x8163
 #endif
 
 #ifndef GL_HP_convolution_border_modes
@@ -5231,7 +5231,7 @@ typedef char GLcharARB;
 typedef unsigned int GLhandleARB;
 #endif
 
-/* GL type for "half" precision (s10e5) float data in host memory */
+/* GL type for "half" precision ( s10e5) float data in host memory */
 #ifndef GL_ARB_half_float_pixel
 typedef unsigned short GLhalfARB;
 #endif
@@ -6858,7 +6858,7 @@ typedef void (APIENTRYP PFNGLMULTIDRAWELEMENTSBASEVERTEXPROC) ( GLenum mode, con
 #ifndef GL_ARB_provoking_vertex
 #define GL_ARB_provoking_vertex 1
 #ifdef GL_GLEXT_PROTOTYPES
-GLAPI void APIENTRY glProvokingVertex ( GLenum mode);
+GLAPI void APIENTRY glProvokingVertex( GLenum mode);
 #endif
 typedef void (APIENTRYP PFNGLPROVOKINGVERTEXPROC) ( GLenum mode);
 #endif
@@ -7454,9 +7454,9 @@ typedef void (APIENTRYP PFNGLGETDOUBLEI_VPROC) ( GLenum target, GLuint index, GL
 #ifndef GL_ARB_cl_event
 #define GL_ARB_cl_event 1
 #ifdef GL_GLEXT_PROTOTYPES
-GLAPI GLsync APIENTRY glCreateSyncFromCLeventARB (struct _cl_context * context, struct _cl_event * event, GLbitfield flags);
+GLAPI GLsync APIENTRY glCreateSyncFromCLeventARB ( struct _cl_context * context, struct _cl_event * event, GLbitfield flags);
 #endif
-typedef GLsync (APIENTRYP PFNGLCREATESYNCFROMCLEVENTARBPROC) (struct _cl_context * context, struct _cl_event * event, GLbitfield flags);
+typedef GLsync (APIENTRYP PFNGLCREATESYNCFROMCLEVENTARBPROC) ( struct _cl_context * context, struct _cl_event * event, GLbitfield flags);
 #endif
 
 #ifndef GL_ARB_debug_output
@@ -8065,8 +8065,8 @@ typedef void (APIENTRYP PFNGLGETFOGFUNCSGISPROC) ( GLfloat *points);
 #define GL_SGIX_fog_offset 1
 #endif
 
-#ifndef GL_HP_image_transform
-#define GL_HP_image_transform 1
+#ifndef GL_HP_anImageransform
+#define GL_HP_anImageransform 1
 #ifdef GL_GLEXT_PROTOTYPES
 GLAPI void APIENTRY glImageTransformParameteriHP ( GLenum target, GLenum pname, GLint param);
 GLAPI void APIENTRY glImageTransformParameterfHP ( GLenum target, GLenum pname, GLfloat param);

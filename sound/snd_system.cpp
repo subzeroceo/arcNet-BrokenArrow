@@ -26,62 +26,62 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "snd_local.h"
 
 #ifdef ID_DEDICATED
-arcCVarSystem idSoundSystemLocal::s_noSound( "s_noSound", "1", CVAR_SOUND | CVAR_BOOL | CVAR_ROM, "" );
+anCVarSystem idSoundSystemLocal::s_noSound( "s_noSound", "1", CVAR_SOUND | CVAR_BOOL | CVAR_ROM, "" );
 #else
-arcCVarSystem idSoundSystemLocal::s_noSound( "s_noSound", "0", CVAR_SOUND | CVAR_BOOL | CVAR_NOCHEAT, "" );
+anCVarSystem idSoundSystemLocal::s_noSound( "s_noSound", "0", CVAR_SOUND | CVAR_BOOL | CVAR_NOCHEAT, "" );
 #endif
-arcCVarSystem idSoundSystemLocal::s_quadraticFalloff( "s_quadraticFalloff", "1", CVAR_SOUND | CVAR_BOOL, "" );
-arcCVarSystem idSoundSystemLocal::s_drawSounds( "s_drawSounds", "0", CVAR_SOUND | CVAR_INTEGER, "", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
-arcCVarSystem idSoundSystemLocal::s_showStartSound( "s_showStartSound", "0", CVAR_SOUND | CVAR_BOOL, "" );
-arcCVarSystem idSoundSystemLocal::s_useOcclusion( "s_useOcclusion", "1", CVAR_SOUND | CVAR_BOOL, "" );
-arcCVarSystem idSoundSystemLocal::s_maxSoundsPerShader( "s_maxSoundsPerShader", "0", CVAR_SOUND | CVAR_ARCHIVE, "", 0, 10, arcCmdSystem::ArgCompletion_Integer<0,10> );
-arcCVarSystem idSoundSystemLocal::s_showLevelMeter( "s_showLevelMeter", "0", CVAR_SOUND | CVAR_BOOL, "" );
-arcCVarSystem idSoundSystemLocal::s_constantAmplitude( "s_constantAmplitude", "-1", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_minVolume6( "s_minVolume6", "0", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_dotbias6( "s_dotbias6", "0.8", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_minVolume2( "s_minVolume2", "0.25", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_dotbias2( "s_dotbias2", "1.1", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_spatializationDecay( "s_spatializationDecay", "2", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_reverse( "s_reverse", "0", CVAR_SOUND | CVAR_ARCHIVE | CVAR_BOOL, "" );
-arcCVarSystem idSoundSystemLocal::s_meterTopTime( "s_meterTopTime", "2000", CVAR_SOUND | CVAR_ARCHIVE | CVAR_INTEGER, "" );
-arcCVarSystem idSoundSystemLocal::s_volume( "s_volume_dB", "0", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "volume in dB" );
-arcCVarSystem idSoundSystemLocal::s_playDefaultSound( "s_playDefaultSound", "1", CVAR_SOUND | CVAR_ARCHIVE | CVAR_BOOL, "play a beep for missing sounds" );
-arcCVarSystem idSoundSystemLocal::s_subFraction( "s_subFraction", "0.75", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "volume to subwoofer in 5.1" );
-arcCVarSystem idSoundSystemLocal::s_globalFraction( "s_globalFraction", "0.8", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "volume to all speakers when not spatialized" );
-arcCVarSystem idSoundSystemLocal::s_doorDistanceAdd( "s_doorDistanceAdd", "150", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "reduce sound volume with this distance when going through a door" );
-arcCVarSystem idSoundSystemLocal::s_singleEmitter( "s_singleEmitter", "0", CVAR_SOUND | CVAR_INTEGER, "mute all sounds but this emitter" );
-arcCVarSystem idSoundSystemLocal::s_numberOfSpeakers( "s_numberOfSpeakers", "2", CVAR_SOUND | CVAR_ARCHIVE, "number of speakers" );
-arcCVarSystem idSoundSystemLocal::s_force22kHz( "s_force22kHz", "0", CVAR_SOUND | CVAR_BOOL, ""  );
-arcCVarSystem idSoundSystemLocal::s_clipVolumes( "s_clipVolumes", "1", CVAR_SOUND | CVAR_BOOL, ""  );
-arcCVarSystem idSoundSystemLocal::s_realTimeDecoding( "s_realTimeDecoding", "1", CVAR_SOUND | CVAR_BOOL | CVAR_INIT, "" );
+anCVarSystem idSoundSystemLocal::s_quadraticFalloff( "s_quadraticFalloff", "1", CVAR_SOUND | CVAR_BOOL, "" );
+anCVarSystem idSoundSystemLocal::s_drawSounds( "s_drawSounds", "0", CVAR_SOUND | CVAR_INTEGER, "", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem idSoundSystemLocal::s_showStartSound( "s_showStartSound", "0", CVAR_SOUND | CVAR_BOOL, "" );
+anCVarSystem idSoundSystemLocal::s_useOcclusion( "s_useOcclusion", "1", CVAR_SOUND | CVAR_BOOL, "" );
+anCVarSystem idSoundSystemLocal::s_maxSoundsPerShader( "s_maxSoundsPerShader", "0", CVAR_SOUND | CVAR_ARCHIVE, "", 0, 10, arcCmdSystem::ArgCompletion_Integer<0,10> );
+anCVarSystem idSoundSystemLocal::s_showLevelMeter( "s_showLevelMeter", "0", CVAR_SOUND | CVAR_BOOL, "" );
+anCVarSystem idSoundSystemLocal::s_constantAmplitude( "s_constantAmplitude", "-1", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_minVolume6( "s_minVolume6", "0", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_dotbias6( "s_dotbias6", "0.8", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_minVolume2( "s_minVolume2", "0.25", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_dotbias2( "s_dotbias2", "1.1", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_spatializationDecay( "s_spatializationDecay", "2", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_reverse( "s_reverse", "0", CVAR_SOUND | CVAR_ARCHIVE | CVAR_BOOL, "" );
+anCVarSystem idSoundSystemLocal::s_meterTopTime( "s_meterTopTime", "2000", CVAR_SOUND | CVAR_ARCHIVE | CVAR_INTEGER, "" );
+anCVarSystem idSoundSystemLocal::s_volume( "s_volume_dB", "0", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "volume in dB" );
+anCVarSystem idSoundSystemLocal::s_playDefaultSound( "s_playDefaultSound", "1", CVAR_SOUND | CVAR_ARCHIVE | CVAR_BOOL, "play a beep for missing sounds" );
+anCVarSystem idSoundSystemLocal::s_subFraction( "s_subFraction", "0.75", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "volume to subwoofer in 5.1" );
+anCVarSystem idSoundSystemLocal::s_globalFraction( "s_globalFraction", "0.8", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "volume to all speakers when not spatialized" );
+anCVarSystem idSoundSystemLocal::s_doorDistanceAdd( "s_doorDistanceAdd", "150", CVAR_SOUND | CVAR_ARCHIVE | CVAR_FLOAT, "reduce sound volume with this distance when going through a door" );
+anCVarSystem idSoundSystemLocal::s_singleEmitter( "s_singleEmitter", "0", CVAR_SOUND | CVAR_INTEGER, "mute all sounds but this emitter" );
+anCVarSystem idSoundSystemLocal::s_numberOfSpeakers( "s_numberOfSpeakers", "2", CVAR_SOUND | CVAR_ARCHIVE, "number of speakers" );
+anCVarSystem idSoundSystemLocal::s_force22kHz( "s_force22kHz", "0", CVAR_SOUND | CVAR_BOOL, ""  );
+anCVarSystem idSoundSystemLocal::s_clipVolumes( "s_clipVolumes", "1", CVAR_SOUND | CVAR_BOOL, ""  );
+anCVarSystem idSoundSystemLocal::s_realTimeDecoding( "s_realTimeDecoding", "1", CVAR_SOUND | CVAR_BOOL | CVAR_INIT, "" );
 
-arcCVarSystem idSoundSystemLocal::s_slowAttenuate( "s_slowAttenuate", "1", CVAR_SOUND | CVAR_BOOL, "slowmo sounds attenuate over shorted distance" );
-arcCVarSystem idSoundSystemLocal::s_enviroSuitCutoffFreq( "s_enviroSuitCutoffFreq", "2000", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_enviroSuitCutoffQ( "s_enviroSuitCutoffQ", "2", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_reverbTime( "s_reverbTime", "1000", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_reverbFeedback( "s_reverbFeedback", "0.333", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_enviroSuitVolumeScale( "s_enviroSuitVolumeScale", "0.9", CVAR_SOUND | CVAR_FLOAT, "" );
-arcCVarSystem idSoundSystemLocal::s_skipHelltimeFX( "s_skipHelltimeFX", "0", CVAR_SOUND | CVAR_BOOL, "" );
+anCVarSystem idSoundSystemLocal::s_slowAttenuate( "s_slowAttenuate", "1", CVAR_SOUND | CVAR_BOOL, "slowmo sounds attenuate over shorted distance" );
+anCVarSystem idSoundSystemLocal::s_enviroSuitCutoffFreq( "s_enviroSuitCutoffFreq", "2000", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_enviroSuitCutoffQ( "s_enviroSuitCutoffQ", "2", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_reverbTime( "s_reverbTime", "1000", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_reverbFeedback( "s_reverbFeedback", "0.333", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_enviroSuitVolumeScale( "s_enviroSuitVolumeScale", "0.9", CVAR_SOUND | CVAR_FLOAT, "" );
+anCVarSystem idSoundSystemLocal::s_skipHelltimeFX( "s_skipHelltimeFX", "0", CVAR_SOUND | CVAR_BOOL, "" );
 
 #if ID_OPENAL
 // off by default. OpenAL DLL gets loaded on-demand
-arcCVarSystem idSoundSystemLocal::s_libOpenAL( "s_libOpenAL", "openal32.dll", CVAR_SOUND | CVAR_ARCHIVE, "OpenAL DLL name/path" );
-arcCVarSystem idSoundSystemLocal::s_useOpenAL( "s_useOpenAL", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ARCHIVE, "use OpenAL" );
-arcCVarSystem idSoundSystemLocal::s_useEAXReverb( "s_useEAXReverb", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ARCHIVE, "use EAX reverb" );
-arcCVarSystem idSoundSystemLocal::s_muteEAXReverb( "s_muteEAXReverb", "0", CVAR_SOUND | CVAR_BOOL, "mute eax reverb" );
-arcCVarSystem idSoundSystemLocal::s_decompressionLimit( "s_decompressionLimit", "6", CVAR_SOUND | CVAR_INTEGER | CVAR_ARCHIVE, "specifies maximum uncompressed sample length in seconds" );
+anCVarSystem idSoundSystemLocal::s_libOpenAL( "s_libOpenAL", "openal32.dll", CVAR_SOUND | CVAR_ARCHIVE, "OpenAL DLL name/path" );
+anCVarSystem idSoundSystemLocal::s_useOpenAL( "s_useOpenAL", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ARCHIVE, "use OpenAL" );
+anCVarSystem idSoundSystemLocal::s_useEAXReverb( "s_useEAXReverb", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ARCHIVE, "use EAX reverb" );
+anCVarSystem idSoundSystemLocal::s_muteEAXReverb( "s_muteEAXReverb", "0", CVAR_SOUND | CVAR_BOOL, "mute eax reverb" );
+anCVarSystem idSoundSystemLocal::s_decompressionLimit( "s_decompressionLimit", "6", CVAR_SOUND | CVAR_INTEGER | CVAR_ARCHIVE, "specifies maximum uncompressed sample length in seconds" );
 #else
-arcCVarSystem idSoundSystemLocal::s_libOpenAL( "s_libOpenAL", "openal32.dll", CVAR_SOUND | CVAR_ARCHIVE, "OpenAL is not supported in this build" );
-arcCVarSystem idSoundSystemLocal::s_useOpenAL( "s_useOpenAL", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ROM, "OpenAL is not supported in this build" );
-arcCVarSystem idSoundSystemLocal::s_useEAXReverb( "s_useEAXReverb", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ROM, "EAX not available in this build" );
-arcCVarSystem idSoundSystemLocal::s_muteEAXReverb( "s_muteEAXReverb", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ROM, "mute eax reverb" );
-arcCVarSystem idSoundSystemLocal::s_decompressionLimit( "s_decompressionLimit", "6", CVAR_SOUND | CVAR_INTEGER | CVAR_ROM, "specifies maximum uncompressed sample length in seconds" );
+anCVarSystem idSoundSystemLocal::s_libOpenAL( "s_libOpenAL", "openal32.dll", CVAR_SOUND | CVAR_ARCHIVE, "OpenAL is not supported in this build" );
+anCVarSystem idSoundSystemLocal::s_useOpenAL( "s_useOpenAL", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ROM, "OpenAL is not supported in this build" );
+anCVarSystem idSoundSystemLocal::s_useEAXReverb( "s_useEAXReverb", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ROM, "EAX not available in this build" );
+anCVarSystem idSoundSystemLocal::s_muteEAXReverb( "s_muteEAXReverb", "0", CVAR_SOUND | CVAR_BOOL | CVAR_ROM, "mute eax reverb" );
+anCVarSystem idSoundSystemLocal::s_decompressionLimit( "s_decompressionLimit", "6", CVAR_SOUND | CVAR_INTEGER | CVAR_ROM, "specifies maximum uncompressed sample length in seconds" );
 #endif
 
 bool idSoundSystemLocal::useOpenAL = false;
@@ -92,7 +92,7 @@ idSoundSystemLocal	soundSystemLocal;
 idSoundSystem	*soundSystem  = &soundSystemLocal;
 
 //#modified-fva; BEGIN
-static void CstMixedSoundToShortOutput(short *outBuffer, const float *inBuffer, float gain, float &lastGain, int numSpeakers) {
+static void CstMixedSoundToShortOutput( short *outBuffer, const float *inBuffer, float gain, float &lastGain, int numSpeakers) {
 	// adjust volume and convert to short
 
 	assert(numSpeakers == 2 || numSpeakers == 6);
@@ -116,18 +116,18 @@ static void CstMixedSoundToShortOutput(short *outBuffer, const float *inBuffer, 
 		// attenuating: gain after clamp
 		if (numSpeakers == 2) {
 			while (pIn < pInPastLast) {
-				*pOut++ = (short)(arcMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
-				*pOut++ = (short)(arcMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
+				*pOut++ = ( short)(anMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
+				*pOut++ = ( short)(anMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
 				currentGain += gainInc;
 			}
 		} else { // numSpeakers == 6
 			while (pIn < pInPastLast) {
-				*pOut++ = (short)(arcMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
-				*pOut++ = (short)(arcMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
-				*pOut++ = (short)(arcMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
-				*pOut++ = (short)(arcMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
-				*pOut++ = (short)(arcMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
-				*pOut++ = (short)(arcMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
+				*pOut++ = ( short)(anMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
+				*pOut++ = ( short)(anMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
+				*pOut++ = ( short)(anMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
+				*pOut++ = ( short)(anMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
+				*pOut++ = ( short)(anMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
+				*pOut++ = ( short)(anMath::ClampFloat(-32768.0f, 32767.0f, *pIn++ ) * currentGain);
 				currentGain += gainInc;
 			}
 		}
@@ -135,18 +135,18 @@ static void CstMixedSoundToShortOutput(short *outBuffer, const float *inBuffer, 
 		// amplifying: gain before clamp
 		if (numSpeakers == 2) {
 			while (pIn < pInPastLast) {
-				*pOut++ = (short)arcMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
-				*pOut++ = (short)arcMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
+				*pOut++ = ( short)anMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
+				*pOut++ = ( short)anMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
 				currentGain += gainInc;
 			}
 		} else { // numSpeakers == 6
 			while (pIn < pInPastLast) {
-				*pOut++ = (short)arcMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
-				*pOut++ = (short)arcMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
-				*pOut++ = (short)arcMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
-				*pOut++ = (short)arcMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
-				*pOut++ = (short)arcMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
-				*pOut++ = (short)arcMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
+				*pOut++ = ( short)anMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
+				*pOut++ = ( short)anMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
+				*pOut++ = ( short)anMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
+				*pOut++ = ( short)anMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
+				*pOut++ = ( short)anMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
+				*pOut++ = ( short)anMath::ClampFloat(-32768.0f, 32767.0f, (*pIn++ ) * currentGain);
 				currentGain += gainInc;
 			}
 		}
@@ -179,19 +179,19 @@ static void CstMixedSoundToFloatOutput(float *buffer, float gain, float &lastGai
 		if (numSpeakers == 2) {
 			while (pBuffer < pBufferPastLast) {
 				float scaledGain = (1.0f / 32768.0f) * currentGain;
-				*pBuffer++ = arcMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
-				*pBuffer++ = arcMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
+				*pBuffer++ = anMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
+				*pBuffer++ = anMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
 				currentGain += gainInc;
 			}
 		} else { // numSpeakers == 6
 			while (pBuffer < pBufferPastLast) {
 				float scaledGain = (1.0f / 32768.0f) * currentGain;
-				*pBuffer++ = arcMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
-				*pBuffer++ = arcMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
-				*pBuffer++ = arcMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
-				*pBuffer++ = arcMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
-				*pBuffer++ = arcMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
-				*pBuffer++ = arcMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
+				*pBuffer++ = anMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
+				*pBuffer++ = anMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
+				*pBuffer++ = anMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
+				*pBuffer++ = anMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
+				*pBuffer++ = anMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
+				*pBuffer++ = anMath::ClampFloat(-32768.0f, 32768.0f, *pBuffer) * scaledGain;
 				currentGain += gainInc;
 			}
 		}
@@ -200,19 +200,19 @@ static void CstMixedSoundToFloatOutput(float *buffer, float gain, float &lastGai
 		if (numSpeakers == 2) {
 			while (pBuffer < pBufferPastLast) {
 				float scaledGain = (1.0f / 32768.0f) * currentGain;
-				*pBuffer++ = arcMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
-				*pBuffer++ = arcMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
+				*pBuffer++ = anMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
+				*pBuffer++ = anMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
 				currentGain += gainInc;
 			}
 		} else { // numSpeakers == 6
 			while (pBuffer < pBufferPastLast) {
 				float scaledGain = (1.0f / 32768.0f) * currentGain;
-				*pBuffer++ = arcMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
-				*pBuffer++ = arcMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
-				*pBuffer++ = arcMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
-				*pBuffer++ = arcMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
-				*pBuffer++ = arcMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
-				*pBuffer++ = arcMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
+				*pBuffer++ = anMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
+				*pBuffer++ = anMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
+				*pBuffer++ = anMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
+				*pBuffer++ = anMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
+				*pBuffer++ = anMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
+				*pBuffer++ = anMath::ClampFloat(-1.0f, 1.0f, (*pBuffer) * scaledGain);
 				currentGain += gainInc;
 			}
 		}
@@ -227,7 +227,7 @@ SoundReloadSounds_f
   this is called from the main thread
 ===============
 */
-void SoundReloadSounds_f( const arcCommandArgs &args ) {
+void SoundReloadSounds_f( const anCommandArgs &args ) {
 	if ( !soundSystemLocal.soundCache ) {
 		return;
 	}
@@ -248,7 +248,7 @@ ListSounds_f
 Optional parameter to only list sounds containing that string
 ===============
 */
-void ListSounds_f( const arcCommandArgs &args ) {
+void ListSounds_f( const anCommandArgs &args ) {
 	int i;
 	const char	*snd = args.Argv( 1 );
 
@@ -302,14 +302,14 @@ void ListSounds_f( const arcCommandArgs &args ) {
 ListSoundDecoders_f
 ===============
 */
-void ListSoundDecoders_f( const arcCommandArgs &args ) {
+void ListSoundDecoders_f( const anCommandArgs &args ) {
 	int i, j, numActiveDecoders, numWaitingDecoders;
 	idSoundWorldLocal *sw = soundSystemLocal.currentSoundWorld;
 
 	numActiveDecoders = numWaitingDecoders = 0;
 
 	for ( i = 0; i < sw->emitters.Num(); i++ ) {
-		arcAudioSystemLocal *sound = sw->emitters[i];
+		anAudioSystemLocal *sound = sw->emitters[i];
 
 		if ( !sound ) {
 			continue;
@@ -319,13 +319,13 @@ void ListSoundDecoders_f( const arcCommandArgs &args ) {
 		for ( j = 0; j < SOUND_MAX_CHANNELS; j++ ) {
 			idSoundChannel	*chan = &sound->channels[j];
 
-			if ( chan->decoder == NULL ) {
+			if ( chan->decoder == nullptr ) {
 				continue;
 			}
 
 			idSoundSample *sample = chan->decoder->GetSample();
 
-			if ( sample != NULL ) {
+			if ( sample != nullptr ) {
 				continue;
 			}
 
@@ -337,7 +337,7 @@ void ListSoundDecoders_f( const arcCommandArgs &args ) {
 	}
 
 	for ( i = 0; i < sw->emitters.Num(); i++ ) {
-		arcAudioSystemLocal *sound = sw->emitters[i];
+		anAudioSystemLocal *sound = sw->emitters[i];
 
 		if ( !sound ) {
 			continue;
@@ -347,13 +347,13 @@ void ListSoundDecoders_f( const arcCommandArgs &args ) {
 		for ( j = 0; j < SOUND_MAX_CHANNELS; j++ ) {
 			idSoundChannel	*chan = &sound->channels[j];
 
-			if ( chan->decoder == NULL ) {
+			if ( chan->decoder == nullptr ) {
 				continue;
 			}
 
 			idSoundSample *sample = chan->decoder->GetSample();
 
-			if ( sample == NULL ) {
+			if ( sample == nullptr ) {
 				continue;
 			}
 
@@ -391,7 +391,7 @@ TestSound_f
   this is called from the main thread
 ===============
 */
-void TestSound_f( const arcCommandArgs &args ) {
+void TestSound_f( const anCommandArgs &args ) {
 	if ( args.Argc() != 2 ) {
 		common->Printf( "Usage: testSound <file>\n" );
 		return;
@@ -410,7 +410,7 @@ restart the sound thread
   this is called from the main thread
 ===============
 */
-void SoundSystemRestart_f( const arcCommandArgs &args ) {
+void SoundSystemRestart_f( const anCommandArgs &args ) {
 	soundSystem->SetMute( true );
 	soundSystemLocal.ShutdownHW();
 	soundSystemLocal.InitHW();
@@ -432,8 +432,8 @@ void idSoundSystemLocal::Init() {
 	muted = false;
 	shutdown = false;
 
-	currentSoundWorld = NULL;
-	soundCache = NULL;
+	currentSoundWorld = nullptr;
+	soundCache = nullptr;
 
 	olddwCurrentWritePos = 0;
 	buffers = 0;
@@ -452,7 +452,7 @@ void idSoundSystemLocal::Init() {
 	// make a 16 byte aligned finalMixBuffer
 	finalMixBuffer = (float *) ( ( ( ( int )realAccum ) + 15 ) & ~15 );
 
-	graph = NULL;
+	graph = nullptr;
 
 	if ( !s_noSound.GetBool() ) {
 		idSampleDecoder::Init();
@@ -468,8 +468,8 @@ void idSoundSystemLocal::Init() {
 			idSoundSystemLocal::s_useOpenAL.SetBool( false );
 		} else {
 			common->Printf( "Setup OpenAL device and context... " );
-			openalDevice = alcOpenDevice( NULL );
-			openalContext = alcCreateContext( openalDevice, NULL );
+			openalDevice = alcOpenDevice( nullptr );
+			openalContext = alcCreateContext( openalDevice, nullptr );
 			alcMakeContextCurrent( openalContext );
 			common->Printf( "Done.\n" );
 
@@ -482,8 +482,8 @@ void idSoundSystemLocal::Init() {
 			} else {
 				common->Printf( "OpenAL: EAX 4.0 extension not found\n" );
 				idSoundSystemLocal::s_useEAXReverb.SetBool( false );
-				alEAXSet = (EAXSet)NULL;
-				alEAXGet = (EAXGet)NULL;
+				alEAXSet = (EAXSet)nullptr;
+				alEAXGet = (EAXGet)nullptr;
 			}
 
 			// try to obtain EAX-RAM extension - not required for operation
@@ -492,21 +492,21 @@ void idSoundSystemLocal::Init() {
 				alEAXGetBufferMode = (EAXGetBufferMode)alGetProcAddress( ID_ALCHAR "EAXGetBufferMode" );
 				common->Printf( "OpenAL: found EAX-RAM extension, %dkB\\%dkB\n", alGetInteger( alGetEnumValue( ID_ALCHAR "AL_EAX_RAM_FREE" ) ) / 1024, alGetInteger( alGetEnumValue( ID_ALCHAR "AL_EAX_RAM_SIZE" ) ) / 1024 );
 			} else {
-				alEAXSetBufferMode = (EAXSetBufferMode)NULL;
-				alEAXGetBufferMode = (EAXGetBufferMode)NULL;
+				alEAXSetBufferMode = (EAXSetBufferMode)nullptr;
+				alEAXGetBufferMode = (EAXGetBufferMode)nullptr;
 				common->Printf( "OpenAL: no EAX-RAM extension\n" );
 			}
 
 			if ( !idSoundSystemLocal::s_useOpenAL.GetBool() ) {
 				common->Printf( "OpenAL: disabling ( no EAX ). Using legacy mixer.\n" );
 
-				alcMakeContextCurrent( NULL );
+				alcMakeContextCurrent( nullptr );
 
 				alcDestroyContext( openalContext );
-				openalContext = NULL;
+				openalContext = nullptr;
 
 				alcCloseDevice( openalDevice );
-				openalDevice = NULL;
+				openalDevice = nullptr;
 			} else {
 
 				ALuint handle;
@@ -521,7 +521,7 @@ void idSoundSystemLocal::Init() {
 						// store in source array
 						openalSources[openalSourceCount].handle = handle;
 						openalSources[openalSourceCount].startTime = 0;
-						openalSources[openalSourceCount].chan = NULL;
+						openalSources[openalSourceCount].chan = nullptr;
 						openalSources[openalSourceCount].inUse = false;
 						openalSources[openalSourceCount].looping = false;
 
@@ -588,9 +588,9 @@ void idSoundSystemLocal::Shutdown() {
 			alDeleteSources( 1, &openalSources[i].handle );
 
 			// clear entry in source array
-			openalSources[i].handle = NULL;
+			openalSources[i].handle = nullptr;
 			openalSources[i].startTime = 0;
-			openalSources[i].chan = NULL;
+			openalSources[i].chan = nullptr;
 			openalSources[i].inUse = false;
 			openalSources[i].looping = false;
 
@@ -599,7 +599,7 @@ void idSoundSystemLocal::Shutdown() {
 
 	// destroy all the sounds (hardware buffers as well)
 	delete soundCache;
-	soundCache = NULL;
+	soundCache = nullptr;
 
 	//#modified-fva; BEGIN
 	fxList.DeleteContents(true);
@@ -607,13 +607,13 @@ void idSoundSystemLocal::Shutdown() {
 
 	// destroy openal device and context
 	if ( useOpenAL ) {
-		alcMakeContextCurrent( NULL );
+		alcMakeContextCurrent( nullptr );
 
 		alcDestroyContext( openalContext );
-		openalContext = NULL;
+		openalContext = nullptr;
 
 		alcCloseDevice( openalDevice );
-		openalDevice = NULL;
+		openalDevice = nullptr;
 	}
 
 	Sys_FreeOpenAL();
@@ -635,14 +635,14 @@ bool idSoundSystemLocal::InitHW() {
 	delete snd_audio_hw;
 	snd_audio_hw = idAudioHardware::Alloc();
 
-	if ( snd_audio_hw == NULL ) {
+	if ( snd_audio_hw == nullptr ) {
 		return false;
 	}
 
 	if ( !useOpenAL ) {
 		if ( !snd_audio_hw->Initialize() ) {
 			delete snd_audio_hw;
-			snd_audio_hw = NULL;
+			snd_audio_hw = nullptr;
 			return false;
 		}
 
@@ -675,13 +675,13 @@ bool idSoundSystemLocal::ShutdownHW() {
 	common->Printf( "Shutting down sound hardware\n" );
 
 	delete snd_audio_hw;
-	snd_audio_hw = NULL;
+	snd_audio_hw = nullptr;
 
 	isInitialized = false;
 
 	if ( graph ) {
 		Mem_Free( graph );
-		graph = NULL;
+		graph = nullptr;
 	}
 
 	return true;
@@ -698,7 +698,7 @@ int idSoundSystemLocal::GetCurrent44kHzTime( void ) const {
 	} else {
 		// NOTE: this would overflow 31bits within about 1h20 ( not that important since we get a snd_audio_hw right away pbly )
 		//return ( ( Sys_Milliseconds()*441 ) / 10 ) * 4;
-		return arcMath::FtoiFast( ( float )Sys_Milliseconds() * 176.4f );
+		return anMath::FtoiFast( ( float )Sys_Milliseconds() * 176.4f );
 	}
 }
 
@@ -785,7 +785,7 @@ int idSoundSystemLocal::AsyncUpdate( int inTime ) {
 	// If not using openal, get actual playback position from sound hardware
 	if ( useOpenAL ) {
 		// here we do it in samples ( overflows in 27 hours or so )
-		dwCurrentWritePos = arcMath::Ftol( ( float )Sys_Milliseconds() * 44.1f ) % ( MIXBUFFER_SAMPLES * ROOM_SLICES_IN_BUFFER );
+		dwCurrentWritePos = anMath::Ftol( ( float )Sys_Milliseconds() * 44.1f ) % ( MIXBUFFER_SAMPLES * ROOM_SLICES_IN_BUFFER );
 		dwCurrentBlock = dwCurrentWritePos / MIXBUFFER_SAMPLES;
 	} else {
 		// and here in bytes
@@ -806,7 +806,7 @@ int idSoundSystemLocal::AsyncUpdate( int inTime ) {
 	}
 
 	// lock the buffer so we can actually write to it
-	short *fBlock = NULL;
+	short *fBlock = nullptr;
 	ulong fBlockLen = 0;
 	if ( !useOpenAL ) {
 		snd_audio_hw->Lock( (void **)&fBlock, &fBlockLen );
@@ -1024,7 +1024,7 @@ cinData_t idSoundSystemLocal::ImageForTime( const int milliseconds, const bool w
 		for ( j = 0; j < numSpeakers; j++ ) {
 			int meter = 0;
 			for ( i = 0; i < MIXBUFFER_SAMPLES; i++ ) {
-				float result = arcMath::Fabs(accum[i*numSpeakers+j] );
+				float result = anMath::Fabs(accum[i*numSpeakers+j] );
 				if ( result > meter ) {
 					meter = result;
 				}
@@ -1171,7 +1171,7 @@ int idSoundSystemLocal::GetSoundDecoderInfo( int index, soundDecoderInfo_t &deco
 	}
 
 	for ( i = firstEmitter; i < sw->emitters.Num(); i++ ) {
-		arcAudioSystemLocal *sound = sw->emitters[i];
+		anAudioSystemLocal *sound = sw->emitters[i];
 
 		if ( !sound ) {
 			continue;
@@ -1181,13 +1181,13 @@ int idSoundSystemLocal::GetSoundDecoderInfo( int index, soundDecoderInfo_t &deco
 		for ( j = firstChannel; j < SOUND_MAX_CHANNELS; j++ ) {
 			idSoundChannel	*chan = &sound->channels[j];
 
-			if ( chan->decoder == NULL ) {
+			if ( chan->decoder == nullptr ) {
 				continue;
 			}
 
 			idSoundSample *sample = chan->decoder->GetSample();
 
-			if ( sample == NULL ) {
+			if ( sample == nullptr ) {
 				continue;
 			}
 
@@ -1215,7 +1215,7 @@ int idSoundSystemLocal::GetSoundDecoderInfo( int index, soundDecoderInfo_t &deco
 idSoundSystemLocal::AllocSoundWorld
 ===================
 */
-ARCSoundWorld *idSoundSystemLocal::AllocSoundWorld( ARCRenderWorld *rw ) {
+ARCSoundWorld *idSoundSystemLocal::AllocSoundWorld( anRenderWorld *rw ) {
 	idSoundWorldLocal	*local = new idSoundWorldLocal;
 
 	local->Init( rw );
@@ -1254,11 +1254,11 @@ int idSoundSystemLocal::MillisecondsToSamples( int ms ) const {
 ===================
 idSoundSystemLocal::SetPlayingSoundWorld
 
-specifying NULL will cause silence to be played
+specifying nullptr will cause silence to be played
 ===================
 */
 void idSoundSystemLocal::SetPlayingSoundWorld( ARCSoundWorld *soundWorld ) {
-	currentSoundWorld = static_cast<idSoundWorldLocal *>(soundWorld);
+	currentSoundWorld = static_cast<idSoundWorldLocal *>( soundWorld);
 }
 
 /*
@@ -1299,8 +1299,8 @@ void idSoundSystemLocal::EndLevelLoad( const char *mapstring ) {
 	}
 	soundCache->EndLevelLoad();
 
-	arcNetString efxname( "efxs/" );
-	arcNetString mapname( mapstring );
+	anString efxname( "efxs/" );
+	anString mapname( mapstring );
 
 	mapname.SetFileExtension( ".efx" );
 	mapname.StripPath();
@@ -1394,7 +1394,7 @@ ALuint idSoundSystemLocal::AllocOpenALSource( idSoundChannel *chan, bool looping
 
 		return openalSources[index].handle;
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -1408,7 +1408,7 @@ void idSoundSystemLocal::FreeOpenALSource( ALuint handle ) {
 	for ( i = 0; i < openalSourceCount; i++ ) {
 		if ( openalSources[i].handle == handle ) {
 			if ( openalSources[i].chan ) {
-				openalSources[i].chan->openalSource = NULL;
+				openalSources[i].chan->openalSource = nullptr;
 			}
 #if ID_OPENAL
 			// Reset source EAX ROOM level when freeing stereo source
@@ -1419,7 +1419,7 @@ void idSoundSystemLocal::FreeOpenALSource( ALuint handle ) {
 #endif
 			// Initialize structure
 			openalSources[i].startTime = 0;
-			openalSources[i].chan = NULL;
+			openalSources[i].chan = nullptr;
 			openalSources[i].inUse = false;
 			openalSources[i].looping = false;
 			openalSources[i].stereo = false;
@@ -1445,7 +1445,7 @@ void SoundFX_Lowpass::ProcessSample( float* in, float* out ) {
 
 	Initialize();
 
-	c = 1.0 / arcMath::Tan16( arcMath::PI * cutoffFrequency / 44100 );
+	c = 1.0 / anMath::Tan16( anMath::PI * cutoffFrequency / 44100 );
 
 	// compute coefs
 	a1 = 1.0 / ( 1.0 + resonance * c + c * c );
@@ -1471,7 +1471,7 @@ void SoundFX_LowpassFast::SetParms( float p1, float p2, float p3 ) {
 	res = p2;
 
 	// precompute the coefs
-	c = 1.0 / arcMath::Tan( arcMath::PI * freq / 44100 );
+	c = 1.0 / anMath::Tan( anMath::PI * freq / 44100 );
 
 	// compute coefs
 	a1 = 1.0 / ( 1.0 + res * c + c * c );
@@ -1614,17 +1614,17 @@ int idSoundSystemLocal::IsEAXAvailable( void ) {
 		return 2;
 	}
 	// when dynamically loading the OpenAL subsystem, we need to get a context before alIsExtensionPresent would work
-	device = alcOpenDevice( NULL );
-	context = alcCreateContext( device, NULL );
+	device = alcOpenDevice( nullptr );
+	context = alcCreateContext( device, nullptr );
 	alcMakeContextCurrent( context );
 	if ( alIsExtensionPresent( ID_ALCHAR "EAX4.0" ) ) {
-		alcMakeContextCurrent( NULL );
+		alcMakeContextCurrent( nullptr );
 		alcDestroyContext( context );
 		alcCloseDevice( device );
 		EAXAvailable = 1;
 		return 1;
 	}
-	alcMakeContextCurrent( NULL );
+	alcMakeContextCurrent( nullptr );
 	alcDestroyContext( context );
 	alcCloseDevice( device );
 	EAXAvailable = 0;

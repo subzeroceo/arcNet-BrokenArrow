@@ -17,9 +17,9 @@
     3. x[i] == hi[i], t[i] <= 0
 
   Partly bounded or unbounded variables can have lo[i] and/or hi[i]
-  set to negative/positive arcMath::INFITITY respectively.
+  set to negative/positive anMath::INFITITY respectively.
 
-  If boxIndex != NULL and boxIndex[i] != -1 then
+  If boxIndex != nullptr and boxIndex[i] != -1 then
 
     lo[i] = - fabs( lo[i] * x[boxIndex[i]] )
     hi[i] = fabs( hi[i] * x[boxIndex[i]] )
@@ -31,14 +31,14 @@
 ===============================================================================
 */
 
-class aRcLCP {
+class anLCP {
 public:
-	static aRcLCP *	AllocSquare( void );		// A must be a square matrix
-	static aRcLCP *	AllocSymmetric( void );		// A must be a symmetric matrix
+	static anLCP *	AllocSquare( void );		// A must be a square matrix
+	static anLCP *	AllocSymmetric( void );		// A must be a symmetric matrix
 
-	virtual			~aRcLCP( void );
+	virtual			~anLCP( void );
 
-	virtual bool	Solve( const arcMatX &A, arcVecX &x, const arcVecX &b, const arcVecX &lo, const arcVecX &hi, const int *boxIndex = NULL ) = 0;
+	virtual bool	Solve( const anMatX &A, anVecX &x, const anVecX &b, const anVecX &lo, const anVecX &hi, const int *boxIndex = nullptr ) = 0;
 	virtual void	SetMaxIterations( int max );
 	virtual int		GetMaxIterations( void );
 

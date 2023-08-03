@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -6,7 +6,7 @@
 #include "mediapreviewdlg.h"
 
 IMPLEMENT_DYNAMIC(CMediaPreviewDlg, CDialog)
-CMediaPreviewDlg::CMediaPreviewDlg(CWnd* pParent /*=NULL*/)
+CMediaPreviewDlg::CMediaPreviewDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CMediaPreviewDlg::IDD, pParent) {
 	mode = MATERIALS;
 	media = "";
@@ -19,7 +19,7 @@ void CMediaPreviewDlg::SetMedia(const char *_media) {
 
 void CMediaPreviewDlg::Refresh() {
 	if (mode == GUIS) {
-		const arcMaterial *mat = declManager->FindMaterial( "guiSurfaces/guipreview" );
+		const anMaterial *mat = declManager->FindMaterial( "guiSurfaces/guipreview" );
 		mat->SetGui( media );
 		drawMaterial.setMedia( "guiSurfaces/guipreview" );
 		drawMaterial.setScale( 4.4f );
@@ -57,12 +57,12 @@ BOOL CMediaPreviewDlg::OnInitDialog() {
 	CRect rct;
 	LONG lSize = sizeof(rct);
 	if (LoadRegistryInfo( "Radiant::EditPreviewWindow", &rct, &lSize) )  {
-		SetWindowPos(NULL, rct.left, rct.top, rct.Width(), rct.Height(), SWP_SHOWWINDOW);
+		SetWindowPos(nullptr, rct.left, rct.top, rct.Width(), rct.Height(), SWP_SHOWWINDOW);
 	}
 
 	GetClientRect(rct);
 	int h = (mode == GUIS) ? (rct.Width() - 8) / 1.333333f : rct.Height() - 8;
-	wndPreview.SetWindowPos(NULL, 4, 4, rct.Width() - 8, h, SWP_SHOWWINDOW);
+	wndPreview.SetWindowPos(nullptr, 4, 4, rct.Width() - 8, h, SWP_SHOWWINDOW);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -70,14 +70,14 @@ BOOL CMediaPreviewDlg::OnInitDialog() {
 
 void CMediaPreviewDlg::OnSize(UINT nType, int cx, int cy) {
 	CDialog::OnSize(nType, cx, cy);
-	if (wndPreview.GetSafeHwnd() == NULL) {
+	if (wndPreview.GetSafeHwnd() == nullptr ) {
 		return;
 	}
 	CRect rect;
 	GetClientRect(rect);
 	//int h = (mode == GUIS) ? (rect.Width() - 8) / 1.333333f : rect.Height() - 8;
 	int h = rect.Height() - 8;
-	wndPreview.SetWindowPos(NULL, 4, 4, rect.Width() - 8, h, SWP_SHOWWINDOW);
+	wndPreview.SetWindowPos(nullptr, 4, 4, rect.Width() - 8, h, SWP_SHOWWINDOW);
 }
 
 void CMediaPreviewDlg::OnDestroy() {
@@ -92,7 +92,7 @@ void CMediaPreviewDlg::OnDestroy() {
 
 void CMediaPreviewDlg::OnLButtonDown(UINT nFlags, CPoint point) {
 	if (mode == GUIS) {
-		arcUserInterfaces *gui = uiManager->FindGui( media );
+		anUserInterfaces *gui = uiManager->FindGui( media );
 		if (gui) {
 			sysEvent_t  ev;
 			memset( &ev, 0, sizeof( ev ) );
@@ -107,7 +107,7 @@ void CMediaPreviewDlg::OnLButtonDown(UINT nFlags, CPoint point) {
 
 void CMediaPreviewDlg::OnLButtonUp(UINT nFlags, CPoint point) {
 	if (mode == GUIS) {
-		arcUserInterfaces *gui = uiManager->FindGui( media );
+		anUserInterfaces *gui = uiManager->FindGui( media );
 		if (gui) {
 			sysEvent_t  ev;
 			memset( &ev, 0, sizeof( ev ) );
@@ -122,7 +122,7 @@ void CMediaPreviewDlg::OnLButtonUp(UINT nFlags, CPoint point) {
 
 void CMediaPreviewDlg::OnMouseMove(UINT nFlags, CPoint point) {
 	if (mode == GUIS) {
-		arcUserInterfaces *gui = uiManager->FindGui( media );
+		anUserInterfaces *gui = uiManager->FindGui( media );
 		if (gui) {
 			CRect rct;
 			wndPreview.GetClientRect(rct);

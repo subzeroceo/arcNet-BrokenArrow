@@ -1,47 +1,46 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idPhysics_Base, idPhysics_Actor )
+CLASS_DECLARATION( anPhysics_Base, anPhysics_Actor )
 END_CLASS
 
 /*
 ================
-idPhysics_Actor::idPhysics_Actor
+anPhysics_Actor::anPhysics_Actor
 ================
 */
-idPhysics_Actor::idPhysics_Actor( void ) {
-	clipModel = NULL;
+anPhysics_Actor::anPhysics_Actor( void ) {
+	clipModel = nullptr;
 	SetClipModelAxis();
 	mass = 100.0f;
 	invMass = 1.0f / mass;
-	masterEntity = NULL;
+	masterEntity = nullptr;
 	masterYaw = 0.0f;
 	masterDeltaYaw = 0.0f;
-	groundEntityPtr = NULL;
+	groundEntityPtr = nullptr;
 }
 
 /*
 ================
-idPhysics_Actor::~idPhysics_Actor
+anPhysics_Actor::~anPhysics_Actor
 ================
 */
-idPhysics_Actor::~idPhysics_Actor( void ) {
+anPhysics_Actor::~anPhysics_Actor( void ) {
 	if ( clipModel ) {
 		delete clipModel;
-		clipModel = NULL;
+		clipModel = nullptr;
 	}
 }
 
 /*
 ================
-idPhysics_Actor::Save
+anPhysics_Actor::Save
 ================
 */
-void idPhysics_Actor::Save( idSaveGame *savefile ) const {
-
+void anPhysics_Actor::Save( anSaveGame *savefile ) const {
 	savefile->WriteClipModel( clipModel );
 	savefile->WriteMat3( clipModelAxis );
 
@@ -57,18 +56,17 @@ void idPhysics_Actor::Save( idSaveGame *savefile ) const {
 
 /*
 ================
-idPhysics_Actor::Restore
+anPhysics_Actor::Restore
 ================
 */
-void idPhysics_Actor::Restore( idRestoreGame *savefile ) {
-
+void anPhysics_Actor::Restore( anRestoreGame *savefile ) {
 	savefile->ReadClipModel( clipModel );
 	savefile->ReadMat3( clipModelAxis );
 
 	savefile->ReadFloat( mass );
 	savefile->ReadFloat( invMass );
 
-	savefile->ReadObject( reinterpret_cast<idClass *&>( masterEntity ) );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( masterEntity ) );
 	savefile->ReadFloat( masterYaw );
 	savefile->ReadFloat( masterDeltaYaw );
 
@@ -77,61 +75,57 @@ void idPhysics_Actor::Restore( idRestoreGame *savefile ) {
 
 /*
 ================
-idPhysics_Actor::SetClipModelAxis
+anPhysics_Actor::SetClipModelAxis
 ================
 */
-void idPhysics_Actor::SetClipModelAxis( void ) {
+void anPhysics_Actor::SetClipModelAxis( void ) {
 	// align clip model to gravity direction
 	if ( ( gravityNormal[2] == -1.0f ) || ( gravityNormal == vec3_zero ) ) {
 		clipModelAxis.Identity();
-	}
-	else {
+	} else {
 		clipModelAxis[2] = -gravityNormal;
 		clipModelAxis[2].NormalVectors( clipModelAxis[0], clipModelAxis[1] );
 		clipModelAxis[1] = -clipModelAxis[1];
 	}
 
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 		clipModel->Link( self, 0, clipModel->GetOrigin(), clipModelAxis );
-// RAVEN END
 	}
 }
 
 /*
 ================
-idPhysics_Actor::GetGravityAxis
+anPhysics_Actor::GetGravityAxis
 ================
 */
-const arcMat3 &idPhysics_Actor::GetGravityAxis( void ) const {
+const anMat3 &anPhysics_Actor::GetGravityAxis( void ) const {
 	return clipModelAxis;
 }
 
 /*
 ================
-idPhysics_Actor::GetMasterDeltaYaw
+anPhysics_Actor::GetMasterDeltaYaw
 ================
 */
-float idPhysics_Actor::GetMasterDeltaYaw( void ) const {
+float anPhysics_Actor::GetMasterDeltaYaw( void ) const {
 	return masterDeltaYaw;
 }
 
 /*
 ================
-idPhysics_Actor::GetGroundEntity
+anPhysics_Actor::GetGroundEntity
 ================
 */
-idEntity *idPhysics_Actor::GetGroundEntity( void ) const {
+anEntity *anPhysics_Actor::GetGroundEntity( void ) const {
 	return groundEntityPtr.GetEntity();
 }
 
 /*
 ================
-idPhysics_Actor::SetClipModel
+anPhysics_Actor::SetClipModel
 ================
 */
-void idPhysics_Actor::SetClipModel( idClipModel *model, const float density, int id, bool freeOld ) {
+void anPhysics_Actor::SetClipModel( anClipModel *model, const float density, int id, bool freeOld ) {
 	assert( self );
 	assert( model );					// a clip model is required
 	assert( model->IsTraceModel() );	// and it should be a trace model
@@ -141,36 +135,33 @@ void idPhysics_Actor::SetClipModel( idClipModel *model, const float density, int
 		delete clipModel;
 	}
 	clipModel = model;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	clipModel->Link( self, 0, clipModel->GetOrigin(), clipModelAxis );
-// RAVEN END
 }
 
 /*
 ================
-idPhysics_Actor::GetClipModel
+anPhysics_Actor::GetClipModel
 ================
 */
-idClipModel *idPhysics_Actor::GetClipModel( int id ) const {
+anClipModel *anPhysics_Actor::GetClipModel( int id ) const {
 	return clipModel;
 }
 
 /*
 ================
-idPhysics_Actor::GetNumClipModels
+anPhysics_Actor::GetNumClipModels
 ================
 */
-int idPhysics_Actor::GetNumClipModels( void ) const {
+int anPhysics_Actor::GetNumClipModels( void ) const {
 	return 1;
 }
 
 /*
 ================
-idPhysics_Actor::SetMass
+anPhysics_Actor::SetMass
 ================
 */
-void idPhysics_Actor::SetMass( float _mass, int id ) {
+void anPhysics_Actor::SetMass( float _mass, int id ) {
 	assert( _mass > 0.0f );
 	mass = _mass;
 	invMass = 1.0f / _mass;
@@ -178,192 +169,176 @@ void idPhysics_Actor::SetMass( float _mass, int id ) {
 
 /*
 ================
-idPhysics_Actor::GetMass
+anPhysics_Actor::GetMass
 ================
 */
-float idPhysics_Actor::GetMass( int id ) const {
+float anPhysics_Actor::GetMass( int id ) const {
 	return mass;
 }
 
 /*
 ================
-idPhysics_Actor::SetContents
+anPhysics_Actor::SetContents
 ================
 */
-void idPhysics_Actor::SetContents( int contents, int id ) {
+void anPhysics_Actor::SetContents( int contents, int id ) {
 	clipModel->SetContents( contents );
 }
 
 /*
 ================
-idPhysics_Actor::GetContents
+anPhysics_Actor::GetContents
 ================
 */
-int idPhysics_Actor::GetContents( int id ) const {
+int anPhysics_Actor::GetContents( int id ) const {
 	return clipModel->GetContents();
 }
 
 /*
 ================
-idPhysics_Actor::GetBounds
+anPhysics_Actor::GetBounds
 ================
 */
-const arcBounds &idPhysics_Actor::GetBounds( int id ) const {
+const anBounds &anPhysics_Actor::GetBounds( int id ) const {
 	return clipModel->GetBounds();
 }
 
 /*
 ================
-idPhysics_Actor::GetAbsBounds
+anPhysics_Actor::GetAbsBounds
 ================
 */
-const arcBounds &idPhysics_Actor::GetAbsBounds( int id ) const {
+const anBounds &anPhysics_Actor::GetAbsBounds( int id ) const {
 	return clipModel->GetAbsBounds();
 }
 
 /*
 ================
-idPhysics_Actor::IsPushable
+anPhysics_Actor::IsPushable
 ================
 */
-bool idPhysics_Actor::IsPushable( void ) const {
-	return ( masterEntity == NULL );
+bool anPhysics_Actor::IsPushable( void ) const {
+	return ( masterEntity == nullptr );
 }
 
 /*
 ================
-idPhysics_Actor::GetOrigin
+anPhysics_Actor::GetOrigin
 ================
 */
-const arcVec3 &idPhysics_Actor::GetOrigin( int id ) const {
+const anVec3 &anPhysics_Actor::GetOrigin( int id ) const {
 	return clipModel->GetOrigin();
 }
 
 /*
 ================
-idPhysics_Player::GetAxis
+anPhysics_Player::GetAxis
 ================
 */
-const arcMat3 &idPhysics_Actor::GetAxis( int id ) const {
+const anMat3 &anPhysics_Actor::GetAxis( int id ) const {
 	return clipModel->GetAxis();
 }
 
 /*
 ================
-idPhysics_Actor::SetGravity
+anPhysics_Actor::SetGravity
 ================
 */
-void idPhysics_Actor::SetGravity( const arcVec3 &newGravity ) {
+void anPhysics_Actor::SetGravity( const anVec3 &newGravity ) {
 	if ( newGravity != gravityVector ) {
-		idPhysics_Base::SetGravity( newGravity );
+		anPhysics_Base::SetGravity( newGravity );
 		SetClipModelAxis();
 	}
 }
 
 /*
 ================
-idPhysics_Actor::ClipTranslation
+anPhysics_Actor::ClipTranslation
 ================
 */
-void idPhysics_Actor::ClipTranslation( trace_t &results, const arcVec3 &translation, const idClipModel *model ) const {
+void anPhysics_Actor::ClipTranslation( trace_t &results, const anVec3 &translation, const anClipModel *model ) const {
 	if ( model ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 		gameLocal.TranslationModel( self, results, clipModel->GetOrigin(), clipModel->GetOrigin() + translation,
 								clipModel, clipModel->GetAxis(), clipMask,
 								model->GetCollisionModel(), model->GetOrigin(), model->GetAxis() );
-	}
-	else {
+	} else {
 		gameLocal.Translation( self, results, clipModel->GetOrigin(), clipModel->GetOrigin() + translation,
 								clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
 	}
 }
 
 /*
 ================
-idPhysics_Actor::ClipRotation
+anPhysics_Actor::ClipRotation
 ================
 */
-void idPhysics_Actor::ClipRotation( trace_t &results, const idRotation &rotation, const idClipModel *model ) const {
+void anPhysics_Actor::ClipRotation( trace_t &results, const anRotation &rotation, const anClipModel *model ) const {
 	if ( model ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 		gameLocal.RotationModel( self, results, clipModel->GetOrigin(), rotation,
 								clipModel, clipModel->GetAxis(), clipMask,
 								model->GetCollisionModel(), model->GetOrigin(), model->GetAxis() );
-	}
-	else {
+	} else {
 		gameLocal.Rotation( self, results, clipModel->GetOrigin(), rotation,
 								clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
 	}
 }
 
 /*
 ================
-idPhysics_Actor::ClipContents
+anPhysics_Actor::ClipContents
 ================
 */
-int idPhysics_Actor::ClipContents( const idClipModel *model ) const {
+int anPhysics_Actor::ClipContents( const anClipModel *model ) const {
 	if ( model ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip models
 		return gameLocal.ContentsModel( self, clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1,
 									model->GetCollisionModel(), model->GetOrigin(), model->GetAxis() );
-	}
-	else {
-		return gameLocal.Contents( self, clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1, NULL );
-// RAVEN END
+	} else {
+		return gameLocal.Contents( self, clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1, nullptr );
 	}
 }
 
 /*
 ================
-idPhysics_Actor::DisableClip
+anPhysics_Actor::DisableClip
 ================
 */
-void idPhysics_Actor::DisableClip( void ) {
+void anPhysics_Actor::DisableClip( void ) {
 	clipModel->Disable();
 }
 
 /*
 ================
-idPhysics_Actor::EnableClip
+anPhysics_Actor::EnableClip
 ================
 */
-void idPhysics_Actor::EnableClip( void ) {
+void anPhysics_Actor::EnableClip( void ) {
 	clipModel->Enable();
 }
 
 /*
 ================
-idPhysics_Actor::UnlinkClip
+anPhysics_Actor::UnlinkClip
 ================
 */
-void idPhysics_Actor::UnlinkClip( void ) {
+void anPhysics_Actor::UnlinkClip( void ) {
 	clipModel->Unlink();
 }
 
 /*
 ================
-idPhysics_Actor::LinkClip
+anPhysics_Actor::LinkClip
 ================
 */
-void idPhysics_Actor::LinkClip( void ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+void anPhysics_Actor::LinkClip( void ) {
 	clipModel->Link( self, 0, clipModel->GetOrigin(), clipModel->GetAxis() );
-// RAVEN END
 }
 
 /*
 ================
-idPhysics_Actor::EvaluateContacts
+anPhysics_Actor::EvaluateContacts
 ================
 */
-bool idPhysics_Actor::EvaluateContacts( void ) {
-
+bool anPhysics_Actor::EvaluateContacts( void ) {
 	// get all the ground contacts
 	ClearContacts();
 	AddGroundContacts( clipModel );

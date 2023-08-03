@@ -1,32 +1,4 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Model_ma.h"
@@ -52,19 +24,19 @@ typedef struct {
 static ma_t maGlobal;
 
 
-void MA_ParseNodeHeader(ARCParser& parser, maNodeHeader_t* header) {
+void MA_ParseNodeHeader(anParser& parser, maNodeHeader_t* header) {
 
 	memset(header, 0, sizeof(maNodeHeader_t) );
 
-	arcNetToken token;
-	while(parser.ReadToken(&token) ) {
+	anToken token;
+	while(parser.ReadToken( &token ) ) {
 		if ( !token.Icmp( "-" ) ) {
-			parser.ReadToken(&token);
+			parser.ReadToken( &token );
 			if ( !token.Icmp( "n" ) ) {
-				parser.ReadToken(&token);
+				parser.ReadToken( &token );
 				strcpy(header->name, token.c_str() );
 			} else if ( !token.Icmp( "p" ) ) {
-				parser.ReadToken(&token);
+				parser.ReadToken( &token );
 				strcpy(header->parent, token.c_str() );
 			}
 		} else if ( !token.Icmp( ";" ) ) {
@@ -75,12 +47,12 @@ void MA_ParseNodeHeader(ARCParser& parser, maNodeHeader_t* header) {
 
 bool MA_ParseHeaderIndex(maAttribHeader_t* header, int& minIndex, int& maxIndex, const char* headerType, const char* skipString) {
 
-	ARCParser miniParse;
-	arcNetToken token;
+	anParser miniParse;
+	anToken token;
 
 	miniParse.LoadMemory(header->name, strlen(header->name), headerType);
-	if (skipString) {
-		miniParse.SkipUntilString(skipString);
+	if ( skipString) {
+		miniParse.SkipUntilString( skipString);
 	}
 
 	if ( !miniParse.SkipUntilString( "[" ) ) {
@@ -88,7 +60,7 @@ bool MA_ParseHeaderIndex(maAttribHeader_t* header, int& minIndex, int& maxIndex,
 		return false;
 	}
 	minIndex = miniParse.ParseInt();
-	miniParse.ReadToken(&token);
+	miniParse.ReadToken( &token );
 	if ( !token.Icmp( "]" ) ) {
 		maxIndex = minIndex;
 	} else {
@@ -97,28 +69,28 @@ bool MA_ParseHeaderIndex(maAttribHeader_t* header, int& minIndex, int& maxIndex,
 	return true;
 }
 
-bool MA_ParseAttribHeader(ARCParser &parser, maAttribHeader_t* header) {
+bool MA_ParseAttribHeader(anParser &parser, maAttribHeader_t* header) {
 
-	arcNetToken token;
+	anToken token;
 
 	memset(header, 0, sizeof(maAttribHeader_t) );
 
-	parser.ReadToken(&token);
+	parser.ReadToken( &token );
 	if ( !token.Icmp( "-" ) ) {
-		parser.ReadToken(&token);
+		parser.ReadToken( &token );
 		if ( !token.Icmp( "s" ) ) {
 			header->size = parser.ParseInt();
-			parser.ReadToken(&token);
+			parser.ReadToken( &token );
 		}
 	}
 	strcpy(header->name, token.c_str() );
 	return true;
 }
 
-bool MA_ReadVec3(ARCParser& parser, arcVec3& vec) {
-	arcNetToken token;
+bool MA_ReadVec3(anParser& parser, anVec3& vec) {
+	anToken token;
 	if ( !parser.SkipUntilString( "double3" ) ) {
-		throw arcExceptions( va( "Maya Loader '%s': Invalid Vec3", parser.GetFileName() ) );
+		throw anExceptions( va( "Maya Loader '%s': Invalid Vec3", parser.GetFileName() ) );
 		return false;
 	}
 
@@ -131,14 +103,14 @@ bool MA_ReadVec3(ARCParser& parser, arcVec3& vec) {
 	return true;
 }
 
-bool IsNodeComplete(arcNetToken& token) {
+bool IsNodeComplete(anToken& token) {
 	if ( !token.Icmp( "createNode" ) || !token.Icmp( "connectAttr" ) || !token.Icmp( "select" ) ) {
 		return true;
 	}
 	return false;
 }
 
-bool MA_ParseTransform(ARCParser& parser) {
+bool MA_ParseTransform(anParser& parser) {
 
 	maNodeHeader_t	header;
 	maTransform_t*	transform;
@@ -153,14 +125,14 @@ bool MA_ParseTransform(ARCParser& parser) {
 	MA_ParseNodeHeader(parser, &header);
 
 	//Read the transform attributes
-	arcNetToken token;
-	while(parser.ReadToken(&token) ) {
+	anToken token;
+	while(parser.ReadToken( &token ) ) {
 		if (IsNodeComplete( token ) ) {
-			parser.UnreadToken(&token);
+			parser.UnreadToken( &token );
 			break;
 		}
 		if ( !token.Icmp( "setAttr" ) ) {
-			parser.ReadToken(&token);
+			parser.ReadToken( &token );
 			if ( !token.Icmp( ".t" ) ) {
 				if ( !MA_ReadVec3(parser, transform->translate) ) {
 					return false;
@@ -194,20 +166,20 @@ bool MA_ParseTransform(ARCParser& parser) {
 	return true;
 }
 
-bool MA_ParseVertex(ARCParser& parser, maAttribHeader_t* header) {
+bool MA_ParseVertex(anParser& parser, maAttribHeader_t* header) {
 
 	maMesh_t* pMesh = &maGlobal.currentObject->mesh;
-	arcNetToken token;
+	anToken token;
 
 	//Allocate enough space for all the verts if this is the first attribute for verticies
 	if ( !pMesh->vertexes) {
 		pMesh->numVertexes = header->size;
-		pMesh->vertexes = (arcVec3 *)Mem_Alloc( sizeof( arcVec3 ) * pMesh->numVertexes );
+		pMesh->vertexes = (anVec3 *)Mem_Alloc( sizeof( anVec3 ) * pMesh->numVertexes );
 	}
 
 	//Get the start and end index for this attribute
 	int minIndex, maxIndex;
-	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "VertexHeader", NULL) ) {
+	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "VertexHeader", nullptr ) ) {
 		//This was just a header
 		return true;
 	}
@@ -222,10 +194,10 @@ bool MA_ParseVertex(ARCParser& parser, maAttribHeader_t* header) {
 	return true;
 }
 
-bool MA_ParseVertexTransforms(ARCParser& parser, maAttribHeader_t* header) {
+bool MA_ParseVertexTransforms(anParser& parser, maAttribHeader_t* header) {
 
 	maMesh_t* pMesh = &maGlobal.currentObject->mesh;
-	arcNetToken token;
+	anToken token;
 
 	//Allocate enough space for all the verts if this is the first attribute for verticies
 	if ( !pMesh->vertTransforms) {
@@ -234,29 +206,29 @@ bool MA_ParseVertexTransforms(ARCParser& parser, maAttribHeader_t* header) {
 		}
 
 		pMesh->numVertTransforms = header->size;
-		pMesh->vertTransforms = (arcVec4 *)Mem_Alloc( sizeof( arcVec4 ) * pMesh->numVertTransforms );
+		pMesh->vertTransforms = (anVec4 *)Mem_Alloc( sizeof( anVec4 ) * pMesh->numVertTransforms );
 		pMesh->nextVertTransformIndex = 0;
 	}
 
 	//Get the start and end index for this attribute
 	int minIndex, maxIndex;
-	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "VertexTransformHeader", NULL) ) {
+	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "VertexTransformHeader", nullptr ) ) {
 		//This was just a header
 		return true;
 	}
 
-	parser.ReadToken(&token);
+	parser.ReadToken( &token );
 	if ( !token.Icmp( "-" ) ) {
-		arcNetToken tk2;
+		anToken tk2;
 		parser.ReadToken(&tk2);
 		if ( !tk2.Icmp( "type" ) ) {
 			parser.SkipUntilString( "float3" );
 		} else {
 			parser.UnreadToken(&tk2);
-			parser.UnreadToken(&token);
+			parser.UnreadToken( &token );
 		}
 	} else {
-		parser.UnreadToken(&token);
+		parser.UnreadToken( &token );
 	}
 
 	//Read each vert
@@ -274,20 +246,20 @@ bool MA_ParseVertexTransforms(ARCParser& parser, maAttribHeader_t* header) {
 	return true;
 }
 
-bool MA_ParseEdge(ARCParser& parser, maAttribHeader_t* header) {
+bool MA_ParseEdge(anParser& parser, maAttribHeader_t* header) {
 
 	maMesh_t* pMesh = &maGlobal.currentObject->mesh;
-	arcNetToken token;
+	anToken token;
 
 	//Allocate enough space for all the verts if this is the first attribute for verticies
 	if ( !pMesh->edges) {
 		pMesh->numEdges = header->size;
-		pMesh->edges = (arcVec3 *)Mem_Alloc( sizeof( arcVec3 ) * pMesh->numEdges );
+		pMesh->edges = (anVec3 *)Mem_Alloc( sizeof( anVec3 ) * pMesh->numEdges );
 	}
 
 	//Get the start and end index for this attribute
 	int minIndex, maxIndex;
-	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "EdgeHeader", NULL) ) {
+	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "EdgeHeader", nullptr ) ) {
 		//This was just a header
 		return true;
 	}
@@ -302,37 +274,37 @@ bool MA_ParseEdge(ARCParser& parser, maAttribHeader_t* header) {
 	return true;
 }
 
-bool MA_ParseNormal(ARCParser& parser, maAttribHeader_t* header) {
+bool MA_ParseNormal(anParser& parser, maAttribHeader_t* header) {
 
 	maMesh_t* pMesh = &maGlobal.currentObject->mesh;
-	arcNetToken token;
+	anToken token;
 
 	//Allocate enough space for all the verts if this is the first attribute for verticies
 	if ( !pMesh->normals) {
 		pMesh->numNormals = header->size;
-		pMesh->normals = (arcVec3 *)Mem_Alloc( sizeof( arcVec3 ) * pMesh->numNormals );
+		pMesh->normals = (anVec3 *)Mem_Alloc( sizeof( anVec3 ) * pMesh->numNormals );
 	}
 
 	//Get the start and end index for this attribute
 	int minIndex, maxIndex;
-	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "NormalHeader", NULL) ) {
+	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "NormalHeader", nullptr ) ) {
 		//This was just a header
 		return true;
 	}
 
 
-	parser.ReadToken(&token);
+	parser.ReadToken( &token );
 	if ( !token.Icmp( "-" ) ) {
-		arcNetToken tk2;
+		anToken tk2;
 		parser.ReadToken(&tk2);
 		if ( !tk2.Icmp( "type" ) ) {
 			parser.SkipUntilString( "float3" );
 		} else {
 			parser.UnreadToken(&tk2);
-			parser.UnreadToken(&token);
+			parser.UnreadToken( &token );
 		}
 	} else {
-		parser.UnreadToken(&token);
+		parser.UnreadToken( &token );
 	}
 
 
@@ -356,10 +328,10 @@ bool MA_ParseNormal(ARCParser& parser, maAttribHeader_t* header) {
 
 
 
-bool MA_ParseFace(ARCParser& parser, maAttribHeader_t* header) {
+bool MA_ParseFace(anParser& parser, maAttribHeader_t* header) {
 
 	maMesh_t* pMesh = &maGlobal.currentObject->mesh;
-	arcNetToken token;
+	anToken token;
 
 	//Allocate enough space for all the verts if this is the first attribute for verticies
 	if ( !pMesh->faces) {
@@ -369,23 +341,23 @@ bool MA_ParseFace(ARCParser& parser, maAttribHeader_t* header) {
 
 	//Get the start and end index for this attribute
 	int minIndex, maxIndex;
-	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "FaceHeader", NULL) ) {
+	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "FaceHeader", nullptr ) ) {
 		//This was just a header
 		return true;
 	}
 
 	//Read the face data
 	int currentFace = minIndex-1;
-	while(parser.ReadToken(&token) ) {
+	while(parser.ReadToken( &token ) ) {
 		if (IsNodeComplete( token ) ) {
-			parser.UnreadToken(&token);
+			parser.UnreadToken( &token );
 			break;
 		}
 
 		if ( !token.Icmp( "f" ) ) {
 			int count = parser.ParseInt();
 			if (count != 3) {
-				throw arcExceptions(va( "Maya Loader '%s': Face is not a triangle.", parser.GetFileName() ));
+				throw anExceptions(va( "Maya Loader '%s': Face is not a triangle.", parser.GetFileName() ) );
 				return false;
 			}
 			//Increment the face number because a new face always starts with an "f" token
@@ -404,7 +376,7 @@ bool MA_ParseFace(ARCParser& parser, maAttribHeader_t* header) {
 			int uvstIndex = parser.ParseInt();
 			int count = parser.ParseInt();
 			if (count != 3) {
-				throw arcExceptions(va( "Maya Loader '%s': Invalid texture coordinates.", parser.GetFileName() ));
+				throw anExceptions(va( "Maya Loader '%s': Invalid texture coordinates.", parser.GetFileName() ) );
 				return false;
 			}
 			pMesh->faces[currentFace].tVertexNum[0] = parser.ParseInt();
@@ -414,7 +386,7 @@ bool MA_ParseFace(ARCParser& parser, maAttribHeader_t* header) {
 		} else if ( !token.Icmp( "mf" ) ) {
 			int count = parser.ParseInt();
 			if (count != 3) {
-				throw arcExceptions(va( "Maya Loader '%s': Invalid texture coordinates.", parser.GetFileName() ));
+				throw anExceptions(va( "Maya Loader '%s': Invalid texture coordinates.", parser.GetFileName() ) );
 				return false;
 			}
 			pMesh->faces[currentFace].tVertexNum[0] = parser.ParseInt();
@@ -425,7 +397,7 @@ bool MA_ParseFace(ARCParser& parser, maAttribHeader_t* header) {
 
 			int count = parser.ParseInt();
 			if (count != 3) {
-				throw arcExceptions(va( "Maya Loader '%s': Invalid vertex color.", parser.GetFileName() ));
+				throw anExceptions(va( "Maya Loader '%s': Invalid vertex color.", parser.GetFileName() ) );
 				return false;
 			}
 			pMesh->faces[currentFace].vertexColors[0] = parser.ParseInt();
@@ -438,20 +410,20 @@ bool MA_ParseFace(ARCParser& parser, maAttribHeader_t* header) {
 	return true;
 }
 
-bool MA_ParseColor(ARCParser& parser, maAttribHeader_t* header) {
+bool MA_ParseColor(anParser& parser, maAttribHeader_t* header) {
 
 	maMesh_t* pMesh = &maGlobal.currentObject->mesh;
-	arcNetToken token;
+	anToken token;
 
 	//Allocate enough space for all the verts if this is the first attribute for verticies
 	if ( !pMesh->colors) {
 		pMesh->numColors = header->size;
-		pMesh->colors = ( byte * )Mem_Alloc( sizeof( byte ) * pMesh->numColors * 4 );
+		pMesh->colors = (byte *)Mem_Alloc( sizeof( byte ) * pMesh->numColors * 4 );
 	}
 
 	//Get the start and end index for this attribute
 	int minIndex, maxIndex;
-	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "ColorHeader", NULL) ) {
+	if ( !MA_ParseHeaderIndex(header, minIndex, maxIndex, "ColorHeader", nullptr ) ) {
 		//This was just a header
 		return true;
 	}
@@ -467,20 +439,20 @@ bool MA_ParseColor(ARCParser& parser, maAttribHeader_t* header) {
 	return true;
 }
 
-bool MA_ParseTVert(ARCParser& parser, maAttribHeader_t* header) {
+bool MA_ParseTVert(anParser& parser, maAttribHeader_t* header) {
 
 	maMesh_t* pMesh = &maGlobal.currentObject->mesh;
-	arcNetToken token;
+	anToken token;
 
 	//This is not the texture coordinates. It is just the name so ignore it
-	if (strstr(header->name, "uvsn" ) ) {
+	if ( strstr(header->name, "uvsn" ) ) {
 		return true;
 	}
 
 	//Allocate enough space for all the data
 	if ( !pMesh->tvertexes) {
 		pMesh->numTVertexes = header->size;
-		pMesh->tvertexes = (arcVec2 *)Mem_Alloc( sizeof( arcVec2 ) * pMesh->numTVertexes );
+		pMesh->tvertexes = (anVec2 *)Mem_Alloc( sizeof( anVec2 ) * pMesh->numTVertexes );
 	}
 
 	//Get the start and end index for this attribute
@@ -490,18 +462,18 @@ bool MA_ParseTVert(ARCParser& parser, maAttribHeader_t* header) {
 		return true;
 	}
 
-	parser.ReadToken(&token);
+	parser.ReadToken( &token );
 	if ( !token.Icmp( "-" ) ) {
-		arcNetToken tk2;
+		anToken tk2;
 		parser.ReadToken(&tk2);
 		if ( !tk2.Icmp( "type" ) ) {
 			parser.SkipUntilString( "float2" );
 		} else {
 			parser.UnreadToken(&tk2);
-			parser.UnreadToken(&token);
+			parser.UnreadToken( &token );
 		}
 	} else {
-		parser.UnreadToken(&token);
+		parser.UnreadToken( &token );
 	}
 
 	//Read each tvert
@@ -526,7 +498,7 @@ bool MA_QuickIsVertShared( int faceIndex, int vertIndex) {
 	for ( int i = 0; i < 3; i++ ) {
 		int edge = pMesh->faces[faceIndex].edge[i];
 		if (edge < 0 ) {
-			edge = arcMath::Fabs(edge)-1;
+			edge = anMath::Fabs(edge)-1;
 		}
 		if (pMesh->edges[edge].z == 1 && (pMesh->edges[edge].x == vertNum || pMesh->edges[edge].y == vertNum) ) {
 			return true;
@@ -548,7 +520,7 @@ void MA_GetSharedFace( int faceIndex, int vertIndex, int& sharedFace, int& share
 
 		int edge = pMesh->faces[faceIndex].edge[edgeIndex];
 		if (edge < 0 ) {
-			edge = arcMath::Fabs(edge)-1;
+			edge = anMath::Fabs(edge)-1;
 		}
 
 		if (pMesh->edges[edge].z == 1 && (pMesh->edges[edge].x == vertNum || pMesh->edges[edge].y == vertNum) ) {
@@ -564,13 +536,13 @@ void MA_GetSharedFace( int faceIndex, int vertIndex, int& sharedFace, int& share
 				}
 			}
 		}
-		if (sharedFace != -1 )
+		if ( sharedFace != -1 )
 			break;
 
 	}
 }
 
-void MA_ParseMesh(ARCParser& parser) {
+void MA_ParseMesh(anParser& parser) {
 
 	maObject_t	*object;
 	object = (maObject_t *)Mem_Alloc( sizeof( maObject_t ) );
@@ -597,29 +569,29 @@ void MA_ParseMesh(ARCParser& parser) {
 	strcpy(object->name, header.name);
 
 	//Read the transform attributes
-	arcNetToken token;
-	while(parser.ReadToken(&token) ) {
+	anToken token;
+	while(parser.ReadToken( &token ) ) {
 		if (IsNodeComplete( token ) ) {
-			parser.UnreadToken(&token);
+			parser.UnreadToken( &token );
 			break;
 		}
 		if ( !token.Icmp( "setAttr" ) ) {
 			maAttribHeader_t header;
 			MA_ParseAttribHeader(parser, &header);
 
-			if (strstr(header.name, ".vt" ) ) {
+			if ( strstr(header.name, ".vt" ) ) {
 				MA_ParseVertex(parser, &header);
-			} else if (strstr(header.name, ".ed" ) ) {
+			} else if ( strstr(header.name, ".ed" ) ) {
 				MA_ParseEdge(parser, &header);
-			} else if (strstr(header.name, ".pt" ) ) {
+			} else if ( strstr(header.name, ".pt" ) ) {
 				MA_ParseVertexTransforms(parser, &header);
-			} else if (strstr(header.name, ".n" ) ) {
+			} else if ( strstr(header.name, ".n" ) ) {
 				MA_ParseNormal(parser, &header);
-			} else if (strstr(header.name, ".fc" ) ) {
+			} else if ( strstr(header.name, ".fc" ) ) {
 				MA_ParseFace(parser, &header);
-			} else if (strstr(header.name, ".clr" ) ) {
+			} else if ( strstr(header.name, ".clr" ) ) {
 				MA_ParseColor(parser, &header);
-			} else if (strstr(header.name, ".uvst" ) ) {
+			} else if ( strstr(header.name, ".uvst" ) ) {
 				MA_ParseTVert(parser, &header);
 			} else {
 				parser.SkipRestOfLine();
@@ -635,7 +607,7 @@ void MA_ParseMesh(ARCParser& parser) {
 		for ( int j = 0; j < 3; j++ ) {
 			int edge = pMesh->faces[i].edge[j];
 			if (edge < 0 ) {
-				edge = arcMath::Fabs(edge)-1;
+				edge = anMath::Fabs(edge)-1;
 				pMesh->faces[i].vertexNum[j] = pMesh->edges[edge].y;
 			} else {
 				pMesh->faces[i].vertexNum[j] = pMesh->edges[edge].x;
@@ -656,7 +628,7 @@ void MA_ParseMesh(ARCParser& parser) {
 					MA_GetSharedFace( i, j, sharedFace, sharedVert);
 				}
 
-				if (sharedFace != -1 ) {
+				if ( sharedFace != -1 ) {
 					//Get the normal from the share
 					pMesh->faces[i].vertexNormals[j] = pMesh->faces[sharedFace].vertexNormals[sharedVert];
 
@@ -664,7 +636,7 @@ void MA_ParseMesh(ARCParser& parser) {
 					//The vertex is not shared so get the next normal
 					if (pMesh->nextNormal >= pMesh->numNormals) {
 						//We are using more normals than exist
-						throw arcExceptions(va( "Maya Loader '%s': Invalid Normals Index.", parser.GetFileName() ));
+						throw anExceptions(va( "Maya Loader '%s': Invalid Normals Index.", parser.GetFileName() ) );
 					}
 					pMesh->faces[i].vertexNormals[j] = pMesh->normals[pMesh->nextNormal];
 					pMesh->nextNormal++;
@@ -679,7 +651,7 @@ void MA_ParseMesh(ARCParser& parser) {
 			pMesh->faces[i].vertexNum[1] = pMesh->faces[i].vertexNum[2];
 			pMesh->faces[i].vertexNum[2] = tmp;
 
-			arcVec3 tmpVec = pMesh->faces[i].vertexNormals[1];
+			anVec3 tmpVec = pMesh->faces[i].vertexNormals[1];
 			pMesh->faces[i].vertexNormals[1] = pMesh->faces[i].vertexNormals[2];
 			pMesh->faces[i].vertexNormals[2] = tmpVec;
 
@@ -697,33 +669,33 @@ void MA_ParseMesh(ARCParser& parser) {
 		pMesh->vertexes[( int )pMesh->vertTransforms[i].w] +=  pMesh->vertTransforms[i].ToVec3();
 	}
 
-	MA_VERBOSE((va( "MESH %s - parent %s\n", header.name, header.parent) ));
-	MA_VERBOSE((va( "\tverts:%d\n",maGlobal.currentObject->mesh.numVertexes) ));
-	MA_VERBOSE((va( "\tfaces:%d\n",maGlobal.currentObject->mesh.numFaces) ));
+	MA_VERBOSE((va( "MESH %s - parent %s\n", header.name, header.parent) ) );
+	MA_VERBOSE((va( "\tverts:%d\n",maGlobal.currentObject->mesh.numVertexes) ) );
+	MA_VERBOSE((va( "\tfaces:%d\n",maGlobal.currentObject->mesh.numFaces) ) );
 }
 
-void MA_ParseFileNode(ARCParser& parser) {
+void MA_ParseFileNode(anParser& parser) {
 
 	//Get the header info from the node
 	maNodeHeader_t	header;
 	MA_ParseNodeHeader(parser, &header);
 
 	//Read the transform attributes
-	arcNetToken token;
-	while(parser.ReadToken(&token) ) {
+	anToken token;
+	while(parser.ReadToken( &token ) ) {
 		if (IsNodeComplete( token ) ) {
-			parser.UnreadToken(&token);
+			parser.UnreadToken( &token );
 			break;
 		}
 		if ( !token.Icmp( "setAttr" ) ) {
 			maAttribHeader_t attribHeader;
 			MA_ParseAttribHeader(parser, &attribHeader);
 
-			if (strstr(attribHeader.name, ".ftn" ) ) {
+			if ( strstr(attribHeader.name, ".ftn" ) ) {
 				parser.SkipUntilString( "string" );
-				parser.ReadToken(&token);
+				parser.ReadToken( &token );
 				if ( !token.Icmp( "( " ) ) {
-					parser.ReadToken(&token);
+					parser.ReadToken( &token );
 				}
 
 				maFileNode_t* fileNode;
@@ -739,7 +711,7 @@ void MA_ParseFileNode(ARCParser& parser) {
 	}
 }
 
-void MA_ParseMaterialNode(ARCParser& parser) {
+void MA_ParseMaterialNode(anParser& parser) {
 
 	//Get the header info from the node
 	maNodeHeader_t	header;
@@ -754,10 +726,10 @@ void MA_ParseMaterialNode(ARCParser& parser) {
 	maGlobal.model->materialNodes.Set(matNode->name, matNode);
 }
 
-void MA_ParseCreateNode(ARCParser& parser) {
+void MA_ParseCreateNode(anParser& parser) {
 
-	arcNetToken token;
-	parser.ReadToken(&token);
+	anToken token;
+	parser.ReadToken( &token );
 
 	if ( !token.Icmp( "transform" ) ) {
 		MA_ParseTransform(parser);
@@ -791,7 +763,7 @@ int MA_AddMaterial(const char* materialName) {
 			memset( material, 0, sizeof( maMaterial_t ) );
 
 			//Remove the OS stuff
-			arcNetString qPath;
+			anString qPath;
 			qPath = fileSystem->OSPathToRelativePath( matNode->file->path );
 
 			strcpy(material->name, qPath.c_str() );
@@ -803,40 +775,40 @@ int MA_AddMaterial(const char* materialName) {
 	return -1;
 }
 
-bool MA_ParseConnectAttr(ARCParser& parser) {
+bool MA_ParseConnectAttr(anParser& parser) {
 
-	arcNetString temp;
-	arcNetString srcName;
-	arcNetString srcType;
-	arcNetString destName;
-	arcNetString destType;
+	anString temp;
+	anString srcName;
+	anString srcType;
+	anString destName;
+	anString destType;
 
-	arcNetToken token;
-	parser.ReadToken(&token);
+	anToken token;
+	parser.ReadToken( &token );
 	temp = token;
 	int dot = temp.Find( "." );
 	if (dot == -1 ) {
-		throw arcExceptions(va( "Maya Loader '%s': Invalid Connect Attribute.", parser.GetFileName() ));
+		throw anExceptions(va( "Maya Loader '%s': Invalid Connect Attribute.", parser.GetFileName() ) );
 		return false;
 	}
 	srcName = temp.Left(dot);
 	srcType = temp.Right(temp.Length()-dot-1 );
 
-	parser.ReadToken(&token);
+	parser.ReadToken( &token );
 	temp = token;
 	dot = temp.Find( "." );
 	if (dot == -1 ) {
-		throw arcExceptions(va( "Maya Loader '%s': Invalid Connect Attribute.", parser.GetFileName() ));
+		throw anExceptions(va( "Maya Loader '%s': Invalid Connect Attribute.", parser.GetFileName() ) );
 		return false;
 	}
 	destName = temp.Left(dot);
 	destType = temp.Right(temp.Length()-dot-1 );
 
-	if (srcType.Find( "oc" ) != -1 ) {
+	if ( srcType.Find( "oc" ) != -1 ) {
 
 		//Is this attribute a material node attribute
 		maMaterialNode_t**	matNode;
-		maGlobal.model->materialNodes.Get(srcName, &matNode);
+		maGlobal.model->materialNodes.Get( srcName, &matNode);
 		if (matNode) {
 			maMaterialNode_t**	destNode;
 			maGlobal.model->materialNodes.Get(destName, &destNode);
@@ -847,7 +819,7 @@ bool MA_ParseConnectAttr(ARCParser& parser) {
 
 		//Is this attribute a file node
 		maFileNode_t** fileNode;
-		maGlobal.model->fileNodes.Get(srcName, &fileNode);
+		maGlobal.model->fileNodes.Get( srcName, &fileNode);
 		if (fileNode) {
 			maMaterialNode_t**	destNode;
 			maGlobal.model->materialNodes.Get(destName, &destNode);
@@ -857,7 +829,7 @@ bool MA_ParseConnectAttr(ARCParser& parser) {
 		}
 	}
 
-	if (srcType.Find( "iog" ) != -1 ) {
+	if ( srcType.Find( "iog" ) != -1 ) {
 		//Is this an attribute for one of our meshes
 		for ( int i = 0; i < maGlobal.model->objects.Num(); i++ ) {
 			if ( !strcmp(maGlobal.model->objects[i]->name, srcName) ) {
@@ -872,20 +844,20 @@ bool MA_ParseConnectAttr(ARCParser& parser) {
 }
 
 
-void MA_BuildScale(arcMat4& mat, float x, float y, float z) {
+void MA_BuildScale(anMat4& mat, float x, float y, float z) {
 	mat.Identity();
 	mat[0][0] = x;
 	mat[1][1] = y;
 	mat[2][2] = z;
 }
 
-void MA_BuildAxisRotation(arcMat4& mat, float ang, int axis) {
+void MA_BuildAxisRotation(anMat4& mat, float ang, int axis) {
 
-	float sinAng = arcMath::Sin(ang);
-	float cosAng = arcMath::Cos(ang);
+	float sinAng = anMath::Sin(ang);
+	float cosAng = anMath::Cos(ang);
 
 	mat.Identity();
-	switch(axis) {
+	switch (axis) {
 	case 0: //x
 		mat[1][1] = cosAng;
 		mat[1][2] = sinAng;
@@ -917,8 +889,8 @@ void MA_ApplyTransformation(maModel_t *model) {
 
 		while(transform) {
 
-			arcMat4 rotx, roty, rotz;
-			arcMat4 scale;
+			anMat4 rotx, roty, rotz;
+			anMat4 scale;
 
 			rotx.Identity();
 			roty.Identity();
@@ -934,7 +906,7 @@ void MA_ApplyTransformation(maModel_t *model) {
 				MA_BuildAxisRotation(rotz, DEG2RAD(-transform->rotate.z), 2);
 			}
 
-			MA_BuildScale(scale, transform->scale.x, transform->scale.y, transform->scale.z);
+			MA_BuildScale( scale, transform->scale.x, transform->scale.y, transform->scale.z);
 
 			//Apply the transformation to each vert
 			for ( int j = 0; j < mesh->numVertexes; j++ ) {
@@ -965,20 +937,20 @@ maModel_t *MA_Parse( const char *buffer, const char* filename, bool verbose ) {
 
 
 
-	maGlobal.currentObject = NULL;
+	maGlobal.currentObject = nullptr;
 
-	// NOTE: using new operator because aseModel_t contains arcNetList class objects
+	// NOTE: using new operator because aseModel_t contains anList class objects
 	maGlobal.model = new maModel_t;
 	maGlobal.model->objects.Resize( 32, 32 );
 	maGlobal.model->materials.Resize( 32, 32 );
 
 
-	ARCParser parser;
+	anParser parser;
 	parser.SetFlags(LEXFL_NOSTRINGCONCAT);
 	parser.LoadMemory(buffer, strlen(buffer), filename);
 
-	arcNetToken token;
-	while(parser.ReadToken(&token) ) {
+	anToken token;
+	while(parser.ReadToken( &token ) ) {
 
 		if ( !token.Icmp( "createNode" ) ) {
 			MA_ParseCreateNode(parser);
@@ -1012,18 +984,18 @@ maModel_t *MA_Load( const char *fileName ) {
 
 	fileSystem->ReadFile( fileName, (void **)&buf, &timeStamp );
 	if ( !buf ) {
-		return NULL;
+		return nullptr;
 	}
 
 	try {
 		ma = MA_Parse( buf, fileName, false );
 		ma->timeStamp = timeStamp;
-	} catch( arcExceptions &e ) {
+	} catch( anExceptions &e ) {
 		common->Warning( "%s", e.error);
 		if (maGlobal.model) {
 			MA_Free(maGlobal.model);
 		}
-		ma = NULL;
+		ma = nullptr;
 	}
 
 	fileSystem->FreeFile( buf );

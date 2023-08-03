@@ -9,46 +9,46 @@
 ===============================================================================
 */
 
-class arcPluecker {
+class anPluecker {
 public:
-					arcPluecker( void );
-					explicit arcPluecker( const float *a );
-					explicit arcPluecker( const arcVec3 &start, const arcVec3 &end );
-					explicit arcPluecker( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 );
+					anPluecker( void );
+					explicit anPluecker( const float *a );
+					explicit anPluecker( const anVec3 &start, const anVec3 &end );
+					explicit anPluecker( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 );
 
 	float			operator[]( const int index ) const;
 	float &			operator[]( const int index );
-	arcPluecker		operator-() const;											// flips the direction
-	arcPluecker		operator*( const float a ) const;
-	arcPluecker		operator/( const float a ) const;
-	float			operator*( const arcPluecker &a ) const;						// permuted inner product
-	arcPluecker		operator-( const arcPluecker &a ) const;
-	arcPluecker		operator+( const arcPluecker &a ) const;
-	arcPluecker &	operator*=( const float a );
-	arcPluecker &	operator/=( const float a );
-	arcPluecker &	operator+=( const arcPluecker &a );
-	arcPluecker &	operator-=( const arcPluecker &a );
+	anPluecker		operator-() const;											// flips the direction
+	anPluecker		operator*( const float a ) const;
+	anPluecker		operator/( const float a ) const;
+	float			operator*( const anPluecker &a ) const;						// permuted inner product
+	anPluecker		operator-( const anPluecker &a ) const;
+	anPluecker		operator+( const anPluecker &a ) const;
+	anPluecker &	operator*=( const float a );
+	anPluecker &	operator/=( const float a );
+	anPluecker &	operator+=( const anPluecker &a );
+	anPluecker &	operator-=( const anPluecker &a );
 
-	bool			Compare( const arcPluecker &a ) const;						// exact compare, no epsilon
-	bool			Compare( const arcPluecker &a, const float epsilon ) const;	// compare with epsilon
-	bool			operator==(	const arcPluecker &a ) const;					// exact compare, no epsilon
-	bool			operator!=(	const arcPluecker &a ) const;					// exact compare, no epsilon
+	bool			Compare( const anPluecker &a ) const;						// exact compare, no epsilon
+	bool			Compare( const anPluecker &a, const float epsilon ) const;	// compare with epsilon
+	bool			operator==(	const anPluecker &a ) const;					// exact compare, no epsilon
+	bool			operator!=(	const anPluecker &a ) const;					// exact compare, no epsilon
 
 	void 			Set( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 );
 	void			Zero( void );
 
-	void			FromLine( const arcVec3 &start, const arcVec3 &end );			// pluecker from line
-	void			FromRay( const arcVec3 &start, const arcVec3 &dir );			// pluecker from ray
-	bool			FromPlanes( const arcPlane &p1, const arcPlane &p2 );			// pluecker from intersection of planes
-	bool			ToLine( arcVec3 &start, arcVec3 &end ) const;					// pluecker to line
-	bool			ToRay( arcVec3 &start, arcVec3 &dir ) const;					// pluecker to ray
-	void			ToDir( arcVec3 &dir ) const;									// pluecker to direction
-	float			PermutedInnerProduct( const arcPluecker &a ) const;			// pluecker permuted inner product
-	float			Distance3DSqr( const arcPluecker &a ) const;					// pluecker line distance
+	void			FromLine( const anVec3 &start, const anVec3 &end );			// pluecker from line
+	void			FromRay( const anVec3 &start, const anVec3 &dir );			// pluecker from ray
+	bool			FromPlanes( const anPlane &p1, const anPlane &p2 );			// pluecker from intersection of planes
+	bool			ToLine( anVec3 &start, anVec3 &end ) const;					// pluecker to line
+	bool			ToRay( anVec3 &start, anVec3 &dir ) const;					// pluecker to ray
+	void			ToDir( anVec3 &dir ) const;									// pluecker to direction
+	float			PermutedInnerProduct( const anPluecker &a ) const;			// pluecker permuted inner product
+	float			Distance3DSqr( const anPluecker &a ) const;					// pluecker line distance
 
 	float			Length( void ) const;										// pluecker length
 	float			LengthSqr( void ) const;									// pluecker squared length
-	arcPluecker		Normalize( void ) const;									// pluecker normalize
+	anPluecker		Normalize( void ) const;									// pluecker normalize
 	float			NormalizeSelf( void );										// pluecker normalize
 
 	int				GetDimension( void ) const;
@@ -61,21 +61,21 @@ private:
 	float			p[6];
 };
 
-extern arcPluecker pluecker_origin;
+extern anPluecker pluecker_origin;
 #define pluecker_zero pluecker_origin
 
-ARC_INLINE arcPluecker::arcPluecker( void ) {
+ARC_INLINE anPluecker::anPluecker( void ) {
 }
 
-ARC_INLINE arcPluecker::arcPluecker( const float *a ) {
+ARC_INLINE anPluecker::anPluecker( const float *a ) {
 	memcpy( p, a, 6 * sizeof( float ) );
 }
 
-ARC_INLINE arcPluecker::arcPluecker( const arcVec3 &start, const arcVec3 &end ) {
+ARC_INLINE anPluecker::anPluecker( const anVec3 &start, const anVec3 &end ) {
 	FromLine( start, end );
 }
 
-ARC_INLINE arcPluecker::arcPluecker( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 ) {
+ARC_INLINE anPluecker::anPluecker( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 ) {
 	p[0] = a1;
 	p[1] = a2;
 	p[2] = a3;
@@ -84,43 +84,43 @@ ARC_INLINE arcPluecker::arcPluecker( const float a1, const float a2, const float
 	p[5] = a6;
 }
 
-ARC_INLINE arcPluecker arcPluecker::operator-() const {
-	return arcPluecker( -p[0], -p[1], -p[2], -p[3], -p[4], -p[5] );
+ARC_INLINE anPluecker anPluecker::operator-() const {
+	return anPluecker( -p[0], -p[1], -p[2], -p[3], -p[4], -p[5] );
 }
 
-ARC_INLINE float arcPluecker::operator[]( const int index ) const {
+ARC_INLINE float anPluecker::operator[]( const int index ) const {
 	return p[index];
 }
 
-ARC_INLINE float &arcPluecker::operator[]( const int index ) {
+ARC_INLINE float &anPluecker::operator[]( const int index ) {
 	return p[index];
 }
 
-ARC_INLINE arcPluecker arcPluecker::operator*( const float a ) const {
-	return arcPluecker( p[0]*a, p[1]*a, p[2]*a, p[3]*a, p[4]*a, p[5]*a );
+ARC_INLINE anPluecker anPluecker::operator*( const float a ) const {
+	return anPluecker( p[0]*a, p[1]*a, p[2]*a, p[3]*a, p[4]*a, p[5]*a );
 }
 
-ARC_INLINE float arcPluecker::operator*( const arcPluecker &a ) const {
+ARC_INLINE float anPluecker::operator*( const anPluecker &a ) const {
 	return p[0] * a.p[4] + p[1] * a.p[5] + p[2] * a.p[3] + p[4] * a.p[0] + p[5] * a.p[1] + p[3] * a.p[2];
 }
 
-ARC_INLINE arcPluecker arcPluecker::operator/( const float a ) const {
+ARC_INLINE anPluecker anPluecker::operator/( const float a ) const {
 	float inva;
 
 	assert( a != 0.0f );
 	inva = 1.0f / a;
-	return arcPluecker( p[0]*inva, p[1]*inva, p[2]*inva, p[3]*inva, p[4]*inva, p[5]*inva );
+	return anPluecker( p[0]*inva, p[1]*inva, p[2]*inva, p[3]*inva, p[4]*inva, p[5]*inva );
 }
 
-ARC_INLINE arcPluecker arcPluecker::operator+( const arcPluecker &a ) const {
-	return arcPluecker( p[0] + a[0], p[1] + a[1], p[2] + a[2], p[3] + a[3], p[4] + a[4], p[5] + a[5] );
+ARC_INLINE anPluecker anPluecker::operator+( const anPluecker &a ) const {
+	return anPluecker( p[0] + a[0], p[1] + a[1], p[2] + a[2], p[3] + a[3], p[4] + a[4], p[5] + a[5] );
 }
 
-ARC_INLINE arcPluecker arcPluecker::operator-( const arcPluecker &a ) const {
-	return arcPluecker( p[0] - a[0], p[1] - a[1], p[2] - a[2], p[3] - a[3], p[4] - a[4], p[5] - a[5] );
+ARC_INLINE anPluecker anPluecker::operator-( const anPluecker &a ) const {
+	return anPluecker( p[0] - a[0], p[1] - a[1], p[2] - a[2], p[3] - a[3], p[4] - a[4], p[5] - a[5] );
 }
 
-ARC_INLINE arcPluecker &arcPluecker::operator*=( const float a ) {
+ARC_INLINE anPluecker &anPluecker::operator*=( const float a ) {
 	p[0] *= a;
 	p[1] *= a;
 	p[2] *= a;
@@ -130,7 +130,7 @@ ARC_INLINE arcPluecker &arcPluecker::operator*=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE arcPluecker &arcPluecker::operator/=( const float a ) {
+ARC_INLINE anPluecker &anPluecker::operator/=( const float a ) {
 	float inva;
 
 	assert( a != 0.0f );
@@ -144,7 +144,7 @@ ARC_INLINE arcPluecker &arcPluecker::operator/=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE arcPluecker &arcPluecker::operator+=( const arcPluecker &a ) {
+ARC_INLINE anPluecker &anPluecker::operator+=( const anPluecker &a ) {
 	p[0] += a[0];
 	p[1] += a[1];
 	p[2] += a[2];
@@ -154,7 +154,7 @@ ARC_INLINE arcPluecker &arcPluecker::operator+=( const arcPluecker &a ) {
 	return *this;
 }
 
-ARC_INLINE arcPluecker &arcPluecker::operator-=( const arcPluecker &a ) {
+ARC_INLINE anPluecker &anPluecker::operator-=( const anPluecker &a ) {
 	p[0] -= a[0];
 	p[1] -= a[1];
 	p[2] -= a[2];
@@ -164,48 +164,48 @@ ARC_INLINE arcPluecker &arcPluecker::operator-=( const arcPluecker &a ) {
 	return *this;
 }
 
-ARC_INLINE bool arcPluecker::Compare( const arcPluecker &a ) const {
+ARC_INLINE bool anPluecker::Compare( const anPluecker &a ) const {
 	return ( ( p[0] == a[0] ) && ( p[1] == a[1] ) && ( p[2] == a[2] ) &&
 			( p[3] == a[3] ) && ( p[4] == a[4] ) && ( p[5] == a[5] ) );
 }
 
-ARC_INLINE bool arcPluecker::Compare( const arcPluecker &a, const float epsilon ) const {
-	if ( arcMath::Fabs( p[0] - a[0] ) > epsilon ) {
+ARC_INLINE bool anPluecker::Compare( const anPluecker &a, const float epsilon ) const {
+	if ( anMath::Fabs( p[0] - a[0] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[1] - a[1] ) > epsilon ) {
+	if ( anMath::Fabs( p[1] - a[1] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[2] - a[2] ) > epsilon ) {
+	if ( anMath::Fabs( p[2] - a[2] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[3] - a[3] ) > epsilon ) {
+	if ( anMath::Fabs( p[3] - a[3] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[4] - a[4] ) > epsilon ) {
+	if ( anMath::Fabs( p[4] - a[4] ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( p[5] - a[5] ) > epsilon ) {
+	if ( anMath::Fabs( p[5] - a[5] ) > epsilon ) {
 		return false;
 	}
 
 	return true;
 }
 
-ARC_INLINE bool arcPluecker::operator==( const arcPluecker &a ) const {
+ARC_INLINE bool anPluecker::operator==( const anPluecker &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool arcPluecker::operator!=( const arcPluecker &a ) const {
+ARC_INLINE bool anPluecker::operator!=( const anPluecker &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void arcPluecker::Set( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 ) {
+ARC_INLINE void anPluecker::Set( const float a1, const float a2, const float a3, const float a4, const float a5, const float a6 ) {
 	p[0] = a1;
 	p[1] = a2;
 	p[2] = a3;
@@ -214,11 +214,11 @@ ARC_INLINE void arcPluecker::Set( const float a1, const float a2, const float a3
 	p[5] = a6;
 }
 
-ARC_INLINE void arcPluecker::Zero( void ) {
+ARC_INLINE void anPluecker::Zero( void ) {
 	p[0] = p[1] = p[2] = p[3] = p[4] = p[5] = 0.0f;
 }
 
-ARC_INLINE void arcPluecker::FromLine( const arcVec3 &start, const arcVec3 &end ) {
+ARC_INLINE void anPluecker::FromLine( const anVec3 &start, const anVec3 &end ) {
 	p[0] = start[0] * end[1] - end[0] * start[1];
 	p[1] = start[0] * end[2] - end[0] * start[2];
 	p[2] = start[0] - end[0];
@@ -227,7 +227,7 @@ ARC_INLINE void arcPluecker::FromLine( const arcVec3 &start, const arcVec3 &end 
 	p[5] = end[1] - start[1];
 }
 
-ARC_INLINE void arcPluecker::FromRay( const arcVec3 &start, const arcVec3 &dir ) {
+ARC_INLINE void anPluecker::FromRay( const anVec3 &start, const anVec3 &dir ) {
 	p[0] = start[0] * dir[1] - dir[0] * start[1];
 	p[1] = start[0] * dir[2] - dir[0] * start[2];
 	p[2] = -dir[0];
@@ -236,8 +236,8 @@ ARC_INLINE void arcPluecker::FromRay( const arcVec3 &start, const arcVec3 &dir )
 	p[5] = dir[1];
 }
 
-ARC_INLINE bool arcPluecker::ToLine( arcVec3 &start, arcVec3 &end ) const {
-	arcVec3 dir1, dir2;
+ARC_INLINE bool anPluecker::ToLine( anVec3 &start, anVec3 &end ) const {
+	anVec3 dir1, dir2;
 	float d;
 
 	dir1[0] = p[3];
@@ -258,8 +258,8 @@ ARC_INLINE bool arcPluecker::ToLine( arcVec3 &start, arcVec3 &end ) const {
 	return true;
 }
 
-ARC_INLINE bool arcPluecker::ToRay( arcVec3 &start, arcVec3 &dir ) const {
-	arcVec3 dir1;
+ARC_INLINE bool anPluecker::ToRay( anVec3 &start, anVec3 &dir ) const {
+	anVec3 dir1;
 	float d;
 
 	dir1[0] = p[3];
@@ -279,32 +279,32 @@ ARC_INLINE bool arcPluecker::ToRay( arcVec3 &start, arcVec3 &dir ) const {
 	return true;
 }
 
-ARC_INLINE void arcPluecker::ToDir( arcVec3 &dir ) const {
+ARC_INLINE void anPluecker::ToDir( anVec3 &dir ) const {
 	dir[0] = -p[2];
 	dir[1] = p[5];
 	dir[2] = -p[4];
 }
 
-ARC_INLINE float arcPluecker::PermutedInnerProduct( const arcPluecker &a ) const {
+ARC_INLINE float anPluecker::PermutedInnerProduct( const anPluecker &a ) const {
 	return p[0] * a.p[4] + p[1] * a.p[5] + p[2] * a.p[3] + p[4] * a.p[0] + p[5] * a.p[1] + p[3] * a.p[2];
 }
 
-ARC_INLINE float arcPluecker::Length( void ) const {
-	return ( float )arcMath::Sqrt( p[5] * p[5] + p[4] * p[4] + p[2] * p[2] );
+ARC_INLINE float anPluecker::Length( void ) const {
+	return ( float )anMath::Sqrt( p[5] * p[5] + p[4] * p[4] + p[2] * p[2] );
 }
 
-ARC_INLINE float arcPluecker::LengthSqr( void ) const {
+ARC_INLINE float anPluecker::LengthSqr( void ) const {
 	return ( p[5] * p[5] + p[4] * p[4] + p[2] * p[2] );
 }
 
-ARC_INLINE float arcPluecker::NormalizeSelf( void ) {
+ARC_INLINE float anPluecker::NormalizeSelf( void ) {
 	float l, d;
 
 	l = LengthSqr();
 	if ( l == 0.0f ) {
 		return l; // pluecker coordinate does not represent a line
 	}
-	d = arcMath::InvSqrt( l );
+	d = anMath::InvSqrt( l );
 	p[0] *= d;
 	p[1] *= d;
 	p[2] *= d;
@@ -314,26 +314,26 @@ ARC_INLINE float arcPluecker::NormalizeSelf( void ) {
 	return d * l;
 }
 
-ARC_INLINE arcPluecker arcPluecker::Normalize( void ) const {
+ARC_INLINE anPluecker anPluecker::Normalize( void ) const {
 	float d;
 
 	d = LengthSqr();
 	if ( d == 0.0f ) {
 		return *this; // pluecker coordinate does not represent a line
 	}
-	d = arcMath::InvSqrt( d );
-	return arcPluecker( p[0]*d, p[1]*d, p[2]*d, p[3]*d, p[4]*d, p[5]*d );
+	d = anMath::InvSqrt( d );
+	return anPluecker( p[0]*d, p[1]*d, p[2]*d, p[3]*d, p[4]*d, p[5]*d );
 }
 
-ARC_INLINE int arcPluecker::GetDimension( void ) const {
+ARC_INLINE int anPluecker::GetDimension( void ) const {
 	return 6;
 }
 
-ARC_INLINE const float *arcPluecker::ToFloatPtr( void ) const {
+ARC_INLINE const float *anPluecker::ToFloatPtr( void ) const {
 	return p;
 }
 
-ARC_INLINE float *arcPluecker::ToFloatPtr( void ) {
+ARC_INLINE float *anPluecker::ToFloatPtr( void ) {
 	return p;
 }
 

@@ -28,12 +28,12 @@ class CDialogParticleEditor : public CDialog {
 	DECLARE_DYNAMIC(CDialogParticleEditor)
 
 public:
-						CDialogParticleEditor(CWnd* pParent = NULL);   // standard constructor
+						CDialogParticleEditor(CWnd* pParent = nullptr );   // standard constructor
 	virtual				~CDialogParticleEditor();
 
 	void				SelectParticle( const char *name );
 	void				SetParticleVisualization( int i );
-	void				SetVectorControlUpdate( arcQuats rotation );
+	void				SetVectorControlUpdate( anQuats rotation );
 
 	enum { TESTMODEL, IMPACT, MUZZLE, FLIGHT, SELECTED };
 
@@ -172,8 +172,8 @@ private:
 	void				RemoveStage();
 	void				ShowStage();
 	void				HideStage();
-	arcDeclParticle *	GetCurParticle();
-	arcParticleStage *	GetCurStage();
+	anDeclParticle *	GetCurParticle();
+	anParticleStage *	GetCurStage();
 	void				ClearDlgVars();
 	void				CurStageToDlgVars();
 	void				DlgVarsToCurStage();

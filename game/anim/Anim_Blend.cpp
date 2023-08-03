@@ -4,7 +4,7 @@
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
+This file is part of the Doom 3 BFG Edition GPL Source Code ( "Doom 3 BFG Edition Source Code" ).
 
 Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #pragma hdrstop
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 
 
 #include "../Game_local.h"
@@ -48,7 +48,7 @@ arcAnim::arcAnim
 =====================
 */
 arcAnim::arcAnim() {
-	modelDef = NULL;
+	modelDef = nullptr;
 	numAnims = 0;
 	memset( anims, 0, sizeof( anims ) );
 	memset( &flags, 0, sizeof( flags ) );
@@ -70,8 +70,8 @@ arcAnim::arcAnim( const arcDeclModelDef *modelDef, const arcAnim *anim ) {
 
 	memset( anims, 0, sizeof( anims ) );
 	for ( i = 0; i < numAnims; i++ ) {
-		anims[ i ] = anim->anims[ i ];
-		anims[ i ]->IncreaseRefs();
+		anims[i] = anim->anims[i];
+		anims[i]->IncreaseRefs();
 	}
 
 	frameLookup.SetNum( anim->frameLookup.Num() );
@@ -79,9 +79,9 @@ arcAnim::arcAnim( const arcDeclModelDef *modelDef, const arcAnim *anim ) {
 
 	frameCommands.SetNum( anim->frameCommands.Num() );
 	for ( i = 0; i < frameCommands.Num(); i++ ) {
-		frameCommands[ i ] = anim->frameCommands[ i ];
-		if ( anim->frameCommands[ i ].string ) {
-			frameCommands[ i ].string = new (TAG_ANIM) arcNetString( *anim->frameCommands[ i ].string );
+		frameCommands[i] = anim->frameCommands[i];
+		if ( anim->frameCommands[i].string ) {
+			frameCommands[i].string = new (TAG_ANIM) anString( *anim->frameCommands[i].string );
 		}
 	}
 }
@@ -95,11 +95,11 @@ arcAnim::~arcAnim() {
 	int i;
 
 	for ( i = 0; i < numAnims; i++ ) {
-		anims[ i ]->DecreaseRefs();
+		anims[i]->DecreaseRefs();
 	}
 
 	for ( i = 0; i < frameCommands.Num(); i++ ) {
-		delete frameCommands[ i ].string;
+		delete frameCommands[i].string;
 	}
 }
 
@@ -108,14 +108,14 @@ arcAnim::~arcAnim() {
 arcAnim::SetAnim
 =====================
 */
-void arcAnim::SetAnim( const arcDeclModelDef *modelDef, const char *sourcename, const char *animname, int num, const idMD5Anim *md5anims[ ANIM_MaxSyncedAnims ] ) {
+void arcAnim::SetAnim( const arcDeclModelDef *modelDef, const char *sourcename, const char *animname, int num, const anM8DAnim *md5anims[ ANIM_MaxSyncedAnims ] ) {
 	int i;
 
 	this->modelDef = modelDef;
 
 	for ( i = 0; i < numAnims; i++ ) {
-		anims[ i ]->DecreaseRefs();
-		anims[ i ] = NULL;
+		anims[i]->DecreaseRefs();
+		anims[i] = nullptr;
 	}
 
 	assert( ( num > 0 ) && ( num <= ANIM_MaxSyncedAnims ) );
@@ -124,14 +124,14 @@ void arcAnim::SetAnim( const arcDeclModelDef *modelDef, const char *sourcename, 
 	name		= animname;
 
 	for ( i = 0; i < num; i++ ) {
-		anims[ i ] = md5anims[ i ];
-		anims[ i ]->IncreaseRefs();
+		anims[i] = md5anims[i];
+		anims[i]->IncreaseRefs();
 	}
 
 	memset( &flags, 0, sizeof( flags ) );
 
 	for ( i = 0; i < frameCommands.Num(); i++ ) {
-		delete frameCommands[ i ].string;
+		delete frameCommands[i].string;
 	}
 
 	frameLookup.Clear();
@@ -160,12 +160,12 @@ const char *arcAnim::FullName() const {
 =====================
 arcAnim::MD5Anim
 
-index 0 will never be NULL.  Any anim >= NumAnims will return NULL.
+index 0 will never be nullptr.  Any anim >= NumAnims will return nullptr.
 =====================
 */
-const idMD5Anim *arcAnim::MD5Anim( int num ) const {
-	if ( anims[0] == NULL ) {
-		return NULL;
+const anM8DAnim *arcAnim::MD5Anim( int num ) const {
+	if ( anims[0] == nullptr ) {
+		return nullptr;
 	}
 	return anims[ num ];
 }
@@ -219,7 +219,7 @@ int	arcAnim::NumAnims() const {
 arcAnim::TotalMovementDelta
 =====================
 */
-const arcVec3 &arcAnim::TotalMovementDelta() const {
+const anVec3 &arcAnim::TotalMovementDelta() const {
 	if ( !anims[ 0 ] ) {
 		return vec3_zero;
 	}
@@ -232,7 +232,7 @@ const arcVec3 &arcAnim::TotalMovementDelta() const {
 arcAnim::GetOrigin
 =====================
 */
-bool arcAnim::GetOrigin( arcVec3 &offset, int animNum, int currentTime, int cyclecount ) const {
+bool arcAnim::GetOrigin( anVec3 &offset, int animNum, int currentTime, int cyclecount ) const {
 	if ( !anims[ animNum ] ) {
 		offset.Zero();
 		return false;
@@ -262,7 +262,7 @@ bool arcAnim::GetOriginRotation( idQuat &rotation, int animNum, int currentTime,
 arcAnim::GetBounds
 =====================
 */
-ARC_INLINE bool arcAnim::GetBounds( arcBounds &bounds, int animNum, int currentTime, int cyclecount ) const {
+ARC_INLINE bool arcAnim::GetBounds( anBounds &bounds, int animNum, int currentTime, int cyclecount ) const {
 	if ( !anims[ animNum ] ) {
 		return false;
 	}
@@ -276,16 +276,16 @@ ARC_INLINE bool arcAnim::GetBounds( arcBounds &bounds, int animNum, int currentT
 =====================
 arcAnim::AddFrameCommand
 
-Returns NULL if no error.
+Returns nullptr if no error.
 =====================
 */
-const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int framenum, idLexer &src, const arcDict *def ) {
+const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int framenum, anLexer &src, const anDict *def ) {
 	int					i;
 	int					index;
-	arcNetString				text;
-	arcNetString				funcname;
+	anString				text;
+	anString				funcname;
 	frameCommand_t		fc;
-	arcNetToken				token;
+	anToken				token;
 	const jointInfo_t	*jointInfo;
 
 	// make sure we're within bounds
@@ -315,7 +315,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SCRIPTFUNCTIONOBJECT;
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "event" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
@@ -328,14 +328,14 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		if ( ev->GetNumArgs() != 0 ) {
 			return va( "Event '%s' has arguments", token.c_str() );
 		}
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "sound" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -348,7 +348,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SOUND_VOICE;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -361,7 +361,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SOUND_VOICE2;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -374,7 +374,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SOUND_BODY;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -387,7 +387,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SOUND_BODY2;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -400,7 +400,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SOUND_BODY3;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -413,7 +413,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SOUND_WEAPON;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -426,7 +426,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SOUND_GLOBAL;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -439,7 +439,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SOUND_ITEM;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -452,7 +452,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SOUND_CHATTER;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -465,7 +465,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		fc.type = FC_SKIN;
 		if ( token == "none" ) {
-			fc.skin = NULL;
+			fc.skin = nullptr;
 		} else {
 			fc.skin = declManager->FindSkin( token );
 			if ( !fc.skin ) {
@@ -480,13 +480,13 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		if ( !declManager->FindType( DECL_FX, token.c_str() ) ) {
 			return va( "fx '%s' not found", token.c_str() );
 		}
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "trigger" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_TRIGGER;
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "triggerSmokeParticle" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
@@ -495,7 +495,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		if ( !declManager->FindType( DECL_PARTICLE, token.c_str() ) ) {
 			return va( "Particle '%s' not found", token.c_str() );
 		}
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "melee" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
@@ -504,7 +504,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		if ( !gameLocal.FindEntityDef( token.c_str(), false ) ) {
 			return va( "Unknown entityDef '%s'", token.c_str() );
 		}
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "direct_damage" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
@@ -513,7 +513,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		if ( !gameLocal.FindEntityDef( token.c_str(), false ) ) {
 			return va( "Unknown entityDef '%s'", token.c_str() );
 		}
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "attack_begin" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
@@ -522,7 +522,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		if ( !gameLocal.FindEntityDef( token.c_str(), false ) ) {
 			return va( "Unknown entityDef '%s'", token.c_str() );
 		}
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "attack_end" ) {
 		fc.type = FC_ENDATTACK;
 	} else if ( token == "muzzle_flash" ) {
@@ -533,7 +533,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 			return va( "Joint '%s' not found", token.c_str() );
 		}
 		fc.type = FC_MUZZLEFLASH;
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "create_missile" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
@@ -542,7 +542,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 			return va( "Joint '%s' not found", token.c_str() );
 		}
 		fc.type = FC_CREATEMISSILE;
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "launch_missile" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
@@ -551,7 +551,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 			return va( "Joint '%s' not found", token.c_str() );
 		}
 		fc.type = FC_LAUNCHMISSILE;
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "fire_missile_at_target" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
@@ -564,7 +564,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 			return "Unexpected end of line";
 		}
 		fc.type = FC_FIREMISSILEATTARGET;
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 		fc.index = jointInfo->num;
 	} else if ( token == "launch_projectile" ) {
 		if ( !src.ReadTokenOnLine( &token ) ) {
@@ -574,7 +574,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 			return "Unknown projectile def";
 		}
 		fc.type = FC_LAUNCH_PROJECTILE;
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "trigger_fx" ) {
 
 		if ( !src.ReadTokenOnLine( &token ) ) {
@@ -592,12 +592,12 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 
 		fc.type = FC_TRIGGER_FX;
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 		fc.index = jointInfo->num;
 
 	} else if ( token == "start_emitter" ) {
 
-		arcNetString str;
+		anString str;
 		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
@@ -618,7 +618,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		}
 		str += token;
 		fc.type = FC_START_EMITTER;
-		fc.string = new (TAG_ANIM) arcNetString( str );
+		fc.string = new (TAG_ANIM) anString( str );
 		fc.index = jointInfo->num;
 
 	} else if ( token == "stop_emitter" ) {
@@ -627,7 +627,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 			return "Unexpected end of line";
 		}
 		fc.type = FC_STOP_EMITTER;
-		fc.string = new (TAG_ANIM) arcNetString( token );
+		fc.string = new (TAG_ANIM) anString( token );
 	} else if ( token == "footstep" ) {
 		fc.type = FC_FOOTSTEP;
 	} else if ( token == "leftfoot" ) {
@@ -667,12 +667,12 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 	} else if ( token == "recordDemo" ) {
 		fc.type = FC_RECORDDEMO;
 		if ( src.ReadTokenOnLine( &token ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		}
 	} else if ( token == "aviGame" ) {
 		fc.type = FC_AVIGAME;
 		if ( src.ReadTokenOnLine( &token ) ) {
-			fc.string = new (TAG_ANIM) arcNetString( token );
+			fc.string = new (TAG_ANIM) anString( token );
 		}
 	} else {
 		return va( "Unknown command '%s'", token.c_str() );
@@ -684,8 +684,8 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 		frameLookup.SetGranularity( 1 );
 		frameLookup.SetNum( anims[ 0 ]->NumFrames() );
 		for ( i = 0; i < frameLookup.Num(); i++ ) {
-			frameLookup[ i ].num = 0;
-			frameLookup[ i ].firstCommand = 0;
+			frameLookup[i].num = 0;
+			frameLookup[i].firstCommand = 0;
 		}
 	}
 
@@ -697,12 +697,12 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 
 	// move all commands from our index onward up one to give us space for our new command
 	for ( i = frameCommands.Num() - 1; i > index; i-- ) {
-		frameCommands[ i ] = frameCommands[ i - 1 ];
+		frameCommands[i] = frameCommands[ i - 1 ];
 	}
 
 	// fix the indices of any later frames to account for the inserted command
 	for ( i = framenum + 1; i < frameLookup.Num(); i++ ) {
-		frameLookup[ i ].firstCommand++;
+		frameLookup[i].firstCommand++;
 	}
 
 	// store the new command
@@ -712,7 +712,7 @@ const char *arcAnim::AddFrameCommand( const arcDeclModelDef *modelDef, int frame
 	frameLookup[ framenum ].num++;
 
 	// return with no error
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -739,7 +739,7 @@ void arcAnim::CallFrameCommands( arcEntity *ent, int from, int to ) const {
 		end = index + frameLookup[ frame ].num;
 		while( index < end ) {
 			const frameCommand_t &command = frameCommands[ index++ ];
-			switch( command.type ) {
+			switch ( command.type ) {
 				case FC_SCRIPTFUNCTION: {
 					gameLocal.CallFrameCommand( ent, command.function );
 					break;
@@ -755,118 +755,118 @@ void arcAnim::CallFrameCommands( arcEntity *ent, int from, int to ) const {
 				}
 				case FC_SOUND: {
 					if ( !command.soundShader ) {
-						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_ANY, 0, false, NULL ) ) {
+						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_ANY, 0, false, nullptr ) ) {
 							gameLocal.Warning( "Framecommand 'sound' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 								ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 						}
 					} else {
-						ent->StartSoundShader( command.soundShader, SND_CHANNEL_ANY, 0, false, NULL );
+						ent->StartSoundShader( command.soundShader, SND_CHANNEL_ANY, 0, false, nullptr );
 					}
 					break;
 				}
 				case FC_SOUND_VOICE: {
 					if ( !command.soundShader ) {
-						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_VOICE, 0, false, NULL ) ) {
+						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_VOICE, 0, false, nullptr ) ) {
 							gameLocal.Warning( "Framecommand 'sound_voice' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 								ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 						}
 					} else {
-						ent->StartSoundShader( command.soundShader, SND_CHANNEL_VOICE, 0, false, NULL );
+						ent->StartSoundShader( command.soundShader, SND_CHANNEL_VOICE, 0, false, nullptr );
 					}
 					break;
 				}
 				case FC_SOUND_VOICE2: {
 					if ( !command.soundShader ) {
-						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_VOICE2, 0, false, NULL ) ) {
+						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_VOICE2, 0, false, nullptr ) ) {
 							gameLocal.Warning( "Framecommand 'sound_voice2' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 								ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 						}
 					} else {
-						ent->StartSoundShader( command.soundShader, SND_CHANNEL_VOICE2, 0, false, NULL );
+						ent->StartSoundShader( command.soundShader, SND_CHANNEL_VOICE2, 0, false, nullptr );
 					}
 					break;
 				}
 				case FC_SOUND_BODY: {
 					if ( !command.soundShader ) {
-						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_BODY, 0, false, NULL ) ) {
+						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_BODY, 0, false, nullptr ) ) {
 							gameLocal.Warning( "Framecommand 'sound_body' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 								ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 						}
 					} else {
-						ent->StartSoundShader( command.soundShader, SND_CHANNEL_BODY, 0, false, NULL );
+						ent->StartSoundShader( command.soundShader, SND_CHANNEL_BODY, 0, false, nullptr );
 					}
 					break;
 				}
 				case FC_SOUND_BODY2: {
 					if ( !command.soundShader ) {
-						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_BODY2, 0, false, NULL ) ) {
+						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_BODY2, 0, false, nullptr ) ) {
 							gameLocal.Warning( "Framecommand 'sound_body2' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 								ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 						}
 					} else {
-						ent->StartSoundShader( command.soundShader, SND_CHANNEL_BODY2, 0, false, NULL );
+						ent->StartSoundShader( command.soundShader, SND_CHANNEL_BODY2, 0, false, nullptr );
 					}
 					break;
 				}
 				case FC_SOUND_BODY3: {
 					if ( !command.soundShader ) {
-						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_BODY3, 0, false, NULL ) ) {
+						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_BODY3, 0, false, nullptr ) ) {
 							gameLocal.Warning( "Framecommand 'sound_body3' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 								ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 						}
 					} else {
-						ent->StartSoundShader( command.soundShader, SND_CHANNEL_BODY3, 0, false, NULL );
+						ent->StartSoundShader( command.soundShader, SND_CHANNEL_BODY3, 0, false, nullptr );
 					}
 					break;
 									 }
 				case FC_SOUND_WEAPON: {
 					if ( !command.soundShader ) {
-						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_WEAPON, 0, false, NULL ) ) {
+						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_WEAPON, 0, false, nullptr ) ) {
 							gameLocal.Warning( "Framecommand 'sound_weapon' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 								ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 						}
 					} else {
-						ent->StartSoundShader( command.soundShader, SND_CHANNEL_WEAPON, 0, false, NULL );
+						ent->StartSoundShader( command.soundShader, SND_CHANNEL_WEAPON, 0, false, nullptr );
 					}
 					break;
 				}
 				case FC_SOUND_GLOBAL: {
 					if ( !command.soundShader ) {
-						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_ANY, SSF_GLOBAL, false, NULL ) ) {
+						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_ANY, SSF_GLOBAL, false, nullptr ) ) {
 							gameLocal.Warning( "Framecommand 'sound_global' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 								ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 						}
 					} else {
-						ent->StartSoundShader( command.soundShader, SND_CHANNEL_ANY, SSF_GLOBAL, false, NULL );
+						ent->StartSoundShader( command.soundShader, SND_CHANNEL_ANY, SSF_GLOBAL, false, nullptr );
 					}
 					break;
 				}
 				case FC_SOUND_ITEM: {
 					if ( !command.soundShader ) {
-						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_ITEM, 0, false, NULL ) ) {
+						if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_ITEM, 0, false, nullptr ) ) {
 							gameLocal.Warning( "Framecommand 'sound_item' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 								ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 						}
 					} else {
-						ent->StartSoundShader( command.soundShader, SND_CHANNEL_ITEM, 0, false, NULL );
+						ent->StartSoundShader( command.soundShader, SND_CHANNEL_ITEM, 0, false, nullptr );
 					}
 					break;
 				}
 				case FC_SOUND_CHATTER: {
 					if ( ent->CanPlayChatterSounds() ) {
 						if ( !command.soundShader ) {
-							if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_VOICE, 0, false, NULL ) ) {
+							if ( !ent->StartSound( command.string->c_str(), SND_CHANNEL_VOICE, 0, false, nullptr ) ) {
 								gameLocal.Warning( "Framecommand 'sound_chatter' on entity '%s', anim '%s', frame %d: Could not find sound '%s'",
 									ent->name.c_str(), FullName(), frame + 1, command.string->c_str() );
 							}
 						} else {
-							ent->StartSoundShader( command.soundShader, SND_CHANNEL_VOICE, 0, false, NULL );
+							ent->StartSoundShader( command.soundShader, SND_CHANNEL_VOICE, 0, false, nullptr );
 						}
 					}
 					break;
 				}
 				case FC_FX: {
-					arcEntityFx::StartFx( command.string->c_str(), NULL, NULL, ent, true );
+					arcEntityFx::StartFx( command.string->c_str(), nullptr, nullptr, ent, true );
 					break;
 				}
 				case FC_SKIN: {
@@ -933,10 +933,10 @@ void arcAnim::CallFrameCommands( arcEntity *ent, int from, int to ) const {
 					break;
 				}
 				case FC_START_EMITTER: {
-					int index = command.string->Find(" ");
+					int index = command.string->Find( " " );
 					if (index >= 0) {
-						arcNetString name = command.string->Left(index);
-						arcNetString particle = command.string->Right(command.string->Length() - index - 1);
+						anString name = command.string->Left(index);
+						anString particle = command.string->Right(command.string->Length() - index - 1);
 						ent->ProcessEvent( &AI_StartEmitter, name.c_str(), modelDef->GetJointName( command.index ), particle.c_str() );
 					}
 				}
@@ -1050,7 +1050,7 @@ int	arcAnim::FindFrameForFrameCommand( frameCommandType_t framecommand, const fr
 	}
 
 	if ( command ) {
-		*command = NULL;
+		*command = nullptr;
 	}
 
 	return -1;
@@ -1098,7 +1098,7 @@ arcAnimBlend::arcAnimBlend
 =====================
 */
 arcAnimBlend::arcAnimBlend() {
-	Reset( NULL );
+	Reset( nullptr );
 }
 
 /*
@@ -1122,7 +1122,7 @@ void arcAnimBlend::Save( arcSaveGame *savefile ) const {
 	savefile->WriteFloat( blendEndValue );
 
 	for ( i = 0; i < ANIM_MaxSyncedAnims; i++ ) {
-		savefile->WriteFloat( animWeights[ i ] );
+		savefile->WriteFloat( animWeights[i] );
 	}
 	savefile->WriteShort( cycle );
 	savefile->WriteShort( frame );
@@ -1154,7 +1154,7 @@ void arcAnimBlend::Restore( arcRestoreGame *savefile, const arcDeclModelDef *mod
 	savefile->ReadFloat( blendEndValue );
 
 	for ( i = 0; i < ANIM_MaxSyncedAnims; i++ ) {
-		savefile->ReadFloat( animWeights[ i ] );
+		savefile->ReadFloat( animWeights[i] );
 	}
 	savefile->ReadShort( cycle );
 	savefile->ReadShort( frame );
@@ -1347,7 +1347,7 @@ void arcAnimBlend::SetFrame( const arcDeclModelDef *modelDef, int _animNum, int 
 		return;
 	}
 
-	const idMD5Anim *md5anim = _anim->MD5Anim( 0 );
+	const anM8DAnim *md5anim = _anim->MD5Anim( 0 );
 	if ( modelDef->Joints().Num() != md5anim->NumJoints() ) {
 		gameLocal.Warning( "Model '%s' has different # of joints than anim '%s'", modelDef->GetModelName(), md5anim->Name() );
 		return;
@@ -1390,7 +1390,7 @@ void arcAnimBlend::CycleAnim( const arcDeclModelDef *modelDef, int _animNum, int
 		return;
 	}
 
-	const idMD5Anim *md5anim = _anim->MD5Anim( 0 );
+	const anM8DAnim *md5anim = _anim->MD5Anim( 0 );
 	if ( modelDef->Joints().Num() != md5anim->NumJoints() ) {
 		gameLocal.Warning( "Model '%s' has different # of joints than anim '%s'", modelDef->GetModelName(), md5anim->Name() );
 		return;
@@ -1430,7 +1430,7 @@ void arcAnimBlend::PlayAnim( const arcDeclModelDef *modelDef, int _animNum, int 
 		return;
 	}
 
-	const idMD5Anim *md5anim = _anim->MD5Anim( 0 );
+	const anM8DAnim *md5anim = _anim->MD5Anim( 0 );
 	if ( modelDef->Joints().Num() != md5anim->NumJoints() ) {
 		gameLocal.Warning( "Model '%s' has different # of joints than anim '%s'", modelDef->GetModelName(), md5anim->Name() );
 		return;
@@ -1672,7 +1672,7 @@ arcAnimBlend::Anim
 */
 const arcAnim *arcAnimBlend::Anim() const {
 	if ( !modelDef ) {
-		return NULL;
+		return nullptr;
 	}
 
 	const arcAnim *anim = modelDef->GetAnim( animNum );
@@ -1734,7 +1734,7 @@ arcAnimBlend::GetFrameNumber
 =====================
 */
 int arcAnimBlend::GetFrameNumber( int currentTime ) const {
-	const idMD5Anim	*md5anim;
+	const anM8DAnim	*md5anim;
 	frameBlend_t	frameinfo;
 	int				animTime;
 
@@ -1760,7 +1760,7 @@ arcAnimBlend::CallFrameCommands
 =====================
 */
 void arcAnimBlend::CallFrameCommands( arcEntity *ent, int fromtime, int totime ) const {
-	const idMD5Anim	*md5anim;
+	const anM8DAnim	*md5anim;
 	frameBlend_t	frame1;
 	frameBlend_t	frame2;
 	int				fromFrameTime;
@@ -1804,15 +1804,15 @@ void arcAnimBlend::CallFrameCommands( arcEntity *ent, int fromtime, int totime )
 arcAnimBlend::BlendAnim
 =====================
 */
-bool arcAnimBlend::BlendAnim( int currentTime, int channel, int numJoints, idJointQuat *blendFrame, float &blendWeight, bool removeOriginOffset, bool overrideBlend, bool printInfo ) const {
+bool arcAnimBlend::BlendAnim( int currentTime, int channel, int numJoints, anJointQuat *blendFrame, float &blendWeight, bool removeOriginOffset, bool overrideBlend, bool printInfo ) const {
 	int				i;
 	float			lerp;
 	float			mixWeight;
-	const idMD5Anim	*md5anim;
-	idJointQuat		*ptr;
+	const anM8DAnim	*md5anim;
+	anJointQuat		*ptr;
 	frameBlend_t	frametime = { 0 };
-	idJointQuat		*jointFrame;
-	idJointQuat		*mixFrame;
+	anJointQuat		*jointFrame;
+	anJointQuat		*mixFrame;
 	int				numAnims;
 	int				time;
 
@@ -1839,7 +1839,7 @@ bool arcAnimBlend::BlendAnim( int currentTime, int channel, int numJoints, idJoi
 		jointFrame = blendFrame;
 	} else {
 		// allocate a temporary buffer to copy the joints from
-		jointFrame = ( idJointQuat * )_alloca16( numJoints * sizeof( *jointFrame ) );
+		jointFrame = ( anJointQuat * )_alloca16( numJoints * sizeof( *jointFrame ) );
 	}
 
 	time = AnimTime( currentTime );
@@ -1858,7 +1858,7 @@ bool arcAnimBlend::BlendAnim( int currentTime, int channel, int numJoints, idJoi
 		// need to mix the multipoint anim together first
 		//
 		// allocate a temporary buffer to copy the joints to
-		mixFrame = ( idJointQuat * )_alloca16( numJoints * sizeof( *jointFrame ) );
+		mixFrame = ( anJointQuat * )_alloca16( numJoints * sizeof( *jointFrame ) );
 
 		if ( !frame ) {
 			anim->MD5Anim( 0 )->ConvertTimeToFrame( time, cycle, frametime );
@@ -1867,9 +1867,9 @@ bool arcAnimBlend::BlendAnim( int currentTime, int channel, int numJoints, idJoi
 		ptr = jointFrame;
 		mixWeight = 0.0f;
 		for ( i = 0; i < numAnims; i++ ) {
-			if ( animWeights[ i ] > 0.0f ) {
-				mixWeight += animWeights[ i ];
-				lerp = animWeights[ i ] / mixWeight;
+			if ( animWeights[i] > 0.0f ) {
+				mixWeight += animWeights[i];
+				lerp = animWeights[i] / mixWeight;
 				md5anim = anim->MD5Anim( i );
 				if ( frame ) {
 					md5anim->GetSingleFrame( frame - 1, ptr, modelDef->GetChannelJoints( channel ), modelDef->NumJointsOnChannel( channel ) );
@@ -1938,10 +1938,10 @@ bool arcAnimBlend::BlendAnim( int currentTime, int channel, int numJoints, idJoi
 arcAnimBlend::BlendOrigin
 =====================
 */
-void arcAnimBlend::BlendOrigin( int currentTime, arcVec3 &blendPos, float &blendWeight, bool removeOriginOffset ) const {
+void arcAnimBlend::BlendOrigin( int currentTime, anVec3 &blendPos, float &blendWeight, bool removeOriginOffset ) const {
 	float	lerp;
-	arcVec3	animpos;
-	arcVec3	pos;
+	anVec3	animpos;
+	anVec3	pos;
 	int		time;
 	int		num;
 	int		i;
@@ -1970,7 +1970,7 @@ void arcAnimBlend::BlendOrigin( int currentTime, arcVec3 &blendPos, float &blend
 	num = anim->NumAnims();
 	for ( i = 0; i < num; i++ ) {
 		anim->GetOrigin( animpos, i, time, cycle );
-		pos += animpos * animWeights[ i ];
+		pos += animpos * animWeights[i];
 	}
 
 	if ( !blendWeight ) {
@@ -1988,11 +1988,11 @@ void arcAnimBlend::BlendOrigin( int currentTime, arcVec3 &blendPos, float &blend
 arcAnimBlend::BlendDelta
 =====================
 */
-void arcAnimBlend::BlendDelta( int fromtime, int totime, arcVec3 &blendDelta, float &blendWeight ) const {
-	arcVec3	pos1;
-	arcVec3	pos2;
-	arcVec3	animpos;
-	arcVec3	delta;
+void arcAnimBlend::BlendDelta( int fromtime, int totime, anVec3 &blendDelta, float &blendWeight ) const {
+	anVec3	pos1;
+	anVec3	pos2;
+	anVec3	animpos;
+	anVec3	delta;
 	int		time1;
 	int		time2;
 	float	lerp;
@@ -2025,10 +2025,10 @@ void arcAnimBlend::BlendDelta( int fromtime, int totime, arcVec3 &blendDelta, fl
 	pos2.Zero();
 	for ( i = 0; i < num; i++ ) {
 		anim->GetOrigin( animpos, i, time1, cycle );
-		pos1 += animpos * animWeights[ i ];
+		pos1 += animpos * animWeights[i];
 
 		anim->GetOrigin( animpos, i, time2, cycle );
-		pos2 += animpos * animWeights[ i ];
+		pos2 += animpos * animWeights[i];
 	}
 
 	delta = pos2 - pos1;
@@ -2084,13 +2084,13 @@ void arcAnimBlend::BlendDeltaRotation( int fromtime, int totime, idQuat &blendDe
 	mixWeight = 0.0f;
 	num = anim->NumAnims();
 	for ( i = 0; i < num; i++ ) {
-		if ( animWeights[ i ] > 0.0f ) {
-			mixWeight += animWeights[ i ];
-			if ( animWeights[ i ] == mixWeight ) {
+		if ( animWeights[i] > 0.0f ) {
+			mixWeight += animWeights[i];
+			if ( animWeights[i] == mixWeight ) {
 				anim->GetOriginRotation( q1, i, time1, cycle );
 				anim->GetOriginRotation( q2, i, time2, cycle );
 			} else {
-				lerp = animWeights[ i ] / mixWeight;
+				lerp = animWeights[i] / mixWeight;
 				anim->GetOriginRotation( q3, i, time1, cycle );
 				q1.Slerp( q1, q3, lerp );
 
@@ -2116,12 +2116,12 @@ void arcAnimBlend::BlendDeltaRotation( int fromtime, int totime, idQuat &blendDe
 arcAnimBlend::AddBounds
 =====================
 */
-bool arcAnimBlend::AddBounds( int currentTime, arcBounds &bounds, bool removeOriginOffset ) const {
+bool arcAnimBlend::AddBounds( int currentTime, anBounds &bounds, bool removeOriginOffset ) const {
 	int			i;
 	int			num;
-	arcBounds	b;
+	anBounds	b;
 	int			time;
-	arcVec3		pos;
+	anVec3		pos;
 	bool		addorigin;
 
 	if ( ( endtime > 0 ) && ( currentTime > endtime ) ) {
@@ -2167,8 +2167,8 @@ arcDeclModelDef::arcDeclModelDef
 =====================
 */
 arcDeclModelDef::arcDeclModelDef() {
-	modelHandle	= NULL;
-	skin		= NULL;
+	modelHandle	= nullptr;
+	skin		= nullptr;
 	offset.Zero();
 	for ( int i = 0; i < ANIM_NumAnimChannels; i++ ) {
 		channelJoints[i].Clear();
@@ -2209,7 +2209,7 @@ void arcDeclModelDef::CopyDecl( const arcDeclModelDef *decl ) {
 
 	anims.SetNum( decl->anims.Num() );
 	for ( i = 0; i < anims.Num(); i++ ) {
-		anims[ i ] = new (TAG_ANIM) arcAnim( this, decl->anims[ i ] );
+		anims[i] = new (TAG_ANIM) arcAnim( this, decl->anims[i] );
 	}
 
 	joints.SetNum( decl->joints.Num() );
@@ -2230,8 +2230,8 @@ void arcDeclModelDef::FreeData() {
 	anims.DeleteContents( true );
 	joints.Clear();
 	jointParents.Clear();
-	modelHandle	= NULL;
-	skin = NULL;
+	modelHandle	= nullptr;
+	skin = nullptr;
 	offset.Zero();
 	for ( int i = 0; i < ANIM_NumAnimChannels; i++ ) {
 		channelJoints[i].Clear();
@@ -2257,17 +2257,17 @@ const jointInfo_t *arcDeclModelDef::FindJoint( const char *name ) const {
 	const idMD5Joint	*joint;
 
 	if ( !modelHandle ) {
-		return NULL;
+		return nullptr;
 	}
 
 	joint = modelHandle->GetJoints();
 	for ( i = 0; i < joints.Num(); i++, joint++ ) {
 		if ( !joint->name.Icmp( name ) ) {
-			return &joints[ i ];
+			return &joints[i];
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -2275,8 +2275,8 @@ const jointInfo_t *arcDeclModelDef::FindJoint( const char *name ) const {
 arcDeclModelDef::ModelHandle
 =====================
 */
-idRenderModel *arcDeclModelDef::ModelHandle() const {
-	return ( idRenderModel * )modelHandle;
+anRenderModel *arcDeclModelDef::ModelHandle() const {
+	return ( anRenderModel * )modelHandle;
 }
 
 /*
@@ -2284,9 +2284,9 @@ idRenderModel *arcDeclModelDef::ModelHandle() const {
 arcDeclModelDef::GetJointList
 =====================
 */
-void arcDeclModelDef::GetJointList( const char *jointnames, arcNetList<jointHandle_t> &jointList ) const {
+void arcDeclModelDef::GetJointList( const char *jointnames, anList<jointHandle_t> &jointList ) const {
 	const char			*pos;
-	arcNetString				jointname;
+	anString				jointname;
 	const jointInfo_t	*joint;
 	const jointInfo_t	*child;
 	int					i;
@@ -2387,7 +2387,7 @@ void arcDeclModelDef::Touch() const {
 arcDeclModelDef::GetDefaultSkin
 =====================
 */
-const arcDeclSkin *arcDeclModelDef::GetDefaultSkin() const {
+const anDeclSkin *arcDeclModelDef::GetDefaultSkin() const {
 	return skin;
 }
 
@@ -2396,7 +2396,7 @@ const arcDeclSkin *arcDeclModelDef::GetDefaultSkin() const {
 arcDeclModelDef::GetDefaultPose
 =====================
 */
-const idJointQuat *arcDeclModelDef::GetDefaultPose() const {
+const anJointQuat *arcDeclModelDef::GetDefaultPose() const {
 	return modelHandle->GetDefaultPose();
 }
 
@@ -2405,14 +2405,14 @@ const idJointQuat *arcDeclModelDef::GetDefaultPose() const {
 arcDeclModelDef::SetupJoints
 =====================
 */
-void arcDeclModelDef::SetupJoints( int *numJoints, idJointMat **jointList, arcBounds &frameBounds, bool removeOriginOffset ) const {
+void arcDeclModelDef::SetupJoints( int *numJoints, anJointMat **jointList, anBounds &frameBounds, bool removeOriginOffset ) const {
 	int					num;
-	const idJointQuat	*pose;
-	idJointMat			*list;
+	const anJointQuat	*pose;
+	anJointMat			*list;
 
 	if ( !modelHandle || modelHandle->IsDefaultModel() ) {
 		Mem_Free16( (*jointList) );
-		(*jointList) = NULL;
+		(*jointList) = nullptr;
 		frameBounds.Clear();
 		return;
 	}
@@ -2425,7 +2425,7 @@ void arcDeclModelDef::SetupJoints( int *numJoints, idJointMat **jointList, arcBo
 	}
 
 	// set up initial pose for model (with no pose, model is just a jumbled mess)
-	list = (idJointMat *) Mem_Alloc16( SIMD_ROUND_JOINTS( num ) * sizeof( list[0] ), TAG_JOINTMAT );
+	list = (anJointMat *) Mem_Alloc16( SIMD_ROUND_JOINTS( num ) * sizeof( list[0] ), TAG_JOINTMAT );
 	pose = GetDefaultPose();
 
 	// convert the joint quaternions to joint matrices
@@ -2434,7 +2434,7 @@ void arcDeclModelDef::SetupJoints( int *numJoints, idJointMat **jointList, arcBo
 	// check if we offset the model by the origin joint
 	if ( removeOriginOffset ) {
 #ifdef VELOCITY_MOVE
-		list[ 0 ].SetTranslation( arcVec3( offset.x, offset.y + pose[0].t.y, offset.z + pose[0].t.z ) );
+		list[ 0 ].SetTranslation( anVec3( offset.x, offset.y + pose[0].t.y, offset.z + pose[0].t.z ) );
 #else
 		list[ 0 ].SetTranslation( offset );
 #endif
@@ -2451,7 +2451,7 @@ void arcDeclModelDef::SetupJoints( int *numJoints, idJointMat **jointList, arcBo
 	*jointList = list;
 
 	// get the bounds of the default pose
-	frameBounds = modelHandle->Bounds( NULL );
+	frameBounds = modelHandle->Bounds( nullptr );
 }
 
 /*
@@ -2459,15 +2459,15 @@ void arcDeclModelDef::SetupJoints( int *numJoints, idJointMat **jointList, arcBo
 arcDeclModelDef::ParseAnim
 =====================
 */
-bool arcDeclModelDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
+bool arcDeclModelDef::ParseAnim( anLexer &src, int numDefaultAnims ) {
 	int				i;
 	int				len;
 	arcAnim			*anim;
-	const idMD5Anim	*md5anims[ ANIM_MaxSyncedAnims ];
-	const idMD5Anim	*md5anim;
-	arcNetString			alias;
-	arcNetToken			realname;
-	arcNetToken			token;
+	const anM8DAnim	*md5anims[ ANIM_MaxSyncedAnims ];
+	const anM8DAnim	*md5anim;
+	anString			alias;
+	anToken			realname;
+	anToken			token;
 	int				numAnims;
 	animFlags_t		flags;
 
@@ -2482,7 +2482,7 @@ bool arcDeclModelDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 	alias = realname;
 
 	for ( i = 0; i < anims.Num(); i++ ) {
-		if ( !strcmp( anims[ i ]->FullName(), realname ) ) {
+		if ( !strcmp( anims[i]->FullName(), realname ) ) {
 			break;
 		}
 	}
@@ -2494,7 +2494,7 @@ bool arcDeclModelDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 	}
 
 	if ( i < numDefaultAnims ) {
-		anim = anims[ i ];
+		anim = anims[i];
 	} else {
 		// create the alias associated with this animation
 		anim = new (TAG_ANIM) arcAnim();
@@ -2504,7 +2504,7 @@ bool arcDeclModelDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 	// random anims end with a number.  find the numeric suffix of the animation.
 	len = alias.Length();
 	for ( i = len - 1; i > 0; i-- ) {
-		if ( !isdigit( (unsigned char)alias[ i ] ) ) {
+		if ( !isdigit( (unsigned char)alias[i] ) ) {
 			break;
 		}
 	}
@@ -2607,7 +2607,7 @@ bool arcDeclModelDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 				framenum = token.GetIntValue();
 
 				// put the command on the specified frame of the animation
-				err = anim->AddFrameCommand( this, framenum, src, NULL );
+				err = anim->AddFrameCommand( this, framenum, src, nullptr );
 				if ( err ) {
 					src.Warning( "%s", err );
 					MakeDefault();
@@ -2634,17 +2634,17 @@ arcDeclModelDef::Parse
 bool arcDeclModelDef::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
 	int					i;
 	int					num;
-	arcNetString				filename;
-	arcNetString				extension;
+	anString				filename;
+	anString				extension;
 	const idMD5Joint	*md5joint;
 	const idMD5Joint	*md5joints;
-	idLexer				src;
-	arcNetToken				token;
-	arcNetToken				token2;
-	arcNetString				jointnames;
+	anLexer				src;
+	anToken				token;
+	anToken				token2;
+	anString				jointnames;
 	int					channel;
 	jointHandle_t		jointnum;
-	arcNetList<jointHandle_t> jointList;
+	anList<jointHandle_t> jointList;
 	int					numDefaultAnims;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
@@ -2750,8 +2750,8 @@ bool arcDeclModelDef::Parse( const char *text, const int textLength, bool allowB
 			}
 			num = 0;
 			for ( i = 0; i < anims.Num(); i++ ) {
-				if ( ( token2 == anims[ i ]->Name() ) || ( token2 == anims[ i ]->FullName() ) ) {
-					delete anims[ i ];
+				if ( ( token2 == anims[i]->Name() ) || ( token2 == anims[i]->FullName() ) ) {
+					delete anims[i];
 					anims.RemoveIndex( i );
 					if ( i >= numDefaultAnims ) {
 						src.Warning( "Anim '%s' was not inherited.  Anim should be removed from the model def.", token2.c_str() );
@@ -2798,14 +2798,14 @@ bool arcDeclModelDef::Parse( const char *text, const int textLength, bool allowB
 				MakeDefault();
 				return false;
 			}
-			if ( !src.CheckTokenString( "(" ) ) {
+			if ( !src.CheckTokenString( "( " ) ) {
 				src.Warning( "Expected { after '%s'\n", token2.c_str() );
 				MakeDefault();
 				return false;
 			}
 
 			for ( i = ANIMCHANNEL_ALL + 1; i < ANIM_NumAnimChannels; i++ ) {
-				if ( !arcNetString::Icmp( channelNames[ i ], token2 ) ) {
+				if ( !anString::Icmp( channelNames[i], token2 ) ) {
 					break;
 				}
 			}
@@ -2819,7 +2819,7 @@ bool arcDeclModelDef::Parse( const char *text, const int textLength, bool allowB
 			channel = i;
 			jointnames = "";
 
-			while( !src.CheckTokenString( ")" ) ) {
+			while( !src.CheckTokenString( " )" ) ) {
 				if ( !src.ReadToken( &token2 ) ) {
 					src.Warning( "Unexpected end of file" );
 					MakeDefault();
@@ -2835,7 +2835,7 @@ bool arcDeclModelDef::Parse( const char *text, const int textLength, bool allowB
 
 			channelJoints[ channel ].SetNum( jointList.Num() );
 			for ( num = i = 0; i < jointList.Num(); i++ ) {
-				jointnum = jointList[ i ];
+				jointnum = jointList[i];
 				if ( joints[ jointnum ].channel != ANIMCHANNEL_ALL ) {
 					src.Warning( "Joint '%s' assigned to multiple channels", modelHandle->GetJointName( jointnum ) );
 					continue;
@@ -2868,7 +2868,7 @@ bool arcDeclModelDef::HasAnim( const char *name ) const {
 
 	// find any animations with same name
 	for ( i = 0; i < anims.Num(); i++ ) {
-		if ( !strcmp( anims[ i ]->Name(), name ) ) {
+		if ( !strcmp( anims[i]->Name(), name ) ) {
 			return true;
 		}
 	}
@@ -2897,7 +2897,7 @@ int arcDeclModelDef::GetSpecificAnim( const char *name ) const {
 
 	// find a specific animation
 	for ( i = 0; i < anims.Num(); i++ ) {
-		if ( !strcmp( anims[ i ]->FullName(), name ) ) {
+		if ( !strcmp( anims[i]->FullName(), name ) ) {
 			return i + 1;
 		}
 	}
@@ -2913,7 +2913,7 @@ arcDeclModelDef::GetAnim
 */
 const arcAnim *arcDeclModelDef::GetAnim( int index ) const {
 	if ( ( index < 1 ) || ( index > anims.Num() ) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	return anims[ index - 1 ];
@@ -2933,7 +2933,7 @@ int arcDeclModelDef::GetAnim( const char *name ) const {
 	int				len;
 
 	len = strlen( name );
-	if ( len && arcNetString::CharIsNumeric( name[ len - 1 ] ) ) {
+	if ( len && anString::CharIsNumeric( name[ len - 1 ] ) ) {
 		// find a specific animation
 		return GetSpecificAnim( name );
 	}
@@ -2941,7 +2941,7 @@ int arcDeclModelDef::GetAnim( const char *name ) const {
 	// find all animations with same name
 	numAnims = 0;
 	for ( i = 0; i < anims.Num(); i++ ) {
-		if ( !strcmp( anims[ i ]->Name(), name ) ) {
+		if ( !strcmp( anims[i]->Name(), name ) ) {
 			animList[ numAnims++ ] = i;
 			if ( numAnims >= MAX_ANIMS ) {
 				break;
@@ -2964,7 +2964,7 @@ int arcDeclModelDef::GetAnim( const char *name ) const {
 arcDeclModelDef::GetSkin
 =====================
 */
-const arcDeclSkin *arcDeclModelDef::GetSkin() const {
+const anDeclSkin *arcDeclModelDef::GetSkin() const {
 	return skin;
 }
 
@@ -2986,7 +2986,7 @@ const char *arcDeclModelDef::GetModelName() const {
 arcDeclModelDef::Joints
 =====================
 */
-const arcNetList<jointInfo_t> &arcDeclModelDef::Joints() const {
+const anList<jointInfo_t> &arcDeclModelDef::Joints() const {
 	return joints;
 }
 
@@ -3029,7 +3029,7 @@ const char *arcDeclModelDef::GetJointName( int jointHandle ) const {
 	const idMD5Joint *joint;
 
 	if ( !modelHandle ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( ( jointHandle < 0 ) || ( jointHandle > joints.Num() ) ) {
@@ -3061,7 +3061,7 @@ arcDeclModelDef::GetChannelJoints
 const int * arcDeclModelDef::GetChannelJoints( int channel ) const {
 	if ( ( channel < 0 ) || ( channel >= ANIM_NumAnimChannels ) ) {
 		gameLocal.Error( "arcDeclModelDef::GetChannelJoints : channel out of range" );
-		return NULL;
+		return nullptr;
 	}
 	return channelJoints[ channel ].Ptr();
 }
@@ -3071,7 +3071,7 @@ const int * arcDeclModelDef::GetChannelJoints( int channel ) const {
 arcDeclModelDef::GetVisualOffset
 =====================
 */
-const arcVec3 &arcDeclModelDef::GetVisualOffset() const {
+const anVec3 &arcDeclModelDef::GetVisualOffset() const {
 	return offset;
 }
 
@@ -3089,10 +3089,10 @@ arcAnimator::arcAnimator
 arcAnimator::arcAnimator() {
 	int	i, j;
 
-	modelDef				= NULL;
-	entity					= NULL;
+	modelDef				= nullptr;
+	entity					= nullptr;
 	numJoints				= 0;
-	joints					= NULL;
+	joints					= nullptr;
 	lastTransformTime		= -1;
 	stoppedAnimatingUpdate	= false;
 	removeOriginOffset		= false;
@@ -3108,7 +3108,7 @@ arcAnimator::arcAnimator() {
 
 	for ( i = ANIMCHANNEL_ALL; i < ANIM_NumAnimChannels; i++ ) {
 		for ( j = 0; j < ANIM_MaxAnimsPerChannel; j++ ) {
-			channels[ i ][ j ].Reset( NULL );
+			channels[i][ j ].Reset( nullptr );
 		}
 	}
 }
@@ -3151,11 +3151,11 @@ void arcAnimator::Save( arcSaveGame *savefile ) const {
 
 	savefile->WriteInt( jointMods.Num() );
 	for ( i = 0; i < jointMods.Num(); i++ ) {
-		savefile->WriteInt( jointMods[ i ]->jointnum );
-		savefile->WriteMat3( jointMods[ i ]->mat );
-		savefile->WriteVec3( jointMods[ i ]->pos );
-		savefile->WriteInt( (int&)jointMods[ i ]->transform_pos );
-		savefile->WriteInt( (int&)jointMods[ i ]->transform_axis );
+		savefile->WriteInt( jointMods[i]->jointnum );
+		savefile->WriteMat3( jointMods[i]->mat );
+		savefile->WriteVec3( jointMods[i]->pos );
+		savefile->WriteInt( (int&)jointMods[i]->transform_pos );
+		savefile->WriteInt( (int&)jointMods[i]->transform_axis );
 	}
 
 	savefile->WriteInt( numJoints );
@@ -3201,7 +3201,7 @@ void arcAnimator::Save( arcSaveGame *savefile ) const {
 
 	for ( i = ANIMCHANNEL_ALL; i < ANIM_NumAnimChannels; i++ ) {
 		for ( j = 0; j < ANIM_MaxAnimsPerChannel; j++ ) {
-			channels[ i ][ j ].Save( savefile );
+			channels[i][ j ].Save( savefile );
 		}
 	}
 }
@@ -3219,21 +3219,21 @@ void arcAnimator::Restore( arcRestoreGame *savefile ) {
 	int num;
 
 	savefile->ReadModelDef( modelDef );
-	savefile->ReadObject( reinterpret_cast<idClass *&>( entity ) );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( entity ) );
 
 	savefile->ReadInt( num );
 	jointMods.SetNum( num );
 	for ( i = 0; i < num; i++ ) {
-		jointMods[ i ] = new (TAG_ANIM) jointMod_t;
-		savefile->ReadInt( (int&)jointMods[ i ]->jointnum );
-		savefile->ReadMat3( jointMods[ i ]->mat );
-		savefile->ReadVec3( jointMods[ i ]->pos );
-		savefile->ReadInt( (int&)jointMods[ i ]->transform_pos );
-		savefile->ReadInt( (int&)jointMods[ i ]->transform_axis );
+		jointMods[i] = new (TAG_ANIM) jointMod_t;
+		savefile->ReadInt( (int&)jointMods[i]->jointnum );
+		savefile->ReadMat3( jointMods[i]->mat );
+		savefile->ReadVec3( jointMods[i]->pos );
+		savefile->ReadInt( (int&)jointMods[i]->transform_pos );
+		savefile->ReadInt( (int&)jointMods[i]->transform_axis );
 	}
 
 	savefile->ReadInt( numJoints );
-	joints = (idJointMat *) Mem_Alloc16( SIMD_ROUND_JOINTS( numJoints ) * sizeof( joints[0] ), TAG_JOINTMAT );
+	joints = (anJointMat *) Mem_Alloc16( SIMD_ROUND_JOINTS( numJoints ) * sizeof( joints[0] ), TAG_JOINTMAT );
 	for ( i = 0; i < numJoints; i++ ) {
 		float *data = joints[i].ToFloatPtr();
 		for ( j = 0; j < 12; j++ ) {
@@ -3283,7 +3283,7 @@ void arcAnimator::Restore( arcRestoreGame *savefile ) {
 
 	for ( i = ANIMCHANNEL_ALL; i < ANIM_NumAnimChannels; i++ ) {
 		for ( j = 0; j < ANIM_MaxAnimsPerChannel; j++ ) {
-			channels[ i ][ j ].Restore( savefile, modelDef );
+			channels[i][ j ].Restore( savefile, modelDef );
 		}
 	}
 }
@@ -3302,17 +3302,17 @@ void arcAnimator::FreeData() {
 
 	for ( i = ANIMCHANNEL_ALL; i < ANIM_NumAnimChannels; i++ ) {
 		for ( j = 0; j < ANIM_MaxAnimsPerChannel; j++ ) {
-			channels[ i ][ j ].Reset( NULL );
+			channels[i][ j ].Reset( nullptr );
 		}
 	}
 
 	jointMods.DeleteContents( true );
 
 	Mem_Free16( joints );
-	joints = NULL;
+	joints = nullptr;
 	numJoints = 0;
 
-	modelDef = NULL;
+	modelDef = nullptr;
 
 	ForceUpdate();
 }
@@ -3332,7 +3332,7 @@ void arcAnimator::PushAnims( int channelNum, int currentTime, int blendTime ) {
 	}
 
 	for ( i = ANIM_MaxAnimsPerChannel - 1; i > 0; i-- ) {
-		channel[ i ] = channel[ i - 1 ];
+		channel[i] = channel[ i - 1 ];
 	}
 
 	channel[ 0 ].Reset( modelDef );
@@ -3345,25 +3345,25 @@ void arcAnimator::PushAnims( int channelNum, int currentTime, int blendTime ) {
 arcAnimator::SetModel
 =====================
 */
-idRenderModel *arcAnimator::SetModel( const char *modelname ) {
+anRenderModel *arcAnimator::SetModel( const char *modelname ) {
 	int i, j;
 
 	FreeData();
 
 	// check if we're just clearing the model
 	if ( !modelname || !*modelname ) {
-		return NULL;
+		return nullptr;
 	}
 
 	modelDef = static_cast<const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelname, false ) );
 	if ( !modelDef ) {
-		return NULL;
+		return nullptr;
 	}
 
-	idRenderModel *renderModel = modelDef->ModelHandle();
+	anRenderModel *renderModel = modelDef->ModelHandle();
 	if ( !renderModel ) {
-		modelDef = NULL;
-		return NULL;
+		modelDef = nullptr;
+		return nullptr;
 	}
 
 	// make sure model hasn't been purged
@@ -3375,7 +3375,7 @@ idRenderModel *arcAnimator::SetModel( const char *modelname ) {
 	// set the modelDef on all channels
 	for ( i = ANIMCHANNEL_ALL; i < ANIM_NumAnimChannels; i++ ) {
 		for ( j = 0; j < ANIM_MaxAnimsPerChannel; j++ ) {
-			channels[ i ][ j ].Reset( modelDef );
+			channels[i][ j ].Reset( modelDef );
 		}
 	}
 
@@ -3432,7 +3432,7 @@ bool arcAnimator::RemoveOrigin() const {
 arcAnimator::GetJointList
 =====================
 */
-void arcAnimator::GetJointList( const char *jointnames, arcNetList<jointHandle_t> &jointList ) const {
+void arcAnimator::GetJointList( const char *jointnames, anList<jointHandle_t> &jointList ) const {
 	if ( modelDef ) {
 		modelDef->GetJointList( jointnames, jointList );
 	}
@@ -3458,7 +3458,7 @@ arcAnimator::GetAnim
 */
 const arcAnim *arcAnimator::GetAnim( int index ) const {
 	if ( !modelDef ) {
-		return NULL;
+		return nullptr;
 	}
 
 	return modelDef->GetAnim( index );
@@ -3504,9 +3504,9 @@ int	arcAnimator::NumJoints() const {
 arcAnimator::ModelHandle
 =====================
 */
-idRenderModel *arcAnimator::ModelHandle() const {
+anRenderModel *arcAnimator::ModelHandle() const {
 	if ( !modelDef ) {
-		return NULL;
+		return nullptr;
 	}
 
 	return modelDef->ModelHandle();
@@ -3529,7 +3529,7 @@ arcAnimator::CurrentAnim
 arcAnimBlend *arcAnimator::CurrentAnim( int channelNum ) {
 	if ( ( channelNum < 0 ) || ( channelNum >= ANIM_NumAnimChannels ) ) {
 		gameLocal.Error( "arcAnimator::CurrentAnim : channel out of range" );
-		return NULL;
+		return nullptr;
 	}
 
 	return &channels[ channelNum ][ 0 ];
@@ -3655,7 +3655,7 @@ void arcAnimator::SyncAnimChannels( int channelNum, int fromChannelNum, int curr
 arcAnimator::SetJointPos
 =====================
 */
-void arcAnimator::SetJointPos( jointHandle_t jointnum, jointModTransform_t transform_type, const arcVec3 &pos ) {
+void arcAnimator::SetJointPos( jointHandle_t jointnum, jointModTransform_t transform_type, const anVec3 &pos ) {
 	int i;
 	jointMod_t *jointMod;
 
@@ -3663,12 +3663,12 @@ void arcAnimator::SetJointPos( jointHandle_t jointnum, jointModTransform_t trans
 		return;
 	}
 
-	jointMod = NULL;
+	jointMod = nullptr;
 	for ( i = 0; i < jointMods.Num(); i++ ) {
-		if ( jointMods[ i ]->jointnum == jointnum ) {
-			jointMod = jointMods[ i ];
+		if ( jointMods[i]->jointnum == jointnum ) {
+			jointMod = jointMods[i];
 			break;
-		} else if ( jointMods[ i ]->jointnum > jointnum ) {
+		} else if ( jointMods[i]->jointnum > jointnum ) {
 			break;
 		}
 	}
@@ -3695,7 +3695,7 @@ void arcAnimator::SetJointPos( jointHandle_t jointnum, jointModTransform_t trans
 arcAnimator::SetJointAxis
 =====================
 */
-void arcAnimator::SetJointAxis( jointHandle_t jointnum, jointModTransform_t transform_type, const arcMat3 &mat ) {
+void arcAnimator::SetJointAxis( jointHandle_t jointnum, jointModTransform_t transform_type, const anMat3 &mat ) {
 	int i;
 	jointMod_t *jointMod;
 
@@ -3703,12 +3703,12 @@ void arcAnimator::SetJointAxis( jointHandle_t jointnum, jointModTransform_t tran
 		return;
 	}
 
-	jointMod = NULL;
+	jointMod = nullptr;
 	for ( i = 0; i < jointMods.Num(); i++ ) {
-		if ( jointMods[ i ]->jointnum == jointnum ) {
-			jointMod = jointMods[ i ];
+		if ( jointMods[i]->jointnum == jointnum ) {
+			jointMod = jointMods[i];
 			break;
-		} else if ( jointMods[ i ]->jointnum > jointnum ) {
+		} else if ( jointMods[i]->jointnum > jointnum ) {
 			break;
 		}
 	}
@@ -3743,12 +3743,12 @@ void arcAnimator::ClearJoint( jointHandle_t jointnum ) {
 	}
 
 	for ( i = 0; i < jointMods.Num(); i++ ) {
-		if ( jointMods[ i ]->jointnum == jointnum ) {
-			delete jointMods[ i ];
+		if ( jointMods[i]->jointnum == jointnum ) {
+			delete jointMods[i];
 			jointMods.RemoveIndex( i );
 			ForceUpdate();
 			break;
-		} else if ( jointMods[ i ]->jointnum > jointnum ) {
+		} else if ( jointMods[i]->jointnum > jointnum ) {
 			break;
 		}
 	}
@@ -3787,7 +3787,7 @@ void arcAnimator::ClearAllAnims( int currentTime, int cleartime ) {
 arcAnimator::GetDelta
 ====================
 */
-void arcAnimator::GetDelta( int fromtime, int totime, arcVec3 &delta ) const {
+void arcAnimator::GetDelta( int fromtime, int totime, anVec3 &delta ) const {
 	int					i;
 	const arcAnimBlend	*blend;
 	float				blendWeight;
@@ -3818,7 +3818,7 @@ void arcAnimator::GetDelta( int fromtime, int totime, arcVec3 &delta ) const {
 arcAnimator::GetDeltaRotation
 ====================
 */
-bool arcAnimator::GetDeltaRotation( int fromtime, int totime, arcMat3 &delta ) const {
+bool arcAnimator::GetDeltaRotation( int fromtime, int totime, anMat3 &delta ) const {
 	int					i;
 	const arcAnimBlend	*blend;
 	float				blendWeight;
@@ -3858,7 +3858,7 @@ bool arcAnimator::GetDeltaRotation( int fromtime, int totime, arcMat3 &delta ) c
 arcAnimator::GetOrigin
 ====================
 */
-void arcAnimator::GetOrigin( int currentTime, arcVec3 &pos ) const {
+void arcAnimator::GetOrigin( int currentTime, anVec3 &pos ) const {
 	int					i;
 	const arcAnimBlend	*blend;
 	float				blendWeight;
@@ -3891,7 +3891,7 @@ void arcAnimator::GetOrigin( int currentTime, arcVec3 &pos ) const {
 arcAnimator::GetBounds
 ====================
 */
-bool arcAnimator::GetBounds( int currentTime, arcBounds &bounds ) {
+bool arcAnimator::GetBounds( int currentTime, anBounds &bounds ) {
 	int					i, j;
 	const arcAnimBlend	*blend;
 	int					count;
@@ -3966,12 +3966,12 @@ void arcAnimator::InitAFPose() {
 arcAnimator::SetAFPoseJointMod
 =====================
 */
-void arcAnimator::SetAFPoseJointMod( const jointHandle_t jointNum, const AFJointModType_t mod, const arcMat3 &axis, const arcVec3 &origin ) {
+void arcAnimator::SetAFPoseJointMod( const jointHandle_t jointNum, const AFJointModType_t mod, const anMat3 &axis, const anVec3 &origin ) {
 	AFPoseJointMods[jointNum].mod = mod;
 	AFPoseJointMods[jointNum].axis = axis;
 	AFPoseJointMods[jointNum].origin = origin;
 
-	int index = idBinSearch_GreaterEqual<int>( AFPoseJoints.Ptr(), AFPoseJoints.Num(), jointNum );
+	int index = BinSearch_GreaterEqual<int>( AFPoseJoints.Ptr(), AFPoseJoints.Num(), jointNum );
 	if ( index >= AFPoseJoints.Num() || jointNum != AFPoseJoints[index] ) {
 		AFPoseJoints.Insert( jointNum, index );
 	}
@@ -3982,7 +3982,7 @@ void arcAnimator::SetAFPoseJointMod( const jointHandle_t jointNum, const AFJoint
 arcAnimator::FinishAFPose
 =====================
 */
-void arcAnimator::FinishAFPose( int animNum, const arcBounds &bounds, const int time ) {
+void arcAnimator::FinishAFPose( int animNum, const anBounds &bounds, const int time ) {
 	int					i, j;
 	int					numJoints;
 	int					parentNum;
@@ -4004,15 +4004,15 @@ void arcAnimator::FinishAFPose( int animNum, const arcBounds &bounds, const int 
 		return;
 	}
 
-	idRenderModel		*md5 = modelDef->ModelHandle();
-	const idMD5Anim		*md5anim = anim->MD5Anim( 0 );
+	anRenderModel		*md5 = modelDef->ModelHandle();
+	const anM8DAnim		*md5anim = anim->MD5Anim( 0 );
 
 	if ( numJoints != md5anim->NumJoints() ) {
 		gameLocal.Warning( "Model '%s' has different # of joints than anim '%s'", md5->Name(), md5anim->Name() );
 		return;
 	}
 
-	idJointQuat *jointFrame = ( idJointQuat * )_alloca16( numJoints * sizeof( *jointFrame ) );
+	anJointQuat *jointFrame = ( anJointQuat * )_alloca16( numJoints * sizeof( *jointFrame ) );
 	md5anim->GetSingleFrame( 0, jointFrame, modelDef->GetChannelJoints( ANIMCHANNEL_ALL ), modelDef->NumJointsOnChannel( ANIMCHANNEL_ALL ) );
 
 	if ( removeOriginOffset ) {
@@ -4023,14 +4023,14 @@ void arcAnimator::FinishAFPose( int animNum, const arcBounds &bounds, const int 
 #endif
 	}
 
-	idJointMat *joints = ( idJointMat * )_alloca16( numJoints * sizeof( *joints ) );
+	anJointMat *joints = ( anJointMat * )_alloca16( numJoints * sizeof( *joints ) );
 
 	// convert the joint quaternions to joint matrices
 	SIMDProcessor->ConvertJointQuatsToJointMats( joints, jointFrame, numJoints );
 
 	// first joint is always root of entire hierarchy
 	if ( AFPoseJoints.Num() && AFPoseJoints[0] == 0 ) {
-		switch( AFPoseJointMods[0].mod ) {
+		switch ( AFPoseJointMods[0].mod ) {
 			case AF_JOINTMOD_AXIS: {
 				joints[0].SetRotation( AFPoseJointMods[0].axis );
 				break;
@@ -4063,7 +4063,7 @@ void arcAnimator::FinishAFPose( int animNum, const arcBounds &bounds, const int 
 
 		parentNum = jointParent[i];
 
-		switch( AFPoseJointMods[jointMod].mod ) {
+		switch ( AFPoseJointMods[jointMod].mod ) {
 			case AF_JOINTMOD_AXIS: {
 				joints[i].SetRotation( AFPoseJointMods[jointMod].axis );
 				joints[i].SetTranslation( joints[parentNum].ToVec3() + joints[i].ToVec3() * joints[parentNum].ToMat3() );
@@ -4130,7 +4130,7 @@ void arcAnimator::SetAFPoseBlendWeight( float blendWeight ) {
 arcAnimator::BlendAFPose
 =====================
 */
-bool arcAnimator::BlendAFPose( idJointQuat *blendFrame ) const {
+bool arcAnimator::BlendAFPose( anJointQuat *blendFrame ) const {
 
 	if ( !AFPoseJoints.Num() ) {
 		return false;
@@ -4269,9 +4269,9 @@ bool arcAnimator::CreateFrame( int currentTime, bool force ) {
 	const arcAnimBlend *	blend;
 	const int *			jointParent;
 	const jointMod_t *	jointMod;
-	const idJointQuat *	defaultPose;
+	const anJointQuat *	defaultPose;
 
-	static idCVar		r_showSkel( "r_showSkel", "0", CVAR_RENDERER | CVAR_INTEGER, "", 0, 2, idCmdSystem::ArgCompletion_Integer<0,2> );
+	static anCVar		r_showSkel( "r_showSkel", "0", CVAR_RENDERER | CVAR_INTEGER, "", 0, 2, idCmdSystem::ArgCompletion_Integer<0,2> );
 
 	if ( !modelDef || !modelDef->ModelHandle() ) {
 		return false;
@@ -4311,7 +4311,7 @@ bool arcAnimator::CreateFrame( int currentTime, bool force ) {
 	}
 
 	numJoints = modelDef->Joints().Num();
-	idJointQuat *jointFrame = ( idJointQuat * )_alloca16( numJoints * sizeof( jointFrame[0] ) );
+	anJointQuat *jointFrame = ( anJointQuat * )_alloca16( numJoints * sizeof( jointFrame[0] ) );
 	SIMDProcessor->Memcpy( jointFrame, defaultPose, numJoints * sizeof( jointFrame[0] ) );
 
 	hasAnim = false;
@@ -4339,7 +4339,7 @@ bool arcAnimator::CreateFrame( int currentTime, bool force ) {
 				continue;
 			}
 			blendWeight = baseBlend;
-			blend = channels[ i ];
+			blend = channels[i];
 			for ( j = 0; j < ANIM_MaxAnimsPerChannel; j++, blend++ ) {
 				if ( blend->BlendAnim( currentTime, i, numJoints, jointFrame, blendWeight, removeOriginOffset, false, debugInfo ) ) {
 					hasAnim = true;
@@ -4351,7 +4351,7 @@ bool arcAnimator::CreateFrame( int currentTime, bool force ) {
 			}
 
 			if ( debugInfo && !AFPoseJoints.Num() && !blendWeight ) {
-				gameLocal.Printf( "%d: %s using default pose in model '%s'\n", gameLocal.time, channelNames[ i ], modelDef->GetModelName() );
+				gameLocal.Printf( "%d: %s using default pose in model '%s'\n", gameLocal.time, channelNames[i], modelDef->GetModelName() );
 			}
 		}
 	}
@@ -4388,7 +4388,7 @@ bool arcAnimator::CreateFrame( int currentTime, bool force ) {
 	if ( jointMods.Num() && ( jointMods[0]->jointnum == 0 ) ) {
 		jointMod = jointMods[0];
 
-		switch( jointMod->transform_axis ) {
+		switch ( jointMod->transform_axis ) {
 			case JOINTMOD_NONE:
 				break;
 
@@ -4406,7 +4406,7 @@ bool arcAnimator::CreateFrame( int currentTime, bool force ) {
 				break;
 		}
 
-		switch( jointMod->transform_pos ) {
+		switch ( jointMod->transform_pos ) {
 			case JOINTMOD_NONE:
 				break;
 
@@ -4442,7 +4442,7 @@ bool arcAnimator::CreateFrame( int currentTime, bool force ) {
 		parentNum = jointParent[i];
 
 		// modify the axis
-		switch( jointMod->transform_axis ) {
+		switch ( jointMod->transform_axis ) {
 			case JOINTMOD_NONE:
 				joints[i].SetRotation( joints[i].ToMat3() * joints[ parentNum ].ToMat3() );
 				break;
@@ -4465,7 +4465,7 @@ bool arcAnimator::CreateFrame( int currentTime, bool force ) {
 		}
 
 		// modify the position
-		switch( jointMod->transform_pos ) {
+		switch ( jointMod->transform_pos ) {
 			case JOINTMOD_NONE:
 				joints[i].SetTranslation( joints[parentNum].ToVec3() + joints[i].ToVec3() * joints[parentNum].ToMat3() );
 				break;
@@ -4519,7 +4519,7 @@ arcAnimator::GetJointTransform>	gamex86.dll!arcAnimator::ForceUpdate()  Line 426
 
 =====================
 */
-bool arcAnimator::GetJointTransform( jointHandle_t jointHandle, int currentTime, arcVec3 &offset, arcMat3 &axis ) {
+bool arcAnimator::GetJointTransform( jointHandle_t jointHandle, int currentTime, anVec3 &offset, anMat3 &axis ) {
 	if ( !modelDef || ( jointHandle < 0 ) || ( jointHandle >= modelDef->NumJoints() ) ) {
 		return false;
 	}
@@ -4537,12 +4537,12 @@ bool arcAnimator::GetJointTransform( jointHandle_t jointHandle, int currentTime,
 arcAnimator::GetJointLocalTransform
 =====================
 */
-bool arcAnimator::GetJointLocalTransform( jointHandle_t jointHandle, int currentTime, arcVec3 &offset, arcMat3 &axis ) {
+bool arcAnimator::GetJointLocalTransform( jointHandle_t jointHandle, int currentTime, anVec3 &offset, anMat3 &axis ) {
 	if ( !modelDef ) {
 		return false;
 	}
 
-	const arcNetList<jointInfo_t> &modelJoints = modelDef->Joints();
+	const anList<jointInfo_t> &modelJoints = modelDef->Joints();
 
 	if ( ( jointHandle < 0 ) || ( jointHandle >= modelJoints.Num() ) ) {
 		return false;
@@ -4552,7 +4552,7 @@ bool arcAnimator::GetJointLocalTransform( jointHandle_t jointHandle, int current
 	CreateFrame( currentTime, false );
 
 	if ( jointHandle > 0 ) {
-		idJointMat m = joints[ jointHandle ];
+		anJointMat m = joints[ jointHandle ];
 		m /= joints[ modelJoints[ jointHandle ].parentNum ];
 		offset = m.ToVec3();
 		axis = m.ToMat3();
@@ -4597,7 +4597,7 @@ arcAnimator::GetChannelForJoint
 */
 int arcAnimator::GetChannelForJoint( jointHandle_t joint ) const {
 	if ( !modelDef ) {
-		gameLocal.Error( "arcAnimator::GetChannelForJoint: NULL model" );
+		gameLocal.Error( "arcAnimator::GetChannelForJoint: nullptr model" );
 		return -1;
 	}
 
@@ -4650,7 +4650,7 @@ jointHandle_t arcAnimator::GetFirstChild( jointHandle_t jointnum ) const {
 arcAnimator::GetJoints
 =====================
 */
-void arcAnimator::GetJoints( int *numJoints, idJointMat **jointsPtr ) {
+void arcAnimator::GetJoints( int *numJoints, anJointMat **jointsPtr ) {
 	*numJoints = this->numJoints;
 	*jointsPtr = this->joints;
 }
@@ -4747,7 +4747,7 @@ int	arcAnimator::AnimLength( int animNum ) const {
 arcAnimator::TotalMovementDelta
 =====================
 */
-const arcVec3 &arcAnimator::TotalMovementDelta( int animNum ) const {
+const anVec3 &arcAnimator::TotalMovementDelta( int animNum ) const {
 	const arcAnim *anim = GetAnim( animNum );
 	if ( anim ) {
 		return anim->TotalMovementDelta();
@@ -4767,41 +4767,41 @@ const arcVec3 &arcAnimator::TotalMovementDelta( int animNum ) const {
 ANIM_GetModelDefFromEntityDef
 =====================
 */
-const arcDeclModelDef *ANIM_GetModelDefFromEntityDef( const arcDict *args ) {
+const arcDeclModelDef *ANIM_GetModelDefFromEntityDef( const anDict *args ) {
 	const arcDeclModelDef *modelDef;
 
-	arcNetString name = args->GetString( "model" );
+	anString name = args->GetString( "model" );
 	modelDef = static_cast<const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, name, false ) );
-	if ( modelDef != NULL && modelDef->ModelHandle() ) {
+	if ( modelDef != nullptr && modelDef->ModelHandle() ) {
 		return modelDef;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
 =====================
-idGameEdit::ANIM_GetModelFromEntityDef
+anGameEdit::ANIM_GetModelFromEntityDef
 =====================
 */
-idRenderModel *idGameEdit::ANIM_GetModelFromEntityDef( const arcDict *args ) {
-	idRenderModel *model;
+anRenderModel *anGameEdit::ANIM_GetModelFromEntityDef( const anDict *args ) {
+	anRenderModel *model;
 	const arcDeclModelDef *modelDef;
 
-	model = NULL;
+	model = nullptr;
 
-	arcNetString name = args->GetString( "model" );
+	anString name = args->GetString( "model" );
 	modelDef = static_cast<const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, name, false ) );
-	if ( modelDef != NULL ) {
+	if ( modelDef != nullptr ) {
 		model = modelDef->ModelHandle();
 	}
 
-	if ( model == NULL ) {
+	if ( model == nullptr ) {
 		model = renderModelManager->FindModel( name );
 	}
 
-	if ( model != NULL && model->IsDefaultModel() ) {
-		return NULL;
+	if ( model != nullptr && model->IsDefaultModel() ) {
+		return nullptr;
 	}
 
 	return model;
@@ -4809,15 +4809,15 @@ idRenderModel *idGameEdit::ANIM_GetModelFromEntityDef( const arcDict *args ) {
 
 /*
 =====================
-idGameEdit::ANIM_GetModelFromEntityDef
+anGameEdit::ANIM_GetModelFromEntityDef
 =====================
 */
-idRenderModel *idGameEdit::ANIM_GetModelFromEntityDef( const char *classname ) {
-	const arcDict *args;
+anRenderModel *anGameEdit::ANIM_GetModelFromEntityDef( const char *classname ) {
+	const anDict *args;
 
 	args = gameLocal.FindEntityDefDict( classname, false );
 	if ( !args ) {
-		return NULL;
+		return nullptr;
 	}
 
 	return ANIM_GetModelFromEntityDef( args );
@@ -4825,11 +4825,11 @@ idRenderModel *idGameEdit::ANIM_GetModelFromEntityDef( const char *classname ) {
 
 /*
 =====================
-idGameEdit::ANIM_GetModelOffsetFromEntityDef
+anGameEdit::ANIM_GetModelOffsetFromEntityDef
 =====================
 */
-const arcVec3 &idGameEdit::ANIM_GetModelOffsetFromEntityDef( const char *classname ) {
-	const arcDict *args;
+const anVec3 &anGameEdit::ANIM_GetModelOffsetFromEntityDef( const char *classname ) {
+	const anDict *args;
 	const arcDeclModelDef *modelDef;
 
 	args = gameLocal.FindEntityDefDict( classname, false );
@@ -4847,14 +4847,14 @@ const arcVec3 &idGameEdit::ANIM_GetModelOffsetFromEntityDef( const char *classna
 
 /*
 =====================
-idGameEdit::ANIM_GetModelFromName
+anGameEdit::ANIM_GetModelFromName
 =====================
 */
-idRenderModel *idGameEdit::ANIM_GetModelFromName( const char *modelName ) {
+anRenderModel *anGameEdit::ANIM_GetModelFromName( const char *modelName ) {
 	const arcDeclModelDef *modelDef;
-	idRenderModel *model;
+	anRenderModel *model;
 
-	model = NULL;
+	model = nullptr;
 	modelDef = static_cast<const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelName, false ) );
 	if ( modelDef ) {
 		model = modelDef->ModelHandle();
@@ -4867,12 +4867,12 @@ idRenderModel *idGameEdit::ANIM_GetModelFromName( const char *modelName ) {
 
 /*
 =====================
-idGameEdit::ANIM_GetAnimFromEntityDef
+anGameEdit::ANIM_GetAnimFromEntityDef
 =====================
 */
-const idMD5Anim *idGameEdit::ANIM_GetAnimFromEntityDef( const char *classname, const char *animname ) {
-	const arcDict *args;
-	const idMD5Anim *md5anim;
+const anM8DAnim *anGameEdit::ANIM_GetAnimFromEntityDef( const char *classname, const char *animname ) {
+	const anDict *args;
+	const anM8DAnim *md5anim;
 	const arcAnim *anim;
 	int	animNum;
 	const char	*modelname;
@@ -4880,10 +4880,10 @@ const idMD5Anim *idGameEdit::ANIM_GetAnimFromEntityDef( const char *classname, c
 
 	args = gameLocal.FindEntityDefDict( classname, false );
 	if ( !args ) {
-		return NULL;
+		return nullptr;
 	}
 
-	md5anim = NULL;
+	md5anim = nullptr;
 	modelname = args->GetString( "model" );
 	modelDef = static_cast<const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelname, false ) );
 	if ( modelDef ) {
@@ -4900,10 +4900,10 @@ const idMD5Anim *idGameEdit::ANIM_GetAnimFromEntityDef( const char *classname, c
 
 /*
 =====================
-idGameEdit::ANIM_GetNumAnimsFromEntityDef
+anGameEdit::ANIM_GetNumAnimsFromEntityDef
 =====================
 */
-int idGameEdit::ANIM_GetNumAnimsFromEntityDef( const arcDict *args ) {
+int anGameEdit::ANIM_GetNumAnimsFromEntityDef( const anDict *args ) {
 	const char *modelname;
 	const arcDeclModelDef *modelDef;
 
@@ -4917,10 +4917,10 @@ int idGameEdit::ANIM_GetNumAnimsFromEntityDef( const arcDict *args ) {
 
 /*
 =====================
-idGameEdit::ANIM_GetAnimNameFromEntityDef
+anGameEdit::ANIM_GetAnimNameFromEntityDef
 =====================
 */
-const char *idGameEdit::ANIM_GetAnimNameFromEntityDef( const arcDict *args, int animNum ) {
+const char *anGameEdit::ANIM_GetAnimNameFromEntityDef( const anDict *args, int animNum ) {
 	const char *modelname;
 	const arcDeclModelDef *modelDef;
 
@@ -4937,19 +4937,19 @@ const char *idGameEdit::ANIM_GetAnimNameFromEntityDef( const arcDict *args, int 
 
 /*
 =====================
-idGameEdit::ANIM_GetAnim
+anGameEdit::ANIM_GetAnim
 =====================
 */
-const idMD5Anim *idGameEdit::ANIM_GetAnim( const char *fileName ) {
+const anM8DAnim *anGameEdit::ANIM_GetAnim( const char *fileName ) {
 	return animationLib.GetAnim( fileName );
 }
 
 /*
 =====================
-idGameEdit::ANIM_GetLength
+anGameEdit::ANIM_GetLength
 =====================
 */
-int	idGameEdit::ANIM_GetLength( const idMD5Anim *anim ) {
+int	anGameEdit::ANIM_GetLength( const anM8DAnim *anim ) {
 	if ( !anim ) {
 		return 0;
 	}
@@ -4958,10 +4958,10 @@ int	idGameEdit::ANIM_GetLength( const idMD5Anim *anim ) {
 
 /*
 =====================
-idGameEdit::ANIM_GetNumFrames
+anGameEdit::ANIM_GetNumFrames
 =====================
 */
-int idGameEdit::ANIM_GetNumFrames( const idMD5Anim *anim ) {
+int anGameEdit::ANIM_GetNumFrames( const anM8DAnim *anim ) {
 	if ( !anim ) {
 		return 0;
 	}
@@ -4970,10 +4970,10 @@ int idGameEdit::ANIM_GetNumFrames( const idMD5Anim *anim ) {
 
 /*
 =====================
-idGameEdit::ANIM_CreateAnimFrame
+anGameEdit::ANIM_CreateAnimFrame
 =====================
 */
-void idGameEdit::ANIM_CreateAnimFrame( const idRenderModel *model, const idMD5Anim *anim, int numJoints, idJointMat *joints, int time, const arcVec3 &offset, bool remove_origin_offset ) {
+void anGameEdit::ANIM_CreateAnimFrame( const anRenderModel *model, const anM8DAnim *anim, int numJoints, anJointMat *joints, int time, const anVec3 &offset, bool remove_origin_offset ) {
 	int					i;
 	frameBlend_t		frame;
 	const idMD5Joint	*md5joints;
@@ -4993,7 +4993,7 @@ void idGameEdit::ANIM_CreateAnimFrame( const idRenderModel *model, const idMD5An
 	}
 
 	if ( !joints ) {
-		gameLocal.Error( "ANIM_CreateAnimFrame: NULL joint frame pointer on model (%s)", model->Name() );
+		gameLocal.Error( "ANIM_CreateAnimFrame: nullptr joint frame pointer on model (%s)", model->Name() );
 	}
 
 	if ( numJoints != anim->NumJoints() ) {
@@ -5006,14 +5006,14 @@ void idGameEdit::ANIM_CreateAnimFrame( const idRenderModel *model, const idMD5An
 	}
 
 	// create index for all joints
-	index = ( int * )_alloca16( numJoints * sizeof( int ) );
+	index = ( int*)_alloca16( numJoints * sizeof( int ) );
 	for ( i = 0; i < numJoints; i++ ) {
 		index[i] = i;
 	}
 
 	// create the frame
 	anim->ConvertTimeToFrame( time, 1, frame );
-	idJointQuat *jointFrame = ( idJointQuat * )_alloca16( numJoints * sizeof( *jointFrame ) );
+	anJointQuat *jointFrame = ( anJointQuat * )_alloca16( numJoints * sizeof( *jointFrame ) );
 	anim->GetInterpolatedFrame( frame, jointFrame, index, numJoints );
 
 	// convert joint quaternions to joint matrices
@@ -5035,29 +5035,29 @@ void idGameEdit::ANIM_CreateAnimFrame( const idRenderModel *model, const idMD5An
 
 /*
 =====================
-idGameEdit::ANIM_CreateMeshForAnim
+anGameEdit::ANIM_CreateMeshForAnim
 =====================
 */
-idRenderModel *idGameEdit::ANIM_CreateMeshForAnim( idRenderModel *model, const char *classname, const char *animname, int frame, bool remove_origin_offset ) {
+anRenderModel *anGameEdit::ANIM_CreateMeshForAnim( anRenderModel *model, const char *classname, const char *animname, int frame, bool remove_origin_offset ) {
 	renderEntity_t			ent;
-	const arcDict			*args;
+	const anDict			*args;
 	const char				*temp;
-	idRenderModel			*newmodel;
-	const idMD5Anim 		*md5anim;
-	arcNetString					filename;
-	arcNetString					extension;
+	anRenderModel			*newmodel;
+	const anM8DAnim 		*md5anim;
+	anString					filename;
+	anString					extension;
 	const arcAnim			*anim;
 	int						animNum;
-	arcVec3					offset;
+	anVec3					offset;
 	const arcDeclModelDef	*modelDef;
 
 	if ( !model || model->IsDefaultModel() ) {
-		return NULL;
+		return nullptr;
 	}
 
 	args = gameLocal.FindEntityDefDict( classname, false );
 	if ( !args ) {
-		return NULL;
+		return nullptr;
 	}
 
 	memset( &ent, 0, sizeof( ent ) );
@@ -5069,11 +5069,11 @@ idRenderModel *idGameEdit::ANIM_CreateMeshForAnim( idRenderModel *model, const c
 	if ( modelDef ) {
 		animNum = modelDef->GetAnim( animname );
 		if ( !animNum ) {
-			return NULL;
+			return nullptr;
 		}
 		anim = modelDef->GetAnim( animNum );
 		if ( !anim ) {
-			return NULL;
+			return nullptr;
 		}
 		md5anim = anim->MD5Anim( 0 );
 		ent.customSkin = modelDef->GetDefaultSkin();
@@ -5090,7 +5090,7 @@ idRenderModel *idGameEdit::ANIM_CreateMeshForAnim( idRenderModel *model, const c
 	}
 
 	if ( !md5anim ) {
-		return NULL;
+		return nullptr;
 	}
 
 	temp = args->GetString( "skin", "" );
@@ -5099,16 +5099,16 @@ idRenderModel *idGameEdit::ANIM_CreateMeshForAnim( idRenderModel *model, const c
 	}
 
 	ent.numJoints = model->NumJoints();
-	ent.joints = ( idJointMat * )Mem_Alloc16( SIMD_ROUND_JOINTS( ent.numJoints ) * sizeof( *ent.joints ), TAG_JOINTMAT );
+	ent.joints = ( anJointMat * )Mem_Alloc16( SIMD_ROUND_JOINTS( ent.numJoints ) * sizeof( *ent.joints ), TAG_JOINTMAT );
 
 	ANIM_CreateAnimFrame( model, md5anim, ent.numJoints, ent.joints, FRAME2MS( frame ), offset, remove_origin_offset );
 
 	SIMD_INIT_LAST_JOINT( ent.joints, ent.numJoints );
 
-	newmodel = model->InstantiateDynamicModel( &ent, NULL, NULL );
+	newmodel = model->InstantiateDynamicModel( &ent, nullptr, nullptr );
 
 	Mem_Free16( ent.joints );
-	ent.joints = NULL;
+	ent.joints = nullptr;
 
 	return newmodel;
 }

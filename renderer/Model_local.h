@@ -1,31 +1,3 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
 #ifndef __MODEL_LOCAL_H__
 #define __MODEL_LOCAL_H__
 
@@ -37,13 +9,13 @@ If you have questions concerning this license or the applicable additional terms
 ===============================================================================
 */
 
-class aRcModelStatic : public ARCRenderModel {
+class anModelStatic : public anRenderModel {
 public:
 	// the inherited public interface
-	static ARCRenderModel *		Alloc();
+	static anRenderModel *		Alloc();
 
-								aRcModelStatic();
-	virtual						~aRcModelStatic();
+								anModelStatic();
+	virtual						~anModelStatic();
 
 	virtual void				InitFromFile( const char *fileName );
 	virtual void				PartialInitFromFile( const char *fileName );
@@ -66,23 +38,23 @@ public:
 	virtual int					NumSurfaces() const;
 	virtual int					NumBaseSurfaces() const;
 	virtual const modelSurface_t *Surface( int surfaceNum ) const;
-	virtual surfTriangles_t *	AllocSurfaceTriangles( int numVerts, int numIndexes ) const;
-	virtual void				FreeSurfaceTriangles( surfTriangles_t *tris ) const;
-	virtual surfTriangles_t *	ShadowHull() const;
+	virtual srfTriangles_t *	AllocSurfaceTriangles( int numVerts, int numIndexes ) const;
+	virtual void				FreeSurfaceTriangles( srfTriangles_t *tris ) const;
+	virtual srfTriangles_t *	ShadowHull() const;
 	virtual bool				IsStaticWorldModel() const;
 	virtual dynamicModel_t		IsDynamicModel() const;
 	virtual bool				IsDefaultModel() const;
 	virtual bool				IsReloadable() const;
-	virtual ARCRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel );
+	virtual anRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel );
 	virtual int					NumJoints( void ) const;
-	virtual const aRcMD5Joint *	GetJoints( void ) const;
+	virtual const anM8DJoint *	GetJoints( void ) const;
 	virtual jointHandle_t		GetJointHandle( const char *name ) const;
 	virtual const char *		GetJointName( jointHandle_t handle ) const;
-	virtual const idJointQuat *	GetDefaultPose( void ) const;
+	virtual const anJointQuat *	GetDefaultPose( void ) const;
 	virtual int					NearestJoint( int surfaceNum, int a, int b, int c ) const;
-	virtual arcBounds			Bounds( const struct renderEntity_s *ent ) const;
-	virtual void				ReadFromDemoFile( class ARCDemoFile *f );
-	virtual void				WriteToDemoFile( class ARCDemoFile *f );
+	virtual anBounds			Bounds( const struct renderEntity_s *ent ) const;
+	virtual void				ReadFromDemoFile( class anDemoFile *f );
+	virtual void				WriteToDemoFile( class anDemoFile *f );
 	virtual float				DepthHack() const;
 
 	void						MakeDefaultModel();
@@ -103,16 +75,16 @@ public:
 	bool						FindSurfaceWithId( int id, int &surfaceNum );
 
 public:
-	arcNetList<modelSurface_t>		surfaces;
-	arcBounds					bounds;
+	anList<modelSurface_t>		surfaces;
+	anBounds					bounds;
 	int							overlaysAdded;
 
 protected:
 	int							lastModifiedFrame;
 	int							lastArchivedFrame;
 
-	arcNetString						name;
-	surfTriangles_t *			shadowHull;
+	anString						name;
+	srfTriangles_t *			shadowHull;
 	bool						isStaticWorldModel;
 	bool						defaulted;
 	bool						purged;					// eventually we will have dynamic reloading
@@ -121,10 +93,10 @@ protected:
 	bool						levelLoadReferenced;	// for determining if it needs to be freed
 	ARC_TIME_T						timeStamp;
 
-	static arcCVarSystem				r_mergeModelSurfaces;	// combine model surfaces with the same material
-	static arcCVarSystem				r_slopVertex;			// merge xyz coordinates this far apart
-	static arcCVarSystem				r_slopTexCoord;			// merge texture coordinates this far apart
-	static arcCVarSystem				r_slopNormal;			// merge normals that dot less than this
+	static anCVarSystem				r_mergeModelSurfaces;	// combine model surfaces with the same material
+	static anCVarSystem				r_slopVertex;			// merge xyz coordinates this far apart
+	static anCVarSystem				r_slopTexCoord;			// merge texture coordinates this far apart
+	static anCVarSystem				r_slopNormal;			// merge normals that dot less than this
 };
 
 /*
@@ -135,63 +107,63 @@ protected:
 ===============================================================================
 */
 
-class idMD5Mesh {
-	friend class				idRenderModelMD5;
+class anM8DMesh {
+	friend class				anRenderModelM8D;
 
 public:
-								idMD5Mesh();
-								~idMD5Mesh();
+								anM8DMesh();
+								~anM8DMesh();
 
- 	void						ParseMesh( arcLexer &parser, int numJoints, const arcJointMat *joints );
+ 	void						ParseMesh( anLexer &parser, int numJoints, const arcJointMat *joints );
 	void						UpdateSurface( const struct renderEntity_s *ent, const arcJointMat *joints, modelSurface_t *surf );
-	arcBounds					CalcBounds( const arcJointMat *joints );
+	anBounds					CalcBounds( const arcJointMat *joints );
 	int							NearestJoint( int a, int b, int c ) const;
 	int							NumVerts( void ) const;
 	int							NumTris( void ) const;
 	int							NumWeights( void ) const;
 
 private:
-	arcNetList<arcVec2>				texCoords;			// texture coordinates
+	anList<anVec2>				texCoords;			// texture coordinates
 	int							numWeights;			// number of weights
-	arcVec4 *					scaledWeights;		// joint weights
+	anVec4 *					scaledWeights;		// joint weights
 	int *						weightIndex;		// pairs of: joint offset + bool true if next weight is for next vertex
-	const arcMaterial *			shader;				// material applied to mesh
+	const anMaterial *			shader;				// material applied to mesh
 	int							numTris;			// number of triangles
-	struct deformInfo_s *		deformInfo;			// used to create surfTriangles_t from base frames and new vertexes
+	struct deformInfo_s *		deformInfo;			// used to create srfTriangles_t from base frames and new vertexes
 	int							surfaceNum;			// number of the static surface created for this mesh
 
-	void						TransformVerts( arcDrawVert *verts, const arcJointMat *joints );
-	void						TransformScaledVerts( arcDrawVert *verts, const arcJointMat *joints, float scale );
+	void						TransformVerts( anDrawVertex *verts, const arcJointMat *joints );
+	void						TransformScaledVerts( anDrawVertex *verts, const arcJointMat *joints, float scale );
 };
 
-class idRenderModelMD5 : public aRcModelStatic {
+class anRenderModelM8D : public anModelStatic {
 public:
 	virtual void				InitFromFile( const char *fileName );
 	virtual dynamicModel_t		IsDynamicModel() const;
-	virtual arcBounds			Bounds( const struct renderEntity_s *ent ) const;
+	virtual anBounds			Bounds( const struct renderEntity_s *ent ) const;
 	virtual void				Print() const;
 	virtual void				List() const;
 	virtual void				TouchData();
 	virtual void				PurgeModel();
 	virtual void				LoadModel();
 	virtual int					Memory() const;
-	virtual ARCRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel );
+	virtual anRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel );
 	virtual int					NumJoints( void ) const;
-	virtual const aRcMD5Joint *	GetJoints( void ) const;
+	virtual const anM8DJoint *	GetJoints( void ) const;
 	virtual jointHandle_t		GetJointHandle( const char *name ) const;
 	virtual const char *		GetJointName( jointHandle_t handle ) const;
-	virtual const idJointQuat *	GetDefaultPose( void ) const;
+	virtual const anJointQuat *	GetDefaultPose( void ) const;
 	virtual int					NearestJoint( int surfaceNum, int a, int b, int c ) const;
 
 private:
-	arcNetList<aRcMD5Joint>			joints;
-	arcNetList<idJointQuat>			defaultPose;
-	arcNetList<idMD5Mesh>			meshes;
+	anList<anM8DJoint>			joints;
+	anList<anJointQuat>			defaultPose;
+	anList<anM8DMesh>			meshes;
 
 	void						CalculateBounds( const arcJointMat *joints );
-	void						GetFrameBounds( const renderEntity_t *ent, arcBounds &bounds ) const;
+	void						GetFrameBounds( const renderEntity_t *ent, anBounds &bounds ) const;
 	void						DrawJoints( const renderEntity_t *ent, const struct viewDef_s *view ) const;
-	void						ParseJoint( arcLexer &parser, aRcMD5Joint *joint, idJointQuat *defaultPose );
+	void						ParseJoint( anLexer &parser, anM8DJoint *joint, anJointQuat *defaultPose );
 };
 
 /*
@@ -205,12 +177,12 @@ private:
 struct md3Header_s;
 struct md3Surface_s;
 
-class idRenderModelMD3 : public aRcModelStatic {
+class idRenderModelMD3 : public anModelStatic {
 public:
 	virtual void				InitFromFile( const char *fileName );
 	virtual dynamicModel_t		IsDynamicModel() const;
-	virtual ARCRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel );
-	virtual arcBounds			Bounds( const struct renderEntity_s *ent ) const;
+	virtual anRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel );
+	virtual anBounds			Bounds( const struct renderEntity_s *ent ) const;
 
 private:
 	int							index;			// model = tr.models[model->index]
@@ -218,7 +190,7 @@ private:
 	struct md3Header_s *		md3;			// only if type == MOD_MESH
 	int							numLods;
 
-	void						LerpMeshVertexes( surfTriangles_t *tri, const struct md3Surface_s *surf, const float backlerp, const int frame, const int oldframe ) const;
+	void						LerpMeshVertexes( srfTriangles_t *tri, const struct md3Surface_s *surf, const float backlerp, const int frame, const int oldframe ) const;
 };
 
 /*
@@ -229,17 +201,17 @@ private:
 ===============================================================================
 */
 
-class ARCLiquidModel : public aRcModelStatic {
+class anLiquidModel : public anModelStatic {
 public:
-								ARCLiquidModel();
+								anLiquidModel();
 
 	virtual void				InitFromFile( const char *fileName );
 	virtual dynamicModel_t		IsDynamicModel() const;
-	virtual ARCRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel );
-	virtual arcBounds			Bounds( const struct renderEntity_s *ent ) const;
+	virtual anRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel );
+	virtual anBounds			Bounds( const struct renderEntity_s *ent ) const;
 
 	virtual void				Reset();
-	void						IntersectBounds( const arcBounds &bounds, float displacement );
+	void						IntersectBounds( const anBounds &bounds, float displacement );
 
 private:
 	modelSurface_t				GenerateSurface( float lerp );
@@ -257,8 +229,8 @@ private:
 
 	arcRandom					random;
 
-	const arcMaterial *			shader;
-	struct deformInfo_s	*		deformInfo;		// used to create surfTriangles_t from base frames
+	const anMaterial *			shader;
+	struct deformInfo_s	*		deformInfo;		// used to create srfTriangles_t from base frames
 											// and new vertexes
 
 	float						density;
@@ -266,11 +238,11 @@ private:
 	int							drop_radius;
 	float						drop_delay;
 
-	arcNetList<float>				pages;
+	anList<float>				pages;
 	float *						page1;
 	float *						page2;
 
-	arcNetList<arcDrawVert>			verts;
+	anList<anDrawVertex>			verts;
 
 	int							nextDropTime;
 
@@ -284,20 +256,20 @@ private:
 ===============================================================================
 */
 
-class idRenderModelPrt : public aRcModelStatic {
+class idRenderModelPrt : public anModelStatic {
 public:
 								idRenderModelPrt();
 
 	virtual void				InitFromFile( const char *fileName );
 	virtual void				TouchData();
 	virtual dynamicModel_t		IsDynamicModel() const;
-	virtual ARCRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel );
-	virtual arcBounds			Bounds( const struct renderEntity_s *ent ) const;
+	virtual anRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel );
+	virtual anBounds			Bounds( const struct renderEntity_s *ent ) const;
 	virtual float				DepthHack() const;
 	virtual int					Memory() const;
 
 private:
-	const arcDeclParticle *		particleSystem;
+	const anDeclParticle *		particleSystem;
 };
 
 /*
@@ -308,12 +280,12 @@ private:
 ===============================================================================
 */
 
-class idRenderModelBeam : public aRcModelStatic {
+class idRenderModelBeam : public anModelStatic {
 public:
 	virtual dynamicModel_t		IsDynamicModel() const;
 	virtual bool				IsLoaded() const;
-	virtual ARCRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel );
-	virtual arcBounds			Bounds( const struct renderEntity_s *ent ) const;
+	virtual anRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel );
+	virtual anBounds			Bounds( const struct renderEntity_s *ent ) const;
 };
 
 /*
@@ -329,26 +301,26 @@ struct Trail_t {
 	int							lastUpdateTime;
 	int							duration;
 
-	arcVec3						pts[MAX_TRAIL_PTS];
+	anVec3						pts[MAX_TRAIL_PTS];
 	int							numPoints;
 };
 
-class idRenderModelTrail : public aRcModelStatic {
-	arcNetList<Trail_t>				trails;
+class idRenderModelTrail : public anModelStatic {
+	anList<Trail_t>				trails;
 	int							numActive;
-	arcBounds					trailBounds;
+	anBounds					trailBounds;
 
 public:
 								idRenderModelTrail();
 
 	virtual dynamicModel_t		IsDynamicModel() const;
 	virtual bool				IsLoaded() const;
-	virtual ARCRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel );
-	virtual arcBounds			Bounds( const struct renderEntity_s *ent ) const;
+	virtual anRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel );
+	virtual anBounds			Bounds( const struct renderEntity_s *ent ) const;
 
-	int							NewTrail( arcVec3 pt, int duration );
-	void						UpdateTrail( int index, arcVec3 pt );
-	void						DrawTrail( int index, const struct renderEntity_s *ent, surfTriangles_t *tri, float globalAlpha );
+	int							NewTrail( anVec3 pt, int duration );
+	void						UpdateTrail( int index, anVec3 pt );
+	void						DrawTrail( int index, const struct renderEntity_s *ent, srfTriangles_t *tri, float globalAlpha );
 };
 
 /*
@@ -359,12 +331,12 @@ public:
 ===============================================================================
 */
 
-class idRenderModelLightning : public aRcModelStatic {
+class idRenderModelLightning : public anModelStatic {
 public:
 	virtual dynamicModel_t		IsDynamicModel() const;
 	virtual bool				IsLoaded() const;
-	virtual ARCRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel );
-	virtual arcBounds			Bounds( const struct renderEntity_s *ent ) const;
+	virtual anRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel );
+	virtual anBounds			Bounds( const struct renderEntity_s *ent ) const;
 };
 
 /*
@@ -374,12 +346,12 @@ public:
 
 ================================================================================
 */
-class idRenderModelSprite : public aRcModelStatic {
+class idRenderModelSprite : public anModelStatic {
 public:
 	virtual	dynamicModel_t	IsDynamicModel() const;
 	virtual	bool			IsLoaded() const;
-	virtual	ARCRenderModel *	InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel );
-	virtual	arcBounds		Bounds( const struct renderEntity_s *ent ) const;
+	virtual	anRenderModel *	InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel );
+	virtual	anBounds		Bounds( const struct renderEntity_s *ent ) const;
 };
 
-#endif /* !__MODEL_LOCAL_H__ */
+#endif // !__MODEL_LOCAL_H__

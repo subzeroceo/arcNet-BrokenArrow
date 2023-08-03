@@ -14,26 +14,26 @@
 
 typedef struct particlePState_s {
 	int						atRest;						// set when simulation is suspended
-	arcVec3					localOrigin;				// origin relative to master
-	arcMat3					localAxis;					// axis relative to master
-	arcVec3					pushVelocity;				// push velocity
-	arcVec3					origin;
-	arcVec3					velocity;
+	anVec3					localOrigin;				// origin relative to master
+	anMat3					localAxis;					// axis relative to master
+	anVec3					pushVelocity;				// push velocity
+	anVec3					origin;
+	anVec3					velocity;
 	bool					onGround;
 	bool					inWater;
 } particlePState_t;
 
-class rvPhysics_Particle : public idPhysics_Base {
+class anPhysics_Particle : public anPhysics_Base {
 
 public:
 
-	CLASS_PROTOTYPE( rvPhysics_Particle );
+	CLASS_PROTOTYPE( anPhysics_Particle );
 
-							rvPhysics_Particle( void );
-							~rvPhysics_Particle( void );
+							anPhysics_Particle( void );
+							~anPhysics_Particle( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 							// initialisation
 	void					SetFriction( const float linear, const float angular, const float contact );
@@ -49,15 +49,15 @@ public:
 	bool					IsInWater ( void ) const;
 
 public:	// common physics interface
-	void					SetClipModel( idClipModel *model, float density, int id = 0, bool freeOld = true );
-	idClipModel *			GetClipModel( int id = 0 ) const;
+	void					SetClipModel( anClipModel *model, float density, int id = 0, bool freeOld = true );
+	anClipModel *			GetClipModel( int id = 0 ) const;
 	int						GetNumClipModels( void ) const;
 
 	void					SetContents( int contents, int id = -1 );
 	int						GetContents( int id = -1 ) const;
 
-	const arcBounds &		GetBounds( int id = -1 ) const;
-	const arcBounds &		GetAbsBounds( int id = -1 ) const;
+	const anBounds &		GetBounds( int id = -1 ) const;
+	const anBounds &		GetAbsBounds( int id = -1 ) const;
 
 	bool					Evaluate( int timeStepMSec, int endTimeMSec );
 	void					UpdateTime( int endTimeMSec );
@@ -75,22 +75,22 @@ public:	// common physics interface
 	void					SaveState( void );
 	void					RestoreState( void );
 
-	void					SetOrigin( const arcVec3 &newOrigin, int id = -1 );
-	void					SetAxis( const arcMat3 &newAxis, int id = -1 );
+	void					SetOrigin( const anVec3 &newOrigin, int id = -1 );
+	void					SetAxis( const anMat3 &newAxis, int id = -1 );
 
-	void					Translate( const arcVec3 &translation, int id = -1 );
-	void					Rotate( const idRotation &rotation, int id = -1 );
+	void					Translate( const anVec3 &translation, int id = -1 );
+	void					Rotate( const anRotation &rotation, int id = -1 );
 
-	const arcVec3 &			GetOrigin( int id = 0 ) const;
-	const arcMat3 &			GetAxis( int id = 0 ) const;
+	const anVec3 &			GetOrigin( int id = 0 ) const;
+	const anMat3 &			GetAxis( int id = 0 ) const;
 
-	void					SetLinearVelocity( const arcVec3 &newLinearVelocity, int id = 0 );
+	void					SetLinearVelocity( const anVec3 &newLinearVelocity, int id = 0 );
 
-	const arcVec3 &			GetLinearVelocity( int id = 0 ) const;
+	const anVec3 &			GetLinearVelocity( int id = 0 ) const;
 
-	void					ClipTranslation( trace_t &results, const arcVec3 &translation, const idClipModel *model ) const;
-	void					ClipRotation( trace_t &results, const idRotation &rotation, const idClipModel *model ) const;
-	int						ClipContents( const idClipModel *model ) const;
+	void					ClipTranslation( trace_t &results, const anVec3 &translation, const anClipModel *model ) const;
+	void					ClipRotation( trace_t &results, const anRotation &rotation, const anClipModel *model ) const;
+	int						ClipContents( const anClipModel *model ) const;
 
 	void					DisableClip( void );
 	void					EnableClip( void );
@@ -99,14 +99,14 @@ public:	// common physics interface
 	void					LinkClip( void );
 
 	void					SetPushed( int deltaTime );
-	const arcVec3 &			GetPushedLinearVelocity( const int id = 0 ) const;
+	const anVec3 &			GetPushedLinearVelocity( const int id = 0 ) const;
 
-	void					SetMaster( idEntity *master, const bool orientated );
+	void					SetMaster( anEntity *master, const bool orientated );
 
-	void					WriteToSnapshot( idBitMsgDelta &msg ) const;
-	void					ReadFromSnapshot( const idBitMsgDelta &msg );
+	void					WriteToSnapshot( anBitMsgDelta &msg ) const;
+	void					ReadFromSnapshot( const anBitMsgDelta &msg );
 
-	idEntityPtr<idEntity>	extraPassEntity;
+	anEntityPtr<anEntity>	extraPassEntity;
 
 private:
 	// state of the particle
@@ -119,7 +119,7 @@ private:
 	float					contactFriction;			// friction with contact surfaces
 	float					bouncyness;					// bouncyness
 	bool					allowBounce;				// Allowed to bounce at all?
-	idClipModel *			clipModel;					// clip model used for collision detection
+	anClipModel *			clipModel;					// clip model used for collision detection
 
 	bool					dropToFloor;				// true if dropping to the floor and putting to rest
 	bool					testSolid;					// true if testing for inside solid during a drop
@@ -131,21 +131,21 @@ private:
 private:
 
 	void					DropToFloorAndRest	( void );
-	bool					SlideMove			( arcVec3& start, arcVec3& velocity, const arcVec3& delta );
+	bool					SlideMove			( anVec3& start, anVec3& velocity, const anVec3& delta );
 	void					CheckGround			( void );
 	void					ApplyFriction		( float timeStep );
 	void					DebugDraw			( void );
 };
 
-ARC_INLINE bool rvPhysics_Particle::IsOnGround ( void ) const {
+ARC_INLINE bool anPhysics_Particle::IsOnGround ( void ) const {
 	return current.onGround;
 }
 
-ARC_INLINE bool rvPhysics_Particle::IsInWater ( void ) const {
+ARC_INLINE bool anPhysics_Particle::IsInWater ( void ) const {
 	return current.inWater;
 }
 
-ARC_INLINE bool rvPhysics_Particle::CanBounce ( void ) const {
+ARC_INLINE bool anPhysics_Particle::CanBounce ( void ) const {
 	return allowBounce;
 }
 

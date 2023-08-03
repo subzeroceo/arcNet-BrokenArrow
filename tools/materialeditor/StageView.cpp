@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "StageView.h"
@@ -34,7 +34,7 @@ END_MESSAGE_MAP()
 * Constructor for StageView.
 */
 StageView::StageView() {
-	currentMaterial = NULL;
+	currentMaterial = nullptr;
 	bDragging = false;
 	internalChange = false;
 }
@@ -76,7 +76,7 @@ void StageView::MV_OnMaterialSaved(MaterialDoc* pMaterial) {
 */
 void StageView::MV_OnMaterialStageAdd(MaterialDoc* pMaterial, int stageNum) {
 	CListCtrl& list = GetListCtrl();
-	arcNetString name = pMaterial->GetAttribute(stageNum, "name" );
+	anString name = pMaterial->GetAttribute(stageNum, "name" );
 	int index = list.InsertItem(stageNum+1, name.c_str() );
 	SetToggleState(index, ToggleListView::TOGGLE_STATE_ON);
 }
@@ -124,7 +124,7 @@ void StageView::MV_OnMaterialStageMove(MaterialDoc* pMaterial, int from, int to)
 		int type = -1;
 
 		int stageType = currentMaterial->GetAttributeInt(to-1, "stagetype" );
-		switch(stageType) {
+		switch (stageType) {
 				case MaterialDoc::STAGE_TYPE_NORMAL:
 					type = MaterialDefManager::MATERIAL_DEF_STAGE;
 					break;
@@ -291,7 +291,7 @@ void StageView::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult) {
 					type = MaterialDefManager::MATERIAL_DEF_MATERIAL;
 				else {
 					int stageType = currentMaterial->GetAttributeInt(pNMLV->iItem-1, "stagetype" );
-					switch(stageType) {
+					switch (stageType) {
 						case MaterialDoc::STAGE_TYPE_NORMAL:
 							type = MaterialDefManager::MATERIAL_DEF_STAGE;
 							break;
@@ -479,7 +479,7 @@ void StageView::OnDeleteAllStages() {
 void StageView::OnAddStage() {
 	MaterialDoc* material = materialDocManager->GetCurrentMaterialDoc();
 
-	arcNetString name = va( "Stage %d", material->GetStageCount()+1 );
+	anString name = va( "Stage %d", material->GetStageCount()+1 );
 	material->AddStage(MaterialDoc::STAGE_TYPE_NORMAL, name.c_str() );
 }
 
@@ -531,7 +531,7 @@ void StageView::OnPaste() {
 	if (materialDocManager->IsCopyStage() ) {
 		MaterialDoc* material = materialDocManager->GetCurrentMaterialDoc();
 		int type;
-		arcNetString name;
+		anString name;
 
 		materialDocManager->GetCopyStageInfo(type, name);
 
@@ -658,7 +658,7 @@ void StageView::PopupMenu(CPoint* pt) {
 	CMenu FloatingMenu;
 	VERIFY(FloatingMenu.LoadMenu(IDR_ME_STAGELIST_POPUP) );
 	CMenu* pPopupMenu = FloatingMenu.GetSubMenu (0 );
-	ASSERT(pPopupMenu != NULL);
+	ASSERT(pPopupMenu != nullptr );
 
 	POSITION pos = list.GetFirstSelectedItemPosition();
 	int nItem = -1;
@@ -751,7 +751,7 @@ void StageView::DropItemOnList() {
 
 	int type = -1;
 	int stageType = currentMaterial->GetAttributeInt(toStage, "stagetype" );
-	switch(stageType) {
+	switch (stageType) {
 		case MaterialDoc::STAGE_TYPE_NORMAL:
 			type = MaterialDefManager::MATERIAL_DEF_STAGE;
 			break;

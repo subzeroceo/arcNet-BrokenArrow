@@ -17,7 +17,7 @@ public:
 	enum { IDD = IDD_FIND };
 
 public:
-	FindDialog(CWnd* pParent = NULL);
+	FindDialog(CWnd* pParent = nullptr );
 	virtual ~FindDialog();
 
 	BOOL					Create();

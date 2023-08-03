@@ -1,5 +1,5 @@
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "CPathTreeCtrl.h"
@@ -38,12 +38,12 @@ CPathTreeCtrl::FindItem
 Find the given path in the tree.
 ================
 */
-HTREEITEM CPathTreeCtrl::FindItem( const arcNetString &pathName ) {
+HTREEITEM CPathTreeCtrl::FindItem( const anString &pathName ) {
 	int lastSlash;
-	arcNetString path, tmpPath, itemName;
+	anString path, tmpPath, itemName;
 	HTREEITEM item, parentItem;
 
-	parentItem = NULL;
+	parentItem = nullptr;
 	item = GetRootItem();
 
 	lastSlash = pathName.Last( '/' );
@@ -67,7 +67,7 @@ HTREEITEM CPathTreeCtrl::FindItem( const arcNetString &pathName ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -78,12 +78,12 @@ Inserts a new item going from the root down the tree only creating paths where n
 This is slow and should only be used to insert single items.
 ================
 */
-HTREEITEM CPathTreeCtrl::InsertPathIntoTree( const arcNetString &pathName, const int id ) {
+HTREEITEM CPathTreeCtrl::InsertPathIntoTree( const anString &pathName, const int id ) {
 	int lastSlash;
-	arcNetString path, tmpPath, itemName;
+	anString path, tmpPath, itemName;
 	HTREEITEM item, parentItem;
 
-	parentItem = NULL;
+	parentItem = nullptr;
 	item = GetRootItem();
 
 	lastSlash = pathName.Last( '/' );
@@ -122,9 +122,9 @@ Adds a new item to the tree.
 Assumes new paths after the current stack path do not yet exist.
 ================
 */
-HTREEITEM CPathTreeCtrl::AddPathToTree( const arcNetString &pathName, const int id, idPathTreeStack &stack ) {
+HTREEITEM CPathTreeCtrl::AddPathToTree( const anString &pathName, const int id, idPathTreeStack &stack ) {
 	int lastSlash;
-	arcNetString itemName, tmpPath;
+	anString itemName, tmpPath;
 	HTREEITEM item;
 
 	lastSlash = pathName.Last( '/' );
@@ -162,12 +162,12 @@ Returns the number of items added to the result tree.
 int CPathTreeCtrl::SearchTree( treeItemCompare_t compare, void *data, CPathTreeCtrl &result ) {
 	idPathTreeStack stack, searchStack;
 	HTREEITEM item, child;
-	arcNetString name;
+	anString name;
 	int id, numItems;
 
 	numItems = 0;
 	result.DeleteAllItems();
-	stack.PushRoot( NULL );
+	stack.PushRoot( nullptr );
 
 	item = GetRootItem();
 	searchStack.PushRoot( item );
@@ -189,7 +189,7 @@ int CPathTreeCtrl::SearchTree( treeItemCompare_t compare, void *data, CPathTreeC
 			numItems++;
 		}
 
-		for ( item = GetNextSiblingItem( item ); item == NULL;  ) {
+		for ( item = GetNextSiblingItem( item ); item == nullptr;  ) {
 			item = GetNextSiblingItem( searchStack.TopItem() );
 			searchStack.Pop();
 			if ( searchStack.Num() <= 0 ) {

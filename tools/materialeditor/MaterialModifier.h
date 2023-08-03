@@ -46,7 +46,7 @@ public:
 
 protected:
 	MaterialDocManager*		manager;
-	arcNetString					materialName;
+	anString					materialName;
 };
 
 /**
@@ -63,7 +63,7 @@ public:
 
 protected:
 	int						stage;
-	arcNetString					key;
+	anString					key;
 };
 
 /**
@@ -79,8 +79,8 @@ public:
 	virtual void 			Redo();
 
 protected:
-	arcNetString					value;
-	arcNetString					oldValue;
+	anString					value;
+	anString					oldValue;
 
 };
 
@@ -124,7 +124,7 @@ protected:
 */
 class StageDeleteModifier : public MaterialModifier {
 public:
-	StageDeleteModifier(MaterialDocManager* manager, const char* materialName, int stageNum, arcDictionary stageData);
+	StageDeleteModifier(MaterialDocManager* manager, const char* materialName, int stageNum, anDict stageData);
 	virtual ~StageDeleteModifier() {};
 
 	virtual void 			Undo();
@@ -132,7 +132,7 @@ public:
 
 protected:
 	int						stageNum;
-	arcDictionary					stageData;
+	anDict					stageData;
 };
 
 /**
@@ -149,7 +149,7 @@ public:
 protected:
 	int						stageNum;
 	int						stageType;
-	arcNetString					stageName;
+	anString					stageName;
 };
 
 /**
@@ -164,7 +164,7 @@ public:
 	virtual void			Redo();
 
 protected:
-	arcNetString					materialFile;
+	anString					materialFile;
 };
 
 /**
@@ -194,8 +194,8 @@ public:
 	virtual void			Redo();
 
 protected:
-	arcNetString					materialFile;
-	arcNetString					copyMaterial;
+	anString					materialFile;
+	anString					copyMaterial;
 };
 
 /**
@@ -210,7 +210,7 @@ public:
 	virtual void			Redo();
 
 protected:
-	arcNetString					oldName;
+	anString					oldName;
 };
 
 /**
@@ -244,7 +244,7 @@ public:
 protected:
 	MaterialTreeView*		view;
 	HTREEITEM				item;
-	arcNetString					oldName;
+	anString					oldName;
 };
 
 /**
@@ -252,7 +252,7 @@ protected:
 */
 class DeleteMaterialFolderModifier : public MaterialModifier {
 public:
-	DeleteMaterialFolderModifier(MaterialDocManager* manager, const char* materialName, MaterialTreeView* view, HTREEITEM parent, arcStringList* affectedMaterials);
+	DeleteMaterialFolderModifier(MaterialDocManager* manager, const char* materialName, MaterialTreeView* view, HTREEITEM parent, anStringList* affectedMaterials);
 	virtual ~DeleteMaterialFolderModifier() {};
 
 	virtual void			Undo();
@@ -260,7 +260,7 @@ public:
 
 protected:
 	MaterialTreeView*		view;
-	arcStringList				affectedMaterials;
+	anStringList				affectedMaterials;
 
 	HTREEITEM				item;
 	HTREEITEM				parent;

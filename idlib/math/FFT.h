@@ -16,11 +16,11 @@ typedef struct {
 	float im;
 } cpxFloat_t;
 
-class teCKFFT {
+class anFastFourierT {
 public:
-	static void		FFT1D( cpxFloat_t *data, int N, int ISI, int stride = 1 );
-	static void		FFT2D( cpxFloat_t *data, int N, int ISI );
-	static void		FFT3D( cpxFloat_t *data, int N, int ISI );
+	static void		FastFourierT1D( cpxFloat_t *data, int N, int ISI, int stride = 1 );
+	static void		FastFourierT2D( cpxFloat_t *data, int N, int ISI );
+	static void		FastFourierT3D( cpxFloat_t *data, int N, int ISI );
 };
 
 #endif

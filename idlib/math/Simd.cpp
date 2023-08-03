@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "Simd_Generic.h"
@@ -11,9 +11,9 @@
 #include "Simd_AVX.h"
 #include "Simd_Macros.h"
 
-arcSIMDProcessor	*	processor = NULL;			// pointer to SIMD processor
-arcSIMDProcessor *	generic = NULL;				// pointer to generic SIMD implementation
-arcSIMDProcessor *	SIMDProcessor = NULL;
+arcSIMDProcessor	*	processor = nullptr;			// pointer to SIMD processor
+arcSIMDProcessor *	generic = nullptr;				// pointer to generic SIMD implementation
+arcSIMDProcessor *	SIMDProcessor = nullptr;
 
 arcSIMD::arcSIMD() {
 	LOG( "Constructing arcSIMD object" );
@@ -26,8 +26,8 @@ arcSIMD::~arcSIMD() {
 void arcSIMD::AddPS(float *r, float *s0, float *s1) {
     __m128 a, b, c;
 
-    a = _mm_load_ps(s0);
-    b = _mm_load_ps(s1);
+    a = _mm_load_ps( s0);
+    b = _mm_load_ps( s1);
     c = _mm_add_ps(a, b);
     _mm_store_ps(r, c);
 }
@@ -37,8 +37,8 @@ void arcSIMD::AddPS(float *r, float *s0, float *s1, int n) {
     __m128 a, b, c;
 
     for ( int i = 0; i < n; i++ ) {
-        a = _mm_load_ps(s0);
-        b = _mm_load_ps(s1);
+        a = _mm_load_ps( s0);
+        b = _mm_load_ps( s1);
         c = _mm_add_ps(a, b);
         _mm_store_ps(r, c);
         s0 += 4;
@@ -53,8 +53,8 @@ void arcSIMD::AddPS(float *r, float *s0, float *s1, int n) {
     __m128 a, b, c;
 
     for ( int i = 0; i < n; i++ ) {
-        a = _mm_load_ps(s0);
-        b = _mm_load_ps(s1);
+        a = _mm_load_ps( s0);
+        b = _mm_load_ps( s1);
         c = _mm_add_ps(a, b);
         _mm_store_ps(r, c);
         s0 += 4;
@@ -68,8 +68,8 @@ void arcSIMD::Subtract(float *r, float *s0, float *s1, int n) {
     __m128 a, b, c;
 
     for ( int i = 0; i < n; i++ ) {
-        a = _mm_load_ps(s0);
-        b = _mm_load_ps(s1);
+        a = _mm_load_ps( s0);
+        b = _mm_load_ps( s1);
         c = _mm_sub_ps(a, b);
         _mm_store_ps(r, c);
         s0 += 4;
@@ -83,8 +83,8 @@ void arcSIMD::Subtract(float *r, float *s0, float *s1, int n) {
 void arcSIMD::Multiply(float *r, float *s0, float *s1) {
     __m128 a, b, c;
 
-    a = _mm_load_ps(s0);
-    b = _mm_load_ps(s1);
+    a = _mm_load_ps( s0);
+    b = _mm_load_ps( s1);
     c = _mm_mul_ps(a, b);
     _mm_store_ps(r, c);
 }
@@ -94,8 +94,8 @@ void arcSIMD::Multiply(float *r, float *s0, float *s1, int n) {
     __m128 a, b, c;
 
     for ( int i = 0; i < n; i++ ) {
-        a = _mm_load_ps(s0);
-        b = _mm_load_ps(s1);
+        a = _mm_load_ps( s0);
+        b = _mm_load_ps( s1);
         c = _mm_mul_ps(a, b);
         _mm_store_ps(r, c);
         s0 += 4;
@@ -112,7 +112,7 @@ arcSIMD::Init
 void arcSIMD::Init( void ) {
 	generic = new arcSIMD_Generic;
 	generic->cpuid = CPUID_GENERIC;
-	processor = NULL;
+	processor = nullptr;
 	SIMDProcessor = generic;
 }
 
@@ -125,7 +125,7 @@ void arcSIMD::InitProcessor( const char *module, bool forceGeneric ) {
 	cpuid_t cpuid;
 	arcSIMDProcessor *newProcessor;
 
-	cpuid = arcLibrary::sys->GetProcessorId();
+	cpuid = anLibrary::sys->GetProcessorId();
 
 	if ( forceGeneric ) {
 		newProcessor = generic;
@@ -154,17 +154,17 @@ void arcSIMD::InitProcessor( const char *module, bool forceGeneric ) {
 
 	if ( newProcessor != SIMDProcessor ) {
 		SIMDProcessor = newProcessor;
-		arcLibrary::common->Printf( "%s using %s for SIMD processing\n", module, SIMDProcessor->GetName() );
+		anLibrary::common->Printf( "%s using %s for SIMD processing\n", module, SIMDProcessor->GetName() );
 	}
 
 	if ( cpuid & CPUID_FTZ ) {
-		arcLibrary::sys->FPU_SetFTZ( true );
-		arcLibrary::common->Printf( "enabled Flush-To-Zero mode\n" );
+		anLibrary::sys->FPU_SetFTZ( true );
+		anLibrary::common->Printf( "enabled Flush-To-Zero mode\n" );
 	}
 
 	if ( cpuid & CPUID_DAZ ) {
-		arcLibrary::sys->FPU_SetDAZ( true );
-		arcLibrary::common->Printf( "enabled Denormals-Are-Zero mode\n" );
+		anLibrary::sys->FPU_SetDAZ( true );
+		anLibrary::common->Printf( "enabled Denormals-Are-Zero mode\n" );
 	}
 }
 
@@ -178,9 +178,9 @@ void arcSIMD::Shutdown( void ) {
 		delete processor;
 	}
 	delete generic;
-	generic = NULL;
-	processor = NULL;
-	SIMDProcessor = NULL;
+	generic = nullptr;
+	processor = nullptr;
+	SIMDProcessor = nullptr;
 }
 
 //===============================================================
@@ -193,7 +193,7 @@ void arcSIMD::Shutdown( void ) {
 #define BIG_COUNT	COUNT*5		// Some tests need a larger count
 #define NUMTESTS	2048		// number of tests
 
-#define RANDOM_SEED		1013904223L	//( ( int )arcLibrary::sys->GetClockTicks() )
+#define RANDOM_SEED		1013904223L	//( ( int )anLibrary::sys->GetClockTicks() )
 
 arcSIMDProcessor *p_simd;
 arcSIMDProcessor *p_generic;
@@ -360,17 +360,17 @@ PrintClocks
 ============
 */
 void PrintClocks( char *string, int dataCount, int clocks, int otherClocks = 0 ) {
-	arcLibrary::common->Printf( string );
-	for ( int i = arcNetString::LengthWithoutColors( string ); i < 48; i++ ) {
-		arcLibrary::common->Printf( " " );
+	anLibrary::common->Printf( string );
+	for ( int i = anString::LengthWithoutColors( string ); i < 48; i++ ) {
+		anLibrary::common->Printf( " " );
 	}
 	clocks -= baseClocks;
 	if ( otherClocks && clocks ) {
 		otherClocks -= baseClocks;
 		int p = ( int ) ( ( float ) ( otherClocks - clocks ) * 100.0f / ( float ) otherClocks );
-		arcLibrary::common->Printf( "c = %4d, clcks = %5d, %d%%\n", dataCount, clocks, p );
+		anLibrary::common->Printf( "c = %4d, clcks = %5d, %d%%\n", dataCount, clocks, p );
 	} else {
-		arcLibrary::common->Printf( "c = %4d, clcks = %5d\n", dataCount, clocks );
+		anLibrary::common->Printf( "c = %4d, clcks = %5d\n", dataCount, clocks );
 	}
 }
 
@@ -409,7 +409,7 @@ void TestAdd( void ) {
 		fsrc1[i] = srnd.CRandomFloat() * 10.0f;
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	int bestClocksGeneric = 0;
 	for ( int i = 0; i < NUMTESTS; i++ ) {
@@ -429,7 +429,7 @@ void TestAdd( void ) {
 	}
 
 	for ( int i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
@@ -454,7 +454,7 @@ void TestAdd( void ) {
 	}
 
 	for ( int i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
@@ -482,7 +482,7 @@ void TestSub( void ) {
 		fsrc1[i] = srnd.CRandomFloat() * 10.0f;
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	int bestClocksGeneric = 0;
 	for ( int i = 0; i < NUMTESTS; i++ ) {
@@ -502,7 +502,7 @@ void TestSub( void ) {
 	}
 
 	for ( int i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
@@ -527,7 +527,7 @@ void TestSub( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
@@ -556,7 +556,7 @@ void TestMul( void ) {
 		fsrc1[i] = srnd.CRandomFloat() * 10.0f;
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -576,7 +576,7 @@ void TestMul( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
@@ -602,7 +602,7 @@ void TestMul( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
@@ -630,10 +630,10 @@ void TestDiv( void ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
 		do {
 			fsrc1[i] = srnd.CRandomFloat() * 10.0f;
-		} while( arcMath::Fabs( fsrc1[i] ) < 0.1f );
+		} while( anMath::Fabs( fsrc1[i] ) < 0.1f );
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -653,7 +653,7 @@ void TestDiv( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
@@ -679,7 +679,7 @@ void TestDiv( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-3f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-3f ) {
 			break;
 		}
 	}
@@ -706,7 +706,7 @@ void TestMulAdd( void ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	for ( j = 0; j < 50 && j < COUNT; j++ ) {
 		bestClocksGeneric = 0;
@@ -733,7 +733,7 @@ void TestMulAdd( void ) {
 		}
 
 		for ( i = 0; i < COUNT; i++ ) {
-			if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+			if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 				break;
 			}
 		}
@@ -761,7 +761,7 @@ void TestMulSub( void ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	for ( j = 0; j < 50 && j < COUNT; j++ ) {
 		bestClocksGeneric = 0;
@@ -788,7 +788,7 @@ void TestMulSub( void ) {
 		}
 
 		for ( i = 0; i < COUNT; i++ ) {
-			if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+			if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 				break;
 			}
 		}
@@ -809,12 +809,12 @@ void TestDot( void ) {
 	ALIGN16( float fdst1[COUNT] );
 	ALIGN16( float fsrc0[COUNT] );
 	ALIGN16( float fsrc1[COUNT] );
-	ALIGN16( arcVec3 v3src0[COUNT] );
-	ALIGN16( arcVec3 v3src1[COUNT] );
-	ALIGN16( arcVec3 v3constant ) ( 1.0f, 2.0f, 3.0f );
-	ALIGN16( arcPlane v4src0[COUNT] );
-	ALIGN16( arcPlane v4constant ) (1.0f, 2.0f, 3.0f, 4.0f);
-	ALIGN16( arcDrawVert drawVerts[COUNT] );
+	ALIGN16( anVec3 v3src0[COUNT] );
+	ALIGN16( anVec3 v3src1[COUNT] );
+	ALIGN16( anVec3 v3constant ) ( 1.0f, 2.0f, 3.0f );
+	ALIGN16( anPlane v4src0[COUNT] );
+	ALIGN16( anPlane v4constant ) (1.0f, 2.0f, 3.0f, 4.0f);
+	ALIGN16( anDrawVertex drawVerts[COUNT] );
 	const char *result;
 
 	arcRandom srnd( RANDOM_SEED );
@@ -833,7 +833,7 @@ void TestDot( void ) {
 		drawVerts[i].xyz = v3src0[i];
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 
 	bestClocksGeneric = 0;
@@ -843,7 +843,7 @@ void TestDot( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->Dot( arcVec3 * arcVec3[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->Dot( anVec3 * anVec3[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -854,12 +854,12 @@ void TestDot( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
 	result = ( i >= COUNT ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->Dot( arcVec3 * arcVec3[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->Dot( anVec3 * anVec3[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 
 	bestClocksGeneric = 0;
@@ -869,7 +869,7 @@ void TestDot( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->Dot( arcVec3 * arcPlane[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->Dot( anVec3 * anPlane[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -880,12 +880,12 @@ void TestDot( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
 	result = ( i >= COUNT ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->Dot( arcVec3 * arcPlane[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->Dot( anVec3 * anPlane[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 
 	bestClocksGeneric = 0;
@@ -895,7 +895,7 @@ void TestDot( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->Dot( arcVec3 * arcDrawVert[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->Dot( anVec3 * anDrawVertex[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -906,12 +906,12 @@ void TestDot( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
 	result = ( i >= COUNT ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->Dot( arcVec3 * arcDrawVert[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->Dot( anVec3 * anDrawVertex[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 
 	bestClocksGeneric = 0;
@@ -921,7 +921,7 @@ void TestDot( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->Dot( arcPlane * arcVec3[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->Dot( anPlane * anVec3[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -932,12 +932,12 @@ void TestDot( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
 	result = ( i >= COUNT ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->Dot( arcPlane * arcVec3[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->Dot( anPlane * anVec3[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 
 	bestClocksGeneric = 0;
@@ -947,7 +947,7 @@ void TestDot( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->Dot( arcPlane * arcPlane[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->Dot( anPlane * anPlane[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -958,12 +958,12 @@ void TestDot( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
 	result = ( i >= COUNT ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->Dot( arcPlane * arcPlane[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->Dot( anPlane * anPlane[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 
 	bestClocksGeneric = 0;
@@ -973,7 +973,7 @@ void TestDot( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->Dot( arcPlane * arcDrawVert[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->Dot( anPlane * anDrawVertex[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -984,12 +984,12 @@ void TestDot( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-5f ) {
 			break;
 		}
 	}
 	result = ( i >= COUNT ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->Dot( arcPlane * arcDrawVert[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->Dot( anPlane * anDrawVertex[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 
 	bestClocksGeneric = 0;
@@ -999,7 +999,7 @@ void TestDot( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->Dot( arcVec3[] * arcVec3[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->Dot( anVec3[] * anVec3[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1010,15 +1010,15 @@ void TestDot( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		if ( arcMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-4f ) {
+		if ( anMath::Fabs( fdst0[i] - fdst1[i] ) > 1e-4f ) {
 			break;
 		}
 	}
 	result = ( i >= COUNT ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->Dot( arcVec3[] * arcVec3[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->Dot( anVec3[] * anVec3[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	float dot1 = 0.0f, dot2 = 0.0f;
 	for ( j = 0; j < 50 && j < COUNT; j++ ) {
@@ -1039,7 +1039,7 @@ void TestDot( void ) {
 			StopRecordTime( end );
 			GetBest( start, end, bestClocksSIMD );
 		}
-		result = arcMath::Fabs( dot1 - dot2 ) < 1e-4f ? "ok" : S_COLOR_RED"X";
+		result = anMath::Fabs( dot1 - dot2 ) < 1e-4f ? "ok" : S_COLOR_RED"X";
 		PrintClocks( va( "   simd->Dot( float[%2d] * float[%2d] ) %s", j, j, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 }
@@ -1063,7 +1063,7 @@ void TestCompare( void ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1289,13 +1289,13 @@ void TestMinMax( void ) {
 	int i;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	ALIGN16( float fsrc0[COUNT] );
-	ALIGN16( arcVec2 v2src0[COUNT] );
-	ALIGN16( arcVec3 v3src0[COUNT] );
-	ALIGN16( arcDrawVert drawVerts[COUNT] );
+	ALIGN16( anVec2 v2src0[COUNT] );
+	ALIGN16( anVec3 v3src0[COUNT] );
+	ALIGN16( anDrawVertex drawVerts[COUNT] );
 	ALIGN16( int indexes[COUNT] );
 	float min = 0.0f, max = 0.0f, min2 = 0.0f, max2 = 0.0f;
-	arcVec2 v2min, v2max, v2min2, v2max2;
-	arcVec3 vmin, vmax, vmin2, vmax2;
+	anVec2 v2min, v2max, v2min2, v2max2;
+	anVec3 vmin, vmax, vmin2, vmax2;
 	const char *result;
 
 	arcRandom srnd( RANDOM_SEED );
@@ -1311,12 +1311,12 @@ void TestMinMax( void ) {
 		indexes[i] = i;
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
-		min = arcMath::INFINITY;
-		max = -arcMath::INFINITY;
+		min = anMath::INFINITY;
+		max = -anMath::INFINITY;
 		StartRecordTime( start );
 		p_generic->MinMax( min, max, fsrc0, COUNT );
 		StopRecordTime( end );
@@ -1342,7 +1342,7 @@ void TestMinMax( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->MinMax( arcVec2[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->MinMax( anVec2[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1353,7 +1353,7 @@ void TestMinMax( void ) {
 	}
 
 	result = ( v2min == v2min2 && v2max == v2max2 ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->MinMax( arcVec2[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->MinMax( anVec2[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1362,7 +1362,7 @@ void TestMinMax( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->MinMax( arcVec3[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->MinMax( anVec3[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1373,7 +1373,7 @@ void TestMinMax( void ) {
 	}
 
 	result = ( vmin == vmin2 && vmax == vmax2 ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->MinMax( arcVec3[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->MinMax( anVec3[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1382,7 +1382,7 @@ void TestMinMax( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->MinMax( arcDrawVert[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->MinMax( anDrawVertex[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1393,7 +1393,7 @@ void TestMinMax( void ) {
 	}
 
 	result = ( vmin == vmin2 && vmax == vmax2 ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->MinMax( arcDrawVert[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->MinMax( anDrawVertex[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1402,7 +1402,7 @@ void TestMinMax( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocksGeneric );
 	}
-	PrintClocks( "generic->MinMax( arcDrawVert[], indexes[] )", COUNT, bestClocksGeneric );
+	PrintClocks( "generic->MinMax( anDrawVertex[], indexes[] )", COUNT, bestClocksGeneric );
 
 	bestClocksSIMD = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1413,7 +1413,7 @@ void TestMinMax( void ) {
 	}
 
 	result = ( vmin == vmin2 && vmax == vmax2 ) ? "ok" : S_COLOR_RED"X";
-	PrintClocks( va( "   simd->MinMax( arcDrawVert[], indexes[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
+	PrintClocks( va( "   simd->MinMax( anDrawVertex[], indexes[] ) %s", result ), COUNT, bestClocksSIMD, bestClocksGeneric );
 }
 
 /*
@@ -1435,7 +1435,7 @@ void TestClamp( void ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -1526,7 +1526,7 @@ void TestMemcpy( void ) {
 
 	arcRandom random( RANDOM_SEED );
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	for ( int i = 5; i < 8192; i += 31 ) {
 		for ( int j = 0; j < i; j++ ) {
@@ -1536,14 +1536,14 @@ void TestMemcpy( void ) {
 		for ( int j = 0; j < i; j++ ) {
 			if ( test1[j] != test0[j] ) {
 				//#modified-fva; BEGIN
-				//arcLibrary::common->Printf( "   simd->Memcpy() "S_COLOR_RED"X\n" );
-				arcLibrary::common->Printf( "   simd->Memcpy() " S_COLOR_RED"X\n" );
+				//anLibrary::common->Printf( "   simd->Memcpy() "S_COLOR_RED"X\n" );
+				anLibrary::common->Printf( "   simd->Memcpy() " S_COLOR_RED"X\n" );
 				//#modified-fva; END
 				return;
 			}
 		}
 	}
-	arcLibrary::common->Printf( "   simd->Memcpy() ok\n" );
+	anLibrary::common->Printf( "   simd->Memcpy() ok\n" );
 }
 
 /*
@@ -1564,15 +1564,15 @@ void TestMemset( void ) {
 			for ( int k = 0; k < i; k++ ) {
 				if ( test[k] != ( byte )j ) {
 					//#modified-fva; BEGIN
-					//arcLibrary::common->Printf( "   simd->Memset() "S_COLOR_RED"X\n" );
-					arcLibrary::common->Printf( "   simd->Memset() " S_COLOR_RED"X\n" );
+					//anLibrary::common->Printf( "   simd->Memset() "S_COLOR_RED"X\n" );
+					anLibrary::common->Printf( "   simd->Memset() " S_COLOR_RED"X\n" );
 					//#modified-fva; END
 					return;
 				}
 			}
 		}
 	}
-	arcLibrary::common->Printf( "   simd->Memset() ok\n" );
+	anLibrary::common->Printf( "   simd->Memset() ok\n" );
 }
 
 #define	MATX_SIMD_EPSILON			1e-5f
@@ -1585,10 +1585,10 @@ TestMatXMultiplyVecX
 void TestMatXMultiplyVecX( void ) {
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	const char *result;
-	arcMatX mat;
-	arcVecX src(6);
-	arcVecX dst(6);
-	arcVecX tst(6);
+	anMatX mat;
+	anVecX src(6);
+	anVecX dst(6);
+	anVecX tst(6);
 
 	src[0] = 1.0f;
 	src[1] = 2.0f;
@@ -1597,7 +1597,7 @@ void TestMatXMultiplyVecX( void ) {
 	src[4] = 5.0f;
 	src[5] = 6.0f;
 
-	arcLibrary::common->Printf( "================= NxN * Nx1 ===================\n" );
+	anLibrary::common->Printf( "================= NxN * Nx1 ===================\n" );
 
 	for ( int i = 1; i <= 6; i++ ) {
 		mat.Random( i, i, RANDOM_SEED, -10.0f, 10.0f );
@@ -1626,7 +1626,7 @@ void TestMatXMultiplyVecX( void ) {
 		PrintClocks( va( "   simd->MatX_MultiplyVecX %dx%d*%dx1 %s", i, i, i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= Nx6 * 6x1 ===================\n" );
+	anLibrary::common->Printf( "================= Nx6 * 6x1 ===================\n" );
 
 	for ( int i = 1; i <= 6; i++ ) {
 		mat.Random( i, 6, RANDOM_SEED, -10.0f, 10.0f );
@@ -1655,7 +1655,7 @@ void TestMatXMultiplyVecX( void ) {
 		PrintClocks( va( "   simd->MatX_MultiplyVecX %dx6*6x1 %s", i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= 6xN * Nx1 ===================\n" );
+	anLibrary::common->Printf( "================= 6xN * Nx1 ===================\n" );
 
 	for ( int i = 1; i <= 6; i++ ) {
 		mat.Random( 6, i, RANDOM_SEED, -10.0f, 10.0f );
@@ -1693,10 +1693,10 @@ void TestMatXMultiplyAddVecX( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	const char *result;
-	arcMatX mat;
-	arcVecX src(6);
-	arcVecX dst(6);
-	arcVecX tst(6);
+	anMatX mat;
+	anVecX src(6);
+	anVecX dst(6);
+	anVecX tst(6);
 
 	src[0] = 1.0f;
 	src[1] = 2.0f;
@@ -1705,7 +1705,7 @@ void TestMatXMultiplyAddVecX( void ) {
 	src[4] = 5.0f;
 	src[5] = 6.0f;
 
-	arcLibrary::common->Printf( "================= NxN * Nx1 ===================\n" );
+	anLibrary::common->Printf( "================= NxN * Nx1 ===================\n" );
 
 	for ( i = 1; i <= 6; i++ ) {
 		mat.Random( i, i, RANDOM_SEED, -10.0f, 10.0f );
@@ -1735,7 +1735,7 @@ void TestMatXMultiplyAddVecX( void ) {
 		PrintClocks( va( "   simd->MatX_MultiplyAddVecX %dx%d*%dx1 %s", i, i, i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= Nx6 * 6x1 ===================\n" );
+	anLibrary::common->Printf( "================= Nx6 * 6x1 ===================\n" );
 
 	for ( i = 1; i <= 6; i++ ) {
 		mat.Random( i, 6, RANDOM_SEED, -10.0f, 10.0f );
@@ -1764,7 +1764,7 @@ void TestMatXMultiplyAddVecX( void ) {
 		PrintClocks( va( "   simd->MatX_MultiplyAddVecX %dx6*6x1 %s", i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= 6xN * Nx1 ===================\n" );
+	anLibrary::common->Printf( "================= 6xN * Nx1 ===================\n" );
 
 	for ( i = 1; i <= 6; i++ ) {
 		mat.Random( 6, i, RANDOM_SEED, -10.0f, 10.0f );
@@ -1803,10 +1803,10 @@ void TestMatXTransposeMultiplyVecX( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	const char *result;
-	arcMatX mat;
-	arcVecX src(6);
-	arcVecX dst(6);
-	arcVecX tst(6);
+	anMatX mat;
+	anVecX src(6);
+	anVecX dst(6);
+	anVecX tst(6);
 
 	src[0] = 1.0f;
 	src[1] = 2.0f;
@@ -1815,7 +1815,7 @@ void TestMatXTransposeMultiplyVecX( void ) {
 	src[4] = 5.0f;
 	src[5] = 6.0f;
 
-	arcLibrary::common->Printf( "================= Nx6 * Nx1 ===================\n" );
+	anLibrary::common->Printf( "================= Nx6 * Nx1 ===================\n" );
 
 	for ( i = 1; i <= 6; i++ ) {
 		mat.Random( i, 6, RANDOM_SEED, -10.0f, 10.0f );
@@ -1844,7 +1844,7 @@ void TestMatXTransposeMultiplyVecX( void ) {
 		PrintClocks( va( "   simd->MatX_TransposeMulVecX %dx6*%dx1 %s", i, i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= 6xN * 6x1 ===================\n" );
+	anLibrary::common->Printf( "================= 6xN * 6x1 ===================\n" );
 
 	for ( i = 1; i <= 6; i++ ) {
 		mat.Random( 6, i, RANDOM_SEED, -10.0f, 10.0f );
@@ -1883,10 +1883,10 @@ void TestMatXTransposeMultiplyAddVecX( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	const char *result;
-	arcMatX mat;
-	arcVecX src(6);
-	arcVecX dst(6);
-	arcVecX tst(6);
+	anMatX mat;
+	anVecX src(6);
+	anVecX dst(6);
+	anVecX tst(6);
 
 	src[0] = 1.0f;
 	src[1] = 2.0f;
@@ -1895,7 +1895,7 @@ void TestMatXTransposeMultiplyAddVecX( void ) {
 	src[4] = 5.0f;
 	src[5] = 6.0f;
 
-	arcLibrary::common->Printf( "================= Nx6 * Nx1 ===================\n" );
+	anLibrary::common->Printf( "================= Nx6 * Nx1 ===================\n" );
 
 	for ( i = 1; i <= 6; i++ ) {
 		mat.Random( i, 6, RANDOM_SEED, -10.0f, 10.0f );
@@ -1924,7 +1924,7 @@ void TestMatXTransposeMultiplyAddVecX( void ) {
 		PrintClocks( va( "   simd->MatX_TransposeMulAddVecX %dx6*%dx1 %s", i, i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= 6xN * 6x1 ===================\n" );
+	anLibrary::common->Printf( "================= 6xN * 6x1 ===================\n" );
 
 	for ( i = 1; i <= 6; i++ ) {
 		mat.Random( 6, i, RANDOM_SEED, -10.0f, 10.0f );
@@ -1966,9 +1966,9 @@ void TestMatXMultiplyMatX( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	const char *result;
-	arcMatX m1, m2, dst, tst;
+	anMatX m1, m2, dst, tst;
 
-	arcLibrary::common->Printf( "================= NxN * Nx6 ===================\n" );
+	anLibrary::common->Printf( "================= NxN * Nx6 ===================\n" );
 
 	// NxN * Nx6
 	for ( i = 1; i <= 5; i++ ) {
@@ -1999,7 +1999,7 @@ void TestMatXMultiplyMatX( void ) {
 		PrintClocks( va( "   simd->MatX_MultiplyMatX %dx%d*%dx6 %s", i, i, i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= 6xN * Nx6 ===================\n" );
+	anLibrary::common->Printf( "================= 6xN * Nx6 ===================\n" );
 
 	// 6xN * Nx6
 	for ( i = 1; i <= 5; i++ ) {
@@ -2030,7 +2030,7 @@ void TestMatXMultiplyMatX( void ) {
 		PrintClocks( va( "   simd->MatX_MultiplyMatX 6x%d*%dx6 %s", i, i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= Nx6 * 6xN ===================\n" );
+	anLibrary::common->Printf( "================= Nx6 * 6xN ===================\n" );
 
 	// Nx6 * 6xN
 	for ( i = 1; i <= 5; i++ ) {
@@ -2061,7 +2061,7 @@ void TestMatXMultiplyMatX( void ) {
 		PrintClocks( va( "   simd->MatX_MultiplyMatX %dx6*6x%d %s", i, i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= 6x6 * 6xN ===================\n" );
+	anLibrary::common->Printf( "================= 6x6 * 6xN ===================\n" );
 
 	// 6x6 * 6xN
 	for ( i = 1; i <= 6; i++ ) {
@@ -2102,9 +2102,9 @@ void TestMatXTransposeMultiplyMatX( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	const char *result;
-	arcMatX m1, m2, dst, tst;
+	anMatX m1, m2, dst, tst;
 
-	arcLibrary::common->Printf( "================= Nx6 * NxN ===================\n" );
+	anLibrary::common->Printf( "================= Nx6 * NxN ===================\n" );
 
 	// Nx6 * NxN
 	for ( i = 1; i <= 5; i++ ) {
@@ -2135,7 +2135,7 @@ void TestMatXTransposeMultiplyMatX( void ) {
 		PrintClocks( va( "   simd->MatX_TransMultiplyMatX %dx6*%dx%d %s", i, i, i, result ), 1, bestClocksSIMD, bestClocksGeneric );
 	}
 
-	arcLibrary::common->Printf( "================= 6xN * 6x6 ===================\n" );
+	anLibrary::common->Printf( "================= 6xN * 6x6 ===================\n" );
 
 	// 6xN * 6x6
 	for ( i = 1; i <= 6; i++ ) {
@@ -2179,10 +2179,10 @@ void TestMatXLowerTriangularSolve( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	const char *result;
-	arcMatX L;
-	arcVecX x, b, tst;
+	anMatX L;
+	anVecX x, b, tst;
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	L.Random( MATX_LTS_SOLVE_SIZE, MATX_LTS_SOLVE_SIZE, 0, -1.0f, 1.0f );
 	x.SetSize( MATX_LTS_SOLVE_SIZE );
@@ -2224,10 +2224,10 @@ void TestMatXLowerTriangularSolveTranspose( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	const char *result;
-	arcMatX L;
-	arcVecX x, b, tst;
+	anMatX L;
+	anVecX x, b, tst;
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	L.Random( MATX_LTS_SOLVE_SIZE, MATX_LTS_SOLVE_SIZE, 0, -1.0f, 1.0f );
 	x.SetSize( MATX_LTS_SOLVE_SIZE );
@@ -2272,10 +2272,10 @@ void TestMatXLDLTFactor( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	const char *result;
-	arcMatX src, original, mat1, mat2;
-	arcVecX invDiag1, invDiag2;
+	anMatX src, original, mat1, mat2;
+	anVecX invDiag1, invDiag2;
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	original.SetSize( MATX_LDLT_FACTOR_SOLVE_SIZE, MATX_LDLT_FACTOR_SOLVE_SIZE );
 	src.Random( MATX_LDLT_FACTOR_SOLVE_SIZE, MATX_LDLT_FACTOR_SOLVE_SIZE, 0, -1.0f, 1.0f );
@@ -2317,10 +2317,10 @@ TestBlendJoints
 void TestBlendJoints( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( idJointQuat baseJoints[COUNT] );
-	ALIGN16( idJointQuat joints1[COUNT] );
-	ALIGN16( idJointQuat joints2[COUNT] );
-	ALIGN16( idJointQuat blendJoints[COUNT] );
+	ALIGN16( anJointQuat baseJoints[COUNT] );
+	ALIGN16( anJointQuat joints1[COUNT] );
+	ALIGN16( anJointQuat joints2[COUNT] );
+	ALIGN16( anJointQuat blendJoints[COUNT] );
 	ALIGN16( int index[COUNT] );
 	float lerp = 0.3f;
 	const char *result;
@@ -2328,7 +2328,7 @@ void TestBlendJoints( void ) {
 	arcRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
-		arcAngles angles;
+		anAngles angles;
 		angles[0] = srnd.CRandomFloat() * 180.0f;
 		angles[1] = srnd.CRandomFloat() * 180.0f;
 		angles[2] = srnd.CRandomFloat() * 180.0f;
@@ -2389,7 +2389,7 @@ TestConvertJointQuatsToJointMats
 void TestConvertJointQuatsToJointMats( void ) {
 	int i;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( idJointQuat baseJoints[COUNT] );
+	ALIGN16( anJointQuat baseJoints[COUNT] );
 	ALIGN16( arcJointMat joints1[COUNT] );
 	ALIGN16( arcJointMat joints2[COUNT] );
 	const char *result;
@@ -2397,7 +2397,7 @@ void TestConvertJointQuatsToJointMats( void ) {
 	arcRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
-		arcAngles angles;
+		anAngles angles;
 		angles[0] = srnd.CRandomFloat() * 180.0f;
 		angles[1] = srnd.CRandomFloat() * 180.0f;
 		angles[2] = srnd.CRandomFloat() * 180.0f;
@@ -2442,19 +2442,19 @@ void TestConvertJointMatsToJointQuats( void ) {
 	int i;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	ALIGN16( arcJointMat baseJoints[COUNT] );
-	ALIGN16( idJointQuat joints1[COUNT] );
-	ALIGN16( idJointQuat joints2[COUNT] );
+	ALIGN16( anJointQuat joints1[COUNT] );
+	ALIGN16( anJointQuat joints2[COUNT] );
 	const char *result;
 
 	arcRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
-		arcAngles angles;
+		anAngles angles;
 		angles[0] = srnd.CRandomFloat() * 180.0f;
 		angles[1] = srnd.CRandomFloat() * 180.0f;
 		angles[2] = srnd.CRandomFloat() * 180.0f;
 		baseJoints[i].SetRotation( angles.ToMat3() );
-		arcVec3 v;
+		anVec3 v;
 		v[0] = srnd.CRandomFloat() * 10.0f;
 		v[1] = srnd.CRandomFloat() * 10.0f;
 		v[2] = srnd.CRandomFloat() * 10.0f;
@@ -2480,11 +2480,11 @@ void TestConvertJointMatsToJointQuats( void ) {
 
 	for ( i = 0; i < COUNT; i++ ) {
 		if ( !joints1[i].q.Compare( joints2[i].q, 1e-4f ) ) {
-			arcLibrary::common->Printf( "ConvertJointMatsToJointQuats: broken q %i\n", i );
+			anLibrary::common->Printf( "ConvertJointMatsToJointQuats: broken q %i\n", i );
 			break;
 		}
 		if ( !joints1[i].t.Compare( joints2[i].t, 1e-4f ) ) {
-			arcLibrary::common->Printf( "ConvertJointMatsToJointQuats: broken t %i\n", i );
+			anLibrary::common->Printf( "ConvertJointMatsToJointQuats: broken t %i\n", i );
 			break;
 		}
 	}
@@ -2509,12 +2509,12 @@ void TestTransformJoints( void ) {
 	arcRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i <= COUNT; i++ ) {
-		arcAngles angles;
+		anAngles angles;
 		angles[0] = srnd.CRandomFloat() * 180.0f;
 		angles[1] = srnd.CRandomFloat() * 180.0f;
 		angles[2] = srnd.CRandomFloat() * 180.0f;
 		joints[i].SetRotation( angles.ToMat3() );
-		arcVec3 v;
+		anVec3 v;
 		v[0] = srnd.CRandomFloat() * 2.0f;
 		v[1] = srnd.CRandomFloat() * 2.0f;
 		v[2] = srnd.CRandomFloat() * 2.0f;
@@ -2571,12 +2571,12 @@ void TestUntransformJoints( void ) {
 	arcRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i <= COUNT; i++ ) {
-		arcAngles angles;
+		anAngles angles;
 		angles[0] = srnd.CRandomFloat() * 180.0f;
 		angles[1] = srnd.CRandomFloat() * 180.0f;
 		angles[2] = srnd.CRandomFloat() * 180.0f;
 		joints[i].SetRotation( angles.ToMat3() );
-		arcVec3 v;
+		anVec3 v;
 		v[0] = srnd.CRandomFloat() * 2.0f;
 		v[1] = srnd.CRandomFloat() * 2.0f;
 		v[2] = srnd.CRandomFloat() * 2.0f;
@@ -2626,22 +2626,22 @@ TestTransformVerts
 void TestTransformVerts( void ) {
 	int i;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcDrawVert drawVerts1[NUMVERTS] );
-	ALIGN16( arcDrawVert drawVerts2[NUMVERTS] );
+	ALIGN16( anDrawVertex drawVerts1[NUMVERTS] );
+	ALIGN16( anDrawVertex drawVerts2[NUMVERTS] );
 	ALIGN16( arcJointMat joints[NUMJOINTS] );
-	ALIGN16( arcVec4 weights[COUNT] );
+	ALIGN16( anVec4 weights[COUNT] );
 	ALIGN16( int weightIndex[COUNT*2] );
 	const char *result;
 
 	arcRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < NUMJOINTS; i++ ) {
-		arcAngles angles;
+		anAngles angles;
 		angles[0] = srnd.CRandomFloat() * 180.0f;
 		angles[1] = srnd.CRandomFloat() * 180.0f;
 		angles[2] = srnd.CRandomFloat() * 180.0f;
 		joints[i].SetRotation( angles.ToMat3() );
-		arcVec3 v;
+		anVec3 v;
 		v[0] = srnd.CRandomFloat() * 2.0f;
 		v[1] = srnd.CRandomFloat() * 2.0f;
 		v[2] = srnd.CRandomFloat() * 2.0f;
@@ -2691,8 +2691,8 @@ TestTracePointCull
 void TestTracePointCull( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcPlane planes[4] );
-	ALIGN16( arcDrawVert drawVerts[COUNT] );
+	ALIGN16( anPlane planes[4] );
+	ALIGN16( anDrawVertex drawVerts[COUNT] );
 	ALIGN16( byte cullBits1[COUNT] );
 	ALIGN16( byte cullBits2[COUNT] );
 	byte totalOr1 = 0, totalOr2 = 0;
@@ -2700,10 +2700,10 @@ void TestTracePointCull( void ) {
 
 	arcRandom srnd( RANDOM_SEED );
 
-	planes[0].SetNormal( arcVec3(  1,  0, 0 ) );
-	planes[1].SetNormal( arcVec3( -1,  0, 0 ) );
-	planes[2].SetNormal( arcVec3(  0,  1, 0 ) );
-	planes[3].SetNormal( arcVec3(  0, -1, 0 ) );
+	planes[0].SetNormal( anVec3(  1,  0, 0 ) );
+	planes[1].SetNormal( anVec3( -1,  0, 0 ) );
+	planes[2].SetNormal( anVec3(  0,  1, 0 ) );
+	planes[3].SetNormal( anVec3(  0, -1, 0 ) );
 	planes[0][3] = -5.3f;
 	planes[1][3] = 5.3f;
 	planes[2][3] = -3.4f;
@@ -2749,20 +2749,20 @@ TestDecalPointCull
 void TestDecalPointCull( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcPlane planes[6] );
-	ALIGN16( arcDrawVert drawVerts[COUNT] );
+	ALIGN16( anPlane planes[6] );
+	ALIGN16( anDrawVertex drawVerts[COUNT] );
 	ALIGN16( byte cullBits1[COUNT] );
 	ALIGN16( byte cullBits2[COUNT] );
 	const char *result;
 
 	arcRandom srnd( RANDOM_SEED );
 
-	planes[0].SetNormal( arcVec3(  1,  0,  0 ) );
-	planes[1].SetNormal( arcVec3( -1,  0,  0 ) );
-	planes[2].SetNormal( arcVec3(  0,  1,  0 ) );
-	planes[3].SetNormal( arcVec3(  0, -1,  0 ) );
-	planes[4].SetNormal( arcVec3(  0,  0,  1 ) );
-	planes[5].SetNormal( arcVec3(  0,  0, -1 ) );
+	planes[0].SetNormal( anVec3(  1,  0,  0 ) );
+	planes[1].SetNormal( anVec3( -1,  0,  0 ) );
+	planes[2].SetNormal( anVec3(  0,  1,  0 ) );
+	planes[3].SetNormal( anVec3(  0, -1,  0 ) );
+	planes[4].SetNormal( anVec3(  0,  0,  1 ) );
+	planes[5].SetNormal( anVec3(  0,  0, -1 ) );
 	planes[0][3] = -5.3f;
 	planes[1][3] = 5.3f;
 	planes[2][3] = -4.4f;
@@ -2810,18 +2810,18 @@ TestOverlayPointCull
 void TestOverlayPointCull( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcPlane planes[2] );
-	ALIGN16( arcDrawVert drawVerts[COUNT] );
+	ALIGN16( anPlane planes[2] );
+	ALIGN16( anDrawVertex drawVerts[COUNT] );
 	ALIGN16( byte cullBits1[COUNT] );
 	ALIGN16( byte cullBits2[COUNT] );
-	ALIGN16( arcVec2 texCoords1[COUNT] );
-	ALIGN16( arcVec2 texCoords2[COUNT] );
+	ALIGN16( anVec2 texCoords1[COUNT] );
+	ALIGN16( anVec2 texCoords2[COUNT] );
 	const char *result;
 
 	arcRandom srnd( RANDOM_SEED );
 
-	planes[0].SetNormal( arcVec3( 0.3f, 0.2f, 0.9f ) );
-	planes[1].SetNormal( arcVec3( 0.9f, 0.2f, 0.3f ) );
+	planes[0].SetNormal( anVec3( 0.3f, 0.2f, 0.9f ) );
+	planes[1].SetNormal( anVec3( 0.9f, 0.2f, 0.3f ) );
 	planes[0][3] = -5.3f;
 	planes[1][3] = -4.3f;
 
@@ -2868,10 +2868,10 @@ TestDeriveTriPlanes
 void TestDeriveTriPlanes( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcDrawVert drawVerts1[COUNT] );
-	ALIGN16( arcDrawVert drawVerts2[COUNT] );
-	ALIGN16( arcPlane planes1[COUNT] );
-	ALIGN16( arcPlane planes2[COUNT] );
+	ALIGN16( anDrawVertex drawVerts1[COUNT] );
+	ALIGN16( anDrawVertex drawVerts2[COUNT] );
+	ALIGN16( anPlane planes1[COUNT] );
+	ALIGN16( anPlane planes2[COUNT] );
 	ALIGN16( int indexes[COUNT*3] );
 	const char *result;
 
@@ -2927,10 +2927,10 @@ TestDeriveTangents
 void TestDeriveTangents( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcDrawVert drawVerts1[COUNT] );
-	ALIGN16( arcDrawVert drawVerts2[COUNT] );
-	ALIGN16( arcPlane planes1[COUNT] );
-	ALIGN16( arcPlane planes2[COUNT] );
+	ALIGN16( anDrawVertex drawVerts1[COUNT] );
+	ALIGN16( anDrawVertex drawVerts2[COUNT] );
+	ALIGN16( anPlane planes1[COUNT] );
+	ALIGN16( anPlane planes2[COUNT] );
 	ALIGN16( int indexes[COUNT*3] );
 	const char *result;
 
@@ -2970,14 +2970,14 @@ void TestDeriveTangents( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		arcVec3 v1, v2;
+		anVec3 v1, v2;
 
 		v1 = drawVerts1[i].normal;
 		v1.Normalize();
 		v2 = drawVerts2[i].normal;
 		v2.Normalize();
 		if ( !v1.Compare( v2, 1e-1f ) ) {
-			arcLibrary::common->Printf( "DeriveTangents: broken at normal %i\n -- expecting %s got %s", i, v1.ToString(), v2.ToString() );
+			anLibrary::common->Printf( "DeriveTangents: broken at normal %i\n -- expecting %s got %s", i, v1.ToString(), v2.ToString() );
 			break;
 		}
 		v1 = drawVerts1[i].tangents[0];
@@ -2985,7 +2985,7 @@ void TestDeriveTangents( void ) {
 		v2 = drawVerts2[i].tangents[0];
 		v2.Normalize();
 		if ( !v1.Compare( v2, 1e-1f ) ) {
-			arcLibrary::common->Printf( "DeriveTangents: broken at tangent0 %i -- expecting %s got %s\n", i, v1.ToString(), v2.ToString() );
+			anLibrary::common->Printf( "DeriveTangents: broken at tangent0 %i -- expecting %s got %s\n", i, v1.ToString(), v2.ToString() );
 			break;
 		}
 		v1 = drawVerts1[i].tangents[1];
@@ -2993,7 +2993,7 @@ void TestDeriveTangents( void ) {
 		v2 = drawVerts2[i].tangents[1];
 		v2.Normalize();
 		if ( !v1.Compare( v2, 1e-1f ) ) {
-			arcLibrary::common->Printf( "DeriveTangents: broken at tangent1 %i -- expecting %s got %s\n", i, v1.ToString(), v2.ToString() );
+			anLibrary::common->Printf( "DeriveTangents: broken at tangent1 %i -- expecting %s got %s\n", i, v1.ToString(), v2.ToString() );
 			break;
 		}
 		if ( !planes1[i].Compare( planes2[i], 1e-1f, 1e-1f ) ) {
@@ -3012,8 +3012,8 @@ TestDeriveUnsmoothedTangents
 void TestDeriveUnsmoothedTangents( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcDrawVert drawVerts1[COUNT] );
-	ALIGN16( arcDrawVert drawVerts2[COUNT] );
+	ALIGN16( anDrawVertex drawVerts1[COUNT] );
+	ALIGN16( anDrawVertex drawVerts2[COUNT] );
 	ALIGN16( dominantTri_s dominantTris[COUNT] );
 	const char *result;
 
@@ -3053,7 +3053,7 @@ void TestDeriveUnsmoothedTangents( void ) {
 	}
 
 	for ( i = 0; i < COUNT; i++ ) {
-		arcVec3 v1, v2;
+		anVec3 v1, v2;
 
 		v1 = drawVerts1[i].normal;
 		v1.Normalize();
@@ -3089,8 +3089,8 @@ TestNormalizeTangents
 void TestNormalizeTangents( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcDrawVert drawVerts1[COUNT] );
-	ALIGN16( arcDrawVert drawVerts2[COUNT] );
+	ALIGN16( anDrawVertex drawVerts1[COUNT] );
+	ALIGN16( anDrawVertex drawVerts2[COUNT] );
 	const char *result;
 
 	arcRandom srnd( RANDOM_SEED );
@@ -3150,13 +3150,13 @@ TestGetTextureSpaceLightVectors
 void TestGetTextureSpaceLightVectors( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcDrawVert drawVerts[COUNT] );
-	ALIGN16( arcVec4 texCoords1[COUNT] );
-	ALIGN16( arcVec4 texCoords2[COUNT] );
+	ALIGN16( anDrawVertex drawVerts[COUNT] );
+	ALIGN16( anVec4 texCoords1[COUNT] );
+	ALIGN16( anVec4 texCoords2[COUNT] );
 	ALIGN16( int indexes[COUNT*3] );
-	ALIGN16( arcVec3 lightVectors1[COUNT] );
-	ALIGN16( arcVec3 lightVectors2[COUNT] );
-	arcVec3 lightOrigin;
+	ALIGN16( anVec3 lightVectors1[COUNT] );
+	ALIGN16( anVec3 lightVectors2[COUNT] );
+	anVec3 lightOrigin;
 	const char *result;
 
 	arcRandom srnd( RANDOM_SEED );
@@ -3214,13 +3214,13 @@ TestGetSpecularTextureCoords
 void TestGetSpecularTextureCoords( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcDrawVert drawVerts[COUNT] );
-	ALIGN16( arcVec4 texCoords1[COUNT] );
-	ALIGN16( arcVec4 texCoords2[COUNT] );
+	ALIGN16( anDrawVertex drawVerts[COUNT] );
+	ALIGN16( anVec4 texCoords1[COUNT] );
+	ALIGN16( anVec4 texCoords2[COUNT] );
 	ALIGN16( int indexes[COUNT*3] );
-	ALIGN16( arcVec3 lightVectors1[COUNT] );
-	ALIGN16( arcVec3 lightVectors2[COUNT] );
-	arcVec3 lightOrigin, viewOrigin;
+	ALIGN16( anVec3 lightVectors1[COUNT] );
+	ALIGN16( anVec3 lightVectors2[COUNT] );
+	anVec3 lightOrigin, viewOrigin;
 	const char *result;
 
 	arcRandom srnd( RANDOM_SEED );
@@ -3281,13 +3281,13 @@ TestCreateShadowCache
 void TestCreateShadowCache( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcDrawVert drawVerts[COUNT] );
-	ALIGN16( arcVec4 vertexCache1[COUNT*2] );
-	ALIGN16( arcVec4 vertexCache2[COUNT*2] );
+	ALIGN16( anDrawVertex drawVerts[COUNT] );
+	ALIGN16( anVec4 vertexCache1[COUNT*2] );
+	ALIGN16( anVec4 vertexCache2[COUNT*2] );
 	ALIGN16( int originalVertRemap[COUNT] );
 	ALIGN16( int vertRemap1[COUNT] );
 	ALIGN16( int vertRemap2[COUNT] );
-	ALIGN16( arcVec3 lightOrigin );
+	ALIGN16( anVec3 lightOrigin );
 	int numVerts1 = 0, numVerts2 = 0;
 	const char *result;
 
@@ -3423,7 +3423,7 @@ void TestSoundUpSampling( void ) {
 			}
 
 			for ( i = 0; i < MIXBUFFER_SAMPLES*numSpeakers; i++ ) {
-				if ( arcMath::Fabs( samples1[i] - samples2[i] ) > SOUND_UPSAMPLE_EPSILON ) {
+				if ( anMath::Fabs( samples1[i] - samples2[i] ) > SOUND_UPSAMPLE_EPSILON ) {
 					break;
 				}
 			}
@@ -3453,7 +3453,7 @@ void TestSoundUpSampling( void ) {
 			}
 
 			for ( i = 0; i < MIXBUFFER_SAMPLES*numSpeakers; i++ ) {
-				if ( arcMath::Fabs( samples1[i] - samples2[i] ) > SOUND_UPSAMPLE_EPSILON ) {
+				if ( anMath::Fabs( samples1[i] - samples2[i] ) > SOUND_UPSAMPLE_EPSILON ) {
 					break;
 				}
 			}
@@ -3520,7 +3520,7 @@ void TestSoundMixing( void ) {
 	}
 
 	for ( i = 0; i < MIXBUFFER_SAMPLES*6; i++ ) {
-		if ( arcMath::Fabs( mixBuffer1[i] - mixBuffer2[i] ) > SOUND_MIX_EPSILON ) {
+		if ( anMath::Fabs( mixBuffer1[i] - mixBuffer2[i] ) > SOUND_MIX_EPSILON ) {
 			break;
 		}
 	}
@@ -3552,7 +3552,7 @@ void TestSoundMixing( void ) {
 	}
 
 	for ( i = 0; i < MIXBUFFER_SAMPLES*6; i++ ) {
-		if ( arcMath::Fabs( mixBuffer1[i] - mixBuffer2[i] ) > SOUND_MIX_EPSILON ) {
+		if ( anMath::Fabs( mixBuffer1[i] - mixBuffer2[i] ) > SOUND_MIX_EPSILON ) {
 			break;
 		}
 	}
@@ -3585,7 +3585,7 @@ void TestSoundMixing( void ) {
 	}
 
 	for ( i = 0; i < MIXBUFFER_SAMPLES*6; i++ ) {
-		if ( arcMath::Fabs( mixBuffer1[i] - mixBuffer2[i] ) > SOUND_MIX_EPSILON ) {
+		if ( anMath::Fabs( mixBuffer1[i] - mixBuffer2[i] ) > SOUND_MIX_EPSILON ) {
 			break;
 		}
 	}
@@ -3617,7 +3617,7 @@ void TestSoundMixing( void ) {
 	}
 
 	for ( i = 0; i < MIXBUFFER_SAMPLES*6; i++ ) {
-		if ( arcMath::Fabs( mixBuffer1[i] - mixBuffer2[i] ) > SOUND_MIX_EPSILON ) {
+		if ( anMath::Fabs( mixBuffer1[i] - mixBuffer2[i] ) > SOUND_MIX_EPSILON ) {
 			break;
 		}
 	}
@@ -3670,7 +3670,7 @@ void TestMath( void ) {
 	int i;
 	TIME_TYPE start, end, bestClocks;
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	float tst = -1.0f;
 	float tst2 = 1.0f;
@@ -3693,7 +3693,7 @@ void TestMath( void ) {
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		int tmp = * ( int * ) &tst;
+		int tmp = * ( int*) &tst;
 		tmp &= 0x7FFFFFFF;
 		tst = * ( float * ) &tmp;
 		StopRecordTime( end );
@@ -3701,7 +3701,7 @@ void TestMath( void ) {
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "    arcMath::Fabs( tst )", 1, bestClocks );
+	PrintClocks( "    anMath::Fabs( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = 10.0f + 100.0f * rnd.RandomFloat();
@@ -3719,303 +3719,303 @@ void TestMath( void ) {
 	tst = rnd.RandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Sqrt( tst );
+		tst = anMath::Sqrt( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.RandomFloat();
 	}
-	PrintClocks( "    arcMath::Sqrt( tst )", 1, bestClocks );
+	PrintClocks( "    anMath::Sqrt( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.RandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Sqrt16( tst );
+		tst = anMath::Sqrt16( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.RandomFloat();
 	}
-	PrintClocks( "  arcMath::Sqrt16( tst )", 1, bestClocks );
+	PrintClocks( "  anMath::Sqrt16( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.RandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Sqrt64( tst );
+		tst = anMath::Sqrt64( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.RandomFloat();
 	}
-	PrintClocks( "  arcMath::Sqrt64( tst )", 1, bestClocks );
+	PrintClocks( "  anMath::Sqrt64( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.RandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = tst * arcMath::RSqrt( tst );
+		tst = tst * anMath::RSqrt( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.RandomFloat();
 	}
-	PrintClocks( "   arcMath::RSqrt( tst )", 1, bestClocks );
+	PrintClocks( "   anMath::RSqrt( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Sin( tst );
+		tst = anMath::Sin( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "     arcMath::Sin( tst )", 1, bestClocks );
+	PrintClocks( "     anMath::Sin( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Sin16( tst );
+		tst = anMath::Sin16( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "   arcMath::Sin16( tst )", 1, bestClocks );
+	PrintClocks( "   anMath::Sin16( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Cos( tst );
+		tst = anMath::Cos( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "     arcMath::Cos( tst )", 1, bestClocks );
+	PrintClocks( "     anMath::Cos( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Cos16( tst );
+		tst = anMath::Cos16( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "   arcMath::Cos16( tst )", 1, bestClocks );
+	PrintClocks( "   anMath::Cos16( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		arcMath::SinCos( tst, tst, tst2 );
+		anMath::SinCos( tst, tst, tst2 );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "  arcMath::SinCos( tst )", 1, bestClocks );
+	PrintClocks( "  anMath::SinCos( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		arcMath::SinCos16( tst, tst, tst2 );
+		anMath::SinCos16( tst, tst, tst2 );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "arcMath::SinCos16( tst )", 1, bestClocks );
+	PrintClocks( "anMath::SinCos16( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Tan( tst );
+		tst = anMath::Tan( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "     arcMath::Tan( tst )", 1, bestClocks );
+	PrintClocks( "     anMath::Tan( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Tan16( tst );
+		tst = anMath::Tan16( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "   arcMath::Tan16( tst )", 1, bestClocks );
+	PrintClocks( "   anMath::Tan16( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::ASin( tst );
+		tst = anMath::ASin( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
-		testvar = ( testvar + tst ) * tst * ( 1.0f / arcMath::PI );
+		testvar = ( testvar + tst ) * tst * ( 1.0f / anMath::PI );
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "    arcMath::ASin( tst )", 1, bestClocks );
+	PrintClocks( "    anMath::ASin( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::ASin16( tst );
+		tst = anMath::ASin16( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
-		testvar = ( testvar + tst ) * tst * ( 1.0f / arcMath::PI );
+		testvar = ( testvar + tst ) * tst * ( 1.0f / anMath::PI );
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "  arcMath::ASin16( tst )", 1, bestClocks );
+	PrintClocks( "  anMath::ASin16( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::ACos( tst );
+		tst = anMath::ACos( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
-		testvar = ( testvar + tst ) * tst * ( 1.0f / arcMath::PI );
+		testvar = ( testvar + tst ) * tst * ( 1.0f / anMath::PI );
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "    arcMath::ACos( tst )", 1, bestClocks );
+	PrintClocks( "    anMath::ACos( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::ACos16( tst );
+		tst = anMath::ACos16( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
-		testvar = ( testvar + tst ) * tst * ( 1.0f / arcMath::PI );
+		testvar = ( testvar + tst ) * tst * ( 1.0f / anMath::PI );
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "  arcMath::ACos16( tst )", 1, bestClocks );
+	PrintClocks( "  anMath::ACos16( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::ATan( tst );
-		StopRecordTime( end );
-		GetBest( start, end, bestClocks );
-		testvar = ( testvar + tst ) * tst;
-		tst = rnd.CRandomFloat();
-	}
-	PrintClocks( "    arcMath::ATan( tst )", 1, bestClocks );
-
-	bestClocks = 0;
-	tst = rnd.CRandomFloat();
-	for ( i = 0; i < NUMTESTS; i++ ) {
-		StartRecordTime( start );
-		tst = arcMath::ATan16( tst );
+		tst = anMath::ATan( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "  arcMath::ATan16( tst )", 1, bestClocks );
+	PrintClocks( "    anMath::ATan( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Pow( 2.7f, tst );
+		tst = anMath::ATan16( tst );
+		StopRecordTime( end );
+		GetBest( start, end, bestClocks );
+		testvar = ( testvar + tst ) * tst;
+		tst = rnd.CRandomFloat();
+	}
+	PrintClocks( "  anMath::ATan16( tst )", 1, bestClocks );
+
+	bestClocks = 0;
+	tst = rnd.CRandomFloat();
+	for ( i = 0; i < NUMTESTS; i++ ) {
+		StartRecordTime( start );
+		tst = anMath::Pow( 2.7f, tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst * 0.1f;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "    arcMath::Pow( tst )", 1, bestClocks );
+	PrintClocks( "    anMath::Pow( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Pow16( 2.7f, tst );
+		tst = anMath::Pow16( 2.7f, tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst * 0.1f;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "  arcMath::Pow16( tst )", 1, bestClocks );
+	PrintClocks( "  anMath::Pow16( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Exp( tst );
+		tst = anMath::Exp( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst * 0.1f;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "    arcMath::Exp( tst )", 1, bestClocks );
+	PrintClocks( "    anMath::Exp( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		tst = arcMath::Exp16( tst );
+		tst = anMath::Exp16( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst * 0.1f;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "  arcMath::Exp16( tst )", 1, bestClocks );
+	PrintClocks( "  anMath::Exp16( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		tst = fabs( tst ) + 1.0f;
 		StartRecordTime( start );
-		tst = arcMath::Log( tst );
+		tst = anMath::Log( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "    arcMath::Log( tst )", 1, bestClocks );
+	PrintClocks( "    anMath::Log( tst )", 1, bestClocks );
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		tst = fabs( tst ) + 1.0f;
 		StartRecordTime( start );
-		tst = arcMath::Log16( tst );
+		tst = anMath::Log16( tst );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 		testvar = ( testvar + tst ) * tst;
 		tst = rnd.CRandomFloat();
 	}
-	PrintClocks( "  arcMath::Log16( tst )", 1, bestClocks );
+	PrintClocks( "  anMath::Log16( tst )", 1, bestClocks );
 
-	arcLibrary::common->Printf( "testvar = %f\n", testvar );
+	anLibrary::common->Printf( "testvar = %f\n", testvar );
 
-	arcMat3 resultMat3;
-	arcQuats fromQuat, toQuat, resultQuat;
-	arcCQuats cq;
-	arcAngles ang;
+	anMat3 resultMat3;
+	anQuats fromQuat, toQuat, resultQuat;
+	anCQuats cq;
+	anAngles ang;
 
-	fromQuat = arcAngles( 30, 45, 0 ).ToQuat();
-	toQuat = arcAngles( 45, 0, 0 ).ToQuat();
-	cq = arcAngles( 30, 45, 0 ).ToQuat().ToCQuat();
-	ang = arcAngles( 30, 40, 50 );
+	fromQuat = anAngles( 30, 45, 0 ).ToQuat();
+	toQuat = anAngles( 45, 0, 0 ).ToQuat();
+	cq = anAngles( 30, 45, 0 ).ToQuat().ToCQuat();
+	ang = anAngles( 30, 40, 50 );
 
 	bestClocks = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -4024,7 +4024,7 @@ void TestMath( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 	}
-	PrintClocks( "       arcQuats::ToMat3()", 1, bestClocks );
+	PrintClocks( "       anQuats::ToMat3()", 1, bestClocks );
 
 	bestClocks = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -4033,7 +4033,7 @@ void TestMath( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 	}
-	PrintClocks( "        arcQuats::Slerp()", 1, bestClocks );
+	PrintClocks( "        anQuats::Slerp()", 1, bestClocks );
 
 	bestClocks = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -4042,7 +4042,7 @@ void TestMath( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 	}
-	PrintClocks( "      arcCQuats::ToQuat()", 1, bestClocks );
+	PrintClocks( "      anCQuats::ToQuat()", 1, bestClocks );
 
 	bestClocks = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -4051,7 +4051,7 @@ void TestMath( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 	}
-	PrintClocks( "     arcAngles::ToQuat()", 1, bestClocks );
+	PrintClocks( "     anAngles::ToQuat()", 1, bestClocks );
 
 	bestClocks = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -4060,7 +4060,7 @@ void TestMath( void ) {
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );
 	}
-	PrintClocks( "     arcAngles::ToMat3()", 1, bestClocks );
+	PrintClocks( "     anAngles::ToMat3()", 1, bestClocks );
 }
 
 /*
@@ -4086,7 +4086,7 @@ void TestNegate( void ) {
 		//fsrc1[i] = srnd.CRandomFloat() * 10.0f;
 	}
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
@@ -4126,7 +4126,7 @@ void TestNegate( void ) {
 arcSIMD::Test_f
 ============
 */
-void arcSIMD::Test_f( const arcCommandArgs &args ) {
+void arcSIMD::Test_f( const anCommandArgs &args ) {
 
 #ifdef _WIN32
 	SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL );
@@ -4135,43 +4135,43 @@ void arcSIMD::Test_f( const arcCommandArgs &args ) {
 	p_simd = processor;
 	p_generic = generic;
 
-	if ( arcNetString::Length( args.Argv( 1 ) ) != 0 ) {
-		cpuid_t cpuid = arcLibrary::sys->GetProcessorId();
-		arcNetString argString = args.Args();
+	if ( anString::Length( args.Argv( 1 ) ) != 0 ) {
+		cpuid_t cpuid = anLibrary::sys->GetProcessorId();
+		anString argString = args.Args();
 
 		argString.Replace( " ", "" );
 
-		if ( arcNetString::Icmp( argString, "MMX" ) == 0 ) {
+		if ( anString::Icmp( argString, "MMX" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) ) {
 				common->Printf( "CPU does not support MMX\n" );
 				return;
 			}
 			p_simd = new arcSIMD_MMX;
-		} else if ( arcNetString::Icmp( argString, "3DNow" ) == 0 ) {
+		} else if ( anString::Icmp( argString, "3DNow" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) || !( cpuid & CPUID_3DNOW ) ) {
 				common->Printf( "CPU does not support MMX & 3DNow\n" );
 				return;
 			}
 			p_simd = new idSIMD_3DNow;
-		} else if ( arcNetString::Icmp( argString, "SSE" ) == 0 ) {
+		} else if ( anString::Icmp( argString, "SSE" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) || !( cpuid & CPUID_SSE ) ) {
 				common->Printf( "CPU does not support MMX & SSE\n" );
 				return;
 			}
 			p_simd = new idSIMD_SSE;
-		} else if ( arcNetString::Icmp( argString, "SSE2" ) == 0 ) {
+		} else if ( anString::Icmp( argString, "SSE2" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) || !( cpuid & CPUID_SSE ) || !( cpuid & CPUID_SSE2 ) ) {
 				common->Printf( "CPU does not support MMX & SSE & SSE2\n" );
 				return;
 			}
 			p_simd = new idSIMD_SSE2;
-		} else if ( arcNetString::Icmp( argString, "SSE3" ) == 0 ) {
+		} else if ( anString::Icmp( argString, "SSE3" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) || !( cpuid & CPUID_SSE ) || !( cpuid & CPUID_SSE2 ) || !( cpuid & CPUID_SSE3 ) ) {
 				common->Printf( "CPU does not support MMX & SSE & SSE2 & SSE3\n" );
 				return;
 			}
 			p_simd = new arcSIMD_SSE3();
-		} else if ( arcNetString::Icmp( argString, "AltiVec" ) == 0 ) {
+		} else if ( anString::Icmp( argString, "AltiVec" ) == 0 ) {
 			if ( !( cpuid & CPUID_ALTIVEC ) ) {
 				common->Printf( "CPU does not support AltiVec\n" );
 				return;
@@ -4183,9 +4183,9 @@ void arcSIMD::Test_f( const arcCommandArgs &args ) {
 		}
 	}
 
-	arcLibrary::common->SetRefreshOnPrint( true );
+	anLibrary::common->SetRefreshOnPrint( true );
 
-	arcLibrary::common->Printf( "using %s for SIMD processing\n", p_simd->GetName() );
+	anLibrary::common->Printf( "using %s for SIMD processing\n", p_simd->GetName() );
 
 	GetBaseClocks();
 
@@ -4214,7 +4214,7 @@ void arcSIMD::Test_f( const arcCommandArgs &args ) {
 	TestMatXLowerTriangularSolveTranspose();
 	TestMatXLDLTFactor();
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	TestBlendJoints();
 	TestConvertJointQuatsToJointMats();
@@ -4233,18 +4233,18 @@ void arcSIMD::Test_f( const arcCommandArgs &args ) {
 	TestGetSpecularTextureCoords();
 	TestCreateShadowCache();
 
-	arcLibrary::common->Printf( "====================================\n" );
+	anLibrary::common->Printf( "====================================\n" );
 
 	TestSoundUpSampling();
 	TestSoundMixing();
 
-	arcLibrary::common->SetRefreshOnPrint( false );
+	anLibrary::common->SetRefreshOnPrint( false );
 
 	if ( p_simd != processor ) {
 		delete p_simd;
 	}
-	p_simd = NULL;
-	p_generic = NULL;
+	p_simd = nullptr;
+	p_generic = nullptr;
 
 #ifdef _WIN32
 	SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_NORMAL );

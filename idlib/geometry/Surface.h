@@ -18,36 +18,36 @@ typedef struct surfaceEdge_s {
 } surfaceEdge_t;
 
 
-class arcSurface {
+class anSurface {
 public:
-							arcSurface( void );
-							explicit arcSurface( const arcSurface &surf );
-							explicit arcSurface( const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes );
-							~arcSurface( void );
+							anSurface( void );
+							explicit anSurface( const anSurface &surf );
+							explicit anSurface( const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes );
+							~anSurface( void );
 
-	const arcDrawVert &		operator[]( const int index ) const;
-	arcDrawVert &			operator[]( const int index );
-	arcSurface &				operator+=( const arcSurface &surf );
+	const anDrawVertex &		operator[]( const int index ) const;
+	anDrawVertex &			operator[]( const int index );
+	anSurface &				operator+=( const anSurface &surf );
 
 	int						GetNumIndexes( void ) const { return indexes.Num(); }
 	const int *				GetIndexes( void ) const { return indexes.Ptr(); }
 	int						GetNumVertices( void ) const { return verts.Num(); }
-	const arcDrawVert *		GetVertices( void ) const { return verts.Ptr(); }
+	const anDrawVertex *		GetVertices( void ) const { return verts.Ptr(); }
 	const int *				GetEdgeIndexes( void ) const { return edgeIndexes.Ptr(); }
 	const surfaceEdge_t *	GetEdges( void ) const { return edges.Ptr(); }
 
 	void					Clear( void );
-	void					SwapTriangles( arcSurface &surf );
-	void					TranslateSelf( const arcVec3 &translation );
-	void					RotateSelf( const arcMat3 &rotation );
+	void					SwapTriangles( anSurface &surf );
+	void					TranslateSelf( const anVec3 &translation );
+	void					RotateSelf( const anMat3 &rotation );
 
 							// splits the surface into a front and back surface, the surface itself stays unchanged
 							// frontOnPlaneEdges and backOnPlaneEdges optionally store the indexes to the edges that lay on the split plane
 							// returns a SIDE_?
-	int						Split( const arcPlane &plane, const float epsilon, arcSurface **front, arcSurface **back, int *frontOnPlaneEdges = NULL, int *backOnPlaneEdges = NULL ) const;
+	int						Split( const anPlane &plane, const float epsilon, anSurface **front, anSurface **back, int *frontOnPlaneEdges = nullptr, int *backOnPlaneEdges = nullptr ) const;
 							// cuts off the part at the back side of the plane, returns true if some part was at the front
 							// if there is nothing at the front the number of points is set to zero
-	bool					ClipInPlace( const arcPlane &plane, const float epsilon = ON_EPSILON, const bool keepOn = false );
+	bool					ClipInPlace( const anPlane &plane, const float epsilon = ON_EPSILON, const bool keepOn = false );
 
 							// returns true if each triangle can be reached from any other triangle by a traversal
 	bool					IsConnected( void ) const;
@@ -56,19 +56,19 @@ public:
 							// returns true if the surface is a convex hull
 	bool					IsPolytope( const float epsilon = 0.1f ) const;
 
-	float					PlaneDistance( const arcPlane &plane ) const;
-	int						PlaneSide( const arcPlane &plane, const float epsilon = ON_EPSILON ) const;
+	float					PlaneDistance( const anPlane &plane ) const;
+	int						PlaneSide( const anPlane &plane, const float epsilon = ON_EPSILON ) const;
 
 							// returns true if the line intersects one of the surface triangles
-	bool					LineIntersection( const arcVec3 &start, const arcVec3 &end, bool backFaceCull = false ) const;
+	bool					LineIntersection( const anVec3 &start, const anVec3 &end, bool backFaceCull = false ) const;
 							// intersection point is start + dir * scale
-	bool					RayIntersection( const arcVec3 &start, const arcVec3 &dir, float &scale, bool backFaceCull = false ) const;
+	bool					RayIntersection( const anVec3 &start, const anVec3 &dir, float &scale, bool backFaceCull = false ) const;
 
 protected:
-	arcNetList<arcDrawVert>		verts;			// vertices
-	arcNetList<int>				indexes;		// 3 references to vertices for each triangle
-	arcNetList<surfaceEdge_t>	edges;			// edges
-	arcNetList<int>				edgeIndexes;	// 3 references to edges for each triangle, may be negative for reversed edge
+	anList<anDrawVertex>		verts;			// vertices
+	anList<int>				indexes;		// 3 references to vertices for each triangle
+	anList<surfaceEdge_t>	edges;			// edges
+	anList<int>				edgeIndexes;	// 3 references to edges for each triangle, may be negative for reversed edge
 
 protected:
 	void					GenerateEdgeIndexes( void );
@@ -77,19 +77,19 @@ protected:
 
 /*
 ====================
-arcSurface::arcSurface
+anSurface::anSurface
 ====================
 */
-ARC_INLINE arcSurface::arcSurface( void ) {
+ARC_INLINE anSurface::anSurface( void ) {
 }
 
 /*
 =================
-arcSurface::arcSurface
+anSurface::anSurface
 =================
 */
-ARC_INLINE arcSurface::arcSurface( const arcDrawVert *verts, const int numVerts, const int *indexes, const int numIndexes ) {
-	assert( verts != NULL && indexes != NULL && numVerts > 0 && numIndexes > 0 );
+ARC_INLINE anSurface::anSurface( const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+	assert( verts != nullptr && indexes != nullptr && numVerts > 0 && numIndexes > 0 );
 	this->verts.SetNum( numVerts );
 	memcpy( this->verts.Ptr(), verts, numVerts * sizeof( verts[0] ) );
 	this->indexes.SetNum( numIndexes );
@@ -99,10 +99,10 @@ ARC_INLINE arcSurface::arcSurface( const arcDrawVert *verts, const int numVerts,
 
 /*
 ====================
-arcSurface::arcSurface
+anSurface::anSurface
 ====================
 */
-ARC_INLINE arcSurface::arcSurface( const arcSurface &surf ) {
+ARC_INLINE anSurface::anSurface( const anSurface &surf ) {
 	this->verts = surf.verts;
 	this->indexes = surf.indexes;
 	this->edges = surf.edges;
@@ -111,36 +111,36 @@ ARC_INLINE arcSurface::arcSurface( const arcSurface &surf ) {
 
 /*
 ====================
-arcSurface::~arcSurface
+anSurface::~anSurface
 ====================
 */
-ARC_INLINE arcSurface::~arcSurface( void ) {
+ARC_INLINE anSurface::~anSurface( void ) {
 }
 
 /*
 =================
-arcSurface::operator[]
+anSurface::operator[]
 =================
 */
-ARC_INLINE const arcDrawVert &arcSurface::operator[]( const int index ) const {
+ARC_INLINE const anDrawVertex &anSurface::operator[]( const int index ) const {
 	return verts[index];
 };
 
 /*
 =================
-arcSurface::operator[]
+anSurface::operator[]
 =================
 */
-ARC_INLINE arcDrawVert &arcSurface::operator[]( const int index ) {
+ARC_INLINE anDrawVertex &anSurface::operator[]( const int index ) {
 	return verts[index];
 };
 
 /*
 =================
-arcSurface::operator+=
+anSurface::operator+=
 =================
 */
-ARC_INLINE arcSurface &arcSurface::operator+=( const arcSurface &surf ) {
+ARC_INLINE anSurface &anSurface::operator+=( const anSurface &surf ) {
 	int i, m, n;
 	n = verts.Num();
 	m = indexes.Num();
@@ -155,10 +155,10 @@ ARC_INLINE arcSurface &arcSurface::operator+=( const arcSurface &surf ) {
 
 /*
 =================
-arcSurface::Clear
+anSurface::Clear
 =================
 */
-ARC_INLINE void arcSurface::Clear( void ) {
+ARC_INLINE void anSurface::Clear( void ) {
 	verts.Clear();
 	indexes.Clear();
 	edges.Clear();
@@ -167,10 +167,10 @@ ARC_INLINE void arcSurface::Clear( void ) {
 
 /*
 =================
-arcSurface::SwapTriangles
+anSurface::SwapTriangles
 =================
 */
-ARC_INLINE void arcSurface::SwapTriangles( arcSurface &surf ) {
+ARC_INLINE void anSurface::SwapTriangles( anSurface &surf ) {
 	verts.Swap( surf.verts );
 	indexes.Swap( surf.indexes );
 	edges.Swap( surf.edges );
@@ -179,10 +179,10 @@ ARC_INLINE void arcSurface::SwapTriangles( arcSurface &surf ) {
 
 /*
 =================
-arcSurface::TranslateSelf
+anSurface::TranslateSelf
 =================
 */
-ARC_INLINE void arcSurface::TranslateSelf( const arcVec3 &translation ) {
+ARC_INLINE void anSurface::TranslateSelf( const anVec3 &translation ) {
 	for ( int i = 0; i < verts.Num(); i++ ) {
 		verts[i].xyz += translation;
 	}
@@ -190,10 +190,10 @@ ARC_INLINE void arcSurface::TranslateSelf( const arcVec3 &translation ) {
 
 /*
 =================
-arcSurface::RotateSelf
+anSurface::RotateSelf
 =================
 */
-ARC_INLINE void arcSurface::RotateSelf( const arcMat3 &rotation ) {
+ARC_INLINE void anSurface::RotateSelf( const anMat3 &rotation ) {
 	for ( int i = 0; i < verts.Num(); i++ ) {
 		verts[i].xyz *= rotation;
 		verts[i].normal *= rotation;

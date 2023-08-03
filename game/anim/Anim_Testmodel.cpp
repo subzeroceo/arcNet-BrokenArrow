@@ -4,7 +4,7 @@
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
+This file is part of the Doom 3 BFG Edition GPL Source Code ( "Doom 3 BFG Edition Source Code" ).
 
 Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ move around it to view it from different angles.
 */
 
 #pragma hdrstop
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 
 
 #include "../Game_local.h"
@@ -65,8 +65,8 @@ idTestModel::idTestModel
 ================
 */
 idTestModel::idTestModel() {
-	head = NULL;
-	headAnimator = NULL;
+	head = nullptr;
+	headAnimator = nullptr;
 	anim = 0;
 	headAnim = 0;
 	starttime = 0;
@@ -99,14 +99,14 @@ idTestModel::Spawn
 ================
 */
 void idTestModel::Spawn() {
-	arcVec3				size;
-	arcBounds			bounds;
+	anVec3				size;
+	anBounds			bounds;
 	const char			*headModel;
 	jointHandle_t		joint;
-	arcNetString				jointName;
-	arcVec3				origin, modelOffset;
-	arcMat3				axis;
-	const idKeyValue	*kv;
+	anString				jointName;
+	anVec3				origin, modelOffset;
+	anMat3				axis;
+	const anKeyValue	*kv;
 	copyJoints_t		copyJoint;
 
 	if ( renderEntity.hModel && renderEntity.hModel->IsDefaultModel() && !animator.ModelDef() ) {
@@ -122,11 +122,11 @@ void idTestModel::Spawn() {
 	physicsObj.SetOrigin( GetPhysics()->GetOrigin() );
 	physicsObj.SetAxis( GetPhysics()->GetAxis() );
 
-	if ( spawnArgs.GetVector( "mins", NULL, bounds[0] ) ) {
-		spawnArgs.GetVector( "maxs", NULL, bounds[1] );
+	if ( spawnArgs.GetVector( "mins", nullptr, bounds[0] ) ) {
+		spawnArgs.GetVector( "maxs", nullptr, bounds[1] );
 		physicsObj.SetClipBox( bounds, 1.0f );
 		physicsObj.SetContents( 0 );
-	} else if ( spawnArgs.GetVector( "size", NULL, size ) ) {
+	} else if ( spawnArgs.GetVector( "size", nullptr, size ) ) {
 		bounds[ 0 ].Set( size.x * -0.5f, size.y * -0.5f, 0.0f );
 		bounds[ 1 ].Set( size.x * 0.5f, size.y * 0.5f, size.z );
 		physicsObj.SetClipBox( bounds, 1.0f );
@@ -144,8 +144,8 @@ void idTestModel::Spawn() {
 			gameLocal.Warning( "Joint '%s' not found for 'head_joint'", jointName.c_str() );
 		} else {
 			// copy any sounds in case we have frame commands on the head
-			arcDict				args;
-			const idKeyValue	*sndKV = spawnArgs.MatchPrefix( "snd_", NULL );
+			anDict				args;
+			const anKeyValue	*sndKV = spawnArgs.MatchPrefix( "snd_", nullptr );
 			while( sndKV ) {
 				args.Set( sndKV->GetKey(), sndKV->GetValue() );
 				sndKV = spawnArgs.MatchPrefix( "snd_", sndKV );
@@ -162,7 +162,7 @@ void idTestModel::Spawn() {
 			headAnimator = head.GetEntity()->GetAnimator();
 
 			// set up the list of joints to copy to the head
-			for ( kv = spawnArgs.MatchPrefix( "copy_joint", NULL ); kv != NULL; kv = spawnArgs.MatchPrefix( "copy_joint", kv ) ) {
+			for ( kv = spawnArgs.MatchPrefix( "copy_joint", nullptr ); kv != nullptr; kv = spawnArgs.MatchPrefix( "copy_joint", kv ) ) {
 				jointName = kv->GetKey();
 
 				if ( jointName.StripLeadingOnce( "copy_joint_world " ) ) {
@@ -211,7 +211,7 @@ idTestModel::~idTestModel() {
 		gameLocal.Printf( "Removing testmodel\n" );
 	}
 	if ( gameLocal.testmodel == this ) {
-		gameLocal.testmodel = NULL;
+		gameLocal.testmodel = nullptr;
 	}
 	if ( head.GetEntity() ) {
 		head.GetEntity()->StopSound( SND_CHANNEL_ANY, false );
@@ -225,7 +225,7 @@ idTestModel::Event_Footstep
 ===============
 */
 void idTestModel::Event_Footstep() {
-	StartSound( "snd_footstep", SND_CHANNEL_BODY, 0, false, NULL );
+	StartSound( "snd_footstep", SND_CHANNEL_BODY, 0, false, nullptr );
 }
 
 /*
@@ -246,9 +246,9 @@ idTestModel::Think
 ================
 */
 void idTestModel::Think() {
-	arcVec3 pos;
-	arcMat3 axis;
-	arcAngles ang;
+	anVec3 pos;
+	anMat3 axis;
+	anAngles ang;
 	int	i;
 
 	if ( thinkFlags & TH_THINK ) {
@@ -257,7 +257,7 @@ void idTestModel::Think() {
 			if ( head.GetEntity() ) {
 				head.GetEntity()->StopSound( SND_CHANNEL_ANY, false );
 			}
-			switch( g_testModelAnimate.GetInteger() ) {
+			switch ( g_testModelAnimate.GetInteger() ) {
 			default:
 			case 0:
 				// cycle anim with origin reset
@@ -345,16 +345,16 @@ void idTestModel::Think() {
 		if ( headAnimator ) {
 			// copy the animation from the body to the head
 			for ( i = 0; i < copyJoints.Num(); i++ ) {
-				if ( copyJoints[ i ].mod == JOINTMOD_WORLD_OVERRIDE ) {
-					arcMat3 mat = head.GetEntity()->GetPhysics()->GetAxis().Transpose();
-					GetJointWorldTransform( copyJoints[ i ].from, gameLocal.time, pos, axis );
+				if ( copyJoints[i].mod == JOINTMOD_WORLD_OVERRIDE ) {
+					anMat3 mat = head.GetEntity()->GetPhysics()->GetAxis().Transpose();
+					GetJointWorldTransform( copyJoints[i].from, gameLocal.time, pos, axis );
 					pos -= head.GetEntity()->GetPhysics()->GetOrigin();
-					headAnimator->SetJointPos( copyJoints[ i ].to, copyJoints[ i ].mod, pos * mat );
-					headAnimator->SetJointAxis( copyJoints[ i ].to, copyJoints[ i ].mod, axis * mat );
+					headAnimator->SetJointPos( copyJoints[i].to, copyJoints[i].mod, pos * mat );
+					headAnimator->SetJointAxis( copyJoints[i].to, copyJoints[i].mod, axis * mat );
 				} else {
-					animator.GetJointLocalTransform( copyJoints[ i ].from, gameLocal.time, pos, axis );
-					headAnimator->SetJointPos( copyJoints[ i ].to, copyJoints[ i ].mod, pos );
-					headAnimator->SetJointAxis( copyJoints[ i ].to, copyJoints[ i ].mod, axis );
+					animator.GetJointLocalTransform( copyJoints[i].from, gameLocal.time, pos, axis );
+					headAnimator->SetJointPos( copyJoints[i].to, copyJoints[i].mod, pos );
+					headAnimator->SetJointAxis( copyJoints[i].to, copyJoints[i].mod, axis );
 				}
 			}
 		}
@@ -363,12 +363,12 @@ void idTestModel::Think() {
 		RunPhysics();
 
 		physicsObj.GetAngles( ang );
-		physicsObj.SetAngularExtrapolation( extrapolation_t(EXTRAPOLATION_LINEAR|EXTRAPOLATION_NOSTOP), gameLocal.time, 0, ang, arcAngles( 0, g_testModelRotate.GetFloat() * 360.0f / 60.0f, 0 ), ang_zero );
+		physicsObj.SetAngularExtrapolation( extrapolation_t(EXTRAPOLATION_LINEAR|EXTRAPOLATION_NOSTOP), gameLocal.time, 0, ang, anAngles( 0, g_testModelRotate.GetFloat() * 360.0f / 60.0f, 0 ), ang_zero );
 
-		arcClipModel *clip = physicsObj.GetClipModel();
-		if ( clip != NULL && animator.ModelDef() ) {
-			arcVec3 neworigin;
-			arcMat3 axis;
+		anClipModel *clip = physicsObj.GetClipModel();
+		if ( clip != nullptr && animator.ModelDef() ) {
+			anVec3 neworigin;
+			anMat3 axis;
 			jointHandle_t joint;
 
 			joint = animator.GetJointHandle( "origin" );
@@ -398,7 +398,7 @@ void idTestModel::Think() {
 idTestModel::NextAnim
 ================
 */
-void idTestModel::NextAnim( const idCmdArgs &args ) {
+void idTestModel::NextAnim( const anCommandArgs &args ) {
 	if ( !animator.NumAnims() ) {
 		return;
 	}
@@ -440,7 +440,7 @@ void idTestModel::NextAnim( const idCmdArgs &args ) {
 idTestModel::PrevAnim
 ================
 */
-void idTestModel::PrevAnim( const idCmdArgs &args ) {
+void idTestModel::PrevAnim( const anCommandArgs &args ) {
 	if ( !animator.NumAnims() ) {
 		return;
 	}
@@ -481,7 +481,7 @@ void idTestModel::PrevAnim( const idCmdArgs &args ) {
 idTestModel::NextFrame
 ================
 */
-void idTestModel::NextFrame( const idCmdArgs &args ) {
+void idTestModel::NextFrame( const anCommandArgs &args ) {
 	if ( !anim || ( ( g_testModelAnimate.GetInteger() != 3 ) && ( g_testModelAnimate.GetInteger() != 5 ) ) ) {
 		return;
 	}
@@ -502,7 +502,7 @@ void idTestModel::NextFrame( const idCmdArgs &args ) {
 idTestModel::PrevFrame
 ================
 */
-void idTestModel::PrevFrame( const idCmdArgs &args ) {
+void idTestModel::PrevFrame( const anCommandArgs &args ) {
 	if ( !anim || ( ( g_testModelAnimate.GetInteger() != 3 ) && ( g_testModelAnimate.GetInteger() != 5 ) ) ) {
 		return;
 	}
@@ -523,8 +523,8 @@ void idTestModel::PrevFrame( const idCmdArgs &args ) {
 idTestModel::TestAnim
 ================
 */
-void idTestModel::TestAnim( const idCmdArgs &args ) {
-	arcNetString			name;
+void idTestModel::TestAnim( const anCommandArgs &args ) {
+	anString			name;
 	int				animNum;
 	const arcAnim	*newanim;
 
@@ -533,7 +533,7 @@ void idTestModel::TestAnim( const idCmdArgs &args ) {
 		return;
 	}
 
-	newanim = NULL;
+	newanim = nullptr;
 
 	name = args.Argv( 1 );
 	animNum = animator.GetAnim( name );
@@ -574,7 +574,7 @@ void idTestModel::TestAnim( const idCmdArgs &args ) {
 idTestModel::BlendAnim
 =====================
 */
-void idTestModel::BlendAnim( const idCmdArgs &args ) {
+void idTestModel::BlendAnim( const anCommandArgs &args ) {
 	int anim1;
 	int anim2;
 
@@ -617,7 +617,7 @@ Makes the current test model permanent, allowing you to place
 multiple test models
 =================
 */
-void idTestModel::KeepTestModel_f( const idCmdArgs &args ) {
+void idTestModel::KeepTestModel_f( const anCommandArgs &args ) {
 	if ( !gameLocal.testmodel ) {
 		gameLocal.Printf( "No active testModel.\n" );
 		return;
@@ -625,7 +625,7 @@ void idTestModel::KeepTestModel_f( const idCmdArgs &args ) {
 
 	gameLocal.Printf( "modelDef %p kept\n", gameLocal.testmodel->renderEntity.hModel );
 
-	gameLocal.testmodel = NULL;
+	gameLocal.testmodel = nullptr;
 }
 
 /*
@@ -635,11 +635,11 @@ idTestModel::TestSkin_f
 Sets a skin on an existing testModel
 =================
 */
-void idTestModel::TestSkin_f( const idCmdArgs &args ) {
-	arcVec3		offset;
-	arcNetString		name;
+void idTestModel::TestSkin_f( const anCommandArgs &args ) {
+	anVec3		offset;
+	anString		name;
 	arcNetBasePlayer *	player;
-	arcDict		dict;
+	anDict		dict;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -654,7 +654,7 @@ void idTestModel::TestSkin_f( const idCmdArgs &args ) {
 
 	if ( args.Argc() < 2 ) {
 		common->Printf( "removing testSkin.\n" );
-		gameLocal.testmodel->SetSkin( NULL );
+		gameLocal.testmodel->SetSkin( nullptr );
 		return;
 	}
 
@@ -669,11 +669,11 @@ idTestModel::TestShaderParm_f
 Sets a shaderParm on an existing testModel
 =================
 */
-void idTestModel::TestShaderParm_f( const idCmdArgs &args ) {
-	arcVec3		offset;
-	arcNetString		name;
+void idTestModel::TestShaderParm_f( const anCommandArgs &args ) {
+	anVec3		offset;
+	anString		name;
 	arcNetBasePlayer *	player;
-	arcDict		dict;
+	anDict		dict;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -698,7 +698,7 @@ void idTestModel::TestShaderParm_f( const idCmdArgs &args ) {
 	}
 
 	float	value;
-	if ( !arcNetString::Icmp( args.Argv( 2 ), "time" ) ) {
+	if ( !anString::Icmp( args.Argv( 2 ), "time" ) ) {
 		value = gameLocal.time * -0.001;
 	} else {
 		value = atof( args.Argv( 2 ) );
@@ -715,12 +715,12 @@ Creates a static modelDef in front of the current position, which
 can then be moved around
 =================
 */
-void idTestModel::TestModel_f( const idCmdArgs &args ) {
-	arcVec3			offset;
-	arcNetString			name;
+void idTestModel::TestModel_f( const anCommandArgs &args ) {
+	anVec3			offset;
+	anString			name;
 	arcNetBasePlayer *		player;
-	const arcDict *	entityDef;
-	arcDict			dict;
+	const anDict *	entityDef;
+	anDict			dict;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -730,7 +730,7 @@ void idTestModel::TestModel_f( const idCmdArgs &args ) {
 	// delete the testModel if active
 	if ( gameLocal.testmodel ) {
 		delete gameLocal.testmodel;
-		gameLocal.testmodel = NULL;
+		gameLocal.testmodel = nullptr;
 	}
 
 	if ( args.Argc() < 2 ) {
@@ -772,18 +772,18 @@ void idTestModel::TestModel_f( const idCmdArgs &args ) {
 idTestModel::ArgCompletion_TestModel
 =====================
 */
-void idTestModel::ArgCompletion_TestModel( const idCmdArgs &args, void(*callback)( const char *s ) ) {
+void idTestModel::ArgCompletion_TestModel( const anCommandArgs &args, void(*callback)( const char *s ) ) {
 	int i, num;
 
 	num = declManager->GetNumDecls( DECL_ENTITYDEF );
 	for ( i = 0; i < num; i++ ) {
-		callback( arcNetString( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( DECL_ENTITYDEF, i , false )->GetName() );
+		callback( anString( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( DECL_ENTITYDEF, i , false )->GetName() );
 	}
 	num = declManager->GetNumDecls( DECL_MODELDEF );
 	for ( i = 0; i < num; i++ ) {
-		callback( arcNetString( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( DECL_MODELDEF, i , false )->GetName() );
+		callback( anString( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( DECL_MODELDEF, i , false )->GetName() );
 	}
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "models/", false, ".lwo", ".ase", ".md5mesh", ".ma", ".mb", NULL );
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "models/", false, ".lwo", ".ase", ".md5mesh", ".ma", ".mb", nullptr );
 }
 
 /*
@@ -791,7 +791,7 @@ void idTestModel::ArgCompletion_TestModel( const idCmdArgs &args, void(*callback
 idTestModel::TestParticleStopTime_f
 =====================
 */
-void idTestModel::TestParticleStopTime_f( const idCmdArgs &args ) {
+void idTestModel::TestParticleStopTime_f( const anCommandArgs &args ) {
 	if ( !gameLocal.testmodel ) {
 		gameLocal.Printf( "No testModel active.\n" );
 		return;
@@ -806,7 +806,7 @@ void idTestModel::TestParticleStopTime_f( const idCmdArgs &args ) {
 idTestModel::TestAnim_f
 =====================
 */
-void idTestModel::TestAnim_f( const idCmdArgs &args ) {
+void idTestModel::TestAnim_f( const anCommandArgs &args ) {
 	if ( !gameLocal.testmodel ) {
 		gameLocal.Printf( "No testModel active.\n" );
 		return;
@@ -821,7 +821,7 @@ void idTestModel::TestAnim_f( const idCmdArgs &args ) {
 idTestModel::ArgCompletion_TestAnim
 =====================
 */
-void idTestModel::ArgCompletion_TestAnim( const idCmdArgs &args, void(*callback)( const char *s ) ) {
+void idTestModel::ArgCompletion_TestAnim( const anCommandArgs &args, void(*callback)( const char *s ) ) {
 	if ( gameLocal.testmodel ) {
 		arcAnimator *animator = gameLocal.testmodel->GetAnimator();
 		for ( int i = 0; i < animator->NumAnims(); i++ ) {
@@ -835,7 +835,7 @@ void idTestModel::ArgCompletion_TestAnim( const idCmdArgs &args, void(*callback)
 idTestModel::TestBlend_f
 =====================
 */
-void idTestModel::TestBlend_f( const idCmdArgs &args ) {
+void idTestModel::TestBlend_f( const anCommandArgs &args ) {
 	if ( !gameLocal.testmodel ) {
 		gameLocal.Printf( "No testModel active.\n" );
 		return;
@@ -849,7 +849,7 @@ void idTestModel::TestBlend_f( const idCmdArgs &args ) {
 idTestModel::TestModelNextAnim_f
 =====================
 */
-void idTestModel::TestModelNextAnim_f( const idCmdArgs &args ) {
+void idTestModel::TestModelNextAnim_f( const anCommandArgs &args ) {
 	if ( !gameLocal.testmodel ) {
 		gameLocal.Printf( "No testModel active.\n" );
 		return;
@@ -863,7 +863,7 @@ void idTestModel::TestModelNextAnim_f( const idCmdArgs &args ) {
 idTestModel::TestModelPrevAnim_f
 =====================
 */
-void idTestModel::TestModelPrevAnim_f( const idCmdArgs &args ) {
+void idTestModel::TestModelPrevAnim_f( const anCommandArgs &args ) {
 	if ( !gameLocal.testmodel ) {
 		gameLocal.Printf( "No testModel active.\n" );
 		return;
@@ -877,7 +877,7 @@ void idTestModel::TestModelPrevAnim_f( const idCmdArgs &args ) {
 idTestModel::TestModelNextFrame_f
 =====================
 */
-void idTestModel::TestModelNextFrame_f( const idCmdArgs &args ) {
+void idTestModel::TestModelNextFrame_f( const anCommandArgs &args ) {
 	if ( !gameLocal.testmodel ) {
 		gameLocal.Printf( "No testModel active.\n" );
 		return;
@@ -891,7 +891,7 @@ void idTestModel::TestModelNextFrame_f( const idCmdArgs &args ) {
 idTestModel::TestModelPrevFrame_f
 =====================
 */
-void idTestModel::TestModelPrevFrame_f( const idCmdArgs &args ) {
+void idTestModel::TestModelPrevFrame_f( const anCommandArgs &args ) {
 	if ( !gameLocal.testmodel ) {
 		gameLocal.Printf( "No testModel active.\n" );
 		return;

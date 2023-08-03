@@ -82,7 +82,7 @@ start_pass_main (j_compress_ptr cinfo, J_BUF_MODE pass_mode)
   switch (pass_mode) {
   case JBUF_PASS_THRU:
 #ifdef FULL_MAIN_BUFFER_SUPPORTED
-    if (main->whole_image[0] != NULL)
+    if (main->whole_image[0] != nullptr )
       ERREXIT(cinfo, JERR_BAD_BUFFER_MODE);
 #endif
     main->pub.process_data = process_data_simple_main;
@@ -91,7 +91,7 @@ start_pass_main (j_compress_ptr cinfo, J_BUF_MODE pass_mode)
   case JBUF_SAVE_SOURCE:
   case JBUF_CRANK_DEST:
   case JBUF_SAVE_AND_PASS:
-    if (main->whole_image[0] == NULL)
+    if (main->whole_image[0] == nullptr )
       ERREXIT(cinfo, JERR_BAD_BUFFER_MODE);
     main->pub.process_data = process_data_buffer_main;
     break;
@@ -251,7 +251,7 @@ jinit_c_main_controller (j_compress_ptr cinfo, boolean need_full_buffer)
   main = (my_main_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_main_controller) );
-  cinfo->main = (struct jpeg_c_main_controller *) main;
+  cinfo->main = ( struct jpeg_c_main_controller *) main;
   main->pub.start_pass = start_pass_main;
 
   /* We don't need to create a buffer in raw-data mode. */
@@ -279,7 +279,7 @@ jinit_c_main_controller (j_compress_ptr cinfo, boolean need_full_buffer)
 #endif
   } else {
 #ifdef FULL_MAIN_BUFFER_SUPPORTED
-    main->whole_image[0] = NULL; /* flag for no virtual arrays */
+    main->whole_image[0] = nullptr; /* flag for no virtual arrays */
 #endif
     /* Allocate a strip buffer for each component */
     for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;

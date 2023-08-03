@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../renderer/tr_local.h"
@@ -11,7 +11,7 @@
 #define GUIED_CENTERSIZE	5
 
 rvGESelectionMgr::rvGESelectionMgr() {
-	mWorkspace = NULL;
+	mWorkspace = nullptr;
 }
 
 /*
@@ -135,7 +135,7 @@ void rvGESelectionMgr::Render( void ) {
 
 	qglPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-	arcVec4&	color = gApp.GetOptions().GetSelectionColor();
+	anVec4&	color = gApp.GetOptions().GetSelectionColor();
  	qglColor4f( color[0],color[1],color[2], 1.0f );
 
 	qglBegin( GL_LINE_LOOP );
@@ -255,7 +255,7 @@ Update the selection rectangle from all the currently selected items.
 */
 void rvGESelectionMgr::UpdateRectangle( void ) {
 	int		i;
-	arcVec2	point;
+	anVec2	point;
 
 	assert( mWorkspace );
 
@@ -390,7 +390,7 @@ idWindow* rvGESelectionMgr::GetBottomMost( void ) {
 	int			i;
 
 	depth  = 9999;
-	bottom = NULL;
+	bottom = nullptr;
 
 	// Loop through all the selections and find the bottom most window
 	for ( i = 0; i < mSelections.Num(); i ++ ) {

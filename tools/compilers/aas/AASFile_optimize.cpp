@@ -26,11 +26,11 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
-#include "AASFile.h"
-#include "AASFile_local.h"
+#include "SEASFile.h"
+#include "SEASFile_local.h"
 
 
 //===============================================================
@@ -41,23 +41,23 @@ If you have questions concerning this license or the applicable additional terms
 
 /*
 ================
-idAASFileLocal::Optimize
+anSEASFileLocal::Optimize
 ================
 */
-void idAASFileLocal::Optimize( void ) {
+void anSEASFileLocal::Optimize( void ) {
 	int i, j, k, faceNum, edgeNum, areaFirstFace, faceFirstEdge;
-	aasArea_t *area;
-	aasFace_t *face;
-	aasEdge_t *edge;
-	idReachability *reach;
-	arcNetList<int> vertexRemap;
-	arcNetList<int> edgeRemap;
-	arcNetList<int> faceRemap;
-	arcNetList<aasVertex_t> newVertices;
-	arcNetList<aasEdge_t> newEdges;
-	arcNetList<aasIndex_t> newEdgeIndex;
-	arcNetList<aasFace_t> newFaces;
-	arcNetList<aasIndex_t> newFaceIndex;
+	seasArea_t *area;
+	seasFace_t *face;
+	seasEdge_t *edge;
+	anReachability *reach;
+	anList<int> vertexRemap;
+	anList<int> edgeRemap;
+	anList<int> faceRemap;
+	anList<seasVertex_t> newVertices;
+	anList<seasEdge_t> newEdges;
+	anList<seasIndex_t> newEdgeIndex;
+	anList<seasFace_t> newFaces;
+	anList<seasIndex_t> newFaceIndex;
 
 	vertexRemap.AssureSize( vertices.Num(), -1 );
 	edgeRemap.AssureSize( edges.Num(), 0 );

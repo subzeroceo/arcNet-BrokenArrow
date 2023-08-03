@@ -1,6 +1,6 @@
 #ifndef __QGL_H__
 #define __QGL_H__
-#include "/home/subzeroceo/ArC-NetSoftware-Projects/brokenarrow/idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #if defined( _WIN32 )
 
 #include <gl/gl.h>
@@ -88,7 +88,9 @@ BOOL ( WINAPI * qwglSwapIntervalEXT )( int interval );
 
 // multitexture
 extern	void ( APIENTRY * qglMultiTexCoord2fARB )( GLenum texture, GLfloat s, GLfloat t );
-extern	void ( APIENTRY * qglMultiTexCoord2fvARB )( GLenum texture, GLfloat *st );
+extern	void ( APIENTRY * qglMultiTexCoord2fvARB )( GLenum texture, const GLfloat *st );
+extern	void ( APIENTRY * qglMultiTexCoord4fARB )( GLenum texture, GLfloat s, GLfloat t, GLfloat r, GLfloat q );
+extern	void ( APIENTRY * qglMultiTexCoord4fvARB )( GLenum texture, const GLfloat *strq );
 extern	void ( APIENTRY * qglActiveTextureARB )( GLenum texture );
 extern	void ( APIENTRY * qglClientActiveTextureARB )( GLenum texture );
 
@@ -105,7 +107,6 @@ extern PFNGLUNMAPBUFFERARBPROC qglUnmapBufferARB;
 extern PFNGLGETBUFFERPARAMETERIVARBPROC qglGetBufferParameterivARB;
 extern PFNGLGETBUFFERPOINTERVARBPROC qglGetBufferPointervARB;
 
-
 // NV_register_combiners
 extern	void ( APIENTRY *qglCombinerParameterfvNV )( GLenum pname, const GLfloat *params );
 extern	void ( APIENTRY *qglCombinerParameterivNV )( GLenum pname, const GLint *params );
@@ -118,11 +119,19 @@ extern	void ( APIENTRY *qglCombinerOutputNV )( GLenum stage, GLenum portion, GLe
 											   GLboolean cdDotProduct, GLboolean muxSum );
 extern	void ( APIENTRY *qglFinalCombinerInputNV )( GLenum variable, GLenum input, GLenum mapping, GLenum componentUsage );
 
+// NV_vertex_program / NV_fragment_program
+extern void ( APIENTRY *qglBindProgramNV ) (GLenum, GLuint);
+extern void ( APIENTRY *qglLoadProgramNV ) (GLenum, GLuint, GLsizei, const GLubyte * RESTRICT );
+extern void ( APIENTRY *qglProgramParameter4fvNV ) (GLenum, GLuint, const GLfloat * RESTRICT );
+
 // 3D textures
 extern void ( APIENTRY *qglTexImage3D)( GLenum, GLint, GLint, GLsizei, GLsizei, GLsizei, GLint, GLenum, GLenum, const GLvoid *);
 
 // shared texture palette
 extern	void ( APIENTRY *qglColorTableEXT)( int, int, int, int, int, const void * );
+
+// EXT_draw_range_elements
+extern  void ( APIENTRY * qglDrawRangeElementsEXT )(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid * RESTRICT indices);
 
 // ATI_fragment_shader
 extern	PFNGLGENFRAGMENTSHADERSATIPROC	qglGenFragmentShadersATI;
@@ -143,28 +152,149 @@ extern	PFNGLSETFRAGMENTSHADERCONSTANTATIPROC	qglSetFragmentShaderConstantATI;
 // EXT_stencil_two_side
 extern	PFNGLACTIVESTENCILFACEEXTPROC	qglActiveStencilFaceEXT;
 
-
 // ATI_separate_stencil
 extern	PFNGLSTENCILOPSEPARATEATIPROC		qglStencilOpSeparateATI;
 extern	PFNGLSTENCILFUNCSEPARATEATIPROC		qglStencilFuncSeparateATI;
 
 // ARB_texture_compression
 extern	PFNGLCOMPRESSEDTEXIMAGE2DARBPROC	qglCompressedTexImage2DARB;
+extern	PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC	qglCompressedTexSubImage2DARB;
 extern	PFNGLGETCOMPRESSEDTEXIMAGEARBPROC	qglGetCompressedTexImageARB;
 
 // ARB_vertex_program / ARB_fragment_program
 extern PFNGLVERTEXATTRIBPOINTERARBPROC		qglVertexAttribPointerARB;
 extern PFNGLENABLEVERTEXATTRIBARRAYARBPROC	qglEnableVertexAttribArrayARB;
 extern PFNGLDISABLEVERTEXATTRIBARRAYARBPROC	qglDisableVertexAttribArrayARB;
+extern PFNGLVERTEXATTRIB3FVARBPROC			qglVertexAttrib3fvARB;
+extern PFNGLVERTEXATTRIB4FVARBPROC			qglVertexAttrib4fvARB;
+extern PFNGLGETPROGRAMIVARBPROC				qglGetProgramivARB;
 extern PFNGLPROGRAMSTRINGARBPROC			qglProgramStringARB;
 extern PFNGLBINDPROGRAMARBPROC				qglBindProgramARB;
+extern PFNGLDELETEPROGRAMSARBPROC			qglDeleteProgramsARB;
 extern PFNGLGENPROGRAMSARBPROC				qglGenProgramsARB;
+extern PFNGLPROGRAMENVPARAMETER4FARBPROC	qglProgramEnvParameter4fARB;
 extern PFNGLPROGRAMENVPARAMETER4FVARBPROC	qglProgramEnvParameter4fvARB;
+extern PFNGLPROGRAMLOCALPARAMETER4FARBPROC	qglProgramLocalParameter4fARB;
 extern PFNGLPROGRAMLOCALPARAMETER4FVARBPROC	qglProgramLocalParameter4fvARB;
+extern PFNGLGETVERTEXATTRIBPOINTERVARBPROC	qglGetVertexAttribPointervARB;
+
+// GLSL fragment
+extern PFNGLCREATESHADEROBJECTARBPROC		qglCreateShaderObjectARB;
+extern PFNGLDELETEOBJECTARBPROC				qglDeleteObjectARB;
+extern PFNGLSHADERSOURCEARBPROC				qglShaderSourceARB;
+extern PFNGLCOMPILESHADERARBPROC			qglCompileShaderARB;
+extern PFNGLGETOBJECTPARAMETERIVARBPROC		qglGetObjectParameterivARB;
+extern PFNGLCREATEPROGRAMOBJECTARBPROC		qglCreateProgramObjectARB;
+extern PFNGLATTACHOBJECTARBPROC				qglAttachObjectARB;
+extern PFNGLDETACHOBJECTARBPROC				qglDetachObjectARB;
+extern PFNGLLINKPROGRAMARBPROC				qglLinkProgramARB;
+extern PFNGLUSEPROGRAMOBJECTARBPROC			qglUseProgramObjectARB;
+extern PFNGLGETUNIFORMLOCATIONARBPROC		qglGetUniformLocationARB;
+extern PFNGLUNIFORM1FARBPROC				qglUniform1fARB;
+extern PFNGLUNIFORM1IARBPROC				qglUniform1iARB;
+extern PFNGLUNIFORM1FVARBPROC				qglUniform1fvARB;
+extern PFNGLUNIFORM2FVARBPROC				qglUniform2fvARB;
+extern PFNGLUNIFORM3FVARBPROC				qglUniform3fvARB;
+extern PFNGLUNIFORM4FVARBPROC				qglUniform4fvARB;
+extern PFNGLGETINFOLOGARBPROC				qglGetInfoLogARB;
 
 // GL_EXT_depth_bounds_test
 extern PFNGLDEPTHBOUNDSEXTPROC              qglDepthBoundsEXT;
 
+// GL_ARB_occlusion_query
+extern PFNGLGENQUERIESARBPROC				qglGenQueriesARB;
+extern PFNGLDELETEQUERIESARBPROC			qglDeleteQueriesARB;
+extern PFNGLISQUERYARBPROC					qglIsQueryARB;
+extern PFNGLBEGINQUERYARBPROC				qglBeginQueryARB;
+extern PFNGLENDQUERYARBPROC					qglEndQueryARB;
+extern PFNGLGETQUERYIVARBPROC				qglGetQueryivARB;
+extern PFNGLGETQUERYOBJECTIVARBPROC			qglGetQueryObjectivARB;
+extern PFNGLGETQUERYOBJECTUIVARBPROC		qglGetQueryObjectuivARB;
+
+// GL_EXT_framebuffer_object
+extern PFNGLISRENDERBUFFEREXTPROC						qglIsRenderbufferEXT;
+extern PFNGLBINDRENDERBUFFEREXTPROC						qglBindRenderbufferEXT;
+extern PFNGLDELETERENDERBUFFERSEXTPROC					qglDeleteRenderbuffersEXT;
+extern PFNGLGENRENDERBUFFERSEXTPROC						qglGenRenderbuffersEXT;
+extern PFNGLRENDERBUFFERSTORAGEEXTPROC					qglRenderbufferStorageEXT;
+extern PFNGLGETRENDERBUFFERPARAMETERIVEXTPROC			qglGetRenderbufferParameterivEXT;
+extern PFNGLISFRAMEBUFFEREXTPROC						qglIsFramebufferEXT;
+extern PFNGLBINDFRAMEBUFFEREXTPROC						qglBindFramebufferEXT;
+extern PFNGLDELETEFRAMEBUFFERSEXTPROC					qglDeleteFramebuffersEXT;
+extern PFNGLGENFRAMEBUFFERSEXTPROC						qglGenFramebuffersEXT;
+extern PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC				qglCheckFramebufferStatusEXT;
+extern PFNGLFRAMEBUFFERTEXTURE1DEXTPROC					qglFramebufferTexture1DEXT;
+extern PFNGLFRAMEBUFFERTEXTURE2DEXTPROC					qglFramebufferTexture2DEXT;
+extern PFNGLFRAMEBUFFERTEXTURE3DEXTPROC					qglFramebufferTexture3DEXT;
+extern PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC				qglFramebufferRenderbufferEXT;
+extern PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC	qglGetFramebufferAttachmentParameterivEXT;
+extern PFNGLGENERATEMIPMAPEXTPROC						qglGenerateMipmapEXT;
+
+// GL_EXT_blend_minmax
+extern PFNGLBLENDEQUATIONEXTPROC			qglBlendEquationEXT;
+extern	void ( APIENTRY *qglBlendEquationEXT)( GLenum mode );
+
+
+// GL_ARB_multisample
+extern PFNGLSAMPLECOVERAGEARBPROC			qglSampleCoverageARB;
+
+// GL_ARB_shader_objects
+extern PFNGLDELETEOBJECTARBPROC				qglDeleteObjectARB;
+extern PFNGLGETHANDLEARBPROC				qglGetHandleARB;
+extern PFNGLDETACHOBJECTARBPROC				qglDetachObjectARB;
+extern PFNGLCREATESHADEROBJECTARBPROC		qglCreateShaderObjectARB;
+extern PFNGLSHADERSOURCEARBPROC				qglShaderSourceARB;
+extern PFNGLCOMPILESHADERARBPROC			qglCompileShaderARB;
+extern PFNGLCREATEPROGRAMOBJECTARBPROC		qglCreateProgramObjectARB;
+extern PFNGLATTACHOBJECTARBPROC				qglAttachObjectARB;
+extern PFNGLLINKPROGRAMARBPROC				qglLinkProgramARB;
+extern PFNGLUSEPROGRAMOBJECTARBPROC			qglUseProgramObjectARB;
+extern PFNGLVALIDATEPROGRAMARBPROC			qglValidateProgramARB;
+extern PFNGLUNIFORM1FARBPROC				qglUniform1fARB;
+extern PFNGLUNIFORM2FARBPROC				qglUniform2fARB;
+extern PFNGLUNIFORM3FARBPROC				qglUniform3fARB;
+extern PFNGLUNIFORM4FARBPROC				qglUniform4fARB;
+extern PFNGLUNIFORM1IARBPROC				qglUniform1iARB;
+extern PFNGLUNIFORM2IARBPROC				qglUniform2iARB;
+extern PFNGLUNIFORM3IARBPROC				qglUniform3iARB;
+extern PFNGLUNIFORM4IARBPROC				qglUniform4iARB;
+extern PFNGLUNIFORM1FVARBPROC				qglUniform1fvARB;
+extern PFNGLUNIFORM2FVARBPROC				qglUniform2fvARB;
+extern PFNGLUNIFORM3FVARBPROC				qglUniform3fvARB;
+extern PFNGLUNIFORM4FVARBPROC				qglUniform4fvARB;
+extern PFNGLUNIFORM1IVARBPROC				qglUniform1ivARB;
+extern PFNGLUNIFORM2IVARBPROC				qglUniform2ivARB;
+extern PFNGLUNIFORM3IVARBPROC				qglUniform3ivARB;
+extern PFNGLUNIFORM4IVARBPROC				qglUniform4ivARB;
+extern PFNGLUNIFORMMATRIX2FVARBPROC			qglUniformMatrix2fvARB;
+extern PFNGLUNIFORMMATRIX3FVARBPROC			qglUniformMatrix3fvARB;
+extern PFNGLUNIFORMMATRIX4FVARBPROC			qglUniformMatrix4fvARB;
+extern PFNGLGETOBJECTPARAMETERFVARBPROC		qglGetObjectParameterfvARB;
+extern PFNGLGETOBJECTPARAMETERIVARBPROC		qglGetObjectParameterivARB;
+extern PFNGLGETINFOLOGARBPROC				qglGetInfoLogARB;
+extern PFNGLGETATTACHEDOBJECTSARBPROC		qglGetAttachedObjectsARB;
+extern PFNGLGETUNIFORMLOCATIONARBPROC		qglGetUniformLocationARB;
+extern PFNGLGETACTIVEUNIFORMARBPROC			qglGetActiveUniformARB;
+extern PFNGLGETUNIFORMFVARBPROC				qglGetUniformfvARB;
+extern PFNGLGETUNIFORMIVARBPROC				qglGetUniformivARB;
+extern PFNGLGETSHADERSOURCEARBPROC			qglGetShaderSourceARB;
+
+// GL_ARB_vertex_shader
+extern PFNGLBINDATTRIBLOCATIONARBPROC		qglBindAttribLocationARB;
+extern PFNGLGETACTIVEATTRIBARBPROC			qglGetActiveAttribARB;
+extern PFNGLGETATTRIBLOCATIONARBPROC		qglGetAttribLocationARB;
+
+// GL_EXT_gpu_program_parameters
+extern PFNGLPROGRAMENVPARAMETERS4FVEXTPROC		qglProgramEnvParameters4fvEXT;
+extern PFNGLPROGRAMLOCALPARAMETERS4FVEXTPROC	qglProgramLocalParameters4fvEXT;
+
+// GL_EXT_timer_query
+extern PFNGLGETQUERYOBJECTI64VEXTPROC		qglGetQueryObjecti64vEXT;
+extern PFNGLGETQUERYOBJECTUI64VEXTPROC		qglGetQueryObjectui64vEXT;
+
+// GREMEDY_string_marker
+extern PFNGLSTRINGMARKERGREMEDYPROC			qglStringMarkerGREMEDY;
+extern PFNGLSECONDARYCOLOR3BPROC			qglSecondaryColor3b;
 //===========================================================================
 
 // non-windows systems will just redefine qgl* to gl*
@@ -511,12 +641,66 @@ extern  void ( APIENTRY * qglVertex4sv )(const GLshort *v);
 extern  void ( APIENTRY * qglVertexPointer )( GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
 extern  void ( APIENTRY * qglViewport )( GLint x, GLint y, GLsizei width, GLsizei height);
 
+extern void ( APIENTRY * qglPointParameterfEXT )( GLenum param, GLfloat value );
+extern void ( APIENTRY * qglPointParameterfvEXT )( GLenum param, const GLfloat *value );
+extern void ( APIENTRY * qglColorTableEXT )( int, int, int, int, int, const void * );
+
+extern void ( APIENTRY * qglMTexCoord2fSGIS )( GLenum, GLfloat, GLfloat );
+extern void ( APIENTRY * qglSelectTextureSGIS )( GLenum );
+
+extern void ( APIENTRY * qglActiveTextureARB )( GLenum texture );
+extern void ( APIENTRY * qglClientActiveTextureARB )( GLenum texture );
+extern void ( APIENTRY * qglMultiTexCoord1dARB )( GLenum target, GLdouble s );
+extern void ( APIENTRY * qglMultiTexCoord1dvARB )( GLenum target, const GLdouble *v );
+extern void ( APIENTRY * qglMultiTexCoord1fARB )( GLenum target, GLfloat s );
+extern void ( APIENTRY * qglMultiTexCoord1fvARB )( GLenum target, const GLfloat *v );
+extern void ( APIENTRY * qglMultiTexCoord1iARB )( GLenum target, GLint s );
+extern void ( APIENTRY * qglMultiTexCoord1ivARB )( GLenum target, const GLint *v );
+extern void ( APIENTRY * qglMultiTexCoord1sARB )( GLenum target, GLshort s );
+extern void ( APIENTRY * qglMultiTexCoord1svARB )( GLenum target, const GLshort *v );
+extern void ( APIENTRY * qglMultiTexCoord2dARB )( GLenum target, GLdouble s );
+extern void ( APIENTRY * qglMultiTexCoord2dvARB )( GLenum target, const GLdouble *v );
+extern void ( APIENTRY * qglMultiTexCoord2fARB )( GLenum target, GLfloat s );
+extern void ( APIENTRY * qglMultiTexCoord2fvARB )( GLenum target, const GLfloat *v );
+extern void ( APIENTRY * qglMultiTexCoord2iARB )( GLenum target, GLint s );
+extern void ( APIENTRY * qglMultiTexCoord2ivARB )( GLenum target, const GLint *v );
+extern void ( APIENTRY * qglMultiTexCoord2sARB )( GLenum target, GLshort s );
+extern void ( APIENTRY * qglMultiTexCoord2svARB )( GLenum target, const GLshort *v );
+extern void ( APIENTRY * qglMultiTexCoord3dARB )( GLenum target, GLdouble s );
+extern void ( APIENTRY * qglMultiTexCoord3dvARB )( GLenum target, const GLdouble *v );
+extern void ( APIENTRY * qglMultiTexCoord3fARB )( GLenum target, GLfloat s );
+extern void ( APIENTRY * qglMultiTexCoord3fvARB )( GLenum target, const GLfloat *v );
+extern void ( APIENTRY * qglMultiTexCoord3iARB )( GLenum target, GLint s );
+extern void ( APIENTRY * qglMultiTexCoord3ivARB )( GLenum target, const GLint *v );
+extern void ( APIENTRY * qglMultiTexCoord3sARB )( GLenum target, GLshort s );
+extern void ( APIENTRY * qglMultiTexCoord3svARB )( GLenum target, const GLshort *v );
+extern void ( APIENTRY * qglMultiTexCoord4dARB )( GLenum target, GLdouble s );
+extern void ( APIENTRY * qglMultiTexCoord4dvARB )( GLenum target, const GLdouble *v );
+extern void ( APIENTRY * qglMultiTexCoord4fARB )( GLenum target, GLfloat s );
+extern void ( APIENTRY * qglMultiTexCoord4fvARB )( GLenum target, const GLfloat *v );
+extern void ( APIENTRY * qglMultiTexCoord4iARB )( GLenum target, GLint s );
+extern void ( APIENTRY * qglMultiTexCoord4ivARB )( GLenum target, const GLint *v );
+extern void ( APIENTRY * qglMultiTexCoord4sARB )( GLenum target, GLshort s );
+extern void ( APIENTRY * qglMultiTexCoord4svARB )( GLenum target, const GLshort *v );
+
 #if defined( _WIN32 )
+typedef struct tagPIXELFORMATDESCRIPTOR PIXELFORMATDESCRIPTOR, *PPIXELFORMATDESCRIPTOR, FAR *LPPIXELFORMATDESCRIPTOR;
+
 extern  int   ( WINAPI * qwglChoosePixelFormat )(HDC, CONST PIXELFORMATDESCRIPTOR *);
 extern  int   ( WINAPI * qwglDescribePixelFormat) (HDC, int, UINT, LPPIXELFORMATDESCRIPTOR);
 extern  int   ( WINAPI * qwglGetPixelFormat)(HDC);
 extern  BOOL  ( WINAPI * qwglSetPixelFormat)(HDC, int, CONST PIXELFORMATDESCRIPTOR *);
 extern  BOOL  ( WINAPI * qwglSwapBuffers)(HDC);
+
+typedef struct HPBUFFERARB__ *HPBUFFERARB;
+extern BOOL  ( WINAPI * qwglBindTexImageARB)(HPBUFFERARB, int);
+extern BOOL	 ( WINAPI * qwglChoosePixelFormatARB)(HDC hdc, const int * RESTRICT piAttribIList, const FLOAT * RESTRICT pfAttribFList, UINT nMaxFormats, int * RESTRICT piFormats, UINT * RESTRICT nNumFormats);
+extern HPBUFFERARB ( WINAPI * qwglCreatePbufferARB)(HDC hDC, int iPixelFormat, int iWidth, int iHeight, const int * RESTRICT piAttribList);
+extern BOOL  ( WINAPI * qwglDestroyPbufferARB)(HPBUFFERARB);
+extern HDC	 ( WINAPI * qwglGetPbufferDCARB)(HPBUFFERARB);
+extern int	 ( WINAPI * qwglReleasePbufferDCARB)(HPBUFFERARB, HDC);
+extern BOOL  ( WINAPI * qwglReleaseTexImageARB)(HPBUFFERARB, int);
+extern BOOL  ( WINAPI * qwglSetPbufferAttribARB)(HPBUFFERARB, const int * RESTRICT );
 
 extern BOOL  ( WINAPI * qwglCopyContext)(HGLRC, HGLRC, UINT);
 extern HGLRC ( WINAPI * qwglCreateContext)(HDC);
@@ -535,20 +719,37 @@ extern BOOL ( WINAPI * qwglDescribeLayerPlane)(HDC, int, int, UINT,LPLAYERPLANED
 extern int  ( WINAPI * qwglSetLayerPaletteEntries)(HDC, int, int, int,CONST COLORREF *);
 extern int  ( WINAPI * qwglGetLayerPaletteEntries)(HDC, int, int, int,COLORREF *);
 extern BOOL ( WINAPI * qwglRealizeLayerPalette)(HDC, int, BOOL);
-extern BOOL ( WINAPI * qwglSwapLayerBuffers)(HDC, UINT);
+extern BOOL ( WINAPI * qwglSwapLayerBuffers )( HDC, UINT );
+
+extern BOOL ( WINAPI * qwglSwapIntervalEXT )( int interval );
+
+extern BOOL ( WINAPI * qwglGetDeviceGammaRampEXT )( unsigned char *pRed, unsigned char *pGreen, unsigned char *pBlue );
+extern BOOL ( WINAPI * qwglSetDeviceGammaRampEXT )( const unsigned char *pRed, const unsigned char *pGreen, const unsigned char *pBlue );
 
 #endif	// _WIN32
 
 #if defined( __linux__ )
 
-//GLX Functions
+// GLX Functions
 extern XVisualInfo * (*qglXChooseVisual)( Display *dpy, int screen, int *attribList );
 extern GLXContext (*qglXCreateContext)( Display *dpy, XVisualInfo *vis, GLXContext shareList, Bool direct );
 extern void (*qglXDestroyContext)( Display *dpy, GLXContext ctx );
 extern Bool (*qglXMakeCurrent)( Display *dpy, GLXDrawable drawable, GLXContext ctx);
 extern void (*qglXSwapBuffers)( Display *dpy, GLXDrawable drawable );
-extern GLExtension_t (*qglXGetProcAddressARB)( const GLubyte *procname );
 
+extern GLXPixmap ( *qglXCreateGLXPixmap )( Display *dpy, XVisualInfo *visual, Pixmap pixmap );
+extern void ( *qglXDestroyGLXPixmap )( Display *dpy, GLXPixmap pixmap );
+extern Bool ( *qglXQueryExtension )( Display *dpy, int *errorb, int *event );
+extern Bool ( *qglXQueryVersion )( Display *dpy, int *maj, int *min );
+extern Bool ( *qglXIsDirect )( Display *dpy, GLXContext ctx );
+extern int ( *qglXGetConfig )( Display *dpy, XVisualInfo *visual, int attrib, int *value );
+extern GLXContext ( *qglXGetCurrentContext )( void );
+extern GLXDrawable ( *qglXGetCurrentDrawable )( void );
+extern void ( *qglXWaitGL )( void );
+extern void ( *qglXWaitX )( void );
+extern void ( *qglXUseXFont )( Font font, int first, int count, int list );
+
+extern GLExtension_t (*qglXGetProcAddressARB)( const GLubyte *procname );
 // make sure the code is correctly using qgl everywhere
 // don't enable that when building glimp itself obviously..
 #if !defined( GLIMP )
@@ -556,6 +757,19 @@ extern GLExtension_t (*qglXGetProcAddressARB)( const GLubyte *procname );
 #endif
 
 #endif // __linux__
+extern void ( APIENTRY* qgluPerspective )( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar );
+extern void ( APIENTRY* qgluLookAt )( GLdouble eyex, GLdouble eyey, GLdouble eyez, GLdouble centerx, GLdouble centery, GLdouble centerz, GLdouble upx, GLdouble upy, GLdouble upz );
+extern const GLubyte * ( APIENTRY * qgluErrorString )(GLenum errCode );
+extern void ( APIENTRY * qglSetTexCacheDefault2DImageId ) ( int id);
+extern void ( APIENTRY * qglSetTexCacheDefaultCubeImageId ) ( int id);
+extern  GLboolean ( APIENTRY * qglTexImageExistsInBundles ) ( unsigned long texNameCRC32 );
+extern  void ( APIENTRY * qglTexImageFromCache )( int id, unsigned long texNameCRC32 );
+
+// capture backbuffer to memory
+extern void xglCapture( int width, int height, void * RESTRICT pixels );
+
+// allow us to directly use the results of resolving from the EDRAM rendertarget as texture.
+extern void ( APIENTRY * qglTexImageFromFrontBuffer )( void );
 
 #endif	// hardlinlk vs dlopen
 

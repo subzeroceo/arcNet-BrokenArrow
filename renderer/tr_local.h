@@ -3,8 +3,8 @@
 
 #include "Image.h"
 
-class ARCRenderWorldLocal;
-class arcMaterial;
+class anRenderWorldLocal;
+class anMaterial;
 class arcDeclMaterial;
 
 const int FALLOFF_TEXTURE_SIZE =	64;
@@ -13,9 +13,9 @@ const int FOG_ENTER_SIZE =			64;
 const float FOG_ENTER = ( FOG_ENTER_SIZE+1.0f )/( FOG_ENTER_SIZE*2 );
 
 // picky to get the bilerp correct at terminator
-// ARCScreenRect gets carried around with each drawSurf, so it makes sense
-// to keep it compact, instead of just using the arcBounds class
-class ARCScreenRect {
+// anScreenRect gets carried around with each drawSurf, so it makes sense
+// to keep it compact, instead of just using the anBounds class
+class anScreenRect {
 public:
 	short		x1, y1, x2, y2;							// inclusive pixel bounds inside viewport
     float       zMin, zmax;								// for depth bounds test
@@ -23,34 +23,34 @@ public:
 	void		Clear();								// clear to backwards values
 	void		AddPoint( float x, float y );			// adds a point
 	void		Expand();								// expand by one pixel each way to fix roundoffs
-	void		Intersect( const ARCScreenRect &rect );
-	void		Union( const ARCScreenRect &rect );
-	bool		Equals( const ARCScreenRect &rect ) const;
+	void		Intersect( const anScreenRect &rect );
+	void		Union( const anScreenRect &rect );
+	bool		Equals( const anScreenRect &rect ) const;
 	bool		IsEmpty() const;
 
-	ARCScreenRect RectFromViewFrustumBounds( const arcBounds &bounds );
-	ARCScreenRect CalcIntersectionBounds( const viewDef_t *viewDef );
+	anScreenRect RectFromViewFrustumBounds( const anBounds &bounds );
+	anScreenRect CalcIntersectionBounds( const viewDef_t *viewDef );
 };
 
-ARCScreenRect R_ScreenRectFromViewFrustumBounds( const arcBounds &bounds );
-void R_ShowColoredScreenRect( const ARCScreenRect &rect, int colorIndex );
+anScreenRect R_ScreenRectFromViewFrustumBounds( const anBounds &bounds );
+void R_ShowColoredScreenRect( const anScreenRect &rect, int colorIndex );
 
 void TransposeGLMatrix( const float in[16], float out[16] );
 void InvertByTranspose( const float a[16], float r[16] );
 void FullInvert( const float a[16], float r[16] );
 
 void FinishStageTexture( const textureStage_t *texture, const drawSurf_t *surf );
-void AxisToModelMatrix( const arcMat3 &axis, const arcVec3 &origin, float modelMatrix[16] );
+void AxisToModelMatrix( const anMat3 &axis, const anVec3 &origin, float modelMatrix[16] );
 
 // note that many of these assume a normalized matrix, and will not work with scaled axis
-void GlobalPointToLocal( const float modelMatrix[16], const arcVec3 &in, arcVec3 &out );
-void GlobalVectorToLocal( const float modelMatrix[16], const arcVec3 &in, arcVec3 &out );
-void GlobalPlaneToLocal( const float modelMatrix[16], const arcPlane &in, arcPlane &out );
-void PointTimesMatrix( const float modelMatrix[16], const arcVec4 &in, arcVec4 &out );
-void LocalPointToGlobal( const float modelMatrix[16], const arcVec3 &in, arcVec3 &out );
-void LocalVectorToGlobal( const float modelMatrix[16], const arcVec3 &in, arcVec3 &out );
-void LocalPlaneToGlobal( const float modelMatrix[16], const arcPlane &in, arcPlane &out );
-void TransformModelToClip( const arcVec3 &src, const float *modelMatrix, const float *projectionMatrix, arcPlane &eye, arcPlane &dst );
+void GlobalPointToLocal( const float modelMatrix[16], const anVec3 &in, anVec3 &out );
+void GlobalVectorToLocal( const float modelMatrix[16], const anVec3 &in, anVec3 &out );
+void GlobalPlaneToLocal( const float modelMatrix[16], const anPlane &in, anPlane &out );
+void PointTimesMatrix( const float modelMatrix[16], const anVec4 &in, anVec4 &out );
+void LocalPointToGlobal( const float modelMatrix[16], const anVec3 &in, anVec3 &out );
+void LocalVectorToGlobal( const float modelMatrix[16], const anVec3 &in, anVec3 &out );
+void LocalPlaneToGlobal( const float modelMatrix[16], const anPlane &in, anPlane &out );
+void TransformModelToClip( const anVec3 &src, const float *modelMatrix, const float *projectionMatrix, anPlane &eye, anPlane &dst );
 void TransformEyeZToWin( float srcZ, const float *projectionMatrix, float &dstZ );
 void GL_MultMatrix( const float *a, const float *b, float *out );
 static float CalcSplit( float n, float f, float i, float m );
@@ -68,26 +68,26 @@ SURFACES
 #include "Interaction.h"
 
 // drawSurf_t structures command the back end to render surfaces
-// a given surfTriangles_t may be used with multiple viewEntity_t,
+// a given srfTriangles_t may be used with multiple viewEntity_t,
 // as when viewed in a subview or multiple viewport render, or
 // with multiple shaders when skinned, or, possibly with multiple
 // lights, although currently each lighting interaction creates
-// unique surfTriangles_t
+// unique srfTriangles_t
 
 // drawSurf_t are always allocated and freed every frame, they are never cached
 static const int	DSF_VIEW_INSIDE_SHADOW	= 1;
 
 typedef struct drawSurf_s {
-	const surfTriangles_t		*geo;
+	const srfTriangles_t	*geo;
 
 	GLint					numIndexes;
 	vertCacheHandle_t		indexCache;			// triIndex_t
-	vertCacheHandle_t		ambientCache;		// arcDrawVert
-	vertCacheHandle_t		shadowCache;		// arcShadowCache / arcShadowCache
+	vertCacheHandle_t		ambientCache;		// anDrawVertex
+	vertCacheHandle_t		shadowCache;		// anShadowCache / anShadowCache
 	vertCacheHandle_t		jointCache;			// arcJointMat
 
 	const struct viewEntity_s *space;
-	const arcMaterial		*material;			// may be NULL for shadow volumes
+	const anMaterial		*material;			// may be nullptr for shadow volumes
 	GLint					ExtraGLStateBits;	// Extra GL state |'d with material->stage[].drawStateBits
 
 	float					sort;				// material->sort, modified by gui / entity sort offsets
@@ -95,7 +95,7 @@ typedef struct drawSurf_s {
 
 	const struct drawSurf_s	*nextOnLight;		// viewLight chains
 
-	ARCScreenRect			scissorRect;		// for scissor clipping, local inside renderView viewport
+	anScreenRect			scissorRect;		// for scissor clipping, local inside renderView viewport
 	int						dsFlags;			// DSF_VIEW_INSIDE_SHADOW, etc
 
 	struct vertCache_s		*dynamicTexCoords;	// float * in vertex cache memory
@@ -107,7 +107,7 @@ typedef struct drawSurf_s {
 
 typedef struct {
 	int			numPlanes;		// this is always 6 for now
-	arcPlane	planes[6];
+	anPlane	planes[6];
 	// positive sides facing inward
 	// plane 5 is always the plane the projection is going to, the
 	// other planes are just clip planes
@@ -124,15 +124,15 @@ typedef struct areaReference_s {
 	struct areaReference_s *areaNext;				// chain in the area
 	struct areaReference_s *areaPrev;
 	struct areaReference_s *ownerNext;				// chain on either the entityDef or lightDef
-	ARCRenderEntityLocal *	entity;					// only one of entity / light will be non-NULL
-	ARCRenderLightsLocal *	light;					// only one of entity / light will be non-NULL
+	anRenderEntityLocal *	entity;					// only one of entity / light will be non-nullptr
+	anRenderLightsLocal *	light;					// only one of entity / light will be non-nullptr
 	struct portalArea_s	*	area;					// so owners can find all the areas they are in
 } areaReference_t;
 
-// ARCRenderLights should become the new public interface replacing the arcNetHandle_t to light defs in the ARCRenderWorld interface
-class ARCRenderLights {
+// anRenderLight should become the new public interface replacing the arcNetHandle_t to light defs in the anRenderWorld interface
+class anRenderLight {
 public:
-	virtual					~ARCRenderLights() {}
+	virtual					~anRenderLight() {}
 
 	virtual void			FreeRenderLight() = 0;
 	virtual void			UpdateRenderLight( const renderLight_t *re, bool forceUpdate = false ) = 0;
@@ -141,10 +141,10 @@ public:
 	virtual int				GetIndex() = 0;
 };
 
-// ARCRenderEntity should become the new public interface replacing the arcNetHandle_t to entity defs in the ARCRenderWorld interface
-class ARCRenderEntity {
+// anRenderEntity should become the new public interface replacing the arcNetHandle_t to entity defs in the anRenderWorld interface
+class anRenderEntity {
 public:
-	virtual					~ARCRenderEntity() {}
+	virtual					~anRenderEntity() {}
 
 	virtual void			FreeRenderEntity() = 0;
 	virtual void			UpdateRenderEntity( const renderEntity_t *re, bool forceUpdate = false ) = 0;
@@ -153,13 +153,13 @@ public:
 	virtual int				GetIndex() = 0;
 
 	// overlays are extra polygons that deform with animating models for blood and damage marks
-	virtual void			ProjectOverlay( const arcPlane localTextureAxis[2], const arcMaterial *material ) = 0;
+	virtual void			ProjectOverlay( const anPlane localTextureAxis[2], const anMaterial *material ) = 0;
 	virtual void			RemoveDecals() = 0;
 };
 
-class ARCRenderLightsLocal : public ARCRenderLights {
+class anRenderLightsLocal : public anRenderLight {
 public:
-							ARCRenderLightsLocal();
+							anRenderLightsLocal();
 
 	virtual void			FreeRenderLight();
 	virtual void			UpdateRenderLight( const renderLight_t *re, bool forceUpdate = false );
@@ -174,7 +174,7 @@ public:
 
 	float					modelMatrix[16];		// this is just a rearrangement of parms.axis and parms.origin
 
-	ARCRenderWorldLocal		*world;
+	anRenderWorldLocal *	world;
 	int						index;					// in world lightdefs
 
 	int						areaNum;				// if not -1, we may be able to cull all the light's
@@ -187,34 +187,34 @@ public:
 
 
 	// derived information
-	arcPlane				lightProject[4];
+	anPlane					lightProject[4];
 
-	const arcMaterial		*lightShader;			// guaranteed to be valid, even if parms.shader isn't
-	ARCImage				*falloffImage;
+	const anMaterial		*lightShader;			// guaranteed to be valid, even if parms.shader isn't
+	anImage					*falloffImage;
 
-	arcVec3					globalLightOrigin;		// accounting for lightCenter and parallel
+	anVec3					globalLightOrigin;		// accounting for lightCenter and parallel
 
 
-	arcPlane				frustum[6];				// in global space, positive side facing out, last two are front/back
-	arcWinding				*frustumWindings[6];		// used for culling
-	surfTriangles_t			*frustumTris;			// triangulated frustumWindings[]
+	anPlane					frustum[6];				// in global space, positive side facing out, last two are front/back
+	anWinding *				frustumWindings[6];		// used for culling
+	srfTriangles_t *		frustumTris;			// triangulated frustumWindings[]
 
 	int						numShadowFrustums;		// one for projected lights, usually six for point lights
 	shadowFrustum_t			shadowFrustums[6];
 
 	int						viewCount;				// if == tr.viewCount, the light is on the viewDef->viewLights list
-	struct viewLight_s		*viewLight;
+	struct viewLight_s *	viewLight;
 
-	areaReference_t			*references;				// each area the light is present in will have a lightRef
-	ARCInteraction *			firstInteraction;		// doubly linked list
-	ARCInteraction *			lastInteraction;
+	areaReference_t *		references;				// each area the light is present in will have a lightRef
+	an Interaction *		firstInteraction;		// doubly linked list
+	an Interaction *		lastInteraction;
 
-	struct doublePortal_s	*foggedPortals;
+	struct doublePortal_s *	foggedPortals;
 };
 
-class ARCRenderEntityLocal : public ARCRenderEntity {
+class anRenderEntityLocal : public anRenderEntity {
 public:
-							ARCRenderEntityLocal();
+							anRenderEntityLocal();
 
 	virtual void			FreeRenderEntity();
 	virtual void			UpdateRenderEntity( const renderEntity_t *re, bool forceUpdate = false );
@@ -223,14 +223,14 @@ public:
 	virtual int				GetIndex();
 
 	// overlays are extra polygons that deform with animating models for blood and damage marks
-	virtual void			ProjectOverlay( const arcPlane localTextureAxis[2], const arcMaterial *material );
+	virtual void			ProjectOverlay( const anPlane localTextureAxis[2], const anMaterial *material );
 	virtual void			RemoveDecals();
 
 	renderEntity_t			parms;
 
 	float					modelMatrix[16];		// this is just a rearrangement of parms.axis and parms.origin
 
-	ARCRenderWorldLocal		*world;
+	anRenderWorldLocal		*world;
 	int						index;					// in world entityDefs
 
 	int						lastModifiedFrameNum;	// to determine if it is constantly changing,
@@ -238,14 +238,14 @@ public:
 													// in the cached memory
 	bool					archived;				// for demo writing
 
-	ARCRenderModel			*dynamicModel;			// if parms.model->IsDynamicModel(), this is the generated data
+	anRenderModel			*dynamicModel;			// if parms.model->IsDynamicModel(), this is the generated data
 	int						dynamicModelFrameCount;	// continuously animating dynamic models will recreate
 													// dynamicModel if this doesn't == tr.viewCount
-	ARCRenderModel			*cachedDynamicModel;
+	anRenderModel			*cachedDynamicModel;
 
-	arcBounds			referenceBounds;		// the local bounds used to place entityRefs, either from parms or a model
+	anBounds				referenceBounds;		// the local bounds used to place entityRefs, either from parms or a model
 
-	// a viewEntity_t is created whenever a ARCRenderEntityLocal is considered for inclusion
+	// a viewEntity_t is created whenever a anRenderEntityLocal is considered for inclusion
 	// in a given view, even if it turns out to not be visible
 	int						viewCount;				// if tr.viewCount == viewCount, viewEntity is valid,
 													// but the entity may still be off screen
@@ -257,31 +257,31 @@ public:
 	// note that an entity could still be in the view frustum and not be visible due
 	// to portal passing
 
-	ARCRenderModelDecal		*decals;					// chain of decals that have been projected on this model
-	ARCRenderModelOverlay	*overlay;				// blood overlays on animated models
+	anRenderModelDecal *	decals;					// chain of decals that have been projected on this model
+	anRenderModelOverlay *	overlay;				// blood overlays on animated models
 
-	areaReference_t 		*entityRefs;				// chain of all references
-	ARCInteraction			*firstInteraction;		// doubly linked list
-	ARCInteraction			*lastInteraction;
+	areaReference_t *		entityRefs;				// chain of all references
+	an Interaction *		firstInteraction;		// doubly linked list
+	an Interaction *		lastInteraction;
 
 	bool					needsPortalSky;
 };
 
 // viewLights are allocated on the frame temporary stack memory
-// a viewLight contains everything that the back end needs out of an ARCRenderLightsLocal,
+// a viewLight contains everything that the back end needs out of an anRenderLightsLocal,
 // which the front end may be modifying simultaniously if running in SMP mode.
 // a viewLight may exist even without any surfaces, and may be relevent for fogging,
 // but should never exist if its volume does not intersect the view frustum
 typedef struct viewLight_s {
-	struct viewLight_s		*next;
+	struct viewLight_s *	next;
 
 	// back end should NOT reference the lightDef, because it can change when running SMP
-	ARCRenderLightsLocal	*lightDef;
+	anRenderLightsLocal	*	lightDef;
 
 	// for scissor clipping, local inside renderView viewport
 	// scissorRect.Empty() is true if the viewEntity_t was never actually
 	// seen through any portals
-	ARCScreenRect			scissorRect;
+	anScreenRect			scissorRect;
 
 	// if the view isn't inside the light, we can use the non-reversed
 	// shadow drawing, avoiding the draws of the front and rear caps
@@ -296,13 +296,13 @@ typedef struct viewLight_s {
 	// allowing us to skip drawing the projected caps of shadows if we can't see the face
 	int						viewSeesShadowPlaneBits;
 
-	arcVec3					globalLightOrigin;			// global light origin used by backend
-	arcPlane				lightProject[4];			// light project used by backend
-	arcPlane				fogPlane;					// fog plane for backend fog volume rendering
-	const surfTriangles_t	*frustumTris;				// light frustum for backend fog volume rendering
-	const arcMaterial		*lightShader;				// light shader used by backend
-	const float				*shaderRegisters;			// shader registers used by backend
-	ARCImage				*falloffImage;				// falloff image used by backend
+	anVec3					globalLightOrigin;			// global light origin used by backend
+	anPlane					lightProject[4];			// light project used by backend
+	anPlane					fogPlane;					// fog plane for backend fog volume rendering
+	const srfTriangles_t *	frustumTris;				// light frustum for backend fog volume rendering
+	const anMaterial *		lightShader;				// light shader used by backend
+	const float *			shaderRegisters;			// shader registers used by backend
+	anImage *				falloffImage;				// falloff image used by backend
 
 	const struct drawSurf_s	*globalShadows;				// shadow everything
 	const struct drawSurf_s	*localInteractions;			// don't get local shadows
@@ -311,24 +311,24 @@ typedef struct viewLight_s {
 	const struct drawSurf_s	*translucentInteractions;	// get shadows from everything
 } viewLight_t;
 
-// a viewEntity is created whenever a ARCRenderEntityLocal is considered for inclusion
+// a viewEntity is created whenever a anRenderEntityLocal is considered for inclusion
 // in the current view, but it may still turn out to be culled.
 // viewEntity are allocated on the frame temporary stack memory
-// a viewEntity contains everything that the back end needs out of a ARCRenderEntityLocal,
+// a viewEntity contains everything that the back end needs out of a anRenderEntityLocal,
 // which the front end may be modifying simultaniously if running in SMP mode.
 // A single entityDef can generate multiple viewEntity_t in a single frame, as when seen in a mirror
 typedef struct viewEntity_s {
 	struct viewEntity_s		*next;
 
 	// back end should NOT reference the entityDef, because it can change when running SMP
-	ARCRenderEntityLocal	*entityDef;
+	anRenderEntityLocal	*entityDef;
 
 	// for scissor clipping, local inside renderView viewport
 	// scissorRect.Empty() is true if the viewEntity_t was never actually
 	// seen through any portals, but was created for shadow casting.
 	// a viewEntity can have a non-empty scissorRect, meaning that an area
 	// that it is in is visible, and still not be visible.
-	ARCScreenRect			scissorRect;
+	anScreenRect			scissorRect;
 
 	bool					primaryViewDepthHack;
 	float					modelDepthHack;
@@ -347,11 +347,11 @@ typedef struct viewDef_s {
 	float					projectionMatrix[16];
 	viewEntity_t			worldSpace;
 
-	ARCRenderWorldLocal *	renderWorld;
+	anRenderWorldLocal *	renderWorld;
 
 	float					floatTime;
 
-	arcVec3					initialViewAreaOrigin;
+	anVec3					initialViewAreaOrigin;
 	// Used to find the portalArea that view flooding will take place from.
 	// for a normal view, the initialViewOrigin will be renderView.viewOrg,
 	// but a mirror may put the projection origin outside
@@ -368,11 +368,11 @@ typedef struct viewDef_s {
 	bool					isEditor;
 
 	int						numClipPlanes;			// mirrors will often use a single clip plane
-	arcPlane				clipPlanes[MAX_CLIP_PLANES];		// in world space, the positive side
+	anPlane					clipPlanes[MAX_CLIP_PLANES];		// in world space, the positive side
 												// of the plane is the visible side
-	ARCScreenRect			viewport;				// in real pixels and proper Y flip
+	anScreenRect			viewport;				// in real pixels and proper Y flip
 
-	ARCScreenRect			scissor;
+	anScreenRect			scissor;
 	// for scissor clipping, local inside renderView viewport
 	// subviews may only be rendering part of the main view
 	// these are real physical pixel values, possibly scaled and offset from the
@@ -383,7 +383,7 @@ typedef struct viewDef_s {
 
 	// drawSurfs are the visible surfaces of the viewEntities, sorted
 	// by the material sort parameter
-	drawSurf_t				**drawSurfs;				// we don't use an arcNetList for this, because
+	drawSurf_t				**drawSurfs;				// we don't use an anList for this, because
 	int						numDrawSurfs;			// it is allocated in frame temporary memory
 	int						maxDrawSurfs;			// may be resized
 
@@ -393,8 +393,8 @@ typedef struct viewDef_s {
 	// of 2D rendering, which we can optimize in certain ways.  A 2D view will
 	// not have any viewEntities
 
-	arcPlane				frustum[5];				// positive sides face outward, [4] is the front clip plane
-	ARCFrustum				viewFrustum;
+	anPlane					frustum[5];				// positive sides face outward, [4] is the front clip plane
+	anFrustum				viewFrustum;
 
 	int						areaNum;				// -1 = not in a valid area
 
@@ -411,26 +411,26 @@ const int	MAX_CLIP_PLANES	= 1;				// we may expand this to six for some subview 
 typedef struct {
 	const drawSurf_t		*surf;
 
-	ARCImage				*lightImage;
-	ARCImage				*lightFalloffImage;
-	ARCImage				*bumpImage;
-	ARCImage				*diffuseImage;
-	ARCImage				*specularImage;
+	anImage					*lightImage;
+	anImage					*lightFalloffImage;
+	anImage					*bumpImage;
+	anImage					*diffuseImage;
+	anImage					*specularImage;
 
-	arcVec4					diffuseColor;	// may have a light color baked into it, will be < tr.backEndRendererMaxLight
-	arcVec4					specularColor;	// may have a light color baked into it, will be < tr.backEndRendererMaxLight
+	anVec4					diffuseColor;	// may have a light color baked into it, will be < tr.backEndRendererMaxLight
+	anVec4					specularColor;	// may have a light color baked into it, will be < tr.backEndRendererMaxLight
 	stageVertexColor_t		vertexColor;	// applies to both diffuse and specular
 
 	int						ambientLight;	// use tr.ambientNormalMap instead of normalization cube map
 	// (not a bool just to avoid an uninitialized memory check of the pad region by valgrind)
 
 	// these are loaded into the vertex program
-	arcVec4				localLightOrigin;
-	arcVec4				localViewOrigin;
-	arcVec4				lightProjection[4];	// in local coordinates, possibly with a texture matrix baked in
-	arcVec4				bumpMatrix[2];
-	arcVec4				diffuseMatrix[2];
-	arcVec4				specularMatrix[2];
+	anVec4				localLightOrigin;
+	anVec4				localViewOrigin;
+	anVec4				lightProjection[4];	// in local coordinates, possibly with a texture matrix baked in
+	anVec4				bumpMatrix[2];
+	anVec4				diffuseMatrix[2];
+	anVec4				specularMatrix[2];
 } drawInteraction_t;
 
 //====================================================
@@ -438,7 +438,7 @@ typedef struct {
 typedef struct {
 	int					sphereCull, sphereClip, sphereCullOut;
 	int					boxCull, boxCullOut;
-	int					createInteractions;	// number of calls to ARCInteraction::CreateInteraction
+	int					createInteractions;	// number of calls to an Interaction::CreateInteraction
 	int					createLightTris;
 	int					createShadowVolumes;
 	int					generateMD5;
@@ -448,9 +448,9 @@ typedef struct {
 	int					shadowViewEntities;
 	int					viewLights;
 	int					numViews;			// number of total views rendered
-	int					deformedSurfs;		// idMD5Mesh::GenerateSurface
-	int					deformedVerts;		// idMD5Mesh::GenerateSurface
-	int					deformedIndexes;	// idMD5Mesh::GenerateSurface
+	int					deformedSurfs;		// anM8DMesh::GenerateSurface
+	int					deformedVerts;		// anM8DMesh::GenerateSurface
+	int					deformedIndexes;	// anM8DMesh::GenerateSurface
 	int					tangentIndexes;		// R_DeriveTangents()
 	int					entityUpdates, lightUpdates, entityReferences, lightReferences;
 	int					guiSurfaces;
@@ -458,10 +458,12 @@ typedef struct {
 } performanceCounters_t;
 
 typedef struct {
-	int					current2DMap;
-	int					current3DMap;
-	int					currentCubeMap;
-	int					texEnv;
+	GLint				current2DMap;
+	GLint				current3DMap;
+	GLint				currentCubeMap;
+	GLint				currentSeamlessCubeMap;
+	GLint				currentRect;
+	GLint				texEnv;
 	textureType_t		textureType;
 } tmu_t;
 
@@ -469,6 +471,14 @@ const int MAX_MULTITEXTURE_UNITS =	8;
 typedef struct {
 	tmu_t				tmu[MAX_MULTITEXTURE_UNITS];
 	int					currenttmu;
+	GLuint				textures[NUM_TEXTURE_BUNDLES];	// honest this is the same as tmu
+	GLenum				texUnit;	// and this too currenttmu
+
+	GLuint				program;
+
+	GLuint				drawFramebuffer;
+	GLuint				readFramebuffer;
+	GLuint				renderbuffer;
 
 	int					faceCulling;
 
@@ -515,13 +525,14 @@ typedef struct {
 	backEndCounters_t	pc;
 
 	const viewEntity_t	*currentSpace;		// for detecting when a matrix must change
-	ARCScreenRect		currentScissor;
+	anScreenRect		currentScissor;
 	// for scissor clipping, local inside renderView viewport
 
 	viewLight_t			*vLight;
 	int					depthFunc;			// GLS_DEPTHFUNC_EQUAL, or GLS_DEPTHFUNC_LESS for translucent
 	float				lightTxteMatrix[16];	// only if lightStage->texture.hasMatrix
 	float				lightColor[4];		// evaluation of current light's color stage
+	anVec4				lightColorVec;
 
 	float				lightScale;			// Every light color calaculation will be multiplied by this,
 											// which will guarantee that the result is < tr.backEndRendererMaxLight
@@ -564,7 +575,7 @@ static const int	MAX_RENDER_CROPS = 8;
 // backend functions should never modify any of these fields,
 // but may read fields that aren't dynamically modified
 // by the frontend.
-class ARCRenderEngineLocal : public ARCRenderSystem {
+class anRenderSystemLocal : public anRenderSystem {
 public:
 	// external functions
 	virtual void			Init( void );
@@ -575,25 +586,25 @@ public:
 	virtual bool			IsFullScreen( void ) const;
 	virtual int				GetScreenWidth() const;
 	virtual int				GetScreenHeight() const;
-	virtual ARCRenderWorld	*AllocRenderWorld( void );
-	virtual void			FreeRenderWorld( ARCRenderWorld *rw );
+	virtual anRenderWorld	*AllocRenderWorld( void );
+	virtual void			FreeRenderWorld( anRenderWorld *rw );
 	virtual void			BeginLevelLoad( void );
 	virtual void			EndLevelLoad( void );
 	virtual bool			RegisterFont( const char *fontName, fontInfoEx_t &font );
-	virtual void			SetColor( const arcVec4 &rgba );
+	virtual void			SetColor( const anVec4 &rgba );
 	virtual void			SetColor4( float r, float g, float b, float a );
-	virtual void			DrawStretchPic( const aRcnicalImageVertex *verts, const qglIndex_t *indexes, int vertCount, int indexCount, const arcMaterial *material, bool clip = true, float x = 0.0f, float y = 0.0f, float w = 640.0f, float h = 0.0f );
-	virtual void			DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const arcMaterial *material );
+	virtual void			DrawStretchPic( const anDrawVertex *verts, const qglIndex_t *indexes, int vertCount, int indexCount, const anMaterial *material, bool clip = true, float x = 0.0f, float y = 0.0f, float w = 640.0f, float h = 0.0f );
+	virtual void			DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const anMaterial *material );
 
-	virtual void			DrawStretchTri( arcVec2 p1, arcVec2 p2, arcVec2 p3, arcVec2 t1, arcVec2 t2, arcVec2 t3, const arcMaterial *material );
-	virtual void			GlobalToNormalizedDeviceCoordinates( const arcVec3 &global, arcVec3 &ndc );
+	virtual void			DrawStretchTri( anVec2 p1, anVec2 p2, anVec2 p3, anVec2 t1, anVec2 t2, anVec2 t3, const anMaterial *material );
+	virtual void			GlobalToNormalizedDeviceCoordinates( const anVec3 &global, anVec3 &ndc );
 	virtual void			GetGLSettings( int& width, int& height );
 	virtual void			PrintMemInfo( MemInfo_t *mi );
 
-	virtual void			DrawSmallChar( int x, int y, int ch, const arcMaterial *material );
-	virtual void			DrawSmallStringExt( int x, int y, const char *string, const arcVec4 &setColor, bool forceColor, const arcMaterial *material );
-	virtual void			DrawBigChar( int x, int y, int ch, const arcMaterial *material );
-	virtual void			DrawBigStringExt( int x, int y, const char *string, const arcVec4 &setColor, bool forceColor, const arcMaterial *material );
+	virtual void			DrawSmallChar( int x, int y, int ch, const anMaterial *material );
+	virtual void			DrawSmallStringExt( int x, int y, const char *string, const anVec4 &setColor, bool forceColor, const anMaterial *material );
+	virtual void			DrawBigChar( int x, int y, int ch, const anMaterial *material );
+	virtual void			DrawBigStringExt( int x, int y, const char *string, const anVec4 &setColor, bool forceColor, const anMaterial *material );
 	virtual void			BeginFrame( int winWidth, int winHeight );
 	virtual void			EndFrame( int *frontEndMsec, int *backEndMsec );
 	virtual void			TakeScreenshot( int width, int height, const char *fileName, int downSample, renderView_t *ref );
@@ -606,12 +617,12 @@ public:
 
 public:
 	// internal functions
-							ARCRenderEngineLocal( void );
-							~ARCRenderEngineLocal( void );
+							anRenderSystemLocal( void );
+							~anRenderSystemLocal( void );
 
 	void					Clear( void );
 	void					SetBackEndRenderer();			// sets tr.backEndRenderer based on cvars
-	void					RenderViewToViewport( const renderView_t *renderView, ARCScreenRect *viewport );
+	void					RenderViewToViewport( const renderView_t *renderView, anScreenRect *viewport );
 
 public:
 	// renderer globals
@@ -637,20 +648,20 @@ public:
 														// determines how much overbrighting needs
 														// to be done post-process
 
-	arcVec4					ambientLightVector;	// used for "ambient bump mapping"
+	anVec4					ambientLightVector;	// used for "ambient bump mapping"
 
 	float					sortOffset;				// for determinist sorting of equal sort materials
 
-	arcNetList<ARCRenderWorldLocal*>worlds;
+	anList<anRenderWorldLocal*>worlds;
 
-	ARCRenderWorldLocal		*primaryWorld;
+	anRenderWorldLocal		*primaryWorld;
 	renderView_t			primaryRenderView;
 	viewDef_t *				primaryView;
 	// many console commands need to know which world they should operate on
 
-	const arcMaterial		*defaultMTL;
-	ARCImage				*testImg;
-	ARCImage				*ambientCubeImage;	// hack for testing dependent ambient lighting
+	const anMaterial		*defaultMTL;
+	anImage				*testImg;
+	anImage				*ambientCubeImage;	// hack for testing dependent ambient lighting
 
 	viewDef_t				*viewDef;
 
@@ -667,189 +678,189 @@ public:
 
 	// GUI drawing variables for surface creation
 	int						guiRecursionLevel;		// to prevent infinite overruns
-	class arcInteractiveGuiModel *guiModel;
+	class anInteractiveGuiModel *guiModel;
 
 	GLushort				gammaTable[256];	// brightness / gamma modify this
 };
 
 extern backEndState_t		backEnd;
-extern ARCRenderEngineLocal	tr;
+extern anRenderSystemLocal	tr;
 extern qglConfig_t			qglConfig;		// outside of TR since it shouldn't be cleared during ref re-init
-extern arcGraphicsBuffer	arcBuffer;
+extern anRenderCache	arcBuffer;
 //
 // cvars
 //
-extern arcCVarSystem r_ext_vertex_array_range;
+extern anCVarSystem r_ext_vertex_array_range;
 
-extern arcCVarSystem r_glDriver;				// "opengl32", etc
-extern arcCVarSystem r_mode;					// video mode number
-extern arcCVarSystem r_displayRefresh;			// optional display refresh rate option for vid mode
-extern arcCVarSystem r_fullscreen;				// 0 = windowed, 1 = full screen
-extern arcCVarSystem r_multiSamples;			// number of antialiasing samples
+extern anCVarSystem r_glDriver;				// "opengl32", etc
+extern anCVarSystem r_mode;					// video mode number
+extern anCVarSystem r_displayRefresh;			// optional display refresh rate option for vid mode
+extern anCVarSystem r_fullscreen;				// 0 = windowed, 1 = full screen
+extern anCVarSystem r_multiSamples;			// number of antialiasing samples
 
-extern arcCVarSystem r_ignore;					// used for random debugging without defining new vars
-extern arcCVarSystem r_ignore2;				// used for random debugging without defining new vars
-extern arcCVarSystem r_znear;					// near Z clip plane
+extern anCVarSystem r_ignore;					// used for random debugging without defining new vars
+extern anCVarSystem r_ignore2;				// used for random debugging without defining new vars
+extern anCVarSystem r_znear;					// near Z clip plane
 
-extern arcCVarSystem r_finish;					// force a call to glFinish() every frame
-extern arcCVarSystem r_frontBuffer;			// draw to front buffer for debugging
-extern arcCVarSystem r_swapInterval;			// changes wglSwapIntarval
-extern arcCVarSystem r_offsetFactor;			// polygon offset parameter
-extern arcCVarSystem r_offsetUnits;			// polygon offset parameter
-extern arcCVarSystem r_singleTriangle;			// only draw a single triangle per primitive
-extern arcCVarSystem r_logFile;				// number of frames to emit GL logs
-extern arcCVarSystem r_clear;					// force screen clear every frame
-extern arcCVarSystem r_shadows;				// enable shadows
-extern arcCVarSystem r_subviewOnly;			// 1 = don't render main view, allowing subviews to be debugged
-extern arcCVarSystem r_lightScale;				// all light intensities are multiplied by this, which is normally 2
-extern arcCVarSystem r_flareSize;				// scale the flare deforms from the material def
+extern anCVarSystem r_finish;					// force a call to glFinish() every frame
+extern anCVarSystem r_frontBuffer;			// draw to front buffer for debugging
+extern anCVarSystem r_swapInterval;			// changes wglSwapIntarval
+extern anCVarSystem r_offsetFactor;			// polygon offset parameter
+extern anCVarSystem r_offsetUnits;			// polygon offset parameter
+extern anCVarSystem r_singleTriangle;			// only draw a single triangle per primitive
+extern anCVarSystem r_logFile;				// number of frames to emit GL logs
+extern anCVarSystem r_clear;					// force screen clear every frame
+extern anCVarSystem r_shadows;				// enable shadows
+extern anCVarSystem r_subviewOnly;			// 1 = don't render main view, allowing subviews to be debugged
+extern anCVarSystem r_lightScale;				// all light intensities are multiplied by this, which is normally 2
+extern anCVarSystem r_flareSize;				// scale the flare deforms from the material def
 
-extern arcCVarSystem r_gamma;					// changes gamma tables
-extern arcCVarSystem r_brightness;				// changes gamma tables
+extern anCVarSystem r_gamma;					// changes gamma tables
+extern anCVarSystem r_brightness;				// changes gamma tables
 
-extern arcCVarSystem r_renderer;				// arb, nv10, nv20, r200, gl2, etc
+extern anCVarSystem r_renderer;				// arb, nv10, nv20, r200, gl2, etc
 
-extern arcCVarSystem r_cgVertexProfile;		// arbvp1, vp20, vp30
-extern arcCVarSystem r_cgFragmentProfile;		// arbfp1, fp30
+extern anCVarSystem r_cgVertexProfile;		// arbvp1, vp20, vp30
+extern anCVarSystem r_cgFragmentProfile;		// arbfp1, fp30
 
-extern arcCVarSystem r_checkBounds;			// compare all surface bounds with precalculated ones
+extern anCVarSystem r_checkBounds;			// compare all surface bounds with precalculated ones
 
-extern arcCVarSystem r_useNV20MonoLights;		// 1 = allow an interaction pass optimization
-extern arcCVarSystem r_useLightPortalFlow;	// 1 = do a more precise area reference determination
-extern arcCVarSystem r_useTripleTextureARB;	// 1 = cards with 3+ texture units do a two pass instead of three pass
-extern arcCVarSystem r_useShadowSurfaceScissor;// 1 = scissor shadows by the scissor rect of the interaction surfaces
-extern arcCVarSystem r_useConstantMaterials;	// 1 = use pre-calculated material registers if possible
-extern arcCVarSystem r_useInteractionTable;	// create a full entityDefs * lightDefs table to make finding interactions faster
-extern arcCVarSystem r_useNodeCommonChildren;	// stop pushing reference bounds early when possible
-extern arcCVarSystem r_useSilRemap;			// 1 = consider verts with the same XYZ, but different ST the same for shadows
-extern arcCVarSystem r_useCulling;			// 0 = none, 1 = sphere, 2 = sphere + box
-extern arcCVarSystem r_useLightCulling;		// 0 = none, 1 = box, 2 = exact clip of polyhedron faces
-extern arcCVarSystem r_useLightScissors;		// 1 = use custom scissor rectangle for each light
-extern arcCVarSystem r_useClippedLightScissors;// 0 = full screen when near clipped, 1 = exact when near clipped, 2 = exact always
-extern arcCVarSystem r_useEntityCulling;		// 0 = none, 1 = box
-extern arcCVarSystem r_useEntityScissors;		// 1 = use custom scissor rectangle for each entity
-extern arcCVarSystem r_useInteractionCulling;	// 1 = cull interactions
-extern arcCVarSystem r_useInteractionScissors;	// 1 = use a custom scissor rectangle for each interaction
-extern arcCVarSystem r_useFrustumFarDistance;	// if != 0 force the view frustum far distance to this distance
-extern arcCVarSystem r_useShadowCulling;		// try to cull shadows from partially visible lights
-extern arcCVarSystem r_usePreciseTriangleInteractions;	// 1 = do winding clipping to determine if each ambiguous tri should be lit
-extern arcCVarSystem r_useTurboShadow;			// 1 = use the infinite projection with W technique for dynamic shadows
-extern arcCVarSystem r_useExternalShadows;		// 1 = skip drawing caps when outside the light volume
-extern arcCVarSystem r_useOptimizedShadows;	// 1 = use the dmap generated static shadow volumes
-extern arcCVarSystem r_useShadowVertexProgram;	// 1 = do the shadow projection in the vertex program on capable cards
-extern arcCVarSystem r_useShadowProjectedCull;	// 1 = discard triangles outside light volume before shadowing
-extern arcCVarSystem r_useDeferredTangents;	// 1 = don't always calc tangents after deform
-extern arcCVarSystem r_useCachedDynamicModels;	// 1 = cache snapshots of dynamic models
-extern arcCVarSystem r_useTwoSidedStencil;		// 1 = do stencil shadows in one pass with different ops on each side
-extern arcCVarSystem r_useInfiniteFarZ;		// 1 = use the no-far-clip-plane trick
-extern arcCVarSystem r_useScissor;				// 1 = scissor clip as portals and lights are processed
-extern arcCVarSystem r_usePortals;				// 1 = use portals to perform area culling, otherwise draw everything
-extern arcCVarSystem r_useStateCaching;		// avoid redundant state changes in GL_*() calls
-extern arcCVarSystem r_useCombinerDisplayLists;// if 1, put all nvidia register combiner programming in display lists
-extern arcCVarSystem r_useVertexBuffers;		// if 0, don't use ARB_vertex_buffer_object for vertexes
-extern arcCVarSystem r_useIndexBuffers;		// if 0, don't use ARB_vertex_buffer_object for indexes
-extern arcCVarSystem r_useEntityCallbacks;		// if 0, issue the callback immediately at update time, rather than defering
-extern arcCVarSystem r_lightAllBackFaces;		// light all the back faces, even when they would be shadowed
-extern arcCVarSystem r_useDepthBoundsTest;     // use depth bounds test to reduce shadow fill
+extern anCVarSystem r_useNV20MonoLights;		// 1 = allow an interaction pass optimization
+extern anCVarSystem r_useLightPortalFlow;	// 1 = do a more precise area reference determination
+extern anCVarSystem r_useTripleTextureARB;	// 1 = cards with 3+ texture units do a two pass instead of three pass
+extern anCVarSystem r_useShadowSurfaceScissor;// 1 = scissor shadows by the scissor rect of the interaction surfaces
+extern anCVarSystem r_useConstantMaterials;	// 1 = use pre-calculated material registers if possible
+extern anCVarSystem r_useInteractionTable;	// create a full entityDefs * lightDefs table to make finding interactions faster
+extern anCVarSystem r_useNodeCommonChildren;	// stop pushing reference bounds early when possible
+extern anCVarSystem r_useSilRemap;			// 1 = consider verts with the same XYZ, but different ST the same for shadows
+extern anCVarSystem r_useCulling;			// 0 = none, 1 = sphere, 2 = sphere + box
+extern anCVarSystem r_useLightCulling;		// 0 = none, 1 = box, 2 = exact clip of polyhedron faces
+extern anCVarSystem r_useLightScissors;		// 1 = use custom scissor rectangle for each light
+extern anCVarSystem r_useClippedLightScissors;// 0 = full screen when near clipped, 1 = exact when near clipped, 2 = exact always
+extern anCVarSystem r_useEntityCulling;		// 0 = none, 1 = box
+extern anCVarSystem r_useEntityScissors;		// 1 = use custom scissor rectangle for each entity
+extern anCVarSystem r_useInteractionCulling;	// 1 = cull interactions
+extern anCVarSystem r_useInteractionScissors;	// 1 = use a custom scissor rectangle for each interaction
+extern anCVarSystem r_useFrustumFarDistance;	// if != 0 force the view frustum far distance to this distance
+extern anCVarSystem r_useShadowCulling;		// try to cull shadows from partially visible lights
+extern anCVarSystem r_usePreciseTriangleInteractions;	// 1 = do winding clipping to determine if each ambiguous tri should be lit
+extern anCVarSystem r_useTurboShadow;			// 1 = use the infinite projection with W technique for dynamic shadows
+extern anCVarSystem r_useExternalShadows;		// 1 = skip drawing caps when outside the light volume
+extern anCVarSystem r_useOptimizedShadows;	// 1 = use the dmap generated static shadow volumes
+extern anCVarSystem r_useShadowVertexProgram;	// 1 = do the shadow projection in the vertex program on capable cards
+extern anCVarSystem r_useShadowProjectedCull;	// 1 = discard triangles outside light volume before shadowing
+extern anCVarSystem r_useDeferredTangents;	// 1 = don't always calc tangents after deform
+extern anCVarSystem r_useCachedDynamicModels;	// 1 = cache snapshots of dynamic models
+extern anCVarSystem r_useTwoSidedStencil;		// 1 = do stencil shadows in one pass with different ops on each side
+extern anCVarSystem r_useInfiniteFarZ;		// 1 = use the no-far-clip-plane trick
+extern anCVarSystem r_useScissor;				// 1 = scissor clip as portals and lights are processed
+extern anCVarSystem r_usePortals;				// 1 = use portals to perform area culling, otherwise draw everything
+extern anCVarSystem r_useStateCaching;		// avoid redundant state changes in GL_*() calls
+extern anCVarSystem r_useCombinerDisplayLists;// if 1, put all nvidia register combiner programming in display lists
+extern anCVarSystem r_useVertexBuffers;		// if 0, don't use ARB_vertex_buffer_object for vertexes
+extern anCVarSystem r_useIndexBuffers;		// if 0, don't use ARB_vertex_buffer_object for indexes
+extern anCVarSystem r_useEntityCallbacks;		// if 0, issue the callback immediately at update time, rather than defering
+extern anCVarSystem r_lightAllBackFaces;		// light all the back faces, even when they would be shadowed
+extern anCVarSystem r_useDepthBoundsTest;     // use depth bounds test to reduce shadow fill
 
-extern arcCVarSystem r_skipPostProcess;		// skip all post-process renderings
-extern arcCVarSystem r_skipSuppress;			// ignore the per-view suppressions
-extern arcCVarSystem r_skipInteractions;		// skip all light/surface interaction drawing
-extern arcCVarSystem r_skipFrontEnd;			// bypasses all front end work, but 2D gui rendering still draws
-extern arcCVarSystem r_skipBackEnd;			// don't draw anything
-extern arcCVarSystem r_skipCopyTexture;		// do all rendering, but don't actually copyTexSubImage2D
-extern arcCVarSystem r_skipRender;				// skip 3D rendering, but pass 2D
-extern arcCVarSystem r_skipRenderContext;		// NULL the rendering context during backend 3D rendering
-extern arcCVarSystem r_skipTranslucent;		// skip the translucent interaction rendering
-extern arcCVarSystem r_skipAmbient;			// bypasses all non-interaction drawing
-extern arcCVarSystem r_skipNewAmbient;			// bypasses all vertex/fragment program ambients
-extern arcCVarSystem r_skipBlendLights;		// skip all blend lights
-extern arcCVarSystem r_skipFogLights;			// skip all fog lights
-extern arcCVarSystem r_skipSubviews;			// 1 = don't render any mirrors / cameras / etc
-extern arcCVarSystem r_skipGuiShaders;			// 1 = don't render any gui elements on surfaces
-extern arcCVarSystem r_skipParticles;			// 1 = don't render any particles
-extern arcCVarSystem r_skipUpdates;			// 1 = don't accept any entity or light updates, making everything static
-extern arcCVarSystem r_skipDeforms;			// leave all deform materials in their original state
-extern arcCVarSystem r_skipDynamicTextures;	// don't dynamically create textures
-extern arcCVarSystem r_skipLightScale;			// don't do any post-interaction light scaling, makes things dim on low-dynamic range cards
-extern arcCVarSystem r_skipBump;				// uses a flat surface instead of the bump map
-extern arcCVarSystem r_skipSpecular;			// use black for specular
-extern arcCVarSystem r_skipDiffuse;			// use black for diffuse
-extern arcCVarSystem r_skipOverlays;			// skip overlay surfaces
+extern anCVarSystem r_skipPostProcess;		// skip all post-process renderings
+extern anCVarSystem r_skipSuppress;			// ignore the per-view suppressions
+extern anCVarSystem r_skipInteractions;		// skip all light/surface interaction drawing
+extern anCVarSystem r_skipFrontEnd;			// bypasses all front end work, but 2D gui rendering still draws
+extern anCVarSystem r_skipBackEnd;			// don't draw anything
+extern anCVarSystem r_skipCopyTexture;		// do all rendering, but don't actually copyTexSubImage2D
+extern anCVarSystem r_skipRender;				// skip 3D rendering, but pass 2D
+extern anCVarSystem r_skipRenderContext;		// nullptr the rendering context during backend 3D rendering
+extern anCVarSystem r_skipTranslucent;		// skip the translucent interaction rendering
+extern anCVarSystem r_skipAmbient;			// bypasses all non-interaction drawing
+extern anCVarSystem r_skipNewAmbient;			// bypasses all vertex/fragment program ambients
+extern anCVarSystem r_skipBlendLights;		// skip all blend lights
+extern anCVarSystem r_skipFogLights;			// skip all fog lights
+extern anCVarSystem r_skipSubviews;			// 1 = don't render any mirrors / cameras / etc
+extern anCVarSystem r_skipGuiShaders;			// 1 = don't render any gui elements on surfaces
+extern anCVarSystem r_skipParticles;			// 1 = don't render any particles
+extern anCVarSystem r_skipUpdates;			// 1 = don't accept any entity or light updates, making everything static
+extern anCVarSystem r_skipDeforms;			// leave all deform materials in their original state
+extern anCVarSystem r_skipDynamicTextures;	// don't dynamically create textures
+extern anCVarSystem r_skipLightScale;			// don't do any post-interaction light scaling, makes things dim on low-dynamic range cards
+extern anCVarSystem r_skipBump;				// uses a flat surface instead of the bump map
+extern anCVarSystem r_skipSpecular;			// use black for specular
+extern anCVarSystem r_skipDiffuse;			// use black for diffuse
+extern anCVarSystem r_skipOverlays;			// skip overlay surfaces
 
-extern arcCVarSystem r_ignoreGLErrors;
+extern anCVarSystem r_ignoreGLErrors;
 
-extern arcCVarSystem r_forceLoadImages;		// draw all images to screen after registration
-extern arcCVarSystem r_demonstrateBug;			// used during development to show IHV's their problems
-extern arcCVarSystem r_screenFraction;			// for testing fill rate, the resolution of the entire screen can be changed
+extern anCVarSystem r_forceLoadImages;		// draw all images to screen after registration
+extern anCVarSystem r_demonstrateBug;			// used during development to show IHV's their problems
+extern anCVarSystem r_screenFraction;			// for testing fill rate, the resolution of the entire screen can be changed
 
-extern arcCVarSystem r_showUnsmoothedTangents;	// highlight geometry rendered with unsmoothed tangents
-extern arcCVarSystem r_showSilhouette;			// highlight edges that are casting shadow planes
-extern arcCVarSystem r_showVertexColor;		// draws all triangles with the solid vertex color
-extern arcCVarSystem r_showUpdates;			// report entity and light updates and ref counts
-extern arcCVarSystem r_showDynamic;			// report stats on dynamic surface generation
-extern arcCVarSystem r_showLightScale;			// report the scale factor applied to drawing for overbrights
-extern arcCVarSystem r_showIntensity;			// draw the screen colors based on intensity, red = 0, green = 128, blue = 255
-extern arcCVarSystem r_showDefs;				// report the number of modeDefs and lightDefs in view
-extern arcCVarSystem r_showTrace;				// show the intersection of an eye trace with the world
-extern arcCVarSystem r_showSmp;				// show which end (front or back) is blocking
-extern arcCVarSystem r_showDepth;				// display the contents of the depth buffer and the depth range
-extern arcCVarSystem r_showImages;				// draw all images to screen instead of rendering
-extern arcCVarSystem r_showTris;				// enables wireframe rendering of the world
-extern arcCVarSystem r_showSurfaceInfo;		// show surface material name under crosshair
-extern arcCVarSystem r_showNormals;			// draws wireframe normals
-extern arcCVarSystem r_showEdges;				// draw the sil edges
-extern arcCVarSystem r_showViewEntitys;		// displays the bounding boxes of all view models and optionally the index
-extern arcCVarSystem r_showTexturePolarity;	// shade triangles by texture area polarity
-extern arcCVarSystem r_showTangentSpace;		// shade triangles by tangent space
-extern arcCVarSystem r_showDominantTri;		// draw lines from vertexes to center of dominant triangles
-extern arcCVarSystem r_showTextureVectors;		// draw each triangles texture (tangent) vectors
-extern arcCVarSystem r_showLights;				// 1 = print light info, 2 = also draw volumes
-extern arcCVarSystem r_showLightCount;			// colors surfaces based on light count
-extern arcCVarSystem r_showShadows;			// visualize the stencil shadow volumes
-extern arcCVarSystem r_showShadowCount;		// colors screen based on shadow volume depth complexity
-extern arcCVarSystem r_showLightScissors;		// show light scissor rectangles
-extern arcCVarSystem r_showEntityScissors;		// show entity scissor rectangles
-extern arcCVarSystem r_showInteractionFrustums;// show a frustum for each interaction
-extern arcCVarSystem r_showInteractionScissors;// show screen rectangle which contains the interaction frustum
-extern arcCVarSystem r_showMemory;				// print frame memory utilization
-extern arcCVarSystem r_showCull;				// report sphere and box culling stats
-extern arcCVarSystem r_showInteractions;		// report interaction generation activity
-extern arcCVarSystem r_showSurfaces;			// report surface/light/shadow counts
-extern arcCVarSystem r_showPrimitives;			// report vertex/index/draw counts
-extern arcCVarSystem r_showPortals;			// draw portal outlines in color based on passed / not passed
-extern arcCVarSystem r_showAlloc;				// report alloc/free counts
-extern arcCVarSystem r_showSkel;				// draw the skeleton when model animates
-extern arcCVarSystem r_showOverDraw;			// show overdraw
-extern arcCVarSystem r_jointNameScale;			// size of joint names when r_showskel is set to 1
-extern arcCVarSystem r_jointNameOffset;		// offset of joint names when r_showskel is set to 1
+extern anCVarSystem r_showUnsmoothedTangents;	// highlight geometry rendered with unsmoothed tangents
+extern anCVarSystem r_showSilhouette;			// highlight edges that are casting shadow planes
+extern anCVarSystem r_showVertexColor;		// draws all triangles with the solid vertex color
+extern anCVarSystem r_showUpdates;			// report entity and light updates and ref counts
+extern anCVarSystem r_showDynamic;			// report stats on dynamic surface generation
+extern anCVarSystem r_showLightScale;			// report the scale factor applied to drawing for overbrights
+extern anCVarSystem r_showIntensity;			// draw the screen colors based on intensity, red = 0, green = 128, blue = 255
+extern anCVarSystem r_showDefs;				// report the number of modeDefs and lightDefs in view
+extern anCVarSystem r_showTrace;				// show the intersection of an eye trace with the world
+extern anCVarSystem r_showSmp;				// show which end (front or back) is blocking
+extern anCVarSystem r_showDepth;				// display the contents of the depth buffer and the depth range
+extern anCVarSystem r_showImages;				// draw all images to screen instead of rendering
+extern anCVarSystem r_showTris;				// enables wireframe rendering of the world
+extern anCVarSystem r_showSurfaceInfo;		// show surface material name under crosshair
+extern anCVarSystem r_showNormals;			// draws wireframe normals
+extern anCVarSystem r_showEdges;				// draw the sil edges
+extern anCVarSystem r_showViewEntitys;		// displays the bounding boxes of all view models and optionally the index
+extern anCVarSystem r_showTexturePolarity;	// shade triangles by texture area polarity
+extern anCVarSystem r_showTangentSpace;		// shade triangles by tangent space
+extern anCVarSystem r_showDominantTri;		// draw lines from vertexes to center of dominant triangles
+extern anCVarSystem r_showTextureVectors;		// draw each triangles texture (tangent) vectors
+extern anCVarSystem r_showLights;				// 1 = print light info, 2 = also draw volumes
+extern anCVarSystem r_showLightCount;			// colors surfaces based on light count
+extern anCVarSystem r_showShadows;			// visualize the stencil shadow volumes
+extern anCVarSystem r_showShadowCount;		// colors screen based on shadow volume depth complexity
+extern anCVarSystem r_showLightScissors;		// show light scissor rectangles
+extern anCVarSystem r_showEntityScissors;		// show entity scissor rectangles
+extern anCVarSystem r_showInteractionFrustums;// show a frustum for each interaction
+extern anCVarSystem r_showInteractionScissors;// show screen rectangle which contains the interaction frustum
+extern anCVarSystem r_showMemory;				// print frame memory utilization
+extern anCVarSystem r_showCull;				// report sphere and box culling stats
+extern anCVarSystem r_showInteractions;		// report interaction generation activity
+extern anCVarSystem r_showSurfaces;			// report surface/light/shadow counts
+extern anCVarSystem r_showPrimitives;			// report vertex/index/draw counts
+extern anCVarSystem r_showPortals;			// draw portal outlines in color based on passed / not passed
+extern anCVarSystem r_showAlloc;				// report alloc/free counts
+extern anCVarSystem r_showSkel;				// draw the skeleton when model animates
+extern anCVarSystem r_showOverDraw;			// show overdraw
+extern anCVarSystem r_jointNameScale;			// size of joint names when r_showskel is set to 1
+extern anCVarSystem r_jointNameOffset;		// offset of joint names when r_showskel is set to 1
 
-extern arcCVarSystem r_testGamma;				// draw a grid pattern to test gamma levels
-extern arcCVarSystem r_testStepGamma;			// draw a grid pattern to test gamma levels
-extern arcCVarSystem r_testGammaBias;			// draw a grid pattern to test gamma levels
+extern anCVarSystem r_testGamma;				// draw a grid pattern to test gamma levels
+extern anCVarSystem r_testStepGamma;			// draw a grid pattern to test gamma levels
+extern anCVarSystem r_testGammaBias;			// draw a grid pattern to test gamma levels
 
-extern arcCVarSystem r_testARBProgram;			// experiment with vertex/fragment programs
+extern anCVarSystem r_testARBProgram;			// experiment with vertex/fragment programs
 
-extern arcCVarSystem r_singleLight;			// suppress all but one light
-extern arcCVarSystem r_singleEntity;			// suppress all but one entity
-extern arcCVarSystem r_singleArea;				// only draw the portal area the view is actually in
-extern arcCVarSystem r_singleSurface;			// suppress all but one surface on each entity
-extern arcCVarSystem r_shadowPolygonOffset;	// bias value added to depth test for stencil shadow drawing
-extern arcCVarSystem r_shadowPolygonFactor;	// scale value for stencil shadow drawing
+extern anCVarSystem r_singleLight;			// suppress all but one light
+extern anCVarSystem r_singleEntity;			// suppress all but one entity
+extern anCVarSystem r_singleArea;				// only draw the portal area the view is actually in
+extern anCVarSystem r_singleSurface;			// suppress all but one surface on each entity
+extern anCVarSystem r_shadowPolygonOffset;	// bias value added to depth test for stencil shadow drawing
+extern anCVarSystem r_shadowPolygonFactor;	// scale value for stencil shadow drawing
 
-extern arcCVarSystem r_jitter;				// randomly subpixel jitter the projection matrix
-extern arcCVarSystem r_lightSourceRadius;		// for soft-shadow sampling
-extern arcCVarSystem r_lockSurfaces;
-extern arcCVarSystem r_orderIndexes;			// perform index reorganization to optimize vertex use
+extern anCVarSystem r_jitter;				// randomly subpixel jitter the projection matrix
+extern anCVarSystem r_lightSourceRadius;		// for soft-shadow sampling
+extern anCVarSystem r_lockSurfaces;
+extern anCVarSystem r_orderIndexes;			// perform index reorganization to optimize vertex use
 
-extern arcCVarSystem r_debugLineDepthTest;	// perform depth test on debug lines
-extern arcCVarSystem r_debugLineWidth;		// width of debug lines
-extern arcCVarSystem r_debugArrowStep;		// step size of arrow cone line rotation in degrees
-extern arcCVarSystem r_debugPolygonFilled;
+extern anCVarSystem r_debugLineDepthTest;	// perform depth test on debug lines
+extern anCVarSystem r_debugLineWidth;		// width of debug lines
+extern anCVarSystem r_debugArrowStep;		// step size of arrow cone line rotation in degrees
+extern anCVarSystem r_debugPolygonFilled;
 
-extern arcCVarSystem r_materialOverride;		// override all materials
+extern anCVarSystem r_materialOverride;		// override all materials
 
-extern arcCVarSystem r_debugRenderToTexture;
+extern anCVarSystem r_debugRenderToTexture;
 
 /*
 ====================================================================
@@ -917,7 +928,7 @@ void R_DoneFreeType( void );
 
 void R_SetColorMappings( void );
 
-void R_ScreenShot_f( const arcCommandArgs &args );
+void R_ScreenShot_f( const anCommandArgs &args );
 void R_StencilShot( void );
 
 bool R_CheckExtension( char *name );
@@ -934,11 +945,11 @@ MAIN
 //void R_RenderView( viewDef_t *parms );
 
 // performs radius cull first, then corner cull
-bool R_CullLocalBox( const arcBounds &bounds, const float modelMatrix[16], int numPlanes, const arcPlane *planes );
-bool R_RadiusCullLocalBox( const arcBounds &bounds, const float modelMatrix[16], int numPlanes, const arcPlane *planes );
-bool R_CornerCullLocalBox( const arcBounds &bounds, const float modelMatrix[16], int numPlanes, const arcPlane *planes );
+bool R_CullLocalBox( const anBounds &bounds, const float modelMatrix[16], int numPlanes, const anPlane *planes );
+bool R_RadiusCullLocalBox( const anBounds &bounds, const float modelMatrix[16], int numPlanes, const anPlane *planes );
+bool R_CornerCullLocalBox( const anBounds &bounds, const float modelMatrix[16], int numPlanes, const anPlane *planes );
 
-void R_GlobalToNormalizedDeviceCoordinates( const arcVec3 &global, arcVec3 &ndc );
+void R_GlobalToNormalizedDeviceCoordinates( const anVec3 &global, anVec3 &ndc );
 
 void R_SetViewMatrix( viewDef_t *viewDef );
 
@@ -950,23 +961,23 @@ LIGHT
 ============================================================
 */
 
-void R_ListRenderLightDefs_f( const arcCommandArgs &args );
-void R_ListRenderEntityDefs_f( const arcCommandArgs &args );
+void R_ListRenderLightDefs_f( const anCommandArgs &args );
+void R_ListRenderEntityDefs_f( const anCommandArgs &args );
 
-bool R_IssueEntityDefCallback( ARCRenderEntityLocal *def );
-ARCRenderModel *R_EntityDefDynamicModel( ARCRenderEntityLocal *def );
+bool R_IssueEntityDefCallback( anRenderEntityLocal *def );
+anRenderModel *R_EntityDefDynamicModel( anRenderEntityLocal *def );
 
-viewEntity_t *R_SetEntityDefViewEntity( ARCRenderEntityLocal *def );
-viewLight_t *R_SetLightDefViewLight( ARCRenderLightsLocal *def );
+viewEntity_t *R_SetEntityDefViewEntity( anRenderEntityLocal *def );
+viewLight_t *R_SetLightDefViewLight( anRenderLightsLocal *def );
 
-void R_AddDrawSurf( const surfTriangles_t *tri, const viewEntity_t *space, const renderEntity_t *renderEntity, const arcMaterial *shader, const ARCScreenRect &scissor );
+void R_AddDrawSurf( const srfTriangles_t *tri, const viewEntity_t *space, const renderEntity_t *renderEntity, const anMaterial *shader, const anScreenRect &scissor );
 
-void R_LinkLightSurf( const drawSurf_t **link, const surfTriangles_t *tri, const viewEntity_t *space, const ARCRenderLightsLocal *light, const arcMaterial *shader, const ARCScreenRect &scissor, bool viewInsideShadow );
+void R_LinkLightSurf( const drawSurf_t **link, const srfTriangles_t *tri, const viewEntity_t *space, const anRenderLightsLocal *light, const anMaterial *shader, const anScreenRect &scissor, bool viewInsideShadow );
 
-bool R_CreateAmbientCache( surfTriangles_t *tri, bool needsLighting );
-bool R_CreateLightingCache( const ARCRenderEntityLocal *ent, const ARCRenderLightsLocal *light, surfTriangles_t *tri );
-void R_CreatePrivateShadowCache( surfTriangles_t *tri );
-void R_CreateVertexProgramShadowCache( surfTriangles_t *tri );
+bool R_CreateAmbientCache( srfTriangles_t *tri, bool needsLighting );
+bool R_CreateLightingCache( const anRenderEntityLocal *ent, const anRenderLightsLocal *light, srfTriangles_t *tri );
+void R_CreatePrivateShadowCache( srfTriangles_t *tri );
+void R_CreateVertexProgramShadowCache( srfTriangles_t *tri );
 
 /*
 ============================================================
@@ -976,10 +987,10 @@ LIGHTRUN
 ============================================================
 */
 
-void R_RegenerateWorld_f( const arcCommandArgs &args );
+void R_RegenerateWorld_f( const anCommandArgs &args );
 
-void R_ModulateLights_f( const arcCommandArgs &args );
-void R_SetLightProject( arcPlane lightProject[4], const arcVec3 origin, const arcVec3 targetPoint, const arcVec3 rightVector, const arcVec3 upVector, const arcVec3 start, const arcVec3 stop );
+void R_ModulateLights_f( const anCommandArgs &args );
+void R_SetLightProject( anPlane lightProject[4], const anVec3 origin, const anVec3 targetPoint, const anVec3 rightVector, const anVec3 upVector, const anVec3 start, const anVec3 stop );
 
 void R_AddLightSurfaces( void );
 void R_AddModelSurfaces( void );
@@ -988,21 +999,21 @@ void R_RemoveUnecessaryViewLights( void );
 void R_FreeDerivedData( void );
 void R_ReCreateWorldReferences( void );
 
-void R_CreateEntityRefs( ARCRenderEntityLocal *def );
-void R_CreateLightRefs( ARCRenderLightsLocal *light );
+void R_CreateEntityRefs( anRenderEntityLocal *def );
+void R_CreateLightRefs( anRenderLightsLocal *light );
 
-void R_DeriveLightData( ARCRenderLightsLocal *light );
-void R_FreeLightDefDerivedData( ARCRenderLightsLocal *light );
-void R_CheckForEntityDefsUsingModel( ARCRenderModel *model );
+void R_DeriveLightData( anRenderLightsLocal *light );
+void R_FreeLightDefDerivedData( anRenderLightsLocal *light );
+void R_CheckForEntityDefsUsingModel( anRenderModel *model );
 
-void R_ClearEntityDefDynamicModel( ARCRenderEntityLocal *def );
-void R_FreeEntityDefDerivedData( ARCRenderEntityLocal *def, bool keepDecals, bool keepCachedDynamicModel );
-void R_FreeEntityDefCachedDynamicModel( ARCRenderEntityLocal *def );
-void R_FreeEntityDefDecals( ARCRenderEntityLocal *def );
-void R_FreeEntityDefOverlay( ARCRenderEntityLocal *def );
-void R_FreeEntityDefFadedDecals( ARCRenderEntityLocal *def, int time );
+void R_ClearEntityDefDynamicModel( anRenderEntityLocal *def );
+void R_FreeEntityDefDerivedData( anRenderEntityLocal *def, bool keepDecals, bool keepCachedDynamicModel );
+void R_FreeEntityDefCachedDynamicModel( anRenderEntityLocal *def );
+void R_FreeEntityDefDecals( anRenderEntityLocal *def );
+void R_FreeEntityDefOverlay( anRenderEntityLocal *def );
+void R_FreeEntityDefFadedDecals( anRenderEntityLocal *def, int time );
 
-void R_CreateLightDefFogPortals( ARCRenderLightsLocal *ldef );
+void R_CreateLightDefFogPortals( anRenderLightsLocal *ldef );
 
 /*
 ============================================================
@@ -1015,8 +1026,8 @@ RENDER
 void RB_EnterViewDepthHack();
 void RB_EnterModelDepthHack( float depth );
 void RB_LeaveDepthHack();
-void RB_DrawElementsImmediate( const surfTriangles_t *tri );
-void RB_RenderTriangleSurface( const surfTriangles_t *tri );
+void RB_DrawElementsImmediate( const srfTriangles_t *tri );
+void RB_RenderTriangleSurface( const srfTriangles_t *tri );
 void RB_T_RenderTriangleSurface( const drawSurf_t *surf );
 void RB_RenderDrawSurfListWithFunction( drawSurf_t **drawSurfs, int numDrawSurfs, void (*triFunc_)( const drawSurf_t *) );
 void RB_RenderDrawSurfChainWithFunction( const drawSurf_t *drawSurfs, void (*triFunc_)( const drawSurf_t *) );
@@ -1025,7 +1036,7 @@ void RB_LoadShaderTextureMatrix( const float *shaderRegisters, const textureStag
 void RB_GetShaderTextureMatrix( const float *shaderRegisters, const textureStage_t *texture, float matrix[16] );
 void RB_CreateSingleDrawInteractions( const drawSurf_t *surf, void (*DrawInteraction)(const drawInteraction_t *) );
 
-const materialStage_t *RB_SetLightTexture( const ARCRenderLightsLocal *light );
+const materialStage_t *RB_SetLightTexture( const anRenderLightsLocal *light );
 
 void RB_DrawView( const void *data );
 
@@ -1041,15 +1052,15 @@ DRAW_STANDARD
 ============================================================
 */
 
-void RB_DrawElementsWithCounters( const surfTriangles_t *tri );
-void RB_DrawShadowElementsWithCounters( const surfTriangles_t *tri, int numIndexes );
+void RB_DrawElementsWithCounters( const srfTriangles_t *tri );
+void RB_DrawShadowElementsWithCounters( const srfTriangles_t *tri, int numIndexes );
 void RB_STD_FillDepthBuffer( drawSurf_t **drawSurfs, int numDrawSurfs );
 void RB_BindVariableStageImage( const textureStage_t *texture, const float *shaderRegisters );
 void RB_BindStageTexture( const float *shaderRegisters, const textureStage_t *texture, const drawSurf_t *surf );
 void RB_StencilShadowPass( const drawSurf_t *drawSurfs );
 void RB_STD_DrawView( void );
 void RB_STD_FogAllLights( void );
-void RB_BakeTextureMatrixIntoTexgen( arcPlane lightProject[3], const float textureMatrix[16] );
+void RB_BakeTextureMatrixIntoTexgen( anPlane lightProject[3], const float textureMatrix[16] );
 
 /*
 ============================================================
@@ -1072,7 +1083,7 @@ void	RB_NV20_DrawInteractions( void );
 
 void	R_ARB2_Init( void );
 void	RB_ARB2_DrawInteractions( void );
-void	R_ReloadARBPrograms_f( const arcCommandArgs &args );
+void	R_ReloadARBPrograms_f( const anCommandArgs &args );
 int		R_FindARBProgram( GLenum target, const char *program );
 
 typedef enum {
@@ -1158,7 +1169,7 @@ TR_STENCILSHADOWS moved to tr_shadowbounds.cpp
 ============================================================
 */
 
-void R_MakeShadowFrustums( ARCRenderLightsLocal *def );
+void R_MakeShadowFrustums( anRenderLightsLocal *def );
 
 typedef enum {
 	SG_DYNAMIC,		// use infinite projections
@@ -1166,7 +1177,7 @@ typedef enum {
 	SG_OFFLINE		// perform very time consuming optimizations
 } shadowGen_t;
 
-surfTriangles_t *R_CreateShadowVolume( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, shadowGen_t optimize, srfCullInfo_t &cullInfo );
+srfTriangles_t *R_CreateShadowVolume( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, shadowGen_t optimize, srfCullInfo_t &cullInfo );
 
 /*
 ============================================================
@@ -1181,8 +1192,8 @@ calling this function may modify "facing" based on culling
 ============================================================
 */
 
-surfTriangles_t		*R_CreateVertexProgramTurboShadowVolume( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, srfCullInfo_t &cullInfo );
-surfTriangles_t		*R_CreateTurboShadowVolume( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, srfCullInfo_t &cullInfo );
+srfTriangles_t		*R_CreateVertexProgramTurboShadowVolume( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, srfCullInfo_t &cullInfo );
+srfTriangles_t		*R_CreateTurboShadowVolume( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, srfCullInfo_t &cullInfo );
 
 /*
 ============================================================
@@ -1195,7 +1206,7 @@ dmap time optimization of shadow volumes, called from R_CreateShadowVolume
 */
 
 typedef struct {
-	arcVec3			*verts;			// includes both front and back projections, caller should free
+	anVec3			*verts;			// includes both front and back projections, caller should free
 	int				numVerts;
 	qglIndex_t		*indexes;	// caller should free
 
@@ -1207,9 +1218,9 @@ typedef struct {
 	int				totalIndexes;
 } optimizedShadow_t;
 
-optimizedShadow_t	SuperOptimizeOccluders( arcVec4 *verts, qglIndex_t *indexes, int numIndexes, arcPlane projectionPlane, arcVec3 projectionOrigin );
+optimizedShadow_t	SuperOptimizeOccluders( anVec4 *verts, qglIndex_t *indexes, int numIndexes, anPlane projectionPlane, anVec3 projectionOrigin );
 
-void				CleanupOptimizedShadowTris( surfTriangles_t *tri );
+void				CleanupOptimizedShadowTris( srfTriangles_t *tri );
 
 /*
 ============================================================
@@ -1224,50 +1235,50 @@ TRISURF
 void				R_InitTriSurfData( void );
 void				R_ShutdownTriSurfData( void );
 void				R_PurgeTriSurfData( frameData_t *frame );
-void				R_ShowTriSurfMemory_f( const arcCommandArgs &args );
+void				R_ShowTriSurfMemory_f( const anCommandArgs &args );
 
-surfTriangles_t *	R_AllocStaticTriSurf( void );
-surfTriangles_t *	R_CopyStaticTriSurf( const surfTriangles_t *tri );
-void				R_AllocStaticTriSurfVerts( surfTriangles_t *tri, int numVerts );
-void				R_AllocStaticTriSurfIndexes( surfTriangles_t *tri, int numIndexes );
-void				R_AllocStaticTriSurfShadowVerts( surfTriangles_t *tri, int numVerts );
-void				R_AllocStaticTriSurfPlanes( surfTriangles_t *tri, int numIndexes );
-void				R_ResizeStaticTriSurfVerts( surfTriangles_t *tri, int numVerts );
-void				R_ResizeStaticTriSurfIndexes( surfTriangles_t *tri, int numIndexes );
-void				R_ResizeStaticTriSurfShadowVerts( surfTriangles_t *tri, int numVerts );
-void				R_ReferenceStaticTriSurfVerts( surfTriangles_t *tri, const surfTriangles_t *reference );
-void				R_ReferenceStaticTriSurfIndexes( surfTriangles_t *tri, const surfTriangles_t *reference );
-void				R_FreeStaticTriSurfSilIndexes( surfTriangles_t *tri );
-void				R_FreeStaticTriSurf( surfTriangles_t *tri );
-void				R_FreeStaticTriSurfVertexCaches( surfTriangles_t *tri );
-void				R_ReallyFreeStaticTriSurf( surfTriangles_t *tri );
+srfTriangles_t *	R_AllocStaticTriSurf( void );
+srfTriangles_t *	R_CopyStaticTriSurf( const srfTriangles_t *tri );
+void				R_AllocStaticTriSurfVerts( srfTriangles_t *tri, int numVerts );
+void				R_AllocStaticTriSurfIndexes( srfTriangles_t *tri, int numIndexes );
+void				R_AllocStaticTriSurfShadowVerts( srfTriangles_t *tri, int numVerts );
+void				R_AllocStaticTriSurfPlanes( srfTriangles_t *tri, int numIndexes );
+void				R_ResizeStaticTriSurfVerts( srfTriangles_t *tri, int numVerts );
+void				R_ResizeStaticTriSurfIndexes( srfTriangles_t *tri, int numIndexes );
+void				R_ResizeStaticTriSurfShadowVerts( srfTriangles_t *tri, int numVerts );
+void				R_ReferenceStaticTriSurfVerts( srfTriangles_t *tri, const srfTriangles_t *reference );
+void				R_ReferenceStaticTriSurfIndexes( srfTriangles_t *tri, const srfTriangles_t *reference );
+void				R_FreeStaticTriSurfSilIndexes( srfTriangles_t *tri );
+void				R_FreeStaticTriSurf( srfTriangles_t *tri );
+void				R_FreeStaticTriSurfVertexCaches( srfTriangles_t *tri );
+void				R_ReallyFreeStaticTriSurf( srfTriangles_t *tri );
 void				R_FreeDeferredTriSurfs( frameData_t *frame );
-int					R_TriSurfMemory( const surfTriangles_t *tri );
+int					R_TriSurfMemory( const srfTriangles_t *tri );
 
-void				R_BoundTriSurf( surfTriangles_t *tri );
-void				R_RemoveDuplicatedTriangles( surfTriangles_t *tri );
-void				R_CreateSilIndexes( surfTriangles_t *tri );
-void				R_RemoveDegenerateTriangles( surfTriangles_t *tri );
-void				R_RemoveUnusedVerts( surfTriangles_t *tri );
-void				R_RangeCheckIndexes( const surfTriangles_t *tri );
-void				R_CreateVertexNormals( surfTriangles_t *tri );	// also called by dmap
-void				R_DeriveFacePlanes( surfTriangles_t *tri );		// also called by renderbump
-void				R_CleanupTriangles( surfTriangles_t *tri, bool createNormals, bool identifySilEdges, bool useUnsmoothedTangents );
-void				R_ReverseTriangles( surfTriangles_t *tri );
+void				R_BoundTriSurf( srfTriangles_t *tri );
+void				R_RemoveDuplicatedTriangles( srfTriangles_t *tri );
+void				R_CreateSilIndexes( srfTriangles_t *tri );
+void				R_RemoveDegenerateTriangles( srfTriangles_t *tri );
+void				R_RemoveUnusedVerts( srfTriangles_t *tri );
+void				R_RangeCheckIndexes( const srfTriangles_t *tri );
+void				R_CreateVertexNormals( srfTriangles_t *tri );	// also called by dmap
+void				R_DeriveFacePlanes( srfTriangles_t *tri );		// also called by renderbump
+void				R_CleanupTriangles( srfTriangles_t *tri, bool createNormals, bool identifySilEdges, bool useUnsmoothedTangents );
+void				R_ReverseTriangles( srfTriangles_t *tri );
 
-static void			R_ByteSwapTri( surfTriangles_t *tri );
+static void			R_ByteSwapTri( srfTriangles_t *tri );
 
 // Only deals with vertexes and indexes, not silhouettes, planes, etc.
 // Does NOT perform a cleanup triangles, so there may be duplicated verts in the result.
-surfTriangles_t *	R_MergeSurfaceList( const surfTriangles_t **surfaces, int numSurfaces );
-surfTriangles_t *	R_MergeTriangles( const surfTriangles_t *tri1, const surfTriangles_t *tri2 );
+srfTriangles_t *	R_MergeSurfaceList( const srfTriangles_t **surfaces, int numSurfaces );
+srfTriangles_t *	R_MergeTriangles( const srfTriangles_t *tri1, const srfTriangles_t *tri2 );
 
 // if the deformed verts have significant enough texture coordinate changes to reverse the texture
 // polarity of a triangle, the tangents will be incorrect
-void				R_DeriveTangents( surfTriangles_t *tri, bool allocFacePlanes = true );
+void				R_DeriveTangents( srfTriangles_t *tri, bool allocFacePlanes = true );
 
 // deformable meshes precalculate as much as possible from a base frame, then generate
-// complete surfTriangles_t from just a new set of vertexes
+// complete srfTriangles_t from just a new set of vertexes
 typedef struct deformInfo_s {
 	int				numSourceVerts;
 
@@ -1294,7 +1305,7 @@ typedef struct deformInfo_s {
 } deformInfo_t;
 
 
-deformInfo_t *		R_BuildDeformInfo( int numVerts, const aRcnicalImageVertex *verts, int numIndexes, const int *indexes, bool useUnsmoothedTangents );
+deformInfo_t *		R_BuildDeformInfo( int numVerts, const anDrawVertex *verts, int numIndexes, const int *indexes, bool useUnsmoothedTangents );
 void				R_FreeDeformInfo( deformInfo_t *deformInfo );
 int					R_DeformInfoMemoryUsed( deformInfo_t *deformInfo );
 
@@ -1306,7 +1317,7 @@ SUBVIEW
 ============================================================
 */
 
-bool				R_PreciseCullSurface( const drawSurf_t *drawSurf, arcBounds &ndcBounds );
+bool				R_PreciseCullSurface( const drawSurf_t *drawSurf, anBounds &ndcBounds );
 bool				R_GenerateSubViews( void );
 
 /*
@@ -1314,7 +1325,7 @@ bool				R_GenerateSubViews( void );
 
 SCENE GENERATION
 
-moved into class arcGraphicsBuffer and in vertexcache.h temporarily. Most likely will be Vertex/RenderCache.h the name may change when its created
+moved into class anRenderCache and in vertexcache.h temporarily. Most likely will be Vertex/RenderCache.h the name may change when its created
 just future note and heads up
 ============================================================
 */
@@ -1341,13 +1352,13 @@ RENDERER DEBUG TOOLS
 */
 
 float RB_DrawTextLength( const char *text, float scale, int len );
-void RB_AddDebugText( const char *text, const arcVec3 &origin, float scale, const arcVec4 &color, const arcMat3 &viewAxis, const int align, const int lifetime, const bool depthTest );
+void RB_AddDebugText( const char *text, const anVec3 &origin, float scale, const anVec4 &color, const anMat3 &viewAxis, const int align, const int lifetime, const bool depthTest );
 void RB_ClearDebugText( int time );
-void RB_AddDebugLine( const arcVec4 &color, const arcVec3 &start, const arcVec3 &end, const int lifeTime, const bool depthTest );
+void RB_AddDebugLine( const anVec4 &color, const anVec3 &start, const anVec3 &end, const int lifeTime, const bool depthTest );
 void RB_ClearDebugLines( int time );
-void RB_AddDebugPolygon( const arcVec4 &color, const arcWinding &winding, const int lifeTime, const bool depthTest );
+void RB_AddDebugPolygon( const anVec4 &color, const anWinding &winding, const int lifeTime, const bool depthTest );
 void RB_ClearDebugPolygons( int time );
-void RB_DrawBounds( const arcBounds &bounds );
+void RB_DrawBounds( const anBounds &bounds );
 void RB_ShowLights( drawSurf_t **drawSurfs, int numDrawSurfs );
 void RB_ShowLightCount( drawSurf_t **drawSurfs, int numDrawSurfs );
 void RB_PolygonClear( void );
@@ -1369,7 +1380,7 @@ void RB_SetDefaultGLState( void );
 void RB_SetGL2D( void );
 
 // write a comment to the r_logFile if it is enabled
-void RB_LogComment( const char *comment, ... ) arc_attribute((format(printf,1,2) ));
+void RB_LogComment( const char *comment, ... ) an_attribute((format(printf,1,2) ) );
 
 void RB_ShowImages( void );
 
@@ -1384,27 +1395,27 @@ TR_GUISURF
 =============================================================
 */
 
-void R_SurfaceToTextureAxis( const surfTriangles_t *tri, arcVec3 &origin, arcVec3 axis[3] );
-void R_RenderGuiSurf( arcUserInterfaces *gui, drawSurf_t *drawSurf );
+void R_SurfaceToTextureAxis( const srfTriangles_t *tri, anVec3 &origin, anVec3 axis[3] );
+void R_RenderGuiSurf( anUserInterfaces *gui, drawSurf_t *drawSurf );
 
 void R_OrderIndexes( int numIndexes, qglIndex_t *indexes );
 
 void R_DeformDrawSurf( drawSurf_t *drawSurf );
 
-surfTriangles_t *R_PolytopeSurface( int numPlanes, const arcPlane *planes, arcWinding **windings );
+srfTriangles_t *R_PolytopeSurface( int numPlanes, const anPlane *planes, anWinding **windings );
 
 typedef struct {
 	float		fraction;
 	// only valid if fraction < 1.0
-	arcVec3		point;
-	arcVec3		normal;
+	anVec3		point;
+	anVec3		normal;
 	int			indexes[3];
 } localTrace_t;
 
-localTrace_t R_LocalTrace( const arcVec3 &start, const arcVec3 &end, const float radius, const surfTriangles_t *tri );
+localTrace_t R_LocalTrace( const anVec3 &start, const anVec3 &end, const float radius, const srfTriangles_t *tri );
 void RB_ShowTrace( drawSurf_t **drawSurfs, int numDrawSurfs );
 
-ARCScreenRect R_CalcIntersectionScissor( const ARCRenderLightsLocal * lightDef, const ARCRenderEntityLocal * entityDef, const viewDef_t * viewDef );
+anScreenRect R_CalcIntersectionScissor( const anRenderLightsLocal * lightDef, const anRenderEntityLocal * entityDef, const viewDef_t * viewDef );
 
 #include "RenderWorld_local.h"
 #include "GuiModel.h"

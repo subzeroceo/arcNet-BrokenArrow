@@ -18,11 +18,11 @@ public:
 private:
 
 	struct grouping {
-		arcVec3 axis;
+		anVec3 axis;
 		float rotate;
 		float rotateSpeed;
-		arcVec3 rotationPoint;
-		arcVec3 worldPos;
+		anVec3 rotationPoint;
+		anVec3 worldPos;
 		float time;
 		float alpha;
 	};
@@ -38,11 +38,11 @@ class sdSnowPrecipitation : public sdAbstractPrecipitationSystem {
 	int				renderEntityHandle;
 
 	struct grouping {
-		arcVec3 axis;
+		anVec3 axis;
 		float rotate;
 		float rotateSpeed;
-		arcVec3 rotationPoint;
-		arcVec3 worldPos;
+		anVec3 rotationPoint;
+		anVec3 worldPos;
 		float time;
 		float alpha;
 	};

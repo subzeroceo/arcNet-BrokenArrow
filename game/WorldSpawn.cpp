@@ -5,7 +5,7 @@ Worldspawn class.  Each map has one worldspawn which handles global spawnargs.
 
 */
 
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -32,7 +32,7 @@ idWorldspawn::Spawn
 ================
 */
 void idWorldspawn::Spawn( void ) {
-	assert( gameLocal.world == NULL );
+	assert( gameLocal.world == nullptr );
 	gameLocal.world = this;
 
 	g_gravity.SetFloat( spawnArgs.GetFloat( "gravity", va( "%f", DEFAULT_GRAVITY ) ) );
@@ -48,6 +48,6 @@ idWorldspawn::~idWorldspawn
 */
 idWorldspawn::~idWorldspawn() {
 	if ( gameLocal.world == this ) {
-		gameLocal.world = NULL;
+		gameLocal.world = nullptr;
 	}
 }

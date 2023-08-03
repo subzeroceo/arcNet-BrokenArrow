@@ -41,7 +41,7 @@ class CRotateDlg : public CDialog
 {
 // Construction
 public:
-	CRotateDlg(CWnd* pParent = NULL);   // standard constructor
+	CRotateDlg(CWnd* pParent = nullptr );   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CRotateDlg)

@@ -1,27 +1,27 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
-arcVec2 vec2_origin( 0.0f, 0.0f );
-arcVec3 vec3_origin( 0.0f, 0.0f, 0.0f );
-arcVec4 vec4_origin( 0.0f, 0.0f, 0.0f, 0.0f );
-arcVec5 vec5_origin( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f );
-arcVec6 vec6_origin( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f );
-arcVec6 vec6_infinity( arcMath::INFINITY, arcMath::INFINITY, arcMath::INFINITY, arcMath::INFINITY, arcMath::INFINITY, arcMath::INFINITY );
+anVec2 vec2_origin( 0.0f, 0.0f );
+anVec3 vec3_origin( 0.0f, 0.0f, 0.0f );
+anVec4 vec4_origin( 0.0f, 0.0f, 0.0f, 0.0f );
+anVec5 vec5_origin( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f );
+anVec6 vec6_origin( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f );
+anVec6 vec6_infinity( anMath::INFINITY, anMath::INFINITY, anMath::INFINITY, anMath::INFINITY, anMath::INFINITY, anMath::INFINITY );
 
 
 //===============================================================
 //
-//	arcVec2
+//	anVec2
 //
 //===============================================================
 
 /*
 =============
-arcVec2::ToString
+anVec2::ToString
 =============
 */
-const char *arcVec2::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anVec2::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
@@ -31,7 +31,7 @@ Lerp
 Linearly inperpolates one vector to another.
 =============
 */
-void arcVec2::Lerp( const arcVec2 &v1, const arcVec2 &v2, const float l ) {
+void anVec2::Lerp( const anVec2 &v1, const anVec2 &v2, const float l ) {
 	if ( l <= 0.0f ) {
 		(*this) = v1;
 	} else if ( l >= 1.0f ) {
@@ -44,24 +44,24 @@ void arcVec2::Lerp( const arcVec2 &v1, const arcVec2 &v2, const float l ) {
 
 //===============================================================
 //
-//	arcVec3
+//	anVec3
 //
 //===============================================================
 
 /*
 =============
-arcVec3::VectorNormalize
+anVec3::VectorNormalize
 =============
 */
-arcVec3 arcVec3::VectorNormalize( arcVec3 v ) {
+anVec3 anVec3::VectorNormalize( anVec3 v ) {
 	float sqrLength, invLength;
 
 	sqrLength = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
 
 	if ( sqrLength ) {
 		// writing it this way allows gcc to recognize that rsqrt can be used
-		invLength = 1/( float )arcMath::Sqrt( sqrLength );
-		// sqrt(sqrLength) = length * (1 / sqrt(sqrLength) )
+		invLength = 1/( float )anMath::Sqrt( sqrLength );
+		// sqrt( sqrLength) = length * (1 / sqrt( sqrLength) )
 		sqrLength *= invLength;
 		v[0] *= invLength;
 		v[1] *= invLength;
@@ -73,10 +73,10 @@ arcVec3 arcVec3::VectorNormalize( arcVec3 v ) {
 
 /*
 =============
-arcVec3::Rotate
+anVec3::Rotate
 =============
 */
-void arcVec3::Rotate( arcVec3 in, arcMat3 matrix[3], arcVec3 out ) {
+void anVec3::Rotate( anVec3 in, anMat3 matrix[3], anVec3 out ) {
 	out[0] = Dot( in, matrix[0] );
 	out[1] = Dot( in, matrix[1] );
 	out[2] = Dot( in, matrix[2] );
@@ -84,10 +84,10 @@ void arcVec3::Rotate( arcVec3 in, arcMat3 matrix[3], arcVec3 out ) {
 
 /*
 =============
-arcVec3::ToYaw
+anVec3::ToYaw
 =============
 */
-float arcVec3::ToYaw( void ) const {
+float anVec3::ToYaw( void ) const {
 	float yaw;
 
 	if ( ( y == 0.0f ) && ( x == 0.0f ) ) {
@@ -104,10 +104,10 @@ float arcVec3::ToYaw( void ) const {
 
 /*
 =============
-arcVec3::ToPitch
+anVec3::ToPitch
 =============
 */
-float arcVec3::ToPitch( void ) const {
+float anVec3::ToPitch( void ) const {
 	float	forward;
 	float	pitch;
 
@@ -118,8 +118,8 @@ float arcVec3::ToPitch( void ) const {
 			pitch = 270.0f;
 		}
 	} else {
-		forward = ( float )arcMath::Sqrt( x * x + y * y );
-		pitch = RAD2DEG( arcMath::ATan2( z, forward ) );
+		forward = ( float )anMath::Sqrt( x * x + y * y );
+		pitch = RAD2DEG( anMath::ATan2( z, forward ) );
 		if ( pitch < 0.0f ) {
 			pitch += 360.0f;
 		}
@@ -130,10 +130,10 @@ float arcVec3::ToPitch( void ) const {
 
 /*
 =============
-arcVec3::ToRadians
+anVec3::ToRadians
 =============
 */
-TeKRadians arcVec3::ToRadians( void ) const {
+TeKRadians anVec3::ToRadians( void ) const {
 	float forward;
 	float yaw;
 	float pitch;
@@ -141,21 +141,21 @@ TeKRadians arcVec3::ToRadians( void ) const {
 	if ( !x && !y ) {
 		yaw = 0.0f;
 		if ( z > 0.0f ) {
-			pitch = arcMath::HALF_PI;
+			pitch = anMath::HALF_PI;
 		} else {
-			pitch = arcMath::THREEFOURTHS_PI;
+			pitch = anMath::THREEFOURTHS_PI;
 		}
 	} else {
-		yaw = arcMath::ATan( y, x );
+		yaw = anMath::ATan( y, x );
 		if ( yaw < 0.0f )
 		{
-			yaw += arcMath::TWO_PI;
+			yaw += anMath::TWO_PI;
 		}
 
-		forward = ( float )arcMath::Sqrt( x * x + y * y );
-		pitch = arcMath::ATan( z, forward );
+		forward = ( float )anMath::Sqrt( x * x + y * y );
+		pitch = anMath::ATan( z, forward );
 		if ( pitch < 0.0f ) {
-			pitch += arcMath::TWO_PI;
+			pitch += anMath::TWO_PI;
 		}
 	}
 
@@ -164,10 +164,10 @@ TeKRadians arcVec3::ToRadians( void ) const {
 
 /*
 =============
-arcVec3::ToAngles
+anVec3::ToAngles
 =============
 */
-arcAngles arcVec3::ToAngles( void ) const {
+anAngles anVec3::ToAngles( void ) const {
 	float forward;
 	float yaw;
 	float pitch;
@@ -185,22 +185,22 @@ arcAngles arcVec3::ToAngles( void ) const {
 			yaw += 360.0f;
 		}
 
-		forward = ( float )arcMath::Sqrt( x * x + y * y );
+		forward = ( float )anMath::Sqrt( x * x + y * y );
 		pitch = RAD2DEG( atan2( z, forward ) );
 		if ( pitch < 0.0f ) {
 			pitch += 360.0f;
 		}
 	}
 
-	return arcAngles( -pitch, yaw, 0.0f );
+	return anAngles( -pitch, yaw, 0.0f );
 }
 
 /*
 =============
-arcVec3::ToPolar
+anVec3::ToPolar
 =============
 */
-idPolar3 arcVec3::ToPolar( void ) const {
+anPolar3 anVec3::ToPolar( void ) const {
 	float forward;
 	float yaw;
 	float pitch;
@@ -218,22 +218,22 @@ idPolar3 arcVec3::ToPolar( void ) const {
 			yaw += 360.0f;
 		}
 
-		forward = ( float )arcMath::Sqrt( x * x + y * y );
+		forward = ( float )anMath::Sqrt( x * x + y * y );
 		pitch = RAD2DEG( atan2( z, forward ) );
 		if ( pitch < 0.0f ) {
 			pitch += 360.0f;
 		}
 	}
-	return idPolar3( arcMath::Sqrt( x * x + y * y + z * z ), yaw, -pitch );
+	return anPolar3( anMath::Sqrt( x * x + y * y + z * z ), yaw, -pitch );
 }
 
 /*
 =============
-arcVec3::ToMat3
+anVec3::ToMat3
 =============
 */
-arcMat3 arcVec3::ToMat3( void ) const {
-	arcMat3	mat;
+anMat3 anVec3::ToMat3( void ) const {
+	anMat3	mat;
 	float	d;
 
 	mat[0] = *this;
@@ -243,7 +243,7 @@ arcMat3 arcVec3::ToMat3( void ) const {
 		mat[1][1] = 0.0f;
 		mat[1][2] = 0.0f;
 	} else {
-		d = arcMath::InvSqrt( d );
+		d = anMath::InvSqrt( d );
 		mat[1][0] = -y * d;
 		mat[1][1] = x * d;
 		mat[1][2] = 0.0f;
@@ -255,11 +255,11 @@ arcMat3 arcVec3::ToMat3( void ) const {
 
 /*
 =============
-arcVec3::ToString
+anVec3::ToString
 =============
 */
-const char *arcVec3::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anVec3::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
@@ -269,7 +269,7 @@ Lerp
 Linearly inperpolates one vector to another.
 =============
 */
-void arcVec3::Lerp( const arcVec3 &v1, const arcVec3 &v2, const float l ) {
+void anVec3::Lerp( const anVec3 &v1, const anVec3 &v2, const float l ) {
 	if ( l <= 0.0f ) {
 		(*this) = v1;
 	} else if ( l >= 1.0f ) {
@@ -288,7 +288,7 @@ Vectors are expected to be normalized.
 =============
 */
 #define LERP_DELTA 1e-6
-void arcVec3::SLerp( const arcVec3 &v1, const arcVec3 &v2, const float t ) {
+void anVec3::SLerp( const anVec3 &v1, const anVec3 &v2, const float t ) {
 	float omega, cosom, sinom, scale0, scale1;
 
 	if ( t <= 0.0f ) {
@@ -320,7 +320,7 @@ LerpAngle
 from older libraries.
 =============
 */
-float arcVec3::LerpAngle( const float from, const float to, const float frac ) {
+float anVec3::LerpAngle( const float from, const float to, const float frac ) {
 	float a;
 
 	if ( to - from > 180 ) {
@@ -341,7 +341,7 @@ ProjectSelfOntoSphere
 Projects the z component onto a sphere.
 =============
 */
-void arcVec3::ProjectSelfOntoSphere( const float radius ) {
+void anVec3::ProjectSelfOntoSphere( const float radius ) {
 	float rsqr = radius * radius;
 	float len = Length();
 	if ( len  < rsqr * 0.5f ) {
@@ -357,37 +357,37 @@ Inverse
 inverts the given vector
 =============
 */
-void arcVec3::Inverse( const arcVec3 v ) {
+void anVec3::Inverse( const anVec3 v ) {
 	v[0] = -v[0];
 	v[1] = -v[1];
 	v[2] = -v[2];
 }
 
-void arcVec3::MA( const arcVec3 a, float scale, const arcVec3 b, arcVec3 c ) {
+void anVec3::MA( const anVec3 a, float scale, const anVec3 b, anVec3 c ) {
 	c[0] = a[0] + scale * b[0];
 	c[1] = a[1] + scale * b[1];
 	c[2] = a[2] + scale * b[2];
 }
 
-void arcVec3::Subtract( const arcVec3 a, const arcVec3 b, arcVec3 out ) {
+void anVec3::Subtract( const anVec3 a, const anVec3 b, anVec3 out ) {
 	out[0] = a[0] - b[0];
 	out[1] = a[1] - b[1];
 	out[2] = a[2] - b[2];
 }
 
-void arcVec3::Add( const arcVec3 a, const arcVec3 b, arcVec3 out ) {
+void anVec3::Add( const anVec3 a, const anVec3 b, anVec3 out ) {
 	out[0] = a[0] + b[0];
 	out[1] = a[1] + b[1];
 	out[2] = a[2] + b[2];
 }
 
-void arcVec3::Copy( const arcVec3 in, arcVec3 out ) {
+void anVec3::Copy( const anVec3 in, anVec3 out ) {
 	out[0] = in[0];
 	out[1] = in[1];
 	out[2] = in[2];
 }
 
-void arcVec3::Scale( const arcVec3 in, const arcVec3 scale, arcVec3 out ) {
+void anVec3::Scale( const anVec3 in, const anVec3 scale, anVec3 out ) {
 	out[0] = in[0] * scale;
 	out[1] = in[1] * scale;
 	out[2] = in[2] * scale;
@@ -395,17 +395,17 @@ void arcVec3::Scale( const arcVec3 in, const arcVec3 scale, arcVec3 out ) {
 
 //===============================================================
 //
-//	arcVec4
+//	anVec4
 //
 //===============================================================
 
 /*
 =============
-arcVec4::ToString
+anVec4::ToString
 =============
 */
-const char *arcVec4::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anVec4::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
@@ -415,7 +415,7 @@ Lerp
 Linearly inperpolates one vector to another.
 =============
 */
-void arcVec4::Lerp( const arcVec4 &v1, const arcVec4 &v2, const float l ) {
+void anVec4::Lerp( const anVec4 &v1, const anVec4 &v2, const float l ) {
 	if ( l <= 0.0f ) {
 		(*this) = v1;
 	} else if ( l >= 1.0f ) {
@@ -425,7 +425,7 @@ void arcVec4::Lerp( const arcVec4 &v1, const arcVec4 &v2, const float l ) {
 	}
 }
 
-void arcVec4::Scale( const arcVec4 in, const arcVec4 scale, arcVec4 out ) {
+void anVec4::Scale( const anVec4 in, const anVec4 scale, anVec4 out ) {
 	out[0] = in[0] * scale;
 	out[1] = in[1] * scale;
 	out[2] = in[2] * scale;
@@ -433,25 +433,25 @@ void arcVec4::Scale( const arcVec4 in, const arcVec4 scale, arcVec4 out ) {
 }
 //===============================================================
 //
-//	arcVec5
+//	anVec5
 //
 //===============================================================
 
 /*
 =============
-arcVec5::ToString
+anVec5::ToString
 =============
 */
-const char *arcVec5::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anVec5::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
 =============
-arcVec5::Lerp
+anVec5::Lerp
 =============
 */
-void arcVec5::Lerp( const arcVec5 &v1, const arcVec5 &v2, const float l ) {
+void anVec5::Lerp( const anVec5 &v1, const anVec5 &v2, const float l ) {
 	if ( l <= 0.0f ) {
 		(*this) = v1;
 	} else if ( l >= 1.0f ) {
@@ -468,20 +468,39 @@ void arcVec5::Lerp( const arcVec5 &v1, const arcVec5 &v2, const float l ) {
 
 //===============================================================
 //
-//	arcVec6
+//	anVec6
 //
 //===============================================================
 
 /*
 =============
-arcVec6::ToString
+anVec6::ToString
 =============
 */
-const char *arcVec6::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anVec6::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
-void Vector10Copy( vec3_origin *in, vec3_origin *out ) {
+//===============================================================
+//
+//	anVecX
+//
+//===============================================================
+
+float	anVecX::temp[VECX_MAX_TEMP+4];
+float *	anVecX::tempPtr = (float *) ( ( ( int ) anVecX::temp + 15 ) & ~15 );
+int		anVecX::tempIndex = 0;
+
+/*
+=============
+anVecX::ToString
+=============
+*/
+const char *anVecX::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+}
+
+void anVecX::Copy( vec3_origin *in, vec3_origin *out ) {
 	out[0] = in[0];
 	out[1] = in[1];
 	out[2] = in[2];
@@ -492,22 +511,4 @@ void Vector10Copy( vec3_origin *in, vec3_origin *out ) {
 	out[7] = in[7];
 	out[8] = in[8];
 	out[9] = in[9];
-}
-//===============================================================
-//
-//	arcVecX
-//
-//===============================================================
-
-float	arcVecX::temp[VECX_MAX_TEMP+4];
-float *	arcVecX::tempPtr = (float *) ( ( ( int ) arcVecX::temp + 15 ) & ~15 );
-int		arcVecX::tempIndex = 0;
-
-/*
-=============
-arcVecX::ToString
-=============
-*/
-const char *arcVecX::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }

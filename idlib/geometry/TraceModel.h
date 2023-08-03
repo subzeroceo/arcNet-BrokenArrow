@@ -10,26 +10,26 @@
 ===============================================================================
 */
 
-class arcSurface_Traceable : public arcSurface {
+class anSurface_Traceable : public anSurface {
 public:
-								arcSurface_Traceable( void );
-								arcSurface_Traceable( const arcSurface &surf ) :
-									arcSurface( surf ),
-									hash( NULL ),
+								anSurface_Traceable( void );
+								anSurface_Traceable( const anSurface &surf ) :
+									anSurface( surf ),
+									hash( nullptr ),
 									traceCount( 0 ),
-									triPlanes( NULL ),
-									lastTriTrace( NULL ) {
+									triPlanes( nullptr ),
+									lastTriTrace( nullptr ) {
 									bounds.Clear();
 								}
-								~arcSurface_Traceable( void );
+								~anSurface_Traceable( void );
 
-	const arcBounds&				GetBounds( void );
+	const anBounds&				GetBounds( void );
 	void						SetTraceFraction( const float traceFraction );
 
 	void						OptimizeForTracing( const float traceFraction = 1.f );
 
 								// intersection point is start + dir * scale
-	bool						RayIntersection( /*arcList< int >& tracedTris,*/ const arcVec3 &start, const arcVec3 &dir, float &scale, arcDrawVert& dv, bool backFaceCull = false ) const;
+	bool						RayIntersection( /*arcList< int >& tracedTris,*/ const anVec3 &start, const anVec3 &dir, float &scale, anDrawVertex& dv, bool backFaceCull = false ) const;
 
 protected:
 	class TraceableTriHash {
@@ -44,69 +44,69 @@ protected:
 			hashTriangle_t*	triangleList;
 		};
 
-							TraceableTriHash( arcSurface_Traceable &surface, const int binsPerAxis = 50, const int snapFractions = 32 );
+							TraceableTriHash( anSurface_Traceable &surface, const int binsPerAxis = 50, const int snapFractions = 32 );
 							~TraceableTriHash( void );
 
-		const arcBounds&		GetBounds( void ) const { return bounds; }
-		hashBin_t*			GetHashBin( const arcVec3& point );
+		const anBounds&		GetBounds( void ) const { return bounds; }
+		hashBin_t*			GetHashBin( const anVec3& point );
 
 	private:
 		int					binsPerAxis;
 		int					snapFractions;
-		arcBounds			bounds;
+		anBounds			bounds;
 
 		hashBin_t *			bins;
-		arcVec3				scale;
+		anVec3				scale;
 		int					intMins[ 3 ];
 		int					intScale[ 3 ];
 
-		arcBlockAlloc< hashTriangle_t, 128 >	triangleAllocator;
+		anBlockAlloc< hashTriangle_t, 128 >	triangleAllocator;
 
 	private:
 		int					BinIndex( const int x, const int y, const int z ) const { return ( ( binsPerAxis * binsPerAxis * z ) + ( binsPerAxis * y ) + x ); }
 	};
 
-	arcBounds					bounds;
+	anBounds					bounds;
 	arcTraceableTriHash*	hash;
 
 	float						traceDist;
 
 	mutable size_t				traceCount;
 
-	arcPlane*					triPlanes;
+	anPlane*					triPlanes;
 	size_t*						lastTriTrace;
 
 protected:
 	void						GenerateHash( void );
-	void						GenerateIntersectionDrawVert( const arcVec3& intersection, const int intersectedTriIndex, arcDrawVert& dv ) const;
+	void						GenerateIntersectionDrawVert( const anVec3& intersection, const int intersectedTriIndex, anDrawVertex& dv ) const;
 };
 
 /*
 ====================
-arcSurface_Traceable::TraceableTriHash::~TraceableTriHash
+anSurface_Traceable::TraceableTriHash::~TraceableTriHash
 ====================
 */
-ARC_INLINE arcSurface_Traceable::TraceableTriHash::~TraceableTriHash( void ) {
+ARC_INLINE anSurface_Traceable::TraceableTriHash::~TraceableTriHash( void ) {
 	delete [] bins;
 	triangleAllocator.Shutdown();
 }
 
 /*
 ====================
-arcSurface_Traceable::TraceableTriHash::GetHashBin
+anSurface_Traceable::TraceableTriHash::GetHashBin
 ====================
 */
-ARC_INLINE arcSurface_Traceable::TraceableTriHash::hashBin_t* arcSurface_Traceable::TraceableTriHash::GetHashBin( const arcVec3& point ) {
+ARC_INLINE anSurface_Traceable::TraceableTriHash::hashBin_t* anSurface_Traceable::TraceableTriHash::GetHashBin( const anVec3& point ) {
 	int block[ 3 ];
 
 	// snap the point to integral values
 	for ( int i = 0; i < 3; i++ ) {
-		block[ i ] = arcMath::Ftoi( arcMath::Floor( ( point[ i ] + .5f / snapFractions ) * snapFractions ) );
-		block[ i ] = ( block[ i ] - intMins[ i ] ) / intScale[ i ];
-		if ( block[ i ] < 0 ) {
-			block[ i ] = 0;
-		} else if ( block[ i ] >= binsPerAxis ) {
-			block[ i ] = binsPerAxis - 1;
+		block[i] = anMath::Ftoi( anMath::Floor( ( point[i] + .5f / snapFractions ) * snapFractions ) );
+		block[i] = ( block[i] - intMins[i] ) / intScale[i];
+		if ( block[i] < 0 ) {
+			block[i] = 0;
+		} else if ( block[i] >= binsPerAxis ) {
+			block[i] = binsPerAxis - 1;
 		}
 	}
 
@@ -115,23 +115,23 @@ ARC_INLINE arcSurface_Traceable::TraceableTriHash::hashBin_t* arcSurface_Traceab
 
 /*
 ====================
-arcSurface_Traceable::arcSurface_Traceable
+anSurface_Traceable::anSurface_Traceable
 ====================
 */
-ARC_INLINE arcSurface_Traceable::arcSurface_Traceable( void ) :
-	hash( NULL ),
+ARC_INLINE anSurface_Traceable::anSurface_Traceable( void ) :
+	hash( nullptr ),
 	traceCount( 0 ),
-	triPlanes( NULL ),
-	lastTriTrace( NULL ) {
+	triPlanes( nullptr ),
+	lastTriTrace( nullptr ) {
 	bounds.Clear();
 }
 
 /*
 ====================
-arcSurface_Traceable::~arcSurface_Traceable
+anSurface_Traceable::~anSurface_Traceable
 ====================
 */
-ARC_INLINE arcSurface_Traceable::~arcSurface_Traceable( void ) {
+ARC_INLINE anSurface_Traceable::~anSurface_Traceable( void ) {
 	delete hash;
 	delete [] triPlanes;
 	delete [] lastTriTrace;
@@ -139,10 +139,10 @@ ARC_INLINE arcSurface_Traceable::~arcSurface_Traceable( void ) {
 
 /*
 ====================
-arcSurface_Traceable::GetBounds
+anSurface_Traceable::GetBounds
 ====================
 */
-ARC_INLINE const arcBounds& arcSurface_Traceable::GetBounds( void ) {
+ARC_INLINE const anBounds& anSurface_Traceable::GetBounds( void ) {
 	if ( bounds.IsCleared() ) {
 		//SIMDProcessor->MinMax( bounds[0], bounds[1], verts.Begin(), indexes.Begin(), indexes.Num() );
 	}
@@ -152,10 +152,10 @@ ARC_INLINE const arcBounds& arcSurface_Traceable::GetBounds( void ) {
 
 /*
 ====================
-arcSurface_Traceable::SetTraceFraction
+anSurface_Traceable::SetTraceFraction
 ====================
 */
-ARC_INLINE void arcSurface_Traceable::SetTraceFraction( const float traceFraction ) {
+ARC_INLINE void anSurface_Traceable::SetTraceFraction( const float traceFraction ) {
 	traceDist = 0.f;
 
 	// the traceDist will be the traceFrac times the largest bounds axis
@@ -170,17 +170,17 @@ ARC_INLINE void arcSurface_Traceable::SetTraceFraction( const float traceFractio
 
 /*
 ====================
-arcSurface_Traceable::OptimizeForTracing
+anSurface_Traceable::OptimizeForTracing
 ====================
 */
-ARC_INLINE void arcSurface_Traceable::OptimizeForTracing( const float traceFraction ) {
+ARC_INLINE void anSurface_Traceable::OptimizeForTracing( const float traceFraction ) {
 	delete hash;
 	delete [] triPlanes;
 	delete [] lastTriTrace;
 
 	hash = new TraceableTriHash( *this );
 
-	triPlanes = new arcPlane[ indexes.Num() / 3 ];
+	triPlanes = new anPlane[ indexes.Num() / 3 ];
 	SIMDProcessor->DeriveTriPlanes( triPlanes, verts.Begin(), verts.Num(), indexes.Begin(), indexes.Num() );
 
 	lastTriTrace = new size_t[ indexes.Num() / 3 ];
@@ -201,9 +201,9 @@ ARC_INLINE void arcSurface_Traceable::OptimizeForTracing( const float traceFract
 ===============================================================================
 */
 
-class arcVec3;
-class arcMat3;
-class arcBounds;
+class anVec3;
+class anMat3;
+class anBounds;
 
 // trace model type
 typedef enum {
@@ -225,22 +225,22 @@ typedef enum {
 #define MAX_TRACEMODEL_POLYS		16
 #define MAX_TRACEMODEL_POLYEDGES	16
 
-typedef arcVec3 traceModelVert_t;
+typedef anVec3 traceModelVert_t;
 
 typedef struct {
 	int					v[2];
-	arcVec3				normal;
+	anVec3				normal;
 } traceModelEdge_t;
 
 typedef struct {
-	arcVec3				normal;
+	anVec3				normal;
 	float				dist;
-	arcBounds			bounds;
+	anBounds			bounds;
 	int					numEdges;
 	int					edges[MAX_TRACEMODEL_POLYEDGES];
 } traceModelPoly_t;
 
-class arcTraceModel {
+class anTraceModel {
 
 public:
 	traceModel_t		type;
@@ -250,58 +250,58 @@ public:
 	traceModelEdge_t	edges[MAX_TRACEMODEL_EDGES+1];
 	int					numPolys;
 	traceModelPoly_t	polys[MAX_TRACEMODEL_POLYS];
-	arcVec3				offset;			// offset to center of model
-	arcBounds			bounds;			// bounds of model
+	anVec3				offset;			// offset to center of model
+	anBounds			bounds;			// bounds of model
 	bool				isConvex;		// true when model is convex
 
 public:
-						arcTraceModel( void );
+						anTraceModel( void );
 						// axial bounding box
-						arcTraceModel( const arcBounds &boxBounds );
+						anTraceModel( const anBounds &boxBounds );
 						// cylinder approximation
-						arcTraceModel( const arcBounds &cylBounds, const int numSides );
+						anTraceModel( const anBounds &cylBounds, const int numSides );
 						// bone
-						arcTraceModel( const float length, const float width );
+						anTraceModel( const float length, const float width );
 
 						// axial box
-	void				SetupBox( const arcBounds &boxBounds );
+	void				SetupBox( const anBounds &boxBounds );
 	void				SetupBox( const float size );
 						// octahedron
-	void				SetupOctahedron( const arcBounds &octBounds );
+	void				SetupOctahedron( const anBounds &octBounds );
 	void				SetupOctahedron( const float size );
 						// dodecahedron
-	void				SetupDodecahedron( const arcBounds &dodBounds );
+	void				SetupDodecahedron( const anBounds &dodBounds );
 	void				SetupDodecahedron( const float size );
 						// cylinder approximation
-	void				SetupCylinder( const arcBounds &cylBounds, const int numSides );
+	void				SetupCylinder( const anBounds &cylBounds, const int numSides );
 	void				SetupCylinder( const float height, const float width, const int numSides );
 						// cone approximation
-	void				SetupCone( const arcBounds &coneBounds, const int numSides );
+	void				SetupCone( const anBounds &coneBounds, const int numSides );
 	void				SetupCone( const float height, const float width, const int numSides );
 						// two tetrahedrons attached to each other
 	void				SetupBone( const float length, const float width );
 						// arbitrary convex polygon
-	void				SetupPolygon( const arcVec3 *v, const int count );
-	void				SetupPolygon( const arcWinding &w );
+	void				SetupPolygon( const anVec3 *v, const int count );
+	void				SetupPolygon( const anWinding &w );
 						// generate edge normals
 	int					GenerateEdgeNormals( void );
 						// translate the trm
-	void				Translate( const arcVec3 &translation );
+	void				Translate( const anVec3 &translation );
 						// rotate the trm
-	void				Rotate( const arcMat3 &rotation );
+	void				Rotate( const anMat3 &rotation );
 						// shrink the model m units on all sides
 	void				Shrink( const float m );
 						// compare
-	bool				Compare( const arcTraceModel &trm ) const;
-	bool				operator==(	const arcTraceModel &trm ) const;
-	bool				operator!=(	const arcTraceModel &trm ) const;
+	bool				Compare( const anTraceModel &trm ) const;
+	bool				operator==(	const anTraceModel &trm ) const;
+	bool				operator!=(	const anTraceModel &trm ) const;
 						// get the area of one of the polygons
 	float				GetPolygonArea( int polyNum ) const;
 						// get the silhouette edges
-	int					GetProjectionSilhouetteEdges( const arcVec3 &projectionOrigin, int silEdges[MAX_TRACEMODEL_EDGES] ) const;
-	int					GetParallelProjectionSilhouetteEdges( const arcVec3 &projectionDir, int silEdges[MAX_TRACEMODEL_EDGES] ) const;
+	int					GetProjectionSilhouetteEdges( const anVec3 &projectionOrigin, int silEdges[MAX_TRACEMODEL_EDGES] ) const;
+	int					GetParallelProjectionSilhouetteEdges( const anVec3 &projectionDir, int silEdges[MAX_TRACEMODEL_EDGES] ) const;
 						// calculate mass properties assuming an uniform density
-	void				GetMassProperties( const float density, float &mass, arcVec3 &centerOfMass, arcMat3 &inertiaTensor ) const;
+	void				GetMassProperties( const float density, float &mass, anVec3 &centerOfMass, anMat3 &inertiaTensor ) const;
 
 private:
 	void				InitBox( void );
@@ -312,38 +312,37 @@ private:
 	void				ProjectionIntegrals( int polyNum, int a, int b, struct projectionIntegrals_s &integrals ) const;
 	void				PolygonIntegrals( int polyNum, int a, int b, int c, struct polygonIntegrals_s &integrals ) const;
 	void				VolumeIntegrals( struct volumeIntegrals_s &integrals ) const;
-	void				VolumeFromPolygon( arcTraceModel &trm, float thickness ) const;
+	void				VolumeFromPolygon( anTraceModel &trm, float thickness ) const;
 	int					GetOrderedSilhouetteEdges( const int edgeIsSilEdge[MAX_TRACEMODEL_EDGES+1], int silEdges[MAX_TRACEMODEL_EDGES] ) const;
 };
 
 
-ARC_INLINE arcTraceModel::arcTraceModel( void ) {
+ARC_INLINE anTraceModel::anTraceModel( void ) {
 	type = TRM_INVALID;
 	numVerts = numEdges = numPolys = 0;
 	bounds.Zero();
 }
 
-ARC_INLINE arcTraceModel::arcTraceModel( const arcBounds &boxBounds ) {
+ARC_INLINE anTraceModel::anTraceModel( const anBounds &boxBounds ) {
 	InitBox();
 	SetupBox( boxBounds );
 }
 
-ARC_INLINE arcTraceModel::arcTraceModel( const arcBounds &cylBounds, const int numSides ) {
+ARC_INLINE anTraceModel::anTraceModel( const anBounds &cylBounds, const int numSides ) {
 	SetupCylinder( cylBounds, numSides );
 }
 
-ARC_INLINE arcTraceModel::arcTraceModel( const float length, const float width ) {
+ARC_INLINE anTraceModel::anTraceModel( const float length, const float width ) {
 	InitBone();
 	SetupBone( length, width );
 }
 
-ARC_INLINE bool arcTraceModel::operator==( const arcTraceModel &trm ) const {
+ARC_INLINE bool anTraceModel::operator==( const anTraceModel &trm ) const {
 	return Compare( trm );
 }
 
-ARC_INLINE bool arcTraceModel::operator!=( const arcTraceModel &trm ) const {
+ARC_INLINE bool anTraceModel::operator!=( const anTraceModel &trm ) const {
 	return !Compare( trm );
 }
 
-#endif /* !__TRACEMODEL_H__ */
-
+#endif // !__TRACEMODEL_H__

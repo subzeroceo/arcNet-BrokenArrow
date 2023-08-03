@@ -20,7 +20,7 @@ enum VehicleAI_Flags {
 	VAIF_Freeze		= 4,
 };
 
-class rvVehicleAI : public idAI {
+class rvVehicleAI : public anSAAI {
 	friend class rvVehicleMonster;
 
 public:
@@ -31,8 +31,8 @@ public:
 
 	void					Spawn					( void );
 	void					Think					( void );
-	void					Save					( idSaveGame *savefile ) const;
-	void					Restore					( idRestoreGame *savefile );
+	void					Save					( anSaveGame *savefile ) const;
+	void					Restore					( anRestoreGame *savefile );
 
 	void					SetVehicle				( rvVehicleMonster * vehicle );
 
@@ -53,13 +53,13 @@ private:
 	virtual void			OnWakeUp				( void );
 	virtual void			CustomMove				( void );
 
-	const idEntity *		MoveCloserTo			( const arcVec3 & point, idEntity * current );
-	const idEntity *		MoveAwayFrom			( const arcVec3 & point, idEntity * current );
-	const idEntity *		FindClosestNode			( void ) const;
+	const anEntity *		MoveCloserTo			( const anVec3 & point, anEntity * current );
+	const anEntity *		MoveAwayFrom			( const anVec3 & point, anEntity * current );
+	const anEntity *		FindClosestNode			( void ) const;
 
-	void					Event_ChoosePathTarget	( idEntity * current );
+	void					Event_ChoosePathTarget	( anEntity * current );
 
-	idEntityPtr<rvVehicleDriver>	driver;
+	anEntityPtr<rvVehicleDriver>	driver;
 	int								flags;
 };
 

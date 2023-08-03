@@ -1,12 +1,12 @@
 #ifndef __PHYSICS_EVENT_H__
 #define __PHYSICS_EVENT_H__
 
-class arcPhysicsEvent {
+class anPhysicsEvent {
 public:
-	typedef arcLinkList< arcPhysicsEvent > nodeType_t;
+	typedef arcLinkList< anPhysicsEvent > nodeType_t;
 
-								arcPhysicsEvent( nodeType_t& list );
-	virtual						~arcPhysicsEvent( void ) { ; }
+								anPhysicsEvent( nodeType_t& list );
+	virtual						~anPhysicsEvent( void ) { ; }
 
 	int							GetCreationTime( void ) const { return _creationTime; }
 
@@ -19,14 +19,14 @@ private:
 	nodeType_t					_node;
 };
 
-class arcPhysicsEvent_RadiusPush : public arcPhysicsEvent {
+class anPhysicsEvent_RadiusPush : public anPhysicsEvent {
 public:
-								arcPhysicsEvent_RadiusPush( nodeType_t &list, const arcVec3 &origin, float radius, const arcDeclDamage *damageDecl, float push, const arcEntity *inflictor, const arcEntity *ignore, int flags );
+								anPhysicsEvent_RadiusPush( nodeType_t &list, const anVec3 &origin, float radius, const arcDeclDamage *damageDecl, float push, const arcEntity *inflictor, const arcEntity *ignore, int flags );
 
 	void						Apply( void ) const;
 
 private:
-	arcVec3						_origin;
+	anVec3						_origin;
 	float						_radius;
 	float						_push;
 	arcEntityPtr< arcEntity >		_inflictor;

@@ -31,7 +31,7 @@ public:
 	virtual void	MV_OnMaterialNameChanged(MaterialDoc* pMaterial, const char* oldName);
 
 	//SourceModifyOwner Interface
-	virtual arcNetString GetSourceText();
+	virtual anString GetSourceText();
 
 protected:
 	MaterialEditView();
@@ -56,5 +56,5 @@ protected:
 	bool sourceInit;
 
 	bool	sourceChanged;
-	arcNetString	currentMaterialName;
+	anString	currentMaterialName;
 };

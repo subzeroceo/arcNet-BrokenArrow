@@ -1,56 +1,56 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-ABSTRACT_DECLARATION( idClass, idPhysics )
+ABSTRACT_DECLARATION( anClass, anPhysics )
 END_CLASS
 
 
 /*
 ================
-idPhysics::~idPhysics
+anPhysics::~anPhysics
 ================
 */
-idPhysics::~idPhysics( void ) {
+anPhysics::~anPhysics( void ) {
 }
 
 /*
 ================
-idPhysics::Save
+anPhysics::Save
 ================
 */
-void idPhysics::Save( idSaveGame *savefile ) const {
+void anPhysics::Save( anSaveGame *savefile ) const {
 }
 
 /*
 ================
-idPhysics::Restore
+anPhysics::Restore
 ================
 */
-void idPhysics::Restore( idRestoreGame *savefile ) {
+void anPhysics::Restore( anRestoreGame *savefile ) {
 }
 
 /*
 ================
-idPhysics::SetClipBox
+anPhysics::SetClipBox
 ================
 */
-void idPhysics::SetClipBox( const arcBounds &bounds, float density ) {
-	SetClipModel( new idClipModel( idTraceModel( bounds ) ), density );
+void anPhysics::SetClipBox( const anBounds &bounds, float density ) {
+	SetClipModel( new anClipModel( anTraceModel( bounds ) ), density );
 }
 
 /*
 ================
-idPhysics::SnapTimeToPhysicsFrame
+anPhysics::SnapTimeToPhysicsFrame
 ================
 */
-int idPhysics::SnapTimeToPhysicsFrame( int t ) {
+int anPhysics::SnapTimeToPhysicsFrame( int t ) {
 	int s;
-// RAVEN BEGIN
+
 // bdube: use GetMSec access rather than USERCMD_TIME
 	s = t + gameLocal.GetMSec() - 1;
 	return ( s - s % gameLocal.GetMSec() );
-// RAVEN END
+
 }

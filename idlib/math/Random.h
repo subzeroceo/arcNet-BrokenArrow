@@ -109,7 +109,7 @@ ARC_INLINE int aRcSecondaryRandom::RandomInt( int max ) {
 	if ( max == 0 ) {
 		return 0;		// avoid divide by zero error
 	}
-	return ( RandomInt() >> ( 16 - arcMath::BitsForInteger( max ) ) ) % max;
+	return ( RandomInt() >> ( 16 - anMath::BitsForInteger( max ) ) ) % max;
 }
 
 ARC_INLINE float aRcSecondaryRandom::RandomFloat( void ) {

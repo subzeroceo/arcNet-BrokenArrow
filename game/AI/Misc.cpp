@@ -4,18 +4,18 @@ Various utility objects and functions.
 
 */
 
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Game_local.h"
 
-// RAVEN BEGIN
+
 // nmckenzie: added ai
 #if !defined(__GAME_PROJECTILE_H__)
 	#include "Projectile.h"
 #endif
 #include "ai/AI.h"
-// RAVEN END
+
 
 /*
 ===============================================================================
@@ -29,7 +29,7 @@ that can be bound to other entities.  Should not be subclassed.
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idSpawnableEntity )
+CLASS_DECLARATION( anEntity, idSpawnableEntity )
 END_CLASS
 
 /*
@@ -45,91 +45,91 @@ void idSpawnableEntity::Spawn() {
 /*
 ===============================================================================
 
-	idPlayerStart
+	anBasePlayerStart
 
 ===============================================================================
 */
 
-const idEventDef EV_TeleportStage( "<TeleportStage>", "e" );
+const anEventDef EV_TeleportStage( "<TeleportStage>", "e" );
 
-CLASS_DECLARATION( idEntity, idPlayerStart )
-	EVENT( EV_Activate,			idPlayerStart::Event_Teleport )
-	EVENT( EV_TeleportStage,	idPlayerStart::Event_TeleportStage )
+CLASS_DECLARATION( anEntity, anBasePlayerStart )
+	EVENT( EV_Activate,			anBasePlayerStart::Event_Teleport )
+	EVENT( EV_TeleportStage,	anBasePlayerStart::Event_TeleportStage )
 END_CLASS
 
 /*
 ===============
-idPlayerStart::idPlayerStart
+anBasePlayerStart::anBasePlayerStart
 ================
 */
-idPlayerStart::idPlayerStart( void ) {
+anBasePlayerStart::anBasePlayerStart( void ) {
 	teleportStage = 0;
 }
 
 /*
 ===============
-idPlayerStart::Spawn
+anBasePlayerStart::Spawn
 ================
 */
-void idPlayerStart::Spawn( void ) {
+void anBasePlayerStart::Spawn( void ) {
 	teleportStage = 0;
 }
 
 /*
 ================
-idPlayerStart::Save
+anBasePlayerStart::Save
 ================
 */
-void idPlayerStart::Save( idSaveGame *savefile ) const {
+void anBasePlayerStart::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( teleportStage );
 }
 
 /*
 ================
-idPlayerStart::Restore
+anBasePlayerStart::Restore
 ================
 */
-void idPlayerStart::Restore( idRestoreGame *savefile ) {
+void anBasePlayerStart::Restore( anRestoreGame *savefile ) {
 	savefile->ReadInt( teleportStage );
 }
 
 /*
 ================
-idPlayerStart::ClientReceiveEvent
+anBasePlayerStart::ClientReceiveEvent
 ================
 */
-bool idPlayerStart::ClientReceiveEvent( int event, int time, const idBitMsg &msg ) {
+bool anBasePlayerStart::ClientReceiveEvent( int event, int time, const anBitMsg &msg ) {
 	int entityNumber;
 
-	switch( event ) {
+	switch ( event ) {
 		case EVENT_TELEPORTPLAYER: {
 			entityNumber = msg.ReadBits( GENTITYNUM_BITS );
-			idPlayer *player = static_cast<idPlayer *>( gameLocal.entities[entityNumber] );
+			anBasePlayer *player = static_cast<anBasePlayer *>( gameLocal.entities[entityNumber] );
 			float x = msg.ReadFloat();
 			float y = msg.ReadFloat();
 			float z = msg.ReadFloat();
 
-			arcVec3 prevOrigin( x, y, z );
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-			if ( player != NULL && player->IsType( idPlayer::GetClassType() ) ) {
-// RAVEN END
+			anVec3 prevOrigin( x, y, z );
+
+
+			if ( player != nullptr && player->IsType( anBasePlayer::GetClassType() ) ) {
+
 				Event_TeleportEntity( player, false, prevOrigin );
 			}
 			return true;
 		}
 		case EVENT_TELEPORTITEM: {
 			entityNumber = msg.ReadBits( GENTITYNUM_BITS );
-			idEntity* activator = gameLocal.entities[ entityNumber ];
+			anEntity* activator = gameLocal.entities[ entityNumber ];
 
-			if ( activator != NULL ) {
+			if ( activator != nullptr ) {
 				Event_TeleportEntity( activator, false );
 			}
 			return true;
 		}
 
 		default: {
-			return idEntity::ClientReceiveEvent( event, time, msg );
+			return anEntity::ClientReceiveEvent( event, time, msg );
 		}
 	}
 //unreachable
@@ -138,18 +138,18 @@ bool idPlayerStart::ClientReceiveEvent( int event, int time, const idBitMsg &msg
 
 /*
 ===============
-idPlayerStart::Event_TeleportStage
+anBasePlayerStart::Event_TeleportStage
 
 FIXME: add functionality to fx system ( could be done with player scripting too )
 ================
 */
-void idPlayerStart::Event_TeleportStage( idPlayer *player ) {
+void anBasePlayerStart::Event_TeleportStage( anBasePlayer *player ) {
 	float teleportDelay = spawnArgs.GetFloat( "teleportDelay" );
 	switch ( teleportStage ) {
 		case 0:
 			player->playerView.Flash( colorWhite, 125 );
 			player->SetInfluenceLevel( INFLUENCE_LEVEL3 );
-			player->SetInfluenceView( spawnArgs.GetString( "mtr_teleportFx" ), NULL, 0.0f, NULL );
+			player->SetInfluenceView( spawnArgs.GetString( "mtr_teleportFx" ), nullptr, 0.0f, nullptr );
 			soundSystem->FadeSoundClasses( SOUNDWORLD_GAME, 0, -20.0f, teleportDelay );
 			teleportStage++;
 			PostEventSec( &EV_TeleportStage, teleportDelay, player );
@@ -160,7 +160,7 @@ void idPlayerStart::Event_TeleportStage( idPlayer *player ) {
 			PostEventSec( &EV_TeleportStage, 0.25f, player );
 			break;
 		case 2:
-			player->SetInfluenceView( NULL, NULL, 0.0f, NULL );
+			player->SetInfluenceView( nullptr, nullptr, 0.0f, nullptr );
 			TeleportPlayer( player );
 			player->StopSound( SND_CHANNEL_BODY2, false );
 			player->SetInfluenceLevel( INFLUENCE_NONE );
@@ -173,14 +173,14 @@ void idPlayerStart::Event_TeleportStage( idPlayer *player ) {
 
 /*
 ===============
-idPlayerStart::TeleportPlayer
+anBasePlayerStart::TeleportPlayer
 ================
 */
-void idPlayerStart::TeleportPlayer( idPlayer *player ) {
+void anBasePlayerStart::TeleportPlayer( anBasePlayer *player ) {
 	float pushVel = spawnArgs.GetFloat( "push", "50000" );
 	float f = spawnArgs.GetFloat( "visualEffect", "0" );
 	const char *viewName = spawnArgs.GetString( "visualView", "" );
-	idEntity *ent = viewName ? gameLocal.FindEntity( viewName ) : NULL;
+	anEntity *ent = viewName ? gameLocal.FindEntity( viewName ) : nullptr;
 
 	if ( f && ent ) {
 		// place in private camera view for some time
@@ -194,13 +194,13 @@ void idPlayerStart::TeleportPlayer( idPlayer *player ) {
 		}
 	} else {
 		// direct to exit, Teleport will take care of the killbox
-		player->Teleport( GetPhysics()->GetOrigin(), GetPhysics()->GetAxis().ToAngles(), NULL );
+		player->Teleport( GetPhysics()->GetOrigin(), GetPhysics()->GetAxis().ToAngles(), nullptr );
 
 		// multiplayer hijacked this entity, so only push the player in multiplayer
 		if ( gameLocal.isMultiplayer ) {
 			//push
-			arcVec3 impulse( pushVel, 0, 0 );
-			impulse *= GetPhysics( )->GetAxis ( );
+			anVec3 impulse( pushVel, 0, 0 );
+			impulse *= GetPhysics( )->GetAxis();
 			player->ApplyImpulse( gameLocal.world, 0, player->GetPhysics( )->GetOrigin( ), impulse );
 		}
 	}
@@ -208,27 +208,27 @@ void idPlayerStart::TeleportPlayer( idPlayer *player ) {
 
 /*
 ===============
-idPlayerStart::Teleport
+anBasePlayerStart::Teleport
 For non-players
 ================
 */
-void idPlayerStart::Teleport( idEntity* other ) {
+void anBasePlayerStart::Teleport( anEntity* other ) {
 	other->SetOrigin( GetPhysics()->GetOrigin() );
-	arcVec3 vel = other->GetPhysics()->GetLinearVelocity();
+	anVec3 vel = other->GetPhysics()->GetLinearVelocity();
 	vel *= GetPhysics()->GetAxis();
 	other->GetPhysics()->SetLinearVelocity( vel );
 }
 
-void idPlayerStart::Event_TeleportEntity( idEntity* activator, bool predicted, arcVec3& prevOrigin ) {
-	idPlayer *player;
+void anBasePlayerStart::Event_TeleportEntity( anEntity* activator, bool predicted, anVec3& prevOrigin ) {
+	anBasePlayer *player;
 
-	if ( activator->IsType( idPlayer::GetClassType() ) ) {
-		player = static_cast<idPlayer*>( activator );
+	if ( activator->IsType( anBasePlayer::GetClassType() ) ) {
+		player = static_cast<anBasePlayer*>( activator );
 	} else {
-		player = NULL;
+		player = nullptr;
 
 		if ( gameLocal.isServer ) {
-			idBitMsg	msg;
+			anBitMsg	msg;
 			byte		msgBuf[MAX_EVENT_PARAM_SIZE];
 
 			msg.Init( msgBuf, sizeof( msgBuf ) );
@@ -237,18 +237,18 @@ void idPlayerStart::Event_TeleportEntity( idEntity* activator, bool predicted, a
 			ServerSendInstanceEvent( EVENT_TELEPORTITEM, &msg, false, -1 );
 		}
 
-		arcVec3 oldOrigin = activator->GetPhysics()->GetOrigin();
+		anVec3 oldOrigin = activator->GetPhysics()->GetOrigin();
 		Teleport( activator );
 
-		if( gameLocal.isMultiplayer ) {
-			if( gameLocal.isServer ) {
-				gameLocal.PlayEffect( activator->spawnArgs, "fx_teleport_enter", oldOrigin, arcVec3(0,0,1).ToMat3(), false, vec3_origin );
-				gameLocal.PlayEffect( activator->spawnArgs, "fx_teleport", activator->GetPhysics()->GetOrigin(), arcVec3(0,0,1).ToMat3(), false, vec3_origin );
-			} else if( predicted ) {
+		if ( gameLocal.isMultiplayer ) {
+			if ( gameLocal.isServer ) {
+				gameLocal.PlayEffect( activator->spawnArgs, "fx_teleport_enter", oldOrigin, anVec3(0,0,1).ToMat3(), false, vec3_origin );
+				gameLocal.PlayEffect( activator->spawnArgs, "fx_teleport", activator->GetPhysics()->GetOrigin(), anVec3(0,0,1).ToMat3(), false, vec3_origin );
+			} else if ( predicted ) {
 				// only predict teleport enter
-				gameLocal.PlayEffect( activator->spawnArgs, "fx_teleport_enter", oldOrigin, arcVec3(0,0,1).ToMat3(), false, vec3_origin );
+				gameLocal.PlayEffect( activator->spawnArgs, "fx_teleport_enter", oldOrigin, anVec3(0,0,1).ToMat3(), false, vec3_origin );
 			} else {
-				gameLocal.PlayEffect( activator->spawnArgs, "fx_teleport", oldOrigin, arcVec3(0,0,1).ToMat3(), false, vec3_origin );
+				gameLocal.PlayEffect( activator->spawnArgs, "fx_teleport", oldOrigin, anVec3(0,0,1).ToMat3(), false, vec3_origin );
 			}
 		}
 	}
@@ -260,16 +260,16 @@ void idPlayerStart::Event_TeleportEntity( idEntity* activator, bool predicted, a
 			Event_TeleportStage( player );
 
 		} else {
-			arcVec3 oldOrigin;
+			anVec3 oldOrigin;
 
-			if( gameLocal.isServer || prevOrigin == vec3_zero ) {
+			if ( gameLocal.isServer || prevOrigin == vec3_zero ) {
 				oldOrigin = activator->GetPhysics()->GetOrigin();
 			} else {
 				oldOrigin = prevOrigin;
 			}
 
 			if ( gameLocal.isServer ) {
-				idBitMsg	msg;
+				anBitMsg	msg;
 				byte		msgBuf[MAX_EVENT_PARAM_SIZE];
 
 				msg.Init( msgBuf, sizeof( msgBuf ) );
@@ -283,9 +283,9 @@ void idPlayerStart::Event_TeleportEntity( idEntity* activator, bool predicted, a
 
 			TeleportPlayer( player );
 
-			if( gameLocal.isMultiplayer ) {
-				gameLocal.PlayEffect( player->spawnArgs, "fx_teleport_enter", oldOrigin, arcVec3(0,0,1).ToMat3(), false, vec3_origin );
-				gameLocal.PlayEffect( player->spawnArgs, "fx_teleport", player->GetPhysics()->GetOrigin(), arcVec3(0,0,1).ToMat3(), false, vec3_origin );
+			if ( gameLocal.isMultiplayer ) {
+				gameLocal.PlayEffect( player->spawnArgs, "fx_teleport_enter", oldOrigin, anVec3(0,0,1).ToMat3(), false, vec3_origin );
+				gameLocal.PlayEffect( player->spawnArgs, "fx_teleport", player->GetPhysics()->GetOrigin(), anVec3(0,0,1).ToMat3(), false, vec3_origin );
 			}
 		}
 		}
@@ -294,10 +294,10 @@ void idPlayerStart::Event_TeleportEntity( idEntity* activator, bool predicted, a
 
 /*
 ===============
-idPlayerStart::Event_TeleportPlayer
+anBasePlayerStart::Event_TeleportPlayer
 ================
 */
-void idPlayerStart::Event_Teleport( idEntity *activator ) {
+void anBasePlayerStart::Event_Teleport( anEntity *activator ) {
 	Event_TeleportEntity( activator, true );
 }
 
@@ -309,7 +309,7 @@ void idPlayerStart::Event_Teleport( idEntity *activator ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idActivator )
+CLASS_DECLARATION( anEntity, idActivator )
 	EVENT( EV_Activate,		idActivator::Event_Activate )
 END_CLASS
 
@@ -318,7 +318,7 @@ END_CLASS
 idActivator::Save
 ================
 */
-void idActivator::Save( idSaveGame *savefile ) const {
+void idActivator::Save( anSaveGame *savefile ) const {
 	savefile->WriteBool( stay_on );
 }
 
@@ -327,7 +327,7 @@ void idActivator::Save( idSaveGame *savefile ) const {
 idActivator::Restore
 ================
 */
-void idActivator::Restore( idRestoreGame *savefile ) {
+void idActivator::Restore( anRestoreGame *savefile ) {
 	savefile->ReadBool( stay_on );
 
 	if ( stay_on ) {
@@ -346,25 +346,25 @@ void idActivator::Spawn( void ) {
 	spawnArgs.GetBool( "stay_on", "0", stay_on );
 	spawnArgs.GetBool( "start_off", "0", start_off );
 
-// RAVEN BEGIN
+
 // bdube: optional clip model on activators
 	const char	*temp;
 	if ( spawnArgs.GetString( "clipmodel", "", &temp ) ) {
-// RAVEN BEGIN
+
 // mwhitlock: Dynamic memory consolidation
-		RV_PUSH_HEAP_MEM(this);
-// RAVEN END
-		GetPhysics()->SetClipModel( new idClipModel(temp), 1.0f );
-// RAVEN BEGIN
+		PUSH_HEAP_MEM(this);
+
+		GetPhysics()->SetClipModel( new anClipModel(temp), 1.0f );
+
 // mwhitlock: Dynamic memory consolidation
-		RV_POP_HEAP();
-// RAVEN END
+		POP_HEAP();
+
 	} else {
-		GetPhysics()->SetClipBox( arcBounds( vec3_origin ).Expand( 4 ), 1.0f );
+		GetPhysics()->SetClipBox( anBounds( vec3_origin ).Expand( 4 ), 1.0f );
 	}
 
 	GetPhysics()->SetContents( 0 );
-// RAVEN END
+
 
 	if ( !start_off ) {
 		BecomeActive( TH_THINK );
@@ -393,7 +393,7 @@ void idActivator::Think( void ) {
 idActivator::Activate
 ================
 */
-void idActivator::Event_Activate( idEntity *activator ) {
+void idActivator::Event_Activate( anEntity *activator ) {
 	if ( thinkFlags & TH_THINK ) {
 		BecomeInactive( TH_THINK );
 	} else {
@@ -410,7 +410,7 @@ idPathCorner
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idPathCorner )
+CLASS_DECLARATION( anEntity, idPathCorner )
 //	EVENT( AI_RandomPath,		idPathCorner::Event_RandomPath )
 END_CLASS
 
@@ -428,15 +428,15 @@ idPathCorner::DrawDebugInfo
 =====================
 */
 void idPathCorner::DrawDebugInfo( void ) {
-	idEntity *ent;
-	arcBounds bnds( arcVec3( -4.0, -4.0f, -8.0f ), arcVec3( 4.0, 4.0f, 64.0f ) );
+	anEntity *ent;
+	anBounds bnds( anVec3( -4.0, -4.0f, -8.0f ), anVec3( 4.0, 4.0f, 64.0f ) );
 
-	for( ent = gameLocal.spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next() ) {
+	for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
 		if ( !ent->IsType( idPathCorner::Type ) ) {
 			continue;
 		}
 
-		arcVec3 org = ent->GetPhysics()->GetOrigin();
+		anVec3 org = ent->GetPhysics()->GetOrigin();
 		gameRenderWorld->DebugBounds( colorRed, bnds, org, 0 );
 	}
 }
@@ -446,16 +446,16 @@ void idPathCorner::DrawDebugInfo( void ) {
 idPathCorner::RandomPath
 ============
 */
-idPathCorner *idPathCorner::RandomPath( const idEntity *source, const idEntity *ignore ) {
+idPathCorner *idPathCorner::RandomPath( const anEntity *source, const anEntity *ignore ) {
 	int	i;
 	int	num;
 	int which;
-	idEntity *ent;
+	anEntity *ent;
 	idPathCorner *path[ MAX_GENTITIES ];
 
 	num = 0;
-	for( i = 0; i < source->targets.Num(); i++ ) {
-		ent = source->targets[ i ].GetEntity();
+	for ( i = 0; i < source->targets.Num(); i++ ) {
+		ent = source->targets[i].GetEntity();
 		if ( ent && ( ent != ignore ) && ent->IsType( idPathCorner::Type ) ) {
 			path[ num++ ] = static_cast<idPathCorner *>( ent );
 			if ( num >= MAX_GENTITIES ) {
@@ -465,7 +465,7 @@ idPathCorner *idPathCorner::RandomPath( const idEntity *source, const idEntity *
 	}
 
 	if ( !num ) {
-		return NULL;
+		return nullptr;
 	}
 
 	which = gameLocal.random.RandomInt( num );
@@ -480,8 +480,8 @@ idPathCorner::Event_RandomPath
 void idPathCorner::Event_RandomPath( void ) {
 	idPathCorner *path;
 
-	path = RandomPath( this, NULL );
-	idThread::ReturnEntity( path );
+	path = RandomPath( this, nullptr );
+	anThread::ReturnEntity( path );
 }
 
 /*
@@ -492,14 +492,14 @@ void idPathCorner::Event_RandomPath( void ) {
 ===============================================================================
 */
 
-const idEventDef EV_RestoreDamagable( "<RestoreDamagable>" );
-// RAVEN BEGIN
-// kfuller: spawn other things
-const idEventDef EV_SpawnForcefield( "<SpawnForcefield>" );
-const idEventDef EV_SpawnTriggerHurt( "<SpawnTriggerHurt>" );
-// RAVEN END
+const anEventDef EV_RestoreDamagable( "<RestoreDamagable>" );
 
-CLASS_DECLARATION( idEntity, idDamagable )
+// kfuller: spawn other things
+const anEventDef EV_SpawnForcefield( "<SpawnForcefield>" );
+const anEventDef EV_SpawnTriggerHurt( "<SpawnTriggerHurt>" );
+
+
+CLASS_DECLARATION( anEntity, idDamagable )
 	EVENT( EV_Activate,			idDamagable::Event_BecomeBroken )
 	EVENT( EV_RestoreDamagable,	idDamagable::Event_RestoreDamagable )
 END_CLASS
@@ -520,7 +520,7 @@ idDamagable::idDamagable( void ) {
 idDamagable::Save
 ================
 */
-void idDamagable::Save( idSaveGame *savefile ) const {
+void idDamagable::Save( anSaveGame *savefile ) const {
 
 	savefile->WriteInt( invincibleTime );
 
@@ -544,7 +544,7 @@ void idDamagable::Save( idSaveGame *savefile ) const {
 idDamagable::Restore
 ================
 */
-void idDamagable::Restore( idRestoreGame *savefile ) {
+void idDamagable::Restore( anRestoreGame *savefile ) {
 
 	const char* stageName;
 
@@ -563,7 +563,7 @@ void idDamagable::Restore( idRestoreGame *savefile ) {
 
 
 	// Get the stage name, if there is none then there are no more stages
-	stageDict = NULL;
+	stageDict = nullptr;
 	if ( spawnArgs.GetString ( va( "def_stage%d", stage ), "", &stageName ) && stageName ) {
 
 		stageDict = gameLocal.FindEntityDefDict ( stageName, false );
@@ -576,28 +576,28 @@ idDamagable::Spawn
 ================
 */
 void idDamagable::Spawn( void ) {
-	idStr	broken;
+	anString	broken;
 	bool	keepContents;
 
-// RAVEN BEGIN
+
 // abahr: stage stuff
 	stage				= 0;
 	stageNext			= 1;
-	stageDict			= NULL;
+	stageDict			= nullptr;
 	stageEndTime		= 0;
 	stageEndHealth		= 9999;
 	stageEndSpeed		= 0;
 //jshepard:
 	stageEndOnGround    = false;
-// RAVEN END
+
 
 	health = spawnArgs.GetInt( "health", "5" );
 
-// RAVEN BEGIN
+
 // abahr: stage stuff
    stageEndHealth = health - 1;
-	activateStageOnTrigger = spawnArgs.GetBool("activateOnTrigger");
-// RAVEN END
+	activateStageOnTrigger = spawnArgs.GetBool( "activateOnTrigger" );
+
 
 	spawnArgs.GetInt( "count", "1", count );
 	invincibleTime = gameLocal.GetTime() + SEC2MS( spawnArgs.GetFloat( "invincibleTime", "0" ) );
@@ -609,10 +609,10 @@ void idDamagable::Spawn( void ) {
 		gameLocal.Error( "idDamagable '%s' at (%s): cannot load broken model '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), broken.c_str() );
 	}
 
-// RAVEN BEGIN
+
 // bdube: turn take damage off if it has no health
 	fl.takedamage = health > 0 ? true : false;
-// RAVEN END
+
 
 	keepContents = spawnArgs.GetBool( "KeepContents" );
 
@@ -628,7 +628,7 @@ void idDamagable::Spawn( void ) {
 idDamagable::BecomeBroken
 ================
 */
-void idDamagable::BecomeBroken( idEntity *activator ) {
+void idDamagable::BecomeBroken( anEntity *activator ) {
 	float	forceState;
 	int		numStates;
 	int		cycle;
@@ -649,7 +649,7 @@ void idDamagable::BecomeBroken( idEntity *activator ) {
 		}
 	}
 
-	idStr	broken;
+	anString	broken;
 
 	spawnArgs.GetString( "broken", "", broken );
 	if ( broken.Length() ) {
@@ -691,9 +691,9 @@ void idDamagable::BecomeBroken( idEntity *activator ) {
 idMoveable::Damage
 ============
 */
-// RAVEN BEGIN
+
 // abahr
-void idDamagable::Damage( idEntity *inflictor, idEntity *attacker, const arcVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
+void idDamagable::Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
 
 	if ( invincibleTime > gameLocal.GetTime() )	{
 		return;
@@ -702,18 +702,18 @@ void idDamagable::Damage( idEntity *inflictor, idEntity *attacker, const arcVec3
 	// If there is a damage filter we need to check to see if the damage def meets the requirement
 	const char* damageFilter;
 	if ( spawnArgs.GetString ( "damage_filter", "", &damageFilter ) && *damageFilter ) {
-		const idDict *damageDef = gameLocal.FindEntityDefDict( damageDefName, false );
+		const anDict *damageDef = gameLocal.FindEntityDefDict( damageDefName, false );
 		if ( !damageDef ) {
 			gameLocal.Error( "Unknown damageDef '%s'\n", damageDefName );
 		}
 		// If the filter isnt matched then ignore it
-		if ( !damageDef->GetBool ( va("filter_%s", damageFilter ) ) ) {
+		if ( !damageDef->GetBool ( va( "filter_%s", damageFilter ) ) ) {
 			return;
 		}
 	}
 	if ( spawnArgs.GetBool( "nosplash", "0" ) ) {
 		//ignore splash damage
-		const idDict *damageDef = gameLocal.FindEntityDefDict( damageDefName, false );
+		const anDict *damageDef = gameLocal.FindEntityDefDict( damageDefName, false );
 		if ( !damageDef ) {
 			gameLocal.Error( "Unknown damageDef '%s'\n", damageDefName );
 		}
@@ -723,7 +723,7 @@ void idDamagable::Damage( idEntity *inflictor, idEntity *attacker, const arcVec3
 		}
 	}
 
-	idEntity::Damage ( inflictor, attacker, dir, damageDefName, damageScale, location );
+	anEntity::Damage ( inflictor, attacker, dir, damageDefName, damageScale, location );
 
 	// Force a stage update so impact effects will be correct
 	UpdateStage();
@@ -734,7 +734,7 @@ void idDamagable::Damage( idEntity *inflictor, idEntity *attacker, const arcVec3
 idDamagable::Killed
 ================
 */
-void idDamagable::Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location ) {
+void idDamagable::Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location ) {
 	if ( gameLocal.time < nextTriggerTime ) {
 		health += damage;
 		return;
@@ -756,7 +756,7 @@ void idDamagable::UpdateStage ( void ) {
 
 		// Check to see if the stage is complete
 		oldstage = stage;
-		while ( health < stageEndHealth || (stageEndTime != 0 && gameLocal.time > stageEndTime ) || (stageEndOnGround && GetPhysics()->HasGroundContacts()) || activateStageOnTrigger ) {
+		while ( health < stageEndHealth || ( stageEndTime != 0 && gameLocal.time > stageEndTime ) || ( stageEndOnGround && GetPhysics()->HasGroundContacts()) || activateStageOnTrigger ) {
 			stage = stageNext;
 
 			//this only needs to happen once
@@ -764,7 +764,7 @@ void idDamagable::UpdateStage ( void ) {
 
 			// Get the stage name, if there is none then there are no more stages
 			const char* stageName;
-			if ( !spawnArgs.GetString ( va("def_stage%d", stage ), "", &stageName ) || !stageName ) {
+			if ( !spawnArgs.GetString ( va( "def_stage%d", stage ), "", &stageName ) || !stageName ) {
 				stage = 0;
 				break;
 			}
@@ -792,7 +792,7 @@ void idDamagable::UpdateStage ( void ) {
 			stageNext = stage + 1;
 
 			// Execute the new stage
-			ExecuteStage ( );
+			ExecuteStage();
 		}
 	}
 }
@@ -803,7 +803,7 @@ idDamagable::ExecuteStage
 ================
 */
 void idDamagable::ExecuteStage ( void ) {
-	const idKeyValue* kv;
+	const anKeyValue* kv;
 	bool			  remove;
 
 	// Remove the entity this frame?
@@ -820,58 +820,58 @@ void idDamagable::ExecuteStage ( void ) {
 	}
 
 	// Stop current looping effects
-	StopAllEffects ( );
+	StopAllEffects();
 
 	// Play all effects (if they start with "fx_loop" then also loop them
-	for ( kv = stageDict->MatchPrefix ( "fx_" ); kv; kv = stageDict->MatchPrefix("fx_",kv) ) {
+	for ( kv = stageDict->MatchPrefix ( "fx_" ); kv; kv = stageDict->MatchPrefix( "fx_",kv) ) {
 		if ( !kv->GetKey().Icmpn ( "fx_loop", 7 ) ) {
 			if ( !remove ) {
 				PlayEffect ( gameLocal.GetEffect ( *stageDict, kv->GetKey() ),
-							 renderEntity.origin + GetStageVector ( va("offset_%s", kv->GetKey().c_str() ) ),
-							 GetStageVector ( va("dir_%s", kv->GetKey().c_str() ), "1 0 0" ).ToMat3() * renderEntity.axis,
+							 renderEntity.origin + GetStageVector ( va( "offset_%s", kv->GetKey().c_str() ) ),
+							 GetStageVector ( va( "dir_%s", kv->GetKey().c_str() ), "1 0 0" ).ToMat3() * renderEntity.axis,
 							 true );
 			}
 		} else {
 			gameLocal.PlayEffect ( gameLocal.GetEffect ( *stageDict, "fx_explode" ),
-								   GetPhysics()->GetOrigin() + GetStageVector ( va("offset_%s", kv->GetKey().c_str() ) ) * GetPhysics()->GetAxis(),
-								   GetStageVector ( va("dir_%s", kv->GetKey().c_str() ), "1 0 0" ).ToMat3() );
+								   GetPhysics()->GetOrigin() + GetStageVector ( va( "offset_%s", kv->GetKey().c_str() ) ) * GetPhysics()->GetAxis(),
+								   GetStageVector ( va( "dir_%s", kv->GetKey().c_str() ), "1 0 0" ).ToMat3() );
 		}
 	}
 
 	// Kick off debris
-	for ( kv = stageDict->MatchPrefix ( "def_debris" ); kv; kv = stageDict->MatchPrefix("def_debris",kv) ) {
-		const idDict* args = gameLocal.FindEntityDefDict ( kv->GetValue(), false );
+	for ( kv = stageDict->MatchPrefix ( "def_debris" ); kv; kv = stageDict->MatchPrefix( "def_debris",kv) ) {
+		const anDict* args = gameLocal.FindEntityDefDict ( kv->GetValue(), false );
 		if ( !args ) {
 			continue;
 		}
 
-		rvClientMoveable* cent = NULL;
+		rvClientMoveable* cent = nullptr;
 		// force spawnclass to rvClientMoveable
 		gameLocal.SpawnClientEntityDef( *args, (rvClientEntity**)(&cent), false, "rvClientMoveable" );
 
-		if( !cent ) {
+		if ( !cent ) {
 			continue;
 		}
-		cent->SetOrigin ( GetPhysics()->GetOrigin() + GetStageVector ( va("offset_%s", kv->GetKey().c_str()) ) * GetPhysics()->GetAxis() );
-		cent->SetAxis ( GetPhysics()->GetAxis ( ) );
+		cent->SetOrigin ( GetPhysics()->GetOrigin() + GetStageVector ( va( "offset_%s", kv->GetKey().c_str()) ) * GetPhysics()->GetAxis() );
+		cent->SetAxis ( GetPhysics()->GetAxis() );
 
-		arcVec3 vel;
-		vel = GetStageVector ( va("vel_%s", kv->GetKey().c_str()) ) * GetPhysics()->GetAxis();
-		vel += GetPhysics()->GetLinearVelocity ( );
+		anVec3 vel;
+		vel = GetStageVector ( va( "vel_%s", kv->GetKey().c_str()) ) * GetPhysics()->GetAxis();
+		vel += GetPhysics()->GetLinearVelocity();
 		cent->GetPhysics()->SetLinearVelocity ( vel );
 		cent->PostEventMS ( &CL_FadeOut, 2500, 2500 );
 	}
 
     // Apply force to all objects nearby
 	float fPush;
-	stageDict->GetFloat("radiusPush","0",fPush);
+	stageDict->GetFloat( "radiusPush","0",fPush);
 	if (fPush > 0)	{
 		gameLocal.RadiusPush( GetPhysics()->GetOrigin(), 128, fPush, this, this, 1.0f, true );
 	}
 
 	// Remove the entity now?
 	if ( remove ) {
-		Hide ( );
+		Hide();
 		PostEventMS ( &EV_Remove, 0 );
 		return;
 	}
@@ -889,10 +889,10 @@ void idDamagable::ExecuteStage ( void ) {
 	}
 
 	// Velocities
-	arcVec3 vel;
+	anVec3 vel;
 	vel  = GetStageVector ( "vel_world" );
 	vel += (GetStageVector ( "vel_local" ) * GetPhysics()->GetAxis() );
-	vel += GetPhysics()->GetLinearVelocity ( );
+	vel += GetPhysics()->GetLinearVelocity();
 	GetPhysics()->SetLinearVelocity ( vel );
 
 	// Enable thinking to ensure stages are run
@@ -904,12 +904,12 @@ void idDamagable::ExecuteStage ( void ) {
 idDamagable::GetStageVector
 ================
 */
-arcVec3 idDamagable::GetStageVector ( const char* key, const char* defaultString ) const {
-	arcVec3 mins;
-	if ( stageDict->GetVector ( va("%s_min", key ), "", mins ) ) {
-		arcVec3 maxs;
-		stageDict->GetVector ( va("%s_max", key), mins.ToString(), maxs );
-		return mins + (maxs - mins) * gameLocal.random.RandomFloat ( );
+anVec3 idDamagable::GetStageVector ( const char* key, const char* defaultString ) const {
+	anVec3 mins;
+	if ( stageDict->GetVector ( va( "%s_min", key ), "", mins ) ) {
+		anVec3 maxs;
+		stageDict->GetVector ( va( "%s_max", key), mins.ToString(), maxs );
+		return mins + (maxs - mins) * gameLocal.random.RandomFloat();
 	}
 
 	return stageDict->GetVector ( key, defaultString );
@@ -922,10 +922,10 @@ idDamagable::GetStageFloat
 */
 float idDamagable::GetStageFloat	( const char* key, const char* defaultString ) const {
 	float minValue;
-	if ( stageDict->GetFloat ( va("%s_min", key ), "", minValue ) ) {
+	if ( stageDict->GetFloat ( va( "%s_min", key ), "", minValue ) ) {
 		float maxValue;
-		stageDict->GetFloat ( va("%s_max", key), va("%g",minValue), maxValue );
-		return minValue + (maxValue - minValue) * gameLocal.random.CRandomFloat ( );
+		stageDict->GetFloat ( va( "%s_max", key), va( "%g",minValue), maxValue );
+		return minValue + (maxValue - minValue) * gameLocal.random.CRandomFloat();
 	}
 
 	return stageDict->GetFloat ( key, defaultString );
@@ -938,10 +938,10 @@ idDamagable::GetStageInt
 */
 int idDamagable::GetStageInt	( const char* key, const char* defaultString ) const {
 	int minValue;
-	if ( stageDict->GetInt ( va("%s_min", key ), "", minValue ) ) {
+	if ( stageDict->GetInt ( va( "%s_min", key ), "", minValue ) ) {
 		int maxValue;
-		stageDict->GetInt ( va("%s_max", key), va("%d",minValue), maxValue );
-		return minValue + (maxValue - minValue) * gameLocal.random.CRandomFloat ( );
+		stageDict->GetInt ( va( "%s_max", key), va( "%d",minValue), maxValue );
+		return minValue + (maxValue - minValue) * gameLocal.random.CRandomFloat();
 	}
 
 	return stageDict->GetInt ( key, defaultString );
@@ -952,13 +952,13 @@ int idDamagable::GetStageInt	( const char* key, const char* defaultString ) cons
 idDamagable::Event_BecomeBroken
 ================
 */
-void idDamagable::Event_BecomeBroken( idEntity *activator ) {
+void idDamagable::Event_BecomeBroken( anEntity *activator ) {
 	BecomeBroken( activator );
 
-// RAVEN BEGIN
+
 // bdube: start stages
-	UpdateStage ( );
-// RAVEN END
+	UpdateStage();
+
 }
 
 /*
@@ -980,7 +980,7 @@ void idDamagable::Event_RestoreDamagable( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idExplodable )
+CLASS_DECLARATION( anEntity, idExplodable )
 	EVENT( EV_Activate,	idExplodable::Event_Explode )
 END_CLASS
 
@@ -998,14 +998,14 @@ void idExplodable::Spawn( void ) {
 idExplodable::Event_Explode
 ================
 */
-void idExplodable::Event_Explode( idEntity *activator ) {
+void idExplodable::Event_Explode( anEntity *activator ) {
 	const char *temp;
 
 	if ( spawnArgs.GetString( "def_damage", "damage_explosion", &temp ) ) {
 		gameLocal.RadiusDamage( GetPhysics()->GetOrigin(), activator, activator, this, this, temp );
 	}
 
-	StartSound( "snd_explode", SND_CHANNEL_ANY, 0, false, NULL );
+	StartSound( "snd_explode", SND_CHANNEL_ANY, 0, false, nullptr );
 
 	// Show() calls UpdateVisuals, so we don't need to call it ourselves after setting the shaderParms
 	renderEntity.shaderParms[SHADERPARM_RED]		= 1.0f;
@@ -1030,7 +1030,7 @@ void idExplodable::Event_Explode( idEntity *activator ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idSpring )
+CLASS_DECLARATION( anEntity, idSpring )
 	EVENT( EV_PostSpawn,	idSpring::Event_LinkSpring )
 END_CLASS
 
@@ -1040,8 +1040,8 @@ idSpring::Think
 ================
 */
 void idSpring::Think( void ) {
-	arcVec3 start, end, origin;
-	arcMat3 axis;
+	anVec3 start, end, origin;
+	anMat3 axis;
 
 	// run physics
 	RunPhysics();
@@ -1064,7 +1064,7 @@ void idSpring::Think( void ) {
 			end = origin + p2 * axis;
 		}
 
-		gameRenderWorld->DebugLine( arcVec4(1, 1, 0, 1), start, end, 0, true );
+		gameRenderWorld->DebugLine( anVec4(1, 1, 0, 1), start, end, 0, true );
 	}
 
 	Present();
@@ -1076,7 +1076,7 @@ idSpring::Event_LinkSpring
 ================
 */
 void idSpring::Event_LinkSpring( void ) {
-	idStr name1, name2;
+	anString name1, name2;
 
 	spawnArgs.GetString( "ent1", "", name1 );
 	spawnArgs.GetString( "ent2", "", name2 );
@@ -1122,7 +1122,7 @@ void idSpring::Spawn( void ) {
 
 	spring.InitSpring( Kstretch, 0.0f, damping, restLength );
 
-	ent1 = ent2 = NULL;
+	ent1 = ent2 = nullptr;
 
 	PostEventMS( &EV_PostSpawn, 0 );
 }
@@ -1132,7 +1132,7 @@ void idSpring::Spawn( void ) {
 idSpring::Save
 ================
 */
-void idSpring::Save( idSaveGame *savefile ) const {
+void idSpring::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt ( id1 );
 	savefile->WriteInt ( id2 );
 	savefile->WriteVec3 ( p1 );
@@ -1145,37 +1145,37 @@ void idSpring::Save( idSaveGame *savefile ) const {
 idSpring::Restore
 ================
 */
-void idSpring::Restore( idRestoreGame *savefile ) {
+void idSpring::Restore( anRestoreGame *savefile ) {
 	savefile->ReadInt ( id1 );
 	savefile->ReadInt ( id2 );
 	savefile->ReadVec3 ( p1 );
 	savefile->ReadVec3 ( p2 );
 	spring.Restore ( savefile );
-	Event_LinkSpring ( );
+	Event_LinkSpring();
 }
 
 /*
 ===============================================================================
 
-  idForceField
+  anForceField
 
 ===============================================================================
 */
 
-const idEventDef EV_Toggle( "Toggle", NULL );
+const anEventDef EV_Toggle( "Toggle", nullptr );
 
-CLASS_DECLARATION( idEntity, idForceField )
-	EVENT( EV_Activate,		idForceField::Event_Activate )
-	EVENT( EV_Toggle,		idForceField::Event_Toggle )
-	EVENT( EV_FindTargets,	idForceField::Event_FindTargets )
+CLASS_DECLARATION( anEntity, anForceField )
+	EVENT( EV_Activate,		anForceField::Event_Activate )
+	EVENT( EV_Toggle,		anForceField::Event_Toggle )
+	EVENT( EV_FindTargets,	anForceField::Event_FindTargets )
 END_CLASS
 
 /*
 ===============
-idForceField::Toggle
+anForceField::Toggle
 ================
 */
-void idForceField::Toggle( void ) {
+void anForceField::Toggle( void ) {
 	if ( thinkFlags & TH_THINK ) {
 		BecomeInactive( TH_THINK );
 	} else {
@@ -1185,10 +1185,10 @@ void idForceField::Toggle( void ) {
 
 /*
 ================
-idForceField::Think
+anForceField::Think
 ================
 */
-void idForceField::Think( void ) {
+void anForceField::Think( void ) {
 	if ( thinkFlags & TH_THINK ) {
 		// evaluate force
 		forceField.Evaluate( gameLocal.time );
@@ -1198,29 +1198,29 @@ void idForceField::Think( void ) {
 
 /*
 ================
-idForceField::Save
+anForceField::Save
 ================
 */
-void idForceField::Save( idSaveGame *savefile ) const {
+void anForceField::Save( anSaveGame *savefile ) const {
 	savefile->WriteStaticObject( forceField );
 }
 
 /*
 ================
-idForceField::Restore
+anForceField::Restore
 ================
 */
-void idForceField::Restore( idRestoreGame *savefile ) {
+void anForceField::Restore( anRestoreGame *savefile ) {
 	savefile->ReadStaticObject( forceField );
 }
 
 /*
 ================
-idForceField::Spawn
+anForceField::Spawn
 ================
 */
-void idForceField::Spawn( void ) {
-	arcVec3 uniform;
+void anForceField::Spawn( void ) {
+	anVec3 uniform;
 	float explosion, implosion, randomTorque;
 
 	if ( spawnArgs.GetVector( "uniform", "0 0 0", uniform ) ) {
@@ -1247,18 +1247,18 @@ void idForceField::Spawn( void ) {
 	forceField.SetMonsterOnly( spawnArgs.GetBool( "monsterOnly", "0" ) );
 
 	// set the collision model on the force field
-// RAVEN BEGIN
+
 // mwhitlock: Dynamic memory consolidation
-	RV_PUSH_HEAP_MEM(this);
-// RAVEN END
-	forceField.SetClipModel( new idClipModel( GetPhysics()->GetClipModel() ) );
-// RAVEN BEGIN
+	PUSH_HEAP_MEM(this);
+
+	forceField.SetClipModel( new anClipModel( GetPhysics()->GetClipModel() ) );
+
 // mwhitlock: Dynamic memory consolidation
-	RV_POP_HEAP();
-// RAVEN END
+	POP_HEAP();
+
 	forceField.SetOwner( this );
 	// remove the collision model from the physics object
-	GetPhysics()->SetClipModel( NULL, 1.0f );
+	GetPhysics()->SetClipModel( nullptr, 1.0f );
 
 	if ( spawnArgs.GetBool( "start_on" ) ) {
 		BecomeActive( TH_THINK );
@@ -1267,19 +1267,19 @@ void idForceField::Spawn( void ) {
 
 /*
 ===============
-idForceField::Event_Toggle
+anForceField::Event_Toggle
 ================
 */
-void idForceField::Event_Toggle( void ) {
+void anForceField::Event_Toggle( void ) {
 	Toggle();
 }
 
 /*
 ================
-idForceField::Event_Activate
+anForceField::Event_Activate
 ================
 */
-void idForceField::Event_Activate( idEntity *activator ) {
+void anForceField::Event_Activate( anEntity *activator ) {
 	float wait;
 
 	Toggle();
@@ -1290,10 +1290,10 @@ void idForceField::Event_Activate( idEntity *activator ) {
 
 /*
 ================
-idForceField::Event_FindTargets
+anForceField::Event_FindTargets
 ================
 */
-void idForceField::Event_FindTargets( void ) {
+void anForceField::Event_FindTargets( void ) {
 	FindTargets();
 	RemoveNullTargets();
 	if ( targets.Num() ) {
@@ -1301,20 +1301,20 @@ void idForceField::Event_FindTargets( void ) {
 	}
 }
 
-// RAVEN BEGIN
+
 // bdube: jump pads
 
 /*
 ===============================================================================
 
-  idForceField
+  anForceField
 
 ===============================================================================
 */
 
 const int JUMPPAD_EFFECT_DELAY	= 100;
 
-CLASS_DECLARATION( idForceField, rvJumpPad )
+CLASS_DECLARATION( anForceField, rvJumpPad )
 	EVENT( EV_FindTargets,	rvJumpPad::Event_FindTargets )
 END_CLASS
 
@@ -1339,16 +1339,16 @@ void rvJumpPad::Think( void ) {
 
 		// If force has been applied to an entity and jump pad effect hasnt been played for a bit
 		// then play it now.
-		if ( forceField.GetLastApplyTime ( ) - lastEffectTime > JUMPPAD_EFFECT_DELAY ) {
+		if ( forceField.GetLastApplyTime() - lastEffectTime > JUMPPAD_EFFECT_DELAY ) {
 			// start locally
-			StartSound( "snd_jump", SND_CHANNEL_ITEM, 0, false, NULL );
+			StartSound( "snd_jump", SND_CHANNEL_ITEM, 0, false, nullptr );
 			if ( spawnArgs.GetString( "fx_jump" )[ 0 ] ) {
 				PlayEffect( "fx_jump", renderEntity.origin, effectAxis, false, vec3_origin, false );
 			}
 
 			// send through unreliable
 			if ( gameLocal.isServer ) {
-				idBitMsg	msg;
+				anBitMsg	msg;
 				byte		msgBuf[ MAX_GAME_MESSAGE_SIZE ];
 
 				msg.Init( msgBuf, sizeof( msgBuf ) );
@@ -1383,15 +1383,15 @@ void rvJumpPad::Event_FindTargets( void ) {
 	FindTargets();
 	RemoveNullTargets();
 	if ( targets.Num() ) {
-		idEntity* ent;
+		anEntity* ent;
 		ent = targets[0].GetEntity();
 		assert( ent );
 
-		arcVec3 vert;
-		arcVec3 diff;
-		arcVec3 vel;
-		arcVec3 localGravity( gameLocal.GetCurrentGravity(this) );
-		arcVec3 localGravityNormal( localGravity.ToNormal() );
+		anVec3 vert;
+		anVec3 diff;
+		anVec3 vel;
+		anVec3 localGravity( gameLocal.GetCurrentGravity(this) );
+		anVec3 localGravityNormal( localGravity.ToNormal() );
 		float  time;
 		float  dist;
 
@@ -1400,7 +1400,7 @@ void rvJumpPad::Event_FindTargets( void ) {
 		vert = (diff * localGravityNormal) * localGravityNormal;
 
 		// Determine how long it would take to cover the distance along the gravity vector
-		time = arcMath::Sqrt( vert.Length() / (0.5f * localGravity.Length()) );
+		time = anMath::Sqrt( vert.Length() / (0.5f * localGravity.Length()) );
 		if ( !time ) {
 			PostEventMS( &EV_Remove, 0 );
 			return;
@@ -1428,21 +1428,21 @@ void rvJumpPad::Event_FindTargets( void ) {
 rvJumpPad::ClientReceiveEvent
 ===============
 */
-bool rvJumpPad::ClientReceiveEvent( int event, int time, const idBitMsg &msg ) {
+bool rvJumpPad::ClientReceiveEvent( int event, int time, const anBitMsg &msg ) {
 	switch ( event ) {
 	case EVENT_JUMPFX: {
 		if ( spawnArgs.GetString( "fx_jump" )[ 0 ] ) {
 			PlayEffect( "fx_jump", renderEntity.origin, effectAxis, false, vec3_origin, false );
 		}
-		StartSound( "snd_jump", SND_CHANNEL_ITEM, 0, false, NULL );
+		StartSound( "snd_jump", SND_CHANNEL_ITEM, 0, false, nullptr );
 		return true;
 	}
 	default:
-		return idEntity::ClientReceiveEvent( event, time, msg );
+		return anEntity::ClientReceiveEvent( event, time, msg );
 	}
 }
 
-// RAVEN END
+
 
 /*
 ===============================================================================
@@ -1452,16 +1452,16 @@ bool rvJumpPad::ClientReceiveEvent( int event, int time, const idBitMsg &msg ) {
 ===============================================================================
 */
 
-const idEventDef EV_Animated_Start( "<start>" );
-const idEventDef EV_LaunchMissiles( "launchMissiles", "ssssdf" );
-const idEventDef EV_LaunchMissilesUpdate( "<launchMissiles>", "dddd" );
-const idEventDef EV_AnimDone( "<AnimDone>", "d" );
-const idEventDef EV_StartRagdoll( "startRagdoll" );
+const anEventDef EV_Animated_Start( "<start>" );
+const anEventDef EV_LaunchMissiles( "launchMissiles", "ssssdf" );
+const anEventDef EV_LaunchMissilesUpdate( "<launchMissiles>", "dddd" );
+const anEventDef EV_AnimDone( "<AnimDone>", "d" );
+const anEventDef EV_StartRagdoll( "startRagdoll" );
 
-// RAVEN BEGIN
+
 // bdube: script object
-const idEventDef EV_SetAnimState ( "setAnimState", "sd" );
-// RAVEN END
+const anEventDef EV_SetAnimState ( "setAnimState", "sd" );
+
 
 CLASS_DECLARATION( idAFEntity_Gibbable, idAnimated )
 	EVENT( EV_Activate,				idAnimated::Event_Activate )
@@ -1474,13 +1474,13 @@ CLASS_DECLARATION( idAFEntity_Gibbable, idAnimated )
 	EVENT( EV_LaunchMissiles,		idAnimated::Event_LaunchMissiles )
 	EVENT( EV_LaunchMissilesUpdate,	idAnimated::Event_LaunchMissilesUpdate )
 
-// RAVEN BEGIN
+
 // bdube: script object
 	EVENT( EV_SetAnimState,			idAnimated::Event_SetAnimState )
 	EVENT( AI_PlayAnim,				idAnimated::Event_PlayAnim )
 	EVENT( AI_PlayCycle,			idAnimated::Event_PlayCycle )
 	EVENT( AI_AnimDone,				idAnimated::Event_AnimDone2 )
-// RAVEN END
+
 
 END_CLASS
 
@@ -1496,17 +1496,17 @@ idAnimated::idAnimated() {
 	blendFrames = 0;
 	soundJoint = INVALID_JOINT;
 	activated = false;
-	combatModel = NULL;
-	activator = NULL;
+	combatModel = nullptr;
+	activator = nullptr;
 	current_anim_index = 0;
 	num_anims = 0;
-// RAVEN BEGIN
+
 // bdube: script control
-	scriptThread = NULL;
-	for( i = 0; i < ANIM_NumAnimChannels; i++ ) {
+	scriptThread = nullptr;
+	for ( i = 0; i < ANIM_NumAnimChannels; i++ ) {
 		animDoneTime[i] = 0;
 	}
-// RAVEN END
+
 }
 
 /*
@@ -1516,12 +1516,12 @@ idAnimated::idAnimated
 */
 idAnimated::~idAnimated() {
 	delete combatModel;
-	combatModel = NULL;
+	combatModel = nullptr;
 
-// RAVEN BEGIN
+
 // bdube: kill script object
 	delete scriptThread;
-// RAVEN END
+
 }
 
 /*
@@ -1529,7 +1529,7 @@ idAnimated::~idAnimated() {
 idAnimated::Save
 ================
 */
-void idAnimated::Save( idSaveGame *savefile ) const {
+void idAnimated::Save( anSaveGame *savefile ) const {
 	int		i;
 
 	savefile->WriteInt( num_anims );
@@ -1540,14 +1540,14 @@ void idAnimated::Save( idSaveGame *savefile ) const {
 	activator.Save( savefile );
 	savefile->WriteBool( activated );
 
-// RAVEN BEGIN
+
 	savefile->WriteObject( scriptThread );
 	savefile->WriteString( state );
 	savefile->WriteString( idealState );
-	for( i = 0; i < ANIM_NumAnimChannels; i++ ) {
+	for ( i = 0; i < ANIM_NumAnimChannels; i++ ) {
 		savefile->WriteInt( animDoneTime[i] );
 	}
-// RAVEN END
+
 }
 
 /*
@@ -1555,7 +1555,7 @@ void idAnimated::Save( idSaveGame *savefile ) const {
 idAnimated::Restore
 ================
 */
-void idAnimated::Restore( idRestoreGame *savefile ) {
+void idAnimated::Restore( anRestoreGame *savefile ) {
 	int		i;
 
 	savefile->ReadInt( num_anims );
@@ -1566,14 +1566,14 @@ void idAnimated::Restore( idRestoreGame *savefile ) {
 	activator.Restore( savefile );
 	savefile->ReadBool( activated );
 
-// RAVEN BEGIN
-	savefile->ReadObject( reinterpret_cast<idClass *&>( scriptThread ) );
+
+	savefile->ReadObject( reinterpret_cast<anClass *&>( scriptThread ) );
 	savefile->ReadString( state );
 	savefile->ReadString( idealState );
-	for( i = 0; i < ANIM_NumAnimChannels; i++ ) {
+	for ( i = 0; i < ANIM_NumAnimChannels; i++ ) {
 		savefile->ReadInt( animDoneTime[i] );
 	}
-// RAVEN END
+
 }
 
 /*
@@ -1582,7 +1582,7 @@ idAnimated::Spawn
 ================
 */
 void idAnimated::Spawn( void ) {
-	idStr		animname;
+	anString		animname;
 	int			anim2;
 	float		wait;
 	const char	*joint;
@@ -1593,19 +1593,19 @@ void idAnimated::Spawn( void ) {
 		gameLocal.Warning( "idAnimated '%s' at (%s): cannot find joint '%s' for sound playback", name.c_str(), GetPhysics()->GetOrigin().ToString(0), joint );
 	}
 
-	LoadAF( NULL );
+	LoadAF( nullptr );
 
 	// allow bullets to collide with a combat model
 	if ( spawnArgs.GetBool( "combatModel", "0" ) ) {
-// RAVEN BEGIN
+
 // mwhitlock: Dynamic memory consolidation
-		RV_PUSH_HEAP_MEM(this);
-// RAVEN END
-		combatModel = new idClipModel( modelDefHandle );
-// RAVEN BEGIN
+		PUSH_HEAP_MEM(this);
+
+		combatModel = new anClipModel( modelDefHandle );
+
 // mwhitlock: Dynamic memory consolidation
-		RV_POP_HEAP();
-// RAVEN END
+		POP_HEAP();
+
 	}
 
 	// allow the entity to take damage
@@ -1615,11 +1615,11 @@ void idAnimated::Spawn( void ) {
 
 	blendFrames = 0;
 
-// RAVEN BEGIN
+
 // bdube: script control
 	// setup script object
 	const char* scriptObjectName;
-	if ( spawnArgs.GetString( "scriptobject", NULL, &scriptObjectName ) ) {
+	if ( spawnArgs.GetString( "scriptobject", nullptr, &scriptObjectName ) ) {
 		if ( !scriptObject.SetType( scriptObjectName ) ) {
 			gameLocal.Error( "Script object '%s' not found on entity '%s'.", scriptObjectName, name.c_str() );
 		}
@@ -1632,27 +1632,27 @@ void idAnimated::Spawn( void ) {
 		constructor = scriptObject.GetConstructor();
 		if ( constructor ) {
 			// start a thread that will initialize after Spawn is done being called
-// RAVEN BEGIN
+
 // mwhitlock: Dynamic memory consolidation
-			RV_PUSH_HEAP_MEM(this);
-// RAVEN END
-			scriptThread = new idThread();
-// RAVEN BEGIN
+			PUSH_HEAP_MEM(this);
+
+			scriptThread = new anThread();
+
 // mwhitlock: Dynamic memory consolidation
-			RV_POP_HEAP();
-// RAVEN END
+			POP_HEAP();
+
 			scriptThread->ManualDelete();
 			scriptThread->ManualControl();
 			scriptThread->SetThreadName( name.c_str() );
 			scriptThread->CallFunction( this, constructor, true );
-			scriptThread->Execute ( );
+			scriptThread->Execute();
 		}
 
 		fl.takedamage = true;
 
 		return;
 	}
-// RAVEN END
+
 
 	current_anim_index = 0;
 	spawnArgs.GetInt( "num_anims", "0", num_anims );
@@ -1683,10 +1683,10 @@ void idAnimated::Spawn( void ) {
 		animator.CycleAnim( ANIMCHANNEL_ALL, anim2, gameLocal.time, 0 );
 	} else if ( anim ) {
 		// init joints to the first frame of the animation
-// RAVEN BEGIN
+
 		frameBlend_t frameBlend = { 0, 0, 0, 1.0f, 0 };
 		animator.SetFrame( ANIMCHANNEL_ALL, anim, frameBlend );
-// RAVEN END
+
 
 		if ( !num_anims ) {
 			blendFrames = 0;
@@ -1706,7 +1706,7 @@ idAnimated::LoadAF
 ===============
 */
 bool idAnimated::LoadAF( const char* keyname ) {
-	idStr fileName;
+	anString fileName;
 
 	if ( !keyname || !*keyname ) {
 		keyname = "ragdoll";
@@ -1724,7 +1724,7 @@ bool idAnimated::LoadAF( const char* keyname ) {
 idAnimated::GetPhysicsToSoundTransform
 ===============
 */
-bool idAnimated::GetPhysicsToSoundTransform( arcVec3 &origin, arcMat3 &axis ) {
+bool idAnimated::GetPhysicsToSoundTransform( anVec3 &origin, anMat3 &axis ) {
 	animator.GetJointTransform( soundJoint, gameLocal.time, origin, axis );
 	axis = renderEntity.axis;
 	return true;
@@ -1778,7 +1778,7 @@ void idAnimated::PlayNextAnim( void ) {
 	Show();
 	current_anim_index++;
 
-	spawnArgs.GetString( va( "anim%d", current_anim_index ), NULL, &animname );
+	spawnArgs.GetString( va( "anim%d", current_anim_index ), nullptr, &animname );
 	if ( !animname ) {
 		anim = 0;
 		animator.Clear( ANIMCHANNEL_ALL, gameLocal.time, FRAME2MS( blendFrames ) );
@@ -1854,14 +1854,14 @@ void idAnimated::Event_AnimDone( int animindex ) {
 idAnimated::Event_Activate
 ================
 */
-void idAnimated::Event_Activate( idEntity *_activator ) {
-// RAVEN BEGIN
+void idAnimated::Event_Activate( anEntity *_activator ) {
+
 // bdube: script object support
 	if ( scriptThread ) {
 		CallHandler ( "onActivate" );
 		return;
 	}
-// RAVEN END
+
 
 	if ( num_anims ) {
 		PlayNextAnim();
@@ -1925,7 +1925,7 @@ idAnimated::Event_Footstep
 ===============
 */
 void idAnimated::Event_Footstep( void ) {
-	StartSound( "snd_footstep", SND_CHANNEL_BODY, 0, false, NULL );
+	StartSound( "snd_footstep", SND_CHANNEL_BODY, 0, false, nullptr );
 }
 
 /*
@@ -1934,13 +1934,13 @@ idAnimated::Event_LaunchMissilesUpdate
 =====================
 */
 void idAnimated::Event_LaunchMissilesUpdate( int launchjoint, int targetjoint, int numshots, int framedelay ) {
-	arcVec3			launchPos;
-	arcVec3			targetPos;
-	arcMat3			axis;
-	arcVec3			dir;
-	idEntity *		ent;
+	anVec3			launchPos;
+	anVec3			targetPos;
+	anMat3			axis;
+	anVec3			dir;
+	anEntity *		ent;
 	idProjectile *	projectile;
-	const idDict *	projectileDef;
+	const anDict *	projectileDef;
 	const char *	projectilename;
 
 	projectilename = spawnArgs.GetString( "projectilename" );
@@ -1950,12 +1950,12 @@ void idAnimated::Event_LaunchMissilesUpdate( int launchjoint, int targetjoint, i
 		return;
 	}
 
-	StartSound( "snd_missile", SND_CHANNEL_WEAPON, 0, false, NULL );
+	StartSound( "snd_missile", SND_CHANNEL_WEAPON, 0, false, nullptr );
 
 	animator.GetJointTransform( ( jointHandle_t )launchjoint, gameLocal.time, launchPos, axis );
 	launchPos = renderEntity.origin + launchPos * renderEntity.axis;
 
-// RAVEN BEGIN
+
 // bdube: with no target bone it will just shoot out the direction of the bones orientation
 	if ( targetjoint != INVALID_JOINT ) {
 		animator.GetJointTransform( ( jointHandle_t )targetjoint, gameLocal.time, targetPos, axis );
@@ -1965,15 +1965,15 @@ void idAnimated::Event_LaunchMissilesUpdate( int launchjoint, int targetjoint, i
 		axis *= renderEntity.axis;
 		dir = axis[0];
 	}
-// RAVEN END
+
 
 	dir.Normalize();
 
 	gameLocal.SpawnEntityDef( *projectileDef, &ent, false );
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
+
+
 	if ( !ent || !ent->IsType( idProjectile::GetClassType() ) ) {
-// RAVEN END
+
 		gameLocal.Error( "idAnimated '%s' at (%s): in 'launchMissiles' call '%s' is not an idProjectile", name.c_str(), GetPhysics()->GetOrigin().ToString(0), projectilename );
 	}
 	projectile = ( idProjectile * )ent;
@@ -1991,7 +1991,7 @@ idAnimated::Event_LaunchMissiles
 =====================
 */
 void idAnimated::Event_LaunchMissiles( const char *projectilename, const char *sound, const char *launchjoint, const char *targetjoint, int numshots, int framedelay ) {
-	const idDict *	projectileDef;
+	const anDict *	projectileDef;
 	jointHandle_t	launch;
 	jointHandle_t	target;
 
@@ -2008,18 +2008,18 @@ void idAnimated::Event_LaunchMissiles( const char *projectilename, const char *s
 	}
 
 	target = animator.GetJointHandle( targetjoint );
-// RAVEN BEGIN
+
 // bdube: invalid is ok now, it means shoot out the direction of the bone
 //	if ( target == INVALID_JOINT ) {
 //		gameLocal.Warning( "idAnimated '%s' at (%s): unknown target joint '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), targetjoint );
 //	}
-// RAVEN END
+
 
 	spawnArgs.Set( "projectilename", projectilename );
 	spawnArgs.Set( "missilesound", sound );
 
 	CancelEvents( &EV_LaunchMissilesUpdate );
-// RAVEN BEGIN
+
 // nmckenzie: Do this now.  No delays.  No event loops or updates.  Just a straightforward DO THIS.  Tacky.
 	if ( numshots == 1 && framedelay == 0 ){
 		Event_LaunchMissilesUpdate ( launch, target, 1, 0 );
@@ -2027,10 +2027,10 @@ void idAnimated::Event_LaunchMissiles( const char *projectilename, const char *s
 	else{
 		ProcessEvent( &EV_LaunchMissilesUpdate, launch, target, numshots - 1, framedelay );
 	}
-// RAVEN END
+
 }
 
-// RAVEN BEGIN
+
 // bdube: added
 /*
 =====================
@@ -2047,8 +2047,8 @@ idAnimated::Think
 =====================
 */
 void idAnimated::Think ( void ) {
-	UpdateScript ( );
-	idAFEntity_Gibbable::Think ( );
+	UpdateScript();
+	idAFEntity_Gibbable::Think();
 }
 
 /*
@@ -2056,7 +2056,7 @@ void idAnimated::Think ( void ) {
 idAnimated::Think
 =====================
 */
-void idAnimated::Damage ( idEntity* inflictor, idEntity* attacker, const arcVec3& dir, const char* damageDefName, const float damageScale, const int location ) {
+void idAnimated::Damage ( anEntity* inflictor, anEntity* attacker, const anVec3& dir, const char* damageDefName, const float damageScale, const int location ) {
 	if ( !scriptThread ) {
 		return;
 	}
@@ -2077,11 +2077,11 @@ void idAnimated::Event_PlayAnim( int channel, const char *animname ) {
 		gameLocal.Warning( "missing '%s' animation on '%s' (%s)", animname, name.c_str(), GetEntityDefName() );
 		animator.Clear( channel, gameLocal.time, FRAME2MS( blendFrames ) );
 		animDoneTime[channel] = 0;
-		idThread::ReturnFloat( false );
+		anThread::ReturnFloat( false );
 	} else {
 		animator.PlayAnim( channel, anim, gameLocal.time, FRAME2MS( blendFrames ) );
 		animDoneTime[channel] = animator.CurrentAnim( channel )->GetEndTime();
-		idThread::ReturnFloat( MS2SEC( animDoneTime[channel] - gameLocal.time ) );
+		anThread::ReturnFloat( MS2SEC( animDoneTime[channel] - gameLocal.time ) );
 	}
 	blendFrames = 0;
 }
@@ -2113,9 +2113,9 @@ idAnimated::Event_AnimDone2
 */
 void idAnimated::Event_AnimDone2( int channel, int blend ) {
 	if ( animDoneTime[channel] - FRAME2MS( blend ) <= gameLocal.time ) {
-		idThread::ReturnInt( true );
+		anThread::ReturnInt( true );
 	} else {
-		idThread::ReturnInt( false );
+		anThread::ReturnInt( false );
 	}
 }
 
@@ -2154,7 +2154,7 @@ void idAnimated::UpdateScript( void ) {
 	}
 
 	// If no state has been set then dont execute nothing
-	if ( !state.Length ( ) || scriptThread->IsWaiting() ) {
+	if ( !state.Length() || scriptThread->IsWaiting() ) {
 		return;
 	}
 
@@ -2180,7 +2180,7 @@ void idAnimated::CallHandler ( const char* handler ) {
 	}
 
 	scriptThread->CallFunction( this, func, false );
-	scriptThread->Execute ( );
+	scriptThread->Execute();
 }
 
 /*
@@ -2202,7 +2202,7 @@ void idAnimated::SetState( const char *statename, int frames ) {
 	idealState = "";
 }
 
-// RAVEN END
+
 
 /*
 ===============================================================================
@@ -2214,7 +2214,7 @@ void idAnimated::SetState( const char *statename, int frames ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idStaticEntity )
+CLASS_DECLARATION( anEntity, idStaticEntity )
 	EVENT( EV_Activate,				idStaticEntity::Event_Activate )
 END_CLASS
 
@@ -2238,7 +2238,7 @@ idStaticEntity::idStaticEntity( void ) {
 idStaticEntity::Save
 ===============
 */
-void idStaticEntity::Save( idSaveGame *savefile ) const {
+void idStaticEntity::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( spawnTime );
 	savefile->WriteBool( active );
 	savefile->WriteVec4( fadeFrom );
@@ -2253,7 +2253,7 @@ void idStaticEntity::Save( idSaveGame *savefile ) const {
 idStaticEntity::Restore
 ===============
 */
-void idStaticEntity::Restore( idRestoreGame *savefile ) {
+void idStaticEntity::Restore( anRestoreGame *savefile ) {
 	savefile->ReadInt( spawnTime );
 	savefile->ReadBool( active );
 	savefile->ReadVec4( fadeFrom );
@@ -2273,7 +2273,7 @@ void idStaticEntity::Spawn( void ) {
 	bool hidden;
 	bool keepContents;
 
-// RAVEN BEGIN
+
 // rjohnson: inline models can be solid, since the entities hang around anyway (don't know why it was done that way)
 	solid = spawnArgs.GetBool( "solid" );
 
@@ -2285,7 +2285,7 @@ void idStaticEntity::Spawn( void ) {
 		}
 		return;
 	}
-// RAVEN END
+
 
 	hidden = spawnArgs.GetBool( "hide" );
 	keepContents = spawnArgs.GetBool( "KeepContents" );
@@ -2301,7 +2301,7 @@ void idStaticEntity::Spawn( void ) {
 	spawnTime = gameLocal.time;
 	active = false;
 
-	idStr model = spawnArgs.GetString( "model" );
+	anString model = spawnArgs.GetString( "model" );
 	// FIXME: temp also catch obsolete .ips extension
 	if ( model.Find( ".ips" ) >= 0 || model.Find( ".prt" ) >= 0 ) {
 		// we want the parametric particles out of sync with each other
@@ -2326,10 +2326,10 @@ idStaticEntity::ShowEditingDialog
 ================
 */
 void idStaticEntity::ShowEditingDialog( void ) {
-// RAVEN BEGIN
+
 // bdube: not using
 //	common->InitTool( EDITOR_PARTICLE, &spawnArgs );
-// RAVEN END
+
 }
 /*
 ================
@@ -2337,22 +2337,22 @@ idStaticEntity::Think
 ================
 */
 void idStaticEntity::Think( void ) {
-	idEntity::Think();
+	anEntity::Think();
 	if ( thinkFlags & TH_THINK ) {
 		if ( runGui && renderEntity.gui[0] ) {
-			idPlayer *player = gameLocal.GetLocalPlayer();
+			anBasePlayer *player = gameLocal.GetLocalPlayer();
 			if ( player ) {
 				if ( !player->objectiveSystemOpen ) {
-					for( int i = 0; i < MAX_RENDERENTITY_GUI; i++ ) {
-						if ( renderEntity.gui[ i ] ) {
-							renderEntity.gui[ i ]->StateChanged( gameLocal.time, true );
+					for ( int i = 0; i < MAX_RENDERENTITY_GUI; i++ ) {
+						if ( renderEntity.gui[i] ) {
+							renderEntity.gui[i]->StateChanged( gameLocal.time, true );
 						}
 					}
 				}
 			}
 		}
 		if ( fadeEnd > 0 ) {
-			arcVec4 color;
+			anVec4 color;
 			if ( gameLocal.time < fadeEnd ) {
 				color.Lerp( fadeFrom, fadeTo, ( float )( gameLocal.time - fadeStart ) / ( float )( fadeEnd - fadeStart ) );
 			} else {
@@ -2370,7 +2370,7 @@ void idStaticEntity::Think( void ) {
 idStaticEntity::Fade
 ================
 */
-void idStaticEntity::Fade( const arcVec4 &to, float fadeTime ) {
+void idStaticEntity::Fade( const anVec4 &to, float fadeTime ) {
 	GetColor( fadeFrom );
 	fadeTo = to;
 	fadeStart = gameLocal.time;
@@ -2384,7 +2384,7 @@ idStaticEntity::Hide
 ================
 */
 void idStaticEntity::Hide( void ) {
-	idEntity::Hide();
+	anEntity::Hide();
 	GetPhysics()->SetContents( 0 );
 }
 
@@ -2394,7 +2394,7 @@ idStaticEntity::Show
 ================
 */
 void idStaticEntity::Show( void ) {
-	idEntity::Show();
+	anEntity::Show();
 	if ( spawnArgs.GetBool( "solid" ) ) {
 		GetPhysics()->SetContents( CONTENTS_SOLID );
 	}
@@ -2405,13 +2405,13 @@ void idStaticEntity::Show( void ) {
 idStaticEntity::Event_Activate
 ================
 */
-void idStaticEntity::Event_Activate( idEntity *activator ) {
-	idStr activateGui;
+void idStaticEntity::Event_Activate( anEntity *activator ) {
+	anString activateGui;
 
 	spawnTime = gameLocal.time;
 	active = !active;
 
-	const idKeyValue *kv = spawnArgs.FindKey( "hide" );
+	const anKeyValue *kv = spawnArgs.FindKey( "hide" );
 	if ( kv ) {
 		if ( IsHidden() ) {
 			Show();
@@ -2434,7 +2434,7 @@ void idStaticEntity::Event_Activate( idEntity *activator ) {
 idStaticEntity::WriteToSnapshot
 ================
 */
-void idStaticEntity::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void idStaticEntity::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	GetPhysics()->WriteToSnapshot( msg );
 	WriteBindToSnapshot( msg );
 	WriteColorToSnapshot( msg );
@@ -2447,7 +2447,7 @@ void idStaticEntity::WriteToSnapshot( idBitMsgDelta &msg ) const {
 idStaticEntity::ReadFromSnapshot
 ================
 */
-void idStaticEntity::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void idStaticEntity::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	bool hidden;
 
 	GetPhysics()->ReadFromSnapshot( msg );
@@ -2510,7 +2510,7 @@ void idFuncEmitter::Spawn( void ) {
 idFuncEmitter::Save
 ===============
 */
-void idFuncEmitter::Save( idSaveGame *savefile ) const {
+void idFuncEmitter::Save( anSaveGame *savefile ) const {
 	savefile->WriteBool( hidden );
 }
 
@@ -2519,7 +2519,7 @@ void idFuncEmitter::Save( idSaveGame *savefile ) const {
 idFuncEmitter::Restore
 ===============
 */
-void idFuncEmitter::Restore( idRestoreGame *savefile ) {
+void idFuncEmitter::Restore( anRestoreGame *savefile ) {
 	savefile->ReadBool( hidden );
 }
 
@@ -2528,7 +2528,7 @@ void idFuncEmitter::Restore( idRestoreGame *savefile ) {
 idFuncEmitter::Event_Activate
 ================
 */
-void idFuncEmitter::Event_Activate( idEntity *activator ) {
+void idFuncEmitter::Event_Activate( anEntity *activator ) {
 	if ( hidden || spawnArgs.GetBool( "cycleTrigger" ) ) {
 		renderEntity.shaderParms[SHADERPARM_PARTICLE_STOPTIME] = 0;
 		renderEntity.shaderParms[SHADERPARM_TIMEOFFSET] = -MS2SEC( gameLocal.time );
@@ -2545,7 +2545,7 @@ void idFuncEmitter::Event_Activate( idEntity *activator ) {
 idFuncEmitter::WriteToSnapshot
 ================
 */
-void idFuncEmitter::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void idFuncEmitter::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	msg.WriteBits( hidden ? 1 : 0, 1 );
 	msg.WriteFloat( renderEntity.shaderParms[ SHADERPARM_PARTICLE_STOPTIME ] );
 	msg.WriteFloat( renderEntity.shaderParms[ SHADERPARM_TIMEOFFSET ] );
@@ -2556,7 +2556,7 @@ void idFuncEmitter::WriteToSnapshot( idBitMsgDelta &msg ) const {
 idFuncEmitter::ReadFromSnapshot
 ================
 */
-void idFuncEmitter::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void idFuncEmitter::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	hidden = msg.ReadBits( 1 ) != 0;
 	renderEntity.shaderParms[ SHADERPARM_PARTICLE_STOPTIME ] = msg.ReadFloat();
 	renderEntity.shaderParms[ SHADERPARM_TIMEOFFSET ] = msg.ReadFloat();
@@ -2575,7 +2575,7 @@ idFuncSplat
 */
 
 
-const idEventDef EV_Splat( "<Splat>" );
+const anEventDef EV_Splat( "<Splat>" );
 CLASS_DECLARATION( idFuncEmitter, idFuncSplat )
 EVENT( EV_Activate,		idFuncSplat::Event_Activate )
 EVENT( EV_Splat,		idFuncSplat::Event_Splat )
@@ -2603,7 +2603,7 @@ idFuncSplat::Event_Splat
 ================
 */
 void idFuncSplat::Event_Splat( void ) {
-	const char *splat = NULL;
+	const char *splat = nullptr;
 	int count = spawnArgs.GetInt( "splatCount", "1" );
 	for ( int i = 0; i < count; i++ ) {
 		splat = spawnArgs.RandomPrefix( "mtr_splat", gameLocal.random );
@@ -2614,7 +2614,7 @@ void idFuncSplat::Event_Splat( void ) {
 			gameLocal.ProjectDecal( GetPhysics()->GetOrigin(), GetPhysics()->GetAxis()[2], dist, true, size, splat, angle );
 		}
 	}
-	StartSound( "snd_splat", SND_CHANNEL_ANY, 0, false, NULL );
+	StartSound( "snd_splat", SND_CHANNEL_ANY, 0, false, nullptr );
 }
 
 /*
@@ -2622,10 +2622,10 @@ void idFuncSplat::Event_Splat( void ) {
 idFuncSplat::Event_Activate
 ================
 */
-void idFuncSplat::Event_Activate( idEntity *activator ) {
+void idFuncSplat::Event_Activate( anEntity *activator ) {
 	idFuncEmitter::Event_Activate( activator );
 	PostEventSec( &EV_Splat, spawnArgs.GetFloat( "splatDelay", "0.25" ) );
-	StartSound( "snd_spurt", SND_CHANNEL_ANY, 0, false, NULL );
+	StartSound( "snd_spurt", SND_CHANNEL_ANY, 0, false, nullptr );
 }
 
 /*
@@ -2636,7 +2636,7 @@ void idFuncSplat::Event_Activate( idEntity *activator ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idTextEntity )
+CLASS_DECLARATION( anEntity, idTextEntity )
 END_CLASS
 
 /*
@@ -2659,7 +2659,7 @@ void idTextEntity::Spawn( void ) {
 idTextEntity::Save
 ================
 */
-void idTextEntity::Save( idSaveGame *savefile ) const {
+void idTextEntity::Save( anSaveGame *savefile ) const {
 	savefile->WriteString( text );
 	savefile->WriteBool( playerOriented );
 }
@@ -2669,7 +2669,7 @@ void idTextEntity::Save( idSaveGame *savefile ) const {
 idTextEntity::Restore
 ================
 */
-void idTextEntity::Restore( idRestoreGame *savefile ) {
+void idTextEntity::Restore( anRestoreGame *savefile ) {
 	savefile->ReadString( text );
 	savefile->ReadBool( playerOriented );
 }
@@ -2722,7 +2722,7 @@ void idTextEntity::ClientPredictionThink( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idVacuumSeparatorEntity )
+CLASS_DECLARATION( anEntity, idVacuumSeparatorEntity )
 	EVENT( EV_Activate,		idVacuumSeparatorEntity::Event_Activate )
 END_CLASS
 
@@ -2741,7 +2741,7 @@ idVacuumSeparatorEntity::idVacuumSeparatorEntity( void ) {
 idVacuumSeparatorEntity::Save
 ================
 */
-void idVacuumSeparatorEntity::Save( idSaveGame *savefile ) const {
+void idVacuumSeparatorEntity::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( (int)portal );
 	savefile->WriteInt( gameRenderWorld->GetPortalState( portal ) );
 }
@@ -2751,10 +2751,10 @@ void idVacuumSeparatorEntity::Save( idSaveGame *savefile ) const {
 idVacuumSeparatorEntity::Restore
 ================
 */
-void idVacuumSeparatorEntity::Restore( idRestoreGame *savefile ) {
+void idVacuumSeparatorEntity::Restore( anRestoreGame *savefile ) {
 	int state;
 
-	savefile->ReadInt( (int &)portal );
+	savefile->ReadInt( ( int&)portal );
 	savefile->ReadInt( state );
 
 	gameLocal.SetPortalState( portal, state );
@@ -2766,9 +2766,9 @@ idVacuumSeparatorEntity::Spawn
 ================
 */
 void idVacuumSeparatorEntity::Spawn() {
-	arcBounds b;
+	anBounds b;
 
-	b = arcBounds( spawnArgs.GetVector( "origin" ) ).Expand( 16 );
+	b = anBounds( spawnArgs.GetVector( "origin" ) ).Expand( 16 );
 	portal = gameRenderWorld->FindPortal( b );
 	if ( !portal ) {
 		gameLocal.Warning( "VacuumSeparator '%s' didn't contact a portal", spawnArgs.GetString( "name" ) );
@@ -2782,7 +2782,7 @@ void idVacuumSeparatorEntity::Spawn() {
 idVacuumSeparatorEntity::Event_Activate
 ================
 */
-void idVacuumSeparatorEntity::Event_Activate( idEntity *activator ) {
+void idVacuumSeparatorEntity::Event_Activate( anEntity *activator ) {
 	if ( !portal ) {
 		return;
 	}
@@ -2798,7 +2798,7 @@ idLocationSeparatorEntity
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idLocationSeparatorEntity )
+CLASS_DECLARATION( anEntity, idLocationSeparatorEntity )
 END_CLASS
 
 /*
@@ -2807,9 +2807,9 @@ idLocationSeparatorEntity::Spawn
 ================
 */
 void idLocationSeparatorEntity::Spawn() {
-	arcBounds b;
+	anBounds b;
 
-	b = arcBounds( spawnArgs.GetVector( "origin" ) ).Expand( 16 );
+	b = anBounds( spawnArgs.GetVector( "origin" ) ).Expand( 16 );
 	qhandle_t portal = gameRenderWorld->FindPortal( b );
 	if ( !portal ) {
 		gameLocal.Warning( "LocationSeparator '%s' didn't contact a portal", spawnArgs.GetString( "name" ) );
@@ -2828,7 +2828,7 @@ void idLocationSeparatorEntity::Spawn() {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idVacuumEntity )
+CLASS_DECLARATION( anEntity, idVacuumEntity )
 END_CLASS
 
 /*
@@ -2842,12 +2842,12 @@ void idVacuumEntity::Spawn() {
 		return;
 	}
 
-	arcVec3 org = spawnArgs.GetVector( "origin" );
+	anVec3 org = spawnArgs.GetVector( "origin" );
 
 	gameLocal.vacuumAreaNum = gameRenderWorld->PointInArea( org );
 }
 
-// RAVEN BEGIN
+
 // abahr:
 /*
 ===============================================================================
@@ -2857,7 +2857,7 @@ void idVacuumEntity::Spawn() {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, rvGravitySeparatorEntity )
+CLASS_DECLARATION( anEntity, rvGravitySeparatorEntity )
 	EVENT( EV_Activate,		rvGravitySeparatorEntity::Event_Activate )
 END_CLASS
 
@@ -2876,7 +2876,7 @@ rvGravitySeparatorEntity::rvGravitySeparatorEntity( void ) {
 rvGravitySeparatorEntity::Save
 ================
 */
-void rvGravitySeparatorEntity::Save( idSaveGame *savefile ) const {
+void rvGravitySeparatorEntity::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( (int)portal );
 	savefile->WriteInt( gameRenderWorld->GetPortalState( portal ) );
 }
@@ -2886,10 +2886,10 @@ void rvGravitySeparatorEntity::Save( idSaveGame *savefile ) const {
 rvGravitySeparatorEntity::Restore
 ================
 */
-void rvGravitySeparatorEntity::Restore( idRestoreGame *savefile ) {
+void rvGravitySeparatorEntity::Restore( anRestoreGame *savefile ) {
 	int state;
 
-	savefile->ReadInt( (int &)portal );
+	savefile->ReadInt( ( int&)portal );
 	savefile->ReadInt( state );
 
 	gameLocal.SetPortalState( portal, state );
@@ -2901,9 +2901,9 @@ rvGravitySeparatorEntity::Spawn
 ================
 */
 void rvGravitySeparatorEntity::Spawn() {
-	arcBounds b;
+	anBounds b;
 
-	b = arcBounds( spawnArgs.GetVector( "origin" ) ).Expand( 16 );
+	b = anBounds( spawnArgs.GetVector( "origin" ) ).Expand( 16 );
 	portal = gameRenderWorld->FindPortal( b );
 	if ( !portal ) {
 		gameLocal.Warning( "GravitySeparator '%s' didn't contact a portal", spawnArgs.GetString( "name" ) );
@@ -2917,7 +2917,7 @@ void rvGravitySeparatorEntity::Spawn() {
 rvGravitySeparatorEntity::Event_Activate
 ================
 */
-void rvGravitySeparatorEntity::Event_Activate( idEntity *activator ) {
+void rvGravitySeparatorEntity::Event_Activate( anEntity *activator ) {
 	if ( !portal ) {
 		return;
 	}
@@ -2933,7 +2933,7 @@ void rvGravitySeparatorEntity::Event_Activate( idEntity *activator ) {
 
 ===============================================================================
 */
-ABSTRACT_DECLARATION( idEntity, rvGravityArea )
+ABSTRACT_DECLARATION( anEntity, rvGravityArea )
 END_CLASS
 
 /*
@@ -2942,7 +2942,7 @@ rvGravityArea::Spawn
 ================
 */
 void rvGravityArea::Spawn() {
-	area = gameRenderWorld->PointInArea( spawnArgs.GetVector("origin") );
+	area = gameRenderWorld->PointInArea( spawnArgs.GetVector( "origin" ) );
 	gameLocal.AddUniqueGravityInfo( this );
 }
 
@@ -2951,7 +2951,7 @@ void rvGravityArea::Spawn() {
 rvGravityArea::Save
 ================
 */
-void rvGravityArea::Save( idSaveGame *savefile ) const {
+void rvGravityArea::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( area );
 }
 
@@ -2960,7 +2960,7 @@ void rvGravityArea::Save( idSaveGame *savefile ) const {
 rvGravityArea::Restore
 ================
 */
-void rvGravityArea::Restore( idRestoreGame *savefile ) {
+void rvGravityArea::Restore( anRestoreGame *savefile ) {
 	savefile->ReadInt( area );
 }
 
@@ -2971,7 +2971,7 @@ rvGravityArea::IsEqualTo
 */
 bool rvGravityArea::IsEqualTo( const rvGravityArea* area ) const {
 	assert( area );
-	return !idStr::Icmp( GetName(), area->GetName() );
+	return !anString::Icmp( GetName(), area->GetName() );
 }
 
 /*
@@ -3034,7 +3034,7 @@ void rvGravityArea_Static::Spawn() {
 rvGravityArea_Static::Save
 ================
 */
-void rvGravityArea_Static::Save( idSaveGame *savefile ) const {
+void rvGravityArea_Static::Save( anSaveGame *savefile ) const {
 	savefile->WriteVec3( gravity );
 }
 
@@ -3043,7 +3043,7 @@ void rvGravityArea_Static::Save( idSaveGame *savefile ) const {
 rvGravityArea_Static::Restore
 ================
 */
-void rvGravityArea_Static::Restore( idRestoreGame *savefile ) {
+void rvGravityArea_Static::Restore( anRestoreGame *savefile ) {
 	savefile->ReadVec3( gravity );
 }
 
@@ -3062,13 +3062,13 @@ END_CLASS
 rvGravityArea_SurfaceNormal::GetGravity
 ================
 */
-const arcVec3 rvGravityArea_SurfaceNormal::GetGravity( const arcVec3& origin, const arcMat3& axis, int clipMask, idEntity* passEntity ) const {
+const anVec3 rvGravityArea_SurfaceNormal::GetGravity( const anVec3& origin, const anMat3& axis, int clipMask, anEntity* passEntity ) const {
 	trace_t results;
 
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
-	if( !gameLocal.TracePoint( this, results, origin, origin + -axis[2] * 50.0f, clipMask, passEntity ) ) {
-// RAVEN END
+
+
+	if ( !gameLocal.TracePoint( this, results, origin, origin + -axis[2] * 50.0f, clipMask, passEntity ) ) {
+
 		return gameLocal.GetGravity();
 	}
 
@@ -3080,7 +3080,7 @@ const arcVec3 rvGravityArea_SurfaceNormal::GetGravity( const arcVec3& origin, co
 rvGravityArea_SurfaceNormal::GetGravity
 ================
 */
-const arcVec3 rvGravityArea_SurfaceNormal::GetGravity( const idEntity* ent ) const {
+const anVec3 rvGravityArea_SurfaceNormal::GetGravity( const anEntity* ent ) const {
 	return GetGravity( ent->GetPhysics() );
 }
 
@@ -3089,7 +3089,7 @@ const arcVec3 rvGravityArea_SurfaceNormal::GetGravity( const idEntity* ent ) con
 rvGravityArea_SurfaceNormal::GetGravity
 ================
 */
-const arcVec3 rvGravityArea_SurfaceNormal::GetGravity( const rvClientEntity* ent ) const {
+const anVec3 rvGravityArea_SurfaceNormal::GetGravity( const rvClientEntity* ent ) const {
 	return GetGravity( ent->GetPhysics() );
 }
 
@@ -3098,10 +3098,10 @@ const arcVec3 rvGravityArea_SurfaceNormal::GetGravity( const rvClientEntity* ent
 rvGravityArea_SurfaceNormal::GetGravity
 ================
 */
-const arcVec3 rvGravityArea_SurfaceNormal::GetGravity( const idPhysics* physics ) const {
+const anVec3 rvGravityArea_SurfaceNormal::GetGravity( const anPhysics* physics ) const {
 	return GetGravity( physics->GetOrigin(), physics->GetAxis(), physics->GetClipMask(), physics->GetSelf() );
 }
-// RAVEN END
+
 
 
 /*
@@ -3112,7 +3112,7 @@ idLocationEntity
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idLocationEntity )
+CLASS_DECLARATION( anEntity, idLocationEntity )
 END_CLASS
 
 /*
@@ -3121,7 +3121,7 @@ idLocationEntity::Spawn
 ======================
 */
 void idLocationEntity::Spawn() {
-	idStr realName;
+	anString realName;
 
 	// this just holds dict information
 
@@ -3148,7 +3148,7 @@ const char *idLocationEntity::GetLocation( void ) const {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idBeam )
+CLASS_DECLARATION( anEntity, idBeam )
 	EVENT( EV_PostSpawn,			idBeam::Event_MatchTarget )
 	EVENT( EV_Activate,				idBeam::Event_Activate )
 END_CLASS
@@ -3159,8 +3159,8 @@ idBeam::idBeam
 ===============
 */
 idBeam::idBeam() {
-	target = NULL;
-	master = NULL;
+	target = nullptr;
+	master = nullptr;
 }
 
 /*
@@ -3168,7 +3168,7 @@ idBeam::idBeam() {
 idBeam::Save
 ===============
 */
-void idBeam::Save( idSaveGame *savefile ) const {
+void idBeam::Save( anSaveGame *savefile ) const {
 	target.Save( savefile );
 	master.Save( savefile );
 }
@@ -3178,7 +3178,7 @@ void idBeam::Save( idSaveGame *savefile ) const {
 idBeam::Restore
 ===============
 */
-void idBeam::Restore( idRestoreGame *savefile ) {
+void idBeam::Restore( anRestoreGame *savefile ) {
 	target.Restore( savefile );
 	master.Restore( savefile );
 }
@@ -3217,7 +3217,7 @@ void idBeam::Think( void ) {
 
 	masterEnt = master.GetEntity();
 	if ( masterEnt ) {
-		const arcVec3 &origin = GetPhysics()->GetOrigin();
+		const anVec3 &origin = GetPhysics()->GetOrigin();
 		masterEnt->SetBeamTarget( origin );
 	}
 	Present();
@@ -3236,7 +3236,7 @@ void idBeam::SetMaster( idBeam *masterbeam ) {
 idBeam::SetBeamTarget
 ================
 */
-void idBeam::SetBeamTarget( const arcVec3 &origin ) {
+void idBeam::SetBeamTarget( const anVec3 &origin ) {
 	if ( ( renderEntity.shaderParms[ SHADERPARM_BEAM_END_X ] != origin.x ) || ( renderEntity.shaderParms[ SHADERPARM_BEAM_END_Y ] != origin.y ) || ( renderEntity.shaderParms[ SHADERPARM_BEAM_END_Z ] != origin.z ) ) {
 		renderEntity.shaderParms[ SHADERPARM_BEAM_END_X ] = origin.x;
 		renderEntity.shaderParms[ SHADERPARM_BEAM_END_Y ] = origin.y;
@@ -3253,11 +3253,11 @@ idBeam::Show
 void idBeam::Show( void ) {
 	idBeam *targetEnt;
 
-	idEntity::Show();
+	anEntity::Show();
 
 	targetEnt = target.GetEntity();
 	if ( targetEnt ) {
-		const arcVec3 &origin = targetEnt->GetPhysics()->GetOrigin();
+		const anVec3 &origin = targetEnt->GetPhysics()->GetOrigin();
 		SetBeamTarget( origin );
 	}
 }
@@ -3269,16 +3269,16 @@ idBeam::Event_MatchTarget
 */
 void idBeam::Event_MatchTarget( void ) {
 	int i;
-	idEntity *targetEnt;
+	anEntity *targetEnt;
 	idBeam *targetBeam;
 
 	if ( !targets.Num() ) {
 		return;
 	}
 
-	targetBeam = NULL;
-	for( i = 0; i < targets.Num(); i++ ) {
-		targetEnt = targets[ i ].GetEntity();
+	targetBeam = nullptr;
+	for ( i = 0; i < targets.Num(); i++ ) {
+		targetEnt = targets[i].GetEntity();
 		if ( targetEnt && targetEnt->IsType( idBeam::Type ) ) {
 			targetBeam = static_cast<idBeam *>( targetEnt );
 			break;
@@ -3301,7 +3301,7 @@ void idBeam::Event_MatchTarget( void ) {
 idBeam::Event_Activate
 ================
 */
-void idBeam::Event_Activate( idEntity *activator ) {
+void idBeam::Event_Activate( anEntity *activator ) {
 	if ( IsHidden() ) {
 		Show();
 	} else {
@@ -3314,7 +3314,7 @@ void idBeam::Event_Activate( idEntity *activator ) {
 idBeam::WriteToSnapshot
 ================
 */
-void idBeam::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void idBeam::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	GetPhysics()->WriteToSnapshot( msg );
 	WriteBindToSnapshot( msg );
 	WriteColorToSnapshot( msg );
@@ -3328,7 +3328,7 @@ void idBeam::WriteToSnapshot( idBitMsgDelta &msg ) const {
 idBeam::ReadFromSnapshot
 ================
 */
-void idBeam::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void idBeam::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	GetPhysics()->ReadFromSnapshot( msg );
 	ReadBindFromSnapshot( msg );
 	ReadColorFromSnapshot( msg );
@@ -3349,7 +3349,7 @@ void idBeam::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idLiquid )
+CLASS_DECLARATION( anEntity, idLiquid )
 	EVENT( EV_Touch,			idLiquid::Event_Touch )
 END_CLASS
 
@@ -3358,7 +3358,7 @@ END_CLASS
 idLiquid::Save
 ================
 */
-void idLiquid::Save( idSaveGame *savefile ) const {
+void idLiquid::Save( anSaveGame *savefile ) const {
 	// Nothing to save
 	// cnicholson: It says nothing to save here, no mention of *model
 }
@@ -3368,7 +3368,7 @@ void idLiquid::Save( idSaveGame *savefile ) const {
 idLiquid::Restore
 ================
 */
-void idLiquid::Restore( idRestoreGame *savefile ) {
+void idLiquid::Restore( anRestoreGame *savefile ) {
 	//FIXME: NO!
 	Spawn();
 }
@@ -3385,7 +3385,7 @@ void idLiquid::Spawn() {
 		gameLocal.Error( "Entity '%s' must have liquid model", name.c_str() );
 	}
 	model->Reset();
-	GetPhysics()->SetContents( CONTENTS_TRIGGER );
+	GetPhysics()->SetContents( CONTENTS_TRIGGER_SEAS );
 */
 }
 
@@ -3394,10 +3394,10 @@ void idLiquid::Spawn() {
 idLiquid::Event_Touch
 ================
 */
-void idLiquid::Event_Touch( idEntity *other, trace_t *trace ) {
+void idLiquid::Event_Touch( anEntity *other, trace_t *trace ) {
 	// FIXME: for QuakeCon
 /*
-	arcVec3 pos;
+	anVec3 pos;
 
 	pos = other->GetPhysics()->GetOrigin() - GetPhysics()->GetOrigin();
 	model->IntersectBounds( other->GetPhysics()->GetBounds().Translate( pos ), -10.0f );
@@ -3413,7 +3413,7 @@ void idLiquid::Event_Touch( idEntity *other, trace_t *trace ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idShaking )
+CLASS_DECLARATION( anEntity, idShaking )
 	EVENT( EV_Activate,				idShaking::Event_Activate )
 END_CLASS
 
@@ -3428,7 +3428,7 @@ idShaking::idShaking() {
 
 
 idShaking::~idShaking() {
-	SetPhysics( NULL );
+	SetPhysics( nullptr );
 }
 
 /*
@@ -3436,7 +3436,7 @@ idShaking::~idShaking() {
 idShaking::Save
 ===============
 */
-void idShaking::Save( idSaveGame *savefile ) const {
+void idShaking::Save( anSaveGame *savefile ) const {
 	savefile->WriteBool( active );
 	savefile->WriteStaticObject( physicsObj );
 }
@@ -3446,7 +3446,7 @@ void idShaking::Save( idSaveGame *savefile ) const {
 idShaking::Restore
 ===============
 */
-void idShaking::Restore( idRestoreGame *savefile ) {
+void idShaking::Restore( anRestoreGame *savefile ) {
 	savefile->ReadBool( active );
 	savefile->ReadStaticObject( physicsObj );
 	RestorePhysics( &physicsObj );
@@ -3459,15 +3459,15 @@ idShaking::Spawn
 */
 void idShaking::Spawn( void ) {
 	physicsObj.SetSelf( this );
-// RAVEN BEGIN
+
 // mwhitlock: Dynamic memory consolidation
-	RV_PUSH_HEAP_MEM(this);
-// RAVEN END
-	physicsObj.SetClipModel( new idClipModel( GetPhysics()->GetClipModel() ), 1.0f );
-// RAVEN BEGIN
+	PUSH_HEAP_MEM(this);
+
+	physicsObj.SetClipModel( new anClipModel( GetPhysics()->GetClipModel() ), 1.0f );
+
 // mwhitlock: Dynamic memory consolidation
-	RV_POP_HEAP();
-// RAVEN END
+	POP_HEAP();
+
 	physicsObj.SetOrigin( GetPhysics()->GetOrigin() );
 	physicsObj.SetAxis( GetPhysics()->GetAxis() );
 	physicsObj.SetClipMask( MASK_SOLID );
@@ -3486,7 +3486,7 @@ idShaking::BeginShaking
 */
 void idShaking::BeginShaking( void ) {
 	int			phase;
-	idAngles	shake;
+	anAngles	shake;
 	int			period;
 
 	active = true;
@@ -3501,7 +3501,7 @@ void idShaking::BeginShaking( void ) {
 idShaking::Event_Activate
 ================
 */
-void idShaking::Event_Activate( idEntity *activator ) {
+void idShaking::Event_Activate( anEntity *activator ) {
 	if ( !active ) {
 		BeginShaking();
 	} else {
@@ -3517,9 +3517,9 @@ void idShaking::Event_Activate( idEntity *activator ) {
 
 ===============================================================================
 */
-idCVar g_earthquake( "g_earthquake", "1", 0, "controls earthquake effect" );
+anCVar g_earthquake( "g_earthquake", "1", 0, "controls earthquake effect" );
 
-CLASS_DECLARATION( idEntity, idEarthQuake )
+CLASS_DECLARATION( anEntity, idEarthQuake )
 	EVENT( EV_Activate,				idEarthQuake::Event_Activate )
 END_CLASS
 
@@ -3544,7 +3544,7 @@ idEarthQuake::idEarthQuake() {
 idEarthQuake::Save
 ===============
 */
-void idEarthQuake::Save( idSaveGame *savefile ) const {
+void idEarthQuake::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( nextTriggerTime );
 	savefile->WriteInt( shakeStopTime );
 	savefile->WriteFloat( wait );
@@ -3560,7 +3560,7 @@ void idEarthQuake::Save( idSaveGame *savefile ) const {
 idEarthQuake::Restore
 ===============
 */
-void idEarthQuake::Restore( idRestoreGame *savefile ) {
+void idEarthQuake::Restore( anRestoreGame *savefile ) {
 	savefile->ReadInt( nextTriggerTime );
 	savefile->ReadInt( shakeStopTime );
 	savefile->ReadFloat( wait );
@@ -3601,7 +3601,7 @@ void idEarthQuake::Spawn( void ) {
 idEarthQuake::Event_Activate
 ================
 */
-void idEarthQuake::Event_Activate( idEntity *activator ) {
+void idEarthQuake::Event_Activate( anEntity *activator ) {
 
 	if ( nextTriggerTime > gameLocal.time ) {
 		return;
@@ -3611,8 +3611,8 @@ void idEarthQuake::Event_Activate( idEntity *activator ) {
 		return;
 	}
 
-	idPlayer *player = gameLocal.GetLocalPlayer();
-	if ( player == NULL ) {
+	anBasePlayer *player = gameLocal.GetLocalPlayer();
+	if ( player == nullptr ) {
 		return;
 	}
 
@@ -3632,15 +3632,15 @@ void idEarthQuake::Event_Activate( idEntity *activator ) {
 
 	const idSoundShader *shader = declManager->FindSound( spawnArgs.GetString( "snd_quake" ) );
 	if ( playerOriented ) {
-		player->StartSoundShader( shader, SND_CHANNEL_ANY, SSF_GLOBAL, false, NULL );
+		player->StartSoundShader( shader, SND_CHANNEL_ANY, SSF_GLOBAL, false, nullptr );
 	} else {
-		StartSoundShader( shader, SND_CHANNEL_ANY, SSF_GLOBAL, false, NULL );
+		StartSoundShader( shader, SND_CHANNEL_ANY, SSF_GLOBAL, false, nullptr );
 	}
 
-// RAVEN BEGIN
+
 // kfuller: look for fx entities and the like that may want to be triggered when a mortar round (aka earthquake) goes off
-	AffectNearbyEntities(spawnArgs.GetFloat("affectEntities", "0"));
-// RAVEN END
+	AffectNearbyEntities( spawnArgs.GetFloat( "affectEntities", "0" ) );
+
 
 	if ( shakeTime > 0.0f ) {
 		shakeStopTime = gameLocal.time + SEC2MS( shakeTime );
@@ -3658,11 +3658,11 @@ void idEarthQuake::Event_Activate( idEntity *activator ) {
 	}
 }
 
-// RAVEN BEGIN
+
 // kfuller: look for fx entities and the like that may want to be triggered when a mortar round, earthquake, etc goes off
 void idEarthQuake::AffectNearbyEntities(float affectRadius)
 {
-	if( !g_earthquake.GetBool() )
+	if ( !g_earthquake.GetBool() )
 	{
 		return;
 	}
@@ -3671,36 +3671,36 @@ void idEarthQuake::AffectNearbyEntities(float affectRadius)
 	{
 		return;
 	}
-	arcVec3		affectOrigin(GetPhysics()->GetOrigin());
+	anVec3		affectOrigin(GetPhysics()->GetOrigin());
 
 	if (playerOriented)
 	{
-		idPlayer *player = gameLocal.GetLocalPlayer();
-		if ( player == NULL )
+		anBasePlayer *player = gameLocal.GetLocalPlayer();
+		if ( player == nullptr )
 		{
 			return;
 		}
 		affectOrigin = player->GetPhysics()->GetOrigin();
 	}
 
-	idEntity *	entityList[ MAX_GENTITIES ];
+	anEntity *	entityList[ MAX_GENTITIES ];
 	int			numListedEntities = 0;
-	idEntity	*curEnt = NULL;
-	bool		requiresLOS = spawnArgs.GetBool("requiresLOS", "false");
+	anEntity	*curEnt = nullptr;
+	bool		requiresLOS = spawnArgs.GetBool( "requiresLOS", "false" );
 
 	// get all entities touching the bounds
 	numListedEntities = gameLocal.EntitiesWithinRadius(affectOrigin, affectRadius, entityList, MAX_GENTITIES );
-	for (int i = 0; i < numListedEntities; i++)
+	for ( int i = 0; i < numListedEntities; i++ )
 	{
 		// only affect certain entities. first check if they have the "quakeChance" key/value, then send them an earthquake event
 		curEnt = entityList[i];
-		if (curEnt && curEnt->spawnArgs.GetFloat("quakeChance"))
+		if (curEnt && curEnt->spawnArgs.GetFloat( "quakeChance" ) )
 		{
-			curEnt->PostEventMS(&EV_Earthquake, 0, (float)requiresLOS);
+			curEnt->PostEventMS(&EV_Earthquake, 0, ( float )requiresLOS);
 		}
 	}
 }
-// RAVEN END
+
 
 /*
 ===============
@@ -3730,7 +3730,7 @@ void idEarthQuake::Think( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idFuncPortal )
+CLASS_DECLARATION( anEntity, idFuncPortal )
 	EVENT( EV_Activate,				idFuncPortal::Event_Activate )
 END_CLASS
 
@@ -3749,7 +3749,7 @@ idFuncPortal::idFuncPortal() {
 idFuncPortal::Save
 ===============
 */
-void idFuncPortal::Save( idSaveGame *savefile ) const {
+void idFuncPortal::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( (int)portal );
 	savefile->WriteBool( state );
 }
@@ -3759,8 +3759,8 @@ void idFuncPortal::Save( idSaveGame *savefile ) const {
 idFuncPortal::Restore
 ===============
 */
-void idFuncPortal::Restore( idRestoreGame *savefile ) {
-	savefile->ReadInt( (int &)portal );
+void idFuncPortal::Restore( anRestoreGame *savefile ) {
+	savefile->ReadInt( ( int&)portal );
 	savefile->ReadBool( state );
 	gameLocal.SetPortalState( portal, state ? PS_BLOCK_ALL : PS_BLOCK_NONE );
 }
@@ -3783,7 +3783,7 @@ void idFuncPortal::Spawn( void ) {
 idFuncPortal::Event_Activate
 ================
 */
-void idFuncPortal::Event_Activate( idEntity *activator ) {
+void idFuncPortal::Event_Activate( anEntity *activator ) {
 	if ( portal > 0 ) {
 		state = !state;
 		gameLocal.SetPortalState( portal, state ? PS_BLOCK_ALL : PS_BLOCK_NONE );
@@ -3798,7 +3798,7 @@ void idFuncPortal::Event_Activate( idEntity *activator ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idFuncAASPortal )
+CLASS_DECLARATION( anEntity, idFuncAASPortal )
 	EVENT( EV_Activate,				idFuncAASPortal::Event_Activate )
 END_CLASS
 
@@ -3816,7 +3816,7 @@ idFuncAASPortal::idFuncAASPortal() {
 idFuncAASPortal::Save
 ===============
 */
-void idFuncAASPortal::Save( idSaveGame *savefile ) const {
+void idFuncAASPortal::Save( anSaveGame *savefile ) const {
 	savefile->WriteBool( state );
 }
 
@@ -3825,7 +3825,7 @@ void idFuncAASPortal::Save( idSaveGame *savefile ) const {
 idFuncAASPortal::Restore
 ===============
 */
-void idFuncAASPortal::Restore( idRestoreGame *savefile ) {
+void idFuncAASPortal::Restore( anRestoreGame *savefile ) {
 	savefile->ReadBool( state );
 	gameLocal.SetAASAreaState( GetPhysics()->GetAbsBounds(), AREACONTENTS_CLUSTERPORTAL, state );
 }
@@ -3845,7 +3845,7 @@ void idFuncAASPortal::Spawn( void ) {
 idFuncAASPortal::Event_Activate
 ================
 */
-void idFuncAASPortal::Event_Activate( idEntity *activator ) {
+void idFuncAASPortal::Event_Activate( anEntity *activator ) {
 	state ^= 1;
 	gameLocal.SetAASAreaState( GetPhysics()->GetAbsBounds(), AREACONTENTS_CLUSTERPORTAL, state );
 }
@@ -3858,7 +3858,7 @@ void idFuncAASPortal::Event_Activate( idEntity *activator ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idFuncAASObstacle )
+CLASS_DECLARATION( anEntity, idFuncAASObstacle )
 	EVENT( EV_Activate,				idFuncAASObstacle::Event_Activate )
 END_CLASS
 
@@ -3876,7 +3876,7 @@ idFuncAASObstacle::idFuncAASObstacle() {
 idFuncAASObstacle::Save
 ===============
 */
-void idFuncAASObstacle::Save( idSaveGame *savefile ) const {
+void idFuncAASObstacle::Save( anSaveGame *savefile ) const {
 	savefile->WriteBool( state );
 }
 
@@ -3885,7 +3885,7 @@ void idFuncAASObstacle::Save( idSaveGame *savefile ) const {
 idFuncAASObstacle::Restore
 ===============
 */
-void idFuncAASObstacle::Restore( idRestoreGame *savefile ) {
+void idFuncAASObstacle::Restore( anRestoreGame *savefile ) {
 	savefile->ReadBool( state );
 	gameLocal.SetAASAreaState( GetPhysics()->GetAbsBounds(), AREACONTENTS_OBSTACLE, state );
 }
@@ -3905,7 +3905,7 @@ void idFuncAASObstacle::Spawn( void ) {
 idFuncAASObstacle::Event_Activate
 ================
 */
-void idFuncAASObstacle::Event_Activate( idEntity *activator ) {
+void idFuncAASObstacle::Event_Activate( anEntity *activator ) {
 	state ^= 1;
 	gameLocal.SetAASAreaState( GetPhysics()->GetAbsBounds(), AREACONTENTS_OBSTACLE, state );
 }
@@ -3928,10 +3928,10 @@ idFuncRadioChatter
 ===============================================================================
 */
 
-const idEventDef EV_ResetRadioHud( "<resetradiohud>", "e" );
-idEntityPtr<idFuncRadioChatter> idFuncRadioChatter::lastRadioChatter = 0;
+const anEventDef EV_ResetRadioHud( "<resetradiohud>", "e" );
+anEntityPtr<idFuncRadioChatter> idFuncRadioChatter::lastRadioChatter = 0;
 
-CLASS_DECLARATION( idEntity, idFuncRadioChatter )
+CLASS_DECLARATION( anEntity, idFuncRadioChatter )
 EVENT( EV_Activate,				idFuncRadioChatter::Event_Activate )
 EVENT( EV_ResetRadioHud,		idFuncRadioChatter::Event_ResetRadioHud )
 EVENT( EV_IsActive,				idFuncRadioChatter::Event_IsActive )
@@ -3952,7 +3952,7 @@ idFuncRadioChatter::idFuncRadioChatter() {
 idFuncRadioChatter::Save
 ===============
 */
-void idFuncRadioChatter::Save( idSaveGame *savefile ) const {
+void idFuncRadioChatter::Save( anSaveGame *savefile ) const {
 	savefile->WriteFloat( time );
 	savefile->WriteBool( isActive ); // cnicholson: Added unsaved var
 	lastRadioChatter.Save ( savefile );
@@ -3963,9 +3963,9 @@ void idFuncRadioChatter::Save( idSaveGame *savefile ) const {
 idFuncRadioChatter::Restore
 ===============
 */
-void idFuncRadioChatter::Restore( idRestoreGame *savefile ) {
+void idFuncRadioChatter::Restore( anRestoreGame *savefile ) {
 	savefile->ReadFloat( time );
-	savefile->ReadBool( isActive ); // cnicholson: Added unrestored var
+	savefile->ReadBool( isActive );
 	lastRadioChatter.Restore ( savefile );
 }
 
@@ -3983,8 +3983,8 @@ void idFuncRadioChatter::Spawn( void ) {
 idFuncRadioChatter::Event_Activate
 ================
 */
-void idFuncRadioChatter::Event_Activate( idEntity *activator ) {
-	idPlayer *player;
+void idFuncRadioChatter::Event_Activate( anEntity *activator ) {
+	anBasePlayer *player;
 	const char	*sound;
 	const idSoundShader *shader;
 	int length;
@@ -3992,21 +3992,21 @@ void idFuncRadioChatter::Event_Activate( idEntity *activator ) {
 
 	lastRadioChatter = this;
 
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-	if ( activator && activator->IsType( idPlayer::GetClassType() ) ) {
-// RAVEN END
-		player = static_cast<idPlayer *>( activator );
+
+
+	if ( activator && activator->IsType( anBasePlayer::GetClassType() ) ) {
+
+		player = static_cast<anBasePlayer *>( activator );
 	} else {
 		player = gameLocal.GetLocalPlayer();
 	}
 
-// RAVEN BEGIN
+
 // bdube: replaced named event with method
 	player->StartRadioChatter();
 // twhitaker: for isActive() script event
 	isActive = true;
-// RAVEN END
+
 
 	sound = spawnArgs.GetString( "snd_radiochatter", "" );
 	if ( sound && *sound ) {
@@ -4032,17 +4032,17 @@ void idFuncRadioChatter::Event_Activate( idEntity *activator ) {
 idFuncRadioChatter::Event_ResetRadioHud
 ================
 */
-void idFuncRadioChatter::Event_ResetRadioHud( idEntity *activator ) {
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-	idPlayer *player = ( activator->IsType( idPlayer::GetClassType() ) ) ? static_cast<idPlayer *>( activator ) : gameLocal.GetLocalPlayer();
-// RAVEN END
-// RAVEN BEGIN
+void idFuncRadioChatter::Event_ResetRadioHud( anEntity *activator ) {
+
+
+	anBasePlayer *player = ( activator->IsType( anBasePlayer::GetClassType() ) ) ? static_cast<anBasePlayer *>( activator ) : gameLocal.GetLocalPlayer();
+
+
 // bdube: replaced named event with method
 	player->StopRadioChatter();
 // twhitaker: for isActive() script event
 	isActive = false;
-// RAVEN END
+
 	ActivateTargets( activator );
 }
 
@@ -4052,7 +4052,7 @@ idFuncRadioChatter::Event_ResetRadioHud
 ================
 */
 void idFuncRadioChatter::Event_IsActive( void ) {
-	idThread::ReturnFloat( static_cast< float >( isActive ) );
+	anThread::ReturnFloat( static_cast< float >( isActive ) );
 }
 
 /*
@@ -4074,7 +4074,7 @@ void idFuncRadioChatter::RepeatLast( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idPhantomObjects )
+CLASS_DECLARATION( anEntity, idPhantomObjects )
 	EVENT( EV_Activate,				idPhantomObjects::Event_Activate )
 END_CLASS
 
@@ -4084,7 +4084,7 @@ idPhantomObjects::idPhantomObjects
 ===============
 */
 idPhantomObjects::idPhantomObjects() {
-	target			= NULL;
+	target			= nullptr;
 	end_time		= 0;
 	throw_time 		= 0.0f;
 	shake_time 		= 0.0f;
@@ -4100,7 +4100,7 @@ idPhantomObjects::idPhantomObjects() {
 idPhantomObjects::Save
 ===============
 */
-void idPhantomObjects::Save( idSaveGame *savefile ) const {
+void idPhantomObjects::Save( anSaveGame *savefile ) const {
 	int i;
 
 	savefile->WriteInt( end_time );
@@ -4112,12 +4112,12 @@ void idPhantomObjects::Save( idSaveGame *savefile ) const {
 	savefile->WriteInt( max_wait );
 	target.Save( savefile );
 	savefile->WriteInt( targetTime.Num() );
-	for( i = 0; i < targetTime.Num(); i++ ) {
-		savefile->WriteInt( targetTime[ i ] );
+	for ( i = 0; i < targetTime.Num(); i++ ) {
+		savefile->WriteInt( targetTime[i] );
 	}
 
-	for( i = 0; i < lastTargetPos.Num(); i++ ) {
-		savefile->WriteVec3( lastTargetPos[ i ] );
+	for ( i = 0; i < lastTargetPos.Num(); i++ ) {
+		savefile->WriteVec3( lastTargetPos[i] );
 	}
 }
 
@@ -4126,7 +4126,7 @@ void idPhantomObjects::Save( idSaveGame *savefile ) const {
 idPhantomObjects::Restore
 ===============
 */
-void idPhantomObjects::Restore( idRestoreGame *savefile ) {
+void idPhantomObjects::Restore( anRestoreGame *savefile ) {
 	int num;
 	int i;
 
@@ -4145,18 +4145,18 @@ void idPhantomObjects::Restore( idRestoreGame *savefile ) {
 	lastTargetPos.SetGranularity( 1 );
 	lastTargetPos.SetNum( num );
 
-	for( i = 0; i < num; i++ ) {
-		savefile->ReadInt( targetTime[ i ] );
+	for ( i = 0; i < num; i++ ) {
+		savefile->ReadInt( targetTime[i] );
 	}
 
 	if ( savefile->GetBuildNumber() == INITIAL_RELEASE_BUILD_NUMBER ) {
 		// these weren't saved out in the first release
-		for( i = 0; i < num; i++ ) {
-			lastTargetPos[ i ].Zero();
+		for ( i = 0; i < num; i++ ) {
+			lastTargetPos[i].Zero();
 		}
 	} else {
-		for( i = 0; i < num; i++ ) {
-			savefile->ReadVec3( lastTargetPos[ i ] );
+		for ( i = 0; i < num; i++ ) {
+			savefile->ReadVec3( lastTargetPos[i] );
 		}
 	}
 }
@@ -4187,7 +4187,7 @@ void idPhantomObjects::Spawn( void ) {
 idPhantomObjects::Event_Activate
 ================
 */
-void idPhantomObjects::Event_Activate( idEntity *activator ) {
+void idPhantomObjects::Event_Activate( anEntity *activator ) {
 	int i;
 	float time;
 	float frac;
@@ -4203,13 +4203,13 @@ void idPhantomObjects::Event_Activate( idEntity *activator ) {
 		return;
 	}
 
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-	if ( !activator || !activator->IsType( idActor::GetClassType() ) ) {
-// RAVEN END
+
+
+	if ( !activator || !activator->IsType( anActor::GetClassType() ) ) {
+
 		target = gameLocal.GetLocalPlayer();
 	} else {
-		target = static_cast<idActor *>( activator );
+		target = static_cast<anActor *>( activator );
 	}
 
 	end_time = gameLocal.time + SEC2MS( spawnArgs.GetFloat( "end_time", "0" ) );
@@ -4217,13 +4217,13 @@ void idPhantomObjects::Event_Activate( idEntity *activator ) {
 	targetTime.SetNum( targets.Num() );
 	lastTargetPos.SetNum( targets.Num() );
 
-	const arcVec3 &toPos = target.GetEntity()->GetEyePosition();
+	const anVec3 &toPos = target.GetEntity()->GetEyePosition();
 
     // calculate the relative times of all the objects
 	time = 0.0f;
-	for( i = 0; i < targetTime.Num(); i++ ) {
-		targetTime[ i ] = SEC2MS( time );
-		lastTargetPos[ i ] = toPos;
+	for ( i = 0; i < targetTime.Num(); i++ ) {
+		targetTime[i] = SEC2MS( time );
+		lastTargetPos[i] = toPos;
 
 		frac = 1.0f - ( float )i / ( float )targetTime.Num();
 		time += ( gameLocal.random.RandomFloat() + 1.0f ) * 0.5f * frac + 0.1f;
@@ -4231,8 +4231,8 @@ void idPhantomObjects::Event_Activate( idEntity *activator ) {
 
 	// scale up the times to fit within throw_time
 	scale = throw_time / time;
-	for( i = 0; i < targetTime.Num(); i++ ) {
-		targetTime[ i ] = gameLocal.time + SEC2MS( shake_time )+ targetTime[ i ] * scale;
+	for ( i = 0; i < targetTime.Num(); i++ ) {
+		targetTime[i] = gameLocal.time + SEC2MS( shake_time )+ targetTime[i] * scale;
 	}
 
 	BecomeActive( TH_THINK );
@@ -4247,11 +4247,11 @@ void idPhantomObjects::Think( void ) {
 	int			i;
 	int			num;
 	float		time;
-	arcVec3		vel;
-	arcVec3		ang;
-	idEntity	*ent;
-	idActor		*targetEnt;
-	idPhysics	*entPhys;
+	anVec3		vel;
+	anVec3		ang;
+	anEntity	*ent;
+	anActor		*targetEnt;
+	anPhysics	*entPhys;
 	trace_t		tr;
 
 	// if we are completely closed off from the player, don't do anything at all
@@ -4269,11 +4269,11 @@ void idPhantomObjects::Think( void ) {
 		BecomeInactive( TH_THINK );
 	}
 
-	const arcVec3 &toPos = targetEnt->GetEyePosition();
+	const anVec3 &toPos = targetEnt->GetEyePosition();
 
 	num = 0;
 	for ( i = 0; i < targets.Num(); i++ ) {
-		ent = targets[ i ].GetEntity();
+		ent = targets[i].GetEntity();
 		if ( !ent ) {
 			continue;
 		}
@@ -4283,43 +4283,43 @@ void idPhantomObjects::Think( void ) {
 			continue;
 		}
 
-		if ( !targetTime[ i ] ) {
+		if ( !targetTime[i] ) {
 			// already threw this object
 			continue;
 		}
 
 		num++;
 
-		time = MS2SEC( targetTime[ i ] - gameLocal.time );
+		time = MS2SEC( targetTime[i] - gameLocal.time );
 		if ( time > shake_time ) {
 			continue;
 		}
 
 		entPhys = ent->GetPhysics();
-		const arcVec3 &entOrg = entPhys->GetOrigin();
+		const anVec3 &entOrg = entPhys->GetOrigin();
 
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.TracePoint( this, tr, entOrg, toPos, MASK_OPAQUE, ent );
-// RAVEN END
+
 		if ( tr.fraction >= 1.0f || ( gameLocal.GetTraceEntity( tr ) == targetEnt ) ) {
-			lastTargetPos[ i ] = toPos;
+			lastTargetPos[i] = toPos;
 		}
 
 		if ( time < 0.0f ) {
-			idAI::PredictTrajectory( entPhys->GetOrigin(), lastTargetPos[ i ], speed, entPhys->GetGravity(),
+			anSAAI::PredictTrajectory( entPhys->GetOrigin(), lastTargetPos[i], speed, entPhys->GetGravity(),
 				entPhys->GetClipModel(), entPhys->GetClipMask(), 256.0f, ent, targetEnt, ai_debugTrajectory.GetBool() ? 1 : 0, vel );
 			vel *= speed;
 			entPhys->SetLinearVelocity( vel );
 			if ( !end_time ) {
-				targetTime[ i ] = 0;
+				targetTime[i] = 0;
 			} else {
-				targetTime[ i ] = gameLocal.time + gameLocal.random.RandomInt( max_wait - min_wait ) + min_wait;
+				targetTime[i] = gameLocal.time + gameLocal.random.RandomInt( max_wait - min_wait ) + min_wait;
 			}
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
+
+
 			if ( ent->IsType( idMoveable::GetClassType() ) ) {
-// RAVEN END
+
 				idMoveable *ment = static_cast<idMoveable*>( ent );
 				ment->EnableDamage( true, 2.5f );
 			}
@@ -4336,7 +4336,7 @@ void idPhantomObjects::Think( void ) {
 	}
 }
 
-// RAVEN BEGIN
+
 // bdube: jump points
 
 /*
@@ -4347,7 +4347,7 @@ rvDebugJumpPoint
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, rvDebugJumpPoint )
+CLASS_DECLARATION( anEntity, rvDebugJumpPoint )
 END_CLASS
 
 /*
@@ -4357,7 +4357,7 @@ rvDebugJumpPoint::Spawn
 */
 void rvDebugJumpPoint::Spawn() {
 	// Add the jump point
-	gameDebug.JumpAdd ( name, GetPhysics()->GetOrigin(), GetPhysics()->GetAxis().ToAngles ( ) );
+	gameDebug.JumpAdd ( name, GetPhysics()->GetOrigin(), GetPhysics()->GetAxis().ToAngles() );
 
 	// Dont need the entity any more
 	PostEventMS( &EV_Remove, 0 );
@@ -4372,7 +4372,7 @@ rvFuncSaveGame
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, rvFuncSaveGame )
+CLASS_DECLARATION( anEntity, rvFuncSaveGame )
 	EVENT( EV_Activate,		rvFuncSaveGame::Event_Activate )
 END_CLASS
 
@@ -4380,7 +4380,7 @@ void rvFuncSaveGame::Spawn( void ) {
 
 }
 
-void rvFuncSaveGame::Event_Activate( idEntity *activator ) {
+void rvFuncSaveGame::Event_Activate( anEntity *activator ) {
 	// TODO: Xenon - request the player to save the game.
 	cmdSystem->BufferCommandText( CMD_EXEC_APPEND, "saveGame checkPoint" );
 }

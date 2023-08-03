@@ -6,7 +6,7 @@
  * Include file for users of JPEG library.
  * You will need to have included system headers that define at least
  * the typedefs FILE and size_t before you can include jpeglib.h.
- * (stdio.h is sufficient on ANSI-conforming systems.)
+ * ( stdio.h is sufficient on ANSI-conforming systems.)
  * You may also wish to include "jerror.h".
  */
 
@@ -24,7 +24,7 @@ int LoadJPG( const char *filename, unsigned char **pic, int *width, int *height 
    */
   /* This struct represents a JPEG error handler.  It is declared separately
    * because applications often want to supply a specialized error handler
-   * (see the second half of this file for an example).  But here we just
+   * ( see the second half of this file for an example).  But here we just
    * take the easy way out and use the standard error handler, which will
    * print a message on stderr and call exit() if compression fails.
    * Note that this struct must live as long as the main JPEG parameter
@@ -101,7 +101,7 @@ int LoadJPG( const char *filename, unsigned char **pic, int *width, int *height 
   *width = cinfo.output_width;
   *height = cinfo.output_height;
 
-  /* Step 6: while (scan lines remain to be read) */
+  /* Step 6: while ( scan lines remain to be read) */
   /*           jpeg_read_scanlines(...); */
 
   /* Here we use the library's state variable cinfo.output_scanline as the

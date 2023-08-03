@@ -15,7 +15,7 @@ class CDialogTextures : public CDialog {
 public:
 	enum { NONE, TEXTURES, MATERIALS, MODELS, SCRIPTS, SOUNDS, SOUNDPARENT, GUIS, PARTICLES, FX,NUMIDS };
 	static const char *TypeNames[NUMIDS];
-	CDialogTextures(CWnd* pParent = NULL);   // standard constructor
+	CDialogTextures(CWnd* pParent = nullptr );   // standard constructor
 	void OnCancel();
 	void CollapseEditor();
 	void SelectCurrentItem(bool collapse, const char *name, int id);
@@ -33,10 +33,10 @@ public:
 	idGLDrawable m_testDrawable;
 	idGLDrawableMaterial m_drawMaterial;
 	idGLDrawableModel m_drawModel;
-	const arcMaterial *editMaterial;
-	arcNetString editGui;
-	arcNetString currentFile;
-	arcNetString mediaName;
+	const anMaterial *editMaterial;
+	anString editGui;
+	anString currentFile;
+	anString mediaName;
 	bool setTexture;
 	bool ignoreCollapse;
 	int mode;
@@ -51,7 +51,7 @@ public:
 
 // Implementation
 protected:
-	void addStrList(const char *root, const arcStringList &list, int id);
+	void addStrList(const char *root, const anStringList &list, int id);
 	void addScripts(bool rootItems);
 	void addModels(bool rootItems);
 	void addMaterials(bool rootItems);
@@ -61,7 +61,7 @@ protected:
 	void BuildTree();
 	void CollapseChildren(HTREEITEM parent);
 	const char *buildItemName(HTREEITEM item, const char *rootName);
-	bool loadTree( HTREEITEM item, const arcNetString &name, CWaitDlg *dlg );
+	bool loadTree( HTREEITEM item, const anString &name, CWaitDlg *dlg );
 	HTREEITEM findItem(const char *name, HTREEITEM item, HTREEITEM *foundItem);
 	// Generated message map functions
 	//{{AFX_MSG(CDialogTextures)
@@ -81,8 +81,8 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
-	arcHashTable<HTREEITEM>	quickTree;
-	arcNetString					itemName;
+	anHashTable<HTREEITEM>	quickTree;
+	anString					itemName;
 
 public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

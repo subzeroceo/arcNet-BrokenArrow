@@ -6,7 +6,7 @@ public:
 		tokenType = 0;
 		tokenSubType = 0;
 	}
-	idBinaryToken( const arcNetToken &tok ) {
+	idBinaryToken( const anToken &tok ) {
 		token = tok.c_str();
 		tokenType = tok.type;
 		tokenSubType = tok.subtype;
@@ -14,24 +14,24 @@ public:
 	bool operator==( const idBinaryToken &b ) const {
 		return ( tokenType == b.tokenType && tokenSubType == b.tokenSubType && token.Cmp( b.token ) == 0 );
 	}
-	void Read( arcNetFile *inFile ) {
+	void Read( anFile *inFile ) {
 		inFile->ReadString( token );
 		inFile->ReadBig( tokenType );
 		inFile->ReadBig( tokenSubType );
 	}
-	void Write( arcNetFile *inFile ) {
+	void Write( anFile *inFile ) {
 		inFile->WriteString( token );
 		inFile->WriteBig( tokenType );
 		inFile->WriteBig( tokenSubType );
 	}
-	arcNetString token;
+	anString token;
 	int8  tokenType;
 	short tokenSubType;
 };
 
-class idTokenIndexes {
+class anTokenIndexes {
 public:
-	idTokenIndexes() {}
+	anTokenIndexes() {}
 	void Clear() {
 		tokenIndexes.Clear();
 	}
@@ -53,12 +53,12 @@ public:
 	const char *GetName() {
 		return fileName.c_str();
 	}
-	void Write( arcNetFile *outFile ) {
+	void Write( anFile *outFile ) {
 		outFile->WriteString( fileName );
 		outFile->WriteBig( ( int )tokenIndexes.Num() );
 		outFile->WriteBigArray( tokenIndexes.Ptr(), tokenIndexes.Num() );
 	}
-	void Read( arcNetFile *inFile ) {
+	void Read( anFile *inFile ) {
 		inFile->ReadString( fileName );
 		int num;
 		inFile->ReadBig( num );
@@ -66,19 +66,19 @@ public:
 		inFile->ReadBigArray( tokenIndexes.Ptr(), num );
 	}
 private:
-	arcNetList< short > tokenIndexes;
-	arcNetString fileName;
+	anList< short > tokenIndexes;
+	anString fileName;
 };
 
-class idTokenParser {
+class anTokenParser {
 public:
-	idTokenParser() {
+	anTokenParser() {
 		timeStamp = FILE_NOT_FOUND_TIMESTAMP;
 		preloaded = false;
 		currentToken = 0;
 		currentTokenList = 0;
 	}
-	~idTokenParser() {
+	~anTokenParser() {
 		Clear();
 	}
 	void Clear() {
@@ -90,31 +90,31 @@ public:
 	}
 	void LoadFromFile( const char *filename );
 	void WriteToFile (const char *filename );
-	void LoadFromParser( ARCParser &parser, const char *guiName );
+	void LoadFromParser( anParser &parser, const char *guiName );
 
 	bool StartParsing( const char *fileName );
 	void DoneParsing() { currentTokenList = -1; }
 
 	bool IsLoaded() { return tokens.Num() > 0; }
-	bool ReadToken( arcNetToken * tok );
+	bool ReadToken( anToken * tok );
 	int	ExpectTokenString( const char *string );
-	int	ExpectTokenType( int type, int subtype, arcNetToken *token );
-	int ExpectAnyToken( arcNetToken *token );
+	int	ExpectTokenType( int type, int subtype, anToken *token );
+	int ExpectAnyToken( anToken *token );
 	void SetMarker() {}
-	void UnreadToken( const arcNetToken *token );
+	void UnreadToken( const anToken *token );
 	void Error( VERIFY_FORMAT_STRING const char *str, ... );
 	void Warning( VERIFY_FORMAT_STRING const char *str, ... );
 	int ParseInt();
 	bool ParseBool();
-	float ParseFloat( bool *errorFlag = NULL );
+	float ParseFloat( bool *errorFlag = nullptr );
 	void UpdateTimeStamp( ARC_TIME_T &t ) {
 		if ( t > timeStamp ) {
 			timeStamp = t;
 		}
 	}
 private:
-	arcNetList< idBinaryToken > tokens;
-	arcNetList< idTokenIndexes > guiTokenIndexes;
+	anList< idBinaryToken > tokens;
+	anList< anTokenIndexes > guiTokenIndexes;
 	int currentToken;
 	int currentTokenList;
 	ARC_TIME_T timeStamp;

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -56,7 +56,7 @@ toolTip_t DialogAFConstraintHinge::toolTips[] = {
 	{ IDC_EDIT_HINGE_LIMIT_ANGLE1, "limit orientation" },
 	{ IDC_EDIT_HINGE_LIMIT_ANGLE2, "limit width" },
 	{ IDC_EDIT_HINGE_LIMIT_ANGLE3, "limit angle" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 IMPLEMENT_DYNAMIC(DialogAFConstraintHinge, CDialog)
@@ -66,7 +66,7 @@ IMPLEMENT_DYNAMIC(DialogAFConstraintHinge, CDialog)
 DialogAFConstraintHinge::DialogAFConstraintHinge
 ================
 */
-DialogAFConstraintHinge::DialogAFConstraintHinge(CWnd* pParent /*=NULL*/)
+DialogAFConstraintHinge::DialogAFConstraintHinge(CWnd* pParent /*=nullptr*/)
 	: CDialog(DialogAFConstraintHinge::IDD, pParent)
 	, m_anchor_x(0 )
 	, m_anchor_y(0 )
@@ -76,8 +76,8 @@ DialogAFConstraintHinge::DialogAFConstraintHinge(CWnd* pParent /*=NULL*/)
 	, m_limitAngle1(0 )
 	, m_limitAngle2(30.0f)
 	, m_limitAngle3(0 )
-	, constraint(NULL)
-	, file(NULL)
+	, constraint(nullptr )
+	, file(nullptr )
 {
 	Create( IDD_DIALOG_AF_CONSTRAINT_HINGE, pParent );
 	EnableToolTips( TRUE );
@@ -127,7 +127,7 @@ void DialogAFConstraintHinge::InitJointLists( void ) {
 		return;
 	}
 
-	const ARCRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
+	const anRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
 	if ( !model ) {
 		return;
 	}
@@ -146,9 +146,9 @@ void DialogAFConstraintHinge::InitJointLists( void ) {
 DialogAFConstraintHinge::LoadFile
 ================
 */
-void DialogAFConstraintHinge::LoadFile( arcDeclAF *af ) {
+void DialogAFConstraintHinge::LoadFile( anDeclAF *af ) {
 	file = af;
-	constraint = NULL;
+	constraint = nullptr;
 	InitJointLists();
 }
 
@@ -166,13 +166,13 @@ void DialogAFConstraintHinge::SaveFile( void ) {
 DialogAFConstraintHinge::LoadConstraint
 ================
 */
-void DialogAFConstraintHinge::LoadConstraint( arcDeclAF_Constraint *c ) {
+void DialogAFConstraintHinge::LoadConstraint( anDeclAF_Constraint *c ) {
 	int i, s1, s2;
-	arcAngles angles;
+	anAngles angles;
 
 	constraint = c;
 
-	// load anchor from the current arcDeclAF_Constraint
+	// load anchor from the current anDeclAF_Constraint
 	SetSafeComboBoxSelection( &m_comboAnchorJoint, constraint->anchor.joint1.c_str(), -1 );
 	m_anchor_x = constraint->anchor.ToVec3().x;
 	m_anchor_y = constraint->anchor.ToVec3().y;
@@ -201,7 +201,7 @@ void DialogAFConstraintHinge::LoadConstraint( arcDeclAF_Constraint *c ) {
 	CheckRadioButton( IDC_RADIO_HINGE_AXIS_BONE, IDC_RADIO_HINGE_AXIS_ANGLES, i );
 
 	// hinge limit
-	if ( constraint->limit == arcDeclAF_Constraint::LIMIT_CONE ) {
+	if ( constraint->limit == anDeclAF_Constraint::LIMIT_CONE ) {
 		i = IDC_RADIO_HINGE_LIMIT_ANGLES;
 	}
 	else {
@@ -230,7 +230,7 @@ void DialogAFConstraintHinge::SaveConstraint( void ) {
 	}
 	UpdateData( TRUE );
 
-	// save anchor to the current arcDeclAF_Constraint
+	// save anchor to the current anDeclAF_Constraint
 	GetSafeComboBoxSelection( &m_comboAnchorJoint, str, -1 );
 	constraint->anchor.joint1 = str;
 	constraint->anchor.ToVec3().x = m_anchor_x;
@@ -245,7 +245,7 @@ void DialogAFConstraintHinge::SaveConstraint( void ) {
 		constraint->axis.joint2 = str;
 	}
 	else {
-		constraint->axis.ToVec3() = arcAngles( m_axisPitch, m_axisYaw, 0.0f ).ToForward();
+		constraint->axis.ToVec3() = anAngles( m_axisPitch, m_axisYaw, 0.0f ).ToForward();
 	}
 
 	// hinge limit
@@ -483,7 +483,7 @@ void DialogAFConstraintHinge::OnDeltaposSpinHingeAxisYaw(NMHDR *pNMHDR, LRESULT 
 void DialogAFConstraintHinge::OnBnClickedRadioHingeLimitNone() {
 	if ( IsDlgButtonChecked( IDC_RADIO_HINGE_LIMIT_NONE ) ) {
 		if ( constraint ) {
-			constraint->limit = arcDeclAF_Constraint::LIMIT_NONE;
+			constraint->limit = anDeclAF_Constraint::LIMIT_NONE;
 			UpdateFile();
 		}
 	}
@@ -492,7 +492,7 @@ void DialogAFConstraintHinge::OnBnClickedRadioHingeLimitNone() {
 void DialogAFConstraintHinge::OnBnClickedRadioHingeLimitAngles() {
 	if ( IsDlgButtonChecked( IDC_RADIO_HINGE_LIMIT_ANGLES ) ) {
 		if ( constraint ) {
-			constraint->limit = arcDeclAF_Constraint::LIMIT_CONE;
+			constraint->limit = anDeclAF_Constraint::LIMIT_CONE;
 			UpdateFile();
 		}
 	}

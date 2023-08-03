@@ -36,8 +36,8 @@ class rvGEModifierGroup : public rvGEModifier
 {
 public:
 
-	rvGEModifierGroup ( );
-	~rvGEModifierGroup ( );
+	rvGEModifierGroup();
+	~rvGEModifierGroup();
 
 	virtual bool		Apply		( void );
 	virtual bool		Undo		( void );
@@ -54,13 +54,13 @@ public:
 
 protected:
 
-	arcNetList<rvGEModifier*>	mModifiers;
+	anList<rvGEModifier*>	mModifiers;
 
 };
 
 ARC_INLINE int rvGEModifierGroup::GetCount( void )
 {
-	return mModifiers.Num ( );
+	return mModifiers.Num();
 }
 
 #endif

@@ -1,9 +1,9 @@
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( arcPhysics_Actor, arcPhysics_Player )
+CLASS_DECLARATION( anPhysics_Actor, anPhysics_Player )
 END_CLASS
 
 // movement parameters
@@ -41,14 +41,14 @@ int c_pmove = 0;
 
 /*
 ============
-arcPhysics_Player::CmdScale
+anPhysics_Player::CmdScale
 
 Returns the scale factor to apply to cmd movements
 This allows the clients to use axial -127 to 127 values for all directions
 without getting a sqrt(2) distortion in speed.
 ============
 */
-float arcPhysics_Player::CmdScale( const usercmd_t &cmd ) const {
+float anPhysics_Player::CmdScale( const usercmd_t &cmd ) const {
 	int		max;
 	float	total;
 	float	scale;
@@ -79,20 +79,20 @@ float arcPhysics_Player::CmdScale( const usercmd_t &cmd ) const {
 		return 0.0f;
 	}
 
-	total = arcMath::Sqrt( (float) forwardmove * forwardmove + rightmove * rightmove + upmove * upmove );
-	scale = (float) playerSpeed * max / ( 127.0f * total );
+	total = anMath::Sqrt( ( float ) forwardmove * forwardmove + rightmove * rightmove + upmove * upmove );
+	scale = ( float ) playerSpeed * max / ( 127.0f * total );
 
 	return scale;
 }
 
 /*
 ==============
-arcPhysics_Player::Accelerate
+anPhysics_Player::Accelerate
 
 Handles user intended acceleration
 ==============
 */
-void arcPhysics_Player::Accelerate( const arcVec3 &wishdir, const float wishspeed, const float accel ) {
+void anPhysics_Player::Accelerate( const anVec3 &wishdir, const float wishspeed, const float accel ) {
 #if 1
 	// q2 style
 	float addspeed, accelspeed, currentspeed;
@@ -110,8 +110,8 @@ void arcPhysics_Player::Accelerate( const arcVec3 &wishdir, const float wishspee
 	current.velocity += accelspeed * wishdir;
 #else
 	// proper way (avoids strafe jump maxspeed bug), but feels bad
-	arcVec3		wishVelocity;
-	arcVec3		pushDir;
+	anVec3		wishVelocity;
+	anVec3		pushDir;
 	float		pushLen;
 	float		canPush;
 
@@ -130,19 +130,19 @@ void arcPhysics_Player::Accelerate( const arcVec3 &wishdir, const float wishspee
 
 /*
 ==================
-arcPhysics_Player::SlideMove
+anPhysics_Player::SlideMove
 
 Returns true if the velocity was clipped in some way
 ==================
 */
 #define	MAX_CLIP_PLANES	5
 
-bool arcPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool push ) {
+bool anPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, bool push ) {
 	int			i, j, k, pushFlags;
 	int			bumpcount, numbumps, numplanes;
 	float		d, time_left, into, totalMass;
-	arcVec3		dir, planes[MAX_CLIP_PLANES];
-	arcVec3		end, stepEnd, primal_velocity, endVelocity, endClipVelocity, clipVelocity;
+	anVec3		dir, planes[MAX_CLIP_PLANES];
+	anVec3		end, stepEnd, primal_velocity, endVelocity, endClipVelocity, clipVelocity;
 	trace_t		trace, stepTrace, downTrace;
 	bool		nearGround, stepped, pushed;
 
@@ -257,7 +257,7 @@ bool arcPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, boo
 
 			if ( totalMass > 0.0f ) {
 				// decrease velocity based on the total mass of the objects being pushed ?
-				current.velocity *= 1.0f - arcMath::ClampFloat( 0.0f, 1000.0f, totalMass - 20.0f ) * ( 1.0f / 950.0f );
+				current.velocity *= 1.0f - anMath::ClampFloat( 0.0f, 1000.0f, totalMass - 20.0f ) * ( 1.0f / 950.0f );
 				pushed = true;
 			}
 
@@ -397,13 +397,13 @@ bool arcPhysics_Player::SlideMove( bool gravity, bool stepUp, bool stepDown, boo
 
 /*
 ==================
-arcPhysics_Player::Friction
+anPhysics_Player::Friction
 
 Handles both ground friction and water friction
 ==================
 */
-void arcPhysics_Player::Friction( void ) {
-	arcVec3	vel;
+void anPhysics_Player::Friction( void ) {
+	anVec3	vel;
 	float	speed, newspeed, control;
 	float	drop;
 
@@ -458,14 +458,14 @@ void arcPhysics_Player::Friction( void ) {
 
 /*
 ===================
-arcPhysics_Player::WaterJumpMove
+anPhysics_Player::WaterJumpMove
 
 Flying out of the water
 ===================
 */
-void arcPhysics_Player::WaterJumpMove( void ) {
+void anPhysics_Player::WaterJumpMove( void ) {
 	// waterjump has no control, but falls
-	arcPhysics_Player::SlideMove( true, true, false, false );
+	anPhysics_Player::SlideMove( true, true, false, false );
 
 	// add gravity
 	current.velocity += gravityNormal * frametime;
@@ -479,24 +479,24 @@ void arcPhysics_Player::WaterJumpMove( void ) {
 
 /*
 ===================
-arcPhysics_Player::WaterMove
+anPhysics_Player::WaterMove
 ===================
 */
-void arcPhysics_Player::WaterMove( void ) {
-	arcVec3	wishvel;
+void anPhysics_Player::WaterMove( void ) {
+	anVec3	wishvel;
 	float	wishspeed;
-	arcVec3	wishdir;
+	anVec3	wishdir;
 	float	scale;
 	float	vel;
 
-	if ( arcPhysics_Player::CheckWaterJump() ) {
-		arcPhysics_Player::WaterJumpMove();
+	if ( anPhysics_Player::CheckWaterJump() ) {
+		anPhysics_Player::WaterJumpMove();
 		return;
 	}
 
-	arcPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
-	scale = arcPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	// user intentions
 	if ( !scale ) {
@@ -513,7 +513,7 @@ void arcPhysics_Player::WaterMove( void ) {
 		wishspeed = playerSpeed * PM_SWIMSCALE;
 	}
 
-	arcPhysics_Player::Accelerate( wishdir, wishspeed, PM_WATERACCELERATE );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, PM_WATERACCELERATE );
 
 	// make sure we can go up slopes easily under water
 	if ( groundPlane && ( current.velocity * groundTrace.c.normal ) < 0.0f ) {
@@ -525,24 +525,24 @@ void arcPhysics_Player::WaterMove( void ) {
 		current.velocity *= vel;
 	}
 
-	arcPhysics_Player::SlideMove( false, true, false, false );
+	anPhysics_Player::SlideMove( false, true, false, false );
 }
 
 /*
 ===================
-arcPhysics_Player::FlyMove
+anPhysics_Player::FlyMove
 ===================
 */
-void arcPhysics_Player::FlyMove( void ) {
-	arcVec3	wishvel;
+void anPhysics_Player::FlyMove( void ) {
+	anVec3	wishvel;
 	float	wishspeed;
-	arcVec3	wishdir;
+	anVec3	wishdir;
 	float	scale;
 
 	// normal slowdown
-	arcPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
-	scale = arcPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	if ( !scale ) {
 		wishvel = vec3_origin;
@@ -554,25 +554,25 @@ void arcPhysics_Player::FlyMove( void ) {
 	wishdir = wishvel;
 	wishspeed = wishdir.Normalize();
 
-	arcPhysics_Player::Accelerate( wishdir, wishspeed, PM_FLYACCELERATE );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, PM_FLYACCELERATE );
 
-	arcPhysics_Player::SlideMove( false, false, false, false );
+	anPhysics_Player::SlideMove( false, false, false, false );
 }
 
 /*
 ===================
-arcPhysics_Player::AirMove
+anPhysics_Player::AirMove
 ===================
 */
-void arcPhysics_Player::AirMove( void ) {
-	arcVec3		wishvel;
-	arcVec3		wishdir;
+void anPhysics_Player::AirMove( void ) {
+	anVec3		wishvel;
+	anVec3		wishdir;
 	float		wishspeed;
 	float		scale;
 
-	arcPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
-	scale = arcPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	// project moves down to flat plane
 	viewForward -= (viewForward * gravityNormal) * gravityNormal;
@@ -587,7 +587,7 @@ void arcPhysics_Player::AirMove( void ) {
 	wishspeed *= scale;
 
 	// not on ground, so little effect on velocity
-	arcPhysics_Player::Accelerate( wishdir, wishspeed, PM_AIRACCELERATE );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, PM_AIRACCELERATE );
 
 	// we may have a ground plane that is very steep, even
 	// though we don't have a groundentity
@@ -596,42 +596,42 @@ void arcPhysics_Player::AirMove( void ) {
 		current.velocity.ProjectOntoPlane( groundTrace.c.normal, OVERCLIP );
 	}
 
-	arcPhysics_Player::SlideMove( true, false, false, false );
+	anPhysics_Player::SlideMove( true, false, false, false );
 }
 
 /*
 ===================
-arcPhysics_Player::WalkMove
+anPhysics_Player::WalkMove
 ===================
 */
-void arcPhysics_Player::WalkMove( void ) {
-	arcVec3		wishvel;
-	arcVec3		wishdir;
+void anPhysics_Player::WalkMove( void ) {
+	anVec3		wishvel;
+	anVec3		wishdir;
 	float		wishspeed;
 	float		scale;
 	float		accelerate;
-	arcVec3		oldVelocity, vel;
+	anVec3		oldVelocity, vel;
 	float		oldVel, newVel;
 
 	if ( waterLevel > WATERLEVEL_WAIST && ( viewForward * groundTrace.c.normal ) > 0.0f ) {
 		// begin swimming
-		arcPhysics_Player::WaterMove();
+		anPhysics_Player::WaterMove();
 		return;
 	}
 
-	if ( arcPhysics_Player::CheckJump() ) {
+	if ( anPhysics_Player::CheckJump() ) {
 		// jumped away
 		if ( waterLevel > WATERLEVEL_FEET ) {
-			arcPhysics_Player::WaterMove();
+			anPhysics_Player::WaterMove();
 		} else {
-			arcPhysics_Player::AirMove();
+			anPhysics_Player::AirMove();
 		}
 		return;
 	}
 
-	arcPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
-	scale = arcPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	// project moves down to flat plane
 	viewForward -= (viewForward * gravityNormal) * gravityNormal;
@@ -667,7 +667,7 @@ void arcPhysics_Player::WalkMove( void ) {
 		accelerate = PM_ACCELERATE;
 	}
 
-	arcPhysics_Player::Accelerate( wishdir, wishspeed, accelerate );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, accelerate );
 
 	if ( ( groundMaterial && groundMaterial->GetSurfaceFlags() & SURF_SLICK ) || current.movementFlags & PMF_TIME_KNOCKBACK ) {
 		current.velocity += gravityVector * frametime;
@@ -685,7 +685,7 @@ void arcPhysics_Player::WalkMove( void ) {
 			oldVel = oldVelocity.LengthSqr();
 			if ( oldVel > 1.0f ) {
 				// don't decrease velocity when going up or down a slope
-				current.velocity *= arcMath::Sqrt( oldVel / newVel );
+				current.velocity *= anMath::Sqrt( oldVel / newVel );
 			}
 		}
 	}
@@ -698,15 +698,15 @@ void arcPhysics_Player::WalkMove( void ) {
 
 	gameLocal.push.InitSavingPushedEntityPositions();
 
-	arcPhysics_Player::SlideMove( false, true, true, true );
+	anPhysics_Player::SlideMove( false, true, true, true );
 }
 
 /*
 ==============
-arcPhysics_Player::DeadMove
+anPhysics_Player::DeadMove
 ==============
 */
-void arcPhysics_Player::DeadMove( void ) {
+void anPhysics_Player::DeadMove( void ) {
 	float	forward;
 
 	if ( !walking ) {
@@ -726,13 +726,13 @@ void arcPhysics_Player::DeadMove( void ) {
 
 /*
 ===============
-arcPhysics_Player::NoclipMove
+anPhysics_Player::NoclipMove
 ===============
 */
-void arcPhysics_Player::NoclipMove( void ) {
+void anPhysics_Player::NoclipMove( void ) {
 	float		speed, drop, friction, newspeed, stopspeed;
 	float		scale, wishspeed;
-	arcVec3		wishdir;
+	anVec3		wishdir;
 
 	// friction
 	speed = current.velocity.Length();
@@ -757,14 +757,14 @@ void arcPhysics_Player::NoclipMove( void ) {
 	}
 
 	// accelerate
-	scale = arcPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	wishdir = scale * (viewForward * command.forwardmove + viewRight * command.rightmove);
 	wishdir -= scale * gravityNormal * command.upmove;
 	wishspeed = wishdir.Normalize();
 	wishspeed *= scale;
 
-	arcPhysics_Player::Accelerate( wishdir, wishspeed, PM_ACCELERATE );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, PM_ACCELERATE );
 
 	// move
 	current.origin += frametime * current.velocity;
@@ -772,23 +772,23 @@ void arcPhysics_Player::NoclipMove( void ) {
 
 /*
 ===============
-arcPhysics_Player::SpectatorMove
+anPhysics_Player::SpectatorMove
 ===============
 */
-void arcPhysics_Player::SpectatorMove( void ) {
-	arcVec3	wishvel;
+void anPhysics_Player::SpectatorMove( void ) {
+	anVec3	wishvel;
 	float	wishspeed;
-	arcVec3	wishdir;
+	anVec3	wishdir;
 	float	scale;
 
 	trace_t	trace;
-	arcVec3	end;
+	anVec3	end;
 
 	// fly movement
 
-	arcPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
-	scale = arcPhysics_Player::CmdScale( command );
+	scale = anPhysics_Player::CmdScale( command );
 
 	if ( !scale ) {
 		wishvel = vec3_origin;
@@ -799,18 +799,18 @@ void arcPhysics_Player::SpectatorMove( void ) {
 	wishdir = wishvel;
 	wishspeed = wishdir.Normalize();
 
-	arcPhysics_Player::Accelerate( wishdir, wishspeed, PM_FLYACCELERATE );
+	anPhysics_Player::Accelerate( wishdir, wishspeed, PM_FLYACCELERATE );
 
-	arcPhysics_Player::SlideMove( false, false, false, false );
+	anPhysics_Player::SlideMove( false, false, false, false );
 }
 
 /*
 ============
-arcPhysics_Player::LadderMove
+anPhysics_Player::LadderMove
 ============
 */
-void arcPhysics_Player::LadderMove( void ) {
-	arcVec3	wishdir, wishvel, right;
+void anPhysics_Player::LadderMove( void ) {
+	anVec3	wishdir, wishvel, right;
 	float	wishspeed, scale;
 	float	upscale;
 
@@ -826,8 +826,8 @@ void arcPhysics_Player::LadderMove( void ) {
 		upscale = -1.0f;
 	}
 
-	scale = arcPhysics_Player::CmdScale( command );
-	wishvel = -0.9f * gravityNormal * upscale * scale * (float)command.forwardmove;
+	scale = anPhysics_Player::CmdScale( command );
+	wishvel = -0.9f * gravityNormal * upscale * scale * ( float )command.forwardmove;
 
 	// strafe
 	if ( command.rightmove ) {
@@ -841,20 +841,20 @@ void arcPhysics_Player::LadderMove( void ) {
 		if ( ladderNormal * viewForward > 0.0f ) {
 			right = -right;
 		}
-		wishvel += 2.0f * right * scale * (float) command.rightmove;
+		wishvel += 2.0f * right * scale * ( float ) command.rightmove;
 	}
 
 	// up down movement
 	if ( command.upmove ) {
-		wishvel += -0.5f * gravityNormal * scale * (float) command.upmove;
+		wishvel += -0.5f * gravityNormal * scale * ( float ) command.upmove;
 	}
 
 	// do strafe friction
-	arcPhysics_Player::Friction();
+	anPhysics_Player::Friction();
 
 	// accelerate
 	wishspeed = wishvel.Normalize();
-	arcPhysics_Player::Accelerate( wishvel, wishspeed, PM_ACCELERATE );
+	anPhysics_Player::Accelerate( wishvel, wishspeed, PM_ACCELERATE );
 
 	// cap the vertical velocity
 	upscale = current.velocity * -gravityNormal;
@@ -878,15 +878,15 @@ void arcPhysics_Player::LadderMove( void ) {
 		}
 	}
 
-	arcPhysics_Player::SlideMove( false, ( command.forwardmove > 0 ), false, false );
+	anPhysics_Player::SlideMove( false, ( command.forwardmove > 0 ), false, false );
 }
 
 /*
 =============
-arcPhysics_Player::CorrectAllSolid
+anPhysics_Player::CorrectAllSolid
 =============
 */
-void arcPhysics_Player::CorrectAllSolid( trace_t &trace, int contents ) {
+void anPhysics_Player::CorrectAllSolid( trace_t &trace, int contents ) {
 	if ( debugLevel ) {
 		gameLocal.Printf( "%i:allsolid\n", c_pmove );
 	}
@@ -904,19 +904,19 @@ void arcPhysics_Player::CorrectAllSolid( trace_t &trace, int contents ) {
 		trace.c.entityNum = ENTITYNUM_WORLD;
 		trace.c.id = 0;
 		trace.c.type = CONTACT_TRMVERTEX;
-		trace.c.material = NULL;
+		trace.c.material = nullptr;
 		trace.c.contents = contents;
 	}
 }
 
 /*
 =============
-arcPhysics_Player::CheckGround
+anPhysics_Player::CheckGround
 =============
 */
-void arcPhysics_Player::CheckGround( void ) {
+void anPhysics_Player::CheckGround( void ) {
 	int i, contents;
-	arcVec3 point;
+	anVec3 point;
 	bool hadGroundContacts;
 
 	hadGroundContacts = HasGroundContacts();
@@ -943,14 +943,14 @@ void arcPhysics_Player::CheckGround( void ) {
 	contents = gameLocal.clip.Contents( current.origin, clipModel, clipModel->GetAxis(), -1, self );
 	if ( contents & MASK_SOLID ) {
 		// do something corrective if stuck in solid
-		arcPhysics_Player::CorrectAllSolid( groundTrace, contents );
+		anPhysics_Player::CorrectAllSolid( groundTrace, contents );
 	}
 
 	// if the trace didn't hit anything, we are in free fall
 	if ( groundTrace.fraction == 1.0f ) {
 		groundPlane = false;
 		walking = false;
-		groundEntityPtr = NULL;
+		groundEntityPtr = nullptr;
 		return;
 	}
 
@@ -974,7 +974,7 @@ void arcPhysics_Player::CheckGround( void ) {
 			gameLocal.Printf( "%i:steep\n", c_pmove );
 		}
 
-		// FIXME: if they can't slide down the slope, let them walk (sharp crevices)
+		// FIXME: if they can't slide down the slope, let them walk ( sharp crevices)
 
 		// make sure we don't die from sliding down a steep slope
 		if ( current.velocity * gravityNormal > 150.0f ) {
@@ -1019,15 +1019,15 @@ void arcPhysics_Player::CheckGround( void ) {
 
 /*
 ==============
-arcPhysics_Player::CheckDuck
+anPhysics_Player::CheckDuck
 
 Sets clip model size
 ==============
 */
-void arcPhysics_Player::CheckDuck( void ) {
+void anPhysics_Player::CheckDuck( void ) {
 	trace_t	trace;
-	arcVec3 end;
-	arcBounds bounds;
+	anVec3 end;
+	anBounds bounds;
 	float maxZ;
 
 	if ( current.movementType == PM_DEAD ) {
@@ -1062,20 +1062,20 @@ void arcPhysics_Player::CheckDuck( void ) {
 		bounds = clipModel->GetBounds();
 		bounds[1][2] = maxZ;
 		if ( pm_usecylinder.GetBool() ) {
-			clipModel->LoadModel( arcTraceModel( bounds, 8 ) );
+			clipModel->LoadModel( anTraceModel( bounds, 8 ) );
 		} else {
-			clipModel->LoadModel( arcTraceModel( bounds ) );
+			clipModel->LoadModel( anTraceModel( bounds ) );
 		}
 	}
 }
 
 /*
 ================
-arcPhysics_Player::CheckLadder
+anPhysics_Player::CheckLadder
 ================
 */
-void arcPhysics_Player::CheckLadder( void ) {
-	arcVec3		forward, start, end;
+void anPhysics_Player::CheckLadder( void ) {
+	anVec3		forward, start, end;
 	trace_t		trace;
 	float		tracedist;
 
@@ -1129,11 +1129,11 @@ void arcPhysics_Player::CheckLadder( void ) {
 
 /*
 =============
-arcPhysics_Player::CheckJump
+anPhysics_Player::CheckJump
 =============
 */
-bool arcPhysics_Player::CheckJump( void ) {
-	arcVec3 addVelocity;
+bool anPhysics_Player::CheckJump( void ) {
+	anVec3 addVelocity;
 
 	if ( command.upmove < 10 ) {
 		// not holding jump
@@ -1155,7 +1155,7 @@ bool arcPhysics_Player::CheckJump( void ) {
 	current.movementFlags |= PMF_JUMP_HELD | PMF_JUMPED;
 
 	addVelocity = 2.0f * maxJumpHeight * -gravityVector;
-	addVelocity *= arcMath::Sqrt( addVelocity.Normalize() );
+	addVelocity *= anMath::Sqrt( addVelocity.Normalize() );
 	current.velocity += addVelocity;
 
 	return true;
@@ -1163,13 +1163,13 @@ bool arcPhysics_Player::CheckJump( void ) {
 
 /*
 =============
-arcPhysics_Player::CheckWaterJump
+anPhysics_Player::CheckWaterJump
 =============
 */
-bool arcPhysics_Player::CheckWaterJump( void ) {
-	arcVec3	spot;
+bool anPhysics_Player::CheckWaterJump( void ) {
+	anVec3	spot;
 	int		cont;
-	arcVec3	flatforward;
+	anVec3	flatforward;
 
 	if ( current.movementTime ) {
 		return false;
@@ -1185,13 +1185,13 @@ bool arcPhysics_Player::CheckWaterJump( void ) {
 
 	spot = current.origin + 30.0f * flatforward;
 	spot -= 4.0f * gravityNormal;
-	cont = gameLocal.clip.Contents( spot, NULL, mat3_identity, -1, self );
+	cont = gameLocal.clip.Contents( spot, nullptr, mat3_identity, -1, self );
 	if ( !(cont & CONTENTS_SOLID) ) {
 		return false;
 	}
 
 	spot -= 16.0f * gravityNormal;
-	cont = gameLocal.clip.Contents( spot, NULL, mat3_identity, -1, self );
+	cont = gameLocal.clip.Contents( spot, nullptr, mat3_identity, -1, self );
 	if ( cont ) {
 		return false;
 	}
@@ -1206,12 +1206,12 @@ bool arcPhysics_Player::CheckWaterJump( void ) {
 
 /*
 =============
-arcPhysics_Player::SetWaterLevel
+anPhysics_Player::SetWaterLevel
 =============
 */
-void arcPhysics_Player::SetWaterLevel( void ) {
-	arcVec3		point;
-	arcBounds	bounds;
+void anPhysics_Player::SetWaterLevel( void ) {
+	anVec3		point;
+	anBounds	bounds;
 	int			contents;
 
 	//
@@ -1224,20 +1224,20 @@ void arcPhysics_Player::SetWaterLevel( void ) {
 
 	// check at feet level
 	point = current.origin - ( bounds[0][2] + 1.0f ) * gravityNormal;
-	contents = gameLocal.clip.Contents( point, NULL, mat3_identity, -1, self );
+	contents = gameLocal.clip.Contents( point, nullptr, mat3_identity, -1, self );
 	if ( contents & MASK_WATER ) {
 		waterType = contents;
 		waterLevel = WATERLEVEL_FEET;
 
 		// check at waist level
 		point = current.origin - ( bounds[1][2] - bounds[0][2] ) * 0.5f * gravityNormal;
-		contents = gameLocal.clip.Contents( point, NULL, mat3_identity, -1, self );
+		contents = gameLocal.clip.Contents( point, nullptr, mat3_identity, -1, self );
 		if ( contents & MASK_WATER ) {
 			waterLevel = WATERLEVEL_WAIST;
 
 			// check at head level
 			point = current.origin - ( bounds[1][2] - 1.0f ) * gravityNormal;
-			contents = gameLocal.clip.Contents( point, NULL, mat3_identity, -1, self );
+			contents = gameLocal.clip.Contents( point, nullptr, mat3_identity, -1, self );
 			if ( contents & MASK_WATER ) {
 				waterLevel = WATERLEVEL_HEAD;
 			}
@@ -1247,10 +1247,10 @@ void arcPhysics_Player::SetWaterLevel( void ) {
 
 /*
 ================
-arcPhysics_Player::DropTimers
+anPhysics_Player::DropTimers
 ================
 */
-void arcPhysics_Player::DropTimers( void ) {
+void anPhysics_Player::DropTimers( void ) {
 	// drop misc timing counter
 	if ( current.movementTime ) {
 		if ( framemsec >= current.movementTime ) {
@@ -1264,10 +1264,10 @@ void arcPhysics_Player::DropTimers( void ) {
 
 /*
 ================
-arcPhysics_Player::MovePlayer
+anPhysics_Player::MovePlayer
 ================
 */
-void arcPhysics_Player::MovePlayer( int msec ) {
+void anPhysics_Player::MovePlayer( int msec ) {
 	// this counter lets us debug movement problems with a journal
 	// by setting a conditional breakpoint for the previous frame
 	c_pmove++;
@@ -1301,7 +1301,7 @@ void arcPhysics_Player::MovePlayer( int msec ) {
 	current.velocity -= current.pushVelocity;
 
 	// view vectors
-	viewAngles.ToVectors( &viewForward, NULL, NULL );
+	viewAngles.ToVectors( &viewForward, nullptr, nullptr );
 	viewForward *= clipModelAxis;
 	viewRight = gravityNormal.Cross( viewForward );
 	viewRight.Normalize();
@@ -1309,14 +1309,14 @@ void arcPhysics_Player::MovePlayer( int msec ) {
 	// fly in spectator mode
 	if ( current.movementType == PM_SPECTATOR ) {
 		SpectatorMove();
-		arcPhysics_Player::DropTimers();
+		anPhysics_Player::DropTimers();
 		return;
 	}
 
 	// special no clip mode
 	if ( current.movementType == PM_NOCLIP ) {
-		arcPhysics_Player::NoclipMove();
-		arcPhysics_Player::DropTimers();
+		anPhysics_Player::NoclipMove();
+		anPhysics_Player::DropTimers();
 		return;
 	}
 
@@ -1328,44 +1328,44 @@ void arcPhysics_Player::MovePlayer( int msec ) {
 	}
 
 	// set watertype and waterlevel
-	arcPhysics_Player::SetWaterLevel();
+	anPhysics_Player::SetWaterLevel();
 
 	// check for ground
-	arcPhysics_Player::CheckGround();
+	anPhysics_Player::CheckGround();
 
 	// check if up against a ladder
-	arcPhysics_Player::CheckLadder();
+	anPhysics_Player::CheckLadder();
 
 	// set clip model size
-	arcPhysics_Player::CheckDuck();
+	anPhysics_Player::CheckDuck();
 
 	// handle timers
-	arcPhysics_Player::DropTimers();
+	anPhysics_Player::DropTimers();
 
 	// move
 	if ( current.movementType == PM_DEAD ) {
 		// dead
-		arcPhysics_Player::DeadMove();
+		anPhysics_Player::DeadMove();
 	} else if ( ladder ) {
 		// going up or down a ladder
-		arcPhysics_Player::LadderMove();
+		anPhysics_Player::LadderMove();
 	} else if ( current.movementFlags & PMF_TIME_WATERJUMP ) {
 		// jumping out of water
-		arcPhysics_Player::WaterJumpMove();
+		anPhysics_Player::WaterJumpMove();
 	} else if ( waterLevel > 1 ) {
 		// swimming
-		arcPhysics_Player::WaterMove();
+		anPhysics_Player::WaterMove();
 	} else if ( walking ) {
 		// walking on ground
-		arcPhysics_Player::WalkMove();
+		anPhysics_Player::WalkMove();
 	} else {
 		// airborne
-		arcPhysics_Player::AirMove();
+		anPhysics_Player::AirMove();
 	}
 
 	// set watertype, waterlevel and groundentity
-	arcPhysics_Player::SetWaterLevel();
-	arcPhysics_Player::CheckGround();
+	anPhysics_Player::SetWaterLevel();
+	anPhysics_Player::CheckGround();
 
 	// move the player velocity back into the world frame
 	current.velocity += current.pushVelocity;
@@ -1374,75 +1374,75 @@ void arcPhysics_Player::MovePlayer( int msec ) {
 
 /*
 ================
-arcPhysics_Player::GetWaterLevel
+anPhysics_Player::GetWaterLevel
 ================
 */
-waterLevel_t arcPhysics_Player::GetWaterLevel( void ) const {
+waterLevel_t anPhysics_Player::GetWaterLevel( void ) const {
 	return waterLevel;
 }
 
 /*
 ================
-arcPhysics_Player::GetWaterType
+anPhysics_Player::GetWaterType
 ================
 */
-int arcPhysics_Player::GetWaterType( void ) const {
+int anPhysics_Player::GetWaterType( void ) const {
 	return waterType;
 }
 
 /*
 ================
-arcPhysics_Player::HasJumped
+anPhysics_Player::HasJumped
 ================
 */
-bool arcPhysics_Player::HasJumped( void ) const {
+bool anPhysics_Player::HasJumped( void ) const {
 	return ( ( current.movementFlags & PMF_JUMPED ) != 0 );
 }
 
 /*
 ================
-arcPhysics_Player::HasSteppedUp
+anPhysics_Player::HasSteppedUp
 ================
 */
-bool arcPhysics_Player::HasSteppedUp( void ) const {
+bool anPhysics_Player::HasSteppedUp( void ) const {
 	return ( ( current.movementFlags & ( PMF_STEPPED_UP | PMF_STEPPED_DOWN ) ) != 0 );
 }
 
 /*
 ================
-arcPhysics_Player::GetStepUp
+anPhysics_Player::GetStepUp
 ================
 */
-float arcPhysics_Player::GetStepUp( void ) const {
+float anPhysics_Player::GetStepUp( void ) const {
 	return current.stepUp;
 }
 
 /*
 ================
-arcPhysics_Player::IsCrouching
+anPhysics_Player::IsCrouching
 ================
 */
-bool arcPhysics_Player::IsCrouching( void ) const {
+bool anPhysics_Player::IsCrouching( void ) const {
 	return ( ( current.movementFlags & PMF_DUCKED ) != 0 );
 }
 
 /*
 ================
-arcPhysics_Player::OnLadder
+anPhysics_Player::OnLadder
 ================
 */
-bool arcPhysics_Player::OnLadder( void ) const {
+bool anPhysics_Player::OnLadder( void ) const {
 	return ladder;
 }
 
 /*
 ================
-arcPhysics_Player::arcPhysics_Player
+anPhysics_Player::anPhysics_Player
 ================
 */
-arcPhysics_Player::arcPhysics_Player( void ) {
+anPhysics_Player::anPhysics_Player( void ) {
 	debugLevel = false;
-	clipModel = NULL;
+	clipModel = nullptr;
 	clipMask = 0;
 	memset( &current, 0, sizeof( current ) );
 	saved = current;
@@ -1460,7 +1460,7 @@ arcPhysics_Player::arcPhysics_Player( void ) {
 	walking = false;
 	groundPlane = false;
 	memset( &groundTrace, 0, sizeof( groundTrace ) );
-	groundMaterial = NULL;
+	groundMaterial = nullptr;
 	ladder = false;
 	ladderNormal.Zero();
 	waterLevel = WATERLEVEL_NONE;
@@ -1469,10 +1469,10 @@ arcPhysics_Player::arcPhysics_Player( void ) {
 
 /*
 ================
-arcPhysics_Player_SavePState
+anPhysics_Player_SavePState
 ================
 */
-void arcPhysics_Player_SavePState( arcSaveGame *savefile, const playerPState_t &state ) {
+void anPhysics_Player_SavePState( arcSaveGame *savefile, const playerPState_t &state ) {
 	savefile->WriteVec3( state.origin );
 	savefile->WriteVec3( state.velocity );
 	savefile->WriteVec3( state.localOrigin );
@@ -1485,10 +1485,10 @@ void arcPhysics_Player_SavePState( arcSaveGame *savefile, const playerPState_t &
 
 /*
 ================
-arcPhysics_Player_RestorePState
+anPhysics_Player_RestorePState
 ================
 */
-void arcPhysics_Player_RestorePState( arcRestoreGame *savefile, playerPState_t &state ) {
+void anPhysics_Player_RestorePState( arcRestoreGame *savefile, playerPState_t &state ) {
 	savefile->ReadVec3( state.origin );
 	savefile->ReadVec3( state.velocity );
 	savefile->ReadVec3( state.localOrigin );
@@ -1501,12 +1501,12 @@ void arcPhysics_Player_RestorePState( arcRestoreGame *savefile, playerPState_t &
 
 /*
 ================
-arcPhysics_Player::Save
+anPhysics_Player::Save
 ================
 */
-void arcPhysics_Player::Save( arcSaveGame *savefile ) const {
-	arcPhysics_Player_SavePState( savefile, current );
-	arcPhysics_Player_SavePState( savefile, saved );
+void anPhysics_Player::Save( arcSaveGame *savefile ) const {
+	anPhysics_Player_SavePState( savefile, current );
+	anPhysics_Player_SavePState( savefile, saved );
 
 	savefile->WriteFloat( walkSpeed );
 	savefile->WriteFloat( crouchSpeed );
@@ -1537,12 +1537,12 @@ void arcPhysics_Player::Save( arcSaveGame *savefile ) const {
 
 /*
 ================
-arcPhysics_Player::Restore
+anPhysics_Player::Restore
 ================
 */
-void arcPhysics_Player::Restore( arcRestoreGame *savefile ) {
-	arcPhysics_Player_RestorePState( savefile, current );
-	arcPhysics_Player_RestorePState( savefile, saved );
+void anPhysics_Player::Restore( arcRestoreGame *savefile ) {
+	anPhysics_Player_RestorePState( savefile, current );
+	anPhysics_Player_RestorePState( savefile, saved );
 
 	savefile->ReadFloat( walkSpeed );
 	savefile->ReadFloat( crouchSpeed );
@@ -1567,72 +1567,72 @@ void arcPhysics_Player::Restore( arcRestoreGame *savefile ) {
 	savefile->ReadBool( ladder );
 	savefile->ReadVec3( ladderNormal );
 
-	savefile->ReadInt( (int &)waterLevel );
+	savefile->ReadInt( ( int&)waterLevel );
 	savefile->ReadInt( waterType );
 }
 
 /*
 ================
-arcPhysics_Player::SetPlayerInput
+anPhysics_Player::SetPlayerInput
 ================
 */
-void arcPhysics_Player::SetPlayerInput( const usercmd_t &cmd, const arcAngles &newViewAngles ) {
+void anPhysics_Player::SetPlayerInput( const usercmd_t &cmd, const anAngles &newViewAngles ) {
 	command = cmd;
 	viewAngles = newViewAngles;		// can't use cmd.angles cause of the delta_angles
 }
 
 /*
 ================
-arcPhysics_Player::SetSpeed
+anPhysics_Player::SetSpeed
 ================
 */
-void arcPhysics_Player::SetSpeed( const float newWalkSpeed, const float newCrouchSpeed ) {
+void anPhysics_Player::SetSpeed( const float newWalkSpeed, const float newCrouchSpeed ) {
 	walkSpeed = newWalkSpeed;
 	crouchSpeed = newCrouchSpeed;
 }
 
 /*
 ================
-arcPhysics_Player::SetMaxStepHeight
+anPhysics_Player::SetMaxStepHeight
 ================
 */
-void arcPhysics_Player::SetMaxStepHeight( const float newMaxStepHeight ) {
+void anPhysics_Player::SetMaxStepHeight( const float newMaxStepHeight ) {
 	maxStepHeight = newMaxStepHeight;
 }
 
 /*
 ================
-arcPhysics_Player::GetMaxStepHeight
+anPhysics_Player::GetMaxStepHeight
 ================
 */
-float arcPhysics_Player::GetMaxStepHeight( void ) const {
+float anPhysics_Player::GetMaxStepHeight( void ) const {
 	return maxStepHeight;
 }
 
 /*
 ================
-arcPhysics_Player::SetMaxJumpHeight
+anPhysics_Player::SetMaxJumpHeight
 ================
 */
-void arcPhysics_Player::SetMaxJumpHeight( const float newMaxJumpHeight ) {
+void anPhysics_Player::SetMaxJumpHeight( const float newMaxJumpHeight ) {
 	maxJumpHeight = newMaxJumpHeight;
 }
 
 /*
 ================
-arcPhysics_Player::SetMovementType
+anPhysics_Player::SetMovementType
 ================
 */
-void arcPhysics_Player::SetMovementType( const pmtype_t type ) {
+void anPhysics_Player::SetMovementType( const pmtype_t type ) {
 	current.movementType = type;
 }
 
 /*
 ================
-arcPhysics_Player::SetKnockBack
+anPhysics_Player::SetKnockBack
 ================
 */
-void arcPhysics_Player::SetKnockBack( const int knockBackTime ) {
+void anPhysics_Player::SetKnockBack( const int knockBackTime ) {
 	if ( current.movementTime ) {
 		return;
 	}
@@ -1642,21 +1642,21 @@ void arcPhysics_Player::SetKnockBack( const int knockBackTime ) {
 
 /*
 ================
-arcPhysics_Player::SetDebugLevel
+anPhysics_Player::SetDebugLevel
 ================
 */
-void arcPhysics_Player::SetDebugLevel( bool set ) {
+void anPhysics_Player::SetDebugLevel( bool set ) {
 	debugLevel = set;
 }
 
 /*
 ================
-arcPhysics_Player::Evaluate
+anPhysics_Player::Evaluate
 ================
 */
-bool arcPhysics_Player::Evaluate( int timeStepMSec, int endTimeMSec ) {
-	arcVec3 masterOrigin, oldOrigin;
-	arcMat3 masterAxis;
+bool anPhysics_Player::Evaluate( int timeStepMSec, int endTimeMSec ) {
+	anVec3 masterOrigin, oldOrigin;
+	anMat3 masterAxis;
 
 	waterLevel = WATERLEVEL_NONE;
 	waterType = 0;
@@ -1678,7 +1678,7 @@ bool arcPhysics_Player::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 	ActivateContactEntities();
 
-	arcPhysics_Player::MovePlayer( timeStepMSec );
+	anPhysics_Player::MovePlayer( timeStepMSec );
 
 	clipModel->Link( gameLocal.clip, self, 0, current.origin, clipModel->GetAxis() );
 
@@ -1691,27 +1691,27 @@ bool arcPhysics_Player::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 /*
 ================
-arcPhysics_Player::UpdateTime
+anPhysics_Player::UpdateTime
 ================
 */
-void arcPhysics_Player::UpdateTime( int endTimeMSec ) {
+void anPhysics_Player::UpdateTime( int endTimeMSec ) {
 }
 
 /*
 ================
-arcPhysics_Player::GetTime
+anPhysics_Player::GetTime
 ================
 */
-int arcPhysics_Player::GetTime( void ) const {
+int anPhysics_Player::GetTime( void ) const {
 	return gameLocal.time;
 }
 
 /*
 ================
-arcPhysics_Player::GetImpactInfo
+anPhysics_Player::GetImpactInfo
 ================
 */
-void arcPhysics_Player::GetImpactInfo( const int id, const arcVec3 &point, impactInfo_t *info ) const {
+void anPhysics_Player::GetImpactInfo( const int id, const anVec3 &point, impactInfo_t *info ) const {
 	info->invMass = invMass;
 	info->invInertiaTensor.Zero();
 	info->position.Zero();
@@ -1720,10 +1720,10 @@ void arcPhysics_Player::GetImpactInfo( const int id, const arcVec3 &point, impac
 
 /*
 ================
-arcPhysics_Player::ApplyImpulse
+anPhysics_Player::ApplyImpulse
 ================
 */
-void arcPhysics_Player::ApplyImpulse( const int id, const arcVec3 &point, const arcVec3 &impulse ) {
+void anPhysics_Player::ApplyImpulse( const int id, const anVec3 &point, const anVec3 &impulse ) {
 	if ( current.movementType != PM_NOCLIP ) {
 		current.velocity += impulse * invMass;
 	}
@@ -1731,37 +1731,37 @@ void arcPhysics_Player::ApplyImpulse( const int id, const arcVec3 &point, const 
 
 /*
 ================
-arcPhysics_Player::IsAtRest
+anPhysics_Player::IsAtRest
 ================
 */
-bool arcPhysics_Player::IsAtRest( void ) const {
+bool anPhysics_Player::IsAtRest( void ) const {
 	return false;
 }
 
 /*
 ================
-arcPhysics_Player::GetRestStartTime
+anPhysics_Player::GetRestStartTime
 ================
 */
-int arcPhysics_Player::GetRestStartTime( void ) const {
+int anPhysics_Player::GetRestStartTime( void ) const {
 	return -1;
 }
 
 /*
 ================
-arcPhysics_Player::SaveState
+anPhysics_Player::SaveState
 ================
 */
-void arcPhysics_Player::SaveState( void ) {
+void anPhysics_Player::SaveState( void ) {
 	saved = current;
 }
 
 /*
 ================
-arcPhysics_Player::RestoreState
+anPhysics_Player::RestoreState
 ================
 */
-void arcPhysics_Player::RestoreState( void ) {
+void anPhysics_Player::RestoreState( void ) {
 	current = saved;
 	clipModel->Link( gameLocal.clip, self, 0, current.origin, clipModel->GetAxis() );
 	EvaluateContacts();
@@ -1769,12 +1769,12 @@ void arcPhysics_Player::RestoreState( void ) {
 
 /*
 ================
-arcPhysics_Player::SetOrigin
+anPhysics_Player::SetOrigin
 ================
 */
-void arcPhysics_Player::SetOrigin( const arcVec3 &newOrigin, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Player::SetOrigin( const anVec3 &newOrigin, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.localOrigin = newOrigin;
 	if ( masterEntity ) {
@@ -1789,28 +1789,28 @@ void arcPhysics_Player::SetOrigin( const arcVec3 &newOrigin, int id ) {
 
 /*
 ================
-arcPhysics_Player::GetOrigin
+anPhysics_Player::GetOrigin
 ================
 */
-const arcVec3 & arcPhysics_Player::PlayerGetOrigin( void ) const {
+const anVec3 & anPhysics_Player::PlayerGetOrigin( void ) const {
 	return current.origin;
 }
 
 /*
 ================
-arcPhysics_Player::SetAxis
+anPhysics_Player::SetAxis
 ================
 */
-void arcPhysics_Player::SetAxis( const arcMat3 &newAxis, int id ) {
+void anPhysics_Player::SetAxis( const anMat3 &newAxis, int id ) {
 	clipModel->Link( gameLocal.clip, self, 0, clipModel->GetOrigin(), newAxis );
 }
 
 /*
 ================
-arcPhysics_Player::Translate
+anPhysics_Player::Translate
 ================
 */
-void arcPhysics_Player::Translate( const arcVec3 &translation, int id ) {
+void anPhysics_Player::Translate( const anVec3 &translation, int id ) {
 
 	current.localOrigin += translation;
 	current.origin += translation;
@@ -1820,12 +1820,12 @@ void arcPhysics_Player::Translate( const arcVec3 &translation, int id ) {
 
 /*
 ================
-arcPhysics_Player::Rotate
+anPhysics_Player::Rotate
 ================
 */
-void arcPhysics_Player::Rotate( const idRotation &rotation, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Player::Rotate( const anRotation &rotation, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.origin *= rotation;
 	if ( masterEntity ) {
@@ -1840,33 +1840,33 @@ void arcPhysics_Player::Rotate( const idRotation &rotation, int id ) {
 
 /*
 ================
-arcPhysics_Player::SetLinearVelocity
+anPhysics_Player::SetLinearVelocity
 ================
 */
-void arcPhysics_Player::SetLinearVelocity( const arcVec3 &newLinearVelocity, int id ) {
+void anPhysics_Player::SetLinearVelocity( const anVec3 &newLinearVelocity, int id ) {
 	current.velocity = newLinearVelocity;
 }
 
 /*
 ================
-arcPhysics_Player::GetLinearVelocity
+anPhysics_Player::GetLinearVelocity
 ================
 */
-const arcVec3 &arcPhysics_Player::GetLinearVelocity( int id ) const {
+const anVec3 &anPhysics_Player::GetLinearVelocity( int id ) const {
 	return current.velocity;
 }
 
 /*
 ================
-arcPhysics_Player::SetPushed
+anPhysics_Player::SetPushed
 ================
 */
-void arcPhysics_Player::SetPushed( int deltaTime ) {
-	arcVec3 velocity;
+void anPhysics_Player::SetPushed( int deltaTime ) {
+	anVec3 velocity;
 	float d;
 
 	// velocity with which the player is pushed
-	velocity = ( current.origin - saved.origin ) / ( deltaTime * arcMath::M_MS2SEC );
+	velocity = ( current.origin - saved.origin ) / ( deltaTime * anMath::M_MS2SEC );
 
 	// remove any downward push velocity
 	d = velocity * gravityNormal;
@@ -1879,32 +1879,32 @@ void arcPhysics_Player::SetPushed( int deltaTime ) {
 
 /*
 ================
-arcPhysics_Player::GetPushedLinearVelocity
+anPhysics_Player::GetPushedLinearVelocity
 ================
 */
-const arcVec3 &arcPhysics_Player::GetPushedLinearVelocity( const int id ) const {
+const anVec3 &anPhysics_Player::GetPushedLinearVelocity( const int id ) const {
 	return current.pushVelocity;
 }
 
 /*
 ================
-arcPhysics_Player::ClearPushedVelocity
+anPhysics_Player::ClearPushedVelocity
 ================
 */
-void arcPhysics_Player::ClearPushedVelocity( void ) {
+void anPhysics_Player::ClearPushedVelocity( void ) {
 	current.pushVelocity.Zero();
 }
 
 /*
 ================
-arcPhysics_Player::SetMaster
+anPhysics_Player::SetMaster
 
   the binding is never orientated
 ================
 */
-void arcPhysics_Player::SetMaster( arcEntity *master, const bool orientated ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Player::SetMaster( arcEntity *master, const bool orientated ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	if ( master ) {
 		if ( !masterEntity ) {
@@ -1917,14 +1917,14 @@ void arcPhysics_Player::SetMaster( arcEntity *master, const bool orientated ) {
 		ClearContacts();
 	} else {
 		if ( masterEntity ) {
-			masterEntity = NULL;
+			masterEntity = nullptr;
 		}
 	}
 }
 
 const float	PLAYER_VELOCITY_MAX				= 4000;
 const int	PLAYER_VELOCITY_TOTAL_BITS		= 16;
-const int	PLAYER_VELOCITY_EXPONENT_BITS	= arcMath::BitsForInteger( arcMath::BitsForFloat( PLAYER_VELOCITY_MAX ) ) + 1;
+const int	PLAYER_VELOCITY_EXPONENT_BITS	= anMath::BitsForInteger( anMath::BitsForFloat( PLAYER_VELOCITY_MAX ) ) + 1;
 const int	PLAYER_VELOCITY_MANTISSA_BITS	= PLAYER_VELOCITY_TOTAL_BITS - 1 - PLAYER_VELOCITY_EXPONENT_BITS;
 const int	PLAYER_MOVEMENT_TYPE_BITS		= 3;
 const int	PLAYER_MOVEMENT_FLAGS_BITS		= 8;

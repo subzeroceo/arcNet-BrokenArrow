@@ -10,19 +10,19 @@ class rvGEStateModifier : public rvGEModifier
 {
 public:
 
-	rvGEStateModifier ( const char* name, idWindow* window, arcDictionary& dict );
+	rvGEStateModifier ( const char* name, idWindow* window, anDict& dict );
 
 	virtual bool		Apply	( void );
 	virtual bool		Undo	( void );
 
 protected:
 
-	bool	SetState	( arcDictionary& dict );
+	bool	SetState	( anDict& dict );
 
 	rvGEWindowWrapper::EWindowType	mWindowType;
 	rvGEWindowWrapper::EWindowType	mUndoWindowType;
-	arcDictionary							mDict;
-	arcDictionary							mUndoDict;
+	anDict							mDict;
+	anDict							mUndoDict;
 };
 
 #endif // GESTATEMODIFIER_H_

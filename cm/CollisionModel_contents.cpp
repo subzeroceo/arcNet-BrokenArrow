@@ -7,7 +7,7 @@
 ===============================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "CollisionModel_local.h"
@@ -22,20 +22,20 @@ Contents test
 
 /*
 ================
-arcCollisionModelManagerLocal::TestTrmVertsInBrush
+anSoftBodiesPhysicsManager::TestTrmVertsInBrush
 
   returns true if any of the trm vertices is inside the brush
 ================
 */
-bool arcCollisionModelManagerLocal::TestTrmVertsInBrush( cm_traceWork_t *tw, cm_brush_t *b ) {
+bool anSoftBodiesPhysicsManager::TestTrmVertsInBrush( cm_traceWork_t *tw, cm_brush_t *b ) {
 	int i, j, numVerts, bestPlane;
 	float d, bestd;
-	arcVec3 *p;
+	anVec3 *p;
 
-	if ( b->checkcount == arcCollisionModelManagerLocal::checkCount ) {
+	if ( b->checkcount == anSoftBodiesPhysicsManager::checkCount ) {
 		return false;
 	}
-	b->checkcount = arcCollisionModelManagerLocal::checkCount;
+	b->checkcount = anSoftBodiesPhysicsManager::checkCount;
 
 	if ( !( b->contents & tw->contents ) ) {
 		return false;
@@ -58,7 +58,7 @@ bool arcCollisionModelManagerLocal::TestTrmVertsInBrush( cm_traceWork_t *tw, cm_
 
 		// see if the point is inside the brush
 		bestPlane = 0;
-		bestd = -arcMath::INFINITY;
+		bestd = -anMath::INFINITY;
 		for ( i = 0; i < b->numPlanes; i++ ) {
 			d = b->planes[i].Distance( *p );
 			if ( d >= 0.0f ) {
@@ -121,20 +121,20 @@ CM_SetTrmPolygonSidedness
 
 /*
 ================
-arcCollisionModelManagerLocal::TestTrmInPolygon
+anSoftBodiesPhysicsManager::TestTrmInPolygon
 
   returns true if the trm intersects the polygon
 ================
 */
-bool arcCollisionModelManagerLocal::TestTrmInPolygon( cm_traceWork_t *tw, cm_polygon_t *p ) {
+bool anSoftBodiesPhysicsManager::TestTrmInPolygon( cm_traceWork_t *tw, cm_polygon_t *p ) {
  edgeNum, flip, trmEdgeNum, bitNum, bestPlane;
 	int sides[MAX_TRACEMODEL_VERTS];
 
 	// if already checked this polygon
-	if ( p->checkcount == arcCollisionModelManagerLocal::checkCount ) {
+	if ( p->checkcount == anSoftBodiesPhysicsManager::checkCount ) {
 		return false;
 	}
-	p->checkcount = arcCollisionModelManagerLocal::checkCount;
+	p->checkcount = anSoftBodiesPhysicsManager::checkCount;
 
 	// if this polygon does not have the right contents behind it
 	if ( !( p->contents & tw->contents) ) {
@@ -147,7 +147,7 @@ bool arcCollisionModelManagerLocal::TestTrmInPolygon( cm_traceWork_t *tw, cm_pol
 	}
 
 	// bounds should cross polygon plane
-	switch( tw->bounds.PlaneSide( p->plane ) ) {
+	switch ( tw->bounds.PlaneSide( p->plane ) ) {
 		case PLANESIDE_CROSS:
 			break;
 		case PLANESIDE_FRONT:
@@ -166,19 +166,19 @@ bool arcCollisionModelManagerLocal::TestTrmInPolygon( cm_traceWork_t *tw, cm_pol
 			int edgeNum = p->edges[i];
 			edge = tw->model->edges + abs( edgeNum );
 			// if this edge is already tested
-			if ( edge->checkcount == arcCollisionModelManagerLocal::checkCount ) {
+			if ( edge->checkcount == anSoftBodiesPhysicsManager::checkCount ) {
 				continue;
 			}
 
 			for ( int j = 0; j < 2; j++ ) {
 				v = &tw->model->vertices[edge->vertexNum[j]];
 				// if this vertex is already tested
-				if ( v->checkcount == arcCollisionModelManagerLocal::checkCount ) {
+				if ( v->checkcount == anSoftBodiesPhysicsManager::checkCount ) {
 					continue;
 				}
 
 				int bestPlane = 0;
-				float bestd = -arcMath::INFINITY;
+				float bestd = -anMath::INFINITY;
 				for ( int k = 0; k < tw->numPolys; k++ ) {
 					float d = tw->polys[k].plane.Distance( v->p );
 					if ( d >= 0.0f ) {
@@ -209,17 +209,17 @@ bool arcCollisionModelManagerLocal::TestTrmInPolygon( cm_traceWork_t *tw, cm_pol
 		int edgeNum = p->edges[i];
 		cm_edge_t *edge = tw->model->edges + abs( edgeNum );
 		// reset sidedness cache if this is the first time we encounter this edge
-		if ( edge->checkcount != arcCollisionModelManagerLocal::checkCount ) {
+		if ( edge->checkcount != anSoftBodiesPhysicsManager::checkCount ) {
 			edge->sideSet = 0;
 		}
 		// pluecker coordinate for edge
 		tw->polygonEdgePlueckerCache[i].FromLine( tw->model->vertices[edge->vertexNum[0]].p, tw->model->vertices[edge->vertexNum[1]].p );
 		cm_vertex_t *v = &tw->model->vertices[edge->vertexNum[INTSIGNBITSET( edgeNum )]];
 		// reset sidedness cache if this is the first time we encounter this vertex
-		if ( v->checkcount != arcCollisionModelManagerLocal::checkCount ) {
+		if ( v->checkcount != anSoftBodiesPhysicsManager::checkCount ) {
 			v->sideSet = 0;
 		}
-		v->checkcount = arcCollisionModelManagerLocal::checkCount;
+		v->checkcount = anSoftBodiesPhysicsManager::checkCount;
 	}
 
 	// get side of polygon for each trm vertex
@@ -242,7 +242,7 @@ bool arcCollisionModelManagerLocal::TestTrmInPolygon( cm_traceWork_t *tw, cm_pol
 			cm_edge_t *edge = tw->model->edges + abs( edgeNum );
 #if 1
 			CM_SetTrmEdgeSidedness( edge, tw->edges[i].pl, tw->polygonEdgePlueckerCache[j], i );
-			if ( INTSIGNBITSET( edgeNum ) ^ (( edge->side >> i ) & 1) ^ flip ) {
+			if ( INTSIGNBITSET( edgeNum ) ^ ( ( edge->side >> i ) & 1) ^ flip ) {
 				break;
 			}
 #else
@@ -279,10 +279,10 @@ bool arcCollisionModelManagerLocal::TestTrmInPolygon( cm_traceWork_t *tw, cm_pol
 	for ( int i = 0; i < p->numEdges; i++ ) {
 		int edgeNum = p->edges[i];
 		cm_edge_t *edge = tw->model->edges + abs( edgeNum );
-		if ( edge->checkcount == arcCollisionModelManagerLocal::checkCount ) {
+		if ( edge->checkcount == anSoftBodiesPhysicsManager::checkCount ) {
 			continue;
 		}
-		edge->checkcount = arcCollisionModelManagerLocal::checkCount;
+		edge->checkcount = anSoftBodiesPhysicsManager::checkCount;
 
 		for ( int j = 0; j < tw->numPolys; j++ ) {
 #if 1
@@ -356,10 +356,10 @@ bool arcCollisionModelManagerLocal::TestTrmInPolygon( cm_traceWork_t *tw, cm_pol
 
 /*
 ================
-arcCollisionModelManagerLocal::PointNode
+anSoftBodiesPhysicsManager::PointNode
 ================
 */
-cm_node_t *arcCollisionModelManagerLocal::PointNode( const arcVec3 &p, cm_model_t *model ) {
+cm_node_t *anSoftBodiesPhysicsManager::PointNode( const anVec3 &p, cm_model_t *model ) {
 	cm_node_t *node = model->node;
 	while ( node->planeType != -1 ) {
 		if ( p[node->planeType] > node->planeDist ) {
@@ -368,21 +368,21 @@ cm_node_t *arcCollisionModelManagerLocal::PointNode( const arcVec3 &p, cm_model_
 			node = node->children[1];
 		}
 
-		assert( node != NULL );
+		assert( node != nullptr );
 	}
 	return node;
 }
 
 /*
 ================
-arcCollisionModelManagerLocal::PointContents
+anSoftBodiesPhysicsManager::PointContents
 ================
 */
-int arcCollisionModelManagerLocal::PointContents( const arcVec3 p, cmHandle_t model ) {
+int anSoftBodiesPhysicsManager::PointContents( const anVec3 p, cmHandle_t model ) {
 	cm_brushRef_t *bref;
 	cm_brush_t *b;
 
-	cm_node_t *node = arcCollisionModelManagerLocal::PointNode( p, arcCollisionModelManagerLocal::models[model] );
+	cm_node_t *node = anSoftBodiesPhysicsManager::PointNode( p, anSoftBodiesPhysicsManager::models[model] );
 	for ( cm_brushRef_t *bref = node->brushes; bref; bref = bref->next ) {
 		float b = bref->b;
 		// test if the point is within the brush bounds
@@ -398,7 +398,7 @@ int arcCollisionModelManagerLocal::PointContents( const arcVec3 p, cmHandle_t mo
 			continue;
 		}
 		// test if the point is inside the brush
-		arcPlane *plane = b->planes;
+		anPlane *plane = b->planes;
 		for ( int i = 0; i < b->numPlanes; i++, plane++ ) {
 			d = plane->Distance( p );
 			if ( d >= 0 ) {
@@ -414,26 +414,26 @@ int arcCollisionModelManagerLocal::PointContents( const arcVec3 p, cmHandle_t mo
 
 /*
 ==================
-arcCollisionModelManagerLocal::TransformedPointContents
+anSoftBodiesPhysicsManager::TransformedPointContents
 ==================
 */
-int	arcCollisionModelManagerLocal::TransformedPointContents( const arcVec3 &p, cmHandle_t model, const arcVec3 &origin, const arcMat3 &modelAxis ) {
-	arcVec3 p_l = p - origin;
+int	anSoftBodiesPhysicsManager::TransformedPointContents( const anVec3 &p, cmHandle_t model, const anVec3 &origin, const anMat3 &modelAxis ) {
+	anVec3 p_l = p - origin;
 	if ( modelAxis.IsRotated() ) {
 		p_l *= modelAxis;
 	}
-	return arcCollisionModelManagerLocal::PointContents( p_l, model );
+	return anSoftBodiesPhysicsManager::PointContents( p_l, model );
 }
 
 
 /*
 ==================
-arcCollisionModelManagerLocal::ContentsTrm
+anSoftBodiesPhysicsManager::ContentsTrm
 ==================
 */
-int arcCollisionModelManagerLocal::ContentsTrm( trace_t *results, const arcVec3 &start,
-const arcTraceModel *trm, const arcMat3 &trmAxis, int contentMask,
-cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
+int anSoftBodiesPhysicsManager::ContentsTrm( trace_t *results, const anVec3 &start,
+const anTraceModel *trm, const anMat3 &trmAxis, int contentMask,
+cmHandle_t model, const anVec3 &modelOrigin, const anMat3 &modelAxis ) {
 	ALIGN16( cm_traceWork_t tw );
 
 	// fast point case
@@ -441,7 +441,7 @@ cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
 					trm->bounds[1][1] - trm->bounds[0][1] <= 0.0f &&
 					trm->bounds[1][2] - trm->bounds[0][2] <= 0.0f ) ) {
 
-		results->c.contents = arcCollisionModelManagerLocal::TransformedPointContents( start, model, modelOrigin, modelAxis );
+		results->c.contents = anSoftBodiesPhysicsManager::TransformedPointContents( start, model, modelOrigin, modelAxis );
 		results->fraction = ( results->c.contents == 0 );
 		results->endpos = start;
 		results->endAxis = trmAxis;
@@ -449,7 +449,7 @@ cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
 		return results->c.contents;
 	}
 
-	arcCollisionModelManagerLocal::checkCount++;
+	anSoftBodiesPhysicsManager::checkCount++;
 
 	tw.trace.fraction = 1.0f;
 	tw.trace.c.contents = 0;
@@ -461,17 +461,17 @@ cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
 	tw.pointTrace = false;
 	tw.quickExit = false;
 	tw.numContacts = 0;
-	tw.model = arcCollisionModelManagerLocal::models[model];
+	tw.model = anSoftBodiesPhysicsManager::models[model];
 	tw.start = start - modelOrigin;
 	tw.end = tw.start;
 
 	bool model_rotated = modelAxis.IsRotated();
 	if ( model_rotated ) {
-		arcMat3 invModelAxis = modelAxis.Transpose();
+		anMat3 invModelAxis = modelAxis.Transpose();
 	}
 
 	// setup trm structure
-	arcCollisionModelManagerLocal::SetupTrm( &tw, trm );
+	anSoftBodiesPhysicsManager::SetupTrm( &tw, trm );
 
 	bool trm_rotated = trmAxis.IsRotated();
 
@@ -495,7 +495,7 @@ cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
 
 	// add offset to start point
 	if ( trm_rotated ) {
-		arcVec3 dir = trm->offset * trmAxis;
+		anVec3 dir = trm->offset * trmAxis;
 		tw.start += dir;
 		tw.end += dir;
 	} else {
@@ -526,7 +526,7 @@ cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
 
 	// setup trm polygons
 	if ( trm_rotated & model_rotated ) {
-		arcMat3 tmpAxis = trmAxis * invModelAxis;
+		anMat3 tmpAxis = trmAxis * invModelAxis;
 		for ( int i = 0; i < tw.numPolys; i++ ) {
 			tw.polys[i].plane *= tmpAxis;
 		}
@@ -552,15 +552,15 @@ cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
 			tw.bounds[0][i] = tw.end[i] + tw.size[0][i] - CM_BOX_EPSILON;
 			tw.bounds[1][i] = tw.start[i] + tw.size[1][i] + CM_BOX_EPSILON;
 		}
-		if ( arcMath::Fabs(tw.size[0][i]) > arcMath::Fabs(tw.size[1][i]) ) {
-			tw.extents[i] = arcMath::Fabs( tw.size[0][i] ) + CM_BOX_EPSILON;
+		if ( anMath::Fabs(tw.size[0][i]) > anMath::Fabs(tw.size[1][i]) ) {
+			tw.extents[i] = anMath::Fabs( tw.size[0][i] ) + CM_BOX_EPSILON;
 		} else {
-			tw.extents[i] = arcMath::Fabs( tw.size[1][i] ) + CM_BOX_EPSILON;
+			tw.extents[i] = anMath::Fabs( tw.size[1][i] ) + CM_BOX_EPSILON;
 		}
 	}
 
 	// trace through the model
-	arcCollisionModelManagerLocal::TraceThroughModel( &tw );
+	anSoftBodiesPhysicsManager::TraceThroughModel( &tw );
 
 	*results = tw.trace;
 	results->fraction = ( results->c.contents == 0 );
@@ -572,20 +572,20 @@ cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
 
 /*
 ==================
-arcCollisionModelManagerLocal::Contents
+anSoftBodiesPhysicsManager::Contents
 ==================
 */
-int arcCollisionModelManagerLocal::Contents( const arcVec3 &start,
-const arcTraceModel *trm, const arcMat3 &trmAxis, int contentMask,
-cmHandle_t model, const arcVec3 &modelOrigin, const arcMat3 &modelAxis ) {
+int anSoftBodiesPhysicsManager::Contents( const anVec3 &start,
+const anTraceModel *trm, const anMat3 &trmAxis, int contentMask,
+cmHandle_t model, const anVec3 &modelOrigin, const anMat3 &modelAxis ) {
 	trace_t results;
 
-	if ( model < 0 || model > arcCollisionModelManagerLocal::maxModels || model > MAX_SUBMODELS ) {
-		common->Printf( "arcCollisionModelManagerLocal::Contents: invalid model handle\n" );
+	if ( model < 0 || model > anSoftBodiesPhysicsManager::maxModels || model > MAX_SUBMODELS ) {
+		common->Printf( "anSoftBodiesPhysicsManager::Contents: invalid model handle\n" );
 		return 0;
 	}
-	if ( !arcCollisionModelManagerLocal::models || !arcCollisionModelManagerLocal::models[model] ) {
-		common->Printf( "arcCollisionModelManagerLocal::Contents: invalid model\n" );
+	if ( !anSoftBodiesPhysicsManager::models || !anSoftBodiesPhysicsManager::models[model] ) {
+		common->Printf( "anSoftBodiesPhysicsManager::Contents: invalid model\n" );
 		return 0;
 	}
 

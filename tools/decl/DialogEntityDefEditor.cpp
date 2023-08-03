@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/Common_resource.h"
@@ -50,7 +50,7 @@ toolTip_t DialogEntityDefEditor::toolTips[] = {
 	{ IDC_DECLEDITOR_BUTTON_TEST, "Test Decl" },
 	{ IDOK, "Save Decl" },
 	{ IDCANCEL, "Cancel" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 
@@ -61,9 +61,9 @@ IMPLEMENT_DYNAMIC(DialogEntityDefEditor, CDialog)
 DialogEntityDefEditor::DialogEntityDefEditor
 ================
 */
-DialogEntityDefEditor::DialogEntityDefEditor( CWnd* pParent /*=NULL*/ )
+DialogEntityDefEditor::DialogEntityDefEditor( CWnd* pParent /*=nullptr*/ )
 	: CDialog(DialogEntityDefEditor::IDD, pParent)
-	, decl(NULL)
+	, decl(nullptr )
 	, firstLine(0 )
 {
 }
@@ -121,9 +121,9 @@ BOOL DialogEntityDefEditor::PreTranslateMessage( MSG* pMsg ) {
 DialogEntityDefEditor::TestDecl
 ================
 */
-bool DialogEntityDefEditor::TestDecl( const arcNetString &declText ) {
-	arcLexer src( LEXFL_NOSTRINGCONCAT );
-	arcNetToken token;
+bool DialogEntityDefEditor::TestDecl( const anString &declText ) {
+	anLexer src( LEXFL_NOSTRINGCONCAT );
+	anToken token;
 	int indent;
 
 	src.LoadMemory( declText, declText.Length(), "decl text" );
@@ -164,7 +164,7 @@ void DialogEntityDefEditor::UpdateStatusBar( void ) {
 DialogEntityDefEditor::LoadDecl
 ================
 */
-void DialogEntityDefEditor::LoadDecl( arcDeclEntityDef *decl ) {
+void DialogEntityDefEditor::LoadDecl( anDeclEntityDef *decl ) {
 	int numLines = 0;
 	CRect rect;
 
@@ -172,7 +172,7 @@ void DialogEntityDefEditor::LoadDecl( arcDeclEntityDef *decl ) {
 
 	// Fill up the spawnclass box with all spawn classes
 	/*
-	idTypeInfo *c = idClass::GetClass( "idClass" );
+	idTypeInfo *c = anClass::GetClass( "anClass" );
 	for (; c; c = c->next) {
 		spawnclassCombo.AddString(c->classname);
 	}
@@ -181,7 +181,7 @@ void DialogEntityDefEditor::LoadDecl( arcDeclEntityDef *decl ) {
 	// Fill up the inherit box with all entitydefs
 	int numDecls = declManager->GetNumDecls(DECL_ENTITYDEF);
 	for ( int i=0; i<numDecls; i++ ) {
-		const arcDecleration *d = declManager->DeclByIndex(DECL_ENTITYDEF, i, false);
+		const anDecl *d = declManager->DeclByIndex(DECL_ENTITYDEF, i, false);
 		if ( d ) {
 			inheritCombo.AddString(d->GetName() );
 		}
@@ -214,10 +214,10 @@ DialogEntityDefEditor::PopulateLists
 */
 void DialogEntityDefEditor::PopulateLists( const char *declText, const int textLength )
 {
-	arcLexer src;
-	arcNetToken	token, token2;
+	anLexer src;
+	anToken	token, token2;
 
-	arcDictionary dict;
+	anDict dict;
 
 	src.LoadMemory( declText, textLength, decl->GetFileName(), firstLine);
 	src.SetFlags( DECL_LEXER_FLAGS );
@@ -249,14 +249,14 @@ void DialogEntityDefEditor::PopulateLists( const char *declText, const int textL
 
 	// Get the parent, and remove the 'inherit' key so it doesn't show up in the list
 	// We currently don't support multiple inheritence properly, but nothing uses it anyway
-	arcNetString inherit;
-	const idKeyValue *inheritKeyVal = dict.FindKey( "inherit" );
+	anString inherit;
+	const anKeyValue *inheritKeyVal = dict.FindKey( "inherit" );
 	if (inheritKeyVal) {
 		inherit = inheritKeyVal->GetValue();
 		dict.Delete(inheritKeyVal->GetKey() );
 	}
 
-	arcNetString spawnclass = dict.GetString( "spawnclass", "" );
+	anString spawnclass = dict.GetString( "spawnclass", "" );
 	dict.Delete( "spawnclass" );
 
 	keyValsList.ResetContent();
@@ -264,7 +264,7 @@ void DialogEntityDefEditor::PopulateLists( const char *declText, const int textL
 	// Fill up the list with all the main info
 	size_t numPairs = dict.Size();
 	for (unsigned int i=0; i<numPairs; i++ ) {
-		const idKeyValue *keyVal = dict.GetKeyVal( i );
+		const anKeyValue *keyVal = dict.GetKeyVal( i );
 		if (keyVal) {
 			keyValsList.AddPropItem(new CPropertyItem(keyVal->GetKey().c_str(), keyVal->GetValue().c_str(), PIT_EDIT, "" ) );
 		}
@@ -288,7 +288,7 @@ DialogEntityDefEditor::SetInherit
 =================
 */
 
-void DialogEntityDefEditor::SetInherit(arcNetString &inherit)
+void DialogEntityDefEditor::SetInherit(anString &inherit)
 {
 	CWaitCursor wc;
 
@@ -306,12 +306,12 @@ void DialogEntityDefEditor::SetInherit(arcNetString &inherit)
 	CString spawnclass;
 	// Fill up the rest of the box with inherited info
 	if ( !inherit.IsEmpty() ) {
-		const arcDecleration *temp = declManager->FindType(DECL_ENTITYDEF, inherit, false);
-		const arcDeclEntityDef *parent = static_cast<const arcDeclEntityDef *>(temp);
+		const anDecl *temp = declManager->FindType(DECL_ENTITYDEF, inherit, false);
+		const anDeclEntityDef *parent = static_cast<const anDeclEntityDef *>(temp);
 		if (parent) {
 			size_t numPairs = parent->dict.Size();
 			for (unsigned int i=0; i<numPairs; i++ ) {
-				const idKeyValue *keyVal = parent->dict.GetKeyVal( i );
+				const anKeyValue *keyVal = parent->dict.GetKeyVal( i );
 				if (keyVal) {
 					if (spawnclass.IsEmpty() && keyVal->GetKey() == "spawnclass" ) {
 						spawnclass = keyVal->GetValue();
@@ -622,7 +622,7 @@ void DialogEntityDefEditor::OnInheritChange( ) {
 	testButton.EnableWindow( TRUE );
 	okButton.EnableWindow( TRUE );
 
-	arcNetString inherit = "";
+	anString inherit = "";
 
 	int sel = inheritCombo.GetCurSel();
 	if ( sel == CB_ERR ) {
@@ -659,7 +659,7 @@ DialogEntityDefEditor::BuildDeclText
 ================
 */
 
-void DialogEntityDefEditor::BuildDeclText( arcNetString &declText )
+void DialogEntityDefEditor::BuildDeclText( anString &declText )
 {
 	CString declName;
 	declNameEdit.GetWindowText(declName);
@@ -694,7 +694,7 @@ DialogEntityDefEditor::OnBnClickedTest
 ================
 */
 void DialogEntityDefEditor::OnBnClickedTest() {
-	arcNetString declText, oldDeclText;
+	anString declText, oldDeclText;
 
 	if ( decl ) {
 
@@ -725,7 +725,7 @@ DialogEntityDefEditor::OnBnClickedOk
 void DialogEntityDefEditor::OnBnClickedOk() {
 	if ( decl ) {
 
-		arcNetString declText;
+		anString declText;
 		BuildDeclText(declText);
 
 		if ( !TestDecl( declText ) ) {

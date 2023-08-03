@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -44,7 +44,7 @@ CEntityListDlg g_EntityListDlg;
 // CEntityListDlg dialog
 
 void CEntityListDlg::ShowDialog() {
-	if (g_EntityListDlg.GetSafeHwnd() == NULL) {
+	if (g_EntityListDlg.GetSafeHwnd() == nullptr ) {
 		g_EntityListDlg.Create(IDD_DLG_ENTITYLIST);
 	}
 	g_EntityListDlg.UpdateList();
@@ -52,7 +52,7 @@ void CEntityListDlg::ShowDialog() {
 
 }
 
-CEntityListDlg::CEntityListDlg(CWnd* pParent /*=NULL*/)
+CEntityListDlg::CEntityListDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CEntityListDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEntityListDlg)

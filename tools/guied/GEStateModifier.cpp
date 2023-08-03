@@ -26,13 +26,13 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "GEApp.h"
 #include "GEStateModifier.h"
 
-rvGEStateModifier::rvGEStateModifier ( const char* name, idWindow* window, arcDictionary& dict ) :
+rvGEStateModifier::rvGEStateModifier ( const char* name, idWindow* window, anDict& dict ) :
 	rvGEModifier ( name, window ),
 	mDict ( dict )
 {
@@ -73,9 +73,9 @@ rvGEStateModifier::Apply
 Applys the given dictionary to the window
 ================
 */
-bool rvGEStateModifier::SetState ( arcDictionary& dict )
+bool rvGEStateModifier::SetState ( anDict& dict )
 {
-	const idKeyValue*	key;
+	const anKeyValue*	key;
 	int					i;
 
 	// Delete any key thats gone in the new dict

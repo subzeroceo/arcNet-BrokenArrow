@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 #include "../../sys/win32/rc/guied_resource.h"
 #include "GEApp.h"
@@ -57,8 +57,8 @@ bool GEItescriptsDlg_Init( HWND hwnd ) {
 
 	int i;
 
-	for ( i = 0; i < wrapper->GetVariableDict().GetNumKeyVals ( ); i ++ ) {
-		const idKeyValue* key = wrapper->GetVariableDict().GetKeyVal ( i );
+	for ( i = 0; i < wrapper->GetVariableDict().GetNumKeyVals(); i ++ ) {
+		const anKeyValue* key = wrapper->GetVariableDict().GetKeyVal ( i );
 
 		SendMessage ( script, EM_SETSEL, -1, -1 );
 		SendMessage ( script, EM_REPLACESEL, FALSE, (LPARAM)key->GetKey().c_str() );
@@ -75,8 +75,8 @@ bool GEItescriptsDlg_Init( HWND hwnd ) {
 		SendMessage ( script, EM_REPLACESEL, FALSE, (LPARAM)"\r\n" );
 	}
 
-	for ( i = 0; i < wrapper->GetScriptDict().GetNumKeyVals ( ); i ++ ) {
-		const idKeyValue* key = wrapper->GetScriptDict().GetKeyVal ( i );
+	for ( i = 0; i < wrapper->GetScriptDict().GetNumKeyVals(); i ++ ) {
+		const anKeyValue* key = wrapper->GetScriptDict().GetKeyVal ( i );
 
 		SendMessage ( script, EM_SETSEL, -1, -1 );
 		SendMessage ( script, EM_REPLACESEL, FALSE, (LPARAM)va( "%s\r\n", key->GetKey().c_str() ) );
@@ -120,27 +120,27 @@ bool GEItescriptsDlg_Apply( HWND hwnd ) {
 	getText.cb = chars+1;
 	getText.codepage = CP_ACP;
 	getText.flags = GT_DEFAULT|GT_USECRLF;
-	getText.lpDefaultChar = NULL;
-	getText.lpUsedDefChar = NULL;
+	getText.lpDefaultChar = nullptr;
+	getText.lpUsedDefChar = nullptr;
 	SendMessage ( script, EM_GETTEXTEX, (WPARAM)&getText, (LPARAM)text );
 
-	arcNetString parse = text;
+	anString parse = text;
 	delete[] text;
 
 	try {
-		ARCParser src ( parse, parse.Length(), "", LEXFL_ALLOWMULTICHARLITERALS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
-		arcNetToken token;
+		anParser src ( parse, parse.Length(), "", LEXFL_ALLOWMULTICHARLITERALS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+		anToken token;
 
-		wrapper->GetVariableDict().Clear ( );
-		wrapper->GetScriptDict().Clear ( );
+		wrapper->GetVariableDict().Clear();
+		wrapper->GetScriptDict().Clear();
 
 		while ( src.ReadToken ( &token ) ) {
-			arcNetString scriptName;
-			arcNetString out;
+			anString scriptName;
+			anString out;
 
 			if ( !token.Icmp ( "definevec4" ) ) {
-				arcNetToken token2;
-				arcNetString	result;
+				anToken token2;
+				anString	result;
 
 				if ( !src.ReadToken ( &token2 ) ) {
 					src.Error( "expected define name" );
@@ -150,10 +150,10 @@ bool GEItescriptsDlg_Apply( HWND hwnd ) {
 				idWinVec4				var;
 				idUserInterfaceLocal	ui;
 				idWindow				tempwin ( &ui );
-				arcNetString					out;
+				anString					out;
 				int						i;
 
-				src.SetMarker ( );
+				src.SetMarker();
 				for ( i = 0; i < 3; i ++ ) {
 					tempwin.ParseExpression ( &src, &var );
 					src.ExpectTokenString( "," );
@@ -166,8 +166,8 @@ bool GEItescriptsDlg_Apply( HWND hwnd ) {
 
 				continue;
 			} else if ( !token.Icmp ( "definefloat" ) || !token.Icmp ( "float" ) ) {
-				arcNetToken token2;
-				arcNetString	result;
+				anToken token2;
+				anString	result;
 
 				if ( !src.ReadToken ( &token2 ) ) {
 					src.Error( "expected define name" );
@@ -177,9 +177,9 @@ bool GEItescriptsDlg_Apply( HWND hwnd ) {
 				idWinFloat				var;
 				idUserInterfaceLocal	ui;
 				idWindow				tempwin ( &ui );
-				arcNetString					out;
+				anString					out;
 
-				src.SetMarker ( );
+				src.SetMarker();
 				tempwin.ParseExpression ( &src, &var );
 				src.GetStringFromMarker ( out, true );
 
@@ -210,7 +210,7 @@ bool GEItescriptsDlg_Apply( HWND hwnd ) {
 			} else {
 				int i;
 				for ( i = 0; i < idWindow::SCRIPT_COUNT; i ++ ) {
-					if ( arcNetString::Icmp ( idWindow::ScriptNames[i], token ) == 0 ) {
+					if ( anString::Icmp ( idWindow::ScriptNames[i], token ) == 0 ) {
 						scriptName = idWindow::ScriptNames[i];
 						break;
 					}

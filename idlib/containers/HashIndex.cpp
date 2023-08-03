@@ -1,15 +1,15 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
-int ARCHashIndex::INVALID_INDEX[1] = { -1 };
+int anHashIndex::INVALID_INDEX[1] = { -1 };
 
 /*
 ================
-ARCHashIndex::Init
+anHashIndex::Init
 ================
 */
-void ARCHashIndex::Init( const int initialHashSize, const int initialIndexSize ) {
-	assert( arcMath::IsPowerOfTwo( initialHashSize ) );
+void anHashIndex::Init( const int initialHashSize, const int initialIndexSize ) {
+	assert( anMath::IsPowerOfTwo( initialHashSize ) );
 
 	hashSize = initialHashSize;
 	hash = INVALID_INDEX;
@@ -22,11 +22,11 @@ void ARCHashIndex::Init( const int initialHashSize, const int initialIndexSize )
 
 /*
 ================
-ARCHashIndex::Allocate
+anHashIndex::Allocate
 ================
 */
-void ARCHashIndex::Allocate( const int newHashSize, const int newIndexSize ) {
-	assert( arcMath::IsPowerOfTwo( newHashSize ) );
+void anHashIndex::Allocate( const int newHashSize, const int newIndexSize ) {
+	assert( anMath::IsPowerOfTwo( newHashSize ) );
 
 	Free();
 	hashSize = newHashSize;
@@ -41,10 +41,10 @@ void ARCHashIndex::Allocate( const int newHashSize, const int newIndexSize ) {
 
 /*
 ================
-ARCHashIndex::Free
+anHashIndex::Free
 ================
 */
-void ARCHashIndex::Free( void ) {
+void anHashIndex::Free( void ) {
 	if ( hash != INVALID_INDEX ) {
 		delete[] hash;
 		hash = INVALID_INDEX;
@@ -58,10 +58,10 @@ void ARCHashIndex::Free( void ) {
 
 /*
 ================
-ARCHashIndex::ResizeIndex
+anHashIndex::ResizeIndex
 ================
 */
-void ARCHashIndex::ResizeIndex( const int newIndexSize ) {
+void anHashIndex::ResizeIndex( const int newIndexSize ) {
 	int *oldIndexChain, mod, newSize;
 
 	if ( newIndexSize <= indexSize ) {
@@ -90,10 +90,10 @@ void ARCHashIndex::ResizeIndex( const int newIndexSize ) {
 
 /*
 ================
-ARCHashIndex::GetSpread
+anHashIndex::GetSpread
 ================
 */
-int ARCHashIndex::GetSpread( void ) const {
+int anHashIndex::GetSpread( void ) const {
 	int i, index, totalItems, *numHashItems, average, error, e;
 
 	if ( hash == INVALID_INDEX ) {
@@ -123,5 +123,5 @@ int ARCHashIndex::GetSpread( void ) const {
 		}
 	}
 	delete[] numHashItems;
-	return 100 - (error * 100 / totalItems);
+	return 100 - ( error * 100 / totalItems);
 }

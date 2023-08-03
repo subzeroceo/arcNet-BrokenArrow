@@ -28,7 +28,7 @@
 GLOBAL void *
 jpeg_get_small (j_common_ptr cinfo, size_t sizeofobject)
 {
-  return (void *) malloc(sizeofobject);
+  return (void *) malloc( sizeofobject);
 }
 
 GLOBAL void
@@ -48,7 +48,7 @@ jpeg_free_small (j_common_ptr cinfo, void * object, size_t sizeofobject)
 GLOBAL void FAR *
 jpeg_get_large (j_common_ptr cinfo, size_t sizeofobject)
 {
-  return (void FAR *) malloc(sizeofobject);
+  return (void FAR *) malloc( sizeofobject);
 }
 
 GLOBAL void

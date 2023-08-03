@@ -1,10 +1,10 @@
-class arcMaterial;
-class ARCImage;
-class arcVec4;
-class arcDrawVert;
-class arcPlane;
-class arcVec3;
-class arcNetString;
+class anMaterial;
+class anImage;
+class anVec4;
+class anDrawVertex;
+class anPlane;
+class anVec3;
+class anString;
 
 #include <gl/gl.h>
 #include "../GLIncludes/qgl.h"
@@ -13,8 +13,8 @@ class arcNetString;
 /*
 ===============================================================================
 
-	ARCRenderSystem is responsible for managing the screen, which can have
-	multiple ARCRenderWorld and 2D drawing done on it.
+	anRenderSystem is responsible for managing the screen, which can have
+	multiple anRenderWorld and 2D drawing done on it.
 
 The GLARBmultitexture extension has been superseded by several versions of OpenGL. Here are some of the subsequent versions that incorporate the functionality provided by GLARBmultitexture:
 
@@ -64,28 +64,46 @@ typedef enum gpuVendor_t {
 	VEN_INTEL,
 }gpuVendor_t;
 
+enum graphicsDriverType_t {
+	GLDRV_OGL3X,						// best for development with legacy OpenGL tools
+	GLDRV_OGL32_PROFILE,
+	GLDRV_OGL32_CORE_PROFILE,		// best for shipping to PC
+	GLDRV_OGL_ES2,
+	GLDRV_OGL_ES3,
+	GLDRV_OGL_MESA,					// best to disable float buffers and run shaders in GLSL ES 1.0
+	GLDRV_OGL_4X,
+};
+
 // Contains variables specific to the OpenGL configuration being run right now.
 // These are constant once the OpenGL subsystem is initialized.
 typedef struct qglConfig_t {
-	const char			*rendererOutput;
-	const char			*vendorOutput;
-	const char			*versionOutput;
-	const char			*qglExtStrOutput;
-	const char			*qwglExtStrOutput;
+	const char			*rendererStr;
+	const char			*vendorStr;
+	const char			*versionStr;
+	const char			*extensionsStr;
+	const char			*wglExtensionsStr;
+	const char *		shaderLangVerson;
+	float 				qglslVersion;
 
 	gpuVendor_t			gpuVendor;
+	gpuDriverType_t 	driverType;
 
-	float				qglVersion;				// atof( versionOutput )
+	float				qglVersion;				// atof( versionStr )
 
 	GLuint				colorBits, depthBits, stencilBits, alphaBits;
-	//GLuint				depthMaskBits, redBits, greenBits, blueBits;
+	GLuint				depthMaskBits//, redBits, greenBits, blueBits;
 
 	bool				useSRGBFramebuffer;
 
+	bool				useFramebufferObject;
 	bool				useVertexBufferObject;
 	bool				useVertexArrayObject;
 	GLuint				global_vao;
+
 	bool				drawElementsBaseVertex;
+	bool				drawRangeElementsAvailable;
+	bool				blendMinMaxAvailable;
+	//bool				floatBufferAvailable;
 
 	int					maxImageSize;			// queried from GL
 	int					maxImageUnits;
@@ -95,7 +113,7 @@ typedef struct qglConfig_t {
 	float				maxTextureAnisotropy;
 	bool				useAnisotropyFilter;	// GL_EXT_texture_filter_anisotropic
 
-	// remove and upgrade clientside GL extensions to
+	// remove and upgrade clientside GL extensions
 	bool				isMultiTexture;			// GL_ARB_multitexture: qglMultiTexCoord2fARB, qglMultiTexCoord2fvARB, qglActiveTextureARB, qglClientActiveTextureARB
 	bool				textureCompression;		// GL_EXT_texture_compression_s3tc probably needs to be reviewed, see what can replace it in 4.6
 
@@ -106,22 +124,26 @@ typedef struct qglConfig_t {
 	bool				textureEnvCombine;		// GL_ARB_texture_env_combine
 	bool				regCombiners;			// GL_NV_register_combiners
 
-	bool				useSeamlessCubeMap;
+	bool				blendSquareAvailable;
+
+	bool				useSeamlessCubeMap;		// wolfs latest code calls it seamlessCube GL_ARB_seamless_cube_map
 	bool				useCubeMap;				// GL_ARB_texture_cube_map
 
 	bool				envDot3;				// GL_ARB_texture_env_dot3
-	bool				3DImagesActive;			// for GL_EXT_texture3D
+	bool				use3DImageEXT;			// for GL_EXT_texture3D
 	bool				isSharedTPalette;		// for GL_EXT_shared_texture_palette
 
 	bool				isImageNonPO2;			// GL_ARB_texture_non_power_of_two
+
 	bool				depthBoundsTest;
 	bool				debugOutputAvailable;
+
 	bool				arbVertBuffObject;
 	bool				ARBVPAvailable;
 	bool				ARBFPAvailable;
 
 	bool				isDoubleEdgeStencil;	// GL_EXT_stencil_two_side
-	//bool				ATI_separateStencil // GL_ATI_separate_stencil
+
 	bool				atiDoubleEdgeStencil;
 	bool				atiPixelFormatFloat;	// pixel format float
 	bool				ARBPixelFormatFloat;	// pixel format float ARBPixelFormatFloat
@@ -135,14 +157,14 @@ typedef struct qglConfig_t {
 	int					maxProgramLocalParms;
 	int					maxProgramEnvParms;
 
-	//bool				fragmentProgramOn;
-	//bool				enableGLsl;
+	//bool				fragmentProgram;
+	bool				glSLAvailable;
 
 	bool				nvFloatBuffer;
 	bool				uniformBufferEnabled;
 
 	bool				isTimerQueryActive;
-	//bool				occlusionQueryAvailable;
+	bool				occlusionQueryAvailable;
 	bool				debugOutput;
 	bool				swapControlTear;
 	bool				isSynchronized;
@@ -192,7 +214,7 @@ typedef struct {
 	float				t;				// y offset in image where glyph starts
 	float				s2;
 	float				t2;
-	const arcMaterial *	glyph;			// shader with the glyph
+	const anMaterial *	glyph;			// shader with the glyph
 	char				shaderName[32];
 } glyphInfo_t;
 
@@ -227,15 +249,15 @@ const int BIGCHAR_HEIGHT		= 16;
 const int SCREEN_WIDTH			= 640;
 const int SCREEN_HEIGHT			= 480;
 
-// NOTE: im thinking this will replace the Rendersystem games resolutions(s).
+// NOTE: im thinking this will replace the Rendersystem games resolutions( s).
 //#define	RENDER_WIDTH			1280
 //#define RENDER_HEIGHT			720
 
-class ARCRenderWorld;
-class ARCRenderSystem {
+class anRenderWorld;
+class anRenderSystem {
 public:
 
-	virtual					~ARCRenderSystem() {}
+	virtual					~anRenderSystem() {}
 
 	// set up cvars and basic data structures, but don't
 	// init OpenGL, so it can also be used for dedicated servers
@@ -273,8 +295,8 @@ public:
 	virtual bool			HasQuadBufferSupport() const = 0;
 
 	// allocate a renderWorld to be used for drawing
-	virtual ARCRenderWorld	*AllocRenderWorld( void ) = 0;
-	virtual	void			FreeRenderWorld( ARCRenderWorld * rw ) = 0;
+	virtual anRenderWorld	*AllocRenderWorld( void ) = 0;
+	virtual	void			FreeRenderWorld( anRenderWorld * rw ) = 0;
 
 	// All data that will be used in a level should be
 	// registered before rendering any frames to prevent disk hits,
@@ -286,42 +308,43 @@ public:
 	//virtual void			LoadLevelImages() = 0;
 
 	virtual	void			ExportMD5R( bool compressed ) = 0;
-	virtual void			CopyPrimBatchTriangles( arcDrawVert *destDrawVerts, qglIndex_t *destIndices, void *primBatchMesh, void *silTraceVerts ) = 0;
-	//virtual void			CopyPrimBatchTriangles( arcDrawVert *destDrawVerts, qglIndex_t *destIndices, aRcMesh *primBatchMesh, const aRcSilTraceVertT *silTraceVerts ) = 0;
+	virtual void			CopyPrimBatchTriangles( anDrawVertex *destDrawVerts, qglIndex_t *destIndices, void *primBatchMesh, void *silTraceVerts ) = 0;
+	//virtual void			CopyPrimBatchTriangles( anDrawVertex *destDrawVerts, qglIndex_t *destIndices, aRcMesh *primBatchMesh, const anSilhoutteTraceVertex *silTraceVerts ) = 0;
 	// font support
 	virtual bool			RegisterFont( const char *fontName, fontInfoEx_t &font ) = 0;
 
 	// GUI drawing just involves shader parameter setting and axial image subsections
-	virtual void			SetColor( const arcVec4 &rgba ) = 0;
-	virtual void			SetColor2( const arcVec4 &rgba ) = 0;
+	virtual void			SetColor( const anVec4 &rgba ) = 0;
+	virtual void			SetColor2( const anVec4 &rgba ) = 0;
 	virtual void			SetColor4( float r, float g, float b, float a ) = 0;
 	virtual uint32			GetColor2() = 0;
 
-	virtual void			DrawFilled( const arcVec4 & color, float x, float y, float w, float h ) = 0;
-	virtual void			DrawStretchPic( const arcDrawVert *verts, const qglIndex_t *indexes, int vertCount, int indexCount, const arcMaterial *material, bool clip = true, float min_x = 0.0f, float min_y = 0.0f, float max_x = 640.0f, float max_y = 480.0f ) = 0;
-	virtual void			DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const arcMaterial *material ) = 0;
+	virtual void			DrawFilled( const anVec4 & color, float x, float y, float w, float h ) = 0;
+	virtual void			DrawStretchPic( const anDrawVertex *verts, const qglIndex_t *indexes, int vertCount, int indexCount, const anMaterial *material, bool clip = true, float min_x = 0.0f, float min_y = 0.0f, float max_x = 640.0f, float max_y = 480.0f ) = 0;
+	virtual void			DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const anMaterial *material ) = 0;
 
-	virtual void			DrawStretchTri ( arcVec2 p1, arcVec2 p2, arcVec2 p3, arcVec2 t1, arcVec2 t2, arcVec2 t3, const arcMaterial *material ) = 0;
-	virtual arcDrawVert		*AllocTris( int numVerts, const triIndex_t * indexes, int numIndexes, const arcMaterial * material, const stereoDepthType_t stereoType = STEREO_DEPTH_TYPE_NONE ) = 0;
+	virtual void			DrawStretchTri ( anVec2 p1, anVec2 p2, anVec2 p3, anVec2 t1, anVec2 t2, anVec2 t3, const anMaterial *material ) = 0;
+	virtual anDrawVertex	*AllocTris( int numVerts, const triIndex_t * indexes, int numIndexes, const anMaterial * material ) = 0;
 
-	virtual void			GlobalToNormalizedDeviceCoordinates( const arcVec3 &global, arcVec3 &ndc ) = 0;
+	virtual void			GlobalToNormalizedDeviceCoordinates( const anVec3 &global, anVec3 &ndc ) = 0;
 
-	virtual void			GetGLSettings( int& width, int& height ) = 0;
+	virtual void			GetGLSettings( int &width, int &height ) = 0;
 	virtual void			PrintMemInfo( MemInfo_t *mi ) = 0;
 
-	virtual void			DrawSmallChar( int x, int y, int ch, const arcMaterial *material ) = 0;
-	virtual void			DrawSmallStringExt( int x, int y, const char *string, const arcVec4 &setColor, bool forceColor, const arcMaterial *material ) = 0;
-	virtual void			DrawBigChar( int x, int y, int ch, const arcMaterial *material ) = 0;
-	virtual void			DrawBigStringExt( int x, int y, const char *string, const arcVec4 &setColor, bool forceColor, const arcMaterial *material ) = 0;
+	virtual void			DrawSmallChar( int x, int y, int ch, const anMaterial *material ) = 0;
+	virtual void			DrawSmallStringExt( int x, int y, const char *string, const anVec4 &setColor, bool forceColor, const anMaterial *material ) = 0;
+	virtual void			DrawBigChar( int x, int y, int ch, const anMaterial *material ) = 0;
+	virtual void			DrawBigStringExt( int x, int y, const char *string, const anVec4 &setColor, bool forceColor, const anMaterial *material ) = 0;
 
 	// FIXME: add an interface for arbitrary point/texcoord drawing
 
 	// a frame cam consist of 2D drawing and potentially multiple 3D scenes
 	// window sizes are needed to convert SCREEN_WIDTH / SCREEN_HEIGHT values
 	virtual void			BeginFrame( int winWidth, int winHeight ) = 0;
+	//virtual void			BeginFrame( struct viewDef_s *viewDef, int windowWidth, int windowHeight ) = 0;
 
-	virtual	void			RenderLightFrustum( const struct renderLight_s &renderLight, arcPlane lightFrustum[6] ) = 0;
-	virtual	void			LightProjectionMatrix( const arcVec3 &origin, const arcPlane &rearPlane, arcVec4 mat[4] ) = 0;
+	virtual	void			RenderLightFrustum( const struct renderLight_s &renderLight, anPlane lightFrustum[6] ) = 0;
+	virtual	void			LightProjectionMatrix( const anVec3 &origin, const anPlane &rearPlane, anVec4 mat[4] ) = 0;
 	virtual void			ToggleSmpFrame( void ) = 0;
 	virtual bool			IsSMPEnabled( void ) = 0;
 
@@ -347,13 +370,13 @@ public:
 	// so new scenes and GUIs can be built up in parallel with the rendering.
 	virtual void			RenderCommandBuffers( const setBufferCommand_t *commandBuffers ) = 0;
 
-	// if the pointers are not NULL, timing info will be returned
-	virtual void			EndFrame( int *frontEndMsec, int *backEndMsec, int *numVerts = NULL, int *numIndexes = NULL ) = 0;
+	// if the pointers are not nullptr, timing info will be returned
+	virtual void			EndFrame( int *frontEndMsec, int *backEndMsec, int *numVerts = nullptr, int *numIndexes = nullptr ) = 0;
 
 	// aviDemo uses this.
 	// Will automatically tile render large screen shots if necessary
 	// Samples is the number of jittered frames for anti-aliasing
-	// If ref == NULL, session->updateScreen will be used
+	// If ref == nullptr, session->updateScreen will be used
 	// This will perform swapbuffers, so it is NOT an approppriate way to
 	// generate image files that happen during gameplay, as for savegame
 	// markers.  Use WriteRender() instead.
@@ -394,22 +417,22 @@ public:
 	// consoles switch stereo 3D eye views each 60 hz frame
 	virtual int				GetFrameCount() const = 0;
 	virtual int				GetDoubleBufferIndex( void ) = 0;
-}; extern ARCRenderSystem	*renderSystem;
+}; extern anRenderSystem	*renderSystem;
 
 //
 // functions mainly intended for editor and dmap integration
 //
 
 // returns the frustum planes in world space
-void R_RenderLightFrustum( const struct renderLight_s &renderLight, arcPlane lightFrustum[6] );
+void R_RenderLightFrustum( const struct renderLight_s &renderLight, anPlane lightFrustum[6] );
 
 // for use by dmap to do the carving-on-light-boundaries and for the editor for display
-//void LightProjectionMatrix( const arcVec3 &origin, const arcPlane &rearPlane, arcVec4 mat[4] );
+//void LightProjectionMatrix( const anVec3 &origin, const anPlane &rearPlane, anVec4 mat[4] );
 
 // used by the view shot taker
-void R_ScreenshotFilename( int &lastNumber, const char *base, arcNetString &fileName );
+void R_ScreenshotFilename( int &lastNumber, const char *base, anString &fileName );
 
-ARC_INLINE void	GL_Scissor( const ARCScreenRect & rect ) { GL_Scissor( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
-ARC_INLINE void	GL_Viewport( const ARCScreenRect & rect ) { GL_Viewport( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
+ARC_INLINE void	GL_Scissor( const anScreenRect & rect ) { GL_Scissor( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
+ARC_INLINE void	GL_Viewport( const anScreenRect & rect ) { GL_Viewport( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
 ARC_INLINE void	GL_ViewportAndScissor( int x, int y, int w, int h ) { GL_Viewport( x, y, w, h ); GL_Scissor( x, y, w, h ); }
-ARC_INLINE void	GL_ViewportAndScissor( const ARCScreenRect& rect ) { GL_Viewport( rect ); GL_Scissor( rect ); }
+ARC_INLINE void	GL_ViewportAndScissor( const anScreenRect& rect ) { GL_Viewport( rect ); GL_Scissor( rect ); }

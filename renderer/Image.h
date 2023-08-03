@@ -1,21 +1,22 @@
 
-#include <./usr/include/GL/glew.h>
-#include <./usr/include/GL/gl.h>
+#include "GLIncludes/glew.h"
+#include <GLIncludes/gl.h>
 #include <GLFW/glfw3.h>
 #include </usr/include/GL/internal/glcore.h>
 #include "../renderer/GLIncludes/qgl.h"
 #include "../framework/FileSystem.h"
 #include "../renderer/RenderSystem.h"
 #include "../renderer/RenderWorld.h"
-
+#include "Material.h"
+#include "ImageManager.h"
 /*
 ====================================================================
 
 IMAGE
 
-ARCImage have a one to one correspondance with OpenGL textures.
+anImage have a one to one correspondance with OpenGL textures.
 
-No texture is ever used that does not have a corresponding ARCImage.
+No texture is ever used that does not have a corresponding anImage.
 
 no code outside this unit should call any of these OpenGL functions:
 
@@ -95,21 +96,8 @@ which can be useful for LOD bias calculations.
 ====================================================================
 */
 
-typedef byte				GLubyte;
-typedef float				GLfloat;
-typedef unsigned char		GLubyte8;		// 8-bit unsigned integer
-typedef unsigned short		GLuint16;		// 16-bit unsigned integer
-typedef unsigned int		GLuint32;		// 32-bit unsigned integer
-typedef unsigned long long	GLuint64;		// 64-bit unsigned integer
-
-typedef signed char			GLbyte8;		// 8-bit signed integer
-typedef signed short		GLshort16;		// 16-bit signed integer
-typedef signed int			GLint32;		// 32-bit signed integer
-typedef signed long long	GLint64;		// 64-bit signed integer
-
-typedef float				GLfloat32;		// 32-bit floating-point number
-typedef double				GLfloat64;		// 64-bit floating-point number
-typedef bool				GLbool, GLboolean;
+class anCVar;
+class idMegaTexture;
 
 typedef enum {
 	IS_UNLOADED,	// no gl texture number
@@ -151,18 +139,17 @@ const unsigned long DDSF_MIPMAP          = 0x00400000l;
 // i see no need in them being in different structures when they call the same functions
 // and they are the same file format
 typedef struct {
-    unsigned long		dwSize;
-    unsigned long		dwFlags;
-    unsigned long		dwHeight, dwWidth;
-    unsigned long		dwFourCC, dwPitchOrLinearSize;
-    unsigned long		dwDepth, dwMipMapCount;
-    unsigned long		dwRGBBitCount;
+	unsigned long		dwSize;
+	unsigned long		dwFlags;
+	unsigned long		dwHeight, dwWidth;
+	unsigned long		dwFourCC, dwPitchOrLinearSize;
+	unsigned long		dwDepth, dwMipMapCount;
+	unsigned long		dwRGBBitCount;
 	unsigned long		dwRBitMask, dwGBitMask, dwBBitMask, dwABitMask;
-    ddsFileProperties_t	ddspf; // ddsFilePixelFormat
-    unsigned long		dwCaps1, dwCaps2;
-    unsigned long		dwReserved1[11], dwReserved2[3];
+	GLuint64			ddspf; // ddsFilePixelFormat
+	unsigned long		dwCaps1, dwCaps2;
+	unsigned long		dwReserved1[11], dwReserved2[3];
 } ddsFileProperties_t;
-
 
 //static const mipmapState_t defaultMipmapState = { {0,0,0,0}, {0,0,0,0}, mipmapState_t::MT_NONE };
 
@@ -180,35 +167,33 @@ typedef enum {
 	TT_2D,
 	TT_3D,
 	TT_CUBIC,
+	TT_CUBE_INFT,
 	TT_RECT
 } textureType_t;
 
 typedef enum {
 	CF_2D,			// not a cube map
 	CF_NATIVE,		// _px, _nx, _py, etc, directly sent to GL
-	CF_CAMERA		// _forward, _back, etc, rotated and flipped as needed before sending to GL
+	CF_CAMERA,		// _forward, _back, etc, rotated and flipped as needed before sending to GL
 	CF_HALFSPHERE	// Half-Spherical projection map resampled to cubemap at load time
 } cubeFiles_t;
 
 #define	MAX_IMAGE_NAME	256
 
-class ARCImage {
+class anImage {
 public:
-				ARCImage();
+					anImage();
 
-	const char	*GetName() const { return imgName; }
+	const char *	GetName() const { return imgName; }
 
 	// Makes this image active on the current GL texture unit.
 	// automatically enables or disables cube mapping or texture3D
 	// May perform file loading if the image was not preloaded.
 	// May start a background image read.
-	void		Bind();
+	void			Bind();
 
 	// for use with fragment programs, doesn't change any enable2D/3D/cube states
-	void		BindFragment();
-
-	// deletes the texture object, but leaves the structure so it can be reloaded
-	void		PurgeImage();
+	void			BindFragment();
 
 	// used by callback functions to specify the actual data
 	// data goes from the bottom to the top line of the image, as OpenGL expects it
@@ -225,57 +210,57 @@ public:
 	void		UploadScratch( const GLubyte *pic, int width, int height );
 
 	// Copy data from one image over to the other
-	//void				CopyFromImage( arcImage *img );
-	//void				CopyFromImageCube( arcImage *img );
+	//void				CopyFromImage( anImage *img );
+	//void				CopyFromImageCube( anImage *img );
 
 	//void				Download( GLubyte **pixels, int *width, int *height );
 
 	// just for resource tracking
-	void		SetClassification( int tag );
+	void			SetClassification( int tag );
 
 	// estimates size of the GL image based on dimensions and storage type
-	int			StorageSize() const;
+	int				StorageSize() const;
 
 	// print a one line summary of the image
-	void		Print() const;
+	void			Print( bool csv ) const;
 
 	// check for changed timestamp on disk and reload if necessary
 	//virtual void		Reload( bool checkPrecompressed, bool force );
 
-	int			GetImageId( const char *name ) const;
+	int				GetImageId( const char *name ) const;
 //==========================================================
 
-	void		GetDownsize( int &scaledWidth, int &scaledHeight ) const;
-	void		MakeDefault();	// fill with a grid pattern
+	void			GetDownsize( int &scaledWidth, int &scaledHeight ) const;
+	void			MakeDefault();	// fill with a grid pattern
 
-	void		FromParameters( int width, int height, int internalFormat, textureType_t type, textureFilter_t filter, textureRepeat_t repeat );
+	void			FromParameters( int width, int height, int internalFormat, textureType_t type, textureFilter_t filter, textureRepeat_t repeat );
 
-	void		SetImageFilterAndRepeat() const;
-	bool		ShouldImageBePartialCached();
+	void			SetImageFilterAndRepeat() const;
+	bool			ShouldImageBePartialCached();
 
-	void		WritePrecompressedImage();
-	bool		CheckPrecompressedImage( bool fullLoad );
-	void		UploadPrecompressedImage( GLubyte *data, int len );
+	void			WritePrecompressedImage();
+	bool			CheckPrecompressedImage( bool fullLoad );
+	void			UploadPrecompressedImage( GLubyte *data, int len );
 
-	void		ActuallyLoadImage( bool checkForPrecompressed, bool fromBackEnd );
-	void		StartBackgroundImageLoad();
+	void			ActuallyLoadImage( bool checkForPrecompressed, bool fromBackEnd );
+	void			StartBackgroundImageLoad();
 
-	int			BitsForInternalFormat( int internalFormat ) const;
+	int				BitsForInternalFormat( int internalFormat ) const;
 
-	void		UploadCompressedNormalMap( int width, int height, const GLubyte *rgba, int mipLevel );
+	void			UploadCompressedNormalMap( int width, int height, const GLubyte *rgba, int mipLevel );
 
-	GLenum		SelectInternalFormat( const GLubyte **dataPtrs, int numDataPtrs, int width, int height,textureDepth_t minimumDepth, bool *monochromeResult ) const;
+	GLenum			SelectInternalFormat( const GLubyte **dataPtrs, int numDataPtrs, int width, int height, textureDepth_t minimumDepth, bool *monochromeResult ) const;
 
-	void		ImageProgramStringToCompressedFileName( const char *imageProg, char *fileName ) const;
-	int			NumLevelsForImageSize( int width, int height ) const;
-	int			NumLevelsForImageSize( int width, int height, int internalFormat ) const;
+	void			ImageProgramStringToCompressedFileName( const char *imageProg, char *fileName ) const;
+	int				NumLevelsForImageSize( int width, int height ) const;
+	int				NumLevelsForImageSize( int width, int height, int internalFormat ) const;
 //===========================================================
 
-	void		AllocImage( textureFilter_t filter, textureRepeat_t repeat );
+	void			AllocImage( textureFilter_t filter, textureRepeat_t repeat );
 
 	// Deletes the texture object, but leaves the structure so it can be reloaded
 	// or resized.
-	void		PurgeImage();
+	void			PurgeImage();
 
 	// z is 0 for 2D textures, 0 - 5 for cube maps, and 0 - uploadDepth for 3D textures. Only
 	// one plane at a time of 3D textures can be uploaded. The data is assumed to be correct for
@@ -283,29 +268,48 @@ public:
 	// be in OpenGL RGBA format, the consoles may have to reorganize. pixelPitch is only needed
 	// when updating from a source subrect. Width, height, and dest* are always in pixels, so
 	// they must be a multiple of four for dxt data.
-	void		SubImageUpload( int mipLevel, int destX, int destY, int destZ, int width, int height, const void *data, int pixelPitch = 0 ) const;
+	void			SubImageUpload( int mipLevel, int destX, int destY, int destZ, int width, int height, const void *data, int pixelPitch = 0 ) const;
 
 	// SetPixel is assumed to be a fast memory write on consoles, degenerating to a
 	// SubImageUpload on PCs.  Used to update the page mapping images.
 	// We could remove this now, because the consoles don't use the intermediate page mapping
 	// textures now that they can pack everything into the virtual page table images.
-	void		SetPixel( int mipLevel, int x, int y, const void *data, int dataSize );
+	void			SetPixel( int mipLevel, int x, int y, const void *data, int dataSize );
+
+	GLubyte *		R_Dropsample( const GLubyte *in, int inWidth, int inHeight, int outWidth, int outHeight );
+	GLubyte *		R_ResampleTextureOptimized( const GLubyte byte *in, GLint inWidth, GLint inHeight, GLint outWidth, GLint outHeight );
+	GLubyte *		R_ResampleTexture( const GLubyte *in, int inWidth, int inHeight, int outWidth, int outHeight );
+	GLubyte *		R_MipMapWithAlphaSpecularity( const GLubyte *in, int width, int height );
+	GLubyte *		R_MipMap( const GLubyte *in, int width, int height, bool preserveBorder );
+	GLubyte *		R_MipMap3D( const GLubyte *in, int width, int height, int depth, bool preserveBorder );
+
+	// FIXME: make an "imageBlock" type to hold byte*,width,height?
+	// these operate in-place on the provided pixels
+	void			R_SetBorderTexels( GLubyte *inBase, int width, int height, const GLubyte border[4] );
+	void			R_SetBorderTexels3D( GLubyte *inBase, int width, int height, int depth, const GLubyte border[4] );
+	void			R_BlendOverTexture( GLubyte *data, int pixelCount, const GLubyte blend[4] );
+	void			R_HorizontalFlip( GLubyte *data, int width, int height );
+	void 			R_VerticalFlip( GLubyte *data, int width, int height );
+	void			R_RotatePic( GLubyte *data, int width );
+
+	void			R_LoadImageProgram( const char *name, GLubyte **pic, int *width, int *height, ARC_TIME_T *timestamp, textureDepth_t *depth = nullptr );
+	const char *	R_ParsePastImageProgram( anLexer &src );
 
 	// some scratch images are dynamically resized based on the display window size.  This
 	// simply purges the image and recreates it if the sizes are different, so it should not be
 	// done under any normal circumstances, and probably not at all on consoles.
-	void		Resize( int width, int height );
+	void			Resize( int width, int height );
 
-	//bool		IsCompressed() const { return ( opts.format == FMT_DXT1 || opts.format == FMT_DXT5 ); }
+	bool			IsCompressed() const { return ( opts.format == FMT_DXT1 || opts.format == FMT_DXT5 ); }
 
-	void		SetTexParameters();	// update aniso and trilinear
+	void			SetTexParameters();	// update aniso and trilinear
 
-	bool		IsLoaded() const { return texnum != TEXTURE_NOT_LOADED; }
+	bool			IsLoaded() const { return texnum != TEXTURE_NOT_LOADED; }
 
-	static void			GetGeneratedName( arcNetString &_name, const textureUsage_t &_usage, const cubeFiles_t &_cube );
+	static void			GetGeneratedName( anString &_name, const textureUsage_t &_usage, const cubeFiles_t &_cube );
 
 private:
-	friend class idImageManager;
+	friend class anImageManager;
 
 	void				AllocImage();
 //==========================================================
@@ -322,16 +326,15 @@ private:
 	int						frameOfDistance;		// The frame the lod was last set
 
 	// background loading information
-	ARCImage				*partialImage;			// shrunken, space-saving version
+	anImage					*partialImage;			// shrunken, space-saving version
 	bool					isPartialImage;			// true if this is pointed to by another image
 	bool					backgroundLoadInProgress;	// true if another thread is reading the complete d3t file
 	backgroundDownload_t	bgl;
-	ARCImage *				bglNext;				// linked from tr.backgroundImageLoads
+	anImage *				bglNext;				// linked from tr.backgroundImageLoads
 
 	// parameters that define this image
-	arcNetString				imgName;				// game path, including extension (except for cube maps), may be an image program
-	void					(*generatorFunction)( ARCImage *image );	// NULL for files
-
+	anString				imgName;				// game path, including extension (except for cube maps), may be an image program
+	void					(*generatorFunction)( anImage *image );	// nullptr for files
 
 	bool					fromBackEnd;			// this is the image loaded from the back end
 	bool					fromParams;
@@ -366,26 +369,26 @@ private:
 	int						uploadWidth, uploadHeight, uploadDepth;	// after power of two, downsample, and MAX_TEXTURE_SIZE
 	int						internalFormat;
 
-	ARCImage 				*cacheUsagePrev, *cacheUsageNext;	// for dynamic cache purging of old images
+	anImage 				*cacheUsagePrev, *cacheUsageNext;	// for dynamic cache purging of old images
 
-	ARCImage 				*hashNext;				// for hash chains to speed lookup
+	anImage 				*hashNext;				// for hash chains to speed lookup
 
 	int						refCount;				// overall ref count
 };
 
-ARC_INLINE ARCImage::ARCImage() {
+ARC_INLINE anImage::anImage() {
 	texnum = TEXTURE_NOT_LOADED;
-	partialImage = NULL;
+	partialImage = nullptr;
 	type = TT_DISABLED;
 	isPartialImage = false;
 	frameUsed = 0;
 	classification = 0;
 	backgroundLoadInProgress = false;
 	bgl.opcode = DLTYPE_FILE;
-	bgl.f = NULL;
-	bglNext = NULL;
+	bgl.f = nullptr;
+	bglNext = nullptr;
 	imgName[0] = '\0';
-	generatorFunction = NULL;
+	generatorFunction = nullptr;
 	fromBackEnd = false;
 	fromParams = false;
 	allowDownSize = false;
@@ -402,8 +405,8 @@ ARC_INLINE ARCImage::ARCImage() {
 	//sourceWidth = sourceHeight;
 	uploadWidth = uploadHeight = uploadDepth = 0;
 	internalFormat = 0;
-	cacheUsagePrev = cacheUsageNext = NULL;
-	hashNext = NULL;
+	cacheUsagePrev = cacheUsageNext = nullptr;
+	hashNext = nullptr;
 	isMonochrome = false;
 	refCount = 0;
 }
@@ -414,191 +417,26 @@ void	R_WriteTGA( const char *filename, const GLubyte *data, int width, int heigh
 void	R_WritePalTGA( const char *filename, const GLubyte *data, const GLubyte *palette, int width, int height, bool flipVertical = false );
 // data is in top-to-bottom raster order unless flipVertical is set
 
-class arcImageManager {
-public:public:
-
-	arcImageManager() {
-		insideLevelLoad = false;
-		preloadingMapImages = false;
-	}
-
-	void				Init();
-	void				Shutdown();
-
-	// If the exact combination of parameters has been asked for already, an existing
-	// image will be returned, otherwise a new image will be created.
-	// Be careful not to use the same image file with different filter / repeat / etc parameters
-	// if possible, because it will cause a second copy to be loaded.
-	// If the load fails for any reason, the image will be filled in with the default
-	// grid pattern.
-	// Will automatically resample non-power-of-two images and execute image programs if needed.
-	ARCImage *			ImageFromFile( const char *name, textureFilter_t filter, bool allowDownSize,
-							 textureRepeat_t repeat, textureDepth_t depth, cubeFiles_t cubeMap = CF_2D );
-
-	// look for a loaded image, whatever the parameters
-	ARCImage *			GetImage( const char *name ) const;
-
-	// look for a loaded image, whatever the parameters
-	arcImage *			GetImageWithParameters( const char *name, textureFilter_t filter, textureRepeat_t repeat, textureUsage_t usage, cubeFiles_t cubeMap ) const;
-
-	// The callback will be issued immediately, and later if images are reloaded or vid_restart
-	// The callback function should call one of the ARCImage::Generate* functions to fill in the data
-	ARCImage *			ImageFromFunction( const char *name, void (*generatorFunction)( ARCImage *image ) );
-
-	// called once a frame to allow any background loads that have been completed
-	// to turn into textures.
-	void				CompleteBackgroundImageLoads();
-	// scratch images are for internal renderer use.  ScratchImage names should always begin with an underscore
-	arcImage *			ScratchImage( const char *name, textureFilter_t filter, textureRepeat_t repeat, textureUsage_t usage );
-
-	// returns the number of bytes of image data bound in the previous frame
-	int					SumOfUsedImages();
-
-	// called each frame to allow some cvars to automatically force changes
-	void				CheckCvars();
-
-	// purges all the images before a vid_restart
-	void				PurgeAllImages();
-
-	// reloads all apropriate images after a vid_restart
-	void				ReloadAllImages();
-	// unbind all textures from all texture units
-	void				UnbindAll();
-
-	// disable the active texture unit
-	void				BindNull();
-
-	// Mark all file based images as currently unused,
-	// but don't free anything.  Calls to ImageFromFile() will
-	// either mark the image as used, or create a new image without
-	// loading the actual data.
-	// Called only by renderSystem::BeginLevelLoad
-	void				BeginLevelLoad();
-
-	// Free all images marked as unused, and load all images that are necessary.
-	// This architecture prevents us from having the union of two level's
-	// worth of data present at one time.
-	// Called only by renderSystem::EndLevelLoad
-	void				EndLevelLoad();
-
-	void				SetInsideLevelLoad(bool value) { insideLevelLoad = value; }
-
-	void				Preload( const idPreloadManifest &manifest, const bool & mapPreload );
-
-	// used to clear and then write the dds conversion batch file
-	void				StartBuild();
-	void				FinishBuild( bool removeDups = false );
-	void				AddDDSCommand( const char *cmd );
-
-	void				PrintMemInfo( MemInfo_t *mi );
-
-	// cvars
-	static arcCVarSystem		image_roundDown;			// round bad sizes down to nearest power of two
-	static arcCVarSystem		image_colorMipLevels;		// development aid to see texture mip usage
-	static arcCVarSystem		image_downSize;				// controls texture downsampling
-	static arcCVarSystem		image_useCompression;		// 0 = force everything to high quality
-	static arcCVarSystem		image_filter;				// changes texture filtering on mipmapped images
-	static arcCVarSystem		image_anisotropy;			// set the maximum texture anisotropy if available
-	static arcCVarSystem		image_lodbias;				// change lod bias on mipmapped images
-	static arcCVarSystem		image_useAllFormats;		// allow alpha/intensity/luminance/luminance+alpha
-	static arcCVarSystem		image_usePrecompressedTextures;	// use .dds files if present
-	static arcCVarSystem		image_writePrecompressedTextures; // write .dds files if necessary
-	static arcCVarSystem		image_writeNormalTGA;		// debug tool to write out .tgas of the final normal maps
-	static arcCVarSystem		image_writeNormalTGAPalletized;		// debug tool to write out palletized versions of the final normal maps
-	static arcCVarSystem		image_writeTGA;				// debug tool to write out .tgas of the non normal maps
-	static arcCVarSystem		image_useNormalCompression;	// 1 = use 256 color compression for normal maps if available, 2 = use rxgb compression
-	static arcCVarSystem		image_useOffLineCompression; // will write a batch file with commands for the offline compression
-	static arcCVarSystem		image_preload;				// if 0, dynamically load all images
-	static arcCVarSystem		image_cacheMinK;			// maximum K of precompressed files to read at specification time,
-													// the remainder will be dynamically cached
-	static arcCVarSystem		image_cacheMegs;			// maximum bytes set aside for temporary loading of full-sized precompressed images
-	static arcCVarSystem		image_useCache;				// 1 = do background load image caching
-	static arcCVarSystem		image_showBackgroundLoads;	// 1 = print number of outstanding background loads
-	static arcCVarSystem		image_forceDownSize;		// allows the ability to force a downsize
-	static arcCVarSystem		image_downSizeSpecular;		// downsize specular
-	static arcCVarSystem		image_downSizeSpecularLimit;// downsize specular limit
-	static arcCVarSystem		image_downSizeBump;			// downsize bump maps
-	static arcCVarSystem		image_downSizeBumpLimit;	// downsize bump limit
-	static arcCVarSystem		image_ignoreHighQuality;	// ignore high quality on materials
-	static arcCVarSystem		image_downSizeLimit;		// downsize diffuse limit
-
-	// built-in images
-	ARCImage *			defaultImage;
-	ARCImage *			flatNormalMap;				// 128 128 255 in all pixels
-	ARCImage *			ambientNormalMap;			// tr.ambientLightVector encoded in all pixels
-	ARCImage *			rampImage;					// 0-255 in RGBA in S
-	ARCImage *			alphaRampImage;				// 0-255 in alpha, 255 in RGB
-	ARCImage *			alphaNotchImage;			// 2x1 texture with just 1110 and 1111 with point sampling
-	ARCImage *			whiteImage;					// full of 0xff
-	ARCImage *			blackImage;					// full of 0x00
-	ARCImage *			normalCubeMapImage;			// cube map to normalize STR into RGB
-	ARCImage *			noFalloffImage;				// all 255, but zero clamped
-	ARCImage *			fogImage;					// increasing alpha is denser fog
-	ARCImage *			fogEnterImage;				// adjust fogImage alpha based on terminator plane
-	ARCImage *			cinematicImage;
-	ARCImage *			scratchImage;
-	ARCImage *			scratchImage2;
-	ARCImage *			accumImage;
-	ARCImage *			currentRenderImage;			// for SS_POST_PROCESS shaders
-	ARCImage *			currentDepthImage;				// for motion blur
-	ARCImage *			scratchCubeMapImage;
-	ARCImage *			specularTableImage;			// 1D intensity texture with our specular function
-	ARCImage *			specular2DTableImage;		// 2D intensity texture with our specular function with variable specularity
-	ARCImage *			borderClampImage;			// white inside, black outside
-
-	//--------------------------------------------------------
-
-	ARCImage			*AllocImage( const char *name );
-	void				SetNormalPalette();
-	void				ChangeTextureFilter();
-
-	arcNetList<ARCImage*>	images;
-	arcStringList		ddsList;
-	ARCHashIndex		ddsHash;
-
-	bool				insideLevelLoad;			// don't actually load images now
-
-	GLubyte				originalToCompressed[256];	// maps normal maps to 8 bit textures
-	GLubyte				compressedPalette[768];		// the palette that normal maps use
-
-	// default filter modes for images
-	GLenum				textureMinFilter;
-	GLenum				textureMaxFilter;
-	float				textureAnisotropy;
-	float				textureLODBias;
-
-	ARCImage			*imageHashTable[FILE_HASH_SIZE]; // backupHashTable for image Hash table
-
-	ARCImage			*backgroundImageLoads;		// chain of images that have background file loads active
-	ARCImage			cacheLRU;					// head/tail of doubly linked list
-	int					totalCachedImageSize;		// for determining when something should be purged
-
-	int					numActiveBackgroundImageLoads;
-	const static int MAX_BACKGROUND_IMAGE_LOADS = 8;
-};
-
-extern arcImageManager	*globalImages;		// pointer to global list for the rest of the system
-
 int MakePowerOfTwo( int num );
 
 #define CELL_GCM_INVALID_PITCH		64
 
 /*
 ================================================
-arcRenderTexture holds both the color and depth images that are made
-resident on the video hardware.
+anRenderImage holds both the color and depth images that are made
+resident on the video hardware. make/convert to volumetric image 
 ================================================
 */
-class arcRenderTexture {
+class anRenderImage {
 public:
-							arcRenderTexture();
-							~arcRenderTexture();
+							anRenderImage();
+							~anRenderImage();
 
-	ARC_INLINE int			GetWidth() const { return ( colorImage != NULL ) ? colorImage->GetUploadWidth() : depthImage->GetUploadWidth(); }
-	ARC_INLINE int			GetHeight() const { return ( colorImage != NULL ) ? colorImage->GetUploadHeight() : depthImage->GetUploadHeight(); }
+	ARC_INLINE int			GetWidth() const { return ( colorImage != nullptr ) ? colorImage->GetUploadWidth() : depthImage->GetUploadWidth(); }
+	ARC_INLINE int			GetHeight() const { return ( colorImage != nullptr ) ? colorImage->GetUploadHeight() : depthImage->GetUploadHeight(); }
 
-	ARC_INLINE arcImage *		GetColorImage() const { return colorImage; }
-	ARC_INLINE arcImage *		GetDepthImage() const { return depthImage; }
+	ARC_INLINE anImage *	GetColorImage() const { return colorImage; }
+	ARC_INLINE anImage *	GetDepthImage() const { return depthImage; }
 
 
 	void					Resize( int width, int height );
@@ -606,36 +444,11 @@ public:
 	void					MakeCurrent( int level = 0, int side = 0 );
 
 private:
-	arcImage *			colorImage;
-	arcImage *			depthImage;
+	anImage *			colorImage;
+	anImage *			depthImage;
 	int					targetWidth;
 	int					targetHeight;
-
 };
-
-/*
-====================================================================
-
-IMAGEPROCESS
-
-FIXME: make an "imageBlock" type to hold byte*,width,height?
-====================================================================
-*/
-
-GLubyte *R_Dropsample( const GLubyte *in, int inWidth, int inHeight, int outWidth, int outHeight );
-GLubyte *R_ResampleTextureOptimized( const GLubyte byte *in, GLint inWidth, GLint inHeight, GLint outWidth, GLint outHeight );
-GLubyte *R_ResampleTexture( const GLubyte *in, int inWidth, int inHeight, int outWidth, int outHeight );
-GLubyte *R_MipMapWithAlphaSpecularity( const GLubyte *in, int width, int height );
-GLubyte *R_MipMap( const GLubyte *in, int width, int height, bool preserveBorder );
-GLubyte *R_MipMap3D( const GLubyte *in, int width, int height, int depth, bool preserveBorder );
-
-// these operate in-place on the provided pixels
-void R_SetBorderTexels( GLubyte *inBase, int width, int height, const GLubyte border[4] );
-void R_SetBorderTexels3D( GLubyte *inBase, int width, int height, int depth, const GLubyte border[4] );
-void R_BlendOverTexture( GLubyte *data, int pixelCount, const GLubyte blend[4] );
-void R_HorizontalFlip( GLubyte *data, int width, int height );
-void R_VerticalFlip( GLubyte *data, int width, int height );
-void R_RotatePic( GLubyte *data, int width );
 
 /*
 ====================================================================
@@ -656,7 +469,4 @@ IMAGEPROGRAM
 
 ====================================================================
 */
-
-void R_LoadImageProgram( const char *name, GLubyte **pic, int *width, int *height, ARC_TIME_T *timestamp, textureDepth_t *depth = NULL );
-const char *R_ParsePastImageProgram( arcLexer &src );
 

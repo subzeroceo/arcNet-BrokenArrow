@@ -1,14 +1,14 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
-arcPlane plane_origin( 0.0f, 0.0f, 0.0f, 0.0f );
+anPlane plane_origin( 0.0f, 0.0f, 0.0f, 0.0f );
 
 /*
 ================
-arcPlane::Type
+anPlane::Type
 ================
 */
-int arcPlane::Type( void ) const {
+int anPlane::Type( void ) const {
 	if ( Normal()[0] == 0.0f ) {
 		if ( Normal()[1] == 0.0f ) {
 			return Normal()[2] > 0.0f ? PLANETYPE_Z : PLANETYPE_NEGZ;
@@ -32,14 +32,14 @@ int arcPlane::Type( void ) const {
 
 /*
 ================
-arcPlane::HeightFit
+anPlane::HeightFit
 ================
 */
-bool arcPlane::HeightFit( const arcVec3 *points, const int numPoints ) {
+bool anPlane::HeightFit( const anVec3 *points, const int numPoints ) {
 	int i;
 	float sumXX = 0.0f, sumXY = 0.0f, sumXZ = 0.0f;
 	float sumYY = 0.0f, sumYZ = 0.0f;
-	arcVec3 sum, average, dir;
+	anVec3 sum, average, dir;
 
 	if ( numPoints == 1 ) {
 		a = 0.0f;
@@ -50,7 +50,7 @@ bool arcPlane::HeightFit( const arcVec3 *points, const int numPoints ) {
 	}
 	if ( numPoints == 2 ) {
 		dir = points[1] - points[0];
-		Normal() = dir.Cross( arcVec3( 0, 0, 1 ) ).Cross( dir );
+		Normal() = dir.Cross( anVec3( 0, 0, 1 ) ).Cross( dir );
 		Normalize();
 		d = -( Normal() * points[0] );
 		return true;
@@ -71,7 +71,7 @@ bool arcPlane::HeightFit( const arcVec3 *points, const int numPoints ) {
 		sumYZ += dir.y * dir.z;
 	}
 
-	arcMat2 m( sumXX, sumXY, sumXY, sumYY );
+	anMat2 m( sumXX, sumXY, sumXY, sumYY );
 	if ( !m.InverseSelf() ) {
 		return false;
 	}
@@ -86,10 +86,10 @@ bool arcPlane::HeightFit( const arcVec3 *points, const int numPoints ) {
 
 /*
 ================
-arcPlane::PlaneIntersection
+anPlane::PlaneIntersection
 ================
 */
-bool arcPlane::PlaneIntersection( const arcPlane &plane, arcVec3 &start, arcVec3 &dir ) const {
+bool anPlane::PlaneIntersection( const anPlane &plane, anVec3 &start, anVec3 &dir ) const {
 	double n00, n01, n11, det, invDet, f0, f1;
 
 	n00 = Normal().LengthSqr();
@@ -97,7 +97,7 @@ bool arcPlane::PlaneIntersection( const arcPlane &plane, arcVec3 &start, arcVec3
 	n11 = plane.Normal().LengthSqr();
 	det = n00 * n11 - n01 * n01;
 
-	if ( arcMath::Fabs(det) < 1e-6f ) {
+	if ( anMath::Fabs(det) < 1e-6f ) {
 		return false;
 	}
 
@@ -112,9 +112,9 @@ bool arcPlane::PlaneIntersection( const arcPlane &plane, arcVec3 &start, arcVec3
 
 /*
 =============
-arcPlane::ToString
+anPlane::ToString
 =============
 */
-const char *arcPlane::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anPlane::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }

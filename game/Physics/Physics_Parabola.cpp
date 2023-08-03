@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -9,19 +9,19 @@ static char THIS_FILE[] = __FILE__;
 
 #include "Physics_Parabola.h"
 
-CLASS_DECLARATION( arcPhysics_Base, arcPhysics_Parabola )
+CLASS_DECLARATION( anPhysics_Base, anPhysics_Parabola )
 END_CLASS
 
 /*
 ================
-arcPhysics_Parabola::arcPhysics_Parabola
+anPhysics_Parabola::anPhysics_Parabola
 ================
 */
-arcPhysics_Parabola::arcPhysics_Parabola( void ) {
+anPhysics_Parabola::anPhysics_Parabola( void ) {
 	current.origin.Zero();
 	current.velocity.Zero();
 	current.time = 0;
-	clipModel = NULL;
+	clipModel = nullptr;
 	baseOrg.Zero();
 	baseVelocity.Zero();
 	baseAcceleration.Zero();
@@ -29,19 +29,19 @@ arcPhysics_Parabola::arcPhysics_Parabola( void ) {
 
 /*
 ================
-arcPhysics_Parabola::~arcPhysics_Parabola
+anPhysics_Parabola::~anPhysics_Parabola
 ================
 */
-arcPhysics_Parabola::~arcPhysics_Parabola( void ) {
+anPhysics_Parabola::~anPhysics_Parabola( void ) {
 	gameLocal.clip.DeleteClipModel( clipModel );
 }
 
 /*
 ================
-arcPhysics_Parabola::MakeDefault
+anPhysics_Parabola::MakeDefault
 ================
 */
-void arcPhysics_Parabola::MakeDefault( void ) {
+void anPhysics_Parabola::MakeDefault( void ) {
 	orientation.x	= 0.f;
 	orientation.y	= 0.f;
 	orientation.z	= 0.f;
@@ -56,10 +56,10 @@ void arcPhysics_Parabola::MakeDefault( void ) {
 
 /*
 ================
-arcPhysics_Parabola::CalcProperties
+anPhysics_Parabola::CalcProperties
 ================
 */
-void arcPhysics_Parabola::CalcProperties( arcVec3& origin, arcVec3& velocity, int time ) const {
+void anPhysics_Parabola::CalcProperties( anVec3& origin, anVec3& velocity, int time ) const {
 	if ( time < startTime ) {
 		time = startTime;
 	}
@@ -72,7 +72,7 @@ void arcPhysics_Parabola::CalcProperties( arcVec3& origin, arcVec3& velocity, in
 
 	float elapsed = MS2SEC( time - startTime );
 
-	arcVec3 acc = baseAcceleration + gravityVector;
+	anVec3 acc = baseAcceleration + gravityVector;
 
 	velocity		= baseVelocity + ( acc * elapsed );
 	origin			= baseOrg + ( baseVelocity * elapsed ) + ( 0.5f * acc * Square( elapsed ) );
@@ -80,10 +80,10 @@ void arcPhysics_Parabola::CalcProperties( arcVec3& origin, arcVec3& velocity, in
 
 /*
 ================
-arcPhysics_Parabola::Init
+anPhysics_Parabola::Init
 ================
 */
-void arcPhysics_Parabola::Init( const arcVec3& origin, const arcVec3& velocity, const arcVec3& acceleration, const arcMat3& axes, int _startTime, int _endTime ) {
+void anPhysics_Parabola::Init( const anVec3& origin, const anVec3& velocity, const anVec3& acceleration, const anMat3& axes, int _startTime, int _endTime ) {
 	baseAxes			= axes;
 	baseOrg				= origin;
 	baseVelocity		= velocity;
@@ -97,21 +97,21 @@ void arcPhysics_Parabola::Init( const arcVec3& origin, const arcVec3& velocity, 
 
 /*
 ================
-arcPhysics_Parabola::EvaluatePosition
+anPhysics_Parabola::EvaluatePosition
 ================
 */
-arcVec3 arcPhysics_Parabola::EvaluatePosition( void ) const {
-	arcVec3 org, vel;
+anVec3 anPhysics_Parabola::EvaluatePosition( void ) const {
+	anVec3 org, vel;
 	CalcProperties( org, vel, gameLocal.time );
 	return org;
 }
 
 /*
 ================
-arcPhysics_Parabola::Evaluate
+anPhysics_Parabola::Evaluate
 ================
 */
-bool arcPhysics_Parabola::Evaluate( int timeStepMSec, int endTimeMSec ) {
+bool anPhysics_Parabola::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	parabolaPState_t next;
 
 	CalcProperties( current.origin, current.velocity, endTimeMSec - timeStepMSec );
@@ -144,10 +144,10 @@ bool arcPhysics_Parabola::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 /*
 ================
-arcPhysics_Parabola::LinkClip
+anPhysics_Parabola::LinkClip
 ================
 */
-void arcPhysics_Parabola::LinkClip( void ) {
+void anPhysics_Parabola::LinkClip( void ) {
 	if ( !clipModel ) {
 		return;
 	}
@@ -157,10 +157,10 @@ void arcPhysics_Parabola::LinkClip( void ) {
 
 /*
 ================
-arcPhysics_Parabola::SetClipMask
+anPhysics_Parabola::SetClipMask
 ================
 */
-void arcPhysics_Parabola::SetContents( int contents, int id ) {
+void anPhysics_Parabola::SetContents( int contents, int id ) {
 	if ( clipModel ) {
 		clipModel->SetContents( contents );
 	}
@@ -168,20 +168,20 @@ void arcPhysics_Parabola::SetContents( int contents, int id ) {
 
 /*
 ================
-arcPhysics_Parabola::Evaluate
+anPhysics_Parabola::Evaluate
 ================
 */
-bool arcPhysics_Parabola::CollisionResponse( trace_t& collision ) {
+bool anPhysics_Parabola::CollisionResponse( trace_t &collision ) {
 	arcEntity* ent = gameLocal.entities[ collision.c.entityNum ];
 	if ( !ent ) {
-		gameLocal.Warning( "[Physics Parabola Collision Response] collision against an unknown entity" );
+		gameLocal.Warning( "[Parabola-Physics] Collision Response against unknown entity" );
 		return false;
 	}
 
 	impactInfo_t info;
 	ent->GetImpactInfo( self, collision.c.id, collision.c.point, &info );
 
-	arcVec3 velocity = current.velocity - info.velocity;
+	anVec3 velocity = current.velocity - info.velocity;
 
 	ent->Hit( collision, velocity, self );
 	return self->Collide( collision, velocity, -1 );
@@ -189,16 +189,16 @@ bool arcPhysics_Parabola::CollisionResponse( trace_t& collision ) {
 
 /*
 ==============
-arcPhysics_Parabola::CheckWater
+anPhysics_Parabola::CheckWater
 ==============
 */
-void arcPhysics_Parabola::CheckWater( void ) {
+void anPhysics_Parabola::CheckWater( void ) {
 	waterLevel = 0.0f;
 
-	const arcBounds &absBounds = GetAbsBounds( -1 );
+	const anBounds &absBounds = GetAbsBounds( -1 );
 
-	const arcClipModel *clipModel;
-	int count = gameLocal.clip.ClipModelsTouchingBounds( CLIP_DEBUG_PARMS absBounds, CONTENTS_WATER, &clipModel, 1, NULL );
+	const anClipModel *clipModel;
+	int count = gameLocal.clip.ClipModelsTouchingBounds( CLIP_DEBUG_PARMS absBounds, CONTENTS_WATER, &clipModel, 1, nullptr );
 	if ( !count ) {
 		return;
 	}
@@ -215,8 +215,8 @@ void arcPhysics_Parabola::CheckWater( void ) {
 
 	self->CheckWater( clipModel->GetOrigin(), clipModel->GetAxis(), model );
 
-	const arcBounds& modelBounds = model->GetBounds();
-	arcBounds worldbb;
+	const anBounds& modelBounds = model->GetBounds();
+	anBounds worldbb;
 	worldbb.FromTransformedBounds( GetBounds(), GetOrigin( 0 ), GetAxis( 0 ) );
 	bool submerged = worldbb.GetMaxs()[2] < (modelBounds.GetMaxs()[2] + clipModel->GetOrigin().z);
 
@@ -227,10 +227,10 @@ void arcPhysics_Parabola::CheckWater( void ) {
 
 /*
 ================
-arcPhysics_Parabola::CheckForCollisions
+anPhysics_Parabola::CheckForCollisions
 ================
 */
-bool arcPhysics_Parabola::CheckForCollisions( parabolaPState_t& next, trace_t& collision ) {
+bool anPhysics_Parabola::CheckForCollisions( parabolaPState_t& next, trace_t& collision ) {
 	if ( gameLocal.clip.Translation( CLIP_DEBUG_PARMS collision, current.origin, next.origin, clipModel, baseAxes, clipMask, self ) ) {
 		next.origin		= collision.endpos;
 		next.velocity	= current.velocity;
@@ -242,15 +242,15 @@ bool arcPhysics_Parabola::CheckForCollisions( parabolaPState_t& next, trace_t& c
 
 /*
 ================
-arcPhysics_Parabola::SetClipModel
+anPhysics_Parabola::SetClipModel
 ================
 */
-void arcPhysics_Parabola::SetClipModel( arcClipModel* model, float density, int id, bool freeOld ) {
+void anPhysics_Parabola::SetClipModel( anClipModel* model, float density, int id, bool freeOld ) {
 	assert( self );
 	assert( model );					// we need a clip model
 	assert( model->IsTraceModel() );	// and it should be a trace model
 
-	if ( clipModel != NULL && clipModel != model && freeOld ) {
+	if ( clipModel != nullptr && clipModel != model && freeOld ) {
 		gameLocal.clip.DeleteClipModel( clipModel );
 	}
 	clipModel = model;
@@ -259,66 +259,64 @@ void arcPhysics_Parabola::SetClipModel( arcClipModel* model, float density, int 
 
 /*
 ================
-arcPhysics_Parabola::GetClipModel
+anPhysics_Parabola::GetClipModel
 ================
 */
-arcClipModel *arcPhysics_Parabola::GetClipModel( int id ) const {
+anClipModel *anPhysics_Parabola::GetClipModel( int id ) const {
 	return clipModel;
 }
 
 /*
 ================
-arcPhysics_Parabola::SetAxis
+anPhysics_Parabola::SetAxis
 ================
 */
-void arcPhysics_Parabola::SetAxis( const arcMat3& newAxis, int id ) {
+void anPhysics_Parabola::SetAxis( const anMat3& newAxis, int id ) {
 	baseAxes = newAxis;
-
 	LinkClip();
 }
 
 /*
 ================
-arcPhysics_Parabola::SetOrigin
+anPhysics_Parabola::SetOrigin
 ================
 */
-void arcPhysics_Parabola::SetOrigin( const arcVec3& newOrigin, int id ) {
+void anPhysics_Parabola::SetOrigin( const anVec3& newOrigin, int id ) {
 	current.origin = newOrigin;
-
 	LinkClip();
 }
 
 const float	PARABOLA_ORIGIN_MAX				= 32767.0f;
 const int	PARABOLA_ORIGIN_TOTAL_BITS		= 24;
-const int	PARABOLA_ORIGIN_EXPONENT_BITS	= arcMath::BitsForInteger( arcMath::BitsForFloat( PARABOLA_ORIGIN_MAX ) ) + 1;
+const int	PARABOLA_ORIGIN_EXPONENT_BITS	= anMath::BitsForInteger( anMath::BitsForFloat( PARABOLA_ORIGIN_MAX ) ) + 1;
 const int	PARABOLA_ORIGIN_MANTISSA_BITS	= PARABOLA_ORIGIN_TOTAL_BITS - 1 - PARABOLA_ORIGIN_EXPONENT_BITS;
 
 const float	PARABOLA_VELOCITY_MAX			= 4000;
 const int	PARABOLA_VELOCITY_TOTAL_BITS	= 16;
-const int	PARABOLA_VELOCITY_EXPONENT_BITS	= arcMath::BitsForInteger( arcMath::BitsForFloat( PARABOLA_VELOCITY_MAX ) ) + 1;
+const int	PARABOLA_VELOCITY_EXPONENT_BITS	= anMath::BitsForInteger( anMath::BitsForFloat( PARABOLA_VELOCITY_MAX ) ) + 1;
 const int	PARABOLA_VELOCITY_MANTISSA_BITS	= PARABOLA_VELOCITY_TOTAL_BITS - 1 - PARABOLA_VELOCITY_EXPONENT_BITS;
 
 /*
 ================
-arcPhysics_Parabola::GetBounds
+anPhysics_Parabola::GetBounds
 ================
 */
-const arcBounds& arcPhysics_Parabola::GetBounds( int id ) const {
+const anBounds& anPhysics_Parabola::GetBounds( int id ) const {
 	if ( clipModel ) {
 		return clipModel->GetBounds();
 	}
-	return arcPhysics_Base::GetBounds();
+	return anPhysics_Base::GetBounds();
 }
 
 /*
 ================
-arcPhysics_Parabola::GetAbsBounds
+anPhysics_Parabola::GetAbsBounds
 ================
 */
-const arcBounds& arcPhysics_Parabola::GetAbsBounds( int id ) const {
+const anBounds& anPhysics_Parabola::GetAbsBounds( int id ) const {
 	if ( clipModel ) {
 		return clipModel->GetAbsBounds();
 	}
-	return arcPhysics_Base::GetAbsBounds();
+	return anPhysics_Base::GetAbsBounds();
 }
 

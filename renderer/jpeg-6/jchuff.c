@@ -38,16 +38,16 @@ typedef struct {
  */
 
 #ifndef NO_STRUCT_ASSIGN
-#define ASSIGN_STATE(dest,src)  ((dest) = (src) )
+#define ASSIGN_STATE(dest,src)  ((dest) = ( src) )
 #else
 #if MAX_COMPS_IN_SCAN == 4
 #define ASSIGN_STATE(dest,src)  \
-	((dest).put_buffer = (src).put_buffer, \
-	 (dest).put_bits = (src).put_bits, \
-	 (dest).last_dc_val[0] = (src).last_dc_val[0], \
-	 (dest).last_dc_val[1] = (src).last_dc_val[1], \
-	 (dest).last_dc_val[2] = (src).last_dc_val[2], \
-	 (dest).last_dc_val[3] = (src).last_dc_val[3] )
+	((dest).put_buffer = ( src).put_buffer, \
+	 (dest).put_bits = ( src).put_bits, \
+	 (dest).last_dc_val[0] = ( src).last_dc_val[0], \
+	 (dest).last_dc_val[1] = ( src).last_dc_val[1], \
+	 (dest).last_dc_val[2] = ( src).last_dc_val[2], \
+	 (dest).last_dc_val[3] = ( src).last_dc_val[3] )
 #endif
 #endif
 
@@ -128,21 +128,21 @@ start_pass_huff (j_compress_ptr cinfo, boolean gather_statistics)
     /* Make sure requested tables are present */
     /* (In gather mode, tables need not be allocated yet) */
     if (dctbl < 0 || dctbl >= NUM_HUFF_TBLS ||
-	(cinfo->dc_huff_tbl_ptrs[dctbl] == NULL && !gather_statistics) )
+	(cinfo->dc_huff_tbl_ptrs[dctbl] == nullptr && !gather_statistics) )
       ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, dctbl);
     if (actbl < 0 || actbl >= NUM_HUFF_TBLS ||
-	(cinfo->ac_huff_tbl_ptrs[actbl] == NULL && !gather_statistics) )
+	(cinfo->ac_huff_tbl_ptrs[actbl] == nullptr && !gather_statistics) )
       ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, actbl);
     if (gather_statistics) {
 #ifdef ENTROPY_OPT_SUPPORTED
       /* Allocate and zero the statistics tables */
       /* Note that jpeg_gen_optimal_table expects 257 entries in each table! */
-      if (entropy->dc_count_ptrs[dctbl] == NULL)
+      if (entropy->dc_count_ptrs[dctbl] == nullptr )
 	entropy->dc_count_ptrs[dctbl] = (long *)
 	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				      257 * SIZEOF(long) );
       MEMZERO(entropy->dc_count_ptrs[dctbl], 257 * SIZEOF(long) );
-      if (entropy->ac_count_ptrs[actbl] == NULL)
+      if (entropy->ac_count_ptrs[actbl] == nullptr )
 	entropy->ac_count_ptrs[actbl] = (long *)
 	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				      257 * SIZEOF(long) );
@@ -186,7 +186,7 @@ jpeg_make_c_derived_tbl (j_compress_ptr cinfo, JHUFF_TBL * htbl,
   unsigned int code;
 
   /* Allocate a workspace if we haven't already done so. */
-  if (*pdtbl == NULL)
+  if (*pdtbl == nullptr )
     *pdtbl = (c_derived_tbl *)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				  SIZEOF(c_derived_tbl) );
@@ -210,7 +210,7 @@ jpeg_make_c_derived_tbl (j_compress_ptr cinfo, JHUFF_TBL * htbl,
   si = huffsize[0];
   p = 0;
   while (huffsize[p] ) {
-    while (( ( int ) huffsize[p] ) == si) {
+    while ( ( ( int ) huffsize[p] ) == si) {
       huffcode[p++] = code;
       code++;
     }
@@ -236,10 +236,10 @@ jpeg_make_c_derived_tbl (j_compress_ptr cinfo, JHUFF_TBL * htbl,
 /* Outputting bytes to the file */
 
 /* Emit a byte, taking 'action' if must suspend. */
-#define emit_byte(state,val,action)  \
-	{ *(state)->next_output_byte++ = (JOCTET) (val);  \
-	  if (--(state)->free_in_buffer == 0 )  \
-	    if ( ! dump_buffer(state) )  \
+#define emit_byte( state,val,action)  \
+	{ *( state)->next_output_byte++ = (JOCTET) (val);  \
+	  if (--( state)->free_in_buffer == 0 )  \
+	    if ( ! dump_buffer( state) )  \
 	      { action; } }
 
 
@@ -249,7 +249,7 @@ dump_buffer (working_state * state)
 {
   struct jpeg_destination_mgr * dest = state->cinfo->dest;
 
-  if ( ! (*dest->empty_output_buffer) (state->cinfo) )
+  if ( ! (*dest->empty_output_buffer) ( state->cinfo) )
     return FALSE;
   /* After a successful buffer dump, must reset buffer pointers */
   state->next_output_byte = dest->next_output_byte;
@@ -276,8 +276,8 @@ emit_bits (working_state * state, unsigned int code, int size)
   register int put_bits = state->cur.put_bits;
 
   /* if size is 0, caller used an invalid Huffman table entry */
-  if (size == 0 )
-    ERREXIT(state->cinfo, JERR_HUFF_MISSING_CODE);
+  if ( size == 0 )
+    ERREXIT( state->cinfo, JERR_HUFF_MISSING_CODE);
 
   put_buffer &= (((INT32) 1 )<<size) - 1; /* mask off any extra bits in code */
 
@@ -290,9 +290,9 @@ emit_bits (working_state * state, unsigned int code, int size)
   while (put_bits >= 8) {
     int c = ( int ) ((put_buffer >> 16) & 0xFF);
 
-    emit_byte(state, c, return FALSE);
+    emit_byte( state, c, return FALSE);
     if (c == 0xFF) {		/* need to stuff a zero byte? */
-      emit_byte(state, 0, return FALSE);
+      emit_byte( state, 0, return FALSE);
     }
     put_buffer <<= 8;
     put_bits -= 8;
@@ -308,7 +308,7 @@ emit_bits (working_state * state, unsigned int code, int size)
 LOCAL boolean
 flush_bits (working_state * state)
 {
-  if ( ! emit_bits(state, 0x7F, 7) ) /* fill any partial byte with ones */
+  if ( ! emit_bits( state, 0x7F, 7) ) /* fill any partial byte with ones */
     return FALSE;
   state->cur.put_buffer = 0;	/* and reset bit-buffer to empty */
   state->cur.put_bits = 0;
@@ -345,13 +345,13 @@ encode_one_block (working_state * state, JCOEFPTR block, int last_dc_val,
   }
 
   /* Emit the Huffman-coded symbol for the number of bits */
-  if ( ! emit_bits(state, dctbl->ehufco[nbits], dctbl->ehufsi[nbits] ) )
+  if ( ! emit_bits( state, dctbl->ehufco[nbits], dctbl->ehufsi[nbits] ) )
     return FALSE;
 
   /* Emit that number of bits of the value, if positive, */
   /* or the complement of its magnitude, if negative. */
   if (nbits)			/* emit_bits rejects calls with size 0 */
-    if ( ! emit_bits(state, (unsigned int) temp2, nbits) )
+    if ( ! emit_bits( state, (unsigned int) temp2, nbits) )
       return FALSE;
 
   /* Encode the AC coefficients per section F.1.2.2 */
@@ -364,7 +364,7 @@ encode_one_block (working_state * state, JCOEFPTR block, int last_dc_val,
     } else {
       /* if run length > 15, must emit special run-length-16 codes (0xF0) */
       while (r > 15) {
-	if ( ! emit_bits(state, actbl->ehufco[0xF0], actbl->ehufsi[0xF0] ) )
+	if ( ! emit_bits( state, actbl->ehufco[0xF0], actbl->ehufsi[0xF0] ) )
 	  return FALSE;
 	r -= 16;
       }
@@ -383,21 +383,21 @@ encode_one_block (working_state * state, JCOEFPTR block, int last_dc_val,
 
       /* Emit Huffman symbol for run length / number of bits */
       i = (r << 4) + nbits;
-      if ( ! emit_bits(state, actbl->ehufco[i], actbl->ehufsi[i] ) )
+      if ( ! emit_bits( state, actbl->ehufco[i], actbl->ehufsi[i] ) )
 	return FALSE;
 
       /* Emit that number of bits of the value, if positive, */
       /* or the complement of its magnitude, if negative. */
-      if ( ! emit_bits(state, (unsigned int) temp2, nbits) )
+      if ( ! emit_bits( state, (unsigned int) temp2, nbits) )
 	return FALSE;
 
       r = 0;
     }
   }
 
-  /* If the last coef(s) were zero, emit an end-of-block code */
+  /* If the last coef( s) were zero, emit an end-of-block code */
   if (r > 0 )
-    if ( ! emit_bits(state, actbl->ehufco[0], actbl->ehufsi[0] ) )
+    if ( ! emit_bits( state, actbl->ehufco[0], actbl->ehufsi[0] ) )
       return FALSE;
 
   return TRUE;
@@ -413,11 +413,11 @@ emit_restart (working_state * state, int restart_num)
 {
   int ci;
 
-  if ( ! flush_bits(state) )
+  if ( ! flush_bits( state) )
     return FALSE;
 
-  emit_byte(state, 0xFF, return FALSE);
-  emit_byte(state, JPEG_RST0 + restart_num, return FALSE);
+  emit_byte( state, 0xFF, return FALSE);
+  emit_byte( state, JPEG_RST0 + restart_num, return FALSE);
 
   /* Re-initialize DC predictions to 0 */
   for (ci = 0; ci < state->cinfo->comps_in_scan; ci++ )
@@ -444,7 +444,7 @@ encode_mcu_huff (j_compress_ptr cinfo, JBLOCKROW *MCU_data)
   /* Load up working state */
   state.next_output_byte = cinfo->dest->next_output_byte;
   state.free_in_buffer = cinfo->dest->free_in_buffer;
-  ASSIGN_STATE(state.cur, entropy->saved);
+  ASSIGN_STATE( state.cur, entropy->saved);
   state.cinfo = cinfo;
 
   /* Emit restart marker if needed */
@@ -499,7 +499,7 @@ finish_pass_huff (j_compress_ptr cinfo)
   /* Load up working state ... flush_bits needs it */
   state.next_output_byte = cinfo->dest->next_output_byte;
   state.free_in_buffer = cinfo->dest->free_in_buffer;
-  ASSIGN_STATE(state.cur, entropy->saved);
+  ASSIGN_STATE( state.cur, entropy->saved);
   state.cinfo = cinfo;
 
   /* Flush out the last data */
@@ -517,7 +517,7 @@ finish_pass_huff (j_compress_ptr cinfo)
  * Huffman coding optimization.
  *
  * This actually is optimization, in the sense that we find the best possible
- * Huffman table(s) for the given data.  We first scan the supplied data and
+ * Huffman table( s) for the given data.  We first scan the supplied data and
  * count the number of uses of each symbol that is to be Huffman-coded.
  * (This process must agree with the code above.)  Then we build an
  * optimal Huffman coding tree for the observed counts.
@@ -590,7 +590,7 @@ htest_one_block (JCOEFPTR block, int last_dc_val,
     }
   }
 
-  /* If the last coef(s) were zero, emit an end-of-block code */
+  /* If the last coef( s) were zero, emit an end-of-block code */
   if (r > 0 )
     ac_counts[0]++;
 }
@@ -762,7 +762,7 @@ jpeg_gen_optimal_table (j_compress_ptr cinfo, JHUFF_TBL * htbl, long freq[] )
    */
   p = 0;
   for ( i = 1; i <= MAX_CLEN; i++ ) {
-    for (j = 0; j <= 255; j++ ) {
+    for ( j = 0; j <= 255; j++ ) {
       if (codesize[j] == i) {
 	htbl->huffval[p] = (UINT8) j;
 	p++;
@@ -801,14 +801,14 @@ finish_pass_gather (j_compress_ptr cinfo)
     actbl = compptr->ac_tbl_no;
     if ( ! did_dc[dctbl] ) {
       htblptr = & cinfo->dc_huff_tbl_ptrs[dctbl];
-      if (*htblptr == NULL)
+      if (*htblptr == nullptr )
 	*htblptr = jpeg_alloc_huff_table((j_common_ptr) cinfo);
       jpeg_gen_optimal_table(cinfo, *htblptr, entropy->dc_count_ptrs[dctbl] );
       did_dc[dctbl] = TRUE;
     }
     if ( ! did_ac[actbl] ) {
       htblptr = & cinfo->ac_huff_tbl_ptrs[actbl];
-      if (*htblptr == NULL)
+      if (*htblptr == nullptr )
 	*htblptr = jpeg_alloc_huff_table((j_common_ptr) cinfo);
       jpeg_gen_optimal_table(cinfo, *htblptr, entropy->ac_count_ptrs[actbl] );
       did_ac[actbl] = TRUE;
@@ -833,14 +833,14 @@ jinit_huff_encoder (j_compress_ptr cinfo)
   entropy = (huff_entropy_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(huff_entropy_encoder) );
-  cinfo->entropy = (struct jpeg_entropy_encoder *) entropy;
+  cinfo->entropy = ( struct jpeg_entropy_encoder *) entropy;
   entropy->pub.start_pass = start_pass_huff;
 
   /* Mark tables unallocated */
   for ( i = 0; i < NUM_HUFF_TBLS; i++ ) {
-    entropy->dc_derived_tbls[i] = entropy->ac_derived_tbls[i] = NULL;
+    entropy->dc_derived_tbls[i] = entropy->ac_derived_tbls[i] = nullptr;
 #ifdef ENTROPY_OPT_SUPPORTED
-    entropy->dc_count_ptrs[i] = entropy->ac_count_ptrs[i] = NULL;
+    entropy->dc_count_ptrs[i] = entropy->ac_count_ptrs[i] = nullptr;
 #endif
   }
 }

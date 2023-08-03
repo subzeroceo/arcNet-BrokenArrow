@@ -1,26 +1,91 @@
-#include "ARCRenderMatrixes.h"
+#include "..//idlib/Lib.h"
 
 #undef min
 #undef max
 
-const ARCRenderMatrixes ARCRenderMatrixes::arcEntity;
+#ifndef SGN
+#define SGN(x) (((x) >= 0) ? !!(x) : -1)
+#endif
 
-int ARCRenderMatrixes::GetPixelsPerMeter( int pixelWidth ) const {
-	arcVec3 result = xform( vec3_origin( 1, 0, -1 ) );
+/*#ifndef MAX
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif*/
+
+#ifndef CLAMP
+#define CLAMP(a,b,c) MIN(MAX((a),(b)),(c))
+#endif
+#include "..//idlib/math/math.h"
+const anGL_RenderMatrix anGL_RenderMatrix::arcEntity;
+
+int anGL_RenderMatrix::GetPixelsPerMeter( int pixelWidth ) const {
+	anVec3 result = xform( vec3_origin( 1, 0, -1 ) );
 	return int( ( result.x * 0.5f + 0.5f ) * pixelWidth );
 }
 
-bool ARCRenderMatrixes::IsOrthogonal() const {
+bool anGL_RenderMatrix::IsOrthogonal() const {
 	return columns[3][3] == 1.0f;
 }
+int NextPowerOfTwo( int in ) {
+	int out;
+	for ( out = 1; out < in; out <<= 1 );
+	return out;
+}
+
+union f32_u {
+	float f;
+	uint32_t ui;
+	struct {
+		unsigned int fraction:23;
+		unsigned int exponent:8;
+		unsigned int sign:1;
+	} pack;};
+
+union f16_u {
+	uint16_t ui;
+	struct {
+		unsigned int fraction:10;
+		unsigned int exponent:5;
+		unsigned int sign:1;
+	} pack;
+};
+uint FloatToHalf( float in ) {
+	union f32_u f32;
+	union f16_u f16;
+
+	f32.f = in;
+
+	f16.pack.exponent = anMath::Clamp( ( int ) ( f32.pack.exponent ) - 112, 0, 31 );
+	f16.pack.fraction = f32.pack.fraction >> 13;
+	f16.pack.sign     = f32.pack.sign;
+
+	return f16.ui;
+}
+
+float HalfToFloat( uint in ) {
+	union f32_u *f32;
+	union f16_u *f16;
+
+	f16->ui = in;
+
+	f32.pack.exponent = (int)( f16.pack.exponent ) + 112;
+	f32.pack.fraction = f16.pack.fraction << 13;
+	f32.pack.sign = f16.pack.sign;
+
+	return f32.f;
+}
+
 /*
 ================
-ARCRenderMatrixes::CreateOrthoProjectionMatrix
+anGL_RenderMatrix::CreateOrthoProjectionMatrix
 
 just to have somethng slightly different if needed to save on repetitive calculations.=)
 ================
 */
-const float *ARCRenderMatrixes::CreateOrthoProjectionMatrix( const float left, const float right, const float bottom, const float top, const float znear, const float zfar ) {
+const float *anGL_RenderMatrix::CreateOrthoProjectionMatrix( const float left, const float right, const float bottom, const float top, const float znear, const float zfar ) {
 	static float m[ 16 ] = { 0 };
 
 	m[0]	= 2.0f / ( right - left );
@@ -36,36 +101,36 @@ const float *ARCRenderMatrixes::CreateOrthoProjectionMatrix( const float left, c
 
 /*
 ================
-ARCRenderMatrixes::CreateProjectionMatrix
+anGL_RenderMatrix::CreateProjectionMatrix
 ================
 */
-ARCRenderMatrixes ARCRenderMatrixes::CreateProjectionMatrix( float fov, float aspect, float nearClip, float farClip ) {
-	const float deg = arcMath::PI / 180.0f;
-	const float scale = 1.0f / arcMath::Tan( deg * fov / 2.0f );
+anGL_RenderMatrix anGL_RenderMatrix::CreateProjectionMatrix( float fov, float aspect, float nearClip, float farClip ) {
+	const float deg = anMath::PI / 180.0f;
+	const float scale = 1.0f / anMath::Tan( deg * fov / 2.0f );
 	const float nearmfar = nearClip - farClip;
-	ARCRenderMatrixes m[0] = scale;
-	ARCRenderMatrixes m[5] = scale;
-	ARCRenderMatrixes m[10] = ( farClip + nearClip ) / nearmfar;
-	ARCRenderMatrixes m[11] = -1;
-	ARCRenderMatrixes m[14] = 2 * farClip*nearClip / nearmfar;
+	anGL_RenderMatrix m[0] = scale;
+	anGL_RenderMatrix m[5] = scale;
+	anGL_RenderMatrix m[10] = ( farClip + nearClip ) / nearmfar;
+	anGL_RenderMatrix m[11] = -1;
+	anGL_RenderMatrix m[14] = 2 * farClip*nearClip / nearmfar;
 	m[15] = 0.0f;
 	return m;
 }
 
 /*
 ================
-ARCRenderMatrixes::CreateInfiniteProjectionMatrix
+anGL_RenderMatrix::CreateInfiniteProjectionMatrix
 ================
 */
-ARCRenderMatrixes ARCRenderMatrixes::CreateInfiniteProjectionMatrix( float fov, float aspect, float nearClip ) {
-	const float yMax = nearClip * arcMath::Tan( fov * arcMath::PI / 360.0f );
+anGL_RenderMatrix anGL_RenderMatrix::CreateInfiniteProjectionMatrix( float fov, float aspect, float nearClip ) {
+	const float yMax = nearClip * anMath::Tan( fov * anMath::PI / 360.0f );
 	const float yMin = -yMax;
-	const float xMax = nearClip * arcMath::Tan( fov * arcMath::PI / 360.0f );
+	const float xMax = nearClip * anMath::Tan( fov * anMath::PI / 360.0f );
 	const float xMin = -xMax;
 	const float width = xMax - xMin;
 	const float height = yMax - yMin;
 
-	ARCRenderMatrixes m;
+	anGL_RenderMatrix m;
 	memset( &m, 0, sizeof( m ) );
 
 	m[0] = 2 * nearClip / width;
@@ -82,28 +147,28 @@ ARCRenderMatrixes ARCRenderMatrixes::CreateInfiniteProjectionMatrix( float fov, 
 
 /*
 ================
-ARCRenderMatrixes::CreateLookAtMatrix
+anGL_RenderMatrix::CreateLookAtMatrix
 ================
 */
-ARCRenderMatrixes ARCRenderMatrixes::CreateLookAtMatrix( const arcVec3& viewOrigin, const arcVec3& at, const arcVec3& up ) {
-	ARCRenderMatrixes rot = CreateLookAtMatrix( at - viewOrigin, up );
-	ARCRenderMatrixes translate[12] = -viewOrigin.x;
-	ARCRenderMatrixes translate[13] = -viewOrigin.y;
-	ARCRenderMatrixes translate[14] = -viewOrigin.z;
+anGL_RenderMatrix anGL_RenderMatrix::CreateLookAtMatrix( const anVec3& viewOrigin, const anVec3& at, const anVec3& up ) {
+	anGL_RenderMatrix rot = CreateLookAtMatrix( at - viewOrigin, up );
+	anGL_RenderMatrix translate[12] = -viewOrigin.x;
+	anGL_RenderMatrix translate[13] = -viewOrigin.y;
+	anGL_RenderMatrix translate[14] = -viewOrigin.z;
 	return rot * translate;
 }
 
 /*
 ================
-ARCRenderMatrixes::CreateLookAtMatrix
+anGL_RenderMatrix::CreateLookAtMatrix
 ================
 */
-ARCRenderMatrixes ARCRenderMatrixes::CreateLookAtMatrix( const arcVec3& dir, const arcVec3& up ) {
-	arcVec3 zAxis = ( dir * -1 ).Normalized();
-	arcVec3 xAxis = up.Cross( zAxis ).Normalized();
-	arcVec3 yAxis = zAxis.Cross( xAxis );
+anGL_RenderMatrix anGL_RenderMatrix::CreateLookAtMatrix( const anVec3& dir, const anVec3& up ) {
+	anVec3 zAxis = ( dir * -1 ).Normalized();
+	anVec3 xAxis = up.Cross( zAxis ).Normalized();
+	anVec3 yAxis = zAxis.Cross( xAxis );
 
-	ARCRenderMatrixes m;
+	anGL_RenderMatrix m;
 	m[0] = xAxis.x;
 	m[1] = yAxis.x;
 	m[2] = zAxis.x;
@@ -120,11 +185,11 @@ ARCRenderMatrixes ARCRenderMatrixes::CreateLookAtMatrix( const arcVec3& dir, con
 
 /*
 ================
-ARCRenderMatrixes::CreateViewMatrix
+anGL_RenderMatrix::CreateViewMatrix
 ================
 */
-ARCRenderMatrixes ARCRenderMatrixes::CreateViewMatrix( const arcVec3& origin ) {
-	ARCRenderMatrixes m;
+anGL_RenderMatrix anGL_RenderMatrix::CreateViewMatrix( const anVec3& origin ) {
+	anGL_RenderMatrix m;
 	m[12] = -origin.x;
 	m[13] = -origin.y;
 	m[14] = -origin.z;
@@ -133,10 +198,10 @@ ARCRenderMatrixes ARCRenderMatrixes::CreateViewMatrix( const arcVec3& origin ) {
 
 /*
 ================
-ARCRenderMatrixes::FlipMatrix
+anGL_RenderMatrix::FlipMatrix
 ================
 */
-ARCRenderMatrixes ARCRenderMatrixes::FlipMatrix() {
+anGL_RenderMatrix anGL_RenderMatrix::FlipMatrix() {
 	static float flipMatrix[16] = {
 		// convert from our coordinate system (looking down X)
 		// to OpenGL's coordinate system (looking down -Z)
@@ -145,16 +210,16 @@ ARCRenderMatrixes ARCRenderMatrixes::FlipMatrix() {
 		0, 1, 0, 0,
 		0, 0, 0, 1
 	};
-	static const ARCRenderMatrixes m( flipMatrix );
+	static const anGL_RenderMatrix m( flipMatrix );
 	return m;
 }
 
 /*
 ================
-ARCRenderMatrixes::MatrixMultiply
+anGL_RenderMatrix::MatrixMultiply
 ================
 */
-void ARCRenderMatrixes::MatrixMultiply( const float a[16], const float b[16], float out[16] ) {
+void anGL_RenderMatrix::MatrixMultiply( const float a[16], const float b[16], float out[16] ) {
 	out[0*4+0] = a[0*4+0]*b[0*4+0] + a[0*4+1]*b[1*4+0] + a[0*4+2]*b[2*4+0] + a[0*4+3]*b[3*4+0];
 	out[0*4+1] = a[0*4+0]*b[0*4+1] + a[0*4+1]*b[1*4+1] + a[0*4+2]*b[2*4+1] + a[0*4+3]*b[3*4+1];
 	out[0*4+2] = a[0*4+0]*b[0*4+2] + a[0*4+1]*b[1*4+2] + a[0*4+2]*b[2*4+2] + a[0*4+3]*b[3*4+2];
@@ -176,21 +241,48 @@ void ARCRenderMatrixes::MatrixMultiply( const float a[16], const float b[16], fl
 	out[3*4+3] = a[3*4+0]*b[0*4+3] + a[3*4+1]*b[1*4+3] + a[3*4+2]*b[2*4+3] + a[3*4+3]*b[3*4+3];
 }
 
+void anGL_RenderMatrix::MatrixCrop( float m[16], const anVec3 mins, const anVec3 maxs ) {
+	float scaleX = 2.0f / ( maxs[0] - mins[0] );
+	float scaleY = 2.0f / ( maxs[1] - mins[1] );
+
+	float offsetX = -0.5f * ( maxs[0] + mins[0] ) * scaleX;
+	float offsetY = -0.5f * ( maxs[1] + mins[1] ) * scaleY;
+
+	float scaleZ = 1.0f / ( maxs[2] - mins[2] );
+	float offsetZ = -mins[2] * scaleZ;
+
+	m[ 0] = scaleX;
+	m[ 4] = 0;
+	m[ 8] = 0;
+	m[12] = offsetX;
+	m[ 1] = 0;
+	m[ 5] = scaleY;
+	m[ 9] = 0;
+	m[13] = offsetY;
+	m[ 2] = 0;
+	m[ 6] = 0;
+	m[10] = scaleZ;
+	m[14] = offsetZ;
+	m[ 3] = 0;
+	m[ 7] = 0;
+	m[11] = 0;
+	m[15] = 1;
+}
 /*
 ================
-ARCRenderMatrixes::CalcSplit
+anGL_RenderMatrix::CalcSplit
 ================
 */
-static float ARCRenderMatrixes::CalcSplit( float n, float f, float i, float m ) {
+static float anGL_RenderMatrix::CalcSplit( float n, float f, float i, float m ) {
 	return ( n * pow( f / n, i / m ) + ( f - n ) * i / m ) / 2.0f;
 }
 
 /*
 ================
-ARCRenderMatrixes::TransposeGLMatrix
+anGL_RenderMatrix::TransposeGLMatrix
 ================
 */
-void ARCRenderMatrixes::TransposeGLMatrix( const float in[16], float out[16] ) {
+void anGL_RenderMatrix::TransposeGLMatrix( const float in[16], float out[16] ) {
 	for ( int i = 0; i < 4; i++ ) {
 		for ( int j = 0; j < 4; j++ ) {
 			out[ i*4+j ] = in[ j*4+i ];
@@ -200,10 +292,10 @@ void ARCRenderMatrixes::TransposeGLMatrix( const float in[16], float out[16] ) {
 
 /*
 ================
-ARCRenderMatrixes::InvertByTranspose
+anGL_RenderMatrix::InvertByTranspose
 ================
 */
-void ARCRenderMatrixes::InvertByTranspose( const float a[16], float r[16] ) {
+void anGL_RenderMatrix::InvertByTranspose( const float a[16], float r[16] ) {
     r[ 0] = a[ 0];
     r[ 1] = a[ 4];
     r[ 2] = a[ 8];
@@ -223,23 +315,48 @@ void ARCRenderMatrixes::InvertByTranspose( const float a[16], float r[16] ) {
 }
 
 /*
+anGL_RenderMatrix::MatrixOrthogonalProjectionRH
+*/
+static void anGL_RenderMatrix::MatrixOrthogonalProjectionRH( float m[16], float left, float right, float bottom, float top, float zNear, float zFar ) {
+	m[0] = 2 / ( right - left );
+	m[4] = 0;
+	m[8] = 0;
+	m[12] = ( left + right ) / ( left - right );
+	m[1] = 0;
+	m[5] = 2 / ( top - bottom );
+	m[9] = 0;
+	m[13] = ( top + bottom ) / ( bottom - top );
+	m[2] = 0;
+	m[6] = 0;
+	m[10] = 1 / ( zNear - zFar );
+	m[14] = zNear / ( zNear - zFar );
+	m[3] = 0;
+	m[7] = 0;
+	m[11] = 0;
+	m[15] = 1;
+}
+
+/*
 ================
-ARCRenderMatrixes::FullInvert
+anGL_RenderMatrix::FullInvert
 ================
 */
-void ARCRenderMatrixes::FullInvert( const float a[16], float r[16] ) {
-	arcMat4	am;
+void anGL_RenderMatrix::FullInvert( const float a[16], float r[16] ) {
+	anMat4	am;
 
 	for ( int i = 0; i < 4; i++ ) {
 		for ( int j = 0; j < 4; j++ ) {
 			am[i][j] = a[j*4+i];
 		}
 	}
-
+	// anVec4 test( 100, 100, 100, 1 );
+	// anVec4 transformed, inverted;
+	// transformed = test * am;
 	if ( !am.InverseSelf() ) {
-		common->Error( "Invert failed" );
+		common->Error( "Matrix Inversion Failed" );
 	}
 
+	//	inverted = transformed * am;
 	for ( int i = 0; i < 4; i++ ) {
 		for ( int j = 0; j < 4; j++ ) {
 			r[j*4+i] = am[i][j];
@@ -249,10 +366,10 @@ void ARCRenderMatrixes::FullInvert( const float a[16], float r[16] ) {
 
 /*
 ==========================
-ARCRenderMatrixes::GL_MultMatrix
+anGL_RenderMatrix::GL_MultMatrix
 ==========================
 */
-void ARCRenderMatrixes::GL_MultMatrix( const float a[16], const float b[16], float out[16] ) {
+void anGL_RenderMatrix::GL_MultMatrix( const float a[16], const float b[16], float out[16] ) {
 #if 0
 	for ( int i = 0; i < 4; i++ ) {
 		for ( int j = 0; j < 4; j++ ) {
@@ -283,7 +400,7 @@ void ARCRenderMatrixes::GL_MultMatrix( const float a[16], const float b[16], flo
 #endif
 }
 
-void VectorToAngles( arcVec3 vec, arcVec3 angles ) {
+void VectorToAngles( anVec3 vec, anVec3 angles ) {
 	if ( ( vec[0] == 0 ) && ( vec[1] == 0 ) ) {
 		float yaw = 0;
 		if ( vec[2] > 0 ) {
@@ -292,13 +409,13 @@ void VectorToAngles( arcVec3 vec, arcVec3 angles ) {
 			float pitch = 270;
 		}
 	} else {
-		float yaw = arcMath::RAD2DEG( atan2( vec[1], vec[0] ) );
+		float yaw = anMath::RAD2DEG( atan2( vec[1], vec[0] ) );
 		if ( yaw < 0 ) {
 			yaw += 360;
 		}
 
-		float forward = ( float )arcMath::Sqrt( vec[0] * vec[0] + vec[1] * vec[1] );
-		float pitch = arcMath::RAD2DEG( atan2( vec[2], forward) );
+		float forward = ( float )anMath::Sqrt( vec[0] * vec[0] + vec[1] * vec[1] );
+		float pitch = anMath::RAD2DEG( atan2( vec[2], forward) );
 		if ( pitch < 0 ) {
 			pitch += 360;
 		}
@@ -308,14 +425,14 @@ void VectorToAngles( arcVec3 vec, arcVec3 angles ) {
 	angles[2] = 0;
 }
 
-void SelectVertexByRay( arcVec3 org, arcVec3 dir, modelTrace_t *points, int numPoints ) {
-	float scale = arcMath::Scale();
+void SelectVertexByRay( anVec3 org, anVec3 dir, modelTrace_t *points, int numPoints ) {
+	float scale = anMath::Scale();
 	// find the point closest to the ray
 	float ray1 = -1;
 	float ray2 = 8 / scale / 2;
 
 	for ( int i = 0; i < numPoints; i++ ) {
-		arcVec3 temp = points.point[i] - org;
+		anVec3 temp = points.point[i] - org;
 		float d = temp * dir;
 		temp = org + d * dir;
 		temp = points.point[i] - temp;
@@ -332,8 +449,8 @@ void SelectVertexByRay( arcVec3 org, arcVec3 dir, modelTrace_t *points, int numP
     points[numPoints++] = &points->point[ray1];// &points[ray1];
 }
 
-void ARCRenderMatrixes::GlobalToLocal( arcVec3 world, idVce3 local ) {
-	 arcMat3 mat;
+void anGL_RenderMatrix::GlobalToLocal( anVec3 world, idVce3 local ) {
+	 anMat3 mat;
 	// for each row in the matrix
 	for ( int i = 0; 1 < N; ++i ) {
 		// initialize the matrix to the world vector
@@ -349,12 +466,12 @@ void ARCRenderMatrixes::GlobalToLocal( arcVec3 world, idVce3 local ) {
 		mat[7][0] = 0; mat[7][1] = 0; mat[7][2] = 0;
 		mat[8][0] = 0; mat[8][1] = 0; mat[8][2] = 0;
 	} else {
-		local[0] = arcVec3 v->Dot( world, tr.axis[0] );
-		local[1] = arcVec3 v->Dot( world, tr.axis[1] );
-		local[2] = arcVec3 v->Dot( world, tr.axis[2] );
+		local[0] = anVec3 v->Dot( world, tr.axis[0] );
+		local[1] = anVec3 v->Dot( world, tr.axis[1] );
+		local[2] = anVec3 v->Dot( world, tr.axis[2] );
 }
 
-void ARCRenderMatrixes::AxisToModelMatrix( const arcMat3 &axis, const arcVec3 &origin, float modelMatrix[16] ) {
+void anGL_RenderMatrix::AxisToModelMatrix( const anMat3 &axis, const anVec3 &origin, float modelMatrix[16] ) {
 	// convert the axis to a matrix
 	modelMatrix[0] = axis[0][0];
 	modelMatrix[4] = axis[1][0];
@@ -379,21 +496,21 @@ void ARCRenderMatrixes::AxisToModelMatrix( const arcMat3 &axis, const arcVec3 &o
 }
 
 // FIXME: these assume no skewing or scaling transforms
-void ARCRenderMatrixes::LocalPointToGlobal( const float modelMatrix[16], const arcVec3 &in, arcVec3 &out ) {
+void anGL_RenderMatrix::LocalPointToGlobal( const float modelMatrix[16], const anVec3 &in, anVec3 &out ) {
 	out[0] = in[0] * modelMatrix[0] + in[1] * modelMatrix[4] + in[2] * modelMatrix[8] + modelMatrix[12];
 	out[1] = in[0] * modelMatrix[1] + in[1] * modelMatrix[5] + in[2] * modelMatrix[9] + modelMatrix[13];
 	out[2] = in[0] * modelMatrix[2] + in[1] * modelMatrix[6] + in[2] * modelMatrix[10] + modelMatrix[14];
 }
 
-void ARCRenderMatrixes::PointTimesMatrix( const float modelMatrix[16], const arcVec4 &in, arcVec4 &out ) {
+void anGL_RenderMatrix::PointTimesMatrix( const float modelMatrix[16], const anVec4 &in, anVec4 &out ) {
 	out[0] = in[0] * modelMatrix[0] + in[1] * modelMatrix[4] + in[2] * modelMatrix[8] + modelMatrix[12];
 	out[1] = in[0] * modelMatrix[1] + in[1] * modelMatrix[5] + in[2] * modelMatrix[9] + modelMatrix[13];
 	out[2] = in[0] * modelMatrix[2] + in[1] * modelMatrix[6] + in[2] * modelMatrix[10] + modelMatrix[14];
 	out[3] = in[0] * modelMatrix[3] + in[1] * modelMatrix[7] + in[2] * modelMatrix[11] + modelMatrix[15];
 }
 
-void ARCRenderMatrixes::GlobalPointToLocal( const float modelMatrix[16], const arcVec3 &in, arcVec3 &out ) {
-	arcVec3	temp;
+void anGL_RenderMatrix::GlobalPointToLocal( const float modelMatrix[16], const anVec3 &in, anVec3 &out ) {
+	anVec3	temp;
 
 	temp->Subtract( in, &modelMatrix[12], temp );
 
@@ -402,28 +519,28 @@ void ARCRenderMatrixes::GlobalPointToLocal( const float modelMatrix[16], const a
 	out[2] = temp->Dot( temp, &modelMatrix[8] );
 }
 
-void ARCRenderMatrixes::LocalVectorToGlobal( const float modelMatrix[16], const arcVec3 &in, arcVec3 &out ) {
+void anGL_RenderMatrix::LocalVectorToGlobal( const float modelMatrix[16], const anVec3 &in, anVec3 &out ) {
 	out[0] = in[0] * modelMatrix[0] + in[1] * modelMatrix[4] + in[2] * modelMatrix[8];
 	out[1] = in[0] * modelMatrix[1] + in[1] * modelMatrix[5] + in[2] * modelMatrix[9];
 	out[2] = in[0] * modelMatrix[2] + in[1] * modelMatrix[6] + in[2] * modelMatrix[10];
 }
 
-void ARCRenderMatrixes::GlobalVectorToLocal( const float modelMatrix[16], const arcVec3 &in, arcVec3 &out ) {
-	arcVec3	*v;
+void anGL_RenderMatrix::GlobalVectorToLocal( const float modelMatrix[16], const anVec3 &in, anVec3 &out ) {
+	anVec3	*v;
 	out[0] = v->Dot( in, &modelMatrix[0] );
 	out[1] = v->Dot( in, &modelMatrix[4] );
 	out[2] = v->Dot( in, &modelMatrix[8] );
 }
 
-void ARCRenderMatrixes::GlobalPlaneToLocal( const float modelMatrix[16], const arcPlane &in, arcPlane &out ) {
-	arcVec3	*v;
+void anGL_RenderMatrix::GlobalPlaneToLocal( const float modelMatrix[16], const anPlane &in, anPlane &out ) {
+	anVec3	*v;
 	out[0] = v->Dot( in, &modelMatrix[0] );
 	out[1] = v->Dot( in, &modelMatrix[4] );
 	out[2] = v->Dot( in, &modelMatrix[8] );
 	out[3] = in[3] + modelMatrix[12] * in[0] + modelMatrix[13] * in[1] + modelMatrix[14] * in[2];
 }
 
-void ARCRenderMatrixes::LocalPlaneToGlobal( const float modelMatrix[16], const arcPlane &in, arcPlane &out ) {
+void anGL_RenderMatrix::LocalPlaneToGlobal( const float modelMatrix[16], const anPlane &in, anPlane &out ) {
 	float	offset;
 
 	LocalVectorToGlobal( modelMatrix, in.Normal(), out.Normal() );
@@ -433,7 +550,7 @@ void ARCRenderMatrixes::LocalPlaneToGlobal( const float modelMatrix[16], const a
 }
 
 // transform Z in eye coordinates to window coordinates
-void ARCRenderMatrixes::TransformEyeZToWin( float srcZ, const float *projectionMatrix, float &dstZ ) {
+void anGL_RenderMatrix::TransformEyeZToWin( float srcZ, const float *projectionMatrix, float &dstZ ) {
 	// projection
 	float clipZ = srcZ * projectionMatrix[ 2 + 2 * 4 ] + projectionMatrix[ 2 + 3 * 4 ];
 	float clipW = srcZ * projectionMatrix[ 3 + 2 * 4 ] + projectionMatrix[ 3 + 3 * 4 ];
@@ -451,7 +568,7 @@ void ARCRenderMatrixes::TransformEyeZToWin( float srcZ, const float *projectionM
 TransformModelToClip
 ==========================
 */
-void ARCRenderMatrixes::TransformModelToClip( const arcVec3 &src, const float *modelMatrix, const float *projectionMatrix, arcPlane &eye, arcPlane &dst ) {
+void anGL_RenderMatrix::TransformModelToClip( const anVec3 &src, const float *modelMatrix, const float *projectionMatrix, anPlane &eye, anPlane &dst ) {
 	for ( int i = 0; i < 4; i++ ) {
 		eye[i] =
 			src[0] * modelMatrix[ i + 0 * 4 ] +
@@ -476,41 +593,41 @@ TransformClipToDevice
 Clip to normalized device coordinates
 ==========================
 */
-void ARCRenderMatrixes::TransformClipToDevice( const arcPlane &clip, const viewDef_t *view, arcVec3 &normalized ) {
+void anGL_RenderMatrix::TransformClipToDevice( const anPlane &clip, const viewDef_t *view, anVec3 &normalized ) {
 	normalized[0] = clip[0] / clip[3];
 	normalized[1] = clip[1] / clip[3];
 	normalized[2] = clip[2] / clip[3];
 }
 
-ARCScreenRect ARCRenderMatrixes::RectFromViewFrustumBounds( const arcBounds &bounds ) {
+anScreenRect anGL_RenderMatrix::RectFromViewFrustumBounds( const anBounds &bounds ) {
 	viewDef_t viewDef;
 
 	viewDef.vieworg = bounds[0] + tr.viewDef->worldSpace.modelViewMatrix[3] + tr.viewDef->worldSpace.projectionMatrix[12];
 	viewDef.vieworg.z = -bounds[1] + tr.viewDef->worldSpace.modelViewMatrix[3] + tr.viewDef->worldSpace.projectionMatrix[12];
-	viewDef.viewangles = arcAngles( 0, 0, 0 );
+	viewDef.viewangles = anAngles( 0, 0, 0 );
 	viewDef.viewAxis = mat3_identity;
 
-	ARCScreenRect rect = CalcIntersectionBounds( viewDef );
+	anScreenRect rect = CalcIntersectionBounds( viewDef );
 
 	return rect;
 }
 
-ARCScreenRect ARCRenderMatrixes::CalcIntersectionBounds( const viewDef_t *viewDef ) {
-	arcVec3	viewOrigin = viewDef->vieworg;
+anScreenRect anGL_RenderMatrix::CalcIntersectionBounds( const viewDef_t *viewDef ) {
+	anVec3	viewOrigin = viewDef->vieworg;
 
-	const ARCRenderWorld *world = viewDef->worldSpace.mWorld;
-	const arcBounds modelBounds = world->Bounds( &viewOrigin );
+	const anRenderWorld *world = viewDef->worldSpace.mWorld;
+	const anBounds modelBounds = world->Bounds( &viewOrigin );
 
 	for ( int i = 0; i < 2; i++ ) {
 		float modelAxisLength = modelBounds[i].Length();
-		ARCScreenRect rect[i] = viewDef->scissorRect;
+		anScreenRect rect[i] = viewDef->scissorRect;
 		rect[i].x1 = 0;
 		rect[i].x2 = modelAxisLength;
 	}
 	return rect;
 }
 
-static void ARCRenderMatrixes::GetShaderTextureMatrix( const float *shaderRegisters, const textureStage_t *texture, float matrix[16] ) {
+static void anGL_RenderMatrix::GetShaderTextureMatrix( const float *shaderRegisters, const textureStage_t *texture, float matrix[16] ) {
 	matrix[0*4+0] = shaderRegisters[ texture->matrix[0][0] ];
 	matrix[1*4+0] = shaderRegisters[ texture->matrix[0][1] ];
 	matrix[2*4+0] = 0.0f;
@@ -549,7 +666,7 @@ Sets up the world to view matrix for a given viewParm
 =================
 */
 void R_SetViewMatrix( viewDef_t *viewDef ) {
-	arcVec3	origin;
+	anVec3	origin;
 	viewEntity_t *world;
 	float	viewerMatrix[16];
 	static float	s_flipMatrix[16] = {
@@ -605,11 +722,11 @@ R_GlobalToNormalizedDeviceCoordinates
 -1 to 1 range in x, y, and z
 ==========================
 */
-void R_GlobalToNormalizedDeviceCoordinates( const arcVec3 &global, arcVec3 &ndc ) {
+void R_GlobalToNormalizedDeviceCoordinates( const anVec3 &global, anVec3 &ndc ) {
 	// XP added work on primaryView when no viewDef
 	if ( !tr.viewDef ) {
 		for ( int i = 0; i < 4; i ++ ) {
-			arcPlane view[i] =
+			anPlane view[i] =
 				global[0] * tr.primaryView->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
 				global[1] * tr.primaryView->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
 				global[2] * tr.primaryView->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
@@ -617,7 +734,7 @@ void R_GlobalToNormalizedDeviceCoordinates( const arcVec3 &global, arcVec3 &ndc 
 		}
 
 		for ( int i = 0; i < 4; i ++ ) {
-			arcPlane clip[i] =
+			anPlane clip[i] =
 				view[0] * tr.primaryView->projectionMatrix[ i + 0 * 4 ] +
 				view[1] * tr.primaryView->projectionMatrix[ i + 1 * 4 ] +
 				view[2] * tr.primaryView->projectionMatrix[ i + 2 * 4 ] +
@@ -625,7 +742,7 @@ void R_GlobalToNormalizedDeviceCoordinates( const arcVec3 &global, arcVec3 &ndc 
 		}
 	} else {
 		for ( int i = 0; i < 4; i ++ ) {
-			arcPlane view[i] =
+			anPlane view[i] =
 				global[0] * tr.viewDef->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
 				global[1] * tr.viewDef->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
 				global[2] * tr.viewDef->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
@@ -633,7 +750,7 @@ void R_GlobalToNormalizedDeviceCoordinates( const arcVec3 &global, arcVec3 &ndc 
 		}
 
 		for ( int i = 0; i < 4; i ++ ) {
-			arcPlane clip[i] =
+			anPlane clip[i] =
 				view[0] * tr.viewDef->projectionMatrix[ i + 0 * 4 ] +
 				view[1] * tr.viewDef->projectionMatrix[ i + 1 * 4 ] +
 				view[2] * tr.viewDef->projectionMatrix[ i + 2 * 4 ] +
@@ -647,17 +764,17 @@ void R_GlobalToNormalizedDeviceCoordinates( const arcVec3 &global, arcVec3 &ndc 
 }
 
 /*
-arcPlane Projection::GetZ_Near() const {
-	const arcMat3 *matrix = (const arcMat3 *)columns;
-	arcPlane plane = Plane( matrix[3] + matrix[2], matrix[7] + matrix[6],
+anPlane Projection::GetZ_Near() const {
+	const anMat3 *matrix = (const anMat3 *)columns;
+	anPlane plane = Plane( matrix[3] + matrix[2], matrix[7] + matrix[6],
 			matrix[11] + matrix[10], -matrix[15] - matrix[14] );
 
 	plane.normalize();
 	return plane.d;
 }
-arcPlane ARCRenderMatrixes::GetZ_Far() const {
-	const arcMat3 *matrix = (const arcMat3 *)columns;
-	arcPlane plane = Plane( matrix[3] - matrix[2], matrix[7] - matrix[6],
+anPlane anGL_RenderMatrix::GetZ_Far() const {
+	const anMat3 *matrix = (const anMat3 *)columns;
+	anPlane plane = Plane( matrix[3] - matrix[2], matrix[7] - matrix[6],
 			matrix[11] - matrix[10], matrix[15] - matrix[14] );
 
 	plane.normal = -plane.normal;
@@ -665,30 +782,30 @@ arcPlane ARCRenderMatrixes::GetZ_Far() const {
 
 	return plane.d;
 }
-void ARCRenderMatrixes::PerspectiveZNear( arcPlane pzNear ) {
-	arcPlane zFar = GetZ_Far();
-	arcPlane zNear = pzNear;
+void anGL_RenderMatrix::PerspectiveZNear( anPlane pzNear ) {
+	anPlane zFar = GetZ_Far();
+	anPlane zNear = pzNear;
 
 	real_t deltaZ = zFar - zNear;
 	columns[2][2] = -( zFar + zNear ) / deltaZ;
 	columns[3][2] = -2 * zNear * zFar / deltaZ;
 }
 
-void Projection::SetPerspective( arcPlane degY, arcPlane aspect, arcPlane z_near, arcPlane z_far, bool flipFov ) {
+void Projection::SetPerspective( anPlane degY, anPlane aspect, anPlane z_near, anPlane z_far, bool flipFov ) {
 	if ( flipFov ) {
 		degY = fovY( degY, 1.0f / aspect );
 	}
 
-	arcVec3 sine, cotangent, deltaZ;
-	arcRadians radians = arcMath::DEG2RAD( degY / 2.0f );
+	anVec3 sine, cotangent, deltaZ;
+	arcRadians radians = anMath::DEG2RAD( degY / 2.0f );
 
 	deltaZ = z_far - z_near;
-	sine = arcMath::Sin( radians );
+	sine = anMath::Sin( radians );
 
 	if ( ( deltaZ == 0 ) || ( sine == 0 ) || ( aspect == 0 ) ) {
 		return;
 	}
-	cotangent = arcMath::Cos( radians ) / sine;
+	cotangent = anMath::Cos( radians ) / sine;
 
 	columns.Identity();
 
@@ -700,7 +817,7 @@ void Projection::SetPerspective( arcPlane degY, arcPlane aspect, arcPlane z_near
 	columns[3][3] = 0;
 }
 void Projection::SetDepthCorrection( bool flipY ) {
-	arcMat3 *mat = &columns[0][0];
+	anMat3 *mat = &columns[0][0];
 
 	depth[0] = 1.0f;
 	depth[1] = 0.0f;
@@ -749,10 +866,10 @@ void R_SetupProjection( void ) {
 		float zNear *= 0.25f;
 	}
 
-	float yMax = zNear * tan( tr.viewDef->renderView.fov_y * arcMath::PI / 360.0f );
+	float yMax = zNear * tan( tr.viewDef->renderView.fov_y * anMath::PI / 360.0f );
 	float yMin = -yMax;
 
-	float xMax = zNear * tan( tr.viewDef->renderView.fov_x * arcMath::PI / 360.0f );
+	float xMax = zNear * tan( tr.viewDef->renderView.fov_x * anMath::PI / 360.0f );
 	float xMin = -xMax;
 
 	float width = xMax - xMin;
@@ -808,16 +925,16 @@ struct shortBounds_t {
 		SetToEmpty();
 	}
 
-	shortBounds_t( const arcBounds & b  ) {
+	shortBounds_t( const anBounds & b  ) {
 		SetFromReferenceBounds( b );
 	}
 
 	short b[2][4];		// fourth element is just for padding
 
-	arcBounds ToFloatBounds() const {
+	anBounds ToFloatBounds() const {
 		for ( int i = 0; i < 3; i++ ) {
-			arcBounds f[0][i] = b[0][i];
-			arcBounds f[1][i] = -b[1][i];
+			anBounds f[0][i] = b[0][i];
+			anBounds f[1][i] = -b[1][i];
 		}
 		return f;
 	}
@@ -851,7 +968,7 @@ struct shortBounds_t {
 		comp.b[1][3] = 0x7fff;
 	}
 
-	void SetFromReferenceBounds( const arcBounds & set ) {
+	void SetFromReferenceBounds( const anBounds & set ) {
 		// the maxs are stored negated
 		for ( int i = 0; i < 3; i++ ) {
 			int minv = floor( set[0][i] );
@@ -875,9 +992,9 @@ struct shortBounds_t {
 // pure function
 int FindBoundsIntersectionsTEST( const shortBounds_t testBounds, const shortBounds_t *const	boundsList, const int numBounds, int *const returnedList ) {
 	int hits = 0;
-	arcBounds	testF = testBounds.ToFloatBounds();
+	anBounds	testF = testBounds.ToFloatBounds();
 	for ( int i = 0; i < numBounds; i++ ) {
-		arcBounds	listF = boundsList[i].ToFloatBounds();
+		anBounds	listF = boundsList[i].ToFloatBounds();
 		if ( testF.IntersectsBounds( listF ) ) {
 			returnedList[hits++] = i;
 		}
@@ -896,7 +1013,7 @@ int FindBoundsIntersectionsSimSIMD( const shortBounds_t testBounds, const shortB
 		bool	compare[8];
 		int		count = 0;
 		for ( int j = 0; j < 8; j++ ) {
-			if ( ( (short *)&compareBounds )[j] >= ((short *)&listBounds )[j] ) {
+			if ( ( ( short *)&compareBounds )[j] >= (( short *)&listBounds )[j] ) {
 				compare[j] = true;
 				count++;
 			} else {
@@ -910,44 +1027,44 @@ int FindBoundsIntersectionsSimSIMD( const shortBounds_t testBounds, const shortB
 	return hits;
 }
 
-arcBoundsTrack::arcBoundsTrack() {
-	boundsList = (shortBounds_t *)Mem_Alloc( MAX_BOUNDS_TRACK_INDEXES * sizeof(* boundsList), TAG_RENDER );
+anBoundsTrack::anBoundsTrack() {
+	boundsList = ( shortBounds_t *)Mem_Alloc( MAX_BOUNDS_TRACK_INDEXES * sizeof(* boundsList), TAG_RENDER );
 	ClearAll();
 }
 
-arcBoundsTrack::~arcBoundsTrack() {
+anBoundsTrack::~anBoundsTrack() {
 	Mem_Free( boundsList );
 }
 
-void arcBoundsTrack::ClearAll() {
+void anBoundsTrack::ClearAll() {
 	maxIndex = 0;
 	for ( int i = 0; i < MAX_BOUNDS_TRACK_INDEXES; i++ ) {
 		ClearIndex( i );
 	}
 }
 
-void arcBoundsTrack::SetIndex( const int index, const arcBounds & bounds ) {
+void anBoundsTrack::SetIndex( const int index, const anBounds & bounds ) {
 	assert( ( unsigned )index < MAX_BOUNDS_TRACK_INDEXES );
 	maxIndex = std::max( maxIndex, index+1 );
 	boundsList[index].SetFromReferenceBounds( bounds );
 }
 
-void arcBoundsTrack::ClearIndex( const int index ) {
+void anBoundsTrack::ClearIndex( const int index ) {
 	assert( ( unsigned )index < MAX_BOUNDS_TRACK_INDEXES );
 	boundsList[index].SetToEmpty();
 }
 
-int arcBoundsTrack::FindIntersections( const arcBounds & testBounds, int intersectedIndexes[ MAX_BOUNDS_TRACK_INDEXES ] ) const {
+int anBoundsTrack::FindIntersections( const anBounds & testBounds, int intersectedIndexes[ MAX_BOUNDS_TRACK_INDEXES ] ) const {
 	const shortBounds_t	shortTestBounds( testBounds );
 	return FindBoundsIntersectionsTEST( shortTestBounds, boundsList, maxIndex, intersectedIndexes );
 }
 
-void arcBoundsTrack::Test() {
+void anBoundsTrack::Test() {
 	ClearAll();
 	arcRandom	r;
 
 	for ( int i = 0; i < 1800; i++ ) {
-		arcBounds b;
+		anBounds b;
 		for ( int j = 0; j < 3; j++ ) {
 			b[0][j] = r.RandomInt( 20000 ) - 10000;
 			b[1][j] = b[0][j] + r.RandomInt( 1000 );
@@ -955,7 +1072,7 @@ void arcBoundsTrack::Test() {
 		SetIndex( i, b );
 	}
 
-	const arcBounds testBounds( arcVec3( -1000, 2000, -3000 ), arcVec3( 1500, 4500, -500 ) );
+	const anBounds testBounds( anVec3( -1000, 2000, -3000 ), anVec3( 1500, 4500, -500 ) );
 	SetIndex( 1800, testBounds );
 	SetIndex( 0, testBounds );
 
@@ -966,13 +1083,13 @@ void arcBoundsTrack::Test() {
 
 	int intersectedIndexes2[ MAX_BOUNDS_TRACK_INDEXES ];
 	const int numHits2 = FindBoundsIntersectionsSimSIMD( shortTestBounds, boundsList, maxIndex, intersectedIndexes2 );
-	arcLibrary::Printf( "%i intersections\n", numHits1 );
+	anLibrary::Printf( "%i intersections\n", numHits1 );
 	if ( numHits1 != numHits2 ) {
-		arcLibrary::Printf( "different results\n" );
+		anLibrary::Printf( "different results\n" );
 	} else {
 		for ( int i = 0; i < numHits1; i++ ) {
 			if ( intersectedIndexes1[i] != intersectedIndexes2[i] ) {
-				arcLibrary::Printf( "different results\n" );
+				anLibrary::Printf( "different results\n" );
 				break;
 			}
 		}
@@ -988,10 +1105,149 @@ void arcBoundsTrack::Test() {
 		FindBoundsIntersectionsSimSIMD( shortTestBounds, boundsList, maxIndex, intersectedIndexes2 );
 	}
 	const int64 stop = Sys_Microseconds();
-	arcLibrary::Printf( "%i microseconds for 40 itterations\n", stop - start );
+	anLibrary::Printf( "%i microseconds for 40 itterations\n", stop - start );
 }
 
 class interactionPair_t {
 	int		entityIndex;
 	int		lightIndex;
 };
+
+
+void RB_CalcFireRiseEnvTexCoords( float *st ) {
+	int i;
+	float       *v;
+	int16_t *normal = tess.normal[0];
+	anVec3 fNormal, viewer, reflected;
+	float d;
+
+	v = tess.xyz[0];
+	Negate( backEnd.currentEntity->e.fireRiseDir, viewer );
+
+	for ( i = 0 ; i < tess.numVertexes; i++, v += 4, normal += 4, st += 2 ) {
+		viewer.NormalizeFast();
+		R_VaoUnpackNormal( fNormal, normal );
+		d = viewer.Dot( fNormal );
+		reflected[0] = fNormal[0] * 2 * d - viewer[0];
+		reflected[1] = fNormal[1] * 2 * d - viewer[1];
+		reflected[2] = fNormal[2] * 2 * d - viewer[2];
+
+		st[0] = 0.5f + reflected[1] * 0.5f;
+		st[1] = 0.5f - reflected[2] * 0.5f;
+	}
+}
+
+#define	WAVEVALUE( table, base, amplitude, phase, freq )( ( base ) + table[ ( ( int64_t ) ( ( ( phase ) + tess.shaderTime * ( freq ) ) * FUNCTABLE_SIZE ) ) & FUNCTABLE_MASK ] * ( amplitude ) )
+
+/*
+RB_CalcSwapTexCoords
+old stuff q3/wolf could be useful somewhere
+maybe for lower in spec machines the future.
+*/
+void RB_CalcSwapTexCoords( float *st ) {
+	for ( int i = 0; i < tess.numVertexes; i++, st += 2 ) {
+		float s = st[0];
+		float t = st[1];
+
+		st[0] = t;
+		st[1] = 1.0f - s;
+	}
+}
+static float EvalWaveForm( const waveForm_t *wf )  {
+	float	*table;
+	table = TableForFunc( wf->func );
+	return WAVEVALUE( table, wf->base, wf->amplitude, wf->phase, wf->frequency );
+}
+
+static float EvalWaveFormClamped( const waveForm_t *wf ) {
+	float glow  = EvalWaveForm( wf );
+
+	if ( glow < 0 ) {
+		return 0;
+	}
+
+	if ( glow > 1 ) {
+		return 1;
+	}
+
+	return glow;
+}
+/*
+RB_CalcTurbulentFactors
+old stuff q3/wolf could be useful somewhere
+maybe for lower in spec machines the future.
+*/
+void RB_CalcTurbulentFactors( const waveForm_t *wf, float *amplitude, float *now ) {
+	*now = wf->phase + tess.shaderTime * wf->frequency;
+	*amplitude = wf->amplitude;
+}
+
+/*
+** RB_CalcStretchTexMatrix
+*/
+void RB_CalcStretchTexMatrix( const waveForm_t *wf, float *matrix ) {
+	float p;
+	//p = 1.0f / EvalWaveForm( wf );
+	matrix[0] = p; matrix[2] = 0; matrix[4] = 0.5f - 0.5f * p;
+	matrix[1] = 0; matrix[3] = p; matrix[5] = 0.5f - 0.5f * p;
+}
+/*
+RB_CalcScaleTexMatrix
+*/
+void RB_CalcScaleTexMatrix( const float scale[2], float *matrix ) {
+	matrix[0] = scale[0];
+	matrix[2] = 0.0f;
+	matrix[4] = 0.0f;
+	matrix[1] = 0.0f;
+	matrix[3] = scale[1];
+	matrix[5] = 0.0f;
+}
+
+/*
+RB_CalcScrollTexMatrix
+*/
+void RB_CalcScrollTexMatrix( const float scrollSpeed[2], float *matrix ) {
+	double timeScale = tess.shaderTime;
+	double adjustedScrollS, adjustedScrollT;
+
+	adjustedScrollS = scrollSpeed[0] * timeScale;
+	adjustedScrollT = scrollSpeed[1] * timeScale;
+
+	// clamp so coordinates don't continuously get larger, causing problems
+	// with hardware limits
+	adjustedScrollS = adjustedScrollS - floor( adjustedScrollS );
+	adjustedScrollT = adjustedScrollT - floor( adjustedScrollT );
+
+	matrix[0] = 1.0f; matrix[2] = 0.0f; matrix[4] = adjustedScrollS;
+	matrix[1] = 0.0f; matrix[3] = 1.0f; matrix[5] = adjustedScrollT;
+}
+
+/*
+RB_CalcTransformTexMatrix
+*/
+void RB_CalcTransformTexMatrix( const texModInfo_t *tmi, float *matrix  ) {
+	matrix[0] = tmi->matrix[0][0];
+	matrix[2] = tmi->matrix[1][0];
+	matrix[4] = tmi->translate[0];
+	matrix[1] = tmi->matrix[0][1];
+	matrix[3] = tmi->matrix[1][1];
+	matrix[5] = tmi->translate[1];
+}
+
+/*
+RB_CalcRotateTexMatrix
+*/
+void RB_CalcRotateTexMatrix( float degsPerSecond, float *matrix ) {
+	double timeScale = tris->shaderTime;
+
+	double degs = -degsPerSecond * timeScale;
+	int index = degs * ( FUNCTABLE_SIZE / 360.0f );
+
+	float sinValue = tr.sinTable[ index & FUNCTABLE_MASK ];
+	float cosValue = tr.sinTable[ ( index + FUNCTABLE_SIZE / 4 ) & FUNCTABLE_MASK ];
+
+	matrix[0] = cosValue;
+	matrix[2] = -sinValue; matrix[4] = 0.5f - 0.5f * cosValue + 0.5f fanVec4 * sinValue;
+	matrix[1] = sinValue;
+	matrix[3] = cosValue;  matrix[5] = 0.5f - 0.5f * sinValue - 0.5f * cosValue;
+}

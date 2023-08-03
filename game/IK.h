@@ -14,10 +14,10 @@
 
 #define IK_ANIM				"ik_pose"
 
-class arcPhysics;
+class anPhysics;
 class arcAnimator;
 
-class idIK : public idClass {
+class idIK : public anClass {
 public:
 	CLASS_PROTOTYPE( idIK );
 
@@ -27,14 +27,14 @@ public:
 	virtual bool			IsInitialized( void ) const;
 	bool					IsInhibited( void ) const;
 
-	virtual bool			Init( arcEntity *self, const char *anim, const arcVec3 &modelOffset );
+	virtual bool			Init( arcEntity *self, const char *anim, const anVec3 &modelOffset );
 	virtual bool			Evaluate( void );
 	virtual void			ClearJointMods( void );
 
-	static bool				SolveTwoBones( const arcVec3 &startPos, const arcVec3 &endPos, const arcVec3 &dir, float len0, float len1, arcVec3 &jointPos );
-	static float			GetBoneAxis( const arcVec3 &startPos, const arcVec3 &endPos, const arcVec3 &dir, arcMat3 &axis );
+	static bool				SolveTwoBones( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, float len0, float len1, anVec3 &jointPos );
+	static float			GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, anMat3 &axis );
 
-	arcPhysics*				GetPhysics();
+	anPhysics*				GetPhysics();
 	arcAnimator*				GetAnimator();
 
 protected:
@@ -43,7 +43,7 @@ protected:
 	arcEntity *				self;				// entity using the animated model
 	arcAnimator *			animator;			// animator on entity
 	int						modifiedAnim;		// animation modified by the IK
-	arcVec3					modelOffset;
+	anVec3					modelOffset;
 };
 
 /*
@@ -61,7 +61,7 @@ public:
 							idIK_Walk( void );
 	virtual					~idIK_Walk( void );
 
-	virtual bool			Init( arcEntity *self, const char *anim, const arcVec3 &modelOffset );
+	virtual bool			Init( arcEntity *self, const char *anim, const anVec3 &modelOffset );
 	virtual bool			Evaluate( void );
 	virtual void			ClearJointMods( void );
 
@@ -73,7 +73,7 @@ public:
 private:
 	static const int		MAX_LEGS		= 8;
 
-	arcClipModel *			footModel;
+	anClipModel *			footModel;
 
 	int						numLegs;
 	int						enabledLegs;
@@ -84,14 +84,14 @@ private:
 	jointHandle_t			dirJoints[MAX_LEGS];
 	jointHandle_t			waistJoint;
 
-	arcVec3					hipForward[MAX_LEGS];
-	arcVec3					kneeForward[MAX_LEGS];
+	anVec3					hipForward[MAX_LEGS];
+	anVec3					kneeForward[MAX_LEGS];
 
 	float					upperLegLength[MAX_LEGS];
 	float					lowerLegLength[MAX_LEGS];
 
-	arcMat3					upperLegToHipJoint[MAX_LEGS];
-	arcMat3					lowerLegToKneeJoint[MAX_LEGS];
+	anMat3					upperLegToHipJoint[MAX_LEGS];
+	anMat3					lowerLegToKneeJoint[MAX_LEGS];
 
 	float					smoothing;
 	float					waistSmoothing;
@@ -107,11 +107,11 @@ private:
 	// state
 	int						pivotFoot;
 	float					pivotYaw;
-	arcVec3					pivotPos;
+	anVec3					pivotPos;
 	bool					oldHeightsValid;
 	float					oldWaistHeight;
 	float					oldAnkleHeights[MAX_LEGS];
-	arcVec3					waistOffset;
+	anVec3					waistOffset;
 };
 
 
@@ -130,7 +130,7 @@ public:
 							idIK_Reach( void );
 	virtual					~idIK_Reach( void );
 
-	virtual bool			Init( arcEntity *self, const char *anim, const arcVec3 &modelOffset );
+	virtual bool			Init( arcEntity *self, const char *anim, const anVec3 &modelOffset );
 	virtual bool			Evaluate( void );
 	virtual void			ClearJointMods( void );
 
@@ -145,14 +145,14 @@ private:
 	jointHandle_t			shoulderJoints[MAX_ARMS];
 	jointHandle_t			dirJoints[MAX_ARMS];
 
-	arcVec3					shoulderForward[MAX_ARMS];
-	arcVec3					elbowForward[MAX_ARMS];
+	anVec3					shoulderForward[MAX_ARMS];
+	anVec3					elbowForward[MAX_ARMS];
 
 	float					upperArmLength[MAX_ARMS];
 	float					lowerArmLength[MAX_ARMS];
 
-	arcMat3					upperArmToShoulderJoint[MAX_ARMS];
-	arcMat3					lowerArmToElbowJoint[MAX_ARMS];
+	anMat3					upperArmToShoulderJoint[MAX_ARMS];
+	anMat3					lowerArmToElbowJoint[MAX_ARMS];
 };
 
 /*
@@ -170,7 +170,7 @@ public:
 							arcIK_Aim( void );
 	virtual					~arcIK_Aim( void );
 
-	virtual bool			Init( arcEntity *self, const char *anim, const arcVec3& modelOffset );
+	virtual bool			Init( arcEntity *self, const char *anim, const anVec3& modelOffset );
 	virtual bool			Evaluate( void );
 	virtual void			ClearJointMods( void );
 
@@ -179,10 +179,10 @@ protected:
 		jointHandle_t			joint1;
 		jointHandle_t			joint2;
 
-		arcVec3					lastDir;
+		anVec3					lastDir;
 	} jointGroup_t;
 
-	arcNetList< jointGroup_t >		jointGroups;
+	anList< jointGroup_t >		jointGroups;
 };
 
 #endif /* !__GAME_IK_H__ */

@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -29,7 +29,7 @@ static int	cursorx, cursory;
  =======================================================================================================================
  */
 void Z_MouseDown( int x, int y, int buttons) {
-	arcVec3	org, dir, vup, vright;
+	anVec3	org, dir, vup, vright;
 	brush_t *b;
 
 	Sys_GetCursorPos(&cursorx, &cursory);
@@ -81,7 +81,7 @@ void Z_MouseDown( int x, int y, int buttons) {
 		}
 
 		if (bToggle) {
-			g_pParentWnd->GetZWnd()->m_pZClip->Enable( !(g_pParentWnd->GetZWnd()->m_pZClip->IsEnabled() ));
+			g_pParentWnd->GetZWnd()->m_pZClip->Enable( !(g_pParentWnd->GetZWnd()->m_pZClip->IsEnabled() ) );
 		    Sys_UpdateWindows (W_ALL);
 			return;
 		}
@@ -129,7 +129,7 @@ void Z_MouseDown( int x, int y, int buttons) {
 	}
 
 	// control mbutton = move camera
-	if ( (buttons == (MK_CONTROL | nMouseButton) ) || (buttons == (MK_CONTROL | MK_LBUTTON) )) {
+	if ( (buttons == (MK_CONTROL | nMouseButton) ) || (buttons == (MK_CONTROL | MK_LBUTTON) ) ) {
 		g_pParentWnd->GetCamera()->Camera().origin[2] = org[2];
 		Sys_UpdateWindows(W_CAMERA | W_XY_OVERLAY | W_Z);
 	}
@@ -174,7 +174,7 @@ void Z_MouseMoved( int x, int y, int buttons) {
 
 	// control mbutton = move camera
 	int nMouseButton = g_PrefsDlg.m_nMouseButtons == 2 ? MK_RBUTTON : MK_MBUTTON;
-	if ((buttons == (MK_CONTROL | nMouseButton) ) || (buttons == (MK_CONTROL | MK_LBUTTON) )) {
+	if ((buttons == (MK_CONTROL | nMouseButton) ) || (buttons == (MK_CONTROL | MK_LBUTTON) ) ) {
 		g_pParentWnd->GetCamera()->Camera().origin[2] = z.origin[2] + (y - (z.height / 2) ) / z.scale;
 		Sys_UpdateWindows(W_CAMERA | W_XY_OVERLAY | W_Z);
 	}
@@ -302,7 +302,7 @@ void Z_Draw( void ) {
 	brush_t		*brush;
 	float		w, h;
 	float		top, bottom;
-	arcVec3		org_top, org_bottom, dir_up, dir_down;
+	anVec3		org_top, org_bottom, dir_up, dir_down;
 	int			xCam = z.width / 3;
 
 	if ( !active_brushes.next) {

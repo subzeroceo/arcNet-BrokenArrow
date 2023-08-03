@@ -36,7 +36,7 @@ jpeg_create_decompress (j_decompress_ptr cinfo)
    */
   {
     struct jpeg_error_mgr * err = cinfo->err;
-    MEMZERO(cinfo, SIZEOF(struct jpeg_decompress_struct) );
+    MEMZERO(cinfo, SIZEOF( struct jpeg_decompress_struct) );
     cinfo->err = err;
   }
   cinfo->is_decompressor = TRUE;
@@ -45,15 +45,15 @@ jpeg_create_decompress (j_decompress_ptr cinfo)
   jinit_memory_mgr((j_common_ptr) cinfo);
 
   /* Zero out pointers to permanent structures. */
-  cinfo->progress = NULL;
-  cinfo->src = NULL;
+  cinfo->progress = nullptr;
+  cinfo->src = nullptr;
 
   for ( i = 0; i < NUM_QUANT_TBLS; i++ )
-    cinfo->quant_tbl_ptrs[i] = NULL;
+    cinfo->quant_tbl_ptrs[i] = nullptr;
 
   for ( i = 0; i < NUM_HUFF_TBLS; i++ ) {
-    cinfo->dc_huff_tbl_ptrs[i] = NULL;
-    cinfo->ac_huff_tbl_ptrs[i] = NULL;
+    cinfo->dc_huff_tbl_ptrs[i] = nullptr;
+    cinfo->ac_huff_tbl_ptrs[i] = nullptr;
   }
 
   /* Initialize marker processor so application can override methods
@@ -205,7 +205,7 @@ default_decompress_parms (j_decompress_ptr cinfo)
   cinfo->two_pass_quantize = FALSE;
 #endif
   cinfo->desired_number_of_colors = 256;
-  cinfo->colormap = NULL;
+  cinfo->colormap = nullptr;
   /* Initialize for no mode change in buffered-image mode. */
   cinfo->enable_1pass_quant = FALSE;
   cinfo->enable_external_quant = FALSE;
@@ -227,7 +227,7 @@ default_decompress_parms (j_decompress_ptr cinfo)
  * jpeg_destroy to release any temporary space.)
  * If an abbreviated (tables only) datastream is presented, the routine will
  * return JPEG_HEADER_TABLES_ONLY upon reaching EOI.  The application may then
- * re-use the JPEG object to read the abbreviated image datastream(s).
+ * re-use the JPEG object to read the abbreviated image datastream( s).
  * It is unnecessary (but OK) to call jpeg_abort in this case.
  * The JPEG_SUSPENDED return code only occurs if the data source module
  * requests suspension of the decompressor.  In this case the application

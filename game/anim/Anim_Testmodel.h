@@ -4,7 +4,7 @@
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
+This file is part of the Doom 3 BFG Edition GPL Source Code ( "Doom 3 BFG Edition Source Code" ).
 
 Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,33 +51,33 @@ public:
 
 	virtual bool			ShouldConstructScriptObjectAtSpawn() const;
 
-	void					NextAnim( const idCmdArgs &args );
-	void					PrevAnim( const idCmdArgs &args );
-	void					NextFrame( const idCmdArgs &args );
-	void					PrevFrame( const idCmdArgs &args );
-	void					TestAnim( const idCmdArgs &args );
-	void					BlendAnim( const idCmdArgs &args );
+	void					NextAnim( const anCommandArgs &args );
+	void					PrevAnim( const anCommandArgs &args );
+	void					NextFrame( const anCommandArgs &args );
+	void					PrevFrame( const anCommandArgs &args );
+	void					TestAnim( const anCommandArgs &args );
+	void					BlendAnim( const anCommandArgs &args );
 
-	static void 			KeepTestModel_f( const idCmdArgs &args );
-	static void 			TestModel_f( const idCmdArgs &args );
-	static void				ArgCompletion_TestModel( const idCmdArgs &args, void(*callback)( const char *s ) );
-	static void 			TestSkin_f( const idCmdArgs &args );
-	static void 			TestShaderParm_f( const idCmdArgs &args );
-	static void 			TestParticleStopTime_f( const idCmdArgs &args );
-	static void 			TestAnim_f( const idCmdArgs &args );
-	static void				ArgCompletion_TestAnim( const idCmdArgs &args, void(*callback)( const char *s ) );
-	static void 			TestBlend_f( const idCmdArgs &args );
-	static void 			TestModelNextAnim_f( const idCmdArgs &args );
-	static void 			TestModelPrevAnim_f( const idCmdArgs &args );
-	static void 			TestModelNextFrame_f( const idCmdArgs &args );
-	static void 			TestModelPrevFrame_f( const idCmdArgs &args );
+	static void 			KeepTestModel_f( const anCommandArgs &args );
+	static void 			TestModel_f( const anCommandArgs &args );
+	static void				ArgCompletion_TestModel( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void 			TestSkin_f( const anCommandArgs &args );
+	static void 			TestShaderParm_f( const anCommandArgs &args );
+	static void 			TestParticleStopTime_f( const anCommandArgs &args );
+	static void 			TestAnim_f( const anCommandArgs &args );
+	static void				ArgCompletion_TestAnim( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void 			TestBlend_f( const anCommandArgs &args );
+	static void 			TestModelNextAnim_f( const anCommandArgs &args );
+	static void 			TestModelPrevAnim_f( const anCommandArgs &args );
+	static void 			TestModelNextFrame_f( const anCommandArgs &args );
+	static void 			TestModelPrevFrame_f( const anCommandArgs &args );
 
 private:
 	arcEntityPtr<arcEntity>	head;
 	arcAnimator				*headAnimator;
 	arcAnim					customAnim;
-	arcPhysics_Parametric	physicsObj;
-	arcNetString					animname;
+	anPhysics_Parametric	physicsObj;
+	anString					animname;
 	int						anim;
 	int						headAnim;
 	int						mode;
@@ -85,7 +85,7 @@ private:
 	int						starttime;
 	int						animtime;
 
-	arcNetList<copyJoints_t>	copyJoints;
+	anList<copyJoints_t>	copyJoints;
 
 	virtual void			Think();
 

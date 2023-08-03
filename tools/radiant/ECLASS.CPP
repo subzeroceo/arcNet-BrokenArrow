@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -52,12 +52,12 @@ const evarPrefix_t EvarPrefixes[] = {
 
 const int NumEvarPrefixes = sizeof(EvarPrefixes) / sizeof(evarPrefix_t);
 
-eclass_t	*eclass = NULL;
-eclass_t	*eclass_bad = NULL;
+eclass_t	*eclass = nullptr;
+eclass_t	*eclass_bad = nullptr;
 char		eclass_directory[1024];
 
 // md3 cache for misc_models
-eclass_t *g_md3Cache = NULL;
+eclass_t *g_md3Cache = nullptr;
 
 /*
 
@@ -79,7 +79,7 @@ void CleanEntityList( eclass_t *&pList ) {
 		delete pList;
 		pList = pTemp;
 	}
-	pList = NULL;
+	pList = nullptr;
 }
 
 
@@ -90,11 +90,11 @@ void CleanUpEntities()
 
 	if ( eclass_bad ) {
 		delete eclass_bad;
-		eclass_bad = NULL;
+		eclass_bad = nullptr;
 	}
 }
 
-void ExtendBounds(arcVec3 v, arcVec3 &vMin, arcVec3 &vMax)
+void ExtendBounds(anVec3 v, anVec3 &vMin, anVec3 &vMax)
 {
 	for ( int i = 0 ;i < 3 ;i++ )
 	{
@@ -112,16 +112,16 @@ void ExtendBounds(arcVec3 v, arcVec3 &vMin, arcVec3 &vMax)
 	}
 }
 
-bool LoadModel(const char *pLocation, eclass_t *e, arcVec3 &vMin, arcVec3 &vMax, const char *pSkin)
+bool LoadModel(const char *pLocation, eclass_t *e, anVec3 &vMin, anVec3 &vMax, const char *pSkin)
 {
 	vMin[0] = vMin[1] = vMin[2] = 999999;
 	vMax[0] = vMax[1] = vMax[2] = -999999;
 
-	if (strstr(pLocation, ".ase" ) != NULL)	// FIXME: not correct!
+	if (strstr(pLocation, ".ase" ) != nullptr )	// FIXME: not correct!
 	{
-		arcBounds b;
+		anBounds b;
 		e->modelHandle = renderModelManager->FindModel( pLocation );
-		b = e->modelHandle->Bounds( NULL );
+		b = e->modelHandle->Bounds( nullptr );
 		VectorCopy(b[0], vMin);
 		VectorCopy(b[1], vMax);
 		return true;
@@ -132,8 +132,8 @@ bool LoadModel(const char *pLocation, eclass_t *e, arcVec3 &vMin, arcVec3 &vMax,
 eclass_t *EClass_Alloc( void ) {
 	eclass_t *e;
 	e = new eclass_t;
-	if ( e == NULL ) {
-		return NULL;
+	if ( e == nullptr ) {
+		return nullptr;
 	}
 	e->fixedsize = false;
 	e->unknown = false;
@@ -141,36 +141,36 @@ eclass_t *EClass_Alloc( void ) {
 	e->maxs.Zero();
 	e->color.Zero();
 	memset( &e->texdef, 0, sizeof( e->texdef ) );
-	e->modelHandle = NULL;
-	e->entityModel = NULL;
+	e->modelHandle = nullptr;
+	e->entityModel = nullptr;
 	e->nFrame = 0;
 	e->nShowFlags = 0;
 	e->hPlug = 0;
-	e->next = NULL;
+	e->next = nullptr;
 	return e;
 }
 
 
-eclass_t *EClass_InitFromDict( const arcDictionary *d, const char *name ) {
+eclass_t *EClass_InitFromDict( const anDict *d, const char *name ) {
 	eclass_t			*e;
-	const idKeyValue	*kv;
+	const anKeyValue	*kv;
 
 	// only include entityDefs with "editor_" values in them
 	if ( !d->MatchPrefix( "editor_" ) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	e = EClass_Alloc();
 	if ( !e ) {
-		return NULL;
+		return nullptr;
 	}
 
 	e->defArgs = *d;
 
-	arcNetString str;
-	arcNetString text;
-	arcNetString varname;
-	arcNetString defaultStr;
+	anString str;
+	anString text;
+	anString varname;
+	anString defaultStr;
 
 	e->name = name;
 	d->GetVector( "editor_color", "0 0 1", e->color);
@@ -197,7 +197,7 @@ eclass_t *EClass_InitFromDict( const arcDictionary *d, const char *name ) {
 	// concatenate all editor usage comments
 	text = "";
 	kv = d->MatchPrefix( "editor_usage" );
-	while( kv != NULL ) {
+	while( kv != nullptr ) {
 		text += kv->GetValue();
 		if ( !kv->GetValue().Length() || ( text[ text.Length() - 1 ] != '\n' ) ) {
 			text += "\n";
@@ -221,7 +221,7 @@ eclass_t *EClass_InitFromDict( const arcDictionary *d, const char *name ) {
 	}
 
 /*
-	while( kv != NULL ) {
+	while( kv != nullptr ) {
 		kv->key.Right( kv->key.Length() - 11, varname );
 		str += va( "'%s':\t %s", varname.c_str(), kv->value.c_str() );
 		if ( d->GetString( varname, "", defaultStr ) && defaultStr.Length() ) {
@@ -240,7 +240,7 @@ eclass_t *EClass_InitFromDict( const arcDictionary *d, const char *name ) {
 	while (kv) {
 		const char *temp = d->GetString(kv->GetValue() );
 		if (temp && *temp) {
-			e->args.Set(kv->GetValue(), d->GetString(kv->GetValue() ));
+			e->args.Set(kv->GetValue(), d->GetString(kv->GetValue() ) );
 		}
 		kv = d->MatchPrefix( "editor_copy", kv);
 	}
@@ -259,7 +259,7 @@ eclass_t *EClass_InitFromDict( const arcDictionary *d, const char *name ) {
 		e->nShowFlags |= ECLASS_MOVER;
 	}
 
-	if (d->GetBool( "editor_env" ) || arcNetString::Icmpn(e->name, "env_", 4) == 0 ) {
+	if (d->GetBool( "editor_env" ) || anString::Icmpn(e->name, "env_", 4) == 0 ) {
 		e->nShowFlags |= (ECLASS_ENV | ECLASS_ROTATABLE);
 		if (d->GetBool( "editor_ragdoll" ) ) {
 			e->defArgs.Set( "model", "" );
@@ -274,19 +274,19 @@ eclass_t *EClass_InitFromDict( const arcDictionary *d, const char *name ) {
 		e->nShowFlags |= ECLASS_LIGHT;
 	}
 
-	if ( arcNetString::Icmp(e->name, "light" ) == 0 ) {
+	if ( anString::Icmp(e->name, "light" ) == 0 ) {
 		e->nShowFlags |= ECLASS_LIGHT;
-	} else if ( arcNetString::Icmp(e->name, "path" ) == 0 ) {
+	} else if ( anString::Icmp(e->name, "path" ) == 0 ) {
 		e->nShowFlags |= ECLASS_PATH;
-	} else if ( arcNetString::Icmp(e->name, "target_null" ) == 0 ) {
+	} else if ( anString::Icmp(e->name, "target_null" ) == 0 ) {
 		e->nShowFlags |= ECLASS_CAMERAVIEW;
-	} else if ( arcNetString::Icmp(e->name, "worldspawn" ) == 0 ) {
+	} else if ( anString::Icmp(e->name, "worldspawn" ) == 0 ) {
 		e->nShowFlags |= ECLASS_WORLDSPAWN;
-	} else if ( arcNetString::Icmp(e->name, "speaker" ) == 0 ) {
+	} else if ( anString::Icmp(e->name, "speaker" ) == 0 ) {
 		e->nShowFlags |= ECLASS_SPEAKER;
-	} else if ( arcNetString::Icmp( e->name, "func_emitter" ) == 0 || arcNetString::Icmp( e->name, "func_splat" ) == 0 ) {
+	} else if ( anString::Icmp( e->name, "func_emitter" ) == 0 || anString::Icmp( e->name, "func_splat" ) == 0 ) {
 		e->nShowFlags |= ECLASS_PARTICLE;
-	} else if ( arcNetString::Icmp(e->name, "func_liquid" ) == 0 ) {
+	} else if ( anString::Icmp(e->name, "func_liquid" ) == 0 ) {
 		e->nShowFlags |= ECLASS_LIQUID;
 	}
 
@@ -369,7 +369,7 @@ void Eclass_InitForSourceDirectory (const char *path)
 {
 	int c = declManager->GetNumDecls(DECL_ENTITYDEF);
 	for ( int i = 0; i < c; i++ ) {
-		const arcDeclEntityDef *def = static_cast<const arcDeclEntityDef *>( declManager->DeclByIndex( DECL_ENTITYDEF, i ) );
+		const anDeclEntityDef *def = static_cast<const anDeclEntityDef *>( declManager->DeclByIndex( DECL_ENTITYDEF, i ) );
 		if ( def ) {
 			eclass_t *e = EClass_InitFromDict( &def->dict, def->GetName() );
 			if ( e ) {
@@ -406,7 +406,7 @@ eclass_t *Eclass_ForName (const char *name, bool has_brushes)
 
 	e = EClass_Alloc();
 	if ( !e ) {
-		return NULL;
+		return nullptr;
 	}
 	e->name = Mem_CopyString( name );
 	sprintf(buff, "%s not found in def/*.def\n", name);
@@ -423,11 +423,11 @@ eclass_t *Eclass_ForName (const char *name, bool has_brushes)
 }
 
 
-eclass_t* GetCachedModel(entity_t *pEntity, const char *pName, arcVec3 &vMin, arcVec3 &vMax)
+eclass_t* GetCachedModel(entity_t *pEntity, const char *pName, anVec3 &vMin, anVec3 &vMax)
 {
-	eclass_t *e = NULL;
-	if (pName == NULL || strlen(pName) == 0 ) {
-		return NULL;
+	eclass_t *e = nullptr;
+	if (pName == nullptr || strlen(pName) == 0 ) {
+		return nullptr;
 	}
 
 	for (e = g_md3Cache; e; e = e->next) {
@@ -443,12 +443,12 @@ eclass_t* GetCachedModel(entity_t *pEntity, const char *pName, arcVec3 &vMin, ar
 	memset (e, 0, sizeof(*e) );
 	e->name = Mem_CopyString( pName );
 	e->color[0] = e->color[2] = 0.85f;
-	if (LoadModel(pName, e, vMin, vMax, NULL) ) {
+	if (LoadModel(pName, e, vMin, vMax, nullptr ) ) {
 		EClass_InsertSortedList(g_md3Cache, e);
 		VectorCopy(vMin, e->mins);
 		VectorCopy(vMax, e->maxs);
 		pEntity->md3Class = e;
 		return e;
 	}
-	return NULL;
+	return nullptr;
 }

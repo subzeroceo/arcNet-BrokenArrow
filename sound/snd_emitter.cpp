@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "snd_local.h"
@@ -150,7 +150,7 @@ idSoundChannel::idSoundChannel
 ===================
 */
 idSoundChannel::idSoundChannel( void ) {
-	decoder = NULL;
+	decoder = nullptr;
 	Clear();
 }
 
@@ -172,12 +172,12 @@ void idSoundChannel::Clear( void ) {
 	int j;
 
 	Stop();
-	soundShader = NULL;
+	soundShader = nullptr;
 	lastVolume = 0.0f;
 	triggerChannel = SCHANNEL_ANY;
 	channelFade.Clear();
 	diversity = 0.0f;
-	leadinSample = NULL;
+	leadinSample = nullptr;
 	trigger44kHzTime = 0;
 	for ( j = 0; j < 6; j++ ) {
 		lastV[j] = 0.0f;
@@ -185,7 +185,7 @@ void idSoundChannel::Clear( void ) {
 	memset( &parms, 0, sizeof(parms) );
 
 	triggered = false;
-	openalSource = NULL;
+	openalSource = nullptr;
 	openalStreamingOffset = 0;
 	openalStreamingBuffer[0] = openalStreamingBuffer[1] = openalStreamingBuffer[2] = 0;
 	lastopenalStreamingBuffer[0] = lastopenalStreamingBuffer[1] = lastopenalStreamingBuffer[2] = 0;
@@ -198,7 +198,7 @@ idSoundChannel::Start
 */
 void idSoundChannel::Start( void ) {
 	triggerState = true;
-	if ( decoder == NULL ) {
+	if ( decoder == nullptr ) {
 		decoder = idSampleDecoder::Alloc();
 	}
 }
@@ -210,9 +210,9 @@ idSoundChannel::Stop
 */
 void idSoundChannel::Stop( void ) {
 	triggerState = false;
-	if ( decoder != NULL ) {
+	if ( decoder != nullptr ) {
 		idSampleDecoder::Free( decoder );
-		decoder = NULL;
+		decoder = nullptr;
 	}
 }
 
@@ -336,30 +336,30 @@ void idSoundChannel::GatherChannelSamples( int sampleOffset44k, int sampleCount4
 
 /*
 ===============
-arcAudioSystemLocal::arcAudioSystemLocal
+anAudioSystemLocal::anAudioSystemLocal
 
 ===============
 */
-arcAudioSystemLocal::arcAudioSystemLocal( void ) {
-	soundWorld = NULL;
+anAudioSystemLocal::anAudioSystemLocal( void ) {
+	soundWorld = nullptr;
 	Clear();
 }
 
 /*
 ===============
-arcAudioSystemLocal::~arcAudioSystemLocal
+anAudioSystemLocal::~anAudioSystemLocal
 ===============
 */
-arcAudioSystemLocal::~arcAudioSystemLocal( void ) {
+anAudioSystemLocal::~anAudioSystemLocal( void ) {
 	Clear();
 }
 
 /*
 ===============
-arcAudioSystemLocal::Clear
+anAudioSystemLocal::Clear
 ===============
 */
-void arcAudioSystemLocal::Clear( void ) {
+void anAudioSystemLocal::Clear( void ) {
 	int i;
 
 	for ( i = 0; i < SOUND_MAX_CHANNELS; i++ ) {
@@ -384,10 +384,10 @@ void arcAudioSystemLocal::Clear( void ) {
 
 /*
 ==================
-arcAudioSystemLocal::OverrideParms
+anAudioSystemLocal::OverrideParms
 ==================
 */
-void arcAudioSystemLocal::OverrideParms( const soundShaderParms_t *base,
+void anAudioSystemLocal::OverrideParms( const soundShaderParms_t *base,
 									  const soundShaderParms_t *over, soundShaderParms_t *out ) {
 	if ( !over ) {
 		*out = *base;
@@ -423,13 +423,13 @@ void arcAudioSystemLocal::OverrideParms( const soundShaderParms_t *base,
 
 /*
 ==================
-arcAudioSystemLocal::CheckForCompletion
+anAudioSystemLocal::CheckForCompletion
 
 Checks to see if all the channels have completed, clearing the playing flag if necessary.
 Sets the playing and shakes bools.
 ==================
 */
-void arcAudioSystemLocal::CheckForCompletion( int current44kHzTime ) {
+void anAudioSystemLocal::CheckForCompletion( int current44kHzTime ) {
 	bool hasActive;
 	int i;
 
@@ -443,7 +443,7 @@ void arcAudioSystemLocal::CheckForCompletion( int current44kHzTime ) {
 			if ( !chan->triggerState ) {
 				continue;
 			}
-			const arcSoundShader *shader = chan->soundShader;
+			const anSoundShader *shader = chan->soundShader;
 			if ( !shader ) {
 				continue;
 			}
@@ -481,7 +481,7 @@ void arcAudioSystemLocal::CheckForCompletion( int current44kHzTime ) {
 			}
 
 			// free decoder memory if no sound was decoded for a while
-			if ( chan->decoder != NULL && chan->decoder->GetLastDecodeTime() < current44kHzTime - SOUND_DECODER_FREE_DELAY ) {
+			if ( chan->decoder != nullptr && chan->decoder->GetLastDecodeTime() < current44kHzTime - SOUND_DECODER_FREE_DELAY ) {
 				chan->decoder->ClearDecoder();
 			}
 
@@ -505,12 +505,12 @@ void arcAudioSystemLocal::CheckForCompletion( int current44kHzTime ) {
 
 /*
 ===================
-arcAudioSystemLocal::Spatialize
+anAudioSystemLocal::Spatialize
 
 Called once each sound frame by the main thread from idSoundWorldLocal::PlaceOrigin
 ===================
 */
-void arcAudioSystemLocal::Spatialize( arcVec3 listenerPos, int listenerArea, ARCRenderWorld *rw ) {
+void anAudioSystemLocal::Spatialize( anVec3 listenerPos, int listenerArea, anRenderWorld *rw ) {
 	int			i;
 	bool		hasActive = false;
 
@@ -533,8 +533,8 @@ void arcAudioSystemLocal::Spatialize( arcVec3 listenerPos, int listenerArea, ARC
 	//
 	// work out where the sound comes from
 	//
-	arcVec3 realOrigin = origin * DOOM_TO_METERS;
-	arcVec3 len = listenerPos - realOrigin;
+	anVec3 realOrigin = origin * DOOM_TO_METERS;
+	anVec3 len = listenerPos - realOrigin;
 	realDistance = len.LengthFast();
 
 	if ( realDistance >= maxDistance ) {
@@ -568,7 +568,7 @@ void arcAudioSystemLocal::Spatialize( arcVec3 listenerPos, int listenerArea, ARC
 			return;
 		}
 
-		soundWorld->ResolveOrigin( 0, NULL, soundInArea, 0.0f, origin, this );
+		soundWorld->ResolveOrigin( 0, nullptr, soundInArea, 0.0f, origin, this );
 		distance /= METERS_TO_DOOM;
 	} else {
 		// no portals available
@@ -587,12 +587,12 @@ PUBLIC FUNCTIONS
 
 /*
 =====================
-arcAudioSystemLocal::UpdateEmitter
+anAudioSystemLocal::UpdateEmitter
 =====================
 */
-void arcAudioSystemLocal::UpdateEmitter( const arcVec3 &origin, int listenerId, const soundShaderParms_t *parms ) {
+void anAudioSystemLocal::UpdateEmitter( const anVec3 &origin, int listenerId, const soundShaderParms_t *parms ) {
 	if ( !parms ) {
-		common->Error( "arcAudioSystemLocal::UpdateEmitter: NULL parms" );
+		common->Error( "anAudioSystemLocal::UpdateEmitter: nullptr parms" );
 	}
 	if ( soundWorld && soundWorld->writeDemo ) {
 		soundWorld->writeDemo->WriteInt( DS_SOUND );
@@ -617,12 +617,12 @@ void arcAudioSystemLocal::UpdateEmitter( const arcVec3 &origin, int listenerId, 
 
 /*
 =====================
-arcAudioSystemLocal::Free
+anAudioSystemLocal::Free
 
 They are never truly freed, just marked so they can be reused by the soundWorld
 =====================
 */
-void arcAudioSystemLocal::Free( bool immediate ) {
+void anAudioSystemLocal::Free( bool immediate ) {
 	if ( removeStatus != REMOVE_STATUS_ALIVE ) {
 		return;
 	}
@@ -646,12 +646,12 @@ void arcAudioSystemLocal::Free( bool immediate ) {
 
 /*
 =====================
-arcAudioSystemLocal::StartSound
+anAudioSystemLocal::StartSound
 
 returns the length of the started sound in msec
 =====================
 */
-int arcAudioSystemLocal::StartSound( const arcSoundShader *shader, const s_channelType channel, float diversity, int soundShaderFlags, bool allowSlow ) {
+int anAudioSystemLocal::StartSound( const anSoundShader *shader, const s_channelType channel, float diversity, int soundShaderFlags, bool allowSlow ) {
 	int i;
 
 	if ( !shader ) {
@@ -870,12 +870,12 @@ int arcAudioSystemLocal::StartSound( const arcSoundShader *shader, const s_chann
 
 /*
 ===================
-arcAudioSystemLocal::ModifySound
+anAudioSystemLocal::ModifySound
 ===================
 */
-void arcAudioSystemLocal::ModifySound( const s_channelType channel, const soundShaderParms_t *parms ) {
+void anAudioSystemLocal::ModifySound( const s_channelType channel, const soundShaderParms_t *parms ) {
 	if ( !parms ) {
-		common->Error( "arcAudioSystemLocal::ModifySound: NULL parms" );
+		common->Error( "anAudioSystemLocal::ModifySound: nullptr parms" );
 	}
 	if ( idSoundSystemLocal::s_showStartSound.GetInteger() ) {
 		common->Printf( "ModifySound(%i,%i)\n", index, channel );
@@ -905,7 +905,7 @@ void arcAudioSystemLocal::ModifySound( const s_channelType channel, const soundS
 
 		OverrideParms( &chan->parms, parms, &chan->parms );
 
-		if ( chan->parms.shakes > 0.0f && chan->soundShader != NULL ) {
+		if ( chan->parms.shakes > 0.0f && chan->soundShader != nullptr ) {
 			chan->soundShader->CheckShakesAndOgg();
 		}
 	}
@@ -913,12 +913,12 @@ void arcAudioSystemLocal::ModifySound( const s_channelType channel, const soundS
 
 /*
 ===================
-arcAudioSystemLocal::StopSound
+anAudioSystemLocal::StopSound
 
 can pass SCHANNEL_ANY
 ===================
 */
-void arcAudioSystemLocal::StopSound( const s_channelType channel ) {
+void anAudioSystemLocal::StopSound( const s_channelType channel ) {
 	int i;
 
 	if ( idSoundSystemLocal::s_showStartSound.GetInteger() ) {
@@ -955,8 +955,8 @@ void arcAudioSystemLocal::StopSound( const s_channelType channel ) {
 			chan->leadinSample->PurgeSoundSample();
 		}
 
-		chan->leadinSample = NULL;
-		chan->soundShader = NULL;
+		chan->leadinSample = nullptr;
+		chan->soundShader = nullptr;
 	}
 
 	Sys_LeaveCriticalSection();
@@ -964,12 +964,12 @@ void arcAudioSystemLocal::StopSound( const s_channelType channel ) {
 
 /*
 ===================
-arcAudioSystemLocal::FadeSound
+anAudioSystemLocal::FadeSound
 
-to is in Db (sigh), over is in seconds
+to is in Db ( sigh), over is in seconds
 ===================
 */
-void arcAudioSystemLocal::FadeSound( const s_channelType channel, float to, float over ) {
+void anAudioSystemLocal::FadeSound( const s_channelType channel, float to, float over ) {
 	if ( idSoundSystemLocal::s_showStartSound.GetInteger() ) {
 		common->Printf( "FadeSound(%i,%i,%f,%f )\n", index, channel, to, over );
 	}
@@ -1022,31 +1022,31 @@ void arcAudioSystemLocal::FadeSound( const s_channelType channel, float to, floa
 
 /*
 ===================
-arcAudioSystemLocal::CurrentlyPlaying
+anAudioSystemLocal::CurrentlyPlaying
 ===================
 */
-bool arcAudioSystemLocal::CurrentlyPlaying( void ) const {
+bool anAudioSystemLocal::CurrentlyPlaying( void ) const {
 	return playing;
 }
 
 /*
 ===================
-arcAudioSystemLocal::Index
+anAudioSystemLocal::Index
 ===================
 */
-int	arcAudioSystemLocal::Index( void ) const {
+int	anAudioSystemLocal::Index( void ) const {
 	return index;
 }
 
 /*
 ===================
-arcAudioSystemLocal::CurrentAmplitude
+anAudioSystemLocal::CurrentAmplitude
 
 this is called from the main thread by the material shader system
 to allow lights and surface flares to vary with the sound amplitude
 ===================
 */
-float arcAudioSystemLocal::CurrentAmplitude( void ) {
+float anAudioSystemLocal::CurrentAmplitude( void ) {
 	if ( idSoundSystemLocal::s_constantAmplitude.GetFloat() >= 0.0f ) {
 		return idSoundSystemLocal::s_constantAmplitude.GetFloat();
 	}
@@ -1064,35 +1064,35 @@ float arcAudioSystemLocal::CurrentAmplitude( void ) {
 
 	// calculate a new value
 	ampTime = localTime;
-	amplitude = soundWorld->FindAmplitude( this, localTime, NULL, SCHANNEL_ANY, false );
+	amplitude = soundWorld->FindAmplitude( this, localTime, nullptr, SCHANNEL_ANY, false );
 
 	return amplitude;
 }
 
 /*
 ===================
-arcAudioSystemLocal::GetSlowChannel
+anAudioSystemLocal::GetSlowChannel
 ===================
 */
-idSlowChannel arcAudioSystemLocal::GetSlowChannel( const idSoundChannel *chan ) {
+idSlowChannel anAudioSystemLocal::GetSlowChannel( const idSoundChannel *chan ) {
 	return slowChannels[chan - channels];
 }
 
 /*
 ===================
-arcAudioSystemLocal::SetSlowChannel
+anAudioSystemLocal::SetSlowChannel
 ===================
 */
-void arcAudioSystemLocal::SetSlowChannel( const idSoundChannel *chan, idSlowChannel slow ) {
+void anAudioSystemLocal::SetSlowChannel( const idSoundChannel *chan, idSlowChannel slow ) {
 	slowChannels[chan - channels] = slow;
 }
 
 /*
 ===================
-arcAudioSystemLocal::ResetSlowChannel
+anAudioSystemLocal::ResetSlowChannel
 ===================
 */
-void arcAudioSystemLocal::ResetSlowChannel( const idSoundChannel *chan ) {
+void anAudioSystemLocal::ResetSlowChannel( const idSoundChannel *chan ) {
 	int index = chan - channels;
 	slowChannels[index].Reset();
 }

@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Common_local.h"
@@ -8,36 +8,36 @@
 #define LAUNCH_TITLE_DOOM_EXECUTABLE		"doom1.exe"
 #define LAUNCH_TITLE_DOOM2_EXECUTABLE		"doom2.exe"
 
-arcCVarSystem com_wipeSeconds( "com_wipeSeconds", "1", CVAR_SYSTEM, "" );
-arcCVarSystem com_disableAutoSaves( "com_disableAutoSaves", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
-arcCVarSystem com_disableAllSaves( "com_disableAllSaves", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
+anCVarSystem com_wipeSeconds( "com_wipeSeconds", "1", CVAR_SYSTEM, "" );
+anCVarSystem com_disableAutoSaves( "com_disableAutoSaves", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
+anCVarSystem com_disableAllSaves( "com_disableAllSaves", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
 
 
-extern arcCVarSystem sys_lang;
+extern anCVarSystem sys_lang;
 
-extern arcCVarSystem g_demoMode;
+extern anCVarSystem g_demoMode;
 
 // This is for the dirty hack to get a dialog to show up before we capture the screen for autorender.
 const int NumScreenUpdatesToShowDialog = 25;
 
 /*
 ================
-arcCommonLocal::LaunchExternalTitle
+anCommonLocal::LaunchExternalTitle
 
 Launches an external title  ( Doom 1, or 2 ) based on title index.
 for PS3, a device number is sent in, for the game to register as a local
 user by default, when title initializes.
 ================
 */
-void arcCommonLocal::LaunchExternalTitle( int titleIndex, int device, const lobbyConnectInfo_t * const connectInfo ) {
-	arcNetString deviceString( device );
+void anCommonLocal::LaunchExternalTitle( int titleIndex, int device, const lobbyConnectInfo_t * const connectInfo ) {
+	anString deviceString( device );
 
 	// We want to pass in the current executable, so that the launching title knows which title to return to.
 	// as of right now, this feature is TBD.
-	const char * currentExecutablePath = "ImNotSureYet";
-	arcNetString launchingExecutablePath;
+	const char *currentExecutablePath = "ImNotSureYet";
+	anString launchingExecutablePath;
 
-	arcCommandArgs cmdArgs;
+	anCommandArgs cmdArgs;
 	cmdArgs.AppendArg( currentExecutablePath );
 
 	if ( titleIndex == LAUNCH_TITLE_DOOM ) {
@@ -49,32 +49,32 @@ void arcCommonLocal::LaunchExternalTitle( int titleIndex, int device, const lobb
 
 	} else {
 
-		arcLibrary::Warning( "Unhandled Launch Title %d \n", titleIndex );
+		anLibrary::Warning( "Unhandled Launch Title %d \n", titleIndex );
 	}
 
 	cmdArgs.AppendArg( deviceString.c_str() );
 
 	// Add an argument so that the new process knows whether or not to read exitspawn data.
-	if ( connectInfo != NULL ) {
+	if ( connectInfo != nullptr ) {
 		cmdArgs.AppendArg( "exitspawnInvite" );
 	}
 
 	// Add arguments so that the new process will know which command line to invoke to relaunch this process
 	// if necessary.
 
-	const int launchDataSize = ( connectInfo == NULL ) ? 0 : sizeof( *connectInfo );
+	const int launchDataSize = ( connectInfo == nullptr ) ? 0 : sizeof( *connectInfo );
 
 	Sys_Launch(  launchingExecutablePath.c_str() , cmdArgs, const_cast< lobbyConnectInfo_t * const >( connectInfo ), launchDataSize );
 }
 
 /*
 ================
-arcCommonLocal::StartWipe
+anCommonLocal::StartWipe
 
 Draws and captures the current state, then starts a wipe with that image
 ================
 */
-void arcCommonLocal::StartWipe( const char *_wipeMaterial, bool hold ) {
+void anCommonLocal::StartWipe( const char *_wipeMaterial, bool hold ) {
 	console->Close();
 
 	Draw();
@@ -90,10 +90,10 @@ void arcCommonLocal::StartWipe( const char *_wipeMaterial, bool hold ) {
 
 /*
 ================
-arcCommonLocal::CompleteWipe
+anCommonLocal::CompleteWipe
 ================
 */
-void arcCommonLocal::CompleteWipe() {
+void anCommonLocal::CompleteWipe() {
 	while ( Sys_Milliseconds() < wipeStopTime ) {
 		BusyWait();
 		Sys_Sleep( 10 );
@@ -106,10 +106,10 @@ void arcCommonLocal::CompleteWipe() {
 
 /*
 ================
-arcCommonLocal::ClearWipe
+anCommonLocal::ClearWipe
 ================
 */
-void arcCommonLocal::ClearWipe() {
+void anCommonLocal::ClearWipe() {
 	wipeHold = false;
 	wipeStopTime = 0;
 	wipeStartTime = 0;
@@ -118,22 +118,22 @@ void arcCommonLocal::ClearWipe() {
 
 /*
 ===============
-arcCommonLocal::StartNewGame
+anCommonLocal::StartNewGame
 ===============
 */
-void arcCommonLocal::StartNewGame( const char * mapName, bool devmap, int gameMode ) {
-	if ( session->GetSignInManager().GetMasterLocalUser() == NULL ) {
+void anCommonLocal::StartNewGame( const char *mapName, bool devmap, int gameMode ) {
+	if ( session->GetSignInManager().GetMasterLocalUser() == nullptr ) {
 		// For development make sure a controller is registered
 		// Can't just register the local user because it will be removed because of it's persistent state
 		session->GetSignInManager().SetDesiredLocalUsers( 1, 1 );
 		session->GetSignInManager().Pump();
 	}
 
-	arcNetString mapNameClean = mapName;
+	anString mapNameClean = mapName;
 	mapNameClean.StripFileExtension();
 	mapNameClean.BackSlashesToSlashes();
 
-	arcMatchParameters matchParameters;
+	anMatchParameters matchParameters;
 	matchParameters.mapName = mapNameClean;
 	if ( gameMode == GAME_MODE_SINGLEPLAYER ) {
 		matchParameters.numSlots = 1;
@@ -144,7 +144,7 @@ void arcCommonLocal::StartNewGame( const char * mapName, bool devmap, int gameMo
 		matchParameters.gameMode = gameMode;
 		matchParameters.matchFlags = DefaultPartyFlags;
 		for ( int i = 0; i < mpGameMaps.Num(); i++ ) {
-			if ( arcNetString::Icmp( mpGameMaps[i].mapFile, mapNameClean ) == 0 ) {
+			if ( anString::Icmp( mpGameMaps[i].mapFile, mapNameClean ) == 0 ) {
 				matchParameters.gameMap = i;
 				break;
 			}
@@ -174,12 +174,12 @@ void arcCommonLocal::StartNewGame( const char * mapName, bool devmap, int gameMo
 
 /*
 ===============
-arcCommonLocal::MoveToNewMap
+anCommonLocal::MoveToNewMap
 Single player transition from one map to another
 ===============
 */
-void arcCommonLocal::MoveToNewMap( const char *mapName, bool devmap ) {
-	arcMatchParameters matchParameters;
+void anCommonLocal::MoveToNewMap( const char *mapName, bool devmap ) {
+	anMatchParameters matchParameters;
 	matchParameters.numSlots = 1;
 	matchParameters.gameMode = GAME_MODE_SINGLEPLAYER;
 	matchParameters.gameMap = GAME_MAP_SINGLEPLAYER;
@@ -206,14 +206,14 @@ void arcCommonLocal::MoveToNewMap( const char *mapName, bool devmap ) {
 
 /*
 ===============
-arcCommonLocal::UnloadMap
+anCommonLocal::UnloadMap
 
 Performs cleanup that needs to happen between maps, or when a
 game is exited.
 Exits with mapSpawned = false
 ===============
 */
-void arcCommonLocal::UnloadMap() {
+void anCommonLocal::UnloadMap() {
 	StopPlayingRenderDemo();
 
 	// end the current map in the game
@@ -230,22 +230,22 @@ void arcCommonLocal::UnloadMap() {
 
 /*
 ===============
-arcCommonLocal::LoadLoadingGui
+anCommonLocal::LoadLoadingGui
 ===============
 */
-void arcCommonLocal::LoadLoadingGui( const char *mapName, bool & hellMap ) {
+void anCommonLocal::LoadLoadingGui( const char *mapName, bool & hellMap ) {
 	defaultLoadscreen = false;
-	loadGUI = new idSWF( "loading/default", NULL );
+	loadGUI = new idSWF( "loading/default", nullptr );
 
 	if ( g_demoMode.GetBool() ) {
 		hellMap = false;
-		if ( loadGUI != NULL ) {
-			const arcMaterial * defaultMat = declManager->FindMaterial( "guis/assets/loadscreens/default" );
+		if ( loadGUI != nullptr ) {
+			const anMaterial * defaultMat = declManager->FindMaterial( "guis/assets/loadscreens/default" );
 			renderSystem->LoadLevelImages();
 
 			loadGUI->Activate( true );
 			idSWFSpriteInstance * bgImg = loadGUI->GetRootObject().GetSprite( "bgImage" );
-			if ( bgImg != NULL ) {
+			if ( bgImg != nullptr ) {
 				bgImg->SetMaterial( defaultMat );
 			}
 		}
@@ -254,14 +254,14 @@ void arcCommonLocal::LoadLoadingGui( const char *mapName, bool & hellMap ) {
 	}
 
 	// load / program a gui to stay up on the screen while loading
-	aRcStaticString< MAX_OSPATH > stripped = mapName;
+	anStaticString< MAX_OSPATH > stripped = mapName;
 	stripped.StripFileExtension();
 	stripped.StripPath();
 
 	// use default load screen for demo
-	aRcStaticString< MAX_OSPATH > matName = "guis/assets/loadscreens/";
+	anStaticString< MAX_OSPATH > matName = "guis/assets/loadscreens/";
 	matName.Append( stripped );
-	const arcMaterial * mat = declManager->FindMaterial( matName );
+	const anMaterial * mat = declManager->FindMaterial( matName );
 
 	renderSystem->LoadLevelImages();
 
@@ -275,47 +275,47 @@ void arcCommonLocal::LoadLoadingGui( const char *mapName, bool & hellMap ) {
 		loadTipList[i] = i;
 	}
 
-	if ( loadGUI != NULL ) {
+	if ( loadGUI != nullptr ) {
 		loadGUI->Activate( true );
 		nextLoadTip = Sys_Milliseconds() + LOAD_TIP_CHANGE_INTERVAL;
 
 		idSWFSpriteInstance * bgImg = loadGUI->GetRootObject().GetSprite( "bgImage" );
-		if ( bgImg != NULL ) {
+		if ( bgImg != nullptr ) {
 			bgImg->SetMaterial( mat );
 		}
 
 		idSWFSpriteInstance * overlay = loadGUI->GetRootObject().GetSprite( "overlay" );
 
-		const arcDeclEntityDef * mapDef = static_cast<const arcDeclEntityDef *>(declManager->FindType( DECL_MAPDEF, mapName, false ) );
-		if ( mapDef != NULL ) {
+		const anDeclEntityDef * mapDef = static_cast<const anDeclEntityDef *>(declManager->FindType( DECL_MAPDEF, mapName, false ) );
+		if ( mapDef != nullptr ) {
 			isHellMap = mapDef->dict.GetBool( "hellMap", false );
 
-			if ( isHellMap && overlay != NULL ) {
+			if ( isHellMap && overlay != nullptr ) {
 				overlay->SetVisible( false );
 			}
 
-			arcNetString desc;
-			arcNetString subTitle;
-			arcNetString displayName;
-			idSWFTextInstance * txtVal = NULL;
+			anString desc;
+			anString subTitle;
+			anString displayName;
+			idSWFTextInstance * txtVal = nullptr;
 
 			txtVal = loadGUI->GetRootObject().GetNestedText( "txtRegLoad" );
 			displayName = ARCLocalization::GetString( mapDef->dict.GetString( "name", mapName ) );
 
-			if ( txtVal != NULL ) {
+			if ( txtVal != nullptr ) {
 				txtVal->SetText( "#str_00408" );
 				txtVal->SetStrokeInfo( true, 2.0f, 1.0f );
 			}
 
-			const arcMatchParameters & matchParameters = session->GetActingGameStateLobbyBase().GetMatchParms();
+			const anMatchParameters & matchParameters = session->GetActingGameStateLobbyBase().GetMatchParms();
 			if ( matchParameters.gameMode == GAME_MODE_SINGLEPLAYER ) {
 				desc = ARCLocalization::GetString( mapDef->dict.GetString( "desc", "" ) );
 				subTitle = ARCLocalization::GetString( mapDef->dict.GetString( "subTitle", "" ) );
 			} else {
-				const arcStringList & modes = common->GetModeDisplayList();
-				subTitle = modes[ arcMath::ClampInt( 0, modes.Num() - 1, matchParameters.gameMode ) ];
+				const anStringList & modes = common->GetModeDisplayList();
+				subTitle = modes[ anMath::ClampInt( 0, modes.Num() - 1, matchParameters.gameMode ) ];
 
-				const char * modeDescs[] = { "#str_swf_deathmatch_desc", "#str_swf_tourney_desc", "#str_swf_team_deathmatch_desc", "#str_swf_lastman_desc", "#str_swf_ctf_desc" };
+				const char *modeDescs[] = { "#str_swf_deathmatch_desc", "#str_swf_tourney_desc", "#str_swf_team_deathmatch_desc", "#str_swf_lastman_desc", "#str_swf_ctf_desc" };
 				desc = ARCLocalization::GetString( modeDescs[matchParameters.gameMode] );
 			}
 
@@ -324,19 +324,19 @@ void arcCommonLocal::LoadLoadingGui( const char *mapName, bool & hellMap ) {
 			} else {
 				txtVal = loadGUI->GetRootObject().GetNestedText( "txtHellName" );
 			}
-			if ( txtVal != NULL ) {
+			if ( txtVal != nullptr ) {
 				txtVal->SetText( displayName );
 				txtVal->SetStrokeInfo( true, 2.0f, 1.0f );
 			}
 
 			txtVal = loadGUI->GetRootObject().GetNestedText( "txtSub" );
-			if ( txtVal != NULL && !isHellMap ) {
+			if ( txtVal != nullptr && !isHellMap ) {
 				txtVal->SetText( subTitle );
 				txtVal->SetStrokeInfo( true, 1.75f, 0.75f );
 			}
 
 			txtVal = loadGUI->GetRootObject().GetNestedText( "txtDesc" );
-			if ( txtVal != NULL ) {
+			if ( txtVal != nullptr ) {
 				if ( isHellMap ) {
 					txtVal->SetText( va( "\n%s", desc.c_str() ) );
 				} else {
@@ -350,16 +350,16 @@ void arcCommonLocal::LoadLoadingGui( const char *mapName, bool & hellMap ) {
 
 /*
 ===============
-arcCommonLocal::ExecuteMapChange
+anCommonLocal::ExecuteMapChange
 
 Performs the initialization of a game based on session match parameters, used for both single
 player and multiplayer, but not for renderDemos, which don't create a game at all.
 Exits with mapSpawned = true
 ===============
 */
-void arcCommonLocal::ExecuteMapChange() {
+void anCommonLocal::ExecuteMapChange() {
 	if ( session->GetState() != ARCSession::LOADING ) {
-		arcLibrary::Warning( "Session state is not LOADING in ExecuteMapChange" );
+		anLibrary::Warning( "Session state is not LOADING in ExecuteMapChange" );
 		return;
 	}
 
@@ -370,10 +370,10 @@ void arcCommonLocal::ExecuteMapChange() {
 	// This is so we can tell if we had a new loadmap request from within an existing loadmap call
 	const int cachedLoadingID = session->GetLoadingID();
 
-	const arcMatchParameters & matchParameters = session->GetActingGameStateLobbyBase().GetMatchParms();
+	const anMatchParameters & matchParameters = session->GetActingGameStateLobbyBase().GetMatchParms();
 
 	if ( matchParameters.numSlots <= 0 ) {
-		arcLibrary::Warning( "numSlots <= 0 in ExecuteMapChange" );
+		anLibrary::Warning( "numSlots <= 0 in ExecuteMapChange" );
 		return;
 	}
 
@@ -411,12 +411,12 @@ void arcCommonLocal::ExecuteMapChange() {
 	currentMapName = matchParameters.mapName;
 	currentMapName.StripFileExtension();
 
-	aRcStaticString< MAX_OSPATH > fullMapName = "maps/";
+	anStaticString< MAX_OSPATH > fullMapName = "maps/";
 	fullMapName += currentMapName;
 	fullMapName.SetFileExtension( "map" );
 
 	if ( mapSpawnData.savegameFile ) {
-		fileSystem->BeginLevelLoad( currentMapName, NULL, 0 );
+		fileSystem->BeginLevelLoad( currentMapName, nullptr, 0 );
 	} else {
 		fileSystem->BeginLevelLoad( currentMapName, saveFile.GetDataPtr(), saveFile.GetAllocated() );
 	}
@@ -455,11 +455,11 @@ void arcCommonLocal::ExecuteMapChange() {
 
 
 	if ( fileSystem->UsingResourceFiles() ) {
-		aRcStaticString< MAX_OSPATH > manifestName = currentMapName;
+		anStaticString< MAX_OSPATH > manifestName = currentMapName;
 		manifestName.Replace( "game/", "maps/" );
 		manifestName.Replace( "/mp/", "/" );
 		manifestName += ".preload";
-		aRcPreloadManifest manifest;
+		anPreloadManifest manifest;
 		manifest.LoadManifest( manifestName );
 		renderSystem->Preload( manifest, currentMapName );
 		soundSystem->Preload( manifest );
@@ -562,7 +562,7 @@ void arcCommonLocal::ExecuteMapChange() {
 			game->RunFrame( emptyCommandManager, emptyGameReturn );
 		}
 
-		// kick off an auto-save of the game (so we can always continue in this map if we die before hitting an autosave)
+		// kick off an auto-save of the game ( so we can always continue in this map if we die before hitting an autosave)
 		common->Printf( "----- Saving Game -----\n" );
 		SaveGame( "autosave" );
 	}
@@ -575,14 +575,14 @@ void arcCommonLocal::ExecuteMapChange() {
 	{
 		int vertexMemUsedKB = vertexCache.staticData.vertexMemUsed.GetValue() / 1024;
 		int indexMemUsedKB = vertexCache.staticData.indexMemUsed.GetValue() / 1024;
-		arcLibrary::Printf( "Used %dkb of static vertex memory (%d%%)\n", vertexMemUsedKB, vertexMemUsedKB * 100 / ( STATIC_VERTEX_MEMORY / 1024 ) );
-		arcLibrary::Printf( "Used %dkb of static index memory (%d%%)\n", indexMemUsedKB, indexMemUsedKB * 100 / ( STATIC_INDEX_MEMORY / 1024 ) );
+		anLibrary::Printf( "Used %dkb of static vertex memory (%d%%)\n", vertexMemUsedKB, vertexMemUsedKB * 100 / ( STATIC_VERTEX_MEMORY / 1024 ) );
+		anLibrary::Printf( "Used %dkb of static index memory (%d%%)\n", indexMemUsedKB, indexMemUsedKB * 100 / ( STATIC_INDEX_MEMORY / 1024 ) );
 	}
 
 	if ( common->JapaneseCensorship() ) {
 		if ( currentMapName.Icmp( "game/mp/d3xpdm3" ) == 0 ) {
-			const arcMaterial * gizpool2 = declManager->FindMaterial( "textures/hell/gizpool2" );
-			arcMaterial * chiglass1bluex = const_cast<arcMaterial *>( declManager->FindMaterial( "textures/sfx/chiglass1bluex" ) );
+			const anMaterial * gizpool2 = declManager->FindMaterial( "textures/hell/gizpool2" );
+			anMaterial * chiglass1bluex = const_cast<anMaterial *>( declManager->FindMaterial( "textures/sfx/chiglass1bluex" ) );
 			arcTempArray<char> text( gizpool2->GetTextLength() );
 			gizpool2->GetText( text.Ptr() );
 			chiglass1bluex->Parse( text.Ptr(), text.Num(), false );
@@ -607,7 +607,7 @@ void arcCommonLocal::ExecuteMapChange() {
 
 	// at this point we should be done with the loading gui so we kill it
 	delete loadGUI;
-	loadGUI = NULL;
+	loadGUI = nullptr;
 
 
 	// capture the current screen and start a wipe
@@ -629,12 +629,12 @@ void arcCommonLocal::ExecuteMapChange() {
 
 /*
 ===============
-arcCommonLocal::UpdateLevelLoadPacifier
+anCommonLocal::UpdateLevelLoadPacifier
 
 Pumps the session and if multiplayer, displays dialogs during the loading process.
 ===============
 */
-void arcCommonLocal::UpdateLevelLoadPacifier() {
+void anCommonLocal::UpdateLevelLoadPacifier() {
 	autoRenderIconType_t icon = AUTORENDER_DEFAULTICON;
 	bool autoswapsRunning = renderSystem->AreAutomaticBackgroundSwapsRunning( &icon );
 	if ( !insideExecuteMapChange && !autoswapsRunning ) {
@@ -678,18 +678,18 @@ void arcCommonLocal::UpdateLevelLoadPacifier() {
 		}
 	}
 
-	if ( time >= nextLoadTip && loadGUI != NULL && loadTipList.Num() > 0 && !defaultLoadscreen ) {
+	if ( time >= nextLoadTip && loadGUI != nullptr && loadTipList.Num() > 0 && !defaultLoadscreen ) {
 		if ( autoswapsRunning ) {
 			renderSystem->EndAutomaticBackgroundSwaps();
 		}
 		nextLoadTip = time + LOAD_TIP_CHANGE_INTERVAL;
 		const int rnd = time % loadTipList.Num();
-		aRcStaticString<20> tipId;
+		anStaticString<20> tipId;
 		tipId.Format( "#str_loadtip_%d", loadTipList[ rnd ] );
 		loadTipList.RemoveIndex( rnd );
 
 		idSWFTextInstance * txtVal = loadGUI->GetRootObject().GetNestedText( "txtDesc" );
-		if ( txtVal != NULL ) {
+		if ( txtVal != nullptr ) {
 			if ( isHellMap ) {
 				txtVal->SetText( va( "\n%s", ARCLocalization::GetString( tipId ) ) );
 			} else {
@@ -706,14 +706,14 @@ void arcCommonLocal::UpdateLevelLoadPacifier() {
 
 /*
 ===============
-arcCommonLocal::ScrubSaveGameFileName
+anCommonLocal::ScrubSaveGameFileName
 
 Turns a bad file name into a good one or your money back
 ===============
 */
-void arcCommonLocal::ScrubSaveGameFileName( arcNetString &saveFileName ) const {
+void anCommonLocal::ScrubSaveGameFileName( anString &saveFileName ) const {
 	int i;
-	arcNetString inFileName;
+	anString inFileName;
 
 	inFileName = saveFileName;
 	inFileName.RemoveColors();
@@ -739,16 +739,16 @@ void arcCommonLocal::ScrubSaveGameFileName( arcNetString &saveFileName ) const {
 
 /*
 ===============
-arcCommonLocal::SaveGame
+anCommonLocal::SaveGame
 ===============
 */
-bool arcCommonLocal::SaveGame( const char * saveName ) {
-	if ( pipelineFile != NULL ) {
+bool anCommonLocal::SaveGame( const char *saveName ) {
+	if ( pipelineFile != nullptr ) {
 		// We're already in the middle of a save. Leave us alone.
 		return false;
 	}
 
-	if ( com_disableAllSaves.GetBool() || ( com_disableAutoSaves.GetBool() && ( arcNetString::Icmp( saveName, "autosave" ) == 0 ) ) ) {
+	if ( com_disableAllSaves.GetBool() || ( com_disableAutoSaves.GetBool() && ( anString::Icmp( saveName, "autosave" ) == 0 ) ) ) {
 		return false;
 	}
 
@@ -757,11 +757,11 @@ bool arcCommonLocal::SaveGame( const char * saveName ) {
 		return false;
 	}
 
-	if (mapSpawnData.savegameFile != NULL ) {
+	if (mapSpawnData.savegameFile != nullptr ) {
 		return false;
 	}
 
-	const arcDictionary & persistentPlayerInfo = game->GetPersistentPlayerInfo( 0 );
+	const anDict & persistentPlayerInfo = game->GetPersistentPlayerInfo( 0 );
 	if ( persistentPlayerInfo.GetInt( "health" ) <= 0 ) {
 		common->Printf( "You must be alive to save the game\n" );
 		return false;
@@ -790,7 +790,7 @@ bool arcCommonLocal::SaveGame( const char * saveName ) {
 	stringsFile.Clear( false );
 
 	// Setup the save pipeline
-	pipelineFile = new (TAG_SAVEGAMES) arcFile_SaveGamePipelined();
+	pipelineFile = new (TAG_SAVEGAMES) anFile_SGPipelined();
 	pipelineFile->OpenForWriting( &saveFile );
 
 	// Write SaveGame Header:
@@ -838,14 +838,14 @@ bool arcCommonLocal::SaveGame( const char * saveName ) {
 
 /*
 ===============
-arcCommonLocal::LoadGame
+anCommonLocal::LoadGame
 ===============
 */
-bool arcCommonLocal::LoadGame( const char * saveName ) {
-	if ( session->GetSignInManager().GetMasterLocalUser() == NULL ) {
+bool anCommonLocal::LoadGame( const char *saveName ) {
+	if ( session->GetSignInManager().GetMasterLocalUser() == nullptr ) {
 		return false;
 	}
-	if (mapSpawnData.savegameFile != NULL ) {
+	if (mapSpawnData.savegameFile != nullptr ) {
 		return false;
 	}
 
@@ -855,10 +855,10 @@ bool arcCommonLocal::LoadGame( const char * saveName ) {
 		if ( sgdl[i].slotName == saveName ) {
 			if ( sgdl[i].GetLanguage() != sys_lang.GetString() ) {
 				arcStaticList< idSWFScriptFunction *, 4 > callbacks;
-				arcStaticList< idStrId, 4 > optionText;
-				optionText.Append( idStrId( "#str_swf_continue" ) );
-				aRcStaticString<256> langName = "#str_lang_" + sgdl[i].GetLanguage();
-				aRcStaticString<256> msg;
+				arcStaticList< anStringId, 4 > optionText;
+				optionText.Append( anStringId( "#str_swf_continue" ) );
+				anStaticString<256> langName = "#str_lang_" + sgdl[i].GetLanguage();
+				anStaticString<256> msg;
 				msg.Format( ARCLocalization::GetString( "#str_dlg_wrong_language" ), ARCLocalization::GetString( langName ) );
 				Dialog().AddDynamicDialog( GDM_SAVEGAME_WRONG_LANGUAGE, callbacks, optionText, true, msg, false, true );
 				if ( wipeForced ) {
@@ -885,7 +885,7 @@ bool arcCommonLocal::LoadGame( const char * saveName ) {
 	files.Append( mapSpawnData.stringTableFile );
 	files.Append( mapSpawnData.savegameFile );
 
-	arcNetString slotName = saveName;
+	anString slotName = saveName;
 	ScrubSaveGameFileName( slotName );
 	saveFile.Clear( false );
 	stringsFile.Clear( false );
@@ -894,7 +894,7 @@ bool arcCommonLocal::LoadGame( const char * saveName ) {
 	if ( loadGameHandle != 0 ) {
 		return true;
 	}
-	mapSpawnData.savegameFile = NULL;
+	mapSpawnData.savegameFile = nullptr;
 	if ( wipeForced ) {
 		ClearWipe();
 	}
@@ -924,12 +924,12 @@ bool HandleCommonErrors( const ARCSaveLoadParms & parms ) {
 
 	if ( parms.GetError() & SAVEGAME_E_CORRUPTED ) {
 		// This one might need to be handled by the game
-		common->Dialog().AddDialog( GDM_CORRUPT_CONTINUE, DIALOG_CONTINUE, NULL, NULL, false );
+		common->Dialog().AddDialog( GDM_CORRUPT_CONTINUE, DIALOG_CONTINUE, nullptr, nullptr, false );
 
 		// Find the game in the enumerated details, mark as corrupt so the menus can show as corrupt
 		saveGameDetailsList_t & list = session->GetSaveGameManager().GetEnumeratedSavegamesNonConst();
 		for ( int i = 0; i < list.Num(); i++ ) {
-			if ( arcNetString::Icmp( list[i].slotName, parms.description.slotName ) == 0 ) {
+			if ( anString::Icmp( list[i].slotName, parms.description.slotName ) == 0 ) {
 				list[i].damaged = true;
 			}
 		}
@@ -938,19 +938,19 @@ bool HandleCommonErrors( const ARCSaveLoadParms & parms ) {
 		HandleInsufficientStorage( parms );
 		return true;
 	} else if ( parms.GetError() & SAVEGAME_E_UNABLE_TO_SELECT_STORAGE_DEVICE && saveGame_enable.GetBool() ) {
-		common->Dialog().AddDialog( GDM_UNABLE_TO_USE_SELECTED_STORAGE_DEVICE, DIALOG_CONTINUE, NULL, NULL, false );
+		common->Dialog().AddDialog( GDM_UNABLE_TO_USE_SELECTED_STORAGE_DEVICE, DIALOG_CONTINUE, nullptr, nullptr, false );
 		return true;
 	} else if ( parms.GetError() & SAVEGAME_E_INVALID_FILENAME ) {
-		arcLibrary::Warning( va( "Invalid savegame filename [%s]!", parms.directory.c_str() ) );
+		anLibrary::Warning( va( "Invalid savegame filename [%s]!", parms.directory.c_str() ) );
 		return true;
 	} else if ( parms.GetError() & SAVEGAME_E_DLC_NOT_FOUND ) {
-		common->Dialog().AddDialog( GDM_DLC_ERROR_MISSING_GENERIC, DIALOG_CONTINUE, NULL, NULL, false );
+		common->Dialog().AddDialog( GDM_DLC_ERROR_MISSING_GENERIC, DIALOG_CONTINUE, nullptr, nullptr, false );
 		return true;
 	} else if ( parms.GetError() & SAVEGAME_E_DISC_SWAP ) {
-		common->Dialog().AddDialog( GDM_DISC_SWAP, DIALOG_CONTINUE, NULL, NULL, false );
+		common->Dialog().AddDialog( GDM_DISC_SWAP, DIALOG_CONTINUE, nullptr, nullptr, false );
 		return true;
 	} else if ( parms.GetError() & SAVEGAME_E_INCOMPATIBLE_NEWER_VERSION ) {
-		common->Dialog().AddDialog( GDM_INCOMPATIBLE_NEWER_SAVE, DIALOG_CONTINUE, NULL, NULL, false );
+		common->Dialog().AddDialog( GDM_INCOMPATIBLE_NEWER_SAVE, DIALOG_CONTINUE, nullptr, nullptr, false );
 		return true;
 	}
 
@@ -959,47 +959,47 @@ bool HandleCommonErrors( const ARCSaveLoadParms & parms ) {
 
 /*
 ========================
-arcCommonLocal::OnSaveCompleted
+anCommonLocal::OnSaveCompleted
 ========================
 */
-void arcCommonLocal::OnSaveCompleted( ARCSaveLoadParms & parms ) {
-	assert( pipelineFile != NULL );
+void anCommonLocal::OnSaveCompleted( ARCSaveLoadParms & parms ) {
+	assert( pipelineFile != nullptr );
 	delete pipelineFile;
-	pipelineFile = NULL;
+	pipelineFile = nullptr;
 
 	if ( parms.GetError() == SAVEGAME_E_NONE ) {
 		game->Shell_UpdateSavedGames();
 	}
 
 	if ( !HandleCommonErrors( parms ) ) {
-		common->Dialog().AddDialog( GDM_ERROR_SAVING_SAVEGAME, DIALOG_CONTINUE, NULL, NULL, false );
+		common->Dialog().AddDialog( GDM_ERROR_SAVING_SAVEGAME, DIALOG_CONTINUE, nullptr, nullptr, false );
 	}
 }
 
 /*
 ========================
-arcCommonLocal::OnLoadCompleted
+anCommonLocal::OnLoadCompleted
 ========================
 */
-void arcCommonLocal::OnLoadCompleted( ARCSaveLoadParms & parms ) {
+void anCommonLocal::OnLoadCompleted( ARCSaveLoadParms & parms ) {
 	if ( !HandleCommonErrors( parms ) ) {
-		common->Dialog().AddDialog( GDM_ERROR_LOADING_SAVEGAME, DIALOG_CONTINUE, NULL, NULL, false );
+		common->Dialog().AddDialog( GDM_ERROR_LOADING_SAVEGAME, DIALOG_CONTINUE, nullptr, nullptr, false );
 	}
 }
 
 /*
 ========================
-arcCommonLocal::OnLoadFilesCompleted
+anCommonLocal::OnLoadFilesCompleted
 ========================
 */
-void arcCommonLocal::OnLoadFilesCompleted( ARCSaveLoadParms & parms ) {
-	if ( ( mapSpawnData.savegameFile != NULL ) && ( parms.GetError() == SAVEGAME_E_NONE ) ) {
+void anCommonLocal::OnLoadFilesCompleted( ARCSaveLoadParms & parms ) {
+	if ( ( mapSpawnData.savegameFile != nullptr ) && ( parms.GetError() == SAVEGAME_E_NONE ) ) {
 		// just need to make the file readable
-		((aRcFileMemory *)mapSpawnData.savegameFile)->MakeReadOnly();
-		((aRcFileMemory *)mapSpawnData.stringTableFile)->MakeReadOnly();
+		((anFileMemory *)mapSpawnData.savegameFile)->MakeReadOnly();
+		((anFileMemory *)mapSpawnData.stringTableFile)->MakeReadOnly();
 
-		arcNetString gamename;
-		arcNetString mapname;
+		anString gamename;
+		anString mapname;
 
 		mapSpawnData.savegameVersion = parms.description.GetSaveVersion();
 		mapSpawnData.savegameFile->ReadString( gamename );
@@ -1014,7 +1014,7 @@ void arcCommonLocal::OnLoadFilesCompleted( ARCSaveLoadParms & parms ) {
 			mapSpawnData.savegameFile->ReadBool( consoleUsed );
 			consoleUsed = consoleUsed || com_allowConsole.GetBool();
 
-			arcMatchParameters matchParameters;
+			anMatchParameters matchParameters;
 			matchParameters.numSlots = 1;
 			matchParameters.gameMode = GAME_MODE_SINGLEPLAYER;
 			matchParameters.gameMap = GAME_MAP_SINGLEPLAYER;
@@ -1035,15 +1035,15 @@ void arcCommonLocal::OnLoadFilesCompleted( ARCSaveLoadParms & parms ) {
 		}
 	}
 	// If we got here then we didn't actually load the save game for some reason
-	mapSpawnData.savegameFile = NULL;
+	mapSpawnData.savegameFile = nullptr;
 }
 
 /*
 ========================
-arcCommonLocal::TriggerScreenWipe
+anCommonLocal::TriggerScreenWipe
 ========================
 */
-void arcCommonLocal::TriggerScreenWipe( const char * _wipeMaterial, bool hold ) {
+void anCommonLocal::TriggerScreenWipe( const char *_wipeMaterial, bool hold ) {
 	StartWipe( _wipeMaterial, hold );
 	CompleteWipe();
 	wipeForced = true;
@@ -1052,10 +1052,10 @@ void arcCommonLocal::TriggerScreenWipe( const char * _wipeMaterial, bool hold ) 
 
 /*
 ========================
-arcCommonLocal::OnEnumerationCompleted
+anCommonLocal::OnEnumerationCompleted
 ========================
 */
-void arcCommonLocal::OnEnumerationCompleted( ARCSaveLoadParms & parms ) {
+void anCommonLocal::OnEnumerationCompleted( ARCSaveLoadParms & parms ) {
 	if ( parms.GetError() == SAVEGAME_E_NONE ) {
 		game->Shell_UpdateSavedGames();
 	}
@@ -1063,10 +1063,10 @@ void arcCommonLocal::OnEnumerationCompleted( ARCSaveLoadParms & parms ) {
 
 /*
 ========================
-arcCommonLocal::OnDeleteCompleted
+anCommonLocal::OnDeleteCompleted
 ========================
 */
-void arcCommonLocal::OnDeleteCompleted( ARCSaveLoadParms & parms ) {
+void anCommonLocal::OnDeleteCompleted( ARCSaveLoadParms & parms ) {
 	if ( parms.GetError() == SAVEGAME_E_NONE ) {
 		game->Shell_UpdateSavedGames();
 	}
@@ -1087,8 +1087,8 @@ CONSOLE_COMMAND_SHIP( loadGame, "loads a game", arcCmdSystem::ArgCompletion_Save
 SaveGame_f
 ===============
 */
-CONSOLE_COMMAND_SHIP( saveGame, "saves a game", NULL ) {
-	const char * savename = ( args.Argc() > 1 ) ? args.Argv(1 ) : "quick";
+CONSOLE_COMMAND_SHIP( saveGame, "saves a game", nullptr ) {
+	const char *savename = ( args.Argc() > 1 ) ? args.Argv(1 ) : "quick";
 	if ( commonLocal.SaveGame( savename ) ) {
 		common->Printf( "Saved: %s\n", savename );
 	}
@@ -1110,7 +1110,7 @@ CONSOLE_COMMAND_SHIP( map, "loads a map", arcCmdSystem::ArgCompletion_MapName ) 
 Common_RestartMap_f
 ==================
 */
-CONSOLE_COMMAND_SHIP( restartMap, "restarts the current map", NULL ) {
+CONSOLE_COMMAND_SHIP( restartMap, "restarts the current map", nullptr ) {
 	if ( g_demoMode.GetBool() ) {
 		cmdSystem->AppendCommandText( va( "devmap %s %d\n", commonLocal.GetCurrentMapName(), 0 ) );
 	}
@@ -1148,7 +1148,7 @@ Common_TestMap_f
 ==================
 */
 CONSOLE_COMMAND( testmap, "tests a map", arcCmdSystem::ArgCompletion_MapName ) {
-	arcNetString map, string;
+	anString map, string;
 
 	map = args.Argv(1 );
 	if ( !map.Length() ) {

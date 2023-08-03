@@ -1,7 +1,7 @@
 // Copyright (C) 2007 Id Software, Inc.
 //
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -30,18 +30,18 @@ void				sdSnowEffect::Spawn( void ) {
 	re->numInsts = MAX_GROUPS;
 	re->insts = new sdInstInfo[ re->numInsts ];
 
-	arcVec3 zero;
-	arcMat3 I;
+	anVec3 zero;
+	anMat3 I;
 	zero.Zero();
 	I.Identity();
 	this->SetPosition( zero, I );
 
-	arcBounds modelbb = re->hModel->Bounds();
-	arcVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
+	anBounds modelbb = re->hModel->Bounds();
+	anVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
 	arcNetBasePlayer *p = gameLocal.GetLocalViewPlayer();
-	arcVec3 const &v = p->GetViewPos();
+	anVec3 const &v = p->GetViewPos();
 
-	for (int i=0; i<MAX_GROUPS; i++) {
+	for ( int i=0; i<MAX_GROUPS; i++ ) {
 		groups[i].time = -1.f;
 	}
 
@@ -56,33 +56,33 @@ sdSnowEffect::Think
 */
 void		sdSnowEffect::Think( void ) {
 	renderEntity_t *re = GetRenderEntity();
-	if ( re->hModel == NULL ) {
+	if ( re->hModel == nullptr ) {
 		return;
 	}
 
-	arcBounds modelbb = re->hModel->Bounds();
-	arcVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
+	anBounds modelbb = re->hModel->Bounds();
+	anVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
 
 	arcNetBasePlayer *p = gameLocal.GetLocalViewPlayer();
-	arcVec3 const &v = p->GetViewPos();
+	anVec3 const &v = p->GetViewPos();
 
-	for (int i=0; i<MAX_GROUPS; i++) {
+	for ( int i=0; i<MAX_GROUPS; i++ ) {
 		groups[i].time -= 1.f / 30.f;
 		if ( groups[i].time < 0.f ) {
-			groups[i].axis = arcVec3( idRandom::StaticRandom().RandomFloat()- 0.15f , idRandom::StaticRandom().RandomFloat() - 0.5f , idRandom::StaticRandom().RandomFloat() - 0.5f );
+			groups[i].axis = anVec3( anRandom::StaticRandom().RandomFloat()- 0.15f , anRandom::StaticRandom().RandomFloat() - 0.5f , anRandom::StaticRandom().RandomFloat() - 0.5f );
 			groups[i].axis.z *= 40.25f;
 			groups[i].axis.Normalize();
 			groups[i].rotate = 0.f;
-			groups[i].rotateSpeed = idRandom::StaticRandom().RandomFloat() * 50.f + 50.f;
-			groups[i].rotationPoint = arcVec3( idRandom::StaticRandom().RandomFloat() * extents.x,
-				idRandom::StaticRandom().RandomFloat() * extents.y,
-				idRandom::StaticRandom().RandomFloat() * extents.z );
+			groups[i].rotateSpeed = anRandom::StaticRandom().RandomFloat() * 50.f + 50.f;
+			groups[i].rotationPoint = anVec3( anRandom::StaticRandom().RandomFloat() * extents.x,
+				anRandom::StaticRandom().RandomFloat() * extents.y,
+				anRandom::StaticRandom().RandomFloat() * extents.z );
 
 			groups[i].alpha = 0.f;
-			groups[i].time = idRandom::StaticRandom().RandomFloat() * 1.f + 1.f;
-			groups[i].worldPos = v + arcVec3( (idRandom::StaticRandom().RandomFloat()-0.5f) * extents.x * 3,
-				(idRandom::StaticRandom().RandomFloat()-0.5f) * extents.y * 3,
-				(idRandom::StaticRandom().RandomFloat()-0.5f) * extents.z * 3 );
+			groups[i].time = anRandom::StaticRandom().RandomFloat() * 1.f + 1.f;
+			groups[i].worldPos = v + anVec3( (anRandom::StaticRandom().RandomFloat()-0.5f) * extents.x * 3,
+				(anRandom::StaticRandom().RandomFloat()-0.5f) * extents.y * 3,
+				(anRandom::StaticRandom().RandomFloat()-0.5f) * extents.z * 3 );
 		} else {
 			if ( groups[i].time > 0.25f ) {
 				groups[i].alpha += 1.f / 7.5f;
@@ -95,22 +95,22 @@ void		sdSnowEffect::Think( void ) {
 					groups[i].alpha = 0.f;
 				}
 			}
-			groups[i].worldPos += arcVec3( 0.f, 0.f, -600.f ) * 1.f / 30.f;
+			groups[i].worldPos += anVec3( 0.f, 0.f, -600.f ) * 1.f / 30.f;
 			groups[i].rotate += groups[i].rotateSpeed * 1.f / 30.f;
 		}
 	}
 
 
-	int gridx = arcMath::Ftoi( arcMath::Floor(v.x / extents.x) );
-	int gridy = arcMath::Ftoi( arcMath::Floor(v.y / extents.y) );
+	int gridx = anMath::Ftoi( anMath::Floor(v.x / extents.x) );
+	int gridy = anMath::Ftoi( anMath::Floor(v.y / extents.y) );
 
-	arcBounds bounds;
+	anBounds bounds;
 	bounds.Clear();
 	sdInstInfo *inst = re->insts;
-	for (int i=0; i<MAX_GROUPS; i++) {
-		idRotation r( groups[i].rotationPoint, groups[i].axis, groups[i].rotate );
+	for ( int i=0; i<MAX_GROUPS; i++ ) {
+		anRotation r( groups[i].rotationPoint, groups[i].axis, groups[i].rotate );
 
-		arcBounds bb2;
+		anBounds bb2;
 		inst->inst.color[0] = 0xff;
 		inst->inst.color[1] = 0xff;
 		inst->inst.color[2] = 0xff;
@@ -150,12 +150,12 @@ sdSnowPrecipitation::sdSnowPrecipitation( sdPrecipitationParameters const &_parm
 	re->numInsts = MAX_GROUPS;
 	re->insts = new sdInstInfo[ re->numInsts ];
 
-	arcBounds modelbb = re->hModel->Bounds();
-	arcVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
+	anBounds modelbb = re->hModel->Bounds();
+	anVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
 	arcNetBasePlayer *p = gameLocal.GetLocalViewPlayer();
-	arcVec3 const &v = p->GetViewPos();
+	anVec3 const &v = p->GetViewPos();
 
-	for (int i=0; i<MAX_GROUPS; i++) {
+	for ( int i=0; i<MAX_GROUPS; i++ ) {
 		groups[i].time = -1.f;
 	}
 
@@ -207,33 +207,33 @@ sdSnowPrecipitation::Update
 */
 void sdSnowPrecipitation::Update( void ) {
 	renderEntity_t *re = GetRenderEntity();
-	if ( re->hModel == NULL ) {
+	if ( re->hModel == nullptr ) {
 		return;
 	}
 
-	arcBounds modelbb = re->hModel->Bounds();
-	arcVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
+	anBounds modelbb = re->hModel->Bounds();
+	anVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
 
 	arcNetBasePlayer *p = gameLocal.GetLocalViewPlayer();
-	arcVec3 const &v = p->GetViewPos();
+	anVec3 const &v = p->GetViewPos();
 
-	for (int i=0; i<MAX_GROUPS; i++) {
+	for ( int i=0; i<MAX_GROUPS; i++ ) {
 		groups[i].time -= 1.f / 30.f;
 		if ( groups[i].time < 0.f ) {
-			groups[i].axis = arcVec3( idRandom::StaticRandom().RandomFloat()- 0.15f , idRandom::StaticRandom().RandomFloat() - 0.5f , idRandom::StaticRandom().RandomFloat() - 0.5f );
+			groups[i].axis = anVec3( anRandom::StaticRandom().RandomFloat()- 0.15f , anRandom::StaticRandom().RandomFloat() - 0.5f , anRandom::StaticRandom().RandomFloat() - 0.5f );
 			groups[i].axis.z *= 40.25f;
 			groups[i].axis.Normalize();
 			groups[i].rotate = 0.f;
-			groups[i].rotateSpeed = idRandom::StaticRandom().RandomFloat() * 50.f + 50.f;
-			groups[i].rotationPoint = arcVec3( idRandom::StaticRandom().RandomFloat() * extents.x,
-				idRandom::StaticRandom().RandomFloat() * extents.y,
-				idRandom::StaticRandom().RandomFloat() * extents.z );
+			groups[i].rotateSpeed = anRandom::StaticRandom().RandomFloat() * 50.f + 50.f;
+			groups[i].rotationPoint = anVec3( anRandom::StaticRandom().RandomFloat() * extents.x,
+				anRandom::StaticRandom().RandomFloat() * extents.y,
+				anRandom::StaticRandom().RandomFloat() * extents.z );
 
 			groups[i].alpha = 0.f;
-			groups[i].time = idRandom::StaticRandom().RandomFloat() * 1.f + 1.f;
-			groups[i].worldPos = v + arcVec3( (idRandom::StaticRandom().RandomFloat()-0.5f) * extents.x * 3,
-				(idRandom::StaticRandom().RandomFloat()-0.5f) * extents.y * 3,
-				(idRandom::StaticRandom().RandomFloat()-0.5f) * extents.z * 3 );
+			groups[i].time = anRandom::StaticRandom().RandomFloat() * 1.f + 1.f;
+			groups[i].worldPos = v + anVec3( (anRandom::StaticRandom().RandomFloat()-0.5f) * extents.x * 3,
+				(anRandom::StaticRandom().RandomFloat()-0.5f) * extents.y * 3,
+				(anRandom::StaticRandom().RandomFloat()-0.5f) * extents.z * 3 );
 		} else {
 			if ( groups[i].time > 0.25f ) {
 				groups[i].alpha += 1.f / 7.5f;
@@ -246,22 +246,22 @@ void sdSnowPrecipitation::Update( void ) {
 					groups[i].alpha = 0.f;
 				}
 			}
-			groups[i].worldPos += arcVec3( 0.f, 0.f, -600.f ) * 1.f / 30.f;
+			groups[i].worldPos += anVec3( 0.f, 0.f, -600.f ) * 1.f / 30.f;
 			groups[i].rotate += groups[i].rotateSpeed * 1.f / 30.f;
 		}
 	}
 
 
-	int gridx = arcMath::Ftoi( arcMath::Floor(v.x / extents.x) );
-	int gridy = arcMath::Ftoi( arcMath::Floor(v.y / extents.y) );
+	int gridx = anMath::Ftoi( anMath::Floor(v.x / extents.x) );
+	int gridy = anMath::Ftoi( anMath::Floor(v.y / extents.y) );
 
-	arcBounds bounds;
+	anBounds bounds;
 	bounds.Clear();
 	sdInstInfo *inst = re->insts;
-	for (int i=0; i<MAX_GROUPS; i++) {
-		idRotation r( groups[i].rotationPoint, groups[i].axis, groups[i].rotate );
+	for ( int i=0; i<MAX_GROUPS; i++ ) {
+		anRotation r( groups[i].rotationPoint, groups[i].axis, groups[i].rotate );
 
-		arcBounds bb2;
+		anBounds bb2;
 		inst->inst.color[0] = 0xff;
 		inst->inst.color[1] = 0xff;
 		inst->inst.color[2] = 0xff;
@@ -285,7 +285,7 @@ void sdSnowPrecipitation::Update( void ) {
 
 	if ( !effect.GetRenderEffect().declEffect ) return;
 
-	arcVec3 viewOrg;
+	anVec3 viewOrg;
 	renderView_t view;
 	if ( sdDemoManager::GetInstance().CalculateRenderView( &view ) ) {
 		viewOrg = view.vieworg;
@@ -293,7 +293,7 @@ void sdSnowPrecipitation::Update( void ) {
 		// If we are inside don't run the bacground effect
 		arcNetBasePlayer* player = gameLocal.GetLocalViewPlayer();
 
-		if ( player == NULL ) {
+		if ( player == nullptr ) {
 			return;
 		}
 		viewOrg = player->GetRenderView()->vieworg;

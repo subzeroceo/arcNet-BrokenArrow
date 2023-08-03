@@ -53,7 +53,7 @@ public:
 
 class sdAtmosphereInstance {
 public:
-										sdAtmosphereInstance( arcDict &spawnArgs );
+										sdAtmosphereInstance( anDict &spawnArgs );
 										~sdAtmosphereInstance();
 
 	void								Activate();		// Enable this atmosphere as the current active one
@@ -63,8 +63,8 @@ public:
 
 	void								SetDecl( const sdDeclAtmosphere* atmosphereDecl ) { atmosphereParms.atmosphere = atmosphereDecl; }
 	const sdDeclAtmosphere*				GetDecl() const { return atmosphereParms.atmosphere; }
-	void								SetFloodOrigin( const arcVec3 &orig ) { origin = orig; };
-	const arcVec3&						GetFloodOrigin() const { return origin; }
+	void								SetFloodOrigin( const anVec3 &orig ) { origin = orig; };
+	const anVec3&						GetFloodOrigin() const { return origin; }
 
 private:
 	void								SetupPrecipitation( const sdHeightMapInstance* heightMap, bool force );
@@ -76,7 +76,7 @@ private:
 	sdAbstractPrecipitationSystem*		precipitation[2];
 	sdPrecipitationParameters			precParms[2];
 	bool								active;
-	arcVec3								origin;
+	anVec3								origin;
 
 	const sdHeightMapInstance*			cachedHeightMap;
 };
@@ -95,20 +95,20 @@ public:
 	void						FreeModelDef( void );
 	void						FreeLightDef( void );
 
-	static void					GetAtmosphereLightDetails_f( const idCmdArgs &args );
+	static void					GetAtmosphereLightDetails_f( const anCommandArgs &args );
 
 	static void					DrawPostProcess( sdUserInterfaceLocal* ui, float x, float y, float w, float h );
 
-	arcVec3						GetFogColor();
+	anVec3						GetFogColor();
 
-	const arcVec3&				GetWindVector() const { return windVector; }
+	const anVec3&				GetWindVector() const { return windVector; }
 	static sdAtmosphere*		GetAtmosphereInstance() { return currentAtmosphere; }
 
-	static void					SetAtmosphere_f( const idCmdArgs &args );
-	static void					FloodAmbientCubeMap( const arcVec3 &origin,  const sdDeclAmbientCubeMap *ambientCubeMap );
+	static void					SetAtmosphere_f( const anCommandArgs &args );
+	static void					FloodAmbientCubeMap( const anVec3 &origin,  const sdDeclAmbientCubeMap *ambientCubeMap );
 
 public:
-	static idCVar				a_windTimeScale;
+	static anCVar				a_windTimeScale;
 	static sdAtmosphere*		currentAtmosphere;
 
 private:
@@ -120,7 +120,7 @@ private:
 	void						Event_GetDefaultPostProcessGlareBrightnessThreshold();
 	void						Event_GetDefaultPostProcessGlareThresholdDependency();
 
-	void						Event_SetPostProcessTint( const arcVec3& tint );
+	void						Event_SetPostProcessTint( const anVec3& tint );
 	void						Event_SetPostProcessSaturation( float saturation );
 	void						Event_SetPostProcessContrast( float contrast );
 	void						Event_SetPostProcessGlareParms( float sourceBrightness, float blurBrightness, float brightnessThreshold, float thresholdDep );
@@ -129,16 +129,16 @@ private:
 
 	void						Event_IsNight( void );
 private:
-	const arcMaterial*			glowPostProcessMaterial;
+	const anMaterial*			glowPostProcessMaterial;
 
 	float						windAngle;
 	float						windStrength;
-	arcVec3						windVector;
+	anVec3						windVector;
 
 	const sdProgram::sdFunction*	updatePostProcessFunction;
 
 	sdAtmosphereInstance*			currentAtmosphereInstance;
-	arcNetList< sdAtmosphereInstance* > instances;
+	anList< sdAtmosphereInstance* > instances;
 
 	sdAtmosphereInstance**			areaAtmospheres;
 

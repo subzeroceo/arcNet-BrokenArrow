@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -18,7 +18,7 @@ void WINAPI QE_CheckOpenGLForErrors( void ) {
 			// exiting?", gluErrorString(( GLenum)i) );
 			//
 			if (g_pParentWnd->MessageBox(strMsg, EDITOR_WINDOWTEXT " Error", MB_YESNO) == IDYES) {
-				Map_SaveFile(NULL, false);
+				Map_SaveFile(nullptr, false);
 			}
 
 			exit(1 );
@@ -199,7 +199,7 @@ bool QE_LoadProject(char *projectfile) {
 
 bool QE_SaveProject(const char *pProjectFile) {
 
-	arcNetFile *file = fileSystem->OpenFileWrite(pProjectFile);
+	anFile *file = fileSystem->OpenFileWrite(pProjectFile);
 	if ( !file ) {
 		return false;
 	}
@@ -230,7 +230,7 @@ bool QE_SaveProject(const char *pProjectFile) {
 void ConnectEntities( void ) {
 	entity_t	*e1;
 	const char		*target;
-	arcNetString strTarget;
+	anString strTarget;
 	int i, t;
 
 	if (g_qeglobals.d_select_count < 2) {
@@ -319,7 +319,7 @@ void QE_Init( void ) {
 
 	/*
 	 * other stuff �
-	 * FIXME: arcMaterial Texture_Init (true); Cam_Init (); XY_Init ();
+	 * FIXME: anMaterial Texture_Init (true); Cam_Init (); XY_Init ();
 	 */
 	Z_Init();
 }
@@ -336,8 +336,8 @@ void QE_CountBrushesAndUpdateStatusBar( void ) {
 	g_numbrushes = 0;
 	g_numentities = 0;
 
-	if (active_brushes.next != NULL) {
-		for (b = active_brushes.next; b != NULL && b != &active_brushes; b = next) {
+	if (active_brushes.next != nullptr ) {
+		for (b = active_brushes.next; b != nullptr && b != &active_brushes; b = next) {
 			next = b->next;
 			if (b->brush_faces) {
 				if ( !b->owner->eclass->fixedsize) {
@@ -351,7 +351,7 @@ void QE_CountBrushesAndUpdateStatusBar( void ) {
 	}
 
 	/*
-	 * if ( entities.next != NULL ) { for ( e = entities.next; e != &entities &&
+	 * if ( entities.next != nullptr ) { for ( e = entities.next; e != &entities &&
 	 * g_numentities != MAX_MAP_ENTITIES; e = e->next) { g_numentities++; } }
 	 */
 	if (((g_numbrushes != s_lastbrushcount) || (g_numentities != s_lastentitycount) ) || ( !s_didonce) ) {

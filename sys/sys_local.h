@@ -4,14 +4,14 @@
 /*
 ==============================================================
 
-	arcSystemLocal
+	anSystemLocal
 
 ==============================================================
 */
 
-class arcSystemLocal : public arcSystem {
+class anSystemLocal : public arcSystem {
 public:
-	virtual void			DebugPrintf( const char *fmt, ... )arc_attribute( ( format( printf,2,3 ) ) );
+	virtual void			DebugPrintf( const char *fmt, ... )an_attribute( ( format( printf,2,3 ) ) );
 	virtual void			DebugVPrintf( const char *fmt, va_list arg );
 
 	virtual double			GetClockTicks( void );

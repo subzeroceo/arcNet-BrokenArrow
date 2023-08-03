@@ -26,11 +26,11 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
-#include "AASFile.h"
-#include "AASFile_local.h"
+#include "SEASFile.h"
+#include "SEASFile_local.h"
 #include "AASReach.h"
 
 #define INSIDEUNITS							2.0f
@@ -43,12 +43,12 @@ If you have questions concerning this license or the applicable additional terms
 
 /*
 ================
-idAASReach::ReachabilityExists
+anSEASReach::ReachabilityExists
 ================
 */
-bool idAASReach::ReachabilityExists( int fromAreaNum, int toAreaNum ) {
-	aasArea_t *area;
-	idReachability *reach;
+bool anSEASReach::ReachabilityExists( int fromAreaNum, int toAreaNum ) {
+	seasArea_t *area;
+	anReachability *reach;
 
 	area = &file->areas[fromAreaNum];
 	for ( reach = area->reach; reach; reach = reach->next ) {
@@ -61,38 +61,38 @@ bool idAASReach::ReachabilityExists( int fromAreaNum, int toAreaNum ) {
 
 /*
 ================
-idAASReach::CanSwimInArea
+anSEASReach::CanSwimInArea
 ================
 */
-ARC_INLINE bool idAASReach::CanSwimInArea( int areaNum ) {
+ARC_INLINE bool anSEASReach::CanSwimInArea( int areaNum ) {
 	return ( file->areas[areaNum].contents & AREACONTENTS_WATER ) != 0;
 }
 
 /*
 ================
-idAASReach::AreaHasFloor
+anSEASReach::AreaHasFloor
 ================
 */
-ARC_INLINE bool idAASReach::AreaHasFloor( int areaNum ) {
+ARC_INLINE bool anSEASReach::AreaHasFloor( int areaNum ) {
 	return ( file->areas[areaNum].flags & AREA_FLOOR ) != 0;
 }
 
 /*
 ================
-idAASReach::AreaIsClusterPortal
+anSEASReach::AreaIsClusterPortal
 ================
 */
-ARC_INLINE bool idAASReach::AreaIsClusterPortal( int areaNum ) {
+ARC_INLINE bool anSEASReach::AreaIsClusterPortal( int areaNum ) {
 	return ( file->areas[areaNum].contents & AREACONTENTS_CLUSTERPORTAL ) != 0;
 }
 
 /*
 ================
-idAASReach::AddReachabilityToArea
+anSEASReach::AddReachabilityToArea
 ================
 */
-void idAASReach::AddReachabilityToArea( idReachability *reach, int areaNum ) {
-	aasArea_t *area;
+void anSEASReach::AddReachabilityToArea( anReachability *reach, int areaNum ) {
+	seasArea_t *area;
 
 	area = &file->areas[areaNum];
 	reach->next = area->reach;
@@ -102,14 +102,14 @@ void idAASReach::AddReachabilityToArea( idReachability *reach, int areaNum ) {
 
 /*
 ================
-idAASReach::Reachability_Fly
+anSEASReach::Reachability_Fly
 ================
 */
-void idAASReach::Reachability_Fly( int areaNum ) {
+void anSEASReach::Reachability_Fly( int areaNum ) {
 	int i, faceNum, otherAreaNum;
-	aasArea_t *area;
-	aasFace_t *face;
-	idReachability_Fly *reach;
+	seasArea_t *area;
+	seasFace_t *face;
+	anReachability_Fly *reach;
 
 	area = &file->areas[areaNum];
 
@@ -128,7 +128,7 @@ void idAASReach::Reachability_Fly( int areaNum ) {
 		}
 
 		// create reachability going through this face
-		reach = new idReachability_Fly();
+		reach = new anReachability_Fly();
 		reach->travelType = TFL_FLY;
 		reach->toAreaNum = otherAreaNum;
 		reach->fromAreaNum = areaNum;
@@ -146,14 +146,14 @@ void idAASReach::Reachability_Fly( int areaNum ) {
 
 /*
 ================
-idAASReach::Reachability_Swim
+anSEASReach::Reachability_Swim
 ================
 */
-void idAASReach::Reachability_Swim( int areaNum ) {
+void anSEASReach::Reachability_Swim( int areaNum ) {
 	int i, faceNum, otherAreaNum;
-	aasArea_t *area;
-	aasFace_t *face;
-	idReachability_Swim *reach;
+	seasArea_t *area;
+	seasFace_t *face;
+	anReachability_Swim *reach;
 
 	if ( !CanSwimInArea( areaNum ) ) {
 		return;
@@ -180,7 +180,7 @@ void idAASReach::Reachability_Swim( int areaNum ) {
 		}
 
 		// create reachability going through this face
-		reach = new idReachability_Swim();
+		reach = new anReachability_Swim();
 		reach->travelType = TFL_SWIM;
 		reach->toAreaNum = otherAreaNum;
 		reach->fromAreaNum = areaNum;
@@ -198,14 +198,14 @@ void idAASReach::Reachability_Swim( int areaNum ) {
 
 /*
 ================
-idAASReach::Reachability_EqualFloorHeight
+anSEASReach::Reachability_EqualFloorHeight
 ================
 */
-void idAASReach::Reachability_EqualFloorHeight( int areaNum ) {
+void anSEASReach::Reachability_EqualFloorHeight( int areaNum ) {
 	int i, k, l, m, n, faceNum, face1Num, face2Num, otherAreaNum, edge1Num, edge2Num;
-	aasArea_t *area, *otherArea;
-	aasFace_t *face, *face1, *face2;
-	idReachability_Walk *reach;
+	seasArea_t *area, *otherArea;
+	seasFace_t *face, *face1, *face2;
+	anReachability_Walk *reach;
 
 	if ( !AreaHasFloor( areaNum ) ) {
 		return;
@@ -261,7 +261,7 @@ void idAASReach::Reachability_EqualFloorHeight( int areaNum ) {
 		}
 		if ( k < area->numFaces ) {
 			// create reachability
-			reach = new idReachability_Walk();
+			reach = new anReachability_Walk();
 			reach->travelType = TFL_WALK;
 			reach->toAreaNum = otherAreaNum;
 			reach->fromAreaNum = areaNum;
@@ -281,10 +281,10 @@ void idAASReach::Reachability_EqualFloorHeight( int areaNum ) {
 
 /*
 ================
-idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge
+anSEASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge
 ================
 */
-bool idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num, int area2num ) {
+bool anSEASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num, int area2num ) {
 	int i, j, k, l, edge1Num, edge2Num, areas[10];
 	int floor_bestArea1FloorEdgeNum, floor_bestArea2FloorEdgeNum, floor_foundReach;
 	int water_bestArea1FloorEdgeNum, water_bestArea2FloorEdgeNum, water_foundReach;
@@ -292,20 +292,20 @@ bool idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num,
 	float dist, dist1, dist2, diff, invGravityDot, orthogonalDot;
 	float x1, x2, x3, x4, y1, y2, y3, y4, tmp, y;
 	float length, floor_bestLength, water_bestLength, floor_bestDist, water_bestDist;
-	arcVec3 v1, v2, v3, v4, tmpv, p1area1, p1area2, p2area1, p2area2;
-	arcVec3 normal, orthogonal, edgeVec, start, end;
-	arcVec3 floor_bestStart, floor_bestEnd, floor_bestNormal;
-	arcVec3 water_bestStart, water_bestEnd, water_bestNormal;
-	arcVec3 testPoint;
-	arcPlane *plane;
-	aasArea_t *area1, *area2;
-	aasFace_t *floorFace1, *floorFace2, *floor_bestFace1, *water_bestFace1;
-	aasEdge_t *edge1, *edge2;
-	idReachability_Walk *walkReach;
-	idReachability_BarrierJump *barrierJumpReach;
-	idReachability_WaterJump *waterJumpReach;
-	idReachability_WalkOffLedge *walkOffLedgeReach;
-	aasTrace_t trace;
+	anVec3 v1, v2, v3, v4, tmpv, p1area1, p1area2, p2area1, p2area2;
+	anVec3 normal, orthogonal, edgeVec, start, end;
+	anVec3 floor_bestStart, floor_bestEnd, floor_bestNormal;
+	anVec3 water_bestStart, water_bestEnd, water_bestNormal;
+	anVec3 testPoint;
+	anPlane *plane;
+	seasArea_t *area1, *area2;
+	seasFace_t *floorFace1, *floorFace2, *floor_bestFace1, *water_bestFace1;
+	seasEdge_t *edge1, *edge2;
+	anReachability_Walk *walkReach;
+	anReachability_BarrierJump *barrierJumpReach;
+	anReachability_WaterJump *waterJumpReach;
+	anReachability_WalkOffLedge *walkOffLedgeReach;
+	seasTrace_t trace;
 
 	// must be able to walk or swim in the first area
 	if ( !AreaHasFloor( area1num ) && !CanSwimInArea( area1num ) ) {
@@ -573,7 +573,7 @@ bool idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num,
 		// NOTE: floor_bestDist >= 0 also catches equal floor reachabilities
 		if ( floor_bestDist >= 0 && floor_bestDist < file->settings.maxStepHeight ) {
 			// create walk reachability from area1 to area2
-			walkReach = new idReachability_Walk();
+			walkReach = new anReachability_Walk();
 			walkReach->travelType = TFL_WALK;
 			walkReach->toAreaNum = area2num;
 			walkReach->fromAreaNum = area1num;
@@ -619,7 +619,7 @@ bool idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num,
 				// water jumping from or towards a crouch only areas is not possible
 				if ( !(area1->flags & AREA_CROUCH) && !(area2->flags & AREA_CROUCH) ) {
 					// create water jump reachability from area1 to area2
-					waterJumpReach = new idReachability_WaterJump();
+					waterJumpReach = new anReachability_WaterJump();
 					waterJumpReach->travelType = TFL_WATERJUMP;
 					waterJumpReach->toAreaNum = area2num;
 					waterJumpReach->fromAreaNum = area1num;
@@ -659,7 +659,7 @@ bool idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num,
 				// cannot perform a barrier jump towards or from a crouch area
 				if ( !(area1->flags & AREA_CROUCH) && !(area2->flags & AREA_CROUCH) ) {
 					// create barrier jump reachability from area1 to area2
-					barrierJumpReach = new idReachability_BarrierJump();
+					barrierJumpReach = new anReachability_BarrierJump();
 					barrierJumpReach->travelType = TFL_BARRIERJUMP;
 					barrierJumpReach->toAreaNum = area2num;
 					barrierJumpReach->fromAreaNum = area1num;
@@ -699,7 +699,7 @@ bool idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num,
 		if ( floor_bestDist < 0 ) {
 			if ( floor_bestDist > -file->settings.maxStepHeight ) {
 				// create walk reachability from area1 to area2
-				walkReach = new idReachability_Walk();
+				walkReach = new anReachability_Walk();
 				walkReach->travelType = TFL_WALK;
 				walkReach->toAreaNum = area2num;
 				walkReach->fromAreaNum = area1num;
@@ -711,7 +711,7 @@ bool idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num,
 				return true;
 			}
 			// if no maximum fall height set or less than the max
-			if ( !file->settings.maxFallHeight || arcMath::Fabs(floor_bestDist) < file->settings.maxFallHeight ) {
+			if ( !file->settings.maxFallHeight || anMath::Fabs(floor_bestDist) < file->settings.maxFallHeight ) {
 				// trace a bounding box vertically to check for solids
 				floor_bestEnd += INSIDEUNITS * floor_bestNormal;
 				start = floor_bestEnd;
@@ -733,14 +733,14 @@ bool idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num,
 						}
 						if ( i >= trace.numAreas ) {
 							// create a walk off ledge reachability from area1 to area2
-							walkOffLedgeReach = new idReachability_WalkOffLedge();
+							walkOffLedgeReach = new anReachability_WalkOffLedge();
 							walkOffLedgeReach->travelType = TFL_WALKOFFLEDGE;
 							walkOffLedgeReach->toAreaNum = area2num;
 							walkOffLedgeReach->fromAreaNum = area1num;
 							walkOffLedgeReach->start = floor_bestStart;
 							walkOffLedgeReach->end = floor_bestEnd;
 							walkOffLedgeReach->edgeNum = abs( floor_bestArea1FloorEdgeNum );
-							walkOffLedgeReach->travelTime = file->settings.tt_startWalkOffLedge + arcMath::Fabs(floor_bestDist) * 50 / file->settings.gravityValue;
+							walkOffLedgeReach->travelTime = file->settings.tt_startWalkOffLedge + anMath::Fabs(floor_bestDist) * 50 / file->settings.gravityValue;
 							AddReachabilityToArea( walkOffLedgeReach, area1num );
 							return true;
 						}
@@ -754,18 +754,18 @@ bool idAASReach::Reachability_Step_Barrier_WaterJump_WalkOffLedge( int area1num,
 
 /*
 ================
-idAASReach::Reachability_WalkOffLedge
+anSEASReach::Reachability_WalkOffLedge
 ================
 */
-void idAASReach::Reachability_WalkOffLedge( int areaNum ) {
+void anSEASReach::Reachability_WalkOffLedge( int areaNum ) {
 	int i, j, faceNum, edgeNum, side, reachAreaNum, p, areas[10];
-	aasArea_t *area;
-	aasFace_t *face;
-	aasEdge_t *edge;
-	arcPlane *plane;
-	arcVec3 v1, v2, mid, dir, testEnd;
-	idReachability_WalkOffLedge *reach;
-	aasTrace_t trace;
+	seasArea_t *area;
+	seasFace_t *face;
+	seasEdge_t *edge;
+	anPlane *plane;
+	anVec3 v1, v2, mid, dir, testEnd;
+	anReachability_WalkOffLedge *reach;
+	seasTrace_t trace;
 
 	if ( !AreaHasFloor( areaNum ) || CanSwimInArea( areaNum ) ) {
 		return;
@@ -813,7 +813,7 @@ void idAASReach::Reachability_WalkOffLedge( int areaNum ) {
 			if ( !reachAreaNum || reachAreaNum == areaNum ) {
 				continue;
 			}
-			if ( arcMath::Fabs( mid[2] - trace.endpos[2] ) > file->settings.maxFallHeight ) {
+			if ( anMath::Fabs( mid[2] - trace.endpos[2] ) > file->settings.maxFallHeight ) {
 				continue;
 			}
 			if ( !AreaHasFloor( reachAreaNum ) && !CanSwimInArea( reachAreaNum ) ) {
@@ -832,14 +832,14 @@ void idAASReach::Reachability_WalkOffLedge( int areaNum ) {
 				continue;
 			}
 
-			reach = new idReachability_WalkOffLedge();
+			reach = new anReachability_WalkOffLedge();
 			reach->travelType = TFL_WALKOFFLEDGE;
 			reach->toAreaNum = reachAreaNum;
 			reach->fromAreaNum = areaNum;
 			reach->start = mid;
 			reach->end = trace.endpos;
 			reach->edgeNum = abs( edgeNum );
-			reach->travelTime = file->settings.tt_startWalkOffLedge + arcMath::Fabs(mid[2] - trace.endpos[2] ) * 50 / file->settings.gravityValue;
+			reach->travelTime = file->settings.tt_startWalkOffLedge + anMath::Fabs(mid[2] - trace.endpos[2] ) * 50 / file->settings.gravityValue;
 			AddReachabilityToArea( reach, areaNum );
 		}
 	}
@@ -847,10 +847,10 @@ void idAASReach::Reachability_WalkOffLedge( int areaNum ) {
 
 /*
 ================
-idAASReach::FlagReachableAreas
+anSEASReach::FlagReachableAreas
 ================
 */
-void idAASReach::FlagReachableAreas( idAASFileLocal *file ) {
+void anSEASReach::FlagReachableAreas( anSEASFileLocal *file ) {
 	int i, numReachableAreas;
 
 	numReachableAreas = 0;
@@ -871,10 +871,10 @@ void idAASReach::FlagReachableAreas( idAASFileLocal *file ) {
 
 /*
 ================
-idAASReach::Build
+anSEASReach::Build
 ================
 */
-bool idAASReach::Build( const idMapFile *mapFile, idAASFileLocal *file ) {
+bool anSEASReach::Build( const anMapFile *mapFile, anSEASFileLocal *file ) {
 	int i, j, lastPercent, percent;
 
 	this->mapFile = mapFile;

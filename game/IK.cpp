@@ -1,7 +1,7 @@
 // Copyright (C) 2007 Id Software, Inc.
 //
 
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -24,7 +24,7 @@ static char THIS_FILE[] = __FILE__;
 ===============================================================================
 */
 
-CLASS_DECLARATION( idClass, idIK )
+CLASS_DECLARATION( anClass, idIK )
 END_CLASS
 
 /*
@@ -35,8 +35,8 @@ idIK::idIK
 idIK::idIK( void ) {
 	ik_activate = false;
 	initialized = false;
-	self = NULL;
-	animator = NULL;
+	self = nullptr;
+	animator = nullptr;
 	modifiedAnim = 0;
 	modelOffset.Zero();
 }
@@ -72,7 +72,7 @@ bool idIK::IsInhibited( void ) const {
 idIK::GetPhysics
 ================
 */
-arcPhysics* idIK::GetPhysics() {
+anPhysics* idIK::GetPhysics() {
 	return self->GetPhysics();
 }
 
@@ -90,28 +90,28 @@ arcAnimator* idIK::GetAnimator() {
 idIK::Init
 ================
 */
-bool idIK::Init( arcEntity *self, const char *anim, const arcVec3 &modelOffset ) {
-	idRenderModel *model;
+bool idIK::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) {
+	anRenderModel *model;
 
-	if ( self == NULL ) {
+	if ( self == nullptr ) {
 		return false;
 	}
 
 	this->self = self;
 
 	animator = self->GetAnimator();
-	if ( animator == NULL || animator->ModelDef() == NULL ) {
+	if ( animator == nullptr || animator->ModelDef() == nullptr ) {
 		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no model set.",
 							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
 		return false;
 	}
-	if ( animator->ModelDef()->ModelHandle() == NULL ) {
+	if ( animator->ModelDef()->ModelHandle() == nullptr ) {
 		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) uses default model.",
 							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
 		return false;
 	}
 	model = animator->ModelHandle();
-	if ( model == NULL ) {
+	if ( model == nullptr ) {
 		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no model set.",
 							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
 		return false;
@@ -151,17 +151,17 @@ void idIK::ClearJointMods( void ) {
 idIK::SolveTwoBones
 ================
 */
-bool idIK::SolveTwoBones( const arcVec3 &startPos, const arcVec3 &endPos, const arcVec3 &dir, float len0, float len1, arcVec3 &jointPos ) {
+bool idIK::SolveTwoBones( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, float len0, float len1, anVec3 &jointPos ) {
 	float length, lengthSqr, lengthInv, x, y;
-	arcVec3 vec0, vec1;
+	anVec3 vec0, vec1;
 
 	vec0 = endPos - startPos;
 	lengthSqr = vec0.LengthSqr();
-	lengthInv = arcMath::InvSqrt( lengthSqr );
+	lengthInv = anMath::InvSqrt( lengthSqr );
 	length = lengthInv * lengthSqr;
 
 	// if the start and end position are too far out or too close to each other
-	if ( length > len0 + len1 || length < arcMath::Fabs( len0 - len1 ) ) {
+	if ( length > len0 + len1 || length < anMath::Fabs( len0 - len1 ) ) {
 		jointPos = startPos + 0.5f * vec0;
 		return false;
 	}
@@ -171,7 +171,7 @@ bool idIK::SolveTwoBones( const arcVec3 &startPos, const arcVec3 &endPos, const 
 	vec1.Normalize();
 
 	x = ( length * length + len0 * len0 - len1 * len1 ) * ( 0.5f * lengthInv );
-	y = arcMath::Sqrt( len0 * len0 - x * x );
+	y = anMath::Sqrt( len0 * len0 - x * x );
 
 	jointPos = startPos + ( x * vec0 ) + ( y * vec1 );
 
@@ -183,7 +183,7 @@ bool idIK::SolveTwoBones( const arcVec3 &startPos, const arcVec3 &endPos, const 
 idIK::GetBoneAxis
 ================
 */
-float idIK::GetBoneAxis( const arcVec3 &startPos, const arcVec3 &endPos, const arcVec3 &dir, arcMat3 &axis ) {
+float idIK::GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, anMat3 &axis ) {
 	axis[0] = endPos - startPos;
 	float length = axis[0].Normalize();
 
@@ -213,7 +213,7 @@ idIK_Walk::idIK_Walk
 */
 idIK_Walk::idIK_Walk( void ) {
 	initialized = false;
-	footModel = NULL;
+	footModel = nullptr;
 	numLegs = 0;
 	enabledLegs = 0;
 	for ( int i = 0; i < MAX_LEGS; i++ ) {
@@ -266,20 +266,20 @@ idIK_Walk::~idIK_Walk( void ) {
 idIK_Walk::Init
 ================
 */
-bool idIK_Walk::Init( arcEntity *self, const char *anim, const arcVec3 &modelOffset ) {
+bool idIK_Walk::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	int i;
 	float footSize;
-	arcVec3 verts[4];
-	arcTraceModel trm;
+	anVec3 verts[4];
+	anTraceModel trm;
 	const char *jointName;
-	arcVec3 dir, ankleOrigin, kneeOrigin, hipOrigin, dirOrigin;
-	arcMat3 axis, ankleAxis, kneeAxis, hipAxis;
+	anVec3 dir, ankleOrigin, kneeOrigin, hipOrigin, dirOrigin;
+	anMat3 axis, ankleAxis, kneeAxis, hipAxis;
 
-	static arcVec3 footWinding[4] = {
-		arcVec3(  1.0f,  1.0f, 0.0f ),
-		arcVec3( -1.0f,  1.0f, 0.0f ),
-		arcVec3( -1.0f, -1.0f, 0.0f ),
-		arcVec3(  1.0f, -1.0f, 0.0f )
+	static anVec3 footWinding[4] = {
+		anVec3(  1.0f,  1.0f, 0.0f ),
+		anVec3( -1.0f,  1.0f, 0.0f ),
+		anVec3( -1.0f, -1.0f, 0.0f ),
+		anVec3(  1.0f, -1.0f, 0.0f )
 	};
 
 	if ( !self ) {
@@ -296,7 +296,7 @@ bool idIK_Walk::Init( arcEntity *self, const char *anim, const arcVec3 &modelOff
 	}
 
 	int numJoints = animator->NumJoints();
-	idJointMat *joints = ( idJointMat * )_alloca16( numJoints * sizeof( joints[0] ) );
+	anJointMat *joints = ( anJointMat * )_alloca16( numJoints * sizeof( joints[0] ) );
 
 	// create the animation frame used to setup the IK
 	gameEdit->ANIM_CreateAnimFrame( animator->ModelHandle(), animator->GetAnim( modifiedAnim )->MD5Anim( 0 ), numJoints, joints, 1, animator->ModelDef()->GetVisualOffset() + modelOffset, animator->RemoveOrigin() );
@@ -345,18 +345,18 @@ bool idIK_Walk::Init( arcEntity *self, const char *anim, const arcVec3 &modelOff
 	for ( i = 0; i < numLegs; i++ ) {
 		oldAnkleHeights[i] = 0.0f;
 
-		ankleAxis = joints[ ankleJoints[ i ] ].ToMat3();
-		ankleOrigin = joints[ ankleJoints[ i ] ].ToVec3();
+		ankleAxis = joints[ ankleJoints[i] ].ToMat3();
+		ankleOrigin = joints[ ankleJoints[i] ].ToVec3();
 
-		kneeAxis = joints[ kneeJoints[ i ] ].ToMat3();
-		kneeOrigin = joints[ kneeJoints[ i ] ].ToVec3();
+		kneeAxis = joints[ kneeJoints[i] ].ToMat3();
+		kneeOrigin = joints[ kneeJoints[i] ].ToVec3();
 
-		hipAxis = joints[ hipJoints[ i ] ].ToMat3();
-		hipOrigin = joints[ hipJoints[ i ] ].ToVec3();
+		hipAxis = joints[ hipJoints[i] ].ToMat3();
+		hipOrigin = joints[ hipJoints[i] ].ToVec3();
 
 		// get the IK direction
 		if ( dirJoints[i] != INVALID_JOINT ) {
-			dirOrigin = joints[ dirJoints[ i ] ].ToVec3();
+			dirOrigin = joints[ dirJoints[i] ].ToVec3();
 			dir = dirOrigin - kneeOrigin;
 		} else {
 			dir.Set( 1.0f, 0.0f, 0.0f );
@@ -392,7 +392,7 @@ bool idIK_Walk::Init( arcEntity *self, const char *anim, const arcVec3 &modelOff
 			verts[i] = footWinding[i] * footSize;
 		}
 		trm.SetupPolygon( verts, 4 );
-		footModel = new arcClipModel( trm, false );
+		footModel = new anClipModel( trm, false );
 	}
 
 	initialized = true;
@@ -409,10 +409,10 @@ bool idIK_Walk::Evaluate( void ) {
 	int i, newPivotFoot;
 	float modelHeight, jointHeight, lowestHeight, floorHeights[MAX_LEGS];
 	float shift, smallestShift, newHeight, step, newPivotYaw, height, largestAnkleHeight;
-	arcVec3 modelOrigin, normal, hipDir, kneeDir, start, end, jointOrigins[MAX_LEGS];
-	arcVec3 footOrigin, ankleOrigin, kneeOrigin, hipOrigin, waistOrigin;
-	arcMat3 modelAxis, waistAxis, axis;
-	arcMat3 hipAxis[MAX_LEGS], kneeAxis[MAX_LEGS], ankleAxis[MAX_LEGS];
+	anVec3 modelOrigin, normal, hipDir, kneeDir, start, end, jointOrigins[MAX_LEGS];
+	anVec3 footOrigin, ankleOrigin, kneeOrigin, hipOrigin, waistOrigin;
+	anMat3 modelAxis, waistAxis, axis;
+	anMat3 hipAxis[MAX_LEGS], kneeAxis[MAX_LEGS], ankleAxis[MAX_LEGS];
 	trace_t results;
 
 	if ( !self || !gameLocal.isNewFrame ) {
@@ -435,7 +435,7 @@ bool idIK_Walk::Evaluate( void ) {
 	animator->CreateFrame( gameLocal.time, false );
 
 	// get the joint positions for the feet
-	lowestHeight = arcMath::INFINITY;
+	lowestHeight = anMath::INFINITY;
 	for ( i = 0; i < numLegs; i++ ) {
 		animator->GetJointTransform( footJoints[i], gameLocal.time, footOrigin, axis );
 		jointOrigins[i] = modelOrigin + footOrigin * modelAxis;
@@ -449,7 +449,7 @@ bool idIK_Walk::Evaluate( void ) {
 	if ( usePivot ) {
 		newPivotYaw = modelAxis[0].ToYaw();
 		// change pivot foot
-		if ( newPivotFoot != pivotFoot || arcMath::Fabs( arcMath::AngleNormalize180( newPivotYaw - pivotYaw ) ) > 30.0f ) {
+		if ( newPivotFoot != pivotFoot || anMath::Fabs( anMath::AngleNormalize180( newPivotYaw - pivotYaw ) ) > 30.0f ) {
 			pivotFoot = newPivotFoot;
 			pivotYaw = newPivotYaw;
 			animator->GetJointTransform( footJoints[pivotFoot], gameLocal.time, footOrigin, axis );
@@ -472,7 +472,7 @@ bool idIK_Walk::Evaluate( void ) {
 		floorHeights[i] = results.endpos * normal;
 
 		if ( ik_debug.GetBool() && footModel ) {
-			idFixedWinding w;
+			anFixedWinding w;
 			for ( int j = 0; j < footModel->GetTraceModel()->numVerts; j++ ) {
 				w += footModel->GetTraceModel()->verts[j];
 			}
@@ -480,7 +480,7 @@ bool idIK_Walk::Evaluate( void ) {
 		}
 	}
 
-	const arcPhysics *phys = self->GetPhysics();
+	const anPhysics *phys = self->GetPhysics();
 
 	// test whether or not the character standing on the ground
 	bool onGround = phys->HasGroundContacts();
@@ -489,15 +489,15 @@ bool idIK_Walk::Evaluate( void ) {
 	bool onPlat = false;
 	for ( i = 0; i < phys->GetNumContacts(); i++ ) {
 		arcEntity *ent = gameLocal.entities[ phys->GetContact( i ).entityNum ];
-		if ( ent != NULL && ent->IsType( idPlat::Type ) ) {
+		if ( ent != nullptr && ent->IsType( idPlat::Type ) ) {
 			onPlat = true;
 			break;
 		}
 	}
 
 	// adjust heights of the ankles
-	smallestShift = arcMath::INFINITY;
-	largestAnkleHeight = -arcMath::INFINITY;
+	smallestShift = anMath::INFINITY;
+	largestAnkleHeight = -anMath::INFINITY;
 	for ( i = 0; i < numLegs; i++ ) {
 		if ( onGround && ( enabledLegs & ( 1 << i ) ) ) {
 			shift = floorHeights[i] - modelHeight + footShift;
@@ -722,12 +722,12 @@ idIK_Reach::~idIK_Reach() {
 idIK_Reach::Init
 ================
 */
-bool idIK_Reach::Init( arcEntity *self, const char *anim, const arcVec3 &modelOffset ) {
+bool idIK_Reach::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	int i;
 	const char *jointName;
-	arcTraceModel trm;
-	arcVec3 dir, handOrigin, elbowOrigin, shoulderOrigin, dirOrigin;
-	arcMat3 axis, handAxis, elbowAxis, shoulderAxis;
+	anTraceModel trm;
+	anVec3 dir, handOrigin, elbowOrigin, shoulderOrigin, dirOrigin;
+	anMat3 axis, handAxis, elbowAxis, shoulderAxis;
 
 	if ( !self ) {
 		return false;
@@ -743,7 +743,7 @@ bool idIK_Reach::Init( arcEntity *self, const char *anim, const arcVec3 &modelOf
 	}
 
 	int numJoints = animator->NumJoints();
-	idJointMat *joints = ( idJointMat * )_alloca16( numJoints * sizeof( joints[0] ) );
+	anJointMat *joints = ( anJointMat * )_alloca16( numJoints * sizeof( joints[0] ) );
 
 	// create the animation frame used to setup the IK
 	gameEdit->ANIM_CreateAnimFrame( animator->ModelHandle(), animator->GetAnim( modifiedAnim )->MD5Anim( 0 ), numJoints, joints, 1, animator->ModelDef()->GetVisualOffset() + modelOffset, animator->RemoveOrigin() );
@@ -778,18 +778,18 @@ bool idIK_Reach::Init( arcEntity *self, const char *anim, const arcVec3 &modelOf
 
 	// get the arm bone lengths and rotation matrices
 	for ( i = 0; i < numArms; i++ ) {
-		handAxis = joints[ handJoints[ i ] ].ToMat3();
-		handOrigin = joints[ handJoints[ i ] ].ToVec3();
+		handAxis = joints[ handJoints[i] ].ToMat3();
+		handOrigin = joints[ handJoints[i] ].ToVec3();
 
-		elbowAxis = joints[ elbowJoints[ i ] ].ToMat3();
-		elbowOrigin = joints[ elbowJoints[ i ] ].ToVec3();
+		elbowAxis = joints[ elbowJoints[i] ].ToMat3();
+		elbowOrigin = joints[ elbowJoints[i] ].ToVec3();
 
-		shoulderAxis = joints[ shoulderJoints[ i ] ].ToMat3();
-		shoulderOrigin = joints[ shoulderJoints[ i ] ].ToVec3();
+		shoulderAxis = joints[ shoulderJoints[i] ].ToMat3();
+		shoulderOrigin = joints[ shoulderJoints[i] ].ToVec3();
 
 		// get the IK direction
 		if ( dirJoints[i] != INVALID_JOINT ) {
-			dirOrigin = joints[ dirJoints[ i ] ].ToVec3();
+			dirOrigin = joints[ dirJoints[i] ].ToVec3();
 			dir = dirOrigin - elbowOrigin;
 		} else {
 			dir.Set( -1.0f, 0.0f, 0.0f );
@@ -820,9 +820,9 @@ idIK_Reach::Evaluate
 bool idIK_Reach::Evaluate( void ) {
 	return false;
 	int i;
-	arcVec3 modelOrigin, shoulderOrigin, elbowOrigin, handOrigin, shoulderDir, elbowDir;
-	arcMat3 modelAxis, axis;
-	arcMat3 shoulderAxis[MAX_ARMS], elbowAxis[MAX_ARMS];
+	anVec3 modelOrigin, shoulderOrigin, elbowOrigin, handOrigin, shoulderDir, elbowDir;
+	anMat3 modelAxis, axis;
+	anMat3 shoulderAxis[MAX_ARMS], elbowAxis[MAX_ARMS];
 	trace_t trace;
 
 	modelOrigin = self->GetRenderEntity()->origin;
@@ -926,7 +926,7 @@ arcIK_Aim::~arcIK_Aim( void ) {
 arcIK_Aim::Init
 ================
 */
-bool arcIK_Aim::Init( arcEntity *self, const char *anim, const arcVec3 &modelOffset ) {
+bool arcIK_Aim::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	if ( !idIK::Init( self, anim, modelOffset ) ) {
 		return false;
 	}
@@ -949,7 +949,7 @@ bool arcIK_Aim::Init( arcEntity *self, const char *anim, const arcVec3 &modelOff
 	return true;
 }
 
-extern idCVar r_debugAxisLength;
+extern anCVar r_debugAxisLength;
 
 /*
 ================
@@ -958,14 +958,14 @@ arcIK_Aim::Evaluate
 */
 bool arcIK_Aim::Evaluate( void ) {
 	for ( int i = 0; i < jointGroups.Num(); i++ ) {
-		jointGroup_t &group = jointGroups[ i ];
+		jointGroup_t &group = jointGroups[i];
 
-		arcVec3 org1, org2;
+		anVec3 org1, org2;
 
 		self->GetAnimator()->GetJointTransform( group.joint1, gameLocal.time, org1 );
 		self->GetAnimator()->GetJointTransform( group.joint2, gameLocal.time, org2 );
 
-		arcVec3 dir = org2 - org1;
+		anVec3 dir = org2 - org1;
 		dir.Normalize();
 
 		float dot = dir * group.lastDir;
@@ -982,15 +982,15 @@ bool arcIK_Aim::Evaluate( void ) {
 	ClearJointMods();
 
 	for ( i = 0; i < jointGroups.Num(); i++ ) {
-		jointGroup_t &group = jointGroups[ i ];
+		jointGroup_t &group = jointGroups[i];
 
-		arcVec3 org1, org2;
-		arcMat3 axis1, axis2;
+		anVec3 org1, org2;
+		anMat3 axis1, axis2;
 
 		self->GetAnimator()->GetJointTransform( group.joint1, gameLocal.time, org1, axis1 );
 		self->GetAnimator()->GetJointTransform( group.joint2, gameLocal.time, org2, axis2 );
 
-		arcMat3 axes1, axes2;
+		anMat3 axes1, axes2;
 
 		group.lastDir = org2 - org1;
 		group.lastDir.Normalize();
@@ -1033,7 +1033,7 @@ void arcIK_Aim::ClearJointMods( void ) {
 	}
 
 	for ( int i = 0; i < jointGroups.Num(); i++ ) {
-		jointGroup_t& group = jointGroups[ i ];
+		jointGroup_t& group = jointGroups[i];
 
 		self->GetAnimator()->SetJointAxis( group.joint1, JOINTMOD_NONE, mat3_identity );
 		self->GetAnimator()->SetJointAxis( group.joint2, JOINTMOD_NONE, mat3_identity );

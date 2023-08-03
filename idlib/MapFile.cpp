@@ -1,4 +1,4 @@
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 ARC_INLINE unsigned int FloatCRC( float f ) {
@@ -22,13 +22,13 @@ WARNING : special case behaviour of atan2(y,x) <-> atan(y/x) might not be the sa
 rotation by (0,RotY,RotZ) assigns X to normal
 =================
 */
-static void ComputeAxisBase( const arcVec3 &normal, arcVec3 &texS, arcVec3 &texT ) {
+static void ComputeAxisBase( const anVec3 &normal, anVec3 &texS, anVec3 &texT ) {
 	// do some cleaning
-	arcVec3 n[0] = ( arcMath::Fabs( normal[0] ) < 1e-6f ) ? 0.0f : normal[0];
-    arcVec3 n[1] = ( arcMath::Fabs( normal[1] ) < 1e-6f ) ? 0.0f : normal[1];
-    arcVec3 n[2] = ( arcMath::Fabs( normal[2] ) < 1e-6f ) ? 0.0f : normal[2];
+	anVec3 n[0] = ( anMath::Fabs( normal[0] ) < 1e-6f ) ? 0.0f : normal[0];
+    anVec3 n[1] = ( anMath::Fabs( normal[1] ) < 1e-6f ) ? 0.0f : normal[1];
+    anVec3 n[2] = ( anMath::Fabs( normal[2] ) < 1e-6f ) ? 0.0f : normal[2];
 
-    float RotY = -atan2( n[2], arcMath::Sqrt(n[1] * n[1] + n[0] * n[0] ) );
+    float RotY = -atan2( n[2], anMath::Sqrt(n[1] * n[1] + n[0] * n[0] ) );
     float RotZ = atan2( n[1], n[0] );
     // rotate (0,1,0 ) and (0,0,1 ) to compute texS and texT
     texS[0] = -sin( RotZ );
@@ -42,11 +42,11 @@ static void ComputeAxisBase( const arcVec3 &normal, arcVec3 &texS, arcVec3 &texT
 
 /*
 =================
-aRcMapBrushSides::GetTextureVectors
+anMapBrushSides::GetTextureVectors
 =================
 */
-void aRcMapBrushSides::GetTextureVectors( arcVec4 v[2] ) const {
-	ComputeAxisBase( plane.Normal(), arcVec3 texX, arcVec3 texY );
+void anMapBrushSides::GetTextureVectors( anVec4 v[2] ) const {
+	ComputeAxisBase( plane.Normal(), anVec3 texX, anVec3 texY );
 	for ( int i = 0; i < 2; i++ ) {
            v[i][0] = texX[0] * texMat[i][0] + texY[0] * texMat[i][1];
            v[i][1] = texX[1] * texMat[i][0] + texY[1] * texMat[i][1];
@@ -57,10 +57,10 @@ void aRcMapBrushSides::GetTextureVectors( arcVec4 v[2] ) const {
 
 /*
 ===============
-idMapPatch::GetGeometryCRC
+anMapPatch::GetGeometryCRC
 ===============
 */
-unsigned int idMapPatch::GetGeometryCRC( void ) const {
+unsigned int anMapPatch::GetGeometryCRC( void ) const {
 	unsigned int crc = GetHorzSubdivisions() ^ GetVertSubdivisions();
 	for ( int i = 0; i < GetWidth(); i++ ) {
 		for ( int j = 0; j < GetHeight(); j++ ) {
@@ -77,13 +77,13 @@ unsigned int idMapPatch::GetGeometryCRC( void ) const {
 
 /*
 ===============
-TectMapBrush::GetGeometryCRC
+anMapBrush::GetGeometryCRC
 ===============
 */
-unsigned int TectMapBrush::GetGeometryCRC( void ) const {
+unsigned int anMapBrush::GetGeometryCRC( void ) const {
 	unsigned int crc = 0;
 	for ( int i = 0; i < GetNumSides(); i++ ) {
-		aRcMapBrushSides *mapSide = GetSide( i );
+		anMapBrushSides *mapSide = GetSide( i );
 		for ( int j = 0; j < 4; j++ ) {
 			crc ^= FloatCRC( mapSide->GetPlane()[j] );
 		}
@@ -95,19 +95,19 @@ unsigned int TectMapBrush::GetGeometryCRC( void ) const {
 
 /*
 ===============
-TectMapEnt::GetGeometryCRC
+anMapEntity::GetGeometryCRC
 ===============
 */
-unsigned int TectMapEnt::GetGeometryCRC( void ) const {
+unsigned int anMapEntity::GetGeometryCRC( void ) const {
         unsigned int crc = 0;
         for ( int i = 0; i < GetNumPrimitives(); i++ ) {
-          TectMapPrim *mapPrim = GetPrimitive( i );
+          anMapPrimitive *mapPrim = GetPrimitive( i );
           switch ( mapPrim->GetType() ) {
-          case TectMapPrim::TYPE_BRUSH:
-            crc ^= static_cast<TectMapBrush *>( mapPrim )->GetGeometryCRC();
+          case anMapPrimitive::TYPE_BRUSH:
+            crc ^= static_cast<anMapBrush *>( mapPrim )->GetGeometryCRC();
             break;
-          case TectMapPrim::TYPE_PATCH:
-            crc ^= static_cast<idMapPatch *>( mapPrim )->GetGeometryCRC();
+          case anMapPrimitive::TYPE_PATCH:
+            crc ^= static_cast<anMapPatch *>( mapPrim )->GetGeometryCRC();
             break;
 		}
 	}
@@ -117,10 +117,10 @@ unsigned int TectMapEnt::GetGeometryCRC( void ) const {
 
 /*
 ===============
-aRcMapFile::SetGeometryCRC
+anMapFile::SetGeometryCRC
 ===============
 */
-void aRcMapFile::SetGeometryCRC( void ) {
+void anMapFile::SetGeometryCRC( void ) {
 	geometryCRC = 0;
 	for ( int i = 0; i < entities.Num(); i++ ) {
 		geometryCRC ^= entities[i]->GetGeometryCRC();
@@ -129,13 +129,13 @@ void aRcMapFile::SetGeometryCRC( void ) {
 
 /*
 ===============
-aRcMapFile::NeedsReload
+anMapFile::NeedsReload
 ===============
 */
-bool aRcMapFile::NeedsReload() {
+bool anMapFile::NeedsReload() {
 	if ( name.Length() ) {
 		ARC_TIME_T time = (ARC_TIME_T)-1;
-		if ( arcLibrary::fileSystem->ReadFile( name, NULL, &time ) > 0 ) {
+		if ( anLibrary::fileSystem->ReadFile( name, nullptr, &time ) > 0 ) {
 			return ( time > fileTime );
 		}
 	}

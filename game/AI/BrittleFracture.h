@@ -13,19 +13,19 @@ of the render model which can fracture.
 */
 
 typedef struct shard_s {
-	idClipModel *				clipModel;
-	idFixedWinding				winding;
-	idList<idFixedWinding *>	decals;
-	idList<bool>				edgeHasNeighbour;
-	idList<struct shard_s *>	neighbours;
-	idPhysics_RigidBody			physicsObj;
+	anClipModel *				clipModel;
+	anFixedWinding				winding;
+	anList<anFixedWinding *>	decals;
+	anList<bool>				edgeHasNeighbour;
+	anList<struct shard_s *>	neighbours;
+	anPhysics_RigidBody			physicsObj;
 	int							droppedTime;
 	bool						atEdge;
 	int							islandNum;
 } shard_t;
 
 
-class idBrittleFracture : public idEntity {
+class idBrittleFracture : public anEntity {
 
 public:
 	CLASS_PROTOTYPE( idBrittleFracture );
@@ -33,34 +33,34 @@ public:
 								idBrittleFracture( void );
 	virtual						~idBrittleFracture( void );
 
-	void						Save( idSaveGame *savefile ) const;
-	void						Restore( idRestoreGame *savefile );
+	void						Save( anSaveGame *savefile ) const;
+	void						Restore( anRestoreGame *savefile );
 
 	void						Spawn( void );
 
 	virtual void				Present( void );
 	virtual void				Think( void );
-	virtual void				ApplyImpulse( idEntity *ent, int id, const arcVec3 &point, const arcVec3 &impulse, bool splash = false );
-	virtual void				AddForce( idEntity *ent, int id, const arcVec3 &point, const arcVec3 &force );
-	virtual void				AddDamageEffect( const trace_t &collision, const arcVec3 &velocity, const char *damageDefName, idEntity* inflictor );
-	virtual void				Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location );
+	virtual void				ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &impulse, bool splash = false );
+	virtual void				AddForce( anEntity *ent, int id, const anVec3 &point, const anVec3 &force );
+	virtual void				AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor );
+	virtual void				Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
 
-	void						ProjectDecal( const arcVec3 &point, const arcVec3 &dir, const int time, const char *damageDefName );
+	void						ProjectDecal( const anVec3 &point, const anVec3 &dir, const int time, const char *damageDefName );
 	bool						IsBroken( void ) const;
 
 	enum {
-		EVENT_PROJECT_DECAL = idEntity::EVENT_MAXEVENTS,
+		EVENT_PROJECT_DECAL = anEntity::EVENT_MAXEVENTS,
 		EVENT_SHATTER,
 		EVENT_MAXEVENTS
 	};
 
 	virtual void				ClientPredictionThink( void );
-	virtual bool				ClientReceiveEvent( int event, int time, const idBitMsg &msg );
+	virtual bool				ClientReceiveEvent( int event, int time, const anBitMsg &msg );
 
 private:
 	// setttings
-	const arcMaterial *			material;
-	const arcMaterial *			decalMaterial;
+	const anMaterial *			material;
+	const anMaterial *			decalMaterial;
 	float						decalSize;
 	float						maxShardArea;
 	float						maxShatterRadius;
@@ -71,12 +71,12 @@ private:
 	float						density;
 	float						friction;
 	float						bouncyness;
-	idStr						fxFracture;
+	anString						fxFracture;
 
 	// state
-	idPhysics_StaticMulti		physicsObj;
-	idList<shard_t *>			shards;
-	arcBounds					bounds;
+	anPhysics_StaticMulti		physicsObj;
+	anList<shard_t *>			shards;
+	anBounds					bounds;
 	bool						disableFracture;
 
 	// for rendering
@@ -86,18 +86,18 @@ private:
 	bool						UpdateRenderEntity( renderEntity_s *renderEntity, const renderView_t *renderView ) const;
 	static bool					ModelCallback( renderEntity_s *renderEntity, const renderView_t *renderView );
 
-	void						AddShard( idClipModel *clipModel, idFixedWinding &w );
+	void						AddShard( anClipModel *clipModel, anFixedWinding &w );
 	void						RemoveShard( int index );
-	void						DropShard( shard_t *shard, const arcVec3 &point, const arcVec3 &dir, const float impulse, const int time );
-	void						Shatter( const arcVec3 &point, const arcVec3 &impulse, const int time );
-	void						DropFloatingIslands( const arcVec3 &point, const arcVec3 &impulse, const int time );
+	void						DropShard( shard_t *shard, const anVec3 &point, const anVec3 &dir, const float impulse, const int time );
+	void						Shatter( const anVec3 &point, const anVec3 &impulse, const int time );
+	void						DropFloatingIslands( const anVec3 &point, const anVec3 &impulse, const int time );
 	void						Break( void );
-	void						Fracture_r( idFixedWinding &w );
-	void						CreateFractures( const idRenderModel *renderModel );
+	void						Fracture_r( anFixedWinding &w );
+	void						CreateFractures( const anRenderModel *renderModel );
 	void						FindNeighbours( void );
 
-	void						Event_Activate( idEntity *activator );
-	void						Event_Touch( idEntity *other, trace_t *trace );
+	void						Event_Activate( anEntity *activator );
+	void						Event_Touch( anEntity *other, trace_t *trace );
 };
 
 #endif /* !__GAME_BRITTLEFRACTURE_H__ */

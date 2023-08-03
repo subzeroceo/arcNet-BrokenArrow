@@ -12,7 +12,7 @@ class DialogScriptEditor : public CDialog {
 	DECLARE_DYNAMIC(DialogScriptEditor)
 
 public:
-						DialogScriptEditor( CWnd* pParent = NULL );   // standard constructor
+						DialogScriptEditor( CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogScriptEditor();
 
 	void				OpenFile( const char *fileName );
@@ -64,7 +64,7 @@ private:
 	bool				matchCase;
 	bool				matchWholeWords;
 	bool				searchForward;
-	arcNetString				fileName;
+	anString				fileName;
 	int					firstLine;
 
 private:

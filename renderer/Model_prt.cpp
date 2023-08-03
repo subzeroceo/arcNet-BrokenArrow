@@ -1,46 +1,24 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
 #include "Model_local.h"
 
-static const char *parametricParticle_SnapshotName = "_ParametricParticle_Snapshot_";
+static const char *parametricParticle_SnapshotName = "_ParametricParticle_Legacy_Snapshot_";
+
+/*====================================================================================================
+	integrating to our new .voxtex formatted volume textures
+
+
+====================================================================================================*/
 
 /*
 ====================
-idRenderModelPrt::idRenderModelPrt
+idRenderModelPrt_Legacy::idRenderModelPrt_Legacy
 ====================
 */
 idRenderModelPrt::idRenderModelPrt() {
-	particleSystem = NULL;
+	particleSystem = nullptr;
 }
 
 /*
@@ -50,7 +28,7 @@ idRenderModelPrt::InitFromFile
 */
 void idRenderModelPrt::InitFromFile( const char *fileName ) {
 	name = fileName;
-	particleSystem = static_cast<const arcDeclParticle *>( declManager->FindType( DECL_PARTICLE, fileName ) );
+	particleSystem = static_cast<const anDeclParticle *>( declManager->FindType( DECL_PARTICLE, fileName ) );
 }
 
 /*
@@ -60,7 +38,7 @@ idRenderModelPrt::TouchData
 */
 void idRenderModelPrt::TouchData( void ) {
 	// Ensure our particle system is added to the list of referenced decls
-	particleSystem = static_cast<const arcDeclParticle *>( declManager->FindType( DECL_PARTICLE, name ) );
+	particleSystem = static_cast<const anDeclParticle *>( declManager->FindType( DECL_PARTICLE, name ) );
 }
 
 /*
@@ -68,43 +46,38 @@ void idRenderModelPrt::TouchData( void ) {
 idRenderModelPrt::InstantiateDynamicModel
 ====================
 */
-ARCRenderModel *idRenderModelPrt::InstantiateDynamicModel( const struct renderEntity_s *renderEntity, const struct viewDef_s *viewDef, ARCRenderModel *cachedModel ) {
-	aRcModelStatic	*staticModel;
+anRenderModel *idRenderModelPrt::InstantiateDynamicModel( const struct renderEntity_s *renderEntity, const struct viewDef_s *viewDef, anRenderModel *cachedModel ) {
+	anModelStatic *staticModel;
 
 	if ( cachedModel && !r_useCachedDynamicModels.GetBool() ) {
 		delete cachedModel;
-		cachedModel = NULL;
+		cachedModel = nullptr;
 	}
 
 	// this may be triggered by a model trace or other non-view related source, to which we should look like an empty model
-	if ( renderEntity == NULL || viewDef == NULL ) {
+	if ( renderEntity == nullptr || viewDef == nullptr ) {
 		delete cachedModel;
-		return NULL;
+		return nullptr;
 	}
 
 	if ( r_skipParticles.GetBool() ) {
 		delete cachedModel;
-		return NULL;
+		return nullptr;
 	}
 
-	/*
-	// if the entire system has faded out
+/*	// if the entire system has faded out
 	if ( renderEntity->shaderParms[SP_PARTICLE_STOPTIME] && viewDef->renderView.time * 0.001f >= renderEntity->shaderParms[SP_PARTICLE_STOPTIME] ) {
 		delete cachedModel;
-		return NULL;
-	}
-	*/
+		return nullptr;
+	}*/
 
-	if ( cachedModel != NULL ) {
+	if ( cachedModel != nullptr ) {
+		assert( dynamic_cast<anModelStatic *>(cachedModel) != nullptr );
+		assert( anString::Icmp( cachedModel->Name(), parametricParticle_SnapshotName ) == 0 );
 
-		assert( dynamic_cast<aRcModelStatic *>(cachedModel) != NULL );
-		assert( arcNetString::Icmp( cachedModel->Name(), parametricParticle_SnapshotName ) == 0 );
-
-		staticModel = static_cast<aRcModelStatic *>(cachedModel);
-
+		staticModel = static_cast<anModelStatic *>(cachedModel);
 	} else {
-
-		staticModel = new aRcModelStatic;
+		staticModel = new anModelStatic;
 		staticModel->InitEmpty( parametricParticle_SnapshotName );
 	}
 
@@ -116,8 +89,7 @@ ARCRenderModel *idRenderModelPrt::InstantiateDynamicModel( const struct renderEn
 	g.axis.Identity();
 
 	for ( int stageNum = 0; stageNum < particleSystem->stages.Num(); stageNum++ ) {
-		arcParticleStage *stage = particleSystem->stages[stageNum];
-
+		anParticleStage *stage = particleSystem->stages[stageNum];
 		if ( !stage->material ) {
 			continue;
 		}
@@ -137,7 +109,7 @@ ARCRenderModel *idRenderModelPrt::InstantiateDynamicModel( const struct renderEn
 
 		// some particles will be in this cycle, some will be in the previous cycle
 		steppingRandom.SetSeed( ( ( stageCycle << 10 ) & arcRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * arcRandom::MAX_RAND )  );
-		steppingRandom2.SetSeed( ( ( (stageCycle-1 ) << 10 ) & arcRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * arcRandom::MAX_RAND )  );
+		steppingRandom2.SetSeed( ( ( ( stageCycle-1 ) << 10 ) & arcRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * arcRandom::MAX_RAND )  );
 
 		int	count = stage->totalParticles * stage->NumQuadsPerParticle();
 
@@ -158,7 +130,7 @@ ARCRenderModel *idRenderModelPrt::InstantiateDynamicModel( const struct renderEn
 		}
 
 		int numVerts = 0;
-		arcDrawVert *verts = surf->geometry->verts;
+		anDrawVertex *verts = surf->geometry->verts;
 
 		for ( int index = 0; index < stage->totalParticles; index++ ) {
 			g.index = index;
@@ -255,7 +227,7 @@ dynamicModel_t idRenderModelPrt::IsDynamicModel() const {
 idRenderModelPrt::Bounds
 ====================
 */
-arcBounds idRenderModelPrt::Bounds( const struct renderEntity_s *ent ) const {
+anBounds idRenderModelPrt::Bounds( const struct renderEntity_s *ent ) const {
 	return particleSystem->bounds;
 }
 
@@ -276,7 +248,7 @@ idRenderModelPrt::Memory
 int idRenderModelPrt::Memory() const {
 	int total = 0;
 
-	total += aRcModelStatic::Memory();
+	total += anModelStatic::Memory();
 
 	if ( particleSystem ) {
 		total += sizeof( *particleSystem );
@@ -287,4 +259,172 @@ int idRenderModelPrt::Memory() const {
 	}
 
 	return total;
+}
+
+
+#include "../idlib/Lib.h"
+#pragma hdrstop
+
+#include "tr_local.h"
+#include "Model_local.h"
+
+/*
+
+A simple sprite model that always faces the view axis.
+
+*/
+
+static const char *sprite_SnapshotName = "_sprite_Snapshot_";
+
+/*
+===============
+idRenderModelBeam::IsDynamicModel
+===============
+*/
+dynamicModel_t idRenderModelSprite::IsDynamicModel() const {
+	return DM_CONTINUOUS;
+}
+
+/*
+===============
+idRenderModelBeam::IsLoaded
+===============
+*/
+bool idRenderModelSprite::IsLoaded() const {
+	return true;
+}
+
+/*
+===============
+idRenderModelSprite::InstantiateDynamicModel
+===============
+*/
+anRenderModel *idRenderModelSprite::InstantiateDynamicModel( const struct renderEntity_s *renderEntity, const struct viewDef_s *viewDef, anRenderModel *cachedModel ) {
+	anModelStatic *staticModel;
+	srfTriangles_t *tri;
+	modelSurface_t surf;
+
+	if ( cachedModel && !r_useCachedDynamicModels.GetBool() ) {
+		delete cachedModel;
+		cachedModel = nullptr;
+	}
+
+	if ( renderEntity == nullptr || viewDef == nullptr ) {
+		delete cachedModel;
+		return nullptr;
+	}
+
+	if ( cachedModel != nullptr ) {
+		assert( dynamic_cast<anModelStatic *>( cachedModel ) != nullptr );
+		assert( anString::Icmp( cachedModel->Name(), sprite_SnapshotName ) == 0 );
+
+		staticModel = static_cast<anModelStatic *>( cachedModel );
+		surf = *staticModel->Surface( 0 );
+		tri = surf.geometry;
+	} else {
+		staticModel = new anModelStatic;
+		staticModel->InitEmpty( sprite_SnapshotName );
+
+		tri = R_AllocStaticTriSurf();
+		R_AllocStaticTriSurfVerts( tri, 4 );
+		R_AllocStaticTriSurfIndexes( tri, 6 );
+
+		tri->verts[ 0 ].Clear();
+		tri->verts[ 0 ].normal.Set( 1.0f, 0.0f, 0.0f );
+		tri->verts[ 0 ].tangents[0].Set( 0.0f, 1.0f, 0.0f );
+		tri->verts[ 0 ].tangents[1].Set( 0.0f, 0.0f, 1.0f );
+		tri->verts[ 0 ].st[ 0 ] = 0.0f;
+		tri->verts[ 0 ].st[ 1 ] = 0.0f;
+
+		tri->verts[ 1 ].Clear();
+		tri->verts[ 1 ].normal.Set( 1.0f, 0.0f, 0.0f );
+		tri->verts[ 1 ].tangents[0].Set( 0.0f, 1.0f, 0.0f );
+		tri->verts[ 1 ].tangents[1].Set( 0.0f, 0.0f, 1.0f );
+		tri->verts[ 1 ].st[ 0 ] = 1.0f;
+		tri->verts[ 1 ].st[ 1 ] = 0.0f;
+
+		tri->verts[ 2 ].Clear();
+		tri->verts[ 2 ].normal.Set( 1.0f, 0.0f, 0.0f );
+		tri->verts[ 2 ].tangents[0].Set( 0.0f, 1.0f, 0.0f );
+		tri->verts[ 2 ].tangents[1].Set( 0.0f, 0.0f, 1.0f );
+		tri->verts[ 2 ].st[ 0 ] = 1.0f;
+		tri->verts[ 2 ].st[ 1 ] = 1.0f;
+
+		tri->verts[ 3 ].Clear();
+		tri->verts[ 3 ].normal.Set( 1.0f, 0.0f, 0.0f );
+		tri->verts[ 3 ].tangents[0].Set( 0.0f, 1.0f, 0.0f );
+		tri->verts[ 3 ].tangents[1].Set( 0.0f, 0.0f, 1.0f );
+		tri->verts[ 3 ].st[ 0 ] = 0.0f;
+		tri->verts[ 3 ].st[ 1 ] = 1.0f;
+
+		tri->indexes[ 0 ] = 0;
+		tri->indexes[ 1 ] = 1;
+		tri->indexes[ 2 ] = 3;
+		tri->indexes[ 3 ] = 1;
+		tri->indexes[ 4 ] = 2;
+		tri->indexes[ 5 ] = 3;
+
+		tri->numVerts = 4;
+		tri->numIndexes = 6;
+
+		surf.geometry = tri;
+		surf.id = 0;
+		surf.shader = tr.defaultMaterial;
+		staticModel->AddSurface( surf );
+	}
+
+	int	red			= anMath::FtoiFast( renderEntity->shaderParms[ SP_RED ] * 255.0f );
+	int green		= anMath::FtoiFast( renderEntity->shaderParms[ SP_GREEN ] * 255.0f );
+	int	blue		= anMath::FtoiFast( renderEntity->shaderParms[ SS_BLUE ] * 255.0f );
+	int	alpha		= anMath::FtoiFast( renderEntity->shaderParms[ SS_APLHA ] * 255.0f );
+
+	anVec3 right	= anVec3( 0.0f, renderEntity->shaderParms[ SHADERPARM_SPRITE_WIDTH ] * 0.5f, 0.0f );
+	anVec3 up		= anVec3( 0.0f, 0.0f, renderEntity->shaderParms[ SHADERPARM_SPRITE_HEIGHT ] * 0.5f );
+
+	tri->verts[ 0 ].xyz = up + right;
+	tri->verts[ 0 ].color[ 0 ] = red;
+	tri->verts[ 0 ].color[ 1 ] = green;
+	tri->verts[ 0 ].color[ 2 ] = blue;
+	tri->verts[ 0 ].color[ 3 ] = alpha;
+
+	tri->verts[ 1 ].xyz = up - right;
+	tri->verts[ 1 ].color[ 0 ] = red;
+	tri->verts[ 1 ].color[ 1 ] = green;
+	tri->verts[ 1 ].color[ 2 ] = blue;
+	tri->verts[ 1 ].color[ 3 ] = alpha;
+
+	tri->verts[ 2 ].xyz = - right - up;
+	tri->verts[ 2 ].color[ 0 ] = red;
+	tri->verts[ 2 ].color[ 1 ] = green;
+	tri->verts[ 2 ].color[ 2 ] = blue;
+	tri->verts[ 2 ].color[ 3 ] = alpha;
+
+	tri->verts[ 3 ].xyz = right - up;
+	tri->verts[ 3 ].color[ 0 ] = red;
+	tri->verts[ 3 ].color[ 1 ] = green;
+	tri->verts[ 3 ].color[ 2 ] = blue;
+	tri->verts[ 3 ].color[ 3 ] = alpha;
+
+	R_BoundTriSurf( tri );
+
+	staticModel->bounds = tri->bounds;
+
+	return staticModel;
+}
+
+/*
+===============
+idRenderModelSprite::Bounds
+===============
+*/
+anBounds idRenderModelSprite::Bounds( const struct renderEntity_s *renderEntity ) const {
+	anBounds b;
+
+	b.Zero();
+	if ( renderEntity == nullptr ) {
+		b.ExpandSelf( 8.0f );
+	} else {
+		b.ExpandSelf( Max( renderEntity->shaderParms[SHADERPARM_SPRITE_WIDTH], renderEntity->shaderParms[SHADERPARM_SPRITE_HEIGHT] ) * 0.5f );
+	}
+	return b;
 }

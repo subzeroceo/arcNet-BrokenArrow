@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "roqParam.h"
@@ -39,12 +39,12 @@ int parseTimecodeRange(const char *rangeStr,int field, int skipnum[], int startn
 
 void roqParam::InitFromFile( const char *fileName )
 {
-	ARCParser *src;
-	arcNetToken token;
+	anParser *src;
+	anToken token;
 	int i, readarg;
 
 
-	src = new ARCParser( fileName, LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
+	src = new anParser( fileName, LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 	if ( !src->IsLoaded() ) {
 		delete src;
 		common->Printf( "Error: can't open param file %s\n", fileName);
@@ -247,28 +247,28 @@ void roqParam::InitFromFile( const char *fileName )
 		if (token.Icmp( "input" ) == 0 ) {
 			int num_files = 255;
 
-			range = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
+			range = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
 			padding = (bool *)Mem_ClearedAlloc( num_files * sizeof(bool) );
 			padding2 = (bool *)Mem_ClearedAlloc( num_files * sizeof(bool) );
-			skipnum = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
-			skipnum2 = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
-			startnum = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
-			startnum2 = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
-			endnum = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
-			endnum2 = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
-			numpadding = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
-			numpadding2 = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
-			numfiles = ( int * )Mem_ClearedAlloc( num_files * sizeof( int ) );
-			arcNetString empty;
+			skipnum = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
+			skipnum2 = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
+			startnum = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
+			startnum2 = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
+			endnum = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
+			endnum2 = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
+			numpadding = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
+			numpadding2 = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
+			numfiles = ( int*)Mem_ClearedAlloc( num_files * sizeof( int ) );
+			anString empty;
 			file.AssureSize( num_files, empty );
 			file.AssureSize( num_files, empty );
 
 			field = 0;
 			realnum = 0;
 			do {
-				src->ReadToken(&token);
+				src->ReadToken( &token );
 				if ( token.Icmp( "end_input" ) != 0 ) {
-					arcNetString arg1, arg2, arg3;
+					anString arg1, arg2, arg3;
 
 					file[field] = token;
 					while (src->ReadTokenOnLine( &token ) && token.Icmp( "[" ) ) {
@@ -341,7 +341,7 @@ void roqParam::InitFromFile( const char *fileName )
 	delete src;
 }
 
-void roqParam::GetNthInputFileName( arcNetString &fileName, int n ) {
+void roqParam::GetNthInputFileName( anString &fileName, int n ) {
 	int i, myfield, index,hrs,mins,secs,frs;
 	char tempfile[33], left[256], right[256], *strp;
 	if ( n > realnum ) n = realnum;
@@ -437,7 +437,7 @@ void roqParam::GetNthInputFileName( arcNetString &fileName, int n ) {
 }
 
 const char* roqParam::GetNextImageFilename( void ) {
-	arcNetString tempBuffer;
+	anString tempBuffer;
 	int	i;
 	int len;
 

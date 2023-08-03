@@ -48,7 +48,7 @@ public:
 
 	bool				ShouldConstructScriptObjectAtSpawn( void ) const { return false; }
 
-	static bool			InhibitSpawn( const arcDict& args );
+	static bool			InhibitSpawn( const anDict& args );
 };
 
 /*
@@ -69,7 +69,7 @@ public:
 	void					Spawn( void );
 	virtual bool			LoadAF( void );
 	bool					StartRagdoll( void );
-	virtual bool			GetPhysicsToSoundTransform( arcVec3 &origin, arcMat3 &axis );
+	virtual bool			GetPhysicsToSoundTransform( anVec3 &origin, anMat3 &axis );
 
 private:
 	int						num_anims;
@@ -109,7 +109,7 @@ public:
 	virtual void		Show( void );
 	virtual void		Think( void );
 
-	static bool			InhibitSpawn( const arcDict& args );
+	static bool			InhibitSpawn( const anDict& args );
 
 	virtual void		PostMapSpawn( void );
 
@@ -147,10 +147,10 @@ public:
 										arcLiquid( void );
 	void								Spawn( void );
 
-	virtual void						GetWaterCurrent( arcVec3 &waterCurrent ) const { waterCurrent = current; }
+	virtual void						GetWaterCurrent( anVec3 &waterCurrent ) const { waterCurrent = current; }
 
 private:
-	arcVec3								current;
+	anVec3								current;
 };
 
 /*
@@ -171,16 +171,16 @@ public:
 	void						Spawn();
 	void						PostMapSpawn();
 
-	void						AddClipModel( arcClipModel* model, const arcVec3& origin, const arcMat3& axes );
+	void						AddClipModel( anClipModel* model, const anVec3& origin, const anMat3& axes );
 	void						AddRenderEntity( const renderEntity_t& entity, int ID );
 
 private:
 	void						FreeModelDefs();
 
 private:
-	arcNetList<int>				modelDefHandles;
-	arcNetList<int>				modelID;
-	arcPhysics_StaticMulti		physicsObj;
+	anList<int>				modelDefHandles;
+	anList<int>				modelID;
+	anPhysics_StaticMulti		physicsObj;
 };
 
 /*
@@ -218,29 +218,29 @@ public:
 	virtual				~arcLadderEntity( void );
 
 	bool				IsActive( void ) const { return !fl.forceDisableClip; }
-	arcVec3				GetLadderNormal( void ) const;
-	arcClipModel *		GetLadderModel( void ) const { return ladderModel; }
+	anVec3				GetLadderNormal( void ) const;
+	anClipModel *		GetLadderModel( void ) const { return ladderModel; }
 
 private:
-	arcVec3				ladderNormal;
-	arcClipModel *		ladderModel;
+	anVec3				ladderNormal;
+	anClipModel *		ladderModel;
 };
 
 /*
 ===============================================================================
 
-	idAASObstacleEntity
+	anSEASObstacleEntity
 
 	Allows turning on and off AAS Obstacles
 
 ===============================================================================
 */
 
-class idAASObstacleEntity : public arcEntity {
+class anSEASObstacleEntity : public arcEntity {
 public:
-	CLASS_PROTOTYPE( idAASObstacleEntity );
+	CLASS_PROTOTYPE( anSEASObstacleEntity );
 
-						idAASObstacleEntity( void );
+						anSEASObstacleEntity( void );
 
 	void				Spawn( void );
 

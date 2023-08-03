@@ -32,6 +32,17 @@
 #define ARC_STATICTEMPLATE static
 #define ARC_L_DYNAMIC
 
+// lint complains that extern used with definition is a hazard, but it
+// has the benefit (?) of making it illegal to take the address of the function
+#ifdef _lint
+#define ARC_INLINE_EXTERN				inline
+#define ARC_FORCE_INLINE_EXTERN			__forceinline
+#else
+#define ARC_INLINE_EXTERN				extern inline
+#define ARC_FORCE_INLINE_EXTERN			extern __forceinline
+#endif
+
+
 #define assertmem(x, y) assert(_CrtIsValidPointer(x, y, true))
 
 #endif
@@ -103,7 +114,7 @@ _
 #endif
 
 #ifndef BIT
-#define BIT(num) BITT<num>::VALUE
+#define BIT( num ) BITT<num>::VALUE
 #endif
 
     template <unsigned int B>
@@ -115,9 +126,9 @@ public:
 };
 
 #ifdef __GNUC__
-#define arc_attribute(x) __attribute__(x)
+#define an_attribute(x) __attribute__(x)
 #else
-#define arc_attribute(x)
+#define an_attribute(x)
 #endif
 
 typedef enum {
@@ -204,14 +215,14 @@ typedef enum {
 
 #define MAX_AXIS_RANGE 127
 #define JOY_TO_CURSOR_SPEED                                                    \
-  (arcMath::M_MS2SEC * common->GetUserCmdMSec() * 1.5f * 140.f)
+  (anMath::M_MS2SEC * common->GetUserCmdMSec() * 1.5f * 140.f)
 
 typedef struct sysEvent_s {
   sysEventType_t evType;
   int evValue;
   int evValue2;
   int evPtrLength; // bytes of data pointed to by evPtr, for journaling
-  void *evPtr;     // this must be manually freed if not NULL
+  void *evPtr;     // this must be manually freed if not nullptr
 } sysEvent_t;
 
 typedef struct sysMemoryStats_s {
@@ -227,7 +238,7 @@ typedef struct sysMemoryStats_s {
 
 typedef unsigned long address_t;
 
-template <class type> class arcNetList; // for Sys_ListFiles
+template <class type> class anList; // for Sys_ListFiles
 
 struct sysTime_t {
   int tm_sec;   // seconds after the minute - [0,59]
@@ -254,10 +265,10 @@ void Sys_SetClipboardData(const char *string);
 
 // will go to the various text consoles
 // NOT thread safe - never use in the async paths
-void Sys_Printf(const char *msg, ...) arc_attribute((format(printf, 1, 2)));
+void Sys_Printf(const char *msg, ...) an_attribute((format(printf, 1, 2)));
 
 // guaranteed to be thread-safe
-void Sys_DebugPrintf(const char *fmt, ...) arc_attribute((format(printf, 1, 2)));
+void Sys_DebugPrintf(const char *fmt, ...) an_attribute((format(printf, 1, 2)));
 void Sys_DebugVPrintf(const char *fmt, va_list arg);
 
 // a decent minimum sleep time to avoid going below the process scheduler speeds
@@ -266,7 +277,7 @@ void Sys_DebugVPrintf(const char *fmt, va_list arg);
 // allow game to yield CPU time
 // NOTE: due to SYS_MINSLEEP this is very bad portability karma, and should be
 // completely removed
-void Sys_Sleep(int msec);
+void Sys_Sleep( intmsec);
 
 // Sys_Milliseconds should only be used for profiling purposes,
 // any game related timing information should come from event timeStamps
@@ -290,13 +301,13 @@ void Sys_FPU_ClearStack( void );
 const char *Sys_FPU_GetState( void );
 
 // enables the given FPU exceptions
-void Sys_FPU_EnableExceptions(int exceptions);
+void Sys_FPU_EnableExceptions( intexceptions);
 
 // sets the FPU precision
-void Sys_FPU_SetPrecision(int precision);
+void Sys_FPU_SetPrecision( intprecision);
 
 // sets the FPU rounding mode
-void Sys_FPU_SetRounding(int rounding);
+void Sys_FPU_SetRounding( introunding);
 
 // sets Flush-To-Zero mode (only available when CPUID_FTZ is set)
 void Sys_FPU_SetFTZ(bool enable);
@@ -314,29 +325,29 @@ int Sys_GetVideoRam( void );
 int Sys_GetDriveFreeSpace(const char *path);
 
 // returns memory stats
-void Sys_GetCurrentMemoryStatus(sysMemoryStats_t &stats);
-void Sys_GetExeLaunchMemoryStatus(sysMemoryStats_t &stats);
+void Sys_GetCurrentMemoryStatus( sysMemoryStats_t &stats);
+void Sys_GetExeLaunchMemoryStatus( sysMemoryStats_t &stats);
 
 // lock and unlock memory
 bool Sys_LockMemory(void *ptr, int bytes);
 bool Sys_UnlockMemory(void *ptr, int bytes);
 
 // set amount of physical work memory
-void Sys_SetPhysicalWorkMemory(int minBytes, int maxBytes);
+void Sys_SetPhysicalWorkMemory( intminBytes, int maxBytes);
 
 // allows retrieving the call stack at execution points
 void Sys_GetCallStack(address_t *callStack, const int callStackSize);
 const char *Sys_GetCallStackStr(const address_t *callStack,
                                 const int callStackSize);
-const char *Sys_GetCallStackCurStr(int depth);
-const char *Sys_GetCallStackCurAddressStr(int depth);
+const char *Sys_GetCallStackCurStr( intdepth);
+const char *Sys_GetCallStackCurAddressStr( intdepth);
 void Sys_ShutdownSymbols( void );
 
 // DLL loading, the path should be a fully qualified OS path to the DLL file to
 // be loaded
 int Sys_DLL_Load(const char *dllName);
-void *Sys_DLL_GetProcAddress(int dllHandle, const char *procName);
-void Sys_DLL_Unload(int dllHandle);
+void *Sys_DLL_GetProcAddress( intdllHandle, const char *procName);
+void Sys_DLL_Unload( intdllHandle);
 
 // event generation
 void Sys_GenerateEvents( void );
@@ -353,7 +364,7 @@ unsigned char Sys_GetConsoleKey(bool shifted);
 // map a scancode key to a char
 // does nothing on win32, as SE_KEY == SE_CHAR there
 // on other OSes, consider the keyboard mapping
-unsigned char Sys_MapCharForKey(int key);
+unsigned char Sys_MapCharForKey( intkey);
 
 // keyboard input polling
 int Sys_PollKeyboardInputEvents( void );
@@ -372,7 +383,7 @@ void Sys_GrabMouseCursor(bool grabIt);
 
 void Sys_ShowWindow(bool show);
 bool Sys_IsWindowVisible( void );
-void Sys_ShowConsole(int visLevel, bool quitOnClose);
+void Sys_ShowConsole( intvisLevel, bool quitOnClose);
 
 void Sys_Mkdir(const char *path);
 ARC_TIME_T Sys_FileTimeStamp(FILE *fp);
@@ -386,7 +397,7 @@ const char *Sys_EXEPath( void );
 // use fs_debug to verbose Sys_ListFiles
 // returns -1 if directory was not found (the list is cleared)
 int Sys_ListFiles(const char *directory, const char *extension,
-                  arcNetList<class arcNetString> &list);
+                  anList<class anString> &list);
 
 // know early if we are performing a fatal error shutdown so the error message
 // doesn't get lost
@@ -425,7 +436,7 @@ public:
   // bool		InitForPort( int portNumber, bool vdp = false );
 
   // if the InitForPort fails, the idPort.port field will remain 0
-  bool InitForPort(int portNumber);
+  bool InitForPort( intportNumber);
   int GetPort( void ) const { return bound_to.port; }
   // int			GetPort( void ) const { return port; }
   int GetSocket( void ) const { return netSocket; }
@@ -460,7 +471,7 @@ private:
 idPort::GetTrafficStats
 ===============
 */
-ARC_INLINE void idPort::GetTrafficStats(int &_bytesSent, int &_packetsSent,
+ARC_INLINE void idPort::GetTrafficStats( int&_bytesSent, int &_packetsSent,
                                        int &_bytesReceived,
                                        int &_packetsReceived) const {
   _bytesSent = bytesWritten;
@@ -499,7 +510,7 @@ public:
   // returns -1 on failure (and closes socket)
   // those are non blocking, can be used for polling
   // there is no buffering, you are not guaranteed to Read or Write everything
-  // in a single call (specially on win32, see recv and send documentation)
+  // in a single call ( specially on win32, see recv and send documentation)
   int Read(void *data, int size);
   int Write(void *data, int size);
 
@@ -572,8 +583,8 @@ void Sys_CreateThread(xthread_t function, void *parms, xthreadPriority priority,
 void Sys_DestroyThread(xthreadInfo &info); // sets threadHandle back to 0
 
 // find the name of the calling thread
-// if index != NULL, set the index in g_threads array (use -1 for "main" thread)
-const char *Sys_GetThreadName(int *index = 0);
+// if index != nullptr, set the index in g_threads array (use -1 for "main" thread)
+const char *Sys_GetThreadName( int*index = 0);
 
 const int MAX_CRITICAL_SECTIONS = 4;
 
@@ -584,8 +595,8 @@ enum {
   CRITICAL_SECTION_THREE
 };
 
-void Sys_EnterCriticalSection(int index = CRITICAL_SECTION_ZERO);
-void Sys_LeaveCriticalSection(int index = CRITICAL_SECTION_ZERO);
+void Sys_EnterCriticalSection( int index = CRITICAL_SECTION_ZERO);
+void Sys_LeaveCriticalSection( int index = CRITICAL_SECTION_ZERO);
 
 const int MAX_TRIGGER_EVENTS = 4;
 
@@ -596,8 +607,8 @@ enum {
   TRIGGER_EVENT_THREE
 };
 
-void Sys_WaitForEvent(int index = TRIGGER_EVENT_ZERO);
-void Sys_TriggerEvent(int index = TRIGGER_EVENT_ZERO);
+void Sys_WaitForEvent( int index = TRIGGER_EVENT_ZERO);
+void Sys_TriggerEvent( int index = TRIGGER_EVENT_ZERO);
 
 /*
 ==============================================================
@@ -610,7 +621,7 @@ void Sys_TriggerEvent(int index = TRIGGER_EVENT_ZERO);
 class arcSystem {
 public:
   virtual void DebugPrintf(const char *fmt, ...)
-      arc_attribute((format(printf, 2, 3))) = 0;
+      an_attribute((format(printf, 2, 3))) = 0;
   virtual void DebugVPrintf(const char *fmt, va_list arg) = 0;
 
   virtual double GetClockTicks( void ) = 0;
@@ -622,7 +633,7 @@ public:
   virtual void FPU_SetFTZ(bool enable) = 0;
   virtual void FPU_SetDAZ(bool enable) = 0;
 
-  virtual void FPU_EnableExceptions(int exceptions) = 0;
+  virtual void FPU_EnableExceptions( intexceptions) = 0;
 
   virtual bool LockMemory(void *ptr, int bytes) = 0;
   virtual bool UnlockMemory(void *ptr, int bytes) = 0;
@@ -630,17 +641,17 @@ public:
   virtual void GetCallStack(address_t *callStack, const int callStackSize) = 0;
   virtual const char *GetCallStackStr(const address_t *callStack,
                                       const int callStackSize) = 0;
-  virtual const char *GetCallStackCurStr(int depth) = 0;
+  virtual const char *GetCallStackCurStr( intdepth) = 0;
   virtual void ShutdownSymbols( void ) = 0;
 
   virtual int DLL_Load(const char *dllName) = 0;
-  virtual void *DLL_GetProcAddress(int dllHandle, const char *procName) = 0;
-  virtual void DLL_Unload(int dllHandle) = 0;
+  virtual void *DLL_GetProcAddress( intdllHandle, const char *procName) = 0;
+  virtual void DLL_Unload( intdllHandle) = 0;
   virtual void DLL_GetFileName(const char *baseName, char *dllName,
                                int maxLength) = 0;
 
-  virtual sysEvent_t GenerateMouseButtonEvent(int button, bool down) = 0;
-  virtual sysEvent_t GenerateMouseMoveEvent(int deltax, int deltay) = 0;
+  virtual sysEvent_t GenerateMouseButtonEvent( intbutton, bool down) = 0;
+  virtual sysEvent_t GenerateMouseMoveEvent( intdeltax, int deltay) = 0;
 
   virtual void OpenURL(const char *url, bool quit) = 0;
   virtual void StartProcess(const char *exePath, bool quit) = 0;

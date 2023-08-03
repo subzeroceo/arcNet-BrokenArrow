@@ -4,28 +4,28 @@
 /*
 ==============================================================================
 
-idLinkList
+anLinkList
 
 Circular linked list template
 
 ==============================================================================
 */
 
-template< class type >
-class idLinkList {
+template<class type>
+class anLinkList {
 public:
-						idLinkList();
-						~idLinkList();
+						anLinkList();
+						~anLinkList();
 
 	bool				IsListEmpty( void ) const;
 	bool				InList( void ) const;
 	int					Num( void ) const;
 	void				Clear( void );
 
-	void				InsertBefore( idLinkList &node );
-	void				InsertAfter( idLinkList &node );
-	void				AddToEnd( idLinkList &node );
-	void				AddToFront( idLinkList &node );
+	void				InsertBefore( anLinkList &node );
+	void				InsertAfter( anLinkList &node );
+	void				AddToEnd( anLinkList &node );
+	void				AddToFront( anLinkList &node );
 
 	void				Remove( void );
 
@@ -35,27 +35,27 @@ public:
 	type *				Owner( void ) const;
 	void				SetOwner( type *object );
 
-	idLinkList *		ListHead( void ) const;
-	idLinkList *		NextNode( void ) const;
-	idLinkList *		PrevNode( void ) const;
+	anLinkList *		ListHead( void ) const;
+	anLinkList *		NextNode( void ) const;
+	anLinkList *		PrevNode( void ) const;
 
 private:
-	idLinkList *		head;
-	idLinkList *		next;
-	idLinkList *		prev;
+	anLinkList *		head;
+	anLinkList *		next;
+	anLinkList *		prev;
 	type *				owner;
 };
 
 /*
 ================
-idLinkList<type>::idLinkList
+anLinkList<type>::anLinkList
 
 Node is initialized to be the head of an empty list
 ================
 */
-template< class type >
-idLinkList<type>::idLinkList() {
-	owner	= NULL;
+template<class type>
+anLinkList<type>::anLinkList() {
+	owner	= nullptr;
 	head	= this;
 	next	= this;
 	prev	= this;
@@ -63,51 +63,51 @@ idLinkList<type>::idLinkList() {
 
 /*
 ================
-idLinkList<type>::~idLinkList
+anLinkList<type>::~anLinkList
 
 Removes the node from the list, or if it's the head of a list, removes
 all the nodes from the list.
 ================
 */
-template< class type >
-idLinkList<type>::~idLinkList() {
+template<class type>
+anLinkList<type>::~anLinkList() {
 	Clear();
 }
 
 /*
 ================
-idLinkList<type>::IsListEmpty
+anLinkList<type>::IsListEmpty
 
 Returns true if the list is empty.
 ================
 */
-template< class type >
-bool idLinkList<type>::IsListEmpty( void ) const {
+template<class type>
+bool anLinkList<type>::IsListEmpty( void ) const {
 	return head->next == head;
 }
 
 /*
 ================
-idLinkList<type>::InList
+anLinkList<type>::InList
 
 Returns true if the node is in a list.  If called on the head of a list, will always return false.
 ================
 */
-template< class type >
-bool idLinkList<type>::InList( void ) const {
+template<class type>
+bool anLinkList<type>::InList( void ) const {
 	return head != this;
 }
 
 /*
 ================
-idLinkList<type>::Num
+anLinkList<type>::Num
 
 Returns the number of nodes in the list.
 ================
 */
-template< class type >
-int idLinkList<type>::Num( void ) const {
-	idLinkList<type>	*node;
+template<class type>
+int anLinkList<type>::Num( void ) const {
+	anLinkList<type>	*node;
 	int					num;
 
 	num = 0;
@@ -120,13 +120,13 @@ int idLinkList<type>::Num( void ) const {
 
 /*
 ================
-idLinkList<type>::Clear
+anLinkList<type>::Clear
 
 If node is the head of the list, clears the list.  Otherwise it just removes the node from the list.
 ================
 */
-template< class type >
-void idLinkList<type>::Clear( void ) {
+template<class type>
+void anLinkList<type>::Clear( void ) {
 	if ( head == this ) {
 		while( next != this ) {
 			next->Remove();
@@ -138,13 +138,13 @@ void idLinkList<type>::Clear( void ) {
 
 /*
 ================
-idLinkList<type>::Remove
+anLinkList<type>::Remove
 
 Removes node from list
 ================
 */
-template< class type >
-void idLinkList<type>::Remove( void ) {
+template<class type>
+void anLinkList<type>::Remove( void ) {
 	prev->next = next;
 	next->prev = prev;
 
@@ -155,14 +155,14 @@ void idLinkList<type>::Remove( void ) {
 
 /*
 ================
-idLinkList<type>::InsertBefore
+anLinkList<type>::InsertBefore
 
 Places the node before the existing node in the list.  If the existing node is the head,
 then the new node is placed at the end of the list.
 ================
 */
-template< class type >
-void idLinkList<type>::InsertBefore( idLinkList &node ) {
+template<class type>
+void anLinkList<type>::InsertBefore( anLinkList &node ) {
 	Remove();
 
 	next		= &node;
@@ -174,14 +174,14 @@ void idLinkList<type>::InsertBefore( idLinkList &node ) {
 
 /*
 ================
-idLinkList<type>::InsertAfter
+anLinkList<type>::InsertAfter
 
 Places the node after the existing node in the list.  If the existing node is the head,
 then the new node is placed at the beginning of the list.
 ================
 */
-template< class type >
-void idLinkList<type>::InsertAfter( idLinkList &node ) {
+template<class type>
+void anLinkList<type>::InsertAfter( anLinkList &node ) {
 	Remove();
 
 	prev		= &node;
@@ -193,122 +193,122 @@ void idLinkList<type>::InsertAfter( idLinkList &node ) {
 
 /*
 ================
-idLinkList<type>::AddToEnd
+anLinkList<type>::AddToEnd
 
 Adds node at the end of the list
 ================
 */
-template< class type >
-void idLinkList<type>::AddToEnd( idLinkList &node ) {
+template<class type>
+void anLinkList<type>::AddToEnd( anLinkList &node ) {
 	InsertBefore( *node.head );
 }
 
 /*
 ================
-idLinkList<type>::AddToFront
+anLinkList<type>::AddToFront
 
 Adds node at the beginning of the list
 ================
 */
-template< class type >
-void idLinkList<type>::AddToFront( idLinkList &node ) {
+template<class type>
+void anLinkList<type>::AddToFront( anLinkList &node ) {
 	InsertAfter( *node.head );
 }
 
 /*
 ================
-idLinkList<type>::ListHead
+anLinkList<type>::ListHead
 
 Returns the head of the list.  If the node isn't in a list, it returns
 a pointer to itself.
 ================
 */
-template< class type >
-idLinkList<type> *idLinkList<type>::ListHead( void ) const {
+template<class type>
+anLinkList<type> *anLinkList<type>::ListHead( void ) const {
 	return head;
 }
 
 /*
 ================
-idLinkList<type>::Next
+anLinkList<type>::Next
 
-Returns the next object in the list, or NULL if at the end.
+Returns the next object in the list, or nullptr if at the end.
 ================
 */
-template< class type >
-type *idLinkList<type>::Next( void ) const {
+template<class type>
+type *anLinkList<type>::Next( void ) const {
 	if ( !next || ( next == head ) ) {
-		return NULL;
+		return nullptr;
 	}
 	return next->owner;
 }
 
 /*
 ================
-idLinkList<type>::Prev
+anLinkList<type>::Prev
 
-Returns the previous object in the list, or NULL if at the beginning.
+Returns the previous object in the list, or nullptr if at the beginning.
 ================
 */
-template< class type >
-type *idLinkList<type>::Prev( void ) const {
+template<class type>
+type *anLinkList<type>::Prev( void ) const {
 	if ( !prev || ( prev == head ) ) {
-		return NULL;
+		return nullptr;
 	}
 	return prev->owner;
 }
 
 /*
 ================
-idLinkList<type>::NextNode
+anLinkList<type>::NextNode
 
-Returns the next node in the list, or NULL if at the end.
+Returns the next node in the list, or nullptr if at the end.
 ================
 */
-template< class type >
-idLinkList<type> *idLinkList<type>::NextNode( void ) const {
+template<class type>
+anLinkList<type> *anLinkList<type>::NextNode( void ) const {
 	if ( next == head ) {
-		return NULL;
+		return nullptr;
 	}
 	return next;
 }
 
 /*
 ================
-idLinkList<type>::PrevNode
+anLinkList<type>::PrevNode
 
-Returns the previous node in the list, or NULL if at the beginning.
+Returns the previous node in the list, or nullptr if at the beginning.
 ================
 */
-template< class type >
-idLinkList<type> *idLinkList<type>::PrevNode( void ) const {
+template<class type>
+anLinkList<type> *anLinkList<type>::PrevNode( void ) const {
 	if ( prev == head ) {
-		return NULL;
+		return nullptr;
 	}
 	return prev;
 }
 
 /*
 ================
-idLinkList<type>::Owner
+anLinkList<type>::Owner
 
 Gets the object that is associated with this node.
 ================
 */
-template< class type >
-type *idLinkList<type>::Owner( void ) const {
+template<class type>
+type *anLinkList<type>::Owner( void ) const {
 	return owner;
 }
 
 /*
 ================
-idLinkList<type>::SetOwner
+anLinkList<type>::SetOwner
 
 Sets the object that this node is associated with.
 ================
 */
-template< class type >
-void idLinkList<type>::SetOwner( type *object ) {
+template<class type>
+void anLinkList<type>::SetOwner( type *object ) {
 	owner = object;
 }
 

@@ -17,7 +17,7 @@
 //	useful.
 
 //#include "stdafx.h"
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "PropTree.h"
@@ -40,7 +40,7 @@ extern HINSTANCE ghInst;
 // CPropTreeList
 
 CPropTreeList::CPropTreeList() :
-	m_pProp(NULL),
+	m_pProp(nullptr ),
 	m_BackBufferSize(0,0 ),
 	m_bColDrag(FALSE),
 	m_nPrevCol(0 )
@@ -82,7 +82,7 @@ BOOL CPropTreeList::Create(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UI
 {
 	CWnd* pWnd = this;
 
-	LPCTSTR pszCreateClass = AfxRegisterWndClass(CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS, ::LoadCursor(NULL, IDC_ARROW) );
+	LPCTSTR pszCreateClass = AfxRegisterWndClass(CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS, ::LoadCursor(nullptr, IDC_ARROW) );
 
 	return pWnd->Create(pszCreateClass, _T( "" ), dwStyle, rect, pParentWnd, nID);
 }
@@ -112,13 +112,13 @@ void CPropTreeList::RecreateBackBuffer( int cx, int cy)
 	{
 		m_BackBufferSize = CSize(cx, cy);
 
-		CWindowDC dc(NULL);
+		CWindowDC dc(nullptr );
 
 		int nPlanes = dc.GetDeviceCaps(PLANES);
 		int nBitCount = dc.GetDeviceCaps(BITSPIXEL);
 
 		m_BackBuffer.DeleteObject();
-		m_BackBuffer.CreateBitmap(cx, cy, nPlanes, nBitCount, NULL);
+		m_BackBuffer.CreateBitmap(cx, cy, nPlanes, nBitCount, nullptr );
 	}
 }
 
@@ -129,7 +129,7 @@ void CPropTreeList::UpdateResize()
 	LONG nHeight;
 	CRect rc;
 
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	GetClientRect(rc);
 	nHeight = rc.Height() + 1;
@@ -157,7 +157,7 @@ void CPropTreeList::OnPaint()
 	CDC memdc;
 	CBitmap* pOldBitmap;
 
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	m_pProp->ClearVisibleList();
 
@@ -186,7 +186,7 @@ void CPropTreeList::OnPaint()
 	CPropTreeItem* pItem;
 	LONG nTotal = 0;
 
-	ASSERT(m_pProp->GetRootItem()!=NULL);
+	ASSERT(m_pProp->GetRootItem()!=nullptr );
 
 	rc.DeflateRect(2,2);
 
@@ -202,7 +202,7 @@ void CPropTreeList::OnPaint()
 	}
 
 	// remove clip region
-	SelectClipRgn(memdc.m_hDC, NULL);
+	SelectClipRgn(memdc.m_hDC, nullptr );
 	DeleteObject(hRgn);
 
 	// copy back buffer to the display
@@ -218,7 +218,7 @@ BOOL CPropTreeList::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	{
 		CPoint pt;
 
-		ASSERT(m_pProp!=NULL);
+		ASSERT(m_pProp!=nullptr );
 
 		GetCursorPos(&pt);
 		ScreenToClient(&pt);
@@ -226,13 +226,13 @@ BOOL CPropTreeList::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		switch (m_pProp->HitTest(pt) )
 		{
 			case HTCOLUMN:
-				SetCursor(LoadCursor(ghInst, MAKEINTRESOURCE(IDC_SPLITTER) ));
+				SetCursor(LoadCursor(ghInst, MAKEINTRESOURCE(IDC_SPLITTER) ) );
 				return TRUE;
 
 			case HTCHECKBOX:
 			case HTBUTTON:
 			case HTEXPAND:
-				SetCursor(LoadCursor(ghInst, MAKEINTRESOURCE(IDC_FPOINT) ));
+				SetCursor(LoadCursor(ghInst, MAKEINTRESOURCE(IDC_FPOINT) ) );
 				return TRUE;
 		}
 	}
@@ -243,7 +243,7 @@ BOOL CPropTreeList::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 void CPropTreeList::OnLButtonDown(UINT, CPoint point)
 {
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	if (m_pProp->IsDisableInput() )
 		return;
@@ -280,7 +280,7 @@ void CPropTreeList::OnLButtonDown(UINT, CPoint point)
 			break;
 
 		case HTCHECKBOX:
-			if ((pItem = m_pProp->FindItem( point ) )!=NULL)
+			if ((pItem = m_pProp->FindItem( point ) )!=nullptr )
 			{
 				pItem->Check( !pItem->IsChecked() );
 				m_pProp->SendNotify(PTN_CHECKCLICK, pItem);
@@ -288,7 +288,7 @@ void CPropTreeList::OnLButtonDown(UINT, CPoint point)
 			}
 			break;
 		case HTBUTTON:
-			if ((pItem = m_pProp->FindItem( point ) )!=NULL)
+			if ((pItem = m_pProp->FindItem( point ) )!=nullptr )
 			{
 				pItem->Check();
 				m_pProp->SendNotify(PTN_ITEMBUTTONCLICK, pItem);
@@ -296,7 +296,7 @@ void CPropTreeList::OnLButtonDown(UINT, CPoint point)
 			}
 			break;
 		case HTEXPAND:
-			if ((pItem = m_pProp->FindItem( point ) )!=NULL)
+			if ((pItem = m_pProp->FindItem( point ) )!=nullptr )
 			{
 				if (pItem->GetChild() && !m_pProp->SendNotify(PTN_ITEMEXPANDING, pItem) )
 				{
@@ -311,11 +311,11 @@ void CPropTreeList::OnLButtonDown(UINT, CPoint point)
 			break;
 
 		default:
-			if ((pItem = m_pProp->FindItem( point ) )!=NULL)
+			if ((pItem = m_pProp->FindItem( point ) )!=nullptr )
 			{
 				CPropTreeItem* pOldFocus = m_pProp->GetFocusedItem();
 
-				m_pProp->SelectItems(NULL, FALSE);
+				m_pProp->SelectItems(nullptr, FALSE);
 				m_pProp->SetFocusedItem(pItem);
 
 				pItem->Select();
@@ -333,8 +333,8 @@ void CPropTreeList::OnLButtonDown(UINT, CPoint point)
 			}
 			else
 			{
-				m_pProp->SelectItems(NULL, FALSE);
-				m_pProp->SetFocusedItem(NULL);
+				m_pProp->SelectItems(nullptr, FALSE);
+				m_pProp->SetFocusedItem(nullptr );
 				m_pProp->SendNotify(PTN_SELCHANGE);
 				Invalidate();
 			}
@@ -367,7 +367,7 @@ void CPropTreeList::OnLButtonUp(UINT, CPoint point)
 		switch (nHit)
 		{
 			case HTBUTTON:
-				if ((pItem = m_pProp->FindItem( point ) )!=NULL)
+				if ((pItem = m_pProp->FindItem( point ) )!=nullptr )
 				{
 					pItem->Check( FALSE );
 					Invalidate();
@@ -382,14 +382,14 @@ void CPropTreeList::OnLButtonUp(UINT, CPoint point)
 
 void CPropTreeList::OnLButtonDblClk(UINT, CPoint point)
 {
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	m_pProp->SendNotify(NM_DBLCLK);
 
 	CPropTreeItem* pItem;
 	CPropTreeItem* pOldFocus;
 
-	if ((pItem = m_pProp->FindItem( point ) )!=NULL && pItem->GetChild() )
+	if ((pItem = m_pProp->FindItem( point ) )!=nullptr && pItem->GetChild() )
 	{
 		switch (m_pProp->HitTest( point ) )
 		{
@@ -410,7 +410,7 @@ void CPropTreeList::OnLButtonDblClk(UINT, CPoint point)
 
 			default:
 				pOldFocus = m_pProp->GetFocusedItem();
-				m_pProp->SelectItems(NULL, FALSE);
+				m_pProp->SelectItems(nullptr, FALSE);
 				m_pProp->SetFocusedItem(pItem);
 				pItem->Select();
 
@@ -468,7 +468,7 @@ BOOL CPropTreeList::OnMouseWheel(UINT, short zDelta, CPoint)
 		return TRUE;
 
 	SetFocus();
-	OnVScroll(zDelta < 0 ? SB_LINEDOWN : SB_LINEUP, 0, NULL);
+	OnVScroll(zDelta < 0 ? SB_LINEDOWN : SB_LINEUP, 0, nullptr );
 
 	return TRUE;
 }
@@ -479,7 +479,7 @@ void CPropTreeList::OnKeyDown(UINT nChar, UINT, UINT)
 
 	CPropTreeItem* pItem;
 
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	if (m_pProp->IsDisableInput() || !m_pProp->IsWindowEnabled() )
 		return;
@@ -487,7 +487,7 @@ void CPropTreeList::OnKeyDown(UINT nChar, UINT, UINT)
 	switch (nChar)
 	{
 		case VK_RETURN:
-			if ((pItem = m_pProp->GetFocusedItem() )!=NULL && !pItem->IsRootLevel() && !pItem->IsReadOnly() )
+			if ((pItem = m_pProp->GetFocusedItem() )!=nullptr && !pItem->IsRootLevel() && !pItem->IsReadOnly() )
 			{
 				pItem->Activate(CPropTreeItem::ACTIVATE_TYPE_KEYBOARD, CPoint(0,0 ) );
 			}
@@ -504,7 +504,7 @@ void CPropTreeList::OnKeyDown(UINT nChar, UINT, UINT)
 			break;
 
 		case VK_LEFT:
-			if ((pItem = m_pProp->GetFocusedItem() )!=NULL)
+			if ((pItem = m_pProp->GetFocusedItem() )!=nullptr )
 			{
 				if ( !m_pProp->SendNotify(PTN_ITEMEXPANDING, pItem) )
 				{
@@ -528,7 +528,7 @@ void CPropTreeList::OnKeyDown(UINT nChar, UINT, UINT)
 			break;
 
 		case VK_RIGHT:
-			if ((pItem = m_pProp->GetFocusedItem() )!=NULL)
+			if ((pItem = m_pProp->GetFocusedItem() )!=nullptr )
 			{
 				if ( !m_pProp->SendNotify(PTN_ITEMEXPANDING, pItem) )
 				{
@@ -615,11 +615,11 @@ void CPropTreeList::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar*)
 
 void CPropTreeList::CheckVisibleFocus()
 {
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	CPropTreeItem* pItem;
 
-	if ((pItem = m_pProp->GetFocusedItem() )==NULL)
+	if ((pItem = m_pProp->GetFocusedItem() )==nullptr )
 		return;
 
 	if ( !m_pProp->IsItemVisible(pItem) )
@@ -627,8 +627,8 @@ void CPropTreeList::CheckVisibleFocus()
 		if (m_pProp->IsSingleSelection() )
 			pItem->Select(FALSE);
 
-		m_pProp->SetFocusedItem(NULL);
-		m_pProp->SendNotify(PTN_SELCHANGE, NULL);
+		m_pProp->SetFocusedItem(nullptr );
+		m_pProp->SendNotify(PTN_SELCHANGE, nullptr );
 
 		Invalidate();
 	}

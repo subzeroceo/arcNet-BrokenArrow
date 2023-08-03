@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -7,7 +7,7 @@
 #include "DialogInfo.h"
 #include "splines.h"
 #include "../../renderer/tr_local.h"
-#include "../../renderer/model_local.h"	// for ARCLiquidModel
+#include "../../renderer/model_local.h"	// for anLiquidModel
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -38,8 +38,8 @@ brush_t			g_brClipboard;
 brush_t			g_brUndo;
 entity_t		g_enClipboard;
 
-arcVec3			g_vRotateOrigin;
-arcVec3			g_vRotation;
+anVec3			g_vRotateOrigin;
+anVec3			g_vRotation;
 
 bool			g_bPathMode;
 CClipPoint		g_PathPoints[256];
@@ -60,7 +60,7 @@ const int		XY_RIGHT = 0x02;
 const int		XY_UP = 0x04;
 const int		XY_DOWN = 0x08;
 
-PFNPathCallback *g_pPathFunc = NULL;
+PFNPathCallback *g_pPathFunc = nullptr;
 void	Select_Ungroup();
 
 void AcquirePath( int nCount, PFNPathCallback *pFunc) {
@@ -89,10 +89,10 @@ float fDiff(float f1, float f2) {
 #define MAX_DRAG_POINTS 128
 
 CPtrArray			dragPoints;
-static CDragPoint	*activeDrag = NULL;
+static CDragPoint	*activeDrag = nullptr;
 static bool			activeDragging = false;
 
-bool CDragPoint::PointWithin(arcVec3 p, int nView) {
+bool CDragPoint::PointWithin(anVec3 p, int nView) {
 	if (nView == -1 ) {
 		if (fDiff(p[0], vec[0] ) <= 3 && fDiff(p[1], vec[1] ) <= 3 && fDiff(p[2], vec[2] ) <= 3) {
 			return true;
@@ -108,12 +108,12 @@ bool CDragPoint::PointWithin(arcVec3 p, int nView) {
 	return false;
 }
 
-CDragPoint *PointRay(const arcVec3 &org, const arcVec3 &dir, float *dist) {
+CDragPoint *PointRay(const anVec3 &org, const anVec3 &dir, float *dist) {
 	int			i, besti;
 	float		d, bestd;
-	arcVec3		temp;
-	CDragPoint	*drag = NULL;
-	CDragPoint	*priority = NULL;
+	anVec3		temp;
+	CDragPoint	*drag = nullptr;
+	CDragPoint	*priority = nullptr;
 
 	// find the point closest to the ray
 	float scale = g_pParentWnd->ActiveXY()->Scale();
@@ -131,17 +131,17 @@ CDragPoint *PointRay(const arcVec3 &org, const arcVec3 &dir, float *dist) {
 		if ( d < bestd ) {
 			bestd = d;
 			besti = i;
-			if (priority == NULL) {
+			if (priority == nullptr ) {
 				priority = reinterpret_cast < CDragPoint * > (dragPoints[besti] );
 				if ( !priority->priority) {
-					priority = NULL;
+					priority = nullptr;
 				}
 			}
 		}
 	}
 
 	if (besti == -1 ) {
-		return NULL;
+		return nullptr;
 	}
 
 	drag = reinterpret_cast < CDragPoint * > (dragPoints[besti] );
@@ -153,7 +153,7 @@ CDragPoint *PointRay(const arcVec3 &org, const arcVec3 &dir, float *dist) {
 }
 
 void ClearSelectablePoints(brush_t *b) {
-	if (b == NULL) {
+	if (b == nullptr ) {
 		dragPoints.RemoveAll();
 	} else {
 		CPtrArray	ptr;
@@ -171,11 +171,11 @@ void ClearSelectablePoints(brush_t *b) {
 	}
 }
 
-void AddSelectablePoint(brush_t *b, arcVec3 v, int type, bool priority) {
+void AddSelectablePoint(brush_t *b, anVec3 v, int type, bool priority) {
 	dragPoints.Add(new CDragPoint(b, v, type, priority) );
 }
 
-void UpdateSelectablePoint(brush_t *b, arcVec3 v, int type) {
+void UpdateSelectablePoint(brush_t *b, anVec3 v, int type) {
 	int count = dragPoints.GetSize();
 	for ( int i = 0; i < count; i++ ) {
 		CDragPoint	*drag = reinterpret_cast < CDragPoint * > (dragPoints.GetAt( i ) );
@@ -186,7 +186,7 @@ void UpdateSelectablePoint(brush_t *b, arcVec3 v, int type) {
 	}
 }
 
-void VectorToAngles( arcVec3 vec, arcVec3 angles ) {
+void VectorToAngles( anVec3 vec, anVec3 angles ) {
 	float	forward;
 	float	yaw, pitch;
 
@@ -203,7 +203,7 @@ void VectorToAngles( arcVec3 vec, arcVec3 angles ) {
 			yaw += 360;
 		}
 
-		forward = ( float )arcMath::Sqrt(vec[0] * vec[0] + vec[1] * vec[1] );
+		forward = ( float )anMath::Sqrt(vec[0] * vec[0] + vec[1] * vec[1] );
 		pitch = RAD2DEG( atan2(vec[2], forward) );
 		if (pitch < 0 ) {
 			pitch += 360;
@@ -217,16 +217,16 @@ void VectorToAngles( arcVec3 vec, arcVec3 angles ) {
 // RotateLight target is relative to the light origin up and right are relative to the target up and right are
 // perpendicular and are on a plane through the target with the target vector as normal delta is the movement of the
 // target relative to the light
-void VectorSnapGrid(arcVec3 &v) {
+void VectorSnapGrid(anVec3 &v) {
 	v.x = floor( v.x / g_qeglobals.d_gridsize + 0.5) * g_qeglobals.d_gridsize;
 	v.y = floor( v.y / g_qeglobals.d_gridsize + 0.5) * g_qeglobals.d_gridsize;
 	v.z = floor( v.z / g_qeglobals.d_gridsize + 0.5) * g_qeglobals.d_gridsize;
 }
-static void RotateLight( arcVec3 &target, arcVec3 &up, arcVec3 &right, const arcVec3 &delta ) {
-	arcVec3 dst;
+static void RotateLight( anVec3 &target, anVec3 &up, anVec3 &right, const anVec3 &delta ) {
+	anVec3 dst;
 
 	// calculate new target
-	arcVec3 newtarget = target + delta;
+	anVec3 newtarget = target + delta;
 
 	// get the up and right vector relative to the light origin
 	up += target;
@@ -239,14 +239,14 @@ static void RotateLight( arcVec3 &target, arcVec3 &up, arcVec3 &right, const arc
 		double dp = target * newtarget;
 		double dv = dp / len;
 
-		double angle = RAD2DEG( arcMath::ACos( dv ) );
+		double angle = RAD2DEG( anMath::ACos( dv ) );
 
 		// get a vector orthogonal to the rotation plane
-		arcVec3 cross = target.Cross( newtarget );
+		anVec3 cross = target.Cross( newtarget );
 		cross.Normalize();
 		if ( cross[0] || cross[1] || cross[2] ) {
 			// build the rotation matrix
-			arcMat3 rot = arcRotate( vec3_origin, cross, angle ).ToMat3();
+			anMat3 rot = anRotation( vec3_origin, cross, angle ).ToMat3();
 
 			rot.ProjectVector(target, dst);
 			target = dst;
@@ -259,7 +259,7 @@ static void RotateLight( arcVec3 &target, arcVec3 &up, arcVec3 &right, const arc
 
 	// project the up and right vectors onto a plane that goes through the target and
 	// has normal vector target.Normalize()
-	arcVec3 normal = target;
+	anVec3 normal = target;
 	normal.Normalize();
 	double dist = normal * target;
 
@@ -282,13 +282,13 @@ static void RotateLight( arcVec3 &target, arcVec3 &up, arcVec3 &right, const arc
 	VectorSnapGrid( right );
 }
 
-extern arcVec3 Brush_TransformedPoint(brush_t *b, const arcVec3 &in);
-extern arcMat3 Brush_RotationMatrix(brush_t *b);
-bool UpdateActiveDragPoint(const arcVec3 &move) {
+extern anVec3 Brush_TransformedPoint(brush_t *b, const anVec3 &in);
+extern anMat3 Brush_RotationMatrix(brush_t *b);
+bool UpdateActiveDragPoint(const anVec3 &move) {
 	if (activeDrag) {
-		arcMat3 mat = Brush_RotationMatrix(activeDrag->pBrush);
-		arcMat3 invmat = mat.Transpose();
-		arcVec3	target, up, right, start, end;
+		anMat3 mat = Brush_RotationMatrix(activeDrag->pBrush);
+		anMat3 invmat = mat.Transpose();
+		anVec3	target, up, right, start, end;
 		CString str;
 		if (activeDrag->nType == LIGHT_TARGET) {
 			GetVectorForKey(activeDrag->pBrush->owner, "light_target", target);
@@ -362,8 +362,8 @@ bool UpdateActiveDragPoint(const arcVec3 &move) {
 	return false;
 }
 
-bool SetDragPointCursor(arcVec3 p, int nView) {
-	activeDrag = NULL;
+bool SetDragPointCursor(anVec3 p, int nView) {
+	activeDrag = nullptr;
 
 	int numDragPoints = dragPoints.GetSize();
 	for ( int i = 0; i < numDragPoints; i++ ) {
@@ -380,7 +380,7 @@ void SetActiveDrag(CDragPoint *p) {
 }
 
 void ClearActiveDrag() {
-	activeDrag = NULL;
+	activeDrag = nullptr;
 }
 
 // CXYWnd
@@ -394,8 +394,8 @@ CXYWnd::CXYWnd() {
 	g_bClipMode = false;
 	g_bRogueClipMode = false;
 	g_bSwitch = true;
-	g_pMovingClip = NULL;
-	g_pMovingPath = NULL;
+	g_pMovingClip = nullptr;
+	g_pMovingPath = nullptr;
 	g_brFrontSplits.next = &g_brFrontSplits;
 	g_brBackSplits.next = &g_brBackSplits;
 	m_bActive = false;
@@ -461,7 +461,7 @@ BOOL CXYWnd::PreCreateWindow(CREATESTRUCT &cs) {
 		memset(&wc, 0, sizeof(wc) );
 		wc.style = CS_NOCLOSE;
 		wc.lpszClassName = XY_WINDOW_CLASS;
-		wc.hCursor = NULL;	// LoadCursor (NULL,IDC_ARROW);
+		wc.hCursor = nullptr;	// LoadCursor (nullptr,IDC_ARROW);
 		wc.lpfnWndProc = ::DefWindowProc;
 		if (AfxRegisterClass(&wc) == FALSE) {
 			Error( "CCamWnd RegisterClass: failed" );
@@ -614,7 +614,7 @@ int CXYWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	return 0;
 }
 
-float ptSum(arcVec3 pt) {
+float ptSum(anVec3 pt) {
 	return pt[0] + pt[1] + pt[2];
 }
 
@@ -625,7 +625,7 @@ void CXYWnd::DropClipPoint(UINT nFlags, CPoint point) {
 		SetCapture();
 		SnapToPoint(point.x, rctZ.Height() - 1 - point.y, *g_pMovingClip);
 	} else {
-		arcVec3	*pPt = NULL;
+		anVec3	*pPt = nullptr;
 		if (g_Clip1.Set() == false) {
 			pPt = g_Clip1;
 			g_Clip1.Set(true);
@@ -650,7 +650,7 @@ void CXYWnd::DropClipPoint(UINT nFlags, CPoint point) {
 		// Put the off-viewAxis coordinate at the top or bottom of selected brushes
 		if ( GetAsyncKeyState(VK_CONTROL) & 0x8000 ) {
 			if ( selected_brushes.next != &selected_brushes ) {
-				arcVec3	smins, smaxs;
+				anVec3	smins, smaxs;
 				Select_GetBounds( smins, smaxs );
 				if ( m_nViewType == XY ) {
 					if ( GetAsyncKeyState(VK_SHIFT) & 0x8000 ) {
@@ -694,13 +694,13 @@ void CXYWnd::DropPathPoint(UINT nFlags, CPoint point) {
 			}
 			g_nPathCount = 0;
 			g_bPathMode = false;
-			g_pPathFunc = NULL;
+			g_pPathFunc = nullptr;
 		}
 	}
 	Sys_UpdateWindows(XY | W_CAMERA_IFON);
 }
 
-void CXYWnd::AddPointPoint(UINT nFlags, arcVec3 *pVec) {
+void CXYWnd::AddPointPoint(UINT nFlags, anVec3 *pVec) {
 	g_PointPoints[g_nPointCount].Set(true);
 	//g_PointPoints[g_nPointCount].m_ptScreen = point;
 	g_PointPoints[g_nPointCount].m_ptClip = *pVec;
@@ -714,15 +714,15 @@ void CXYWnd::OnLButtonDown(UINT nFlags, CPoint point) {
 	UndoCopy();
 	if (g_pParentWnd->GetNurbMode() ) {
 		int i, num = g_pParentWnd->GetNurb()->GetNumValues();
-		arcNetList<arcVec2> temp;
+		anList<anVec2> temp;
 			for ( i = 0; i < num; i++ ) {
 			temp.Append(g_pParentWnd->GetNurb()->GetValue( i ) );
 		}
 		CRect	rctZ;
 		GetClientRect(rctZ);
-		arcVec3 v3;
+		anVec3 v3;
 		SnapToPoint(point.x, rctZ.Height() - 1 - point.y, v3);
-		temp.Append(arcVec2(v3.x, v3.y) );
+		temp.Append(anVec2(v3.x, v3.y) );
 		num++;
 		g_pParentWnd->GetNurb()->Clear();
 		for ( i = 0; i < num; i++ ) {
@@ -751,8 +751,8 @@ float Betwixt(float f1, float f2) {
 }
 
 void CXYWnd::ProduceSplits(brush_t **pFront, brush_t **pBack) {
-	*pFront = NULL;
-	*pBack = NULL;
+	*pFront = nullptr;
+	*pBack = nullptr;
 	if (ClipMode() ) {
 		if (g_Clip1.Set() && g_Clip2.Set() ) {
 			face_t	face;
@@ -789,7 +789,7 @@ void CXYWnd::ProduceSplits(brush_t **pFront, brush_t **pBack) {
 
 void CleanList(brush_t *pList) {
 	brush_t *pBrush = pList->next;
-	while (pBrush != NULL && pBrush != pList) {
+	while (pBrush != nullptr && pBrush != pList) {
 		brush_t *pNext = pBrush->next;
 		Brush_Free(pBrush);
 		pBrush = pNext;
@@ -816,9 +816,9 @@ void CXYWnd::ProduceSplitLists() {
 	g_brBackSplits.next = &g_brBackSplits;
 
 	brush_t *pBrush;
-	for (pBrush = selected_brushes.next; pBrush != NULL && pBrush != &selected_brushes; pBrush = pBrush->next) {
-		brush_t *pFront = NULL;
-		brush_t *pBack = NULL;
+	for (pBrush = selected_brushes.next; pBrush != nullptr && pBrush != &selected_brushes; pBrush = pBrush->next) {
+		brush_t *pFront = nullptr;
+		brush_t *pBack = nullptr;
 		if (ClipMode() ) {
 			if (g_Clip1.Set() && g_Clip2.Set() ) {
 				face_t	face;
@@ -862,7 +862,7 @@ void CXYWnd::ProduceSplitLists() {
 
 void Brush_CopyList(brush_t *pFrom, brush_t *pTo) {
 	brush_t *pBrush = pFrom->next;
-	while (pBrush != NULL && pBrush != pFrom) {
+	while (pBrush != nullptr && pBrush != pFrom) {
 		brush_t *pNext = pBrush->next;
 		Brush_RemoveFromList(pBrush);
 		Brush_AddToList(pBrush, pTo);
@@ -896,7 +896,7 @@ void CXYWnd::OnLButtonUp(UINT nFlags, CPoint point) {
 	if (ClipMode() ) {
 		if (g_pMovingClip) {
 			ReleaseCapture();
-			g_pMovingClip = NULL;
+			g_pMovingClip = nullptr;
 		}
 	}
 	OriginalButtonUp(nFlags, point);
@@ -947,12 +947,12 @@ void CXYWnd::OriginalButtonUp(UINT nFlags, CPoint point) {
 	CRect	rctZ;
 	GetClientRect(rctZ);
 	XY_MouseUp(point.x, rctZ.Height() - 1 - point.y, nFlags);
-	if ( !(nFlags & (MK_LBUTTON | MK_RBUTTON | MK_MBUTTON) )) {
+	if ( !(nFlags & (MK_LBUTTON | MK_RBUTTON | MK_MBUTTON) ) ) {
 		ReleaseCapture();
 	}
 }
 
-arcVec3	tdp;
+anVec3	tdp;
 
 void CXYWnd::OnMouseMove(UINT nFlags, CPoint point) {
 	m_ptDown.x = 0;
@@ -977,7 +977,7 @@ void CXYWnd::OnMouseMove(UINT nFlags, CPoint point) {
 		}
 
 		if (m_nTimerID == -1 ) {
-			m_nTimerID = SetTimer(100, 50, NULL);
+			m_nTimerID = SetTimer(100, 50, nullptr );
 			m_ptDrag = point;
 			m_ptDragTotal = 0;
 		}
@@ -1011,7 +1011,7 @@ void CXYWnd::OnMouseMove(UINT nFlags, CPoint point) {
 				g_pMovingPoint->UpdatePointPtr();
 				Sys_UpdateWindows(XY | W_CAMERA_IFON);
 			} else {
-				g_pMovingPoint = NULL;
+				g_pMovingPoint = nullptr;
 
 				int nDim1 = (m_nViewType == YZ) ? 1 : 0;
 				int nDim2 = (m_nViewType == XY) ? 1 : 2;
@@ -1028,7 +1028,7 @@ void CXYWnd::OnMouseMove(UINT nFlags, CPoint point) {
 				SnapToPoint(point.x, m_nHeight - 1 - point.y, g_pMovingClip->m_ptClip);
 				Sys_UpdateWindows(XY | W_CAMERA_IFON);
 			} else {
-				g_pMovingClip = NULL;
+				g_pMovingClip = nullptr;
 
 				int nDim1 = (m_nViewType == YZ) ? 1 : 0;
 				int nDim2 = (m_nViewType == XY) ? 1 : 2;
@@ -1063,7 +1063,7 @@ void CXYWnd::OnMouseMove(UINT nFlags, CPoint point) {
 				SnapToPoint(point.x, m_nHeight - 1 - point.y, g_pMovingPath->m_ptClip);
 				Sys_UpdateWindows(XY | W_CAMERA_IFON);
 			} else {
-				g_pMovingPath = NULL;
+				g_pMovingPath = nullptr;
 
 				int nDim1 = (m_nViewType == YZ) ? 1 : 0;
 				int nDim2 = (m_nViewType == XY) ? 1 : 2;
@@ -1082,9 +1082,9 @@ void CXYWnd::OnMouseMove(UINT nFlags, CPoint point) {
 	}
 
 	if (bCrossHair) {
-		SetCursor(::LoadCursor(NULL, IDC_CROSS) );
+		SetCursor(::LoadCursor(nullptr, IDC_CROSS) );
 	} else {
-		SetCursor(::LoadCursor(NULL, IDC_ARROW) );
+		SetCursor(::LoadCursor(nullptr, IDC_ARROW) );
 	}
 
 	/// If precision crosshair is active, force redraw of the 2d view on mouse move
@@ -1120,7 +1120,7 @@ void CXYWnd::SetClipMode(bool bMode) {
 	} else {
 		if (g_pMovingClip) {
 			ReleaseCapture();
-			g_pMovingClip = NULL;
+			g_pMovingClip = nullptr;
 		}
 
 		CleanList(&g_brFrontSplits);
@@ -1248,13 +1248,13 @@ void CXYWnd::OnPaint() {
 
 				brush_t *pBrush;
 				brush_t *pList = ((m_nViewType == XZ) ? !g_bSwitch : g_bSwitch) ? &g_brBackSplits : &g_brFrontSplits;
-				for (pBrush = pList->next; pBrush != NULL && pBrush != pList; pBrush = pBrush->next) {
+				for (pBrush = pList->next; pBrush != nullptr && pBrush != pList; pBrush = pBrush->next) {
 					qglColor3f( 1, 1, 0 );
 
 					face_t	*face;
 					int		order;
 					for (face = pBrush->brush_faces, order = 0; face; face = face->next, order++ ) {
-						arcWinding *w = face->face_winding;
+						anWinding *w = face->face_winding;
 						if ( !w) {
 							continue;
 						}
@@ -1303,7 +1303,7 @@ void CXYWnd::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
 
 // =======================================================================================================================
 //    FIXME: the brush_t *pBrush is never used. ( Entity_Create uses selected_brushes )
-void CreateEntityFromName(char *pName, brush_t *pBrush, bool forceFixed, arcVec3 min, arcVec3 max, arcVec3 org) {
+void CreateEntityFromName(char *pName, brush_t *pBrush, bool forceFixed, anVec3 min, anVec3 max, anVec3 org) {
 	eclass_t	*pecNew;
 	entity_t	*petNew;
 	if (stricmp(pName, "worldspawn" ) == 0 ) {
@@ -1320,21 +1320,21 @@ void CreateEntityFromName(char *pName, brush_t *pBrush, bool forceFixed, arcVec3
 	// create it
 	petNew = Entity_Create(pecNew, forceFixed);
 
-	if (petNew && arcNetString::Icmp(pName, "light" ) == 0 ) {
-		arcVec3	rad = max - min;
+	if (petNew && anString::Icmp(pName, "light" ) == 0 ) {
+		anVec3	rad = max - min;
 		rad *= 0.5;
 		if (rad.x != 0 && rad.y != 0 && rad.z != 0 ) {
-			SetKeyValue(petNew, "light_radius", va( "%g %g %g", arcMath::Fabs(rad.x), arcMath::Fabs(rad.y), arcMath::Fabs(rad.z) ));
+			SetKeyValue(petNew, "light_radius", va( "%g %g %g", anMath::Fabs(rad.x), anMath::Fabs(rad.y), anMath::Fabs(rad.z) ) );
 			DeleteKey(petNew, "light" );
 		}
 	}
 
-	if (petNew == NULL) {
-		if ( !((selected_brushes.next == &selected_brushes) || (selected_brushes.next->next != &selected_brushes) )) {
+	if (petNew == nullptr ) {
+		if ( !((selected_brushes.next == &selected_brushes) || (selected_brushes.next->next != &selected_brushes) ) ) {
 			brush_t *b = selected_brushes.next;
 			if (b->owner != world_entity && ((b->owner->eclass->fixedsize && pecNew->fixedsize) || forceFixed) ) {
-				arcVec3	mins, maxs;
-				arcVec3	origin;
+				anVec3	mins, maxs;
+				anVec3	origin;
 				for ( int i = 0; i < 3; i++ ) {
 					origin[i] = b->mins[i] - pecNew->mins[i];
 				}
@@ -1365,7 +1365,7 @@ void CreateEntityFromName(char *pName, brush_t *pBrush, bool forceFixed, arcVec3
 }
 
 brush_t *CreateEntityBrush( int x, int y, CXYWnd *pWnd) {
-	arcVec3	mins, maxs;
+	anVec3	mins, maxs;
 	int		i;
 	float	temp;
 	brush_t *n;
@@ -1397,7 +1397,7 @@ brush_t *CreateEntityBrush( int x, int y, CXYWnd *pWnd) {
 
 	n = Brush_Create( mins, maxs, &g_qeglobals.d_texturewin.texdef);
 	if ( !n) {
-		return NULL;
+		return nullptr;
 	}
 
 	Brush_AddToList(n, &selected_brushes);
@@ -1407,7 +1407,7 @@ brush_t *CreateEntityBrush( int x, int y, CXYWnd *pWnd) {
 }
 
 void CreateRightClickEntity(CXYWnd *pWnd, int x, int y, char *pName) {
-	arcVec3	min, max, org;
+	anVec3	min, max, org;
 	Select_GetBounds(min, max);
 	Select_GetMid(org);
 
@@ -1426,8 +1426,8 @@ void CreateRightClickEntity(CXYWnd *pWnd, int x, int y, char *pName) {
 	}
 }
 
-brush_t *CreateSmartBrush(arcVec3 v) {
-	arcVec3	mins, maxs;
+brush_t *CreateSmartBrush(anVec3 v) {
+	anVec3	mins, maxs;
 	int		i;
 	brush_t *n;
 
@@ -1438,7 +1438,7 @@ brush_t *CreateSmartBrush(arcVec3 v) {
 
 	n = Brush_Create( mins, maxs, &g_qeglobals.d_texturewin.texdef);
 	if ( !n) {
-		return NULL;
+		return nullptr;
 	}
 
 	Brush_AddToList(n, &selected_brushes);
@@ -1477,7 +1477,7 @@ void CreateSmartEntity(CXYWnd *pWnd, int x, int y, const char *pName) {
 		AcquirePath( 1, &_SmartPointDone);
 		while (g_bSmartWaiting) {
 			MSG msg;
-			if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) ) {
+			if (::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) ) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
@@ -1494,8 +1494,8 @@ void CreateSmartEntity(CXYWnd *pWnd, int x, int y, const char *pName) {
 		brush_t *pBrush = CreateSmartBrush(g_PathPoints[0] );
 		array.Add(pBrush);
 		Select_Deselect();
-		Select_Brush(reinterpret_cast < brush_t * > (array.GetAt(0 ) ));
-		Select_Brush(reinterpret_cast < brush_t * > (array.GetAt(1 ) ));
+		Select_Brush(reinterpret_cast < brush_t * > (array.GetAt(0 ) ) );
+		Select_Brush(reinterpret_cast < brush_t * > (array.GetAt(1 ) ) );
 		ConnectEntities();
 		g_bScreenUpdates = true;
 	}
@@ -1505,7 +1505,7 @@ void FinishSmartCreation() {
 	CPtrArray	array;
 	HideInfoDialog();
 
-	brush_t *pEntities = NULL;
+	brush_t *pEntities = nullptr;
 	if (g_strSmartEntity.Find( "Smart_Train" ) >= 0 ) {
 		g_bScreenUpdates = false;
 		CreateRightClickEntity(g_pParentWnd->ActiveXY(), g_nSmartX, g_nSmartY, "func_train" );
@@ -1520,8 +1520,8 @@ void FinishSmartCreation() {
 		}
 		for (n = 0; n < g_nPathCount; n++ ) {
 			Select_Deselect();
-			Select_Brush(reinterpret_cast < brush_t * > (array.GetAt(n) ));
-			Select_Brush(reinterpret_cast < brush_t * > (array.GetAt(n + 1 ) ));
+			Select_Brush(reinterpret_cast < brush_t * > (array.GetAt(n) ) );
+			Select_Brush(reinterpret_cast < brush_t * > (array.GetAt(n + 1 ) ) );
 			ConnectEntities();
 		}
 		g_bScreenUpdates = true;
@@ -1538,7 +1538,7 @@ void CXYWnd::KillPathMode() {
 		g_pPathFunc(false, g_nPathCount);
 	}
 	g_nPathCount = 0;
-	g_pPathFunc = NULL;
+	g_pPathFunc = nullptr;
 	Sys_UpdateWindows(W_ALL);
 }
 
@@ -1729,7 +1729,7 @@ void CXYWnd::HandleDrop() {
 			pMakeEntityPop->CreateMenu();
 		}
 
-		CMenu	*pChild = NULL;
+		CMenu	*pChild = nullptr;
 
 		eclass_t	*e;
 		CString		strActive;
@@ -1756,7 +1756,7 @@ void CXYWnd::HandleDrop() {
 						g_ptrMenus.Add(pChild);
 
 						// pChild->DestroyMenu(); delete pChild;
-						pChild = NULL;
+						pChild = nullptr;
 					}
 					strActive = strLeft;
 					pChild = new CMenu;
@@ -1773,7 +1773,7 @@ void CXYWnd::HandleDrop() {
 					g_ptrMenus.Add(pChild);
 
 					// pChild->DestroyMenu(); delete pChild;
-					pChild = NULL;
+					pChild = nullptr;
 				}
 				strActive = "";
 				pMakeEntityPop->AppendMenu(MF_STRING, nID++, strName);
@@ -1800,7 +1800,7 @@ void CXYWnd::XY_Init() {
 	m_precisionCrosshairMode = PRECISION_CROSSHAIR_NONE;
 }
 
-void CXYWnd::SnapToPoint( int x, int y, arcVec3 &point) {
+void CXYWnd::SnapToPoint( int x, int y, anVec3 &point) {
 	if (g_PrefsDlg.m_bNoClamp) {
 		XY_ToPoint(x, y, point);
 	} else {
@@ -1809,7 +1809,7 @@ void CXYWnd::SnapToPoint( int x, int y, arcVec3 &point) {
 	// -- else -- XY_ToPoint(x, y, point); -- //XY_ToPoint(x, y, point);
 }
 
-void CXYWnd::XY_ToPoint( int x, int y, arcVec3 &point) {
+void CXYWnd::XY_ToPoint( int x, int y, anVec3 &point) {
 	float	fx = x;
 	float	fy = y;
 	float	fw = m_nWidth;
@@ -1835,7 +1835,7 @@ void CXYWnd::XY_ToPoint( int x, int y, arcVec3 &point) {
 	}
 }
 
-void CXYWnd::XY_ToGridPoint( int x, int y, arcVec3 &point) {
+void CXYWnd::XY_ToGridPoint( int x, int y, anVec3 &point) {
 	if (m_nViewType == XY) {
 		point[0] = m_vOrigin[0] + (x - m_nWidth / 2) / m_fScale;
 		point[1] = m_vOrigin[1] + (y - m_nHeight / 2) / m_fScale;
@@ -1860,14 +1860,14 @@ void CXYWnd::XY_ToGridPoint( int x, int y, arcVec3 &point) {
 	}
 }
 
-arcVec3 dragOrigin;
-arcVec3 dragDir;
-arcVec3 dragX;
-arcVec3 dragY;
+anVec3 dragOrigin;
+anVec3 dragDir;
+anVec3 dragX;
+anVec3 dragY;
 
 void CXYWnd::XY_MouseDown( int x, int y, int buttons) {
-	arcVec3	point,center;
-	arcVec3	origin, dir, right, up;
+	anVec3	point,center;
+	anVec3	origin, dir, right, up;
 
 	m_nButtonstate = buttons;
 	m_nPressx = x;
@@ -1933,7 +1933,7 @@ void CXYWnd::XY_MouseDown( int x, int y, int buttons) {
 	if ((buttons == MK_LBUTTON) ||
 		(buttons == (MK_LBUTTON | MK_SHIFT) ) ||
 		(buttons == (MK_LBUTTON | MK_CONTROL) ) ||
-		(buttons == (MK_LBUTTON | MK_CONTROL | MK_SHIFT) )) {
+		(buttons == (MK_LBUTTON | MK_CONTROL | MK_SHIFT) ) ) {
 		if (g_qeglobals.d_select_mode == sel_addpoint) {
 			XY_ToGridPoint(x, y, point);
 			if (g_qeglobals.selectObject) {
@@ -1957,7 +1957,7 @@ void CXYWnd::XY_MouseDown( int x, int y, int buttons) {
 
 	// mbutton = angle camera
 	if ((g_PrefsDlg.m_nMouseButtons == 3 && m_nButtonstate == MK_MBUTTON) ||
-		(g_PrefsDlg.m_nMouseButtons == 2 && m_nButtonstate == (MK_SHIFT | MK_CONTROL | MK_RBUTTON) )) {
+		(g_PrefsDlg.m_nMouseButtons == 2 && m_nButtonstate == (MK_SHIFT | MK_CONTROL | MK_RBUTTON) ) ) {
 		VectorSubtract(point, g_pParentWnd->GetCamera()->Camera().origin, point);
 
 		int n1 = (m_nViewType == XY) ? 1 : 2;
@@ -2010,8 +2010,8 @@ void CXYWnd::XY_MouseUp( int x, int y, int buttons) {
 		;
 }
 
-bool CXYWnd::DragDelta( int x, int y, arcVec3 &move) {
-	arcVec3	xvec, yvec, delta;
+bool CXYWnd::DragDelta( int x, int y, anVec3 &move) {
+	anVec3	xvec, yvec, delta;
 	int		i;
 
 	xvec[0] = 1 / m_fScale;
@@ -2036,7 +2036,7 @@ bool CXYWnd::DragDelta( int x, int y, arcVec3 &move) {
 }
 
 void CXYWnd::NewBrushDrag( int x, int y) {
-	arcVec3	mins, maxs, junk;
+	anVec3	mins, maxs, junk;
 	int		i;
 	float	temp;
 	brush_t *n;
@@ -2082,7 +2082,7 @@ void CXYWnd::NewBrushDrag( int x, int y) {
 		return;
 	}
 
-	arcVec3	vSize;
+	anVec3	vSize;
 	VectorSubtract(maxs, mins, vSize);
 	g_strStatus.Format( "Size X:: %.1f  Y:: %.1f  Z:: %.1f", vSize[0], vSize[1], vSize[2] );
 	g_pParentWnd->SetStatusText(2, g_strStatus);
@@ -2098,7 +2098,7 @@ void CXYWnd::NewBrushDrag( int x, int y) {
 }
 
 bool CXYWnd::XY_MouseMoved( int x, int y, int buttons) {
-	arcVec3	point;
+	anVec3	point;
 
 	if ( !m_nButtonstate) {
 		if (g_bCrossHairs) {
@@ -2165,7 +2165,7 @@ bool CXYWnd::XY_MouseMoved( int x, int y, int buttons) {
 	// mbutton = angle camera
 	if (
 		(g_PrefsDlg.m_nMouseButtons == 3 && m_nButtonstate == MK_MBUTTON) ||
-		(g_PrefsDlg.m_nMouseButtons == 2 && m_nButtonstate == (MK_SHIFT | MK_CONTROL | MK_RBUTTON) )) {
+		(g_PrefsDlg.m_nMouseButtons == 2 && m_nButtonstate == (MK_SHIFT | MK_CONTROL | MK_RBUTTON) ) ) {
 		SnapToPoint(x, y, point);
 		VectorSubtract(point, g_pParentWnd->GetCamera()->Camera().origin, point);
 
@@ -2216,7 +2216,7 @@ bool CXYWnd::XY_MouseMoved( int x, int y, int buttons) {
 				SetCursorPos(m_ptCursor.x, m_ptCursor.y);
 				::ShowCursor(FALSE);
 
-				// XY_Draw(); RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+				// XY_Draw(); RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 				Sys_UpdateWindows(W_XY | W_XY_OVERLAY);
 				// ::ShowCursor(TRUE);
 			}
@@ -2306,14 +2306,14 @@ void CXYWnd::XY_DrawGrid() {
 
 		qglBegin( GL_LINES );
 		for (x = xb; x < xe; x += g_qeglobals.d_gridsize) {
-			if ( !( ( int )x & (startPos - 1 ) )) {
+			if ( !( ( int )x & (startPos - 1 ) ) ) {
 				continue;
 			}
 			qglVertex2f(x, yb);
 			qglVertex2f(x, ye);
 		}
 		for (y = yb; y < ye; y += g_qeglobals.d_gridsize) {
-			if ( !( ( int )y & (startPos - 1 ) )) {
+			if ( !( ( int )y & (startPos - 1 ) ) ) {
 				continue;
 			}
 			qglVertex2f(xb, y);
@@ -2449,7 +2449,7 @@ void CXYWnd::XY_DrawBlockGrid() {
 	qglColor4f(0, 0, 0, 0 );
 }
 
-void GLColoredBoxWithLabel(float x, float y, float size, arcVec4 color, const char *text, arcVec4 textColor, float xofs, float yofs, float lineSize) {
+void GLColoredBoxWithLabel(float x, float y, float size, anVec4 color, const char *text, anVec4 textColor, float xofs, float yofs, float lineSize) {
 	globalImages->BindNull();
 	qglPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
 	qglDisable( GL_CULL_FACE);
@@ -2515,7 +2515,7 @@ void CXYWnd::DrawRotateIcon() {
 	} else if (g_qeglobals.rotateAxis == 0 ) {
 		p = "Rotate X Axis";
 	}
-	arcNetString str = p;
+	anString str = p;
 	if (g_qeglobals.flatRotation) {
 		str += g_qeglobals.flatRotation == 2 ? " Flat [center] " : " Flat [ rot origin ] ";
 	}
@@ -2529,15 +2529,15 @@ void CXYWnd::DrawCameraIcon() {
 	if (m_nViewType == XY) {
 		x = g_pParentWnd->GetCamera()->Camera().origin[0];
 		y = g_pParentWnd->GetCamera()->Camera().origin[1];
-		a = g_pParentWnd->GetCamera()->Camera().angles[YAW] * arcMath::M_DEG2RAD;
+		a = g_pParentWnd->GetCamera()->Camera().angles[YAW] * anMath::M_DEG2RAD;
 	} else if (m_nViewType == YZ) {
 		x = g_pParentWnd->GetCamera()->Camera().origin[1];
 		y = g_pParentWnd->GetCamera()->Camera().origin[2];
-		a = g_pParentWnd->GetCamera()->Camera().angles[PITCH] * arcMath::M_DEG2RAD;
+		a = g_pParentWnd->GetCamera()->Camera().angles[PITCH] * anMath::M_DEG2RAD;
 	} else {
 		x = g_pParentWnd->GetCamera()->Camera().origin[0];
 		y = g_pParentWnd->GetCamera()->Camera().origin[2];
-		a = g_pParentWnd->GetCamera()->Camera().angles[PITCH] * arcMath::M_DEG2RAD;
+		a = g_pParentWnd->GetCamera()->Camera().angles[PITCH] * anMath::M_DEG2RAD;
 	}
 
 	float scale = 1.0/m_fScale;	//jhefty - keep the camera icon proportionally the same size
@@ -2553,9 +2553,9 @@ void CXYWnd::DrawCameraIcon() {
 	qglEnd();
 
 	qglBegin( GL_LINE_STRIP );
-	qglVertex3f(x + (48 * cos( a + arcMath::PI * 0.25f )*scale), y + (48 * sin( a + arcMath::PI * 0.25f )*scale), 0 );
+	qglVertex3f(x + (48 * cos( a + anMath::PI * 0.25f )*scale), y + (48 * sin( a + anMath::PI * 0.25f )*scale), 0 );
 	qglVertex3f(x, y, 0 );
-	qglVertex3f(x + (48 * cos( a - arcMath::PI * 0.25f )*scale), y + (48 * sin( a - arcMath::PI * 0.25f )*scale), 0 );
+	qglVertex3f(x + (48 * cos( a - anMath::PI * 0.25f )*scale), y + (48 * sin( a - anMath::PI * 0.25f )*scale), 0 );
 	qglEnd();
 
 #if 0
@@ -2694,8 +2694,8 @@ bool FilterBrush(brush_t *pb) {
 
 	if (g_qeglobals.d_savedinfo.exclude & EXCLUDE_DYNAMICS) {
 		if (pb->modelHandle > 0 ) {
-			ARCRenderModel *model = pb->modelHandle;
-			if ( dynamic_cast<ARCLiquidModel*>(model) ) {
+			anRenderModel *model = pb->modelHandle;
+			if ( dynamic_cast<anLiquidModel*>(model) ) {
 				return true;
 			}
 		}
@@ -2715,7 +2715,7 @@ bool FilterBrush(brush_t *pb) {
 		return false;
 	} else {
 		if ( g_qeglobals.d_savedinfo.exclude & EXCLUDE_ENT ) {
-			return ( arcNetString::Cmpn( pb->owner->eclass->name, "func_static", 10 ) != 0 );
+			return ( anString::Cmpn( pb->owner->eclass->name, "func_static", 10 ) != 0 );
 		}
 	}
 
@@ -2731,7 +2731,7 @@ bool FilterBrush(brush_t *pb) {
 		return true;
 	}
 
-	if ( g_qeglobals.d_savedinfo.exclude & EXCLUDE_MODELS && ( pb->owner->eclass->entityModel != NULL || pb->modelHandle > 0 ) ) {
+	if ( g_qeglobals.d_savedinfo.exclude & EXCLUDE_MODELS && ( pb->owner->eclass->entityModel != nullptr || pb->modelHandle > 0 ) ) {
 		return true;
 	}
 	return false;
@@ -2741,7 +2741,7 @@ bool FilterBrush(brush_t *pb) {
 //	DrawPathLines Draws connections between entities. Needs to consider all entities, not just ones on screen, because
 //	the lines can be visible when neither end is. Called for both camera view and xy view.
 void DrawPathLines( void ) {
-	arcVec3		dir, s1, s2;
+	anVec3		dir, s1, s2;
 	const char	*ent_target[MAX_MAP_ENTITIES];
 	entity_t	*ent_entity[MAX_MAP_ENTITIES];
 
@@ -2768,7 +2768,7 @@ void DrawPathLines( void ) {
 
 	for ( entity_t *se = entities.next; se != &entities; se = se->next) {
 		const char *psz = ValueForKey(se, "name" );
-		if ( psz == NULL || psz[0] == '\0') {
+		if ( psz == nullptr || psz[0] == '\0') {
 			continue;
 		}
 
@@ -2788,8 +2788,8 @@ void DrawPathLines( void ) {
 				continue;
 			}
 
-			arcVec3 mid = sb->owner->origin;
-			arcVec3 mid1 = tb->owner->origin;
+			anVec3 mid = sb->owner->origin;
+			anVec3 mid1 = tb->owner->origin;
 
 			VectorSubtract( mid1, mid, dir );
 			float len = dir.Normalize();
@@ -2808,7 +2808,7 @@ void DrawPathLines( void ) {
 
 			for ( int i = 0; i < arrows; i++ ) {
 				float f = len * ( i + 0.5) / arrows;
-				arcVec3 mid1 = mid + ( f * dir );
+				anVec3 mid1 = mid + ( f * dir );
 				qglVertex3fv( mid1.ToFloatPtr() );
 				qglVertex3f( mid1[0] + s1[0], mid1[1] + s1[1], mid1[2] );
 				qglVertex3fv( mid1.ToFloatPtr() );
@@ -2821,8 +2821,8 @@ void DrawPathLines( void ) {
 }
 
 //    can be greatly simplified but per usual i am in a hurry which is not an excuse, just a fact
-void CXYWnd::PaintSizeInfo( int nDim1, int nDim2, arcVec3 vMinBounds, arcVec3 vMaxBounds) {
-	arcVec3	vSize;
+void CXYWnd::PaintSizeInfo( int nDim1, int nDim2, anVec3 vMinBounds, anVec3 vMaxBounds) {
+	anVec3	vSize;
 	VectorSubtract(vMaxBounds, vMinBounds, vSize);
 
 	qglColor3f(g_qeglobals.d_savedinfo.colors[COLOR_SELBRUSHES][0] * .65, g_qeglobals.d_savedinfo.colors[COLOR_SELBRUSHES][1] * .65, g_qeglobals.d_savedinfo.colors[COLOR_SELBRUSHES][2] * .65);
@@ -2941,7 +2941,7 @@ void CXYWnd::XY_Draw() {
 	brush_t		*brush;
 	float		w, h;
 	entity_t	*e;
-	arcVec3		mins, maxs;
+	anVec3		mins, maxs;
 	int			drawn, culled;
 	int			i;
 
@@ -2975,7 +2975,7 @@ void CXYWnd::XY_Draw() {
 	mins[1] = m_vOrigin[nDim2] - h;
 	maxs[1] = m_vOrigin[nDim2] + h;
 
-	arcBounds viewBounds( mins, maxs );
+	anBounds viewBounds( mins, maxs );
 	viewBounds[0].z = -99999;
 	viewBounds[1].z = 99999;
 
@@ -3067,8 +3067,8 @@ void CXYWnd::XY_Draw() {
 
 	qglLineWidth(1 );
 
-	arcVec3	vMinBounds;
-	arcVec3	vMaxBounds;
+	anVec3	vMinBounds;
+	anVec3	vMaxBounds;
 	vMinBounds[0] = vMinBounds[1] = vMinBounds[2] = 999999.9f;
 	vMaxBounds[0] = vMaxBounds[1] = vMaxBounds[2] = -999999.9f;
 
@@ -3142,7 +3142,7 @@ void CXYWnd::XY_Draw() {
 		qglBegin( GL_POINTS );
 		g_pParentWnd->GetNurb()->SetOrder(3);
 		for ( i = 0; i < 100; i++ ) {
-			arcVec2 v = g_pParentWnd->GetNurb()->GetCurrentValue( time );
+			anVec2 v = g_pParentWnd->GetNurb()->GetCurrentValue( time );
 			qglVertex3f( v.x, v.y, 0.0f);
 			time += 10;
 		}
@@ -3151,7 +3151,7 @@ void CXYWnd::XY_Draw() {
 		qglColor3f(0, 0, 1 );
 		qglBegin( GL_POINTS );
 		for ( i = 0; i < maxage; i++ ) {
-			arcVec2 v = g_pParentWnd->GetNurb()->GetValue( i );
+			anVec2 v = g_pParentWnd->GetNurb()->GetValue( i );
 			qglVertex3f( v.x, v.y, 0.0f);
 		}
 		qglEnd();
@@ -3193,11 +3193,11 @@ void CXYWnd::XY_Draw() {
 	//QE_CheckOpenGLForErrors();
 }
 
-arcVec3 &CXYWnd::GetOrigin() {
+anVec3 &CXYWnd::GetOrigin() {
 	return m_vOrigin;
 }
 
-void CXYWnd::SetOrigin(arcVec3 org) {
+void CXYWnd::SetOrigin(anVec3 org) {
 	m_vOrigin[0] = org[0];
 	m_vOrigin[1] = org[1];
 	m_vOrigin[2] = org[2];
@@ -3210,7 +3210,7 @@ void CXYWnd::OnSize(UINT nType, int cx, int cy) {
 	GetClientRect(rect);
 	m_nWidth = rect.Width();
 	m_nHeight = rect.Height();
-	InvalidateRect(NULL, false);
+	InvalidateRect(nullptr, false);
 }
 
 brush_t hold_brushes;
@@ -3248,7 +3248,7 @@ void CXYWnd::Clip() {
 			g_pPathFunc(true, g_nPathCount);
 		}
 
-		g_pPathFunc = NULL;
+		g_pPathFunc = nullptr;
 		g_nPathCount = 0;
 		g_bPathMode = false;
 	}
@@ -3297,7 +3297,7 @@ void CXYWnd::PositionView() {
  =======================================================================================================================
  =======================================================================================================================
  */
-void CXYWnd::VectorCopyXY(const arcVec3 &in, arcVec3 &out) {
+void CXYWnd::VectorCopyXY(const anVec3 &in, anVec3 &out) {
 	if (m_nViewType == XY) {
 		out[0] = in[0];
 		out[1] = in[1];
@@ -3329,7 +3329,7 @@ void CXYWnd::SetViewType( int n) {
 
 void CXYWnd::Redraw(unsigned int nBits) {
 	m_nUpdateBits = nBits;
-	RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 	m_nUpdateBits = W_XY;
 }
 
@@ -3381,7 +3381,7 @@ void CXYWnd::OnSelectMouserotate() {
 
 void CleanCopyEntities() {
 	entity_t	*pe = g_enClipboard.next;
-	while (pe != NULL && pe != &g_enClipboard) {
+	while (pe != nullptr && pe != &g_enClipboard) {
 		entity_t	*next = pe->next;
 		pe->epairs.Clear();
 
@@ -3439,7 +3439,7 @@ void CXYWnd::Copy() {
 
 			long	lSize = g_Clipboard.GetLength();
 			HANDLE	h = ::GlobalAlloc(GMEM_ZEROINIT | GMEM_MOVEABLE | GMEM_DDESHARE, lSize + sizeof (long) );
-			if (h != NULL) {
+			if (h != nullptr ) {
 				unsigned char	*cp = reinterpret_cast < unsigned char * > (::GlobalLock(h) );
 				memcpy(cp, &lSize, sizeof (long) );
 				cp += sizeof (long);
@@ -3466,10 +3466,10 @@ void CXYWnd::Copy() {
 	CPtrArray	holdArray;
 	CleanList(&g_brClipboard);
 	CleanCopyEntities();
-	for (brush_t * pBrush = selected_brushes.next; pBrush != NULL && pBrush != &selected_brushes; pBrush = pBrush->next) {
+	for (brush_t * pBrush = selected_brushes.next; pBrush != nullptr && pBrush != &selected_brushes; pBrush = pBrush->next) {
 		if (pBrush->owner == world_entity) {
 			brush_t *pClone = Brush_Clone(pBrush);
-			pClone->owner = NULL;
+			pClone->owner = nullptr;
 			Brush_AddToList(pClone, &g_brClipboard);
 		}
 		else {
@@ -3494,7 +3494,7 @@ void CXYWnd::Copy() {
 void CXYWnd::Undo() {
 	/*
 	 * if (g_brUndo.next != &g_brUndo) { g_bScreenUpdates = false; Select_Delete();
-	 * for (brush_t* pBrush = g_brUndo.next; pBrush != NULL && pBrush != &g_brUndo ;
+	 * for (brush_t* pBrush = g_brUndo.next; pBrush != nullptr && pBrush != &g_brUndo ;
 	 * pBrush=pBrush->next) { brush_t* pClone = Brush_Clone(pBrush); Brush_AddToList
 	 * (pClone, &active_brushes); Entity_LinkBrush (pBrush->pUndoOwner, pClone);
 	 * Brush_Build(pClone); Select_Brush(pClone); } CleanList(&g_brUndo);
@@ -3510,7 +3510,7 @@ void CXYWnd::UndoClear() {
 void CXYWnd::UndoCopy() {
 	/*
 	 * CleanList(&g_brUndo); for (brush_t* pBrush = selected_brushes.next; pBrush !=
-	 * NULL && pBrush != &selected_brushes; pBrush=pBrush->next) { brush_t* pClone =
+	 * nullptr && pBrush != &selected_brushes; pBrush=pBrush->next) { brush_t* pClone =
 	 * Brush_Clone(pBrush); pClone->pUndoOwner = pBrush->owner; Brush_AddToList
 	 * (pClone, &g_brUndo); }
 	 */
@@ -3568,11 +3568,11 @@ void CXYWnd::Paste() {
 #else
 	if (g_brClipboard.next != &g_brClipboard || g_enClipboard.next != &g_enClipboard) {
 		Select_Deselect();
-		for (brush_t * pBrush = g_brClipboard.next; pBrush != NULL && pBrush != &g_brClipboard; pBrush = pBrush->next) {
+		for (brush_t * pBrush = g_brClipboard.next; pBrush != nullptr && pBrush != &g_brClipboard; pBrush = pBrush->next) {
 			brush_t *pClone = Brush_Clone(pBrush);
 
 			// pClone->owner = pBrush->owner;
-			if (pClone->owner == NULL) {
+			if (pClone->owner == nullptr ) {
 				Entity_LinkBrush(world_entity, pClone);
 			}
 
@@ -3582,7 +3582,7 @@ void CXYWnd::Paste() {
 
 		for (
 			entity_t * pEntity = g_enClipboard.next;
-			pEntity != NULL && pEntity != &g_enClipboard;
+			pEntity != nullptr && pEntity != &g_enClipboard;
 			pEntity = pEntity->next) {
 			entity_t	*pEClone = Entity_Clone(pEntity);
 			for (brush_t * pEB = pEntity->brushes.onext; pEB != &pEntity->brushes; pEB = pEB->onext) {
@@ -3602,10 +3602,10 @@ void CXYWnd::Paste() {
 	}
 #endif
 }
-arcVec3 &CXYWnd::Rotation() {
+anVec3 &CXYWnd::Rotation() {
 	return g_vRotation;
 }
-arcVec3 &CXYWnd::RotateOrigin() {
+anVec3 &CXYWnd::RotateOrigin() {
 	return g_vRotateOrigin;
 }
 
@@ -3716,10 +3716,10 @@ void CXYWnd::DrawPrecisionCrosshair( void ) {
 	// FIXME: m_mouseX, m_mouseY, m_axisHoriz, m_axisVert, etc... are never set
 	return;
 
-	arcVec3 mouse3dPos (0.0f, 0.0f, 0.0f);
+	anVec3 mouse3dPos (0.0f, 0.0f, 0.0f);
 	float x, y;
-	arcVec4 crossEndColor (1.0f, 0.0f, 1.0f, 1.0f); // the RGBA color of the precision crosshair at its ends
-	arcVec4 crossMidColor; // the RGBA color of the precision crosshair at the crossing point
+	anVec4 crossEndColor (1.0f, 0.0f, 1.0f, 1.0f); // the RGBA color of the precision crosshair at its ends
+	anVec4 crossMidColor; // the RGBA color of the precision crosshair at the crossing point
 
 	/// Transform the mouse coordinates into axis-correct map-coordinates
 	if ( m_precisionCrosshairMode == PRECISION_CROSSHAIR_SNAP )

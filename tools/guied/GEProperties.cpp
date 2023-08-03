@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/guied_resource.h"
@@ -45,9 +45,9 @@ constructor
 */
 rvGEProperties::rvGEProperties( void )
 {
-	mWrapper   = NULL;
-	mWnd	   = NULL;
-	mWorkspace = NULL;
+	mWrapper   = nullptr;
+	mWnd	   = nullptr;
+	mWorkspace = nullptr;
 }
 
 /*
@@ -65,8 +65,8 @@ bool rvGEProperties::Create ( HWND parent, bool visible )
 	wndClass.lpszClassName = "GUIEDITOR_PROPERTIES_CLASS";
 	wndClass.lpfnWndProc   = WndProc;
 	wndClass.hbrBackground = (HBRUSH)GetSysColorBrush ( COLOR_3DFACE );
-	wndClass.hCursor       = LoadCursor((HINSTANCE) NULL, IDC_ARROW);
-	wndClass.lpszMenuName  = NULL;
+	wndClass.hCursor       = LoadCursor((HINSTANCE) nullptr, IDC_ARROW);
+	wndClass.lpszMenuName  = nullptr;
 	wndClass.hInstance     = win32.hInstance;
 	RegisterClassEx ( &wndClass );
 
@@ -76,7 +76,7 @@ bool rvGEProperties::Create ( HWND parent, bool visible )
 							WS_SYSMENU|WS_THICKFRAME|WS_CAPTION|WS_POPUP|WS_OVERLAPPED|WS_BORDER|WS_CLIPSIBLINGS|WS_CHILD,
 							0, 0, 200,300,
 							parent,
-							NULL,
+							nullptr,
 							win32.hInstance,
 							this );
 
@@ -92,7 +92,7 @@ bool rvGEProperties::Create ( HWND parent, bool visible )
 
 		GetWindowRect ( parent, &rParent );
 		GetWindowRect ( mWnd, &rClient );
-		SetWindowPos ( mWnd, NULL,
+		SetWindowPos ( mWnd, nullptr,
 					rParent.right - 10 - (rClient.right-rClient.left),
 					rParent.bottom - 10 - (rClient.bottom-rClient.top),
 					0,0,
@@ -128,27 +128,27 @@ void rvGEProperties::Update ( void )
 {
 	int i;
 
-	if ( mWorkspace && mWorkspace->GetSelectionMgr ( ).Num ( ) == 1 )
+	if ( mWorkspace && mWorkspace->GetSelectionMgr().Num() == 1 )
 	{
 		mWrapper = rvGEWindowWrapper::GetWrapper ( mWorkspace->GetSelectionMgr()[0] );
 	}
 	else
 	{
-		mWrapper = NULL;
+		mWrapper = nullptr;
 	}
 
-	ShowWindow ( mGrid.GetWindow ( ), mWrapper?SW_SHOW:SW_HIDE );
+	ShowWindow ( mGrid.GetWindow(), mWrapper?SW_SHOW:SW_HIDE );
 
-	mGrid.RemoveAllItems ( );
+	mGrid.RemoveAllItems();
 
 	if ( mWrapper )
 	{
-		for ( i = 0; i < ( int )mWrapper->GetStateDict().GetNumKeyVals ( ); i ++ )
+		for ( i = 0; i < ( int )mWrapper->GetStateDict().GetNumKeyVals(); i ++ )
 		{
-			const idKeyValue* kv = mWrapper->GetStateDict().GetKeyVal ( i );
-			arcNetString temp;
+			const anKeyValue* kv = mWrapper->GetStateDict().GetKeyVal ( i );
+			anString temp;
 			temp = kv->GetValue();
-			temp.StripQuotes ( );
+			temp.StripQuotes();
 			mGrid.AddItem ( kv->GetKey(), temp );
 		}
 	}
@@ -163,8 +163,8 @@ Add a state modifier for the given key / value pair
 */
 bool rvGEProperties::AddModifier ( const char* name, const char* value )
 {
-	arcDictionary tempstate;
-	arcNetString  tempvalue;
+	anDict tempstate;
+	anString  tempvalue;
 
 	tempvalue = value;
 	if ( !mWrapper->VerfiyStateKey ( name, tempvalue ) )
@@ -179,13 +179,13 @@ bool rvGEProperties::AddModifier ( const char* name, const char* value )
 		}
 	}
 
-	tempstate = mWrapper->GetStateDict ( );
+	tempstate = mWrapper->GetStateDict();
 
 	tempstate.Set ( name, tempvalue );
 
 	mWorkspace->GetModifierStack().Append ( new rvGEStateModifier ( "Property Change", mWrapper->GetWindow(), tempstate ) );
 	mWorkspace->SetModified ( true );
-	gApp.GetNavigator().Update ( );
+	gApp.GetNavigator().Update();
 
 	return true;
 }
@@ -229,22 +229,22 @@ LRESULT CALLBACK rvGEProperties::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, L
 						NMKEY* nmkey = (NMKEY*)hdr;
 						if ( nmkey->nVKey == VK_DELETE )
 						{
-							int sel = kv->mGrid.GetCurSel ( );
+							int sel = kv->mGrid.GetCurSel();
 							if ( sel != -1 )
 							{
 								const char* prop;
 
 								prop = kv->mGrid.GetItemName(sel);
-								if ( !arcNetString::Icmp ( prop, "rect" )		||
-									 !arcNetString::Icmp ( prop, "visible" )	||
-									 !arcNetString::Icmp ( prop, "name" ) )
+								if ( !anString::Icmp ( prop, "rect" )		||
+									 !anString::Icmp ( prop, "visible" )	||
+									 !anString::Icmp ( prop, "name" ) )
 								{
 									MessageBeep ( MB_ICONASTERISK );
 								}
 								else
 								{
-									arcDictionary tempstate;
-									tempstate = kv->mWrapper->GetStateDict ( );
+									anDict tempstate;
+									tempstate = kv->mWrapper->GetStateDict();
 									tempstate.Delete ( prop );
 									kv->mWorkspace->GetModifierStack().Append ( new rvGEStateModifier ( "Property Change", kv->mWrapper->GetWindow(), tempstate ) );
 									kv->mWorkspace->SetModified ( true );
@@ -275,8 +275,8 @@ LRESULT CALLBACK rvGEProperties::WndProc ( HWND hWnd, UINT msg, WPARAM wParam, L
 
 			kv->mGrid.Create ( hWnd, 999, PGS_ALLOWINSERT );
 
-			kv->SetWorkspace ( NULL );
-			kv->Update ( );
+			kv->SetWorkspace ( nullptr );
+			kv->Update();
 
 			break;
 		}

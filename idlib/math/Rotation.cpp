@@ -1,35 +1,35 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 
 /*
 ============
-arcRotate::ToAngles
+anRotation::ToAngles
 ============
 */
-arcAngles arcRotate::ToAngles( void ) const {
+anAngles anRotation::ToAngles( void ) const {
 	return ToMat3().ToAngles();
 }
 
 /*
 ============
-arcRotate::ToQuat
+anRotation::ToQuat
 ============
 */
-arcQuats arcRotate::ToQuat( void ) const {
+anQuats anRotation::ToQuat( void ) const {
 	float a, s, c;
 
-	a = angle * ( arcMath::M_DEG2RAD * 0.5f );
-	arcMath::SinCos( a, s, c );
-	return arcQuats( vec.x * s, vec.y * s, vec.z * s, c );
+	a = angle * ( anMath::M_DEG2RAD * 0.5f );
+	anMath::SinCos( a, s, c );
+	return anQuats( vec.x * s, vec.y * s, vec.z * s, c );
 }
 
 /*
 ============
-arcRotate::toMat3
+anRotation::toMat3
 ============
 */
-const arcMat3 &arcRotate::ToMat3( void ) const {
+const anMat3 &anRotation::ToMat3( void ) const {
 	float wx, wy, wz;
 	float xx, yy, yz;
 	float xy, xz, zz;
@@ -40,8 +40,8 @@ const arcMat3 &arcRotate::ToMat3( void ) const {
 		return axis;
 	}
 
-	a = angle * ( arcMath::M_DEG2RAD * 0.5f );
-	arcMath::SinCos( a, s, c );
+	a = angle * ( anMath::M_DEG2RAD * 0.5f );
+	anMath::SinCos( a, s, c );
 
 	x = vec[0] * s;
 	y = vec[1] * s;
@@ -82,28 +82,28 @@ const arcMat3 &arcRotate::ToMat3( void ) const {
 
 /*
 ============
-arcRotate::ToMat4
+anRotation::ToMat4
 ============
 */
-arcMat4 arcRotate::ToMat4( void ) const {
+anMat4 anRotation::ToMat4( void ) const {
 	return ToMat3().ToMat4();
 }
 
 /*
 ============
-arcRotate::ToAngularVelocity
+anRotation::ToAngularVelocity
 ============
 */
-arcVec3 arcRotate::ToAngularVelocity( void ) const {
+anVec3 anRotation::ToAngularVelocity( void ) const {
 	return vec * DEG2RAD( angle );
 }
 
 /*
 ============
-arcRotate::Normalize180
+anRotation::Normalize180
 ============
 */
-void arcRotate::Normalize180( void ) {
+void anRotation::Normalize180( void ) {
 	angle -= floor( angle / 360.0f ) * 360.0f;
 	if ( angle > 180.0f ) {
 		angle -= 360.0f;
@@ -114,10 +114,10 @@ void arcRotate::Normalize180( void ) {
 
 /*
 ============
-arcRotate::Normalize360
+anRotation::Normalize360
 ============
 */
-void arcRotate::Normalize360( void ) {
+void anRotation::Normalize360( void ) {
 	angle -= floor( angle / 360.0f ) * 360.0f;
 	if ( angle > 360.0f ) {
 		angle -= 360.0f;

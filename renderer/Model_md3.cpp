@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -35,7 +35,7 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 
 	name = fileName;
 
-	size = fileSystem->ReadFile( fileName, &buffer, NULL );
+	size = fileSystem->ReadFile( fileName, &buffer, nullptr );
 	if ( !size || size<0 ) {
 		return;
 	}
@@ -73,7 +73,7 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 	}
 
 	// swap all the frames
-    frame = (md3Frame_t *) ( ( byte * )md3 + md3->ofsFrames );
+    frame = (md3Frame_t *) ( (byte *)md3 + md3->ofsFrames );
     for ( i = 0; i < md3->numFrames; i++, frame++ ) {
     	frame->radius = LittleFloat( frame->radius );
         for ( j = 0; j < 3; j++ ) {
@@ -84,7 +84,7 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 	}
 
 	// swap all the tags
-    tag = (md3Tag_t *) ( ( byte * )md3 + md3->ofsTags );
+    tag = (md3Tag_t *) ( (byte *)md3 + md3->ofsTags );
     for ( i = 0; i < md3->numTags * md3->numFrames; i++, tag++ ) {
         for ( j = 0; j < 3; j++ ) {
 			tag->origin[j] = LittleFloat( tag->origin[j] );
@@ -95,20 +95,20 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 	}
 
 	// swap all the surfaces
-	surf = (md3Surface_t *) ( ( byte * )md3 + md3->ofsSurfaces );
+	surf = (md3Surface_t *) ( (byte *)md3 + md3->ofsSurfaces );
 	for ( i = 0; i < md3->numSurfaces; i++ ) {
 
-        LL(surf->ident);
-        LL(surf->flags);
-        LL(surf->numFrames);
-        LL(surf->numShaders);
-        LL(surf->numTriangles);
-        LL(surf->ofsTriangles);
-        LL(surf->numVerts);
-        LL(surf->ofsShaders);
-        LL(surf->ofsSt);
-        LL(surf->ofsXyzNormals);
-        LL(surf->ofsEnd);
+        LL( surf->ident);
+        LL( surf->flags);
+        LL( surf->numFrames);
+        LL( surf->numShaders);
+        LL( surf->numTriangles);
+        LL( surf->ofsTriangles);
+        LL( surf->numVerts);
+        LL( surf->ofsShaders);
+        LL( surf->ofsSt);
+        LL( surf->ofsXyzNormals);
+        LL( surf->ofsEnd);
 
 		if ( surf->numVerts > SHADER_MAX_VERTEXES ) {
 			common->Error( "InitFromFile: %s has more than %i verts on a surface (%i)",
@@ -136,16 +136,16 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 		}
 
         // register the shaders
-        shader = (md3Shader_t *) ( ( byte * )surf + surf->ofsShaders );
+        shader = (md3Shader_t *) ( (byte *)surf + surf->ofsShaders );
         for ( j = 0; j < surf->numShaders; j++, shader++ ) {
-            const arcMaterial *sh;
+            const anMaterial *sh;
 
             sh = declManager->FindMaterial( shader->name );
 			shader->shader = sh;
         }
 
 		// swap all the triangles
-		tri = (md3Triangle_t *) ( ( byte * )surf + surf->ofsTriangles );
+		tri = (md3Triangle_t *) ( (byte *)surf + surf->ofsTriangles );
 		for ( j = 0; j < surf->numTriangles; j++, tri++ ) {
 			LL(tri->indexes[0] );
 			LL(tri->indexes[1] );
@@ -153,14 +153,14 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 		}
 
 		// swap all the ST
-        st = (md3St_t *) ( ( byte * )surf + surf->ofsSt );
+        st = (md3St_t *) ( (byte *)surf + surf->ofsSt );
         for ( j = 0; j < surf->numVerts; j++, st++ ) {
             st->st[0] = LittleFloat( st->st[0] );
             st->st[1] = LittleFloat( st->st[1] );
         }
 
 		// swap all the XyzNormals
-        xyz = (md3XyzNormal_t *) ( ( byte * )surf + surf->ofsXyzNormals );
+        xyz = (md3XyzNormal_t *) ( (byte *)surf + surf->ofsXyzNormals );
         for ( j = 0; j < surf->numVerts * surf->numFrames; j++, xyz++ )
 		{
             xyz->xyz[0] = LittleShort( xyz->xyz[0] );
@@ -172,7 +172,7 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 
 
 		// find the next surface
-		surf = (md3Surface_t *)( ( byte * )surf + surf->ofsEnd );
+		surf = (md3Surface_t *)( (byte *)surf + surf->ofsEnd );
 	}
 
 	fileSystem->FreeFile( buffer );
@@ -192,13 +192,13 @@ dynamicModel_t idRenderModelMD3::IsDynamicModel() const {
 idRenderModelMD3::LerpMeshVertexes
 =================
 */
-void idRenderModelMD3::LerpMeshVertexes ( surfTriangles_t *tri, const struct md3Surface_s *surf, const float backlerp, const int frame, const int oldframe ) const {
+void idRenderModelMD3::LerpMeshVertexes ( srfTriangles_t *tri, const struct md3Surface_s *surf, const float backlerp, const int frame, const int oldframe ) const {
 	short	*oldXyz, *newXyz;
 	float	oldXyzScale, newXyzScale;
 	int		vertNum;
 	int		numVerts;
 
-	newXyz = (short *)(( byte * )surf + surf->ofsXyzNormals) + (frame * surf->numVerts * 4);
+	newXyz = ( short *)((byte *)surf + surf->ofsXyzNormals) + (frame * surf->numVerts * 4);
 
 	newXyzScale = MD3_XYZ_SCALE * (1.0 - backlerp);
 
@@ -210,7 +210,7 @@ void idRenderModelMD3::LerpMeshVertexes ( surfTriangles_t *tri, const struct md3
 		//
 		for (vertNum=0; vertNum < numVerts; vertNum++, newXyz += 4 ) {
 
-			arcDrawVert *outvert = &tri->verts[tri->numVerts];
+			anDrawVertex *outvert = &tri->verts[tri->numVerts];
 
 			outvert->xyz.x = newXyz[0] * newXyzScale;
 			outvert->xyz.y = newXyz[1] * newXyzScale;
@@ -222,13 +222,13 @@ void idRenderModelMD3::LerpMeshVertexes ( surfTriangles_t *tri, const struct md3
 		//
 		// interpolate and copy the vertexes
 		//
-		oldXyz = (short *)(( byte * )surf + surf->ofsXyzNormals) + (oldframe * surf->numVerts * 4);
+		oldXyz = ( short *)((byte *)surf + surf->ofsXyzNormals) + (oldframe * surf->numVerts * 4);
 
 		oldXyzScale = MD3_XYZ_SCALE * backlerp;
 
 		for (vertNum=0; vertNum < numVerts; vertNum++, oldXyz += 4, newXyz += 4 ) {
 
-			arcDrawVert *outvert = &tri->verts[tri->numVerts];
+			anDrawVertex *outvert = &tri->verts[tri->numVerts];
 
 			// interpolate the xyz
 			outvert->xyz.x = oldXyz[0] * oldXyzScale + newXyz[0] * newXyzScale;
@@ -245,7 +245,7 @@ void idRenderModelMD3::LerpMeshVertexes ( surfTriangles_t *tri, const struct md3
 idRenderModelMD3::InstantiateDynamicModel
 =============
 */
-ARCRenderModel *idRenderModelMD3::InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel ) {
+anRenderModel *idRenderModelMD3::InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel ) {
 	int				i, j;
 	float			backlerp;
 	int *			triangles;
@@ -254,17 +254,17 @@ ARCRenderModel *idRenderModelMD3::InstantiateDynamicModel( const struct renderEn
 	int				numVerts;
 	md3Surface_t *	surface;
 	int				frame, oldframe;
-	aRcModelStatic	*staticModel;
+	anModelStatic	*staticModel;
 
 	if ( cachedModel ) {
 		delete cachedModel;
-		cachedModel = NULL;
+		cachedModel = nullptr;
 	}
 
-	staticModel = new aRcModelStatic;
+	staticModel = new anModelStatic;
 	staticModel->bounds.Clear();
 
-	surface = (md3Surface_t *) (( byte * )md3 + md3->ofsSurfaces);
+	surface = (md3Surface_t *) ( (byte *)md3 + md3->ofsSurfaces);
 
 	// TODO: these need set by an entity
 	frame = ent->shaderParms[SHADERPARM_MD3_FRAME];			// probably want to keep frames < 1000 or so
@@ -273,7 +273,7 @@ ARCRenderModel *idRenderModelMD3::InstantiateDynamicModel( const struct renderEn
 
 	for ( i = 0; i < md3->numSurfaces; i++ ) {
 
-		surfTriangles_t *tri = R_AllocStaticTriSurf();
+		srfTriangles_t *tri = R_AllocStaticTriSurf();
 		R_AllocStaticTriSurfVerts( tri, surface->numVerts );
 		R_AllocStaticTriSurfIndexes( tri, surface->numTriangles * 3 );
 		tri->bounds.Clear();
@@ -282,23 +282,23 @@ ARCRenderModel *idRenderModelMD3::InstantiateDynamicModel( const struct renderEn
 
 		surf.geometry = tri;
 
-		md3Shader_t* shaders = (md3Shader_t *) (( byte * )surface + surface->ofsShaders);
+		md3Shader_t* shaders = (md3Shader_t *) ( (byte *)surface + surface->ofsShaders);
 		surf.shader = shaders->shader;
 
 		LerpMeshVertexes( tri, surface, backlerp, frame, oldframe );
 
-		triangles = ( int * ) (( byte * )surface + surface->ofsTriangles);
+		triangles = ( int*) ( (byte *)surface + surface->ofsTriangles);
 		indexes = surface->numTriangles * 3;
-		for (j = 0; j < indexes; j++ ) {
+		for ( j = 0; j < indexes; j++ ) {
 			tri->indexes[j] = triangles[j];
 		}
 		tri->numIndexes += indexes;
 
-		texCoords = (float *) (( byte * )surface + surface->ofsSt);
+		texCoords = (float *) ( (byte *)surface + surface->ofsSt);
 
 		numVerts = surface->numVerts;
 		for ( j = 0; j < numVerts; j++ ) {
-			arcDrawVert *stri = &tri->verts[j];
+			anDrawVertex *stri = &tri->verts[j];
 			stri->st[0] = texCoords[j*2+0];
 			stri->st[1] = texCoords[j*2+1];
 		}
@@ -310,7 +310,7 @@ ARCRenderModel *idRenderModelMD3::InstantiateDynamicModel( const struct renderEn
 		staticModel->bounds.AddPoint( surf.geometry->bounds[1] );
 
 		// find the next surface
-		surface = (md3Surface_t *)( ( byte * )surface + surface->ofsEnd );
+		surface = (md3Surface_t *)( (byte *)surface + surface->ofsEnd );
 	}
 
 	return staticModel;
@@ -322,19 +322,19 @@ idRenderModelMD3::Bounds
 =====================
 */
 
-arcBounds idRenderModelMD3::Bounds(const struct renderEntity_s *ent) const {
-	arcBounds		ret;
+anBounds idRenderModelMD3::Bounds(const struct renderEntity_s *ent) const {
+	anBounds		ret;
 
 	ret.Clear();
 
 	if ( !ent || !md3) {
 		// just give it the editor bounds
-		ret.AddPoint(arcVec3(-10,-10,-10) );
-		ret.AddPoint(arcVec3( 10, 10, 10) );
+		ret.AddPoint(anVec3(-10,-10,-10) );
+		ret.AddPoint(anVec3( 10, 10, 10) );
 		return ret;
 	}
 
-	md3Frame_t	*frame = (md3Frame_t *)( ( byte * )md3 + md3->ofsFrames );
+	md3Frame_t	*frame = (md3Frame_t *)( (byte *)md3 + md3->ofsFrames );
 
 	ret.AddPoint( frame->bounds[0] );
 	ret.AddPoint( frame->bounds[1] );

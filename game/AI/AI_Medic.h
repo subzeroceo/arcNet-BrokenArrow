@@ -20,12 +20,12 @@ public:
 	void				InitSpawnArgsVariables			( void );
 	void				Spawn							( void );
 	void				Think							( void );
-	void				Save							( idSaveGame *savefile ) const;
-	void				Restore							( idRestoreGame *savefile );
+	void				Save							( anSaveGame *savefile ) const;
+	void				Restore							( anRestoreGame *savefile );
 
 	virtual void		Show							( void );
 
-	virtual void		TalkTo							( idActor *actor );
+	virtual void		TalkTo							( anActor *actor );
 
 	virtual void		GetDebugInfo					( debugInfoProc_t proc, void* userData );
 
@@ -33,7 +33,7 @@ public:
 
 	virtual void		OnStateThreadClear				( const char *statename, int flags );
 
-	virtual bool		Pain							( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location );
+	virtual bool		Pain							( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
 
 	bool				isTech;
 
@@ -42,7 +42,7 @@ protected:
 
 private:
 
-	idEntityPtr<idPlayer> patient;
+	anEntityPtr<anBasePlayer> patient;
 	bool				healing;
 	int					lastPatientCheckTime;
 	bool				emergencyOverride;
@@ -69,11 +69,11 @@ private:
 	bool				wasAware;
 	bool				wasIgnoreEnemies;
 
-	void				SetHealValues					( idPlayer* player );
+	void				SetHealValues					( anBasePlayer* player );
 
-	void				TakePatient						( idPlayer* pPatient );
+	void				TakePatient						( anBasePlayer* pPatient );
 	void				DropPatient						( void );
- 	bool				CheckTakePatient				( idPlayer* actor );
+ 	bool				CheckTakePatient				( anBasePlayer* actor );
  	bool				SituationAllowsPatient			( void );
  	bool				AvailableToTakePatient			( void );
 

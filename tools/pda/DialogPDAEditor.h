@@ -38,7 +38,7 @@ If you have questions concerning this license or the applicable additional terms
 
 class CDialogPDAEditor : public CDialog {
 public:
-							CDialogPDAEditor(CWnd* pParent = NULL);   // standard constructor
+							CDialogPDAEditor(CWnd* pParent = nullptr );   // standard constructor
 
 	//{{AFX_VIRTUAL(CDialogPDAEditor)
 	virtual BOOL			OnInitDialog();
@@ -100,7 +100,7 @@ private:
 
 class CDialogPDAEditEmail : public CDialog {
 public:
-							CDialogPDAEditEmail(CWnd* pParent = NULL);   // standard constructor
+							CDialogPDAEditEmail(CWnd* pParent = nullptr );   // standard constructor
 
 	//{{AFX_VIRTUAL(CDialogPDAEditEmail)
 	virtual BOOL			OnInitDialog();
@@ -108,7 +108,7 @@ public:
 	//}}AFX_VIRTUAL
 
 	void SetName( CString &name );
-	void SetEmail( const arcDeclEmail *email );
+	void SetEmail( const anDeclEmail *email );
 
 	CString GetDeclText();
 

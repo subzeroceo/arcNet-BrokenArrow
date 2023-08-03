@@ -1,23 +1,23 @@
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 
 /*
 ==============================================================================
 
-  ARCBitMessage
+  anBitMessage
 
 ==============================================================================
 */
 
 /*
 ================
-ARCBitMessage::ARCBitMessage
+anBitMessage::anBitMessage
 ================
 */
-ARCBitMessage::ARCBitMessage() {
-	writeData = NULL;
-	readData = NULL;
+anBitMessage::anBitMessage() {
+	writeData = nullptr;
+	readData = nullptr;
 	maxSize = 0;
 	curSize = 0;
 	writeBit = 0;
@@ -29,19 +29,19 @@ ARCBitMessage::ARCBitMessage() {
 
 /*
 ================
-ARCBitMessage::CheckOverflow
+anBitMessage::CheckOverflow
 ================
 */
-bool ARCBitMessage::CheckOverflow( int numBits ) {
+bool anBitMessage::CheckOverflow( int numBits ) {
 	assert( numBits >= 0 );
 	if ( numBits > GetRemainingWriteBits() ) {
 		if ( !allowOverflow ) {
-			arcLibrary::common->FatalError( "ARCBitMessage: overflow without allowOverflow set" );
+			anLibrary::common->FatalError( "anBitMessage: overflow without allowOverflow set" );
 		}
 		if ( numBits > ( maxSize << 3 ) ) {
-			arcLibrary::common->FatalError( "ARCBitMessage: %i bits is > full message size", numBits );
+			anLibrary::common->FatalError( "anBitMessage: %i bits is > full message size", numBits );
 		}
-		arcLibrary::common->Printf( "ARCBitMessage: overflow\n" );
+		anLibrary::common->Printf( "anBitMessage: overflow\n" );
 		BeginWriting();
 		overflowed = true;
 		return true;
@@ -51,14 +51,14 @@ bool ARCBitMessage::CheckOverflow( int numBits ) {
 
 /*
 ================
-ARCBitMessage::GetByteSpace
+anBitMessage::GetByteSpace
 ================
 */
-byte *ARCBitMessage::GetByteSpace( int length ) {
+byte *anBitMessage::GetByteSpace( int length ) {
 	byte *ptr;
 
 	if ( !writeData ) {
-		arcLibrary::common->FatalError( "ARCBitMessage::GetByteSpace: cannot write to message" );
+		anLibrary::common->FatalError( "anBitMessage::GetByteSpace: cannot write to message" );
 	}
 
 	// round up to the next byte
@@ -74,22 +74,22 @@ byte *ARCBitMessage::GetByteSpace( int length ) {
 
 /*
 ================
-ARCBitMessage::WriteBits
+anBitMessage::WriteBits
 
   If the number of bits is negative a sign is included.
 ================
 */
-void ARCBitMessage::WriteBits( int value, int numBits ) {
+void anBitMessage::WriteBits( int value, int numBits ) {
 	int		put;
 	int		fraction;
 
 	if ( !writeData ) {
-		arcLibrary::common->Error( "ARCBitMessage::WriteBits: cannot write to message" );
+		anLibrary::common->Error( "anBitMessage::WriteBits: cannot write to message" );
 	}
 
 	// check if the number of bits is valid
 	if ( numBits == 0 || numBits < -31 || numBits > 32 ) {
-		arcLibrary::common->Error( "ARCBitMessage::WriteBits: bad numBits %i", numBits );
+		anLibrary::common->Error( "anBitMessage::WriteBits: bad numBits %i", numBits );
 	}
 
 	// check for value overflows
@@ -97,16 +97,16 @@ void ARCBitMessage::WriteBits( int value, int numBits ) {
 	if ( numBits != 32 ) {
 		if ( numBits > 0 ) {
 			if ( value > ( 1 << numBits ) - 1 ) {
-				arcLibrary::common->Warning( "ARCBitMessage::WriteBits: value overflow %d %d", value, numBits );
+				anLibrary::common->Warning( "anBitMessage::WriteBits: value overflow %d %d", value, numBits );
 			} else if ( value < 0 ) {
-				arcLibrary::common->Warning( "ARCBitMessage::WriteBits: value overflow %d %d", value, numBits );
+				anLibrary::common->Warning( "anBitMessage::WriteBits: value overflow %d %d", value, numBits );
 			}
 		} else {
 			int r = 1 << ( - 1 - numBits );
 			if ( value > r - 1 ) {
-				arcLibrary::common->Warning( "ARCBitMessage::WriteBits: value overflow %d %d", value, numBits );
+				anLibrary::common->Warning( "anBitMessage::WriteBits: value overflow %d %d", value, numBits );
 			} else if ( value < -r ) {
-				arcLibrary::common->Warning( "ARCBitMessage::WriteBits: value overflow %d %d", value, numBits );
+				anLibrary::common->Warning( "anBitMessage::WriteBits: value overflow %d %d", value, numBits );
 			}
 		}
 	}
@@ -140,10 +140,10 @@ void ARCBitMessage::WriteBits( int value, int numBits ) {
 
 /*
 ================
-ARCBitMessage::WriteString
+anBitMessage::WriteString
 ================
 */
-void ARCBitMessage::WriteString( const char *s, int maxLength, bool make7Bit ) {
+void anBitMessage::WriteString( const char *s, int maxLength, bool make7Bit ) {
 	if ( !s ) {
 		WriteData( "", 1 );
 	} else {
@@ -151,12 +151,12 @@ void ARCBitMessage::WriteString( const char *s, int maxLength, bool make7Bit ) {
 		byte *dataPtr;
 		const byte *bytePtr;
 
-		l = arcNetString::Length( s );
+		l = anString::Length( s );
 		if ( maxLength >= 0 && l >= maxLength ) {
 			l = maxLength - 1;
 		}
 		dataPtr = GetByteSpace( l + 1 );
-		bytePtr = reinterpret_cast<const byte *>(s);
+		bytePtr = reinterpret_cast<const byte *>( s);
 		if ( make7Bit ) {
 			for ( i = 0; i < l; i++ ) {
 				if ( bytePtr[i] > 127 ) {
@@ -176,19 +176,19 @@ void ARCBitMessage::WriteString( const char *s, int maxLength, bool make7Bit ) {
 
 /*
 ================
-ARCBitMessage::WriteData
+anBitMessage::WriteData
 ================
 */
-void ARCBitMessage::WriteData( const void *data, int length ) {
+void anBitMessage::WriteData( const void *data, int length ) {
 	memcpy( GetByteSpace( length ), data, length );
 }
 
 /*
 ================
-ARCBitMessage::WriteNetadr
+anBitMessage::WriteNetadr
 ================
 */
-void ARCBitMessage::WriteNetadr( const netadr_t adr ) {
+void anBitMessage::WriteNetadr( const netadr_t adr ) {
 	byte *dataPtr;
 	dataPtr = GetByteSpace( 4 );
 	memcpy( dataPtr, adr.ip, 4 );
@@ -197,10 +197,10 @@ void ARCBitMessage::WriteNetadr( const netadr_t adr ) {
 
 /*
 ================
-ARCBitMessage::WriteDelta
+anBitMessage::WriteDelta
 ================
 */
-void ARCBitMessage::WriteDelta( int oldValue, int newValue, int numBits ) {
+void anBitMessage::WriteDelta( int oldValue, int newValue, int numBits ) {
 	if ( oldValue == newValue ) {
 		WriteBits( 0, 1 );
 		return;
@@ -211,10 +211,10 @@ void ARCBitMessage::WriteDelta( int oldValue, int newValue, int numBits ) {
 
 /*
 ================
-ARCBitMessage::WriteDeltaByteCounter
+anBitMessage::WriteDeltaByteCounter
 ================
 */
-void ARCBitMessage::WriteDeltaByteCounter( int oldValue, int newValue ) {
+void anBitMessage::WriteDeltaByteCounter( int oldValue, int newValue ) {
 	int i, x;
 
 	x = oldValue ^ newValue;
@@ -232,10 +232,10 @@ void ARCBitMessage::WriteDeltaByteCounter( int oldValue, int newValue ) {
 
 /*
 ================
-ARCBitMessage::WriteDeltaShortCounter
+anBitMessage::WriteDeltaShortCounter
 ================
 */
-void ARCBitMessage::WriteDeltaShortCounter( int oldValue, int newValue ) {
+void anBitMessage::WriteDeltaShortCounter( int oldValue, int newValue ) {
 	int i, x;
 
 	x = oldValue ^ newValue;
@@ -253,10 +253,10 @@ void ARCBitMessage::WriteDeltaShortCounter( int oldValue, int newValue ) {
 
 /*
 ================
-ARCBitMessage::WriteDeltaLongCounter
+anBitMessage::WriteDeltaLongCounter
 ================
 */
-void ARCBitMessage::WriteDeltaLongCounter( int oldValue, int newValue ) {
+void anBitMessage::WriteDeltaLongCounter( int oldValue, int newValue ) {
 	int i, x;
 
 	x = oldValue ^ newValue;
@@ -274,20 +274,20 @@ void ARCBitMessage::WriteDeltaLongCounter( int oldValue, int newValue ) {
 
 /*
 ==================
-ARCBitMessage::WriteDeltaDict
+anBitMessage::WriteDeltaDict
 ==================
 */
-bool ARCBitMessage::WriteDeltaDict( const arcDictionary &dict, const arcDictionary *base ) {
+bool anBitMessage::WriteDeltaDict( const anDict &dict, const anDict *base ) {
 	int i;
-	const idKeyValue *kv, *basekv;
+	const anKeyValue *kv, *basekv;
 	bool changed = false;
 
-	if ( base != NULL ) {
+	if ( base != nullptr ) {
 
 		for ( i = 0; i < dict.GetNumKeyVals(); i++ ) {
 			kv = dict.GetKeyVal( i );
 			basekv = base->FindKey( kv->GetKey() );
-			if ( basekv == NULL || basekv->GetValue().Icmp( kv->GetValue() ) != 0 ) {
+			if ( basekv == nullptr || basekv->GetValue().Icmp( kv->GetValue() ) != 0 ) {
 				WriteString( kv->GetKey() );
 				WriteString( kv->GetValue() );
 				changed = true;
@@ -299,7 +299,7 @@ bool ARCBitMessage::WriteDeltaDict( const arcDictionary &dict, const arcDictiona
 		for ( i = 0; i < base->GetNumKeyVals(); i++ ) {
 			basekv = base->GetKeyVal( i );
 			kv = dict.FindKey( basekv->GetKey() );
-			if ( kv == NULL ) {
+			if ( kv == nullptr ) {
 				WriteString( basekv->GetKey() );
 				changed = true;
 			}
@@ -326,12 +326,12 @@ bool ARCBitMessage::WriteDeltaDict( const arcDictionary &dict, const arcDictiona
 
 /*
 ================
-ARCBitMessage::ReadBits
+anBitMessage::ReadBits
 
   If the number of bits is negative a sign is included.
 ================
 */
-int ARCBitMessage::ReadBits( int numBits ) const {
+int anBitMessage::ReadBits( int numBits ) const {
 	int		value;
 	int		valueBits;
 	int		get;
@@ -339,12 +339,12 @@ int ARCBitMessage::ReadBits( int numBits ) const {
 	bool	sgn;
 
 	if ( !readData ) {
-		arcLibrary::common->FatalError( "ARCBitMessage::ReadBits: cannot read from message" );
+		anLibrary::common->FatalError( "anBitMessage::ReadBits: cannot read from message" );
 	}
 
 	// check if the number of bits is valid
 	if ( numBits == 0 || numBits < -31 || numBits > 32 ) {
-		arcLibrary::common->FatalError( "ARCBitMessage::ReadBits: bad numBits %i", numBits );
+		anLibrary::common->FatalError( "anBitMessage::ReadBits: bad numBits %i", numBits );
 	}
 
 	value = 0;
@@ -390,10 +390,10 @@ int ARCBitMessage::ReadBits( int numBits ) const {
 
 /*
 ================
-ARCBitMessage::ReadString
+anBitMessage::ReadString
 ================
 */
-int ARCBitMessage::ReadString( char *buffer, int bufferSize ) const {
+int anBitMessage::ReadString( char *buffer, int bufferSize ) const {
 	int	l, c;
 
 	ReadByteAlign();
@@ -423,10 +423,10 @@ int ARCBitMessage::ReadString( char *buffer, int bufferSize ) const {
 
 /*
 ================
-ARCBitMessage::ReadData
+anBitMessage::ReadData
 ================
 */
-int ARCBitMessage::ReadData( void *data, int length ) const {
+int anBitMessage::ReadData( void *data, int length ) const {
 	int cnt;
 
 	ReadByteAlign();
@@ -449,25 +449,25 @@ int ARCBitMessage::ReadData( void *data, int length ) const {
 
 /*
 ================
-ARCBitMessage::ReadNetadr
+anBitMessage::ReadNetadr
 ================
 */
-void ARCBitMessage::ReadNetadr( netadr_t *adr ) const {
+void anBitMessage::ReadNetadr( netadr_t *adr ) const {
 	int i;
 
 	adr->type = NA_IP;
 	for ( i = 0; i < 4; i++ ) {
-		adr->ip[ i ] = ReadByte();
+		adr->ip[i] = ReadByte();
 	}
 	adr->port = ReadUShort();
 }
 
 /*
 ================
-ARCBitMessage::ReadDelta
+anBitMessage::ReadDelta
 ================
 */
-int ARCBitMessage::ReadDelta( int oldValue, int numBits ) const {
+int anBitMessage::ReadDelta( int oldValue, int numBits ) const {
 	if ( ReadBits( 1 ) ) {
 		return ReadBits( numBits );
 	}
@@ -476,10 +476,10 @@ int ARCBitMessage::ReadDelta( int oldValue, int numBits ) const {
 
 /*
 ================
-ARCBitMessage::ReadDeltaByteCounter
+anBitMessage::ReadDeltaByteCounter
 ================
 */
-int ARCBitMessage::ReadDeltaByteCounter( int oldValue ) const {
+int anBitMessage::ReadDeltaByteCounter( int oldValue ) const {
 	int i, newValue;
 
 	i = ReadBits( 3 );
@@ -492,10 +492,10 @@ int ARCBitMessage::ReadDeltaByteCounter( int oldValue ) const {
 
 /*
 ================
-ARCBitMessage::ReadDeltaShortCounter
+anBitMessage::ReadDeltaShortCounter
 ================
 */
-int ARCBitMessage::ReadDeltaShortCounter( int oldValue ) const {
+int anBitMessage::ReadDeltaShortCounter( int oldValue ) const {
 	int i, newValue;
 
 	i = ReadBits( 4 );
@@ -508,10 +508,10 @@ int ARCBitMessage::ReadDeltaShortCounter( int oldValue ) const {
 
 /*
 ================
-ARCBitMessage::ReadDeltaLongCounter
+anBitMessage::ReadDeltaLongCounter
 ================
 */
-int ARCBitMessage::ReadDeltaLongCounter( int oldValue ) const {
+int anBitMessage::ReadDeltaLongCounter( int oldValue ) const {
 	int i, newValue;
 
 	i = ReadBits( 5 );
@@ -524,15 +524,15 @@ int ARCBitMessage::ReadDeltaLongCounter( int oldValue ) const {
 
 /*
 ==================
-ARCBitMessage::ReadDeltaDict
+anBitMessage::ReadDeltaDict
 ==================
 */
-bool ARCBitMessage::ReadDeltaDict( arcDictionary &dict, const arcDictionary *base ) const {
+bool anBitMessage::ReadDeltaDict( anDict &dict, const anDict *base ) const {
 	char		key[MAX_STRING_CHARS];
 	char		value[MAX_STRING_CHARS];
 	bool		changed = false;
 
-	if ( base != NULL ) {
+	if ( base != nullptr ) {
 		dict = *base;
 	} else {
 		dict.Clear();
@@ -554,10 +554,10 @@ bool ARCBitMessage::ReadDeltaDict( arcDictionary &dict, const arcDictionary *bas
 
 /*
 ================
-ARCBitMessage::DirToBits
+anBitMessage::DirToBits
 ================
 */
-int ARCBitMessage::DirToBits( const arcVec3 &dir, int numBits ) {
+int anBitMessage::DirToBits( const anVec3 &dir, int numBits ) {
 	int max, bits;
 	float bias;
 
@@ -569,24 +569,24 @@ int ARCBitMessage::DirToBits( const arcVec3 &dir, int numBits ) {
 	bias = 0.5f / max;
 
 	bits = FLOATSIGNBITSET( dir.x ) << ( numBits * 3 - 1 );
-	bits |= ( arcMath::Ftoi( ( arcMath::Fabs( dir.x ) + bias ) * max ) ) << ( numBits * 2 );
+	bits |= ( anMath::Ftoi( ( anMath::Fabs( dir.x ) + bias ) * max ) ) << ( numBits * 2 );
 	bits |= FLOATSIGNBITSET( dir.y ) << ( numBits * 2 - 1 );
-	bits |= ( arcMath::Ftoi( ( arcMath::Fabs( dir.y ) + bias ) * max ) ) << ( numBits * 1 );
+	bits |= ( anMath::Ftoi( ( anMath::Fabs( dir.y ) + bias ) * max ) ) << ( numBits * 1 );
 	bits |= FLOATSIGNBITSET( dir.z ) << ( numBits * 1 - 1 );
-	bits |= ( arcMath::Ftoi( ( arcMath::Fabs( dir.z ) + bias ) * max ) ) << ( numBits * 0 );
+	bits |= ( anMath::Ftoi( ( anMath::Fabs( dir.z ) + bias ) * max ) ) << ( numBits * 0 );
 	return bits;
 }
 
 /*
 ================
-ARCBitMessage::BitsToDir
+anBitMessage::BitsToDir
 ================
 */
-arcVec3 ARCBitMessage::BitsToDir( int bits, int numBits ) {
+anVec3 anBitMessage::BitsToDir( int bits, int numBits ) {
 	static float sign[2] = { 1.0f, -1.0f };
 	int max;
 	float invMax;
-	arcVec3 dir;
+	anVec3 dir;
 
 	assert( numBits >= 6 && numBits <= 32 );
 
@@ -605,7 +605,7 @@ arcVec3 ARCBitMessage::BitsToDir( int bits, int numBits ) {
 /*
 ==============================================================================
 
-  idBitMsgDelta
+  anBitMsgDelta
 
 ==============================================================================
 */
@@ -614,10 +614,10 @@ const int MAX_DATA_BUFFER		= 1024;
 
 /*
 ================
-idBitMsgDelta::WriteBits
+anBitMsgDelta::WriteBits
 ================
 */
-void idBitMsgDelta::WriteBits( int value, int numBits ) {
+void anBitMsgDelta::WriteBits( int value, int numBits ) {
 	if ( newBase ) {
 		newBase->WriteBits( value, numBits );
 	}
@@ -639,10 +639,10 @@ void idBitMsgDelta::WriteBits( int value, int numBits ) {
 
 /*
 ================
-idBitMsgDelta::WriteDelta
+anBitMsgDelta::WriteDelta
 ================
 */
-void idBitMsgDelta::WriteDelta( int oldValue, int newValue, int numBits ) {
+void anBitMsgDelta::WriteDelta( int oldValue, int newValue, int numBits ) {
 	if ( newBase ) {
 		newBase->WriteBits( newValue, numBits );
 	}
@@ -675,10 +675,10 @@ void idBitMsgDelta::WriteDelta( int oldValue, int newValue, int numBits ) {
 
 /*
 ================
-idBitMsgDelta::ReadBits
+anBitMsgDelta::ReadBits
 ================
 */
-int idBitMsgDelta::ReadBits( int numBits ) const {
+int anBitMsgDelta::ReadBits( int numBits ) const {
 	int value;
 
 	if ( !base ) {
@@ -702,10 +702,10 @@ int idBitMsgDelta::ReadBits( int numBits ) const {
 
 /*
 ================
-idBitMsgDelta::ReadDelta
+anBitMsgDelta::ReadDelta
 ================
 */
-int idBitMsgDelta::ReadDelta( int oldValue, int numBits ) const {
+int anBitMsgDelta::ReadDelta( int oldValue, int numBits ) const {
 	int value;
 
 	if ( !base ) {
@@ -736,10 +736,10 @@ int idBitMsgDelta::ReadDelta( int oldValue, int numBits ) const {
 
 /*
 ================
-idBitMsgDelta::WriteString
+anBitMsgDelta::WriteString
 ================
 */
-void idBitMsgDelta::WriteString( const char *s, int maxLength ) {
+void anBitMsgDelta::WriteString( const char *s, int maxLength ) {
 	if ( newBase ) {
 		newBase->WriteString( s, maxLength );
 	}
@@ -750,7 +750,7 @@ void idBitMsgDelta::WriteString( const char *s, int maxLength ) {
 	} else {
 		char baseString[MAX_DATA_BUFFER];
 		base->ReadString( baseString, sizeof( baseString ) );
-		if ( arcNetString::Cmp( s, baseString ) == 0 ) {
+		if ( anString::Cmp( s, baseString ) == 0 ) {
 			writeDelta->WriteBits( 0, 1 );
 		} else {
 			writeDelta->WriteBits( 1, 1 );
@@ -762,10 +762,10 @@ void idBitMsgDelta::WriteString( const char *s, int maxLength ) {
 
 /*
 ================
-idBitMsgDelta::WriteData
+anBitMsgDelta::WriteData
 ================
 */
-void idBitMsgDelta::WriteData( const void *data, int length ) {
+void anBitMsgDelta::WriteData( const void *data, int length ) {
 	if ( newBase ) {
 		newBase->WriteData( data, length );
 	}
@@ -789,30 +789,30 @@ void idBitMsgDelta::WriteData( const void *data, int length ) {
 
 /*
 ================
-idBitMsgDelta::WriteDict
+anBitMsgDelta::WriteDict
 ================
 */
-void idBitMsgDelta::WriteDict( const arcDictionary &dict ) {
+void anBitMsgDelta::WriteDict( const anDict &dict ) {
 	if ( newBase ) {
-		newBase->WriteDeltaDict( dict, NULL );
+		newBase->WriteDeltaDict( dict, nullptr );
 	}
 
 	if ( !base ) {
-		writeDelta->WriteDeltaDict( dict, NULL );
+		writeDelta->WriteDeltaDict( dict, nullptr );
 		changed = true;
 	} else {
-		arcDictionary baseDict;
-		base->ReadDeltaDict( baseDict, NULL );
+		anDict baseDict;
+		base->ReadDeltaDict( baseDict, nullptr );
 		changed = writeDelta->WriteDeltaDict( dict, &baseDict );
 	}
 }
 
 /*
 ================
-idBitMsgDelta::WriteDeltaByteCounter
+anBitMsgDelta::WriteDeltaByteCounter
 ================
 */
-void idBitMsgDelta::WriteDeltaByteCounter( int oldValue, int newValue ) {
+void anBitMsgDelta::WriteDeltaByteCounter( int oldValue, int newValue ) {
 	if ( newBase ) {
 		newBase->WriteBits( newValue, 8 );
 	}
@@ -834,10 +834,10 @@ void idBitMsgDelta::WriteDeltaByteCounter( int oldValue, int newValue ) {
 
 /*
 ================
-idBitMsgDelta::WriteDeltaShortCounter
+anBitMsgDelta::WriteDeltaShortCounter
 ================
 */
-void idBitMsgDelta::WriteDeltaShortCounter( int oldValue, int newValue ) {
+void anBitMsgDelta::WriteDeltaShortCounter( int oldValue, int newValue ) {
 	if ( newBase ) {
 		newBase->WriteBits( newValue, 16 );
 	}
@@ -859,10 +859,10 @@ void idBitMsgDelta::WriteDeltaShortCounter( int oldValue, int newValue ) {
 
 /*
 ================
-idBitMsgDelta::WriteDeltaLongCounter
+anBitMsgDelta::WriteDeltaLongCounter
 ================
 */
-void idBitMsgDelta::WriteDeltaLongCounter( int oldValue, int newValue ) {
+void anBitMsgDelta::WriteDeltaLongCounter( int oldValue, int newValue ) {
 	if ( newBase ) {
 		newBase->WriteBits( newValue, 32 );
 	}
@@ -884,10 +884,10 @@ void idBitMsgDelta::WriteDeltaLongCounter( int oldValue, int newValue ) {
 
 /*
 ================
-idBitMsgDelta::ReadString
+anBitMsgDelta::ReadString
 ================
 */
-void idBitMsgDelta::ReadString( char *buffer, int bufferSize ) const {
+void anBitMsgDelta::ReadString( char *buffer, int bufferSize ) const {
 	if ( !base ) {
 		readDelta->ReadString( buffer, bufferSize );
 		changed = true;
@@ -895,7 +895,7 @@ void idBitMsgDelta::ReadString( char *buffer, int bufferSize ) const {
 		char baseString[MAX_DATA_BUFFER];
 		base->ReadString( baseString, sizeof( baseString ) );
 		if ( !readDelta || readDelta->ReadBits( 1 ) == 0 ) {
-			arcNetString::Copynz( buffer, baseString, bufferSize );
+			anString::Copynz( buffer, baseString, bufferSize );
 		} else {
 			readDelta->ReadString( buffer, bufferSize );
 			changed = true;
@@ -909,10 +909,10 @@ void idBitMsgDelta::ReadString( char *buffer, int bufferSize ) const {
 
 /*
 ================
-idBitMsgDelta::ReadData
+anBitMsgDelta::ReadData
 ================
 */
-void idBitMsgDelta::ReadData( void *data, int length ) const {
+void anBitMsgDelta::ReadData( void *data, int length ) const {
 	if ( !base ) {
 		readDelta->ReadData( data, length );
 		changed = true;
@@ -935,16 +935,16 @@ void idBitMsgDelta::ReadData( void *data, int length ) const {
 
 /*
 ================
-idBitMsgDelta::ReadDict
+anBitMsgDelta::ReadDict
 ================
 */
-void idBitMsgDelta::ReadDict( arcDictionary &dict ) {
+void anBitMsgDelta::ReadDict( anDict &dict ) {
 	if ( !base ) {
-		readDelta->ReadDeltaDict( dict, NULL );
+		readDelta->ReadDeltaDict( dict, nullptr );
 		changed = true;
 	} else {
-		arcDictionary baseDict;
-		base->ReadDeltaDict( baseDict, NULL );
+		anDict baseDict;
+		base->ReadDeltaDict( baseDict, nullptr );
 		if ( !readDelta ) {
 			dict = baseDict;
 		} else {
@@ -953,16 +953,16 @@ void idBitMsgDelta::ReadDict( arcDictionary &dict ) {
 	}
 
 	if ( newBase ) {
-		newBase->WriteDeltaDict( dict, NULL );
+		newBase->WriteDeltaDict( dict, nullptr );
 	}
 }
 
 /*
 ================
-idBitMsgDelta::ReadDeltaByteCounter
+anBitMsgDelta::ReadDeltaByteCounter
 ================
 */
-int idBitMsgDelta::ReadDeltaByteCounter( int oldValue ) const {
+int anBitMsgDelta::ReadDeltaByteCounter( int oldValue ) const {
 	int value;
 
 	if ( !base ) {
@@ -986,10 +986,10 @@ int idBitMsgDelta::ReadDeltaByteCounter( int oldValue ) const {
 
 /*
 ================
-idBitMsgDelta::ReadDeltaShortCounter
+anBitMsgDelta::ReadDeltaShortCounter
 ================
 */
-int idBitMsgDelta::ReadDeltaShortCounter( int oldValue ) const {
+int anBitMsgDelta::ReadDeltaShortCounter( int oldValue ) const {
 	int value;
 
 	if ( !base ) {
@@ -1013,10 +1013,10 @@ int idBitMsgDelta::ReadDeltaShortCounter( int oldValue ) const {
 
 /*
 ================
-idBitMsgDelta::ReadDeltaLongCounter
+anBitMsgDelta::ReadDeltaLongCounter
 ================
 */
-int idBitMsgDelta::ReadDeltaLongCounter( int oldValue ) const {
+int anBitMsgDelta::ReadDeltaLongCounter( int oldValue ) const {
 	int value;
 
 	if ( !base ) {

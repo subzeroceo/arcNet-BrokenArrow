@@ -35,10 +35,10 @@ typedef enum {
 } cmdExecution_t;
 
 // command function
-typedef void (*cmdFunction_t)( const arcCommandArgs &args );
+typedef void (*cmdFunction_t)( const anCommandArgs &args );
 
 // argument completion function
-typedef void (*argCompletion_t)( const arcCommandArgs &args, void(*callback)( const char *s ) );
+typedef void (*argCompletion_t)( const anCommandArgs &args, void(*callback)( const char *s ) );
 
 /*
 ================================================
@@ -54,7 +54,7 @@ static idCommandLink sys_dumpMemory( "sys_dumpMemory", Sys_DumpMemory_f, "Walks 
 class idCommandLink {
 public:
 	idCommandLink( const char *cmdName, cmdFunction_t function,
-		const char *description, argCompletion_t argCompletion = NULL );
+		const char *description, argCompletion_t argCompletion = nullptr );
 	idCommandLink *	next;
 	const char *	cmdName_;
 	cmdFunction_t	function_;
@@ -64,7 +64,7 @@ public:
 
 // The command system will create commands for all the static definitions
 // when it initializes.
-idCommandLink *CommandLinks( idCommandLink *cl = NULL );
+idCommandLink *CommandLinks( idCommandLink *cl = nullptr );
 
 /*
 ================================================
@@ -98,16 +98,16 @@ created using the CONSOLE_COMMAND_SHIP macro.
 // Turn console commands into static inline code, which will cause them to be
 // removed from the build.
 #define CONSOLE_COMMAND_NO_COMPILE( name, comment, completion ) \
-	static inline void name ## _f( const arcCommandArgs &args )
+	static inline void name ## _f( const anCommandArgs &args )
 
 // lint incorrectly gives this for all console commands: Issue 1568: (Warning -- Variable 'TestAtomicString_v' accesses variable 'atomicStringManager' before the latter is initialized through calls: 'TestAtomicString_f() => idAtomicString::FreeDynamic()')
 // I can't figure out how to disable this just around CONSOLE_COMMAND, so it must stay disabled everywhere,
 // which is a shame.
 //lint -e1568
 #define CONSOLE_COMMAND_COMPILE( name, comment, completion ) \
-	void name ## _f( const arcCommandArgs &args ); \
+	void name ## _f( const anCommandArgs &args ); \
 	idCommandLink name ## _v( #name, name ## _f, comment, completion  ); \
-	void name ## _f( const arcCommandArgs &args )
+	void name ## _f( const anCommandArgs &args )
 
 class arcCmdSystem {
 public:
@@ -117,7 +117,7 @@ public:
 	virtual void		Shutdown() = 0;
 
 						// Registers a command and the function to call for it.
-	virtual void		AddCommand( const char *cmdName, cmdFunction_t function, int flags, const char *description, argCompletion_t argCompletion = NULL ) = 0;
+	virtual void		AddCommand( const char *cmdName, cmdFunction_t function, int flags, const char *description, argCompletion_t argCompletion = nullptr ) = 0;
 						// Removes a command.
 	virtual void		RemoveCommand( const char *cmdName ) = 0;
 						// Remove all commands with one of the flags set.
@@ -127,8 +127,8 @@ public:
 	virtual void		CommandCompletion( void(*callback)( const char *s ) ) = 0;
 	virtual void		ArgCompletion( const char *cmdString, void(*callback)( const char *s ) ) = 0;
 
-	virtual void		ExecuteCommandText( const char * text ) = 0;
-	virtual void		AppendCommandText( const char * text ) = 0;
+	virtual void		ExecuteCommandText( const char *text ) = 0;
+	virtual void		AppendCommandText( const char *text ) = 0;
 
 						// Adds command text to the command buffer, does not add a final \n
 	virtual void		BufferCommandText( cmdExecution_t exec, const char *text ) = 0;
@@ -138,94 +138,94 @@ public:
 	virtual void		ExecuteCommandBuffer() = 0;
 
 						// Base for path/file auto-completion.
-	virtual void		ArgCompletion_FolderExtension( const arcCommandArgs &args, void(*callback)( const char *s ), const char *folder, bool stripFolder, ... ) = 0;
+	virtual void		ArgCompletion_FolderExtension( const anCommandArgs &args, void(*callback)( const char *s ), const char *folder, bool stripFolder, ... ) = 0;
 						// Base for decl name auto-completion.
-	virtual void		ArgCompletion_DeclName( const arcCommandArgs &args, void(*callback)( const char *s ), int type ) = 0;
+	virtual void		ArgCompletion_DeclName( const anCommandArgs &args, void(*callback)( const char *s ), int type ) = 0;
 
 						// Adds to the command buffer in tokenized form ( CMD_EXEC_NOW or CMD_EXEC_APPEND only )
-	virtual void		BufferCommandArgs( cmdExecution_t exec, const arcCommandArgs &args ) = 0;
+	virtual void		BufferCommandArgs( cmdExecution_t exec, const anCommandArgs &args ) = 0;
 
 						// Setup a reloadEngine to happen on next command run, and give a command to execute after reload
-	virtual void		SetupReloadEngine( const arcCommandArgs &args ) = 0;
+	virtual void		SetupReloadEngine( const anCommandArgs &args ) = 0;
 	virtual bool		PostReloadEngine() = 0;
 
 						// Default argument completion functions.
-	static void			ArgCompletion_Boolean( const arcCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_Boolean( const anCommandArgs &args, void(*callback)( const char *s ) );
 	template<int min,int max>
-	static void			ArgCompletion_Integer( const arcCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_Integer( const anCommandArgs &args, void(*callback)( const char *s ) );
 	template<const char **strings>
-	static void			ArgCompletion_String( const arcCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_String( const anCommandArgs &args, void(*callback)( const char *s ) );
 	template<int type>
-	static void			ArgCompletion_Decl( const arcCommandArgs &args, void(*callback)( const char *s ) );
-	static void			ArgCompletion_FileName( const arcCommandArgs &args, void(*callback)( const char *s ) );
-	static void			ArgCompletion_MapName( const arcCommandArgs &args, void(*callback)( const char *s ) );
-	static void			ArgCompletion_ModelName( const arcCommandArgs &args, void(*callback)( const char *s ) );
-	static void			ArgCompletion_SoundName( const arcCommandArgs &args, void(*callback)( const char *s ) );
-	static void			ArgCompletion_ImageName( const arcCommandArgs &args, void(*callback)( const char *s ) );
-	static void			ArgCompletion_VideoName( const arcCommandArgs &args, void(*callback)( const char *s ) );
-	static void			ArgCompletion_ConfigName( const arcCommandArgs &args, void(*callback)( const char *s ) );
-	static void			ArgCompletion_SaveGame( const arcCommandArgs &args, void(*callback)( const char *s ) );
-	static void			ArgCompletion_DemoName( const arcCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_Decl( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_FileName( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_MapName( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_ModelName( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_SoundName( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_ImageName( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_VideoName( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_ConfigName( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_SaveGame( const anCommandArgs &args, void(*callback)( const char *s ) );
+	static void			ArgCompletion_DemoName( const anCommandArgs &args, void(*callback)( const char *s ) );
 };
 
 extern arcCmdSystem *	cmdSystem;
 
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_Boolean( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
+ARC_INLINE void arcCmdSystem::ArgCompletion_Boolean( const anCommandArgs &args, void(*callback)( const char *s ) ) {
 	callback( va( "%s 0", args.Argv( 0 ) ) );
 	callback( va( "%s 1", args.Argv( 0 ) ) );
 }
 
-template<int min,int max> ARC_INLINE void arcCmdSystem::ArgCompletion_Integer( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
+template<int min,int max> ARC_INLINE void arcCmdSystem::ArgCompletion_Integer( const anCommandArgs &args, void(*callback)( const char *s ) ) {
 	for ( int i = min; i <= max; i++ ) {
 		callback( va( "%s %d", args.Argv( 0 ), i ) );
 	}
 }
 
-template<const char **strings> ARC_INLINE void arcCmdSystem::ArgCompletion_String( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
+template<const char **strings> ARC_INLINE void arcCmdSystem::ArgCompletion_String( const anCommandArgs &args, void(*callback)( const char *s ) ) {
 	for ( int i = 0; strings[i]; i++ ) {
 		callback( va( "%s %s", args.Argv( 0 ), strings[i] ) );
 	}
 }
 
-template<int type> ARC_INLINE void arcCmdSystem::ArgCompletion_Decl( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
+template<int type> ARC_INLINE void arcCmdSystem::ArgCompletion_Decl( const anCommandArgs &args, void(*callback)( const char *s ) ) {
 	cmdSystem->ArgCompletion_DeclName( args, callback, type );
 }
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_FileName( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "/", true, "", NULL );
+ARC_INLINE void arcCmdSystem::ArgCompletion_FileName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "/", true, "", nullptr );
 }
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_MapName( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "maps/", true, ".map", NULL );
+ARC_INLINE void arcCmdSystem::ArgCompletion_MapName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "maps/", true, ".map", nullptr );
 }
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_ModelName( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "models/", false, ".lwo", ".ase", ".md5mesh", ".ma", NULL );
+ARC_INLINE void arcCmdSystem::ArgCompletion_ModelName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "models/", false, ".lwo", ".ase", ".md5mesh", ".ma", nullptr );
 }
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_SoundName( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "sound/", false, ".wav", NULL );
+ARC_INLINE void arcCmdSystem::ArgCompletion_SoundName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "sound/", false, ".wav", nullptr );
 }
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_ImageName( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "/", false, ".tga", ".dds", ".jpg", ".pcx", NULL );
+ARC_INLINE void arcCmdSystem::ArgCompletion_ImageName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "/", false, ".tga", ".dds", ".jpg", ".pcx", nullptr );
 }
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_VideoName( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "/", false, ".bik", NULL );
+ARC_INLINE void arcCmdSystem::ArgCompletion_VideoName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "/", false, ".bik", nullptr );
 }
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_ConfigName( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "/", true, ".cfg", NULL );
+ARC_INLINE void arcCmdSystem::ArgCompletion_ConfigName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "/", true, ".cfg", nullptr );
 }
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_SaveGame( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "SaveGames/", true, ".save", NULL );
+ARC_INLINE void arcCmdSystem::ArgCompletion_SaveGame( const anCommandArgs &args, void(*callback)( const char *s ) ) {
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "SaveGames/", true, ".save", nullptr );
 }
 
-ARC_INLINE void arcCmdSystem::ArgCompletion_DemoName( const arcCommandArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_FolderExtension( args, callback, "demos/", true, ".demo", NULL );
+ARC_INLINE void arcCmdSystem::ArgCompletion_DemoName( const anCommandArgs &args, void(*callback)( const char *s ) ) {
+	cmdSystem->ArgCompletion_FolderExtension( args, callback, "demos/", true, ".demo", nullptr );
 }
 
 #endif /* !__CMDSYSTEM_H__ */

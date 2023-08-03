@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/DeclEditor_resource.h"
@@ -35,11 +35,11 @@ toolTip_t DialogDeclBrowser::toolTips[] = {
 	{ IDC_DECLBROWSER_BUTTON_RELOAD, "reload declarations" },
 	{ IDOK, "ok" },
 	{ IDCANCEL, "cancel" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 
-static DialogDeclBrowser *g_DeclDialog = NULL;
+static DialogDeclBrowser *g_DeclDialog = nullptr;
 
 
 IMPLEMENT_DYNAMIC(DialogDeclBrowser, CDialog)
@@ -49,7 +49,7 @@ IMPLEMENT_DYNAMIC(DialogDeclBrowser, CDialog)
 DialogDeclBrowser::DialogDeclBrowser
 ================
 */
-DialogDeclBrowser::DialogDeclBrowser( CWnd* pParent /*=NULL*/ ): CDialog(DialogDeclBrowser::IDD, pParent), m_pchTip(NULL), m_pwchTip(NULL) {
+DialogDeclBrowser::DialogDeclBrowser( CWnd* pParent /*=nullptr*/ ): CDialog(DialogDeclBrowser::IDD, pParent), m_pchTip(nullptr ), m_pwchTip(nullptr ) {
 }
 
 /*
@@ -88,16 +88,16 @@ void DialogDeclBrowser::DoDataExchange(CDataExchange* pDX) {
 DialogDeclBrowser::AddDeclTypeToTree
 ================
 */
-template< class type >
+template<class type>
 int arcListDeclSortCompare( const type *a, const type *b ) {
-	return arcNetString::IcmpPath( (*a)->GetName(), (*b)->GetName() );
+	return anString::IcmpPath( (*a)->GetName(), (*b)->GetName() );
 }
 
 void DialogDeclBrowser::AddDeclTypeToTree( declType_t type, const char *root, CPathTreeCtrl &tree ) {
 	int i;
-	arcNetList<const arcDecleration*> decls;
+	anList<const anDecl*> decls;
 	idPathTreeStack stack;
-	arcNetString rootStr, declName;
+	anString rootStr, declName;
 
 	decls.SetNum( declManager->GetNumDecls( type ) );
 	for ( i = 0; i < decls.Num(); i++ ) {
@@ -108,7 +108,7 @@ void DialogDeclBrowser::AddDeclTypeToTree( declType_t type, const char *root, CP
 	rootStr = root;
 	rootStr += "/";
 
-	stack.PushRoot( NULL );
+	stack.PushRoot( nullptr );
 
 	for ( i = 0; i < decls.Num(); i++ ) {
 		declName = rootStr + decls[i]->GetName();
@@ -128,12 +128,12 @@ DialogDeclBrowser::AddScriptsToTree
 void DialogDeclBrowser::AddScriptsToTree( CPathTreeCtrl &tree ) {
 	int i;
 	idPathTreeStack stack;
-	arcNetString scriptName;
-	arcFileList *files;
+	anString scriptName;
+	anFileList *files;
 
 	files = fileSystem->ListFilesTree( "script", ".script", true );
 
-	stack.PushRoot( NULL );
+	stack.PushRoot( nullptr );
 
 	for ( i = 0; i < files->GetNumFiles(); i++ ) {
 		scriptName = files->GetFile( i );
@@ -155,12 +155,12 @@ DialogDeclBrowser::AddGUIsToTree
 void DialogDeclBrowser::AddGUIsToTree( CPathTreeCtrl &tree ) {
 	int i;
 	idPathTreeStack stack;
-	arcNetString scriptName;
-	arcFileList *files;
+	anString scriptName;
+	anFileList *files;
 
 	files = fileSystem->ListFilesTree( "guis", ".gui", true );
 
-	stack.PushRoot( NULL );
+	stack.PushRoot( nullptr );
 
 	for ( i = 0; i < files->GetNumFiles(); i++ ) {
 		scriptName = files->GetFile( i );
@@ -198,9 +198,9 @@ void DialogDeclBrowser::InitBaseDeclTree( void ) {
 DialogDeclBrowser::GetDeclName
 ================
 */
-void DialogDeclBrowser::GetDeclName( HTREEITEM item, arcNetString &typeName, arcNetString &declName ) const {
+void DialogDeclBrowser::GetDeclName( HTREEITEM item, anString &typeName, anString &declName ) const {
 	HTREEITEM parent;
-	arcNetString itemName;
+	anString itemName;
 
 	declName.Clear();
 	for ( parent = declTree.GetParentItem( item ); parent; parent = declTree.GetParentItem( parent ) ) {
@@ -217,13 +217,13 @@ void DialogDeclBrowser::GetDeclName( HTREEITEM item, arcNetString &typeName, arc
 DialogDeclBrowser::GetDeclFromTreeItem
 ================
 */
-const arcDecleration *DialogDeclBrowser::GetDeclFromTreeItem( HTREEITEM item ) const {
+const anDecl *DialogDeclBrowser::GetDeclFromTreeItem( HTREEITEM item ) const {
 	int id, index;
 	declType_t type;
-	const arcDecleration *decl;
+	const anDecl *decl;
 
 	if ( declTree.GetChildItem( item ) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	id = declTree.GetItemData( item );
@@ -231,7 +231,7 @@ const arcDecleration *DialogDeclBrowser::GetDeclFromTreeItem( HTREEITEM item ) c
 	index = GetIndexFromId( id );
 
 	if ( type < 0 || type >= declManager->GetNumDeclTypes() ) {
-		return NULL;
+		return nullptr;
 	}
 
 	decl = declManager->DeclByIndex( type, index, false );
@@ -244,7 +244,7 @@ const arcDecleration *DialogDeclBrowser::GetDeclFromTreeItem( HTREEITEM item ) c
 DialogDeclBrowser::GetSelectedDecl
 ================
 */
-const arcDecleration *DialogDeclBrowser::GetSelectedDecl( void ) const {
+const anDecl *DialogDeclBrowser::GetSelectedDecl( void ) const {
 	return GetDeclFromTreeItem( declTree.GetSelectedItem() );
 }
 
@@ -255,8 +255,8 @@ DialogDeclBrowser::EditSelected
 */
 void DialogDeclBrowser::EditSelected( void ) const {
 	int id, index;
-	arcDictionary spawnArgs;
-	const arcDecleration *decl;
+	anDict spawnArgs;
+	const anDecl *decl;
 	declType_t type;
 	HTREEITEM item;
 
@@ -270,7 +270,7 @@ void DialogDeclBrowser::EditSelected( void ) const {
 	type = GetTypeFromId( id );
 	index = GetIndexFromId( id );
 
-	switch( type ) {
+	switch ( type ) {
 		case DECL_AF: {
 			decl = declManager->DeclByIndex( type, index, false );
 			spawnArgs.Set( "articulatedFigure", decl->GetName() );
@@ -291,7 +291,7 @@ void DialogDeclBrowser::EditSelected( void ) const {
 		}
 		case DECLTYPE_SCRIPT:
 		case DECLTYPE_GUI: {
-			arcNetString typeName, declName;
+			anString typeName, declName;
 			GetDeclName( item, typeName, declName );
 			DialogScriptEditor *scriptEditor;
 			scriptEditor = new DialogScriptEditor;
@@ -306,7 +306,7 @@ void DialogDeclBrowser::EditSelected( void ) const {
 			DialogDeclEditor *declEditor;
 			declEditor = new DialogDeclEditor;
 			declEditor->Create( IDD_DIALOG_DECLEDITOR, GetParent() );
-			declEditor->LoadDecl( const_cast<arcDecleration *>( decl ) );
+			declEditor->LoadDecl( const_cast<anDecl *>( decl ) );
 			declEditor->ShowWindow( SW_SHOW );
 			declEditor->SetFocus();
 			break;
@@ -330,7 +330,7 @@ DialogDeclBrowser::CompareDecl
 */
 bool DialogDeclBrowser::CompareDecl( HTREEITEM item, const char *name ) const {
 	if ( findNameString.Length() ) {
-		if ( !arcNetString::Filter( findNameString, name, false ) ) {
+		if ( !anString::Filter( findNameString, name, false ) ) {
 			return false;
 		}
 	}
@@ -345,9 +345,9 @@ bool DialogDeclBrowser::CompareDecl( HTREEITEM item, const char *name ) const {
 
 		if ( type == DECLTYPE_SCRIPT || type == DECLTYPE_GUI ) {
 			// search for the text in the script or gui
-			arcNetString text;
+			anString text;
 			void *buffer;
-			if ( fileSystem->ReadFile( arcNetString( name ) + ( ( type == DECLTYPE_SCRIPT ) ? ".script" : ".gui" ), &buffer ) == -1 ) {
+			if ( fileSystem->ReadFile( anString( name ) + ( ( type == DECLTYPE_SCRIPT ) ? ".script" : ".gui" ), &buffer ) == -1 ) {
 				return false;
 			}
 			text = (char *) buffer;
@@ -357,10 +357,10 @@ bool DialogDeclBrowser::CompareDecl( HTREEITEM item, const char *name ) const {
 			}
 		} else {
 			// search for the text in the decl
-			const arcDecleration *decl = declManager->DeclByIndex( type, index, false );
+			const anDecl *decl = declManager->DeclByIndex( type, index, false );
 			char *declText = (char *)_alloca( ( decl->GetTextLength() + 1 ) * sizeof( char ) );
 			decl->GetText( declText );
-			if ( arcNetString::FindText( declText, findTextString, false ) == -1 ) {
+			if ( anString::FindText( declText, findTextString, false ) == -1 ) {
 				return false;
 			}
 		}
@@ -407,24 +407,24 @@ BOOL DialogDeclBrowser::OnInitDialog()  {
 DeclBrowserInit
 ================
 */
-void DeclBrowserInit( const arcDictionary *spawnArgs ) {
+void DeclBrowserInit( const anDict *spawnArgs ) {
 	if ( renderSystem->IsFullScreen() ) {
 		common->Printf( "Cannot run the declaration editor in fullscreen mode.\n"
 					"Set r_fullscreen to 0 and vid_restart.\n" );
 		return;
 	}
 
-	if ( g_DeclDialog == NULL ) {
+	if ( g_DeclDialog == nullptr ) {
 		InitAfx();
 		g_DeclDialog = new DialogDeclBrowser();
 	}
 
-	if ( g_DeclDialog->GetSafeHwnd() == NULL) {
+	if ( g_DeclDialog->GetSafeHwnd() == nullptr ) {
 		g_DeclDialog->Create( IDD_DIALOG_DECLBROWSER );
 /*
 		// FIXME: restore position
 		CRect rct;
-		g_DeclDialog->SetWindowPos( NULL, rct.left, rct.top, 0, 0, SWP_NOSIZE );
+		g_DeclDialog->SetWindowPos( nullptr, rct.left, rct.top, 0, 0, SWP_NOSIZE );
 */
 	}
 
@@ -449,7 +449,7 @@ void DeclBrowserRun( void ) {
 	MSG *msg = &m_msgCur;
 #endif
 
-	while( ::PeekMessage(msg, NULL, NULL, NULL, PM_NOREMOVE) ) {
+	while( ::PeekMessage(msg, nullptr, nullptr, nullptr, PM_NOREMOVE) ) {
 		// pump message
 		if ( !AfxGetApp()->PumpMessage() ) {
 		}
@@ -463,7 +463,7 @@ DeclBrowserShutdown
 */
 void DeclBrowserShutdown( void ) {
 	delete g_DeclDialog;
-	g_DeclDialog = NULL;
+	g_DeclDialog = nullptr;
 }
 
 /*
@@ -529,7 +529,7 @@ BOOL DialogDeclBrowser::OnToolTipNotify( UINT id, NMHDR *pNMHDR, LRESULT *pResul
 
 	if ( pNMHDR->hwndFrom == declTree.GetSafeHwnd() ) {
 		CString toolTip;
-		const arcDecleration *decl = GetDeclFromTreeItem( (HTREEITEM) pNMHDR->idFrom );
+		const anDecl *decl = GetDeclFromTreeItem( (HTREEITEM) pNMHDR->idFrom );
 		if ( !decl ) {
 			return FALSE;
 		}
@@ -773,13 +773,13 @@ DialogDeclBrowser::OnTreeSelChanged
 void DialogDeclBrowser::OnTreeSelChanged( NMHDR* pNMHDR, LRESULT* pResult ) {
 	LV_KEYDOWN* pLVKeyDow = (LV_KEYDOWN*)pNMHDR;
 
-	const arcDecleration *decl = GetSelectedDecl();
+	const anDecl *decl = GetSelectedDecl();
 	if ( decl ) {
 		statusBar.SetWindowText( va( "%d decls listed    -    %s, line: %d", numListedDecls, decl->GetFileName(), decl->GetLineNum() ) );
 		findNameEdit.SetWindowText( va( "%s/%s", declManager->GetDeclNameFromType( decl->GetType() ), decl->GetName() ) );
 	} else {
 		HTREEITEM item = declTree.GetSelectedItem();
-		arcNetString typeName, declName;
+		anString typeName, declName;
 		GetDeclName( item, typeName, declName );
 		findNameEdit.SetWindowText( va( "%s/%s*", typeName.c_str(), declName.c_str() ) );
 		statusBar.SetWindowText( va( "%d decls listed", numListedDecls ) );
@@ -837,8 +837,8 @@ DialogDeclBrowser::OnBnClickedNew
 */
 void DialogDeclBrowser::OnBnClickedNew() {
 	HTREEITEM item;
-	arcNetString typeName, declName;
-	const arcDecleration *decl;
+	anString typeName, declName;
+	const anDecl *decl;
 	DialogDeclNew newDeclDlg;
 
 	newDeclDlg.SetDeclTree( &baseDeclTree );

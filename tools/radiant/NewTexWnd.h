@@ -60,7 +60,7 @@ public:
 	//{{AFX_VIRTUAL(CNewTexWnd)
 	public:
 	virtual BOOL DestroyWindow();
-	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
+	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = nullptr );
 	protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	//}}AFX_VIRTUAL
@@ -88,12 +88,12 @@ protected:
 	CRect rectClient;
 	int currentRow;
 	int currentIndex;
-	arcNetList<const arcMaterial*> materialList;
+	anList<const anMaterial*> materialList;
 
 	// Generated message map functions
 protected:
-	const arcMaterial* NextPos();
-	const arcMaterial *getMaterialAtPoint(CPoint point);
+	const anMaterial* NextPos();
+	const anMaterial *getMaterialAtPoint(CPoint point);
 	void InitPos();
 	//{{AFX_MSG(CNewTexWnd)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

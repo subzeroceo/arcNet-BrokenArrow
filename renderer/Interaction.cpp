@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -6,7 +6,7 @@
 /*
 ===========================================================================
 
-ARCInteraction implementation
+an Interaction implementation
 
 ===========================================================================
 */
@@ -24,10 +24,10 @@ the number of surface triangles, which will be used to handle dangling
 edge silhouettes.
 ================
 */
-void R_CalcInteractionFacing( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, srfCullInfo_t &cullInfo ) {
-	arcVec3 localLightOrigin;
+void R_CalcInteractionFacing( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, srfCullInfo_t &cullInfo ) {
+	anVec3 localLightOrigin;
 
-	if ( cullInfo.facing != NULL ) {
+	if ( cullInfo.facing != nullptr ) {
 		return;
 	}
 
@@ -36,10 +36,10 @@ void R_CalcInteractionFacing( const ARCRenderEntityLocal *ent, const surfTriangl
 	int numFaces = tri->numIndexes / 3;
 
 	if ( !tri->facePlanes || !tri->facePlanesCalculated ) {
-		R_DeriveFacePlanes( const_cast<surfTriangles_t *>(tri) );
+		R_DeriveFacePlanes( const_cast<srfTriangles_t *>(tri) );
 	}
 
-	cullInfo.facing = ( byte * ) R_StaticAlloc( ( numFaces + 1 ) * sizeof( cullInfo.facing[0] ) );
+	cullInfo.facing = (byte *) R_StaticAlloc( ( numFaces + 1 ) * sizeof( cullInfo.facing[0] ) );
 
 	// calculate back face culling
 	float *planeSide = (float *) _alloca16( numFaces * sizeof( float ) );
@@ -61,8 +61,8 @@ at the border we throw things out on the border, because if any one
 vertex is clearly inside, the entire triangle will be accepted.
 =====================
 */
-void R_CalcInteractionCullBits( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, srfCullInfo_t &cullInfo ) {
-	if ( cullInfo.cullBits != NULL ) {
+void R_CalcInteractionCullBits( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, srfCullInfo_t &cullInfo ) {
+	if ( cullInfo.cullBits != nullptr ) {
 		return;
 	}
 
@@ -83,7 +83,7 @@ void R_CalcInteractionCullBits( const ARCRenderEntityLocal *ent, const surfTrian
 		return;
 	}
 
-	cullInfo.cullBits = ( byte * ) R_StaticAlloc( tri->numVerts * sizeof( cullInfo.cullBits[0] ) );
+	cullInfo.cullBits = (byte *) R_StaticAlloc( tri->numVerts * sizeof( cullInfo.cullBits[0] ) );
 	SIMDProcessor->Memset( cullInfo.cullBits, 0, tri->numVerts * sizeof( cullInfo.cullBits[0] ) );
 
 	float *planeSide = (float *) _alloca16( tri->numVerts * sizeof( float ) );
@@ -104,22 +104,22 @@ R_FreeInteractionCullInfo
 ================
 */
 void R_FreeInteractionCullInfo( srfCullInfo_t &cullInfo ) {
-	if ( cullInfo.facing != NULL ) {
+	if ( cullInfo.facing != nullptr ) {
 		R_StaticFree( cullInfo.facing );
-		cullInfo.facing = NULL;
+		cullInfo.facing = nullptr;
 	}
-	if ( cullInfo.cullBits != NULL ) {
+	if ( cullInfo.cullBits != nullptr ) {
 		if ( cullInfo.cullBits != LIGHT_CULL_ALL_FRONT ) {
 			R_StaticFree( cullInfo.cullBits );
 		}
-		cullInfo.cullBits = NULL;
+		cullInfo.cullBits = nullptr;
 	}
 }
 
 #define	MAX_CLIPPED_POINTS	20
 typedef struct {
 	int		numVerts;
-	arcVec3	verts[MAX_CLIPPED_POINTS];
+	anVec3	verts[MAX_CLIPPED_POINTS];
 } clipTri_t;
 
 /*
@@ -134,7 +134,7 @@ I have some worries about edge flag cases when polygons are clipped
 multiple times near the epsilon.
 =============
 */
-static int R_ChopWinding( clipTri_t clipTris[2], int inNum, const arcPlane plane ) {
+static int R_ChopWinding( clipTri_t clipTris[2], int inNum, const anPlane plane ) {
 	float	dists[MAX_CLIPPED_POINTS];
 	int		sides[MAX_CLIPPED_POINTS];
 	int		counts[3];
@@ -175,7 +175,7 @@ static int R_ChopWinding( clipTri_t clipTris[2], int inNum, const arcPlane plane
 
 	out->numVerts = 0;
 	for ( int i = 0; i < in->numVerts; i++ ) {
-		arcVec3 &p1 = in->verts[i];
+		anVec3 &p1 = in->verts[i];
 		if ( sides[i] == SIDE_FRONT ) {
 			out->verts[out->numVerts] = p1;
 			out->numVerts++;
@@ -186,11 +186,11 @@ static int R_ChopWinding( clipTri_t clipTris[2], int inNum, const arcPlane plane
 		}
 
 		// generate a split point
-		arcVec3 &p2 = in->verts[i+1];
+		anVec3 &p2 = in->verts[i+1];
 
 		float dot = dists[i] / ( dists[i] - dists[i+1] );
 		for ( j = 0; j < 3; j++ ) {
-			arcVec3 mid[j] = p1[j] + dot * ( p2[j] - p1[j] );
+			anVec3 mid[j] = p1[j] + dot * ( p2[j] - p1[j] );
 		}
 
 		out->verts[out->numVerts] = mid;
@@ -207,7 +207,7 @@ R_ClipTriangleToLight
 Returns false if nothing is left after clipping
 ===================
 */
-static bool	R_ClipTriangleToLight( const arcVec3 &a, const arcVec3 &b, const arcVec3 &c, int planeBits, const arcPlane frustum[6] ) {
+static bool	R_ClipTriangleToLight( const anVec3 &a, const anVec3 &b, const anVec3 &c, int planeBits, const anPlane frustum[6] ) {
 	clipTri_t	pingPong[2];
 
 	pingPong[0].numVerts = 3;
@@ -236,16 +236,16 @@ The resulting surface will be a subset of the original triangles,
 it will never clip triangles, but it may cull on a per-triangle basis.
 ====================
 */
-static surfTriangles_t *R_CreateLightTris( const ARCRenderEntityLocal *ent,
-									 const surfTriangles_t *tri, const ARCRenderLightsLocal *light,
-									 const arcMaterial *shader, srfCullInfo_t &cullInfo ) {
+static srfTriangles_t *R_CreateLightTris( const anRenderEntityLocal *ent,
+									 const srfTriangles_t *tri, const anRenderLightsLocal *light,
+									 const anMaterial *shader, srfCullInfo_t &cullInfo ) {
 	int			i;
 	int			numIndexes;
 	qglIndex_t	*indexes;
-	surfTriangles_t	*newTri;
+	srfTriangles_t	*newTri;
 	int			c_backfaced;
 	int			c_distance;
-	arcBounds	bounds;
+	anBounds	bounds;
 	bool		includeBackFaces;
 	int			faceNum;
 
@@ -254,7 +254,7 @@ static surfTriangles_t *R_CreateLightTris( const ARCRenderEntityLocal *ent,
 	c_distance = 0;
 
 	numIndexes = 0;
-	indexes = NULL;
+	indexes = nullptr;
 
 	// it is debatable if non-shadowing lights should light back faces. we aren't at the moment
 	if ( r_lightAllBackFaces.GetBool() || light->lightShader->LightEffectsBackSides()
@@ -269,7 +269,7 @@ static surfTriangles_t *R_CreateLightTris( const ARCRenderEntityLocal *ent,
 	newTri = R_AllocStaticTriSurf();
 
 	// save a reference to the original surface
-	newTri->ambientSurface = const_cast<surfTriangles_t *>(tri);
+	newTri->ambientSurface = const_cast<srfTriangles_t *>(tri);
 
 	// the light surface references the verts of the ambient surface
 	newTri->numVerts = tri->numVerts;
@@ -375,7 +375,7 @@ static surfTriangles_t *R_CreateLightTris( const ARCRenderEntityLocal *ent,
 
 	if ( !numIndexes ) {
 		R_ReallyFreeStaticTriSurf( newTri );
-		return NULL;
+		return nullptr;
 	}
 
 	newTri->numIndexes = numIndexes;
@@ -387,36 +387,36 @@ static surfTriangles_t *R_CreateLightTris( const ARCRenderEntityLocal *ent,
 
 /*
 ===============
-ARCInteraction::ARCInteraction
+an Interaction::an Interaction
 ===============
 */
-ARCInteraction::ARCInteraction( void ) {
+an Interaction::an Interaction( void ) {
 	numSurfaces				= 0;
-	surfaces				= NULL;
-	entityDef				= NULL;
-	lightDef				= NULL;
-	lightNext				= NULL;
-	lightPrev				= NULL;
-	entityNext				= NULL;
-	entityPrev				= NULL;
+	surfaces				= nullptr;
+	entityDef				= nullptr;
+	lightDef				= nullptr;
+	lightNext				= nullptr;
+	lightPrev				= nullptr;
+	entityNext				= nullptr;
+	entityPrev				= nullptr;
 	dynamicModelFrameCount	= 0;
 	frustumState			= FRUSTUM_UNINITIALIZED;
-	frustumAreas			= NULL;
+	frustumAreas			= nullptr;
 }
 
 /*
 ===============
-ARCInteraction::AllocAndLink
+an Interaction::AllocAndLink
 ===============
 */
-ARCInteraction *ARCInteraction::AllocAndLink( ARCRenderEntityLocal *edef, ARCRenderLightsLocal *ldef ) {
+an Interaction *an Interaction::AllocAndLink( anRenderEntityLocal *edef, anRenderLightsLocal *ldef ) {
 	if ( !edef || !ldef ) {
-		common->Error( "ARCInteraction::AllocAndLink: NULL parm" );
+		common->Error( "an Interaction::AllocAndLink: nullptr parm" );
 	}
 
-	ARCRenderWorldLocal *renderWorld = edef->world;
+	anRenderWorldLocal *renderWorld = edef->world;
 
-	ARCInteraction *interaction = renderWorld->interactionAllocator.Alloc();
+	an Interaction *interaction = renderWorld->interactionAllocator.Alloc();
 
 	// link and initialize
 	interaction->dynamicModelFrameCount = 0;
@@ -425,16 +425,16 @@ ARCInteraction *ARCInteraction::AllocAndLink( ARCRenderEntityLocal *edef, ARCRen
 	interaction->entityDef = edef;
 
 	interaction->numSurfaces = -1;		// not checked yet
-	interaction->surfaces = NULL;
+	interaction->surfaces = nullptr;
 
-	interaction->frustumState = ARCInteraction::FRUSTUM_UNINITIALIZED;
-	interaction->frustumAreas = NULL;
+	interaction->frustumState = an Interaction::FRUSTUM_UNINITIALIZED;
+	interaction->frustumAreas = nullptr;
 
 	// link at the start of the entity's list
 	interaction->lightNext = ldef->firstInteraction;
-	interaction->lightPrev = NULL;
+	interaction->lightPrev = nullptr;
 	ldef->firstInteraction = interaction;
-	if ( interaction->lightNext != NULL ) {
+	if ( interaction->lightNext != nullptr ) {
 		interaction->lightNext->lightPrev = interaction;
 	} else {
 		ldef->lastInteraction = interaction;
@@ -442,9 +442,9 @@ ARCInteraction *ARCInteraction::AllocAndLink( ARCRenderEntityLocal *edef, ARCRen
 
 	// link at the start of the light's list
 	interaction->entityNext = edef->firstInteraction;
-	interaction->entityPrev = NULL;
+	interaction->entityPrev = nullptr;
 	edef->firstInteraction = interaction;
-	if ( interaction->entityNext != NULL ) {
+	if ( interaction->entityNext != nullptr ) {
 		interaction->entityNext->entityPrev = interaction;
 	} else {
 		edef->lastInteraction = interaction;
@@ -453,8 +453,8 @@ ARCInteraction *ARCInteraction::AllocAndLink( ARCRenderEntityLocal *edef, ARCRen
 	// update the interaction table
 	if ( renderWorld->interactionTable ) {
 		int index = ldef->index * renderWorld->interactionTableWidth + edef->index;
-		if ( renderWorld->interactionTable[index] != NULL ) {
-			common->Error( "ARCInteraction::AllocAndLink: non NULL table entry" );
+		if ( renderWorld->interactionTable[index] != nullptr ) {
+			common->Error( "an Interaction::AllocAndLink: non nullptr table entry" );
 		}
 		renderWorld->interactionTable[index] = interaction;
 	}
@@ -464,13 +464,13 @@ ARCInteraction *ARCInteraction::AllocAndLink( ARCRenderEntityLocal *edef, ARCRen
 
 /*
 ===============
-ARCInteraction::FreeSurfaces
+an Interaction::FreeSurfaces
 
 Frees the surfaces, but leaves the interaction linked in, so it
 will be regenerated automatically
 ===============
 */
-void ARCInteraction::FreeSurfaces( void ) {
+void an Interaction::FreeSurfaces( void ) {
 	if ( this->surfaces ) {
 		for ( int i = 0; i < this->numSurfaces; i++ ) {
 			surfaceInteraction_t *sint = &this->surfaces[i];
@@ -478,31 +478,31 @@ void ARCInteraction::FreeSurfaces( void ) {
 				if ( sint->lightTris != LIGHT_TRIS_DEFERRED ) {
 					R_FreeStaticTriSurf( sint->lightTris );
 				}
-				sint->lightTris = NULL;
+				sint->lightTris = nullptr;
 			}
 			if ( sint->shadowTris ) {
 				// if it doesn't have an entityDef, it is part of a prelight
 				// model, not a generated interaction
 				if ( this->entityDef ) {
 					R_FreeStaticTriSurf( sint->shadowTris );
-					sint->shadowTris = NULL;
+					sint->shadowTris = nullptr;
 				}
 			}
 			R_FreeInteractionCullInfo( sint->cullInfo );
 		}
 
 		R_StaticFree( this->surfaces );
-		this->surfaces = NULL;
+		this->surfaces = nullptr;
 	}
 	this->numSurfaces = -1;
 }
 
 /*
 ===============
-ARCInteraction::Unlink
+an Interaction::Unlink
 ===============
 */
-void ARCInteraction::Unlink( void ) {
+void an Interaction::Unlink( void ) {
 	// unlink from the entity's list
 	if ( this->entityPrev ) {
 		this->entityPrev->entityNext = this->entityNext;
@@ -514,7 +514,7 @@ void ARCInteraction::Unlink( void ) {
 	} else {
 		this->entityDef->lastInteraction = this->entityPrev;
 	}
-	this->entityNext = this->entityPrev = NULL;
+	this->entityNext = this->entityPrev = nullptr;
 
 	// unlink from the light's list
 	if ( this->lightPrev ) {
@@ -527,25 +527,25 @@ void ARCInteraction::Unlink( void ) {
 	} else {
 		this->lightDef->lastInteraction = this->lightPrev;
 	}
-	this->lightNext = this->lightPrev = NULL;
+	this->lightNext = this->lightPrev = nullptr;
 }
 
 /*
 ===============
-ARCInteraction::UnlinkAndFree
+an Interaction::UnlinkAndFree
 
 Removes links and puts it back on the free list.
 ===============
 */
-void ARCInteraction::UnlinkAndFree( void ) {
+void an Interaction::UnlinkAndFree( void ) {
 	// clear the table pointer
-	ARCRenderWorldLocal *renderWorld = this->lightDef->world;
+	anRenderWorldLocal *renderWorld = this->lightDef->world;
 	if ( renderWorld->interactionTable ) {
 		int index = this->lightDef->index * renderWorld->interactionTableWidth + this->entityDef->index;
 		if ( renderWorld->interactionTable[index] != this ) {
-			common->Error( "ARCInteraction::UnlinkAndFree: interactionTable wasn't set" );
+			common->Error( "an Interaction::UnlinkAndFree: interactionTable wasn't set" );
 		}
-		renderWorld->interactionTable[index] = NULL;
+		renderWorld->interactionTable[index] = nullptr;
 	}
 
 	Unlink();
@@ -564,19 +564,19 @@ void ARCInteraction::UnlinkAndFree( void ) {
 
 /*
 ===============
-ARCInteraction::MakeEmpty
+an Interaction::MakeEmpty
 
 Makes the interaction empty and links it at the end of the entity's and light's interaction lists.
 ===============
 */
-void ARCInteraction::MakeEmpty( void ) {
+void an Interaction::MakeEmpty( void ) {
 	// an empty interaction has no surfaces
 	numSurfaces = 0;
 
 	Unlink();
 
 	// relink at the end of the entity's list
-	this->entityNext = NULL;
+	this->entityNext = nullptr;
 	this->entityPrev = this->entityDef->lastInteraction;
 	this->entityDef->lastInteraction = this;
 	if ( this->entityPrev ) {
@@ -586,7 +586,7 @@ void ARCInteraction::MakeEmpty( void ) {
 	}
 
 	// relink at the end of the light's list
-	this->lightNext = NULL;
+	this->lightNext = nullptr;
 	this->lightPrev = this->lightDef->lastInteraction;
 	this->lightDef->lastInteraction = this;
 	if ( this->lightPrev ) {
@@ -598,22 +598,22 @@ void ARCInteraction::MakeEmpty( void ) {
 
 /*
 ===============
-ARCInteraction::HasShadows
+an Interaction::HasShadows
 ===============
 */
-ARC_INLINE bool ARCInteraction::HasShadows( void ) const {
+ARC_INLINE bool an Interaction::HasShadows( void ) const {
 	return ( !lightDef->parms.noShadows && !entityDef->parms.noShadow && lightDef->lightShader->LightCastsShadows() );
 }
 
 /*
 ===============
-ARCInteraction::MemoryUsed
+an Interaction::MemoryUsed
 
 Counts up the memory used by all the surfaceInteractions, which
 will be used to determine when we need to start purging old interactions.
 ===============
 */
-int ARCInteraction::MemoryUsed( void ) {
+int an Interaction::MemoryUsed( void ) {
 	int total = 0;
 
 	for ( int i = 0; i < numSurfaces; i++ ) {
@@ -628,13 +628,13 @@ int ARCInteraction::MemoryUsed( void ) {
 
 /*
 ==================
-ARCInteraction::CalcInteractionScissorRectangle
+an Interaction::CalcInteractionScissorRectangle
 ==================
 */
-ARCScreenRect ARCInteraction::CalcInteractionScissorRectangle( const ARCFrustum &viewFrustum ) {
-	arcBounds		projectionBounds;
-	ARCScreenRect	portalRect;
-	ARCScreenRect	scissorRect;
+anScreenRect an Interaction::CalcInteractionScissorRectangle( const anFrustum &viewFrustum ) {
+	anBounds		projectionBounds;
+	anScreenRect	portalRect;
+	anScreenRect	scissorRect;
 
 	if ( r_useInteractionScissors.GetInteger() == 0 ) {
 		return lightDef->viewLight->scissorRect;
@@ -648,14 +648,14 @@ ARCScreenRect ARCInteraction::CalcInteractionScissorRectangle( const ARCFrustum 
 	// the following is Mr.E's code
 
 	// frustum must be initialized and valid
-	if ( frustumState == ARCInteraction::FRUSTUM_UNINITIALIZED || frustumState == ARCInteraction::FRUSTUM_INVALID ) {
+	if ( frustumState == an Interaction::FRUSTUM_UNINITIALIZED || frustumState == an Interaction::FRUSTUM_INVALID ) {
 		return lightDef->viewLight->scissorRect;
 	}
 
 	// calculate scissors for the portals through which the interaction is visible
 	if ( r_useInteractionScissors.GetInteger() > 1 ) {
 		areaNumRef_t *area;
-		if ( frustumState == ARCInteraction::FRUSTUM_VALID ) {
+		if ( frustumState == an Interaction::FRUSTUM_VALID ) {
 			// retrieve all the areas the interaction frustum touches
 			for ( areaReference_t *ref = entityDef->entityRefs; ref; ref = ref->ownerNext ) {
 				area = entityDef->world->areaNumRefAllocator.Alloc();
@@ -664,7 +664,7 @@ ARCScreenRect ARCInteraction::CalcInteractionScissorRectangle( const ARCFrustum 
 				frustumAreas = area;
 			}
 			frustumAreas = tr.viewDef->renderWorld->FloodFrustumAreas( frustum, frustumAreas );
-			frustumState = ARCInteraction::FRUSTUM_VALIDAREAS;
+			frustumState = an Interaction::FRUSTUM_VALIDAREAS;
 		}
 
 		portalRect.Clear();
@@ -683,9 +683,9 @@ ARCScreenRect ARCInteraction::CalcInteractionScissorRectangle( const ARCFrustum 
 
 	// calculate bounds of the interaction frustum projected into the view frustum
 	if ( lightDef->parms.pointLight ) {
-		viewFrustum.ClippedProjectionBounds( frustum, ARCBox( lightDef->parms.origin, lightDef->parms.lightRadius, lightDef->parms.axis ), projectionBounds );
+		viewFrustum.ClippedProjectionBounds( frustum, anBox( lightDef->parms.origin, lightDef->parms.lightRadius, lightDef->parms.axis ), projectionBounds );
 	} else {
-		viewFrustum.ClippedProjectionBounds( frustum, ARCBox( lightDef->frustumTris->bounds ), projectionBounds );
+		viewFrustum.ClippedProjectionBounds( frustum, anBox( lightDef->frustumTris->bounds ), projectionBounds );
 	}
 
 	if ( projectionBounds.IsCleared() ) {
@@ -707,32 +707,32 @@ ARCScreenRect ARCInteraction::CalcInteractionScissorRectangle( const ARCFrustum 
 
 /*
 ===================
-ARCInteraction::CullInteractionByViewFrustum
+an Interaction::CullInteractionByViewFrustum
 ===================
 */
-bool ARCInteraction::CullInteractionByViewFrustum( const ARCFrustum &viewFrustum ) {
+bool an Interaction::CullInteractionByViewFrustum( const anFrustum &viewFrustum ) {
 	if ( !r_useInteractionCulling.GetBool() ) {
 		return false;
 	}
 
-	if ( frustumState == ARCInteraction::FRUSTUM_INVALID ) {
+	if ( frustumState == an Interaction::FRUSTUM_INVALID ) {
 		return false;
 	}
 
-	if ( frustumState == ARCInteraction::FRUSTUM_UNINITIALIZED ) {
-		frustum.FromProjection( ARCBox( entityDef->referenceBounds, entityDef->parms.origin, entityDef->parms.axis ), lightDef->globalLightOrigin, MAX_WORLD_SIZE );
+	if ( frustumState == an Interaction::FRUSTUM_UNINITIALIZED ) {
+		frustum.FromProjection( anBox( entityDef->referenceBounds, entityDef->parms.origin, entityDef->parms.axis ), lightDef->globalLightOrigin, MAX_WORLD_SIZE );
 		if ( !frustum.IsValid() ) {
-			frustumState = ARCInteraction::FRUSTUM_INVALID;
+			frustumState = an Interaction::FRUSTUM_INVALID;
 			return false;
 		}
 
 		if ( lightDef->parms.pointLight ) {
-			frustum.ConstrainToBox( ARCBox( lightDef->parms.origin, lightDef->parms.lightRadius, lightDef->parms.axis ) );
+			frustum.ConstrainToBox( anBox( lightDef->parms.origin, lightDef->parms.lightRadius, lightDef->parms.axis ) );
 		} else {
-			frustum.ConstrainToBox( ARCBox( lightDef->frustumTris->bounds ) );
+			frustum.ConstrainToBox( anBox( lightDef->frustumTris->bounds ) );
 		}
 
-		frustumState = ARCInteraction::FRUSTUM_VALID;
+		frustumState = an Interaction::FRUSTUM_VALID;
 	}
 
 	if ( !viewFrustum.IntersectsFrustum( frustum ) ) {
@@ -740,10 +740,10 @@ bool ARCInteraction::CullInteractionByViewFrustum( const ARCFrustum &viewFrustum
 	}
 
 	if ( r_showInteractionFrustums.GetInteger() ) {
-		static arcVec4 colors[] = { colorRed, colorGreen, colorBlue, colorYellow, colorMagenta, colorCyan, colorWhite, colorPurple };
+		static anVec4 colors[] = { colorRed, colorGreen, colorBlue, colorYellow, colorMagenta, colorCyan, colorWhite, colorPurple };
 		tr.viewDef->renderWorld->DebugFrustum( colors[lightDef->index & 7], frustum, ( r_showInteractionFrustums.GetInteger() > 1 ) );
 		if ( r_showInteractionFrustums.GetInteger() > 2 ) {
-			tr.viewDef->renderWorld->DebugBox( colorWhite, ARCBox( entityDef->referenceBounds, entityDef->parms.origin, entityDef->parms.axis ) );
+			tr.viewDef->renderWorld->DebugBox( colorWhite, anBox( entityDef->referenceBounds, entityDef->parms.origin, entityDef->parms.axis ) );
 		}
 	}
 
@@ -752,7 +752,7 @@ bool ARCInteraction::CullInteractionByViewFrustum( const ARCFrustum &viewFrustum
 
 /*
 ====================
-ARCInteraction::CreateInteraction
+an Interaction::CreateInteraction
 
 Called when a entityDef and a lightDef are both present in a
 portalArea, and might be visible.  Performs cull checking before doing the expensive
@@ -764,12 +764,12 @@ otherwise it will be marked as deferred.
 The results of this are cached and valid until the light or entity change.
 ====================
 */
-void ARCInteraction::CreateInteraction( const ARCRenderModel *model ) {
-	const arcMaterial *	lightShader = lightDef->lightShader;
+void an Interaction::CreateInteraction( const anRenderModel *model ) {
+	const anMaterial *	lightShader = lightDef->lightShader;
 
 	tr.pc.c_createInteractions++;
 
-	arcBounds bounds = model->Bounds( &entityDef->parms );
+	anBounds bounds = model->Bounds( &entityDef->parms );
 
 	// if it doesn't contact the light frustum, none of the surfaces will
 	if ( R_CullLocalBox( bounds, entityDef->modelMatrix, 6, lightDef->frustum ) ) {
@@ -791,19 +791,19 @@ void ARCInteraction::CreateInteraction( const ARCRenderModel *model ) {
 	// create slots for each of the model's surfaces
 	//
 	numSurfaces = model->NumSurfaces();
-	surfaces = (surfaceInteraction_t *)R_ClearedStaticAlloc( sizeof( *surfaces ) * numSurfaces );
+	surfaces = ( surfaceInteraction_t *)R_ClearedStaticAlloc( sizeof( *surfaces ) * numSurfaces );
 	bool interactionGenerated = false;
 
 	// check each surface in the model
 	for ( int c = 0; c < model->NumSurfaces(); c++ ) {
 		const modelSurface_t *surf = model->Surface( c );
-		surfTriangles_t *tri = surf->geometry;
+		srfTriangles_t *tri = surf->geometry;
 		if ( !tri ) {
 			continue;
 		}
 
 		// determine the shader for this surface, possibly by skinning
-		arcMaterial *shader = surf->shader;
+		anMaterial *shader = surf->shader;
 		shader = R_RemapShaderBySkin( shader, entityDef->parms.customSkin, entityDef->parms.customShader );
 
 		if ( !shader ) {
@@ -841,9 +841,9 @@ void ARCInteraction::CreateInteraction( const ARCRenderModel *model ) {
 		}
 
 		// if the interaction has shadows and this surface casts a shadow
-		if ( HasShadows() && shader->SurfaceCastsShadow() && tri->silEdges != NULL ) {
+		if ( HasShadows() && shader->SurfaceCastsShadow() && tri->silEdges != nullptr ) {
 			// if the light has an optimized shadow volume, don't create shadows for any models that are part of the base areas
-			if ( lightDef->parms.prelightModel == NULL || !model->IsStaticWorldModel() || !r_useOptimizedShadows.GetBool() ) {
+			if ( lightDef->parms.prelightModel == nullptr || !model->IsStaticWorldModel() || !r_useOptimizedShadows.GetBool() ) {
 				// this is the only place during gameplay (outside the utilities) that R_CreateShadowVolume() is called
 				sint->shadowTris = R_CreateShadowVolume( entityDef, tri, lightDef, shadowGen, sint->cullInfo );
 				if ( sint->shadowTris ) {
@@ -879,8 +879,8 @@ If we know that we are "off to the side" of an infinite shadow volume,
 we can draw it without caps in zpass mode
 ======================
 */
-static bool R_PotentiallyInsideInfiniteShadow( const surfTriangles_t *occluder, const arcVec3 &localView, const arcVec3 &localLight ) {
-	arcBounds	exp;
+static bool R_PotentiallyInsideInfiniteShadow( const srfTriangles_t *occluder, const anVec3 &localView, const anVec3 &localLight ) {
+	anBounds	exp;
 
 	// expand the bounds to account for the near clip plane, because the
 	// view could be mathematically outside, but if the near clip plane
@@ -907,7 +907,7 @@ static bool R_PotentiallyInsideInfiniteShadow( const surfTriangles_t *occluder, 
 	// if the ray from localLight to localView intersects a face of the
 	// expanded bounds, we will be inside the projection
 
-	arcVec3	ray = localView - localLight;
+	anVec3	ray = localView - localLight;
 
 	// intersect the ray from the view to the light with the near side of the bounds
 	for ( int axis = 0; axis < 3; axis++ ) {
@@ -921,7 +921,7 @@ static bool R_PotentiallyInsideInfiniteShadow( const surfTriangles_t *occluder, 
 			}
 			float d = exp[0][axis] - localLight[axis];
 			float frac = d / ray[axis];
-			arcVec3 hit = localLight + frac * ray;
+			anVec3 hit = localLight + frac * ray;
 			hit[axis] = exp[0][axis];
 		} else if ( localLight[axis] > exp[1][axis] ) {
 			if ( localView[axis] > exp[1][axis] ) {
@@ -946,7 +946,7 @@ static bool R_PotentiallyInsideInfiniteShadow( const surfTriangles_t *occluder, 
 
 /*
 ==================
-ARCInteraction::AddActiveInteraction
+an Interaction::AddActiveInteraction
 
 Create and add any necessary light and shadow triangles
 
@@ -955,13 +955,13 @@ with this type of light, it can be skipped, but we might need to
 instantiate the dynamic model to find out
 ==================
 */
-void ARCInteraction::AddActiveInteraction( void ) {
+void an Interaction::AddActiveInteraction( void ) {
 	viewLight_t *	vLight;
 	viewEntity_t *	vEntity;
-	ARCScreenRect	shadowScissor;
-	ARCScreenRect	lightScissor;
-	arcVec3			localLightOrigin;
-	arcVec3			localViewOrigin;
+	anScreenRect	shadowScissor;
+	anScreenRect	lightScissor;
+	anVec3			localLightOrigin;
+	anVec3			localViewOrigin;
 
 	vLight = lightDef->viewLight;
 	vEntity = entityDef->viewEntity;
@@ -999,8 +999,8 @@ void ARCInteraction::AddActiveInteraction( void ) {
 	// We will need the dynamic surface created to make interactions, even if the
 	// model itself wasn't visible.  This just returns a cached value after it
 	// has been generated once in the view.
-	ARCRenderModel *model = R_EntityDefDynamicModel( entityDef );
-	if ( model == NULL || model->NumSurfaces() <= 0 ) {
+	anRenderModel *model = R_EntityDefDynamicModel( entityDef );
+	if ( model == nullptr || model->NumSurfaces() <= 0 ) {
 		return;
 	}
 
@@ -1039,7 +1039,7 @@ void ARCInteraction::AddActiveInteraction( void ) {
 				R_FreeInteractionCullInfo( sint->cullInfo );
 			}
 
-			surfTriangles_t *lightTris = sint->lightTris;
+			srfTriangles_t *lightTris = sint->lightTris;
 
 			if ( lightTris ) {
 
@@ -1049,7 +1049,7 @@ void ARCInteraction::AddActiveInteraction( void ) {
 				if ( !R_CullLocalBox( lightTris->bounds, vEntity->modelMatrix, 5, tr.viewDef->frustum ) ) {
 
 					// make sure the original surface has its ambient cache created
-					surfTriangles_t *tri = sint->ambientTris;
+					srfTriangles_t *tri = sint->ambientTris;
 					if ( !tri->ambientCache ) {
 						if ( !R_CreateAmbientCache( tri, sint->shader->ReceivesLighting() ) ) {
 							// skip if we were out of vertex memory
@@ -1085,7 +1085,7 @@ void ARCInteraction::AddActiveInteraction( void ) {
 
 					// add the surface to the light list
 
-					const arcMaterial *shader = sint->shader;
+					const anMaterial *shader = sint->shader;
 					R_GlobalShaderOverride( &shader );
 
 					// there will only be localSurfaces if the light casts shadows and
@@ -1104,7 +1104,7 @@ void ARCInteraction::AddActiveInteraction( void ) {
 			}
 		}
 
-		surfTriangles_t *shadowTris = sint->shadowTris;
+		srfTriangles_t *shadowTris = sint->shadowTris;
 
 		// the shadows will always have to be added, unless we can tell they
 		// are from a surface in an unconnected area
@@ -1168,10 +1168,10 @@ void ARCInteraction::AddActiveInteraction( void ) {
 
 			if ( sint->shader->TestMaterialFlag( MF_NOSELFSHADOW ) ) {
 				R_LinkLightSurf( &vLight->localShadows,
-					shadowTris, vEntity, lightDef, NULL, shadowScissor, inside );
+					shadowTris, vEntity, lightDef, nullptr, shadowScissor, inside );
 			} else {
 				R_LinkLightSurf( &vLight->globalShadows,
-					shadowTris, vEntity, lightDef, NULL, shadowScissor, inside );
+					shadowTris, vEntity, lightDef, nullptr, shadowScissor, inside );
 			}
 		}
 	}
@@ -1182,7 +1182,7 @@ void ARCInteraction::AddActiveInteraction( void ) {
 R_ShowInteractionMemory_f
 ===================
 */
-void R_ShowInteractionMemory_f( const arcCommandArgs &args ) {
+void R_ShowInteractionMemory_f( const anCommandArgs &args ) {
 	int total = 0;
 	int entities = 0;
 	int interactions = 0;
@@ -1196,16 +1196,16 @@ void R_ShowInteractionMemory_f( const arcCommandArgs &args ) {
 	int shadowTriIndexes = 0;
 
 	for ( int i = 0; i < tr.primaryWorld->entityDefs.Num(); i++ ) {
-		ARCRenderEntityLocal	*def = tr.primaryWorld->entityDefs[i];
+		anRenderEntityLocal	*def = tr.primaryWorld->entityDefs[i];
 		if ( !def ) {
 			continue;
 		}
-		if ( def->firstInteraction == NULL ) {
+		if ( def->firstInteraction == nullptr ) {
 			continue;
 		}
 		entities++;
 
-		for ( ARCInteraction *inter = def->firstInteraction; inter != NULL; inter = inter->entityNext ) {
+		for ( an Interaction *inter = def->firstInteraction; inter != nullptr; inter = inter->entityNext ) {
 			interactions++;
 			total += inter->MemoryUsed();
 

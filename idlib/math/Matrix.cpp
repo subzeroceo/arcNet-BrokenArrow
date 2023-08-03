@@ -1,29 +1,29 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 
 //===============================================================
 //
-//	arcMat2
+//	anMat2
 //
 //===============================================================
 
-arcMat2 mat2_zero( arcVec2( 0, 0 ), arcVec2( 0, 0 ) );
-arcMat2 mat2_identity( arcVec2( 1, 0 ), arcVec2( 0, 1 ) );
+anMat2 mat2_zero( anVec2( 0, 0 ), anVec2( 0, 0 ) );
+anMat2 mat2_identity( anVec2( 1, 0 ), anVec2( 0, 1 ) );
 
 /*
 ============
-arcMat2::InverseSelf
+anMat2::InverseSelf
 ============
 */
-bool arcMat2::InverseSelf( void ) {
+bool anMat2::InverseSelf( void ) {
 	// 2+4 = 6 multiplications
 	//		 1 division
 	double det, invDet, a;
 
 	det = mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -40,10 +40,10 @@ bool arcMat2::InverseSelf( void ) {
 
 /*
 ============
-arcMat2::InverseFastSelf
+anMat2::InverseFastSelf
 ============
 */
-bool arcMat2::InverseFastSelf( void ) {
+bool anMat2::InverseFastSelf( void ) {
 #if 1
 	// 2+4 = 6 multiplications
 	//		 1 division
@@ -51,7 +51,7 @@ bool arcMat2::InverseFastSelf( void ) {
 
 	det = mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -94,30 +94,30 @@ bool arcMat2::InverseFastSelf( void ) {
 
 /*
 =============
-arcMat2::ToString
+anMat2::ToString
 =============
 */
-const char *arcMat2::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anMat2::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 
 //===============================================================
 //
-//	arcMat3
+//	anMat3
 //
 //===============================================================
 
-arcMat3 mat3_zero( arcVec3( 0, 0, 0 ), arcVec3( 0, 0, 0 ), arcVec3( 0, 0, 0 ) );
-arcMat3 mat3_identity( arcVec3( 1, 0, 0 ), arcVec3( 0, 1, 0 ), arcVec3( 0, 0, 1 ) );
+anMat3 mat3_zero( anVec3( 0, 0, 0 ), anVec3( 0, 0, 0 ), anVec3( 0, 0, 0 ) );
+anMat3 mat3_identity( anVec3( 1, 0, 0 ), anVec3( 0, 1, 0 ), anVec3( 0, 0, 1 ) );
 
 /*
 ============
-arcMat3::ToAngles
+anMat3::ToAngles
 ============
 */
-arcAngles arcMat3::ToAngles( void ) const {
-	arcAngles	angles;
+anAngles anMat3::ToAngles( void ) const {
+	anAngles	angles;
 
 	float sp = mat[ 0 ][ 2 ];
 
@@ -131,7 +131,7 @@ arcAngles arcMat3::ToAngles( void ) const {
 	double theta = -asin( sp );
 	double cp = cos( theta );
 
-	if ( cp > 8192.0f * arcMath::FLT_EPSILON ) {
+	if ( cp > 8192.0f * anMath::FLT_EPSILON ) {
 		angles.pitch	= RAD2DEG( theta );
 		angles.yaw		= RAD2DEG( atan2( mat[ 0 ][ 1 ], mat[ 0 ][ 0 ] ) );
 		angles.roll		= RAD2DEG( atan2( mat[ 1 ][ 2 ], mat[ 2 ][ 2 ] ) );
@@ -145,18 +145,18 @@ arcAngles arcMat3::ToAngles( void ) const {
 
 /*
 ============
-arcMat3::ToQuat
+anMat3::ToQuat
 ============
 */
-arcQuats arcMat3::ToQuat( void ) const {
-	arcQuats q;
+anQuats anMat3::ToQuat( void ) const {
+	anQuats q;
 
 	static int 	next[ 3 ] = { 1, 2, 0 };
 	float trace = mat[ 0 ][ 0 ] + mat[ 1 ][ 1 ] + mat[ 2 ][ 2 ];
 
 	if ( trace > 0.0f ) {
 		float t = trace + 1.0f;
-		float s = arcMath::InvSqrt( t ) * 0.5f;
+		float s = anMath::InvSqrt( t ) * 0.5f;
 
 		q[3] = s * t;
 		q[0] = ( mat[ 2 ][ 1 ] - mat[ 1 ][ 2 ] ) * s;
@@ -167,20 +167,20 @@ arcQuats arcMat3::ToQuat( void ) const {
 		if ( mat[ 1 ][ 1 ] > mat[ 0 ][ 0 ] ) {
 			i = 1;
 		}
-		if ( mat[ 2 ][ 2 ] > mat[ i ][ i ] ) {
+		if ( mat[ 2 ][ 2 ] > mat[i][i] ) {
 			i = 2;
 		}
 
-		int j = next[ i ];
+		int j = next[i];
 		int k = next[ j ];
 
-		float t = ( mat[ i ][ i ] - ( mat[ j ][ j ] + mat[ k ][ k ] ) ) + 1.0f;
-		float s = arcMath::InvSqrt( t ) * 0.5f;
+		float t = ( mat[i][i] - ( mat[ j ][ j ] + mat[ k ][ k ] ) ) + 1.0f;
+		float s = anMath::InvSqrt( t ) * 0.5f;
 
 		q[i] = s * t;
 		q[3] = ( mat[ k ][ j ] - mat[ j ][ k ] ) * s;
-		q[j] = ( mat[ j ][ i ] + mat[ i ][ j ] ) * s;
-		q[k] = ( mat[ k ][ i ] + mat[ i ][ k ] ) * s;
+		q[j] = ( mat[ j ][i] + mat[i][ j ] ) * s;
+		q[k] = ( mat[ k ][i] + mat[i][ k ] ) * s;
 	}
 
 	return q;
@@ -188,24 +188,24 @@ arcQuats arcMat3::ToQuat( void ) const {
 
 /*
 ============
-arcMat3::ToCQuat
+anMat3::ToCQuat
 ============
 */
-arcCQuats arcMat3::ToCQuat( void ) const {
-	arcQuats q = ToQuat();
+anCQuats anMat3::ToCQuat( void ) const {
+	anQuats q = ToQuat();
 	if ( q.w < 0.0f ) {
-		return arcCQuats( -q.x, -q.y, -q.z );
+		return anCQuats( -q.x, -q.y, -q.z );
 	}
-	return arcCQuats( q.x, q.y, q.z );
+	return anCQuats( q.x, q.y, q.z );
 }
 
 /*
 ============
-arcMat3::ToRotation
+anMat3::ToRotation
 ============
 */
-arcRotate arcMat3::ToRotation( void ) const {
-	arcRotate	r;
+anRotation anMat3::ToRotation( void ) const {
+	anRotation	r;
 	float		trace;
 	float		s;
 	float		t;
@@ -218,7 +218,7 @@ arcRotate arcMat3::ToRotation( void ) const {
 	if ( trace > 0.0f ) {
 
 		t = trace + 1.0f;
-		s = arcMath::InvSqrt( t ) * 0.5f;
+		s = anMath::InvSqrt( t ) * 0.5f;
 
 		r.angle = s * t;
 		r.vec[0] = ( mat[ 2 ][ 1 ] - mat[ 1 ][ 2 ] ) * s;
@@ -229,29 +229,29 @@ arcRotate arcMat3::ToRotation( void ) const {
 		if ( mat[ 1 ][ 1 ] > mat[ 0 ][ 0 ] ) {
 			i = 1;
 		}
-		if ( mat[ 2 ][ 2 ] > mat[ i ][ i ] ) {
+		if ( mat[ 2 ][ 2 ] > mat[i][i] ) {
 			i = 2;
 		}
-		j = next[ i ];
+		j = next[i];
 		k = next[ j ];
 
-		t = ( mat[ i ][ i ] - ( mat[ j ][ j ] + mat[ k ][ k ] ) ) + 1.0f;
-		s = arcMath::InvSqrt( t ) * 0.5f;
+		t = ( mat[i][i] - ( mat[ j ][ j ] + mat[ k ][ k ] ) ) + 1.0f;
+		s = anMath::InvSqrt( t ) * 0.5f;
 
 		r.vec[i]	= s * t;
 		r.angle		= ( mat[ k ][ j ] - mat[ j ][ k ] ) * s;
-		r.vec[j]	= ( mat[ j ][ i ] + mat[ i ][ j ] ) * s;
-		r.vec[k]	= ( mat[ k ][ i ] + mat[ i ][ k ] ) * s;
+		r.vec[j]	= ( mat[ j ][i] + mat[i][ j ] ) * s;
+		r.vec[k]	= ( mat[ k ][i] + mat[i][ k ] ) * s;
 	}
-	r.angle = arcMath::ACos( r.angle );
-	if ( arcMath::Fabs( r.angle ) < 1e-10f ) {
+	r.angle = anMath::ACos( r.angle );
+	if ( anMath::Fabs( r.angle ) < 1e-10f ) {
 		r.vec.Set( 0.0f, 0.0f, 1.0f );
 		r.angle = 0.0f;
 	} else {
 		//vec *= (1.0f / sin( angle ) );
 		r.vec.Normalize();
 		r.vec.FixDegenerateNormal();
-		r.angle *= 2.0f * arcMath::M_RAD2DEG;
+		r.angle *= 2.0f * anMath::M_RAD2DEG;
 	}
 
 	r.origin.Zero();
@@ -262,20 +262,20 @@ arcRotate arcMat3::ToRotation( void ) const {
 
 /*
 =================
-arcMat3::ToAngularVelocity
+anMat3::ToAngularVelocity
 =================
 */
-arcVec3 arcMat3::ToAngularVelocity( void ) const {
-	arcRotate rotation = ToRotation();
+anVec3 anMat3::ToAngularVelocity( void ) const {
+	anRotation rotation = ToRotation();
 	return rotation.GetVec() * DEG2RAD( rotation.GetAngle() );
 }
 
 /*
 ============
-arcMat3::Determinant
+anMat3::Determinant
 ============
 */
-float arcMat3::Determinant( void ) const {
+float anMat3::Determinant( void ) const {
 	float det2_12_01 = mat[1][0] * mat[2][1] - mat[1][1] * mat[2][0];
 	float det2_12_02 = mat[1][0] * mat[2][2] - mat[1][2] * mat[2][0];
 	float det2_12_12 = mat[1][1] * mat[2][2] - mat[1][2] * mat[2][1];
@@ -285,13 +285,13 @@ float arcMat3::Determinant( void ) const {
 
 /*
 ============
-arcMat3::InverseSelf
+anMat3::InverseSelf
 ============
 */
-bool arcMat3::InverseSelf( void ) {
+bool anMat3::InverseSelf( void ) {
 	// 18+3+9 = 30 multiplications
 	//			 1 division
-	arcMat3 inverse;
+	anMat3 inverse;
 	double det, invDet;
 
 	inverse[0][0] = mat[1][1] * mat[2][2] - mat[1][2] * mat[2][1];
@@ -300,7 +300,7 @@ bool arcMat3::InverseSelf( void ) {
 
 	det = mat[0][0] * inverse[0][0] + mat[0][1] * inverse[1][0] + mat[0][2] * inverse[2][0];
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -330,14 +330,14 @@ bool arcMat3::InverseSelf( void ) {
 
 /*
 ============
-arcMat3::InverseFastSelf
+anMat3::InverseFastSelf
 ============
 */
-bool arcMat3::InverseFastSelf( void ) {
+bool anMat3::InverseFastSelf( void ) {
 #if 1
 	// 18+3+9 = 30 multiplications
 	//			 1 division
-	arcMat3 inverse;
+	anMat3 inverse;
 	double det, invDet;
 
 	inverse[0][0] = mat[1][1] * mat[2][2] - mat[1][2] * mat[2][1];
@@ -346,7 +346,7 @@ bool arcMat3::InverseFastSelf( void ) {
 
 	det = mat[0][0] * inverse[0][0] + mat[0][1] * inverse[1][0] + mat[0][2] * inverse[2][0];
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -426,7 +426,7 @@ bool arcMat3::InverseFastSelf( void ) {
 #else
 	//	4*2+4*4 = 24 multiplications
 	//		2*1 =  2 divisions
-	arcMat2 r0;
+	anMat2 r0;
 	float r1[2], r2[2], r3;
 	float det, invDet;
 	float *mat = reinterpret_cast<float *>( this );
@@ -434,7 +434,7 @@ bool arcMat3::InverseFastSelf( void ) {
 	// r0 = m0.Inverse();	// 2x2
 	det = mat[0*3+0] * mat[1*3+1] - mat[0*3+1] * mat[1*3+0];
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -456,7 +456,7 @@ bool arcMat3::InverseFastSelf( void ) {
 	r3 = r2[0] - mat[2*3+2];
 
 	// r3.InverseSelf();
-	if ( arcMath::Fabs( r3 ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( r3 ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -489,12 +489,12 @@ bool arcMat3::InverseFastSelf( void ) {
 
 /*
 ============
-arcMat3::InertiaTranslate
+anMat3::InertiaTranslate
 ============
 */
-arcMat3 arcMat3::InertiaTranslate( const float mass, const arcVec3 &centerOfMass, const arcVec3 &translation ) const {
-	arcMat3 m;
-	arcVec3 newCenter;
+anMat3 anMat3::InertiaTranslate( const float mass, const anVec3 &centerOfMass, const anVec3 &translation ) const {
+	anMat3 m;
+	anVec3 newCenter;
 
 	newCenter = centerOfMass + translation;
 
@@ -514,12 +514,12 @@ arcMat3 arcMat3::InertiaTranslate( const float mass, const arcVec3 &centerOfMass
 
 /*
 ============
-arcMat3::InertiaTranslateSelf
+anMat3::InertiaTranslateSelf
 ============
 */
-arcMat3 &arcMat3::InertiaTranslateSelf( const float mass, const arcVec3 &centerOfMass, const arcVec3 &translation ) {
-	arcMat3 m;
-	arcVec3 newCenter;
+anMat3 &anMat3::InertiaTranslateSelf( const float mass, const anVec3 &centerOfMass, const anVec3 &translation ) {
+	anMat3 m;
+	anVec3 newCenter;
 
 	newCenter = centerOfMass + translation;
 
@@ -541,20 +541,20 @@ arcMat3 &arcMat3::InertiaTranslateSelf( const float mass, const arcVec3 &centerO
 
 /*
 ============
-arcMat3::InertiaRotate
+anMat3::InertiaRotate
 ============
 */
-arcMat3 arcMat3::InertiaRotate( const arcMat3 &rotation ) const {
+anMat3 anMat3::InertiaRotate( const anMat3 &rotation ) const {
 	// NOTE: the rotation matrix is stored column-major
 	return rotation.Transpose() * (*this) * rotation;
 }
 
 /*
 ============
-arcMat3::InertiaRotateSelf
+anMat3::InertiaRotateSelf
 ============
 */
-arcMat3 &arcMat3::InertiaRotateSelf( const arcMat3 &rotation ) {
+anMat3 &anMat3::InertiaRotateSelf( const anMat3 &rotation ) {
 	// NOTE: the rotation matrix is stored column-major
 	*this = rotation.Transpose() * (*this) * rotation;
 	return *this;
@@ -562,34 +562,34 @@ arcMat3 &arcMat3::InertiaRotateSelf( const arcMat3 &rotation ) {
 
 /*
 =============
-arcMat3::ToString
+anMat3::ToString
 =============
 */
-const char *arcMat3::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anMat3::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 //===============================================================
 //
-//	arcMat4
+//	anMat4
 //
 //===============================================================
 
-arcMat4 mat4_zero( arcVec4( 0, 0, 0, 0 ), arcVec4( 0, 0, 0, 0 ), arcVec4( 0, 0, 0, 0 ), arcVec4( 0, 0, 0, 0 ) );
-arcMat4 mat4_identity( arcVec4( 1, 0, 0, 0 ), arcVec4( 0, 1, 0, 0 ), arcVec4( 0, 0, 1, 0 ), arcVec4( 0, 0, 0, 1 ) );
+anMat4 mat4_zero( anVec4( 0, 0, 0, 0 ), anVec4( 0, 0, 0, 0 ), anVec4( 0, 0, 0, 0 ), anVec4( 0, 0, 0, 0 ) );
+anMat4 mat4_identity( anVec4( 1, 0, 0, 0 ), anVec4( 0, 1, 0, 0 ), anVec4( 0, 0, 1, 0 ), anVec4( 0, 0, 0, 1 ) );
 
 /*
 ============
-arcMat4::Transpose
+anMat4::Transpose
 ============
 */
-arcMat4 arcMat4::Transpose( void ) const {
-	arcMat4	transpose;
+anMat4 anMat4::Transpose( void ) const {
+	anMat4	transpose;
 	int		i, j;
 
 	for ( i = 0; i < 4; i++ ) {
 		for ( j = 0; j < 4; j++ ) {
-			transpose[ i ][ j ] = mat[ j ][ i ];
+			transpose[i][ j ] = mat[ j ][i];
         }
 	}
 	return transpose;
@@ -597,18 +597,18 @@ arcMat4 arcMat4::Transpose( void ) const {
 
 /*
 ============
-arcMat4::TransposeSelf
+anMat4::TransposeSelf
 ============
 */
-arcMat4 &arcMat4::TransposeSelf( void ) {
+anMat4 &anMat4::TransposeSelf( void ) {
 	float	temp;
 	int		i, j;
 
 	for ( i = 0; i < 4; i++ ) {
 		for ( j = i + 1; j < 4; j++ ) {
-			temp = mat[ i ][ j ];
-			mat[ i ][ j ] = mat[ j ][ i ];
-			mat[ j ][ i ] = temp;
+			temp = mat[i][ j ];
+			mat[i][ j ] = mat[ j ][i];
+			mat[ j ][i] = temp;
         }
 	}
 	return *this;
@@ -616,10 +616,10 @@ arcMat4 &arcMat4::TransposeSelf( void ) {
 
 /*
 ============
-arcMat4::Determinant
+anMat4::Determinant
 ============
 */
-float arcMat4::Determinant( void ) const {
+float anMat4::Determinant( void ) const {
 
 	// 2x2 sub-determinants
 	float det2_01_01 = mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
@@ -640,10 +640,10 @@ float arcMat4::Determinant( void ) const {
 
 /*
 ============
-arcMat4::InverseSelf
+anMat4::InverseSelf
 ============
 */
-bool arcMat4::InverseSelf( void ) {
+bool anMat4::InverseSelf( void ) {
 	// 84+4+16 = 104 multiplications
 	//			   1 division
 	double det, invDet;
@@ -664,7 +664,7 @@ bool arcMat4::InverseSelf( void ) {
 
 	det = ( - det3_201_123 * mat[3][0] + det3_201_023 * mat[3][1] - det3_201_013 * mat[3][2] + det3_201_012 * mat[3][3] );
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -726,10 +726,10 @@ bool arcMat4::InverseSelf( void ) {
 
 /*
 ============
-arcMat4::InverseFastSelf
+anMat4::InverseFastSelf
 ============
 */
-bool arcMat4::InverseFastSelf( void ) {
+bool anMat4::InverseFastSelf( void ) {
 #if 0
 	// 84+4+16 = 104 multiplications
 	//			   1 division
@@ -751,7 +751,7 @@ bool arcMat4::InverseFastSelf( void ) {
 
 	det = ( - det3_201_123 * mat[3][0] + det3_201_023 * mat[3][1] - det3_201_013 * mat[3][2] + det3_201_012 * mat[3][3] );
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -909,14 +909,14 @@ bool arcMat4::InverseFastSelf( void ) {
 #else
 	//	6*8+2*6 = 60 multiplications
 	//		2*1 =  2 divisions
-	arcMat2 r0, r1, r2, r3;
+	anMat2 r0, r1, r2, r3;
 	float a, det, invDet;
 	float *mat = reinterpret_cast<float *>( this );
 
 	// r0 = m0.Inverse();
 	det = mat[0*4+0] * mat[1*4+1] - mat[0*4+1] * mat[1*4+0];
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -948,7 +948,7 @@ bool arcMat4::InverseFastSelf( void ) {
 	// r3.InverseSelf();
 	det = r3[0][0] * r3[1][1] - r3[0][1] * r3[1][0];
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -996,35 +996,35 @@ bool arcMat4::InverseFastSelf( void ) {
 
 /*
 =============
-arcMat4::ToString
+anMat4::ToString
 =============
 */
-const char *arcMat4::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anMat4::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 
 //===============================================================
 //
-//	arcMat5
+//	anMat5
 //
 //===============================================================
 
-arcMat5 mat5_zero( arcVec5( 0, 0, 0, 0, 0 ), arcVec5( 0, 0, 0, 0, 0 ), arcVec5( 0, 0, 0, 0, 0 ), arcVec5( 0, 0, 0, 0, 0 ), arcVec5( 0, 0, 0, 0, 0 ) );
-arcMat5 mat5_identity( arcVec5( 1, 0, 0, 0, 0 ), arcVec5( 0, 1, 0, 0, 0 ), arcVec5( 0, 0, 1, 0, 0 ), arcVec5( 0, 0, 0, 1, 0 ), arcVec5( 0, 0, 0, 0, 1 ) );
+anMat5 mat5_zero( anVec5( 0, 0, 0, 0, 0 ), anVec5( 0, 0, 0, 0, 0 ), anVec5( 0, 0, 0, 0, 0 ), anVec5( 0, 0, 0, 0, 0 ), anVec5( 0, 0, 0, 0, 0 ) );
+anMat5 mat5_identity( anVec5( 1, 0, 0, 0, 0 ), anVec5( 0, 1, 0, 0, 0 ), anVec5( 0, 0, 1, 0, 0 ), anVec5( 0, 0, 0, 1, 0 ), anVec5( 0, 0, 0, 0, 1 ) );
 
 /*
 ============
-arcMat5::Transpose
+anMat5::Transpose
 ============
 */
-arcMat5 arcMat5::Transpose( void ) const {
-	arcMat5	transpose;
+anMat5 anMat5::Transpose( void ) const {
+	anMat5	transpose;
 	int		i, j;
 
 	for ( i = 0; i < 5; i++ ) {
 		for ( j = 0; j < 5; j++ ) {
-			transpose[ i ][ j ] = mat[ j ][ i ];
+			transpose[i][ j ] = mat[ j ][i];
         }
 	}
 	return transpose;
@@ -1032,18 +1032,18 @@ arcMat5 arcMat5::Transpose( void ) const {
 
 /*
 ============
-arcMat5::TransposeSelf
+anMat5::TransposeSelf
 ============
 */
-arcMat5 &arcMat5::TransposeSelf( void ) {
+anMat5 &anMat5::TransposeSelf( void ) {
 	float	temp;
 	int		i, j;
 
 	for ( i = 0; i < 5; i++ ) {
 		for ( j = i + 1; j < 5; j++ ) {
-			temp = mat[ i ][ j ];
-			mat[ i ][ j ] = mat[ j ][ i ];
-			mat[ j ][ i ] = temp;
+			temp = mat[i][ j ];
+			mat[i][ j ] = mat[ j ][i];
+			mat[ j ][i] = temp;
         }
 	}
 	return *this;
@@ -1051,10 +1051,10 @@ arcMat5 &arcMat5::TransposeSelf( void ) {
 
 /*
 ============
-arcMat5::Determinant
+anMat5::Determinant
 ============
 */
-float arcMat5::Determinant( void ) const {
+float anMat5::Determinant( void ) const {
 
 	// 2x2 sub-determinants required to calculate 5x5 determinant
 	float det2_34_01 = mat[3][0] * mat[4][1] - mat[3][1] * mat[4][0];
@@ -1093,10 +1093,10 @@ float arcMat5::Determinant( void ) const {
 
 /*
 ============
-arcMat5::InverseSelf
+anMat5::InverseSelf
 ============
 */
-bool arcMat5::InverseSelf( void ) {
+bool anMat5::InverseSelf( void ) {
 	// 280+5+25 = 310 multiplications
 	//				1 division
 	double det, invDet;
@@ -1135,7 +1135,7 @@ bool arcMat5::InverseSelf( void ) {
 	// determinant of 5x5 matrix
 	det = mat[0][0] * det4_1234_1234 - mat[0][1] * det4_1234_0234 + mat[0][2] * det4_1234_0134 - mat[0][3] * det4_1234_0124 + mat[0][4] * det4_1234_0123;
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -1252,10 +1252,10 @@ bool arcMat5::InverseSelf( void ) {
 
 /*
 ============
-arcMat5::InverseFastSelf
+anMat5::InverseFastSelf
 ============
 */
-bool arcMat5::InverseFastSelf( void ) {
+bool anMat5::InverseFastSelf( void ) {
 #if 0
 	// 280+5+25 = 310 multiplications
 	//				1 division
@@ -1295,7 +1295,7 @@ bool arcMat5::InverseFastSelf( void ) {
 	// determinant of 5x5 matrix
 	det = mat[0][0] * det4_1234_1234 - mat[0][1] * det4_1234_0234 + mat[0][2] * det4_1234_0134 - mat[0][3] * det4_1234_0124 + mat[0][4] * det4_1234_0123;
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -1580,7 +1580,7 @@ bool arcMat5::InverseFastSelf( void ) {
 #else
 	// 86+30+6 = 122 multiplications
 	//	  2*1  =   2 divisions
-	arcMat3 r0, r1, r2, r3;
+	anMat3 r0, r1, r2, r3;
 	float c0, c1, c2, det, invDet;
 	float *mat = reinterpret_cast<float *>( this );
 
@@ -1591,7 +1591,7 @@ bool arcMat5::InverseFastSelf( void ) {
 
 	det = mat[0*5+0] * c0 + mat[0*5+1] * c1 + mat[0*5+2] * c2;
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -1630,7 +1630,7 @@ bool arcMat5::InverseFastSelf( void ) {
 	// r3.InverseSelf();	// 2x2
 	det = r3[0][0] * r3[1][1] - r3[0][1] * r3[1][0];
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -1689,35 +1689,35 @@ bool arcMat5::InverseFastSelf( void ) {
 
 /*
 =============
-arcMat5::ToString
+anMat5::ToString
 =============
 */
-const char *arcMat5::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anMat5::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 
 //===============================================================
 //
-//	arcMat6
+//	anMat6
 //
 //===============================================================
 
-arcMat6 mat6_zero( arcVec6( 0, 0, 0, 0, 0, 0 ), arcVec6( 0, 0, 0, 0, 0, 0 ), arcVec6( 0, 0, 0, 0, 0, 0 ), arcVec6( 0, 0, 0, 0, 0, 0 ), arcVec6( 0, 0, 0, 0, 0, 0 ), arcVec6( 0, 0, 0, 0, 0, 0 ) );
-arcMat6 mat6_identity( arcVec6( 1, 0, 0, 0, 0, 0 ), arcVec6( 0, 1, 0, 0, 0, 0 ), arcVec6( 0, 0, 1, 0, 0, 0 ), arcVec6( 0, 0, 0, 1, 0, 0 ), arcVec6( 0, 0, 0, 0, 1, 0 ), arcVec6( 0, 0, 0, 0, 0, 1 ) );
+anMat6 mat6_zero( anVec6( 0, 0, 0, 0, 0, 0 ), anVec6( 0, 0, 0, 0, 0, 0 ), anVec6( 0, 0, 0, 0, 0, 0 ), anVec6( 0, 0, 0, 0, 0, 0 ), anVec6( 0, 0, 0, 0, 0, 0 ), anVec6( 0, 0, 0, 0, 0, 0 ) );
+anMat6 mat6_identity( anVec6( 1, 0, 0, 0, 0, 0 ), anVec6( 0, 1, 0, 0, 0, 0 ), anVec6( 0, 0, 1, 0, 0, 0 ), anVec6( 0, 0, 0, 1, 0, 0 ), anVec6( 0, 0, 0, 0, 1, 0 ), anVec6( 0, 0, 0, 0, 0, 1 ) );
 
 /*
 ============
-arcMat6::Transpose
+anMat6::Transpose
 ============
 */
-arcMat6 arcMat6::Transpose( void ) const {
-	arcMat6	transpose;
+anMat6 anMat6::Transpose( void ) const {
+	anMat6	transpose;
 	int		i, j;
 
 	for ( i = 0; i < 6; i++ ) {
 		for ( j = 0; j < 6; j++ ) {
-			transpose[ i ][ j ] = mat[ j ][ i ];
+			transpose[i][ j ] = mat[ j ][i];
         }
 	}
 	return transpose;
@@ -1725,18 +1725,18 @@ arcMat6 arcMat6::Transpose( void ) const {
 
 /*
 ============
-arcMat6::TransposeSelf
+anMat6::TransposeSelf
 ============
 */
-arcMat6 &arcMat6::TransposeSelf( void ) {
+anMat6 &anMat6::TransposeSelf( void ) {
 	float	temp;
 	int		i, j;
 
 	for ( i = 0; i < 6; i++ ) {
 		for ( j = i + 1; j < 6; j++ ) {
-			temp = mat[ i ][ j ];
-			mat[ i ][ j ] = mat[ j ][ i ];
-			mat[ j ][ i ] = temp;
+			temp = mat[i][ j ];
+			mat[i][ j ] = mat[ j ][i];
+			mat[ j ][i] = temp;
         }
 	}
 	return *this;
@@ -1744,10 +1744,10 @@ arcMat6 &arcMat6::TransposeSelf( void ) {
 
 /*
 ============
-arcMat6::Determinant
+anMat6::Determinant
 ============
 */
-float arcMat6::Determinant( void ) const {
+float anMat6::Determinant( void ) const {
 
 	// 2x2 sub-determinants required to calculate 6x6 determinant
 	float det2_45_01 = mat[4][0] * mat[5][1] - mat[4][1] * mat[5][0];
@@ -1820,10 +1820,10 @@ float arcMat6::Determinant( void ) const {
 
 /*
 ============
-arcMat6::InverseSelf
+anMat6::InverseSelf
 ============
 */
-bool arcMat6::InverseSelf( void ) {
+bool anMat6::InverseSelf( void ) {
 	// 810+6+36 = 852 multiplications
 	//				1 division
 	double det, invDet;
@@ -1896,7 +1896,7 @@ bool arcMat6::InverseSelf( void ) {
 	det = mat[0][0] * det5_12345_12345 - mat[0][1] * det5_12345_02345 + mat[0][2] * det5_12345_01345 -
 				mat[0][3] * det5_12345_01245 + mat[0][4] * det5_12345_01235 - mat[0][5] * det5_12345_01234;
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -2137,10 +2137,10 @@ bool arcMat6::InverseSelf( void ) {
 
 /*
 ============
-arcMat6::InverseFastSelf
+anMat6::InverseFastSelf
 ============
 */
-bool arcMat6::InverseFastSelf( void ) {
+bool anMat6::InverseFastSelf( void ) {
 #if 0
 	// 810+6+36 = 852 multiplications
 	//				1 division
@@ -2214,7 +2214,7 @@ bool arcMat6::InverseFastSelf( void ) {
 	det = mat[0][0] * det5_12345_12345 - mat[0][1] * det5_12345_02345 + mat[0][2] * det5_12345_01345 -
 				mat[0][3] * det5_12345_01245 + mat[0][4] * det5_12345_01235 - mat[0][5] * det5_12345_01234;
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -2727,7 +2727,7 @@ bool arcMat6::InverseFastSelf( void ) {
 #else
 	// 6*27+2*30 = 222 multiplications
 	//		2*1  =	 2 divisions
-	arcMat3 r0, r1, r2, r3;
+	anMat3 r0, r1, r2, r3;
 	float c0, c1, c2, det, invDet;
 	float *mat = reinterpret_cast<float *>( this );
 
@@ -2738,7 +2738,7 @@ bool arcMat6::InverseFastSelf( void ) {
 
 	det = mat[0*6+0] * c0 + mat[0*6+1] * c1 + mat[0*6+2] * c2;
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -2794,7 +2794,7 @@ bool arcMat6::InverseFastSelf( void ) {
 
 	det = r3[0][0] * r2[0][0] + r3[0][1] * r2[1][0] + r3[0][2] * r2[2][0];
 
-	if ( arcMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
+	if ( anMath::Fabs( det ) < MATRIX_INVERSE_EPSILON ) {
 		return false;
 	}
 
@@ -2878,31 +2878,31 @@ bool arcMat6::InverseFastSelf( void ) {
 
 /*
 =============
-arcMat6::ToString
+anMat6::ToString
 =============
 */
-const char *arcMat6::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anMat6::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 
 //===============================================================
 //
-//  arcMatX
+//  anMatX
 //
 //===============================================================
 
-float	arcMatX::temp[MATX_MAX_TEMP+4];
-float *	arcMatX::tempPtr = (float *) ( ( ( int ) arcMatX::temp + 15 ) & ~15 );
-int		arcMatX::tempIndex = 0;
+float	anMatX::temp[MATX_MAX_TEMP+4];
+float *	anMatX::tempPtr = (float *) ( ( ( int ) anMatX::temp + 15 ) & ~15 );
+int		anMatX::tempIndex = 0;
 
 
 /*
 ============
-arcMatX::ChangeSize
+anMatX::ChangeSize
 ============
 */
-void arcMatX::ChangeSize( int rows, int columns, bool makeZero ) {
+void anMatX::ChangeSize( int rows, int columns, bool makeZero ) {
 	int alloc = ( rows * columns + 3 ) & ~3;
 	if ( alloc > alloced && alloced != -1 ) {
 		float *oldMat = mat;
@@ -2952,10 +2952,10 @@ void arcMatX::ChangeSize( int rows, int columns, bool makeZero ) {
 
 /*
 ============
-arcMatX::RemoveRow
+anMatX::RemoveRow
 ============
 */
-arcMatX &arcMatX::RemoveRow( int r ) {
+anMatX &anMatX::RemoveRow( int r ) {
 	int i;
 
 	assert( r < numRows );
@@ -2971,10 +2971,10 @@ arcMatX &arcMatX::RemoveRow( int r ) {
 
 /*
 ============
-arcMatX::RemoveColumn
+anMatX::RemoveColumn
 ============
 */
-arcMatX &arcMatX::RemoveColumn( int r ) {
+anMatX &anMatX::RemoveColumn( int r ) {
 	int i;
 
 	assert( r < numColumns );
@@ -2991,10 +2991,10 @@ arcMatX &arcMatX::RemoveColumn( int r ) {
 
 /*
 ============
-arcMatX::RemoveRowColumn
+anMatX::RemoveRowColumn
 ============
 */
-arcMatX &arcMatX::RemoveRowColumn( int r ) {
+anMatX &anMatX::RemoveRowColumn( int r ) {
 	int i;
 
 	assert( r < numRows && r < numColumns );
@@ -3021,12 +3021,12 @@ arcMatX &arcMatX::RemoveRowColumn( int r ) {
 
 /*
 ============
-arcMatX::IsOrthogonal
+anMatX::IsOrthogonal
 
   returns true if (*this) * this->Transpose() == Identity
 ============
 */
-bool arcMatX::IsOrthogonal( const float epsilon ) const {
+bool anMatX::IsOrthogonal( const float epsilon ) const {
 	float *ptr1, *ptr2, sum;
 
 	if ( !IsSquare() ) {
@@ -3042,7 +3042,7 @@ bool arcMatX::IsOrthogonal( const float epsilon ) const {
 				ptr2 += numColumns;
 				sum += ptr1[n] * ptr2[0];
 			}
-			if ( arcMath::Fabs( sum ) > epsilon ) {
+			if ( anMath::Fabs( sum ) > epsilon ) {
 				return false;
 			}
 		}
@@ -3053,12 +3053,12 @@ bool arcMatX::IsOrthogonal( const float epsilon ) const {
 
 /*
 ============
-arcMatX::IsOrthonormal
+anMatX::IsOrthonormal
 
   returns true if (*this) * this->Transpose() == Identity and the length of each column vector is 1
 ============
 */
-bool arcMatX::IsOrthonormal( const float epsilon ) const {
+bool anMatX::IsOrthonormal( const float epsilon ) const {
 	float *ptr1, *ptr2, sum;
 
 	if ( !IsSquare() ) {
@@ -3074,7 +3074,7 @@ bool arcMatX::IsOrthonormal( const float epsilon ) const {
 				ptr2 += numColumns;
 				sum += ptr1[n] * ptr2[0];
 			}
-			if ( arcMath::Fabs( sum ) > epsilon ) {
+			if ( anMath::Fabs( sum ) > epsilon ) {
 				return false;
 			}
 		}
@@ -3086,7 +3086,7 @@ bool arcMatX::IsOrthonormal( const float epsilon ) const {
 			ptr2 += numColumns;
 			sum += ptr2[i] * ptr2[i];
 		}
-		if ( arcMath::Fabs( sum ) > epsilon ) {
+		if ( anMath::Fabs( sum ) > epsilon ) {
 			return false;
 		}
 	}
@@ -3095,16 +3095,16 @@ bool arcMatX::IsOrthonormal( const float epsilon ) const {
 
 /*
 ============
-arcMatX::IsPMatrix
+anMatX::IsPMatrix
 
   returns true if the matrix is a P-matrix
   A square matrix is a P-matrix if all its principal minors are positive.
 ============
 */
-bool arcMatX::IsPMatrix( const float epsilon ) const {
+bool anMatX::IsPMatrix( const float epsilon ) const {
 	int i, j;
 	float d;
-	arcMatX m;
+	anMatX m;
 
 	if ( !IsSquare() ) {
 		return false;
@@ -3150,13 +3150,13 @@ bool arcMatX::IsPMatrix( const float epsilon ) const {
 
 /*
 ============
-arcMatX::IsZMatrix
+anMatX::IsZMatrix
 
   returns true if the matrix is a Z-matrix
   A square matrix M is a Z-matrix if M[i][j] <= 0 for all i != j.
 ============
 */
-bool arcMatX::IsZMatrix( const float epsilon ) const {
+bool anMatX::IsZMatrix( const float epsilon ) const {
 	int i, j;
 
 	if ( !IsSquare() ) {
@@ -3175,16 +3175,16 @@ bool arcMatX::IsZMatrix( const float epsilon ) const {
 
 /*
 ============
-arcMatX::IsPositiveDefinite
+anMatX::IsPositiveDefinite
 
   returns true if the matrix is Positive Definite (PD)
   A square matrix M of order n is said to be PD if y'My > 0 for all vectors y of dimension n, y != 0.
 ============
 */
-bool arcMatX::IsPositiveDefinite( const float epsilon ) const {
+bool anMatX::IsPositiveDefinite( const float epsilon ) const {
 	int i, j, k;
 	float d, s;
-	arcMatX m;
+	anMatX m;
 
 	// the matrix must be square
 	if ( !IsSquare() ) {
@@ -3226,13 +3226,13 @@ bool arcMatX::IsPositiveDefinite( const float epsilon ) const {
 
 /*
 ============
-arcMatX::IsSymmetricPositiveDefinite
+anMatX::IsSymmetricPositiveDefinite
 
   returns true if the matrix is Symmetric Positive Definite (PD)
 ============
 */
-bool arcMatX::IsSymmetricPositiveDefinite( const float epsilon ) const {
-	arcMatX m;
+bool anMatX::IsSymmetricPositiveDefinite( const float epsilon ) const {
+	anMatX m;
 
 	// the matrix must be symmetric
 	if ( !IsSymmetric( epsilon ) ) {
@@ -3249,16 +3249,16 @@ bool arcMatX::IsSymmetricPositiveDefinite( const float epsilon ) const {
 
 /*
 ============
-arcMatX::IsPositiveSemiDefinite
+anMatX::IsPositiveSemiDefinite
 
   returns true if the matrix is Positive Semi Definite (PSD)
   A square matrix M of order n is said to be PSD if y'My >= 0 for all vectors y of dimension n, y != 0.
 ============
 */
-bool arcMatX::IsPositiveSemiDefinite( const float epsilon ) const {
+bool anMatX::IsPositiveSemiDefinite( const float epsilon ) const {
 	int i, j, k;
 	float d, s;
-	arcMatX m;
+	anMatX m;
 
 	// the matrix must be square
 	if ( !IsSquare() ) {
@@ -3287,10 +3287,10 @@ bool arcMatX::IsPositiveSemiDefinite( const float epsilon ) const {
 				continue;
 			}
 			for ( k = 0; k < numRows; k++ ) {
-				if ( arcMath::Fabs( m[k][j] ) > epsilon ) {
+				if ( anMath::Fabs( m[k][j] ) > epsilon ) {
 					return false;
 				}
-				if ( arcMath::Fabs( m[j][k] ) > epsilon ) {
+				if ( anMath::Fabs( m[j][k] ) > epsilon ) {
 					return false;
 				}
 			}
@@ -3315,12 +3315,12 @@ bool arcMatX::IsPositiveSemiDefinite( const float epsilon ) const {
 
 /*
 ============
-arcMatX::IsSymmetricPositiveSemiDefinite
+anMatX::IsSymmetricPositiveSemiDefinite
 
   returns true if the matrix is Symmetric Positive Semi Definite (PSD)
 ============
 */
-bool arcMatX::IsSymmetricPositiveSemiDefinite( const float epsilon ) const {
+bool anMatX::IsSymmetricPositiveSemiDefinite( const float epsilon ) const {
 
 	// the matrix must be symmetric
 	if ( !IsSymmetric( epsilon ) ) {
@@ -3332,12 +3332,12 @@ bool arcMatX::IsSymmetricPositiveSemiDefinite( const float epsilon ) const {
 
 /*
 ============
-arcMatX::LowerTriangularInverse
+anMatX::LowerTriangularInverse
 
   in-place inversion of the lower triangular matrix
 ============
 */
-bool arcMatX::LowerTriangularInverse( void ) {
+bool anMatX::LowerTriangularInverse( void ) {
 	int i, j, k;
 	double d, sum;
 
@@ -3361,12 +3361,12 @@ bool arcMatX::LowerTriangularInverse( void ) {
 
 /*
 ============
-arcMatX::UpperTriangularInverse
+anMatX::UpperTriangularInverse
 
   in-place inversion of the upper triangular matrix
 ============
 */
-bool arcMatX::UpperTriangularInverse( void ) {
+bool anMatX::UpperTriangularInverse( void ) {
 	int i, j, k;
 	double d, sum;
 
@@ -3390,21 +3390,21 @@ bool arcMatX::UpperTriangularInverse( void ) {
 
 /*
 =============
-arcMatX::ToString
+anMatX::ToString
 =============
 */
-const char *arcMatX::ToString( int precision ) const {
-	return arcNetString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anMatX::ToString( int precision ) const {
+	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
 ============
-arcMatX::Update_RankOne
+anMatX::Update_RankOne
 
   Updates the matrix to obtain the matrix: A + alpha * v * w'
 ============
 */
-void arcMatX::Update_RankOne( const arcVecX &v, const arcVecX &w, float alpha ) {
+void anMatX::Update_RankOne( const anVecX &v, const anVecX &w, float alpha ) {
 	int i, j;
 	float s;
 
@@ -3421,12 +3421,12 @@ void arcMatX::Update_RankOne( const arcVecX &v, const arcVecX &w, float alpha ) 
 
 /*
 ============
-arcMatX::Update_RankOneSymmetric
+anMatX::Update_RankOneSymmetric
 
   Updates the matrix to obtain the matrix: A + alpha * v * v'
 ============
 */
-void arcMatX::Update_RankOneSymmetric( const arcVecX &v, float alpha ) {
+void anMatX::Update_RankOneSymmetric( const anVecX &v, float alpha ) {
 	int i, j;
 	float s;
 
@@ -3443,7 +3443,7 @@ void arcMatX::Update_RankOneSymmetric( const arcVecX &v, float alpha ) {
 
 /*
 ============
-arcMatX::Update_RowColumn
+anMatX::Update_RowColumn
 
   Updates the matrix to obtain the matrix:
 
@@ -3454,7 +3454,7 @@ arcMatX::Update_RowColumn
   where: a = v[0,r-1], b = v[r], c = v[r+1,numRows-1], d = w[0,r-1], w[r] = 0.0f, e = w[r+1,numColumns-1]
 ============
 */
-void arcMatX::Update_RowColumn( const arcVecX &v, const arcVecX &w, int r ) {
+void anMatX::Update_RowColumn( const anVecX &v, const anVecX &w, int r ) {
 	int i;
 
 	assert( w[r] == 0.0f );
@@ -3471,7 +3471,7 @@ void arcMatX::Update_RowColumn( const arcVecX &v, const arcVecX &w, int r ) {
 
 /*
 ============
-arcMatX::Update_RowColumnSymmetric
+anMatX::Update_RowColumnSymmetric
 
   Updates the matrix to obtain the matrix:
 
@@ -3482,7 +3482,7 @@ arcMatX::Update_RowColumnSymmetric
   where: a = v[0,r-1], b = v[r], c = v[r+1,numRows-1]
 ============
 */
-void arcMatX::Update_RowColumnSymmetric( const arcVecX &v, int r ) {
+void anMatX::Update_RowColumnSymmetric( const anVecX &v, int r ) {
 	int i;
 
 	assert( numRows == numColumns );
@@ -3501,7 +3501,7 @@ void arcMatX::Update_RowColumnSymmetric( const arcVecX &v, int r ) {
 
 /*
 ============
-arcMatX::Update_Increment
+anMatX::Update_Increment
 
   Updates the matrix to obtain the matrix:
 
@@ -3511,7 +3511,7 @@ arcMatX::Update_Increment
   where: a = v[0,numRows-1], b = v[numRows], c = w[0,numColumns-1]], w[numColumns] = 0
 ============
 */
-void arcMatX::Update_Increment( const arcVecX &v, const arcVecX &w ) {
+void anMatX::Update_Increment( const anVecX &v, const anVecX &w ) {
 	int i;
 
 	assert( numRows == numColumns );
@@ -3530,7 +3530,7 @@ void arcMatX::Update_Increment( const arcVecX &v, const arcVecX &w ) {
 
 /*
 ============
-arcMatX::Update_IncrementSymmetric
+anMatX::Update_IncrementSymmetric
 
   Updates the matrix to obtain the matrix:
 
@@ -3540,7 +3540,7 @@ arcMatX::Update_IncrementSymmetric
   where: a = v[0,numRows-1], b = v[numRows]
 ============
 */
-void arcMatX::Update_IncrementSymmetric( const arcVecX &v ) {
+void anMatX::Update_IncrementSymmetric( const anVecX &v ) {
 	int i;
 
 	assert( numRows == numColumns );
@@ -3558,30 +3558,30 @@ void arcMatX::Update_IncrementSymmetric( const arcVecX &v ) {
 
 /*
 ============
-arcMatX::Update_Decrement
+anMatX::Update_Decrement
 
   Updates the matrix to obtain a matrix with row r and column r removed.
 ============
 */
-void arcMatX::Update_Decrement( int r ) {
+void anMatX::Update_Decrement( int r ) {
 	RemoveRowColumn( r );
 }
 
 /*
 ============
-arcMatX::Inverse_GaussJordan
+anMatX::Inverse_GaussJordan
 
   in-place inversion using Gauss-Jordan elimination
 ============
 */
-bool arcMatX::Inverse_GaussJordan( void ) {
+bool anMatX::Inverse_GaussJordan( void ) {
 	int i, j, k, r, c;
 	float d, max;
 
 	assert( numRows == numColumns );
 
-	int *columnIndex = ( int * ) _alloca16( numRows * sizeof( int ) );
-	int *rowIndex = ( int * ) _alloca16( numRows * sizeof( int ) );
+	int *columnIndex = ( int*) _alloca16( numRows * sizeof( int ) );
+	int *rowIndex = ( int*) _alloca16( numRows * sizeof( int ) );
 	bool *pivot = (bool *) _alloca16( numRows * sizeof( bool ) );
 
 	memset( pivot, 0, numRows * sizeof( bool ) );
@@ -3596,7 +3596,7 @@ bool arcMatX::Inverse_GaussJordan( void ) {
 			if ( !pivot[j] ) {
 				for ( k = 0; k < numRows; k++ ) {
 					if ( !pivot[k] ) {
-						d = arcMath::Fabs( (*this)[j][k] );
+						d = anMath::Fabs( (*this)[j][k] );
 						if ( d > max ) {
 							max = d;
 							r = j;
@@ -3658,15 +3658,15 @@ bool arcMatX::Inverse_GaussJordan( void ) {
 
 /*
 ============
-arcMatX::Inverse_UpdateRankOne
+anMatX::Inverse_UpdateRankOne
 
   Updates the in-place inverse using the Sherman-Morrison formula to obtain the inverse for the matrix: A + alpha * v * w'
 ============
 */
-bool arcMatX::Inverse_UpdateRankOne( const arcVecX &v, const arcVecX &w, float alpha ) {
+bool anMatX::Inverse_UpdateRankOne( const anVecX &v, const anVecX &w, float alpha ) {
 	int i, j;
 	float beta, s;
-	arcVecX y, z;
+	anVecX y, z;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numColumns );
@@ -3696,7 +3696,7 @@ bool arcMatX::Inverse_UpdateRankOne( const arcVecX &v, const arcVecX &w, float a
 
 /*
 ============
-arcMatX::Inverse_UpdateRowColumn
+anMatX::Inverse_UpdateRowColumn
 
   Updates the in-place inverse to obtain the inverse for the matrix:
 
@@ -3707,8 +3707,8 @@ arcMatX::Inverse_UpdateRowColumn
   where: a = v[0,r-1], b = v[r], c = v[r+1,numRows-1], d = w[0,r-1], w[r] = 0.0f, e = w[r+1,numColumns-1]
 ============
 */
-bool arcMatX::Inverse_UpdateRowColumn( const arcVecX &v, const arcVecX &w, int r ) {
-	arcVecX s;
+bool anMatX::Inverse_UpdateRowColumn( const anVecX &v, const anVecX &w, int r ) {
+	anVecX s;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numColumns );
@@ -3731,7 +3731,7 @@ bool arcMatX::Inverse_UpdateRowColumn( const arcVecX &v, const arcVecX &w, int r
 
 /*
 ============
-arcMatX::Inverse_UpdateIncrement
+anMatX::Inverse_UpdateIncrement
 
   Updates the in-place inverse to obtain the inverse for the matrix:
 
@@ -3741,8 +3741,8 @@ arcMatX::Inverse_UpdateIncrement
   where: a = v[0,numRows-1], b = v[numRows], c = w[0,numColumns-1], w[numColumns] = 0
 ============
 */
-bool arcMatX::Inverse_UpdateIncrement( const arcVecX &v, const arcVecX &w ) {
-	arcVecX v2;
+bool anMatX::Inverse_UpdateIncrement( const anVecX &v, const anVecX &w ) {
+	anVecX v2;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numRows+1 );
@@ -3760,14 +3760,14 @@ bool arcMatX::Inverse_UpdateIncrement( const arcVecX &v, const arcVecX &w ) {
 
 /*
 ============
-arcMatX::Inverse_UpdateDecrement
+anMatX::Inverse_UpdateDecrement
 
   Updates the in-place inverse to obtain the inverse of the matrix with row r and column r removed.
   v and w should store the column and row of the original matrix respectively.
 ============
 */
-bool arcMatX::Inverse_UpdateDecrement( const arcVecX &v, const arcVecX &w, int r ) {
-	arcVecX v1, w1;
+bool anMatX::Inverse_UpdateDecrement( const anVecX &v, const anVecX &w, int r ) {
+	anVecX v1, w1;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numRows );
@@ -3795,29 +3795,29 @@ bool arcMatX::Inverse_UpdateDecrement( const arcVecX &v, const arcVecX &w, int r
 
 /*
 ============
-arcMatX::Inverse_Solve
+anMatX::Inverse_Solve
 
   Solve Ax = b with A inverted
 ============
 */
-void arcMatX::Inverse_Solve( arcVecX &x, const arcVecX &b ) const {
+void anMatX::Inverse_Solve( anVecX &x, const anVecX &b ) const {
 	Multiply( x, b );
 }
 
 /*
 ============
-arcMatX::LU_Factor
+anMatX::LU_Factor
 
   in-place factorization: LU
   L is a triangular matrix stored in the lower triangle.
   L has ones on the diagonal that are not stored.
   U is a triangular matrix stored in the upper triangle.
-  If index != NULL partial pivoting is used for numerical stability.
-  If index != NULL it must point to an array of numRow integers and is used to keep track of the row permutation.
-  If det != NULL the determinant of the matrix is calculated and stored.
+  If index != nullptr partial pivoting is used for numerical stability.
+  If index != nullptr it must point to an array of numRow integers and is used to keep track of the row permutation.
+  If det != nullptr the determinant of the matrix is calculated and stored.
 ============
 */
-bool arcMatX::LU_Factor( int *index, float *det ) {
+bool anMatX::LU_Factor( int *index, float *det ) {
 	int i, j, k, newi, min;
 	double s, t, d, w;
 
@@ -3833,12 +3833,12 @@ bool arcMatX::LU_Factor( int *index, float *det ) {
 	for ( i = 0; i < min; i++ ) {
 
 		newi = i;
-		s = arcMath::Fabs( (*this)[i][i] );
+		s = anMath::Fabs( (*this)[i][i] );
 
 		if ( index ) {
 			// find the largest absolute pivot
 			for ( j = i + 1; j < numRows; j++ ) {
-				t = arcMath::Fabs( (*this)[j][i] );
+				t = anMath::Fabs( (*this)[j][i] );
 				if ( t > s ) {
 					newi = j;
 					s = t;
@@ -3896,12 +3896,12 @@ bool arcMatX::LU_Factor( int *index, float *det ) {
 
 /*
 ============
-arcMatX::LU_UpdateRankOne
+anMatX::LU_UpdateRankOne
 
   Updates the in-place LU factorization to obtain the factors for the matrix: LU + alpha * v * w'
 ============
 */
-bool arcMatX::LU_UpdateRankOne( const arcVecX &v, const arcVecX &w, float alpha, int *index ) {
+bool anMatX::LU_UpdateRankOne( const anVecX &v, const anVecX &w, float alpha, int *index ) {
 	int i, j, max;
 	float *y, *z;
 	double diag, beta, p0, p1, d;
@@ -3912,7 +3912,7 @@ bool arcMatX::LU_UpdateRankOne( const arcVecX &v, const arcVecX &w, float alpha,
 	y = (float *) _alloca16( v.GetSize() * sizeof( float ) );
 	z = (float *) _alloca16( w.GetSize() * sizeof( float ) );
 
-	if ( index != NULL ) {
+	if ( index != nullptr ) {
 		for ( i = 0; i < numRows; i++ ) {
 			y[i] = alpha * v[index[i]];
 		}
@@ -3965,7 +3965,7 @@ bool arcMatX::LU_UpdateRankOne( const arcVecX &v, const arcVecX &w, float alpha,
 
 /*
 ============
-arcMatX::LU_UpdateRowColumn
+anMatX::LU_UpdateRowColumn
 
   Updates the in-place LU factorization to obtain the factors for the matrix:
 
@@ -3976,10 +3976,10 @@ arcMatX::LU_UpdateRowColumn
   where: a = v[0,r-1], b = v[r], c = v[r+1,numRows-1], d = w[0,r-1], w[r] = 0.0f, e = w[r+1,numColumns-1]
 ============
 */
-bool arcMatX::LU_UpdateRowColumn( const arcVecX &v, const arcVecX &w, int r, int *index ) {
+bool anMatX::LU_UpdateRowColumn( const anVecX &v, const anVecX &w, int r, int *index ) {
 #if 0
 
-	arcVecX s;
+	anVecX s;
 
 	assert( v.GetSize() >= numColumns );
 	assert( w.GetSize() >= numRows );
@@ -4014,7 +4014,7 @@ bool arcMatX::LU_UpdateRowColumn( const arcVecX &v, const arcVecX &w, int r, int
 	y1 = (float *) _alloca16( v.GetSize() * sizeof( float ) );
 	z1 = (float *) _alloca16( w.GetSize() * sizeof( float ) );
 
-	if ( index != NULL ) {
+	if ( index != nullptr ) {
 		for ( i = 0; i < numRows; i++ ) {
 			y0[i] = v[index[i]];
 		}
@@ -4114,7 +4114,7 @@ bool arcMatX::LU_UpdateRowColumn( const arcVecX &v, const arcVecX &w, int r, int
 
 /*
 ============
-arcMatX::LU_UpdateIncrement
+anMatX::LU_UpdateIncrement
 
   Updates the in-place LU factorization to obtain the factors for the matrix:
 
@@ -4124,7 +4124,7 @@ arcMatX::LU_UpdateIncrement
   where: a = v[0,numRows-1], b = v[numRows], c = w[0,numColumns-1], w[numColumns] = 0
 ============
 */
-bool arcMatX::LU_UpdateIncrement( const arcVecX &v, const arcVecX &w, int *index ) {
+bool anMatX::LU_UpdateIncrement( const anVecX &v, const anVecX &w, int *index ) {
 	int i, j;
 	float sum;
 
@@ -4144,13 +4144,13 @@ bool arcMatX::LU_UpdateIncrement( const arcVecX &v, const arcVecX &w, int *index
 	}
 
 	// add row to the permutation index
-	if ( index != NULL ) {
+	if ( index != nullptr ) {
 		index[numRows - 1] = numRows - 1;
 	}
 
 	// add column to U
 	for ( i = 0; i < numRows; i++ ) {
-		if ( index != NULL ) {
+		if ( index != nullptr ) {
 			sum = v[index[i]];
 		} else {
 			sum = v[i];
@@ -4166,16 +4166,16 @@ bool arcMatX::LU_UpdateIncrement( const arcVecX &v, const arcVecX &w, int *index
 
 /*
 ============
-arcMatX::LU_UpdateDecrement
+anMatX::LU_UpdateDecrement
 
   Updates the in-place LU factorization to obtain the factors for the matrix with row r and column r removed.
   v and w should store the column and row of the original matrix respectively.
-  If index != NULL then u should store row index[r] of the original matrix. If index == NULL then u = w.
+  If index != nullptr then u should store row index[r] of the original matrix. If index == nullptr then u = w.
 ============
 */
-bool arcMatX::LU_UpdateDecrement( const arcVecX &v, const arcVecX &w, const arcVecX &u, int r, int *index ) {
+bool anMatX::LU_UpdateDecrement( const anVecX &v, const anVecX &w, const anVecX &u, int r, int *index ) {
 	int i, p;
-	arcVecX v1, w1;
+	anVecX v1, w1;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numColumns );
@@ -4185,7 +4185,7 @@ bool arcMatX::LU_UpdateDecrement( const arcVecX &v, const arcVecX &w, const arcV
 	v1.SetData( numRows, VECX_ALLOCA( numRows ) );
 	w1.SetData( numRows, VECX_ALLOCA( numRows ) );
 
-	if ( index != NULL ) {
+	if ( index != nullptr ) {
 
 		// find the pivot row
 		for ( p = i = 0; i < numRows; i++ ) {
@@ -4200,8 +4200,8 @@ bool arcMatX::LU_UpdateDecrement( const arcVecX &v, const arcVecX &w, const arcV
 		w1 = -u;
 
 		if ( p != r ) {
-			idSwap( v1[index[r]], v1[index[p]] );
-			idSwap( index[r], index[p] );
+			anSwap( v1[index[r]], v1[index[p]] );
+			anSwap( index[r], index[p] );
 		}
 
 		v1[r] += 1.0f;
@@ -4213,7 +4213,7 @@ bool arcMatX::LU_UpdateDecrement( const arcVecX &v, const arcVecX &w, const arcV
 
 		if ( p != r ) {
 
-			if ( arcMath::Fabs( u[p] ) < 1e-4f ) {
+			if ( anMath::Fabs( u[p] ) < 1e-4f ) {
 				// NOTE: an additional row interchange is required for numerical stability
 			}
 
@@ -4257,12 +4257,12 @@ bool arcMatX::LU_UpdateDecrement( const arcVecX &v, const arcVecX &w, const arcV
 
 /*
 ============
-arcMatX::LU_Solve
+anMatX::LU_Solve
 
   Solve Ax = b with A factored in-place as: LU
 ============
 */
-void arcMatX::LU_Solve( arcVecX &x, const arcVecX &b, const int *index ) const {
+void anMatX::LU_Solve( anVecX &x, const anVecX &b, const int *index ) const {
 	int i, j;
 	double sum;
 
@@ -4270,7 +4270,7 @@ void arcMatX::LU_Solve( arcVecX &x, const arcVecX &b, const int *index ) const {
 
 	// solve L
 	for ( i = 0; i < numRows; i++ ) {
-		if ( index != NULL ) {
+		if ( index != nullptr ) {
 			sum = b[index[i]];
 		} else {
 			sum = b[i];
@@ -4293,14 +4293,14 @@ void arcMatX::LU_Solve( arcVecX &x, const arcVecX &b, const int *index ) const {
 
 /*
 ============
-arcMatX::LU_Inverse
+anMatX::LU_Inverse
 
   Calculates the inverse of the matrix which is factored in-place as LU
 ============
 */
-void arcMatX::LU_Inverse( arcMatX &inv, const int *index ) const {
+void anMatX::LU_Inverse( anMatX &inv, const int *index ) const {
 	int i, j;
-	arcVecX x, b;
+	anVecX x, b;
 
 	assert( numRows == numColumns );
 
@@ -4322,12 +4322,12 @@ void arcMatX::LU_Inverse( arcMatX &inv, const int *index ) const {
 
 /*
 ============
-arcMatX::LU_UnpackFactors
+anMatX::LU_UnpackFactors
 
   Unpacks the in-place LU factorization.
 ============
 */
-void arcMatX::LU_UnpackFactors( arcMatX &L, arcMatX &U ) const {
+void anMatX::LU_UnpackFactors( anMatX &L, anMatX &U ) const {
 	int i, j;
 
 	L.Zero( numRows, numColumns );
@@ -4345,12 +4345,12 @@ void arcMatX::LU_UnpackFactors( arcMatX &L, arcMatX &U ) const {
 
 /*
 ============
-arcMatX::LU_MultiplyFactors
+anMatX::LU_MultiplyFactors
 
   Multiplies the factors of the in-place LU factorization to form the original matrix.
 ============
 */
-void arcMatX::LU_MultiplyFactors( arcMatX &m, const int *index ) const {
+void anMatX::LU_MultiplyFactors( anMatX &m, const int *index ) const {
 	int r, rp, i, j;
 	double sum;
 
@@ -4358,7 +4358,7 @@ void arcMatX::LU_MultiplyFactors( arcMatX &m, const int *index ) const {
 
 	for ( r = 0; r < numRows; r++ ) {
 
-		if ( index != NULL ) {
+		if ( index != nullptr ) {
 			rp = index[r];
 		} else {
 			rp = r;
@@ -4381,7 +4381,7 @@ void arcMatX::LU_MultiplyFactors( arcMatX &m, const int *index ) const {
 
 /*
 ============
-arcMatX::QR_Factor
+anMatX::QR_Factor
 
   in-place factorization: QR
   Q is an orthogonal matrix represented as a product of Householder matrices stored in the lower triangle and c.
@@ -4389,7 +4389,7 @@ arcMatX::QR_Factor
   The initial matrix has to be square.
 ============
 */
-bool arcMatX::QR_Factor( arcVecX &c, arcVecX &d ) {
+bool anMatX::QR_Factor( anVecX &c, anVecX &d ) {
 	int i, j, k;
 	double scale, s, t, sum;
 	bool singular = false;
@@ -4401,7 +4401,7 @@ bool arcMatX::QR_Factor( arcVecX &c, arcVecX &d ) {
 
 		scale = 0.0f;
 		for ( i = k; i < numRows; i++ ) {
-			s = arcMath::Fabs( (*this)[i][k] );
+			s = anMath::Fabs( (*this)[i][k] );
 			if ( s > scale ) {
 				scale = s;
 			}
@@ -4422,7 +4422,7 @@ bool arcMatX::QR_Factor( arcVecX &c, arcVecX &d ) {
 				sum += s * s;
 			}
 
-			s = arcMath::Sqrt( sum );
+			s = anMath::Sqrt( sum );
 			if ( (*this)[k][k] < 0.0f ) {
 				s = -s;
 			}
@@ -4453,28 +4453,28 @@ bool arcMatX::QR_Factor( arcVecX &c, arcVecX &d ) {
 
 /*
 ============
-arcMatX::QR_Rotate
+anMatX::QR_Rotate
 
   Performs a Jacobi rotation on the rows i and i+1 of the unpacked QR factors.
 ============
 */
-void arcMatX::QR_Rotate( arcMatX &R, int i, float a, float b ) {
+void anMatX::QR_Rotate( anMatX &R, int i, float a, float b ) {
 	int j;
 	float f, c, s, w, y;
 
 	if ( a == 0.0f ) {
 		c = 0.0f;
 		s = ( b >= 0.0f ) ? 1.0f : -1.0f;
-	} else if ( arcMath::Fabs( a ) > arcMath::Fabs( b ) ) {
+	} else if ( anMath::Fabs( a ) > anMath::Fabs( b ) ) {
 		f = b / a;
-		c = arcMath::Fabs( 1.0f / arcMath::Sqrt( 1.0f + f * f ) );
+		c = anMath::Fabs( 1.0f / anMath::Sqrt( 1.0f + f * f ) );
 		if ( a < 0.0f ) {
 			c = -c;
 		}
 		s = f * c;
 	} else {
 		f = a / b;
-		s = arcMath::Fabs( 1.0f / arcMath::Sqrt( 1.0f + f * f ) );
+		s = anMath::Fabs( 1.0f / anMath::Sqrt( 1.0f + f * f ) );
 		if ( b < 0.0f ) {
 			s = -s;
 		}
@@ -4496,15 +4496,15 @@ void arcMatX::QR_Rotate( arcMatX &R, int i, float a, float b ) {
 
 /*
 ============
-arcMatX::QR_UpdateRankOne
+anMatX::QR_UpdateRankOne
 
   Updates the unpacked QR factorization to obtain the factors for the matrix: QR + alpha * v * w'
 ============
 */
-bool arcMatX::QR_UpdateRankOne( arcMatX &R, const arcVecX &v, const arcVecX &w, float alpha ) {
+bool anMatX::QR_UpdateRankOne( anMatX &R, const anVecX &v, const anVecX &w, float alpha ) {
 	int i, k;
 	float f;
-	arcVecX u;
+	anVecX u;
 
 	assert( v.GetSize() >= numColumns );
 	assert( w.GetSize() >= numRows );
@@ -4521,13 +4521,13 @@ bool arcMatX::QR_UpdateRankOne( arcMatX &R, const arcVecX &v, const arcVecX &w, 
 	for ( i = k-1; i >= 0; i-- ) {
 		QR_Rotate( R, i, u[i], -u[i+1] );
 		if ( u[i] == 0.0f ) {
-			u[i] = arcMath::Fabs( u[i+1] );
-		} else if ( arcMath::Fabs( u[i] ) > arcMath::Fabs( u[i+1] ) ) {
+			u[i] = anMath::Fabs( u[i+1] );
+		} else if ( anMath::Fabs( u[i] ) > anMath::Fabs( u[i+1] ) ) {
 			f = u[i+1] / u[i];
-			u[i] = arcMath::Fabs( u[i] ) * arcMath::Sqrt( 1.0f + f * f );
+			u[i] = anMath::Fabs( u[i] ) * anMath::Sqrt( 1.0f + f * f );
 		} else {
 			f = u[i] / u[i+1];
-			u[i] = arcMath::Fabs( u[i+1] ) * arcMath::Sqrt( 1.0f + f * f );
+			u[i] = anMath::Fabs( u[i+1] ) * anMath::Sqrt( 1.0f + f * f );
 		}
 	}
 	for ( i = 0; i < v.GetSize(); i++ ) {
@@ -4541,7 +4541,7 @@ bool arcMatX::QR_UpdateRankOne( arcMatX &R, const arcVecX &v, const arcVecX &w, 
 
 /*
 ============
-arcMatX::QR_UpdateRowColumn
+anMatX::QR_UpdateRowColumn
 
   Updates the unpacked QR factorization to obtain the factors for the matrix:
 
@@ -4552,8 +4552,8 @@ arcMatX::QR_UpdateRowColumn
   where: a = v[0,r-1], b = v[r], c = v[r+1,numRows-1], d = w[0,r-1], w[r] = 0.0f, e = w[r+1,numColumns-1]
 ============
 */
-bool arcMatX::QR_UpdateRowColumn( arcMatX &R, const arcVecX &v, const arcVecX &w, int r ) {
-	arcVecX s;
+bool anMatX::QR_UpdateRowColumn( anMatX &R, const anVecX &v, const anVecX &w, int r ) {
+	anVecX s;
 
 	assert( v.GetSize() >= numColumns );
 	assert( w.GetSize() >= numRows );
@@ -4575,7 +4575,7 @@ bool arcMatX::QR_UpdateRowColumn( arcMatX &R, const arcVecX &v, const arcVecX &w
 
 /*
 ============
-arcMatX::QR_UpdateIncrement
+anMatX::QR_UpdateIncrement
 
   Updates the unpacked QR factorization to obtain the factors for the matrix:
 
@@ -4585,8 +4585,8 @@ arcMatX::QR_UpdateIncrement
   where: a = v[0,numRows-1], b = v[numRows], c = w[0,numColumns-1], w[numColumns] = 0
 ============
 */
-bool arcMatX::QR_UpdateIncrement( arcMatX &R, const arcVecX &v, const arcVecX &w ) {
-	arcVecX v2;
+bool anMatX::QR_UpdateIncrement( anMatX &R, const anVecX &v, const anVecX &w ) {
+	anVecX v2;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numRows+1 );
@@ -4607,14 +4607,14 @@ bool arcMatX::QR_UpdateIncrement( arcMatX &R, const arcVecX &v, const arcVecX &w
 
 /*
 ============
-arcMatX::QR_UpdateDecrement
+anMatX::QR_UpdateDecrement
 
   Updates the unpacked QR factorization to obtain the factors for the matrix with row r and column r removed.
   v and w should store the column and row of the original matrix respectively.
 ============
 */
-bool arcMatX::QR_UpdateDecrement( arcMatX &R, const arcVecX &v, const arcVecX &w, int r ) {
-	arcVecX v1, w1;
+bool anMatX::QR_UpdateDecrement( anMatX &R, const anVecX &v, const anVecX &w, int r ) {
+	anVecX v1, w1;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numRows );
@@ -4643,12 +4643,12 @@ bool arcMatX::QR_UpdateDecrement( arcMatX &R, const arcVecX &v, const arcVecX &w
 
 /*
 ============
-arcMatX::QR_Solve
+anMatX::QR_Solve
 
   Solve Ax = b with A factored in-place as: QR
 ============
 */
-void arcMatX::QR_Solve( arcVecX &x, const arcVecX &b, const arcVecX &c, const arcVecX &d ) const {
+void anMatX::QR_Solve( anVecX &x, const anVecX &b, const anVecX &c, const anVecX &d ) const {
 	int i, j;
 	double sum, t;
 
@@ -4686,12 +4686,12 @@ void arcMatX::QR_Solve( arcVecX &x, const arcVecX &b, const arcVecX &c, const ar
 
 /*
 ============
-arcMatX::QR_Solve
+anMatX::QR_Solve
 
   Solve Ax = b with A factored as: QR
 ============
 */
-void arcMatX::QR_Solve( arcVecX &x, const arcVecX &b, const arcMatX &R ) const {
+void anMatX::QR_Solve( anVecX &x, const anVecX &b, const anMatX &R ) const {
 	int i, j;
 	double sum;
 
@@ -4713,14 +4713,14 @@ void arcMatX::QR_Solve( arcVecX &x, const arcVecX &b, const arcMatX &R ) const {
 
 /*
 ============
-arcMatX::QR_Inverse
+anMatX::QR_Inverse
 
   Calculates the inverse of the matrix which is factored in-place as: QR
 ============
 */
-void arcMatX::QR_Inverse( arcMatX &inv, const arcVecX &c, const arcVecX &d ) const {
+void anMatX::QR_Inverse( anMatX &inv, const anVecX &c, const anVecX &d ) const {
 	int i, j;
-	arcVecX x, b;
+	anVecX x, b;
 
 	assert( numRows == numColumns );
 
@@ -4742,12 +4742,12 @@ void arcMatX::QR_Inverse( arcMatX &inv, const arcVecX &c, const arcVecX &d ) con
 
 /*
 ============
-arcMatX::QR_UnpackFactors
+anMatX::QR_UnpackFactors
 
   Unpacks the in-place QR factorization.
 ============
 */
-void arcMatX::QR_UnpackFactors( arcMatX &Q, arcMatX &R, const arcVecX &c, const arcVecX &d ) const {
+void anMatX::QR_UnpackFactors( anMatX &Q, anMatX &R, const anVecX &c, const anVecX &d ) const {
 	int i, j, k;
 	double sum;
 
@@ -4779,15 +4779,15 @@ void arcMatX::QR_UnpackFactors( arcMatX &Q, arcMatX &R, const arcVecX &c, const 
 
 /*
 ============
-arcMatX::QR_MultiplyFactors
+anMatX::QR_MultiplyFactors
 
   Multiplies the factors of the in-place QR factorization to form the original matrix.
 ============
 */
-void arcMatX::QR_MultiplyFactors( arcMatX &m, const arcVecX &c, const arcVecX &d ) const {
+void anMatX::QR_MultiplyFactors( anMatX &m, const anVecX &c, const anVecX &d ) const {
 	int i, j, k;
 	double sum;
-	arcMatX Q;
+	anMatX Q;
 
 	Q.Identity( numRows, numColumns );
 	for ( i = 0; i < numColumns-1; i++ ) {
@@ -4819,23 +4819,23 @@ void arcMatX::QR_MultiplyFactors( arcMatX &m, const arcVecX &c, const arcVecX &d
 
 /*
 ============
-arcMatX::Pythag
+anMatX::Pythag
 
   Computes (a^2 + b^2)^1/2 without underflow or overflow.
 ============
 */
-float arcMatX::Pythag( float a, float b ) const {
+float anMatX::Pythag( float a, float b ) const {
 	double at, bt, ct;
 
-	at = arcMath::Fabs( a );
-	bt = arcMath::Fabs( b );
+	at = anMath::Fabs( a );
+	bt = anMath::Fabs( b );
 	if ( at > bt ) {
 		ct = bt / at;
-		return at * arcMath::Sqrt( 1.0f + ct * ct );
+		return at * anMath::Sqrt( 1.0f + ct * ct );
 	} else {
 		if ( bt ) {
 			ct = at / bt;
-			return bt * arcMath::Sqrt( 1.0f + ct * ct );
+			return bt * anMath::Sqrt( 1.0f + ct * ct );
 		} else {
 			return 0.0f;
 		}
@@ -4844,10 +4844,10 @@ float arcMatX::Pythag( float a, float b ) const {
 
 /*
 ============
-arcMatX::SVD_BiDiag
+anMatX::SVD_BiDiag
 ============
 */
-void arcMatX::SVD_BiDiag( arcVecX &w, arcVecX &rv1, float &anorm ) {
+void anMatX::SVD_BiDiag( anVecX &w, anVecX &rv1, float &anorm ) {
 	int i, j, k, l;
 	double f, h, r, g, s, scale;
 
@@ -4859,7 +4859,7 @@ void arcMatX::SVD_BiDiag( arcVecX &w, arcVecX &rv1, float &anorm ) {
 		g = s = scale = 0.0f;
 		if ( i < numRows ) {
 			for ( k = i; k < numRows; k++ ) {
-				scale += arcMath::Fabs( (*this)[k][i] );
+				scale += anMath::Fabs( (*this)[k][i] );
 			}
 			if ( scale ) {
 				for ( k = i; k < numRows; k++ ) {
@@ -4867,7 +4867,7 @@ void arcMatX::SVD_BiDiag( arcVecX &w, arcVecX &rv1, float &anorm ) {
 					s += (*this)[k][i] * (*this)[k][i];
 				}
 				f = (*this)[i][i];
-				g = arcMath::Sqrt( s );
+				g = anMath::Sqrt( s );
 				if ( f >= 0.0f ) {
 					g = -g;
 				}
@@ -4893,7 +4893,7 @@ void arcMatX::SVD_BiDiag( arcVecX &w, arcVecX &rv1, float &anorm ) {
 		g = s = scale = 0.0f;
 		if ( i < numRows && i != (numColumns-1 ) ) {
 			for ( k = l; k < numColumns; k++ ) {
-				scale += arcMath::Fabs( (*this)[i][k] );
+				scale += anMath::Fabs( (*this)[i][k] );
 			}
 			if ( scale ) {
 				for ( k = l; k < numColumns; k++ ) {
@@ -4901,7 +4901,7 @@ void arcMatX::SVD_BiDiag( arcVecX &w, arcVecX &rv1, float &anorm ) {
 					s += (*this)[i][k] * (*this)[i][k];
 				}
 				f = (*this)[i][l];
-				g = arcMath::Sqrt( s );
+				g = anMath::Sqrt( s );
 				if ( f >= 0.0f ) {
 					g = -g;
 				}
@@ -4925,7 +4925,7 @@ void arcMatX::SVD_BiDiag( arcVecX &w, arcVecX &rv1, float &anorm ) {
 				}
 			}
 		}
-		r = arcMath::Fabs( w[i] ) + arcMath::Fabs( rv1[i] );
+		r = anMath::Fabs( w[i] ) + anMath::Fabs( rv1[i] );
 		if ( r > anorm ) {
 			anorm = r;
 		}
@@ -4934,10 +4934,10 @@ void arcMatX::SVD_BiDiag( arcVecX &w, arcVecX &rv1, float &anorm ) {
 
 /*
 ============
-arcMatX::SVD_InitialWV
+anMatX::SVD_InitialWV
 ============
 */
-void arcMatX::SVD_InitialWV( arcVecX &w, arcMatX &V, arcVecX &rv1 ) {
+void anMatX::SVD_InitialWV( anVecX &w, anMatX &V, anVecX &rv1 ) {
 	int i, j, k, l;
 	double f, g, s;
 
@@ -4981,7 +4981,7 @@ void arcMatX::SVD_InitialWV( arcVecX &w, arcMatX &V, arcVecX &rv1 ) {
 					for ( s = 0.0f, k = l; k < numRows; k++ ) {
 						s += (*this)[k][i] * (*this)[k][j];
 					}
-					f = (s / (*this)[i][i] ) * g;
+					f = ( s / (*this)[i][i] ) * g;
 					for ( k = i; k < numRows; k++ ) {
 						(*this)[k][j] += f * (*this)[k][i];
 					}
@@ -5002,7 +5002,7 @@ void arcMatX::SVD_InitialWV( arcVecX &w, arcMatX &V, arcVecX &rv1 ) {
 
 /*
 ============
-arcMatX::SVD_Factor
+anMatX::SVD_Factor
 
   in-place factorization: U * Diag(w) * V.Transpose()
   known as the Singular Value Decomposition.
@@ -5011,11 +5011,11 @@ arcMatX::SVD_Factor
   V is the transpose of an orthogonal matrix.
 ============
 */
-bool arcMatX::SVD_Factor( arcVecX &w, arcMatX &V ) {
+bool anMatX::SVD_Factor( anVecX &w, anMatX &V ) {
 	int flag, i, its, j, jj, k, l, nm;
 	double c, f, h, s, x, y, z, r, g = 0.0f;
 	float anorm = 0.0f;
-	arcVecX rv1;
+	anVecX rv1;
 
 	if ( numRows < numColumns ) {
 		return false;
@@ -5035,11 +5035,11 @@ bool arcMatX::SVD_Factor( arcVecX &w, arcMatX &V ) {
 			nm = 0;
 			for ( l = k; l >= 0; l-- ) {
 				nm = l - 1;
-				if ( ( arcMath::Fabs( rv1[l] ) + anorm ) == anorm /* arcMath::Fabs( rv1[l] ) < arcMath::FLT_EPSILON */ ) {
+				if ( ( anMath::Fabs( rv1[l] ) + anorm ) == anorm /* anMath::Fabs( rv1[l] ) < anMath::FLT_EPSILON */ ) {
 					flag = 0;
 					break;
 				}
-				if ( ( arcMath::Fabs( w[nm] ) + anorm ) == anorm /* arcMath::Fabs( w[nm] ) < arcMath::FLT_EPSILON */ ) {
+				if ( ( anMath::Fabs( w[nm] ) + anorm ) == anorm /* anMath::Fabs( w[nm] ) < anMath::FLT_EPSILON */ ) {
 					break;
 				}
 			}
@@ -5049,7 +5049,7 @@ bool arcMatX::SVD_Factor( arcVecX &w, arcMatX &V ) {
 				for ( i = l; i <= k; i++ ) {
 					f = s * rv1[i];
 
-					if ( ( arcMath::Fabs( f ) + anorm ) != anorm /* arcMath::Fabs( f ) > arcMath::FLT_EPSILON */ ) {
+					if ( ( anMath::Fabs( f ) + anorm ) != anorm /* anMath::Fabs( f ) > anMath::FLT_EPSILON */ ) {
 						g = w[i];
 						h = Pythag( f, g );
 						w[i] = h;
@@ -5134,15 +5134,15 @@ bool arcMatX::SVD_Factor( arcVecX &w, arcMatX &V ) {
 
 /*
 ============
-arcMatX::SVD_Solve
+anMatX::SVD_Solve
 
   Solve Ax = b with A factored as: U * Diag(w) * V.Transpose()
 ============
 */
-void arcMatX::SVD_Solve( arcVecX &x, const arcVecX &b, const arcVecX &w, const arcMatX &V ) const {
+void anMatX::SVD_Solve( anVecX &x, const anVecX &b, const anVecX &w, const anMatX &V ) const {
 	int i, j;
 	double sum;
-	arcVecX tmp;
+	anVecX tmp;
 
 	assert( x.GetSize() >= numColumns );
 	assert( b.GetSize() >= numColumns );
@@ -5153,7 +5153,7 @@ void arcMatX::SVD_Solve( arcVecX &x, const arcVecX &b, const arcVecX &w, const a
 
 	for ( i = 0; i < numColumns; i++ ) {
 		sum = 0.0f;
-		if ( w[i] >= arcMath::FLT_EPSILON ) {
+		if ( w[i] >= anMath::FLT_EPSILON ) {
 			for ( j = 0; j < numRows; j++ ) {
 				sum += (*this)[j][i] * b[j];
 			}
@@ -5172,15 +5172,15 @@ void arcMatX::SVD_Solve( arcVecX &x, const arcVecX &b, const arcVecX &w, const a
 
 /*
 ============
-arcMatX::SVD_Inverse
+anMatX::SVD_Inverse
 
   Calculates the inverse of the matrix which is factored in-place as: U * Diag(w) * V.Transpose()
 ============
 */
-void arcMatX::SVD_Inverse( arcMatX &inv, const arcVecX &w, const arcMatX &V ) const {
+void anMatX::SVD_Inverse( anMatX &inv, const anVecX &w, const anMatX &V ) const {
 	int i, j, k;
 	double wi, sum;
-	arcMatX V2;
+	anMatX V2;
 
 	assert( numRows == numColumns );
 
@@ -5189,7 +5189,7 @@ void arcMatX::SVD_Inverse( arcMatX &inv, const arcVecX &w, const arcMatX &V ) co
 	// V * [diag(1/w[i] )]
 	for ( i = 0; i < numRows; i++ ) {
 		wi = w[i];
-		wi = ( wi < arcMath::FLT_EPSILON ) ? 0.0f : 1.0f / wi;
+		wi = ( wi < anMath::FLT_EPSILON ) ? 0.0f : 1.0f / wi;
 		for ( j = 0; j < numColumns; j++ ) {
 			V2[j][i] *= wi;
 		}
@@ -5209,12 +5209,12 @@ void arcMatX::SVD_Inverse( arcMatX &inv, const arcVecX &w, const arcMatX &V ) co
 
 /*
 ============
-arcMatX::SVD_MultiplyFactors
+anMatX::SVD_MultiplyFactors
 
   Multiplies the factors of the in-place SVD factorization to form the original matrix.
 ============
 */
-void arcMatX::SVD_MultiplyFactors( arcMatX &m, const arcVecX &w, const arcMatX &V ) const {
+void anMatX::SVD_MultiplyFactors( anMatX &m, const anVecX &w, const anMatX &V ) const {
 	int r, i, j;
 	double sum;
 
@@ -5222,7 +5222,7 @@ void arcMatX::SVD_MultiplyFactors( arcMatX &m, const arcVecX &w, const arcMatX &
 
 	for ( r = 0; r < numRows; r++ ) {
 		// calculate row of matrix
-		if ( w[r] >= arcMath::FLT_EPSILON ) {
+		if ( w[r] >= anMath::FLT_EPSILON ) {
 			for ( i = 0; i < V.GetNumRows(); i++ ) {
 				sum = 0.0f;
 				for ( j = 0; j < numColumns; j++ ) {
@@ -5240,7 +5240,7 @@ void arcMatX::SVD_MultiplyFactors( arcMatX &m, const arcVecX &w, const arcMatX &
 
 /*
 ============
-arcMatX::Cholesky_Factor
+anMatX::Cholesky_Factor
 
   in-place Cholesky factorization: LL'
   L is a triangular matrix stored in the lower triangle.
@@ -5248,7 +5248,7 @@ arcMatX::Cholesky_Factor
   The initial matrix has to be symmetric positive definite.
 ============
 */
-bool arcMatX::Cholesky_Factor( void ) {
+bool anMatX::Cholesky_Factor( void ) {
 	int i, j, k;
 	float *invSqrt;
 	double sum;
@@ -5277,7 +5277,7 @@ bool arcMatX::Cholesky_Factor( void ) {
 			return false;
 		}
 
-		invSqrt[i] = arcMath::InvSqrt( sum );
+		invSqrt[i] = anMath::InvSqrt( sum );
 		(*this)[i][i] = invSqrt[i] * sum;
 	}
 	return true;
@@ -5285,13 +5285,13 @@ bool arcMatX::Cholesky_Factor( void ) {
 
 /*
 ============
-arcMatX::Cholesky_UpdateRankOne
+anMatX::Cholesky_UpdateRankOne
 
   Updates the in-place Cholesky factorization to obtain the factors for the matrix: LL' + alpha * v * v'
   If offset > 0 only the lower right corner starting at (offset, offset) is updated.
 ============
 */
-bool arcMatX::Cholesky_UpdateRankOne( const arcVecX &v, float alpha, int offset ) {
+bool anMatX::Cholesky_UpdateRankOne( const anVecX &v, float alpha, int offset ) {
 	int i, j;
 	float *y;
 	double diag, invDiag, diagSqr, newDiag, newDiagSqr, beta, p, d;
@@ -5314,7 +5314,7 @@ bool arcMatX::Cholesky_UpdateRankOne( const arcVecX &v, float alpha, int offset 
 			return false;
 		}
 
-		(*this)[i][i] = newDiag = arcMath::Sqrt( newDiagSqr );
+		(*this)[i][i] = newDiag = anMath::Sqrt( newDiagSqr );
 
 		alpha /= newDiagSqr;
 		beta = p * alpha;
@@ -5335,7 +5335,7 @@ bool arcMatX::Cholesky_UpdateRankOne( const arcVecX &v, float alpha, int offset 
 
 /*
 ============
-arcMatX::Cholesky_UpdateRowColumn
+anMatX::Cholesky_UpdateRowColumn
 
   Updates the in-place Cholesky factorization to obtain the factors for the matrix:
 
@@ -5346,11 +5346,11 @@ arcMatX::Cholesky_UpdateRowColumn
   where: a = v[0,r-1], b = v[r], c = v[r+1,numRows-1]
 ============
 */
-bool arcMatX::Cholesky_UpdateRowColumn( const arcVecX &v, int r ) {
+bool anMatX::Cholesky_UpdateRowColumn( const anVecX &v, int r ) {
 	int i, j;
 	double sum;
 	float *original, *y;
-	arcVecX addSub;
+	anVecX addSub;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numRows );
@@ -5368,7 +5368,7 @@ bool arcMatX::Cholesky_UpdateRowColumn( const arcVecX &v, int r ) {
 			if ( sum <= 0.0f ) {
 				return false;
 			}
-			(*this)[0][0] = arcMath::Sqrt( sum );
+			(*this)[0][0] = anMath::Sqrt( sum );
 			return true;
 		}
 		for ( i = 0; i < numColumns; i++ ) {
@@ -5408,7 +5408,7 @@ bool arcMatX::Cholesky_UpdateRowColumn( const arcVecX &v, int r ) {
 			if ( sum <= 0.0f ) {
 				return false;
 			}
-			(*this)[r][r] = arcMath::Sqrt( sum );
+			(*this)[r][r] = anMath::Sqrt( sum );
 			return true;
 		}
 
@@ -5426,13 +5426,13 @@ bool arcMatX::Cholesky_UpdateRowColumn( const arcVecX &v, int r ) {
 
 #if 0
 
-	arcVecX v1, v2;
+	anVecX v1, v2;
 	double d;
 
 	v1.SetData( numColumns, (float *) _alloca16( numColumns * sizeof( float ) ) );
 	v2.SetData( numColumns, (float *) _alloca16( numColumns * sizeof( float ) ) );
 
-	d = arcMath::SQRT_1OVER2;
+	d = anMath::SQRT_1OVER2;
 	v1[r] = ( 0.5f * addSub[r] + 1.0f ) * d;
 	v2[r] = ( 0.5f * addSub[r] - 1.0f ) * d;
 	for ( i = r+1; i < numColumns; i++ ) {
@@ -5457,7 +5457,7 @@ bool arcMatX::Cholesky_UpdateRowColumn( const arcVecX &v, int r ) {
 	v1 = (float *) _alloca16( numColumns * sizeof( float ) );
 	v2 = (float *) _alloca16( numColumns * sizeof( float ) );
 
-	d = arcMath::SQRT_1OVER2;
+	d = anMath::SQRT_1OVER2;
 	v1[r] = ( 0.5f * addSub[r] + 1.0f ) * d;
 	v2[r] = ( 0.5f * addSub[r] - 1.0f ) * d;
 	for ( i = r+1; i < numColumns; i++ ) {
@@ -5491,7 +5491,7 @@ bool arcMatX::Cholesky_UpdateRowColumn( const arcVecX &v, int r ) {
 			return false;
 		}
 
-		(*this)[i][i] = newDiag = arcMath::Sqrt( newDiagSqr );
+		(*this)[i][i] = newDiag = anMath::Sqrt( newDiagSqr );
 
 		alpha2 /= newDiagSqr;
 		beta2 = p2 * alpha2;
@@ -5518,7 +5518,7 @@ bool arcMatX::Cholesky_UpdateRowColumn( const arcVecX &v, int r ) {
 
 /*
 ============
-arcMatX::Cholesky_UpdateIncrement
+anMatX::Cholesky_UpdateIncrement
 
   Updates the in-place Cholesky factorization to obtain the factors for the matrix:
 
@@ -5528,7 +5528,7 @@ arcMatX::Cholesky_UpdateIncrement
   where: a = v[0,numRows-1], b = v[numRows]
 ============
 */
-bool arcMatX::Cholesky_UpdateIncrement( const arcVecX &v ) {
+bool anMatX::Cholesky_UpdateIncrement( const anVecX &v ) {
 	int i, j;
 	float *x;
 	double sum;
@@ -5561,21 +5561,21 @@ bool arcMatX::Cholesky_UpdateIncrement( const arcVecX &v ) {
 	}
 
 	// store the diagonal entry
-	(*this)[numRows - 1][numRows - 1] = arcMath::Sqrt( sum );
+	(*this)[numRows - 1][numRows - 1] = anMath::Sqrt( sum );
 
 	return true;
 }
 
 /*
 ============
-arcMatX::Cholesky_UpdateDecrement
+anMatX::Cholesky_UpdateDecrement
 
   Updates the in-place Cholesky factorization to obtain the factors for the matrix with row r and column r removed.
   v should store the row of the original matrix.
 ============
 */
-bool arcMatX::Cholesky_UpdateDecrement( const arcVecX &v, int r ) {
-	arcVecX v1;
+bool anMatX::Cholesky_UpdateDecrement( const anVecX &v, int r ) {
+	anVecX v1;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numRows );
@@ -5606,12 +5606,12 @@ bool arcMatX::Cholesky_UpdateDecrement( const arcVecX &v, int r ) {
 
 /*
 ============
-arcMatX::Cholesky_Solve
+anMatX::Cholesky_Solve
 
   Solve Ax = b with A factored in-place as: LL'
 ============
 */
-void arcMatX::Cholesky_Solve( arcVecX &x, const arcVecX &b ) const {
+void anMatX::Cholesky_Solve( anVecX &x, const anVecX &b ) const {
 	int i, j;
 	double sum;
 
@@ -5639,14 +5639,14 @@ void arcMatX::Cholesky_Solve( arcVecX &x, const arcVecX &b ) const {
 
 /*
 ============
-arcMatX::Cholesky_Inverse
+anMatX::Cholesky_Inverse
 
   Calculates the inverse of the matrix which is factored in-place as: LL'
 ============
 */
-void arcMatX::Cholesky_Inverse( arcMatX &inv ) const {
+void anMatX::Cholesky_Inverse( anMatX &inv ) const {
 	int i, j;
-	arcVecX x, b;
+	anVecX x, b;
 
 	assert( numRows == numColumns );
 
@@ -5668,12 +5668,12 @@ void arcMatX::Cholesky_Inverse( arcMatX &inv ) const {
 
 /*
 ============
-arcMatX::Cholesky_MultiplyFactors
+anMatX::Cholesky_MultiplyFactors
 
   Multiplies the factors of the in-place Cholesky factorization to form the original matrix.
 ============
 */
-void arcMatX::Cholesky_MultiplyFactors( arcMatX &m ) const {
+void anMatX::Cholesky_MultiplyFactors( anMatX &m ) const {
 	int r, i, j;
 	double sum;
 
@@ -5694,7 +5694,7 @@ void arcMatX::Cholesky_MultiplyFactors( arcMatX &m ) const {
 
 /*
 ============
-arcMatX::LDLT_Factor
+anMatX::LDLT_Factor
 
   in-place factorization: LDL'
   L is a triangular matrix stored in the lower triangle.
@@ -5704,7 +5704,7 @@ arcMatX::LDLT_Factor
   The initial matrix has to be symmetric.
 ============
 */
-bool arcMatX::LDLT_Factor( void ) {
+bool anMatX::LDLT_Factor( void ) {
 	int i, j, k;
 	float *v;
 	double d, sum;
@@ -5743,13 +5743,13 @@ bool arcMatX::LDLT_Factor( void ) {
 
 /*
 ============
-arcMatX::LDLT_UpdateRankOne
+anMatX::LDLT_UpdateRankOne
 
   Updates the in-place LDL' factorization to obtain the factors for the matrix: LDL' + alpha * v * v'
   If offset > 0 only the lower right corner starting at (offset, offset) is updated.
 ============
 */
-bool arcMatX::LDLT_UpdateRankOne( const arcVecX &v, float alpha, int offset ) {
+bool anMatX::LDLT_UpdateRankOne( const anVecX &v, float alpha, int offset ) {
 	int i, j;
 	float *y;
 	double diag, newDiag, beta, p, d;
@@ -5790,7 +5790,7 @@ bool arcMatX::LDLT_UpdateRankOne( const arcVecX &v, float alpha, int offset ) {
 
 /*
 ============
-arcMatX::LDLT_UpdateRowColumn
+anMatX::LDLT_UpdateRowColumn
 
   Updates the in-place LDL' factorization to obtain the factors for the matrix:
 
@@ -5801,11 +5801,11 @@ arcMatX::LDLT_UpdateRowColumn
   where: a = v[0,r-1], b = v[r], c = v[r+1,numRows-1]
 ============
 */
-bool arcMatX::LDLT_UpdateRowColumn( const arcVecX &v, int r ) {
+bool anMatX::LDLT_UpdateRowColumn( const anVecX &v, int r ) {
 	int i, j;
 	double sum;
 	float *original, *y;
-	arcVecX addSub;
+	anVecX addSub;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numRows );
@@ -5895,13 +5895,13 @@ bool arcMatX::LDLT_UpdateRowColumn( const arcVecX &v, int r ) {
 
 #if 0
 
-	arcVecX v1, v2;
+	anVecX v1, v2;
 	double d;
 
 	v1.SetData( numColumns, (float *) _alloca16( numColumns * sizeof( float ) ) );
 	v2.SetData( numColumns, (float *) _alloca16( numColumns * sizeof( float ) ) );
 
-	d = arcMath::SQRT_1OVER2;
+	d = anMath::SQRT_1OVER2;
 	v1[r] = ( 0.5f * addSub[r] + 1.0f ) * d;
 	v2[r] = ( 0.5f * addSub[r] - 1.0f ) * d;
 	for ( i = r+1; i < numColumns; i++ ) {
@@ -5925,7 +5925,7 @@ bool arcMatX::LDLT_UpdateRowColumn( const arcVecX &v, int r ) {
 	v1 = (float *) _alloca16( numColumns * sizeof( float ) );
 	v2 = (float *) _alloca16( numColumns * sizeof( float ) );
 
-	d = arcMath::SQRT_1OVER2;
+	d = anMath::SQRT_1OVER2;
 	v1[r] = ( 0.5f * addSub[r] + 1.0f ) * d;
 	v2[r] = ( 0.5f * addSub[r] - 1.0f ) * d;
 	for ( i = r+1; i < numColumns; i++ ) {
@@ -5985,7 +5985,7 @@ bool arcMatX::LDLT_UpdateRowColumn( const arcVecX &v, int r ) {
 
 /*
 ============
-arcMatX::LDLT_UpdateIncrement
+anMatX::LDLT_UpdateIncrement
 
   Updates the in-place LDL' factorization to obtain the factors for the matrix:
 
@@ -5995,7 +5995,7 @@ arcMatX::LDLT_UpdateIncrement
   where: a = v[0,numRows-1], b = v[numRows]
 ============
 */
-bool arcMatX::LDLT_UpdateIncrement( const arcVecX &v ) {
+bool anMatX::LDLT_UpdateIncrement( const anVecX &v ) {
 	int i, j;
 	float *x;
 	double sum, d;
@@ -6035,14 +6035,14 @@ bool arcMatX::LDLT_UpdateIncrement( const arcVecX &v ) {
 
 /*
 ============
-arcMatX::LDLT_UpdateDecrement
+anMatX::LDLT_UpdateDecrement
 
   Updates the in-place LDL' factorization to obtain the factors for the matrix with row r and column r removed.
   v should store the row of the original matrix.
 ============
 */
-bool arcMatX::LDLT_UpdateDecrement( const arcVecX &v, int r ) {
-	arcVecX v1;
+bool anMatX::LDLT_UpdateDecrement( const anVecX &v, int r ) {
+	anVecX v1;
 
 	assert( numRows == numColumns );
 	assert( v.GetSize() >= numRows );
@@ -6073,12 +6073,12 @@ bool arcMatX::LDLT_UpdateDecrement( const arcVecX &v, int r ) {
 
 /*
 ============
-arcMatX::LDLT_Solve
+anMatX::LDLT_Solve
 
   Solve Ax = b with A factored in-place as: LDL'
 ============
 */
-void arcMatX::LDLT_Solve( arcVecX &x, const arcVecX &b ) const {
+void anMatX::LDLT_Solve( anVecX &x, const anVecX &b ) const {
 	int i, j;
 	double sum;
 
@@ -6111,14 +6111,14 @@ void arcMatX::LDLT_Solve( arcVecX &x, const arcVecX &b ) const {
 
 /*
 ============
-arcMatX::LDLT_Inverse
+anMatX::LDLT_Inverse
 
   Calculates the inverse of the matrix which is factored in-place as: LDL'
 ============
 */
-void arcMatX::LDLT_Inverse( arcMatX &inv ) const {
+void anMatX::LDLT_Inverse( anMatX &inv ) const {
 	int i, j;
-	arcVecX x, b;
+	anVecX x, b;
 
 	assert( numRows == numColumns );
 
@@ -6140,12 +6140,12 @@ void arcMatX::LDLT_Inverse( arcMatX &inv ) const {
 
 /*
 ============
-arcMatX::LDLT_UnpackFactors
+anMatX::LDLT_UnpackFactors
 
   Unpacks the in-place LDL' factorization.
 ============
 */
-void arcMatX::LDLT_UnpackFactors( arcMatX &L, arcMatX &D ) const {
+void anMatX::LDLT_UnpackFactors( anMatX &L, anMatX &D ) const {
 	int i, j;
 
 	L.Zero( numRows, numColumns );
@@ -6161,12 +6161,12 @@ void arcMatX::LDLT_UnpackFactors( arcMatX &L, arcMatX &D ) const {
 
 /*
 ============
-arcMatX::LDLT_MultiplyFactors
+anMatX::LDLT_MultiplyFactors
 
   Multiplies the factors of the in-place LDL' factorization to form the original matrix.
 ============
 */
-void arcMatX::LDLT_MultiplyFactors( arcMatX &m ) const {
+void anMatX::LDLT_MultiplyFactors( anMatX &m ) const {
 	int r, i, j;
 	float *v;
 	double sum;
@@ -6198,10 +6198,10 @@ void arcMatX::LDLT_MultiplyFactors( arcMatX &m ) const {
 
 /*
 ============
-arcMatX::TriDiagonal_ClearTriangles
+anMatX::TriDiagonal_ClearTriangles
 ============
 */
-void arcMatX::TriDiagonal_ClearTriangles( void ) {
+void anMatX::TriDiagonal_ClearTriangles( void ) {
 	int i, j;
 
 	assert( numRows == numColumns );
@@ -6215,15 +6215,15 @@ void arcMatX::TriDiagonal_ClearTriangles( void ) {
 
 /*
 ============
-arcMatX::TriDiagonal_Solve
+anMatX::TriDiagonal_Solve
 
   Solve Ax = b with A being tridiagonal.
 ============
 */
-bool arcMatX::TriDiagonal_Solve( arcVecX &x, const arcVecX &b ) const {
+bool anMatX::TriDiagonal_Solve( anVecX &x, const anVecX &b ) const {
 	int i;
 	float d;
-	arcVecX tmp;
+	anVecX tmp;
 
 	assert( numRows == numColumns );
 	assert( x.GetSize() >= numRows && b.GetSize() >= numRows );
@@ -6253,14 +6253,14 @@ bool arcMatX::TriDiagonal_Solve( arcVecX &x, const arcVecX &b ) const {
 
 /*
 ============
-arcMatX::TriDiagonal_Inverse
+anMatX::TriDiagonal_Inverse
 
   Calculates the inverse of a tri-diagonal matrix.
 ============
 */
-void arcMatX::TriDiagonal_Inverse( arcMatX &inv ) const {
+void anMatX::TriDiagonal_Inverse( anMatX &inv ) const {
 	int i, j;
-	arcVecX x, b;
+	anVecX x, b;
 
 	assert( numRows == numColumns );
 
@@ -6282,7 +6282,7 @@ void arcMatX::TriDiagonal_Inverse( arcMatX &inv ) const {
 
 /*
 ============
-arcMatX::HouseholderReduction
+anMatX::HouseholderReduction
 
   Householder reduction to symmetric tri-diagonal form.
   The original matrix is replaced by an orthogonal matrix effecting the accumulated householder transformations.
@@ -6291,7 +6291,7 @@ arcMatX::HouseholderReduction
   The initial matrix has to be symmetric.
 ============
 */
-void arcMatX::HouseholderReduction( arcVecX &diag, arcVecX &subd ) {
+void anMatX::HouseholderReduction( anVecX &diag, anVecX &subd ) {
 	int i0, i1, i2, i3;
 	float h, f, g, invH, halfFdivH, scale, invScale, sum;
 
@@ -6306,7 +6306,7 @@ void arcMatX::HouseholderReduction( arcVecX &diag, arcVecX &subd ) {
 
 		if ( i3 > 0 ) {
 			for ( i2 = 0; i2 <= i3; i2++ ) {
-				scale += arcMath::Fabs( (*this)[i0][i2] );
+				scale += anMath::Fabs( (*this)[i0][i2] );
 			}
 			if ( scale == 0 ) {
 				subd[i0] = (*this)[i0][i3];
@@ -6318,7 +6318,7 @@ void arcMatX::HouseholderReduction( arcVecX &diag, arcVecX &subd ) {
 					h += (*this)[i0][i2] * (*this)[i0][i2];
 				}
 				f = (*this)[i0][i3];
-				g = arcMath::Sqrt( h );
+				g = anMath::Sqrt( h );
 				if ( f > 0.0f ) {
 					g = -g;
 				}
@@ -6387,7 +6387,7 @@ void arcMatX::HouseholderReduction( arcVecX &diag, arcVecX &subd ) {
 
 /*
 ============
-arcMatX::QL
+anMatX::QL
 
   QL algorithm with implicit shifts to determine the eigenvalues and eigenvectors of a symmetric tri-diagonal matrix.
   diag contains the diagonal elements of the symmetric tri-diagonal matrix on input and is overwritten with the eigenvalues.
@@ -6396,7 +6396,7 @@ arcMatX::QL
   or the matrix returned by the Householder reduction to determine the eigenvalues for the original symmetric matrix.
 ============
 */
-bool arcMatX::QL( arcVecX &diag, arcVecX &subd ) {
+bool anMatX::QL( anVecX &diag, anVecX &subd ) {
     const int maxIter = 32;
 	int i0, i1, i2, i3;
 	float a, b, f, g, r, p, s, c;
@@ -6406,8 +6406,8 @@ bool arcMatX::QL( arcVecX &diag, arcVecX &subd ) {
 	for ( i0 = 0; i0 < numRows; i0++ ) {
 		for ( i1 = 0; i1 < maxIter; i1++ ) {
 			for ( i2 = i0; i2 <= numRows - 2; i2++ ) {
-				a = arcMath::Fabs( diag[i2] ) + arcMath::Fabs( diag[i2+1] );
-				if ( arcMath::Fabs( subd[i2] ) + a == a ) {
+				a = anMath::Fabs( diag[i2] ) + anMath::Fabs( diag[i2+1] );
+				if ( anMath::Fabs( subd[i2] ) + a == a ) {
 					break;
 				}
 			}
@@ -6416,7 +6416,7 @@ bool arcMatX::QL( arcVecX &diag, arcVecX &subd ) {
 			}
 
 			g = ( diag[i0+1] - diag[i0] ) / ( 2.0f * subd[i0] );
-			r = arcMath::Sqrt( g * g + 1.0f );
+			r = anMath::Sqrt( g * g + 1.0f );
 			if ( g < 0.0f ) {
 				g = diag[i2] - diag[i0] + subd[i0] / ( g - r );
 			} else {
@@ -6428,15 +6428,15 @@ bool arcMatX::QL( arcVecX &diag, arcVecX &subd ) {
 			for ( i3 = i2 - 1; i3 >= i0; i3-- ) {
 				f = s * subd[i3];
 				b = c * subd[i3];
-				if ( arcMath::Fabs( f ) >= arcMath::Fabs( g ) ) {
+				if ( anMath::Fabs( f ) >= anMath::Fabs( g ) ) {
 					c = g / f;
-					r = arcMath::Sqrt( c * c + 1.0f );
+					r = anMath::Sqrt( c * c + 1.0f );
 					subd[i3+1] = f * r;
 					s = 1.0f / r;
 					c *= s;
 				} else {
 					s = f / g;
-					r = arcMath::Sqrt( s * s + 1.0f );
+					r = anMath::Sqrt( s * s + 1.0f );
 					subd[i3+1] = g * r;
 					c = 1.0f / r;
 					s *= c;
@@ -6466,7 +6466,7 @@ bool arcMatX::QL( arcVecX &diag, arcVecX &subd ) {
 
 /*
 ============
-arcMatX::Eigen_SolveSymmetricTriDiagonal
+anMatX::Eigen_SolveSymmetricTriDiagonal
 
   Determine eigen values and eigen vectors for a symmetric tri-diagonal matrix.
   The eigen values are stored in 'eigenValues'.
@@ -6474,9 +6474,9 @@ arcMatX::Eigen_SolveSymmetricTriDiagonal
   The initial matrix has to be symmetric tri-diagonal.
 ============
 */
-bool arcMatX::Eigen_SolveSymmetricTriDiagonal( arcVecX &eigenValues ) {
+bool anMatX::Eigen_SolveSymmetricTriDiagonal( anVecX &eigenValues ) {
 	int i;
-	arcVecX subd;
+	anVecX subd;
 
 	assert( numRows == numColumns );
 
@@ -6496,7 +6496,7 @@ bool arcMatX::Eigen_SolveSymmetricTriDiagonal( arcVecX &eigenValues ) {
 
 /*
 ============
-arcMatX::Eigen_SolveSymmetric
+anMatX::Eigen_SolveSymmetric
 
   Determine eigen values and eigen vectors for a symmetric matrix.
   The eigen values are stored in 'eigenValues'.
@@ -6504,8 +6504,8 @@ arcMatX::Eigen_SolveSymmetric
   The initial matrix has to be symmetric.
 ============
 */
-bool arcMatX::Eigen_SolveSymmetric( arcVecX &eigenValues ) {
-	arcVecX subd;
+bool anMatX::Eigen_SolveSymmetric( anVecX &eigenValues ) {
+	anVecX subd;
 
 	assert( numRows == numColumns );
 
@@ -6518,17 +6518,17 @@ bool arcMatX::Eigen_SolveSymmetric( arcVecX &eigenValues ) {
 
 /*
 ============
-arcMatX::HessenbergReduction
+anMatX::HessenbergReduction
 
   Reduction to Hessenberg form.
 ============
 */
-void arcMatX::HessenbergReduction( arcMatX &H ) {
+void anMatX::HessenbergReduction( anMatX &H ) {
 	int i, j, m;
 	int low = 0;
 	int high = numRows - 1;
 	float scale, f, g, h;
-	arcVecX v;
+	anVecX v;
 
 	v.SetData( numRows, VECX_ALLOCA( numRows ) );
 
@@ -6536,7 +6536,7 @@ void arcMatX::HessenbergReduction( arcMatX &H ) {
 
 		scale = 0.0f;
 		for ( i = m; i <= high; i++ ) {
-			scale = scale + arcMath::Fabs( H[i][m-1] );
+			scale = scale + anMath::Fabs( H[i][m-1] );
 		}
 		if ( scale != 0.0f ) {
 
@@ -6546,7 +6546,7 @@ void arcMatX::HessenbergReduction( arcMatX &H ) {
 				v[i] = H[i][m-1] / scale;
 				h += v[i] * v[i];
 			}
-			g = arcMath::Sqrt( h );
+			g = anMath::Sqrt( h );
 			if ( v[m] > 0.0f ) {
 				g = -g;
 			}
@@ -6605,14 +6605,14 @@ void arcMatX::HessenbergReduction( arcMatX &H ) {
 
 /*
 ============
-arcMatX::ComplexDivision
+anMatX::ComplexDivision
 
   Complex scalar division.
 ============
 */
-void arcMatX::ComplexDivision( float xr, float xi, float yr, float yi, float &cdivr, float &cdivi ) {
+void anMatX::ComplexDivision( float xr, float xi, float yr, float yi, float &cdivr, float &cdivi ) {
 	float r, d;
-	if ( arcMath::Fabs( yr ) > arcMath::Fabs( yi ) ) {
+	if ( anMath::Fabs( yr ) > anMath::Fabs( yi ) ) {
 		r = yi / yr;
 		d = yr + r * yi;
 		cdivr = ( xr + r * xi ) / d;
@@ -6627,12 +6627,12 @@ void arcMatX::ComplexDivision( float xr, float xi, float yr, float yi, float &cd
 
 /*
 ============
-arcMatX::HessenbergToRealSchur
+anMatX::HessenbergToRealSchur
 
   Reduction from Hessenberg to real Schur form.
 ============
 */
-bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVecX &imaginaryEigenValues ) {
+bool anMatX::HessenbergToRealSchur( anMatX &H, anVecX &realEigenValues, anVecX &imaginaryEigenValues ) {
 	int i, j, k;
 	int n = numRows - 1;
 	int low = 0;
@@ -6648,7 +6648,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 			imaginaryEigenValues[i] = 0.0f;
 		}
 		for ( j = Max( i - 1, 0 ); j < numRows; j++ ) {
-			norm = norm + arcMath::Fabs( H[i][j] );
+			norm = norm + anMath::Fabs( H[i][j] );
 		}
 	}
 
@@ -6658,11 +6658,11 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 		// look for single small sub-diagonal element
 		int l = n;
 		while ( l > low ) {
-			s = arcMath::Fabs( H[l-1][l-1] ) + arcMath::Fabs( H[l][l] );
+			s = anMath::Fabs( H[l-1][l-1] ) + anMath::Fabs( H[l][l] );
 			if ( s == 0.0f ) {
 				s = norm;
 			}
-			if ( arcMath::Fabs( H[l][l-1] ) < eps * s ) {
+			if ( anMath::Fabs( H[l][l-1] ) < eps * s ) {
 				break;
 			}
 			l--;
@@ -6679,7 +6679,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 			w = H[n][n-1] * H[n-1][n];
 			p = ( H[n-1][n-1] - H[n][n] ) / 2.0f;
 			q = p * p + w;
-			z = arcMath::Sqrt( arcMath::Fabs( q ) );
+			z = anMath::Sqrt( anMath::Fabs( q ) );
 			H[n][n] = H[n][n] + exshift;
 			H[n-1][n-1] = H[n-1][n-1] + exshift;
 			x = H[n][n];
@@ -6698,10 +6698,10 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 				imaginaryEigenValues[n-1] = 0.0f;
 				imaginaryEigenValues[n] = 0.0f;
 				x = H[n][n-1];
-				s = arcMath::Fabs( x ) + arcMath::Fabs( z );
+				s = anMath::Fabs( x ) + anMath::Fabs( z );
 				p = x / s;
 				q = z / s;
-				r = arcMath::Sqrt( p * p + q * q );
+				r = anMath::Sqrt( p * p + q * q );
 				p = p / r;
 				q = q / r;
 
@@ -6751,7 +6751,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 				for ( i = low; i <= n; i++ ) {
 					H[i][i] -= x;
 				}
-				s = arcMath::Fabs( H[n][n-1] ) + arcMath::Fabs( H[n-1][n-2] );
+				s = anMath::Fabs( H[n][n-1] ) + anMath::Fabs( H[n-1][n-2] );
 				x = y = 0.75f * s;
 				w = -0.4375f * s * s;
 			}
@@ -6761,7 +6761,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 				s = ( y - x ) / 2.0f;
 				s = s * s + w;
 				if ( s > 0 ) {
-					s = arcMath::Sqrt( s );
+					s = anMath::Sqrt( s );
 					if ( y < x ) {
 						s = -s;
 					}
@@ -6785,15 +6785,15 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 				p = ( r * s - w ) / H[m+1][m] + H[m][m+1];
 				q = H[m+1][m+1] - z - r - s;
 				r = H[m+2][m+1];
-				s = arcMath::Fabs( p ) + arcMath::Fabs( q ) + arcMath::Fabs( r );
+				s = anMath::Fabs( p ) + anMath::Fabs( q ) + anMath::Fabs( r );
 				p = p / s;
 				q = q / s;
 				r = r / s;
 				if ( m == l ) {
 					break;
 				}
-				if ( arcMath::Fabs( H[m][m-1] ) * ( arcMath::Fabs( q ) + arcMath::Fabs( r ) ) <
-						eps * ( arcMath::Fabs( p ) * ( arcMath::Fabs( H[m-1][m-1] ) + arcMath::Fabs( z ) + arcMath::Fabs( H[m+1][m+1] ) ) ) ) {
+				if ( anMath::Fabs( H[m][m-1] ) * ( anMath::Fabs( q ) + anMath::Fabs( r ) ) <
+						eps * ( anMath::Fabs( p ) * ( anMath::Fabs( H[m-1][m-1] ) + anMath::Fabs( z ) + anMath::Fabs( H[m+1][m+1] ) ) ) ) {
 					break;
 				}
 			}
@@ -6812,7 +6812,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 					p = H[k][k-1];
 					q = H[k+1][k-1];
 					r = ( notlast ? H[k+2][k-1] : 0.0f );
-					x = arcMath::Fabs( p ) + arcMath::Fabs( q ) + arcMath::Fabs( r );
+					x = anMath::Fabs( p ) + anMath::Fabs( q ) + anMath::Fabs( r );
 					if ( x != 0.0f ) {
 						p = p / x;
 						q = q / x;
@@ -6822,7 +6822,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 				if ( x == 0.0f ) {
 					break;
 				}
-				s = arcMath::Sqrt( p * p + q * q + r * r );
+				s = anMath::Sqrt( p * p + q * q + r * r );
 				if ( p < 0.0f ) {
 					s = -s;
 				}
@@ -6911,7 +6911,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 						q = ( realEigenValues[i] - p ) * ( realEigenValues[i] - p ) + imaginaryEigenValues[i] * imaginaryEigenValues[i];
 						t = ( x * s - z * r ) / q;
 						H[i][n] = t;
-						if ( arcMath::Fabs(x) > arcMath::Fabs( z ) ) {
+						if ( anMath::Fabs(x) > anMath::Fabs( z ) ) {
 							H[i+1][n] = ( -r - w * t ) / x;
 						} else {
 							H[i+1][n] = ( -s - y * t ) / z;
@@ -6919,7 +6919,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 					}
 
 					// overflow control
-					t = arcMath::Fabs(H[i][n] );
+					t = anMath::Fabs(H[i][n] );
 					if ( ( eps * t ) * t > 1 ) {
 						for ( j = i; j <= n; j++ ) {
 							H[j][n] = H[j][n] / t;
@@ -6931,7 +6931,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 			int l = n-1;
 
 			// last vector component imaginary so matrix is triangular
-			if ( arcMath::Fabs( H[n][n-1] ) > arcMath::Fabs( H[n-1][n] ) ) {
+			if ( anMath::Fabs( H[n][n-1] ) > anMath::Fabs( H[n-1][n] ) ) {
 				H[n-1][n-1] = q / H[n][n-1];
 				H[n-1][n] = -( H[n][n] - p ) / H[n][n-1];
 			} else {
@@ -6964,10 +6964,10 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 						vr = ( realEigenValues[i] - p ) * ( realEigenValues[i] - p ) + imaginaryEigenValues[i] * imaginaryEigenValues[i] - q * q;
 						vi = ( realEigenValues[i] - p ) * 2.0f * q;
 						if ( vr == 0.0f && vi == 0.0f ) {
-							vr = eps * norm * ( arcMath::Fabs( w ) + arcMath::Fabs( q ) + arcMath::Fabs( x ) + arcMath::Fabs( y ) + arcMath::Fabs( z ) );
+							vr = eps * norm * ( anMath::Fabs( w ) + anMath::Fabs( q ) + anMath::Fabs( x ) + anMath::Fabs( y ) + anMath::Fabs( z ) );
 						}
 						ComplexDivision( x * r - z * ra + q * sa, x * s - z * sa - q * ra, vr, vi, H[i][n-1], H[i][n] );
-						if ( arcMath::Fabs( x ) > ( arcMath::Fabs( z ) + arcMath::Fabs( q ) ) ) {
+						if ( anMath::Fabs( x ) > ( anMath::Fabs( z ) + anMath::Fabs( q ) ) ) {
 							H[i+1][n-1] = ( -ra - w * H[i][n-1] + q * H[i][n] ) / x;
 							H[i+1][n] = ( -sa - w * H[i][n] - q * H[i][n-1] ) / x;
 						} else {
@@ -6976,7 +6976,7 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 					}
 
 					// overflow control
-					t = Max( arcMath::Fabs( H[i][n-1] ), arcMath::Fabs( H[i][n] ) );
+					t = Max( anMath::Fabs( H[i][n-1] ), anMath::Fabs( H[i][n] ) );
 					if ( ( eps * t ) * t > 1 ) {
 						for ( j = i; j <= n; j++ ) {
 							H[j][n-1] = H[j][n-1] / t;
@@ -7013,15 +7013,15 @@ bool arcMatX::HessenbergToRealSchur( arcMatX &H, arcVecX &realEigenValues, arcVe
 
 /*
 ============
-arcMatX::Eigen_Solve
+anMatX::Eigen_Solve
 
   Determine eigen values and eigen vectors for a square matrix.
   The eigen values are stored in 'realEigenValues' and 'imaginaryEigenValues'.
   Column i of the original matrix will store the eigen vector corresponding to the realEigenValues[i] and imaginaryEigenValues[i].
 ============
 */
-bool arcMatX::Eigen_Solve( arcVecX &realEigenValues, arcVecX &imaginaryEigenValues ) {
-    arcMatX H;
+bool anMatX::Eigen_Solve( anVecX &realEigenValues, anVecX &imaginaryEigenValues ) {
+    anMatX H;
 
 	assert( numRows == numColumns );
 
@@ -7039,10 +7039,10 @@ bool arcMatX::Eigen_Solve( arcVecX &realEigenValues, arcVecX &imaginaryEigenValu
 
 /*
 ============
-arcMatX::Eigen_SortIncreasing
+anMatX::Eigen_SortIncreasing
 ============
 */
-void arcMatX::Eigen_SortIncreasing( arcVecX &eigenValues ) {
+void anMatX::Eigen_SortIncreasing( anVecX &eigenValues ) {
 	int i, j, k;
 	float min;
 
@@ -7064,10 +7064,10 @@ void arcMatX::Eigen_SortIncreasing( arcVecX &eigenValues ) {
 
 /*
 ============
-arcMatX::Eigen_SortDecreasing
+anMatX::Eigen_SortDecreasing
 ============
 */
-void arcMatX::Eigen_SortDecreasing( arcVecX &eigenValues ) {
+void anMatX::Eigen_SortDecreasing( anVecX &eigenValues ) {
 	int i, j, k;
 	float max;
 
@@ -7089,15 +7089,15 @@ void arcMatX::Eigen_SortDecreasing( arcVecX &eigenValues ) {
 
 /*
 ============
-arcMatX::DeterminantGeneric
+anMatX::DeterminantGeneric
 ============
 */
-float arcMatX::DeterminantGeneric( void ) const {
+float anMatX::DeterminantGeneric( void ) const {
 	int *index;
 	float det;
-	arcMatX tmp;
+	anMatX tmp;
 
-	index = ( int * ) _alloca16( numRows * sizeof( int ) );
+	index = ( int*) _alloca16( numRows * sizeof( int ) );
 	tmp.SetData( numRows, numColumns, MATX_ALLOCA( numRows * numColumns ) );
 	tmp = *this;
 
@@ -7110,15 +7110,15 @@ float arcMatX::DeterminantGeneric( void ) const {
 
 /*
 ============
-arcMatX::InverseSelfGeneric
+anMatX::InverseSelfGeneric
 ============
 */
-bool arcMatX::InverseSelfGeneric( void ) {
+bool anMatX::InverseSelfGeneric( void ) {
 	int i, j, *index;
-	arcMatX tmp;
-	arcVecX x, b;
+	anMatX tmp;
+	anVecX x, b;
 
-	index = ( int * ) _alloca16( numRows * sizeof( int ) );
+	index = ( int*) _alloca16( numRows * sizeof( int ) );
 	tmp.SetData( numRows, numColumns, MATX_ALLOCA( numRows * numColumns ) );
 	tmp = *this;
 
@@ -7144,23 +7144,23 @@ bool arcMatX::InverseSelfGeneric( void ) {
 
 /*
 ============
-arcMatX::Test
+anMatX::Test
 ============
 */
-void arcMatX::Test( void ) {
-	arcMatX original, m1, m2, m3, q1, q2, r1, r2;
-	arcVecX v, w, u, c, d;
+void anMatX::Test( void ) {
+	anMatX original, m1, m2, m3, q1, q2, r1, r2;
+	anVecX v, w, u, c, d;
 	int offset, size, *index1, *index2;
 
 	size = 6;
 	original.Random( size, size, 0 );
 	original = original * original.Transpose();
 
-	index1 = ( int * ) _alloca16( ( size + 1 ) * sizeof( index1[0] ) );
-	index2 = ( int * ) _alloca16( ( size + 1 ) * sizeof( index2[0] ) );
+	index1 = ( int*) _alloca16( ( size + 1 ) * sizeof( index1[0] ) );
+	index2 = ( int*) _alloca16( ( size + 1 ) * sizeof( index2[0] ) );
 
 	/*
-		arcMatX::LowerTriangularInverse
+		anMatX::LowerTriangularInverse
 	*/
 
 	m1 = original;
@@ -7171,11 +7171,11 @@ void arcMatX::Test( void ) {
 	m1.LowerTriangularInverse();
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LowerTriangularInverse failed" );
+		anLibrary::common->Warning( "anMatX::LowerTriangularInverse failed" );
 	}
 
 	/*
-		arcMatX::UpperTriangularInverse
+		anMatX::UpperTriangularInverse
 	*/
 
 	m1 = original;
@@ -7186,11 +7186,11 @@ void arcMatX::Test( void ) {
 	m1.UpperTriangularInverse();
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::UpperTriangularInverse failed" );
+		anLibrary::common->Warning( "anMatX::UpperTriangularInverse failed" );
 	}
 
 	/*
-		arcMatX::Inverse_GaussJordan
+		anMatX::Inverse_GaussJordan
 	*/
 
 	m1 = original;
@@ -7199,11 +7199,11 @@ void arcMatX::Test( void ) {
 	m1 *= original;
 
 	if ( !m1.IsIdentity( 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Inverse_GaussJordan failed" );
+		anLibrary::common->Warning( "anMatX::Inverse_GaussJordan failed" );
 	}
 
 	/*
-		arcMatX::Inverse_UpdateRankOne
+		anMatX::Inverse_UpdateRankOne
 	*/
 
 	m1 = original;
@@ -7225,11 +7225,11 @@ void arcMatX::Test( void ) {
 	m1.Inverse_UpdateRankOne( v, w, 1.0f );
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Inverse_UpdateRankOne failed" );
+		anLibrary::common->Warning( "anMatX::Inverse_UpdateRankOne failed" );
 	}
 
 	/*
-		arcMatX::Inverse_UpdateRowColumn
+		anMatX::Inverse_UpdateRowColumn
 	*/
 
 	for ( offset = 0; offset < size; offset++ ) {
@@ -7253,12 +7253,12 @@ void arcMatX::Test( void ) {
 		m1.Inverse_UpdateRowColumn( v, w, offset );
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::Inverse_UpdateRowColumn failed" );
+			anLibrary::common->Warning( "anMatX::Inverse_UpdateRowColumn failed" );
 		}
 	}
 
 	/*
-		arcMatX::Inverse_UpdateIncrement
+		anMatX::Inverse_UpdateIncrement
 	*/
 
 	m1 = original;
@@ -7281,11 +7281,11 @@ void arcMatX::Test( void ) {
 	m1.Inverse_UpdateIncrement( v, w );
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Inverse_UpdateIncrement failed" );
+		anLibrary::common->Warning( "anMatX::Inverse_UpdateIncrement failed" );
 	}
 
 	/*
-		arcMatX::Inverse_UpdateDecrement
+		anMatX::Inverse_UpdateDecrement
 	*/
 
 	for ( offset = 0; offset < size; offset++ ) {
@@ -7312,26 +7312,26 @@ void arcMatX::Test( void ) {
 		m1.Inverse_UpdateDecrement( v, w, offset );
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::Inverse_UpdateDecrement failed" );
+			anLibrary::common->Warning( "anMatX::Inverse_UpdateDecrement failed" );
 		}
 	}
 
 	/*
-		arcMatX::LU_Factor
+		anMatX::LU_Factor
 	*/
 
 	m1 = original;
 
-	m1.LU_Factor( NULL );	// no pivoting
+	m1.LU_Factor( nullptr );	// no pivoting
 	m1.LU_UnpackFactors( m2, m3 );
 	m1 = m2 * m3;
 
 	if ( !original.Compare( m1, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LU_Factor failed" );
+		anLibrary::common->Warning( "anMatX::LU_Factor failed" );
 	}
 
 	/*
-		arcMatX::LU_UpdateRankOne
+		anMatX::LU_UpdateRankOne
 	*/
 
 	m1 = original;
@@ -7357,11 +7357,11 @@ void arcMatX::Test( void ) {
 	m1 = m3;
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LU_UpdateRankOne failed" );
+		anLibrary::common->Warning( "anMatX::LU_UpdateRankOne failed" );
 	}
 
 	/*
-		arcMatX::LU_UpdateRowColumn
+		anMatX::LU_UpdateRowColumn
 	*/
 
 	for ( offset = 0; offset < size; offset++ ) {
@@ -7389,12 +7389,12 @@ void arcMatX::Test( void ) {
 		m1 = m3;
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::LU_UpdateRowColumn failed" );
+			anLibrary::common->Warning( "anMatX::LU_UpdateRowColumn failed" );
 		}
 	}
 
 	/*
-		arcMatX::LU_UpdateIncrement
+		anMatX::LU_UpdateIncrement
 	*/
 
 	m1 = original;
@@ -7421,11 +7421,11 @@ void arcMatX::Test( void ) {
 	m1 = m3;
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LU_UpdateIncrement failed" );
+		anLibrary::common->Warning( "anMatX::LU_UpdateIncrement failed" );
 	}
 
 	/*
-		arcMatX::LU_UpdateDecrement
+		anMatX::LU_UpdateDecrement
 	*/
 
 	for ( offset = 0; offset < size; offset++ ) {
@@ -7461,26 +7461,26 @@ void arcMatX::Test( void ) {
 		m1 = m3;
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::LU_UpdateDecrement failed" );
+			anLibrary::common->Warning( "anMatX::LU_UpdateDecrement failed" );
 		}
 	}
 
 	/*
-		arcMatX::LU_Inverse
+		anMatX::LU_Inverse
 	*/
 
 	m2 = original;
 
-	m2.LU_Factor( NULL );
-	m2.LU_Inverse( m1, NULL );
+	m2.LU_Factor( nullptr );
+	m2.LU_Inverse( m1, nullptr );
 	m1 *= original;
 
 	if ( !m1.IsIdentity( 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LU_Inverse failed" );
+		anLibrary::common->Warning( "anMatX::LU_Inverse failed" );
 	}
 
 	/*
-		arcMatX::QR_Factor
+		anMatX::QR_Factor
 	*/
 
 	c.SetSize( size );
@@ -7493,11 +7493,11 @@ void arcMatX::Test( void ) {
 	m1 = q1 * r1;
 
 	if ( !original.Compare( m1, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::QR_Factor failed" );
+		anLibrary::common->Warning( "anMatX::QR_Factor failed" );
 	}
 
 	/*
-		arcMatX::QR_UpdateRankOne
+		anMatX::QR_UpdateRankOne
 	*/
 
 	c.SetSize( size );
@@ -7526,11 +7526,11 @@ void arcMatX::Test( void ) {
 	m1 = q1 * r1;
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::QR_UpdateRankOne failed" );
+		anLibrary::common->Warning( "anMatX::QR_UpdateRankOne failed" );
 	}
 
 	/*
-		arcMatX::QR_UpdateRowColumn
+		anMatX::QR_UpdateRowColumn
 	*/
 
 	for ( offset = 0; offset < size; offset++ ) {
@@ -7561,12 +7561,12 @@ void arcMatX::Test( void ) {
 		m1 = q1 * r1;
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::QR_UpdateRowColumn failed" );
+			anLibrary::common->Warning( "anMatX::QR_UpdateRowColumn failed" );
 		}
 	}
 
 	/*
-		arcMatX::QR_UpdateIncrement
+		anMatX::QR_UpdateIncrement
 	*/
 
 	c.SetSize( size+1 );
@@ -7596,11 +7596,11 @@ void arcMatX::Test( void ) {
 	m1 = q1 * r1;
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::QR_UpdateIncrement failed" );
+		anLibrary::common->Warning( "anMatX::QR_UpdateIncrement failed" );
 	}
 
 	/*
-		arcMatX::QR_UpdateDecrement
+		anMatX::QR_UpdateDecrement
 	*/
 
 	for ( offset = 0; offset < size; offset++ ) {
@@ -7634,12 +7634,12 @@ void arcMatX::Test( void ) {
 		m1 = q1 * r1;
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::QR_UpdateDecrement failed" );
+			anLibrary::common->Warning( "anMatX::QR_UpdateDecrement failed" );
 		}
 	}
 
 	/*
-		arcMatX::QR_Inverse
+		anMatX::QR_Inverse
 	*/
 
 	m2 = original;
@@ -7649,11 +7649,11 @@ void arcMatX::Test( void ) {
 	m1 *= original;
 
 	if ( !m1.IsIdentity( 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::QR_Inverse failed" );
+		anLibrary::common->Warning( "anMatX::QR_Inverse failed" );
 	}
 
 	/*
-		arcMatX::SVD_Factor
+		anMatX::SVD_Factor
 	*/
 
 	m1 = original;
@@ -7666,11 +7666,11 @@ void arcMatX::Test( void ) {
 	m1 = m1 * m2 * m3;
 
 	if ( !original.Compare( m1, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::SVD_Factor failed" );
+		anLibrary::common->Warning( "anMatX::SVD_Factor failed" );
 	}
 
 	/*
-		arcMatX::SVD_Inverse
+		anMatX::SVD_Inverse
 	*/
 
 	m2 = original;
@@ -7680,11 +7680,11 @@ void arcMatX::Test( void ) {
 	m1 *= original;
 
 	if ( !m1.IsIdentity( 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::SVD_Inverse failed" );
+		anLibrary::common->Warning( "anMatX::SVD_Inverse failed" );
 	}
 
 	/*
-		arcMatX::Cholesky_Factor
+		anMatX::Cholesky_Factor
 	*/
 
 	m1 = original;
@@ -7693,11 +7693,11 @@ void arcMatX::Test( void ) {
 	m1.Cholesky_MultiplyFactors( m2 );
 
 	if ( !original.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Cholesky_Factor failed" );
+		anLibrary::common->Warning( "anMatX::Cholesky_Factor failed" );
 	}
 
 	/*
-		arcMatX::Cholesky_UpdateRankOne
+		anMatX::Cholesky_UpdateRankOne
 	*/
 
 	m1 = original;
@@ -7720,11 +7720,11 @@ void arcMatX::Test( void ) {
 	m1.Cholesky_UpdateRankOne( w, 1.0f, 0 );
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Cholesky_UpdateRankOne failed" );
+		anLibrary::common->Warning( "anMatX::Cholesky_UpdateRankOne failed" );
 	}
 
 	/*
-		arcMatX::Cholesky_UpdateRowColumn
+		anMatX::Cholesky_UpdateRowColumn
 	*/
 
 	for ( offset = 0; offset < size; offset++ ) {
@@ -7750,12 +7750,12 @@ void arcMatX::Test( void ) {
 		m1.Cholesky_UpdateRowColumn( w, offset );
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::Cholesky_UpdateRowColumn failed" );
+			anLibrary::common->Warning( "anMatX::Cholesky_UpdateRowColumn failed" );
 		}
 	}
 
 	/*
-		arcMatX::Cholesky_UpdateIncrement
+		anMatX::Cholesky_UpdateIncrement
 	*/
 
 	m1.Random( size + 1, size + 1, 0 );
@@ -7785,11 +7785,11 @@ void arcMatX::Test( void ) {
 	m2.ClearUpperTriangle();
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Cholesky_UpdateIncrement failed" );
+		anLibrary::common->Warning( "anMatX::Cholesky_UpdateIncrement failed" );
 	}
 
 	/*
-		arcMatX::Cholesky_UpdateDecrement
+		anMatX::Cholesky_UpdateDecrement
 	*/
 
 	for ( offset = 0; offset < size; offset += size - 1 ) {
@@ -7814,12 +7814,12 @@ void arcMatX::Test( void ) {
 		m1.Cholesky_UpdateDecrement( v, offset );
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::Cholesky_UpdateDecrement failed" );
+			anLibrary::common->Warning( "anMatX::Cholesky_UpdateDecrement failed" );
 		}
 	}
 
 	/*
-		arcMatX::Cholesky_Inverse
+		anMatX::Cholesky_Inverse
 	*/
 
 	m2 = original;
@@ -7829,11 +7829,11 @@ void arcMatX::Test( void ) {
 	m1 *= original;
 
 	if ( !m1.IsIdentity( 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Cholesky_Inverse failed" );
+		anLibrary::common->Warning( "anMatX::Cholesky_Inverse failed" );
 	}
 
 	/*
-		arcMatX::LDLT_Factor
+		anMatX::LDLT_Factor
 	*/
 
 	m1 = original;
@@ -7842,18 +7842,18 @@ void arcMatX::Test( void ) {
 	m1.LDLT_MultiplyFactors( m2 );
 
 	if ( !original.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LDLT_Factor failed" );
+		anLibrary::common->Warning( "anMatX::LDLT_Factor failed" );
 	}
 
 	m1.LDLT_UnpackFactors( m2, m3 );
 	m2 = m2 * m3 * m2.Transpose();
 
 	if ( !original.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LDLT_Factor failed" );
+		anLibrary::common->Warning( "anMatX::LDLT_Factor failed" );
 	}
 
 	/*
-		arcMatX::LDLT_UpdateRankOne
+		anMatX::LDLT_UpdateRankOne
 	*/
 
 	m1 = original;
@@ -7876,11 +7876,11 @@ void arcMatX::Test( void ) {
 	m1.LDLT_UpdateRankOne( w, 1.0f, 0 );
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LDLT_UpdateRankOne failed" );
+		anLibrary::common->Warning( "anMatX::LDLT_UpdateRankOne failed" );
 	}
 
 	/*
-		arcMatX::LDLT_UpdateRowColumn
+		anMatX::LDLT_UpdateRowColumn
 	*/
 
 	for ( offset = 0; offset < size; offset++ ) {
@@ -7904,12 +7904,12 @@ void arcMatX::Test( void ) {
 		m1.LDLT_UpdateRowColumn( w, offset );
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::LDLT_UpdateRowColumn failed" );
+			anLibrary::common->Warning( "anMatX::LDLT_UpdateRowColumn failed" );
 		}
 	}
 
 	/*
-		arcMatX::LDLT_UpdateIncrement
+		anMatX::LDLT_UpdateIncrement
 	*/
 
 	m1.Random( size + 1, size + 1, 0 );
@@ -7939,11 +7939,11 @@ void arcMatX::Test( void ) {
 	m2.ClearUpperTriangle();
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LDLT_UpdateIncrement failed" );
+		anLibrary::common->Warning( "anMatX::LDLT_UpdateIncrement failed" );
 	}
 
 	/*
-		arcMatX::LDLT_UpdateDecrement
+		anMatX::LDLT_UpdateDecrement
 	*/
 
 	for ( offset = 0; offset < size; offset++ ) {
@@ -7968,12 +7968,12 @@ void arcMatX::Test( void ) {
 		m1.LDLT_UpdateDecrement( v, offset );
 
 		if ( !m1.Compare( m2, 1e-3f ) ) {
-			arcLibrary::common->Warning( "arcMatX::LDLT_UpdateDecrement failed" );
+			anLibrary::common->Warning( "anMatX::LDLT_UpdateDecrement failed" );
 		}
 	}
 
 	/*
-		arcMatX::LDLT_Inverse
+		anMatX::LDLT_Inverse
 	*/
 
 	m2 = original;
@@ -7983,11 +7983,11 @@ void arcMatX::Test( void ) {
 	m1 *= original;
 
 	if ( !m1.IsIdentity( 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::LDLT_Inverse failed" );
+		anLibrary::common->Warning( "anMatX::LDLT_Inverse failed" );
 	}
 
 	/*
-		arcMatX::Eigen_SolveSymmetricTriDiagonal
+		anMatX::Eigen_SolveSymmetricTriDiagonal
 	*/
 
 	m3 = original;
@@ -8007,11 +8007,11 @@ void arcMatX::Test( void ) {
 	}
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Eigen_SolveSymmetricTriDiagonal failed" );
+		anLibrary::common->Warning( "anMatX::Eigen_SolveSymmetricTriDiagonal failed" );
 	}
 
 	/*
-		arcMatX::Eigen_SolveSymmetric
+		anMatX::Eigen_SolveSymmetric
 	*/
 
 	m3 = original;
@@ -8030,11 +8030,11 @@ void arcMatX::Test( void ) {
 	}
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Eigen_SolveSymmetric failed" );
+		anLibrary::common->Warning( "anMatX::Eigen_SolveSymmetric failed" );
 	}
 
 	/*
-		arcMatX::Eigen_Solve
+		anMatX::Eigen_Solve
 	*/
 
 	m3 = original;
@@ -8054,6 +8054,6 @@ void arcMatX::Test( void ) {
 	}
 
 	if ( !m1.Compare( m2, 1e-4f ) ) {
-		arcLibrary::common->Warning( "arcMatX::Eigen_Solve failed" );
+		anLibrary::common->Warning( "anMatX::Eigen_Solve failed" );
 	}
 }

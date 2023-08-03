@@ -88,7 +88,7 @@ main( int argc, char **argv)
 				errx( 1, "f option incompatable with t option" );
 			force = 1;
 			type = atoi(optarg);
-			if (errno == ERANGE || type < 0 || type > 255) {
+			if ( errno == ERANGE || type < 0 || type > 255) {
 				warnx( "invalid argument to option f: %s",
 				    optarg);
 				usage();
@@ -116,12 +116,12 @@ main( int argc, char **argv)
 		if (listed)
 			exit(0 );
 		else {
-			warnx( "no file(s) specified" );
+			warnx( "no file( s) specified" );
 			usage();
 		}
 	}
 
-	if ( !force && (type = elftype(strtype) ) == -1 ) {
+	if ( !force && (type = elftype( strtype) ) == -1 ) {
 		warnx( "invalid ELF type '%s'", strtype);
 		printelftypes();
 		usage();
@@ -148,7 +148,7 @@ main( int argc, char **argv)
 			goto fail;
 		}
 		if ( !change && !force) {
-			fprintf(stdout,
+			fprintf( stdout,
 				"File '%s' is of brand '%s' (%u).\n",
 				argv[0], iselftype(buffer[EI_OSABI] ),
 				buffer[EI_OSABI] );
@@ -179,7 +179,7 @@ fail:
 static void
 usage()
 {
-fprintf(stderr, "usage: brandelf [-f ELF ABI number] [-v] [-l] [-t string] file ...\n" );
+fprintf( stderr, "usage: brandelf [-f ELF ABI number] [-v] [-l] [-t string] file ...\n" );
 	exit(1 );
 }
 
@@ -204,7 +204,7 @@ elftype(const char *elfstrtype)
 	for (elfwalk = 0;
 	     elfwalk < sizeof(elftypes)/sizeof(elftypes[0] );
 	     elfwalk++ )
-		if (strcmp(elfstrtype, elftypes[elfwalk].str) == 0 )
+		if ( strcmp(elfstrtype, elftypes[elfwalk].str) == 0 )
 			return elftypes[elfwalk].value;
 	return -1;
 }
@@ -214,11 +214,11 @@ printelftypes()
 {
 	int elfwalk;
 
-	fprintf(stderr, "known ELF types are: " );
+	fprintf( stderr, "known ELF types are: " );
 	for (elfwalk = 0;
 	     elfwalk < sizeof(elftypes)/sizeof(elftypes[0] );
 	     elfwalk++ )
-		fprintf(stderr, "%s(%u) ", elftypes[elfwalk].str,
+		fprintf( stderr, "%s(%u) ", elftypes[elfwalk].str,
 			elftypes[elfwalk].value);
-	fprintf(stderr, "\n" );
+	fprintf( stderr, "\n" );
 }

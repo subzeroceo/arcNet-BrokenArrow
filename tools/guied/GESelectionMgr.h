@@ -50,7 +50,7 @@ public:
 		HT_SIZE_LEFT
 	};
 
-	rvGESelectionMgr ( );
+	rvGESelectionMgr();
 
 	void			SetWorkspace		( rvGEWorkspace* workspace );
 
@@ -78,7 +78,7 @@ protected:
 	void		UpdateRectangle		( void );
 	void		UpdateExpression	( void );
 
-	arcNetList<idWindow*>	mSelections;
+	anList<idWindow*>	mSelections;
 	idRectangle			mRect;
 	rvGEWorkspace*		mWorkspace;
 	bool				mExpression;
@@ -86,7 +86,7 @@ protected:
 
 ARC_INLINE int rvGESelectionMgr::Num ( void )
 {
-	return mSelections.Num ( );
+	return mSelections.Num();
 }
 
 ARC_INLINE idWindow*& rvGESelectionMgr::operator[]( int index )
@@ -104,7 +104,7 @@ ARC_INLINE void rvGESelectionMgr::SetWorkspace ( rvGEWorkspace* workspace )
 
 ARC_INLINE idRectangle& rvGESelectionMgr::GetRect ( void )
 {
-	UpdateRectangle ( );
+	UpdateRectangle();
 	return mRect;
 }
 

@@ -1,13 +1,13 @@
-#include "precompiled.h"
+#include "Lib.h"
 #pragma hdrstop
 
 
 /*
 ============
-arcLangDictionary::arcLangDictionary
+anLangDict::anLangDict
 ============
 */
-arcLangDictionary::arcLangDictionary( void ) {
+anLangDict::anLangDict( void ) {
 	args.SetGranularity( 256 );
 	hash.SetGranularity( 256 );
 	hash.Clear( 4096, 8192 );
@@ -16,39 +16,39 @@ arcLangDictionary::arcLangDictionary( void ) {
 
 /*
 ============
-arcLangDictionary::~arcLangDictionary
+anLangDict::~anLangDict
 ============
 */
-arcLangDictionary::~arcLangDictionary( void ) {
+anLangDict::~anLangDict( void ) {
 	Clear();
 }
 
 /*
 ============
-arcLangDictionary::Clear
+anLangDict::Clear
 ============
 */
-void arcLangDictionary::Clear( void ) {
+void anLangDict::Clear( void ) {
 	args.Clear();
 	hash.Clear();
 }
 
 /*
 ============
-arcLangDictionary::Load
+anLangDict::Load
 ============
 */
-bool arcLangDictionary::Load( const char *fileName, bool clear ) {
+bool anLangDict::Load( const char *fileName, bool clear ) {
 	if ( clear ) {
 		Clear();
 	}
 
-	const char *buffer = NULL;
-	arcLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+	const char *buffer = nullptr;
+	anLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
 
-	int len = arcLibrary::fileSystem->ReadFile( fileName, (void**)&buffer );
+	int len = anLibrary::fileSystem->ReadFile( fileName, (void**)&buffer );
 	if ( len <= 0 ) {
-		// let whoever called us deal with the failure (so sys_lang can be reset)
+		// let whoever called us deal with the failure ( so sys_lang can be reset)
 		return false;
 	}
 	src.LoadMemory( buffer, strlen( buffer ), fileName );
@@ -56,7 +56,7 @@ bool arcLangDictionary::Load( const char *fileName, bool clear ) {
 		return false;
 	}
 
-	arcNetToken tok, tok2;
+	anToken tok, tok2;
 	src.ExpectTokenString( "{" );
 	while ( src.ReadToken( &tok ) ) {
 		if ( tok == "}" ) {
@@ -66,26 +66,26 @@ bool arcLangDictionary::Load( const char *fileName, bool clear ) {
 			if ( tok2 == "}" ) {
 				break;
 			}
-			idLangKeyValue kv;
+			anLangKeyValue kv;
 			kv.key = tok;
 			kv.value = tok2;
 			assert( kv.key.Cmpn( STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 );
 			hash.Add( GetHashKey( kv.key ), args.Append( kv ) );
 		}
 	}
-	arcLibrary::common->Printf( "%i strings read from %s\n", args.Num(), fileName );
-	arcLibrary::fileSystem->FreeFile( (void*)buffer );
+	anLibrary::common->Printf( "%i strings read from %s\n", args.Num(), fileName );
+	anLibrary::fileSystem->FreeFile( (void*)buffer );
 
 	return true;
 }
 
 /*
 ============
-arcLangDictionary::Save
+anLangDict::Save
 ============
 */
-void arcLangDictionary::Save( const char *fileName ) {
-	arcNetFile *outFile = arcLibrary::fileSystem->OpenFileWrite( fileName );
+void anLangDict::Save( const char *fileName ) {
+	anFile *outFile = anLibrary::fileSystem->OpenFileWrite( fileName );
 	outFile->WriteFloatString( "// string table\n// english\n//\n\n{\n" );
 	for ( int j = 0; j < args.Num(); j++ ) {
 		outFile->WriteFloatString( "\t\"%s\"\t\"", args[j].key.c_str() );
@@ -108,20 +108,20 @@ void arcLangDictionary::Save( const char *fileName ) {
 		outFile->WriteFloatString( "\"\n" );
 	}
 	outFile->WriteFloatString( "\n}\n" );
-	arcLibrary::fileSystem->CloseFile( outFile );
+	anLibrary::fileSystem->CloseFile( outFile );
 }
 
 /*
 ============
-arcLangDictionary::GetString
+anLangDict::GetString
 ============
 */
-const char *arcLangDictionary::GetString( const char *str ) const {
-	if ( str == NULL || str[0] == '\0' ) {
+const char *anLangDict::GetString( const char *str ) const {
+	if ( str == nullptr || str[0] == '\0' ) {
 		return "";
 	}
 
-	if ( arcNetString::Cmpn( str, STRTABLE_ID, STRTABLE_ID_LENGTH ) != 0 ) {
+	if ( anString::Cmpn( str, STRTABLE_ID, STRTABLE_ID_LENGTH ) != 0 ) {
 		return str;
 	}
 
@@ -132,29 +132,29 @@ const char *arcLangDictionary::GetString( const char *str ) const {
 		}
 	}
 
-	arcLibrary::common->Warning( "Unknown string id %s", str );
+	anLibrary::common->Warning( "Unknown string id %s", str );
 	return str;
 }
 
 /*
 ============
-arcLangDictionary::AddString
+anLangDict::AddString
 ============
 */
-const char *arcLangDictionary::AddString( const char *str ) {
+const char *anLangDict::AddString( const char *str ) {
 	if ( ExcludeString( str ) ) {
 		return str;
 	}
 
 	int c = args.Num();
 	for ( int j = 0; j < c; j++ ) {
-		if ( arcNetString::Cmp( args[j].value, str ) == 0 ){
+		if ( anString::Cmp( args[j].value, str ) == 0 ){
 			return args[j].key;
 		}
 	}
 
 	int id = GetNextId();
-	idLangKeyValue kv;
+	anLangKeyValue kv;
 
 	kv.key = va( "#str_%08i", id );
 	// kv.key = va( "#str_%05i", id );
@@ -167,29 +167,29 @@ const char *arcLangDictionary::AddString( const char *str ) {
 
 /*
 ============
-arcLangDictionary::GetNumKeyVals
+anLangDict::GetNumKeyVals
 ============
 */
-int arcLangDictionary::GetNumKeyVals( void ) const {
+int anLangDict::GetNumKeyVals( void ) const {
 	return args.Num();
 }
 
 /*
 ============
-arcLangDictionary::GetKeyVal
+anLangDict::GetKeyVal
 ============
 */
-const idLangKeyValue * arcLangDictionary::GetKeyVal( int i ) const {
+const anLangKeyValue * anLangDict::GetKeyVal( int i ) const {
 	return &args[i];
 }
 
 /*
 ============
-arcLangDictionary::AddKeyVal
+anLangDict::AddKeyVal
 ============
 */
-void arcLangDictionary::AddKeyVal( const char *key, const char *val ) {
-	idLangKeyValue kv;
+void anLangDict::AddKeyVal( const char *key, const char *val ) {
+	anLangKeyValue kv;
 	kv.key = key;
 	kv.value = val;
 	assert( kv.key.Cmpn( STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 );
@@ -198,11 +198,11 @@ void arcLangDictionary::AddKeyVal( const char *key, const char *val ) {
 
 /*
 ============
-arcLangDictionary::ExcludeString
+anLangDict::ExcludeString
 ============
 */
-bool arcLangDictionary::ExcludeString( const char *str ) const {
-	if ( str == NULL ) {
+bool anLangDict::ExcludeString( const char *str ) const {
+	if ( str == nullptr ) {
 		return true;
 	}
 
@@ -211,11 +211,11 @@ bool arcLangDictionary::ExcludeString( const char *str ) const {
 		return true;
 	}
 
-	if ( arcNetString::Cmpn( str, STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 ) {
+	if ( anString::Cmpn( str, STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 ) {
 		return true;
 	}
 
-	if ( arcNetString::Icmpn( str, "gui::", strlen( "gui::" ) ) == 0 ) {
+	if ( anString::Icmpn( str, "gui::", strlen( "gui::" ) ) == 0 ) {
 		return true;
 	}
 
@@ -238,10 +238,10 @@ bool arcLangDictionary::ExcludeString( const char *str ) const {
 
 /*
 ============
-arcLangDictionary::GetNextId
+anLangDict::GetNextId
 ============
 */
-int arcLangDictionary::GetNextId( void ) const {
+int anLangDict::GetNextId( void ) const {
 	int c = args.Num();
 	int id = baseID;	// Lets external user supply the base id for this dictionary
 
@@ -249,7 +249,7 @@ int arcLangDictionary::GetNextId( void ) const {
 		return id;
 	}
 
-	arcNetString work;
+	anString work;
 	for ( int j = 0; j < c; j++ ) {
 		work = args[j].key;
 		work.StripLeading( STRTABLE_ID );
@@ -263,10 +263,10 @@ int arcLangDictionary::GetNextId( void ) const {
 
 /*
 ============
-arcLangDictionary::GetHashKey
+anLangDict::GetHashKey
 ============
 */
-int arcLangDictionary::GetHashKey( const char *str ) const {
+int anLangDict::GetHashKey( const char *str ) const {
 	int hashKey = 0;
 	for ( str += STRTABLE_ID_LENGTH; str[0] != '\0'; str++ ) {
 		assert( str[0] >= '0' && str[0] <= '9' );

@@ -9,11 +9,11 @@
 ===============================================================================
 */
 
-extern const idEventDef EV_Light_GetLightParm;
-extern const idEventDef EV_Light_SetLightParm;
-extern const idEventDef EV_Light_SetLightParms;
+extern const anEventDef EV_Light_GetLightParm;
+extern const anEventDef EV_Light_SetLightParm;
+extern const anEventDef EV_Light_SetLightParms;
 
-class idLight : public idEntity {
+class idLight : public anEntity {
 public:
 	CLASS_PROTOTYPE( idLight );
 
@@ -22,21 +22,21 @@ public:
 
 	void			Spawn( void );
 
-	void			Save( idSaveGame *savefile ) const;					// archives object for save game file
-	void			Restore( idRestoreGame *savefile );					// unarchives object from save game file
+	void			Save( anSaveGame *savefile ) const;					// archives object for save game file
+	void			Restore( anRestoreGame *savefile );					// unarchives object from save game file
 
-	virtual void	UpdateChangeableSpawnArgs( const idDict *source );
+	virtual void	UpdateChangeableSpawnArgs( const anDict *source );
 	virtual void	Think( void );
 	virtual void	FreeLightDef( void );
-	virtual bool	GetPhysicsToSoundTransform( arcVec3 &origin, arcMat3 &axis );
+	virtual bool	GetPhysicsToSoundTransform( anVec3 &origin, anMat3 &axis );
 	void			Present( void );
 
-	void			SaveState( idDict *args );
+	void			SaveState( anDict *args );
 	virtual void	SetColor( float red, float green, float blue );
-	virtual void	SetColor( const arcVec4 &color );
-	virtual void	GetColor( arcVec3 &out ) const;
-	virtual void	GetColor( arcVec4 &out ) const;
-	const arcVec3 &	GetBaseColor( void ) const { return baseColor; }
+	virtual void	SetColor( const anVec4 &color );
+	virtual void	GetColor( anVec3 &out ) const;
+	virtual void	GetColor( anVec4 &out ) const;
+	const anVec3 &	GetBaseColor( void ) const { return baseColor; }
 	void			SetShader( const char *shadername );
 	void			SetLightParm( int parmnum, float value );
 	void			SetLightParms( float parm0, float parm1, float parm2, float parm3 );
@@ -44,57 +44,57 @@ public:
 	void			SetRadius( float radius );
 	void			On( void );
 	void			Off( void );
-	void			Fade( const arcVec4 &to, float fadeTime );
+	void			Fade( const anVec4 &to, float fadeTime );
 	void			FadeOut( float time );
 	void			FadeIn( float time );
-	void			Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location );
-	void			BecomeBroken( idEntity *activator );
+	void			Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
+	void			BecomeBroken( anEntity *activator );
 	qhandle_t		GetLightDefHandle( void ) const { return lightDefHandle; }
-	void			SetLightParent( idEntity *lparent ) { lightParent = lparent; }
+	void			SetLightParent( anEntity *lparent ) { lightParent = lparent; }
 	void			SetLightLevel( void );
 
-// RAVEN BEGIN
-// jshepard: other entities (speakers) need access to the refSound of a light object
+
+// jshepard: other entities ( speakers) need access to the refSound of a light object
 	void			SetRefSound( int rSound ) { refSound.referenceSoundHandle = rSound;}
 // ddynerman: sometimes the game needs to know if this light is ambient
 	bool			IsAmbient( void ) { return renderLight.shader->IsAmbientLight(); }
-// RAVEN END
+
 	virtual void	ShowEditingDialog( void );
 
 	enum {
-		EVENT_BECOMEBROKEN = idEntity::EVENT_MAXEVENTS,
+		EVENT_BECOMEBROKEN = anEntity::EVENT_MAXEVENTS,
 		EVENT_MAXEVENTS
 	};
 
 	virtual void	ClientPredictionThink( void );
-	virtual void	WriteToSnapshot( idBitMsgDelta &msg ) const;
-	virtual void	ReadFromSnapshot( const idBitMsgDelta &msg );
-	virtual bool	ClientReceiveEvent( int event, int time, const idBitMsg &msg );
+	virtual void	WriteToSnapshot( anBitMsgDelta &msg ) const;
+	virtual void	ReadFromSnapshot( const anBitMsgDelta &msg );
+	virtual bool	ClientReceiveEvent( int event, int time, const anBitMsg &msg );
 
 private:
 	renderLight_t	renderLight;				// light presented to the renderer
-	arcVec3			localLightOrigin;			// light origin relative to the physics origin
-	arcMat3			localLightAxis;				// light axis relative to physics axis
+	anVec3			localLightOrigin;			// light origin relative to the physics origin
+	anMat3			localLightAxis;				// light axis relative to physics axis
 	qhandle_t		lightDefHandle;				// handle to renderer light def
-	idStr			brokenModel;
+	anString			brokenModel;
 	int				levels;
 	int				currentLevel;
-	arcVec3			baseColor;
+	anVec3			baseColor;
 	bool			breakOnTrigger;
 	int				count;
 	int				triggercount;
-	idEntity *		lightParent;
-	arcVec4			fadeFrom;
-	arcVec4			fadeTo;
+	anEntity *		lightParent;
+	anVec4			fadeFrom;
+	anVec4			fadeTo;
 	int				fadeStart;
 	int				fadeEnd;
-// RAVEN BEGIN
+
 // bdube: light gui
-	idEntityPtr<idEntity>	lightGUI;
+	anEntityPtr<anEntity>	lightGUI;
 // abahr:
 	float			wait;
 	float			random;
-// RAVEN END
+
 
 private:
 	bool			soundWasPlaying;
@@ -102,18 +102,18 @@ private:
 	void			PresentLightDefChange( void );
 	void			PresentModelDefChange( void );
 
-// RAVEN BEGIN
+
 // jscott: added events for light level
 private:
 	void			Event_SetCurrentLightLevel ( int in );
 	void			Event_SetMaxLightLevel ( int in );
 	void			Event_IsOn( void );
-	void			Event_Break( idEntity *activator, float turnOff );
+	void			Event_Break( anEntity *activator, float turnOff );
 	void			Event_DoneBlinking( void );
 	void			Event_DoneBlinkingOff( void );
 	void			Event_EarthQuake( float requiresLOS );
 	void			Event_Timer( void );
-// RAVEN END
+
 
 private:
 	void			Event_SetShader( const char *shadername );
@@ -126,21 +126,21 @@ private:
 	void			Event_Show( void );
 	void			Event_On( void );
 	void			Event_Off( void );
-	void			Event_ToggleOnOff( idEntity *activator );
+	void			Event_ToggleOnOff( anEntity *activator );
 	void			Event_SetSoundHandles( void );
 	void			Event_FadeOut( float time );
 	void			Event_FadeIn( float time );
-// RAVEN BEGIN
+
 // bdube: set light gui
 	void			Event_SetLightGUI( const char* gui );
-// RAVEN END
+
 };
 
-// RAVEN BEGIN
+
 // bdube: externed events
-extern const idEventDef EV_Light_SetCurrentLightLevel;
-extern const idEventDef EV_Light_SetMaxLightLevel;
-extern const idEventDef EV_Light_SetRadius;
-// RAVEN END
+extern const anEventDef EV_Light_SetCurrentLightLevel;
+extern const anEventDef EV_Light_SetMaxLightLevel;
+extern const anEventDef EV_Light_SetRadius;
+
 
 #endif /* !__GAME_LIGHT_H__ */

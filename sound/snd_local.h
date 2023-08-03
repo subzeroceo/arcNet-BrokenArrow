@@ -185,7 +185,7 @@ public:
 				    idWaveFile( void );
 					~idWaveFile( void );
 
-    int				Open( const char* strFileName, waveformatex_t* pwfx = NULL );
+    int				Open( const char* strFileName, waveformatex_t* pwfx = nullptr );
     int				OpenFromMemory( short* pbData, int ulDataSize, waveformatextensible_t* pwfx );
     int				Read( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead );
 	int				Seek( int offset );
@@ -198,7 +198,7 @@ public:
     waveformatextensible_t	mpwfx;        // Pointer to waveformatex structure
 
 private:
-	arcNetFile *		mhmmio;			// I/O handle for the WAVE
+	anFile *		mhmmio;			// I/O handle for the WAVE
     mminfo_t		mck;			// Multimedia RIFF chunk
     mminfo_t		mckRiff;		// used when opening a WAVE file
     dword			mdwSize;		// size in samples
@@ -211,13 +211,13 @@ private:
     short *			mpbDataCur;
     dword			mulDataSize;
 
-	void *			ogg;			// only !NULL when !s_realTimeDecoding
+	void *			ogg;			// only !nullptr when !s_realTimeDecoding
 	bool			isOgg;
 
 private:
     int				ReadMMIO( void );
 
-    int				OpenOGG( const char* strFileName, waveformatex_t* pwfx = NULL );
+    int				OpenOGG( const char* strFileName, waveformatex_t* pwfx = nullptr );
 	int				ReadOGG( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead );
 	int				CloseOGG( void );
 };
@@ -276,7 +276,7 @@ public:
 /*
 ===================================================================================
 
-arcAudioSystemLocal
+anAudioSystemLocal
 
 ===================================================================================
 */
@@ -312,7 +312,7 @@ protected:
 	float				param;
 
 public:
-						SoundFX()										{ channel = 0; buffer = NULL; initialized = false; maxlen = 0; memset( continuitySamples, 0, sizeof( float ) * 4 ); };
+						SoundFX()										{ channel = 0; buffer = nullptr; initialized = false; maxlen = 0; memset( continuitySamples, 0, sizeof( float ) * 4 ); };
 	virtual				~SoundFX()										{ if ( buffer ) delete buffer; };
 
 	virtual void		Initialize()									{ };
@@ -415,7 +415,7 @@ public:
 	soundShaderParms_t	parms;					// combines the shader parms and the per-channel overrides
 	idSoundSample *		leadinSample;			// if not looped, this is the only sample
 	s_channelType		triggerChannel;
-	const arcSoundShader *soundShader;
+	const anSoundShader *soundShader;
 	idSampleDecoder *	decoder;
 	float				diversity;
 	float				lastVolume;				// last calculated volume based on distance
@@ -431,11 +431,11 @@ public:
 
 };
 
-class arcAudioSystemLocal : public ARCSoundEmitter {
+class anAudioSystemLocal : public ARCSoundEmitter {
 public:
 
-						arcAudioSystemLocal( void );
-	virtual				~arcAudioSystemLocal( void );
+						anAudioSystemLocal( void );
+	virtual				~anAudioSystemLocal( void );
 
 	//----------------------------------------------
 
@@ -446,11 +446,11 @@ public:
 	virtual void		Free( bool immediate );
 
 	// the parms specified will be the default overrides for all sounds started on this emitter.
-	// NULL is acceptable for parms
-	virtual void		UpdateEmitter( const arcVec3 &origin, int listenerId, const soundShaderParms_t *parms );
+	// nullptr is acceptable for parms
+	virtual void		UpdateEmitter( const anVec3 &origin, int listenerId, const soundShaderParms_t *parms );
 
 	// returns the length of the started sound in msec
-	virtual int			StartSound( const arcSoundShader *shader, const s_channelType channel, float diversity = 0, int shaderFlags = 0, bool allowSlow = true /* D3XP */ );
+	virtual int			StartSound( const anSoundShader *shader, const s_channelType channel, float diversity = 0, int shaderFlags = 0, bool allowSlow = true /* D3XP */ );
 
 	// can pass SCHANNEL_ANY
 	virtual void		ModifySound( const s_channelType channel, const soundShaderParms_t *parms );
@@ -471,14 +471,14 @@ public:
 
 	void				OverrideParms( const soundShaderParms_t *base, const soundShaderParms_t *over, soundShaderParms_t *out );
 	void				CheckForCompletion( int current44kHzTime );
-	void				Spatialize( arcVec3 listenerPos, int listenerArea, ARCRenderWorld *rw );
+	void				Spatialize( anVec3 listenerPos, int listenerArea, anRenderWorld *rw );
 
 	idSoundWorldLocal *	soundWorld;				// the world that holds this emitter
 
 	int					index;						// in world emitter list
 	removeStatus_t		removeStatus;
 
-	arcVec3				origin;
+	anVec3				origin;
 	int					listenerId;
 	soundShaderParms_t	parms;						// default overrides for all channels
 
@@ -488,7 +488,7 @@ public:
 	int					lastValidPortalArea;		// so an emitter that slides out of the world continues playing
 	bool				playing;					// if false, no channel is active
 	bool				hasShakes;
-	arcVec3				spatializedOrigin;			// the virtual sound origin, either the real sound origin,
+	anVec3				spatializedOrigin;			// the virtual sound origin, either the real sound origin,
 													// or a point through a portal chain
 	float				realDistance;				// in meters
 	float				distance;					// in meters, this may be the straight-line distance, or
@@ -559,22 +559,22 @@ public:
 	virtual ARCSoundEmitter *EmitterForIndex( int index );
 
 	// query data from all emitters in the world
-	virtual float			CurrentShakeAmplitudeForPosition( const int time, const arcVec3 &listererPosition );
+	virtual float			CurrentShakeAmplitudeForPosition( const int time, const anVec3 &listererPosition );
 
 	// where is the camera/microphone
 	// listenerId allows listener-private sounds to be added
-	virtual void			PlaceListener( const arcVec3 &origin, const arcMat3 &axis, const int listenerId, const int gameTime, const arcNetString& areaName );
+	virtual void			PlaceListener( const anVec3 &origin, const anMat3 &axis, const int listenerId, const int gameTime, const anString& areaName );
 
 	// fade all sounds in the world with a given shader soundClass
-	// to is in Db (sigh), over is in seconds
+	// to is in Db ( sigh), over is in seconds
 	virtual void			FadeSoundClasses( const int soundClass, const float to, const float over );
 
 	// dumps the current state and begins archiving commands
-	virtual void			StartWritingDemo( ARCDemoFile *demo );
+	virtual void			StartWritingDemo( anDemoFile *demo );
 	virtual void			StopWritingDemo( void );
 
 	// read a sound command from a demo file
-	virtual void			ProcessDemoCommand( ARCDemoFile *readDemo );
+	virtual void			ProcessDemoCommand( anDemoFile *readDemo );
 
 	// background music
 	virtual void			PlayShaderDirectly( const char *name, int channel = -1 );
@@ -589,13 +589,13 @@ public:
 	virtual void			AVIClose( void );
 
 	// SaveGame Support
-	virtual void			WriteToSaveGame( arcNetFile *savefile );
-	virtual void			ReadFromSaveGame( arcNetFile *savefile );
+	virtual void			WriteToSaveGame( anFile *savefile );
+	virtual void			ReadFromSaveGame( anFile *savefile );
 
-	virtual void			ReadFromSaveGameSoundChannel( arcNetFile *saveGame, idSoundChannel *ch );
-	virtual void			ReadFromSaveGameSoundShaderParams( arcNetFile *saveGame, soundShaderParms_t *params );
-	virtual void			WriteToSaveGameSoundChannel( arcNetFile *saveGame, idSoundChannel *ch );
-	virtual void			WriteToSaveGameSoundShaderParams( arcNetFile *saveGame, soundShaderParms_t *params );
+	virtual void			ReadFromSaveGameSoundChannel( anFile *saveGame, idSoundChannel *ch );
+	virtual void			ReadFromSaveGameSoundShaderParams( anFile *saveGame, soundShaderParms_t *params );
+	virtual void			WriteToSaveGameSoundChannel( anFile *saveGame, idSoundChannel *ch );
+	virtual void			WriteToSaveGameSoundShaderParams( anFile *saveGame, soundShaderParms_t *params );
 
 	virtual void			SetSlowmo( bool active );
 	virtual void			SetSlowmoSpeed( float speed );
@@ -606,33 +606,33 @@ public:
 							idSoundWorldLocal( void );
 
 	void					Shutdown( void );
-	void					Init( ARCRenderWorld *rw );
+	void					Init( anRenderWorld *rw );
 	void					ClearBuffer( void );
 
 	// update
 	void					ForegroundUpdate( int currentTime );
 	void					OffsetSoundTime( int offset44kHz );
 
-	arcAudioSystemLocal *	AllocLocalSoundEmitter();
-	void					CalcEars( int numSpeakers, arcVec3 realOrigin, arcVec3 listenerPos, arcMat3 listenerAxis, float ears[6], float spatialize );
-	void					AddChannelContribution( arcAudioSystemLocal *sound, idSoundChannel *chan,
+	anAudioSystemLocal *	AllocLocalSoundEmitter();
+	void					CalcEars( int numSpeakers, anVec3 realOrigin, anVec3 listenerPos, anMat3 listenerAxis, float ears[6], float spatialize );
+	void					AddChannelContribution( anAudioSystemLocal *sound, idSoundChannel *chan,
 												int current44kHz, int numSpeakers, float *finalMixBuffer );
 	void					MixLoop( int current44kHz, int numSpeakers, float *finalMixBuffer );
 	void					AVIUpdate( void );
-	void					ResolveOrigin( const int stackDepth, const soundPortalTrace_t *prevStack, const int soundArea, const float dist, const arcVec3& soundOrigin, arcAudioSystemLocal *def );
-	float					FindAmplitude( arcAudioSystemLocal *sound, const int localTime, const arcVec3 *listenerPosition, const s_channelType channel, bool shakesOnly );
+	void					ResolveOrigin( const int stackDepth, const soundPortalTrace_t *prevStack, const int soundArea, const float dist, const anVec3& soundOrigin, anAudioSystemLocal *def );
+	float					FindAmplitude( anAudioSystemLocal *sound, const int localTime, const anVec3 *listenerPosition, const s_channelType channel, bool shakesOnly );
 
 	//============================================
 
-	ARCRenderWorld *			rw;				// for portals and debug drawing
-	ARCDemoFile *			writeDemo;			// if not NULL, archive commands here
+	anRenderWorld *			rw;				// for portals and debug drawing
+	anDemoFile *			writeDemo;			// if not nullptr, archive commands here
 
-	arcMat3					listenerAxis;
-	arcVec3					listenerPos;		// position in meters
+	anMat3					listenerAxis;
+	anVec3					listenerPos;		// position in meters
 	int						listenerPrivateId;
-	arcVec3					listenerQU;			// position in "quake units"
+	anVec3					listenerQU;			// position in "quake units"
 	int						listenerArea;
-	arcNetString					listenerAreaName;
+	anString					listenerAreaName;
 	int						listenerEnvironmentID;
 
 	int						gameMsec;
@@ -640,16 +640,16 @@ public:
 	int						pause44kHz;
 	int						lastAVI44kHz;		// determine when we need to mix and write another block
 
-	arcNetList<arcAudioSystemLocal *>emitters;
+	anList<anAudioSystemLocal *>emitters;
 
 	idSoundFade				soundClassFade[SOUND_MAX_CLASSES];	// for global sound fading
 
 	// avi stuff
-	arcNetFile *				fpa[6];
-	arcNetString					aviDemoPath;
-	arcNetString					aviDemoName;
+	anFile *				fpa[6];
+	anString					aviDemoPath;
+	anString					aviDemoName;
 
-	arcAudioSystemLocal *	localSound;		// just for playShaderDirectly()
+	anAudioSystemLocal *	localSound;		// just for playShaderDirectly()
 
 	bool					slowmoActive;
 	float					slowmoSpeed;
@@ -703,14 +703,14 @@ public:
 
 	int						GetSoundDecoderInfo( int index, soundDecoderInfo_t &decoderInfo );
 
-	// if rw == NULL, no portal occlusion or rendered debugging is available
-	virtual ARCSoundWorld	*AllocSoundWorld( ARCRenderWorld *rw );
+	// if rw == nullptr, no portal occlusion or rendered debugging is available
+	virtual ARCSoundWorld	*AllocSoundWorld( anRenderWorld *rw );
 
-	// specifying NULL will cause silence to be played
+	// specifying nullptr will cause silence to be played
 	virtual void			SetPlayingSoundWorld( ARCSoundWorld *soundWorld );
 
 	// some tools, like the sound dialog, may be used in both the game and the editor
-	// This can return NULL, so check!
+	// This can return nullptr, so check!
 	virtual ARCSoundWorld	*GetPlayingSoundWorld( void );
 
 	virtual	void			BeginLevelLoad( void );
@@ -759,7 +759,7 @@ public:
 
 	float					volumesDB[1200];		// dB to float volume conversion
 
-	arcNetList<SoundFX*>		fxList;
+	anList<SoundFX*>		fxList;
 
 	ALCdevice				*openalDevice;
 	ALCcontext				*openalContext;
@@ -778,48 +778,48 @@ public:
 	static int				EAXAvailable;
 
 
-	static arcCVarSystem			s_noSound;
-	static arcCVarSystem			s_quadraticFalloff;
-	static arcCVarSystem			s_drawSounds;
-	static arcCVarSystem			s_minVolume6;
-	static arcCVarSystem			s_dotbias6;
-	static arcCVarSystem			s_minVolume2;
-	static arcCVarSystem			s_dotbias2;
-	static arcCVarSystem			s_spatializationDecay;
-	static arcCVarSystem			s_showStartSound;
-	static arcCVarSystem			s_maxSoundsPerShader;
-	static arcCVarSystem			s_reverse;
-	static arcCVarSystem			s_showLevelMeter;
-	static arcCVarSystem			s_meterTopTime;
-	static arcCVarSystem			s_volume;
-	static arcCVarSystem			s_constantAmplitude;
-	static arcCVarSystem			s_playDefaultSound;
-	static arcCVarSystem			s_useOcclusion;
-	static arcCVarSystem			s_subFraction;
-	static arcCVarSystem			s_globalFraction;
-	static arcCVarSystem			s_doorDistanceAdd;
-	static arcCVarSystem			s_singleEmitter;
-	static arcCVarSystem			s_numberOfSpeakers;
-	static arcCVarSystem			s_force22kHz;
-	static arcCVarSystem			s_clipVolumes;
-	static arcCVarSystem			s_realTimeDecoding;
-	static arcCVarSystem			s_libOpenAL;
-	static arcCVarSystem			s_useOpenAL;
-	static arcCVarSystem			s_useEAXReverb;
-	static arcCVarSystem			s_muteEAXReverb;
-	static arcCVarSystem			s_decompressionLimit;
+	static anCVarSystem			s_noSound;
+	static anCVarSystem			s_quadraticFalloff;
+	static anCVarSystem			s_drawSounds;
+	static anCVarSystem			s_minVolume6;
+	static anCVarSystem			s_dotbias6;
+	static anCVarSystem			s_minVolume2;
+	static anCVarSystem			s_dotbias2;
+	static anCVarSystem			s_spatializationDecay;
+	static anCVarSystem			s_showStartSound;
+	static anCVarSystem			s_maxSoundsPerShader;
+	static anCVarSystem			s_reverse;
+	static anCVarSystem			s_showLevelMeter;
+	static anCVarSystem			s_meterTopTime;
+	static anCVarSystem			s_volume;
+	static anCVarSystem			s_constantAmplitude;
+	static anCVarSystem			s_playDefaultSound;
+	static anCVarSystem			s_useOcclusion;
+	static anCVarSystem			s_subFraction;
+	static anCVarSystem			s_globalFraction;
+	static anCVarSystem			s_doorDistanceAdd;
+	static anCVarSystem			s_singleEmitter;
+	static anCVarSystem			s_numberOfSpeakers;
+	static anCVarSystem			s_force22kHz;
+	static anCVarSystem			s_clipVolumes;
+	static anCVarSystem			s_realTimeDecoding;
+	static anCVarSystem			s_libOpenAL;
+	static anCVarSystem			s_useOpenAL;
+	static anCVarSystem			s_useEAXReverb;
+	static anCVarSystem			s_muteEAXReverb;
+	static anCVarSystem			s_decompressionLimit;
 
-	static arcCVarSystem			s_slowAttenuate;
+	static anCVarSystem			s_slowAttenuate;
 
-	static arcCVarSystem			s_enviroSuitCutoffFreq;
-	static arcCVarSystem			s_enviroSuitCutoffQ;
-	static arcCVarSystem			s_enviroSuitSkipLowpass;
-	static arcCVarSystem			s_enviroSuitSkipReverb;
+	static anCVarSystem			s_enviroSuitCutoffFreq;
+	static anCVarSystem			s_enviroSuitCutoffQ;
+	static anCVarSystem			s_enviroSuitSkipLowpass;
+	static anCVarSystem			s_enviroSuitSkipReverb;
 
-	static arcCVarSystem			s_reverbTime;
-	static arcCVarSystem			s_reverbFeedback;
-	static arcCVarSystem			s_enviroSuitVolumeScale;
-	static arcCVarSystem			s_skipHelltimeFX;
+	static anCVarSystem			s_reverbTime;
+	static anCVarSystem			s_reverbFeedback;
+	static anCVarSystem			s_enviroSuitVolumeScale;
+	static anCVarSystem			s_skipHelltimeFX;
 
 	//#modified-fva; BEGIN
 	float					cstLastVolume;
@@ -844,7 +844,7 @@ public:
 							idSoundSample();
 							~idSoundSample();
 
-	arcNetString					name;						// name of the sample file
+	anString					name;						// name of the sample file
 	ARC_TIME_T		 			timestamp;					// the most recent of all images used in creation, for reloadImages command
 
 	waveformatex_t			objectInfo;					// what are we caching
@@ -908,7 +908,7 @@ public:
 							idSoundCache();
 							~idSoundCache();
 
-	idSoundSample *			FindSound( const arcNetString &fname, bool loadOnDemandOnly );
+	idSoundSample *			FindSound( const anString &fname, bool loadOnDemandOnly );
 
 	const int				GetNumObjects( void ) { return listCache.Num(); }
 	const idSoundSample *	GetObject( const int index ) const;
@@ -922,7 +922,7 @@ public:
 
 private:
 	bool					insideLevelLoad;
-	arcNetList<idSoundSample*>	listCache;
+	anList<idSoundSample*>	listCache;
 };
 
 #endif /* !__SND_LOCAL_H__ */

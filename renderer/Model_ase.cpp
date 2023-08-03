@@ -1,7 +1,10 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Model_ase.h"
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /*
 ======================================================================
@@ -37,13 +40,11 @@ typedef struct {
 static ase_t ase;
 
 
-static aseMesh_t *ASE_GetCurrentMesh( void )
-{
+static aseMesh_t *ASE_GetCurrentMesh( void ) {
 	return ase.currentMesh;
 }
 
-static int CharIsTokenDelimiter( int ch )
-{
+static int CharIsTokenDelimiter( int ch ) {
 	if ( ch <= 32 )
 		return 1;
 	return 0;
@@ -124,8 +125,8 @@ static void ASE_KeyMAP_DIFFUSE( const char *token ) {
 	aseMaterial_t *material;
 
 	if ( !strcmp( token, "*BITMAP" ) ) {
-		arcNetString	qpath;
-		arcNetString	matname;
+		anString	qpath;
+		anString	matname;
 
 		ASE_GetToken( false );
 
@@ -139,7 +140,7 @@ static void ASE_KeyMAP_DIFFUSE( const char *token ) {
 		// convert the 3DSMax material pathname to a qpath
 		matname.BackSlashesToSlashes();
 		qpath = fileSystem->OSPathToRelativePath( matname );
-		arcNetString::Copynz( ase.currentMaterial->name, qpath, sizeof( ase.currentMaterial->name ) );
+		anString::Copynz( ase.currentMaterial->name, qpath, sizeof( ase.currentMaterial->name ) );
 	} else if ( !strcmp( token, "*UVW_U_OFFSET" ) ) {
 		material = ase.model->materials[ase.model->materials.Num() - 1];
 		ASE_GetToken( false );
@@ -161,6 +162,12 @@ static void ASE_KeyMAP_DIFFUSE( const char *token ) {
 		ASE_GetToken( false );
 		material->angle = atof( ase.token );
 	} else {
+    if ( strstr( buff2, buff1 + 2 ) ) {
+			strcpy( ase.materials[ase.numMaterials].name, strstr( buff2, buff1 + 2 ) + strlen( buff1 ) - 2 );
+		} else {
+			sprintf( ase.materials[ase.numMaterials].name, "(not converted: '%s')", buffer );
+			printf( "WARNING: illegal material name '%s'\n", buffer );
+		}
 	}
 }
 
@@ -230,46 +237,6 @@ static void ASE_KeyMESH_VERTEX_LIST( const char *token ) {
 		}
 	} else {
 		common->Error( "Unknown token '%s' while parsing MESH_VERTEX_LIST", token );
-	}
-}
-
-static void ASE_KeyMESH_FACE_LIST( const char *token ) {
-	aseMesh_t *pMesh = ASE_GetCurrentMesh();
-
-	if ( !strcmp( token, "*MESH_FACE" ) ) {
-		ASE_GetToken( false );	// skip face number
-
-		// we are flipping the order here to change the front/back facing
-		// from 3DS to our standard (clockwise facing out)
-		ASE_GetToken( false );	// skip label
-		ASE_GetToken( false );	// first vertex
-		pMesh->faces[ase.currentFace].vertexNum[0] = atoi( ase.token );
-
-		ASE_GetToken( false );	// skip label
-		ASE_GetToken( false );	// second vertex
-		pMesh->faces[ase.currentFace].vertexNum[2] = atoi( ase.token );
-
-		ASE_GetToken( false );	// skip label
-		ASE_GetToken( false );	// third vertex
-		pMesh->faces[ase.currentFace].vertexNum[1] = atoi( ase.token );
-
-		ASE_GetToken( true );
-
-		// we could parse material id and smoothing groups here
-/*
-		if ( ( p = strstr( ase.token, "*MESH_MTLID" ) ) != 0 ) {
-			p += strlen( "*MESH_MTLID" ) + 1;
-			mtlID = atoi( p );
-		} else {
-			common->Error( "No *MESH_MTLID found for face!" );
-		}
-*/
-
-		ase.currentFace++;
-	}
-	else
-	{
-		common->Error( "Unknown token '%s' while parsing MESH_FACE_LIST", token );
 	}
 }
 
@@ -376,7 +343,7 @@ static void ASE_KeyMESH_CVERTLIST( const char *token ) {
 static void ASE_KeyMESH_NORMALS( const char *token ) {
 	aseMesh_t *pMesh = ASE_GetCurrentMesh();
 	aseFace_t	*f;
-	arcVec3		n;
+	anVec3		n;
 
 	pMesh->normalsParsed = true;
 	f = &pMesh->faces[ase.currentFace];
@@ -446,97 +413,73 @@ static void ASE_KeyMESH( const char *token ) {
 
 	if ( !strcmp( token, "*TIMEVALUE" ) ) {
 		ASE_GetToken( false );
-
 		pMesh->timeValue = atoi( ase.token );
 		VERBOSE( ( ".....timevalue: %d\n", pMesh->timeValue ) );
 	} else if ( !strcmp( token, "*MESH_NUMVERTEX" ) ) {
 		ASE_GetToken( false );
-
 		pMesh->numVertexes = atoi( ase.token );
 		VERBOSE( ( ".....num vertexes: %d\n", pMesh->numVertexes ) );
 	} else if ( !strcmp( token, "*MESH_NUMTVERTEX" ) ) {
 		ASE_GetToken( false );
-
 		pMesh->numTVertexes = atoi( ase.token );
 		VERBOSE( ( ".....num tvertexes: %d\n", pMesh->numTVertexes ) );
 	} else if ( !strcmp( token, "*MESH_NUMCVERTEX" ) ) {
 		ASE_GetToken( false );
-
 		pMesh->numCVertexes = atoi( ase.token );
 		VERBOSE( ( ".....num cvertexes: %d\n", pMesh->numCVertexes ) );
 	} else if ( !strcmp( token, "*MESH_NUMFACES" ) ) {
 		ASE_GetToken( false );
-
 		pMesh->numFaces = atoi( ase.token );
 		VERBOSE( ( ".....num faces: %d\n", pMesh->numFaces ) );
 	} else if ( !strcmp( token, "*MESH_NUMTVFACES" ) ) {
 		ASE_GetToken( false );
-
 		pMesh->numTVFaces = atoi( ase.token );
 		VERBOSE( ( ".....num tvfaces: %d\n", pMesh->numTVFaces ) );
-
 		if ( pMesh->numTVFaces != pMesh->numFaces ) {
 			common->Error( "MESH_NUMTVFACES != MESH_NUMFACES" );
 		}
 	} else if ( !strcmp( token, "*MESH_NUMCVFACES" ) ) {
 		ASE_GetToken( false );
-
 		pMesh->numCVFaces = atoi( ase.token );
 		VERBOSE( ( ".....num cvfaces: %d\n", pMesh->numCVFaces ) );
-
-		if ( pMesh->numTVFaces != pMesh->numFaces )
-		{
+		if ( pMesh->numTVFaces != pMesh->numFaces ) {
 			common->Error( "MESH_NUMCVFACES != MESH_NUMFACES" );
 		}
-	}
-	else if ( !strcmp( token, "*MESH_VERTEX_LIST" ) )
-	{
-		pMesh->vertexes = (arcVec3 *)Mem_Alloc( sizeof( arcVec3 ) * pMesh->numVertexes );
+	} else if ( !strcmp( token, "*MESH_VERTEX_LIST" ) ) {
+		pMesh->vertexes = (anVec3 *)Mem_Alloc( sizeof( anVec3 ) * pMesh->numVertexes );
 		ase.currentVertex = 0;
 		VERBOSE( ( ".....parsing MESH_VERTEX_LIST\n" ) );
 		ASE_ParseBracedBlock( ASE_KeyMESH_VERTEX_LIST );
-	}
-	else if ( !strcmp( token, "*MESH_TVERTLIST" ) )
-	{
+	} else if ( !strcmp( token, "*MESH_TVERTLIST" ) ) {
 		ase.currentVertex = 0;
-		pMesh->tvertexes = (arcVec2 *)Mem_Alloc( sizeof( arcVec2 ) * pMesh->numTVertexes );
+		pMesh->tvertexes = (anVec2 *)Mem_Alloc( sizeof( anVec2 ) * pMesh->numTVertexes );
 		VERBOSE( ( ".....parsing MESH_TVERTLIST\n" ) );
 		ASE_ParseBracedBlock( ASE_KeyMESH_TVERTLIST );
-	}
-	else if ( !strcmp( token, "*MESH_CVERTLIST" ) )
-	{
+	} else if ( !strcmp( token, "*MESH_CVERTLIST" ) ) {
 		ase.currentVertex = 0;
-		pMesh->cvertexes = (arcVec3 *)Mem_Alloc( sizeof( arcVec3 ) * pMesh->numCVertexes );
+		pMesh->cvertexes = (anVec3 *)Mem_Alloc( sizeof( anVec3 ) * pMesh->numCVertexes );
 		VERBOSE( ( ".....parsing MESH_CVERTLIST\n" ) );
 		ASE_ParseBracedBlock( ASE_KeyMESH_CVERTLIST );
-	}
-	else if ( !strcmp( token, "*MESH_FACE_LIST" ) )
-	{
+	} else if ( !strcmp( token, "*MESH_FACE_LIST" ) ) {
 		pMesh->faces = (aseFace_t *)Mem_Alloc( sizeof( aseFace_t ) * pMesh->numFaces );
 		ase.currentFace = 0;
 		VERBOSE( ( ".....parsing MESH_FACE_LIST\n" ) );
 		ASE_ParseBracedBlock( ASE_KeyMESH_FACE_LIST );
-	}
-	else if ( !strcmp( token, "*MESH_TFACELIST" ) )
-	{
+	} else if ( !strcmp( token, "*MESH_TFACELIST" ) ) {
 		if ( !pMesh->faces ) {
 			common->Error( "*MESH_TFACELIST before *MESH_FACE_LIST" );
 		}
 		ase.currentFace = 0;
 		VERBOSE( ( ".....parsing MESH_TFACE_LIST\n" ) );
 		ASE_ParseBracedBlock( ASE_KeyTFACE_LIST );
-	}
-	else if ( !strcmp( token, "*MESH_CFACELIST" ) )
-	{
+	} else if ( !strcmp( token, "*MESH_CFACELIST" ) ) {
 		if ( !pMesh->faces ) {
 			common->Error( "*MESH_CFACELIST before *MESH_FACE_LIST" );
 		}
 		ase.currentFace = 0;
 		VERBOSE( ( ".....parsing MESH_CFACE_LIST\n" ) );
 		ASE_ParseBracedBlock( ASE_KeyCFACE_LIST );
-	}
-	else if ( !strcmp( token, "*MESH_NORMALS" ) )
-	{
+	} else if ( !strcmp( token, "*MESH_NORMALS" ) ) {
 		if ( !pMesh->faces ) {
 			common->Warning( "*MESH_NORMALS before *MESH_FACE_LIST" );
 		}
@@ -573,7 +516,7 @@ static void ASE_KeyGEOMOBJECT( const char *token ) {
 	if ( !strcmp( token, "*NODE_NAME" ) ) {
 		ASE_GetToken( true );
 		VERBOSE( ( " %s\n", ase.token ) );
-		arcNetString::Copynz( object->name, ase.token, sizeof( object->name ) );
+		anString::Copynz( object->name, ase.token, sizeof( object->name ) );
 	} else if ( !strcmp( token, "*NODE_PARENT" ) ) {
 		ASE_SkipRestOfLine();
 	// ignore unused data blocks
@@ -633,9 +576,9 @@ aseModel_t *ASE_Parse( const char *buffer, bool verbose ) {
 	ase.buffer = buffer;
 	ase.len = strlen( buffer );
 	ase.curpos = ase.buffer;
-	ase.currentObject = NULL;
+	ase.currentObject = nullptr;
 
-	// NOTE: using new operator because aseModel_t contains arcNetList class objects
+	// NOTE: using new operator because aseModel_t contains anList class objects
 	ase.model = new aseModel_t;
 	memset( ase.model, 0, sizeof( aseModel_t ) );
 	ase.model->objects.Resize( 32, 32 );
@@ -678,7 +621,7 @@ aseModel_t *ASE_Load( const char *fileName ) {
 
 	fileSystem->ReadFile( fileName, (void **)&buf, &timeStamp );
 	if ( !buf ) {
-		return NULL;
+		return nullptr;
 	}
 
 	ase = ASE_Parse( buf, false );
@@ -749,4 +692,442 @@ void ASE_Free( aseModel_t *ase ) {
 	ase->materials.Clear();
 
 	delete ase;
+}
+
+void ASE_Free( void ) {
+	for ( int i = 0; i < ase.currentObject; i++ ) {
+		ASE_FreeGeomObject( i );
+	}
+}
+
+/*===============================================================================*/
+
+/*
+** ASE_Load
+*/
+void ASE_Load( const char *filename, bool verbose, bool grabAnims ) {
+	FILE *fp = fopen( filename, "rb" );
+
+	if ( !fp )
+		Error( "File not found '%s'", filename );
+
+	memset( &ase, 0, sizeof( ase ) );
+
+	ase.verbose = verbose;
+	ase.grabAnims = grabAnims;
+	ase.len = Q_filelength( fp );
+
+	ase.curpos = ase.buffer = malloc( ase.len );
+
+	printf( "Processing '%s'\n", filename );
+
+	if ( fread( ase.buffer, ase.len, 1, fp ) != 1 )
+	{
+		fclose( fp );
+		Error( "fread() != -1 for '%s'", filename );
+	}
+
+	fclose( fp );
+
+	ASE_Process();
+}
+
+
+/*
+** ASE_GetNumSurfaces
+*/
+int ASE_GetNumSurfaces( void )
+{
+	return ase.currentObject;
+}
+
+/*
+** ASE_GetSurfaceName
+*/
+const char *ASE_GetSurfaceName( int which )
+{
+	aseGeomObject_t *pObject = &ase.objects[which];
+
+	if ( !pObject->anim.numFrames )
+		return 0;
+
+	return pObject->name;
+}
+
+/*
+** ASE_GetSurfaceAnimation
+**
+** Returns an animation ( sequence of polysets)
+*/
+polyset_t *ASE_GetSurfaceAnimation( int which, int *pNumFrames, int skipFrameStart, int skipFrameEnd, int maxFrames )
+{
+	aseGeomObject_t *pObject = &ase.objects[which];
+	polyset_t *psets;
+	int numFramesInAnimation;
+	int numFramesToKeep;
+	int i, f;
+
+	if ( !pObject->anim.numFrames )
+		return 0;
+
+	if ( pObject->anim.numFrames > maxFrames && maxFrames != -1 )
+	{
+		numFramesInAnimation = maxFrames;
+	}
+	else
+	{
+		numFramesInAnimation = pObject->anim.numFrames;
+		if ( maxFrames != -1 )
+			printf( "WARNING: ASE_GetSurfaceAnimation maxFrames > numFramesInAnimation\n" );
+	}
+
+	if ( skipFrameEnd != -1 )
+		numFramesToKeep = numFramesInAnimation - ( skipFrameEnd - skipFrameStart + 1 );
+	else
+		numFramesToKeep = numFramesInAnimation;
+
+	*pNumFrames = numFramesToKeep;
+
+	psets = calloc( sizeof( polyset_t ) * numFramesToKeep, 1 );
+
+	for ( f = 0, i = 0; i < numFramesInAnimation; i++ )
+	{
+		int t;
+		aseMesh_t *pMesh = &pObject->anim.frames[i];
+
+		if ( skipFrameStart != -1 )
+		{
+			if ( i >= skipFrameStart && i <= skipFrameEnd )
+				continue;
+		}
+
+		strcpy( psets[f].name, pObject->name );
+		strcpy( psets[f].materialname, ase.materials[pObject->materialRef].name );
+
+		psets[f].triangles = calloc( sizeof( triangle_t ) * pObject->anim.frames[i].numFaces, 1 );
+		psets[f].numtriangles = pObject->anim.frames[i].numFaces;
+
+		for ( t = 0; t < pObject->anim.frames[i].numFaces; t++ )
+		{
+			int k;
+
+			for ( k = 0; k < 3; k++ )
+			{
+				psets[f].triangles[t].verts[k][0] = pMesh->vertexes[pMesh->faces[t][k]].x;
+				psets[f].triangles[t].verts[k][1] = pMesh->vertexes[pMesh->faces[t][k]].y;
+				psets[f].triangles[t].verts[k][2] = pMesh->vertexes[pMesh->faces[t][k]].z;
+
+				if ( pMesh->tvertexes && pMesh->tfaces )
+				{
+					psets[f].triangles[t].texcoords[k][0] = pMesh->tvertexes[pMesh->tfaces[t][k]].s;
+					psets[f].triangles[t].texcoords[k][1] = pMesh->tvertexes[pMesh->tfaces[t][k]].t;
+				}
+
+			}
+		}
+
+		f++;
+	}
+
+	return psets;
+}
+
+static void ASE_FreeGeomObject( int ndx ) {
+	aseGeomObject_t *pObject;
+	int i;
+
+	pObject = &ase.objects[ndx];
+
+	for ( i = 0; i < pObject->anim.numFrames; i++ ) {
+		if ( pObject->anim.frames[i].vertexes ) {
+			free( pObject->anim.frames[i].vertexes );
+		}
+		if ( pObject->anim.frames[i].tvertexes ) {
+			free( pObject->anim.frames[i].tvertexes );
+		}
+		if ( pObject->anim.frames[i].faces ) {
+			free( pObject->anim.frames[i].faces );
+		}
+		if ( pObject->anim.frames[i].tfaces ) {
+			free( pObject->anim.frames[i].tfaces );
+		}
+	}
+
+	memset( pObject, 0, sizeof( *pObject ) );
+}
+
+static aseMesh_t *ASE_GetCurrentMesh( void ) {
+	aseGeomObject_t *pObject;
+
+	if ( ase.currentObject >= MAX_ASE_OBJECTS ) {
+		Error( "Too many GEOMOBJECTs" );
+		return 0; // never called
+	}
+
+	pObject = &ase.objects[ase.currentObject];
+
+	if ( pObject->anim.currentFrame >= MAX_ASE_ANIMATION_FRAMES ) {
+		Error( "Too many MESHes" );
+		return 0;
+	}
+
+	return &pObject->anim.frames[pObject->anim.currentFrame];
+}
+
+static void ASE_SkipEnclosingBraces( void ) {
+	int indent = 0;
+
+	while ( ASE_GetToken( false ) ) {
+		if ( !strcmp( s_token, "{" ) ) {
+			indent++;
+		} else if ( !strcmp( s_token, "}" ) ) {
+			indent--;
+			if ( indent == 0 )
+				break;
+			else if ( indent < 0 )
+				Error( "Unexpected '}'" );
+		}
+	}
+}
+
+static void ASE_KeyMESH_FACE_LIST( const char *token ) {
+	aseMesh_t *pMesh = ASE_GetCurrentMesh();
+
+	if ( !strcmp( token, "*MESH_FACE" ) ) {
+		ASE_GetToken( qfalse );	// skip face number
+
+		ASE_GetToken( qfalse );	// skip label
+		ASE_GetToken( qfalse );	// first vertex
+		pMesh->faces[pMesh->currentFace][0] = atoi( s_token );
+
+		ASE_GetToken( qfalse );	// skip label
+		ASE_GetToken( qfalse );	// second vertex
+		pMesh->faces[pMesh->currentFace][2] = atoi( s_token );
+
+		ASE_GetToken( qfalse );	// skip label
+		ASE_GetToken( qfalse );	// third vertex
+		pMesh->faces[pMesh->currentFace][1] = atoi( s_token );
+
+		ASE_GetToken( qtrue );
+
+/*		if ( ( p = strstr( s_token, "*MESH_MTLID" ) ) != 0 ) {
+			p += strlen( "*MESH_MTLID" ) + 1;
+			mtlID = atoi( p );
+		} else
+			Error( "No *MESH_MTLID found for face!" );
+		}*/
+
+		pMesh->currentFace++;
+	} else {
+		Error( "Unknown token '%s' while parsing MESH_FACE_LIST", token );
+	}
+}
+
+static void ASE_KeyTFACE_LIST( const char *token ) {
+	aseMesh_t *pMesh = ASE_GetCurrentMesh();
+
+	if ( !strcmp( token, "*MESH_TFACE" ) ) {
+		int a, b, c;
+
+		ASE_GetToken( qfalse );
+
+		ASE_GetToken( qfalse );
+		a = atoi( s_token );
+		ASE_GetToken( qfalse );
+		c = atoi( s_token );
+		ASE_GetToken( qfalse );
+		b = atoi( s_token );
+
+		pMesh->tfaces[pMesh->currentFace][0] = a;
+		pMesh->tfaces[pMesh->currentFace][1] = b;
+		pMesh->tfaces[pMesh->currentFace][2] = c;
+
+		pMesh->currentFace++;
+	} else {
+		Error( "Unknown token '%s' in MESH_TFACE", token );
+	}
+}
+
+static void ASE_KeyMESH_ANIMATION( const char *token ) {
+	aseMesh_t *pMesh = ASE_GetCurrentMesh();
+
+	// loads a single animation frame
+	if ( !strcmp( token, "*MESH" ) ) {
+		VERBOSE( ( "...found MESH\n" ) );
+		assert( pMesh->faces == 0 );
+		assert( pMesh->vertexes == 0 );
+		assert( pMesh->tvertexes == 0 );
+		memset( pMesh, 0, sizeof( *pMesh ) );
+
+		ASE_ParseBracedBlock( ASE_KeyMESH );
+
+		if ( ++ase.objects[ase.currentObject].anim.currentFrame == MAX_ASE_ANIMATION_FRAMES ) {
+			Error( "Too many animation frames" );
+		}
+	} else {
+		Error( "Unknown token '%s' while parsing MESH_ANIMATION", token );
+	}
+}
+
+static void ASE_KeyGEOMOBJECT( const char *token ) {
+	if ( !strcmp( token, "*NODE_NAME" ) ) {
+		char *name = ase.objects[ase.currentObject].name;
+
+		ASE_GetToken( qtrue );
+		VERBOSE( ( " %s\n", s_token ) );
+		strcpy( ase.objects[ase.currentObject].name, s_token + 1 );
+		if ( strchr( ase.objects[ase.currentObject].name, '"' ) )
+			*strchr( ase.objects[ase.currentObject].name, '"' ) = 0;
+
+		if ( strstr( name, "tag" ) == name ) {
+			while ( strchr( name, '_' ) != strrchr( name, '_' ) )
+			{
+				*strrchr( name, '_' ) = 0;
+			}
+			while ( strrchr( name, ' ' ) )
+			{
+				*strrchr( name, ' ' ) = 0;
+			}
+		}
+	} else if ( !strcmp( token, "*NODE_PARENT" ) ) {
+		ASE_SkipRestOfLine();
+	// ignore unused data blocks
+	} else if ( !strcmp( token, "*NODE_TM" ) ||
+		      !strcmp( token, "*TM_ANIMATION" ) ) {
+		ASE_ParseBracedBlock( 0 );
+	}
+	// ignore regular meshes that aren't part of animation
+	else if ( !strcmp( token, "*MESH" ) && !ase.grabAnims ) {
+/*		if ( strstr( ase.objects[ase.currentObject].name, "tag_" ) == ase.objects[ase.currentObject].name )  {
+			s_forceStaticMesh = true;
+			ASE_ParseBracedBlock( ASE_KeyMESH );
+			s_forceStaticMesh = false;
+		}*/
+		ASE_ParseBracedBlock( ASE_KeyMESH );
+		if ( ++ase.objects[ase.currentObject].anim.currentFrame == MAX_ASE_ANIMATION_FRAMES ) {
+			Error( "Too many animation frames" );
+		}
+		ase.objects[ase.currentObject].anim.numFrames = ase.objects[ase.currentObject].anim.currentFrame;
+		ase.objects[ase.currentObject].numAnimations++;
+/*		// ignore meshes that aren't part of animations if this object isn't a
+		// a tag
+		else {
+			ASE_ParseBracedBlock( 0 );
+		}*/
+	// according to spec these are obsolete
+	} else if ( !strcmp( token, "*MATERIAL_REF" ) ) {
+		ASE_GetToken( qfalse );
+		ase.objects[ase.currentObject].materialRef = atoi( s_token );
+	// loads a sequence of animation frames
+	} else if ( !strcmp( token, "*MESH_ANIMATION" ) ) {
+		if ( ase.grabAnims ) {
+			VERBOSE( ( "..found MESH_ANIMATION\n" ) );
+
+			if ( ase.objects[ase.currentObject].numAnimations ) {
+				Error( "Multiple MESH_ANIMATIONS within a single GEOM_OBJECT" );
+			}
+			ASE_ParseBracedBlock( ASE_KeyMESH_ANIMATION );
+			ase.objects[ase.currentObject].anim.numFrames = ase.objects[ase.currentObject].anim.currentFrame;
+			ase.objects[ase.currentObject].numAnimations++;
+		} else {
+			ASE_SkipEnclosingBraces();
+		}
+	}
+	// skip unused info
+	else if ( !strcmp( token, "*PROP_MOTIONBLUR" ) ||
+		      !strcmp( token, "*PROP_CASTSHADOW" ) ||
+			  !strcmp( token, "*PROP_RECVSHADOW" ) ) {
+		ASE_SkipRestOfLine();
+	}
+}
+
+static void ConcatenateObjects( aseGeomObject_t *pObjA, aseGeomObject_t *pObjB ) {
+}
+
+static void CollapseObjects( void ) {
+	int numObjects = ase.currentObject;
+
+	for ( int i = 0; i < numObjects; i++ ) {
+		int j;
+		// skip tags
+		if ( strstr( ase.objects[i].name, "tag" ) == ase.objects[i].name ) {
+			continue;
+		}
+
+		if ( !ase.objects[i].numAnimations ) {
+			continue;
+		}
+
+		for ( j = i + 1; j < numObjects; j++ ) {
+			if ( strstr( ase.objects[j].name, "tag" ) == ase.objects[j].name ) {
+				continue;
+			}
+			if ( ase.objects[i].materialRef == ase.objects[j].materialRef ) {
+				if ( ase.objects[j].numAnimations ) {
+					ConcatenateObjects( &ase.objects[i], &ase.objects[j] );
+				}
+			}
+		}
+	}
+}
+
+/*
+** ASE_Process
+*/
+static void ASE_Process( void )
+{
+	while ( ASE_GetToken( qfalse ) )
+	{
+		if ( !strcmp( s_token, "*3DSMAX_ASCIIEXPORT" ) ||
+			 !strcmp( s_token, "*COMMENT" ) )
+		{
+			ASE_SkipRestOfLine();
+		}
+		else if ( !strcmp( s_token, "*SCENE" ) )
+			ASE_SkipEnclosingBraces();
+		else if ( !strcmp( s_token, "*MATERIAL_LIST" ) )
+		{
+			VERBOSE( ( "MATERIAL_LIST\n" ) );
+
+			ASE_ParseBracedBlock( ASE_KeyMATERIAL_LIST );
+		}
+		else if ( !strcmp( s_token, "*GEOMOBJECT" ) )
+		{
+			VERBOSE( ( "GEOMOBJECT" ) );
+
+			ASE_ParseBracedBlock( ASE_KeyGEOMOBJECT );
+
+			if ( strstr( ase.objects[ase.currentObject].name, "Bip" ) ||
+				 strstr( ase.objects[ase.currentObject].name, "ignore_" ) )
+			{
+				ASE_FreeGeomObject( ase.currentObject );
+				VERBOSE( ( "(discarding BIP/ignore object)\n" ) );
+			}
+			else if ( ( strstr( ase.objects[ase.currentObject].name, "h_" ) != ase.objects[ase.currentObject].name ) &&
+				      ( strstr( ase.objects[ase.currentObject].name, "l_" ) != ase.objects[ase.currentObject].name ) &&
+					  ( strstr( ase.objects[ase.currentObject].name, "u_" ) != ase.objects[ase.currentObject].name ) &&
+					  ( strstr( ase.objects[ase.currentObject].name, "tag" ) != ase.objects[ase.currentObject].name ) &&
+					  ase.grabAnims )
+			{
+				VERBOSE( ( "(ignoring improperly labeled object '%s')\n", ase.objects[ase.currentObject].name ) );
+				ASE_FreeGeomObject( ase.currentObject );
+			}
+			else
+			{
+				if ( ++ase.currentObject == MAX_ASE_OBJECTS )
+				{
+					Error( "Too many GEOMOBJECTs" );
+				}
+			}
+		}
+		else if ( s_token[0] )
+		{
+			printf( "Unknown token '%s'\n", s_token );
+		}
+	}
+
+	if ( !ase.currentObject )
+		Error( "No animation data!" );
+
+	CollapseObjects();
 }

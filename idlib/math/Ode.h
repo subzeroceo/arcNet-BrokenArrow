@@ -12,16 +12,16 @@
 
 //===============================================================
 //
-//	idODE
+//	anODE
 //
 //===============================================================
 
 typedef void (*deriveFunction_t)( const float t, const void *userData, const float *state, float *derivatives );
 
-class idODE {
+class anODE {
 
 public:
-	virtual				~idODE( void ) {}
+	virtual				~anODE( void ) {}
 
 	virtual float		Evaluate( const float *state, float *newState, float t0, float t1 ) = 0;
 
@@ -33,15 +33,15 @@ protected:
 
 //===============================================================
 //
-//	idODE_Euler
+//	anODE_Euler
 //
 //===============================================================
 
-class idODE_Euler : public idODE {
+class anODE_Euler : public anODE {
 
 public:
-						idODE_Euler( const int dim, const deriveFunction_t dr, const void *ud );
-	virtual				~idODE_Euler( void );
+						anODE_Euler( const int dim, const deriveFunction_t dr, const void *ud );
+	virtual				~anODE_Euler( void );
 
 	virtual float		Evaluate( const float *state, float *newState, float t0, float t1 );
 
@@ -51,15 +51,15 @@ protected:
 
 //===============================================================
 //
-//	idODE_Midpoint
+//	anODE_Midpoint
 //
 //===============================================================
 
-class idODE_Midpoint : public idODE {
+class anODE_Midpoint : public anODE {
 
 public:
-						idODE_Midpoint( const int dim, const deriveFunction_t dr, const void *ud );
-	virtual				~idODE_Midpoint( void );
+						anODE_Midpoint( const int dim, const deriveFunction_t dr, const void *ud );
+	virtual				~anODE_Midpoint( void );
 
 	virtual float		Evaluate( const float *state, float *newState, float t0, float t1 );
 
@@ -70,15 +70,15 @@ protected:
 
 //===============================================================
 //
-//	idODE_RK4
+//	anODE_RK4
 //
 //===============================================================
 
-class idODE_RK4 : public idODE {
+class anODE_RK4 : public anODE {
 
 public:
-						idODE_RK4( const int dim, const deriveFunction_t dr, const void *ud );
-	virtual				~idODE_RK4( void );
+						anODE_RK4( const int dim, const deriveFunction_t dr, const void *ud );
+	virtual				~anODE_RK4( void );
 
 	virtual float		Evaluate( const float *state, float *newState, float t0, float t1 );
 
@@ -92,15 +92,15 @@ protected:
 
 //===============================================================
 //
-//	idODE_RK4Adaptive
+//	anODE_RK4Adaptive
 //
 //===============================================================
 
-class idODE_RK4Adaptive : public idODE {
+class anODE_RK4Adaptive : public anODE {
 
 public:
-						idODE_RK4Adaptive( const int dim, const deriveFunction_t dr, const void *ud );
-	virtual				~idODE_RK4Adaptive( void );
+						anODE_RK4Adaptive( const int dim, const deriveFunction_t dr, const void *ud );
+	virtual				~anODE_RK4Adaptive( void );
 
 	virtual float		Evaluate( const float *state, float *newState, float t0, float t1 );
 	void				SetMaxError( const float err );
@@ -115,4 +115,4 @@ protected:
 	float *				d4;
 };
 
-#endif /* !__MATH_ODE_H__ */
+#endif // !__MATH_ODE_H__

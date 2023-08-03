@@ -185,10 +185,10 @@ public:
 	idDialogInfo() {
 		msg					= GDM_INVALID;
 		type				= DIALOG_ACCEPT;
-		acceptCB			= NULL;
-		cancelCB			= NULL;
-		altCBOne			= NULL;
-		altCBTwo			= NULL;
+		acceptCB			= nullptr;
+		cancelCB			= nullptr;
+		altCBOne			= nullptr;
+		altCBTwo			= nullptr;
 		showing				= false;
 		clear				= false;
 		waitClear			= false;
@@ -213,12 +213,12 @@ public:
 	bool					renderDuringLoad;
 	int						startTime;
 	int						killTime;
-	aRcStaticString< 256 >		overrideMsg;
+	anStaticString< 256 >		overrideMsg;
 
-	idStrId					txt1;
-	idStrId					txt2;
-	idStrId					txt3;
-	idStrId					txt4;
+	anStringId					txt1;
+	anStringId					txt2;
+	anStringId					txt3;
+	anStringId					txt4;
 };
 
 /*
@@ -228,8 +228,8 @@ idLoadScreenInfo
 */
 class idLoadScreenInfo {
 public:
-	arcNetString	varName;
-	arcNetString	value;
+	anString	varName;
+	anString	value;
 };
 
 /*
@@ -240,7 +240,7 @@ public:
 ==============================================================
 */
 
-class arcCommonDlg {
+class anCommonDlg {
 public:
 	void	Init();
 	void	Render( bool loading );
@@ -250,16 +250,16 @@ public:
 	bool	IsDialogPausing() { return dialogPause; }
 	void	ClearDialogs( bool forceClear = false );
 	bool	HasDialogMsg( gameDialogMessages_t msg, bool * isNowActive );
-	void	AddDialog( gameDialogMessages_t msg, dialogType_t type, idSWFScriptFunction * acceptCallback, idSWFScriptFunction * cancelCallback, bool pause, const char * location = NULL, int lineNumber = 0, bool leaveOnMapHeapReset = false, bool waitOnAtlas = false, bool renderDuringLoad = false );
-	void	AddDynamicDialog( gameDialogMessages_t msg, const arcStaticList< idSWFScriptFunction *, 4 > & callbacks, const arcStaticList< idStrId, 4 > & optionText, bool pause, aRcStaticString< 256 > overrideMsg, bool leaveOnMapHeapReset = false, bool waitOnAtlas = false, bool renderDuringLoad = false );
-	void	AddDialogIntVal( const char * name, int val );
+	void	AddDialog( gameDialogMessages_t msg, dialogType_t type, idSWFScriptFunction * acceptCallback, idSWFScriptFunction * cancelCallback, bool pause, const char *location = nullptr, int lineNumber = 0, bool leaveOnMapHeapReset = false, bool waitOnAtlas = false, bool renderDuringLoad = false );
+	void	AddDynamicDialog( gameDialogMessages_t msg, const arcStaticList< idSWFScriptFunction *, 4 > & callbacks, const arcStaticList< anStringId, 4 > & optionText, bool pause, anStaticString< 256 > overrideMsg, bool leaveOnMapHeapReset = false, bool waitOnAtlas = false, bool renderDuringLoad = false );
+	void	AddDialogIntVal( const char *name, int val );
 	bool	IsDialogActive();
-	void	ClearDialog( gameDialogMessages_t msg, const char * location = NULL, int lineNumber = 0 );
+	void	ClearDialog( gameDialogMessages_t msg, const char *location = nullptr, int lineNumber = 0 );
 	void	ShowSaveIndicator( bool show );
 	bool	HasAnyActiveDialog() const { return ( messageList.Num() > 0 ) && ( !messageList[0].clear ); }
 
 	void	ClearAllDialogHack();
-	arcNetString	GetDialogMsg( gameDialogMessages_t msg, arcNetString & message, arcNetString & title );
+	anString	GetDialogMsg( gameDialogMessages_t msg, anString & message, anString & title );
 	bool	HandleDialogEvent( const sysEvent_t * sev );
 
 protected:

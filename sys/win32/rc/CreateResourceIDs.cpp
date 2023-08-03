@@ -1,4 +1,4 @@
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 
@@ -7,19 +7,19 @@
 CreateResourceIDs_f
 ================
 */
-void CreateResourceIDs_f( const arcCommandArgs &args ) {
+void CreateResourceIDs_f( const anCommandArgs &args ) {
 	int i, j;
-	arcNetString path, fileName;
-	arcStringList resourceFiles;
-	arcLexer src;
-	arcNetToken token;
-	arcStringList dialogs;
-	arcStringList resources;
-	arcStringList bitmaps;
-	arcStringList icons;
-	arcStringList strings;
-	arcStringList controls;
-	arcStringList commands;
+	anString path, fileName;
+	anStringList resFiles;
+	anLexer src;
+	anToken token;
+	anStringList dialogs;
+	anStringList resources;
+	anStringList bitmaps;
+	anStringList icons;
+	anStringList strings;
+	anStringList controls;
+	anStringList commands;
 
 	if ( args.Argc() > 1 ) {
 		path = args.Argv(1 );
@@ -31,10 +31,10 @@ void CreateResourceIDs_f( const arcCommandArgs &args ) {
 	}
 
 	common->Printf( "%s\n", path.c_str() );
-	Sys_ListFiles( path, "_resource.h", resourceFiles );
+	Sys_ListFiles( path, "_resource.h", resFiles );
 
-	for ( i = 0; i < resourceFiles.Num(); i++ ) {
-		fileName = path + "/" + resourceFiles[i];
+	for ( i = 0; i < resFiles.Num(); i++ ) {
+		fileName = path + "/" + resFiles[i];
 		common->Printf( "creating IDs for %s...\n", fileName.c_str() );
 		if ( !src.LoadFile( fileName, true ) ) {
 			common->Warning( "couldn't load %s", fileName.c_str() );
@@ -82,7 +82,7 @@ void CreateResourceIDs_f( const arcCommandArgs &args ) {
 
 		src.FreeSource();
 
-		arcNetFile *f;
+		anFile *f;
 		int curResource, curControl, curCommand;
 
 		curResource = i ? i * 1000 : 100;

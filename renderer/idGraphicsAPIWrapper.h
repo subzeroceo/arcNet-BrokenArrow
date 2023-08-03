@@ -1,11 +1,10 @@
 #ifndef __GRAPHICSAPIWRAPPER_H__
 #define __GRAPHICSAPIWRAPPER_H__
 
-class ARCImage;
-//class idTriangles;
-class ARCRenderModel;
-class aRcDeclRenderProgram;
-class ARCRenderTexture;
+class anImage;
+//class anTriangles;
+class anRenderModel;
+class anRenderImage;
 
 static const int MAX_OCCLUSION_QUERIES = 4096;
 // returned by GL_GetDeferredQueryResult() when the query is from too long ago and the result is no longer available
@@ -82,9 +81,9 @@ void			GL_StartFrame( int frame );			// inserts a timing mark for the start of t
 void			GL_EndFrame();						// inserts a timing mark for the end of the GPU frame
 void			GL_WaitForEndFrame();				// wait for the GPU to reach the last end frame marker
 void			GL_GetLastFrameTime( uint64 & startGPUTimeMicroSec, uint64 & endGPUTimeMicroSec );	// GPU time between GL_StartFrame() and GL_EndFrame()
-void			GL_StartDepthPass( const ARCScreenRect & rect );
+void			GL_StartDepthPass( const anScreenRect & rect );
 void			GL_FinishDepthPass();
-void			GL_GetDepthPassRect( ARCScreenRect & rect );
+void			GL_GetDepthPassRect( anScreenRect & rect );
 
 void			GL_SetDefaultState();
 void			GL_State( uint64 stateVector, bool forceGlState = false );
@@ -95,10 +94,10 @@ void			GL_Cull( int cullType );
 void			GL_Scissor( int x /* left*/, int y /* bottom */, int w, int h );
 void			GL_Viewport( int x /* left */, int y /* bottom */, int w, int h );
 
-ARC_INLINE void	GL_Scissor( const ARCScreenRect & rect ) { GL_Scissor( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
-ARC_INLINE void	GL_Viewport( const ARCScreenRect & rect ) { GL_Viewport( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
+ARC_INLINE void	GL_Scissor( const anScreenRect & rect ) { GL_Scissor( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
+ARC_INLINE void	GL_Viewport( const anScreenRect & rect ) { GL_Viewport( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
 ARC_INLINE void	GL_ViewportAndScissor( int x, int y, int w, int h ) { GL_Viewport( x, y, w, h ); GL_Scissor( x, y, w, h ); }
-ARC_INLINE void	GL_ViewportAndScissor( const ARCScreenRect& rect ) { GL_Viewport( rect ); GL_Scissor( rect ); }
+ARC_INLINE void	GL_ViewportAndScissor( const anScreenRect& rect ) { GL_Viewport( rect ); GL_Scissor( rect ); }
 
 void			GL_Clear( bool color, bool depth, bool stencil, byte stencilValue, float r, float g, float b, float a );
 void			GL_PolygonOffset( float scale, float bias );

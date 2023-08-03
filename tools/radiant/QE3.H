@@ -93,7 +93,7 @@ typedef struct
 	int		iTexMenu;		// nearest, linear, etc
 	float	fGamma;			// gamma for textures
 	char	szProject[256];	// last project loaded
-	arcVec3	colors[COLOR_LAST];
+	anVec3	colors[COLOR_LAST];
 	bool	show_names;
 	bool	show_coordinates;
 	int		exclude;
@@ -135,20 +135,20 @@ typedef struct
 
 	entity_t *d_project_entity;
 
-	arcVec3	d_new_brush_bottom, d_new_brush_top;
+	anVec3	d_new_brush_bottom, d_new_brush_top;
 
 	HINSTANCE d_hInstance;
 
-	arcVec3    d_points[MAX_POINTS];
+	anVec3    d_points[MAX_POINTS];
 	int       d_numpoints;
 	pedge_t   d_edges[MAX_EDGES];
 	int       d_numedges;
 
 	int       d_num_move_points;
-	arcVec3    *d_move_points[MAX_MOVE_POINTS];
+	anVec3    *d_move_points[MAX_MOVE_POINTS];
 
 	int			d_num_move_planes;
-	arcPlane		*d_move_planes[MAX_MOVE_PLANES];
+	anPlane		*d_move_planes[MAX_MOVE_PLANES];
 
 	qtexture_t	*d_qtextures;
 
@@ -165,7 +165,7 @@ typedef struct
 	// connect entities uses the last two brushes selected
 	int			 d_select_count;
 	brush_t		*d_select_order[MAX_MAP_ENTITIES];
-	arcVec3       d_select_translate;    // for dragging w/o making new display lists
+	anVec3       d_select_translate;    // for dragging w/o making new display lists
 	select_t     d_select_mode;
 	idPointListInterface *selectObject;	//
 
@@ -188,8 +188,8 @@ typedef struct
 	bool	bPrimitBrushes;
 	float	mapVersion;
 
-	arcVec3  d_vAreaTL;
-	arcVec3  d_vAreaBR;
+	anVec3  d_vAreaTL;
+	anVec3  d_vAreaBR;
 
 	// tells if we are using .INI files for prefs instead of registry
 	bool	use_ini;
@@ -203,7 +203,7 @@ typedef struct
 	bool	bBSPFrontendPlugin;
 
 	// the editor has its own soundWorld and renderWorld, completely distinct from the game
-	ARCRenderWorld	*rw;
+	anRenderWorld	*rw;
 	ARCSoundWorld	*sw;
 } QEGlobals_t;
 
@@ -220,8 +220,8 @@ void Pointfile_Load( void );
 // drag.c
 //
 void Drag_Begin ( int x, int y, int buttons,
-		   const arcVec3 &xaxis, const arcVec3 &yaxis,
-		   const arcVec3 &origin, const arcVec3 &dir);
+		   const anVec3 &xaxis, const anVec3 &yaxis,
+		   const anVec3 &origin, const anVec3 &dir);
 void Drag_MouseMoved ( int x, int y, int buttons);
 void Drag_MouseUp ( int nButtons = 0 );
 extern bool g_moveOnly;
@@ -237,8 +237,8 @@ void CSG_Merge ( void );
 //
 
 void SetupVertexSelection ( void );
-void SelectEdgeByRay (arcVec3 org, arcVec3 dir);
-void SelectVertexByRay (arcVec3 org, arcVec3 dir);
+void SelectEdgeByRay (anVec3 org, anVec3 dir);
+void SelectVertexByRay (anVec3 org, anVec3 dir);
 
 void ConnectEntities ( void );
 
@@ -256,7 +256,7 @@ char	*TranslateString (char *buf);
 
 void ProjectDialog ( void );
 
-void FillTextureMenu (CStringArray* pArray = NULL);
+void FillTextureMenu (CStringArray* pArray = nullptr );
 void FillBSPMenu ( void );
 
 BOOL CALLBACK Win_Dialog (
@@ -349,24 +349,24 @@ extern void Brush_FlipTexture_BrushPrimit(brush_t *b, bool y);
 
 // Timo
 // new brush primitive stuff
-//void ComputeAxisBase( arcVec3 &normal,arcVec3 &texS,arcVec3 &texT );
+//void ComputeAxisBase( anVec3 &normal,anVec3 &texS,anVec3 &texT );
 void FaceToBrushPrimitFace(face_t *f);
-void EmitBrushPrimitTextureCoordinates(face_t *, arcWinding *, patchMesh_t *patch = NULL);
+void EmitBrushPrimitTextureCoordinates(face_t *, anWinding *, patchMesh_t *patch = nullptr );
 // EmitTextureCoordinates, is old code used for brush to brush primitive conversion
-void EmitTextureCoordinates( arcVec5 ( &xyz )st, const arcMaterial *q, face_t *f, bool force = false);
-void BrushPrimit_Parse( brush_t *, bool newFormat, const arcVec3 origin);
+void EmitTextureCoordinates( anVec5 ( &xyz )st, const anMaterial *q, face_t *f, bool force = false);
+void BrushPrimit_Parse( brush_t *, bool newFormat, const anVec3 origin);
 // compute a fake shift scale rot representation from the texture matrix
 void TexMatToFakeTexCoords( float texMat[2][3], float shift[2], float *rot, float scale[2] );
 void FakeTexCoordsToTexMat( float shift[2], float rot, float scale[2], float texMat[2][3] );
-void ConvertTexMatWithQTexture( brushprimit_texdef_t *texMat1, const arcMaterial *qtex1, brushprimit_texdef_t *texMat2, const arcMaterial *qtex2, float sScale = 1.0, float tScale = 1.0 );
+void ConvertTexMatWithQTexture( brushprimit_texdef_t *texMat1, const anMaterial *qtex1, brushprimit_texdef_t *texMat2, const anMaterial *qtex2, float sScale = 1.0, float tScale = 1.0 );
 // texture locking
-void Face_MoveTexture_BrushPrimit(face_t *f, arcVec3 delta);
+void Face_MoveTexture_BrushPrimit(face_t *f, anVec3 delta);
 void Select_ShiftTexture_BrushPrimit( face_t *f, float x, float y, bool autoAdjust );
-void RotateFaceTexture_BrushPrimit(face_t *f, int nAxis, float fDeg, arcVec3 vOrigin );
+void RotateFaceTexture_BrushPrimit(face_t *f, int nAxis, float fDeg, anVec3 vOrigin );
 // used in CCamWnd::ShiftTexture_BrushPrimit
-void ComputeBest2DVector( arcVec3 v, arcVec3 X, arcVec3 Y, int &x, int &y );
+void ComputeBest2DVector( anVec3 v, anVec3 X, anVec3 Y, int &x, int &y );
 
-void ApplyMatrix_BrushPrimit(face_t *f, arcMat3 matrix, arcVec3 origin);
+void ApplyMatrix_BrushPrimit(face_t *f, anMat3 matrix, anVec3 origin);
 // low level functions .. put in mathlib?
 #define BPMatCopy(a,b) {b[0][0] = a[0][0]; b[0][1] = a[0][1]; b[0][2] = a[0][2]; b[1][0] = a[1][0]; b[1][1] = a[1][1]; b[1][2] = a[1][2];}
 // apply a scale transformation to the BP matrix
@@ -393,11 +393,11 @@ void FillClassList ( void );
 
 extern bool g_bShowLightVolumes;
 extern bool g_bShowLightTextures;
-extern const arcMaterial *Texture_LoadLight(const char *name);
+extern const anMaterial *Texture_LoadLight(const char *name);
 
 #define	FONT_HEIGHT	10
 
-void UniqueTargetName(arcNetString& rStr);
+void UniqueTargetName(anString& rStr);
 
 #define MAP_VERSION 2.0
 
@@ -405,7 +405,7 @@ extern CMainFrame* g_pParentWnd;
 extern CString g_strAppPath;
 extern CPrefsDlg& g_PrefsDlg;
 extern CFindTextureDlg& g_dlgFind;
-extern arcCVarSystem radiant_entityMode;
+extern anCVarSystem radiant_entityMode;
 
 // layout styles
 #define QR_SPLIT 0
@@ -460,7 +460,7 @@ extern const char	*bsp_commands[256];
 extern void HandlePopup(CWnd* pWindow, unsigned int uId);
 extern z_t z;
 extern CString g_strProject;
-extern void TextureAxisFromPlane( const arcPlane &pln, arcVec3 &xv, arcVec3 &yv);
+extern void TextureAxisFromPlane( const anPlane &pln, anVec3 &xv, anVec3 &yv);
 extern bool QE_SaveProject (const char* pProjectFile);
 extern void Clamp(float& f, int nClamp);
 extern bool WriteFileString( FILE *fp, char *string, ... );
@@ -473,7 +473,7 @@ void UpdatePatchInspector();
 extern int g_nSmartX;
 extern int g_nSmartY;
 extern brush_t* CreateEntityBrush( int x, int y, CXYWnd* pWnd);
-int PointInMoveList( arcVec3 *pf );
+int PointInMoveList( anVec3 *pf );
 
 extern bool ByeByeSurfaceDialog();
 extern void UpdateSurfaceDialog();

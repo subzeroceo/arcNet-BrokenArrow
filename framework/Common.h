@@ -1,6 +1,6 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
-#include "../precompiled.h"
+#include "../Lib.h"
 /*
 ==============================================================
 
@@ -9,7 +9,7 @@
 ==============================================================
 */
 
-#define ARC_INLINE						__forceinline
+#define ARC_INLINE						__inline
 
 #include <basetsd.h>					// needed for UINT_PTR
 #include <stddef.h>						// needed for offsetof
@@ -19,7 +19,7 @@
 //#define LSTRTABLE_ID			L"#str_"
 //#define STRTABLE_ID_LENGTH		5
 
-extern arcCVarSystem com_engineHz;
+extern anCVarSystem com_engineHz;
 extern float com_engineHz_latched;
 extern int64 com_engineHz_numerator;
 extern int64 com_engineHz_denominator;
@@ -42,29 +42,29 @@ ARC_INLINE int MSEC_ALIGN_TO_FRAME( int msec ) {
 }
 
 class ARCEngine;
-class ARCRenderWorld;
+class anRenderWorld;
 class ARCSoundWorld;
 class ARCSession;
-class arcCommonDlg;
-class ARCDemoFile;
-class arcUserInterfaces;
+class anCommonDlg;
+class anDemoFile;
+class anUserInterfaces;
 class ARCSaveLoadParms;
-class arcMatchParameters;
+class anMatchParameters;
 
 struct lobbyConnectInfo_t;
 
-ARC_INLINE void BeginProfileNamedEventColor( uint32 color, VERIFY_FORMAT_STRING const char * szName ) {
+ARC_INLINE void BeginProfileNamedEventColor( uint32 color, VERIFY_FORMAT_STRING const char *szName ) {
 }
 ARC_INLINE void EndProfileNamedEvent() {
 }
 
-ARC_INLINE void BeginProfileNamedEvent( VERIFY_FORMAT_STRING const char * szName ) {
+ARC_INLINE void BeginProfileNamedEvent( VERIFY_FORMAT_STRING const char *szName ) {
 	BeginProfileNamedEventColor( ( uint32 ) 0xFF00FF00, szName );
 }
 
 class idScopedProfileEvent {
 public:
-	idScopedProfileEvent( const char * name ) { BeginProfileNamedEvent( name ); }
+	idScopedProfileEvent( const char *name ) { BeginProfileNamedEvent( name ); }
 	~idScopedProfileEvent() { EndProfileNamedEvent(); }
 };
 
@@ -87,7 +87,7 @@ typedef enum {
 
 typedef enum {
 	EDITOR_NONE					= 0,
-	EDITOR_RADIANT				= BIT(1),
+	EDITOR_RADIANT				= BIT( 1 ),
 	EDITOR_GUI					= BIT(2),
 	EDITOR_DEBUGGER				= BIT(3),
 	EDITOR_SCRIPT				= BIT(4),
@@ -111,17 +111,17 @@ typedef enum {
 #define STRTABLE_ID				"#str_"
 #define STRTABLE_ID_LENGTH		5
 
-extern arcCVarSystem		com_version;
-extern arcCVarSystem		com_developer;
-extern arcCVarSystem		com_allowConsole;
-extern arcCVarSystem		com_speeds;
-extern arcCVarSystem		com_showFPS;
-extern arcCVarSystem		com_showMemoryUsage;
-extern arcCVarSystem		com_updateLoadSize;
-extern arcCVarSystem		com_productionMode;
+extern anCVarSystem		com_version;
+extern anCVarSystem		com_developer;
+extern anCVarSystem		com_allowConsole;
+extern anCVarSystem		com_speeds;
+extern anCVarSystem		com_showFPS;
+extern anCVarSystem		com_showMemoryUsage;
+extern anCVarSystem		com_updateLoadSize;
+extern anCVarSystem		com_productionMode;
 
 struct MemInfo_t {
-	arcNetString		filebase;
+	anString		filebase;
 
 	int				total;
 	int				assetTotals;
@@ -147,21 +147,21 @@ struct mpMap_t {
 		supportedModes = src.supportedModes;
 	}
 
-	arcNetString		mapFile;
-	arcNetString		mapName;
+	anString		mapFile;
+	anString		mapName;
 	uint32			supportedModes;
 };
 
 static const int	MAX_LOGGED_STATS = 60 * 120;		// log every half second
 
-class arcCommon {
+class anCommon {
 public:
-	virtual						~arcCommon() {}
+	virtual						~anCommon() {}
 
 								// Initialize everything.
 								// if the OS allows, pass argc/argv directly (without executable name)
 								// otherwise pass the command line in a single string (without executable name)
-	virtual void				Init( int argc, const char * const * argv, const char *cmdline ) = 0;
+	virtual void				Init( int argc, const char *const * argv, const char *cmdline ) = 0;
 
 								// Shuts down everything.
 	virtual void				Shutdown() = 0;
@@ -186,12 +186,12 @@ public:
 
 
 								// Checks for and removes command line "+set var arg" constructs.
-								// If match is NULL, all set commands will be executed, otherwise
+								// If match is nullptr, all set commands will be executed, otherwise
 								// only a set with the exact name.
-	virtual void				StartupVariable( const char * match ) = 0;
+	virtual void				StartupVariable( const char *match ) = 0;
 
 								// Begins redirection of console output to the given buffer.
-	virtual void				BeginRedirect( char *buffer, int buffersize, void (*flush)( const char * ) ) = 0;
+	virtual void				BeginRedirect( char *buffer, int buffersize, void (*flush)( const char *) ) = 0;
 
 								// Stops redirection of console output.
 	virtual void				EndRedirect() = 0;
@@ -249,43 +249,43 @@ public:
 	// Returns the rate (in ms between snaps) that we want to generate snapshots
 	virtual int					GetSnapRate() = 0;
 
-	virtual void				NetReceiveReliable( int peer, int type, ARCBitMessage & msg ) = 0;
+	virtual void				NetReceiveReliable( int peer, int type, anBitMessage & msg ) = 0;
 	virtual void				NetReceiveSnapshot( class ARCSnapShot & ss ) = 0;
-	virtual void				NetReceiveUsercmds( int peer, ARCBitMessage & msg ) = 0;
+	virtual void				NetReceiveUsercmds( int peer, anBitMessage & msg ) = 0;
 
 	// Processes the given event.
 	virtual	bool				ProcessEvent( const sysEvent_t * event ) = 0;
 
-	virtual bool				LoadGame( const char * saveName ) = 0;
-	virtual bool				SaveGame( const char * saveName ) = 0;
+	virtual bool				LoadGame( const char *saveName ) = 0;
+	virtual bool				SaveGame( const char *saveName ) = 0;
 
-	virtual ARCDemoFile *		ReadDemo() = 0;
-	virtual ARCDemoFile *		WriteDemo() = 0;
+	virtual anDemoFile *		ReadDemo() = 0;
+	virtual anDemoFile *		WriteDemo() = 0;
 
 	virtual ARCEngine *			Game() = 0;
-	virtual ARCRenderWorld *	RW() = 0;
+	virtual anRenderWorld *	RW() = 0;
 	virtual ARCSoundWorld *		SW() = 0;
 	virtual ARCSoundWorld *		MenuSW() = 0;
 	virtual ARCSession *		Session() = 0;
-	virtual arcCommonDlg &		Dialog() = 0;
+	virtual anCommonDlg &		Dialog() = 0;
 
 	virtual void				OnSaveCompleted( ARCSaveLoadParms & parms ) = 0;
 	virtual void				OnLoadCompleted( ARCSaveLoadParms & parms ) = 0;
 	virtual void				OnLoadFilesCompleted( ARCSaveLoadParms & parms ) = 0;
 	virtual void				OnEnumerationCompleted( ARCSaveLoadParms & parms ) = 0;
 	virtual void				OnDeleteCompleted( ARCSaveLoadParms & parms ) = 0;
-	virtual void				TriggerScreenWipe( const char * _wipeMaterial, bool hold ) = 0;
+	virtual void				TriggerScreenWipe( const char *_wipeMaterial, bool hold ) = 0;
 
-	virtual void				OnStartHosting( arcMatchParameters & parms ) = 0;
+	virtual void				OnStartHosting( anMatchParameters & parms ) = 0;
 
 	virtual int					GetGameFrame() = 0;
 
 	virtual void				LaunchExternalTitle( int titleIndex, int device, const lobbyConnectInfo_t * const connectInfo ) = 0;
 
 	virtual void				InitializeMPMapsModes() = 0;
-	virtual const arcStringList &GetModeList() const = 0;
-	virtual const arcStringList &GetModeDisplayList() const = 0;
-	virtual const arcNetList<mpMap_t> &GetMapList() const = 0;
+	virtual const anStringList &GetModeList() const = 0;
+	virtual const anStringList &GetModeDisplayList() const = 0;
+	virtual const anList<mpMap_t> &GetMapList() const = 0;
 
 	virtual void				ResetPlayerInput( int playerIndex ) = 0;
 
@@ -295,6 +295,6 @@ public:
 	virtual void				SwitchToGame( currentGame_t newGame ) = 0;
 };
 
-extern arcCommon *		common;
+extern anCommon *		common;
 
 #endif

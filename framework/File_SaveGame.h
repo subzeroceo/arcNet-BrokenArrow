@@ -18,22 +18,22 @@ enum saveGameType_t {
 
 /*
 ================================================
-arcFile_SaveGame
+anFile_SaveGame
 ================================================
 */
-class arcFile_SaveGame : public aRcFileMemory {
+class anFile_SaveGame : public anFileMemory {
 public:
-	arcFile_SaveGame() : type( SAVEGAMEFILE_NONE ), error( false ) {}
-	arcFile_SaveGame( const char * _name ) : aRcFileMemory( _name ), type( SAVEGAMEFILE_NONE ), error( false ) {}
-	arcFile_SaveGame( const char * _name, int type_ ) : aRcFileMemory( _name ), type( type_ ), error( false ) {}
+	anFile_SaveGame() : type( SAVEGAMEFILE_NONE ), error( false ) {}
+	anFile_SaveGame( const char *_name ) : anFileMemory( _name ), type( SAVEGAMEFILE_NONE ), error( false ) {}
+	anFile_SaveGame( const char *_name, int type_ ) : anFileMemory( _name ), type( type_ ), error( false ) {}
 
-	virtual ~arcFile_SaveGame() { }
+	virtual ~anFile_SaveGame() { }
 
-	bool operator==( const arcFile_SaveGame & other ) const {
-		return arcNetString::Icmp( GetName(), other.GetName() ) == 0;
+	bool operator==( const anFile_SaveGame & other ) const {
+		return anString::Icmp( GetName(), other.GetName() ) == 0;
 	}
-	bool operator==( const char * _name ) const {
-		return arcNetString::Icmp( GetName(), _name ) == 0;
+	bool operator==( const char *_name ) const {
+		return anString::Icmp( GetName(), _name ) == 0;
 	}
 	void SetNameAndType( const char *_name, int _type ) {
 		name = _name;
@@ -47,11 +47,11 @@ public: // TODO_KC_CR for now...
 
 /*
 ================================================
-arcFile_SaveGamePipelined uses threads to pipeline overlap compression and IO
+anFile_SGPipelined uses threads to pipeline overlap compression and IO
 ================================================
 */
-class idSGFreadThread;
-class idSGFwriteThread;
+class anSGFreedThread;
+class anSGFwriteThread;
 class idSGFdecompressThread;
 class idSGFcompressThread;
 
@@ -60,7 +60,7 @@ struct blockForIO_t {
 	size_t		bytes;
 };
 
-class arcFile_SaveGamePipelined : public arcNetFile {
+class anFile_SGPipelined : public anFile {
 public:
 	// The buffers each hold two blocks of data, so one block can be operated on by
 	// the next part of the generate / compress / IO pipeline.  The factor of two
@@ -70,14 +70,14 @@ public:
 	static const int UNCOMPRESSED_BLOCK_SIZE	= 256 * 1024;
 
 
-							arcFile_SaveGamePipelined();
-	virtual					~arcFile_SaveGamePipelined();
+							anFile_SGPipelined();
+	virtual					~anFile_SGPipelined();
 
-	bool					OpenForReading( const char * const filename, bool useNativeFile );
-	bool					OpenForWriting( const char * const filename, bool useNativeFile );
+	bool					OpenForReading( const char *const filename, bool useNativeFile );
+	bool					OpenForWriting( const char *const filename, bool useNativeFile );
 
-	bool					OpenForReading( arcNetFile * file );
-	bool					OpenForWriting( arcNetFile * file );
+	bool					OpenForReading( anFile * file );
+	bool					OpenForWriting( anFile * file );
 
 	// Finish any reading or writing.
 	void					Finish();
@@ -96,7 +96,7 @@ public:
 	int						GetPointerSize() const;
 
 	//------------------------
-	// arcNetFile Interface
+	// anFile Interface
 	//------------------------
 
 	virtual const char *	GetName() const { return name.c_str(); }
@@ -128,25 +128,25 @@ public:
 
 	// Called by a background thread to get the next block to be written out.
 	// This may block until a block has been made available through the pipeline.
-	// Pass in NULL to notify the last write failed.
+	// Pass in nullptr to notify the last write failed.
 	// Returns false if there are no more blocks.
 	bool					NextWriteBlock( blockForIO_t * block );
 
 	// Called by a background thread to get the next block to read data into and to
 	// report the number of bytes written to the previous block.
 	// This may block until space is available to place the next block.
-	// Pass in NULL to notify the end of the file was reached.
+	// Pass in nullptr to notify the end of the file was reached.
 	// Returns false if there are no more blocks.
 	bool					NextReadBlock( blockForIO_t * block, size_t lastReadBytes );
 
 private:
-	friend class idSGFreadThread;
-	friend class idSGFwriteThread;
+	friend class anSGFreedThread;
+	friend class anSGFwriteThread;
 	friend class idSGFdecompressThread;
 	friend class idSGFcompressThread;
 
-	arcNetString					name;		// Name of the file.
-	arcNetString					osPath;		// OS path.
+	anString					name;		// Name of the file.
+	anString					osPath;		// OS path.
 	mode_t					mode;		// Open mode.
 	size_t					compressedLength;
 
@@ -184,7 +184,7 @@ private:
 	// These variables are used by WriteBlock() and ReadBlock().
 	//------------------------
 
-	arcNetFile *				nativeFile;
+	anFile *				nativeFile;
 	bool					nativeFileEndHit;
 	bool					finished;
 
@@ -192,8 +192,8 @@ private:
 	// The background threads and signals for NextWriteBlock() and NextReadBlock().
 	//------------------------
 
-	idSGFreadThread *		readThread;
-	idSGFwriteThread *		writeThread;
+	anSGFreedThread *		readThread;
+	anSGFwriteThread *		writeThread;
 
 	idSGFdecompressThread *	decompressThread;
 	idSGFcompressThread *	compressThread;
@@ -202,7 +202,7 @@ private:
 	arcSysSignal				blockAvailable;
 	arcSysSignal				blockFinished;
 
-	aRcStaticString< 32 >		buildVersion;		// build version this file was saved with
+	anStaticString< 32 >		buildVersion;		// build version this file was saved with
 	int16					pointerSize;		// the number of bytes in a pointer, because different pointer sizes mean different offsets into objects a 64 bit build cannot load games saved from a 32 bit build or vice version (a value of 0 is interpreted as 4 bytes)
 	int16					saveFormatVersion;	// version number specific to save games (for maintaining save compatibility across builds)
 

@@ -98,7 +98,7 @@ protected:
 	int		HandleContextMenu	( WPARAM wParam, LPARAM lParam );
 
 	// Datas
-	arcNetList<RPITEM*>	mItems;
+	anList<RPITEM*>	mItems;
 	int				mStartYPos;
 	int				mItemHeight;
 	int				mOldMouseYPos;
@@ -111,7 +111,7 @@ protected:
 	static LRESULT CALLBACK		ButtonProc	( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 	static LRESULT FAR PASCAL	GetMsgProc	( int nCode, WPARAM wParam, LPARAM lParam );
-	static arcNetList<HWND>	mDialogs;
+	static anList<HWND>	mDialogs;
 	static HHOOK		mDialogHook;
 };
 

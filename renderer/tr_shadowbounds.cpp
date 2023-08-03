@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -15,9 +15,9 @@ R_CreateVertexProgramTurboShadowVolume
 are dangling edges that are outside the light frustum still making planes?
 =====================
 */
-surfTriangles_t *R_CreateVertexProgramTurboShadowVolume( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, srfCullInfo_t &cullInfo ) {
+srfTriangles_t *R_CreateVertexProgramTurboShadowVolume( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, srfCullInfo_t &cullInfo ) {
 	int		i, j;
-	surfTriangles_t	*newTri;
+	srfTriangles_t	*newTri;
 	silEdge_t	*sil;
 	const qglIndex_t *indexes;
 	const byte *facing;
@@ -59,10 +59,10 @@ surfTriangles_t *R_CreateVertexProgramTurboShadowVolume( const ARCRenderEntityLo
 
 	if ( !numShadowingFaces ) {
 		// no faces are inside the light frustum and still facing the right way
-		return NULL;
+		return nullptr;
 	}
 
-	// shadowVerts will be NULL on these surfaces, so the shadowVerts will be taken from the ambient surface
+	// shadowVerts will be nullptr on these surfaces, so the shadowVerts will be taken from the ambient surface
 	newTri = R_AllocStaticTriSurf();
 
 	newTri->numVerts = tri->numVerts * 2;
@@ -149,10 +149,10 @@ surfTriangles_t *R_CreateVertexProgramTurboShadowVolume( const ARCRenderEntityLo
 R_CreateTurboShadowVolume
 =====================
 */
-surfTriangles_t *R_CreateTurboShadowVolume( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, srfCullInfo_t &cullInfo ) {
+srfTriangles_t *R_CreateTurboShadowVolume( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, srfCullInfo_t &cullInfo ) {
 	int		i, j;
-	arcVec3	localLightOrigin;
-	surfTriangles_t	*newTri;
+	anVec3	localLightOrigin;
+	srfTriangles_t	*newTri;
 	silEdge_t	*sil;
 	const qglIndex_t *indexes;
 	const byte *facing;
@@ -194,21 +194,21 @@ surfTriangles_t *R_CreateTurboShadowVolume( const ARCRenderEntityLocal *ent, con
 
 	if ( !numShadowingFaces ) {
 		// no faces are inside the light frustum and still facing the right way
-		return NULL;
+		return nullptr;
 	}
 
 	newTri = R_AllocStaticTriSurf();
 
 #ifdef USE_TRI_DATA_ALLOCATOR
 	R_AllocStaticTriSurfShadowVerts( newTri, tri->numVerts * 2 );
-	arcShadowCache *shadowVerts = newTri->shadowVertexes;
+	anShadowCache *shadowVerts = newTri->shadowVertexes;
 #else
-	arcShadowCache *shadowVerts = (arcShadowCache *)_alloca16( tri->numVerts * 2 * sizeof( shadowVerts[0] ) );
+	anShadowCache *shadowVerts = (anShadowCache *)_alloca16( tri->numVerts * 2 * sizeof( shadowVerts[0] ) );
 #endif
 
 	R_GlobalPointToLocal( ent->modelMatrix, light->globalLightOrigin, localLightOrigin );
 
-	int	*vertRemap = ( int * )_alloca16( tri->numVerts * sizeof( vertRemap[0] ) );
+	int	*vertRemap = ( int*)_alloca16( tri->numVerts * sizeof( vertRemap[0] ) );
 
 	SIMDProcessor->Memset( vertRemap, -1, tri->numVerts * sizeof( vertRemap[0] ) );
 
@@ -321,8 +321,8 @@ Generate vertexes and indexes for a polytope, and optionally returns the polygon
 The positive sides of the planes will be visible.
 =====================
 */
-surfTriangles_t *R_PolytopeSurface( int numPlanes, const arcPlane *planes, arcWinding **windings ) {
-	arcFixedWinding planeWindings[MAX_POLYTOPE_PLANES];
+srfTriangles_t *R_PolytopeSurface( int numPlanes, const anPlane *planes, anWinding **windings ) {
+	anFixedWinding planeWindings[MAX_POLYTOPE_PLANES];
 
 	if ( numPlanes > MAX_POLYTOPE_PLANES ) {
 		common->Error( "R_PolytopeSurface: more than %d planes", MAX_POLYTOPE_PLANES );
@@ -331,12 +331,12 @@ surfTriangles_t *R_PolytopeSurface( int numPlanes, const arcPlane *planes, arcWi
 	int numVerts = 0;
 	int numIndexes = 0;
 	for ( int i = 0; i < numPlanes; i++ ) {
-		const arcPlane &plane = planes[i];
-		arcFixedWinding &w = planeWindings[i];
+		const anPlane &plane = planes[i];
+		anFixedWinding &w = planeWindings[i];
 
 		w.BaseForPlane( plane );
 		for ( int j = 0; j < numPlanes; j++ ) {
-			const arcPlane &plane2 = planes[j];
+			const anPlane &plane2 = planes[j];
 			if ( j == i ) {
 				continue;
 			}
@@ -352,13 +352,13 @@ surfTriangles_t *R_PolytopeSurface( int numPlanes, const arcPlane *planes, arcWi
 	}
 
 	// allocate the surface
-	surfTriangles_t *tri = R_AllocStaticTriSurf();
+	srfTriangles_t *tri = R_AllocStaticTriSurf();
 	R_AllocStaticTriSurfVerts( tri, numVerts );
 	R_AllocStaticTriSurfIndexes( tri, numIndexes );
 
 	// copy the data from the windings
 	for ( i = 0; i < numPlanes; i++ ) {
-		arcFixedWinding &w = planeWindings[i];
+		anFixedWinding &w = planeWindings[i];
 		if ( !w.GetNumPoints() ) {
 			continue;
 		}
@@ -377,7 +377,7 @@ surfTriangles_t *R_PolytopeSurface( int numPlanes, const arcPlane *planes, arcWi
 
 		// optionally save the winding
 		if ( windings ) {
-			windings[i] = new arcWinding( w.GetNumPoints() );
+			windings[i] = new anWinding( w.GetNumPoints() );
 			*windings[i] = w;
 		}
 	}
@@ -389,11 +389,11 @@ surfTriangles_t *R_PolytopeSurface( int numPlanes, const arcPlane *planes, arcWi
 
 // Compute conservative shadow bounds as the intersection
 // of the object's bounds' shadow volume and the light's bounds.
-template <class T, int N> struct arcArray {
-arcArray() : s( 0 ) {
+template <class T, int N> struct anArray {
+anArray() : s( 0 ) {
 }
 
-	arcArray( const arcArray<T,N> & cpy ) : s( cpy.s ) {
+	anArray( const anArray<T,N> & cpy ) : s( cpy.s ) {
 		for ( int i=0; i < s; i++ ) {
 			v[i] = cpy.v[i];
 		}
@@ -402,8 +402,8 @@ arcArray() : s( 0 ) {
 	void PushBack( const T & i ) {
 		v[s] = i;
 		s++;
-		//if (s > maxSize) {
-			//maxSize = int(s);
+		//if ( s > maxSize) {
+			//maxSize = int( s);
 		//}
 	}
 
@@ -428,28 +428,28 @@ arcArray() : s( 0 ) {
 //	static int maxSize;
 };
 
-typedef arcArray<int, 4> arcArrayInt;
-//int arcArrayInt::maxSize = 0;
-typedef arcArray<arcVec4, 16> arcArrayVec4;
-//int arcArrayVec4::maxSize = 0;
+typedef anArray<int, 4> anArrayInt;
+//int anArrayInt::maxSize = 0;
+typedef anArray<anVec4, 16> anArrayVec4;
+//int anArrayVec4::maxSize = 0;
 
 struct poly {
-    arcArrayInt vi;
-    arcArrayInt ni;
-    arcVec4 plane;
-}; typedef arcArray<poly, 9> arcArrayPoly;
-//int arcArrayPoly::maxSize = 0;
+    anArrayInt vi;
+    anArrayInt ni;
+    anVec4 plane;
+}; typedef anArray<poly, 9> anArrayPoly;
+//int anArrayPoly::maxSize = 0;
 
 struct edge {
     int vi[2];
     int pi[2];
 };
 
-typedef arcArray<edge, 15> arcArrayEdge;
-//int arcArrayEdge::maxSize = 0;
+typedef anArray<edge, 15> anArrayEdge;
+//int anArrayEdge::maxSize = 0;
 
-arcArrayInt FourIntegers( int a, int b, int c, int d ) {
-    arcArrayInt vi;
+anArrayInt FourIntegers( int a, int b, int c, int d ) {
+    anArrayInt vi;
     vi.PushBack( a );
     vi.PushBack( b );
     vi.PushBack( c );
@@ -457,8 +457,8 @@ arcArrayInt FourIntegers( int a, int b, int c, int d ) {
     return vi;
 }
 
-arcVec3 HomogeneousDifference( arcVec4 a, arcVec4 b) {
-    arcVec3 v;
+anVec3 HomogeneousDifference( anVec4 a, anVec4 b) {
+    anVec3 v;
 	v.x = b.x * a.w - a.x * b.w;
 	v.y = b.y * a.w - a.y * b.w;
 	v.z = b.z * a.w - a.z * b.w;
@@ -466,8 +466,8 @@ arcVec3 HomogeneousDifference( arcVec4 a, arcVec4 b) {
 }
 
 // handles positive w only
-arcVec4 ComputeHomogeneousPlane( arcVec4 a, arcVec4 b, arcVec4 c ) {
-	arcVec4 v, t;
+anVec4 ComputeHomogeneousPlane( anVec4 a, anVec4 b, anVec4 c ) {
+	anVec4 v, t;
 
     if ( a[3] == 0 ) {
 		t = a; a = b; b = c; c = t;
@@ -481,37 +481,37 @@ arcVec4 ComputeHomogeneousPlane( arcVec4 a, arcVec4 b, arcVec4 c ) {
         return v;
 	}
 
-    arcVec3 vb = HomogeneousDifference( a, b );
-    arcVec3 vc = HomogeneousDifference( a, c );
+    anVec3 vb = HomogeneousDifference( a, b );
+    anVec3 vc = HomogeneousDifference( a, c );
 
-    arcVec3 n = vb.Cross(vc);
+    anVec3 n = vb.Cross(vc);
     n.Normalize();
 
 	v.x = n.x;
 	v.y = n.y;
 	v.z = n.z;
 
-	v.w = - ( n * arcVec3( a.x, a.y, a.z ) ) / a.w ;
+	v.w = - ( n * anVec3( a.x, a.y, a.z ) ) / a.w ;
 
     return v;
 }
 
 struct idPolyhedron {
-    arcArrayVec4 v;
-    arcArrayPoly  p;
-    arcArrayEdge  e;
+    anArrayVec4 v;
+    anArrayPoly  p;
+    anArrayEdge  e;
 
     void AddQuad( int va, int vb, int vc, int vd ) {
         poly pg;
         pg.vi = FourIntegers( va, vb, vc, vd );
         pg.ni = FourIntegers( -1, -1, -1, -1 );
         pg.plane = ComputeHomogeneousPlane( v[va], v[vb], v[vc] );
-        p.PushBack( pg);
+        p.PushBack( pg );
     }
 
     void DiscardNeighborInfo() {
         for ( unsigned int i = 0; i < p.Size(); i++ ) {
-            arcArrayInt & ni = p[i].ni;
+            anArrayInt & ni = p[i].ni;
             for ( unsigned int j = 0; j < ni.Size(); j++ ) {
                 ni[j] = -1;
 			}
@@ -527,8 +527,8 @@ struct idPolyhedron {
         int P = p.Size();
         // for each polygon
         for ( int i = 0; i < P-1; i++ ) {
-            const arcArrayInt & vi = p[i].vi;
-            arcArrayInt & ni = p[i].ni;
+            const anArrayInt & vi = p[i].vi;
+            anArrayInt & ni = p[i].ni;
             int Si = vi.Size();
 
             // for each edge of that polygon
@@ -544,8 +544,8 @@ struct idPolyhedron {
 
                 // check all remaining polygons
                 for ( int j = i+1; j < P; j++ ) {
-                    const arcArrayInt & vj = p[j].vi;
-                    arcArrayInt & nj = p[j].ni;
+                    const anArrayInt & vj = p[j].vi;
+                    anArrayInt & nj = p[j].ni;
                     int Sj = vj.Size();
                     for ( int jj = 0; jj < Sj; jj++ ) {
                         int jj0 = jj;
@@ -580,7 +580,7 @@ struct idPolyhedron {
         }
     }
 
-    void Transform( const arcMat4 & m ) {
+    void Transform( const anMat4 & m ) {
         for ( unsigned int i=0; i < v.Size(); i++ ) {
             v[i] = m * v[i];
 		}
@@ -589,18 +589,18 @@ struct idPolyhedron {
 };
 
 // make a unit cube
-idPolyhedron PolyhedronFromBounds( const arcBounds &b ) {
+idPolyhedron PolyhedronFromBounds( const anBounds &b ) {
 	static idPolyhedron p;
 
 	if ( p.e.Size() == 0 ) {
-		p.v.PushBack( arcVec4( -1, -1,  1, 1 ) );
-		p.v.PushBack( arcVec4(  1, -1,  1, 1 ) );
-		p.v.PushBack( arcVec4(  1,  1,  1, 1 ) );
-		p.v.PushBack( arcVec4( -1,  1,  1, 1 ) );
-		p.v.PushBack( arcVec4( -1, -1, -1, 1 ) );
-		p.v.PushBack( arcVec4(  1, -1, -1, 1 ) );
-		p.v.PushBack( arcVec4(  1,  1, -1, 1 ) );
-		p.v.PushBack( arcVec4( -1,  1, -1, 1 ) );
+		p.v.PushBack( anVec4( -1, -1,  1, 1 ) );
+		p.v.PushBack( anVec4(  1, -1,  1, 1 ) );
+		p.v.PushBack( anVec4(  1,  1,  1, 1 ) );
+		p.v.PushBack( anVec4( -1,  1,  1, 1 ) );
+		p.v.PushBack( anVec4( -1, -1, -1, 1 ) );
+		p.v.PushBack( anVec4(  1, -1, -1, 1 ) );
+		p.v.PushBack( anVec4(  1,  1, -1, 1 ) );
+		p.v.PushBack( anVec4( -1,  1, -1, 1 ) );
 
 		p.AddQuad( 0, 1, 2, 3 );
 		p.AddQuad( 7, 6, 5, 4 );
@@ -616,24 +616,24 @@ idPolyhedron PolyhedronFromBounds( const arcBounds &b ) {
 
 	idPolyhedron p2( p);
 
-	const arcVec3 & min = b[0];
-	const arcVec3 & max = b[1];
+	const anVec3 & min = b[0];
+	const anVec3 & max = b[1];
 
 	p2.v.IsEmpty();
-	p2.v.PushBack( arcVec4( min.x, min.y, max.z, 1 ) );
-	p2.v.PushBack( arcVec4( max.x, min.y, max.z, 1 ) );
-	p2.v.PushBack( arcVec4( max.x, max.y, max.z, 1 ) );
-	p2.v.PushBack( arcVec4( min.x, max.y, max.z, 1 ) );
-	p2.v.PushBack( arcVec4( min.x, min.y, min.z, 1 ) );
-	p2.v.PushBack( arcVec4( max.x, min.y, min.z, 1 ) );
-	p2.v.PushBack( arcVec4( max.x, max.y, min.z, 1 ) );
-	p2.v.PushBack( arcVec4( min.x, max.y, min.z, 1 ) );
+	p2.v.PushBack( anVec4( min.x, min.y, max.z, 1 ) );
+	p2.v.PushBack( anVec4( max.x, min.y, max.z, 1 ) );
+	p2.v.PushBack( anVec4( max.x, max.y, max.z, 1 ) );
+	p2.v.PushBack( anVec4( min.x, max.y, max.z, 1 ) );
+	p2.v.PushBack( anVec4( min.x, min.y, min.z, 1 ) );
+	p2.v.PushBack( anVec4( max.x, min.y, min.z, 1 ) );
+	p2.v.PushBack( anVec4( max.x, max.y, min.z, 1 ) );
+	p2.v.PushBack( anVec4( min.x, max.y, min.z, 1 ) );
 
 	p2.RecomputePlane();
     return p2;
 }
 
-idPolyhedron MakeShadowVolume( const idPolyhedron & oc, arcVec4 light ) {
+idPolyhedron MakeShadowVolume( const idPolyhedron & oc, anVec4 light ) {
 	static idPolyhedron lut[64];
 	int index = 0;
 
@@ -648,8 +648,8 @@ idPolyhedron MakeShadowVolume( const idPolyhedron & oc, arcVec4 light ) {
 
 		int V = ph.v.Size();
 		for ( int j = 0; j < V; j++ ) {
-			arcVec3 proj = HomogeneousDifference( light, ph.v[j] );
-			ph.v.PushBack( arcVec4( proj.x, proj.y, proj.z, 0 ) );
+			anVec3 proj = HomogeneousDifference( light, ph.v[j] );
+			ph.v.PushBack( anVec4( proj.x, proj.y, proj.z, 0 ) );
 		}
 
 		ph.p.IsEmpty();
@@ -665,11 +665,11 @@ idPolyhedron MakeShadowVolume( const idPolyhedron & oc, arcVec4 light ) {
 		}
 		ph.ComputeNeighbor();
 
-		arcArrayPoly vpg;
+		anArrayPoly vpg;
 		int I = ph.p.Size();
 		for ( int i=0; i < I; i++ ) {
-			arcArrayInt & vi = ph.p[i].vi;
-			arcArrayInt & ni = ph.p[i].ni;
+			anArrayInt & vi = ph.p[i].vi;
+			anArrayInt & ni = ph.p[i].ni;
 			int S = vi.Size();
 
 			for ( int j = 0; j < S; j++ ) {
@@ -697,17 +697,17 @@ idPolyhedron MakeShadowVolume( const idPolyhedron & oc, arcVec4 light ) {
 	ph2.v = oc.v;
 	int V = ph2.v.Size();
 	for ( int j = 0; j < V; j++ ) {
-		arcVec3 proj = HomogeneousDifference( light, ph2.v[j] );
-		ph2.v.PushBack( arcVec4( proj.x, proj.y, proj.z, 0 ) );
+		anVec3 proj = HomogeneousDifference( light, ph2.v[j] );
+		ph2.v.PushBack( anVec4( proj.x, proj.y, proj.z, 0 ) );
 	}
 
-    // need to compute planes for the shadow volume (sv)
+    // need to compute planes for the shadow volume ( sv)
     ph2.RecomputePlane();
 
     return ph2;
 }
 
-typedef arcArray<arcVec4, 36> idSegments;
+typedef anArray<anVec4, 36> idSegments;
 //int idSegments::maxSize = 0;
 
 void idPolyhedronEdges( idPolyhedron & a, idSegments & e ) {
@@ -724,11 +724,11 @@ void idPolyhedronEdges( idPolyhedron & a, idSegments & e ) {
 
 // clip the segments of e by the planes of idPolyhedron a.
 void ClipSegments(const idPolyhedron & ph, idSegments & is, idSegments & os) {
-    const arcArrayPoly & p = ph.p;
+    const anArrayPoly & p = ph.p;
     for ( unsigned int i = 0; i < is.Size(); i+=2 ) {
-        arcVec4 a = is[i  ];
-        arcVec4 b = is[i+1];
-        arcVec4 c;
+        anVec4 a = is[i  ];
+        anVec4 b = is[i+1];
+        anVec4 c;
 
         bool discard = false;
 
@@ -781,31 +781,31 @@ void ClipSegments(const idPolyhedron & ph, idSegments & is, idSegments & os) {
     }
 }
 
-arcMat4 MakeMatrix4( const float * m ) {
-	return arcMat4( m[ 0], m[ 4], m[ 8], m[12],
+anMat4 MakeMatrix4( const float * m ) {
+	return anMat4( m[ 0], m[ 4], m[ 8], m[12],
 				   m[ 1], m[ 5], m[ 9], m[13],
 				   m[ 2], m[ 6], m[10], m[14],
 				   m[ 3], m[ 7], m[11], m[15] );
 }
 
-void DrawPolyhedron( const viewDef_t *viewDef, const idPolyhedron & p, arcVec4 color ) {
+void DrawPolyhedron( const viewDef_t *viewDef, const idPolyhedron & p, anVec4 color ) {
 	for ( unsigned int i = 0; i < p.e.Size(); i++ ) {
-		viewDef->renderWorld->DebugLine( color, arcVec4::4ToVec3( p.v[p.e[i].vi[0]] ), arcVec4::4ToVec3( p.v[p.e[i].vi[1]] ) );
+		viewDef->renderWorld->DebugLine( color, anVec4::4ToVec3( p.v[p.e[i].vi[0]] ), anVec4::4ToVec3( p.v[p.e[i].vi[1]] ) );
 	}
 }
 
-void DrawSegments( const viewDef_t *viewDef, const idSegments & s, arcVec4 color ) {
+void DrawSegments( const viewDef_t *viewDef, const idSegments & s, anVec4 color ) {
 	for ( unsigned int i = 0; i < s.Size(); i += 2 ) {
-		viewDef->renderWorld->DebugLine( color, arcVec4::4ToVec3( s[i] ), arcVec4::4ToVec3( s[i+1] ) );
+		viewDef->renderWorld->DebugLine( color, anVec4::4ToVec3( s[i] ), anVec4::4ToVec3( s[i+1] ) );
 	}
 }
 
-void R_GlobalToHClip( const viewDef_t *viewDef, const arcVec4 &global, arcVec4 &clip ) {
+void R_GlobalToHClip( const viewDef_t *viewDef, const anVec4 &global, anVec4 &clip ) {
 	//const arcRenderMatrices & projectionMatrix = viewDef->worldSpace.modelViewMatrix;
-	//const arcRenderMatrices::Multiply( arcMat4( arcVec4( 1.0f ), arcVec4( 0.0f, 0.0f, 0.0f, 0.0f ) ), arcMat4( arcVec4( 0.0f, 1.0f ), id )
+	//const arcRenderMatrices::Multiply( anMat4( anVec4( 1.0f ), anVec4( 0.0f, 0.0f, 0.0f, 0.0f ) ), anMat4( anVec4( 0.0f, 1.0f ), id )
 
 	for ( int i = 0; i < 4; i ++ ) {
-		arcVec4 view[i] =
+		anVec4 view[i] =
 			global[0] * viewDef->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
 			global[1] * viewDef->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
 			global[2] * viewDef->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
@@ -814,16 +814,16 @@ void R_GlobalToHClip( const viewDef_t *viewDef, const arcVec4 &global, arcVec4 &
 
 	for ( int i = 0; i < 4; i ++ ) {
 		clip[i] =
-			arcVec4 view[0] * viewDef->projectionMatrix[ i + 0 * 4 ] +
-			arcVec4 view[1] * viewDef->projectionMatrix[ i + 1 * 4 ] +
-			arcVec4 view[2] * viewDef->projectionMatrix[ i + 2 * 4 ] +
-			arcVec4 view[3] * viewDef->projectionMatrix[ i + 3 * 4 ];
+			anVec4 view[0] * viewDef->projectionMatrix[ i + 0 * 4 ] +
+			anVec4 view[1] * viewDef->projectionMatrix[ i + 1 * 4 ] +
+			anVec4 view[2] * viewDef->projectionMatrix[ i + 2 * 4 ] +
+			anVec4 view[3] * viewDef->projectionMatrix[ i + 3 * 4 ];
 	}
 }
 
-ARCScreenRect R_CalcIntersectionScissor( const ARCRenderLightsLocal * lightDef, const ARCRenderEntityLocal * entityDef, const viewDef_t * viewDef ) {
-	arcMat4 a = MakeMatrix4( entityDef->modelMatrix );
-	arcMat4 b = MakeMatrix4( lightDef->modelMatrix );
+anScreenRect R_CalcIntersectionScissor( const anRenderLightsLocal * lightDef, const anRenderEntityLocal * entityDef, const viewDef_t * viewDef ) {
+	anMat4 a = MakeMatrix4( entityDef->modelMatrix );
+	anMat4 b = MakeMatrix4( lightDef->modelMatrix );
 
 	// compute light idPolyhedron
 	idPolyhedron lightVol = idPolyhedronFromBounds( lightDef->frustumTris->bounds );
@@ -839,7 +839,7 @@ ARCScreenRect R_CalcIntersectionScissor( const ARCRenderLightsLocal * lightDef, 
 	idPolyhedron vol = idPolyhedronFromBounds( entityDef->referenceBounds );
 
 	//viewDef->renderWorld->DebugBounds( colorRed, lightDef->frustumTris->bounds );
-	//viewDef->renderWorld->DebugBox( colorBlue, ARCBox( model->Bounds(), entityDef->parms.origin, entityDef->parms.axis ) );
+	//viewDef->renderWorld->DebugBox( colorBlue, anBox( model->Bounds(), entityDef->parms.origin, entityDef->parms.axis ) );
 
 	// Transform it into world space
     vol.Transform( a );
@@ -850,7 +850,7 @@ ARCScreenRect R_CalcIntersectionScissor( const ARCRenderLightsLocal * lightDef, 
 	}
 
 	// Transform light position into world space
-	arcVec4 lighPos = arcVec4( lightDef->globalLightOrigin.x, lightDef->globalLightOrigin.y, lightDef->globalLightOrigin.z, 1.0f );
+	anVec4 lighPos = anVec4( lightDef->globalLightOrigin.x, lightDef->globalLightOrigin.y, lightDef->globalLightOrigin.z, 1.0f );
 
 	// generate shadow volume "idPolyhedron"
     idPolyhedron sv = MakeShadowVolume( vol, lighPos );
@@ -872,17 +872,17 @@ ARCScreenRect R_CalcIntersectionScissor( const ARCRenderLightsLocal * lightDef, 
 		DrawSegments( viewDef, outSegs, colorGreen );
 	}
 
-	arcBounds outBounds;
+	anBounds outBounds;
 	outBounds.Clear();
 	for ( unsigned int i = 0; i < outSegs.Size(); i++ ) {
-		arcVec4 v;
+		anVec4 v;
 		R_GlobalToHClip( viewDef, outSegs[i], v );
 
 		if ( v.w <= 0.0f ) {
 			return lightDef->viewLight->scissorRect;
 		}
 
-		arcVec3 rv( v.x, v.y, v.z );
+		anVec3 rv( v.x, v.y, v.z );
 		rv /= v.w;
 
 		outBounds.AddPoint( rv );
@@ -907,7 +907,7 @@ ARCScreenRect R_CalcIntersectionScissor( const ARCRenderLightsLocal * lightDef, 
 	float h2 = ( viewDef->viewport.y2 - viewDef->viewport.y1 + 1 ) / 2.0f;
 	float y = viewDef->viewport.y1;
 
-	ARCScreenRect rect;
+	anScreenRect rect;
 	rect.x1 = outBounds[0].x * w2 + w2 + x;
 	rect.x2 = outBounds[1].x * w2 + w2 + x;
 	rect.y1 = outBounds[0].y * h2 + h2 + y;
@@ -1029,51 +1029,51 @@ static int			*remap;
 static int			numShadowIndexes;
 static qglIndex_t	shadowIndexes[MAX_SHADOW_INDEXES];
 static int			numShadowVerts;
-static arcVec4		shadowVerts[MAX_SHADOW_VERTS];
+static anVec4		shadowVerts[MAX_SHADOW_VERTS];
 static bool			overflowed;
 
-arcPlane	pointLightFrustums[6][6] = {
-	{	arcPlane( 1,0,0,0 ),
-		arcPlane( 1,1,0,0 ),
-		arcPlane( 1,-1,0,0 ),
-		arcPlane( 1,0,1,0 ),
-		arcPlane( 1,0,-1,0 ),
-		arcPlane( -1,0,0,0 ),
+anPlane	pointLightFrustums[6][6] = {
+	{	anPlane( 1,0,0,0 ),
+		anPlane( 1,1,0,0 ),
+		anPlane( 1,-1,0,0 ),
+		anPlane( 1,0,1,0 ),
+		anPlane( 1,0,-1,0 ),
+		anPlane( -1,0,0,0 ),
 	},{
-		arcPlane( -1,0,0,0 ),
-		arcPlane( -1,1,0,0 ),
-		arcPlane( -1,-1,0,0 ),
-		arcPlane( -1,0,1,0 ),
-		arcPlane( -1,0,-1,0 ),
-		arcPlane( 1,0,0,0 ),
+		anPlane( -1,0,0,0 ),
+		anPlane( -1,1,0,0 ),
+		anPlane( -1,-1,0,0 ),
+		anPlane( -1,0,1,0 ),
+		anPlane( -1,0,-1,0 ),
+		anPlane( 1,0,0,0 ),
 	},{
-		arcPlane( 0,1,0,0 ),
-		arcPlane( 0,1,1,0 ),
-		arcPlane( 0,1,-1,0 ),
-		arcPlane( 1,1,0,0 ),
-		arcPlane( -1,1,0,0 ),
-		arcPlane( 0,-1,0,0 ),
+		anPlane( 0,1,0,0 ),
+		anPlane( 0,1,1,0 ),
+		anPlane( 0,1,-1,0 ),
+		anPlane( 1,1,0,0 ),
+		anPlane( -1,1,0,0 ),
+		anPlane( 0,-1,0,0 ),
 	},{
-		arcPlane( 0,-1,0,0 ),
-		arcPlane( 0,-1,1,0 ),
-		arcPlane( 0,-1,-1,0 ),
-		arcPlane( 1,-1,0,0 ),
-		arcPlane( -1,-1,0,0 ),
-		arcPlane( 0,1,0,0 ),
+		anPlane( 0,-1,0,0 ),
+		anPlane( 0,-1,1,0 ),
+		anPlane( 0,-1,-1,0 ),
+		anPlane( 1,-1,0,0 ),
+		anPlane( -1,-1,0,0 ),
+		anPlane( 0,1,0,0 ),
 	},{
-		arcPlane( 0,0,1,0 ),
-		arcPlane( 1,0,1,0 ),
-		arcPlane( -1,0,1,0 ),
-		arcPlane( 0,1,1,0 ),
-		arcPlane( 0,-1,1,0 ),
-		arcPlane( 0,0,-1,0 ),
+		anPlane( 0,0,1,0 ),
+		anPlane( 1,0,1,0 ),
+		anPlane( -1,0,1,0 ),
+		anPlane( 0,1,1,0 ),
+		anPlane( 0,-1,1,0 ),
+		anPlane( 0,0,-1,0 ),
 	},{
-		arcPlane( 0,0,-1,0 ),
-		arcPlane( 1,0,-1,0 ),
-		arcPlane( -1,0,-1,0 ),
-		arcPlane( 0,1,-1,0 ),
-		arcPlane( 0,-1,-1,0 ),
-		arcPlane( 0,0,1,0 ),},
+		anPlane( 0,0,-1,0 ),
+		anPlane( 1,0,-1,0 ),
+		anPlane( -1,0,-1,0 ),
+		anPlane( 0,1,-1,0 ),
+		anPlane( 0,-1,-1,0 ),
+		anPlane( 0,0,1,0 ),},
 };
 
 int			c_caps, c_sils;
@@ -1087,7 +1087,99 @@ typedef struct {
 } indexRef_t;
 static indexRef_t	indexRef[6];
 static int indexFrustumNumber;		// which shadow generating side of a light the indexRef is for
+void R_AddEdgeDef( int i1, int i2, int facing ) {
+	int c;
 
+	c = numEdgeDefs[ i1 ];
+	if ( c == MAX_EDGE_DEFS ) {
+		return;     // overflow
+	}
+	edgeDefs[ i1 ][ c ].i2 = i2;
+	edgeDefs[ i1 ][ c ].facing = facing;
+
+	numEdgeDefs[ i1 ]++;
+}
+
+void R_RenderShadowEdges( void ) {
+	// FIXME: implement this
+
+	int numTris;
+
+	// dumb way -- render every triangle's edges
+	numTris = tess.numIndexes / 3;
+
+	for ( i = 0 ; i < numTris ; i++ ) {
+		int i1, i2, i3;
+
+		if ( !facing[i] ) {
+			continue;
+		}
+
+		i1 = tess.indexes[ i * 3 + 0 ];
+		i2 = tess.indexes[ i * 3 + 1 ];
+		i3 = tess.indexes[ i * 3 + 2 ];
+
+		qglBegin( GL_TRIANGLE_STRIP );
+		qglVertex3fv( tess.xyz[ i1 ] );
+		qglVertex3fv( shadowXyz[ i1 ] );
+		qglVertex3fv( tess.xyz[ i2 ] );
+		qglVertex3fv( shadowXyz[ i2 ] );
+		qglVertex3fv( tess.xyz[ i3 ] );
+		qglVertex3fv( shadowXyz[ i3 ] );
+		qglVertex3fv( tess.xyz[ i1 ] );
+		qglVertex3fv( shadowXyz[ i1 ] );
+		qglEnd();
+	}
+#else
+	int c, c2;
+	int j, k;
+	int i2;
+	int c_edges, c_rejected;
+	int hit[2];
+
+	// an edge is NOT a silhouette edge if its face doesn't face the light,
+	// or if it has a reverse paired edge that also faces the light.
+	// A well behaved polyhedron would have exactly two faces for each edge,
+	// but lots of models have dangling edges or overfanned edges
+	c_edges = 0;
+	c_rejected = 0;
+
+	for ( i = 0 ; i < tess.numVertexes ; i++ ) {
+		c = numEdgeDefs[ i ];
+		for ( j = 0 ; j < c ; j++ ) {
+			if ( !edgeDefs[ i ][ j ].facing ) {
+				continue;
+			}
+
+			hit[0] = 0;
+			hit[1] = 0;
+
+			i2 = edgeDefs[ i ][ j ].i2;
+			c2 = numEdgeDefs[ i2 ];
+			for ( k = 0 ; k < c2 ; k++ ) {
+				if ( edgeDefs[ i2 ][ k ].i2 == i ) {
+					hit[ edgeDefs[ i2 ][ k ].facing ]++;
+				}
+			}
+
+			// if it doesn't share the edge with another front facing
+			// triangle, it is a sil edge
+			if ( hit[ 1 ] == 0 ) {
+				qglBegin( GL_TRIANGLE_STRIP );
+				qglVertex3fv( tess.xyz[ i ] );
+				qglVertex3fv( shadowXyz[ i ] );
+				qglVertex3fv( tess.xyz[ i2 ] );
+				qglVertex3fv( shadowXyz[ i2 ] );
+				qglEnd();
+				c_edges++;
+			} else {
+				c_rejected++;
+			}
+		}
+	}
+#endif
+#endif
+}
 /*
 ===============
 PointsOrdered
@@ -1104,7 +1196,7 @@ If surfaces are ever guaranteed to not have to edge match with
 other surfaces, we could just compare indexes.
 ===============
 */
-static bool PointsOrdered( const arcVec3 &a, const arcVec3 &b ) {
+static bool PointsOrdered( const anVec3 &a, const anVec3 &b ) {
 	float	i, j;
 
 	// vectors that wind up getting an equal hash value will
@@ -1128,8 +1220,8 @@ R_LightProjectionMatrix
 
 ====================
 */
-void R_LightProjectionMatrix( const arcVec3 &origin, const arcPlane &rearPlane, arcVec4 mat[4] ) {
-	arcVec4		lv;
+void R_LightProjectionMatrix( const anVec3 &origin, const anPlane &rearPlane, anVec4 mat[4] ) {
+	anVec4		lv;
 	float		lg;
 
 	// calculate the homogenious light vector
@@ -1170,11 +1262,11 @@ make a projected copy of the even verts into the odd spots
 that is on the far light clip plane
 ===================
 */
-static void R_ProjectPointsToFarPlane( const ARCRenderEntityLocal *ent, const ARCRenderLightsLocal *light, const arcPlane &lightPlaneLocal, int firstShadowVert, int numShadowVerts ) {
-	arcVec3		lv;
-	arcVec4		mat[4];
+static void R_ProjectPointsToFarPlane( const anRenderEntityLocal *ent, const anRenderLightsLocal *light, const anPlane &lightPlaneLocal, int firstShadowVert, int numShadowVerts ) {
+	anVec3		lv;
+	anVec4		mat[4];
 	int			i;
-	arcVec4		*in;
+	anVec4		*in;
 
 	R_GlobalPointToLocal( ent->modelMatrix, light->globalLightOrigin, lv );
 	R_LightProjectionMatrix( lv, lightPlaneLocal, mat );
@@ -1216,7 +1308,7 @@ static void R_ProjectPointsToFarPlane( const ARCRenderEntityLocal *ent, const AR
 #define	MAX_CLIPPED_POINTS	20
 typedef struct {
 	int		numVerts;
-	arcVec3	verts[MAX_CLIPPED_POINTS];
+	anVec3	verts[MAX_CLIPPED_POINTS];
 	int		edgeFlags[MAX_CLIPPED_POINTS];
 } clipTri_t;
 
@@ -1232,15 +1324,15 @@ I have some worries about edge flag cases when polygons are clipped
 multiple times near the epsilon.
 =============
 */
-static int R_ChopWinding( clipTri_t clipTris[2], int inNum, const arcPlane &plane ) {
+static int R_ChopWinding( clipTri_t clipTris[2], int inNum, const anPlane &plane ) {
 	clipTri_t	*in, *out;
 	float	dists[MAX_CLIPPED_POINTS];
 	int		sides[MAX_CLIPPED_POINTS];
 	int		counts[3];
 	float	dot;
 	int		i, j;
-	arcVec3	*p1, *p2;
-	arcVec3	mid;
+	anVec3	*p1, *p2;
+	anVec3	mid;
 
 	in = &clipTris[inNum];
 	out = &clipTris[inNum^1];
@@ -1320,7 +1412,7 @@ R_ClipTriangleToLight
 Returns false if nothing is left after clipping
 ===================
 */
-static bool	R_ClipTriangleToLight( const arcVec3 &a, const arcVec3 &b, const arcVec3 &c, int planeBits, const arcPlane frustum[6] ) {
+static bool	R_ClipTriangleToLight( const anVec3 &a, const anVec3 &b, const anVec3 &c, int planeBits, const anPlane frustum[6] ) {
 	int			i;
 	int			base;
 	clipTri_t	pingPong[2], *ct;
@@ -1401,7 +1493,7 @@ If one point is clearly clipped by the plane and the
 other point is on the plane, it will be completely removed.
 ===================
 */
-static bool R_ClipLineToLight(	const arcVec3 &a, const arcVec3 &b, const arcPlane frustum[4], arcVec3 &p1, arcVec3 &p2 ) {
+static bool R_ClipLineToLight(	const anVec3 &a, const anVec3 &b, const anPlane frustum[4], anVec3 &p1, anVec3 &p2 ) {
 	float	*clip;
 	int		j;
 	float	d1, d2;
@@ -1436,7 +1528,7 @@ static bool R_ClipLineToLight(	const arcVec3 &a, const arcVec3 &b, const arcPlan
 		}
 
 #if 0
-		if ( arcMath::Fabs(d1 - d2) < 0.001 ) {
+		if ( anMath::Fabs(d1 - d2) < 0.001 ) {
 			d2 = d1 - 0.1;
 		}
 #endif
@@ -1502,7 +1594,7 @@ Add quads from the front points to the projected points
 for each silhouette edge in the light
 =================
 */
-static void R_AddSilEdges( const surfTriangles_t *tri, unsigned short *pointCull, const arcPlane frustum[6] ) {
+static void R_AddSilEdges( const srfTriangles_t *tri, unsigned short *pointCull, const anPlane frustum[6] ) {
 	int		v1, v2;
 	int		i;
 	silEdge_t	*sil;
@@ -1611,7 +1703,7 @@ R_CalcPointCull
 Also inits the remap[] array to all -1
 ================
 */
-static void R_CalcPointCull( const surfTriangles_t *tri, const arcPlane frustum[6], unsigned short *pointCull ) {
+static void R_CalcPointCull( const srfTriangles_t *tri, const anPlane frustum[6], unsigned short *pointCull ) {
 	int i;
 	int frontBits;
 	float *planeSide;
@@ -1637,8 +1729,8 @@ static void R_CalcPointCull( const surfTriangles_t *tri, const arcPlane frustum[
 	}
 
 	planeSide = (float *) _alloca16( tri->numVerts * sizeof( float ) );
-	side1 = ( byte * ) _alloca16( tri->numVerts * sizeof( byte ) );
-	side2 = ( byte * ) _alloca16( tri->numVerts * sizeof( byte ) );
+	side1 = (byte *) _alloca16( tri->numVerts * sizeof( byte ) );
+	side2 = (byte *) _alloca16( tri->numVerts * sizeof( byte ) );
 	SIMDProcessor->Memset( side1, 0, tri->numVerts * sizeof( byte ) );
 	SIMDProcessor->Memset( side2, 0, tri->numVerts * sizeof( byte ) );
 
@@ -1653,7 +1745,7 @@ static void R_CalcPointCull( const surfTriangles_t *tri, const arcPlane frustum[
 		SIMDProcessor->CmpGT( side2, i, planeSide, -LIGHT_CLIP_EPSILON, tri->numVerts );
 	}
 	for ( i = 0; i < tri->numVerts; i++ ) {
-		pointCull[i] |= side1[i] | (side2[i] << 6);
+		pointCull[i] |= side1[i] | ( side2[i] << 6);
 	}
 }
 
@@ -1671,7 +1763,7 @@ If the frustum is just part of a point light, clipped planes don't
 need to be added.
 =================
 */
-static void R_CreateShadowVolumeInFrustum( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, const arcVec3 lightOrigin, const arcPlane frustum[6], const arcPlane &farPlane, bool makeClippedPlanes ) {
+static void R_CreateShadowVolumeInFrustum( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, const anVec3 lightOrigin, const anPlane frustum[6], const anPlane &farPlane, bool makeClippedPlanes ) {
 	int		i;
 	int		numTris;
 	unsigned short		*pointCull;
@@ -1881,19 +1973,19 @@ R_MakeShadowFrustums
 Called at definition derivation time
 ===================
 */
-void R_MakeShadowFrustums( ARCRenderLightsLocal *light ) {
+void R_MakeShadowFrustums( anRenderLightsLocal *light ) {
 	int		i, j;
 
 	if ( light->parms.pointLight ) {
 #if 0
-		arcVec3	adjustedRadius;
+		anVec3	adjustedRadius;
 
 		// increase the light radius to cover any origin offsets.
 		// this will cause some shadows to extend out of the exact light
 		// volume, but is simpler than adjusting all the frustums
-		adjustedRadius[0] = light->parms.lightRadius[0] + arcMath::Fabs( light->parms.lightCenter[0] );
-		adjustedRadius[1] = light->parms.lightRadius[1] + arcMath::Fabs( light->parms.lightCenter[1] );
-		adjustedRadius[2] = light->parms.lightRadius[2] + arcMath::Fabs( light->parms.lightCenter[2] );
+		adjustedRadius[0] = light->parms.lightRadius[0] + anMath::Fabs( light->parms.lightCenter[0] );
+		adjustedRadius[1] = light->parms.lightRadius[1] + anMath::Fabs( light->parms.lightCenter[1] );
+		adjustedRadius[2] = light->parms.lightRadius[2] + anMath::Fabs( light->parms.lightCenter[2] );
 
 		light->numShadowFrustums = 0;
 		// a point light has to project against six planes
@@ -1903,7 +1995,7 @@ void R_MakeShadowFrustums( ARCRenderLightsLocal *light ) {
 			frust->numPlanes = 6;
 			frust->makeClippedPlanes = false;
 			for ( j = 0; j < 6; j++ ) {
-				arcPlane &plane = frust->planes[j];
+				anPlane &plane = frust->planes[j];
 				plane[0] = pointLightFrustums[i][j][0] / adjustedRadius[0];
 				plane[1] = pointLightFrustums[i][j][1] / adjustedRadius[1];
 				plane[2] = pointLightFrustums[i][j][2] / adjustedRadius[2];
@@ -1947,10 +2039,10 @@ void R_MakeShadowFrustums( ARCRenderLightsLocal *light ) {
 		}
 
 		// make the corners
-		arcVec3	corners[8];
+		anVec3	corners[8];
 
 		for ( i = 0; i < 8; i++ ) {
-			arcVec3	temp;
+			anVec3	temp;
 			for ( j = 0; j < 3; j++ ) {
 				if ( i & ( 1 << j ) ) {
 					temp[j] = light->parms.lightRadius[j];
@@ -1966,10 +2058,10 @@ void R_MakeShadowFrustums( ARCRenderLightsLocal *light ) {
 		light->numShadowFrustums = 0;
 		for ( int side = 0; side < 6; side++ ) {
 			shadowFrustum_t	*frust = &light->shadowFrustums[ light->numShadowFrustums ];
-			arcVec3 &p1 = corners[faceCorners[side][0]];
-			arcVec3 &p2 = corners[faceCorners[side][1]];
-			arcVec3 &p3 = corners[faceCorners[side][2]];
-			arcPlane backPlane;
+			anVec3 &p1 = corners[faceCorners[side][0]];
+			anVec3 &p2 = corners[faceCorners[side][1]];
+			anVec3 &p3 = corners[faceCorners[side][2]];
+			anPlane backPlane;
 
 			// plane will have positive side inward
 			backPlane.FromPoints( p1, p2, p3 );
@@ -1986,16 +2078,16 @@ void R_MakeShadowFrustums( ARCRenderLightsLocal *light ) {
 
 			// make planes with positive side facing inwards in light local coordinates
 			for ( int edge = 0; edge < 4; edge++ ) {
-				arcVec3 &p1 = corners[faceCorners[side][edge]];
-				arcVec3 &p2 = corners[faceCorners[side][(edge+1 )&3]];
+				anVec3 &p1 = corners[faceCorners[side][edge]];
+				anVec3 &p2 = corners[faceCorners[side][(edge+1 )&3]];
 
 				// create a plane that goes through the center of projection
 				frust->planes[edge].FromPoints( p2, p1, light->globalLightOrigin );
 
 				// see if we should use an adjacent plane instead
 				if ( centerOutside ) {
-					arcVec3 &p3 = corners[faceEdgeAdjacent[side][edge]];
-					arcPlane sidePlane;
+					anVec3 &p3 = corners[faceEdgeAdjacent[side][edge]];
+					anPlane sidePlane;
 
 					sidePlane.FromPoints( p2, p1, p3 );
 					d = sidePlane.Distance( light->globalLightOrigin );
@@ -2025,7 +2117,7 @@ void R_MakeShadowFrustums( ARCRenderLightsLocal *light ) {
 	// many projected lights that are faking area lights will have their
 	// origin behind solid surfaces.
 	for ( i = 0; i < 6; i++ ) {
-		arcPlane &plane = frust->planes[i];
+		anPlane &plane = frust->planes[i];
 
 		plane.SetNormal( -light->frustum[i].Normal() );
 		plane.SetDist( -light->frustum[i].Dist() );
@@ -2055,7 +2147,7 @@ The worst case index count is much larger, when the 7 vertex clipped triangle
 needs 15 indexes for the front, 15 for the back, and 42 (a quad on seven sides)
 for the sides, for a total of 72 indexes from the original 3.  Ouch.
 
-NULL may be returned if the surface doesn't create a shadow volume at all,
+nullptr may be returned if the surface doesn't create a shadow volume at all,
 as with a single face that the light is behind.
 
 If an edge is within an epsilon of the border of the volume, it must be treated
@@ -2064,18 +2156,18 @@ as if it was culled for edges, because the sil edge will have been
 generated by the triangle irregardless of if it actually was a sil edge.
 =================
 */
-surfTriangles_t *R_CreateShadowVolume( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, shadowGen_t optimize, srfCullInfo_t &cullInfo ) {
+srfTriangles_t *R_CreateShadowVolume( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, shadowGen_t optimize, srfCullInfo_t &cullInfo ) {
 	int		i, j;
-	arcVec3	lightOrigin;
-	surfTriangles_t	*newTri;
+	anVec3	lightOrigin;
+	srfTriangles_t	*newTri;
 	int		capPlaneBits;
 
 	if ( !r_shadows.GetBool() ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( tri->numSilEdges == 0 || tri->numIndexes == 0 || tri->numVerts == 0 ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( tri->numIndexes < 0 ) {
@@ -2108,7 +2200,7 @@ surfTriangles_t *R_CreateShadowVolume( const ARCRenderEntityLocal *ent, const su
 	}
 	if ( allFront ) {
 		// if no faces are the right direction, don't make a shadow at all
-		return NULL;
+		return nullptr;
 	}
 
 	// clear the shadow volume
@@ -2122,8 +2214,8 @@ surfTriangles_t *R_CreateShadowVolume( const ARCRenderEntityLocal *ent, const su
 	// the facing information will be the same for all six projections
 	// from a point light, as well as for any directed lights
 	globalFacing = cullInfo.facing;
-	faceCastsShadow = ( byte * )_alloca16( tri->numIndexes / 3 + 1 );	// + 1 for fake dangling edge face
-	remap = ( int * )_alloca16( tri->numVerts * sizeof( remap[0] ) );
+	faceCastsShadow = (byte *)_alloca16( tri->numIndexes / 3 + 1 );	// + 1 for fake dangling edge face
+	remap = ( int*)_alloca16( tri->numVerts * sizeof( remap[0] ) );
 
 	R_GlobalPointToLocal( ent->modelMatrix, light->globalLightOrigin, lightOrigin );
 
@@ -2132,7 +2224,7 @@ surfTriangles_t *R_CreateShadowVolume( const ARCRenderEntityLocal *ent, const su
 	// the box may have less
 	for ( int frustumNum = 0; frustumNum < light->numShadowFrustums; frustumNum++ ) {
 		const shadowFrustum_t	*frust = &light->shadowFrustums[frustumNum];
-		ALIGN16( arcPlane frustum[6] );
+		ALIGN16( anPlane frustum[6] );
 
 		// transform the planes into entity space
 		// we could share and reverse some of the planes between frustums for a minor
@@ -2160,7 +2252,7 @@ surfTriangles_t *R_CreateShadowVolume( const ARCRenderEntityLocal *ent, const su
 		// if we couldn't make a complete shadow volume, it is better to
 		// not draw one at all, avoiding streamer problems
 		if ( overflowed ) {
-			return NULL;
+			return nullptr;
 		}
 
 		if ( indexFrustumNumber != oldFrustumNumber ) {
@@ -2174,7 +2266,7 @@ surfTriangles_t *R_CreateShadowVolume( const ARCRenderEntityLocal *ent, const su
 	// if no faces have been defined for the shadow volume,
 	// there won't be anything at all
 	if ( numShadowIndexes == 0 ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// this should have been prevented by the overflowed flag, so if it ever happens,

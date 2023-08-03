@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #include "Simd_Generic.h"
@@ -24,7 +24,7 @@
 idSIMD_SSE2::GetName
 ============
 */
-const char * idSIMD_SSE2::GetName( void ) const {
+const char *idSIMD_SSE2::GetName( void ) const {
 	return "MMX & SSE & SSE2";
 }
 
@@ -73,7 +73,7 @@ void VPCALL idSIMD_SSE2::CmpLT( byte *dst, const byte bitNum, const float *src0,
 	*/
 			cnt_l = -cnt_l;
 			src0_p = (char *) src0;
-			_mm_prefetch(src0_p+64, _MM_HINT_NTA);
+			_mm_prefetch( src0_p+64, _MM_HINT_NTA);
 			constant_p = (char *) &constant;
 			xmm1 = _mm_load_ss((float *)constant_p);
 			xmm1 = _mm_shuffle_ps(xmm1, xmm1, R_SHUFFLEPS( 0, 0, 0, 0 ) );
@@ -103,7 +103,7 @@ void VPCALL idSIMD_SSE2::CmpLT( byte *dst, const byte bitNum, const float *src0,
 		__asm	pop			ebx
 	*/
 				xmm0 = _mm_loadu_ps((float *) src0_p);
-				_mm_prefetch(src0_p+128, _MM_HINT_NTA);
+				_mm_prefetch( src0_p+128, _MM_HINT_NTA);
 				xmm0 = _mm_cmplt_ps(xmm0, xmm1);
 				// Simplify using SSE2
 				xmm0i = (__m128i) xmm0;
@@ -113,9 +113,9 @@ void VPCALL idSIMD_SSE2::CmpLT( byte *dst, const byte bitNum, const float *src0,
 				// End
 				mask_l = mask_l &  0x01010101;
 				mask_l = mask_l << bitNum;
-				dst_l  = *(( int * ) dst_p);
+				dst_l  = *(( int*) dst_p);
 				mask_l = mask_l | dst_l;
-				*(( int * ) dst_p) = mask_l;
+				*(( int*) dst_p) = mask_l;
 				src0_p = src0_p + 16;
 				dst_p = dst_p + 4;
 				cnt_l = cnt_l + 1;
@@ -153,7 +153,7 @@ void VPCALL idSIMD_SSE2::CmpLT( byte *dst, const byte bitNum, const float *src0,
 	*/
 				cnt_l = -cnt_l;
 				src0_p = (char *) src0;
-				_mm_prefetch(src0_p+64, _MM_HINT_NTA);
+				_mm_prefetch( src0_p+64, _MM_HINT_NTA);
 				constant_p = (char *) &constant;
 				xmm1 = _mm_load_ss((float *)constant_p);
 				xmm1 = _mm_shuffle_ps(xmm1, xmm1, R_SHUFFLEPS( 0, 0, 0, 0 ) );
@@ -184,7 +184,7 @@ void VPCALL idSIMD_SSE2::CmpLT( byte *dst, const byte bitNum, const float *src0,
 			__asm	pop			ebx
 	*/
 					xmm0 = _mm_load_ps((float *) src0_p);
-					_mm_prefetch(src0_p+128, _MM_HINT_NTA);
+					_mm_prefetch( src0_p+128, _MM_HINT_NTA);
 					xmm0 = _mm_cmplt_ps(xmm0, xmm1);
 					// Simplify using SSE2
 					xmm0i = (__m128i) xmm0;
@@ -194,9 +194,9 @@ void VPCALL idSIMD_SSE2::CmpLT( byte *dst, const byte bitNum, const float *src0,
 					// End
 					mask_l = mask_l &  0x01010101;
 					mask_l = mask_l << bitNum;
-					dst_l  = *(( int * ) dst_p);
+					dst_l  = *(( int*) dst_p);
 					mask_l = mask_l | dst_l;
-					*(( int * ) dst_p) = mask_l;
+					*(( int*) dst_p) = mask_l;
 					src0_p = src0_p + 16;
 					dst_p = dst_p + 4;
 					cnt_l = cnt_l + 1;
@@ -245,11 +245,11 @@ ALIGN4_INIT1( float SIMD_SP_three, 3.0f );
 ALIGN4_INIT1( float SIMD_SP_four, 4.0f );
 ALIGN4_INIT1( float SIMD_SP_maxShort, (1<<15) );
 ALIGN4_INIT1( float SIMD_SP_tiny, 1e-10f );
-ALIGN4_INIT1( float SIMD_SP_PI, arcMath::PI );
-ALIGN4_INIT1( float SIMD_SP_halfPI, arcMath::HALF_PI );
-ALIGN4_INIT1( float SIMD_SP_twoPI, arcMath::TWO_PI );
-ALIGN4_INIT1( float SIMD_SP_oneOverTwoPI, 1.0f / arcMath::TWO_PI );
-ALIGN4_INIT1( float SIMD_SP_infinity, arcMath::INFINITY );
+ALIGN4_INIT1( float SIMD_SP_PI, anMath::PI );
+ALIGN4_INIT1( float SIMD_SP_halfPI, anMath::HALF_PI );
+ALIGN4_INIT1( float SIMD_SP_twoPI, anMath::TWO_PI );
+ALIGN4_INIT1( float SIMD_SP_oneOverTwoPI, 1.0f / anMath::TWO_PI );
+ALIGN4_INIT1( float SIMD_SP_infinity, anMath::INFINITY );
 
 
 /*
@@ -257,7 +257,7 @@ ALIGN4_INIT1( float SIMD_SP_infinity, arcMath::INFINITY );
 idSIMD_SSE2::GetName
 ============
 */
-const char * idSIMD_SSE2::GetName( void ) const {
+const char *idSIMD_SSE2::GetName( void ) const {
 	return "MMX & SSE & SSE2";
 }
 
@@ -273,7 +273,7 @@ idSIMD_SSE2::MatX_LowerTriangularSolve
   x == b is allowed
 ============
 */
-void VPCALL idSIMD_SSE2::MatX_LowerTriangularSolve( const arcMatX &L, float *x, const float *b, const int n, int skip ) {
+void VPCALL idSIMD_SSE2::MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip ) {
 	int nc;
 	const float *lptr;
 
@@ -286,8 +286,8 @@ void VPCALL idSIMD_SSE2::MatX_LowerTriangularSolve( const arcMatX &L, float *x, 
 
 	// unrolled cases for n < 8
 	if ( n < 8 ) {
-		#define NSKIP( n, s )	((n<<3)|(s&7) )
-		switch( NSKIP( n, skip ) ) {
+		#define NSKIP( n, s )	((n<<3)|( s&7) )
+		switch ( NSKIP( n, skip ) ) {
 			case NSKIP( 1, 0 ): x[0] = b[0];
 				return;
 			case NSKIP( 2, 0 ): x[0] = b[0];
@@ -328,7 +328,7 @@ void VPCALL idSIMD_SSE2::MatX_LowerTriangularSolve( const arcMatX &L, float *x, 
 	}
 
 	// process first 4 rows
-	switch( skip ) {
+	switch ( skip ) {
 		case 0: x[0] = b[0];
 		case 1: x[1] = b[1] - lptr[1*nc+0] * x[0];
 		case 2: x[2] = b[2] - lptr[2*nc+0] * x[0] - lptr[2*nc+1] * x[1];
@@ -485,7 +485,7 @@ idSIMD_SSE2::MatX_LowerTriangularSolveTranspose
   x == b is allowed
 ============
 */
-void VPCALL idSIMD_SSE2::MatX_LowerTriangularSolveTranspose( const arcMatX &L, float *x, const float *b, const int n ) {
+void VPCALL idSIMD_SSE2::MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n ) {
 	int nc;
 	const float *lptr;
 
@@ -494,7 +494,7 @@ void VPCALL idSIMD_SSE2::MatX_LowerTriangularSolveTranspose( const arcMatX &L, f
 
 	// unrolled cases for n < 8
 	if ( n < 8 ) {
-		switch( n ) {
+		switch ( n ) {
 			case 0:
 				return;
 			case 1:

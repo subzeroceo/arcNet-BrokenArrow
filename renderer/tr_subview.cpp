@@ -1,11 +1,11 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
 
 typedef struct {
-	arcVec3		origin;
-	arcMat3		axis;
+	anVec3		origin;
+	anMat3		axis;
 } orientation_t;
 
 /*
@@ -13,10 +13,10 @@ typedef struct {
 R_MirrorPoint
 =================
 */
-static void R_MirrorPoint( const arcVec3 in, orientation_t *surface, orientation_t *camera, arcVec3 &out ) {
+static void R_MirrorPoint( const anVec3 in, orientation_t *surface, orientation_t *camera, anVec3 &out ) {
 	int		i;
-	arcVec3	local;
-	arcVec3	transformed;
+	anVec3	local;
+	anVec3	transformed;
 	float	d;
 
 	local = in - surface->origin;
@@ -35,7 +35,7 @@ static void R_MirrorPoint( const arcVec3 in, orientation_t *surface, orientation
 R_MirrorVector
 =================
 */
-static void R_MirrorVector( const arcVec3 in, orientation_t *surface, orientation_t *camera, arcVec3 &out ) {
+static void R_MirrorVector( const anVec3 in, orientation_t *surface, orientation_t *camera, anVec3 &out ) {
 	out = vec3_origin;
 	for ( int i = 0; i < 3; i++ ) {
 		float d = in * surface->axis[i];
@@ -51,10 +51,10 @@ Returns the plane for the first triangle in the surface
 FIXME: check for degenerate triangle?
 =============
 */
-static void R_PlaneForSurface( const surfTriangles_t *tri, arcPlane &plane ) {
-	arcDrawVert *v1 = tri->verts + tri->indexes[0];
-	arcDrawVert *v2 = tri->verts + tri->indexes[1];
-	arcDrawVert *v3 = tri->verts + tri->indexes[2];
+static void R_PlaneForSurface( const srfTriangles_t *tri, anPlane &plane ) {
+	anDrawVertex *v1 = tri->verts + tri->indexes[0];
+	anDrawVertex *v2 = tri->verts + tri->indexes[1];
+	anDrawVertex *v3 = tri->verts + tri->indexes[2];
 	plane.FromPoints( v1->xyz, v2->xyz, v3->xyz );
 }
 
@@ -63,7 +63,7 @@ static void R_PlaneForSurface( const surfTriangles_t *tri, arcPlane &plane ) {
 R_PreciseCullSurface
 
 Check the surface for visibility on a per-triangle basis
-for cases when it is going to be VERY expensive to draw (subviews)
+for cases when it is going to be VERY expensive to draw ( subviews)
 
 If not culled, also returns the bounding box of the surface in
 Normalized Device Coordinates, so it can be used to crop the scissor rect.
@@ -71,11 +71,11 @@ Normalized Device Coordinates, so it can be used to crop the scissor rect.
 OPTIMIZE: we could also take exact portal passing into consideration
 =========================
 */
-bool R_PreciseCullSurface( const drawSurf_t *drawSurf, arcBounds &ndcBounds ) {
-	arcPlane eye;
-	arcVec3 localView;
+bool R_PreciseCullSurface( const drawSurf_t *drawSurf, anBounds &ndcBounds ) {
+	anPlane eye;
+	anVec3 localView;
 
-	const surfTriangles_t *tri = drawSurf->geo;
+	const srfTriangles_t *tri = drawSurf->geo;
 
 	unsigned int pointOr = 0;
 	unsigned int pointAnd = (unsigned int)~0;
@@ -86,7 +86,7 @@ bool R_PreciseCullSurface( const drawSurf_t *drawSurf, arcBounds &ndcBounds ) {
 	for ( int i = 0; i < tri->numVerts; i++ ) {
 		unsigned int pointFlags = 0;
 		R_TransformModelToClip( tri->verts[i].xyz, drawSurf->space->modelViewMatrix, tr.viewDef->projectionMatrix, eye, clip );		for ( int j = 0; j < 3; j++ ) {
-			if ( arcPlane clip[j] >= clip[3] ) {
+			if ( anPlane clip[j] >= clip[3] ) {
 				pointFlags |= (1 << ( j*2 ) );
 			} else if ( clip[j] <= -clip[3] ) {
 				pointFlags |= ( 1 << ( j*2+1 ) );
@@ -108,20 +108,20 @@ bool R_PreciseCullSurface( const drawSurf_t *drawSurf, arcBounds &ndcBounds ) {
 	R_GlobalPointToLocal( drawSurf->space->modelMatrix, tr.viewDef->renderView.vieworg, localView );
 
 	for ( int i = 0; i < tri->numIndexes; i += 3 ) {
-		const arcVec3 &v1 = tri->verts[tri->indexes[i]].xyz;
-		const arcVec3 &v2 = tri->verts[tri->indexes[i+1]].xyz;
-		const arcVec3 &v3 = tri->verts[tri->indexes[i+2]].xyz;
+		const anVec3 &v1 = tri->verts[tri->indexes[i]].xyz;
+		const anVec3 &v2 = tri->verts[tri->indexes[i+1]].xyz;
+		const anVec3 &v3 = tri->verts[tri->indexes[i+2]].xyz;
 		// this is a hack, because R_GlobalPointToLocal doesn't work with the non-normalized
 		// axis that we get from the gui view transform.  It doesn't hurt anything, because
 		// we know that all gui generated surfaces are front facing
 		if ( tr.guiRecursionLevel == 0 ) {
 			// we don't care that it isn't normalized,
 			// all we want is the sign
-			arcVec3 v1 = v2 - v1;
-			arcVec3 d2 = v3 - v1;
-			arcVec3 normal = d2.Cross( d1 );
+			anVec3 v1 = v2 - v1;
+			anVec3 d2 = v3 - v1;
+			anVec3 normal = d2.Cross( d1 );
 
-			arcVec3 dir = v1 - localView;
+			anVec3 dir = v1 - localView;
 
 			float dot = normal * dir;
 			if ( dot >= 0.0f ) {
@@ -130,7 +130,7 @@ bool R_PreciseCullSurface( const drawSurf_t *drawSurf, arcBounds &ndcBounds ) {
 		}
 
 		// now find the exact screen bounds of the clipped triangle
-		arcFixedWinding w.SetNumPoints( 3 );
+		anFixedWinding w.SetNumPoints( 3 );
 		R_LocalPointToGlobal( drawSurf->space->modelMatrix, v1, w[0].ToVec3() );
 		R_LocalPointToGlobal( drawSurf->space->modelMatrix, v2, w[1].ToVec3() );
 		R_LocalPointToGlobal( drawSurf->space->modelMatrix, v3, w[2].ToVec3() );
@@ -142,7 +142,7 @@ bool R_PreciseCullSurface( const drawSurf_t *drawSurf, arcBounds &ndcBounds ) {
 			}
 		}
 		for ( int j = 0; j < w.GetNumPoints(); j++ ) {
-			arcVec3	screen;
+			anVec3	screen;
 			R_GlobalToNormalizedDeviceCoordinates( w[j].ToVec3(), screen );
 			ndcBounds.AddPoint( screen );
 		}
@@ -162,7 +162,7 @@ R_MirrorViewBySurface
 ========================
 */
 static viewDef_t *R_MirrorViewBySurface( drawSurf_t *drawSurf ) {
-	arcPlane originalPlane, plane;
+	anPlane originalPlane, plane;
 
 	// copy the viewport size from the original
 	viewDef_t *parms = (viewDef_t *)R_FrameAlloc( sizeof( *parms ) );
@@ -194,7 +194,7 @@ static viewDef_t *R_MirrorViewBySurface( drawSurf_t *drawSurf ) {
 	R_MirrorVector( tr.viewDef->renderView.viewAxis[2], &surface, &camera, parms->renderView.viewAxis[2] );
 
 	// make the view origin 16 units away from the center of the surface
-	arcVec3	viewOrigin = ( drawSurf->geo->bounds[0] + drawSurf->geo->bounds[1] ) * 0.5;
+	anVec3	viewOrigin = ( drawSurf->geo->bounds[0] + drawSurf->geo->bounds[1] ) * 0.5;
 	viewOrigin += ( originalPlane.Normal() * 16 );
 
 	R_LocalPointToGlobal( drawSurf->space->modelMatrix, viewOrigin, parms->initialViewAreaOrigin );
@@ -287,7 +287,7 @@ static void R_RemoteRender( drawSurf_t *surf, textureStage_t *stage ) {
 R_MirrorRender
 =================
 */
-void R_MirrorRender( drawSurf_t *surf, textureStage_t *stage, ARCScreenRect scissor ) {
+void R_MirrorRender( drawSurf_t *surf, textureStage_t *stage, anScreenRect scissor ) {
 	// remote views can be reused in a single frame
 	if ( stage->dynamicFrameCount == tr.frameCount ) {
 		return;
@@ -335,7 +335,7 @@ void R_MirrorRender( drawSurf_t *surf, textureStage_t *stage, ARCScreenRect scis
 R_XrayRender
 =================
 */
-void R_XrayRender( drawSurf_t *surf, textureStage_t *stage, ARCScreenRect scissor ) {
+void R_XrayRender( drawSurf_t *surf, textureStage_t *stage, anScreenRect scissor ) {
 	// remote views can be reused in a single frame
 	if ( stage->dynamicFrameCount == tr.frameCount ) {
 		return;
@@ -384,7 +384,7 @@ R_GenerateSurfaceSubview
 ==================
 */
 bool R_GenerateSurfaceSubview( drawSurf_t *drawSurf ) {
-	arcBounds ndcBounds;
+	anBounds ndcBounds;
 
 	// for testing the performance hit
 	if ( r_skipSubviews.GetBool() ) {
@@ -395,7 +395,7 @@ bool R_GenerateSurfaceSubview( drawSurf_t *drawSurf ) {
 		return false;
 	}
 
-	const arcMaterial *shader = drawSurf->material;
+	const anMaterial *shader = drawSurf->material;
 	viewDef_t *parms;
 
 	// never recurse through a subview surface that we are
@@ -412,9 +412,9 @@ bool R_GenerateSurfaceSubview( drawSurf_t *drawSurf ) {
 	}
 
 	// crop the scissor bounds based on the precise cull
-	ARCScreenRect	scissor;
+	anScreenRect	scissor;
 
-	ARCScreenRect	*v = &tr.viewDef->viewport;
+	anScreenRect	*v = &tr.viewDef->viewport;
 	scissor.x1 = v->x1 + ( int )( ( v->x2 - v->x1 + 1 ) * 0.5f * ( ndcBounds[0][0] + 1.0f ) );
 	scissor.y1 = v->y1 + ( int )( ( v->y2 - v->y1 + 1 ) * 0.5f * ( ndcBounds[0][1] + 1.0f ) );
 	scissor.x2 = v->x1 + ( int )( ( v->x2 - v->x1 + 1 ) * 0.5f * ( ndcBounds[1][0] + 1.0f ) );
@@ -498,7 +498,7 @@ bool R_GenerateSubViews( void ) {
 	// there are no more subview surfaces.
 	for ( int i = 0; i < tr.viewDef->numDrawSurfs; i++ ) {
 		drawSurf_t *drawSurf; = tr.viewDef->drawSurfs[i];
-		const arcMaterial *shader = drawSurf->material;
+		const anMaterial *shader = drawSurf->material;
 		if ( !shader || !shader->HasSubview() ) {
 			continue;
 		}

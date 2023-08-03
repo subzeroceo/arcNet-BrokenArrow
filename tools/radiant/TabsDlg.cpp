@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "QE3.H"
@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
 // CTabsDlg dialog
 
 //IMPLEMENT_DYNAMIC ( CTabsDlg , CDialog )
-CTabsDlg::CTabsDlg(UINT ID , CWnd* pParent /*=NULL*/)
+CTabsDlg::CTabsDlg(UINT ID , CWnd* pParent /*=nullptr*/)
 	: CDialog(ID, pParent)
 {
 	m_DragTabActive = false;
@@ -86,7 +86,7 @@ void CTabsDlg::OnTcnSelchange(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CTabsDlg::DockWindow ( int ID , bool dock )
 {
-	DockedWindowInfo* info = NULL;
+	DockedWindowInfo* info = nullptr;
 	m_Windows.Lookup ( (WORD)ID , (void*&)info );
 
 	ASSERT ( info );
@@ -132,7 +132,7 @@ void CTabsDlg::DockWindow ( int ID , bool dock )
 		info->m_Window->SetParent ( this );
 		info->m_Window->ShowWindow (TRUE);
 
-		info->m_Container.SetDockManager( NULL );	//so it doesn't try to call back and redock this window
+		info->m_Container.SetDockManager( nullptr );	//so it doesn't try to call back and redock this window
 		info->m_Container.DestroyWindow ();
 
 		CRect rect;
@@ -193,7 +193,7 @@ void CTabsDlg::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CTabsDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	if ( m_DragTabActive && ((abs ( point.x - m_DragDownPoint.x ) > 50) || (abs ( point.y - m_DragDownPoint.y ) > 50) ))
+	if ( m_DragTabActive && ((abs ( point.x - m_DragDownPoint.x ) > 50) || (abs ( point.y - m_DragDownPoint.y ) > 50) ) )
 	{
 		HandleUndock();
 		m_DragTabActive = false;
@@ -225,11 +225,11 @@ void CTabsDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 void CTabsDlg::AddDockedWindow ( CWnd* wnd , int ID , int imageID , const CString& title , bool dock , pfnOnDockEvent dockCallback )
 {
-	DockedWindowInfo* info = NULL;
+	DockedWindowInfo* info = nullptr;
 	m_Windows.Lookup( (WORD)ID , (void*&)info);
 
 	ASSERT ( wnd );
-	ASSERT ( info == NULL );
+	ASSERT ( info == nullptr );
 
 	info = new DockedWindowInfo ( wnd , ID , imageID , title , dockCallback);
 
@@ -243,8 +243,8 @@ void CTabsDlg::ShowAllWindows ( bool show )
 {
 	POSITION pos;
 	WORD ID;
-	DockedWindowInfo* info = NULL;
-	for ( pos = m_Windows.GetStartPosition(); pos != NULL; )
+	DockedWindowInfo* info = nullptr;
+	for ( pos = m_Windows.GetStartPosition(); pos != nullptr; )
 	{
 		m_Windows.GetNextAssoc( pos, ID, (void*&)info );
 		ASSERT ( info->m_Window );
@@ -257,7 +257,7 @@ void CTabsDlg::ShowAllWindows ( bool show )
 
 void CTabsDlg::FocusWindow ( int ID )
 {
-	DockedWindowInfo* info = NULL;
+	DockedWindowInfo* info = nullptr;
 	m_Windows.Lookup( (WORD)ID , (void*&)info);
 
     ASSERT ( info );
@@ -278,7 +278,7 @@ void CTabsDlg::UpdateTabControlIndices ()
 	TCITEM item;
 	item.mask = TCIF_PARAM;
 
-	DockedWindowInfo* info = NULL;
+	DockedWindowInfo* info = nullptr;
 	int itemCount = m_Tabs.GetItemCount();
 
 	for ( int i = 0; i < itemCount; i ++ )
@@ -297,7 +297,7 @@ void CTabsDlg::OnDestroy()
 	TCITEM item;
 	item.mask = TCIF_PARAM;
 
-	DockedWindowInfo* info = NULL;
+	DockedWindowInfo* info = nullptr;
 
 	for ( int i = 0; i < m_Tabs.GetItemCount(); i ++ )
 	{
@@ -314,13 +314,13 @@ void CTabsDlg::OnDestroy()
 bool CTabsDlg::IsDocked ( CWnd* wnd )
 {
 	bool docked = false;
-	DockedWindowInfo* info = NULL;
+	DockedWindowInfo* info = nullptr;
 
 	CString placementName;
 	POSITION pos;
 	WORD wID;
 
-	for ( pos = m_Windows.GetStartPosition(); pos != NULL; )
+	for ( pos = m_Windows.GetStartPosition(); pos != nullptr; )
 	{
 		m_Windows.GetNextAssoc( pos, wID, (void*&)info );
 
@@ -334,17 +334,17 @@ bool CTabsDlg::IsDocked ( CWnd* wnd )
 
 void CTabsDlg::SaveWindowPlacement( int ID )
 {
-	DockedWindowInfo* info = NULL;
+	DockedWindowInfo* info = nullptr;
 
 	CString placementName;
 	POSITION pos;
 	WORD wID = ID;
 
-	for ( pos = m_Windows.GetStartPosition(); pos != NULL; )
+	for ( pos = m_Windows.GetStartPosition(); pos != nullptr; )
 	{
 		m_Windows.GetNextAssoc( pos, wID, (void*&)info );
 
-		if ( (info->m_State == DockedWindowInfo::FLOATING) && ((ID == -1 ) || (ID == info->m_ID) )) {
+		if ( (info->m_State == DockedWindowInfo::FLOATING) && ((ID == -1 ) || (ID == info->m_ID) ) ) {
 			placementName = info->m_Title + "Placement";
 			::SaveWindowPlacement(info->m_Container.GetSafeHwnd() , placementName);
 		}

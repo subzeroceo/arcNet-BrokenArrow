@@ -76,7 +76,7 @@
 
 /* IOCTL Commands for /dev/sequence*/
 #ifndef __SIOWR
-#if defined(__hpux) || (defined(_IOWR) && (defined(_AIX) || ( !defined(sun) && !defined(sparc) && !defined(__INCioctlh) && !defined(__Lynx__) )) )
+#if defined(__hpux) || (defined(_IOWR) && (defined(_AIX) || ( !defined( sun) && !defined( sparc) && !defined(__INCioctlh) && !defined(__Lynx__) ) ) )
 
 /* Use already defined ioctl defines if they exist (except with Sun and some others)*/
 #define	SIOCPARM_MASK	IOCPARM_MASK
@@ -110,9 +110,9 @@
 
 /* the 0x20000000 is so we can distinguish new ioctl's from old */
 #define	__SIO(x,y)	( ( int )(SIOC_VOID|(x<<8)|y) )
-#define	__SIOR(x,y,t)	( ( int )(SIOC_OUT|((sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y) )
-#define	__SIOW(x,y,t)	( ( int )(SIOC_IN|((sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y) )
-#define	__SIOWR(x,y,t)	( ( int )(SIOC_INOUT|((sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y) )
+#define	__SIOR(x,y,t)	( ( int )(SIOC_OUT|(( sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y) )
+#define	__SIOW(x,y,t)	( ( int )(SIOC_IN|(( sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y) )
+#define	__SIOWR(x,y,t)	( ( int )(SIOC_INOUT|(( sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y) )
 #define __SIOC_SIZE(x)	((x>>16)&SIOCPARM_MASK)
 #define __SIOC_DIR(x)	(x & 0xf0000000)
 #define __SIOC_NONE	SIOC_VOID
@@ -182,7 +182,7 @@ typedef struct seq_event_rec {
  * endian formats)
  */
 
-#if defined(_AIX) || defined(AIX) || defined(sparc) || defined(__hppa) || defined(PPC) || defined(__powerpc__) && !defined(i386) && !defined(__i386) && !defined(__i386__)
+#if defined(_AIX) || defined(AIX) || defined( sparc) || defined(__hppa) || defined(PPC) || defined(__powerpc__) && !defined(i386) && !defined(__i386) && !defined(__i386__)
 
 /* Big endian machines */
 #  define _PATCHKEY(id) (0xfd00|id)
@@ -593,7 +593,7 @@ typedef struct
 /*
  * S/PDIF raw format. In this format the S/PDIF frames (including all
  * control and user bits) are included in the data stream. Each sample
- * is stored in a 32 bit frame (see IEC-958 for more info). This format
+ * is stored in a 32 bit frame ( see IEC-958 for more info). This format
  * is supported by very few devices and it's only usable for purposes
  * where full access to the control/user bits is required (real time control).
  */
@@ -644,7 +644,7 @@ typedef struct audio_buf_info
 #	define DSP_CAP_DIGITALIN	0x00800000
 #	define DSP_CAP_ADMASK		0x00f00000
 /*
- * NOTE! (capabilities & DSP_CAP_ADMASK)==0 means just that the
+ * NOTE! (capabilities & DSP_CAP_ADMASK) == 0 means just that the
  * digital/analog interface control features are not supported by the
  * device/driver. However the device still supports analog, digital or
  * both inputs/outputs (depending on the device). See the OSS Programmer's
@@ -1193,7 +1193,7 @@ typedef struct oss_sysinfo {
   int numtimers;		/* # of available timer devices */
   int nummixers;		/* # of mixer devices */
 
-  int filler[SYSINFO_FILL_SIZE];	/* For future expansion (set to -1 ) */
+  int filler[SYSINFO_FILL_SIZE];	/* For future expansion ( set to -1 ) */
 } oss_sysinfo;
 
 typedef struct oss_mixext {
@@ -1208,9 +1208,9 @@ typedef struct oss_mixext {
 #	define MIXT_STEREOSLIDER 5	/* Stereo slider (dual 0 to 100) */
 #	define MIXT_MESSAGE	 6	/* (Readable) textual message */
 #	define MIXT_MONOVU	 7	/* VU meter value (mono) */
-#	define MIXT_STEREOVU	 8	/* VU meter value (stereo) */
+#	define MIXT_STEREOVU	 8	/* VU meter value ( stereo) */
 #	define MIXT_MONOPEAK	 9	/* VU meter peak value (mono) */
-#	define MIXT_STEREOPEAK	10	/* VU meter peak value (stereo) */
+#	define MIXT_STEREOPEAK	10	/* VU meter peak value ( stereo) */
 #	define MIXT_RADIOGROUP	11	/* Radio button group */
 #	define MIXT_MARKER	12	/* Separator between normal and extension entries */
 #	define MIXT_VALUE	13	/* Decimal value entry */
@@ -1413,7 +1413,7 @@ EXTERNC int OSS_write_patch2 ( int fd, unsigned char *buf, int len);
 #  define SEQ_DEFINEBUF(len) SEQ_USE_EXTBUF();static int _requested_seqbuflen=len
 #  define _SEQ_ADVBUF(len) OSS_seq_advbuf(len, seqfd, _seqbuf, _seqbuflen)
 #  define _SEQ_NEEDBUF(len) OSS_seq_needbuf(len, seqfd, _seqbuf, _seqbuflen)
-#  define SEQ_DUMPBUF() OSS_seqbuf_dump(seqfd, _seqbuf, _seqbuflen)
+#  define SEQ_DUMPBUF() OSS_seqbuf_dump( seqfd, _seqbuf, _seqbuflen)
 
 #  define SEQ_LOAD_GMINSTR(dev, instr) \
 		OSS_patch_caching(dev, -1, instr, seqfd, _seqbuf, _seqbuflen)
@@ -1438,7 +1438,7 @@ EXTERNC int OSS_write_patch2 ( int fd, unsigned char *buf, int len);
  *	void
  *	seqbuf_dump () {
  *	  if (_seqbufptr)
- *	    if (write (seqfd, _seqbuf, _seqbufptr) == -1 ) {
+ *	    if (write ( seqfd, _seqbuf, _seqbufptr) == -1 ) {
  *		perror ( "write /dev/sequencer" );
  *		exit (-1 );
  *	      }
@@ -1520,7 +1520,7 @@ EXTERNC int OSS_write_patch2 ( int fd, unsigned char *buf, int len);
 				_seqbuf[_seqbufptr+3] = (chn);\
 				_seqbuf[_seqbufptr+4] = ( p1 );\
 				_seqbuf[_seqbufptr+5] = ( p2 );\
-				*(short *)&_seqbuf[_seqbufptr+6] = (w14);\
+				*( short *)&_seqbuf[_seqbufptr+6] = (w14);\
 				_SEQ_ADVBUF(8);}
 /*
  * SEQ_SYSEX permits sending of sysex messages. (It may look that it permits
@@ -1535,7 +1535,7 @@ EXTERNC int OSS_write_patch2 ( int fd, unsigned char *buf, int len);
  * lengths of each fragments (except the last one) must be 6.
  *
  * Breaking the above rules may work with some MIDI ports but is likely to
- * cause fatal problems with some other devices (such as MPU401).
+ * cause fatal problems with some other devices ( such as MPU401).
  */
 #define SEQ_SYSEX(dev, buf, len) \
 				{int ii, ll=(len); \
@@ -1615,7 +1615,7 @@ EXTERNC int OSS_write_patch2 ( int fd, unsigned char *buf, int len);
 #define SEQ_ECHO_BACK(key)		_TIMER_EVENT(TMR_ECHO, key)
 #define SEQ_SET_TEMPO(value)		_TIMER_EVENT(TMR_TEMPO, value)
 #define SEQ_SONGPOS( pos )		_TIMER_EVENT(TMR_SPP, pos)
-#define SEQ_TIME_SIGNATURE(sig)		_TIMER_EVENT(TMR_TIMESIG, sig)
+#define SEQ_TIME_SIGNATURE( sig)		_TIMER_EVENT(TMR_TIMESIG, sig)
 
 /*
  * Local control events
@@ -1649,16 +1649,16 @@ EXTERNC int OSS_write_patch2 ( int fd, unsigned char *buf, int len);
  */
 #ifdef OSSLIB
 #   define SEQ_WRPATCH(patchx, len) \
-		OSS_write_patch(seqfd, (char*)(patchx), len)
+		OSS_write_patch( seqfd, (char*)(patchx), len)
 #   define SEQ_WRPATCH2(patchx, len) \
-		OSS_write_patch2(seqfd, (char*)(patchx), len)
+		OSS_write_patch2( seqfd, (char*)(patchx), len)
 #else
 #   define SEQ_WRPATCH(patchx, len) \
 		{if (_seqbufptr) SEQ_DUMPBUF();\
-		 if (write(seqfd, (char*)(patchx), len)==-1 ) \
+		 if (write( seqfd, (char*)(patchx), len)==-1 ) \
 		    perror( "Write patch: /dev/sequencer" );}
 #   define SEQ_WRPATCH2(patchx, len) \
-		(SEQ_DUMPBUF(), write(seqfd, (char*)(patchx), len) )
+		(SEQ_DUMPBUF(), write( seqfd, (char*)(patchx), len) )
 #endif
 
 #endif

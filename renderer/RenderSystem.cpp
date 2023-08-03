@@ -1,9 +1,9 @@
-#pragma hdrstop
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #include "tr_local.h"
+#pragma hdrstop
 
-ARCRenderEngineLocal	tr;
-ARCRenderSystem *renderSystem = &tr;
+anRenderSystemLocal	tr;
+anRenderSystem *renderSystem = &tr;
 
 void _qglTexImage2D( GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels) {
     printf( "target: %d\n", target );
@@ -41,7 +41,7 @@ static void R_PerformanceCounters( void ) {
 				megaBytes
 				);
 		} else {
-			common->Printf( "views:%i draws:%i tris:%i (shdw:%i) (vbo:%i) image:%5.1f MB\n",
+			common->Printf( "views:%i draws:%i tris:%i ( shdw:%i) (vbo:%i) image:%5.1f MB\n",
 				tr.pc.numViews,
 				backEnd.pc.drawElements + backEnd.pc.shdwElements,
 				( backEnd.pc.drawIndexes + backEnd.pc.shdwIndexes ) / 3,
@@ -106,7 +106,7 @@ void idRenderBackend::ExecuteBackEndCommands( const setBufferCommand_t *cmds ) {
 R_IssueCommandBuffer
 ====================
 */
-void ARCRenderEngineLocal::RenderCommandBuffers( const setBufferCommand_t * const cmdHead ) {
+void anRenderSystemLocal::RenderCommandBuffers( const setBufferCommand_t * const cmdHead ) {
 	// if there isn't a draw view command, do nothing to avoid swapping a bad frame
 	bool	hasView = false;
 
@@ -145,14 +145,14 @@ void ARCRenderEngineLocal::RenderCommandBuffers( const setBufferCommand_t * cons
 	}
 	R_ClearCommandChain();
 	// pass in null for now - we may need to do some map specific hackery in the future
-	//resolutionScale.InitForMap( NULL );
+	//resolutionScale.InitForMap( nullptr );
 }
 
 /*
 ============
 R_GetCommandBuffer
 
-Returns memory for a command buffer (stretchPicCommand_t,
+Returns memory for a command buffer ( stretchPicCommand_t,
 setBufferCommand_t, etc) and links it to the end of the
 current command chain.
 ============
@@ -160,8 +160,8 @@ current command chain.
 void *R_GetCommandBuffer( int bytes ) {
 	setBufferCommand_t	*cmd;
 
-	cmd = (setBufferCommand_t *)R_FrameAlloc( bytes );
-	cmd->next = NULL;
+	cmd = ( setBufferCommand_t *)R_FrameAlloc( bytes );
+	cmd->next = nullptr;
 	frameData->cmdTail->next = &cmd->commandId;
 	frameData->cmdTail = cmd;
 
@@ -169,22 +169,22 @@ void *R_GetCommandBuffer( int bytes ) {
 }
 
 void RB_CheckOverflow( int verts, int indexes ) {
-	surfTriangles_t *tris;
-		if (tris.numVertexes + verts < SHADER_MAX_VERTEXES && tris.numIndexes + indexes < SHADER_MAX_INDEXES ) {
+	srfTriangles_t *tris;
+		if ( tris.numVertexes + verts < SHADER_MAX_VERTEXES && tris.numIndexes + indexes < SHADER_MAX_INDEXES ) {
 		return;
 	}
 
 	RB_EndFrame();
 
 	if ( verts >= SHADER_MAX_VERTEXES ) {
-		common->Error( ERR_DROP, "RB_CheckOverflow: verts > MAX (%d > %d)", verts, SHADER_MAX_VERTEXES );
+		common->Error( "RB_CheckOverflow: verts > MAX (%d > %d)", verts, SHADER_MAX_VERTEXES );
 	}
 
 	if ( indexes >= SHADER_MAX_INDEXES ) {
-		common->Error( ERR_DROP, "RB_CheckOverflow: indices > MAX (%d > %d)", indexes, SHADER_MAX_INDEXES );
+		common->Error( "RB_CheckOverflow: indices > MAX (%d > %d)", indexes, SHADER_MAX_INDEXES );
 	}
 
-	RB_BeginFrame( tess.shader, tess.fogNum );
+	RB_BeginFrame( tris.shader, tris.fogNum );
 	// write a function that draws and checks OpenGL Overflow for debugging
     qglPushMatrix();
     qglPopMatrix();
@@ -204,9 +204,9 @@ and by R_ToggleSmpFrame
 */
 void R_ClearCommandChain( void ) {
 	// clear the command chain
-	frameData->cmdHead = frameData->cmdTail = (setBufferCommand_t *)R_FrameAlloc( sizeof( *frameData->cmdHead ) );
+	frameData->cmdHead = frameData->cmdTail = ( setBufferCommand_t *)R_FrameAlloc( sizeof( *frameData->cmdHead ) );
 	frameData->cmdHead->commandId = RC_NOP;
-	frameData->cmdHead->next = NULL;
+	frameData->cmdHead->next = nullptr;
 }
 
 /*
@@ -231,7 +231,7 @@ have multiple views if a mirror, portal, or dynamic texture is present.
 =============
 */
 void R_AddDrawViewCmd( viewDef_t *parms ) {//, bool guiOnly ) {
-	setBufferCommand_t	*cmd = (setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	setBufferCommand_t	*cmd = ( setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
 	//cmd->commandId = ( guiOnly ) ? RC_DRAW_VIEW_GUI : RC_DRAW_VIEW_3D;
 	cmd->commandId = RC_DRAW_VIEW;
 	cmd->viewDef = parms;
@@ -292,7 +292,7 @@ void R_LockSurfaceScene( viewDef_t *parms ) {
 	}
 
 	// add the stored off surface commands again
-	cmd = (setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	cmd = ( setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
 	*cmd = tr.lockSurfacesCmd;
 }
 
@@ -315,7 +315,7 @@ static void R_CheckCvars( void ) {
 	// filtering
 	// NOTE: dont forget to define these cvars in the primary headers later
 	if ( r_maxAnisotropicFiltering.IsModified() || r_useTrilinearFiltering.IsModified() ) {//|| r_lodBias.IsModified() ) {
-		arcLibrary::Printf( "Updating texture filter parameters.\n" );
+		anLibrary::Printf( "Updating texture filter parameters.\n" );
 		r_maxAnisotropicFiltering.ClearModified();
 		r_useTrilinearFiltering.ClearModified();
 		//r_lodBias.ClearModified();
@@ -328,7 +328,7 @@ static void R_CheckCvars( void ) {
 	}
 
 	// NOTE: dont forget to define these cvars in the primary headers later
-	extern arcCVarSystem r_useSeamlessCubeMap;
+	extern anCVarSystem r_useSeamlessCubeMap;
 	if ( r_useSeamlessCubeMap.IsModified() ) {
 		r_useSeamlessCubeMap.ClearModified();
 		if ( qglConfig.useSeamlessCubeMap ) {
@@ -341,7 +341,7 @@ static void R_CheckCvars( void ) {
 	}
 
 	// NOTE: dont forget to define these cvars in the primary headers later
-	extern arcCVarSystem r_useSRGB;
+	extern anCVarSystem r_useSRGB;
 	if ( r_useSRGB.IsModified() ) {
 		r_useSRGB.ClearModified();
 		if ( qglConfig.useSRGBFramebuffer ) {
@@ -361,14 +361,25 @@ static void R_CheckCvars( void ) {
 			qglDisable( GL_MULTISAMPLE_ARB );
 		}
 	}
+
+	// turn off shadow mapping for OpenGL drivers that are too slow
+	switch ( qglConfig.driverType ) {
+		case GLDRV_OPENGL_ES2:
+		case GLDRV_OPENGL_ES3:
+		case GLDRV_OPENGL_MESA:
+			r_useShadowMapping.SetInteger( 0 );
+			break;
+		default:
+			break;
+	}
 	// check for changes to logging state
 	GLimp_EnableLogging( r_logFile.GetInteger() != 0 );
 }
 
-ARCRenderEngineLocal::ARCRenderEngineLocal() : unitSquareTriangles( NULL ), zeroOneCubeTriangles( NULL ), testImageTriangles( NULL ) {
+anRenderSystemLocal::anRenderSystemLocal() : unitSquareTriangles( nullptr ), zeroOneCubeTriangles( nullptr ), testImageTriangles( nullptr ) {
 }
 
-ARCRenderEngineLocal::~ARCRenderEngineLocal( void ) {
+anRenderSystemLocal::~anRenderSystemLocal( void ) {
 }
 
 /*
@@ -379,19 +390,19 @@ This can be used to pass general information to the current material, not
 just colors
 =============
 */
-void ARCRenderEngineLocal::SetColor( const arcVec4 &rgba ) {
+void anRenderSystemLocal::SetColor( const anVec4 &rgba ) {
 	guiModel->SetColor( rgba[0], rgba[1], rgba[2], rgba[3] );
 }
 
-void ARCRenderEngineLocal::SetColor2( const arcVec4 & rgba ) {
+void anRenderSystemLocal::SetColor2( const anVec4 & rgba ) {
 	currentColorNativeBytesOrder = LittleLong( PackColor( rgba ) );
 }
 
-void ARCRenderEngineLocal::SetColor4( float r, float g, float b, float a ) {
+void anRenderSystemLocal::SetColor4( float r, float g, float b, float a ) {
 	guiModel->SetColor( r, g, b, a );
 }
 
-uint32 ARCRenderEngineLocal::GetColor2() {
+uint32 anRenderSystemLocal::GetColor2() {
 	return LittleLong( currentColorNativeBytesOrder );
 }
 
@@ -400,16 +411,16 @@ uint32 ARCRenderEngineLocal::GetColor2() {
 DrawStretchPic
 =============
 */
-void ARCRenderEngineLocal::DrawStretchPic( const aRcnicalImageVertex *verts, const qglIndex_t *indexes, int vertCount, int indexCount, const arcMaterial *material, bool clip, float min_x, float min_y, float max_x, float max_y ) {
+void anRenderSystemLocal::DrawStretchPic( const anDrawVertex *verts, const qglIndex_t *indexes, int vertCount, int indexCount, const anMaterial *material, bool clip, float min_x, float min_y, float max_x, float max_y ) {
 	guiModel->DrawStretchPic( verts, indexes, vertCount, indexCount, material,
 		clip, min_x, min_y, max_x, max_y );
 }
 
-void ARCRenderEngineLocal::DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const arcMaterial *material ) {
+void anRenderSystemLocal::DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const anMaterial *material ) {
 	guiModel->DrawStretchPic( x, y, w, h, s1, t1, s2, t2, material );
 }
 
-void ARCRenderEngineLocal::DrawStretchTri( arcVec2 p1, arcVec2 p2, arcVec2 p3, arcVec2 t1, arcVec2 t2, arcVec2 t3, const arcMaterial *material ) {
+void anRenderSystemLocal::DrawStretchTri( anVec2 p1, anVec2 p2, anVec2 p3, anVec2 t1, anVec2 t2, anVec2 t3, const anMaterial *material ) {
 	tr.guiModel->DrawStretchTri( p1, p2, p3, t1, t2, t3, material );
 }
 
@@ -418,29 +429,35 @@ void ARCRenderEngineLocal::DrawStretchTri( arcVec2 p1, arcVec2 p2, arcVec2 p3, a
 GlobalToNormalizedDeviceCoordinates
 =============
 */
-void ARCRenderEngineLocal::GlobalToNormalizedDeviceCoordinates( const arcVec3 &global, arcVec3 &ndc ) {
-	ARCRenderMatrixes->GlobalToNormalizedDeviceCoordinates( global, ndc );
+void anRenderSystemLocal::GlobalToNormalizedDeviceCoordinates( const anVec3 &global, anVec3 &ndc ) {
+	anGL_RenderMatrix->GlobalToNormalizedDeviceCoordinates( global, ndc );
 }
 
 /*
 =====================
-ARCRenderEngineLocal::GetGLSettings
+anRenderSystemLocal::GetGLSettings
 =====================
 */
-//void ARCRenderEngineLocal::GetGLSettings( int& width, int& height ) {
-//	width = qglConfig.vidWidth;
-//	height = qglConfig.vidHeight;
-//}
-void ARCRenderEngineLocal::SetGLState( const GLuint glState ) {
+void anRenderSystemLocal::GetGLSettings( int& width, int& height ) {
+	width = qglConfig.vidWidth;
+	height = qglConfig.vidHeight;
+}
+
+/*
+=====================
+anRenderSystemLocal::GetGLSettings
+=====================
+*/
+void anRenderSystemLocal::SetGLState( const GLint glState ) {
 	glState = qglState;
 }
 
 /*
 =====================
-ARCRenderEngineLocal::DrawFilled
+anRenderSystemLocal::DrawFilled
 =====================
 */
-void ARCRenderEngineLocal::DrawFilled( const arcVec4 & color, float x, float y, float w, float h ) {
+void anRenderSystemLocal::DrawFilled( const anVec4 & color, float x, float y, float w, float h ) {
 	SetColor2( color );
 	DrawStretchPic( x, y, w, h, 0.0f, 0.0f, 1.0f, 1.0f, whiteMaterial );
 }
@@ -451,20 +468,20 @@ idRenderSystemLocal::DrawStretchPic
 =============
 */
 static triIndex_t quadPicIndexes[6] = { 3, 0, 2, 2, 0, 1 };
-void ARCRenderEngineLocal::DrawStretchPic( const arcVec4 & topLeft, const arcVec4 & topRight, const arcVec4 & bottomRight, const arcVec4 & bottomLeft, const arcMaterial * material ) {
+void anRenderSystemLocal::DrawStretchPic( const anVec4 & topLeft, const anVec4 & topRight, const anVec4 & bottomRight, const anVec4 & bottomLeft, const anMaterial * material ) {
 	if ( !R_IsInitialized() ) {
 		return;
 	}
-	if ( material == NULL ) {
+	if ( material == nullptr ) {
 		return;
 	}
 
-	arcDrawVert * verts = guiModel->AllocTris( 4, quadPicIndexes, 6, material, currentGLState, STEREO_DEPTH_TYPE_NONE );
-	if ( verts == NULL ) {
+	anDrawVertex * verts = guiModel->AllocTris( 4, quadPicIndexes, 6, material, currentGLState, STEREO_DEPTH_TYPE_NONE );
+	if ( verts == nullptr ) {
 		return;
 	}
 
-	ALIGNTYPE16 arcDrawVert localVerts[4];
+	ALIGNTYPE16 anDrawVertex localVerts[4];
 
 	localVerts[0].Clear();
 	localVerts[0].xyz[0] = topLeft.x;
@@ -502,19 +519,19 @@ void ARCRenderEngineLocal::DrawStretchPic( const arcVec4 & topLeft, const arcVec
 idRenderSystemLocal::DrawStretchTri
 =============
 */
-void ARCRenderEngineLocal::DrawStretchTri( const arcVec2 & p1, const arcVec2 & p2, const arcVec2 & p3, const arcVec2 & t1, const arcVec2 & t2, const arcVec2 & t3, const arcMaterial *material ) {
-	if ( !R_IsInitialized() && material == NULL ) {
+void anRenderSystemLocal::DrawStretchTri( const anVec2 & p1, const anVec2 & p2, const anVec2 & p3, const anVec2 & t1, const anVec2 & t2, const anVec2 & t3, const anMaterial *material ) {
+	if ( !R_IsInitialized() && material == nullptr ) {
 		return;
 	}
 
 	triIndex_t tempIndexes[3] = { 1, 0, 2 };
 
-	arcDrawVert * verts = guiModel->AllocTris( 3, tempIndexes, 3, material, currentGLState, STEREO_DEPTH_TYPE_NONE );
-	if ( verts == NULL ) {
+	anDrawVertex * verts = guiModel->AllocTris( 3, tempIndexes, 3, material, currentGLState, STEREO_DEPTH_TYPE_NONE );
+	if ( verts == nullptr ) {
 		return;
 	}
 
-	ALIGNTYPE16 arcDrawVert localVerts[3];
+	ALIGNTYPE16 anDrawVertex localVerts[3];
 
 	localVerts[0].Clear();
 	localVerts[0].xyz[0] = p1.x;
@@ -545,18 +562,18 @@ void ARCRenderEngineLocal::DrawStretchTri( const arcVec2 & p1, const arcVec2 & p
 idRenderSystemLocal::AllocTris
 =============
 */
-arcDrawVert *ARCRenderEngineLocal::AllocTris( int numVerts, const triIndex_t * indexes, int numIndexes, const arcMaterial * material, const stereoDepthType_t stereoType ) {
+anDrawVertex *anRenderSystemLocal::AllocTris( int numVerts, const triIndex_t * indexes, int numIndexes, const anMaterial * material, const stereoDepthType_t stereoType ) {
 	return guiModel->AllocTris( numVerts, indexes, numIndexes, material, currentGLState, stereoType );
 }
 
 /*
 =====================
-ARCRenderEngineLocal::DrawSmallChar
+anRenderSystemLocal::DrawSmallChar
 
 small chars are drawn at native screen resolution
 =====================
 */
-void ARCRenderEngineLocal::DrawSmallChar( int x, int y, int ch, const arcMaterial *material ) {
+void anRenderSystemLocal::DrawSmallChar( int x, int y, int ch, const anMaterial *material ) {
 	int row, col;
 	float frow, fcol;
 	float size;
@@ -579,14 +596,12 @@ void ARCRenderEngineLocal::DrawSmallChar( int x, int y, int ch, const arcMateria
 	size = 0.0625f;
 
 	DrawStretchPic( x, y, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT,
-					   fcol, frow,
-					   fcol + size, frow + size,
-					   material );
+					   fcol, frow, fcol + size, frow + size, material );
 }
 
 /*
 ==================
-ARCRenderEngineLocal::DrawSmallString[Color]
+anRenderSystemLocal::DrawSmallString[Color]
 
 Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
@@ -594,8 +609,8 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-void ARCRenderEngineLocal::DrawSmallStringExt( int x, int y, const char *string, const arcVec4 &setColor, bool forceColor, const arcMaterial *material ) {
-	//const arcMaterial	*mtlOveride = NULL;
+void anRenderSystemLocal::DrawSmallStringExt( int x, int y, const char *string, const anVec4 &setColor, bool forceColor, const anMaterial *material ) {
+	//const anMaterial	*mtlOveride = nullptr;
 	// draw the colored text
 	const unsigned char *s = ( const unsigned char* )string;
 	int xx = x;
@@ -603,13 +618,13 @@ void ARCRenderEngineLocal::DrawSmallStringExt( int x, int y, const char *string,
 	SetColor( setColor );
 
 	while ( *s ) {
-		if ( arcNetString::IsColor( ( const char* )s ) ) {
+		if ( anString::IsColor( ( const char* )s ) ) {
 			if ( !forceColor ) {
 				if ( *( s+1 ) == C_COLOR_DEFAULT ) {
 					SetColor( setColor );
 				} else {
-					color = arcNetString::ColorForIndex( *( s+1 ) );
-					arcVec4 color[3] = setColor[3];
+					color = anString::ColorForIndex( *( s+1 ) );
+					anVec4 color[3] = setColor[3];
 					SetColor( color );
 				}
 			}
@@ -629,10 +644,10 @@ void ARCRenderEngineLocal::DrawSmallStringExt( int x, int y, const char *string,
 
 /*
 =====================
-ARCRenderEngineLocal::DrawBigChar
+anRenderSystemLocal::DrawBigChar
 =====================
 */
-void ARCRenderEngineLocal::DrawBigChar( int x, int y, int ch, const arcMaterial *material ) {
+void anRenderSystemLocal::DrawBigChar( int x, int y, int ch, const anMaterial *material ) {
 	ch &= 255;
 
 	if ( ch == ' ' ) {
@@ -655,7 +670,7 @@ void ARCRenderEngineLocal::DrawBigChar( int x, int y, int ch, const arcMaterial 
 
 /*
 ==================
-ARCRenderEngineLocal::DrawBigString[Color]
+anRenderSystemLocal::DrawBigString[Color]
 
 Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
@@ -663,18 +678,18 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-void ARCRenderEngineLocal::DrawBigStringExt( int x, int y, const char *string, const arcVec4 &setColor, bool forceColor, const arcMaterial *material ) {
+void anRenderSystemLocal::DrawBigStringExt( int x, int y, const char *string, const anVec4 &setColor, bool forceColor, const anMaterial *material ) {
 	// draw the colored text
 	const char *s = string;
 	int xx = x;
 	SetColor( setColor );
 	while ( *s ) {
-		if ( arcNetString::IsColor( s ) ) {
+		if ( anString::IsColor( s ) ) {
 			if ( !forceColor ) {
 				if ( *( s+1 ) == C_COLOR_DEFAULT ) {
 					SetColor( setColor );
 				} else {
-					arcVec4 color = arcNetString::ColorForIndex( *( s+1 ) );
+					anVec4 color = anString::ColorForIndex( *( s+1 ) );
 					color[3] = setColor[3];
 					SetColor( color );
 				}
@@ -692,7 +707,7 @@ void ARCRenderEngineLocal::DrawBigStringExt( int x, int y, const char *string, c
 
 /*
 ====================
-ARCRenderEngineLocal::SwapCommandBuffers
+anRenderSystemLocal::SwapCommandBuffers
 
 Performs final closeout of any gui models being defined.
 
@@ -706,10 +721,10 @@ After this is called, new command buffers can be built up in parallel
 with the rendering of the closed off command buffers by RenderCommandBuffers()
 ====================
 */
-const setBufferCommand_t *ARCRenderEngineLocal::SwapCommandBuffers( GLuint64 *frontEndMicroSec, GLuint64 *backEndMicroSec, GLuint64 *shadowMicroSec, GLuint64 *gpuMicroSec ) {
+const setBufferCommand_t *anRenderSystemLocal::SwapCommandBuffers( GLuint64 *frontEndMicroSec, GLuint64 *backEndMicroSec, GLuint64 *shadowMicroSec, GLuint64 *gpuMicroSec ) {
 	RB_LogComment( "SwapCommandBuffers" );
 
-	if ( gpuMicroSec != NULL ) {
+	if ( gpuMicroSec != nullptr ) {
 		*gpuMicroSec = 0;		// until shown otherwise
 	}
 
@@ -719,7 +734,7 @@ const setBufferCommand_t *ARCRenderEngineLocal::SwapCommandBuffers( GLuint64 *fr
 
 
 	// After coming back from an autoswap, we won't have anything to render
-	if ( frameData->cmdHead->next != NULL ) {
+	if ( frameData->cmdHead->next != nullptr ) {
 		// wait for our fence to hit, which means the swap has actually happened
 		// We must do this before clearing any resources the GPU may be using
 		void GL_BlockingSwapBuffers();
@@ -727,12 +742,12 @@ const setBufferCommand_t *ARCRenderEngineLocal::SwapCommandBuffers( GLuint64 *fr
 	}
 
 	// read back the start and end timer queries from the previous frame
-	if ( glConfig.timerQueryAvailable ) {
+	if ( qglConfig.timerQueryAvailable ) {
 		GLuint drawingTimeNanoseconds = 0;
 		if ( tr.timerQueryId != 0 ) {
 			qglGetQueryObjectui64vEXT( tr.timerQueryId, GL_QUERY_RESULT, &drawingTimeNanoseconds );
 		}
-		if ( gpuMicroSec != NULL ) {
+		if ( gpuMicroSec != nullptr ) {
 			*gpuMicroSec = drawingTimeNanoseconds / 1000;
 		}
 	}
@@ -740,7 +755,7 @@ const setBufferCommand_t *ARCRenderEngineLocal::SwapCommandBuffers( GLuint64 *fr
 	//------------------------------
 
 	// save out timing information
-	if ( frontEndMicroSec != NULL && backEndMicroSec != NULL && shadowMicroSec != NULL ) {
+	if ( frontEndMicroSec != nullptr && backEndMicroSec != nullptr && shadowMicroSec != nullptr ) {
 		*frontEndMicroSec = pc.frontEndMicroSec;
 		*backEndMicroSec = backEnd.pc.totalMicroSec;
 		*shadowMicroSec = backEnd.pc.shadowMicroSec;
@@ -763,7 +778,7 @@ SetBackEndRenderer
 Check for changes in the back end renderSystem, possibly invalidating cached data
 ==================
 */
-void ARCRenderEngineLocal::SetBackEndRenderer() {
+void anRenderSystemLocal::SetBackEndRenderer() {
 	if ( !r_renderer.IsModified() ) {
 		return;
 	}
@@ -772,25 +787,25 @@ void ARCRenderEngineLocal::SetBackEndRenderer() {
 
 	backEndRenderer = BE_BAD;
 
-	if ( arcNetString::Icmp( r_renderer.GetString(), "arb" ) == 0 ) {
+	if ( anString::Icmp( r_renderer.GetString(), "arb" ) == 0 ) {
 		backEndRenderer = BE_ARB;
-	} else if ( arcNetString::Icmp( r_renderer.GetString(), "arb2" ) == 0 ) {
+	} else if ( anString::Icmp( r_renderer.GetString(), "arb2" ) == 0 ) {
 		if ( qglConfig.ARB2Path ) {
 			backEndRenderer = BE_ARB2;
 		}
-	} else if ( arcNetString::Icmp( r_renderer.GetString(), "nv10" ) == 0 ) {
+	} else if ( anString::Icmp( r_renderer.GetString(), "nv10" ) == 0 ) {
 		if ( qglConfig.NV10Path ) {
 			backEndRenderer = BE_NV10;
 		}
-	} else if ( arcNetString::Icmp( r_renderer.GetString(), "nv20" ) == 0 ) {
+	} else if ( anString::Icmp( r_renderer.GetString(), "nv20" ) == 0 ) {
 		if ( qglConfig.NV20Path ) {
 			backEndRenderer = BE_NV20;
 		}
-	} else if ( arcNetString::Icmp( r_renderer.GetString(), "r200" ) == 0 ) {
+	} else if ( anString::Icmp( r_renderer.GetString(), "r200" ) == 0 ) {
 		if ( qglConfig.R200Path ) {
 			backEndRenderer = BE_R200;
 		}
-	} else if ( arcNetString::Icmp( r_renderer.GetString(), "GLARB" ) == 0 ) {
+	} else if ( anString::Icmp( r_renderer.GetString(), "GL_4_6" ) == 0 ) {
 		if ( qglConfig.ARB_GLARBpath ) {
 			backEndRenderer = BE_GLARB;
 		}
@@ -816,9 +831,9 @@ void ARCRenderEngineLocal::SetBackEndRenderer() {
 	beRenderVertProgs = false;
 	beRenderMaxLight = 1.0;
 
-	switch( backEndRenderer ) {
+	switch ( backEndRenderer ) {
 	case BE_GLARB:
-		common->Printf( "using GLARB renderSystem\n" );
+		common->Printf( "using GL 4.6 renderSystem\n" );
 		break;
 	case BE_ARB:
 		common->Printf( "using ARB renderSystem\n" );
@@ -861,7 +876,7 @@ void ARCRenderEngineLocal::SetBackEndRenderer() {
 BeginFrame
 ====================
 */
-void ARCRenderEngineLocal::BeginFrame( int winWidth, int winHeight ) {
+void anRenderSystemLocal::BeginFrame( int winWidth, int winHeight ) {
 	setBufferCommand_t	*cmd;
 
 	if ( !qglConfig.isInitialized ) {
@@ -894,8 +909,6 @@ void ARCRenderEngineLocal::BeginFrame( int winWidth, int winHeight ) {
 		int h = SCREEN_HEIGHT * r_screenFraction.GetInteger() / 100.0f;
 		CropRenderSize( w, h );
 	}
-
-
 	// this is the ONLY place this is modified
 	frameCount++;
 
@@ -906,7 +919,7 @@ void ARCRenderEngineLocal::BeginFrame( int winWidth, int winHeight ) {
 	// the first rendering will be used for commands like
 	// screenshot, rather than a possible subsequent remote
 	// or mirror render
-	// primaryWorld = NULL;
+	// primaryWorld = nullptr;
 
 	// set the time for shader effects in 2D rendering
 	frameShaderTime = eventLoop->Milliseconds() * 0.001;
@@ -914,7 +927,7 @@ void ARCRenderEngineLocal::BeginFrame( int winWidth, int winHeight ) {
 	//
 	// draw buffer stuff
 	//
-	cmd = (setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	cmd = ( setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
 	cmd->commandId = RC_SET_BUFFER;
 	cmd->frameCount = frameCount;
 
@@ -924,16 +937,16 @@ void ARCRenderEngineLocal::BeginFrame( int winWidth, int winHeight ) {
 		cmd->buffer = ( int )GL_BACK;
 	}
 }
-void ARCRenderEngineLocal::RenderLightFrustum( const struct renderLight_s &renderLight, arcPlane lightFrustum[6] ) {
+void anRenderSystemLocal::RenderLightFrustum( const struct renderLight_s &renderLight, anPlane lightFrustum[6] ) {
 	R_RenderLightFrustum( renderLight, lightFrustum );
 }
 
-void ARCRenderEngineLocal::LightProjectionMatrix( const arcVec3 &origin, const arcPlane &rearPlane, arcVec4 mat[4] ) {
+void anRenderSystemLocal::LightProjectionMatrix( const anVec3 &origin, const anPlane &rearPlane, anVec4 mat[4] ) {
 	LightProjectionMatrix();
 }
 
 
-void ARCRenderEngineLocal::ToggleSmpFrame( void ) {
+void anRenderSystemLocal::ToggleSmpFrame( void ) {
 	// note that this does not necessarily mean we're going to be finishing
 	// a render job in parallel
 	//
@@ -949,7 +962,6 @@ void ARCRenderEngineLocal::ToggleSmpFrame( void ) {
 		if ( frameCount.GetValue() < oldFrameCount ) {
 			guiSmpToggle = false;
 		}
-
 	}
 }
 
@@ -968,17 +980,17 @@ Parameters:
 - numIndexes: a pointer to an integer to store the number of indexes (optional)
 =============
 */
-void ARCRenderEngineLocal::EndFrame( int *frontEndMsec, int *backEndMsec, int *numVerts, int *numIndexes ) {
+void anRenderSystemLocal::EndFrame( int *frontEndMsec, int *backEndMsec, int *numVerts, int *numIndexes ) {
     if ( !qglConfig.isInitialized || !qglDrawBuffer( setBufferCommand_t *cmd ) ) {
         return R_IsInitialized();
 	} else {
-		if ( !qglConfig.isInitialized == NULL ) {
+		if ( !qglConfig.isInitialized == nullptr ) {
 			return;
 		}
     }
 
 	// After coming back from an autoswap, we won't have anything to render
-	if ( frameData->cmdHead->next != NULL ) {
+	if ( frameData->cmdHead->next != nullptr ) {
 		// wait for our fence to hit, which means the swap has actually happened
 		// We must do this before clearing any resources the GPU may be using
 		void GL_BlockingSwapBuffers();
@@ -988,11 +1000,11 @@ void ARCRenderEngineLocal::EndFrame( int *frontEndMsec, int *backEndMsec, int *n
     // Close any GUI drawing
     guiModel->EmitFullScreen();
     guiModel->Clear();
-	if ( numVerts != NULL ) {
+	if ( numVerts != nullptr ) {
 		// *numVerts = pc.frontEndMicroSec;
 	}
 
-	//if ( gpuMicroSec != NULL ) {
+	//if ( gpuMicroSec != nullptr ) {
 		// *gpuMicroSec = 0;		// until shown otherwise
 	//}
 
@@ -1000,10 +1012,10 @@ void ARCRenderEngineLocal::EndFrame( int *frontEndMsec, int *backEndMsec, int *n
 	// The function takes in several optional parameters to store
 	// the number of milliseconds spent in the front end saving the timing information, the
 	// back end the number of vertices, and the number of indexes.
-	if ( frontEndMsec != NULL ) {
+	if ( frontEndMsec != nullptr ) {
 		*frontEndMsec = pc.frontEndMsec;
 	}
-	if ( backEndMsec != NULL ) {
+	if ( backEndMsec != nullptr ) {
 		*backEndMsec = backEnd.pc.mSec;
 	}
 
@@ -1017,7 +1029,7 @@ void ARCRenderEngineLocal::EndFrame( int *frontEndMsec, int *backEndMsec, int *n
     GL_CheckErrors();
 
     // Add the swapbuffers command
-    setBufferCommand_t *cmd = (setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+    setBufferCommand_t *cmd = ( setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
     cmd->commandId = RC_SWAP_BUFFERS;
 
     // Start the back end up again with the new command list
@@ -1039,22 +1051,20 @@ RenderViewToViewport
 Converts from SCREEN_WIDTH / SCREEN_HEIGHT coordinates to current cropped pixel coordinates
 =====================
 */
-void ARCRenderEngineLocal::RenderViewToViewport( const renderView_t *renderView, aRcScreenRect *viewport ) {
+void anRenderSystemLocal::RenderViewToViewport( const renderView_t *renderView, anScreenRect *viewport ) {
 	renderCrop_t *rc = &renderCrops[currentRenderCrop];
 
 	float wRatio = ( float )rc->width / SCREEN_WIDTH;
 	float hRatio = ( float )rc->height / SCREEN_HEIGHT;
 
-	viewport->x1 = arcMath::Ftoi( rc->x + renderView->x * wRatio );
-	viewport->x2 = arcMath::Ftoi( rc->x + floor( ( renderView->x + renderView->width ) * wRatio + 0.5f ) - 1 );
-	viewport->y1 = arcMath::Ftoi( ( rc->y + rc->height ) - floor( ( renderView->y + renderView->height ) * hRatio + 0.5f ) );
-	viewport->y2 = arcMath::Ftoi( ( rc->y + rc->height ) - floor( renderView->y * hRatio + 0.5f ) - 1 );
+	viewport->x1 = anMath::Ftoi( rc->x + renderView->x * wRatio );
+	viewport->x2 = anMath::Ftoi( rc->x + floor( ( renderView->x + renderView->width ) * wRatio + 0.5f ) - 1 );
+	viewport->y1 = anMath::Ftoi( ( rc->y + rc->height ) - floor( ( renderView->y + renderView->height ) * hRatio + 0.5f ) );
+	viewport->y2 = anMath::Ftoi( ( rc->y + rc->height ) - floor( renderView->y * hRatio + 0.5f ) - 1 );
 }
 
 static int RoundDownToPowerOfTwo( int v ) {
-	int	i;
-
-	for ( i = 0; i < 20; i++ ) {
+	for ( int i = 0; i < 20; i++ ) {
 		if ( ( 1 << i ) == v ) {
 			return v;
 		}
@@ -1074,7 +1084,7 @@ so if you specify a power of two size for a texture copy, it may be shrunk
 down, but still valid.
 ================
 */
-void ARCRenderEngineLocal::CropRenderSize( int width, int height, bool makePowerOfTwo, bool forceDimensions ) {
+void anRenderSystemLocal::CropRenderSize( int width, int height, bool makePowerOfTwo, bool forceDimensions ) {
 	if ( !qglConfig.isInitialized ) {
 		return;
 	}
@@ -1094,7 +1104,7 @@ void ARCRenderEngineLocal::CropRenderSize( int width, int height, bool makePower
 	renderView.width = width;
 	renderView.height = height;
 
-	aRcScreenRect	r;
+	anScreenRect r;
 	RenderViewToViewport( &renderView, &r );
 
 	width = r.x2 - r.x1 + 1;
@@ -1124,7 +1134,7 @@ void ARCRenderEngineLocal::CropRenderSize( int width, int height, bool makePower
 	}
 
 	if ( currentRenderCrop == MAX_RENDER_CROPS ) {
-		common->Error( "ARCRenderEngineLocal::CropRenderSize: currentRenderCrop == MAX_RENDER_CROPS" );
+		common->Error( "anRenderSystemLocal::CropRenderSize: currentRenderCrop == MAX_RENDER_CROPS" );
 	}
 
 	currentRenderCrop++;
@@ -1139,30 +1149,30 @@ void ARCRenderEngineLocal::CropRenderSize( int width, int height, bool makePower
 
 /*
 =====================
-ARCRenderEngineLocal::WriteDemoPics
+anRenderSystemLocal::WriteDemoPics
 =====================
 */
-void ARCRenderEngineLocal::WriteDemoPics() {
+void anRenderSystemLocal::WriteDemoPics() {
 	//common->WriteDemo()->WriteInt( DS_RENDER );
 	//common->WriteDemo()->WriteInt( DC_GUI_MODEL );
 }
 
 /*
 =====================
-ARCRenderEngineLocal::DrawDemoPics
+anRenderSystemLocal::DrawDemoPics
 =====================
 */
-void ARCRenderEngineLocal::DrawDemoPics() {
+void anRenderSystemLocal::DrawDemoPics() {
 }
 
 /*
 =====================
-ARCRenderEngineLocal::GetCroppedViewport
+anRenderSystemLocal::GetCroppedViewport
 
 Returns the current cropped pixel coordinates
 =====================
 */
-void ARCRenderEngineLocal::GetCroppedViewport( idScreenRect * viewport ) {
+void anRenderSystemLocal::GetCroppedViewport( idScreenRect * viewport ) {
 	*viewport = renderCrops[currentRenderCrop];
 }
 
@@ -1171,13 +1181,13 @@ void ARCRenderEngineLocal::GetCroppedViewport( idScreenRect * viewport ) {
 UnCrop
 ================
 */
-void ARCRenderEngineLocal::UnCrop() {
-	if ( !qglConfig.isInitialized ) {
+void anRenderSystemLocal::UnCrop() {
+	if ( !qglConfig.isInitialized ) {// && IsInitialized() ) {
 		return;
 	}
 
 	if ( currentRenderCrop < 1 ) {
-		common->Error( "ARCRenderEngineLocal::UnCrop: currentRenderCrop < 1" );
+		common->Error( "anRenderSystemLocal::UnCrop: currentRenderCrop < 1" );
 	}
 
 	// close any gui drawing
@@ -1192,8 +1202,8 @@ void ARCRenderEngineLocal::UnCrop() {
 CaptureRenderToImage
 ================
 */
-void ARCRenderEngineLocal::CaptureRenderToImage( const char *imageName ) {
-	if ( !qglConfig.isInitialized ) {
+void anRenderSystemLocal::CaptureRenderToImage( const char *imageName ) {
+	if ( !qglConfig.isInitialized ) {// && IsInitialized() ) {
 		return;
 	}
 	guiModel->EmitFullScreen();
@@ -1201,11 +1211,11 @@ void ARCRenderEngineLocal::CaptureRenderToImage( const char *imageName ) {
 
 	// look up the image before we create the render command, because it
 	// may need to sync to create the image
-	ARCImage	*image = globalImages->ImageFromFile( imageName, TF_DEFAULT, true, TR_REPEAT, TD_DEFAULT );
+	anImage	*image = globalImages->ImageFromFile( imageName, TF_DEFAULT, true, TR_REPEAT, TD_DEFAULT );
 
 	renderCrop_t *rc = &renderCrops[currentRenderCrop];
 
-	setBufferCommand_t *cmd = (setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	setBufferCommand_t *cmd = ( setBufferCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
 	cmd->commandId = RC_COPY_RENDER;
 	cmd->x = rc->x;
 	cmd->y = rc->y;
@@ -1221,8 +1231,8 @@ void ARCRenderEngineLocal::CaptureRenderToImage( const char *imageName ) {
 CaptureRenderToFile
 ==============
 */
-void ARCRenderEngineLocal::CaptureRenderToFile( const char *fileName, bool fixAlpha ) {
-	if ( !qglConfig.isInitialized ) {
+void anRenderSystemLocal::CaptureRenderToFile( const char *fileName, bool fixAlpha ) {
+	if ( !qglConfig.isInitialized ) {// && IsInitialized() ) {
 		return;
 	}
 
@@ -1232,15 +1242,17 @@ void ARCRenderEngineLocal::CaptureRenderToFile( const char *fileName, bool fixAl
 	guiModel->Clear();
 	RenderCommandBuffers();
 
-	qglReadBuffer( GL_BACK );
+	if ( !qglConfig.useFramebufferObject ) {
+		qglReadBuffer( GL_BACK );
+	}
 
 	// include extra space for OpenGL padding to word boundaries
 	int	c = ( rc->width + 3 ) * rc->height;
-	byte *data = ( byte * )R_StaticAlloc( c * 3 );
+	byte *data = (byte *)R_StaticAlloc( c * 3 );
 
 	qglReadPixels( rc->x, rc->y, rc->width, rc->height, GL_RGB, GL_UNSIGNED_BYTE, data );
 
-	/*byte *data2 = ( byte * )R_StaticAlloc( c * 4 );
+	/*byte *data2 = (byte *)R_StaticAlloc( c * 4 );
 
 	for ( int i = 0; i < c; i++ ) {
 		data2[ i * 4 ] = data[ i * 3 ];
@@ -1253,7 +1265,7 @@ void ARCRenderEngineLocal::CaptureRenderToFile( const char *fileName, bool fixAl
 	int dataRowSize = rc->width * 3; // row size without padding
 	int dataRowSkip = dataStride - dataRowSize;
 
-	byte *data2 = ( byte * )R_StaticAlloc( rc->width * rc->height * 4 );
+	byte *data2 = (byte *)R_StaticAlloc( rc->width * rc->height * 4 );
 	byte *pData2 = data2;
 	byte *pData2PastLast = data2 + ( rc->width * rc->height * 4 );
 
@@ -1279,9 +1291,9 @@ void ARCRenderEngineLocal::CaptureRenderToFile( const char *fileName, bool fixAl
 AllocRenderWorld
 ==============
 */
-ARCRenderWorld *ARCRenderEngineLocal::AllocRenderWorld() {
-	ARCRenderWorldLocal *rw;
-	rw = new ARCRenderWorldLocal;
+anRenderWorld *anRenderSystemLocal::AllocRenderWorld() {
+	anRenderWorldLocal *rw;
+	rw = new anRenderWorldLocal;
 	worlds.Append( rw );
 	return rw;
 }
@@ -1291,11 +1303,11 @@ ARCRenderWorld *ARCRenderEngineLocal::AllocRenderWorld() {
 FreeRenderWorld
 ==============
 */
-void ARCRenderEngineLocal::FreeRenderWorld( ARCRenderWorld *rw ) {
+void anRenderSystemLocal::FreeRenderWorld( anRenderWorld *rw ) {
 	if ( primaryWorld == rw ) {
-		primaryWorld = NULL;
+		primaryWorld = nullptr;
 	}
-	worlds.Remove( static_cast<ARCRenderWorldLocal *>( rw ) );
+	worlds.Remove( static_cast<anRenderWorldLocal *>( rw ) );
 	delete rw;
 }
 
@@ -1304,7 +1316,7 @@ void ARCRenderEngineLocal::FreeRenderWorld( ARCRenderWorld *rw ) {
 PrintMemInfo
 ==============
 */
-void ARCRenderEngineLocal::PrintMemInfo( MemInfo_t *mi ) {
+void anRenderSystemLocal::PrintMemInfo( MemInfo_t *mi ) {
 	// sum up image totals
 	globalImages->PrintMemInfo( mi );
 
@@ -1315,11 +1327,11 @@ void ARCRenderEngineLocal::PrintMemInfo( MemInfo_t *mi ) {
 
 /*
 ===============
-ARCRenderEngineLocal::UploadImage
+anRenderSystemLocal::UploadImage
 ===============
 */
-bool ARCRenderEngineLocal::UploadImage( const char *imageName, const byte *data, int width, int height  ) {
-	ARCImage *image = globalImages->GetImage( imageName );
+bool anRenderSystemLocal::UploadImage( const char *imageName, const byte *data, int width, int height  ) {
+	anImage *image = globalImages->GetImage( imageName );
 	if ( !image ) {
 		return false;
 	}

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "GEApp.h"
@@ -35,18 +35,18 @@ If you have questions concerning this license or the applicable additional terms
 rvGEHideModifier::rvGEHideModifier ( const char* name, idWindow* window, bool hide ) :
 	rvGEModifier ( name, window )
 {
-	mParent		= NULL;
+	mParent		= nullptr;
 	mHide		= hide;
-	mUndoHide	= mWrapper->IsHidden ( );
+	mUndoHide	= mWrapper->IsHidden();
 
 	// If unhiding then find any parent window along the way that may be hidden and prevent
 	// this window from being visible
 	if ( !hide )
 	{
 		mParent = mWindow;
-		while ( NULL != (mParent = mParent->GetParent ( ) ) )
+		while ( nullptr != (mParent = mParent->GetParent() ) )
 		{
-			if ( rvGEWindowWrapper::GetWrapper(mParent)->IsHidden ( ) )
+			if ( rvGEWindowWrapper::GetWrapper(mParent)->IsHidden() )
 			{
 				break;
 			}

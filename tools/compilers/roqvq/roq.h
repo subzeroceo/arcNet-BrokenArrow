@@ -98,9 +98,9 @@ public:
 	void				WriteHangFrame( void );
 	int					NumberOfFrames( void );
 private:
-	void				Write16Word( word *aWord, arcNetFile *stream );
-	void				Write32Word( unsigned int *aWord, arcNetFile *stream );
-	int					SizeFile( arcNetFile *ftosize );
+	void				Write16Word( word *aWord, anFile *stream );
+	void				Write32Word( unsigned int *aWord, anFile *stream );
+	int					SizeFile( anFile *ftosize );
 	void				CloseRoQFile( void );
 	void				WriteCodeBookToStream( byte *codebook, int csize, word cflags );
 
@@ -116,13 +116,13 @@ private:
 	codec *				encoder;
 	roqParam *			paramFile;
 
-	arcNetFile *			RoQFile;
+	anFile *			RoQFile;
 	NSBitmapImageRep *	image;
 	int					numQuadCels;
 	bool				quietMode;
 	bool				lastFrame;
-	arcNetString 				roqOutfile;
-	arcNetString 				currentFile;
+	anString 				roqOutfile;
+	anString 				currentFile;
 	int					numberOfFrames;
 	int					previousSize;
 	byte 				codes[4096];

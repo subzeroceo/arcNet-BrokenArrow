@@ -1,4 +1,4 @@
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Game_local.h"
@@ -13,7 +13,7 @@
 ===============================================================================
 */
 
-ABSTRACT_DECLARATION( idEntity, idCamera )
+ABSTRACT_DECLARATION( anEntity, idCamera )
 END_CLASS
 
 /*
@@ -30,7 +30,7 @@ idCamera::GetRenderView
 =====================
 */
 renderView_t *idCamera::GetRenderView() {
-	renderView_t *rv = idEntity::GetRenderView();
+	renderView_t *rv = anEntity::GetRenderView();
 	GetViewParms( rv );
 	return rv;
 }
@@ -40,25 +40,25 @@ renderView_t *idCamera::GetRenderView() {
   idCameraView
 
 ***********************************************************************/
-const idEventDef EV_Camera_SetAttachments( "<getattachments>", NULL );
+const anEventDef EV_Camera_SetAttachments( "<getattachments>", nullptr );
 
-// RAVEN BEGIN
+
 // bdube: added events
-const idEventDef EV_SetFOV	(	 "setFOV", "f" );
-const idEventDef EV_GetFOV		( "getFOV", NULL, 'f' );
-const idEventDef EV_BlendFOV	( "blendFOV", "fff");
-// RAVEN END
+const anEventDef EV_SetFOV	(	 "setFOV", "f" );
+const anEventDef EV_GetFOV		( "getFOV", nullptr, 'f' );
+const anEventDef EV_BlendFOV	( "blendFOV", "fff" );
+
 
 CLASS_DECLARATION( idCamera, idCameraView )
 	EVENT( EV_Activate,				idCameraView::Event_Activate )
 	EVENT( EV_Camera_SetAttachments, idCameraView::Event_SetAttachments )
 
-// RAVEN BEGIN
+
 // bdube: added events
 	EVENT( EV_SetFOV,				idCameraView::Event_SetFOV )
 	EVENT( EV_BlendFOV,				idCameraView::Event_BlendFOV )
 	EVENT( EV_GetFOV,				idCameraView::Event_GetFOV )
-// RAVEN END
+
 END_CLASS
 
 /*
@@ -67,13 +67,13 @@ idCameraView::idCameraView
 ================
 */
 idCameraView::idCameraView() {
-// RAVEN BEGIN
+
 // bdube: interpolate fov
 // scork: get it from the cvar, don't assume 90
 	fov.Init ( gameLocal.time, 0, g_fov.GetFloat(), g_fov.GetFloat() );
-// RAVEN END
-	attachedTo = NULL;
-	attachedView = NULL;
+
+	attachedTo = nullptr;
+	attachedView = nullptr;
 }
 
 /*
@@ -81,14 +81,14 @@ idCameraView::idCameraView() {
 idCameraView::Save
 ================
 */
-void idCameraView::Save( idSaveGame *savefile ) const {
-// RAVEN BEGIN
+void idCameraView::Save( anSaveGame *savefile ) const {
+
 // bdube: fov interpolated now
 	savefile->WriteInt( fov.GetDuration() );
 	savefile->WriteInt( fov.GetStartTime() );
 	savefile->WriteFloat( fov.GetStartValue() );
 	savefile->WriteFloat( fov.GetEndValue() );
-// RAVEN END
+
 	savefile->WriteObject( attachedTo );
 	savefile->WriteObject( attachedView );
 }
@@ -98,8 +98,8 @@ void idCameraView::Save( idSaveGame *savefile ) const {
 idCameraView::Restore
 ================
 */
-void idCameraView::Restore( idRestoreGame *savefile ) {
-// RAVEN BEGIN
+void idCameraView::Restore( anRestoreGame *savefile ) {
+
 // bdube: fov interpolated now
 	int set;
 	float setf;
@@ -111,9 +111,9 @@ void idCameraView::Restore( idRestoreGame *savefile ) {
 	fov.SetStartValue( setf );
 	savefile->ReadFloat( setf );
 	fov.SetEndValue( setf );
-// RAVEN END
-	savefile->ReadObject( reinterpret_cast<idClass *&>( attachedTo ) );
-	savefile->ReadObject( reinterpret_cast<idClass *&>( attachedView ) );
+
+	savefile->ReadObject( reinterpret_cast<anClass *&>( attachedTo ) );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( attachedView ) );
 }
 
 /*
@@ -131,8 +131,8 @@ void idCameraView::Event_SetAttachments(  ) {
 idCameraView::Event_Activate
 ================
 */
-void idCameraView::Event_Activate( idEntity *activator ) {
-	if (spawnArgs.GetBool("trigger")) {
+void idCameraView::Event_Activate( anEntity *activator ) {
+	if ( spawnArgs.GetBool( "trigger" ) ) {
 		if (gameLocal.GetCamera() != this) {
 			if ( g_debugCinematic.GetBool() ) {
 				gameLocal.Printf( "%d: '%s' start\n", gameLocal.framenum, GetName() );
@@ -143,7 +143,7 @@ void idCameraView::Event_Activate( idEntity *activator ) {
 			if ( g_debugCinematic.GetBool() ) {
 				gameLocal.Printf( "%d: '%s' stop\n", gameLocal.framenum, GetName() );
 			}
-			gameLocal.SetCamera(NULL);
+			gameLocal.SetCamera(nullptr );
 		}
 	}
 }
@@ -157,11 +157,11 @@ void idCameraView::Stop( void ) {
 	if ( g_debugCinematic.GetBool() ) {
 		gameLocal.Printf( "%d: '%s' stop\n", gameLocal.framenum, GetName() );
 	}
-	gameLocal.SetCamera(NULL);
+	gameLocal.SetCamera(nullptr );
 	ActivateTargets( gameLocal.GetLocalPlayer() );
 }
 
-// RAVEN BEGIN
+
 // bdube: added events
 /*
 =====================
@@ -190,16 +190,16 @@ idCameraView::Event_GetFOV
 */
 void idCameraView::Event_GetFOV()
 {
-	idThread::ReturnFloat(fov.GetCurrentValue(gameLocal.time));
+	anThread::ReturnFloat(fov.GetCurrentValue(gameLocal.time));
 }
-// RAVEN END
+
 
 /*
 =====================
 idCameraView::Spawn
 =====================
 */
-void idCameraView::SetAttachment( idEntity **e, const char *p  ) {
+void idCameraView::SetAttachment( anEntity **e, const char *p  ) {
 	const char *cam = spawnArgs.GetString( p );
 	if ( strlen ( cam ) ) {
 		*e = gameLocal.FindEntity( cam );
@@ -214,19 +214,19 @@ idCameraView::Spawn
 */
 void idCameraView::Spawn( void ) {
 	// if no target specified use ourself
-	const char *cam = spawnArgs.GetString("cameraTarget");
+	const char *cam = spawnArgs.GetString( "cameraTarget" );
 	if ( strlen ( cam ) == 0) {
-		spawnArgs.Set("cameraTarget", spawnArgs.GetString("name"));
+		spawnArgs.Set( "cameraTarget", spawnArgs.GetString( "name" ) );
 	}
-// RAVEN BEGIN
+
 // bdube: interpolate fov
 // scork: ... but default from the cvar, not hardwired 90
-	fov.Init ( gameLocal.time, 0, spawnArgs.GetFloat("fov", va("%f",g_fov.GetFloat())), spawnArgs.GetFloat("fov", va("%f",g_fov.GetFloat())) );
-// RAVEN END
+	fov.Init ( gameLocal.time, 0, spawnArgs.GetFloat( "fov", va( "%f",g_fov.GetFloat())), spawnArgs.GetFloat( "fov", va( "%f",g_fov.GetFloat())) );
+
 
 	PostEventMS( &EV_Camera_SetAttachments, 0 );
 
-	UpdateChangeableSpawnArgs(NULL);
+	UpdateChangeableSpawnArgs(nullptr );
 }
 
 /*
@@ -237,12 +237,12 @@ idCamera::RenderView
 void idCameraView::GetViewParms( renderView_t *view ) {
 	assert( view );
 
-	if (view == NULL) {
+	if (view == nullptr ) {
 		return;
 	}
 
-	arcVec3 dir;
-	idEntity *ent;
+	anVec3 dir;
+	anEntity *ent;
 
 	if ( attachedTo ) {
 		ent = attachedTo;
@@ -259,10 +259,10 @@ void idCameraView::GetViewParms( renderView_t *view ) {
 		view->viewaxis = ent->GetPhysics()->GetAxis();
 	}
 
-// RAVEN BEGIN
+
 // bdube: interpolate fov
 	gameLocal.CalcFov( fov.GetCurrentValue( gameLocal.time ), view->fov_x, view->fov_y );
-// RAVEN END
+
 }
 
 
@@ -273,7 +273,7 @@ void idCameraView::GetViewParms( renderView_t *view ) {
 
 
 
-// RAVEN BEGIN
+
 // rjohnson: camera is now contained in a def for frame commands
 
 /***********************************************************************
@@ -349,10 +349,10 @@ int	rvCameraAnimation::NumCuts( void ) const {
 	return cameraCuts.Num();
 }
 
-void rvCameraAnimation::SetAnim( const idDeclCameraDef *cameraDef, const char *sourcename, const char *animname, idStr filename ) {
+void rvCameraAnimation::SetAnim( const idDeclCameraDef *cameraDef, const char *sourcename, const char *animname, anString filename ) {
 	int			version;
-	idLexer		parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
-	idToken		token;
+	anLexer		parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
+	anToken		token;
 	int			numFrames;
 	int			numCuts;
 	int			i;
@@ -402,9 +402,9 @@ void rvCameraAnimation::SetAnim( const idDeclCameraDef *cameraDef, const char *s
 	parser.ExpectTokenString( "cuts" );
 	parser.ExpectTokenString( "{" );
 	cameraCuts.SetNum( numCuts );
-	for( i = 0; i < numCuts; i++ ) {
-		cameraCuts[ i ] = parser.ParseInt();
-		if ( ( cameraCuts[ i ] < 1 ) || ( cameraCuts[ i ] >= numFrames ) ) {
+	for ( i = 0; i < numCuts; i++ ) {
+		cameraCuts[i] = parser.ParseInt();
+		if ( ( cameraCuts[i] < 1 ) || ( cameraCuts[i] >= numFrames ) ) {
 			parser.Error( "Invalid camera cut" );
 		}
 	}
@@ -414,10 +414,10 @@ void rvCameraAnimation::SetAnim( const idDeclCameraDef *cameraDef, const char *s
 	parser.ExpectTokenString( "camera" );
 	parser.ExpectTokenString( "{" );
 	camera.SetNum( numFrames );
-	for( i = 0; i < numFrames; i++ ) {
-		parser.Parse1DMatrix( 3, camera[ i ].t.ToFloatPtr() );
-		parser.Parse1DMatrix( 3, camera[ i ].q.ToFloatPtr() );
-		camera[ i ].fov = parser.ParseFloat();
+	for ( i = 0; i < numFrames; i++ ) {
+		parser.Parse1DMatrix( 3, camera[i].t.ToFloatPtr() );
+		parser.Parse1DMatrix( 3, camera[i].q.ToFloatPtr() );
+		camera[i].fov = parser.ParseFloat();
 	}
 	parser.ExpectTokenString( "}" );
 
@@ -442,9 +442,9 @@ void rvCameraAnimation::SetAnim( const idDeclCameraDef *cameraDef, const char *s
 	float diff_q, last_q, q;
 	diff_t = last_t = 0.0f;
 	diff_q = last_q = 0.0f;
-	for( i = 1; i < numFrames; i++ ) {
-		t = ( camera[ i ].t - camera[ i - 1 ].t ).Length();
-		q = ( camera[ i ].q.ToQuat() - camera[ i - 1 ].q.ToQuat() ).Length();
+	for ( i = 1; i < numFrames; i++ ) {
+		t = ( camera[i].t - camera[ i - 1 ].t ).Length();
+		q = ( camera[i].q.ToQuat() - camera[ i - 1 ].q.ToQuat() ).Length();
 		diff_t = t - last_t;
 		diff_q = q - last_q;
 		gGraph.AddValue( ( i % 10 ) == 0 );
@@ -470,25 +470,25 @@ void rvCameraAnimation::SetAnim( const idDeclCameraDef *cameraDef, const char *s
 =====================
 rvCameraAnimation::AddFrameCommand
 
-Returns NULL if no error.
+Returns nullptr if no error.
 =====================
 */
-const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef, const idList<int>& frames, idLexer &src, const idDict *def ) {
+const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef, const anList<int>& frames, anLexer &src, const anDict *def ) {
 	int					i;
 	int					index;
-	idStr				text;
-	idStr				funcname;
+	anString				text;
+	anString				funcname;
 	frameCommand_t		fc;
-	idToken				token;
+	anToken				token;
 
 	memset( &fc, 0, sizeof( fc ) );
 
-	if( !src.ReadTokenOnLine( &token ) ) {
+	if ( !src.ReadTokenOnLine( &token ) ) {
 		return "Unexpected end of line";
 	}
 
 	if ( token == "call" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SCRIPTFUNCTION;
@@ -497,52 +497,52 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			return va( "Function '%s' not found", token.c_str() );
 		}
 	} else if ( token == "object_call" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SCRIPTFUNCTIONOBJECT;
-		fc.string = new idStr( token );
+		fc.string = new anString( token );
 	} else if ( token == "event" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_EVENTFUNCTION;
-		const idEventDef *ev = idEventDef::FindEvent( token );
+		const anEventDef *ev = anEventDef::FindEvent( token );
 		if ( !ev ) {
 			return va( "Event '%s' not found", token.c_str() );
 		}
 		if ( ev->GetNumArgs() != 0 ) {
 			return va( "Event '%s' has arguments", token.c_str() );
 		}
-		fc.string = new idStr( token );
+		fc.string = new anString( token );
 	}
-// RAVEN BEGIN
+
 // abahr:
-	else if( token == "eventArgs" ) {
+	else if ( token == "eventArgs" ) {
 		src.ParseRestOfLine( token );
-		if( token.Length() <= 0 ) {
+		if ( token.Length() <= 0 ) {
 			return "Unexpected end of line";
 		}
 
 		fc.type = FC_EVENTFUNCTION_ARGS;
-		fc.parmList = new idList<idStr>();
+		fc.parmList = new anList<anString>();
 		token.Split( *fc.parmList, ' ' );
-		fc.event = idEventDef::FindEvent( (*fc.parmList)[0] );
-		if( !fc.event ) {
+		fc.event = anEventDef::FindEvent( (*fc.parmList)[0] );
+		if ( !fc.event ) {
 			SAFE_DELETE_PTR( fc.parmList );
 			return va( "Event '%s' not found", (*fc.parmList)[0].c_str() );
 		}
 
 		fc.parmList->RemoveIndex( 0 );
 	}
-// RAVEN END
+
 	else if ( token == "sound" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -550,12 +550,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "sound_voice" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND_VOICE;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -563,12 +563,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "sound_voice2" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND_VOICE2;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -576,12 +576,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "sound_body" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND_BODY;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -589,12 +589,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "sound_body2" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND_BODY2;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -602,12 +602,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "sound_body3" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND_BODY3;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -615,12 +615,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "sound_weapon" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND_WEAPON;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -628,12 +628,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "sound_global" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND_GLOBAL;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -641,12 +641,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "sound_item" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND_ITEM;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -654,12 +654,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "sound_chatter" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SOUND_CHATTER;
 		if ( !token.Cmpn( "snd_", 4 ) ) {
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		} else {
 			fc.soundShader = declManager->FindSound( token );
 			if ( fc.soundShader->GetState() == DS_DEFAULTED ) {
@@ -667,12 +667,12 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "skin" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_SKIN;
 		if ( token == "none" ) {
-			fc.skin = NULL;
+			fc.skin = nullptr;
 		} else {
 			fc.skin = declManager->FindSkin( token );
 			if ( !fc.skin ) {
@@ -680,7 +680,7 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 			}
 		}
 	} else if ( token == "fx" ) {
-// RAVEN BEGIN
+
 // bdube: use Raven effect system
 		fc.type = FC_FX;
 
@@ -690,60 +690,60 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 		}
 
 		// Effect is indirect if it starts with fx_
-		if ( !idStr::Icmpn ( token, "fx_", 3 ) ) {
-			fc.string = new idStr ( token );
+		if ( !anString::Icmpn ( token, "fx_", 3 ) ) {
+			fc.string = new anString ( token );
 		} else {
 			fc.effect = ( const idDecl * )declManager->FindEffect( token );
 		}
 
 		// Joint specified?
 		if ( src.ReadTokenOnLine ( &token ) ) {
-			fc.joint = new idStr ( token );
+			fc.joint = new anString ( token );
 		}
 
 		// End joint specified?
 		if ( src.ReadTokenOnLine ( &token ) ) {
-			fc.joint2 = new idStr ( token );
+			fc.joint2 = new anString ( token );
 		}
-// RAVEN END
+
 	} else if ( token == "trigger" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_TRIGGER;
-		fc.string = new idStr( token );
-// RAVEN BEGIN
+		fc.string = new anString( token );
+
 // bdube: not using
 /*
 	} else if ( token == "triggerSmokeParticle" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_TRIGGER_SMOKE_PARTICLE;
-		fc.string = new idStr( token );
+		fc.string = new anString( token );
 */
-// RAVEN END
+
 	} else if ( token == "direct_damage" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_DIRECTDAMAGE;
 		if ( !gameLocal.FindEntityDef( token.c_str(), false ) ) {
 			return va( "Unknown entityDef '%s'", token.c_str() );
 		}
-		fc.string = new idStr( token );
+		fc.string = new anString( token );
 	} else if ( token == "muzzle_flash" ) {
-/*		if( !src.ReadTokenOnLine( &token ) ) {
+/*		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		if ( ( token != "" ) && !modelDef->FindJoint( token ) ) {
 			return va( "Joint '%s' not found", token.c_str() );
 		}
 		fc.type = FC_MUZZLEFLASH;
-		fc.string = new idStr( token );*/
+		fc.string = new anString( token );*/
 	} else if ( token == "muzzle_flash" ) {
 		fc.type = FC_MUZZLEFLASH;
-		fc.string = new idStr( "" );
+		fc.string = new anString( "" );
 	} else if ( token == "footstep" ) {
 		fc.type = FC_FOOTSTEP;
 	} else if ( token == "leftfoot" ) {
@@ -769,28 +769,28 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 	} else if ( token == "disableWalkIK" ) {
 		fc.type = FC_DISABLE_WALK_IK;
 	} else if ( token == "enableLegIK" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_ENABLE_LEG_IK;
 		fc.index = atoi( token );
 	} else if ( token == "disableLegIK" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line";
 		}
 		fc.type = FC_DISABLE_LEG_IK;
 		fc.index = atoi( token );
 	} else if ( token == "recordDemo" ) {
 		fc.type = FC_RECORDDEMO;
-		if( src.ReadTokenOnLine( &token ) ) {
-			fc.string = new idStr( token );
+		if ( src.ReadTokenOnLine( &token ) ) {
+			fc.string = new anString( token );
 		}
 	} else if ( token == "aviGame" ) {
 		fc.type = FC_AVIGAME;
-		if( src.ReadTokenOnLine( &token ) ) {
-			fc.string = new idStr( token );
+		if ( src.ReadTokenOnLine( &token ) ) {
+			fc.string = new anString( token );
 		}
-// RAVEN BEGIN
+
 // bdube: added script commands
 	} else if ( token == "ai_enablePain" ) {
 		fc.type = FC_AI_ENABLE_PAIN;
@@ -806,34 +806,34 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 		fc.type = FC_AI_ATTACK;
 
 		// Name of attack
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line while looking for attack Name";
 		}
-		fc.string = new idStr( token );
+		fc.string = new anString( token );
 
 		// Joint to attack from
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line while looking for attack joint";
 		}
-		fc.joint = new idStr( token );
+		fc.joint = new anString( token );
 	} else if ( token == "ai_attack_melee" ) {
-		if( !src.ReadTokenOnLine( &token ) ) {
+		if ( !src.ReadTokenOnLine( &token ) ) {
 			return "Unexpected end of line while looking for melee attack name";
 		}
 		fc.type = FC_AI_ATTACK_MELEE;
-		fc.string = new idStr( token );
+		fc.string = new anString( token );
 	} else if ( token == "guievent" )  {
 		fc.type = FC_GUIEVENT;
-		if( src.ReadTokenOnLine( &token ) )
+		if ( src.ReadTokenOnLine( &token ) )
 		{
-			fc.string = new idStr( token );
+			fc.string = new anString( token );
 		}
 	} else if ( token == "speak" )  {
 		fc.type = FC_AI_SPEAK;
-		if( src.ReadTokenOnLine( &token ) ) {
-			fc.string = new idStr( token );
+		if ( src.ReadTokenOnLine( &token ) ) {
+			fc.string = new anString( token );
 		}
-// RAVEN END
+
 	} else {
 		return va( "Unknown command '%s'", token.c_str() );
 	}
@@ -843,13 +843,13 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 		// we haven't, so allocate the table and initialize it
 		frameLookup.SetGranularity( 1 );
 		frameLookup.SetNum( camera.Num() );
-		for( i = 0; i < frameLookup.Num(); i++ ) {
-			frameLookup[ i ].num = 0;
-			frameLookup[ i ].firstCommand = 0;
+		for ( i = 0; i < frameLookup.Num(); i++ ) {
+			frameLookup[i].num = 0;
+			frameLookup[i].firstCommand = 0;
 		}
 	}
 
-// RAVEN BEGIN
+
 // bdube: support multiple frames
 	for ( int ii = 0; ii < frames.Num(); ii ++ ) {
 		int framenum = frames[ii];
@@ -858,28 +858,28 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 //			-1 because we don't want commands on the loop frame.
 //			If the anim doesn't loop they won't get handled.
 		if ( ( framenum < 1 ) || ( framenum > camera.Num() -1 ) ) {
-			gameLocal.Error("Frame command out of range: %d on  anim '%s'. Max %d.", framenum, name.c_str(), camera.Num() -1 );
+			gameLocal.Error( "Frame command out of range: %d on  anim '%s'. Max %d.", framenum, name.c_str(), camera.Num() -1 );
 		}
 
 		// Duplicate the frame info
 		if ( ii != 0 ) {
 			if ( fc.string ) {
-				fc.string = new idStr ( fc.string->c_str() );
+				fc.string = new anString ( fc.string->c_str() );
 			}
 			if ( fc.joint ) {
-				fc.joint = new idStr ( fc.joint->c_str() );
+				fc.joint = new anString ( fc.joint->c_str() );
 			}
 			if ( fc.joint2 ) {
-				fc.joint2 = new idStr ( fc.joint2->c_str() );
+				fc.joint2 = new anString ( fc.joint2->c_str() );
 			}
 			if ( fc.parmList ) {
-				fc.parmList = new idList<idStr>( *fc.parmList );
+				fc.parmList = new anList<anString>( *fc.parmList );
 			}
 		}
 
 		// frame numbers are 1 based in .def files, but 0 based internally
 		framenum--;
-// RAVEN END
+
 
 	// allocate space for a new command
 	frameCommands.Alloc();
@@ -888,13 +888,13 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 	index = frameLookup[ framenum ].firstCommand + frameLookup[ framenum ].num;
 
 	// move all commands from our index onward up one to give us space for our new command
-	for( i = frameCommands.Num() - 1; i > index; i-- ) {
-		frameCommands[ i ] = frameCommands[ i - 1 ];
+	for ( i = frameCommands.Num() - 1; i > index; i-- ) {
+		frameCommands[i] = frameCommands[ i - 1 ];
 	}
 
 	// fix the indices of any later frames to account for the inserted command
-	for( i = framenum + 1; i < frameLookup.Num(); i++ ) {
-		frameLookup[ i ].firstCommand++;
+	for ( i = framenum + 1; i < frameLookup.Num(); i++ ) {
+		frameLookup[i].firstCommand++;
 	}
 
 	// store the new command
@@ -903,13 +903,13 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 	// increase the number of commands on this frame
 	frameLookup[ framenum ].num++;
 
-// RAVEN BEGIN
+
 // bdube: loop frame commands
 	}
-// RAVEN END
+
 
 	// return with no error
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -917,17 +917,17 @@ const char *rvCameraAnimation::AddFrameCommand( const idDeclCameraDef *cameraDef
 rvCameraAnimation::CallFrameCommandSound
 =====================
 */
-void rvCameraAnimation::CallFrameCommandSound ( const frameCommand_t& command, idEntity* ent, const s_channelType channel ) const {
+void rvCameraAnimation::CallFrameCommandSound ( const frameCommand_t& command, anEntity* ent, const s_channelType channel ) const {
 
 	int flags = 0;
-	if( channel == ( FC_SOUND_GLOBAL - FC_SOUND ) ) {
+	if ( channel == ( FC_SOUND_GLOBAL - FC_SOUND ) ) {
 		flags = SSF_PRIVATE_SOUND;
 	}
 
 	if ( command.string ) {
-		ent->StartSound ( command.string->c_str(), channel, flags, false, NULL );
+		ent->StartSound ( command.string->c_str(), channel, flags, false, nullptr );
 	} else {
-		ent->StartSoundShader( command.soundShader, channel, flags, false, NULL );
+		ent->StartSoundShader( command.soundShader, channel, flags, false, nullptr );
 	}
 }
 
@@ -936,7 +936,7 @@ void rvCameraAnimation::CallFrameCommandSound ( const frameCommand_t& command, i
 rvCameraAnimation::CallFrameCommands
 =====================
 */
-void rvCameraAnimation::CallFrameCommands( idEntity *ent, int from, int to ) const {
+void rvCameraAnimation::CallFrameCommands( anEntity *ent, int from, int to ) const {
 	int index;
 	int end;
 	int frame;
@@ -960,39 +960,39 @@ void rvCameraAnimation::CallFrameCommands( idEntity *ent, int from, int to ) con
 		while( index < end ) {
 			const frameCommand_t &command = frameCommands[ index++ ];
 
-// RAVEN BEGIN
+
 // bdube: frame command debugging
 			if ( g_showFrameCmds.GetBool() ) {
-				idStr shortName;
+				anString shortName;
 				shortName = name;
 				shortName.StripPath();
-				shortName.StripFileExtension ( );
+				shortName.StripFileExtension();
 				gameLocal.Printf ( "Cameraframecmd: anim=%s frame=%d cmd=%s parm=%s\n",
 							 shortName.c_str(),
 							 frame + 1,
 							 frameCommandInfo[command.type].name,
 							 command.string?command.string->c_str():"???" );
 			}
-// RAVEN END
 
-			switch( command.type ) {
+
+			switch ( command.type ) {
 				case FC_SCRIPTFUNCTION: {
 					gameLocal.CallFrameCommand( ent, command.function );
 					break;
 				}
-// RAVEN BEGIN
+
 // bdube: rewrote
 				case FC_SCRIPTFUNCTIONOBJECT: {
 					ent->ProcessEvent ( &EV_CallFunction, command.string->c_str() );
 					break;
 				}
-// RAVEN END
+
 				case FC_EVENTFUNCTION: {
-					const idEventDef *ev = idEventDef::FindEvent( command.string->c_str() );
+					const anEventDef *ev = anEventDef::FindEvent( command.string->c_str() );
 					ent->ProcessEvent( ev );
 					break;
 				}
-// RAVEN BEGIN
+
 // abahr:
 				case FC_EVENTFUNCTION_ARGS: {
 					assert( command.event );
@@ -1012,10 +1012,10 @@ void rvCameraAnimation::CallFrameCommands( idEntity *ent, int from, int to ) con
 				case FC_SOUND_CHATTER:
 					CallFrameCommandSound ( command, ent, (const s_channelType)(command.type - FC_SOUND) );
 					break;
-// RAVEN END
+
 
 				case FC_FX: {
-// RAVEN BEGIN
+
 // bdube: use raven effect system
 					rvClientEffect* cent;
 					if ( command.string ) {
@@ -1032,13 +1032,13 @@ void rvCameraAnimation::CallFrameCommands( idEntity *ent, int from, int to ) con
 						}
 					}
 					// End origin bone specified?
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-					if ( cent && command.joint2 && ent->IsType ( idAnimatedEntity::GetClassType() ) ) {
-// RAVEN END
+
+
+					if ( cent && command.joint2 && ent->IsType ( anAnimatedEntity::GetClassType() ) ) {
+
 						cent->SetEndOrigin ( ent->GetAnimator()->GetJointHandle ( *command.joint2 ) );
 					}
-// RAVEN END
+
 					break;
 				}
 				case FC_SKIN:
@@ -1046,7 +1046,7 @@ void rvCameraAnimation::CallFrameCommands( idEntity *ent, int from, int to ) con
 					break;
 
 				case FC_TRIGGER: {
-					idEntity *target;
+					anEntity *target;
 
 					target = gameLocal.FindEntity( command.string->c_str() );
 					if ( target ) {
@@ -1170,18 +1170,18 @@ void rvCameraAnimation::CallFrameCommands( idEntity *ent, int from, int to ) con
 
 				case FC_ACT_ATTACH_HIDE:
 /*
-					if ( ent->IsType(idActor::GetClassType()) )
+					if ( ent->IsType(anActor::GetClassType()) )
 					{
-						static_cast<idActor*>(ent)->HideAttachment( command.string->c_str() );
+						static_cast<anActor*>(ent)->HideAttachment( command.string->c_str() );
 					}
 */
 					break;
 
 				case FC_ACT_ATTACH_SHOW:
 /*
-					if ( ent->IsType(idActor::GetClassType()) )
+					if ( ent->IsType(anActor::GetClassType()) )
 					{
-						static_cast<idActor*>(ent)->ShowAttachment( command.string->c_str() );
+						static_cast<anActor*>(ent)->ShowAttachment( command.string->c_str() );
 					}
 */
 					break;
@@ -1225,7 +1225,7 @@ idDeclCameraDef::~idDeclCameraDef() {
 	FreeData();
 }
 
-// RAVEN BEGIN
+
 // jsinger: Added to support serialization/deserialization of binary decls
 #ifdef RV_BINARYDECLS
 /*
@@ -1251,13 +1251,13 @@ void idDeclCameraDef::AddReferences() const
 	assert(false);
 }
 #endif
-// RAVEN END
+
 /*
 =================
 idDeclCameraDef::Size
 =================
 */
-// RAVEN BEGIN
+
 // jscott: made more accurate
 size_t idDeclCameraDef::Size( void ) const {
 
@@ -1268,7 +1268,7 @@ size_t idDeclCameraDef::Size( void ) const {
 
 	return( size );
 }
-// RAVEN END
+
 
 /*
 =====================
@@ -1281,8 +1281,8 @@ void idDeclCameraDef::CopyDecl( const idDeclCameraDef *decl ) {
 	FreeData();
 
 	anims.SetNum( decl->anims.Num() );
-	for( i = 0; i < anims.Num(); i++ ) {
-		anims[ i ] = new rvCameraAnimation( this, decl->anims[ i ] );
+	for ( i = 0; i < anims.Num(); i++ ) {
+		anims[i] = new rvCameraAnimation( this, decl->anims[i] );
 	}
 }
 
@@ -1319,26 +1319,26 @@ void idDeclCameraDef::Touch( void ) const {
 idDeclCameraDef::ParseAnim
 =====================
 */
-bool idDeclCameraDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
+bool idDeclCameraDef::ParseAnim( anLexer &src, int numDefaultAnims ) {
 	int					i;
 	int					len;
 	rvCameraAnimation	*anim;
-	idStr				alias;
-	idToken				realname;
-	idToken				token;
+	anString				alias;
+	anToken				realname;
+	anToken				token;
 	int					numAnims;
 
 	numAnims = 0;
 
-	if( !src.ReadToken( &realname ) ) {
+	if ( !src.ReadToken( &realname ) ) {
 		src.Warning( "Unexpected end of file" );
 		MakeDefault();
 		return false;
 	}
 	alias = realname;
 
-	for( i = 0; i < anims.Num(); i++ ) {
-		if ( !idStr::Cmp( anims[ i ]->FullName(), realname ) ) {
+	for ( i = 0; i < anims.Num(); i++ ) {
+		if ( !anString::Cmp( anims[i]->FullName(), realname ) ) {
 			break;
 		}
 	}
@@ -1350,7 +1350,7 @@ bool idDeclCameraDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 	}
 
 	if ( i < numDefaultAnims ) {
-		anim = anims[ i ];
+		anim = anims[i];
 	} else {
 		// create the alias associated with this animation
 		anim = new rvCameraAnimation();
@@ -1359,8 +1359,8 @@ bool idDeclCameraDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 
 	// random anims end with a number.  find the numeric suffix of the animation.
 	len = alias.Length();
-	for( i = len - 1; i > 0; i-- ) {
-		if ( !isdigit( alias[ i ] ) ) {
+	for ( i = len - 1; i > 0; i-- ) {
+		if ( !isdigit( alias[i] ) ) {
 			break;
 		}
 	}
@@ -1376,7 +1376,7 @@ bool idDeclCameraDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 	alias.CapLength( i + 1 );
 
 	// parse the anims from the string
-	if( !src.ReadToken( &token ) ) {
+	if ( !src.ReadToken( &token ) ) {
 		src.Warning( "Unexpected end of file" );
 		MakeDefault();
 		return false;
@@ -1387,7 +1387,7 @@ bool idDeclCameraDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 	// parse any frame commands or animflags
 	if ( src.CheckTokenString( "{" ) ) {
 		while( 1 ) {
-			if( !src.ReadToken( &token ) ) {
+			if ( !src.ReadToken( &token ) ) {
 				src.Warning( "Unexpected end of file" );
 				MakeDefault();
 				return false;
@@ -1396,15 +1396,15 @@ bool idDeclCameraDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 				break;
 			} else if ( token == "frame" ) {
 				// create a frame command
-// RAVEN BEGIN
+
 // bdube: Support a list of frame numbers
 //				int			framenum;
 				const char	*err;
-				idList<int> frameList;
+				anList<int> frameList;
 
 				do
 				{
-// RAVEN END
+
 				// make sure we don't have any line breaks while reading the frame command so the error line # will be correct
 				if ( !src.ReadTokenOnLine( &token ) ) {
 					src.Warning( "Missing frame # after 'frame'" );
@@ -1418,18 +1418,18 @@ bool idDeclCameraDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 				} else if ( token.type != TT_NUMBER || token.subtype == TT_FLOAT ) {
 					src.Error( "expected integer value, found '%s'", token.c_str() );
 				}
-// RAVEN BEGIN
+
 // bdube: multiple frames
 					frameList.Append ( token.GetIntValue() );
 
 				} while ( src.CheckTokenString ( "," ) );
-// RAVEN END
+
 
 				// put the command on the specified frame of the animation
-// RAVEN BEGIN
+
 // bdube: Support a list of frame numbers
-				err = anim->AddFrameCommand( this, frameList, src, NULL );
-// RAVEN END
+				err = anim->AddFrameCommand( this, frameList, src, nullptr );
+
 				if ( err ) {
 					src.Warning( "%s", err );
 					MakeDefault();
@@ -1452,11 +1452,11 @@ idDeclCameraDef::Parse
 ================
 */
 bool idDeclCameraDef::Parse( const char *text, const int textLength, bool noCaching ) {
-	idStr				filename;
-	idStr				extension;
-	idLexer				src;
-	idToken				token;
-	idToken				token2;
+	anString				filename;
+	anString				extension;
+	anLexer				src;
+	anToken				token;
+	anToken				token2;
 	int					numDefaultAnims;
 
 	TIME_THIS_SCOPE( __FUNCLINE__);
@@ -1498,7 +1498,7 @@ bool idDeclCameraDef::Parse( const char *text, const int textLength, bool noCach
 idDeclCameraDef::Validate
 =====================
 */
-bool idDeclCameraDef::Validate( const char *psText, int iTextLength, idStr &strReportTo ) const {
+bool idDeclCameraDef::Validate( const char *psText, int iTextLength, anString &strReportTo ) const {
 	idDeclCameraDef *pSelf = (idDeclCameraDef*) declManager->AllocateDecl( DECL_MODELDEF );
 	bool bOk = pSelf->Parse( psText, iTextLength, false );
 	pSelf->FreeData();
@@ -1517,8 +1517,8 @@ bool idDeclCameraDef::HasAnim( const char *name ) const {
 	int	i;
 
 	// find any animations with same name
-	for( i = 0; i < anims.Num(); i++ ) {
-		if ( !idStr::Cmp( anims[ i ]->Name(), name ) ) {
+	for ( i = 0; i < anims.Num(); i++ ) {
+		if ( !anString::Cmp( anims[i]->Name(), name ) ) {
 			return true;
 		}
 	}
@@ -1546,8 +1546,8 @@ int idDeclCameraDef::GetSpecificAnim( const char *name ) const {
 	int	i;
 
 	// find a specific animation
-	for( i = 0; i < anims.Num(); i++ ) {
-		if ( !idStr::Cmp( anims[ i ]->FullName(), name ) ) {
+	for ( i = 0; i < anims.Num(); i++ ) {
+		if ( !anString::Cmp( anims[i]->FullName(), name ) ) {
 			return i + 1;
 		}
 	}
@@ -1570,15 +1570,15 @@ int idDeclCameraDef::GetAnim( const char *name ) const {
 	int				len;
 
 	len = strlen( name );
-	if ( len && idStr::CharIsNumeric( name[ len - 1 ] ) ) {
+	if ( len && anString::CharIsNumeric( name[ len - 1 ] ) ) {
 		// find a specific animation
 		return GetSpecificAnim( name );
 	}
 
 	// find all animations with same name
 	numAnims = 0;
-	for( i = 0; i < anims.Num(); i++ ) {
-		if ( !idStr::Cmp( anims[ i ]->Name(), name ) ) {
+	for ( i = 0; i < anims.Num(); i++ ) {
+		if ( !anString::Cmp( anims[i]->Name(), name ) ) {
 			animList[ numAnims++ ] = i;
 			if ( numAnims >= MAX_ANIMS ) {
 				break;
@@ -1612,13 +1612,13 @@ int idDeclCameraDef::GetAnim( const char *name ) const {
 
 ===============================================================================
 */
-const idEventDef EV_Camera_Start( "start", NULL );
-const idEventDef EV_Camera_Stop( "stop", NULL );
+const anEventDef EV_Camera_Start( "start", nullptr );
+const anEventDef EV_Camera_Stop( "stop", nullptr );
 
-// RAVEN BEGIN
+
 // mekberg: wait support
-const idEventDef EV_Camera_IsActive( "isActive", "", 'd' );
-// RAVEN END
+const anEventDef EV_Camera_IsActive( "isActive", "", 'd' );
+
 
 CLASS_DECLARATION( idCamera, idCameraAnim )
 	EVENT( EV_Thread_SetCallback,	idCameraAnim::Event_SetCallback )
@@ -1626,10 +1626,10 @@ CLASS_DECLARATION( idCamera, idCameraAnim )
 	EVENT( EV_Camera_Start,			idCameraAnim::Event_Start )
 	EVENT( EV_Activate,				idCameraAnim::Event_Activate )
 
-	// RAVEN BEGIN
+
 	// mekberg: wait support
 	EVENT( EV_IsActive,				idCameraAnim::Event_IsActive )
-	// RAVEN END
+
 END_CLASS
 
 
@@ -1643,7 +1643,7 @@ idCameraAnim::idCameraAnim() {
 	offset.Zero();
 	cycle = 1;
 	starttime = 0;
-	activator = NULL;
+	activator = nullptr;
 	lastFrame = -1;
 }
 
@@ -1654,7 +1654,7 @@ idCameraAnim::~idCameraAnim
 */
 idCameraAnim::~idCameraAnim() {
 	if ( gameLocal.GetCamera() == this ) {
-		gameLocal.SetCamera( NULL );
+		gameLocal.SetCamera( nullptr );
 	}
 }
 
@@ -1663,7 +1663,7 @@ idCameraAnim::~idCameraAnim() {
 idCameraAnim::Save
 ================
 */
-void idCameraAnim::Save( idSaveGame *savefile ) const {
+void idCameraAnim::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( threadNum );
 	savefile->WriteVec3( offset );
 	savefile->WriteInt( starttime );
@@ -1678,7 +1678,7 @@ void idCameraAnim::Save( idSaveGame *savefile ) const {
 idCameraAnim::Restore
 ================
 */
-void idCameraAnim::Restore( idRestoreGame *savefile ) {
+void idCameraAnim::Restore( anRestoreGame *savefile ) {
 	savefile->ReadInt( threadNum );
 	savefile->ReadVec3( offset );
 	savefile->ReadInt( starttime );
@@ -1707,13 +1707,13 @@ void idCameraAnim::Spawn( void ) {
 
 	LoadAnim();
 
-// RAVEN BEGIN
+
 #ifndef _CONSOLE
 	// touch the cinematic streaming command file during build
-	if ( cvarSystem->GetCVarBool("com_makingBuild") && cvarSystem->GetCVarBool("com_Bundler") )
+	if ( cvarSystem->GetCVarBool( "com_makingBuild" ) && cvarSystem->GetCVarBool( "com_Bundler" ) )
 	{
-		idFile *file;
-		idStr filename = "cinematics/";
+		anFile *file;
+		anString filename = "cinematics/";
 		filename += gameLocal.mapFileNameStripped;
 		filename += "_";
 		filename += name;
@@ -1722,7 +1722,7 @@ void idCameraAnim::Spawn( void ) {
 		fileSystem->CloseFile( file );
 	}
 #endif
-// RAVEN END
+
 }
 
 /*
@@ -1731,9 +1731,9 @@ idCameraAnim::Load
 ================
 */
 void idCameraAnim::LoadAnim( void ) {
-	idLexer		parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
-	idToken		token;
-	idStr		filename;
+	anLexer		parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
+	anToken		token;
+	anString		filename;
 	const char	*key;
 
 	key = spawnArgs.GetString( "camera" );
@@ -1767,18 +1767,18 @@ void idCameraAnim::Start( void ) {
 	gameLocal.SetCamera( this );
 	BecomeActive( TH_THINK );
 
-// RAVEN BEGIN
+
 // jnewquist: Track texture usage during cinematics for streaming purposes
 #ifndef _CONSOLE
-	renderSystem->TrackTextureUsage( idRenderSystem::TEXTURE_TRACK_BEGIN, cameraDef->GetAnim(1)->GetFrameRate(), GetName() );
+	renderSystem->TrackTextureUsage( idRenderSystem::TEXTURE_TRACK_BEGIN, cameraDef->GetAnim( 1 )->GetFrameRate(), GetName() );
 #endif
-// RAVEN END
+
 
 	// if the player has already created the renderview for this frame, have him update it again so that the camera starts this frame
-// RAVEN BEGIN
+
 // mekberg: make sure render view is valid.
 	if ( gameLocal.GetLocalPlayer( )->GetRenderView( ) && gameLocal.GetLocalPlayer()->GetRenderView()->time == gameLocal.time ) {
-// RAVEN END
+
 		gameLocal.GetLocalPlayer()->CalculateRenderView();
 	}
 }
@@ -1795,19 +1795,19 @@ void idCameraAnim::Stop( void ) {
 		}
 
 		BecomeInactive( TH_THINK );
-		gameLocal.SetCamera( NULL );
+		gameLocal.SetCamera( nullptr );
 		if ( threadNum ) {
-			idThread::ObjectMoveDone( threadNum, this );
+			anThread::ObjectMoveDone( threadNum, this );
 			threadNum = 0;
 		}
 		ActivateTargets( activator.GetEntity() );
 
-// RAVEN BEGIN
+
 // jnewquist: Track texture usage during cinematics for streaming purposes
 #ifndef _CONSOLE
-		renderSystem->TrackTextureUsage( idRenderSystem::TEXTURE_TRACK_END, cameraDef->GetAnim(1)->GetFrameRate() );
+		renderSystem->TrackTextureUsage( idRenderSystem::TEXTURE_TRACK_END, cameraDef->GetAnim( 1 )->GetFrameRate() );
 #endif
-// RAVEN END
+
 	}
 }
 
@@ -1822,27 +1822,27 @@ void idCameraAnim::Think( void ) {
 
 	if ( thinkFlags & TH_THINK ) {
 		// check if we're done in the Think function when the cinematic is being skipped (idCameraAnim::GetViewParms isn't called when skipping cinematics).
-// RAVEN BEGIN
+
 // abahr: removed '!'
 		if ( gameLocal.skipCinematic ) {
-// RAVEN END
+
 			return;
 		}
 
-		if ( cameraDef->GetAnim(1)->NumFrames() < 2 ) {
+		if ( cameraDef->GetAnim( 1 )->NumFrames() < 2 ) {
 			// 1 frame anims never end
 			return;
 		}
 
-		if ( cameraDef->GetAnim(1)->GetFrameRate() == gameLocal.GetMHz() ) {
+		if ( cameraDef->GetAnim( 1 )->GetFrameRate() == gameLocal.GetMHz() ) {
 			frameTime	= gameLocal.time - starttime;
 			frame		= frameTime / gameLocal.msec;
 		} else {
-			frameTime	= ( gameLocal.time - starttime ) * cameraDef->GetAnim(1)->GetFrameRate();
+			frameTime	= ( gameLocal.time - starttime ) * cameraDef->GetAnim( 1 )->GetFrameRate();
 			frame		= frameTime / 1000;
 		}
 
-		if ( frame > cameraDef->GetAnim(1)->NumFrames() + cameraDef->GetAnim(1)->NumCuts() - 2 ) {
+		if ( frame > cameraDef->GetAnim( 1 )->NumFrames() + cameraDef->GetAnim( 1 )->NumCuts() - 2 ) {
 			if ( cycle > 0 ) {
 				cycle--;
 			}
@@ -1850,7 +1850,7 @@ void idCameraAnim::Think( void ) {
 
 			if ( cycle != 0 ) {
 				// advance start time so that we loop
-				starttime += ( ( cameraDef->GetAnim(1)->NumFrames() - cameraDef->GetAnim(1)->NumCuts() ) * 1000 ) / cameraDef->GetAnim(1)->GetFrameRate();
+				starttime += ( ( cameraDef->GetAnim( 1 )->NumFrames() - cameraDef->GetAnim( 1 )->NumCuts() ) * 1000 ) / cameraDef->GetAnim( 1 )->GetFrameRate();
 			} else {
 				Stop();
 			}
@@ -1878,29 +1878,29 @@ void idCameraAnim::GetViewParms( renderView_t *view ) {
 	if ( !view ) {
 		return;
 	}
-//RAVEN BEGIN
+
 //jshepard: safety first
-	if( !cameraDef )	{
-		gameLocal.Warning("Invalid cameraDef in GetViewParms");
-		return;
-	}
-//RAVEN END
-	if ( !cameraDef->GetAnim(1) ) {
+	if ( !cameraDef )	{
+		gameLocal.Warning( "Invalid cameraDef in GetViewParms" );
 		return;
 	}
 
-	if ( cameraDef->GetAnim(1)->NumFrames() == 0 ) {
+	if ( !cameraDef->GetAnim( 1 ) ) {
+		return;
+	}
+
+	if ( cameraDef->GetAnim( 1 )->NumFrames() == 0 ) {
 		// we most likely are in the middle of a restore
 		// FIXME: it would be better to fix it so this doesn't get called during a restore
 		return;
 	}
 
-	if ( cameraDef->GetAnim(1)->GetFrameRate() == gameLocal.GetMHz() ) {
+	if ( cameraDef->GetAnim( 1 )->GetFrameRate() == gameLocal.GetMHz() ) {
 		frameTime	= gameLocal.time - starttime;
 		frame		= frameTime / gameLocal.msec;
 		lerp		= 0.0f;
 	} else {
-		frameTime	= ( gameLocal.time - starttime ) * cameraDef->GetAnim(1)->GetFrameRate();
+		frameTime	= ( gameLocal.time - starttime ) * cameraDef->GetAnim( 1 )->GetFrameRate();
 		frame		= frameTime / 1000;
 		lerp		= ( frameTime % 1000 ) * 0.001f;
 	}
@@ -1908,26 +1908,26 @@ void idCameraAnim::GetViewParms( renderView_t *view ) {
 	// skip any frames where camera cuts occur
 	realFrame = frame;
 	cut = 0;
-	for( i = 0; i < cameraDef->GetAnim(1)->NumCuts(); i++ ) {
-		if ( frame < cameraDef->GetAnim(1)->GetCut( i ) ) {
+	for ( i = 0; i < cameraDef->GetAnim( 1 )->NumCuts(); i++ ) {
+		if ( frame < cameraDef->GetAnim( 1 )->GetCut( i ) ) {
 			break;
 		}
 		frame++;
 		cut++;
 	}
 	if ( lastFrame != frame ) {
-		cameraDef->GetAnim(1)->CallFrameCommands( this, lastFrame, frame );
+		cameraDef->GetAnim( 1 )->CallFrameCommands( this, lastFrame, frame );
 		lastFrame = frame;
 	}
 
 	if ( g_debugCinematic.GetBool() ) {
-		int prevFrameTime	= ( gameLocal.time - starttime - gameLocal.msec ) * cameraDef->GetAnim(1)->GetFrameRate();
+		int prevFrameTime	= ( gameLocal.time - starttime - gameLocal.msec ) * cameraDef->GetAnim( 1 )->GetFrameRate();
 		int prevFrame		= prevFrameTime / 1000;
 		int prevCut;
 
 		prevCut = 0;
-		for( i = 0; i < cameraDef->GetAnim(1)->NumCuts(); i++ ) {
-			if ( prevFrame < cameraDef->GetAnim(1)->GetCut( i ) ) {
+		for ( i = 0; i < cameraDef->GetAnim( 1 )->NumCuts(); i++ ) {
+			if ( prevFrame < cameraDef->GetAnim( 1 )->GetCut( i ) ) {
 				break;
 			}
 			prevFrame++;
@@ -1941,41 +1941,41 @@ void idCameraAnim::GetViewParms( renderView_t *view ) {
 
 	// clamp to the first frame.  also check if this is a one frame anim.  one frame anims would end immediately,
 	// but since they're mainly used for static cams anyway, just stay on it infinitely.
-	if ( ( frame < 0 ) || ( cameraDef->GetAnim(1)->NumFrames() < 2 ) ) {
-		view->viewaxis = cameraDef->GetAnim(1)->GetAnim( 0 )->q.ToQuat().ToMat3();
-		view->vieworg = cameraDef->GetAnim(1)->GetAnim( 0 )->t + offset;
-		view->fov_x = cameraDef->GetAnim(1)->GetAnim( 0 )->fov;
-	} else if ( frame > cameraDef->GetAnim(1)->NumFrames() - 2 ) {
+	if ( ( frame < 0 ) || ( cameraDef->GetAnim( 1 )->NumFrames() < 2 ) ) {
+		view->viewaxis = cameraDef->GetAnim( 1 )->GetAnim( 0 )->q.ToQuat().ToMat3();
+		view->vieworg = cameraDef->GetAnim( 1 )->GetAnim( 0 )->t + offset;
+		view->fov_x = cameraDef->GetAnim( 1 )->GetAnim( 0 )->fov;
+	} else if ( frame > cameraDef->GetAnim( 1 )->NumFrames() - 2 ) {
 		if ( cycle > 0 ) {
 			cycle--;
 		}
 
 		if ( cycle != 0 ) {
 			// advance start time so that we loop
-			starttime += ( ( cameraDef->GetAnim(1)->NumFrames() - cameraDef->GetAnim(1)->NumCuts() ) * 1000 ) / cameraDef->GetAnim(1)->GetFrameRate();
+			starttime += ( ( cameraDef->GetAnim( 1 )->NumFrames() - cameraDef->GetAnim( 1 )->NumCuts() ) * 1000 ) / cameraDef->GetAnim( 1 )->GetFrameRate();
 			GetViewParms( view );
 			return;
 		}
 
 		Stop();
-		if ( gameLocal.GetCamera() != NULL ) {
+		if ( gameLocal.GetCamera() != nullptr ) {
 			// we activated another camera when we stopped, so get it's viewparms instead
 			gameLocal.GetCamera()->GetViewParms( view );
 			return;
 		} else {
 			// just use our last frame
-			camFrame = cameraDef->GetAnim(1)->GetAnim( cameraDef->GetAnim(1)->NumFrames() - 1 );
+			camFrame = cameraDef->GetAnim( 1 )->GetAnim( cameraDef->GetAnim( 1 )->NumFrames() - 1 );
 			view->viewaxis = camFrame->q.ToQuat().ToMat3();
 			view->vieworg = camFrame->t + offset;
 			view->fov_x = camFrame->fov;
 		}
 	} else if ( lerp == 0.0f ) {
-		camFrame = cameraDef->GetAnim(1)->GetAnim( frame );
+		camFrame = cameraDef->GetAnim( 1 )->GetAnim( frame );
 		view->viewaxis = camFrame[ 0 ].q.ToMat3();
 		view->vieworg = camFrame[ 0 ].t + offset;
 		view->fov_x = camFrame[ 0 ].fov;
 	} else {
-		camFrame = cameraDef->GetAnim(1)->GetAnim( frame );
+		camFrame = cameraDef->GetAnim( 1 )->GetAnim( frame );
 		invlerp = 1.0f - lerp;
 		q1 = camFrame[ 0 ].q.ToQuat();
 		q2 = camFrame[ 1 ].q.ToQuat();
@@ -1992,34 +1992,34 @@ void idCameraAnim::GetViewParms( renderView_t *view ) {
 
 #if 0
 	static int lastFrame = 0;
-	static arcVec3 lastFrameVec( 0.0f, 0.0f, 0.0f );
+	static anVec3 lastFrameVec( 0.0f, 0.0f, 0.0f );
 	if ( gameLocal.time != lastFrame ) {
-		gameRenderWorld->DebugBounds( colorCyan, arcBounds( view->vieworg ).Expand( 16.0f ), vec3_origin, gameLocal.msec );
-		gameRenderWorld->DebugLine( colorRed, view->vieworg, view->vieworg + arcVec3( 0.0f, 0.0f, 2.0f ), 10000, false );
+		gameRenderWorld->DebugBounds( colorCyan, anBounds( view->vieworg ).Expand( 16.0f ), vec3_origin, gameLocal.msec );
+		gameRenderWorld->DebugLine( colorRed, view->vieworg, view->vieworg + anVec3( 0.0f, 0.0f, 2.0f ), 10000, false );
 		gameRenderWorld->DebugLine( colorCyan, lastFrameVec, view->vieworg, 10000, false );
 		gameRenderWorld->DebugLine( colorYellow, view->vieworg + view->viewaxis[ 0 ] * 64.0f, view->vieworg + view->viewaxis[ 0 ] * 66.0f, 10000, false );
-		gameRenderWorld->DebugLine( colorOrange, view->vieworg + view->viewaxis[ 0 ] * 64.0f, view->vieworg + view->viewaxis[ 0 ] * 64.0f + arcVec3( 0.0f, 0.0f, 2.0f ), 10000, false );
+		gameRenderWorld->DebugLine( colorOrange, view->vieworg + view->viewaxis[ 0 ] * 64.0f, view->vieworg + view->viewaxis[ 0 ] * 64.0f + anVec3( 0.0f, 0.0f, 2.0f ), 10000, false );
 		lastFrameVec = view->vieworg;
 		lastFrame = gameLocal.time;
 	}
 #endif
 
 	if ( g_showcamerainfo.GetBool() ) {
-		gameLocal.Printf( "^5Frame: ^7%d/%d\n\n\n", realFrame + 1, cameraDef->GetAnim(1)->NumFrames() - cameraDef->GetAnim(1)->NumCuts() );
+		gameLocal.Printf( "^5Frame: ^7%d/%d\n\n\n", realFrame + 1, cameraDef->GetAnim( 1 )->NumFrames() - cameraDef->GetAnim( 1 )->NumCuts() );
 	}
 // jnewquist: Track texture usage during cinematics for streaming purposes
 #ifndef _CONSOLE
 	renderSystem->TrackTextureUsage( idRenderSystem::TEXTURE_TRACK_UPDATE, realFrame );
 #endif
 }
-// RAVEN END
+
 
 /*
 ===============
 idCameraAnim::Event_Activate
 ================
 */
-void idCameraAnim::Event_Activate( idEntity *_activator ) {
+void idCameraAnim::Event_Activate( anEntity *_activator ) {
 	activator = _activator;
 	if ( thinkFlags & TH_THINK ) {
 		Stop();
@@ -2053,14 +2053,14 @@ idCameraAnim::Event_SetCallback
 */
 void idCameraAnim::Event_SetCallback( void ) {
 	if ( ( gameLocal.GetCamera() == this ) && !threadNum ) {
-		threadNum = idThread::CurrentThreadNum();
-		idThread::ReturnInt( true );
+		threadNum = anThread::CurrentThreadNum();
+		anThread::ReturnInt( true );
 	} else {
-		idThread::ReturnInt( false );
+		anThread::ReturnInt( false );
 	}
 }
 
-// RAVEN BEGIN
+
 // mekberg: wait support
 /*
 ================
@@ -2068,12 +2068,12 @@ idCameraAnim::Event_IsActive
 ================
 */
 void idCameraAnim::Event_IsActive( void ) {
-	idThread::ReturnFloat( gameLocal.GetCamera( ) ? 1.0f : 0.0f );
+	anThread::ReturnFloat( gameLocal.GetCamera( ) ? 1.0f : 0.0f );
 }
 
-// RAVEN END
 
-// RAVEN BEGIN
+
+
 // jscott: portal sky support
 
 /***********************************************************************
@@ -2090,7 +2090,7 @@ END_CLASS
 rvCameraPortalSky::Save
 ================
 */
-void rvCameraPortalSky::Save( idSaveGame *savefile ) const
+void rvCameraPortalSky::Save( anSaveGame *savefile ) const
 {
 }
 
@@ -2099,7 +2099,7 @@ void rvCameraPortalSky::Save( idSaveGame *savefile ) const
 rvCameraPortalSky::Restore
 ================
 */
-void rvCameraPortalSky::Restore( idRestoreGame *savefile )
+void rvCameraPortalSky::Restore( anRestoreGame *savefile )
 {
 	// Run spawn to set default values
 	Spawn();
@@ -2112,7 +2112,7 @@ rvCameraPortalSky::Spawn
 */
 void rvCameraPortalSky::Spawn( void )
 {
-	if( gameLocal.GetPortalSky() )
+	if ( gameLocal.GetPortalSky() )
 	{
 		gameLocal.Error( "Only one portal sky camera allowed" );
 	}
@@ -2127,7 +2127,7 @@ rvCameraPortalSky::GetViewParms
 void rvCameraPortalSky::GetViewParms( renderView_t *view )
 {
 	assert( view );
-	if( view )
+	if ( view )
 	{
 		view->vieworg = GetPhysics()->GetOrigin();
 		view->viewID = -1;
@@ -2149,7 +2149,7 @@ END_CLASS
 rvCameraPlayback::Save
 ================
 */
-void rvCameraPlayback::Save( idSaveGame *savefile ) const
+void rvCameraPlayback::Save( anSaveGame *savefile ) const
 {
 }
 
@@ -2158,7 +2158,7 @@ void rvCameraPlayback::Save( idSaveGame *savefile ) const
 rvCameraPlayback::Restore
 ================
 */
-void rvCameraPlayback::Restore( idRestoreGame *savefile )
+void rvCameraPlayback::Restore( anRestoreGame *savefile )
 {
 	// Run spawn to set default values
 	Spawn();
@@ -2185,10 +2185,10 @@ void rvCameraPlayback::GetViewParms( renderView_t *view )
 	rvDeclPlaybackData	pbd;
 
 	assert( view );
-	if( view )
+	if ( view )
 	{
 		pbd.Init();
-		if( declManager->GetPlaybackData( playback, PBFL_GET_POSITION | PBFL_GET_ANGLES_FROM_VEL, gameLocal.time - startTime, gameLocal.time - startTime, &pbd ) )
+		if ( declManager->GetPlaybackData( playback, PBFL_GET_POSITION | PBFL_GET_ANGLES_FROM_VEL, gameLocal.time - startTime, gameLocal.time - startTime, &pbd ) )
 		{
 			startTime = gameLocal.time;
 		}
@@ -2197,12 +2197,12 @@ void rvCameraPlayback::GetViewParms( renderView_t *view )
 		view->viewaxis = pbd.GetAngles().ToMat3();
 
 		// field of view
-// RAVEN BEGIN
+
 // jshepard: fov as a float for smoove transitions
 		gameLocal.CalcFov ( g_fov.GetFloat(), view->fov_x, view->fov_y );
 
-// RAVEN END
+
 	}
 }
 
-// RAVEN END
+

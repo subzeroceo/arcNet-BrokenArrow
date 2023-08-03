@@ -1,6 +1,6 @@
 #ifndef __FILE_MANIFEST_H__
 #define __FILE_MANIFEST_H__
-
+#include "idlib/Lib.h"
 /*
 ==============================================================
 
@@ -9,56 +9,52 @@
 ==============================================================
 */
 
-class aRcManifest {
+class anManifest {
 public:
-	aRcManifest() {
+	anManifest() {
 		cacheTable.SetGranularity( 4096 );
 		cacheHash.SetGranularity( 4096 );
 	}
-	~aRcManifest(){}
+	~anManifest(){}
 
 	bool LoadManifest( const char *fileName );
-	bool LoadManifestFromFile( arcNetFile *file );
+	bool LoadManifestFromFile( anFile *file );
 	void WriteManifestFile( const char *fileName );
 
-	int NumFiles() {
-		return cacheTable.Num();
-	}
+	int NumFiles() { return cacheTable.Num(); }
 
 	int FindFile( const char *fileName );
 
-	const arcNetString & GetFileNameByIndex( int idx ) const;
+	const anString & GetFileNameByIndex( int idx ) const;
 
 
-	const char * GetManifestName() {
-		return filename;
-	}
+	const char *GetManifestName() { return filename; }
 
 	void RemoveAll( const char *filename );
 	void AddFile( const char *filename );
 
-	void PopulateList( arcStaticList< arcNetString, 16384 > &dest ) {
+	void PopulateList( arcStaticList< anString, 16384 > &dest ) {
 		dest.Clear();
 		for ( int i = 0; i < cacheTable.Num(); i++ ) {
-			dest.Append( cacheTable[ i ] );
+			dest.Append( cacheTable[i] );
 		}
 	}
 
 	void Print() {
-		arcLibrary::Printf( "dump for manifest %s\n", GetManifestName() );
-		arcLibrary::Printf( "---------------------------------------\n" );
+		anLibrary::Printf( "dump for manifest %s\n", GetManifestName() );
+		anLibrary::Printf( "---------------------------------------\n" );
 		for ( int i = 0; i < NumFiles(); i++ ) {
-			const arcNetString & name = GetFileNameByIndex( i );
+			const anString & name = GetFileNameByIndex( i );
 			if ( name.Find( ".idwav", false ) >= 0 ) {
-				arcLibrary::Printf( "%s\n", GetFileNameByIndex( i ).c_str() );
+				anLibrary::Printf( "%s\n", GetFileNameByIndex( i ).c_str() );
 			}
 		}
 	}
 
 private:
-	arcStringList cacheTable;
-	ARCHashIndex	cacheHash;
-	arcNetString filename;
+	anStringList cacheTable;
+	anHashIndex	cacheHash;
+	anString filename;
 };
 
 // image preload
@@ -69,13 +65,13 @@ struct imagePreload_s {
 		usage = 0;
 		cubeMap = 0;
 	}
-	void Write( arcNetFile *f ) {
+	void Write( anFile *f ) {
 		f->WriteBig( filter );
 		f->WriteBig( repeat );
 		f->WriteBig( usage );
 		f->WriteBig( cubeMap );
 	}
-	void Read( arcNetFile *f ) {
+	void Read( anFile *f ) {
 		f->ReadBig( filter );
 		f->ReadBig( repeat );
 		f->ReadBig( usage );
@@ -112,20 +108,20 @@ struct preloadEntry_s {
 		}
 		return ret;
 	}
-	void Write( arcNetFile *outFile ) {
+	void Write( anFile *outFile ) {
 		outFile->WriteBig( resType );
 		outFile->WriteString( resourceName );
 		imgData.Write( outFile );
 	}
 
-	void Read( arcNetFile *inFile ) {
+	void Read( anFile *inFile ) {
 		inFile->ReadBig( resType );
 		inFile->ReadString( resourceName );
 		imgData.Read( inFile );
 	}
 
 	int				resType;		// type
-	arcNetString			resourceName;	// resource name
+	anString		resourceName;	// resource name
 	imagePreload_s	imgData;		// image specific data
 };
 
@@ -133,31 +129,31 @@ struct preloadSort_t {
 	int idx;
 	int ofs;
 };
-class aRcSortPreload : public ARCSortQuick< preloadSort_t, aRcSortPreload > {
+class anSortPreload : public anSortQuick<preloadSort_t, anSortPreload> {
 public:
-	int Compare( const preloadSort_t & a, const preloadSort_t & b ) const { return a.ofs - b.ofs; }
+	int Compare( const preloadSort_t &a, const preloadSort_t &b ) const { return a.ofs - b.ofs; }
 };
 
-class aRcPreloadManifest {
+class anPreloadManifest {
 public:
-	aRcPreloadManifest() {
+	anPreloadManifest() {
 		entries.SetGranularity( 2048 );
 	}
-	~aRcPreloadManifest(){}
+	~anPreloadManifest(){}
 
 	bool LoadManifest( const char *fileName );
-	bool LoadManifestFromFile( arcNetFile *file );
+	bool LoadManifestFromFile( anFile *file );
 
 	void WriteManifest( const char *fileName );
-	void WriteManifestToFile(  arcNetFile *outFile ) {
-		if ( outFile == NULL ) {
+	void WriteManifestToFile(  anFile *outFile ) {
+		if ( outFile == nullptr ) {
 			return;
 		}
 		filename = outFile->GetName();
 		outFile->WriteBig ( ( int )entries.Num() );
 		outFile->WriteString( filename );
 		for ( int i = 0; i < entries.Num(); i++ ) {
-			entries[ i ].Write( outFile );
+			entries[i].Write( outFile );
 		}
 	}
 
@@ -169,11 +165,11 @@ public:
 		return entries[ idx ];
 	}
 
-	const arcNetString & GetResourceNameByIndex( int idx ) const {
+	const anString & GetResourceNameByIndex( int idx ) const {
 		return entries[ idx ].resourceName;
 	}
 
-	const char * GetManifestName() const {
+	const char *GetManifestName() const {
 		return filename;
 	}
 
@@ -228,7 +224,7 @@ public:
 
 	int FindResource( const char *name ) {
 		for ( int i = 0; i < entries.Num(); i++ ) {
-			if ( arcNetString::Icmp( name, entries[ i ].resourceName ) == 0 ) {
+			if ( anString::Icmp( name, entries[i].resourceName ) == 0 ) {
 				return i;
 			}
 		}
@@ -236,16 +232,16 @@ public:
 	}
 
 	void Print() {
-		arcLibrary::Printf( "dump for preload manifest %s\n", GetManifestName() );
-		arcLibrary::Printf( "---------------------------------------\n" );
+		anLibrary::Printf( "dump for preload manifest %s\n", GetManifestName() );
+		anLibrary::Printf( "---------------------------------------\n" );
 		for ( int i = 0; i < NumResources(); i++ ) {
-			arcLibrary::Printf( "%s\n", GetResourceNameByIndex( i ).c_str() );
+			anLibrary::Printf( "%s\n", GetResourceNameByIndex( i ).c_str() );
 		}
 	}
 private:
-	arcNetList< preloadEntry_s > entries;
-	arcNetString filename;
+	anList< preloadEntry_s > entries;
+	anString filename;
 };
 
 
-#endif /* !__FILE_MANIFEST_H__ */
+#endif // !__FILE_MANIFEST_H__

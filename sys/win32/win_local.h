@@ -72,7 +72,7 @@ void	Win_SetErrorText( const char *text );
 
 cpuid_t	Sys_GetCPUId( void );
 
-int		MapKey (int key);
+int		MapKey ( intkey);
 
 
 // Input subsystem
@@ -135,19 +135,19 @@ typedef struct {
 	unsigned short	oldHardwareGamma[3][256];
 	// desktop gamma is saved here for restoration at exit
 
-	static idCVar	sys_arch;
-	static idCVar	sys_cpustring;
-	static idCVar	in_mouse;
-	static idCVar	win_allowAltTab;
-	static idCVar	win_notaskkeys;
-	static idCVar	win_username;
-	static idCVar	win_xpos;			// archived X coordinate of window position
-	static idCVar	win_ypos;			// archived Y coordinate of window position
-	static idCVar	win_outputDebugString;
-	static idCVar	win_outputEditString;
-	static idCVar	win_viewlog;
-	static idCVar	win_timerUpdate;
-	static idCVar	win_allowMultipleInstances;
+	static anCVar	sys_arch;
+	static anCVar	sys_cpustring;
+	static anCVar	in_mouse;
+	static anCVar	win_allowAltTab;
+	static anCVar	win_notaskkeys;
+	static anCVar	win_username;
+	static anCVar	win_xpos;			// archived X coordinate of window position
+	static anCVar	win_ypos;			// archived Y coordinate of window position
+	static anCVar	win_outputDebugString;
+	static anCVar	win_outputEditString;
+	static anCVar	win_viewlog;
+	static anCVar	win_timerUpdate;
+	static anCVar	win_allowMultipleInstances;
 
 	CRITICAL_SECTION criticalSections[MAX_CRITICAL_SECTIONS];
 	HANDLE			backgroundDownloadSemaphore;

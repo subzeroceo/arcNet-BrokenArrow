@@ -14,7 +14,7 @@ instancing of objects.
 
 const int NEXT_FRAME_EVENT_TIME = -999;
 
-class idClass;
+class anClass;
 class idTypeInfo;
 class arcEventDef;
 class idScriptObject;
@@ -24,17 +24,17 @@ extern const arcEventDefInternal EV_Remove;
 extern const arcEventDef EV_SafeRemove;
 extern const arcEventDef EV_IsType;
 
-typedef void ( idClass::*eventCallback_t )( void );
+typedef void ( anClass::*eventCallback_t )( void );
 
-template< class Type >
+template<class Type>
 struct idEventFunc {
 	const arcEventDef	*event;
 	eventCallback_t		function;
 };
 
 // added & so gcc could compile this
-#define EVENT( event, function )	{ &( event ), ( void ( idClass::* )( void ) )( &function ) },
-#define END_CLASS					{ NULL, NULL } };
+#define EVENT( event, function )	{ &( event ), ( void ( anClass::* )( void ) )( &function ) },
+#define END_CLASS					{ nullptr, nullptr } };
 
 
 class idEventArg {
@@ -46,8 +46,8 @@ public:
 	idEventArg( int data )						{ type = D_EVENT_INTEGER; value = data; };
 	idEventArg( bool data )						{ type = D_EVENT_BOOLEAN; value = data; };
 	idEventArg( float data )					{ type = D_EVENT_FLOAT; value = *reinterpret_cast<UINT_PTR *>( &data ); };
-	idEventArg( arcVec3 &data )					{ type = D_EVENT_VECTOR; value = reinterpret_cast<UINT_PTR>( &data ); };
-	idEventArg( const arcNetString &data )				{ type = D_EVENT_STRING; value = reinterpret_cast<UINT_PTR>( data.c_str() ); };
+	idEventArg( anVec3 &data )					{ type = D_EVENT_VECTOR; value = reinterpret_cast<UINT_PTR>( &data ); };
+	idEventArg( const anString &data )				{ type = D_EVENT_STRING; value = reinterpret_cast<UINT_PTR>( data.c_str() ); };
 	idEventArg( const char *data )				{ type = D_EVENT_STRING; value = reinterpret_cast<UINT_PTR>( data ); };
 	idEventArg( const idWStr &data )			{ type = D_EVENT_WSTRING; value = reinterpret_cast<UINT_PTR>( data.c_str() ); };
 	idEventArg( const wchar_t *data )			{ type = D_EVENT_WSTRING; value = reinterpret_cast<UINT_PTR>( data ); };
@@ -63,7 +63,7 @@ public:
 
 /***********************************************************************
 
-  idClass
+  anClass
 
 ***********************************************************************/
 
@@ -71,7 +71,7 @@ public:
 ================
 CLASS_PROTOTYPE
 
-This macro must be included in the definition of any subclass of idClass.
+This macro must be included in the definition of any subclass of anClass.
 It prototypes variables used in class instanciation and type checking.
 Use this on single inheritance concrete classes only.
 ================
@@ -79,7 +79,7 @@ Use this on single inheritance concrete classes only.
 #define CLASS_PROTOTYPE( nameofclass )									\
 public:																	\
 	static	idTypeInfo						Type;						\
-	static	idClass							*CreateInstance( void );	\
+	static	anClass							*CreateInstance( void );	\
 	virtual	idTypeInfo						*GetType( void ) const;		\
 	static	idEventFunc<nameofclass>		eventCallbacks[]
 
@@ -97,18 +97,18 @@ incorrect.  Use this on concrete classes only.
 
 #define CLASS_DECLARATION( nameofsuperclass, nameofclass )											\
 	idTypeInfo nameofclass::Type( #nameofclass, #nameofsuperclass,									\
-		( idEventFunc<idClass> * )nameofclass::eventCallbacks,										\
+		( idEventFunc<anClass> * )nameofclass::eventCallbacks,										\
 		nameofclass::CreateInstance,																\
-		( void ( idClass::* )( void ) )&nameofclass::Spawn,											\
+		( void ( anClass::* )( void ) )&nameofclass::Spawn,											\
 		nameofclass::InhibitSpawn );																\
-	idClass *nameofclass::CreateInstance( void ) {													\
+	anClass *nameofclass::CreateInstance( void ) {													\
 		try {																						\
 			nameofclass *ptr = new nameofclass;														\
 			ptr->FindUninitializedMemory();															\
 			return ptr;																				\
 		}																							\
 		catch( idAllocError & ) {																	\
-			return NULL;																			\
+			return nullptr;																			\
 		}																							\
 	}																								\
 	idTypeInfo *nameofclass::GetType( void ) const {												\
@@ -120,7 +120,7 @@ idEventFunc<nameofclass> nameofclass::eventCallbacks[] = {
 ================
 ABSTRACT_PROTOTYPE
 
-This macro must be included in the definition of any abstract subclass of idClass.
+This macro must be included in the definition of any abstract subclass of anClass.
 It prototypes variables used in class instanciation and type checking.
 Use this on single inheritance abstract classes only.
 ================
@@ -128,7 +128,7 @@ Use this on single inheritance abstract classes only.
 #define ABSTRACT_PROTOTYPE( nameofclass )								\
 public:																	\
 	static	idTypeInfo						Type;						\
-	static	idClass							*CreateInstance( void );	\
+	static	anClass							*CreateInstance( void );	\
 	virtual	idTypeInfo						*GetType( void ) const;		\
 	static	idEventFunc<nameofclass>		eventCallbacks[]
 
@@ -145,24 +145,24 @@ on abstract classes only.
 */
 #define ABSTRACT_DECLARATION( nameofsuperclass, nameofclass )										\
 	idTypeInfo nameofclass::Type( #nameofclass, #nameofsuperclass,									\
-		( idEventFunc<idClass> * )nameofclass::eventCallbacks,										\
+		( idEventFunc<anClass> * )nameofclass::eventCallbacks,										\
 		nameofclass::CreateInstance,																\
-		( void ( idClass::* )( void ) )&nameofclass::Spawn,											\
+		( void ( anClass::* )( void ) )&nameofclass::Spawn,											\
 		nameofclass::InhibitSpawn	);																\
-	idClass *nameofclass::CreateInstance( void ) {													\
+	anClass *nameofclass::CreateInstance( void ) {													\
 		common->Error( "Cannot instanciate abstract class %s.", #nameofclass );						\
-		return NULL;																				\
+		return nullptr;																				\
 	}																								\
 	idTypeInfo *nameofclass::GetType( void ) const {												\
 		return &( nameofclass::Type );																\
 	}																								\
 	idEventFunc<nameofclass> nameofclass::eventCallbacks[] = {
 
-typedef void ( idClass::*classSpawnFunc_t )( void );
+typedef void ( anClass::*classSpawnFunc_t )( void );
 
-class idClass {
+class anClass {
 public:
-	ABSTRACT_PROTOTYPE( idClass );
+	ABSTRACT_PROTOTYPE( anClass );
 
 #ifdef ID_REDIRECT_NEWDELETE
 #undef new
@@ -175,7 +175,7 @@ public:
 #define new ID_DEBUG_NEW
 #endif
 
-	virtual						~idClass();
+	virtual						~anClass();
 
 	void						Spawn( void );
 	void						CallSpawn( void );
@@ -185,10 +185,10 @@ public:
 	void						FindUninitializedMemory( void );
 
 	template< typename T >
-	T*							Cast( void ) { return this ? ( IsType( T::Type ) ? static_cast< T* >( this ) : NULL ) : NULL; }
+	T*							Cast( void ) { return this ? ( IsType( T::Type ) ? static_cast< T* >( this ) : nullptr ) : nullptr; }
 
 	template< typename T >
-	const T*					Cast( void ) const { return this ? ( IsType( T::Type ) ? static_cast< const T* >( this ) : NULL ) : NULL; }
+	const T*					Cast( void ) const { return this ? ( IsType( T::Type ) ? static_cast< const T* >( this ) : nullptr ) : nullptr; }
 
 	bool						RespondsTo( const arcEventDef &ev ) const;
 
@@ -234,32 +234,32 @@ public:
 
 	bool						IsSpawning( void ) { return spawningObjects.FindIndex( this ) != -1; }
 
-	virtual idLinkList< idClass >*	GetInstanceNode( void ) { return NULL; }
-	static bool					InhibitSpawn( const arcDict& args ) { return false; }
+	virtual anLinkList< anClass >*	GetInstanceNode( void ) { return nullptr; }
+	static bool					InhibitSpawn( const anDict& args ) { return false; }
 
 	virtual void				BecomeActive( int flags, bool force = false ) { assert( false ); }
 	virtual void				BecomeInactive( int flags, bool force = false ) { assert( false ); }
-	virtual idScriptObject*		GetScriptObject( void ) const { return NULL; }
-	virtual void				SetSkin( const arcDeclSkin* skin ) { ; }
-	virtual const char*			GetName( void ) const { return NULL; }
-	virtual arcAnimator*			GetAnimator( void ) { return NULL; }
+	virtual idScriptObject*		GetScriptObject( void ) const { return nullptr; }
+	virtual void				SetSkin( const anDeclSkin* skin ) { ; }
+	virtual const char*			GetName( void ) const { return nullptr; }
+	virtual arcAnimator*			GetAnimator( void ) { return nullptr; }
 
 	// Static functions
 	static void					InitClasses( void );
 	static void					ShutdownClasses( void );
 	static idTypeInfo *			GetClass( const char *name );
-	static void					DisplayInfo_f( const idCmdArgs &args );
-	static void					ListClasses_f( const idCmdArgs &args );
-	static idClass *			CreateInstance( const char *name );
+	static void					DisplayInfo_f( const anCommandArgs &args );
+	static void					ListClasses_f( const anCommandArgs &args );
+	static anClass *			CreateInstance( const char *name );
 	static int					GetNumTypes( void ) { return types.Num(); }
 	static int					GetTypeNumBits( void ) { return typeNumBits; }
 	static idTypeInfo *			GetType( int num );
-	static void					ArgCompletion_ClassName( const idCmdArgs &args, void(*callback)( const char *s ) );
+	static void					ArgCompletion_ClassName( const anCommandArgs &args, void(*callback)( const char *s ) );
 
-	static void					WikiClassTree_f( const idCmdArgs &args );
-	static void					WikiClassPage_f( const idCmdArgs &args );
+	static void					WikiClassTree_f( const anCommandArgs &args );
+	static void					WikiClassPage_f( const anCommandArgs &args );
 
-	idLinkList< idEvent >		scheduledEvents;
+	anLinkList< idEvent >		scheduledEvents;
 
 private:
 	classSpawnFunc_t			CallSpawnFunc( idTypeInfo *cls );
@@ -270,12 +270,12 @@ private:
 	void						Event_IsClass( int typeNumber );
 
 	static bool					initialized;
-	static arcNetList<idTypeInfo *>	types;
-	static arcNetList<idTypeInfo *>	typenums;
+	static anList<idTypeInfo *>	types;
+	static anList<idTypeInfo *>	typenums;
 	static int					typeNumBits;
 	static size_t				memused;
 	static int					numobjects;
-	static arcNetList< idClass* >	spawningObjects;
+	static anList< anClass* >	spawningObjects;
 };
 
 /***********************************************************************
@@ -284,47 +284,47 @@ private:
 
 ***********************************************************************/
 
-typedef void ( *mediaCacheFunc_t )( const arcDict& );
-typedef void ( *classCallback_t )( idClass* );
+typedef void ( *mediaCacheFunc_t )( const anDict& );
+typedef void ( *classCallback_t )( anClass* );
 
 template< typename T >
 class sdInstanceCollector {
 public:
 										sdInstanceCollector( bool includeChildTypes ) { T::Type.GetInstances( *this, includeChildTypes ); }
-	void								operator()( idClass* cls ) { *instances.Alloc() = reinterpret_cast< T* >( cls ); }
+	void								operator()( anClass* cls ) { *instances.Alloc() = reinterpret_cast< T* >( cls ); }
 
 	int									Num( void ) const { return instances.Num(); }
 	T*									operator[]( int index ) { return instances[index]; }
 
-	idStaticList< T*, MAX_GENTITIES >&	GetList( void ) { return instances; }
+	anStaticList< T*, MAX_GENTITIES >&	GetList( void ) { return instances; }
 
 private:
-	idStaticList< T*, MAX_GENTITIES >	instances;
+	anStaticList< T*, MAX_GENTITIES >	instances;
 };
 
 class idTypeInfo { // Gordon: public field maek meh angreh!
 public:
 	const char *				classname;
 	const char *				superclass;
-	void						( idClass::*Spawn )( void );
+	void						( anClass::*Spawn )( void );
 
-	idEventFunc<idClass> *		eventCallbacks;
+	idEventFunc<anClass> *		eventCallbacks;
 	eventCallback_t *			eventMap;
 	idTypeInfo *				super;
 	idTypeInfo *				next;
 	bool						freeEventMap;
 	int							typeNum;
 	int							lastChild;
-	mutable idLinkList< idClass >		instances;
+	mutable anLinkList< anClass >		instances;
 
 	idHierarchy<idTypeInfo>		node;
 
 								idTypeInfo( const char *classname,
 											const char *superclass,
-											idEventFunc<idClass> *eventCallbacks,
-											idClass* ( *CreateInstance )( void ),
-											void ( idClass::*Spawn )( void ),
-											bool ( *inhibitSpawn )( const arcDict& dict )
+											idEventFunc<anClass> *eventCallbacks,
+											anClass* ( *CreateInstance )( void ),
+											void ( anClass::*Spawn )( void ),
+											bool ( *inhibitSpawn )( const anDict& dict )
 											);
 
 								~idTypeInfo();
@@ -332,15 +332,15 @@ public:
 	void						Init( void );
 	void						Shutdown( void );
 
-	idClass*					CreateInstance( void ) const;
-	bool						InhibitSpawn( const arcDict& args ) const;
+	anClass*					CreateInstance( void ) const;
+	bool						InhibitSpawn( const anDict& args ) const;
 
 	bool						IsType( const idTypeInfo &superclass ) const;
 	bool						RespondsTo( const arcEventDef &ev ) const;
 
 	template< typename T >
 	void GetInstances( T& callback, bool includeChildren ) const {
-		idClass* cls = instances.Next();
+		anClass* cls = instances.Next();
 		for ( ; cls; cls = cls->GetInstanceNode()->Next() ) {
 			callback( cls );
 		}
@@ -354,8 +354,8 @@ public:
 	}
 
 private:
-	idClass*					( *_createInstance )( void );
-	bool						( *_inhibitSpawn )( const arcDict& args );
+	anClass*					( *_createInstance )( void );
+	bool						( *_inhibitSpawn )( const anDict& args );
 };
 
 /*
@@ -377,18 +377,18 @@ idTypeInfo::RespondsTo
 */
 ARC_INLINE bool idTypeInfo::RespondsTo( const arcEventDef &ev ) const {
 	assert( idEvent::initialized );
-	return eventMap[ ev.GetEventNum() ] != NULL;
+	return eventMap[ ev.GetEventNum() ] != nullptr;
 }
 
 /*
 ================
-idClass::IsType
+anClass::IsType
 
 Checks if the object's class is a subclass of the class defined by the
 passed in idTypeInfo.
 ================
 */
-ARC_INLINE bool idClass::IsType( const idTypeInfo &superclass ) const {
+ARC_INLINE bool anClass::IsType( const idTypeInfo &superclass ) const {
 	idTypeInfo *subclass;
 
 	subclass = GetType();
@@ -397,10 +397,10 @@ ARC_INLINE bool idClass::IsType( const idTypeInfo &superclass ) const {
 
 /*
 ================
-idClass::RespondsTo
+anClass::RespondsTo
 ================
 */
-ARC_INLINE bool idClass::RespondsTo( const arcEventDef &ev ) const {
+ARC_INLINE bool anClass::RespondsTo( const arcEventDef &ev ) const {
 	const idTypeInfo *c;
 
 	assert( idEvent::initialized );

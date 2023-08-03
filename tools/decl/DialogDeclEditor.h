@@ -40,10 +40,10 @@ class DialogDeclEditor : public CDialog {
 	DECLARE_DYNAMIC(DialogDeclEditor)
 
 public:
-						DialogDeclEditor( CWnd* pParent = NULL );   // standard constructor
+						DialogDeclEditor( CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogDeclEditor();
 
-	void				LoadDecl( arcDecleration *decl );
+	void				LoadDecl( anDecl *decl );
 
 	//{{AFX_VIRTUAL(DialogDeclEditor)
 	virtual BOOL		OnInitDialog();
@@ -95,11 +95,11 @@ private:
 	bool				matchCase;
 	bool				matchWholeWords;
 	bool				searchForward;
-	arcDecleration *			decl;
+	anDecl *			decl;
 	int					firstLine;
 
 private:
-	bool				TestDecl( const arcNetString &declText );
+	bool				TestDecl( const anString &declText );
 	void				UpdateStatusBar( void );
 };
 

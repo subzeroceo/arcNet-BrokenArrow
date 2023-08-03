@@ -1057,7 +1057,7 @@ BEGIN
     LTEXT           "Version:\t\t1.1",IDC_ABOUT_GLVERSION,10,111,249,10
     LTEXT           "Renderer:\tWHATEVER",IDC_ABOUT_GLRENDERER,10,121,253,24
     GROUPBOX        "OpenGL Extensions",IDC_STATIC,5,152,265,65
-    CONTROL         "DOOM Radiant 1.0 build 199\nCopyright ©1999, 2003 Id Software, Inc.\n\n",
+    CONTROL         "DOOM Radiant 1.0 build 199\nCopyright ï¿½1999, 2003 Id Software, Inc.\n\n",
                     IDC_STATIC,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,99,7,
                     132,78
     EDITTEXT        IDC_ABOUT_GLEXTENSIONS,10,162,256,53,ES_MULTILINE | 
@@ -1327,7 +1327,7 @@ IDD_DIALOG_FINDREPLACE DIALOGEX 0, 0, 222, 98
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
 EXSTYLE WS_EX_CONTROLPARENT
-CAPTION "Find replace texture(s)"
+CAPTION "Find replace texture( s)"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_EDIT_FIND,27,16,132,12,ES_AUTOHSCROLL
@@ -2654,7 +2654,7 @@ BEGIN
     ID_VIEW_RENDERENTITYOUTLINES 
                             "Render light entities in render mode\nRender light entities in render mode"
     ID_VIEW_MATERIALANIMATION 
-                            "Render material (shader) animation\nRender material (shader) animation"
+                            "Render material ( shader) animation\nRender material ( shader) animation"
 END
 
 STRINGTABLE 
@@ -2743,14 +2743,14 @@ BEGIN
     ID_CURVE_PATCHBEVEL     "Create a bevel"
     ID_PATCH_DRILLDOWN      "Selects drill down rows and columns\nSelects drill down rows and columns"
     ID_CURVE_LOADPATCHFILE  "Load corresponding .patch file\nLoad corresponding .patch file"
-    ID_CURVE_INSERTROW      "Inserts a row in the selected patch(s)\nInserts a row in the selected patch(s)"
-    ID_CURVE_INSERTCOLUMN   "Inserts a column in the selected patch(s)\nInserts a column in the selected patch(s)"
+    ID_CURVE_INSERTROW      "Inserts a row in the selected patch( s)\nInserts a row in the selected patch( s)"
+    ID_CURVE_INSERTCOLUMN   "Inserts a column in the selected patch( s)\nInserts a column in the selected patch( s)"
 END
 
 STRINGTABLE 
 BEGIN
-    ID_CURVE_DELETEROW      "Deletes a row in the current patch(s)\nDeletes a row in the current patch(s)"
-    ID_CURVE_DELETECOLUMN   "Deletes a column in the current Patch(s)\nDeletes a column in the current Patch(s)"
+    ID_CURVE_DELETEROW      "Deletes a row in the current patch( s)\nDeletes a row in the current patch( s)"
+    ID_CURVE_DELETECOLUMN   "Deletes a column in the current Patch( s)\nDeletes a column in the current Patch( s)"
     ID_PATCH_INSDEL         "Redisperse patch points\nRedisperse patch points"
     ID_CURVE_INSERT_ADDCOLUMN 
                             "Add a column to the end of the patch\nAdd a column to the end of the patch"

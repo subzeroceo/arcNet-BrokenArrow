@@ -1,20 +1,20 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idPhysics, idPhysics_Static )
+CLASS_DECLARATION( anPhysics, anPhysics_Static )
 END_CLASS
 
 /*
 ================
-idPhysics_Static::idPhysics_Static
+anPhysics_Static::anPhysics_Static
 ================
 */
-idPhysics_Static::idPhysics_Static( void ) {
-	self = NULL;
-	clipModel = NULL;
+anPhysics_Static::anPhysics_Static( void ) {
+	self = nullptr;
+	clipModel = nullptr;
 	current.origin.Zero();
 	current.axis.Identity();
 	current.localOrigin.Zero();
@@ -25,14 +25,14 @@ idPhysics_Static::idPhysics_Static( void ) {
 
 /*
 ================
-idPhysics_Static::~idPhysics_Static
+anPhysics_Static::~anPhysics_Static
 ================
 */
-idPhysics_Static::~idPhysics_Static( void ) {
+anPhysics_Static::~anPhysics_Static( void ) {
 	if ( self && self->GetPhysics() == this ) {
-		self->SetPhysics( NULL );
+		self->SetPhysics( nullptr );
 	}
-	idForce::DeletePhysics( this );
+	anForce::DeletePhysics( this );
 	if ( clipModel ) {
 		delete clipModel;
 	}
@@ -40,10 +40,10 @@ idPhysics_Static::~idPhysics_Static( void ) {
 
 /*
 ================
-idPhysics_Static::Save
+anPhysics_Static::Save
 ================
 */
-void idPhysics_Static::Save( idSaveGame *savefile ) const {
+void anPhysics_Static::Save( anSaveGame *savefile ) const {
 	savefile->WriteObject( self );
 
 	savefile->WriteVec3( current.origin );
@@ -58,11 +58,11 @@ void idPhysics_Static::Save( idSaveGame *savefile ) const {
 
 /*
 ================
-idPhysics_Static::Restore
+anPhysics_Static::Restore
 ================
 */
-void idPhysics_Static::Restore( idRestoreGame *savefile ) {
-	savefile->ReadObject( reinterpret_cast<idClass *&>( self ) );
+void anPhysics_Static::Restore( anRestoreGame *savefile ) {
+	savefile->ReadObject( reinterpret_cast<anClass *&>( self ) );
 
 	savefile->ReadVec3( current.origin );
 	savefile->ReadMat3( current.axis );
@@ -76,20 +76,20 @@ void idPhysics_Static::Restore( idRestoreGame *savefile ) {
 
 /*
 ================
-idPhysics_Static::SetSelf
+anPhysics_Static::SetSelf
 ================
 */
-void idPhysics_Static::SetSelf( idEntity *e ) {
+void anPhysics_Static::SetSelf( anEntity *e ) {
 	assert( e );
 	self = e;
 }
 
 /*
 ================
-idPhysics_Static::SetClipModel
+anPhysics_Static::SetClipModel
 ================
 */
-void idPhysics_Static::SetClipModel( idClipModel *model, float density, int id, bool freeOld ) {
+void anPhysics_Static::SetClipModel( anClipModel *model, float density, int id, bool freeOld ) {
 	assert( self );
 
 	if ( clipModel && clipModel != model && freeOld ) {
@@ -97,74 +97,74 @@ void idPhysics_Static::SetClipModel( idClipModel *model, float density, int id, 
 	}
 	clipModel = model;
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 }
 
 /*
 ================
-idPhysics_Static::GetClipModel
+anPhysics_Static::GetClipModel
 ================
 */
-idClipModel *idPhysics_Static::GetClipModel( int id ) const {
+anClipModel *anPhysics_Static::GetClipModel( int id ) const {
 	if ( clipModel ) {
 		return clipModel;
 	}
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
-	return idClip::DefaultClipModel();
-// RAVEN END
+
+
+	return anClip::DefaultClipModel();
+
 }
 
 /*
 ================
-idPhysics_Static::GetNumClipModels
+anPhysics_Static::GetNumClipModels
 ================
 */
-int idPhysics_Static::GetNumClipModels( void ) const {
-	return ( clipModel != NULL );
+int anPhysics_Static::GetNumClipModels( void ) const {
+	return ( clipModel != nullptr );
 }
 
 /*
 ================
-idPhysics_Static::SetMass
+anPhysics_Static::SetMass
 ================
 */
-void idPhysics_Static::SetMass( float mass, int id ) {
+void anPhysics_Static::SetMass( float mass, int id ) {
 }
 
 /*
 ================
-idPhysics_Static::GetMass
+anPhysics_Static::GetMass
 ================
 */
-float idPhysics_Static::GetMass( int id ) const {
+float anPhysics_Static::GetMass( int id ) const {
 	return 0.0f;
 }
 
-// RAVEN BEGIN
+
 // bdube: Added center mass call
 /*
 ================
-idPhysics_Static::GetCenterMass
+anPhysics_Static::GetCenterMass
 
 default center of mass is origin
 ================
 */
-arcVec3 idPhysics_Static::GetCenterMass ( int id ) const {
+anVec3 anPhysics_Static::GetCenterMass ( int id ) const {
 	return GetOrigin();
 }
-// RAVEN END
+
 
 /*
 ================
-idPhysics_Static::SetContents
+anPhysics_Static::SetContents
 ================
 */
-void idPhysics_Static::SetContents( int contents, int id ) {
+void anPhysics_Static::SetContents( int contents, int id ) {
 	if ( clipModel ) {
 		clipModel->SetContents( contents );
 	}
@@ -172,10 +172,10 @@ void idPhysics_Static::SetContents( int contents, int id ) {
 
 /*
 ================
-idPhysics_Static::GetContents
+anPhysics_Static::GetContents
 ================
 */
-int idPhysics_Static::GetContents( int id ) const {
+int anPhysics_Static::GetContents( int id ) const {
 	if ( clipModel ) {
 		return clipModel->GetContents();
 	}
@@ -184,27 +184,27 @@ int idPhysics_Static::GetContents( int id ) const {
 
 /*
 ================
-idPhysics_Static::SetClipMask
+anPhysics_Static::SetClipMask
 ================
 */
-void idPhysics_Static::SetClipMask( int mask, int id ) {
+void anPhysics_Static::SetClipMask( int mask, int id ) {
 }
 
 /*
 ================
-idPhysics_Static::GetClipMask
+anPhysics_Static::GetClipMask
 ================
 */
-int idPhysics_Static::GetClipMask( int id ) const {
+int anPhysics_Static::GetClipMask( int id ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Static::GetBounds
+anPhysics_Static::GetBounds
 ================
 */
-const arcBounds &idPhysics_Static::GetBounds( int id ) const {
+const anBounds &anPhysics_Static::GetBounds( int id ) const {
 	if ( clipModel ) {
 		return clipModel->GetBounds();
 	}
@@ -213,11 +213,11 @@ const arcBounds &idPhysics_Static::GetBounds( int id ) const {
 
 /*
 ================
-idPhysics_Static::GetAbsBounds
+anPhysics_Static::GetAbsBounds
 ================
 */
-const arcBounds &idPhysics_Static::GetAbsBounds( int id ) const {
-	static arcBounds absBounds;
+const anBounds &anPhysics_Static::GetAbsBounds( int id ) const {
+	static anBounds absBounds;
 
 	if ( clipModel ) {
 		return clipModel->GetAbsBounds();
@@ -228,18 +228,18 @@ const arcBounds &idPhysics_Static::GetAbsBounds( int id ) const {
 
 /*
 ================
-idPhysics_Static::Evaluate
+anPhysics_Static::Evaluate
 ================
 */
-bool idPhysics_Static::Evaluate( int timeStepMSec, int endTimeMSec ) {
-// RAVEN BEGIN
+bool anPhysics_Static::Evaluate( int timeStepMSec, int endTimeMSec ) {
+
 // bdube: draw bbox
 	if ( hasMaster ) {
-		arcVec3 masterOrigin;
-		arcVec3 oldOrigin;
-		arcMat3 masterAxis;
-		arcMat3 oldAxis;
-// RAVEN END
+		anVec3 masterOrigin;
+		anVec3 oldOrigin;
+		anMat3 masterAxis;
+		anMat3 oldAxis;
+
 
 		oldOrigin = current.origin;
 		oldAxis = current.axis;
@@ -252,10 +252,10 @@ bool idPhysics_Static::Evaluate( int timeStepMSec, int endTimeMSec ) {
 			current.axis = current.localAxis;
 		}
 		if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 			clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 		}
 
 		return ( current.origin != oldOrigin || current.axis != oldAxis );
@@ -265,125 +265,125 @@ bool idPhysics_Static::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 /*
 ================
-idPhysics_Static::UpdateTime
+anPhysics_Static::UpdateTime
 ================
 */
-void idPhysics_Static::UpdateTime( int endTimeMSec ) {
+void anPhysics_Static::UpdateTime( int endTimeMSec ) {
 }
 
 /*
 ================
-idPhysics_Static::GetTime
+anPhysics_Static::GetTime
 ================
 */
-int idPhysics_Static::GetTime( void ) const {
+int anPhysics_Static::GetTime( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Static::GetImpactInfo
+anPhysics_Static::GetImpactInfo
 ================
 */
-void idPhysics_Static::GetImpactInfo( const int id, const arcVec3 &point, impactInfo_t *info ) const {
+void anPhysics_Static::GetImpactInfo( const int id, const anVec3 &point, impactInfo_t *info ) const {
 	memset( info, 0, sizeof( *info ) );
 }
 
 /*
 ================
-idPhysics_Static::ApplyImpulse
+anPhysics_Static::ApplyImpulse
 ================
 */
-void idPhysics_Static::ApplyImpulse( const int id, const arcVec3 &point, const arcVec3 &impulse ) {
+void anPhysics_Static::ApplyImpulse( const int id, const anVec3 &point, const anVec3 &impulse ) {
 }
 
 /*
 ================
-idPhysics_Static::AddForce
+anPhysics_Static::AddForce
 ================
 */
-void idPhysics_Static::AddForce( const int id, const arcVec3 &point, const arcVec3 &force ) {
+void anPhysics_Static::AddForce( const int id, const anVec3 &point, const anVec3 &force ) {
 }
 
 /*
 ================
-idPhysics_Static::Activate
+anPhysics_Static::Activate
 ================
 */
-void idPhysics_Static::Activate( void ) {
+void anPhysics_Static::Activate( void ) {
 }
 
 /*
 ================
-idPhysics_Static::PutToRest
+anPhysics_Static::PutToRest
 ================
 */
-void idPhysics_Static::PutToRest( void ) {
+void anPhysics_Static::PutToRest( void ) {
 }
 
 /*
 ================
-idPhysics_Static::IsAtRest
+anPhysics_Static::IsAtRest
 ================
 */
-bool idPhysics_Static::IsAtRest( void ) const {
+bool anPhysics_Static::IsAtRest( void ) const {
 	return true;
 }
 
 /*
 ================
-idPhysics_Static::GetRestStartTime
+anPhysics_Static::GetRestStartTime
 ================
 */
-int idPhysics_Static::GetRestStartTime( void ) const {
+int anPhysics_Static::GetRestStartTime( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Static::IsPushable
+anPhysics_Static::IsPushable
 ================
 */
-bool idPhysics_Static::IsPushable( void ) const {
+bool anPhysics_Static::IsPushable( void ) const {
 	return false;
 }
 
-// RAVEN BEGIN
+
 // bdube: water interraction
 /*
 ================
-idPhysics_Static::IsInWater
+anPhysics_Static::IsInWater
 ================
 */
-bool idPhysics_Static::IsInWater ( void ) const {
+bool anPhysics_Static::IsInWater ( void ) const {
 	return false;
 }
-// RAVEN END
+
 
 /*
 ================
-idPhysics_Static::SaveState
+anPhysics_Static::SaveState
 ================
 */
-void idPhysics_Static::SaveState( void ) {
+void anPhysics_Static::SaveState( void ) {
 }
 
 /*
 ================
-idPhysics_Static::RestoreState
+anPhysics_Static::RestoreState
 ================
 */
-void idPhysics_Static::RestoreState( void ) {
+void anPhysics_Static::RestoreState( void ) {
 }
 
 /*
 ================
-idPhysics_Static::SetOrigin
+anPhysics_Static::SetOrigin
 ================
 */
-void idPhysics_Static::SetOrigin( const arcVec3 &newOrigin, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Static::SetOrigin( const anVec3 &newOrigin, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.localOrigin = newOrigin;
 
@@ -395,21 +395,21 @@ void idPhysics_Static::SetOrigin( const arcVec3 &newOrigin, int id ) {
 	}
 
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 }
 
 /*
 ================
-idPhysics_Static::SetAxis
+anPhysics_Static::SetAxis
 ================
 */
-void idPhysics_Static::SetAxis( const arcMat3 &newAxis, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Static::SetAxis( const anMat3 &newAxis, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.localAxis = newAxis;
 
@@ -421,38 +421,38 @@ void idPhysics_Static::SetAxis( const arcMat3 &newAxis, int id ) {
 	}
 
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 }
 
 /*
 ================
-idPhysics_Static::Translate
+anPhysics_Static::Translate
 ================
 */
-void idPhysics_Static::Translate( const arcVec3 &translation, int id ) {
+void anPhysics_Static::Translate( const anVec3 &translation, int id ) {
 	current.localOrigin += translation;
 	current.origin += translation;
 
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 }
 
 /*
 ================
-idPhysics_Static::Rotate
+anPhysics_Static::Rotate
 ================
 */
-void idPhysics_Static::Rotate( const idRotation &rotation, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Static::Rotate( const anRotation &rotation, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.origin *= rotation;
 	current.axis *= rotation.ToMat3();
@@ -467,82 +467,82 @@ void idPhysics_Static::Rotate( const idRotation &rotation, int id ) {
 	}
 
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 }
 
 /*
 ================
-idPhysics_Static::GetOrigin
+anPhysics_Static::GetOrigin
 ================
 */
-const arcVec3 &idPhysics_Static::GetOrigin( int id ) const {
+const anVec3 &anPhysics_Static::GetOrigin( int id ) const {
 	return current.origin;
 }
 
 /*
 ================
-idPhysics_Static::GetAxis
+anPhysics_Static::GetAxis
 ================
 */
-const arcMat3 &idPhysics_Static::GetAxis( int id ) const {
+const anMat3 &anPhysics_Static::GetAxis( int id ) const {
 	return current.axis;
 }
 
 /*
 ================
-idPhysics_Static::SetLinearVelocity
+anPhysics_Static::SetLinearVelocity
 ================
 */
-void idPhysics_Static::SetLinearVelocity( const arcVec3 &newLinearVelocity, int id ) {
+void anPhysics_Static::SetLinearVelocity( const anVec3 &newLinearVelocity, int id ) {
 }
 
 /*
 ================
-idPhysics_Static::SetAngularVelocity
+anPhysics_Static::SetAngularVelocity
 ================
 */
-void idPhysics_Static::SetAngularVelocity( const arcVec3 &newAngularVelocity, int id ) {
+void anPhysics_Static::SetAngularVelocity( const anVec3 &newAngularVelocity, int id ) {
 }
 
 /*
 ================
-idPhysics_Static::GetLinearVelocity
+anPhysics_Static::GetLinearVelocity
 ================
 */
-const arcVec3 &idPhysics_Static::GetLinearVelocity( int id ) const {
+const anVec3 &anPhysics_Static::GetLinearVelocity( int id ) const {
 	return vec3_origin;
 }
 
 /*
 ================
-idPhysics_Static::GetAngularVelocity
+anPhysics_Static::GetAngularVelocity
 ================
 */
-const arcVec3 &idPhysics_Static::GetAngularVelocity( int id ) const {
+const anVec3 &anPhysics_Static::GetAngularVelocity( int id ) const {
 	return vec3_origin;
 }
 
 /*
 ================
-idPhysics_Static::SetGravity
+anPhysics_Static::SetGravity
 ================
 */
-void idPhysics_Static::SetGravity( const arcVec3 &newGravity ) {
+void anPhysics_Static::SetGravity( const anVec3 &newGravity ) {
 }
 
 /*
 ================
-idPhysics_Static::GetGravity
+anPhysics_Static::GetGravity
 ================
 */
-const arcVec3 &idPhysics_Static::GetGravity( void ) const {
-	static arcVec3 gravity( 0, 0, -g_gravity.GetFloat() );
-	if( gameLocal.isMultiplayer ) {
-		gravity = arcVec3( 0, 0, -g_mp_gravity.GetFloat() );
+const anVec3 &anPhysics_Static::GetGravity( void ) const {
+	static anVec3 gravity( 0, 0, -g_gravity.GetFloat() );
+	if ( gameLocal.isMultiplayer ) {
+		gravity = anVec3( 0, 0, -g_mp_gravity.GetFloat() );
 	}
 
 	return gravity;
@@ -550,64 +550,64 @@ const arcVec3 &idPhysics_Static::GetGravity( void ) const {
 
 /*
 ================
-idPhysics_Static::GetGravityNormal
+anPhysics_Static::GetGravityNormal
 ================
 */
-const arcVec3 &idPhysics_Static::GetGravityNormal( void ) const {
-	static arcVec3 gravity( 0, 0, -1 );
+const anVec3 &anPhysics_Static::GetGravityNormal( void ) const {
+	static anVec3 gravity( 0, 0, -1 );
 	return gravity;
 }
 
 /*
 ================
-idPhysics_Static::ClipTranslation
+anPhysics_Static::ClipTranslation
 ================
 */
-void idPhysics_Static::ClipTranslation( trace_t &results, const arcVec3 &translation, const idClipModel *model ) const {
+void anPhysics_Static::ClipTranslation( trace_t &results, const anVec3 &translation, const anClipModel *model ) const {
 	if ( model ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.TranslationModel( self, results, current.origin, current.origin + translation,
 			clipModel, current.axis, MASK_SOLID, model->GetCollisionModel(), model->GetOrigin(), model->GetAxis() );
 	} else {
 		gameLocal.Translation( self, results, current.origin, current.origin + translation,
 			clipModel, current.axis, MASK_SOLID, self );
-// RAVEN END
+
 	}
 }
 
 /*
 ================
-idPhysics_Static::ClipRotation
+anPhysics_Static::ClipRotation
 ================
 */
-void idPhysics_Static::ClipRotation( trace_t &results, const idRotation &rotation, const idClipModel *model ) const {
+void anPhysics_Static::ClipRotation( trace_t &results, const anRotation &rotation, const anClipModel *model ) const {
 	if ( model ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		gameLocal.RotationModel( self, results, current.origin, rotation,
 			clipModel, current.axis, MASK_SOLID, model->GetCollisionModel(), model->GetOrigin(), model->GetAxis() );
 	} else {
 		gameLocal.Rotation( self, results, current.origin, rotation, clipModel, current.axis, MASK_SOLID, self );
 	}
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Static::ClipContents
+anPhysics_Static::ClipContents
 ================
 */
-int idPhysics_Static::ClipContents( const idClipModel *model ) const {
+int anPhysics_Static::ClipContents( const anClipModel *model ) const {
 	if ( clipModel ) {
 		if ( model ) {
-// RAVEN BEGIN
+
 // ddynerman: multiple collision worlds
 			return gameLocal.ContentsModel( self, clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1,
 				model->GetCollisionModel(), model->GetOrigin(), model->GetAxis() );
 		} else {
-			return gameLocal.Contents( self, clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1, NULL );
-// RAVEN END
+			return gameLocal.Contents( self, clipModel->GetOrigin(), clipModel, clipModel->GetAxis(), -1, nullptr );
+
 		}
 	}
 	return 0;
@@ -615,10 +615,10 @@ int idPhysics_Static::ClipContents( const idClipModel *model ) const {
 
 /*
 ================
-idPhysics_Static::DisableClip
+anPhysics_Static::DisableClip
 ================
 */
-void idPhysics_Static::DisableClip( void ) {
+void anPhysics_Static::DisableClip( void ) {
 	if ( clipModel ) {
 		clipModel->Disable();
 	}
@@ -626,10 +626,10 @@ void idPhysics_Static::DisableClip( void ) {
 
 /*
 ================
-idPhysics_Static::EnableClip
+anPhysics_Static::EnableClip
 ================
 */
-void idPhysics_Static::EnableClip( void ) {
+void anPhysics_Static::EnableClip( void ) {
 	if ( clipModel ) {
 		clipModel->Enable();
 	}
@@ -637,10 +637,10 @@ void idPhysics_Static::EnableClip( void ) {
 
 /*
 ================
-idPhysics_Static::UnlinkClip
+anPhysics_Static::UnlinkClip
 ================
 */
-void idPhysics_Static::UnlinkClip( void ) {
+void anPhysics_Static::UnlinkClip( void ) {
 	if ( clipModel ) {
 		clipModel->Unlink();
 	}
@@ -648,42 +648,42 @@ void idPhysics_Static::UnlinkClip( void ) {
 
 /*
 ================
-idPhysics_Static::LinkClip
+anPhysics_Static::LinkClip
 ================
 */
-void idPhysics_Static::LinkClip( void ) {
+void anPhysics_Static::LinkClip( void ) {
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 }
 
 /*
 ================
-idPhysics_Static::EvaluateContacts
+anPhysics_Static::EvaluateContacts
 ================
 */
-bool idPhysics_Static::EvaluateContacts( void ) {
+bool anPhysics_Static::EvaluateContacts( void ) {
 	return false;
 }
 
 /*
 ================
-idPhysics_Static::GetNumContacts
+anPhysics_Static::GetNumContacts
 ================
 */
-int idPhysics_Static::GetNumContacts( void ) const {
+int anPhysics_Static::GetNumContacts( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Static::GetContact
+anPhysics_Static::GetContact
 ================
 */
-const contactInfo_t &idPhysics_Static::GetContact( int num ) const {
+const contactInfo_t &anPhysics_Static::GetContact( int num ) const {
 	static contactInfo_t info;
 	memset( &info, 0, sizeof( info ) );
 	return info;
@@ -691,89 +691,89 @@ const contactInfo_t &idPhysics_Static::GetContact( int num ) const {
 
 /*
 ================
-idPhysics_Static::ClearContacts
+anPhysics_Static::ClearContacts
 ================
 */
-void idPhysics_Static::ClearContacts( void ) {
+void anPhysics_Static::ClearContacts( void ) {
 }
 
 /*
 ================
-idPhysics_Static::AddContactEntity
+anPhysics_Static::AddContactEntity
 ================
 */
-void idPhysics_Static::AddContactEntity( idEntity *e ) {
+void anPhysics_Static::AddContactEntity( anEntity *e ) {
 }
 
 /*
 ================
-idPhysics_Static::RemoveContactEntity
+anPhysics_Static::RemoveContactEntity
 ================
 */
-void idPhysics_Static::RemoveContactEntity( idEntity *e ) {
+void anPhysics_Static::RemoveContactEntity( anEntity *e ) {
 }
 
 /*
 ================
-idPhysics_Static::HasGroundContacts
+anPhysics_Static::HasGroundContacts
 ================
 */
-bool idPhysics_Static::HasGroundContacts( void ) const {
+bool anPhysics_Static::HasGroundContacts( void ) const {
 	return false;
 }
 
 /*
 ================
-idPhysics_Static::IsGroundEntity
+anPhysics_Static::IsGroundEntity
 ================
 */
-bool idPhysics_Static::IsGroundEntity( int entityNum ) const {
+bool anPhysics_Static::IsGroundEntity( int entityNum ) const {
 	return false;
 }
 
 /*
 ================
-idPhysics_Static::IsGroundClipModel
+anPhysics_Static::IsGroundClipModel
 ================
 */
-bool idPhysics_Static::IsGroundClipModel( int entityNum, int id ) const {
+bool anPhysics_Static::IsGroundClipModel( int entityNum, int id ) const {
 	return false;
 }
 
 /*
 ================
-idPhysics_Static::SetPushed
+anPhysics_Static::SetPushed
 ================
 */
-void idPhysics_Static::SetPushed( int deltaTime ) {
+void anPhysics_Static::SetPushed( int deltaTime ) {
 }
 
 /*
 ================
-idPhysics_Static::GetPushedLinearVelocity
+anPhysics_Static::GetPushedLinearVelocity
 ================
 */
-const arcVec3 &idPhysics_Static::GetPushedLinearVelocity( const int id ) const {
+const anVec3 &anPhysics_Static::GetPushedLinearVelocity( const int id ) const {
 	return vec3_origin;
 }
 
 /*
 ================
-idPhysics_Static::GetPushedAngularVelocity
+anPhysics_Static::GetPushedAngularVelocity
 ================
 */
-const arcVec3 &idPhysics_Static::GetPushedAngularVelocity( const int id ) const {
+const anVec3 &anPhysics_Static::GetPushedAngularVelocity( const int id ) const {
 	return vec3_origin;
 }
 
 /*
 ================
-idPhysics_Static::SetMaster
+anPhysics_Static::SetMaster
 ================
 */
-void idPhysics_Static::SetMaster( idEntity *master, const bool orientated ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Static::SetMaster( anEntity *master, const bool orientated ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	if ( master ) {
 		if ( !hasMaster ) {
@@ -797,47 +797,47 @@ void idPhysics_Static::SetMaster( idEntity *master, const bool orientated ) {
 
 /*
 ================
-idPhysics_Static::GetBlockingInfo
+anPhysics_Static::GetBlockingInfo
 ================
 */
-const trace_t *idPhysics_Static::GetBlockingInfo( void ) const {
-	return NULL;
+const trace_t *anPhysics_Static::GetBlockingInfo( void ) const {
+	return nullptr;
 }
 
 /*
 ================
-idPhysics_Static::GetBlockingEntity
+anPhysics_Static::GetBlockingEntity
 ================
 */
-idEntity *idPhysics_Static::GetBlockingEntity( void ) const {
-	return NULL;
+anEntity *anPhysics_Static::GetBlockingEntity( void ) const {
+	return nullptr;
 }
 
 /*
 ================
-idPhysics_Static::GetLinearEndTime
+anPhysics_Static::GetLinearEndTime
 ================
 */
-int idPhysics_Static::GetLinearEndTime( void ) const {
+int anPhysics_Static::GetLinearEndTime( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Static::GetAngularEndTime
+anPhysics_Static::GetAngularEndTime
 ================
 */
-int idPhysics_Static::GetAngularEndTime( void ) const {
+int anPhysics_Static::GetAngularEndTime( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Static::WriteToSnapshot
+anPhysics_Static::WriteToSnapshot
 ================
 */
-void idPhysics_Static::WriteToSnapshot( idBitMsgDelta &msg ) const {
-	idCQuat quat, localQuat;
+void anPhysics_Static::WriteToSnapshot( anBitMsgDelta &msg ) const {
+	anCQuat quat, localQuat;
 
 	quat = current.axis.ToCQuat();
 	localQuat = current.localAxis.ToCQuat();
@@ -858,11 +858,11 @@ void idPhysics_Static::WriteToSnapshot( idBitMsgDelta &msg ) const {
 
 /*
 ================
-idPhysics_Base::ReadFromSnapshot
+anPhysics_Base::ReadFromSnapshot
 ================
 */
-void idPhysics_Static::ReadFromSnapshot( const idBitMsgDelta &msg ) {
-	idCQuat quat, localQuat;
+void anPhysics_Static::ReadFromSnapshot( const anBitMsgDelta &msg ) {
+	anCQuat quat, localQuat;
 
 	current.origin[0] = msg.ReadFloat();
 	current.origin[1] = msg.ReadFloat();

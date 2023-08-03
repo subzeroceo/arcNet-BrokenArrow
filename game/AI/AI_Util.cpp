@@ -1,39 +1,39 @@
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 #include "../spawner.h"
 #include "AI_Manager.h"
 #include "AI_Util.h"
-#include "AAS_Find.h"
+#include "SEAS_Find.h"
 
 /*
 ===============================================================================
 
-rvAIHelper
+anSAAIHelper
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, rvAIHelper  )
-	EVENT( EV_Activate,	rvAIHelper::Event_Activate )
+CLASS_DECLARATION( anEntity, anSAAIHelper  )
+	EVENT( EV_Activate,	anSAAIHelper::Event_Activate )
 END_CLASS
 
 /*
 ================
-rvAIHelper::rvAIHelper
+anSAAIHelper::anSAAIHelper
 ================
 */
-rvAIHelper::rvAIHelper ( void ) {
+anSAAIHelper::anSAAIHelper ( void ) {
 	helperNode.SetOwner( this );
 }
 
 /*
 ================
-rvAIHelper::Spawn
+anSAAIHelper::Spawn
 ================
 */
-void rvAIHelper::Spawn ( void ) {
+void anSAAIHelper::Spawn ( void ) {
 	// Auto activate?
 	if ( spawnArgs.GetBool ( "start_on" ) ) {
 		PostEventMS ( &EV_Activate, 0, this );
@@ -42,20 +42,20 @@ void rvAIHelper::Spawn ( void ) {
 
 /*
 ================
-rvAIHelper::IsCombat
+anSAAIHelper::IsCombat
 ================
 */
-bool rvAIHelper::IsCombat ( void ) const {
+bool anSAAIHelper::IsCombat ( void ) const {
 	return false;
 }
 
 
 /*
 ================
-rvAIHelper::OnActivate
+anSAAIHelper::OnActivate
 ================
 */
-void rvAIHelper::OnActivate ( bool active ) {
+void anSAAIHelper::OnActivate ( bool active ) {
 	if ( active ) {
 		ActivateTargets ( this );
 	}
@@ -63,11 +63,11 @@ void rvAIHelper::OnActivate ( bool active ) {
 
 /*
 ================
-rvAIHelper::Event_Activate
+anSAAIHelper::Event_Activate
 ================
 */
-void rvAIHelper::Event_Activate( idEntity *activator ) {
-	if ( !helperNode.InList ( ) ) {
+void anSAAIHelper::Event_Activate( anEntity *activator ) {
+	if ( !helperNode.InList() ) {
 		aiManager.RegisterHelper ( this );
 		OnActivate ( true );
 	} else {
@@ -78,10 +78,10 @@ void rvAIHelper::Event_Activate( idEntity *activator ) {
 
 /*
 ================
-rvAIHelper::GetDirection
+anSAAIHelper::GetDirection
 ================
 */
-arcVec3 rvAIHelper::GetDirection	( const idAI* ai ) const {
+anVec3 anSAAIHelper::GetDirection	( const anSAAI* ai ) const {
 	if ( ai->team == 0 ) {
 		return GetPhysics()->GetAxis()[0];
 	}
@@ -90,10 +90,10 @@ arcVec3 rvAIHelper::GetDirection	( const idAI* ai ) const {
 
 /*
 ================
-rvAIHelper::ValidateDestination
+anSAAIHelper::ValidateDestination
 ================
 */
-bool rvAIHelper::ValidateDestination ( const idAI* ent, const arcVec3& dest ) const {
+bool anSAAIHelper::ValidateDestination ( const anSAAI* ent, const anVec3& dest ) const {
 	return true;
 }
 
@@ -105,7 +105,7 @@ rvAICombatHelper
 ===============================================================================
 */
 
-class rvAICombatHelper : public rvAIHelper {
+class rvAICombatHelper : public anSAAIHelper {
 public:
 	CLASS_PROTOTYPE( rvAICombatHelper );
 
@@ -114,16 +114,16 @@ public:
 	void			Spawn				( void );
 
 	virtual bool	IsCombat			( void ) const;
-	virtual bool	ValidateDestination ( const idAI* ent, const arcVec3& dest ) const;
+	virtual bool	ValidateDestination ( const anSAAI* ent, const anVec3& dest ) const;
 
 protected:
 
 	virtual void	OnActivate			( bool active );
 
-	idEntityPtr<idLocationEntity>	location;
+	anEntityPtr<idLocationEntity>	location;
 };
 
-CLASS_DECLARATION( rvAIHelper, rvAICombatHelper )
+CLASS_DECLARATION( anSAAIHelper, rvAICombatHelper )
 END_CLASS
 
 /*
@@ -148,13 +148,13 @@ rvAICombatHelper::OnActivate
 ================
 */
 void rvAICombatHelper::OnActivate ( bool active ) {
-	rvAIHelper::OnActivate ( active );
+	anSAAIHelper::OnActivate ( active );
 
 	if ( active ) {
 		if ( spawnArgs.GetBool ( "tetherLocation", "1" ) ) {
 			location = gameLocal.LocationForPoint ( GetPhysics()->GetOrigin() );
 		} else {
-			location = NULL;
+			location = nullptr;
 		}
 	}
 }
@@ -173,7 +173,7 @@ bool rvAICombatHelper::IsCombat ( void ) const {
 rvAICombatHelper::ValidateDestination
 ================
 */
-bool rvAICombatHelper::ValidateDestination ( const idAI* ai, const arcVec3& dest ) const {
+bool rvAICombatHelper::ValidateDestination ( const anSAAI* ai, const anVec3& dest ) const {
 	// If tethering to a location then see if the location of the given points matches our tethered location
 	if ( location ) {
 		if ( gameLocal.LocationForPoint ( dest - ai->GetPhysics()->GetGravityNormal() * 32.0f ) != location ) {
@@ -182,8 +182,8 @@ bool rvAICombatHelper::ValidateDestination ( const idAI* ai, const arcVec3& dest
 	}
 
 	// Is the destination on the wrong side of the helper?
-	arcVec3 origin;
-	arcVec3 dir;
+	anVec3 origin;
+	anVec3 dir;
 
 	dir = GetDirection(ai);
 	if ( ai->enemy.ent ) {
@@ -199,7 +199,7 @@ bool rvAICombatHelper::ValidateDestination ( const idAI* ai, const arcVec3& dest
 	}
 
 	// Would this destination link us to the wrong helper?
-	if ( static_cast< const rvAIHelper * >( aiManager.FindClosestHelper( dest ) ) != this ) {
+	if ( static_cast< const anSAAIHelper * >( aiManager.FindClosestHelper( dest ) ) != this ) {
 		return false;
 	}
 
@@ -214,7 +214,7 @@ bool rvAICombatHelper::ValidateDestination ( const idAI* ai, const arcVec3& dest
 ===============================================================================
 */
 
-class rvAIAvoid : public idEntity {
+class rvAIAvoid : public anEntity {
 public:
 	CLASS_PROTOTYPE( rvAIAvoid );
 
@@ -223,7 +223,7 @@ public:
 	void	Spawn	( void );
 };
 
-CLASS_DECLARATION( idEntity, rvAIAvoid )
+CLASS_DECLARATION( anEntity, rvAIAvoid )
 END_CLASS
 
 /*
@@ -257,9 +257,9 @@ void rvAIAvoid::Spawn ( void ) {
 ===============================================================================
 */
 
-const idEventDef AI_AppendFromSpawner ( "<appendFromSpawner>", "ee" );
+const anEventDef AI_AppendFromSpawner ( "<appendFromSpawner>", "ee" );
 
-CLASS_DECLARATION( idEntity, rvAITrigger )
+CLASS_DECLARATION( anEntity, rvAITrigger )
 	EVENT( EV_Activate,				rvAITrigger::Event_Activate )
 	EVENT( AI_AppendFromSpawner,	rvAITrigger::Event_AppendFromSpawner )
 END_CLASS
@@ -297,7 +297,7 @@ void rvAITrigger::Spawn ( void ) {
 
 	// If there are no conditions we are done
 	if ( !conditionDead && !conditionTether && !conditionStop ) {
-		gameLocal.Warning ( "No conditions specified on ai trigger entity '%s'", GetName ( ) );
+		gameLocal.Warning ( "No conditions specified on ai trigger entity '%s'", GetName() );
 		PostEventMS ( &EV_Remove, 0 );
 	}
 }
@@ -307,14 +307,14 @@ void rvAITrigger::Spawn ( void ) {
 rvAITrigger::Save
 ================
 */
-void rvAITrigger::Save ( idSaveGame *savefile ) const {
+void rvAITrigger::Save ( anSaveGame *savefile ) const {
 	int i;
-	savefile->WriteInt ( testAI.Num ( ) );
+	savefile->WriteInt ( testAI.Num() );
 	for ( i = 0; i < testAI.Num(); i ++ ) {
 		testAI[i].Save ( savefile );
 	}
 
-	savefile->WriteInt ( testSpawner.Num ( ) );
+	savefile->WriteInt ( testSpawner.Num() );
 	for ( i = 0; i < testSpawner.Num(); i ++ ) {
 		testSpawner[i].Save ( savefile );
 	}
@@ -334,19 +334,19 @@ void rvAITrigger::Save ( idSaveGame *savefile ) const {
 rvAITrigger::Restore
 ================
 */
-void rvAITrigger::Restore ( idRestoreGame *savefile ) {
+void rvAITrigger::Restore ( anRestoreGame *savefile ) {
 	int i;
 	int num;
 
 	savefile->ReadInt ( num );
-	testAI.Clear ( );
+	testAI.Clear();
 	testAI.SetNum ( num );
 	for ( i = 0; i < num; i ++ ) {
 		testAI[i].Restore ( savefile );
 	}
 
 	savefile->ReadInt ( num );
-	testSpawner.Clear ( );
+	testSpawner.Clear();
 	testSpawner.SetNum ( num );
 	for ( i = 0; i < num; i ++ ) {
 		testSpawner[i].Restore ( savefile );
@@ -389,13 +389,13 @@ void rvAITrigger::Think ( void ) {
 	}
 
 	// If we have no AI we are tracking then wait until we do
-	if ( !testAI.Num ( ) ) {
+	if ( !testAI.Num() ) {
 		return;
 	}
 
 	int count = 0;
 	for ( v = 0; v < testAI.Num(); v ++ ) {
-		idAI* ai = testAI[v];
+		anSAAI* ai = testAI[v];
 		if ( !ai ) {
 			testAI.RemoveIndex ( v );
 			v--;
@@ -405,7 +405,7 @@ void rvAITrigger::Think ( void ) {
 			if ( conditionDead ) {
 				continue;
 			}
-			if ( conditionTether && !ai->IsWithinTether ( ) ) {
+			if ( conditionTether && !ai->IsWithinTether() ) {
 				continue;
 			}
 			if ( conditionStop && ai->move.fl.moving ) {
@@ -416,7 +416,7 @@ void rvAITrigger::Think ( void ) {
 	}
 
 	// If result is true then we should fire our trigger now
-	if ( count >= (int) ((float)testAI.Num()*percent) ) {
+	if ( count >= (int) ( ( float )testAI.Num()*percent) ) {
 		ActivateTargets ( this );
 
 		// If only triggering once just remove ourselves now
@@ -436,22 +436,22 @@ rvAITrigger::FindTargets
 void rvAITrigger::FindTargets ( void ) {
 	int t;
 
-	idEntity::FindTargets ( );
+	anEntity::FindTargets();
 
 	for ( t = 0; t < targets.Num(); t ++ ) {
-		idEntity* ent = targets[t];
+		anEntity* ent = targets[t];
 		if ( !ent ) {
 			continue;
 		}
-		if ( ent->IsType ( idAI::GetClassType ( ) ) ) {
-			testAI.Append ( idEntityPtr<idAI>(static_cast<idAI*>(ent)) );
+		if ( ent->IsType ( anSAAI::GetClassType() ) ) {
+			testAI.Append ( anEntityPtr<anSAAI>( static_cast<anSAAI*>(ent)) );
 			targets.RemoveIndex ( t );
 			t--;
 			continue;
 		}
-		if ( ent->IsType ( rvSpawner::GetClassType ( ) ) ) {
+		if ( ent->IsType ( rvSpawner::GetClassType() ) ) {
 			static_cast<rvSpawner*>(ent)->AddCallback ( this, &AI_AppendFromSpawner );
-			testSpawner.Append ( idEntityPtr<rvSpawner>(static_cast<rvSpawner*>(ent)) );
+			testSpawner.Append ( anEntityPtr<rvSpawner>( static_cast<rvSpawner*>(ent)) );
 			targets.RemoveIndex ( t );
 			t--;
 			continue;
@@ -464,11 +464,11 @@ void rvAITrigger::FindTargets ( void ) {
 rvAITrigger::Event_Activate
 ================
 */
-void rvAITrigger::Event_Activate( idEntity *activator ) {
+void rvAITrigger::Event_Activate( anEntity *activator ) {
 
 	// Add spawners and ai to the list when they come in
-	if ( activator && activator->IsType ( idAI::GetClassType ( ) ) ) {
-		testAI.Append ( idEntityPtr<idAI>(static_cast<idAI*>(activator)) );
+	if ( activator && activator->IsType ( anSAAI::GetClassType() ) ) {
+		testAI.Append ( anEntityPtr<anSAAI>( static_cast<anSAAI*>(activator)) );
 		return;
 	}
 
@@ -486,42 +486,42 @@ void rvAITrigger::Event_Activate( idEntity *activator ) {
 rvAITrigger::Event_AppendFromSpawner
 ================
 */
-void rvAITrigger::Event_AppendFromSpawner ( rvSpawner* spawner, idEntity* spawned ) {
+void rvAITrigger::Event_AppendFromSpawner ( rvSpawner* spawner, anEntity* spawned ) {
 	// If its an ai entity being spawned then add it to our test list
-	if ( spawned && spawned->IsType ( idAI::GetClassType ( ) ) ) {
-		testAI.Append ( idEntityPtr<idAI>(static_cast<idAI*>(spawned)) );
+	if ( spawned && spawned->IsType ( anSAAI::GetClassType() ) ) {
+		testAI.Append ( anEntityPtr<anSAAI>( static_cast<anSAAI*>( spawned)) );
 	}
 }
 
 /*
 ===============================================================================
 
-								rvAITether
+								anSAAITether
 
 ===============================================================================
 */
-const idEventDef EV_TetherSetupLocation ( "tetherSetupLocation" );
-const idEventDef EV_TetherGetLocation ( "tetherGetLocation" );
-CLASS_DECLARATION( idEntity, rvAITether )
-	EVENT( EV_Activate,					rvAITether::Event_Activate )
-	EVENT( EV_TetherGetLocation,		rvAITether::Event_TetherGetLocation )
-	EVENT( EV_TetherSetupLocation,		rvAITether::Event_TetherSetupLocation )
+const anEventDef EV_TetherSetupLocation ( "tetherSetupLocation" );
+const anEventDef EV_TetherGetLocation ( "tetherGetLocation" );
+CLASS_DECLARATION( anEntity, anSAAITether )
+	EVENT( EV_Activate,					anSAAITether::Event_Activate )
+	EVENT( EV_TetherGetLocation,		anSAAITether::Event_TetherGetLocation )
+	EVENT( EV_TetherSetupLocation,		anSAAITether::Event_TetherSetupLocation )
 END_CLASS
 
 /*
 ================
-rvAITether::rvAITether
+anSAAITether::anSAAITether
 ================
 */
-rvAITether::rvAITether ( void ) {
+anSAAITether::anSAAITether ( void ) {
 }
 
 /*
 ================
-rvAITether::InitNonPersistentSpawnArgs
+anSAAITether::InitNonPersistentSpawnArgs
 ================
 */
-void rvAITether::InitNonPersistentSpawnArgs ( void ) {
+void anSAAITether::InitNonPersistentSpawnArgs ( void ) {
 	tfl.canBreak   		 = spawnArgs.GetBool ( "allowBreak", "1" );
 	tfl.autoBreak		 = spawnArgs.GetBool ( "autoBreak", "0" );
 	tfl.forceRun   		 = spawnArgs.GetBool ( "forceRun", "0" );
@@ -542,21 +542,21 @@ void rvAITether::InitNonPersistentSpawnArgs ( void ) {
 
 /*
 ================
-rvAITether::Spawn
+anSAAITether::Spawn
 ================
 */
-void rvAITether::Spawn ( void ) {
-	InitNonPersistentSpawnArgs ( );
+void anSAAITether::Spawn ( void ) {
+	InitNonPersistentSpawnArgs();
 
 	PostEventMS( &EV_TetherSetupLocation, 100 );
 }
 
 /*
 ================
-rvAITether::Event_TetherSetupLocation
+anSAAITether::Event_TetherSetupLocation
 ================
 */
-void rvAITether::Event_TetherSetupLocation( void ) {
+void anSAAITether::Event_TetherSetupLocation( void ) {
 	//NOTE: we now do this right after spawn so we don't stomp other tether's locations
 	//		if we activate after them and are in the same room as them.
 	//		Dynamically-spawned locations are very, very bad!
@@ -569,52 +569,52 @@ void rvAITether::Event_TetherSetupLocation( void ) {
 			location = gameLocal.AddLocation ( GetPhysics()->GetOrigin() - GetPhysics()->GetGravityNormal() * 32.0f, "tether_location" );
 		}
 	} else {
-		location = NULL;
+		location = nullptr;
 	}
 	PostEventMS( &EV_TetherGetLocation, 100 );
 }
 
 /*
 ================
-rvAITether::Event_TetherGetLocation
+anSAAITether::Event_TetherGetLocation
 ================
 */
-void rvAITether::Event_TetherGetLocation( void ) {
+void anSAAITether::Event_TetherGetLocation( void ) {
 	//NOW: all locations should be made & spread, get our location (may not be the one
 	//		we added, it could be be the same as another tether if it's in the same room as us)
 	if ( spawnArgs.GetBool ( "location", "1" ) ) {
 		location = gameLocal.LocationForPoint ( GetPhysics()->GetOrigin() - GetPhysics()->GetGravityNormal() * 32.0f );
 	} else {
-		location = NULL;
+		location = nullptr;
 	}
 }
 
 /*
 ================
-rvAITether::Save
+anSAAITether::Save
 ================
 */
-void rvAITether::Save ( idSaveGame *savefile ) const {
+void anSAAITether::Save ( anSaveGame *savefile ) const {
 	location.Save( savefile );
 }
 
 /*
 ================
-rvAITether::Restore
+anSAAITether::Restore
 ================
 */
-void rvAITether::Restore ( idRestoreGame *savefile ) {
+void anSAAITether::Restore ( anRestoreGame *savefile ) {
 	location.Restore( savefile );
 
-	InitNonPersistentSpawnArgs ( );
+	InitNonPersistentSpawnArgs();
 }
 
 /*
 ================
-rvAITether::ValidateAAS
+anSAAITether::ValidateAAS
 ================
 */
-bool rvAITether::ValidateAAS ( idAI* ai ) {
+bool anSAAITether::ValidateAAS ( anSAAI* ai ) {
 	if ( !ai->aas ) {
 		return false;
 	}
@@ -623,10 +623,10 @@ bool rvAITether::ValidateAAS ( idAI* ai ) {
 
 /*
 ================
-rvAITether::ValidateDestination
+anSAAITether::ValidateDestination
 ================
 */
-bool rvAITether::ValidateDestination ( idAI* ai, const arcVec3& dest ) {
+bool anSAAITether::ValidateDestination ( anSAAI* ai, const anVec3& dest ) {
 	if ( location ) {
 		if ( gameLocal.LocationForPoint ( dest - ai->GetPhysics()->GetGravityNormal() * 32.0f ) != location ) {
 			return false;
@@ -637,27 +637,27 @@ bool rvAITether::ValidateDestination ( idAI* ai, const arcVec3& dest ) {
 
 /*
 ================
-rvAITether::ValidateBounds
+anSAAITether::ValidateBounds
 ================
 */
-bool rvAITether::ValidateBounds	( const arcBounds& bounds ) {
+bool anSAAITether::ValidateBounds	( const anBounds& bounds ) {
 	return true;
 }
 
 /*
 ================
-rvAITether::FindGoal
+anSAAITether::FindGoal
 ================
 */
-bool rvAITether::FindGoal ( idAI* ai, aasGoal_t& goal ) {
-	rvAASFindGoalForTether findGoal ( ai, this );
+bool anSAAITether::FindGoal ( anSAAI* ai, seasGoal_t& goal ) {
+	SEASTegtherObjective findGoal ( ai, this );
 	if ( !ai->aas->FindNearestGoal( goal,
 								ai->PointReachableAreaNum( ai->GetPhysics()->GetOrigin() ),
 								ai->GetPhysics()->GetOrigin(),
 								GetPhysics()->GetOrigin(),
 								ai->move.travelFlags,
 								0.0f, 0.0f,
-								NULL, 0, findGoal ) ) {
+								nullptr, 0, findGoal ) ) {
 		return false;
 	}
 	return true;
@@ -666,10 +666,10 @@ bool rvAITether::FindGoal ( idAI* ai, aasGoal_t& goal ) {
 
 /*
 ================
-rvAITether::Event_Activate
+anSAAITether::Event_Activate
 ================
 */
-void rvAITether::Event_Activate( idEntity *activator ) {
+void anSAAITether::Event_Activate( anEntity *activator ) {
 	int i;
 
 	//WELL!  Turns out designers are binding tethers to movers, so we have to get our location *again* on activation...
@@ -677,7 +677,7 @@ void rvAITether::Event_Activate( idEntity *activator ) {
 		location = gameLocal.LocationForPoint ( GetPhysics()->GetOrigin() - GetPhysics()->GetGravityNormal() * 32.0f );
 	}
 
-	if ( activator && activator->IsType ( idAI::GetClassType() ) ) {
+	if ( activator && activator->IsType ( anSAAI::GetClassType() ) ) {
 		activator->ProcessEvent ( &EV_Activate, this );
 	}
 
@@ -686,7 +686,7 @@ void rvAITether::Event_Activate( idEntity *activator ) {
 		if ( !targets[i] ) {
 			continue;
 		}
-		if ( targets[i]->IsType ( idAI::GetClassType() ) ) {
+		if ( targets[i]->IsType ( anSAAI::GetClassType() ) ) {
 			targets[i]->ProcessEvent ( &EV_Activate, this );
 
 			// Aggressive/Passive stance change?
@@ -701,11 +701,11 @@ void rvAITether::Event_Activate( idEntity *activator ) {
 
 /*
 ================
-rvAITether::DebugDraw
+anSAAITether::DebugDraw
 ================
 */
-void rvAITether::DebugDraw ( void ) {
-	const arcBounds& bounds = GetPhysics()->GetAbsBounds();
+void anSAAITether::DebugDraw ( void ) {
+	const anBounds& bounds = GetPhysics()->GetAbsBounds();
 	gameRenderWorld->DebugBounds ( colorYellow, bounds.Expand ( 8.0f ) );
 	gameRenderWorld->DebugArrow ( colorWhite, bounds.GetCenter(), bounds.GetCenter() + GetPhysics()->GetAxis()[0] * 16.0f, 8.0f );
 	gameRenderWorld->DrawText( name.c_str(), bounds.GetCenter(), 0.1f, colorWhite, gameLocal.GetLocalPlayer()->viewAngles.ToMat3(), 1 );
@@ -715,62 +715,62 @@ void rvAITether::DebugDraw ( void ) {
 /*
 ===============================================================================
 
-								rvAITetherBehind
+								anSAAITetherBehind
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( rvAITether, rvAITetherBehind )
+CLASS_DECLARATION( anSAAITether, anSAAITetherBehind )
 END_CLASS
 
 /*
 ================
-rvAITetherBehind::InitNonPersistentSpawnArgs
+anSAAITetherBehind::InitNonPersistentSpawnArgs
 ================
 */
-void rvAITetherBehind::InitNonPersistentSpawnArgs ( void ) {
+void anSAAITetherBehind::InitNonPersistentSpawnArgs ( void ) {
 	range = spawnArgs.GetFloat ( "range" );
 }
 
 /*
 ================
-rvAITetherBehind::Spawn
+anSAAITetherBehind::Spawn
 ================
 */
-void rvAITetherBehind::Spawn ( void ) {
-	InitNonPersistentSpawnArgs ( );
+void anSAAITetherBehind::Spawn ( void ) {
+	InitNonPersistentSpawnArgs();
 }
 
 /*
 ================
-rvAITetherBehind::Restore
+anSAAITetherBehind::Restore
 ================
 */
-void rvAITetherBehind::Restore ( idRestoreGame* savefile ) {
-	InitNonPersistentSpawnArgs ( );
+void anSAAITetherBehind::Restore ( anRestoreGame* savefile ) {
+	InitNonPersistentSpawnArgs();
 }
 
 /*
 ================
-rvAITetherBehind::ValidateDestination
+anSAAITetherBehind::ValidateDestination
 ================
 */
-bool rvAITetherBehind::ValidateDestination ( idAI* ai, const arcVec3& dest ) {
+bool anSAAITetherBehind::ValidateDestination ( anSAAI* ai, const anVec3& dest ) {
 	// Check base tether first
-	if ( !rvAITether::ValidateDestination ( ai, dest ) ) {
+	if ( !anSAAITether::ValidateDestination ( ai, dest ) ) {
 		return false;
 	}
 
 	// Make sure we include the move range in the tether
-	arcVec3 origin;
+	anVec3 origin;
 	if ( range ) {
-		origin = GetPhysics()->GetOrigin ( ) + GetPhysics()->GetAxis()[0] * GetOriginReachedRange() - GetPhysics()->GetAxis()[0] * range;
+		origin = GetPhysics()->GetOrigin() + GetPhysics()->GetAxis()[0] * GetOriginReachedRange() - GetPhysics()->GetAxis()[0] * range;
 		if ( GetPhysics()->GetAxis()[0] * (origin-dest) > 0.0f ) {
 			return false;
 		}
 	}
 
-	origin = GetPhysics()->GetOrigin ( ) - GetPhysics()->GetAxis()[0] * GetOriginReachedRange();
+	origin = GetPhysics()->GetOrigin() - GetPhysics()->GetAxis()[0] * GetOriginReachedRange();
 
 	// Are we on wrong side of tether?
 	return ( GetPhysics()->GetAxis()[0] * (origin-dest) ) >= 0.0f;
@@ -778,40 +778,40 @@ bool rvAITetherBehind::ValidateDestination ( idAI* ai, const arcVec3& dest ) {
 
 /*
 ================
-rvAITetherBehind::ValidateBounds
+anSAAITetherBehind::ValidateBounds
 ================
 */
-bool rvAITetherBehind::ValidateBounds ( const arcBounds& bounds ) {
-	if ( !rvAITether::ValidateBounds ( bounds ) ) {
+bool anSAAITetherBehind::ValidateBounds ( const anBounds& bounds ) {
+	if ( !anSAAITether::ValidateBounds ( bounds ) ) {
 		return false;
 	}
 
-	idPlane plane;
+	anPlane plane;
 	int     side;
-	plane.SetNormal ( GetPhysics()->GetAxis ( )[0] );
-	plane.FitThroughPoint ( GetPhysics()->GetOrigin ( ) );
+	plane.SetNormal ( GetPhysics()->GetAxis()[0] );
+	plane.FitThroughPoint ( GetPhysics()->GetOrigin() );
 	side = bounds.PlaneSide ( plane );
 	return ( side == PLANESIDE_CROSS || side == PLANESIDE_BACK );
 }
 
 /*
 ================
-rvAITetherBehind::DebugDraw
+anSAAITetherBehind::DebugDraw
 ================
 */
-void rvAITetherBehind::DebugDraw ( void ) {
-	arcVec3 dir;
+void anSAAITetherBehind::DebugDraw ( void ) {
+	anVec3 dir;
 
-	rvAITether::DebugDraw ( );
+	anSAAITether::DebugDraw();
 
-	dir = GetPhysics()->GetGravityNormal ( ).Cross ( GetPhysics()->GetAxis()[0] );
+	dir = GetPhysics()->GetGravityNormal().Cross ( GetPhysics()->GetAxis()[0] );
 	gameRenderWorld->DebugLine ( colorPink,
 								 GetPhysics()->GetOrigin() - dir * 1024.0f,
 								 GetPhysics()->GetOrigin() + dir * 1024.0f );
 
 	if ( range ) {
-		arcVec3 origin;
-		origin = GetPhysics()->GetOrigin ( ) - GetPhysics()->GetAxis ( )[0] * range;
+		anVec3 origin;
+		origin = GetPhysics()->GetOrigin() - GetPhysics()->GetAxis()[0] * range;
 		gameRenderWorld->DebugArrow ( colorPink, GetPhysics()->GetOrigin(), origin, 5.0f );
 		gameRenderWorld->DebugLine ( colorPink,
 									 origin - dir * 1024.0f,
@@ -822,20 +822,20 @@ void rvAITetherBehind::DebugDraw ( void ) {
 /*
 ===============================================================================
 
-								rvAITetherRadius
+								anSAAITetherRadius
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( rvAITether, rvAITetherRadius )
+CLASS_DECLARATION( anSAAITether, anSAAITetherRadius )
 END_CLASS
 
 /*
 ================
-rvAITetherRadius::InitNonPersistentSpawnArgs
+anSAAITetherRadius::InitNonPersistentSpawnArgs
 ================
 */
-void rvAITetherRadius::InitNonPersistentSpawnArgs ( void ) {
+void anSAAITetherRadius::InitNonPersistentSpawnArgs ( void ) {
 	float radius;
 	if ( !spawnArgs.GetFloat ( "tetherRadius", "0", radius ) ) {
 		radius = spawnArgs.GetFloat ( "radius", "128" );
@@ -845,69 +845,69 @@ void rvAITetherRadius::InitNonPersistentSpawnArgs ( void ) {
 
 /*
 ================
-rvAITetherRadius::Spawn
+anSAAITetherRadius::Spawn
 ================
 */
-void rvAITetherRadius::Spawn ( void ) {
-	InitNonPersistentSpawnArgs ( );
+void anSAAITetherRadius::Spawn ( void ) {
+	InitNonPersistentSpawnArgs();
 }
 
 /*
 ================
-rvAITetherRadius::Restore
+anSAAITetherRadius::Restore
 ================
 */
-void rvAITetherRadius::Restore ( idRestoreGame* savefile ) {
-	InitNonPersistentSpawnArgs ( );
+void anSAAITetherRadius::Restore ( anRestoreGame* savefile ) {
+	InitNonPersistentSpawnArgs();
 }
 
 /*
 ================
-rvAITetherRadius::ValidateDestination
+anSAAITetherRadius::ValidateDestination
 ================
 */
-bool rvAITetherRadius::ValidateDestination ( idAI* ai, const arcVec3& dest ) {
+bool anSAAITetherRadius::ValidateDestination ( anSAAI* ai, const anVec3& dest ) {
 	// Check base tether first
-	if ( !rvAITether::ValidateDestination ( ai, dest ) ) {
+	if ( !anSAAITether::ValidateDestination ( ai, dest ) ) {
 		return false;
 	}
 	// Are we within tether radius?
-	return ((dest - GetPhysics()->GetOrigin()).LengthSqr ( ) < radiusSqr - Square ( ai->move.range ) );
+	return ((dest - GetPhysics()->GetOrigin()).LengthSqr() < radiusSqr - Square ( ai->move.range ) );
 }
 
 
 /*
 ================
-rvAITetherRadius::ValidateBounds
+anSAAITetherRadius::ValidateBounds
 ================
 */
-bool rvAITetherRadius::ValidateBounds ( const arcBounds& bounds ) {
-	if ( !rvAITether::ValidateBounds ( bounds ) ) {
+bool anSAAITetherRadius::ValidateBounds ( const anBounds& bounds ) {
+	if ( !anSAAITether::ValidateBounds ( bounds ) ) {
 		return false;
 	}
-	return ( Square ( bounds.ShortestDistance ( GetPhysics()->GetOrigin ( ) ) ) < radiusSqr );
+	return ( Square ( bounds.ShortestDistance ( GetPhysics()->GetOrigin() ) ) < radiusSqr );
 }
 
 /*
 ================
-rvAITetherRadius::DebugDraw
+anSAAITetherRadius::DebugDraw
 ================
 */
-void rvAITetherRadius::DebugDraw ( void ) {
-	rvAITether::DebugDraw ( );
-	gameRenderWorld->DebugCircle( colorPink, GetPhysics()->GetOrigin(), GetPhysics()->GetGravityNormal(), arcMath::Sqrt(radiusSqr), 25 );
+void anSAAITetherRadius::DebugDraw ( void ) {
+	anSAAITether::DebugDraw();
+	gameRenderWorld->DebugCircle( colorPink, GetPhysics()->GetOrigin(), GetPhysics()->GetGravityNormal(), anMath::Sqrt(radiusSqr), 25 );
 }
 
 
 /*
 ===============================================================================
 
-								rvAITetherClear
+								anSAAITetherClear
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( rvAITether, rvAITetherClear )
+CLASS_DECLARATION( anSAAITether, anSAAITetherClear )
 END_CLASS
 
 
@@ -919,7 +919,7 @@ END_CLASS
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, rvAIBecomePassive )
+CLASS_DECLARATION( anEntity, rvAIBecomePassive )
 	EVENT( EV_Activate,	rvAIBecomePassive::Event_Activate )
 END_CLASS
 
@@ -928,7 +928,7 @@ END_CLASS
 rvAIBecomePassive::Event_Activate
 ================
 */
-void rvAIBecomePassive::Event_Activate( idEntity *activator ) {
+void rvAIBecomePassive::Event_Activate( anEntity *activator ) {
 	int		i;
 	bool	ignoreEnemies;
 
@@ -939,7 +939,7 @@ void rvAIBecomePassive::Event_Activate( idEntity *activator ) {
 		if ( !targets[i] ) {
 			continue;
 		}
-		if ( targets[i]->IsType ( idAI::GetClassType() ) ) {
+		if ( targets[i]->IsType ( anSAAI::GetClassType() ) ) {
 			targets[i]->ProcessEvent ( &AI_BecomePassive, ignoreEnemies );
 		}
 	}
@@ -953,7 +953,7 @@ void rvAIBecomePassive::Event_Activate( idEntity *activator ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, rvAIBecomeAggressive )
+CLASS_DECLARATION( anEntity, rvAIBecomeAggressive )
 	EVENT( EV_Activate,	rvAIBecomeAggressive::Event_Activate )
 END_CLASS
 
@@ -962,7 +962,7 @@ END_CLASS
 rvAIBecomeAggressive::Event_Activate
 ================
 */
-void rvAIBecomeAggressive::Event_Activate( idEntity *activator ) {
+void rvAIBecomeAggressive::Event_Activate( anEntity *activator ) {
 	int i;
 
 	// All targetted AI will become aggressive
@@ -970,7 +970,7 @@ void rvAIBecomeAggressive::Event_Activate( idEntity *activator ) {
 		if ( !targets[i] ) {
 			continue;
 		}
-		if ( targets[i]->IsType ( idAI::GetClassType() ) ) {
+		if ( targets[i]->IsType ( anSAAI::GetClassType() ) ) {
 			targets[i]->ProcessEvent ( &AI_BecomeAggressive );
 		}
 	}

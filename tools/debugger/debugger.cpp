@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/debugger_resource.h"
@@ -36,13 +36,13 @@ If you have questions concerning this license or the applicable additional terms
 DWORD CALLBACK DebuggerThread ( LPVOID param );
 
 rvDebuggerApp					gDebuggerApp;
-HWND							gDebuggerWindow = NULL;
+HWND							gDebuggerWindow = nullptr;
 bool							gDebuggerSuspend = false;
 bool							gDebuggerConnnected = false;
-HANDLE							gDebuggerGameThread = NULL;
+HANDLE							gDebuggerGameThread = nullptr;
 
-rvDebuggerServer*				gDebuggerServer			= NULL;
-HANDLE							gDebuggerServerThread   = NULL;
+rvDebuggerServer*				gDebuggerServer			= nullptr;
+HANDLE							gDebuggerServerThread   = nullptr;
 DWORD							gDebuggerServerThreadID = 0;
 bool							gDebuggerServerQuit     = false;
 
@@ -56,7 +56,7 @@ Main entry point for the debugger application
 void DebuggerClientInit( const char *cmdline )
 {
 	// See if the debugger is already running
-	if ( rvDebuggerWindow::Activate ( ) )
+	if ( rvDebuggerWindow::Activate() )
 	{
 		goto DebuggerClientInitDone;
 	}
@@ -66,7 +66,7 @@ void DebuggerClientInit( const char *cmdline )
 		goto DebuggerClientInitDone;
 	}
 
-	gDebuggerApp.Run ( );
+	gDebuggerApp.Run();
 
 DebuggerClientInitDone:
 
@@ -90,7 +90,7 @@ void DebuggerClientLaunch ( void )
 	}
 
 	// See if the debugger is already running
-	if ( rvDebuggerWindow::Activate ( ) ) {
+	if ( rvDebuggerWindow::Activate() ) {
 		return;
 	}
 
@@ -105,10 +105,10 @@ void DebuggerClientLaunch ( void )
 
 	GetCurrentDirectory ( MAX_PATH, curDir );
 
-	GetModuleFileName ( NULL, exeFile, MAX_PATH );
-	const char* s = va( "%s +set fs_game %s +set fs_cdpath %s +debugger", exeFile, cvarSystem->GetCVarString( "fs_game" ), cvarSystem->GetCVarString( "fs_cdpath" ) );
-	CreateProcess ( NULL, (LPSTR)s,
-					NULL, NULL, FALSE, 0, NULL, curDir, &startup, &process );
+	GetModuleFileName ( nullptr, exeFile, MAX_PATH );
+	const char* s = va( "%s +set fs_enginepath %s +set fs_cdpath %s +debugger", exeFile, cvarSystem->GetCVarString( "fs_enginepath" ), cvarSystem->GetCVarString( "fs_cdpath" ) );
+	CreateProcess ( nullptr, (LPSTR)s,
+					nullptr, nullptr, FALSE, 0, nullptr, curDir, &startup, &process );
 
 	CloseHandle ( process.hThread );
 	CloseHandle ( process.hProcess );
@@ -127,7 +127,7 @@ DWORD CALLBACK DebuggerServerThread ( LPVOID param )
 
 	while ( !gDebuggerServerQuit )
 	{
-		gDebuggerServer->ProcessMessages ( );
+		gDebuggerServer->ProcessMessages();
 		Sleep ( 1 );
 	}
 
@@ -157,15 +157,15 @@ bool DebuggerServerInit ( void )
 	}
 
 	// Initialize the debugger server
-	if ( !gDebuggerServer->Initialize ( ) )
+	if ( !gDebuggerServer->Initialize() )
 	{
 		delete gDebuggerServer;
-		gDebuggerServer = NULL;
+		gDebuggerServer = nullptr;
 		return false;
 	}
 
 	// Start the debugger server thread
-	gDebuggerServerThread = CreateThread ( NULL, 0, DebuggerServerThread, 0, 0, &gDebuggerServerThreadID );
+	gDebuggerServerThread = CreateThread ( nullptr, 0, DebuggerServerThread, 0, 0, &gDebuggerServerThreadID );
 
 	return true;
 }
@@ -191,11 +191,11 @@ void DebuggerServerShutdown ( void )
 		gDebuggerServer->Shutdown();
 
 		delete gDebuggerServer;
-		gDebuggerServer = NULL;
+		gDebuggerServer = nullptr;
 
 		// Cleanup the thread handle
 		CloseHandle ( gDebuggerServerThread );
-		gDebuggerServerThread = NULL;
+		gDebuggerServerThread = nullptr;
 	}
 }
 

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -70,7 +70,7 @@ toolTip_t DialogAFConstraintUniversal::toolTips[] = {
 	{ IDC_EDIT_UNIVERSAL_LIMIT_CONE_ANGLE, "cone angle" },
 	{ IDC_EDIT_UNIVERSAL_LIMIT_PYRAMID_ANGLE1, "first pyramid angle" },
 	{ IDC_EDIT_UNIVERSAL_LIMIT_PYRAMID_ANGLE2, "second pyramid angle" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 IMPLEMENT_DYNAMIC(DialogAFConstraintUniversal, CDialog)
@@ -80,7 +80,7 @@ IMPLEMENT_DYNAMIC(DialogAFConstraintUniversal, CDialog)
 DialogAFConstraintUniversal::DialogAFConstraintUniversal
 ================
 */
-DialogAFConstraintUniversal::DialogAFConstraintUniversal(CWnd* pParent /*=NULL*/)
+DialogAFConstraintUniversal::DialogAFConstraintUniversal(CWnd* pParent /*=nullptr*/)
 	: CDialog(DialogAFConstraintUniversal::IDD, pParent)
 	, m_anchor_x(0 )
 	, m_anchor_y(0 )
@@ -95,8 +95,8 @@ DialogAFConstraintUniversal::DialogAFConstraintUniversal(CWnd* pParent /*=NULL*/
 	, m_limitPitch(0 )
 	, m_limitYaw(0 )
 	, m_limitRoll(0 )
-	, constraint(NULL)
-	, file(NULL)
+	, constraint(nullptr )
+	, file(nullptr )
 {
 	Create( IDD_DIALOG_AF_CONSTRAINT_UNIVERSAL, pParent );
 	EnableToolTips( TRUE );
@@ -159,7 +159,7 @@ void DialogAFConstraintUniversal::InitJointLists( void ) {
 		return;
 	}
 
-	const ARCRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
+	const anRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
 	if ( !model ) {
 		return;
 	}
@@ -182,9 +182,9 @@ void DialogAFConstraintUniversal::InitJointLists( void ) {
 DialogAFConstraintUniversal::LoadFile
 ================
 */
-void DialogAFConstraintUniversal::LoadFile( arcDeclAF *af ) {
+void DialogAFConstraintUniversal::LoadFile( anDeclAF *af ) {
 	file = af;
-	constraint = NULL;
+	constraint = nullptr;
 	InitJointLists();
 }
 
@@ -202,10 +202,10 @@ void DialogAFConstraintUniversal::SaveFile( void ) {
 DialogAFConstraintUniversal::LoadConstraint
 ================
 */
-void DialogAFConstraintUniversal::LoadConstraint( arcDeclAF_Constraint *c ) {
+void DialogAFConstraintUniversal::LoadConstraint( anDeclAF_Constraint *c ) {
 	int i, s1, s2;
-	arcAngles angles;
-	arcMat3 mat;
+	anAngles angles;
+	anMat3 mat;
 
 	constraint = c;
 
@@ -253,10 +253,10 @@ void DialogAFConstraintUniversal::LoadConstraint( arcDeclAF_Constraint *c ) {
 	CheckRadioButton( IDC_RADIO_UNIVERSAL_BONE_SHAFT2, IDC_RADIO_UNIVERSAL_ANGLES_SHAFT2, i );
 
 	// limit
-	if ( constraint->limit == arcDeclAF_Constraint::LIMIT_CONE ) {
+	if ( constraint->limit == anDeclAF_Constraint::LIMIT_CONE ) {
 		i = IDC_RADIO_UNIVERSAL_LIMIT_CONE;
 	}
-	else if ( constraint->limit == arcDeclAF_Constraint::LIMIT_PYRAMID ) {
+	else if ( constraint->limit == anDeclAF_Constraint::LIMIT_PYRAMID ) {
 		i = IDC_RADIO_UNIVERSAL_LIMIT_PYRAMID;
 	}
 	else {
@@ -294,8 +294,8 @@ DialogAFConstraintUniversal::SaveConstraint
 void DialogAFConstraintUniversal::SaveConstraint( void ) {
 	int s1, s2;
 	CString str;
-	arcAngles angles;
-	arcMat3 mat;
+	anAngles angles;
+	anMat3 mat;
 
 	if ( !file || !constraint ) {
 		return;
@@ -317,7 +317,7 @@ void DialogAFConstraintUniversal::SaveConstraint( void ) {
 		constraint->shaft[0].joint2 = str;
 	}
 	else {
-		constraint->shaft[0].ToVec3() = arcAngles( m_pitchShaft1, m_yawShaft1, 0.0f ).ToForward();
+		constraint->shaft[0].ToVec3() = anAngles( m_pitchShaft1, m_yawShaft1, 0.0f ).ToForward();
 	}
 
 	// shaft 2
@@ -328,11 +328,11 @@ void DialogAFConstraintUniversal::SaveConstraint( void ) {
 		constraint->shaft[1].joint2 = str;
 	}
 	else {
-		constraint->shaft[1].ToVec3() = arcAngles( m_pitchShaft2, m_yawShaft2, 0.0f ).ToForward();
+		constraint->shaft[1].ToVec3() = anAngles( m_pitchShaft2, m_yawShaft2, 0.0f ).ToForward();
 	}
 
 	// limit
-	if ( constraint->limit == arcDeclAF_Constraint::LIMIT_CONE ) {
+	if ( constraint->limit == anDeclAF_Constraint::LIMIT_CONE ) {
 		constraint->limitAngles[0] = m_coneAngle;
 	}
 	else {
@@ -674,7 +674,7 @@ void DialogAFConstraintUniversal::OnDeltaposSpinUniversalYawShaft2(NMHDR *pNMHDR
 void DialogAFConstraintUniversal::OnBnClickedRadioUniversalLimitNone() {
 	if ( IsDlgButtonChecked( IDC_RADIO_UNIVERSAL_LIMIT_NONE ) ) {
 		if ( constraint ) {
-			constraint->limit = arcDeclAF_Constraint::LIMIT_NONE;
+			constraint->limit = anDeclAF_Constraint::LIMIT_NONE;
 			UpdateFile();
 		}
 	}
@@ -683,7 +683,7 @@ void DialogAFConstraintUniversal::OnBnClickedRadioUniversalLimitNone() {
 void DialogAFConstraintUniversal::OnBnClickedRadioUniversalLimitCone() {
 	if ( IsDlgButtonChecked( IDC_RADIO_UNIVERSAL_LIMIT_CONE ) ) {
 		if ( constraint ) {
-			constraint->limit = arcDeclAF_Constraint::LIMIT_CONE;
+			constraint->limit = anDeclAF_Constraint::LIMIT_CONE;
 			UpdateFile();
 		}
 	}
@@ -692,7 +692,7 @@ void DialogAFConstraintUniversal::OnBnClickedRadioUniversalLimitCone() {
 void DialogAFConstraintUniversal::OnBnClickedRadioUniversalLimitPyramid() {
 	if ( IsDlgButtonChecked( IDC_RADIO_UNIVERSAL_LIMIT_PYRAMID ) ) {
 		if ( constraint ) {
-			constraint->limit = arcDeclAF_Constraint::LIMIT_PYRAMID;
+			constraint->limit = anDeclAF_Constraint::LIMIT_PYRAMID;
 			UpdateFile();
 		}
 	}

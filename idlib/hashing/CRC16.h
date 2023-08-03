@@ -16,4 +16,4 @@ void CRC16_UpdateChecksum( unsigned short &crcvalue, const void *data, int lengt
 void CRC16_FinishChecksum( unsigned short &crcvalue );
 unsigned short CRC16_BlockChecksum( const void *data, int length );
 
-#endif /* !__CRC16_H__ */
+#endif // !__CRC16_H__

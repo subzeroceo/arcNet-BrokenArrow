@@ -23,16 +23,18 @@
 #undef FLT_EPSILON
 #endif
 
-#define DEG2RAD( a )				( ( a ) * arcMath::M_DEG2RAD )
-#define RAD2DEG( a )				( ( a ) * arcMath::M_RAD2DEG )
+#define VEC_EPSILON (0.05f)
 
-#define SEC2MS( t )					( arcMath::FtoiFast( ( t ) * arcMath::M_SEC2MS ) )
-#define MS2SEC( t )					( ( t ) * arcMath::M_MS2SEC )
+#define DEG2RAD( a )				( ( a ) * anMath::M_DEG2RAD )
+#define RAD2DEG( a )				( ( a ) * anMath::M_RAD2DEG )
 
-#define	ANGLE2SHORT( x )			( arcMath::FtoiFast( ( x ) * 65536.0f / 360.0f ) & 65535 )
+#define SEC2MS( t )					( anMath::FtoiFast( ( t ) * anMath::M_SEC2MS ) )
+#define MS2SEC( t )					( ( t ) * anMath::M_MS2SEC )
+
+#define	ANGLE2SHORT( x )			( anMath::FtoiFast( ( x ) * 65536.0f / 360.0f ) & 65535 )
 #define	SHORT2ANGLE( x )			( ( x ) * ( 360.0f / 65536.0f ) )
 
-#define	ANGLE2BYTE( x )				( arcMath::FtoiFast( ( x ) * 256.0f / 360.0f ) & 255 )
+#define	ANGLE2BYTE( x )				( anMath::FtoiFast( ( x ) * 256.0f / 360.0f ) & 255 )
 #define	BYTE2ANGLE( x )				( ( x ) * ( 360.0f / 256.0f ) )
 
 #define FLOATSIGNBITSET( f )		( (*(const unsigned long *)&( f ) ) >> 31 )
@@ -81,23 +83,35 @@ template<class T> ARC_INLINE T	MaxElement( const T *begin, const T *end) {
 T maxVal = *begin; for ( const T* it = begin + 1; it != end; ++it ) {
 if ( *it > maxVal ) { maxVal = *it; } } return maxVal; }
 template <class T> ARC_INLINE T MinElement( const T array[], int size ) {
-if (size == 0) { return T(); } T min_element = array[0]; for (int i = 1; i < size; i++) { if ( array[i] < min_element ) { min_element = array[i]; } return min_element; }
+if ( size == 0) { return T(); } T min_element = array[0]; for ( int i = 1; i < size; i++ ) { if ( array[i] < min_element ) { min_element = array[i]; } return min_element; }
 
 //int intArray[] = {4, 2, 9, 5, 7};
 //int minInt = MinElement<int>(intArray, 5);  // returns 2
 
 //double doubleArray[] = {3.14, 2.718, 1.618};
 //double minDouble = MinElement<double>(doubleArray, 3);  // returns 1.618
+// time in milliseconds
+// velocity where 1.0 equal rough walking speed
+struct anVelocity {
+	anVelocity( long start, long duration, float s ) {
+		startTime = start;
+		time = duration;
+		speed = s;
+	}
+	long	startTime;
+	long	time;
+	float	speed;
+};
 
-class arcMath {
+class anMath {
 public:
 
 	static void					Init( void );
 	static	int					InitSeed( void );			// for a non seed based init
-
 	static	void				InitRand( unsigned long seed ) { mSeed = seed; }// Init the seed to a unique number
-	static template<class T> int arcMin( T Val1, T Val2 );
-	static template<class T> int arcMax( T Val1, T Val2 );
+
+	static template<class T> int Min( T Val1, T Val2 );
+	static template<class T> int Max( T Val1, T Val2 );
 
 	static float				RSqrt( float x );			// reciprocal square root, returns huge number when x == 0.0
 
@@ -125,21 +139,21 @@ public:
 	static float				Tan16( float a );			// tangent with 16 bits precision, maximum absolute error is 1.8897e-08
 	static double				Tan64( float a );			// tangent with 64 bits precision
 
-	static float				ASin( float a );			// arcLexer sine with 32 bits precision, input is clamped to [-1, 1] to avoid a silent NaN
-	static float				ASin16( float a );			// arcLexer sine with 16 bits precision, maximum absolute error is 6.7626e-05
-	static double				ASin64( float a );			// arcLexer sine with 64 bits precision
+	static float				ASin( float a );			// anLexer sine with 32 bits precision, input is clamped to [-1, 1] to avoid a silent NaN
+	static float				ASin16( float a );			// anLexer sine with 16 bits precision, maximum absolute error is 6.7626e-05
+	static double				ASin64( float a );			// anLexer sine with 64 bits precision
 
-	static float				ACos( float a );			// arcLexer cosine with 32 bits precision, input is clamped to [-1, 1] to avoid a silent NaN
-	static float				ACos16( float a );			// arcLexer cosine with 16 bits precision, maximum absolute error is 6.7626e-05
-	static double				ACos64( float a );			// arcLexer cosine with 64 bits precision
+	static float				ACos( float a );			// anLexer cosine with 32 bits precision, input is clamped to [-1, 1] to avoid a silent NaN
+	static float				ACos16( float a );			// anLexer cosine with 16 bits precision, maximum absolute error is 6.7626e-05
+	static double				ACos64( float a );			// anLexer cosine with 64 bits precision
 
-	static float				ATan( float a );			// arcLexer tangent with 32 bits precision
-	static float				ATan16( float a );			// arcLexer tangent with 16 bits precision, maximum absolute error is 1.3593e-08
-	static double				ATan64( float a );			// arcLexer tangent with 64 bits precision
+	static float				ATan( float a );			// anLexer tangent with 32 bits precision
+	static float				ATan16( float a );			// anLexer tangent with 16 bits precision, maximum absolute error is 1.3593e-08
+	static double				ATan64( float a );			// anLexer tangent with 64 bits precision
 
-	static float				ATan( float y, float x );	// arcLexer tangent with 32 bits precision
-	static float				ATan16( float y, float x );	// arcLexer tangent with 16 bits precision, maximum absolute error is 1.3593e-08
-	static double				ATan64( float y, float x );	// arcLexer tangent with 64 bits precision
+	static float				ATan( float y, float x );	// anLexer tangent with 32 bits precision
+	static float				ATan16( float y, float x );	// anLexer tangent with 16 bits precision, maximum absolute error is 1.3593e-08
+	static double				ATan64( float y, float x );	// anLexer tangent with 64 bits precision
 
 	static float				Pow( float x, float y );	// x raised to the power y with 32 bits precision
 	static float				Pow16( float x, float y );	// x raised to the power y with 16 bits precision
@@ -148,6 +162,12 @@ public:
 	static float				Exp( float f );				// e raised to the power f with 32 bits precision
 	static float				Exp16( float f );			// e raised to the power f with 16 bits precision
 	static double				Exp64( float f );			// e raised to the power f with 64 bits precision
+
+	static int					GetExp32( int x );
+	static unsigned long		GetExp( unsigned long x );
+	static unsigned long		GetExp( int x );
+	static unsigned long &		SetExp( unsigned long &x, unsigned long iExp );
+	static unsigned long &		SetExp( unsigned long &x, unsigned long iExp );
 
 	static float				Log( float f );				// natural logarithm with 32 bits precision
 	static float				Log16( float f );			// natural logarithm with 16 bits precision
@@ -176,7 +196,7 @@ public:
 
 	static float				FloatRand( float min, float max );// Returns a float min <= x < max (exclusive; will get max - 0.00001; but never max)
 	static float				FloatRand();				// Returns a float min <= 0 < 1.0
-	static float				FloatRand( const arcVec2& v );
+	static float				FloatRand( const anVec2& v );
 	static int					IntRand( int min, int max );// Returns an integer min <= x <= max (ie inclusive)
 
 	static int					IsFinite( float f );
@@ -223,20 +243,21 @@ public:
 	static const float			FLOAT_EPSILON;				// smallest positive number such that 1.0+FLT_EPSILON != 1.0
 	static const int			INT_MIN;
 	static const int			INT_MAX;
+	static const float			VEC_EPSILON = 0.05f;
 
 	static float				FractionalPart( const float a );
 	static float				CalcPow( const float num, const float exp );
 	static float				ArbitraryBase( float base, float x );
 
-	static void					ArtesianFromPolar( arcVec3 &result, arcVec3 view );
-	static void					PolarFromArtesian( arcVec3 &view, arcVec3 artesian );
-	static float				BarycentricTriArea( const arcVec3 &normal, const arcVec3 &a, const arcVec3 &b, const arcVec3 &c );
-	static void					BarycentricEvaluate( arcVec2 &result, const arcVec3 &point, const arcVec3 &normal, const float area, const arcVec3 t[3], const arcVec2 tc[3] );
-	static float				BarycentricTriArea2D( const arcVec3 &normal, const arcVec3 &a, const arcVec3 &b, const arcVec3 &c );
-	static void					BarycentricEvaluate2D( arcVec2 &result, const arcVec3 &point, const arcVec3 &normal, const float area, const arcVec3 t[3], const arcVec2 tc[3] );
+	static void					ArtesianFromPolar( anVec3 &result, anVec3 view );
+	static void					PolarFromArtesian( anVec3 &view, anVec3 artesian );
+	static float				BarycentricTriArea( const anVec3 &normal, const anVec3 &a, const anVec3 &b, const anVec3 &c );
+	static void					BarycentricEvaluate( anVec2 &result, const anVec3 &point, const anVec3 &normal, const float area, const anVec3 t[3], const anVec2 tc[3] );
+	static float				BarycentricTriArea2D( const anVec3 &normal, const anVec3 &a, const anVec3 &b, const anVec3 &c );
+	static void					BarycentricEvaluate2D( anVec2 &result, const anVec3 &point, const anVec3 &normal, const float area, const anVec3 t[3], const anVec2 tc[3] );
 
 	static float		 		DifferentialValueLerp( float start, float end, float frac );
-	static float				DifferentialValueLerp2( const arcVec2& range, float frac );
+	static float				DifferentialValueLerp2( const anVec2& range, float frac );
 	static float				MidPointLerp( float start, float mid, float end, float frac );
 	static float				NewMidPointLerp( const float startVal, const float midVal, const float endVal, const float frac );
 
@@ -246,11 +267,23 @@ public:
 	static float				TstScaleToDB( float scale );
 
 	static void 				NormalToLatLong( const vec3_origin &normal, byte bytes[2] );
-	static arcVec3				NearestBoundaryPoint( const arcVec3 &pt, const arcBounds &bounds );
-	static arcVec3 				ProjectPointOntoLine( const arcVec3 &point, const arcVec3 &line, const arcVec3 &lineStartPoint );
+	static anVec3				NearestBoundaryPoint( const anVec3 &pt, const anBounds &bounds );
+	static anVec3 				ProjectPointOntoLine( const anVec3 &point, const anVec3 &line, const anVec3 &lineStartPoint );
 
-	static float 				PointToLineDist( const arcVec3 &point, const arcVec3 &line, const arcVec3 &lineStartPoint );
-	//static float 				LineToPointDist( const arcVec3 &line, const arcVec3 &lineStartPoint );
+	static float 				PointToLineDist( const anVec3 &point, const anVec3 &line, const anVec3 &lineStartPoint );
+	//static float 				LineToPointDist( const anVec3 &line, const anVec3 &lineStartPoint );
+
+	// Calculate the average of an array of numbers
+	float 						ArrayAvg( const float numbers[], int size );
+
+	// Calculate the average of a vector of numbers
+	float						VecAvg( const float &numbers );
+
+	// Calculate the average of two numbers
+	float						CalcAvg( float num1, float num2 );
+
+	// Calculate the average of three numbers
+	float						CalcAvg( float num1, float num2, float num3 );
 
 private:
 	enum {
@@ -274,23 +307,23 @@ private:
 
 /*
 ===============
-arcMath::arcMin
+anMath::arcMin
 ===============
 */
-template<class T>arcMath::arcMin( T Val1, T Val2 ) {
+template<class T>anMath::Min( T Val1, T Val2 ) {
 	return Min( Val1, Val2 );
 }
 
 /*
 ===============
-arcMath::arcMax
+anMath::arcMax
 ===============
 */
-template<class T> arcMath::arcMax( T Val1, T Val2 ) {
+template<class T> anMath::Max( T Val1, T Val2 ) {
 	return Max( Val1, Val2 );
 }
 
-ARC_INLINE float arcMath::RSqrt( float x ) {
+ARC_INLINE float anMath::RSqrt( float x ) {
 	long i;
 	float y, r;
 
@@ -302,8 +335,8 @@ ARC_INLINE float arcMath::RSqrt( float x ) {
 	return r;
 }
 
-ARC_INLINE float arcMath::InvSqrt16( float x ) {
-	dword a = ( (union _flint*)( &x ) )->i;
+ARC_INLINE float anMath::InvSqrt16( float x ) {
+	dword a = ( (union _flint *)( &x ) )->i;
 	union _flint seed;
 
 	assert( initialized );
@@ -315,8 +348,8 @@ ARC_INLINE float arcMath::InvSqrt16( float x ) {
 	return ( float ) r;
 }
 
-ARC_INLINE float arcMath::InvSqrt( float x ) {
-	dword a = ( (union _flint*)( &x ) )->i;
+ARC_INLINE float anMath::InvSqrt( float x ) {
+	dword a = ( (union _flint *)( &x ) )->i;
 	union _flint seed;
 
 	assert( initialized );
@@ -329,7 +362,7 @@ ARC_INLINE float arcMath::InvSqrt( float x ) {
 	return ( float ) r;
 }
 
-ARC_INLINE double arcMath::InvSqrt64( float x ) {
+ARC_INLINE double anMath::InvSqrt64( float x ) {
 	dword a = ( (union _flint*)( &x ) )->i;
 	union _flint seed;
 
@@ -344,23 +377,23 @@ ARC_INLINE double arcMath::InvSqrt64( float x ) {
 	return r;
 }
 
-ARC_INLINE float arcMath::Sqrt16( float x ) {
+ARC_INLINE float anMath::Sqrt16( float x ) {
 	return x * InvSqrt16( x );
 }
 
-ARC_INLINE float arcMath::Sqrt( float x ) {
+ARC_INLINE float anMath::Sqrt( float x ) {
 	return x * InvSqrt( x );
 }
 
-ARC_INLINE double arcMath::Sqrt64( float x ) {
+ARC_INLINE double anMath::Sqrt64( float x ) {
 	return x * InvSqrt64( x );
 }
 
-ARC_INLINE float arcMath::Sin( float a ) {
+ARC_INLINE float anMath::Sin( float a ) {
 	return sinf( a );
 }
 
-ARC_INLINE float arcMath::Sin16( float a ) {
+ARC_INLINE float anMath::Sin16( float a ) {
 	float s;
 
 	if ( ( a < 0.0f ) || ( a >= TWO_PI ) ) {
@@ -388,15 +421,15 @@ ARC_INLINE float arcMath::Sin16( float a ) {
 	return a * ( ( ( ( ( -2.39e-08f * s + 2.7526e-06f ) * s - 1.98409e-04f ) * s + 8.3333315e-03f ) * s - 1.666666664e-01f ) * s + 1.0f );
 }
 
-ARC_INLINE double arcMath::Sin64( float a ) {
+ARC_INLINE double anMath::Sin64( float a ) {
 	return sin( a );
 }
 
-ARC_INLINE float arcMath::Cos( float a ) {
+ARC_INLINE float anMath::Cos( float a ) {
 	return cosf( a );
 }
 
-ARC_INLINE float arcMath::Cos16( float a ) {
+ARC_INLINE float anMath::Cos16( float a ) {
 	float s, d;
 
 	if ( ( a < 0.0f ) || ( a >= TWO_PI ) ) {
@@ -432,11 +465,11 @@ ARC_INLINE float arcMath::Cos16( float a ) {
 	return d * ( ( ( ( ( -2.605e-07f * s + 2.47609e-05f ) * s - 1.3888397e-03f ) * s + 4.16666418e-02f ) * s - 4.999999963e-01f ) * s + 1.0f );
 }
 
-ARC_INLINE double arcMath::Cos64( float a ) {
+ARC_INLINE double anMath::Cos64( float a ) {
 	return cos( a );
 }
 
-ARC_INLINE void arcMath::SinCos( float a, float &s, float &c ) {
+ARC_INLINE void anMath::SinCos( float a, float &s, float &c ) {
 #ifdef _WIN32
 	_asm {
 		fld		a
@@ -452,11 +485,11 @@ ARC_INLINE void arcMath::SinCos( float a, float &s, float &c ) {
 #endif
 }
 
-ARC_INLINE void arcMath::SinCos16( float a, float &s, float &c ) {
+ARC_INLINE void anMath::SinCos16( float a, float &s, float &c ) {
 	float t, d;
 
-	if ( ( a < 0.0f ) || ( a >= arcMath::TWO_PI ) ) {
-		a -= floorf( a / arcMath::TWO_PI ) * arcMath::TWO_PI;
+	if ( ( a < 0.0f ) || ( a >= anMath::TWO_PI ) ) {
+		a -= floorf( a / anMath::TWO_PI ) * anMath::TWO_PI;
 	}
 #if 1
 	if ( a < PI ) {
@@ -489,7 +522,7 @@ ARC_INLINE void arcMath::SinCos16( float a, float &s, float &c ) {
 	c = d * ( ( ( ( ( -2.605e-07f * t + 2.47609e-05f ) * t - 1.3888397e-03f ) * t + 4.16666418e-02f ) * t - 4.999999963e-01f ) * t + 1.0f );
 }
 
-ARC_INLINE void arcMath::SinCos64( float a, double &s, double &c ) {
+ARC_INLINE void anMath::SinCos64( float a, double &s, double &c ) {
 #ifdef _WIN32
 	_asm {
 		fld		a
@@ -505,11 +538,11 @@ ARC_INLINE void arcMath::SinCos64( float a, double &s, double &c ) {
 #endif
 }
 
-ARC_INLINE float arcMath::Tan( float a ) {
+ARC_INLINE float anMath::Tan( float a ) {
 	return tanf( a );
 }
 
-ARC_INLINE float arcMath::Tan16( float a ) {
+ARC_INLINE float anMath::Tan16( float a ) {
 	float s;
 	bool reciprocal;
 
@@ -551,11 +584,11 @@ ARC_INLINE float arcMath::Tan16( float a ) {
 	}
 }
 
-ARC_INLINE double arcMath::Tan64( float a ) {
+ARC_INLINE double anMath::Tan64( float a ) {
 	return tan( a );
 }
 
-ARC_INLINE float arcMath::ASin( float a ) {
+ARC_INLINE float anMath::ASin( float a ) {
 	if ( a <= -1.0f ) {
 		return -HALF_PI;
 	}
@@ -565,7 +598,7 @@ ARC_INLINE float arcMath::ASin( float a ) {
 	return asinf( a );
 }
 
-ARC_INLINE float arcMath::ASin16( float a ) {
+ARC_INLINE float anMath::ASin16( float a ) {
 	if ( FLOATSIGNBITSET( a ) ) {
 		if ( a <= -1.0f ) {
 			return -HALF_PI;
@@ -580,7 +613,7 @@ ARC_INLINE float arcMath::ASin16( float a ) {
 	}
 }
 
-ARC_INLINE double arcMath::ASin64( float a ) {
+ARC_INLINE double anMath::ASin64( float a ) {
 	if ( a <= -1.0f ) {
 		return -HALF_PI;
 	}
@@ -592,7 +625,7 @@ ARC_INLINE double arcMath::ASin64( float a ) {
 	return asin( a );
 }
 
-ARC_INLINE float arcMath::ACos( float a ) {
+ARC_INLINE float anMath::ACos( float a ) {
 	//angle = acosf( a );
 	if ( a <= -1.0f ) {
 		return PI;
@@ -605,7 +638,7 @@ ARC_INLINE float arcMath::ACos( float a ) {
 	return acosf( a );
 }
 
-ARC_INLINE float arcMath::ACos16( float a ) {
+ARC_INLINE float anMath::ACos16( float a ) {
 	if ( FLOATSIGNBITSET( a ) ) {
 		if ( a <= -1.0f ) {
 			return PI;
@@ -620,7 +653,7 @@ ARC_INLINE float arcMath::ACos16( float a ) {
 	}
 }
 
-ARC_INLINE double arcMath::ACos64( float a ) {
+ARC_INLINE double anMath::ACos64( float a ) {
 	if ( a <= -1.0f ) {
 		return PI;
 	}
@@ -630,11 +663,11 @@ ARC_INLINE double arcMath::ACos64( float a ) {
 	return acos( a );
 }
 
-ARC_INLINE float arcMath::ATan( float a ) {
+ARC_INLINE float anMath::ATan( float a ) {
 	return atanf( a );
 }
 
-ARC_INLINE float arcMath::ATan16( float a ) {
+ARC_INLINE float anMath::ATan16( float a ) {
 	if ( fabs( a ) > 1.0f ) {
 		a = 1.0f / a;
 		float s = a * a;
@@ -652,15 +685,15 @@ ARC_INLINE float arcMath::ATan16( float a ) {
 	}
 }
 
-ARC_INLINE double arcMath::ATan64( float a ) {
+ARC_INLINE double anMath::ATan64( float a ) {
 	return atan( a );
 }
 
-ARC_INLINE float arcMath::ATan( float y, float x ) {
+ARC_INLINE float anMath::ATan( float y, float x ) {
 	return atan2f( y, x );
 }
 
-ARC_INLINE float arcMath::ATan16( float y, float x ) {
+ARC_INLINE float anMath::ATan16( float y, float x ) {
 	float a, s;
 
 	if ( fabs( y ) > fabs( x ) ) {
@@ -681,27 +714,45 @@ ARC_INLINE float arcMath::ATan16( float y, float x ) {
 	}
 }
 
-ARC_INLINE double arcMath::ATan64( float y, float x ) {
+ARC_INLINE double anMath::ATan64( float y, float x ) {
 	return atan2( y, x );
 }
 
-ARC_INLINE float arcMath::Pow( float x, float y ) {
+ARC_INLINE float anMath::Pow( float x, float y ) {
 	return powf( x, y );
 }
 
-ARC_INLINE float arcMath::Pow16( float x, float y ) {
+ARC_INLINE float anMath::Pow16( float x, float y ) {
 	return Exp16( y * Log16( x ) );
 }
 
-ARC_INLINE double arcMath::Pow64( float x, float y ) {
+ARC_INLINE double anMath::Pow64( float x, float y ) {
 	return pow( x, y );
 }
-
-ARC_INLINE float arcMath::Exp( float f ) {
+ARC_INLINE float anMath::Exp( float f ) {
 	return expf( f );
 }
+ARC_INLINE int anMath::GetExp32( int x ) {
+    return ( x >> 23 & 0x0FF ) - 127;
+}
+ARC_INLINE unsigned long anMath::GetExp( unsigned long x ) {
+	return ( unsigned long )( *(unsigned long *)&x >> 23 & 0x0FF ) - 127;
+  }
 
-ARC_INLINE float arcMath::Exp16( float f ) {
+ARC_INLINE unsigned long anMath::GetExp( int x ) {
+	return ( unsigned long )(*( (unsigned long *)&x + 1 ) >> 20 & 0x7FF ) - 1023;
+}
+
+ARC_INLINE unsigned long &anMath::SetExp( unsigned long &x, unsigned long iExp ) {
+	( *( unsigned long *)& x &= ~( 0x0FF << 23 ) ) |= ( ieExp + 127 ) << 23;
+	return x;
+}
+ARC_INLINE unsigned long &anMath::SetExp( unsigned long &x, unsigned long iExp ) {
+	( *( (unsigned long *)&x + 1 ) &= ~( 0x7FF << 20 ) ) |= ( iExp + 1023 ) << 20;
+	return x;
+}
+
+ARC_INLINE float anMath::Exp16( float f ) {
 	int i, s, e, m, exponent;
 	float x, x2, y, p, q;
 
@@ -732,15 +783,15 @@ ARC_INLINE float arcMath::Exp16( float f ) {
 	return x;
 }
 
-ARC_INLINE double arcMath::Exp64( float f ) {
+ARC_INLINE double anMath::Exp64( float f ) {
 	return exp( f );
 }
 
-ARC_INLINE float arcMath::Log( float f ) {
+ARC_INLINE float anMath::Log( float f ) {
 	return logf( f );
 }
 
-ARC_INLINE float arcMath::Log16( float f ) {
+ARC_INLINE float anMath::Log16( float f ) {
 	int i, exponent;
 	float y, y2;
 
@@ -756,43 +807,43 @@ ARC_INLINE float arcMath::Log16( float f ) {
 	return y;
 }
 
-ARC_INLINE double arcMath::Log64( float f ) {
+ARC_INLINE double anMath::Log64( float f ) {
 	return log( f );
 }
 
-ARC_INLINE int arcMath::IPow( int x, int y ) {
+ARC_INLINE int anMath::IPow( int x, int y ) {
 	int r; for ( r = x; y > 1; y-- ) { r *= x; } return r;
 }
 
-ARC_INLINE int arcMath::ILog2( float f ) {
+ARC_INLINE int anMath::ILog2( float f ) {
 	return ( ( (*reinterpret_cast<int *>( &f ) ) >> IEEE_FLT_MANTISSA_BITS ) & ( ( 1 << IEEE_FLT_EXPONENT_BITS ) - 1 ) ) - IEEE_FLT_EXPONENT_BIAS;
 }
 
-ARC_INLINE int arcMath::ILog2( int i ) {
+ARC_INLINE int anMath::ILog2( int i ) {
 	return ILog2( ( float )i );
 }
 
-ARC_INLINE int arcMath::BitsForFloat( float f ) {
+ARC_INLINE int anMath::BitsForFloat( float f ) {
 	return ILog2( f ) + 1;
 }
 
-ARC_INLINE int arcMath::BitsForInteger( int i ) {
+ARC_INLINE int anMath::BitsForInteger( int i ) {
 	return ILog2( ( float )i ) + 1;
 }
 
-ARC_INLINE int arcMath::MaskForFloatSign( float f ) {
+ARC_INLINE int anMath::MaskForFloatSign( float f ) {
 	return ( (*reinterpret_cast<int *>( &f ) ) >> 31 );
 }
 
-ARC_INLINE int arcMath::MaskForIntegerSign( int i ) {
+ARC_INLINE int anMath::MaskForIntegerSign( int i ) {
 	return ( i >> 31 );
 }
 
-ARC_INLINE int arcMath::FloorPowerOfTwo( int x ) {
+ARC_INLINE int anMath::FloorPowerOfTwo( int x ) {
 	return CeilPowerOfTwo( x ) >> 1;
 }
 
-ARC_INLINE int arcMath::CeilPowerOfTwo( int x ) {
+ARC_INLINE int anMath::CeilPowerOfTwo( int x ) {
 	x--;
 	x |= x >> 1;
 	x |= x >> 2;
@@ -803,11 +854,11 @@ ARC_INLINE int arcMath::CeilPowerOfTwo( int x ) {
 	return x;
 }
 
-ARC_INLINE bool arcMath::IsPowerOfTwo( int x ) {
+ARC_INLINE bool anMath::IsPowerOfTwo( int x ) {
 	return ( x & ( x - 1 ) ) == 0 && x > 0;
 }
 
-ARC_INLINE int arcMath::BitCount( int x ) {
+ARC_INLINE int anMath::BitCount( int x ) {
 	x -= ( ( x >> 1 ) & 0x55555555 );
 	x = ( ( ( x >> 2 ) & 0x33333333 ) + ( x & 0x33333333 ) );
 	x = ( ( ( x >> 4 ) + x ) & 0x0f0f0f0f );
@@ -815,7 +866,7 @@ ARC_INLINE int arcMath::BitCount( int x ) {
 	return ( ( x + ( x >> 16 ) ) & 0x0000003f );
 }
 
-ARC_INLINE int arcMath::BitReverse( int x ) {
+ARC_INLINE int anMath::BitReverse( int x ) {
 	x = ( ( ( x >> 1 ) & 0x55555555 ) | ( ( x & 0x55555555 ) << 1 ) );
 	x = ( ( ( x >> 2 ) & 0x33333333 ) | ( ( x & 0x33333333 ) << 2 ) );
 	x = ( ( ( x >> 4 ) & 0x0f0f0f0f ) | ( ( x & 0x0f0f0f0f ) << 4 ) );
@@ -823,34 +874,34 @@ ARC_INLINE int arcMath::BitReverse( int x ) {
 	return ( ( x >> 16 ) | ( x << 16 ) );
 }
 
-ARC_INLINE int arcMath::Abs( int x ) {
+ARC_INLINE int anMath::Abs( int x ) {
    int y = x >> 31;
    return ( ( x ^ y ) - y );
 }
 
-ARC_INLINE float arcMath::Fabs( float f ) {
+ARC_INLINE float anMath::Fabs( float f ) {
 	int tmp = *reinterpret_cast<int *>( &f );
 	tmp &= 0x7FFFFFFF;
 	return *reinterpret_cast<float *>( &tmp );
 }
 
-ARC_INLINE float arcMath::Floor( float f ) {
+ARC_INLINE float anMath::Floor( float f ) {
 	return floorf( f );
 }
 
-ARC_INLINE float arcMath::Ceil( float f ) {
+ARC_INLINE float anMath::Ceil( float f ) {
 	return ceilf( f );
 }
 
-ARC_INLINE float arcMath::Rint( float f ) {
+ARC_INLINE float anMath::Rint( float f ) {
 	return floorf( f + 0.5f );
 }
 
-ARC_INLINE int arcMath::Ftoi( float f ) {
+ARC_INLINE int anMath::Ftoi( float f ) {
 	return ( int ) f;
 }
 
-ARC_INLINE int arcMath::FtoiFast( float f ) {
+ARC_INLINE int anMath::FtoiFast( float f ) {
 #ifdef _WIN32
 	int i;
 	__asm fld		f
@@ -878,11 +929,11 @@ ARC_INLINE int arcMath::FtoiFast( float f ) {
 #endif
 }
 
-ARC_INLINE unsigned long arcMath::Ftol( float f ) {
+ARC_INLINE unsigned long anMath::Ftol( float f ) {
 	return ( unsigned long ) f;
 }
 
-ARC_INLINE unsigned long arcMath::FtolFast( float f ) {
+ARC_INLINE unsigned long anMath::FtolFast( float f ) {
 #ifdef _WIN32
 	// FIXME: this overflows on 31bits still .. same as FtoiFast
 	unsigned long i;
@@ -912,7 +963,7 @@ ARC_INLINE unsigned long arcMath::FtolFast( float f ) {
 #endif
 }
 
-ARC_INLINE byte arcMath::Ftob( float f ) {
+ARC_INLINE byte anMath::Ftob( float f ) {
 #ifdef ID_WIN_X86_SSE
 	// If a converted result is negative the value (0 ) is returned and if the
 	// converted result is larger than the maximum byte the value (255) is returned.
@@ -936,7 +987,7 @@ ARC_INLINE byte arcMath::Ftob( float f ) {
 #endif
 }
 
-ARC_INLINE signed char arcMath::ClampChar( int i ) {
+ARC_INLINE signed char anMath::ClampChar( int i ) {
 	if ( i < -128 ) {
 		return -128;
 	}
@@ -946,7 +997,7 @@ ARC_INLINE signed char arcMath::ClampChar( int i ) {
 	return i;
 }
 
-ARC_INLINE signed short arcMath::ClampShort( int i ) {
+ARC_INLINE signed short anMath::ClampShort( int i ) {
 	if ( i < -32768 ) {
 		return -32768;
 	}
@@ -956,7 +1007,7 @@ ARC_INLINE signed short arcMath::ClampShort( int i ) {
 	return i;
 }
 
-ARC_INLINE int arcMath::ClampInt( int min, int max, int value ) {
+ARC_INLINE int anMath::ClampInt( int min, int max, int value ) {
 	if ( value < min ) {
 		return min;
 	}
@@ -966,7 +1017,7 @@ ARC_INLINE int arcMath::ClampInt( int min, int max, int value ) {
 	return value;
 }
 
-ARC_INLINE float arcMath::ClampFloat( float min, float max, float value ) {
+ARC_INLINE float anMath::ClampFloat( float min, float max, float value ) {
 	if ( value < min ) {
 		return min;
 	}
@@ -976,14 +1027,14 @@ ARC_INLINE float arcMath::ClampFloat( float min, float max, float value ) {
 	return value;
 }
 
-ARC_INLINE float arcMath::AngleNormalize360( float angle ) {
+ARC_INLINE float anMath::AngleNormalize360( float angle ) {
 	if ( ( angle >= 360.0f ) || ( angle < 0.0f ) ) {
 		angle -= floor( angle / 360.0f ) * 360.0f;
 	}
 	return angle;
 }
 
-ARC_INLINE float arcMath::AngleNormalize180( float angle ) {
+ARC_INLINE float anMath::AngleNormalize180( float angle ) {
 	angle = AngleNormalize360( angle );
 	if ( angle > 180.0f ) {
 		angle -= 360.0f;
@@ -991,11 +1042,11 @@ ARC_INLINE float arcMath::AngleNormalize180( float angle ) {
 	return angle;
 }
 
-ARC_INLINE float arcMath::AngleDelta( float angle1, float angle2 ) {
+ARC_INLINE float anMath::AngleDelta( float angle1, float angle2 ) {
 	return AngleNormalize180( angle1 - angle2 );
 }
 
-ARC_INLINE int arcMath::FloatHash( const float *array, const int numFloats ) {
+ARC_INLINE int anMath::FloatHash( const float *array, const int numFloats ) {
 	int i, hash = 0;
 	const int *ptr;
 
@@ -1004,6 +1055,36 @@ ARC_INLINE int arcMath::FloatHash( const float *array, const int numFloats ) {
 		hash ^= ptr[i];
 	}
 	return hash;
+}
+
+// Calculate the average of an array of numbers
+ARC_INLINE float anMath::CalcAvg( const float numbers[], int size ) {
+    float sum = 0.0f;
+    for ( int i = 0; i < size; i++ )
+    {
+        sum += numbers[i];
+    }
+    return sum / size;
+}
+
+// Calculate the average of a vector of numbers
+ARC_INLINE float anMath::CalcAvg( const float &numbers ) {
+    float sum = 0.0f;
+    for ( float number : numbers )
+    {
+        sum += number;
+    }
+    return sum / numbers.Size();
+}
+
+// Calculate the average of two numbers
+ARC_INLINE float anMath::CalcAvg( float num1, float num2 ) {
+    return ( num1 + num2 ) / 2;
+}
+
+// Calculate the average of three numbers
+ARC_INLINE float anMath::CalcAvg( float num1, float num2, float num3 ) {
+    return ( num1 + num2 + num3 ) / 3;
 }
 
 #endif

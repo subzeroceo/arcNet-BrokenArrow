@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "GEApp.h"
@@ -11,16 +11,16 @@ rvGEZOrderModifier::rvGEZOrderModifier ( const char* name, idWindow* window, EZO
 	int			index;
 	idWindow*	parent;
 
-	parent = window->GetParent ( );
+	parent = window->GetParent();
 	if ( !parent )  {
 		return;
 	}
 
-	count = parent->GetChildCount ( );
+	count = parent->GetChildCount();
 	index = parent->GetChildIndex ( mWindow );
 
 	if ( index + 1 >= count ) {
-		mUndoBefore = NULL;
+		mUndoBefore = nullptr;
 	} else {
 		mUndoBefore = parent->GetChild ( index + 1 );
 	}
@@ -48,7 +48,7 @@ rvGEZOrderModifier::rvGEZOrderModifier ( const char* name, idWindow* window, EZO
 	}
 
 	if ( index >= count ) {
-		mBefore = NULL;
+		mBefore = nullptr;
 	} else {
 		mBefore = parent->GetChild ( index );
 	}
@@ -57,7 +57,7 @@ rvGEZOrderModifier::rvGEZOrderModifier ( const char* name, idWindow* window, EZO
 bool rvGEZOrderModifier::Apply ( void ) {
 	idWindow* parent;
 
-	parent = mWindow->GetParent ( );
+	parent = mWindow->GetParent();
 
 	parent->RemoveChild ( mWindow );
 	parent->InsertChild ( mWindow, mBefore );
@@ -69,7 +69,7 @@ bool rvGEZOrderModifier::Undo ( void )
 {
 	idWindow* parent;
 
-	parent = mWindow->GetParent ( );
+	parent = mWindow->GetParent();
 
 	parent->RemoveChild ( mWindow );
 	parent->InsertChild ( mWindow, mUndoBefore );
@@ -79,7 +79,7 @@ bool rvGEZOrderModifier::Undo ( void )
 
 bool rvGEZOrderModifier::IsValid ( void )
 {
-	if ( !mWindow->GetParent ( ) )
+	if ( !mWindow->GetParent() )
 	{
 		return false;
 	}

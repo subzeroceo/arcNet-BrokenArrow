@@ -6,7 +6,7 @@
 
 #include "../framework/CVarSystem.h"
 
-class idRenderWorld;
+class anRenderWorld;
 
 class sdAtmosphereRenderable {
 public:
@@ -16,14 +16,14 @@ public:
 									}
 
 		const sdDeclAtmosphere*		atmosphere;
-		idRenderModel*				boxDomeModel;
-		idRenderModel*				oldDomeModel;
-		arcVec3						skyOrigin;
+		anRenderModel*				boxDomeModel;
+		anRenderModel*				oldDomeModel;
+		anVec3						skyOrigin;
 
 		int							mapId;
 	};
 
-								sdAtmosphereRenderable( idRenderWorld* renderWorld );
+								sdAtmosphereRenderable( anRenderWorld* renderWorld );
 	virtual						~sdAtmosphereRenderable();
 
 	void						UpdateAtmosphere( parms_t& parms );
@@ -36,14 +36,14 @@ public:
 	bool						IsLightValid() const { return skyLightHandle != -1; }
 
 public:
-	static idCVar				a_sun;
-	static idCVar				a_glowScale;
-	static idCVar				a_glowBaseScale;
-	static idCVar				a_glowThresh;
-	static idCVar				a_glowLuminanceDependency;
-	static idCVar				a_glowSunPower;
-	static idCVar				a_glowSunScale;
-	static idCVar				a_glowSunBaseScale;
+	static anCVar				a_sun;
+	static anCVar				a_glowScale;
+	static anCVar				a_glowBaseScale;
+	static anCVar				a_glowThresh;
+	static anCVar				a_glowLuminanceDependency;
+	static anCVar				a_glowSunPower;
+	static anCVar				a_glowSunScale;
+	static anCVar				a_glowSunBaseScale;
 
 private:
 	void						UpdateCelestialBody( parms_t& parms );
@@ -53,11 +53,11 @@ private:
 
 
 private:
-	idRenderWorld*				renderWorld;
+	anRenderWorld*				renderWorld;
 	int							Uid;
 
-	arcNetList< renderEntity_t >	renderEnts;
-	arcNetList< qhandle_t >			renderHandles;
+	anList< renderEntity_t >	renderEnts;
+	anList< qhandle_t >			renderHandles;
 
 	renderLight_t				skyLight;
 	qhandle_t					skyLightHandle;
@@ -70,8 +70,8 @@ private:
 
 	qhandle_t					occtestHandle;
 
-	const arcMaterial*			postProcessMaterial;
-	idRenderModel*				spriteModel;
+	const anMaterial*			postProcessMaterial;
+	anRenderModel*				spriteModel;
 
 	float						currentScale;
 	float						currentAlpha;

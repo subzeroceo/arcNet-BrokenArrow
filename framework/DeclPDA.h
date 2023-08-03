@@ -4,15 +4,15 @@
 /*
 ===============================================================================
 
-	arcDeclPDA
+	anDeclPDA
 
 ===============================================================================
 */
 
 
-class arcDeclEmail : public arcDecleration {
+class anDeclEmail : public anDecl {
 public:
-							arcDeclEmail() {}
+							anDeclEmail() {}
 
 	virtual size_t			Size() const;
 	virtual const char *	DefaultDefinition() const;
@@ -28,17 +28,17 @@ public:
 	const char *			GetTo() const { return to; }
 
 private:
-	arcNetString					text;
-	arcNetString					subject;
-	arcNetString					date;
-	arcNetString					to;
-	arcNetString					from;
+	anString					text;
+	anString					subject;
+	anString					date;
+	anString					to;
+	anString					from;
 };
 
 
-class arcDeclVideo : public arcDecleration {
+class anDeclVideo : public anDecl {
 public:
-							arcDeclVideo() : preview( NULL ), video( NULL ), audio( NULL ) {};
+							anDeclVideo() : preview( nullptr ), video( nullptr ), audio( nullptr ) {};
 
 	virtual size_t			Size() const;
 	virtual const char *	DefaultDefinition() const;
@@ -47,24 +47,24 @@ public:
 	virtual void			Print() const;
 	virtual void			List() const;
 
-	const arcMaterial *		GetRoq() const { return video; }
-	const arcSoundShader *	GetWave() const { return audio; }
+	const anMaterial *		GetRoq() const { return video; }
+	const anSoundShader *	GetWave() const { return audio; }
 	const char *			GetVideoName() const { return videoName; }
 	const char *			GetInfo() const { return info; }
-	const arcMaterial *		GetPreview() const { return preview; }
+	const anMaterial *		GetPreview() const { return preview; }
 
 private:
-	const arcMaterial *		preview;
-	const arcMaterial *		video;
-	arcNetString					videoName;
-	arcNetString					info;
-	const arcSoundShader *	audio;
+	const anMaterial *		preview;
+	const anMaterial *		video;
+	anString					videoName;
+	anString					info;
+	const anSoundShader *	audio;
 };
 
 
-class arcDeclAudio : public arcDecleration {
+class anDeclAudio : public anDecl {
 public:
-							arcDeclAudio() : audio( NULL ) {};
+							anDeclAudio() : audio( nullptr ) {};
 
 	virtual size_t			Size() const;
 	virtual const char *	DefaultDefinition() const;
@@ -74,18 +74,18 @@ public:
 	virtual void			List() const;
 
 	const char *			GetAudioName() const { return audioName; }
-	const arcSoundShader *	GetWave() const { return audio; }
+	const anSoundShader *	GetWave() const { return audio; }
 	const char *			GetInfo() const { return info; }
 
 private:
-	const arcSoundShader *	audio;
-	arcNetString					audioName;
-	arcNetString					info;
+	const anSoundShader *	audio;
+	anString					audioName;
+	anString					info;
 };
 
-class arcDeclPDA : public arcDecleration {
+class anDeclPDA : public anDecl {
 public:
-							arcDeclPDA() { originalEmails = originalVideos = 0; };
+							anDeclPDA() { originalEmails = originalVideos = 0; };
 
 	virtual size_t			Size() const;
 	virtual const char *	DefaultDefinition() const;
@@ -94,17 +94,17 @@ public:
 	virtual void			Print() const;
 	virtual void			List() const;
 
-	virtual void			AddVideo( const arcDeclVideo * video, bool unique = true ) const { if ( unique ) { videos.AddUnique( video ); } else { videos.Append( video ); } }
-	virtual void			AddAudio( const arcDeclAudio * audio, bool unique = true ) const { if ( unique ) { audios.AddUnique( audio ); } else { audios.Append( audio ); } }
-	virtual void			AddEmail( const arcDeclEmail * email, bool unique = true ) const { if ( unique ) { emails.AddUnique( email ); } else { emails.Append( email ); } }
+	virtual void			AddVideo( const anDeclVideo * video, bool unique = true ) const { if ( unique ) { videos.AddUnique( video ); } else { videos.Append( video ); } }
+	virtual void			AddAudio( const anDeclAudio * audio, bool unique = true ) const { if ( unique ) { audios.AddUnique( audio ); } else { audios.Append( audio ); } }
+	virtual void			AddEmail( const anDeclEmail * email, bool unique = true ) const { if ( unique ) { emails.AddUnique( email ); } else { emails.Append( email ); } }
 	virtual void			RemoveAddedEmailsAndVideos() const;
 
 	virtual const int		GetNumVideos() const { return videos.Num(); }
 	virtual const int		GetNumAudios() const { return audios.Num(); }
 	virtual const int		GetNumEmails() const { return emails.Num(); }
-	virtual const arcDeclVideo *GetVideoByIndex( int index ) const { return ( index < 0 || index > videos.Num() ? NULL : videos[index] ); }
-	virtual const arcDeclAudio *GetAudioByIndex( int index ) const { return ( index < 0 || index > audios.Num() ? NULL : audios[index] ); }
-	virtual const arcDeclEmail *GetEmailByIndex( int index ) const { return ( index < 0 || index > emails.Num() ? NULL : emails[index] ); }
+	virtual const anDeclVideo *GetVideoByIndex( int index ) const { return ( index < 0 || index > videos.Num() ? nullptr : videos[index] ); }
+	virtual const anDeclAudio *GetAudioByIndex( int index ) const { return ( index < 0 || index > audios.Num() ? nullptr : audios[index] ); }
+	virtual const anDeclEmail *GetEmailByIndex( int index ) const { return ( index < 0 || index > emails.Num() ? nullptr : emails[index] ); }
 
 	virtual void			SetSecurity( const char *sec ) const;
 
@@ -117,16 +117,16 @@ public:
 	const char *			GetTitle() const { return title; }
 
 private:
-	mutable arcNetList<const arcDeclVideo *>	videos;
-	mutable arcNetList<const arcDeclAudio *>	audios;
-	mutable arcNetList<const arcDeclEmail *>	emails;
-	arcNetString					pdaName;
-	arcNetString					fullName;
-	arcNetString					icon;
-	arcNetString					id;
-	arcNetString					post;
-	arcNetString					title;
-	mutable arcNetString			security;
+	mutable anList<const anDeclVideo *>	videos;
+	mutable anList<const anDeclAudio *>	audios;
+	mutable anList<const anDeclEmail *>	emails;
+	anString					pdaName;
+	anString					fullName;
+	anString					icon;
+	anString					id;
+	anString					post;
+	anString					title;
+	mutable anString			security;
 	mutable	int				originalEmails;
 	mutable int				originalVideos;
 };

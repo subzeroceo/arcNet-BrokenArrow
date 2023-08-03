@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 #include "Common_local.h"
 #include "../renderer/Image.h"
@@ -22,26 +22,26 @@ which should also be nicely contained.
 #define DEFAULT_FIXED_TIC "0"
 #define DEFAULT_NO_SLEEP "0"
 
-arcCVarSystem com_deltaTimeClamp( "com_deltaTimeClamp", "50", CVAR_INTEGER, "don't process more than this time in a single frame" );
+anCVarSystem com_deltaTimeClamp( "com_deltaTimeClamp", "50", CVAR_INTEGER, "don't process more than this time in a single frame" );
 
-arcCVarSystem com_fixedTic( "com_fixedTic", DEFAULT_FIXED_TIC, CVAR_BOOL, "run a single game frame per render frame" );
-arcCVarSystem com_noSleep( "com_noSleep", DEFAULT_NO_SLEEP, CVAR_BOOL, "don't sleep if the game is running too fast" );
-arcCVarSystem com_smp( "com_smp", "1", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "run the game and draw code in a separate thread" );
-arcCVarSystem com_aviDemoSamples( "com_aviDemoSamples", "16", CVAR_SYSTEM, "" );
-arcCVarSystem com_aviDemoWidth( "com_aviDemoWidth", "256", CVAR_SYSTEM, "" );
-arcCVarSystem com_aviDemoHeight( "com_aviDemoHeight", "256", CVAR_SYSTEM, "" );
-arcCVarSystem com_skipGameDraw( "com_skipGameDraw", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
+anCVarSystem com_fixedTic( "com_fixedTic", DEFAULT_FIXED_TIC, CVAR_BOOL, "run a single game frame per render frame" );
+anCVarSystem com_noSleep( "com_noSleep", DEFAULT_NO_SLEEP, CVAR_BOOL, "don't sleep if the game is running too fast" );
+anCVarSystem com_smp( "com_smp", "1", CVAR_BOOL|CVAR_SYSTEM|CVAR_NOCHEAT, "run the game and draw code in a separate thread" );
+anCVarSystem com_aviDemoSamples( "com_aviDemoSamples", "16", CVAR_SYSTEM, "" );
+anCVarSystem com_aviDemoWidth( "com_aviDemoWidth", "256", CVAR_SYSTEM, "" );
+anCVarSystem com_aviDemoHeight( "com_aviDemoHeight", "256", CVAR_SYSTEM, "" );
+anCVarSystem com_skipGameDraw( "com_skipGameDraw", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
 
-arcCVarSystem com_sleepGame( "com_sleepGame", "0", CVAR_SYSTEM | CVAR_INTEGER, "intentionally add a sleep in the game time" );
-arcCVarSystem com_sleepDraw( "com_sleepDraw", "0", CVAR_SYSTEM | CVAR_INTEGER, "intentionally add a sleep in the draw time" );
-arcCVarSystem com_sleepRender( "com_sleepRender", "0", CVAR_SYSTEM | CVAR_INTEGER, "intentionally add a sleep in the render time" );
+anCVarSystem com_sleepGame( "com_sleepGame", "0", CVAR_SYSTEM | CVAR_INTEGER, "intentionally add a sleep in the game time" );
+anCVarSystem com_sleepDraw( "com_sleepDraw", "0", CVAR_SYSTEM | CVAR_INTEGER, "intentionally add a sleep in the draw time" );
+anCVarSystem com_sleepRender( "com_sleepRender", "0", CVAR_SYSTEM | CVAR_INTEGER, "intentionally add a sleep in the render time" );
 
-arcCVarSystem com_drawDebugHud( "com_drawDebugHud", "0", CVAR_SYSTEM | CVAR_INTEGER, "0 = None, 1 = Hud 1, 2 = Hud 2, 3 = Snapshots" );
+anCVarSystem com_drawDebugHud( "com_drawDebugHud", "0", CVAR_SYSTEM | CVAR_INTEGER, "0 = None, 1 = Hud 1, 2 = Hud 2, 3 = Snapshots" );
 
-arcCVarSystem timescale( "timescale", "1", CVAR_SYSTEM | CVAR_FLOAT, "Number of game frames to run per render frame", 0.001f, 100.0f );
+anCVarSystem timescale( "timescale", "1", CVAR_SYSTEM | CVAR_FLOAT, "Number of game frames to run per render frame", 0.001f, 100.0f );
 
-extern arcCVarSystem in_useJoystick;
-extern arcCVarSystem in_joystickRumble;
+extern anCVarSystem in_useJoystick;
+extern anCVarSystem in_joystickRumble;
 
 /*
 ===============
@@ -91,7 +91,7 @@ int idGameThread::Run() {
 	// we should have consumed all of our usercmds
 	if ( userCmdMgr ) {
 		if ( userCmdMgr->HasUserCmdForPlayer( game->GetLocalClientNum() ) && common->GetCurrentGame() == DOOM3_BFG ) {
-			arcLibrary::Printf( "idGameThread::Run: didn't consume all usercmds\n" );
+			anLibrary::Printf( "idGameThread::Run: didn't consume all usercmds\n" );
 		}
 	}
 
@@ -148,12 +148,12 @@ gameReturn_t idGameThread::RunGameAndDraw( int numGameFrames_, arcUserCmdMgr & u
 
 /*
 ===============
-arcCommonLocal::DrawWipeModel
+anCommonLocal::DrawWipeModel
 
 Draw the fade material over everything that has been drawn
 ===============
 */
-void arcCommonLocal::DrawWipeModel() {
+void anCommonLocal::DrawWipeModel() {
 	if ( wipeStartTime >= wipeStopTime ) {
 		return;
 	}
@@ -171,16 +171,16 @@ void arcCommonLocal::DrawWipeModel() {
 
 /*
 ===============
-arcCommonLocal::Draw
+anCommonLocal::Draw
 ===============
 */
-void arcCommonLocal::Draw() {
+void anCommonLocal::Draw() {
 	// debugging tool to test frame dropping behavior
 	if ( com_sleepDraw.GetInteger() ) {
 		Sys_Sleep( com_sleepDraw.GetInteger() );
 	}
 
-	if ( loadGUI != NULL ) {
+	if ( loadGUI != nullptr ) {
 		loadGUI->Render( renderSystem, Sys_Milliseconds() );
 	} else if ( currentGame == DOOM_CLASSIC || currentGame == DOOM2_CLASSIC ) {
 		const float sysWidth = renderSystem->GetWidth() * renderSystem->GetPixelAspect();
@@ -236,7 +236,7 @@ void arcCommonLocal::Draw() {
 		// draw the wipe material on top of this if it hasn't completed yet
 		DrawWipeModel();
 
-		Dialog().Render( loadGUI != NULL );
+		Dialog().Render( loadGUI != nullptr );
 
 		// draw the half console / notify console on top of everything
 		console->Draw( false );
@@ -245,12 +245,12 @@ void arcCommonLocal::Draw() {
 
 /*
 ===============
-arcCommonLocal::UpdateScreen
+anCommonLocal::UpdateScreen
 
 This is an out-of-sequence screen update, not the normal game rendering
 ===============
 */
-void arcCommonLocal::UpdateScreen( bool captureToImage ) {
+void anCommonLocal::UpdateScreen( bool captureToImage ) {
 	if ( insideUpdateScreen ) {
 		return;
 	}
@@ -279,10 +279,10 @@ void arcCommonLocal::UpdateScreen( bool captureToImage ) {
 }
 /*
 ================
-arcCommonLocal::ProcessGameReturn
+anCommonLocal::ProcessGameReturn
 ================
 */
-void arcCommonLocal::ProcessGameReturn( const gameReturn_t & ret ) {
+void anCommonLocal::ProcessGameReturn( const gameReturn_t & ret ) {
 	// set joystick rumble
 	if ( in_useJoystick.GetBool() && in_joystickRumble.GetBool() && !game->Shell_IsActive() && session->GetSignInManager().GetMasterInputDevice() >= 0 ) {
 		Sys_SetRumble( session->GetSignInManager().GetMasterInputDevice(), ret.vibrationLow, ret.vibrationHigh );		// Only set the rumble on the active controller
@@ -295,38 +295,38 @@ void arcCommonLocal::ProcessGameReturn( const gameReturn_t & ret ) {
 	syncNextEngineFrame = ret.syncNextEngineFrame;
 
 	if ( ret.sessionCommand[0] ) {
-		arcCommandArgs args;
+		anCommandArgs args;
 
 		args.TokenizeString( ret.sessionCommand, false );
 
-		if ( !arcNetString::Icmp( args.Argv(0 ), "map" ) ) {
+		if ( !anString::Icmp( args.Argv(0 ), "map" ) ) {
 			MoveToNewMap( args.Argv( 1 ), false );
-		} else if ( !arcNetString::Icmp( args.Argv(0 ), "devmap" ) ) {
+		} else if ( !anString::Icmp( args.Argv(0 ), "devmap" ) ) {
 			MoveToNewMap( args.Argv( 1 ), true );
-		} else if ( !arcNetString::Icmp( args.Argv(0 ), "died" ) ) {
+		} else if ( !anString::Icmp( args.Argv(0 ), "died" ) ) {
 			if ( !IsMultiplayer() ) {
 				game->Shell_Show( true );
 			}
-		} else if ( !arcNetString::Icmp( args.Argv(0 ), "disconnect" ) ) {
+		} else if ( !anString::Icmp( args.Argv(0 ), "disconnect" ) ) {
 			cmdSystem->BufferCommandText( CMD_EXEC_INSERT, "stoprecording; disconnect" );
-		} else if ( !arcNetString::Icmp( args.Argv(0 ), "endOfDemo" ) ) {
+		} else if ( !anString::Icmp( args.Argv(0 ), "endOfDemo" ) ) {
 			cmdSystem->BufferCommandText( CMD_EXEC_NOW, "endOfDemo" );
 		}
 	}
 }
 
-extern arcCVarSystem com_forceGenericSIMD;
+extern anCVarSystem com_forceGenericSIMD;
 
 /*
 =================
-arcCommonLocal::Frame
+anCommonLocal::Frame
 =================
 */
-void arcCommonLocal::Frame() {
+void anCommonLocal::Frame() {
 	try {
 		SCOPED_PROFILE_EVENT( "Common::Frame" );
 		// This is the only place this is incremented
-		arcLibrary::frameNumber++;
+		anLibrary::frameNumber++;
 		// allow changing SIMD usage on the fly
 		if ( com_forceGenericSIMD.IsModified() ) {
 			arcSIMD::InitProcessor( "SIMD", com_forceGenericSIMD.GetBool() );
@@ -335,7 +335,7 @@ void arcCommonLocal::Frame() {
 
 		// Do the actual switch between Doom 3 and the classics here so
 		// that things don't get confused in the middle of the frame.
-		PerformGameSwitch();
+		PerformGameswitch ();
 
 		// pump all the events
 		Sys_GenerateEvents();
@@ -366,14 +366,14 @@ void arcCommonLocal::Frame() {
 
 		// save the screenshot and audio from the last draw if needed
 		//if ( aviCaptureMode ) {
-		//	arcNetString name = va( "demos/%s/%s_%05i.tga", aviDemoShortName.c_str(), aviDemoShortName.c_str(), aviDemoFrameCount++ );
-		//	renderSystem->TakeScreenshot( com_aviDemoWidth.GetInteger(), com_aviDemoHeight.GetInteger(), name, com_aviDemoSamples.GetInteger(), NULL );
+		//	anString name = va( "demos/%s/%s_%05i.tga", aviDemoShortName.c_str(), aviDemoShortName.c_str(), aviDemoFrameCount++ );
+		//	renderSystem->TakeScreenshot( com_aviDemoWidth.GetInteger(), com_aviDemoHeight.GetInteger(), name, com_aviDemoSamples.GetInteger(), nullptr );
 
 			// remove any printed lines at the top before taking the screenshot
 			console->ClearNotifyLines();
 
 			// this will call Draw, possibly multiple times if com_aviDemoSamples is > 1
-			//renderSystem->TakeScreenshot( com_aviDemoWidth.GetInteger(), com_aviDemoHeight.GetInteger(), name, com_aviDemoSamples.GetInteger(), NULL );
+			//renderSystem->TakeScreenshot( com_aviDemoWidth.GetInteger(), com_aviDemoHeight.GetInteger(), name, com_aviDemoSamples.GetInteger(), nullptr );
 		//}
 
 		//--------------------------------------------
@@ -386,7 +386,7 @@ void arcCommonLocal::Frame() {
 		// this should exit right after vsync, with the GPU idle and ready to draw
 		// This may block if the GPU isn't finished renderng the previous frame.
 		frameTiming.startSyncTime = Sys_Microseconds();
-		const setBufferCommand_t * renderCommands = NULL;
+		const setBufferCommand_t * renderCommands = nullptr;
 		if ( com_smp.GetBool() ) {
 			renderCommands = renderSystem->SwapCommandBuffers( &time_frontend, &time_backend, &time_shadows, &time_gpu );
 		} else {
@@ -509,7 +509,7 @@ void arcCommonLocal::Frame() {
 		if ( session->GetState() == ARCSession::LOADING ) {
 			// If the session reports we should be loading a map, load it!
 			ExecuteMapChange();
-			mapSpawnData.savegameFile = NULL;
+			mapSpawnData.savegameFile = nullptr;
 			mapSpawnData.persistentPlayerInfo.Clear();
 			return;
 		} else if ( session->GetState() != ARCSession::INGAME && mapSpawned ) {
@@ -633,7 +633,7 @@ void arcCommonLocal::Frame() {
 			int	nowTime = Sys_Milliseconds();
 			int	com_frameMsec = nowTime - lastTime;
 			lastTime = nowTime;
-			Printf( "frame:%d all:%3d gfr:%3d rf:%3lld bk:%3lld\n", arcLibrary::frameNumber, com_frameMsec, time_gameFrame, time_frontend / 1000, time_backend / 1000 );
+			Printf( "frame:%d all:%3d gfr:%3d rf:%3lld bk:%3lld\n", anLibrary::frameNumber, com_frameMsec, time_gameFrame, time_frontend / 1000, time_backend / 1000 );
 			time_gameFrame = 0;
 			time_gameDraw = 0;
 		}
@@ -641,7 +641,7 @@ void arcCommonLocal::Frame() {
 		// the FPU stack better be empty at this point or some bad code or compiler bug left values on the stack
 		if ( !Sys_FPU_StackIsEmpty() ) {
 			Printf( Sys_FPU_GetState() );
-			FatalError( "arcCommon::Frame: the FPU stack is not empty at the end of the frame\n" );
+			FatalError( "anCommon::Frame: the FPU stack is not empty at the end of the frame\n" );
 		}
 
 		mainFrameTiming = frameTiming;

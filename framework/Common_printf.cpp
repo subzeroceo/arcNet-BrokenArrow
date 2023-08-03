@@ -1,22 +1,22 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Common_local.h"
 
-arcCVarSystem com_logFile( "logFile", "0", CVAR_SYSTEM | CVAR_NOCHEAT, "1 = buffer log, 2 = flush after each print", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
-arcCVarSystem com_logFileName( "logFileName", "qconsole.log", CVAR_SYSTEM | CVAR_NOCHEAT, "name of log file, if empty, qconsole.log will be used" );
-arcCVarSystem com_timestampPrints( "com_timestampPrints", "0", CVAR_SYSTEM, "print time with each console print, 1 = msec, 2 = sec", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem com_logFile( "logFile", "0", CVAR_SYSTEM | CVAR_NOCHEAT, "1 = buffer log, 2 = flush after each print", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
+anCVarSystem com_logFileName( "logFileName", "qconsole.log", CVAR_SYSTEM | CVAR_NOCHEAT, "name of log file, if empty, qconsole.log will be used" );
+anCVarSystem com_timestampPrints( "com_timestampPrints", "0", CVAR_SYSTEM, "print time with each console print, 1 = msec, 2 = sec", 0, 2, arcCmdSystem::ArgCompletion_Integer<0,2> );
 
 #ifndef ID_RETAIL
-arcCVarSystem com_printFilter( "com_printFilter", "", CVAR_SYSTEM, "only print lines that contain this, add multiple filters with a; delimeter" );
+anCVarSystem com_printFilter( "com_printFilter", "", CVAR_SYSTEM, "only print lines that contain this, add multiple filters with a; delimeter" );
 #endif
 
 /*
 ==================
-arcCommonLocal::BeginRedirect
+anCommonLocal::BeginRedirect
 ==================
 */
-void arcCommonLocal::BeginRedirect( char *buffer, int buffersize, void (*flush)( const char *) ) {
+void anCommonLocal::BeginRedirect( char *buffer, int buffersize, void (*flush)( const char *) ) {
 	if ( !buffer || !buffersize || !flush ) {
 		return;
 	}
@@ -29,49 +29,49 @@ void arcCommonLocal::BeginRedirect( char *buffer, int buffersize, void (*flush)(
 
 /*
 ==================
-arcCommonLocal::EndRedirect
+anCommonLocal::EndRedirect
 ==================
 */
-void arcCommonLocal::EndRedirect() {
+void anCommonLocal::EndRedirect() {
 	if ( rd_flush && rd_buffer[ 0 ] ) {
 		rd_flush( rd_buffer );
 	}
 
-	rd_buffer = NULL;
+	rd_buffer = nullptr;
 	rd_buffersize = 0;
-	rd_flush = NULL;
+	rd_flush = nullptr;
 }
 
 /*
 ==================
-arcCommonLocal::CloseLogFile
+anCommonLocal::CloseLogFile
 ==================
 */
-void arcCommonLocal::CloseLogFile() {
+void anCommonLocal::CloseLogFile() {
 	if ( logFile ) {
 		com_logFile.SetBool( false ); // make sure no further VPrintf attempts to open the log file again
 		fileSystem->CloseFile( logFile );
-		logFile = NULL;
+		logFile = nullptr;
 	}
 }
 
 /*
 ==================
-arcCommonLocal::SetRefreshOnPrint
+anCommonLocal::SetRefreshOnPrint
 ==================
 */
-void arcCommonLocal::SetRefreshOnPrint( bool set ) {
+void anCommonLocal::SetRefreshOnPrint( bool set ) {
 	com_refreshOnPrint = set;
 }
 
 /*
 ==================
-arcCommonLocal::VPrintf
+anCommonLocal::VPrintf
 
 A raw string should NEVER be passed as fmt, because of "%f" type crashes.
 ==================
 */
-void arcCommonLocal::VPrintf( const char *fmt, va_list args ) {
+void anCommonLocal::VPrintf( const char *fmt, va_list args ) {
 	static bool	logFileFailed = false;
 
 	// if the cvar system is not initialized
@@ -93,7 +93,7 @@ void arcCommonLocal::VPrintf( const char *fmt, va_list args ) {
 	}
 	timeLength = strlen( msg );
 	// don't overflow
-	if ( arcNetString::vsnPrintf( msg+timeLength, MAX_PRINT_MSG_SIZE-timeLength-1, fmt, args ) < 0 ) {
+	if ( anString::vsnPrintf( msg+timeLength, MAX_PRINT_MSG_SIZE-timeLength-1, fmt, args ) < 0 ) {
 		msg[sizeof( msg )-2] = '\n'; msg[sizeof( msg )-1] = '\0'; // avoid output garbling
 		Sys_Printf( "VPrintf: truncated to %d characters\n", strlen( msg )-1 );
 	}
@@ -107,26 +107,26 @@ void arcCommonLocal::VPrintf( const char *fmt, va_list args ) {
 		return;
 	}
 #ifndef ID_RETAIL
-	if ( com_printFilter.GetString() != NULL && com_printFilter.GetString()[ 0 ] != '\0' ) {
-		aRcStaticString< 4096 > filterBuf = com_printFilter.GetString();
-		aRcStaticString< 4096 > msgBuf = msg;
+	if ( com_printFilter.GetString() != nullptr && com_printFilter.GetString()[ 0 ] != '\0' ) {
+		anStaticString< 4096 > filterBuf = com_printFilter.GetString();
+		anStaticString< 4096 > msgBuf = msg;
 		filterBuf.ToLower();
 		msgBuf.ToLower();
 		char *sp = strtok( &filterBuf[ 0 ], ";" );
 		bool p = false;
-		for (; sp != NULL; ) {
-			if ( strstr( msgBuf, sp ) != NULL ) {
+		for (; sp != nullptr; ) {
+			if ( strstr( msgBuf, sp ) != nullptr ) {
 				p = true;
 				break;
 			}
-			sp = strtok( NULL, ";" );
+			sp = strtok( nullptr, ";" );
 		}
 		if ( !p ) {
 			return;
 		}
 	}
 #endif
-	if ( !arcLibrary::IsMainThread() ) {
+	if ( !anLibrary::IsMainThread() ) {
 		OutputDebugString( msg );
 		return;
 	}
@@ -135,7 +135,7 @@ void arcCommonLocal::VPrintf( const char *fmt, va_list args ) {
 	console->Print( msg );
 
 	// remove any color codes
-	arcNetString::RemoveColors( msg );
+	anString::RemoveColors( msg );
 
 	// echo to dedicated console and early console
 	Sys_Printf( "%s", msg );
@@ -197,14 +197,14 @@ void arcCommonLocal::VPrintf( const char *fmt, va_list args ) {
 
 /*
 ==================
-arcCommonLocal::Printf
+anCommonLocal::Printf
 
 Both client and server can use this, and it will output to the appropriate place.
 
 A raw string should NEVER be passed as fmt, because of "%f" type crashers.
 ==================
 */
-void arcCommonLocal::Printf( const char *fmt, ... ) {
+void anCommonLocal::Printf( const char *fmt, ... ) {
 	va_list argptr;
 	va_start( argptr, fmt );
 	VPrintf( fmt, argptr );
@@ -213,12 +213,12 @@ void arcCommonLocal::Printf( const char *fmt, ... ) {
 
 /*
 ==================
-arcCommonLocal::DPrintf
+anCommonLocal::DPrintf
 
 prints message that only shows up if the "developer" cvar is set
 ==================
 */
-void arcCommonLocal::DPrintf( const char *fmt, ... ) {
+void anCommonLocal::DPrintf( const char *fmt, ... ) {
 	va_list		argptr;
 	char		msg[MAX_PRINT_MSG_SIZE];
 
@@ -227,7 +227,7 @@ void arcCommonLocal::DPrintf( const char *fmt, ... ) {
 	}
 
 	va_start( argptr, fmt );
-	arcNetString::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
+	anString::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
 	va_end( argptr );
 	msg[sizeof( msg )-1] = '\0';
 
@@ -242,12 +242,12 @@ void arcCommonLocal::DPrintf( const char *fmt, ... ) {
 
 /*
 ==================
-arcCommonLocal::DWarning
+anCommonLocal::DWarning
 
 prints warning message in yellow that only shows up if the "developer" cvar is set
 ==================
 */
-void arcCommonLocal::DWarning( const char *fmt, ... ) {
+void anCommonLocal::DWarning( const char *fmt, ... ) {
 	va_list		argptr;
 	char		msg[MAX_PRINT_MSG_SIZE];
 
@@ -256,7 +256,7 @@ void arcCommonLocal::DWarning( const char *fmt, ... ) {
 	}
 
 	va_start( argptr, fmt );
-	arcNetString::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
+	anString::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
 	va_end( argptr );
 	msg[sizeof( msg )-1] = '\0';
 
@@ -265,21 +265,21 @@ void arcCommonLocal::DWarning( const char *fmt, ... ) {
 
 /*
 ==================
-arcCommonLocal::Warning
+anCommonLocal::Warning
 
 prints WARNING %s and adds the warning message to a queue to be printed later on
 ==================
 */
-void arcCommonLocal::Warning( const char *fmt, ... ) {
+void anCommonLocal::Warning( const char *fmt, ... ) {
 	va_list		argptr;
 	char		msg[MAX_PRINT_MSG_SIZE];
 
-	if ( !arcLibrary::IsMainThread() ) {
+	if ( !anLibrary::IsMainThread() ) {
 		return;	// not thread safe!
 	}
 
 	va_start( argptr, fmt );
-	arcNetString::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
+	anString::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
 	va_end( argptr );
 	msg[sizeof( msg )-1] = 0;
 
@@ -292,10 +292,10 @@ void arcCommonLocal::Warning( const char *fmt, ... ) {
 
 /*
 ==================
-arcCommonLocal::PrintWarnings
+anCommonLocal::PrintWarnings
 ==================
 */
-void arcCommonLocal::PrintWarnings() {
+void anCommonLocal::PrintWarnings() {
 	int i;
 
 	if ( !warningList.Num() ) {
@@ -319,22 +319,22 @@ void arcCommonLocal::PrintWarnings() {
 
 /*
 ==================
-arcCommonLocal::ClearWarnings
+anCommonLocal::ClearWarnings
 ==================
 */
-void arcCommonLocal::ClearWarnings( const char *reason ) {
+void anCommonLocal::ClearWarnings( const char *reason ) {
 	warningCaption = reason;
 	warningList.Clear();
 }
 
 /*
 ==================
-arcCommonLocal::DumpWarnings
+anCommonLocal::DumpWarnings
 ==================
 */
-void arcCommonLocal::DumpWarnings() {
+void anCommonLocal::DumpWarnings() {
 	int			i;
-	arcNetFile		*warningFile;
+	anFile		*warningFile;
 
 	if ( !warningList.Num() ) {
 		return;
@@ -366,7 +366,7 @@ void arcCommonLocal::DumpWarnings() {
 		fileSystem->CloseFile( warningFile );
 
 #ifndef ID_DEBUG
-		arcNetString	osPath;
+		anString	osPath;
 		osPath = fileSystem->RelativePathToOSPath( "warnings.md", "fs_savepath" );
 		WinExec( va( "Notepad.exe %s", osPath.c_str() ), SW_SHOW );
 #endif
@@ -375,10 +375,10 @@ void arcCommonLocal::DumpWarnings() {
 
 /*
 ==================
-arcCommonLocal::Error
+anCommonLocal::Error
 ==================
 */
-void arcCommonLocal::Error( const char *fmt, ... ) {
+void anCommonLocal::Error( const char *fmt, ... ) {
 	va_list		argptr;
 	static int	lastErrorTime;
 	static int	errorCount;
@@ -431,9 +431,9 @@ void arcCommonLocal::Error( const char *fmt, ... ) {
 	com_errorEntered = code;
 
 	va_start (argptr,fmt);
-	arcNetString::vsnPrintf( errorMessage, sizeof(errorMessage), fmt, argptr );
+	anString::vsnPrintf( errorMessage, sizeof( errorMessage), fmt, argptr );
 	va_end (argptr);
-	errorMessage[sizeof(errorMessage)-1] = '\0';
+	errorMessage[sizeof( errorMessage)-1] = '\0';
 
 
 	// copy the error message to the clip board
@@ -465,12 +465,12 @@ void arcCommonLocal::Error( const char *fmt, ... ) {
 
 /*
 ==================
-arcCommonLocal::FatalError
+anCommonLocal::FatalError
 
 Dump out of the game to a system dialog
 ==================
 */
-void arcCommonLocal::FatalError( const char *fmt, ... ) {
+void anCommonLocal::FatalError( const char *fmt, ... ) {
 	va_list		argptr;
 
 	if ( com_productionMode.GetInteger() == 3 ) {
@@ -487,9 +487,9 @@ void arcCommonLocal::FatalError( const char *fmt, ... ) {
 		Sys_Printf( "FATAL: recursed fatal error:\n%s\n", errorMessage );
 
 		va_start( argptr, fmt );
-		arcNetString::vsnPrintf( errorMessage, sizeof(errorMessage), fmt, argptr );
+		anString::vsnPrintf( errorMessage, sizeof( errorMessage), fmt, argptr );
 		va_end( argptr );
-		errorMessage[sizeof(errorMessage)-1] = '\0';
+		errorMessage[sizeof( errorMessage)-1] = '\0';
 
 		Sys_Printf( "%s\n", errorMessage );
 
@@ -499,9 +499,9 @@ void arcCommonLocal::FatalError( const char *fmt, ... ) {
 	com_errorEntered = ERP_FATAL;
 
 	va_start( argptr, fmt );
-	arcNetString::vsnPrintf( errorMessage, sizeof(errorMessage), fmt, argptr );
+	anString::vsnPrintf( errorMessage, sizeof( errorMessage), fmt, argptr );
 	va_end( argptr );
-	errorMessage[sizeof(errorMessage)-1] = '\0';
+	errorMessage[sizeof( errorMessage)-1] = '\0';
 
 	if ( cvarSystem->GetCVarBool( "r_fullscreen" ) ) {
 		cmdSystem->BufferCommandText( CMD_EXEC_NOW, "vid_restart partial windowed\n" );

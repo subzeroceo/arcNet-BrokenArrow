@@ -1,33 +1,33 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 
 /*
 =================
-arcDeclEntityDef::Size
+anDeclEntityDef::Size
 =================
 */
-size_t arcDeclEntityDef::Size() const {
-	return sizeof( arcDeclEntityDef ) + dict.Allocated();
+size_t anDeclEntityDef::Size() const {
+	return sizeof( anDeclEntityDef ) + dict.Allocated();
 }
 
 /*
 ================
-arcDeclEntityDef::FreeData
+anDeclEntityDef::FreeData
 ================
 */
-void arcDeclEntityDef::FreeData() {
+void anDeclEntityDef::FreeData() {
 	dict.Clear();
 }
 
 /*
 ================
-arcDeclEntityDef::Parse
+anDeclEntityDef::Parse
 ================
 */
-bool arcDeclEntityDef::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
-	arcLexer src;
-	arcNetToken	token, token2;
+bool anDeclEntityDef::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+	anLexer src;
+	anToken	token, token2;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
 	src.SetFlags( DECL_LEXER_FLAGS );
@@ -67,16 +67,16 @@ bool arcDeclEntityDef::Parse( const char *text, const int textLength, bool allow
 	// never be parsed mroe than once
 
 	// find all of the dicts first, because copying inherited values will modify the dict
-	arcNetList<const arcDeclEntityDef *> defList;
+	anList<const anDeclEntityDef *> defList;
 
 	while ( 1 ) {
-		const idKeyValue *kv;
-		kv = dict.MatchPrefix( "inherit", NULL );
+		const anKeyValue *kv;
+		kv = dict.MatchPrefix( "inherit", nullptr );
 		if ( !kv ) {
 			break;
 		}
 
-		const arcDeclEntityDef *copy = static_cast<const arcDeclEntityDef *>( declManager->FindType( DECL_ENTITYDEF, kv->GetValue(), false ) );
+		const anDeclEntityDef *copy = static_cast<const anDeclEntityDef *>( declManager->FindType( DECL_ENTITYDEF, kv->GetValue(), false ) );
 		if ( !copy ) {
 			src.Warning( "Unknown entityDef '%s' inherited by '%s'", kv->GetValue().c_str(), GetName() );
 		} else {
@@ -89,7 +89,7 @@ bool arcDeclEntityDef::Parse( const char *text, const int textLength, bool allow
 
 	// now copy over the inherited key / value pairs
 	for ( int i = 0; i < defList.Num(); i++ ) {
-		dict.SetDefaults( &defList[ i ]->dict );
+		dict.SetDefaults( &defList[i]->dict );
 	}
 
 	game->CacheDictionaryMedia( &dict );
@@ -99,10 +99,10 @@ bool arcDeclEntityDef::Parse( const char *text, const int textLength, bool allow
 
 /*
 ================
-arcDeclEntityDef::DefaultDefinition
+anDeclEntityDef::DefaultDefinition
 ================
 */
-const char *arcDeclEntityDef::DefaultDefinition() const {
+const char *anDeclEntityDef::DefaultDefinition() const {
 	return
 		"{\n"
 	"\t"	"\"DEFAULTED\"\t\"1\"\n"
@@ -111,11 +111,11 @@ const char *arcDeclEntityDef::DefaultDefinition() const {
 
 /*
 ================
-arcDeclEntityDef::Print
+anDeclEntityDef::Print
 
 Dumps all key/value pairs, including inherited ones
 ================
 */
-void arcDeclEntityDef::Print() {
+void anDeclEntityDef::Print() {
 	dict.Print();
 }

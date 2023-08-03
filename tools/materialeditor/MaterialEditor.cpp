@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/win_local.h"
@@ -10,9 +10,9 @@
 #define new DEBUG_NEW
 #endif
 
-MEMainFrame* meMainFrame = NULL;
+MEMainFrame* meMainFrame = nullptr;
 
-CFont* materialEditorFont = NULL;
+CFont* materialEditorFont = nullptr;
 
 /**
 * Initializes the material editor tool.
@@ -42,8 +42,8 @@ void MaterialEditorInit( void ) {
 	LOGFONT lf;
 	memset(&lf, 0, sizeof (LOGFONT) );
 
-	CWindowDC dc(NULL);
-	lf.lfCharSet = (BYTE)GetTextCharsetInfo(dc.GetSafeHdc(), NULL, 0 );
+	CWindowDC dc(nullptr );
+	lf.lfCharSet = (BYTE)GetTextCharsetInfo(dc.GetSafeHdc(), nullptr, 0 );
 
 	lf.lfHeight = info.lfMenuFont.lfHeight;
 	lf.lfWeight = info.lfMenuFont.lfWeight;
@@ -61,7 +61,7 @@ void MaterialEditorInit( void ) {
 	meMainFrame = new MEMainFrame;
 
 	// create and load the frame with its resources
-	meMainFrame->LoadFrame(IDR_ME_MAINFRAME, WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL, NULL);
+	meMainFrame->LoadFrame(IDR_ME_MAINFRAME, WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, nullptr, nullptr );
 
 
 	// hide the doom window by default
@@ -78,7 +78,7 @@ void MaterialEditorInit( void ) {
 void MaterialEditorRun( void ) {
 	MSG *msg = AfxGetCurrentMessage();
 
-	while( ::PeekMessage(msg, NULL, NULL, NULL, PM_NOREMOVE) ) {
+	while( ::PeekMessage(msg, nullptr, nullptr, nullptr, PM_NOREMOVE) ) {
 		// pump message
 		if ( !AfxGetApp()->PumpMessage() ) {
 		}
@@ -91,7 +91,7 @@ void MaterialEditorRun( void ) {
 void MaterialEditorShutdown( void ) {
 	delete meMainFrame;
 	delete materialEditorFont;
-	meMainFrame = NULL;
+	meMainFrame = nullptr;
 }
 
 /**

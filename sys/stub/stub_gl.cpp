@@ -2,9 +2,9 @@
 ===========================================================================
 
 Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
+This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
 
 Doom 3 Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../renderer/tr_local.h"
@@ -135,7 +135,7 @@ void glGetDoublev(GLenum pname, GLdouble *params){};
 GLenum glGetError(void){return 0;};
 void glGetFloatv(GLenum pname, GLfloat *params){};
 void glGetIntegerv(GLenum pname, GLint *params){
-	switch( pname ) {
+	switch ( pname ) {
 		case GL_MAX_TEXTURE_SIZE: *params = 1024; break;
 		case GL_MAX_TEXTURE_UNITS_ARB: *params = 2; break;
 		default: *params = 0; break;
@@ -154,7 +154,7 @@ void glGetPixelMapusv(GLenum map, GLushort *values){};
 void glGetPointerv(GLenum pname, GLvoid* *params){};
 void glGetPolygonStipple(GLubyte *mask){};
 const GLubyte * glGetString(GLenum name){
-	switch( name ) {
+	switch ( name ) {
 		case GL_EXTENSIONS: return (GLubyte *)"GL_ARB_multitexture GL_ARB_texture_env_combine GL_ARB_texture_cube_map GL_ARB_texture_env_dot3";
 	}
 	return (const GLubyte *)"";

@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/Common_resource.h"
@@ -24,7 +24,7 @@ toolTip_t DialogDeclEditor::toolTips[] = {
 	{ IDC_DECLEDITOR_BUTTON_TEST, "test decl" },
 	{ IDOK, "save decl" },
 	{ IDCANCEL, "cancel" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 
@@ -35,7 +35,7 @@ IMPLEMENT_DYNAMIC(DialogDeclEditor, CDialog)
 DialogDeclEditor::DialogDeclEditor
 ================
 */
-DialogDeclEditor::DialogDeclEditor( CWnd* pParent /*=NULL*/ ) : CDialog(DialogDeclEditor::IDD, pParent), findDlg(NULL), matchCase(false), matchWholeWords(false), decl(NULL), firstLine(0 ) {
+DialogDeclEditor::DialogDeclEditor( CWnd* pParent /*=nullptr*/ ) : CDialog(DialogDeclEditor::IDD, pParent), findDlg(nullptr ), matchCase(false), matchWholeWords(false), decl(nullptr ), firstLine(0 ) {
 }
 
 /*
@@ -80,9 +80,9 @@ BOOL DialogDeclEditor::PreTranslateMessage( MSG* pMsg ) {
 DialogDeclEditor::TestDecl
 ================
 */
-bool DialogDeclEditor::TestDecl( const arcNetString &declText ) {
-	arcLexer src( LEXFL_NOSTRINGCONCAT );
-	arcNetToken token;
+bool DialogDeclEditor::TestDecl( const anString &declText ) {
+	anLexer src( LEXFL_NOSTRINGCONCAT );
+	anToken token;
 	int indent;
 
 	src.LoadMemory( declText, declText.Length(), "decl text" );
@@ -126,16 +126,16 @@ void DialogDeclEditor::UpdateStatusBar( void ) {
 DialogDeclEditor::LoadDecl
 ================
 */
-void DialogDeclEditor::LoadDecl( arcDecleration *decl ) {
+void DialogDeclEditor::LoadDecl( anDecl *decl ) {
 	int numLines = 0;
 	int numCharsPerLine = 0;
 	int maxCharsPerLine = 0;
-	arcNetString declText;
+	anString declText;
 	CRect rect;
 
 	this->decl = decl;
 
-	switch( decl->GetType() ) {
+	switch ( decl->GetType() ) {
 		case DECL_ENTITYDEF:
 			declEdit.SetStringColor( SRE_COLOR_BLUE, SRE_COLOR_DARK_CYAN );
 			declEdit.LoadKeyWordsFromFile( "editors/entity.def" );
@@ -503,12 +503,12 @@ DialogDeclEditor::OnFindDialogMessage
 ================
 */
 LRESULT DialogDeclEditor::OnFindDialogMessage( WPARAM wParam, LPARAM lParam ) {
-	if ( findDlg == NULL ) {
+	if ( findDlg == nullptr ) {
 		return 0;
 	}
 
 	if ( findDlg->IsTerminating() ) {
-        findDlg = NULL;
+        findDlg = nullptr;
         return 0;
     }
 
@@ -580,7 +580,7 @@ DialogDeclEditor::OnBnClickedTest
 ================
 */
 void DialogDeclEditor::OnBnClickedTest() {
-	arcNetString declText;
+	anString declText;
 
 	if ( decl ) {
 		declEdit.GetText( declText );
@@ -613,7 +613,7 @@ DialogDeclEditor::OnBnClickedOk
 ================
 */
 void DialogDeclEditor::OnBnClickedOk() {
-	arcNetString declText;
+	anString declText;
 
 	if ( decl ) {
 		declEdit.GetText( declText );

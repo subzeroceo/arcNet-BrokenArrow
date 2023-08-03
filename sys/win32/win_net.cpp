@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include <iptypes.h>
@@ -37,16 +37,16 @@ static WSADATA	winsockdata;
 static bool	winsockInitialized = false;
 static bool usingSocks = false;
 
-idCVar net_ip( "net_ip", "localhost", CVAR_SYSTEM, "local IP address" );
-idCVar net_port( "net_port", "0", CVAR_SYSTEM | CVAR_INTEGER, "local IP port number" );
-idCVar net_forceLatency( "net_forceLatency", "0", CVAR_SYSTEM | CVAR_INTEGER, "milliseconds latency" );
-idCVar net_forceDrop( "net_forceDrop", "0", CVAR_SYSTEM | CVAR_INTEGER, "percentage packet loss" );
+anCVar net_ip( "net_ip", "localhost", CVAR_SYSTEM, "local IP address" );
+anCVar net_port( "net_port", "0", CVAR_SYSTEM | CVAR_INTEGER, "local IP port number" );
+anCVar net_forceLatency( "net_forceLatency", "0", CVAR_SYSTEM | CVAR_INTEGER, "milliseconds latency" );
+anCVar net_forceDrop( "net_forceDrop", "0", CVAR_SYSTEM | CVAR_INTEGER, "percentage packet loss" );
 
-idCVar net_socksEnabled( "net_socksEnabled", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "" );
-idCVar net_socksServer( "net_socksServer", "", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
-idCVar net_socksPort( "net_socksPort", "1080", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "" );
-idCVar net_socksUsername( "net_socksUsername", "", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
-idCVar net_socksPassword( "net_socksPassword", "", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
+anCVar net_socksEnabled( "net_socksEnabled", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "" );
+anCVar net_socksServer( "net_socksServer", "", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
+anCVar net_socksPort( "net_socksPort", "1080", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "" );
+anCVar net_socksUsername( "net_socksUsername", "", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
+anCVar net_socksPassword( "net_socksPassword", "", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
 
 
 static struct sockaddr	socksRelayAddr;
@@ -76,7 +76,7 @@ char *NET_ErrorString( void ) {
 	int		code;
 
 	code = WSAGetLastError();
-	switch( code ) {
+	switch ( code ) {
 	case WSAEINTR: return "WSAEINTR";
 	case WSAEBADF: return "WSAEBADF";
 	case WSAEACCES: return "WSAEACCES";
@@ -134,15 +134,15 @@ void Net_NetadrToSockadr( const netadr_t *a, struct sockaddr *s ) {
 	memset( s, 0, sizeof(*s) );
 
 	if ( a->type == NA_BROADCAST ) {
-		((struct sockaddr_in *)s)->sin_family = AF_INET;
-		((struct sockaddr_in *)s)->sin_addr.s_addr = INADDR_BROADCAST;
+		(( struct sockaddr_in *)s)->sin_family = AF_INET;
+		(( struct sockaddr_in *)s)->sin_addr.s_addr = INADDR_BROADCAST;
 	}
 	else if ( a->type == NA_IP || a->type == NA_LOOPBACK ) {
-		((struct sockaddr_in *)s)->sin_family = AF_INET;
-		((struct sockaddr_in *)s)->sin_addr.s_addr = *(int *)&a->ip;
+		(( struct sockaddr_in *)s)->sin_family = AF_INET;
+		(( struct sockaddr_in *)s)->sin_addr.s_addr = *( int*)&a->ip;
 	}
 
-	((struct sockaddr_in *)s)->sin_port = htons( (short)a->port );
+	(( struct sockaddr_in *)s)->sin_port = htons( ( short)a->port );
 }
 
 
@@ -153,10 +153,10 @@ Net_SockadrToNetadr
 */
 void Net_SockadrToNetadr( struct sockaddr *s, netadr_t *a ) {
 	unsigned int ip;
-	if (s->sa_family == AF_INET) {
-		ip = ((struct sockaddr_in *)s)->sin_addr.s_addr;
+	if ( s->sa_family == AF_INET) {
+		ip = (( struct sockaddr_in *)s)->sin_addr.s_addr;
 		*(unsigned int *)&a->ip = ip;
-		a->port = htons( ((struct sockaddr_in *)s)->sin_port );
+		a->port = htons( (( struct sockaddr_in *)s)->sin_port );
 		// we store in network order, that loopback test is host order..
 		ip = ntohl( ip );
 		if ( ip == INADDR_LOOPBACK ) {
@@ -181,7 +181,7 @@ static bool Net_ExtractPort( const char *src, char *buf, int bufsize, int *port 
 		return false;
 	}
 	*p = '\0';
-	*port = strtol( p+1, NULL, 10 );
+	*port = strtol( p+1, nullptr, 10 );
 	if ( errno == ERANGE ) {
 		return false;
 	}
@@ -200,13 +200,13 @@ static bool Net_StringToSockaddr( const char *s, struct sockaddr *sadr, bool doD
 
 	memset( sadr, 0, sizeof( *sadr ) );
 
-	((struct sockaddr_in *)sadr)->sin_family = AF_INET;
-	((struct sockaddr_in *)sadr)->sin_port = 0;
+	(( struct sockaddr_in *)sadr)->sin_family = AF_INET;
+	(( struct sockaddr_in *)sadr)->sin_port = 0;
 
 	if ( s[0] >= '0' && s[0] <= '9' ) {
-		unsigned long ret = inet_addr(s);
+		unsigned long ret = inet_addr( s);
 		if ( ret != INADDR_NONE ) {
-			*(int *)&((struct sockaddr_in *)sadr)->sin_addr = ret;
+			*( int*)&(( struct sockaddr_in *)sadr)->sin_addr = ret;
 		} else {
 			// check for port
 			if ( !Net_ExtractPort( s, buf, sizeof( buf ), &port ) ) {
@@ -216,20 +216,20 @@ static bool Net_StringToSockaddr( const char *s, struct sockaddr *sadr, bool doD
 			if ( ret == INADDR_NONE ) {
 				return false;
 			}
-			*(int *)&((struct sockaddr_in *)sadr)->sin_addr = ret;
-			((struct sockaddr_in *)sadr)->sin_port = htons( port );
+			*( int*)&(( struct sockaddr_in *)sadr)->sin_addr = ret;
+			(( struct sockaddr_in *)sadr)->sin_port = htons( port );
 		}
 	} else if ( doDNSResolve ) {
 		// try to remove the port first, otherwise the DNS gets confused into multiple timeouts
 		// failed or not failed, buf is expected to contain the appropriate host to resolve
 		if ( Net_ExtractPort( s, buf, sizeof( buf ), &port ) ) {
-			((struct sockaddr_in *)sadr)->sin_port = htons( port );
+			(( struct sockaddr_in *)sadr)->sin_port = htons( port );
 		}
 		h = gethostbyname( buf );
 		if ( h == 0 ) {
 			return false;
 		}
-		*(int *)&((struct sockaddr_in *)sadr)->sin_addr = *(int *)h->h_addr_list[0];
+		*( int*)&(( struct sockaddr_in *)sadr)->sin_addr = *( int*)h->h_addr_list[0];
 	}
 
 	return true;
@@ -268,23 +268,23 @@ int NET_IPSocket( const char *net_interface, int port, netadr_t *bound_to ) {
 	}
 
 	// make it broadcast capable
-	if ( setsockopt( newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i) ) == SOCKET_ERROR ) {
+	if ( setsockopt( newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof( i ) ) == SOCKET_ERROR ) {
 		common->Printf( "WARNING: UDP_OpenSocket: setsockopt SO_BROADCAST: %s\n", NET_ErrorString() );
 		return 0;
 	}
 
-	if ( !net_interface || !net_interface[0] || !arcNetString::Icmp( net_interface, "localhost" ) ) {
+	if ( !net_interface || !net_interface[0] || !anString::Icmp( net_interface, "localhost" ) ) {
 		address.sin_addr.s_addr = INADDR_ANY;
 	}
 	else {
-		Net_StringToSockaddr( net_interface, (struct sockaddr *)&address, true );
+		Net_StringToSockaddr( net_interface, ( struct sockaddr *)&address, true );
 	}
 
 	if ( port == PORT_ANY ) {
 		address.sin_port = 0;
 	}
 	else {
-		address.sin_port = htons( (short)port );
+		address.sin_port = htons( ( short)port );
 	}
 
 	address.sin_family = AF_INET;
@@ -299,8 +299,8 @@ int NET_IPSocket( const char *net_interface, int port, netadr_t *bound_to ) {
 	// ( this used to be in idPort::InitForPort )
 	if ( bound_to ) {
 		int len = sizeof( address );
-		getsockname( newsocket, (sockaddr *)&address, &len );
-		Net_SockadrToNetadr( (sockaddr *)&address, bound_to );
+		getsockname( newsocket, ( sockaddr *)&address, &len );
+		Net_SockadrToNetadr( ( sockaddr *)&address, bound_to );
 	}
 
 	return newsocket;
@@ -330,7 +330,7 @@ void NET_OpenSocks( int port ) {
 	}
 
 	h = gethostbyname( net_socksServer.GetString() );
-	if ( h == NULL ) {
+	if ( h == nullptr ) {
 		err = WSAGetLastError();
 		common->Printf( "WARNING: NET_OpenSocks: gethostbyname: %s\n", NET_ErrorString() );
 		return;
@@ -340,10 +340,10 @@ void NET_OpenSocks( int port ) {
 		return;
 	}
 	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = *(int *)h->h_addr_list[0];
-	address.sin_port = htons( (short)net_socksPort.GetInteger() );
+	address.sin_addr.s_addr = *( int*)h->h_addr_list[0];
+	address.sin_port = htons( ( short)net_socksPort.GetInteger() );
 
-	if ( connect( socks_socket, (struct sockaddr *)&address, sizeof( address ) ) == SOCKET_ERROR ) {
+	if ( connect( socks_socket, ( struct sockaddr *)&address, sizeof( address ) ) == SOCKET_ERROR ) {
 		err = WSAGetLastError();
 		common->Printf( "NET_OpenSocks: connect: %s\n", NET_ErrorString() );
 		return;
@@ -388,7 +388,7 @@ void NET_OpenSocks( int port ) {
 		common->Printf( "NET_OpenSocks: bad response\n" );
 		return;
 	}
-	switch( buf[1] ) {
+	switch ( buf[1] ) {
 	case 0:	// no authentication
 		break;
 	case 2: // username/password authentication
@@ -446,8 +446,8 @@ void NET_OpenSocks( int port ) {
 	buf[1] = 3;		// command: UDP associate
 	buf[2] = 0;		// reserved
 	buf[3] = 1;		// address type: IPV4
-	*(int *)&buf[4] = INADDR_ANY;
-	*(short *)&buf[8] = htons( (short)port );		// port
+	*( int*)&buf[4] = INADDR_ANY;
+	*( short *)&buf[8] = htons( ( short)port );		// port
 	if ( send( socks_socket, (const char *)buf, 10, 0 ) == SOCKET_ERROR ) {
 		err = WSAGetLastError();
 		common->Printf( "NET_OpenSocks: send: %s\n", NET_ErrorString() );
@@ -474,10 +474,10 @@ void NET_OpenSocks( int port ) {
 		common->Printf( "NET_OpenSocks: relay address is not IPV4: %i\n", buf[3] );
 		return;
 	}
-	((struct sockaddr_in *)&socksRelayAddr)->sin_family = AF_INET;
-	((struct sockaddr_in *)&socksRelayAddr)->sin_addr.s_addr = *(int *)&buf[4];
-	((struct sockaddr_in *)&socksRelayAddr)->sin_port = *(short *)&buf[8];
-	memset( ((struct sockaddr_in *)&socksRelayAddr)->sin_zero, 0, 8 );
+	(( struct sockaddr_in *)&socksRelayAddr)->sin_family = AF_INET;
+	(( struct sockaddr_in *)&socksRelayAddr)->sin_addr.s_addr = *( int*)&buf[4];
+	(( struct sockaddr_in *)&socksRelayAddr)->sin_port = *( short *)&buf[8];
+	memset( (( struct sockaddr_in *)&socksRelayAddr)->sin_zero, 0, 8 );
 
 	usingSocks = true;
 }
@@ -506,7 +506,7 @@ bool Net_WaitForUDPPacket( int netSocket, int timeout ) {
 	tv.tv_sec = 0;
 	tv.tv_usec = timeout * 1000;
 
-	ret = select( netSocket + 1, &set, NULL, NULL, &tv );
+	ret = select( netSocket + 1, &set, nullptr, nullptr, &tv );
 
 	if ( ret == -1 ) {
 		common->DPrintf( "Net_WaitForUPDPacket select(): %s\n", strerror( errno ) );
@@ -537,7 +537,7 @@ bool Net_GetUDPPacket( int netSocket, netadr_t &net_from, char *data, int &size,
 	}
 
 	fromlen = sizeof(from);
-	ret = recvfrom( netSocket, data, maxSize, 0, (struct sockaddr *)&from, &fromlen );
+	ret = recvfrom( netSocket, data, maxSize, 0, ( struct sockaddr *)&from, &fromlen );
 	if ( ret == SOCKET_ERROR ) {
 		err = WSAGetLastError();
 
@@ -551,7 +551,7 @@ bool Net_GetUDPPacket( int netSocket, netadr_t &net_from, char *data, int &size,
 	}
 
 	if ( netSocket == ip_socket ) {
-		memset( ((struct sockaddr_in *)&from)->sin_zero, 0, 8 );
+		memset( (( struct sockaddr_in *)&from)->sin_zero, 0, 8 );
 	}
 
 	if ( usingSocks && netSocket == ip_socket && memcmp( &from, &socksRelayAddr, fromlen ) == 0 ) {
@@ -563,7 +563,7 @@ bool Net_GetUDPPacket( int netSocket, netadr_t &net_from, char *data, int &size,
 		net_from.ip[1] = data[5];
 		net_from.ip[2] = data[6];
 		net_from.ip[3] = data[7];
-		net_from.port = *(short *)&data[8];
+		net_from.port = *( short *)&data[8];
 		memmove( data, &data[10], ret - 10 );
 	} else {
 		Net_SockadrToNetadr( &from, &net_from );
@@ -601,10 +601,10 @@ void Net_SendUDPPacket( int netSocket, int length, const void *data, const netad
 		socksBuf[1] = 0;
 		socksBuf[2] = 0;	// fragment (not fragmented)
 		socksBuf[3] = 1;	// address type: IPV4
-		*(int *)&socksBuf[4] = ((struct sockaddr_in *)&addr)->sin_addr.s_addr;
-		*(short *)&socksBuf[8] = ((struct sockaddr_in *)&addr)->sin_port;
+		*( int*)&socksBuf[4] = (( struct sockaddr_in *)&addr)->sin_addr.s_addr;
+		*( short *)&socksBuf[8] = (( struct sockaddr_in *)&addr)->sin_port;
 		memcpy( &socksBuf[10], data, length );
-		ret = sendto( netSocket, socksBuf, length+10, 0, &socksRelayAddr, sizeof(socksRelayAddr) );
+		ret = sendto( netSocket, socksBuf, length+10, 0, &socksRelayAddr, sizeof( socksRelayAddr) );
 	} else {
 		ret = sendto( netSocket, (const char *)data, length, 0, &addr, sizeof(addr) );
 	}
@@ -645,7 +645,7 @@ void Sys_InitNetworking( void ) {
 	common->Printf( "Winsock Initialized\n" );
 
 	PIP_ADAPTER_INFO pAdapterInfo;
-	PIP_ADAPTER_INFO pAdapter = NULL;
+	PIP_ADAPTER_INFO pAdapter = nullptr;
 	DWORD dwRetVal = 0;
 	PIP_ADDR_STRING pIPAddrString;
 	ULONG ulOutBufLen;
@@ -680,14 +680,14 @@ void Sys_InitNetworking( void ) {
 			pIPAddrString = &pAdapter->IpAddressList;
 			while( pIPAddrString ) {
 				unsigned long ip_a, ip_m;
-				if ( !arcNetString::Icmp( "127.0.0.1", pIPAddrString->IpAddress.String ) ) {
+				if ( !anString::Icmp( "127.0.0.1", pIPAddrString->IpAddress.String ) ) {
 					foundloopback = true;
 				}
 				ip_a = ntohl( inet_addr( pIPAddrString->IpAddress.String ) );
 				ip_m = ntohl( inet_addr( pIPAddrString->IpMask.String ) );
 				//skip null netmasks
 				if ( !ip_m ) {
-					common->Printf( "%s NULL netmask - skipped\n", pIPAddrString->IpAddress.String );
+					common->Printf( "%s nullptr netmask - skipped\n", pIPAddrString->IpAddress.String );
 					pIPAddrString = pIPAddrString->Next;
 					continue;
 				}
@@ -760,12 +760,12 @@ const char *Sys_NetAdrToString( const netadr_t a ) {
 
 	if ( a.type == NA_LOOPBACK ) {
 		if ( a.port ) {
-			arcNetString::snPrintf( s, 64, "localhost:%i", a.port );
+			anString::snPrintf( s, 64, "localhost:%i", a.port );
 		} else {
-			arcNetString::snPrintf( s, 64, "localhost" );
+			anString::snPrintf( s, 64, "localhost" );
 		}
 	} else if ( a.type == NA_IP ) {
-		arcNetString::snPrintf( s, 64, "%i.%i.%i.%i:%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3], a.port );
+		anString::snPrintf( s, 64, "%i.%i.%i.%i:%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3], a.port );
 	}
 	return s;
 }
@@ -853,11 +853,11 @@ public:
 	udpMsg_t *			sendLast;
 	udpMsg_t *			recieveFirst;
 	udpMsg_t *			recieveLast;
-	arcBlockAlloc<udpMsg_t, 64> udpMsgAllocator;
+	anBlockAlloc<udpMsg_t, 64> udpMsgAllocator;
 };
 
 idUDPLag::idUDPLag( void ) {
-	sendFirst = sendLast = recieveFirst = recieveLast = NULL;
+	sendFirst = sendLast = recieveFirst = recieveLast = nullptr;
 }
 
 idUDPLag::~idUDPLag( void ) {
@@ -920,7 +920,7 @@ void idPort::Close() {
 	if ( netSocket ) {
 		if ( udpPorts[ bound_to.port ] ) {
 			delete udpPorts[ bound_to.port ];
-			udpPorts[ bound_to.port ] = NULL;
+			udpPorts[ bound_to.port ] = nullptr;
 		}
 		closesocket( netSocket );
 		netSocket = 0;
@@ -961,7 +961,7 @@ bool idPort::GetPacket( netadr_t &from, void *data, int &size, int maxSize ) {
 			msg->size = size;
 			msg->address = from;
 			msg->time = Sys_Milliseconds();
-			msg->next = NULL;
+			msg->next = nullptr;
 			if ( udpPorts[ bound_to.port ]->recieveLast ) {
 				udpPorts[ bound_to.port ]->recieveLast->next = msg;
 			} else {
@@ -982,7 +982,7 @@ bool idPort::GetPacket( netadr_t &from, void *data, int &size, int maxSize ) {
 			from = msg->address;
 			udpPorts[ bound_to.port ]->recieveFirst = udpPorts[ bound_to.port ]->recieveFirst->next;
 			if ( !udpPorts[ bound_to.port ]->recieveFirst ) {
-				udpPorts[ bound_to.port ]->recieveLast = NULL;
+				udpPorts[ bound_to.port ]->recieveLast = nullptr;
 			}
 			udpPorts[ bound_to.port ]->udpMsgAllocator.Free( msg );
 			return true;
@@ -1040,7 +1040,7 @@ void idPort::SendPacket( const netadr_t to, const void *data, int size ) {
 		msg->size = size;
 		msg->address = to;
 		msg->time = Sys_Milliseconds();
-		msg->next = NULL;
+		msg->next = nullptr;
 		if ( udpPorts[ bound_to.port ]->sendLast ) {
 			udpPorts[ bound_to.port ]->sendLast->next = msg;
 		} else {
@@ -1052,7 +1052,7 @@ void idPort::SendPacket( const netadr_t to, const void *data, int size ) {
 			Net_SendUDPPacket( netSocket, msg->size, msg->data, msg->address );
 			udpPorts[ bound_to.port ]->sendFirst = udpPorts[ bound_to.port ]->sendFirst->next;
 			if ( !udpPorts[ bound_to.port ]->sendFirst ) {
-				udpPorts[ bound_to.port ]->sendLast = NULL;
+				udpPorts[ bound_to.port ]->sendLast = nullptr;
 			}
 			udpPorts[ bound_to.port ]->udpMsgAllocator.Free( msg );
 		}
@@ -1115,7 +1115,7 @@ bool idTCP::Init( const char *host, short port ) {
 		return false;
 	}
 
-	if ( connect( fd, &sadr, sizeof(sadr)) == SOCKET_ERROR ) {
+	if ( connect( fd, &sadr, sizeof( sadr)) == SOCKET_ERROR ) {
 		common->Printf( "ERROR: idTCP::Init: connect: %s\n", NET_ErrorString() );
 		closesocket( fd );
 		fd = 0;
@@ -1155,7 +1155,7 @@ int idTCP::Read( void *data, int size ) {
 	int nbytes;
 
 	if ( !fd ) {
-		common->Printf("idTCP::Read: not initialized\n");
+		common->Printf( "idTCP::Read: not initialized\n" );
 		return -1;
 	}
 
@@ -1186,7 +1186,7 @@ int idTCP::Write( void *data, int size ) {
 	int nbytes;
 
 	if ( !fd ) {
-		common->Printf("idTCP::Write: not initialized\n");
+		common->Printf( "idTCP::Write: not initialized\n" );
 		return -1;
 	}
 

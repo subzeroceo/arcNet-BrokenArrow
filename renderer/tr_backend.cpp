@@ -1,3 +1,4 @@
+#include "../idlib/Lib.h"
 #include "GLIncludes/qgl.h"
 #include <glcore.h>
 #include <glad.h>
@@ -11,9 +12,9 @@
  frameData_t	*frameData;
  backEndState_t	backEnd;
 
-arcCVarSystem r_drawFlickerBox( "r_drawFlickerBox", "0", CVAR_RENDERER | CVAR_BOOL, "visual test for dropping frames" );
-arcCVarSystem r_showSwapBuffers( "r_showSwapBuffers", "0", CVAR_BOOL, "Show timings from GL_BlockingSwapBuffers" );
-arcCVarSystem r_syncEveryFrame( "r_syncEveryFrame", "1", CVAR_BOOL, "Don't let the GPU buffer execution past swapbuffers" );
+anCVarSystem r_drawFlickerBox( "r_drawFlickerBox", "0", CVAR_RENDERER | CVAR_BOOL, "visual test for dropping frames" );
+anCVarSystem r_showSwapBuffers( "r_showSwapBuffers", "0", CVAR_BOOL, "Show timings from GL_BlockingSwapBuffers" );
+anCVarSystem r_syncEveryFrame( "r_syncEveryFrame", "1", CVAR_BOOL, "Don't let the GPU buffer execution past swapbuffers" );
 
 typedef struct __GLsync *GLsync;
 static int		swapIndex;		// 0 or 1 into renderSync
@@ -63,6 +64,31 @@ static void RB_SetVertexColorParms( stageVertexColor_t svc ) {
 	}
 }
 
+static const void *RB_ClearColor( const void *data ) {
+	const clearColorCommand_t *cmd = data;
+
+	if ( cmd->fullscreen ) {
+		qglViewport( 0, 0, glConfig.vidWidth, glConfig.vidHeight );
+		qglScissor( 0, 0, glConfig.vidWidth, glConfig.vidHeight );
+	}
+
+	if ( cmd->colorMask ) {
+		qglColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
+	}
+
+	qglClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+
+	if ( cmd->frontAndBack ) {
+		qglDrawBuffer( GL_FRONT );
+		qglClear( GL_COLOR_BUFFER_BIT );
+		qglDrawBuffer( GL_BACK );
+	}
+
+	qglClear( GL_COLOR_BUFFER_BIT );
+
+	return (const void *)( cmd + 1 );
+}
+
 /*
 ===============
 GL_TextureAnisotropy
@@ -73,7 +99,7 @@ steady. lol =( this is a mess and needs updating.
 ===============
 */
 void GL_TextureAnisotropy( float aniso ) {
-	ARCImage *glt;
+	anImage *glt;
 
 	if ( r_maxAnisotropicFiltering.GetInteger() == 1 ) {
 		if ( aniso < 1.0 || aniso > qglConfig.maxTextureAnisotropy ) {
@@ -89,7 +115,7 @@ void GL_TextureAnisotropy( float aniso ) {
 
 	// change all the existing texture objects
 	for ( int i = 0 ; i < tr.numImages ; i++ ) {
-		glt = tr.images[ i ];
+		glt = tr.images[i];
 		GL_Bind( glt );
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, aniso );
 	}
@@ -126,7 +152,7 @@ void R_DeleteTextures( void ) {
 ======================
 RB_SetDefaultGLState
 
-This should initialize all GL state(s) that any part of the entire program
+This should initialize all GL state( s) that any part of the entire program
 may touch, including the editor.
 ======================
 */
@@ -137,9 +163,9 @@ void RB_SetDefaultGLState( void ) {
 	qglColor4f( 1, 1, 1, 1 );
 
 	// the vertex array is always enabled
-	qglEnableClientState( GL_VERTEX_ARRAY );
-	qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	qglDisableClientState( GL_COLOR_ARRAY );
+	//qglEnableClientState( GL_VERTEX_ARRAY );
+	//qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	//qglDisableClientState( GL_COLOR_ARRAY );
 
 	//
 	// make sure our GL state vector is set correctly
@@ -180,7 +206,7 @@ void RB_SetDefaultGLState( void ) {
 		GL_TexEnv( GL_MODULATE );
 		qglDisable( GL_TEXTURE_2D );
 
-		if ( qglConfig.3DImagesActive ) {
+		if ( qglConfig.use3DImageEXT ) {
 			qglDisable( GL_TEXTURE_3D );
 		}
 
@@ -236,6 +262,20 @@ void GL_SetDefaultState() {
 
 /*
 ========================
+GL_ClearDepth
+
+Updated to support additional culling modes and OpenGL 4.6
+========================
+*/
+static const void *GL_ClearDepthBuffer( const void *data ) {
+	const clearDepthCommand_t *cmd = data;
+	//RB_EndSurface();
+	qglClear( GL_DEPTH_BUFFER_BIT );
+	return (const void *)(cmd + 1);
+}
+
+/*
+========================
 GL_GetCurrentStateMinusStencil
 ========================
 */
@@ -271,6 +311,90 @@ void RenderPrintf( const char *comment, ... ) {
 }
 
 //=============================================================================
+void GLDSA_BindNullTextures( void ) {
+	if ( backEnd.qglRefConfig.directStateAccess ) {
+		for ( int i = 0; i < NUM_TEXTURE_BUNDLES; i++ ) {
+			qglBindMultiTextureEXT( GL_TEXTURE0 + i, GL_TEXTURE_2D, 0 );
+			backEnd.qglState.textures[i] = 0;
+		}
+	} else {
+		for ( int i = 0; i < NUM_TEXTURE_BUNDLES; i++ ) {
+			qglActiveTexture( GL_TEXTURE0 + i );
+			qglBindTexture( GL_TEXTURE_2D, 0 );
+			backEnd.qglState.textures[i] = 0;
+		}
+
+		qglActiveTexture( GL_TEXTURE0 );
+		backEnd.qglState.texUnit = GL_TEXTURE0;
+	}
+}
+
+int GLDSA_BindMultiTexture( GLenum texUnit, GLenum target, GLuint texture ) {
+	GLuint tmu = texUnit - GL_TEXTURE0;
+
+	if ( backEnd.qglState.textures[tmu] == texture ) {
+		return 0;
+	}
+
+	if ( target >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && target <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z ) {
+		target = GL_TEXTURE_CUBE_MAP;
+	}
+	qglBindMultiTextureEXT( texUnit, target, texture );
+	backEnd.qglState.textures[tmu] = texture;
+	return 1;
+}
+
+GLvoid APIENTRY GLDSA_BindMultiTextureEXT( GLenum texUnit, GLenum target, GLuint texture ) {
+	if ( backEnd.qglState.texUnit != texUnit ) {
+		qglActiveTexture( texUnit );
+		backEnd.qglState.texUnit = texUnit;
+	}
+
+	qglBindTexture( target, texture );
+}
+void GLDSA_BindNullFramebuffers( void ) {
+	qglBindFramebuffer( GL_FRAMEBUFFER, 0 );
+	backEnd.qglState.drawFramebuffer = backEnd.qglState.readFramebuffer = 0;
+	qglBindRenderbuffer( GL_RENDERBUFFER, 0 );
+	backEnd.qglState.renderbuffer = 0;
+}
+
+void GLDSA_BindFramebuffer( GLenum target, GLuint framebuffer ) {
+	switch ( target ) {
+		case GL_FRAMEBUFFER:
+			if ( framebuffer != backEnd.qglState.drawFramebuffer || framebuffer != backEnd.qglState.readFramebuffer ) {
+				qglBindFramebuffer( target, framebuffer );
+				qglState.drawFramebuffer = qglState.readFramebuffer = framebuffer;
+			}
+			break;
+
+		case GL_DRAW_FRAMEBUFFER:
+			if ( framebuffer != backEnd.qglState.drawFramebuffer ) {
+				qglBindFramebuffer( target, framebuffer );
+				backEnd.qglState.drawFramebuffer = framebuffer;
+			}
+			break;
+
+		case GL_READ_FRAMEBUFFER:
+			if ( framebuffer != backEnd.qglState.readFramebuffer ) {
+				qglBindFramebuffer( target, framebuffer ) ;
+				backEnd.qglState.readFramebuffer = framebuffer;
+			}
+			break;
+	}
+}
+
+void GLDSA_BindRenderbuffer( GLuint renderbuffer ) {
+	if ( renderbuffer != backEnd.qglState.renderbuffer ) {
+		qglBindRenderbuffer( GL_RENDERBUFFER, renderbuffer );
+		backEnd.qglState.renderbuffer = renderbuffer;
+	}
+}
+
+void GL_BindNullProgram( void ) {
+	qglUseProgram( 0 );
+	backEnd.qglState.program = 0;
+}
 
 /*
 ====================
@@ -294,7 +418,7 @@ void GL_SetCurrentTextureUnit( int unit ) {
 		common->Warning( "GL_SetCurrentTextureUnit: unit = %i", unit );
 		return;
 	}
-	if ( nackEnd.qglState.currenttmu == unit ) {
+	if ( backEnd.qglState.currenttmu == unit ) {
 		return;
 	}
 	qglActiveTextureARB( GL_TEXTURE0_ARB + unit );
@@ -308,17 +432,18 @@ GL_UseProgram
 ====================
 */
 void GL_UseProgram( shaderProgram_t *program ) {
-	if ( backEnd.qglState.currentProgram == program ) {
-		return;
+	if ( backEnd.qglState.program == program ) {
+		return;//0;
 	}
 
-	RB_LogComment( "Last shader program: %s, %p\n", backEnd.qglState.currentProgram ? backEnd.qglState.currentProgram->name : "NULL", backEnd.qglState.currentProgram );
-	RB_LogComment( "Current shader program: %s, %p\n", program ? program->name : "NULL", program );
-#
+	RB_LogComment( "Last shader program: %s, %p\n", backEnd.qglState.program ? backEnd.qglState.program->name : "nullptr", backEnd.qglState.program );
+	RB_LogComment( "Current shader program: %s, %p\n", program ? program->name : "nullptr", program );
+
 	qglUseProgram( program ? program->program : 0 );
-	backEnd.qglState.currentProgram = program;
+	backEnd.qglState.program = program;
 
 	GL_CheckErrors();
+	//return 1;
 }
 
 /*
@@ -327,13 +452,13 @@ GL_Uniform1fv
 ====================
 */
 void GL_Uniform1fv( GLint location, const GLfloat *value ) {
-	if ( !backEnd.qglState.currentProgram) {
-		common->Printf("GL_Uniform1fv: no current program object\n");
+	if ( !backEnd.qglState.program ) {
+		common->Printf( "GL_Uniform1fv: no current program object\n" );
 		__builtin_trap();
 		return;
 	}
 
-	qglUniform1fv( *(GLint *)( (char *)backEnd.qglState.currentProgram + location ), 1, value );
+	qglUniform1fv( *(GLint *)( (char *)backEnd.qglState.program + location ), 1, value );
 
 	GL_CheckErrors();
 }
@@ -344,13 +469,13 @@ GL_Uniform4fv
 ====================
 */
 void GL_Uniform4fv( GLint location, const GLfloat *value) {
-	if ( !backEnd.qglState.currentProgram ) {
-		common->Printf("GL_Uniform4fv: no current program object\n");
+	if ( !backEnd.qglState.program ) {
+		common->Printf( "GL_Uniform4fv: no current program object\n" );
 		__builtin_trap();
 		return;
 	}
 
-	qglUniform4fv(*(GLint *)( (char *)backEnd.qglState.currentProgram + location), 1, value);
+	qglUniform4fv(*(GLint *)( (char *)backEnd.qglState.program + location), 1, value);
 	GL_CheckErrors();
 }
 
@@ -360,13 +485,13 @@ GL_UniformMatrix4fv
 ====================
 */
 void GL_UniformMatrix4fv( GLint location, const GLfloat *value) {
-	if ( !backEnd.qglState.currentProgram) {
-		common->Printf("GL_Uniform4fv: no current program object\n");
+	if ( !backEnd.qglState.program ) {
+		common->Printf( "GL_Uniform4fv: no current program object\n" );
 		__builtin_trap();
 		return;
 	}
 
-	qglUniformMatrix4fv(*(GLint *)( (char *)backEnd.qglState.currentProgram + location), 1, GL_FALSE, value);
+	qglUniformMatrix4fv(*(GLint *)( (char *)backEnd.qglState.program + location), 1, GL_FALSE, value);
 	GL_CheckErrors();
 }
 
@@ -376,23 +501,23 @@ GL_EnableVertexAttribArray
 ====================
 */
 void GL_EnableVertexAttribArray( GLuint index ) {
-	if ( !backEnd.qglState.currentProgram ) {
-		common->Printf( "GL_EnableVertexAttribArray: no current program object\n");
+	if ( !backEnd.qglState.program ) {
+		common->Printf( "GL_EnableVertexAttribArray: no current program object\n" );
 		__builtin_trap();
 		return;
 	}
 
-	if ( (*(GLint *)( (char *)backEnd.qglState.currentProgram + index ) ) == -1 ) {
-		common->Printf("GL_EnableVertexAttribArray: unbound attribute index\n" );
+	if ( (*(GLint *)( (char *)backEnd.qglState.program + index ) ) == -1 ) {
+		common->Printf( "GL_EnableVertexAttribArray: unbound attribute index\n" );
 #ifdef _HARM_SHADER_NAME
-		RB_LogComment( "Current shader program: %s, index: %d\n", backEnd.qglState.currentProgram->name, index );
+		RB_LogComment( "Current shader program: %s, index: %d\n", backEnd.qglState.program->name, index );
 #endif
 		__builtin_trap();
 		return;
 	}
 
-	//RB_LogComment("glEnableVertexAttribArray( %i );\n", index);
-	qglEnableVertexAttribArray( *(GLint *)( (char *)backEnd.qglState.currentProgram + index ) );
+	//RB_LogComment( "glEnableVertexAttribArray( %i );\n", index);
+	qglEnableVertexAttribArray( *(GLint *)( (char *)backEnd.qglState.program + index ) );
 	GL_CheckErrors();
 }
 
@@ -401,22 +526,22 @@ void GL_EnableVertexAttribArray( GLuint index ) {
 GL_DisableVertexAttribArray
 ====================
 */
-void GL_DisableVertexAttribArray( GLuint index) {
-	if ( !backEnd.qglState.currentProgram ) {
+void GL_DisableVertexAttribArray( GLuint index ) {
+	if ( !backEnd.qglState.program ) {
 		common->Printf( "GL_DisableVertexAttribArray: no current program object\n" );
 		qglDisableVertexAttribArray( index );
 		__builtin_trap();
 		return;
 	}
 
-	if ( ( *(GLint *)( (char *)backEnd.qglState.currentProgram + index ) ) == -1 ) {
+	if ( ( *(GLint *)( (char *)backEnd.qglState.program + index ) ) == -1 ) {
 		common->Printf( "GL_DisableVertexAttribArray: unbound attribute index\n" );
-		RB_LogComment( "Current shader program: %s, index: %d\n", backEnd.qglState.currentProgram->name, index );
+		RB_LogComment( "Current shader program: %s, index: %d\n", backEnd.qglState.program->name, index );
 		__builtin_trap();
 		return;
 	}
 
-	qglDisableVertexAttribArray( *(GLint *)( (char *)backEnd.qglState.currentProgram + index ) );
+	qglDisableVertexAttribArray( *(GLint *)( (char *)backEnd.qglState.program + index ) );
 	GL_CheckErrors();
 }
 
@@ -426,20 +551,20 @@ GL_VertexAttribPointer
 ====================
 */
 void GL_VertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer ) {
-	if ( !backEnd.qglState.currentProgram  ) {
+	if ( !backEnd.qglState.program  ) {
 		common->Printf( "GL_VertexAttribPointer: no current program object\n" );
 		__builtin_trap();
 		return;
 	}
 
-	if ( ( *(GLint *)( (char *)backEnd.qglState.currentProgram + index ) ) == -1 ) {
+	if ( ( *(GLint *)( (char *)backEnd.qglState.program + index ) ) == -1 ) {
 		common->Printf( "GL_VertexAttribPointer: unbound attribute index\n" );
 		__builtin_trap();
 		return;
 	}
 
 	// RB_LogComment( "qglVertexAttribPointer( %i, %i, %i, %i, %i, %p );\n", index, size, type, normalized, stride, pointer );
-	qglVertexAttribPointer( *(GLint *)( (char *)backEnd.qglState.currentProgram + index ), size, type, normalized, stride, pointer );
+	qglVertexAttribPointer( *(GLint *)( (char *)backEnd.qglState.program + index ), size, type, normalized, stride, pointer );
 	GL_CheckErrors();
 }
 /*
@@ -448,6 +573,7 @@ GL_Cull
 
 This handles the flipping needed when the view being
 rendered is a mirored view.
+Updated to support additional culling modes and OpenGL 4.6
 ====================
 */
 void GL_Cull( int cullType ) {
@@ -457,32 +583,42 @@ void GL_Cull( int cullType ) {
 			qglDisable( GL_CULL_FACE );
 		}
 		return;
-	} else {
-		// Enable culling
-		qglEnable( GL_CULL_FACE );
-		if ( cullType == CT_BACK_SIDED ) {
+	} else if ( cullType == CT_BACK_SIDED ) {
+		if ( backEnd.viewDef->isMirror ) {
+			// Enable culling
+			qglEnable( GL_CULL_FACE );
+			qglCullFace( GL_FRONT );
+		} else {
+			qglEnable( GL_CULL_FACE );
 			// Back face culling
 			qglCullFace( GL_BACK );
-		} else if ( cullType == CT_FRONT_SIDED ) {
+		}
+	} else if ( cullType == CT_FRONT_SIDED ) {
+		if ( backEnd.viewDef->isMirror ) {
+			qglEnable( GL_CULL_FACE );
+			qglCullFace( GL_BACK );
+		} else {
+			qglEnable( GL_CULL_FACE );
 			// Front face culling
 			qglCullFace( GL_FRONT );
-		} else if ( cullType == CT_OCCLUSION_CULL ) {
-			// Occlusion culling using query objects
-			qglCullFace( GL_BACK );
+		}
+	} else if ( cullType == CT_OCCLUSION_CULL ) {
+		// Occlusion culling using query objects
+		qglEnable( GL_CULL_FACE );
+		qglCullFace( GL_BACK );
 
-			GLuint queryId = qglGenQueries( 1 );
-			qglBeginQuery( GL_ANY_SAMPLES_PASSED, queryId );
+		GLuint queryId = qglGenQueries( 1 );
+		qglBeginQuery( GL_ANY_SAMPLES_PASSED, queryId );
 
-			// Draw occluder geometry...
-			qglEndQuery( GL_ANY_SAMPLES_PASSED );
-			GLuint numSamples = 0;
-			qglGetQueryObjectuiv( queryId, GL_QUERY_RESULT, &numSamples );
+		// Draw occluder geometry...
+		qglEndQuery( GL_ANY_SAMPLES_PASSED );
+		GLuint numSamples = 0;
+		qglGetQueryObjectuiv( queryId, GL_QUERY_RESULT, &numSamples );
 
-			if ( numSamples > 0 ) {
-				// Visible, render normally
-			} else {
-				// Occluded, skip rendering
-			}
+		if ( numSamples > 0 ) {
+			// Visible, render normally
+		} else {
+			// Occluded, skip rendering
 			qglDeleteQueries( 1, &queryId );
 		} else {
 			// Unsupported cull type
@@ -552,25 +688,24 @@ void GL_State( GLuint stateBits ) {
 		}
 	}
 
-	//
 	// check depthFunc bits
 	//
 	if ( diff & ( GLS_DEPTHFUNC_EQUAL | GLS_DEPTHFUNC_LESS | GLS_DEPTHFUNC_ALWAYS ) ) {
 		GLenum depthFunc;
-		if ( stateBits & GLS_DEPTHFUNC_EQUAL ) {
-			//qglDepthFunc( GL_EQUAL );
+		switch ( stateBits & ( GLS_DEPTHFUNC_EQUAL | GLS_DEPTHFUNC_LESS | GLS_DEPTHFUNC_ALWAYS ) ) {
+			case GLS_DEPTHFUNC_EQUAL:
 			depthFunc = GL_EQUAL;
-		} else if ( stateBits & GLS_DEPTHFUNC_ALWAYS ) {
+			case GLS_DEPTHFUNC_LESS:
+			depthFunc = GL_LESS;
+			case GLS_DEPTHFUNC_ALWAYS
 			//qglDepthFunc( GL_ALWAYS );
 			depthFunc = GL_ALWAYS;
 		} else {
-			//qglDepthFunc( GL_LEQUAL );
 			depthFunc = GL_LEQUAL;
 		}
 		qglDepthFunc( depthFunc );
 	}
 
-	//
 	// check blend bits
 	//
 	if ( diff & ( GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS ) ) {
@@ -643,7 +778,13 @@ void GL_State( GLuint stateBits ) {
 			break;
 		}
 
-		qglBlendFunc( srcFactor, dstFactor );
+		// Only actually update GL's blend func if blending is enabled.
+		if ( srcFactor == GL_ONE && dstFactor == GL_ZERO ) {
+			qglDisable( GL_BLEND );
+		} else {
+			qglEnable( GL_BLEND );
+			qglBlendFunc( srcFactor, dstFactor );
+		}
 	}
 
 	// check depthmask
@@ -655,8 +796,6 @@ void GL_State( GLuint stateBits ) {
 
 	// check colormask
 	//
-	diff &= (GLS_REDMASK | GLS_GREENMASK | GLS_BLUEMASK | GLS_ALPHAMASK);
-
 	if ( diff & ( GLS_REDMASK|GLS_GREENMASK|GLS_BLUEMASK|GLS_ALPHAMASK ) ) {
 		GLboolean r = ( stateBits & GLS_REDMASK ) ? 0 : 1;
 		GLboolean g = ( stateBits & GLS_GREENMASK ) ? 0 : 1;
@@ -669,12 +808,24 @@ void GL_State( GLuint stateBits ) {
 	//
 	if ( diff & GLS_POLYMODE_LINE ) {
 		GLenum mode = ( stateBits & GLS_POLYMODE_LINE ) ? GL_LINE : GL_FILL;
-		qglPolygonMode( L_FRONT_AND_BACK, mode );
+		qglPolygonMode( GL_FRONT_AND_BACK, mode );
+	}
+
+	// polygon offset
+	if ( diff & GLS_POLYGON_OFFSET ) {
+		if ( stateBits & GLS_POLYGON_OFFSET ) {
+			qglPolygonOffset( backEnd.qglState.polyOfsScale, backEnd.qglState.polyOfsBias );
+			qglEnable( GL_POLYGON_OFFSET_FILL );
+			qglEnable( GL_POLYGON_OFFSET_LINE );
+		} else {
+			qglDisable( GL_POLYGON_OFFSET_FILL );
+			qglDisable( GL_POLYGON_OFFSET_LINE );
+		}
 	}
 
 	// alpha test
 	//
-	if ( ( diff & GLS_ATEST_BITS ) || (stateBits & GLS_ATEST_BITS ) == 0 ) {
+	if ( ( diff & GLS_ATEST_BITS ) || ( stateBits & GLS_ATEST_BITS ) == 0 ) {
 		qglDisable( GL_ALPHA_TEST );
 	} else if ( stateBits & GLS_ATEST_BITS == GLS_ATEST_EQ_255 ) {
 		qglEnable( GL_ALPHA_TEST );
@@ -689,6 +840,132 @@ void GL_State( GLuint stateBits ) {
 		common->assert( 0 );
 	}
 
+	// stencil
+	if ( diff & ( GLS_STENCIL_FUNC_BITS | GLS_STENCIL_OP_BITS ) ) {
+		if ( ( stateBits & ( GLS_STENCIL_FUNC_BITS | GLS_STENCIL_OP_BITS ) ) != 0 ) {
+			qglEnable( GL_STENCIL_TEST );
+		} else {
+			qglDisable( GL_STENCIL_TEST );
+		}
+	}
+
+	if ( diff & ( GLS_STENCIL_FUNC_BITS | GLS_STENCIL_FUNC_REF_BITS | GLS_STENCIL_FUNC_MASK_BITS ) ) {
+		GLuint ref = GLuint( ( stateBits & GLS_STENCIL_FUNC_REF_BITS ) >> GLS_STENCIL_FUNC_REF_SHIFT );
+		GLuint mask = GLuint( ( stateBits & GLS_STENCIL_FUNC_MASK_BITS ) >> GLS_STENCIL_FUNC_MASK_SHIFT );
+		GLenum func = 0;
+		switch ( stateBits & GLS_STENCIL_FUNC_BITS ) {
+			case GLS_STENCIL_FUNC_NEVER:
+				func = GL_NEVER;
+				break;
+			case GLS_STENCIL_FUNC_LESS:
+				func = GL_LESS;
+				break;
+			case GLS_STENCIL_FUNC_EQUAL:
+				func = GL_EQUAL;
+				break;
+			case GLS_STENCIL_FUNC_LEQUAL:
+				func = GL_LEQUAL;
+				break;
+			case GLS_STENCIL_FUNC_GREATER:
+				func = GL_GREATER;
+				break;
+			case GLS_STENCIL_FUNC_NOTEQUAL:
+				func = GL_NOTEQUAL;
+				break;
+			case GLS_STENCIL_FUNC_GEQUAL:
+				func = GL_GEQUAL;
+				break;
+			case GLS_STENCIL_FUNC_ALWAYS:
+				func = GL_ALWAYS;
+				break;
+		}
+		qglStencilFunc( func, ref, mask );
+	}
+
+	if ( diff & ( GLS_STENCIL_OP_FAIL_BITS | GLS_STENCIL_OP_ZFAIL_BITS | GLS_STENCIL_OP_PASS_BITS ) ) {
+		GLenum sFail = 0;
+		GLenum zFail = 0;
+		GLenum pass = 0;
+		switch ( stateBits & GLS_STENCIL_OP_FAIL_BITS ) {
+			case GLS_STENCIL_OP_FAIL_KEEP:
+				sFail = GL_KEEP;
+				break;
+			case GLS_STENCIL_OP_FAIL_ZERO:
+				sFail = GL_ZERO;
+				break;
+			case GLS_STENCIL_OP_FAIL_REPLACE:
+				sFail = GL_REPLACE;
+				break;
+			case GLS_STENCIL_OP_FAIL_INCR:
+				sFail = GL_INCR;
+				break;
+			case GLS_STENCIL_OP_FAIL_DECR:
+				sFail = GL_DECR;
+				break;
+			case GLS_STENCIL_OP_FAIL_INVERT:
+				sFail = GL_INVERT;
+				break;
+			case GLS_STENCIL_OP_FAIL_INCR_WRAP:
+				sFail = GL_INCR_WRAP;
+				break;
+			case GLS_STENCIL_OP_FAIL_DECR_WRAP:
+				sFail = GL_DECR_WRAP;
+				break;
+		}
+		switch ( stateBits & GLS_STENCIL_OP_ZFAIL_BITS ) {
+			case GLS_STENCIL_OP_ZFAIL_KEEP:
+				zFail = GL_KEEP;
+				break;
+			case GLS_STENCIL_OP_ZFAIL_ZERO:
+				zFail = GL_ZERO;
+				break;
+			case GLS_STENCIL_OP_ZFAIL_REPLACE:
+				zFail = GL_REPLACE;
+				break;
+			case GLS_STENCIL_OP_ZFAIL_INCR:
+				zFail = GL_INCR;
+				break;
+			case GLS_STENCIL_OP_ZFAIL_DECR:
+				zFail = GL_DECR;
+				break;
+			case GLS_STENCIL_OP_ZFAIL_INVERT:
+				zFail = GL_INVERT;
+				break;
+			case GLS_STENCIL_OP_ZFAIL_INCR_WRAP:
+				zFail = GL_INCR_WRAP;
+				break;
+			case GLS_STENCIL_OP_ZFAIL_DECR_WRAP:
+				zFail = GL_DECR_WRAP;
+				break;
+		}
+		switch ( stateBits & GLS_STENCIL_OP_PASS_BITS ) {
+			case GLS_STENCIL_OP_PASS_KEEP:
+				pass = GL_KEEP;
+				break;
+			case GLS_STENCIL_OP_PASS_ZERO:
+				pass = GL_ZERO;
+				break;
+			case GLS_STENCIL_OP_PASS_REPLACE:
+				pass = GL_REPLACE;
+				break;
+			case GLS_STENCIL_OP_PASS_INCR:
+				pass = GL_INCR;
+				break;
+			case GLS_STENCIL_OP_PASS_DECR:
+				pass = GL_DECR;
+				break;
+			case GLS_STENCIL_OP_PASS_INVERT:
+				pass = GL_INVERT;
+				break;
+			case GLS_STENCIL_OP_PASS_INCR_WRAP:
+				pass = GL_INCR_WRAP;
+				break;
+			case GLS_STENCIL_OP_PASS_DECR_WRAP:
+				pass = GL_DECR_WRAP;
+				break;
+		}
+		qglStencilOp( sFail, zFail, pass );
+	}
 	backEnd.qglState.glStateBits = stateBits;
 }
 
@@ -808,7 +1085,15 @@ static void RB_DrawFlickerBox() {
 const void *RB_DrawBuffer( const void *data ) {
 	const drawBufferCommand_t *cmd = (const drawBufferCommand_t *)data;
 
-	qglDrawBuffer( cmd->buffer );
+	for ( int i = 0; i < buffer.size(); i++ ) {
+		buffer[i] = { 255, 255, 255, 255 }; // White color
+	}
+	if ( qglConfig.useVertexBufferObject ) {
+		BindFrameBuffer( cmd->buffer );
+		qglDrawBuffer( GL_COLOR_ATTACHMENT0 );
+	} else {
+		qglDrawBuffer( cmd->buffer );
+	}
 
 	// clear screen for debugging
 	if ( r_clear.GetInteger() ) {
@@ -880,7 +1165,7 @@ const void GL_BlockingSwapBuffers() {
 		renderSync[swapIndex] = 0;
 		common->Printf( "no sync available\n" );
 		swapIndex ^= 1;
-		if ( qglXMakeCurrent( dpy, None, NULL ) ) {
+		if ( qglXMakeCurrent( dpy, None, nullptr ) ) {
 			common->Error( "qglXMakeCurrent failed\n" );
 		}
 	}
@@ -1006,7 +1291,7 @@ static void	RB_SetBuffer( const void *data ) {
 	// clear screen for debugging
 	// automatically enable this with several other debug tools
 	// that might leave unrendered portions of the screen
-	if ( r_clear.GetFloat() || arcNetString::Length( r_clear.GetString() ) != 1 || r_lockSurfaces.GetBool() || r_singleArea.GetBool() || r_showOverDraw.GetBool() ) {
+	if ( r_clear.GetFloat() || anString::Length( r_clear.GetString() ) != 1 || r_lockSurfaces.GetBool() || r_singleArea.GetBool() || r_showOverDraw.GetBool() ) {
 		float c[3];
 		switch ( r_clear.GetInteger() ) {
 			case 2:
@@ -1051,8 +1336,8 @@ void RB_ShowImages( void ) {
 
 	//for ( int m = 0 ; m < MAX_MIP_LEVELS ; m++ ) {
 	for ( int i = 0 ; i < globalImages->images.Num() ; i++ ) {
-		ARCImage *image = globalImages->images[i];
-		if ( images->partialImage == NULL && images->texnum == ARCImage::TEXTURE_NOT_LOADED ) {
+		anImage *image = globalImages->images[i];
+		if ( images->partialImage == nullptr && images->texnum == anImage::TEXTURE_NOT_LOADED ) {
 			continue;
 		}
 
@@ -1112,205 +1397,39 @@ const void	RB_SwapBuffers( const void *data ) {
 
 /*
 =============
-RB_CopyRender
+RB_ClearDepth
 
-Copy part of the current framebuffer to an image
 =============
 */
-const void RB_CopyRender( const void *data ) {
-	const setBufferCommand_t *cmd = (const setBufferCommand_t *)data;
+const void *RB_ClearDepth(const void *data) {
+	const clearDepthCommand_t *cmd = data;
 
-	if ( r_skipCopyTexture.GetBool() ) {
-		return;
+	// finish any 2D drawing if needed
+	if(tess.numIndexes)
+		RB_EndSurface();
+
+	// texture swapping test
+	if (r_showImages->integer)
+		RB_ShowImages();
+
+	if (glRefConfig.framebufferObject) {
+		if (!tr.renderFbo || backEnd.framePostProcessed) {
+			FBO_Bind(NULL);
+		} else {
+			FBO_Bind(tr.renderFbo);
+		}
 	}
 
-    RB_LogComment( "***************** RB_CopyRender *****************\n" );
+	qglClear(GL_DEPTH_BUFFER_BIT);
 
-	if ( cmd->image ) {
-		cmd->image->CopyFramebuffer( cmd->x, cmd->y, cmd->imageWidth, cmd->imageHeight, false );
+	// if we're doing MSAA, clear the depth texture for the resolve buffer
+	if (tr.msaaResolveFbo) {
+		FBO_Bind(tr.msaaResolveFbo);
+		qglClear(GL_DEPTH_BUFFER_BIT);
 	}
+
+	return (const void *)(cmd + 1);
 }
-
-/*
-====================
-RB_StereoRenderExecuteBackEndCommands
-
-Renders the draw list twice, with slight modifications for left eye / right eye
-====================
-*/
-void RB_StereoRenderExecuteBackEndCommands( const setBufferCommand_t * const allCmds ) {
-	GLint backEndStartTime = Sys_Microseconds();
-
-	// If we are in a monoscopic context, this draws to the only buffer, and is
-	// the same as GL_BACK.  In a quad-buffer stereo context, this is necessary
-	// to prevent GL from forcing the rendering to go to both BACK_LEFT and
-	// BACK_RIGHT at a performance penalty.
-	// To allow stereo deghost processing, the views have to be copied to separate
-	// textures anyway, so there isn't any benefit to rendering to BACK_RIGHT for
-	// that eye.
-	qglDrawBuffer( GL_BACK_LEFT );
-
-	// create the stereoRenderImage if we haven't already
-	static arcImage * stereoRenderImages[2];
-	for ( int i = 0; i < 2; i++ ) {
-		if ( stereoRenderImages[i] == NULL ) {
-			stereoRenderImages[i] = globalImages->ImageFromFunction( va("_stereoRender%i",i), R_MakeStereoRenderImage );
-		}
-
-		// resize the stereo render image if the main window has changed size
-		if ( stereoRenderImages[i]->GetUploadWidth() != renderSystem->GetWidth() ||
-			 stereoRenderImages[i]->GetUploadHeight() != renderSystem->GetHeight() ) {
-			stereoRenderImages[i]->Resize( renderSystem->GetWidth(), renderSystem->GetHeight() );
-		}
-	}
-
-	// In stereoRender mode, the front end has generated two RC_DRAW_VIEW commands
-	// with slightly different origins for each eye.
-
-	// TODO: only do the copy after the final view has been rendered, not mirror subviews?
-
-	// Render the 3D draw views from the screen origin so all the screen relative
-	// texture mapping works properly, then copy the portion we are going to use
-	// off to a texture.
-	bool foundEye[2] = { false, false };
-
-	for ( int stereoEye = 1; stereoEye >= -1; stereoEye -= 2 ) {
-		// set up the target texture we will draw to
-		const int targetEye = ( stereoEye == 1 ) ? 1 : 0;
-
-		// Set the back end into a known default state to fix any stale render state issues
-		GL_SetDefaultState();
-		renderProgManager.Unbind();
-		renderProgManager.ZeroUniforms();
-
-		for ( const setBufferCommand_t * cmds = allCmds; cmds != NULL; cmds = (const setBufferCommand_t *)cmds->next ) {
-			switch ( cmds->commandId ) {
-			case RC_NOP:
-				break;
-			case RC_DRAW_VIEW_GUI:
-			case RC_DRAW_VIEW_3D: {
-					const setBufferCommand_t *const dsc = (const setBufferCommand_t *)cmds;
-					const viewDef_t		&eyeViewDef = *dsc->viewDef;
-					if ( eyeViewDef.renderView.viewEyeBuffer && eyeViewDef.renderView.viewEyeBuffer != stereoEye ) {
-						// this is the render view for the other eye
-						continue;
-					}
-
-					foundEye[ targetEye ] = true;
-					RB_DrawView( dsc, stereoEye );
-					if ( cmds->commandId == RC_DRAW_VIEW_GUI ) {
-					}
-				}
-				break;
-			case RC_SET_BUFFER:
-				RB_SetBuffer( cmds );
-				break;
-			case RC_COPY_RENDER:
-				RB_CopyRender( cmds );
-				break;
-			case RC_POST_PROCESS: {
-					postProcessCommand_t * cmd = (postProcessCommand_t *)cmds;
-					if ( cmd->viewDef->renderView.viewEyeBuffer != stereoEye ) {
-						break;
-					}
-					RB_PostProcess( cmds );
-				}
-				break;
-			default:
-				common->Error( "RB_ExecuteBackEndCommands: bad commandId" );
-				break;
-			}
-		}
-
-		// copy to the target
-		stereoRenderImages[ targetEye ]->CopyFramebuffer( 0, 0, renderSystem->GetWidth(), renderSystem->GetHeight() );
-	}
-
-	// perform the final compositing / warping / deghosting to the actual framebuffer(s)
-	assert( foundEye[0] && foundEye[1] );
-
-	GL_SetDefaultState();
-
-	//RB_SetMVP( renderMatrix_identity );
-
-	// If we are in quad-buffer pixel format but testing another 3D mode,
-	// make sure we draw to both eyes.  This is likely to be sub-optimal
-	// performance on most cards and drivers, but it is better than getting
-	// a confusing, half-ghosted view.
-	if ( renderSystem->GetStereo3DMode() != STEREO3D_QUAD_BUFFER ) {
-		qglDrawBuffer( GL_BACK );
-	}
-
-	GL_State( GLS_DEPTHFUNC_ALWAYS );
-	GL_Cull( CT_TWO_SIDED );
-
-	// We just want to do a quad pass - so make sure we disable any texgen and
-	// set the texture matrix to the identity so we don't get anomalies from
-	// any stale uniform data being present from a previous draw call
-	const float texS[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
-	const float texT[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
-	renderProgManager.SetRenderParm( RENDERPARM_TEXTUREMATRIX_S, texS );
-	renderProgManager.SetRenderParm( RENDERPARM_TEXTUREMATRIX_T, texT );
-
-	// disable any texgen
-	const float texGenEnabled[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	renderProgManager.SetRenderParm( RENDERPARM_TEXGEN_0_ENABLED, texGenEnabled );
-
-	renderProgManager.BindShader_Texture();
-	GL_Color( 1, 1, 1, 1 );
-
-	switch( renderSystem->GetStereo3DMode() ) {
-	case STEREO3D_QUAD_BUFFER:
-		glDrawBuffer( GL_BACK_RIGHT );
-		GL_SetCurrentTextureUnit( 0 );
-		stereoRenderImages[1]->Bind();
-		GL_SetCurrentTextureUnit( 1 );
-		stereoRenderImages[0]->Bind();
-		RB_DrawElementsWithCounters( &backEnd.unitSquareSurface );
-
-		glDrawBuffer( GL_BACK_LEFT );
-		GL_SetCurrentTextureUnit( 1 );
-		stereoRenderImages[1]->Bind();
-		GL_SetCurrentTextureUnit( 0 );
-		stereoRenderImages[0]->Bind();
-		RB_DrawElementsWithCounters( &backEnd.unitSquareSurface );
-
-		break;
-	case STEREO3D_HDMI_720:
-		// HDMI 720P 3D
-		GL_SetCurrentTextureUnit( 0 );
-		stereoRenderImages[1]->Bind();
-		GL_SetCurrentTextureUnit( 1 );
-		stereoRenderImages[0]->Bind();
-		GL_ViewportAndScissor( 0, 0, 1280, 720 );
-		RB_DrawElementsWithCounters( &backEnd.unitSquareSurface );
-
-		GL_SetCurrentTextureUnit( 0 );
-		stereoRenderImages[0]->Bind();
-		GL_SetCurrentTextureUnit( 1 );
-		stereoRenderImages[1]->Bind();
-		GL_ViewportAndScissor( 0, 750, 1280, 720 );
-		RB_DrawElementsWithCounters( &backEnd.unitSquareSurface );
-
-		// force the HDMI 720P 3D guard band to a constant color
-		qglScissor( 0, 720, 1280, 30 );
-		qglClear( GL_COLOR_BUFFER_BIT );
-		break;
-	default:
-
-	// debug tool
-	RB_DrawFlickerBox();
-
-	// make sure the drawing is actually started
-	qglFlush();
-
-	// we may choose to sync to the swapbuffers before the next frame
-
-	// stop rendering on this thread
-	GLuint backEndFinishTime = Sys_Microseconds();
-	backEnd.pc.totalMicroSec = backEndFinishTime - backEndStartTime;
-}
-
 /*
 ====================
 RB_ExecuteBackEndCommands

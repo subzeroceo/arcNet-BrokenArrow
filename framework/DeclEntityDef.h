@@ -4,14 +4,14 @@
 /*
 ===============================================================================
 
-	arcDeclEntityDef
+	anDeclEntityDef
 
 ===============================================================================
 */
 
-class arcDeclEntityDef : public arcDecleration {
+class anDeclEntityDef : public anDecl {
 public:
-	arcDictionary					dict;
+	anDict					dict;
 
 	virtual size_t			Size() const;
 	virtual const char *	DefaultDefinition() const;

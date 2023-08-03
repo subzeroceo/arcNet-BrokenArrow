@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
@@ -18,11 +18,11 @@ arcFootPrintManagerLocal
 class arcFootPrintManagerLocal : public arcFootPrintManager {
 public:
 
-	arcFootPrintManagerLocal() : system( NULL ) {}
+	arcFootPrintManagerLocal() : system( nullptr ) {}
 	virtual void					Init( void );
 	virtual void					Deinit( void );
 
-	virtual bool					AddFootPrint( const arcVec3 & point, const arcVec3 &forward, const arcVec3 &up, bool right );
+	virtual bool					AddFootPrint( const anVec3 & point, const anVec3 &forward, const anVec3 &up, bool right );
 
 	virtual void					Think( void );
 
@@ -31,9 +31,9 @@ public:
 
 private:
 	struct footprint {
-		arcVec3 p;
-		arcVec3 f;
-		arcVec3 l;
+		anVec3 p;
+		anVec3 f;
+		anVec3 l;
 		int age;
 	};
 
@@ -80,7 +80,7 @@ arcFootPrintManagerLocal::Deinit
 */
 void arcFootPrintManagerLocal::Shutdown( void ) {
 	delete system;
-	system = NULL;
+	system = nullptr;
 }
 
 /*
@@ -88,7 +88,7 @@ void arcFootPrintManagerLocal::Shutdown( void ) {
 arcFootPrintManagerLocal::AddFootPrint
 ==============
 */
-bool arcFootPrintManagerLocal::AddFootPrint( const arcVec3 &point, const arcVec3 &forward, const arcVec3 &up, bool right ) {
+bool arcFootPrintManagerLocal::AddFootPrint( const anVec3 &point, const anVec3 &forward, const anVec3 &up, bool right ) {
 	int num = end - start;
 	int index = end % MAX_FOOTSTEPS;
 	end++;
@@ -131,17 +131,17 @@ void arcFootPrintManagerLocal::Think( void ) {
 	surf->numVerts = 0;
 	surf->bounds.Clear();
 
-	for (unsigned int i=start; i<end; i++) {
+	for (unsigned int i=start; i<end; i++ ) {
 		int index = i % MAX_FOOTSTEPS;
 		footprint *f = &footprints[index];
 
-		arcDrawVert *v = &surf->verts[ surf->numVerts ];
+		anDrawVertex *v = &surf->verts[ surf->numVerts ];
 		vertIndex_t  *idx = &surf->indexes[ surf->numIndexes ];
 
 		byte alpha = 255;
 		int a = ( gameLocal.time - f->age );
 		if ( a > SEC2MS( 50 ) ) {
-			alpha = ( byte )( arcMath::ClampFloat( 0.f, 1.f, 1.f - ( ( a - SEC2MS( 50 ) ) / ( float )( SEC2MS( 10 ) ) ) ) * 255 );
+			alpha = ( byte )( anMath::ClampFloat( 0.f, 1.f, 1.f - ( ( a - SEC2MS( 50 ) ) / ( float )( SEC2MS( 10 ) ) ) ) * 255 );
 		}
 
 		v->Clear();
@@ -193,7 +193,7 @@ void arcFootPrintManagerLocal::Think( void ) {
 	if ( surf->numVerts ) {
 		surf->bounds.ExpandSelf( 10.f );
 		system->GetRenderEntity().hModel->FreeVertexCache();
-		system->GetRenderEntity().hModel->SetBounds(surf->bounds);
+		system->GetRenderEntity().hModel->SetBounds( surf->bounds);
 		system->GetRenderEntity().bounds = surf->bounds;
 
 		system->PresentRenderEntity();
@@ -206,7 +206,7 @@ arcFootPrintManagerLocal::GetRenderEntity
 ==============
 */
 renderEntity_t* arcFootPrintManagerLocal::GetRenderEntity( void ) {
-	return system == NULL ? NULL : &system->GetRenderEntity();
+	return system == nullptr ? nullptr : &system->GetRenderEntity();
 }
 
 /*
@@ -215,5 +215,5 @@ arcFootPrintManagerLocal::GetModelHandle
 ==============
 */
 int arcFootPrintManagerLocal::GetModelHandle( void ) {
-	return system == NULL ? -1 : system->GetModelHandle();
+	return system == nullptr ? -1 : system->GetModelHandle();
 }

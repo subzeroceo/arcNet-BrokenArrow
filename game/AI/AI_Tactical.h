@@ -36,7 +36,7 @@ typedef struct {
 
 } aiPostureInfo_t;
 
-class rvAITactical : public idAI {
+class rvAITactical : public anSAAI {
 public:
 
 	CLASS_PROTOTYPE( rvAITactical );
@@ -46,8 +46,8 @@ public:
 	void				InitSpawnArgsVariables			( void );
 	void				Spawn							( void );
 	void				Think							( void );
-	void				Save							( idSaveGame *savefile ) const;
-	void				Restore							( idRestoreGame *savefile );
+	void				Save							( anSaveGame *savefile ) const;
+	void				Restore							( anRestoreGame *savefile );
 
 	virtual bool		CheckActions					( void );
 
@@ -75,11 +75,11 @@ protected:
 	void				UpdateAnimPrefix				( void );
 
 	int					ammo;
-	int					maxShots;	
+	int					maxShots;
 	int					minShots;
 	int					shots;
 	float				fireRate;
-	
+
 	int					playerFocusTime;
 	int					playerAnnoyTime;
 
@@ -99,7 +99,7 @@ private:
 	bool				healthRegenEnabled;
 	int					healthRegenNextTime;
 	int					maxHealth;
-	
+
 	int					nextWallTraceTime;
 
 	// Custom actions
@@ -108,14 +108,14 @@ private:
 
 	// Torso States
 	stateResult_t		State_Torso_SetPosture				( const stateParms_t& parms );
-	
+
 	stateResult_t		State_Torso_RangedAttack			( const stateParms_t& parms );
 	stateResult_t		State_Torso_MovingRangedAttack		( const stateParms_t& parms );
 	stateResult_t		State_Torso_Reload					( const stateParms_t& parms );
 
 	stateResult_t		State_Torso_Cover_LeanLeftAttack	( const stateParms_t& parms );
-	stateResult_t		State_Torso_Cover_LeanRightAttack	( const stateParms_t& parms );	
-	stateResult_t		State_Torso_Cover_LeanAttack		( const stateParms_t& parms );	
+	stateResult_t		State_Torso_Cover_LeanRightAttack	( const stateParms_t& parms );
+	stateResult_t		State_Torso_Cover_LeanAttack		( const stateParms_t& parms );
 	stateResult_t		State_Torso_Cover_Peek				( const stateParms_t& parms );
 
 	// Frame Commands
@@ -129,6 +129,6 @@ private:
 	CLASS_STATES_PROTOTYPE ( rvAITactical );
 };
 
-extern const idEventDef AI_ForcePosture;
+extern const anEventDef AI_ForcePosture;
 
 #endif /* !__AI_TACTICAL__ */

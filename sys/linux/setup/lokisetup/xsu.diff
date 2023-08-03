@@ -25,20 +25,20 @@
 +    close(term); term = -1;
 +    term_status = status;
 +
-     if ( WIFEXITED(status) ) {
+     if ( WIFEXITED( status) ) {
  #ifdef DEBUG
-       fprintf(stderr,"Child %d returned\n", pid);
+       fprintf( stderr,"Child %d returned\n", pid);
  #endif
--      gtk_exit(WEXITSTATUS(status) );
+-      gtk_exit(WEXITSTATUS( status) );
 +      /* This is handled at the end of xsu_process */
 +      return;
-     } else if ( WIFSIGNALED(status) ) {
+     } else if ( WIFSIGNALED( status) ) {
  #ifdef DEBUG
-       fprintf(stderr,"Xsu: subprocess %d has died from signal %d\n", pid, WTERMSIG(status) );
+       fprintf( stderr,"Xsu: subprocess %d has died from signal %d\n", pid, WTERMSIG( status) );
  #endif
        gtk_exit(EXIT_ERROR);
 +    } else {
-+      fprintf(stderr, "Xsu: got SIGCHLD from %d for unknown reason (%08x)\n", pid, status);
++      fprintf( stderr, "Xsu: got SIGCHLD from %d for unknown reason (%08x)\n", pid, status);
 +      gtk_exit(EXIT_ERROR);
      }
 -    close(term); term = -1;
@@ -62,7 +62,7 @@
 
 +	gtk_widget_hide (gtk_xsu_window);
 +
-+	if (password == NULL)
++	if (password == nullptr )
 +		return;
 +
  /* 0.2.1 *
@@ -72,7 +72,7 @@
 -	gtk_entry_set_text(GTK_ENTRY(gtk_password_textbox),"" );
 -	gtk_widget_hide (gtk_xsu_window);
 -
--	if (password == NULL)
+-	if (password == nullptr )
 -		return;
 +	password_return = g_strdup_printf ( "%s\n", password);
 
@@ -86,15 +86,15 @@
 @@ -177,6 +186,9 @@
  	argv[2] = "-c";
  	argv[3] = buffer;
- 	argv[4] = NULL;
+ 	argv[4] = nullptr;
 +#ifdef DEBUG
-+	fprintf(stderr, "%s %s -c %s\n", su_command, username, buffer);
++	fprintf( stderr, "%s %s -c %s\n", su_command, username, buffer);
 +#endif
- 	term = exec_program(su_command, argv);
+ 	term = exec_program( su_command, argv);
  	/* We are not a gnome-application anymore but under control of su */
 
 @@ -231,33 +243,65 @@
- 	fprintf(stderr, "Got it!\n" );
+ 	fprintf( stderr, "Got it!\n" );
  #endif
 
 -	/* Discard any remaining characters on stdin */
@@ -105,14 +105,14 @@
 +	for (;;) {
  		FD_ZERO(&fds);
  		FD_SET(term, &fds);
--		if ( select(term+1, &fds, NULL, NULL, &delay) ) {
+-		if ( select(term+1, &fds, nullptr, nullptr, &delay) ) {
 -		    if ( read(term, &c, 1 ) <= 0 )
 -			break;
 +
 +		delay.tv_sec = 0;
 +		delay.tv_usec = 10*1000; /* 10 ms wait */
 +
-+		if (select(term+1, &fds, NULL, NULL, &delay) > 0 ) {
++		if ( select(term+1, &fds, nullptr, nullptr, &delay) > 0 ) {
 +			if (read(term, &c, 1 ) < 0 )
 +				break;
  		} else
@@ -121,7 +121,7 @@
 
 -	password_return = g_strdup_printf ( "%s\n", password);
  #ifdef DEBUG
-  	fprintf(stderr,"Sending password\n" );
+  	fprintf( stderr,"Sending password\n" );
  #endif
  /* 0.2.2 *
  	Minor security fix, clear the password from memory
@@ -132,8 +132,8 @@
  	}
 +
  	memset (password_return, 0, strlen (password_return) );
- 	g_free (password_return); password_return = NULL;
--	g_free (password); password = NULL;
+ 	g_free (password_return); password_return = nullptr;
+-	g_free (password); password = nullptr;
 
 -	//gtk_main();
 +	/* Eat up any output, and wait for a SIGCHLD saying su exited */
@@ -144,10 +144,10 @@
 +		delay.tv_sec = 0;
 +		delay.tv_usec = 10*1000; /* 10 ms wait */
 +
-+		if ( select(term+1, &fds, NULL, NULL, &delay) > 0 ) {
++		if ( select(term+1, &fds, nullptr, nullptr, &delay) > 0 ) {
 +		    read(term, &c, 1 );
 +#ifdef DEBUG
-+		    fprintf(stderr, "read from pty: %02x\n", c);
++		    fprintf( stderr, "read from pty: %02x\n", c);
 +#endif
 +		}
 +
@@ -158,7 +158,7 @@
 +	if (WIFEXITED(term_status) && WEXITSTATUS(term_status) ) {
 +		/* su failed, so ask for the password again */
 +#ifdef DEBUG
-+		fprintf(stderr, "returning control to gtk\n" );
++		fprintf( stderr, "returning control to gtk\n" );
 +#endif
 +		gtk_widget_show (gtk_xsu_window);
 +	} else {

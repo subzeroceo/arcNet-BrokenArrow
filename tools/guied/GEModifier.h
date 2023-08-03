@@ -36,7 +36,7 @@ class rvGEModifier
 public:
 
 	rvGEModifier ( const char* name, idWindow* window );
-	virtual ~rvGEModifier ( ) { }
+	virtual ~rvGEModifier() { }
 
 	virtual bool		Apply		( void ) = 0;
 	virtual bool		Undo		( void ) = 0;
@@ -54,7 +54,7 @@ protected:
 
 	idWindow*			mWindow;
 	rvGEWindowWrapper*	mWrapper;
-	arcNetString				mName;
+	anString				mName;
 };
 
 ARC_INLINE bool rvGEModifier::IsValid ( void )

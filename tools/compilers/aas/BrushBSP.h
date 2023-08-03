@@ -59,9 +59,9 @@ public:
 	void					AddToNodes( idBrushBSPNode *front, idBrushBSPNode *back );
 	void					RemoveFromNode( idBrushBSPNode *l );
 	void					Flip( void );
-	int						Split( const arcPlane &splitPlane, idBrushBSPPortal **front, idBrushBSPPortal **back );
-	arcWinding *				GetWinding( void ) const { return winding; }
-	const arcPlane &			GetPlane( void ) const { return plane; }
+	int						Split( const anPlane &splitPlane, idBrushBSPPortal **front, idBrushBSPPortal **back );
+	anWinding *				GetWinding( void ) const { return winding; }
+	const anPlane &			GetPlane( void ) const { return plane; }
 	void					SetFaceNum( int num ) { faceNum = num; }
 	int						GetFaceNum( void ) const { return faceNum; }
 	int						GetFlags( void ) const { return flags; }
@@ -71,9 +71,9 @@ public:
 	idBrushBSPNode *		GetNode( int side ) const { return nodes[side]; }
 
 private:
-	arcPlane					plane;			// portal plane
+	anPlane					plane;			// portal plane
 	int						planeNum;		// number of plane this portal is on
-	arcWinding *				winding;		// portal winding
+	anWinding *				winding;		// portal winding
 	idBrushBSPNode *		nodes[2];		// nodes this portal seperates
 	idBrushBSPPortal *		next[2];		// next portal in list for both nodes
 	int						flags;			// portal flags
@@ -99,12 +99,12 @@ public:
 							idBrushBSPNode( void );
 							~idBrushBSPNode( void );
 	void					SetContentsFromBrushes( void );
-	arcBounds				GetPortalBounds( void );
+	anBounds				GetPortalBounds( void );
 	idBrushBSPNode *		GetChild( int index ) const { return children[index]; }
 	idBrushBSPNode *		GetParent( void ) const { return parent; }
 	void					SetContents( int contents ) { this->contents = contents; }
 	int						GetContents( void ) const { return contents; }
-	const arcPlane &			GetPlane( void ) const { return plane; }
+	const anPlane &			GetPlane( void ) const { return plane; }
 	idBrushBSPPortal *		GetPortals( void ) const { return portals; }
 	void					SetAreaNum( int num ) { areaNum = num; }
 	int						GetAreaNum( void ) const { return areaNum; }
@@ -119,18 +119,18 @@ public:
 							// first recurse down the tree and flood from there
 	void					RemoveFlagRecurseFlood( int flag );
 							// returns side of the plane the node is on
-	int						PlaneSide( const arcPlane &plane, float epsilon = ON_EPSILON ) const;
+	int						PlaneSide( const anPlane &plane, float epsilon = ON_EPSILON ) const;
 							// split the leaf node with a plane
-	bool					Split( const arcPlane &splitPlane, int splitPlaneNum );
+	bool					Split( const anPlane &splitPlane, int splitPlaneNum );
 
 
 private:
-	arcPlane					plane;			// split plane if this is not a leaf node
+	anPlane					plane;			// split plane if this is not a leaf node
 	idBrush *				volume;			// node volume
 	int						contents;		// node contents
 	idBrushList				brushList;		// list with brushes for this node
 	idBrushBSPNode *		parent;			// parent of this node
-	idBrushBSPNode *		children[2];	// both are NULL if this is a leaf node
+	idBrushBSPNode *		children[2];	// both are nullptr if this is a leaf node
 	idBrushBSPPortal *		portals;		// portals of this node
 	int						flags;			// node flags
 	int						areaNum;		// number of the area created for this node
@@ -158,9 +158,9 @@ public:
 							// portalize the bsp tree
 	void					Portalize( void );
 							// remove subspaces outside the map not reachable by entities
-	bool					RemoveOutside( const idMapFile *mapFile, int contents, const arcStringList &classNames );
+	bool					RemoveOutside( const anMapFile *mapFile, int contents, const anStringList &classNames );
 							// write file with a trace going through a leak
-	void					LeakFile( const arcNetString &fileName );
+	void					LeakFile( const anString &fileName );
 							// try to merge portals
 	void					MergePortals( int skipContents );
 							// try to merge the two leaf nodes at either side of the portal
@@ -169,16 +169,16 @@ public:
 							// melt portal windings
 	void					MeltPortals( int skipContents );
 							// write a map file with a brush for every leaf node that has the given contents
-	void					WriteBrushMap( const arcNetString &fileName, const arcNetString &ext, int contents );
+	void					WriteBrushMap( const anString &fileName, const anString &ext, int contents );
 							// bounds for the whole tree
-	const arcBounds &		GetTreeBounds( void ) const { return treeBounds; }
+	const anBounds &		GetTreeBounds( void ) const { return treeBounds; }
 							// root node of the tree
 	idBrushBSPNode *		GetRootNode( void ) const { return root; }
 
 private:
 	idBrushBSPNode *		root;
 	idBrushBSPNode *		outside;
-	arcBounds				treeBounds;
+	anBounds				treeBounds;
 	aRcPlaneSet				portalPlanes;
 	int						numGridCells;
 	int						numSplits;
@@ -190,7 +190,7 @@ private:
 	int						insideLeafNodes;
 	int						numMergedPortals;
 	int						numInsertedPoints;
-	arcVec3					leakOrigin;
+	anVec3					leakOrigin;
 	int						brushMapContents;
 	idBrushMap *			brushMap;
 
@@ -207,27 +207,27 @@ private:
 	void					SetSplitterUsed( idBrushBSPNode *node, int planeNum );
 	idBrushBSPNode *		BuildBrushBSP_r( idBrushBSPNode *node, const aRcPlaneSet &planeList, bool *testedPlanes, int skipContents );
 	idBrushBSPNode *		ProcessGridCell( idBrushBSPNode *node, int skipContents );
-	void					BuildGrid_r( arcNetList<idBrushBSPNode *> &gridCells, idBrushBSPNode *node );
+	void					BuildGrid_r( anList<idBrushBSPNode *> &gridCells, idBrushBSPNode *node );
 	void					PruneTree_r( idBrushBSPNode *node, int contents );
 	void					MakeOutsidePortals( void );
-	arcWinding *				BaseWindingForNode( idBrushBSPNode *node );
+	anWinding *				BaseWindingForNode( idBrushBSPNode *node );
 	void					MakeNodePortal( idBrushBSPNode *node );
 	void					SplitNodePortals( idBrushBSPNode *node );
 	void					MakeTreePortals_r( idBrushBSPNode *node );
 	void					FloodThroughPortals_r( idBrushBSPNode *node, int contents, int depth );
-	bool					FloodFromOrigin( const arcVec3 &origin, int contents );
-	bool					FloodFromEntities( const idMapFile *mapFile, int contents, const arcStringList &classNames );
+	bool					FloodFromOrigin( const anVec3 &origin, int contents );
+	bool					FloodFromEntities( const anMapFile *mapFile, int contents, const anStringList &classNames );
 	void					RemoveOutside_r( idBrushBSPNode *node, int contents );
 	void					SetPortalPlanes_r( idBrushBSPNode *node, aRcPlaneSet &planeList );
 	void					SetPortalPlanes( void );
 	void					MergePortals_r( idBrushBSPNode *node, int skipContents );
 	void					MergeLeafNodePortals( idBrushBSPNode *node, int skipContents );
-	void					UpdateTreeAfterMerge_r( idBrushBSPNode *node, const arcBounds &bounds, idBrushBSPNode *oldNode, idBrushBSPNode *newNode );
+	void					UpdateTreeAfterMerge_r( idBrushBSPNode *node, const anBounds &bounds, idBrushBSPNode *oldNode, idBrushBSPNode *newNode );
 	void					RemoveLeafNodeColinearPoints( idBrushBSPNode *node );
 	void					RemoveColinearPoints_r( idBrushBSPNode *node, int skipContents );
-	void					MeltFlood_r( idBrushBSPNode *node, int skipContents, arcBounds &bounds, arcVectorSet<arcVec3,3> &vertexList );
-	void					MeltLeafNodePortals( idBrushBSPNode *node, int skipContents, arcVectorSet<arcVec3,3> &vertexList );
-	void					MeltPortals_r( idBrushBSPNode *node, int skipContents, arcVectorSet<arcVec3,3> &vertexList );
+	void					MeltFlood_r( idBrushBSPNode *node, int skipContents, anBounds &bounds, anVectorSet<anVec3,3> &vertexList );
+	void					MeltLeafNodePortals( idBrushBSPNode *node, int skipContents, anVectorSet<anVec3,3> &vertexList );
+	void					MeltPortals_r( idBrushBSPNode *node, int skipContents, anVectorSet<anVec3,3> &vertexList );
 };
 
 #endif /* !__BRUSHBSP_H__ */

@@ -1,3 +1,4 @@
+#include "../Lib.h"
 #ifndef __MATH_ANGLES_H__
 #define __MATH_ANGLES_H__
 
@@ -14,48 +15,52 @@
 #define	PITCH				0		// up / down
 #define	YAW					1		// left / right
 #define	ROLL				2		// fall over
+const int A_ROLL			= 0;
+const int A_PITCH			= 1;
+const int A_YAW				= 2;
 
-class arcVec3;
-class arcQuats;
-class arcRotate;
-class arcMat3;
-class arcMat4;
+class anMath;
+class anVec3;
+class anQuats;
+class anRotation;
+class anMat3;
+class anMat4;
 
-class arcAngles {
+class anAngles {
 public:
 	float			pitch;
 	float			yaw;
 	float			roll;
 
-					arcAngles( void );
-					arcAngles( float pitch, float yaw, float roll );
-					explicit arcAngles( const arcVec3 &v );
+					anAngles( void );
+					anAngles( float pitch, float yaw, float roll );
+					explicit anAngles( const anVec3 &v );
 	float			AngleMod( float a );
 	void 			Set( float pitch, float yaw, float roll );
-	arcAngles &		Zero( void );
+	anAngles &		Zero( void );
 
 	float			operator[]( int index ) const;
 	float &			operator[]( int index );
-	arcAngles		operator-() const;			// negate angles, in general not the inverse rotation
-	arcAngles &		operator=( const arcAngles &a );
-	arcAngles		operator+( const arcAngles &a ) const;
-	arcAngles &		operator+=( const arcAngles &a );
-	arcAngles		operator-( const arcAngles &a ) const;
-	arcAngles &		operator-=( const arcAngles &a );
-	arcAngles		operator*( const float a ) const;
-	arcAngles &		operator*=( const float a );
-	arcAngles		operator/( const float a ) const;
-	arcAngles &		operator/=( const float a );
+	anAngles		operator-() const;			// negate angles, in general not the inverse rotation
+	anAngles &		operator=( const anAngles &a );
+	anAngles		operator+( const anAngles &a ) const;
+	anAngles &		operator+=( const anAngles &a );
+	anAngles		operator-( const anAngles &a ) const;
+	anAngles &		operator-=( const anAngles &a );
+	anAngles		operator*( const float a ) const;
+	anAngles &		operator*=( const float a );
+	anAngles		operator/( const float a ) const;
+	anAngles &		operator/=( const float a );
 
-	friend arcAngles operator*( const float a, const arcAngles &b );
+	friend anAngles operator*( const float a, const anAngles &b );
 
-	bool			Compare( const arcAngles &a ) const;							// exact compare, no epsilon
-	bool			Compare( const arcAngles &a, const float epsilon ) const;	// compare with epsilon
-	bool			operator==(	const arcAngles &a ) const;						// exact compare, no epsilon
-	bool			operator!=(	const arcAngles &a ) const;						// exact compare, no epsilon
+	bool			Compare( const anAngles &a ) const;							// exact compare, no epsilon
+	bool			Compare( const anAngles &a, const float epsilon ) const;	// compare with epsilon
+	bool			operator==(	const anAngles &a ) const;						// exact compare, no epsilon
+	bool			operator!=(	const anAngles &a ) const;						// exact compare, no epsilon
 
-	arcAngles &		Normalize360( void );	// normalizes 'this'
-	arcAngles &		Normalize180( void );	// normalizes 'this'
+	anAngles &		Normalize360( void );	// normalizes 'this'
+	anAngles &		Normalize180( void );	// normalizes 'this'
 
 	static float 	LerpAngle( float from, float to, float frac );
 
@@ -65,63 +70,73 @@ public:
 
 	static float	Subtract( float a1, float a2 );
 
-	void			Clamp( const arcAngles &min, const arcAngles &max );
+	void			Clamp( const anAngles &min, const anAngles &max );
 
 	int				GetDimension( void ) const;
 
-	void			ToVectors( arcVec3 *forward, arcVec3 *right = NULL, arcVec3 *up = NULL ) const;
-	arcVec3			ToForward( void ) const;
-	arcQuats		ToQuat( void ) const;
-	arcRotate ToRotation( void ) const;
-	arcMat3			ToMat3( void ) const;
-	arcMat4			ToMat4( void ) const;
-	arcVec3			ToAngularVelocity( void ) const;
+	void			ToVectors( anVec3 *forward, anVec3 *right = nullptr, anVec3 *up = nullptr ) const;
+	anVec3			ToForward( void ) const;
+	anQuats			ToQuat( void ) const;
+	anRotation 		ToRotation( void ) const;
+	anMat3			ToMat3( void ) const;
+
+	void			ToMat3NoRoll( anMat3 &mat ) const;
+	static anMat3 &	YawToMat3( float yaw, anMat3 &mat );
+	static anMat3 &	PitchToMat3( float pitch, anMat3 &mat );
+	static anMat3 &	RollToMat3( float roll, anMat3 &mat );
+
+	anMat4			ToMat4( void ) const;
+	anVec3			ToAngularVelocity( void ) const;
 
 	const float *	ToFloatPtr( void ) const;
 	float *			ToFloatPtr( void );
 	const char *	ToString( int precision = 2 ) const;
+
+	anMat3			ToMat3Maya( void ) const;
+
+	bool			FixDenormals( float epsilon = anMath::FLT_EPSILON );
 };
 
-extern arcAngles ang_zero;
+extern anAngles ang_zero;
 
-ARC_INLINE arcAngles::arcAngles( void ) {
+ARC_INLINE anAngles::anAngles( void ) {
 }
 
-ARC_INLINE arcAngles::arcAngles( float pitch, float yaw, float roll ) {
+ARC_INLINE anAngles::anAngles( float pitch, float yaw, float roll ) {
 	this->pitch = pitch;
 	this->yaw	= yaw;
 	this->roll	= roll;
 }
 
-ARC_INLINE arcAngles::arcAngles( const arcVec3 &v ) {
+ARC_INLINE anAngles::anAngles( const anVec3 &v ) {
 	this->pitch = v[0];
 	this->yaw	= v[1];
 	this->roll	= v[2];
 }
 
-ARC_INLINE float arcAngles::AngleMod( float a ) {
+ARC_INLINE float anAngles::AngleMod( float a ) {
 	return( ( 360.0f / 65536 ) * ( ( int )( a * ( 65536 / 360.0f ) ) & 65535 ) );
 }
 
-ARC_INLINE void arcAngles::Set( float pitch, float yaw, float roll ) {
+ARC_INLINE void anAngles::Set( float pitch, float yaw, float roll ) {
 	this->pitch = pitch;
 	this->yaw	= yaw;
 	this->roll	= roll;
 }
 
-ARC_INLINE arcAngles &arcAngles::Zero( void ) {
+ARC_INLINE anAngles &anAngles::Zero( void ) {
 	pitch = yaw = roll = 0.0f;
 	return *this;
 }
 
-ARC_INLINE float arcAngles::AngleNormalize360( float angle ) {
+ARC_INLINE float anAngles::AngleNormalize360( float angle ) {
 	if ( ( angle >= 360.0f ) || ( angle < 0.0f ) ) {
 		angle -= floor( angle / 360.0f ) * 360.0f;
 	}
 	return angle;
 }
 
-ARC_INLINE float arcAngles::AngleNormalize180( float angle ) {
+ARC_INLINE float anAngles::AngleNormalize180( float angle ) {
 	angle = AngleNormalize360( angle );
 	if ( angle > 180.0f ) {
 		angle -= 360.0f;
@@ -129,36 +144,36 @@ ARC_INLINE float arcAngles::AngleNormalize180( float angle ) {
 	return angle;
 }
 
-ARC_INLINE float arcAngles::AngleDelta( float angle1, float angle2 ) {
+ARC_INLINE float anAngles::AngleDelta( float angle1, float angle2 ) {
 	return AngleNormalize180( angle1 - angle2 );
 }
 
-ARC_INLINE float arcAngles::operator[]( int index ) const {
+ARC_INLINE float anAngles::operator[]( int index ) const {
 	assert( ( index >= 0 ) && ( index < 3 ) );
 	return ( &pitch )[index];
 }
 
-ARC_INLINE float &arcAngles::operator[]( int index ) {
+ARC_INLINE float &anAngles::operator[]( int index ) {
 	assert( ( index >= 0 ) && ( index < 3 ) );
 	return ( &pitch )[index];
 }
 
-ARC_INLINE arcAngles arcAngles::operator-() const {
-	return arcAngles( -pitch, -yaw, -roll );
+ARC_INLINE anAngles anAngles::operator-() const {
+	return anAngles( -pitch, -yaw, -roll );
 }
 
-ARC_INLINE arcAngles &arcAngles::operator=( const arcAngles &a ) {
+ARC_INLINE anAngles &anAngles::operator=( const anAngles &a ) {
 	pitch	= a.pitch;
 	yaw		= a.yaw;
 	roll	= a.roll;
 	return *this;
 }
 
-ARC_INLINE arcAngles arcAngles::operator+( const arcAngles &a ) const {
-	return arcAngles( pitch + a.pitch, yaw + a.yaw, roll + a.roll );
+ARC_INLINE anAngles anAngles::operator+( const anAngles &a ) const {
+	return anAngles( pitch + a.pitch, yaw + a.yaw, roll + a.roll );
 }
 
-ARC_INLINE arcAngles& arcAngles::operator+=( const arcAngles &a ) {
+ARC_INLINE anAngles& anAngles::operator+=( const anAngles &a ) {
 	pitch	+= a.pitch;
 	yaw		+= a.yaw;
 	roll	+= a.roll;
@@ -166,11 +181,11 @@ ARC_INLINE arcAngles& arcAngles::operator+=( const arcAngles &a ) {
 	return *this;
 }
 
-ARC_INLINE arcAngles arcAngles::operator-( const arcAngles &a ) const {
-	return arcAngles( pitch - a.pitch, yaw - a.yaw, roll - a.roll );
+ARC_INLINE anAngles anAngles::operator-( const anAngles &a ) const {
+	return anAngles( pitch - a.pitch, yaw - a.yaw, roll - a.roll );
 }
 
-ARC_INLINE arcAngles& arcAngles::operator-=( const arcAngles &a ) {
+ARC_INLINE anAngles& anAngles::operator-=( const anAngles &a ) {
 	pitch	-= a.pitch;
 	yaw		-= a.yaw;
 	roll	-= a.roll;
@@ -178,23 +193,23 @@ ARC_INLINE arcAngles& arcAngles::operator-=( const arcAngles &a ) {
 	return *this;
 }
 
-ARC_INLINE arcAngles arcAngles::operator*( const float a ) const {
-	return arcAngles( pitch * a, yaw * a, roll * a );
+ARC_INLINE anAngles anAngles::operator*( const float a ) const {
+	return anAngles( pitch * a, yaw * a, roll * a );
 }
 
-ARC_INLINE arcAngles& arcAngles::operator*=( float a ) {
+ARC_INLINE anAngles& anAngles::operator*=( float a ) {
 	pitch	*= a;
 	yaw		*= a;
 	roll	*= a;
 	return *this;
 }
 
-ARC_INLINE arcAngles arcAngles::operator/( const float a ) const {
+ARC_INLINE anAngles anAngles::operator/( const float a ) const {
 	float inva = 1.0f / a;
-	return arcAngles( pitch * inva, yaw * inva, roll * inva );
+	return anAngles( pitch * inva, yaw * inva, roll * inva );
 }
 
-ARC_INLINE arcAngles& arcAngles::operator/=( float a ) {
+ARC_INLINE anAngles& anAngles::operator/=( float a ) {
 	float inva = 1.0f / a;
 	pitch	*= inva;
 	yaw		*= inva;
@@ -202,39 +217,39 @@ ARC_INLINE arcAngles& arcAngles::operator/=( float a ) {
 	return *this;
 }
 
-ARC_INLINE arcAngles operator*( const float a, const arcAngles &b ) {
-	return arcAngles( a * b.pitch, a * b.yaw, a * b.roll );
+ARC_INLINE anAngles operator*( const float a, const anAngles &b ) {
+	return anAngles( a * b.pitch, a * b.yaw, a * b.roll );
 }
 
-ARC_INLINE bool arcAngles::Compare( const arcAngles &a ) const {
+ARC_INLINE bool anAngles::Compare( const anAngles &a ) const {
 	return ( ( a.pitch == pitch ) && ( a.yaw == yaw ) && ( a.roll == roll ) );
 }
 
-ARC_INLINE bool arcAngles::Compare( const arcAngles &a, const float epsilon ) const {
-	if ( arcMath::Fabs( pitch - a.pitch ) > epsilon ) {
+ARC_INLINE bool anAngles::Compare( const anAngles &a, const float epsilon ) const {
+	if ( anMath::Fabs( pitch - a.pitch ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( yaw - a.yaw ) > epsilon ) {
+	if ( anMath::Fabs( yaw - a.yaw ) > epsilon ) {
 		return false;
 	}
 
-	if ( arcMath::Fabs( roll - a.roll ) > epsilon ) {
+	if ( anMath::Fabs( roll - a.roll ) > epsilon ) {
 		return false;
 	}
 
 	return true;
 }
 
-ARC_INLINE bool arcAngles::operator==( const arcAngles &a ) const {
+ARC_INLINE bool anAngles::operator==( const anAngles &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool arcAngles::operator!=( const arcAngles &a ) const {
+ARC_INLINE bool anAngles::operator!=( const anAngles &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void arcAngles::Clamp( const arcAngles &min, const arcAngles &max ) {
+ARC_INLINE void anAngles::Clamp( const anAngles &min, const anAngles &max ) {
 	if ( pitch < min.pitch ) {
 		pitch = min.pitch;
 	} else if ( pitch > max.pitch ) {
@@ -252,16 +267,68 @@ ARC_INLINE void arcAngles::Clamp( const arcAngles &min, const arcAngles &max ) {
 	}
 }
 
-ARC_INLINE int arcAngles::GetDimension( void ) const {
+ARC_INLINE int anAngles::GetDimension( void ) const {
 	return 3;
 }
 
-ARC_INLINE const float *arcAngles::ToFloatPtr( void ) const {
+ARC_INLINE const float *anAngles::ToFloatPtr( void ) const {
 	return &pitch;
 }
 
-ARC_INLINE float *arcAngles::ToFloatPtr( void ) {
+ARC_INLINE float *anAngles::ToFloatPtr( void ) {
 	return &pitch;
 }
 
+ARC_INLINE anMat3 &anAngles::YawToMat3( float yaw, anMat3 &mat ) {
+	float sy, cy;
+
+	anMath::SinCos( DEG2RAD( yaw ), sy, cy );
+
+	mat[ 0 ].Set( cy, sy, 0 );
+	mat[ 1 ].Set( -sy, cy, 0 );
+	mat[ 2 ].Set( 0, 0, 1 );
+
+	return mat;
+}
+
+ARC_INLINE anMat3 &anAngles::PitchToMat3( float pitch, anMat3 &mat ) {
+	float sp, cp;
+
+	anMath::SinCos( DEG2RAD( pitch ), sp, cp );
+
+	mat[ 0 ].Set( cp, 0, -sp );
+	mat[ 1 ].Set( 0, 1, 0 );
+	mat[ 2 ].Set( sp, 0, cp );
+
+	return mat;
+}
+
+ARC_INLINE anMat3 &anAngles::RollToMat3( float roll, anMat3 &mat ) {
+	float sr, cr;
+
+	anMath::SinCos( DEG2RAD( roll ), sr, cr );
+
+	mat[ 0 ].Set( 1, 0, 0 );
+	mat[ 1 ].Set( 0, cr, sr );
+	mat[ 2 ].Set( 0, -sr, cr );
+
+	return mat;
+}
+
+ARC_INLINE bool anAngles::FixDenormals( float epsilon ) {
+	bool denormal = false;
+	if ( fabs( yaw ) < epsilon ) {
+		yaw = 0.0f;
+		denormal = true;
+	}
+	if ( fabs( pitch ) < epsilon ) {
+		pitch = 0.0f;
+		denormal = true;
+	}
+	if ( fabs( roll ) < epsilon ) {
+		roll = 0.0f;
+		denormal = true;
+	}
+	return denormal;
+}
 #endif

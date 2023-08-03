@@ -11,169 +11,169 @@
 */
 
 
-class arcAngles;
-class arcQuats;
-class arcMat3;
+class anAngles;
+class anQuats;
+class anMat3;
 
-class arcRotate {
+class anRotation {
 
-	friend class arcAngles;
-	friend class arcQuats;
-	friend class arcMat3;
+	friend class anAngles;
+	friend class anQuats;
+	friend class anMat3;
 
 public:
-						arcRotate( void );
-						arcRotate( const arcVec3 &rotationOrigin, const arcVec3 &rotationVec, const float rotationAngle );
+						anRotation( void );
+						anRotation( const anVec3 &rotationOrigin, const anVec3 &rotationVec, const float rotationAngle );
 
-	void				Set( const arcVec3 &rotationOrigin, const arcVec3 &rotationVec, const float rotationAngle );
-	void				SetOrigin( const arcVec3 &rotationOrigin );
-	void				SetVec( const arcVec3 &rotationVec );					// has to be normalized
+	void				Set( const anVec3 &rotationOrigin, const anVec3 &rotationVec, const float rotationAngle );
+	void				SetOrigin( const anVec3 &rotationOrigin );
+	void				SetVec( const anVec3 &rotationVec );					// has to be normalized
 	void				SetVec( const float x, const float y, const float z );	// has to be normalized
 	void				SetAngle( const float rotationAngle );
 	void				Scale( const float s );
 	void				ReCalculateMatrix( void );
-	const arcVec3 &		GetOrigin( void ) const;
-	const arcVec3 &		GetVec( void ) const;
+	const anVec3 &		GetOrigin( void ) const;
+	const anVec3 &		GetVec( void ) const;
 	float				GetAngle( void ) const;
 
-	arcRotate			operator-() const;										// flips rotation
-	arcRotate			operator*( const float s ) const;						// scale rotation
-	arcRotate			operator/( const float s ) const;						// scale rotation
-	arcRotate &			operator*=( const float s );							// scale rotation
-	arcRotate &			operator/=( const float s );							// scale rotation
-	arcVec3				operator*( const arcVec3 &v ) const;					// rotate vector
+	anRotation			operator-() const;										// flips rotation
+	anRotation			operator*( const float s ) const;						// scale rotation
+	anRotation			operator/( const float s ) const;						// scale rotation
+	anRotation &			operator*=( const float s );							// scale rotation
+	anRotation &			operator/=( const float s );							// scale rotation
+	anVec3				operator*( const anVec3 &v ) const;					// rotate vector
 
-	friend arcRotate	operator*( const float s, const arcRotate &r );			// scale rotation
-	friend arcVec3		operator*( const arcVec3 &v, const arcRotate &r );		// rotate vector
-	friend arcVec3 &	operator*=( arcVec3 &v, const arcRotate &r );			// rotate vector
+	friend anRotation	operator*( const float s, const anRotation &r );			// scale rotation
+	friend anVec3		operator*( const anVec3 &v, const anRotation &r );		// rotate vector
+	friend anVec3 &	operator*=( anVec3 &v, const anRotation &r );			// rotate vector
 
-	arcAngles			ToAngles( void ) const;
-	arcQuats			ToQuat( void ) const;
-	const arcMat3 &		ToMat3( void ) const;
-	arcMat4				ToMat4( void ) const;
-	arcVec3				ToAngularVelocity( void ) const;
+	anAngles			ToAngles( void ) const;
+	anQuats			ToQuat( void ) const;
+	const anMat3 &		ToMat3( void ) const;
+	anMat4				ToMat4( void ) const;
+	anVec3				ToAngularVelocity( void ) const;
 
-	void				RotatePoint( arcVec3 &point ) const;
+	void				RotatePoint( anVec3 &point ) const;
 
 	void				Normalize180( void );
 	void				Normalize360( void );
 
 private:
-	arcVec3				origin;			// origin of rotation
-	arcVec3				vec;			// normalized vector to rotate around
+	anVec3				origin;			// origin of rotation
+	anVec3				vec;			// normalized vector to rotate around
 	float				angle;			// angle of rotation in degrees
-	mutable arcMat3		axis;			// rotation axis
+	mutable anMat3		axis;			// rotation axis
 	mutable bool		axisValid;		// true if rotation axis is valid
 };
 
 
-ARC_INLINE arcRotate::arcRotate( void ) {
+ARC_INLINE anRotation::anRotation( void ) {
 }
 
-ARC_INLINE arcRotate::arcRotate( const arcVec3 &rotationOrigin, const arcVec3 &rotationVec, const float rotationAngle ) {
+ARC_INLINE anRotation::anRotation( const anVec3 &rotationOrigin, const anVec3 &rotationVec, const float rotationAngle ) {
 	origin = rotationOrigin;
 	vec = rotationVec;
 	angle = rotationAngle;
 	axisValid = false;
 }
 
-ARC_INLINE void arcRotate::Set( const arcVec3 &rotationOrigin, const arcVec3 &rotationVec, const float rotationAngle ) {
+ARC_INLINE void anRotation::Set( const anVec3 &rotationOrigin, const anVec3 &rotationVec, const float rotationAngle ) {
 	origin = rotationOrigin;
 	vec = rotationVec;
 	angle = rotationAngle;
 	axisValid = false;
 }
 
-ARC_INLINE void arcRotate::SetOrigin( const arcVec3 &rotationOrigin ) {
+ARC_INLINE void anRotation::SetOrigin( const anVec3 &rotationOrigin ) {
 	origin = rotationOrigin;
 }
 
-ARC_INLINE void arcRotate::SetVec( const arcVec3 &rotationVec ) {
+ARC_INLINE void anRotation::SetVec( const anVec3 &rotationVec ) {
 	vec = rotationVec;
 	axisValid = false;
 }
 
-ARC_INLINE void arcRotate::SetVec( float x, float y, float z ) {
+ARC_INLINE void anRotation::SetVec( float x, float y, float z ) {
 	vec[0] = x;
 	vec[1] = y;
 	vec[2] = z;
 	axisValid = false;
 }
 
-ARC_INLINE void arcRotate::SetAngle( const float rotationAngle ) {
+ARC_INLINE void anRotation::SetAngle( const float rotationAngle ) {
 	angle = rotationAngle;
 	axisValid = false;
 }
 
-ARC_INLINE void arcRotate::Scale( const float s ) {
+ARC_INLINE void anRotation::Scale( const float s ) {
 	angle *= s;
 	axisValid = false;
 }
 
-ARC_INLINE void arcRotate::ReCalculateMatrix( void ) {
+ARC_INLINE void anRotation::ReCalculateMatrix( void ) {
 	axisValid = false;
 	ToMat3();
 }
 
-ARC_INLINE const arcVec3 &arcRotate::GetOrigin( void ) const {
+ARC_INLINE const anVec3 &anRotation::GetOrigin( void ) const {
 	return origin;
 }
 
-ARC_INLINE const arcVec3 &arcRotate::GetVec( void ) const  {
+ARC_INLINE const anVec3 &anRotation::GetVec( void ) const  {
 	return vec;
 }
 
-ARC_INLINE float arcRotate::GetAngle( void ) const  {
+ARC_INLINE float anRotation::GetAngle( void ) const  {
 	return angle;
 }
 
-ARC_INLINE arcRotate arcRotate::operator-() const {
-	return arcRotate( origin, vec, -angle );
+ARC_INLINE anRotation anRotation::operator-() const {
+	return anRotation( origin, vec, -angle );
 }
 
-ARC_INLINE arcRotate arcRotate::operator*( const float s ) const {
-	return arcRotate( origin, vec, angle * s );
+ARC_INLINE anRotation anRotation::operator*( const float s ) const {
+	return anRotation( origin, vec, angle * s );
 }
 
-ARC_INLINE arcRotate arcRotate::operator/( const float s ) const {
+ARC_INLINE anRotation anRotation::operator/( const float s ) const {
 	assert( s != 0.0f );
-	return arcRotate( origin, vec, angle / s );
+	return anRotation( origin, vec, angle / s );
 }
 
-ARC_INLINE arcRotate &arcRotate::operator*=( const float s ) {
+ARC_INLINE anRotation &anRotation::operator*=( const float s ) {
 	angle *= s;
 	axisValid = false;
 	return *this;
 }
 
-ARC_INLINE arcRotate &arcRotate::operator/=( const float s ) {
+ARC_INLINE anRotation &anRotation::operator/=( const float s ) {
 	assert( s != 0.0f );
 	angle /= s;
 	axisValid = false;
 	return *this;
 }
 
-ARC_INLINE arcVec3 arcRotate::operator*( const arcVec3 &v ) const {
+ARC_INLINE anVec3 anRotation::operator*( const anVec3 &v ) const {
 	if ( !axisValid ) {
 		ToMat3();
 	}
 	return ( ( v - origin) * axis + origin);
 }
 
-ARC_INLINE arcRotate operator*( const float s, const arcRotate &r ) {
+ARC_INLINE anRotation operator*( const float s, const anRotation &r ) {
 	return r * s;
 }
 
-ARC_INLINE arcVec3 operator*( const arcVec3 &v, const arcRotate &r ) {
+ARC_INLINE anVec3 operator*( const anVec3 &v, const anRotation &r ) {
 	return r * v;
 }
 
-ARC_INLINE arcVec3 &operator*=( arcVec3 &v, const arcRotate &r ) {
+ARC_INLINE anVec3 &operator*=( anVec3 &v, const anRotation &r ) {
 	v = r * v;
 	return v;
 }
 
-ARC_INLINE void arcRotate::RotatePoint( arcVec3 &point ) const {
+ARC_INLINE void anRotation::RotatePoint( anVec3 &point ) const {
 	if ( !axisValid ) {
 		ToMat3();
 	}

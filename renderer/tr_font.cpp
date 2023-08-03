@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -14,7 +14,7 @@
 #define _CEIL(x)   (((x)+63) & -64)
 #define _TRUNC(x)  ((x) >> 6)
 
-FT_Library ftLibrary = NULL;
+FT_Library ftLibrary = nullptr;
 #endif
 
 
@@ -75,7 +75,7 @@ FT_Bitmap *R_RenderGlyph( FT_GlyphSlot glyph, glyphInfo_t* glyphOut ) {
 	} else {
 		common->Printf( "Non-outline fonts are not supported\n" );
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -88,11 +88,11 @@ glyphInfo_t *RE_ConstructGlyphInfo( unsigned char *imageOut, int *xOut, int *yOu
 	static glyphInfo_t glyph;
 	unsigned char *src, *dst;
 	float scaledWidth, scaledHeight;
-	FT_Bitmap *bitmap = NULL;
+	FT_Bitmap *bitmap = nullptr;
 
 	memset(&glyph, 0, sizeof(glyphInfo_t) );
 	// make sure everything is here
-	if (face != NULL) {
+	if (face != nullptr ) {
 		FT_Load_Glyph(face, FT_Get_Char_Index( face, c), FT_LOAD_DEFAULT );
 		bitmap = R_RenderGlyph(face->glyph, &glyph);
 		if (bitmap) {
@@ -114,9 +114,9 @@ glyphInfo_t *RE_ConstructGlyphInfo( unsigned char *imageOut, int *xOut, int *yOu
 /*
 		// need to convert to power of 2 sizes so we do not get
 		// any scaling from the gl upload
-		for (scaledWidth = 1; scaledWidth < glyph.pitch; scaledWidth<<=1 )
+		for ( scaledWidth = 1; scaledWidth < glyph.pitch; scaledWidth<<=1 )
 			;
-		for (scaledHeight = 1; scaledHeight < glyph.height; scaledHeight<<=1 )
+		for ( scaledHeight = 1; scaledHeight < glyph.height; scaledHeight<<=1 )
 			;
 */
 
@@ -153,7 +153,7 @@ glyphInfo_t *RE_ConstructGlyphInfo( unsigned char *imageOut, int *xOut, int *yOu
 				unsigned char *_dst = dst;
 				unsigned char mask = 0x80;
 				unsigned char val = *_src;
-				for (j = 0; j < glyph.pitch; j++ ) {
+				for ( j = 0; j < glyph.pitch; j++ ) {
 					if (mask == 0x80) {
 						val = *_src++;
 					}
@@ -239,250 +239,6 @@ float readFloat( void ) {
 
 /*
 ============
-RegisterFont
-
-Loads 3 point sizes, 12, 24, and 48
-============
-*/
-bool ARCRenderEngineLocal::RegisterFont( const char *fontName, fontInfoEx_t &font ) {
-#ifdef BUILD_FREETYPE
-	FT_Face face;
-	int j, k, xOut, yOut, lastStart, imageNumber;
-	int scaledSize, newSize, maxHeight, left, satLevels;
-	unsigned char *out, *imageBuff;
-	glyphInfo_t *glyph;
-	ARCImage *image;
-	arcMaterial *h;
-	float max;
-#endif
-	void *faceData;
-	ARC_TIME_T ftime;
-	int i, len, fontCount;
-	char name[1024];
-
-	int pointSize = 12;
-/*
-	if ( registeredFontCount >= MAX_FONTS ) {
-		common->Warning( "RegisterFont: Too many fonts registered already." );
-		return false;
-	}
-
-	int pointSize = 12;
-	arcNetString::snPrintf( name, sizeof( name ), "%s/fontImage_%i.dat", fontName, pointSize );
-	for ( i = 0; i < registeredFontCount; i++ ) {
-		if ( arcNetString::Icmp(name, registeredFont[i].fontInfoS.name) == 0 ) {
-			memcpy( &font, &registeredFont[i], sizeof( fontInfoEx_t ) );
-			return true;
-		}
-	}
-*/
-
-	memset( &font, 0, sizeof( font ) );
-
-	for ( fontCount = 0; fontCount < 3; fontCount++ ) {
-		if ( fontCount == 0 ) {
-			pointSize = 12;
-		} else if ( fontCount == 1 ) {
-			pointSize = 24;
-		} else {
-			pointSize = 48;
-		}
-		// we also need to adjust the scale based on point size relative to 48 points as the ui scaling is based on a 48 point font
-		float glyphScale = 1.0f; 		// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
-		glyphScale *= 48.0f / pointSize;
-
-		arcNetString::snPrintf( name, sizeof( name ), "%s/fontImage_%i.dat", fontName, pointSize );
-
-		fontInfo_t *outFont;
-		if ( fontCount == 0 ) {
-			outFont = &font.fontInfoS;
-		} else if ( fontCount == 1 ) {
-			outFont = &font.fontInfoM;
-		} else {
-			outFont = &font.fontInfoXL;
-		}
-
-		arcNetString::Copynz( outFont->name, name, sizeof( outFont->name ) );
-
-		len = fileSystem->ReadFile( name, NULL, &ftime );
-		if ( len != sizeof( fontInfo_t ) ) {
-			common->Warning( "RegisterFont: couldn't find font: '%s'", name );
-			return false;
-		}
-
-		fileSystem->ReadFile( name, &faceData, &ftime );
-		fdOffset = 0;
-		fdFile = reinterpret_cast<unsigned char*>(faceData);
-		for ( i = 0; i < GLYPHS_PER_FONT; i++ ) {
-			outFont->glyphs[i].height		= readInt();
-			outFont->glyphs[i].top			= readInt();
-			outFont->glyphs[i].bottom		= readInt();
-			outFont->glyphs[i].pitch		= readInt();
-			outFont->glyphs[i].xSkip		= readInt();
-			outFont->glyphs[i].imageWidth	= readInt();
-			outFont->glyphs[i].imageHeight	= readInt();
-			outFont->glyphs[i].s			= readFloat();
-			outFont->glyphs[i].t			= readFloat();
-			outFont->glyphs[i].s2			= readFloat();
-			outFont->glyphs[i].t2			= readFloat();
-			int junk /* font.glyphs[i].glyph */		= readInt();
-			//FIXME: the +6, -6 skips the embedded fonts/
-			memcpy( outFont->glyphs[i].shaderName, &fdFile[fdOffset + 6], 32 - 6 );
-			fdOffset += 32;
-		}
-		outFont->glyphScale = readFloat();
-
-		int mw = 0;
-		int mh = 0;
-		for ( i = GLYPH_START; i < GLYPH_END; i++ ) {
-			arcNetString::snPrintf(name, sizeof( name ), "%s/%s", fontName, outFont->glyphs[i].shaderName);
-			outFont->glyphs[i].glyph = declManager->FindMaterial( name );
-			outFont->glyphs[i].glyph->SetSort( SS_GUI );
-			if (mh < outFont->glyphs[i].height) {
-				mh = outFont->glyphs[i].height;
-			}
-			if (mw < outFont->glyphs[i].xSkip) {
-				mw = outFont->glyphs[i].xSkip;
-			}
-		}
-		if (fontCount == 0 ) {
-			font.maxHeightS = mw;
-			font.maxHeightS = mh;
-		} else if (fontCount == 1 ) {
-			font.maxWidthMedium = mw;
-			font.maxHeightMedium = mh;
-		} else {
-			font.maxWidthXL = mw;
-			font.maxHeighXL = mh;
-		}
-		fileSystem->FreeFile( faceData );
-	}
-
-	//memcpy( &registeredFont[registeredFontCount++], &font, sizeof( fontInfoEx_t ) );
-
-	return true ;
-
-#ifndef BUILD_FREETYPE
-    common->Warning( "RegisterFont: couldn't load FreeType code %s", name );
-#else
-
-	if (ftLibrary == NULL) {
-		common->Warning( "RegisterFont: FreeType not initialized." );
-		return;
-	}
-
-	len = fileSystem->ReadFile(fontName, &faceData, &ftime);
-	if ( len <= 0 ) {
-		common->Warning( "RegisterFont: Unable to read font file" );
-		return;
-	}
-
-	// allocate on the stack first in case we fail
-	if ( FT_New_Memory_Face( ftLibrary, faceData, len, 0, &face ) ) {
-		common->Warning( "RegisterFont: FreeType2, unable to allocate new face." );
-		return;
-	}
-
-	if ( FT_Set_Char_Size( face, pointSize << 6, pointSize << 6, dpi, dpi) ) {
-		common->Warning( "RegisterFont: FreeType2, Unable to set face char size." );
-		return;
-	}
-
-	// font = registeredFonts[registeredFontCount++];
-
-	// make a 256x256 image buffer, once it is full, register it, clean it and keep going
-	// until all glyphs are rendered
-
-	out = Mem_Alloc( 1024*1024 );
-	if ( out == NULL ) {
-		common->Warning( "RegisterFont: Mem_Alloc failure during output image creation." );
-		return;
-	}
-	memset( out, 0, 1024*1024 );
-
-	maxHeight = 0;
-
-	for ( i = GLYPH_START; i < GLYPH_END; i++ ) {
-		glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qtrue);
-	}
-
-	xOut = 0;
-	yOut = 0;
-	i = GLYPH_START;
-	lastStart = i;
-	imageNumber = 0;
-
-	while ( i <= GLYPH_END ) {
-		glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qfalse);
-		if (xOut == -1 || yOut == -1 || i == GLYPH_END)  {
-			// ran out of room
-			// we need to create an image from the bitmap, set all the handles in the glyphs to this point
-			//
-
-			scaledSize = 256*256;
-			newSize = scaledSize * 4;
-			imageBuff = Mem_Alloc(newSize);
-			left = 0;
-			max = 0;
-			satLevels = 255;
-			for ( k = 0; k < (scaledSize); k++ ) {
-				if ( max < out[k] ) {
-					max = out[k];
-				}
-			}
-
-			if ( max > 0 ) {
-				max = 255/max;
-			}
-
-			for ( k = 0; k < (scaledSize); k++ ) {
-				imageBuff[left++] = 255;
-				imageBuff[left++] = 255;
-				imageBuff[left++] = 255;
-				imageBuff[left++] = (( float )out[k] * max);
-			}
-
-			arcNetString::snprintf( name, sizeof( name ), "fonts/fontImage_%i_%i.tga", imageNumber++, pointSize );
-			if (r_saveFontData->integer) {
-				R_WriteTGA(name, imageBuff, 256, 256);
-			}
-
-			//arcNetString::snprintf( name, sizeof( name ), "fonts/fontImage_%i_%i", imageNumber++, pointSize );
-			image = R_CreateImage(name, imageBuff, 256, 256, qfalse, qfalse, GL_CLAMP);
-			h = RE_RegisterShaderFromImage(name, LIGHTMAP_2D, image, qfalse);
-			for (j = lastStart; j < i; j++ ) {
-				font.glyphs[j].glyph = h;
-				arcNetString::Copynz( font.glyphs[j].shaderName, name, sizeof( font.glyphs[j].shaderName ) );
-			}
-			lastStart = i;
-			memset( out, 0, 1024*1024 );
-			xOut = 0;
-			yOut = 0;
-			Mem_Free( imageBuff );
-			i++;
-		} else {
-			memcpy( &font.glyphs[i], glyph, sizeof( glyphInfo_t ) );
-			i++;
-		}
-	}
-
-	registeredFont[registeredFontCount].glyphScale = glyphScale;
-	font.glyphScale = glyphScale;
-	memcpy( &registeredFont[registeredFontCount++], &font, sizeof( fontInfo_t ) );
-
-	if ( r_saveFontData->integer ) {
-		fileSystem->WriteFile( va( "fonts/fontImage_%i.dat", pointSize), &font, sizeof( fontInfo_t ) );
-	}
-
-	Mem_Free( out );
-
-	fileSystem->FreeFile( faceData );
-#endif
-	return true;
-}
-
-/*
-============
 R_InitFreeType
 ============
 */
@@ -504,7 +260,7 @@ void R_DoneFreeType( void ) {
 #ifdef BUILD_FREETYPE
 	if ( ftLibrary ) {
 		FT_Done_FreeType( ftLibrary );
-		ftLibrary = NULL;
+		ftLibrary = nullptr;
 	}
 #endif
 //	registeredFontCount = 0;

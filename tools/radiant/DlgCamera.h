@@ -43,7 +43,7 @@ class CDlgCamera : public CDialog
 {
 // Construction
 public:
-	CDlgCamera(CWnd* pParent = NULL);   // standard constructor
+	CDlgCamera(CWnd* pParent = nullptr );   // standard constructor
 	void setupFromCamera();
 
 // Dialog Data

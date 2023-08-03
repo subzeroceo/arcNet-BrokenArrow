@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "MaterialDocManager.h"
@@ -37,7 +37,7 @@ If you have questions concerning this license or the applicable additional terms
 * Constructor for MaterialDocManager.
 */
 MaterialDocManager::MaterialDocManager( void ) {
-	currentMaterial = NULL;
+	currentMaterial = nullptr;
 	cutMaterial = false;
 }
 
@@ -73,7 +73,7 @@ void MaterialDocManager::UnRegisterMaterialView(MaterialView* view) {
 	materialViews.Remove(view);
 
 	//Remove the reference to myself
-	view->SetMaterialDocManager(NULL);
+	view->SetMaterialDocManager(nullptr );
 }
 
 /**
@@ -85,7 +85,7 @@ void MaterialDocManager::UnRegisterAllMaterialViews() {
 	//Remove the reference to myself
 	int c = materialViews.Num();
 	for ( int i = 0; i < c; i++ ) {
-		materialViews[i]->SetMaterialDocManager(NULL);
+		materialViews[i]->SetMaterialDocManager(nullptr );
 	}
 	materialViews.Clear();
 }
@@ -94,14 +94,14 @@ void MaterialDocManager::UnRegisterAllMaterialViews() {
 * Tells the MaterialDocManager which material has been selected for editing.
 * @param material The material that has been selected.
 */
-void MaterialDocManager::SetSelectedMaterial(arcMaterial* material) {
+void MaterialDocManager::SetSelectedMaterial(anMaterial* material) {
 
 	bool change = false;
 
 	//Do we need to change the material
 	if (material) {
 		if (currentMaterial) {
-			if (strcmp(material->GetName(), currentMaterial->renderMaterial->GetName() )) {
+			if (strcmp(material->GetName(), currentMaterial->renderMaterial->GetName() ) ) {
 				change = true;
 			}
 		} else {
@@ -118,9 +118,9 @@ void MaterialDocManager::SetSelectedMaterial(arcMaterial* material) {
 		if (currentMaterial) {
 
 			//Delete the material unless it has been changed
-			if ( !inProgressMaterials.Get(currentMaterial->name.c_str() )) {
+			if ( !inProgressMaterials.Get(currentMaterial->name.c_str() ) ) {
 				delete currentMaterial;
-				currentMaterial = NULL;
+				currentMaterial = nullptr;
 			}
 		}
 
@@ -197,7 +197,7 @@ void MaterialDocManager::AddMaterial(const char* name, const char* filename, con
 	newDoc->manager = this;
 	newDoc->modified = true;
 
-	arcMaterial* rendMat = (arcMaterial*)declManager->CreateNewDecl(DECL_MATERIAL, name, filename);
+	anMaterial* rendMat = (anMaterial*)declManager->CreateNewDecl(DECL_MATERIAL, name, filename);
 
 	if (sourceText) {
 		rendMat->SetText(sourceText);
@@ -227,7 +227,7 @@ void MaterialDocManager::RedoAddMaterial(const char* name, bool clearData) {
 	newDoc->manager = this;
 	newDoc->modified = true;
 
-	arcMaterial* rendMat = const_cast<arcMaterial *>(declManager->FindMaterial(name, false) );
+	anMaterial* rendMat = const_cast<anMaterial *>(declManager->FindMaterial(name, false) );
 
 	if (clearData) {
 		rendMat->SetText(rendMat->DefaultDefinition() );
@@ -318,7 +318,7 @@ void MaterialDocManager::SaveFile(const char* filename) {
 	}
 
 	//Notify everyone
-	NotifyViews(NULL, MATERIAL_SAVE_FILE, filename);
+	NotifyViews(nullptr, MATERIAL_SAVE_FILE, filename);
 }
 
 /**
@@ -356,7 +356,7 @@ void MaterialDocManager::ReloadFile(const char *filename) {
 		NotifyViews(currentMaterial, SELECTION_CHANGE);
 	}
 
-	NotifyViews(NULL, FILE_RELOAD, filename);
+	NotifyViews(nullptr, FILE_RELOAD, filename);
 }
 
 /**
@@ -366,8 +366,8 @@ void MaterialDocManager::ReloadFile(const char *filename) {
 */
 MaterialDoc* MaterialDocManager::CreateMaterialDoc(const char* materialName) {
 
-	const arcMaterial* material = declManager->FindMaterial(materialName);
-	return CreateMaterialDoc(const_cast<arcMaterial *>(material) );
+	const anMaterial* material = declManager->FindMaterial(materialName);
+	return CreateMaterialDoc(const_cast<anMaterial *>(material) );
 }
 
 /**
@@ -375,14 +375,14 @@ MaterialDoc* MaterialDocManager::CreateMaterialDoc(const char* materialName) {
 * object already exists then it is used.
 * @param material The material for which to create a MaterialDoc object.
 */
-MaterialDoc* MaterialDocManager::CreateMaterialDoc(arcMaterial* material) {
+MaterialDoc* MaterialDocManager::CreateMaterialDoc(anMaterial* material) {
 
 	MaterialDoc* existingDoc = GetInProgressDoc(material);
 	if (existingDoc) {
 		return existingDoc;
 	}
 
-	if (currentMaterial && material && !currentMaterial->name.Icmp(material->GetName() )) {
+	if (currentMaterial && material && !currentMaterial->name.Icmp(material->GetName() ) ) {
 		return currentMaterial;
 	}
 
@@ -394,7 +394,7 @@ MaterialDoc* MaterialDocManager::CreateMaterialDoc(arcMaterial* material) {
 		return newDoc;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -402,17 +402,17 @@ MaterialDoc* MaterialDocManager::CreateMaterialDoc(arcMaterial* material) {
 * a MaterialDoc object already exists.
 * @param material The material to check for.
 */
-MaterialDoc* MaterialDocManager::GetInProgressDoc(arcMaterial* material) {
+MaterialDoc* MaterialDocManager::GetInProgressDoc(anMaterial* material) {
 
 	if (material) {
 		for ( int i = 0; i < inProgressMaterials.Num(); i++ ) {
 			MaterialDoc** pDoc = inProgressMaterials.GetIndex( i );
 
-			if ( !(*pDoc)->name.Icmp(material->GetName() ))
+			if ( !(*pDoc)->name.Icmp(material->GetName() ) )
 				return *pDoc;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -447,7 +447,7 @@ bool MaterialDocManager::IsCopyMaterial() {
 /**
 * Returns the name of the material in the copy buffer.
 */
-arcNetString MaterialDocManager::GetCopyMaterialName() {
+anString MaterialDocManager::GetCopyMaterialName() {
 	return copyMaterial;
 }
 
@@ -468,7 +468,7 @@ void MaterialDocManager::PasteMaterial(const char* name, const char* filename) {
 		copyMat->ApplyMaterialChanges();
 	}
 	//Paste the material
-	arcMaterial* material = copyMat->renderMaterial;
+	anMaterial* material = copyMat->renderMaterial;
 
 	//Add a material with the existing source text
 	char *declText = (char *) _alloca( material->GetTextLength() + 1 );
@@ -501,7 +501,7 @@ void MaterialDocManager::CopyStage(MaterialDoc* materialDoc, int stageNum) {
 	copyStageMaterial = materialDoc->name;
 	copyStage = materialDoc->GetStage(stageNum);
 
-	arcNetString stageName = copyStage.stageData.GetString( "name" );
+	anString stageName = copyStage.stageData.GetString( "name" );
 }
 
 /**
@@ -539,7 +539,7 @@ void MaterialDocManager::PasteStage(MaterialDoc* materialDoc) {
 * @param type Holds the type of the stage in the copy buffer.
 * @param name Hold the name of the stage in the copy buffer.
 */
-void MaterialDocManager::GetCopyStageInfo( int& type, arcNetString& name) {
+void MaterialDocManager::GetCopyStageInfo( int& type, anString& name) {
 	if (IsCopyStage() ) {
 		type = copyStage.stageData.GetInt( "stagetype" );
 		name = copyStage.stageData.GetString( "name" );
@@ -655,7 +655,7 @@ void  MaterialDocManager::AddMaterialRedoModifier(MaterialModifier* mod) {
 bool MaterialDocManager::FindMaterial(const char* name, MaterialSearchData_t* searchData, bool checkName) {
 
 	//Fast way of finding the material without parsing
-	const arcMaterial* material = static_cast<const arcMaterial *>(declManager->FindDeclWithoutParsing(DECL_MATERIAL, name, false) );
+	const anMaterial* material = static_cast<const anMaterial *>(declManager->FindDeclWithoutParsing(DECL_MATERIAL, name, false) );
 
 	if (material) {
 
@@ -663,7 +663,7 @@ bool MaterialDocManager::FindMaterial(const char* name, MaterialSearchData_t* se
 
 		if (checkName) {
 			//Check the name
-			arcNetString name = material->GetName();
+			anString name = material->GetName();
 
 			findPos = name.Find(searchData->searchText, false);
 			if (findPos != -1 ) {
@@ -675,7 +675,7 @@ bool MaterialDocManager::FindMaterial(const char* name, MaterialSearchData_t* se
 		char *declText = (char *) _alloca( material->GetTextLength() + 1 );
 		material->GetText( declText );
 
-		arcNetString text = declText;
+		anString text = declText;
 		int start = text.Find( "{" );
 		if (start != -1 ) {
 			text = text.Right(text.Length()-start);
@@ -694,16 +694,16 @@ bool MaterialDocManager::FindMaterial(const char* name, MaterialSearchData_t* se
 * Returns a unique material name given a base name. This is used to resolve materials with the same name.
 * @param name The base name of the material.
 */
-arcNetString MaterialDocManager::GetUniqueMaterialName(arcNetString name) {
+anString MaterialDocManager::GetUniqueMaterialName(anString name) {
 	int num = 0;
 	while(1 ) {
-		arcNetString testName;
+		anString testName;
 		if (num == 0 )
 			testName = name;
 		else
 			testName = va( "%s%d", name.c_str(), num);
 
-		const arcMaterial* mat = declManager->FindMaterial(testName.c_str(), false);
+		const anMaterial* mat = declManager->FindMaterial(testName.c_str(), false);
 		if ( !mat) {
 			return testName;
 		} else {
@@ -729,7 +729,7 @@ void MaterialDocManager::NotifyViews(MaterialDoc* materialDoc, int notifyType, .
 	int c = materialViews.Num();
 	for ( int i = 0; i < c; i++ ) {
 		va_start( argptr, notifyType );
-		switch(notifyType) {
+		switch (notifyType) {
 			case SELECTION_CHANGE:
 				materialViews[i]->MV_OnMaterialSelectionChange(materialDoc);
 				break;
@@ -795,7 +795,7 @@ void MaterialDocManager::NotifyViews(MaterialDoc* materialDoc, int notifyType, .
 void MaterialDocManager::MaterialChanged(MaterialDoc* materialDoc) {
 
 	//Make sure this material is in our list of changed materials
-	if ( !inProgressMaterials.Get(materialDoc->name.c_str() )) {
+	if ( !inProgressMaterials.Get(materialDoc->name.c_str() ) ) {
 		inProgressMaterials.Set(materialDoc->name.c_str(), materialDoc);
 	}
 
@@ -822,7 +822,7 @@ void MaterialDocManager::MaterialSaved(MaterialDoc* materialDoc) {
 	MaterialDoc** tempDoc;
 	if (inProgressMaterials.Get(materialDoc->name.c_str(), &tempDoc) ) {
 
-		arcNetString name = materialDoc->name.c_str();
+		anString name = materialDoc->name.c_str();
 
 		//Remove this file from our in progress list
 		inProgressMaterials.Remove(name.c_str() );

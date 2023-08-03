@@ -4,18 +4,18 @@
 /*
 ===============================================================================
 
-	General hash table. Slower than ARCHashIndex but it can also be used for
+	General hash table. Slower than anHashIndex but it can also be used for
 	linked lists and other data structures than just indexes or arrays.
 
 ===============================================================================
 */
 
-template< class Type >
-class arcHashTable {
+template<class Type>
+class anHashTable {
 public:
-					arcHashTable( int newtablesize = 256 );
-					arcHashTable( const arcHashTable<Type> &map );
-					~arcHashTable( void );
+					anHashTable( int newtablesize = 256 );
+					anHashTable( const anHashTable<Type> &map );
+					~anHashTable( void );
 
 					// returns total size of allocated memory
 	size_t			Allocated( void ) const;
@@ -23,7 +23,7 @@ public:
 	size_t			Size( void ) const;
 
 	void			Set( const char *key, Type &value );
-	bool			Get( const char *key, Type **value = NULL ) const;
+	bool			Get( const char *key, Type **value = nullptr ) const;
 	bool			Remove( const char *key );
 
 	void			Clear( void );
@@ -38,11 +38,11 @@ public:
 
 private:
 	struct hashnode_s {
-		arcNetString		key;
+		anString	key;
 		Type		value;
-		hashnode_s *next;
+		hashnode_s * next;
 
-		hashnode_s( const arcNetString &k, Type v, hashnode_s *n ) : key( k ), value( v ), next( n ) {};
+		hashnode_s( const anString &k, Type v, hashnode_s *n ) : key( k ), value( v ), next( n ) {};
 		hashnode_s( const char *k, Type v, hashnode_s *n ) : key( k ), value( v ), next( n ) {};
 	};
 
@@ -57,13 +57,12 @@ private:
 
 /*
 ================
-arcHashTable<Type>::arcHashTable
+anHashTable<Type>::anHashTable
 ================
 */
-template< class Type >
-ARC_INLINE arcHashTable<Type>::arcHashTable( int newtablesize ) {
-
-	assert( arcMath::IsPowerOfTwo( newtablesize ) );
+template<class Type>
+ARC_INLINE anHashTable<Type>::anHashTable( int newtablesize ) {
+	assert( anMath::IsPowerOfTwo( newtablesize ) );
 
 	tablesize = newtablesize;
 	assert( tablesize > 0 );
@@ -71,38 +70,32 @@ ARC_INLINE arcHashTable<Type>::arcHashTable( int newtablesize ) {
 	heads = new hashnode_s *[ tablesize ];
 	memset( heads, 0, sizeof( *heads ) * tablesize );
 
-	numentries		= 0;
-
+	numentries = 0;
 	tablesizemask = tablesize - 1;
 }
 
 /*
 ================
-arcHashTable<Type>::arcHashTable
+anHashTable<Type>::anHashTable
 ================
 */
-template< class Type >
-ARC_INLINE arcHashTable<Type>::arcHashTable( const arcHashTable<Type> &map ) {
-	int			i;
-	hashnode_s	*node;
-	hashnode_s	**prev;
-
+template<class Type>
+ARC_INLINE anHashTable<Type>::anHashTable( const anHashTable<Type> &map ) {
 	assert( map.tablesize > 0 );
-
 	tablesize		= map.tablesize;
 	heads			= new hashnode_s *[ tablesize ];
 	numentries		= map.numentries;
 	tablesizemask	= map.tablesizemask;
 
-	for ( i = 0; i < tablesize; i++ ) {
-		if ( !map.heads[ i ] ) {
-			heads[ i ] = NULL;
+	for ( int i = 0; i < tablesize; i++ ) {
+		if ( !map.heads[i] ) {
+			heads[i] = nullptr;
 			continue;
 		}
 
-		prev = &heads[ i ];
-		for ( node = map.heads[ i ]; node != NULL; node = node->next ) {
-			*prev = new hashnode_s( node->key, node->value, NULL );
+		hashnode_s **prev = &heads[i];
+		for ( hashnode_s *node = map.heads[i]; node != nullptr; node = node->next ) {
+			*prev = new hashnode_s( node->key, node->value, nullptr );
 			prev = &( *prev )->next;
 		}
 	}
@@ -110,58 +103,56 @@ ARC_INLINE arcHashTable<Type>::arcHashTable( const arcHashTable<Type> &map ) {
 
 /*
 ================
-arcHashTable<Type>::~arcHashTable<Type>
+anHashTable<Type>::~anHashTable<Type>
 ================
 */
-template< class Type >
-ARC_INLINE arcHashTable<Type>::~arcHashTable( void ) {
+template<class Type>
+ARC_INLINE anHashTable<Type>::~anHashTable( void ) {
 	Clear();
 	delete[] heads;
 }
 
 /*
 ================
-arcHashTable<Type>::Allocated
+anHashTable<Type>::Allocated
 ================
 */
-template< class Type >
-ARC_INLINE size_t arcHashTable<Type>::Allocated( void ) const {
+template<class Type>
+ARC_INLINE size_t anHashTable<Type>::Allocated( void ) const {
 	return sizeof( heads ) * tablesize + sizeof( *heads ) * numentries;
 }
 
 /*
 ================
-arcHashTable<Type>::Size
+anHashTable<Type>::Size
 ================
 */
-template< class Type >
-ARC_INLINE size_t arcHashTable<Type>::Size( void ) const {
-	return sizeof( arcHashTable<Type> ) + sizeof( heads ) * tablesize + sizeof( *heads ) * numentries;
+template<class Type>
+ARC_INLINE size_t anHashTable<Type>::Size( void ) const {
+	return sizeof( anHashTable<Type> ) + sizeof( heads ) * tablesize + sizeof( *heads ) * numentries;
 }
 
 /*
 ================
-arcHashTable<Type>::GetHash
+anHashTable<Type>::GetHash
 ================
 */
-template< class Type >
-ARC_INLINE int arcHashTable<Type>::GetHash( const char *key ) const {
-	return ( arcNetString::Hash( key ) & tablesizemask );
+template<class Type>
+ARC_INLINE int anHashTable<Type>::GetHash( const char *key ) const {
+	return ( anString::Hash( key ) & tablesizemask );
 }
 
 /*
 ================
-arcHashTable<Type>::Set
+anHashTable<Type>::Set
 ================
 */
-template< class Type >
-ARC_INLINE void arcHashTable<Type>::Set( const char *key, Type &value ) {
+template<class Type>
+ARC_INLINE void anHashTable<Type>::Set( const char *key, Type &value ) {
 	hashnode_s *node, **nextPtr;
-	int hash, s;
-
-	hash = GetHash( key );
-	for ( nextPtr = &(heads[hash] ), node = *nextPtr; node != NULL; nextPtr = &(node->next), node = *nextPtr ) {
-		s = node->key.Cmp( key );
+	int hash = GetHash( key );
+	for ( hashnode_s **nextPtr = &(heads[hash] ), hashnode_s *node = *nextPtr; node != nullptr; nextPtr = &(node->next), node = *nextPtr ) {
+		int s = node->key.Cmp( key );
 		if ( s == 0 ) {
 			node->value = value;
 			return;
@@ -179,17 +170,14 @@ ARC_INLINE void arcHashTable<Type>::Set( const char *key, Type &value ) {
 
 /*
 ================
-arcHashTable<Type>::Get
+anHashTable<Type>::Get
 ================
 */
-template< class Type >
-ARC_INLINE bool arcHashTable<Type>::Get( const char *key, Type **value ) const {
-	hashnode_s *node;
-	int hash, s;
-
-	hash = GetHash( key );
-	for ( node = heads[ hash ]; node != NULL; node = node->next ) {
-		s = node->key.Cmp( key );
+template<class Type>
+ARC_INLINE bool anHashTable<Type>::Get( const char *key, Type **value ) const {
+	int hash = GetHash( key );
+	for ( hashnode_s *node = heads[ hash ]; node != nullptr; node = node->next ) {
+		int s = node->key.Cmp( key );
 		if ( s == 0 ) {
 			if ( value ) {
 				*value = &node->value;
@@ -202,7 +190,7 @@ ARC_INLINE bool arcHashTable<Type>::Get( const char *key, Type **value ) const {
 	}
 
 	if ( value ) {
-		*value = NULL;
+		*value = nullptr;
 	}
 
 	return false;
@@ -210,26 +198,22 @@ ARC_INLINE bool arcHashTable<Type>::Get( const char *key, Type **value ) const {
 
 /*
 ================
-arcHashTable<Type>::GetIndex
+anHashTable<Type>::GetIndex
 
 the entire contents can be itterated over, but note that the
 exact index for a given element may change when new elements are added
 ================
 */
-template< class Type >
-ARC_INLINE Type *arcHashTable<Type>::GetIndex( int index ) const {
-	hashnode_s	*node;
-	int			count;
-	int			i;
-
+template<class Type>
+ARC_INLINE Type *anHashTable<Type>::GetIndex( int index ) const {
 	if ( ( index < 0 ) || ( index > numentries ) ) {
 		assert( 0 );
-		return NULL;
+		return nullptr;
 	}
 
-	count = 0;
-	for ( i = 0; i < tablesize; i++ ) {
-		for ( node = heads[ i ]; node != NULL; node = node->next ) {
+	int count = 0;
+	for ( int i = 0; i < tablesize; i++ ) {
+		for ( hashnode_s *node = heads[i]; node != nullptr; node = node->next ) {
 			if ( count == index ) {
 				return &node->value;
 			}
@@ -237,25 +221,21 @@ ARC_INLINE Type *arcHashTable<Type>::GetIndex( int index ) const {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-arcHashTable<Type>::Remove
+anHashTable<Type>::Remove
 ================
 */
-template< class Type >
-ARC_INLINE bool arcHashTable<Type>::Remove( const char *key ) {
-	hashnode_s	**head;
-	hashnode_s	*node;
+template<class Type>
+ARC_INLINE bool anHashTable<Type>::Remove( const char *key ) {
 	hashnode_s	*prev;
-	int			hash;
-
-	hash = GetHash( key );
-	head = &heads[ hash ];
+	int hash = GetHash( key );
+	hashnode_s	**head = &heads[ hash ];
 	if ( *head ) {
-		for ( prev = NULL, node = *head; node != NULL; prev = node, node = node->next ) {
+		for ( hashnode_s *prev = nullptr, hashnode_s *node = *head; node != nullptr; prev = node, node = node->next ) {
 			if ( node->key == key ) {
 				if ( prev ) {
 					prev->next = node->next;
@@ -275,24 +255,24 @@ ARC_INLINE bool arcHashTable<Type>::Remove( const char *key ) {
 
 /*
 ================
-arcHashTable<Type>::Clear
+anHashTable<Type>::Clear
 ================
 */
-template< class Type >
-ARC_INLINE void arcHashTable<Type>::Clear( void ) {
+template<class Type>
+ARC_INLINE void anHashTable<Type>::Clear( void ) {
 	int			i;
 	hashnode_s	*node;
 	hashnode_s	*next;
 
 	for ( i = 0; i < tablesize; i++ ) {
-		next = heads[ i ];
-		while( next != NULL ) {
+		next = heads[i];
+		while( next != nullptr ) {
 			node = next;
 			next = next->next;
 			delete node;
 		}
 
-		heads[ i ] = NULL;
+		heads[i] = nullptr;
 	}
 
 	numentries = 0;
@@ -300,25 +280,25 @@ ARC_INLINE void arcHashTable<Type>::Clear( void ) {
 
 /*
 ================
-arcHashTable<Type>::DeleteContents
+anHashTable<Type>::DeleteContents
 ================
 */
-template< class Type >
-ARC_INLINE void arcHashTable<Type>::DeleteContents( void ) {
+template<class Type>
+ARC_INLINE void anHashTable<Type>::DeleteContents( void ) {
 	int			i;
 	hashnode_s	*node;
 	hashnode_s	*next;
 
 	for ( i = 0; i < tablesize; i++ ) {
-		next = heads[ i ];
-		while( next != NULL ) {
+		next = heads[i];
+		while( next != nullptr ) {
 			node = next;
 			next = next->next;
 			delete node->value;
 			delete node;
 		}
 
-		heads[ i ] = NULL;
+		heads[i] = nullptr;
 	}
 
 	numentries = 0;
@@ -326,26 +306,26 @@ ARC_INLINE void arcHashTable<Type>::DeleteContents( void ) {
 
 /*
 ================
-arcHashTable<Type>::Num
+anHashTable<Type>::Num
 ================
 */
-template< class Type >
-ARC_INLINE int arcHashTable<Type>::Num( void ) const {
+template<class Type>
+ARC_INLINE int anHashTable<Type>::Num( void ) const {
 	return numentries;
 }
 
-#if defined(ID_TYPEINFO)
+#if defined(ARC_TYPEINFO)
 #define __GNUC__ 99
 #endif
 
 #if !defined(__GNUC__) || __GNUC__ < 4
 /*
 ================
-arcHashTable<Type>::GetSpread
+anHashTable<Type>::GetSpread
 ================
 */
-template< class Type >
-int arcHashTable<Type>::GetSpread( void ) const {
+template<class Type>
+int anHashTable<Type>::GetSpread( void ) const {
 	int i, average, error, e;
 	hashnode_s	*node;
 
@@ -357,7 +337,7 @@ int arcHashTable<Type>::GetSpread( void ) const {
 	error = 0;
 	for ( i = 0; i < tablesize; i++ ) {
 		numItems = 0;
-		for ( node = heads[ i ]; node != NULL; node = node->next ) {
+		for ( node = heads[i]; node != nullptr; node = node->next ) {
 			numItems++;
 		}
 		e = abs( numItems - average );
@@ -365,12 +345,12 @@ int arcHashTable<Type>::GetSpread( void ) const {
 			error += e - 1;
 		}
 	}
-	return 100 - (error * 100 / numentries);
+	return 100 - ( error * 100 / numentries );
 }
 #endif
 
-#if defined(ID_TYPEINFO)
+#if defined(ARC_TYPEINFO)
 #undef __GNUC__
 #endif
 
-#endif /* !__HASHTABLE_H__ */
+#endif // !__HASHTABLE_H__

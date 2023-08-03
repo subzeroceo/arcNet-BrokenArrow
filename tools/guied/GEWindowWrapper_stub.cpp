@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../ui/EditWindow.h"
@@ -9,7 +9,7 @@
 
 #include "GEWindowWrapper.h"
 
-static rvGEWindowWrapper stub_wrap( NULL, rvGEWindowWrapper::WT_UNKNOWN );
+static rvGEWindowWrapper stub_wrap( nullptr, rvGEWindowWrapper::WT_UNKNOWN );
 
 rvGEWindowWrapper::rvGEWindowWrapper( idWindow* window, EWindowType type ) { }
 

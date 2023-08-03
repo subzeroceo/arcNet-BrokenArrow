@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 static autoComplete_t	globalAutoComplete;
@@ -11,12 +11,12 @@ FindMatches
 static void FindMatches( const char *s ) {
 	int		i;
 
-	if ( arcNetString::Icmpn( s, globalAutoComplete.completionString, strlen( globalAutoComplete.completionString ) ) != 0 ) {
+	if ( anString::Icmpn( s, globalAutoComplete.completionString, strlen( globalAutoComplete.completionString ) ) != 0 ) {
 		return;
 	}
 	globalAutoComplete.matchCount++;
 	if ( globalAutoComplete.matchCount == 1 ) {
-		arcNetString::Copynz( globalAutoComplete.currentMatch, s, sizeof( globalAutoComplete.currentMatch ) );
+		anString::Copynz( globalAutoComplete.currentMatch, s, sizeof( globalAutoComplete.currentMatch ) );
 		return;
 	}
 
@@ -36,12 +36,12 @@ FindIndexMatch
 ===============
 */
 static void FindIndexMatch( const char *s ) {
-	if ( arcNetString::Icmpn( s, globalAutoComplete.completionString, strlen( globalAutoComplete.completionString ) ) != 0 ) {
+	if ( anString::Icmpn( s, globalAutoComplete.completionString, strlen( globalAutoComplete.completionString ) ) != 0 ) {
 		return;
 	}
 
 	if ( globalAutoComplete.findMatchIndex == globalAutoComplete.matchIndex ) {
-		arcNetString::Copynz( globalAutoComplete.currentMatch, s, sizeof( globalAutoComplete.currentMatch ) );
+		anString::Copynz( globalAutoComplete.currentMatch, s, sizeof( globalAutoComplete.currentMatch ) );
 	}
 
 	globalAutoComplete.findMatchIndex++;
@@ -53,7 +53,7 @@ PrintMatches
 ===============
 */
 static void PrintMatches( const char *s ) {
-	if ( arcNetString::Icmpn( s, globalAutoComplete.currentMatch, strlen( globalAutoComplete.currentMatch ) ) == 0 ) {
+	if ( anString::Icmpn( s, globalAutoComplete.currentMatch, strlen( globalAutoComplete.currentMatch ) ) == 0 ) {
 		common->Printf( "    %s\n", s );
 	}
 }
@@ -64,7 +64,7 @@ PrintCvarMatches
 ===============
 */
 static void PrintCvarMatches( const char *s ) {
-	if ( arcNetString::Icmpn( s, globalAutoComplete.currentMatch, strlen( globalAutoComplete.currentMatch ) ) == 0 ) {
+	if ( anString::Icmpn( s, globalAutoComplete.currentMatch, strlen( globalAutoComplete.currentMatch ) ) == 0 ) {
 		common->Printf( "    %s" S_COLOR_WHITE " = \"%s\"\n", s, cvarSystem->GetCVarString( s ) );
 	}
 }
@@ -161,12 +161,12 @@ arcEditField::AutoComplete
 */
 void arcEditField::AutoComplete() {
 	char completionArgString[MAX_EDIT_LINE];
-	arcCommandArgs args;
+	anCommandArgs args;
 
 	if ( !autoComplete.valid ) {
 		args.TokenizeString( buffer, false );
-		arcNetString::Copynz( autoComplete.completionString, args.Argv( 0 ), sizeof( autoComplete.completionString ) );
-		arcNetString::Copynz( completionArgString, args.Args(), sizeof( completionArgString ) );
+		anString::Copynz( autoComplete.completionString, args.Argv( 0 ), sizeof( autoComplete.completionString ) );
+		anString::Copynz( completionArgString, args.Args(), sizeof( completionArgString ) );
 		autoComplete.matchCount = 0;
 		autoComplete.matchIndex = 0;
 		autoComplete.currentMatch[0] = 0;
@@ -189,8 +189,8 @@ void arcEditField::AutoComplete() {
 		// when there's only one match or there's an argument
 		if ( autoComplete.matchCount == 1 || completionArgString[0] != '\0' ) {
 			/// try completing arguments
-			arcNetString::Append( autoComplete.completionString, sizeof( autoComplete.completionString ), " " );
-			arcNetString::Append( autoComplete.completionString, sizeof( autoComplete.completionString ), completionArgString );
+			anString::Append( autoComplete.completionString, sizeof( autoComplete.completionString ), " " );
+			anString::Append( autoComplete.completionString, sizeof( autoComplete.completionString ), completionArgString );
 			autoComplete.matchCount = 0;
 
 			globalAutoComplete = autoComplete;
@@ -200,21 +200,21 @@ void arcEditField::AutoComplete() {
 
 			autoComplete = globalAutoComplete;
 
-			arcNetString::snPrintf( buffer, sizeof( buffer ), "%s", autoComplete.currentMatch );
+			anString::snPrintf( buffer, sizeof( buffer ), "%s", autoComplete.currentMatch );
 
 			if ( autoComplete.matchCount == 0 ) {
 				// no argument matches
-				arcNetString::Append( buffer, sizeof( buffer ), " " );
-				arcNetString::Append( buffer, sizeof( buffer ), completionArgString );
+				anString::Append( buffer, sizeof( buffer ), " " );
+				anString::Append( buffer, sizeof( buffer ), completionArgString );
 				SetCursor( strlen( buffer ) );
 				return;
 			}
 		} else {
 			// multiple matches, complete to shortest
-			arcNetString::snPrintf( buffer, sizeof( buffer ), "%s", autoComplete.currentMatch );
+			anString::snPrintf( buffer, sizeof( buffer ), "%s", autoComplete.currentMatch );
 			if ( strlen( completionArgString ) ) {
-				arcNetString::Append( buffer, sizeof( buffer ), " " );
-				arcNetString::Append( buffer, sizeof( buffer ), completionArgString );
+				anString::Append( buffer, sizeof( buffer ), " " );
+				anString::Append( buffer, sizeof( buffer ), completionArgString );
 			}
 		}
 
@@ -249,7 +249,7 @@ void arcEditField::AutoComplete() {
 		autoComplete = globalAutoComplete;
 
 		// and print it
-		arcNetString::snPrintf( buffer, sizeof( buffer ), autoComplete.currentMatch );
+		anString::snPrintf( buffer, sizeof( buffer ), autoComplete.currentMatch );
 		if ( autoComplete.length > ( int )strlen( buffer ) ) {
 			autoComplete.length = strlen( buffer );
 		}
@@ -486,7 +486,7 @@ arcEditField::SetBuffer
 */
 void arcEditField::SetBuffer( const char *buf ) {
 	Clear();
-	arcNetString::Copynz( buffer, buf, sizeof( buffer ) );
+	anString::Copynz( buffer, buf, sizeof( buffer ) );
 	SetCursor( strlen( buffer ) );
 }
 
@@ -521,10 +521,10 @@ void arcEditField::Draw( int x, int y, int width, bool showCursor ) {
 		prestep = scroll;
 
 		// Skip color code
-		if ( arcNetString::IsColor( buffer + prestep ) ) {
+		if ( anString::IsColor( buffer + prestep ) ) {
 			prestep += 2;
 		}
-		if ( prestep > 0 && arcNetString::IsColor( buffer + prestep - 1 ) ) {
+		if ( prestep > 0 && anString::IsColor( buffer + prestep - 1 ) ) {
 			prestep++;
 		}
 	}
@@ -549,7 +549,7 @@ void arcEditField::Draw( int x, int y, int width, bool showCursor ) {
 		return;
 	}
 
-	if ( ( int )( arcLibrary::frameNumber >> 4 ) & 1 ) {
+	if ( ( int )( anLibrary::frameNumber >> 4 ) & 1 ) {
 		return;		// off blink
 	}
 
@@ -561,7 +561,7 @@ void arcEditField::Draw( int x, int y, int width, bool showCursor ) {
 
 	// Move the cursor back to account for color codes
 	for ( int i = 0; i<cursor; i++ ) {
-		if ( arcNetString::IsColor( &str[i] ) ) {
+		if ( anString::IsColor( &str[i] ) ) {
 			i++;
 			prestep += 2;
 		}

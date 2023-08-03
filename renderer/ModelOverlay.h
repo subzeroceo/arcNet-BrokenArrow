@@ -26,18 +26,18 @@ typedef struct overlaySurface_s {
 } overlaySurface_t;
 
 typedef struct overlayMaterial_s {
-	const arcMaterial *			material;
-	arcNetList<overlaySurface_t *>	surfaces;
+	const anMaterial *			material;
+	anList<overlaySurface_t *>	surfaces;
 } overlayMaterial_t;
 
 
-class ARCRenderModelOverlay {
+class anRenderModelOverlay {
 public:
-								ARCRenderModelOverlay();
-								~ARCRenderModelOverlay();
+								anRenderModelOverlay();
+								~anRenderModelOverlay();
 
-	static ARCRenderModelOverlay *Alloc( void );
-	static void					Free( ARCRenderModelOverlay *overlay );
+	static anRenderModelOverlay *Alloc( void );
+	static void					Free( anRenderModelOverlay *overlay );
 
 	// Projects an overlay onto deformable geometry and can be added to
 	// a render entity to allow decals on top of dynamic models.
@@ -45,19 +45,19 @@ public:
 	// light interaction shaders. Materials for overlays should always
 	// be clamped, because the projected texcoords can run well off the
 	// texture since no new clip vertexes are generated.
-	void						CreateOverlay( const ARCRenderModel *model, const arcPlane localTextureAxis[2], const arcMaterial *material );
+	void						CreateOverlay( const anRenderModel *model, const anPlane localTextureAxis[2], const anMaterial *material );
 
 	// Creates new model surfaces for baseModel, which should be a static instantiation of a dynamic model.
-	void						AddOverlaySurfacesToModel( ARCRenderModel *baseModel );
+	void						AddOverlaySurfacesToModel( anRenderModel *baseModel );
 
 	// Removes overlay surfaces from the model.
-	static void					RemoveOverlaySurfacesFromModel( ARCRenderModel *baseModel );
+	static void					RemoveOverlaySurfacesFromModel( anRenderModel *baseModel );
 
-	void						ReadFromDemoFile( class ARCDemoFile *f );
-	void						WriteToDemoFile( class ARCDemoFile *f ) const;
+	void						ReadFromDemoFile( class anDemoFile *f );
+	void						WriteToDemoFile( class anDemoFile *f ) const;
 
 private:
-	arcNetList<overlayMaterial_t *>	materials;
+	anList<overlayMaterial_t *>	materials;
 
 	void						FreeSurface( overlaySurface_t *surface );
 };

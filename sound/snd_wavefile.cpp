@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "snd_local.h"
@@ -39,12 +39,12 @@ If you have questions concerning this license or the applicable additional terms
 //-----------------------------------------------------------------------------
 idWaveFile::idWaveFile( void ) {
 	memset( &mpwfx, 0, sizeof( waveformatextensible_t ) );
-	mhmmio		= NULL;
+	mhmmio		= nullptr;
 	mdwSize		= 0;
 	mseekBase	= 0;
 	mbIsReadingFromMemory = false;
-	mpbData		= NULL;
-	ogg			= NULL;
+	mpbData		= nullptr;
+	ogg			= nullptr;
 	isOgg		= false;
 }
 
@@ -70,18 +70,18 @@ int idWaveFile::Open( const char* strFileName, waveformatex_t* pwfx ) {
 
 	mbIsReadingFromMemory = false;
 
-	mpbData     = NULL;
+	mpbData     = nullptr;
 	mpbDataCur  = mpbData;
 
-	if ( strFileName == NULL ) {
+	if ( strFileName == nullptr ) {
 		return -1;
 	}
 
-	arcNetString name = strFileName;
+	anString name = strFileName;
 
 	// note: used to only check for .wav when making a build
 	name.SetFileExtension( ".ogg" );
-	if ( fileSystem->ReadFile( name, NULL, NULL ) != -1 ) {
+	if ( fileSystem->ReadFile( name, nullptr, nullptr ) != -1 ) {
 		return OpenOGG( name, pwfx );
 	}
 
@@ -93,7 +93,7 @@ int idWaveFile::Open( const char* strFileName, waveformatex_t* pwfx ) {
 		return -1;
 	}
 	if ( mhmmio->Length() <= 0 ) {
-		mhmmio = NULL;
+		mhmmio = nullptr;
 		return -1;
 	}
 	if ( ReadMMIO() != 0 ) {
@@ -229,7 +229,7 @@ int idWaveFile::ResetFile( void ) {
 	if ( mbIsReadingFromMemory ) {
 		mpbDataCur = mpbData;
 	} else  {
-		if ( mhmmio == NULL ) {
+		if ( mhmmio == nullptr ) {
 			return -1;
 		}
 
@@ -267,13 +267,13 @@ int idWaveFile::ResetFile( void ) {
 //-----------------------------------------------------------------------------
 int idWaveFile::Read( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead ) {
 
-	if ( ogg != NULL ) {
+	if ( ogg != nullptr ) {
 
 		return ReadOGG( pBuffer, dwSizeToRead, pdwSizeRead );
 
 	} else if ( mbIsReadingFromMemory ) {
 
-		if ( mpbDataCur == NULL ) {
+		if ( mpbDataCur == nullptr ) {
 			return -1;
 		}
 		if ( (byte*)(mpbDataCur + dwSizeToRead) > (byte*)(mpbData + mulDataSize) ) {
@@ -282,7 +282,7 @@ int idWaveFile::Read( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead ) {
  		SIMDProcessor->Memcpy( pBuffer, mpbDataCur, dwSizeToRead );
 		mpbDataCur += dwSizeToRead;
 
-		if ( pdwSizeRead != NULL ) {
+		if ( pdwSizeRead != nullptr ) {
 			*pdwSizeRead = dwSizeToRead;
 		}
 
@@ -290,10 +290,10 @@ int idWaveFile::Read( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead ) {
 
 	} else {
 
-		if ( mhmmio == NULL ) {
+		if ( mhmmio == nullptr ) {
 			return -1;
 		}
-		if ( pBuffer == NULL ) {
+		if ( pBuffer == nullptr ) {
 			return -1;
 		}
 
@@ -303,7 +303,7 @@ int idWaveFile::Read( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead ) {
 			LittleRevBytes( pBuffer, 2, dwSizeToRead / 2 );
 		}
 
-		if ( pdwSizeRead != NULL ) {
+		if ( pdwSizeRead != nullptr ) {
 			*pdwSizeRead = dwSizeToRead;
 		}
 
@@ -316,12 +316,12 @@ int idWaveFile::Read( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead ) {
 // Desc: Closes the wave file
 //-----------------------------------------------------------------------------
 int idWaveFile::Close( void ) {
-	if ( ogg != NULL ) {
+	if ( ogg != nullptr ) {
 		return CloseOGG();
 	}
-	if ( mhmmio != NULL ) {
+	if ( mhmmio != nullptr ) {
 		fileSystem->CloseFile( mhmmio );
-		mhmmio = NULL;
+		mhmmio = nullptr;
 	}
 	return 0;
 }
@@ -331,7 +331,7 @@ int idWaveFile::Close( void ) {
 //-----------------------------------------------------------------------------
 int idWaveFile::Seek( int offset ) {
 
-	if ( ogg != NULL ) {
+	if ( ogg != nullptr ) {
 
 		common->FatalError( "idWaveFile::Seek: cannot seek on an OGG file\n" );
 
@@ -340,7 +340,7 @@ int idWaveFile::Seek( int offset ) {
 		mpbDataCur = mpbData + offset;
 
 	} else {
-		if ( mhmmio == NULL ) {
+		if ( mhmmio == nullptr ) {
 			return -1;
 		}
 

@@ -14,7 +14,7 @@ merge conflicts and to make further changes to the system possible.
 #define __AI_MOVE_H__
 
 
-typedef idEntityPtr<idEntity>			entityPointer_t;
+typedef anEntityPtr<anEntity>			entityPointer_t;
 
 #define MAX_PATH_LEN	48
 
@@ -109,7 +109,7 @@ stopEvent_t - used by path prediction
 */
 typedef enum {
 	SE_BLOCKED			= BIT(0),
-	SE_ENTER_LEDGE_AREA	= BIT(1),
+	SE_ENTER_LEDGE_AREA	= BIT( 1 ),
 	SE_ENTER_OBSTACLE	= BIT(2),
 	SE_FALL				= BIT(3),
 	SE_LAND				= BIT(4)
@@ -121,16 +121,16 @@ obstaclePath_s
 =====================
 */
 typedef struct obstaclePath_s {
-	arcVec3				seekPos;					// seek position avoiding obstacles
-	idEntity *			firstObstacle;				// if != NULL the first obstacle along the path
-	arcVec3				startPosOutsideObstacles;	// start position outside obstacles
-	idEntity *			startPosObstacle;			// if != NULL the obstacle containing the start position
-	arcVec3				seekPosOutsideObstacles;	// seek position outside obstacles
-	idEntity *			seekPosObstacle;			// if != NULL the obstacle containing the seek position
-	// RAVEN BEGIN
+	anVec3				seekPos;					// seek position avoiding obstacles
+	anEntity *			firstObstacle;				// if != nullptr the first obstacle along the path
+	anVec3				startPosOutsideObstacles;	// start position outside obstacles
+	anEntity *			startPosObstacle;			// if != nullptr the obstacle containing the start position
+	anVec3				seekPosOutsideObstacles;	// seek position outside obstacles
+	anEntity *			seekPosObstacle;			// if != nullptr the obstacle containing the seek position
+
 	// cdr: Alternate Routes Bug
-	idList<idEntity*>	allObstacles;
-	// RAVEN END
+	anList<anEntity*>	allObstacles;
+
 } obstaclePath_t;
 
 /*
@@ -139,12 +139,12 @@ predictedPath_s
 =====================
 */
 typedef struct predictedPath_s {
-	arcVec3				endPos;						// final position
-	arcVec3				endVelocity;				// velocity at end position
-	arcVec3				endNormal;					// normal of blocking surface
+	anVec3				endPos;						// final position
+	anVec3				endVelocity;				// velocity at end position
+	anVec3				endNormal;					// normal of blocking surface
 	int					endTime;					// time predicted
 	int					endEvent;					// event that stopped the prediction
-	const idEntity *	blockingEntity;				// entity that blocks the movement
+	const anEntity *	blockingEntity;				// entity that blocks the movement
 } predictedPath_t;
 
 
@@ -154,8 +154,8 @@ pathSeek_s
 =====================
 */
 typedef struct pathSeek_s {
-	idReachability*		reach;
-	arcVec3				seekPos;
+	anReachability*		reach;
+	anVec3				seekPos;
 } pathSeek_t;
 
 
@@ -169,9 +169,9 @@ class idMoveState {
 public:
 							idMoveState();
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
-	void					Spawn( idDict &spawnArgs );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
+	void					Spawn( anDict &spawnArgs );
 
 
 	struct movementFlags_s {
@@ -197,7 +197,7 @@ public:
 
 		bool		allowDirectional	:1;		// allows directional movement (ie. running sideways, backwards)
 		bool		allowAnimMove		:1;		// allows any animation movement
-		bool		allowPrevAnimMove	:1;		// allows slide move if current animmove has no motion extraction on it (smooth transitions)
+		bool		allowPrevAnimMove	:1;		// allows slide move if current animmove has no motion extraction on it ( smooth transitions)
 		bool		allowHiddenMove		:1;		// allows character to still move around while hidden
 		bool		allowPushMovables	:1;		// allows the articulated figure to push moveable objects
 		bool		allowSlideToGoal	:1;		// allows the AI to excactly slide to the goal position if close enough
@@ -213,8 +213,8 @@ public:
 	moveType_t				moveType;
 	aiMoveCommand_t			moveCommand;
 	moveStatus_t			moveStatus;
-	arcVec3					moveDest;
-	arcVec3					moveDir;				// used for wandering and slide moves
+	anVec3					moveDest;
+	anVec3					moveDir;				// used for wandering and slide moves
 
 	int						toAreaNum;
 	int						startTime;
@@ -224,8 +224,8 @@ public:
 	float					wanderYaw;
 	int						nextWanderTime;
 	int						blockTime;
-	idEntityPtr<idEntity>	obstacle;
-	arcVec3					lastMoveOrigin;
+	anEntityPtr<anEntity>	obstacle;
+	anVec3					lastMoveOrigin;
 	int						lastMoveTime;
 	int						anim;
 
@@ -264,31 +264,31 @@ public:
 	aiMoveDir_t				idealDirection;			// Direction we want to be moving in
 	float					walkRange;				// Distance to target before starting to walk
 	float					walkTurn;				// Turn delta threshold for walking when turning
-	arcVec2					followRange;			// Min and max range for AI following their leader
-	arcVec2					searchRange;			// Min and max range to use when searching for a new place to move to
+	anVec2					followRange;			// Min and max range for AI following their leader
+	anVec2					searchRange;			// Min and max range to use when searching for a new place to move to
 	float					attackPositionRange;	// Override for how close you have to get to your attackPosition before stopping
 	float					turnDelta;				// Amount to turn when turning
 
-	arcVec3					goalPos;
+	anVec3					goalPos;
 	int						goalArea;
 	entityPointer_t			goalEntity;
-	arcVec3					goalEntityOrigin;		// move to entity uses this to avoid checking the floor position every frame
+	anVec3					goalEntityOrigin;		// move to entity uses this to avoid checking the floor position every frame
 
-	arcVec3					myPos;
+	anVec3					myPos;
 	int						myArea;
 
-	arcVec3					seekPos;
+	anVec3					seekPos;
 
 	pathSeek_t				path[MAX_PATH_LEN];
 	int						pathLen;
 	int						pathArea;
 	int						pathTime;
 
-	arcVec3					addVelocity;
+	anVec3					addVelocity;
 };
 
 // cdr: Obstacle Avoidance
-void AI_EntityMoved(idEntity* ent);
+void AI_EntityMoved(anEntity* ent);
 void AI_MoveInitialize();
 
 

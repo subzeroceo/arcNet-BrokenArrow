@@ -41,8 +41,8 @@ class CDialogSoundGroup : public CDialog
 {
 // Construction
 public:
-	arcStringList list;
-	CDialogSoundGroup(CWnd* pParent = NULL);   // standard constructor
+	anStringList list;
+	CDialogSoundGroup(CWnd* pParent = nullptr );   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDialogSoundGroup)

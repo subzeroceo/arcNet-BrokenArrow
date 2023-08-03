@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "MaterialPropTreeView.h"
@@ -67,24 +67,24 @@ void MaterialPropTreeView::SetPropertyListType( int listType, int stageNum) {
 
 	m_Tree.DeleteAllItems();
 
-	//arcNetList<MaterialProp_t*>* propList = NULL;
+	//anList<MaterialProp_t*>* propList = nullptr;
 	MaterialDefList* propList = MaterialDefManager::GetMaterialDefs(currentListType);
 	currentPropDefs = propList;
 
 	if ( !propList)
 		return;
 
-	CPropTreeItem* pCurrentGroup = NULL;
-	CPropTreeItem* pCurrentNode = NULL;
+	CPropTreeItem* pCurrentGroup = nullptr;
+	CPropTreeItem* pCurrentNode = nullptr;
 
 	for ( int i = 0; i < propList->Num(); i++ ) {
-		switch((*propList)[i]->type) {
+		switch ((*propList)[i]->type) {
 			case MaterialDef::MATERIAL_DEF_TYPE_GROUP:
 				{
 					pCurrentGroup = m_Tree.InsertItem(new CPropTreeItem() );
 					pCurrentNode = pCurrentGroup;
 
-					if ( !registry.GetBool(va( "Expand%d%s", currentListType, (*propList)[i]->displayName.c_str() )) )
+					if ( !registry.GetBool(va( "Expand%d%s", currentListType, (*propList)[i]->displayName.c_str() ) ) )
 						pCurrentGroup->Expand();
 				}
 				break;
@@ -136,7 +136,7 @@ void MaterialPropTreeView::SaveSettings() {
 void MaterialPropTreeView::MV_OnMaterialChange(MaterialDoc* pMaterial) {
 
 	if (materialDocManager->GetCurrentMaterialDoc() ) {
-		arcNetString currentName = materialDocManager->GetCurrentMaterialDoc()->name;
+		anString currentName = materialDocManager->GetCurrentMaterialDoc()->name;
 		if ( !internalChange && !pMaterial->name.Icmp(currentName) ) {
 			RefreshProperties();
 		}
@@ -157,7 +157,7 @@ void MaterialPropTreeView::OnPropertyChangeNotification( NMHDR *nmhdr, LRESULT *
 	if (propItem) {
 		MaterialDoc* materialDoc = materialDocManager->GetCurrentMaterialDoc();
 
-		switch(propItem->type) {
+		switch (propItem->type) {
 			case MaterialDef::MATERIAL_DEF_TYPE_BOOL:
 				{
 					BOOL val = item->GetItemValue();
@@ -166,7 +166,7 @@ void MaterialPropTreeView::OnPropertyChangeNotification( NMHDR *nmhdr, LRESULT *
 				break;
 			case MaterialDef::MATERIAL_DEF_TYPE_STRING:
 				{
-					arcNetString val = (LPCTSTR)item->GetItemValue();
+					anString val = (LPCTSTR)item->GetItemValue();
 					materialDoc->SetAttribute(currentStage, propItem->dictName, val);
 				}
 				break;
@@ -205,7 +205,7 @@ MaterialDef* MaterialPropTreeView::FindDefForTreeID(UINT treeID) {
 			return (*currentPropDefs)[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -221,7 +221,7 @@ void MaterialPropTreeView::RefreshProperties() {
  	MaterialDoc* materialDoc = materialDocManager->GetCurrentMaterialDoc();
 
 	for ( int i = 0; i < propList->Num(); i++ ) {
-		switch((*propList)[i]->type) {
+		switch ((*propList)[i]->type) {
 			case MaterialDef::MATERIAL_DEF_TYPE_BOOL:
 				{
 					bool val = materialDoc->GetAttributeBool(currentStage, (*propList)[i]->dictName);
@@ -231,7 +231,7 @@ void MaterialPropTreeView::RefreshProperties() {
 				break;
 			case MaterialDef::MATERIAL_DEF_TYPE_STRING:
 				{
-					arcNetString val = materialDoc->GetAttribute(currentStage, (*propList)[i]->dictName);
+					anString val = materialDoc->GetAttribute(currentStage, (*propList)[i]->dictName);
 					CPropTreeItemEdit* item = (CPropTreeItemEdit*)m_Tree.FindItem((*propList)[i]->GetViewData(PROP_TREE_VIEW) );
 					item->SetItemValue((LPARAM)val.c_str() );
 				}

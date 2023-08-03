@@ -1,4 +1,4 @@
-#include "arcLibrary/precompiled.h"
+#include "idlib/Lib.h"
 #include "renderer/tr_local.h"
 #include "sys/linux/local.h"
 #include "glimp_local.h"
@@ -51,7 +51,7 @@ define(`assign_funcptr', `qgl`$1' = dll`$1';') forloop(`i', gl_start, gl_end, `a
 define(`assign_funcptr', `qglX`$1' = dll`$1';') forloop(`i', glX_start, glX_end, `assign_funcptr(indir(`f'i`_name') )')
 }
 
-static void *glHandle = NULL;
+static void *glHandle = nullptr;
 
 void GLimp_dlsym_failed(const char *name) {
 	common->DPrintf( "dlsym(%s) failed: %s\n", name, dlerror() );
@@ -81,11 +81,11 @@ forloop(`i', glX_start, glX_end, `safe_dlsym_funcptr(indir(`f'i`_ret'), indir(`f
 
 void GLimp_dlclose() {
 	if ( !glHandle ) {
-		common->DPrintf( "dlclose: GL handle is NULL\n" );
+		common->DPrintf( "dlclose: GL handle is nullptr\n" );
 	} else {
 		dlclose( glHandle );
-		glHandle = NULL;
+		glHandle = nullptr;
 	}
-define(`reset_funcptr', `qgl`$1' = NULL;') forloop(`i', gl_start, gl_end, `reset_funcptr(indir(`f'i`_name') )')
-define(`reset_funcptr', `qglX`$1' = NULL;') forloop(`i', glX_start, glX_end, `reset_funcptr(indir(`f'i`_name') )')
+define(`reset_funcptr', `qgl`$1' = nullptr;') forloop(`i', gl_start, gl_end, `reset_funcptr(indir(`f'i`_name') )')
+define(`reset_funcptr', `qglX`$1' = nullptr;') forloop(`i', glX_start, glX_end, `reset_funcptr(indir(`f'i`_name') )')
 }

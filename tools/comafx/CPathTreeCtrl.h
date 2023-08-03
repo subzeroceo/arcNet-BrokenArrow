@@ -52,7 +52,7 @@ public:
 private:
 	int					size;
 	HTREEITEM			stackItem[128];
-	arcNetString				stackName[128];
+	anString				stackName[128];
 };
 
 ARC_INLINE void idPathTreeStack::PushRoot( HTREEITEM root ) {
@@ -77,9 +77,9 @@ public:
 						CPathTreeCtrl();
 						~CPathTreeCtrl();
 
-	HTREEITEM			FindItem( const arcNetString &pathName );
-	HTREEITEM			InsertPathIntoTree( const arcNetString &pathName, const int id );
-	HTREEITEM			AddPathToTree( const arcNetString &pathName, const int id, idPathTreeStack &stack );
+	HTREEITEM			FindItem( const anString &pathName );
+	HTREEITEM			InsertPathIntoTree( const anString &pathName, const int id );
+	HTREEITEM			AddPathToTree( const anString &pathName, const int id, idPathTreeStack &stack );
 	int					SearchTree( treeItemCompare_t compare, void *data, CPathTreeCtrl &result );
 
 protected:

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../game/game.h"
@@ -45,10 +45,10 @@ If you have questions concerning this license or the applicable additional terms
 
 /////////////////////////////////////////////////////////////////////////////
 // CCDialogPDAEditor dialog
-CDialogPDAEditor *g_PDAEditorDialog = NULL;
+CDialogPDAEditor *g_PDAEditorDialog = nullptr;
 
 
-CDialogPDAEditor::CDialogPDAEditor(CWnd* pParent /*=NULL*/)
+CDialogPDAEditor::CDialogPDAEditor(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDialogPDAEditor::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDialogPDAEditor)
@@ -105,7 +105,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CDialogPDAEditor message handlers
 
-void PDAEditorInit( const arcDictionary *spawnArgs ) {
+void PDAEditorInit( const anDict *spawnArgs ) {
 
 	if ( renderSystem->IsFullScreen() ) {
 		common->Printf( "Cannot run the PDA editor in fullscreen mode.\n"
@@ -113,17 +113,17 @@ void PDAEditorInit( const arcDictionary *spawnArgs ) {
 		return;
 	}
 
-	if ( g_PDAEditorDialog == NULL ) {
+	if ( g_PDAEditorDialog == nullptr ) {
 		InitAfx();
 		g_PDAEditorDialog = new CDialogPDAEditor();
 	}
 
-	if ( g_PDAEditorDialog->GetSafeHwnd() == NULL ) {
+	if ( g_PDAEditorDialog->GetSafeHwnd() == nullptr ) {
 		g_PDAEditorDialog->Create(IDD_DIALOG_PDA_EDITOR);
 /*
 		// FIXME: restore position
 		CRect rct;
-		g_PDAEditorDialog->SetWindowPos( NULL, rct.left, rct.top, 0,0, SWP_NOSIZE );
+		g_PDAEditorDialog->SetWindowPos( nullptr, rct.left, rct.top, 0,0, SWP_NOSIZE );
 */
 	}
 
@@ -135,7 +135,7 @@ void PDAEditorInit( const arcDictionary *spawnArgs ) {
 	if ( spawnArgs ) {
 		// select PDA based on spawn args
 		const char *name = spawnArgs->GetString( "pda" );
-		arcDeclPDA *decl = static_cast<arcDeclPDA *>( const_cast<arcDecleration *>( declManager->FindType( DECL_PDA, name ) ) );
+		anDeclPDA *decl = static_cast<anDeclPDA *>( const_cast<anDecl *>( declManager->FindType( DECL_PDA, name ) ) );
 		// FIXME: select this PDA
 	}
 }
@@ -147,7 +147,7 @@ void PDAEditorRun( void ) {
 	MSG *msg = &m_msgCur;
 #endif
 
-	while( ::PeekMessage(msg, NULL, NULL, NULL, PM_NOREMOVE) ) {
+	while( ::PeekMessage(msg, nullptr, nullptr, nullptr, PM_NOREMOVE) ) {
 		// pump message
 		if ( !AfxGetApp()->PumpMessage() ) {
 		}
@@ -156,7 +156,7 @@ void PDAEditorRun( void ) {
 
 void PDAEditorShutdown( void ) {
 	delete g_PDAEditorDialog;
-	g_PDAEditorDialog = NULL;
+	g_PDAEditorDialog = nullptr;
 }
 
 void CDialogPDAEditor::OnActivate( UINT nState, CWnd *pWndOther, BOOL bMinimized ) {
@@ -206,7 +206,7 @@ void CDialogPDAEditor::PopulatePDAList()
 	int i;
 	int num = declManager->GetNumDecls(DECL_PDA);
 	for ( i=0; i < num; i++ ) {
-		const arcDeclPDA *pda = dynamic_cast<const arcDeclPDA *>( declManager->DeclByIndex(DECL_PDA, i) );
+		const anDeclPDA *pda = dynamic_cast<const anDeclPDA *>( declManager->DeclByIndex(DECL_PDA, i) );
 		pdaList.AddString( pda->GetName() );
 	}
 }
@@ -220,7 +220,7 @@ void CDialogPDAEditor::OnSelChangePDA()
 		return;
 	}
 
-	const arcDeclPDA *pda = dynamic_cast<const arcDeclPDA *>( declManager->DeclByIndex(DECL_PDA, index) );
+	const anDeclPDA *pda = dynamic_cast<const anDeclPDA *>( declManager->DeclByIndex(DECL_PDA, index) );
 	if ( !pda ) {
 		return;
 	}
@@ -228,7 +228,7 @@ void CDialogPDAEditor::OnSelChangePDA()
 	CString windowTitle;
 	windowTitle.Format( "PDA Editor - %s", pda->GetName() );
 
-	arcNetFile *file = fileSystem->OpenFileAppend( pda->GetFileName() );
+	anFile *file = fileSystem->OpenFileAppend( pda->GetFileName() );
 	if ( file ) {
 		fileSystem->CloseFile( file );
 		saveButton.EnableWindow( true );
@@ -276,9 +276,9 @@ void CDialogPDAEditor::OnBtnClickedSave()
 		return;
 	}
 
-	const arcDeclPDA *pdaConst = dynamic_cast<const arcDeclPDA *>( declManager->DeclByIndex(DECL_PDA, index) );
+	const anDeclPDA *pdaConst = dynamic_cast<const anDeclPDA *>( declManager->DeclByIndex(DECL_PDA, index) );
 	if ( pdaConst ) {
-		arcDeclPDA *pda = const_cast<arcDeclPDA *>(pdaConst);
+		anDeclPDA *pda = const_cast<anDeclPDA *>(pdaConst);
 
 		CString declText = "\n";
 		declText += "pda ";
@@ -341,7 +341,7 @@ void CDialogPDAEditor::OnBtnClickedPDAAdd()
 	CDialogPDAAdd dlg;
 	if ( dlg.DoModal() == IDOK ) {
 		dlg.name.MakeLower();
-		arcDecleration *decl = declManager->CreateNewDecl( DECL_PDA, dlg.name, "newpdas/" + dlg.name + ".pda" );
+		anDecl *decl = declManager->CreateNewDecl( DECL_PDA, dlg.name, "newpdas/" + dlg.name + ".pda" );
 		decl->ReplaceSourceFileText();
 		decl->Invalidate();
 		PopulatePDAList();
@@ -360,7 +360,7 @@ void CDialogPDAEditor::OnBtnClickedEmailAdd()
 	if ( index < 0 ) {
 		return;
 	}
-	const arcDeclPDA *pda = dynamic_cast<const arcDeclPDA *>( declManager->DeclByIndex(DECL_PDA, index) );
+	const anDeclPDA *pda = dynamic_cast<const anDeclPDA *>( declManager->DeclByIndex(DECL_PDA, index) );
 
 	if ( pda ) {
 		CString name;
@@ -369,12 +369,12 @@ void CDialogPDAEditor::OnBtnClickedEmailAdd()
 		int newIndex = pda->GetNumEmails();
 		do {
 			name.Format( "%s_email_%d", pda->GetName(), newIndex++ );
-		} while ( declManager->FindType(DECL_EMAIL, name, false) != NULL );
+		} while ( declManager->FindType(DECL_EMAIL, name, false) != nullptr );
 
 		CDialogPDAEditEmail addDlg;
 		addDlg.SetName( name );
 		if ( addDlg.DoModal() == IDOK ) {
-			arcDeclEmail *email = static_cast<arcDeclEmail *>(declManager->CreateNewDecl(DECL_EMAIL, name, pda->GetFileName() ));
+			anDeclEmail *email = static_cast<anDeclEmail *>(declManager->CreateNewDecl(DECL_EMAIL, name, pda->GetFileName() ) );
 			email->SetText( addDlg.GetDeclText() );
 			email->ReplaceSourceFileText();
 			email->Invalidate();
@@ -382,7 +382,7 @@ void CDialogPDAEditor::OnBtnClickedEmailAdd()
 			pda->AddEmail( name );
 
 			// Get it again to reparse
-			const arcDeclEmail *emailConst = static_cast<const arcDeclEmail *>( declManager->FindType( DECL_EMAIL, name) );
+			const anDeclEmail *emailConst = static_cast<const anDeclEmail *>( declManager->FindType( DECL_EMAIL, name) );
 			emailList.AddString( emailConst->GetSubject() );
 
 			// Save the pda to include this email in the list
@@ -398,7 +398,7 @@ void CDialogPDAEditor::OnBtnClickedEmailEdit()
 	if ( index < 0 ) {
 		return;
 	}
-	const arcDeclPDA *pda = dynamic_cast<const arcDeclPDA *>( declManager->DeclByIndex(DECL_PDA, index) );
+	const anDeclPDA *pda = dynamic_cast<const anDeclPDA *>( declManager->DeclByIndex(DECL_PDA, index) );
 
 	if ( pda ) {
 		index = emailList.GetCurSel();
@@ -409,13 +409,13 @@ void CDialogPDAEditor::OnBtnClickedEmailEdit()
 		CDialogPDAEditEmail editDlg;
 		editDlg.SetEmail( pda->GetEmailByIndex( index ) );
 		if ( editDlg.DoModal() == IDOK ) {
-			arcDeclEmail *email = const_cast<arcDeclEmail *>( pda->GetEmailByIndex( index ) );
+			anDeclEmail *email = const_cast<anDeclEmail *>( pda->GetEmailByIndex( index ) );
 			email->SetText( editDlg.GetDeclText() );
 			email->ReplaceSourceFileText();
 			email->Invalidate();
 
 			// Get it again to reparse
-			email = const_cast<arcDeclEmail *>( pda->GetEmailByIndex( index ) );
+			email = const_cast<anDeclEmail *>( pda->GetEmailByIndex( index ) );
 
 			emailList.DeleteString( index );
 			emailList.InsertString( index, email->GetSubject() );
@@ -454,7 +454,7 @@ void CDialogPDAEditor::OnBtnClickedVideoDel()
 
 
 
-CDialogPDAEditEmail::CDialogPDAEditEmail(CWnd* pParent /*=NULL*/)
+CDialogPDAEditEmail::CDialogPDAEditEmail(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDialogPDAEditEmail::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDialogPDAEditEmail)
@@ -498,7 +498,7 @@ void CDialogPDAEditEmail::SetName( CString &_name )
 	name = _name;
 }
 
-void CDialogPDAEditEmail::SetEmail( const arcDeclEmail *email )
+void CDialogPDAEditEmail::SetEmail( const anDeclEmail *email )
 {
 	to = email->GetTo();
 	from = email->GetFrom();

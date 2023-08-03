@@ -45,7 +45,7 @@ initial_setup (j_decompress_ptr cinfo)
   /* Make sure image isn't bigger than I can handle */
   if ((long) cinfo->image_height > (long) JPEG_MAX_DIMENSION ||
       (long) cinfo->image_width > (long) JPEG_MAX_DIMENSION)
-    ERREXIT1(cinfo, JERR_IMAGE_TOO_BIG, (unsigned int) JPEG_MAX_DIMENSION);
+    ERREXIT1(cinfo, JERR_anImageOO_BIG, (unsigned int) JPEG_MAX_DIMENSION);
 
   /* For now, precision must match compiled-in value... */
   if (cinfo->data_precision != BITS_IN_JSAMPLE)
@@ -101,7 +101,7 @@ initial_setup (j_decompress_ptr cinfo)
     /* Mark component needed, until color conversion says otherwise */
     compptr->component_needed = TRUE;
     /* Mark no quantization table yet saved for component */
-    compptr->quant_table = NULL;
+    compptr->quant_table = nullptr;
   }
 
   /* Compute number of fully interleaved MCU rows. */
@@ -127,7 +127,7 @@ per_scan_setup (j_decompress_ptr cinfo)
 
   if (cinfo->comps_in_scan == 1 ) {
 
-    /* Noninterleaved (single-component) scan */
+    /* Noninterleaved ( single-component) scan */
     compptr = cinfo->cur_comp_info[0];
 
     /* Overall image size in MCUs */
@@ -226,12 +226,12 @@ latch_quant_tables (j_decompress_ptr cinfo)
   for (ci = 0; ci < cinfo->comps_in_scan; ci++ ) {
     compptr = cinfo->cur_comp_info[ci];
     /* No work if we already saved Q-table for this component */
-    if (compptr->quant_table != NULL)
+    if (compptr->quant_table != nullptr )
       continue;
     /* Make sure specified quantization table is present */
     qtblno = compptr->quant_tbl_no;
     if (qtblno < 0 || qtblno >= NUM_QUANT_TBLS ||
-	cinfo->quant_tbl_ptrs[qtblno] == NULL)
+	cinfo->quant_tbl_ptrs[qtblno] == nullptr )
       ERREXIT1(cinfo, JERR_NO_QUANT_TABLE, qtblno);
     /* OK, save away the quantization table */
     qtbl = (JQUANT_TBL *)
@@ -348,7 +348,7 @@ reset_input_controller (j_decompress_ptr cinfo)
   (*cinfo->err->reset_error_mgr) ((j_common_ptr) cinfo);
   (*cinfo->marker->reset_marker_reader) (cinfo);
   /* Reset progression state -- would be cleaner if entropy decoder did this */
-  cinfo->coef_bits = NULL;
+  cinfo->coef_bits = nullptr;
 }
 
 
@@ -366,7 +366,7 @@ jinit_input_controller (j_decompress_ptr cinfo)
   inputctl = (my_inputctl_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
 				SIZEOF(my_input_controller) );
-  cinfo->inputctl = (struct jpeg_input_controller *) inputctl;
+  cinfo->inputctl = ( struct jpeg_input_controller *) inputctl;
   /* Initialize method pointers */
   inputctl->pub.consume_input = consume_markers;
   inputctl->pub.reset_input_controller = reset_input_controller;

@@ -26,7 +26,7 @@
 #define _VECTOR_CTL_H
 
 // Callback pointer prototype:
-typedef void (*VectorCtlCallbackProc)( arcQuats rotation );
+typedef void (*VectorCtlCallbackProc)( anQuats rotation );
 
 // The callback should look like:
 //      void CALLBACK MyCallBack (double dVecX, double dVecY, double dVecZ);
@@ -99,7 +99,7 @@ public:
     void SetZ(double dz) { SetAxis(dz, 2);  }
     double GetZ() { return m_dVec[2]; }
     void SetVector(double dx, double dy, double dz);
-	void SetidAxis( const arcMat3 &mat ) {
+	void SetidAxis( const anMat3 &mat ) {
 		rotationMatrix = mat;
 		rotationQuat = mat.ToQuat();
 		m_dVec = mat[2];
@@ -112,13 +112,13 @@ public:
     void ClipToFront (BOOL bEnable) { m_bFrontVector = bEnable; }
 
         // Set user-defined callback function to call whenever the vector has changed.
-        // Set to NULL to disable callback.
+        // Set to nullptr to disable callback.
     void SetVectorChangingCallback(VectorCtlCallbackProc proc)
         { m_procVectorChanging = proc; }
 
         // Set user-defined callback function to call whenever the vector has finished
         // changing (user dropped track-ball).
-        // Set to NULL to disable callback.
+        // Set to nullptr to disable callback.
     void SetVectorChangedCallback(VectorCtlCallbackProc proc)
         { m_procVectorChanged = proc; }
 
@@ -175,11 +175,11 @@ private:
     double      m_dSpecularExponent,    // Specularity effect intensity
                 m_dSensitivity;         // The bigger the number the less sensitive the mouse gets
                                         // Valid ranges are 1..MAX_UINT
-	arcVec3		m_dVec;		            // Vector components
-	arcMat3		rotationMatrix;			//
-	arcQuats	rotationQuat;
-	arcQuats	previousQuat;
-	arcVec3		lastPress;
+	anVec3		m_dVec;		            // Vector components
+	anMat3		rotationMatrix;			//
+	anQuats	rotationQuat;
+	anQuats	previousQuat;
+	anVec3		lastPress;
 	float		radius;
 
     VectorCtlCallbackProc   m_procVectorChanging, m_procVectorChanged;

@@ -1,18 +1,18 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idForce, idForce_Field )
+CLASS_DECLARATION( anForce, anForce_Field )
 END_CLASS
 
 /*
 ================
-idForce_Field::idForce_Field
+anForce_Field::anForce_Field
 ================
 */
-idForce_Field::idForce_Field( void ) {
+anForce_Field::anForce_Field( void ) {
 	type			= FORCEFIELD_UNIFORM;
 	applyType		= FORCEFIELD_APPLY_FORCE;
 	magnitude		= 0.0f;
@@ -20,20 +20,17 @@ idForce_Field::idForce_Field( void ) {
 	randomTorque	= 0.0f;
 	playerOnly		= false;
 	monsterOnly		= false;
-	clipModel		= NULL;
-// RAVEN BEGIN
-// bdube: added last apply time
+	clipModel		= nullptr;
 	lastApplyTime   = -1;
-	owner			= NULL;
-// RAVEN END
+	owner			= nullptr;
 }
 
 /*
 ================
-idForce_Field::~idForce_Field
+anForce_Field::~anForce_Field
 ================
 */
-idForce_Field::~idForce_Field( void ) {
+anForce_Field::~anForce_Field( void ) {
 	if ( this->clipModel ) {
 		delete this->clipModel;
 	}
@@ -41,10 +38,10 @@ idForce_Field::~idForce_Field( void ) {
 
 /*
 ================
-idForce_Field::Save
+anForce_Field::Save
 ================
 */
-void idForce_Field::Save( idSaveGame *savefile ) const {
+void anForce_Field::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( type );
 	savefile->WriteInt( applyType);
 	savefile->WriteFloat( magnitude );
@@ -54,18 +51,18 @@ void idForce_Field::Save( idSaveGame *savefile ) const {
 	savefile->WriteBool( monsterOnly );
 	savefile->WriteClipModel( clipModel );
 
-	savefile->WriteInt ( lastApplyTime );	// cnicholson: Added unsaved var
-	// TOSAVE: idEntity*			owner;
+	savefile->WriteInt ( lastApplyTime );
+	// TOSAVE: anEntity*			owner;
 }
 
 /*
 ================
-idForce_Field::Restore
+anForce_Field::Restore
 ================
 */
-void idForce_Field::Restore( idRestoreGame *savefile ) {
-	savefile->ReadInt( (int &)type );
-	savefile->ReadInt( (int &)applyType);
+void anForce_Field::Restore( anRestoreGame *savefile ) {
+	savefile->ReadInt( ( int&)type );
+	savefile->ReadInt( ( int&)applyType);
 	savefile->ReadFloat( magnitude );
 	savefile->ReadVec3( dir );
 	savefile->ReadFloat( randomTorque );
@@ -73,15 +70,15 @@ void idForce_Field::Restore( idRestoreGame *savefile ) {
 	savefile->ReadBool( monsterOnly );
 	savefile->ReadClipModel( clipModel );
 
-	savefile->ReadInt ( lastApplyTime );	// cnicholson: Added unrestored var
+	savefile->ReadInt ( lastApplyTime );
 }
 
 /*
 ================
-idForce_Field::SetClipModel
+anForce_Field::SetClipModel
 ================
 */
-void idForce_Field::SetClipModel( idClipModel *clipModel ) {
+void anForce_Field::SetClipModel( anClipModel *clipModel ) {
 	if ( this->clipModel && clipModel != this->clipModel ) {
 		delete this->clipModel;
 	}
@@ -90,10 +87,10 @@ void idForce_Field::SetClipModel( idClipModel *clipModel ) {
 
 /*
 ================
-idForce_Field::Uniform
+anForce_Field::Uniform
 ================
 */
-void idForce_Field::Uniform( const arcVec3 &force ) {
+void anForce_Field::Uniform( const anVec3 &force ) {
 	dir = force;
 	magnitude = dir.Normalize();
 	type = FORCEFIELD_UNIFORM;
@@ -101,107 +98,88 @@ void idForce_Field::Uniform( const arcVec3 &force ) {
 
 /*
 ================
-idForce_Field::Explosion
+anForce_Field::Explosion
 ================
 */
-void idForce_Field::Explosion( float force ) {
+void anForce_Field::Explosion( float force ) {
 	magnitude = force;
 	type = FORCEFIELD_EXPLOSION;
 }
 
 /*
 ================
-idForce_Field::Implosion
+anForce_Field::Implosion
 ================
 */
-void idForce_Field::Implosion( float force ) {
+void anForce_Field::Implosion( float force ) {
 	magnitude = force;
 	type = FORCEFIELD_IMPLOSION;
 }
 
 /*
 ================
-idForce_Field::RandomTorque
+anForce_Field::RandomTorque
 ================
 */
-void idForce_Field::RandomTorque( float force ) {
+void anForce_Field::RandomTorque( float force ) {
 	randomTorque = force;
 }
 
 /*
 ================
-idForce_Field::Evaluate
+anForce_Field::Evaluate
 ================
 */
-void idForce_Field::Evaluate( int time ) {
+void anForce_Field::Evaluate( int time ) {
 	int numClipModels, i;
-	arcBounds bounds;
-	arcVec3 force, torque, angularVelocity;
-	idClipModel *cm, *clipModelList[ MAX_GENTITIES ];
+	anBounds bounds;
+	anVec3 force, torque, angularVelocity;
+	anClipModel *cm, *clipModelList[ MAX_GENTITIES ];
 
 	assert( clipModel );
-
 	bounds.FromTransformedBounds( clipModel->GetBounds(), clipModel->GetOrigin(), clipModel->GetAxis() );
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
 	numClipModels = gameLocal.ClipModelsTouchingBounds( owner, bounds, -1, clipModelList, MAX_GENTITIES );
-// RAVEN END
 
 	for ( i = 0; i < numClipModels; i++ ) {
-		cm = clipModelList[ i ];
-
+		cm = clipModelList[i];
 		if ( !cm->IsTraceModel() ) {
 			continue;
 		}
 
-		idEntity *entity = cm->GetEntity();
+		anEntity *entity = cm->GetEntity();
 
 		if ( !entity ) {
 			continue;
 		}
 
-		idPhysics *physics = entity->GetPhysics();
+		anPhysics *physics = entity->GetPhysics();
 
 		if ( playerOnly ) {
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-			if ( !physics->IsType( idPhysics_Player::GetClassType() ) ) {
-// RAVEN END
+			if ( !physics->IsType( anPhysics_Player::GetClassType() ) ) {
 				continue;
 			}
 		} else if ( monsterOnly ) {
-// RAVEN BEGIN
-// jnewquist: Use accessor for static class type
-			if ( !physics->IsType( idPhysics_Monster::GetClassType() ) ) {
-
+			if ( !physics->IsType( anPhysics_Monster::GetClassType() ) ) {
 				continue;
 			}
 		}
-
-// nrausch: It was undesireable to have gibs and discarded weapons bouncing on jump pads
-		if ( gameLocal.isMultiplayer ) {
-			if ( entity->IsType( idItem::GetClassType() ) ) {
-				continue;
-			}
-			if ( entity->IsType( rvClientPhysics::GetClassType() ) ) {
-				continue;
-			}
-			if ( entity->IsType( idPlayer::GetClassType() ) ) {
-				if ( ((idPlayer*)entity)->health <= 0 ) {
-					continue;
-				}
-			}
-
-		}
-
-// ddynerman: multiple clip worlds
-		if ( !gameLocal.ContentsModel( owner, cm->GetOrigin(), cm, cm->GetAxis(), -1,
-									clipModel->GetCollisionModel(), clipModel->GetOrigin(), clipModel->GetAxis() ) ) {
-// RAVEN END
+		if ( entity->IsType( idItem::GetClassType() ) ) {
 			continue;
 		}
 
-		switch( type ) {
+		if ( entity->IsType( anBasePlayer::GetClassType() ) ) {
+			if ( ( (anBasePlayer *)entity )->health <= 0 ) {
+				continue;
+			}
+
+		}
+
+		if ( !gameLocal.ContentsModel( owner, cm->GetOrigin(), cm, cm->GetAxis(), -1,
+						clipModel->GetCollisionModel(), clipModel->GetOrigin(), clipModel->GetAxis() ) ) {
+			continue;
+		}
+
+		switch ( type ) {
 			case FORCEFIELD_UNIFORM: {
 				force = dir;
 				break;
@@ -217,7 +195,7 @@ void idForce_Field::Evaluate( int time ) {
 				break;
 			}
 			default: {
-				gameLocal.Error( "idForce_Field: invalid type" );
+				gameLocal.Error( "anForce_Field: invalid type" );
 				break;
 			}
 		}
@@ -231,12 +209,11 @@ void idForce_Field::Evaluate( int time ) {
 			}
 		}
 
-		switch( applyType ) {
+		switch ( applyType ) {
 			case FORCEFIELD_APPLY_FORCE: {
 				if ( randomTorque != 0.0f ) {
 					entity->AddForce( gameLocal.world, cm->GetId(), cm->GetOrigin() + torque.Cross( dir ) * randomTorque, dir * magnitude );
-				}
-				else {
+				} else {
 					entity->AddForce( gameLocal.world, cm->GetId(), cm->GetOrigin(), force * magnitude );
 				}
 				break;
@@ -252,21 +229,17 @@ void idForce_Field::Evaluate( int time ) {
 			case FORCEFIELD_APPLY_IMPULSE: {
 				if ( randomTorque != 0.0f ) {
 					entity->ApplyImpulse( gameLocal.world, cm->GetId(), cm->GetOrigin() + torque.Cross( dir ) * randomTorque, dir * magnitude );
-				}
-				else {
+				} else {
 					entity->ApplyImpulse( gameLocal.world, cm->GetId(), cm->GetOrigin(), force * magnitude );
 				}
 				break;
 			}
 			default: {
-				gameLocal.Error( "idForce_Field: invalid apply type" );
+				gameLocal.Error( "anForce_Field: invalid apply type" );
 				break;
 			}
 		}
 
-// RAVEN BEGIN
-// bdube: added last apply time
 		lastApplyTime = time;
-// RAVEN END
 	}
 }

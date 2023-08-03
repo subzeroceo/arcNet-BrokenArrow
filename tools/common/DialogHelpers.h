@@ -29,7 +29,7 @@ public:
 		SetWindowText ( mWindow, text );
 	}
 
-	void GetText ( arcNetString& out ) {
+	void GetText ( anString& out ) {
 		char text[4096];
 		GetWindowText ( mWindow, text, 4095 );
 		out = text;
@@ -37,7 +37,7 @@ public:
 
 	float GetFloat ( void )
 	{
-		arcNetString text;
+		anString text;
 		GetText ( text );
 		return atof( text );
 	}

@@ -19,7 +19,7 @@ USE_XHOST=0
 # this is the message for su call, printf
 SU_MESSAGE="You need to run this installation as the super user.\nPlease enter the root password."
 
-NULL=/dev/null
+nullptr=/dev/null
 # See if we have the XPG4 utilities (Solaris)
 if test -d /usr/xpg4/bin; then
 	PATH=/usr/xpg4/bin:$PATH
@@ -73,7 +73,7 @@ DetectLIBC()
 		# this step even fails on amd64 gentoo, only has GLIBC_2.2 2.3 in it's strings
 		echo "glibc-2.1"
 		status=0
-#		if [ fgrep GLIBC_2.1 /lib/libc.so.6* 2> $NULL >> $NULL ]; then
+#		if [ fgrep GLIBC_2.1 /lib/libc.so.6* 2> $nullptr >> $nullptr ]; then
 #			echo "glibc-2.1"
 #			status=0
 #		else
@@ -192,7 +192,7 @@ __EOF__
         "$setup" "$@"
         failed="$?"
     else
-        "$setup" "$@" 2>> $NULL
+        "$setup" "$@" 2>> $nullptr
         failed="$?"
     fi
     if [ "$absolute" -eq 0 ]
@@ -223,7 +223,7 @@ then
   if [ "$GOT_ROOT" != "0" ]
   then
 	if [ "$USE_XHOST" -eq 1 ]; then
-		xhost +127.0.0.1 2> $NULL > $NULL
+		xhost +127.0.0.1 2> $nullptr > $nullptr
 	fi
     if [ "$GET_ROOT" -eq 1 ]
     then
@@ -273,7 +273,7 @@ then
   fi
 fi
 
-# run the setup program (setup.gtk first, then setup)
+# run the setup program ( setup.gtk first, then setup)
 # except when trying setup.gtk first then console setup, always exit with 0
 # if the setup was cancelled, it is not our problem
 try_run setup.gtk $args $*

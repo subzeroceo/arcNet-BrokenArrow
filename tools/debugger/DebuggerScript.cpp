@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "DebuggerApp.h"
@@ -42,9 +42,9 @@ rvDebuggerScript::rvDebuggerScript
 */
 rvDebuggerScript::rvDebuggerScript ( void )
 {
-	mContents  = NULL;
-	mProgram   = NULL;
-	mInterface = NULL;
+	mContents  = nullptr;
+	mProgram   = nullptr;
+	mInterface = nullptr;
 }
 
 /*
@@ -54,7 +54,7 @@ rvDebuggerScript::~rvDebuggerScript
 */
 rvDebuggerScript::~rvDebuggerScript ( void )
 {
-	Unload ( );
+	Unload();
 }
 
 /*
@@ -77,9 +77,9 @@ void rvDebuggerScript::Unload ( void )
 		delete mProgram;
 	}
 
-	mContents  = NULL;
-	mProgram   = NULL;
-	mInterface = NULL;
+	mContents  = nullptr;
+	mProgram   = nullptr;
+	mInterface = nullptr;
 }
 
 /*
@@ -97,14 +97,14 @@ bool rvDebuggerScript::Load ( const char* filename )
 	int	  size;
 
 	// Unload the script before reloading it
-	Unload ( );
+	Unload();
 
 	// Cache the filename used to load the script
 	mFilename = filename;
 
 	// Read in the file
 	size = fileSystem->ReadFile ( filename, &buffer, &mModifiedTime );
-	if ( buffer == NULL )
+	if ( buffer == nullptr )
 	{
 		return false;
 	}
@@ -124,15 +124,15 @@ bool rvDebuggerScript::Load ( const char* filename )
 	{
 		// Parse the script using the script compiler
 		mProgram = new idProgram;
-		mProgram->BeginCompilation ( );
+		mProgram->BeginCompilation();
 		mProgram->CompileFile ( SCRIPT_DEFAULT );
 
 		//BSM Nerve: Loads a game specific main script file
-		arcNetString gamedir = cvarSystem->GetCVarString( "fs_game" );
+		anString gamedir = cvarSystem->GetCVarString( "fs_enginepath" );
 		if (gamedir.Length() > 0 ) {
 
-			arcNetString scriptFile = va( "script/%s_main.script", gamedir.c_str() );
-			if (fileSystem->ReadFile(scriptFile.c_str(), NULL) > 0 ) {
+			anString scriptFile = va( "script/%s_main.script", gamedir.c_str() );
+			if (fileSystem->ReadFile(scriptFile.c_str(), nullptr ) > 0 ) {
 				mProgram.CompileFile(scriptFile.c_str() );
 			}
 
@@ -141,9 +141,9 @@ bool rvDebuggerScript::Load ( const char* filename )
 		// Make sure the file isnt already compiled before trying to compile it again
 		for ( int f = mProgram->NumFilenames() - 1; f >= 0; f -- )
 		{
-			arcNetString qpath;
+			anString qpath;
 			qpath = fileSystem->OSPathToRelativePath ( mProgram->GetFilename ( f ) );
-			qpath.BackSlashesToSlashes ( );
+			qpath.BackSlashesToSlashes();
 			if ( !qpath.Cmp ( filename ) )
 			{
 				break;
@@ -155,15 +155,15 @@ bool rvDebuggerScript::Load ( const char* filename )
 			mProgram->CompileText ( filename, mContents, false );
 		}
 
-		mProgram->FinishCompilation ( );
+		mProgram->FinishCompilation();
 	}
 	catch ( arcExceptions& )
 	{
 		// Failed to parse the script so fail to load the file
 		delete mProgram;
-		mProgram = NULL;
+		mProgram = nullptr;
 		delete[] mContents;
-		mContents = NULL;
+		mContents = nullptr;
 
 		// TODO: Should cache the error for the dialog box
 
@@ -200,7 +200,7 @@ bool rvDebuggerScript::IsLineCode ( int linenumber )
 
 	// Run through all the statements in the program and see if any match the
 	// linenumber that we are checking.
-	for ( i	= 0; i < mProgram->NumStatements ( ); i ++ )
+	for ( i	= 0; i < mProgram->NumStatements(); i ++ )
 	{
 		if ( mProgram->GetStatement ( i ).linenumber == linenumber )
 		{
@@ -225,7 +225,7 @@ bool rvDebuggerScript::IsFileModified ( bool updateTime )
 	bool	result = false;
 
 	// Grab the filetime and shut the file down
-	fileSystem->ReadFile ( mFilename, NULL, &t );
+	fileSystem->ReadFile ( mFilename, nullptr, &t );
 
 	// Has the file been modified?
 	if ( t > mModifiedTime )

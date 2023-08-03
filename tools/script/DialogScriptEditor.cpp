@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/Common_resource.h"
@@ -15,14 +15,14 @@
 
 
 typedef struct scriptEventInfo_s {
-	arcNetString		name;
-	arcNetString		parms;
-	arcNetString		help;
+	anString		name;
+	anString		parms;
+	anString		help;
 } scriptEventInfo_t;
 
-static arcNetList<scriptEventInfo_t> scriptEvents;
+static anList<scriptEventInfo_t> scriptEvents;
 
-static DialogScriptEditor *g_ScriptDialog = NULL;
+static DialogScriptEditor *g_ScriptDialog = nullptr;
 
 // DialogScriptEditor dialog
 
@@ -31,7 +31,7 @@ static UINT FindDialogMessage = ::RegisterWindowMessage( FINDMSGSTRING );
 toolTip_t DialogScriptEditor::toolTips[] = {
 	{ IDOK, "save" },
 	{ IDCANCEL, "cancel" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 
@@ -42,9 +42,9 @@ IMPLEMENT_DYNAMIC(DialogScriptEditor, CDialog)
 DialogScriptEditor::DialogScriptEditor
 ================
 */
-DialogScriptEditor::DialogScriptEditor( CWnd* pParent /*=NULL*/ )
+DialogScriptEditor::DialogScriptEditor( CWnd* pParent /*=nullptr*/ )
 	: CDialog(DialogScriptEditor::IDD, pParent)
-	, findDlg(NULL)
+	, findDlg(nullptr )
 	, matchCase(false)
 	, matchWholeWords(false)
 	, firstLine(0 )
@@ -106,9 +106,9 @@ DialogScriptEditor::InitScriptEvents
 */
 void DialogScriptEditor::InitScriptEvents( void ) {
 	int index;
-	ARCParser src;
-	arcNetToken token;
-	arcNetString whiteSpace;
+	anParser src;
+	anToken token;
+	anString whiteSpace;
 	scriptEventInfo_t info;
 
 	if ( !src.LoadFile( "script/doom_events.script" ) ) {
@@ -201,14 +201,14 @@ void DialogScriptEditor::OpenFile( const char *fileName ) {
 	int numLines = 0;
 	int numCharsPerLine = 0;
 	int maxCharsPerLine = 0;
-	arcNetString scriptText, extension;
+	anString scriptText, extension;
 	CRect rect;
 	void *buffer;
 
 	scriptEdit.Init();
 	scriptEdit.AllowPathNames( false );
 
-	arcNetString( fileName ).ExtractFileExtension( extension );
+	anString( fileName ).ExtractFileExtension( extension );
 
 	if ( extension.Icmp( "script" ) == 0 ) {
         InitScriptEvents();
@@ -334,7 +334,7 @@ END_MESSAGE_MAP()
 ScriptEditorInit
 ================
 */
-void ScriptEditorInit( const arcDictionary *spawnArgs ) {
+void ScriptEditorInit( const anDict *spawnArgs ) {
 
 	if ( renderSystem->IsFullScreen() ) {
 		common->Printf( "Cannot run the script editor in fullscreen mode.\n"
@@ -342,17 +342,17 @@ void ScriptEditorInit( const arcDictionary *spawnArgs ) {
 		return;
 	}
 
-	if ( g_ScriptDialog == NULL ) {
+	if ( g_ScriptDialog == nullptr ) {
 		InitAfx();
 		g_ScriptDialog = new DialogScriptEditor();
 	}
 
-	if ( g_ScriptDialog->GetSafeHwnd() == NULL) {
+	if ( g_ScriptDialog->GetSafeHwnd() == nullptr ) {
 		g_ScriptDialog->Create( IDD_DIALOG_SCRIPTEDITOR );
 /*
 		// FIXME: restore position
 		CRect rct;
-		g_ScriptDialog->SetWindowPos( NULL, rct.left, rct.top, 0, 0, SWP_NOSIZE );
+		g_ScriptDialog->SetWindowPos( nullptr, rct.left, rct.top, 0, 0, SWP_NOSIZE );
 */
 	}
 
@@ -377,7 +377,7 @@ void ScriptEditorRun( void ) {
 	MSG *msg = &m_msgCur;
 #endif
 
-	while( ::PeekMessage(msg, NULL, NULL, NULL, PM_NOREMOVE) ) {
+	while( ::PeekMessage(msg, nullptr, nullptr, nullptr, PM_NOREMOVE) ) {
 		// pump message
 		if ( !AfxGetApp()->PumpMessage() ) {
 		}
@@ -391,7 +391,7 @@ ScriptEditorShutdown
 */
 void ScriptEditorShutdown( void ) {
 	delete g_ScriptDialog;
-	g_ScriptDialog = NULL;
+	g_ScriptDialog = nullptr;
 	scriptEvents.Clear();
 }
 
@@ -618,12 +618,12 @@ DialogScriptEditor::OnFindDialogMessage
 ================
 */
 LRESULT DialogScriptEditor::OnFindDialogMessage( WPARAM wParam, LPARAM lParam ) {
-	if ( findDlg == NULL ) {
+	if ( findDlg == nullptr ) {
 		return 0;
 	}
 
 	if ( findDlg->IsTerminating() ) {
-        findDlg = NULL;
+        findDlg = nullptr;
         return 0;
     }
 
@@ -694,7 +694,7 @@ DialogScriptEditor::OnBnClickedOk
 ================
 */
 void DialogScriptEditor::OnBnClickedOk() {
-	arcNetString scriptText;
+	anString scriptText;
 
 	common->Printf( "Writing \'%s\'...\n", fileName.c_str() );
 

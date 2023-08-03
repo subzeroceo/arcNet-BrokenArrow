@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "win_local.h"
@@ -40,7 +40,7 @@ static void WIN_DisableAltTab( void ) {
 	if ( s_alttab_disabled || win32.win_allowAltTab.GetBool() ) {
 		return;
 	}
-	if ( !arcNetString::Icmp( cvarSystem->GetCVarString( "sys_arch" ), "winnt" ) ) {
+	if ( !anString::Icmp( cvarSystem->GetCVarString( "sys_arch" ), "winnt" ) ) {
 		RegisterHotKey( 0, 0, MOD_ALT, VK_TAB );
 	} else {
 		BOOL old;
@@ -54,7 +54,7 @@ static void WIN_EnableAltTab( void ) {
 	if ( !s_alttab_disabled || win32.win_allowAltTab.GetBool() ) {
 		return;
 	}
-	if ( !arcNetString::Icmp( cvarSystem->GetCVarString( "sys_arch" ), "winnt" ) ) {
+	if ( !anString::Icmp( cvarSystem->GetCVarString( "sys_arch" ), "winnt" ) ) {
 		UnregisterHotKey( 0, 0 );
 	} else {
 		BOOL old;
@@ -186,7 +186,7 @@ MapKey
 Map from windows to Doom keynums
 =======
 */
-int MapKey (int key)
+int MapKey ( intkey)
 {
 	int result;
 	int modified;
@@ -208,7 +208,7 @@ int MapKey (int key)
 	//The specific case we are testing is the numpad / is not being translated
 	//properly for localized builds.
 	if (is_extended) {
-		switch(modified) {
+		switch (modified) {
 			case 0x35: //Numpad /
 				return K_KP_SLASH;
 		}
@@ -217,7 +217,7 @@ int MapKey (int key)
 	const unsigned char *scanToKey = Sys_GetScanTable();
 	result = scanToKey[modified];
 
-	// common->Printf( "Key: 0x%08x Modified: 0x%02x Extended: %s Result: 0x%02x\n", key, modified, (is_extended?"Y":"N"), result);
+	// common->Printf( "Key: 0x%08x Modified: 0x%02x Extended: %s Result: 0x%02x\n", key, modified, (is_extended?"Y":"N" ), result);
 
 	if ( is_extended ) {
 		switch ( result )
@@ -275,7 +275,7 @@ main window procedure
 */
 LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 	int key;
-	switch( uMsg ) {
+	switch ( uMsg ) {
 		case WM_WINDOWPOSCHANGED:
 			if (glConfig.isInitialized) {
 				RECT rect;
@@ -304,7 +304,7 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 
 		case WM_DESTROY:
 			// let sound and input know about this?
-			win32.hWnd = NULL;
+			win32.hWnd = nullptr;
 			if ( win32.cdsFullscreen ) {
 				WIN_EnableAltTab();
 			}
@@ -351,8 +351,8 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 
 			if ( !win32.cdsFullscreen )
 			{
-				xPos = (short) LOWORD(lParam);    // horizontal position
-				yPos = (short) HIWORD(lParam);    // vertical position
+				xPos = ( short) LOWORD(lParam);    // horizontal position
+				yPos = ( short) HIWORD(lParam);    // vertical position
 
 				r.left   = 0;
 				r.top    = 0;
@@ -395,7 +395,7 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 				// as two events (ctrl then alt)
 				break;
 			}
-			Sys_QueEvent( win32.sysMsgTime, SE_KEY, key, true, 0, NULL );
+			Sys_QueEvent( win32.sysMsgTime, SE_KEY, key, true, 0, nullptr );
 			break;
 
 		case WM_SYSKEYUP:
@@ -410,11 +410,11 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 				// as two events (ctrl then alt)
 				break;
 			}
-			Sys_QueEvent( win32.sysMsgTime, SE_KEY, key, false, 0, NULL );
+			Sys_QueEvent( win32.sysMsgTime, SE_KEY, key, false, 0, nullptr );
 			break;
 
 		case WM_CHAR:
-			Sys_QueEvent( win32.sysMsgTime, SE_CHAR, wParam, 0, 0, NULL );
+			Sys_QueEvent( win32.sysMsgTime, SE_CHAR, wParam, 0, 0, nullptr );
 			break;
 
 		case WM_NCLBUTTONDOWN:
@@ -445,8 +445,8 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 			int key = delta < 0 ? K_MWHEELDOWN : K_MWHEELUP;
 			delta = abs( delta );
 			while( delta-- > 0 ) {
-				Sys_QueEvent( win32.sysMsgTime, SE_KEY, key, true, 0, NULL );
-				Sys_QueEvent( win32.sysMsgTime, SE_KEY, key, false, 0, NULL );
+				Sys_QueEvent( win32.sysMsgTime, SE_KEY, key, true, 0, nullptr );
+				Sys_QueEvent( win32.sysMsgTime, SE_KEY, key, false, 0, nullptr );
 			}
 			break;
 		}

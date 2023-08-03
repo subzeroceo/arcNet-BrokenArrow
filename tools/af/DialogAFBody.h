@@ -34,9 +34,9 @@ class DialogAFBody : public CDialog {
 	DECLARE_DYNAMIC(DialogAFBody)
 
 public:
-						DialogAFBody( CWnd* pParent = NULL );   // standard constructor
+						DialogAFBody( CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogAFBody();
-	void				LoadFile( arcDeclAF *af );
+	void				LoadFile( anDeclAF *af );
 	void				SaveFile( void );
 	void				LoadBody( const char *name );
 	void				SaveBody( void );
@@ -108,8 +108,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	arcDeclAF *			file;
-	arcDeclAF_Body *		body;
+	anDeclAF *			file;
+	anDeclAF_Body *		body;
 	int					numJoints;
 
 	//{{AFX_DATA(DialogAFBody)

@@ -115,7 +115,7 @@ public:
 	short		my;								// mouse delta y
 
 	// Clients are authoritative on their positions
-	arcVec3		pos;
+	anVec3		pos;
 	float		speedSquared;
 
 public:
@@ -210,7 +210,7 @@ public:
 	virtual void		ClearAngles() = 0;
 
 	// When the console is down or the menu is up, only emit default usercmd, so the player isn't moving around.
-	// Each subsystem (session and game) may want an inhibit will OR the requests.
+	// Each subsystem ( session and game) may want an inhibit will OR the requests.
 	virtual void		InhibitUsercmd( inhibit_t subsystem, bool inhibit ) = 0;
 
 	// Set a value that can safely be referenced by UsercmdInterrupt() for each key binding.
@@ -259,7 +259,7 @@ public:
 	static const int USERCMD_BUFFER_SIZE = 128;
 
 	//usercmd_t	cmdBuffer[ USERCMD_BUFFER_SIZE ][ MAX_PLAYERS ];
-	id2DArray< usercmd_t, USERCMD_BUFFER_SIZE, MAX_PLAYERS >::type	cmdBuffer;
+	an2DArray< usercmd_t, USERCMD_BUFFER_SIZE, MAX_PLAYERS >::type	cmdBuffer;
 	arcArray< int, MAX_PLAYERS >			writeFrame;	//"where we write to next"
 	arcArray< int, MAX_PLAYERS >			readFrame;	//"the last frame we read"
 
@@ -267,7 +267,7 @@ public:
 		cmdBuffer[ writeFrame[ playerIndex ] % USERCMD_BUFFER_SIZE ][ playerIndex ] = cmd;
 		if ( writeFrame[ playerIndex ] - readFrame[ playerIndex ] + 1 > USERCMD_BUFFER_SIZE ) {
 			readFrame[ playerIndex ] = writeFrame[ playerIndex ] - USERCMD_BUFFER_SIZE / 2;		// Set to middle of buffer as a temp fix until we can catch the client up correctly
-			arcLibrary::Printf( "PutUserCmdForPlayer: buffer overflow.\n" );
+			anLibrary::Printf( "PutUserCmdForPlayer: buffer overflow.\n" );
 		}
 		writeFrame[ playerIndex ]++;
 	}

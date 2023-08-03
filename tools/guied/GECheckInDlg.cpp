@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/guied_resource.h"
@@ -7,7 +7,7 @@
 
 typedef struct {
 	const char*		mFilename;
-	arcNetString*			mComment;
+	anString*			mComment;
 } GECHECKINDLG;
 
 /*
@@ -61,7 +61,7 @@ GECheckInDlg_DoModal
 Starts the check in dialog
 ================
 */
-bool GECheckInDlg_DoModal ( HWND parent, const char* filename, arcNetString* comment ) {
+bool GECheckInDlg_DoModal ( HWND parent, const char* filename, anString* comment ) {
 	GECHECKINDLG	dlg;
 
 	dlg.mComment = comment;

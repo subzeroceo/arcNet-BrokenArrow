@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "codec.h"
@@ -116,7 +116,7 @@ void codec::Segment( int *alist, float *flist, int numElements, float rmse)
 	int x, y, yy, xx, numc, onf, index, temp, best, a0, a1, a2, a3, bpp, i, len;
 	byte	find[16], *lineout, *cbook, *src, *dst;
 	float	fy, fcr, fcb;
-	arcNetFile *fpcb;
+	anFile *fpcb;
 	char cbFile[256], tempcb[256], temptb[256];
 	bool doopen;
 	float y0,y1,y2,y3,cr,cb;
@@ -179,7 +179,7 @@ void codec::Segment( int *alist, float *flist, int numElements, float rmse)
 					numEntries++;
 					for (yy=y;yy<(y+4);yy++ ) {
 					for (xx=x;xx<(x+4);xx++ ) {
-						src = image->bitmapData() + (yy*(bpp*image->pixelsWide() )) + (xx*bpp);
+						src = image->bitmapData() + (yy*(bpp*image->pixelsWide() ) ) + (xx*bpp);
 						memcpy( dst, src, 3); dst += 3;
 					}
 					}
@@ -411,7 +411,7 @@ bool diff;
 		diff = false;
 		size = pquad[i].size;
 		if (size) {
-		switch( pquad[i].status ) {
+		switch ( pquad[i].status ) {
 			case	DEP:
 				break;
 			case	SLD:
@@ -755,7 +755,7 @@ register int ind;
 	ind = 0;
 
 	for ( i=0; i<size; i++ ) {
-	for (j = 0; j<size; j++ ) {
+	for ( j = 0; j<size; j++ ) {
 		if (old[3]||bnew[3] ) ind += RGBADIST( old, bnew );
 		old += 4; bnew += 4;
 	}
@@ -776,7 +776,7 @@ int i,j,snr;
 	snr = 0;
 
 	for ( i=0; i<size; i++ ) {
-	for (j = 0; j<size; j++ ) {
+	for ( j = 0; j<size; j++ ) {
 		snr += RGBADIST( old, bnew );
 		old += 4; bnew += 4;
 	}
@@ -1112,7 +1112,7 @@ byte *idataA, *idataB;
 	InitImages();
 
 	flist = (float *)Mem_ClearedAlloc( (numQuadCels+1 ) *sizeof( float ) );
-	ilist = ( int * )Mem_ClearedAlloc( (numQuadCels+1 ) *sizeof( int  ) );
+	ilist = ( int*)Mem_ClearedAlloc( (numQuadCels+1 ) *sizeof( int  ) );
 
 
 	fsize = 56*1024;
@@ -1131,7 +1131,7 @@ byte *idataA, *idataB;
 	if (previousImage[0] ) wtype = 1; else wtype = 0;
 
 	for ( i=0; i<numQuadCels; i++ ) {
-		for (j = 0;j<DEAD;j++ ) qStatus[i].snr[j] = 9999;
+		for ( j = 0;j<DEAD;j++ ) qStatus[i].snr[j] = 9999;
 		qStatus[i].mark = false;
 		if ( qStatus[i].size == osize ) {
 			if (previousImage[0] ) {
@@ -1376,7 +1376,7 @@ byte *idataA, *idataB;
 	InitImages();
 
 	flist = (float *)Mem_ClearedAlloc( (numQuadCels+1 ) * sizeof( float ) );
-	ilist = ( int * )Mem_ClearedAlloc( (numQuadCels+1 ) * sizeof( int  ) );
+	ilist = ( int*)Mem_ClearedAlloc( (numQuadCels+1 ) * sizeof( int  ) );
 
 
 	fsize = 56*1024;
@@ -1389,7 +1389,7 @@ byte *idataA, *idataB;
 	if (previousImage[0] ) wtype = 1; else wtype = 0;
 
 	for ( i=0; i<numQuadCels; i++ ) {
-		for (j = 0;j<DEAD;j++ ) qStatus[i].snr[j] = 9999;
+		for ( j = 0;j<DEAD;j++ ) qStatus[i].snr[j] = 9999;
 		qStatus[i].mark = false;
 		if ( qStatus[i].size == osize ) {
 			if (previousImage[0] ) {
@@ -1477,8 +1477,8 @@ void codec::VQ( const int numEntries, const int dimension, const unsigned char *
 
 	bool *inuse = (bool *)_alloca( numEntries * sizeof(bool) );
 	float *snrs = (float *)_alloca( numEntries * sizeof( float ) );
-	int *indexes = ( int * )_alloca( numEntries * sizeof( int ) );
-	int *indexet = ( int * )_alloca( numEntries * sizeof( int ) );
+	int *indexes = ( int*)_alloca( numEntries * sizeof( int ) );
+	int *indexet = ( int*)_alloca( numEntries * sizeof( int ) );
 
 	int numFinalEntries = numEntries;
 	for ( i=0; i<numEntries; i++ ) {
@@ -1547,13 +1547,13 @@ void codec::VQ( const int numEntries, const int dimension, const unsigned char *
 							g1 = ( float )vectors[jbase+x+1];
 							b0 = ( float )vectors[ibase+x+2];
 							b1 = ( float )vectors[jbase+x+2];
-							dist += arcMath::Sqrt16( (r0-r1)*(r0-r1) + (g0-g1)*(g0-g1) + (b0-b1)*(b0-b1) );
+							dist += anMath::Sqrt16( (r0-r1)*(r0-r1) + (g0-g1)*(g0-g1) + (b0-b1)*(b0-b1) );
 #else
 							// JDC: optimization
 							int	dr = vectors[ibase+x] - vectors[jbase+x];
 							int	dg = vectors[ibase+x+1] - vectors[jbase+x+1];
 							int	db = vectors[ibase+x+2] - vectors[jbase+x+2];
-							dist += arcMath::Sqrt16( dr * dr + dg * dg + db * db );
+							dist += anMath::Sqrt16( dr * dr + dg * dg + db * db );
 #endif
 						}
 						simport = import[i] * import[j];
@@ -1633,13 +1633,13 @@ void codec::VQ( const int numEntries, const int dimension, const unsigned char *
 							g1 = ( float )vectors[jbase+x+1];
 							b0 = ( float )vectors[ibase+x+2];
 							b1 = ( float )vectors[jbase+x+2];
-							dist += arcMath::Sqrt16( (r0-r1)*(r0-r1) + (g0-g1)*(g0-g1) + (b0-b1)*(b0-b1) );
+							dist += anMath::Sqrt16( (r0-r1)*(r0-r1) + (g0-g1)*(g0-g1) + (b0-b1)*(b0-b1) );
 #else
 							// JDC: optimization
 							int	dr = vectors[ibase+x] - vectors[jbase+x];
 							int	dg = vectors[ibase+x+1] - vectors[jbase+x+1];
 							int	db = vectors[ibase+x+2] - vectors[jbase+x+2];
-							dist += arcMath::Sqrt16( dr * dr + dg * dg + db * db );
+							dist += anMath::Sqrt16( dr * dr + dg * dg + db * db );
 							if ( dist > scaledBestDist ) {
 								break;
 							}

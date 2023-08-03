@@ -1,16 +1,14 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
-
-ARCSphere sphere_zero( vec3_zero, 0.0f );
-
+anSphere sphere_zero( vec3_zero, 0.0f );
 
 /*
 ================
-ARCSphere::PlaneDistance
+anSphere::PlaneDistance
 ================
 */
-float ARCSphere::PlaneDistance( const arcPlane &plane ) const {
+float anSphere::PlaneDistance( const anPlane &plane ) const {
 	float d;
 
 	d = plane.Distance( origin );
@@ -25,10 +23,10 @@ float ARCSphere::PlaneDistance( const arcPlane &plane ) const {
 
 /*
 ================
-ARCSphere::PlaneSide
+anSphere::PlaneSide
 ================
 */
-int ARCSphere::PlaneSide( const arcPlane &plane, const float epsilon ) const {
+int anSphere::PlaneSide( const anPlane &plane, const float epsilon ) const {
 	float d;
 
 	d = plane.Distance( origin );
@@ -43,13 +41,13 @@ int ARCSphere::PlaneSide( const arcPlane &plane, const float epsilon ) const {
 
 /*
 ============
-ARCSphere::LineIntersection
+anSphere::LineIntersection
 
   Returns true if the line intersects the sphere between the start and end point.
 ============
 */
-bool ARCSphere::LineIntersection( const arcVec3 &start, const arcVec3 &end ) const {
-	arcVec3 r, s, e;
+bool anSphere::LineIntersection( const anVec3 &start, const anVec3 &end ) const {
+	anVec3 r, s, e;
 	float a;
 
 	s = start - origin;
@@ -58,11 +56,9 @@ bool ARCSphere::LineIntersection( const arcVec3 &start, const arcVec3 &end ) con
 	a = -s * r;
 	if ( a <= 0 ) {
 		return ( s * s < radius * radius );
-	}
-	else if ( a >= r * r ) {
+	} else if ( a >= r * r ) {
 		return ( e * e < radius * radius );
-	}
-	else {
+	} else {
 		r = s + ( a / ( r * r ) ) * r;
 		return ( r * r < radius * radius );
 	}
@@ -70,16 +66,16 @@ bool ARCSphere::LineIntersection( const arcVec3 &start, const arcVec3 &end ) con
 
 /*
 ============
-ARCSphere::RayIntersection
+anSphere::RayIntersection
 
   Returns true if the ray intersects the sphere.
   The ray can intersect the sphere in both directions from the start point.
   If start is inside the sphere then scale1 < 0 and scale2 > 0.
 ============
 */
-bool ARCSphere::RayIntersection( const arcVec3 &start, const arcVec3 &dir, float &scale1, float &scale2 ) const {
+bool anSphere::RayIntersection( const anVec3 &start, const anVec3 &dir, float &scale1, float &scale2 ) const {
 	double a, b, c, d, sqrtd;
-	arcVec3 p;
+	anVec3 p;
 
 	p = start - origin;
 	a = dir * dir;
@@ -91,7 +87,7 @@ bool ARCSphere::RayIntersection( const arcVec3 &start, const arcVec3 &dir, float
 		return false;
 	}
 
-	sqrtd = arcMath::Sqrt( d );
+	sqrtd = anMath::Sqrt( d );
 	a = 1.0f / a;
 
 	scale1 = ( -b + sqrtd ) * a;
@@ -102,15 +98,15 @@ bool ARCSphere::RayIntersection( const arcVec3 &start, const arcVec3 &dir, float
 
 /*
 ============
-ARCSphere::FromPoints
+anSphere::FromPoints
 
   Tight sphere for a point set.
 ============
 */
-void ARCSphere::FromPoints( const arcVec3 *points, const int numPoints ) {
+void anSphere::FromPoints( const anVec3 *points, const int numPoints ) {
 	int i;
 	float radiusSqr, dist;
-	arcVec3 mins, maxs;
+	anVec3 mins, maxs;
 
 	SIMDProcessor->MinMax( mins, maxs, points, numPoints );
 
@@ -123,5 +119,5 @@ void ARCSphere::FromPoints( const arcVec3 *points, const int numPoints ) {
 			radiusSqr = dist;
 		}
 	}
-	radius = arcMath::Sqrt( radiusSqr );
+	radius = anMath::Sqrt( radiusSqr );
 }

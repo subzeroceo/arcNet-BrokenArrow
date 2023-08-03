@@ -1,4 +1,4 @@
-// RAVEN BEGIN
+
 // bdube: note that this file is no longer merged with Doom3 updates
 //
 // MERGE_DATE 06/02/2004
@@ -14,8 +14,8 @@
 ===============================================================================
 */
 
-extern const idEventDef EV_BecomeNonSolid;
-extern const idEventDef EV_IsAtRest;
+extern const anEventDef EV_BecomeNonSolid;
+extern const anEventDef EV_IsAtRest;
 
 class idMoveable : public idDamagable {
 public:
@@ -26,8 +26,8 @@ public:
 
 	void					Spawn( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	virtual void			Think( void );
 
@@ -36,44 +36,44 @@ public:
 
 	bool					AllowStep( void ) const;
 	void					EnableDamage( bool enable, float duration );
-	virtual bool			Collide( const trace_t &collision, const arcVec3 &velocity );
-	virtual void			Damage( idEntity *inflictor, idEntity *attacker, const arcVec3 &dir, const char *damageDefName, const float damageScale, const int location );
-	virtual void			Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location );
-	virtual void			WriteToSnapshot( idBitMsgDelta &msg ) const;
-	virtual void			ReadFromSnapshot( const idBitMsgDelta &msg );
+	virtual bool			Collide( const trace_t &collision, const anVec3 &velocity );
+	virtual void			Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
+	virtual void			Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
+	virtual void			WriteToSnapshot( anBitMsgDelta &msg ) const;
+	virtual void			ReadFromSnapshot( const anBitMsgDelta &msg );
 
-	virtual void			AddDamageEffect( const trace_t &collision, const arcVec3 &velocity, const char *damageDefName, idEntity* inflictor );
+	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor );
 
 protected:
 
-	idPhysics_RigidBody		physicsObj;				// physics object
-	idStr					brokenModel;			// model set when health drops down to or below zero
-	idStr					damage;					// if > 0 apply damage to hit entities
+	anPhysics_RigidBody		physicsObj;				// physics object
+	anString					brokenModel;			// model set when health drops down to or below zero
+	anString					damage;					// if > 0 apply damage to hit entities
 	int						nextCollideFxTime;		// next time it is ok to spawn collision fx
 	float					minDamageVelocity;		// minimum velocity before moveable applies damage
 	float					maxDamageVelocity;		// velocity at which the maximum damage is applied
-	idCurve_Spline<arcVec3> *initialSpline;			// initial spline path the moveable follows
-	arcVec3					initialSplineDir;		// initial relative direction along the spline path
+	anCurve_Spline<anVec3> *initialSpline;			// initial spline path the moveable follows
+	anVec3					initialSplineDir;		// initial relative direction along the spline path
 	bool					unbindOnDeath;			// unbind from master when health drops down to or below zero
 	bool					allowStep;				// allow monsters to step on the object
 	bool					canDamage;				// only apply damage when this is set
 
-	idEntityPtr<idEntity>	lastAttacker;
+	anEntityPtr<anEntity>	lastAttacker;
 
 	virtual void			ExecuteStage	( void );
 
-	const arcMaterial *		GetRenderModelMaterial( void ) const;
+	const anMaterial *		GetRenderModelMaterial( void ) const;
 	void					BecomeNonSolid( void );
 	void					InitInitialSpline( int startTime );
 	bool					FollowInitialSplinePath( void );
 
-	void					Event_Activate( idEntity *activator );
+	void					Event_Activate( anEntity *activator );
 	void					Event_BecomeNonSolid( void );
 	void					Event_SetOwnerFromSpawnArgs( void );
 	void					Event_IsAtRest( void );
 	void					Event_CanDamage ( float enable );
 	void					Event_SetHealth ( float newHealth );
-	void					Event_RadiusDamage( idEntity *attacker, const char* splash );
+	void					Event_RadiusDamage( anEntity *attacker, const char* splash );
 };
 
 
@@ -94,21 +94,21 @@ public:
 
 	void					Spawn( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	void					BarrelThink( void );
 	virtual void			Think( void );
-	virtual bool			GetPhysicsToVisualTransform( arcVec3 &origin, arcMat3 &axis );
+	virtual bool			GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis );
 	virtual void			ClientPredictionThink( void );
 
 private:
 	float					radius;					// radius of barrel
 	int						barrelAxis;				// one of the coordinate axes the barrel cylinder is parallel to
-	arcVec3					lastOrigin;				// origin of the barrel the last think frame
-	arcMat3					lastAxis;				// axis of the barrel the last think frame
+	anVec3					lastOrigin;				// origin of the barrel the last think frame
+	anMat3					lastAxis;				// axis of the barrel the last think frame
 	float					additionalRotation;		// additional rotation of the barrel about it's axis
-	arcMat3					additionalAxis;			// additional rotation axis
+	anMat3					additionalAxis;			// additional rotation axis
 };
 
 
@@ -131,16 +131,16 @@ public:
 
 	void					Spawn( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	virtual void			Think( void );
-	virtual void			Damage( idEntity *inflictor, idEntity *attacker, const arcVec3 &dir,
+	virtual void			Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir,
 								const char *damageDefName, const float damageScale, const int location );
-	virtual void			Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location );
+	virtual void			Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
 
-	virtual void			WriteToSnapshot( idBitMsgDelta &msg ) const;
-	virtual void			ReadFromSnapshot( const idBitMsgDelta &msg );
+	virtual void			WriteToSnapshot( anBitMsgDelta &msg ) const;
+	virtual void			ReadFromSnapshot( const anBitMsgDelta &msg );
 
 private:
 	typedef enum {
@@ -152,8 +152,8 @@ private:
 	} explode_state_t;
 	explode_state_t			state;
 
-	arcVec3					spawnOrigin;
-	arcMat3					spawnAxis;
+	anVec3					spawnOrigin;
+	anMat3					spawnAxis;
 	qhandle_t				ipsHandle;
 	qhandle_t				lightHandle;
 	renderEntity_t			ipsEntity;
@@ -168,7 +168,7 @@ private:
 	void					AddLight( const char *name , bool burn );
 	void					ExplodingEffects( void );
 
-	void					Event_Activate( idEntity *activator );
+	void					Event_Activate( anEntity *activator );
 	void					Event_Respawn();
 	void					Event_Explode();
 	void					Event_TriggerTargets();
@@ -176,4 +176,4 @@ private:
 
 #endif /* !__GAME_MOVEABLE_H__ */
 
-// RAVEN END
+

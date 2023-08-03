@@ -13,8 +13,8 @@
 ===============================================================================
 */
 
-#define LIGHT_TRIS_DEFERRED			((surfTriangles_t *)-1 )
-#define LIGHT_CULL_ALL_FRONT		(( byte * )-1 )
+#define LIGHT_TRIS_DEFERRED			(( srfTriangles_t *)-1 )
+#define LIGHT_CULL_ALL_FRONT		((byte *)-1 )
 #define	LIGHT_CLIP_EPSILON			0.1f
 
 
@@ -29,23 +29,23 @@ typedef struct {
 	byte *					cullBits;
 
 	// Clip planes in surface space used to calculate the cull bits.
-	arcPlane					localClipPlanes[6];
+	anPlane					localClipPlanes[6];
 } srfCullInfo_t;
 
 
 typedef struct {
 	// if lightTris == LIGHT_TRIS_DEFERRED, then the calculation of the
 	// lightTris has been deferred, and must be done if ambientTris is visible
-	surfTriangles_t *		lightTris;
+	srfTriangles_t *		lightTris;
 
 	// shadow volume triangle surface
-	surfTriangles_t *		shadowTris;
+	srfTriangles_t *		shadowTris;
 
 	// so we can check ambientViewCount before adding lightTris, and get
 	// at the shared vertex and possibly shadowVertex caches
-	surfTriangles_t *		ambientTris;
+	srfTriangles_t *		ambientTris;
 
-	const arcMaterial *		shader;
+	const anMaterial *		shader;
 
 	int						expCulled;			// only for the experimental shadow buffer renderer
 
@@ -59,36 +59,36 @@ typedef struct areaNumRef_s {
 } areaNumRef_t;
 
 
-class ARCRenderEntityLocal;
-class ARCRenderLightsLocal;
+class anRenderEntityLocal;
+class anRenderLightsLocal;
 
-class ARCInteraction {
+class an Interaction {
 public:
 	// this may be 0 if the light and entity do not actually intersect
 	// -1 = an untested interaction
 	int						numSurfaces;
 
 	// if there is a whole-entity optimized shadow hull, it will
-	// be present as a surfaceInteraction_t with a NULL ambientTris, but
+	// be present as a surfaceInteraction_t with a nullptr ambientTris, but
 	// possibly having a shader to specify the shadow sorting order
 	surfaceInteraction_t *	surfaces;
 
-	// get space from here, if NULL, it is a pre-generated shadow volume from dmap
-	ARCRenderEntityLocal *	entityDef;
-	ARCRenderLightsLocal *	lightDef;
+	// get space from here, if nullptr, it is a pre-generated shadow volume from dmap
+	anRenderEntityLocal *	entityDef;
+	anRenderLightsLocal *	lightDef;
 
-	ARCInteraction *			lightNext;				// for lightDef chains
-	ARCInteraction *			lightPrev;
-	ARCInteraction *			entityNext;				// for entityDef chains
-	ARCInteraction *			entityPrev;
+	an Interaction *			lightNext;				// for lightDef chains
+	an Interaction *			lightPrev;
+	an Interaction *			entityNext;				// for entityDef chains
+	an Interaction *			entityPrev;
 
 public:
-							ARCInteraction( void );
+							an Interaction( void );
 
 	// because these are generated and freed each game tic for active elements all
 	// over the world, we use a custom pool allocater to avoid memory allocation overhead
 	// and fragmentation
-	static ARCInteraction *	AllocAndLink( ARCRenderEntityLocal *edef, ARCRenderLightsLocal *ldef );
+	static an Interaction *	AllocAndLink( anRenderEntityLocal *edef, anRenderLightsLocal *ldef );
 
 	// unlinks from the entity and light, frees all surfaceInteractions,
 	// and puts it back on the free list
@@ -125,32 +125,32 @@ private:
 		FRUSTUM_VALID,
 		FRUSTUM_VALIDAREAS,
 	}						frustumState;
-	ARCFrustum				frustum;				// frustum which contains the interaction
+	anFrustum				frustum;				// frustum which contains the interaction
 	areaNumRef_t *			frustumAreas;			// numbers of the areas the frustum touches
 
 	int						dynamicModelFrameCount;	// so we can tell if a callback model animated
 
 private:
 	// actually create the interaction
-	void					CreateInteraction( const ARCRenderModel *model );
+	void					CreateInteraction( const anRenderModel *model );
 
 	// unlink from entity and light lists
 	void					Unlink( void );
 
 	// try to determine if the entire interaction, including shadows, is guaranteed
 	// to be outside the view frustum
-	bool					CullInteractionByViewFrustum( const ARCFrustum &viewFrustum );
+	bool					CullInteractionByViewFrustum( const anFrustum &viewFrustum );
 
 	// determine the minimum scissor rect that will include the interaction shadows
 	// projected to the bounds of the light
-	ARCScreenRect			CalcInteractionScissorRectangle( const ARCFrustum &viewFrustum );
+	anScreenRect			CalcInteractionScissorRectangle( const anFrustum &viewFrustum );
 };
 
 
-void R_CalcInteractionFacing( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, srfCullInfo_t &cullInfo );
-void R_CalcInteractionCullBits( const ARCRenderEntityLocal *ent, const surfTriangles_t *tri, const ARCRenderLightsLocal *light, srfCullInfo_t &cullInfo );
+void R_CalcInteractionFacing( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, srfCullInfo_t &cullInfo );
+void R_CalcInteractionCullBits( const anRenderEntityLocal *ent, const srfTriangles_t *tri, const anRenderLightsLocal *light, srfCullInfo_t &cullInfo );
 void R_FreeInteractionCullInfo( srfCullInfo_t &cullInfo );
 
-void R_ShowInteractionMemory_f( const arcCommandArgs &args );
+void R_ShowInteractionMemory_f( const anCommandArgs &args );
 
 #endif /* !__INTERACTION_H__ */

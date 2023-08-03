@@ -1,5 +1,5 @@
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 /*
@@ -66,20 +66,20 @@ static unsigned char PADDING[64] = {
 };
 
 /* F, G and H are basic MD4 functions. */
-#define F( x, y, z ) (((x) & (y) ) | ((~x) & (z) ))
-#define G( x, y, z ) (((x) & (y) ) | ((x) & (z) ) | ((y) & (z) ))
+#define F( x, y, z ) (((x) & (y) ) | ((~x) & (z) ) )
+#define G( x, y, z ) (((x) & (y) ) | ((x) & (z) ) | ((y) & (z) ) )
 #define H( x, y, z ) ((x) ^ (y) ^ (z) )
 
 /* ROTATE_LEFT rotates x left n bits. */
-#define ROTATE_LEFT(x, n) (((x) << (n) ) | ((x) >> (32-(n) )) )
+#define ROTATE_LEFT(x, n) (((x) << (n) ) | ((x) >> (32-(n) ) ) )
 
 /* FF, GG and HH are transformations for rounds 1, 2 and 3 */
 /* Rotation is separate from addition to prevent recomputation */
-#define FF(a, b, c, d, x, s) {( a ) += F ( ( b ), ( c ), ( d ) ) + (x); ( a ) = ROTATE_LEFT ( ( a ), (s) );}
+#define FF(a, b, c, d, x, s) {( a ) += F ( ( b ), ( c ), ( d ) ) + (x); ( a ) = ROTATE_LEFT ( ( a ), ( s) );}
 
-#define GG(a, b, c, d, x, s) {( a ) += G ( ( b ), ( c ), ( d ) ) + (x) + (UINT4)0x5a827999; ( a ) = ROTATE_LEFT ( ( a ), (s) );}
+#define GG(a, b, c, d, x, s) {( a ) += G ( ( b ), ( c ), ( d ) ) + (x) + (UINT4)0x5a827999; ( a ) = ROTATE_LEFT ( ( a ), ( s) );}
 
-#define HH(a, b, c, d, x, s) {( a ) += H ( ( b ), ( c ), ( d ) ) + (x) + (UINT4)0x6ed9eba1; ( a ) = ROTATE_LEFT ( ( a ), (s) );}
+#define HH(a, b, c, d, x, s) {( a ) += H ( ( b ), ( c ), ( d ) ) + (x) + (UINT4)0x6ed9eba1; ( a ) = ROTATE_LEFT ( ( a ), ( s) );}
 
 /* Encodes input (UINT4) into output (unsigned char). Assumes len is a multiple of 4. */
 static void Encode( unsigned char *output, UINT4 *input, unsigned int len ) {

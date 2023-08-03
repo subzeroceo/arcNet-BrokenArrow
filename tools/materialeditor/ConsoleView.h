@@ -14,9 +14,9 @@ public:
 	CEdit			editConsole;
 	CEdit			editInput;
 
-	arcNetString		consoleStr;
-	arcStringList	consoleHistory;
-	arcNetString		currentCommand;
+	anString		consoleStr;
+	anStringList	consoleHistory;
+	anString		currentCommand;
 	int				currentHistoryPosition;
 	bool			saveCurrentCommand;
 
@@ -25,8 +25,8 @@ public:
 
 	//Public Operations
 	void			AddText(const char *msg);
-	void			SetConsoleText( const arcNetString& text );
-	void			ExecuteCommand( const arcNetString& cmd = "" );
+	void			SetConsoleText( const anString& text );
+	void			ExecuteCommand( const anString& cmd = "" );
 protected:
 	ConsoleView();
 	DECLARE_DYNCREATE(ConsoleView)

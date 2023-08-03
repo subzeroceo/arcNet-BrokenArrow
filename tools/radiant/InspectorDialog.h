@@ -13,7 +13,7 @@ class CInspectorDialog : public CTabsDlg
 	//DECLARE_DYNAMIC(CInspectorDialog)w
 
 public:
-	CInspectorDialog(CWnd* pParent = NULL);   // standard constructor
+	CInspectorDialog(CWnd* pParent = nullptr );   // standard constructor
 	virtual ~CInspectorDialog();
 
 // Dialog Data
@@ -37,7 +37,7 @@ public:
 	void UpdateEntitySel(eclass_t *ent);
 	void UpdateSelectedEntity();
 	void FillClassList();
-	bool GetSelectAllCriteria(arcNetString &key, arcNetString &val);
+	bool GetSelectAllCriteria(anString &key, anString &val);
 
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnDestroy();

@@ -21,11 +21,11 @@ public:
 	};
 
 	int					type;
-	arcNetString				dictName;
-	arcNetString				displayName;
-	arcNetString				displayInfo;
+	anString				dictName;
+	anString				displayName;
+	anString				displayInfo;
 	bool				quotes;
-	arcHashTable<DWORD>	viewData;
+	anHashTable<DWORD>	viewData;
 
 public:
 
@@ -41,7 +41,7 @@ public:
 * are grouped together during the load process for use by the different view and
 * MaterialDoc.
 */
-typedef arcNetList<MaterialDef*> MaterialDefList;
+typedef anList<MaterialDef*> MaterialDefList;
 
 /**
 * This class contains static utility functions that view and MaterialDoc use
@@ -63,7 +63,7 @@ public:
 	};
 
 	static void 				InitializeMaterialDefLists();
-	static void					InitializeMaterialDefList(arcLexer* src, const char* typeName, MaterialDefList* list);
+	static void					InitializeMaterialDefList(anLexer* src, const char* typeName, MaterialDefList* list);
 
 	static void					DestroyMaterialDefLists();
 

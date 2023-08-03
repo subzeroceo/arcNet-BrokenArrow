@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 #include "tr_local.h"
 
@@ -51,10 +51,10 @@ typedef struct mtrParsingData_s {
 
 /*
 =============
-arcMaterial::CommonInit
+anMaterial::CommonInit
 =============
 */
-void arcMaterial::CommonInit() {
+void anMaterial::CommonInit() {
 	desc = "<none>";
 	renderBump = "";
 	contentFlags = CONTENTS_SOLID;
@@ -65,15 +65,15 @@ void arcMaterial::CommonInit() {
 	cullType = CT_FRONT_SIDED;
 	deform = DFRM_NONE;
 	numOps = 0;
-	ops = NULL;
+	ops = nullptr;
 	numRegisters = 0;
-	expressionRegisters = NULL;
-	constantRegisters = NULL;
+	expressionRegisters = nullptr;
+	constantRegisters = nullptr;
 	numStages = 0;
 	numAmbientStages = 0;
-	stages = NULL;
-	editorImage = NULL;
-	lightFalloffImage = NULL;
+	stages = nullptr;
+	editorImage = nullptr;
+	lightFalloffImage = nullptr;
 	shouldCreateBackSides = false;
 	entityGui = 0;
 	fogLight = false;
@@ -83,7 +83,7 @@ void arcMaterial::CommonInit() {
 	hasSubview = false;
 	allowOverlays = true;
 	unsmoothedTangents = false;
-	gui = NULL;
+	gui = nullptr;
 	memset( deformRegisters, 0, sizeof( deformRegisters ) );
 	editorAlpha = 1.0;
 	spectrum = 0;
@@ -106,10 +106,10 @@ void arcMaterial::CommonInit() {
 
 /*
 =============
-arcMaterial::arcMaterial
+anMaterial::anMaterial
 =============
 */
-arcMaterial::arcMaterial() {
+anMaterial::anMaterial() {
 	CommonInit();
 
 	// we put this here instead of in CommonInit, because
@@ -119,55 +119,55 @@ arcMaterial::arcMaterial() {
 
 /*
 =============
-arcMaterial::~arcMaterial
+anMaterial::~anMaterial
 =============
 */
-arcMaterial::~arcMaterial() {
+anMaterial::~anMaterial() {
 }
 
 /*
 ===============
-arcMaterial::FreeData
+anMaterial::FreeData
 ===============
 */
-void arcMaterial::FreeData() {
+void anMaterial::FreeData() {
 	int i;
 
 	if ( stages ) {
 		// delete any idCinematic textures
 		for ( i = 0; i < numStages; i++ ) {
-			if ( stages[i].texture.cinematic != NULL ) {
+			if ( stages[i].texture.cinematic != nullptr ) {
 				delete stages[i].texture.cinematic;
-				stages[i].texture.cinematic = NULL;
+				stages[i].texture.cinematic = nullptr;
 			}
-			if ( stages[i].newStage != NULL ) {
+			if ( stages[i].newStage != nullptr ) {
 				Mem_Free( stages[i].newStage );
-				stages[i].newStage = NULL;
+				stages[i].newStage = nullptr;
 			}
 		}
 		R_StaticFree( stages );
-		stages = NULL;
+		stages = nullptr;
 	}
-	if ( expressionRegisters != NULL ) {
+	if ( expressionRegisters != nullptr ) {
 		R_StaticFree( expressionRegisters );
-		expressionRegisters = NULL;
+		expressionRegisters = nullptr;
 	}
-	if ( constantRegisters != NULL ) {
+	if ( constantRegisters != nullptr ) {
 		R_StaticFree( constantRegisters );
-		constantRegisters = NULL;
+		constantRegisters = nullptr;
 	}
-	if ( ops != NULL ) {
+	if ( ops != nullptr ) {
 		R_StaticFree( ops );
-		ops = NULL;
+		ops = nullptr;
 	}
 }
 
 /*
 ==============
-arcMaterial::GetEditorImage
+anMaterial::GetEditorImage
 ==============
 */
-ARCImage *arcMaterial::GetEditorImage( void ) const {
+anImage *anMaterial::GetEditorImage( void ) const {
 	if ( editorImage ) {
 		return editorImage;
 	}
@@ -217,10 +217,10 @@ static infoParm_t	infoParms[] = {
 	{"moveableclip",0,	0,	CONTENTS_MOVEABLECLIP },// solid to moveable entities
 	{"ikclip",		0,	0,	CONTENTS_IKCLIP },		// solid to IK
 	{"blood",		0,	0,	CONTENTS_BLOOD },		// used to detect blood decals
-	{"trigger",		0,	0,	CONTENTS_TRIGGER },		// used for triggers
-	{"aassolid",	0,	0,	CONTENTS_AAS_SOLID },	// solid for AAS
-	{"aasobstacle",	0,	0,	CONTENTS_AAS_OBSTACLE },// used to compile an obstacle into AAS that can be enabled/disabled
-	//{"flashlight_trigger", 0, 0, CONTENTS_FLASHLIGHT_TRIGGER }, // used for triggers that are activated by the flashlight
+	{"trigger",		0,	0,	CONTENTS_TRIGGER_SEAS },		// used for triggers
+	{"aassolid",	0,	0,	CONTENTS_SOLID_SEAS },	// solid for AAS
+	{"aasobstacle",	0,	0,	CONTENTS_OBSTACLE_SEAS },// used to compile an obstacle into AAS that can be enabled/disabled
+	//{"flashlight_trigger", 0, 0, CONTENTS_LIGHT_TRIGGER }, // used for triggers that are activated by the flashlight
 	{"nonsolid",	1,	0,	0 			},			// clears the solid flag
 	{"nullNormal",	0,	SURF_NULLNORMAL,0 },		// renderbump will draw as 0x80 0x80 0x80
 
@@ -265,12 +265,12 @@ static const int numInfoParms = sizeof( infoParms ) / sizeof ( infoParms[0] );
 
 /*
 ===============
-arcMaterial::CheckSurfaceParm
+anMaterial::CheckSurfaceParm
 
 See if the current token matches one of the surface parm bit flags
 ===============
 */
-bool arcMaterial::CheckSurfaceParm( arcNetToken *token ) {
+bool anMaterial::CheckSurfaceParm( anToken *token ) {
 	for ( int i = 0; i < numInfoParms; i++ ) {
 		if ( !token->Icmp( infoParms[i].name ) ) {
 			if ( infoParms[i].surfaceFlags & SURF_TYPE_MASK ) {
@@ -290,12 +290,12 @@ bool arcMaterial::CheckSurfaceParm( arcNetToken *token ) {
 
 /*
 ===============
-arcMaterial::MatchToken
+anMaterial::MatchToken
 
 Sets defaultShader and returns false if the next token doesn't match
 ===============
 */
-bool arcMaterial::MatchToken( arcLexer &src, const char *match ) {
+bool anMaterial::MatchToken( anLexer &src, const char *match ) {
 	if ( !src.ExpectTokenString( match ) ) {
 		SetMaterialFlag( MF_DEFAULTED );
 		return false;
@@ -305,11 +305,11 @@ bool arcMaterial::MatchToken( arcLexer &src, const char *match ) {
 
 /*
 =================
-arcMaterial::ParseSort
+anMaterial::ParseSort
 =================
 */
-void arcMaterial::ParseSort( arcLexer &src ) {
-	arcNetToken token;
+void anMaterial::ParseSort( anLexer &src ) {
+	anToken token;
 
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Warning( "missing sort parameter" );
@@ -344,11 +344,11 @@ void arcMaterial::ParseSort( arcLexer &src ) {
 
 /*
 =================
-arcMaterial::ParseStereoEye
+anMaterial::ParseStereoEye
 =================
 */
-void arcMaterial::ParseStereoEye( idLexer &src ) {
-	arcNetToken token;
+void anMaterial::ParseStereoEye( anLexer &src ) {
+	anToken token;
 
 	if ( !src.ReadTokenOnLine( &token ) ) {
 		src.Warning( "missing eye parameter" );
@@ -367,11 +367,11 @@ void arcMaterial::ParseStereoEye( idLexer &src ) {
 
 /*
 =================
-arcMaterial::ParseDecalInfo
+anMaterial::ParseDecalInfo
 =================
 */
-void arcMaterial::ParseDecalInfo( arcLexer &src ) {
-	arcNetToken token;
+void anMaterial::ParseDecalInfo( anLexer &src ) {
+	anToken token;
 
 	decalInfo.stayTime = src.ParseFloat() * 1000;
 	decalInfo.fadeTime = src.ParseFloat() * 1000;
@@ -386,10 +386,10 @@ void arcMaterial::ParseDecalInfo( arcLexer &src ) {
 
 /*
 =============
-arcMaterial::GetExpressionConstant
+anMaterial::GetExpressionConstant
 =============
 */
-int arcMaterial::GetExpressionConstant( float f ) {
+int anMaterial::GetExpressionConstant( float f ) {
 	for ( int i = EXP_REG_NUM_PREDEFINED; i < numRegisters; i++ ) {
 		if ( !pd->registerIsTemporary[i] && pd->shaderRegisters[i] == f ) {
 			return i;
@@ -409,10 +409,10 @@ int arcMaterial::GetExpressionConstant( float f ) {
 
 /*
 =============
-arcMaterial::GetExpressionTemporary
+anMaterial::GetExpressionTemporary
 =============
 */
-int arcMaterial::GetExpressionTemporary( void ) {
+int anMaterial::GetExpressionTemporary( void ) {
 	if ( numRegisters == MAX_EXP_REGS ) {
 		common->Warning( "GetExpressionTemporary: material '%s' hit MAX_EXP_REGS", GetName() );
 		SetMaterialFlag( MF_DEFAULTED );
@@ -425,10 +425,10 @@ int arcMaterial::GetExpressionTemporary( void ) {
 
 /*
 =============
-arcMaterial::GetExpressionOp
+anMaterial::GetExpressionOp
 =============
 */
-expOp_t	*arcMaterial::GetExpressionOp( void ) {
+expOp_t	*anMaterial::GetExpressionOp( void ) {
 	if ( numOps == MAX_EXP_OPS ) {
 		common->Warning( "GetExpressionOp: material '%s' hit MAX_EXP_OPS", GetName() );
 		SetMaterialFlag( MF_DEFAULTED );
@@ -440,10 +440,10 @@ expOp_t	*arcMaterial::GetExpressionOp( void ) {
 
 /*
 =================
-arcMaterial::EmitOp
+anMaterial::EmitOp
 =================
 */
-int arcMaterial::EmitOp( int a, int b, expOpType_t opType ) {
+int anMaterial::EmitOp( int a, int b, expOpType_t opType ) {
 	// optimize away identity operations
 	if ( opType == OP_TYPE_ADD ) {
 		if ( !pd->registerIsTemporary[a] && pd->shaderRegisters[a] == 0 ) {
@@ -485,25 +485,25 @@ int arcMaterial::EmitOp( int a, int b, expOpType_t opType ) {
 
 /*
 =================
-arcMaterial::ParseEmitOp
+anMaterial::ParseEmitOp
 =================
 */
-int arcMaterial::ParseEmitOp( arcLexer &src, int a, expOpType_t opType, int priority ) {
+int anMaterial::ParseEmitOp( anLexer &src, int a, expOpType_t opType, int priority ) {
 	int b = ParseExpressionPriority( src, priority );
 	return EmitOp( a, b, opType );
 }
 
 /*
 =================
-arcMaterial::ParseTerm
+anMaterial::ParseTerm
 
 Returns a register index
 =================
 */
-int arcMaterial::ParseTerm( arcLexer &src ) {
+int anMaterial::ParseTerm( anLexer &src ) {
 	src.ReadToken( &token );
 
-	if ( arcNetToken token == "( " ) {
+	if ( anToken token == "( " ) {
 		int a = ParseExpression( src );
 		MatchToken( src, " )" );
 		return a;
@@ -618,7 +618,7 @@ int arcMaterial::ParseTerm( arcLexer &src ) {
 	}
 
 	// see if it is a table name
-	const arcDeclTable *table = static_cast<const arcDeclTable *>( declManager->FindType( DECL_TABLE, token.c_str(), false ) );
+	const anDeclTable *table = static_cast<const anDeclTable *>( declManager->FindType( DECL_TABLE, token.c_str(), false ) );
 	if ( !table ) {
 		src.Warning( "Bad term '%s'", token.c_str() );
 		SetMaterialFlag( MF_DEFAULTED );
@@ -637,14 +637,14 @@ int arcMaterial::ParseTerm( arcLexer &src ) {
 
 /*
 =================
-arcMaterial::ParseExpressionPriority
+anMaterial::ParseExpressionPriority
 
 Returns a register index
 =================
 */
 #define	TOP_PRIORITY 4
-int arcMaterial::ParseExpressionPriority( arcLexer &src, int priority ) {
-	arcNetToken token;
+int anMaterial::ParseExpressionPriority( anLexer &src, int priority ) {
+	anToken token;
 
 	if ( priority == 0 ) {
 		return ParseTerm( src );
@@ -714,22 +714,22 @@ int arcMaterial::ParseExpressionPriority( arcLexer &src, int priority ) {
 
 /*
 =================
-arcMaterial::ParseExpression
+anMaterial::ParseExpression
 
 Returns a register index
 =================
 */
-int arcMaterial::ParseExpression( arcLexer &src ) {
+int anMaterial::ParseExpression( anLexer &src ) {
 	return ParseExpressionPriority( src, TOP_PRIORITY );
 }
 
 
 /*
 ===============
-arcMaterial::ClearStage
+anMaterial::ClearStage
 ===============
 */
-void arcMaterial::ClearStage( materialStage_t *ss ) {
+void anMaterial::ClearStage( materialStage_t *ss ) {
 	ss->drawStateBits = 0;
 	ss->conditionRegister = GetExpressionConstant( 1 );
 	ss->color.registers[0] =
@@ -740,10 +740,10 @@ void arcMaterial::ClearStage( materialStage_t *ss ) {
 
 /*
 ===============
-arcMaterial::NameToSrcBlendMode
+anMaterial::NameToSrcBlendMode
 ===============
 */
-int arcMaterial::NameToSrcBlendMode( const arcNetString &name ) {
+int anMaterial::NameToSrcBlendMode( const anString &name ) {
 	if ( !name.Icmp( "GL_ONE" ) ) {
 		return GLS_SRCBLEND_ONE;
 	} else if ( !name.Icmp( "GL_ZERO" ) ) {
@@ -772,10 +772,10 @@ int arcMaterial::NameToSrcBlendMode( const arcNetString &name ) {
 
 /*
 ===============
-arcMaterial::NameToDstBlendMode
+anMaterial::NameToDstBlendMode
 ===============
 */
-int arcMaterial::NameToDstBlendMode( const arcNetString &name ) {
+int anMaterial::NameToDstBlendMode( const anString &name ) {
 	if ( !name.Icmp( "GL_ONE" ) ) {
 		return GLS_DSTBLEND_ONE;
 	} else if ( !name.Icmp( "GL_ZERO" ) ) {
@@ -802,11 +802,11 @@ int arcMaterial::NameToDstBlendMode( const arcNetString &name ) {
 
 /*
 ================
-arcMaterial::ParseBlend
+anMaterial::ParseBlend
 ================
 */
-void arcMaterial::ParseBlend( arcLexer &src, materialStage_t *stage ) {
-	arcNetToken token;
+void anMaterial::ParseBlend( anLexer &src, materialStage_t *stage ) {
+	anToken token;
 	int		srcBlend, dstBlend;
 
 	if ( !src.ReadToken( &token ) ) {
@@ -857,15 +857,15 @@ void arcMaterial::ParseBlend( arcLexer &src, materialStage_t *stage ) {
 
 /*
 ================
-arcMaterial::ParseVertexParm
+anMaterial::ParseVertexParm
 
 If there is a single value, it will be repeated across all elements
 If there are two values, 3 = 0.0, 4 = 1.0
 if there are three values, 4 = 1.0
 ================
 */
-void arcMaterial::ParseVertexParm( arcLexer &src, newShaderStage_t *newStage ) {
-	arcNetToken				token;
+void anMaterial::ParseVertexParm( anLexer &src, materialStage_t *newStage ) {
+	anToken				token;
 
 	src.ReadTokenOnLine( &token );
 	int	parm = token.GetIntValue();
@@ -911,12 +911,12 @@ void arcMaterial::ParseVertexParm( arcLexer &src, newShaderStage_t *newStage ) {
 
 /*
 ================
-arcMaterial::ParseFragmentMap
+anMaterial::ParseFragmentMap
 ================
 */
-void arcMaterial::ParseFragmentMap( arcLexer &src, newShaderStage_t *newStage ) {
+void anMaterial::ParseFragmentMap( anLexer &src, materialStage_t *newStage ) {
 	str;
-	arcNetToken token;
+	anToken token;
 
 	textureFilter_t tf = TF_DEFAULT;
 	textureRepeat_t trp = TR_REPEAT;
@@ -1005,10 +1005,10 @@ void arcMaterial::ParseFragmentMap( arcLexer &src, newShaderStage_t *newStage ) 
 
 /*
 ===============
-arcMaterial::MultiplyTextureMatrix
+anMaterial::MultiplyTextureMatrix
 ===============
 */
-void arcMaterial::MultiplyTextureMatrix( textureStage_t *ts, int registers[2][3] ) {
+void anMaterial::MultiplyTextureMatrix( textureStage_t *ts, int registers[2][3] ) {
 	int old[2][3];
 
 	if ( !ts->hasMatrix ) {
@@ -1048,7 +1048,7 @@ void arcMaterial::MultiplyTextureMatrix( textureStage_t *ts, int registers[2][3]
 
 /*
 =================
-arcMaterial::ParseStage
+anMaterial::ParseStage
 An open brace has been parsed
 {
 	if <expression>
@@ -1058,13 +1058,13 @@ An open brace has been parsed
 }
 =================
 */
-void arcMaterial::ParseStage( arcLexer &src, const textureRepeat_t trpDefault ) {
-	arcNetToken				token;
+void anMaterial::ParseStage( anLexer &src, const textureRepeat_t trpDefault ) {
+	anToken				token;
 	const char			*str;
 	char				imageName[MAX_IMAGE_NAME];
 	int					a, b;
 	int					matrix[2][3];
-	newShaderStage_t	newStage;
+	materialStage_t	newStage;
 
 	if ( numStages >= MAX_SHADER_STAGES ) {
 		SetMaterialFlag( MF_DEFAULTED );
@@ -1114,7 +1114,7 @@ void arcMaterial::ParseStage( arcLexer &src, const textureRepeat_t trpDefault ) 
 
 		if ( !token.Icmp( "map" ) ) {
 			const char *str = R_ParsePastImageProgram( src );
-			arcNetString::Copynz( imageName, str, sizeof( imageName ) );
+			anString::Copynz( imageName, str, sizeof( imageName ) );
 			continue;
 		}
 
@@ -1185,14 +1185,14 @@ void arcMaterial::ParseStage( arcLexer &src, const textureRepeat_t trpDefault ) 
 
 		if ( !token.Icmp( "cubeMap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			arcNetString::Copynz( imageName, str, sizeof( imageName ) );
+			anString::Copynz( imageName, str, sizeof( imageName ) );
 			cubeMap = CF_NATIVE;
 			continue;
 		}
 
 		if ( !token.Icmp( "cameraCubeMap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			arcNetString::Copynz( imageName, str, sizeof( imageName ) );
+			anString::Copynz( imageName, str, sizeof( imageName ) );
 			cubeMap = CF_CAMERA;
 			continue;
 		}
@@ -1377,13 +1377,13 @@ void arcMaterial::ParseStage( arcLexer &src, const textureRepeat_t trpDefault ) 
 			continue;
 		}
 		if ( !token.Icmp( "rotate" ) ) {
-			const arcDeclTable *table;
+			const anDeclTable *table;
 			int		sinReg, cosReg;
 
 			// in cycles
 			a = ParseExpression( src );
 
-			table = static_cast<const arcDeclTable *>( declManager->FindType( DECL_TABLE, "sinTable", false ) );
+			table = static_cast<const anDeclTable *>( declManager->FindType( DECL_TABLE, "sinTable", false ) );
 			if ( !table ) {
 				common->Warning( "no sinTable for rotate defined" );
 				SetMaterialFlag( MF_DEFAULTED );
@@ -1391,7 +1391,7 @@ void arcMaterial::ParseStage( arcLexer &src, const textureRepeat_t trpDefault ) 
 			}
 			sinReg = EmitOp( table->Index(), a, OP_TYPE_TABLE );
 
-			table = static_cast<const arcDeclTable *>( declManager->FindType( DECL_TABLE, "cosTable", false ) );
+			table = static_cast<const anDeclTable *>( declManager->FindType( DECL_TABLE, "cosTable", false ) );
 			if ( !table ) {
 				common->Warning( "no cosTable for rotate defined" );
 				SetMaterialFlag( MF_DEFAULTED );
@@ -1557,8 +1557,8 @@ void arcMaterial::ParseStage( arcLexer &src, const textureRepeat_t trpDefault ) 
 	// if we are using newStage, allocate a copy of it
 	if ( newStage.fragmentProgram || newStage.vertexProgram ) {
 		//newStage.glslProgram = renderProgManager.FindGLSLProgram( GetName(), newStage.vertexProgram, newStage.fragmentProgram );
-		ss->newStage = (newShaderStage_t *)Mem_Alloc( sizeof( newStage ) );//, TAG_MATERIAL );
-		*(ss->newStage) = newStage;
+		ss->newStage = (materialStage_t *)Mem_Alloc( sizeof( newStage ) );//, TAG_MATERIAL );
+		*( ss->newStage) = newStage;
 	}
 
 	// successfully parsed a stage
@@ -1566,7 +1566,7 @@ void arcMaterial::ParseStage( arcLexer &src, const textureRepeat_t trpDefault ) 
 
 	// select a compressed depth based on what the stage is
 	if ( td == TD_DEFAULT ) {
-		switch( ss->lighting ) {
+		switch ( ss->lighting ) {
 		case SL_AMBIENT:
 			td = SL_AMBIENT;
 			break;
@@ -1601,11 +1601,11 @@ void arcMaterial::ParseStage( arcLexer &src, const textureRepeat_t trpDefault ) 
 
 /*
 ===============
-arcMaterial::ParseDeform
+anMaterial::ParseDeform
 ===============
 */
-void arcMaterial::ParseDeform( arcLexer &src ) {
-    arcNetToken token;
+void anMaterial::ParseDeform( anLexer &src ) {
+    anToken token;
 
     // Expect a token from the source lexer
     if ( !src.ExpectAnyToken( &token ) ) {
@@ -1675,7 +1675,7 @@ void arcMaterial::ParseDeform( arcLexer &src ) {
 }
 /*
 ==============
-arcMaterial::AddImplicitStages
+anMaterial::AddImplicitStages
 
 If a material has diffuse or specular stages without any
 bump stage, add an implicit _flat bumpmap stage.
@@ -1688,9 +1688,9 @@ It is valid to have either a diffuse or specular without the other.
 It is valid to have a reflection map and a bump map for bumpy reflection
 ==============
 */
-void arcMaterial::AddImplicitStages( const textureRepeat_t trpDefault /* = TR_REPEAT  */ ) {
+void anMaterial::AddImplicitStages( const textureRepeat_t trpDefault /* = TR_REPEAT  */ ) {
 	char	buffer[1024];
-	arcLexer		newSrc;
+	anLexer		newSrc;
 	bool hasDiffuse = false;
 	bool hasSpecular = false;
 	bool hasBump = false;
@@ -1721,7 +1721,7 @@ void arcMaterial::AddImplicitStages( const textureRepeat_t trpDefault /* = TR_RE
 	}
 
 	if ( !hasBump ) {
-		arcNetString::snPrintf( buffer, sizeof( buffer ), "blend bumpmap\nmap _flat\n}\n" );
+		anString::snPrintf( buffer, sizeof( buffer ), "blend bumpmap\nmap _flat\n}\n" );
 		newSrc.LoadMemory( buffer, strlen(buffer), "bumpmap" );
 		newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 		ParseStage( newSrc, trpDefault );
@@ -1729,7 +1729,7 @@ void arcMaterial::AddImplicitStages( const textureRepeat_t trpDefault /* = TR_RE
 	}
 
 	if ( !hasDiffuse && !hasSpecular && !hasReflection ) {
-		arcNetString::snPrintf( buffer, sizeof( buffer ), "blend diffusemap\nmap _white\n}\n" );
+		anString::snPrintf( buffer, sizeof( buffer ), "blend diffusemap\nmap _white\n}\n" );
 		newSrc.LoadMemory( buffer, strlen(buffer), "diffusemap" );
 		newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 		ParseStage( newSrc, trpDefault );
@@ -1740,7 +1740,7 @@ void arcMaterial::AddImplicitStages( const textureRepeat_t trpDefault /* = TR_RE
 
 /*
 ===============
-arcMaterial::SortInteractionStages
+anMaterial::SortInteractionStages
 
 The renderer expects bump, then diffuse, then specular
 There can be multiple bump maps, followed by additional
@@ -1751,7 +1751,7 @@ ignored during interactions, and all the interaction
 stages are ignored during ambient drawing.
 ===============
 */
-void arcMaterial::SortInteractionStages() {
+void anMaterial::SortInteractionStages() {
 	for ( int i = 0; i < numStages; i = j ) {
 		// find the next bump map
 		for ( int j = i + 1; j < numStages; j++ ) {
@@ -1782,7 +1782,7 @@ void arcMaterial::SortInteractionStages() {
 
 /*
 =================
-arcMaterial::ParseMaterial
+anMaterial::ParseMaterial
 
 The current text pointer is at the explicit text definition of the
 Parse it into the global material variable. Later functions will optimize it.
@@ -1790,12 +1790,12 @@ Parse it into the global material variable. Later functions will optimize it.
 If there is any error during parsing, defaultShader will be set.
 =================
 */
-void arcMaterial::ParseMaterial( arcLexer &src ) {
-	arcNetToken		token;
+void anMaterial::ParseMaterial( anLexer &src ) {
+	anToken		token;
 	int			s;
 	char		buffer[1024];
 	const char	*str;
-	arcLexer		newSrc;
+	anLexer		newSrc;
 	int			i;
 
 	s = 0;
@@ -1939,13 +1939,13 @@ void arcMaterial::ParseMaterial( arcLexer &src ) {
 		// light volumes
 		} else if ( !token.Icmp( "lightFalloffImage" ) ) {
 			str = R_ParsePastImageProgram( src );
-			arcNetString	copy;
+			anString	copy;
 
 			copy = str;	// so other things don't step on it
 			lightFalloffImage = globalImages->ImageFromFile( copy, TF_DEFAULT, false, TR_CLAMP /* TR_CLAMP_TO_ZERO */, TD_DEFAULT );
 			continue;
 		// guisurf <guifile> | guisurf entity
-		// an entity guisurf must have an arcUserInterfaces
+		// an entity guisurf must have an anUserInterfaces
 		// specified in the renderEntity
 		} else if ( !token.Icmp( "guisurf" ) ) {
 			src.ReadTokenOnLine( &token );
@@ -1983,7 +1983,7 @@ void arcMaterial::ParseMaterial( arcLexer &src ) {
 		// diffusemap for stage shortcut
 		} else if ( !token.Icmp( "diffusemap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			arcNetString::snPrintf( buffer, sizeof( buffer ), "blend diffusemap\nmap %s\n}\n", str );
+			anString::snPrintf( buffer, sizeof( buffer ), "blend diffusemap\nmap %s\n}\n", str );
 			newSrc.LoadMemory( buffer, strlen(buffer), "diffusemap" );
 			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 			ParseStage( newSrc, trpDefault );
@@ -1992,7 +1992,7 @@ void arcMaterial::ParseMaterial( arcLexer &src ) {
 		// specularmap for stage shortcut
 		} else if ( !token.Icmp( "specularmap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			arcNetString::snPrintf( buffer, sizeof( buffer ), "blend specularmap\nmap %s\n}\n", str );
+			anString::snPrintf( buffer, sizeof( buffer ), "blend specularmap\nmap %s\n}\n", str );
 			newSrc.LoadMemory( buffer, strlen(buffer), "specularmap" );
 			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 			ParseStage( newSrc, trpDefault );
@@ -2001,7 +2001,7 @@ void arcMaterial::ParseMaterial( arcLexer &src ) {
 		// normalmap for stage shortcut
 		} else if ( !token.Icmp( "bumpmap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			arcNetString::snPrintf( buffer, sizeof( buffer ), "blend bumpmap\nmap %s\n}\n", str );
+			anString::snPrintf( buffer, sizeof( buffer ), "blend bumpmap\nmap %s\n}\n", str );
 			newSrc.LoadMemory( buffer, strlen(buffer), "bumpmap" );
 			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 			ParseStage( newSrc, trpDefault );
@@ -2075,23 +2075,23 @@ void arcMaterial::ParseMaterial( arcLexer &src ) {
 
 /*
 =========================
-arcMaterial::SetGui
+anMaterial::SetGui
 =========================
 */
-void arcMaterial::SetGui( const char *_gui ) const {
+void anMaterial::SetGui( const char *_gui ) const {
 	gui = uiManager->FindGui( _gui, true, false, true );
 }
 
 /*
 =========================
-arcMaterial::Parse
+anMaterial::Parse
 
 Parses the current material definition and finds all necessary images.
 =========================
 */
-bool arcMaterial::Parse( const char *text, const int textLength ) {
-	arcLexer	src;
-	arcNetToken	token;
+bool anMaterial::Parse( const char *text, const int textLength ) {
+	anLexer	src;
+	anToken	token;
 	mtrParsingData_t parsingData;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
@@ -2280,7 +2280,7 @@ bool arcMaterial::Parse( const char *text, const int textLength ) {
 	// per-surface
 	CheckForConstantRegisters();
 
-	pd = NULL;	// the pointer will be invalid after exiting this function
+	pd = nullptr;	// the pointer will be invalid after exiting this function
 
 	// finish things up
 	if ( TestMaterialFlag( MF_DEFAULTED ) ) {
@@ -2292,7 +2292,7 @@ bool arcMaterial::Parse( const char *text, const int textLength ) {
 
 /*
 ===================
-arcMaterial::Print
+anMaterial::Print
 ===================
 */
 char *opNames[] = {
@@ -2312,7 +2312,7 @@ char *opNames[] = {
 	"OP_TYPE_OR"
 };
 
-void arcMaterial::Print() const {
+void anMaterial::Print() const {
 	for ( int i = EXP_REG_NUM_PREDEFINED; i < GetNumRegisters(); i++ ) {
 		common->Printf( "register %i: %f\n", i, expressionRegisters[i] );
 	}
@@ -2329,19 +2329,19 @@ void arcMaterial::Print() const {
 
 /*
 ===============
-arcMaterial::Save
+anMaterial::Save
 ===============
 */
-bool arcMaterial::Save( const char *fileName ) {
+bool anMaterial::Save( const char *fileName ) {
 	return ReplaceSourceFileText();
 }
 
 /*
 ===============
-arcMaterial::AddReference
+anMaterial::AddReference
 ===============
 */
-void arcMaterial::AddReference() {
+void anMaterial::AddReference() {
 	refCount++;
 
 	for ( int i = 0; i < numStages; i++ ) {
@@ -2354,14 +2354,14 @@ void arcMaterial::AddReference() {
 
 /*
 ===============
-arcMaterial::EvaluateRegisters
+anMaterial::EvaluateRegisters
 
 Parameters are taken from the localSpace and the renderView,
 then all expressions are evaluated, leaving the material registers
 set to their apropriate values.
 ===============
 */
-void arcMaterial::EvaluateRegisters( float *registers, const float shaderParms[MAX_ENTITY_SHADER_PARMS], const viewDef_t *view, ARCSoundEmitter *soundEmitter ) const {
+void anMaterial::EvaluateRegisters( float *registers, const float shaderParms[MAX_ENTITY_SHADER_PARMS], const viewDef_t *view, ARCSoundEmitter *soundEmitter ) const {
 	// copy the material constants
 	for ( int i = EXP_REG_NUM_PREDEFINED; i < numRegisters; i++ ) {
 		registers[i] = expressionRegisters[i];
@@ -2411,7 +2411,7 @@ void arcMaterial::EvaluateRegisters( float *registers, const float shaderParms[M
 			registers[op->c] = ( int )registers[op->a] % b;
 			break;
 		case OP_TYPE_TABLE: {
-				const arcDeclTable *table = static_cast<const arcDeclTable *>( declManager->DeclByIndex( DECL_TABLE, op->a ) );
+				const anDeclTable *table = static_cast<const anDeclTable *>( declManager->DeclByIndex( DECL_TABLE, op->a ) );
 				registers[op->c] = table->TableLookup( registers[op->b] );
 			}
 			break;
@@ -2455,14 +2455,14 @@ void arcMaterial::EvaluateRegisters( float *registers, const float shaderParms[M
 
 /*
 =============
-arcMaterial::Texgen
+anMaterial::Texgen
 =============
 */
-texGen_t arcMaterial::Texgen() const {
+texGen_t anMaterial::Texgen() const {
 	if ( stages ) {
 		for ( int i = 0; i < numStages; i++ ) {
-			if ( stages[ i ].texture.texgen != TG_EXPLICIT ) {
-				return stages[ i ].texture.texgen;
+			if ( stages[i].texture.texgen != TG_EXPLICIT ) {
+				return stages[i].texture.texgen;
 			}
 		}
 	}
@@ -2472,30 +2472,30 @@ texGen_t arcMaterial::Texgen() const {
 
 /*
 =============
-arcMaterial::GetImageWidth
+anMaterial::GetImageWidth
 =============
 */
-int arcMaterial::GetImageWidth( void ) const {
+int anMaterial::GetImageWidth( void ) const {
 	assert( GetStage(0 ) && GetStage(0 )->texture.image );
 	return GetStage(0 )->texture.image->uploadWidth;
 }
 
 /*
 =============
-arcMaterial::GetImageHeight
+anMaterial::GetImageHeight
 =============
 */
-int arcMaterial::GetImageHeight( void ) const {
+int anMaterial::GetImageHeight( void ) const {
 	assert( GetStage(0 ) && GetStage(0 )->texture.image );
 	return GetStage(0 )->texture.image->uploadHeight;
 }
 
 /*
 =============
-arcMaterial::CinematicLength
+anMaterial::CinematicLength
 =============
 */
-int	arcMaterial::CinematicLength() const {
+int	anMaterial::CinematicLength() const {
 	if ( !stages || !stages[0].texture.cinematic ) {
 		return 0;
 	}
@@ -2504,10 +2504,10 @@ int	arcMaterial::CinematicLength() const {
 
 /*
 =============
-arcMaterial::UpdateCinematic
+anMaterial::UpdateCinematic
 =============
 */
-void arcMaterial::UpdateCinematic( int time ) const {
+void anMaterial::UpdateCinematic( int time ) const {
 	if ( !stages || !stages[0].texture.cinematic || !backEnd.viewDef ) {
 		return;
 	}
@@ -2516,25 +2516,25 @@ void arcMaterial::UpdateCinematic( int time ) const {
 
 /*
 =============
-arcMaterial::CloseCinematic
+anMaterial::CloseCinematic
 =============
 */
-void arcMaterial::CloseCinematic( void ) const {
+void anMaterial::CloseCinematic( void ) const {
 	for ( int i = 0; i < numStages; i++ ) {
 		if ( stages[i].texture.cinematic ) {
 			stages[i].texture.cinematic->Close();
 			delete stages[i].texture.cinematic;
-			stages[i].texture.cinematic = NULL;
+			stages[i].texture.cinematic = nullptr;
 		}
 	}
 }
 
 /*
 =============
-arcMaterial::ResetCinematicTime
+anMaterial::ResetCinematicTime
 =============
 */
-void arcMaterial::ResetCinematicTime( int time ) const {
+void anMaterial::ResetCinematicTime( int time ) const {
 	for ( int i = 0; i < numStages; i++ ) {
 		if ( stages[i].texture.cinematic ) {
 			stages[i].texture.cinematic->ResetTime( time );
@@ -2544,19 +2544,19 @@ void arcMaterial::ResetCinematicTime( int time ) const {
 
 /*
 =============
-arcMaterial::ConstantRegisters
+anMaterial::ConstantRegisters
 =============
 */
-const float *arcMaterial::ConstantRegisters() const {
+const float *anMaterial::ConstantRegisters() const {
 	if ( !r_useConstantMaterials.GetBool() ) {
-		return NULL;
+		return nullptr;
 	}
 	return constantRegisters;
 }
 
 /*
 ==================
-arcMaterial::CheckForConstantRegisters
+anMaterial::CheckForConstantRegisters
 
 As of 5/2/03, about half of the unique materials loaded on typical
 maps are constant, but 2/3 of the surface references are.
@@ -2564,7 +2564,7 @@ This is probably an optimization of dubious value.
 ==================
 */
 static int	c_constant, c_variable;
-void arcMaterial::CheckForConstantRegisters() {
+void anMaterial::CheckForConstantRegisters() {
 	if ( !pd->registersAreConstant ) {
 		return;
 	}
@@ -2582,14 +2582,14 @@ void arcMaterial::CheckForConstantRegisters() {
 
 /*
 ===================
-arcMaterial::ImageName
+anMaterial::ImageName
 ===================
 */
-const char *arcMaterial::ImageName( void ) const {
+const char *anMaterial::ImageName( void ) const {
 	if ( numStages == 0 ) {
 		return "_scratch";
 	}
-	ARCImage *image = stages[0].texture.image;
+	anImage *image = stages[0].texture.image;
 	if ( image ) {
 		return image->imgName;
 	}
@@ -2598,14 +2598,14 @@ const char *arcMaterial::ImageName( void ) const {
 
 /*
 ===================
-arcMaterial::SetImageClassifications
+anMaterial::SetImageClassifications
 
 Just for image resource tracking.
 ===================
 */
-void arcMaterial::SetImageClassifications( int tag ) const {
+void anMaterial::SetImageClassifications( int tag ) const {
 	for ( int i = 0; i < numStages; i++ ) {
-		ARCImage	*image = stages[i].texture.image;
+		anImage	*image = stages[i].texture.image;
 		if ( image ) {
 			image->SetClassification( tag );
 		}
@@ -2614,23 +2614,23 @@ void arcMaterial::SetImageClassifications( int tag ) const {
 
 /*
 =================
-arcMaterial::Size
+anMaterial::Size
 =================
 */
-size_t arcMaterial::Size( void ) const {
-	return sizeof( arcMaterial );
+size_t anMaterial::Size( void ) const {
+	return sizeof( anMaterial );
 }
 
 /*
 ===================
-arcMaterial::SetDefaultText
+anMaterial::SetDefaultText
 ===================
 */
-bool arcMaterial::SetDefaultText( void ) {
+bool anMaterial::SetDefaultText( void ) {
 	// if there exists an image with the same name
-	if ( 1 ) { //fileSystem->ReadFile( GetName(), NULL ) != -1 ) {
+	if ( 1 ) { //fileSystem->ReadFile( GetName(), nullptr ) != -1 ) {
 		char generated[2048];
-		arcNetString::snPrintf( generated, sizeof( generated ),
+		anString::snPrintf( generated, sizeof( generated ),
 		"material %s // IMPLICITLY GENERATED\n"
 		"{\n"
 		"{\n"
@@ -2649,10 +2649,10 @@ bool arcMaterial::SetDefaultText( void ) {
 
 /*
 ===================
-arcMaterial::DefaultDefinition
+anMaterial::DefaultDefinition
 ===================
 */
-const char *arcMaterial::DefaultDefinition() const {
+const char *anMaterial::DefaultDefinition() const {
 	return
 		"{\n"
 	"\t"	"{\n"
@@ -2665,24 +2665,24 @@ const char *arcMaterial::DefaultDefinition() const {
 
 /*
 ===================
-arcMaterial::GetBumpStage
+anMaterial::GetBumpStage
 ===================
 */
-const materialStage_t *arcMaterial::GetBumpStage( void ) const {
+const materialStage_t *anMaterial::GetBumpStage( void ) const {
 	for ( int i = 0; i < numStages; i++ ) {
 		if ( stages[i].lighting == SL_BUMP ) {
 			return &stages[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
 ===================
-arcMaterial::ReloadImages
+anMaterial::ReloadImages
 ===================
 */
-void arcMaterial::ReloadImages( bool force ) const
+void anMaterial::ReloadImages( bool force ) const
 {
 	for ( int i = 0; i < numStages; i++ ) {
 		if ( stages[i].newStage ) {

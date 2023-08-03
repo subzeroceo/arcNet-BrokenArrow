@@ -118,8 +118,8 @@ public:
 	void					GetCursorPos( int &line, int &column, int &character ) const;
 	CHARRANGE				GetVisibleRange( void ) const;
 
-	void					GetText( arcNetString &text ) const;
-	void					GetText( arcNetString &text, int startCharIndex, int endCharIndex ) const;
+	void					GetText( anString &text ) const;
+	void					GetText( anString &text, int startCharIndex, int endCharIndex ) const;
 	void					SetText( const char *text );
 
 	void					GoToLine( int line );
@@ -166,11 +166,11 @@ protected:
 
 	int						charType[256];
 
-	arcNetList<keyWord_t>		keyWordsFromFile;
+	anList<keyWord_t>		keyWordsFromFile;
 	const keyWord_t *		keyWords;
 	int *					keyWordLengths;
 	COLORREF *				keyWordColors;
-	ARCHashIndex				keyWordHash;
+	anHashIndex				keyWordHash;
 
 	bool					caseSensitive;
 	bool					allowPathNames;
@@ -216,7 +216,7 @@ protected:
 	void					UpdateVisibleRange( void );
 
 	bool					GetNameBeforeCurrentSelection( CString &name, int &charIndex ) const;
-	bool					GetNameForMousePosition( arcNetString &name ) const;
+	bool					GetNameForMousePosition( anString &name ) const;
 
 	void					AutoCompleteInsertText( void );
 	void					AutoCompleteUpdate( void );

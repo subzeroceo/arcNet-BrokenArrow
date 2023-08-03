@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -37,7 +37,7 @@ void CWaveOpen::OnFileNameChange() {
   CString str = GetPathName();
   str.MakeLower();
   CWnd *pWnd = GetDlgItem(IDC_BTN_PLAY);
-  if (pWnd == NULL)
+  if (pWnd == nullptr )
   {
     return;
   }
@@ -52,7 +52,7 @@ void CWaveOpen::OnFileNameChange() {
 }
 
 void CWaveOpen::OnBtnPlay() {
-    sndPlaySound(NULL, NULL);
+    sndPlaySound(nullptr, nullptr );
     CString str = GetPathName();
     if (str.GetLength() > 0 ) {
       sndPlaySound(str, SND_FILENAME | SND_ASYNC);
@@ -63,7 +63,7 @@ BOOL CWaveOpen::OnInitDialog() {
 	CFileDialog::OnInitDialog();
 
   CWnd *pWnd = GetDlgItem(IDC_BTN_PLAY);
-  if (pWnd != NULL) {
+  if (pWnd != nullptr ) {
     pWnd->EnableWindow(FALSE);
   }
 

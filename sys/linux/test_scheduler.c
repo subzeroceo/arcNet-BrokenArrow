@@ -17,7 +17,7 @@ int Sys_Milliseconds( void ) {
 	int curtime;
 	struct timeval tp;
 
-	gettimeofday(&tp, NULL);
+	gettimeofday(&tp, nullptr );
 
 	if ( !sys_timeBase) {
 		sys_timeBase = tp.tv_sec;
@@ -45,7 +45,7 @@ int main( int argc, void *argv[] ) {
 	// (root rights required for that)
 	parm.sched_priority = 99;
 	if ( sched_setscheduler(0, SCHED_RR, &parm) != 0 ) {
-		printf( "sched_setscheduler SCHED_RR failed: %s\n", strerror(errno) );
+		printf( "sched_setscheduler SCHED_RR failed: %s\n", strerror( errno) );
 	} else {
 		printf( "sched_setscheduler SCHED_RR ok\n" );
 	}

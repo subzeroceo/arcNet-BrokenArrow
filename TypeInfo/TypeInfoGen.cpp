@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "TypeInfoGen.h"
@@ -7,18 +7,18 @@
 
 /*
 ================
-ARCInfoGen::ARCInfoGen
+anInfoGen::anInfoGen
 ================
 */
-ARCInfoGen::ARCInfoGen( void ) {
+anInfoGen::anInfoGen( void ) {
 }
 
 /*
 ================
-ARCInfoGen::~ARCInfoGen
+anInfoGen::~anInfoGen
 ================
 */
-ARCInfoGen::~ARCInfoGen( void ) {
+anInfoGen::~anInfoGen( void ) {
 	constants.DeleteContents( true );
 	enums.DeleteContents( true );
 	classes.DeleteContents( true );
@@ -26,10 +26,10 @@ ARCInfoGen::~ARCInfoGen( void ) {
 
 /*
 ================
-ARCInfoGen::GetInheritance
+anInfoGen::GetInheritance
 ================
 */
-int ARCInfoGen::GetInheritance( const char *typeName ) const {
+int anInfoGen::GetInheritance( const char *typeName ) const {
 	for ( int i = 0; i < classes.Num(); i++ ) {
 		if ( classes[i]->typeName.Cmp( typeName ) == 0 ) {
 			if ( classes[i]->superType[0] != '\0' ) {
@@ -43,12 +43,12 @@ int ARCInfoGen::GetInheritance( const char *typeName ) const {
 
 /*
 ================
-ARCInfoGen::EvaluateIntegerString
+anInfoGen::EvaluateIntegerString
 ================
 */
-int ARCInfoGen::EvaluateIntegerString( const arcNetString &string ) {
-	ARCParser src;
-	arcNetString evalString;
+int anInfoGen::EvaluateIntegerString( const anString &string ) {
+	anParser src;
+	anString evalString;
 
 	if ( string.Find( "::" ) != -1 ) {
 		return 0;
@@ -60,12 +60,12 @@ int ARCInfoGen::EvaluateIntegerString( const arcNetString &string ) {
 
 /*
 ================
-ARCInfoGen::EvaluateFloatString
+anInfoGen::EvaluateFloatString
 ================
 */
-float ARCInfoGen::EvaluateFloatString( const arcNetString &string ) {
-	ARCParser src;
-	arcNetString evalString;
+float anInfoGen::EvaluateFloatString( const anString &string ) {
+	anParser src;
+	anString evalString;
 
 	if ( string.Find( "::" ) != -1 ) {
 		return 0.0f;
@@ -77,26 +77,26 @@ float ARCInfoGen::EvaluateFloatString( const arcNetString &string ) {
 
 /*
 ================
-ARCInfoGen::FindConstant
+anInfoGen::FindConstant
 ================
 */
-arcConstantInfo *ARCInfoGen::FindConstant( const char *name ) {
+anConstantInfo *anInfoGen::FindConstant( const char *name ) {
 	for ( int i = 0; i < constants.Num(); i++ ) {
 		if ( constants[i]->name.Cmp( name ) == 0 ) {
 			return constants[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-ARCInfoGen::GetIntegerConstant
+anInfoGen::GetIntegerConstant
 ================
 */
-int ARCInfoGen::GetIntegerConstant( const char *scope, const char *name, ARCParser &src ) {
-	arcConstantInfo *constant = FindConstant( arcNetString( scope ) + name );
-	if ( constant == NULL ) {
+int anInfoGen::GetIntegerConstant( const char *scope, const char *name, anParser &src ) {
+	anConstantInfo *constant = FindConstant( anString( scope ) + name );
+	if ( constant == nullptr ) {
 		constant = FindConstant( name );
 	}
 	if ( constant ) {
@@ -108,12 +108,12 @@ int ARCInfoGen::GetIntegerConstant( const char *scope, const char *name, ARCPars
 
 /*
 ================
-ARCInfoGen::GetFloatConstant
+anInfoGen::GetFloatConstant
 ================
 */
-float ARCInfoGen::GetFloatConstant( const char *scope, const char *name, ARCParser &src ) {
-	arcConstantInfo *constant = FindConstant( arcNetString( scope ) + name );
-	if ( constant == NULL ) {
+float anInfoGen::GetFloatConstant( const char *scope, const char *name, anParser &src ) {
+	anConstantInfo *constant = FindConstant( anString( scope ) + name );
+	if ( constant == nullptr ) {
 		constant = FindConstant( name );
 	}
 	if ( constant ) {
@@ -125,12 +125,12 @@ float ARCInfoGen::GetFloatConstant( const char *scope, const char *name, ARCPars
 
 /*
 ================
-ARCInfoGen::ParseArraySize
+anInfoGen::ParseArraySize
 ================
 */
-int ARCInfoGen::ParseArraySize( const char *scope, ARCParser &src ) {
-	arcNetToken token;
-	arcNetString sizeString, constantString;
+int anInfoGen::ParseArraySize( const char *scope, anParser &src ) {
+	anToken token;
+	anString sizeString, constantString;
 	int size, totalSize;
 
 	if ( !src.CheckTokenString( "[" ) ) {
@@ -168,12 +168,12 @@ int ARCInfoGen::ParseArraySize( const char *scope, ARCParser &src ) {
 
 /*
 ================
-ARCInfoGen::ParseConstantValue
+anInfoGen::ParseConstantValue
 ================
 */
-void ARCInfoGen::ParseConstantValue( const char *scope, ARCParser &src, arcNetString &value ) {
-	arcNetToken token;
-	arcNetString constantString;
+void anInfoGen::ParseConstantValue( const char *scope, anParser &src, anString &value ) {
+	anToken token;
+	anString constantString;
 
 	int indent = 0;
 	while( src.ReadToken( &token ) ) {
@@ -199,17 +199,17 @@ void ARCInfoGen::ParseConstantValue( const char *scope, ARCParser &src, arcNetSt
 
 /*
 ================
-ARCInfoGen::ParseEnumType
+anInfoGen::ParseEnumType
 ================
 */
-arcEnumTypeInfo *ARCInfoGen::ParseEnumType( const char *scope, bool isTemplate, bool typeDef, ARCParser &src ) {
+anEnumTypeInfo *anInfoGen::ParseEnumType( const char *scope, bool isTemplate, bool typeDef, anParser &src ) {
 	int value;
-	arcNetToken token;
-	arcEnumTypeInfo *typeInfo;
-	arcEnumValueInfo enumValue;
-	arcNetString valueString;
+	anToken token;
+	anEnumTypeInfo *typeInfo;
+	anEnumValueInfo enumValue;
+	anString valueString;
 
-	typeInfo = new arcEnumTypeInfo;
+	typeInfo = new anEnumTypeInfo;
 	typeInfo->scope = scope;
 	typeInfo->isTemplate = isTemplate;
 
@@ -224,7 +224,7 @@ arcEnumTypeInfo *ARCInfoGen::ParseEnumType( const char *scope, bool isTemplate, 
 	if ( !src.CheckTokenString( "{" ) ) {
 		src.UnreadToken( &token );
 		delete typeInfo;
-		return NULL;
+		return nullptr;
 	}
 
 	value = -1;
@@ -233,7 +233,7 @@ arcEnumTypeInfo *ARCInfoGen::ParseEnumType( const char *scope, bool isTemplate, 
 		enumValue.name = token;
 
 		if ( src.CheckTokenString( "=" ) ) {
-			arcNetString valueString;
+			anString valueString;
 			ParseConstantValue( scope, src, valueString );
 			if ( valueString.Length() ) {
 				value = EvaluateIntegerString( valueString );
@@ -246,7 +246,7 @@ arcEnumTypeInfo *ARCInfoGen::ParseEnumType( const char *scope, bool isTemplate, 
 		typeInfo->values.Append( enumValue );
 
 		// add a constant for the enum value
-		arcConstantInfo *constantInfo = new arcConstantInfo;
+		anConstantInfo *constantInfo = new anConstantInfo;
 		constantInfo->name = scope + enumValue.name;
 		constantInfo->type = "int";
 		constantInfo->value = va( "%d", value );
@@ -274,14 +274,14 @@ arcEnumTypeInfo *ARCInfoGen::ParseEnumType( const char *scope, bool isTemplate, 
 
 /*
 ================
-ARCInfoGen::ParseClassType
+anInfoGen::ParseClassType
 ================
 */
-arcClassTypeInfo *ARCInfoGen::ParseClassType( const char *scope, const char *templateArgs, bool isTemplate, bool typeDef, ARCParser &src ) {
-	arcNetToken token;
-	arcClassTypeInfo *typeInfo;
+anClassTypeInfo *anInfoGen::ParseClassType( const char *scope, const char *templateArgs, bool isTemplate, bool typeDef, anParser &src ) {
+	anToken token;
+	anClassTypeInfo *typeInfo;
 
-	typeInfo = new arcClassTypeInfo;
+	typeInfo = new anClassTypeInfo;
 	typeInfo->scope = scope;
 	typeInfo->isTemplate = isTemplate;
 
@@ -296,12 +296,12 @@ arcClassTypeInfo *ARCInfoGen::ParseClassType( const char *scope, const char *tem
 	if ( src.CheckTokenString( ":" ) ) {
 		if ( !src.ExpectTokenType( TT_NAME, 0, &token ) ) {
 			delete typeInfo;
-			return NULL;
+			return nullptr;
 		}
 		while(	token == "public" || token == "protected" || token == "private" ) {
 			if ( !src.ExpectTokenType( TT_NAME, 0, &token ) ) {
 				delete typeInfo;
-				return NULL;
+				return nullptr;
 			}
 
 			typeInfo->superType = token;
@@ -331,7 +331,7 @@ arcClassTypeInfo *ARCInfoGen::ParseClassType( const char *scope, const char *tem
 
 			if ( !src.ExpectTokenType( TT_NAME, 0, &token ) ) {
 				delete typeInfo;
-				return NULL;
+				return nullptr;
 			}
 
 			src.Warning( "multiple inheritance not supported for '%s%s'", typeInfo->scope.c_str(), typeInfo->typeName.c_str() );
@@ -341,7 +341,7 @@ arcClassTypeInfo *ARCInfoGen::ParseClassType( const char *scope, const char *tem
 	if ( !src.CheckTokenString( "{" ) ) {
 		src.UnreadToken( &token );
 		delete typeInfo;
-		return NULL;
+		return nullptr;
 	}
 
 	ParseScope( typeInfo->scope + typeInfo->typeName + "::", typeInfo->isTemplate, src, typeInfo );
@@ -361,15 +361,15 @@ arcClassTypeInfo *ARCInfoGen::ParseClassType( const char *scope, const char *tem
 
 /*
 ================
-ARCInfoGen::ParseScope
+anInfoGen::ParseScope
 ================
 */
-void ARCInfoGen::ParseScope( const char *scope, bool isTemplate, ARCParser &src, arcClassTypeInfo *typeInfo ) {
+void anInfoGen::ParseScope( const char *scope, bool isTemplate, anParser &src, anClassTypeInfo *typeInfo ) {
 	int indent;
-	arcNetToken token;
-	arcClassTypeInfo *classInfo;
-	arcEnumTypeInfo *enumInfo;
-	arcNetString varType;
+	anToken token;
+	anClassTypeInfo *classInfo;
+	anEnumTypeInfo *enumInfo;
+	anString varType;
 	bool isConst = false;
 	bool isStatic = false;
 
@@ -606,7 +606,7 @@ void ARCInfoGen::ParseScope( const char *scope, bool isTemplate, ARCParser &src,
 				isStatic = false;
 			} else if ( ( isStatic || isConst ) && src.CheckTokenString( "=" ) ) {
 				// constant
-				arcConstantInfo *constantInfo = new arcConstantInfo;
+				anConstantInfo *constantInfo = new anConstantInfo;
 				constantInfo->name = scope + token;
 				constantInfo->type = varType;
 				constantInfo->type.StripTrailing( ' ' );
@@ -620,7 +620,7 @@ void ARCInfoGen::ParseScope( const char *scope, bool isTemplate, ARCParser &src,
 				while( 1 ) {
 					int arraySize = ParseArraySize( scope, src );
 					if ( arraySize ) {
-						arcClassVariableInfo var;
+						anClassVariableInfo var;
 
 						var.name = token;
 						var.type = varType;
@@ -638,12 +638,12 @@ void ARCInfoGen::ParseScope( const char *scope, bool isTemplate, ARCParser &src,
 					} else {
 						int bits = 0;
 						if ( src.CheckTokenString( ":" ) ) {
-							arcNetToken bitSize;
+							anToken bitSize;
 							src.ExpectTokenType( TT_NUMBER, TT_INTEGER, &bitSize );
 							bits = bitSize.GetIntValue();
 						}
 						if ( src.CheckTokenString( "," ) ) {
-							arcClassVariableInfo var;
+							anClassVariableInfo var;
 
 							var.name = token;
 							var.type = varType;
@@ -652,7 +652,7 @@ void ARCInfoGen::ParseScope( const char *scope, bool isTemplate, ARCParser &src,
 							typeInfo->variables.Append( var );
 							varType.StripTrailing( "* " );
 						} else if ( src.CheckTokenString( ";" ) ) {
-							arcClassVariableInfo var;
+							anClassVariableInfo var;
 							var.name = token;
 							var.type = varType;
 							var.type.StripTrailing( ' ' );
@@ -685,23 +685,23 @@ void ARCInfoGen::ParseScope( const char *scope, bool isTemplate, ARCParser &src,
 
 /*
 ================
-ARCInfoGen::AddDefine
+anInfoGen::AddDefine
 ================
 */
-void ARCInfoGen::AddDefine( const char *define ) {
+void anInfoGen::AddDefine( const char *define ) {
 	defines.Append( define );
 }
 
 /*
 ================
-ARCInfoGen::CreateTypeInfo
+anInfoGen::CreateTypeInfo
 ================
 */
-void ARCInfoGen::CreateTypeInfo( const char *path ) {
+void anInfoGen::CreateTypeInfo( const char *path ) {
 	int i, j, inheritance;
-	arcNetString fileName;
-	arcFileList *files;
-	ARCParser src;
+	anString fileName;
+	anFileList *files;
+	anParser src;
 	//#modified-fva; BEGIN
 	common->Printf( "Type Info Generator "TYPE_INFO_GEN_VERSION"\n" );
 	//#modified-fva; END
@@ -723,7 +723,7 @@ void ARCInfoGen::CreateTypeInfo( const char *path ) {
 			src.AddDefine( defines[j] );
 		}
 
-		arcClassTypeInfo *typeInfo = new arcClassTypeInfo;
+		anClassTypeInfo *typeInfo = new anClassTypeInfo;
 		ParseScope( "", false, src, typeInfo );
 		delete typeInfo;
 
@@ -763,7 +763,7 @@ void ARCInfoGen::CreateTypeInfo( const char *path ) {
 CleanName
 ================
 */
-void CleanName( arcNetString &name ) {
+void CleanName( anString &name ) {
 	name.Replace( "::", "_" );
 	name.Replace( " , ", "_" );
 	name.Replace( "< ", "_" );
@@ -773,13 +773,13 @@ void CleanName( arcNetString &name ) {
 
 /*
 ================
-ARCInfoGen::WriteTypeInfo
+anInfoGen::WriteTypeInfo
 ================
 */
-void ARCInfoGen::WriteTypeInfo( const char *fileName ) const {
+void anInfoGen::WriteTypeInfo( const char *fileName ) const {
 	int i, j;
-	arcNetString path, define;
-	arcNetFile *file;
+	anString path, define;
+	anFile *file;
 
 	path = fileSystem->RelativePathToOSPath( fileName );
 
@@ -818,31 +818,31 @@ void ARCInfoGen::WriteTypeInfo( const char *fileName ) const {
 
 	file->WriteFloatString(
 		"typedef struct {\n"
-		"\t"	"const char * name;\n"
-		"\t"	"const char * type;\n"
-		"\t"	"const char * value;\n"
+		"\t"	"const char *name;\n"
+		"\t"	"const char *type;\n"
+		"\t"	"const char *value;\n"
 		"} constantInfo_t;\n"
 		"\n"
 		"typedef struct {\n"
-		"\t"	"const char * name;\n"
+		"\t"	"const char *name;\n"
 		"\t"	"int value;\n"
 		"} enumValueInfo_t;\n"
 		"\n"
 		"typedef struct {\n"
-		"\t"	"const char * typeName;\n"
+		"\t"	"const char *typeName;\n"
 		"\t"	"const enumValueInfo_t * values;\n"
 		"} enumTypeInfo_t;\n"
 		"\n"
 		"typedef struct {\n"
-		"\t"	"const char * type;\n"
-		"\t"	"const char * name;\n"
+		"\t"	"const char *type;\n"
+		"\t"	"const char *name;\n"
 		"\t"	"int offset;\n"
 		"\t"	"int size;\n"
 		"} classVariableInfo_t;\n"
 		"\n"
 		"typedef struct {\n"
-		"\t"	"const char * typeName;\n"
-		"\t"	"const char * superType;\n"
+		"\t"	"const char *typeName;\n"
+		"\t"	"const char *superType;\n"
 		"\t"	"int size;\n"
 		"\t"	"const classVariableInfo_t * variables;\n"
 		"} classTypeInfo_t;\n"
@@ -852,18 +852,18 @@ void ARCInfoGen::WriteTypeInfo( const char *fileName ) const {
 	file->WriteFloatString( "static constantInfo_t constantInfo[] = {\n" );
 
 	for ( i = 0; i < constants.Num(); i++ ) {
-		arcConstantInfo *info = constants[i];
+		anConstantInfo *info = constants[i];
 		file->WriteFloatString( "\t{ \"%s\", \"%s\", \"%s\" },\n", info->type.c_str(), info->name.c_str(), info->value.c_str() );
 	}
 
-	file->WriteFloatString( "\t{ NULL, NULL, NULL }\n" );
+	file->WriteFloatString( "\t{ nullptr, nullptr, nullptr }\n" );
 	file->WriteFloatString( "};\n\n" );
 
 	// enum values
 	for ( i = 0; i < enums.Num(); i++ ) {
-		arcEnumTypeInfo *info = enums[i];
+		anEnumTypeInfo *info = enums[i];
 
-		arcNetString typeInfoName = info->scope + info->typeName;
+		anString typeInfoName = info->scope + info->typeName;
 		CleanName( typeInfoName );
 
 		file->WriteFloatString( "static enumValueInfo_t %s_typeInfo[] = {\n", typeInfoName.c_str() );
@@ -875,7 +875,7 @@ void ARCInfoGen::WriteTypeInfo( const char *fileName ) const {
 			file->WriteFloatString( "\t{ \"%s\", %d },\n", info->values[j].name.c_str(), info->values[j].value );
 		}
 
-		file->WriteFloatString( "\t{ NULL, 0 }\n" );
+		file->WriteFloatString( "\t{ nullptr, 0 }\n" );
 		file->WriteFloatString( "};\n\n" );
 	}
 
@@ -883,10 +883,10 @@ void ARCInfoGen::WriteTypeInfo( const char *fileName ) const {
 	file->WriteFloatString( "static enumTypeInfo_t enumTypeInfo[] = {\n" );
 
 	for ( i = 0; i < enums.Num(); i++ ) {
-		arcEnumTypeInfo *info = enums[i];
+		anEnumTypeInfo *info = enums[i];
 
-		arcNetString typeName = info->scope + info->typeName;
-		arcNetString typeInfoName = typeName;
+		anString typeName = info->scope + info->typeName;
+		anString typeInfoName = typeName;
 		CleanName( typeInfoName );
 
 		if ( info->isTemplate ) {
@@ -895,14 +895,14 @@ void ARCInfoGen::WriteTypeInfo( const char *fileName ) const {
 		file->WriteFloatString( "\t{ \"%s\", %s_typeInfo },\n", typeName.c_str(), typeInfoName.c_str() );
 	}
 
-	file->WriteFloatString( "\t{ NULL, NULL }\n" );
+	file->WriteFloatString( "\t{ nullptr, nullptr }\n" );
 	file->WriteFloatString( "};\n\n" );
 
 	// class variables
 	for ( i = 0; i < classes.Num(); i++ ) {
-		arcClassTypeInfo *info = classes[i];
-		arcNetString typeName = info->scope + info->typeName;
-		arcNetString typeInfoName = typeName;
+		anClassTypeInfo *info = classes[i];
+		anString typeName = info->scope + info->typeName;
+		anString typeInfoName = typeName;
 		CleanName( typeInfoName );
 
 		file->WriteFloatString( "static classVariableInfo_t %s_typeInfo[] = {\n", typeInfoName.c_str() );
@@ -916,7 +916,7 @@ void ARCInfoGen::WriteTypeInfo( const char *fileName ) const {
 			file->WriteFloatString( "\t{ \"%s\", \"%s\", ( int )(&((%s *)0 )->%s), sizeof( ((%s *)0 )->%s ) },\n", varType, varName, typeName.c_str(), varName, typeName.c_str(), varName );
 		}
 
-		file->WriteFloatString( "\t{ NULL, 0 }\n" );
+		file->WriteFloatString( "\t{ nullptr, 0 }\n" );
 		file->WriteFloatString( "};\n\n" );
 	}
 
@@ -924,10 +924,10 @@ void ARCInfoGen::WriteTypeInfo( const char *fileName ) const {
 	file->WriteFloatString( "static classTypeInfo_t classTypeInfo[] = {\n" );
 
 	for ( i = 0; i < classes.Num(); i++ ) {
-		arcClassTypeInfo *info = classes[i];
+		anClassTypeInfo *info = classes[i];
 
-		arcNetString typeName = info->scope + info->typeName;
-		arcNetString typeInfoName = typeName;
+		anString typeName = info->scope + info->typeName;
+		anString typeInfoName = typeName;
 		CleanName( typeInfoName );
 
 		if ( info->unnamed || info->isTemplate ) {
@@ -936,7 +936,7 @@ void ARCInfoGen::WriteTypeInfo( const char *fileName ) const {
 		file->WriteFloatString( "\t{ \"%s\", \"%s\", sizeof(%s), %s_typeInfo },\n", typeName.c_str(), info->superType.c_str(), typeName.c_str(), typeInfoName.c_str() );
 	}
 
-	file->WriteFloatString( "\t{ NULL, NULL, 0, NULL }\n" );
+	file->WriteFloatString( "\t{ nullptr, nullptr, 0, nullptr }\n" );
 	file->WriteFloatString( "};\n\n" );
 
 	file->WriteFloatString( "#endif\n" );

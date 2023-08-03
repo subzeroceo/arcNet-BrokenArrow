@@ -1,5 +1,5 @@
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 typedef struct {
@@ -15,16 +15,15 @@ typedef struct {
 
 ===================
 */
-void teCKFFT::FFT1D( cpxFloat_t *data, int N, int ISI, int stride ) {
-	int i, j, m, mmax, istep;
+void anFastFourierTT::FastFourierT1D( cpxFloat_t *data, int N, int ISI, int stride ) {
 	cpxFloat_t cfTemp;
 	cpxDouble_t cdTemp1, cdTemp2;
 	double theta, dTemp;
-	const double pi = arcMath::PI;
+	const double pi = anMath::PI;
 
 	// first operation puts data in bit-reversed order
-	j = 0;
-	for ( i = 0; i < N; i++ ) {
+	int j = 0;
+	for ( int i = 0; i < N; i++ ) {
 		if ( i < j ) {
 			cfTemp.re = data[j * stride].re;
 			cfTemp.im = data[j * stride].im;
@@ -35,11 +34,11 @@ void teCKFFT::FFT1D( cpxFloat_t *data, int N, int ISI, int stride ) {
 			data[i * stride].re = cfTemp.re;
 			data[i * stride].im = cfTemp.im;
 		}
-		m = N / 2;
-		while(j >= m) {
+		int m = N / 2;
+		while ( j >= m ) {
 			j = j - m;
 			m = m / 2;
-			if (m == 0 ){
+			if ( m == 0 ){
 				break;
 			}
 		}
@@ -47,17 +46,17 @@ void teCKFFT::FFT1D( cpxFloat_t *data, int N, int ISI, int stride ) {
 	}
 
 	// second operation computes the butterflies
-	mmax = 1;
-	while (mmax < N) {
-		istep = 2 * mmax;
+	int mmax = 1;
+	while ( mmax < N ) {
+		int istep = 2 * mmax;
 		theta = pi * ISI / mmax;
-		dTemp = arcMath::Sin(theta / 2.0 );
-		cdTemp2.re = -2.0 * dTemp * dTemp;
-		cdTemp2.im = arcMath::Sin(theta);
-		cdTemp1.re = 1.0;
-		cdTemp1.im = 0.0;
-		for (m = 0; m < mmax; m++ ) {
-			for ( i = m; i < N; i += istep) {
+		dTemp = anMath::Sin( theta / 2.0f );
+		cdTemp2.re = -2.0f * dTemp * dTemp;
+		cdTemp2.im = anMath::Sin( theta );
+		cdTemp1.re = 1.0f;
+		cdTemp1.im = 0.0f;
+		for ( int m = 0; m < mmax; m++ ) {
+			for ( int i = m; i < N; i += istep ) {
 				j = i + mmax;
 				cfTemp.re = ( float )(cdTemp1.re * data[j * stride].re - cdTemp1.im * data[j * stride].im);
 				cfTemp.im = ( float )(cdTemp1.re * data[j * stride].im + cdTemp1.im * data[j * stride].re);
@@ -74,55 +73,46 @@ void teCKFFT::FFT1D( cpxFloat_t *data, int N, int ISI, int stride ) {
 	}
 }
 
-void teCKFFT::FFT2D( cpxFloat_t *data, int N, int ISI )  {
-	cpxFloat_t	*orig;
-	int			i;
-
-	orig = data;
-
+void anFastFourierTT::FastFourierT2D( cpxFloat_t *data, int N, int ISI )  {
+	cpxFloat_t *orig = data;
 	// 1D horizontal transform
-	for ( i = 0; i < N; i++ ) {
-		FFT1D( data, N, ISI, 1 );
+	for ( int i = 0; i < N; i++ ) {
+		FastFourierT1D( data, N, ISI, 1 );
 		data += N;
 	}
 
 	// 1D vertical transform
 	data = orig;
-	for ( i = 0; i < N; i++ ) {
-		FFT1D( data, N, ISI, N );
+	for ( int i = 0; i < N; i++ ) {
+		FastFourierT1D( data, N, ISI, N );
 		data++;
 	}
 }
 
-// jscott: added 3d Fourier transform - cost 3N^2
-void teCKFFT::FFT3D( cpxFloat_t *data, int N, int ISI )  {
-	cpxFloat_t	*orig;
-	int			i, j;
-
-	orig = data;
+void anFastFourierTT::FastFourierT3D( cpxFloat_t *data, int N, int ISI )  {
+	cpxFloat_t *orig = data;
 
 	// Transform each slice
-	for ( j = 0; j < N; j++ ) {
+	for ( int j = 0; j < N; j++ ) {
 		// 1D transform
 		data = orig + j * N * N;
-		for ( i = 0; i < N; i++ ) {
-			FFT1D( data, N, ISI, 1 );
+		for ( int i = 0; i < N; i++ ) {
+			FastFourierT1D( data, N, ISI, 1 );
 			data += N;
 		}
 
 		// 1D transform
 		data = orig + j * N * N;
-		for ( i = 0; i < N; i++ )
-		{
-			FFT1D( data, N, ISI, N );
+		for ( int i = 0; i < N; i++ ) {
+			FastFourierT1D( data, N, ISI, N );
 			data++;
 		}
 	}
 
 	// Transform the volume
 	data = orig;
-	for ( j = 0; j < N * N; j++ ) {
-		FFT1D( data, N, ISI, N * N );
+	for ( int j = 0; j < N * N; j++ ) {
+		FastFourierT1D( data, N, ISI, N * N );
 		data++;
 	}
 }

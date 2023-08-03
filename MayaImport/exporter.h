@@ -14,13 +14,13 @@ typedef enum {
 } exportType_t;
 
 typedef struct {
-	arcCQuats				q;
-	arcVec3				t;
+	anCQuats				q;
+	anVec3				t;
 } jointFrame_t;
 
 typedef struct {
-	arcCQuats				q;
-	arcVec3				t;
+	anCQuats				q;
+	anVec3				t;
 	float				fov;
 } cameraFrame_t;
 
@@ -35,7 +35,7 @@ typedef struct {
 class arcTokenizer {
 private:
 	int					currentToken;
-	arcStringList		tokens;
+	anStringList		tokens;
 
 public:
 						arcTokenizer()			{ Clear(); };
@@ -61,14 +61,14 @@ public:
 
 class arcNamePair {
 public:
-	arcNetString	from;
-	arcNetString	to;
+	anString	from;
+	anString	to;
 };
 
 class arcAnimGroup {
 public:
-	arcNetString		name;
-	arcStringList	joints;
+	anString		name;
+	anStringList	joints;
 };
 
 class arcExportOptions {
@@ -78,11 +78,11 @@ private:
 	void					Reset( const char *commandline );
 
 public:
-	arcNetString					commandLine;
-	arcNetString					src;
-	arcNetString					dest;
-	arcNetString					game;
-	arcNetString					prefix;
+	anString					commandLine;
+	anString					src;
+	anString					dest;
+	anString					game;
+	anString					prefix;
 	float					scale;
 	exportType_t			type;
 	bool					ignoreMeshes;
@@ -94,14 +94,14 @@ public:
 	int						framerate;
 	float					xyzPrecision;
 	float					quatPrecision;
-	arcNetString					align;
-	arcNetList<arcNamePair>	renamejoints;
-	arcNetList<arcNamePair>	remapjoints;
-	arcStringList			keepjoints;
-	arcStringList			skipmeshes;
-	arcStringList			keepmeshes;
-	arcNetList<arcAnimGroup *>	exportgroups;
-	arcNetList<arcAnimGroup>	groups;
+	anString					align;
+	anList<arcNamePair>	renamejoints;
+	anList<arcNamePair>	remapjoints;
+	anStringList			keepjoints;
+	anStringList			skipmeshes;
+	anStringList			keepmeshes;
+	anList<arcAnimGroup *>	exportgroups;
+	anList<arcAnimGroup>	groups;
 	float					rotate;
 	float					jointThreshold;
 	int						cycleStart;
@@ -121,9 +121,9 @@ arcExportJoint
 
 class arcExportJoint {
 public:
-	arcNetString						name;
-	arcNetString						realname;
-	arcNetString						longname;
+	anString						name;
+	anString						realname;
+	anString						longname;
 	int							index;
 	int							exportNum;
 	bool						keep;
@@ -136,14 +136,14 @@ public:
 	arcHierarchy<arcExportJoint>mayaNode;
 	arcHierarchy<arcExportJoint>exportNode;
 
-	arcVec3						t;
-	arcMat3						wm;
+	anVec3						t;
+	anMat3						wm;
 
-	arcVec3						idt;
-	arcMat3						idwm;
+	anVec3						idt;
+	anMat3						idwm;
 
-	arcVec3						bindpos;
-	arcMat3						bindmat;
+	anVec3						bindpos;
+	anMat3						bindmat;
 
 	int							animBits;
 	int							firstComponent;
@@ -165,12 +165,12 @@ misc structures
 typedef struct {
 	arcExportJoint			*joint;
 	float					jointWeight;
-	arcVec3					offset;
+	anVec3					offset;
 } exportWeight_t;
 
 typedef struct {
-	arcVec3					pos;
-	arcVec2					texCoords;
+	anVec3					pos;
+	anVec2					texCoords;
 	int						startweight;
 	int						numWeights;
 } exportVertex_t;
@@ -180,7 +180,7 @@ typedef struct {
 } exportTriangle_t;
 
 typedef struct {
-	arcVec2					uv[ 3 ];
+	anVec2					uv[ 3 ];
 } exportUV_t;
 
 ARC_INLINE int operator==( exportVertex_t a, exportVertex_t b ) {
@@ -226,21 +226,20 @@ ARC_INLINE int operator==( exportVertex_t a, exportVertex_t b ) {
 #define	SHADER_MAX_VERTEXES	1000
 #define	SHADER_MAX_INDEXES	(6*SHADER_MAX_VERTEXES)
 
-
 // the maximum size of game reletive pathnames
 #define	MAX_Q3PATH		64
 
 typedef struct md3Frame_s {
-	arcVec3		bounds[2];
-	arcVec3		localOrigin;
+	anVec3		bounds[2];
+	anVec3		localOrigin;
 	float		radius;
 	char		name[16];
 } md3Frame_t;
 
 typedef struct md3Tag_s {
 	char		name[MAX_Q3PATH];	// tag name
-	arcVec3		origin;
-	arcVec3		axis[3];
+	anVec3		origin;
+	anVec3		axis[3];
 } md3Tag_t;
 
 /*
@@ -324,19 +323,19 @@ arcExportMesh
 class arcExportMesh {
 public:
 
-	arcNetString						name;
-	arcNetString						shader;
+	anString						name;
+	anString						shader;
 
 	bool						keep;
 
-	arcNetList<exportVertex_t>		verts;
-	arcNetList<exportTriangle_t>	tris;
-	arcNetList<exportWeight_t>		weights;
-	arcNetList<exportUV_t>			uv;
+	anList<exportVertex_t>		verts;
+	anList<exportTriangle_t>	tris;
+	anList<exportWeight_t>		weights;
+	anList<exportUV_t>			uv;
 
 								arcExportMesh() { keep = true; };
 	void						ShareVerts( void );
-	void						GetBounds( arcBounds &bounds ) const;
+	void						GetBounds( anBounds &bounds ) const;
 	void						Merge( arcExportMesh *mesh );
 };
 
@@ -351,19 +350,19 @@ arcExportModel
 class arcExportModel {
 public:
 	arcExportJoint				*exportOrigin;
-	arcNetList<arcExportJoint>		joints;
+	anList<arcExportJoint>		joints;
 	arcHierarchy<arcExportJoint>	mayaHead;
 	arcHierarchy<arcExportJoint>	exportHead;
-	arcNetList<int>					cameraCuts;
-	arcNetList<cameraFrame_t>		camera;
-	arcNetList<arcBounds>			bounds;
-	arcNetList<jointFrame_t>		jointFrames;
-	arcNetList<jointFrame_t	*>		frames;
+	anList<int>					cameraCuts;
+	anList<cameraFrame_t>		camera;
+	anList<anBounds>			bounds;
+	anList<jointFrame_t>		jointFrames;
+	anList<jointFrame_t	*>		frames;
 	int							frameRate;
 	int							numFrames;
 	int							skipjoints;
 	int							export_joints;
-	arcNetList<arcExportMesh *>		meshes;
+	anList<arcExportMesh *>		meshes;
 
 								arcExportModel();
 								~arcExportModel();
@@ -395,13 +394,13 @@ private:
 
 
 	void					GetBindPose( MObject &jointNode, arcExportJoint *joint, float scale );
-	void					GetLocalTransform( arcExportJoint *joint, arcVec3 &pos, arcMat3 &mat );
-	void					GetWorldTransform( arcExportJoint *joint, arcVec3 &pos, arcMat3 &mat, float scale );
+	void					GetLocalTransform( arcExportJoint *joint, anVec3 &pos, anMat3 &mat );
+	void					GetWorldTransform( arcExportJoint *joint, anVec3 &pos, anMat3 &mat, float scale );
 
 	void					CreateJoints( float scale );
-	void					PruneJoints( arcStringList &keepjoints, arcNetString &prefix );
-	void					RenameJoints( arcNetList<arcNamePair> &renamejoints, arcNetString &prefix );
-	bool					RemapParents( arcNetList<arcNamePair> &remapjoints );
+	void					PruneJoints( anStringList &keepjoints, anString &prefix );
+	void					RenameJoints( anList<arcNamePair> &renamejoints, anString &prefix );
+	bool					RemapParents( anList<arcNamePair> &remapjoints );
 
 	MObject					FindShader( MObject& setNode );
 	void					GetTextureForMesh( arcExportMesh *mesh, MFnDagNode &dagNode );
@@ -410,16 +409,16 @@ private:
 	void					CreateMesh( float scale );
 	void					CombineMeshes( void );
 
-	void					GetAlignment( arcNetString &alignName, arcMat3 &align, float rotate, int startframe );
+	void					GetAlignment( anString &alignName, anMat3 &align, float rotate, int startframe );
 
 	const char				*GetObjectType( MObject object );
 
 	float					GetCameraFov( arcExportJoint *joint );
-	void					GetCameraFrame( arcExportJoint *camera, arcMat3 &align, cameraFrame_t *cam );
-	void					CreateCameraAnim( arcMat3 &align );
+	void					GetCameraFrame( arcExportJoint *camera, anMat3 &align, cameraFrame_t *cam );
+	void					CreateCameraAnim( anMat3 &align );
 
-	void					GetDefaultPose( arcMat3 &align );
-	void					CreateAnimation( arcMat3 &align );
+	void					GetDefaultPose( anMat3 &align );
+	void					CreateAnimation( anMat3 &align );
 
 public:
 							arcMayaExport( arcExportOptions &exportOptions ) : options( exportOptions ) { };

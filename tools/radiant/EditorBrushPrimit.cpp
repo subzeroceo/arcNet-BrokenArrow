@@ -26,14 +26,14 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
 
 #define ZERO_EPSILON	1.0E-6
 
-class arcVec3D {
+class anVec3D {
 public:
 	double x, y, z;
 	double &			operator[]( const int index ) {
@@ -46,11 +46,11 @@ public:
 
 //
 // =======================================================================================================================
-//    compute a determinant using Sarrus rule ++timo "inline" this with a macro NOTE:: the three arcVec3D are understood as
+//    compute a determinant using Sarrus rule ++timo "inline" this with a macro NOTE:: the three anVec3D are understood as
 //    columns of the matrix
 // =======================================================================================================================
 //
-double SarrusDet(arcVec3D a, arcVec3D b, arcVec3D c) {
+double SarrusDet(anVec3D a, anVec3D b, anVec3D c) {
 	return ( double )a[0] * ( double )b[1] * ( double )c[2] + ( double )b[0] * ( double )c[1] * ( double )a[2] + ( double )c[0] * ( double )a[1] * ( double )b[2] - ( double )c[0] * ( double )b[1] * ( double )a[2] - ( double )a[1] * ( double )b[0] * ( double )c[2] -	( double )a[0] * ( double )b[2] * ( double )c[1];
 }
 
@@ -61,23 +61,23 @@ double SarrusDet(arcVec3D a, arcVec3D b, arcVec3D c) {
 //    when x == 0 rotation by (0,RotY,RotZ) assigns X to normal
 // =======================================================================================================================
 //
-void ComputeAxisBase(arcVec3 &normal, arcVec3D &texS, arcVec3D &texT) {
+void ComputeAxisBase(anVec3 &normal, anVec3D &texS, anVec3D &texT) {
 	double	RotY, RotZ;
 
 	// do some cleaning
-	if (arcMath::Fabs(normal[0] ) < 1e-6) {
+	if (anMath::Fabs(normal[0] ) < 1e-6) {
 		normal[0] = 0.0f;
 	}
 
-	if (arcMath::Fabs(normal[1] ) < 1e-6) {
+	if (anMath::Fabs(normal[1] ) < 1e-6) {
 		normal[1] = 0.0f;
 	}
 
-	if (arcMath::Fabs(normal[2] ) < 1e-6) {
+	if (anMath::Fabs(normal[2] ) < 1e-6) {
 		normal[2] = 0.0f;
 	}
 
-	RotY = -atan2(normal[2], arcMath::Sqrt(normal[1] * normal[1] + normal[0] * normal[0] ) );
+	RotY = -atan2(normal[2], anMath::Sqrt(normal[1] * normal[1] + normal[0] * normal[0] ) );
 	RotZ = atan2(normal[1], normal[0] );
 
 	// rotate (0,1,0 ) and (0,0,1 ) to compute texS and texT
@@ -96,11 +96,11 @@ void ComputeAxisBase(arcVec3 &normal, arcVec3D &texS, arcVec3D &texT) {
  =======================================================================================================================
  */
 void FaceToBrushPrimitFace(face_t *f) {
-	arcVec3D	texX, texY;
-	arcVec3D	proj;
+	anVec3D	texX, texY;
+	anVec3D	proj;
 
 	// ST of (0,0 ) ( 1,0 ) (0,1 )
-	arcVec5	ST[3];	// [ point index ] [ xyz ST ]
+	anVec5	ST[3];	// [ point index ] [ xyz ST ]
 
 	//
 	// ++timo not used as long as brushprimit_texdef and texdef are static
@@ -116,7 +116,7 @@ void FaceToBrushPrimitFace(face_t *f) {
 
 	// check d_texture
 	if ( !f->d_texture) {
-		common->Printf( "Warning : f.d_texture is NULL in FaceToBrushPrimitFace\n" );
+		common->Printf( "Warning : f.d_texture is nullptr in FaceToBrushPrimitFace\n" );
 		return;
 	}
 #endif
@@ -157,11 +157,11 @@ void FaceToBrushPrimitFace(face_t *f) {
 //    compute texture coordinates for the winding points
 // =======================================================================================================================
 //
-void EmitBrushPrimitTextureCoordinates(face_t *f, arcWinding *w, patchMesh_t *patch) {
-	arcVec3D	texX, texY;
+void EmitBrushPrimitTextureCoordinates(face_t *f, anWinding *w, patchMesh_t *patch) {
+	anVec3D	texX, texY;
 	double	x, y;
 
-	if (f== NULL || (w == NULL && patch == NULL) ) {
+	if (f== nullptr || (w == nullptr && patch == nullptr ) ) {
 		return;
 	}
 
@@ -178,7 +178,7 @@ void EmitBrushPrimitTextureCoordinates(face_t *f, arcWinding *w, patchMesh_t *pa
 			f->brushprimit_texdef.coords[1][1] == 0 ) {
 		f->brushprimit_texdef.coords[0][0] = 1.0f;
 		f->brushprimit_texdef.coords[1][1] = 1.0f;
-		ConvertTexMatWithQTexture(&f->brushprimit_texdef, NULL, &f->brushprimit_texdef, f->d_texture);
+		ConvertTexMatWithQTexture(&f->brushprimit_texdef, nullptr, &f->brushprimit_texdef, f->d_texture);
 	}
 
 	int i;
@@ -209,7 +209,7 @@ void EmitBrushPrimitTextureCoordinates(face_t *f, arcWinding *w, patchMesh_t *pa
 //    parse a brush in brush primitive format
 // =======================================================================================================================
 //
-void BrushPrimit_Parse(brush_t *b, bool newFormat, const arcVec3 origin) {
+void BrushPrimit_Parse(brush_t *b, bool newFormat, const anVec3 origin) {
 	face_t	*f;
 	int		i, j;
 	GetToken(true);
@@ -233,7 +233,7 @@ void BrushPrimit_Parse(brush_t *b, bool newFormat, const arcVec3 origin) {
 		}
 		else {	// it's a face
 			f = Face_Alloc();
-			f->next = NULL;
+			f->next = nullptr;
 			if ( !b->brush_faces) {
 				b->brush_faces = f;
 			}
@@ -246,8 +246,8 @@ void BrushPrimit_Parse(brush_t *b, bool newFormat, const arcVec3 origin) {
 
 			if (newFormat) {
 				// read the three point plane definition
-				arcPlane plane;
-				for (j = 0; j < 4; j++ ) {
+				anPlane plane;
+				for ( j = 0; j < 4; j++ ) {
 					GetToken(false);
 					plane[j] = atof( token );
 				}
@@ -256,11 +256,11 @@ void BrushPrimit_Parse(brush_t *b, bool newFormat, const arcVec3 origin) {
 				f->originalPlane = plane;
 				f->dirty = false;
 
-				//arcWinding	*w = Brush_MakeFaceWinding(b, f, true);
-				arcWinding w;
+				//anWinding	*w = Brush_MakeFaceWinding(b, f, true);
+				anWinding w;
 				w.BaseForPlane( plane );
 
-				for (j = 0; j < 3; j++ ) {
+				for ( j = 0; j < 3; j++ ) {
 					f->planepts[j].x = w[j].x + origin.x;
 					f->planepts[j].y = w[j].y + origin.y;
 					f->planepts[j].z = w[j].z + origin.z;
@@ -279,7 +279,7 @@ void BrushPrimit_Parse(brush_t *b, bool newFormat, const arcVec3 origin) {
 						return;
 					}
 
-					for (j = 0; j < 3; j++ ) {
+					for ( j = 0; j < 3; j++ ) {
 						GetToken(false);
 						f->planepts[i][j] = atof( token );
 					}
@@ -305,7 +305,7 @@ void BrushPrimit_Parse(brush_t *b, bool newFormat, const arcVec3 origin) {
 				return;
 			}
 
-			for (j = 0; j < 3; j++ ) {
+			for ( j = 0; j < 3; j++ ) {
 				GetToken(false);
 				f->brushprimit_texdef.coords[0][j] = atof( token );
 			}
@@ -322,7 +322,7 @@ void BrushPrimit_Parse(brush_t *b, bool newFormat, const arcVec3 origin) {
 				return;
 			}
 
-			for (j = 0; j < 3; j++ ) {
+			for ( j = 0; j < 3; j++ ) {
 				GetToken(false);
 				f->brushprimit_texdef.coords[1][j] = atof( token );
 			}
@@ -371,23 +371,23 @@ void TexMatToFakeTexCoords(float texMat[2][3], float shift[2], float *rot, float
 #ifdef _DEBUG
 
 	// check this matrix is orthogonal
-	if (arcMath::Fabs(texMat[0][0] * texMat[0][1] + texMat[1][0] * texMat[1][1] ) > ZERO_EPSILON) {
+	if (anMath::Fabs(texMat[0][0] * texMat[0][1] + texMat[1][0] * texMat[1][1] ) > ZERO_EPSILON) {
 		common->Printf( "Warning : non orthogonal texture matrix in TexMatToFakeTexCoords\n" );
 	}
 #endif
-	scale[0] = arcMath::Sqrt(texMat[0][0] * texMat[0][0] + texMat[1][0] * texMat[1][0] );
-	scale[1] = arcMath::Sqrt(texMat[0][1] * texMat[0][1] + texMat[1][1] * texMat[1][1] );
+	scale[0] = anMath::Sqrt(texMat[0][0] * texMat[0][0] + texMat[1][0] * texMat[1][0] );
+	scale[1] = anMath::Sqrt(texMat[0][1] * texMat[0][1] + texMat[1][1] * texMat[1][1] );
 #ifdef _DEBUG
 	if (scale[0] < ZERO_EPSILON || scale[1] < ZERO_EPSILON) {
 		common->Printf( "Warning : unexpected scale==0 in TexMatToFakeTexCoords\n" );
 	}
 #endif
 	// compute rotate value
-	if (arcMath::Fabs(texMat[0][0] ) < ZERO_EPSILON)
+	if (anMath::Fabs(texMat[0][0] ) < ZERO_EPSILON)
 	{
 #ifdef _DEBUG
 		// check brushprimit_texdef[1][0] is not zero
-		if (arcMath::Fabs(texMat[1][0] ) < ZERO_EPSILON) {
+		if (anMath::Fabs(texMat[1][0] ) < ZERO_EPSILON) {
 			common->Printf( "Warning : unexpected texdef[1][0]==0 in TexMatToFakeTexCoords\n" );
 		}
 #endif
@@ -424,11 +424,11 @@ void FakeTexCoordsToTexMat(float shift[2], float rot, float scale[2], float texM
 
 //
 // =======================================================================================================================
-//    convert a texture matrix between two qtexture_t if NULL for qtexture_t, basic 2x2 texture is assumed ( straight
+//    convert a texture matrix between two qtexture_t if nullptr for qtexture_t, basic 2x2 texture is assumed ( straight
 //    mapping between s/t coordinates and geometric coordinates )
 // =======================================================================================================================
 //
-void ConvertTexMatWithQTexture(float texMat1[2][3], const arcMaterial *qtex1, float texMat2[2][3], const arcMaterial *qtex2, float sScale = 1.0, float tScale = 1.0 ) {
+void ConvertTexMatWithQTexture(float texMat1[2][3], const anMaterial *qtex1, float texMat2[2][3], const anMaterial *qtex2, float sScale = 1.0, float tScale = 1.0 ) {
 	float	s1, s2;
 	s1 = (qtex1 ? static_cast<float>(qtex1->GetEditorImage()->uploadWidth) : 2.0f) / (qtex2 ? static_cast<float>(qtex2->GetEditorImage()->uploadWidth) : 2.0f);
 	s2 = (qtex1 ? static_cast<float>(qtex1->GetEditorImage()->uploadHeight) : 2.0f) / (qtex2 ? static_cast<float>(qtex2->GetEditorImage()->uploadHeight) : 2.0f);
@@ -446,7 +446,7 @@ void ConvertTexMatWithQTexture(float texMat1[2][3], const arcMaterial *qtex1, fl
  =======================================================================================================================
  =======================================================================================================================
  */
-void ConvertTexMatWithQTexture(brushprimit_texdef_t	*texMat1, const arcMaterial *qtex1, brushprimit_texdef_t *texMat2, const arcMaterial *qtex2, float sScale, float tScale) {
+void ConvertTexMatWithQTexture(brushprimit_texdef_t	*texMat1, const anMaterial *qtex1, brushprimit_texdef_t *texMat2, const anMaterial *qtex2, float sScale, float tScale) {
 	ConvertTexMatWithQTexture(texMat1->coords, qtex1, texMat2->coords, qtex2, sScale, tScale);
 }
 
@@ -456,12 +456,12 @@ void ConvertTexMatWithQTexture(brushprimit_texdef_t	*texMat1, const arcMaterial 
 //    texture locking
 // =======================================================================================================================
 //
-void Face_MoveTexture_BrushPrimit(face_t *f, arcVec3 delta) {
-	arcVec3D	texS, texT;
+void Face_MoveTexture_BrushPrimit(face_t *f, anVec3 delta) {
+	anVec3D	texS, texT;
 	double	tx, ty;
-	arcVec3D	M[3];	// columns of the matrix .. easier that way
+	anVec3D	M[3];	// columns of the matrix .. easier that way
 	double	det;
-	arcVec3D	D[2];
+	anVec3D	D[2];
 
 	// compute plane axis base ( doesn't change with translation )
 	ComputeAxisBase(f->plane.Normal(), texS, texT);
@@ -499,13 +499,13 @@ void Face_MoveTexture_BrushPrimit(face_t *f, arcVec3 delta) {
 
 //
 // =======================================================================================================================
-//    call Face_MoveTexture_BrushPrimit after arcVec3D computation
+//    call Face_MoveTexture_BrushPrimit after anVec3D computation
 // =======================================================================================================================
 //
 void Select_ShiftTexture_BrushPrimit(face_t *f, float x, float y, bool autoAdjust) {
 #if 0
-	arcVec3D	texS, texT;
-	arcVec3D	delta;
+	anVec3D	texS, texT;
+	anVec3D	delta;
 	ComputeAxisBase(f->plane.normal, texS, texT);
 	VectorScale(texS, x, texS);
 	VectorScale(texT, y, texT);
@@ -528,11 +528,11 @@ void Select_ShiftTexture_BrushPrimit(face_t *f, float x, float y, bool autoAdjus
 //    best fitted 2D vector is x.X+y.Y
 // =======================================================================================================================
 //
-void ComputeBest2DVector(arcVec3 v, arcVec3 X, arcVec3 Y, int &x, int &y) {
+void ComputeBest2DVector(anVec3 v, anVec3 X, anVec3 Y, int &x, int &y) {
 	double	sx, sy;
 	sx = DotProduct( v, X);
 	sy = DotProduct( v, Y);
-	if (arcMath::Fabs(sy) > arcMath::Fabs(sx) ) {
+	if (anMath::Fabs(sy) > anMath::Fabs(sx) ) {
 		x = 0;
 		if (sy > 0.0 ) {
 			y = 1;
@@ -560,14 +560,14 @@ void ComputeBest2DVector(arcVec3 v, arcVec3 X, arcVec3 Y, int &x, int &y) {
 //    the commented out section to fill M and D ++timo TODO: update the other members to use this when possible
 // =======================================================================================================================
 //
-void MatrixForPoints(arcVec3D M[3], arcVec3D D[2], brushprimit_texdef_t *T) {
+void MatrixForPoints(anVec3D M[3], anVec3D D[2], brushprimit_texdef_t *T) {
 	//
-	// arcVec3D M[3]; // columns of the matrix .. easier that way (the indexing is not
+	// anVec3D M[3]; // columns of the matrix .. easier that way (the indexing is not
 	// standard! it's column-line .. later computations are easier that way)
 	//
 	double	det;
 
-	// arcVec3D D[2];
+	// anVec3D D[2];
 	M[2][0] = 1.0f;
 	M[2][1] = 1.0f;
 	M[2][2] = 1.0f;
@@ -606,26 +606,26 @@ void MatrixForPoints(arcVec3D M[3], arcVec3D D[2], brushprimit_texdef_t *T) {
 //    mins and maxs are the face bounding box ++timo fixme: we use the face info, mins and maxs are irrelevant
 // =======================================================================================================================
 //
-void Face_FitTexture_BrushPrimit(face_t *f, arcVec3 mins, arcVec3 maxs, float height, float width) {
-	arcVec3D					BBoxSTMin, BBoxSTMax;
-	arcWinding				*w;
+void Face_FitTexture_BrushPrimit(face_t *f, anVec3 mins, anVec3 maxs, float height, float width) {
+	anVec3D					BBoxSTMin, BBoxSTMax;
+	anWinding				*w;
 	int						i, j;
 	double					val;
-	arcVec3D					M[3], D[2];
+	anVec3D					M[3], D[2];
 
-	// arcVec3D N[2],Mf[2];
+	// anVec3D N[2],Mf[2];
 	brushprimit_texdef_t	N;
-	arcVec3D					Mf[2];
+	anVec3D					Mf[2];
 
 
 
 	//memset(f->brushprimit_texdef.coords, 0, sizeof(f->brushprimit_texdef.coords) );
 	//f->brushprimit_texdef.coords[0][0] = 1.0f;
 	//f->brushprimit_texdef.coords[1][1] = 1.0f;
-	//ConvertTexMatWithQTexture(&f->brushprimit_texdef, NULL, &f->brushprimit_texdef, f->d_texture);
+	//ConvertTexMatWithQTexture(&f->brushprimit_texdef, nullptr, &f->brushprimit_texdef, f->d_texture);
 	//
 	// we'll be working on a standardized texture size ConvertTexMatWithQTexture(
-	// &f->brushprimit_texdef, f->d_texture, &f->brushprimit_texdef, NULL ); compute
+	// &f->brushprimit_texdef, f->d_texture, &f->brushprimit_texdef, nullptr ); compute
 	// the BBox in ST coords
 	//
 	EmitBrushPrimitTextureCoordinates(f, f->face_winding);
@@ -636,7 +636,7 @@ void Face_FitTexture_BrushPrimit(face_t *f, arcVec3 mins, arcVec3 maxs, float he
 	if (w) {
 		for ( i = 0; i < w->GetNumPoints(); i++ ) {
 			// AddPointToBounds in 2D on (S,T) coordinates
-			for (j = 0; j < 2; j++ ) {
+			for ( j = 0; j < 2; j++ ) {
 				val = ( *w )[i][j + 3];
 				if (val < BBoxSTMin[j] ) {
 					BBoxSTMin[j] = val;
@@ -721,7 +721,7 @@ void Face_FitTexture_BrushPrimit(face_t *f, arcVec3 mins, arcVec3 maxs, float he
 
 	//
 	// handle the texture size ConvertTexMatWithQTexture( &f->brushprimit_texdef,
-	// NULL, &f->brushprimit_texdef, f->d_texture );
+	// nullptr, &f->brushprimit_texdef, f->d_texture );
 	//
 }
 
@@ -746,7 +746,7 @@ void Face_ScaleTexture_BrushPrimit(face_t *face, float sS, float sT) {
  =======================================================================================================================
  =======================================================================================================================
  */
-void Face_RotateTexture_BrushPrimit(face_t *face, float amount, arcVec3 origin) {
+void Face_RotateTexture_BrushPrimit(face_t *face, float amount, anVec3 origin) {
 	brushprimit_texdef_t	*pBP = &face->brushprimit_texdef;
 	if (amount) {
 		float	x = pBP->coords[0][0];
@@ -777,31 +777,31 @@ bool	txlock_bRotation;
 // rotation locking params
 int		txl_nAxis;
 double	txl_fDeg;
-arcVec3D	txl_vOrigin;
+anVec3D	txl_vOrigin;
 
 // flip locking params
-arcVec3D	txl_matrix[3];
-arcVec3D	txl_origin;
+anVec3D	txl_matrix[3];
+anVec3D	txl_origin;
 
 /*
  =======================================================================================================================
  =======================================================================================================================
  */
 void TextureLockTransformation_BrushPrimit(face_t *f) {
-	arcVec3D	Orig, texS, texT;		// axis base of initial plane
+	anVec3D	Orig, texS, texT;		// axis base of initial plane
 
 	// used by transformation algo
-	arcVec3D	temp;
+	anVec3D	temp;
 	int		j;
-	//arcVec3D	vRotate;				// rotation vector
+	//anVec3D	vRotate;				// rotation vector
 
-	arcVec3D	rOrig, rvecS, rvecT;	// geometric transformation of (0,0 ) ( 1,0 ) (0,1 ) { initial plane axis base }
-	arcVec3	rNormal;
-	arcVec3D	rtexS, rtexT;	// axis base for the transformed plane
-	arcVec3D	lOrig, lvecS, lvecT;	// [2] are not used ( but usefull for debugging )
-	arcVec3D	M[3];
+	anVec3D	rOrig, rvecS, rvecT;	// geometric transformation of (0,0 ) ( 1,0 ) (0,1 ) { initial plane axis base }
+	anVec3	rNormal;
+	anVec3D	rtexS, rtexT;	// axis base for the transformed plane
+	anVec3D	lOrig, lvecS, lvecT;	// [2] are not used ( but usefull for debugging )
+	anVec3D	M[3];
 	double	det;
-	arcVec3D	D[2];
+	anVec3D	D[2];
 
 	// silence compiler warnings
 	rOrig.Zero();
@@ -840,17 +840,17 @@ void TextureLockTransformation_BrushPrimit(face_t *f) {
 	}
 	else {
 		VectorSubtract(Orig, txl_origin, temp);
-		for (j = 0; j < 3; j++ ) {
+		for ( j = 0; j < 3; j++ ) {
 			rOrig[j] = DotProduct(temp, txl_matrix[j] ) + txl_origin[j];
 		}
 
 		VectorSubtract(texS, txl_origin, temp);
-		for (j = 0; j < 3; j++ ) {
+		for ( j = 0; j < 3; j++ ) {
 			rvecS[j] = DotProduct(temp, txl_matrix[j] ) + txl_origin[j];
 		}
 
 		VectorSubtract(texT, txl_origin, temp);
-		for (j = 0; j < 3; j++ ) {
+		for ( j = 0; j < 3; j++ ) {
 			rvecT[j] = DotProduct(temp, txl_matrix[j] ) + txl_origin[j];
 		}
 
@@ -858,7 +858,7 @@ void TextureLockTransformation_BrushPrimit(face_t *f) {
 		// we also need the axis base of the target plane, apply the transformation matrix
 		// to the normal too..
 		//
-		for (j = 0; j < 3; j++ ) {
+		for ( j = 0; j < 3; j++ ) {
 			rNormal[j] = DotProduct(f->plane, txl_matrix[j] );
 		}
 	}
@@ -906,7 +906,7 @@ void TextureLockTransformation_BrushPrimit(face_t *f) {
 //    texture locking called before the points on the face are actually rotated
 // =======================================================================================================================
 //
-void RotateFaceTexture_BrushPrimit(face_t *f, int nAxis, float fDeg, arcVec3 vOrigin) {
+void RotateFaceTexture_BrushPrimit(face_t *f, int nAxis, float fDeg, anVec3 vOrigin) {
 	// this is a placeholder to call the general texture locking algorithm
 	txlock_bRotation = true;
 	txl_nAxis = nAxis;
@@ -923,7 +923,7 @@ void RotateFaceTexture_BrushPrimit(face_t *f, int nAxis, float fDeg, arcVec3 vOr
 //    the geometric transformation is done
 // =======================================================================================================================
 //
-void ApplyMatrix_BrushPrimit(face_t *f, arcMat3 matrix, arcVec3 origin) {
+void ApplyMatrix_BrushPrimit(face_t *f, anMat3 matrix, anVec3 origin) {
 	// this is a placeholder to call the general texture locking algorithm
 	txlock_bRotation = false;
 	VectorCopy(matrix[0], txl_matrix[0] );
@@ -972,10 +972,10 @@ void BPMatRotate(float A[2][3], float theta) {
 }
 
 void Face_GetScale_BrushPrimit(face_t *face, float *s, float *t, float *rot) {
-	arcVec3D	texS, texT;
+	anVec3D	texS, texT;
 	ComputeAxisBase(face->plane.Normal(), texS, texT);
 
-	if (face == NULL || face->face_winding == NULL) {
+	if (face == nullptr || face->face_winding == nullptr ) {
 		return;
 	}
 	// find ST coordinates for the center of the face
@@ -1005,13 +1005,13 @@ void Face_GetScale_BrushPrimit(face_t *face, float *s, float *t, float *rot) {
 	BPMatMul(aux, m, BPO);
 
 	// apply a given scale (on S and T)
-	ConvertTexMatWithQTexture(BPO, face->d_texture, aux, NULL);
+	ConvertTexMatWithQTexture(BPO, face->d_texture, aux, nullptr );
 
-	*s = arcMath::Sqrt(aux[0][0] * aux[0][0] + aux[1][0] * aux[1][0] );
-	*t = arcMath::Sqrt(aux[0][1] * aux[0][1] + aux[1][1] * aux[1][1] );
+	*s = anMath::Sqrt(aux[0][0] * aux[0][0] + aux[1][0] * aux[1][0] );
+	*t = anMath::Sqrt(aux[0][1] * aux[0][1] + aux[1][1] * aux[1][1] );
 
 	// compute rotate value
-	if (arcMath::Fabs(face->brushprimit_texdef.coords[0][0] ) < ZERO_EPSILON)
+	if (anMath::Fabs(face->brushprimit_texdef.coords[0][0] ) < ZERO_EPSILON)
 	{
 		// rotate is +-90
 		if (face->brushprimit_texdef.coords[1][0] > 0 ) {
@@ -1033,7 +1033,7 @@ void Face_GetScale_BrushPrimit(face_t *face, float *s, float *t, float *rot) {
  =======================================================================================================================
  */
 void Face_SetExplicitScale_BrushPrimit(face_t *face, float s, float t) {
-	arcVec3D	texS, texT;
+	anVec3D	texS, texT;
 	ComputeAxisBase(face->plane.Normal(), texS, texT);
 
 	// find ST coordinates for the center of the face
@@ -1064,12 +1064,12 @@ void Face_SetExplicitScale_BrushPrimit(face_t *face, float s, float t) {
 	BPMatMul(aux, m, BPO);
 
 	// apply a given scale (on S and T)
-	ConvertTexMatWithQTexture(BPO, face->d_texture, aux, NULL);
+	ConvertTexMatWithQTexture(BPO, face->d_texture, aux, nullptr );
 
 	// reset the scale (normalize the matrix)
 	double	v1, v2;
-	v1 = arcMath::Sqrt(aux[0][0] * aux[0][0] + aux[1][0] * aux[1][0] );
-	v2 = arcMath::Sqrt(aux[0][1] * aux[0][1] + aux[1][1] * aux[1][1] );
+	v1 = anMath::Sqrt(aux[0][0] * aux[0][0] + aux[1][0] * aux[1][0] );
+	v2 = anMath::Sqrt(aux[0][1] * aux[0][1] + aux[1][1] * aux[1][1] );
 
 	if (s == 0.0 ) {
 		s = v1;
@@ -1087,7 +1087,7 @@ void Face_SetExplicitScale_BrushPrimit(face_t *face, float s, float t) {
 	aux[1][0] *= sS;
 	aux[0][1] *= sT;
 	aux[1][1] *= sT;
-	ConvertTexMatWithQTexture(aux, NULL, BPO, face->d_texture);
+	ConvertTexMatWithQTexture(aux, nullptr, BPO, face->d_texture);
 	BPMatMul(m, BPO, aux);	// m is M^-1
 	m[0][2] = -Os;
 	m[1][2] = -Ot;
@@ -1109,7 +1109,7 @@ void Face_FlipTexture_BrushPrimit(face_t *f, bool y) {
 	}
 #if 0
 
-	arcVec3D	texS, texT;
+	anVec3D	texS, texT;
 	ComputeAxisBase(f->plane.normal, texS, texT);
 	double	Os = 0, Ot = 0;
 	for ( int i = 0; i < f->face_winding->numpoints; i++ ) {
@@ -1154,7 +1154,7 @@ void Face_SetAxialScale_BrushPrimit(face_t *face, bool y) {
 	//float oldS, oldT, oldR;
 	//Face_GetScale_BrushPrimit(face, &oldS, &oldT, &oldR);
 
-	arcVec3D min, max;
+	anVec3D min, max;
 	min.x = min.y = min.z = 999999.0;
 	max.x = max.y = max.z = -999999.0;
 	for ( int i = 0; i < face->face_winding->GetNumPoints(); i++ ) {
@@ -1168,7 +1168,7 @@ void Face_SetAxialScale_BrushPrimit(face_t *face, bool y) {
 		}
 	}
 
-	arcVec3 len;
+	anVec3 len;
 
 	if (g_bAxialMode) {
 		if (g_axialAnchor >= 0 && g_axialAnchor < face->face_winding->GetNumPoints() &&
@@ -1187,8 +1187,8 @@ void Face_SetAxialScale_BrushPrimit(face_t *face, bool y) {
 	}
 
 	double dist = len.Length();
-	double width = arcMath::Fabs( max.x - min.x);
-	double height = arcMath::Fabs( max.z - min.z);
+	double width = anMath::Fabs( max.x - min.x);
+	double height = anMath::Fabs( max.z - min.z);
 
 	//len = maxs[2] - mins[2];
 	//double yDist = len.Length();
@@ -1218,7 +1218,7 @@ void Face_SetAxialScale_BrushPrimit(face_t *face, bool y) {
 	common->Printf( "Face x: %f  y: %f  xr: %f  yr: %f\n", x, y, xRatio, yRatio);
 	common->Printf( "Texture x: %i  y: %i  \n",face->d_texture->GetEditorImage()->uploadWidth, face->d_texture->GetEditorImage()->uploadHeight);
 
-	arcVec3D texS, texT;
+	anVec3D texS, texT;
 	ComputeAxisBase(face->plane.normal, texS, texT);
 	float	Os = 0, Ot = 0;
 	for ( int i = 0; i < face->face_winding->numpoints; i++ ) {

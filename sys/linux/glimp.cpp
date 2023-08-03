@@ -9,16 +9,16 @@ extern "C" {
 	#include "Linux-System/libXNVCtrl/NVCtrlLib.h"
 }
 
-arcCVarSystem sys_videoRam( "sys_videoRam", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "Texture memory on the video card (in megabytes) - 0: autodetect", 0, 512 );
+anCVarSystem sys_videoRam( "sys_videoRam", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "Texture memory on the video card (in megabytes) - 0: autodetect", 0, 512 );
 
-Display *dpy = NULL;
+Display *dpy = nullptr;
 static int scrnum = 0;
 
 Window win = 0;
 
 bool dga_found = false;
 
-static GLXContext ctx = NULL;
+static GLXContext ctx = nullptr;
 
 static bool vidmode_ext = false;
 static int vidmode_MajorVersion = 0, vidmode_MinorVersion = 0;	// major and minor of XF86VidExtensions
@@ -67,7 +67,7 @@ void GLimp_ActivateContext() {
 
 void GLimp_DeactivateContext() {
 	assert( dpy );
-	qglXMakeCurrent( dpy, None, NULL );
+	qglXMakeCurrent( dpy, None, nullptr );
 }
 
 // save and restore the original gamma of the system
@@ -79,9 +79,9 @@ void GLimp_SaveGamma() {
 	assert( dpy );
 
 	XF86VidModeGetGammaRampSize( dpy, scrnum, &save_rampsize );
-	save_red = ( unsigned short * )malloc(save_rampsize*sizeof( unsigned short ) );
-	save_green = ( unsigned short * )malloc(save_rampsize*sizeof( unsigned short ) );
-	save_blue = ( unsigned short * )malloc(save_rampsize*sizeof( unsigned short ) );
+	save_red = ( unsigned short * )malloc( save_rampsize*sizeof( unsigned short ) );
+	save_green = ( unsigned short * )malloc( save_rampsize*sizeof( unsigned short ) );
+	save_blue = ( unsigned short * )malloc( save_rampsize*sizeof( unsigned short ) );
 	XF86VidModeGetGammaRamp( dpy, scrnum, save_rampsize, save_red, save_green, save_blue );
 }
 
@@ -119,7 +119,7 @@ void GLimp_SetGamma( unsigned short red[256], unsigned short green[256], unsigne
 			int r_i; float r_f;
 
 			for ( i=0; i<size-1; i++ ) {
-				r_f = ( float )i*255.0f/( float )(size-1 );
+				r_f = ( float )i*255.0f/( float )( size-1 );
 				r_i = ( int )floor(r_f);
 				r_f -= ( float )r_i;
 				l_red[i] = ( int )round( ( 1.0f-r_f )*( float )red[r_i]+r_f*( float )red[r_i+1] );
@@ -154,9 +154,9 @@ void GLimp_Shutdown() {
 		//XCloseDisplay( dpy );
 
 		vidmode_active = false;
-		dpy = NULL;
+		dpy = nullptr;
 		win = 0;
-		ctx = NULL;
+		ctx = nullptr;
 	}
 }
 
@@ -222,7 +222,7 @@ bool GLimp_OpenDisplay( void ) {
 	// set up our custom error handler for X failures
 	XSetErrorHandler( &idXErrorHandler );
 
-	if ( !( dpy = XOpenDisplay(NULL) ) ) {
+	if ( !( dpy = XOpenDisplay(nullptr ) ) ) {
 		BE_RenderPrintf( "Cannot Open X Sessions display port\n" );
 		return false;
 	}
@@ -350,9 +350,9 @@ int GLX_Init( glimpParms_t a ) {
 				else if (depthbits == 16 )
 					depthbits = 8;
 			case 3:
-				if (stencilbits == 24 )
+				if ( stencilbits == 24 )
 					stencilbits = 16;
-				else if (stencilbits == 16 )
+				else if ( stencilbits == 16 )
 					stencilbits = 8;
 			}
 		}
@@ -451,7 +451,7 @@ int GLX_Init( glimpParms_t a ) {
 
 	XFlush( dpy );
 	XSync( dpy, False );
-	ctx = qglXCreateContext(dpy, visinfo, NULL, True );
+	ctx = qglXCreateContext(dpy, visinfo, nullptr, True );
 	XSync( dpy, False );
 
 	// Free the visinfo after we're done with it
@@ -459,10 +459,10 @@ int GLX_Init( glimpParms_t a ) {
 
 	qglXMakeCurrent( dpy, win, ctx );
 
-	glstring = ( const char * ) qglGetString( GL_RENDERER );
+	glstring = ( const char *) qglGetString( GL_RENDERER );
 	BE_RenderPrintf( "GL_RENDERER: %s\n", glstring);
 
-	glstring = ( const char * ) qglGetString( GL_EXTENSIONS );
+	glstring = ( const char *) qglGetString( GL_EXTENSIONS );
 	BE_RenderPrintf( "GL_EXTENSIONS: %s\n", glstring );
 
 	// FIXME: here, software GL test
@@ -560,7 +560,7 @@ int Sys_GetVideoRam( void ) {
 				} else if ( strlen( line ) >= 13 && strstr( line, "max   Inv =" ) == line ) {
 					total += atoi( line + 12 );
 				}
-				line = strtok( NULL, "\n" );
+				line = strtok( nullptr, "\n" );
 			}
 			if ( total ) {
 				run_once = total / 1048576;

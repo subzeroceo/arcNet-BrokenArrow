@@ -1,21 +1,21 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
 
 #define NEWEDGESEL	1
 
-int FindPoint(arcVec3 point) {
+int FindPoint(anVec3 point) {
 	int i, j;
 
 	for ( i = 0; i < g_qeglobals.d_numpoints; i++ ) {
-		for (j = 0; j < 3; j++ ) {
-			if (arcMath::Fabs(point[j] - g_qeglobals.d_points[i][j] ) > 0.1 ) {
+		for ( j = 0; j < 3; j++ ) {
+			if (anMath::Fabs(point[j] - g_qeglobals.d_points[i][j] ) > 0.1 ) {
 				break;
 			}
 		}
 
-		if (j == 3) {
+		if ( j == 3) {
 			return i;
 		}
 	}
@@ -55,7 +55,7 @@ void MakeFace (brush_t * b, face_t * f)
 void MakeFace (face_t * f)
 #endif
 {
-	arcWinding	*w;
+	anWinding	*w;
 	int			i;
 	int			pnum[128];
 
@@ -112,7 +112,7 @@ void SelectFaceEdge (brush_t * b, face_t * f, int p1, int p2)
 void SelectFaceEdge (face_t * f, int p1, int p2)
 #endif
 {
-	arcWinding	*w;
+	anWinding	*w;
 	int			i, j, k;
 	int			pnum[128];
 
@@ -132,7 +132,7 @@ void SelectFaceEdge (face_t * f, int p1, int p2)
 			VectorCopy(g_qeglobals.d_points[pnum[i]], f->planepts[0] );
 			VectorCopy(g_qeglobals.d_points[pnum[( i + 1 ) % w->GetNumPoints()]], f->planepts[1] );
 			VectorCopy(g_qeglobals.d_points[pnum[( i + 2) % w->GetNumPoints()]], f->planepts[2] );
-			for (j = 0; j < 3; j++ ) {
+			for ( j = 0; j < 3; j++ ) {
 				for (k = 0; k < 3; k++ ) {
 					f->planepts[j][k] =
 					floor(f->planepts[j][k] / g_qeglobals.d_gridsize + 0.5) * g_qeglobals.d_gridsize;
@@ -155,7 +155,7 @@ void SelectFaceEdge (face_t * f, int p1, int p2)
  */
 void SelectVertex( int p1) {
 	brush_t		*b;
-	arcWinding	*w;
+	anWinding	*w;
 	int			i, j, k;
 	face_t		*f;
 
@@ -172,7 +172,7 @@ void SelectVertex( int p1) {
 					VectorCopy( ( *w )[( i + w->GetNumPoints() - 1 ) % w->GetNumPoints()], f->planepts[0] );
 					VectorCopy( ( *w )[i], f->planepts[1] );
 					VectorCopy( ( *w )[( i + 1 ) % w->GetNumPoints()], f->planepts[2] );
-					for (j = 0; j < 3; j++ ) {
+					for ( j = 0; j < 3; j++ ) {
 						for (k = 0; k < 3; k++ ) {
 							// f->planepts[j][k] = floor(f->planepts[j][k]/g_qeglobals.d_gridsize+0.5)*g_qeglobals.d_gridsize;
 						}
@@ -202,7 +202,7 @@ void SelectVertex( int p1) {
 				VectorCopy(w[( i + w->GetNumPoints() - 1 ) % w->GetNumPoints()], f->planepts[0] );
 				VectorCopy(w[i], f->planepts[1] );
 				VectorCopy(w[( i + 1 ) % w->GetNumPoints()], f->planepts[2] );
-				for (j = 0; j < 3; j++ ) {
+				for ( j = 0; j < 3; j++ ) {
 					for (k = 0; k < 3; k++ ) {
 						// f->planepts[j][k] = floor(f->planepts[j][k]/g_qeglobals.d_gridsize+0.5)*g_qeglobals.d_gridsize;
 					}
@@ -220,10 +220,10 @@ void SelectVertex( int p1) {
 #endif
 }
 
-void SelectEdgeByRay(arcVec3 org, arcVec3 dir) {
+void SelectEdgeByRay(anVec3 org, anVec3 dir) {
 	int		i, j, besti;
 	float	d, bestd;
-	arcVec3	mid, temp;
+	anVec3	mid, temp;
 	pedge_t *e;
 
 	// find the edge closest to the ray
@@ -231,7 +231,7 @@ void SelectEdgeByRay(arcVec3 org, arcVec3 dir) {
 	bestd = 8;
 
 	for ( i = 0; i < g_qeglobals.d_numedges; i++ ) {
-		for (j = 0; j < 3; j++ ) {
+		for ( j = 0; j < 3; j++ ) {
 			mid[j] = 0.5 * (g_qeglobals.d_points[g_qeglobals.d_edges[i].p1][j] + g_qeglobals.d_points[g_qeglobals.d_edges[i].p2][j] );
 		}
 
@@ -271,10 +271,10 @@ void SelectEdgeByRay(arcVec3 org, arcVec3 dir) {
 #endif
 }
 
-void SelectVertexByRay(arcVec3 org, arcVec3 dir) {
+void SelectVertexByRay(anVec3 org, anVec3 dir) {
 	int		i, besti;
 	float	d, bestd;
-	arcVec3	temp;
+	anVec3	temp;
 
 	float scale = g_pParentWnd->ActiveXY()->Scale();
 	// find the point closest to the ray
@@ -304,16 +304,16 @@ void SelectVertexByRay(arcVec3 org, arcVec3 dir) {
 	// SelectVertex (besti);
 }
 
-extern void AddPatchMovePoint(arcVec3 v, bool bMulti, bool bFull);
+extern void AddPatchMovePoint(anVec3 v, bool bMulti, bool bFull);
 
 /*
  =======================================================================================================================
  =======================================================================================================================
  */
-void SelectCurvePointByRay(const arcVec3 &org, const arcVec3 &dir, int buttons) {
+void SelectCurvePointByRay(const anVec3 &org, const anVec3 &dir, int buttons) {
 	int		i, besti;
 	float	d, bestd;
-	arcVec3	temp;
+	anVec3	temp;
 
 	// find the point closest to the ray
 	float scale = g_pParentWnd->ActiveXY()->Scale();
@@ -351,10 +351,10 @@ void SelectCurvePointByRay(const arcVec3 &org, const arcVec3 &dir, int buttons) 
  =======================================================================================================================
  =======================================================================================================================
  */
-void SelectSplinePointByRay(const arcVec3 &org, const arcVec3 &dir, int buttons) {
+void SelectSplinePointByRay(const anVec3 &org, const anVec3 &dir, int buttons) {
 	int		i, besti;
 	float	d, bestd;
-	arcVec3	temp;
+	anVec3	temp;
 
 	// find the point closest to the ray
 	besti = -1;

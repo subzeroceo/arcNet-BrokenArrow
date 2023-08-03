@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -8,9 +8,9 @@
 R_ListRenderLightDefs_f
 ===================
 */
-void R_ListRenderLightDefs_f( const arcCommandArgs &args ) {
+void R_ListRenderLightDefs_f( const anCommandArgs &args ) {
 	int			i;
-	ARCRenderLightsLocal	*ldef;
+	anRenderLightsLocal	*ldef;
 
 	if ( !tr.primaryWorld ) {
 		return;
@@ -28,7 +28,7 @@ void R_ListRenderLightDefs_f( const arcCommandArgs &args ) {
 
 		// count up the interactions
 		int	iCount = 0;
-		for ( ARCInteraction *inter = ldef->firstInteraction; inter != NULL; inter = inter->lightNext ) {
+		for ( an Interaction *inter = ldef->firstInteraction; inter != nullptr; inter = inter->lightNext ) {
 			iCount++;
 		}
 		totalIntr += iCount;
@@ -52,9 +52,9 @@ void R_ListRenderLightDefs_f( const arcCommandArgs &args ) {
 R_ListRenderEntityDefs_f
 ===================
 */
-void R_ListRenderEntityDefs_f( const arcCommandArgs &args ) {
+void R_ListRenderEntityDefs_f( const anCommandArgs &args ) {
 	int			i;
-	ARCRenderEntityLocal	*mdef;
+	anRenderEntityLocal	*mdef;
 
 	if ( !tr.primaryWorld ) {
 		return;
@@ -72,7 +72,7 @@ void R_ListRenderEntityDefs_f( const arcCommandArgs &args ) {
 
 		// count up the interactions
 		int	iCount = 0;
-		for ( ARCInteraction *inter = mdef->firstInteraction; inter != NULL; inter = inter->entityNext ) {
+		for ( an Interaction *inter = mdef->firstInteraction; inter != nullptr; inter = inter->entityNext ) {
 			iCount++;
 		}
 		totalIntr += iCount;
@@ -93,22 +93,22 @@ void R_ListRenderEntityDefs_f( const arcCommandArgs &args ) {
 
 /*
 ===================
-ARCRenderWorldLocal::ARCRenderWorldLocal
+anRenderWorldLocal::anRenderWorldLocal
 ===================
 */
-ARCRenderWorldLocal::ARCRenderWorldLocal() {
+anRenderWorldLocal::anRenderWorldLocal() {
 	mapName.Clear();
 	mapTimeStamp = FILE_NOT_FOUND_TIMESTAMP;
 
 	generateAllInteractionsCalled = false;
 
-	areaNodes = NULL;
+	areaNodes = nullptr;
 	numAreaNodes = 0;
 
-	portalAreas = NULL;
+	portalAreas = nullptr;
 	numPortalAreas = 0;
 
-	doublePortals = NULL;
+	doublePortals = nullptr;
 	numInterAreaPortals = 0;
 
 	interactionTable = 0;
@@ -118,10 +118,10 @@ ARCRenderWorldLocal::ARCRenderWorldLocal() {
 
 /*
 ===================
-ARCRenderWorldLocal::~ARCRenderWorldLocal
+anRenderWorldLocal::~anRenderWorldLocal
 ===================
 */
-ARCRenderWorldLocal::~ARCRenderWorldLocal() {
+anRenderWorldLocal::~anRenderWorldLocal() {
 	// free all the entityDefs, lightDefs, portals, etc
 	FreeWorld();
 
@@ -136,12 +136,12 @@ ARCRenderWorldLocal::~ARCRenderWorldLocal() {
 ResizeInteractionTable
 ===================
 */
-void ARCRenderWorldLocal::ResizeInteractionTable() {
+void anRenderWorldLocal::ResizeInteractionTable() {
 	// we overflowed the interaction table, so dump it
 	// we may want to resize this in the future if it turns out to be common
-	common->Printf( "ARCRenderWorldLocal::ResizeInteractionTable: overflowed interactionTableWidth, dumping\n" );
+	common->Printf( "anRenderWorldLocal::ResizeInteractionTable: overflowed interactionTableWidth, dumping\n" );
 	R_StaticFree( interactionTable );
-	interactionTable = NULL;
+	interactionTable = nullptr;
 }
 
 /*
@@ -149,11 +149,11 @@ void ARCRenderWorldLocal::ResizeInteractionTable() {
 AddEntityDef
 ===================
 */
-arcNetHandle_t ARCRenderWorldLocal::AddEntityDef( const renderEntity_t *re ){
+arcNetHandle_t anRenderWorldLocal::AddEntityDef( const renderEntity_t *re ){
 	// try and reuse a free spot
 	int entityHandle = entityDefs.FindNull();
 	if ( entityHandle == -1 ) {
-		entityHandle = entityDefs.Append( NULL );
+		entityHandle = entityDefs.Append( nullptr );
 		if ( interactionTable && entityDefs.Num() > interactionTableWidth ) {
 			ResizeInteractionTable();
 		}
@@ -173,7 +173,7 @@ visible entities
 ==============
 */
 int callbackUpdate;
-void ARCRenderWorldLocal::UpdateEntityDef( arcNetHandle_t entityHandle, const renderEntity_t *re ) {
+void anRenderWorldLocal::UpdateEntityDef( arcNetHandle_t entityHandle, const renderEntity_t *re ) {
 	if ( r_skipUpdates.GetBool() ) {
 		return;
 	}
@@ -181,18 +181,18 @@ void ARCRenderWorldLocal::UpdateEntityDef( arcNetHandle_t entityHandle, const re
 	tr.pc.entityUpdates++;
 
 	if ( !re->hModel && !re->callback ) {
-		common->Error( "ARCRenderWorld::UpdateEntityDef: NULL hModel" );
+		common->Error( "anRenderWorld::UpdateEntityDef: nullptr hModel" );
 	}
 
 	// create new slots if needed
 	if ( entityHandle < 0 || entityHandle > LUDICROUS_INDEX ) {
-		common->Error( "ARCRenderWorld::UpdateEntityDef: index = %i", entityHandle );
+		common->Error( "anRenderWorld::UpdateEntityDef: index = %i", entityHandle );
 	}
 	while ( entityHandle >= entityDefs.Num() ) {
-		entityDefs.Append( NULL );
+		entityDefs.Append( nullptr );
 	}
 
-	ARCRenderEntityLocal *def = entityDefs[entityHandle];
+	anRenderEntityLocal *def = entityDefs[entityHandle];
 	if ( def ) {
 		if ( !re->forceUpdate ) {
 			// check for exact match (OPTIMIZE: check through pointers more)
@@ -228,7 +228,7 @@ void ARCRenderWorldLocal::UpdateEntityDef( arcNetHandle_t entityHandle, const re
 		}
 	} else {
 		// creating a new one
-		def = new ARCRenderEntityLocal;
+		def = new anRenderEntityLocal;
 		entityDefs[entityHandle] = def;
 
 		def->world = this;
@@ -255,18 +255,18 @@ void ARCRenderWorldLocal::UpdateEntityDef( arcNetHandle_t entityHandle, const re
 FreeEntityDef
 
 Frees all references and lit surfaces from the model, and
-NULL's out it's entry in the world list
+nullptr's out it's entry in the world list
 ===================
 */
-void ARCRenderWorldLocal::FreeEntityDef( arcNetHandle_t entityHandle ) {
+void anRenderWorldLocal::FreeEntityDef( arcNetHandle_t entityHandle ) {
 	if ( entityHandle < 0 || entityHandle >= entityDefs.Num() ) {
-		common->Printf( "ARCRenderWorld::FreeEntityDef: handle %i > %i\n", entityHandle, entityDefs.Num() );
+		common->Printf( "anRenderWorld::FreeEntityDef: handle %i > %i\n", entityHandle, entityDefs.Num() );
 		return;
 	}
 
-	ARCRenderEntityLocal	*def = entityDefs[entityHandle];
+	anRenderEntityLocal	*def = entityDefs[entityHandle];
 	if ( !def ) {
-		common->Printf( "ARCRenderWorld::FreeEntityDef: handle %i is NULL\n", entityHandle );
+		common->Printf( "anRenderWorld::FreeEntityDef: handle %i is nullptr\n", entityHandle );
 		return;
 	}
 
@@ -276,12 +276,12 @@ void ARCRenderWorldLocal::FreeEntityDef( arcNetHandle_t entityHandle ) {
 	// in R_FreeEntityDefDerivedData(), otherwise the gui
 	// object still exists in the game
 
-	def->parms.gui[ 0 ] = NULL;
-	def->parms.gui[ 1 ] = NULL;
-	def->parms.gui[ 2 ] = NULL;
+	def->parms.gui[ 0 ] = nullptr;
+	def->parms.gui[ 1 ] = nullptr;
+	def->parms.gui[ 2 ] = nullptr;
 
 	delete def;
-	entityDefs[ entityHandle ] = NULL;
+	entityDefs[ entityHandle ] = nullptr;
 }
 
 /*
@@ -289,16 +289,16 @@ void ARCRenderWorldLocal::FreeEntityDef( arcNetHandle_t entityHandle ) {
 GetRenderEntity
 ==================
 */
-const renderEntity_t *ARCRenderWorldLocal::GetRenderEntity( arcNetHandle_t entityHandle ) const {
+const renderEntity_t *anRenderWorldLocal::GetRenderEntity( arcNetHandle_t entityHandle ) const {
 	if ( entityHandle < 0 || entityHandle >= entityDefs.Num() ) {
-		common->Printf( "ARCRenderWorld::GetRenderEntity: invalid handle %i [0, %i]\n", entityHandle, entityDefs.Num() );
-		return NULL;
+		common->Printf( "anRenderWorld::GetRenderEntity: invalid handle %i [0, %i]\n", entityHandle, entityDefs.Num() );
+		return nullptr;
 	}
 
-	ARCRenderEntityLocal	*def = entityDefs[entityHandle];
+	anRenderEntityLocal	*def = entityDefs[entityHandle];
 	if ( !def ) {
-		common->Printf( "ARCRenderWorld::GetRenderEntity: handle %i is NULL\n", entityHandle );
-		return NULL;
+		common->Printf( "anRenderWorld::GetRenderEntity: handle %i is nullptr\n", entityHandle );
+		return nullptr;
 	}
 
 	return &def->parms;
@@ -309,12 +309,12 @@ const renderEntity_t *ARCRenderWorldLocal::GetRenderEntity( arcNetHandle_t entit
 AddLightDef
 ==================
 */
-arcNetHandle_t ARCRenderWorldLocal::AddLightDef( const renderLight_t *rlight ) {
+arcNetHandle_t anRenderWorldLocal::AddLightDef( const renderLight_t *rlight ) {
 	// try and reuse a free spot
 	int lightHandle = lightDefs.FindNull();
 
 	if ( lightHandle == -1 ) {
-		lightHandle = lightDefs.Append( NULL );
+		lightHandle = lightDefs.Append( nullptr );
 		if ( interactionTable && lightDefs.Num() > interactionTableHeight ) {
 			ResizeInteractionTable();
 		}
@@ -334,7 +334,7 @@ usually be deferred until it is visible in a scene
 Does not write to the demo file, which will only be done for visible lights
 =================
 */
-void ARCRenderWorldLocal::UpdateLightDef( arcNetHandle_t lightHandle, const renderLight_t *rlight ) {
+void anRenderWorldLocal::UpdateLightDef( arcNetHandle_t lightHandle, const renderLight_t *rlight ) {
 	if ( r_skipUpdates.GetBool() ) {
 		return;
 	}
@@ -343,14 +343,14 @@ void ARCRenderWorldLocal::UpdateLightDef( arcNetHandle_t lightHandle, const rend
 
 	// create new slots if needed
 	if ( lightHandle < 0 || lightHandle > LUDICROUS_INDEX ) {
-		common->Error( "ARCRenderWorld::UpdateLightDef: index = %i", lightHandle );
+		common->Error( "anRenderWorld::UpdateLightDef: index = %i", lightHandle );
 	}
 	while ( lightHandle >= lightDefs.Num() ) {
-		lightDefs.Append( NULL );
+		lightDefs.Append( nullptr );
 	}
 
 	bool justUpdate = false;
-	ARCRenderLightsLocal *light = lightDefs[lightHandle];
+	anRenderLightsLocal *light = lightDefs[lightHandle];
 	if ( light ) {
 		// if the shape of the light stays the same, we don't need to dump
 		// any of our derived data, because shader parms are calculated every frame
@@ -369,7 +369,7 @@ void ARCRenderWorldLocal::UpdateLightDef( arcNetHandle_t lightHandle, const rend
 		}
 	} else {
 		// create a new one
-		light = new ARCRenderLightsLocal;
+		light = new anRenderLightsLocal;
 		lightDefs[lightHandle] = light;
 		light->world = this;
 		light->index = lightHandle;
@@ -379,7 +379,7 @@ void ARCRenderWorldLocal::UpdateLightDef( arcNetHandle_t lightHandle, const rend
 	light->lastModifiedFrameNum = tr.frameCount;
 
 	if ( light->lightHasMoved ) {
-		light->parms.prelightModel = NULL;
+		light->parms.prelightModel = nullptr;
 	}
 
 	if ( !justUpdate) {
@@ -394,25 +394,25 @@ void ARCRenderWorldLocal::UpdateLightDef( arcNetHandle_t lightHandle, const rend
 FreeLightDef
 
 Frees all references and lit surfaces from the light, and
-NULL's out it's entry in the world list
+nullptr's out it's entry in the world list
 ====================
 */
-void ARCRenderWorldLocal::FreeLightDef( arcNetHandle_t lightHandle ) {
+void anRenderWorldLocal::FreeLightDef( arcNetHandle_t lightHandle ) {
 	if ( lightHandle < 0 || lightHandle >= lightDefs.Num() ) {
-		common->Printf( "ARCRenderWorld::FreeLightDef: invalid handle %i [0, %i]\n", lightHandle, lightDefs.Num() );
+		common->Printf( "anRenderWorld::FreeLightDef: invalid handle %i [0, %i]\n", lightHandle, lightDefs.Num() );
 		return;
 	}
 
-	ARCRenderLightsLocal	*light = lightDefs[lightHandle];
+	anRenderLightsLocal	*light = lightDefs[lightHandle];
 	if ( !light ) {
-		common->Printf( "ARCRenderWorld::FreeLightDef: handle %i is NULL\n", lightHandle );
+		common->Printf( "anRenderWorld::FreeLightDef: handle %i is nullptr\n", lightHandle );
 		return;
 	}
 
 	R_FreeLightDefDerivedData( light );
 
 	delete light;
-	lightDefs[lightHandle] = NULL;
+	lightDefs[lightHandle] = nullptr;
 }
 
 /*
@@ -420,16 +420,16 @@ void ARCRenderWorldLocal::FreeLightDef( arcNetHandle_t lightHandle ) {
 GetRenderLight
 ==================
 */
-const renderLight_t *ARCRenderWorldLocal::GetRenderLight( arcNetHandle_t lightHandle ) const {
+const renderLight_t *anRenderWorldLocal::GetRenderLight( arcNetHandle_t lightHandle ) const {
 	if ( lightHandle < 0 || lightHandle >= lightDefs.Num() ) {
-		common->Printf( "ARCRenderWorld::GetRenderLight: handle %i > %i\n", lightHandle, lightDefs.Num() );
-		return NULL;
+		common->Printf( "anRenderWorld::GetRenderLight: handle %i > %i\n", lightHandle, lightDefs.Num() );
+		return nullptr;
 	}
 
-	ARCRenderLightsLocal *def = lightDefs[lightHandle];
+	anRenderLightsLocal *def = lightDefs[lightHandle];
 	if ( !def ) {
-		common->Printf( "ARCRenderWorld::GetRenderLight: handle %i is NULL\n", lightHandle );
-		return NULL;
+		common->Printf( "anRenderWorld::GetRenderLight: handle %i is nullptr\n", lightHandle );
+		return nullptr;
 	}
 
 	return &def->parms;
@@ -437,18 +437,18 @@ const renderLight_t *ARCRenderWorldLocal::GetRenderLight( arcNetHandle_t lightHa
 
 /*
 ================
-ARCRenderWorldLocal::ProjectDecalOntoWorld
+anRenderWorldLocal::ProjectDecalOntoWorld
 ================
 */
-void ARCRenderWorldLocal::ProjectDecalOntoWorld( const arcFixedWinding &winding, const arcVec3 &projectionOrigin, const bool parallel, const float fadeDepth, const arcMaterial *material, const int startTime ) {
+void anRenderWorldLocal::ProjectDecalOntoWorld( const anFixedWinding &winding, const anVec3 &projectionOrigin, const bool parallel, const float fadeDepth, const anMaterial *material, const int startTime ) {
 	int i, areas[10], numAreas;
 	const areaReference_t *ref;
 	const portalArea_t *area;
-	const ARCRenderModel *model;
-	ARCRenderEntityLocal *def;
+	const anRenderModel *model;
+	anRenderEntityLocal *def;
 	decalProjectionInfo_t info, localInfo;
 
-	if ( !ARCRenderModelDecal::CreateProjectionInfo( info, winding, projectionOrigin, parallel, fadeDepth, material, startTime ) ) {
+	if ( !anRenderModelDecal::CreateProjectionInfo( info, winding, projectionOrigin, parallel, fadeDepth, material, startTime ) ) {
 		return;
 	}
 
@@ -463,15 +463,15 @@ void ARCRenderWorldLocal::ProjectDecalOntoWorld( const arcFixedWinding &winding,
 			def = ref->entity;
 			// completely ignore any dynamic or callback models
 			model = def->parms.hModel;
-			if ( model == NULL || model->IsDynamicModel() != DM_STATIC || def->parms.callback ) {
+			if ( model == nullptr || model->IsDynamicModel() != DM_STATIC || def->parms.callback ) {
 				continue;
 			}
 
-			if ( def->parms.customShader != NULL && !def->parms.customShader->AllowOverlays() ) {
+			if ( def->parms.customShader != nullptr && !def->parms.customShader->AllowOverlays() ) {
 				continue;
 			}
 
-			arcBounds bounds;
+			anBounds bounds;
 			bounds.FromTransformedBounds( model->Bounds( &def->parms ), def->parms.origin, def->parms.axis );
 
 			// if the model bounds do not overlap with the projection bounds
@@ -480,11 +480,11 @@ void ARCRenderWorldLocal::ProjectDecalOntoWorld( const arcFixedWinding &winding,
 			}
 
 			// transform the bounding planes, fade planes and texture axis into local space
-			ARCRenderModelDecal::GlobalProjectionInfoToLocal( localInfo, info, def->parms.origin, def->parms.axis );
-			localInfo.force = ( def->parms.customShader != NULL );
+			anRenderModelDecal::GlobalProjectionInfoToLocal( localInfo, info, def->parms.origin, def->parms.axis );
+			localInfo.force = ( def->parms.customShader != nullptr );
 
 			if ( !def->decals ) {
-				def->decals = ARCRenderModelDecal::Alloc();
+				def->decals = anRenderModelDecal::Alloc();
 			}
 			def->decals->CreateDecal( model, localInfo );
 		}
@@ -493,33 +493,33 @@ void ARCRenderWorldLocal::ProjectDecalOntoWorld( const arcFixedWinding &winding,
 
 /*
 ====================
-ARCRenderWorldLocal::ProjectDecal
+anRenderWorldLocal::ProjectDecal
 ====================
 */
-void ARCRenderWorldLocal::ProjectDecal( arcNetHandle_t entityHandle, const arcFixedWinding &winding, const arcVec3 &projectionOrigin, const bool parallel, const float fadeDepth, const arcMaterial *material, const int startTime ) {
+void anRenderWorldLocal::ProjectDecal( arcNetHandle_t entityHandle, const anFixedWinding &winding, const anVec3 &projectionOrigin, const bool parallel, const float fadeDepth, const anMaterial *material, const int startTime ) {
 	decalProjectionInfo_t info, localInfo;
 
 	if ( entityHandle < 0 || entityHandle >= entityDefs.Num() ) {
-		common->Error( "ARCRenderWorld::ProjectOverlay: index = %i", entityHandle );
+		common->Error( "anRenderWorld::ProjectOverlay: index = %i", entityHandle );
 		return;
 	}
 
-	ARCRenderEntityLocal	*def = entityDefs[ entityHandle ];
+	anRenderEntityLocal	*def = entityDefs[ entityHandle ];
 	if ( !def ) {
 		return;
 	}
 
-	const ARCRenderModel *model = def->parms.hModel;
+	const anRenderModel *model = def->parms.hModel;
 
-	if ( model == NULL || model->IsDynamicModel() != DM_STATIC || def->parms.callback ) {
+	if ( model == nullptr || model->IsDynamicModel() != DM_STATIC || def->parms.callback ) {
 		return;
 	}
 
-	if ( !ARCRenderModelDecal::CreateProjectionInfo( info, winding, projectionOrigin, parallel, fadeDepth, material, startTime ) ) {
+	if ( !anRenderModelDecal::CreateProjectionInfo( info, winding, projectionOrigin, parallel, fadeDepth, material, startTime ) ) {
 		return;
 	}
 
-	arcBounds bounds;
+	anBounds bounds;
 	bounds.FromTransformedBounds( model->Bounds( &def->parms ), def->parms.origin, def->parms.axis );
 
 	// if the model bounds do not overlap with the projection bounds
@@ -528,57 +528,57 @@ void ARCRenderWorldLocal::ProjectDecal( arcNetHandle_t entityHandle, const arcFi
 	}
 
 	// transform the bounding planes, fade planes and texture axis into local space
-	ARCRenderModelDecal::GlobalProjectionInfoToLocal( localInfo, info, def->parms.origin, def->parms.axis );
-	localInfo.force = ( def->parms.customShader != NULL );
+	anRenderModelDecal::GlobalProjectionInfoToLocal( localInfo, info, def->parms.origin, def->parms.axis );
+	localInfo.force = ( def->parms.customShader != nullptr );
 
-	if ( def->decals == NULL ) {
-		def->decals = ARCRenderModelDecal::Alloc();
+	if ( def->decals == nullptr ) {
+		def->decals = anRenderModelDecal::Alloc();
 	}
 	def->decals->CreateDecal( model, localInfo );
 }
 
 /*
 ====================
-ARCRenderWorldLocal::ProjectOverlay
+anRenderWorldLocal::ProjectOverlay
 ====================
 */
-void ARCRenderWorldLocal::ProjectOverlay( arcNetHandle_t entityHandle, const arcPlane localTextureAxis[2], const arcMaterial *material ) {
+void anRenderWorldLocal::ProjectOverlay( arcNetHandle_t entityHandle, const anPlane localTextureAxis[2], const anMaterial *material ) {
 	if ( entityHandle < 0 || entityHandle >= entityDefs.Num() ) {
-		common->Error( "ARCRenderWorld::ProjectOverlay: index = %i", entityHandle );
+		common->Error( "anRenderWorld::ProjectOverlay: index = %i", entityHandle );
 		return;
 	}
 
-	ARCRenderEntityLocal *def = entityDefs[ entityHandle ];
+	anRenderEntityLocal *def = entityDefs[ entityHandle ];
 	if ( !def ) {
 		return;
 	}
 
 	const renderEntity_t *refEnt = &def->parms;
 
-	ARCRenderModel *model = refEnt->hModel;
+	anRenderModel *model = refEnt->hModel;
 	if ( model->IsDynamicModel() != DM_CACHED ) {	// FIXME: probably should be MD5 only
 		return;
 	}
 	model = R_EntityDefDynamicModel( def );
 
-	if ( def->overlay == NULL ) {
-		def->overlay = ARCRenderModelOverlay::Alloc();
+	if ( def->overlay == nullptr ) {
+		def->overlay = anRenderModelOverlay::Alloc();
 	}
 	def->overlay->CreateOverlay( model, localTextureAxis, material );
 }
 
 /*
 ====================
-ARCRenderWorldLocal::RemoveDecals
+anRenderWorldLocal::RemoveDecals
 ====================
 */
-void ARCRenderWorldLocal::RemoveDecals( arcNetHandle_t entityHandle ) {
+void anRenderWorldLocal::RemoveDecals( arcNetHandle_t entityHandle ) {
 	if ( entityHandle < 0 || entityHandle >= entityDefs.Num() ) {
-		common->Error( "ARCRenderWorld::ProjectOverlay: index = %i", entityHandle );
+		common->Error( "anRenderWorld::ProjectOverlay: index = %i", entityHandle );
 		return;
 	}
 
-	ARCRenderEntityLocal	*def = entityDefs[ entityHandle ];
+	anRenderEntityLocal	*def = entityDefs[ entityHandle ];
 	if ( !def ) {
 		return;
 	}
@@ -594,7 +594,7 @@ SetRenderView
 Sets the current view so any calls to the render world will use the correct parms.
 ====================
 */
-void ARCRenderWorldLocal::SetRenderView( const renderView_t *renderView ) {
+void anRenderWorldLocal::SetRenderView( const renderView_t *renderView ) {
 	tr.primaryRenderView = *renderView;
 }
 
@@ -609,7 +609,7 @@ Rendering a scene may require multiple views to be rendered
 to handle mirrors,
 ====================
 */
-void ARCRenderWorldLocal::RenderScene( const renderView_t *renderView ) {
+void anRenderWorldLocal::RenderScene( const renderView_t *renderView ) {
 #ifndef	ID_DEDICATED
 	renderView_t	copy;
 
@@ -626,7 +626,7 @@ void ARCRenderWorldLocal::RenderScene( const renderView_t *renderView ) {
 	}
 
 	if ( renderView->fov_x <= 0 || renderView->fov_y <= 0 ) {
-		common->Error( "ARCRenderWorld::RenderScene: bad FOVs: %f, %f", renderView->fov_x, renderView->fov_y );
+		common->Error( "anRenderWorld::RenderScene: bad FOVs: %f, %f", renderView->fov_x, renderView->fov_y );
 	}
 
 	// close any gui drawing
@@ -667,7 +667,7 @@ void ARCRenderWorldLocal::RenderScene( const renderView_t *renderView ) {
 
 	// see if the view needs to reverse the culling sense in mirrors
 	// or environment cube sides
-	arcVec3	cross;
+	anVec3	cross;
 	cross = parms->renderView.viewAxis[1].Cross( parms->renderView.viewAxis[2] );
 	if ( cross * parms->renderView.viewAxis[0] > 0 ) {
 		parms->isMirror = false;
@@ -699,7 +699,7 @@ void ARCRenderWorldLocal::RenderScene( const renderView_t *renderView ) {
 
 #if 0
 	for ( int i = 0; i < entityDefs.Num(); i++ ) {
-		ARCRenderEntityLocal	*def = entityDefs[i];
+		anRenderEntityLocal	*def = entityDefs[i];
 		if ( !def ) {
 			continue;
 		}
@@ -725,7 +725,7 @@ void ARCRenderWorldLocal::RenderScene( const renderView_t *renderView ) {
 NumAreas
 ===================
 */
-int ARCRenderWorldLocal::NumAreas( void ) const {
+int anRenderWorldLocal::NumAreas( void ) const {
 	return numPortalAreas;
 }
 
@@ -734,13 +734,13 @@ int ARCRenderWorldLocal::NumAreas( void ) const {
 NumPortalsInArea
 ===================
 */
-int ARCRenderWorldLocal::NumPortalsInArea( int areaNum ) {
+int anRenderWorldLocal::NumPortalsInArea( int areaNum ) {
 	portalArea_t	*area;
 	int				count;
 	portal_t		*portal;
 
 	if ( areaNum >= numPortalAreas || areaNum < 0 ) {
-		common->Error( "ARCRenderWorld::NumPortalsInArea: bad areanum %i", areaNum );
+		common->Error( "anRenderWorld::NumPortalsInArea: bad areanum %i", areaNum );
 	}
 	area = &portalAreas[areaNum];
 
@@ -756,14 +756,14 @@ int ARCRenderWorldLocal::NumPortalsInArea( int areaNum ) {
 GetPortal
 ===================
 */
-exitPortal_t ARCRenderWorldLocal::GetPortal( int areaNum, int portalNum ) {
+exitPortal_t anRenderWorldLocal::GetPortal( int areaNum, int portalNum ) {
 	portalArea_t	*area;
 	int				count;
 	portal_t		*portal;
 	exitPortal_t	ret;
 
 	if ( areaNum > numPortalAreas ) {
-		common->Error( "ARCRenderWorld::GetPortal: areaNum > numAreas" );
+		common->Error( "anRenderWorld::GetPortal: areaNum > numAreas" );
 	}
 	area = &portalAreas[areaNum];
 	count = 0;
@@ -779,7 +779,7 @@ exitPortal_t ARCRenderWorldLocal::GetPortal( int areaNum, int portalNum ) {
 		count++;
 	}
 
-	common->Error( "ARCRenderWorld::GetPortal: portalNum > numPortals" );
+	common->Error( "anRenderWorld::GetPortal: portalNum > numPortals" );
 
 	memset( &ret, 0, sizeof( ret ) );
 	return ret;
@@ -793,7 +793,7 @@ Will return -1 if the point is not in an area, otherwise
 it will return 0 <= value < tr.world->numPortalAreas
 ===============
 */
-int ARCRenderWorldLocal::PointInArea( const arcVec3 &point ) const {
+int anRenderWorldLocal::PointInArea( const anVec3 &point ) const {
 	areaNode_t	*node;
 	int			nodeNum;
 	float		d;
@@ -816,7 +816,7 @@ int ARCRenderWorldLocal::PointInArea( const arcVec3 &point ) const {
 		if ( nodeNum < 0 ) {
 			nodeNum = -1 - nodeNum;
 			if ( nodeNum >= numPortalAreas ) {
-				common->Error( "ARCRenderWorld::PointInArea: area out of range" );
+				common->Error( "anRenderWorld::PointInArea: area out of range" );
 			}
 			return nodeNum;
 		}
@@ -831,7 +831,7 @@ int ARCRenderWorldLocal::PointInArea( const arcVec3 &point ) const {
 BoundsInAreas_r
 ===================
 */
-void ARCRenderWorldLocal::BoundsInAreas_r( int nodeNum, const arcBounds &bounds, int *areas, int *numAreas, int maxAreas ) const {
+void anRenderWorldLocal::BoundsInAreas_r( int nodeNum, const anBounds &bounds, int *areas, int *numAreas, int maxAreas ) const {
 	int side, i;
 	areaNode_t *node;
 
@@ -878,7 +878,7 @@ BoundsInAreas
   returns the total number of areas the bounds are in
 ===================
 */
-int ARCRenderWorldLocal::BoundsInAreas( const arcBounds &bounds, int *areas, int maxAreas ) const {
+int anRenderWorldLocal::BoundsInAreas( const anBounds &bounds, int *areas, int maxAreas ) const {
 	int numAreas = 0;
 
 	assert( areas );
@@ -902,26 +902,26 @@ this doesn't do any occlusion testing, simply ignoring non-gui surfaces.
 start / end are in global world coordinates.
 ================
 */
-guiPoint_t	ARCRenderWorldLocal::GuiTrace( arcNetHandle_t entityHandle, const arcVec3 start, const arcVec3 end ) const {
+guiPoint_t	anRenderWorldLocal::GuiTrace( arcNetHandle_t entityHandle, const anVec3 start, const anVec3 end ) const {
 	localTrace_t	local;
-	arcVec3			localStart, localEnd, bestPoint;
+	anVec3			localStart, localEnd, bestPoint;
 	int				j;
-	ARCRenderModel	*model;
-	surfTriangles_t	*tri;
-	const arcMaterial *shader;
+	anRenderModel	*model;
+	srfTriangles_t	*tri;
+	const anMaterial *shader;
 	guiPoint_t	pt;
 
 	pt.x = pt.y = -1;
 	pt.guiId = 0;
 
 	if ( ( entityHandle < 0 ) || ( entityHandle >= entityDefs.Num() ) ) {
-		common->Printf( "ARCRenderWorld::GuiTrace: invalid handle %i\n", entityHandle );
+		common->Printf( "anRenderWorld::GuiTrace: invalid handle %i\n", entityHandle );
 		return pt;
 	}
 
-	ARCRenderEntityLocal *def = entityDefs[entityHandle];
+	anRenderEntityLocal *def = entityDefs[entityHandle];
 	if ( !def ) {
-		common->Printf( "ARCRenderWorld::GuiTrace: handle %i is NULL\n", entityHandle );
+		common->Printf( "anRenderWorld::GuiTrace: handle %i is nullptr\n", entityHandle );
 		return pt;
 	}
 
@@ -935,11 +935,11 @@ guiPoint_t	ARCRenderWorldLocal::GuiTrace( arcNetHandle_t entityHandle, const arc
 	R_GlobalPointToLocal( def->modelMatrix, end, localEnd );
 
 	float best = 99999.0;
-	const modelSurface_t *bestSurf = NULL;
+	const modelSurface_t *bestSurf = nullptr;
 
 	for ( int j = 0; j < model->NumSurfaces(); j++ ) {
 		const modelSurface_t *surf = model->Surface( j );
-		surfTriangles_t *tri = surf->geometry;
+		srfTriangles_t *tri = surf->geometry;
 		if ( !tri ) {
 			continue;
 		}
@@ -955,8 +955,8 @@ guiPoint_t	ARCRenderWorldLocal::GuiTrace( arcNetHandle_t entityHandle, const arc
 
 		local = R_LocalTrace( localStart, localEnd, 0.0f, tri );
 		if ( local.fraction < 1.0 ) {
-			arcVec3				origin, axis[3];
-			arcVec3				cursor;
+			anVec3				origin, axis[3];
+			anVec3				cursor;
 			float				axisLen[2];
 
 			R_SurfaceToTextureAxis( tri, origin, axis );
@@ -978,27 +978,27 @@ guiPoint_t	ARCRenderWorldLocal::GuiTrace( arcNetHandle_t entityHandle, const arc
 
 /*
 ===================
-ARCRenderWorldLocal::ModelTrace
+anRenderWorldLocal::ModelTrace
 ===================
 */
-bool ARCRenderWorldLocal::ModelTrace( modelTrace_t &trace, arcNetHandle_t entityHandle, const arcVec3 &start, const arcVec3 &end, const float radius ) const {
+bool anRenderWorldLocal::ModelTrace( modelTrace_t &trace, arcNetHandle_t entityHandle, const anVec3 &start, const anVec3 &end, const float radius ) const {
 	int i;
 	bool collisionSurface;
 	const modelSurface_t *surf;
 	localTrace_t localTrace;
-	ARCRenderModel *model;
+	anRenderModel *model;
 	float modelMatrix[16];
-	arcVec3 localStart, localEnd;
-	const arcMaterial *shader;
+	anVec3 localStart, localEnd;
+	const anMaterial *shader;
 
 	trace.fraction = 1.0f;
 
 	if ( entityHandle < 0 || entityHandle >= entityDefs.Num() ) {
-//		common->Error( "ARCRenderWorld::ModelTrace: index = %i", entityHandle );
+//		common->Error( "anRenderWorld::ModelTrace: index = %i", entityHandle );
 		return false;
 	}
 
-	ARCRenderEntityLocal	*def = entityDefs[entityHandle];
+	anRenderEntityLocal	*def = entityDefs[entityHandle];
 	if ( !def ) {
 		return false;
 	}
@@ -1064,32 +1064,32 @@ bool ARCRenderWorldLocal::ModelTrace( modelTrace_t &trace, arcNetHandle_t entity
 
 /*
 ===================
-ARCRenderWorldLocal::Trace
+anRenderWorldLocal::Trace
 ===================
 */
 const char* playerModelExcludeList[] = {
 	"file://models/md5/.md5mesh",
 	"file://models/md5/.md5mesh",
-	NULL
+	nullptr
 };
 
 const char *playerMaterialExcludeList[] = {
 	"muzzleflash",
-	NULL
+	nullptr
 };
 
-bool ARCRenderWorldLocal::Trace( modelTrace_t &trace, const arcVec3 &start, const arcVec3 &end, const float radius, bool skipDynamic, bool skipPlayer /*_D3XP*/ ) const {
+bool anRenderWorldLocal::Trace( modelTrace_t &trace, const anVec3 &start, const anVec3 &end, const float radius, bool skipDynamic, bool skipPlayer /*_D3XP*/ ) const {
 	areaReference_t * ref;
-	ARCRenderEntityLocal *def;
+	anRenderEntityLocal *def;
 	portalArea_t * area;
-	ARCRenderModel * model;
-	surfTriangles_t * tri;
+	anRenderModel * model;
+	srfTriangles_t * tri;
 	localTrace_t localTrace;
 	int areas[128], numAreas, i, j, numSurfaces;
-	arcBounds traceBounds, bounds;
+	anBounds traceBounds, bounds;
 	float modelMatrix[16];
-	arcVec3 localStart, localEnd;
-	const arcMaterial *shader;
+	anVec3 localStart, localEnd;
+	const anMaterial *shader;
 
 	trace.fraction = 1.0f;
 	trace.point = end;
@@ -1122,7 +1122,7 @@ bool ARCRenderWorldLocal::Trace( modelTrace_t &trace, const arcVec3 &start, cons
 
 #if 1
 				if ( skipPlayer ) {
-					arcNetString name = model->Name();
+					anString name = model->Name();
 					const char *exclude;
 					int k;
 
@@ -1163,7 +1163,7 @@ bool ARCRenderWorldLocal::Trace( modelTrace_t &trace, const arcVec3 &start, cons
 
 #if 1
 				if ( skipPlayer ) {
-					arcNetString name = shader->GetName();
+					anString name = shader->GetName();
 					for ( int k = 0; playerMaterialExcludeList[k]; k++ ) {
 						const char *exclude = playerMaterialExcludeList[k];
 						if ( name == exclude ) {
@@ -1214,12 +1214,12 @@ bool ARCRenderWorldLocal::Trace( modelTrace_t &trace, const arcVec3 &start, cons
 
 /*
 ==================
-ARCRenderWorldLocal::RecurseProcBSP
+anRenderWorldLocal::RecurseProcBSP
 ==================
 */
-void ARCRenderWorldLocal::RecurseProcBSP_r( modelTrace_t *results, int parentNodeNum, int nodeNum, float p1f, float p2f, const arcVec3 &p1, const arcVec3 &p2 ) const {
+void anRenderWorldLocal::RecurseProcBSP_r( modelTrace_t *results, int parentNodeNum, int nodeNum, float p1f, float p2f, const anVec3 &p1, const anVec3 &p2 ) const {
 	float		frac;
-	arcVec3		mid;
+	anVec3		mid;
 	int			side;
 	float		midf;
 	areaNode_t *node;
@@ -1267,13 +1267,13 @@ void ARCRenderWorldLocal::RecurseProcBSP_r( modelTrace_t *results, int parentNod
 
 /*
 ==================
-ARCRenderWorldLocal::FastWorldTrace
+anRenderWorldLocal::FastWorldTrace
 ==================
 */
-bool ARCRenderWorldLocal::FastWorldTrace( modelTrace_t &results, const arcVec3 &start, const arcVec3 &end ) const {
+bool anRenderWorldLocal::FastWorldTrace( modelTrace_t &results, const anVec3 &start, const anVec3 &end ) const {
 	memset( &results, 0, sizeof( modelTrace_t ) );
 	results.fraction = 1.0f;
-	if ( areaNodes != NULL ) {
+	if ( areaNodes != nullptr ) {
 		RecurseProcBSP_r( &results, -1, 0, 0.0f, 1.0f, start, end );
 		return ( results.fraction < 1.0f );
 	}
@@ -1296,9 +1296,9 @@ This is called by R_PushVolumeIntoTree and also directly
 for the world model references that are precalculated.
 =================
 */
-void ARCRenderWorldLocal::AddEntityRefToArea( ARCRenderEntityLocal *def, portalArea_t *area ) {
+void anRenderWorldLocal::AddEntityRefToArea( anRenderEntityLocal *def, portalArea_t *area ) {
 	if ( !def ) {
-		common->Error( "ARCRenderWorldLocal::AddEntityRefToArea: NULL def" );
+		common->Error( "anRenderWorldLocal::AddEntityRefToArea: nullptr def" );
 	}
 
 	areaReference_t *ref = areaReferenceAllocator.Alloc();
@@ -1325,7 +1325,7 @@ AddLightRefToArea
 
 ===================
 */
-void ARCRenderWorldLocal::AddLightRefToArea( ARCRenderLightsLocal *light, portalArea_t *area ) {
+void anRenderWorldLocal::AddLightRefToArea( anRenderLightsLocal *light, portalArea_t *area ) {
 	// add a lightref to this area
 	areaReference_t *lRef = areaReferenceAllocator.Alloc();
 	lRef->light = light;
@@ -1349,11 +1349,11 @@ Force the generation of all light / surface interactions at the start of a level
 If this isn't called, they will all be dynamically generated
 
 This really isn't all that helpful anymore, because the calculation of shadows
-and light interactions is deferred from ARCRenderWorldLocal::CreateLightDefInteractions(), but we
+and light interactions is deferred from anRenderWorldLocal::CreateLightDefInteractions(), but we
 use it as an oportunity to size the interactionTable
 ===================
 */
-void ARCRenderWorldLocal::GenerateAllInteractions() {
+void anRenderWorldLocal::GenerateAllInteractions() {
 	if ( !qglConfig.isInitialized ) {
 		return;
 	}
@@ -1365,12 +1365,12 @@ void ARCRenderWorldLocal::GenerateAllInteractions() {
 	// watch how much memory we allocate
 	tr.staticAllocCount = 0;
 
-	// let ARCRenderWorldLocal::CreateLightDefInteractions() know that it shouldn't
+	// let anRenderWorldLocal::CreateLightDefInteractions() know that it shouldn't
 	// try and do any view specific optimizations
-	tr.viewDef = NULL;
+	tr.viewDef = nullptr;
 
 	for ( int i = 0; i < this->lightDefs.Num(); i++ ) {
-		ARCRenderLightsLocal *ldef = this->lightDefs[i];
+		anRenderLightsLocal *ldef = this->lightDefs[i];
 		if ( !ldef ) {
 			continue;
 		}
@@ -1380,7 +1380,7 @@ void ARCRenderWorldLocal::GenerateAllInteractions() {
 	int end = Sys_Milliseconds();
 	int	mSec = end - start;
 
-	common->Printf( "ARCRenderWorld::GenerateAllInteractions, mSec = %i, staticAllocCount = %i.\n", mSec, tr.staticAllocCount );
+	common->Printf( "anRenderWorld::GenerateAllInteractions, mSec = %i, staticAllocCount = %i.\n", mSec, tr.staticAllocCount );
 
 
 	// build the interaction table
@@ -1388,16 +1388,16 @@ void ARCRenderWorldLocal::GenerateAllInteractions() {
 		interactionTableWidth = entityDefs.Num() + 100;
 		interactionTableHeight = lightDefs.Num() + 100;
 		int	size = interactionTableWidth * interactionTableHeight * sizeof( *interactionTable );
-		interactionTable = ( ARCInteraction **)R_ClearedStaticAlloc( size );
+		interactionTable = ( an Interaction **)R_ClearedStaticAlloc( size );
 		int	count = 0;
 		for ( int i = 0; i < this->lightDefs.Num(); i++ ) {
-			ARCRenderLightsLocal	*ldef = this->lightDefs[i];
+			anRenderLightsLocal	*ldef = this->lightDefs[i];
 			if ( !ldef ) {
 				continue;
 			}
-			ARCInteraction	*inter;
-			for ( inter = ldef->firstInteraction; inter != NULL; inter = inter->lightNext ) {
-				ARCRenderEntityLocal	*edef = inter->entityDef;
+			an Interaction	*inter;
+			for ( inter = ldef->firstInteraction; inter != nullptr; inter = inter->lightNext ) {
+				anRenderEntityLocal	*edef = inter->entityDef;
 				int index = ldef->index * interactionTableWidth + edef->index;
 
 				interactionTable[index] = inter;
@@ -1406,7 +1406,7 @@ void ARCRenderWorldLocal::GenerateAllInteractions() {
 		}
 
 		common->Printf( "interactionTable size: %i bytes\n", size );
-		common->Printf( "%i interaction take %i bytes\n", count, count * sizeof( ARCInteraction ) );
+		common->Printf( "%i interaction take %i bytes\n", count, count * sizeof( an Interaction ) );
 	}
 
 	// entities flagged as noDynamicInteractions will no longer make any
@@ -1415,17 +1415,17 @@ void ARCRenderWorldLocal::GenerateAllInteractions() {
 
 /*
 ===================
-ARCRenderWorldLocal::FreeInteractions
+anRenderWorldLocal::FreeInteractions
 ===================
 */
-void ARCRenderWorldLocal::FreeInteractions() {
+void anRenderWorldLocal::FreeInteractions() {
 	for ( int i = 0; i < entityDefs.Num(); i++ ) {
-		ARCRenderEntityLocal *def = entityDefs[i];
+		anRenderEntityLocal *def = entityDefs[i];
 		if ( !def ) {
 			continue;
 		}
 		// free all the interactions
-		while ( def->firstInteraction != NULL ) {
+		while ( def->firstInteraction != nullptr ) {
 			def->firstInteraction->UnlinkAndFree();
 		}
 	}
@@ -1446,7 +1446,7 @@ to prevent double checking areas.
 We might alternatively choose to do this with an area flow.
 ==================
 */
-void ARCRenderWorldLocal::PushVolumeIntoTree_r( ARCRenderEntityLocal *def, ARCRenderLightsLocal *light, const ARCSphere *sphere, int numPoints, const arcVec3 (*points), int nodeNum ) {
+void anRenderWorldLocal::PushVolumeIntoTree_r( anRenderEntityLocal *def, anRenderLightsLocal *light, const anSphere *sphere, int numPoints, const anVec3 (*points), int nodeNum ) {
 	int			i;
 	areaNode_t	*node;
 	bool	front, back;
@@ -1507,7 +1507,7 @@ void ARCRenderWorldLocal::PushVolumeIntoTree_r( ARCRenderEntityLocal *def, ARCRe
 	// exact check all the points against the node plane
 	front = back = false;
 #ifdef MACOS_X	//loop unrolling & pre-fetching for performance
-	const arcVec3 norm = node->plane.Normal();
+	const anVec3 norm = node->plane.Normal();
 	const float plane3 = node->plane[3];
 	float D0, D1, D2, D3;
 
@@ -1587,12 +1587,12 @@ void ARCRenderWorldLocal::PushVolumeIntoTree_r( ARCRenderEntityLocal *def, ARCRe
 PushVolumeIntoTree
 ==============
 */
-void ARCRenderWorldLocal::PushVolumeIntoTree( ARCRenderEntityLocal *def, ARCRenderLightsLocal *light, int numPoints, const arcVec3 (*points) ) {	if ( areaNodes == NULL ) {
+void anRenderWorldLocal::PushVolumeIntoTree( anRenderEntityLocal *def, anRenderLightsLocal *light, int numPoints, const anVec3 (*points) ) {	if ( areaNodes == nullptr ) {
 		return;
 	}
 
 	// calculate a bounding sphere for the points
-	arcVec3 mid.Zero();
+	anVec3 mid.Zero();
 	for ( int i = 0; i < numPoints; i++ ) {
 		mid += points[i];
 	}
@@ -1601,14 +1601,14 @@ void ARCRenderWorldLocal::PushVolumeIntoTree( ARCRenderEntityLocal *def, ARCRend
 	float radSquared = 0;
 
 	for ( int i = 0; i < numPoints; i++ ) {
-		arcVec3 dir = points[i] - mid;
+		anVec3 dir = points[i] - mid;
 		float lr = dir * dir;
 		if ( lr > radSquared ) {
 			radSquared = lr;
 		}
 	}
 
-	ARCSphere sphere( mid, sqrt( radSquared ) );
+	anSphere sphere( mid, sqrt( radSquared ) );
 
 	PushVolumeIntoTree_r( def, light, &sphere, numPoints, points, 0 );
 }
@@ -1617,30 +1617,30 @@ void ARCRenderWorldLocal::PushVolumeIntoTree( ARCRenderEntityLocal *def, ARCRend
 
 /*
 ====================
-ARCRenderWorldLocal::DebugClearLines
+anRenderWorldLocal::DebugClearLines
 ====================
 */
-void ARCRenderWorldLocal::DebugClearLines( int time ) {
+void anRenderWorldLocal::DebugClearLines( int time ) {
 	RB_ClearDebugLines( time );
 	RB_ClearDebugText( time );
 }
 
 /*
 ====================
-ARCRenderWorldLocal::DebugLine
+anRenderWorldLocal::DebugLine
 ====================
 */
-void ARCRenderWorldLocal::DebugLine( const arcVec4 &color, const arcVec3 &start, const arcVec3 &end, const int lifeTime, const bool depthTest ) {
+void anRenderWorldLocal::DebugLine( const anVec4 &color, const anVec3 &start, const anVec3 &end, const int lifeTime, const bool depthTest ) {
 	RB_AddDebugLine( color, start, end, lifeTime, depthTest );
 }
 
 /*
 ================
-ARCRenderWorldLocal::DebugArrow
+anRenderWorldLocal::DebugArrow
 ================
 */
-void ARCRenderWorldLocal::DebugArrow( const arcVec4 &color, const arcVec3 &start, const arcVec3 &end, int size, const int lifeTime ) {
-	arcVec3 right, up;
+void anRenderWorldLocal::DebugArrow( const anVec4 &color, const anVec3 &start, const anVec3 &end, int size, const int lifeTime ) {
+	anVec3 right, up;
 	float a;
 	static float arrowCos[40];
 	static float arrowSin[40];
@@ -1654,25 +1654,25 @@ void ARCRenderWorldLocal::DebugArrow( const arcVec4 &color, const arcVec3 &start
 	if ( static int arrowStep != r_debugArrowStep.GetInteger() ) {
 		arrowStep = r_debugArrowStep.GetInteger();
 		for ( int i = 0, a = 0; a < 360.0f; a += arrowStep, i++ ) {
-			arrowCos[i] = arcMath::Cos16( DEG2RAD( a ) );
-			arrowSin[i] = arcMath::Sin16( DEG2RAD( a ) );
+			arrowCos[i] = anMath::Cos16( DEG2RAD( a ) );
+			arrowSin[i] = anMath::Sin16( DEG2RAD( a ) );
 		}
 		arrowCos[i] = arrowCos[0];
 		arrowSin[i] = arrowSin[0];
 	}
 	// draw a nice arrow
-	arcVec3 forward = end - start;
+	anVec3 forward = end - start;
 	forward.Normalize();
 	forward.NormalVectors( right, up );
 	for ( int i = 0, a = 0; a < 360.0f; a += arrowStep, i++ ) {
 		float s = 0.5f * size * arrowCos[i];
-		arcVec3 v1 = end - size * forward;
+		anVec3 v1 = end - size * forward;
 		v1 = v1 + s * right;
 		s = 0.5f * size * arrowSin[i];
 		v1 = v1 + s * up;
 
 		s = 0.5f * size * arrowCos[i+1];
-		arcVec3 v2 = end - size * forward;
+		anVec3 v2 = end - size * forward;
 		v2 = v2 + s * right;
 		s = 0.5f * size * arrowSin[i+1];
 		v2 = v2 + s * up;
@@ -1684,17 +1684,17 @@ void ARCRenderWorldLocal::DebugArrow( const arcVec4 &color, const arcVec3 &start
 
 /*
 ====================
-ARCRenderWorldLocal::DebugWinding
+anRenderWorldLocal::DebugWinding
 ====================
 */
-void ARCRenderWorldLocal::DebugWinding( const arcVec4 &color, const arcWinding &w, const arcVec3 &origin, const arcMat3 &axis, const int lifeTime, const bool depthTest ) {
+void anRenderWorldLocal::DebugWinding( const anVec4 &color, const anWinding &w, const anVec3 &origin, const anMat3 &axis, const int lifeTime, const bool depthTest ) {
 	if ( w.GetNumPoints() < 2 ) {
 		return;
 	}
 
-	arcVec3 lastPoint = origin + w[w.GetNumPoints()-1].ToVec3() * axis;
+	anVec3 lastPoint = origin + w[w.GetNumPoints()-1].ToVec3() * axis;
 	for ( int i = 0; i < w.GetNumPoints(); i++ ) {
-		arcVec3 point = origin + w[i].ToVec3() * axis;
+		anVec3 point = origin + w[i].ToVec3() * axis;
 		DebugLine( color, lastPoint, point, lifeTime, depthTest );
 		lastPoint = point;
 	}
@@ -1702,18 +1702,18 @@ void ARCRenderWorldLocal::DebugWinding( const arcVec4 &color, const arcWinding &
 
 /*
 ====================
-ARCRenderWorldLocal::DebugCircle
+anRenderWorldLocal::DebugCircle
 ====================
 */
-void ARCRenderWorldLocal::DebugCircle( const arcVec4 &color, const arcVec3 &origin, const arcVec3 &dir, const float radius, const int numSteps, const int lifeTime, const bool depthTest ) {
+void anRenderWorldLocal::DebugCircle( const anVec4 &color, const anVec3 &origin, const anVec3 &dir, const float radius, const int numSteps, const int lifeTime, const bool depthTest ) {
 	dir.OrthogonalBasis( left, up );
-	arcVec3 left *= radius;
-	arcVec3 up *= radius;
-	arcVec3 lastPoint = origin + up;
+	anVec3 left *= radius;
+	anVec3 up *= radius;
+	anVec3 lastPoint = origin + up;
 
 	for ( int i = 1; i <= numSteps; i++ ) {
-		float a = arcMath::TWO_PI * i / numSteps;
-		arcVec3 point = origin + arcMath::Sin16( a ) * left + arcMath::Cos16( a ) * up;
+		float a = anMath::TWO_PI * i / numSteps;
+		anVec3 point = origin + anMath::Sin16( a ) * left + anMath::Cos16( a ) * up;
 		if ( depthTest ) {
 			DebugLine( color, lastPoint, point, lifeTime, depthTest );
 		}
@@ -1723,29 +1723,29 @@ void ARCRenderWorldLocal::DebugCircle( const arcVec4 &color, const arcVec3 &orig
 
 /*
 ============
-ARCRenderWorldLocal::DebugSphere
+anRenderWorldLocal::DebugSphere
 ============
 */
-void ARCRenderWorldLocal::DebugSphere( const arcVec4 &color, const ARCSphere &sphere, const int lifeTime, const bool depthTest /*_D3XP*/ ) {
+void anRenderWorldLocal::DebugSphere( const anVec4 &color, const anSphere &sphere, const int lifeTime, const bool depthTest /*_D3XP*/ ) {
 	int i, j, n, num;
-	arcVec3 p, lastp, *lastArray;
+	anVec3 p, lastp, *lastArray;
 
 	int num = 360 / 15;
-	lastArray = ( arcVec3 *) _alloca16( num * sizeof( arcVec3 ) );
-	lastArray[0] = sphere.GetOrigin() + arcVec3( 0, 0, sphere.GetRadius() );
+	lastArray = ( anVec3 *) _alloca16( num * sizeof( anVec3 ) );
+	lastArray[0] = sphere.GetOrigin() + anVec3( 0, 0, sphere.GetRadius() );
 	for ( n = 1; n < num; n++ ) {
 		lastArray[n] = lastArray[0];
 	}
 
 	for ( int i = 15; i <= 360; i += 15 ) {
-		float s = arcMath::Sin16( DEG2RAD( i ) );
-		float c = arcMath::Cos16( DEG2RAD( i ) );
+		float s = anMath::Sin16( DEG2RAD( i ) );
+		float c = anMath::Cos16( DEG2RAD( i ) );
 		lastp[0] = sphere.GetOrigin()[0];
 		lastp[1] = sphere.GetOrigin()[1] + sphere.GetRadius() * s;
 		lastp[2] = sphere.GetOrigin()[2] + sphere.GetRadius() * c;
 		for ( int n = 0, j = 15; j <= 360; j += 15, n++ ) {
-			p[0] = sphere.GetOrigin()[0] + arcMath::Sin16( DEG2RAD( j ) ) * sphere.GetRadius() * s;
-			p[1] = sphere.GetOrigin()[1] + arcMath::Cos16( DEG2RAD( j ) ) * sphere.GetRadius() * s;
+			p[0] = sphere.GetOrigin()[0] + anMath::Sin16( DEG2RAD( j ) ) * sphere.GetRadius() * s;
+			p[1] = sphere.GetOrigin()[1] + anMath::Cos16( DEG2RAD( j ) ) * sphere.GetRadius() * s;
 			p[2] = lastp[2];
 
 			DebugLine( color, lastp, p, lifeTime,depthTest );
@@ -1759,12 +1759,12 @@ void ARCRenderWorldLocal::DebugSphere( const arcVec4 &color, const ARCSphere &sp
 
 /*
 ====================
-ARCRenderWorldLocal::DebugBounds
+anRenderWorldLocal::DebugBounds
 ====================
 */
-void ARCRenderWorldLocal::DebugBounds( const arcVec4 &color, const arcBounds &bounds, const arcVec3 &org, const int lifeTime ) {
+void anRenderWorldLocal::DebugBounds( const anVec4 &color, const anBounds &bounds, const anVec3 &org, const int lifeTime ) {
 	int i;
-	arcVec3 v[8];
+	anVec3 v[8];
 
 	if ( bounds.IsCleared() ) {
 		return;
@@ -1782,9 +1782,9 @@ void ARCRenderWorldLocal::DebugBounds( const arcVec4 &color, const arcBounds &bo
 	}
 }
 
-void ARCRenderWorldLocal::DebugBoundsDepthTest( const arcVec4 &color, const arcBounds &bounds, const arcVec3 &org, const int lifeTime,  bool depthTest ) {
+void anRenderWorldLocal::DebugBoundsDepthTest( const anVec4 &color, const anBounds &bounds, const anVec3 &org, const int lifeTime,  bool depthTest ) {
 	int i;
-	arcVec3 v[8];
+	anVec3 v[8];
 
 	if ( bounds.IsCleared() || depthTest == false ) {
 		return;
@@ -1809,12 +1809,12 @@ void ARCRenderWorldLocal::DebugBoundsDepthTest( const arcVec4 &color, const arcB
 
 /*
 ====================
-ARCRenderWorldLocal::DebugBox
+anRenderWorldLocal::DebugBox
 ====================
 */
-void ARCRenderWorldLocal::DebugBox( const arcVec4 &color, const ARCBox &box, const int lifeTime ) {
+void anRenderWorldLocal::DebugBox( const anVec4 &color, const anBox &box, const int lifeTime ) {
 	int i;
-	arcVec3 v[8];
+	anVec3 v[8];
 
 	box.ToPoints( v );
 	for ( i = 0; i < 4; i++ ) {
@@ -1826,12 +1826,12 @@ void ARCRenderWorldLocal::DebugBox( const arcVec4 &color, const ARCBox &box, con
 
 /*
 ================
-ARCRenderWorldLocal::DebugFrustum
+anRenderWorldLocal::DebugFrustum
 ================
 */
-void ARCRenderWorldLocal::DebugFrustum( const arcVec4 &color, const ARCFrustum &frustum, const bool showFromOrigin, const int lifeTime ) {
+void anRenderWorldLocal::DebugFrustum( const anVec4 &color, const anFrustum &frustum, const bool showFromOrigin, const int lifeTime ) {
 	int i;
-	arcVec3 v[8];
+	anVec3 v[8];
 
 	frustum.ToPoints( v );
 
@@ -1853,17 +1853,17 @@ void ARCRenderWorldLocal::DebugFrustum( const arcVec4 &color, const ARCFrustum &
 
 /*
 ============
-ARCRenderWorldLocal::DebugCone
+anRenderWorldLocal::DebugCone
 
   dir is the cone axis
   radius1 is the radius at the apex
   radius2 is the radius at apex+dir
 ============
 */
-void ARCRenderWorldLocal::DebugCone( const arcVec4 &color, const arcVec3 &apex, const arcVec3 &dir, float radius1, float radius2, const int lifeTime ) {
+void anRenderWorldLocal::DebugCone( const anVec4 &color, const anVec3 &apex, const anVec3 &dir, float radius1, float radius2, const int lifeTime ) {
 	int i;
-	arcMat3 axis;
-	arcVec3 top, p1, p2, lastp1, lastp2, d;
+	anMat3 axis;
+	anVec3 top, p1, p2, lastp1, lastp2, d;
 
 	axis[2] = dir;
 	axis[2].Normalize();
@@ -1875,7 +1875,7 @@ void ARCRenderWorldLocal::DebugCone( const arcVec4 &color, const arcVec3 &apex, 
 
 	if ( radius1 == 0.0f ) {
 		for ( i = 20; i <= 360; i += 20 ) {
-			d = arcMath::Sin16( DEG2RAD( i ) ) * axis[0] + arcMath::Cos16( DEG2RAD( i ) ) * axis[1];
+			d = anMath::Sin16( DEG2RAD( i ) ) * axis[0] + anMath::Cos16( DEG2RAD( i ) ) * axis[1];
 			p2 = top + d * radius2;
 			DebugLine( color, lastp2, p2, lifeTime );
 			DebugLine( color, p2, apex, lifeTime );
@@ -1884,7 +1884,7 @@ void ARCRenderWorldLocal::DebugCone( const arcVec4 &color, const arcVec3 &apex, 
 	} else {
 		lastp1 = apex + radius1 * axis[1];
 		for ( i = 20; i <= 360; i += 20 ) {
-			d = arcMath::Sin16( DEG2RAD( i ) ) * axis[0] + arcMath::Cos16( DEG2RAD( i ) ) * axis[1];
+			d = anMath::Sin16( DEG2RAD( i ) ) * axis[0] + anMath::Cos16( DEG2RAD( i ) ) * axis[1];
 			p1 = apex + d * radius1;
 			p2 = top + d * radius2;
 			DebugLine( color, lastp1, p1, lifeTime );
@@ -1898,12 +1898,12 @@ void ARCRenderWorldLocal::DebugCone( const arcVec4 &color, const arcVec3 &apex, 
 
 /*
 ================
-ARCRenderWorldLocal::DebugAxis
+anRenderWorldLocal::DebugAxis
 ================
 */
-void ARCRenderWorldLocal::DebugAxis( const arcVec3 &origin, const arcMat3 &axis ) {
-	arcVec3 start = origin;
-	arcVec3 end = start + axis[0] * 20.0f;
+void anRenderWorldLocal::DebugAxis( const anVec3 &origin, const anMat3 &axis ) {
+	anVec3 start = origin;
+	anVec3 end = start + axis[0] * 20.0f;
 	DebugArrow( colorWhite, start, end, 2 );
 	end = start + axis[0] * -20.0f;
 	DebugArrow( colorWhite, start, end, 2 );
@@ -1917,51 +1917,51 @@ void ARCRenderWorldLocal::DebugAxis( const arcVec3 &origin, const arcMat3 &axis 
 	DebugArrow( colorBlue, start, end, 2 );
 }
 
-void ARCRenderWorldLocal::ShowDebugLines( void ) {
+void anRenderWorldLocal::ShowDebugLines( void ) {
 
 }
 
-void ARCRenderWorldLocal::ShowDebugPolygons( void ) {
+void anRenderWorldLocal::ShowDebugPolygons( void ) {
 
 
 }
-void ARCRenderWorldLocal::ShowDebugText( void ){
+void anRenderWorldLocal::ShowDebugText( void ){
 	RB_ShowDebugText();
 }
 
 /*
 ====================
-ARCRenderWorldLocal::DebugClearPolygons
+anRenderWorldLocal::DebugClearPolygons
 ====================
 */
-void ARCRenderWorldLocal::DebugClearPolygons( int time ) {
+void anRenderWorldLocal::DebugClearPolygons( int time ) {
 	RB_ClearDebugPolygons( time );
 }
 
 /*
 ====================
-ARCRenderWorldLocal::DebugPolygon
+anRenderWorldLocal::DebugPolygon
 ====================
 */
-void ARCRenderWorldLocal::DebugPolygon( const arcVec4 &color, const arcWinding &winding, const int lifeTime, const bool depthTest ) {
+void anRenderWorldLocal::DebugPolygon( const anVec4 &color, const anWinding &winding, const int lifeTime, const bool depthTest ) {
 	RB_AddDebugPolygon( color, winding, lifeTime, depthTest );
 }
 
 /*
 ================
-ARCRenderWorldLocal::DebugScreenRect
+anRenderWorldLocal::DebugScreenRect
 ================
 */
-void ARCRenderWorldLocal::DebugScreenRect( const arcVec4 &color, const ARCScreenRect &rect, const viewDef_t *viewDef, const int lifeTime ) {
-	arcBounds bounds;
-	arcVec3 p[4];
+void anRenderWorldLocal::DebugScreenRect( const anVec4 &color, const anScreenRect &rect, const viewDef_t *viewDef, const int lifeTime ) {
+	anBounds bounds;
+	anVec3 p[4];
 
 	float centerx = ( viewDef->viewport.x2 - viewDef->viewport.x1 ) * 0.5f;
 	float centery = ( viewDef->viewport.y2 - viewDef->viewport.y1 ) * 0.5f;
 
 	float dScale = r_znear.GetFloat() + 1.0f;
-	float hScale = dScale * arcMath::Tan16( DEG2RAD( viewDef->renderView.fov_x * 0.5f ) );
-	float vScale = dScale * arcMath::Tan16( DEG2RAD( viewDef->renderView.fov_y * 0.5f ) );
+	float hScale = dScale * anMath::Tan16( DEG2RAD( viewDef->renderView.fov_x * 0.5f ) );
+	float vScale = dScale * anMath::Tan16( DEG2RAD( viewDef->renderView.fov_y * 0.5f ) );
 
 	bounds[0][0] = bounds[1][0] = dScale;
 	bounds[0][1] = -( rect.x1 - centerx ) / centerx * hScale;
@@ -1982,38 +1982,38 @@ void ARCRenderWorldLocal::DebugScreenRect( const arcVec4 &color, const ARCScreen
 
 /*
 ================
-ARCRenderWorldLocal::DrawTextLength
+anRenderWorldLocal::DrawTextLength
 
   returns the length of the given text
 ================
 */
-float ARCRenderWorldLocal::DrawTextLength( const char *text, float scale, int len ) {
+float anRenderWorldLocal::DrawTextLength( const char *text, float scale, int len ) {
 	return RB_DrawTextLength( text, scale, len );
 }
 
 /*
 ================
-ARCRenderWorldLocal::DrawText
+anRenderWorldLocal::DrawText
 
   oriented on the viewAxis
   align can be 0-left, 1-center (default), 2-right
 ================
 */
-void ARCRenderWorldLocal::DrawText( const char *text, const arcVec3 &origin, float scale, const arcVec4 &color, const arcMat3 &viewAxis, const int align, const int lifeTime, const bool depthTest ) {
+void anRenderWorldLocal::DrawText( const char *text, const anVec3 &origin, float scale, const anVec4 &color, const anMat3 &viewAxis, const int align, const int lifeTime, const bool depthTest ) {
 	RB_AddDebugText( text, origin, scale, color, viewAxis, align, lifeTime, depthTest );
 }
 
-size_t MemorySummary( const ARCCommandArgs &args ) {
+size_t MemorySummary( const anCommandArgs &args ) {
 
 }
 
 /*
 ===============
-ARCRenderWorldLocal::RegenerateWorld
+anRenderWorldLocal::RegenerateWorld
 ===============
 */
-void ARCRenderWorldLocal::RegenerateWorld() {
-	R_RegenerateWorld_f( arcCommandArgs() );
+void anRenderWorldLocal::RegenerateWorld() {
+	R_RegenerateWorld_f( anCommandArgs() );
 }
 
 /*
@@ -2021,7 +2021,7 @@ void ARCRenderWorldLocal::RegenerateWorld() {
 R_GlobalShaderOverride
 ===============
 */
-bool R_GlobalShaderOverride( const arcMaterial **shader ) {
+bool R_GlobalShaderOverride( const anMaterial **shader ) {
 	if ( !( *shader )->IsDrawn() ) {
 		return false;
 	}
@@ -2044,9 +2044,9 @@ bool R_GlobalShaderOverride( const arcMaterial **shader ) {
 R_RemapShaderBySkin
 ===============
 */
-const arcMaterial *R_RemapShaderBySkin( const arcMaterial *shader, const arcDeclSkin *skin, const arcMaterial *customShader ) {
+const anMaterial *R_RemapShaderBySkin( const anMaterial *shader, const anDeclSkin *skin, const anMaterial *customShader ) {
 	if ( !shader ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// never remap surfaces that were originally nodraw, like collision hulls
@@ -2058,13 +2058,13 @@ const arcMaterial *R_RemapShaderBySkin( const arcMaterial *shader, const arcDecl
 		// this is sort of a hack, but cause deformed surfaces to map to empty surfaces,
 		// so the item highlight overlay doesn't highlight the autosprite surface
 		if ( shader->Deform() ) {
-			return NULL;
+			return nullptr;
 		}
-		return const_cast<arcMaterial *>( customShader );
+		return const_cast<anMaterial *>( customShader );
 	}
 
 	if ( !skin || !shader ) {
-		return const_cast<arcMaterial *>( shader );
+		return const_cast<anMaterial *>( shader );
 	}
 
 	return skin->RemapShaderBySkin( shader );

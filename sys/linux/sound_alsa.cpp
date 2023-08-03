@@ -25,15 +25,15 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #include "../../sound/snd_local.h"
 #include "../posix/posix_public.h"
 #include "sound.h"
 
 #include <dlfcn.h>
 
-static arcCVarSystem s_alsa_pcm( "s_alsa_pcm", "default", CVAR_SYSTEM | CVAR_ARCHIVE, "which alsa pcm device to use. default, hwplug, hw.. see alsa docs" );
-static arcCVarSystem s_alsa_lib( "s_alsa_lib", "libasound.so.2", CVAR_SYSTEM | CVAR_ARCHIVE, "alsa client sound library" );
+static anCVarSystem s_alsa_pcm( "s_alsa_pcm", "default", CVAR_SYSTEM | CVAR_ARCHIVE, "which alsa pcm device to use. default, hwplug, hw.. see alsa docs" );
+static anCVarSystem s_alsa_lib( "s_alsa_lib", "libasound.so.2", CVAR_SYSTEM | CVAR_ARCHIVE, "alsa client sound library" );
 
 /*
 ===============
@@ -61,22 +61,22 @@ bool idAudioHardwareALSA::DLOpen( void ) {
 		common->Printf( "asoundlib version: %s\n", version );
 	}
 	// dlsym the symbols
-	ALSA_DLSYM(snd_pcm_avail_update);
-	ALSA_DLSYM(snd_pcm_close);
-	ALSA_DLSYM(snd_pcm_hw_params);
-	ALSA_DLSYM(snd_pcm_hw_params_any);
-	ALSA_DLSYM(snd_pcm_hw_params_get_buffer_size);
-	ALSA_DLSYM(snd_pcm_hw_params_set_access);
-	ALSA_DLSYM(snd_pcm_hw_params_set_buffer_size_min);
-	ALSA_DLSYM(snd_pcm_hw_params_set_channels);
-	ALSA_DLSYM(snd_pcm_hw_params_set_format);
-	ALSA_DLSYM(snd_pcm_hw_params_set_rate);
-	ALSA_DLSYM(snd_pcm_hw_params_sizeof);
-	ALSA_DLSYM(snd_pcm_open);
-	ALSA_DLSYM(snd_pcm_prepare);
-	ALSA_DLSYM(snd_pcm_state);
-	ALSA_DLSYM(snd_pcm_writei);
-	ALSA_DLSYM(snd_strerror);
+	ALSA_DLSYM( snd_pcm_avail_update);
+	ALSA_DLSYM( snd_pcm_close);
+	ALSA_DLSYM( snd_pcm_hw_params);
+	ALSA_DLSYM( snd_pcm_hw_params_any);
+	ALSA_DLSYM( snd_pcm_hw_params_get_buffer_size);
+	ALSA_DLSYM( snd_pcm_hw_params_set_access);
+	ALSA_DLSYM( snd_pcm_hw_params_set_buffer_size_min);
+	ALSA_DLSYM( snd_pcm_hw_params_set_channels);
+	ALSA_DLSYM( snd_pcm_hw_params_set_format);
+	ALSA_DLSYM( snd_pcm_hw_params_set_rate);
+	ALSA_DLSYM( snd_pcm_hw_params_sizeof);
+	ALSA_DLSYM( snd_pcm_open);
+	ALSA_DLSYM( snd_pcm_prepare);
+	ALSA_DLSYM( snd_pcm_state);
+	ALSA_DLSYM( snd_pcm_writei);
+	ALSA_DLSYM( snd_strerror);
 	return true;
 }
 
@@ -89,16 +89,16 @@ void idAudioHardwareALSA::Release() {
 	if ( m_pcm_handle ) {
 		common->Printf( "close pcm\n" );
 		id_snd_pcm_close( m_pcm_handle );
-		m_pcm_handle = NULL;
+		m_pcm_handle = nullptr;
 	}
 	if ( m_buffer ) {
 		free( m_buffer );
-		m_buffer = NULL;
+		m_buffer = nullptr;
 	}
 	if ( m_handle ) {
 		common->Printf( "dlclose\n" );
 		dlclose( m_handle );
-		m_handle = NULL;
+		m_handle = nullptr;
 	}
 }
 
@@ -261,7 +261,7 @@ idAudioHardwareALSA::GetMixBuffer
 =================
 */
 short* idAudioHardwareALSA::GetMixBuffer() {
-	return (short *)m_buffer;
+	return ( short *)m_buffer;
 }
 
 /*

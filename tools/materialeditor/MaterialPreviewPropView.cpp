@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 
@@ -39,7 +39,7 @@ IMPLEMENT_DYNCREATE(MaterialPreviewPropView, CPropTreeView)
 
 MaterialPreviewPropView::MaterialPreviewPropView() {
 	numLights = 0;
-	materialPreview = NULL;
+	materialPreview = nullptr;
 }
 
 MaterialPreviewPropView::~MaterialPreviewPropView() {
@@ -53,7 +53,7 @@ END_MESSAGE_MAP()
 
 void MaterialPreviewPropView::AddLight( void ) {
 	int i, count, lightShaderIndex = 0;
-	const arcMaterial *mat;
+	const anMaterial *mat;
 
 	CPropTreeItemButton*	pRoot;
 	CPropTreeItemCombo*		pCombo;
@@ -65,8 +65,8 @@ void MaterialPreviewPropView::AddLight( void ) {
 	numLights++;
 
 	pRoot = (CPropTreeItemButton*)m_Tree.InsertItem(new CPropTreeItemButton() );
-	pRoot->SetLabelText(_T(va( "Light #%d", numLights) ));
-	pRoot->SetInfoText(_T(va( "Parameters for light number %d.", numLights) ));
+	pRoot->SetLabelText(_T(va( "Light #%d", numLights) ) );
+	pRoot->SetInfoText(_T(va( "Parameters for light number %d.", numLights) ) );
 	pRoot->SetButtonText( "Remove" );
 	pRoot->SetCtrlID( numLights - 1 );
 	pRoot->Expand();
@@ -81,7 +81,7 @@ void MaterialPreviewPropView::AddLight( void ) {
 	for ( i = 0; i < count; i++ ) {
 		mat = declManager->MaterialByIndex( i, false);
 
-		arcNetString materialName = mat->GetName();
+		anString materialName = mat->GetName();
 		materialName.ToLower();
 
 		if ( materialName.Left(7) == "lights/" || materialName.Left(5) == "fogs/" ) {
@@ -181,7 +181,7 @@ void MaterialPreviewPropView::InitializePropTree( void ) {
 
 	for ( i = 0; i < MAX_ENTITY_SHADER_PARMS; i++ ) {
 		pEdit = (CPropTreeItemEdit*)m_Tree.InsertItem( new CPropTreeItemEdit(), pParmRoot );
-		pEdit->SetLabelText(_T(va( "parm%d", i) ));
+		pEdit->SetLabelText(_T(va( "parm%d", i) ) );
 		pEdit->SetInfoText(_T( "Set the local shaderparm for the model" ) );
 		if ( i < 4 ) {
 			pEdit->SetItemValue((LPARAM)_T( "1" ) );
@@ -197,7 +197,7 @@ void MaterialPreviewPropView::InitializePropTree( void ) {
 
 	for ( i = 0; i < MAX_TOTALSHADER_PARMS; i++ ) {
 		pEdit = (CPropTreeItemEdit*)m_Tree.InsertItem( new CPropTreeItemEdit(), pParmRoot );
-		pEdit->SetLabelText(_T(va( "global%d", i) ));
+		pEdit->SetLabelText(_T(va( "global%d", i) ) );
 		pEdit->SetInfoText(_T( "Set the global shaderparm for the renderworld" ) );
 		if ( i < 4 ) {
 			pEdit->SetItemValue((LPARAM)_T( "1" ) );
@@ -254,7 +254,7 @@ void MaterialPreviewPropView::RegisterPreviewView( MaterialPreviewView *view ) {
 // MaterialPreviewPropView message handlers
 
 void MaterialPreviewPropView::OnPropertyChangeNotification( NMHDR *nmhdr, LRESULT *lresult ) {
-	arcVec3			testColor;
+	anVec3			testColor;
 	int				lightId = 0;
 	COLORREF		color;
 	NMPROPTREE		*nmProp;
@@ -270,7 +270,7 @@ void MaterialPreviewPropView::OnPropertyChangeNotification( NMHDR *nmhdr, LRESUL
 		lightId = parent->GetCtrlID();
 	}
 
-	arcNetString	itemLabel = item->GetLabelText();
+	anString	itemLabel = item->GetLabelText();
 
 	if ( itemLabel == "Model Type" ) {
 		materialPreview->OnModelChange( item->GetItemValue() );
@@ -329,7 +329,7 @@ void MaterialPreviewPropView::OnPropertyButtonClick( NMHDR *nmhdr, LRESULT *lres
 	nmProp = (NMPROPTREE *)nmhdr;
 	item = nmProp->pItem;
 
-	arcNetString	itemLabel = item->GetLabelText();
+	anString	itemLabel = item->GetLabelText();
 
 	if ( itemLabel == "Preview Lights" ) {
 		AddLight();
@@ -341,13 +341,13 @@ void MaterialPreviewPropView::OnPropertyButtonClick( NMHDR *nmhdr, LRESULT *lres
 
 		m_Tree.DeleteItem( item );
 
-		for ( light = m_Tree.GetRootItem()->GetChild(); light != NULL; light = light->GetSibling() ) {
-			arcNetString label = light->GetLabelText();
+		for ( light = m_Tree.GetRootItem()->GetChild(); light != nullptr; light = light->GetSibling() ) {
+			anString label = light->GetLabelText();
 
 			if ( label.Left(5) == "Light" ) {
 				testLightNum++;
-				light->SetLabelText(_T(va( "Light #%d", testLightNum) ));
-				light->SetInfoText(_T(va( "Parameters for light number %d.", testLightNum) ));
+				light->SetLabelText(_T(va( "Light #%d", testLightNum) ) );
+				light->SetInfoText(_T(va( "Parameters for light number %d.", testLightNum) ) );
 				light->SetCtrlID( testLightNum - 1 );
 			}
 		}

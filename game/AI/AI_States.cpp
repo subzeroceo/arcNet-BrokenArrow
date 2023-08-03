@@ -1,12 +1,12 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 #include "../vehicle/Vehicle.h"
 #include "AI_Manager.h"
 #include "AI_Util.h"
-#include "AAS_Find.h"
+#include "SEAS_Find.h"
 
 static const int 	TACTICALUPDATE_MELEEDELAY   	= 500;		// Rate to update tactical state when rushing
 static const int 	TACTICALUPDATE_RANGEDDELAY 		= 2000;		// Rate to update tactical state when in ranged combat
@@ -22,65 +22,65 @@ static const int 	COVER_ENEMYDELAY				= 5000;		// Stay behind cover for 5 second
 
 static const float	COVER_TRIGGERRADIUS				= 64.0f;
 
-CLASS_STATES_DECLARATION ( idAI )
+CLASS_STATES_DECLARATION ( anSAAI )
 	// Wait States
-	STATE ( "Wait_Activated",				idAI::State_Wait_Activated )
-	STATE ( "Wait_ScriptedDone",			idAI::State_Wait_ScriptedDone )
-	STATE ( "Wait_Action",					idAI::State_Wait_Action )
-	STATE ( "Wait_ActionNoPain",			idAI::State_Wait_ActionNoPain )
+	STATE ( "Wait_Activated",				anSAAI::State_Wait_Activated )
+	STATE ( "Wait_ScriptedDone",			anSAAI::State_Wait_ScriptedDone )
+	STATE ( "Wait_Action",					anSAAI::State_Wait_Action )
+	STATE ( "Wait_ActionNoPain",			anSAAI::State_Wait_ActionNoPain )
 
 	// Global States
-	STATE ( "State_WakeUp",					idAI::State_WakeUp )
-	STATE ( "State_TriggerAnim",			idAI::State_TriggerAnim )
+	STATE ( "State_WakeUp",					anSAAI::State_WakeUp )
+	STATE ( "State_TriggerAnim",			anSAAI::State_TriggerAnim )
 
 	// Passive states
-	STATE ( "State_Passive",				idAI::State_Passive )
+	STATE ( "State_Passive",				anSAAI::State_Passive )
 
 	// Combat states
-	STATE ( "State_Combat",					idAI::State_Combat )
-	STATE ( "State_CombatCover",			idAI::State_CombatCover )
-	STATE ( "State_CombatMelee",			idAI::State_CombatMelee )
-	STATE ( "State_CombatRanged",			idAI::State_CombatRanged )
-	STATE ( "State_CombatTurret",			idAI::State_CombatTurret )
-	STATE ( "State_CombatHide",				idAI::State_CombatHide )
+	STATE ( "State_Combat",					anSAAI::State_Combat )
+	STATE ( "State_CombatCover",			anSAAI::State_CombatCover )
+	STATE ( "State_CombatMelee",			anSAAI::State_CombatMelee )
+	STATE ( "State_CombatRanged",			anSAAI::State_CombatRanged )
+	STATE ( "State_CombatTurret",			anSAAI::State_CombatTurret )
+	STATE ( "State_CombatHide",				anSAAI::State_CombatHide )
 
-	STATE ( "State_Wander",					idAI::State_Wander )
-	STATE ( "State_MoveTether",				idAI::State_MoveTether )
-	STATE ( "State_MoveFollow",				idAI::State_MoveFollow )
-	STATE ( "State_MovePlayerPush",			idAI::State_MovePlayerPush )
-	STATE ( "State_Killed",					idAI::State_Killed )
-	STATE ( "State_Dead",					idAI::State_Dead )
-	STATE ( "State_LightningDeath",			idAI::State_LightningDeath )
-	STATE ( "State_Burn",					idAI::State_Burn )
-	STATE ( "State_Remove",					idAI::State_Remove )
-	STATE ( "State_ScriptedMove",			idAI::State_ScriptedMove )
-	STATE ( "State_ScriptedFace",			idAI::State_ScriptedFace )
-	STATE ( "State_ScriptedStop",			idAI::State_ScriptedStop )
-	STATE ( "State_ScriptedPlaybackMove",	idAI::State_ScriptedPlaybackMove )
-	STATE ( "State_ScriptedPlaybackAim",	idAI::State_ScriptedPlaybackAim )
-	STATE ( "State_ScriptedJumpDown",		idAI::State_ScriptedJumpDown )
+	STATE ( "State_Wander",					anSAAI::State_Wander )
+	STATE ( "State_MoveTether",				anSAAI::State_MoveTether )
+	STATE ( "State_MoveFollow",				anSAAI::State_MoveFollow )
+	STATE ( "State_MovePlayerPush",			anSAAI::State_MovePlayerPush )
+	STATE ( "State_Killed",					anSAAI::State_Killed )
+	STATE ( "State_Dead",					anSAAI::State_Dead )
+	STATE ( "State_LightningDeath",			anSAAI::State_LightningDeath )
+	STATE ( "State_Burn",					anSAAI::State_Burn )
+	STATE ( "State_Remove",					anSAAI::State_Remove )
+	STATE ( "State_ScriptedMove",			anSAAI::State_ScriptedMove )
+	STATE ( "State_ScriptedFace",			anSAAI::State_ScriptedFace )
+	STATE ( "State_ScriptedStop",			anSAAI::State_ScriptedStop )
+	STATE ( "State_ScriptedPlaybackMove",	anSAAI::State_ScriptedPlaybackMove )
+	STATE ( "State_ScriptedPlaybackAim",	anSAAI::State_ScriptedPlaybackAim )
+	STATE ( "State_ScriptedJumpDown",		anSAAI::State_ScriptedJumpDown )
 
 	// Torso States
-	STATE ( "Torso_Idle",					idAI::State_Torso_Idle )
-	STATE ( "Torso_Sight",					idAI::State_Torso_Sight )
-	STATE ( "Torso_CustomCycle",			idAI::State_Torso_CustomCycle )
-	STATE ( "Torso_Action",					idAI::State_Torso_Action )
-	STATE ( "Torso_FinishAction",			idAI::State_Torso_FinishAction )
-	STATE ( "Torso_Pain",					idAI::State_Torso_Pain )
-	STATE ( "Torso_ScriptedAnim",			idAI::State_Torso_ScriptedAnim )
-	STATE ( "Torso_PassiveIdle",			idAI::State_Torso_PassiveIdle )
-	STATE ( "Torso_PassiveFidget",			idAI::State_Torso_PassiveFidget )
+	STATE ( "Torso_Idle",					anSAAI::State_Torso_Idle )
+	STATE ( "Torso_Sight",					anSAAI::State_Torso_Sight )
+	STATE ( "Torso_CustomCycle",			anSAAI::State_Torso_CustomCycle )
+	STATE ( "Torso_Action",					anSAAI::State_Torso_Action )
+	STATE ( "Torso_FinishAction",			anSAAI::State_Torso_FinishAction )
+	STATE ( "Torso_Pain",					anSAAI::State_Torso_Pain )
+	STATE ( "Torso_ScriptedAnim",			anSAAI::State_Torso_ScriptedAnim )
+	STATE ( "Torso_PassiveIdle",			anSAAI::State_Torso_PassiveIdle )
+	STATE ( "Torso_PassiveFidget",			anSAAI::State_Torso_PassiveFidget )
 
 	// Leg States
-	STATE ( "Legs_Idle",					idAI::State_Legs_Idle )
-	STATE ( "Legs_Move",					idAI::State_Legs_Move )
-	STATE ( "Legs_MoveThink",				idAI::State_Legs_MoveThink )
-	STATE ( "Legs_TurnLeft",				idAI::State_Legs_TurnLeft )
-	STATE ( "Legs_TurnRight",				idAI::State_Legs_TurnRight )
-	STATE ( "Legs_ChangeDirection",			idAI::State_Legs_ChangeDirection )
+	STATE ( "Legs_Idle",					anSAAI::State_Legs_Idle )
+	STATE ( "Legs_Move",					anSAAI::State_Legs_Move )
+	STATE ( "Legs_MoveThink",				anSAAI::State_Legs_MoveThink )
+	STATE ( "Legs_TurnLeft",				anSAAI::State_Legs_TurnLeft )
+	STATE ( "Legs_TurnRight",				anSAAI::State_Legs_TurnRight )
+	STATE ( "Legs_ChangeDirection",			anSAAI::State_Legs_ChangeDirection )
 
 	// Head States
-	STATE ( "Head_Idle",					idAI::State_Head_Idle )
+	STATE ( "Head_Idle",					anSAAI::State_Head_Idle )
 
 END_CLASS_STATES
 
@@ -94,10 +94,10 @@ END_CLASS_STATES
 
 /*
 ================
-idAI::State_TriggerAnim
+anSAAI::State_TriggerAnim
 ================
 */
-stateResult_t idAI::State_TriggerAnim ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_TriggerAnim ( const stateParms_t& parms ) {
 	const char* triggerAnim;
 
 	// If we dont have the trigger anim, just skip it
@@ -120,16 +120,16 @@ stateResult_t idAI::State_TriggerAnim ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_WakeUp
+anSAAI::State_WakeUp
 ================
 */
-stateResult_t idAI::State_WakeUp ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_WakeUp ( const stateParms_t& parms ) {
 	const char* triggerAnim;
 
-	WakeUp ( );
+	WakeUp();
 
 	// Start immeidately into a playback?
-	if( spawnArgs.FindKey( "playback_intro" ) ){
+	if ( spawnArgs.FindKey( "playback_intro" ) ){
 		ScriptedPlaybackMove ( "playback_intro", PBFL_GET_POSITION | PBFL_GET_ANGLES_FROM_VEL, 0 );
 	// Start immeidately into a scripted anim?
 	} else if ( spawnArgs.GetString ( "trigger_anim", "", &triggerAnim) && *triggerAnim && HasAnim ( ANIMCHANNEL_TORSO, triggerAnim ) ) {
@@ -156,10 +156,10 @@ stateResult_t idAI::State_WakeUp ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Passive
+anSAAI::State_Passive
 ================
 */
-stateResult_t idAI::State_Passive ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Passive ( const stateParms_t& parms ) {
 	if ( leader && !aifl.scripted ) {
 		if ( !GetEnemy() ) {
 			if ( combat.fl.aware && !combat.fl.ignoreEnemies ) {
@@ -172,7 +172,7 @@ stateResult_t idAI::State_Passive ( const stateParms_t& parms ) {
 		}
 	}
 
-	if ( UpdateAction ( ) ) {
+	if ( UpdateAction() ) {
 		return SRESULT_WAIT;
 	}
 	if ( UpdateTactical ( TACTICALUPDATE_PASSIVEDELAY ) ) {
@@ -183,13 +183,13 @@ stateResult_t idAI::State_Passive ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Combat
+anSAAI::State_Combat
 
 The base combat state is basically the clearing house for other combat states.  By calling
 UpdateTactical with a timer of zero it ensures a better tactical move can be found.
 ================
 */
-stateResult_t idAI::State_Combat ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Combat ( const stateParms_t& parms ) {
 	enum {
 		STAGE_INIT,
 		STAGE_WAIT
@@ -220,7 +220,7 @@ stateResult_t idAI::State_Combat ( const stateParms_t& parms ) {
 			}
 
 			// Perform actions
-			if ( UpdateAction ( ) ) {
+			if ( UpdateAction() ) {
 				return SRESULT_WAIT;
 			}
 
@@ -232,13 +232,13 @@ stateResult_t idAI::State_Combat ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_CombatCover
+anSAAI::State_CombatCover
 
 Seek out a cover point that has a vantage point on the enemy.  Stay there firing at the
 enemy until the cover point is invalidated.
 ================
 */
-stateResult_t idAI::State_CombatCover ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_CombatCover ( const stateParms_t& parms ) {
 	enum {
 		STAGE_MOVE,
 		STAGE_ATTACK,
@@ -246,7 +246,7 @@ stateResult_t idAI::State_CombatCover ( const stateParms_t& parms ) {
 	switch ( parms.stage ) {
 		case STAGE_MOVE:
 			// Attack when we have either stopped moving or are within melee range
-			if ( move.fl.done && aasSensor->Reserved ( ) ) {
+			if ( move.fl.done && aasSensor->Reserved() ) {
 				StopMove ( MOVE_STATUS_DONE );
 				TurnToward ( GetPhysics()->GetOrigin() + aasSensor->Reserved()->Normal() * 64.0f );
 				return SRESULT_STAGE ( STAGE_ATTACK );
@@ -257,15 +257,15 @@ stateResult_t idAI::State_CombatCover ( const stateParms_t& parms ) {
 				return SRESULT_DONE_WAIT;
 			}
 			// Perform actions on the way to the enemy
-			if ( UpdateAction ( ) ) {
+			if ( UpdateAction() ) {
 				return SRESULT_WAIT;
 			}
 			return SRESULT_WAIT;
 
 		case STAGE_ATTACK:
 			// If we dont have a cover point anymore then just bail out
-			if ( !aasSensor->Reserved ( ) ) {
-				ForceTacticalUpdate ( );
+			if ( !aasSensor->Reserved() ) {
+				ForceTacticalUpdate();
 				UpdateTactical ( 0 );
 				return SRESULT_DONE_WAIT;
 			}
@@ -274,17 +274,17 @@ stateResult_t idAI::State_CombatCover ( const stateParms_t& parms ) {
 				return SRESULT_DONE_WAIT;
 			}
 			// If we have moved off our cover point, move back
-			if ( DistanceTo ( aasSensor->ReservedOrigin ( ) ) > 8.0f ) {
+			if ( DistanceTo ( aasSensor->ReservedOrigin() ) > 8.0f ) {
 				if ( UpdateTactical ( 0 ) ) {
 					return SRESULT_DONE_WAIT;
 				}
 			}
 			// Dont do any cover checks until they are facing towards the wall
-			if ( !FacingIdeal ( ) ) {
+			if ( !FacingIdeal() ) {
 				return SRESULT_WAIT;
 			}
 			// Perform cover point actions
-			if ( UpdateAction ( ) ) {
+			if ( UpdateAction() ) {
 				return SRESULT_WAIT;
 			}
 
@@ -296,12 +296,12 @@ stateResult_t idAI::State_CombatCover ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_CombatMelee
+anSAAI::State_CombatMelee
 
 Head directly towards our enemy but allow ranged actions along the way
 ================
 */
-stateResult_t idAI::State_CombatMelee ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_CombatMelee ( const stateParms_t& parms ) {
 	enum {
 		STAGE_MOVE,			// Move towards the enemy
 		STAGE_ATTACK,		// Keep attacking until no longer in melee range
@@ -310,7 +310,7 @@ stateResult_t idAI::State_CombatMelee ( const stateParms_t& parms ) {
 		case STAGE_MOVE:
 			// If we can no longer get to our enemy, give up on this and do something else!
 			if ( move.moveStatus == MOVE_STATUS_DEST_UNREACHABLE ) {
-				ForceTacticalUpdate ( );
+				ForceTacticalUpdate();
 				UpdateTactical ( 0 );
 				return SRESULT_DONE_WAIT;
 			}
@@ -320,7 +320,7 @@ stateResult_t idAI::State_CombatMelee ( const stateParms_t& parms ) {
 				return SRESULT_STAGE ( STAGE_ATTACK );
 			}
 			// Perform actions on the way to the enemy
-			if ( UpdateAction ( ) ) {
+			if ( UpdateAction() ) {
 				return SRESULT_WAIT;
 			}
 			// Update tactical state occasionally
@@ -331,8 +331,8 @@ stateResult_t idAI::State_CombatMelee ( const stateParms_t& parms ) {
 
 		case STAGE_ATTACK:
 			// If we are out of melee range or lost sight of our enemy then start moving again
-			if ( !IsEnemyVisible ( ) ) {
-				ForceTacticalUpdate ( );
+			if ( !IsEnemyVisible() ) {
+				ForceTacticalUpdate();
 				UpdateTactical ( 0 );
 				return SRESULT_DONE_WAIT;
 			}
@@ -340,7 +340,7 @@ stateResult_t idAI::State_CombatMelee ( const stateParms_t& parms ) {
 			TurnToward ( enemy.lastKnownPosition );
 
 			// Perform actions while standing still
-			if ( UpdateAction ( ) ) {
+			if ( UpdateAction() ) {
 				return SRESULT_WAIT;
 			}
 
@@ -355,12 +355,12 @@ stateResult_t idAI::State_CombatMelee ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_CombatRanged
+anSAAI::State_CombatRanged
 
 Move towards enemy until within firing range then continue to shoot at the enemy
 ================
 */
-stateResult_t idAI::State_CombatRanged ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_CombatRanged ( const stateParms_t& parms ) {
 	enum {
 		STAGE_MOVE,			// Move to an attack position
 		STAGE_ATTACK,		// Perform actions until the enemy is out of range or not visible
@@ -369,7 +369,7 @@ stateResult_t idAI::State_CombatRanged ( const stateParms_t& parms ) {
 		case STAGE_MOVE:
 			// if we lost our enemy we are done here
 			if ( !enemy.ent ) {
-				ForceTacticalUpdate ( );
+				ForceTacticalUpdate();
 				if ( UpdateTactical ( 0 ) ) {
 					return SRESULT_DONE_WAIT;
 				}
@@ -387,8 +387,8 @@ stateResult_t idAI::State_CombatRanged ( const stateParms_t& parms ) {
 				 && enemy.range >= combat.attackRange[0]
 				 && enemy.range <= combat.attackRange[1]
 				 && ( DistanceTo ( move.moveDest ) < DistanceTo ( move.lastMoveOrigin ) )
-				 && (!tether || tether->ValidateDestination ( this, physicsObj.GetOrigin( ) ) )
-				 && aiManager.ValidateDestination ( this, physicsObj.GetOrigin ( ) ) ) {
+				 && ( !tether || tether->ValidateDestination ( this, physicsObj.GetOrigin( ) ) )
+				 && aiManager.ValidateDestination ( this, physicsObj.GetOrigin() ) ) {
 				StopMove ( MOVE_STATUS_DONE );
 				return SRESULT_STAGE ( STAGE_ATTACK );
 			}
@@ -397,7 +397,7 @@ stateResult_t idAI::State_CombatRanged ( const stateParms_t& parms ) {
 				return SRESULT_DONE_WAIT;
 			}
 			// Perform actions along the way
-			if ( UpdateAction ( ) ) {
+			if ( UpdateAction() ) {
 				return SRESULT_WAIT;
 			}
 			return SRESULT_WAIT;
@@ -412,7 +412,7 @@ stateResult_t idAI::State_CombatRanged ( const stateParms_t& parms ) {
 				return SRESULT_DONE_WAIT;
 			}
 			// Perform actions
-			if ( UpdateAction ( ) ) {
+			if ( UpdateAction() ) {
 				return SRESULT_WAIT;
 			}
 			return SRESULT_WAIT;
@@ -422,14 +422,14 @@ stateResult_t idAI::State_CombatRanged ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_CombatTurret
+anSAAI::State_CombatTurret
 
 Stay put and shoot at the enemy when nearby
 ================
 */
-stateResult_t idAI::State_CombatTurret ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_CombatTurret ( const stateParms_t& parms ) {
 	// Turn toward the enemy if visible but not in fov
-	if ( IsEnemyVisible ( ) && !enemy.fl.inFov ) {
+	if ( IsEnemyVisible() && !enemy.fl.inFov ) {
 		TurnToward ( enemy.lastKnownPosition );
 	// Turn towards tether direction if we have no enemy
 	} else if ( !enemy.ent && tether ) {
@@ -447,7 +447,7 @@ stateResult_t idAI::State_CombatTurret ( const stateParms_t& parms ) {
 	}
 
 	// Perform actions
-	if ( UpdateAction ( ) ) {
+	if ( UpdateAction() ) {
 		return SRESULT_WAIT;
 	}
 
@@ -464,12 +464,12 @@ stateResult_t idAI::State_CombatTurret ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_CombatHide
+anSAAI::State_CombatHide
 ================
 */
-stateResult_t idAI::State_CombatHide ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_CombatHide ( const stateParms_t& parms ) {
 	// Turn toward the enemy if visible but not in fov
-	if ( IsEnemyVisible ( ) ) {
+	if ( IsEnemyVisible() ) {
 		if ( !move.fl.moving ) {
 			TurnToward ( enemy.lastKnownPosition );
 		}
@@ -480,7 +480,7 @@ stateResult_t idAI::State_CombatHide ( const stateParms_t& parms ) {
 	}
 
 	// Perform actions
-	if ( UpdateAction ( ) ) {
+	if ( UpdateAction() ) {
 		return SRESULT_WAIT;
 	}
 
@@ -489,17 +489,17 @@ stateResult_t idAI::State_CombatHide ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Wander
+anSAAI::State_Wander
 ================
 */
-stateResult_t idAI::State_Wander ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Wander ( const stateParms_t& parms ) {
 	enum {
 		STAGE_INIT,
 		STAGE_WAIT
 	};
 	switch ( parms.stage ) {
 		case STAGE_INIT:
-			if ( !WanderAround ( ) ) {
+			if ( !WanderAround() ) {
 				return SRESULT_DONE;
 			}
 			return SRESULT_STAGE ( STAGE_WAIT );
@@ -515,12 +515,12 @@ stateResult_t idAI::State_Wander ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_MoveTether
+anSAAI::State_MoveTether
 
 Move into tether range
 ================
 */
-stateResult_t idAI::State_MoveTether ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_MoveTether ( const stateParms_t& parms ) {
 	enum {
 		STAGE_MOVE,
 		STAGE_DONE,
@@ -539,12 +539,12 @@ stateResult_t idAI::State_MoveTether ( const stateParms_t& parms ) {
 			if ( move.fl.done ) {
 				StopMove ( MOVE_STATUS_DONE );
 				if ( tether ) {
-					arcVec3 toPos = physicsObj.GetOrigin( ) + 64.0f * tether->GetPhysics()->GetAxis()[0];
+					anVec3 toPos = physicsObj.GetOrigin( ) + 64.0f * tether->GetPhysics()->GetAxis()[0];
 					TurnToward ( toPos );
 					if ( !IsBehindCover() ) {
 						//Do a trace *once* to see if I can crouch-look in the direction of the tether at this point
 						trace_t tr;
-						arcVec3 crouchEye = physicsObj.GetOrigin( );
+						anVec3 crouchEye = physicsObj.GetOrigin( );
 						crouchEye.z += 32.0f;
 						gameLocal.TracePoint( this, tr, crouchEye, toPos, MASK_SHOT_BOUNDINGBOX, this );
 						if ( tr.fraction >= 1.0f ) {
@@ -552,7 +552,7 @@ stateResult_t idAI::State_MoveTether ( const stateParms_t& parms ) {
 						}
 					}
 				}
-				ForceTacticalUpdate ( );
+				ForceTacticalUpdate();
 				return SRESULT_STAGE ( STAGE_DONE );
 			}
 			// Update tactical state occasionally to see if there is something better to do
@@ -560,12 +560,12 @@ stateResult_t idAI::State_MoveTether ( const stateParms_t& parms ) {
 				return SRESULT_DONE_WAIT;
 			}
 			// Perform actions on the way to the enemy
-			if ( UpdateAction ( ) ) {
+			if ( UpdateAction() ) {
 				return SRESULT_WAIT;
 			}
 
 		case STAGE_DONE:
-			if ( UpdateTactical ( ) ) {
+			if ( UpdateTactical() ) {
 				return SRESULT_DONE_WAIT;
 			}
 			return SRESULT_WAIT;
@@ -576,10 +576,10 @@ stateResult_t idAI::State_MoveTether ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_MoveFollow
+anSAAI::State_MoveFollow
 ================
 */
-stateResult_t idAI::State_MoveFollow ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_MoveFollow ( const stateParms_t& parms ) {
 	enum {
 		STAGE_MOVE,
 		STAGE_DONE,
@@ -594,7 +594,7 @@ stateResult_t idAI::State_MoveFollow ( const stateParms_t& parms ) {
 			} else if ( DistanceTo ( leader ) < (move.followRange[0]+move.followRange[1])*0.5f && aiManager.ValidateDestination ( this, physicsObj.GetOrigin( ), false, leader ) ) {
 				move.fl.done = true;
 				/*
-				idEntity* leaderGroundElevator = leader->GetGroundElevator();
+				anEntity* leaderGroundElevator = leader->GetGroundElevator();
 				if ( leaderGroundElevator && GetGroundElevator(leaderGroundElevator) != leaderGroundElevator ) {
 					move.fl.done = false;
 				}
@@ -606,7 +606,7 @@ stateResult_t idAI::State_MoveFollow ( const stateParms_t& parms ) {
 				if ( leader ) {
 					TurnToward ( leader->GetPhysics()->GetOrigin() );
 				}
-				ForceTacticalUpdate ( );
+				ForceTacticalUpdate();
 				return SRESULT_STAGE ( STAGE_DONE );
 			} else {
 				if ( UpdateTactical ( TACTICALUPDATE_FOLLOWDELAY ) ) {
@@ -615,12 +615,12 @@ stateResult_t idAI::State_MoveFollow ( const stateParms_t& parms ) {
 			}
 
 			// Perform actions on the way to the enemy
-			UpdateAction ( );
+			UpdateAction();
 
 			return SRESULT_WAIT;
 
 		case STAGE_DONE:
-			if ( UpdateTactical ( ) ) {
+			if ( UpdateTactical() ) {
 				return SRESULT_DONE_WAIT;
 			}
 			return SRESULT_WAIT;
@@ -631,12 +631,12 @@ stateResult_t idAI::State_MoveFollow ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_MovePlayerPush
+anSAAI::State_MovePlayerPush
 
 Move out of the way when the player is pushing us
 ================
 */
-stateResult_t idAI::State_MovePlayerPush ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_MovePlayerPush ( const stateParms_t& parms ) {
 	enum {
 		STAGE_MOVE,
 		STAGE_DONE,
@@ -646,17 +646,17 @@ stateResult_t idAI::State_MovePlayerPush ( const stateParms_t& parms ) {
 		case STAGE_MOVE:
 			if ( move.fl.done ) {
 				StopMove(MOVE_STATUS_DONE);
-				ForceTacticalUpdate ( );
+				ForceTacticalUpdate();
 				return SRESULT_STAGE ( STAGE_DONE );
 			} else if ( gameLocal.GetTime() - move.startTime > 2000 ) {
-				if ( UpdateTactical ( ) ) {
+				if ( UpdateTactical() ) {
 					return SRESULT_DONE_WAIT;
 				}
 			}
 			return SRESULT_WAIT;
 
 		case STAGE_DONE:
-			if ( UpdateTactical ( ) ) {
+			if ( UpdateTactical() ) {
 				return SRESULT_DONE_WAIT;
 			}
 			return SRESULT_WAIT;
@@ -666,14 +666,14 @@ stateResult_t idAI::State_MovePlayerPush ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Killed
+anSAAI::State_Killed
 ================
 */
-stateResult_t idAI::State_Killed ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Killed ( const stateParms_t& parms ) {
 	disablePain = true;
 
 	//quickburning subjects skip all this jazz
-	if( fl.quickBurn )	{
+	if ( fl.quickBurn )	{
 		PostState ( "State_Dead" );
 		return SRESULT_DONE;
 	}
@@ -688,7 +688,7 @@ stateResult_t idAI::State_Killed ( const stateParms_t& parms ) {
 	// Make sure all animations stop
 	animator.ClearAllAnims ( gameLocal.time, 0 );
 
-	if( spawnArgs.GetBool ( "remove_on_death" )  ){
+	if ( spawnArgs.GetBool ( "remove_on_death" )  ){
 		PostState ( "State_Remove" );
 	} else {
 		PostState ( "State_Dead" );
@@ -700,17 +700,17 @@ stateResult_t idAI::State_Killed ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Dead
+anSAAI::State_Dead
 ================
 */
-stateResult_t idAI::State_Dead ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Dead ( const stateParms_t& parms ) {
 	if ( !fl.hidden ) {
 		float burnDelay = spawnArgs.GetFloat ( "burnaway" );
 		if ( burnDelay > 0.0f ) {
-			if( fl.quickBurn )	{
+			if ( fl.quickBurn )	{
 				StopRagdoll();
 				PostState ( "State_Burn", SEC2MS(0.05f) );
-			} else if ( spawnArgs.GetString( "fx_burn_lightning", NULL ) ) {
+			} else if ( spawnArgs.GetString( "fx_burn_lightning", nullptr ) ) {
 				lightningNextTime = 0;
 				lightningEffects = 0;
 				PostState ( "State_LightningDeath", SEC2MS(burnDelay) );
@@ -731,14 +731,14 @@ stateResult_t idAI::State_Dead ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_LightningDeath
+anSAAI::State_LightningDeath
 ================
 */
-stateResult_t idAI::State_LightningDeath ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_LightningDeath ( const stateParms_t& parms ) {
 	if ( gameLocal.time > lightningNextTime ) {
 		if ( !lightningEffects )
 		{
-			StartSound ( "snd_burn_lightning", SND_CHANNEL_BODY, 0, false, NULL );
+			StartSound ( "snd_burn_lightning", SND_CHANNEL_BODY, 0, false, nullptr );
 		}
 		rvClientCrawlEffect* effect;
 		effect = new rvClientCrawlEffect ( gameLocal.GetEffect ( spawnArgs, "fx_burn_lightning" ), this, 100 );
@@ -756,7 +756,7 @@ stateResult_t idAI::State_LightningDeath ( const stateParms_t& parms ) {
 	{
 		for ( int i = GetAnimator()->NumJoints() - 1; i > 0; i -- ) {
 			if ( i != GetAnimator()->GetFirstChild ( (jointHandle_t)i ) ) {
-				if ( !gameLocal.random.RandomInt(1) ) {
+				if ( !gameLocal.random.RandomInt( 1 ) ) {
 					PlayEffect( "fx_burn_lightning", (jointHandle_t)i );
 				}
 			}
@@ -773,11 +773,11 @@ stateResult_t idAI::State_LightningDeath ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Burn
+anSAAI::State_Burn
 ================
 */
-stateResult_t idAI::State_Burn ( const stateParms_t& parms ) {
-	if( fl.hidden ){
+stateResult_t anSAAI::State_Burn ( const stateParms_t& parms ) {
+	if ( fl.hidden ){
 		return SRESULT_DONE;
 	}
 
@@ -789,16 +789,16 @@ stateResult_t idAI::State_Burn ( const stateParms_t& parms ) {
 	fl.takedamage = false;
 
 	renderEntity.shaderParms[ SHADERPARM_TIME_OF_DEATH ] = gameLocal.time * 0.001f;
-	idEntity *head = GetHead();
+	anEntity *head = GetHead();
 	if ( head ) {
 		head->GetRenderEntity()->shaderParms[ SHADERPARM_TIME_OF_DEATH ] = gameLocal.time * 0.001f;
 	}
 
 	UpdateVisuals();
 
-	if ( spawnArgs.GetString( "fx_burn_particles", NULL ) )
+	if ( spawnArgs.GetString( "fx_burn_particles", nullptr ) )
 	{
-		int i = GetAnimator()->GetJointHandle( spawnArgs.GetString("joint_chestOffset","chest") );
+		int i = GetAnimator()->GetJointHandle( spawnArgs.GetString( "joint_chestOffset","chest" ) );
 		if ( i != INVALID_JOINT )
 		{
 			PlayEffect( "fx_burn_particles_chest", (jointHandle_t)i );
@@ -814,27 +814,27 @@ stateResult_t idAI::State_Burn ( const stateParms_t& parms ) {
 		//FIXME: not small joints...
 	}
 
-	StartSound ( "snd_burn", SND_CHANNEL_BODY, 0, false, NULL );
+	StartSound ( "snd_burn", SND_CHANNEL_BODY, 0, false, nullptr );
 
 	return SRESULT_DONE;
 }
 
 /*
 ================
-idAI::State_Remove
+anSAAI::State_Remove
 ================
 */
-stateResult_t idAI::State_Remove ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Remove ( const stateParms_t& parms ) {
 	PostEventMS( &EV_Remove, 0 );
 	return SRESULT_DONE;
 }
 
 /*
 ================
-idAI::State_Torso_ScriptedAnim
+anSAAI::State_Torso_ScriptedAnim
 ================
 */
-stateResult_t idAI::State_Torso_ScriptedAnim ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Torso_ScriptedAnim ( const stateParms_t& parms ) {
 	if ( AnimDone ( ANIMCHANNEL_TORSO, parms.blendFrames ) ) {
 		aifl.scripted = false;
 		return SRESULT_DONE;
@@ -844,10 +844,10 @@ stateResult_t idAI::State_Torso_ScriptedAnim ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_ScriptedMove
+anSAAI::State_ScriptedMove
 ================
 */
-stateResult_t idAI::State_ScriptedMove ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_ScriptedMove ( const stateParms_t& parms ) {
 	if ( !aifl.scripted || move.fl.done ) {
 		return SRESULT_DONE;
 	}
@@ -857,10 +857,10 @@ stateResult_t idAI::State_ScriptedMove ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_ScriptedFace
+anSAAI::State_ScriptedFace
 ================
 */
-stateResult_t idAI::State_ScriptedFace ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_ScriptedFace ( const stateParms_t& parms ) {
 	if ( !aifl.scripted || FacingIdeal() ) {
 		return SRESULT_DONE;
 	}
@@ -870,10 +870,10 @@ stateResult_t idAI::State_ScriptedFace ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_ScriptedPlaybackMove
+anSAAI::State_ScriptedPlaybackMove
 ================
 */
-stateResult_t idAI::State_ScriptedPlaybackMove ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_ScriptedPlaybackMove ( const stateParms_t& parms ) {
 	if ( mPlayback.IsActive() ) {
 		return SRESULT_WAIT;
 	}
@@ -882,10 +882,10 @@ stateResult_t idAI::State_ScriptedPlaybackMove ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_ScriptedPlaybackAim
+anSAAI::State_ScriptedPlaybackAim
 ================
 */
-stateResult_t idAI::State_ScriptedPlaybackAim ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_ScriptedPlaybackAim ( const stateParms_t& parms ) {
 	if ( mLookPlayback.IsActive() ) {
 		return SRESULT_WAIT;
 	}
@@ -894,16 +894,16 @@ stateResult_t idAI::State_ScriptedPlaybackAim ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_ScriptedStop
+anSAAI::State_ScriptedStop
 ================
 */
-stateResult_t idAI::State_ScriptedStop ( const stateParms_t& parms ) {
-	ScriptedEnd ( );
+stateResult_t anSAAI::State_ScriptedStop ( const stateParms_t& parms ) {
+	ScriptedEnd();
 
 	// If ending in an idle animation move the legs back to idle and
 	// revert back to normal combat
 	if ( aifl.scriptedEndWithIdle ) {
-		ForceTacticalUpdate ( );
+		ForceTacticalUpdate();
 		UpdateTactical ( 0 );
 	}
 
@@ -920,10 +920,10 @@ stateResult_t idAI::State_ScriptedStop ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Torso_Idle
+anSAAI::State_Torso_Idle
 ================
 */
-stateResult_t idAI::State_Torso_Idle ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Torso_Idle ( const stateParms_t& parms ) {
 	// Custom passive idle?
 	if ( combat.tacticalCurrent == AITACTICAL_PASSIVE && passive.animIdlePrefix.Length() ) {
 		PostAnimState ( ANIMCHANNEL_TORSO, "Torso_PassiveIdle", parms.blendFrames );
@@ -931,13 +931,13 @@ stateResult_t idAI::State_Torso_Idle ( const stateParms_t& parms ) {
 	}
 
 	// If the legs were disabled then get them back into idle again
-	if ( legsAnim.Disabled ( ) ) {
+	if ( legsAnim.Disabled() ) {
 		SetAnimState ( ANIMCHANNEL_LEGS, "Legs_Idle", parms.blendFrames );
 	}
 
 	// Start idle animation
 	const char* idleAnim = GetIdleAnimName ();
-	if ( !torsoAnim.IsIdle () || idStr::Icmp ( idleAnim, animator.CurrentAnim ( ANIMCHANNEL_TORSO )->AnimName ( ) ) ) {
+	if ( !torsoAnim.IsIdle () || anString::Icmp ( idleAnim, animator.CurrentAnim ( ANIMCHANNEL_TORSO )->AnimName() ) ) {
 		IdleAnim ( ANIMCHANNEL_TORSO, idleAnim, parms.blendFrames );
 	}
 
@@ -946,10 +946,10 @@ stateResult_t idAI::State_Torso_Idle ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Torso_PassiveIdle
+anSAAI::State_Torso_PassiveIdle
 ================
 */
-stateResult_t idAI::State_Torso_PassiveIdle ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Torso_PassiveIdle ( const stateParms_t& parms ) {
 	enum {
 		STAGE_START,
 		STAGE_START_WAIT,
@@ -960,26 +960,26 @@ stateResult_t idAI::State_Torso_PassiveIdle ( const stateParms_t& parms ) {
 		STAGE_TALK_WAIT,
 	};
 
-	idStr animName;
+	anString animName;
 
 	switch ( parms.stage ) {
 		case STAGE_START:
 			// Talk animation?
 			if ( passive.talkTime > gameLocal.time ) {
-				idStr postfix;
+				anString postfix;
 				if ( talkMessage >= TALKMSG_LOOP ) {
 					postfix = aiTalkMessageString[TALKMSG_LOOP];
-					postfix += va("%d", (int)(talkMessage - TALKMSG_LOOP+1) );
+					postfix += va( "%d", (int)(talkMessage - TALKMSG_LOOP+1) );
 				} else {
 					postfix = aiTalkMessageString[talkMessage];
 				}
 				// Find their talk animation
-				animName = spawnArgs.GetString ( va("%s_%s", passive.animTalkPrefix.c_str(), postfix.c_str() ) );
-				if ( !animName.Length ( ) ) {
+				animName = spawnArgs.GetString ( va( "%s_%s", passive.animTalkPrefix.c_str(), postfix.c_str() ) );
+				if ( !animName.Length() ) {
 					animName = spawnArgs.GetString ( passive.animTalkPrefix );
 				}
 
-				if ( animName.Length ( ) ) {
+				if ( animName.Length() ) {
 					DisableAnimState ( ANIMCHANNEL_LEGS );
 					PlayCycle ( ANIMCHANNEL_TORSO, animName, parms.blendFrames );
 					return SRESULT_STAGE ( STAGE_TALK_WAIT );
@@ -1002,7 +1002,7 @@ stateResult_t idAI::State_Torso_PassiveIdle ( const stateParms_t& parms ) {
 			passive.idleAnimChangeTime = passive.fl.multipleIdles ? SEC2MS ( spawnArgs.GetFloat ( "idle_change_rate", "10" ) ) : 0;
 
 			// Is there a start animation for the idle?
-			animName = va("%s_start", passive.idleAnim.c_str() );
+			animName = va( "%s_start", passive.idleAnim.c_str() );
 			if ( HasAnim ( ANIMCHANNEL_TORSO, animName ) ) {
 				PlayAnim ( ANIMCHANNEL_TORSO, animName, parms.blendFrames );
 				return SRESULT_STAGE ( STAGE_START_WAIT );
@@ -1041,7 +1041,7 @@ stateResult_t idAI::State_Torso_PassiveIdle ( const stateParms_t& parms ) {
 			return SRESULT_WAIT;
 
 		case STAGE_END:
-			animName = va("%s_end", passive.idleAnim.c_str() );
+			animName = va( "%s_end", passive.idleAnim.c_str() );
 			if ( HasAnim ( ANIMCHANNEL_TORSO, animName ) ) {
 				PlayAnim ( ANIMCHANNEL_TORSO, animName, parms.blendFrames );
 				return SRESULT_STAGE ( STAGE_END_WAIT );
@@ -1065,25 +1065,25 @@ stateResult_t idAI::State_Torso_PassiveIdle ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Torso_PassiveFidget
+anSAAI::State_Torso_PassiveFidget
 ================
 */
-stateResult_t idAI::State_Torso_PassiveFidget ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Torso_PassiveFidget ( const stateParms_t& parms ) {
 	enum {
 		STAGE_INIT,
 		STAGE_WAIT,
 	};
 
-	idStr animName;
+	anString animName;
 
 	switch ( parms.stage ) {
 		case STAGE_INIT:
 			passive.fidgetTime = 0;
-			animName = spawnArgs.RandomPrefix ( va("anim_%sfidget", passive.prefix.c_str() ), gameLocal.random );
-			if ( !animName.Length ( ) ) {
+			animName = spawnArgs.RandomPrefix ( va( "anim_%sfidget", passive.prefix.c_str() ), gameLocal.random );
+			if ( !animName.Length() ) {
 				animName = spawnArgs.RandomPrefix ( "anim_fidget", gameLocal.random );
 			}
-			if ( !animName.Length ( ) ) {
+			if ( !animName.Length() ) {
 				return SRESULT_DONE;
 			}
 			if ( !PlayAnim ( ANIMCHANNEL_TORSO, animName, parms.blendFrames ) ) {
@@ -1102,12 +1102,12 @@ stateResult_t idAI::State_Torso_PassiveFidget ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_ScriptedJumpDown
+anSAAI::State_ScriptedJumpDown
 
 Face edge, walk off
 ================
 */
-stateResult_t idAI::State_ScriptedJumpDown( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_ScriptedJumpDown( const stateParms_t& parms ) {
 	enum {
 		STAGE_INIT,
 		STAGE_FACE_WAIT,
@@ -1164,7 +1164,7 @@ stateResult_t idAI::State_ScriptedJumpDown( const stateParms_t& parms ) {
 			break;
 		case STAGE_INAIR:
 			{
-				arcVec3 vel = viewAxis[0] * 200.0f;
+				anVec3 vel = viewAxis[0] * 200.0f;
 				vel.z = -50.0f;
 				physicsObj.SetLinearVelocity( vel );
 				PlayAnim( ANIMCHANNEL_TORSO, "jumpdown_loop", 4 );
@@ -1201,19 +1201,19 @@ stateResult_t idAI::State_ScriptedJumpDown( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Torso_CustomCycle
+anSAAI::State_Torso_CustomCycle
 ================
 */
-stateResult_t idAI::State_Torso_CustomCycle ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Torso_CustomCycle ( const stateParms_t& parms ) {
 	return SRESULT_DONE;
 }
 
 /*
 ================
-idAI::State_Torso_Sight
+anSAAI::State_Torso_Sight
 ================
 */
-stateResult_t idAI::State_Torso_Sight ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Torso_Sight ( const stateParms_t& parms ) {
 	enum {
 		STAGE_INIT,
 		STAGE_WAIT,
@@ -1227,13 +1227,13 @@ stateResult_t idAI::State_Torso_Sight ( const stateParms_t& parms ) {
 			}
 
 			// Execute sighted scripts
-			if( !enemy.fl.sighted ) {
+			if ( !enemy.fl.sighted ) {
 				enemy.fl.sighted = true;
 				ExecScriptFunction ( funcs.first_sight, this );
 			}
 			ExecScriptFunction ( funcs.sight );
 
-			idStr animName = spawnArgs.GetString ( "anim_sight", spawnArgs.GetString ( "sight_anim" ) );
+			anString animName = spawnArgs.GetString ( "anim_sight", spawnArgs.GetString ( "sight_anim" ) );
 			if ( HasAnim ( ANIMCHANNEL_TORSO, animName ) ) {
 				DisableAnimState ( ANIMCHANNEL_LEGS );
 				PlayAnim ( ANIMCHANNEL_TORSO, animName, parms.blendFrames );
@@ -1253,17 +1253,17 @@ stateResult_t idAI::State_Torso_Sight ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Torso_Action
+anSAAI::State_Torso_Action
 ================
 */
-stateResult_t idAI::State_Torso_Action ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Torso_Action ( const stateParms_t& parms ) {
 	// Invalid animation so dont bother with running the action
 	if ( actionAnimNum == -1 ) {
 		return SRESULT_DONE_WAIT;
 	}
 
 	// Play the action animation
-	PlayAnim ( ANIMCHANNEL_TORSO, animator.GetAnim ( actionAnimNum )->FullName ( ), parms.blendFrames );
+	PlayAnim ( ANIMCHANNEL_TORSO, animator.GetAnim ( actionAnimNum )->FullName(), parms.blendFrames );
 
 	// Wait till animation is finished
 	PostAnimState ( ANIMCHANNEL_TORSO, "Wait_TorsoAnim", parms.blendFrames );
@@ -1273,10 +1273,10 @@ stateResult_t idAI::State_Torso_Action ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Torso_FinishAction
+anSAAI::State_Torso_FinishAction
 ================
 */
-stateResult_t idAI::State_Torso_FinishAction ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Torso_FinishAction ( const stateParms_t& parms ) {
 
 	RestoreFlag ( AIFLAGOVERRIDE_DISABLEPAIN );
 	RestoreFlag ( AIFLAGOVERRIDE_DAMAGE );
@@ -1286,17 +1286,17 @@ stateResult_t idAI::State_Torso_FinishAction ( const stateParms_t& parms ) {
 	enemy.fl.lockOrigin	 = false;
 	aifl.action			 = false;
 
-	OnStopAction ( );
+	OnStopAction();
 
 	return SRESULT_DONE;
 }
 
 /*
 ================
-idAI::State_Torso_Pain
+anSAAI::State_Torso_Pain
 ================
 */
-stateResult_t idAI::State_Torso_Pain ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Torso_Pain ( const stateParms_t& parms ) {
 	enum {
 		STAGE_START,
 		STAGE_START_WAIT,
@@ -1306,7 +1306,7 @@ stateResult_t idAI::State_Torso_Pain ( const stateParms_t& parms ) {
 		STAGE_END_WAIT
 	};
 
-	idStr animName;
+	anString animName;
 
 	switch ( parms.stage ) {
 		case STAGE_START:
@@ -1315,7 +1315,7 @@ stateResult_t idAI::State_Torso_Pain ( const stateParms_t& parms ) {
 			pain.loopEndTime = gameLocal.time + SEC2MS ( spawnArgs.GetFloat ( "pain_maxLoopTime", "1" ) );
 
 			// Just in case the pain anim wasnt set before we got here.
-			if ( !painAnim.Length ( ) ) {
+			if ( !painAnim.Length() ) {
 				painAnim = "pain";
 			}
 
@@ -1370,10 +1370,10 @@ stateResult_t idAI::State_Torso_Pain ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Head_Idle
+anSAAI::State_Head_Idle
 ================
 */
-stateResult_t idAI::State_Head_Idle ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Head_Idle ( const stateParms_t& parms ) {
 	return SRESULT_DONE;
 }
 
@@ -1387,10 +1387,10 @@ stateResult_t idAI::State_Head_Idle ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Legs_Idle
+anSAAI::State_Legs_Idle
 ================
 */
-stateResult_t idAI::State_Legs_Idle ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Legs_Idle ( const stateParms_t& parms ) {
 	enum {
 		STAGE_INIT,
 		STAGE_WAIT,
@@ -1399,8 +1399,8 @@ stateResult_t idAI::State_Legs_Idle ( const stateParms_t& parms ) {
 		case STAGE_INIT: {
 			const char* idleAnim;
 			move.fl.allowAnimMove = false;
-			idleAnim = GetIdleAnimName ( );
-			if ( !legsAnim.IsIdle () || idStr::Icmp ( idleAnim, animator.CurrentAnim ( ANIMCHANNEL_LEGS )->AnimName ( ) ) ) {
+			idleAnim = GetIdleAnimName();
+			if ( !legsAnim.IsIdle () || anString::Icmp ( idleAnim, animator.CurrentAnim ( ANIMCHANNEL_LEGS )->AnimName() ) ) {
 				IdleAnim ( ANIMCHANNEL_LEGS, idleAnim, parms.blendFrames );
 			}
 			return SRESULT_STAGE ( STAGE_WAIT );
@@ -1425,10 +1425,10 @@ stateResult_t idAI::State_Legs_Idle ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Legs_TurnLeft
+anSAAI::State_Legs_TurnLeft
 ================
 */
-stateResult_t idAI::State_Legs_TurnLeft ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Legs_TurnLeft ( const stateParms_t& parms ) {
 	// Go back to idle if we are done here
 	if ( !AnimDone ( ANIMCHANNEL_LEGS, parms.blendFrames ) ) {
 		return SRESULT_WAIT;
@@ -1440,10 +1440,10 @@ stateResult_t idAI::State_Legs_TurnLeft ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Legs_TurnRight
+anSAAI::State_Legs_TurnRight
 ================
 */
-stateResult_t idAI::State_Legs_TurnRight ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Legs_TurnRight ( const stateParms_t& parms ) {
 	// Go back to idle if we are done here
 	if ( !AnimDone ( ANIMCHANNEL_LEGS, parms.blendFrames ) ) {
 		return SRESULT_WAIT;
@@ -1455,11 +1455,11 @@ stateResult_t idAI::State_Legs_TurnRight ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Legs_Move
+anSAAI::State_Legs_Move
 ================
 */
-stateResult_t idAI::State_Legs_Move ( const stateParms_t& parms ) {
-	idStr	animName;
+stateResult_t anSAAI::State_Legs_Move ( const stateParms_t& parms ) {
+	anString	animName;
 
 	move.fl.allowAnimMove = true;
 	move.fl.allowPrevAnimMove = false;
@@ -1476,7 +1476,7 @@ stateResult_t idAI::State_Legs_Move ( const stateParms_t& parms ) {
 	}
 
 	// Make sure run status is up to date when legs start moving
-	UpdateRunStatus ( );
+	UpdateRunStatus();
 
 	// Run or walk?
 	animName = "run";
@@ -1513,10 +1513,10 @@ stateResult_t idAI::State_Legs_Move ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Legs_MoveThink
+anSAAI::State_Legs_MoveThink
 ================
 */
-stateResult_t idAI::State_Legs_MoveThink ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Legs_MoveThink ( const stateParms_t& parms ) {
 	move.fl.allowAnimMove = true;
 	move.fl.allowPrevAnimMove = false;
 
@@ -1527,7 +1527,7 @@ stateResult_t idAI::State_Legs_MoveThink ( const stateParms_t& parms ) {
 	}
 
 	// If the run state has changed restart the leg movement
-	if ( UpdateRunStatus ( ) || (move.idealDirection != move.currentDirection) ) {
+	if ( UpdateRunStatus() || (move.idealDirection != move.currentDirection) ) {
 		PostAnimState ( ANIMCHANNEL_LEGS, "Legs_Move", 4 );
 		return SRESULT_DONE;
 	}
@@ -1538,11 +1538,11 @@ stateResult_t idAI::State_Legs_MoveThink ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Legs_ChangeDirection
+anSAAI::State_Legs_ChangeDirection
 ================
 */
-stateResult_t idAI::State_Legs_ChangeDirection ( const stateParms_t& parms ) {
-	if ( FacingIdeal ( ) || (move.idealDirection != move.currentDirection) ) {
+stateResult_t anSAAI::State_Legs_ChangeDirection ( const stateParms_t& parms ) {
+	if ( FacingIdeal() || (move.idealDirection != move.currentDirection) ) {
 		return SRESULT_DONE;
 	}
 
@@ -1561,18 +1561,18 @@ stateResult_t idAI::State_Legs_ChangeDirection ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::UpdateRunStatus
+anSAAI::UpdateRunStatus
 ================
 */
-bool idAI::UpdateRunStatus ( void ) {
+bool anSAAI::UpdateRunStatus ( void ) {
 	// Get new run status
 	if ( !move.fl.moving || !CanMove() ) {
 		move.fl.idealRunning = false;
 	} else if ( move.walkRange && !ai_useRVMasterMove.GetBool() && move.moveCommand != MOVE_TO_ENEMY && (DistanceTo ( move.moveDest ) - move.range) < move.walkRange ) {
 		move.fl.idealRunning = false;
-	} else if ( IsTethered() && tether->IsRunForced ( ) ) {
+	} else if ( IsTethered() && tether->IsRunForced() ) {
 		move.fl.idealRunning = true;
-	} else if ( IsTethered() && tether->IsWalkForced ( ) ) {
+	} else if ( IsTethered() && tether->IsWalkForced() ) {
 		move.fl.idealRunning = false;
 	} else if ( move.fl.noWalk ) {
 		move.fl.idealRunning = true;
@@ -1583,7 +1583,7 @@ bool idAI::UpdateRunStatus ( void ) {
 			move.fl.idealRunning = false;
 		} else if ( InLookAtCoverMode() ) {
 			move.fl.idealRunning = false;
-		} else if ( !ai_useRVMasterMove.GetBool() && move.walkTurn && !move.fl.allowDirectional && fabs(GetTurnDelta ( )) > move.walkTurn ) {
+		} else if ( !ai_useRVMasterMove.GetBool() && move.walkTurn && !move.fl.allowDirectional && fabs(GetTurnDelta()) > move.walkTurn ) {
 			move.fl.idealRunning = false;
 		} else {
 			move.fl.idealRunning = true;
@@ -1597,13 +1597,13 @@ bool idAI::UpdateRunStatus ( void ) {
 
 /*
 ================
-idAI::UpdateTactical
+anSAAI::UpdateTactical
 
 This method is a recursive method that will determine the best tactical state to be in
 from the given available states.
 ================
 */
-bool idAI::UpdateTactical ( int delay ) {
+bool anSAAI::UpdateTactical ( int delay ) {
 	// Update tactical cannot be called while performing an action and it must be called from the main state loop
 	assert ( !aifl.action );
 
@@ -1617,8 +1617,8 @@ bool idAI::UpdateTactical ( int delay ) {
 	}
 
 	// AI Speeds
-	if ( ai_speeds.GetBool ( ) ) {
-		aiManager.timerFindEnemy.Start ( );
+	if ( ai_speeds.GetBool() ) {
+		aiManager.timerFindEnemy.Start();
 	}
 
 	// Keep the enemy status up to date
@@ -1626,14 +1626,14 @@ bool idAI::UpdateTactical ( int delay ) {
 		// If we dont have an enemy or havent seen our enemy for a while just find a new one entirely
 		if ( gameLocal.time - enemy.checkTime > 250 ) {
 			CheckForEnemy ( true, true );
-		} else if ( !IsEnemyRecentlyVisible ( ) ) {
+		} else if ( !IsEnemyRecentlyVisible() ) {
 			CheckForEnemy ( true );
 		}
 	}
 
 	// AI Speeds
-	if ( ai_speeds.GetBool ( ) ) {
-		aiManager.timerFindEnemy.Stop ( );
+	if ( ai_speeds.GetBool() ) {
+		aiManager.timerFindEnemy.Stop();
 	}
 
 	// We have sighted an enemy so execute the sight state
@@ -1654,8 +1654,8 @@ bool idAI::UpdateTactical ( int delay ) {
 		}
 
 		// handle Auto break tethers
-		if ( IsTethered ( ) && tether->IsAutoBreak ( ) && IsWithinTether ( ) ) {
-			tether = NULL;
+		if ( IsTethered() && tether->IsAutoBreak() && IsWithinTether() ) {
+			tether = nullptr;
 		}
 
 		// Filter the tactical
@@ -1669,22 +1669,22 @@ bool idAI::UpdateTactical ( int delay ) {
 	}
 
 	// AI Speeds
-	if ( ai_speeds.GetBool ( ) ) {
-		aiManager.timerTactical.Start ( );
+	if ( ai_speeds.GetBool() ) {
+		aiManager.timerTactical.Start();
 	}
 
 	// Recursively look for a better tactical state
-	bool result = UpdateTactical_r ( );
+	bool result = UpdateTactical_r();
 
 	// AI Speeds
-	if ( ai_speeds.GetBool ( ) ) {
-		aiManager.timerTactical.Stop ( );
+	if ( ai_speeds.GetBool() ) {
+		aiManager.timerTactical.Stop();
 	}
 
 	return result;
 }
 
-bool idAI::UpdateTactical_r ( void ) {
+bool anSAAI::UpdateTactical_r ( void ) {
 	// Mapping of tactical types to combat states
 	static const char* tacticalState [ ] = {
 		"State_Combat",				// AITACTICAL_NONE
@@ -1743,7 +1743,7 @@ bool idAI::UpdateTactical_r ( void ) {
 
 	// Skip the tactial state if necessary
 	if ( checkResult == AICTRESULT_SKIP ) {
-		return UpdateTactical_r ( );
+		return UpdateTactical_r();
 	}
 
 	// Check to see if we need to move for the new tactical tate
@@ -1782,7 +1782,7 @@ bool idAI::UpdateTactical_r ( void ) {
 				break;
 
 			case AITACTICAL_MELEE:
-				result = MoveToEnemy ( );
+				result = MoveToEnemy();
 				break;
 
 			case AITACTICAL_PASSIVE:
@@ -1797,7 +1797,7 @@ bool idAI::UpdateTactical_r ( void ) {
 					result = false;
 				}
 				if ( !result ) {
-					result = MoveToHide ( );
+					result = MoveToHide();
 				}
 				if ( !result && enemy.ent ) {
 					result = MoveOutOfRange ( enemy.ent, combat.hideRange[1], combat.hideRange[0] );
@@ -1807,7 +1807,7 @@ bool idAI::UpdateTactical_r ( void ) {
 
 		// Move impossible?
 		if ( !result ) {
-			return UpdateTactical_r ( );
+			return UpdateTactical_r();
 		}
 
 		// Look to see if we are already there
@@ -1828,7 +1828,7 @@ bool idAI::UpdateTactical_r ( void ) {
 
 	// If we had any saved aas find we dont need it anymore
 	delete aasFind;
-	aasFind = NULL;
+	aasFind = nullptr;
 
 	// Set tactical update time to current time.  This time is used to delay tactical updates
 	// in a generic fashion.
@@ -1846,7 +1846,7 @@ bool idAI::UpdateTactical_r ( void ) {
  	combat.tacticalMaskUpdate	= 0;
 
 	// Start the legs and head in the idle position
-	if ( legsAnim.Disabled ( ) ) {
+	if ( legsAnim.Disabled() ) {
 		SetAnimState ( ANIMCHANNEL_LEGS, "Legs_Idle", 4 );
 	}
 	SetAnimState ( ANIMCHANNEL_TORSO, "Torso_Idle", 4 );
@@ -1861,12 +1861,12 @@ bool idAI::UpdateTactical_r ( void ) {
 
 /*
 ================
-idAI::FilterTactical
+anSAAI::FilterTactical
 
 Filters out tactical types from the given available list.
 ================
 */
-int idAI::FilterTactical ( int availableTactical ) {
+int anSAAI::FilterTactical ( int availableTactical ) {
 	// No passive if we are agressive
 	if ( enemy.ent || combat.fl.aware ) {
 		availableTactical &= ~(AITACTICAL_PASSIVE_BIT);
@@ -1882,7 +1882,7 @@ int idAI::FilterTactical ( int availableTactical ) {
 	if ( aifl.scripted ) {
 		availableTactical &= ~(AITACTICAL_MOVE_PLAYERPUSH_BIT);
 	} else {
-		if ( !pusher || !pusher->IsType ( idPlayer::GetClassType ( ) ) ) {
+		if ( !pusher || !pusher->IsType ( anBasePlayer::GetClassType() ) ) {
 			//no current pusher
 			if ( combat.tacticalCurrent == AITACTICAL_MOVE_PLAYERPUSH ) {
 				//in the middle of a push move, just continue it
@@ -1927,7 +1927,7 @@ int idAI::FilterTactical ( int availableTactical ) {
 	}
 
 	// No tether move if not tethered
-	if ( !IsTethered ( ) ) {
+	if ( !IsTethered() ) {
 		availableTactical &= ~(AITACTICAL_MOVE_TETHER_BIT);
 
 		// Filter out any tactical states that require a leader
@@ -1960,12 +1960,12 @@ int idAI::FilterTactical ( int availableTactical ) {
 	}
 
 	// Filter out all cover states if cover is disabled
-	if ( ai_disableCover.GetBool ( ) ) {
+	if ( ai_disableCover.GetBool() ) {
 		availableTactical &= ~(AITACTICAL_COVER_BITS);
 	}
 
 	//if we need to fight in melee then fight in melee!
-	if( IsMeleeNeeded( ) )	{
+	if ( IsMeleeNeeded( ) )	{
 		availableTactical &= ~(AITACTICAL_RANGED_BIT|AITACTICAL_COVER_FLANK_BIT|AITACTICAL_COVER_ADVANCE_BIT|AITACTICAL_COVER_RETREAT_BIT|AITACTICAL_COVER_AMBUSH_BIT|AITACTICAL_HIDE_BIT);
 	}
 
@@ -1974,14 +1974,14 @@ int idAI::FilterTactical ( int availableTactical ) {
 
 /*
 ================
-idAI::CheckTactical
+anSAAI::CheckTactical
 
 Returns 'AICHECKTACTICAL_MOVE' if we should use the given tactical state and execute a movement to do so
 Returns 'AICHECKTACTICAL_SKIP' if the given tactical state should be skipped
 Returns 'AICHECKTACTICAL_NOMOVE' if the given tactical state should be used but no movement is required
 ================
 */
-aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
+aiCTResult_t anSAAI::CheckTactical ( aiTactical_t tactical ) {
 	// Handle non movement tactical states first
 	if ( BIT(tactical) & AITACTICAL_NONMOVING_BITS ) {
 		// If we are moving
@@ -1992,10 +1992,10 @@ aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
 	}
 
 	// If we are tethered always check that first
-	if ( IsTethered ( ) ) {
+	if ( IsTethered() ) {
 		if ( !move.fl.moving || tactical != combat.tacticalCurrent ) {
 			// We stopped out of tether range so try a new move to get back in
-			if ( !tether->ValidateDestination ( this, physicsObj.GetOrigin ( ) ) ) {
+			if ( !tether->ValidateDestination ( this, physicsObj.GetOrigin() ) ) {
 				return AICTRESULT_OK;
 			}
 		} else {
@@ -2007,7 +2007,7 @@ aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
 	}
 
 	// Anything wrong with our current destination, if so pick a new move
-	if ( SkipCurrentDestination ( ) ) {
+	if ( SkipCurrentDestination() ) {
 		return AICTRESULT_OK;
 	}
 
@@ -2022,7 +2022,7 @@ aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
 				if ( DistanceTo ( leader ) < move.followRange[1] ) {
 					//unless the leader is on an elevator we should be standing on...
 					/*
-					idEntity* leaderGroundElevator = leader->GetGroundElevator();
+					anEntity* leaderGroundElevator = leader->GetGroundElevator();
 					if ( leaderGroundElevator && GetGroundElevator(leaderGroundElevator) != leaderGroundElevator ) {
 						return AICTRESULT_OK;
 					}
@@ -2042,7 +2042,7 @@ aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
 
 		case AITACTICAL_RANGED:
 			// Currently issuing a find
-			if ( dynamic_cast<rvAASFindGoalForAttack*>(aasFind) ) {
+			if ( dynamic_cast<anAASHolstileCoordnation*>(aasFind) ) {
 				return AICTRESULT_OK;
 			}
 
@@ -2051,7 +2051,7 @@ aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
 				return AICTRESULT_OK;
 			}
 			// If the enemy is visible then no movement is required for ranged combat
-			if ( !IsEnemyRecentlyVisible ( ) ) {
+			if ( !IsEnemyRecentlyVisible() ) {
 				return AICTRESULT_OK;
 			}
 			if ( !move.fl.moving ) {
@@ -2066,7 +2066,7 @@ aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
 				}
 			} else {
 				// Is our destination out of range?
-				if ( (move.moveDest - enemy.lastKnownPosition).LengthSqr ( ) > Square ( combat.attackRange[1] ) ) {
+				if ( (move.moveDest - enemy.lastKnownPosition).LengthSqr() > Square ( combat.attackRange[1] ) ) {
 					return AICTRESULT_OK;
 				}
 			}
@@ -2089,11 +2089,11 @@ aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
 			if ( !combat.tacticalUpdateTime ) {
 				return AICTRESULT_OK;
 			}
-			if ( enemy.ent && !IsEnemyRecentlyVisible ( ) ) {
+			if ( enemy.ent && !IsEnemyRecentlyVisible() ) {
 				return AICTRESULT_OK;
 			}
 			// No longer behind cover?
-			if ( !IsBehindCover ( ) ) {
+			if ( !IsBehindCover() ) {
 				return AICTRESULT_OK;
 			}
 		 	// Move if there have been too many close calls
@@ -2112,30 +2112,30 @@ aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
 
 /*
 ================
-idAI::WakeUpTargets
+anSAAI::WakeUpTargets
 ================
 */
-void idAI::WakeUpTargets ( void ) {
-	const idKeyValue* kv;
+void anSAAI::WakeUpTargets ( void ) {
+	const anKeyValue* kv;
 
 	for ( kv = spawnArgs.MatchPrefix ( "wakeup_target" ); kv; kv = spawnArgs.MatchPrefix ( "wakeup_target", kv ) ) {
-		idEntity* ent;
-		ent = gameLocal.FindEntity ( kv->GetValue ( ) );
+		anEntity* ent;
+		ent = gameLocal.FindEntity ( kv->GetValue() );
 		if ( !ent ) {
 			gameLocal.Warning ( "Unknown wakeup_target '%s' on entity '%s'", kv->GetValue().c_str(), GetName() );
 		} else {
 			ent->Signal( SIG_TRIGGER );
 			ent->PostEventMS( &EV_Activate, 0, this );
-			ent->TriggerGuis ( );
+			ent->TriggerGuis();
 		}
 	}
 
 	// Find all the tether entities we target
 	const char* target;
 	if ( spawnArgs.GetString ( "tether_target", "", &target ) && *target ) {
-		idEntity* ent;
+		anEntity* ent;
 		ent = gameLocal.FindEntity ( target );
-		if ( ent && ent->IsType ( rvAITether::GetClassType ( ) ) ) {
+		if ( ent && ent->IsType ( anSAAITether::GetClassType() ) ) {
 			ProcessEvent ( &EV_Activate, ent );
 		}
 	}
@@ -2151,13 +2151,13 @@ void idAI::WakeUpTargets ( void ) {
 
 /*
 ================
-idAI::State_Wait_Activated
+anSAAI::State_Wait_Activated
 
 Stop the state thread until the ai is activated
 ================
 */
-stateResult_t idAI::State_Wait_Activated ( const stateParms_t& parms ) {
-	if ( (aifl.activated || aifl.pain ) && CanBecomeSolid ( ) ) {
+stateResult_t anSAAI::State_Wait_Activated ( const stateParms_t& parms ) {
+	if ( (aifl.activated || aifl.pain ) && CanBecomeSolid() ) {
 		return SRESULT_DONE;
 	}
 	return SRESULT_WAIT;
@@ -2165,13 +2165,13 @@ stateResult_t idAI::State_Wait_Activated ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Wait_Action
+anSAAI::State_Wait_Action
 
 Stop the state thread as long as a torso action is running and allow a pain action to interrupt
 ================
 */
-stateResult_t idAI::State_Wait_Action ( const stateParms_t& parms ) {
-	if ( CheckPainActions ( ) ) {
+stateResult_t anSAAI::State_Wait_Action ( const stateParms_t& parms ) {
+	if ( CheckPainActions() ) {
 		// Our current action is being interrupted by pain so make sure the action can be performed
 		// immediately after coming out of the pain.
 		actionTime = actionSkipTime;
@@ -2186,12 +2186,12 @@ stateResult_t idAI::State_Wait_Action ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Wait_ActionNoPain
+anSAAI::State_Wait_ActionNoPain
 
 Stop the state thread as long as a torso action is running
 ================
 */
-stateResult_t idAI::State_Wait_ActionNoPain ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Wait_ActionNoPain ( const stateParms_t& parms ) {
 	if ( !aifl.action ) {
 		return SRESULT_DONE;
 	}
@@ -2200,12 +2200,12 @@ stateResult_t idAI::State_Wait_ActionNoPain ( const stateParms_t& parms ) {
 
 /*
 ================
-idAI::State_Wait_ScriptedDone
+anSAAI::State_Wait_ScriptedDone
 
 Stop the state thread as a scripted sequence is active
 ================
 */
-stateResult_t idAI::State_Wait_ScriptedDone ( const stateParms_t& parms ) {
+stateResult_t anSAAI::State_Wait_ScriptedDone ( const stateParms_t& parms ) {
 	if ( aifl.scripted ) {
 		return SRESULT_WAIT;
 	}

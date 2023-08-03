@@ -4,8 +4,8 @@
 #ifndef __ANIM_FRAMECOMMANDS_H__
 #define __ANIM_FRAMECOMMANDS_H__
 
-extern idCVar g_debugFrameCommands;
-extern idCVar g_debugFrameCommandsFilter;
+extern anCVar g_debugFrameCommands;
+extern anCVar g_debugFrameCommandsFilter;
 
 
 class sdAnimFrameCommand {
@@ -21,8 +21,8 @@ public:
 	static sdAnimFrameCommand*	Alloc( const char* typeName );
 
 	virtual const char*			GetTypeName( void ) const = 0;
-	virtual bool				Init( idParser& src ) = 0;
-	virtual void				Run( idClass* ent ) const = 0;
+	virtual bool				Init( anParser& src ) = 0;
+	virtual void				Run( anClass* ent ) const = 0;
 
 	void						IncRef( void ) { refCount++; }
 	void						DecRef( void ) { refCount--; if ( refCount == 0 ) { delete this; } }
@@ -40,46 +40,46 @@ private:
 class sdAnimFrameCommand_ScriptFunction : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_ScriptFunction( void ) { ; }
-								sdAnimFrameCommand_ScriptFunction( const arcNetString& _functionName ) : functionName( _functionName ) { ; }
+								sdAnimFrameCommand_ScriptFunction( const anString& _functionName ) : functionName( _functionName ) { ; }
 								~sdAnimFrameCommand_ScriptFunction( void ) { ; }
 
 	static const char*			TypeName( void ) { return "call"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 private:
-	arcNetString						functionName;
+	anString						functionName;
 };
 
 class sdAnimFrameCommand_ScriptObjectFunction : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_ScriptObjectFunction( void ) { ; }
-								sdAnimFrameCommand_ScriptObjectFunction( const arcNetString& _functionName ) : functionName( _functionName ) { ; }
+								sdAnimFrameCommand_ScriptObjectFunction( const anString& _functionName ) : functionName( _functionName ) { ; }
 								~sdAnimFrameCommand_ScriptObjectFunction( void ) { ; }
 
 	static const char*			TypeName( void ) { return "object_call"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 private:
-	arcNetString						functionName;
+	anString						functionName;
 };
 
 class sdAnimFrameCommand_Event : public sdAnimFrameCommand {
 public:
-								sdAnimFrameCommand_Event( void ) : ev( NULL ) { ; }
+								sdAnimFrameCommand_Event( void ) : ev( nullptr ) { ; }
 								sdAnimFrameCommand_Event( const arcEventDef* _ev ) : ev( _ev ) { ; }
 								~sdAnimFrameCommand_Event( void ) { ; }
 
 	static const char*			TypeName( void ) { return "event"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 private:
 	const arcEventDef*			ev;
@@ -89,17 +89,17 @@ private:
 class sdAnimFrameCommand_Sound : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_Sound( void ) { ; }
-								sdAnimFrameCommand_Sound( const arcNetString& _soundName, soundChannel_t _soundChannel ) : soundName( _soundName ), soundChannel( _soundChannel ) { ; }
+								sdAnimFrameCommand_Sound( const anString& _soundName, soundChannel_t _soundChannel ) : soundName( _soundName ), soundChannel( _soundChannel ) { ; }
 								~sdAnimFrameCommand_Sound( void ) { ; }
 
 	static const char*			TypeName( void ) { return "sound_channel"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 private:
-	arcNetString						soundName;
+	anString						soundName;
 	soundChannel_t				soundChannel;
 };
 
@@ -112,8 +112,8 @@ public:
 	static const char*			TypeName( void ) { return "fade_channel"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 private:
 	float						to;
@@ -125,35 +125,35 @@ private:
 
 class sdAnimFrameCommand_Skin : public sdAnimFrameCommand {
 public:
-								sdAnimFrameCommand_Skin( void ) : skin( NULL ) { ; }
-								sdAnimFrameCommand_Skin( const arcDeclSkin* _skin ) : skin( _skin ){ ; }
+								sdAnimFrameCommand_Skin( void ) : skin( nullptr ) { ; }
+								sdAnimFrameCommand_Skin( const anDeclSkin* _skin ) : skin( _skin ){ ; }
 								~sdAnimFrameCommand_Skin( void ) { ; }
 
 	static const char*			TypeName( void ) { return "skin"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 private:
-	const arcDeclSkin*			skin;
+	const anDeclSkin*			skin;
 };
 
 class sdAnimFrameCommand_Effect : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_Effect( void ) { ; }
-								sdAnimFrameCommand_Effect( const arcNetString& _effectName, const arcNetString& _jointName ) : effectName( _effectName ), jointName( _jointName ) { ; }
+								sdAnimFrameCommand_Effect( const anString& _effectName, const anString& _jointName ) : effectName( _effectName ), jointName( _jointName ) { ; }
 								~sdAnimFrameCommand_Effect( void ) { ; }
 
 	static const char*			TypeName( void ) { return "effect"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 private:
-	arcNetString						effectName;
-	arcNetString						jointName;
+	anString						effectName;
+	anString						jointName;
 };
 
 class sdAnimFrameCommand_FootStep : public sdAnimFrameCommand {
@@ -164,43 +164,43 @@ public:
 	static const char*			TypeName( void ) { return "footstep"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 	bool						rightFoot;
-	arcNetString						prefix;
+	anString						prefix;
 };
 
 class sdAnimFrameCommand_DemoScript : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_DemoScript( void ) { ; }
-								sdAnimFrameCommand_DemoScript( const arcNetString& _command ) : command( _command ) { ; }
+								sdAnimFrameCommand_DemoScript( const anString& _command ) : command( _command ) { ; }
 								~sdAnimFrameCommand_DemoScript( void ) { ; }
 
 	static const char*			TypeName( void ) { return "demoScriptEvent"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 private:
-	arcNetString						command;
+	anString						command;
 };
 
 class sdAnimFrameCommand_WeaponState : public sdAnimFrameCommand {
 public:
 	sdAnimFrameCommand_WeaponState( void ) { ; }
-	sdAnimFrameCommand_WeaponState( const arcNetString& _command ) : command( _command ) { ; }
+	sdAnimFrameCommand_WeaponState( const anString& _command ) : command( _command ) { ; }
 	~sdAnimFrameCommand_WeaponState( void ) { ; }
 
 	static const char*			TypeName( void ) { return "weaponState"; }
 	virtual const char*			GetTypeName( void ) const { return TypeName(); }
 
-	virtual bool				Init( idParser& src );
-	virtual void				Run( idClass* ent ) const;
+	virtual bool				Init( anParser& src );
+	virtual void				Run( anClass* ent ) const;
 
 private:
-	arcNetString						command;
+	anString						command;
 };
 
 #endif // __ANIM_FRAMECOMMANDS_H__

@@ -1,22 +1,22 @@
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 //===============================================================
 //
-//	arcWinding
+//	anWinding
 //
 //===============================================================
 
 /*
 =============
-arcWinding::ReAllocate
+anWinding::ReAllocate
 =============
 */
-bool arcWinding::ReAllocate( int n, bool keep ) {
-	arcVec5 *oldP = p;
+bool anWinding::ReAllocate( int n, bool keep ) {
+	anVec5 *oldP = p;
 	n = ( n + 3 ) & ~3;	// align up to multiple of four
-	p = new arcVec5[n];
+	p = new anVec5[n];
 	if ( oldP ) {
 		if ( keep ) {
 			memcpy( p, oldP, numPoints * sizeof( p[0] ) );
@@ -30,11 +30,11 @@ bool arcWinding::ReAllocate( int n, bool keep ) {
 
 /*
 =============
-arcWinding::BaseForPlane
+anWinding::BaseForPlane
 =============
 */
-void arcWinding::BaseForPlane( const arcVec3 &normal, const float dist ) {
-	arcVec3 org, vright, vup;
+void anWinding::BaseForPlane( const anVec3 &normal, const float dist ) {
+	anVec3 org, vright, vup;
 
 	org = normal * dist;
 
@@ -56,24 +56,24 @@ void arcWinding::BaseForPlane( const arcVec3 &normal, const float dist ) {
 
 /*
 =============
-arcWinding::Split
+anWinding::Split
 =============
 */
-int arcWinding::Split( const arcPlane &plane, const float epsilon, arcWinding **front, arcWinding **back ) const {
+int anWinding::Split( const anPlane &plane, const float epsilon, anWinding **front, anWinding **back ) const {
 	float *			dists;
 	byte *			sides;
 	int				counts[3];
 	float			dot;
 	int				i, j;
-	const arcVec5 *	p1, *p2;
-	arcVec5			mid;
-	arcWinding *		f, *b;
+	const anVec5 *	p1, *p2;
+	anVec5			mid;
+	anWinding *		f, *b;
 	int				( maxPts );
 
 	assert( this );
 
 	dists = (float *) _alloca( ( numPoints + 4 ) * sizeof( float ) );
-	sides = ( byte * ) _alloca( ( numPoints + 4 ) * sizeof( byte ) );
+	sides = (byte *) _alloca( ( numPoints + 4 ) * sizeof( byte ) );
 
 	counts[0] = counts[1] = counts[2] = 0;
 
@@ -92,11 +92,11 @@ int arcWinding::Split( const arcPlane &plane, const float epsilon, arcWinding **
 	sides[i] = sides[0];
 	dists[i] = dists[0];
 
-	*front = *back = NULL;
+	*front = *back = nullptr;
 
 	// if coplanar, put on the front side if the normals match
 	if ( !counts[SIDE_FRONT] && !counts[SIDE_BACK] ) {
-		arcPlane windingPlane;
+		anPlane windingPlane;
 		GetPlane( windingPlane );
 		if ( windingPlane.Normal() * plane.Normal() > 0.0f ) {
 			*front = Copy();
@@ -120,8 +120,8 @@ int arcWinding::Split( const arcPlane &plane, const float epsilon, arcWinding **
 
 	( maxPts ) = numPoints+4;	// cant use counts[0]+2 because of fp grouping errors
 
-	*front = f = new arcWinding( ( maxPts ) );
-	*back = b = new arcWinding( ( maxPts ) );
+	*front = f = new anWinding( ( maxPts ) );
+	*back = b = new anWinding( ( maxPts ) );
 
 	for ( i = 0; i < numPoints; i++ ) {
 		p1 = &p[i];
@@ -189,7 +189,7 @@ int arcWinding::Split( const arcPlane &plane, const float epsilon, arcWinding **
 	}
 
 	if ( f->numPoints > ( maxPts ) || b->numPoints > ( maxPts ) ) {
-		arcLibrary::common->FatalError( "arcWinding::Split: points exceeded estimate." );
+		anLibrary::common->FatalError( "anWinding::Split: points exceeded estimate." );
 	}
 
 	return SIDE_CROSS;
@@ -197,25 +197,25 @@ int arcWinding::Split( const arcPlane &plane, const float epsilon, arcWinding **
 
 /*
 =============
-arcWinding::Clip
+anWinding::Clip
 =============
 */
-arcWinding *arcWinding::Clip( const arcPlane &plane, const float epsilon, const bool keepOn ) {
+anWinding *anWinding::Clip( const anPlane &plane, const float epsilon, const bool keepOn ) {
 	float *		dists;
 	byte *		sides;
-	arcVec5 *	newPoints;
+	anVec5 *	newPoints;
 	int			newNumPoints;
 	int			counts[3];
 	float		dot;
 	int			i, j;
-	arcVec5 *	p1, *p2;
-	arcVec5		mid;
+	anVec5 *	p1, *p2;
+	anVec5		mid;
 	int			( maxPts );
 
 	assert( this );
 
 	dists = (float *) _alloca( ( numPoints + 4 ) * sizeof( float ) );
-	sides = ( byte * ) _alloca( ( numPoints + 4 ) * sizeof( byte ) );
+	sides = (byte *) _alloca( ( numPoints + 4 ) * sizeof( byte ) );
 
 	counts[SIDE_FRONT] = counts[SIDE_BACK] = counts[SIDE_ON] = 0;
 
@@ -241,7 +241,7 @@ arcWinding *arcWinding::Clip( const arcPlane &plane, const float epsilon, const 
 	// if nothing at the front of the clipping plane
 	if ( !counts[SIDE_FRONT] ) {
 		delete this;
-		return NULL;
+		return nullptr;
 	}
 	// if nothing at the back of the clipping plane
 	if ( !counts[SIDE_BACK] ) {
@@ -250,7 +250,7 @@ arcWinding *arcWinding::Clip( const arcPlane &plane, const float epsilon, const 
 
 	( maxPts ) = numPoints + 4;		// cant use counts[0]+2 because of fp grouping errors
 
-	newPoints = (arcVec5 *) _alloca16( ( maxPts ) * sizeof( arcVec5 ) );
+	newPoints = (anVec5 *) _alloca16( ( maxPts ) * sizeof( anVec5 ) );
 	newNumPoints = 0;
 
 	for ( i = 0; i < numPoints; i++ ) {
@@ -304,32 +304,32 @@ arcWinding *arcWinding::Clip( const arcPlane &plane, const float epsilon, const 
 	}
 
 	numPoints = newNumPoints;
-	memcpy( p, newPoints, newNumPoints * sizeof(arcVec5) );
+	memcpy( p, newPoints, newNumPoints * sizeof(anVec5) );
 
 	return this;
 }
 
 /*
 =============
-arcWinding::ClipInPlace
+anWinding::ClipInPlace
 =============
 */
-bool arcWinding::ClipInPlace( const arcPlane &plane, const float epsilon, const bool keepOn ) {
+bool anWinding::ClipInPlace( const anPlane &plane, const float epsilon, const bool keepOn ) {
 	float*		dists;
 	byte *		sides;
-	arcVec5 *	newPoints;
+	anVec5 *	newPoints;
 	int			newNumPoints;
 	int			counts[3];
 	float		dot;
 	int			i, j;
-	arcVec5 *	p1, *p2;
-	arcVec5		mid;
+	anVec5 *	p1, *p2;
+	anVec5		mid;
 	int			( maxPts );
 
 	assert( this );
 
 	dists = (float *) _alloca( ( numPoints + 4 ) * sizeof( float ) );
-	sides = ( byte * ) _alloca( ( numPoints + 4 ) * sizeof( byte ) );
+	sides = (byte *) _alloca( ( numPoints + 4 ) * sizeof( byte ) );
 
 	counts[SIDE_FRONT] = counts[SIDE_BACK] = counts[SIDE_ON] = 0;
 
@@ -364,7 +364,7 @@ bool arcWinding::ClipInPlace( const arcPlane &plane, const float epsilon, const 
 
 	( maxPts ) = numPoints + 4;		// cant use counts[0]+2 because of fp grouping errors
 
-	newPoints = (arcVec5 *) _alloca16( ( maxPts ) * sizeof( arcVec5 ) );
+	newPoints = (anVec5 *) _alloca16( ( maxPts ) * sizeof( anVec5 ) );
 	newNumPoints = 0;
 
 	for ( i = 0; i < numPoints; i++ ) {
@@ -417,18 +417,18 @@ bool arcWinding::ClipInPlace( const arcPlane &plane, const float epsilon, const 
 	}
 
 	numPoints = newNumPoints;
-	memcpy( p, newPoints, newNumPoints * sizeof(arcVec5) );
+	memcpy( p, newPoints, newNumPoints * sizeof(anVec5) );
 
 	return true;
 }
 
 /*
 =============
-arcWinding::Copy
+anWinding::Copy
 =============
 */
-arcWinding *arcWinding::Copy( void ) const {
-	arcWinding *w = new arcWinding( numPoints );
+anWinding *anWinding::Copy( void ) const {
+	anWinding *w = new anWinding( numPoints );
 	w->numPoints = numPoints;
 	memcpy( w->p, p, numPoints * sizeof( p[0] ) );
 	return w;
@@ -436,11 +436,11 @@ arcWinding *arcWinding::Copy( void ) const {
 
 /*
 =============
-arcWinding::Reverse
+anWinding::Reverse
 =============
 */
-arcWinding *arcWinding::Reverse( void ) const {
-	arcWinding *w = new arcWinding( numPoints );
+anWinding *anWinding::Reverse( void ) const {
+	anWinding *w = new anWinding( numPoints );
 	w->numPoints = numPoints;
 	for ( int i = 0; i < numPoints; i++ ) {
 		w->p[ numPoints - i - 1 ] = p[i];
@@ -450,12 +450,12 @@ arcWinding *arcWinding::Reverse( void ) const {
 
 /*
 =============
-arcWinding::ReverseSelf
+anWinding::ReverseSelf
 =============
 */
-void arcWinding::ReverseSelf( void ) {
+void anWinding::ReverseSelf( void ) {
 	for ( int i = 0; i < (numPoints>>1 ); i++ ) {
-		arcVec5 v = p[i];
+		anVec5 v = p[i];
 		p[i] = p[numPoints - i - 1];
 		p[numPoints - i - 1] = v;
 	}
@@ -463,15 +463,15 @@ void arcWinding::ReverseSelf( void ) {
 
 /*
 =============
-arcWinding::Check
+anWinding::Check
 =============
 */
-bool arcWinding::Check( bool print ) const {
-	arcPlane plane;
+bool anWinding::Check( bool print ) const {
+	anPlane plane;
 
 	if ( numPoints < 3 ) {
 		if ( print ) {
-			arcLibrary::common->Printf( "arcWinding::Check: only %i points.", numPoints );
+			anLibrary::common->Printf( "anWinding::Check: only %i points.", numPoints );
 		}
 		return false;
 	}
@@ -479,7 +479,7 @@ bool arcWinding::Check( bool print ) const {
 	float area = GetArea();
 	if ( area < 1.0f ) {
 		if ( print ) {
-			arcLibrary::common->Printf( "arcWinding::Check: tiny area: %f", area );
+			anLibrary::common->Printf( "anWinding::Check: tiny area: %f", area );
 		}
 		return false;
 	}
@@ -487,12 +487,12 @@ bool arcWinding::Check( bool print ) const {
 	GetPlane( plane );
 
 	for ( int i = 0; i < numPoints; i++ ) {
-		const arcVec3 &p1 = p[i].ToVec3();
+		const anVec3 &p1 = p[i].ToVec3();
 		// check if the winding is huge
 		for ( int j = 0; j < 3; j++ ) {
 			if ( p1[j] >= MAX_WORLD_COORD || p1[j] <= MIN_WORLD_COORD ) {
 				if ( print ) {
-					arcLibrary::common->Printf( "arcWinding::Check: point %d outside world %c-axis: %f", i, 'X'+j, p1[j] );
+					anLibrary::common->Printf( "anWinding::Check: point %d outside world %c-axis: %f", i, 'X'+j, p1[j] );
 				}
 				return false;
 			}
@@ -504,24 +504,24 @@ bool arcWinding::Check( bool print ) const {
 		float d = p1 * plane.Normal() + plane[3];
 		if ( d < -ON_EPSILON || d > ON_EPSILON ) {
 			if ( print ) {
-				arcLibrary::common->Printf( "arcWinding::Check: point %d off plane.", i );
+				anLibrary::common->Printf( "anWinding::Check: point %d off plane.", i );
 			}
 			return false;
 		}
 
 		// check if the edge isn't degenerate
-		const arcVec3 &p2 = p[j].ToVec3();
-		arcVec3 dir = p2 - p1;
+		const anVec3 &p2 = p[j].ToVec3();
+		anVec3 dir = p2 - p1;
 
 		if ( dir.Length() < ON_EPSILON) {
 			if ( print ) {
-				arcLibrary::common->Printf( "arcWinding::Check: edge %d is degenerate.", i );
+				anLibrary::common->Printf( "anWinding::Check: edge %d is degenerate.", i );
 			}
 			return false;
 		}
 
 		// check if the winding is convex
-		arcVec3 edgenormal = plane.Normal().Cross( dir );
+		anVec3 edgenormal = plane.Normal().Cross( dir );
 		edgenormal.Normalize();
 		float edgedist = p1 * edgenormal;
 		edgedist += ON_EPSILON;
@@ -534,7 +534,7 @@ bool arcWinding::Check( bool print ) const {
 			float d = p[j].ToVec3() * edgenormal;
 			if ( d > edgedist ) {
 				if ( print ) {
-					arcLibrary::common->Printf( "arcWinding::Check: non-convex." );
+					anLibrary::common->Printf( "anWinding::Check: non-convex." );
 				}
 				return false;
 			}
@@ -545,15 +545,15 @@ bool arcWinding::Check( bool print ) const {
 
 /*
 =============
-arcWinding::GetArea
+anWinding::GetArea
 =============
 */
-float arcWinding::GetArea( void ) const {
+float anWinding::GetArea( void ) const {
 	float total = 0.0f;
 	for ( int  i = 2; i < numPoints; i++ ) {
-		arcVec3 d1 = p[i-1].ToVec3() - p[0].ToVec3();
-		arcVec3 d2 = p[i].ToVec3() - p[0].ToVec3();
-		arcVec3 cross = d1.Cross( d2 );
+		anVec3 d1 = p[i-1].ToVec3() - p[0].ToVec3();
+		anVec3 d2 = p[i].ToVec3() - p[0].ToVec3();
+		anVec3 cross = d1.Cross( d2 );
 		total += cross.Length();
 	}
 	return total * 0.5f;
@@ -561,28 +561,28 @@ float arcWinding::GetArea( void ) const {
 
 /*
 =============
-arcWinding::GetRadius
+anWinding::GetRadius
 =============
 */
-float arcWinding::GetRadius( const arcVec3 &center ) const {
+float anWinding::GetRadius( const anVec3 &center ) const {
 	float radius = 0.0f;
 	for ( int i = 0; i < numPoints; i++ ) {
-		arcVec3 dir = p[i].ToVec3() - center;
+		anVec3 dir = p[i].ToVec3() - center;
 		float r = dir * dir;
 		if ( r > radius ) {
 			float radius = r;
 		}
 	}
-	return arcMath::Sqrt( radius );
+	return anMath::Sqrt( radius );
 }
 
 /*
 =============
-arcWinding::GetCenter
+anWinding::GetCenter
 =============
 */
-arcVec3 arcWinding::GetCenter( void ) const {
-	arcVec3 center.Zero();
+anVec3 anWinding::GetCenter( void ) const {
+	anVec3 center.Zero();
 	for ( int i = 0; i < numPoints; i++ ) {
 		center += p[i].ToVec3();
 	}
@@ -592,19 +592,19 @@ arcVec3 arcWinding::GetCenter( void ) const {
 
 /*
 =============
-arcWinding::GetPlane
+anWinding::GetPlane
 =============
 */
-void arcWinding::GetPlane( arcVec3 &normal, float &dist ) const {
+void anWinding::GetPlane( anVec3 &normal, float &dist ) const {
 	if ( numPoints < 3 ) {
 		normal.Zero();
 		dist = 0.0f;
 		return;
 	}
 
-	arcVec3 center = GetCenter();
-	arcVec3 v1 = p[0].ToVec3() - center;
-	arcVec3 v2 = p[1].ToVec3() - center;
+	anVec3 center = GetCenter();
+	anVec3 v1 = p[0].ToVec3() - center;
+	anVec3 v2 = p[1].ToVec3() - center;
 	normal = v2.Cross( v1 );
 	normal.Normalize();
 	dist = p[0].ToVec3() * normal;
@@ -612,18 +612,18 @@ void arcWinding::GetPlane( arcVec3 &normal, float &dist ) const {
 
 /*
 =============
-arcWinding::GetPlane
+anWinding::GetPlane
 =============
 */
-void arcWinding::GetPlane( arcPlane &plane ) const {
+void anWinding::GetPlane( anPlane &plane ) const {
 	if ( numPoints < 3 ) {
 		plane.Zero();
 		return;
 	}
 
-	arcVec3 center = GetCenter();
-	arcVec3 v1 = p[0].ToVec3() - center;
-	arcVec3 v2 = p[1].ToVec3() - center;
+	anVec3 center = GetCenter();
+	anVec3 v1 = p[0].ToVec3() - center;
+	anVec3 v2 = p[1].ToVec3() - center;
 	plane.SetNormal( v2.Cross( v1 ) );
 	plane.Normalize();
 	plane.FitThroughPoint( p[0].ToVec3() );
@@ -631,10 +631,10 @@ void arcWinding::GetPlane( arcPlane &plane ) const {
 
 /*
 =============
-arcWinding::GetBounds
+anWinding::GetBounds
 =============
 */
-void arcWinding::GetBounds( arcBounds &bounds ) const {
+void anWinding::GetBounds( anBounds &bounds ) const {
 	if ( !numPoints ) {
 		bounds.Clear();
 		return;
@@ -662,10 +662,10 @@ void arcWinding::GetBounds( arcBounds &bounds ) const {
 
 /*
 =============
-arcWinding::RemoveEqualPoints
+anWinding::RemoveEqualPoints
 =============
 */
-void arcWinding::RemoveEqualPoints( const float epsilon ) {
+void anWinding::RemoveEqualPoints( const float epsilon ) {
 	for ( int  i = 0; i < numPoints; i++ ) {
 		if ( ( p[i].ToVec3() - p[( i+numPoints-1 )%numPoints].ToVec3() ).LengthSqr() >= Square( epsilon ) ) {
 			continue;
@@ -680,20 +680,20 @@ void arcWinding::RemoveEqualPoints( const float epsilon ) {
 
 /*
 =============
-arcWinding::RemoveColinearPoints
+anWinding::RemoveColinearPoints
 =============
 */
-void arcWinding::RemoveColinearPoints( const arcVec3 &normal, const float epsilon ) {
+void anWinding::RemoveColinearPoints( const anVec3 &normal, const float epsilon ) {
 	if ( numPoints <= 3 ) {
 		return;
 	}
 
 	for ( int i = 0; i < numPoints; i++ ) {
 		// create plane through edge orthogonal to winding plane
-		arcVec3 edgeNormal = (p[i].ToVec3() - p[( i+numPoints-1 )%numPoints].ToVec3() ).Cross( normal );
+		anVec3 edgeNormal = (p[i].ToVec3() - p[( i+numPoints-1 )%numPoints].ToVec3() ).Cross( normal );
 		edgeNormal.Normalize();
 		float dist = edgeNormal * p[i].ToVec3();
-		if ( arcMath::Fabs( edgeNormal * p[( i+1 )%numPoints].ToVec3() - dist ) > epsilon ) {
+		if ( anMath::Fabs( edgeNormal * p[( i+1 )%numPoints].ToVec3() - dist ) > epsilon ) {
 			continue;
 		}
 
@@ -707,22 +707,22 @@ void arcWinding::RemoveColinearPoints( const arcVec3 &normal, const float epsilo
 
 /*
 =============
-arcWinding::AddToConvexHull
+anWinding::AddToConvexHull
 
   Adds the given winding to the convex hull.
   Assumes the current winding already is a convex hull with three or more points.
 =============
 */
-void arcWinding::AddToConvexHull( const arcWinding *winding, const arcVec3 &normal, const float epsilon ) {
+void anWinding::AddToConvexHull( const anWinding *winding, const anVec3 &normal, const float epsilon ) {
 	int				i, j, k;
-	arcVec3			dir;
+	anVec3			dir;
 	float			d;
 	int				maxPts;
-	arcVec3 *		hullDirs;
+	anVec3 *		hullDirs;
 	bool *			hullSide;
 	bool			outside;
 	int				numNewHullPoints;
-	arcVec5 *		newHullPoints;
+	anVec5 *		newHullPoints;
 
 	if ( !winding ) {
 		return;
@@ -734,12 +734,12 @@ void arcWinding::AddToConvexHull( const arcWinding *winding, const arcVec3 &norm
 		return;
 	}
 
-	newHullPoints = (arcVec5 *) _alloca( maxPts * sizeof( arcVec5 ) );
-	hullDirs = (arcVec3 *) _alloca( maxPts * sizeof( arcVec3 ) );
+	newHullPoints = (anVec5 *) _alloca( maxPts * sizeof( anVec5 ) );
+	hullDirs = (anVec3 *) _alloca( maxPts * sizeof( anVec3 ) );
 	hullSide = (bool *) _alloca( maxPts * sizeof( bool ) );
 
 	for ( i = 0; i < winding->numPoints; i++ ) {
-		const arcVec5 &p1 = winding->p[i];
+		const anVec5 &p1 = winding->p[i];
 
 		// calculate hull edge vectors
 		for ( j = 0; j < this->numPoints; j++ ) {
@@ -793,28 +793,28 @@ void arcWinding::AddToConvexHull( const arcWinding *winding, const arcVec3 &norm
 		}
 
 		this->numPoints = numNewHullPoints;
-		memcpy( this->p, newHullPoints, numNewHullPoints * sizeof(arcVec5) );
+		memcpy( this->p, newHullPoints, numNewHullPoints * sizeof(anVec5) );
 	}
 }
 
 /*
 =============
-arcWinding::AddToConvexHull
+anWinding::AddToConvexHull
 
   Add a point to the convex hull.
   The current winding must be convex but may be degenerate and can have less than three points.
 =============
 */
-void arcWinding::AddToConvexHull( const arcVec3 &point, const arcVec3 &normal, const float epsilon ) {
+void anWinding::AddToConvexHull( const anVec3 &point, const anVec3 &normal, const float epsilon ) {
 	int				j, k, numHullPoints;
-	arcVec3			dir;
+	anVec3			dir;
 	float			d;
-	arcVec3 *		hullDirs;
+	anVec3 *		hullDirs;
 	bool *			hullSide;
-	arcVec5 *		hullPoints;
+	anVec5 *		hullPoints;
 	bool			outside;
 
-	switch( numPoints ) {
+	switch ( numPoints ) {
 		case 0: {
 			p[0] = point;
 			numPoints++;
@@ -852,7 +852,7 @@ void arcWinding::AddToConvexHull( const arcVec3 &point, const arcVec3 &normal, c
 		}
 	}
 
-	hullDirs = (arcVec3 *) _alloca( numPoints * sizeof( arcVec3 ) );
+	hullDirs = (anVec3 *) _alloca( numPoints * sizeof( anVec3 ) );
 	hullSide = (bool *) _alloca( numPoints * sizeof( bool ) );
 
 	// calculate hull edge vectors
@@ -891,7 +891,7 @@ void arcWinding::AddToConvexHull( const arcVec3 &point, const arcVec3 &normal, c
 		return;
 	}
 
-	hullPoints = (arcVec5 *) _alloca( (numPoints+1 ) * sizeof( arcVec5 ) );
+	hullPoints = (anVec5 *) _alloca( (numPoints+1 ) * sizeof( anVec5 ) );
 
 	// insert the point here
 	hullPoints[0] = point;
@@ -911,31 +911,31 @@ void arcWinding::AddToConvexHull( const arcVec3 &point, const arcVec3 &normal, c
 		return;
 	}
 	numPoints = numHullPoints;
-	memcpy( p, hullPoints, numHullPoints * sizeof(arcVec5) );
+	memcpy( p, hullPoints, numHullPoints * sizeof(anVec5) );
 }
 
 /*
 =============
-arcWinding::TryMerge
+anWinding::TryMerge
 =============
 */
 #define	CONTINUOUS_EPSILON	0.005f
 
-arcWinding *arcWinding::TryMerge( const arcWinding &w, const arcVec3 &planenormal, int keep ) const {
-	arcVec3			*p1, *p2, *p3, *p4, *back;
-	arcWinding		*newf;
-	const arcWinding	*f1, *f2;
+anWinding *anWinding::TryMerge( const anWinding &w, const anVec3 &planenormal, int keep ) const {
+	anVec3			*p1, *p2, *p3, *p4, *back;
+	anWinding		*newf;
+	const anWinding	*f1, *f2;
 	int				i, j, k, l;
-	arcVec3			normal, delta;
+	anVec3			normal, delta;
 	float			dot;
 	bool			keep1, keep2;
 
 	f1 = this;
 	f2 = &w;
 	//
-	// find a arcLibrary::common edge
+	// find a anLibrary::common edge
 	//
-	p1 = p2 = NULL;	// stop compiler warning
+	p1 = p2 = nullptr;	// stop compiler warning
 	j = 0;
 
 	for ( i = 0; i < f1->numPoints; i++ ) {
@@ -945,10 +945,10 @@ arcWinding *arcWinding::TryMerge( const arcWinding &w, const arcVec3 &planenorma
 			p3 = &f2->p[j].ToVec3();
 			p4 = &f2->p[(j+1 ) % f2->numPoints].ToVec3();
 			for (k = 0; k < 3; k++ ) {
-				if ( arcMath::Fabs( ( *p1 )[k] - (*p4)[k] ) > 0.1f ) {
+				if ( anMath::Fabs( ( *p1 )[k] - (*p4)[k] ) > 0.1f ) {
 					break;
 				}
-				if ( arcMath::Fabs( ( *p2 )[k] - (*p3)[k] ) > 0.1f ) {
+				if ( anMath::Fabs( ( *p2 )[k] - (*p3)[k] ) > 0.1f ) {
 					break;
 				}
 			}
@@ -962,7 +962,7 @@ arcWinding *arcWinding::TryMerge( const arcWinding &w, const arcVec3 &planenorma
 	}
 
 	if ( i == f1->numPoints ) {
-		return NULL;			// no matching edges
+		return nullptr;			// no matching edges
 	}
 
 	//
@@ -978,7 +978,7 @@ arcWinding *arcWinding::TryMerge( const arcWinding &w, const arcVec3 &planenorma
 	delta = (*back) - ( *p1 );
 	dot = delta * normal;
 	if ( dot > CONTINUOUS_EPSILON ) {
-		return NULL;			// not a convex polygon
+		return nullptr;			// not a convex polygon
 	}
 
 	keep1 = (bool)(dot < -CONTINUOUS_EPSILON);
@@ -992,7 +992,7 @@ arcWinding *arcWinding::TryMerge( const arcWinding &w, const arcVec3 &planenorma
 	delta = (*back) - ( *p2 );
 	dot = delta * normal;
 	if ( dot > CONTINUOUS_EPSILON ) {
-		return NULL;			// not a convex polygon
+		return nullptr;			// not a convex polygon
 	}
 
 	keep2 = (bool)(dot < -CONTINUOUS_EPSILON);
@@ -1000,7 +1000,7 @@ arcWinding *arcWinding::TryMerge( const arcWinding &w, const arcVec3 &planenorma
 	//
 	// build the new polygon
 	//
-	newf = new arcWinding( f1->numPoints + f2->numPoints );
+	newf = new anWinding( f1->numPoints + f2->numPoints );
 
 	// copy first polygon
 	for ( k = ( i+1 ) % f1->numPoints; k != i; k = (k+1 ) % f1->numPoints ) {
@@ -1026,12 +1026,12 @@ arcWinding *arcWinding::TryMerge( const arcWinding &w, const arcVec3 &planenorma
 
 /*
 =============
-arcWinding::RemovePoint
+anWinding::RemovePoint
 =============
 */
-void arcWinding::RemovePoint( int point ) {
+void anWinding::RemovePoint( int point ) {
 	if ( point < 0 || point >= numPoints ) {
-		arcLibrary::common->FatalError( "arcWinding::removePoint: point out of range" );
+		anLibrary::common->FatalError( "anWinding::removePoint: point out of range" );
 	}
 	if ( point < numPoints - 1 ) {
 		memmove( &p[point], &p[point+1], ( numPoints - point - 1 ) * sizeof( p[0] ) );
@@ -1041,16 +1041,16 @@ void arcWinding::RemovePoint( int point ) {
 
 /*
 =============
-arcWinding::InsertPoint
+anWinding::InsertPoint
 =============
 */
-void arcWinding::InsertPoint( const arcVec3 &point, int spot ) {
+void anWinding::InsertPoint( const anVec3 &point, int spot ) {
 	if ( spot > numPoints ) {
-		arcLibrary::common->FatalError( "arcWinding::insertPoint: spot > numPoints" );
+		anLibrary::common->FatalError( "anWinding::insertPoint: spot > numPoints" );
 	}
 
 	if ( spot < 0 ) {
-		arcLibrary::common->FatalError( "arcWinding::insertPoint: spot < 0" );
+		anLibrary::common->FatalError( "anWinding::insertPoint: spot < 0" );
 	}
 
 	EnsureAlloced( numPoints+1, true );
@@ -1063,29 +1063,29 @@ void arcWinding::InsertPoint( const arcVec3 &point, int spot ) {
 
 /*
 =============
-arcWinding::InsertPointIfOnEdge
+anWinding::InsertPointIfOnEdge
 =============
 */
-bool arcWinding::InsertPointIfOnEdge( const arcVec3 &point, const arcPlane &plane, const float epsilon ) {
+bool anWinding::InsertPointIfOnEdge( const anVec3 &point, const anPlane &plane, const float epsilon ) {
 	float dist, dot;
-	arcVec3 normal;
+	anVec3 normal;
 
 	// point may not be too far from the winding plane
-	if ( arcMath::Fabs( plane.Distance( point ) ) > epsilon ) {
+	if ( anMath::Fabs( plane.Distance( point ) ) > epsilon ) {
 		return false;
 	}
 
 	for ( int i = 0; i < numPoints; i++ ) {
 		// create plane through edge orthogonal to winding plane
-		arcVec3 normal = (p[( i+1 )%numPoints].ToVec3() - p[i].ToVec3() ).Cross( plane.Normal() );
+		anVec3 normal = (p[( i+1 )%numPoints].ToVec3() - p[i].ToVec3() ).Cross( plane.Normal() );
 		normal.Normalize();
 		float dist = normal * p[i].ToVec3();
 
-		if ( arcMath::Fabs( normal * point - dist ) > epsilon ) {
+		if ( anMath::Fabs( normal * point - dist ) > epsilon ) {
 			continue;
 		}
 
-		arcVec3 normal = plane.Normal().Cross( normal );
+		anVec3 normal = plane.Normal().Cross( normal );
 		float dot = normal * point;
 
 		float dist = dot - normal * p[i].ToVec3();
@@ -1116,15 +1116,15 @@ bool arcWinding::InsertPointIfOnEdge( const arcVec3 &point, const arcPlane &plan
 
 /*
 =============
-arcWinding::IsTiny
+anWinding::IsTiny
 =============
 */
 #define	EDGE_LENGTH		0.2f
 
-bool arcWinding::IsTiny( void ) const {
+bool anWinding::IsTiny( void ) const {
 	int edges = 0;
 	for ( int i = 0; i < numPoints; i++ ) {
-		arcVec3 delta = p[( i+1 )%numPoints].ToVec3() - p[i].ToVec3();
+		anVec3 delta = p[( i+1 )%numPoints].ToVec3() - p[i].ToVec3();
 		float len = delta.Length();
 		if ( len > EDGE_LENGTH ) {
 			if ( ++edges == 3 ) {
@@ -1137,10 +1137,10 @@ bool arcWinding::IsTiny( void ) const {
 
 /*
 =============
-arcWinding::IsHuge
+anWinding::IsHuge
 =============
 */
-bool arcWinding::IsHuge( void ) const {
+bool anWinding::IsHuge( void ) const {
 	for ( int i = 0; i < numPoints; i++ ) {
 		for ( int j = 0; j < 3; j++ ) {
 			if ( p[i][j] <= MIN_WORLD_COORD || p[i][j] >= MAX_WORLD_COORD ) {
@@ -1153,25 +1153,25 @@ bool arcWinding::IsHuge( void ) const {
 
 /*
 =============
-arcWinding::Print
+anWinding::Print
 =============
 */
-void arcWinding::Print( void ) const {
+void anWinding::Print( void ) const {
 	for ( int i = 0; i < numPoints; i++ ) {
-		arcLibrary::common->Printf( "(%5.1f, %5.1f, %5.1f)\n", p[i][0], p[i][1], p[i][2] );
+		anLibrary::common->Printf( "(%5.1f, %5.1f, %5.1f)\n", p[i][0], p[i][1], p[i][2] );
 	}
 }
 
 /*
 =============
-arcWinding::PlaneDistance
+anWinding::PlaneDistance
 =============
 */
-float arcWinding::PlaneDistance( const arcPlane &plane ) const {
+float anWinding::PlaneDistance( const anPlane &plane ) const {
 	int		i;
 	float	d, min, max;
 
-	min = arcMath::INFINITY;
+	min = anMath::INFINITY;
 	max = -min;
 	for ( i = 0; i < numPoints; i++ ) {
 		d = plane.Distance( p[i].ToVec3() );
@@ -1199,10 +1199,10 @@ float arcWinding::PlaneDistance( const arcPlane &plane ) const {
 
 /*
 =============
-arcWinding::PlaneSide
+anWinding::PlaneSide
 =============
 */
-int arcWinding::PlaneSide( const arcPlane &plane, const float epsilon ) const {
+int anWinding::PlaneSide( const anPlane &plane, const float epsilon ) const {
 	bool	front, back;
 	int		i;
 	float	d;
@@ -1238,12 +1238,12 @@ int arcWinding::PlaneSide( const arcPlane &plane, const float epsilon ) const {
 
 /*
 =============
-arcWinding::PlanesConcave
+anWinding::PlanesConcave
 =============
 */
 #define WCONVEX_EPSILON		0.2f
 
-bool arcWinding::PlanesConcave( const arcWinding &w2, const arcVec3 &normal1, const arcVec3 &normal2, float dist1, float dist2 ) const {
+bool anWinding::PlanesConcave( const anWinding &w2, const anVec3 &normal1, const anVec3 &normal2, float dist1, float dist2 ) const {
 	// check if one of the points of winding 1 is at the back of the plane of winding 2
 	for ( int i = 0; i < numPoints; i++ ) {
 		if ( normal2 * p[i].ToVec3() - dist2 > WCONVEX_EPSILON ) {
@@ -1262,14 +1262,14 @@ bool arcWinding::PlanesConcave( const arcWinding &w2, const arcVec3 &normal1, co
 
 /*
 =============
-arcWinding::PointInside
+anWinding::PointInside
 =============
 */
-bool arcWinding::PointInside( const arcVec3 &normal, const arcVec3 &point, const float epsilon ) const {
+bool anWinding::PointInside( const anVec3 &normal, const anVec3 &point, const float epsilon ) const {
 	for ( int i = 0; i < numPoints; i++ ) {
-		arcVec3 dir = p[( i+1 ) % numPoints].ToVec3() - p[i].ToVec3();
-		arcVec3 pointvec = point - p[i].ToVec3();
-		arcVec3 n = dir.Cross( normal );
+		anVec3 dir = p[( i+1 ) % numPoints].ToVec3() - p[i].ToVec3();
+		anVec3 pointvec = point - p[i].ToVec3();
+		anVec3 n = dir.Cross( normal );
 		if ( pointvec * n < -epsilon ) {
 			return false;
 		}
@@ -1279,10 +1279,10 @@ bool arcWinding::PointInside( const arcVec3 &normal, const arcVec3 &point, const
 
 /*
 =============
-arcWinding::LineIntersection
+anWinding::LineIntersection
 =============
 */
-bool arcWinding::LineIntersection( const arcPlane &windingPlane, const arcVec3 &start, const arcVec3 &end, bool backFaceCull ) const {
+bool anWinding::LineIntersection( const anPlane &windingPlane, const anVec3 &start, const anVec3 &end, bool backFaceCull ) const {
 	float front = windingPlane.Distance( start );
 	float back = windingPlane.Distance( end );
 
@@ -1301,13 +1301,13 @@ bool arcWinding::LineIntersection( const arcPlane &windingPlane, const arcVec3 &
 	}
 
 	// get point of intersection with winding plane
-	if ( arcMath::Fabs( front - back ) < 0.0001f ) {
-		arcVec3 mid = end;
+	if ( anMath::Fabs( front - back ) < 0.0001f ) {
+		anVec3 mid = end;
 	} else {
 		float frac = front / (front - back);
-		arcVec3 mid[0] = start[0] + (end[0] - start[0] ) * frac;
-		arcVec3 mid[1] = start[1] + (end[1] - start[1] ) * frac;
-		arcVec3 mid[2] = start[2] + (end[2] - start[2] ) * frac;
+		anVec3 mid[0] = start[0] + (end[0] - start[0] ) * frac;
+		anVec3 mid[1] = start[1] + (end[1] - start[1] ) * frac;
+		anVec3 mid[2] = start[2] + (end[2] - start[2] ) * frac;
 	}
 
 	return PointInside( windingPlane.Normal(), mid, 0.0f );
@@ -1315,12 +1315,12 @@ bool arcWinding::LineIntersection( const arcPlane &windingPlane, const arcVec3 &
 
 /*
 =============
-arcWinding::RayIntersection
+anWinding::RayIntersection
 =============
 */
-bool arcWinding::RayIntersection( const arcPlane &windingPlane, const arcVec3 &start, const arcVec3 &dir, float &scale, bool backFaceCull ) const {
+bool anWinding::RayIntersection( const anPlane &windingPlane, const anVec3 &start, const anVec3 &dir, float &scale, bool backFaceCull ) const {
 	bool side, lastside = false;
-	arcPluecker pl1, pl2;
+	anPluecker pl1, pl2;
 
 	scale = 0.0f;
 	pl1.FromRay( start, dir );
@@ -1341,33 +1341,33 @@ bool arcWinding::RayIntersection( const arcPlane &windingPlane, const arcVec3 &s
 
 /*
 =================
-arcWinding::TriangleArea
+anWinding::TriangleArea
 =================
 */
-float arcWinding::TriangleArea( const arcVec3 &a, const arcVec3 &b, const arcVec3 &c ) {
-	arcVec3 v1 = b - a;
-	arcVec3 v2 = c - a;
-	arcVec3 cross = v1.Cross( v2 );
+float anWinding::TriangleArea( const anVec3 &a, const anVec3 &b, const anVec3 &c ) {
+	anVec3 v1 = b - a;
+	anVec3 v2 = c - a;
+	anVec3 cross = v1.Cross( v2 );
 	return 0.5f * cross.Length();
 }
 
 
 //===============================================================
 //
-//	arcFixedWinding
+//	anFixedWinding
 //
 //===============================================================
 
 /*
 =============
-arcFixedWinding::ReAllocate
+anFixedWinding::ReAllocate
 =============
 */
-bool arcFixedWinding::ReAllocate( int n, bool keep ) {
+bool anFixedWinding::ReAllocate( int n, bool keep ) {
 	assert( n <= MAX_POINTS_ON_WINDING );
 
 	if ( n > MAX_POINTS_ON_WINDING ) {
-		arcLibrary::common->Printf( "WARNING: arcFixedWinding -> MAX_POINTS_ON_WINDING overflowed\n" );
+		anLibrary::common->Printf( "WARNING: anFixedWinding -> MAX_POINTS_ON_WINDING overflowed\n" );
 		return false;
 	}
 	return true;
@@ -1375,14 +1375,14 @@ bool arcFixedWinding::ReAllocate( int n, bool keep ) {
 
 /*
 =============
-arcFixedWinding::Split
+anFixedWinding::Split
 =============
 */
-int arcFixedWinding::Split( arcFixedWinding *back, const arcPlane &plane, const float epsilon ) {
+int anFixedWinding::Split( anFixedWinding *back, const anPlane &plane, const float epsilon ) {
 	int		counts[3];
 	float	dists[MAX_POINTS_ON_WINDING+4];
 	byte	sides[MAX_POINTS_ON_WINDING+4];
-	arcVec5	mid;
+	anVec5	mid;
 
 	counts[SIDE_FRONT] = counts[SIDE_BACK] = counts[SIDE_ON] = 0;
 
@@ -1416,16 +1416,16 @@ int arcFixedWinding::Split( arcFixedWinding *back, const arcPlane &plane, const 
 
 	out.numPoints = 0;
 	back->numPoints = 0;
-	arcFixedWinding out;
+	anFixedWinding out;
 
 	for ( int i = 0; i < numPoints; i++ ) {
-		arcVec5 *p1 = &p[i];
+		anVec5 *p1 = &p[i];
 		if ( !out.EnsureAlloced( out.numPoints+1, true ) !back->EnsureAlloced( back->numPoints+1, true ) ) {
 			return SIDE_FRONT;		// can't split -- fall back to original
 		}
 
 		if ( sides[i] == SIDE_ON ) {
-			arcFixedWinding out.p[out.numPoints] = *p1;
+			anFixedWinding out.p[out.numPoints] = *p1;
 			out.numPoints++;
 			back->p[back->numPoints] = *p1;
 			back->numPoints++;
@@ -1456,9 +1456,9 @@ int arcFixedWinding::Split( arcFixedWinding *back, const arcPlane &plane, const 
 		// generate a split point
 		int j = i + 1;
 		if ( j >= numPoints ) {
-			arcVec5 *p2 = &p[0];
+			anVec5 *p2 = &p[0];
 		} else {
-			arcVec5 *p2 = &p[j];
+			anVec5 *p2 = &p[j];
 		}
 
 		float dot = dists[i] / (dists[i] - dists[i+1] );

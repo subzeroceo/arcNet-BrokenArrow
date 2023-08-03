@@ -1,56 +1,26 @@
-/*
-===========================================================================
 
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "Model_local.h"
 #include "tr_local.h"
 
-
 /*
 ====================
-ARCRenderModelOverlay::ARCRenderModelOverlay
+anRenderModelOverlay::anRenderModelOverlay
 ====================
 */
-ARCRenderModelOverlay::ARCRenderModelOverlay() {
+anRenderModelOverlay::anRenderModelOverlay() {
 }
 
 /*
 ====================
-ARCRenderModelOverlay::~ARCRenderModelOverlay
+anRenderModelOverlay::~anRenderModelOverlay
 ====================
 */
-ARCRenderModelOverlay::~ARCRenderModelOverlay() {
-	int i, k;
-
-	for ( k = 0; k < materials.Num(); k++ ) {
-		for ( i = 0; i < materials[k]->surfaces.Num(); i++ ) {
+anRenderModelOverlay::~anRenderModelOverlay() {
+	for ( int k = 0; k < materials.Num(); k++ ) {
+		for ( int i = 0; i < materials[k]->surfaces.Num(); i++ ) {
 			FreeSurface( materials[k]->surfaces[i] );
 		}
 		materials[k]->surfaces.Clear();
@@ -61,28 +31,28 @@ ARCRenderModelOverlay::~ARCRenderModelOverlay() {
 
 /*
 ====================
-ARCRenderModelOverlay::Alloc
+anRenderModelOverlay::Alloc
 ====================
 */
-ARCRenderModelOverlay *ARCRenderModelOverlay::Alloc( void ) {
-	return new ARCRenderModelOverlay;
+anRenderModelOverlay *anRenderModelOverlay::Alloc( void ) {
+	return new anRenderModelOverlay;
 }
 
 /*
 ====================
-ARCRenderModelOverlay::Free
+anRenderModelOverlay::Free
 ====================
 */
-void ARCRenderModelOverlay::Free( ARCRenderModelOverlay *overlay ) {
+void anRenderModelOverlay::Free( anRenderModelOverlay *overlay ) {
 	delete overlay;
 }
 
 /*
 ====================
-ARCRenderModelOverlay::FreeSurface
+anRenderModelOverlay::FreeSurface
 ====================
 */
-void ARCRenderModelOverlay::FreeSurface( overlaySurface_t *surface ) {
+void anRenderModelOverlay::FreeSurface( overlaySurface_t *surface ) {
 	if ( surface->verts ) {
 		Mem_Free( surface->verts );
 	}
@@ -94,16 +64,16 @@ void ARCRenderModelOverlay::FreeSurface( overlaySurface_t *surface ) {
 
 /*
 =====================
-ARCRenderModelOverlay::CreateOverlay
+anRenderModelOverlay::CreateOverlay
 
 This projects on both front and back sides to avoid seams
 The material should be clamped, because entire triangles are added, some of which
 may extend well past the 0.0 to 1.0 texture range
 =====================
 */
-void ARCRenderModelOverlay::CreateOverlay( const ARCRenderModel *model, const arcPlane localTextureAxis[2], const arcMaterial *mtr ) {
+void anRenderModelOverlay::CreateOverlay( const anRenderModel *model, const anPlane localTextureAxis[2], const anMaterial *mtr ) {
 	int i, maxVerts, maxIndexes, surfNum;
-	ARCRenderModelOverlay *overlay = NULL;
+	anRenderModelOverlay *overlay = nullptr;
 
 	// count up the maximum possible vertices and indexes per surface
 	maxVerts = 0;
@@ -126,7 +96,6 @@ void ARCRenderModelOverlay::CreateOverlay( const ARCRenderModel *model, const ar
 	for ( surfNum = 0; surfNum < model->NumBaseSurfaces(); surfNum++ ) {
 		const modelSurface_t *surf = model->Surface( surfNum );
 		float d;
-
 		if ( !surf->geometry || !surf->shader ) {
 			continue;
 		}
@@ -136,7 +105,7 @@ void ARCRenderModelOverlay::CreateOverlay( const ARCRenderModel *model, const ar
 			continue;
 		}
 
-		const surfTriangles_t *stri = surf->geometry;
+		const srfTriangles_t *stri = surf->geometry;
 
 		// try to cull the whole surface along the first texture axis
 		d = stri->bounds.PlaneDistance( localTextureAxis[0] );
@@ -150,8 +119,8 @@ void ARCRenderModelOverlay::CreateOverlay( const ARCRenderModel *model, const ar
 			continue;
 		}
 
-		byte *cullBits = ( byte * )_alloca16( stri->numVerts * sizeof( cullBits[0] ) );
-		arcVec2 *texCoords = (arcVec2 *)_alloca16( stri->numVerts * sizeof( texCoords[0] ) );
+		byte *cullBits = (byte *)_alloca16( stri->numVerts * sizeof( cullBits[0] ) );
+		anVec2 *texCoords = (anVec2 *)_alloca16( stri->numVerts * sizeof( texCoords[0] ) );
 
 		SIMDProcessor->OverlayPointCull( cullBits, texCoords, localTextureAxis, stri->verts, stri->numVerts );
 
@@ -166,7 +135,6 @@ void ARCRenderModelOverlay::CreateOverlay( const ARCRenderModel *model, const ar
 			int v1 = stri->indexes[index+0];
 			int	v2 = stri->indexes[index+1];
 			int v3 = stri->indexes[index+2];
-
 			// skip triangles completely off one side
 			if ( cullBits[v1] & cullBits[v2] & cullBits[v3] ) {
 				continue;
@@ -230,18 +198,18 @@ void ARCRenderModelOverlay::CreateOverlay( const ARCRenderModel *model, const ar
 
 /*
 ====================
-ARCRenderModelOverlay::AddOverlaySurfacesToModel
+anRenderModelOverlay::AddOverlaySurfacesToModel
 ====================
 */
-void ARCRenderModelOverlay::AddOverlaySurfacesToModel( ARCRenderModel *baseModel ) {
+void anRenderModelOverlay::AddOverlaySurfacesToModel( anRenderModel *baseModel ) {
 	int i, j, k, numVerts, numIndexes, surfaceNum;
 	const modelSurface_t *baseSurf;
-	aRcModelStatic *staticModel;
+	anModelStatic *staticModel;
 	overlaySurface_t *surf;
-	surfTriangles_t *newTri;
+	srfTriangles_t *newTri;
 	modelSurface_t *newSurf;
 
-	if ( baseModel == NULL || baseModel->IsDefaultModel() ) {
+	if ( baseModel == nullptr || baseModel->IsDefaultModel() ) {
 		return;
 	}
 
@@ -251,11 +219,11 @@ void ARCRenderModelOverlay::AddOverlaySurfacesToModel( ARCRenderModel *baseModel
 	}
 
 	if ( baseModel->IsDynamicModel() != DM_STATIC ) {
-		common->Error( "ARCRenderModelOverlay::AddOverlaySurfacesToModel: baseModel is not a static model" );
+		common->Error( "anRenderModelOverlay::AddOverlaySurfacesToModel: baseModel is not a static model" );
 	}
 
-	assert( dynamic_cast<aRcModelStatic *>(baseModel) != NULL );
-	staticModel = static_cast<aRcModelStatic *>(baseModel);
+	assert( dynamic_cast<anModelStatic *>(baseModel) != nullptr );
+	staticModel = static_cast<anModelStatic *>(baseModel);
 
 	staticModel->overlaysAdded = 0;
 
@@ -265,7 +233,6 @@ void ARCRenderModelOverlay::AddOverlaySurfacesToModel( ARCRenderModel *baseModel
 	}
 
 	for ( k = 0; k < materials.Num(); k++ ) {
-
 		numVerts = numIndexes = 0;
 		for ( i = 0; i < materials[k]->surfaces.Num(); i++ ) {
 			numVerts += materials[k]->surfaces[i]->numVerts;
@@ -276,12 +243,12 @@ void ARCRenderModelOverlay::AddOverlaySurfacesToModel( ARCRenderModel *baseModel
 			newSurf = &staticModel->surfaces[surfaceNum];
 		} else {
 			newSurf = &staticModel->surfaces.Alloc();
-			newSurf->geometry = NULL;
+			newSurf->geometry = nullptr;
 			newSurf->shader = materials[k]->material;
 			newSurf->id = -1 - k;
 		}
 
-		if ( newSurf->geometry == NULL || newSurf->geometry->numVerts < numVerts || newSurf->geometry->numIndexes < numIndexes ) {
+		if ( newSurf->geometry == nullptr || newSurf->geometry->numVerts < numVerts || newSurf->geometry->numIndexes < numIndexes ) {
 			R_FreeStaticTriSurf( newSurf->geometry );
 			newSurf->geometry = R_AllocStaticTriSurf();
 			R_AllocStaticTriSurfVerts( newSurf->geometry, numVerts );
@@ -296,12 +263,11 @@ void ARCRenderModelOverlay::AddOverlaySurfacesToModel( ARCRenderModel *baseModel
 
 		for ( i = 0; i < materials[k]->surfaces.Num(); i++ ) {
 			surf = materials[k]->surfaces[i];
-
 			// get the model surface for this overlay surface
 			if ( surf->surfaceNum < staticModel->NumSurfaces() ) {
 				baseSurf = staticModel->Surface( surf->surfaceNum );
 			} else {
-				baseSurf = NULL;
+				baseSurf = nullptr;
 			}
 
 			// if the surface ids no longer match
@@ -333,7 +299,7 @@ void ARCRenderModelOverlay::AddOverlaySurfacesToModel( ARCRenderModel *baseModel
 
 				if ( overlayVert->vertexNum >= baseSurf->geometry->numVerts ) {
 					// This can happen when playing a demofile and a model has been changed since it was recorded, so just issue a warning and go on.
-					common->Warning( "ARCRenderModelOverlay::AddOverlaySurfacesToModel: overlay vertex out of range.  Model has probably changed since generating the overlay." );
+					common->Warning( "anRenderModelOverlay::AddOverlaySurfacesToModel: overlay vertex out of range.  Model has probably changed since generating the overlay." );
 					FreeSurface( surf );
 					materials[k]->surfaces.RemoveIndex( i );
 					staticModel->DeleteSurfaceWithId( newSurf->id );
@@ -354,33 +320,16 @@ void ARCRenderModelOverlay::AddOverlaySurfacesToModel( ARCRenderModel *baseModel
 
 /*
 ====================
-ARCRenderModelOverlay::RemoveOverlaySurfacesFromModel
+anRenderModelOverlay::RemoveOverlaySurfacesFromModel
 ====================
 */
-void ARCRenderModelOverlay::RemoveOverlaySurfacesFromModel( ARCRenderModel *baseModel ) {
-	aRcModelStatic *staticModel;
+void anRenderModelOverlay::RemoveOverlaySurfacesFromModel( anRenderModel *baseModel ) {
+	anModelStatic *staticModel;
 
-	assert( dynamic_cast<aRcModelStatic *>(baseModel) != NULL );
-	staticModel = static_cast<aRcModelStatic *>(baseModel);
+	assert( dynamic_cast<anModelStatic *>(baseModel) != nullptr );
+	staticModel = static_cast<anModelStatic *>(baseModel);
 
 	staticModel->DeleteSurfacesWithNegativeId();
 	staticModel->overlaysAdded = 0;
 }
 
-/*
-====================
-ARCRenderModelOverlay::ReadFromDemoFile
-====================
-*/
-void ARCRenderModelOverlay::ReadFromDemoFile( ARCDemoFile *f ) {
-	// FIXME: implement
-}
-
-/*
-====================
-ARCRenderModelOverlay::WriteToDemoFile
-====================
-*/
-void ARCRenderModelOverlay::WriteToDemoFile( ARCDemoFile *f ) const {
-	// FIXME: implement
-}

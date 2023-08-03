@@ -17,7 +17,7 @@
  * This implementation is based on Arai, Agui, and Nakajima's algorithm for
  * scaled DCT.  Their original paper (Trans. IEICE E-71(11):1095) is in
  * Japanese, but the algorithm is described in the Pennebaker & Mitchell
- * JPEG textbook (see REFERENCES section in file README).  The following code
+ * JPEG textbook ( see REFERENCES section in file README).  The following code
  * is based directly on figure 4-8 in P&M.
  * While an 8-point DCT cannot be done in less than 11 multiplies, it is
  * possible to arrange the computation so that many of the multiplies are
@@ -69,7 +69,7 @@
  *
  * A final compromise is to represent the multiplicative constants to only
  * 8 fractional bits, rather than 13.  This saves some shifting work on some
- * machines, and may also reduce the cost of multiplication (since there
+ * machines, and may also reduce the cost of multiplication ( since there
  * are fewer one-bits in the constants).
  */
 
@@ -146,11 +146,11 @@
 #endif
 #define IRIGHT_SHIFT(x,shft)  \
     ((ishift_temp = (x) ) < 0 ? \
-     (ishift_temp >> (shft) ) | ((~((DCTELEM) 0 ) ) << (DCTELEMBITS-(shft) )) : \
-     (ishift_temp >> (shft) ))
+     (ishift_temp >> ( shft) ) | ((~((DCTELEM) 0 ) ) << (DCTELEMBITS-( shft) ) ) : \
+     (ishift_temp >> ( shft) ) )
 #else
 #define ISHIFT_TEMPS
-#define IRIGHT_SHIFT(x,shft)	((x) >> (shft) )
+#define IRIGHT_SHIFT(x,shft)	((x) >> ( shft) )
 #endif
 
 #ifdef USE_ACCURATE_ROUNDING

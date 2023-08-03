@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "snd_local.h"
@@ -36,9 +36,9 @@ If you have questions concerning this license or the applicable additional terms
 idSoundWorldLocal::Init
 ==================
 */
-void idSoundWorldLocal::Init( ARCRenderWorld *renderWorld ) {
+void idSoundWorldLocal::Init( anRenderWorld *renderWorld ) {
 	rw = renderWorld;
-	writeDemo = NULL;
+	writeDemo = nullptr;
 
 	listenerAxis.Identity();
 	listenerPos.Zero();
@@ -58,15 +58,15 @@ void idSoundWorldLocal::Init( ARCRenderWorld *renderWorld ) {
 	}
 
 	// fill in the 0 index spot
-	arcAudioSystemLocal	*placeHolder = new arcAudioSystemLocal;
+	anAudioSystemLocal	*placeHolder = new anAudioSystemLocal;
 	emitters.Append( placeHolder );
 
-	fpa[0] = fpa[1] = fpa[2] = fpa[3] = fpa[4] = fpa[5] = NULL;
+	fpa[0] = fpa[1] = fpa[2] = fpa[3] = fpa[4] = fpa[5] = nullptr;
 
 	aviDemoPath = "";
 	aviDemoName = "";
 
-	localSound = NULL;
+	localSound = nullptr;
 
 	slowmoActive		= false;
 	slowmoSpeed			= 0;
@@ -101,7 +101,7 @@ void idSoundWorldLocal::Shutdown() {
 	int i;
 
 	if ( soundSystemLocal.currentSoundWorld == this ) {
-		soundSystemLocal.currentSoundWorld = NULL;
+		soundSystemLocal.currentSoundWorld = nullptr;
 	}
 
 	AVIClose();
@@ -109,10 +109,10 @@ void idSoundWorldLocal::Shutdown() {
 	for ( i = 0; i < emitters.Num(); i++ ) {
 		if ( emitters[i] ) {
 			delete emitters[i];
-			emitters[i] = NULL;
+			emitters[i] = nullptr;
 		}
 	}
-	localSound = NULL;
+	localSound = nullptr;
 }
 
 /*
@@ -128,10 +128,10 @@ void idSoundWorldLocal::ClearAllSoundEmitters() {
 	AVIClose();
 
 	for ( i = 0; i < emitters.Num(); i++ ) {
-		arcAudioSystemLocal *sound = emitters[i];
+		anAudioSystemLocal *sound = emitters[i];
 		sound->Clear();
 	}
-	localSound = NULL;
+	localSound = nullptr;
 
 	Sys_LeaveCriticalSection();
 }
@@ -141,9 +141,9 @@ void idSoundWorldLocal::ClearAllSoundEmitters() {
 idSoundWorldLocal::AllocLocalSoundEmitter
 ===================
 */
-arcAudioSystemLocal *idSoundWorldLocal::AllocLocalSoundEmitter() {
+anAudioSystemLocal *idSoundWorldLocal::AllocLocalSoundEmitter() {
 	int i, index;
-	arcAudioSystemLocal *def = NULL;
+	anAudioSystemLocal *def = nullptr;
 
 	index = -1;
 
@@ -164,7 +164,7 @@ arcAudioSystemLocal *idSoundWorldLocal::AllocLocalSoundEmitter() {
 
 	if ( index == -1 ) {
 		// append a brand new one
-		def = new arcAudioSystemLocal;
+		def = new anAudioSystemLocal;
 
 		// we need to protect this from the async thread
 		Sys_EnterCriticalSection();
@@ -192,7 +192,7 @@ idSoundWorldLocal::AllocSoundEmitter
 ===================
 */
 ARCSoundEmitter *idSoundWorldLocal::AllocSoundEmitter() {
-	arcAudioSystemLocal *emitter = AllocLocalSoundEmitter();
+	anAudioSystemLocal *emitter = AllocLocalSoundEmitter();
 
 	if ( idSoundSystemLocal::s_showStartSound.GetInteger() ) {
 		common->Printf( "AllocSoundEmitter = %i\n",  emitter->index );
@@ -213,7 +213,7 @@ idSoundWorldLocal::StartWritingDemo
   this is called from the main thread
 ===================
 */
-void idSoundWorldLocal::StartWritingDemo( ARCDemoFile *demo ) {
+void idSoundWorldLocal::StartWritingDemo( anDemoFile *demo ) {
 	writeDemo = demo;
 
 	writeDemo->WriteInt( DS_SOUND );
@@ -231,7 +231,7 @@ idSoundWorldLocal::StopWritingDemo
 ===================
 */
 void idSoundWorldLocal::StopWritingDemo() {
-	writeDemo = NULL;
+	writeDemo = nullptr;
 }
 
 /*
@@ -241,9 +241,9 @@ idSoundWorldLocal::ProcessDemoCommand
   this is called from the main thread
 ===================
 */
-void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
+void idSoundWorldLocal::ProcessDemoCommand( anDemoFile *readDemo ) {
 	int	index;
-	arcAudioSystemLocal	*def;
+	anAudioSystemLocal	*def;
 
 	if ( !readDemo ) {
 		return;
@@ -255,7 +255,7 @@ void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
 		return;
 	}
 
-	switch( dc ) {
+	switch ( dc ) {
 	case SCMD_STATE:
 		// we need to protect this from the async thread
 		// other instances of calling idSoundWorldLocal::ReadFromSaveGame do this while the sound code is muted
@@ -267,8 +267,8 @@ void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
 		break;
 	case SCMD_PLACE_LISTENER:
 		{
-			arcVec3	origin;
-			arcMat3	axis;
+			anVec3	origin;
+			anMat3	axis;
 			int		listenerId;
 			int		gameTime;
 
@@ -287,7 +287,7 @@ void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
 		}
 		if ( index == emitters.Num() ) {
 			// append a brand new one
-			def = new arcAudioSystemLocal;
+			def = new anAudioSystemLocal;
 			emitters.Append( def );
 		}
 		def = emitters[index];
@@ -307,7 +307,7 @@ void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
 		break;
 	case SCMD_UPDATE:
 		{
-			arcVec3 origin;
+			anVec3 origin;
 			int listenerId;
 			soundShaderParms_t parms;
 
@@ -325,7 +325,7 @@ void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
 		break;
 	case SCMD_START:
 		{
-			const arcSoundShader *shader;
+			const anSoundShader *shader;
 			int			channel;
 			float		diversity;
 			int			shaderFlags;
@@ -335,7 +335,7 @@ void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
 			readDemo->ReadInt( channel );
 			readDemo->ReadFloat( diversity );
 			readDemo->ReadInt( shaderFlags );
-			EmitterForIndex( index )->StartSound( shader, (s_channelType)channel, diversity, shaderFlags );
+			EmitterForIndex( index )->StartSound( shader, ( s_channelType)channel, diversity, shaderFlags );
 		}
 		break;
 	case SCMD_MODIFY:
@@ -351,7 +351,7 @@ void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
 			readDemo->ReadFloat( parms.shakes );
 			readDemo->ReadInt( parms.soundShaderFlags );
 			readDemo->ReadInt( parms.soundClass );
-			EmitterForIndex( index )->ModifySound( (s_channelType)channel, &parms );
+			EmitterForIndex( index )->ModifySound( ( s_channelType)channel, &parms );
 		}
 		break;
 	case SCMD_STOP:
@@ -360,7 +360,7 @@ void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
 
 			readDemo->ReadInt( index );
 			readDemo->ReadInt( channel );
-			EmitterForIndex( index )->StopSound( (s_channelType)channel );
+			EmitterForIndex( index )->StopSound( ( s_channelType)channel );
 		}
 		break;
 	case SCMD_FADE:
@@ -372,7 +372,7 @@ void idSoundWorldLocal::ProcessDemoCommand( ARCDemoFile *readDemo ) {
 			readDemo->ReadInt( channel );
 			readDemo->ReadFloat( to );
 			readDemo->ReadFloat( over );
-			EmitterForIndex( index )->FadeSound((s_channelType)channel, to, over );
+			EmitterForIndex( index )->FadeSound(( s_channelType)channel, to, over );
 		}
 		break;
 	}
@@ -385,7 +385,7 @@ idSoundWorldLocal::CurrentShakeAmplitudeForPosition
   this is called from the main thread
 ===================
 */
-float idSoundWorldLocal::CurrentShakeAmplitudeForPosition( const int time, const arcVec3 &listererPosition ) {
+float idSoundWorldLocal::CurrentShakeAmplitudeForPosition( const int time, const anVec3 &listererPosition ) {
 	float amp = 0.0f;
 	int localTime;
 
@@ -396,7 +396,7 @@ float idSoundWorldLocal::CurrentShakeAmplitudeForPosition( const int time, const
 	localTime = soundSystemLocal.GetCurrent44kHzTime();
 
 	for ( int i = 1; i < emitters.Num(); i++ ) {
-		arcAudioSystemLocal *sound = emitters[i];
+		anAudioSystemLocal *sound = emitters[i];
 		if ( !sound->hasShakes ) {
 			continue;
 		}
@@ -419,7 +419,7 @@ for AVIdemo writing
 */
 void idSoundWorldLocal::MixLoop( int current44kHz, int numSpeakers, float *finalMixBuffer ) {
 	int i, j;
-	arcAudioSystemLocal *sound;
+	anAudioSystemLocal *sound;
 
 	// if noclip flying outside the world, leave silence
 	if ( listenerArea == -1 ) {
@@ -448,7 +448,7 @@ void idSoundWorldLocal::MixLoop( int current44kHz, int numSpeakers, float *final
 
 		//#modified-fva; BEGIN
 		//alListenerf( AL_GAIN, 1.0f );
-		alListenerf(AL_GAIN, soundSystemLocal.dB2Scale(idSoundSystemLocal::s_volume.GetFloat() ));
+		alListenerf(AL_GAIN, soundSystemLocal.dB2Scale(idSoundSystemLocal::s_volume.GetFloat() ) );
 		//#modified-fva; END
 		alListenerfv( AL_POSITION, listenerPosition );
 		alListenerfv( AL_ORIENTATION, listenerOrientation );
@@ -456,10 +456,10 @@ void idSoundWorldLocal::MixLoop( int current44kHz, int numSpeakers, float *final
 #if ID_OPENAL
 		if ( soundSystemLocal.s_useEAXReverb.GetBool() ) {
 			if ( soundSystemLocal.efxloaded ) {
-				idSoundEffect *effect = NULL;
+				idSoundEffect *effect = nullptr;
 				int EnvironmentID = -1;
-				arcNetString defaultStr( "default" );
-				arcNetString listenerAreaStr( listenerArea );
+				anString defaultStr( "default" );
+				anString listenerAreaStr( listenerArea );
 
 				soundSystemLocal.EFXDatabase.FindEffect( listenerAreaStr, &effect, &EnvironmentID );
 				if ( !effect)
@@ -607,11 +607,11 @@ void idSoundWorldLocal::AVIUpdate() {
 			} else if ( s > 32767.0f ) {
 				outD[j] = 32767;
 			} else {
-				outD[j] = arcMath::FtoiFast( s );
+				outD[j] = anMath::FtoiFast( s );
 			}
 		}
 		// write to file
-		fpa[i]->Write( outD, MIXBUFFER_SAMPLES*sizeof(short) );
+		fpa[i]->Write( outD, MIXBUFFER_SAMPLES*sizeof( short) );
 	}
 
 	lastAVI44kHz += MIXBUFFER_SAMPLES;
@@ -637,15 +637,15 @@ void idSoundWorldLocal::AVIClose( void ) {
 	game44kHz -= MIXBUFFER_SAMPLES;
 
 	for ( i = 0; i < 6; i++ ) {
-		if ( fpa[i] != NULL ) {
+		if ( fpa[i] != nullptr ) {
 			fileSystem->CloseFile( fpa[i] );
-			fpa[i] = NULL;
+			fpa[i] = nullptr;
 		}
 	}
 	if ( soundSystemLocal.snd_audio_hw->GetNumberOfSpeakers() == 2 ) {
 		// convert it to a wave file
-		arcNetFile *rL, *lL, *wO;
-		arcNetString	name;
+		anFile *rL, *lL, *wO;
+		anString	name;
 
 		name = aviDemoPath + aviDemoName + ".wav";
 		wO = fileSystem->OpenFileWrite( name );
@@ -734,7 +734,7 @@ set at maxDistance
 */
 static const int MAX_PORTAL_TRACE_DEPTH = 10;
 
-void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTrace_t *prevStack, const int soundArea, const float dist, const arcVec3& soundOrigin, arcAudioSystemLocal *def ) {
+void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTrace_t *prevStack, const int soundArea, const float dist, const anVec3& soundOrigin, anAudioSystemLocal *def ) {
 
 	if ( dist >= def->distance ) {
 		// we can't possibly hear the sound through this chain of portals
@@ -742,7 +742,7 @@ void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTr
 	}
 
 	if ( soundArea == listenerArea ) {
-		float	fullDist = dist + (soundOrigin - listenerQU).LengthFast();
+		float	fullDist = dist + ( soundOrigin - listenerQU).LengthFast();
 		if ( fullDist < def->distance ) {
 			def->distance = fullDist;
 			def->spatializedOrigin = soundOrigin;
@@ -791,13 +791,13 @@ void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTr
 
 		// pick a point on the portal to serve as our virtual sound origin
 #if 1
-		arcVec3	source;
+		anVec3	source;
 
-		arcPlane	pl;
+		anPlane	pl;
 		re.w->GetPlane( pl );
 
 		float	scale;
-		arcVec3	dir = listenerQU - soundOrigin;
+		anVec3	dir = listenerQU - soundOrigin;
 		if ( !pl.RayIntersection( soundOrigin, dir, scale ) ) {
 			source = re.w->GetCenter();
 		} else {
@@ -806,12 +806,12 @@ void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTr
 			// if this point isn't inside the portal edges, slide it in
 			for ( int i = 0; i < re.w->GetNumPoints(); i++ ) {
 				int j = ( i + 1 ) % re.w->GetNumPoints();
-				arcVec3	edgeDir = (*(re.w) )[j].ToVec3() - (*(re.w) )[i].ToVec3();
-				arcVec3	edgeNormal;
+				anVec3	edgeDir = (*(re.w) )[j].ToVec3() - (*(re.w) )[i].ToVec3();
+				anVec3	edgeNormal;
 
 				edgeNormal.Cross( pl.Normal(), edgeDir );
 
-				arcVec3	fromVert = source - (*(re.w) )[j].ToVec3();
+				anVec3	fromVert = source - (*(re.w) )[j].ToVec3();
 
 				float	d = edgeNormal * fromVert;
 				if ( d > 0 ) {
@@ -828,23 +828,23 @@ void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTr
 		// all the portal edge planes, then project that point (or the original if not clipped)
 		// onto the portal plane to get the spatialized origin
 
-		arcVec3	start = listenerQU;
-		arcVec3	mid = re.w->GetCenter();
+		anVec3	start = listenerQU;
+		anVec3	mid = re.w->GetCenter();
 		bool	wasClipped = false;
 
 		for ( int i = 0; i < re.w->GetNumPoints(); i++ ) {
 			int j = ( i + 1 ) % re.w->GetNumPoints();
-			arcVec3	v1 = (*(re.w) )[j].ToVec3() - soundOrigin;
-			arcVec3	v2 = (*(re.w) )[i].ToVec3() - soundOrigin;
+			anVec3	v1 = (*(re.w) )[j].ToVec3() - soundOrigin;
+			anVec3	v2 = (*(re.w) )[i].ToVec3() - soundOrigin;
 
 			v1.Normalize();
 			v2.Normalize();
 
-			arcVec3	edgeNormal;
+			anVec3	edgeNormal;
 
 			edgeNormal.Cross( v1, v2 );
 
-			arcVec3	fromVert = start - soundOrigin;
+			anVec3	fromVert = start - soundOrigin;
 			float	d1 = edgeNormal * fromVert;
 
 			if ( d1 > 0.0f ) {
@@ -854,16 +854,16 @@ void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTr
 				// move it in
 				float	f = d1 / ( d1 - d2 );
 
-				arcVec3	clipped = start * ( 1.0f - f ) + mid * f;
+				anVec3	clipped = start * ( 1.0f - f ) + mid * f;
 				start = clipped;
 				wasClipped = true;
 			}
 		}
 
-		arcVec3	source;
+		anVec3	source;
 		if ( wasClipped ) {
 			// now project it onto the portal plane
-			arcPlane	pl;
+			anPlane	pl;
 			re.w->GetPlane( pl );
 
 			float	f1 = pl.Distance( start );
@@ -876,7 +876,7 @@ void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTr
 		}
 #endif
 
-		arcVec3 tlen = source - soundOrigin;
+		anVec3 tlen = source - soundOrigin;
 		float tlenLength = tlen.LengthFast();
 
 		ResolveOrigin( stackDepth+1, &newStack, otherArea, dist+tlenLength+occlusionDistance, source, def );
@@ -891,8 +891,8 @@ idSoundWorldLocal::PlaceListener
   this is called by the main thread
 ===================
 */
-void idSoundWorldLocal::PlaceListener( const arcVec3& origin, const arcMat3& axis,
-									const int listenerId, const int gameTime, const arcNetString& areaName  ) {
+void idSoundWorldLocal::PlaceListener( const anVec3& origin, const anMat3& axis,
+									const int listenerId, const int gameTime, const anString& areaName  ) {
 
 	int current44kHzTime;
 
@@ -927,10 +927,10 @@ void idSoundWorldLocal::PlaceListener( const arcVec3& origin, const arcMat3& axi
 	gameMsec = gameTime;
 	if ( fpa[0] ) {
 		// exactly 30 fps so the wave file can be used for exact video frames
-		game44kHz = arcMath::FtoiFast( gameMsec * ( ( 1000.0f / 60.0f ) / 16.0f ) * 0.001f * 44100.0f );
+		game44kHz = anMath::FtoiFast( gameMsec * ( ( 1000.0f / 60.0f ) / 16.0f ) * 0.001f * 44100.0f );
 	} else {
 		// the normal 16 msec / frame
-		game44kHz = arcMath::FtoiFast( gameMsec * 0.001f * 44100.0f );
+		game44kHz = anMath::FtoiFast( gameMsec * 0.001f * 44100.0f );
 	}
 
 	listenerPrivateId = listenerId;
@@ -961,7 +961,7 @@ idSoundWorldLocal::ForegroundUpdate
 */
 void idSoundWorldLocal::ForegroundUpdate( int current44kHzTime ) {
 	int j, k;
-	arcAudioSystemLocal	*def;
+	anAudioSystemLocal	*def;
 
 	if ( !soundSystemLocal.isInitialized ) {
 		return;
@@ -1000,14 +1000,14 @@ void idSoundWorldLocal::ForegroundUpdate( int current44kHzTime ) {
 		// per-sound debug options
 		if ( idSoundSystemLocal::s_drawSounds.GetInteger() && rw ) {
 			if ( def->distance < def->maxDistance || idSoundSystemLocal::s_drawSounds.GetInteger() > 1 ) {
-				arcBounds ref;
+				anBounds ref;
 				ref.Clear();
-				ref.AddPoint( arcVec3( -10, -10, -10 ) );
-				ref.AddPoint( arcVec3(  10,  10,  10 ) );
+				ref.AddPoint( anVec3( -10, -10, -10 ) );
+				ref.AddPoint( anVec3(  10,  10,  10 ) );
 				float vis = (1.0f - (def->distance / def->maxDistance) );
 
 				// draw a box
-				rw->DebugBounds( arcVec4( vis, 0.25f, vis, vis ), ref, def->origin );
+				rw->DebugBounds( anVec4( vis, 0.25f, vis, vis ), ref, def->origin );
 
 				// draw an arrow to the audible position, possible a portal center
 				if ( def->origin != def->spatializedOrigin ) {
@@ -1015,9 +1015,9 @@ void idSoundWorldLocal::ForegroundUpdate( int current44kHzTime ) {
 				}
 
 				// draw the index
-				arcVec3	textPos = def->origin;
+				anVec3	textPos = def->origin;
 				textPos[2] -= 8;
-				rw->DrawText( va( "%i", def->index), textPos, 0.1f, arcVec4( 1,0,0,1 ), listenerAxis );
+				rw->DrawText( va( "%i", def->index), textPos, 0.1f, anVec4( 1,0,0,1 ), listenerAxis );
 				textPos[2] += 8;
 
 				// run through all the channels
@@ -1035,7 +1035,7 @@ void idSoundWorldLocal::ForegroundUpdate( int current44kHzTime ) {
 					const char	*defaulted = chan->leadinSample->defaultSound ? "(DEFAULTED)" : "";
 					sprintf( text, "%s (%i/%i %i/%i)%s", chan->soundShader->GetName(), ( int )def->distance,
 						( int )def->realDistance, ( int )min, ( int )max, defaulted );
-					rw->DrawText( text, textPos, 0.1f, arcVec4( 1,0,0,1 ), listenerAxis );
+					rw->DrawText( text, textPos, 0.1f, anVec4( 1,0,0,1 ), listenerAxis );
 					textPos[2] += 8;
 				}
 			}
@@ -1048,7 +1048,7 @@ void idSoundWorldLocal::ForegroundUpdate( int current44kHzTime ) {
 	// the sound meter
 	//
 	if ( idSoundSystemLocal::s_showLevelMeter.GetInteger() ) {
-		const arcMaterial *gui = declManager->FindMaterial( "guis/assets/soundmeter/audiobg", false );
+		const anMaterial *gui = declManager->FindMaterial( "guis/assets/soundmeter/audiobg", false );
 		if ( gui ) {
 			const materialStage_t *foo = gui->GetStage(0 );
 			if ( !foo->texture.cinematic ) {
@@ -1074,7 +1074,7 @@ void idSoundWorldLocal::OffsetSoundTime( int offset44kHz ) {
 	int i, j;
 
 	for ( i = 0; i < emitters.Num(); i++ ) {
-		if ( emitters[i] == NULL ) {
+		if ( emitters[i] == nullptr ) {
 			continue;
 		}
 		for ( j = 0; j < SOUND_MAX_CHANNELS; j++ ) {
@@ -1094,7 +1094,7 @@ void idSoundWorldLocal::OffsetSoundTime( int offset44kHz ) {
 idSoundWorldLocal::WriteToSaveGame
 ===================
 */
-void idSoundWorldLocal::WriteToSaveGame( arcNetFile *savefile ) {
+void idSoundWorldLocal::WriteToSaveGame( anFile *savefile ) {
 	int i, j, num, currentSoundTime;
 	const char *name;
 
@@ -1114,10 +1114,10 @@ void idSoundWorldLocal::WriteToSaveGame( arcNetFile *savefile ) {
 	savefile->WriteInt(currentSoundTime);
 
 	num = emitters.Num();
-	savefile->WriteInt(num);
+	savefile->WriteInt( num );
 
 	for ( i = 1; i < emitters.Num(); i++ ) {
-		arcAudioSystemLocal *def = emitters[i];
+		anAudioSystemLocal *def = emitters[i];
 
 		if ( def->removeStatus != REMOVE_STATUS_ALIVE ) {
 			int skip = -1;
@@ -1178,12 +1178,12 @@ void idSoundWorldLocal::WriteToSaveGame( arcNetFile *savefile ) {
  idSoundWorldLocal::WriteToSaveGameSoundShaderParams
  ===================
  */
-void idSoundWorldLocal::WriteToSaveGameSoundShaderParams( arcNetFile *saveGame, soundShaderParms_t *params ) {
+void idSoundWorldLocal::WriteToSaveGameSoundShaderParams( anFile *saveGame, soundShaderParms_t *params ) {
 	saveGame->WriteFloat(params->minDistance);
 	saveGame->WriteFloat(params->maxDistance);
 	saveGame->WriteFloat(params->volume);
 	saveGame->WriteFloat(params->shakes);
-	saveGame->WriteInt(params->soundShaderFlags);
+	saveGame->WriteInt(params->soundShaderFlags );
 	saveGame->WriteInt(params->soundClass);
 }
 
@@ -1192,7 +1192,7 @@ void idSoundWorldLocal::WriteToSaveGameSoundShaderParams( arcNetFile *saveGame, 
  idSoundWorldLocal::WriteToSaveGameSoundChannel
  ===================
  */
-void idSoundWorldLocal::WriteToSaveGameSoundChannel( arcNetFile *saveGame, idSoundChannel *ch ) {
+void idSoundWorldLocal::WriteToSaveGameSoundChannel( anFile *saveGame, idSoundChannel *ch ) {
 	saveGame->WriteBool( ch->triggerState );
 	saveGame->WriteUnsignedChar( 0 );
 	saveGame->WriteUnsignedChar( 0 );
@@ -1219,13 +1219,13 @@ void idSoundWorldLocal::WriteToSaveGameSoundChannel( arcNetFile *saveGame, idSou
 idSoundWorldLocal::ReadFromSaveGame
 ===================
 */
-void idSoundWorldLocal::ReadFromSaveGame( arcNetFile *savefile ) {
+void idSoundWorldLocal::ReadFromSaveGame( anFile *savefile ) {
 	int i, num, handle, listenerId, gameTime, channel;
 	int savedSoundTime, currentSoundTime, soundTimeOffset;
-	arcAudioSystemLocal *def;
-	arcVec3 origin;
-	arcMat3 axis;
-	arcNetString soundShader;
+	anAudioSystemLocal *def;
+	anVec3 origin;
+	anMat3 axis;
+	anString soundShader;
 
 	ClearAllSoundEmitters();
 
@@ -1252,7 +1252,7 @@ void idSoundWorldLocal::ReadFromSaveGame( arcNetFile *savefile ) {
 	savefile->ReadInt( num );
 
 	while( emitters.Num() < num ) {
-		def = new arcAudioSystemLocal;
+		def = new anAudioSystemLocal;
 		def->index = emitters.Append( def );
 		def->soundWorld = this;
 	}
@@ -1298,7 +1298,7 @@ void idSoundWorldLocal::ReadFromSaveGame( arcNetFile *savefile ) {
 
 			idSoundChannel *chan = &def->channels[channel];
 
-			if ( chan->decoder != NULL ) {
+			if ( chan->decoder != nullptr ) {
 				// The pointer in the save file is not valid, so we grab a new one
 				chan->decoder = idSampleDecoder::Alloc();
 			}
@@ -1311,7 +1311,7 @@ void idSoundWorldLocal::ReadFromSaveGame( arcNetFile *savefile ) {
 			if ( soundSystemLocal.soundCache ) {
 				chan->leadinSample = soundSystemLocal.soundCache->FindSound( soundShader, false );
 			} else {
-				chan->leadinSample = NULL;
+				chan->leadinSample = nullptr;
 			}
 
 			// adjust the hardware start time
@@ -1348,12 +1348,12 @@ void idSoundWorldLocal::ReadFromSaveGame( arcNetFile *savefile ) {
  idSoundWorldLocal::ReadFromSaveGameSoundShaderParams
  ===================
  */
-void idSoundWorldLocal::ReadFromSaveGameSoundShaderParams( arcNetFile *saveGame, soundShaderParms_t *params ) {
+void idSoundWorldLocal::ReadFromSaveGameSoundShaderParams( anFile *saveGame, soundShaderParms_t *params ) {
 	saveGame->ReadFloat(params->minDistance);
 	saveGame->ReadFloat(params->maxDistance);
 	saveGame->ReadFloat(params->volume);
 	saveGame->ReadFloat(params->shakes);
-	saveGame->ReadInt(params->soundShaderFlags);
+	saveGame->ReadInt(params->soundShaderFlags );
 	saveGame->ReadInt(params->soundClass);
 }
 
@@ -1362,7 +1362,7 @@ void idSoundWorldLocal::ReadFromSaveGameSoundShaderParams( arcNetFile *saveGame,
  idSoundWorldLocal::ReadFromSaveGameSoundChannel
  ===================
  */
-void idSoundWorldLocal::ReadFromSaveGameSoundChannel( arcNetFile *saveGame, idSoundChannel *ch ) {
+void idSoundWorldLocal::ReadFromSaveGameSoundChannel( anFile *saveGame, idSoundChannel *ch ) {
 	saveGame->ReadBool( ch->triggerState );
 	char tmp;
 	saveGame->ReadChar( tmp );
@@ -1392,7 +1392,7 @@ idSoundWorldLocal::EmitterForIndex
 */
 ARCSoundEmitter	*idSoundWorldLocal::EmitterForIndex( int index ) {
 	if ( index == 0 ) {
-		return NULL;
+		return nullptr;
 	}
 	if ( index >= emitters.Num() ) {
 		common->Error( "idSoundWorldLocal::EmitterForIndex: %i > %i", index, emitters.Num() );
@@ -1410,7 +1410,7 @@ idSoundWorldLocal::StopAllSounds
 void idSoundWorldLocal::StopAllSounds() {
 
 	for ( int i = 0; i < emitters.Num(); i++ ) {
-		arcAudioSystemLocal * def = emitters[i];
+		anAudioSystemLocal * def = emitters[i];
 		def->StopSound( SCHANNEL_ANY );
 	}
 }
@@ -1478,7 +1478,7 @@ void idSoundWorldLocal::PlayShaderDirectly( const char *shaderName, int channel 
 		return;
 	}
 
-	const arcSoundShader *shader = declManager->FindSound( shaderName );
+	const anSoundShader *shader = declManager->FindSound( shaderName );
 	if ( !shader ) {
 		return;
 	}
@@ -1503,10 +1503,10 @@ idSoundWorldLocal::CalcEars
 Determine the volumes from each speaker for a given sound emitter
 ===============
 */
-void idSoundWorldLocal::CalcEars( int numSpeakers, arcVec3 spatializedOrigin, arcVec3 listenerPos,
-								 arcMat3 listenerAxis, float ears[6], float spatialize ) {
-	arcVec3 svec = spatializedOrigin - listenerPos;
-	arcVec3 ovec;
+void idSoundWorldLocal::CalcEars( int numSpeakers, anVec3 spatializedOrigin, anVec3 listenerPos,
+								 anMat3 listenerAxis, float ears[6], float spatialize ) {
+	anVec3 svec = spatializedOrigin - listenerPos;
+	anVec3 ovec;
 
 	ovec[0] = svec * listenerAxis[0];
 	ovec[1] = svec * listenerAxis[1];
@@ -1515,13 +1515,13 @@ void idSoundWorldLocal::CalcEars( int numSpeakers, arcVec3 spatializedOrigin, ar
 	ovec.Normalize();
 
 	if ( numSpeakers == 6 ) {
-		static arcVec3	speakerVector[6] = {
-			arcVec3(  0.707f,  0.707f, 0.0f ),	// front left
-			arcVec3(  0.707f, -0.707f, 0.0f ),	// front right
-			arcVec3(  0.707f,  0.0f,   0.0f ),	// front center
-			arcVec3(  0.0f,    0.0f,   0.0f ),	// sub
-			arcVec3( -0.707f,  0.707f, 0.0f ),	// rear left
-			arcVec3( -0.707f, -0.707f, 0.0f )	// rear right
+		static anVec3	speakerVector[6] = {
+			anVec3(  0.707f,  0.707f, 0.0f ),	// front left
+			anVec3(  0.707f, -0.707f, 0.0f ),	// front right
+			anVec3(  0.707f,  0.0f,   0.0f ),	// front center
+			anVec3(  0.0f,    0.0f,   0.0f ),	// sub
+			anVec3( -0.707f,  0.707f, 0.0f ),	// rear left
+			anVec3( -0.707f, -0.707f, 0.0f )	// rear right
 		};
 		for ( int i = 0; i < 6; i++ ) {
 			if ( i == 3 ) {
@@ -1570,7 +1570,7 @@ Mixes MIXBUFFER_SAMPLES samples starting at current44kHz sample time into
 finalMixBuffer
 ===============
 */
-void idSoundWorldLocal::AddChannelContribution( arcAudioSystemLocal *sound, idSoundChannel *chan,
+void idSoundWorldLocal::AddChannelContribution( anAudioSystemLocal *sound, idSoundChannel *chan,
 				   int current44kHz, int numSpeakers, float *finalMixBuffer ) {
 	int j;
 	float volume;
@@ -1585,7 +1585,7 @@ void idSoundWorldLocal::AddChannelContribution( arcAudioSystemLocal *sound, idSo
 
 	// fetch the actual wave file and see if it's valid
 	idSoundSample *sample = chan->leadinSample;
-	if ( sample == NULL ) {
+	if ( sample == nullptr ) {
 		return;
 	}
 
@@ -1595,7 +1595,7 @@ void idSoundWorldLocal::AddChannelContribution( arcAudioSystemLocal *sound, idSo
 	}
 
 	// get the actual shader
-	const arcSoundShader *shader = chan->soundShader;
+	const anSoundShader *shader = chan->soundShader;
 
 	// this might happen if the foreground thread just deleted the sound emitter
 	if ( !shader ) {
@@ -1661,7 +1661,7 @@ void idSoundWorldLocal::AddChannelContribution( arcAudioSystemLocal *sound, idSo
 	// it's not affected by distance or occlusion
 	//
 	float	spatialize = 1;
-	arcVec3 spatializedOriginInMeters;
+	anVec3 spatializedOriginInMeters;
 	if ( !global ) {
 		float	dlen;
 
@@ -1679,7 +1679,7 @@ void idSoundWorldLocal::AddChannelContribution( arcAudioSystemLocal *sound, idSo
 		if ( dlen >= maxd ) {
 			volume = 0.0f;
 		} else if ( dlen > mind ) {
-			float frac = arcMath::ClampFloat( 0.0f, 1.0f, 1.0f - ((dlen - mind) / (maxd - mind) ));
+			float frac = anMath::ClampFloat( 0.0f, 1.0f, 1.0f - ((dlen - mind) / (maxd - mind) ) );
 			if ( idSoundSystemLocal::s_quadraticFalloff.GetBool() ) {
 				frac *= frac;
 			}
@@ -1768,7 +1768,7 @@ void idSoundWorldLocal::AddChannelContribution( arcAudioSystemLocal *sound, idSo
 
 				// handle streaming sounds (decode on the fly) both single shot AND looping
 				if ( chan->triggered ) {
-					alSourcei( chan->openalSource, AL_BUFFER, NULL );
+					alSourcei( chan->openalSource, AL_BUFFER, nullptr );
 					alDeleteBuffers( 3, &chan->lastopenalStreamingBuffer[0] );
 					chan->lastopenalStreamingBuffer[0] = chan->openalStreamingBuffer[0];
 					chan->lastopenalStreamingBuffer[1] = chan->openalStreamingBuffer[1];
@@ -1793,11 +1793,11 @@ void idSoundWorldLocal::AddChannelContribution( arcAudioSystemLocal *sound, idSo
 					chan->GatherChannelSamples( chan->openalStreamingOffset * sample->objectInfo.nChannels, MIXBUFFER_SAMPLES * sample->objectInfo.nChannels, alignedInputSamples );
 					for ( int i = 0; i < ( MIXBUFFER_SAMPLES * sample->objectInfo.nChannels ); i++ ) {
 						if ( alignedInputSamples[i] < -32768.0f )
-							((short *)alignedInputSamples)[i] = -32768;
+							(( short *)alignedInputSamples)[i] = -32768;
 						else if ( alignedInputSamples[i] > 32767.0f )
-							((short *)alignedInputSamples)[i] = 32767;
+							(( short *)alignedInputSamples)[i] = 32767;
 						else
-							((short *)alignedInputSamples)[i] = arcMath::FtoiFast( alignedInputSamples[i] );
+							(( short *)alignedInputSamples)[i] = anMath::FtoiFast( alignedInputSamples[i] );
 					}
 					alBufferData( buffers[j], chan->leadinSample->objectInfo.nChannels == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, alignedInputSamples, MIXBUFFER_SAMPLES * sample->objectInfo.nChannels * sizeof( short ), 44100 );
 					chan->openalStreamingOffset += MIXBUFFER_SAMPLES;
@@ -1920,7 +1920,7 @@ idSoundWorldLocal::FindAmplitude
 
   this is called from the main thread
 
-  if listenerPosition is NULL, this is being used for shader parameters,
+  if listenerPosition is nullptr, this is being used for shader parameters,
   like flashing lights and glows based on sound level.  Otherwise, it is being used for
   the screen-shake on a player.
 
@@ -1928,7 +1928,7 @@ idSoundWorldLocal::FindAmplitude
   which would be problematic in multiplayer
 ===============
 */
-float idSoundWorldLocal::FindAmplitude( arcAudioSystemLocal *sound, const int localTime, const arcVec3 *listenerPosition,
+float idSoundWorldLocal::FindAmplitude( anAudioSystemLocal *sound, const int localTime, const anVec3 *listenerPosition,
 									   const s_channelType channel, bool shakesOnly ) {
 	int		i, j;
 	soundShaderParms_t *parms;
@@ -1946,7 +1946,7 @@ float idSoundWorldLocal::FindAmplitude( arcAudioSystemLocal *sound, const int lo
 
 	if ( listenerPosition ) {
 		// this doesn't do the portal spatialization
-		arcVec3 dist = sound->origin - *listenerPosition;
+		anVec3 dist = sound->origin - *listenerPosition;
 		dlen = dist.Length();
 		dlen *= DOOM_TO_METERS;
 	} else {
@@ -1956,7 +1956,7 @@ float idSoundWorldLocal::FindAmplitude( arcAudioSystemLocal *sound, const int lo
 	activeChannelCount = 0;
 
 	for ( i = 0; i < SOUND_MAX_CHANNELS; i++ ) {
-		idSoundChannel	*chan = &sound->channels[ i ];
+		idSoundChannel	*chan = &sound->channels[i];
 
 		if ( !chan->triggerState ) {
 			continue;
@@ -1999,7 +1999,7 @@ float idSoundWorldLocal::FindAmplitude( arcAudioSystemLocal *sound, const int lo
 				if ( dlen >= maxd ) {
 					volume = 0.0f;
 				} else if ( dlen > mind ) {
-					float frac = arcMath::ClampFloat( 0, 1, 1.0f - ((dlen - mind) / (maxd - mind) ));
+					float frac = anMath::ClampFloat( 0, 1, 1.0f - ((dlen - mind) / (maxd - mind) ) );
 					if ( idSoundSystemLocal::s_quadraticFalloff.GetBool() ) {
 						frac *= frac;
 					}
@@ -2025,7 +2025,7 @@ float idSoundWorldLocal::FindAmplitude( arcAudioSystemLocal *sound, const int lo
 		} else {
 			int offset = (localTime - localTriggerTimes);	// offset in samples
 			int size = ( looping ? chan->soundShader->entries[0]->LengthIn44kHzSamples() : chan->leadinSample->LengthIn44kHzSamples() );
-			short *amplitudeData = (short *)( looping ? chan->soundShader->entries[0]->amplitudeData : chan->leadinSample->amplitudeData );
+			short *amplitudeData = ( short *)( looping ? chan->soundShader->entries[0]->amplitudeData : chan->leadinSample->amplitudeData );
 
 			if ( amplitudeData ) {
 				// when the amplitudeData is present use that fill a dummy sourceBuffer
@@ -2084,7 +2084,7 @@ float idSoundWorldLocal::FindAmplitude( arcAudioSystemLocal *sound, const int lo
 idSoundWorldLocal::FadeSoundClasses
 
 fade all sounds in the world with a given shader soundClass
-to is in Db (sigh), over is in seconds
+to is in Db ( sigh), over is in seconds
 =================
 */
 void	idSoundWorldLocal::FadeSoundClasses( const int soundClass, const float to, const float over ) {

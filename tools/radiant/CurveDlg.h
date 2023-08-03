@@ -35,13 +35,13 @@ class CCurveDlg : public CDialog
 	DECLARE_DYNAMIC(CCurveDlg)
 
 public:
-	CCurveDlg(CWnd* pParent = NULL);   // standard constructor
+	CCurveDlg(CWnd* pParent = nullptr );   // standard constructor
 	virtual ~CCurveDlg();
 
 // Dialog Data
 	enum { IDD = IDD_DIALOG_NEWCURVE };
 
-	arcNetString strCurveType;
+	anString strCurveType;
 protected:
 	CComboBox comboCurve;
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

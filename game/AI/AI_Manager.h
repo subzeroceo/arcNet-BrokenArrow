@@ -23,7 +23,7 @@ typedef enum {
 	AITEAMTIMER_MAX
 } aiTeamTimer_t;
 
-extern arcVec4 aiTeamColor[AITEAM_NUM];
+extern anVec4 aiTeamColor[AITEAM_NUM];
 
 /*
 =====================
@@ -32,11 +32,11 @@ blockedReach_t
 */
 // cdr: Alternate Routes Bug
 typedef struct aiBlocked_s {
-	idAAS*							aas;
-	idReachability*					reach;
+	anSEAS*							aas;
+	anReachability*					reach;
 	int								time;
-	idList< idEntityPtr<idEntity> >	blockers;
-	idList< arcVec3 >				positions;
+	anList< anEntityPtr<anEntity> >	blockers;
+	anList< anVec3 >				positions;
 } aiBlocked_t;
 
 /*
@@ -45,7 +45,7 @@ aiAvoid_t
 =====================
 */
 typedef struct aiAvoid_s {
-	arcVec3							origin;
+	anVec3							origin;
 	float							radius;
 	int								team;
 } aiAvoid_t;
@@ -53,25 +53,25 @@ typedef struct aiAvoid_s {
 /*
 ===============================================================================
 
-rvAIHelper
+anSAAIHelper
 
 ===============================================================================
 */
 
-class rvAIHelper : public idEntity {
+class anSAAIHelper : public anEntity {
 public:
-	CLASS_PROTOTYPE( rvAIHelper );
+	CLASS_PROTOTYPE( anSAAIHelper );
 
-	rvAIHelper ( void );
+	anSAAIHelper ( void );
 
-	idLinkList<rvAIHelper>	helperNode;
+	anLinkList<anSAAIHelper>	helperNode;
 
 	void			Spawn					( void );
 
 	virtual bool	IsCombat				( void ) const;
-	virtual bool	ValidateDestination		( const idAI* ent, const arcVec3& dest ) const;
+	virtual bool	ValidateDestination		( const anSAAI* ent, const anVec3& dest ) const;
 
-	arcVec3			GetDirection			( const idAI* ent ) const;
+	anVec3			GetDirection			( const anSAAI* ent ) const;
 
 protected:
 
@@ -79,7 +79,7 @@ protected:
 
 private:
 
-	void			Event_Activate			( idEntity *activator );
+	void			Event_Activate			( anEntity *activator );
 };
 
 /*
@@ -104,13 +104,13 @@ public:
 
 	void				RunFrame				( void );
 
-	void				Save					( idSaveGame *savefile ) const;
-	void				Restore					( idRestoreGame *savefile );
+	void				Save					( anSaveGame *savefile ) const;
+	void				Restore					( anRestoreGame *savefile );
 
 	void				Clear					( void );
 
 	bool				IsActive				( void );
-	bool				IsSimpleThink			( idAI* ai );
+	bool				IsSimpleThink			( anSAAI* ai );
 
 	/*
 	===============================================================================
@@ -120,9 +120,9 @@ public:
 
 	void				UnMarkAllReachBlocked	( void );
 	void				ReMarkAllReachBlocked	( void );
-	void				MarkReachBlocked		( idAAS* aas, idReachability* reach, const idList<idEntity*>& blockers);
-	bool				ValidateDestination		( idAI* ignore, const arcVec3& dest, bool skipCurrent = false, idActor* skipActor = NULL ) const;
-	void				AddAvoid				( const arcVec3& origin, float range, int team );
+	void				MarkReachBlocked		( anSEAS* aas, anReachability* reach, const anList<anEntity*>& blockers);
+	bool				ValidateDestination		( anSAAI* ignore, const anVec3& dest, bool skipCurrent = false, anActor* skipActor = nullptr ) const;
+	void				AddAvoid				( const anVec3& origin, float range, int team );
 
 	/*
 	===============================================================================
@@ -130,9 +130,9 @@ public:
 	===============================================================================
 	*/
 
-	void				RegisterHelper			( rvAIHelper* helper );
-	void				UnregisterHelper		( rvAIHelper* helper );
-	rvAIHelper*			FindClosestHelper		( const arcVec3& origin );
+	void				RegisterHelper			( anSAAIHelper* helper );
+	void				UnregisterHelper		( anSAAIHelper* helper );
+	anSAAIHelper*			FindClosestHelper		( const anVec3& origin );
 
 	/*
 	===============================================================================
@@ -140,16 +140,16 @@ public:
 	===============================================================================
 	*/
 
-	void				AddTeammate				( idActor* ent );
-	void				RemoveTeammate			( idActor* ent );
+	void				AddTeammate				( anActor* ent );
+	void				RemoveTeammate			( anActor* ent );
 
-	idActor*			GetAllyTeam				( aiTeam_t team );
-	idActor*			GetEnemyTeam			( aiTeam_t team );
+	anActor*			GetAllyTeam				( aiTeam_t team );
+	anActor*			GetEnemyTeam			( aiTeam_t team );
 
-	idActor*			NearestTeammateToPoint	( idActor* from, arcVec3 point, bool nonPlayer = false, float maxRange = 1000.0f, bool checkFOV = false, bool checkLOS = false );
-	idEntity*			NearestTeammateEnemy	( idActor* from, float maxRange=1000.0f, bool checkFOV = false, bool checkLOS = false, idActor** ally = NULL );
-	bool				LocalTeamHasEnemies		( idAI* self, float maxBuddyRange=640.0f, float maxEnemyRange=1024.0f, bool checkPVS=false );
-	bool				ActorIsBehindActor		( idActor* ambusher, idActor* victim );
+	anActor*			NearestTeammateToPoint	( anActor* from, anVec3 point, bool nonPlayer = false, float maxRange = 1000.0f, bool checkFOV = false, bool checkLOS = false );
+	anEntity*			NearestTeammateEnemy	( anActor* from, float maxRange=1000.0f, bool checkFOV = false, bool checkLOS = false, anActor** ally = nullptr );
+	bool				LocalTeamHasEnemies		( anSAAI* self, float maxBuddyRange=640.0f, float maxEnemyRange=1024.0f, bool checkPVS=false );
+	bool				ActorIsBehindActor		( anActor* ambusher, anActor* victim );
 
 	/*
 	===============================================================================
@@ -167,8 +167,8 @@ public:
 	===============================================================================
 	*/
 
-	void				AnnounceKill			( idAI* victim, idEntity* attacker, idEntity* inflictor );
-	void				AnnounceDeath			( idAI* victim, idEntity* attacker );
+	void				AnnounceKill			( anSAAI* victim, anEntity* attacker, anEntity* inflictor );
+	void				AnnounceDeath			( anSAAI* victim, anEntity* attacker );
 
 	/*
 	===============================================================================
@@ -176,7 +176,7 @@ public:
 	===============================================================================
 	*/
 
-	void				ReactToPlayerAttack		( idPlayer* player, const arcVec3 &origOrigin, const arcVec3 &origDir );
+	void				ReactToPlayerAttack		( anBasePlayer* player, const anVec3 &origOrigin, const anVec3 &origDir );
 
 	/*
 	===============================================================================
@@ -184,10 +184,10 @@ public:
 	===============================================================================
 	*/
 
-	idTimer				timerFindEnemy;
-	idTimer				timerTactical;
-	idTimer				timerMove;
-	idTimer				timerThink;
+	anTimer				timerFindEnemy;
+	anTimer				timerTactical;
+	anTimer				timerMove;
+	anTimer				timerThink;
 
 	int					thinkCount;
 	int					simpleThinkCount;
@@ -199,14 +199,14 @@ protected:
 	void				DebugDraw				( void );
 	void				DebugDrawHelpers		( void );
 
-	idList<aiBlocked_t>		blockedReaches;
-	idLinkList<idAI>		simpleThink;
-	idLinkList<rvAIHelper>	helpers;
+	anList<aiBlocked_t>		blockedReaches;
+	anLinkList<anSAAI>		simpleThink;
+	anLinkList<anSAAIHelper>	helpers;
 
-	idLinkList<idActor>		teams[AITEAM_NUM];
+	anLinkList<anActor>		teams[AITEAM_NUM];
 	int						teamTimers[AITEAM_NUM][AITEAMTIMER_MAX];
 
-	idList<aiAvoid_t>		avoids;
+	anList<aiAvoid_t>		avoids;
 };
 
 ARC_INLINE bool rvAIManager::CheckTeamTimer ( int team, aiTeamTimer_t timer ) {
@@ -221,11 +221,11 @@ ARC_INLINE void rvAIManager::SetTeamTimer ( int team, aiTeamTimer_t timer, int d
 	teamTimers[team][timer] = gameLocal.time + delay;
 }
 
-ARC_INLINE void rvAIManager::AddAvoid ( const arcVec3& origin, float radius, int team ) {
-	if ( !IsActive ( ) ) {
+ARC_INLINE void rvAIManager::AddAvoid ( const anVec3& origin, float radius, int team ) {
+	if ( !IsActive() ) {
 		return;
 	}
-	aiAvoid_t& a = avoids.Alloc ( );
+	aiAvoid_t& a = avoids.Alloc();
 	a.origin = origin;
 	a.radius = radius;
 	a.team   = team;

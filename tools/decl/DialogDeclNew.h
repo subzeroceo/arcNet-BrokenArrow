@@ -39,14 +39,14 @@ class DialogDeclNew : public CDialog {
 	DECLARE_DYNAMIC(DialogDeclNew)
 
 public:
-						DialogDeclNew( CWnd* pParent = NULL );   // standard constructor
+						DialogDeclNew( CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogDeclNew();
 
 	void				SetDeclTree( CPathTreeCtrl *tree ) { declTree = tree; }
 	void				SetDefaultType( const char *type ) { defaultType = type; }
 	void				SetDefaultName( const char *name ) { defaultName = name; }
 	void				SetDefaultFile( const char *file ) { defaultFile = file; }
-	arcDecleration *			GetNewDecl( void ) const { return newDecl; }
+	anDecl *			GetNewDecl( void ) const { return newDecl; }
 
 	//{{AFX_VIRTUAL(DialogDeclNew)
 	virtual BOOL		OnInitDialog();
@@ -81,10 +81,10 @@ private:
 	static toolTip_t	toolTips[];
 
 	CPathTreeCtrl *		declTree;
-	arcNetString				defaultType;
-	arcNetString				defaultName;
-	arcNetString				defaultFile;
-	arcDecleration *			newDecl;
+	anString				defaultType;
+	anString				defaultName;
+	anString				defaultFile;
+	anDecl *			newDecl;
 
 private:
 	void				InitTypeList( void );

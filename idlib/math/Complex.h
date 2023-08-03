@@ -113,7 +113,7 @@ ARC_INLINE TeckComplex TeckComplex::operator*( const TeckComplex &a ) const {
 
 ARC_INLINE TeckComplex TeckComplex::operator/( const TeckComplex &a ) const {
 	float s, t;
-	if ( arcMath::Fabs( a.r ) >= arcMath::Fabs( a.i ) ) {
+	if ( anMath::Fabs( a.r ) >= anMath::Fabs( a.i ) ) {
 		s = a.i / a.r;
 		t = 1.0f / ( a.r + s * a.i );
 		return TeckComplex( ( r + s * i ) * t, ( i - s * r ) * t );
@@ -139,7 +139,7 @@ ARC_INLINE TeckComplex &TeckComplex::operator*=( const TeckComplex &a ) {
 
 ARC_INLINE TeckComplex &TeckComplex::operator/=( const TeckComplex &a ) {
 	float s, t;
-	if ( arcMath::Fabs( a.r ) >= arcMath::Fabs( a.i ) ) {
+	if ( anMath::Fabs( a.r ) >= anMath::Fabs( a.i ) ) {
 		s = a.i / a.r;
 		t = 1.0f / ( a.r + s * a.i );
 		*this = TeckComplex( ( r + s * i ) * t, ( i - s * r ) * t );
@@ -209,7 +209,7 @@ ARC_INLINE TeckComplex operator*( const float a, const TeckComplex &b ) {
 
 ARC_INLINE TeckComplex operator/( const float a, const TeckComplex &b ) {
 	float s, t;
-	if ( arcMath::Fabs( b.r ) >= arcMath::Fabs( b.i ) ) {
+	if ( anMath::Fabs( b.r ) >= anMath::Fabs( b.i ) ) {
 		s = b.i / b.r;
 		t = a / ( b.r + s * b.i );
 		return TeckComplex( t, - s * t );
@@ -230,7 +230,7 @@ ARC_INLINE TeckComplex operator-( const float a, const TeckComplex &b ) {
 
 ARC_INLINE TeckComplex TeckComplex::Reciprocal( void ) const {
 	float s, t;
-	if ( arcMath::Fabs( r ) >= arcMath::Fabs( i ) ) {
+	if ( anMath::Fabs( r ) >= anMath::Fabs( i ) ) {
 		s = i / r;
 		t = 1.0f / ( r + s * i );
 		return TeckComplex( t, - s * t );
@@ -247,14 +247,14 @@ ARC_INLINE TeckComplex TeckComplex::Sqrt( void ) const {
 	if ( r == 0.0f && i == 0.0f ) {
 		return TeckComplex( 0.0f, 0.0f );
 	}
-	x = arcMath::Fabs( r );
-	y = arcMath::Fabs( i );
+	x = anMath::Fabs( r );
+	y = anMath::Fabs( i );
 	if ( x >= y ) {
 		w = y / x;
-		w = arcMath::Sqrt( x ) * arcMath::Sqrt( 0.5f * ( 1.0f + arcMath::Sqrt( 1.0f + w * w ) ) );
+		w = anMath::Sqrt( x ) * anMath::Sqrt( 0.5f * ( 1.0f + anMath::Sqrt( 1.0f + w * w ) ) );
 	} else {
 		w = x / y;
-		w = arcMath::Sqrt( y ) * arcMath::Sqrt( 0.5f * ( w + arcMath::Sqrt( 1.0f + w * w ) ) );
+		w = anMath::Sqrt( y ) * anMath::Sqrt( 0.5f * ( w + anMath::Sqrt( 1.0f + w * w ) ) );
 	}
 	if ( w == 0.0f ) {
 		return TeckComplex( 0.0f, 0.0f );
@@ -268,18 +268,18 @@ ARC_INLINE TeckComplex TeckComplex::Sqrt( void ) const {
 
 ARC_INLINE float TeckComplex::Abs( void ) const {
 	float x, y, t;
-	x = arcMath::Fabs( r );
-	y = arcMath::Fabs( i );
+	x = anMath::Fabs( r );
+	y = anMath::Fabs( i );
 	if ( x == 0.0f ) {
 		return y;
 	} else if ( y == 0.0f ) {
 		return x;
 	} else if ( x > y ) {
 		t = y / x;
-		return x * arcMath::Sqrt( 1.0f + t * t );
+		return x * anMath::Sqrt( 1.0f + t * t );
 	} else {
 		t = x / y;
-		return y * arcMath::Sqrt( 1.0f + t * t );
+		return y * anMath::Sqrt( 1.0f + t * t );
 	}
 }
 
@@ -288,10 +288,10 @@ ARC_INLINE bool TeckComplex::Compare( const TeckComplex &a ) const {
 }
 
 ARC_INLINE bool TeckComplex::Compare( const TeckComplex &a, const float epsilon ) const {
-	if ( arcMath::Fabs( r - a.r ) > epsilon ) {
+	if ( anMath::Fabs( r - a.r ) > epsilon ) {
 		return false;
 	}
-	if ( arcMath::Fabs( i - a.i ) > epsilon ) {
+	if ( anMath::Fabs( i - a.i ) > epsilon ) {
 		return false;
 	}
 	return true;

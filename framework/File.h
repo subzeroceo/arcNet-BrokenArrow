@@ -1,56 +1,56 @@
 #ifndef __FILE_H__
 #define __FILE_H__
-
+#include <cstdio>
 /*
 ==============================================================
 
-  File Streams.
+  File Stream
 
 ==============================================================
 */
-
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
 // mode parm for Seek
 typedef enum {
-	FS_SEEK_CUR,
-	FS_SEEK_END,
-	FS_SEEK_SET
+	FS_SEEK_SET = SEEK_SET,
+	FS_SEEK_CUR	= SEEK_CUR,
+	FS_SEEK_END	= SEEK_END,
 } fsOrigin_t;
 
-class aRcFileSystemLocal;
-
-
-class arcNetFile {
+class anFileSystem;
+class anFile {
 public:
-	virtual					~arcNetFile() {};
+	virtual					~anFile( void ) {};
 							// Get the name of the file.
-	virtual const char *	GetName() const;
+	virtual const char *	GetName( void );
 							// Get the full file path.
-	virtual const char *	GetFullPath() const;
+	virtual const char *	GetFullPath( void );
 							// Read data from the file to the buffer.
 	virtual int				Read( void *buffer, int len );
 							// Write data from the buffer to the file.
 	virtual int				Write( const void *buffer, int len );
 							// Returns the length of the file.
-	virtual int				Length() const;
+	virtual int				Length( void );
 							// Return a time value for reload operations.
-	virtual ARC_TIME_T		Timestamp() const;
+	virtual ARC_TIME_T		Timestamp( void );
 							// Returns offset in file.
-	virtual int				Tell() const;
+	virtual int				Tell( void );
 							// Forces flush on files being writting to.
-	virtual void			ForceFlush();
+	virtual void			ForceFlush( void );
 							// Causes any buffered data to be written to the file.
-	virtual void			Flush();
+	virtual void			Flush( void );
 							// Seek on a file.
 	virtual int				Seek( long offset, fsOrigin_t origin );
 							// Go back to the beginning of the file.
-	virtual void			Rewind();
+	virtual void			Rewind( void );
 							// Like fprintf.
-	virtual int				Printf( VERIFY_FORMAT_STRING const char *fmt, ... );
+	virtual int				Printf( const char *fmt, ... ) an_attribute( ( format( printf, 2, 3 )  ) );
 							// Like fprintf but with argument pointer
 	virtual int				VPrintf( const char *fmt, va_list arg );
 							// Write a string with high precision floating point numbers to the file.
-	virtual int				WriteFloatString( VERIFY_FORMAT_STRING const char *fmt, ... );
-
+	virtual int				WriteFloatString( const char *fmt, ... ) an_attribute( ( format( printf, 2, 3 ) ) );
+	
 	// Endian portable alternatives to Read(...)
 	virtual int				ReadInt( int &value );
 	virtual int				ReadUnsignedInt( unsigned int &value );
@@ -59,13 +59,19 @@ public:
 	virtual int				ReadChar( char &value );
 	virtual int				ReadUnsignedChar( unsigned char &value );
 	virtual int				ReadFloat( float &value );
+	virtual int				ReadDouble( double &value );
 	virtual int				ReadBool( bool &value );
-	virtual int				ReadString( arcNetString &string );
-	virtual int				ReadVec2( arcVec2 &vec );
-	virtual int				ReadVec3( arcVec3 &vec );
-	virtual int				ReadVec4( arcVec4 &vec );
-	virtual int				ReadVec6( arcVec6 &vec );
-	virtual int				ReadMat3( arcMat3 &mat );
+	virtual int				ReadString( anString &string );
+	virtual int				ReadVec2( anVec2 &vec );
+	virtual int				ReadVec3( anVec3 &vec );
+	virtual int				ReadVec4( anVec4 &vec );
+	virtual int				ReadVec6( anVec6 &vec );
+	virtual int				ReadMat3( anMat3 &mat );
+	virtual int 			ReadCQuat( anCQuat &quat );
+	virtual int 			ReadAngles( anAngles &angles );
+	virtual int				ReadRadians( anRadians &rads );
+	virtual int				Read1DFloatArray( float *dst );
+	virtual int				ReadFloatArray( float *src, const int num );
 
 	// Endian portable alternatives to Write(...)
 	virtual int				WriteInt( const int value );
@@ -75,272 +81,191 @@ public:
 	virtual int				WriteChar( const char value );
 	virtual int				WriteUnsignedChar( const unsigned char value );
 	virtual int				WriteFloat( const float value );
+	virtual int				WriteDouble( const double value );
 	virtual int				WriteBool( const bool value );
 	virtual int				WriteString( const char *string );
-	virtual int				WriteVec2( const arcVec2 &vec );
-	virtual int				WriteVec3( const arcVec3 &vec );
-	virtual int				WriteVec4( const arcVec4 &vec );
-	virtual int				WriteVec6( const arcVec6 &vec );
-	virtual int				WriteMat3( const arcMat3 &mat );
-
-	template<class type> ARC_INLINE size_t ReadBig( type &c ) {
-		size_t r = Read( &c, sizeof( c ) );
-		idSwap::Big( c );
-		return r;
-	}
-
-	template<class type> ARC_INLINE size_t ReadBigArray( type *c, int count ) {
-		size_t r = Read( c, sizeof( c[0] ) * count );
-		idSwap::BigArray( c, count );
-		return r;
-	}
-
-	template<class type> ARC_INLINE size_t WriteBig( const type &c ) {
-		type b = c;
-		idSwap::Big( b );
-		return Write( &b, sizeof( b ) );
-	}
-
-	template<class type> ARC_INLINE size_t WriteBigArray( const type *c, int count ) {
-		size_t r = 0;
-		for ( int i = 0; i < count; i++ ) {
-			r += WriteBig( c[i] );
-		}
-		return r;
-	}
+	virtual int				WriteVec2( const anVec2 &vec );
+	virtual int				WriteVec3( const anVec3 &vec );
+	virtual int				WriteVec4( const anVec4 &vec );
+	virtual int				WriteVec6( const anVec6 &vec );
+	virtual int				WriteMat3( const anMat3 &mat );
+	virtual int				WriteCQuat( const anCQuat &quat );
+	virtual int				WriteAngles( const anAngles &angles );
+	virtual int				WriteRadians( const anRadians &rads );
+	virtual int				Write1DFloatArray( const int num, const float *src );
+	virtual int				WriteFloatArray( const float *src, const int num );
 };
 
-/*
-================================================
-aRcFileMemory
-================================================
-*/
-class aRcFileMemory : public arcNetFile {
-	friend class			aRcFileSystemLocal;
-
+class anFileMemory : public anFile {
+	friend class			anFileSystem;
 public:
-							aRcFileMemory();	// file for writing without name
-							aRcFileMemory( const char *name );	// file for writing
-							aRcFileMemory( const char *name, char *data, int length );	// file for writing
-							aRcFileMemory( const char *name, const char *data, int length );	// file for reading
-	virtual					~aRcFileMemory();
+							anFileMemory( void );	// file for writing without name
+							anFileMemory( const char *name );	// file for writing
+							anFileMemory( const char *name, char *data, int length );	// file for writing
+							anFileMemory( const char *name, const char *data, int length );	// file for reading
+	virtual					~anFileMemory( void );
 
-	virtual const char *	GetName() const { return name.c_str(); }
-	virtual const char *	GetFullPath() const { return name.c_str(); }
+	virtual const char *	GetName( void ) { return name.c_str(); }
+	virtual const char *	GetFullPath( void ) { return name.c_str(); }
 	virtual int				Read( void *buffer, int len );
 	virtual int				Write( const void *buffer, int len );
-	virtual int				Length() const;
-	virtual void			SetLength( size_t len );
-	virtual ARC_TIME_T		Timestamp() const;
-	virtual int				Tell() const;
-	virtual void			ForceFlush();
-	virtual void			Flush();
+	virtual int				Length( void );
+	virtual ARC_TIME_T		Timestamp( void );
+	virtual int				Tell( void );
+	virtual void			ForceFlush( void );
+	virtual void			Flush( void );
 	virtual int				Seek( long offset, fsOrigin_t origin );
 
-	// Set the given length and don't allow the file to grow.
-	void					SetMaxLength( size_t len );
 							// changes memory file to read only
-	void					MakeReadOnly();
-	// Change the file to be writable
-	void					MakeWritable();
+	virtual void			MakeReadOnly( void );
 							// clear the file
 	virtual void			Clear( bool freeMemory = true );
 							// set data for reading
 	void					SetData( const char *data, int length );
 							// returns const pointer to the memory buffer
-	const char *			GetDataPtr() const { return filePtr; }
-							// returns pointer to the memory buffer
-	char *					GetDataPtr() { return filePtr; }
+	const char *			GetDataPtr( void ) const { return filePtr; }
 							// set the file granularity
 	void					SetGranularity( int g ) { assert( g > 0 ); granularity = g; }
-	void					PreAllocate( size_t len );
 
-	// Doesn't change how much is allocated, but allows you to set the size of the file to smaller than it should be.
-	// Useful for stripping off a checksum at the end of the file
-	void					TruncateData( size_t len );
-
-	void					TakeDataOwnership();
-
-	size_t					GetMaxLength() { return maxSize; }
-	size_t					GetAllocated() { return allocated; }
-
-protected:
-	arcNetString					name;			// name of the file
 private:
+	anString				name;			// name of the file
 	int						mode;			// open mode
-	size_t					maxSize;		// maximum size of file
-	size_t					fileSize;		// size of the file
-	size_t					allocated;		// allocated size
+	int						maxSize;		// maximum size of file
+	int						fileSize;		// size of the file
+	int						allocated;		// allocated size
 	int						granularity;	// file granularity
 	char *					filePtr;		// buffer holding the file data
 	char *					curPtr;			// current read/write pointer
 };
 
-
-class arcFile_BitMsg : public arcNetFile {
-	friend class			aRcFileSystemLocal;
-
+class anFileBitMsg : public anFile {
+	friend class			anFileSystem;
 public:
-							arcFile_BitMsg( ARCBitMessage &msg );
-							arcFile_BitMsg( const ARCBitMessage &msg );
-	virtual					~arcFile_BitMsg();
+							anFileBitMsg( anBitMsg &msg );
+							anFileBitMsg( const anBitMsg &msg );
+	virtual					~anFileBitMsg( void );
 
-	virtual const char *	GetName() const { return name.c_str(); }
-	virtual const char *	GetFullPath() const { return name.c_str(); }
+	virtual const char *	GetName( void ) { return name.c_str(); }
+	virtual const char *	GetFullPath( void ) { return name.c_str(); }
 	virtual int				Read( void *buffer, int len );
 	virtual int				Write( const void *buffer, int len );
-	virtual int				Length() const;
-	virtual ARC_TIME_T		Timestamp() const;
-	virtual int				Tell() const;
-	virtual void			ForceFlush();
-	virtual void			Flush();
+	virtual int				Length( void );
+	virtual ARC_TIME_T		Timestamp( void );
+	virtual int				Tell( void );
+	virtual void			ForceFlush( void );
+	virtual void			Flush( void );
 	virtual int				Seek( long offset, fsOrigin_t origin );
 
 private:
-	arcNetString					name;			// name of the file
+	anString				name;			// name of the file
 	int						mode;			// open mode
-	ARCBitMessage *				msg;
+	anBitMsg *				msg;
 };
 
-
-class arcFile_Permanent : public arcNetFile {
-	friend class			aRcFileSystemLocal;
-
+class anFilePermanent : public anFile {
+	friend class			anFileSystem;
 public:
-							arcFile_Permanent();
-	virtual					~arcFile_Permanent();
+							anFilePermanent( void );
+	virtual					~anFilePermanent( void );
 
-	virtual const char *	GetName() const { return name.c_str(); }
-	virtual const char *	GetFullPath() const { return fullPath.c_str(); }
+	virtual const char *	GetName( void ) { return name.c_str(); }
+	virtual const char *	GetFullPath( void ) { return fullPath.c_str(); }
 	virtual int				Read( void *buffer, int len );
 	virtual int				Write( const void *buffer, int len );
-	virtual int				Length() const;
-	virtual ARC_TIME_T		Timestamp() const;
-	virtual int				Tell() const;
-	virtual void			ForceFlush();
-	virtual void			Flush();
+	virtual int				Length( void );
+	virtual ARC_TIME_T		Timestamp( void );
+	virtual int				Tell( void );
+	virtual void			ForceFlush( void );
+	virtual void			Flush( void );
 	virtual int				Seek( long offset, fsOrigin_t origin );
 
 	// returns file pointer
-	arcFileHandle			GetFilePtr() { return o; }
+	FILE *					GetFilePtr( void ) { return o; }
 
 private:
-	arcNetString					name;			// relative path of the file - relative path
-	arcNetString					fullPath;		// full file path - OS path
+	anString				name;			// relative path of the file - relative path
+	anString				fullPath;		// full file path - OS path
 	int						mode;			// open mode
 	int						fileSize;		// size of the file
-	arcFileHandle			o;				// file handle
+	FILE *					o;				// file handle
 	bool					handleSync;		// true if written data is immediately flushed
 };
 
-class arcFile_Cached : public arcFile_Permanent {
-	friend class			aRcFileSystemLocal;
+class anFileBuffered : public anFile {
+	friend class			anFileSystem;
+
 public:
-	arcFile_Cached();
-	virtual					~arcFile_Cached();
+							anFileBuffered( const int granularity = 2048 * 1024 );	// file for reading
+							anFileBuffered( anFile *source, const int granularity = 2048 * 1024 );	// file for reading
+	 							~anFileBuffered( void );
 
-	void					CacheData( uint64 offset, uint64 length );
+	const char *			GetName( void ) { return source->GetName(); }
+	const char *			GetFullPath( void ) { return source->GetFullPath(); }
+	int						Read( void *buffer, int len );
+	int						Length( void ) const { return source->Length(); }
+	unsigned int			Timestamp( void ) { return source->Timestamp(); }
+	int						Tell( void );
+	int						Seek( long offset, fsOrigin_t origin );
 
-	virtual int				Read( void *buffer, int len );
-
-	virtual int				Tell() const;
-	virtual int				Seek( long offset, fsOrigin_t origin );
+	void					SetSource( anFile *source );
+	void					ReleaseSource();
 
 private:
-	uint64				internalFilePos;
-	uint64				bufferedStartOffset;
-	uint64				bufferedEndOffset;
-	byte *				buffered;
+	int						ReadInternal( void *buffer, int len );
+	void					SeekInternal( long offset );
+
+private:
+	anFile *				source;			// source file pointer
+	int						granularity;	// file granularity
+	int						available;		// current amount of data left in buffer
+	long					sourceOffset;	// offset in source file of file data
+	const byte *			filePtr;		// buffer holding the file data
+	const byte *			curPtr;			// current read pointer
 };
 
-
-class arcFile_InZip : public arcNetFile {
-	friend class			aRcFileSystemLocal;
-
+class anCompressedArchive : public anFile {
+	friend class			anFileSystem;
 public:
-							arcFile_InZip();
-	virtual					~arcFile_InZip();
+							anCompressedArchive( void );
+	virtual					~anCompressedArchive( void );
 
-	virtual const char *	GetName() const { return name.c_str(); }
-	virtual const char *	GetFullPath() const { return fullPath.c_str(); }
+	virtual const char *	GetName( void ) { return name.c_str(); }
+	virtual const char *	GetFullPath( void ) { return fullPath.c_str(); }
 	virtual int				Read( void *buffer, int len );
 	virtual int				Write( const void *buffer, int len );
-	virtual int				Length() const;
-	virtual ARC_TIME_T		Timestamp() const;
-	virtual int				Tell() const;
-	virtual void			ForceFlush();
-	virtual void			Flush();
+	virtual int				Length( void );
+	virtual ARC_TIME_T		Timestamp( void );
+	virtual int				Tell( void );
+	virtual void			ForceFlush( void );
+	virtual void			Flush( void );
 	virtual int				Seek( long offset, fsOrigin_t origin );
 
 private:
-	arcNetString					name;			// name of the file in the pak
-	arcNetString					fullPath;		// full file path including pak file name
+	anString				name;			// name of the file in the pak
+	anString				fullPath;		// full file path including pak file name
 	int						zipFilePos;		// zip file info position in pak
 	int						fileSize;		// size of the file
 	void *					z;				// unzip info
 };
 
-#if 1
-class arcFile_InnerResource : public arcNetFile {
-	friend class			aRcFileSystemLocal;
-
+class anFileCached : public idFile_Permanent {
+	friend class			idFileSystemLocal;
 public:
-							arcFile_InnerResource( const char *_name, arcNetFile *rezFile, int _offset, int _len );
-	virtual					~arcFile_InnerResource();
+	anFileCached();
+	virtual					~anFileCached();
 
-	virtual const char *	GetName() const { return name.c_str(); }
-	virtual const char *	GetFullPath() const { return name.c_str(); }
-	virtual int				Read( void *buffer, int len );
-	virtual int				Write( const void *buffer, int len ) { assert( false ); return 0; }
-	virtual int				Length() const { return length; }
-	virtual ARC_TIME_T		Timestamp() const { return 0; }
-	virtual int				Tell() const;
-	virtual int				Seek( long offset, fsOrigin_t origin );
-	void					SetResourceBuffer( byte * buf ) {
-		resourceBuffer = buf;
-		internalFilePos = 0;
-	}
+	void					CacheData( uint64 offset, uint64 length );
+
+	int						Read( void *buffer, int len );
+
+	int						Tell() const;
+	int						Seek( long offset, fsOrigin_t origin );
 
 private:
-	arcNetString				name;				// name of the file in the pak
-	int					offset;				// offset in the resource file
-	int					length;				// size
-	arcNetFile *			resourceFile;		// actual file
-	int					internalFilePos;	// seek offset
-	byte *				resourceBuffer;		// if using the temp save memory
-};
-#endif
-/*
-================================================
-arcFileLocal is a FileStream wrapper that automatically closes a file when the
-class variable goes out of scope. Note that the pointer passed in to the constructor can be for
-any type of File Stream that ultimately inherits from arcNetFile, and that this is not actually a
-SmartPointer, as it does not keep a reference count.
-================================================
-*/
-class arcFileLocal {
-public:
-	// Constructor that accepts and stores the file pointer.
-	arcFileLocal( arcNetFile *_file )	: file( _file ) {
-	}
-
-	// Destructor that will destroy (close) the file when this wrapper class goes out of scope.
-	~arcFileLocal();
-
-	// Cast to a file pointer.
-	operator arcNetFile * () const {
-		return file;
-	}
-
-	// Member access operator for treating the wrapper as if it were the file, itself.
-	arcNetFile * operator -> () const {
-		return file;
-	}
-
-protected:
-	arcNetFile *file;	// The managed file pointer.
+	uint				internalFilePos;
+	uint				bufferedStartOffset;
+	uint				bufferedEndOffset;
+	byte *				buffered;
 };
 
-
-
-#endif /* !__FILE_H__ */
+#endif // !__FILE_H__

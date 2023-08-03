@@ -36,7 +36,7 @@ class CConsoleDlg : public CDialog
 	DECLARE_DYNCREATE(CConsoleDlg)
 
 public:
-	CConsoleDlg(CWnd* pParent = NULL);   // standard constructor
+	CConsoleDlg(CWnd* pParent = nullptr );   // standard constructor
 	virtual ~CConsoleDlg();
 
 // Dialog Data
@@ -50,12 +50,12 @@ public:
 	CEdit editConsole;
 	CEdit editInput;
 	void AddText(const char *msg);
-	void SetConsoleText ( const arcNetString& text );
-	void ExecuteCommand ( const arcNetString& cmd = "" );
+	void SetConsoleText ( const anString& text );
+	void ExecuteCommand ( const anString& cmd = "" );
 
-	arcNetString consoleStr;
-    arcStringList consoleHistory;
-    arcNetString currentCommand;
+	anString consoleStr;
+    anStringList consoleHistory;
+    anString currentCommand;
     int currentHistoryPosition;
 	bool saveCurrentCommand;
 

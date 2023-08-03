@@ -53,7 +53,7 @@ public:
 		m_sample_format = 0;
 		m_channels = 0;
 		m_speed = 0;
-		m_buffer = NULL;
+		m_buffer = nullptr;
 		m_buffer_size = 0;
 		m_loops = 0;
 		m_writeChunks		= 0;
@@ -78,7 +78,7 @@ public:
 private:
 	void		Release( bool bSilent = false );
 	void		InitFailed();
-	void		ExtractOSSVersion( int version, arcNetString &str ) const;
+	void		ExtractOSSVersion( int version, anString &str ) const;
 };
 
 #ifndef NO_ALSA
@@ -89,12 +89,12 @@ private:
 #define ALSA_PCM_NEW_SW_PARAMS_API
 #include <alsa/asoundlib.h>
 
-#define id_snd_pcm_hw_params_alloca(ptr) do { assert(ptr); *ptr = (snd_pcm_hw_params_t *) alloca(id_snd_pcm_hw_params_sizeof() ); memset(*ptr, 0, id_snd_pcm_hw_params_sizeof() ); } while (0 )
+#define id_snd_pcm_hw_params_alloca(ptr) do { assert(ptr); *ptr = ( snd_pcm_hw_params_t *) alloca(id_snd_pcm_hw_params_sizeof() ); memset(*ptr, 0, id_snd_pcm_hw_params_sizeof() ); } while (0 )
 
-typedef const char * ( *pfn_snd_asoundlib_version )( void );
+typedef const char *( *pfn_snd_asoundlib_version )( void );
 typedef snd_pcm_sframes_t ( *pfn_snd_pcm_avail_update )( snd_pcm_t *pcm );
 typedef int ( *pfn_snd_pcm_close )( snd_pcm_t *pcm );
-typedef const char * ( *pfn_snd_strerror )( int errnum );
+typedef const char *( *pfn_snd_strerror )( int errnum );
 typedef int ( *pfn_snd_pcm_hw_params )( snd_pcm_t *pcm, snd_pcm_hw_params_t *params );
 typedef int ( *pfn_snd_pcm_hw_params_any )( snd_pcm_t *pcm, snd_pcm_hw_params_t *params );
 typedef int ( *pfn_snd_pcm_hw_params_get_buffer_size )( const snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val );
@@ -128,12 +128,12 @@ private:
 
 public:
 						idAudioHardwareALSA() {
-							m_pcm_handle		= NULL;
+							m_pcm_handle		= nullptr;
 							m_channels			= 0;
-							m_buffer			= NULL;
+							m_buffer			= nullptr;
 							m_buffer_size		= 0;
 							m_remainingFrames	= 0;
-							m_handle			= NULL;
+							m_handle			= nullptr;
 						}
 						virtual				~idAudioHardwareALSA();
 
@@ -160,7 +160,7 @@ private:
 	void				InitFailed();
 	void				PlayTestPattern();
 
-	// may be NULL, outdated alsa versions are missing it and we just ignore
+	// may be nullptr, outdated alsa versions are missing it and we just ignore
 	pfn_snd_asoundlib_version id_snd_asoundlib_version;
 
 	pfn_snd_pcm_avail_update id_snd_pcm_avail_update;

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 //#include "stdafx.h"
@@ -59,7 +59,7 @@ CEntKeyFindReplace::CEntKeyFindReplace(	CString* p_strFindKey,
 										CString* p_strReplaceValue,
 										bool*	 p_bWholeStringMatchOnly,
 										bool*	 p_bSelectAllMatchingEnts,
-										CWnd*	 pParent /*=NULL*/)
+										CWnd*	 pParent /*=nullptr*/)
 	: CDialog(CEntKeyFindReplace::IDD, pParent)
 {
 	m_pStrFindKey		= p_strFindKey;
@@ -122,11 +122,11 @@ void CEntKeyFindReplace::OnReplace()
 	}
 	else
 	{
-		if ( !m_strFindValue.IsEmpty() || GetYesNo(va( "Empty FIND <value> means replace any existing ( & non-blank ) <value> for <key> \"%s\"\n\nProceed?",(LPCSTR)m_strFindKey) ))
+		if ( !m_strFindValue.IsEmpty() || GetYesNo(va( "Empty FIND <value> means replace any existing ( & non-blank ) <value> for <key> \"%s\"\n\nProceed?",(LPCSTR)m_strFindKey) ) )
 		{
 			// another check, if they're trying to do a replace with a missing replace key, it'll just delete found keys...
 			//
-			if (( !m_strReplaceKey.IsEmpty() && !m_strReplaceValue.IsEmpty() ) || GetYesNo(va( "Empty REPLACE <key> or <value> fields will just delete all occurence of <key> \"%s\"\n\nProceed?",m_strFindKey) ))
+			if (( !m_strReplaceKey.IsEmpty() && !m_strReplaceValue.IsEmpty() ) || GetYesNo(va( "Empty REPLACE <key> or <value> fields will just delete all occurence of <key> \"%s\"\n\nProceed?",m_strFindKey) ) )
 			{
 				if (GetYesNo( "Sure?" ) )
 				{

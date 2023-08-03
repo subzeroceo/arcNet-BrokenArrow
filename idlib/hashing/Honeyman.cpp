@@ -1,5 +1,5 @@
 
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 #define HONEYMAN_INIT_VALUE		0x00000000L
@@ -30,9 +30,7 @@ static unsigned long crctable[256];
 */
 
 void make_crc_table( void ) {
-
 	#define POLY 0x48000000L	/* 31-bit polynomial (avoids sign problems) */
-
 	for ( int i = 0; i < 128; i++ ) {
 		int sum = 0;
 		for ( int j = 7 - 1; j >= 0; --j ) {
@@ -80,7 +78,6 @@ static unsigned long crctable[256] = {
 	0x0ee00000L, 0x46e00000L, 0x2ae00000L, 0x62e00000L,
 	0x1ce00000L, 0x54e00000L, 0x38e00000L, 0x70e00000L
 };
-
 #endif
 
 void Honeyman_InitChecksum( unsigned long &crcvalue ) {
@@ -108,7 +105,6 @@ void Honeyman_FinishChecksum( unsigned long &crcvalue ) {
 
 unsigned long Honeyman_BlockChecksum( const void *data, int length ) {
 	unsigned long crc;
-
 	Honeyman_InitChecksum( crc );
 	Honeyman_UpdateChecksum( crc, data, length );
 	Honeyman_FinishChecksum( crc );

@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "qe3.h"
@@ -66,7 +66,7 @@ void HideInfoDialog()
 }
 
 
-CDialogInfo::CDialogInfo(CWnd* pParent /*=NULL*/)
+CDialogInfo::CDialogInfo(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDialogInfo::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDialogInfo)

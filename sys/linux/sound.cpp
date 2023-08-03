@@ -36,17 +36,17 @@ If you have questions concerning this license or the applicable additional terms
 // http://www.opensound.com/
 #include <sys/soundcard.h>
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #include "../../sound/snd_local.h"
 #include "../posix/posix_public.h"
 #include "sound.h"
 
-const char	*s_driverArgs[]	= { "best", "oss", "alsa", NULL };
+const char	*s_driverArgs[]	= { "best", "oss", "alsa", nullptr };
 
 #ifndef NO_ALSA
-static arcCVarSystem s_driver( "s_driver", s_driverArgs[0], CVAR_SYSTEM | CVAR_ARCHIVE, "sound driver. 'best' will attempt to use alsa and fallback to OSS if not available", s_driverArgs, arcCmdSystem::ArgCompletion_String<s_driverArgs> );
+static anCVarSystem s_driver( "s_driver", s_driverArgs[0], CVAR_SYSTEM | CVAR_ARCHIVE, "sound driver. 'best' will attempt to use alsa and fallback to OSS if not available", s_driverArgs, arcCmdSystem::ArgCompletion_String<s_driverArgs> );
 #else
-static arcCVarSystem s_driver( "s_driver", "oss", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_ROM, "sound driver. only OSS is supported in this build" );
+static anCVarSystem s_driver( "s_driver", "oss", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_ROM, "sound driver. only OSS is supported in this build" );
 #endif
 
 idAudioHardware *idAudioHardware::Alloc() {
@@ -98,12 +98,12 @@ void idAudioHardwareOSS::Release( bool bSilent ) {
 		}
 		if (m_buffer) {
 			free( m_buffer );
-			m_buffer = NULL;
+			m_buffer = nullptr;
 			m_buffer_size = 0;
 		}
 		common->Printf( "close sound device\n" );
 		if (close(m_audio_fd) == -1 ) {
-			common->Warning( "failed to close sound device: %s", strerror(errno) );
+			common->Warning( "failed to close sound device: %s", strerror( errno) );
 		}
 		m_audio_fd = 0;
 		if ( !bSilent) {
@@ -129,7 +129,7 @@ void idAudioHardwareOSS::InitFailed() {
 idAudioHardwareOSS::ExtractOSSVersion
 =================
 */
-void idAudioHardwareOSS::ExtractOSSVersion( int version, arcNetString &str ) const {
+void idAudioHardwareOSS::ExtractOSSVersion( int version, anString &str ) const {
 	sprintf( str, "%d.%d.%d", ( version & 0xFF0000 ) >> 16, ( version & 0xFF00 ) >> 8, version & 0xFF );
 }
 
@@ -144,13 +144,13 @@ BSD NOTE: With the GNU library, you can use free to free the blocks that memalig
 That does not work in BSD, however--BSD does not provide any way to free such blocks.
 =================
 */
-arcCVarSystem s_device( "s_dsp", "/dev/dsp", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
+anCVarSystem s_device( "s_dsp", "/dev/dsp", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
 
 bool idAudioHardwareOSS::Initialize( ) {
 	common->Printf( "------ OSS Sound Initialization ------\n" );
 
 	int requested_sample_format, caps, oss_version;
-	arcNetString s_compiled_oss_version, s_oss_version;
+	anString s_compiled_oss_version, s_oss_version;
 	struct audio_buf_info info;
 
 	memset( &info, 0, sizeof( info ) );
@@ -162,7 +162,7 @@ bool idAudioHardwareOSS::Initialize( ) {
 	// open device ------------------------------------------------
 	if ((m_audio_fd = open( s_device.GetString(), O_WRONLY | O_NONBLOCK, 0 ) ) == -1 ) {
 		m_audio_fd = 0;
-		common->Warning( "failed to open sound device '%s': %s", s_device.GetString(), strerror(errno) );
+		common->Warning( "failed to open sound device '%s': %s", s_device.GetString(), strerror( errno) );
 		InitFailed();
 		return false;
 	}
@@ -223,7 +223,7 @@ bool idAudioHardwareOSS::Initialize( ) {
 	requested_sample_format = AFMT_S16_LE;
 	m_sample_format = requested_sample_format;
 	if (ioctl(m_audio_fd, SNDCTL_DSP_SETFMT, &m_sample_format) == -1 ) {
-		common->Warning( "ioctl SNDCTL_DSP_SETFMT %d failed: %s", requested_sample_format, strerror(errno) );
+		common->Warning( "ioctl SNDCTL_DSP_SETFMT %d failed: %s", requested_sample_format, strerror( errno) );
 		InitFailed();
 		return false;
 	}
@@ -243,7 +243,7 @@ bool idAudioHardwareOSS::Initialize( ) {
 
 	m_channels = idSoundSystemLocal::s_numberOfSpeakers.GetInteger();
 	if ( ioctl( m_audio_fd, SNDCTL_DSP_CHANNELS, &m_channels ) == -1 ) {
-		common->Warning( "ioctl SNDCTL_DSP_CHANNELS %d failed: %s", idSoundSystemLocal::s_numberOfSpeakers.GetInteger(), strerror(errno) );
+		common->Warning( "ioctl SNDCTL_DSP_CHANNELS %d failed: %s", idSoundSystemLocal::s_numberOfSpeakers.GetInteger(), strerror( errno) );
 		InitFailed();
 		return false;
 	}
@@ -253,7 +253,7 @@ bool idAudioHardwareOSS::Initialize( ) {
 			// we didn't request 2 channels, some drivers reply 1 channel on error but may still let us still get 2 if properly asked
 			m_channels = 2;
 			if ( ioctl( m_audio_fd, SNDCTL_DSP_CHANNELS, &m_channels ) == -1 ) {
-				common->Warning( "ioctl SNDCTL_DSP_CHANNELS fallback to 2 failed: %s", strerror(errno) );
+				common->Warning( "ioctl SNDCTL_DSP_CHANNELS fallback to 2 failed: %s", strerror( errno) );
 				InitFailed();
 				return false;
 			}
@@ -273,7 +273,7 @@ bool idAudioHardwareOSS::Initialize( ) {
 	// sampling rate ------------------------------------------------
 	m_speed = PRIMARYFREQ;
 	if ( ioctl( m_audio_fd, SNDCTL_DSP_SPEED, &m_speed ) == -1 ) {
-		common->Warning( "ioctl SNDCTL_DSP_SPEED %d failed: %s", PRIMARYFREQ, strerror(errno) );
+		common->Warning( "ioctl SNDCTL_DSP_SPEED %d failed: %s", PRIMARYFREQ, strerror( errno) );
 		InitFailed();
 		return false;
 	}
@@ -302,11 +302,11 @@ bool idAudioHardwareOSS::Initialize( ) {
 	// toggle off before toggling on. that's what OSS source code samples recommends
 	int flag = 0;
 	if (ioctl(m_audio_fd, SNDCTL_DSP_SETTRIGGER, &flag) == -1 ) {
-		common->Warning( "ioctl SNDCTL_DSP_SETTRIGGER 0 failed: %s", strerror(errno) );
+		common->Warning( "ioctl SNDCTL_DSP_SETTRIGGER 0 failed: %s", strerror( errno) );
 	}
 	flag = PCM_ENABLE_OUTPUT;
 	if (ioctl(m_audio_fd, SNDCTL_DSP_SETTRIGGER, &flag) == -1 ) {
-		common->Warning( "ioctl SNDCTL_DSP_SETTRIGGER PCM_ENABLE_OUTPUT failed: %s", strerror(errno) );
+		common->Warning( "ioctl SNDCTL_DSP_SETTRIGGER PCM_ENABLE_OUTPUT failed: %s", strerror( errno) );
 	}
 
 	common->Printf( "--------------------------------------\n" );
@@ -349,7 +349,7 @@ idAudioHardwareOSS::GetMixBuffer
 =================
 */
 short* idAudioHardwareOSS::GetMixBuffer() {
-	return (short *)m_buffer;
+	return ( short *)m_buffer;
 }
 
 /*

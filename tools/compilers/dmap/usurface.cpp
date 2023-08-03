@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "dmap.h"
@@ -61,14 +61,14 @@ static void AddTriListToArea( uEntity_t *e, mapTri_t *triList, int planeNum, int
 			// check the texture vectors
 			for ( i = 0; i < 2; i++ ) {
 				for ( j = 0; j < 3; j++ ) {
-					if ( arcMath::Fabs( texVec->v[i][j] - group->texVec.v[i][j] ) > TEXTURE_VECTOR_EQUAL_EPSILON ) {
+					if ( anMath::Fabs( texVec->v[i][j] - group->texVec.v[i][j] ) > TEXTURE_VECTOR_EQUAL_EPSILON ) {
 						break;
 					}
 				}
 				if ( j != 3 ) {
 					break;
 				}
-				if ( arcMath::Fabs( texVec->v[i][3] - group->texVec.v[i][3] ) > TEXTURE_OFFSET_EQUAL_EPSILON ) {
+				if ( anMath::Fabs( texVec->v[i][3] - group->texVec.v[i][3] ) > TEXTURE_OFFSET_EQUAL_EPSILON ) {
 					break;
 				}
 			}
@@ -102,9 +102,9 @@ TexVecForTri
 */
 static void TexVecForTri( textureVectors_t *texVec, mapTri_t *tri ) {
 	float	area, inva;
-	arcVec3	temp;
-	arcVec5	d0, d1;
-	arcDrawVert	*a, *b, *c;
+	anVec3	temp;
+	anVec5	d0, d1;
+	anDrawVertex	*a, *b, *c;
 
 	a = &tri->v[0];
 	b = &tri->v[1];
@@ -150,30 +150,30 @@ TriListForSide
 #define	SNAP_FLOAT_TO_INT	256
 #define	SNAP_INT_TO_FLOAT	(1.0/SNAP_FLOAT_TO_INT)
 
-mapTri_t *TriListForSide( const side_t *s, const arcWinding *w ) {
+mapTri_t *TriListForSide( const side_t *s, const anWinding *w ) {
 	int				i, j;
-	arcDrawVert		*dv;
+	anDrawVertex		*dv;
 	mapTri_t		*tri, *triList;
-	const arcVec3		*vec;
-	const arcMaterial	*si;
+	const anVec3		*vec;
+	const anMaterial	*si;
 
 	si = s->material;
 
 	// skip any generated faces
 	if ( !si ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// don't create faces for non-visible sides
 	if ( !si->SurfaceCastsShadow() && !si->IsDrawn() ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( 1 ) {
 		// triangle fan using only the outer verts
 		// this gives the minimum triangle count,
 		// but may have some very distended triangles
-		triList = NULL;
+		triList = nullptr;
 		for ( i = 2; i < w->GetNumPoints(); i++ ) {
 			tri = AllocTri();
 			tri->material = si;
@@ -213,9 +213,9 @@ mapTri_t *TriListForSide( const side_t *s, const arcWinding *w ) {
 	} else {
 		// triangle fan from central point, more verts and tris, but less distended
 		// I use this when debugging some tjunction problems
-		triList = NULL;
+		triList = nullptr;
 		for ( i = 0; i < w->GetNumPoints(); i++ ) {
-			arcVec3	midPoint;
+			anVec3	midPoint;
 
 			tri = AllocTri();
 			tri->material = si;
@@ -269,8 +269,8 @@ ClipSideByTree_r
 Adds non-opaque leaf fragments to the convex hull
 ====================
 */
-static void ClipSideByTree_r( arcWinding *w, side_t *side, node_t *node ) {
-	arcWinding		*front, *back;
+static void ClipSideByTree_r( anWinding *w, side_t *side, node_t *node ) {
+	anWinding		*front, *back;
 
 	if ( !w ) {
 		return;
@@ -324,7 +324,7 @@ to be trimmed off automatically.
 void ClipSidesByTree( uEntity_t *e ) {
 	uBrush_t		*b;
 	int				i;
-	arcWinding		*w;
+	anWinding		*w;
 	side_t			*side;
 	primitive_t		*prim;
 
@@ -342,7 +342,7 @@ void ClipSidesByTree( uEntity_t *e ) {
 				continue;
 			}
 			w = side->winding->Copy();
-			side->visibleHull = NULL;
+			side->visibleHull = nullptr;
 			ClipSideByTree_r( w, side, e->tree->headnode );
 			// for debugging, we can choose to use the entire original side
 			// but we skip this if the side was completely clipped away
@@ -366,8 +366,8 @@ This is used for adding curve triangles
 The winding will be freed before it returns
 ====================
 */
-void ClipTriIntoTree_r( arcWinding *w, mapTri_t *originalTri, uEntity_t *e, node_t *node ) {
-	arcWinding		*front, *back;
+void ClipTriIntoTree_r( anWinding *w, mapTri_t *originalTri, uEntity_t *e, node_t *node ) {
+	anWinding		*front, *back;
 
 	if ( !w ) {
 		return;
@@ -387,7 +387,7 @@ void ClipTriIntoTree_r( arcWinding *w, mapTri_t *originalTri, uEntity_t *e, node
 	if ( !node->opaque && node->area >= 0 ) {
 		mapTri_t	*list;
 		int			planeNum;
-		arcPlane		plane;
+		anPlane		plane;
 		textureVectors_t	texVec;
 
 		list = WindingToTriList( w, originalTri );
@@ -417,8 +417,8 @@ Returns the area number that the winding is in, or
 
 ====================
 */
-static int CheckWindingInAreas_r( const arcWinding *w, node_t *node ) {
-	arcWinding		*front, *back;
+static int CheckWindingInAreas_r( const anWinding *w, node_t *node ) {
+	anWinding		*front, *back;
 
 	if ( !w ) {
 		return -1;
@@ -470,8 +470,8 @@ Clips a winding down into the bsp tree, then converts
 the fragments to triangles and adds them to the area lists
 ====================
 */
-static void PutWindingIntoAreas_r( uEntity_t *e, const arcWinding *w, side_t *side, node_t *node ) {
-	arcWinding		*front, *back;
+static void PutWindingIntoAreas_r( uEntity_t *e, const anWinding *w, side_t *side, node_t *node ) {
+	anWinding		*front, *back;
 	int				area;
 
 	if ( !w ) {
@@ -537,7 +537,7 @@ Used for curves and inlined models
 */
 void AddMapTriToAreas( mapTri_t *tri, uEntity_t *e ) {
 	int				area;
-	arcWinding		*w;
+	anWinding		*w;
 
 	// skip degenerate triangles from pinched curves
 	if ( MapTriArea( tri ) <= 0 ) {
@@ -559,13 +559,13 @@ void AddMapTriToAreas( mapTri_t *tri, uEntity_t *e ) {
 	}
 	if ( area >= 0 ) {
 		mapTri_t	*newTri;
-		arcPlane		plane;
+		anPlane		plane;
 		int			planeNum;
 		textureVectors_t	texVec;
 
 		// put in single area
 		newTri = CopyMapTri( tri );
-		newTri->next = NULL;
+		newTri->next = nullptr;
 
 		PlaneForTri( tri, plane );
 		planeNum = FindFloatPlane( plane );
@@ -630,7 +630,7 @@ void PutPrimitivesInAreas( uEntity_t *e ) {
 		for ( int eNum = 1; eNum < dmapGlobals.num_entities; eNum++ ) {
 			uEntity_t *entity = &dmapGlobals.uEntities[eNum];
 			const char *className = entity->mapEntity->epairs.GetString( "classname" );
-			if ( arcNetString::Icmp( className, "func_static" ) ) {
+			if ( anString::Icmp( className, "func_static" ) ) {
 				continue;
 			}
 			if ( !entity->mapEntity->epairs.GetBool( "inline" ) && !inlineAll ) {
@@ -640,26 +640,26 @@ void PutPrimitivesInAreas( uEntity_t *e ) {
 			if ( !modelName ) {
 				continue;
 			}
-			ARCRenderModel	*model = renderModelManager->FindModel( modelName );
+			anRenderModel	*model = renderModelManager->FindModel( modelName );
 
 			common->Printf( "inlining %s.\n", entity->mapEntity->epairs.GetString( "name" ) );
 
-			arcMat3	axis;
+			anMat3	axis;
 			// get the rotation matrix in either full form, or single angle form
 			if ( !entity->mapEntity->epairs.GetMatrix( "rotation", "1 0 0 0 1 0 0 0 1", axis ) ) {
 				float angle = entity->mapEntity->epairs.GetFloat( "angle" );
 				if ( angle != 0.0f ) {
-					axis = arcAngles( 0.0f, angle, 0.0f ).ToMat3();
+					axis = anAngles( 0.0f, angle, 0.0f ).ToMat3();
 				} else {
 					axis.Identity();
 				}
 			}
 
-			arcVec3	origin = entity->mapEntity->epairs.GetVector( "origin" );
+			anVec3	origin = entity->mapEntity->epairs.GetVector( "origin" );
 
 			for ( i = 0; i < model->NumSurfaces(); i++ ) {
 				const modelSurface_t *surface = model->Surface( i );
-				const surfTriangles_t *tri = surface->geometry;
+				const srfTriangles_t *tri = surface->geometry;
 
 				mapTri_t	mapTri;
 				memset( &mapTri, 0, sizeof( mapTri ) );
@@ -670,7 +670,7 @@ void PutPrimitivesInAreas( uEntity_t *e ) {
 				}
 				for ( int j = 0; j < tri->numIndexes; j += 3 ) {
 					for ( int k = 0; k < 3; k++ ) {
-						arcVec3 v = tri->verts[tri->indexes[j+k]].xyz;
+						anVec3 v = tri->verts[tri->indexes[j+k]].xyz;
 
 						mapTri.v[k].xyz = v * axis + origin;
 
@@ -703,13 +703,13 @@ will benefit from re-optimization.
 */
 static void ClipTriByLight( const mapLight_t *light, const mapTri_t *tri,
 						   mapTri_t **in, mapTri_t **out ) {
-	arcWinding	*inside, *oldInside;
-	arcWinding	*outside[6];
+	anWinding	*inside, *oldInside;
+	anWinding	*outside[6];
 	bool	hasOutside;
 	int			i;
 
-	*in = NULL;
-	*out = NULL;
+	*in = nullptr;
+	*out = nullptr;
 
 	// clip this winding to the light
 	inside = WindingForTri( tri );
@@ -721,7 +721,7 @@ static void ClipTriByLight( const mapLight_t *light, const mapTri_t *tri,
 			delete oldInside;
 		}
 		else {
-			outside[i] = NULL;
+			outside[i] = nullptr;
 		}
 		if ( outside[i] ) {
 			hasOutside = true;
@@ -739,7 +739,7 @@ static void ClipTriByLight( const mapLight_t *light, const mapTri_t *tri,
 		}
 
 		*out = CopyMapTri( tri );
-		(*out)->next = NULL;
+		(*out)->next = nullptr;
 
 		return;
 	}
@@ -751,7 +751,7 @@ static void ClipTriByLight( const mapLight_t *light, const mapTri_t *tri,
 		delete inside;
 
 		*in = CopyMapTri( tri );
-		(*in)->next = NULL;
+		(*in)->next = nullptr;
 
 		return;
 	}
@@ -799,7 +799,7 @@ static void BuildLightShadows( uEntity_t *e, mapLight_t *light ) {
 	mapTri_t	*tri;
 	mapTri_t	*shadowers;
 	optimizeGroup_t		*shadowerGroups;
-	arcVec3		lightOrigin;
+	anVec3		lightOrigin;
 	bool		hasPerforatedSurface = false;
 
 	//
@@ -810,7 +810,7 @@ static void BuildLightShadows( uEntity_t *e, mapLight_t *light ) {
 
 	// shadowers will contain all the triangles that will contribute to the
 	// shadow volume
-	shadowerGroups = NULL;
+	shadowerGroups = nullptr;
 	lightOrigin = light->def.globalLightOrigin;
 
 	// if the light is no-shadows, don't add any surfaces
@@ -838,7 +838,7 @@ static void BuildLightShadows( uEntity_t *e, mapLight_t *light ) {
 
 				// build up a list of the triangle fragments inside the
 				// light frustum
-				shadowers = NULL;
+				shadowers = nullptr;
 				for ( tri = group->triList; tri; tri = tri->next ) {
 					mapTri_t	*in, *out;
 
@@ -867,7 +867,7 @@ static void BuildLightShadows( uEntity_t *e, mapLight_t *light ) {
 				if ( !check ) {
 					check = (optimizeGroup_t *)Mem_Alloc( sizeof( *check ) );
 					*check = *group;
-					check->triList = NULL;
+					check->triList = nullptr;
 					check->nextGroup = shadowerGroups;
 					shadowerGroups = check;
 				}
@@ -914,7 +914,7 @@ static void CarveGroupsByLight( uEntity_t *e, mapLight_t *light ) {
 
 	for ( i = 0; i < e->numAreas; i++ ) {
 		area = &e->areas[i];
-		carvedGroups = NULL;
+		carvedGroups = nullptr;
 
 		// we will be either freeing or reassigning the groups as we go
 		for ( group = area->groups; group; group = nextGroup ) {
@@ -946,8 +946,8 @@ static void CarveGroupsByLight( uEntity_t *e, mapLight_t *light ) {
 			}
 
 			// split into lists for hit-by-light, and not-hit-by-light
-			inside = NULL;
-			outside = NULL;
+			inside = nullptr;
+			outside = nullptr;
 
 			for ( tri = group->triList; tri; tri = tri->next ) {
 				mapTri_t	*in, *out;
@@ -976,7 +976,7 @@ static void CarveGroupsByLight( uEntity_t *e, mapLight_t *light ) {
 			}
 
 			// free the original
-			group->nextGroup = NULL;
+			group->nextGroup = nullptr;
 			FreeOptimizeGroupList( group );
 		}
 

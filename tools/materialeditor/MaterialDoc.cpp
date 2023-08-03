@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "MaterialDoc.h"
@@ -21,14 +21,14 @@ MaterialDoc::~MaterialDoc( void ) {
 }
 
 /**
-* Initializes the MaterialDoc instance with a specific arcMaterial. This method will
+* Initializes the MaterialDoc instance with a specific anMaterial. This method will
 * parse the material into the internal dictionary representation and optionally
-* allow the arcMaterial object to reparse the source.
-* @param material The arcMaterial instance to use.
+* allow the anMaterial object to reparse the source.
+* @param material The anMaterial instance to use.
 * @param parseMaterial Flag to determine if the material should be parsed into the editor representation.
-* @param parseRenderMaterial Flag to determine if the arcMaterial object should be reparsed.
+* @param parseRenderMaterial Flag to determine if the anMaterial object should be reparsed.
 */
-void MaterialDoc::SetRenderMaterial(arcMaterial* material, bool parseMaterial, bool parseRenderMatierial) {
+void MaterialDoc::SetRenderMaterial(anMaterial* material, bool parseMaterial, bool parseRenderMatierial) {
 
 	renderMaterial = material;
 
@@ -49,7 +49,7 @@ void MaterialDoc::SetRenderMaterial(arcMaterial* material, bool parseMaterial, b
 
 	name = material->GetName();
 
-	arcLexer		src;
+	anLexer		src;
 
 	char *declText = (char *) _alloca( material->GetTextLength() + 1 );
 	material->GetText( declText );
@@ -77,7 +77,7 @@ int	MaterialDoc::FindStage( int stageType, const char* name) {
 
 	for ( int i = 0; i < editMaterial.stages.Num(); i++ ) {
 		int type = GetAttributeInt( i, "stagetype" );
-		arcNetString localname = GetAttribute( i, "name" );
+		anString localname = GetAttribute( i, "name" );
 		if (stageType == type && !localname.Icmp( name ) )
 			return i;
 	}
@@ -201,10 +201,10 @@ bool MaterialDoc::GetAttributeBool( int stage, const char* attribName, const cha
 void MaterialDoc::SetAttribute( int stage, const char* attribName, const char* value, bool addUndo) {
 
 	//Make sure we need to set the attribute
-	arcNetString orig  = GetAttribute(stage, attribName);
+	anString orig  = GetAttribute(stage, attribName);
 	if (orig.Icmp(value) ) {
 
-		arcDictionary* dict;
+		anDict* dict;
 		if (stage == -1 ) {
 			dict = &editMaterial.materialData;
 		} else {
@@ -237,7 +237,7 @@ void MaterialDoc::SetAttributeInt( int stage, const char* attribName, int value,
 	int orig  = GetAttributeInt(stage, attribName);
 	if (orig != value) {
 
-		arcDictionary* dict;
+		anDict* dict;
 		if (stage == -1 ) {
 			dict = &editMaterial.materialData;
 		} else {
@@ -264,7 +264,7 @@ void MaterialDoc::SetAttributeFloat( int stage, const char* attribName, float va
 	float orig  = GetAttributeFloat(stage, attribName);
 	if (orig != value) {
 
-		arcDictionary* dict;
+		anDict* dict;
 		if (stage == -1 ) {
 			dict = &editMaterial.materialData;
 		} else {
@@ -291,7 +291,7 @@ void MaterialDoc::SetAttributeBool( int stage, const char* attribName, bool valu
 	bool orig  = GetAttributeBool(stage, attribName);
 	if (orig != value) {
 
-		arcDictionary* dict;
+		anDict* dict;
 		if (stage == -1 ) {
 			dict = &editMaterial.materialData;
 		} else {
@@ -318,7 +318,7 @@ void MaterialDoc::SetAttributeBool( int stage, const char* attribName, bool valu
 * @param addUndo Flag that specifies if the system should add an undo operation.
 */
 void MaterialDoc::SetMaterialName(const char* materialName, bool addUndo) {
-	arcNetString oldName = name;
+	anString oldName = name;
 
 	declManager->RenameDecl(DECL_MATERIAL, oldName, materialName);
 	name = renderMaterial->GetName();
@@ -341,8 +341,8 @@ void MaterialDoc::SetMaterialName(const char* materialName, bool addUndo) {
 * @param stage The stage or -1 for the material.
 * @param data The dictionary to copy.
 */
-void MaterialDoc::SetData( int stage, arcDictionary* data) {
-	arcDictionary* dict;
+void MaterialDoc::SetData( int stage, anDict* data) {
+	anDict* dict;
 	if (stage == -1 ) {
 		dict = &editMaterial.materialData;
 	} else {
@@ -374,7 +374,7 @@ bool MaterialDoc::IsSourceModified() {
 /**
 * Applies any source changes to the edit representation of the material.
 */
-void MaterialDoc::ApplySourceModify(arcNetString& text) {
+void MaterialDoc::ApplySourceModify(anString& text) {
 
 	if (sourceModify) {
 
@@ -384,7 +384,7 @@ void MaterialDoc::ApplySourceModify(arcNetString& text) {
 
 		ClearEditMaterial();
 
-		arcLexer		src;
+		anLexer		src;
 		src.LoadMemory(text, text.Length(), "Material" );
 
 		src.SetFlags(
@@ -396,8 +396,8 @@ void MaterialDoc::ApplySourceModify(arcNetString& text) {
 			LEXFL_NOFATALERRORS				// just set a flag instead of fatal erroring
 			);
 
-		arcNetToken token;
-		if ( !src.ReadToken(&token) ) {
+		anToken token;
+		if ( !src.ReadToken( &token ) ) {
 			src.Warning( "Missing decl name" );
 			return;
 		}
@@ -546,7 +546,7 @@ void MaterialDoc::ApplyMaterialChanges(bool force) {
 	if (force || applyWaiting) {
 
 		if (sourceModify && sourceModifyOwner) {
-			arcNetString text = sourceModifyOwner->GetSourceText();
+			anString text = sourceModifyOwner->GetSourceText();
 			ApplySourceModify(text);
 		}
 
@@ -616,11 +616,11 @@ void MaterialDoc::OnMaterialChanged() {
 
 /**
 * Passes text to a render material for parsing.
-* @param source The text that sould be applied to the arcMaterial.
+* @param source The text that sould be applied to the anMaterial.
 */
 void MaterialDoc::ParseMaterialText(const char* source) {
 
-	/*arcLexer src;
+	/*anLexer src;
 	src.LoadMemory(source, strlen(source), "material" );
 	src.SetFlags(
 		LEXFL_NOSTRINGCONCAT |			// multiple strings seperated by whitespaces are not concatenated
@@ -639,13 +639,13 @@ void MaterialDoc::ParseMaterialText(const char* source) {
 }
 
 /**
-* Parses the source text from an arcMaterial and initializes the editor dictionary representation
+* Parses the source text from an anMaterial and initializes the editor dictionary representation
 * of the material.
-* @param src The arcLexer object that contains the material text.
+* @param src The anLexer object that contains the material text.
 */
-void MaterialDoc::ParseMaterial(arcLexer* src) {
+void MaterialDoc::ParseMaterial(anLexer* src) {
 
-	arcNetToken		token;
+	anToken		token;
 
 	//Parse past the name
 	src->SkipUntilString( "{" );
@@ -666,17 +666,17 @@ void MaterialDoc::ParseMaterial(arcLexer* src) {
 
 		if ( !token.Icmp( "diffusemap" ) ) {
 			//Added as a special stage
-			arcNetString str;
+			anString str;
 			src->ReadRestOfLine( str );
 			AddSpecialMapStage( "diffusemap", str);
 		}
 		else if ( !token.Icmp( "specularmap" ) ) {
-			arcNetString str;
+			anString str;
 			src->ReadRestOfLine( str );
 			AddSpecialMapStage( "specularmap", str);
 		}
 		else if ( !token.Icmp( "bumpmap" ) ) {
-			arcNetString str;
+			anString str;
 			src->ReadRestOfLine( str );
 			AddSpecialMapStage( "bumpmap", str);
 		}
@@ -687,11 +687,11 @@ void MaterialDoc::ParseMaterial(arcLexer* src) {
 }
 
 /**
-* Parses a single stage from the source text from an arcMaterial and initializes the editor dictionary
+* Parses a single stage from the source text from an anMaterial and initializes the editor dictionary
 * representation of the material.
-* @param src The arcLexer object that contains the material text.
+* @param src The anLexer object that contains the material text.
 */
-void MaterialDoc::ParseStage(arcLexer* src) {
+void MaterialDoc::ParseStage(anLexer* src) {
 
 	MEStage_t* newStage = new MEStage_t();
 	int index = editMaterial.stages.Append(newStage);
@@ -699,7 +699,7 @@ void MaterialDoc::ParseStage(arcLexer* src) {
 	newStage->stageData.SetInt( "stagetype", STAGE_TYPE_NORMAL);
 	newStage->enabled = true;
 
-	arcNetToken		token;
+	anToken		token;
 
 	while ( 1 ) {
 
@@ -718,7 +718,7 @@ void MaterialDoc::ParseStage(arcLexer* src) {
 
 		if ( !token.Icmp( "name" ) ) {
 
-			arcNetString str;
+			anString str;
 			src->ReadRestOfLine( str );
 			str.StripTrailing('\"');
 			str.StripLeading('\"');
@@ -727,7 +727,7 @@ void MaterialDoc::ParseStage(arcLexer* src) {
 		}
 	}
 
-	arcNetString name;
+	anString name;
 	newStage->stageData.GetString( "name", "", name);
 	if (name.Length() <= 0 )
 		newStage->stageData.Set( "name", va( "Stage %d", index+1 ) );
@@ -752,21 +752,21 @@ void MaterialDoc::AddSpecialMapStage(const char* stageName, const char* map) {
 * Finds the appropriate material definition for the supplied token and initializes the
 * internal dictionary data.
 * @param token The token to lookup
-* @param src The arcLexer that contains the material source text.
+* @param src The anLexer that contains the material source text.
 * @param type The type of attribute grouping to use material, stage or special stage.
 * @param dict The dictionary to initialize.
 */
-bool MaterialDoc::ParseMaterialDef(arcNetToken* token, arcLexer* src, int type, arcDictionary* dict) {
+bool MaterialDoc::ParseMaterialDef(anToken* token, anLexer* src, int type, anDict* dict) {
 
 	MaterialDefList* defs = MaterialDefManager::GetMaterialDefs(type);
 
 	for ( int i = 0; i < defs->Num(); i++ ) {
 		if ( !token->Icmp((*defs)[i]->dictName) ) {
 
-			switch((*defs)[i]->type) {
+			switch ((*defs)[i]->type) {
 					case MaterialDef::MATERIAL_DEF_TYPE_STRING:
 						{
-							arcNetString str;
+							anString str;
 							src->ReadRestOfLine( str );
 							if ((*defs)[i]->quotes) {
 								str.StripTrailing('\"');
@@ -783,14 +783,14 @@ bool MaterialDoc::ParseMaterialDef(arcNetToken* token, arcLexer* src, int type, 
 						break;
 					case MaterialDef::MATERIAL_DEF_TYPE_FLOAT:
 						{
-							arcNetString str;
+							anString str;
 							src->ReadRestOfLine( str );
 							dict->Set((*defs)[i]->dictName, str);
 						}
 						break;
 					case MaterialDef::MATERIAL_DEF_TYPE_INT:
 						{
-							arcNetString str;
+							anString str;
 							src->ReadRestOfLine( str );
 							dict->Set((*defs)[i]->dictName, str);
 						}
@@ -819,7 +819,7 @@ void MaterialDoc::ClearEditMaterial() {
 */
 const char*	MaterialDoc::GenerateSourceText() {
 
-	aRcFileMemory f;
+	anFileMemory f;
 
 	f.WriteFloatString( "\n\n/*\n"
 		"\tGenerated by the Material Editor.\n"
@@ -844,7 +844,7 @@ const char*	MaterialDoc::GenerateSourceText() {
 
 /**
 * Writes the internal dictionary data to the standard format and replaces the
-* arcMaterial source text with the newly generated text.
+* anMaterial source text with the newly generated text.
 */
 void MaterialDoc::ReplaceSourceText() {
 		renderMaterial->SetText(GenerateSourceText() );
@@ -855,9 +855,9 @@ void MaterialDoc::ReplaceSourceText() {
 * @param stage The stage to write.
 * @param file The file where the stage should be wirtten
 */
-void MaterialDoc::WriteStage( int stage, aRcFileMemory* file) {
+void MaterialDoc::WriteStage( int stage, anFileMemory* file) {
 
-	//arcNetString stageName = GetAttribute(stage, "name" );
+	//anString stageName = GetAttribute(stage, "name" );
 	int type = GetAttributeInt(stage, "stagetype" );
 	//if ( !stageName.Icmp( "diffusemap" ) || !stageName.Icmp( "specularmap" ) || !stageName.Icmp( "bumpmap" ) ) {
 	if (type == STAGE_TYPE_SPECIALMAP) {
@@ -866,7 +866,7 @@ void MaterialDoc::WriteStage( int stage, aRcFileMemory* file) {
 	}
 
 	file->WriteFloatString( "\t{\n" );
-	arcNetString name = GetAttribute(stage, "name" );
+	anString name = GetAttribute(stage, "name" );
 	if (name.Length() > 0 ) {
 		file->WriteFloatString( "\t\tname\t\"%s\"\n", name.c_str() );
 	}
@@ -880,9 +880,9 @@ void MaterialDoc::WriteStage( int stage, aRcFileMemory* file) {
 * @param stage The stage to write.
 * @param file The file where the stage should be wirtten
 */
-void MaterialDoc::WriteSpecialMapStage( int stage, aRcFileMemory* file) {
-	arcNetString stageName = GetAttribute(stage, "name" );
-	arcNetString map = GetAttribute(stage, "map" );
+void MaterialDoc::WriteSpecialMapStage( int stage, anFileMemory* file) {
+	anString stageName = GetAttribute(stage, "name" );
+	anString map = GetAttribute(stage, "map" );
 
 	file->WriteFloatString( "\t%s\t%s\n", stageName.c_str(), map.c_str() );
 }
@@ -894,19 +894,19 @@ void MaterialDoc::WriteSpecialMapStage( int stage, aRcFileMemory* file) {
 * @param type The attribute grouping to use.
 * @param indent The number of tabs to indent the text.
 */
-void MaterialDoc::WriteMaterialDef( int stage, aRcFileMemory* file, int type, int indent) {
+void MaterialDoc::WriteMaterialDef( int stage, anFileMemory* file, int type, int indent) {
 
-	arcNetString prefix = "";
+	anString prefix = "";
 	for ( int i = 0; i < indent; i++ ) {
 		prefix += "\t";
 	}
 
 	MaterialDefList* defs = MaterialDefManager::GetMaterialDefs(type);
 	for ( int i = 0; i < defs->Num(); i++ ) {
-		switch((*defs)[i]->type) {
+		switch ((*defs)[i]->type) {
 			case MaterialDef::MATERIAL_DEF_TYPE_STRING:
 				{
-					arcNetString attrib = GetAttribute(stage, (*defs)[i]->dictName);
+					anString attrib = GetAttribute(stage, (*defs)[i]->dictName);
 					if (attrib.Length() > 0 ) {
 						if ((*defs)[i]->quotes)
 							file->WriteFloatString( "%s%s\t\"%s\"\n", prefix.c_str(), (*defs)[i]->dictName.c_str(), attrib.c_str() );

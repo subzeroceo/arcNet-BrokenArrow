@@ -1,19 +1,19 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idPhysics, idPhysics_Base )
+CLASS_DECLARATION( anPhysics, anPhysics_Base )
 END_CLASS
 
 /*
 ================
-idPhysics_Base::idPhysics_Base
+anPhysics_Base::anPhysics_Base
 ================
 */
-idPhysics_Base::idPhysics_Base( void ) {
-	self = NULL;
+anPhysics_Base::anPhysics_Base( void ) {
+	self = nullptr;
 	clipMask = 0;
 	SetGravity( gameLocal.GetGravity() );
 	ClearContacts();
@@ -21,394 +21,394 @@ idPhysics_Base::idPhysics_Base( void ) {
 
 /*
 ================
-idPhysics_Base::~idPhysics_Base
+anPhysics_Base::~anPhysics_Base
 ================
 */
-idPhysics_Base::~idPhysics_Base( void ) {
+anPhysics_Base::~anPhysics_Base( void ) {
 	if ( self && self->GetPhysics() == this ) {
-		self->SetPhysics( NULL );
+		self->SetPhysics( nullptr );
 	}
-	idForce::DeletePhysics( this );
+	anForce::DeletePhysics( this );
 	ClearContacts();
 }
 
 /*
 ================
-idPhysics_Base::Save
+anPhysics_Base::Save
 ================
 */
-void idPhysics_Base::Save( idSaveGame *savefile ) const {
-	int i;
-
+void anPhysics_Base::Save( anSaveGame *savefile ) const {
 	savefile->WriteObject( self );
 	savefile->WriteInt( clipMask );
 	savefile->WriteVec3( gravityVector );
 	savefile->WriteVec3( gravityNormal );
 
 	savefile->WriteInt( contacts.Num() );
-	for ( i = 0; i < contacts.Num(); i++ ) {
+	for ( int i = 0; i < contacts.Num(); i++ ) {
 		savefile->WriteContactInfo( contacts[i] );
 	}
 
 	savefile->WriteInt( contactEntities.Num() );
-	for ( i = 0; i < contactEntities.Num(); i++ ) {
+	for ( int i = 0; i < contactEntities.Num(); i++ ) {
 		contactEntities[i].Save( savefile );
 	}
 }
 
 /*
 ================
-idPhysics_Base::Restore
+anPhysics_Base::Restore
 ================
 */
-void idPhysics_Base::Restore( idRestoreGame *savefile ) {
-	int i, num;
+void anPhysics_Base::Restore( anRestoreGame *savefile ) {
+	int num;
 
-	savefile->ReadObject( reinterpret_cast<idClass *&>( self ) );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( self ) );
 	savefile->ReadInt( clipMask );
 	savefile->ReadVec3( gravityVector );
 	savefile->ReadVec3( gravityNormal );
 
 	savefile->ReadInt( num );
 	contacts.SetNum( num );
-	for ( i = 0; i < contacts.Num(); i++ ) {
+	for ( int i = 0; i < contacts.Num(); i++ ) {
 		savefile->ReadContactInfo( contacts[i] );
 	}
 
 	savefile->ReadInt( num );
 	contactEntities.SetNum( num );
-	for ( i = 0; i < contactEntities.Num(); i++ ) {
+	for ( int i = 0; i < contactEntities.Num(); i++ ) {
 		contactEntities[i].Restore( savefile );
 	}
 }
 
 /*
 ================
-idPhysics_Base::SetSelf
+anPhysics_Base::SetSelf
 ================
 */
-void idPhysics_Base::SetSelf( idEntity *e ) {
+void anPhysics_Base::SetSelf( anEntity *e ) {
 	assert( e );
 	self = e;
 }
 
 /*
 ================
-idPhysics_Base::SetClipModel
+anPhysics_Base::SetClipModel
 ================
 */
-void idPhysics_Base::SetClipModel( idClipModel *model, float density, int id, bool freeOld ) {
+void anPhysics_Base::SetClipModel( anClipModel *model, float density, int id, bool freeOld ) {
 }
 
 /*
 ================
-idPhysics_Base::GetClipModel
+anPhysics_Base::GetClipModel
 ================
 */
-idClipModel *idPhysics_Base::GetClipModel( int id ) const {
-	return NULL;
+anClipModel *anPhysics_Base::GetClipModel( int id ) const {
+	return nullptr;
 }
 
 /*
 ================
-idPhysics_Base::GetNumClipModels
+anPhysics_Base::GetNumClipModels
 ================
 */
-int idPhysics_Base::GetNumClipModels( void ) const {
+int anPhysics_Base::GetNumClipModels( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Base::SetMass
+anPhysics_Base::SetMass
 ================
 */
-void idPhysics_Base::SetMass( float mass, int id ) {
+void anPhysics_Base::SetMass( float mass, int id ) {
 }
 
 /*
 ================
-idPhysics_Base::GetMass
+anPhysics_Base::GetMass
 ================
 */
-float idPhysics_Base::GetMass( int id ) const {
+float anPhysics_Base::GetMass( int id ) const {
 	return 0.0f;
 }
 
-// RAVEN BEGIN
+
 // bdube: Added center mass call
 /*
 ================
-idPhysics_Base::GetCenterMass
+anPhysics_Base::GetCenterMass
 
 default center of mass is origin
 ================
 */
-arcVec3 idPhysics_Base::GetCenterMass ( int id ) const {
+anVec3 anPhysics_Base::GetCenterMass( int id ) const {
 	return GetOrigin();
 }
-// RAVEN END
+
 
 /*
 ================
-idPhysics_Base::SetContents
+anPhysics_Base::SetContents
 ================
 */
-void idPhysics_Base::SetContents( int contents, int id ) {
+void anPhysics_Base::SetContents( int contents, int id ) {
 }
 
 /*
 ================
-idPhysics_Base::SetClipMask
+anPhysics_Base::SetClipMask
 ================
 */
-int idPhysics_Base::GetContents( int id ) const {
+int anPhysics_Base::GetContents( int id ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Base::SetClipMask
+anPhysics_Base::SetClipMask
 ================
 */
-void idPhysics_Base::SetClipMask( int mask, int id ) {
+void anPhysics_Base::SetClipMask( int mask, int id ) {
 	clipMask = mask;
 }
 
 /*
 ================
-idPhysics_Base::GetClipMask
+anPhysics_Base::GetClipMask
 ================
 */
-int idPhysics_Base::GetClipMask( int id ) const {
+int anPhysics_Base::GetClipMask( int id ) const {
 	return clipMask;
 }
 
 /*
 ================
-idPhysics_Base::GetBounds
+anPhysics_Base::GetBounds
 ================
 */
-const arcBounds &idPhysics_Base::GetBounds( int id ) const {
+const anBounds &anPhysics_Base::GetBounds( int id ) const {
 	return bounds_zero;
 }
 
 /*
 ================
-idPhysics_Base::GetAbsBounds
+anPhysics_Base::GetAbsBounds
 ================
 */
-const arcBounds &idPhysics_Base::GetAbsBounds( int id ) const {
+const anBounds &anPhysics_Base::GetAbsBounds( int id ) const {
 	return bounds_zero;
 }
 
 /*
 ================
-idPhysics_Base::Evaluate
+anPhysics_Base::Evaluate
 ================
 */
-bool idPhysics_Base::Evaluate( int timeStepMSec, int endTimeMSec ) {
+bool anPhysics_Base::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	return false;
 }
 
 /*
 ================
-idPhysics_Base::UpdateTime
+anPhysics_Base::UpdateTime
 ================
 */
-void idPhysics_Base::UpdateTime( int endTimeMSec ) {
+void anPhysics_Base::UpdateTime( int endTimeMSec ) {
 }
 
 /*
 ================
-idPhysics_Base::GetTime
+anPhysics_Base::GetTime
 ================
 */
-int idPhysics_Base::GetTime( void ) const {
+int anPhysics_Base::GetTime( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Base::GetImpactInfo
+anPhysics_Base::GetImpactInfo
 ================
 */
-void idPhysics_Base::GetImpactInfo( const int id, const arcVec3 &point, impactInfo_t *info ) const {
-	memset( info, 0, sizeof( *info ) );
+void anPhysics_Base::GetImpactInfo( const int id, const anVec3 &point, impactInfo_t *info ) const {
+	memset( info, 0, sizeof(* info) );
 }
 
 /*
 ================
-idPhysics_Base::ApplyImpulse
+anPhysics_Base::ApplyImpulse
 ================
 */
-void idPhysics_Base::ApplyImpulse( const int id, const arcVec3 &point, const arcVec3 &impulse ) {
+void anPhysics_Base::ApplyImpulse( const int id, const anVec3 &point, const anVec3 &impulse ) {
 }
 
 /*
 ================
-idPhysics_Base::AddForce
+anPhysics_Base::AddForce
 ================
 */
-void idPhysics_Base::AddForce( const int id, const arcVec3 &point, const arcVec3 &force ) {
+void anPhysics_Base::AddForce( const int id, const anVec3 &point, const anVec3 &force ) {
 }
 
 /*
 ================
-idPhysics_Base::Activate
+anPhysics_Base::Activate
 ================
 */
-void idPhysics_Base::Activate( void ) {
+void anPhysics_Base::Activate( void ) {
 }
 
 /*
 ================
-idPhysics_Base::PutToRest
+anPhysics_Base::PutToRest
 ================
 */
-void idPhysics_Base::PutToRest( void ) {
+void anPhysics_Base::PutToRest( void ) {
 }
 
 /*
 ================
-idPhysics_Base::IsAtRest
+anPhysics_Base::IsAtRest
 ================
 */
-bool idPhysics_Base::IsAtRest( void ) const {
+bool anPhysics_Base::IsAtRest( void ) const {
 	return true;
 }
 
 /*
 ================
-idPhysics_Base::GetRestStartTime
+anPhysics_Base::GetRestStartTime
 ================
 */
-int idPhysics_Base::GetRestStartTime( void ) const {
+int anPhysics_Base::GetRestStartTime( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Base::IsPushable
+anPhysics_Base::IsPushable
 ================
 */
-bool idPhysics_Base::IsPushable( void ) const {
+bool anPhysics_Base::IsPushable( void ) const {
 	return true;
 }
 
-// RAVEN BEGIN
-// bdube: water interraction
-bool idPhysics_Base::IsInWater ( void ) const {
+/*
+================
+anPhysics_Base::IsInWater
+================
+*/
+bool anPhysics_Base::IsInWater( void ) const {
 	return false;
 }
-// RAVEN END
 
 /*
 ================
-idPhysics_Base::SaveState
+anPhysics_Base::SaveState
 ================
 */
-void idPhysics_Base::SaveState( void ) {
+void anPhysics_Base::SaveState( void ) {
 }
 
 /*
 ================
-idPhysics_Base::RestoreState
+anPhysics_Base::RestoreState
 ================
 */
-void idPhysics_Base::RestoreState( void ) {
+void anPhysics_Base::RestoreState( void ) {
 }
 
 /*
 ================
-idPhysics_Base::SetOrigin
+anPhysics_Base::SetOrigin
 ================
 */
-void idPhysics_Base::SetOrigin( const arcVec3 &newOrigin, int id ) {
+void anPhysics_Base::SetOrigin( const anVec3 &newOrigin, int id ) {
 }
 
 /*
 ================
-idPhysics_Base::SetAxis
+anPhysics_Base::SetAxis
 ================
 */
-void idPhysics_Base::SetAxis( const arcMat3 &newAxis, int id ) {
+void anPhysics_Base::SetAxis( const anMat3 &newAxis, int id ) {
 }
 
 /*
 ================
-idPhysics_Base::Translate
+anPhysics_Base::Translate
 ================
 */
-void idPhysics_Base::Translate( const arcVec3 &translation, int id ) {
+void anPhysics_Base::Translate( const anVec3 &translation, int id ) {
 }
 
 /*
 ================
-idPhysics_Base::Rotate
+anPhysics_Base::Rotate
 ================
 */
-void idPhysics_Base::Rotate( const idRotation &rotation, int id ) {
+void anPhysics_Base::Rotate( const anRotation &rotation, int id ) {
 }
 
 /*
 ================
-idPhysics_Base::GetOrigin
+anPhysics_Base::GetOrigin
 ================
 */
-const arcVec3 &idPhysics_Base::GetOrigin( int id ) const {
+const anVec3 &anPhysics_Base::GetOrigin( int id ) const {
 	return vec3_origin;
 }
 
 /*
 ================
-idPhysics_Base::GetAxis
+anPhysics_Base::GetAxis
 ================
 */
-const arcMat3 &idPhysics_Base::GetAxis( int id ) const {
+const anMat3 &anPhysics_Base::GetAxis( int id ) const {
 	return mat3_identity;
 }
 
 /*
 ================
-idPhysics_Base::SetLinearVelocity
+anPhysics_Base::SetLinearVelocity
 ================
 */
-void idPhysics_Base::SetLinearVelocity( const arcVec3 &newLinearVelocity, int id ) {
+void anPhysics_Base::SetLinearVelocity( const anVec3 &newLinearVelocity, int id ) {
 }
 
 /*
 ================
-idPhysics_Base::SetAngularVelocity
+anPhysics_Base::SetAngularVelocity
 ================
 */
-void idPhysics_Base::SetAngularVelocity( const arcVec3 &newAngularVelocity, int id ) {
+void anPhysics_Base::SetAngularVelocity( const anVec3 &newAngularVelocity, int id ) {
 }
 
 /*
 ================
-idPhysics_Base::GetLinearVelocity
+anPhysics_Base::GetLinearVelocity
 ================
 */
-const arcVec3 &idPhysics_Base::GetLinearVelocity( int id ) const {
+const anVec3 &anPhysics_Base::GetLinearVelocity( int id ) const {
 	return vec3_origin;
 }
 
 /*
 ================
-idPhysics_Base::GetAngularVelocity
+anPhysics_Base::GetAngularVelocity
 ================
 */
-const arcVec3 &idPhysics_Base::GetAngularVelocity( int id ) const {
+const anVec3 &anPhysics_Base::GetAngularVelocity( int id ) const {
 	return vec3_origin;
 }
 
 /*
 ================
-idPhysics_Base::SetGravity
+anPhysics_Base::SetGravity
 ================
 */
-void idPhysics_Base::SetGravity( const arcVec3 &newGravity ) {
+void anPhysics_Base::SetGravity( const anVec3 &newGravity ) {
 	gravityVector = newGravity;
 	gravityNormal = newGravity;
 	gravityNormal.Normalize();
@@ -416,119 +416,116 @@ void idPhysics_Base::SetGravity( const arcVec3 &newGravity ) {
 
 /*
 ================
-idPhysics_Base::GetGravity
+anPhysics_Base::GetGravity
 ================
 */
-const arcVec3 &idPhysics_Base::GetGravity( void ) const {
+const anVec3 &anPhysics_Base::GetGravity( void ) const {
 	return gravityVector;
 }
 
 /*
 ================
-idPhysics_Base::GetGravityNormal
+anPhysics_Base::GetGravityNormal
 ================
 */
-const arcVec3 &idPhysics_Base::GetGravityNormal( void ) const {
+const anVec3 &anPhysics_Base::GetGravityNormal( void ) const {
 	return gravityNormal;
 }
 
 /*
 ================
-idPhysics_Base::ClipTranslation
+anPhysics_Base::ClipTranslation
 ================
 */
-void idPhysics_Base::ClipTranslation( trace_t &results, const arcVec3 &translation, const idClipModel *model ) const {
+void anPhysics_Base::ClipTranslation( trace_t &results, const anVec3 &translation, const anClipModel *model ) const {
 	memset( &results, 0, sizeof( trace_t ) );
 }
 
 /*
 ================
-idPhysics_Base::ClipRotation
+anPhysics_Base::ClipRotation
 ================
 */
-void idPhysics_Base::ClipRotation( trace_t &results, const idRotation &rotation, const idClipModel *model ) const {
+void anPhysics_Base::ClipRotation( trace_t &results, const anRotation &rotation, const anClipModel *model ) const {
 	memset( &results, 0, sizeof( trace_t ) );
 }
 
 /*
 ================
-idPhysics_Base::ClipContents
+anPhysics_Base::ClipContents
 ================
 */
-int idPhysics_Base::ClipContents( const idClipModel *model ) const {
+int anPhysics_Base::ClipContents( const anClipModel *model ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Base::DisableClip
+anPhysics_Base::DisableClip
 ================
 */
-void idPhysics_Base::DisableClip( void ) {
+void anPhysics_Base::DisableClip( void ) {
 }
 
 /*
 ================
-idPhysics_Base::EnableClip
+anPhysics_Base::EnableClip
 ================
 */
-void idPhysics_Base::EnableClip( void ) {
+void anPhysics_Base::EnableClip( void ) {
 }
 
 /*
 ================
-idPhysics_Base::UnlinkClip
+anPhysics_Base::UnlinkClip
 ================
 */
-void idPhysics_Base::UnlinkClip( void ) {
+void anPhysics_Base::UnlinkClip( void ) {
 }
 
 /*
 ================
-idPhysics_Base::LinkClip
+anPhysics_Base::LinkClip
 ================
 */
-void idPhysics_Base::LinkClip( void ) {
+void anPhysics_Base::LinkClip( void ) {
 }
 
 /*
 ================
-idPhysics_Base::EvaluateContacts
+anPhysics_Base::EvaluateContacts
 ================
 */
-bool idPhysics_Base::EvaluateContacts( void ) {
+bool anPhysics_Base::EvaluateContacts( void ) {
 	return false;
 }
 
 /*
 ================
-idPhysics_Base::GetNumContacts
+anPhysics_Base::GetNumContacts
 ================
 */
-int idPhysics_Base::GetNumContacts( void ) const {
+int anPhysics_Base::GetNumContacts( void ) const {
 	return contacts.Num();
 }
 
 /*
 ================
-idPhysics_Base::GetContact
+anPhysics_Base::GetContact
 ================
 */
-const contactInfo_t &idPhysics_Base::GetContact( int num ) const {
+const contactInfo_t &anPhysics_Base::GetContact( int num ) const {
 	return contacts[num];
 }
 
 /*
 ================
-idPhysics_Base::ClearContacts
+anPhysics_Base::ClearContacts
 ================
 */
-void idPhysics_Base::ClearContacts( void ) {
-	int i;
-	idEntity *ent;
-
-	for ( i = 0; i < contacts.Num(); i++ ) {
-		ent = gameLocal.entities[ contacts[i].entityNum ];
+void anPhysics_Base::ClearContacts( void ) {
+	for ( int i = 0; i < contacts.Num(); i++ ) {
+		anEntity *ent = gameLocal.entities[ contacts[i].entityNum ];
 		if ( ent ) {
 			ent->RemoveContactEntity( self );
 		}
@@ -538,17 +535,15 @@ void idPhysics_Base::ClearContacts( void ) {
 
 /*
 ================
-idPhysics_Base::AddContactEntity
+anPhysics_Base::AddContactEntity
 ================
 */
-void idPhysics_Base::AddContactEntity( idEntity *e ) {
-	int i;
-	idEntity *ent;
+void anPhysics_Base::AddContactEntity( anEntity *e ) {
 	bool found = false;
 
-	for ( i = 0; i < contactEntities.Num(); i++ ) {
-		ent = contactEntities[i].GetEntity();
-		if ( ent == NULL ) {
+	for ( int i = 0; i < contactEntities.Num(); i++ ) {
+		anEntity *ent = contactEntities[i].GetEntity();
+		if ( ent == nullptr ) {
 			contactEntities.RemoveIndex( i-- );
 		}
 		if ( ent == e ) {
@@ -562,15 +557,12 @@ void idPhysics_Base::AddContactEntity( idEntity *e ) {
 
 /*
 ================
-idPhysics_Base::RemoveContactEntity
+anPhysics_Base::RemoveContactEntity
 ================
 */
-void idPhysics_Base::RemoveContactEntity( idEntity *e ) {
-	int i;
-	idEntity *ent;
-
-	for ( i = 0; i < contactEntities.Num(); i++ ) {
-		ent = contactEntities[i].GetEntity();
+void anPhysics_Base::RemoveContactEntity( anEntity *e ) {
+	for ( int i = 0; i < contactEntities.Num(); i++ ) {
+		anEntity *ent = contactEntities[i].GetEntity();
 		if ( !ent ) {
 			contactEntities.RemoveIndex( i-- );
 			continue;
@@ -582,17 +574,15 @@ void idPhysics_Base::RemoveContactEntity( idEntity *e ) {
 	}
 }
 
-// RAVEN BEGIN
-// abahr:
 /*
 ================
-idPhysics_Base::GetContactNormal
+anPhysics_Base::GetContactNormal
 ================
 */
-const arcVec3 idPhysics_Base::GetContactNormal() const {
-	arcVec3 normal( vec3_zero );
+const anVec3 anPhysics_Base::GetContactNormal() const {
+	anVec3 normal( vec3_zero );
 
-	for( int ix = 0; ix < GetNumContacts(); ++ix ) {
+	for ( int ix = 0; ix < GetNumContacts(); ++ix ) {
 		normal += GetContact( ix ).normal;
 	}
 
@@ -601,13 +591,13 @@ const arcVec3 idPhysics_Base::GetContactNormal() const {
 
 /*
 ================
-idPhysics_Base::GetContactNormal
+anPhysics_Base::GetContactNormal
 ================
 */
-const arcVec3 idPhysics_Base::GetGroundContactNormal() const {
-	arcVec3 normal( vec3_zero );
+const anVec3 anPhysics_Base::GetGroundContactNormal() const {
+	anVec3 normal( vec3_zero );
 
-	for( int ix = 0; ix < GetNumContacts(); ++ix ) {
+	for ( int ix = 0; ix < GetNumContacts(); ++ix ) {
 		if ( GetContact(ix).normal * -gravityNormal > 0.0f ) {
 			normal += GetContact( ix ).normal;
 		}
@@ -615,17 +605,14 @@ const arcVec3 idPhysics_Base::GetGroundContactNormal() const {
 
 	return normal.ToNormal();
 }
-// RAVEN END
 
 /*
 ================
-idPhysics_Base::HasGroundContacts
+anPhysics_Base::HasGroundContacts
 ================
 */
-bool idPhysics_Base::HasGroundContacts( void ) const {
-	int i;
-
-	for ( i = 0; i < contacts.Num(); i++ ) {
+bool anPhysics_Base::HasGroundContacts( void ) const {
+	for ( int i = 0; i < contacts.Num(); i++ ) {
 		if ( contacts[i].normal * -gravityNormal > 0.0f ) {
 			return true;
 		}
@@ -635,13 +622,11 @@ bool idPhysics_Base::HasGroundContacts( void ) const {
 
 /*
 ================
-idPhysics_Base::IsGroundEntity
+anPhysics_Base::IsGroundEntity
 ================
 */
-bool idPhysics_Base::IsGroundEntity( int entityNum ) const {
-	int i;
-
-	for ( i = 0; i < contacts.Num(); i++ ) {
+bool anPhysics_Base::IsGroundEntity( int entityNum ) const {
+	for ( int i = 0; i < contacts.Num(); i++ ) {
 		if ( contacts[i].entityNum == entityNum && ( contacts[i].normal * -gravityNormal > 0.0f ) ) {
 			return true;
 		}
@@ -651,13 +636,11 @@ bool idPhysics_Base::IsGroundEntity( int entityNum ) const {
 
 /*
 ================
-idPhysics_Base::IsGroundClipModel
+anPhysics_Base::IsGroundClipModel
 ================
 */
-bool idPhysics_Base::IsGroundClipModel( int entityNum, int id ) const {
-	int i;
-
-	for ( i = 0; i < contacts.Num(); i++ ) {
+bool anPhysics_Base::IsGroundClipModel( int entityNum, int id ) const {
+	for ( int i = 0; i < contacts.Num(); i++ ) {
 		if ( contacts[i].entityNum == entityNum && contacts[i].id == id && ( contacts[i].normal * -gravityNormal > 0.0f ) ) {
 			return true;
 		}
@@ -667,107 +650,102 @@ bool idPhysics_Base::IsGroundClipModel( int entityNum, int id ) const {
 
 /*
 ================
-idPhysics_Base::SetPushed
+anPhysics_Base::SetPushed
 ================
 */
-void idPhysics_Base::SetPushed( int deltaTime ) {
+void anPhysics_Base::SetPushed( int deltaTime ) {
 }
 
 /*
 ================
-idPhysics_Base::GetPushedLinearVelocity
+anPhysics_Base::GetPushedLinearVelocity
 ================
 */
-const arcVec3 &idPhysics_Base::GetPushedLinearVelocity( const int id ) const {
+const anVec3 &anPhysics_Base::GetPushedLinearVelocity( const int id ) const {
 	return vec3_origin;
 }
 
 /*
 ================
-idPhysics_Base::GetPushedAngularVelocity
+anPhysics_Base::GetPushedAngularVelocity
 ================
 */
-const arcVec3 &idPhysics_Base::GetPushedAngularVelocity( const int id ) const {
+const anVec3 &anPhysics_Base::GetPushedAngularVelocity( const int id ) const {
 	return vec3_origin;
 }
 
 /*
 ================
-idPhysics_Base::SetMaster
+anPhysics_Base::SetMaster
 ================
 */
-void idPhysics_Base::SetMaster( idEntity *master, const bool orientated ) {
+void anPhysics_Base::SetMaster( anEntity *master, const bool orientated ) {
 }
 
 /*
 ================
-idPhysics_Base::GetBlockingInfo
+anPhysics_Base::GetBlockingInfo
 ================
 */
-const trace_t *idPhysics_Base::GetBlockingInfo( void ) const {
-	return NULL;
+const trace_t *anPhysics_Base::GetBlockingInfo( void ) const {
+	return nullptr;
 }
 
 /*
 ================
-idPhysics_Base::GetBlockingEntity
+anPhysics_Base::GetBlockingEntity
 ================
 */
-idEntity *idPhysics_Base::GetBlockingEntity( void ) const {
-	return NULL;
+anEntity *anPhysics_Base::GetBlockingEntity( void ) const {
+	return nullptr;
 }
 
 /*
 ================
-idPhysics_Base::GetLinearEndTime
+anPhysics_Base::GetLinearEndTime
 ================
 */
-int idPhysics_Base::GetLinearEndTime( void ) const {
+int anPhysics_Base::GetLinearEndTime( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Base::GetAngularEndTime
+anPhysics_Base::GetAngularEndTime
 ================
 */
-int idPhysics_Base::GetAngularEndTime( void ) const {
+int anPhysics_Base::GetAngularEndTime( void ) const {
 	return 0;
 }
 
 /*
 ================
-idPhysics_Base::AddGroundContacts
+anPhysics_Base::AddGroundContacts
 ================
 */
-void idPhysics_Base::AddGroundContacts( const idClipModel *clipModel ) {
-	arcVec6 dir;
-	int index, num;
-
-	index = contacts.Num();
+void anPhysics_Base::AddGroundContacts( const anClipModel *clipModel ) {
+	anVec6 dir;
+	int index = contacts.Num();
 	contacts.SetNum( index + 10, false );
 
 	dir.SubVec3(0) = gravityNormal;
-	dir.SubVec3(1) = vec3_origin;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
-	num = gameLocal.Contacts( self, &contacts[index], 10, clipModel->GetOrigin(),
+	dir.SubVec3( 1 ) = vec3_origin;
+
+
+	int num = gameLocal.Contacts( self, &contacts[index], 10, clipModel->GetOrigin(),
 					dir, CONTACT_EPSILON, clipModel, clipModel->GetAxis(), clipMask, self );
-// RAVEN END
+
 	contacts.SetNum( index + num, false );
 }
 
 /*
 ================
-idPhysics_Base::AddContactEntitiesForContacts
+anPhysics_Base::AddContactEntitiesForContacts
 ================
 */
-void idPhysics_Base::AddContactEntitiesForContacts( void ) {
-	int i;
-	idEntity *ent;
-
-	for ( i = 0; i < contacts.Num(); i++ ) {
-		ent = gameLocal.entities[ contacts[i].entityNum ];
+void anPhysics_Base::AddContactEntitiesForContacts( void ) {
+	for ( int  i = 0; i < contacts.Num(); i++ ) {
+		anEntity *ent = gameLocal.entities[ contacts[i].entityNum ];
 		if ( ent && ent != self ) {
 			ent->AddContactEntity( self );
 		}
@@ -776,15 +754,12 @@ void idPhysics_Base::AddContactEntitiesForContacts( void ) {
 
 /*
 ================
-idPhysics_Base::ActivateContactEntities
+anPhysics_Base::ActivateContactEntities
 ================
 */
-void idPhysics_Base::ActivateContactEntities( void ) {
-	int i;
-	idEntity *ent;
-
-	for ( i = 0; i < contactEntities.Num(); i++ ) {
-		ent = contactEntities[i].GetEntity();
+void anPhysics_Base::ActivateContactEntities( void ) {
+	for ( int i = 0; i < contactEntities.Num(); i++ ) {
+		anEntity *ent = contactEntities[i].GetEntity();
 		if ( ent ) {
 			ent->ActivatePhysics( self );
 		} else {
@@ -795,14 +770,11 @@ void idPhysics_Base::ActivateContactEntities( void ) {
 
 /*
 ================
-idPhysics_Base::IsOutsideWorld
+anPhysics_Base::IsOutsideWorld
 ================
 */
-bool idPhysics_Base::IsOutsideWorld( void ) const {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+bool anPhysics_Base::IsOutsideWorld( void ) const {
 	if ( !gameLocal.GetWorldBounds( self ).Expand( 128.0f ).IntersectsBounds( GetAbsBounds() ) ) {
-// RAVEN END
 		return true;
 	}
 	return false;
@@ -810,63 +782,109 @@ bool idPhysics_Base::IsOutsideWorld( void ) const {
 
 /*
 ================
-idPhysics_Base::DrawVelocity
+anPhysics_Base::DrawVelocity
+
+leaving here marked out but still alive til new code is tested
 ================
 */
-void idPhysics_Base::DrawVelocity( int id, float linearScale, float angularScale ) const {
-	arcVec3 dir, org, vec, start, end;
-	arcMat3 axis;
-	float length, a;
-
-	dir = GetLinearVelocity( id );
+void anPhysics_Base::DrawVelocityOld( int id, float linearScale, float angularScale ) const {
+	anVec3 dir = GetLinearVelocity( id );
 	dir *= linearScale;
 	if ( dir.LengthSqr() > Square( 0.1f ) ) {
 		dir.Truncate( 10.0f );
-		org = GetOrigin( id );
+		anVec3 org = GetOrigin( id );
 		gameRenderWorld->DebugArrow( colorRed, org, org + dir, 1 );
 	}
 
 	dir = GetAngularVelocity( id );
-	length = dir.Normalize();
+	float length = dir.Normalize();
 	length *= angularScale;
 	if ( length > 0.1f ) {
 		if ( length < 60.0f ) {
 			length = 60.0f;
-		}
-		else if ( length > 360.0f ) {
+		} else if ( length > 360.0f ) {
 			length = 360.0f;
 		}
-		axis = GetAxis( id );
-		vec = axis[2];
-		if ( arcMath::Fabs( dir * vec ) > 0.99f ) {
+		anMat3 axis = GetAxis( id );
+		anVec3 vec = axis[2];
+		if ( anMath::Fabs( dir * vec ) > 0.99f ) {
 			vec = axis[0];
 		}
 		vec -= vec * dir * vec;
 		vec.Normalize();
 		vec *= 4.0f;
-		start = org + vec;
-		for ( a = 20.0f; a < length; a += 20.0f ) {
-			end = org + idRotation( vec3_origin, dir, -a ).ToMat3() * vec;
+		anVec3 start = org + vec;
+		for ( float a = 20.0f; a < length; a += 20.0f ) {
+			anVec3 end = org + anRotation( vec3_origin, dir, -a ).ToMat3() * vec;
 			gameRenderWorld->DebugLine( colorBlue, start, end, 1 );
 			start = end;
 		}
-		end = org + idRotation( vec3_origin, dir, -length ).ToMat3() * vec;
+		end = org + anRotation( vec3_origin, dir, -length ).ToMat3() * vec;
 		gameRenderWorld->DebugArrow( colorBlue, start, end, 1 );
 	}
 }
 
 /*
 ================
-idPhysics_Base::WriteToSnapshot
+anPhysics_Base::DrawVelocity
 ================
 */
-void idPhysics_Base::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void anPhysics_Base::DrawVelocity( int id, float linearScale, float angularScale ) const {
+    anVec3 linearVelocity = GetLinearVelocity( id );
+    anVec3 angularVelocity = GetAngularVelocity( id );
+    anVec3 origin = GetOrigin( id );
+    anMat3 axis = GetAxis( id );
+
+		// Draw linear velocity
+	float linearVelocityLength = linearVelocity.Length() * linearScale;
+
+	if ( linearVelocityLength > 0.1f ) {
+		linearVelocity.Truncate( 10.0f );
+		gameRenderWorld->DebugArrow( colorRed, origin, origin + linearVelocity, 1 );
+		// Draw angular velocity
+		float angularVelocityLength = angularVelocity.Normalize() * angularScale;
+		if ( angularVelocityLength > 0.1f ) {
+			if ( angularVelocityLength < 60.0f )  {
+				angularVelocityLength = 60.0f;
+			} else if ( angularVelocityLength > 360.0f ) {
+				angularVelocityLength = 360.0f;
+			}
+
+			anVec3 vec = axis[2];
+
+			if ( anMath::Fabs( angularVelocity * vec ) > 0.99f ) {
+				vec = axis[0];
+			}
+
+			vec -= vec * angularVelocity * vec;
+			vec.Normalize();
+			vec *= 4.0f;
+
+			anVec3 start = origin + vec;
+			anVec3 end;
+			for ( float a = 20.0f; a < angularVelocityLength; a += 20.0f ) {
+				end = origin + anRotation( vec3_origin, angularVelocity, -a ).ToMat3() * vec;
+				gameRenderWorld->DebugLine( colorBlue, start, end, 1 );
+				start = end;
+			}
+			end = origin + anRotation( vec3_origin, angularVelocity, -angularVelocityLength ).ToMat3() * vec;
+			gameRenderWorld->DebugArrow( colorBlue, start, end, 1 );
+		}
+	}
 }
 
 /*
 ================
-idPhysics_Base::ReadFromSnapshot
+anPhysics_Base::WriteToSnapshot
 ================
 */
-void idPhysics_Base::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void anPhysics_Base::WriteToSnapshot( anBitMsgDelta &msg ) const {
+}
+
+/*
+================
+anPhysics_Base::ReadFromSnapshot
+================
+*/
+void anPhysics_Base::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 }

@@ -45,19 +45,19 @@ typedef struct dominantTri_s {
 } dominantTri_t;
 
 typedef struct lightingCache_s {
-	arcVec3						localLightVector;		// this is the statically computed vector to the light
+	anVec3						localLightVector;		// this is the statically computed vector to the light
 														// in texture space for cards without vertex programs
 } lightingCache_t;
 
-typedef struct arcShadowCache {
-	arcVec4						xyz;					// we use homogenous coordinate tricks
-} arcShadowCache;
+typedef struct anShadowCache {
+	anVec4						xyz;					// we use homogenous coordinate tricks
+} anShadowCache;
 
 const int SHADOW_CAP_INFINITE	= 64;
 
 // our only drawing geometry type
 typedef struct surfTriangles_s {
-	arcBounds				bounds;					// for culling
+	anBounds					bounds;					// for culling
 
 	int							ambientViewCount;		// if == tr.viewCount, it is visible this view
 
@@ -69,7 +69,7 @@ typedef struct surfTriangles_s {
 														// pointers into the original surface, and should not be freed
 
 	int							numVerts;				// number of vertices
-	arcDrawVert *			verts;					// vertices, allocated with special allocator
+	anDrawVertex *				verts;					// vertices, allocated with special allocator
 
 	int							numIndexes;				// for shadows, this has both front and rear end caps and silhouette planes
 	qglIndex_t *				indexes;				// indexes, allocated with special allocator
@@ -85,7 +85,7 @@ typedef struct surfTriangles_s {
 	int							numSilEdges;			// number of silhouette edges
 	silEdge_t *					silEdges;				// silhouette edges
 
-	arcPlane *					facePlanes;				// [numIndexes/3] plane equations
+	anPlane *					facePlanes;				// [numIndexes/3] plane equations
 
 	dominantTri_t *				dominantTris;			// [numVerts] for deformed surface fast tangent calculation
 
@@ -97,28 +97,28 @@ typedef struct surfTriangles_s {
 														// plane, we need to draw the rear caps of the shadow volume
 														// turboShadows will have SHADOW_CAP_INFINITE
 
-	arcShadowCache *				shadowVertexes;			// these will be copied to shadowCache when it is going to be drawn.
-														// these are NULL when vertex programs are available
+	anShadowCache *				shadowVertexes;			// these will be copied to shadowCache when it is going to be drawn.
+														// these are nullptr when vertex programs are available
 
-	struct surfTriangles_s *			ambientSurface;			// for light interactions, point back at the original surface that generated
+	struct surfTriangles_s *	ambientSurface;			// for light interactions, point back at the original surface that generated
 														// the interaction, which we will get the ambientCache from
 
-	struct surfTriangles_s *			nextDeferredFree;		// chain of tris to free next frame
+	struct surfTriangles_s *	nextDeferredFree;		// chain of tris to free next frame
 
 	// data in vertex object space, not directly readable by the CPU
 	struct vertCache_s *		indexCache;				// int
-	struct vertCache_s *		ambientCache;			// arcDrawVert
+	struct vertCache_s *		ambientCache;			// anDrawVertex
 	struct vertCache_s *		lightingCache;			// lightingCache_t
-	struct vertCache_s *		shadowCache;			// arcShadowCache
-	arcVec3						aliasPoint[3];
-} surfTriangles_t;
+	struct vertCache_s *		shadowCache;			// anShadowCache
+	anVec3						aliasPoint[3];
+} srfTriangles_t;
 
-typedef arcNetList<surfTriangles_t *> aRcTriangleList;
+typedef anList<srfTriangles_t *> anTriangleList;
 
 typedef struct modelSurface_s {
 	int							id;
-	const arcMaterial *			shader;
-	surfTriangles_t *				geometry;
+	const anMaterial *			shader;
+	srfTriangles_t *			geometry;
 } modelSurface_t;
 
 typedef enum {
@@ -131,19 +131,19 @@ typedef enum {
 	INVALID_JOINT				= -1
 } jointHandle_t;
 
-class aRcMD5Joint {
+class anM8DJoint {
 public:
-								aRcMD5Joint() { parent = NULL; }
-	arcNetString						name;
-	const aRcMD5Joint *			parent;
+								anM8DJoint() { parent = nullptr; }
+	anString						name;
+	const anM8DJoint *			parent;
 };
 
 // the init methods may be called again on an already created model when
 // a reloadModels is issued
 
-class ARCRenderModel {
+class anRenderModel {
 public:
-	virtual						~ARCRenderModel() {};
+	virtual						~anRenderModel() {};
 
 	// Loads static models only, dynamic models must be loaded by the modelManager
 	virtual void				InitFromFile( const char *fileName ) = 0;
@@ -218,20 +218,20 @@ public:
 	virtual const modelSurface_t *Surface( int surfaceNum ) const = 0;
 
 	// Allocates surface triangles.
-	// Allocates memory for surfTriangles_t::verts and surfTriangles_t::indexes
+	// Allocates memory for srfTriangles_t::verts and srfTriangles_t::indexes
 	// The allocated memory is not initialized.
-	// surfTriangles_t::numVerts and surfTriangles_t::numIndexes are set to zero.
-	virtual surfTriangles_t *			AllocSurfaceTriangles( int numVerts, int numIndexes ) const = 0;
+	// srfTriangles_t::numVerts and srfTriangles_t::numIndexes are set to zero.
+	virtual srfTriangles_t *			AllocSurfaceTriangles( int numVerts, int numIndexes ) const = 0;
 
 	// Frees surfaces triangles.
-	virtual void					FreeSurfaceTriangles( surfTriangles_t *tris ) const = 0;
+	virtual void					FreeSurfaceTriangles( srfTriangles_t *tris ) const = 0;
 
 	// created at load time by stitching together all surfaces and sharing
 	// the maximum number of edges.  This may be incorrect if a skin file
 	// remaps surfaces between shadow casting and non-shadow casting, or
 	// if some surfaces are noSelfShadow and others aren't
-	virtual surfTriangles_t	*			ShadowHull() const = 0;
-	virtual surfTriangles_t	*			CreateSurfaceShadowHull() const = 0;
+	virtual srfTriangles_t	*			ShadowHull() const = 0;
+	virtual srfTriangles_t	*			CreateSurfaceShadowHull() const = 0;
 
 	// models of the form "_area*" may have a prelight shadow model associated with it
 	virtual bool					IsStaticWorldModel() const = 0;
@@ -248,7 +248,7 @@ public:
 
 	// dynamic models should return a fast, conservative approximation
 	// static models should usually return the exact value
-	virtual arcBounds			Bounds( const struct renderEntity_s *ent = NULL ) const = 0;
+	virtual anBounds			Bounds( const struct renderEntity_s *ent = nullptr ) const = 0;
 
 	// returns value != 0.0f if the model requires the depth hack
 	virtual float				DepthHack() const = 0;
@@ -260,13 +260,13 @@ public:
 	// The renderer will delete the returned dynamic model the next view
 	// This isn't const, because it may need to reload a purged model if it
 	// wasn't precached correctly.
-	virtual ARCRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, ARCRenderModel *cachedModel ) = 0;
+	virtual anRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel ) = 0;
 
 	// Returns the number of joints or 0 if the model is not an MD5
 	virtual int					NumJoints( void ) const = 0;
 
-	// Returns the MD5 joints or NULL if the model is not an MD5
-	virtual const aRcMD5Joint *	GetJoints( void ) const = 0;
+	// Returns the MD5 joints or nullptr if the model is not an MD5
+	virtual const anM8DJoint *	GetJoints( void ) const = 0;
 
 	// Returns the handle for the joint with the given name.
 	virtual jointHandle_t		GetJointHandle( const char *name ) const = 0;
@@ -274,15 +274,15 @@ public:
 	// Returns the name for the joint with the given handle.
 	virtual const char *		GetJointName( jointHandle_t handle ) const = 0;
 
-	// Returns the default animation pose or NULL if the model is not an MD5.
-	virtual const idJointQuat *	GetDefaultPose( void ) const = 0;
+	// Returns the default animation pose or nullptr if the model is not an MD5.
+	virtual const anJointQuat *	GetDefaultPose( void ) const = 0;
 
 	// Returns number of the joint nearest to the given triangle.
 	virtual int					NearestJoint( int surfaceNum, int a, int c, int b ) const = 0;
 
 	// Writing to and reading from a demo file.
-	//virtual void				ReadFromDemoFile( class ARCDemoFile *f ) = 0;
-	//virtual void				WriteToDemoFile( class ARCDemoFile *f ) = 0;
+	//virtual void				ReadFromDemoFile( class anDemoFile *f ) = 0;
+	//virtual void				WriteToDemoFile( class anDemoFile *f ) = 0;
 };
 
 #endif

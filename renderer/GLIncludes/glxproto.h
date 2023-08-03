@@ -6,7 +6,7 @@
  * Copyright (C) 1991-2000 Silicon Graphics, Inc. All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
+ * copy of this software and associated documentation files (the "Software" ),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software, and to permit persons to whom the
@@ -141,7 +141,7 @@ typedef struct GLXRender {
 /*
 ** Large render command request.  A single large rendering command
 ** is output in multiple X extension requests.	The first packet
-** contains an opcode dependent header (see below) that describes
+** contains an opcode dependent header ( see below) that describes
 ** the data that follows.
 */
 typedef struct GLXRenderLarge {

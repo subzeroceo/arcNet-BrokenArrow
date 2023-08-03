@@ -54,7 +54,7 @@ public:
 					   CString* p_strReplaceValue, 
 					   bool*	p_bWholeStringMatchOnly,
 					   bool*	p_bSelectAllMatchingEnts,
-					   CWnd*	pParent = NULL);   // standard constructor
+					   CWnd*	pParent = nullptr );   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CEntKeyFindReplace)

@@ -17,7 +17,7 @@
 //	useful.
 
 //#include "stdafx.h"
-#include "../..//idlib/precompiled.h"
+#include "../..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "PropTree.h"
@@ -34,7 +34,7 @@ static char THIS_FILE[] = __FILE__;
 // CPropTreeInfo
 
 CPropTreeInfo::CPropTreeInfo() :
-	m_pProp(NULL)
+	m_pProp(nullptr )
 {
 }
 
@@ -70,7 +70,7 @@ void CPropTreeInfo::OnPaint()
 	dc.DrawEdge(&rc, BDR_SUNKENOUTER, BF_RECT);
 	rc.DeflateRect(4, 4);
 
-	ASSERT(m_pProp!=NULL);
+	ASSERT(m_pProp!=nullptr );
 
 	CPropTreeItem* pItem = m_pProp->GetFocusedItem();
 

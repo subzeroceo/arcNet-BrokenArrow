@@ -1,26 +1,26 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
 
 /*
 ================
-arcInteractiveGuiModel::arcInteractiveGuiModel
+anInteractiveGuiModel::anInteractiveGuiModel
 ================
 */
-arcInteractiveGuiModel::arcInteractiveGuiModel() {
+anInteractiveGuiModel::anInteractiveGuiModel() {
 	indexes.SetGranularity( 1000 );
 	verts.SetGranularity( 1000 );
 }
 
 /*
 ================
-arcInteractiveGuiModel::Clear
+anInteractiveGuiModel::Clear
 
 Begins collecting draw commands into surfaces
 ================
 */
-void arcInteractiveGuiModel::Clear() {
+void anInteractiveGuiModel::Clear() {
 	surfaces.SetNum( 0, false );
 	indexes.SetNum( 0, false );
 	verts.SetNum( 0, false );
@@ -32,15 +32,15 @@ void arcInteractiveGuiModel::Clear() {
 EmitSurface
 ================
 */
-void arcInteractiveGuiModel::EmitSurface( guiModelSurface_t *surf, float modelMatrix[16], float modelViewMatrix[16], bool depthHack ) {
-	surfTriangles_t	*tri;
+void anInteractiveGuiModel::EmitSurface( guiModelSurface_t *surf, float modelMatrix[16], float modelViewMatrix[16], bool depthHack ) {
+	srfTriangles_t	*tri;
 
 	if ( surf->numVerts == 0 ) {
 		return;		// nothing in the surface
 	}
 
 	// copy verts and indexes
-	tri = (surfTriangles_t *)R_ClearedFrameAlloc( sizeof( *tri ) );
+	tri = ( srfTriangles_t *)R_ClearedFrameAlloc( sizeof( *tri ) );
 
 	tri->numIndexes = surf->numIndexes;
 	tri->numVerts = surf->numVerts;
@@ -50,7 +50,7 @@ void arcInteractiveGuiModel::EmitSurface( guiModelSurface_t *surf, float modelMa
 	// we might be able to avoid copying these and just let them reference the list vars
 	// but some things, like deforms and recursive
 	// guis, need to access the verts in cpu space, not just through the vertex range
-	tri->verts = (arcDrawVert *)R_FrameAlloc( tri->numVerts * sizeof( tri->verts[0] ) );
+	tri->verts = (anDrawVertex *)R_FrameAlloc( tri->numVerts * sizeof( tri->verts[0] ) );
 	memcpy( tri->verts, &verts[surf->firstVert], tri->numVerts * sizeof( tri->verts[0] ) );
 
 	// move the verts to the vertex cache
@@ -79,7 +79,7 @@ void arcInteractiveGuiModel::EmitSurface( guiModelSurface_t *surf, float modelMa
 EmitToCurrentView
 ====================
 */
-void arcInteractiveGuiModel::EmitToCurrentView( float modelMatrix[16], bool depthHack ) {
+void anInteractiveGuiModel::EmitToCurrentView( float modelMatrix[16], bool depthHack ) {
 	float	modelViewMatrix[16];
 
 	GL_MultMatrix( modelMatrix, tr.viewDef->worldSpace.modelViewMatrix, modelViewMatrix );
@@ -91,12 +91,12 @@ void arcInteractiveGuiModel::EmitToCurrentView( float modelMatrix[16], bool dept
 
 /*
 ================
-arcInteractiveGuiModel::EmitFullScreen
+anInteractiveGuiModel::EmitFullScreen
 
 Creates a view that covers the screen and emit the surfaces
 ================
 */
-void arcInteractiveGuiModel::EmitFullScreen( void ) {
+void anInteractiveGuiModel::EmitFullScreen( void ) {
 	viewDef_t	*viewDef;
 
 	if ( surfaces[0].numVerts == 0 ) {
@@ -174,7 +174,7 @@ void arcInteractiveGuiModel::EmitFullScreen( void ) {
 AdvanceSurf
 =============
 */
-void arcInteractiveGuiModel::AdvanceSurf() {
+void anInteractiveGuiModel::AdvanceSurf() {
 	guiModelSurface_t	s;
 
 	if ( surfaces.Num() ) {
@@ -204,7 +204,7 @@ void arcInteractiveGuiModel::AdvanceSurf() {
 SetColor
 =============
 */
-void arcInteractiveGuiModel::SetColor( float r, float g, float b, float a ) {
+void anInteractiveGuiModel::SetColor( float r, float g, float b, float a ) {
 	if ( !qglConfig.isInitialized ) {
 		return;
 	}
@@ -229,7 +229,7 @@ void arcInteractiveGuiModel::SetColor( float r, float g, float b, float a ) {
 DrawStretchPic
 =============
 */
-void arcInteractiveGuiModel::DrawStretchPic( const arcDrawVert *dverts, const qglIndex_t *dindexes, int vertCount, int indexCount, const arcMaterial *hShader, bool clip, float min_x, float min_y, float max_x, float max_y ) {
+void anInteractiveGuiModel::DrawStretchPic( const anDrawVertex *dverts, const qglIndex_t *dindexes, int vertCount, int indexCount, const anMaterial *hShader, bool clip, float min_x, float min_y, float max_x, float max_y ) {
 	if ( !qglConfig.isInitialized ) {
 		return;
 	}
@@ -242,7 +242,7 @@ void arcInteractiveGuiModel::DrawStretchPic( const arcDrawVert *dverts, const qg
 		if ( surf->numVerts ) {
 			AdvanceSurf();
 		}
-		const_cast<arcMaterial *>(hShader)->EnsureNotPurged();	// in case it was a gui item started before a level change
+		const_cast<anMaterial *>(hShader)->EnsureNotPurged();	// in case it was a gui item started before a level change
 		surf->material = hShader;
 	}
 
@@ -251,12 +251,12 @@ void arcInteractiveGuiModel::DrawStretchPic( const arcDrawVert *dverts, const qg
 	if ( clip ) {
 		// FIXME:	this is grim stuff, and should be rewritten if we have any significant
 		//			number of guis asking for clipping
-		arcFixedWinding w;
+		anFixedWinding w;
 		for ( int i = 0; i < indexCount; i += 3 ) {
 			w.Clear();
-			w.AddPoint(arcVec5(dverts[dindexes[i]].xyz.x, dverts[dindexes[i]].xyz.y, dverts[dindexes[i]].xyz.z, dverts[dindexes[i]].st.x, dverts[dindexes[i]].st.y) );
-			w.AddPoint(arcVec5(dverts[dindexes[i+1]].xyz.x, dverts[dindexes[i+1]].xyz.y, dverts[dindexes[i+1]].xyz.z, dverts[dindexes[i+1]].st.x, dverts[dindexes[i+1]].st.y) );
-			w.AddPoint(arcVec5(dverts[dindexes[i+2]].xyz.x, dverts[dindexes[i+2]].xyz.y, dverts[dindexes[i+2]].xyz.z, dverts[dindexes[i+2]].st.x, dverts[dindexes[i+2]].st.y) );
+			w.AddPoint(anVec5(dverts[dindexes[i]].xyz.x, dverts[dindexes[i]].xyz.y, dverts[dindexes[i]].xyz.z, dverts[dindexes[i]].st.x, dverts[dindexes[i]].st.y) );
+			w.AddPoint(anVec5(dverts[dindexes[i+1]].xyz.x, dverts[dindexes[i+1]].xyz.y, dverts[dindexes[i+1]].xyz.z, dverts[dindexes[i+1]].st.x, dverts[dindexes[i+1]].st.y) );
+			w.AddPoint(anVec5(dverts[dindexes[i+2]].xyz.x, dverts[dindexes[i+2]].xyz.y, dverts[dindexes[i+2]].xyz.z, dverts[dindexes[i+2]].st.x, dverts[dindexes[i+2]].st.y) );
 			for ( int j = 0; j < 3; j++ ) {
 				if ( w[j].x < min_x || w[j].x > max_x ||
 					w[j].y < min_y || w[j].y > max_y ) {
@@ -265,7 +265,7 @@ void arcInteractiveGuiModel::DrawStretchPic( const arcDrawVert *dverts, const qg
 			}
 
 			if ( j < 3 ) {
-				arcPlane p;
+				anPlane p;
 				p.Normal().y = p.Normal().z = 0.0f; p.Normal().x = 1.0f; p.SetDist( min_x );
 				w.ClipInPlace( p );
 				p.Normal().y = p.Normal().z = 0.0f; p.Normal().x = -1.0f; p.SetDist( -max_x );
@@ -279,7 +279,7 @@ void arcInteractiveGuiModel::DrawStretchPic( const arcDrawVert *dverts, const qg
 			int	numVerts = verts.Num();
 			verts.SetNum( numVerts + w.GetNumPoints(), false );
 			for ( j = 0; j < w.GetNumPoints(); j++ ) {
-				arcDrawVert *dv = &verts[numVerts+j];
+				anDrawVertex *dv = &verts[numVerts+j];
 
 				dv->xyz.x = w[j].x;
 				dv->xyz.y = w[j].y;
@@ -324,7 +324,7 @@ DrawStretchPic
 x/y/w/h are in the 0,0 to 640,480 range
 =============
 */
-void arcInteractiveGuiModel::DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const arcMaterial *hShader ) {
+void anInteractiveGuiModel::DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const anMaterial *hShader ) {
 	if ( !qglConfig.isInitialized || !hShader ) {
 		return;
 	}
@@ -349,7 +349,7 @@ void arcInteractiveGuiModel::DrawStretchPic( float x, float y, float w, float h,
 		return; // completely clipped away
 	}
 
-	arcDrawVert verts[4];
+	anDrawVertex verts[4];
 	qglIndex_t indexes[6];
 
 	if ( r_useImprovedStretchPicCode ) {
@@ -453,8 +453,8 @@ DrawStretchTri
 x/y/w/h are in the 0,0 to 640,480 range
 =============
 */
-void arcInteractiveGuiModel::DrawStretchTri( arcVec2 p1, arcVec2 p2, arcVec2 p3, arcVec2 t1, arcVec2 t2, arcVec2 t3, const arcMaterial *material ) {
-	arcDrawVert tempVerts[3];
+void anInteractiveGuiModel::DrawStretchTri( anVec2 p1, anVec2 p2, anVec2 p3, anVec2 t1, anVec2 t2, anVec2 t3, const anMaterial *material ) {
+	anDrawVertex tempVerts[3];
 	qglIndex_t tempIndexes[3];
 	int vertCount = 3;
 	int indexCount = 3;
@@ -514,7 +514,7 @@ void arcInteractiveGuiModel::DrawStretchTri( arcVec2 p1, arcVec2 p2, arcVec2 p3,
 		if ( surf->numVerts ) {
 			AdvanceSurf();
 		}
-		const_cast<arcMaterial *>(material)->EnsureNotPurged();	// in case it was a gui item started before a level change
+		const_cast<anMaterial *>(material)->EnsureNotPurged();	// in case it was a gui item started before a level change
 		surf->material = material;
 	}
 

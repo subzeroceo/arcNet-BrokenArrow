@@ -1,35 +1,35 @@
 
-#include "../../idlib/precompiled.h"
+#include "../../idlib/Lib.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( idPhysics_Base, idPhysics_Parametric )
+CLASS_DECLARATION( anPhysics_Base, anPhysics_Parametric )
 END_CLASS
 
 
 /*
 ================
-idPhysics_Parametric::Activate
+anPhysics_Parametric::Activate
 ================
 */
-void idPhysics_Parametric::Activate( void ) {
+void anPhysics_Parametric::Activate( void ) {
 	current.atRest = -1;
 	self->BecomeActive( TH_PHYSICS );
 }
 
 /*
 ================
-idPhysics_Parametric::TestIfAtRest
+anPhysics_Parametric::TestIfAtRest
 ================
 */
-bool idPhysics_Parametric::TestIfAtRest( void ) const {
+bool anPhysics_Parametric::TestIfAtRest( void ) const {
 
 	if ( ( current.linearExtrapolation.GetExtrapolationType() & ~EXTRAPOLATION_NOSTOP ) == EXTRAPOLATION_NONE &&
 			( current.angularExtrapolation.GetExtrapolationType() & ~EXTRAPOLATION_NOSTOP ) == EXTRAPOLATION_NONE &&
 				current.linearInterpolation.GetDuration() == 0 &&
 					current.angularInterpolation.GetDuration() == 0 &&
-						current.spline == NULL ) {
+						current.spline == nullptr ) {
 		return true;
 	}
 
@@ -49,7 +49,7 @@ bool idPhysics_Parametric::TestIfAtRest( void ) const {
 		return false;
 	}
 
-	if ( current.spline != NULL && !current.spline->IsDone( current.time ) ) {
+	if ( current.spline != nullptr && !current.spline->IsDone( current.time ) ) {
 		return false;
 	}
 
@@ -58,20 +58,20 @@ bool idPhysics_Parametric::TestIfAtRest( void ) const {
 
 /*
 ================
-idPhysics_Parametric::Rest
+anPhysics_Parametric::Rest
 ================
 */
-void idPhysics_Parametric::Rest( void ) {
+void anPhysics_Parametric::Rest( void ) {
 	current.atRest = gameLocal.time;
 	self->BecomeInactive( TH_PHYSICS );
 }
 
 /*
 ================
-idPhysics_Parametric::idPhysics_Parametric
+anPhysics_Parametric::anPhysics_Parametric
 ================
 */
-idPhysics_Parametric::idPhysics_Parametric( void ) {
+anPhysics_Parametric::anPhysics_Parametric( void ) {
 
 	current.time = gameLocal.time;
 	current.atRest = -1;
@@ -85,49 +85,49 @@ idPhysics_Parametric::idPhysics_Parametric( void ) {
 	current.angularExtrapolation.Init( 0, 0, ang_zero, ang_zero, ang_zero, EXTRAPOLATION_NONE );
 	current.linearInterpolation.Init( 0, 0, 0, 0, vec3_zero, vec3_zero );
 	current.angularInterpolation.Init( 0, 0, 0, 0, ang_zero, ang_zero );
-	current.spline = NULL;
+	current.spline = nullptr;
 	current.splineInterpolate.Init( 0, 1, 1, 2, 0, 0 );
 
 	saved = current;
 
 	isPusher = false;
 	pushFlags = 0;
-	clipModel = NULL;
+	clipModel = nullptr;
 	isBlocked = false;
 	memset( &pushResults, 0, sizeof( pushResults ) );
 
 	hasMaster = false;
 	isOrientated = false;
 
-// RAVEN BEGIN
+
 // abahr:
 	useAxisOffset = false;
 	axisOffset.Identity();
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Parametric::~idPhysics_Parametric
+anPhysics_Parametric::~anPhysics_Parametric
 ================
 */
-idPhysics_Parametric::~idPhysics_Parametric( void ) {
-	if ( clipModel != NULL ) {
+anPhysics_Parametric::~anPhysics_Parametric( void ) {
+	if ( clipModel != nullptr ) {
 		delete clipModel;
-		clipModel = NULL;
+		clipModel = nullptr;
 	}
-	if ( current.spline != NULL ) {
+	if ( current.spline != nullptr ) {
 		delete current.spline;
-		current.spline = NULL;
+		current.spline = nullptr;
 	}
 }
 
 /*
 ================
-idPhysics_Parametric_SavePState
+anPhysics_Parametric_SavePState
 ================
 */
-void idPhysics_Parametric_SavePState( idSaveGame *savefile, const parametricPState_t &state ) {
+void anPhysics_Parametric_SavePState( anSaveGame *savefile, const parametricPState_t &state ) {
 	savefile->WriteInt( state.time );
 	savefile->WriteInt( state.atRest );
 	savefile->WriteBool( state.useSplineAngles );
@@ -177,14 +177,14 @@ void idPhysics_Parametric_SavePState( idSaveGame *savefile, const parametricPSta
 
 /*
 ================
-idPhysics_Parametric_RestorePState
+anPhysics_Parametric_RestorePState
 ================
 */
-void idPhysics_Parametric_RestorePState( idRestoreGame *savefile, parametricPState_t &state ) {
+void anPhysics_Parametric_RestorePState( anRestoreGame *savefile, parametricPState_t &state ) {
 	extrapolation_t etype;
 	float startTime, duration, accelTime, decelTime, startValue, endValue;
-	arcVec3 linearStartValue, linearBaseSpeed, linearSpeed, startPos, endPos;
-	idAngles angularStartValue, angularBaseSpeed, angularSpeed, startAng, endAng;
+	anVec3 linearStartValue, linearBaseSpeed, linearSpeed, startPos, endPos;
+	anAngles angularStartValue, angularBaseSpeed, angularSpeed, startAng, endAng;
 
 	savefile->ReadInt( state.time );
 	savefile->ReadInt( state.atRest );
@@ -195,7 +195,7 @@ void idPhysics_Parametric_RestorePState( idRestoreGame *savefile, parametricPSta
 	savefile->ReadVec3( state.localOrigin );
 	savefile->ReadAngles( state.localAngles );
 
-	savefile->ReadInt( (int &)etype );
+	savefile->ReadInt( ( int&)etype );
 	savefile->ReadFloat( startTime );
 	savefile->ReadFloat( duration );
 	savefile->ReadVec3( linearStartValue );
@@ -204,7 +204,7 @@ void idPhysics_Parametric_RestorePState( idRestoreGame *savefile, parametricPSta
 
 	state.linearExtrapolation.Init( startTime, duration, linearStartValue, linearBaseSpeed, linearSpeed, etype );
 
-	savefile->ReadInt( (int &)etype );
+	savefile->ReadInt( ( int&)etype );
 	savefile->ReadFloat( startTime );
 	savefile->ReadFloat( duration );
 	savefile->ReadAngles( angularStartValue );
@@ -245,13 +245,13 @@ void idPhysics_Parametric_RestorePState( idRestoreGame *savefile, parametricPSta
 
 /*
 ================
-idPhysics_Parametric::Save
+anPhysics_Parametric::Save
 ================
 */
-void idPhysics_Parametric::Save( idSaveGame *savefile ) const {
+void anPhysics_Parametric::Save( anSaveGame *savefile ) const {
 
-	idPhysics_Parametric_SavePState( savefile, current );
-	idPhysics_Parametric_SavePState( savefile, saved );
+	anPhysics_Parametric_SavePState( savefile, current );
+	anPhysics_Parametric_SavePState( savefile, saved );
 
 	savefile->WriteBool( isPusher );
 	savefile->WriteClipModel( clipModel );
@@ -269,13 +269,13 @@ void idPhysics_Parametric::Save( idSaveGame *savefile ) const {
 
 /*
 ================
-idPhysics_Parametric::Restore
+anPhysics_Parametric::Restore
 ================
 */
-void idPhysics_Parametric::Restore( idRestoreGame *savefile ) {
+void anPhysics_Parametric::Restore( anRestoreGame *savefile ) {
 
-	idPhysics_Parametric_RestorePState( savefile, current );
-	idPhysics_Parametric_RestorePState( savefile, saved );
+	anPhysics_Parametric_RestorePState( savefile, current );
+	anPhysics_Parametric_RestorePState( savefile, saved );
 
 	savefile->ReadBool( isPusher );
 	savefile->ReadClipModel( clipModel );
@@ -287,17 +287,17 @@ void idPhysics_Parametric::Restore( idRestoreGame *savefile ) {
 	savefile->ReadBool( hasMaster );
 	savefile->ReadBool( isOrientated );
 
-	savefile->ReadBool ( useAxisOffset );	// cnicholson: Added unrestored var
-	savefile->ReadMat3 ( axisOffset );		// cnicholson: Added unrestored var
+	savefile->ReadBool ( useAxisOffset );
+	savefile->ReadMat3 ( axisOffset );
 
 }
 
 /*
 ================
-idPhysics_Parametric::SetPusher
+anPhysics_Parametric::SetPusher
 ================
 */
-void idPhysics_Parametric::SetPusher( int flags ) {
+void anPhysics_Parametric::SetPusher( int flags ) {
 	assert( clipModel );
 	isPusher = true;
 	pushFlags = flags;
@@ -305,19 +305,19 @@ void idPhysics_Parametric::SetPusher( int flags ) {
 
 /*
 ================
-idPhysics_Parametric::IsPusher
+anPhysics_Parametric::IsPusher
 ================
 */
-bool idPhysics_Parametric::IsPusher( void ) const {
+bool anPhysics_Parametric::IsPusher( void ) const {
 	return isPusher;
 }
 
 /*
 ================
-idPhysics_Parametric::SetLinearExtrapolation
+anPhysics_Parametric::SetLinearExtrapolation
 ================
 */
-void idPhysics_Parametric::SetLinearExtrapolation( extrapolation_t type, int time, int duration, const arcVec3 &base, const arcVec3 &speed, const arcVec3 &baseSpeed ) {
+void anPhysics_Parametric::SetLinearExtrapolation( extrapolation_t type, int time, int duration, const anVec3 &base, const anVec3 &speed, const anVec3 &baseSpeed ) {
 	current.time = gameLocal.time;
 	current.linearExtrapolation.Init( time, duration, base, baseSpeed, speed, type );
 	current.localOrigin = base;
@@ -326,10 +326,10 @@ void idPhysics_Parametric::SetLinearExtrapolation( extrapolation_t type, int tim
 
 /*
 ================
-idPhysics_Parametric::SetAngularExtrapolation
+anPhysics_Parametric::SetAngularExtrapolation
 ================
 */
-void idPhysics_Parametric::SetAngularExtrapolation( extrapolation_t type, int time, int duration, const idAngles &base, const idAngles &speed, const idAngles &baseSpeed ) {
+void anPhysics_Parametric::SetAngularExtrapolation( extrapolation_t type, int time, int duration, const anAngles &base, const anAngles &speed, const anAngles &baseSpeed ) {
 	current.time = gameLocal.time;
 	current.angularExtrapolation.Init( time, duration, base, baseSpeed, speed, type );
 	current.localAngles = base;
@@ -338,28 +338,28 @@ void idPhysics_Parametric::SetAngularExtrapolation( extrapolation_t type, int ti
 
 /*
 ================
-idPhysics_Parametric::GetLinearExtrapolationType
+anPhysics_Parametric::GetLinearExtrapolationType
 ================
 */
-extrapolation_t idPhysics_Parametric::GetLinearExtrapolationType( void ) const {
+extrapolation_t anPhysics_Parametric::GetLinearExtrapolationType( void ) const {
 	return current.linearExtrapolation.GetExtrapolationType();
 }
 
 /*
 ================
-idPhysics_Parametric::GetAngularExtrapolationType
+anPhysics_Parametric::GetAngularExtrapolationType
 ================
 */
-extrapolation_t idPhysics_Parametric::GetAngularExtrapolationType( void ) const {
+extrapolation_t anPhysics_Parametric::GetAngularExtrapolationType( void ) const {
 	return current.angularExtrapolation.GetExtrapolationType();
 }
 
 /*
 ================
-idPhysics_Parametric::SetLinearInterpolation
+anPhysics_Parametric::SetLinearInterpolation
 ================
 */
-void idPhysics_Parametric::SetLinearInterpolation( int time, int accelTime, int decelTime, int duration, const arcVec3 &startPos, const arcVec3 &endPos ) {
+void anPhysics_Parametric::SetLinearInterpolation( int time, int accelTime, int decelTime, int duration, const anVec3 &startPos, const anVec3 &endPos ) {
 	current.time = gameLocal.time;
 	current.linearInterpolation.Init( time, accelTime, decelTime, duration, startPos, endPos );
 	current.localOrigin = startPos;
@@ -368,10 +368,10 @@ void idPhysics_Parametric::SetLinearInterpolation( int time, int accelTime, int 
 
 /*
 ================
-idPhysics_Parametric::SetAngularInterpolation
+anPhysics_Parametric::SetAngularInterpolation
 ================
 */
-void idPhysics_Parametric::SetAngularInterpolation( int time, int accelTime, int decelTime, int duration, const idAngles &startAng, const idAngles &endAng ) {
+void anPhysics_Parametric::SetAngularInterpolation( int time, int accelTime, int decelTime, int duration, const anAngles &startAng, const anAngles &endAng ) {
 	current.time = gameLocal.time;
 	current.angularInterpolation.Init( time, accelTime, decelTime, duration, startAng, endAng );
 	current.localAngles = startAng;
@@ -380,16 +380,16 @@ void idPhysics_Parametric::SetAngularInterpolation( int time, int accelTime, int
 
 /*
 ================
-idPhysics_Parametric::SetSpline
+anPhysics_Parametric::SetSpline
 ================
 */
-void idPhysics_Parametric::SetSpline( idCurve_Spline<arcVec3> *spline, int accelTime, int decelTime, bool useSplineAngles ) {
-	if ( current.spline != NULL ) {
+void anPhysics_Parametric::SetSpline( anCurve_Spline<anVec3> *spline, int accelTime, int decelTime, bool useSplineAngles ) {
+	if ( current.spline != nullptr ) {
 		delete current.spline;
-		current.spline = NULL;
+		current.spline = nullptr;
 	}
 	current.spline = spline;
-	if ( current.spline != NULL ) {
+	if ( current.spline != nullptr ) {
 		float startTime = current.spline->GetTime( 0 );
 		float endTime = current.spline->GetTime( current.spline->GetNumValues() - 1 );
 		float length = current.spline->GetLengthForTime( endTime );
@@ -401,64 +401,64 @@ void idPhysics_Parametric::SetSpline( idCurve_Spline<arcVec3> *spline, int accel
 
 /*
 ================
-idPhysics_Parametric::GetSpline
+anPhysics_Parametric::GetSpline
 ================
 */
-idCurve_Spline<arcVec3> *idPhysics_Parametric::GetSpline( void ) const {
+anCurve_Spline<anVec3> *anPhysics_Parametric::GetSpline( void ) const {
 	return current.spline;
 }
 
 /*
 ================
-idPhysics_Parametric::GetSplineAcceleration
+anPhysics_Parametric::GetSplineAcceleration
 ================
 */
-int idPhysics_Parametric::GetSplineAcceleration( void ) const {
+int anPhysics_Parametric::GetSplineAcceleration( void ) const {
 	return current.splineInterpolate.GetAcceleration();
 }
 
 /*
 ================
-idPhysics_Parametric::GetSplineDeceleration
+anPhysics_Parametric::GetSplineDeceleration
 ================
 */
-int idPhysics_Parametric::GetSplineDeceleration( void ) const {
+int anPhysics_Parametric::GetSplineDeceleration( void ) const {
 	return current.splineInterpolate.GetDeceleration();
 }
 
 /*
 ================
-idPhysics_Parametric::UsingSplineAngles
+anPhysics_Parametric::UsingSplineAngles
 ================
 */
-bool idPhysics_Parametric::UsingSplineAngles( void ) const {
+bool anPhysics_Parametric::UsingSplineAngles( void ) const {
 	return current.useSplineAngles;
 }
 
 /*
 ================
-idPhysics_Parametric::GetLocalOrigin
+anPhysics_Parametric::GetLocalOrigin
 ================
 */
-void idPhysics_Parametric::GetLocalOrigin( arcVec3 &curOrigin ) const {
+void anPhysics_Parametric::GetLocalOrigin( anVec3 &curOrigin ) const {
 	curOrigin = current.localOrigin;
 }
 
 /*
 ================
-idPhysics_Parametric::GetLocalAngles
+anPhysics_Parametric::GetLocalAngles
 ================
 */
-void idPhysics_Parametric::GetLocalAngles( idAngles &curAngles ) const {
+void anPhysics_Parametric::GetLocalAngles( anAngles &curAngles ) const {
 	curAngles = current.localAngles;
 }
 
 /*
 ================
-idPhysics_Parametric::SetClipModel
+anPhysics_Parametric::SetClipModel
 ================
 */
-void idPhysics_Parametric::SetClipModel( idClipModel *model, float density, int id, bool freeOld ) {
+void anPhysics_Parametric::SetClipModel( anClipModel *model, float density, int id, bool freeOld ) {
 
 	assert( self );
 	assert( model );
@@ -467,53 +467,53 @@ void idPhysics_Parametric::SetClipModel( idClipModel *model, float density, int 
 		delete clipModel;
 	}
 	clipModel = model;
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 	clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 }
 
 /*
 ================
-idPhysics_Parametric::GetClipModel
+anPhysics_Parametric::GetClipModel
 ================
 */
-idClipModel *idPhysics_Parametric::GetClipModel( int id ) const {
+anClipModel *anPhysics_Parametric::GetClipModel( int id ) const {
 	return clipModel;
 }
 
 /*
 ================
-idPhysics_Parametric::GetNumClipModels
+anPhysics_Parametric::GetNumClipModels
 ================
 */
-int idPhysics_Parametric::GetNumClipModels( void ) const {
-	return ( clipModel != NULL );
+int anPhysics_Parametric::GetNumClipModels( void ) const {
+	return ( clipModel != nullptr );
 }
 
 /*
 ================
-idPhysics_Parametric::SetMass
+anPhysics_Parametric::SetMass
 ================
 */
-void idPhysics_Parametric::SetMass( float mass, int id ) {
+void anPhysics_Parametric::SetMass( float mass, int id ) {
 }
 
 /*
 ================
-idPhysics_Parametric::GetMass
+anPhysics_Parametric::GetMass
 ================
 */
-float idPhysics_Parametric::GetMass( int id ) const {
+float anPhysics_Parametric::GetMass( int id ) const {
 	return 0.0f;
 }
 
 /*
 ================
-idPhysics_Parametric::SetClipMask
+anPhysics_Parametric::SetClipMask
 ================
 */
-void idPhysics_Parametric::SetContents( int contents, int id ) {
+void anPhysics_Parametric::SetContents( int contents, int id ) {
 	if ( clipModel ) {
 		clipModel->SetContents( contents );
 	}
@@ -521,10 +521,10 @@ void idPhysics_Parametric::SetContents( int contents, int id ) {
 
 /*
 ================
-idPhysics_Parametric::SetClipMask
+anPhysics_Parametric::SetClipMask
 ================
 */
-int idPhysics_Parametric::GetContents( int id ) const {
+int anPhysics_Parametric::GetContents( int id ) const {
 	if ( clipModel ) {
 		return clipModel->GetContents();
 	}
@@ -533,37 +533,37 @@ int idPhysics_Parametric::GetContents( int id ) const {
 
 /*
 ================
-idPhysics_Parametric::GetBounds
+anPhysics_Parametric::GetBounds
 ================
 */
-const arcBounds &idPhysics_Parametric::GetBounds( int id ) const {
+const anBounds &anPhysics_Parametric::GetBounds( int id ) const {
 	if ( clipModel ) {
 		return clipModel->GetBounds();
 	}
-	return idPhysics_Base::GetBounds();
+	return anPhysics_Base::GetBounds();
 }
 
 /*
 ================
-idPhysics_Parametric::GetAbsBounds
+anPhysics_Parametric::GetAbsBounds
 ================
 */
-const arcBounds &idPhysics_Parametric::GetAbsBounds( int id ) const {
+const anBounds &anPhysics_Parametric::GetAbsBounds( int id ) const {
 	if ( clipModel ) {
 		return clipModel->GetAbsBounds();
 	}
-	return idPhysics_Base::GetAbsBounds();
+	return anPhysics_Base::GetAbsBounds();
 }
 
 /*
 ================
-idPhysics_Parametric::Evaluate
+anPhysics_Parametric::Evaluate
 ================
 */
-bool idPhysics_Parametric::Evaluate( int timeStepMSec, int endTimeMSec ) {
-	arcVec3 oldLocalOrigin, oldOrigin, masterOrigin;
-	idAngles oldLocalAngles, oldAngles;
-	arcMat3 oldAxis, masterAxis;
+bool anPhysics_Parametric::Evaluate( int timeStepMSec, int endTimeMSec ) {
+	anVec3 oldLocalOrigin, oldOrigin, masterOrigin;
+	anAngles oldLocalAngles, oldAngles;
+	anMat3 oldAxis, masterAxis;
 
 	isBlocked = false;
 	oldLocalOrigin = current.localOrigin;
@@ -575,7 +575,7 @@ bool idPhysics_Parametric::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	current.localOrigin.Zero();
 	current.localAngles.Zero();
 
-	if ( current.spline != NULL ) {
+	if ( current.spline != nullptr ) {
 		float length = current.splineInterpolate.GetCurrentValue( endTimeMSec );
 		float t = current.spline->GetTimeForLength( length, 0.01f );
 		current.localOrigin = current.spline->GetCurrentValue( t );
@@ -617,10 +617,10 @@ bool idPhysics_Parametric::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 		gameLocal.push.ClipPush( pushResults, self, pushFlags, oldOrigin, oldAxis, current.origin, current.axis );
 		if ( pushResults.fraction < 1.0f ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 			clipModel->Link( self, 0, oldOrigin, oldAxis );
-// RAVEN END
+
 			current.localOrigin = oldLocalOrigin;
 			current.origin = oldOrigin;
 			current.localAngles = oldLocalAngles;
@@ -634,10 +634,10 @@ bool idPhysics_Parametric::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	}
 
 	if ( clipModel ) {
-// RAVEN BEGIN
+
 // abahr: a hack way of hiding gimble lock from movers.
 		clipModel->Link( self, 0, current.origin, UseAxisOffset() ? GetAxisOffset() * current.axis : current.axis );
-// RAVEN END
+
 	}
 
 	current.time = endTimeMSec;
@@ -651,10 +651,10 @@ bool idPhysics_Parametric::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 /*
 ================
-idPhysics_Parametric::UpdateTime
+anPhysics_Parametric::UpdateTime
 ================
 */
-void idPhysics_Parametric::UpdateTime( int endTimeMSec ) {
+void anPhysics_Parametric::UpdateTime( int endTimeMSec ) {
 	int timeLeap = endTimeMSec - current.time;
 
 	current.time = endTimeMSec;
@@ -663,7 +663,7 @@ void idPhysics_Parametric::UpdateTime( int endTimeMSec ) {
 	current.angularExtrapolation.SetStartTime( current.angularExtrapolation.GetStartTime() + timeLeap );
 	current.linearInterpolation.SetStartTime( current.linearInterpolation.GetStartTime() + timeLeap );
 	current.angularInterpolation.SetStartTime( current.angularInterpolation.GetStartTime() + timeLeap );
-	if ( current.spline != NULL ) {
+	if ( current.spline != nullptr ) {
 		current.spline->ShiftTime( timeLeap );
 		current.splineInterpolate.SetStartTime( current.splineInterpolate.GetStartTime() + timeLeap );
 	}
@@ -671,74 +671,74 @@ void idPhysics_Parametric::UpdateTime( int endTimeMSec ) {
 
 /*
 ================
-idPhysics_Parametric::GetTime
+anPhysics_Parametric::GetTime
 ================
 */
-int idPhysics_Parametric::GetTime( void ) const {
+int anPhysics_Parametric::GetTime( void ) const {
 	return current.time;
 }
 
 /*
 ================
-idPhysics_Parametric::IsAtRest
+anPhysics_Parametric::IsAtRest
 ================
 */
-bool idPhysics_Parametric::IsAtRest( void ) const {
+bool anPhysics_Parametric::IsAtRest( void ) const {
 	return current.atRest >= 0;
 }
 
 /*
 ================
-idPhysics_Parametric::GetRestStartTime
+anPhysics_Parametric::GetRestStartTime
 ================
 */
-int idPhysics_Parametric::GetRestStartTime( void ) const {
+int anPhysics_Parametric::GetRestStartTime( void ) const {
 	return current.atRest;
 }
 
 /*
 ================
-idPhysics_Parametric::IsPushable
+anPhysics_Parametric::IsPushable
 ================
 */
-bool idPhysics_Parametric::IsPushable( void ) const {
+bool anPhysics_Parametric::IsPushable( void ) const {
 	return false;
 }
 
 /*
 ================
-idPhysics_Parametric::SaveState
+anPhysics_Parametric::SaveState
 ================
 */
-void idPhysics_Parametric::SaveState( void ) {
+void anPhysics_Parametric::SaveState( void ) {
 	saved = current;
 }
 
 /*
 ================
-idPhysics_Parametric::RestoreState
+anPhysics_Parametric::RestoreState
 ================
 */
-void idPhysics_Parametric::RestoreState( void ) {
+void anPhysics_Parametric::RestoreState( void ) {
 
 	current = saved;
 
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 }
 
 /*
 ================
-idPhysics_Parametric::SetOrigin
+anPhysics_Parametric::SetOrigin
 ================
 */
-void idPhysics_Parametric::SetOrigin( const arcVec3 &newOrigin, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Parametric::SetOrigin( const anVec3 &newOrigin, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.linearExtrapolation.SetStartValue( newOrigin );
 	current.linearInterpolation.SetStartValue( newOrigin );
@@ -752,22 +752,22 @@ void idPhysics_Parametric::SetOrigin( const arcVec3 &newOrigin, int id ) {
 		current.origin = current.localOrigin;
 	}
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 	Activate();
 }
 
 /*
 ================
-idPhysics_Parametric::SetAxis
+anPhysics_Parametric::SetAxis
 ================
 */
-void idPhysics_Parametric::SetAxis( const arcMat3 &newAxis, int id ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Parametric::SetAxis( const anMat3 &newAxis, int id ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	current.localAngles = newAxis.ToAngles();
 
@@ -785,63 +785,63 @@ void idPhysics_Parametric::SetAxis( const arcMat3 &newAxis, int id ) {
 		current.angles = current.localAngles;
 	}
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 	Activate();
 }
 
 /*
 ================
-idPhysics_Parametric::Move
+anPhysics_Parametric::Move
 ================
 */
-void idPhysics_Parametric::Translate( const arcVec3 &translation, int id ) {
+void anPhysics_Parametric::Translate( const anVec3 &translation, int id ) {
 }
 
 /*
 ================
-idPhysics_Parametric::Rotate
+anPhysics_Parametric::Rotate
 ================
 */
-void idPhysics_Parametric::Rotate( const idRotation &rotation, int id ) {
+void anPhysics_Parametric::Rotate( const anRotation &rotation, int id ) {
 }
 
 /*
 ================
-idPhysics_Parametric::GetOrigin
+anPhysics_Parametric::GetOrigin
 ================
 */
-const arcVec3 &idPhysics_Parametric::GetOrigin( int id ) const {
+const anVec3 &anPhysics_Parametric::GetOrigin( int id ) const {
 	return current.origin;
 }
 
 /*
 ================
-idPhysics_Parametric::GetAxis
+anPhysics_Parametric::GetAxis
 ================
 */
-const arcMat3 &idPhysics_Parametric::GetAxis( int id ) const {
+const anMat3 &anPhysics_Parametric::GetAxis( int id ) const {
 	return current.axis;
 }
 
 /*
 ================
-idPhysics_Parametric::GetAngles
+anPhysics_Parametric::GetAngles
 ================
 */
-void idPhysics_Parametric::GetAngles( idAngles &curAngles ) const {
+void anPhysics_Parametric::GetAngles( anAngles &curAngles ) const {
 	curAngles = current.angles;
 }
 
 /*
 ================
-idPhysics_Parametric::SetLinearVelocity
+anPhysics_Parametric::SetLinearVelocity
 ================
 */
-void idPhysics_Parametric::SetLinearVelocity( const arcVec3 &newLinearVelocity, int id ) {
+void anPhysics_Parametric::SetLinearVelocity( const anVec3 &newLinearVelocity, int id ) {
 	SetLinearExtrapolation( extrapolation_t(EXTRAPOLATION_LINEAR|EXTRAPOLATION_NOSTOP), gameLocal.time, 0, current.origin, newLinearVelocity, vec3_origin );
 	current.linearInterpolation.Init( 0, 0, 0, 0, vec3_zero, vec3_zero );
 	Activate();
@@ -849,17 +849,17 @@ void idPhysics_Parametric::SetLinearVelocity( const arcVec3 &newLinearVelocity, 
 
 /*
 ================
-idPhysics_Parametric::SetAngularVelocity
+anPhysics_Parametric::SetAngularVelocity
 ================
 */
-void idPhysics_Parametric::SetAngularVelocity( const arcVec3 &newAngularVelocity, int id ) {
-	idRotation rotation;
-	arcVec3 vec;
+void anPhysics_Parametric::SetAngularVelocity( const anVec3 &newAngularVelocity, int id ) {
+	anRotation rotation;
+	anVec3 vec;
 	float angle;
 
 	vec = newAngularVelocity;
 	angle = vec.Normalize();
-	rotation.Set( vec3_origin, vec, (float) RAD2DEG( angle ) );
+	rotation.Set( vec3_origin, vec, ( float ) RAD2DEG( angle ) );
 
 	SetAngularExtrapolation( extrapolation_t(EXTRAPOLATION_LINEAR|EXTRAPOLATION_NOSTOP), gameLocal.time, 0, current.angles, rotation.ToAngles(), ang_zero );
 	current.angularInterpolation.Init( 0, 0, 0, 0, ang_zero, ang_zero );
@@ -868,11 +868,11 @@ void idPhysics_Parametric::SetAngularVelocity( const arcVec3 &newAngularVelocity
 
 /*
 ================
-idPhysics_Parametric::GetLinearVelocity
+anPhysics_Parametric::GetLinearVelocity
 ================
 */
-const arcVec3 &idPhysics_Parametric::GetLinearVelocity( int id ) const {
-	static arcVec3 curLinearVelocity;
+const anVec3 &anPhysics_Parametric::GetLinearVelocity( int id ) const {
+	static anVec3 curLinearVelocity;
 
 	curLinearVelocity = current.linearExtrapolation.GetCurrentSpeed( gameLocal.time );
 	return curLinearVelocity;
@@ -880,12 +880,12 @@ const arcVec3 &idPhysics_Parametric::GetLinearVelocity( int id ) const {
 
 /*
 ================
-idPhysics_Parametric::GetAngularVelocity
+anPhysics_Parametric::GetAngularVelocity
 ================
 */
-const arcVec3 &idPhysics_Parametric::GetAngularVelocity( int id ) const {
-	static arcVec3 curAngularVelocity;
-	idAngles angles;
+const anVec3 &anPhysics_Parametric::GetAngularVelocity( int id ) const {
+	static anVec3 curAngularVelocity;
+	anAngles angles;
 
 	angles = current.angularExtrapolation.GetCurrentSpeed( gameLocal.time );
 	curAngularVelocity = angles.ToAngularVelocity();
@@ -894,10 +894,10 @@ const arcVec3 &idPhysics_Parametric::GetAngularVelocity( int id ) const {
 
 /*
 ================
-idPhysics_Parametric::DisableClip
+anPhysics_Parametric::DisableClip
 ================
 */
-void idPhysics_Parametric::DisableClip( void ) {
+void anPhysics_Parametric::DisableClip( void ) {
 	if ( clipModel ) {
 		clipModel->Disable();
 	}
@@ -905,10 +905,10 @@ void idPhysics_Parametric::DisableClip( void ) {
 
 /*
 ================
-idPhysics_Parametric::EnableClip
+anPhysics_Parametric::EnableClip
 ================
 */
-void idPhysics_Parametric::EnableClip( void ) {
+void anPhysics_Parametric::EnableClip( void ) {
 	if ( clipModel ) {
 		clipModel->Enable();
 	}
@@ -916,10 +916,10 @@ void idPhysics_Parametric::EnableClip( void ) {
 
 /*
 ================
-idPhysics_Parametric::UnlinkClip
+anPhysics_Parametric::UnlinkClip
 ================
 */
-void idPhysics_Parametric::UnlinkClip( void ) {
+void anPhysics_Parametric::UnlinkClip( void ) {
 	if ( clipModel ) {
 		clipModel->Unlink();
 	}
@@ -927,47 +927,47 @@ void idPhysics_Parametric::UnlinkClip( void ) {
 
 /*
 ================
-idPhysics_Parametric::LinkClip
+anPhysics_Parametric::LinkClip
 ================
 */
-void idPhysics_Parametric::LinkClip( void ) {
+void anPhysics_Parametric::LinkClip( void ) {
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 }
 
 /*
 ================
-idPhysics_Parametric::GetBlockingInfo
+anPhysics_Parametric::GetBlockingInfo
 ================
 */
-const trace_t *idPhysics_Parametric::GetBlockingInfo( void ) const {
-	return ( isBlocked ? &pushResults : NULL );
+const trace_t *anPhysics_Parametric::GetBlockingInfo( void ) const {
+	return ( isBlocked ? &pushResults : nullptr );
 }
 
 /*
 ================
-idPhysics_Parametric::GetBlockingEntity
+anPhysics_Parametric::GetBlockingEntity
 ================
 */
-idEntity *idPhysics_Parametric::GetBlockingEntity( void ) const {
+anEntity *anPhysics_Parametric::GetBlockingEntity( void ) const {
 	if ( isBlocked ) {
 		return gameLocal.entities[ pushResults.c.entityNum ];
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-idPhysics_Parametric::SetMaster
+anPhysics_Parametric::SetMaster
 ================
 */
-void idPhysics_Parametric::SetMaster( idEntity *master, const bool orientated ) {
-	arcVec3 masterOrigin;
-	arcMat3 masterAxis;
+void anPhysics_Parametric::SetMaster( anEntity *master, const bool orientated ) {
+	anVec3 masterOrigin;
+	anMat3 masterAxis;
 
 	if ( master ) {
 		if ( !hasMaster ) {
@@ -1002,12 +1002,12 @@ void idPhysics_Parametric::SetMaster( idEntity *master, const bool orientated ) 
 
 /*
 ================
-idPhysics_Parametric::GetLinearEndTime
+anPhysics_Parametric::GetLinearEndTime
 ================
 */
-int idPhysics_Parametric::GetLinearEndTime( void ) const {
-	if ( current.spline != NULL ) {
-		if ( current.spline->GetBoundaryType() != idCurve_Spline<arcVec3>::BT_CLOSED ) {
+int anPhysics_Parametric::GetLinearEndTime( void ) const {
+	if ( current.spline != nullptr ) {
+		if ( current.spline->GetBoundaryType() != anCurve_Spline<anVec3>::BT_CLOSED ) {
 			return current.spline->GetTime( current.spline->GetNumValues() - 1 );
 		} else {
 			return 0;
@@ -1021,10 +1021,10 @@ int idPhysics_Parametric::GetLinearEndTime( void ) const {
 
 /*
 ================
-idPhysics_Parametric::GetAngularEndTime
+anPhysics_Parametric::GetAngularEndTime
 ================
 */
-int idPhysics_Parametric::GetAngularEndTime( void ) const {
+int anPhysics_Parametric::GetAngularEndTime( void ) const {
 	if ( current.angularInterpolation.GetDuration() != 0 ) {
 		return current.angularInterpolation.GetEndTime();
 	} else {
@@ -1034,10 +1034,10 @@ int idPhysics_Parametric::GetAngularEndTime( void ) const {
 
 /*
 ================
-idPhysics_Parametric::WriteToSnapshot
+anPhysics_Parametric::WriteToSnapshot
 ================
 */
-void idPhysics_Parametric::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void anPhysics_Parametric::WriteToSnapshot( anBitMsgDelta &msg ) const {
 	msg.WriteLong( current.time );
 	msg.WriteLong( current.atRest );
 	msg.WriteFloat( current.origin[0] );
@@ -1104,14 +1104,14 @@ void idPhysics_Parametric::WriteToSnapshot( idBitMsgDelta &msg ) const {
 
 /*
 ================
-idPhysics_Parametric::ReadFromSnapshot
+anPhysics_Parametric::ReadFromSnapshot
 ================
 */
-void idPhysics_Parametric::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void anPhysics_Parametric::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	extrapolation_t linearType, angularType;
 	float startTime, duration, accelTime, decelTime;
-	arcVec3 linearStartValue, linearSpeed, linearBaseSpeed, startPos, endPos;
-	idAngles angularStartValue, angularSpeed, angularBaseSpeed, startAng, endAng;
+	anVec3 linearStartValue, linearSpeed, linearBaseSpeed, startPos, endPos;
+	anAngles angularStartValue, angularSpeed, angularBaseSpeed, startAng, endAng;
 
 	current.time = msg.ReadLong();
 	current.atRest = msg.ReadLong();
@@ -1183,9 +1183,9 @@ void idPhysics_Parametric::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	current.axis = current.angles.ToMat3();
 
 	if ( clipModel ) {
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
+
+
 		clipModel->Link( self, 0, current.origin, current.axis );
-// RAVEN END
+
 	}
 }

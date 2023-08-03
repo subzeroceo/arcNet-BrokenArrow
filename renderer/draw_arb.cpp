@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -36,9 +36,6 @@ falloff
 light projection
 diffuse
 
-*/
-
-/*
 ==================
 RB_ARB_DrawInteraction
 
@@ -51,13 +48,13 @@ it is set to lessThan for blended transparent surfaces
 */
 static void RB_ARB_DrawInteraction( const drawInteraction_t *din ) {
 	const drawSurf_t *surf = din->surf;
-	const surfTriangles_t	*tri = din->surf->geo;
+	const srfTriangles_t	*tri = din->surf->geo;
 
 	// set the vertex arrays, which may not all be enabled on a given pass
-	arcDrawVert *ac = (arcDrawVert *)vertexCache.Position( tri->ambientCache );
-	qglVertexPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), ac->xyz.ToFloatPtr() );
+	anDrawVertex *ac = (anDrawVertex *)vertexCache.Position( tri->ambientCache );
+	qglVertexPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), ac->xyz.ToFloatPtr() );
 	GL_SetCurrentTextureUnit( 0 );
-	qglTexCoordPointer( 2, GL_FLOAT, sizeof( arcDrawVert ), (void *)&ac->st );
+	qglTexCoordPointer( 2, GL_FLOAT, sizeof( anDrawVertex ), (void *)&ac->st );
 
 	//-----------------------------------------------------
 	//
@@ -79,9 +76,8 @@ static void RB_ARB_DrawInteraction( const drawInteraction_t *din ) {
 
 // ATI R100 can't do partial texgens
 #define	NO_MIXED_TEXGEN
-
 #ifdef NO_MIXED_TEXGEN
-arcVec4	plane;
+anVec4	plane;
 plane[0] = 0;
 plane[1] = 0;
 plane[2] = 0;
@@ -95,7 +91,6 @@ plane[2] = 0;
 plane[3] = 1;
 qglEnable( GL_TEXTURE_GEN_Q );
 qglTexGenfv( GL_Q, GL_OBJECT_PLANE, plane.ToFloatPtr() );
-
 #endif
 
 	din->lightFalloffImage->Bind();
@@ -108,7 +103,6 @@ qglTexGenfv( GL_Q, GL_OBJECT_PLANE, plane.ToFloatPtr() );
 qglDisable( GL_TEXTURE_GEN_T );
 qglDisable( GL_TEXTURE_GEN_Q );
 #endif
-
 #if 0
 GL_State( GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO | GLS_DEPTHMASK
 			| backEnd.depthFunc );
@@ -124,9 +118,7 @@ return;
 
 	// we can't do bump mapping with standard calls, so skip it
 	if ( qglConfig.envDot3 && qglConfig.useCubeMap ) {
-		//
 		// draw the bump map result onto the alpha channel
-		//
 		GL_State( GLS_SRCBLEND_DST_ALPHA | GLS_DSTBLEND_ZERO | GLS_COLORMASK | GLS_DEPTHMASK
 			| backEnd.depthFunc );
 
@@ -187,7 +179,7 @@ return;
 		qglColor4fv( din->diffuseColor.ToFloatPtr() );
 	} else {
 		// FIXME: does this not get diffuseColor blended in?
-		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( arcDrawVert ), (void *)&ac->color );
+		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( anDrawVertex ), (void *)&ac->color );
 		qglEnableClientState( GL_COLOR_ARRAY );
 
 		if ( din->vertexColor == SVC_INVERSE_MODULATE ) {
@@ -251,13 +243,13 @@ it is set to lessThan for blended transparent surfaces
 */
 static void RB_ARB_DrawThreeTextureInteraction( const drawInteraction_t *din ) {
 	const drawSurf_t *surf = din->surf;
-	const surfTriangles_t	*tri = din->surf->geo;
+	const srfTriangles_t	*tri = din->surf->geo;
 
 	// set the vertex arrays, which may not all be enabled on a given pass
-	arcDrawVert *ac = (arcDrawVert *)vertexCache.Position( tri->ambientCache );
-	qglVertexPointer( 3, GL_FLOAT, sizeof( arcDrawVert ), ac->xyz.ToFloatPtr() );
+	anDrawVertex *ac = (anDrawVertex *)vertexCache.Position( tri->ambientCache );
+	qglVertexPointer( 3, GL_FLOAT, sizeof( anDrawVertex ), ac->xyz.ToFloatPtr() );
 	GL_SetCurrentTextureUnit( 0 );
-	qglTexCoordPointer( 2, GL_FLOAT, sizeof( arcDrawVert ), (void *)&ac->st );
+	qglTexCoordPointer( 2, GL_FLOAT, sizeof( anDrawVertex ), (void *)&ac->st );
 	qglColor3f( 1, 1, 1 );
 
 	//
@@ -323,7 +315,7 @@ static void RB_ARB_DrawThreeTextureInteraction( const drawInteraction_t *din ) {
 		qglColor4fv( din->diffuseColor.ToFloatPtr() );
 	} else {
 		// FIXME: does this not get diffuseColor blended in?
-		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( arcDrawVert ), (void *)&ac->color );
+		qglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( anDrawVertex ), (void *)&ac->color );
 		qglEnableClientState( GL_COLOR_ARRAY );
 
 		if ( din->vertexColor == SVC_INVERSE_MODULATE ) {
@@ -362,7 +354,7 @@ static void RB_ARB_DrawThreeTextureInteraction( const drawInteraction_t *din ) {
 
 	qglTexGenfv( GL_S, GL_OBJECT_PLANE, din->lightProjection[3].ToFloatPtr() );
 
-	arcVec4	plane;
+	anVec4	plane;
 	plane[0] = 0;
 	plane[1] = 0;
 	plane[2] = 0;
@@ -411,7 +403,7 @@ static void RB_CreateDrawInteractions( const drawSurf_t *surf ) {
 	}
 
 	// force a space calculation
-	backEnd.currentSpace = NULL;
+	backEnd.currentSpace = nullptr;
 
 	if ( r_useTripleTextureARB.GetBool() && qglConfig.maxImageUnits >= 3 ) {
 		for (; surf; surf = surf->nextOnLight ) {
@@ -480,7 +472,6 @@ static void RB_RenderViewLight( viewLight_t *vLight ) {
 	RB_CreateDrawInteractions( vLight->translucentInteractions );
 }
 
-
 /*
 ==================
 RB_ARB_DrawInteractions
@@ -493,4 +484,3 @@ void RB_ARB_DrawInteractions( void ) {
 		RB_RenderViewLight( vLight );
 	}
 }
-

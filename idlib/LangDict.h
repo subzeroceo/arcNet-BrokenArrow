@@ -9,16 +9,16 @@
 ===============================================================================
 */
 
-class idLangKeyValue {
+class anLangKeyValue {
 public:
-	arcNetString					key;
-	arcNetString					value;
+	anString					key;
+	anString					value;
 };
 
-class arcLangDictionary {
+class anLangDict {
 public:
-							arcLangDictionary( void );
-							~arcLangDictionary( void );
+							anLangDict( void );
+							~anLangDict( void );
 
 	void					Clear( void );
 	bool					Load( const char *fileName, bool clear = true );
@@ -31,13 +31,13 @@ public:
 	void					AddKeyVal( const char *key, const char *val );
 
 	int						GetNumKeyVals( void ) const;
-	const idLangKeyValue *	GetKeyVal( int i ) const;
+	const anLangKeyValue *	GetKeyVal( int i ) const;
 
 	void					SetBaseID( int id) { baseID = id; };
 
 private:
-	arcNetList<idLangKeyValue>	args;
-	ARCHashIndex				hash;
+	anList<anLangKeyValue>	args;
+	anHashIndex				hash;
 
 	bool					ExcludeString( const char *str ) const;
 	int						GetNextId( void ) const;
@@ -46,4 +46,4 @@ private:
 	int						baseID;
 };
 
-#endif /* !__LANGDICT_H__ */
+#endif // !__LANGDICT_H__

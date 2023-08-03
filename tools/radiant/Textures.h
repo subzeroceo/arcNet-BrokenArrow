@@ -37,13 +37,13 @@ void		Texture_ShowInuse ( void );
 void		Texture_ShowDirectory ( int menunum, bool bLinked = false);
 void		Texture_ShowAll();
 void		Texture_HideAll();
-void		Texture_Cleanup(CStringList *pList = NULL);
+void		Texture_Cleanup(CStringList *pList = nullptr );
 
 // TTimo: added bNoAlpha flag to ignore alpha channel when parsing a .TGA file, transparency is usually achieved through qer_trans keyword in shaders
 // in some cases loading an empty alpha channel causes display bugs (brushes not seen)
 //qtexture_t *Texture_ForName (const char *name, bool bReplace = false, bool bShader = false, bool bNoAlpha = false, bool bReload = false, bool makeShader = true);
 
-const arcMaterial *Texture_ForName(const char *name);
+const anMaterial *Texture_ForName(const char *name);
 
 void		Texture_Init ( void );
 void		Texture_SetTexture (texdef_t *texdef, brushprimit_texdef_t *brushprimit_texdef, bool bFitScale = false, bool bSetSelection = true);

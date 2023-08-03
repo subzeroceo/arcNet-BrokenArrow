@@ -42,30 +42,30 @@ public:
 						// setup for the current map
 	void				Init( void );
 	void				Shutdown( void );
-						// get the area(s) the source is in
-	int					GetPVSArea( const arcVec3 &point ) const;		// returns the area number
-	int					GetPVSAreas( const arcBounds &bounds, int *areas, int maxAreas ) const;	// returns number of areas
+						// get the area( s) the source is in
+	int					GetPVSArea( const anVec3 &point ) const;		// returns the area number
+	int					GetPVSAreas( const anBounds &bounds, int *areas, int maxAreas ) const;	// returns number of areas
 						// setup current PVS for the source
-	pvsHandle_t			SetupCurrentPVS( const arcVec3 &source, const pvsType_t type = PVS_NORMAL ) const;
-	pvsHandle_t			SetupCurrentPVS( const arcBounds &source, const pvsType_t type = PVS_NORMAL ) const;
+	pvsHandle_t			SetupCurrentPVS( const anVec3 &source, const pvsType_t type = PVS_NORMAL ) const;
+	pvsHandle_t			SetupCurrentPVS( const anBounds &source, const pvsType_t type = PVS_NORMAL ) const;
 	pvsHandle_t			SetupCurrentPVS( const int sourceArea, const pvsType_t type = PVS_NORMAL ) const;
 	pvsHandle_t			SetupCurrentPVS( const int *sourceAreas, const int numSourceAreas, const pvsType_t type = PVS_NORMAL ) const;
 	pvsHandle_t			MergeCurrentPVS( pvsHandle_t pvs1, pvsHandle_t pvs2 ) const;
 	void				FreeCurrentPVS( pvsHandle_t handle ) const;
 						// returns true if the target is within the current PVS
-	bool				InCurrentPVS( const pvsHandle_t handle, const arcVec3 &target ) const;
-	bool				InCurrentPVS( const pvsHandle_t handle, const arcBounds &target ) const;
+	bool				InCurrentPVS( const pvsHandle_t handle, const anVec3 &target ) const;
+	bool				InCurrentPVS( const pvsHandle_t handle, const anBounds &target ) const;
 	bool				InCurrentPVS( const pvsHandle_t handle, const int targetArea ) const;
 	bool				InCurrentPVS( const pvsHandle_t handle, const int *targetAreas, int numTargetAreas ) const;
 						// draw all portals that are within the PVS of the source
-	void				DrawPVS( const arcVec3 &source, const pvsType_t type = PVS_NORMAL ) const;
-	void				DrawPVS( const arcBounds &source, const pvsType_t type = PVS_NORMAL ) const;
+	void				DrawPVS( const anVec3 &source, const pvsType_t type = PVS_NORMAL ) const;
+	void				DrawPVS( const anBounds &source, const pvsType_t type = PVS_NORMAL ) const;
 						// visualize the PVS the handle points to
-	void				DrawCurrentPVS( const pvsHandle_t handle, const arcVec3 &source ) const;
+	void				DrawCurrentPVS( const pvsHandle_t handle, const anVec3 &source ) const;
 
 #if ASYNC_WRITE_PVS
-	void				WritePVS( const pvsHandle_t handle, idBitMsg &msg );
-	void				ReadPVS( const pvsHandle_t handle, const idBitMsg &msg );
+	void				WritePVS( const pvsHandle_t handle, anBitMsg &msg );
+	void				ReadPVS( const pvsHandle_t handle, const anBitMsg &msg );
 #endif
 
 private:
@@ -93,7 +93,7 @@ private:
 	void				FrontPortalPVS( void ) const;
 	struct pvsStack_s *	FloodPassagePVS_r( struct pvsPortal_s *source, const struct pvsPortal_s *portal, struct pvsStack_s *prevStack ) const;
 	void				PassagePVS( void ) const;
-	void				AddPassageBoundaries( const idWinding &source, const idWinding &pass, bool flipClip, arcPlane *bounds, int &numBounds, int maxBounds ) const;
+	void				AddPassageBoundaries( const idWinding &source, const idWinding &pass, bool flipClip, anPlane *bounds, int &numBounds, int maxBounds ) const;
 	void				CreatePassages( void ) const;
 	void				DestroyPassages( void ) const;
 	int					AreaPVSFromPortalPVS( void ) const;

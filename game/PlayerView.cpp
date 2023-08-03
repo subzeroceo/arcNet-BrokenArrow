@@ -1,4 +1,4 @@
-#include "../idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Game_local.h"
@@ -12,7 +12,7 @@ arcNetBasePlayerView::arcNetBasePlayerView
 arcNetBasePlayerView::arcNetBasePlayerView() {
 	memset( screenBlobs, 0, sizeof( screenBlobs ) );
 	memset( &view, 0, sizeof( view ) );
-	player = NULL;
+	player = nullptr;
 	dvMaterial = declManager->FindMaterial( "_scratch" );
 	irGogglesMaterial = declManager->FindMaterial( "textures/decals/irblend" );
 	bloodSprayMaterial = declManager->FindMaterial( "textures/decals/bloodspray" );
@@ -82,7 +82,7 @@ LocalKickDir is the direction of force in the player's coordinate system,
 which will determine the head kick direction
 ==============
 */
-void arcNetBasePlayerView::DamageImpulse( arcVec3 localKickDir, const arcDict *damageDef ) {
+void arcNetBasePlayerView::DamageImpulse( anVec3 localKickDir, const anDict *damageDef ) {
 	float dvTime = damageDef->GetFloat( "dv_time" );
 	if ( dvTime ) {
 		if ( dvFinishTime < gameLocal.time ) {
@@ -170,11 +170,11 @@ arcNetBasePlayerView::WeaponFireFeedback
 Called when a weapon fires, generates head twitches, etc
 ==================
 */
-void arcNetBasePlayerView::WeaponFireFeedback( const arcDict *weaponDef ) {
+void arcNetBasePlayerView::WeaponFireFeedback( const anDict *weaponDef ) {
 	int recoilTime = weaponDef->GetInt( "recoilTime" );
 	// don't shorten a damage kick in progress
 	if ( recoilTime && kickFinishTime < gameLocal.time ) {
-		arcAngles angles;
+		anAngles angles;
 		weaponDef->GetAngles( "recoilAngles", "5 0 0", angles );
 		kickAngles = angles;
 		int	finish = gameLocal.time + g_kickTime.GetFloat() * recoilTime;
@@ -188,7 +188,7 @@ arcNetBasePlayerView::CalculateShake
 ===================
 */
 void arcNetBasePlayerView::CalculateShake() {
-	arcVec3	origin, matrix;
+	anVec3	origin, matrix;
 
 	float shakeVolume = gameSoundWorld->CurrentShakeAmplitudeForPosition( gameLocal.time, player->firstPersonViewOrigin );
 	//
@@ -207,7 +207,7 @@ void arcNetBasePlayerView::CalculateShake() {
 arcNetBasePlayerView::ShakeAxis
 ===================
 */
-arcMat3 arcNetBasePlayerView::ShakeAxis() const {
+anMat3 arcNetBasePlayerView::ShakeAxis() const {
 	return shakeAng.ToMat3();
 }
 
@@ -218,13 +218,13 @@ arcNetBasePlayerView::AngleOffset
   kickVector, a world space direction that the attack should
 ===================
 */
-arcAngles arcNetBasePlayerView::AngleOffset() const {
-	arcAngles ang.Zero();
+anAngles arcNetBasePlayerView::AngleOffset() const {
+	anAngles ang.Zero();
 
 	if ( gameLocal.time < kickFinishTime ) {
 		float offset = kickFinishTime - gameLocal.time;
 
-		arcAngles ang = kickAngles * offset * offset * g_kickAmplitude.GetFloat();
+		anAngles ang = kickAngles * offset * offset * g_kickAmplitude.GetFloat();
 
 		for ( int i = 0 ; i < 3 ; i++ ) {
 			if ( ang[i] > 70.0f ) {
@@ -242,7 +242,7 @@ arcAngles arcNetBasePlayerView::AngleOffset() const {
 arcNetBasePlayerView::SingleView
 ==================
 */
-void arcNetBasePlayerView::SingleView( idUserInterface *hud, const renderView_t *view ) {
+void arcNetBasePlayerView::SingleView( anUserInterface *hud, const renderView_t *view ) {
 	// normal rendering
 	if ( !view ) {
 		return;
@@ -273,7 +273,7 @@ void arcNetBasePlayerView::SingleView( idUserInterface *hud, const renderView_t 
 
 			blob->y += blob->driftAmount;
 
-			float	fade = (float)( blob->finishTime - gameLocal.time ) / ( blob->finishTime - blob->startFadeTime );
+			float	fade = ( float )( blob->finishTime - gameLocal.time ) / ( blob->finishTime - blob->startFadeTime );
 			if ( fade > 1.0f ) {
 				fade = 1.0f;
 			}
@@ -286,7 +286,7 @@ void arcNetBasePlayerView::SingleView( idUserInterface *hud, const renderView_t 
 
 	// test a single material drawn over everything
 	if ( g_testPostProcess.GetString()[0] ) {
-		const arcMaterial *mtr = declManager->FindMaterial( g_testPostProcess.GetString(), false );
+		const anMaterial *mtr = declManager->FindMaterial( g_testPostProcess.GetString(), false );
 		if ( !mtr ) {
 			common->Printf( "Material not found.\n" );
 			g_testPostProcess.SetString( "" );
@@ -304,8 +304,8 @@ arcNetBasePlayerView::Flash
 flashes the player view with the given color
 =================
 */
-void arcNetBasePlayerView::Flash( arcVec4 color, int time ) {
-	Fade( arcVec4( 0, 0, 0, 0), time );
+void arcNetBasePlayerView::Flash( anVec4 color, int time ) {
+	Fade( anVec4( 0, 0, 0, 0), time );
 	fadeFromColor = colorWhite;
 }
 
@@ -317,7 +317,7 @@ used for level transition fades
 assumes: color.w is 0 or 1
 =================
 */
-void arcNetBasePlayerView::Fade( arcVec4 color, int time ) {
+void arcNetBasePlayerView::Fade( anVec4 color, int time ) {
 	if ( !fadeTime ) {
 		fadeFromColor.Set( 0.0f, 0.0f, 0.0f, 1.0f - color[ 3 ] );
 	} else {
@@ -376,7 +376,7 @@ void arcNetBasePlayerView::ScreenFade() {
 arcNetBasePlayerView::RenderPlayerView
 ===================
 */
-void arcNetBasePlayerView::RenderPlayerView( idUserInterface *hud ) {
+void arcNetBasePlayerView::RenderPlayerView( anUserInterface *hud ) {
 	const renderView_t *view = player->GetRenderView();
 	SingleView( hud, view );
 	ScreenFade();

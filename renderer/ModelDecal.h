@@ -19,12 +19,12 @@
 const int NUM_DECAL_BOUNDING_PLANES = 6;
 
 typedef struct decalProjectionInfo_s {
-	arcVec3						projectionOrigin;
-	arcBounds				projectionBounds;
-	arcPlane					boundingPlanes[6];
-	arcPlane					fadePlanes[2];
-	arcPlane					textureAxis[2];
-	const arcMaterial *			material;
+	anVec3						projectionOrigin;
+	anBounds				projectionBounds;
+	anPlane					boundingPlanes[6];
+	anPlane					fadePlanes[2];
+	anPlane					textureAxis[2];
+	const anMaterial *			material;
 	bool						parallel;
 	float						fadeDepth;
 	int							startTime;
@@ -32,57 +32,57 @@ typedef struct decalProjectionInfo_s {
 } decalProjectionInfo_t;
 
 
-class ARCRenderModelDecal {
+class anRenderModelDecal {
 public:
-								ARCRenderModelDecal( void );
-								~ARCRenderModelDecal( void );
+								anRenderModelDecal( void );
+								~anRenderModelDecal( void );
 
-	static ARCRenderModelDecal * Alloc( void );
-	static void					Free( ARCRenderModelDecal *decal );
+	static anRenderModelDecal * Alloc( void );
+	static void					Free( anRenderModelDecal *decal );
 
 								// Creates decal projection info.
-	static bool					CreateProjectionInfo( decalProjectionInfo_t &info, const arcFixedWinding &winding, const arcVec3 &projectionOrigin, const bool parallel, const float fadeDepth, const arcMaterial *material, const int startTime );
+	static bool					CreateProjectionInfo( decalProjectionInfo_t &info, const anFixedWinding &winding, const anVec3 &projectionOrigin, const bool parallel, const float fadeDepth, const anMaterial *material, const int startTime );
 
 								// Transform the projection info from global space to local.
-	static void					GlobalProjectionInfoToLocal( decalProjectionInfo_t &localInfo, const decalProjectionInfo_t &info, const arcVec3 &origin, const arcMat3 &axis );
+	static void					GlobalProjectionInfoToLocal( decalProjectionInfo_t &localInfo, const decalProjectionInfo_t &info, const anVec3 &origin, const anMat3 &axis );
 
 								// Creates a deal on the given model.
-	void						CreateDecal( const ARCRenderModel *model, const decalProjectionInfo_t &localInfo );
+	void						CreateDecal( const anRenderModel *model, const decalProjectionInfo_t &localInfo );
 
 								// Remove decals that are completely faded away.
-	static ARCRenderModelDecal * RemoveFadedDecals( ARCRenderModelDecal *decals, int time );
+	static anRenderModelDecal * RemoveFadedDecals( anRenderModelDecal *decals, int time );
 
 								// Updates the vertex colors, removing any faded indexes,
 								// then copy the verts to temporary vertex cache and adds a drawSurf.
 	void						AddDecalDrawSurf( struct viewEntity_s *space );
 
 								// Returns the next decal in the chain.
-	ARCRenderModelDecal *		Next( void ) const { return nextDecal; }
+	anRenderModelDecal *		Next( void ) const { return nextDecal; }
 
-	//void						ReadFromDemoFile( class ARCDemoFile *f );
-	//void						WriteToDemoFile( class ARCDemoFile *f ) const;
+	//void						ReadFromDemoFile( class anDemoFile *f );
+	//void						WriteToDemoFile( class anDemoFile *f ) const;
 
 private:
 	static const int			MAX_DECAL_VERTS = 40;
 	static const int			MAX_DECAL_INDEXES = 60;
 
-	const arcMaterial *			material;
-	surfTriangles_t					tri;
-	arcDrawVert				verts[MAX_DECAL_VERTS];
+	const anMaterial *			material;
+	srfTriangles_t					tri;
+	anDrawVertex				verts[MAX_DECAL_VERTS];
 	float						vertDepthFade[MAX_DECAL_VERTS];
 	qglIndex_t					indexes[MAX_DECAL_INDEXES];
 	int							indexStartTime[MAX_DECAL_INDEXES];
-	ARCRenderModelDecal *		nextDecal;
+	anRenderModelDecal *		nextDecal;
 
 								// Adds the winding triangles to the appropriate decal in the
 								// chain, creating a new one if necessary.
-	void						AddWinding( const arcWinding &w, const arcMaterial *decalMaterial, const arcPlane fadePlanes[2], float fadeDepth, int startTime );
+	void						AddWinding( const anWinding &w, const anMaterial *decalMaterial, const anPlane fadePlanes[2], float fadeDepth, int startTime );
 
 								// Adds depth faded triangles for the winding to the appropriate
 								// decal in the chain, creating a new one if necessary.
 								// The part of the winding at the front side of both fade planes is not faded.
 								// The parts at the back sides of the fade planes are faded with the given depth.
-	void						AddDepthFadedWinding( const arcWinding &w, const arcMaterial *decalMaterial, const arcPlane fadePlanes[2], float fadeDepth, int startTime );
+	void						AddDepthFadedWinding( const anWinding &w, const anMaterial *decalMaterial, const anPlane fadePlanes[2], float fadeDepth, int startTime );
 };
 
 #endif

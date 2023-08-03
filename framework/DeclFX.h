@@ -4,7 +4,7 @@
 /*
 ===============================================================================
 
-	arcDeclFX
+	anDeclFX
 
 ===============================================================================
 */
@@ -29,9 +29,9 @@ typedef struct {
 	int						type;
 	int						sibling;
 
-	arcNetString					data;
-	arcNetString					name;
-	arcNetString					fire;
+	anString					data;
+	anString					name;
+	anString					fire;
 
 	float					delay;
 	float					duration;
@@ -48,9 +48,9 @@ typedef struct {
 	float					random1;
 	float					random2;
 
-	arcVec3					lightColor;
-	arcVec3					offset;
-	arcMat3					axis;
+	anVec3					lightColor;
+	anVec3					offset;
+	anMat3					axis;
 
 	bool					soundStarted;
 	bool					shakeStarted;
@@ -66,7 +66,7 @@ typedef struct {
 //
 // grouped fx structures
 //
-class arcDeclFX : public arcDecleration {
+class anDeclFX : public anDecl {
 public:
 	virtual size_t			Size() const;
 	virtual const char *	DefaultDefinition() const;
@@ -75,11 +75,11 @@ public:
 	virtual void			Print() const;
 	virtual void			List() const;
 
-	arcNetList<idFXSingleAction, TAG_FX>events;
-	arcNetString					joint;
+	anList<idFXSingleAction, TAG_FX>events;
+	anString					joint;
 
 private:
-	void					ParseSingleFXAction( arcLexer &src, idFXSingleAction& FXAction );
+	void					ParseSingleFXAction( anLexer &src, idFXSingleAction& FXAction );
 };
 
 #endif /* !__DECLFX_H__ */

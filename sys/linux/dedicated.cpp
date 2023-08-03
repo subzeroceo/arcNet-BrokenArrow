@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #include "../../renderer/tr_local.h"
 #include "../posix/posix_public.h"
 #include "local.h"

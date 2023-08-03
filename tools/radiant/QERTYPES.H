@@ -46,7 +46,7 @@ public:
 		if ( name && name[0] ) {
 			delete []name;
 		}
-		name = NULL;
+		name = nullptr;
 	}
 
 	void SetName( const char *p )
@@ -139,7 +139,7 @@ typedef struct qtexture_s
   bool bFromShader;   // created from a shader
   float fTrans;           // amount of transparency
   int   nShaderFlags;     // qer_ shader flags
-	arcVec3	color;			    // for flat shade mode
+	anVec3	color;			    // for flat shade mode
 	bool	inuse;		    // true = is present on the level
 
 	// cast this one to an IPluginQTexture if you are using it
@@ -159,18 +159,18 @@ typedef struct face_s
 {
 	struct face_s			*next;
 	struct face_s			*original;		//used for vertex movement
-	arcVec3					planepts[3];
-	arcVec3					orgplanepts[3];	// used for arbitrary rotation
+	anVec3					planepts[3];
+	anVec3					orgplanepts[3];	// used for arbitrary rotation
 	texdef_t				texdef;
 
-	arcPlane					plane;
-	arcPlane					originalPlane;
+	anPlane					plane;
+	anPlane					originalPlane;
 	bool					dirty;
 
-	arcWinding				*face_winding;
+	anWinding				*face_winding;
 
-	arcVec3					d_color;
-	const arcMaterial		*d_texture;
+	anVec3					d_color;
+	const anMaterial		*d_texture;
 
 	// Timo new brush primit texdef
 	brushprimit_texdef_t	brushprimit_texdef;
@@ -182,7 +182,7 @@ typedef struct face_s
 } face_t;
 
 typedef struct {
-	arcVec3	xyz;
+	anVec3	xyz;
 	float	sideST[2];
 	float	capST[2];
 } curveVertex_t;
@@ -234,9 +234,9 @@ typedef struct {
 	int			vertSubdivisions;
 	bool		explicitSubdivisions;
 	int			contents, flags, value, type;
-	const arcMaterial *d_texture;
-	arcDrawVert *verts;
-	//arcDrawVert *ctrl;
+	const anMaterial *d_texture;
+	anDrawVertex *verts;
+	//anDrawVertex *ctrl;
 	brush_t *	pSymbiot;
 	bool		bSelected;
 	bool		bOverlay;
@@ -244,12 +244,12 @@ typedef struct {
 	int			nListIDCam;
 	int			nListSelected;
 
-	arcDictionary *	epairs;
+	anDict *	epairs;
 	// cast this one to an IPluginTexdef if you are using it
 	// NOTE: casting can be done with a GETPLUGINTEXDEF defined in isurfaceplugin.h
 	// TODO: if the __ISURFACEPLUGIN_H_ header is used, use a union { void *pData; IPluginTexdef *pPluginTexdef } kind of thing ?
 	void *		pData;
-	ARC_INLINE arcDrawVert &ctrl( int col, int row ) {
+	ARC_INLINE anDrawVertex &ctrl( int col, int row ) {
 		if ( col < 0 || col >= width || row < 0 || row >= height ) {
 			common->Warning( "patchMesh_t::ctrl: control point out of range" );
 			return verts[0];
@@ -280,17 +280,17 @@ typedef struct brush_s
 	struct brush_s	*oprev, *onext;	// links in entity
 	brush_t *   list;				//keep a handy link to the list its in
 	struct entity_s	*owner;
-	arcVec3 mins, maxs;
+	anVec3 mins, maxs;
 
-	arcVec3	lightCenter;			// for moving the shading center of point lights
-	arcVec3	lightRight;
-	arcVec3	lightTarget;
-	arcVec3	lightUp;
-	arcVec3	lightRadius;
-	arcVec3	lightOffset;
-	arcVec3	lightColor;
-	arcVec3	lightStart;
-	arcVec3	lightEnd;
+	anVec3	lightCenter;			// for moving the shading center of point lights
+	anVec3	lightRight;
+	anVec3	lightTarget;
+	anVec3	lightUp;
+	anVec3	lightRadius;
+	anVec3	lightOffset;
+	anVec3	lightColor;
+	anVec3	lightStart;
+	anVec3	lightEnd;
 	bool	pointLight;
 	bool	startEnd;
 	int		lightTexture;
@@ -324,10 +324,10 @@ typedef struct brush_s
 	DWORD itemOwner;
 #endif
 
-	ARCRenderModel	*modelHandle;
+	anRenderModel	*modelHandle;
 
 	// brush primitive only
-	arcDictionary	epairs;
+	anDict	epairs;
 
 } brush_t;
 
@@ -337,7 +337,7 @@ typedef struct brush_s
 
 typedef struct trimodel_t
 {
-  arcVec3 v[3];
+  anVec3 v[3];
   float  st[3][2];
 } trimodel;
 
@@ -374,31 +374,31 @@ enum EVAR_TYPES {
 
 typedef struct evar_s {
 	int	type;
-	arcNetString name;
-	arcNetString desc;
+	anString name;
+	anString desc;
 } evar_t;
 
 typedef struct eclass_s
 {
 	struct eclass_s *next;
-	arcNetString	name;
+	anString	name;
 	bool	fixedsize;
 	bool	unknown;		// wasn't found in source
-	arcVec3	mins, maxs;
-	arcVec3	color;
+	anVec3	mins, maxs;
+	anVec3	color;
 	texdef_t texdef;
-	arcNetString	comments;
-	arcNetString	desc;
+	anString	comments;
+	anString	desc;
 
-	ARCRenderModel *modelHandle;
-	ARCRenderModel *entityModel;
+	anRenderModel *modelHandle;
+	anRenderModel *entityModel;
 
 	int   nFrame;
 	unsigned int nShowFlags;
-	arcNetString	defMaterial;
-	arcDictionary	args;
-	arcDictionary	defArgs;
-	arcNetList<evar_t> vars;
+	anString	defMaterial;
+	anDict	args;
+	anDict	defArgs;
+	anList<evar_t> vars;
 
 	HMODULE	hPlug;
 } eclass_t;

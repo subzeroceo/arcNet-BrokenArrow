@@ -27,7 +27,7 @@ If you have questions concerning this license or the applicable additional terms
 */
 #pragma once
 
-class arcDeclAF;
+class anDeclAF;
 
 class DialogAFView;
 class DialogAFProperties;
@@ -42,9 +42,9 @@ class DialogAF : public CDialog {
 	DECLARE_DYNAMIC(DialogAF)
 
 public:
-						DialogAF( CWnd* pParent = NULL );   // standard constructor
+						DialogAF( CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogAF();
-	void				LoadFile( arcDeclAF *af );
+	void				LoadFile( anDeclAF *af );
 	void				SaveFile( void );
 	void				ReloadFile( void );
 	void				SetFileModified( void );
@@ -79,7 +79,7 @@ private:
 	DialogAFBody *		bodyDlg;
 	DialogAFConstraint *constraintDlg;
 
-	arcDeclAF *			file;				// file being edited
+	anDeclAF *			file;				// file being edited
 
 	//{{AFX_DATA(DialogAF)
 	CComboBox			AFList;				// list with .af files

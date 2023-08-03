@@ -304,7 +304,7 @@ create_colormap (j_decompress_ptr cinfo)
     /* fill in colormap entries for i'th color component */
     nci = cquantize->Ncolors[i]; /* # of distinct values for this color */
     blksize = blkdist / nci;
-    for (j = 0; j < nci; j++ ) {
+    for ( j = 0; j < nci; j++ ) {
       /* Compute j'th output value (out of nci) for component */
       val = output_value(cinfo, i, j, nci-1 );
       /* Fill in all colormap entries that have this value of this component */
@@ -371,7 +371,7 @@ create_colorindex (j_decompress_ptr cinfo)
     indexptr = cquantize->colorindex[i];
     val = 0;
     k = largest_input_value(cinfo, i, 0, nci-1 );
-    for (j = 0; j <= MAXJSAMPLE; j++ ) {
+    for ( j = 0; j <= MAXJSAMPLE; j++ ) {
       while (j > k)		/* advance val if past boundary */
 	k = largest_input_value(cinfo, i, ++val, nci-1 );
       /* premultiply so that no multiplication needed in main processing */
@@ -379,7 +379,7 @@ create_colorindex (j_decompress_ptr cinfo)
     }
     /* Pad at both ends if necessary */
     if (pad)
-      for (j = 1; j <= MAXJSAMPLE; j++ ) {
+      for ( j = 1; j <= MAXJSAMPLE; j++ ) {
 	indexptr[-j] = indexptr[0];
 	indexptr[MAXJSAMPLE+j] = indexptr[MAXJSAMPLE];
       }
@@ -408,9 +408,9 @@ make_odither_array (j_decompress_ptr cinfo, int ncolors)
    * On 16-bit-int machine, be careful to avoid overflow.
    */
   den = 2 * ODITHER_CELLS * ((INT32) (ncolors - 1 ) );
-  for (j = 0; j < ODITHER_SIZE; j++ ) {
+  for ( j = 0; j < ODITHER_SIZE; j++ ) {
     for (k = 0; k < ODITHER_SIZE; k++ ) {
-      num = ((INT32) (ODITHER_CELLS-1 - 2*( ( int )base_dither_matrix[j][k] ) ))
+      num = ((INT32) (ODITHER_CELLS-1 - 2*( ( int )base_dither_matrix[j][k] ) ) )
 	    * MAXJSAMPLE;
       /* Ensure round towards zero despite C's lack of consistency
        * about rounding negative values in integer division...
@@ -437,14 +437,14 @@ create_odither_tables (j_decompress_ptr cinfo)
 
   for ( i = 0; i < cinfo->out_color_components; i++ ) {
     nci = cquantize->Ncolors[i]; /* # of distinct values for this color */
-    odither = NULL;		/* search for matching prior component */
-    for (j = 0; j < i; j++ ) {
+    odither = nullptr;		/* search for matching prior component */
+    for ( j = 0; j < i; j++ ) {
       if (nci == cquantize->Ncolors[j] ) {
 	odither = cquantize->odither[j];
 	break;
       }
     }
-    if (odither == NULL)	/* need a new table? */
+    if (odither == nullptr )	/* need a new table? */
       odither = make_odither_array(cinfo, nci);
     cquantize->odither[i] = odither;
   }
@@ -531,7 +531,7 @@ quantize_ord_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
   for (row = 0; row < num_rows; row++ ) {
     /* Initialize output values to 0 so can process components separately */
     jzero_far((void FAR *) output_buf[row],
-	      (size_t) (width * SIZEOF(JSAMPLE) ));
+	      ( size_t) (width * SIZEOF(JSAMPLE) ) );
     row_index = cquantize->row_index;
     for (ci = 0; ci < nc; ci++ ) {
       input_ptr = input_buf[row] + ci;
@@ -636,7 +636,7 @@ quantize_fs_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
   for (row = 0; row < num_rows; row++ ) {
     /* Initialize output values to 0 so can process components separately */
     jzero_far((void FAR *) output_buf[row],
-	      (size_t) (width * SIZEOF(JSAMPLE) ));
+	      ( size_t) (width * SIZEOF(JSAMPLE) ) );
     for (ci = 0; ci < nc; ci++ ) {
       input_ptr = input_buf[row] + ci;
       output_ptr = output_buf[row];
@@ -725,7 +725,7 @@ alloc_fs_workspace (j_decompress_ptr cinfo)
   size_t arraysize;
   int i;
 
-  arraysize = (size_t) ((cinfo->output_width + 2) * SIZEOF(FSERROR) );
+  arraysize = ( size_t) ((cinfo->output_width + 2) * SIZEOF(FSERROR) );
   for ( i = 0; i < cinfo->out_color_components; i++ ) {
     cquantize->fserrors[i] = (FSERRPTR)
       (*cinfo->mem->alloc_large)((j_common_ptr) cinfo, JPOOL_IMAGE, arraysize);
@@ -769,17 +769,17 @@ start_pass_1_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
     if ( ! cquantize->is_padded)
       create_colorindex(cinfo);
     /* Create ordered-dither tables if we didn't already. */
-    if (cquantize->odither[0] == NULL)
+    if (cquantize->odither[0] == nullptr )
       create_odither_tables(cinfo);
     break;
   case JDITHER_FS:
     cquantize->pub.color_quantize = quantize_fs_dither;
     cquantize->on_odd_row = FALSE; /* initialize state for F-S dither */
     /* Allocate Floyd-Steinberg workspace if didn't already. */
-    if (cquantize->fserrors[0] == NULL)
+    if (cquantize->fserrors[0] == nullptr )
       alloc_fs_workspace(cinfo);
     /* Initialize the propagated errors to zero. */
-    arraysize = (size_t) ((cinfo->output_width + 2) * SIZEOF(FSERROR) );
+    arraysize = ( size_t) ((cinfo->output_width + 2) * SIZEOF(FSERROR) );
     for ( i = 0; i < cinfo->out_color_components; i++ )
       jzero_far((void FAR *) cquantize->fserrors[i], arraysize);
     break;
@@ -825,12 +825,12 @@ jinit_1pass_quantizer (j_decompress_ptr cinfo)
   cquantize = (my_cquantize_ptr)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_cquantizer) );
-  cinfo->cquantize = (struct jpeg_color_quantizer *) cquantize;
+  cinfo->cquantize = ( struct jpeg_color_quantizer *) cquantize;
   cquantize->pub.start_pass = start_pass_1_quant;
   cquantize->pub.finish_pass = finish_pass_1_quant;
   cquantize->pub.new_color_map = new_color_map_1_quant;
-  cquantize->fserrors[0] = NULL; /* Flag FS workspace not allocated */
-  cquantize->odither[0] = NULL;	/* Also flag odither arrays not allocated */
+  cquantize->fserrors[0] = nullptr; /* Flag FS workspace not allocated */
+  cquantize->odither[0] = nullptr;	/* Also flag odither arrays not allocated */
 
   /* Make sure my internal arrays won't overflow */
   if (cinfo->out_color_components > MAX_Q_COMPS)

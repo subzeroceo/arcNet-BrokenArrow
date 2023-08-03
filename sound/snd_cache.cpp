@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #include "snd_local.h"
@@ -6,9 +6,9 @@
 #define USE_SOUND_CACHE_ALLOCATOR
 
 #ifdef USE_SOUND_CACHE_ALLOCATOR
-static arcDynamicBlockAlloc<byte, 1<<20, 1<<10>	soundCacheAllocator;
+static anDynamicBlockAlloc<byte, 1<<20, 1<<10>	soundCacheAllocator;
 #else
-static arcDynamicAlloc<byte, 1<<20, 1<<10>		soundCacheAllocator;
+static anDynamicAlloc<byte, 1<<20, 1<<10>		soundCacheAllocator;
 #endif
 
 /*
@@ -19,7 +19,7 @@ idSoundCache::idSoundCache()
 idSoundCache::idSoundCache() {
 	soundCacheAllocator.Init();
 	soundCacheAllocator.SetLockMemory( true );
-	listCache.AssureSize( 1024, NULL );
+	listCache.AssureSize( 1024, nullptr );
 	listCache.SetGranularity( 256 );
 	insideLevelLoad = false;
 }
@@ -43,7 +43,7 @@ returns a single cached object pointer
 */
 const idSoundSample* idSoundCache::GetObject( const int index ) const {
 	if (index<0 || index>listCache.Num() ) {
-		return NULL;
+		return nullptr;
 	}
 	return listCache[index];
 }
@@ -55,8 +55,8 @@ idSoundCache::FindSound
 Adds a sound object to the cache and returns a handle for it.
 ===================
 */
-idSoundSample *idSoundCache::FindSound( const arcNetString& filename, bool loadOnDemandOnly ) {
-	arcNetString fname;
+idSoundSample *idSoundCache::FindSound( const anString& filename, bool loadOnDemandOnly ) {
+	anString fname;
 
 	fname = filename;
 	fname.BackSlashesToSlashes();
@@ -131,7 +131,7 @@ void idSoundCache::BeginLevelLoad() {
 	insideLevelLoad = true;
 
 	for ( int i = 0; i < listCache.Num(); i++ ) {
-		idSoundSample *sample = listCache[ i ];
+		idSoundSample *sample = listCache[i];
 		if ( !sample ) {
 			continue;
 		}
@@ -163,7 +163,7 @@ void idSoundCache::EndLevelLoad() {
 	useCount = 0;
 	purgeCount = 0;
 	for ( int i = 0; i < listCache.Num(); i++ ) {
-		idSoundSample	*sample = listCache[ i ];
+		idSoundSample	*sample = listCache[i];
 		if ( !sample ) {
 			continue;
 		}
@@ -194,7 +194,7 @@ idSoundCache::PrintMemInfo
 void idSoundCache::PrintMemInfo( MemInfo_t *mi ) {
 	int i, j, num = 0, total = 0;
 	int *sortIndex;
-	arcNetFile *f;
+	anFile *f;
 
 	f = fileSystem->OpenFileWrite( mi->filebase + "_sounds.txt" );
 	if ( !f ) {
@@ -235,12 +235,12 @@ void idSoundCache::PrintMemInfo( MemInfo_t *mi ) {
 		}
 
 		total += sample->objectMemSize;
-		f->Printf( "%s %s\n", arcNetString::FormatNumber( sample->objectMemSize ).c_str(), sample->name.c_str() );
+		f->Printf( "%s %s\n", anString::FormatNumber( sample->objectMemSize ).c_str(), sample->name.c_str() );
 	}
 
 	mi->soundAssetsTotal = total;
 
-	f->Printf( "\nTotal sound bytes allocated: %s\n", arcNetString::FormatNumber( total ).c_str() );
+	f->Printf( "\nTotal sound bytes allocated: %s\n", anString::FormatNumber( total ).c_str() );
 	fileSystem->CloseFile( f );
 }
 
@@ -262,9 +262,9 @@ idSoundSample::idSoundSample() {
 	memset( &objectInfo, 0, sizeof(waveformatex_t) );
 	objectSize = 0;
 	objectMemSize = 0;
-	nonCacheData = NULL;
-	amplitudeData = NULL;
-	openalBuffer = NULL;
+	nonCacheData = nullptr;
+	amplitudeData = nullptr;
+	openalBuffer = nullptr;
 	hardwareBuffer = false;
 	defaultSound = false;
 	onDemand = false;
@@ -315,12 +315,12 @@ void idSoundSample::MakeDefault( void ) {
 	objectSize = MIXBUFFER_SAMPLES * 2;
 	objectMemSize = objectSize * sizeof( short );
 
-	nonCacheData = ( byte * )soundCacheAllocator.Alloc( objectMemSize );
+	nonCacheData = (byte *)soundCacheAllocator.Alloc( objectMemSize );
 
-	short *ncd = (short *)nonCacheData;
+	short *ncd = ( short *)nonCacheData;
 
 	for ( int i = 0; i < MIXBUFFER_SAMPLES; i ++ ) {
-		v = sin( arcMath::PI * 2 * i / 64 );
+		v = sin( anMath::PI * 2 * i / 64 );
 		sample = v * 0x4000;
 		ncd[i*2+0] = sample;
 		ncd[i*2+1] = sample;
@@ -358,20 +358,20 @@ void idSoundSample::CheckForDownSample( void ) {
 		return;
 	}
 	int shortSamples = objectSize >> 1;
-	short *converted = (short *)soundCacheAllocator.Alloc( shortSamples * sizeof( short ) );
+	short *converted = ( short *)soundCacheAllocator.Alloc( shortSamples * sizeof( short ) );
 
 	if ( objectInfo.nChannels == 1 ) {
 		for ( int i = 0; i < shortSamples; i++ ) {
-			converted[i] = ((short *)nonCacheData)[i*2];
+			converted[i] = (( short *)nonCacheData)[i*2];
 		}
 	} else {
 		for ( int i = 0; i < shortSamples; i += 2 ) {
-			converted[i+0] = ((short *)nonCacheData)[i*2+0];
-			converted[i+1] = ((short *)nonCacheData)[i*2+1];
+			converted[i+0] = (( short *)nonCacheData)[i*2+0];
+			converted[i+1] = (( short *)nonCacheData)[i*2+1];
 		}
 	}
 	soundCacheAllocator.Free( nonCacheData );
-	nonCacheData = ( byte * )converted;
+	nonCacheData = (byte *)converted;
 	objectSize >>= 1;
 	objectMemSize >>= 1;
 	objectInfo.nAvgBytesPerSec >>= 1;
@@ -386,11 +386,11 @@ idSoundSample::GetNewTimeStamp
 ARC_TIME_T idSoundSample::GetNewTimeStamp( void ) const {
 	ARC_TIME_T timestamp;
 
-	fileSystem->ReadFile( name, NULL, &timestamp );
+	fileSystem->ReadFile( name, nullptr, &timestamp );
 	if ( timestamp == FILE_NOT_FOUND_TIMESTAMP ) {
-		arcNetString oggName = name;
+		anString oggName = name;
 		oggName.SetFileExtension( ".ogg" );
-		fileSystem->ReadFile( oggName, NULL, &timestamp );
+		fileSystem->ReadFile( oggName, nullptr, &timestamp );
 	}
 	return timestamp;
 }
@@ -450,8 +450,8 @@ void idSoundSample::Load( void ) {
 	objectSize = fh.GetOutputSize();
 	objectMemSize = fh.GetMemorySize();
 
-	nonCacheData = ( byte * )soundCacheAllocator.Alloc( objectMemSize );
-	fh.Read( nonCacheData, objectMemSize, NULL );
+	nonCacheData = (byte *)soundCacheAllocator.Alloc( objectMemSize );
+	fh.Read( nonCacheData, objectMemSize, nullptr );
 
 	// optionally convert it to 22kHz to save memory
 	CheckForDownSample();
@@ -474,7 +474,7 @@ void idSoundSample::Load( void ) {
 					int blockSize = 512 * objectInfo.nSamplesPerSec / 44100 ;
 
 					// Allocate amplitude data array
-					amplitudeData = ( byte * )soundCacheAllocator.Alloc( ( objectSize / blockSize + 1 ) * 2 * sizeof( short) );
+					amplitudeData = (byte *)soundCacheAllocator.Alloc( ( objectSize / blockSize + 1 ) * 2 * sizeof( short) );
 
 					// Creating array of min/max amplitude pairs per blockSize samples
 					int i;
@@ -484,12 +484,12 @@ void idSoundSample::Load( void ) {
 
 						int j;
 						for ( j = 0; j < Min( objectSize - i, blockSize ); j++ ) {
-							min = ((short *)nonCacheData)[ i + j ] < min ? ((short *)nonCacheData)[ i + j ] : min;
-							max = ((short *)nonCacheData)[ i + j ] > max ? ((short *)nonCacheData)[ i + j ] : max;
+							min = (( short *)nonCacheData)[ i + j ] < min ? (( short *)nonCacheData)[ i + j ] : min;
+							max = (( short *)nonCacheData)[ i + j ] > max ? (( short *)nonCacheData)[ i + j ] : max;
 						}
 
-						((short *)amplitudeData)[ ( i / blockSize ) * 2     ] = min;
-						((short *)amplitudeData)[ ( i / blockSize ) * 2 + 1 ] = max;
+						(( short *)amplitudeData)[ ( i / blockSize ) * 2     ] = min;
+						(( short *)amplitudeData)[ ( i / blockSize ) * 2 + 1 ] = max;
 					}
 
 					hardwareBuffer = true;
@@ -515,33 +515,33 @@ void idSoundSample::Load( void ) {
 					// Decoder *always* outputs 44 kHz data
 					decoder->Decode( this, 0, LengthIn44kHzSamples(), destData );
 
-					// Downsample back to original frequency (save memory)
+					// Downsample back to original frequency ( save memory)
 					if ( objectInfo.nSamplesPerSec == 11025 ) {
 						for ( int i = 0; i < objectSize; i++ ) {
 							if ( destData[i*4] < -32768.0f )
-								((short *)destData)[i] = -32768;
+								(( short *)destData)[i] = -32768;
 							else if ( destData[i*4] > 32767.0f )
-								((short *)destData)[i] = 32767;
+								(( short *)destData)[i] = 32767;
 							else
-								((short *)destData)[i] = arcMath::FtoiFast( destData[i*4] );
+								(( short *)destData)[i] = anMath::FtoiFast( destData[i*4] );
 						}
 					} else if ( objectInfo.nSamplesPerSec == 22050 ) {
 						for ( int i = 0; i < objectSize; i++ ) {
 							if ( destData[i*2] < -32768.0f )
-								((short *)destData)[i] = -32768;
+								(( short *)destData)[i] = -32768;
 							else if ( destData[i*2] > 32767.0f )
-								((short *)destData)[i] = 32767;
+								(( short *)destData)[i] = 32767;
 							else
-								((short *)destData)[i] = arcMath::FtoiFast( destData[i*2] );
+								(( short *)destData)[i] = anMath::FtoiFast( destData[i*2] );
 						}
 					} else {
 						for ( int i = 0; i < objectSize; i++ ) {
 							if ( destData[i] < -32768.0f )
-								((short *)destData)[i] = -32768;
+								(( short *)destData)[i] = -32768;
 							else if ( destData[i] > 32767.0f )
-								((short *)destData)[i] = 32767;
+								(( short *)destData)[i] = 32767;
 							else
-								((short *)destData)[i] = arcMath::FtoiFast( destData[i] );
+								(( short *)destData)[i] = anMath::FtoiFast( destData[i] );
 						}
 					}
 
@@ -554,7 +554,7 @@ void idSoundSample::Load( void ) {
 						int blockSize = 512 * objectInfo.nSamplesPerSec / 44100 ;
 
 						// Allocate amplitude data array
-						amplitudeData = ( byte * )soundCacheAllocator.Alloc( ( objectSize / blockSize + 1 ) * 2 * sizeof( short ) );
+						amplitudeData = (byte *)soundCacheAllocator.Alloc( ( objectSize / blockSize + 1 ) * 2 * sizeof( short ) );
 
 						// Creating array of min/max amplitude pairs per blockSize samples
 						int i;
@@ -564,18 +564,18 @@ void idSoundSample::Load( void ) {
 
 							int j;
 							for ( j = 0; j < Min( objectSize - i, blockSize ); j++ ) {
-								min = ((short *)destData)[ i + j ] < min ? ((short *)destData)[ i + j ] : min;
-								max = ((short *)destData)[ i + j ] > max ? ((short *)destData)[ i + j ] : max;
+								min = (( short *)destData)[ i + j ] < min ? (( short *)destData)[ i + j ] : min;
+								max = (( short *)destData)[ i + j ] > max ? (( short *)destData)[ i + j ] : max;
 							}
 
-							((short *)amplitudeData)[ ( i / blockSize ) * 2     ] = min;
-							((short *)amplitudeData)[ ( i / blockSize ) * 2 + 1 ] = max;
+							(( short *)amplitudeData)[ ( i / blockSize ) * 2     ] = min;
+							(( short *)amplitudeData)[ ( i / blockSize ) * 2 + 1 ] = max;
 						}
 
 						hardwareBuffer = true;
 					}
 
-					soundCacheAllocator.Free( ( byte * )destData );
+					soundCacheAllocator.Free( (byte *)destData );
 					idSampleDecoder::Free( decoder );
 				}
 			}
@@ -584,7 +584,7 @@ void idSoundSample::Load( void ) {
 		// Free memory if sample was loaded into hardware
 		if ( hardwareBuffer ) {
 			soundCacheAllocator.Free( nonCacheData );
-			nonCacheData = NULL;
+			nonCacheData = nullptr;
 		}
 	}
 
@@ -612,12 +612,12 @@ void idSoundSample::PurgeSoundSample() {
 
 	if ( amplitudeData ) {
 		soundCacheAllocator.Free( amplitudeData );
-		amplitudeData = NULL;
+		amplitudeData = nullptr;
 	}
 
 	if ( nonCacheData ) {
 		soundCacheAllocator.Free( nonCacheData );
-		nonCacheData = NULL;
+		nonCacheData = nullptr;
 	}
 }
 

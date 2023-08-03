@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/AFEditor_resource.h"
@@ -50,7 +50,7 @@ cm_type_t modelTypes[] = {
 	{ TRM_CONE, "cone" },
 	{ TRM_BONE, "bone" },
 	{ TRM_CUSTOM, "custom" },
-	{ TRM_INVALID, NULL }
+	{ TRM_INVALID, nullptr }
 };
 
 const char *ModelTypeToString( int type ) {
@@ -64,7 +64,7 @@ const char *ModelTypeToString( int type ) {
 
 traceModel_t StringToModelType( const char *str ) {
 	for ( int i = 0; modelTypes[i].name; i++ ) {
-		if ( arcNetString::Icmp( modelTypes[i].name, str ) == 0 ) {
+		if ( anString::Icmp( modelTypes[i].name, str ) == 0 ) {
 			return modelTypes[i].type;
 		}
 	}
@@ -114,7 +114,7 @@ toolTip_t DialogAFBody::toolTips[] = {
 	{ IDC_RADIO_MODIFY_POSITION, "modify the joint position" },
 	{ IDC_RADIO_MODIFY_BOTH, "modify the joint orientation and position" },
 	{ IDC_EDIT_CONTAINEDJOINTS, "all the joints contained by this body" },
-	{ 0, NULL }
+	{ 0, nullptr }
 };
 
 IMPLEMENT_DYNAMIC(DialogAFBody, CDialog)
@@ -124,9 +124,9 @@ IMPLEMENT_DYNAMIC(DialogAFBody, CDialog)
 DialogAFBody::DialogAFBody
 ================
 */
-DialogAFBody::DialogAFBody( CWnd* pParent /*=NULL*/ )
+DialogAFBody::DialogAFBody( CWnd* pParent /*=nullptr*/ )
 	: CDialog(DialogAFBody::IDD, pParent)
-	, constraintDlg(NULL)
+	, constraintDlg(nullptr )
 	, numJoints(0 )
 	, cm_length(0 )
 	, cm_height(0 )
@@ -143,8 +143,8 @@ DialogAFBody::DialogAFBody( CWnd* pParent /*=NULL*/ )
 	, m_linearFriction(0 )
 	, m_angularFriction(0 )
 	, m_contactFriction(0 )
-	, file(NULL)
-	, body(NULL)
+	, file(nullptr )
+	, body(nullptr )
 {
 	Create( IDD_DIALOG_AF_BODY, pParent );
 	EnableToolTips( TRUE );
@@ -228,7 +228,7 @@ DialogAFBody::InitJointLists
 ================
 */
 void DialogAFBody::InitJointLists( void ) {
-	arcStringList joints;
+	anStringList joints;
 
 	cm_comboBoneJoint1.ResetContent();
 	cm_comboBoneJoint2.ResetContent();
@@ -241,7 +241,7 @@ void DialogAFBody::InitJointLists( void ) {
 		return;
 	}
 
-	const ARCRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
+	const anRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
 	if ( !model ) {
 		return;
 	}
@@ -347,7 +347,7 @@ void DialogAFBody::InitModifiedJointList( void ) {
 		return;
 	}
 
-	const ARCRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
+	const anRenderModel *model = engineEdit->ANIM_GetModelFromName( file->model );
 	if ( !model ) {
 		return;
 	}
@@ -428,9 +428,9 @@ void DialogAFBody::InitNewRenameDeleteButtons( void ) {
 DialogAFBody::LoadFile
 ================
 */
-void DialogAFBody::LoadFile( arcDeclAF *af ) {
+void DialogAFBody::LoadFile( anDeclAF *af ) {
 	file = af;
-	body = NULL;
+	body = nullptr;
 	InitJointLists();
 	InitBodyList();
 	InitNewRenameDeleteButtons();
@@ -452,7 +452,7 @@ DialogAFBody::LoadBody
 */
 void DialogAFBody::LoadBody( const char *name ) {
 	int i, s1, s2;
-	arcNetString str;
+	anString str;
 
 	if ( !file ) {
 		return;
@@ -467,7 +467,7 @@ void DialogAFBody::LoadBody( const char *name ) {
 	}
 	body = file->bodies[i];
 
-	// load collision model from the current arcDeclAF_Body
+	// load collision model from the current anDeclAF_Body
 	SetSafeComboBoxSelection( &cm_comboType, ModelTypeToString( body->modelType ), -1 );
 	if ( body->modelType == TRM_BONE ) {
 		s1 = SetSafeComboBoxSelection( &cm_comboBoneJoint1, body->v1.joint1.c_str(), -1 );
@@ -510,35 +510,35 @@ void DialogAFBody::LoadBody( const char *name ) {
 		cm_inertiaScale.SetWindowText( body->inertiaScale.ToString( 1 ) );
 	}
 
-	// load collision detection settings from the current arcDeclAF_Body
+	// load collision detection settings from the current anDeclAF_Body
 	m_selfCollision = body->selfCollision;
-	arcDeclAF::ContentsToString( body->contents, str );
+	anDeclAF::ContentsToString( body->contents, str );
 	m_editContents.SetWindowText( str );
-	arcDeclAF::ContentsToString( body->clipMask, str );
+	anDeclAF::ContentsToString( body->clipMask, str );
 	m_editClipMask.SetWindowText( str );
 
-	// load friction settings from the current arcDeclAF_Body
+	// load friction settings from the current anDeclAF_Body
 	m_linearFriction = body->linearFriction;
 	m_angularFriction = body->angularFriction;
 	m_contactFriction = body->contactFriction;
 
 	// friction direction and contact motor direction
 	if ( body->frictionDirection.ToVec3() != vec3_origin ) {
-		aRcFileMemory file( "frictionDirection" );
+		anFileMemory file( "frictionDirection" );
 		file.WriteFloatString( "%f %f %f", body->frictionDirection.ToVec3().x, body->frictionDirection.ToVec3().y, body->frictionDirection.ToVec3().z );
 		m_frictionDirection.SetWindowText( file.GetDataPtr() );
 	} else {
 		m_frictionDirection.SetWindowText( "" );
 	}
 	if ( body->contactMotorDirection.ToVec3() != vec3_origin ) {
-		aRcFileMemory file( "contactMotorDirection" );
+		anFileMemory file( "contactMotorDirection" );
 		file.WriteFloatString( "%f %f %f", body->contactMotorDirection.ToVec3().x, body->contactMotorDirection.ToVec3().y, body->contactMotorDirection.ToVec3().z );
 		m_contactMotorDirection.SetWindowText( file.GetDataPtr() );
 	} else {
 		m_contactMotorDirection.SetWindowText( "" );
 	}
 
-	// load joint settings from the current arcDeclAF_Body
+	// load joint settings from the current anDeclAF_Body
 	InitModifiedJointList();
 	if ( body->jointMod == DECLAF_JOINTMOD_AXIS ) {
 		i = IDC_RADIO_MODIFY_ORIENTATION;
@@ -577,7 +577,7 @@ void DialogAFBody::SaveBody( void ) {
 	}
 	UpdateData( TRUE );
 
-	// save the collision model to the current arcDeclAF_Body
+	// save the collision model to the current anDeclAF_Body
 	cm_comboType.GetLBText( cm_comboType.GetCurSel(), str );
 	body->modelType = StringToModelType( str );
 	if ( body->modelType == TRM_BONE ) {
@@ -621,10 +621,10 @@ void DialogAFBody::SaveBody( void ) {
 	body->numSides = cm_numSides;
 	body->density = cm_density;
 	cm_inertiaScale.GetWindowText( str );
-	if ( arcNetString::Icmp( str, "none" ) == 0 ) {
+	if ( anString::Icmp( str, "none" ) == 0 ) {
 		body->inertiaScale.Identity();
 	} else {
-		arcLexer src( str, str.GetLength(), "inertiaScale" );
+		anLexer src( str, str.GetLength(), "inertiaScale" );
 		src.SetFlags( LEXFL_NOERRORS | LEXFL_NOWARNINGS );
 		for ( int i = 0; i < 3; i++ ) {
 			for ( int j = 0; j < 3; j++ ) {
@@ -633,14 +633,14 @@ void DialogAFBody::SaveBody( void ) {
 		}
 	}
 
-	// save the collision detection settings to the current arcDeclAF_Body
+	// save the collision detection settings to the current anDeclAF_Body
 	body->selfCollision = ( m_selfCollision != FALSE );
 	m_editContents.GetWindowText( str );
-	body->contents = arcDeclAF::ContentsFromString( str );
+	body->contents = anDeclAF::ContentsFromString( str );
 	m_editClipMask.GetWindowText( str );
-	body->clipMask = arcDeclAF::ContentsFromString( str );
+	body->clipMask = anDeclAF::ContentsFromString( str );
 
-	// save friction settings to the current arcDeclAF_Body
+	// save friction settings to the current anDeclAF_Body
 	body->linearFriction = m_linearFriction;
 	body->angularFriction = m_angularFriction;
 	body->contactFriction = m_contactFriction;
@@ -657,7 +657,7 @@ void DialogAFBody::SaveBody( void ) {
 		sscanf( str, "%f %f %f", &body->contactMotorDirection.ToVec3().x, &body->contactMotorDirection.ToVec3().y, &body->contactMotorDirection.ToVec3().z );
 	}
 
-	// save joint settings to the current arcDeclAF_Body
+	// save joint settings to the current anDeclAF_Body
 	GetSafeComboBoxSelection( &m_comboModifiedJoint, str, -1 );
 	body->jointName = str;
 	m_editContainedJoints.GetWindowText( str );
@@ -864,7 +864,7 @@ void DialogAFBody::OnBnClickedButtonDeletebody() {
 			// delete currently selected body
 			file->DeleteBody( str );
 			bodyList.DeleteString( i );
-			body = NULL;
+			body = nullptr;
 			OnCbnSelchangeComboBodies();
 			constraintDlg->LoadFile( file );
 			engineEdit->AF_UpdateEntities( file->GetName() );
@@ -1189,7 +1189,7 @@ void DialogAFBody::OnDeltaposSpinAnglesPitch(NMHDR *pNMHDR, LRESULT *pResult) {
 	else {
 		cm_angles_pitch -= 1;
 	}
-	cm_angles_pitch = arcMath::AngleNormalize360( cm_angles_pitch );
+	cm_angles_pitch = anMath::AngleNormalize360( cm_angles_pitch );
 	UpdateData( FALSE );
 	UpdateFile();
 	*pResult = 0;
@@ -1212,7 +1212,7 @@ void DialogAFBody::OnDeltaposSpinAnglesYaw(NMHDR *pNMHDR, LRESULT *pResult) {
 	else {
 		cm_angles_yaw -= 1;
 	}
-	cm_angles_yaw = arcMath::AngleNormalize360( cm_angles_yaw );
+	cm_angles_yaw = anMath::AngleNormalize360( cm_angles_yaw );
 	UpdateData( FALSE );
 	UpdateFile();
 	*pResult = 0;
@@ -1235,7 +1235,7 @@ void DialogAFBody::OnDeltaposSpinAnglesRoll(NMHDR *pNMHDR, LRESULT *pResult) {
 	else {
 		cm_angles_roll -= 1;
 	}
-	cm_angles_roll = arcMath::AngleNormalize360( cm_angles_roll );
+	cm_angles_roll = anMath::AngleNormalize360( cm_angles_roll );
 	UpdateData( FALSE );
 	UpdateFile();
 	*pResult = 0;

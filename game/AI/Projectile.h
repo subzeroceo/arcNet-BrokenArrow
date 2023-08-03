@@ -1,4 +1,4 @@
-// RAVEN BEGIN
+
 // bdube: note that this file is no longer merged with Doom3 updates
 //
 // MERGE_DATE 09/30/2004
@@ -14,9 +14,9 @@
 ===============================================================================
 */
 
-extern const idEventDef EV_Explode;
+extern const anEventDef EV_Explode;
 
-class idProjectile : public idEntity {
+class idProjectile : public anEntity {
 public :
 	CLASS_PROTOTYPE( idProjectile );
 
@@ -25,31 +25,31 @@ public :
 
 	void					Spawn( void );
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
-	void					Create( idEntity *owner, const arcVec3 &start, const arcVec3 &dir, idEntity* ignore = NULL, idEntity* extraPassEntity = NULL );
-	virtual void			Launch( const arcVec3 &start, const arcVec3 &dir, const arcVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float dmgPower = 1.0f );
+	void					Create( anEntity *owner, const anVec3 &start, const anVec3 &dir, anEntity* ignore = nullptr, anEntity* extraPassEntity = nullptr );
+	virtual void			Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float dmgPower = 1.0f );
 
 	virtual void			FreeLightDef( void );
 
 //RITUAL BEGIN
-	void					SetOwner(idEntity* ent)	{ owner = ent;	}
+	void					SetOwner(anEntity* ent)	{ owner = ent;	}
 // RITUAL END
 
-	idEntity *				GetOwner( void ) const;
+	anEntity *				GetOwner( void ) const;
 
 	virtual void			Think( void );
-	virtual void			Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location );
-	virtual bool			GetPhysicsToVisualTransform( arcVec3 &origin, arcMat3 &axis );
+	virtual void			Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
+	virtual bool			GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis );
 
-	virtual bool			Collide( const trace_t &collision, const arcVec3 &velocity );
-	virtual bool			Collide( const trace_t &collision, const arcVec3 &velocity, bool &hitTeleporter );
-	virtual void			Explode( const trace_t *collision, const bool showExplodeFX, idEntity *ignore = NULL, const char *sndExplode = "snd_explode" );
+	virtual bool			Collide( const trace_t &collision, const anVec3 &velocity );
+	virtual bool			Collide( const trace_t &collision, const anVec3 &velocity, bool &hitTeleporter );
+	virtual void			Explode( const trace_t *collision, const bool showExplodeFX, anEntity *ignore = nullptr, const char *sndExplode = "snd_explode" );
 	void					Fizzle( void );
 
-	static arcVec3			GetVelocity( const idDict *projectile );
-	static arcVec3			GetGravity( const idDict *projectile );
+	static anVec3			GetVelocity( const anDict *projectile );
+	static anVec3			GetGravity( const anDict *projectile );
 
 	void					SetSpeed		( float s, int accelTime = 0 );
 	float					GetSpeed		( void ) const;
@@ -60,16 +60,16 @@ public :
 	int						methodOfDeath;
 
 	virtual void			ClientPredictionThink( void );
-	virtual void			WriteToSnapshot( idBitMsgDelta &msg ) const;
-	virtual void			ReadFromSnapshot( const idBitMsgDelta &msg );
+	virtual void			WriteToSnapshot( anBitMsgDelta &msg ) const;
+	virtual void			ReadFromSnapshot( const anBitMsgDelta &msg );
 
 	virtual bool			ClientStale( void );
 
 protected:
-	void					SpawnImpactEntities(const trace_t& collision, const arcVec3 projectileDirection);
+	void					SpawnImpactEntities(const trace_t& collision, const anVec3 projectileDirection);
 
 
-	idEntityPtr<idEntity>	owner;
+	anEntityPtr<anEntity>	owner;
 
 	struct projectileFlags_s {
 		bool				detonate_on_world			: 1;
@@ -83,16 +83,16 @@ protected:
 
 	renderLight_t			renderLight;
 	qhandle_t				lightDefHandle;				// handle to renderer light def
-	arcVec3					lightOffset;
+	anVec3					lightOffset;
 	int						lightStartTime;
 	int						lightEndTime;
-	arcVec3					lightColor;
+	anVec3					lightColor;
 
-	idEntity*				impactedEntity;
+	anEntity*				impactedEntity;
 
-	rvPhysics_Particle		physicsObj;
-	idAngles				visualAngles;
-	idAngles				angularVelocity;
+	anPhysics_Particle		physicsObj;
+	anAngles				visualAngles;
+	anAngles				angularVelocity;
 	idInterpolate<float>	speed;
 	bool					updateVelocity;
 
@@ -104,18 +104,18 @@ protected:
 	int						bounceCount;
 	bool					sticky;
 
-	idStr					impactEntity;
+	anString					impactEntity;
 	int						numImpactEntities;
 	int						ieMinPitch;
 	int						ieMaxPitch;
 	float					ieSlicePercentage;
 
-// RAVEN BEGIN
+
 // ddynerman: hit count for stats
 	int						hitCount;
 // ddynerman: pre-prediction ( rocket jumping )
 	int						prePredictTime;
-// RAVEN END
+
 	typedef enum {
 		SPAWNED = 0,
 		CREATED = 1,
@@ -126,25 +126,25 @@ protected:
 
 	projectileState_t		state;
 
-	void					PlayPainEffect		( idEntity* ent, int damage, const rvDeclMatType* materialType, const arcVec3& origin, const arcVec3& direction );
-	virtual void			PlayDetonateEffect	( const arcVec3& origin, const arcMat3& axis );
+	void					PlayPainEffect		( anEntity* ent, int damage, const rvDeclMatType* materialType, const anVec3& origin, const anVec3& direction );
+	virtual void			PlayDetonateEffect	( const anVec3& origin, const anMat3& axis );
 
 private:
-	void					DefaultDamageEffect	( const trace_t &collision, const arcVec3 &velocity, const char *damageDefName );
+	void					DefaultDamageEffect	( const trace_t &collision, const anVec3 &velocity, const char *damageDefName );
 
 	void					Event_Explode			( void );
 	void					Event_Fizzle			( void );
-	void					Event_RadiusDamage		( idEntity *ignore );
-	void					Event_ResidualDamage	( idEntity *ignore );
-	void					Event_Touch				( idEntity *other, trace_t *trace );
+	void					Event_RadiusDamage		( anEntity *ignore );
+	void					Event_ResidualDamage	( anEntity *ignore );
+	void					Event_Touch				( anEntity *other, trace_t *trace );
 
 	bool					syncPhysics;
 
 	// cheap linear client side projectiles
 	// transmitted in snapshot
 	int						launchTime;
-	arcVec3					launchOrig;
-	arcVec3					launchDir;
+	anVec3					launchOrig;
+	anVec3					launchDir;
 	// set from def file in :Launch on both client and server
 	float					launchSpeed;
 };
@@ -161,9 +161,9 @@ idGuidedProjectile
 ===============================================================================
 */
 
-extern const idEventDef EV_UpdateGuideTarget;
-extern const idEventDef EV_GuideToEntity;
-extern const idEventDef EV_GuideToPos;
+extern const anEventDef EV_UpdateGuideTarget;
+extern const anEventDef EV_GuideToEntity;
+extern const anEventDef EV_GuideToPos;
 
 class idGuidedProjectile : public idProjectile {
 public :
@@ -180,27 +180,27 @@ public :
 		GUIDE_MAX
 	};
 
-	void					Save( idSaveGame *savefile ) const;
-	void					Restore( idRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	virtual void			Think( void );
-	virtual void			Launch( const arcVec3 &start, const arcVec3 &dir, const arcVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float dmgPower = 1.0f );
+	virtual void			Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float dmgPower = 1.0f );
 
-	void					GuideTo			( const arcVec3& post, const arcVec3& dir );
-	void					GuideTo			( const arcVec3& pos );
-	void					GuideTo			( idEntity* ent, jointHandle_t guideJoint=INVALID_JOINT, const arcVec3 &offset=vec3_origin );
+	void					GuideTo			( const anVec3& post, const anVec3& dir );
+	void					GuideTo			( const anVec3& pos );
+	void					GuideTo			( anEntity* ent, jointHandle_t guideJoint=INVALID_JOINT, const anVec3 &offset=vec3_origin );
 	void					CancelGuide		( void );
 
 	int						GetGuideType	( void ) const;
 
-	virtual void			Killed( idEntity *inflictor, idEntity *attacker, int damage, const arcVec3 &dir, int location );
+	virtual void			Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
 
 protected:
 
 	int						guideType;
-	idEntityPtr<idEntity>	guideEnt;
-	arcVec3					guideDir;
-	arcVec3					guidePos;
+	anEntityPtr<anEntity>	guideEnt;
+	anVec3					guideDir;
+	anVec3					guidePos;
 	jointHandle_t			guideJoint;
 	float					guideMinDist;
 
@@ -213,7 +213,7 @@ protected:
 	float					driftAngleStep;
 	float					driftProjectRange;
 
-	virtual bool			GetGuideDir		( arcVec3 &outDir, float& outDist );
+	virtual bool			GetGuideDir		( anVec3 &outDir, float& outDist );
 
 private:
 
@@ -227,18 +227,18 @@ ARC_INLINE int idGuidedProjectile::GetGuideType ( void ) const {
 	return guideType;
 }
 
-ARC_INLINE void idGuidedProjectile::GuideTo ( const arcVec3& pos, const arcVec3& dir ) {
+ARC_INLINE void idGuidedProjectile::GuideTo ( const anVec3& pos, const anVec3& dir ) {
 	guideType = GUIDE_DIR;
 	guidePos  = pos;
 	guideDir  = dir;
 }
 
-ARC_INLINE void idGuidedProjectile::GuideTo ( const arcVec3& pos ) {
+ARC_INLINE void idGuidedProjectile::GuideTo ( const anVec3& pos ) {
 	guideType = GUIDE_POS;
 	guidePos  = pos;
 }
 
-ARC_INLINE void idGuidedProjectile::GuideTo ( idEntity* ent, jointHandle_t joint, const arcVec3 &offset ) {
+ARC_INLINE void idGuidedProjectile::GuideTo ( anEntity* ent, jointHandle_t joint, const anVec3 &offset ) {
 	guideType = GUIDE_ENTITY;
 	guideEnt  = ent;
 	guideJoint = joint;
@@ -254,7 +254,7 @@ ARC_INLINE void idGuidedProjectile::CancelGuide ( void ) {
 
 	// twhitaker: TEMP
 	if ( guideEnt.IsValid() ) {
-		guideEnt->GuidedProjectileIncoming( NULL );
+		guideEnt->GuidedProjectileIncoming( nullptr );
 	}
 	// </twhitaker>
 }
@@ -274,19 +274,19 @@ public :
 							rvDriftingProjectile ( void );
 							~rvDriftingProjectile ( void );
 
-	void					Save			( idSaveGame *savefile ) const;
-	void					Restore			( idRestoreGame *savefile );
+	void					Save			( anSaveGame *savefile ) const;
+	void					Restore			( anRestoreGame *savefile );
 
 	virtual void			Think			( void );
-	virtual void			Launch			( const arcVec3 &start, const arcVec3 &dir, const arcVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float dmgPower = 1.0f );
+	virtual void			Launch			( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float dmgPower = 1.0f );
 
 protected:
 
 	virtual void			UpdateVisualAngles	( void );
 
-	arcVec3					startDir;
-	arcVec3					startOrigin;
-	arcMat3					startAxis;
+	anVec3					startDir;
+	anVec3					startOrigin;
+	anMat3					startAxis;
 	float					startSpeed;
 
 	idInterpolateAccelDecelLinear<float>	driftOffset[2];
@@ -319,7 +319,7 @@ public :
 
 protected:
 
-	idEntityPtr<rvSpawner>	spawner;
+	anEntityPtr<rvSpawner>	spawner;
 
 	enum {
 		STATE_NONE,
@@ -355,4 +355,4 @@ private:
 
 #endif /* !__GAME_PROJECTILE_H__ */
 
-// RAVEN END
+

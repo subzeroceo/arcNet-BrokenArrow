@@ -1,4 +1,4 @@
-#include "..//idlib/precompiled.h"
+#include "..//idlib/Lib.h"
 #pragma hdrstop
 
 #include "../../sys/win32/rc/guied_resource.h"
@@ -30,7 +30,7 @@ static float g_ZoomScales[rvGEWorkspace::ZOOM_MAX] = { 0, 0.25f, 0.33f, 0.50f, 0
 static const int ID_GUIED_SELECT_FIRST = 9800;
 static const int ID_GUIED_SELECT_LAST  = 9900;
 
-arcNetList<rvGEClipboardItem*> rvGEWorkspace::mClipboard;
+anList<rvGEClipboardItem*> rvGEWorkspace::mClipboard;
 
 rvGEWorkspace::rvGEWorkspace( rvGEApp* app ) : mApplication( app ) {
 	mWnd	    		= 0;
@@ -52,7 +52,7 @@ rvGEWorkspace::rvGEWorkspace( rvGEApp* app ) : mApplication( app ) {
 
 rvGEWorkspace::~rvGEWorkspace() {
 	// Make sure all the wrappers get cleaned up
-	rvGEWindowWrapper::GetWrapper( mInterface->GetDesktop() )->EnumChildren( CleanupEnumProc, NULL );
+	rvGEWindowWrapper::GetWrapper( mInterface->GetDesktop() )->EnumChildren( CleanupEnumProc, nullptr );
 
 	DestroyCursor( mHandCursor );
 
@@ -131,7 +131,7 @@ Detaches the workspace from the window it is currently attached to
 void rvGEWorkspace::Detach( void ) {
 	assert( mWnd );
 	SetWindowLong( mWnd, GWL_USERDATA, 0 );
-	mWnd = NULL;
+	mWnd = nullptr;
 }
 
 /*
@@ -147,7 +147,7 @@ bool rvGEWorkspace::SetupPixelFormat( void ) {
 
 	int pixelFormat = ChoosePixelFormat(hDC, &win32.pfd);
 	if (pixelFormat > 0 )  {
-		if (SetPixelFormat(hDC, pixelFormat, &win32.pfd) == NULL)
+		if (SetPixelFormat(hDC, pixelFormat, &win32.pfd) == nullptr )
 		{
 			result = false;
 		}
@@ -171,7 +171,7 @@ void rvGEWorkspace::RenderGrid( void ) {
 	float	x;
 	float	y;
 	float	step;
-	arcVec4&	color = mApplication->GetOptions().GetGridColor();
+	anVec4&	color = mApplication->GetOptions().GetGridColor();
 
 	// See if the grid is off before rendering it
 	if ( !mApplication->GetOptions().GetGridVisible() ) {
@@ -318,7 +318,7 @@ Updates the window title with the name of the file and the zoom level and weithe
 */
 void rvGEWorkspace::UpdateTitle( void ) {
 	// Set the window title based on the current filename
-	SetWindowText( mWnd, va( "%s%s (%d%%)", arcNetString(mFilename).StripPath().c_str( ), mModified?"*":"", ( int ) (g_ZoomScales[mZoom] * 100) ) );
+	SetWindowText( mWnd, va( "%s%s (%d%%)", anString(mFilename).StripPath().c_str( ), mModified?"*":"", ( int ) (g_ZoomScales[mZoom] * 100) ) );
 
 	gApp.GetStatusBar().SetZoom( ( int )(g_ZoomScales[mZoom] * 100.0f) );
 }
@@ -516,41 +516,41 @@ Called to update the cursor when the mouse is within the workspace window
 void rvGEWorkspace::UpdateCursor( rvGESelectionMgr::EHitTest type ) {
 	switch ( type ) {
 		case rvGESelectionMgr::HT_SELECT:
-			SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_ARROW) ) );
+			SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_ARROW) ) );
 			break;
 
 		case rvGESelectionMgr::HT_MOVE:
-			SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_SIZEALL) ) );
+			SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_SIZEALL) ) );
 			break;
 
 		case rvGESelectionMgr::HT_SIZE_LEFT:
 		case rvGESelectionMgr::HT_SIZE_RIGHT:
-			SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_SIZEWE ) ) );
+			SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_SIZEWE ) ) );
 			break;
 
 		case rvGESelectionMgr::HT_SIZE_TOP:
 		case rvGESelectionMgr::HT_SIZE_BOTTOM:
-			SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_SIZENS ) ) );
+			SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_SIZENS ) ) );
 			break;
 
 		case rvGESelectionMgr::HT_SIZE_TOPRIGHT:
 		case rvGESelectionMgr::HT_SIZE_BOTTOMLEFT:
-			SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_SIZENESW ) ) );
+			SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_SIZENESW ) ) );
 			break;
 
 		case rvGESelectionMgr::HT_SIZE_BOTTOMRIGHT:
 		case rvGESelectionMgr::HT_SIZE_TOPLEFT:
-			SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_SIZENWSE ) ) );
+			SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_SIZENWSE ) ) );
 			break;
 	}
 }
 
 void rvGEWorkspace::UpdateCursor( float x, float y ) {
-	arcVec2						point;
+	anVec2						point;
 	rvGESelectionMgr::EHitTest	type;
 
 	// First convert the worspace coord to a window coord
-	point = WorkspaceToWindow( arcVec2( x, y ) );
+	point = WorkspaceToWindow( anVec2( x, y ) );
 
 	// See if it hits anything
 	type = mSelections.HitTest( point.x, point.y );
@@ -559,14 +559,14 @@ void rvGEWorkspace::UpdateCursor( float x, float y ) {
 	if ( rvGESelectionMgr::HT_NONE != type ) {
 		UpdateCursor( type );
 	} else {
-		SetCursor( LoadCursor( NULL, MAKEINTRESOURCE(IDC_ARROW ) ) );
+		SetCursor( LoadCursor( nullptr, MAKEINTRESOURCE(IDC_ARROW ) ) );
 	}
 }
 
 void rvGEWorkspace::UpdateCursor( void ) {
 	if ( mDragType == rvGESelectionMgr::HT_NONE ) {
 		POINT	point;
-		arcVec2	cursor;
+		anVec2	cursor;
 
 		GetCursorPos( &point );
 		cursor.Set( point.x, point.y );
@@ -595,9 +595,9 @@ void rvGEWorkspace::HandleMessage( UINT msg, WPARAM wParam, LPARAM lParam ) {
 			}
 
 
-			GetApplication()->GetNavigator().SetWorkspace(NULL);
-			GetApplication()->GetTransformer().SetWorkspace(NULL);
-			GetApplication()->GetProperties().SetWorkspace(NULL);
+			GetApplication()->GetNavigator().SetWorkspace(nullptr );
+			GetApplication()->GetTransformer().SetWorkspace(nullptr );
+			GetApplication()->GetProperties().SetWorkspace(nullptr );
 			break;
 		}
 
@@ -610,7 +610,7 @@ void rvGEWorkspace::HandleMessage( UINT msg, WPARAM wParam, LPARAM lParam ) {
 
 		case WM_SETCURSOR: {
 			POINT point;
-			arcVec2 cursor;
+			anVec2 cursor;
 			GetCursorPos( &point );
 			cursor.Set( point.x, point.y );
 			WindowToWorkspace( cursor );
@@ -789,7 +789,7 @@ int	rvGEWorkspace::HandleRButtonDown( WPARAM wParam, LPARAM lParam ) {
 
 	// Bring up the popup menu
 	ClientToScreen( mWnd, &point );
-	TrackPopupMenu( menu, TPM_RIGHTBUTTON|TPM_LEFTALIGN, point.x, point.y, 0, mWnd, NULL );
+	TrackPopupMenu( menu, TPM_RIGHTBUTTON|TPM_LEFTALIGN, point.x, point.y, 0, mWnd, nullptr );
 
 	DestroyMenu( popup );
 	DestroyMenu( menu );
@@ -809,7 +809,7 @@ int	rvGEWorkspace::HandleLButtonDown( WPARAM wParam, LPARAM lParam ) {
 		return 0;
 	}
 
-	arcVec2 point( LOWORD(lParam), HIWORD(lParam) );
+	anVec2 point( LOWORD(lParam), HIWORD(lParam) );
 	WindowToWorkspace( point );
 
 	// Make sure whatever modifications get generated cant be merged into whats already there
@@ -832,7 +832,7 @@ int	rvGEWorkspace::HandleLButtonDown( WPARAM wParam, LPARAM lParam ) {
 
 	// dissallow selection of the desktop.
 	if ( gApp.GetOptions().GetIgnoreDesktopSelect() && window == mInterface->GetDesktop() ) {
-		window = NULL;
+		window = nullptr;
 	}
 
 	if ( mDragType == rvGESelectionMgr::HT_MOVE || mDragType == rvGESelectionMgr::HT_NONE ) {
@@ -909,7 +909,7 @@ Handles the moving of the mouse for dragging and cursor updating
 ================
 */
 int	rvGEWorkspace::HandleMouseMove( WPARAM wParam, LPARAM lParam ) {
-	arcVec2	cursor;
+	anVec2	cursor;
 
 	cursor.Set( (short)LOWORD(lParam), (short)HIWORD(lParam) );
 
@@ -1064,7 +1064,7 @@ rvGEWorkspace::WindowToWorkspace
 Converts the given coordinates in windows space to the workspace's coordinates.
 ================
 */
-arcVec2& rvGEWorkspace::WindowToWorkspace( arcVec2& point ) {
+anVec2& rvGEWorkspace::WindowToWorkspace( anVec2& point ) {
 	point.x = (point.x - mRect.x) / mRect.w * SCREEN_WIDTH;
 	point.y = (point.y - mRect.y) / mRect.h * SCREEN_HEIGHT;
 
@@ -1087,7 +1087,7 @@ rvGEWorkspace::WindowToWorkspace
 Converts the given workspace coordinates to the windows coordinates.
 ================
 */
-arcVec2& rvGEWorkspace::WorkspaceToWindow( arcVec2& point ) {
+anVec2& rvGEWorkspace::WorkspaceToWindow( anVec2& point ) {
 	point.x = mRect.x + (point.x / SCREEN_WIDTH * mRect.w);
 	point.y = mRect.y + (point.y / SCREEN_HEIGHT * mRect.h);
 
@@ -1119,7 +1119,7 @@ rvGEWorkspace::EZoomLevel rvGEWorkspace::ZoomIn( void ) {
 	UpdateScrollbars();
 	UpdateTitle();
 
-	InvalidateRect( mWnd, NULL, FALSE );
+	InvalidateRect( mWnd, nullptr, FALSE );
 
 	return (EZoomLevel)mZoom;
 }
@@ -1140,7 +1140,7 @@ rvGEWorkspace::EZoomLevel rvGEWorkspace::ZoomOut( void ) {
 	UpdateScrollbars();
 	UpdateTitle();
 
-	InvalidateRect( mWnd, NULL, FALSE );
+	InvalidateRect( mWnd, nullptr, FALSE );
 
 	return (EZoomLevel)mZoom;
 }
@@ -1186,7 +1186,7 @@ rvGEModifier* rvGEWorkspace::CreateModifier( EModifierType type, idWindow* windo
 			break;
 
 		default:
-			mod = NULL;
+			mod = nullptr;
 			break;
 	}
 	return mod;
@@ -1297,11 +1297,11 @@ rvGEWorkspace::NewWindow
 Create a new window
 ================
 */
-idWindow* rvGEWorkspace::NewWindow( arcDictionary* state, rvGEWindowWrapper::EWindowType type ) {
+idWindow* rvGEWorkspace::NewWindow( anDict* state, rvGEWindowWrapper::EWindowType type ) {
 	idWindow*			window = new idWindow( mInterface->GetDesktop()->GetDC(), mInterface );
 	rvGEWindowWrapper*	wrapper;
 	int					count;
-	arcNetString				baseName;
+	anString				baseName;
 
 	switch ( type ) {
 		case rvGEWindowWrapper::WT_NORMAL:
@@ -1326,7 +1326,7 @@ idWindow* rvGEWorkspace::NewWindow( arcDictionary* state, rvGEWindowWrapper::EWi
 
 		default:
 			assert( false );
-			return NULL;
+			return nullptr;
 	}
 
 	baseName = state ? state->GetString( "name","unnamed" ) : "unnamed";
@@ -1351,8 +1351,8 @@ idWindow* rvGEWorkspace::NewWindow( arcDictionary* state, rvGEWindowWrapper::EWi
 		}
 	}
 
-	arcNetString winName;
-	arcNetString winTemplate;
+	anString winName;
+	anString winTemplate;
 
 	if ( count ) {
 		winName = va( "%s%d", baseName.c_str(), count );
@@ -1361,7 +1361,7 @@ idWindow* rvGEWorkspace::NewWindow( arcDictionary* state, rvGEWindowWrapper::EWi
 	}
 	winTemplate = winName + " { }";
 
-	ARCParser src( winTemplate, winTemplate.Length(), "", LEXFL_ALLOWMULTICHARLITERALS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
+	anParser src( winTemplate, winTemplate.Length(), "", LEXFL_ALLOWMULTICHARLITERALS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
 	window->Parse( &src );
 
 	wrapper = rvGEWindowWrapper::GetWrapper( window );
@@ -1379,7 +1379,7 @@ idWindow* rvGEWorkspace::NewWindow( arcDictionary* state, rvGEWindowWrapper::EWi
 
 idWindow* rvGEWorkspace::AddWindow( rvGEWindowWrapper::EWindowType type ) {
 	idWindow*	window;
-	arcDictionary		state;
+	anDict		state;
 
 	state.Set( "rect", "0,0,100,100" );
 	state.Set( "visible", "1" );
@@ -1387,7 +1387,7 @@ idWindow* rvGEWorkspace::AddWindow( rvGEWindowWrapper::EWindowType type ) {
 	window = NewWindow( &state, type );
 	assert( window );
 
-	mModifiers.Append( new rvGEInsertModifier( "New", window, mInterface->GetDesktop(), NULL ) );
+	mModifiers.Append( new rvGEInsertModifier( "New", window, mInterface->GetDesktop(), nullptr ) );
 
 	mSelections.Set( window );
 	mApplication->GetNavigator().Update();
@@ -1402,7 +1402,7 @@ bool rvGEWorkspace::EditSelectedProperties( void ) {
 		return false;
 	}
 
-	arcDictionary dict;
+	anDict dict;
 	if ( GEItemPropsDlg_DoModal( mWnd, mSelections[0], dict ) ) {
 		mModifiers.Append( new rvGEStateModifier( "Item Properties", mSelections[0], dict ) );
 		SetModified( true );
@@ -1495,12 +1495,12 @@ Align the selected items to the first one using the given align type
 void rvGEWorkspace::AlignSelected( EItemAlign align ) {
 	static const char*	alignNames[]={"Lefts","Centers","Rights","Tops","Middles","Bottoms" };
 	int					i;
-	arcNetString				modName;
+	anString				modName;
 	rvGEModifierGroup*	group;
 
 	assert( mSelections.Num() > 1 );
 
-	modName = "Align " + arcNetString(alignNames[align] );
+	modName = "Align " + anString(alignNames[align] );
 
 	group   = new rvGEModifierGroup();
 
@@ -1661,7 +1661,7 @@ void rvGEWorkspace::AddModifierSize( const char* modName, float l, float t, floa
 		// time as a child you will get double movement because the child is relative to the parent.  Therefore
 		// we need to subtract out the closest parents sizing.
 		idWindow* parent = mSelections[i];
-		while( NULL != (parent = parent->GetParent() ) ) {
+		while( nullptr != (parent = parent->GetParent() ) ) {
 			rvGEWindowWrapper*	pwrapper = rvGEWindowWrapper::GetWrapper( parent );
 			float				offset;
 
@@ -1719,7 +1719,7 @@ void rvGEWorkspace::MakeSelectedAChild( void ) {
 			continue;
 		}
 
-		group->Append( new rvGEInsertModifier( "Make Child", mSelections[i], mSelections[0], NULL ) );
+		group->Append( new rvGEInsertModifier( "Make Child", mSelections[i], mSelections[0], nullptr ) );
 	}
 
 	mModifiers.Append( group );
@@ -1763,7 +1763,7 @@ void rvGEWorkspace::Paste( void ) {
 	mSelections.Clear();
 
 	for ( i = 0; i < mClipboard.Num(); i ++ ) {
-		arcDictionary							state;
+		anDict							state;
 		rvGEWindowWrapper::EWindowType	type;
 
 		state.Copy( mClipboard[i]->mStateDict );
@@ -1771,7 +1771,7 @@ void rvGEWorkspace::Paste( void ) {
 		state.Delete( "windowType" );
 
 		idWindow* window = NewWindow( &state, type );
-		group->Append( new rvGEInsertModifier( "Paste", window, mInterface->GetDesktop(), NULL ) );
+		group->Append( new rvGEInsertModifier( "Paste", window, mInterface->GetDesktop(), nullptr ) );
 		mSelections.Add( window );
 
 		rvGEWindowWrapper::GetWrapper( window )->GetScriptDict() = mClipboard[i]->mScriptDict;

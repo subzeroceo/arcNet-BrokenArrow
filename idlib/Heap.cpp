@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "/idlib/Lib.h"
 #pragma hdrstop
 
 #ifndef USE_LIBC_MALLOC
@@ -11,7 +11,7 @@
 
 //===============================================================
 //
-//	aRcHeap
+//	anHeap
 //
 //===============================================================
 
@@ -23,11 +23,11 @@
 #define SMALL_ALIGN( bytes )	( ALIGN_SIZE( (bytes) + SMALL_HEADER_SIZE ) - SMALL_HEADER_SIZE )
 #define MEDIUM_SMALLEST_SIZE	( ALIGN_SIZE( 256 ) + ALIGN_SIZE( MEDIUM_HEADER_SIZE ) )
 
-class aRcHeap {
+class anHeap {
 
 public:
-					aRcHeap( void );
-					~aRcHeap( void );				// frees all associated data
+					anHeap( void );
+					~anHeap( void );				// frees all associated data
 	void			Init( void );					// initialize
 	void *			Allocate( const dword bytes );	// allocate memory
 	void			Free( void *p );				// free memory
@@ -97,12 +97,12 @@ private:
 
 	// methods
 	page_s *		AllocatePage( dword bytes );	// allocate page from the OS
-	void			FreePage( aRcHeap::page_s *p );	// free an OS allocated page
+	void			FreePage( anHeap::page_s *p );	// free an OS allocated page
 
 	void *			SmallAllocate( dword bytes );	// allocate memory (1-255 bytes) from small heap manager
 	void			SmallFree( void *ptr );			// free memory allocated by small heap manager
 
-	void *			MediumAllocateFromPage( aRcHeap::page_s *p, dword sizeNeeded );
+	void *			MediumAllocateFromPage( anHeap::page_s *p, dword sizeNeeded );
 	void *			MediumAllocate( dword bytes );	// allocate memory (256-32768 bytes) from medium heap manager
 	void			MediumFree( void *ptr );		// free memory allocated by medium heap manager
 
@@ -110,84 +110,84 @@ private:
 	void			LargeFree( void *ptr );			// free memory allocated by large heap manager
 
 	void			ReleaseSwappedPages( void );
-	void			FreePageReal( aRcHeap::page_s *p );
+	void			FreePageReal( anHeap::page_s *p );
 };
 
 /*
 ================
-aRcHeap::Init
+anHeap::Init
 ================
 */
-void aRcHeap::Init() {
+void anHeap::Init() {
 	OSAllocs			= 0;
 	pageRequests		= 0;
-	pageSize			= 65536 - sizeof( aRcHeap::page_s );
+	pageSize			= 65536 - sizeof( anHeap::page_s );
 	pagesAllocated		= 0;								// reset page allocation counter
 
-	largeFirstUsedPage	= NULL;								// init large heap manager
-	swapPage			= NULL;
+	largeFirstUsedPage	= nullptr;								// init large heap manager
+	swapPage			= nullptr;
 
-	memset( smallFirstFree, 0, sizeof(smallFirstFree) );	// init small heap manager
-	smallFirstUsedPage	= NULL;
+	memset( smallFirstFree, 0, sizeof( smallFirstFree) );	// init small heap manager
+	smallFirstUsedPage	= nullptr;
 	smallCurPage		= AllocatePage( pageSize );
 	assert( smallCurPage );
 	smallCurPageOffset	= SMALL_ALIGN( 0 );
 
-	defragBlock = NULL;
+	defragBlock = nullptr;
 
-	mediumFirstFreePage	= NULL;								// init medium heap manager
-	mediumLastFreePage	= NULL;
-	mediumFirstUsedPage	= NULL;
+	mediumFirstFreePage	= nullptr;								// init medium heap manager
+	mediumLastFreePage	= nullptr;
+	mediumFirstUsedPage	= nullptr;
 
 	c_heapAllocRunningCount = 0;
 }
 
 /*
 ================
-aRcHeap::aRcHeap
+anHeap::anHeap
 ================
 */
-aRcHeap::aRcHeap( void ) {
+anHeap::anHeap( void ) {
 	Init();
 }
 
 /*
 ================
-aRcHeap::~aRcHeap
+anHeap::~anHeap
 
   returns all allocated memory back to OS
 ================
 */
-aRcHeap::~aRcHeap( void ) {
-	aRcHeap::page_s	*p;
+anHeap::~anHeap( void ) {
+	anHeap::page_s	*p;
 
 	if ( smallCurPage ) {
 		FreePage( smallCurPage );			// free small-heap current allocation page
 	}
 	p = smallFirstUsedPage;					// free small-heap allocated pages
 	while ( p ) {
-		aRcHeap::page_s *next = p->next;
+		anHeap::page_s *next = p->next;
 		FreePage( p );
 		p= next;
 	}
 
 	p = largeFirstUsedPage;					// free large-heap allocated pages
 	while ( p ) {
-		aRcHeap::page_s *next = p->next;
+		anHeap::page_s *next = p->next;
 		FreePage( p );
 		p = next;
 	}
 
 	p = mediumFirstFreePage;				// free medium-heap allocated pages
 	while ( p ) {
-		aRcHeap::page_s *next = p->next;
+		anHeap::page_s *next = p->next;
 		FreePage( p );
 		p = next;
 	}
 
 	p = mediumFirstUsedPage;				// free medium-heap allocated completely used pages
 	while ( p ) {
-		aRcHeap::page_s *next = p->next;
+		anHeap::page_s *next = p->next;
 		FreePage( p );
 		p = next;
 	}
@@ -203,10 +203,10 @@ aRcHeap::~aRcHeap( void ) {
 
 /*
 ================
-aRcHeap::AllocDefragBlock
+anHeap::AllocDefragBlock
 ================
 */
-void aRcHeap::AllocDefragBlock( void ) {
+void anHeap::AllocDefragBlock( void ) {
 	int		size = 0x40000000;
 
 	if ( defragBlock ) {
@@ -219,7 +219,7 @@ void aRcHeap::AllocDefragBlock( void ) {
 		}
 		size >>= 1;
 	}
-	arcLibrary::common->Printf( "Allocated a %i mb defrag block\n", size / (1024*1024) );
+	anLibrary::common->Printf( "Allocated a %i mb defrag block\n", size / (1024*1024) );
 }
 
 // NOTE:
@@ -244,12 +244,12 @@ void *qMalloc( size_t nSize ) {
 
 /*
 ================
-aRcHeap::Allocate
+anHeap::Allocate
 ================
 */
-void *aRcHeap::Allocate( const dword bytes ) {
+void *anHeap::Allocate( const dword bytes ) {
 	if ( !bytes ) {
-		return NULL;
+		return nullptr;
 	}
 	c_heapAllocRunningCount++;
 
@@ -268,10 +268,10 @@ void *aRcHeap::Allocate( const dword bytes ) {
 
 /*
 ================
-aRcHeap::Free
+anHeap::Free
 ================
 */
-void aRcHeap::Free( void *p ) {
+void anHeap::Free( void *p ) {
 	if ( !p ) {
 		return;
 	}
@@ -280,7 +280,7 @@ void aRcHeap::Free( void *p ) {
 #if USE_LIBC_MALLOC
 	free( p );
 #else
-	switch( ( ( byte * )( p ) )[-1] ) {
+	switch ( ( (byte *)( p ) )[-1] ) {
 		case SMALL_ALLOC: {
 			SmallFree( p );
 			break;
@@ -294,7 +294,7 @@ void aRcHeap::Free( void *p ) {
 			break;
 		}
 		default: {
-			arcLibrary::common->FatalError( "aRcHeap::Free: invalid memory block (%s)", arcLibrary::sys->GetCallStackCurStr( 4 ) );
+			anLibrary::common->FatalError( "anHeap::Free: invalid memory block (%s)", anLibrary::sys->GetCallStackCurStr( 4 ) );
 			break;
 		}
 	}
@@ -303,45 +303,45 @@ void aRcHeap::Free( void *p ) {
 
 /*
 ================
-aRcHeap::Allocate16
+anHeap::Allocate16
 ================
 */
-void *aRcHeap::Allocate16( const dword bytes ) {
+void *anHeap::Allocate16( const dword bytes ) {
 	byte *ptr, *alignedPtr;
 
-	ptr = ( byte * ) malloc( bytes + 16 + 4 );
+	ptr = (byte *) malloc( bytes + 16 + 4 );
 	if ( !ptr ) {
 		if ( defragBlock ) {
-			arcLibrary::common->Printf( "Freeing defragBlock on alloc of %i.\n", bytes );
+			anLibrary::common->Printf( "Freeing defragBlock on alloc of %i.\n", bytes );
 			free( defragBlock );
-			defragBlock = NULL;
-			ptr = ( byte * ) malloc( bytes + 16 + 4 );
+			defragBlock = nullptr;
+			ptr = (byte *) malloc( bytes + 16 + 4 );
 			AllocDefragBlock();
 		}
 		if ( !ptr ) {
 			common->FatalError( "malloc failure for %i", bytes );
 		}
 	}
-	alignedPtr = ( byte * ) ( ( ( int ) ptr ) + 15 & ~15 );
+	alignedPtr = (byte *) ( ( ( int ) ptr ) + 15 & ~15 );
 	if ( alignedPtr - ptr < 4 ) {
 		alignedPtr += 16;
 	}
-	*( ( int * )(alignedPtr - 4) ) = ( int ) ptr;
+	*( ( int*)(alignedPtr - 4) ) = ( int ) ptr;
 	return (void *) alignedPtr;
 }
 
 /*
 ================
-aRcHeap::Free16
+anHeap::Free16
 ================
 */
-void aRcHeap::Free16( void *p ) {
-	free( (void *) *( ( int * ) ( ( ( byte * ) p ) - 4 ) ) );
+void anHeap::Free16( void *p ) {
+	free( (void *) *( ( int*) ( ( (byte *) p ) - 4 ) ) );
 }
 
 /*
 ================
-aRcHeap::Msize
+anHeap::Msize
 
   returns size of allocated memory block
   p	= pointer to memory block
@@ -349,7 +349,7 @@ aRcHeap::Msize
 			allocation request (due to block alignment reasons).
 ================
 */
-dword aRcHeap::Msize( void *p ) {
+dword anHeap::Msize( void *p ) {
 	if ( !p ) {
 		return 0;
 	}
@@ -361,18 +361,18 @@ dword aRcHeap::Msize( void *p ) {
 		return 0;
 	#endif
 #else
-	switch( ( ( byte * )( p ) )[-1] ) {
+	switch ( ( (byte *)( p ) )[-1] ) {
 		case SMALL_ALLOC: {
-			return SMALL_ALIGN( ( ( byte * )( p ) )[-SMALL_HEADER_SIZE] * ALIGN );
+			return SMALL_ALIGN( ( (byte *)( p ) )[-SMALL_HEADER_SIZE] * ALIGN );
 		}
 		case MEDIUM_ALLOC: {
-			return ( (mediumHeapEntry_s *)( ( ( byte * )( p ) ) - ALIGN_SIZE( MEDIUM_HEADER_SIZE ) ) )->size - ALIGN_SIZE( MEDIUM_HEADER_SIZE );
+			return ( (mediumHeapEntry_s *)( ( (byte *)( p ) ) - ALIGN_SIZE( MEDIUM_HEADER_SIZE ) ) )->size - ALIGN_SIZE( MEDIUM_HEADER_SIZE );
 		}
 		case LARGE_ALLOC: {
-			return ( (aRcHeap::page_s*)(*( (dword *)( ( ( byte * )p) - ALIGN_SIZE( LARGE_HEADER_SIZE ) ) ) ) )->dataSize - ALIGN_SIZE( LARGE_HEADER_SIZE );
+			return ( (anHeap::page_s*)(*( (dword *)( ( (byte *)p) - ALIGN_SIZE( LARGE_HEADER_SIZE ) ) ) ) )->dataSize - ALIGN_SIZE( LARGE_HEADER_SIZE );
 		}
 		default: {
-			arcLibrary::common->FatalError( "aRcHeap::Msize: invalid memory block (%s)", arcLibrary::sys->GetCallStackCurStr( 4 ) );
+			anLibrary::common->FatalError( "anHeap::Msize: invalid memory block (%s)", anLibrary::sys->GetCallStackCurStr( 4 ) );
 			return 0;
 		}
 	}
@@ -381,94 +381,94 @@ dword aRcHeap::Msize( void *p ) {
 
 /*
 ================
-aRcHeap::Dump
+anHeap::Dump
 
   dump contents of the heap
 ================
 */
-void aRcHeap::Dump( void ) {
-	aRcHeap::page_s	*pg;
+void anHeap::Dump( void ) {
+	anHeap::page_s	*pg;
 
 	for ( pg = smallFirstUsedPage; pg; pg = pg->next ) {
-		arcLibrary::common->Printf( "%p  bytes %-8d  (in use by small heap)\n", pg->data, pg->dataSize);
+		anLibrary::common->Printf( "%p  bytes %-8d  (in use by small heap)\n", pg->data, pg->dataSize);
 	}
 
 	if ( smallCurPage ) {
 		pg = smallCurPage;
-		arcLibrary::common->Printf( "%p  bytes %-8d  (small heap active page)\n", pg->data, pg->dataSize );
+		anLibrary::common->Printf( "%p  bytes %-8d  ( small heap active page)\n", pg->data, pg->dataSize );
 	}
 
 	for ( pg = mediumFirstUsedPage; pg; pg = pg->next ) {
-		arcLibrary::common->Printf( "%p  bytes %-8d  (completely used by medium heap)\n", pg->data, pg->dataSize );
+		anLibrary::common->Printf( "%p  bytes %-8d  (completely used by medium heap)\n", pg->data, pg->dataSize );
 	}
 
 	for ( pg = mediumFirstFreePage; pg; pg = pg->next ) {
-		arcLibrary::common->Printf( "%p  bytes %-8d  (partially used by medium heap)\n", pg->data, pg->dataSize );
+		anLibrary::common->Printf( "%p  bytes %-8d  (partially used by medium heap)\n", pg->data, pg->dataSize );
 	}
 
 	for ( pg = largeFirstUsedPage; pg; pg = pg->next ) {
-		arcLibrary::common->Printf( "%p  bytes %-8d  (fully used by large heap)\n", pg->data, pg->dataSize );
+		anLibrary::common->Printf( "%p  bytes %-8d  (fully used by large heap)\n", pg->data, pg->dataSize );
 	}
 
-	arcLibrary::common->Printf( "pages allocated : %d\n", pagesAllocated );
+	anLibrary::common->Printf( "pages allocated : %d\n", pagesAllocated );
 }
 
 /*
 ================
-aRcHeap::FreePageReal
+anHeap::FreePageReal
 
   frees page to be used by the OS
   p	= page to free
 ================
 */
-void aRcHeap::FreePageReal( aRcHeap::page_s *p ) {
+void anHeap::FreePageReal( anHeap::page_s *p ) {
 	assert( p );
 	::free( p );
 }
 
 /*
 ================
-aRcHeap::ReleaseSwappedPages
+anHeap::ReleaseSwappedPages
 
   releases the swap page to OS
 ================
 */
-void aRcHeap::ReleaseSwappedPages () {
+void anHeap::ReleaseSwappedPages () {
 	if ( swapPage ) {
 		FreePageReal( swapPage );
 	}
-	swapPage = NULL;
+	swapPage = nullptr;
 }
 
 /*
 ================
-aRcHeap::AllocatePage
+anHeap::AllocatePage
 
   allocates memory from the OS
   bytes	= page size in bytes
   returns pointer to page
 ================
 */
-aRcHeap::page_s* aRcHeap::AllocatePage( dword bytes ) {
-	aRcHeap::page_s*	p;
+anHeap::page_s* anHeap::AllocatePage( dword bytes ) {
+	anHeap::page_s*	p;
 
 	pageRequests++;
 
 	if ( swapPage && swapPage->dataSize == bytes ) {			// if we've got a swap page somewhere
 		p			= swapPage;
-		swapPage	= NULL;
+		swapPage	= nullptr;
 	} else {
 		dword size;
 
-		size = bytes + sizeof(aRcHeap::page_s);
+		size = bytes + sizeof(anHeap::page_s);
 
-		p = (aRcHeap::page_s *) ::malloc( size + ALIGN - 1 );
+		p = (anHeap::page_s *) ::malloc( size + ALIGN - 1 );
 		if ( !p ) {
 			if ( defragBlock ) {
-				arcLibrary::common->Printf( "Freeing defragBlock on alloc of %i.\n", size + ALIGN - 1 );
+				anLibrary::common->Printf( "Freeing defragBlock on alloc of %i.\n", size + ALIGN - 1 );
 				free( defragBlock );
-				defragBlock = NULL;
-				p = (aRcHeap::page_s *) ::malloc( size + ALIGN - 1 );
+				defragBlock = nullptr;
+				p = (anHeap::page_s *) ::malloc( size + ALIGN - 1 );
 				AllocDefragBlock();
 			}
 			if ( !p ) {
@@ -476,15 +476,15 @@ aRcHeap::page_s* aRcHeap::AllocatePage( dword bytes ) {
 			}
 		}
 
-		p->data		= (void *) ALIGN_SIZE( ( int )( ( byte * )( p ) ) + sizeof( aRcHeap::page_s ) );
-		p->dataSize	= size - sizeof(aRcHeap::page_s);
-		p->firstFree = NULL;
+		p->data		= (void *) ALIGN_SIZE( ( int )( (byte *)( p ) ) + sizeof( anHeap::page_s ) );
+		p->dataSize	= size - sizeof(anHeap::page_s);
+		p->firstFree = nullptr;
 		p->largestFree = 0;
 		OSAllocs++;
 	}
 
-	p->prev = NULL;
-	p->next = NULL;
+	p->prev = nullptr;
+	p->next = nullptr;
 
 	pagesAllocated++;
 
@@ -493,13 +493,13 @@ aRcHeap::page_s* aRcHeap::AllocatePage( dword bytes ) {
 
 /*
 ================
-aRcHeap::FreePage
+anHeap::FreePage
 
   frees a page back to the operating system
   p	= pointer to page
 ================
 */
-void aRcHeap::FreePage( aRcHeap::page_s *p ) {
+void anHeap::FreePage( anHeap::page_s *p ) {
 	assert( p );
 
 	if ( p->dataSize == pageSize && !swapPage ) {			// add to swap list?
@@ -519,14 +519,14 @@ void aRcHeap::FreePage( aRcHeap::page_s *p ) {
 
 /*
 ================
-aRcHeap::SmallAllocate
+anHeap::SmallAllocate
 
   allocate memory (1-255 bytes) from the small heap manager
   bytes = number of bytes to allocate
   returns pointer to allocated memory
 ================
 */
-void *aRcHeap::SmallAllocate( dword bytes ) {
+void *anHeap::SmallAllocate( dword bytes ) {
 	// we need the at least sizeof( dword ) bytes for the free list
 	if ( bytes < sizeof( dword ) ) {
 		bytes = sizeof( dword );
@@ -535,9 +535,9 @@ void *aRcHeap::SmallAllocate( dword bytes ) {
 	// increase the number of bytes if necessary to make sure the next small allocation is aligned
 	bytes = SMALL_ALIGN( bytes );
 
-	byte *smallBlock = ( byte * )(smallFirstFree[bytes / ALIGN] );
+	byte *smallBlock = (byte *)( smallFirstFree[bytes / ALIGN] );
 	if ( smallBlock ) {
-		dword *link = (dword *)(smallBlock + SMALL_HEADER_SIZE);
+		dword *link = (dword *)( smallBlock + SMALL_HEADER_SIZE);
 		smallBlock[1] = SMALL_ALLOC;					// allocation identifier
 		smallFirstFree[bytes / ALIGN] = (void *)(*link);
 		return (void *)(link);
@@ -551,13 +551,13 @@ void *aRcHeap::SmallAllocate( dword bytes ) {
 		smallFirstUsedPage	= smallCurPage;
 		smallCurPage		= AllocatePage( pageSize );
 		if ( !smallCurPage ) {
-			return NULL;
+			return nullptr;
 		}
 		// make sure the first allocation is aligned
 		smallCurPageOffset	= SMALL_ALIGN( 0 );
 	}
 
-	smallBlock			= ( ( byte * )smallCurPage->data) + smallCurPageOffset;
+	smallBlock			= ( (byte *)smallCurPage->data) + smallCurPageOffset;
 	smallBlock[0]		= ( byte )(bytes / ALIGN);		// write # of bytes/ALIGN
 	smallBlock[1]		= SMALL_ALLOC;					// allocation identifier
 	smallCurPageOffset  += bytes + SMALL_HEADER_SIZE;	// increase the offset on the current page
@@ -566,23 +566,23 @@ void *aRcHeap::SmallAllocate( dword bytes ) {
 
 /*
 ================
-aRcHeap::SmallFree
+anHeap::SmallFree
 
   frees a block of memory allocated by SmallAllocate() call
   data = pointer to block of memory
 ================
 */
-void aRcHeap::SmallFree( void *ptr ) {
-	( ( byte * )(ptr) )[-1] = INVALID_ALLOC;
+void anHeap::SmallFree( void *ptr ) {
+	( (byte *)(ptr) )[-1] = INVALID_ALLOC;
 
-	byte *d = ( ( byte * )ptr ) - SMALL_HEADER_SIZE;
+	byte *d = ( (byte *)ptr ) - SMALL_HEADER_SIZE;
 	dword *dt = (dword *)ptr;
 	// index into the table with free small memory blocks
 	dword ix = *d;
 
 	// check if the index is correct
 	if ( ix > (256 / ALIGN) ) {
-		arcLibrary::common->FatalError( "SmallFree: invalid memory block" );
+		anLibrary::common->FatalError( "SmallFree: invalid memory block" );
 	}
 
 	*dt = (dword)smallFirstFree[ix];	// write next index
@@ -600,7 +600,7 @@ void aRcHeap::SmallFree( void *ptr ) {
 
 /*
 ================
-aRcHeap::MediumAllocateFromPage
+anHeap::MediumAllocateFromPage
 
   performs allocation using the medium heap manager from a given page
   p				= page
@@ -608,9 +608,9 @@ aRcHeap::MediumAllocateFromPage
   returns pointer to allocated memory
 ================
 */
-void *aRcHeap::MediumAllocateFromPage( aRcHeap::page_s *p, dword sizeNeeded ) {
+void *anHeap::MediumAllocateFromPage( anHeap::page_s *p, dword sizeNeeded ) {
 
-	mediumHeapEntry_s	*best,*nw = NULL;
+	mediumHeapEntry_s	*best,*nw = nullptr;
 	byte				*ret;
 
 	best = (mediumHeapEntry_s *)(p->firstFree);			// first block is largest
@@ -621,12 +621,12 @@ void *aRcHeap::MediumAllocateFromPage( aRcHeap::page_s *p, dword sizeNeeded ) {
 
 	// if we can allocate another block from this page after allocating sizeNeeded bytes
 	if ( best->size >= (dword)( sizeNeeded + MEDIUM_SMALLEST_SIZE ) ) {
-		nw = (mediumHeapEntry_s *)( ( byte * )best + best->size - sizeNeeded);
+		nw = (mediumHeapEntry_s *)( (byte *)best + best->size - sizeNeeded);
 		nw->page		= p;
 		nw->prev		= best;
 		nw->next		= best->next;
-		nw->prevFree	= NULL;
-		nw->nextFree	= NULL;
+		nw->prevFree	= nullptr;
+		nw->nextFree	= nullptr;
 		nw->size		= sizeNeeded;
 		nw->freeBlock	= 0;			// used block
 		if ( best->next ) {
@@ -646,15 +646,15 @@ void *aRcHeap::MediumAllocateFromPage( aRcHeap::page_s *p, dword sizeNeeded ) {
 			best->nextFree->prevFree = best->prevFree;
 		}
 
-		best->prevFree  = NULL;
-		best->nextFree  = NULL;
+		best->prevFree  = nullptr;
+		best->nextFree  = nullptr;
 		best->freeBlock = 0;			// used block
 		nw = best;
 
 		p->largestFree = 0;
 	}
 
-	ret		= ( byte * )(nw) + ALIGN_SIZE( MEDIUM_HEADER_SIZE );
+	ret		= (byte *)(nw) + ALIGN_SIZE( MEDIUM_HEADER_SIZE );
 	ret[-1] = MEDIUM_ALLOC;		// allocation identifier
 
 	return (void *)(ret);
@@ -662,15 +662,15 @@ void *aRcHeap::MediumAllocateFromPage( aRcHeap::page_s *p, dword sizeNeeded ) {
 
 /*
 ================
-aRcHeap::MediumAllocate
+anHeap::MediumAllocate
 
   allocate memory (256-32768 bytes) from medium heap manager
   bytes	= number of bytes to allocate
   returns pointer to allocated memory
 ================
 */
-void *aRcHeap::MediumAllocate( dword bytes ) {
-	aRcHeap::page_s		*p;
+void *anHeap::MediumAllocate( dword bytes ) {
+	anHeap::page_s		*p;
 	void				*data;
 
 	dword sizeNeeded = ALIGN_SIZE( bytes ) + ALIGN_SIZE( MEDIUM_HEADER_SIZE );
@@ -685,9 +685,9 @@ void *aRcHeap::MediumAllocate( dword bytes ) {
 	if ( !p ) {								// need to allocate new page?
 		p = AllocatePage( pageSize );
 		if ( !p ) {
-			return NULL;					// malloc failure!
+			return nullptr;					// malloc failure!
 		}
-		p->prev		= NULL;
+		p->prev		= nullptr;
 		p->next		= mediumFirstFreePage;
 		if (p->next) {
 			p->next->prev = p;
@@ -704,20 +704,20 @@ void *aRcHeap::MediumAllocate( dword bytes ) {
 		mediumHeapEntry_s *e;
 		e				= (mediumHeapEntry_s *)(p->firstFree);
 		e->page			= p;
-		// make sure ( ( byte * )e + e->size) is aligned
+		// make sure ( (byte *)e + e->size) is aligned
 		e->size			= pageSize & ~(ALIGN - 1 );
-		e->prev			= NULL;
-		e->next			= NULL;
-		e->prevFree		= NULL;
-		e->nextFree		= NULL;
+		e->prev			= nullptr;
+		e->next			= nullptr;
+		e->prevFree		= nullptr;
+		e->nextFree		= nullptr;
 		e->freeBlock	= 1;
 	}
 
 	data = MediumAllocateFromPage( p, sizeNeeded );		// allocate data from page
 
     // if the page can no longer serve memory, move it away from free list
-	// (so that it won't slow down the later alloc queries)
-	// this modification speeds up the pageWalk from O(N) to O(sqrt(N) )
+	// ( so that it won't slow down the later alloc queries)
+	// this modification speeds up the pageWalk from O(N) to O( sqrt(N) )
 	// a call to free may swap this page back to the free list
 
 	if ( p->largestFree < MEDIUM_SMALLEST_SIZE ) {
@@ -737,7 +737,7 @@ void *aRcHeap::MediumAllocate( dword bytes ) {
 		}
 
 		// link to "completely used" list
-		p->prev = NULL;
+		p->prev = nullptr;
 		p->next = mediumFirstUsedPage;
 		if ( p->next ) {
 			p->next->prev = p;
@@ -746,7 +746,7 @@ void *aRcHeap::MediumAllocate( dword bytes ) {
 		return data;
 	}
 
-	// re-order linked list (so that next malloc query starts from current
+	// re-order linked list ( so that next malloc query starts from current
 	// matching block) -- this speeds up both the page walks and block walks
 
 	if ( p != mediumFirstFreePage ) {
@@ -757,8 +757,8 @@ void *aRcHeap::MediumAllocate( dword bytes ) {
 		mediumLastFreePage->next	= mediumFirstFreePage;
 		mediumFirstFreePage->prev	= mediumLastFreePage;
 		mediumLastFreePage			= p->prev;
-		p->prev->next				= NULL;
-		p->prev						= NULL;
+		p->prev->next				= nullptr;
+		p->prev						= nullptr;
 		mediumFirstFreePage			= p;
 	}
 
@@ -767,17 +767,17 @@ void *aRcHeap::MediumAllocate( dword bytes ) {
 
 /*
 ================
-aRcHeap::MediumFree
+anHeap::MediumFree
 
   frees a block allocated by the medium heap manager
   ptr	= pointer to data block
 ================
 */
-void aRcHeap::MediumFree( void *ptr ) {
-	( ( byte * )(ptr) )[-1] = INVALID_ALLOC;
+void anHeap::MediumFree( void *ptr ) {
+	( (byte *)(ptr) )[-1] = INVALID_ALLOC;
 
-	mediumHeapEntry_s	*e = (mediumHeapEntry_s *)( ( byte * )ptr - ALIGN_SIZE( MEDIUM_HEADER_SIZE ) );
-	aRcHeap::page_s		*p = e->page;
+	mediumHeapEntry_s	*e = (mediumHeapEntry_s *)( (byte *)ptr - ALIGN_SIZE( MEDIUM_HEADER_SIZE ) );
+	anHeap::page_s		*p = e->page;
 	bool				isInFreeList;
 
 	isInFreeList = p->largestFree >= MEDIUM_SMALLEST_SIZE;
@@ -797,7 +797,7 @@ void aRcHeap::MediumFree( void *ptr ) {
 		e = prev;
 	}
 	else {
-		e->prevFree		= NULL;				// link to beginning of free list
+		e->prevFree		= nullptr;				// link to beginning of free list
 		e->nextFree		= (mediumHeapEntry_s *)p->firstFree;
 		if ( e->nextFree ) {
 			assert( !(e->nextFree->prevFree) );
@@ -852,7 +852,7 @@ void aRcHeap::MediumFree( void *ptr ) {
 		}
 
 		e->nextFree = (mediumHeapEntry_s *)p->firstFree;
-		e->prevFree = NULL;
+		e->prevFree = nullptr;
 		if ( e->nextFree ) {
 			e->nextFree->prevFree = e;
 		}
@@ -873,7 +873,7 @@ void aRcHeap::MediumFree( void *ptr ) {
 			mediumFirstUsedPage = p->next;
 		}
 
-		p->next = NULL;
+		p->next = nullptr;
 		p->prev = mediumLastFreePage;
 
 		if ( mediumLastFreePage ) {
@@ -894,20 +894,20 @@ void aRcHeap::MediumFree( void *ptr ) {
 
 /*
 ================
-aRcHeap::LargeAllocate
+anHeap::LargeAllocate
 
   allocates a block of memory from the operating system
   bytes	= number of bytes to allocate
   returns pointer to allocated memory
 ================
 */
-void *aRcHeap::LargeAllocate( dword bytes ) {
-	aRcHeap::page_s *p = AllocatePage( bytes + ALIGN_SIZE( LARGE_HEADER_SIZE ) );
+void *anHeap::LargeAllocate( dword bytes ) {
+	anHeap::page_s *p = AllocatePage( bytes + ALIGN_SIZE( LARGE_HEADER_SIZE ) );
 
 	assert( p );
 
 	if ( !p ) {
-		return NULL;
+		return nullptr;
 	}
 
 	byte *	d	= (byte*)(p->data) + ALIGN_SIZE( LARGE_HEADER_SIZE );
@@ -916,7 +916,7 @@ void *aRcHeap::LargeAllocate( dword bytes ) {
 	d[-1]		= LARGE_ALLOC;			// allocation identifier
 
 	// link to 'large used page list'
-	p->prev = NULL;
+	p->prev = nullptr;
 	p->next = largeFirstUsedPage;
 	if ( p->next ) {
 		p->next->prev = p;
@@ -928,19 +928,19 @@ void *aRcHeap::LargeAllocate( dword bytes ) {
 
 /*
 ================
-aRcHeap::LargeFree
+anHeap::LargeFree
 
   frees a block of memory allocated by the 'large memory allocator'
   p	= pointer to allocated memory
 ================
 */
-void aRcHeap::LargeFree( void *ptr) {
-	aRcHeap::page_s*	pg;
+void anHeap::LargeFree( void *ptr) {
+	anHeap::page_s*	pg;
 
-	( ( byte * )(ptr) )[-1] = INVALID_ALLOC;
+	( (byte *)(ptr) )[-1] = INVALID_ALLOC;
 
 	// get page pointer
-	pg = (aRcHeap::page_s *)(*( (dword *)( ( ( byte * )ptr) - ALIGN_SIZE( LARGE_HEADER_SIZE ) ) ) );
+	pg = (anHeap::page_s *)(*( (dword *)( ( (byte *)ptr) - ALIGN_SIZE( LARGE_HEADER_SIZE ) ) ) );
 
 	// unlink from doubly linked list
 	if ( pg->prev ) {
@@ -952,7 +952,7 @@ void aRcHeap::LargeFree( void *ptr) {
 	if ( pg == largeFirstUsedPage ) {
 		largeFirstUsedPage = pg->next;
 	}
-	pg->next = pg->prev = NULL;
+	pg->next = pg->prev = nullptr;
 
 	FreePage(pg);
 }
@@ -965,7 +965,7 @@ void aRcHeap::LargeFree( void *ptr) {
 
 #undef new
 
-static aRcHeap *			mem_heap = NULL;
+static anHeap *			mem_heap = nullptr;
 static memoryStats_t	mem_total_allocs = { 0, 0x0fffffff, -1, 0 };
 static memoryStats_t	mem_frame_allocs;
 static memoryStats_t	mem_frame_frees;
@@ -1038,7 +1038,7 @@ void Mem_UpdateFreeStats( int size ) {
 	mem_total_allocs.totalSize -= size;
 }
 
-#ifndef ID_DEBUG_MEMORY
+#ifndef ARC_DEBUG_MEMORY
 
 /*
 ==================
@@ -1047,7 +1047,7 @@ Mem_Alloc
 */
 void *Mem_Alloc( const int size ) {
 	if ( !size ) {
-		return NULL;
+		return nullptr;
 	}
 	if ( !mem_heap ) {
 #ifdef CRASH_ON_STATIC_ALLOCATION
@@ -1087,7 +1087,7 @@ Mem_Alloc16
 */
 void *Mem_Alloc16( const int size ) {
 	if ( !size ) {
-		return NULL;
+		return nullptr;
 	}
 	if ( !mem_heap ) {
 #ifdef CRASH_ON_STATIC_ALLOCATION
@@ -1160,7 +1160,7 @@ char *Mem_CopyString( const char *in ) {
 Mem_Dump_f
 ==================
 */
-void Mem_Dump_f( const arcCommandArgs &args ) {
+void Mem_Dump_f( const anCommandArgs &args ) {
 }
 
 /*
@@ -1168,7 +1168,7 @@ void Mem_Dump_f( const arcCommandArgs &args ) {
 Mem_DumpCompressed_f
 ==================
 */
-void Mem_DumpCompressed_f( const arcCommandArgs &args ) {
+void Mem_DumpCompressed_f( const anCommandArgs &args ) {
 }
 
 /*
@@ -1177,7 +1177,7 @@ Mem_Init
 ==================
 */
 void Mem_Init( void ) {
-	mem_heap = new aRcHeap;
+	mem_heap = new anHeap;
 	Mem_ClearFrameStats();
 }
 
@@ -1187,8 +1187,8 @@ Mem_Shutdown
 ==================
 */
 void Mem_Shutdown( void ) {
-	aRcHeap *m = mem_heap;
-	mem_heap = NULL;
+	anHeap *m = mem_heap;
+	mem_heap = nullptr;
 	delete m;
 }
 
@@ -1201,7 +1201,7 @@ void Mem_EnableLeakTest( const char *name ) {
 }
 
 
-#else /* !ID_DEBUG_MEMORY */
+#else /* !ARC_DEBUG_MEMORY */
 
 #undef		Mem_Alloc
 #undef		Mem_ClearedAlloc
@@ -1224,7 +1224,7 @@ typedef struct debugMemory_s {
 	struct debugMemory_s *	next;
 } debugMemory_t;
 
-static debugMemory_t *	mem_debugMemory = NULL;
+static debugMemory_t *	mem_debugMemory = nullptr;
 static char				mem_leakName[256] = "";
 
 /*
@@ -1234,7 +1234,7 @@ Mem_CleanupFileName
 */
 const char *Mem_CleanupFileName( const char *fileName ) {
 	int i1, i2;
-	arcNetString newFileName;
+	anString newFileName;
 	static char newFileNames[4][MAX_STRING_CHARS];
 	static int index;
 
@@ -1270,7 +1270,7 @@ void Mem_Dump( const char *fileName ) {
 	int i, numBlocks, totalSize;
 	char dump[32], *ptr;
 	debugMemory_t *b;
-	arcNetString module, funcName;
+	anString module, funcName;
 	FILE *f;
 
 	f = fopen( fileName, "wb" );
@@ -1282,7 +1282,7 @@ void Mem_Dump( const char *fileName ) {
 	for ( numBlocks = 0, b = mem_debugMemory; b; b = b->next, numBlocks++ ) {
 		ptr = ( (char *) b) + sizeof( debugMemory_t );
 		totalSize += b->size;
-		for ( i = 0; i < (sizeof( dump )-1 ) && i < b->size; i++ ) {
+		for ( i = 0; i < ( sizeof( dump )-1 ) && i < b->size; i++ ) {
 			if ( ptr[i] >= 32 && ptr[i] < 127 ) {
 				dump[i] = ptr[i];
 			} else {
@@ -1291,14 +1291,14 @@ void Mem_Dump( const char *fileName ) {
 		}
 		dump[i] = '\0';
 		if ( ( b->size >> 10 ) != 0 ) {
-			fprintf( f, "size: %6d KB: %s, line: %d [%s], call stack: %s\r\n", ( b->size >> 10 ), Mem_CleanupFileName(b->fileName), b->lineNumber, dump, arcLibrary::sys->GetCallStackStr( b->callStack, MAX_CALLSTACK_DEPTH ) );
+			fprintf( f, "size: %6d KB: %s, line: %d [%s], call stack: %s\r\n", ( b->size >> 10 ), Mem_CleanupFileName(b->fileName), b->lineNumber, dump, anLibrary::sys->GetCallStackStr( b->callStack, MAX_CALLSTACK_DEPTH ) );
 		}
 		else {
-			fprintf( f, "size: %7d B: %s, line: %d [%s], call stack: %s\r\n", b->size, Mem_CleanupFileName(b->fileName), b->lineNumber, dump, arcLibrary::sys->GetCallStackStr( b->callStack, MAX_CALLSTACK_DEPTH ) );
+			fprintf( f, "size: %7d B: %s, line: %d [%s], call stack: %s\r\n", b->size, Mem_CleanupFileName(b->fileName), b->lineNumber, dump, anLibrary::sys->GetCallStackStr( b->callStack, MAX_CALLSTACK_DEPTH ) );
 		}
 	}
 
-	arcLibrary::sys->ShutdownSymbols();
+	anLibrary::sys->ShutdownSymbols();
 
 	fprintf( f, "%8d total memory blocks allocated\r\n", numBlocks );
 	fprintf( f, "%8d KB memory allocated\r\n", ( totalSize >> 10 ) );
@@ -1311,7 +1311,7 @@ void Mem_Dump( const char *fileName ) {
 Mem_Dump_f
 ==================
 */
-void Mem_Dump_f( const arcCommandArgs &args ) {
+void Mem_Dump_f( const anCommandArgs &args ) {
 	const char *fileName;
 
 	if ( args.Argc() >= 2 ) {
@@ -1346,15 +1346,15 @@ typedef enum {
 void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sortCallStack, int numFrames ) {
 	int numBlocks, totalSize, r, j;
 	debugMemory_t *b;
-	allocInfo_t *a, *nexta, *allocInfo = NULL, *sortedAllocInfo = NULL, *prevSorted, *nextSorted;
-	arcNetString module, funcName;
+	allocInfo_t *a, *nexta, *allocInfo = nullptr, *sortedAllocInfo = nullptr, *prevSorted, *nextSorted;
+	anString module, funcName;
 	FILE *f;
 
 	// build list with memory allocations
 	totalSize = 0;
 	numBlocks = 0;
 	for ( b = mem_debugMemory; b; b = b->next ) {
-		if ( numFrames && b->frameNumber < arcLibrary::frameNumber - numFrames ) {
+		if ( numFrames && b->frameNumber < anLibrary::frameNumber - numFrames ) {
 			continue;
 		}
 
@@ -1374,7 +1374,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 			if ( j < MAX_CALLSTACK_DEPTH ) {
 				continue;
 			}
-			if ( arcNetString::Cmp( a->fileName, b->fileName ) != 0 ) {
+			if ( anString::Cmp( a->fileName, b->fileName ) != 0 ) {
 				continue;
 			}
 			a->numAllocs++;
@@ -1400,8 +1400,8 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 	// sort list
 	for ( a = allocInfo; a; a = nexta ) {
 		nexta = a->next;
-		prevSorted = NULL;
-		switch( memSort ) {
+		prevSorted = nullptr;
+		switch ( memSort ) {
 			// sort on size
 			case MEMSORT_SIZE: {
 				for ( nextSorted = sortedAllocInfo; nextSorted; nextSorted = nextSorted->next ) {
@@ -1415,7 +1415,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 			// sort on file name and line number
 			case MEMSORT_LOCATION: {
 				for ( nextSorted = sortedAllocInfo; nextSorted; nextSorted = nextSorted->next ) {
-					r = arcNetString::Cmp( Mem_CleanupFileName( a->fileName ), Mem_CleanupFileName( nextSorted->fileName ) );
+					r = anString::Cmp( Mem_CleanupFileName( a->fileName ), Mem_CleanupFileName( nextSorted->fileName ) );
 					if ( r < 0 || ( r == 0 && a->lineNumber < nextSorted->lineNumber ) ) {
 						break;
 					}
@@ -1461,11 +1461,11 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 	// write list to file
 	for ( a = sortedAllocInfo; a; a = nexta ) {
 		nexta = a->next;
-		fprintf( f, "size: %6d KB, allocs: %5d: %s, line: %d, call stack: %s\r\n", (a->size >> 10), a->numAllocs, Mem_CleanupFileName(a->fileName), a->lineNumber, arcLibrary::sys->GetCallStackStr( a->callStack, MAX_CALLSTACK_DEPTH ) );
+		fprintf( f, "size: %6d KB, allocs: %5d: %s, line: %d, call stack: %s\r\n", (a->size >> 10), a->numAllocs, Mem_CleanupFileName(a->fileName), a->lineNumber, anLibrary::sys->GetCallStackStr( a->callStack, MAX_CALLSTACK_DEPTH ) );
 		::free( a );
 	}
 
-	arcLibrary::sys->ShutdownSymbols();
+	anLibrary::sys->ShutdownSymbols();
 
 	fprintf( f, "%8d total memory blocks allocated\r\n", numBlocks );
 	fprintf( f, "%8d KB memory allocated\r\n", ( totalSize >> 10 ) );
@@ -1478,7 +1478,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 Mem_DumpCompressed_f
 ==================
 */
-void Mem_DumpCompressed_f( const arcCommandArgs &args ) {
+void Mem_DumpCompressed_f( const anCommandArgs &args ) {
 	int argNum;
 	const char *arg, *fileName;
 	memorySortType_t memSort = MEMSORT_LOCATION;
@@ -1489,25 +1489,25 @@ void Mem_DumpCompressed_f( const arcCommandArgs &args ) {
 	arg = args.Argv( argNum );
 	while ( arg[0] == '-' ) {
 		arg = args.Argv( ++argNum );
-		if ( arcNetString::Icmp( arg, "s" ) == 0 ) {
+		if ( anString::Icmp( arg, "s" ) == 0 ) {
 			memSort = MEMSORT_SIZE;
-		} else if ( arcNetString::Icmp( arg, "l" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "l" ) == 0 ) {
 			memSort = MEMSORT_LOCATION;
-		} else if ( arcNetString::Icmp( arg, "a" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "a" ) == 0 ) {
 			memSort = MEMSORT_NUMALLOCS;
-		} else if ( arcNetString::Icmp( arg, "cs1" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "cs1" ) == 0 ) {
 			memSort = MEMSORT_CALLSTACK;
 			sortCallStack = 2;
-		} else if ( arcNetString::Icmp( arg, "cs2" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "cs2" ) == 0 ) {
 			memSort = MEMSORT_CALLSTACK;
 			sortCallStack = 1;
-		} else if ( arcNetString::Icmp( arg, "cs3" ) == 0 ) {
+		} else if ( anString::Icmp( arg, "cs3" ) == 0 ) {
 			memSort = MEMSORT_CALLSTACK;
 			sortCallStack = 0;
 		} else if ( arg[0] == 'f' ) {
 			numFrames = atoi( arg + 1 );
 		} else {
-			arcLibrary::common->Printf( "memoryDumpCompressed [options] [filename]\n"
+			anLibrary::common->Printf( "memoryDumpCompressed [options] [filename]\n"
 						"options:\n"
 						"  -s     sort on size\n"
 						"  -l     sort on location\n"
@@ -1540,7 +1540,7 @@ void *Mem_AllocDebugMemory( const int size, const char *fileName, const int line
 	debugMemory_t *m;
 
 	if ( !size ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( !mem_heap ) {
@@ -1553,8 +1553,7 @@ void *Mem_AllocDebugMemory( const int size, const char *fileName, const int line
 
 	if ( align16 ) {
 		p = mem_heap->Allocate16( size + sizeof( debugMemory_t ) );
-	}
-	else {
+	} else {
 		p = mem_heap->Allocate( size + sizeof( debugMemory_t ) );
 	}
 
@@ -1563,17 +1562,17 @@ void *Mem_AllocDebugMemory( const int size, const char *fileName, const int line
 	m = (debugMemory_t *) p;
 	m->fileName = fileName;
 	m->lineNumber = lineNumber;
-	m->frameNumber = arcLibrary::frameNumber;
+	m->frameNumber = anLibrary::frameNumber;
 	m->size = size;
 	m->next = mem_debugMemory;
-	m->prev = NULL;
+	m->prev = nullptr;
 	if ( mem_debugMemory ) {
 		mem_debugMemory->prev = m;
 	}
 	mem_debugMemory = m;
-	arcLibrary::sys->GetCallStack( m->callStack, MAX_CALLSTACK_DEPTH );
+	anLibrary::sys->GetCallStack( m->callStack, MAX_CALLSTACK_DEPTH );
 
-	return ( ( ( byte * ) p ) + sizeof( debugMemory_t ) );
+	return ( ( (byte *) p ) + sizeof( debugMemory_t ) );
 }
 
 /*
@@ -1583,7 +1582,6 @@ Mem_FreeDebugMemory
 */
 void Mem_FreeDebugMemory( void *p, const char *fileName, const int lineNumber, const bool align16 ) {
 	debugMemory_t *m;
-
 	if ( !p ) {
 		return;
 	}
@@ -1597,10 +1595,10 @@ void Mem_FreeDebugMemory( void *p, const char *fileName, const int lineNumber, c
 		return;
 	}
 
-	m = (debugMemory_t *) ( ( ( byte * ) p ) - sizeof( debugMemory_t ) );
+	m = (debugMemory_t *) ( ( (byte *) p ) - sizeof( debugMemory_t ) );
 
 	if ( m->size < 0 ) {
-		arcLibrary::common->FatalError( "memory freed twice, first from %s, now from %s", arcLibrary::sys->GetCallStackStr( m->callStack, MAX_CALLSTACK_DEPTH ), arcLibrary::sys->GetCallStackCurStr( MAX_CALLSTACK_DEPTH ) );
+		anLibrary::common->FatalError( "memory freed twice, first from %s, now from %s", anLibrary::sys->GetCallStackStr( m->callStack, MAX_CALLSTACK_DEPTH ), anLibrary::sys->GetCallStackCurStr( MAX_CALLSTACK_DEPTH ) );
 	}
 
 	Mem_UpdateFreeStats( m->size );
@@ -1610,21 +1608,19 @@ void Mem_FreeDebugMemory( void *p, const char *fileName, const int lineNumber, c
 	}
 	if ( m->prev ) {
 		m->prev->next = m->next;
-	}
-	else {
+	} else {
 		mem_debugMemory = m->next;
 	}
 
 	m->fileName = fileName;
 	m->lineNumber = lineNumber;
-	m->frameNumber = arcLibrary::frameNumber;
+	m->frameNumber = anLibrary::frameNumber;
 	m->size = -m->size;
-	arcLibrary::sys->GetCallStack( m->callStack, MAX_CALLSTACK_DEPTH );
+	anLibrary::sys->GetCallStack( m->callStack, MAX_CALLSTACK_DEPTH );
 
 	if ( align16 ) {
  		mem_heap->Free16( m );
-	}
-	else {
+	} else {
  		mem_heap->Free( m );
 	}
 }
@@ -1636,7 +1632,7 @@ Mem_Alloc
 */
 void *Mem_Alloc( const int size, const char *fileName, const int lineNumber ) {
 	if ( !size ) {
-		return NULL;
+		return nullptr;
 	}
 	return Mem_AllocDebugMemory( size, fileName, lineNumber, false );
 }
@@ -1660,7 +1656,7 @@ Mem_Alloc16
 */
 void *Mem_Alloc16( const int size, const char *fileName, const int lineNumber ) {
 	if ( !size ) {
-		return NULL;
+		return nullptr;
 	}
 	void *mem = Mem_AllocDebugMemory( size, fileName, lineNumber, true );
 	// make sure the memory is 16 byte aligned
@@ -1712,7 +1708,7 @@ Mem_Init
 ==================
 */
 void Mem_Init( void ) {
-	mem_heap = new aRcHeap;
+	mem_heap = new anHeap;
 }
 
 /*
@@ -1728,8 +1724,8 @@ void Mem_Shutdown( void ) {
 		Mem_DumpCompressed( va( "%s_leak_cs1.txt", mem_leakName ), MEMSORT_CALLSTACK, 2, 0 );
 	}
 
-	aRcHeap *m = mem_heap;
-	mem_heap = NULL;
+	anHeap *m = mem_heap;
+	mem_heap = nullptr;
 	delete m;
 }
 
@@ -1739,7 +1735,7 @@ Mem_EnableLeakTest
 ==================
 */
 void Mem_EnableLeakTest( const char *name ) {
-	arcNetString::Copynz( mem_leakName, name, sizeof( mem_leakName ) );
+	anString::Copynz( mem_leakName, name, sizeof( mem_leakName ) );
 }
 
 #endif

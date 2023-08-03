@@ -1,4 +1,4 @@
-#include "/idlib/precompiled.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 
 #include "tr_local.h"
@@ -36,30 +36,30 @@ bool idRenderModelBeam::IsLoaded() const {
 idRenderModelBeam::InstantiateDynamicModel
 ===============
 */
-ARCRenderModel *idRenderModelBeam::InstantiateDynamicModel( const struct renderEntity_s *renderEntity, const struct viewDef_s *viewDef, ARCRenderModel *cachedModel ) {
-	aRcModelStatic *staticModel;
-	surfTriangles_t *tri;
+anRenderModel *idRenderModelBeam::InstantiateDynamicModel( const struct renderEntity_s *renderEntity, const struct viewDef_s *viewDef, anRenderModel *cachedModel ) {
+	anModelStatic *staticModel;
+	srfTriangles_t *tri;
 	modelSurface_t surf;
 
 	if ( cachedModel ) {
 		delete cachedModel;
-		cachedModel = NULL;
+		cachedModel = nullptr;
 	}
 
-	if ( renderEntity == NULL || viewDef == NULL ) {
+	if ( renderEntity == nullptr || viewDef == nullptr ) {
 		delete cachedModel;
-		return NULL;
+		return nullptr;
 	}
 
-	if ( cachedModel != NULL ) {
-		assert( dynamic_cast<aRcModelStatic *>( cachedModel ) != NULL );
-		assert( arcNetString::Icmp( cachedModel->Name(), beam_SnapshotName ) == 0 );
+	if ( cachedModel != nullptr ) {
+		assert( dynamic_cast<anModelStatic *>( cachedModel ) != nullptr );
+		assert( anString::Icmp( cachedModel->Name(), beam_SnapshotName ) == 0 );
 
-		staticModel = static_cast<aRcModelStatic *>( cachedModel );
+		staticModel = static_cast<anModelStatic *>( cachedModel );
 		surf = *staticModel->Surface( 0 );
 		tri = surf.geometry;
 	} else {
-		staticModel = new aRcModelStatic;
+		staticModel = new anModelStatic;
 		staticModel->InitEmpty( beam_SnapshotName );
 
 		tri = R_AllocStaticTriSurf();
@@ -98,31 +98,31 @@ ARCRenderModel *idRenderModelBeam::InstantiateDynamicModel( const struct renderE
 		staticModel->AddSurface( surf );
 	}
 
-	arcVec3	target = *reinterpret_cast<const arcVec3 *>( &renderEntity->shaderParms[SHADERPARM_BEAM_END_X] );
+	anVec3	target = *reinterpret_cast<const anVec3 *>( &renderEntity->shaderParms[SHADERPARM_BEAM_END_X] );
 
 	// we need the view direction to project the minor axis of the tube
 	// as the view changes
-	arcVec3	localView, localTarget;
+	anVec3	localView, localTarget;
 	float	modelMatrix[16];
 	R_AxisToModelMatrix( renderEntity->axis, renderEntity->origin, modelMatrix );
 	R_GlobalPointToLocal( modelMatrix, viewDef->renderView.vieworg, localView );
 	R_GlobalPointToLocal( modelMatrix, target, localTarget );
 
-	arcVec3	major = localTarget;
-	arcVec3	minor;
+	anVec3	major = localTarget;
+	anVec3	minor;
 
-	arcVec3	mid = 0.5f * localTarget;
-	arcVec3	dir = mid - localView;
+	anVec3	mid = 0.5f * localTarget;
+	anVec3	dir = mid - localView;
 	minor.Cross( major, dir );
 	minor.Normalize();
 	if ( renderEntity->shaderParms[SHADERPARM_BEAM_WIDTH] != 0.0f ) {
 		minor *= renderEntity->shaderParms[SHADERPARM_BEAM_WIDTH] * 0.5f;
 	}
 
-	int red		= arcMath::FtoiFast( renderEntity->shaderParms[SP_RED] * 255.0f );
-	int green	= arcMath::FtoiFast( renderEntity->shaderParms[SP_GREEN] * 255.0f );
-	int blue	= arcMath::FtoiFast( renderEntity->shaderParms[SS_BLUE] * 255.0f );
-	int alpha	= arcMath::FtoiFast( renderEntity->shaderParms[SS_APLHA] * 255.0f );
+	int red		= anMath::FtoiFast( renderEntity->shaderParms[SP_RED] * 255.0f );
+	int green	= anMath::FtoiFast( renderEntity->shaderParms[SP_GREEN] * 255.0f );
+	int blue	= anMath::FtoiFast( renderEntity->shaderParms[SS_BLUE] * 255.0f );
+	int alpha	= anMath::FtoiFast( renderEntity->shaderParms[SS_APLHA] * 255.0f );
 
 	tri->verts[0].xyz = minor;
 	tri->verts[0].color[0] = red;
@@ -160,15 +160,15 @@ ARCRenderModel *idRenderModelBeam::InstantiateDynamicModel( const struct renderE
 idRenderModelBeam::Bounds
 ===============
 */
-arcBounds idRenderModelBeam::Bounds( const struct renderEntity_s *renderEntity ) const {
-	arcBounds	b;
+anBounds idRenderModelBeam::Bounds( const struct renderEntity_s *renderEntity ) const {
+	anBounds	b;
 
 	b.Zero();
 	if ( !renderEntity ) {
 		b.ExpandSelf( 8.0f );
 	} else {
-		arcVec3	target = *reinterpret_cast<const arcVec3 *>( &renderEntity->shaderParms[SHADERPARM_BEAM_END_X] );
-		arcVec3	localTarget;
+		anVec3	target = *reinterpret_cast<const anVec3 *>( &renderEntity->shaderParms[SHADERPARM_BEAM_END_X] );
+		anVec3	localTarget;
 		float	modelMatrix[16];
 		R_AxisToModelMatrix( renderEntity->axis, renderEntity->origin, modelMatrix );
 		R_GlobalPointToLocal( modelMatrix, target, localTarget );

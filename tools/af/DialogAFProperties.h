@@ -34,9 +34,9 @@ class DialogAFProperties : public CDialog {
 	DECLARE_DYNAMIC(DialogAFProperties)
 
 public:
-						DialogAFProperties( CWnd* pParent = NULL );   // standard constructor
+						DialogAFProperties( CWnd* pParent = nullptr );   // standard constructor
 	virtual				~DialogAFProperties();
-	void				LoadFile( arcDeclAF *af );
+	void				LoadFile( anDeclAF *af );
 	void				SaveFile( void );
 
 	DialogAFBody *		bodyDlg;
@@ -78,7 +78,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	arcDeclAF *			file;
+	anDeclAF *			file;
 
 	//{{AFX_DATA(DialogAFProperties)
 	CEdit				m_editModel;

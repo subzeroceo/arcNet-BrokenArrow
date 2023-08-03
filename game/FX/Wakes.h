@@ -10,22 +10,22 @@ struct sdWakeParms {
 
 	static const int MAX_POINTS = 4;
 
-	const arcMaterial *centerMat;
-	const arcMaterial *edgeMat;
-	arcVec2 centerWidths;
-	arcVec2 edgeWidths;
-	arcVec2 centerScales;
-	arcVec2 edgeScales;
-	arcVec2 centerTexCoord;
-	arcVec2 edgeTexCoord;
+	const anMaterial *centerMat;
+	const anMaterial *edgeMat;
+	anVec2 centerWidths;
+	anVec2 edgeWidths;
+	anVec2 centerScales;
+	anVec2 edgeScales;
+	anVec2 centerTexCoord;
+	anVec2 edgeTexCoord;
 	int maxVisDist;
 
 	int numPoints;
-	arcVec3 points[MAX_POINTS];
-	arcVec3 normals[MAX_POINTS];
+	anVec3 points[MAX_POINTS];
+	anVec3 normals[MAX_POINTS];
 
 	bool noWake;
-	void ParseFromDict( const arcDict &spawnArgs );
+	void ParseFromDict( const anDict &spawnArgs );
 };
 
 struct sdWakeNode {
@@ -40,7 +40,7 @@ public:
 	static const int MAX_NODES = 64;
 
 private:
-	arcDrawVert *triangleVerts;
+	anDrawVertex *triangleVerts;
 	int	firstVert;	//Index of first vertex in the triangle list where this layer can write to
 
 	int numNodes;
@@ -60,8 +60,8 @@ private:
 	float	texOfs;			// How far have we traveled "in curve parameter space"
 	float	negScale;
 	float	posScale;
-	arcVec3	lastOrigin;		// Origin of last "node" call
-	arcVec3	lastDeriv;		// First order derivative of last node
+	anVec3	lastOrigin;		// Origin of last "node" call
+	anVec3	lastDeriv;		// First order derivative of last node
 
 	int		AddToBack( sdWakeNode &node );
 	void	PopFront();
@@ -70,8 +70,8 @@ private:
 
 public:
 	sdWakeLayer( void );
-	void	Init( arcDrawVert *triangleVerts, int firstVertex );
-	void	AddNode( const arcVec3 &origin, const arcVec3 &emitLeft, float alpha );
+	void	Init( anDrawVertex *triangleVerts, int firstVertex );
+	void	AddNode( const anVec3 &origin, const anVec3 &emitLeft, float alpha );
 	void	Update( struct srfTriangles_t *triangles );
 	void	Break( void );
 
@@ -86,11 +86,11 @@ class sdWake : public HardcodedParticleSystem {
 
 	static const int MAX_POINTS = 4;
 
-	arcVec3 minPoint;
-	arcVec3 maxPoint;
+	anVec3 minPoint;
+	anVec3 maxPoint;
 	int nextNodeTime;
 
-	arcNetList< arcDrawVert > triangleVerts[2];
+	anList< anDrawVertex > triangleVerts[2];
 
 
 //	srfTriangles_t *	GetTriSurf( int index ) { return renderEntity.hModel->Surface( index )->geometry; }
@@ -100,18 +100,18 @@ class sdWake : public HardcodedParticleSystem {
 	sdWakeLayer layer3;
 
 	int numPoints;
-	arcVec3 points[MAX_POINTS];
-	arcVec3 normals[MAX_POINTS];
+	anVec3 points[MAX_POINTS];
+	anVec3 normals[MAX_POINTS];
 	bool stopped;
 	int ticket;
 
-	void AddPoint( const arcVec3 &point );
+	void AddPoint( const anVec3 &point );
 	void ClearPoints( void );
 
 public:
     sdWake( void );
 	void Init(  const sdWakeParms &params, int ticket );
-	void Update( const arcVec3 &forward, const arcVec3 &origin, const arcMat3 &axis );
+	void Update( const anVec3 &forward, const anVec3 &origin, const anMat3 &axis );
 	void Update( void );
 	void Break( void );
 	bool HasStopped( void );
@@ -127,11 +127,11 @@ class sdWakeManagerLocal {
 	sdWake *wakes;
 
 public:
-	sdWakeManagerLocal() : wakes(NULL), numWakes(0) {}
+	sdWakeManagerLocal() : wakes(nullptr ), numWakes(0) {}
 	void Init( void );
 	void Deinit( void );
 	unsigned int AllocateWake( const sdWakeParms &params );
-	bool UpdateWake( unsigned int handle, const arcVec3 &forward, const arcVec3 &origin, const arcMat3 &axis );
+	bool UpdateWake( unsigned int handle, const anVec3 &forward, const anVec3 &origin, const anMat3 &axis );
 	void BreakWake( unsigned int wake );
 	void Think( void );
 };

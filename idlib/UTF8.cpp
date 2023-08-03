@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "../Lib.h"
 #pragma hdrstop
 
 template< typename T > ARC_INLINE bool Is1ByteUTF8SequenceStart( const T value ) { return ( ( value & 0x80 ) == 0x00 ); }
@@ -10,10 +10,10 @@ template< typename T > ARC_INLINE bool Is2ByteUTF8Sequence( const T value ) { re
 
 /*
 ============
-arcNetUTF8::arcNetUTF8
+anUTF8::anUTF8
 ============
 */
-arcNetUTF8::arcNetUTF8( arcNetFile* file ) {
+anUTF8::anUTF8( anFile* file ) {
 	Init();
 	EnsureAlloced( file->Length() );
 	len = alloced;
@@ -22,10 +22,10 @@ arcNetUTF8::arcNetUTF8( arcNetFile* file ) {
 
 /*
 ============
-arcNetUTF8::arcNetUTF8
+anUTF8::anUTF8
 ============
 */
-arcNetUTF8::arcNetUTF8( const byte* data, const int size ) {
+anUTF8::anUTF8( const byte* data, const int size ) {
 	Init();
 	EnsureAlloced( size );
 	len = alloced;
@@ -34,10 +34,10 @@ arcNetUTF8::arcNetUTF8( const byte* data, const int size ) {
 
 /*
 ============
-arcNetUTF8::DecodeLength
+anUTF8::DecodeLength
 ============
 */
-int arcNetUTF8::DecodeLength() const {
+int anUTF8::DecodeLength() const {
 	// count the number of characters in the UTF-8 data
 	int length = 0;
 
@@ -69,10 +69,10 @@ int arcNetUTF8::DecodeLength() const {
 
 /*
 ============
-arcNetUTF8::Decode
+anUTF8::Decode
 ============
 */
-int arcNetUTF8::Decode( wchar_t *to ) const {
+int anUTF8::Decode( wchar_t *to ) const {
 	int i = 0;
 	wchar_t *ptr = to;
 
@@ -87,17 +87,15 @@ int arcNetUTF8::Decode( wchar_t *to ) const {
 	}
 
 	*ptr = L'\0';
-
 	return ( ptr - to );
 }
 
-
 /*
 ============
-arcNetUTF8::Encode
+anUTF8::Encode
 ============
 */
-void arcNetUTF8::Encode( arcNetFile* file, const wchar_t* data, int len ) {
+void anUTF8::Encode( anFile* file, const wchar_t* data, int len ) {
 	int index = 0;
 
 	while( index < len ) {
@@ -117,10 +115,10 @@ void arcNetUTF8::Encode( arcNetFile* file, const wchar_t* data, int len ) {
 
 /*
 ============
-arcNetUTF8::UTF8toUCS2
+anUTF8::UTF8toUCS2
 ============
 */
-int arcNetUTF8::UTF8toUCS2( const byte* data, const int len, wchar_t* ucs2 ) const {
+int anUTF8::UTF8toUCS2( const byte* data, const int len, wchar_t* ucs2 ) const {
 	if ( len < 1 ) {
 		return -1;
 	}
