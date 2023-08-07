@@ -33,7 +33,7 @@ public:
 protected:
 
 // abahr: removed const from function
-	void				CallScript( anEntity* scriptEntity );
+	void				CallScript( anEntity *scriptEntity );
 
 
 	void				Event_Enable( void );
@@ -73,7 +73,7 @@ private:
 	float				delay;
 	float				random_delay;
 	int					nextTriggerTime;
-	anString				requires;
+	anStr				requires;
 	int					removeItem;
 	bool				touchClient;
 	bool				touchOther;
@@ -127,7 +127,7 @@ private:
 	float				random_delay;
 	int					nextTriggerTime;
 	bool				triggerFirst;
-	anString				entityName;
+	anStr				entityName;
 
 	void				TriggerAction( anEntity *activator );
 	void				Event_TriggerAction( anEntity *activator );
@@ -162,8 +162,8 @@ private:
 	float				wait;
 	bool				on;
 	float				delay;
-	anString				onName;
-	anString				offName;
+	anStr				onName;
+	anStr				offName;
 
 	void				Event_Timer( void );
 	void				Event_Use( anEntity *activator );

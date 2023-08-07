@@ -27,7 +27,7 @@ This is a row-major matrix and transforms are applied with left-multiplication.
 class anGLMatrix {
 public:
 							anGLMatrix() {}
-	ARC_INLINE				anGLMatrix(	float a0, float a1, float a2, float a3,
+	inline				anGLMatrix(	float a0, float a1, float a2, float a3,
 											float b0, float b1, float b2, float b3,
 											float c0, float c1, float c2, float c3,
 											float d0, float d1, float d2, float d3 );
@@ -36,33 +36,33 @@ public:
 	float *					operator[]( int index ) { assert( index >= 0 && index < 4 ); return &m[index*4]; }
 
 	void					Zero() { memset( m, 0, sizeof( m ) ); }
-	ARC_INLINE void			Identity();
+	inline void			Identity();
 
 	// Matrix classification (only meant to be used for asserts).
-	ARC_INLINE bool			IsZero( float epsilon ) const;
-	ARC_INLINE bool			IsIdentity( float epsilon ) const;
-	ARC_INLINE bool			IsAffineTransform( float epsilon ) const;
-	ARC_INLINE bool			IsUniformScale( float epsilon ) const;
+	inline bool			IsZero( float epsilon ) const;
+	inline bool			IsIdentity( float epsilon ) const;
+	inline bool			IsAffineTransform( float epsilon ) const;
+	inline bool			IsUniformScale( float epsilon ) const;
 
 	// Transform a point.
 	// NOTE: the anVec3 out variant does not divide by W.
-	ARC_INLINE void			TransformPoint( const anVec3 & in, anVec3 & out ) const;
-	ARC_INLINE void			TransformPoint( const anVec3 & in, anVec4 & out ) const;
-	ARC_INLINE void			TransformPoint( const anVec4 & in, anVec4 & out ) const;
+	inline void			TransformPoint( const anVec3 & in, anVec3 & out ) const;
+	inline void			TransformPoint( const anVec3 & in, anVec4 & out ) const;
+	inline void			TransformPoint( const anVec4 & in, anVec4 & out ) const;
 
 	// These assume the matrix has no non-uniform scaling or shearing.
 	// NOTE: a direction will only stay normalized if the matrix has no skewing or scaling.
-	ARC_INLINE void			TransformDir( const anVec3 & in, anVec3 & out, bool normalize ) const;
-	ARC_INLINE void			TransformPlane( const anPlane & in, anPlane & out, bool normalize ) const;
+	inline void			TransformDir( const anVec3 & in, anVec3 & out, bool normalize ) const;
+	inline void			TransformPlane( const anPlane & in, anPlane & out, bool normalize ) const;
 
 	// These transforms work with non-uniform scaling and shearing by multiplying
 	// with 'transpose(inverse(M))' where this matrix is assumed to be 'inverse(M)'.
-	ARC_INLINE void			InverseTransformDir( const anVec3 & in, anVec3 & out, bool normalize ) const;
-	ARC_INLINE void			InverseTransformPlane( const anPlane & in, anPlane & out, bool normalize ) const;
+	inline void			InverseTransformDir( const anVec3 & in, anVec3 & out, bool normalize ) const;
+	inline void			InverseTransformPlane( const anPlane & in, anPlane & out, bool normalize ) const;
 
 	// Project a point.
-	static ARC_INLINE void	TransformModelToClip( const anVec3 & src, const anGLMatrix & modelMatrix, const anGLMatrix & projectionMatrix, anVec4 & eye, anVec4 & clip );
-	static ARC_INLINE void	TransformClipToDevice( const anVec4 & clip, anVec3 & ndc );
+	static inline void	TransformModelToClip( const anVec3 & src, const anGLMatrix & modelMatrix, const anGLMatrix & projectionMatrix, anVec4 & eye, anVec4 & clip );
+	static inline void	TransformClipToDevice( const anVec4 & clip, anVec3 & ndc );
 
 	// Create a matrix that goes from local space to the space defined by the 'origin' and 'axis'.
 	static void				CreateFromOriginAxis( const anVec3 & origin, const anMat3 & axis, anGLMatrix & out );
@@ -76,8 +76,8 @@ public:
 	static void				CreateProjectionMatrixFov( float xFovDegrees, float yFovDegrees, float zNear, float zFar, float xOffset, float yOffset, anGLMatrix & out );
 
 	// Apply depth hacks to a projection matrix.
-	static ARC_INLINE void	ApplyDepthHack( anGLMatrix & src );
-	static ARC_INLINE void	ApplyModelDepthHack( anGLMatrix & src, float value );
+	static inline void	ApplyDepthHack( anGLMatrix & src );
+	static inline void	ApplyModelDepthHack( anGLMatrix & src, float value );
 
 	// Offset and scale the given matrix such that the result matrix transforms the unit-cube to exactly cover the given bounds (and the inverse).
 	static void				OffsetScaleForBounds( const anGLMatrix & src, const anBounds & bounds, anGLMatrix & out );
@@ -119,7 +119,7 @@ extern const anGLMatrix renderMatrix_windowSpaceToClipSpace;
 anGLMatrix::anGLMatrix
 ========================
 */
-ARC_INLINE anGLMatrix::anGLMatrix(	float a0, float a1, float a2, float a3,
+inline anGLMatrix::anGLMatrix(	float a0, float a1, float a2, float a3,
 											float b0, float b1, float b2, float b3,
 											float c0, float c1, float c2, float c3,
 											float d0, float d1, float d2, float d3 ) {
@@ -134,7 +134,7 @@ ARC_INLINE anGLMatrix::anGLMatrix(	float a0, float a1, float a2, float a3,
 anGLMatrix::Identity
 ========================
 */
-ARC_INLINE void anGLMatrix::Identity() {
+inline void anGLMatrix::Identity() {
 	m[0*4+0] = 1.0f;
 	m[0*4+1] = 0.0f;
 	m[0*4+2] = 0.0f;
@@ -161,7 +161,7 @@ ARC_INLINE void anGLMatrix::Identity() {
 anGLMatrix::IsZero
 ========================
 */
-ARC_INLINE bool anGLMatrix::IsZero( float epsilon ) const {
+inline bool anGLMatrix::IsZero( float epsilon ) const {
 	for ( int i = 0; i < 16; i++ ) {
 		if ( anMath::Fabs( m[i] ) > epsilon ) {
 			return false;
@@ -175,7 +175,7 @@ ARC_INLINE bool anGLMatrix::IsZero( float epsilon ) const {
 anGLMatrix::IsIdentity
 ========================
 */
-ARC_INLINE bool anGLMatrix::IsIdentity( float epsilon ) const {
+inline bool anGLMatrix::IsIdentity( float epsilon ) const {
 	for ( int i = 0; i < 4; i++ ) {
 		for ( int j = 0; j < 4; j++ ) {
 			if ( i == j ) {
@@ -197,7 +197,7 @@ ARC_INLINE bool anGLMatrix::IsIdentity( float epsilon ) const {
 anGLMatrix::IsAffineTransform
 ========================
 */
-ARC_INLINE bool anGLMatrix::IsAffineTransform( float epsilon ) const {
+inline bool anGLMatrix::IsAffineTransform( float epsilon ) const {
 	if ( anMath::Fabs( m[3 * 4 + 0] ) > epsilon ||
 			anMath::Fabs( m[3 * 4 + 1] ) > epsilon ||
 				anMath::Fabs( m[3 * 4 + 2] ) > epsilon ||
@@ -212,7 +212,7 @@ ARC_INLINE bool anGLMatrix::IsAffineTransform( float epsilon ) const {
 anGLMatrix::IsUniformScale
 ========================
 */
-ARC_INLINE bool anGLMatrix::IsUniformScale( float epsilon ) const {
+inline bool anGLMatrix::IsUniformScale( float epsilon ) const {
 	float d0 = anMath::InvSqrt( m[0*4+0] * m[0*4+0] + m[1*4+0] * m[1*4+0] + m[2*4+0] * m[2*4+0] );
 	float d1 = anMath::InvSqrt( m[0*4+1] * m[0*4+1] + m[1*4+1] * m[1*4+1] + m[2*4+1] * m[2*4+1] );
 	float d2 = anMath::InvSqrt( m[0*4+2] * m[0*4+2] + m[1*4+2] * m[1*4+2] + m[2*4+2] * m[2*4+2] );
@@ -227,7 +227,7 @@ ARC_INLINE bool anGLMatrix::IsUniformScale( float epsilon ) const {
 anGLMatrix::TransformPoint
 ========================
 */
-ARC_INLINE void anGLMatrix::TransformPoint( const anVec3 & in, anVec3 & out ) const {
+inline void anGLMatrix::TransformPoint( const anVec3 & in, anVec3 & out ) const {
 	assert( in.ToFloatPtr() != out.ToFloatPtr() );
 	const anGLMatrix & matrix = *this;
 	out[0] = in[0] * matrix[0][0] + in[1] * matrix[0][1] + in[2] * matrix[0][2] + matrix[0][3];
@@ -241,7 +241,7 @@ ARC_INLINE void anGLMatrix::TransformPoint( const anVec3 & in, anVec3 & out ) co
 anGLMatrix::TransformPoint
 ========================
 */
-ARC_INLINE void anGLMatrix::TransformPoint( const anVec3 & in, anVec4 & out ) const {
+inline void anGLMatrix::TransformPoint( const anVec3 & in, anVec4 & out ) const {
 	assert( in.ToFloatPtr() != out.ToFloatPtr() );
 	const anGLMatrix & matrix = *this;
 	out[0] = in[0] * matrix[0][0] + in[1] * matrix[0][1] + in[2] * matrix[0][2] + matrix[0][3];
@@ -255,7 +255,7 @@ ARC_INLINE void anGLMatrix::TransformPoint( const anVec3 & in, anVec4 & out ) co
 anGLMatrix::TransformPoint
 ========================
 */
-ARC_INLINE void anGLMatrix::TransformPoint( const anVec4 & in, anVec4 & out ) const {
+inline void anGLMatrix::TransformPoint( const anVec4 & in, anVec4 & out ) const {
 	assert( in.ToFloatPtr() != out.ToFloatPtr() );
 	const anGLMatrix & matrix = *this;
 	out[0] = in[0] * matrix[0][0] + in[1] * matrix[0][1] + in[2] * matrix[0][2] + in[3] * matrix[0][3];
@@ -269,7 +269,7 @@ ARC_INLINE void anGLMatrix::TransformPoint( const anVec4 & in, anVec4 & out ) co
 anGLMatrix::TransformDir
 ========================
 */
-ARC_INLINE void anGLMatrix::TransformDir( const anVec3 & in, anVec3 & out, bool normalize ) const {
+inline void anGLMatrix::TransformDir( const anVec3 & in, anVec3 & out, bool normalize ) const {
 	const anGLMatrix & matrix = *this;
 	float p0 = in[0] * matrix[0][0] + in[1] * matrix[0][1] + in[2] * matrix[0][2];
 	float p1 = in[0] * matrix[1][0] + in[1] * matrix[1][1] + in[2] * matrix[1][2];
@@ -290,7 +290,7 @@ ARC_INLINE void anGLMatrix::TransformDir( const anVec3 & in, anVec3 & out, bool 
 anGLMatrix::TransformPlane
 ========================
 */
-ARC_INLINE void anGLMatrix::TransformPlane( const anPlane & in, anPlane & out, bool normalize ) const {
+inline void anGLMatrix::TransformPlane( const anPlane & in, anPlane & out, bool normalize ) const {
 	assert( IsUniformScale( 0.01f ) );
 	const anGLMatrix & matrix = *this;
 	float p0 = in[0] * matrix[0][0] + in[1] * matrix[0][1] + in[2] * matrix[0][2];
@@ -316,7 +316,7 @@ ARC_INLINE void anGLMatrix::TransformPlane( const anPlane & in, anPlane & out, b
 anGLMatrix::InverseTransformDir
 ========================
 */
-ARC_INLINE void anGLMatrix::InverseTransformDir( const anVec3 & in, anVec3 & out, bool normalize ) const {
+inline void anGLMatrix::InverseTransformDir( const anVec3 & in, anVec3 & out, bool normalize ) const {
 	assert( in.ToFloatPtr() != out.ToFloatPtr() );
 	const anGLMatrix & matrix = *this;
 	float p0 = in[0] * matrix[0][0] + in[1] * matrix[1][0] + in[2] * matrix[2][0];
@@ -338,7 +338,7 @@ ARC_INLINE void anGLMatrix::InverseTransformDir( const anVec3 & in, anVec3 & out
 anGLMatrix::InverseTransformPlane
 ========================
 */
-ARC_INLINE void anGLMatrix::InverseTransformPlane( const anPlane & in, anPlane & out, bool normalize ) const {
+inline void anGLMatrix::InverseTransformPlane( const anPlane & in, anPlane & out, bool normalize ) const {
 	assert( in.ToFloatPtr() != out.ToFloatPtr() );
 	const anGLMatrix & matrix = *this;
 	float p0 = in[0] * matrix[0][0] + in[1] * matrix[1][0] + in[2] * matrix[2][0] + in[3] * matrix[3][0];
@@ -363,7 +363,7 @@ ARC_INLINE void anGLMatrix::InverseTransformPlane( const anPlane & in, anPlane &
 anGLMatrix::TransformModelToClip
 ========================
 */
-ARC_INLINE void anGLMatrix::TransformModelToClip( const anVec3 & src, const anGLMatrix & modelMatrix, const anGLMatrix & projectionMatrix, anVec4 & eye, anVec4 & clip ) {
+inline void anGLMatrix::TransformModelToClip( const anVec3 & src, const anGLMatrix & modelMatrix, const anGLMatrix & projectionMatrix, anVec4 & eye, anVec4 & clip ) {
 	for ( int i = 0; i < 4; i++ ) {
 		eye[i] =	modelMatrix[i][0] * src[0] +
 					modelMatrix[i][1] * src[1] +
@@ -385,7 +385,7 @@ anGLMatrix::TransformClipToDevice
 Clip to normalized device coordinates.
 ========================
 */
-ARC_INLINE void anGLMatrix::TransformClipToDevice( const anVec4 & clip, anVec3 & ndc ) {
+inline void anGLMatrix::TransformClipToDevice( const anVec4 & clip, anVec3 & ndc ) {
 	assert( anMath::Fabs( clip[3] ) > anMath::FLT_SMALLEST_NON_DENORMAL );
 	float r = 1.0f / clip[3];
 	ndc[0] = clip[0] * r;
@@ -398,7 +398,7 @@ ARC_INLINE void anGLMatrix::TransformClipToDevice( const anVec4 & clip, anVec3 &
 anGLMatrix::ApplyDepthHack
 ========================
 */
-ARC_INLINE void anGLMatrix::ApplyDepthHack( anGLMatrix & src ) {
+inline void anGLMatrix::ApplyDepthHack( anGLMatrix & src ) {
 	// scale projected z by 25%
 	src.m[2*4+0] *= 0.25f;
 	src.m[2*4+1] *= 0.25f;
@@ -411,7 +411,7 @@ ARC_INLINE void anGLMatrix::ApplyDepthHack( anGLMatrix & src ) {
 anGLMatrix::ApplyModelDepthHack
 ========================
 */
-ARC_INLINE void anGLMatrix::ApplyModelDepthHack( anGLMatrix & src, float value ) {
+inline void anGLMatrix::ApplyModelDepthHack( anGLMatrix & src, float value ) {
 	// offset projected z
 	src.m[2*4+3] -= value;
 }
@@ -421,7 +421,7 @@ ARC_INLINE void anGLMatrix::ApplyModelDepthHack( anGLMatrix & src, float value )
 anGLMatrix::CullPointToMVP
 ========================
 */
-ARC_INLINE bool anGLMatrix::CullPointToMVP( const anGLMatrix & mvp, const anVec3 & point, bool zeroToOne ) {
+inline bool anGLMatrix::CullPointToMVP( const anGLMatrix & mvp, const anVec3 & point, bool zeroToOne ) {
 	byte bits;
 	return CullPointToMVPbits( mvp, point, &bits, zeroToOne );
 }
@@ -431,7 +431,7 @@ ARC_INLINE bool anGLMatrix::CullPointToMVP( const anGLMatrix & mvp, const anVec3
 anGLMatrix::CullBoundsToMVP
 ========================
 */
-ARC_INLINE bool anGLMatrix::CullBoundsToMVP( const anGLMatrix & mvp, const anBounds & bounds, bool zeroToOne ) {
+inline bool anGLMatrix::CullBoundsToMVP( const anGLMatrix & mvp, const anBounds & bounds, bool zeroToOne ) {
 	byte bits;
 	return CullBoundsToMVPbits( mvp, bounds, &bits, zeroToOne );
 }
@@ -441,7 +441,7 @@ ARC_INLINE bool anGLMatrix::CullBoundsToMVP( const anGLMatrix & mvp, const anBou
 anGLMatrix::CullExtrudedBoundsToMVP
 ========================
 */
-ARC_INLINE bool anGLMatrix::CullExtrudedBoundsToMVP( const anGLMatrix & mvp, const anBounds & bounds, const anVec3 & extrudeDirection, const anPlane & clipPlane, bool zeroToOne ) {
+inline bool anGLMatrix::CullExtrudedBoundsToMVP( const anGLMatrix & mvp, const anBounds & bounds, const anVec3 & extrudeDirection, const anPlane & clipPlane, bool zeroToOne ) {
 	byte bits;
 	return CullExtrudedBoundsToMVPbits( mvp, bounds, extrudeDirection, clipPlane, &bits, zeroToOne );
 }

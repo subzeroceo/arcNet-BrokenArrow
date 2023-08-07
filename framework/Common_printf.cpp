@@ -16,7 +16,7 @@ anCVarSystem com_printFilter( "com_printFilter", "", CVAR_SYSTEM, "only print li
 anCommonLocal::BeginRedirect
 ==================
 */
-void anCommonLocal::BeginRedirect( char *buffer, int buffersize, void (*flush)( const char *) ) {
+void anCommonLocal::BeginRedirect( char *buffer, int buffersize, void (* flush)(const char *) ) {
 	if ( !buffer || !buffersize || !flush ) {
 		return;
 	}
@@ -33,7 +33,7 @@ anCommonLocal::EndRedirect
 ==================
 */
 void anCommonLocal::EndRedirect() {
-	if ( rd_flush && rd_buffer[ 0 ] ) {
+	if ( rd_flush && rd_buffer[0] ) {
 		rd_flush( rd_buffer );
 	}
 
@@ -82,7 +82,7 @@ void anCommonLocal::VPrintf( const char *fmt, va_list args ) {
 	// so we can see how long different init sections are taking
 	int timeLength = 0;
 	char msg[MAX_PRINT_MSG_SIZE];
-	msg[ 0 ] = '\0';
+	msg[0] = '\0';
 	if ( com_timestampPrints.GetInteger() ) {
 		int	t = Sys_Milliseconds();
 		if ( com_timestampPrints.GetInteger() == 1 ) {
@@ -93,7 +93,7 @@ void anCommonLocal::VPrintf( const char *fmt, va_list args ) {
 	}
 	timeLength = strlen( msg );
 	// don't overflow
-	if ( anString::vsnPrintf( msg+timeLength, MAX_PRINT_MSG_SIZE-timeLength-1, fmt, args ) < 0 ) {
+	if ( anStr::vsnPrintf( msg+timeLength, MAX_PRINT_MSG_SIZE-timeLength-1, fmt, args ) < 0 ) {
 		msg[sizeof( msg )-2] = '\n'; msg[sizeof( msg )-1] = '\0'; // avoid output garbling
 		Sys_Printf( "VPrintf: truncated to %d characters\n", strlen( msg )-1 );
 	}
@@ -107,12 +107,12 @@ void anCommonLocal::VPrintf( const char *fmt, va_list args ) {
 		return;
 	}
 #ifndef ID_RETAIL
-	if ( com_printFilter.GetString() != nullptr && com_printFilter.GetString()[ 0 ] != '\0' ) {
+	if ( com_printFilter.GetString() != nullptr && com_printFilter.GetString()[0] != '\0' ) {
 		anStaticString< 4096 > filterBuf = com_printFilter.GetString();
 		anStaticString< 4096 > msgBuf = msg;
 		filterBuf.ToLower();
 		msgBuf.ToLower();
-		char *sp = strtok( &filterBuf[ 0 ], ";" );
+		char *sp = strtok( &filterBuf[0], ";" );
 		bool p = false;
 		for (; sp != nullptr; ) {
 			if ( strstr( msgBuf, sp ) != nullptr ) {
@@ -135,7 +135,7 @@ void anCommonLocal::VPrintf( const char *fmt, va_list args ) {
 	console->Print( msg );
 
 	// remove any color codes
-	anString::RemoveColors( msg );
+	anStr::RemoveColors( msg );
 
 	// echo to dedicated console and early console
 	Sys_Printf( "%s", msg );
@@ -176,8 +176,8 @@ void anCommonLocal::VPrintf( const char *fmt, va_list args ) {
 
 			time_t aclock;
 			time( &aclock );
-			struct tm * newtime = localtime( &aclock );
-			Printf( "log file '%s' opened on %s\n", fileName, asctime( newtime ) );
+			struct tm * newTime = localTime( &aclock );
+			Printf( "log file '%s' opened on %s\n", fileName, asctime( newTime ) );
 		}
 		if ( logFile ) {
 			logFile->Write( msg, strlen( msg ) );
@@ -227,7 +227,7 @@ void anCommonLocal::DPrintf( const char *fmt, ... ) {
 	}
 
 	va_start( argptr, fmt );
-	anString::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
+	anStr::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
 	va_end( argptr );
 	msg[sizeof( msg )-1] = '\0';
 
@@ -256,7 +256,7 @@ void anCommonLocal::DWarning( const char *fmt, ... ) {
 	}
 
 	va_start( argptr, fmt );
-	anString::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
+	anStr::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
 	va_end( argptr );
 	msg[sizeof( msg )-1] = '\0';
 
@@ -279,7 +279,7 @@ void anCommonLocal::Warning( const char *fmt, ... ) {
 	}
 
 	va_start( argptr, fmt );
-	anString::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
+	anStr::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
 	va_end( argptr );
 	msg[sizeof( msg )-1] = 0;
 
@@ -366,7 +366,7 @@ void anCommonLocal::DumpWarnings() {
 		fileSystem->CloseFile( warningFile );
 
 #ifndef ID_DEBUG
-		anString	osPath;
+		anStr	osPath;
 		osPath = fileSystem->RelativePathToOSPath( "warnings.md", "fs_savepath" );
 		WinExec( va( "Notepad.exe %s", osPath.c_str() ), SW_SHOW );
 #endif
@@ -430,9 +430,9 @@ void anCommonLocal::Error( const char *fmt, ... ) {
 
 	com_errorEntered = code;
 
-	va_start (argptr,fmt);
-	anString::vsnPrintf( errorMessage, sizeof( errorMessage), fmt, argptr );
-	va_end (argptr);
+	va_start ( argptr, fmt );
+	anStr::vsnPrintf( errorMessage, sizeof( errorMessage), fmt, argptr );
+	va_end ( argptr );
 	errorMessage[sizeof( errorMessage)-1] = '\0';
 
 
@@ -487,7 +487,7 @@ void anCommonLocal::FatalError( const char *fmt, ... ) {
 		Sys_Printf( "FATAL: recursed fatal error:\n%s\n", errorMessage );
 
 		va_start( argptr, fmt );
-		anString::vsnPrintf( errorMessage, sizeof( errorMessage), fmt, argptr );
+		anStr::vsnPrintf( errorMessage, sizeof( errorMessage), fmt, argptr );
 		va_end( argptr );
 		errorMessage[sizeof( errorMessage)-1] = '\0';
 
@@ -499,7 +499,7 @@ void anCommonLocal::FatalError( const char *fmt, ... ) {
 	com_errorEntered = ERP_FATAL;
 
 	va_start( argptr, fmt );
-	anString::vsnPrintf( errorMessage, sizeof( errorMessage), fmt, argptr );
+	anStr::vsnPrintf( errorMessage, sizeof( errorMessage), fmt, argptr );
 	va_end( argptr );
 	errorMessage[sizeof( errorMessage)-1] = '\0';
 

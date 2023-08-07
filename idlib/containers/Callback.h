@@ -95,7 +95,7 @@ private:
 MakeCallback
 ========================
 */
-ARC_INLINE_EXTERN anCallBackStatic MakeCallback( void ( *f )( void ) ) {
+inline_EXTERN anCallBackStatic MakeCallback( void ( *f )( void ) ) {
 	return anCallBackStatic( f );
 }
 
@@ -105,7 +105,7 @@ MakeCallback
 ========================
 */
 template <class T>
-ARC_INLINE_EXTERN anCallBackBindMem<T> MakeCallback( T * t, void ( T::*f )( void ) ) {
+inline_EXTERN anCallBackBindMem<T> MakeCallback( T * t, void ( T::*f )( void ) ) {
 	return anCallBackBindMem<T>( t, f );
 }
 
@@ -115,7 +115,7 @@ MakeCallback
 ========================
 */
 template <class T, typename A1>
-ARC_INLINE_EXTERN anCallBackBindMemArg1<T, A1> MakeCallback( T * t, void ( T::*f )( A1 ), A1 a1 ) {
+inline_EXTERN anCallBackBindMemArg1<T, A1> MakeCallback( T * t, void ( T::*f )( A1 ), A1 a1 ) {
 	return anCallBackBindMemArg1<T, A1>( t, f, a1 );
 }
 

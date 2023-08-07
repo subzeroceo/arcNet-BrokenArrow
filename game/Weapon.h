@@ -33,8 +33,8 @@ public:
 
 	void								Init( idWeapon* _owner ) { owner = _owner; }
 
-	virtual void						HandleNetworkMessage( arcNetBasePlayer* player, const char* message );
-	virtual void						HandleNetworkEvent( const char* message );
+	virtual void						HandleNetworkMessage( anBasePlayer* player, const char *message );
+	virtual void						HandleNetworkEvent( const char *message );
 
 protected:
 	idWeapon*							owner;
@@ -44,7 +44,7 @@ class sdWeaponLockInfo {
 public:
 							sdWeaponLockInfo( void ) { lockingSound = nullptr; lockedSound = nullptr; lockDistance = 0.f; supported = false; lockFriendly = false; sticky = false; }
 
-	void					Load( const anDict& dict );
+	void					Load( const anDict &dict );
 
 	void					SetSupported( bool value ) { supported = value; }
 
@@ -69,12 +69,12 @@ private:
 	const sdDeclTargetInfo*	lockFilter;
 };
 
-class arcNetBasePlayer;
+class anBasePlayer;
 class idProjectile;
 class idMoveableItem;
 class sdPlayerStatEntry;
 
-extern const arcEventDef EV_Weapon_LaunchProjectiles;
+extern const anEventDef EV_Weapon_LaunchProjectiles;
 
 typedef struct modInfo_s {
 	const anDeclEntityDef*	projectileDef;
@@ -127,7 +127,7 @@ enum weaponAimValueIndex_t {
 	WAV_NUM,
 };
 
-class idWeapon : public arcAnimatedEntity {
+class idWeapon : public anAnimatedEntity {
 public:
 	CLASS_PROTOTYPE( idWeapon );
 
@@ -136,8 +136,8 @@ public:
 
 	// Init
 	void					Spawn( void );
-	void					SetOwner( arcNetBasePlayer* _owner );
-	arcNetBasePlayer*				GetOwner( void ) { return owner; }
+	void					SetOwner( anBasePlayer* _owner );
+	anBasePlayer*				GetOwner( void ) { return owner; }
 	virtual bool			ShouldConstructScriptObjectAtSpawn( void ) const;
 
 	virtual bool			StartSynced( void ) const { return true; }
@@ -146,9 +146,9 @@ public:
 
 	virtual bool			NoThink( void ) const { return true; }
 
-	bool					OnActivate( arcNetBasePlayer* player, float distance );
-	bool					OnActivateHeld( arcNetBasePlayer* player, float distance );
-	bool					OnUsed( arcNetBasePlayer* player, float distance );
+	bool					OnActivate( anBasePlayer* player, float distance );
+	bool					OnActivateHeld( anBasePlayer* player, float distance );
+	bool					OnUsed( anBasePlayer* player, float distance );
 	bool					OnWeapNext();
 	bool					OnWeapPrev();
 
@@ -157,7 +157,7 @@ public:
 	// Weapon definition management
 	void					Clear( void );
 	void					LinkScriptVariables( void );
-	void					GetWeaponDef( const sdDeclInvItem* item );
+	void					GetWeaponDef( const anInventoryItem* item );
 	bool					IsLinked( void );
 
 	void					MakeReady( void ) { Event_WeaponReady(); }
@@ -185,7 +185,7 @@ public:
 	void					EndAttack( void );
 
 	void					UpdateSpreadValue( void );
-	void					UpdateSpreadValue( const anVec3& velocity, const anAngles& angles, const anAngles& oldAngles );
+	void					UpdateSpreadValue( const anVec3 &velocity, const anAngles& angles, const anAngles& oldAngles );
 
 	virtual bool			ClientReceiveEvent( int event, int time, const anBitMsg &msg );
 	virtual	bool			ClientReceiveUnreliableEvent( int event, int time, const anBitMsg &msg );
@@ -221,7 +221,7 @@ public:
 	void					SetOwnerStanceState( weaponSpreadValueIndex_t state );
 
 	// Script state management
-	virtual sdProgramThread* ConstructScriptObject( void );
+	virtual idProgramThread* ConstructScriptObject( void );
 	virtual void			DeconstructScriptObject( void );
 	void					SetState( const char *statename, int blendFrames );
 	void					UpdateScript( void );
@@ -262,7 +262,7 @@ public:
 	static void				UnRegisterCVarCallback( void );
 	static void				UpdateWeaponVisibility( void );
 
-	const sdDeclInvItem*	GetInvItemDecl( void ) const { return weaponItem; }
+	const anInventoryItem*	GetInvItemDecl( void ) const { return weaponItem; }
 
 	void					SetNumWorldModels( int count );
 
@@ -272,7 +272,7 @@ public:
 	bool					ActivateAttack( void ) const { return activateAttack; }
 
 private:
-	void					SetupAnimClass( const char* prefix );
+	void					SetupAnimClass( const char *prefix );
 
 	// script control
 	idScriptBool			WEAPON_ATTACK;
@@ -285,10 +285,10 @@ private:
 
 	weaponStatus_t			status;
 
-	sdProgramThread*		thread;
+	idProgramThread*		thread;
 
-	anString					state;
-	anString					idealState;
+	anStr					state;
+	anStr					idealState;
 
 	int						animBlendFrames;
 	int						animDoneTime;
@@ -305,21 +305,21 @@ private:
 	};
 	stats_t					stats;
 
-	const sdProgram::sdFunction*		onActivateFunc;
-	const sdProgram::sdFunction*		onActivateFuncHeld;
-	const sdProgram::sdFunction*		onUsedFunc;
-	const sdProgram::sdFunction*		onWeapNextFunc;
-	const sdProgram::sdFunction*		onWeapPrevFunc;
-	const sdProgram::sdFunction*		cleanupFunc;
-	const sdProgram::sdFunction*		getGrenadeFuseStartFunc;
-	const sdProgram::sdFunction*		ironSightsEnabledFunc;
+	const idProgram::sdFunction*		onActivateFunc;
+	const idProgram::sdFunction*		onActivateFuncHeld;
+	const idProgram::sdFunction*		onUsedFunc;
+	const idProgram::sdFunction*		onWeapNextFunc;
+	const idProgram::sdFunction*		onWeapPrevFunc;
+	const idProgram::sdFunction*		cleanupFunc;
+	const idProgram::sdFunction*		getGrenadeFuseStartFunc;
+	const idProgram::sdFunction*		ironSightsEnabledFunc;
 
 	playerWeaponTypes_t					playerWeaponNum;
 
 	// precreated projectile
-	arcEntity				*projectileEnt;
+	anEntity				*projectileEnt;
 
-	arcNetBasePlayer*										owner;
+	anBasePlayer*										owner;
 
 	anList< rvClientEntityPtr< sdClientAnimated > >	worldModels;
 	anList< jointHandle_t >							barrelJointsWorld;
@@ -383,7 +383,7 @@ private:
 	bool					swayEnabled;
 
 	// weapon definition
-	const sdDeclInvItem*	weaponItem;
+	const anInventoryItem*	weaponItem;
 
 	const sdDeclDamage*		meleeDamage;
 	const sdDeclDamage*		meleeSpecialDamage;
@@ -427,7 +427,7 @@ private:
 	void					InitWorldModel( int index );
 	void					MuzzleRise( anVec3 &origin, anMat3 &axis );
 
-	void					SetupStats( const char* statName );
+	void					SetupStats( const char *statName );
 
 	virtual void			SetSkin( const anDeclSkin* skin );
 
@@ -457,7 +457,7 @@ private:
 	void					Event_GetBlendFrames( animChannel_t channel );
 	void					Event_Next( void );
 	void					Event_LaunchProjectiles( int numProjectiles, int projectileIndex, float spread, float fuseOffset, float launchPower, float dmgPower );
-	void					Event_DoProjectileTracer( int projectileIndex, const anVec3& start, const anVec3& end );
+	void					Event_DoProjectileTracer( int projectileIndex, const anVec3 &start, const anVec3 &end );
 	void					Event_CreateProjectile( int projectileIndex );
 	void					Event_Melee( int contentMask, float distance, bool ignoreOwner, bool useAntiLag );
 	void					Event_MeleeAttack( float damageScale );
@@ -495,20 +495,20 @@ private:
 	void					Event_SetDriftScale( float scale );
 	void					Event_ResetTracerCounter( void );
 	void					Event_GetLastTracer( void );
-	void					Event_SetupAnimClass( const char* prefix );
-	void					Event_HasWeaponAnim( const char* anim );
-	void					Event_SetStatName( const char* statName );
+	void					Event_SetupAnimClass( const char *prefix );
+	void					Event_HasWeaponAnim( const char *anim );
+	void					Event_SetStatName( const char *statName );
 
-	void					Event_SendTracerMessage( const anVec3& start, const anVec3& end, float strength );
+	void					Event_SendTracerMessage( const anVec3 &start, const anVec3 &end, float strength );
 
 	enum {
-		EVENT_RELOAD = arcEntity::EVENT_MAXEVENTS,
+		EVENT_RELOAD = anEntity::EVENT_MAXEVENTS,
 		EVENT_TRACER,		// unreliable event
 		EVENT_MAXEVENTS
 	};
 };
 
-ARC_INLINE bool idWeapon::IsLinked( void ) {
+inline bool idWeapon::IsLinked( void ) {
 	return isLinked;
 }
 

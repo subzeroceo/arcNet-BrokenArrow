@@ -35,7 +35,7 @@ protected:
 anSurface_SweptSpline::anSurface_SweptSpline
 ====================
 */
-ARC_INLINE anSurface_SweptSpline::anSurface_SweptSpline( void ) {
+inline anSurface_SweptSpline::anSurface_SweptSpline( void ) {
 	spline = nullptr;
 	sweptSpline = nullptr;
 }
@@ -45,7 +45,7 @@ ARC_INLINE anSurface_SweptSpline::anSurface_SweptSpline( void ) {
 anSurface_SweptSpline::~anSurface_SweptSpline
 ====================
 */
-ARC_INLINE anSurface_SweptSpline::~anSurface_SweptSpline( void ) {
+inline anSurface_SweptSpline::~anSurface_SweptSpline( void ) {
 	delete spline;
 	delete sweptSpline;
 }
@@ -55,7 +55,7 @@ ARC_INLINE anSurface_SweptSpline::~anSurface_SweptSpline( void ) {
 anSurface_SweptSpline::Clear
 ====================
 */
-ARC_INLINE void anSurface_SweptSpline::Clear( void ) {
+inline void anSurface_SweptSpline::Clear( void ) {
 	anSurface::Clear();
 	delete spline;
 	spline = nullptr;
@@ -199,7 +199,7 @@ public:
 	void SetBaseTime(long t) {baseTime = t;}
 
 protected:
-	anString name;
+	anStr name;
 	float CalcSpline( int step, float tension );
 	anList<anVec3 *> controlPoints;
 	anList<anVec3 *> splinePoints;

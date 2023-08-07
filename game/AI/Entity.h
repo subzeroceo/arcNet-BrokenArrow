@@ -121,7 +121,7 @@ public:
 	int						snapshotSequence;		// last snapshot this entity was in
 	int						snapshotBits;			// number of bits this entity occupied in the last snapshot
 
-	anString					name;					// name of entity
+	anStr					name;					// name of entity
 	anDict					spawnArgs;				// key/value pairs used to spawn and initialize entity
 	idScriptObject			scriptObject;			// contains all script defined data for this entity
 
@@ -219,8 +219,8 @@ public:
 // abahr:
 	bool					IsActive( int flags ) const { return (flags & thinkFlags ) > 0; }
 	const char*				GetEntityDefClassName() const { return spawnArgs.GetString( "classname" ); }
-	bool					IsEntityDefClass( const char* className ) const { return !anString::Icmp(className, GetEntityDefClassName()); }
-	virtual void			GetPosition( anVec3& origin, anMat3& axis ) const;
+	bool					IsEntityDefClass( const char *className ) const { return !anStr::Icmp(className, GetEntityDefClassName()); }
+	virtual void			GetPosition( anVec3 &origin, anMat3 &axis ) const;
 // kfuller: added methods
 	virtual void			GetLocalAngles(anAngles &localAng);
 
@@ -241,8 +241,8 @@ public:
 
 
 // bdube: surfaces
-	void					HideSurface ( const char* surface );
-	void					ShowSurface ( const char* surface );
+	void					HideSurface ( const char *surface );
+	void					ShowSurface ( const char *surface );
 	void					ClearSkin( void );
 
 
@@ -264,7 +264,7 @@ public:
 	virtual
 	void					UpdateModelTransform( void );
 	virtual void			UpdateRenderEntityCallback();
-	virtual const idAnimator *	GetAnimator( void ) const { return nullptr; }	// returns animator object used by this entity
+	virtual const anAnimator *	GetAnimator( void ) const { return nullptr; }	// returns animator object used by this entity
 
 	virtual void			ProjectOverlay( const anVec3 &origin, const anVec3 &dir, float size, const char *material );
 	int						GetNumPVSAreas( void );
@@ -276,7 +276,7 @@ public:
 	virtual bool			UpdateAnimationControllers( void );
 	bool					UpdateRenderEntity( renderEntity_s *renderEntity, const renderView_t *renderView );
 	static bool				ModelCallback( renderEntity_s *renderEntity, const renderView_t *renderView );
-	virtual idAnimator *	GetAnimator( void );	// returns animator object used by this entity
+	virtual anAnimator *	GetAnimator( void );	// returns animator object used by this entity
 
 	// sound
 	virtual bool			CanPlayChatterSounds( void ) const;
@@ -294,21 +294,21 @@ public:
 
 // bdube: added effect functions
 	// effects
-	rvClientEffect*			PlayEffect		( const char* effectName, jointHandle_t joint, const anVec3& originOffset, const anMat3& axisOffset, bool loop = false, const anVec3& endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
-	rvClientEffect*			PlayEffect		( const idDecl *effect, jointHandle_t joint, const anVec3& originOffset, const anMat3& axisOffset, bool loop = false, const anVec3& endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
-	rvClientEffect*			PlayEffect		( const char* effectName, jointHandle_t joint, bool loop = false, const anVec3& endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
+	rvClientEffect*			PlayEffect		( const char *effectName, jointHandle_t joint, const anVec3 &originOffset, const anMat3 &axisOffset, bool loop = false, const anVec3 &endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
+	rvClientEffect*			PlayEffect		( const idDecl *effect, jointHandle_t joint, const anVec3 &originOffset, const anMat3 &axisOffset, bool loop = false, const anVec3 &endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
+	rvClientEffect*			PlayEffect		( const char *effectName, jointHandle_t joint, bool loop = false, const anVec3 &endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
 
-	rvClientEffect*			PlayEffect		( const char* effectName, const anVec3& origin, const anMat3& axis, bool loop = false, const anVec3& endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
-	rvClientEffect*			PlayEffect		( const idDecl *effect, const anVec3& origin, const anMat3& axis, bool loop = false, const anVec3& endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
-	void					StopEffect		( const char* effectName, bool destroyParticles = false );
+	rvClientEffect*			PlayEffect		( const char *effectName, const anVec3 &origin, const anMat3 &axis, bool loop = false, const anVec3 &endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
+	rvClientEffect*			PlayEffect		( const idDecl *effect, const anVec3 &origin, const anMat3 &axis, bool loop = false, const anVec3 &endOrigin = vec3_origin, bool broadcast = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one );
+	void					StopEffect		( const char *effectName, bool destroyParticles = false );
 	void					StopEffect		( const idDecl *effect, bool destroyParticles = false );
 	void					StopAllEffects	( bool destroyParticles = false );
 	void					UpdateEffects	( void );
 
-	float					DistanceTo		( anEntity* ent );
-	float					DistanceTo		( const anVec3& pos ) const;
-	float					DistanceTo2d	( anEntity* ent );
-	float					DistanceTo2d	( const anVec3& pos ) const;
+	float					DistanceTo		( anEntity *ent );
+	float					DistanceTo		( const anVec3 &pos ) const;
+	float					DistanceTo2d	( anEntity *ent );
+	float					DistanceTo2d	( const anVec3 &pos ) const;
 
 	virtual bool			CanTakeDamage	( void ) const;
 
@@ -391,14 +391,14 @@ public:
 
 // kfuller: added blocked methods
 	virtual void			LastBlockedBy( intblockedEntNum) {}
-	virtual int				GetLastBlocker(void) { return -1; }
+	virtual int				GetLastBlocker( void ) { return -1; }
 // rjohnson: moved entity info out of idGameLocal into its own function
 	virtual void			DrawDebugEntityInfo( anBounds *viewBounds = 0, anBounds *viewTextBounds = 0, anVec4 *overrideColor = 0 );
 // nmckenzie: Adding ability for non-Actors to be enemies for AI characters.  Rename this function at some point, most likely.
 	virtual anVec3			GetEyePosition( void ) const { return GetPhysics()->GetOrigin(); }
 // abahr:
 	virtual bool			SkipImpulse( anEntity *ent, int id );
-	virtual void			ApplyImpulse( anEntity* ent, int id, const anVec3& point, const anVec3& dir, const anDict* damageDef );
+	virtual void			ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &dir, const anDict* damageDef );
 
 
 	// damage
@@ -411,13 +411,13 @@ public:
 	virtual anEntity*		GetDamageEntity ( void );
 
 							// returns true if this entity can be damaged from the given origin
-	virtual bool			CanDamage( const anVec3 &origin, anVec3 &damagePoint, anEntity* ignoreEnt = nullptr ) const;
+	virtual bool			CanDamage( const anVec3 &origin, anVec3 &damagePoint, anEntity *ignoreEnt = nullptr ) const;
 
 							// applies damage to this entity
 	virtual	void			Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
 							// adds a damage effect like overlays, blood, sparks, debris etc.
-	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor );
-	virtual bool			CanPlayImpactEffect ( anEntity* attacker, anEntity* target );
+	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor );
+	virtual bool			CanPlayImpactEffect ( anEntity *attacker, anEntity *target );
 							// callback function for when another entity recieved damage from this entity.  damage can be adjusted and returned to the caller.
 	virtual void			DamageFeedback( anEntity *victim, anEntity *inflictor, int &damage );
 							// notifies this entity that it is in pain
@@ -647,15 +647,15 @@ protected:
 // begisler: added
 	void					Event_ClearSkin					( void );
 // bdube: effect events
-	void					Event_PlayEffect				( const char* effectName, const char* boneName, bool loop );
-	void					Event_StopEffect				( const char* effectName );
+	void					Event_PlayEffect				( const char *effectName, const char *boneName, bool loop );
+	void					Event_StopEffect				( const char *effectName );
 	void					Event_StopAllEffects			( void );
 	void					Event_GetHealth					( void );
 // bdube: mesh events
-	void					Event_ShowSurface				( const char* surface );
-	void					Event_HideSurface				( const char* surface );
+	void					Event_ShowSurface				( const char *surface );
+	void					Event_HideSurface				( const char *surface );
 // bdube: gui events
-	void					Event_GuiEvent					( const char* eventName );
+	void					Event_GuiEvent					( const char *eventName );
 // jscott:
 	void					Event_PlaybackCallback			( int type, int changed, int impulse );
 // nmckenzie: get bind master
@@ -665,9 +665,9 @@ protected:
 	void					Event_UnbindTargets				( anEntity *activator);
 // abahr:
 	void					Event_RemoveNullTargets			();
-	void					Event_IsA						( const char* entityDefName );
-	void					Event_IsSameTypeAs				( const anEntity* ent );
-	void					Event_MatchPrefix				( const char *prefix, const char* previousKey );
+	void					Event_IsA						( const char *entityDefName );
+	void					Event_IsSameTypeAs				( const anEntity *ent );
+	void					Event_MatchPrefix				( const char *prefix, const char *previousKey );
 	void					Event_ClearTargetList			( float destroyContents );
 // twhitaker: added - to add targets from script
 	void					Event_AppendTarget				( anEntity *appendMe );
@@ -679,41 +679,41 @@ protected:
 
 
 // bdube: added inlines
-ARC_INLINE rvClientEffect* anEntity::PlayEffect( const char* effectName, const anVec3& origin, const anMat3& axis, bool loop, const anVec3& endOrigin,
+inline rvClientEffect* anEntity::PlayEffect( const char *effectName, const anVec3 &origin, const anMat3 &axis, bool loop, const anVec3 &endOrigin,
 												 bool broadcast, effectCategory_t category, const anVec4& effectTint ) {
 	return PlayEffect( gameLocal.GetEffect( spawnArgs, effectName ), origin, axis, loop, endOrigin, broadcast, category, effectTint );
 }
 
-ARC_INLINE rvClientEffect* anEntity::PlayEffect( const char* effectName, jointHandle_t jointHandle, bool loop, const anVec3& endOrigin,
+inline rvClientEffect* anEntity::PlayEffect( const char *effectName, jointHandle_t jointHandle, bool loop, const anVec3 &endOrigin,
 												bool broadcast, effectCategory_t category, const anVec4& effectTint ) {
 	return PlayEffect( gameLocal.GetEffect( spawnArgs, effectName ), jointHandle, vec3_origin, mat3_identity, loop, endOrigin, broadcast, category, effectTint );
 }
 
-ARC_INLINE rvClientEffect* anEntity::PlayEffect( const char* effectName, jointHandle_t jointHandle, const anVec3& originOffset, const anMat3& axisOffset, bool loop, const anVec3& endOrigin,
+inline rvClientEffect* anEntity::PlayEffect( const char *effectName, jointHandle_t jointHandle, const anVec3 &originOffset, const anMat3 &axisOffset, bool loop, const anVec3 &endOrigin,
 												bool broadcast, effectCategory_t category, const anVec4& effectTint ) {
 	return PlayEffect( gameLocal.GetEffect( spawnArgs, effectName ), jointHandle, originOffset, axisOffset, loop, endOrigin, broadcast, category, effectTint );
 }
 
 
-ARC_INLINE anPhysics *anEntity::GetPhysics( void ) const {
+inline anPhysics *anEntity::GetPhysics( void ) const {
 	return physics;
 }
 
-ARC_INLINE renderEntity_t *anEntity::GetRenderEntity( void ) {
+inline renderEntity_t *anEntity::GetRenderEntity( void ) {
 	return &renderEntity;
 }
 
-ARC_INLINE int anEntity::GetModelDefHandle( void ) {
+inline int anEntity::GetModelDefHandle( void ) {
 	return modelDefHandle;
 }
 
 // scork: accessors so sound editor can indicate current-highlit ent
-ARC_INLINE int anEntity::GetRefSoundShaderFlags( void ) const
+inline int anEntity::GetRefSoundShaderFlags( void ) const
 {
 	return refSound.parms.soundShaderFlags;
 }
 
-ARC_INLINE void anEntity::SetRefSoundShaderFlags( int iFlags )
+inline void anEntity::SetRefSoundShaderFlags( int iFlags )
 {
 	refSound.parms.soundShaderFlags = iFlags;
 }
@@ -756,21 +756,21 @@ public:
 
 	void					UpdateAnimation( void );
 
-	virtual idAnimator *	GetAnimator( void );
+	virtual anAnimator *	GetAnimator( void );
 	virtual void			SetModel( const char *modelname );
 
 	bool					GetJointWorldTransform( jointHandle_t jointHandle, int currentTime, anVec3 &offset, anMat3 &axis );
 	bool					GetJointTransformForAnim( jointHandle_t jointHandle, int animNum, int currentTime, anVec3 &offset, anMat3 &axis ) const;
 
 	virtual int				GetDefaultSurfaceType( void ) const;
-	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor );
+	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor );
 	virtual void			ProjectHeadOverlay( const anVec3 &point, const anVec3 &dir, float size, const char *decal ) {}
 
 	virtual bool			ClientReceiveEvent( int event, int time, const anBitMsg &msg );
 
 
 // abahr:
-	virtual const idAnimator *	GetAnimator( void ) const { return &animator; }
+	virtual const anAnimator *	GetAnimator( void ) const { return &animator; }
 	virtual void			UpdateRenderEntityCallback();
 
 
@@ -780,7 +780,7 @@ public:
 	};
 
 protected:
-	idAnimator				animator;
+	anAnimator				animator;
 	damageEffect_t *		damageEffects;
 
 
@@ -799,8 +799,8 @@ private:
 
 
 // bdube: programmer controlled joint events
-	void					Event_SetJointAngularVelocity	( const char* jointName, float pitch, float yaw, float roll, int blendTime );
-	void					Event_CollapseJoints			( const char* jointnames, const char* collapseTo );
+	void					Event_SetJointAngularVelocity	( const char *jointName, float pitch, float yaw, float roll, int blendTime );
+	void					Event_CollapseJoints			( const char *jointnames, const char *collapseTo );
 
 
 
@@ -811,34 +811,34 @@ private:
 void UpdateGuiParms( anUserInterface *gui, const anDict *args );
 
 
-ARC_INLINE float anEntity::DistanceTo ( anEntity* ent ) {
+inline float anEntity::DistanceTo ( anEntity *ent ) {
 	return DistanceTo ( ent->GetPhysics()->GetOrigin() );
 }
 
-ARC_INLINE float anEntity::DistanceTo ( const anVec3& pos ) const {
+inline float anEntity::DistanceTo ( const anVec3 &pos ) const {
 	return (pos - GetPhysics()->GetOrigin()).LengthFast();
 }
 
-ARC_INLINE float anEntity::DistanceTo2d ( anEntity* ent ) {
+inline float anEntity::DistanceTo2d ( anEntity *ent ) {
 	return DistanceTo2d ( ent->GetPhysics()->GetOrigin() );
 }
 
-ARC_INLINE bool anEntity::CanTakeDamage ( void ) const {
+inline bool anEntity::CanTakeDamage ( void ) const {
 	return fl.takedamage;
 }
 
 
 // ddynerman: MP arena stuff
-ARC_INLINE int anEntity::GetInstance( void ) const {
+inline int anEntity::GetInstance( void ) const {
 	return instance;
 }
 
 // ddynerman: multiple collision worlds
-ARC_INLINE int anEntity::GetClipWorld( void ) const {
+inline int anEntity::GetClipWorld( void ) const {
 	return clipWorld;
 }
 
-ARC_INLINE void anEntity::SetClipWorld( int newCW ) {
+inline void anEntity::SetClipWorld( int newCW ) {
 	clipWorld = newCW;
 	if ( GetPhysics() ) {
 		GetPhysics()->UnlinkClip();

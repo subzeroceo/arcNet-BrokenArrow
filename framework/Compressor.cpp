@@ -267,7 +267,7 @@ void anCompressor_BitStream::Init( anFile *f, bool compress, int wordLength ) {
 anCompressor_BitStream::InitCompress
 ================
 */
-ARC_INLINE void anCompressor_BitStream::InitCompress( const void *inData, const int inLength ) {
+inline void anCompressor_BitStream::InitCompress( const void *inData, const int inLength ) {
 	readLength = inLength;
 	readByte = 0;
 	readBit = 0;
@@ -286,7 +286,7 @@ ARC_INLINE void anCompressor_BitStream::InitCompress( const void *inData, const 
 anCompressor_BitStream::InitDecompress
 ================
 */
-ARC_INLINE void anCompressor_BitStream::InitDecompress( void *outData, int outLength ) {
+inline void anCompressor_BitStream::InitDecompress( void *outData, int outLength ) {
 	if ( !readLength ) {
 		readLength = file->Read( buffer, sizeof( buffer ) );
 		readByte = 0;

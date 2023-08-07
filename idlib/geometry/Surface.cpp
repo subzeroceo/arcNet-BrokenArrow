@@ -8,7 +8,7 @@
 UpdateVertexIndex
 =================
 */
-ARC_INLINE int UpdateVertexIndex( int vertexIndexNum[2], int *vertexRemap, int *vertexCopyIndex, int vertNum ) {
+inline int UpdateVertexIndex( int vertexIndexNum[2], int *vertexRemap, int *vertexCopyIndex, int vertNum ) {
 	int s = INTSIGNBITSET( vertexRemap[vertNum] );
 	vertexIndexNum[0] = vertexRemap[vertNum];
 	vertexRemap[vertNum] = vertexIndexNum[s];
@@ -88,7 +88,7 @@ int anSurface::Split( const anPlane &plane, const float epsilon, anSurface **fro
 	*front = surface[0] = new anSurface();
 	*back = surface[1] = new anSurface();
 
-	edgeSplitVertex = ( int*) _alloca( edges.Num() * sizeof( int ) );
+	edgeSplitVertex = (int *) _alloca( edges.Num() * sizeof( int ) );
 	numEdgeSplitVertexes = 0;
 
 	maxOnPlaneEdges = 4 * counts[SIDE_ON];
@@ -119,13 +119,13 @@ int anSurface::Split( const anPlane &plane, const float epsilon, anSurface **fro
 	surface[1]->indexes.Resize( ( ( counts[SIDE_BACK] + counts[SIDE_ON] ) * 2 ) + ( numEdgeSplitVertexes * 4 ) );
 
 	// allocate indexes to construct the triangle indexes for the front and back surface
-	vertexRemap[0] = ( int*) _alloca( verts.Num() * sizeof( int ) );
+	vertexRemap[0] = (int *) _alloca( verts.Num() * sizeof( int ) );
 	memset( vertexRemap[0], -1, verts.Num() * sizeof( int ) );
-	vertexRemap[1] = ( int*) _alloca( verts.Num() * sizeof( int ) );
+	vertexRemap[1] = (int *) _alloca( verts.Num() * sizeof( int ) );
 	memset( vertexRemap[1], -1, verts.Num() * sizeof( int ) );
 
-	vertexCopyIndex[0] = ( int*) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
-	vertexCopyIndex[1] = ( int*) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
+	vertexCopyIndex[0] = (int *) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
+	vertexCopyIndex[1] = (int *) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
 
 	vertexIndexNum[0][0] = vertexIndexNum[1][0] = 0;
 	vertexIndexNum[0][1] = vertexIndexNum[1][1] = numEdgeSplitVertexes;
@@ -137,8 +137,8 @@ int anSurface::Split( const anPlane &plane, const float epsilon, anSurface **fro
 
 	maxOnPlaneEdges += 4 * numEdgeSplitVertexes;
 	// allocate one more in case no triangles are actually split which may happen for a disconnected surface
-	onPlaneEdges[0] = ( int*) _alloca( ( maxOnPlaneEdges + 1 ) * sizeof( int ) );
-	onPlaneEdges[1] = ( int*) _alloca( ( maxOnPlaneEdges + 1 ) * sizeof( int ) );
+	onPlaneEdges[0] = (int *) _alloca( ( maxOnPlaneEdges + 1 ) * sizeof( int ) );
+	onPlaneEdges[1] = (int *) _alloca( ( maxOnPlaneEdges + 1 ) * sizeof( int ) );
 	numOnPlaneEdges[0] = numOnPlaneEdges[1] = 0;
 
 	// split surface triangles
@@ -394,7 +394,7 @@ bool anSurface::ClipInPlace( const anPlane &plane, const float epsilon, const bo
 		return true;
 	}
 
-	edgeSplitVertex = ( int*) _alloca( edges.Num() * sizeof( int ) );
+	edgeSplitVertex = (int *) _alloca( edges.Num() * sizeof( int ) );
 	numEdgeSplitVertexes = 0;
 
 	counts[SIDE_FRONT] = counts[SIDE_BACK] = 0;
@@ -421,10 +421,10 @@ bool anSurface::ClipInPlace( const anPlane &plane, const float epsilon, const bo
 	newIndexes.Resize( ( counts[SIDE_FRONT] << 1 ) + ( numEdgeSplitVertexes << 2 ) );
 
 	// allocate indexes to construct the triangle indexes for the front and back surface
-	vertexRemap = ( int*) _alloca( verts.Num() * sizeof( int ) );
+	vertexRemap = (int *) _alloca( verts.Num() * sizeof( int ) );
 	memset( vertexRemap, -1, verts.Num() * sizeof( int ) );
 
-	vertexCopyIndex = ( int*) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
+	vertexCopyIndex = (int *) _alloca( ( numEdgeSplitVertexes + verts.Num() ) * sizeof( int ) );
 
 	vertexIndexNum[0] = 0;
 	vertexIndexNum[1] = numEdgeSplitVertexes;
@@ -579,9 +579,9 @@ bool anSurface::IsConnected( void ) const {
 
 	numIslands = 0;
 	numTris = indexes.Num() / 3;
-	islandNum = ( int*) _alloca16( numTris * sizeof( int ) );
+	islandNum = (int *) _alloca16( numTris * sizeof( int ) );
 	memset( islandNum, -1, numTris * sizeof( int ) );
-	queue = ( int*) _alloca16( numTris * sizeof( int ) );
+	queue = (int *) _alloca16( numTris * sizeof( int ) );
 
 	for ( i = 0; i < numTris; i++ ) {
 		if ( islandNum[i] != -1 ) {
@@ -795,9 +795,9 @@ void anSurface::GenerateEdgeIndexes( void ) {
 	int *index, *vertexEdges, *edgeChain;
 	surfaceEdge_t e[3];
 
-	vertexEdges = ( int*) _alloca16( verts.Num() * sizeof( int ) );
+	vertexEdges = (int *) _alloca16( verts.Num() * sizeof( int ) );
 	memset( vertexEdges, -1, verts.Num() * sizeof( int ) );
-	edgeChain = ( int*) _alloca16( indexes.Num() * sizeof( int ) );
+	edgeChain = (int *) _alloca16( indexes.Num() * sizeof( int ) );
 
 	edgeIndexes.SetNum( indexes.Num(), true );
 

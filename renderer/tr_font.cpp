@@ -33,7 +33,7 @@ void R_GetGlyphInfo( FT_GlyphSlot glyph, int *left, int *right, int *width, int 
 	*top    = _CEIL( glyph->metrics.horiBearingY );
 	*bottom = _FLOOR( glyph->metrics.horiBearingY - glyph->metrics.height );
 	*height = _TRUNC( *top - *bottom );
-	*pitch  = ( qtrue ? (*width+3) & -4 : (*width+7) >> 3 );
+	*pitch  = ( true ? (*width+3) & -4 : (*width+7) >> 3 );
 }
 
 /*

@@ -21,10 +21,10 @@ typedef struct autoComplete_s {
 	int				findMatchIndex;
 } autoComplete_t;
 
-class arcEditField {
+class anEditField {
 public:
-					arcEditField();
-					~arcEditField();
+					anEditField();
+					~anEditField();
 
 	void			Clear();
 	void			SetWidthInChars( int w );
@@ -81,7 +81,7 @@ private:
 arcTextDimension::arcTextDimension
 ============
 */
-ARC_INLINE arcTextDimension::arcTextDimension( void ) :
+inline arcTextDimension::arcTextDimension( void ) :
 	scale( 1.0f ),
 	width( 0 ),
 	height( 0 ),
@@ -95,7 +95,7 @@ ARC_INLINE arcTextDimension::arcTextDimension( void ) :
 arcTextDimension::~arcTextDimension
 ============
 */
-ARC_INLINE arcTextDimension::~arcTextDimension( void ) {
+inline arcTextDimension::~arcTextDimension( void ) {
 	if ( advances != &advancesBase[0] ) {
 		Mem_Free( advances );
 	}
@@ -106,7 +106,7 @@ ARC_INLINE arcTextDimension::~arcTextDimension( void ) {
 arcTextDimension::Init
 ============
 */
-ARC_INLINE void arcTextDimension::Init( const wchar_t *text, const int textLength, const an2DBounds &rect, unsigned int flags, const qhandle_t font, const int pointSize, anList<int> *lineBreaks ) {
+inline void arcTextDimension::Init( const wchar_t *text, const int textLength, const an2DBounds &rect, unsigned int flags, const qhandle_t font, const int pointSize, anList<int> *lineBreaks ) {
 	if ( lineBreaks != nullptr ) {
 		lineBreaks->SetNum( 0, false );
 	}
@@ -144,7 +144,7 @@ ARC_INLINE void arcTextDimension::Init( const wchar_t *text, const int textLengt
 arcTextDimension::GetAdvance
 ============
 */
-ARC_INLINE int arcTextDimension::GetAdvance( const int index ) const {
+inline int arcTextDimension::GetAdvance( const int index ) const {
 	if ( advances == nullptr ) {
 		return 0;
 	}
@@ -157,7 +157,7 @@ ARC_INLINE int arcTextDimension::GetAdvance( const int index ) const {
 arcTextDimensionHelper::GetWidth
 ============
 */
-ARC_INLINE float arcTextDimension::GetWidth( const int startIndex, const int endIndex ) const {
+inline float arcTextDimension::GetWidth( const int startIndex, const int endIndex ) const {
 	if ( advances == nullptr || textLength == 0 ) {
 		return 0.0f;
 	}
@@ -174,7 +174,7 @@ ARC_INLINE float arcTextDimension::GetWidth( const int startIndex, const int end
 arcTextDimension::ToVirtualScreenSize
 ============
 */
-ARC_INLINE int arcTextDimension::ToVirtualScreenSize( const int size ) const {
+inline int arcTextDimension::ToVirtualScreenSize( const int size ) const {
 	return anMath::Ftoi( anMath::Ceil( ( size >> 6 ) / scale ) );
 }
 
@@ -183,7 +183,7 @@ ARC_INLINE int arcTextDimension::ToVirtualScreenSize( const int size ) const {
 arcTextDimension::ToVirtualScreenSizeFloat
 ============
 */
-ARC_INLINE float arcTextDimension::ToVirtualScreenSizeFloat( const int size ) const {
+inline float arcTextDimension::ToVirtualScreenSizeFloat( const int size ) const {
 	return ( size >> 6 ) / scale;
 }
 

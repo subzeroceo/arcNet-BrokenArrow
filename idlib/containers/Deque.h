@@ -34,7 +34,7 @@ idDeque<T>::PushBack
 ============
 */
 template< class T >
-ARC_INLINE void idDeque<T>::PushBack( const T& element ) {
+inline void idDeque<T>::PushBack( const T& element ) {
 	list.Append( element );
 }
 
@@ -44,7 +44,7 @@ idDeque<T>::PopBack
 ============
 */
 template< class T >
-ARC_INLINE void idDeque<T>::PopBack() {
+inline void idDeque<T>::PopBack() {
 	list.RemoveIndex( Num() - 1 );
 }
 
@@ -54,7 +54,7 @@ idDeque<T>::Back
 ============
 */
 template< class T >
-ARC_INLINE T& idDeque<T>::Back() {
+inline T& idDeque<T>::Back() {
 	return list[ Num() - 1 ];
 }
 
@@ -64,7 +64,7 @@ idDeque<T>::PushFront
 ============
 */
 template< class T >
-ARC_INLINE void idDeque<T>::PushFront( const T& element ) {
+inline void idDeque<T>::PushFront( const T& element ) {
 	list.Insert( element, 0 );
 }
 
@@ -74,7 +74,7 @@ idDeque<T>::PopFront
 ============
 */
 template< class T >
-ARC_INLINE void idDeque<T>::PopFront() {
+inline void idDeque<T>::PopFront() {
 	list.RemoveIndex( 0 );
 }
 
@@ -84,8 +84,8 @@ idDeque<T>::Front
 ============
 */
 template< class T >
-ARC_INLINE T& idDeque<T>::Front() {
-	return list[ 0 ];
+inline T& idDeque<T>::Front() {
+	return list[0];
 }
 
 /*
@@ -94,7 +94,7 @@ idDeque<T>::Clear
 ============
 */
 template< class T >
-ARC_INLINE void idDeque<T>::Clear() {
+inline void idDeque<T>::Clear() {
 	list.Clear();
 }
 
@@ -104,7 +104,7 @@ idDeque<T>::DeleteContents
 ============
 */
 template< class T >
-ARC_INLINE void idDeque<T>::DeleteContents() {
+inline void idDeque<T>::DeleteContents() {
 	list.DeleteContents( true );
 }
 
@@ -114,7 +114,7 @@ idDeque<T>::SetGranularity
 ============
 */
 template< class T >
-ARC_INLINE void idDeque<T>::SetGranularity( int newGranularity ) {
+inline void idDeque<T>::SetGranularity( int newGranularity ) {
 	list.SetGranularity( newGranularity );
 }
 
@@ -124,7 +124,7 @@ idDeque<T>::Empty
 ============
 */
 template< class T >
-ARC_INLINE bool idDeque<T>::Empty() const {
+inline bool idDeque<T>::Empty() const {
 	return list.Num() == 0;
 }
 
@@ -134,7 +134,7 @@ idDeque<T>::Num
 ============
 */
 template< class T >
-ARC_INLINE int idDeque<T>::Num() const {
+inline int idDeque<T>::Num() const {
 	return list.Num();
 }
 /*

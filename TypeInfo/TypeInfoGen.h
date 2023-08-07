@@ -15,21 +15,21 @@
 
 class anConstantInfo {
 public:
-	anString					name;
-	anString					type;
-	anString					value;
+	anStr					name;
+	anStr					type;
+	anStr					value;
 };
 
 class anEnumValueInfo {
 public:
-	anString					name;
+	anStr					name;
 	int							value;
 };
 
 class anEnumTypeInfo {
 public:
-	anString					typeName;
-	anString					scope;
+	anStr					typeName;
+	anStr					scope;
 	bool						unnamed;
 	bool						isTemplate;
 	anList<anEnumValueInfo>		values;
@@ -37,16 +37,16 @@ public:
 
 class anClassVariableInfo {
 public:
-	anString					name;
-	anString					type;
+	anStr					name;
+	anStr					type;
 	int							bits;
 };
 
 class anClassTypeInfo {
 public:
-	anString					typeName;
-	anString					superType;
-	anString					scope;
+	anStr					typeName;
+	anStr					superType;
+	anStr					scope;
 	bool						unnamed;
 	bool						isTemplate;
 	anList<anClassVariableInfo>	variables;
@@ -70,16 +70,16 @@ private:
 
 	int							numTemplates;
 	int							maxInheritance;
-	anString					maxInheritanceClass;
+	anStr					maxInheritanceClass;
 
 	int							GetInheritance( const char *typeName ) const;
-	int							EvaluateIntegerString( const anString &string );
-	float						EvaluateFloatString( const anString &string );
+	int							EvaluateIntegerString( const anStr &string );
+	float						EvaluateFloatString( const anStr &string );
 	anConstantInfo *			FindConstant( const char *name );
 	int							GetIntegerConstant( const char *scope, const char *name, anParser &src );
 	float						GetFloatConstant( const char *scope, const char *name, anParser &src );
 	int							ParseArraySize( const char *scope, anParser &src );
-	void						ParseConstantValue( const char *scope, anParser &src, anString &value );
+	void						ParseConstantValue( const char *scope, anParser &src, anStr &value );
 	anEnumTypeInfo *			ParseEnumType( const char *scope, bool isTemplate, bool typeDef, anParser &src );
 	anClassTypeInfo *			ParseClassType( const char *scope, const char *templateArgs, bool isTemplate, bool typeDef, anParser &src );
 	void						ParseScope( const char *scope, bool isTemplate, anParser &src, anClassTypeInfo *typeInfo );

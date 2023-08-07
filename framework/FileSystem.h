@@ -34,7 +34,8 @@ static const int		MAX_OSPATH					= 256;
 typedef enum {
 	FS_READ		= 0,
 	FS_WRITE	= 1,
-	FS_APPEND	= 2
+	FS_APPEND	= 2,
+	FS_APPEND_SYNC = -1,
 } fsMode_t;
 
 typedef enum {
@@ -69,9 +70,9 @@ typedef enum {
 } findFile_t;
 
 typedef struct urlDownload_s {
-	anString				url;
-	anString				urlAuth;
-	anString				referer;
+	anStr				url;
+	anStr				urlAuth;
+	anStr				referer;
 	char					dlerror[ MAX_STRING_CHARS ];
 	int						dltotal;
 	int						dlnow;
@@ -97,8 +98,8 @@ typedef struct backgroundDownload_s {
 } backgroundDownload_t;
 
 typedef struct proxyDownload_s {
-    anString               proxyUrl;
-    anString               proxyAuth;
+    anStr               proxyUrl;
+    anStr               proxyAuth;
 } proxyDownload_t;
 
 // file list for directory listings
@@ -111,7 +112,7 @@ public:
 	const anStringList &	GetList( void ) const { return list; }
 
 private:
-	anString				basePath;
+	anStr				basePath;
 	anStringList			list;
 };
 
@@ -131,7 +132,7 @@ private:
 struct metaDataContext_t {
 	const anDict *	meta;
 	bool			addon;
-	anString		pak;
+	anStr		pak;
 };
 
 class anMetaDataList {
@@ -150,7 +151,7 @@ public:
 	const anDict *			FindMetaData( const char *name, const anDict *defaultDict = nullptr ) {
 								for ( int i = 0; i < metaData.Num(); i++ ) {
 									const char *value = metaData[i].meta->GetString( "metadata_name" );
-									if ( !anString::Icmp( name, value ) ) {
+									if ( !anStr::Icmp( name, value ) ) {
 										return metaData[i].meta;
 									}
 								}
@@ -159,7 +160,7 @@ public:
 	int						FindMetaDataIndex( const char *name ) {
 								for ( int i = 0; i < metaData.Num(); i++ ) {
 									const char *value = metaData[i].meta->GetString( "metadata_name" );
-									if ( !anString::Icmp( name, value ) ) {
+									if ( !anStr::Icmp( name, value ) ) {
 										return i;
 									}
 								}
@@ -169,7 +170,7 @@ public:
 	const metaDataContext_t *	FindMetaDataContext( const char *name ) const {
 								for ( int i = 0; i < metaData.Num(); i++ ) {
 									const char *value = metaData[i].meta->GetString( "metadata_name" );
-									if ( !anString::Icmp( name, value ) ) {
+									if ( !anStr::Icmp( name, value ) ) {
 										return &metaData[i];
 									}
 								}
@@ -226,13 +227,13 @@ public:
 							// The returned files will not include any directories or '/' unless fullRelativePath is set.
 							// The extension must include a leading dot and may not contain wildcards.
 							// If extension is "/", only subdirectories will be returned.
-	anFileList *			ListFiles( const char *relativePath, const char *extension, bool sort = false, bool fullRelativePath = false, const char* gamedir = nullptr );
+	anFileList *			ListFiles( const char *relativePath, const char *extension, bool sort = false, bool fullRelativePath = false, const char *gamedir = nullptr );
 
 							// Lists files in the given directory and all subdirectories with the given extension.
 							// Directory should not have either a leading or trailing '/'
 							// The returned files include a full relative path.
 							// The extension must include a leading dot and may not contain wildcards.
-	anFileList *			ListFilesTree( const char *relativePath, const char *extension, bool sort = false, const char* gamedir = nullptr );
+	anFileList *			ListFilesTree( const char *relativePath, const char *extension, bool sort = false, const char *gamedir = nullptr );
 
 							// Frees the given file list.
 	void					FreeFileList( anFileList *fileList );
@@ -271,7 +272,7 @@ public:
 	bool					UpdateGamePakChecksums( void );
 
 							// 0-terminated list of pak checksums
-							// if pureChecksums[ 0 ] == 0, all data sources will be allowed
+							// if pureChecksums[0] == 0, all data sources will be allowed
 							// otherwise, only pak files that match one of the checksums will be checked for files
 							// with the sole exception of .cfg files.
 							// the function tries to configure pure mode from the paks already referenced and this new list
@@ -310,6 +311,7 @@ public:
 							// A 0 byte will always be appended at the end, so string ops are safe.
 							// The buffer should be considered read-only, because it may be cached for other uses.
 	int						ReadFile( const char *relativePath, void **buffer, ARC_TIME_T *timestamp = nullptr );
+							//ReadFile(char const*,void **,anFileProps *,fsPathSearch_t)
 
 							// Frees the memory allocated by ReadFile.
 	void					FreeFile( void *buffer );
@@ -322,14 +324,14 @@ public:
 	void					RemoveFile( const char *relativePath );
 // added
 							// Removes the specified directory.
-	bool					RemoveDir( const char * relativePath ) = 0;
+	bool					RemoveDir( const char * relativePath );
 							// Removes the given directory from a full OS path
 	bool					RemoveExplicitDir( const char *OSPath, bool nonEmpty, bool recursive );
 							// Renames a file, taken from idTech5 (minus the fsPath_t)
-	bool					RenameFile( const char *relativePath, const char *newName, const char *basePath = "fs_savepath" ) = 0;
+	bool					RenameFile( const char *relativePath, const char *newName, const char *basePath = "fs_savepath" );
 // end added
 							// Opens a file for reading.
-	anFile *				OpenFileRead( const char *relativePath, bool allowCopyFiles = true, const char* gamedir = nullptr );
+	anFile *				OpenFileRead( const char *relativePath, bool allowCopyFiles = true, const char *gamedir = nullptr );
 
 							// Opens a file for writing, will create any needed subdirectories.
 	anFile *				OpenFileWrite( const char *relativePath, const char *basePath = "fs_savepath" );
@@ -351,6 +353,7 @@ public:
 
 							// Closes a file.
 	void					CloseFile( anFile *f );
+	int 					FTelll( anFile *f );
 
 							// Returns immediately, performing the read from a background thread.
 	void					BackgroundDownload( backgroundDownload_t *bgl );
@@ -380,16 +383,16 @@ public:
 
 	anFile *				MakeTemporaryFile( void );
 	bool					IsExtension( const char *fileName, const char *ext, int nLength ) const;
-	sysFolder_t 			IsFolder( const char * relativePath, const char *basePath = "fs_basepath" );
+	sysFolder_t 			IsFolder( const char *relativePath, const char *basePath = "fs_basepath" );
 
 	void					EnableBackgroundCache( bool enable );
 	void					BeginLevelLoad( const char *name, char *_blockBuffer, int _blockBufferSize  );
 	void					EndLevelLoad();
-	bool 					IsBinaryModel( const idStr & resName ) const;
+	bool 					IsBinaryModel( const anStr & resName ) const;
 
 							// make downloaded pak files known so pure negotiation works next time
 	int						AddPakBFile( const char *path );
-	int						AddZipFile( const char *path );
+	int						AddPK4File( const char *path );
 
 							// look for a file in the loaded paks or the addon paks
 							// if the file is found in addons, FS's internal structures are ready for a reloadEngine
@@ -407,7 +410,7 @@ public:
 		if ( idx >= 0 && idx < resourceFiles.Num() ) {
 			return resourceFiles[ idx ]->resourceFile;
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	// textures
@@ -420,60 +423,66 @@ public:
 	static void				Path_f( const anCommandArgs &args );
 	static void				TouchFile_f( const anCommandArgs &args );
 	static void				TouchFileList_f( const anCommandArgs &args );
+
+// added 
 	bool					IsEoF( const anFile *f ) const;
 	bool					ExplicitIsEOF( const anFile *file ) const;
-
+// -- end added
 private:
 	friend dword 			BackgroundDownloadThread( void *parms );
 
 	const char *			CaseSearch( const char *inDir );
 
-	void					ReplaceSeparators( anString &path, char sep = PATHSEPERATOR_CHAR );
+	void					ReplaceSeparators( anStr &path, char sep = PATHSEPERATOR_CHAR );
 	long					HashFileName( const char *fname ) const;
 	int						ListOSFiles( const char *directory, const char *extension, anStringList &list );
-	FILE *					OpenOSFile( const char *name, const char *mode, anString *caseSensitiveName = nullptr );
-	FILE *					OpenOSFileCorrectName( anString &path, const char *mode );
+	FILE *					OpenOSFile( const char *name, const char *mode, anStr *caseSensitiveName = nullptr );
+	FILE *					OpenOSFileCorrectName( anStr &path, const char *mode );
 	int						DirectFileLength( FILE *o );
 	void					CopyFile( anFile *src, const char *toOSPath );
 
+// added 
 	static void				CheckFilenameIsMutable( const char *filename, const char *function );
-
+// -- end
 	int						AddUnique( const char *name, anStringList &list, anHashIndex &hashIndex ) const;
 	void					GetExtensionList( const char *extension, anStringList &extensionList ) const;
-	int						GetFileList( const char *relativePath, const anStringList &extensions, anStringList &list, anHashIndex &hashIndex, bool fullRelativePath, const char* gamedir = nullptr );
+	int						GetFileList( const char *relativePath, const anStringList &extensions, anStringList &list, anHashIndex &hashIndex, bool fullRelativePath, const char *gamedir = nullptr );
 
-	void					SortFileList( const char **filelist, int numfiles ) const;
+	void					SortFileList( const char **filelist, int numFiles ) const;
 
-	int						GetFileListTree( const char *relativePath, const anStringList &extensions, anStringList &list, anHashIndex &hashIndex, const char* gamedir = nullptr );
-	pack_t *				LoadZipFile( const char *zipfile );
+	int						GetFileListTree( const char *relativePath, const anStringList &extensions, anStringList &list, anHashIndex &hashIndex, const char *gamedir = nullptr );
+
+	pK5Nb_t *				LoadPaKFile( const char *pkFile );
 	void					AddGameDirectory( const char *path, const char *dir );
 	void					SetupGameDirectories( const char *gameName );
+
 	void					Startup( void );
 	void					SetRestrictions( void );
+
 							// some files can be obtained from directories without compromising si_pure
 	bool					FileAllowedFromDir( const char *path );
 							// searches all the paks, no pure check
-	pack_t *				GetPackForChecksum( int checksum, bool searchAddons = false );
+	pK5Nb_t *				GetPackForChecksum( int checksum, bool searchAddons = false );
 							// searches all the paks, no pure check
-	pack_t *				FindPakForFileChecksum( const char *relativePath, int fileChecksum, bool bReference );
-	anCompressedArchive *			ReadFileFromZip( pack_t *pak, fileInPack_t *pakFile, const char *relativePath );
+	pK5Nb_t *				FindPakForFileChecksum( const char *relativePath, int fileChecksum, bool bReference );
+	anCompressedArchive *	ReadFileFromPaK( pK5Nb_t *pak, fileInPack_t *pakFile, const char *relativePath );
 	int						GetFileChecksum( anFile *file );
-	pureStatus_t			GetPackStatus( pack_t *pak );
+	pureStatus_t			GetPackStatus( pK5Nb_t *pak );
 	addonInfo_t *			ParseAddonDef( const char *buf, const int len );
-	void					FollowAddonDependencies( pack_t *pak );
+	void					FollowAddonDependencies( pK5Nb_t *pak );
 
 	static size_t			CurlWriteFunction( void *ptr, size_t size, size_t nmemb, void *stream );
 							// curl_progress_callback in curl.h
 	static int				CurlProgressFunction( void *clientp, double dltotal, double dlnow, double ultotal, double ulnow );
 private:
 
-	searchpath_t *			searchPaths;
+	searchPath_t *			searchPaths;
 	int						readCount;			// total bytes read
 	int						loadCount;			// total files read
 	int						loadStack;			// total files in memory
-	anString				engineFolder;		// this will be a single name without separators
+	anStr					engineFolder;		// this will be a single name without separators
 
-	searchpath_t			*addonPaks;			// not loaded up, but we saw them
+	searchPath_t *			addonPaks;			// not loaded up, but we saw them
 
 	anDict					mapDict;			// for GetMapDecl
 
@@ -495,8 +504,8 @@ private:
 	xthreadInfo				backgroundThread;
 
 	bool 					usePkB;		// for binary archive .pk files ".pkB"
-	anList<pack_t *>		pak4;
-	anList<pack_t *>		pak5;
+	anList<pK5Nb_t *>		pak4;
+	anList<pK5Nb_t *>		pak5;
 	bool					loadedFileFromDir;		// set to true once a file was loaded from a directory - can't switch to pure anymore
 	anList<int>				restartChecksums;		// used during a restart to set things in right order
 	anList<int>				addonChecksums;			// list of checksums that should go to the search list directly ( for restarts )
@@ -522,14 +531,14 @@ any type of File Stream that it ultimately inherits from the primary file class,
 inwhich is not actually a "SmartPointer", as it does not retain reference counts.
 ================================================
 */
-class anFileScoped {
+class anScopedFileSystem {
 public:
 	// Constructor that accepts and stores the file pointer.
-	anFileScoped( anFile *_file ) : file( _file ) {
+	anScopedFileSystem( anFile *sF ) : file( sF ) {
 	}
 
 	// Destructor that will destroy (close) the file when this wrapper class goes out of scope.
-	~anFileScoped() {
+	~anScopedFileSystem() {
 		fileSystem->CloseFile( file );
 	}
 
@@ -543,8 +552,9 @@ public:
 		return file;
 	}
 
-protected:
-	anFile *file;	// The managed file pointer.
+protected:		
+							// The managed file pointer.
+	anFile *				file;	
 };
 
 #endif // !__FILESYSTEM_H__

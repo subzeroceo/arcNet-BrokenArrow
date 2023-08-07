@@ -69,22 +69,22 @@ void idConsoleHistory::AddToHistory( const char *line, bool writeHistoryFile ) {
 idConsoleHistory::RetrieveFromHistory
 ========================
 */
-anString idConsoleHistory::RetrieveFromHistory( bool backward ) {
+anStr idConsoleHistory::RetrieveFromHistory( bool backward ) {
 	// if there are no commands in the history
 	if ( numHistory == 0 ) {
-		return anString( "" );
+		return anStr( "" );
 	}
 	// move the history point
 	if ( backward ) {
 		if ( upPoint < numHistory - COMMAND_HISTORY || upPoint < 0 ) {
-			return anString( "" );
+			return anStr( "" );
 		}
 		returnLine = upPoint;
 		downPoint = upPoint + 1;
 		upPoint--;
 	} else {
 		if ( downPoint >= numHistory ) {
-			return anString( "" );
+			return anStr( "" );
 		}
 		returnLine = downPoint;
 		upPoint = downPoint - 1;
@@ -102,7 +102,7 @@ void idConsoleHistory::LoadHistoryFile() {
 	anLexer lex;
 	if ( lex.LoadFile( HISTORY_FILE_NAME, false ) ) {
 		while( 1 ) {
-			anString	line;
+			anStr	line;
 			lex.ParseCompleteLine( line );
 			if ( line.IsEmpty() ) {
 				break;

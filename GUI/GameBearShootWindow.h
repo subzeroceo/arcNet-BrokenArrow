@@ -6,7 +6,7 @@ class idGameBearShootWindow;
 class BSEntity {
 public:
 	const anMaterial *		material;
-	anString					materialName;
+	anStr					materialName;
 	float					width, height;
 	bool					visible;
 
@@ -28,7 +28,7 @@ public:
 	virtual void		WriteToSaveGame( anFile *savefile );
 	virtual void		ReadFromSaveGame( anFile *savefile, idGameBearShootWindow* _game );
 
-	void				SetMaterial(const char* name);
+	void				SetMaterial(const char *name);
 	void				SetSize( float _width, float _height );
 	void				SetVisible( bool isVisible );
 

@@ -187,11 +187,11 @@ private:
 	float					Pm_AirAccelerate( void );
 };
 
-ARC_INLINE bool anPhysics_Player::IsNoclip( void ) const {
+inline bool anPhysics_Player::IsNoclip( void ) const {
 	return current.movementType == PM_NOCLIP;
 }
 
-ARC_INLINE bool anPhysics_Player::IsDead( void ) const {
+inline bool anPhysics_Player::IsDead( void ) const {
 	return current.movementType == PM_DEAD;
 }
 

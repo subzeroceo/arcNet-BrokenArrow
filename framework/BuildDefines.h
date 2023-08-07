@@ -33,7 +33,7 @@ typedef enum {
 	#define ARC_STATICTEMPLATE			static
 #endif
 
-#define ARC_INLINE						__forceinline
+#define inline						__forceinline
 #define ARC_TLS							__declspec( thread )
 #define ARC_DEPRECATED					__declspec( deprecated )
 
@@ -119,7 +119,7 @@ public:
 #define ASSERT							Assert
 
 #define ARC_STATICTEMPLATE
-#define ARC_INLINE						inline
+#define inline						inline
 #define ARC_DEPRECATED
 // from gcc 4.0 manual:
 // The __thread specifier may be used alone, with the extern or static specifiers, but with no other storage class specifier. When used with extern or static, __thread must appear immediately after the other storage class specifier.
@@ -160,7 +160,7 @@ public:
 #define ASSERT							assert
 
 #define ARC_STATICTEMPLATE
-#define ARC_INLINE						inline
+#define inline						inline
 #define ARC_TLS							__thread
 #define ARC_DEPRECATED
 
@@ -169,7 +169,7 @@ public:
 #define ARC_AL_DYNAMIC
 #endif
 
-template< typename T > ARC_INLINE void Swap( T& l, T& r ) {
+template< typename T > inline void Swap( T& l, T& r ) {
 	T temp = l;
 	l = r;
 	r = temp;
@@ -224,9 +224,9 @@ template< typename T > ARC_INLINE void Swap( T& l, T& r ) {
 	#define ARC_FAKE_PURE 0
 #endif
 
-// don't define ID_ALLOW_TOOLS when we don't want tool code in the executable.
+// don't define ARC_ALLOW_TOOLS when we don't want tool code in the executable.
 #if defined( _WIN32 ) && !defined( ID_DEDICATED ) && !defined( ARCNET_DEMO_BUILD )
-	#define	ID_ALLOW_TOOLS
+	#define	ARC_ALLOW_TOOLS
 #endif
 
 // don't do backtraces in release builds.
@@ -261,8 +261,8 @@ template< typename T > ARC_INLINE void Swap( T& l, T& r ) {
 #ifdef __cplusplus
 #define ARC_TIME_T time_t
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS
-#undef NULL
-#define NULL 0
+#undef nullptr
+#define nullptr 0
 #endif
 
 

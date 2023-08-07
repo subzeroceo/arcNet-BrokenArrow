@@ -14,7 +14,7 @@
 
 #include "Entity.h"
 
-class idWorldspawn : public arcEntity {
+class idWorldspawn : public anEntity {
 public:
 	CLASS_PROTOTYPE( idWorldspawn );
 

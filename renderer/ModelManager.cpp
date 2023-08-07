@@ -9,7 +9,7 @@
 anCVarSystem preload_MapModels( "preload_MapModels", "1", CVAR_SYSTEM | CVAR_BOOL, "preload models during begin or end levelload" );
 anCVarSystem postLoadExportModels( "postLoadExportModels", "0", CVAR_BOOL | CVAR_RENDERER, "export models after loading to OBJ model format" );
 
-class ARCModelManagerLocal : public ARCModelManager {
+class ARCModelManagerLocal : public anModelManager {
 public:
 							ARCModelManagerLocal();
 	virtual					~ARCModelManagerLocal() {}
@@ -121,7 +121,7 @@ ARCModelManagerLocal::ReloadModels_f
 ==============
 */
 void ARCModelManagerLocal::ReloadModels_f( const anCommandArgs &args ) {
-	if ( anString::Icmp( args.Argv(1 ), "all" ) == 0 ) {
+	if ( anStr::Icmp( args.Argv(1 ), "all" ) == 0 ) {
 		localModelManager.ReloadModels( true );
 	} else {
 		localModelManager.ReloadModels( false );
@@ -224,7 +224,7 @@ ARCModelManagerLocal::GetModel
 =================
 */
 anRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool createIfNotFound ) {
-	//anString::StripExtension( modelName )
+	//anStr::StripExtension( modelName )
 	if ( !modelName || !modelName[0] ) {
 		return nullptr;
 	}
@@ -241,7 +241,7 @@ anRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool creat
 		anRenderModel *model = models[i];
 		if ( canonical.Icmp( model->Name() ) == 0 ) {
 			if ( !model->IsLoaded() ) {
-				anString generatedFileName = "generated/rendermodels/";
+				anStr generatedFileName = "generated/rendermodels/";
 				generatedFileName.AppendPath( canonical );
 				generatedFileName.SetFileExtension( va( "b%s", extension.c_str() ) );
 
@@ -274,7 +274,7 @@ anRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool creat
 	// determine which subclass of anRenderModel to initialize
 
 	anRenderModel	*model = nullptr;
-	anString extension;
+	anStr extension;
 	canonical.ExtractFileExtension( extension );
 	//if ( ( extension.Icmp( "md8" ) == 0 ) || (extension.Icmp( "obj" ) == 0) || ( extension.Icmp( "ase" ) == 0 ) || ( extension.Icmp( "lwo" ) == 0 ) || ( extension.Icmp( "flt" ) == 0 ) || ( extension.Icmp( "ma" ) == 0 ) ) {
 		//model = new( TAG_MODEL ) anModelStatic;
@@ -289,7 +289,7 @@ anRenderModel *ARCModelManagerLocal::GetModel( const char *modelName, bool creat
 		model = new anRenderModelM8D;
 		model->InitFromFile( modelName );
 	} else if ( extension.Icmp( "md3" ) == 0 ) {
-		model = new idRenderModelMD3;
+		model = new idRenderModelMD3_Legacy;
 		model->InitFromFile( modelName );
 	} else if ( extension.Icmp( "prt" ) == 0  ) {
 		model = new idRenderModelPrt;
@@ -412,19 +412,19 @@ void ARCModelManagerLocal::FreeModel( anRenderModel *model ) {
 		return;
 	}
 	if ( !dynamic_cast<anModelStatic *>( model ) ) {
-		common->Error( "ARCModelManager::FreeModel: model '%s' is not a static model", model->Name() );
+		common->Error( "anModelManager::FreeModel: model '%s' is not a static model", model->Name() );
 		return;
 	}
 	if ( model == defaultModel ) {
-		common->Error( "ARCModelManager::FreeModel: can't free the default model" );
+		common->Error( "anModelManager::FreeModel: can't free the default model" );
 		return;
 	}
 	if ( model == beamModel ) {
-		common->Error( "ARCModelManager::FreeModel: can't free the beam model" );
+		common->Error( "anModelManager::FreeModel: can't free the beam model" );
 		return;
 	}
 	if ( model == spriteModel ) {
-		common->Error( "ARCModelManager::FreeModel: can't free the sprite model" );
+		common->Error( "anModelManager::FreeModel: can't free the sprite model" );
 		return;
 	}
 
@@ -720,12 +720,12 @@ void ARCModelManagerLocal::PrintMemInfo( MemInfo_t *mi ) {
 
 		int mem = model->Memory();
 		int totalMem += mem;
-		f->Printf( "%s %s\n", anString::FormatNumber( mem ).c_str(), model->Name() );
+		f->Printf( "%s %s\n", anStr::FormatNumber( mem ).c_str(), model->Name() );
 	}
 
 	delete sortIndex;
 	mi->modelAssetsTotal = totalMem;
 
-	f->Printf( "\nTotal model bytes allocated: %s\n", anString::FormatNumber( totalMem ).c_str() );
+	f->Printf( "\nTotal model bytes allocated: %s\n", anStr::FormatNumber( totalMem ).c_str() );
 	fileSystem->CloseFile( f );
 }

@@ -289,7 +289,7 @@ void RB_Error( errorParm_t code, const char *fmt, ... ) {
 	char buf[ 4096 ];
 	va_list	argptr;
 	va_start( argptr, fmt );
-	anString::vsnprintf( buf, sizeof( buf ), fmt, argptr );
+	anStr::vsnprintf( buf, sizeof( buf ), fmt, argptr );
 	va_end( argptr );
 	common->Error( code, "%s", buf );
 }
@@ -298,7 +298,7 @@ void RB_Printf( const char *fmt, ... ) {
 	char buf[ MAXPRINTMSG ];
 	va_list	argptr;
 	va_start( argptr, fmt );
-	anString::vsnprintf( buf, sizeof( buf ), fmt, argptr );
+	anStr::vsnprintf( buf, sizeof( buf ), fmt, argptr );
 	va_end( argptr );
 
 	common->Printf( PRINT_ALL, "%s", buf );
@@ -935,7 +935,7 @@ void R_InitOpenGL( void ) {
 	qglConfig.vendorStr = (const char *)qglGetString( GL_VENDOR );
 	qglConfig.rendererStr = (const char *)qglGetString( GL_RENDERER );
 	qglConfig.versionStr = (const char *)qglGetString( GL_VERSION );
-	qglConfig.shaderLangVerson = ( const char* )qglGetString( GL_SHADING_LANGUAGE_VERSION );
+	qglConfig.shaderLangVerson = ( const char *)qglGetString( GL_SHADING_LANGUAGE_VERSION );
 	qglConfig.extensionsStr = (const char *)qglGetString( GL_EXTENSIONS );
 	if ( qglConfig.extensionsStr == nullptr ) {
 		// As of OpenGL 3.2, qglGetStringi is required to obtain the available extensions
@@ -1003,7 +1003,7 @@ void R_InitOpenGL( void ) {
 	static bool glCheck = false;
 	if ( !glCheck && win32.osversion.dwMajorVersion == 6 ) {
 		glCheck = true;
-		if ( !anString::Icmp( qglConfig.vendorStr, "Microsoft" ) && anString::FindText( qglConfig.rendererStr, "OpenGL-D3D" ) != -1 ) {
+		if ( !anStr::Icmp( qglConfig.vendorStr, "Microsoft" ) && anStr::FindText( qglConfig.rendererStr, "OpenGL-D3D" ) != -1 ) {
 			if ( cvarSystem->GetCVarBool( "r_fullscreen" ) ) {
 				cmdSystem->BufferCommandText( CMD_EXEC_NOW, "vid_restart partial windowed\n" );
 				Sys_GrabMouseCursor( false );
@@ -1065,7 +1065,7 @@ void GL_CheckErrors( void ) {
 				strncpy( stack, "GL_OUT_OF_MEMORY" );
 				break;
 			default:
-				anString::snPrintf( stack, sizeof( stack ), "%i", err );
+				anStr::snPrintf( stack, sizeof( stack ), "%i", err );
 				break;
 		}
 		common->Printf( "caught OpenGL error: %s in file %s line %i\n", stack, filename, line );
@@ -1137,7 +1137,7 @@ void R_TestImage_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	if ( anString::IsNumeric( args.Argv(1 ) ) ) {
+	if ( anStr::IsNumeric( args.Argv(1 ) ) ) {
 		imageNum = atoi( args.Argv(1 ) );
 		if ( imageNum >= 0 && imageNum < globalImages->images.Num() ) {
 			tr.testImage = globalImages->images[imageNum];
@@ -1173,7 +1173,7 @@ static int R_QSortSurfaceAreas( const void *a, const void *b ) {
 		return 1;
 	}
 
-	return anString::Icmp( ea->GetName(), eb->GetName() );
+	return anStr::Icmp( ea->GetName(), eb->GetName() );
 }
 
 /*
@@ -1216,8 +1216,8 @@ R_ExtractTGA_f
 ================
 */
 void R_ExtractTGA_f( const anCommandArgs &args ) {
-	anString relativePath;
-	anString extension;
+	anStr relativePath;
+	anStr extension;
 	//anFileList *fileList;
 	int imageNum;
 	anImage	*img = nullptr;
@@ -1228,7 +1228,7 @@ void R_ExtractTGA_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	if ( anString::IsNumeric( args.Argv( 1 ) ) ) {
+	if ( anStr::IsNumeric( args.Argv( 1 ) ) ) {
 		imageNum = atoi( args.Argv( 1 ) );
 		if ( imageNum >= 0 && imageNum < globalImages->images.Num() ) {
 			img = globalImages->images[imageNum];
@@ -1288,7 +1288,7 @@ void R_ReportImageDuplication_f( const anCommandArgs &args ) {
 			if ( image1->imageHash != image2->imageHash ||  image2->uploadWidth != image1->uploadWidth || image2->uploadHeight != image1->uploadHeight ) {
 				continue;
 			}
-			if ( !anString::Icmp( image1->imgName, image2->imgName ) ) {
+			if ( !anStr::Icmp( image1->imgName, image2->imgName ) ) {
 				// ignore same image-with-different-parms
 				continue;
 			}
@@ -1554,7 +1554,7 @@ from the beginning, because recording demo avis can involve
 thousands of shots
 ==================
 */
-void R_ScreenshotFilename( int &lastNumber, const char *base, anString &fileName ) {
+void R_ScreenshotFilename( int &lastNumber, const char *base, anStr &fileName ) {
 	bool restrict = cvarSystem->GetCVarBool( "fs_restrict" );
 	cvarSystem->SetCVarBool( "fs_restrict", false );
 
@@ -1601,7 +1601,7 @@ screenshot [width] [height] [samples]
 #define	MAX_BLENDS	256	// to keep the accumulation in shorts
 void R_ScreenShot_f( const anCommandArgs &args ) {
 	static int lastNumber = 0;
-	anString checkname;
+	anStr checkname;
 
 	int width = qglConfig.vidWidth;
 	int height = qglConfig.vidHeight;
@@ -1704,7 +1704,7 @@ Saves out env/<basename>_ft.tga, etc
 ==================
 */
 void R_EnvShot_f( const anCommandArgs &args ) {
-	anString fullname;
+	anStr fullname;
 	anMat3 axis[6];
 	char *extensions[6] =  { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga",
 		"_pz.tga", "_nz.tga" };
@@ -1886,7 +1886,7 @@ void R_MakeAmbientMap_f( const anCommandArgs &args ) {
 
 	// read all of the images
 	for ( int i = 0 ; i < 6 ; i++ ) {
-		anString fullname;
+		anStr fullname;
 		common->Sprintf( fullname, "env/%s%s", baseName, extensions[i] );
 		common->Printf( "loading %s\n", fullname.c_str() );
 		session->UpdateScreen();
@@ -1969,7 +1969,7 @@ Saves out env/<basename>_amb_ft.tga, etc
 ==================
 */
 void R_MakeAmbientMap_f( const anCommandArgs &args ) {
-	anString fullname;
+	anStr fullname;
 	char *extensions[6] =  { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga", "_pz.tga", "_nz.tga" };
 
 	if ( args.Argc() != 2 && args.Argc() != 3 ) {
@@ -2094,7 +2094,7 @@ void R_MakeAmbientMap_f( const anCommandArgs &args ) {
 }
 
 void R_TransformCubemap( const char *orgDirection[6], const char *orgDir, const char *destDirection[6], const char *destDir, const char *baseName ) {
-	anString	 fullname;
+	anStr	 fullname;
 	bool        errorInOriginalImages = false;
 	byte *		buffers[6];
 	int			width = 0, height = 0;
@@ -2109,7 +2109,7 @@ void R_TransformCubemap( const char *orgDirection[6], const char *orgDir, const 
 		if ( !buffers[i] ) {
 			common->Printf( "failed.\n" );
 			errorInOriginalImages = true;
-		} else if( width != height ) {
+		} else if ( width != height ) {
 			common->Printf( "wrong size pal!\n\n\nget your shit together and set the size according to your images!\n\n\ninept programmers are inept!\n" );
 			errorInOriginalImages = true;
 		} else {
@@ -2276,7 +2276,7 @@ extern	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 	} else {
 		common->Printf( "Vertex cache is SLOW\n" );
 	}
-	//if( qglConfig.gpuSkinningAvailable ) {
+	//if ( qglConfig.gpuSkinningAvailable ) {
 		//common->Printf( S_COLOR_GREEN "GPU skeletal animation available\n" );
 	//Color/} else {
 		//common->Printf( S_COLOR_RED "GPU skeletal animation not available ( slower CPU path active)\n" );
@@ -2297,11 +2297,11 @@ void R_VidRestart_f( const anCommandArgs &args ) {
 	bool full = true;
 	bool forceWindow = false;
 	for ( int i = 1; i < args.Argc(); i++ ) {
-		if ( anString::Icmp( args.Argv( i ), "partial" ) == 0 ) {
+		if ( anStr::Icmp( args.Argv( i ), "partial" ) == 0 ) {
 			full = false;
 			continue;
 		}
-		if ( anString::Icmp( args.Argv( i ), "windowed" ) == 0 ) {
+		if ( anStr::Icmp( args.Argv( i ), "windowed" ) == 0 ) {
 			forceWindow = true;
 			continue;
 		}
@@ -2893,7 +2893,7 @@ void anRenderSystemLocal::LoadLevelImages() {
 anRenderSystemLocal::Preload
 ========================
 */
-///void anRenderSystemLocal::Preload( const idPreloadManifest &manifest, const char* mapName ) {
+///void anRenderSystemLocal::Preload( const idPreloadManifest &manifest, const char *mapName ) {
 	//globalImages->Preload( manifest, true );
 	//uiManager->Preload( mapName );
 	//renderModelManager->Preload( manifest );
@@ -2932,9 +2932,9 @@ bool anRenderSystemLocal::RegisterFont( const char *fontName, fontInfoEx_t &font
 	}
 
 	int pointSize = 12;
-	anString::snPrintf( name, sizeof( name ), "%s/fontImage_%i.dat", fontName, pointSize );
+	anStr::snPrintf( name, sizeof( name ), "%s/fontImage_%i.dat", fontName, pointSize );
 	for ( i = 0; i < registeredFontCount; i++ ) {
-		if ( anString::Icmp(name, registeredFont[i].fontInfoS.name) == 0 ) {
+		if ( anStr::Icmp(name, registeredFont[i].fontInfoS.name) == 0 ) {
 			memcpy( &font, &registeredFont[i], sizeof( fontInfoEx_t ) );
 			return true;
 		}
@@ -2954,7 +2954,7 @@ bool anRenderSystemLocal::RegisterFont( const char *fontName, fontInfoEx_t &font
 		float glyphScale = 1.0f; 		// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
 		glyphScale *= 48.0f / pointSize;
 
-		anString::snPrintf( name, sizeof( name ), "%s/fontImage_%i.dat", fontName, pointSize );
+		anStr::snPrintf( name, sizeof( name ), "%s/fontImage_%i.dat", fontName, pointSize );
 
 		fontInfo_t *outFont;
 		if ( fontCount == 0 ) {
@@ -2965,7 +2965,7 @@ bool anRenderSystemLocal::RegisterFont( const char *fontName, fontInfoEx_t &font
 			outFont = &font.fontInfoXL;
 		}
 
-		anString::Copynz( outFont->name, name, sizeof( outFont->name ) );
+		anStr::Copynz( outFont->name, name, sizeof( outFont->name ) );
 
 		len = fileSystem->ReadFile( name, nullptr, &ftime );
 		if ( len != sizeof( fontInfo_t ) ) {
@@ -2998,7 +2998,7 @@ bool anRenderSystemLocal::RegisterFont( const char *fontName, fontInfoEx_t &font
 		int mw = 0;
 		int mh = 0;
 		for ( i = GLYPH_START; i < GLYPH_END; i++ ) {
-			anString::snPrintf(name, sizeof( name ), "%s/%s", fontName, outFont->glyphs[i].shaderName);
+			anStr::snPrintf(name, sizeof( name ), "%s/%s", fontName, outFont->glyphs[i].shaderName);
 			outFont->glyphs[i].glyph = declManager->FindMaterial( name );
 			outFont->glyphs[i].glyph->SetSort( SS_GUI );
 			if (mh < outFont->glyphs[i].height) {

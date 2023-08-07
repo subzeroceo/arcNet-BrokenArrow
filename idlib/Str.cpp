@@ -11,9 +11,9 @@
 static anDynamicBlockAlloc<char, 1<<18, 128>	stringDataAllocator;
 #endif
 
-anString::HMSTimeFormat_t	anString::defaultHMSFormat;
+anStr::HMSTimeFormat_t	anStr::defaultHMSFormat;
 
-strColor_t g_color_table[COLOR_BITS+1] = 
+strColor_t g_color_table[COLOR_BITS+1] = {
 	{ anVec4( 0.0f,		0.0f,		0.0f,  1.0f ), "^0" },			// 0 - S_COLOR_DEFAULT			0
 	{ anVec4( 1.0f,		0.0f,		0.0f,  1.0f ), "^1" }, 			// 1 - S_COLOR_RED				1
 	{ anVec4( 0.0f,		1.0f,		0.0f,  1.0f ), "^2" }, 			// 2 - S_COLOR_GREEN			2
@@ -54,37 +54,37 @@ const char *units[2][4] = {
 };
 /*
 ============
-anString::ColorForIndex
+anStr::ColorForIndex
 ============
 */
-const anVec4 &anString::ColorForIndex( int i ) {
+const anVec4 &anStr::ColorForIndex( int i ) {
 	return g_color_table[ i & COLOR_BITS ].color;
 }
 
 /*
 ============
-anString::ColorForIndex
+anStr::ColorForIndex
 ============
 */
-const anVec4 &anString::ColorForChar( int c ) {
+const anVec4 &anStr::ColorForChar( int c ) {
 	return g_color_table[ ColorIndex( c ) ].color;
 }
 
 /*
 ============
-anString::ColorForIndex
+anStr::ColorForIndex
 ============
 */
-const char *anString::StrForColorIndex( int i ) {
+const char *anStr::StrForColorIndex( int i ) {
 	return g_color_table[ i & COLOR_BITS ].str; //return g_color_table[ i & 15 ];
 }
 
 /*
 ============
-anString::ReAllocate
+anStr::ReAllocate
 ============
 */
-void anString::ReAllocate( int amount, bool keepOld ) {
+void anStr::ReAllocate( int amount, bool keepOld ) {
 	assert( amount > 0 );
 
 	int mod = amount % STR_ALLOC_GRAN;
@@ -113,10 +113,10 @@ void anString::ReAllocate( int amount, bool keepOld ) {
 
 /*
 ============
-anString::FreeData
+anStr::FreeData
 ============
 */
-void anString::FreeData( void ) {
+void anStr::FreeData( void ) {
 	if ( data && data != baseBuffer ) {
 		stringDataAllocator.Free( data );
 		//delete[] data;
@@ -126,18 +126,17 @@ void anString::FreeData( void ) {
 
 /*
 ============
-anString::operator=
+anStr::operator=
 ============
 */
-void anString::operator=( const char *text ) {
+void anStr::operator=( const char *text ) {
 	int l;
 	int diff;
-	int i;
 
 	if ( !text ) {
 		// safe behaviour if nullptr
 		EnsureAlloced( 1, false );
-		data[ 0 ] = '\0';
+		data[0] = '\0';
 		len = 0;
 		return;
 	}
@@ -152,7 +151,7 @@ void anString::operator=( const char *text ) {
 
 		assert( strlen( text ) < (unsigned)len );
 
-		for ( i = 0; text[i]; i++ ) {
+		for ( int i = 0; text[i]; i++ ) {
 			data[i] = text[i];
 		}
 
@@ -171,12 +170,12 @@ void anString::operator=( const char *text ) {
 
 /*
 ============
-anString::FindChar
+anStr::FindChar
 
 returns -1 if not found otherwise the index of the char
 ============
 */
-int anString::FindChar( const char *str, const char c, int start, int end ) {
+int anStr::FindChar( const char *str, const char c, int start, int end ) {
 	if ( end == -1 ) {
 		end = strlen( str ) - 1;
 	}
@@ -190,12 +189,12 @@ int anString::FindChar( const char *str, const char c, int start, int end ) {
 
 /*
 ============
-anString::FindText
+anStr::FindText
 
 returns -1 if not found otherwise the index of the text
 ============
 */
-int anString::FindText( const char *str, const char *text, bool casesensitive, int start, int end ) {
+int anStr::FindText( const char *str, const char *text, bool casesensitive, int start, int end ) {
 	int l, i, j;
 
 	if ( end == -1 ) {
@@ -225,7 +224,7 @@ int anString::FindText( const char *str, const char *text, bool casesensitive, i
 
 /*
 ============
-anString::Filter
+anStr::Filter
 
 Returns true if the string conforms the given filter.
 Several metacharacter may be used in the filter.
@@ -237,8 +236,8 @@ Several metacharacter may be used in the filter.
 
 ============
 */
-bool anString::Filter( const char *filter, const char *name, bool casesensitive ) {
-	anString buf;
+bool anStr::Filter( const char *filter, const char *name, bool casesensitive ) {
+	anStr buf;
 	int i, found, index;
 
 	while(*filter) {
@@ -256,7 +255,7 @@ bool anString::Filter( const char *filter, const char *name, bool casesensitive 
 				filter++;
 			}
 			if ( buf.Length() ) {
-				index = anString( name ).Find( buf.c_str(), casesensitive );
+				index = anStr( name ).Find( buf.c_str(), casesensitive );
 				if ( index == -1 ) {
 					return false;
 				}
@@ -334,12 +333,12 @@ bool anString::Filter( const char *filter, const char *name, bool casesensitive 
 
 /*
 =============
-anString::StripMediaName
+anStr::StripMediaName
 
   makes the string lower case, replaces backslashes with forward slashes, and removes extension
 =============
 */
-void anString::StripMediaName( const char *name, anString &mediaName ) {
+void anStr::StripMediaName( const char *name, anStr &mediaName ) {
 	char c;
 
 	mediaName.Empty();
@@ -353,17 +352,17 @@ void anString::StripMediaName( const char *name, anString &mediaName ) {
 		if ( c == '\\' ) {
 			mediaName.Append( '/' );
 		} else {
-			mediaName.Append( anString::ToLower( c ) );
+			mediaName.Append( anStr::ToLower( c ) );
 		}
 	}
 }
 
 /*
 =============
-anString::CheckExtension
+anStr::CheckExtension
 =============
 */
-bool anString::CheckExtension( const char *name, const char *ext ) {
+bool anStr::CheckExtension( const char *name, const char *ext ) {
 	const char *s1 = name + Length( name ) - 1;
 	const char *s2 = ext + Length( ext ) - 1;
 	int c1, c2, d;
@@ -395,10 +394,10 @@ bool anString::CheckExtension( const char *name, const char *ext ) {
 
 /*
 =============
-anString::FloatArrayToString
+anStr::FloatArrayToString
 =============
 */
-const char *anString::FloatArrayToString( const float *array, const int length, const int precision ) {
+const char *anStr::FloatArrayToString( const float *array, const int length, const int precision ) {
 	static int index = 0;
 	static char str[4][16384];	// in case called by nested functions
 	int i, n;
@@ -408,15 +407,15 @@ const char *anString::FloatArrayToString( const float *array, const int length, 
 	s = str[index];
 	index = (index + 1 ) & 3;
 
-	anString::snPrintf( format, sizeof( format ), "%%.%df", precision );
-	n = anString::snPrintf( s, sizeof( str[0] ), format, array[0] );
+	anStr::snPrintf( format, sizeof( format ), "%%.%df", precision );
+	n = anStr::snPrintf( s, sizeof( str[0] ), format, array[0] );
 	if ( precision > 0 ) {
 		while( n > 0 && s[n-1] == '0' ) s[--n] = '\0';
 		while( n > 0 && s[n-1] == '.' ) s[--n] = '\0';
 	}
-	anString::snPrintf( format, sizeof( format ), " %%.%df", precision );
+	anStr::snPrintf( format, sizeof( format ), " %%.%df", precision );
 	for ( i = 1; i < length; i++ ) {
-		n += anString::snPrintf( s + n, sizeof( str[0] ) - n, format, array[i] );
+		n += anStr::snPrintf( s + n, sizeof( str[0] ) - n, format, array[i] );
 		if ( precision > 0 ) {
 			while( n > 0 && s[n-1] == '0' ) s[--n] = '\0';
 			while( n > 0 && s[n-1] == '.' ) s[--n] = '\0';
@@ -427,12 +426,12 @@ const char *anString::FloatArrayToString( const float *array, const int length, 
 
 /*
 ============
-anString::Last
+anStr::Last
 
 returns -1 if not found otherwise the index of the char
 ============
 */
-int anString::Last( const char c ) const {
+int anStr::Last( const char c ) const {
 	int i;
 
 	for ( i = Length(); i > 0; i-- ) {
@@ -446,22 +445,22 @@ int anString::Last( const char c ) const {
 
 /*
 ============
-anString::StripLeading
+anStr::StripLeading
 ============
 */
-void anString::StripLeading( const char c ) {
-	while( data[ 0 ] == c ) {
-		memmove( &data[ 0 ], &data[ 1 ], len );
+void anStr::StripLeading( const char c ) {
+	while( data[0] == c ) {
+		memmove( &data[0], &data[1], len );
 		len--;
 	}
 }
 
 /*
 ============
-anString::StripLeading
+anStr::StripLeading
 ============
 */
-void anString::StripLeading( const char *string ) {
+void anStr::StripLeading( const char *string ) {
 	int l;
 
 	l = strlen( string );
@@ -475,10 +474,10 @@ void anString::StripLeading( const char *string ) {
 
 /*
 ============
-anString::StripLeadingOnce
+anStr::StripLeadingOnce
 ============
 */
-bool anString::StripLeadingOnce( const char *string ) {
+bool anStr::StripLeadingOnce( const char *string ) {
 	int l;
 
 	l = strlen( string );
@@ -492,10 +491,10 @@ bool anString::StripLeadingOnce( const char *string ) {
 
 /*
 ============
-anString::StripTrailing
+anStr::StripTrailing
 ============
 */
-void anString::StripTrailing( const char c ) {
+void anStr::StripTrailing( const char c ) {
 	int i;
 
 	for ( i = Length(); i > 0 && data[ i - 1 ] == c; i-- ) {
@@ -506,10 +505,10 @@ void anString::StripTrailing( const char c ) {
 
 /*
 ============
-anString::StripLeading
+anStr::StripLeading
 ============
 */
-void anString::StripTrailing( const char *string ) {
+void anStr::StripTrailing( const char *string ) {
 	int l;
 
 	l = strlen( string );
@@ -523,10 +522,10 @@ void anString::StripTrailing( const char *string ) {
 
 /*
 ============
-anString::StripTrailingOnce
+anStr::StripTrailingOnce
 ============
 */
-bool anString::StripTrailingOnce( const char *string ) {
+bool anStr::StripTrailingOnce( const char *string ) {
 	int l;
 
 	l = strlen( string );
@@ -540,12 +539,12 @@ bool anString::StripTrailingOnce( const char *string ) {
 
 /*
 ============
-anString::Replace
+anStr::Replace
 ============
 */
-void anString::Replace( const char *old, const char *nw ) {
+void anStr::Replace( const char *old, const char *nw ) {
 	int		oldLen, newLen, i, j, count;
-	anString	oldString( data );
+	anStr	oldString( data );
 
 	oldLen = strlen( old );
 	newLen = strlen( nw );
@@ -553,7 +552,7 @@ void anString::Replace( const char *old, const char *nw ) {
 	// Work out how big the new string will be
 	count = 0;
 	for ( i = 0; i < oldString.Length(); i++ ) {
-		if ( !anString::Cmpn( &oldString[i], old, oldLen ) ) {
+		if ( !anStr::Cmpn( &oldString[i], old, oldLen ) ) {
 			count++;
 			i += oldLen - 1;
 		}
@@ -564,7 +563,7 @@ void anString::Replace( const char *old, const char *nw ) {
 
 		// Replace the old data with the new data
 		for ( i = 0, j = 0; i < oldString.Length(); i++ ) {
-			if ( !anString::Cmpn( &oldString[i], old, oldLen ) ) {
+			if ( !anStr::Cmpn( &oldString[i], old, oldLen ) ) {
 				memcpy( data + j, nw, newLen );
 				i += oldLen - 1;
 				j += newLen;
@@ -580,10 +579,10 @@ void anString::Replace( const char *old, const char *nw ) {
 
 /*
 ============
-anString::Mid
+anStr::Mid
 ============
 */
-const char *anString::Mid( int start, int len, anString &result ) const {
+const char *anStr::Mid( int start, int len, anStr &result ) const {
 	int i;
 
 	result.Empty();
@@ -603,12 +602,12 @@ const char *anString::Mid( int start, int len, anString &result ) const {
 
 /*
 ============
-anString::Mid
+anStr::Mid
 ============
 */
-anString anString::Mid( int start, int len ) const {
+anStr anStr::Mid( int start, int len ) const {
 	int i;
-	anString result;
+	anStr result;
 
 	i = Length();
 	if ( i == 0 || len <= 0 || start >= i ) {
@@ -625,10 +624,10 @@ anString anString::Mid( int start, int len ) const {
 
 /*
 ============
-anString::StripTrailingWhitespace
+anStr::StripTrailingWhitespace
 ============
 */
-void anString::StripTrailingWhitespace( void ) {
+void anStr::StripTrailingWhitespace( void ) {
 	int i;
 
 	// cast to unsigned char to prevent stripping off high-ASCII characters
@@ -640,12 +639,12 @@ void anString::StripTrailingWhitespace( void ) {
 
 /*
 ============
-anString::StripQuotes
+anStr::StripQuotes
 
 Removes the quotes from the beginning and end of the string
 ============
 */
-anString& anString::StripQuotes( void ) {
+anStr& anStr::StripQuotes( void ) {
 	if ( data[0] != '\"' ) {
 		return *this;
 	}
@@ -658,7 +657,7 @@ anString& anString::StripQuotes( void ) {
 
 	// Strip the leading quote now
 	len--;
-	memmove( &data[ 0 ], &data[ 1 ], len );
+	memmove( &data[0], &data[1], len );
 	data[len] = '\0';
 
 	return *this;
@@ -674,10 +673,10 @@ anString& anString::StripQuotes( void ) {
 
 /*
 ============
-anString::FileNameHash
+anStr::FileNameHash
 ============
 */
-int anString::FileNameHash( void ) const {
+int anStr::FileNameHash( void ) const {
 	int		i;
 	long	hash;
 	char	letter;
@@ -685,7 +684,7 @@ int anString::FileNameHash( void ) const {
 	hash = 0;
 	i = 0;
 	while( data[i] != '\0' ) {
-		letter = anString::ToLower( data[i] );
+		letter = anStr::ToLower( data[i] );
 		if ( letter == '.' ) {
 			break;				// don't include extension
 		}
@@ -701,10 +700,10 @@ int anString::FileNameHash( void ) const {
 
 /*
 ============
-anString::BackSlashesToSlashes
+anStr::BackSlashesToSlashes
 ============
 */
-anString &anString::BackSlashesToSlashes( void ) {
+anStr &anStr::BackSlashesToSlashes( void ) {
 	int i;
 
 	for ( i = 0; i < len; i++ ) {
@@ -717,10 +716,10 @@ anString &anString::BackSlashesToSlashes( void ) {
 
 /*
 ============
-anString::SetFileExtension
+anStr::SetFileExtension
 ============
 */
-anString &anString::SetFileExtension( const char *extension ) {
+anStr &anStr::SetFileExtension( const char *extension ) {
 	StripFileExtension();
 	if ( *extension != '.' ) {
 		Append( '.' );
@@ -731,10 +730,10 @@ anString &anString::SetFileExtension( const char *extension ) {
 
 /*
 ============
-anString::StripFileExtension
+anStr::StripFileExtension
 ============
 */
-anString &anString::StripFileExtension( void ) {
+anStr &anStr::StripFileExtension( void ) {
 	int i;
 
 	for ( i = len-1; i >= 0; i-- ) {
@@ -749,10 +748,10 @@ anString &anString::StripFileExtension( void ) {
 
 /*
 ============
-anString::StripAbsoluteFileExtension
+anStr::StripAbsoluteFileExtension
 ============
 */
-anString &anString::StripAbsoluteFileExtension( void ) {
+anStr &anStr::StripAbsoluteFileExtension( void ) {
 	int i;
 
 	for ( i = 0; i < len; i++ ) {
@@ -768,10 +767,10 @@ anString &anString::StripAbsoluteFileExtension( void ) {
 
 /*
 ==================
-anString::DefaultFileExtension
+anStr::DefaultFileExtension
 ==================
 */
-anString &anString::DefaultFileExtension( const char *extension ) {
+anStr &anStr::DefaultFileExtension( const char *extension ) {
 	int i;
 
 	// do nothing if the string already has an extension
@@ -789,11 +788,11 @@ anString &anString::DefaultFileExtension( const char *extension ) {
 
 /*
 ==================
-anString::DefaultPath
+anStr::DefaultPath
 ==================
 */
-anString &anString::DefaultPath( const char *basepath ) {
-	if ( ( ( *this )[ 0 ] == '/' ) || ( ( *this )[ 0 ] == '\\' ) ) {
+anStr &anStr::DefaultPath( const char *basepath ) {
+	if ( ( ( *this )[0] == '/' ) || ( ( *this )[0] == '\\' ) ) {
 		// absolute path location
 		return *this;
 	}
@@ -804,10 +803,10 @@ anString &anString::DefaultPath( const char *basepath ) {
 
 /*
 ====================
-anString::AppendPath
+anStr::AppendPath
 ====================
 */
-void anString::AppendPath( const char *text ) {
+void anStr::AppendPath( const char *text ) {
 	int pos;
 	int i = 0;
 
@@ -838,10 +837,10 @@ void anString::AppendPath( const char *text ) {
 
 /*
 ==================
-anString::StripFilename
+anStr::StripFilename
 ==================
 */
-anString &anString::StripFilename( void ) {
+anStr &anStr::StripFilename( void ) {
 	int pos;
 
 	pos = Length() - 1;
@@ -859,10 +858,10 @@ anString &anString::StripFilename( void ) {
 
 /*
 ==================
-anString::StripPath
+anStr::StripPath
 ==================
 */
-anString &anString::StripPath( void ) {
+anStr &anStr::StripPath( void ) {
 	int pos;
 
 	pos = Length();
@@ -876,10 +875,10 @@ anString &anString::StripPath( void ) {
 
 /*
 ====================
-anString::ExtractFilePath
+anStr::ExtractFilePath
 ====================
 */
-void anString::ExtractFilePath( anString &dest ) const {
+void anStr::ExtractFilePath( anStr &dest ) const {
 	int pos;
 
 	//
@@ -895,16 +894,14 @@ void anString::ExtractFilePath( anString &dest ) const {
 
 /*
 ====================
-anString::ExtractFileName
+anStr::ExtractFileName
 ====================
 */
-void anString::ExtractFileName( anString &dest ) const {
-	int pos;
-
+void anStr::ExtractFileName( anStr &dest ) const {
 	//
 	// back up until a \ or the start
 	//
-	pos = Length() - 1;
+	int pos = Length() - 1;
 	while( ( pos > 0 ) && ( ( *this )[ pos - 1 ] != '/' ) && ( ( *this )[ pos - 1 ] != '\\' ) ) {
 		pos--;
 	}
@@ -914,22 +911,19 @@ void anString::ExtractFileName( anString &dest ) const {
 
 /*
 ====================
-anString::ExtractFileBase
+anStr::ExtractFileBase
 ====================
 */
-void anString::ExtractFileBase( anString &dest ) const {
-	int pos;
-	int start;
-
+void anStr::ExtractFileBase( anStr &dest ) const {
 	//
 	// back up until a \ or the start
 	//
-	pos = Length() - 1;
+	int pos = Length() - 1;
 	while( ( pos > 0 ) && ( ( *this )[ pos - 1 ] != '/' ) && ( ( *this )[ pos - 1 ] != '\\' ) ) {
 		pos--;
 	}
 
-	start = pos;
+	int start = pos;
 	while( ( pos < Length() ) && ( ( *this )[ pos ] != '.' ) ) {
 		pos++;
 	}
@@ -939,16 +933,14 @@ void anString::ExtractFileBase( anString &dest ) const {
 
 /*
 ====================
-anString::ExtractFileExtension
+anStr::ExtractFileExtension
 ====================
 */
-void anString::ExtractFileExtension( anString &dest ) const {
-	int pos;
-
+void anStr::ExtractFileExtension( anStr &dest ) const {
 	//
 	// back up until a . or the start
 	//
-	pos = Length() - 1;
+	int pos = Length() - 1;
 	while( ( pos > 0 ) && ( ( *this )[ pos - 1 ] != '.' ) ) {
 		pos--;
 	}
@@ -961,7 +953,6 @@ void anString::ExtractFileExtension( anString &dest ) const {
 	}
 }
 
-
 /*
 =====================================================================
 
@@ -972,21 +963,18 @@ void anString::ExtractFileExtension( anString &dest ) const {
 
 /*
 ============
-anString::IsNumeric
+anStr::IsNumeric
 
 Checks a string to see if it contains only numerical values.
 ============
 */
-bool anString::IsNumeric( const char *s ) {
-	int		i;
-	bool	dot;
-
+bool anStr::IsNumeric( const char *s ) {
 	if ( *s == '-' ) {
 		s++;
 	}
 
-	dot = false;
-	for ( i = 0; s[i]; i++ ) {
+	bool dot = false;
+	for ( int i = 0; s[i]; i++ ) {
 		if ( !isdigit( s[i] ) ) {
 			if ( ( s[i] == '.' ) && !dot ) {
 				dot = true;
@@ -1001,12 +989,12 @@ bool anString::IsNumeric( const char *s ) {
 
 /*
 ============
-anString::HasLower
+anStr::HasLower
 
 Checks if a string has any lowercase chars
 ============
 */
-bool anString::HasLower( const char *s ) {
+bool anStr::HasLower( const char *s ) {
 	if ( !s ) {
 		return false;
 	}
@@ -1023,12 +1011,12 @@ bool anString::HasLower( const char *s ) {
 
 /*
 ============
-anString::HasUpper
+anStr::HasUpper
 
 Checks if a string has any uppercase chars
 ============
 */
-bool anString::HasUpper( const char *s ) {
+bool anStr::HasUpper( const char *s ) {
 	if ( !s ) {
 		return false;
 	}
@@ -1045,10 +1033,10 @@ bool anString::HasUpper( const char *s ) {
 
 /*
 ================
-anString::Cmp
+anStr::Cmp
 ================
 */
-int anString::Cmp( const char *s1, const char *s2 ) {
+int anStr::Cmp( const char *s1, const char *s2 ) {
 	int c1, c2, d;
 
 	do {
@@ -1066,10 +1054,10 @@ int anString::Cmp( const char *s1, const char *s2 ) {
 
 /*
 ================
-anString::Cmpn
+anStr::Cmpn
 ================
 */
-int anString::Cmpn( const char *s1, const char *s2, int n ) {
+int anStr::Cmpn( const char *s1, const char *s2, int n ) {
 	int c1, c2, d;
 
 	assert( n >= 0 );
@@ -1093,15 +1081,52 @@ int anString::Cmpn( const char *s1, const char *s2, int n ) {
 
 /*
 ================
-anString::Icmp
+anStr::Icmp
 ================
 */
-int anString::Icmp( const char *s1, const char *s2 ) {
+int anStr::Icmp( const char *s1, const char *s2 ) {
 	int c1, c2, d;
 
 	do {
 		c1 = *s1++;
 		c2 = *s2++;
+		d = c1 - c2;
+		while( d ) {
+			if ( c1 <= 'Z' && c1 >= 'A' ) {
+				d += ('a' - 'A');
+				if ( !d ) {
+					break;
+				}
+			}
+			if ( c2 <= 'Z' && c2 >= 'A' ) {
+				d -= ('a' - 'A');
+				if ( !d ) {
+					break;
+				}
+			}
+			return ( INTSIGNBITNOTSET( d ) << 1 ) - 1;
+		}
+	} while( c1 );
+
+	return 0;		// strings are equal
+}
+
+/*
+================
+anStr::Icmpn
+================
+*/
+int anStr::Icmpn( const char *s1, const char *s2, int n ) {
+	int c1, c2, d;
+
+	assert( n >= 0 );
+
+	do {
+		c1 = *s1++;
+		c2 = *s2++;
+		if ( !n-- ) {
+			return 0;		// strings are equal until end point
+		}
 
 		d = c1 - c2;
 		while( d ) {
@@ -1126,55 +1151,17 @@ int anString::Icmp( const char *s1, const char *s2 ) {
 
 /*
 ================
-anString::Icmpn
+anStr::Icmp
 ================
 */
-int anString::Icmpn( const char *s1, const char *s2, int n ) {
-	int c1, c2, d;
-
-	assert( n >= 0 );
-
-	do {
-		c1 = *s1++;
-		c2 = *s2++;
-		if ( !n-- ) {
-			return 0;		// strings are equal until end point
-		}
-
-		d = c1 - c2;
-		while( d ) {
-			if ( c1 <= 'Z' && c1 >= 'A' ) {
-				d += ('a' - 'A');
-				if ( !d ) {
-					break;
-				}
-			}
-			if ( c2 <= 'Z' && c2 >= 'A' ) {
-				d -= ('a' - 'A');
-				if ( !d ) {
-					break;
-				}
-			}
-			return ( INTSIGNBITNOTSET( d ) << 1 ) - 1;
-		}
-	} while( c1 );
-
-	return 0;		// strings are equal
-}
-
-/*
-================
-anString::Icmp
-================
-*/
-int anString::IcmpNoColor( const char *s1, const char *s2 ) {
+int anStr::IcmpNoColor( const char *s1, const char *s2 ) {
 	int c1, c2, d;
 
 	do {
-		while ( anString::IsColor( s1 ) ) {
+		while ( anStr::IsColor( s1 ) ) {
 			s1 += 2;
 		}
-		while ( anString::IsColor( s2 ) ) {
+		while ( anStr::IsColor( s2 ) ) {
 			s2 += 2;
 		}
 		c1 = *s1++;
@@ -1203,10 +1190,10 @@ int anString::IcmpNoColor( const char *s1, const char *s2 ) {
 
 /*
 ================
-anString::IcmpPath
+anStr::IcmpPath
 ================
 */
-int anString::IcmpPath( const char *s1, const char *s2 ) {
+int anStr::IcmpPath( const char *s1, const char *s2 ) {
 	int c1, c2, d;
 
 #if 0
@@ -1272,10 +1259,10 @@ int anString::IcmpPath( const char *s1, const char *s2 ) {
 
 /*
 ================
-anString::IcmpnPath
+anStr::IcmpnPath
 ================
 */
-int anString::IcmpnPath( const char *s1, const char *s2, int n ) {
+int anStr::IcmpnPath( const char *s1, const char *s2, int n ) {
 	int c1, c2, d;
 
 #if 0
@@ -1347,18 +1334,18 @@ int anString::IcmpnPath( const char *s1, const char *s2, int n ) {
 
 /*
 =============
-anString::Copynz
+anStr::Copynz
 
 Safe strncpy that ensures a trailing zero
 =============
 */
-void anString::Copynz( char *dest, const char *src, int destsize ) {
+void anStr::Copynz( char *dest, const char *src, int destsize ) {
 	if ( !src ) {
-		anLibrary::common->Warning( "anString::Copynz: nullptr src" );
+		anLibrary::common->Warning( "anStr::Copynz: nullptr src" );
 		return;
 	}
 	if ( destsize < 1 ) {
-		anLibrary::common->Warning( "anString::Copynz: destsize < 1" );
+		anLibrary::common->Warning( "anStr::Copynz: destsize < 1" );
 		return;
 	}
 
@@ -1368,27 +1355,27 @@ void anString::Copynz( char *dest, const char *src, int destsize ) {
 
 /*
 ================
-anString::Append
+anStr::Append
 
   never goes past bounds or leaves without a terminating 0
 ================
 */
-void anString::Append( char *dest, int size, const char *src ) {
+void anStr::Append( char *dest, int size, const char *src ) {
 	int		l1;
 
 	l1 = strlen( dest );
 	if ( l1 >= size ) {
-		anLibrary::common->Error( "anString::Append: already overflowed" );
+		anLibrary::common->Error( "anStr::Append: already overflowed" );
 	}
-	anString::Copynz( dest + l1, src, size - l1 );
+	anStr::Copynz( dest + l1, src, size - l1 );
 }
 
 /*
 ================
-anString::LengthWithoutColors
+anStr::LengthWithoutColors
 ================
 */
-int anString::LengthWithoutColors( const char *s ) {
+int anStr::LengthWithoutColors( const char *s ) {
 	int len;
 	const char *p;
 
@@ -1399,7 +1386,7 @@ int anString::LengthWithoutColors( const char *s ) {
 	len = 0;
 	p = s;
 	while( *p ) {
-		if ( anString::IsColor( p ) ) {
+		if ( anStr::IsColor( p ) ) {
 			p += 2;
 			continue;
 		}
@@ -1412,10 +1399,10 @@ int anString::LengthWithoutColors( const char *s ) {
 
 /*
 ================
-anString::RemoveColors
+anStr::RemoveColors
 ================
 */
-char *anString::RemoveColors( char *string ) {
+char *anStr::RemoveColors( char *string ) {
 	char *d;
 	char *s;
 	int c;
@@ -1423,7 +1410,7 @@ char *anString::RemoveColors( char *string ) {
 	s = string;
 	d = string;
 	while( (c = *s) != 0 ) {
-		if ( anString::IsColor( s ) ) {
+		if ( anStr::IsColor( s ) ) {
 			s++;
 		}
 		else {
@@ -1438,10 +1425,10 @@ char *anString::RemoveColors( char *string ) {
 
 /*
 ================
-anString::snPrintf
+anStr::snPrintf
 ================
 */
-int anString::snPrintf( char *dest, int size, const char *fmt, ...) {
+int anStr::snPrintf( char *dest, int size, const char *fmt, ...) {
 	int len;
 	va_list argptr;
 	char buffer[32000];	// big, but small enough to fit in PPC stack
@@ -1450,19 +1437,19 @@ int anString::snPrintf( char *dest, int size, const char *fmt, ...) {
 	len = vsprintf( buffer, fmt, argptr );
 	va_end( argptr );
 	if ( len >= sizeof( buffer ) ) {
-		anLibrary::common->Error( "anString::snPrintf: overflowed buffer" );
+		anLibrary::common->Error( "anStr::snPrintf: overflowed buffer" );
 	}
 	if ( len >= size ) {
-		anLibrary::common->Warning( "anString::snPrintf: overflow of %i in %i\n", len, size );
+		anLibrary::common->Warning( "anStr::snPrintf: overflow of %i in %i\n", len, size );
 		len = size;
 	}
-	anString::Copynz( dest, buffer, size );
+	anStr::Copynz( dest, buffer, size );
 	return len;
 }
 
 /*
 ============
-anString::vsnPrintf
+anStr::vsnPrintf
 
 vsnprintf portability:
 
@@ -1474,11 +1461,11 @@ win32: _vsnprintf returns the number of characters written, not including the te
 or a negative value if an output error occurs. If the number of characters to write exceeds count, then count
 characters are written and -1 is returned and no trailing '\0' is added.
 
-anString::vsnPrintf: always appends a trailing '\0', returns number of characters written (not including terminal \0 )
+anStr::vsnPrintf: always appends a trailing '\0', returns number of characters written (not including terminal \0 )
 or returns -1 on failure or if the buffer would be overflowed.
 ============
 */
-int anString::vsnPrintf( char *dest, int size, const char *fmt, va_list argptr ) {
+int anStr::vsnPrintf( char *dest, int size, const char *fmt, va_list argptr ) {
 	int ret;
 
 #ifdef _WIN32
@@ -1504,13 +1491,13 @@ sprintf
 Sets the value of the string using a printf interface.
 ============
 */
-int sprintf( anString &string, const char *fmt, ... ) {
+int sprintf( anStr &string, const char *fmt, ... ) {
 	int l;
 	va_list argptr;
 	char buffer[32000];
 
 	va_start( argptr, fmt );
-	l = anString::vsnPrintf( buffer, sizeof(buffer)-1, fmt, argptr );
+	l = anStr::vsnPrintf( buffer, sizeof(buffer)-1, fmt, argptr );
 	va_end( argptr );
 	buffer[sizeof(buffer)-1] = '\0';
 
@@ -1525,11 +1512,11 @@ vsprintf
 Sets the value of the string using a vprintf interface.
 ============
 */
-int vsprintf( anString &string, const char *fmt, va_list argptr ) {
+int vsprintf( anStr &string, const char *fmt, va_list argptr ) {
 	int l;
 	char buffer[32000];
 
-	l = anString::vsnPrintf( buffer, sizeof(buffer)-1, fmt, argptr );
+	l = anStr::vsnPrintf( buffer, sizeof(buffer)-1, fmt, argptr );
 	buffer[sizeof(buffer)-1] = '\0';
 
 	string = buffer;
@@ -1562,10 +1549,10 @@ char *va( const char *fmt, ... ) {
 
 /*
 ============
-anString::BestUnit
+anStr::BestUnit
 ============
 */
-int anString::BestUnit( const char *format, float value, Measure_t measure ) {
+int anStr::BestUnit( const char *format, float value, Measure_t measure ) {
 	int unit = 1;
 	while ( unit <= 3 && ( 1 << ( unit * 10 ) < value ) ) {
 		unit++;
@@ -1580,10 +1567,10 @@ int anString::BestUnit( const char *format, float value, Measure_t measure ) {
 
 /*
 ============
-anString::SetUnit
+anStr::SetUnit
 ============
 */
-void anString::SetUnit( const char *format, float value, int unit, Measure_t measure ) {
+void anStr::SetUnit( const char *format, float value, int unit, Measure_t measure ) {
 	value /= 1 << ( unit * 10 );
 	sprintf( *this, format, value );
 	*this += " ";
@@ -1592,10 +1579,10 @@ void anString::SetUnit( const char *format, float value, int unit, Measure_t mea
 
 /*
 ================
-anString::InitMemory
+anStr::InitMemory
 ================
 */
-void anString::InitMemory( void ) {
+void anStr::InitMemory( void ) {
 #ifdef USE_STRING_DATA_ALLOCATOR
 	stringDataAllocator.Init();
 #endif
@@ -1603,10 +1590,10 @@ void anString::InitMemory( void ) {
 
 /*
 ================
-anString::ShutdownMemory
+anStr::ShutdownMemory
 ================
 */
-void anString::ShutdownMemory( void ) {
+void anStr::ShutdownMemory( void ) {
 #ifdef USE_STRING_DATA_ALLOCATOR
 	stringDataAllocator.Shutdown();
 #endif
@@ -1614,10 +1601,10 @@ void anString::ShutdownMemory( void ) {
 
 /*
 ================
-anString::PurgeMemory
+anStr::PurgeMemory
 ================
 */
-void anString::PurgeMemory( void ) {
+void anStr::PurgeMemory( void ) {
 #ifdef USE_STRING_DATA_ALLOCATOR
 	stringDataAllocator.FreeEmptyBaseBlocks();
 #endif
@@ -1625,10 +1612,10 @@ void anString::PurgeMemory( void ) {
 
 /*
 ================
-anString::ShowMemoryUsage_f
+anStr::ShowMemoryUsage_f
 ================
 */
-void anString::ShowMemoryUsage_f( const anCommandArgs &args ) {
+void anStr::ShowMemoryUsage_f( const anCommandArgs &args ) {
 #ifdef USE_STRING_DATA_ALLOCATOR
 	anLibrary::common->Printf( "%6d KB string memory (%d KB free in %d blocks, %d empty base blocks)\n",
 		stringDataAllocator.GetBaseBlockMemory() >> 10, stringDataAllocator.GetFreeBlockMemory() >> 10,
@@ -1638,7 +1625,7 @@ void anString::ShowMemoryUsage_f( const anCommandArgs &args ) {
 
 /*
 ================
-anString::FormatNumber
+anStr::FormatNumber
 ================
 */
 struct formatList_t {
@@ -1656,8 +1643,8 @@ formatList_t formatList[] = {
 int numFormatList = sizeof(formatList) / sizeof( formatList[0] );
 
 
-anString anString::FormatNumber( int number ) {
-	anString string;
+anStr anStr::FormatNumber( int number ) {
+	anStr string;
 	bool hit;
 
 	// reset
@@ -1679,7 +1666,6 @@ anString anString::FormatNumber( int number ) {
 			}
 		}
 	} while ( hit );
-
 	// print out
 	bool found = false;
 
@@ -1713,3 +1699,214 @@ anString anString::FormatNumber( int number ) {
 	return string;
 }
 
+int Q_isprint( int c ) {
+	if ( c >= 0x20 && c <= 0x7E ) {
+		return ( 1 );
+	}
+	return ( 0 );
+}
+
+int Q_islower( int c ) {
+	if ( c >= 'a' && c <= 'z' ) {
+		return ( 1 );
+	}
+	return ( 0 );
+}
+
+int Q_isupper( int c ) {
+	if ( c >= 'A' && c <= 'Z' ) {
+		return ( 1 );
+	}
+	return ( 0 );
+}
+
+int Q_isalpha( int c ) {
+	if ( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) ) {
+		return ( 1 );
+	}
+	return ( 0 );
+}
+
+char* Q_strrchr( const char* string, int c ) {
+	char cc = c;
+	char *sp = (char *)0, *s = (char *)string;
+
+	while ( *s ) {
+		if ( *s == cc ) {
+			sp = s;
+		}
+		s++;
+	}
+	if ( cc == 0 ) {
+		sp = s;
+	}
+
+	return sp;
+}
+
+/*
+=============
+Q_strncpyz
+
+Safe strncpy that ensures a trailing zero
+=============
+*/
+void Q_strncpyz( char *dest, const char *src, int destsize ) {
+	if ( !src ) {
+		Com_Error( ERR_FATAL, "Q_strncpyz: NULL src" );
+	}
+	if ( destsize < 1 ) {
+		Com_Error( ERR_FATAL,"Q_strncpyz: destsize < 1" );
+	}
+
+	strncpy( dest, src, destsize - 1 );
+	dest[destsize - 1] = 0;
+}
+
+int Q_stricmpn( const char *s1, const char *s2, int n ) {
+	int c1, c2;
+
+	do {
+		c1 = *s1++;
+		c2 = *s2++;
+
+		if ( !n-- ) {
+			return 0;       // strings are equal until end point
+		}
+
+		if ( c1 != c2 ) {
+			if ( c1 >= 'a' && c1 <= 'z' ) {
+				c1 -= ( 'a' - 'A' );
+			}
+			if ( c2 >= 'a' && c2 <= 'z' ) {
+				c2 -= ( 'a' - 'A' );
+			}
+			if ( c1 != c2 ) {
+				return c1 < c2 ? -1 : 1;
+			}
+		}
+	} while ( c1 );
+
+	return 0;       // strings are equal
+}
+
+int Q_strncmp( const char *s1, const char *s2, int n ) {
+	int c1, c2;
+
+	do {
+		c1 = *s1++;
+		c2 = *s2++;
+
+		if ( !n-- ) {
+			return 0;       // strings are equal until end point
+		}
+
+		if ( c1 != c2 ) {
+			return c1 < c2 ? -1 : 1;
+		}
+	} while ( c1 );
+
+	return 0;       // strings are equal
+}
+
+int Q_stricmp( const char *s1, const char *s2 ) {
+	return Q_stricmpn( s1, s2, 99999 );
+}
+
+
+char *Q_strlwr( char *s1 ) {
+	char    *s;
+
+	s = s1;
+	while ( *s ) {
+		*s = tolower( *s );
+		s++;
+	}
+	return s1;
+}
+
+char *Q_strupr( char *s1 ) {
+	char    *s;
+
+	s = s1;
+	while ( *s ) {
+		*s = toupper( *s );
+		s++;
+	}
+	return s1;
+}
+
+
+// never goes past bounds or leaves without a terminating 0
+void Q_strcat( char *dest, int size, const char *src ) {
+	int l1;
+
+	l1 = strlen( dest );
+	if ( l1 >= size ) {
+		Com_Error( ERR_FATAL, "Q_strcat: already overflowed" );
+	}
+	Q_strncpyz( dest + l1, src, size - l1 );
+}
+
+
+int Q_PrintStrlen( const char *string ) {
+	if ( !string ) {
+		return 0;
+	}
+
+	int len = 0;
+	const char *p = string;
+	while ( *p ) {
+		if ( Q_IsColorString( p ) ) {
+			p += 2;
+			continue;
+		}
+		p++;
+		len++;
+	}
+
+	return len;
+}
+
+char *Q_CleanStr( char *string ) {
+	int c;
+	char *s = string, *d = string;
+	while ( ( c = *s ) != 0 ) {
+		if ( Q_IsColorString( s ) ) {
+			s++;
+		} else if ( c >= 0x20 && c <= 0x7E )   {
+			*d++ = c;
+		}
+		s++;
+	}
+	*d = '\0';
+
+	return string;
+}
+
+#if 0
+/*
+============
+va
+
+does a varargs printf into a temp buffer, so I don't need to have
+varargs versions of all text functions.
+FIXME: make this buffer size safe someday
+============
+*/
+char *QDECL va( char *format, ... ) {
+	va_list argptr;
+	static char string[2][32000];       // in case va is called by nested functions
+	static int index = 0;
+	char    *buf;
+
+	buf = string[index & 1];
+	index++;
+
+	va_start( argptr, format );
+	vsprintf( buf, format,argptr );
+	va_end( argptr );
+
+	return buf;
+}
+#endif

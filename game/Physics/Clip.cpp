@@ -536,7 +536,7 @@ anClipModel::Restore
 ================
 */
 void anClipModel::Restore( anRestoreGame *savefile ) {
-	anString collisionModelName;
+	anStr collisionModelName;
 	bool linked;
 
 	savefile->ReadBool( enabled );
@@ -687,8 +687,8 @@ void anClipModel::Link( void ) {
 	clp->CoordsForBounds( coords, absBounds );
 
 	int x, y;
-	for ( x = coords[ 0 ]; x < coords[ 2 ]; x++ ) {
-		for ( y = coords[ 1 ]; y < coords[ 3 ]; y++ ) {
+	for ( x = coords[0]; x < coords[2]; x++ ) {
+		for ( y = coords[1]; y < coords[3]; y++ ) {
 			clipSector_t* sector = &clp->clipSectors[ x + ( y << CLIPSECTOR_DEPTH ) ];
 			sector->dynamicContents |= GetContents();
 			clipLink_t* link = clipLinkAllocator.Alloc();
@@ -776,13 +776,13 @@ clipSector_t *anClip::CreateClipSectors_r( const int depth, const anBounds &boun
 		delete[] clipSectors;
 		clipSectors = nullptr;
 	}
-	nodeOffsetVisual = bounds[ 0 ];
+	nodeOffsetVisual = bounds[0];
 
 	int i;
 	for ( i = 0; i < 3; i++ ) {
 #ifdef _DEBUG
-		if ( bounds[ 1 ][i] - bounds[ 0 ][i] )	{
-			nodeScale[i] = depth / ( bounds[ 1 ][i] - bounds[ 0 ][i] );
+		if ( bounds[1][i] - bounds[0][i] )	{
+			nodeScale[i] = depth / ( bounds[1][i] - bounds[0][i] );
 		} else {
 			gameLocal.Error( "zero size bounds while creating clipsectors" );
 			nodeScale[i] = depth;
@@ -794,7 +794,7 @@ clipSector_t *anClip::CreateClipSectors_r( const int depth, const anBounds &boun
 			nodeOffset[ i] = nodeOffset[ i] + 0.5f;
 		}
 #else
-		nodeScale[i] = depth / ( bounds[ 1 ][i] - bounds[ 0 ][i] );
+		nodeScale[i] = depth / ( bounds[1][i] - bounds[0][i] );
 		nodeOffset[i] = nodeOffsetVisual[i] + ( 0.5f / nodeScale[i] );
 
 #endif
@@ -818,10 +818,10 @@ void anClip::Init( void ) {
 	world->GetBounds( worldBounds );
 
 	// create world sectors
-	PUSH_HEAP_MEM(this);
+	PushHeapMemory(this);
 	CreateClipSectors_r( CLIPSECTOR_WIDTH, worldBounds, maxSector );
 	GetClipSectorsStaticContents();
-	POP_HEAP();
+	PopSystemHeap();
 	size = worldBounds[1] - worldBounds[0];
 	gameLocal.Printf( "map bounds are (%1.1f, %1.1f, %1.1f)\n", size[0], size[1], size[2] );
 	gameLocal.Printf( "max clip sector is (%1.1f, %1.1f, %1.1f)\n", maxSector[0], maxSector[1], maxSector[2] );
@@ -893,8 +893,8 @@ int anClip::ClipModelsTouchingBounds( const anBounds &bounds, int contentMask, a
 	CoordsForBounds( coords, parms.bounds );
 
 	int x, y;
-	for ( x = coords[ 0 ]; x < coords[ 2 ]; x++ ) {
-		for ( y = coords[ 1 ]; y < coords[ 3 ]; y++ ) {
+	for ( x = coords[0]; x < coords[2]; x++ ) {
+		for ( y = coords[1]; y < coords[3]; y++ ) {
 			clipSector_t* sector = &clipSectors[ x + ( y << CLIPSECTOR_DEPTH ) ];
 
 			if ( !( sector->dynamicContents & contentMask ) ) {
@@ -1029,9 +1029,9 @@ void anClip::DrawAreaClipSectors( float range ) const {
 
 	int i;
 	for ( i = 0; i < count; i++ ) {
-		anEntity* owner = clipModels[i]->GetEntity();
+		anEntity *owner = clipModels[i]->GetEntity();
 
-		const anVec3& org = clipModels[i]->GetOrigin();
+		const anVec3 &org = clipModels[i]->GetOrigin();
 		const anBounds& bounds = clipModels[i]->GetBounds();
 
 		gameRenderWorld->DebugBounds( colorCyan, bounds, org );
@@ -1056,39 +1056,39 @@ void anClip::DrawClipSectors( void ) const {
 		inverseNodeScale[i] = 1 / nodeScale[i];
 	}
 
-	const char* filter = g_showClipSectorFilter.GetString();
+	const char *filter = g_showClipSectorFilter.GetString();
 	idTypeInfo* type = anClass::GetClass( filter );
 
 	for ( int x = 0; x < CLIPSECTOR_WIDTH; x++ ) {
 		for ( int y = 0; y < CLIPSECTOR_WIDTH; y++ ) {
 //			idWinding w( 4 );
-			bounds[ 0 ].x = ( inverseNodeScale.x * x ) + nodeOffsetVisual.x + 1;
-			bounds[ 0 ].y = ( inverseNodeScale.y * y ) + nodeOffsetVisual.y + 1;
-			bounds[ 0 ].z = player->GetPhysics()->GetBounds()[0].z;
+			bounds[0].x = ( inverseNodeScale.x * x ) + nodeOffsetVisual.x + 1;
+			bounds[0].y = ( inverseNodeScale.y * y ) + nodeOffsetVisual.y + 1;
+			bounds[0].z = player->GetPhysics()->GetBounds()[0].z;
 
-			bounds[ 1 ].x = ( inverseNodeScale.x * ( x + 1 ) ) + nodeOffsetVisual.x - 1;
-			bounds[ 1 ].y = ( inverseNodeScale.y * ( y + 1 ) ) + nodeOffsetVisual.y - 1;
-			bounds[ 1 ].z = player->GetPhysics()->GetBounds()[1].z;
+			bounds[1].x = ( inverseNodeScale.x * ( x + 1 ) ) + nodeOffsetVisual.x - 1;
+			bounds[1].y = ( inverseNodeScale.y * ( y + 1 ) ) + nodeOffsetVisual.y - 1;
+			bounds[1].z = player->GetPhysics()->GetBounds()[1].z;
 
 			anVec3 point;
-			point.x = ( bounds[ 0 ].x + bounds[ 1 ].x ) * 0.5f;
-			point.y = ( bounds[ 0 ].y + bounds[ 1 ].y ) * 0.5f;
+			point.x = ( bounds[0].x + bounds[1].x ) * 0.5f;
+			point.y = ( bounds[0].y + bounds[1].y ) * 0.5f;
 			point.z = 0.f;
 
-/*			point.x = bounds[ 0 ].x;
-			point.y = bounds[ 0 ].y;
+/*			point.x = bounds[0].x;
+			point.y = bounds[0].y;
 			w.AddPoint( point );
 
-			point.x = bounds[ 1 ].x;
-			point.y = bounds[ 0 ].y;
+			point.x = bounds[1].x;
+			point.y = bounds[0].y;
 			w.AddPoint( point );
 
-			point.x = bounds[ 1 ].x;
-			point.y = bounds[ 1 ].y;
+			point.x = bounds[1].x;
+			point.y = bounds[1].y;
 			w.AddPoint( point );
 
-			point.x = bounds[ 0 ].x;
-			point.y = bounds[ 1 ].y;
+			point.x = bounds[0].x;
+			point.y = bounds[1].y;
 			w.AddPoint( point );*/
 
 			clipSector_t* sector = &clipSectors[ x + ( y << CLIPSECTOR_DEPTH ) ];
@@ -1122,13 +1122,13 @@ anClip::GetClipSectorsStaticContents
 void anClip::GetClipSectorsStaticContents( void ) {
 	anBounds bounds;
 
-	bounds[ 0 ].x = 0;
-	bounds[ 0 ].y = 0;
-	bounds[ 0 ].z = worldBounds[ 0 ].z;
+	bounds[0].x = 0;
+	bounds[0].y = 0;
+	bounds[0].z = worldBounds[0].z;
 
-	bounds[ 1 ].x = 1 / nodeScale.x;
-	bounds[ 1 ].y = 1 / nodeScale.y;
-	bounds[ 1 ].z = worldBounds[ 1 ].z;
+	bounds[1].x = 1 / nodeScale.x;
+	bounds[1].y = 1 / nodeScale.y;
+	bounds[1].z = worldBounds[1].z;
 
 	anTraceModel* trm = new anTraceModel( bounds );
 
@@ -1257,7 +1257,7 @@ const anTraceModel *anClip::TraceModelForClipModel( const anClipModel *mdl ) con
 anClip::TestHugeTranslation
 ============
 */
-ARC_INLINE bool TestHugeTranslation( trace_t &results, const anClipModel *mdl, const anVec3 &start, const anVec3 &end, const anMat3 &trmAxis ) {
+inline bool TestHugeTranslation( trace_t &results, const anClipModel *mdl, const anVec3 &start, const anVec3 &end, const anMat3 &trmAxis ) {
 	if ( mdl != nullptr && ( end - start ).LengthSqr() > Square( CM_MAX_TRACE_DIST ) ) {
 		assert( 0 );
 

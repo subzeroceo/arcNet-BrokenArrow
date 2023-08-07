@@ -1,50 +1,43 @@
-// Copyright (C) 2007 Id Software, Inc.
-//
-
 #include "../Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
 
 #include "Inventory.h"
-
-//#include "../decls/DeclInvItem.h"
 #include "../Player.h"
 #include "../Weapon.h"
-#include "../script/Script_Helper.h"
-#include "../script/Script_ScriptObject.h"
-//#include "../botai/BotThreadData.h"
+
 
 /*
 ===============================================================================
 
-	sdItemPoolEntry
+	anItemPoolEntry
 
 ===============================================================================
 */
 
 /*
 ==============
-sdItemPoolEntry::sdItemPoolEntry
+anItemPoolEntry::anItemPoolEntry
 ==============
 */
-sdItemPoolEntry::sdItemPoolEntry( void ) {
+anItemPoolEntry::anItemPoolEntry( void ) {
 	flags.disabled	= false;
 	flags.hidden	= false;
-	item			= NULL;
+	item			= nullptr;
 	joint			= INVALID_JOINT;
 }
 
 /*
 ==============
-sdItemPoolEntry::SetItem
+anItemPoolEntry::SetItem
 ==============
 */
-void sdItemPoolEntry::SetItem( const sdDeclInvItem* _item ) {
+void anItemPoolEntry::SetItem( const anItem *_item ) {
 	item = _item;
 
 	if ( item ) {
@@ -59,25 +52,25 @@ void sdItemPoolEntry::SetItem( const sdDeclInvItem* _item ) {
 /*
 ===============================================================================
 
-	sdPlayerClassSetup
+	anPlayerClassSetup
 
 ===============================================================================
 */
 
 /*
 ==============
-sdPlayerClassSetup::sdPlayerClassSetup
+anPlayerClassSetup::anPlayerClassSetup
 ==============
 */
-sdPlayerClassSetup::sdPlayerClassSetup( void ) : playerClass( NULL ) {
+anPlayerClassSetup::anPlayerClassSetup( void ) : playerClass( nullptr ) {
 }
 
 /*
 ==============
-sdPlayerClassSetup::operator=
+anPlayerClassSetup::operator=
 ==============
 */
-void sdPlayerClassSetup::operator=( const sdPlayerClassSetup& rhs ) {
+void anPlayerClassSetup::operator=( const anPlayerClassSetup& rhs ) {
 	playerClass = rhs.playerClass;
 	playerClassOptions.SetNum( rhs.playerClassOptions.Num(), false );
 	for ( int i = 0; i < playerClassOptions.Num(); i++ ) {
@@ -87,12 +80,12 @@ void sdPlayerClassSetup::operator=( const sdPlayerClassSetup& rhs ) {
 
 /*
 ==============
-sdPlayerClassSetup::SetOptions
+anPlayerClassSetup::SetOptions
 ==============
 */
-void sdPlayerClassSetup::SetOptions( const idList< int >& options ) {
+void anPlayerClassSetup::SetOptions( const anList< int >& options ) {
 	if ( options.Num() != playerClassOptions.Num() ) {
-		gameLocal.Warning( "sdPlayerClassSetup::SetOptions Number of options did not match" );
+		gameLocal.Warning( "anPlayerClassSetup::SetOptions Number of options did not match" );
 		return;
 	}
 
@@ -101,10 +94,10 @@ void sdPlayerClassSetup::SetOptions( const idList< int >& options ) {
 
 /*
 ==============
-sdPlayerClassSetup::SetClass
+anPlayerClassSetup::SetClass
 ==============
 */
-bool sdPlayerClassSetup::SetClass( const sdDeclPlayerClass* pc, bool force ) {
+bool anPlayerClassSetup::SetClass( const anDeclPlayerClass* pc, bool force ) {
 	if ( pc == playerClass && !force ) {
 		return false;
 	}
@@ -121,10 +114,10 @@ bool sdPlayerClassSetup::SetClass( const sdDeclPlayerClass* pc, bool force ) {
 
 /*
 ==============
-sdPlayerClassSetup::SetOption
+anPlayerClassSetup::SetOption
 ==============
 */
-bool sdPlayerClassSetup::SetOption( int index, int itemIndex ) {
+bool anPlayerClassSetup::SetOption( int index, int itemIndex ) {
 	if ( index < 0 || index >= playerClassOptions.Num() ) {
 		return false;
 	}
@@ -140,10 +133,10 @@ bool sdPlayerClassSetup::SetOption( int index, int itemIndex ) {
 
 /*
 ============
-sdPlayerClassSetup::GetOption
+anPlayerClassSetup::GetOption
 ============
 */
-int	sdPlayerClassSetup::GetOption( int index ) const {
+int	anPlayerClassSetup::GetOption( int index ) const {
 	assert( index >= 0 && index < playerClassOptions.Num() );
 
 	return playerClassOptions[ index ];
@@ -152,17 +145,17 @@ int	sdPlayerClassSetup::GetOption( int index ) const {
 /*
 ===============================================================================
 
-	sdUpgradeItemPool
+	anUpgradeItemPool
 
 ===============================================================================
 */
 
 /*
 ==============
-sdUpgradeItemPool::OnHide
+anUpgradeItemPool::OnHide
 ==============
 */
-void sdUpgradeItemPool::OnHide( void ) {
+void anUpgradeItemPool::OnHide( void ) {
 	for ( int i = 0; i < modelItems.Num(); i++ ) {
 		modelItems[ i ]->HideModel();
 	}
@@ -171,10 +164,10 @@ void sdUpgradeItemPool::OnHide( void ) {
 
 /*
 ==============
-sdUpgradeItemPool::OnShow
+anUpgradeItemPool::OnShow
 ==============
 */
-void sdUpgradeItemPool::OnShow( void ) {
+void anUpgradeItemPool::OnShow( void ) {
 	for ( int i = 0; i < items.Num(); i++ ) {
 		if ( !items[ i ].IsVisible() ) {
 			continue;
@@ -185,10 +178,10 @@ void sdUpgradeItemPool::OnShow( void ) {
 
 /*
 ==============
-sdUpgradeItemPool::ShowItem
+anUpgradeItemPool::ShowItem
 ==============
 */
-bool sdUpgradeItemPool::ShowItem( sdItemPoolEntry& item ) {
+bool anUpgradeItemPool::ShowItem( anItemPoolEntry& item ) {
 	if ( !item.GetModel().hModel ) {
 		return false;
 	}
@@ -201,28 +194,28 @@ bool sdUpgradeItemPool::ShowItem( sdItemPoolEntry& item ) {
 
 /*
 ==============
-sdUpgradeItemPool::HideItem
+anUpgradeItemPool::HideItem
 ==============
 */
-void sdUpgradeItemPool::HideItem( sdItemPoolEntry& item ) {
+void anUpgradeItemPool::HideItem( anItemPoolEntry& item ) {
 	modelItems.RemoveFast( &item );
 	item.HideModel();
 }
 
 /*
 ==============
-sdUpgradeItemPool::AddItem
+anUpgradeItemPool::AddItem
 ==============
 */
-int sdUpgradeItemPool::AddItem( const sdDeclInvItem* item, bool enabled ) {
-	sdItemPoolEntry& entry = items.Alloc();
+int anUpgradeItemPool::AddItem( const anInventoryItem* item, bool enabled ) {
+	anItemPoolEntry& entry = items.Alloc();
 
 	entry.SetItem( item );
 	entry.SetDisabled( !enabled );
 
-	idPlayer* player = parent->GetOwner();
+	anBasePlayer* player = parent->GetOwner();
 
-	idRenderModel* model = item->GetModel();
+	anRenderModel* model = item->GetModel();
 	if ( model && enabled ) {
 		renderEntity_t& entity = entry.GetModel();
 
@@ -246,29 +239,29 @@ int sdUpgradeItemPool::AddItem( const sdDeclInvItem* item, bool enabled ) {
 
 /*
 ==============
-sdUpgradeItemPool::ClearItem
+anUpgradeItemPool::ClearItem
 ==============
 */
-void sdUpgradeItemPool::ClearItem( sdItemPoolEntry& entry ) {
+void anUpgradeItemPool::ClearItem( anItemPoolEntry& entry ) {
 	HideItem( entry );
-	entry.SetItem( NULL );
+	entry.SetItem( nullptr );
 }
 
 /*
 ==============
-sdUpgradeItemPool::Init
+anUpgradeItemPool::Init
 ==============
 */
-void sdUpgradeItemPool::Init( sdInventory* _parent ) {
+void anUpgradeItemPool::Init( anInventory* _parent ) {
 	parent = _parent;
 }
 
 /*
 ==============
-sdUpgradeItemPool::Clear
+anUpgradeItemPool::Clear
 ==============
 */
-void sdUpgradeItemPool::Clear( void ) {
+void anUpgradeItemPool::Clear( void ) {
 	for( int i = 0; i < items.Num(); i++ ) {
 		ClearItem( items[ i ] );
 	}
@@ -277,14 +270,12 @@ void sdUpgradeItemPool::Clear( void ) {
 
 /*
 ==============
-sdUpgradeItemPool::ApplyPlayerState
+anUpgradeItemPool::ApplyPlayerState
 ==============
 */
-void sdUpgradeItemPool::ApplyPlayerState( const sdInventoryPlayerStateData& newState ) {
-	NET_GET_NEW( sdInventoryPlayerStateData );
-
+void anUpgradeItemPool::ApplyPlayerState( const anInventoryPlayerStateData& newState ) {	NET_GET_NEW( anInventoryPlayerStateData );
 	for( int i = 0; i < items.Num(); i++ ) {
-		sdItemPoolEntry &item = items[ i ];
+		anItemPoolEntry &item = items[ i ];
 		for ( int j = 0; j < item.clips.Num(); j++ ) {
 			if ( item.GetItem()->GetClips()[ j ].maxAmmo <= 0 ) {
 				continue;
@@ -297,16 +288,14 @@ void sdUpgradeItemPool::ApplyPlayerState( const sdInventoryPlayerStateData& newS
 
 /*
 ==============
-sdUpgradeItemPool::ReadPlayerState
+anUpgradeItemPool::ReadPlayerState
 ==============
 */
-void sdUpgradeItemPool::ReadPlayerState( const sdInventoryPlayerStateData& baseState, sdInventoryPlayerStateData& newState, const idBitMsg& msg ) const {
-	NET_GET_STATES( sdInventoryPlayerStateData );
-
+void anUpgradeItemPool::ReadPlayerState( const anInventoryPlayerStateData& baseState, anInventoryPlayerStateData& newState, const anBitMsg& msg ) const {
 	newData.itemData.SetNum( items.Num() );
 
 	for( int i = 0; i < items.Num(); i++ ) {
-		const sdItemPoolEntry& item = items[ i ];
+		const anItemPoolEntry& item = items[ i ];
 		newData.itemData[ i ].clips.SetNum( item.clips.Num() );
 		for ( int j = 0; j < item.clips.Num(); j++ ) {
 			if ( i < baseData.itemData.Num() && j < baseData.itemData[ i ].clips.Num() ) {
@@ -320,19 +309,15 @@ void sdUpgradeItemPool::ReadPlayerState( const sdInventoryPlayerStateData& baseS
 
 /*
 ==============
-sdUpgradeItemPool::WritePlayerState
+anUpgradeItemPool::WritePlayerState
 ==============
 */
-void sdUpgradeItemPool::WritePlayerState( const sdInventoryPlayerStateData& baseState, sdInventoryPlayerStateData& newState, idBitMsg& msg ) const {
-	NET_GET_STATES( sdInventoryPlayerStateData );
-
+void anUpgradeItemPool::WritePlayerState( const anInventoryPlayerStateData &baseState, anInventoryPlayerStateData &newState, anBitMsg &msg ) const {
 	newData.itemData.SetNum( items.Num() );
 
 	for( int i = 0; i < items.Num(); i++ ) {
-		const sdItemPoolEntry& item = items[ i ];
-
+		const anItemPoolEntry& item = items[ i ];
 		newData.itemData[ i ].clips.SetNum( item.clips.Num() );
-
 		for ( int j = 0; j < item.clips.Num(); j++ ) {
 			newData.itemData[ i ].clips[ j ] = item.clips[ j ];
 			if ( i < baseData.itemData.Num() && j < baseData.itemData[ i ].clips.Num() ) {
@@ -346,18 +331,15 @@ void sdUpgradeItemPool::WritePlayerState( const sdInventoryPlayerStateData& base
 
 /*
 ==============
-sdUpgradeItemPool::CheckPlayerStateChanges
+anUpgradeItemPool::CheckPlayerStateChanges
 ==============
 */
-bool sdUpgradeItemPool::CheckPlayerStateChanges( const sdInventoryPlayerStateData& baseState ) const {
-	NET_GET_BASE( sdInventoryPlayerStateData );
-
+bool anUpgradeItemPool::CheckPlayerStateChanges( const anInventoryPlayerStateData& baseState ) const {
 	if ( baseData.itemData.Num() != items.Num() ) {
 		return true;
 	}
-
 	for( int i = 0; i < items.Num(); i++ ) {
-		const sdItemPoolEntry& item = items[ i ];
+		const anItemPoolEntry& item = items[ i ];
 		if ( baseData.itemData[ i ].clips.Num() != item.clips.Num() ) {
 			return true;
 		}
@@ -374,11 +356,11 @@ bool sdUpgradeItemPool::CheckPlayerStateChanges( const sdInventoryPlayerStateDat
 
 /*
 ==============
-sdUpgradeItemPool::UpdateJoints
+anUpgradeItemPool::UpdateJoints
 ==============
 */
-void sdUpgradeItemPool::UpdateJoints( void ) {
-	idPlayer* owner = parent->GetOwner();
+void anUpgradeItemPool::UpdateJoints( void ) {
+	anBasePlayer *owner = parent->GetOwner();
 
 	for( int i = 0; i < items.Num(); i++ ) {
 		items[ i ].joint = owner->GetAnimator()->GetJointHandle( items[ i ].item->GetJoint() );
@@ -387,24 +369,22 @@ void sdUpgradeItemPool::UpdateJoints( void ) {
 
 /*
 ==============
-sdUpgradeItemPool::UpdateModels
+anUpgradeItemPool::UpdateModels
 ==============
 */
-void sdUpgradeItemPool::UpdateModels( void ) {
+void anUpgradeItemPool::UpdateModels( void ) {
 	// no need to do this in reprediction
 	if ( !gameLocal.isNewFrame ) {
 		return;
 	}
 
-	idPlayer *owner = parent->GetOwner();
+	anBasePlayer *owner = parent->GetOwner();
 
 	for ( int i = 0; i < modelItems.Num(); i++ ) {
-		sdItemPoolEntry& item = *modelItems[ i ];
-
+		anItemPoolEntry& item = *modelItems[ i ];
 		renderEntity_t &entity = item.GetModel();
 
 		entity.customSkin = owner->GetRenderEntity()->customSkin;
-
 		owner->GetWorldOriginAxisNoUpdate( item.joint, entity.origin, entity.axis );
 
 		item.UpdateModel();
@@ -413,22 +393,22 @@ void sdUpgradeItemPool::UpdateModels( void ) {
 
 /*
 ==============
-sdUpgradeItemPool::~sdUpgradeItemPool
+anUpgradeItemPool::~anUpgradeItemPool
 ==============
 */
-sdUpgradeItemPool::~sdUpgradeItemPool( void ) {
+anUpgradeItemPool::~anUpgradeItemPool( void ) {
 	Clear();
 }
 
 /*
 ==============
-sdUpgradeItemPool::SetupModelShadows
+anUpgradeItemPool::SetupModelShadows
 ==============
 */
-void sdUpgradeItemPool::SetupModelShadows( sdItemPoolEntry& entry ) {
-	idPlayer* owner = parent->GetOwner();
+void anUpgradeItemPool::SetupModelShadows( anItemPoolEntry& entry ) {
+	anBasePlayer *owner = parent->GetOwner();
 
-	renderEntity_t& renderEntity = entry.GetModel();
+	renderEntity_t &renderEntity = entry.GetModel();
 
 	viewState_t state = owner->HasShadow();
 	switch ( state ) {
@@ -452,10 +432,10 @@ void sdUpgradeItemPool::SetupModelShadows( sdItemPoolEntry& entry ) {
 
 /*
 ============
-sdUpgradeItemPool::UpdateModelShadows
+anUpgradeItemPool::UpdateModelShadows
 ============
 */
-void sdUpgradeItemPool::UpdateModelShadows( void ) {
+void anUpgradeItemPool::UpdateModelShadows( void ) {
 	for ( int i = 0; i < modelItems.Num(); i++ ) {
 		SetupModelShadows( *modelItems[ i ] );
 	}
@@ -464,20 +444,20 @@ void sdUpgradeItemPool::UpdateModelShadows( void ) {
 /*
 ===============================================================================
 
-	sdInventory
+	anInventory
 
 ===============================================================================
 */
 
-anList<int> sdInventory::slotForBank;
+anList<int> anInventory::slotForBank;
 
 /*
 ==============
-sdInventoryBroadcastData::MakeDefault
+anInventoryBroadcastData::MakeDefault
 ==============
 */
-void sdInventoryBroadcastData::MakeDefault( void ) {
-	idealWeapon					= -1;
+void anInventoryBroadcastData::MakeDefault( void ) {
+	idealWeapon = -1;
 	disabledMask.Shutdown();
 	ammoMask.Shutdown();
 
@@ -486,10 +466,10 @@ void sdInventoryBroadcastData::MakeDefault( void ) {
 
 /*
 ==============
-sdInventoryBroadcastData::Write
+anInventoryBroadcastData::Write
 ==============
 */
-void sdInventoryBroadcastData::Write( idFile* file ) const {
+void anInventoryBroadcastData::Write( anFile *file ) const {
 	file->WriteInt( idealWeapon );
 	file->WriteInt( disabledMask.GetSize() );
 	for ( int i = 0; i < disabledMask.GetSize(); i++ ) {
@@ -506,10 +486,10 @@ void sdInventoryBroadcastData::Write( idFile* file ) const {
 
 /*
 ==============
-sdInventoryBroadcastData::Read
+anInventoryBroadcastData::Read
 ==============
 */
-void sdInventoryBroadcastData::Read( idFile* file ) {
+void anInventoryBroadcastData::Read( anFile *file ) {
 	file->ReadInt( idealWeapon );
 
 	int sizeDummy;
@@ -531,10 +511,10 @@ void sdInventoryBroadcastData::Read( idFile* file ) {
 
 /*
 ==============
-sdInventoryPlayerStateData::MakeDefault
+anInventoryPlayerStateData::MakeDefault
 ==============
 */
-void sdInventoryPlayerStateData::MakeDefault( void ) {
+void anInventoryPlayerStateData::MakeDefault( void ) {
 	ammo.SetNum( gameLocal.declAmmoTypeType.Num() );
 	for ( int i = 0; i < ammo.Num(); i++ ) {
 		ammo[ i ] = 0;
@@ -544,10 +524,10 @@ void sdInventoryPlayerStateData::MakeDefault( void ) {
 
 /*
 ==============
-sdInventoryPlayerStateData::Write
+anInventoryPlayerStateData::Write
 ==============
 */
-void sdInventoryPlayerStateData::Write( idFile* file ) const {
+void anInventoryPlayerStateData::Write( anFile *file ) const {
 	file->WriteInt( ammo.Num() );
 	for ( int i = 0; i < ammo.Num(); i++ ) {
 		file->WriteShort( ammo[ i ] );
@@ -561,10 +541,10 @@ void sdInventoryPlayerStateData::Write( idFile* file ) const {
 
 /*
 ==============
-sdInventoryPlayerStateData::Read
+anInventoryPlayerStateData::Read
 ==============
 */
-void sdInventoryPlayerStateData::Read( idFile* file ) {
+void anInventoryPlayerStateData::Read( anFile *file ) {
 	int count;
 	file->ReadInt( count );
 
@@ -585,19 +565,19 @@ void sdInventoryPlayerStateData::Read( idFile* file ) {
 
 /*
 ==============
-sdInventoryItemStateData::MakeDefault
+anInventoryItemStateData::MakeDefault
 ==============
 */
-void sdInventoryItemStateData::MakeDefault( void ) {
+void anInventoryItemStateData::MakeDefault( void ) {
 	clips.SetNum( 0, false );
 }
 
 /*
 ==============
-sdInventoryItemStateData::Write
+anInventoryItemStateData::Write
 ==============
 */
-void sdInventoryItemStateData::Write( idFile* file ) const {
+void anInventoryItemStateData::Write( anFile *file ) const {
 	file->WriteInt( clips.Num() );
 	for ( int i = 0; i < clips.Num(); i++ ) {
 		file->WriteShort( clips[ i ] );
@@ -606,10 +586,10 @@ void sdInventoryItemStateData::Write( idFile* file ) const {
 
 /*
 ==============
-sdInventoryItemStateData::Read
+anInventoryItemStateData::Read
 ==============
 */
-void sdInventoryItemStateData::Read( idFile* file ) {
+void anInventoryItemStateData::Read( anFile *file ) {
 	int count;
 	file->ReadInt( count );
 
@@ -621,14 +601,14 @@ void sdInventoryItemStateData::Read( idFile* file ) {
 
 /*
 ==============
-sdInventory::GetCommandMapIcon
+anInventory::GetCommandMapIcon
 ==============
 */
-const idMaterial* sdInventory::GetCommandMapIcon( const iconType_e iconType ) const {
-	const sdDeclPlayerClass* pc = playerClass.GetClass();
+const anMaterial *anInventory::GetCommandMapIcon( const iconType_e iconType ) const {
+	const anDeclPlayerClass* pc = playerClass.GetClass();
 
 	if ( !pc ) {
-		return NULL;
+		return nullptr;
 	}
 
 	switch( iconType ) {
@@ -640,15 +620,15 @@ const idMaterial* sdInventory::GetCommandMapIcon( const iconType_e iconType ) co
 			return pc->GetCommandmapIconUnknown();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
 ==============
-sdInventory::UpdateItems
+anInventory::UpdateItems
 ==============
 */
-void sdInventory::UpdateItems( void ) {
+void anInventory::UpdateItems( void ) {
 	if ( classThread ) {
 		if ( classThread->Execute() ) {
 			ShutdownClassThread();
@@ -658,19 +638,19 @@ void sdInventory::UpdateItems( void ) {
 
 /*
 ==============
-sdInventory::Present
+anInventory::Present
 ==============
 */
-void sdInventory::Present( void ) {
+void anInventory::Present( void ) {
 	items.UpdateModels();
 }
 
 /*
 ==============
-sdInventory::Init
+anInventory::Init
 ==============
 */
-void sdInventory::Init( idDict& dict, bool full, bool setWeapon ) {
+void anInventory::Init( anDict &dict, bool full, bool setWeapon ) {
 	ammo.AssureSize( gameLocal.declAmmoTypeType.Num(), 0 );
 	ammoLimits.AssureSize( gameLocal.declAmmoTypeType.Num(), 0 );
 
@@ -695,10 +675,10 @@ void sdInventory::Init( idDict& dict, bool full, bool setWeapon ) {
 
 /*
 ==============
-sdInventory::WriteDemoBaseData
+anInventory::WriteDemoBaseData
 ==============
 */
-void sdInventory::WriteDemoBaseData( idFile* file ) const {
+void anInventory::WriteDemoBaseData( anFile *file ) const {
 	int playerClassIndex = playerClass.GetClass() ? playerClass.GetClass()->Index() : -1;
 	file->WriteInt( playerClassIndex );
 	if ( playerClassIndex != -1 ) {
@@ -719,15 +699,15 @@ void sdInventory::WriteDemoBaseData( idFile* file ) const {
 
 /*
 ==============
-sdInventory::ReadDemoBaseData
+anInventory::ReadDemoBaseData
 ==============
 */
-void sdInventory::ReadDemoBaseData( idFile* file ) {
+void anInventory::ReadDemoBaseData( anFile *file ) {
 	int playerClassIndex;
 
 	file->ReadInt( playerClassIndex );
 	if ( playerClassIndex != -1 ) {
-		const sdDeclPlayerClass* cls = gameLocal.declPlayerClassType[ playerClassIndex ];
+		const anDeclPlayerClass* cls = gameLocal.declPlayerClassType[ playerClassIndex ];
 
 		SetPlayerClass( cls );
 
@@ -742,7 +722,7 @@ void sdInventory::ReadDemoBaseData( idFile* file ) {
 
 	file->ReadInt( cachedPlayerClassIndex );
 	if ( cachedPlayerClassIndex != -1 ) {
-		const sdDeclPlayerClass* cls = gameLocal.declPlayerClassType[ cachedPlayerClassIndex ];
+		const anDeclPlayerClass* cls = gameLocal.declPlayerClassType[ cachedPlayerClassIndex ];
 		cachedPlayerClass.SetClass( cls, true );
 		for ( int i = 0; i < cachedPlayerClass.GetOptions().Num(); i++ ) {
 			int itemIndex;
@@ -756,51 +736,51 @@ void sdInventory::ReadDemoBaseData( idFile* file ) {
 
 /*
 ==============
-sdInventory::sdInventory
+anInventory::anInventory
 ==============
 */
-sdInventory::sdInventory( void ) {
+anInventory::anInventory( void ) {
 	weaponChanged		= false;
-	classThread			= NULL;
+	classThread			= nullptr;
 	timeClassChanged	= 0;
 	currentWeaponIndex	= -1;
 	idealWeapon			= -1;
-	SetOwner( NULL );
+	SetOwner( nullptr );
 	items.Init( this );
 }
 
 /*
 ==============
-sdInventory::SetOwner
+anInventory::SetOwner
 ==============
 */
-void sdInventory::SetOwner( idPlayer* _owner ) {
+void anInventory::SetOwner( anBasePlayer* _owner ) {
 	owner = _owner;
 }
 
 /*
 ==============
-sdInventory::GetOwner
+anInventory::GetOwner
 ==============
 */
-idPlayer* sdInventory::GetOwner( void ) {
+anBasePlayer* anInventory::GetOwner( void ) {
 	return owner;
 }
 
 /*
 ==============
-sdInventory::~sdInventory
+anInventory::~anInventory
 ==============
 */
-sdInventory::~sdInventory( void ) {
+anInventory::~anInventory( void ) {
 }
 
 /*
 ==============
-sdInventory::GetAmmoFraction
+anInventory::GetAmmoFraction
 ==============
 */
-float sdInventory::GetAmmoFraction( void ) {
+float anInventory::GetAmmoFraction( void ) {
 	if ( !playerClass.GetClass() ) {
 		return 0.f;
 	}
@@ -817,34 +797,34 @@ float sdInventory::GetAmmoFraction( void ) {
 
 /*
 ==============
-sdInventory::BuildSlotBankLookup
+anInventory::BuildSlotBankLookup
 ==============
 */
-void sdInventory::BuildSlotBankLookup( void ) {
+void anInventory::BuildSlotBankLookup( void ) {
 	slotForBank.Clear();
 
 	const sdDeclStringMap* stringMap = gameLocal.declStringMapType.LocalFind( "inventorySlots" );
-	const idDict& dict = stringMap->GetDict();
+	const anDict &dict = stringMap->GetDict();
 
 	int i = 0;
 	while ( true ) {
 		//const sdDeclInvSlot* slot = gameLocal.declInvSlotType.LocalFindByIndex( i, true );
-		const char* value = dict.GetString( va( "slot%i", i ) );
+		const char *value = dict.GetString( va( "slot%i", i ) );
 		i++;
-		if ( value[ 0 ] == '\0' ) {
+		if ( value[0] == '\0' ) {
 			break;
 		}
 		const sdDeclInvSlot* slot = gameLocal.declInvSlotType.LocalFind( value, true );
 
 		int slotBank = slot->GetBank();
-		if( slotBank == -1 ) {
+		if ( slotBank == -1 ) {
 			continue;
 		}
 
 		slotForBank.AssureSize( slotBank + 1, -1 );
 
-		if( slotForBank[ slotBank ] != -1 ) {
-			gameLocal.Error( "sdInventory::BuildSlotBankLookup Multiple Slots Using Weapon Bank %i", slotBank );
+		if ( slotForBank[ slotBank ] != -1 ) {
+			gameLocal.Error( "anInventory::BuildSlotBankLookup Multiple Slots Using Weapon Bank %i", slotBank );
 		}
 
 		slotForBank[ slotBank ] = slot->Index();		
@@ -853,10 +833,10 @@ void sdInventory::BuildSlotBankLookup( void ) {
 
 /*
 ==============
-sdInventory::GetSlotForWeapon
+anInventory::GetSlotForWeapon
 ==============
 */
-int sdInventory::GetSlotForWeapon( int weapon ) const {
+int anInventory::GetSlotForWeapon( int weapon ) const {
 	if ( weapon >= 0 && weapon < items.Num() ) {
 		if ( CanEquip( weapon, false ) ) {
 			int count = slotForBank.Num();
@@ -877,34 +857,34 @@ int sdInventory::GetSlotForWeapon( int weapon ) const {
 
 /*
 ==============
-sdInventory::GetCurrentSlot
+anInventory::GetCurrentSlot
 ==============
 */
-int sdInventory::GetCurrentSlot( void ) const {
+int anInventory::GetCurrentSlot( void ) const {
 	return GetSlotForWeapon( idealWeapon );
 }
 
 /*
 ==============
-sdInventory::GetSwitchingSlot
+anInventory::GetSwitchingSlot
 ==============
 */
-int sdInventory::GetSwitchingSlot( void ) const {
+int anInventory::GetSwitchingSlot( void ) const {
 	return GetSlotForWeapon( switchingWeapon );
 }
 
 /*
 ============
-sdInventory::FindBestWeapon
+anInventory::FindBestWeapon
 ============
 */
-int sdInventory::FindBestWeapon( bool allowCurrent ) {
+int anInventory::FindBestWeapon( bool allowCurrent ) {
 	int bestIndex = -1;
 	int bestRank = 9999;
 
 	for ( int i = 0; i < items.Num(); i++ ) {
 		if ( !allowCurrent ) {
-			if( ( i == switchingWeapon || i == currentWeapon ) ) {
+			if ( ( i == switchingWeapon || i == currentWeapon ) ) {
 				continue;
 			}
 		}
@@ -913,7 +893,7 @@ int sdInventory::FindBestWeapon( bool allowCurrent ) {
 			continue;
 		}
 
-		const sdDeclInvItem* item = items[ i ].item;
+		const anInventoryItem* item = items[ i ].item;
 
 		int rank = item->GetAutoSwitchPriority();
 		if ( rank < bestRank && rank > 0 && CheckWeaponHasAmmo( item ) ) {
@@ -927,10 +907,10 @@ int sdInventory::FindBestWeapon( bool allowCurrent ) {
 
 /*
 ============
-sdInventory::CycleNextSafeWeapon
+anInventory::CycleNextSafeWeapon
 ============
 */
-void sdInventory::SelectBestWeapon( bool allowCurrent ) {	
+void anInventory::SelectBestWeapon( bool allowCurrent ) {	
 	int bestIndex = FindBestWeapon( allowCurrent );
 	if ( bestIndex != -1 ) {
 		SetIdealWeapon( bestIndex );
@@ -939,10 +919,10 @@ void sdInventory::SelectBestWeapon( bool allowCurrent ) {
 
 /*
 ============
-sdInventory::CycleNextSafeWeapon
+anInventory::CycleNextSafeWeapon
 ============
 */
-void sdInventory::CycleNextSafeWeapon( void ) {	
+void anInventory::CycleNextSafeWeapon( void ) {	
 	int bestIndex = FindBestWeapon( false );
 	if ( bestIndex != -1 ) {
 		SetSwitchingWeapon( bestIndex );
@@ -951,22 +931,22 @@ void sdInventory::CycleNextSafeWeapon( void ) {
 
 /*
 ==============
-sdInventory::CycleWeaponsNext
+anInventory::CycleWeaponsNext
 ==============
 */
-void sdInventory::CycleWeaponsNext( int currentSlot ) {
+void anInventory::CycleWeaponsNext( int currentSlot ) {
 	bool force = true;
 	bool looped;
 	int weapon;
 
-	if( currentSlot == -999 ) {
+	if ( currentSlot == -999 ) {
 		force = false;
 		currentSlot = ChooseCurrentSlot();
 	}
 	
 	weapon = CycleWeaponByPosition( currentSlot, true, looped, false, false );
 
-	if( !looped && weapon != -1 ) {
+	if ( !looped && weapon != -1 ) {
 		SetSwitchingWeapon( weapon );
 		return;
 	}
@@ -977,7 +957,7 @@ void sdInventory::CycleWeaponsNext( int currentSlot ) {
 		int pos = ( i + cnt ) % max;
 
 		weapon = CycleWeaponByPosition( pos, true, looped, false, false );
-		if( weapon != -1 ) {
+		if ( weapon != -1 ) {
 			SetSwitchingWeapon( weapon );
 			return;
 		}
@@ -986,21 +966,21 @@ void sdInventory::CycleWeaponsNext( int currentSlot ) {
 
 /*
 ==============
-sdInventory::CycleWeaponsPrev
+anInventory::CycleWeaponsPrev
 ==============
 */
-void sdInventory::CycleWeaponsPrev( int currentSlot ) {
+void anInventory::CycleWeaponsPrev( int currentSlot ) {
 	bool force = true;
 	bool looped;
 	int weapon;
 
-	if( currentSlot == -999 ) {
+	if ( currentSlot == -999 ) {
 		force = false;
 		currentSlot = ChooseCurrentSlot();
 	}
 
 	weapon = CycleWeaponByPosition( currentSlot, false, looped, false, false );
-	if( !looped && weapon != -1 ) {
+	if ( !looped && weapon != -1 ) {
 		SetSwitchingWeapon( weapon );
 		return;
 	}
@@ -1011,7 +991,7 @@ void sdInventory::CycleWeaponsPrev( int currentSlot ) {
 		int pos = ( ( i - cnt ) + max ) % max;
 
 		weapon = CycleWeaponByPosition( pos, false, looped, false, false );
-		if( weapon != -1 ) {
+		if ( weapon != -1 ) {
 			SetSwitchingWeapon( weapon );
 			return;
 		}
@@ -1020,29 +1000,29 @@ void sdInventory::CycleWeaponsPrev( int currentSlot ) {
 
 /*
 ==============
-sdInventory::CycleWeaponByPosition
+anInventory::CycleWeaponByPosition
 
 if "primaryOnly" == true, it will only select the first weapon in that slot, never looping to any other weapon that
 may share that slot.
 ==============
 */
-int sdInventory::CycleWeaponByPosition( int pos, bool forward, bool& looped, bool force, bool primaryOnly ) {
-	if( pos < 0 || pos >= slotForBank.Num() ) {
+int anInventory::CycleWeaponByPosition( int pos, bool forward, bool& looped, bool force, bool primaryOnly ) {
+	if ( pos < 0 || pos >= slotForBank.Num() ) {
 		return false;
 	}
 
 	int slot = slotForBank[ pos ];
-	if( slot == -1 ) {
+	if ( slot == -1 ) {
 		return false;
 	}
 
 	int startpos = 0;
 
 	if ( !primaryOnly ) {
-        if( ( ChooseCurrentSlot() == pos ) ) {
-			if( switchingWeapon >= 0 ) {
+        if ( ( ChooseCurrentSlot() == pos ) ) {
+			if ( switchingWeapon >= 0 ) {
 				startpos = switchingWeapon;
-			} else if( idealWeapon >= 0 ) {
+			} else if ( idealWeapon >= 0 ) {
 				startpos = idealWeapon;
 			} else {
 				startpos = currentWeapon;
@@ -1055,15 +1035,13 @@ int sdInventory::CycleWeaponByPosition( int pos, bool forward, bool& looped, boo
 
 /*
 ==============
-sdInventory::UpdatePrimaryWeapon
+anInventory::UpdatePrimaryWeapon
 ==============
 */
-void sdInventory::UpdatePrimaryWeapon( void ) {
+void anInventory::UpdatePrimaryWeapon( void ) {
     for ( int i = 0; i < items.Num(); i++ ) {
-		
-		const sdDeclInvItem* item = items[ i ].GetItem();
-	
-		if ( item == NULL || !item->UsesSlot( slotForBank[ GUN_SLOT ] ) ) {
+		const anInventoryItem* item = items[ i ].GetItem();
+		if ( item == nullptr || !item->UsesSlot( slotForBank[ GUN_SLOT ] ) ) {
 			continue;
 		}
 
@@ -1074,7 +1052,7 @@ void sdInventory::UpdatePrimaryWeapon( void ) {
 		int weaponNum = item->GetData().GetInt( "player_weapon_num", "-1" );
 
 		if ( weaponNum != 14 && weaponNum != -1 ) { //mal_FIXME: 14 = hack for the AR/Grenade Launcher combo. Need to fix this!
-			botThreadData.GetGameWorldState()->clientInfo[ owner->entityNumber ].weapInfo.primaryWeapon = ( playerWeaponTypes_t ) weaponNum;
+			botThreadData.GetGameWorldState()->clientInfo[owner->entityNumber].weapInfo.primaryWeapon = ( playerWeaponTypes_t ) weaponNum;
 			break;
 		}
 	}
@@ -1082,18 +1060,16 @@ void sdInventory::UpdatePrimaryWeapon( void ) {
 
 /*
 ==============
-sdInventory::CheckWeaponSlotHasAmmo
+anInventory::CheckWeaponSlotHasAmmo
 ==============
 */
-bool sdInventory::CheckWeaponSlotHasAmmo( int slot ) {
+bool anInventory::CheckWeaponSlotHasAmmo( int slot ) {
 	bool hasAmmo = false;
-	int i, ammoInClip, clipSize;
+	int ammoInClip, clipSize;
 
-	clientInfo_t &client = botThreadData.GetGameWorldState()->clientInfo[ owner->entityNumber ];
-
-    for ( i = 0; i < items.Num(); i++ ) {
-		const sdDeclInvItem* item = items[ i ].GetItem();
-		if ( item == NULL || !item->UsesSlot( slotForBank[ slot ] ) ) {
+    for ( int i = 0; i < items.Num(); i++ ) {
+		const anInventoryItem *item = items[ i ].GetItem();
+		if ( item == nullptr || !item->UsesSlot( slotForBank[ slot ] ) ) {
 			continue;
 		}
 
@@ -1104,10 +1080,9 @@ bool sdInventory::CheckWeaponSlotHasAmmo( int slot ) {
 		if ( CheckWeaponHasAmmo( item ) ) {
 			hasAmmo = true;
 			if ( slot == GUN_SLOT ) { //mal: if this is our primary gun we're checking, see if it needs ammo.
-				const idList< itemClip_t >& itemClips = item->GetClips();
+				const anList< itemClip_t >& itemClips = item->GetClips();
 				int ammoFraction;
 				int maxAmmo, curAmmo;
-
 				if ( !itemClips.Num() ) {
 					break;
 				}
@@ -1134,7 +1109,6 @@ bool sdInventory::CheckWeaponSlotHasAmmo( int slot ) {
 				} else {
 					ammoInClip = GetClip( i, MAIN_GUN );
 					clipSize = GetClipSize( i, MAIN_GUN );
-
 					if ( ammoInClip == 0 || ammoInClip < clipSize ) {
 						client.weapInfo.primaryWeapNeedsReload = true;
 					} else {
@@ -1155,9 +1129,9 @@ bool sdInventory::CheckWeaponSlotHasAmmo( int slot ) {
 				}
 
 				if ( ( maxAmmo / ammoFraction ) > curAmmo ) {
-					botThreadData.GetGameWorldState()->clientInfo[ owner->entityNumber ].weapInfo.primaryWeapNeedsAmmo = true;
+					botThreadData.GetGameWorldState()->clientInfo[owner->entityNumber].weapInfo.primaryWeapNeedsAmmo = true;
 				} else {
-					botThreadData.GetGameWorldState()->clientInfo[ owner->entityNumber ].weapInfo.primaryWeapNeedsAmmo = false;
+					botThreadData.GetGameWorldState()->clientInfo[owner->entityNumber].weapInfo.primaryWeapNeedsAmmo = false;
 				}
 			}
 			break;
@@ -1169,10 +1143,10 @@ bool sdInventory::CheckWeaponSlotHasAmmo( int slot ) {
 
 /*
 ==============
-sdInventory::CyleWeaponBySlot
+anInventory::CyleWeaponBySlot
 ==============
 */
-int sdInventory::CycleWeaponBySlot( int slot, bool forward, bool& looped, bool force, int startingpos ) {
+int anInventory::CycleWeaponBySlot( int slot, bool forward, bool& looped, bool force, int startingpos ) {
 	looped = false;
 
 	int i = startingpos;// + ( forward ? 1 : -1 );
@@ -1180,17 +1154,17 @@ int sdInventory::CycleWeaponBySlot( int slot, bool forward, bool& looped, bool f
 	int max = items.Num();
 
 	for( j = 0; j < max; j++ ) {
-		if( forward ) {
+		if ( forward ) {
 			i++;
-			if( i >= max ) { looped = true;	i -= max;}
+			if ( i >= max ) { looped = true;	i -= max;}
 		} else {
 			i--;
-			if( i < 0 ) { looped = true; i += max; }
+			if ( i < 0 ) { looped = true; i += max; }
 		}
 
 //		if ( !force ) {
 //
-//			if( /*!looped && */( i == switchingWeapon || i == currentWeapon )) {
+//			if ( /*!looped && */( i == switchingWeapon || i == currentWeapon )) {
 //				continue;
 //			}
 //		}
@@ -1199,7 +1173,7 @@ int sdInventory::CycleWeaponBySlot( int slot, bool forward, bool& looped, bool f
 			continue;
 		}
 
-		const sdDeclInvItem* item = items[ i ].item;
+		const anInventoryItem* item = items[ i ].item;
 		if ( !item->UsesSlot( slot ) ) {
 			continue;
 		}
@@ -1216,10 +1190,10 @@ int sdInventory::CycleWeaponBySlot( int slot, bool forward, bool& looped, bool f
 
 /*
 ==============
-sdInventory::SelectWeaponByName
+anInventory::SelectWeaponByName
 ==============
 */
-void sdInventory::SelectWeaponByName( const char* weaponName, bool ignoreInhibit ) {
+void anInventory::SelectWeaponByName( const char *weaponName, bool ignoreInhibit ) {
 	if ( !ignoreInhibit  ) {
 		if ( owner->InhibitWeaponSwitch() ) {
 			return;
@@ -1240,10 +1214,10 @@ void sdInventory::SelectWeaponByName( const char* weaponName, bool ignoreInhibit
 
 /*
 ==============
-sdInventory::SelectWeaponByNumber
+anInventory::SelectWeaponByNumber
 ==============
 */
-void sdInventory::SelectWeaponByNumber( const playerWeaponTypes_t weaponNum ) {
+void anInventory::SelectWeaponByNumber( const playerWeaponTypes_t weaponNum ) {
 	if ( owner->InhibitWeaponSwitch() ) {
 		return;
 	}
@@ -1262,16 +1236,16 @@ void sdInventory::SelectWeaponByNumber( const playerWeaponTypes_t weaponNum ) {
 
 /*
 ==============
-sdInventory::CanEquip
+anInventory::CanEquip
 ==============
 */
-bool sdInventory::CanEquip( int index, bool checkRequirements ) const {
+bool anInventory::CanEquip( int index, bool checkRequirements ) const {
 	if ( index < 0 || index >= items.Num() ) {
 		return false;
 	}
 
-	const sdDeclInvItem* item = items[ index ].item;
-	if ( item == NULL ) {
+	const anInventoryItem* item = items[ index ].item;
+	if ( item == nullptr ) {
 		assert( false );
 		return false;
 	}
@@ -1280,12 +1254,12 @@ bool sdInventory::CanEquip( int index, bool checkRequirements ) const {
 		return false;
 	}
 
-	if ( owner->GetProxyEntity() != NULL ) {
-		if( !item->GetType()->IsVehicleEquipable() ) {
+	if ( owner->GetProxyEntity() != nullptr ) {
+		if ( !item->GetType()->IsVehicleEquipable() ) {
 			return false;
 		}
 	} else {
-		if( !item->GetType()->IsEquipable() ) {
+		if ( !item->GetType()->IsEquipable() ) {
 			return false;
 		}
 	}
@@ -1301,15 +1275,15 @@ bool sdInventory::CanEquip( int index, bool checkRequirements ) const {
 
 /*
 ==============
-sdInventory::CanAutoEquip
+anInventory::CanAutoEquip
 ==============
 */
-bool sdInventory::CanAutoEquip( int index, bool checkExplosive ) const {
+bool anInventory::CanAutoEquip( int index, bool checkExplosive ) const {
 	if ( !CanEquip( index, true ) ) {
 		return false;
 	}
 
-	const sdDeclInvItem* item = items[ index ].item;
+	const anInventoryItem* item = items[ index ].item;
 	if ( item->GetWeaponMenuIgnore() ) {
 		return false;
 	}
@@ -1325,17 +1299,17 @@ bool sdInventory::CanAutoEquip( int index, bool checkExplosive ) const {
 
 /*
 ==============
-sdInventory::FindWeapon
+anInventory::FindWeapon
 ==============
 */
-int sdInventory::FindWeapon( const char* weaponName ) {
+int anInventory::FindWeapon( const char *weaponName ) {
 	for( int i = 0; i < items.Num(); i++ ) {
 		if ( !CanEquip( i, true ) ) {
 			continue;
 		}
 
-		const sdDeclInvItem* item = items[ i ].item;
-		if ( !idStr::Icmp( item->GetName(), weaponName ) ) {
+		const anInventoryItem* item = items[ i ].item;
+		if ( !anStr::Icmp( item->GetName(), weaponName ) ) {
 			return i;
 		}
 	}
@@ -1344,18 +1318,18 @@ int sdInventory::FindWeapon( const char* weaponName ) {
 
 /*
 ==============
-sdInventory::FindWeaponNum
+anInventory::FindWeaponNum
 
 A handy function that lets the player pick a specific weapon, without cycling thru the slots.
 ==============
 */
-int sdInventory::FindWeaponNum( const playerWeaponTypes_t weaponNum ) {
+int anInventory::FindWeaponNum( const playerWeaponTypes_t weaponNum ) {
 	for( int i = 0; i < items.Num(); i++ ) {
 		if ( !CanEquip( i, true ) ) {
 			continue;
 		}
 
-		const sdDeclInvItem* weapItem = items[ i ].item;
+		const anInventoryItem* weapItem = items[ i ].item;
 
 		if ( weapItem->GetData().GetInt( "player_weapon_num", "-1" ) == weaponNum ) {
 			return i;
@@ -1366,10 +1340,10 @@ int sdInventory::FindWeaponNum( const playerWeaponTypes_t weaponNum ) {
 
 /*
 ==============
-sdInventory::SetIdealWeapon
+anInventory::SetIdealWeapon
 ==============
 */
-void sdInventory::SetIdealWeapon( int pos, bool force ) {
+void anInventory::SetIdealWeapon( int pos, bool force ) {
 	if ( pos < -1 || pos >= items.Num() ) {
 		return;
 	}
@@ -1400,10 +1374,10 @@ void sdInventory::SetIdealWeapon( int pos, bool force ) {
 
 /*
 ==============
-sdInventory::GetClip
+anInventory::GetClip
 ==============
 */
-int	sdInventory::GetClip( int index, int modIndex ) const {
+int	anInventory::GetClip( int index, int modIndex ) const {
 	if ( index >= items.Num() || modIndex >= items[ index ].clips.Num() ) {
 		return 0;
 	}
@@ -1413,10 +1387,10 @@ int	sdInventory::GetClip( int index, int modIndex ) const {
 
 /*
 ============
-sdInventory::GetClipSize
+anInventory::GetClipSize
 ============
 */
-int	sdInventory::GetClipSize( int index, int modIndex ) const {
+int	anInventory::GetClipSize( int index, int modIndex ) const {
 	if ( index >= items.Num() || modIndex >= items[ index ].clips.Num() ) {
 		return 0;
 	}
@@ -1425,10 +1399,10 @@ int	sdInventory::GetClipSize( int index, int modIndex ) const {
 
 /*
 ==============
-sdInventory::SetClip
+anInventory::SetClip
 ==============
 */
-void sdInventory::SetClip( int index, int modIndex, int count ) {
+void anInventory::SetClip( int index, int modIndex, int count ) {
 	if ( index >= items.Num() || modIndex >= items[ index ].clips.Num() ) {
 		return;
 	}
@@ -1437,10 +1411,10 @@ void sdInventory::SetClip( int index, int modIndex, int count ) {
 
 /*
 ==============
-sdInventory::IsWeaponValid
+anInventory::IsWeaponValid
 ==============
 */
-bool sdInventory::IsWeaponValid( int weapon ) const {
+bool anInventory::IsWeaponValid( int weapon ) const {
 	if ( weapon < 0 || weapon >= items.Num() ) {
 		return false;
 	}
@@ -1450,12 +1424,12 @@ bool sdInventory::IsWeaponValid( int weapon ) const {
 
 /*
 ==============
-sdInventory::IsWeaponBankValid
+anInventory::IsWeaponBankValid
 0-based weapon bank (0 is fists, 1 is pistol, etc)
 ==============
 */
-bool sdInventory::IsWeaponBankValid( int slot ) const {
-	if( slot < 0 || slot >= slotForBank.Num() ) {
+bool anInventory::IsWeaponBankValid( int slot ) const {
+	if ( slot < 0 || slot >= slotForBank.Num() ) {
 		return false;
 	}
 	
@@ -1465,7 +1439,7 @@ bool sdInventory::IsWeaponBankValid( int slot ) const {
 			continue;
 		}
 
-		const sdDeclInvItem* item = items[ i ].GetItem();
+		const anInventoryItem* item = items[ i ].GetItem();
 		if ( !item->UsesSlot( slotForBank[ slot ] )) {
 			continue;
 		}
@@ -1482,14 +1456,14 @@ bool sdInventory::IsWeaponBankValid( int slot ) const {
 
 /*
 ============
-sdInventory::NumValidWeaponBanks
+anInventory::NumValidWeaponBanks
 ============
 */
-int sdInventory::NumValidWeaponBanks() const {
+int anInventory::NumValidWeaponBanks() const {
 	int numValid = 0;
 	int max = slotForBank.Num();
 	for( int i = 0; i < max; i++ ) {
-		if( IsWeaponBankValid( i )) {
+		if ( IsWeaponBankValid( i )) {
 			numValid++;
 		}
 	}
@@ -1499,17 +1473,17 @@ int sdInventory::NumValidWeaponBanks() const {
 
 /*
 ==============
-sdInventory::GetActivePlayer
+anInventory::GetActivePlayer
 ==============
 */
-idPlayer* sdInventory::GetActivePlayer( void ) const {
-	idPlayer* modelPlayer = NULL;
+anBasePlayer* anInventory::GetActivePlayer( void ) const {
+	anBasePlayer* modelPlayer = nullptr;
 
 	int disguiseClient = owner->GetDisguiseClient();
 	if ( disguiseClient != -1 ) {
-		modelPlayer = gameLocal.EntityForSpawnId( disguiseClient )->Cast< idPlayer >();
+		modelPlayer = gameLocal.EntityForSpawnId( disguiseClient )->Cast< anBasePlayer >();
 	}
-	if ( modelPlayer == NULL ) {
+	if ( modelPlayer == nullptr ) {
 		modelPlayer = owner;
 	}
 	return modelPlayer;
@@ -1517,10 +1491,10 @@ idPlayer* sdInventory::GetActivePlayer( void ) const {
 
 /*
 ==============
-sdInventory::GetActivePlayerClass
+anInventory::GetActivePlayerClass
 ==============
 */
-const sdDeclPlayerClass* sdInventory::GetActivePlayerClass( void ) const {
+const anDeclPlayerClass* anInventory::GetActivePlayerClass( void ) const {
 	if ( owner->IsDisguised() ) {
 		return owner->GetDisguiseClass();
 	}
@@ -1529,42 +1503,42 @@ const sdDeclPlayerClass* sdInventory::GetActivePlayerClass( void ) const {
 
 /*
 ==============
-sdInventory::SetupModel
+anInventory::SetupModel
 ==============
 */
-void sdInventory::SetupModel( void ) {
+void anInventory::SetupModel( void ) {
 	SetupModel( GetActivePlayerClass() );
 }
 
 /*
 ==============
-sdInventory::GetPlayerJoint
+anInventory::GetPlayerJoint
 ==============
 */
-jointHandle_t sdInventory::GetPlayerJoint( const idDict& dict, const char* name ) {
-	const char* value = dict.GetString( name );
+jointHandle_t anInventory::GetPlayerJoint( const anDict &dict, const char *name ) {
+	const char *value = dict.GetString( name );
 	jointHandle_t handle = owner->GetAnimator()->GetJointHandle( value );
 	if ( handle == INVALID_JOINT ) {
-		gameLocal.Error( "sdInventory::GetPlayerJoint '%s' not found for '%s' on '%s'", value, name, owner->name.c_str() );
+		gameLocal.Error( "anInventory::GetPlayerJoint '%s' not found for '%s' on '%s'", value, name, owner->name.c_str() );
 	}
 	return handle;
 }
 
 /*
 ==============
-sdInventory::SkinForClass
+anInventory::SkinForClass
 ==============
 */
-const idDeclSkin* sdInventory::SkinForClass( const sdDeclPlayerClass* cls ) {
-	if ( gameLocal.mapSkinPool != NULL ) {
-		const char* skinKey = cls->GetClimateSkinKey();
+const idDeclSkin* anInventory::SkinForClass( const anDeclPlayerClass* cls ) {
+	if ( gameLocal.mapSkinPool != nullptr ) {
+		const char *skinKey = cls->GetClimateSkinKey();
 		if ( *skinKey != '\0' ) {
-			const char* skinName = gameLocal.mapSkinPool->GetDict().GetString( va( "skin_%s", skinKey ) );
+			const char *skinName = gameLocal.mapSkinPool->GetDict().GetString( va( "skin_%s", skinKey ) );
 			if ( *skinName == '\0' ) {
-				gameLocal.Warning( "sdInventory::SetupModel No Skin Set For '%s'", skinKey );
+				gameLocal.Warning( "anInventory::SetupModel No Skin Set For '%s'", skinKey );
 			} else {
 				const idDeclSkin* skin = gameLocal.declSkinType[ skinName ];
-				if ( skin == NULL ) {
+				if ( skin == nullptr ) {
 					gameLocal.Warning( "sdScriptEntity::Spawn Skin '%s' Not Found", skinName );
 				} else {
 					return skin;
@@ -1573,18 +1547,18 @@ const idDeclSkin* sdInventory::SkinForClass( const sdDeclPlayerClass* cls ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
 ==============
-sdInventory::SetupModel
+anInventory::SetupModel
 ==============
 */
-void sdInventory::SetupModel( const sdDeclPlayerClass* cls ) {
-	owner->SetSkin( NULL );
+void anInventory::SetupModel( const anDeclPlayerClass* cls ) {
+	owner->SetSkin( nullptr );
 
-	if ( cls == NULL ) {
+	if ( cls == nullptr ) {
 		owner->SetModel( "" );
 		owner->UpdateShadows();
 		owner->SetHipJoint( INVALID_JOINT );
@@ -1596,17 +1570,17 @@ void sdInventory::SetupModel( const sdDeclPlayerClass* cls ) {
 		return;
 	}
 
-	if( !cls->GetModel() ) {
-		gameLocal.Error( "sdInventory::SetupModel NULL model for class '%s'", cls->GetName() );
+	if ( !cls->GetModel() ) {
+		gameLocal.Error( "anInventory::SetupModel nullptr model for class '%s'", cls->GetName() );
 	}
 
-	const idDict& dict = cls->GetModelData();
+	const anDict &dict = cls->GetModelData();
 	
 	owner->SetModel( cls->GetModel()->GetName() );
 	owner->UpdateShadows();
 
 	const idDeclSkin* skin = SkinForClass( cls );
-	if ( skin != NULL ) {
+	if ( skin != nullptr ) {
 		owner->SetSkin( skin );
 	}
 
@@ -1628,7 +1602,7 @@ void sdInventory::SetupModel( const sdDeclPlayerClass* cls ) {
 
 	SetupLocationalDamage( dict );
 
-	sdScriptHelper h;
+	idScriptHelper h;
 	owner->CallNonBlockingScriptEvent( owner->GetScriptFunction( "OnNewModel" ), h );
 
 	items.UpdateJoints();
@@ -1636,29 +1610,29 @@ void sdInventory::SetupModel( const sdDeclPlayerClass* cls ) {
 
 /*
 ============
-sdInventory::SetupLocationalDamage
+anInventory::SetupLocationalDamage
 ============
 */
-void sdInventory::SetupLocationalDamage( const idDict& dict ) {
+void anInventory::SetupLocationalDamage( const anDict &dict ) {
 	owner->RemoveLocationalDamageInfo();
 
 	locationalDamageInfo_t info;
 	int	numLocationDamageJoints = dict.GetInt( "loc_damage_joint_num", "6" );
 	for( int i = 0; i < numLocationDamageJoints; i++ ) {
-		const char* jointName = dict.GetString( va( "loc_damage_joint_%d", i ), "" );
+		const char *jointName = dict.GetString( va( "loc_damage_joint_%d", i ), "" );
 		info.joint = owner->GetAnimator()->GetJointHandle( jointName );
-		if( info.joint == INVALID_JOINT ) {
+		if ( info.joint == INVALID_JOINT ) {
 			gameLocal.Warning( "Invalid locational damage joint %d", i );
 			continue;
 		}
 		
-		if( !owner->GetAnimator()->GetJointTransform( info.joint, gameLocal.time, info.pos ) ) {
+		if ( !owner->GetAnimator()->GetJointTransform( info.joint, gameLocal.time, info.pos ) ) {
 			gameLocal.Warning( "Invalid local transform for locational damage joint %d", i );
 			continue;
 		}
 
 		info.area = owner->LocationalDamageAreaForString( dict.GetString( va( "loc_damage_area_%d", i ), "" ) );
-		if( info.area == LDA_INVALID ) {
+		if ( info.area == LDA_INVALID ) {
 			gameLocal.Warning( "Invalid locational damage area for joint %d", i );
 			continue;
 		}
@@ -1670,30 +1644,30 @@ void sdInventory::SetupLocationalDamage( const idDict& dict ) {
 
 /*
 ==============
-sdInventory::CheckPlayerClass
+anInventory::CheckPlayerClass
 ==============
 */
-void sdInventory::CheckPlayerClass( bool setWeapon ) {
+void anInventory::CheckPlayerClass( bool setWeapon ) {
 	sdTeamInfo* team = owner->GetTeam();
 	if ( !team ) {
 		return;
 	}
 
-	const sdDeclPlayerClass* newClass = playerClass.GetClass();
+	const anDeclPlayerClass* newClass = playerClass.GetClass();
 
-	sdPlayerClassSetup oldCachedClassSetup = cachedPlayerClass;
+	anPlayerClassSetup oldCachedClassSetup = cachedPlayerClass;
 
 	if ( cachedPlayerClass.GetClass() ) {
 		if ( cachedPlayerClass.GetClass()->GetTeam() == team ) {
 			newClass = cachedPlayerClass.GetClass();
 		}
 
-		SetCachedClass( NULL );
+		SetCachedClass( nullptr );
 	}
 
 	if ( newClass ) {
 		if ( newClass->GetTeam() != team ) {
-			newClass = NULL;
+			newClass = nullptr;
 		}
 	}
 
@@ -1720,34 +1694,34 @@ void sdInventory::CheckPlayerClass( bool setWeapon ) {
 
 /*
 ==============
-sdInventory::IsIdealWeaponValid
+anInventory::IsIdealWeaponValid
 ==============
 */
-bool sdInventory::IsIdealWeaponValid( void ) const {
+bool anInventory::IsIdealWeaponValid( void ) const {
 	return IsWeaponValid( idealWeapon );
 }
 
 /*
 ==============
-sdInventory::IsCurrentWeaponValid
+anInventory::IsCurrentWeaponValid
 ==============
 */
-bool sdInventory::IsCurrentWeaponValid( void ) const {
+bool anInventory::IsCurrentWeaponValid( void ) const {
 	return IsWeaponValid( currentWeapon );
 }
 
 /*
 ==============
-sdInventory::GetCurrentItem
+anInventory::GetCurrentItem
 ==============
 */
-const sdDeclInvItem* sdInventory::GetCurrentItem( void ) const {
+const anInventoryItem* anInventory::GetCurrentItem( void ) const {
 	if ( currentWeapon < 0 || currentWeapon >= items.Num() ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( !CanEquip( currentWeapon, false ) ) {
-		return NULL;
+		return nullptr;
 	}
 
 	return items[ currentWeapon ].GetItem();
@@ -1755,14 +1729,14 @@ const sdDeclInvItem* sdInventory::GetCurrentItem( void ) const {
 
 /*
 ==============
-sdInventory::GetCurrentWeaponName
+anInventory::GetCurrentWeaponName
 ==============
 */
-const char* sdInventory::GetCurrentWeaponName( void ) {
-	const sdDeclInvItem* item = GetCurrentItem();
+const char *anInventory::GetCurrentWeaponName( void ) {
+	const anInventoryItem* item = GetCurrentItem();
 
 	if ( !item ) {
-		return NULL;
+		return nullptr;
 	}
 
 	return item->GetData().GetString( "anim_prefix" );
@@ -1770,14 +1744,14 @@ const char* sdInventory::GetCurrentWeaponName( void ) {
 
 /*
 ==============
-sdInventory::GetCurrentWeaponClass
+anInventory::GetCurrentWeaponClass
 ==============
 */
-const char* sdInventory::GetCurrentWeaponClass( void ) {
-	const sdDeclInvItem* item = GetCurrentItem();
+const char *anInventory::GetCurrentWeaponClass( void ) {
+	const anInventoryItem* item = GetCurrentItem();
 
 	if ( !item ) {
-		return NULL;
+		return nullptr;
 	}
 
 	return item->GetData().GetString( "anim_prefix_class" );
@@ -1785,10 +1759,10 @@ const char* sdInventory::GetCurrentWeaponClass( void ) {
 
 /*
 ==============
-sdInventory::ClearAmmo
+anInventory::ClearAmmo
 ==============
 */
-void sdInventory::ClearAmmo( void ) {
+void anInventory::ClearAmmo( void ) {
 	for ( int i = 0; i < ammo.Num(); i++ ) {
 		ammo[ i ] = 0;
 		ammoLimits[ i ] = 0;
@@ -1797,27 +1771,27 @@ void sdInventory::ClearAmmo( void ) {
 
 /*
 ==============
-sdInventory::GiveClass
+anInventory::GiveClass
 ==============
 */
-bool sdInventory::GiveClass( const sdDeclPlayerClass* cls, bool sendInfo ) {
+bool anInventory::GiveClass( const anDeclPlayerClass* cls, bool sendInfo ) {
 	if ( gameLocal.isClient ) {
 		assert( false );
 		return false;
 	}
 
- 	if ( cls == NULL ) {
-		gameLocal.Error( "sdInventory::GiveClass: NULL player class" );
+ 	if ( cls == nullptr ) {
+		gameLocal.Error( "anInventory::GiveClass: nullptr player class" );
 		return false;
 	}
 
-	if ( cls->GetPackage() == NULL ) {
-		gameLocal.Error( "sdInventory::GiveClass: NULL package on player class '%s'", cls->GetName() );
+	if ( cls->GetPackage() == nullptr ) {
+		gameLocal.Error( "anInventory::GiveClass: nullptr package on player class '%s'", cls->GetName() );
 		return false;
 	}
 
 	const sdTeamInfo* otherTeam = cls->GetTeam();
-	if ( otherTeam != NULL && otherTeam != owner->GetGameTeam() ) {
+	if ( otherTeam != nullptr && otherTeam != owner->GetGameTeam() ) {
 		return false;
 	}
 
@@ -1825,8 +1799,8 @@ bool sdInventory::GiveClass( const sdDeclPlayerClass* cls, bool sendInfo ) {
 		return false;
 	}
 
-	idEntity* proxy = owner->GetProxyEntity();
-	if ( proxy != NULL ) {
+	abEntity* proxy = owner->GetProxyEntity();
+	if ( proxy != nullptr ) {
 		proxy->GetUsableInterface()->OnExit( owner, true );
 	}
 
@@ -1842,24 +1816,24 @@ bool sdInventory::GiveClass( const sdDeclPlayerClass* cls, bool sendInfo ) {
 
 /*
 ==============
-sdInventory::SendClassInfo
+anInventory::SendClassInfo
 ==============
 */
-void sdInventory::SendClassInfo( bool cached ) {
+void anInventory::SendClassInfo( bool cached ) {
 	if ( !gameLocal.isServer ) {
 		return;
 	}
 
-	sdPlayerClassSetup& setup = cached ? cachedPlayerClass : playerClass;
+	anPlayerClassSetup& setup = cached ? cachedPlayerClass : playerClass;
 
-	const sdDeclPlayerClass* cls = setup.GetClass();
+	const anDeclPlayerClass* cls = setup.GetClass();
 
-	sdEntityBroadcastEvent msg( owner, cached ? idPlayer::EVENT_SETCACHEDCLASS : idPlayer::EVENT_SETCLASS );
+	sdEntityBroadcastEvent msg( owner, cached ? anBasePlayer::EVENT_SETCACHEDCLASS : anBasePlayer::EVENT_SETCLASS );
 	msg.WriteBits( cls ? cls->Index() + 1 : 0, gameLocal.GetNumPlayerClassBits() );
 	if ( cls ) {
 		for ( int i = 0; i < cls->GetNumOptions(); i++ ) {
-			const sdDeclPlayerClass::optionList_t& option = cls->GetOption( i );
-			msg.WriteBits( setup.GetOptions()[ i ], idMath::BitsForInteger( option.Num() ) );
+			const anDeclPlayerClass::optionList_t& option = cls->GetOption( i );
+			msg.WriteBits( setup.GetOptions()[ i ], anMath::BitsForInteger( option.Num() ) );
 		}
 	}
 	msg.Send( true, sdReliableMessageClientInfoAll() );
@@ -1867,16 +1841,16 @@ void sdInventory::SendClassInfo( bool cached ) {
 
 /*
 ==============
-sdInventory::SetupClassThread
+anInventory::SetupClassThread
 ==============
 */
-void sdInventory::SetupClassThread( void ) {
+void anInventory::SetupClassThread( void ) {
 	ShutdownClassThread();
 	if ( playerClass.GetClass() ) {
-		const char* classThreadName = playerClass.GetClass()->GetClassThreadName();
+		const char *classThreadName = playerClass.GetClass()->GetClassThreadName();
 		if ( *classThreadName ) {
 			classThread = gameLocal.program->CreateThread();
-			classThread->SetName( idStr( owner->GetName() ) + "_classThread" );
+			classThread->SetName( anStr( owner->GetName() ) + "_classThread" );
 			classThread->CallFunction( owner->scriptObject, owner->scriptObject->GetFunction( classThreadName ) );
 			classThread->ManualDelete();
 			classThread->ManualControl();
@@ -1887,23 +1861,23 @@ void sdInventory::SetupClassThread( void ) {
 
 /*
 ==============
-sdInventory::ClearClass
+anInventory::ClearClass
 ==============
 */
-void sdInventory::ClearClass( void ) {
-	SetPlayerClass( NULL );
+void anInventory::ClearClass( void ) {
+	SetPlayerClass( nullptr );
 	SendClassInfo( false );
 }
 
 /*
 ==============
-sdInventory::LogClassTime
+anInventory::LogClassTime
 ==============
 */
-void sdInventory::LogClassTime( void ) {
-	const sdDeclPlayerClass* pc = playerClass.GetClass();
-	if ( pc != NULL ) {
-		const sdDeclPlayerClass::stats_t& stats = pc->GetStats();
+void anInventory::LogClassTime( void ) {
+	const anDeclPlayerClass* pc = playerClass.GetClass();
+	if ( pc != nullptr ) {
+		const anDeclPlayerClass::stats_t& stats = pc->GetStats();
 		if ( stats.timePlayed ) {
 			int t = MS2SEC( gameLocal.time - timeClassChanged );
 			stats.timePlayed->IncreaseValue( owner->entityNumber, t );
@@ -1914,19 +1888,19 @@ void sdInventory::LogClassTime( void ) {
 
 /*
 ==============
-sdInventory::SetPlayerClass
+anInventory::SetPlayerClass
 ==============
 */
-void sdInventory::SetPlayerClass( const sdDeclPlayerClass* cls ) {
+void anInventory::SetPlayerClass( const anDeclPlayerClass* cls ) {
 	LogClassTime();
-	SetCachedClass( NULL );
+	SetCachedClass( nullptr );
 
 	playerClass.SetClass( cls, true );
 
 	SetupClassOptions( true, false );
 	SetupClassThread();
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	owner->CallFloatNonBlockingScriptEvent( owner->GetScriptObject()->GetFunction( "OnClassChanged" ), h1 );
 
 	SetupModel();
@@ -1938,16 +1912,16 @@ void sdInventory::SetPlayerClass( const sdDeclPlayerClass* cls ) {
 
 /*
 ==============
-sdInventory::SetClassOption
+anInventory::SetClassOption
 ==============
 */
-bool sdInventory::SetClassOption( int optionIndex, int itemIndex, bool sendInfo ) {
+bool anInventory::SetClassOption( int optionIndex, int itemIndex, bool sendInfo ) {
 	if ( !playerClass.SetOption( optionIndex, itemIndex ) ) {
 		return false;
 	}
 
-	idEntity* proxy = owner->GetProxyEntity();
-	if ( proxy != NULL ) {
+	abEntity* proxy = owner->GetProxyEntity();
+	if ( proxy != nullptr ) {
 		proxy->GetUsableInterface()->OnExit( owner, true );
 	}
 
@@ -1962,10 +1936,10 @@ bool sdInventory::SetClassOption( int optionIndex, int itemIndex, bool sendInfo 
 
 /*
 ============
-sdInventory::SetCachedClass
+anInventory::SetCachedClass
 ============
 */
-bool sdInventory::SetCachedClass( const sdDeclPlayerClass* pc, bool sendInfo ) {
+bool anInventory::SetCachedClass( const anDeclPlayerClass* pc, bool sendInfo ) {
 	bool changed = cachedPlayerClass.SetClass( pc );
 
 	if ( changed && sendInfo ) {
@@ -1977,10 +1951,10 @@ bool sdInventory::SetCachedClass( const sdDeclPlayerClass* pc, bool sendInfo ) {
 
 /*
 ============
-sdInventory::SetCachedClassOption
+anInventory::SetCachedClassOption
 ============
 */
-bool sdInventory::SetCachedClassOption( int optionIndex, int itemIndex, bool sendInfo ) {
+bool anInventory::SetCachedClassOption( int optionIndex, int itemIndex, bool sendInfo ) {
 	if ( optionIndex < 0 || optionIndex >= cachedPlayerClass.GetOptions().Num() ) {
 		return false;
 	}
@@ -1996,30 +1970,30 @@ bool sdInventory::SetCachedClassOption( int optionIndex, int itemIndex, bool sen
 
 /*
 ==============
-sdInventory::AddItems
+anInventory::AddItems
 ==============
 */
-bool sdInventory::AddItems( const sdDeclItemPackage* package, bool enabled ) {
+bool anInventory::AddItems( const sdDeclItemPackage* package, bool enabled ) {
 	const sdDeclItemPackageNode& node = package->GetItemRoot();
 	return AddItemNode( node, enabled, false );
 }
 
 /*
 ==============
-sdInventory::CheckItems
+anInventory::CheckItems
 ==============
 */
-bool sdInventory::CheckItems( const sdDeclItemPackage* package ) {
+bool anInventory::CheckItems( const sdDeclItemPackage* package ) {
 	const sdDeclItemPackageNode& node = package->GetItemRoot();
 	return AddItemNode( node, true, true );
 }
 
 /*
 ==============
-sdInventory::AddItemNode
+anInventory::AddItemNode
 ==============
 */
-bool sdInventory::AddItemNode( const sdDeclItemPackageNode& node, bool enabled, bool testOnly ) {
+bool anInventory::AddItemNode( const sdDeclItemPackageNode& node, bool enabled, bool testOnly ) {
 	bool added = false;
 
 	if ( !node.GetRequirements().Check( owner ) ) {
@@ -2027,7 +2001,7 @@ bool sdInventory::AddItemNode( const sdDeclItemPackageNode& node, bool enabled, 
 	}
 
 	for ( int i = 0; i < node.GetItems().Num(); i++ ) {
-		const sdDeclInvItem* item = node.GetItems()[ i ];
+		const anInventoryItem* item = node.GetItems()[ i ];
 		if ( !testOnly ) {
 			items.AddItem( item, enabled );
 		}
@@ -2043,16 +2017,16 @@ bool sdInventory::AddItemNode( const sdDeclItemPackageNode& node, bool enabled, 
 
 /*
 ==============
-sdInventory::SetupClassOptions
+anInventory::SetupClassOptions
 ==============
 */
-void sdInventory::SetupClassOptions( bool clearAmmo, bool setWeapon, bool allowCurrentWeapon ) {
+void anInventory::SetupClassOptions( bool clearAmmo, bool setWeapon, bool allowCurrentWeapon ) {
 	bool disguise = owner->IsDisguised();
 	if ( disguise ) {
 		items.Clear();
 
-		const sdDeclPlayerClass* cls = owner->GetDisguiseClass();
-		if ( cls == NULL ) {
+		const anDeclPlayerClass* cls = owner->GetDisguiseClass();
+		if ( cls == nullptr ) {
 			return;
 		}
 
@@ -2065,8 +2039,8 @@ void sdInventory::SetupClassOptions( bool clearAmmo, bool setWeapon, bool allowC
 
 		items.Clear();
 
-		const sdDeclPlayerClass* cls = playerClass.GetClass();
-		if ( cls == NULL ) {
+		const anDeclPlayerClass* cls = playerClass.GetClass();
+		if ( cls == nullptr ) {
 			return;
 		}
 
@@ -2083,7 +2057,7 @@ void sdInventory::SetupClassOptions( bool clearAmmo, bool setWeapon, bool allowC
 		}
 
 		for ( int i = 0; i < playerClass.GetOptions().Num(); i++ ) {
-			const sdDeclPlayerClass::optionList_t& list = cls->GetOption( i );
+			const anDeclPlayerClass::optionList_t& list = cls->GetOption( i );
 
 			int index = playerClass.GetOptions()[ i ];
 			if ( index < 0 || index >= list.Num() ) {
@@ -2112,22 +2086,22 @@ void sdInventory::SetupClassOptions( bool clearAmmo, bool setWeapon, bool allowC
 
 /*
 ==============
-sdInventory::HasAbility
+anInventory::HasAbility
 ==============
 */
-bool sdInventory::HasAbility( qhandle_t handle ) const {
-	const sdDeclPlayerClass* cls = playerClass.GetClass();
+bool anInventory::HasAbility( qhandle_t handle ) const {
+	const anDeclPlayerClass* cls = playerClass.GetClass();
 	return cls && cls->HasAbility( handle );
 }
 
 /*
 ==============
-sdInventory::SortClips
+anInventory::SortClips
 ==============
 */
-void sdInventory::SortClips( void ) {
+void anInventory::SortClips( void ) {
 	for ( int i = 0; i < items.Num(); i++ ) {
-		const sdDeclInvItem* item = GetItem( i );
+		const anInventoryItem* item = GetItem( i );
 		for( int clip = 0; clip < item->GetClips().Num(); clip++ ) {
 			const itemClip_t& clipInfo = item->GetClips()[ clip ];
 			if ( clipInfo.maxAmmo > 0 && clipInfo.ammoPerShot > 0 ) {
@@ -2140,17 +2114,17 @@ void sdInventory::SortClips( void ) {
 
 /*
 ==============
-sdInventory::GiveConsumables
+anInventory::GiveConsumables
 ==============
 */
-bool sdInventory::GiveConsumablesNode( const sdDeclItemPackageNode& node ) {
+bool anInventory::GiveConsumablesNode( const sdDeclItemPackageNode& node ) {
 	if ( !node.GetRequirements().Check( owner ) ) {
 		return false;
 	}
 
 	bool given = false;
 
-	idList<const sdConsumable *> consumables = node.GetConsumables();
+	anList<const sdConsumable *> consumables = node.GetConsumables();
 	for ( int i = 0; i < consumables.Num(); i++ ) {
 		if ( !consumables[ i ]->Give( owner ) ) {
 			continue;
@@ -2167,25 +2141,25 @@ bool sdInventory::GiveConsumablesNode( const sdDeclItemPackageNode& node ) {
 
 /*
 ==============
-sdInventory::GiveConsumables
+anInventory::GiveConsumables
 ==============
 */
-bool sdInventory::GiveConsumables( const sdDeclItemPackage* package ) {
+bool anInventory::GiveConsumables( const sdDeclItemPackage* package ) {
 	return GiveConsumablesNode( package->GetItemRoot() );
 }
 
 /*
 ==============
-sdInventory::GetWeaponTitle
+anInventory::GetWeaponTitle
 ==============
 */
-const sdDeclLocStr* sdInventory::GetWeaponTitle( void ) const {
-	if( IsSwitchActive() ) {
+const sdDeclLocStr* anInventory::GetWeaponTitle( void ) const {
+	if ( IsSwitchActive() ) {
 		return items[ switchingWeapon ].item->GetItemName();
 	}
 
 	if ( !IsCurrentWeaponValid() ) {
-		return NULL;
+		return nullptr;
 	}
 
 	return items[ currentWeapon ].item->GetItemName();
@@ -2193,11 +2167,11 @@ const sdDeclLocStr* sdInventory::GetWeaponTitle( void ) const {
 
 /*
 ==============
-sdInventory::GetWeaponName
+anInventory::GetWeaponName
 ==============
 */
-const char* sdInventory::GetWeaponName( void ) const {
-	if( IsSwitchActive() ) {
+const char *anInventory::GetWeaponName( void ) const {
+	if ( IsSwitchActive() ) {
 		return items[ switchingWeapon ].item->GetName();
 	}
 
@@ -2210,11 +2184,11 @@ const char* sdInventory::GetWeaponName( void ) const {
 
 /*
 ============
-sdInventory::CheckWeaponHasAmmo
+anInventory::CheckWeaponHasAmmo
 ============
 */
-bool sdInventory::CheckWeaponHasAmmo( const sdDeclInvItem* item ) const {
-	const idList< itemClip_t >& itemClips = item->GetClips();
+bool anInventory::CheckWeaponHasAmmo( const anInventoryItem* item ) const {
+	const anList< itemClip_t >& itemClips = item->GetClips();
 
 	if ( !itemClips.Num() ) {
 		return true;
@@ -2230,40 +2204,40 @@ bool sdInventory::CheckWeaponHasAmmo( const sdDeclInvItem* item ) const {
 
 /*
 ============
-sdInventory::GetAmmo
+anInventory::GetAmmo
 ============
 */
-int sdInventory::GetAmmo( int index ) const {
+int anInventory::GetAmmo( int index ) const {
 	return ammo[ index ];
 }
 
 /*
 ==============
-sdInventory::ShutdownClassThread
+anInventory::ShutdownClassThread
 ==============
 */
-void sdInventory::ShutdownClassThread( void ) {
-	if ( classThread != NULL ) {
+void anInventory::ShutdownClassThread( void ) {
+	if ( classThread != nullptr ) {
 		gameLocal.program->FreeThread( classThread );
-		classThread = NULL;
+		classThread = nullptr;
 	}
 }
 
 /*
 ============
-sdInventory::CancelWeaponSwitch
+anInventory::CancelWeaponSwitch
 ============
 */
-void sdInventory::CancelWeaponSwitch( void ) {
+void anInventory::CancelWeaponSwitch( void ) {
 	switchingWeapon = -1;
 }
 
 /*
 ============
-sdInventory::AcceptWeaponSwitch
+anInventory::AcceptWeaponSwitch
 ============
 */
-void sdInventory::AcceptWeaponSwitch( void ) {
+void anInventory::AcceptWeaponSwitch( void ) {
 	if ( CanEquip( switchingWeapon, true ) ) {
 		SetIdealWeapon( switchingWeapon );
 		switchingWeapon = -1;
@@ -2272,10 +2246,10 @@ void sdInventory::AcceptWeaponSwitch( void ) {
 
 /*
 ============
-sdInventory::UpdateCurrentWeapon
+anInventory::UpdateCurrentWeapon
 ============
 */
-void sdInventory::UpdateCurrentWeapon( void ) {
+void anInventory::UpdateCurrentWeapon( void ) {
 	if ( currentWeapon != idealWeapon ) {
 		if ( currentWeapon >= 0 && currentWeapon < items.Num() ) {
 			if ( items.ShowItem( items[ currentWeapon ] ) ) {
@@ -2296,11 +2270,11 @@ void sdInventory::UpdateCurrentWeapon( void ) {
 
 /*
 ============
-sdInventory::ApplyPlayerState
+anInventory::ApplyPlayerState
 ============
 */
-void sdInventory::ApplyPlayerState( const sdInventoryPlayerStateData& newState ) {
-	NET_GET_NEW( sdInventoryPlayerStateData );
+void anInventory::ApplyPlayerState( const anInventoryPlayerStateData& newState ) {
+	NET_GET_NEW( anInventoryPlayerStateData );
 
 	for ( int i = 0; i < newData.ammo.Num(); i++ ) {
 		SetAmmo( i, newData.ammo[ i ] );
@@ -2311,11 +2285,11 @@ void sdInventory::ApplyPlayerState( const sdInventoryPlayerStateData& newState )
 
 /*
 ============
-sdInventory::ReadPlayerState
+anInventory::ReadPlayerState
 ============
 */
-void sdInventory::ReadPlayerState( const sdInventoryPlayerStateData& baseState, sdInventoryPlayerStateData& newState, const idBitMsg& msg ) const {
-	//NET_GET_STATES( sdInventoryPlayerStateData );
+void anInventory::ReadPlayerState( const anInventoryPlayerStateData& baseState, anInventoryPlayerStateData& newState, const anBitMsg& msg ) const {
+	//NET_GET_STATES( anInventoryPlayerStateData );
 
 	newData.ammo.SetNum( gameLocal.declAmmoTypeType.Num() );
 	for ( int i = 0; i < newData.ammo.Num(); i++ ) {
@@ -2327,11 +2301,11 @@ void sdInventory::ReadPlayerState( const sdInventoryPlayerStateData& baseState, 
 
 /*
 ============
-sdInventory::WritePlayerState
+anInventory::WritePlayerState
 ============
 */
-void sdInventory::WritePlayerState( const sdInventoryPlayerStateData& baseState, sdInventoryPlayerStateData& newState, idBitMsg& msg ) const {
-	//NET_GET_STATES( sdInventoryPlayerStateData );
+void anInventory::WritePlayerState( const anInventoryPlayerStateData& baseState, anInventoryPlayerStateData& newState, anBitMsg& msg ) const {
+	//NET_GET_STATES( anInventoryPlayerStateData );
 
 	newData.ammo.SetNum( gameLocal.declAmmoTypeType.Num() );
 	for ( int i = 0; i < newData.ammo.Num(); i++ ) {
@@ -2344,11 +2318,11 @@ void sdInventory::WritePlayerState( const sdInventoryPlayerStateData& baseState,
 
 /*
 ============
-sdInventory::CheckPlayerStateChanges
+anInventory::CheckPlayerStateChanges
 ============
 */
-bool sdInventory::CheckPlayerStateChanges( const sdInventoryPlayerStateData& baseState ) const {
-	//NET_GET_BASE( sdInventoryPlayerStateData );
+bool anInventory::CheckPlayerStateChanges( const anInventoryPlayerStateData& baseState ) const {
+	//NET_GET_BASE( anInventoryPlayerStateData );
 
 	for ( int i = 0; i < baseData.ammo.Num(); i++ ) {
 		if ( baseData.ammo[ i ] != GetAmmo( i ) ) {
@@ -2362,10 +2336,10 @@ bool sdInventory::CheckPlayerStateChanges( const sdInventoryPlayerStateData& bas
 
 /*
 ============
-sdInventory::HideCurrentItem
+anInventory::HideCurrentItem
 ============
 */
-void sdInventory::HideCurrentItem( bool hide ) {
+void anInventory::HideCurrentItem( bool hide ) {
 	if ( currentWeapon != -1 ) {
 		if ( hide ) {
 			items[ currentWeapon ].SetVisible( false );
@@ -2380,14 +2354,14 @@ void sdInventory::HideCurrentItem( bool hide ) {
 
 /*
 ============
-sdInventory::SetClass
+anInventory::SetClass
 ============
 */
-bool sdInventory::SetClass( const idBitMsg& msg, bool cached ) {
-	sdPlayerClassSetup& setup = cached ? cachedPlayerClass : playerClass;
+bool anInventory::SetClass( const anBitMsg& msg, bool cached ) {
+	anPlayerClassSetup& setup = cached ? cachedPlayerClass : playerClass;
 
 	int playerClassIndex = msg.ReadBits( gameLocal.GetNumPlayerClassBits() ) - 1;
-	const sdDeclPlayerClass* pc = NULL;
+	const anDeclPlayerClass* pc = nullptr;
 	if ( playerClassIndex != -1 ) {
 		pc = gameLocal.declPlayerClassType[ playerClassIndex ];
 	}
@@ -2403,7 +2377,7 @@ bool sdInventory::SetClass( const idBitMsg& msg, bool cached ) {
 	if ( pc ) {
 		bool changed = false;
 		for ( int i = 0; i < pc->GetNumOptions(); i++ ) {
-			int itemIndex = msg.ReadBits( idMath::BitsForInteger( pc->GetOption( i ).Num() ) );
+			int itemIndex = msg.ReadBits( anMath::BitsForInteger( pc->GetOption( i ).Num() ) );
 			if ( setup.GetOptions()[ i ] != itemIndex ) {
 				setup.SetOption( i, itemIndex );
 				changed = true;
@@ -2419,44 +2393,44 @@ bool sdInventory::SetClass( const idBitMsg& msg, bool cached ) {
 
 /*
 ============
-sdInventory::UpdateForDisguise
+anInventory::UpdateForDisguise
 ============
 */
-void sdInventory::UpdateForDisguise( void ) {
+void anInventory::UpdateForDisguise( void ) {
 	SetupClassOptions( false, true, false );
 	SetupModel();
 }
 
 /*
 ============
-sdInventory::OnHide
+anInventory::OnHide
 ============
 */
-void sdInventory::OnHide( void ) {
+void anInventory::OnHide( void ) {
 	items.OnHide();
 }
 
 /*
 ============
-sdInventory::OnShow
+anInventory::OnShow
 ============
 */
-void sdInventory::OnShow( void ) {
+void anInventory::OnShow( void ) {
 	items.OnShow();
 }
 
 /*
 ============
-sdInventory::LogSuicide
+anInventory::LogSuicide
 ============
 */
-void sdInventory::LogSuicide( void ) {
-	const sdDeclPlayerClass* pc = playerClass.GetClass();
+void anInventory::LogSuicide( void ) {
+	const anDeclPlayerClass* pc = playerClass.GetClass();
 	if ( !pc ) {
 		return;
 	}
 
-	const sdDeclPlayerClass::stats_t &stats = pc->GetStats();
+	const anDeclPlayerClass::stats_t &stats = pc->GetStats();
 	if ( stats.suicides ) {
 		stats.suicides->IncreaseValue( owner->entityNumber, 1 );
 	}
@@ -2464,33 +2438,33 @@ void sdInventory::LogSuicide( void ) {
 
 /*
 ============
-sdInventory::LogDeath
+anInventory::LogDeath
 ============
 */
-void sdInventory::LogDeath( void ) {
-	const sdDeclPlayerClass *pc = playerClass.GetClass();
+void anInventory::LogDeath( void ) {
+	const anDeclPlayerClass *pc = playerClass.GetClass();
 	if ( !pc ) {
 		return;
 	}
 
-	const sdDeclPlayerClass::stats_t& stats = pc->GetStats();
-	if ( stats.deaths != NULL ) {
+	const anDeclPlayerClass::stats_t& stats = pc->GetStats();
+	if ( stats.deaths != nullptr ) {
 		stats.deaths->IncreaseValue( owner->entityNumber, 1 );
 	}
 }
 
 /*
 ============
-sdInventory::LogRevive
+anInventory::LogRevive
 ============
 */
-void sdInventory::LogRevive( void ) {
-	const sdDeclPlayerClass* pc = playerClass.GetClass();
+void anInventory::LogRevive( void ) {
+	const anDeclPlayerClass* pc = playerClass.GetClass();
 	if ( !pc ) {
 		return;
 	}
 
-	const sdDeclPlayerClass::stats_t& stats = pc->GetStats();
+	const anDeclPlayerClass::stats_t& stats = pc->GetStats();
 	if ( stats.revived ) {
 		stats.revived->IncreaseValue( owner->entityNumber, 1 );
 	}
@@ -2498,16 +2472,16 @@ void sdInventory::LogRevive( void ) {
 
 /*
 ============
-sdInventory::LogTapOut
+anInventory::LogTapOut
 ============
 */
-void sdInventory::LogTapOut( void ) {
-	const sdDeclPlayerClass* pc = playerClass.GetClass();
+void anInventory::LogTapOut( void ) {
+	const anDeclPlayerClass* pc = playerClass.GetClass();
 	if ( !pc ) {
 		return;
 	}
 
-	const sdDeclPlayerClass::stats_t& stats = pc->GetStats();
+	const anDeclPlayerClass::stats_t& stats = pc->GetStats();
 	if ( stats.tapouts ) {
 		stats.tapouts->IncreaseValue( owner->entityNumber, 1 );
 	}
@@ -2515,32 +2489,32 @@ void sdInventory::LogTapOut( void ) {
 
 /*
 ============
-sdInventory::LogRespawn
+anInventory::LogRespawn
 ============
 */
-void sdInventory::LogRespawn( void ) {
-	const sdDeclPlayerClass* pc = playerClass.GetClass();
+void anInventory::LogRespawn( void ) {
+	const anDeclPlayerClass* pc = playerClass.GetClass();
 	if ( !pc ) {
 		return;
 	}
 
-	const sdDeclPlayerClass::stats_t& stats = pc->GetStats();
-	if ( stats.respawns != NULL ) {
+	const anDeclPlayerClass::stats_t& stats = pc->GetStats();
+	if ( stats.respawns != nullptr ) {
 		stats.respawns->IncreaseValue( owner->entityNumber, 1 );
 	}
 }
 
 /*
 ============
-sdInventory::UpdatePlayerClassInfo
+anInventory::UpdatePlayerClassInfo
 
 update the players class info game side for the bots.
 ============
 */
-void sdInventory::UpdatePlayerClassInfo( const sdDeclPlayerClass* pc ) {
+void anInventory::UpdatePlayerClassInfo( const anDeclPlayerClass *pc ) {
  	if ( !pc ) {
 		return;
 	}
 	
-	botThreadData.GetGameWorldState()->clientInfo[ owner->entityNumber ].classType = pc->GetPlayerClassNum();
+	botThreadData.GetGameWorldState()->clientInfo[owner->entityNumber].classType = pc->GetPlayerClassNum();
 }

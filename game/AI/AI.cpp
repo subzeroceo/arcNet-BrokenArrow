@@ -18,7 +18,7 @@ AI.cpp
 #include "../spawner.h"
 #include "AI_Tactical.h"
 
-const char* aiTalkMessageString [ ] = {
+const char *aiTalkMessageString [ ] = {
 	"None",
 	"primary",
 	"secondary",
@@ -602,7 +602,7 @@ anSAAI::Spawn
 void anSAAI::Spawn( void ) {
 	const char*			jointname;
 	const anKeyValue*	kv;
-	anString				jointName;
+	anStr				jointName;
 	anAngles			jointScale;
 	jointHandle_t		joint;
 	anVec3				local_dir;
@@ -767,7 +767,7 @@ void anSAAI::Spawn( void ) {
 
 	SetPhysics( &physicsObj );
 
-	physicsObj.GetGravityAxis().ProjectVector( viewAxis[ 0 ], local_dir );
+	physicsObj.GetGravityAxis().ProjectVector( viewAxis[0], local_dir );
 	move.current_yaw		= local_dir.ToYaw();
 	move.ideal_yaw			= anMath::AngleNormalize180( move.current_yaw );
 
@@ -806,7 +806,7 @@ void anSAAI::Spawn( void ) {
 	StopMove( MOVE_STATUS_DONE );
 
 	// Initialize any scripts
-	anString prefix = "script_";
+	anStr prefix = "script_";
 	for ( kv = spawnArgs.MatchPrefix ( prefix.c_str(), nullptr );
 		  kv;
 		  kv = spawnArgs.MatchPrefix ( prefix.c_str(), kv ) ) {
@@ -840,7 +840,7 @@ void anSAAI::Spawn( void ) {
 	combat.tacticalMaskAvailable |= ( spawnArgs.GetBool ( "allowPlayerPush",  "0" )		? AITACTICAL_MOVE_PLAYERPUSH_BIT	: 0);
 
 	// Talking?
-	const char* npc;
+	const char *npc;
 	if ( spawnArgs.GetString( "npc_name", nullptr, &npc ) != nullptr && *npc ) {
 		if ( spawnArgs.GetBool ( "follows", "0" ) ) {
 			SetTalkState ( TALK_FOLLOW );
@@ -891,7 +891,7 @@ anSAAI::Begin
 ===================
 */
 void anSAAI::Begin ( void ) {
-	const char* temp;
+	const char *temp;
 	bool		animWalk;
 	bool		animRun;
 
@@ -921,7 +921,7 @@ anSAAI::WakeUp
 ===================
 */
 void anSAAI::WakeUp ( void ) {
-	const char* temp;
+	const char *temp;
 
 	// Already awake?
 	if ( aifl.awake ) {
@@ -1032,7 +1032,7 @@ void anSAAI::List_f( const anCommandArgs &args ) {
 
 	// Combine the two lists
 	for ( e = 0; e < countsSpawned.GetNumKeyVals(); e ++ ) {
-		const char* keyName = countsSpawned.GetKeyVal ( e )->GetKey();
+		const char *keyName = countsSpawned.GetKeyVal ( e )->GetKey();
 		countsFixed.Set ( keyName, va( "(%s) %3d",
 						  countsSpawned.GetKeyVal ( e )->GetValue().c_str(),
 						  countsFixed.GetInt ( keyName, "0" ) + atoi(countsSpawned.GetKeyVal ( e )->GetValue()) ) );
@@ -1154,7 +1154,7 @@ void anSAAI::Think( void ) {
 
 	if ( thinkFlags & TH_THINK ) {
 		// clear out the enemy when he dies or is hidden
-		anEntity* enemyEnt = enemy.ent;
+		anEntity *enemyEnt = enemy.ent;
 		anActor*  enemyAct = dynamic_cast<anActor*>( enemyEnt );
 
 		// Clear our enemy if necessary
@@ -1250,7 +1250,7 @@ void anSAAI::Think( void ) {
 anSAAI::UpdateFocus
 ============
 */
-void anSAAI::UpdateFocus ( const anMat3& orientationAxis ) {
+void anSAAI::UpdateFocus ( const anMat3 &orientationAxis ) {
 	// Alwasy look at enemy
 	if ( !allowJointMod || !allowEyeFocus ) {
 		SetFocus ( AIFOCUS_NONE, 0 );
@@ -1320,7 +1320,7 @@ void anSAAI::UpdateFocus ( const anMat3& orientationAxis ) {
 
 	// Calculate the focus position
 	if ( focusType == AIFOCUS_NONE ) {
-		currentFocusPos = GetEyePosition() + orientationAxis[ 0 ] * 64.0f;
+		currentFocusPos = GetEyePosition() + orientationAxis[0] * 64.0f;
 	} else if ( focusType == AIFOCUS_COVER ) {
 		currentFocusPos = GetEyePosition() + aasSensor->Reserved()->Normal() * 64.0f;
 	} else if ( focusType == AIFOCUS_COVERLOOK ) {
@@ -1332,7 +1332,7 @@ void anSAAI::UpdateFocus ( const anMat3& orientationAxis ) {
 	} else if ( focusType == AIFOCUS_TETHER ) {
 		currentFocusPos = GetEyePosition() + tether->GetPhysics()->GetAxis()[0] * 64.0f;
 	} else {
-		anEntity* focusEnt = nullptr;
+		anEntity *focusEnt = nullptr;
 		switch ( focusType ) {
 			case AIFOCUS_LEADER:		focusEnt = leader;						break;
 			case AIFOCUS_PLAYER:		focusEnt = gameLocal.GetLocalPlayer();	break;
@@ -1346,7 +1346,7 @@ void anSAAI::UpdateFocus ( const anMat3& orientationAxis ) {
 				currentFocusPos = focusEnt->GetPhysics()->GetOrigin();
 			}
 		} else {
-			currentFocusPos = GetEyePosition() + orientationAxis[ 0 ] * 64.0f;
+			currentFocusPos = GetEyePosition() + orientationAxis[0] * 64.0f;
 		}
 	}
 
@@ -1838,7 +1838,7 @@ void anSAAI::TalkTo( anActor *actor ) {
 
 			// Loop until we find a valid talk message
 			while ( 1 ) {
-				anString postfix;
+				anStr postfix;
 				if ( talkMessage >= TALKMSG_LOOP ) {
 					postfix = aiTalkMessageString[TALKMSG_LOOP];
 					postfix += va( "%d", (int)(talkMessage - TALKMSG_LOOP+1) );
@@ -1973,7 +1973,7 @@ void anSAAI::UpdateEnemyPosition ( bool forceUpdate ) {
 	}
 
 	anActor*  enemyActor = dynamic_cast<anActor*>(enemy.ent.GetEntity());
-	anEntity* enemyEnt   = static_cast<anEntity*>(enemy.ent.GetEntity());
+	anEntity *enemyEnt   = static_cast<anEntity*>(enemy.ent.GetEntity());
 
 	enemy.lastVisibleFromEyePosition = GetEyePosition();
 
@@ -2103,7 +2103,7 @@ void anSAAI::UpdateEnemy ( void ) {
 anSAAI::LastKnownPosition
 =====================
 */
-const anVec3& anSAAI::LastKnownPosition ( const anEntity *ent ) {
+const anVec3 &anSAAI::LastKnownPosition ( const anEntity *ent ) {
 	return	(ent==enemy.ent)?(enemy.lastKnownPosition):(ent->GetPhysics()->GetOrigin());
 }
 
@@ -2242,8 +2242,8 @@ void anSAAI::CalculateAttackOffsets ( void ) {
 	// launch offsets so that anim number can be used without subtracting 1.
 	attackAnimInfo.SetGranularity( 1 );
 	attackAnimInfo.SetNum( num + 1 );
-	attackAnimInfo[ 0 ].attackOffset.Zero();
-	attackAnimInfo[ 0 ].eyeOffset.Zero();
+	attackAnimInfo[0].attackOffset.Zero();
+	attackAnimInfo[0].eyeOffset.Zero();
 
 	for ( i = 1; i <= num; i++ ) {
 		attackAnimInfo[i].attackOffset.Zero();
@@ -2288,7 +2288,7 @@ void anSAAI::CreateProjectileClipModel( void ) const {
 anSAAI::GetPredictedAimDirOffset
 =====================
 */
-void anSAAI::GetPredictedAimDirOffset ( const anVec3& source, const anVec3& target, float projectileSpeed, const anVec3& targetVelocity, anVec3& offset ) const {
+void anSAAI::GetPredictedAimDirOffset ( const anVec3 &source, const anVec3 &target, float projectileSpeed, const anVec3 &targetVelocity, anVec3 &offset ) const {
 	float  a;
 	float  b;
 	float  c;
@@ -2359,7 +2359,7 @@ bool anSAAI::GetAimDir(
 
 	// if no aimAtEnt or projectile set
 	if ( !targetEnt ) {
-		aimDir = viewAxis[ 0 ] * physicsObj.GetGravityAxis();
+		aimDir = viewAxis[0] * physicsObj.GetGravityAxis();
 		return false;
 	}
 
@@ -2465,7 +2465,7 @@ void anSAAI::RemoveProjectile( void ) {
 anSAAI::Attack
 =====================
 */
-bool anSAAI::Attack ( const char* attackName, jointHandle_t joint, anEntity* target, const anVec3& pushVelocity ) {
+bool anSAAI::Attack ( const char *attackName, jointHandle_t joint, anEntity *target, const anVec3 &pushVelocity ) {
 	// Get the attack dictionary
 	const anDict* attackDict;
 	attackDict = gameLocal.FindEntityDefDict ( spawnArgs.GetString ( va( "def_attack_%s", attackName ) ), false );
@@ -2622,7 +2622,7 @@ idProjectile* anSAAI::AttackRanged (
 		// spread the projectiles out
 		angle = anMath::Sin( attack_spread * gameLocal.random.RandomFloat() );
 		spin = ( float )DEG2RAD( 360.0f ) * gameLocal.random.RandomFloat();
-		dir = axis[ 0 ] + axis[ 2 ] * ( angle * anMath::Sin( spin ) ) - axis[ 1 ] * ( angle * anMath::Cos( spin ) );
+		dir = axis[0] + axis[2] * ( angle * anMath::Sin( spin ) ) - axis[1] * ( angle * anMath::Cos( spin ) );
 		dir.Normalize();
 
 		if ( attack_hitscan ) {
@@ -2930,8 +2930,8 @@ anSAAI::GetMuzzle
 */
 void anSAAI::GetMuzzle( jointHandle_t joint, anVec3 &muzzle, anMat3 &axis ) {
 	if ( joint == INVALID_JOINT ) {
-		muzzle = physicsObj.GetOrigin() + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 14;
-		muzzle -= physicsObj.GetGravityNormal() * physicsObj.GetBounds()[ 1 ].z * 0.5f;
+		muzzle = physicsObj.GetOrigin() + viewAxis[0] * physicsObj.GetGravityAxis() * 14;
+		muzzle -= physicsObj.GetGravityNormal() * physicsObj.GetBounds()[1].z * 0.5f;
 	} else {
 		GetJointWorldTransform( joint, gameLocal.time, muzzle, axis );
 		//MCG
@@ -3029,7 +3029,7 @@ anSAAI::UpdateChatter
 */
 void anSAAI::UpdateChatter ( void ) {
 	int			chatterRate;
-	const char* chatter;
+	const char *chatter;
 
 	// No chatter?
 	if ( !chatterRateIdle && !chatterRateCombat ) {
@@ -3107,7 +3107,7 @@ anSAAI::SetLeader
 ============
 */
 void anSAAI::SetLeader ( anEntity *newLeader ) {
-	anEntity* oldLeader = leader;
+	anEntity *oldLeader = leader;
 
 	if ( !newLeader ){
 		leader = nullptr;
@@ -3162,7 +3162,7 @@ bool anSAAI::UpdateAnimationControllers( void ) {
 		orientationJointYaw = move.current_yaw;
 	} else {
 		GetJointWorldTransform( orientationJoint, gameLocal.time, orientationJointPos, orientationJointAxis );
-		orientationJointYaw = orientationJointAxis[ 2 ].ToYaw();
+		orientationJointYaw = orientationJointAxis[2].ToYaw();
 		orientationJointAxis = anAngles( 0.0f, orientationJointYaw, 0.0f ).ToMat3();
 	}
 
@@ -3179,13 +3179,13 @@ bool anSAAI::UpdateAnimationControllers( void ) {
 	UpdateFocus( orientationJointAxis );
 
 	//MCG NOTE: don't know why Dube added this extra check for the torsoAnim (5/09/05), but it was causing popping, so I took it out... :/
-	//bool canLook = ( !torsoAnim.AnimDone(0) || !torsoAnim.GetAnimator()->CurrentAnim(ANIMCHANNEL_TORSO)->IsDone(gameLocal.GetTime()) || torsoAnim.Disabled() ) && !torsoAnim.GetAnimFlags().ai_no_look && !aifl.disableLook;
+	//bool canLook = ( !torsoAnim.AnimDone( 0 ) || !torsoAnim.GetAnimator()->CurrentAnim(ANIMCHANNEL_TORSO)->IsDone(gameLocal.GetTime()) || torsoAnim.Disabled() ) && !torsoAnim.GetAnimFlags().ai_no_look && !aifl.disableLook;
 	//bool canLook = ( !torsoAnim.GetAnimFlags().ai_no_look && !aifl.disableLook);
 
 	bool canLook = ( !animator.GetAnimFlags(animator.CurrentAnim(ANIMCHANNEL_TORSO)->AnimNum()).ai_no_look && !aifl.disableLook);
 	if ( !canLook ) {
 		//actually, do the looking, but bring it back forward...
-		currentFocusPos = GetEyePosition() + orientationJointAxis[ 0 ] * 64.0f;
+		currentFocusPos = GetEyePosition() + orientationJointAxis[0] * 64.0f;
 	}
 
 	// Determine the new look yaw
@@ -3338,7 +3338,7 @@ bool anSAAI::UpdateAnimationControllers( void ) {
 	// Orient the eyes towards their target
 	if ( leftEyeJoint != INVALID_JOINT && rightEyeJoint != INVALID_JOINT ) {
 		if ( head ) {
-			idAnimator *headAnimator = head->GetAnimator();
+			anAnimator *headAnimator = head->GetAnimator();
 
 			if ( focusType != AIFOCUS_NONE && allowEyeFocus && canLook ) {
 				//tweak these since it's looking at the wrong spot and not calculating from each eye and I don't have time to bother rewriting all of this properly
@@ -3419,7 +3419,7 @@ idProjectile* anSAAI::AttackProjectile ( const anDict* projectileDict, const anV
 
 	axis = ang.ToMat3();
 	if ( !projectile.GetEntity() ) {
-		CreateProjectile( projectileDict, org, axis[ 0 ] );
+		CreateProjectile( projectileDict, org, axis[0] );
 	}
 
 	// make sure the projectile starts inside the monster bounding box
@@ -3431,8 +3431,8 @@ idProjectile* anSAAI::AttackProjectile ( const anDict* projectileDict, const anV
 	if ( ( ( ownerBounds[1][0] - ownerBounds[0][0] ) > ( projBounds[1][0] - projBounds[0][0] ) ) &&
 		( ( ownerBounds[1][1] - ownerBounds[0][1] ) > ( projBounds[1][1] - projBounds[0][1] ) ) &&
 		( ( ownerBounds[1][2] - ownerBounds[0][2] ) > ( projBounds[1][2] - projBounds[0][2] ) ) ) {
-		if ( (ownerBounds - projBounds).RayIntersection( org, viewAxis[ 0 ], distance ) ) {
-			start = org + distance * viewAxis[ 0 ];
+		if ( (ownerBounds - projBounds).RayIntersection( org, viewAxis[0], distance ) ) {
+			start = org + distance * viewAxis[0];
 		} else {
 			start = ownerBounds.GetCenter();
 		}
@@ -3447,7 +3447,7 @@ idProjectile* anSAAI::AttackProjectile ( const anDict* projectileDict, const anV
 
 
 	// launch the projectile
- 	projectile.GetEntity()->Launch( tr.endpos, axis[ 0 ], vec3_origin );
+ 	projectile.GetEntity()->Launch( tr.endpos, axis[0], vec3_origin );
  	result = projectile;
 	projectile = nullptr;
 
@@ -3461,7 +3461,7 @@ void anSAAI::RadiusDamageFromJoint( const char *jointname, const char *damageDef
 	anVec3 org;
 	anMat3 axis;
 
-	if ( !jointname || !jointname[ 0 ] ) {
+	if ( !jointname || !jointname[0] ) {
 		org = physicsObj.GetOrigin();
 	} else {
 		joint = animator.GetJointHandle( jointname );
@@ -3568,7 +3568,7 @@ const char *anSAAI::ChooseAnim( int channel, const char *animname ) {
 anSAAI::ExecScriptFunction
 ============
 */
-void anSAAI::ExecScriptFunction ( rvScriptFuncUtility& func, anEntity* parm ) {
+void anSAAI::ExecScriptFunction ( rvScriptFuncUtility& func, anEntity *parm ) {
 	if ( parm ) {
 		func.InsertEntity( parm, 0 );
 	} else {
@@ -3594,11 +3594,11 @@ void anSAAI::Prethink ( void ) {
 	}
 
 	if ( leader ) {
-		anEntity* groundEnt	= leader->GetGroundEntity();
+		anEntity *groundEnt	= leader->GetGroundEntity();
 		if ( !(tether && !aifl.tetherMover) && groundEnt ) {
 			if ( groundEnt->IsType ( anMover::GetClassType() ) ) {
-				anEntity* ent;
-				anEntity* next;
+				anEntity *ent;
+				anEntity *next;
 				for ( ent = groundEnt->GetNextTeamEntity(); ent != nullptr; ent = next ) {
 					next = ent->GetNextTeamEntity();
 					if ( ent->GetBindMaster() == groundEnt && ent->IsType ( anSAAITether::GetClassType() ) ) {
@@ -3722,7 +3722,7 @@ void anSAAI::OnUpdatePlayback ( const rvDeclPlaybackData& pbd ) {
 anSAAI::OnLeaderChange
 ============
 */
-void anSAAI::OnLeaderChange ( anEntity* oldLeader ) {
+void anSAAI::OnLeaderChange ( anEntity *oldLeader ) {
 	ForceTacticalUpdate();
 }
 
@@ -3731,7 +3731,7 @@ void anSAAI::OnLeaderChange ( anEntity* oldLeader ) {
 anSAAI::OnEnemyChange
 ============
 */
-void anSAAI::OnEnemyChange ( anEntity* oldEnemy ) {
+void anSAAI::OnEnemyChange ( anEntity *oldEnemy ) {
 	// Make sure we update our tactical state immediately
 	ForceTacticalUpdate();
 
@@ -3826,17 +3826,17 @@ void anSAAI::OnEnemyVisiblityChange ( bool oldVisible ) {
 anSAAI::OnSetKey
 ============
 */
-void anSAAI::OnSetKey	( const char* key, const char* value ) {
-	if ( !anString::Icmp ( key, "noCombatChatter" ) ) {
+void anSAAI::OnSetKey	( const char *key, const char *value ) {
+	if ( !anStr::Icmp ( key, "noCombatChatter" ) ) {
 		combat.fl.noChatter = spawnArgs.GetBool ( key );
-	} else if ( !anString::Icmp ( key, "allowPlayerPush" ) ) {
+	} else if ( !anStr::Icmp ( key, "allowPlayerPush" ) ) {
 		combat.tacticalMaskAvailable &= ~(AITACTICAL_MOVE_PLAYERPUSH_BIT);
 		if ( spawnArgs.GetBool ( key ) ) {
 			combat.tacticalMaskAvailable |= AITACTICAL_MOVE_PLAYERPUSH_BIT;
 		}
-	} else if ( !anString::Icmp ( key, "noLook" ) ) {
+	} else if ( !anStr::Icmp ( key, "noLook" ) ) {
 		aifl.disableLook = spawnArgs.GetBool ( key );
-	} else if ( !anString::Icmp ( key, "killer_guard" ) ) {
+	} else if ( !anStr::Icmp ( key, "killer_guard" ) ) {
 		aifl.killerGuard = spawnArgs.GetBool ( key );
 	}
 }
@@ -4118,8 +4118,8 @@ float anSAAI::GetTurnDelta( void ){
 anSAAI::GetIdleAnimName
 ============
 */
-const char* anSAAI::GetIdleAnimName ( void ) {
-	const char* animName = nullptr;
+const char *anSAAI::GetIdleAnimName ( void ) {
+	const char *animName = nullptr;
 
 	// Start idle animation
 	if ( enemy.ent ) {
@@ -4358,7 +4358,7 @@ anSAAI::CheckForReplaceEnemy
 TODO: Call CalculateThreat ( ent ) and compare to current entity
 ============
 */
-bool anSAAI::CheckForReplaceEnemy ( anEntity* replacement ) {
+bool anSAAI::CheckForReplaceEnemy ( anEntity *replacement ) {
 	bool replace;
 
 	// If our replacement is a driver a vehicle and they are hidden we will
@@ -4443,7 +4443,7 @@ void anSAAI::UpdateThreat ( void ) {
 anSAAI::CalculateEnemyThreat
 ============
 */
-float anSAAI::CalculateEnemyThreat ( anEntity* enemyEnt ) {
+float anSAAI::CalculateEnemyThreat ( anEntity *enemyEnt ) {
 	// Calculate the adjusted threat for this actor
 	float threat = 1.0f;
 	if ( enemyEnt->IsType ( anSAAI::GetClassType() ) ) {
@@ -4491,7 +4491,7 @@ anSAAI::Speak
 ============
 */
 bool anSAAI::Speak( const char *lipsync, bool random ){
-	assert( anString::Icmpn( lipsync, "lipsync_", 7 ) == 0 );
+	assert( anStr::Icmpn( lipsync, "lipsync_", 7 ) == 0 );
 
 	if ( random ) {
 		// If there is no lipsync then skip it
@@ -4659,7 +4659,7 @@ void anSAAI::ScriptedStop ( void ) {
 anSAAI::ScriptedMove
 ================
 */
-void anSAAI::ScriptedMove ( anEntity* destEnt, float minDist, bool endWithIdle ) {
+void anSAAI::ScriptedMove ( anEntity *destEnt, float minDist, bool endWithIdle ) {
 	if ( !ScriptedBegin ( endWithIdle ) ) {
 		return;
 	}
@@ -4687,7 +4687,7 @@ void anSAAI::ScriptedMove ( anEntity* destEnt, float minDist, bool endWithIdle )
 anSAAI::ScriptedFace
 ================
 */
-void anSAAI::ScriptedFace ( anEntity* faceEnt, bool endWithIdle ) {
+void anSAAI::ScriptedFace ( anEntity *faceEnt, bool endWithIdle ) {
 	if ( !ScriptedBegin ( endWithIdle ) ) {
 		return;
 	}
@@ -4712,7 +4712,7 @@ another operation which will stop a scripted sequence is called. When done can o
 back to their normal processing if endWithIdle is set to true.
 ================
 */
-void anSAAI::ScriptedAnim ( const char* animname, int blendFrames, bool loop, bool endWithIdle ) {
+void anSAAI::ScriptedAnim ( const char *animname, int blendFrames, bool loop, bool endWithIdle ) {
 	// Start the scripted sequence
 	if ( !ScriptedBegin ( endWithIdle, true ) ) {
 		return;
@@ -4743,7 +4743,7 @@ void anSAAI::ScriptedAnim ( const char* animname, int blendFrames, bool loop, bo
 anSAAI::ScriptedPlaybackAim
 ============
 */
-void anSAAI::ScriptedPlaybackAim ( const char* playback, int flags, int numFrames ) {
+void anSAAI::ScriptedPlaybackAim ( const char *playback, int flags, int numFrames ) {
 	// Start the scripted sequence
 	if ( !ScriptedBegin ( false ) ) {
 		return;
@@ -4761,8 +4761,8 @@ void anSAAI::ScriptedPlaybackAim ( const char* playback, int flags, int numFrame
 anSAAI::ScriptedAction
 ============
 */
-void anSAAI::ScriptedAction ( anEntity* actionEnt, bool endWithIdle ) {
-	const char* actionName;
+void anSAAI::ScriptedAction ( anEntity *actionEnt, bool endWithIdle ) {
+	const char *actionName;
 
 	if ( !actionEnt ) {
 		return;
@@ -4804,36 +4804,36 @@ void anSAAI::FootStep ( void ) {
 anSAAI::SetScript
 ============
 */
-void anSAAI::SetScript( const char* scriptName, const char* funcName ) {
+void anSAAI::SetScript( const char *scriptName, const char *funcName ) {
 	if ( !funcName || !funcName[0] ) {
 		return;
 	}
 
 	// Set the associated script
-	if ( !anString::Icmp ( scriptName, "first_sight" ) ) {
+	if ( !anStr::Icmp ( scriptName, "first_sight" ) ) {
 		funcs.first_sight.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "sight" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "sight" ) ) {
 		funcs.sight.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "pain" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "pain" ) ) {
 		funcs.pain.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "damage" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "damage" ) ) {
 		funcs.damage.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "death" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "death" ) ) {
 		funcs.death.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "attack" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "attack" ) ) {
 		funcs.attack.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "init" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "init" ) ) {
 		funcs.init.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "onclick" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "onclick" ) ) {
 		funcs.onclick.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "launch_projectile" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "launch_projectile" ) ) {
 		funcs.launch_projectile.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "footstep" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "footstep" ) ) {
 		funcs.footstep.Init( funcName );
-	} else if ( !anString::Icmp ( scriptName, "postHeal" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "postHeal" ) ) {
 		// hax: this is a medic only script and I don't want to store it on every AI type..
 		//	I also don't want it generating the warning below in this case.
-	} else if ( !anString::Icmp ( scriptName, "postWeaponDestroyed" ) ) {
+	} else if ( !anStr::Icmp ( scriptName, "postWeaponDestroyed" ) ) {
 		// hax: this is a Gladiator/Light Tank only script and I don't want to store it on every AI type..
 		//	I also don't want it generating the warning below in this case.
 	} else {
@@ -4854,7 +4854,7 @@ void anSAAI::SetScript( const char* scriptName, const char* funcName ) {
 anSAAI::ReactToShotAt
 ============
 */
-void anSAAI::ReactToShotAt ( anEntity* attacker, const anVec3 &origOrigin, const anVec3 &origDir ) {
+void anSAAI::ReactToShotAt ( anEntity *attacker, const anVec3 &origOrigin, const anVec3 &origDir ) {
 	if ( g_perfTest_aiNoDodge.GetBool() ) {
 		return;
 	}
@@ -4882,7 +4882,7 @@ void anSAAI::ReactToShotAt ( anEntity* attacker, const anVec3 &origOrigin, const
 anSAAI::ReactToPain
 ============
 */
-void anSAAI::ReactToPain ( anEntity* attacker, int damage ) {
+void anSAAI::ReactToPain ( anEntity *attacker, int damage ) {
 	CheckForReplaceEnemy ( attacker );
 }
 
@@ -5044,7 +5044,7 @@ void anSAAI::SetTalkState ( talkState_t state ) {
 anSAAI::SetPassivePrefix
 ============
 */
-void anSAAI::SetPassivePrefix ( const char* prefix ) {
+void anSAAI::SetPassivePrefix ( const char *prefix ) {
 	passive.prefix = prefix;
 	if ( passive.prefix.Length() ) {
 		passive.prefix += "_";
@@ -5066,7 +5066,7 @@ void anSAAI::SetPassivePrefix ( const char* prefix ) {
 anSAAI::GetPassiveAnimPrefix
 ============
 */
-bool anSAAI::GetPassiveAnimPrefix ( const char* animName, anString& animPrefix ) {
+bool anSAAI::GetPassiveAnimPrefix ( const char *animName, anStr& animPrefix ) {
 	const anKeyValue* key;
 
 	// First see if we have custom idle animations for the passive prefix
@@ -5130,7 +5130,7 @@ bool anSAAI::CheckDeathCausesMissionFailure( void )
 	if ( targets.Num() )
 	{
 		//go through my targets and see if any are of class rvObjectiveFailed
-		anEntity* targEnt;
+		anEntity *targEnt;
 		for ( int i = 0; i < targets.Num(); i++ ) {
 			targEnt = targets[i].GetEntity();
 			if ( !targEnt )

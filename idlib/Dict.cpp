@@ -51,7 +51,7 @@ void anDict::Copy( const anDict &other ) {
 	n = other.args.Num();
 
 	if ( args.Num() ) {
-		found = ( int*) _alloca16( other.args.Num() * sizeof( int ) );
+		found = (int *) _alloca16( other.args.Num() * sizeof( int ) );
         for ( i = 0; i < n; i++ ) {
 			found[i] = FindKeyIndex( other.args[i].GetKey() );
 		}
@@ -62,7 +62,7 @@ void anDict::Copy( const anDict &other ) {
 	for ( i = 0; i < n; i++ ) {
 		if ( found && found[i] != -1 ) {
 			// first set the new value and then free the old value to allow proper self copying
-			const ARCPoolString *oldValue = args[found[i]].value;
+			const anPoolString *oldValue = args[found[i]].value;
 			args[found[i]].value = globalValues.CopyString( other.args[i].value );
 			globalValues.FreeString( oldValue );
 		} else {
@@ -197,7 +197,7 @@ void anDict::Print() const {
 }
 
 int KeyCompare( const anKeyValue *a, const anKeyValue *b ) {
-	return anString::Cmp( a->GetKey(), b->GetKey() );
+	return anStr::Cmp( a->GetKey(), b->GetKey() );
 }
 
 /*
@@ -254,7 +254,7 @@ void anDict::Set( const char *key, const char *value ) {
 	i = FindKeyIndex( key );
 	if ( i != -1 ) {
 		// first set the new value and then free the old value to allow proper self copying
-		const ARCPoolString *oldValue = args[i].value;
+		const anPoolString *oldValue = args[i].value;
 		args[i].value = globalValues.AllocString( value );
 		globalValues.FreeString( oldValue );
 	} else {
@@ -520,7 +520,7 @@ const anKeyValue *anDict::MatchPrefix( const char *prefix, const anKeyValue *las
 anDict::RandomPrefix
 ================
 */
-const char *anDict::RandomPrefix( const char *prefix, arcRandom &random ) const {
+const char *anDict::RandomPrefix( const char *prefix, anRandom &random ) const {
 	int count;
 	const int MAX_RANDOM_KEYS = 2048;
 	const char *list[MAX_RANDOM_KEYS];
@@ -552,7 +552,7 @@ void anDict::WriteToFileHandle( anFile *f ) const {
 ReadString
 ================
 */
-static anString ReadString( anFile *f ) {
+static anStr ReadString( anFile *f ) {
 	char	str[MAX_STRING_CHARS];
 	int		len;
 
@@ -566,7 +566,7 @@ static anString ReadString( anFile *f ) {
 		anLibrary::common->Error( "anDict::ReadFromFileHandle: bad string" );
 	}
 
-	return anString( str );
+	return anStr( str );
 }
 
 /*
@@ -576,7 +576,7 @@ anDict::ReadFromFileHandle
 */
 void anDict::ReadFromFileHandle( anFile *f ) {
 	int c;
-	anString key, val;
+	anStr key, val;
 
 	Clear();
 
@@ -626,7 +626,7 @@ anDictStringSortCmp
 */
 // NOTE: the const wonkyness is required to make msvc happy
 template<>
-ARC_INLINE int arcListSortCompare( const ARCPoolString * const *a, const ARCPoolString * const *b ) {
+inline int anListSortCompare( const anPoolString * const *a, const anPoolString * const *b ) {
 	return (*a)->Icmp( **b );
 }
 
@@ -637,7 +637,7 @@ anDict::ListKeys_f
 */
 void anDict::ListKeys_f( const anCommandArgs &args ) {
 	int i;
-	anList<const ARCPoolString *> keyStrings;
+	anList<const anPoolString *> keyStrings;
 
 	for ( i = 0; i < globalKeys.Num(); i++ ) {
 		keyStrings.Append( globalKeys[i] );
@@ -656,7 +656,7 @@ anDict::ListValues_f
 */
 void anDict::ListValues_f( const anCommandArgs &args ) {
 	int i;
-	anList<const ARCPoolString *> valueStrings;
+	anList<const anPoolString *> valueStrings;
 
 	for ( i = 0; i < globalValues.Num(); i++ ) {
 		valueStrings.Append( globalValues[i] );

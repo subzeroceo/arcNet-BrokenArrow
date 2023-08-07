@@ -72,10 +72,10 @@ public:
 	void					Save( anSaveGame *savefile ) const;
 	void					Restore( anRestoreGame *savefile );
 
-	void					Init( anEntity *owner, idAnimator *_animator, int animchannel );
+	void					Init( anEntity *owner, anAnimator *_animator, int animchannel );
 	void					Shutdown( void );
 	void					SetState		( const char *name, int blendFrames, int flags = 0 );
-	void					PostState		( const char* name, int blendFrames = 0, int delay = 0, int flags = 0 );
+	void					PostState		( const char *name, int blendFrames = 0, int delay = 0, int flags = 0 );
 	void					StopAnim( int frames );
 	void					PlayAnim( int anim );
 	void					CycleAnim( int anim );
@@ -90,20 +90,20 @@ public:
 
 	anStateThread&			GetStateThread	( void );
 
-	idAnimator *			GetAnimator( void ) const {return animator;};
+	anAnimator *			GetAnimator( void ) const {return animator;};
 private:
 
 // bdube: converted self to entity ptr so any entity can use it
 	anEntity *				self;
 
-	idAnimator *			animator;
+	anAnimator *			animator;
 	int						channel;
 	bool					disabled;
 
 	anStateThread			stateThread;
 };
 
-ARC_INLINE anStateThread& idAnimState::GetStateThread ( void ) {
+inline anStateThread& idAnimState::GetStateThread ( void ) {
 	return stateThread;
 }
 
@@ -140,7 +140,7 @@ public:
 	virtual int				GetDefaultSurfaceType( void ) const;
 	virtual void			ProjectOverlay( const anVec3 &origin, const anVec3 &dir, float size, const char *material );
 
-	virtual bool			LoadAF( const char* keyname = nullptr, bool purgeAF = false );
+	virtual bool			LoadAF( const char *keyname = nullptr, bool purgeAF = false );
 	void					SetupBody( void );
 
 	virtual void			CheckBlink( void );
@@ -154,8 +154,8 @@ public:
 
 	virtual void			OnStateThreadClear ( const char *statename, int flags = 0 );
 	void					SetState		( const char *statename, int flags = 0 );
-	void					PostState		( const char* statename, int delay = 0, int flags = 0 );
-	void					InterruptState	( const char* statename, int delay = 0, int flags = 0 );
+	void					PostState		( const char *statename, int delay = 0, int flags = 0 );
+	void					InterruptState	( const char *statename, int delay = 0, int flags = 0 );
 
 							// vision testing
 	void					SetEyeHeight( float height );
@@ -165,7 +165,7 @@ public:
 	virtual anVec3			GetEyePosition( void ) const;
 	virtual anVec3			GetChestPosition ( void ) const;
 	anEntity*				GetGroundEntity ( void ) const;
-	virtual anEntity*		GetGroundElevator( anEntity* testElevator=nullptr ) const;
+	virtual anEntity*		GetGroundElevator( anEntity *testElevator=nullptr ) const;
 
 	void					Present( void );
 
@@ -174,8 +174,8 @@ public:
 	bool					CheckFOV	( const anVec3 &pos, float ang = -1.0f ) const;
 	virtual bool			HasFOV		( anEntity *ent );
 	virtual	bool			CanSee		( const anEntity *ent, bool useFOV ) const;
-	virtual	bool			CanSeeFrom	( const anVec3& from, const anEntity *ent, bool useFOV ) const;
-	virtual	bool			CanSeeFrom	( const anVec3& from, const anVec3& toPos, bool useFOV ) const;
+	virtual	bool			CanSeeFrom	( const anVec3 &from, const anEntity *ent, bool useFOV ) const;
+	virtual	bool			CanSeeFrom	( const anVec3 &from, const anVec3 &toPos, bool useFOV ) const;
 
 							// damage
 	void					SetupDamageGroups( void );
@@ -190,7 +190,7 @@ public:
 	const char *			GetDamageGroup( int location );
 	void					ClearPain( void );
 	virtual bool			Pain( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
-	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor );
+	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor );
 
 							// model/combat model/ragdoll
 	void					SetCombatModel( void );
@@ -216,9 +216,9 @@ public:
 	virtual void			GetAASLocation( anSEAS *aas, anVec3 &pos, int &areaNum ) const;
 
 	void					Attach( anEntity *ent );
-	anEntity*				FindAttachment( const char* attachmentName );
-	void					HideAttachment( const char* attachmentName );
-	void					ShowAttachment( const char* attachmentName );
+	anEntity*				FindAttachment( const char *attachmentName );
+	void					HideAttachment( const char *attachmentName );
+	void					ShowAttachment( const char *attachmentName );
 	anEntity*				GetHead() { return head; }
 
 	virtual void			Teleport( const anVec3 &origin, const anAngles &angles, anEntity *destination );
@@ -253,7 +253,7 @@ public:
 
 	virtual bool			IsCrouching				( void ) const {return false;};
 
-	virtual bool			SkipImpulse( anEntity* ent, int id );
+	virtual bool			SkipImpulse( anEntity *ent, int id );
 
 	int						lightningNextTime;
 	int						lightningEffects;
@@ -288,11 +288,11 @@ protected:
 	jointHandle_t			neckJoint;
 	jointHandle_t			headJoint;
 
-	idIK_Walk				walkIK;
+	anIK_Walk				walkIK;
 
-	anString					animPrefix;
-	anString					painType;
-	anString					painAnim;
+	anStr					animPrefix;
+	anStr					painType;
+	anStr					painAnim;
 
 	// blinking
 	int						blink_anim;
@@ -321,7 +321,7 @@ protected:
 
 
 // bdube: vehicles
-	virtual bool			EnterVehicle ( anEntity* vehicle );
+	virtual bool			EnterVehicle ( anEntity *vehicle );
 	virtual bool			ExitVehicle	 ( bool force = false );
 
 
@@ -343,7 +343,7 @@ protected:
 	jointHandle_t			deathPushJoint;
 
 	void					FlashlightUpdate	( bool forceOn = false );
-	void					InitDeathPush		( const anVec3& dir, int location, const anDict* damageDict, float pushScale = 1.0f );
+	void					InitDeathPush		( const anVec3 &dir, int location, const anDict* damageDict, float pushScale = 1.0f );
 	void					DeathPush			( void );
 
 	// Add some dynamic externals for debugging
@@ -353,7 +353,7 @@ protected:
 protected:
 
 	virtual void			FootStep			( void );
-	virtual void			SetupHead( const char* headDefName = "", anVec3 headOffset = anVec3(0, 0, 0) );
+	virtual void			SetupHead( const char *headDefName = "", anVec3 headOffset = anVec3(0, 0, 0) );
 
 private:
 	void					SyncAnimChannels( int channel, int syncToChannel, int blendFrames );
@@ -390,7 +390,7 @@ private:
 
 	void					Event_Teleport		( anVec3 &newPos, anVec3 &newAngles );
 	void					Event_Flashlight	( bool enable );
-	void					Event_EnterVehicle	( anEntity* vehicle );
+	void					Event_EnterVehicle	( anEntity *vehicle );
 	void					Event_ExitVehicle	( bool force );
 	void					Event_PreExitVehicle( bool force );
 
@@ -413,11 +413,11 @@ protected:
 	idAnimState&			GetAnimState			( int channel );
 };
 
-ARC_INLINE bool anActor::IsInVehicle( void ) const {
+inline bool anActor::IsInVehicle( void ) const {
 	return vehicleController.IsDriving();
 }
 
-ARC_INLINE rvVehicleController& anActor::GetVehicleController( void ) {
+inline rvVehicleController& anActor::GetVehicleController( void ) {
 	return vehicleController;
 }
 

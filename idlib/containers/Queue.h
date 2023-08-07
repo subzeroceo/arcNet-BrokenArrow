@@ -9,12 +9,12 @@
 ===============================================================================
 */
 
-#define arcQueue( type, next ) arcQueueTemplate<type, ( int )&(((type*)nullptr )->next)>
+#define anQueue( type, next ) anQueueTemplate<type, ( int )&( ( (type *)nullptr )->next )>
 
 template< class type, int nextOffset >
-class arcQueueTemplate {
+class anQueueTemplate {
 public:
-							arcQueueTemplate( void );
+							anQueueTemplate( void );
 
 	void					Add( type *element );
 	type *					Get( void );
@@ -24,18 +24,18 @@ private:
 	type *					last;
 };
 
-#define QUEUE_NEXT_PTR( element )		(*((type**)(((byte*)element)+nextOffset) ) )
+#define QUEUE_NEXT_PTR( element )		( *( (type **)( ( (byte *)element ) + nextOffset ) ) )
 
 template< class type, int nextOffset >
-arcQueueTemplate<type,nextOffset>::arcQueueTemplate( void ) {
+anQueueTemplate<type,nextOffset>::anQueueTemplate( void ) {
 	first = last = nullptr;
 }
 
 template< class type, int nextOffset >
-void arcQueueTemplate<type,nextOffset>::Add( type *element ) {
-	QUEUE_NEXT_PTR(element) = nullptr;
+void anQueueTemplate<type,nextOffset>::Add( type *element ) {
+	QUEUE_NEXT_PTR( element ) = nullptr;
 	if ( last ) {
-		QUEUE_NEXT_PTR(last) = element;
+		QUEUE_NEXT_PTR( last ) = element;
 	} else {
 		first = element;
 	}
@@ -43,16 +43,16 @@ void arcQueueTemplate<type,nextOffset>::Add( type *element ) {
 }
 
 template< class type, int nextOffset >
-type *arcQueueTemplate<type,nextOffset>::Get( void ) {
+type *anQueueTemplate<type,nextOffset>::Get( void ) {
 	type *element;
 
 	element = first;
 	if ( element ) {
-		first = QUEUE_NEXT_PTR(first);
+		first = QUEUE_NEXT_PTR( first );
 		if ( last == element ) {
 			last = nullptr;
 		}
-		QUEUE_NEXT_PTR(element) = nullptr;
+		QUEUE_NEXT_PTR( element ) = nullptr;
 	}
 	return element;
 }

@@ -87,11 +87,11 @@ public:
 					// skip the braced section
 	int				SkipBracedSection( bool parseFirstBrace = true );
 					// parse a braced section into a string
-	const char *	ParseBracedSection( anString &out, int tabs = -1 );
+	const char *	ParseBracedSection( anStr &out, int tabs = -1 );
 					// parse a braced section into a string, maintaining indents and newlines
-	const char *	ParseBracedSectionExact( anString &out, int tabs = -1 );
+	const char *	ParseBracedSectionExact( anStr &out, int tabs = -1 );
 					// parse the rest of the line
-	const char *	ParseRestOfLine( anString &out );
+	const char *	ParseRestOfLine( anStr &out );
 					// unread the given token
 	void			UnreadToken( anToken *token );
 					// read a token only if on the current line
@@ -107,11 +107,11 @@ public:
 	int				Parse2DMatrix( int y, int x, float *m );
 	int				Parse3DMatrix( int z, int y, int x, float *m );
 					// get the white space before the last read token
-	int				GetLastWhiteSpace( anString &whiteSpace ) const;
+	int				GetLastWhiteSpace( anStr &whiteSpace ) const;
 					// Set a marker in the source file (there is only one marker)
 	void			SetMarker( void );
 					// Get the string from the marker to the current position
-	void			GetStringFromMarker( anString& out, bool clean = false );
+	void			GetStringFromMarker( anStr& out, bool clean = false );
 					// add a define to the source
 	int				AddDefine( const char *string );
 					// add builtin defines
@@ -137,9 +137,9 @@ public:
 					// returns the current line number
 	const int		GetLineNum( void ) const;
 					// print an error message
-	void			Error( const char *str, ... ) const an_attribute((format(printf,2,3) ) );
+	void			Error( const char *str, ... ) const an_attribute( ( format( printf, 2, 3 ) ) );
 					// print a warning message
-	void			Warning( const char *str, ... ) const an_attribute((format(printf,2,3) ) );
+	void			Warning( const char *str, ... ) const an_attribute( ( format( printf, 2, 3 ) ) );
 
 					// add a global define that will be added to all opened sources
 	static int		AddGlobalDefine( const char *string );
@@ -152,8 +152,8 @@ public:
 
 private:
 	int				loaded;						// set when a source file is loaded from file or memory
-	anString			filename;					// file name of the script
-	anString			includepath;				// path to include files
+	anStr			filename;					// file name of the script
+	anStr			includepath;				// path to include files
 	bool			OSPath;						// true if the file was loaded from an OS path
 	const punctuation_t *punctuations;			// punctuations to use
 	int				flags;						// flags used for script parsing
@@ -216,7 +216,7 @@ private:
 	int				ReadDollarDirective( void );
 };
 
-ARC_INLINE const char *anParser::GetFileName( void ) const {
+inline const char *anParser::GetFileName( void ) const {
 	if ( anParser::scriptStack ) {
 		return anParser::scriptStack->GetFileName();
 	} else {
@@ -224,7 +224,7 @@ ARC_INLINE const char *anParser::GetFileName( void ) const {
 	}
 }
 
-ARC_INLINE const int anParser::GetFileOffset( void ) const {
+inline const int anParser::GetFileOffset( void ) const {
 	if ( anParser::scriptStack ) {
 		return anParser::scriptStack->GetFileOffset();
 	} else {
@@ -232,7 +232,7 @@ ARC_INLINE const int anParser::GetFileOffset( void ) const {
 	}
 }
 
-ARC_INLINE const ARC_TIME_T anParser::GetFileTime( void ) const {
+inline const ARC_TIME_T anParser::GetFileTime( void ) const {
 	if ( anParser::scriptStack ) {
 		return anParser::scriptStack->GetFileTime();
 	} else {
@@ -240,7 +240,7 @@ ARC_INLINE const ARC_TIME_T anParser::GetFileTime( void ) const {
 	}
 }
 
-ARC_INLINE const int anParser::GetLineNum( void ) const {
+inline const int anParser::GetLineNum( void ) const {
 	if ( anParser::scriptStack ) {
 		return anParser::scriptStack->GetLineNum();
 	} else {

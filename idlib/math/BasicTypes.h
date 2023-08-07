@@ -208,12 +208,12 @@ private:
 	float				value;
 };
 
-ARC_INLINE float BoundedFloatGetMin( int min_m, int min_e ) {
+inline float BoundedFloatGetMin( int min_m, int min_e ) {
 	int MIN_MULTIPLIER = CONST_IEXP10( min_e >= 0 ? min_e : -min_e );
 	return ( min_e >= 0 ) ? (float) min_m * MIN_MULTIPLIER : (float) min_m / MIN_MULTIPLIER;
 }
 
-ARC_INLINE float BoundedFloatGetMax( int max_m, int max_e ) {
+inline float BoundedFloatGetMax( int max_m, int max_e ) {
 	int MAX_MULTIPLIER = CONST_IEXP10( max_e >= 0 ? max_e : -max_e );
 	return ( max_e >= 0 ) ? (float) max_m * MAX_MULTIPLIER : (float) max_m / MAX_MULTIPLIER;
 }

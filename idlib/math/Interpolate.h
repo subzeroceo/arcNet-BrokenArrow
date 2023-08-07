@@ -49,7 +49,7 @@ anInterpolation::anInterpolation
 ====================
 */
 template<class type>
-ARC_INLINE anInterpolation<type>::anInterpolation() {
+inline anInterpolation<type>::anInterpolation() {
 	currentTime = startTime = duration = 0;
 	memset( &currentValue, 0, sizeof( currentValue ) );
 	startValue = endValue = currentValue;
@@ -61,7 +61,7 @@ anInterpolation::Init
 ====================
 */
 template<class type>
-ARC_INLINE void anInterpolation<type>::Init( const float startTime, const float duration, const type &startValue, const type &endValue ) {
+inline void anInterpolation<type>::Init( const float startTime, const float duration, const type &startValue, const type &endValue ) {
 	this->startTime = startTime;
 	this->duration = duration;
 	this->startValue = startValue;
@@ -76,7 +76,7 @@ anInterpolation::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anInterpolation<type>::GetCurrentValue( float time ) const {
+inline type anInterpolation<type>::GetCurrentValue( float time ) const {
 	float deltaTime;
 
 	deltaTime = time - startTime;
@@ -93,15 +93,15 @@ ARC_INLINE type anInterpolation<type>::GetCurrentValue( float time ) const {
 	return currentValue;
 }
 template<class type>
-ARC_INLINE type anInterpolation<type>::GetDeltaValue( float startTime, float endTime ) const {
+inline type anInterpolation<type>::GetDeltaValue( float startTime, float endTime ) const {
 	return GetCurrentValue(endTime) - GetCurrentValue( startTime);
 }
 
-ARC_INLINE float Linear( float frac ) {
+inline float Linear( float frac ) {
 	return frac;
 }
 
-ARC_INLINE float SinusoidalMidPoint( float frac ) {
+inline float SinusoidalMidPoint( float frac ) {
 	return anMath::Sin( DEG2RAD(anMath::MidPointLerp(0.0f, 60.0f, 90.0f, frac) ) );
 }
 
@@ -128,7 +128,7 @@ protected:
 anSphericalInterpolation::anSphericalInterpolation
 ====================
 */
-ARC_INLINE anSphericalInterpolation::anSphericalInterpolation() :
+inline anSphericalInterpolation::anSphericalInterpolation() :
 	anInterpolation<anQuats>() {
 	SetTimeFunction( SinusoidalMidPoint );
 }
@@ -138,7 +138,7 @@ ARC_INLINE anSphericalInterpolation::anSphericalInterpolation() :
 anSphericalInterpolation::GetCurrentValue
 ====================
 */
-ARC_INLINE anQuats anSphericalInterpolation::GetCurrentValue( float time ) const {
+inline anQuats anSphericalInterpolation::GetCurrentValue( float time ) const {
 	float deltaTime = time - startTime;
 
 	if ( time != currentTime ) {
@@ -237,7 +237,7 @@ anLinearKinematicInterpolation::anLinearKinematicInterpolation
 ====================
 */
 template<class type>
-ARC_INLINE anLinearKinematicInterpolation<type>::anLinearKinematicInterpolation() {
+inline anLinearKinematicInterpolation<type>::anLinearKinematicInterpolation() {
 	startTime = accelTime = linearTime = decelTime = 0;
 	memset( &startValue, 0, sizeof( startValue ) );
 	endValue = startValue;
@@ -249,7 +249,7 @@ anLinearKinematicInterpolation::Init
 ====================
 */
 template<class type>
-ARC_INLINE void anLinearKinematicInterpolation<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue ) {
+inline void anLinearKinematicInterpolation<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue ) {
 	type speed;
 
 	this->startTime = startTime;
@@ -284,7 +284,7 @@ anLinearKinematicInterpolation::Invalidate
 ====================
 */
 template<class type>
-ARC_INLINE void anLinearKinematicInterpolation<type>::Invalidate( void ) {
+inline void anLinearKinematicInterpolation<type>::Invalidate( void ) {
 	extrapolate.Init( 0, 0, extrapolate.GetStartValue(), extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_NONE );
 }
 
@@ -294,7 +294,7 @@ anLinearKinematicInterpolation::SetPhase
 ====================
 */
 template<class type>
-ARC_INLINE void anLinearKinematicInterpolation<type>::SetPhase( float time ) const {
+inline void anLinearKinematicInterpolation<type>::SetPhase( float time ) const {
 	float deltaTime = time - startTime;
 	if ( deltaTime < accelTime ) {
 		if ( extrapolate.GetExtrapolationType() != EXTRAPOLATION_ACCELLINEAR ) {
@@ -317,7 +317,7 @@ anLinearKinematicInterpolation::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anLinearKinematicInterpolation<type>::GetCurrentValue( float time ) const {
+inline type anLinearKinematicInterpolation<type>::GetCurrentValue( float time ) const {
 	SetPhase( time );
 	return extrapolate.GetCurrentValue( time );
 }
@@ -328,7 +328,7 @@ anLinearKinematicInterpolation::GetCurrentSpeed
 ====================
 */
 template<class type>
-ARC_INLINE type anLinearKinematicInterpolation<type>::GetCurrentSpeed( float time ) const {
+inline type anLinearKinematicInterpolation<type>::GetCurrentSpeed( float time ) const {
 	SetPhase( time );
 	return extrapolate.GetCurrentSpeed( time );
 }
@@ -384,7 +384,7 @@ anInterpolateSineKinematics::anInterpolateSineKinematics
 ====================
 */
 template<class type>
-ARC_INLINE anInterpolateSineKinematics<type>::anInterpolateSineKinematics() {
+inline anInterpolateSineKinematics<type>::anInterpolateSineKinematics() {
 	startTime = accelTime = linearTime = decelTime = 0;
 	memset( &startValue, 0, sizeof( startValue ) );
 	endValue = startValue;
@@ -396,7 +396,7 @@ anInterpolateSineKinematics::Init
 ====================
 */
 template<class type>
-ARC_INLINE void anInterpolateSineKinematics<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue ) {
+inline void anInterpolateSineKinematics<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type &startValue, const type &endValue ) {
 	type speed;
 
 	this->startTime = startTime;
@@ -424,7 +424,7 @@ ARC_INLINE void anInterpolateSineKinematics<type>::Init( const float startTime, 
 		extrapolate.Init( startTime, this->decelTime, startValue, ( startValue - startValue ), speed, EXTRAPOLATION_DECELSINE );
 	}
 }
-ARC_INLINE void anInterpolateSineKinematics<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type& startValue, const type& endValue ) {
+inline void anInterpolateSineKinematics<type>::Init( const float startTime, const float accelTime, const float decelTime, const float duration, const type& startValue, const type& endValue ) {
     this->startTime = startTime;
     this->startValue = startValue;
     this->endValue = endValue;
@@ -466,7 +466,7 @@ anInterpolateSineKinematics::Invalidate
 ====================
 */
 template<class type>
-ARC_INLINE void anInterpolateSineKinematics<type>::Invalidate( void ) {
+inline void anInterpolateSineKinematics<type>::Invalidate( void ) {
 	extrapolate.Init( 0, 0, extrapolate.GetStartValue(), extrapolate.GetBaseSpeed(), extrapolate.GetSpeed(), EXTRAPOLATION_NONE );
 }
 
@@ -476,7 +476,7 @@ anInterpolateSineKinematics::SetPhase
 ====================
 */
 template<class type>
-ARC_INLINE void anInterpolateSineKinematics<type>::SetPhase( float time ) const {
+inline void anInterpolateSineKinematics<type>::SetPhase( float time ) const {
 	float deltaTime = time - startTime;
 	if ( deltaTime < accelTime ) {
 		if ( extrapolate.GetExtrapolationType() != EXTRAPOLATION_ACCELSINE ) {
@@ -499,7 +499,7 @@ anInterpolateSineKinematics::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anInterpolateSineKinematics<type>::GetCurrentValue( float time ) const {
+inline type anInterpolateSineKinematics<type>::GetCurrentValue( float time ) const {
 	SetPhase( time );
 	return extrapolate.GetCurrentValue( time );
 }
@@ -510,7 +510,7 @@ anInterpolateSineKinematics::GetCurrentSpeed
 ====================
 */
 template<class type>
-ARC_INLINE type anInterpolateSineKinematics<type>::GetCurrentSpeed( float time ) const {
+inline type anInterpolateSineKinematics<type>::GetCurrentSpeed( float time ) const {
 	SetPhase( time );
 	return extrapolate.GetCurrentSpeed( time );
 }
@@ -580,7 +580,7 @@ anLanczosInterpolator::anLanczosInterpolator
 ====================
 */
 template<class type>
-ARC_INLINE anLanczosInterpolator<type>::anLanczosInterpolator() {
+inline anLanczosInterpolator<type>::anLanczosInterpolator() {
 	currentTime = startTime = duration = 0;
 	memset( &currentValue, 0, sizeof( currentValue ) );
 	startValue = endValue = currentValue;
@@ -593,7 +593,7 @@ anLanczosInterpolator::Init
 ====================
 */
 template<class type>
-ARC_INLINE void anLanczosInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue, const int kernelSize ) {
+inline void anLanczosInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue, const int kernelSize ) {
 	this->kernelSize = kernelSize;
 	this->startTime = startTime;
 	this->duration = duration;
@@ -604,7 +604,7 @@ ARC_INLINE void anLanczosInterpolator<type>::Init( const int startTime, const in
 }
 
 template<class type>
-ARC_INLINE anLanczosInterpolator::GetCurrentValue( int time ) const {
+inline anLanczosInterpolator::GetCurrentValue( int time ) const {
 	int lanczosTime = time - startTime;
 	if ( time != currentTime ) {
 		currentTime = time;
@@ -628,7 +628,7 @@ ARC_INLINE anLanczosInterpolator::GetCurrentValue( int time ) const {
 }
 
 template<class type>
-ARC_INLINE const float anLanczosInterpolator::LanczosKernel( const float x ) const {
+inline const float anLanczosInterpolator::LanczosKernel( const float x ) const {
     if ( x == 0.0f ) {
         return 1.0f;
     } else if ( anMath::Abs( x ) < kernelSize ) {
@@ -642,7 +642,7 @@ ARC_INLINE const float anLanczosInterpolator::LanczosKernel( const float x ) con
 
 // Lanczos kernel function
 template<class type>
-ARC_INLINE  const float anLanczosInterpolator::KernelScale( float x ) const {
+inline  const float anLanczosInterpolator::KernelScale( float x ) const {
     const float radius = 2.0f;
     if ( x > -radius && x < radius ) {
         return sinc( x ) * sinc( x / radius );
@@ -703,7 +703,7 @@ anHermiteInterpolator::anHermiteInterpolator
 ====================
 */
 template<class type>
-ARC_INLINE anHermiteInterpolator<type>::anHermiteInterpolator() {
+inline anHermiteInterpolator<type>::anHermiteInterpolator() {
 	currentTime = startTime = duration = 0;
 	memset( &currentValue, 0, sizeof( currentValue ) );
 	startValue = endValue = currentValue;
@@ -716,7 +716,7 @@ anHermiteInterpolator::Init
 ====================
 */
 template<class type>
-ARC_INLINE void anHermiteInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue, const float S1, const float S2 ) {
+inline void anHermiteInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue, const float S1, const float S2 ) {
 	this->S1 = S1;
 	this->S2 = S2;
 	this->startTime = startTime;
@@ -733,7 +733,7 @@ anHermiteInterpolator::Init
 ====================
 */
 template<class type>
-ARC_INLINE void anHermiteInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue ) {
+inline void anHermiteInterpolator<type>::Init( const int startTime, const int duration, const type startValue, const type endValue ) {
 	this->startTime = startTime;
 	this->duration = duration;
 	this->startValue = startValue;
@@ -748,7 +748,7 @@ anHermiteInterpolator::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anHermiteInterpolator<type>::GetCurrentValue( int time ) const {
+inline type anHermiteInterpolator<type>::GetCurrentValue( int time ) const {
 	int deltaTime = time - startTime;
 	if ( time != currentTime ) {
 		currentTime = time;
@@ -765,7 +765,7 @@ ARC_INLINE type anHermiteInterpolator<type>::GetCurrentValue( int time ) const {
 
 // Returns an alpha value [0..1] based on Hermite Parameters N1, N2, S1, S2 and an input alpha 't'
 template<class type>
-ARC_INLINE float anHermiteInterpolator<type>::HermiteAlpha(const float t) const {
+inline float anHermiteInterpolator<type>::HermiteAlpha(const float t) const {
 	float N1 = 0.0f;
 	float N2 = 1.0f;
 	float tSquared = t * t;
@@ -809,35 +809,35 @@ protected:
 	anVec3			OutgoingTangent( int i );
 };
 
-ARC_INLINE void anCatMullROMSpline::Clear() {
+inline void anCatMullROMSpline::Clear() {
 	tension = continuity = bias = 0.0f;
 	nodes.Clear();
 }
 
-ARC_INLINE void anCatMullROMSpline::AddPoint( const anVec3 &point ) {
+inline void anCatMullROMSpline::AddPoint( const anVec3 &point ) {
 	nodes.Append( point );
 	numNodes++;
 }
 
-ARC_INLINE anVec3 anCatMullROMSpline::GetNode( int i ) {
+inline anVec3 anCatMullROMSpline::GetNode( int i ) {
 	// Clamping has the effect of having duplicate nodes beyond the array boundaries
 	int index = anMath::ClampInt( 0, nodes.Num()-1, i );
 	return nodes[index];
 }
 
-ARC_INLINE anVec3 anCatMullROMSpline::IncomingTangent( int i ) {
+inline anVec3 anCatMullROMSpline::IncomingTangent( int i ) {
 	anVec3 p0 = GetNode( i - 1 );
 	anVec3 p1 = GetNode( i );
 	return ( p1 - p0 ).Normalize();
 }
 
-ARC_INLINE anVec3 anCatMullROMSpline::OutgoingTangent( int i ) {
+inline anVec3 anCatMullROMSpline::OutgoingTangent( int i ) {
 	anVec3 p1 = GetNode( i );
 	anVec3 p2 = GetNode( i + 1 );
 	return ( p2 - p1 ).Normalize();
 }
 
-ARC_INLINE anVec3 anCatMullROMSpline::GetValue( float t ) {
+inline anVec3 anCatMullROMSpline::GetValue( float t ) {
 	int p0 = Floor( t );
 	int p1 = p0 + 1;
 	float t = t - ( float )p0;
@@ -887,38 +887,38 @@ protected:
 	anVec3			OutgoingTangent( int i );
 };
 
-ARC_INLINE void anTCBSpline::Clear() {
+inline void anTCBSpline::Clear() {
 	tension = continuity = bias = 0.0f;
 	nodes.Clear();
 }
 
-ARC_INLINE void anTCBSpline::AddPoint( const anVec3 &point ) {
+inline void anTCBSpline::AddPoint( const anVec3 &point ) {
 	nodes.Append( point );
 }
 
-ARC_INLINE void anTCBSpline::SetControls( float tension, float continuity, float bias ) {
+inline void anTCBSpline::SetControls( float tension, float continuity, float bias ) {
 	this->tension = anMath::ClampFloat( 0.0f, 1.0f, tension );
 	this->continuity = anMath::ClampFloat( 0.0f, 1.0f, continuity );
 	this->bias = anMath::ClampFloat( 0.0f, 1.0f, bias );
 }
 
-ARC_INLINE anVec3 anTCBSpline::GetNode( int i ) {
+inline anVec3 anTCBSpline::GetNode( int i ) {
 	// Clamping has the effect of having duplicate nodes beyond the array boundaries
 	int index = anMath::ClampInt( 0, nodes.Num()-1, i );
 	return nodes[index];
 }
 
-ARC_INLINE anVec3 anTCBSpline::IncomingTangent( int i ) {
+inline anVec3 anTCBSpline::IncomingTangent( int i ) {
 	return	( ( 1.0f - tension )*( 1.0f - continuity )*( 1.0f + bias ) * 0.5f) * (GetNode( i ) - GetNode(i-1)) +
 			( ( 1.0f - tension )*( 1.0f + continuity )*( 1.0f - bias ) * 0.5f) * (GetNode(i+1) - GetNode( i ));
 }
 
-ARC_INLINE anVec3 anTCBSpline::OutgoingTangent( int i ) {
+inline anVec3 anTCBSpline::OutgoingTangent( int i ) {
 	return	((1.0f-tension)*( 1.0f + continuity )*( 1.0f + bias ) * 0.5f) * (GetNode( i ) - GetNode(i-1)) +
 			((1.0f-tension)*( 1.0f - continuity )*( 1.0f - bias ) * 0.5f) * (GetNode(i+1) - GetNode( i ));
 }
 
-ARC_INLINE anVec3 anTCBSpline::GetValue( float alpha ) {
+inline anVec3 anTCBSpline::GetValue( float alpha ) {
 	float t = anMath::ClampFloat(0.0f, 1.0f, alpha);
 	int numNodes = nodes.Num();
 	int numSegments = numNodes-1;
@@ -973,14 +973,14 @@ private:
 };
 
 template<class type>
-ARC_INLINE anSawInterpolation<type>::anSawInterpolation() {
+inline anSawInterpolation<type>::anSawInterpolation() {
 	currentTime = startTime = duration = 0;
 	memset( &currentValue, 0, sizeof( currentValue ) );
 	startValue = endValue = currentValue;
 }
 
 template<class type>
-ARC_INLINE void anSawInterpolation<type>::Init( const int startTime, const int duration, const type startValue, const type endValue ) {
+inline void anSawInterpolation<type>::Init( const int startTime, const int duration, const type startValue, const type endValue ) {
 	this->startTime = startTime;
 	this->duration = duration;
 	this->startValue = startValue;
@@ -990,7 +990,7 @@ ARC_INLINE void anSawInterpolation<type>::Init( const int startTime, const int d
 }
 
 template<class type>
-ARC_INLINE type anSawInterpolation<type>::GetCurrentValue( int time ) const {
+inline type anSawInterpolation<type>::GetCurrentValue( int time ) const {
 	int deltaTime = time - startTime;
 	if ( time != currentTime ) {
 		currentTime = time;
@@ -1044,14 +1044,14 @@ private:
 };
 
 template<class type>
-ARC_INLINE anSinOscillator<type>::anSinOscillator() {
+inline anSinOscillator<type>::anSinOscillator() {
 	currentTime = startTime = period = 0;
 	memset( &currentValue, 0, sizeof( currentValue ) );
 	minValue = maxValue = currentValue;
 }
 
 template<class type>
-ARC_INLINE void anSinOscillator<type>::Init( const int startTime, const int period, const type minValue, const type maxValue ) {
+inline void anSinOscillator<type>::Init( const int startTime, const int period, const type minValue, const type maxValue ) {
 	this->startTime = startTime;
 	this->period = period;
 	this->minValue = minValue;
@@ -1061,7 +1061,7 @@ ARC_INLINE void anSinOscillator<type>::Init( const int startTime, const int peri
 }
 
 template<class type>
-ARC_INLINE type anSinOscillator<type>::GetCurrentValue( int time ) const {
+inline type anSinOscillator<type>::GetCurrentValue( int time ) const {
 	if ( time != currentTime ) {
 		currentTime = time;
 
@@ -1138,7 +1138,7 @@ anBandPassFilter::idInterpolate
 ====================
 */
 template<typename type>
-ARC_INLINE anBandPassFilter<type>::anBandPassFilter( void ) {
+inline anBandPassFilter<type>::anBandPassFilter( void ) {
 	lowStartTime	= 0.f;
 	lowDuration		= 0.f;
 	highStartTime	= 0.f;
@@ -1156,7 +1156,7 @@ anBandPassFilter::Init
 ====================
 */
 template<typename type>
-ARC_INLINE void anBandPassFilter<type>::Init( const float lowPassStart, const float lowPassDuration, const float highPassStart, const float highPassDuration, const type& _lowValue, const type& _highValue ) {
+inline void anBandPassFilter<type>::Init( const float lowPassStart, const float lowPassDuration, const float highPassStart, const float highPassDuration, const type& _lowValue, const type& _highValue ) {
 	assert( lowPassDuration >= 0 );
 	assert( highPassDuration >= 0 );
 	assert( lowPassStart + lowPassDuration <= highPassStart );
@@ -1176,7 +1176,7 @@ anBandPassFilter::GetCurrentValue
 ====================
 */
 template<typename type>
-ARC_INLINE type anBandPassFilter<type>::GetCurrentValue( float time ) const {
+inline type anBandPassFilter<type>::GetCurrentValue( float time ) const {
 	if ( time < lowStartTime ) {
 		// pre leading edge condition
 

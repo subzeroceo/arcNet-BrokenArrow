@@ -20,7 +20,7 @@ public:	idConsoleHistory()
 	// the string will not have a \n
 	// Returns an empty string if there is nothing to retrieve in that
 	// direction.
-	anString			RetrieveFromHistory( bool backward );
+	anStr			RetrieveFromHistory( bool backward );
 
 	// console commands
 	void			PrintHistory();
@@ -33,7 +33,7 @@ private:
 	int				numHistory;
 
 	static const int COMMAND_HISTORY = 64;
-	arcArray<anString,COMMAND_HISTORY>	historyLines;
+	arcArray<anStr,COMMAND_HISTORY>	historyLines;
 
 	compile_time_assert( CONST_ISPOWEROFTWO( COMMAND_HISTORY ) );	// we use the binary 'and' operator for wrapping
 };

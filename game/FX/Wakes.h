@@ -127,7 +127,7 @@ class sdWakeManagerLocal {
 	sdWake *wakes;
 
 public:
-	sdWakeManagerLocal() : wakes(nullptr ), numWakes(0) {}
+	sdWakeManagerLocal() : wakes(nullptr ), numWakes( 0 ) {}
 	void Init( void );
 	void Deinit( void );
 	unsigned int AllocateWake( const sdWakeParms &params );

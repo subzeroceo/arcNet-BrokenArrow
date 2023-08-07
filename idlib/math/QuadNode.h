@@ -193,7 +193,7 @@ anQuadTree<type>::anQuadTree( const int depth )
 ================
 */
 template<class type>
-ARC_INLINE anQuadTree<type>::anQuadTree( const anBounds &bounds, const int depth ) {
+inline anQuadTree<type>::anQuadTree( const anBounds &bounds, const int depth ) {
 	assert( depth > 0 );
 
 	this->depth = depth;
@@ -202,8 +202,8 @@ ARC_INLINE anQuadTree<type>::anQuadTree( const anBounds &bounds, const int depth
 	// expand by 1 unit so everything fits completely in it
 	this->bounds.ExpandSelf( 1.f );
 
-	nodeScale.x = anMath::Pow( 2, depth - 1 ) / ( this->bounds[ 1 ].x - this->bounds[ 0 ].x );
-	nodeScale.y = anMath::Pow( 2, depth - 1 ) / ( this->bounds[ 1 ].y - this->bounds[ 0 ].y );
+	nodeScale.x = anMath::Pow( 2, depth - 1 ) / ( this->bounds[1].x - this->bounds[0].x );
+	nodeScale.y = anMath::Pow( 2, depth - 1 ) / ( this->bounds[1].y - this->bounds[0].y );
 
 	nodes = new anQuadNode** [ depth ];
 
@@ -219,7 +219,7 @@ ARC_INLINE anQuadTree<type>::anQuadTree( const anBounds &bounds, const int depth
 	headNode->SetBounds( bounds );
 
 	// put in node array
-	nodes[ 0 ][ 0 ] = headNode;
+	nodes[0][0] = headNode;
 }
 
 /*
@@ -228,7 +228,7 @@ anQuadTree<type>::~anQuadTree
 ================
 */
 template<class type>
-ARC_INLINE anQuadTree<type>::~anQuadTree( void ) {
+inline anQuadTree<type>::~anQuadTree( void ) {
 	if ( nodes ) {
 		for ( int i = 0; i < depth; i++ ) {
 			int nCells = static_cast< int >( anMath::Pow( 2.f, i * 2.f ) );
@@ -271,7 +271,7 @@ anQuadTree<type>::GetUsedDepth
 ================
 */
 template<class type>
-ARC_INLINE const int anQuadTree<type>::GetUsedDepth( void ) const {
+inline const int anQuadTree<type>::GetUsedDepth( void ) const {
 	int maxReachedDepth = 0;
 	GetUsedDepth_r( *headNode, 1, &maxReachedDepth );
 	return maxReachedDepth + 1;
@@ -283,7 +283,7 @@ anQuadTree<type>::BuildQuadTree
 ================
 */
 template<class type>
-ARC_INLINE void anQuadTree<type>::BuildQuadTree( void ) {
+inline void anQuadTree<type>::BuildQuadTree( void ) {
 #if 1
 	FindChildren_r( *headNode, 1, 0, 0 );
 #else
@@ -298,7 +298,7 @@ anQuadTree<type>::BuildQuadTree
 ================
 */
 template<class type>
-ARC_INLINE void anQuadTree<type>::BuildQuadTree( typename anQuadTree<type>::anQuadNode &node ) {
+inline void anQuadTree<type>::BuildQuadTree( typename anQuadTree<type>::anQuadNode &node ) {
 	// TODO
 }
 
@@ -308,13 +308,13 @@ anQuadTree<type>::FindNode
 ================
 */
 template<class type>
-ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::FindNode( const anVec3 &point ) {
+inline typename anQuadTree<type>::anQuadNode * anQuadTree<type>::FindNode( const anVec3 &point ) {
 	if ( !bounds.ContainsPoint( point ) ) {
 		return nullptr;
 	}
 
-	int x = (int)( ( point.x - bounds[ 0 ].x ) * nodeScale.x );
-	int y = (int)( ( point.y - bounds[ 0 ].y ) * nodeScale.y );
+	int x = (int)( ( point.x - bounds[0].x ) * nodeScale.x );
+	int y = (int)( ( point.y - bounds[0].y ) * nodeScale.y );
 
 	for ( int nodeDepth = depth - 1; nodeDepth >= 0; nodeDepth--, x >>= 1, y >>= 1 ) {
 		anQuadNode	*node = nodes[ nodeDepth ][ ( y << nodeDepth ) + x ];
@@ -333,11 +333,11 @@ anQuadTree<type>::GetNode( const anBounds & )
 ================
 */
 template<class type>
-ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::GetNode( const anBounds &bounds ) {
-	int x = (int)( ( bounds[ 0 ].x - this->bounds[ 0 ].x ) * nodeScale.x );
-	int y = (int)( ( bounds[ 0 ].y - this->bounds[ 0 ].y ) * nodeScale.y );
-	int xR = x ^ (int)( ( bounds[ 1 ].x - this->bounds[ 0 ].x ) * nodeScale.x );
-	int yR = y ^ (int)( ( bounds[ 1 ].y - this->bounds[ 0 ].y ) * nodeScale.y );
+inline typename anQuadTree<type>::anQuadNode * anQuadTree<type>::GetNode( const anBounds &bounds ) {
+	int x = (int)( ( bounds[0].x - this->bounds[0].x ) * nodeScale.x );
+	int y = (int)( ( bounds[0].y - this->bounds[0].y ) * nodeScale.y );
+	int xR = x ^ (int)( ( bounds[1].x - this->bounds[0].x ) * nodeScale.x );
+	int yR = y ^ (int)( ( bounds[1].y - this->bounds[0].y ) * nodeScale.y );
 
 	int nodeDepth = depth;
 
@@ -369,7 +369,7 @@ anQuadTree<type>::GetNode( const nodePosition_t &nodePosition  )
 ================
 */
 template<class type>
-ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::GetNode( const nodePosition_t &nodePosition ) {
+inline typename anQuadTree<type>::anQuadNode * anQuadTree<type>::GetNode( const nodePosition_t &nodePosition ) {
 	anQuadNode** node = &nodes[ nodePosition.level ][ ( nodePosition.y << ( nodePosition.level ) ) + nodePosition.x ];
 
 	if ( *node ) {
@@ -417,14 +417,14 @@ anQuadTree<type>::AllocNode
 ================
 */
 template<class type>
-ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::AllocNode( anQuadNode **node, int nodeLevel, int x, int y ) {
+inline typename anQuadTree<type>::anQuadNode * anQuadTree<type>::AllocNode( anQuadNode **node, int nodeLevel, int x, int y ) {
 	int levelDimensions = anMath::Pow( 2, nodeLevel );
-	anVec2 cellSize( ( headNode->GetBounds()[ 1 ].x - headNode->GetBounds()[ 0 ].x ) / levelDimensions,
+	anVec2 cellSize( ( headNode->GetBounds()[1].x - headNode->GetBounds()[0].x ) / levelDimensions,
 	anVec2 pCellsize;
 
 	// create the new node
 	anVec2 nodeBounds.Clear();
-	anVec2 nodeMins.Set( headNode->GetBounds()[ 0 ].x + x * cellSize.x, headNode->GetBounds()[ 0 ].y + y * cellSize.y );
+	anVec2 nodeMins.Set( headNode->GetBounds()[0].x + x * cellSize.x, headNode->GetBounds()[0].y + y * cellSize.y );
 	anBounds nodeBounds.AddPoint( anVec3( nodeMins.x, nodeMins.y, 0.f ) );
 	anBounds nodeBounds.AddPoint( anVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
 	*node = new anQuadNode( nodeBounds );
@@ -446,12 +446,12 @@ ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::AllocNode( 
 
 		if ( !(*parent) ) {
 			levelDimensions = anMath::Pow( 2, pNodeLevel );
-			pCellsize.Set( ( headNode->GetBounds()[ 1 ].x - headNode->GetBounds()[ 0 ].x ) / levelDimensions,
-						   ( headNode->GetBounds()[ 1 ].y - headNode->GetBounds()[ 0 ].y ) / levelDimensions );
+			pCellsize.Set( ( headNode->GetBounds()[1].x - headNode->GetBounds()[0].x ) / levelDimensions,
+						   ( headNode->GetBounds()[1].y - headNode->GetBounds()[0].y ) / levelDimensions );
 
 			// create the new node
 			nodeBounds.Clear();
-			nodeMins.Set( headNode->GetBounds()[ 0 ].x + pX * pCellsize.x, headNode->GetBounds()[ 0 ].y + pY * pCellsize.y );
+			nodeMins.Set( headNode->GetBounds()[0].x + pX * pCellsize.x, headNode->GetBounds()[0].y + pY * pCellsize.y );
 			nodeBounds.AddPoint( anVec3( nodeMins.x, nodeMins.y, 0.f ) );
 			nodeBounds.AddPoint( anVec3( nodeMins.x + pCellsize.x, nodeMins.y + pCellsize.y, 0.f ) );
 			*parent = new anQuadNode( nodeBounds );
@@ -476,7 +476,7 @@ ARC_INLINE typename anQuadTree<type>::anQuadNode * anQuadTree<type>::AllocNode( 
 
 			// create the new node
 			nodeBounds.Clear();
-			nodeMins.Set( headNode->GetBounds()[ 0 ].x + x * cellSize.x, headNode->GetBounds()[ 0 ].y + y * cellSize.y );
+			nodeMins.Set( headNode->GetBounds()[0].x + x * cellSize.x, headNode->GetBounds()[0].y + y * cellSize.y );
 			nodeBounds.AddPoint( anVec3( nodeMins.x, nodeMins.y, 0.f ) );
 			nodeBounds.AddPoint( anVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
 			*sibling = new anQuadNode( nodeBounds );
@@ -550,7 +550,7 @@ void anQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
 				continue;
 			}
 
-			// bottom neighbor (0)
+			// bottom neighbor ( 0 )
 			if ( y > 0 ) {
 				int nbX = x;
 				int nbY = y - 1;

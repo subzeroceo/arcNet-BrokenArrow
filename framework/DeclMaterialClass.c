@@ -124,7 +124,7 @@ void anDeclSurfaceType::FreeData( void ) {
 anDeclSurfaceType::FreeData
 =======================
 */
-bool anDeclSurfaceType::Validate( const char *psText, int iTextLength, anString &strReportTo ) const {
+bool anDeclSurfaceType::Validate( const char *psText, int iTextLength, anStr &strReportTo ) const {
 	// Validate text according to business logic
 	bool valid = true;
 	if ( iTextLength < 10 ) {
@@ -138,7 +138,7 @@ bool anDeclSurfaceType::Validate( const char *psText, int iTextLength, anString 
 anDeclSurfaceType::GetMaterialTypeArrayata
 =======================
 */
-byte *anDeclSurfaceType::ST_GetSurfaceTypeArray( anString image, int &width, int &height ) {
+byte *anDeclSurfaceType::ST_GetSurfaceTypeArray( anStr image, int &width, int &height ) {
 	// Load image at path
 	MyImage image( imagePath );
 
@@ -153,7 +153,7 @@ byte *anDeclSurfaceType::ST_GetSurfaceTypeArray( anString image, int &width, int
 	return types;
 }
 
-std::vector<anDeclSurfaceType> ST_GetSurfaceTypeArray( const anString& image, int& width, int& height, const std::vector<Color>& colors ) {
+std::vector<anDeclSurfaceType> ST_GetSurfaceTypeArray( const anStr& image, int& width, int& height, const std::vector<Color>& colors ) {
     // Load the image and retrieve the width and height
     // ... (implementation specific to your codebase)
 
@@ -178,7 +178,7 @@ std::vector<anDeclSurfaceType> ST_GetSurfaceTypeArray( const anString& image, in
         // Find the corresponding surface type based on the pixel color
         for ( intj = 0; j < colors.size(); ++j) {
             if (pixelColor == colors[j]) {
-                surfaceType.type = anString::Format( "SurfaceType%d", j + 1);
+                surfaceType.type = anStr::Format( "SurfaceType%d", j + 1);
                 break;
             }
         }
@@ -190,7 +190,7 @@ std::vector<anDeclSurfaceType> ST_GetSurfaceTypeArray( const anString& image, in
     return surfaceTypeArray;
 }
 
-byte* ST_GetSurfaceTypeArray(const anString& image, int& width, int& height, const std::vector<Color>& colors) {
+byte* ST_GetSurfaceTypeArray(const anStr& image, int& width, int& height, const std::vector<Color>& colors) {
     // Load the image and retrieve the width and height
     // ... (implementation specific to your codebase)
 

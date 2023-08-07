@@ -1,59 +1,29 @@
-/*
-===========================================================================
-
-Doom 3 BFG Edition GPL Source Code
-Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 BFG Edition GPL Source Code ( "Doom 3 BFG Edition Source Code" ).
-
-Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 BFG Edition Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 BFG Edition Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 BFG Edition Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 BFG Edition Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
 #pragma hdrstop
 #include "../../idlib/Lib.h"
-
-
 #include "../Game_local.h"
 
-anCVar binaryLoadAnim( "binaryLoadAnim", "1", 0, "enable binary load/write of anM8DAnim" );
+anCVar binaryLoadAnim( "LoadBinaryAnim", "1", 0, "enables the engine to read/load/write of binary MD6B Animation files." );
 
-static const byte B_ANIM_MD5_VERSION = 101;
-static const unsigned int B_ANIM_MD5_MAGIC = ( 'B' << 24 ) | ( 'M' << 16 ) | ( 'D' << 8 ) | B_ANIM_MD5_VERSION;
+static const byte B_ANIM_MD6_VERSION = 101;
+static const unsigned int B_ANIM_MD6_MAGIC = ( 'B' << 24 ) | ( 'M' << 16 ) | ( 'D' << 8 ) | B_ANIM_MD6_VERSION;
 
 static const int JOINT_FRAME_PAD	= 1;	// one extra to be able to read one more float than is necessary
 
-bool arcAnimManager::forceExport = false;
+bool anAnimManager::forceExport = false;
 
 /***********************************************************************
 
-	anM8DAnim
+	anMD6Anim
 
 ***********************************************************************/
 
 /*
 ====================
-anM8DAnim::anM8DAnim
+anMD6Anim::anMD6Anim
 ====================
 */
-anM8DAnim::anM8DAnim() {
-	ref_count	= 0;
+anMD6Anim::anMD6Anim() {
+	refCount	= 0;
 	numFrames	= 0;
 	numJoints	= 0;
 	frameRate	= 24;
@@ -64,19 +34,19 @@ anM8DAnim::anM8DAnim() {
 
 /*
 ====================
-anM8DAnim::anM8DAnim
+anMD6Anim::anMD6Anim
 ====================
 */
-anM8DAnim::~anM8DAnim() {
+anMD6Anim::~anMD6Anim() {
 	Free();
 }
 
 /*
 ====================
-anM8DAnim::Free
+anMD6Anim::Free
 ====================
 */
-void anM8DAnim::Free() {
+void anMD6Anim::Free() {
 	numFrames	= 0;
 	numJoints	= 0;
 	frameRate	= 24;
@@ -93,84 +63,81 @@ void anM8DAnim::Free() {
 
 /*
 ====================
-anM8DAnim::NumFrames
+anMD6Anim::NumFrames
 ====================
 */
-int	anM8DAnim::NumFrames() const {
+int	anMD6Anim::NumFrames() const {
 	return numFrames;
 }
 
 /*
 ====================
-anM8DAnim::NumJoints
+anMD6Anim::NumJoints
 ====================
 */
-int	anM8DAnim::NumJoints() const {
+int	anMD6Anim::NumJoints() const {
 	return numJoints;
 }
 
 /*
 ====================
-anM8DAnim::Length
+anMD6Anim::Length
 ====================
 */
-int anM8DAnim::Length() const {
+int anMD6Anim::Length() const {
 	return animLength;
 }
 
 /*
 =====================
-anM8DAnim::TotalMovementDelta
+anMD6Anim::TotalMovementDelta
 =====================
 */
-const anVec3 &anM8DAnim::TotalMovementDelta() const {
+const anVec3 &anMD6Anim::TotalMovementDelta() const {
 	return totaldelta;
 }
 
 /*
 =====================
-anM8DAnim::TotalMovementDelta
+anMD6Anim::TotalMovementDelta
 =====================
 */
-const char *anM8DAnim::Name() const {
+const char *anMD6Anim::Name() const {
 	return name;
 }
 
 /*
 ====================
-anM8DAnim::Reload
+anMD6Anim::Reload
 ====================
 */
-bool anM8DAnim::Reload() {
-	anString filename;
-
+bool anMD6Anim::Reload() {
+	anStr filename;
 	filename = name;
 	Free();
-
 	return LoadAnim( filename );
 }
 
 /*
 ====================
-anM8DAnim::Allocated
+anMD6Anim::Allocated
 ====================
 */
-size_t anM8DAnim::Allocated() const {
-	size_t	size = bounds.Allocated() + jointInfo.Allocated() + componentFrames.Allocated() + name.Allocated();
+size_t anMD6Anim::Allocated() const {
+	size_t size = bounds.Allocated() + jointInfo.Allocated() + componentFrames.Allocated() + name.Allocated();
 	return size;
 }
 
 /*
 ====================
-anM8DAnim::LoadAnim
+anMD6Anim::LoadAnim
 ====================
 */
-bool anM8DAnim::LoadAnim( const char *filename ) {
-
+bool anMD6Anim::LoadAnim( const char *filename ) {
 	anLexer	parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
 	anToken	token;
 
-	anString generatedFileName = "generated/anim/";
+	anStr generatedFileName = "generated/anim/";
 	generatedFileName.AppendPath( filename );
 	generatedFileName.SetFileExtension( ".bMD5anim" );
 
@@ -273,8 +240,8 @@ bool anM8DAnim::LoadAnim( const char *filename ) {
 	bounds.SetGranularity( 1 );
 	bounds.SetNum( numFrames );
 	for ( int i = 0; i < numFrames; i++ ) {
-		parser.Parse1DMatrix( 3, bounds[i][ 0 ].ToFloatPtr() );
-		parser.Parse1DMatrix( 3, bounds[i][ 1 ].ToFloatPtr() );
+		parser.Parse1DMatrix( 3, bounds[i][0].ToFloatPtr() );
+		parser.Parse1DMatrix( 3, bounds[i][1].ToFloatPtr() );
 	}
 	parser.ExpectTokenString( "}" );
 
@@ -317,35 +284,35 @@ bool anM8DAnim::LoadAnim( const char *filename ) {
 	if ( !numAnimatedComponents ) {
 		totaldelta.Zero();
 	} else {
-		componentPtr = &componentFrames[ jointInfo[ 0 ].firstComponent ];
-		if ( jointInfo[ 0 ].animBits & ANIM_TX ) {
+		componentPtr = &componentFrames[ jointInfo[0].firstComponent ];
+		if ( jointInfo[0].animBits & ANIM_TX ) {
 			for ( int i = 0; i < numFrames; i++ ) {
-				componentPtr[ numAnimatedComponents * i ] -= baseFrame[ 0 ].t.x;
+				componentPtr[ numAnimatedComponents * i ] -= baseFrame[0].t.x;
 			}
 			totaldelta.x = componentPtr[ numAnimatedComponents * ( numFrames - 1 ) ];
 			componentPtr++;
 		} else {
 			totaldelta.x = 0.0f;
 		}
-		if ( jointInfo[ 0 ].animBits & ANIM_TY ) {
+		if ( jointInfo[0].animBits & ANIM_TY ) {
 			for ( int i = 0; i < numFrames; i++ ) {
-				componentPtr[ numAnimatedComponents * i ] -= baseFrame[ 0 ].t.y;
+				componentPtr[ numAnimatedComponents * i ] -= baseFrame[0].t.y;
 			}
 			totaldelta.y = componentPtr[ numAnimatedComponents * ( numFrames - 1 ) ];
 			componentPtr++;
 		} else {
 			totaldelta.y = 0.0f;
 		}
-		if ( jointInfo[ 0 ].animBits & ANIM_TZ ) {
+		if ( jointInfo[0].animBits & ANIM_TZ ) {
 			for ( int i = 0; i < numFrames; i++ ) {
-				componentPtr[ numAnimatedComponents * i ] -= baseFrame[ 0 ].t.z;
+				componentPtr[ numAnimatedComponents * i ] -= baseFrame[0].t.z;
 			}
 			totaldelta.z = componentPtr[ numAnimatedComponents * ( numFrames - 1 ) ];
 		} else {
 			totaldelta.z = 0.0f;
 		}
 	}
-	baseFrame[ 0 ].t.Zero();
+	baseFrame[0].t.Zero();
 
 	// we don't count last frame because it would cause a 1 frame pause at the end
 	animLength = ( ( numFrames - 1 ) * 1000 + frameRate - 1 ) / frameRate;
@@ -362,18 +329,17 @@ bool anM8DAnim::LoadAnim( const char *filename ) {
 
 /*
 ========================
-anM8DAnim::LoadBinary
+anMD6Anim::LoadBinary
 ========================
 */
-bool anM8DAnim::LoadBinary( anFile * file, ARC_TIME_T sourceTimeStamp ) {
-
+bool anMD6Anim::LoadBinary( anFile *file, ARC_TIME_T sourceTimeStamp ) {
 	if ( file == nullptr ) {
 		return false;
 	}
 
 	unsigned int magic = 0;
 	file->ReadBig( magic );
-	if ( magic != B_ANIM_MD5_MAGIC ) {
+	if ( magic != B_ANIM_MD6_MAGIC ) {
 		return false;
 	}
 
@@ -403,7 +369,7 @@ bool anM8DAnim::LoadBinary( anFile * file, ARC_TIME_T sourceTimeStamp ) {
 	for ( int i = 0; i < num; i++ ) {
 		jointAnimInfo_t & j = jointInfo[i];
 
-		anString jointName;
+		anStr jointName;
 		file->ReadString( jointName );
 		if ( jointName.IsEmpty() ) {
 			j.nameIndex = -1;
@@ -436,23 +402,22 @@ bool anM8DAnim::LoadBinary( anFile * file, ARC_TIME_T sourceTimeStamp ) {
 
 	//file->ReadString( name );
 	file->ReadVec3( totaldelta );
-	//file->ReadBig( ref_count );
+	//file->ReadBig( refCount );
 
 	return true;
 }
 
 /*
 ========================
-anM8DAnim::WriteBinary
+anMD6Anim::WriteBinary
 ========================
 */
-void anM8DAnim::WriteBinary( anFile * file, ARC_TIME_T sourceTimeStamp ) {
-
+void anMD6Anim::WriteBinary( anFile *file, ARC_TIME_T sourceTimeStamp ) {
 	if ( file == nullptr ) {
 		return;
 	}
 
-	file->WriteBig( B_ANIM_MD5_MAGIC );
+	file->WriteBig( B_ANIM_MD6_MAGIC );
 	file->WriteBig( sourceTimeStamp );
 
 	file->WriteBig( numFrames );
@@ -471,7 +436,7 @@ void anM8DAnim::WriteBinary( anFile * file, ARC_TIME_T sourceTimeStamp ) {
 	file->WriteBig( jointInfo.Num() );
 	for ( int i = 0; i < jointInfo.Num(); i++ ) {
 		jointAnimInfo_t & j = jointInfo[i];
-		anString jointName = animationLib.JointName( j.nameIndex );
+		anStr jointName = animationLib.JointName( j.nameIndex );
 		file->WriteString( jointName );
 		file->WriteBig( j.parentNum );
 		file->WriteBig( j.animBits );
@@ -495,66 +460,65 @@ void anM8DAnim::WriteBinary( anFile * file, ARC_TIME_T sourceTimeStamp ) {
 
 	//file->WriteString( name );
 	file->WriteVec3( totaldelta );
-	//file->WriteBig( ref_count );
+	//file->WriteBig( refCount );
 }
 
 /*
 ====================
-anM8DAnim::IncreaseRefs
+anMD6Anim::IncreaseRefs
 ====================
 */
-void anM8DAnim::IncreaseRefs() const {
-	ref_count++;
+void anMD6Anim::IncreaseRefs() const {
+	refCount++;
 }
 
 /*
 ====================
-anM8DAnim::DecreaseRefs
+anMD6Anim::DecreaseRefs
 ====================
 */
-void anM8DAnim::DecreaseRefs() const {
-	ref_count--;
+void anMD6Anim::DecreaseRefs() const {
+	refCount--;
 }
 
 /*
 ====================
-anM8DAnim::NumRefs
+anMD6Anim::NumRefs
 ====================
 */
-int anM8DAnim::NumRefs() const {
-	return ref_count;
+int anMD6Anim::NumRefs() const {
+	return refCount;
 }
 
 /*
 ====================
-anM8DAnim::GetFrameBlend
+anMD6Anim::GetFrameBlend
 ====================
 */
-void anM8DAnim::GetFrameBlend( int framenum, frameBlend_t &frame ) const {
+void anMD6Anim::GetFrameBlend( int frameNum, frameBlend_t &frame ) const {
 	frame.cycleCount	= 0;
 	frame.backlerp		= 0.0f;
 	frame.frontlerp		= 1.0f;
 
 	// frame 1 is first frame
-	framenum--;
-	if ( framenum < 0 ) {
-		framenum = 0;
-	} else if ( framenum >= numFrames ) {
-		framenum = numFrames - 1;
+	frameNum--;
+	if ( frameNum < 0 ) {
+		frameNum = 0;
+	} else if ( frameNum >= numFrames ) {
+		frameNum = numFrames - 1;
 	}
 
-	frame.frame1 = framenum;
-	frame.frame2 = framenum;
+	frame.frame1 = frameNum;
+	frame.frame2 = frameNum;
 }
 
 /*
 ====================
-anM8DAnim::ConvertTimeToFrame
+anMD6Anim::ConvertTimeToFrame
 ====================
 */
-void anM8DAnim::ConvertTimeToFrame( int time, int cyclecount, frameBlend_t &frame ) const {
-	int frameTime;
-	int frameNum;
+void anMD6Anim::ConvertTimeToFrame( int time, int cyclecount, frameBlend_t &frame ) const {
+	int frameTime, frameNum;
 
 	if ( numFrames <= 1 ) {
 		frame.frame1		= 0;
@@ -599,12 +563,12 @@ void anM8DAnim::ConvertTimeToFrame( int time, int cyclecount, frameBlend_t &fram
 
 /*
 ====================
-anM8DAnim::GetOrigin
+anMD6Anim::GetOrigin
 ====================
 */
-void anM8DAnim::GetOrigin( anVec3 &offset, int time, int cyclecount ) const {
-	offset = baseFrame[ 0 ].t;
-	if ( !( jointInfo[ 0 ].animBits & ( ANIM_TX | ANIM_TY | ANIM_TZ ) ) ) {
+void anMD6Anim::GetOrigin( anVec3 &offset, int time, int cyclecount ) const {
+	offset = baseFrame[0].t;
+	if ( !( jointInfo[0].animBits & ( ANIM_TX | ANIM_TY | ANIM_TZ ) ) ) {
 		// just use the baseframe
 		return;
 	}
@@ -612,22 +576,22 @@ void anM8DAnim::GetOrigin( anVec3 &offset, int time, int cyclecount ) const {
 	frameBlend_t frame;
 	ConvertTimeToFrame( time, cyclecount, frame );
 
-	const float *componentPtr1 = &componentFrames[ numAnimatedComponents * frame.frame1 + jointInfo[ 0 ].firstComponent ];
-	const float *componentPtr2 = &componentFrames[ numAnimatedComponents * frame.frame2 + jointInfo[ 0 ].firstComponent ];
+	const float *componentPtr1 = &componentFrames[ numAnimatedComponents * frame.frame1 + jointInfo[0].firstComponent ];
+	const float *componentPtr2 = &componentFrames[ numAnimatedComponents * frame.frame2 + jointInfo[0].firstComponent ];
 
-	if ( jointInfo[ 0 ].animBits & ANIM_TX ) {
+	if ( jointInfo[0].animBits & ANIM_TX ) {
 		offset.x = *componentPtr1 * frame.frontlerp + *componentPtr2 * frame.backlerp;
 		componentPtr1++;
 		componentPtr2++;
 	}
 
-	if ( jointInfo[ 0 ].animBits & ANIM_TY ) {
+	if ( jointInfo[0].animBits & ANIM_TY ) {
 		offset.y = *componentPtr1 * frame.frontlerp + *componentPtr2 * frame.backlerp;
 		componentPtr1++;
 		componentPtr2++;
 	}
 
-	if ( jointInfo[ 0 ].animBits & ANIM_TZ ) {
+	if ( jointInfo[0].animBits & ANIM_TZ ) {
 		offset.z = *componentPtr1 * frame.frontlerp + *componentPtr2 * frame.backlerp;
 	}
 
@@ -638,22 +602,22 @@ void anM8DAnim::GetOrigin( anVec3 &offset, int time, int cyclecount ) const {
 
 /*
 ====================
-anM8DAnim::GetOriginRotation
+anMD6Anim::GetOriginRotation
 ====================
 */
-void anM8DAnim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) const {
-	int animBits = jointInfo[ 0 ].animBits;
+void anMD6Anim::GetOriginRotation( anQuat &rotation, int time, int cyclecount ) const {
+	int animBits = jointInfo[0].animBits;
 	if ( !( animBits & ( ANIM_QX | ANIM_QY | ANIM_QZ ) ) ) {
 		// just use the baseframe
-		rotation = baseFrame[ 0 ].q;
+		rotation = baseFrame[0].q;
 		return;
 	}
 
 	frameBlend_t frame;
 	ConvertTimeToFrame( time, cyclecount, frame );
 
-	const float	*jointframe1 = &componentFrames[ numAnimatedComponents * frame.frame1 + jointInfo[ 0 ].firstComponent ];
-	const float	*jointframe2 = &componentFrames[ numAnimatedComponents * frame.frame2 + jointInfo[ 0 ].firstComponent ];
+	const float	*jointframe1 = &componentFrames[ numAnimatedComponents * frame.frame1 + jointInfo[0].firstComponent ];
+	const float	*jointframe2 = &componentFrames[ numAnimatedComponents * frame.frame2 + jointInfo[0].firstComponent ];
 
 	if ( animBits & ANIM_TX ) {
 		jointframe1++;
@@ -670,16 +634,16 @@ void anM8DAnim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) 
 		jointframe2++;
 	}
 
-	idQuat q1;
-	idQuat q2;
+	anQuat q1;
+	anQuat q2;
 
 	switch ( animBits & (ANIM_QX|ANIM_QY|ANIM_QZ) ) {
 		case ANIM_QX:
 			q1.x = jointframe1[0];
 			q2.x = jointframe2[0];
-			q1.y = baseFrame[ 0 ].q.y;
+			q1.y = baseFrame[0].q.y;
 			q2.y = q1.y;
-			q1.z = baseFrame[ 0 ].q.z;
+			q1.z = baseFrame[0].q.z;
 			q2.z = q1.z;
 			q1.w = q1.CalcW();
 			q2.w = q2.CalcW();
@@ -687,9 +651,9 @@ void anM8DAnim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) 
 		case ANIM_QY:
 			q1.y = jointframe1[0];
 			q2.y = jointframe2[0];
-			q1.x = baseFrame[ 0 ].q.x;
+			q1.x = baseFrame[0].q.x;
 			q2.x = q1.x;
-			q1.z = baseFrame[ 0 ].q.z;
+			q1.z = baseFrame[0].q.z;
 			q2.z = q1.z;
 			q1.w = q1.CalcW();
 			q2.w = q2.CalcW();
@@ -697,9 +661,9 @@ void anM8DAnim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) 
 		case ANIM_QZ:
 			q1.z = jointframe1[0];
 			q2.z = jointframe2[0];
-			q1.x = baseFrame[ 0 ].q.x;
+			q1.x = baseFrame[0].q.x;
 			q2.x = q1.x;
-			q1.y = baseFrame[ 0 ].q.y;
+			q1.y = baseFrame[0].q.y;
 			q2.y = q1.y;
 			q1.w = q1.CalcW();
 			q2.w = q2.CalcW();
@@ -709,7 +673,7 @@ void anM8DAnim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) 
 			q1.y = jointframe1[1];
 			q2.x = jointframe2[0];
 			q2.y = jointframe2[1];
-			q1.z = baseFrame[ 0 ].q.z;
+			q1.z = baseFrame[0].q.z;
 			q2.z = q1.z;
 			q1.w = q1.CalcW();
 			q2.w = q2.CalcW();
@@ -719,7 +683,7 @@ void anM8DAnim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) 
 			q1.z = jointframe1[1];
 			q2.x = jointframe2[0];
 			q2.z = jointframe2[1];
-			q1.y = baseFrame[ 0 ].q.y;
+			q1.y = baseFrame[0].q.y;
 			q2.y = q1.y;
 			q1.w = q1.CalcW();
 			q2.w = q2.CalcW();
@@ -729,7 +693,7 @@ void anM8DAnim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) 
 			q1.z = jointframe1[1];
 			q2.y = jointframe2[0];
 			q2.z = jointframe2[1];
-			q1.x = baseFrame[ 0 ].q.x;
+			q1.x = baseFrame[0].q.x;
 			q2.x = q1.x;
 			q1.w = q1.CalcW();
 			q2.w = q2.CalcW();
@@ -751,10 +715,10 @@ void anM8DAnim::GetOriginRotation( idQuat &rotation, int time, int cyclecount ) 
 
 /*
 ====================
-anM8DAnim::GetBounds
+anMD6Anim::GetBounds
 ====================
 */
-void anM8DAnim::GetBounds( anBounds &bnds, int time, int cyclecount ) const {
+void anMD6Anim::GetBounds( anBounds &bnds, int time, int cyclecount ) const {
 	frameBlend_t frame;
 	ConvertTimeToFrame( time, cyclecount, frame );
 
@@ -762,30 +726,29 @@ void anM8DAnim::GetBounds( anBounds &bnds, int time, int cyclecount ) const {
 	bnds.AddBounds( bounds[ frame.frame2 ] );
 
 	// origin position
-	anVec3 offset = baseFrame[ 0 ].t;
-	if ( jointInfo[ 0 ].animBits & ( ANIM_TX | ANIM_TY | ANIM_TZ ) ) {
-		const float *componentPtr1 = &componentFrames[ numAnimatedComponents * frame.frame1 + jointInfo[ 0 ].firstComponent ];
-		const float *componentPtr2 = &componentFrames[ numAnimatedComponents * frame.frame2 + jointInfo[ 0 ].firstComponent ];
-
-		if ( jointInfo[ 0 ].animBits & ANIM_TX ) {
+	anVec3 offset = baseFrame[0].t;
+	if ( jointInfo[0].animBits & ( ANIM_TX | ANIM_TY | ANIM_TZ ) ) {
+		const float *componentPtr1 = &componentFrames[ numAnimatedComponents * frame.frame1 + jointInfo[0].firstComponent ];
+		const float *componentPtr2 = &componentFrames[ numAnimatedComponents * frame.frame2 + jointInfo[0].firstComponent ];
+		if ( jointInfo[0].animBits & ANIM_TX ) {
 			offset.x = *componentPtr1 * frame.frontlerp + *componentPtr2 * frame.backlerp;
 			componentPtr1++;
 			componentPtr2++;
 		}
 
-		if ( jointInfo[ 0 ].animBits & ANIM_TY ) {
+		if ( jointInfo[0].animBits & ANIM_TY ) {
 			offset.y = *componentPtr1 * frame.frontlerp + *componentPtr2 * frame.backlerp;
 			componentPtr1++;
 			componentPtr2++;
 		}
 
-		if ( jointInfo[ 0 ].animBits & ANIM_TZ ) {
+		if ( jointInfo[0].animBits & ANIM_TZ ) {
 			offset.z = *componentPtr1 * frame.frontlerp + *componentPtr2 * frame.backlerp;
 		}
 	}
 
-	bnds[ 0 ] -= offset;
-	bnds[ 1 ] -= offset;
+	bnds[0] -= offset;
+	bnds[1] -= offset;
 }
 
 /*
@@ -794,25 +757,21 @@ DecodeInterpolatedFrames
 
 ====================
 */
-int DecodeInterpolatedFrames( anJointQuat * joints, anJointQuat * blendJoints, int * lerpIndex, const float * frame1, const float * frame2,
-							const jointAnimInfo_t * jointInfo, const int * index, const int numIndexes ) {
+int DecodeInterpolatedFrames( anJointQuat *joints, anJointQuat *blendJoints, int *lerpIndex, const float *frame1, const float *frame2, const jointAnimInfo_t *jointInfo, const int *index, const int numIndexes ) {
 	int numLerpJoints = 0;
 	for ( int i = 0; i < numIndexes; i++ ) {
 		const int j = index[i];
-		const jointAnimInfo_t * infoPtr = &jointInfo[j];
-
+		const jointAnimInfo_t *infoPtr = &jointInfo[j];
 		const int animBits = infoPtr->animBits;
 		if ( animBits != 0 ) {
-
 			lerpIndex[numLerpJoints++] = j;
 
-			anJointQuat * jointPtr = &joints[j];
-			anJointQuat * blendPtr = &blendJoints[j];
-
+			anJointQuat *jointPtr = &joints[j];
+			anJointQuat *blendPtr = &blendJoints[j];
 			*blendPtr = *jointPtr;
 
-			const float * jointframe1 = frame1 + infoPtr->firstComponent;
-			const float * jointframe2 = frame2 + infoPtr->firstComponent;
+			const float *jointframe1 = frame1 + infoPtr->firstComponent;
+			const float *jointframe2 = frame2 + infoPtr->firstComponent;
 
 			if ( animBits & (ANIM_TX|ANIM_TY|ANIM_TZ) ) {
 				if ( animBits & ANIM_TX ) {
@@ -852,53 +811,48 @@ int DecodeInterpolatedFrames( anJointQuat * joints, anJointQuat * blendJoints, i
 
 /*
 ====================
-anM8DAnim::GetInterpolatedFrame
+anMD6Anim::GetInterpolatedFrame
 ====================
 */
-void anM8DAnim::GetInterpolatedFrame( frameBlend_t &frame, anJointQuat *joints, const int *index, int numIndexes ) const {
+void anMD6Anim::GetInterpolatedFrame( frameBlend_t &frame, anJointQuat *joints, const int *index, int numIndexes ) const {
 	// copy the baseframe
-	SIMDProcessor->Memcpy( joints, baseFrame.Ptr(), baseFrame.Num() * sizeof( baseFrame[ 0 ] ) );
+	SIMDProcessor->Memcpy( joints, baseFrame.Ptr(), baseFrame.Num() * sizeof( baseFrame[0] ) );
 
 	if ( numAnimatedComponents == 0 ) {
 		// just use the base frame
 		return;
 	}
 
-	anJointQuat * blendJoints = (anJointQuat *)_alloca16( baseFrame.Num() * sizeof( blendJoints[ 0 ] ) );
-	int * lerpIndex = ( int*)_alloca16( baseFrame.Num() * sizeof( lerpIndex[ 0 ] ) );
+	anJointQuat * blendJoints = (anJointQuat *)_alloca16( baseFrame.Num() * sizeof( blendJoints[0] ) );
+	int *lerpIndex = (int *)_alloca16( baseFrame.Num() * sizeof( lerpIndex[0] ) );
 
-	const float * frame1 = &componentFrames[frame.frame1 * numAnimatedComponents];
-	const float * frame2 = &componentFrames[frame.frame2 * numAnimatedComponents];
+	const float *frame1 = &componentFrames[frame.frame1 * numAnimatedComponents];
+	const float *rame2 = &componentFrames[frame.frame2 * numAnimatedComponents];
 
 	int numLerpJoints = DecodeInterpolatedFrames( joints, blendJoints, lerpIndex, frame1, frame2, jointInfo.Ptr(), index, numIndexes );
 
 	SIMDProcessor->BlendJoints( joints, blendJoints, frame.backlerp, lerpIndex, numLerpJoints );
 
 	if ( frame.cycleCount ) {
-		joints[ 0 ].t += totaldelta * ( float )frame.cycleCount;
+		joints[0].t += totaldelta * ( float )frame.cycleCount;
 	}
 }
 
 /*
 ====================
 DecodeSingleFrame
-
 ====================
 */
-void DecodeSingleFrame( anJointQuat * joints, const float * frame,
-						const jointAnimInfo_t * jointInfo, const int * index, const int numIndexes ) {
+void DecodeSingleFrame( anJointQuat *joints, const float *frame, const jointAnimInfo_t *jointInfo, const int *index, const int numIndexes ) {
 	for ( int i = 0; i < numIndexes; i++ ) {
 		const int j = index[i];
 		const jointAnimInfo_t * infoPtr = &jointInfo[j];
 
 		const int animBits = infoPtr->animBits;
 		if ( animBits != 0 ) {
-
-			anJointQuat * jointPtr = &joints[j];
-
-			const float * jointframe = frame + infoPtr->firstComponent;
-
-			if ( animBits & (ANIM_TX|ANIM_TY|ANIM_TZ) ) {
+			anJointQuat *jointPtr = &joints[j];
+			const float *jointframe = frame + infoPtr->firstComponent;
+			if ( animBits & ( ANIM_TX|ANIM_TY|ANIM_TZ ) ) {
 				if ( animBits & ANIM_TX ) {
 					jointPtr->t.x = *jointframe++;
 				}
@@ -910,7 +864,7 @@ void DecodeSingleFrame( anJointQuat * joints, const float * frame,
 				}
 			}
 
-			if ( animBits & (ANIM_QX|ANIM_QY|ANIM_QZ) ) {
+			if ( animBits & ( ANIM_QX|ANIM_QY|ANIM_QZ ) ) {
 				if ( animBits & ANIM_QX ) {
 					jointPtr->q.x = *jointframe++;
 				}
@@ -928,29 +882,29 @@ void DecodeSingleFrame( anJointQuat * joints, const float * frame,
 
 /*
 ====================
-anM8DAnim::GetSingleFrame
+anMD6Anim::GetSingleFrame
 ====================
 */
-void anM8DAnim::GetSingleFrame( int framenum, anJointQuat *joints, const int *index, int numIndexes ) const {
+void anMD6Anim::GetSingleFrame( int frameNum, anJointQuat *joints, const int *index, int numIndexes ) const {
 	// copy the baseframe
-	SIMDProcessor->Memcpy( joints, baseFrame.Ptr(), baseFrame.Num() * sizeof( baseFrame[ 0 ] ) );
+	SIMDProcessor->Memcpy( joints, baseFrame.Ptr(), baseFrame.Num() * sizeof( baseFrame[0] ) );
 
-	if ( framenum == 0 || numAnimatedComponents == 0 ) {
+	if ( frameNum == 0 || numAnimatedComponents == 0 ) {
 		// just use the base frame
 		return;
 	}
 
-	const float * frame = &componentFrames[framenum * numAnimatedComponents];
+	const float * frame = &componentFrames[frameNum * numAnimatedComponents];
 
 	DecodeSingleFrame( joints, frame, jointInfo.Ptr(), index, numIndexes );
 }
 
 /*
 ====================
-anM8DAnim::CheckModelHierarchy
+anMD6Anim::CheckModelHierarchy
 ====================
 */
-void anM8DAnim::CheckModelHierarchy( const anRenderModel *model ) const {
+void anMD6Anim::CheckModelHierarchy( const anRenderModel *model ) const {
 	if ( jointInfo.Num() != model->NumJoints() ) {
 		if ( !fileSystem->InProductionMode() ) {
 			gameLocal.Warning( "Model '%s' has different # of joints than anim '%s'", model->Name(), name.c_str() );
@@ -960,7 +914,7 @@ void anM8DAnim::CheckModelHierarchy( const anRenderModel *model ) const {
 		}
 	}
 
-	const idMD5Joint *modelJoints = model->GetJoints();
+	const anMD5Joint *modelJoints = model->GetJoints();
 	for ( int i = 0; i < jointInfo.Num(); i++ ) {
 		int jointNum = jointInfo[i].nameIndex;
 		if ( modelJoints[i].name != animationLib.JointName( jointNum ) ) {
@@ -980,33 +934,33 @@ void anM8DAnim::CheckModelHierarchy( const anRenderModel *model ) const {
 
 /***********************************************************************
 
-	arcAnimManager
+	anAnimManager
 
 ***********************************************************************/
 
 /*
 ====================
-arcAnimManager::arcAnimManager
+anAnimManager::anAnimManager
 ====================
 */
-arcAnimManager::arcAnimManager() {
+anAnimManager::anAnimManager() {
 }
 
 /*
 ====================
-arcAnimManager::~arcAnimManager
+anAnimManager::~anAnimManager
 ====================
 */
-arcAnimManager::~arcAnimManager() {
+anAnimManager::~anAnimManager() {
 	Shutdown();
 }
 
 /*
 ====================
-arcAnimManager::Shutdown
+anAnimManager::Shutdown
 ====================
 */
-void arcAnimManager::Shutdown() {
+void anAnimManager::Shutdown() {
 	animations.DeleteContents();
 	jointnames.Clear();
 	jointnamesHash.Free();
@@ -1014,27 +968,27 @@ void arcAnimManager::Shutdown() {
 
 /*
 ====================
-arcAnimManager::GetAnim
+anAnimManager::GetAnim
 ====================
 */
-anM8DAnim *arcAnimManager::GetAnim( const char *name ) {
-	anM8DAnim **animptrptr;
-	anM8DAnim *anim;
+anMD6Anim *anAnimManager::GetAnim( const char *name ) {
+	anMD6Anim **animptrptr;
+	anMD6Anim *anim;
 
 	// see if it has been asked for before
 	animptrptr = nullptr;
 	if ( animations.Get( name, &animptrptr ) ) {
 		anim = *animptrptr;
 	} else {
-		anString extension;
-		anString filename = name;
+		anStr extension;
+		anStr filename = name;
 
 		filename.ExtractFileExtension( extension );
 		if ( extension != MD5_ANIM_EXT ) {
 			return nullptr;
 		}
 
-		anim = new (TAG_ANIM) anM8DAnim();
+		anim = new (TAG_ANIM) anMD6Anim();
 		if ( !anim->LoadAnim( filename ) ) {
 			gameLocal.Warning( "Couldn't load anim: '%s'", filename.c_str() );
 			delete anim;
@@ -1048,10 +1002,10 @@ anM8DAnim *arcAnimManager::GetAnim( const char *name ) {
 
 /*
 ================
-arcAnimManager::Preload
+anAnimManager::Preload
 ================
 */
-void arcAnimManager::Preload( const idPreloadManifest &manifest ) {
+void anAnimManager::Preload( const idPreloadManifest &manifest ) {
 	if ( manifest.NumResources() >= 0 ) {
 		common->Printf( "Preloading anims...\n" );
 		int	start = Sys_Milliseconds();
@@ -1071,14 +1025,13 @@ void arcAnimManager::Preload( const idPreloadManifest &manifest ) {
 
 /*
 ================
-arcAnimManager::ReloadAnims
+anAnimManager::ReloadAnims
 ================
 */
-void arcAnimManager::ReloadAnims() {
-	int			i;
-	anM8DAnim	**animptr;
+void anAnimManager::ReloadAnims() {
+	anMD6Anim **animptr;
 
-	for ( i = 0; i < animations.Num(); i++ ) {
+	for ( int i = 0; i < animations.Num(); i++ ) {
 		animptr = animations.GetIndex( i );
 		if ( animptr != nullptr && *animptr != nullptr ) {
 			( *animptr )->Reload();
@@ -1088,14 +1041,12 @@ void arcAnimManager::ReloadAnims() {
 
 /*
 ================
-arcAnimManager::JointIndex
+anAnimManager::JointIndex
 ================
 */
-int	arcAnimManager::JointIndex( const char *name ) {
-	int i, hash;
-
-	hash = jointnamesHash.GenerateKey( name );
-	for ( i = jointnamesHash.First( hash ); i != -1; i = jointnamesHash.Next( i ) ) {
+int	anAnimManager::JointIndex( const char *name ) {
+	int hash = jointnamesHash.GenerateKey( name );
+	for ( int i = jointnamesHash.First( hash ); i != -1; i = jointnamesHash.Next( i ) ) {
 		if ( jointnames[i].Cmp( name ) == 0 ) {
 			return i;
 		}
@@ -1108,22 +1059,21 @@ int	arcAnimManager::JointIndex( const char *name ) {
 
 /*
 ================
-arcAnimManager::JointName
+anAnimManager::JointName
 ================
 */
-const char *arcAnimManager::JointName( int index ) const {
+const char *anAnimManager::JointName( int index ) const {
 	return jointnames[index];
 }
 
 /*
 ================
-arcAnimManager::ListAnims
+anAnimManager::ListAnims
 ================
 */
-void arcAnimManager::ListAnims() const {
-	int			i;
-	anM8DAnim	**animptr;
-	anM8DAnim	*anim;
+void anAnimManager::ListAnims() const {
+	anMD6Anim	**animptr;
+	anMD6Anim	*anim;
 	size_t		size;
 	size_t		s;
 	size_t		namesize;
@@ -1131,7 +1081,7 @@ void arcAnimManager::ListAnims() const {
 
 	num = 0;
 	size = 0;
-	for ( i = 0; i < animations.Num(); i++ ) {
+	for ( int i = 0; i < animations.Num(); i++ ) {
 		animptr = animations.GetIndex( i );
 		if ( animptr != nullptr && *animptr != nullptr ) {
 			anim = *animptr;
@@ -1143,7 +1093,7 @@ void arcAnimManager::ListAnims() const {
 	}
 
 	namesize = jointnames.Size() + jointnamesHash.Size();
-	for ( i = 0; i < jointnames.Num(); i++ ) {
+	for ( int i = 0; i < jointnames.Num(); i++ ) {
 		namesize += jointnames[i].Size();
 	}
 
@@ -1153,15 +1103,14 @@ void arcAnimManager::ListAnims() const {
 
 /*
 ================
-arcAnimManager::FlushUnusedAnims
+anAnimManager::FlushUnusedAnims
 ================
 */
-void arcAnimManager::FlushUnusedAnims() {
-	int						i;
-	anM8DAnim				**animptr;
-	anList<anM8DAnim *>		removeAnims;
+void anAnimManager::FlushUnusedAnims() {
+	anMD6Anim **animptr;
+	anList<anMD6Anim *> removeAnims;
 
-	for ( i = 0; i < animations.Num(); i++ ) {
+	for ( int i = 0; i < animations.Num(); i++ ) {
 		animptr = animations.GetIndex( i );
 		if ( animptr != nullptr && *animptr != nullptr ) {
 			if ( ( *animptr )->NumRefs() <= 0 ) {
@@ -1170,7 +1119,7 @@ void arcAnimManager::FlushUnusedAnims() {
 		}
 	}
 
-	for ( i = 0; i < removeAnims.Num(); i++ ) {
+	for ( int i = 0; i < removeAnims.Num(); i++ ) {
 		animations.Remove( removeAnims[i]->Name() );
 		delete removeAnims[i];
 	}

@@ -198,7 +198,7 @@ typedef struct st_lwEnvelope {
    char          *name;
    lwKey         *key;                 /* linked list of keys */
    int            nkeys;
-   int            behavior[ 2 ];       /* pre and post (extrapolation) */
+   int            behavior[2];       /* pre and post (extrapolation) */
    lwPlugin      *cfilter;             /* linked list of channel filters */
    int            ncfilters;
 } lwEnvelope;
@@ -219,7 +219,7 @@ typedef struct st_lwEParam {
 } lwEParam;
 
 typedef struct st_lwVParam {
-   float          val[ 3 ];
+   float          val[3];
    int            eindex;
 } lwVParam;
 
@@ -326,7 +326,7 @@ typedef struct st_lwImageMap {
 
 typedef struct st_lwProcedural {
    int            axis;
-   float          value[ 3 ];
+   float          value[3];
    char          *name;
    void          *data;
 } lwProcedural;
@@ -375,7 +375,7 @@ typedef struct st_lwTParam {
 } lwTParam;
 
 typedef struct st_lwCParam {
-   float          rgb[ 3 ];
+   float          rgb[3];
    int            eindex;
    lwTexture     *tex;                 /* linked list of texture layers */
 } lwCParam;
@@ -458,7 +458,7 @@ typedef struct st_lwVMapPt {
 /* points and polygons */
 
 typedef struct st_lwPoint {
-   float          pos[ 3 ];
+   float          pos[3];
    int            npols;               /* number of polygons sharing the point */
    int           *pol;                 /* array of polygon indexes */
    int            nvmaps;
@@ -467,7 +467,7 @@ typedef struct st_lwPoint {
 
 typedef struct st_lwPolVert {
    int            index;               /* index into the point array */
-   float          norm[ 3 ];
+   float          norm[3];
    int            nvmaps;
    lwVMapPt      *vm;                  /* array of vmap references */
 } lwPolVert;
@@ -478,7 +478,7 @@ typedef struct st_lwPolygon {
    int            smoothgrp;           /* smoothing group */
    int            flags;
    unsigned int   type;
-   float          norm[ 3 ];
+   float          norm[3];
    int            nverts;
    lwPolVert     *v;                   /* array of vertex records */
 } lwPolygon;
@@ -506,7 +506,7 @@ typedef struct st_lwLayer {
    int            index;
    int            parent;
    int            flags;
-   float          pivot[ 3 ];
+   float          pivot[3];
    float          bbox[ 6 ];
    lwPointList    point;
    lwPolygonList  polygon;

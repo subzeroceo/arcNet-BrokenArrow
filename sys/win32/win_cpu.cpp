@@ -402,7 +402,6 @@ CPUCount
 #define HT_DISABLED					2
 #define HT_SUPPORTED_NOT_ENABLED	3
 #define HT_CANNOT_DETECT			4
-
 int CPUCount( int &logicalNum, int &physicalNum ) {
 	int statusFlag;
 	SYSTEM_INFO info;
@@ -412,7 +411,7 @@ int CPUCount( int &logicalNum, int &physicalNum ) {
 	statusFlag = HT_NOT_CAPABLE;
 
 	info.dwNumberOfProcessors = 0;
-	GetSystemInfo (&info);
+	GetSystemInfo( &info );
 
 	// Number of physical processors in a non-Intel system
 	// or in a 32-bit Intel system with Hyper-Threading technology disabled
@@ -433,7 +432,7 @@ int CPUCount( int &logicalNum, int &physicalNum ) {
 
 		unsigned char i = 1, PHY_ID_MASK  = 0xFF, PHY_ID_SHIFT = 0;
 
-		while( i < logicalNum ) {
+		while ( i < logicalNum ) {
 			i *= 2;
  			PHY_ID_MASK  <<= 1;
 			PHY_ID_SHIFT++;
@@ -564,6 +563,11 @@ cpuid_t Sys_GetCPUId( void ) {
 	}
 
 	// check for Multi Media Extensions
+	//if ( HasAVX() ) {
+		//flags |= CPUID_AVX;
+	//}
+
+	// check for Multi Media Extensions
 	if ( HasMMX() ) {
 		flags |= CPUID_MMX;
 	}
@@ -603,7 +607,7 @@ cpuid_t Sys_GetCPUId( void ) {
 		flags |= CPUID_DAZ;
 	}
 
-	return (cpuid_t)flags;
+	return ( cpuid_t )flags;
 }
 
 
@@ -820,13 +824,13 @@ const char *Sys_FPU_GetState( void ) {
 		mov			numValues, eax
 	}
 
-	int ctrl = *( int*)&fpuState[0];
-	int stat = *( int*)&fpuState[4];
-	int tags = *( int*)&fpuState[8];
-	int inof = *( int*)&fpuState[12];
-	int inse = *( int*)&fpuState[16];
-	int opof = *( int*)&fpuState[20];
-	int opse = *( int*)&fpuState[24];
+	int ctrl = *(int *)&fpuState[0];
+	int stat = *(int *)&fpuState[4];
+	int tags = *(int *)&fpuState[8];
+	int inof = *(int *)&fpuState[12];
+	int inse = *(int *)&fpuState[16];
+	int opof = *(int *)&fpuState[20];
+	int opse = *(int *)&fpuState[24];
 
 	ptr = fpuString;
 	ptr += sprintf( ptr,"FPU State:\n"

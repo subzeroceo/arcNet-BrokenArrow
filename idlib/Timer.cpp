@@ -29,36 +29,36 @@ void anTimer::InitBaseClockTicks( void ) const {
 
 /*
 =================
-arcTimerReport::arcTimerReport
+anTimerReport::anTimerReport
 =================
 */
-arcTimerReport::arcTimerReport() {
+anTimerReport::anTimerReport() {
 }
 
 /*
 =================
-arcTimerReport::SetReportName
+anTimerReport::SetReportName
 =================
 */
-void arcTimerReport::SetReportName( const char *name ) {
+void anTimerReport::SetReportName( const char *name ) {
 	reportName = ( name ) ? name : "Timer Report";
 }
 
 /*
 =================
-arcTimerReport::~arcTimerReport
+anTimerReport::~anTimerReport
 =================
 */
-arcTimerReport::~arcTimerReport() {
+anTimerReport::~anTimerReport() {
 	Clear();
 }
 
 /*
 =================
-arcTimerReport::AddReport
+anTimerReport::AddReport
 =================
 */
-int arcTimerReport::AddReport( const char *name ) {
+int anTimerReport::AddReport( const char *name ) {
 	if ( name && *name ) {
 		names.Append( name );
 		return timers.Append( new anTimer() );
@@ -68,10 +68,10 @@ int arcTimerReport::AddReport( const char *name ) {
 
 /*
 =================
-arcTimerReport::Clear
+anTimerReport::Clear
 =================
 */
-void arcTimerReport::Clear() {
+void anTimerReport::Clear() {
 	timers.DeleteContents( true );
 	names.Clear();
 	reportName.Clear();
@@ -79,10 +79,10 @@ void arcTimerReport::Clear() {
 
 /*
 =================
-arcTimerReport::Reset
+anTimerReport::Reset
 =================
 */
-void arcTimerReport::Reset() {
+void anTimerReport::Reset() {
 	assert ( timers.Num() == names.Num() );
 	for ( int i = 0; i < timers.Num(); i++ ) {
 		timers[i]->Clear();
@@ -91,10 +91,10 @@ void arcTimerReport::Reset() {
 
 /*
 =================
-arcTimerReport::AddTime
+anTimerReport::AddTime
 =================
 */
-void arcTimerReport::AddTime( const char *name, anTimer *time ) {
+void anTimerReport::AddTime( const char *name, anTimer *time ) {
 	assert ( timers.Num() == names.Num() );
 	int i;
 	for ( i = 0; i < names.Num(); i++ ) {
@@ -114,10 +114,10 @@ void arcTimerReport::AddTime( const char *name, anTimer *time ) {
 
 /*
 =================
-arcTimerReport::PrintReport
+anTimerReport::PrintReport
 =================
 */
-void arcTimerReport::PrintReport() {
+void anTimerReport::PrintReport() {
 	assert( timers.Num() == names.Num() );
 	anLibrary::common->Printf( "Timing Report for %s\n", reportName.c_str() );
 	anLibrary::common->Printf( "-------------------------------\n" );

@@ -191,7 +191,7 @@ idSoundWorldLocal::AllocSoundEmitter
   this is called from the main thread
 ===================
 */
-ARCSoundEmitter *idSoundWorldLocal::AllocSoundEmitter() {
+anSoundEmitter *idSoundWorldLocal::AllocSoundEmitter() {
 	anAudioSystemLocal *emitter = AllocLocalSoundEmitter();
 
 	if ( idSoundSystemLocal::s_showStartSound.GetInteger() ) {
@@ -458,8 +458,8 @@ void idSoundWorldLocal::MixLoop( int current44kHz, int numSpeakers, float *final
 			if ( soundSystemLocal.efxloaded ) {
 				idSoundEffect *effect = nullptr;
 				int EnvironmentID = -1;
-				anString defaultStr( "default" );
-				anString listenerAreaStr( listenerArea );
+				anStr defaultStr( "default" );
+				anStr listenerAreaStr( listenerArea );
 
 				soundSystemLocal.EFXDatabase.FindEffect( listenerAreaStr, &effect, &EnvironmentID );
 				if ( !effect)
@@ -645,7 +645,7 @@ void idSoundWorldLocal::AVIClose( void ) {
 	if ( soundSystemLocal.snd_audio_hw->GetNumberOfSpeakers() == 2 ) {
 		// convert it to a wave file
 		anFile *rL, *lL, *wO;
-		anString	name;
+		anStr	name;
 
 		name = aviDemoPath + aviDemoName + ".wav";
 		wO = fileSystem->OpenFileWrite( name );
@@ -734,7 +734,7 @@ set at maxDistance
 */
 static const int MAX_PORTAL_TRACE_DEPTH = 10;
 
-void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTrace_t *prevStack, const int soundArea, const float dist, const anVec3& soundOrigin, anAudioSystemLocal *def ) {
+void idSoundWorldLocal::ResolveOrigin( const int stackDepth, const soundPortalTrace_t *prevStack, const int soundArea, const float dist, const anVec3 &soundOrigin, anAudioSystemLocal *def ) {
 
 	if ( dist >= def->distance ) {
 		// we can't possibly hear the sound through this chain of portals
@@ -891,8 +891,8 @@ idSoundWorldLocal::PlaceListener
   this is called by the main thread
 ===================
 */
-void idSoundWorldLocal::PlaceListener( const anVec3& origin, const anMat3& axis,
-									const int listenerId, const int gameTime, const anString& areaName  ) {
+void idSoundWorldLocal::PlaceListener( const anVec3 &origin, const anMat3 &axis,
+									const int listenerId, const int gameTime, const anStr& areaName  ) {
 
 	int current44kHzTime;
 
@@ -1225,7 +1225,7 @@ void idSoundWorldLocal::ReadFromSaveGame( anFile *savefile ) {
 	anAudioSystemLocal *def;
 	anVec3 origin;
 	anMat3 axis;
-	anString soundShader;
+	anStr soundShader;
 
 	ClearAllSoundEmitters();
 
@@ -1390,7 +1390,7 @@ void idSoundWorldLocal::ReadFromSaveGameSoundChannel( anFile *saveGame, idSoundC
 idSoundWorldLocal::EmitterForIndex
 ===================
 */
-ARCSoundEmitter	*idSoundWorldLocal::EmitterForIndex( int index ) {
+anSoundEmitter	*idSoundWorldLocal::EmitterForIndex( int index ) {
 	if ( index == 0 ) {
 		return nullptr;
 	}
@@ -1487,7 +1487,7 @@ void idSoundWorldLocal::PlayShaderDirectly( const char *shaderName, int channel 
 		localSound = AllocLocalSoundEmitter();
 	}
 
-	static arcRandom	rnd;
+	static anRandom	rnd;
 	float	diversity = rnd.RandomFloat();
 
 	localSound->StartSound( shader, ( channel == -1 ) ? SCHANNEL_ONE : channel , diversity, SSF_GLOBAL );
@@ -1793,11 +1793,11 @@ void idSoundWorldLocal::AddChannelContribution( anAudioSystemLocal *sound, idSou
 					chan->GatherChannelSamples( chan->openalStreamingOffset * sample->objectInfo.nChannels, MIXBUFFER_SAMPLES * sample->objectInfo.nChannels, alignedInputSamples );
 					for ( int i = 0; i < ( MIXBUFFER_SAMPLES * sample->objectInfo.nChannels ); i++ ) {
 						if ( alignedInputSamples[i] < -32768.0f )
-							(( short *)alignedInputSamples)[i] = -32768;
+							((short *)alignedInputSamples)[i] = -32768;
 						else if ( alignedInputSamples[i] > 32767.0f )
-							(( short *)alignedInputSamples)[i] = 32767;
+							((short *)alignedInputSamples)[i] = 32767;
 						else
-							(( short *)alignedInputSamples)[i] = anMath::FtoiFast( alignedInputSamples[i] );
+							((short *)alignedInputSamples)[i] = anMath::FtoiFast( alignedInputSamples[i] );
 					}
 					alBufferData( buffers[j], chan->leadinSample->objectInfo.nChannels == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, alignedInputSamples, MIXBUFFER_SAMPLES * sample->objectInfo.nChannels * sizeof( short ), 44100 );
 					chan->openalStreamingOffset += MIXBUFFER_SAMPLES;
@@ -2025,7 +2025,7 @@ float idSoundWorldLocal::FindAmplitude( anAudioSystemLocal *sound, const int loc
 		} else {
 			int offset = (localTime - localTriggerTimes);	// offset in samples
 			int size = ( looping ? chan->soundShader->entries[0]->LengthIn44kHzSamples() : chan->leadinSample->LengthIn44kHzSamples() );
-			short *amplitudeData = ( short *)( looping ? chan->soundShader->entries[0]->amplitudeData : chan->leadinSample->amplitudeData );
+			short *amplitudeData = (short *)( looping ? chan->soundShader->entries[0]->amplitudeData : chan->leadinSample->amplitudeData );
 
 			if ( amplitudeData ) {
 				// when the amplitudeData is present use that fill a dummy sourceBuffer

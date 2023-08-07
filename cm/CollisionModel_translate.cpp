@@ -26,7 +26,7 @@ anCollisionModelDetectLocal::TranslateEdgeThroughEdge
   calculates fraction of the translation completed at which the edges collide
 ================
 */
-ARC_INLINE int anCollisionModelDetectLocal::TranslateEdgeThroughEdge( anVec3 &cross, anPluecker &l1, anPluecker &l2, float *fraction ) {
+inline int anCollisionModelDetectLocal::TranslateEdgeThroughEdge( anVec3 &cross, anPluecker &l1, anPluecker &l2, float *fraction ) {
 	float d, t;
 
 	/*
@@ -151,7 +151,7 @@ ARC_INLINE int anCollisionModelDetectLocal::TranslateEdgeThroughEdge( anVec3 &cr
 CM_AddContact
 ================
 */
-ARC_INLINE void CM_AddContact( cm_traceWork_t *tw ) {
+inline void CM_AddContact( cm_traceWork_t *tw ) {
 	if ( tw->numContacts >= tw->maxContacts ) {
 		return;
 	}
@@ -169,7 +169,7 @@ CM_SetVertexSidedness
   stores for the given model vertex at which side of one of the trm edges it passes
 ================
 */
-ARC_INLINE void CM_SetVertexSidedness( cm_vertex_t *v, const anPluecker &vpl, const anPluecker &epl, const int bitNum ) {
+inline void CM_SetVertexSidedness( cm_vertex_t *v, const anPluecker &vpl, const anPluecker &epl, const int bitNum ) {
 	if ( !( v->sideSet & ( 1<<bitNum ) ) ) {
 		float fl;
 		fl = vpl.PermutedInnerProduct( epl );
@@ -185,7 +185,7 @@ CM_SetEdgeSidedness
   stores for the given model edge at which side one of the trm vertices
 ================
 */
-ARC_INLINE void CM_SetEdgeSidedness( cm_edge_t *edge, const anPluecker &vpl, const anPluecker &epl, const int bitNum ) {
+inline void CM_SetEdgeSidedness( cm_edge_t *edge, const anPluecker &vpl, const anPluecker &epl, const int bitNum ) {
 	if ( !( edge->sideSet & (1<<bitNum ) ) ) {
 		float fl;
 		fl = vpl.PermutedInnerProduct( epl );

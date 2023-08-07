@@ -6,7 +6,7 @@
 /*
 ===========================================================================
 
-an Interaction implementation
+anInteraction implementation
 
 ===========================================================================
 */
@@ -387,10 +387,10 @@ static srfTriangles_t *R_CreateLightTris( const anRenderEntityLocal *ent,
 
 /*
 ===============
-an Interaction::an Interaction
+anInteraction::anInteraction
 ===============
 */
-an Interaction::an Interaction( void ) {
+anInteraction::anInteraction( void ) {
 	numSurfaces				= 0;
 	surfaces				= nullptr;
 	entityDef				= nullptr;
@@ -406,17 +406,17 @@ an Interaction::an Interaction( void ) {
 
 /*
 ===============
-an Interaction::AllocAndLink
+anInteraction::AllocAndLink
 ===============
 */
-an Interaction *an Interaction::AllocAndLink( anRenderEntityLocal *edef, anRenderLightsLocal *ldef ) {
+anInteraction *anInteraction::AllocAndLink( anRenderEntityLocal *edef, anRenderLightsLocal *ldef ) {
 	if ( !edef || !ldef ) {
-		common->Error( "an Interaction::AllocAndLink: nullptr parm" );
+		common->Error( "anInteraction::AllocAndLink: nullptr parm" );
 	}
 
 	anRenderWorldLocal *renderWorld = edef->world;
 
-	an Interaction *interaction = renderWorld->interactionAllocator.Alloc();
+	anInteraction *interaction = renderWorld->interactionAllocator.Alloc();
 
 	// link and initialize
 	interaction->dynamicModelFrameCount = 0;
@@ -427,7 +427,7 @@ an Interaction *an Interaction::AllocAndLink( anRenderEntityLocal *edef, anRende
 	interaction->numSurfaces = -1;		// not checked yet
 	interaction->surfaces = nullptr;
 
-	interaction->frustumState = an Interaction::FRUSTUM_UNINITIALIZED;
+	interaction->frustumState = anInteraction::FRUSTUM_UNINITIALIZED;
 	interaction->frustumAreas = nullptr;
 
 	// link at the start of the entity's list
@@ -454,7 +454,7 @@ an Interaction *an Interaction::AllocAndLink( anRenderEntityLocal *edef, anRende
 	if ( renderWorld->interactionTable ) {
 		int index = ldef->index * renderWorld->interactionTableWidth + edef->index;
 		if ( renderWorld->interactionTable[index] != nullptr ) {
-			common->Error( "an Interaction::AllocAndLink: non nullptr table entry" );
+			common->Error( "anInteraction::AllocAndLink: non nullptr table entry" );
 		}
 		renderWorld->interactionTable[index] = interaction;
 	}
@@ -464,13 +464,13 @@ an Interaction *an Interaction::AllocAndLink( anRenderEntityLocal *edef, anRende
 
 /*
 ===============
-an Interaction::FreeSurfaces
+anInteraction::FreeSurfaces
 
 Frees the surfaces, but leaves the interaction linked in, so it
 will be regenerated automatically
 ===============
 */
-void an Interaction::FreeSurfaces( void ) {
+void anInteraction::FreeSurfaces( void ) {
 	if ( this->surfaces ) {
 		for ( int i = 0; i < this->numSurfaces; i++ ) {
 			surfaceInteraction_t *sint = &this->surfaces[i];
@@ -499,10 +499,10 @@ void an Interaction::FreeSurfaces( void ) {
 
 /*
 ===============
-an Interaction::Unlink
+anInteraction::Unlink
 ===============
 */
-void an Interaction::Unlink( void ) {
+void anInteraction::Unlink( void ) {
 	// unlink from the entity's list
 	if ( this->entityPrev ) {
 		this->entityPrev->entityNext = this->entityNext;
@@ -532,18 +532,18 @@ void an Interaction::Unlink( void ) {
 
 /*
 ===============
-an Interaction::UnlinkAndFree
+anInteraction::UnlinkAndFree
 
 Removes links and puts it back on the free list.
 ===============
 */
-void an Interaction::UnlinkAndFree( void ) {
+void anInteraction::UnlinkAndFree( void ) {
 	// clear the table pointer
 	anRenderWorldLocal *renderWorld = this->lightDef->world;
 	if ( renderWorld->interactionTable ) {
 		int index = this->lightDef->index * renderWorld->interactionTableWidth + this->entityDef->index;
 		if ( renderWorld->interactionTable[index] != this ) {
-			common->Error( "an Interaction::UnlinkAndFree: interactionTable wasn't set" );
+			common->Error( "anInteraction::UnlinkAndFree: interactionTable wasn't set" );
 		}
 		renderWorld->interactionTable[index] = nullptr;
 	}
@@ -564,12 +564,12 @@ void an Interaction::UnlinkAndFree( void ) {
 
 /*
 ===============
-an Interaction::MakeEmpty
+anInteraction::MakeEmpty
 
 Makes the interaction empty and links it at the end of the entity's and light's interaction lists.
 ===============
 */
-void an Interaction::MakeEmpty( void ) {
+void anInteraction::MakeEmpty( void ) {
 	// an empty interaction has no surfaces
 	numSurfaces = 0;
 
@@ -598,22 +598,22 @@ void an Interaction::MakeEmpty( void ) {
 
 /*
 ===============
-an Interaction::HasShadows
+anInteraction::HasShadows
 ===============
 */
-ARC_INLINE bool an Interaction::HasShadows( void ) const {
+inline bool anInteraction::HasShadows( void ) const {
 	return ( !lightDef->parms.noShadows && !entityDef->parms.noShadow && lightDef->lightShader->LightCastsShadows() );
 }
 
 /*
 ===============
-an Interaction::MemoryUsed
+anInteraction::MemoryUsed
 
 Counts up the memory used by all the surfaceInteractions, which
 will be used to determine when we need to start purging old interactions.
 ===============
 */
-int an Interaction::MemoryUsed( void ) {
+int anInteraction::MemoryUsed( void ) {
 	int total = 0;
 
 	for ( int i = 0; i < numSurfaces; i++ ) {
@@ -628,10 +628,10 @@ int an Interaction::MemoryUsed( void ) {
 
 /*
 ==================
-an Interaction::CalcInteractionScissorRectangle
+anInteraction::CalcInteractionScissorRectangle
 ==================
 */
-anScreenRect an Interaction::CalcInteractionScissorRectangle( const anFrustum &viewFrustum ) {
+anScreenRect anInteraction::CalcInteractionScissorRectangle( const anFrustum &viewFrustum ) {
 	anBounds		projectionBounds;
 	anScreenRect	portalRect;
 	anScreenRect	scissorRect;
@@ -648,14 +648,14 @@ anScreenRect an Interaction::CalcInteractionScissorRectangle( const anFrustum &v
 	// the following is Mr.E's code
 
 	// frustum must be initialized and valid
-	if ( frustumState == an Interaction::FRUSTUM_UNINITIALIZED || frustumState == an Interaction::FRUSTUM_INVALID ) {
+	if ( frustumState == anInteraction::FRUSTUM_UNINITIALIZED || frustumState == anInteraction::FRUSTUM_INVALID ) {
 		return lightDef->viewLight->scissorRect;
 	}
 
 	// calculate scissors for the portals through which the interaction is visible
 	if ( r_useInteractionScissors.GetInteger() > 1 ) {
 		areaNumRef_t *area;
-		if ( frustumState == an Interaction::FRUSTUM_VALID ) {
+		if ( frustumState == anInteraction::FRUSTUM_VALID ) {
 			// retrieve all the areas the interaction frustum touches
 			for ( areaReference_t *ref = entityDef->entityRefs; ref; ref = ref->ownerNext ) {
 				area = entityDef->world->areaNumRefAllocator.Alloc();
@@ -664,7 +664,7 @@ anScreenRect an Interaction::CalcInteractionScissorRectangle( const anFrustum &v
 				frustumAreas = area;
 			}
 			frustumAreas = tr.viewDef->renderWorld->FloodFrustumAreas( frustum, frustumAreas );
-			frustumState = an Interaction::FRUSTUM_VALIDAREAS;
+			frustumState = anInteraction::FRUSTUM_VALIDAREAS;
 		}
 
 		portalRect.Clear();
@@ -707,22 +707,22 @@ anScreenRect an Interaction::CalcInteractionScissorRectangle( const anFrustum &v
 
 /*
 ===================
-an Interaction::CullInteractionByViewFrustum
+anInteraction::CullInteractionByViewFrustum
 ===================
 */
-bool an Interaction::CullInteractionByViewFrustum( const anFrustum &viewFrustum ) {
+bool anInteraction::CullInteractionByViewFrustum( const anFrustum &viewFrustum ) {
 	if ( !r_useInteractionCulling.GetBool() ) {
 		return false;
 	}
 
-	if ( frustumState == an Interaction::FRUSTUM_INVALID ) {
+	if ( frustumState == anInteraction::FRUSTUM_INVALID ) {
 		return false;
 	}
 
-	if ( frustumState == an Interaction::FRUSTUM_UNINITIALIZED ) {
+	if ( frustumState == anInteraction::FRUSTUM_UNINITIALIZED ) {
 		frustum.FromProjection( anBox( entityDef->referenceBounds, entityDef->parms.origin, entityDef->parms.axis ), lightDef->globalLightOrigin, MAX_WORLD_SIZE );
 		if ( !frustum.IsValid() ) {
-			frustumState = an Interaction::FRUSTUM_INVALID;
+			frustumState = anInteraction::FRUSTUM_INVALID;
 			return false;
 		}
 
@@ -732,7 +732,7 @@ bool an Interaction::CullInteractionByViewFrustum( const anFrustum &viewFrustum 
 			frustum.ConstrainToBox( anBox( lightDef->frustumTris->bounds ) );
 		}
 
-		frustumState = an Interaction::FRUSTUM_VALID;
+		frustumState = anInteraction::FRUSTUM_VALID;
 	}
 
 	if ( !viewFrustum.IntersectsFrustum( frustum ) ) {
@@ -752,7 +752,7 @@ bool an Interaction::CullInteractionByViewFrustum( const anFrustum &viewFrustum 
 
 /*
 ====================
-an Interaction::CreateInteraction
+anInteraction::CreateInteraction
 
 Called when a entityDef and a lightDef are both present in a
 portalArea, and might be visible.  Performs cull checking before doing the expensive
@@ -764,7 +764,7 @@ otherwise it will be marked as deferred.
 The results of this are cached and valid until the light or entity change.
 ====================
 */
-void an Interaction::CreateInteraction( const anRenderModel *model ) {
+void anInteraction::CreateInteraction( const anRenderModel *model ) {
 	const anMaterial *	lightShader = lightDef->lightShader;
 
 	tr.pc.c_createInteractions++;
@@ -946,7 +946,7 @@ static bool R_PotentiallyInsideInfiniteShadow( const srfTriangles_t *occluder, c
 
 /*
 ==================
-an Interaction::AddActiveInteraction
+anInteraction::AddActiveInteraction
 
 Create and add any necessary light and shadow triangles
 
@@ -955,7 +955,7 @@ with this type of light, it can be skipped, but we might need to
 instantiate the dynamic model to find out
 ==================
 */
-void an Interaction::AddActiveInteraction( void ) {
+void anInteraction::AddActiveInteraction( void ) {
 	viewLight_t *	vLight;
 	viewEntity_t *	vEntity;
 	anScreenRect	shadowScissor;
@@ -1205,7 +1205,7 @@ void R_ShowInteractionMemory_f( const anCommandArgs &args ) {
 		}
 		entities++;
 
-		for ( an Interaction *inter = def->firstInteraction; inter != nullptr; inter = inter->entityNext ) {
+		for ( anInteraction *inter = def->firstInteraction; inter != nullptr; inter = inter->entityNext ) {
 			interactions++;
 			total += inter->MemoryUsed();
 

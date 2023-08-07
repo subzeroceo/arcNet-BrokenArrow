@@ -70,83 +70,83 @@ private:
 
 extern anSphere	sphere_zero;
 
-ARC_INLINE anSphere::anSphere( void ) {
+inline anSphere::anSphere( void ) {
 }
 
-ARC_INLINE anSphere::anSphere( const anVec3 &point ) {
+inline anSphere::anSphere( const anVec3 &point ) {
 	origin = point;
 	radius = 0.0f;
 }
 
-ARC_INLINE anSphere::anSphere( const anVec3 &point, const float r ) {
+inline anSphere::anSphere( const anVec3 &point, const float r ) {
 	origin = point;
 	radius = r;
 }
 
-ARC_INLINE float anSphere::operator[]( const int index ) const {
+inline float anSphere::operator[]( const int index ) const {
 	return ((float *) &origin)[index];
 }
 
-ARC_INLINE float &anSphere::operator[]( const int index ) {
+inline float &anSphere::operator[]( const int index ) {
 	return ((float *) &origin)[index];
 }
 
-ARC_INLINE anSphere anSphere::operator+( const anVec3 &t ) const {
+inline anSphere anSphere::operator+( const anVec3 &t ) const {
 	return anSphere( origin + t, radius );
 }
 
-ARC_INLINE anSphere &anSphere::operator+=( const anVec3 &t ) {
+inline anSphere &anSphere::operator+=( const anVec3 &t ) {
 	origin += t;
 	return *this;
 }
 
-ARC_INLINE bool anSphere::Compare( const anSphere &a ) const {
+inline bool anSphere::Compare( const anSphere &a ) const {
 	return ( origin.Compare( a.origin ) && radius == a.radius );
 }
 
-ARC_INLINE bool anSphere::Compare( const anSphere &a, const float epsilon ) const {
+inline bool anSphere::Compare( const anSphere &a, const float epsilon ) const {
 	return ( origin.Compare( a.origin, epsilon ) && anMath::Fabs( radius - a.radius ) <= epsilon );
 }
 
-ARC_INLINE bool anSphere::operator==( const anSphere &a ) const {
+inline bool anSphere::operator==( const anSphere &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool anSphere::operator!=( const anSphere &a ) const {
+inline bool anSphere::operator!=( const anSphere &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void anSphere::Clear( void ) {
+inline void anSphere::Clear( void ) {
 	origin.Zero();
 	radius = -1.0f;
 }
 
-ARC_INLINE void anSphere::Zero( void ) {
+inline void anSphere::Zero( void ) {
 	origin.Zero();
 	radius = 0.0f;
 }
 
-ARC_INLINE void anSphere::SetOrigin( const anVec3 &o ) {
+inline void anSphere::SetOrigin( const anVec3 &o ) {
 	origin = o;
 }
 
-ARC_INLINE void anSphere::SetRadius( const float r ) {
+inline void anSphere::SetRadius( const float r ) {
 	radius = r;
 }
 
-ARC_INLINE const anVec3 &anSphere::GetOrigin( void ) const {
+inline const anVec3 &anSphere::GetOrigin( void ) const {
 	return origin;
 }
 
-ARC_INLINE float anSphere::GetRadius( void ) const {
+inline float anSphere::GetRadius( void ) const {
 	return radius;
 }
 
-ARC_INLINE bool anSphere::IsCleared( void ) const {
+inline bool anSphere::IsCleared( void ) const {
 	return ( radius < 0.0f );
 }
 
-ARC_INLINE bool anSphere::AddPoint( const anVec3 &p ) {
+inline bool anSphere::AddPoint( const anVec3 &p ) {
 	if ( radius < 0.0f ) {
 		origin = p;
 		radius = 0.0f;
@@ -164,7 +164,7 @@ ARC_INLINE bool anSphere::AddPoint( const anVec3 &p ) {
 	}
 }
 
-ARC_INLINE bool anSphere::AddSphere( const anSphere &s ) {
+inline bool anSphere::AddSphere( const anSphere &s ) {
 	if ( radius < 0.0f ) {
 		origin = s.origin;
 		radius = s.radius;
@@ -182,32 +182,32 @@ ARC_INLINE bool anSphere::AddSphere( const anSphere &s ) {
 	}
 }
 
-ARC_INLINE anSphere anSphere::Expand( const float d ) const {
+inline anSphere anSphere::Expand( const float d ) const {
 	return anSphere( origin, radius + d );
 }
 
-ARC_INLINE anSphere &anSphere::ExpandSelf( const float d ) {
+inline anSphere &anSphere::ExpandSelf( const float d ) {
 	radius += d;
 	return *this;
 }
 
-ARC_INLINE anSphere anSphere::Translate( const anVec3 &translation ) const {
+inline anSphere anSphere::Translate( const anVec3 &translation ) const {
 	return anSphere( origin + translation, radius );
 }
 
-ARC_INLINE anSphere &anSphere::TranslateSelf( const anVec3 &translation ) {
+inline anSphere &anSphere::TranslateSelf( const anVec3 &translation ) {
 	origin += translation;
 	return *this;
 }
 
-ARC_INLINE bool anSphere::ContainsPoint( const anVec3 &p ) const {
+inline bool anSphere::ContainsPoint( const anVec3 &p ) const {
 	if ( ( p - origin ).LengthSqr() > radius * radius ) {
 		return false;
 	}
 	return true;
 }
 
-ARC_INLINE bool anSphere::IntersectsSphere( const anSphere &s ) const {
+inline bool anSphere::IntersectsSphere( const anSphere &s ) const {
 	float r = s.radius + radius;
 	if ( ( s.origin - origin ).LengthSqr() > r * r ) {
 		return false;
@@ -215,29 +215,29 @@ ARC_INLINE bool anSphere::IntersectsSphere( const anSphere &s ) const {
 	return true;
 }
 
-ARC_INLINE void anSphere::FromPointTranslation( const anVec3 &point, const anVec3 &translation ) {
+inline void anSphere::FromPointTranslation( const anVec3 &point, const anVec3 &translation ) {
 	origin = point + 0.5f * translation;
 	radius = anMath::Sqrt( 0.5f * translation.LengthSqr() );
 }
 
-ARC_INLINE void anSphere::FromSphereTranslation( const anSphere &sphere, const anVec3 &start, const anVec3 &translation ) {
+inline void anSphere::FromSphereTranslation( const anSphere &sphere, const anVec3 &start, const anVec3 &translation ) {
 	origin = start + sphere.origin + 0.5f * translation;
 	radius = anMath::Sqrt( 0.5f * translation.LengthSqr() ) + sphere.radius;
 }
 
-ARC_INLINE void anSphere::FromPointRotation( const anVec3 &point, const anRotation &rotation ) {
+inline void anSphere::FromPointRotation( const anVec3 &point, const anRotation &rotation ) {
 	anVec3 end = rotation * point;
 	origin = ( point + end ) * 0.5f;
 	radius = anMath::Sqrt( 0.5f * ( end - point ).LengthSqr() );
 }
 
-ARC_INLINE void anSphere::FromSphereRotation( const anSphere &sphere, const anVec3 &start, const anRotation &rotation ) {
+inline void anSphere::FromSphereRotation( const anSphere &sphere, const anVec3 &start, const anRotation &rotation ) {
 	anVec3 end = rotation * sphere.origin;
 	origin = start + ( sphere.origin + end ) * 0.5f;
 	radius = anMath::Sqrt( 0.5f * ( end - sphere.origin ).LengthSqr() ) + sphere.radius;
 }
 
-ARC_INLINE void anSphere::AxisProjection( const anVec3 &dir, float &min, float &max ) const {
+inline void anSphere::AxisProjection( const anVec3 &dir, float &min, float &max ) const {
 	float d;
 	d = dir * origin;
 	min = d - radius;

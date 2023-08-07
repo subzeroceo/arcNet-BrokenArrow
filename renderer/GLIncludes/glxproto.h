@@ -125,10 +125,10 @@ typedef CARD32 GLXContextTag;
 ** a single X extension request.
 */
 typedef struct GLXRender {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextTag contextTag;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextTag 	contextTag;
 } xGLXRenderReq;
 #define sz_xGLXRenderReq 8
 
@@ -145,13 +145,13 @@ typedef struct GLXRender {
 ** the data that follows.
 */
 typedef struct GLXRenderLarge {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextTag contextTag;
-    CARD16	requestNumber;
-    CARD16	requestTotal;
-    CARD32	dataBytes;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextTag 	contextTag;
+    CARD16			requestNumber;
+    CARD16			requestTotal;
+    CARD32			dataBytes;
 } xGLXRenderLargeReq;
 #define sz_xGLXRenderLargeReq 16
 
@@ -161,10 +161,10 @@ typedef struct GLXRenderLarge {
 ** opcodes.
 */
 typedef struct GLXSingle {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextTag contextTag;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextTag	contextTag;
 } xGLXSingleReq;
 #define sz_xGLXSingleReq 8
 
@@ -172,11 +172,11 @@ typedef struct GLXSingle {
 ** glXQueryVersion request
 */
 typedef struct GLXQueryVersion {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    CARD32	majorVersion;
-    CARD32	minorVersion;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    CARD32			majorVersion;
+    CARD32			minorVersion;
 } xGLXQueryVersionReq;
 #define sz_xGLXQueryVersionReq 12
 
@@ -184,10 +184,10 @@ typedef struct GLXQueryVersion {
 ** glXIsDirect request
 */
 typedef struct GLXIsDirect {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextID context;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextID 	context;
 } xGLXIsDirectReq;
 #define sz_xGLXIsDirectReq 8
 
@@ -195,16 +195,16 @@ typedef struct GLXIsDirect {
 ** glXCreateContext request
 */
 typedef struct GLXCreateContext {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextID context;
-    CARD32	visual;
-    CARD32	screen;
-    GLXContextID shareList;
-    BOOL	isDirect;
-    CARD8	reserved1;
-    CARD16	reserved2;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextID 	context;
+    CARD32 			visual;
+    CARD32 			screen;
+    GLXContextID 	shareList;
+    BOOL			isDirect;
+    CARD8			reserved1;
+    CARD16			reserved2;
 } xGLXCreateContextReq;
 #define sz_xGLXCreateContextReq 24
 
@@ -212,10 +212,10 @@ typedef struct GLXCreateContext {
 ** glXDestroyContext request
 */
 typedef struct GLXDestroyContext {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextID context;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextID 	context;
 } xGLXDestroyContextReq;
 #define sz_xGLXDestroyContextReq 8
 
@@ -223,12 +223,12 @@ typedef struct GLXDestroyContext {
 ** glXMakeCurrent request
 */
 typedef struct GLXMakeCurrent {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXDrawable drawable;
-    GLXContextID context;
-    GLXContextTag oldContextTag;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXDrawable 	drawable;
+    GLXContextID 	context;
+    GLXContextTag 	oldContextTag;
 } xGLXMakeCurrentReq;
 #define sz_xGLXMakeCurrentReq 16
 
@@ -236,10 +236,10 @@ typedef struct GLXMakeCurrent {
 ** glXWaitGL request
 */
 typedef struct GLXWaitGL {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextTag contextTag;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextTag 	contextTag;
 } xGLXWaitGLReq;
 #define sz_xGLXWaitGLReq 8
 
@@ -247,10 +247,10 @@ typedef struct GLXWaitGL {
 ** glXWaitX request
 */
 typedef struct GLXWaitX {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextTag contextTag;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextTag 	contextTag;
 } xGLXWaitXReq;
 #define sz_xGLXWaitXReq 8
 
@@ -258,13 +258,13 @@ typedef struct GLXWaitX {
 ** glXCopyContext request
 */
 typedef struct GLXCopyContext {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextID source;
-    GLXContextID dest;
-    CARD32	mask;
-    GLXContextTag contextTag;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextID 	source;
+    GLXContextID 	dest;
+    CARD32			mask;
+    GLXContextTag 	contextTag;
 } xGLXCopyContextReq;
 #define sz_xGLXCopyContextReq 20
 
@@ -272,11 +272,11 @@ typedef struct GLXCopyContext {
 ** glXSwapBuffers request
 */
 typedef struct GLXSwapBuffers {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextTag contextTag;
-    GLXDrawable drawable;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextTag	contextTag;
+    GLXDrawable 	drawable;
 } xGLXSwapBuffersReq;
 #define sz_xGLXSwapBuffersReq 12
 
@@ -284,14 +284,14 @@ typedef struct GLXSwapBuffers {
 ** glXUseXFont request
 */
 typedef struct GLXUseXFont {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXContextTag contextTag;
-    CARD32	font;
-    CARD32	first;
-    CARD32	count;
-    CARD32	listBase;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXContextTag 	contextTag;
+    CARD32			font;
+    CARD32			first;
+    CARD32			count;
+    CARD32			listBase;
 } xGLXUseXFontReq;
 #define sz_xGLXUseXFontReq 24
 
@@ -299,13 +299,13 @@ typedef struct GLXUseXFont {
 ** glXCreateGLXPixmap request
 */
 typedef struct GLXCreateGLXPixmap {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    CARD32	screen;
-    CARD32	visual;
-    CARD32	pixmap;
-    GLXPixmap	glxpixmap;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    CARD32			screen;
+    CARD32			visual;
+    CARD32			pixmap;
+    GLXPixmap		glxpixmap;
 } xGLXCreateGLXPixmapReq;
 #define sz_xGLXCreateGLXPixmapReq 20
 
@@ -313,10 +313,10 @@ typedef struct GLXCreateGLXPixmap {
 ** glXDestroyGLXPixmap request
 */
 typedef struct GLXDestroyGLXPixmap {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    GLXPixmap	glxpixmap;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    GLXPixmap		glxpixmap;
 } xGLXDestroyGLXPixmapReq;
 #define sz_xGLXDestroyGLXPixmapReq 8
 
@@ -324,10 +324,10 @@ typedef struct GLXDestroyGLXPixmap {
 ** glXGetVisualConfigs request
 */
 typedef struct GLXGetVisualConfigs {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    CARD32	screen;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    CARD32			screen;
 } xGLXGetVisualConfigsReq;
 #define sz_xGLXGetVisualConfigsReq 8
 
@@ -335,11 +335,11 @@ typedef struct GLXGetVisualConfigs {
 ** glXVendorPrivate request.
 */
 typedef struct GLXVendorPrivate {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    CARD32	vendorCode;		/* vendor-specific opcode */
-    GLXContextTag contextTag;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    CARD32			vendorCode;		/* vendor-specific opcode */
+    GLXContextTag	contextTag;
     /*
     ** More data may follow; this is just the header.
     */
@@ -350,11 +350,11 @@ typedef struct GLXVendorPrivate {
 ** glXVendorPrivateWithReply request
 */
 typedef struct GLXVendorPrivateWithReply {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    CARD32	vendorCode;		/* vendor-specific opcode */
-    GLXContextTag contextTag;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    CARD32			vendorCode;		/* vendor-specific opcode */
+    GLXContextTag 	contextTag;
     /*
     ** More data may follow; this is just the header.
     */
@@ -365,10 +365,10 @@ typedef struct GLXVendorPrivateWithReply {
 ** glXQueryExtensionsString request
 */
 typedef struct GLXQueryExtensionsString {
-    CARD8	reqType;
-    CARD8	glxCode;
-    CARD16	length;
-    CARD32	screen;
+    CARD8			reqType;
+    CARD8			glxCode;
+    CARD16			length;
+    CARD32			screen;
 } xGLXQueryExtensionsStringReq;
 #define sz_xGLXQueryExtensionsStringReq 8
 

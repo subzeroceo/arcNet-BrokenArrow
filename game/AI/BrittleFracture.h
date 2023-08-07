@@ -42,7 +42,7 @@ public:
 	virtual void				Think( void );
 	virtual void				ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &impulse, bool splash = false );
 	virtual void				AddForce( anEntity *ent, int id, const anVec3 &point, const anVec3 &force );
-	virtual void				AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor );
+	virtual void				AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor );
 	virtual void				Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
 
 	void						ProjectDecal( const anVec3 &point, const anVec3 &dir, const int time, const char *damageDefName );
@@ -71,7 +71,7 @@ private:
 	float						density;
 	float						friction;
 	float						bouncyness;
-	anString						fxFracture;
+	anStr						fxFracture;
 
 	// state
 	anPhysics_StaticMulti		physicsObj;

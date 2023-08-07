@@ -207,7 +207,7 @@ public:
 };
 
 template<class type>
-ARC_INLINE anDecl *anDeclAllocator() {
+inline anDecl *anDeclAllocator() {
 	return new ( TAG_DECL )type;
 }
 
@@ -252,7 +252,7 @@ public:
 
 	virtual const anDecl *	FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault = true ) = 0;
 
-	virtual void					ReloadFile( const char* filename, bool force ) = 0;
+	virtual void					ReloadFile( const char *filename, bool force ) = 0;
 
 							// Returns the number of decls of the given type.
 	virtual int						GetNumDecls( declType_t type ) = 0;
@@ -271,7 +271,7 @@ public:
 	virtual anDecl *		CreateNewDecl( declType_t type, const char *name, const char *fileName ) = 0;
 
 							// BSM - Added for the material editors rename capabilities
-	virtual bool					RenameDecl( declType_t type, const char* oldName, const char* newName ) = 0;
+	virtual bool					RenameDecl( declType_t type, const char *oldName, const char *newName ) = 0;
 
 							// When media files are loaded, a reference line can be printed at a
 							// proper indentation if decl_show is set
@@ -294,12 +294,12 @@ public:
 extern anDeclManager		*declManager;
 
 template<declType_t type>
-ARC_INLINE void ListDecls_f( const anCommandArgs &args ) {
+inline void ListDecls_f( const anCommandArgs &args ) {
 	declManager->ListType( args, type );
 }
 
 template<declType_t type>
-ARC_INLINE void PrintDecls_f( const anCommandArgs &args ) {
+inline void PrintDecls_f( const anCommandArgs &args ) {
 	declManager->PrintType( args, type );
 }
 

@@ -13,7 +13,7 @@ class BOEntity {
 public:
 	bool					visible;
 
-	anString					materialName;
+	anStr					materialName;
 	const anMaterial *		material;
 	float					width, height;
 	anVec4					color;
@@ -34,7 +34,7 @@ public:
 	virtual void			WriteToSaveGame( anFile *savefile );
 	virtual void			ReadFromSaveGame( anFile *savefile, idGameBustOutWindow* _game );
 
-	void					SetMaterial(const char* name);
+	void					SetMaterial(const char *name);
 	void					SetSize( float _width, float _height );
 	void					SetColor( float r, float g, float b, float a );
 	void					SetVisible( bool isVisible );

@@ -26,7 +26,7 @@ public:
 	virtual const char*	HandleEvent(const sysEvent_t *event, bool *updateVisuals);
 	virtual void		PostParse();
 	virtual void		Draw( inttime, float x, float y);
-	virtual void		Activate(bool activate, anString &act);
+	virtual void		Activate(bool activate, anStr &act);
 	virtual void		HandleBuddyUpdate(idWindow *buddy);
 	virtual void		StateChanged( bool redraw = false );
 	virtual size_t		Allocated(){return idWindow::Allocated();};
@@ -48,24 +48,24 @@ private:
 	int					top;
 	float				sizeBias;
 	bool				horizontal;
-	anString				tabStopStr;
-	anString				tabAlignStr;
-	anString				tabVAlignStr;
-	anString				tabTypeStr;
-	anString				tabIconSizeStr;
-	anString				tabIconVOffsetStr;
+	anStr				tabStopStr;
+	anStr				tabAlignStr;
+	anStr				tabVAlignStr;
+	anStr				tabTypeStr;
+	anStr				tabIconSizeStr;
+	anStr				tabIconVOffsetStr;
 	idHashTable<const anMaterial*> iconMaterials;						
 	bool				multipleSel;
 
 	anStringList			listItems;
 	idSliderWindow*		scroller;
 	anList<int>			currentSel;
-	anString				listName;
+	anStr				listName;
 
 	int					clickTime;
 
 	int					typedTime;
-	anString				typed;
+	anStr				typed;
 };
 
 #endif // __LISTWINDOW_H

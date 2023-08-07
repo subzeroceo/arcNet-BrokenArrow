@@ -1,31 +1,4 @@
 /*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-/*
 ** QGL_WIN.C
 **
 ** This file implements the operating system binding of GL to QGL function
@@ -33,7 +6,7 @@ If you have questions concerning this license or the applicable additional terms
 ** two functions:
 **
 ** QGL_Init() - loads libraries, assigns function pointers, etc.
-** QGL_Shutdown() - unloads libraries, NULLs function pointers
+** QGL_Shutdown() - unloads libraries, nullptrs function pointers
 */
 #include "../../idlib/Lib.h"
 #pragma hdrstop
@@ -53,8 +26,8 @@ BOOL  ( WINAPI * qwglCopyContext)(HGLRC, HGLRC, UINT);
 HGLRC ( WINAPI * qwglCreateContext)(HDC);
 HGLRC ( WINAPI * qwglCreateLayerContext)(HDC, int);
 BOOL  ( WINAPI * qwglDeleteContext)(HGLRC);
-HGLRC ( WINAPI * qwglGetCurrentContext)(VOID);
-HDC   ( WINAPI * qwglGetCurrentDC)(VOID);
+HGLRC ( WINAPI * qwglGetCurrentContext)( void );
+HDC   ( WINAPI * qwglGetCurrentDC)( void );
 PROC  ( WINAPI * qwglGetProcAddress)(LPCSTR);
 BOOL  ( WINAPI * qwglMakeCurrent)(HDC, HGLRC);
 BOOL  ( WINAPI * qwglShareLists)(HGLRC, HGLRC);
@@ -146,8 +119,8 @@ void ( APIENTRY * qglEdgeFlagPointer )(GLsizei stride, const GLvoid *pointer);
 void ( APIENTRY * qglEdgeFlagv )(const GLboolean *flag);
 void ( APIENTRY * qglEnable )(GLenum cap);
 void ( APIENTRY * qglEnableClientState )(GLenum array);
-void ( APIENTRY * qglEnd )(void);
-void ( APIENTRY * qglEndList )(void);
+void ( APIENTRY * qglEnd )( void );
+void ( APIENTRY * qglEndList )( void );
 void ( APIENTRY * qglEvalCoord1d )(GLdouble u);
 void ( APIENTRY * qglEvalCoord1dv )(const GLdouble *u);
 void ( APIENTRY * qglEvalCoord1f )(GLfloat u);
@@ -161,8 +134,8 @@ void ( APIENTRY * qglEvalMesh2 )(GLenum mode, GLint i1, GLint i2, GLint j1, GLin
 void ( APIENTRY * qglEvalPoint1 )(GLint i);
 void ( APIENTRY * qglEvalPoint2 )(GLint i, GLint j);
 void ( APIENTRY * qglFeedbackBuffer )(GLsizei size, GLenum type, GLfloat *buffer);
-void ( APIENTRY * qglFinish )(void);
-void ( APIENTRY * qglFlush )(void);
+void ( APIENTRY * qglFinish )( void );
+void ( APIENTRY * qglFlush )( void );
 void ( APIENTRY * qglFogf )(GLenum pname, GLfloat param);
 void ( APIENTRY * qglFogfv )(GLenum pname, const GLfloat *params);
 void ( APIENTRY * qglFogi )(GLenum pname, GLint param);
@@ -174,7 +147,7 @@ void ( APIENTRY * qglGenTextures )(GLsizei n, GLuint *textures);
 void ( APIENTRY * qglGetBooleanv )(GLenum pname, GLboolean *params);
 void ( APIENTRY * qglGetClipPlane )(GLenum plane, GLdouble *equation);
 void ( APIENTRY * qglGetDoublev )(GLenum pname, GLdouble *params);
-GLenum ( APIENTRY * qglGetError )(void);
+GLenum ( APIENTRY * qglGetError )( void );
 void ( APIENTRY * qglGetFloatv )(GLenum pname, GLfloat *params);
 void ( APIENTRY * qglGetIntegerv )(GLenum pname, GLint *params);
 void ( APIENTRY * qglGetLightfv )(GLenum light, GLenum pname, GLfloat *params);
@@ -213,7 +186,7 @@ void ( APIENTRY * qglIndexs )(GLshort c);
 void ( APIENTRY * qglIndexsv )(const GLshort *c);
 void ( APIENTRY * qglIndexub )(GLubyte c);
 void ( APIENTRY * qglIndexubv )(const GLubyte *c);
-void ( APIENTRY * qglInitNames )(void);
+void ( APIENTRY * qglInitNames )( void );
 void ( APIENTRY * qglInterleavedArrays )(GLenum format, GLsizei stride, const GLvoid *pointer);
 GLboolean ( APIENTRY * qglIsEnabled )(GLenum cap);
 GLboolean ( APIENTRY * qglIsList )(GLuint list);
@@ -229,7 +202,7 @@ void ( APIENTRY * qglLightiv )(GLenum light, GLenum pname, const GLint *params);
 void ( APIENTRY * qglLineStipple )(GLint factor, GLushort pattern);
 void ( APIENTRY * qglLineWidth )(GLfloat width);
 void ( APIENTRY * qglListBase )(GLuint base);
-void ( APIENTRY * qglLoadIdentity )(void);
+void ( APIENTRY * qglLoadIdentity )( void );
 void ( APIENTRY * qglLoadMatrixd )(const GLdouble *m);
 void ( APIENTRY * qglLoadMatrixf )(const GLfloat *m);
 void ( APIENTRY * qglLoadName )(GLuint name);
@@ -275,14 +248,14 @@ void ( APIENTRY * qglPointSize )(GLfloat size);
 void ( APIENTRY * qglPolygonMode )(GLenum face, GLenum mode);
 void ( APIENTRY * qglPolygonOffset )(GLfloat factor, GLfloat units);
 void ( APIENTRY * qglPolygonStipple )(const GLubyte *mask);
-void ( APIENTRY * qglPopAttrib )(void);
-void ( APIENTRY * qglPopClientAttrib )(void);
-void ( APIENTRY * qglPopMatrix )(void);
-void ( APIENTRY * qglPopName )(void);
+void ( APIENTRY * qglPopAttrib )( void );
+void ( APIENTRY * qglPopClientAttrib )( void );
+void ( APIENTRY * qglPopMatrix )( void );
+void ( APIENTRY * qglPopName )( void );
 void ( APIENTRY * qglPrioritizeTextures )(GLsizei n, const GLuint *textures, const GLclampf *priorities);
 void ( APIENTRY * qglPushAttrib )(GLbitfield mask);
 void ( APIENTRY * qglPushClientAttrib )(GLbitfield mask);
-void ( APIENTRY * qglPushMatrix )(void);
+void ( APIENTRY * qglPushMatrix )( void );
 void ( APIENTRY * qglPushName )(GLuint name);
 void ( APIENTRY * qglRasterPos2d )(GLdouble x, GLdouble y);
 void ( APIENTRY * qglRasterPos2dv )(const GLdouble *v);
@@ -485,8 +458,8 @@ static void ( APIENTRY * dllEdgeFlagPointer )(GLsizei stride, const GLvoid *poin
 static void ( APIENTRY * dllEdgeFlagv )(const GLboolean *flag);
 static void ( APIENTRY * dllEnable )(GLenum cap);
 static void ( APIENTRY * dllEnableClientState )(GLenum array);
-static void ( APIENTRY * dllEnd )(void);
-static void ( APIENTRY * dllEndList )(void);
+static void ( APIENTRY * dllEnd )( void );
+static void ( APIENTRY * dllEndList )( void );
 static void ( APIENTRY * dllEvalCoord1d )(GLdouble u);
 static void ( APIENTRY * dllEvalCoord1dv )(const GLdouble *u);
 static void ( APIENTRY * dllEvalCoord1f )(GLfloat u);
@@ -500,8 +473,8 @@ static void ( APIENTRY * dllEvalMesh2 )(GLenum mode, GLint i1, GLint i2, GLint j
 static void ( APIENTRY * dllEvalPoint1 )(GLint i);
 static void ( APIENTRY * dllEvalPoint2 )(GLint i, GLint j);
 static void ( APIENTRY * dllFeedbackBuffer )(GLsizei size, GLenum type, GLfloat *buffer);
-static void ( APIENTRY * dllFinish )(void);
-static void ( APIENTRY * dllFlush )(void);
+static void ( APIENTRY * dllFinish )( void );
+static void ( APIENTRY * dllFlush )( void );
 static void ( APIENTRY * dllFogf )(GLenum pname, GLfloat param);
 static void ( APIENTRY * dllFogfv )(GLenum pname, const GLfloat *params);
 static void ( APIENTRY * dllFogi )(GLenum pname, GLint param);
@@ -513,7 +486,7 @@ static void ( APIENTRY * dllGenTextures )(GLsizei n, GLuint *textures);
 static void ( APIENTRY * dllGetBooleanv )(GLenum pname, GLboolean *params);
 static void ( APIENTRY * dllGetClipPlane )(GLenum plane, GLdouble *equation);
 static void ( APIENTRY * dllGetDoublev )(GLenum pname, GLdouble *params);
-GLenum ( APIENTRY * dllGetError )(void);
+GLenum ( APIENTRY * dllGetError )( void );
 static void ( APIENTRY * dllGetFloatv )(GLenum pname, GLfloat *params);
 static void ( APIENTRY * dllGetIntegerv )(GLenum pname, GLint *params);
 static void ( APIENTRY * dllGetLightfv )(GLenum light, GLenum pname, GLfloat *params);
@@ -552,7 +525,7 @@ static void ( APIENTRY * dllIndexs )(GLshort c);
 static void ( APIENTRY * dllIndexsv )(const GLshort *c);
 static void ( APIENTRY * dllIndexub )(GLubyte c);
 static void ( APIENTRY * dllIndexubv )(const GLubyte *c);
-static void ( APIENTRY * dllInitNames )(void);
+static void ( APIENTRY * dllInitNames )( void );
 static void ( APIENTRY * dllInterleavedArrays )(GLenum format, GLsizei stride, const GLvoid *pointer);
 GLboolean ( APIENTRY * dllIsEnabled )(GLenum cap);
 GLboolean ( APIENTRY * dllIsList )(GLuint list);
@@ -568,7 +541,7 @@ static void ( APIENTRY * dllLightiv )(GLenum light, GLenum pname, const GLint *p
 static void ( APIENTRY * dllLineStipple )(GLint factor, GLushort pattern);
 static void ( APIENTRY * dllLineWidth )(GLfloat width);
 static void ( APIENTRY * dllListBase )(GLuint base);
-static void ( APIENTRY * dllLoadIdentity )(void);
+static void ( APIENTRY * dllLoadIdentity )( void );
 static void ( APIENTRY * dllLoadMatrixd )(const GLdouble *m);
 static void ( APIENTRY * dllLoadMatrixf )(const GLfloat *m);
 static void ( APIENTRY * dllLoadName )(GLuint name);
@@ -614,14 +587,14 @@ static void ( APIENTRY * dllPointSize )(GLfloat size);
 static void ( APIENTRY * dllPolygonMode )(GLenum face, GLenum mode);
 static void ( APIENTRY * dllPolygonOffset )(GLfloat factor, GLfloat units);
 static void ( APIENTRY * dllPolygonStipple )(const GLubyte *mask);
-static void ( APIENTRY * dllPopAttrib )(void);
-static void ( APIENTRY * dllPopClientAttrib )(void);
-static void ( APIENTRY * dllPopMatrix )(void);
-static void ( APIENTRY * dllPopName )(void);
+static void ( APIENTRY * dllPopAttrib )( void );
+static void ( APIENTRY * dllPopClientAttrib )( void );
+static void ( APIENTRY * dllPopMatrix )( void );
+static void ( APIENTRY * dllPopName )( void );
 static void ( APIENTRY * dllPrioritizeTextures )(GLsizei n, const GLuint *textures, const GLclampf *priorities);
 static void ( APIENTRY * dllPushAttrib )(GLbitfield mask);
 static void ( APIENTRY * dllPushClientAttrib )(GLbitfield mask);
-static void ( APIENTRY * dllPushMatrix )(void);
+static void ( APIENTRY * dllPushMatrix )( void );
 static void ( APIENTRY * dllPushName )(GLuint name);
 static void ( APIENTRY * dllRasterPos2d )(GLdouble x, GLdouble y);
 static void ( APIENTRY * dllRasterPos2dv )(const GLdouble *v);
@@ -1229,8 +1202,7 @@ DEF(GL_POLYGON_OFFSET_FILL)
 	{ 0, nullptr }
 };
 
-static const char *EnumString( GLenum t )
-{
+static const char *EnumString( GLenum t ) {
 	static char buffer[8][1024];
 	static int index = 0;
 
@@ -1271,24 +1243,25 @@ static const char *FloatData( const GLfloat *v, int count ) {
 #if 0
 
 // TODO: support GLbitfield
-
-static void APIENTRY logClear(GLbitfield mask)
-{
+static void APIENTRY logClear( GLbitfield mask ) {
 	fprintf( tr.logFile, "glClear( 0 " );
 
-	if ( mask & GL_COLOR_BUFFER_BIT )
+	if ( mask & GL_COLOR_BUFFER_BIT ) {
 		fprintf( tr.logFile, "| GL_COLOR_BUFFER_BIT " );
-	if ( mask & GL_DEPTH_BUFFER_BIT )
+	}
+	if ( mask & GL_DEPTH_BUFFER_BIT ) {
+	}
 		fprintf( tr.logFile, "| GL_DEPTH_BUFFER_BIT " );
-	if ( mask & GL_STENCIL_BUFFER_BIT )
+	if ( mask & GL_STENCIL_BUFFER_BIT ) {
+	}
 		fprintf( tr.logFile, "| GL_STENCIL_BUFFER_BIT " );
-	if ( mask & GL_ACCUM_BUFFER_BIT )
+	if ( mask & GL_ACCUM_BUFFER_BIT ) {
 		fprintf( tr.logFile, "| GL_ACCUM_BUFFER_BIT " );
+	}
 
 	fprintf( tr.logFile, " );\n" );
 	dllClear( mask );
 }
-
 #endif
 
 #include "gl_logfuncs.cpp"
@@ -1299,12 +1272,10 @@ static void APIENTRY logClear(GLbitfield mask)
 ** Unloads the specified DLL then nulls out all the proc pointers.  This
 ** is only called during a hard shutdown of the OGL subsystem (e.g. vid_restart).
 */
-void QGL_Shutdown( void )
-{
+void QGL_Shutdown( void ) {
 	common->Printf( "...shutting down QGL\n" );
 
-	if ( win32.hinstOpenGL )
-	{
+	if ( win32.hinstOpenGL ) {
 		common->Printf( "...unloading OpenGL DLL\n" );
 		FreeLibrary( win32.hinstOpenGL );
 	}
@@ -1673,8 +1644,6 @@ void QGL_Shutdown( void )
 }
 
 #define GR_NUM_BOARDS 0x0f
-
-
 #pragma warning (disable : 4113 4133 4047 )
 #define GPA( a ) GetProcAddress( win32.hinstOpenGL, a )
 
@@ -1687,20 +1656,17 @@ void QGL_Shutdown( void )
 ** operating systems we need to do the right thing, whatever that
 ** might be.
 */
-bool QGL_Init( const char *dllname )
-{
+bool QGL_Init( const char *dllname ) {
 	assert( win32.hinstOpenGL == 0 );
+	common->Printf( "------------ INITIALIZING ARC-NETS QGL ------------\n" );
+	common->Printf( "Loading Modern Open-GL Library( '%s' ): ", dllname );
 
-	common->Printf( "...initializing QGL\n" );
-
-	common->Printf( "...calling LoadLibrary( '%s' ): ", dllname );
-
-	if ( ( win32.hinstOpenGL = LoadLibrary( dllname ) ) == 0 )
-	{
-		common->Printf( "failed\n" );
+	if ( ( win32.hinstOpenGL = LoadLibrary( dllname ) ) == 0 ) {
+		common->Printf( "FAILED QGL Initialization Process.\n" );
+		common->Printf( "CRITICAL SYSTEM FAILURE Detected. Initiating EMERGENCY SHUTDOWN PROTOCOL.\n" );
 		return false;
 	}
-	common->Printf( "succeeded\n" );
+	common->Printf( "Initialization Has Sucessfully Completed, ACCESS GRANTED\n" );
 
 	qglAccum                     = dllAccum = glAccum;
 	qglAlphaFunc                 = dllAlphaFunc = glAlphaFunc;
@@ -1804,7 +1770,7 @@ bool QGL_Init( const char *dllname )
 	qglGetBooleanv               = 	dllGetBooleanv               = glGetBooleanv;
 	qglGetClipPlane              = 	dllGetClipPlane              = glGetClipPlane;
 	qglGetDoublev                = 	dllGetDoublev                = glGetDoublev;
-	qglGetError                  = 	dllGetError                  = ( GLenum (__stdcall * )(void) ) glGetError;
+	qglGetError                  = 	dllGetError                  = ( GLenum (__stdcall * )( void ) ) glGetError;
 	qglGetFloatv                 = 	dllGetFloatv                 = glGetFloatv;
 	qglGetIntegerv               = 	dllGetIntegerv               = glGetIntegerv;
 	qglGetLightfv                = 	dllGetLightfv                = glGetLightfv;
@@ -2105,9 +2071,9 @@ void GLimp_EnableLogging( bool enable ) {
 
 	if ( enable ) {
 		if ( !tr.logFile ) {
-			struct tm		*newtime;
+			struct tm		*newTime;
 			ARC_TIME_T			aclock;
-			anString			qpath;
+			anStr			qpath;
 			int				i;
 			const char		*path;
 
@@ -2122,13 +2088,13 @@ void GLimp_EnableLogging( bool enable ) {
 			}
 
 			path = fileSystem->RelativePathToOSPath( qpath, "fs_savepath" );
-			anString::Copynz( ospath, path, sizeof( ospath ) );
+			anStr::Copynz( ospath, path, sizeof( ospath ) );
 			tr.logFile = fopen( ospath, "wt" );
 
 			// write the time out to the top of the file
 			time( &aclock );
-			newtime = localtime( &aclock );
-			fprintf( tr.logFile, "// %s", asctime( newtime ) );
+			newTime = localTime( &aclock );
+			fprintf( tr.logFile, "// %s", asctime( newTime ) );
 			fprintf( tr.logFile, "// %s\n\n", cvarSystem->GetCVarString( "si_version" ) );
 		}
 

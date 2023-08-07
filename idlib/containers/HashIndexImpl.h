@@ -14,7 +14,7 @@ idHashIndexBase::Write
 ================
 */
 HASHINDEX_TEMPLATE_HEADER
-ARC_INLINE void HASHINDEX_TEMPLATE_TAG::Write( idFile *file ) const {
+inline void HASHINDEX_TEMPLATE_TAG::Write( anFile *file ) const {
 	file->WriteInt( hashSize );
 	if ( hash ) {
 		file->WriteBool( true );
@@ -41,7 +41,7 @@ idHashIndexBase::Read
 ================
 */
 HASHINDEX_TEMPLATE_HEADER
-ARC_INLINE void HASHINDEX_TEMPLATE_TAG::Read( idFile *file ) {
+inline void HASHINDEX_TEMPLATE_TAG::Read( anFile *file ) {
 	Free();
 
 	bool temp;

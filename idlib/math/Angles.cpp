@@ -209,9 +209,9 @@ anMat3 anAngles::ToMat3( void ) const {
 	anMath::SinCos( DEG2RAD( pitch ), sp, cp );
 	anMath::SinCos( DEG2RAD( roll ), sr, cr );
 
-	mat[ 0 ].Set( cp * cy, cp * sy, -sp );
-	mat[ 1 ].Set( sr * sp * cy + cr * -sy, sr * sp * sy + cr * cy, sr * cp );
-	mat[ 2 ].Set( cr * sp * cy + -sr * -sy, cr * sp * sy + -sr * cy, cr * cp );
+	mat[0].Set( cp * cy, cp * sy, -sp );
+	mat[1].Set( sr * sp * cy + cr * -sy, sr * sp * sy + cr * cy, sr * cp );
+	mat[2].Set( cr * sp * cy + -sr * -sy, cr * sp * sy + -sr * cy, cr * cp );
 
 	return mat;
 }
@@ -224,12 +224,12 @@ anAngles::ToMat3NoRoll
 void anAngles::ToMat3NoRoll( anMat3 &mat ) const {
 	float sp, sy, cp, cy;
 
-	idMath::SinCos( DEG2RAD( yaw ), sy, cy );
-	idMath::SinCos( DEG2RAD( pitch ), sp, cp );
+	anMath::SinCos( DEG2RAD( yaw ), sy, cy );
+	anMath::SinCos( DEG2RAD( pitch ), sp, cp );
 
-	mat[ 0 ].Set( cp * cy, cp * sy, -sp );
-	mat[ 1 ].Set( -sy, cy, 0.0f );
-	mat[ 2 ].Set( sp * cy, sp * sy, cp );
+	mat[0].Set( cp * cy, cp * sy, -sp );
+	mat[1].Set( -sy, cy, 0.0f );
+	mat[2].Set( sp * cy, sp * sy, cp );
 }
 
 /*
@@ -286,5 +286,5 @@ anAngles::ToString
 =============
 */
 const char *anAngles::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }

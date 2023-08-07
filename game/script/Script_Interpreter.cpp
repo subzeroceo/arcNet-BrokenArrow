@@ -21,7 +21,7 @@ idInterpreter::idInterpreter() {
 idInterpreter::Save
 ================
 */
-void idInterpreter::Save( idSaveGame *savefile ) const {
+void idInterpreter::Save( anSaveGame *savefile ) const {
 	int i;
 
 	savefile->WriteInt( callStackDepth );
@@ -71,9 +71,9 @@ void idInterpreter::Save( idSaveGame *savefile ) const {
 idInterpreter::Restore
 ================
 */
-void idInterpreter::Restore( idRestoreGame *savefile ) {
+void idInterpreter::Restore( anRestoreGame *savefile ) {
 	int i;
-	idStr funcname;
+	anStr funcname;
 	int func_index;
 
 	savefile->ReadInt( callStackDepth );
@@ -84,7 +84,7 @@ void idInterpreter::Restore( idRestoreGame *savefile ) {
 		if ( func_index >= 0 ) {
 			callStack[i].f = gameLocal.program.GetFunction( func_index );
 		} else {
-			callStack[i].f = NULL;
+			callStack[i].f = nullptr;
 		}
 
 		savefile->ReadInt( callStack[i].stackbase );
@@ -101,7 +101,7 @@ void idInterpreter::Restore( idRestoreGame *savefile ) {
 	if ( func_index >= 0 ) {
 		currentFunction = gameLocal.program.GetFunction( func_index );
 	} else {
-		currentFunction = NULL;
+		currentFunction = nullptr;
 	}
 	savefile->ReadInt( instructionPointer );
 
@@ -112,8 +112,8 @@ void idInterpreter::Restore( idRestoreGame *savefile ) {
 		multiFrameEvent = idEventDef::FindEvent( funcname );
 	}
 
-	savefile->ReadObject( reinterpret_cast<idClass *&>( eventEntity ) );
-	savefile->ReadObject( reinterpret_cast<idClass *&>( thread ) );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( eventEntity ) );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( thread ) );
 
 	savefile->ReadBool( doneProcessing );
 	savefile->ReadBool( threadDying );
@@ -135,8 +135,8 @@ void idInterpreter::Reset( void ) {
 	maxStackDepth = 0;
 
 	popParms = 0;
-	multiFrameEvent = NULL;
-	eventEntity = NULL;
+	multiFrameEvent = nullptr;
+	eventEntity = nullptr;
 
 	currentFunction = 0;
 	NextInstruction( 0 );
@@ -155,7 +155,7 @@ used primarily for the debugger and debugging
 //FIXME:  This is pretty much wrong.  won't access data in most situations.
 ================
 */
-bool idInterpreter::GetRegisterValue( const char *name, idStr &out, int scopeDepth ) {
+bool idInterpreter::GetRegisterValue( const char *name, anStr &out, int scopeDepth ) {
 	varEval_t		reg;
 	idVarDef		*d;
 	char			funcObject[ 1024 ];
@@ -180,11 +180,11 @@ bool idInterpreter::GetRegisterValue( const char *name, idStr &out, int scopeDep
 		return false;
 	}
 
-	idStr::Copynz( funcObject, func->Name(), sizeof( funcObject ) );
+	anStr::Copynz( funcObject, func->Name(), sizeof( funcObject ) );
 	funcName = strstr( funcObject, "::" );
 	if ( funcName ) {
 		*funcName = '\0';
-		scope = gameLocal.program.GetDef( NULL, funcObject, &def_namespace );
+		scope = gameLocal.program.GetDef( nullptr, funcObject, &def_namespace );
 		funcName += 2;
 	} else {
 		funcName = funcObject;
@@ -192,21 +192,21 @@ bool idInterpreter::GetRegisterValue( const char *name, idStr &out, int scopeDep
 	}
 
 	// Get the function from the object
-	d = gameLocal.program.GetDef( NULL, funcName, scope );
+	d = gameLocal.program.GetDef( nullptr, funcName, scope );
 	if ( !d ) {
 		return false;
 	}
 	
 	// Get the variable itself and check various namespaces
-	d = gameLocal.program.GetDef( NULL, name, d );
+	d = gameLocal.program.GetDef( nullptr, name, d );
 	if ( !d ) {
 		if ( scope == &def_namespace ) {
 			return false;
 		}
 		
-		d = gameLocal.program.GetDef( NULL, name, scope );
+		d = gameLocal.program.GetDef( nullptr, name, scope );
 		if ( !d ) {
-			d = gameLocal.program.GetDef( NULL, name, &def_namespace );
+			d = gameLocal.program.GetDef( nullptr, name, &def_namespace );
 			if ( !d ) {
 				return false;
 			}
@@ -298,7 +298,7 @@ idInterpreter::GetCallstack
 ================
 */
 const prstack_t *idInterpreter::GetCallstack( void ) const {
-	return &callStack[ 0 ];
+	return &callStack[0];
 }
 
 /*
@@ -501,7 +501,7 @@ Calls a function on a script object.
 NOTE: If this is called from within a event called by this interpreter, the function arguments will be invalid after calling this function.
 ================
 */
-void idInterpreter::EnterObjectFunction( idEntity *self, const function_t *func, bool clearStack ) {
+void idInterpreter::EnterObjectFunction( abEntity *self, const function_t *func, bool clearStack ) {
 	if ( clearStack ) {
 		Reset();
 	}
@@ -550,7 +550,7 @@ void idInterpreter::EnterFunction( const function_t *func, bool clearStack ) {
 	}
 
 	if ( !func ) {
-		Error( "NULL function" );
+		Error( "nullptr function" );
 	}
 
 	if ( debug ) {
@@ -662,7 +662,7 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 	const char			*format;
 
 	if ( !func ) {
-		Error( "NULL function" );
+		Error( "nullptr function" );
 	}
 
 	assert( func->eventdef );
@@ -696,8 +696,8 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 			break;
 
 		case D_EVENT_ENTITY :
-		case D_EVENT_ENTITY_NULL :
-			gameLocal.program.ReturnEntity( ( idEntity * )NULL );
+		case D_EVENT_ENTITY_nullptr :
+			gameLocal.program.ReturnEntity( ( abEntity * )nullptr );
 			break;
 
 		case D_EVENT_TRACE :
@@ -707,7 +707,7 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 		}
 
 		PopParms( argsize );
-		eventEntity = NULL;
+		eventEntity = nullptr;
 		return;
 	}
 
@@ -726,17 +726,17 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 
 		case D_EVENT_VECTOR :
 			var.intPtr = ( int * )&localstack[ start + pos ];
-			( *( idVec3 ** )&data[ i ] ) = var.vectorPtr;
+			( *( anVec3 ** )&data[ i ] ) = var.vectorPtr;
 			break;
 
 		case D_EVENT_STRING :
-			( *( const char ** )&data[ i ] ) = ( char * )&localstack[ start + pos ];
+			( *( const char ** )&data[ i ] ) = (char *)&localstack[ start + pos ];
 			break;
 
 		case D_EVENT_ENTITY :
 			var.intPtr = ( int * )&localstack[ start + pos ];
-			( *( idEntity ** )&data[ i ] ) = GetEntity( *var.entityNumberPtr );
-			if ( !( *( idEntity ** )&data[ i ] ) ) {
+			( *( abEntity ** )&data[ i ] ) = GetEntity( *var.entityNumberPtr );
+			if ( !( *( abEntity ** )&data[ i ] ) ) {
 				Warning( "Entity not found for event '%s'. Terminating thread.", evdef->GetName() );
 				threadDying = true;
 				PopParms( argsize );
@@ -744,9 +744,9 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 			}
 			break;
 
-		case D_EVENT_ENTITY_NULL :
+		case D_EVENT_ENTITY_nullptr :
 			var.intPtr = ( int * )&localstack[ start + pos ];
-			( *( idEntity ** )&data[ i ] ) = GetEntity( *var.entityNumberPtr );
+			( *( abEntity ** )&data[ i ] ) = GetEntity( *var.entityNumberPtr );
 			break;
 
 		case D_EVENT_TRACE :
@@ -768,7 +768,7 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 		if ( popParms ) {
 			PopParms( popParms );
 		}
-		eventEntity = NULL;
+		eventEntity = nullptr;
 	} else {
 		doneProcessing = true;
 	}
@@ -780,7 +780,7 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 idInterpreter::BeginMultiFrameEvent
 ================
 */
-bool idInterpreter::BeginMultiFrameEvent( idEntity *ent, const idEventDef *event ) { 
+bool idInterpreter::BeginMultiFrameEvent( abEntity *ent, const idEventDef *event ) { 
 	if ( eventEntity != ent ) {
 		Error( "idInterpreter::BeginMultiFrameEvent called with wrong entity" );
 	}
@@ -800,12 +800,12 @@ bool idInterpreter::BeginMultiFrameEvent( idEntity *ent, const idEventDef *event
 idInterpreter::EndMultiFrameEvent
 ================
 */
-void idInterpreter::EndMultiFrameEvent( idEntity *ent, const idEventDef *event ) {
+void idInterpreter::EndMultiFrameEvent( abEntity *ent, const idEventDef *event ) {
 	if ( multiFrameEvent != event ) {
 		Error( "idInterpreter::EndMultiFrameEvent called with wrong event" );
 	}
 
-	multiFrameEvent = NULL;
+	multiFrameEvent = nullptr;
 }
 
 /*
@@ -814,7 +814,7 @@ idInterpreter::MultiFrameEventInProgress
 ================
 */
 bool idInterpreter::MultiFrameEventInProgress( void ) const {
-	return multiFrameEvent != NULL;
+	return multiFrameEvent != nullptr;
 }
 
 /*
@@ -833,7 +833,7 @@ void idInterpreter::CallSysEvent( const function_t *func, int argsize ) {
 	const char			*format;
 
 	if ( !func ) {
-		Error( "NULL function" );
+		Error( "nullptr function" );
 	}
 
 	assert( func->eventdef );
@@ -856,17 +856,17 @@ void idInterpreter::CallSysEvent( const function_t *func, int argsize ) {
 
 		case D_EVENT_VECTOR :
 			source.intPtr = ( int * )&localstack[ start + pos ];
-			*( idVec3 ** )&data[ i ] = source.vectorPtr;
+			*( anVec3 ** )&data[ i ] = source.vectorPtr;
 			break;
 
 		case D_EVENT_STRING :
-			*( const char ** )&data[ i ] = ( char * )&localstack[ start + pos ];
+			*( const char ** )&data[ i ] = (char *)&localstack[ start + pos ];
 			break;
 
 		case D_EVENT_ENTITY :
 			source.intPtr = ( int * )&localstack[ start + pos ];
-			*( idEntity ** )&data[ i ] = GetEntity( *source.entityNumberPtr );
-			if ( !*( idEntity ** )&data[ i ] ) {
+			*( abEntity ** )&data[ i ] = GetEntity( *source.entityNumberPtr );
+			if ( !*( abEntity ** )&data[ i ] ) {
 				Warning( "Entity not found for event '%s'. Terminating thread.", evdef->GetName() );
 				threadDying = true;
 				PopParms( argsize );
@@ -874,9 +874,9 @@ void idInterpreter::CallSysEvent( const function_t *func, int argsize ) {
 			}
 			break;
 
-		case D_EVENT_ENTITY_NULL :
+		case D_EVENT_ENTITY_nullptr :
 			source.intPtr = ( int * )&localstack[ start + pos ];
-			*( idEntity ** )&data[ i ] = GetEntity( *source.entityNumberPtr );
+			*( abEntity ** )&data[ i ] = GetEntity( *source.entityNumberPtr );
 			break;
 
 		case D_EVENT_TRACE :
@@ -1106,7 +1106,7 @@ bool idInterpreter::Execute( void ) {
 
 			if ( *var_b.floatPtr == 0.0f ) {
 				Warning( "Divide by zero" );
-				*var_c.floatPtr = idMath::INFINITY;
+				*var_c.floatPtr = anMath::INFINITY;
 			} else {
 				*var_c.floatPtr = *var_a.floatPtr / *var_b.floatPtr;
 			}
@@ -1249,7 +1249,7 @@ bool idInterpreter::Execute( void ) {
 		case OP_NOT_ENT:
 			var_a = GetVariable( st->a );
 			var_c = GetVariable( st->c );
-			*var_c.floatPtr = ( GetEntity( *var_a.entityNumberPtr ) == NULL );
+			*var_c.floatPtr = ( GetEntity( *var_a.entityNumberPtr ) == nullptr );
 			break;
 
 		case OP_NEG_F:
@@ -1288,7 +1288,7 @@ bool idInterpreter::Execute( void ) {
 			var_a = GetVariable( st->a );
 			var_b = GetVariable( st->b );
 			var_c = GetVariable( st->c );
-			*var_c.floatPtr = ( idStr::Cmp( GetString( st->a ), GetString( st->b ) ) == 0 );
+			*var_c.floatPtr = ( anStr::Cmp( GetString( st->a ), GetString( st->b ) ) == 0 );
 			break;
 
 		case OP_EQ_E:
@@ -1317,7 +1317,7 @@ bool idInterpreter::Execute( void ) {
 
 		case OP_NE_S:
 			var_c = GetVariable( st->c );
-			*var_c.floatPtr = ( idStr::Cmp( GetString( st->a ), GetString( st->b ) ) != 0 );
+			*var_c.floatPtr = ( anStr::Cmp( GetString( st->a ), GetString( st->b ) ) != 0 );
 			break;
 
 		case OP_NE_E:
@@ -1372,7 +1372,7 @@ bool idInterpreter::Execute( void ) {
 
 			if ( *var_a.floatPtr == 0.0f ) {
 				Warning( "Divide by zero" );
-				*var_b.floatPtr = idMath::INFINITY;
+				*var_b.floatPtr = anMath::INFINITY;
 			} else {
 				*var_b.floatPtr = *var_b.floatPtr / *var_a.floatPtr;
 			}
@@ -1384,7 +1384,7 @@ bool idInterpreter::Execute( void ) {
 
 			if ( *var_a.floatPtr == 0.0f ) {
 				Warning( "Divide by zero" );
-				var_b.vectorPtr->Set( idMath::INFINITY, idMath::INFINITY, idMath::INFINITY );
+				var_b.vectorPtr->Set( anMath::INFINITY, anMath::INFINITY, anMath::INFINITY );
 			} else {
 				*var_b.vectorPtr = *var_b.vectorPtr / *var_a.floatPtr;
 			}
@@ -1563,7 +1563,7 @@ bool idInterpreter::Execute( void ) {
 		case OP_STOREP_S:
 			var_b = GetVariable( st->b );
 			if ( var_b.evalPtr && var_b.evalPtr->stringPtr ) {
-				idStr::Copynz( var_b.evalPtr->stringPtr, GetString( st->a ), MAX_STRING_LEN );
+				anStr::Copynz( var_b.evalPtr->stringPtr, GetString( st->a ), MAX_STRING_LEN );
 			}
 			break;
 
@@ -1579,7 +1579,7 @@ bool idInterpreter::Execute( void ) {
 			var_b = GetVariable( st->b );
 			if ( var_b.evalPtr && var_b.evalPtr->stringPtr ) {
 				var_a = GetVariable( st->a );
-				idStr::Copynz( var_b.evalPtr->stringPtr, FloatToString( *var_a.floatPtr ), MAX_STRING_LEN );
+				anStr::Copynz( var_b.evalPtr->stringPtr, FloatToString( *var_a.floatPtr ), MAX_STRING_LEN );
 			}
 			break;
 
@@ -1588,9 +1588,9 @@ bool idInterpreter::Execute( void ) {
 			if ( var_b.evalPtr && var_b.evalPtr->stringPtr ) {
 				var_a = GetVariable( st->a );
 				if ( *var_a.floatPtr != 0.0f ) {
-					idStr::Copynz( var_b.evalPtr->stringPtr, "true", MAX_STRING_LEN );
+					anStr::Copynz( var_b.evalPtr->stringPtr, "true", MAX_STRING_LEN );
 				} else {
-					idStr::Copynz( var_b.evalPtr->stringPtr, "false", MAX_STRING_LEN );
+					anStr::Copynz( var_b.evalPtr->stringPtr, "false", MAX_STRING_LEN );
 				}
 			}
 			break;
@@ -1599,7 +1599,7 @@ bool idInterpreter::Execute( void ) {
 			var_b = GetVariable( st->b );
 			if ( var_b.evalPtr && var_b.evalPtr->stringPtr ) {
 				var_a = GetVariable( st->a );
-				idStr::Copynz( var_b.evalPtr->stringPtr, var_a.vectorPtr->ToString(), MAX_STRING_LEN );
+				anStr::Copynz( var_b.evalPtr->stringPtr, var_a.vectorPtr->ToString(), MAX_STRING_LEN );
 			}
 			break;
 
@@ -1658,7 +1658,7 @@ bool idInterpreter::Execute( void ) {
 			if ( obj ) {
 				var_c.evalPtr->bytePtr = &obj->data[ st->b->value.ptrOffset ];
 			} else {
-				var_c.evalPtr->bytePtr = NULL;
+				var_c.evalPtr->bytePtr = nullptr;
 			}
 			break;
 

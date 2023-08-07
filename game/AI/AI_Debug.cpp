@@ -30,7 +30,7 @@ const char *aiMoveCommandString[ NUM_MOVE_COMMANDS ] = {
 	"MOVE_WANDER"
 };
 
-const char* aiMoveStatusString[ NUM_MOVE_STATUS ] = {
+const char *aiMoveStatusString[ NUM_MOVE_STATUS ] = {
 	"MOVE_STATUS_DONE",
 	"MOVE_STATUS_MOVING",
 	"MOVE_STATUS_WAITING",
@@ -44,14 +44,14 @@ const char* aiMoveStatusString[ NUM_MOVE_STATUS ] = {
 	"MOVE_STATUS_DISABLED"
 };
 
-const char* aiMoveDirectionString [ MOVEDIR_MAX ] = {
+const char *aiMoveDirectionString [ MOVEDIR_MAX ] = {
 	"MOVEDIR_FORWARD",
 	"MOVEDIR_BACKWARD",
 	"MOVEDIR_LEFT",
 	"MOVEDIR_RIGHT"
 };
 
-const char* aiTacticalString [ AITACTICAL_MAX ] = {
+const char *aiTacticalString [ AITACTICAL_MAX ] = {
 	"AITACTICAL_NONE",
 	"AITACTICAL_MELEE",
 	"AITACTICAL_MOVE_FOLLOW",
@@ -68,7 +68,7 @@ const char* aiTacticalString [ AITACTICAL_MAX ] = {
 	"AITACTICAL_PASSIVE",
 };
 
-const char* aiFocusString [ AIFOCUS_MAX ] = {
+const char *aiFocusString [ AIFOCUS_MAX ] = {
 	"AIFOCUS_NONE",
 	"AIFOCUS_LEADER",
 	"AIFOCUS_TARGET",
@@ -81,7 +81,7 @@ const char* aiFocusString [ AIFOCUS_MAX ] = {
 	"AIFOCUS_TETHER",
 };
 
-const char* aiActionStatusString [ rvAIAction::STATUS_MAX ] = {
+const char *aiActionStatusString [ rvAIAction::STATUS_MAX ] = {
 	"Unused",
 	"OK",
 	"Disabled",
@@ -235,7 +235,7 @@ void anSAAI::DrawTactical ( void ) {
 
 	// Move Over Head
 	//----------------
-	origin -= GetPhysics()->GetGravityNormal() * (GetPhysics()->GetBounds()[ 1 ].z - GetPhysics()->GetBounds()[ 0 ].z);
+	origin -= GetPhysics()->GetGravityNormal() * (GetPhysics()->GetBounds()[1].z - GetPhysics()->GetBounds()[0].z);
 
 	// Draw Enemy Related Info
 	//-------------------------

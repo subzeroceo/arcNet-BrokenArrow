@@ -40,14 +40,14 @@ anListGUILocal::GetSelection
 */
 int anListGUILocal::GetSelection( char *s, int size, int _sel ) const {
 	if ( s ) {		
-		s[ 0 ] = '\0';
+		s[0] = '\0';
 	}
 	int sel = m_pGUI->State().GetInt( va( "%s_sel_%i", m_name.c_str(), _sel ), "-1" );
 	if ( sel == -1 || sel >= m_ids.Num() ) {
 		return -1;
 	}
 	if ( s ) {
-		anString::snPrintf( s, size, m_pGUI->State().GetString( va( "%s_item_%i", m_name.c_str(), sel ), "" ) );
+		anStr::snPrintf( s, size, m_pGUI->State().GetString( va( "%s_item_%i", m_name.c_str(), sel ), "" ) );
 	}
 	// don't let overflow
 	if ( sel >= m_ids.Num() ) {
@@ -72,7 +72,7 @@ void anListGUILocal::SetSelection( int sel ) {
 anListGUILocal::Add
 ====================
 */
-void anListGUILocal::Add( int id, const anString &s ) {
+void anListGUILocal::Add( int id, const anStr &s ) {
 	int i = m_ids.FindIndex( id );
 	if ( i == -1 ) {
 		Append( s );
@@ -88,7 +88,7 @@ void anListGUILocal::Add( int id, const anString &s ) {
 anListGUILocal::Push
 ====================
 */
-void anListGUILocal::Push( const anString &s ) {
+void anListGUILocal::Push( const anStr &s ) {
 	Append( s );
 	m_ids.Append( m_ids.Num() );
 	StateChanged();
@@ -117,7 +117,7 @@ anListGUILocal::Clear
 */
 void anListGUILocal::Clear() {
 	m_ids.Clear();
-	anList<anString>::Clear();
+	anList<anStr>::Clear();
 	if ( m_pGUI ) {
 		// will clear all the GUI variables and will set m_water back to 0
 		StateChanged();

@@ -124,7 +124,7 @@ bool anPhysics_SimpleRigidBody::CollisionResponse( const trace_t &collision, anV
 		current.angularVelocity.FixDenormals( 0.000001f );
 	}
 
-	arcEntity* ent = gameLocal.entities[ collision.c.entityNum ];
+	anEntity *ent = gameLocal.entities[ collision.c.entityNum ];
 
 	ent->Hit( collision, hitVelocity, self );
 	return self->Collide( collision, hitVelocity, -1 );
@@ -202,7 +202,7 @@ void anPhysics_SimpleRigidBody::DropToFloorAndRest( void ) {
 
 		if ( gameLocal.clip.Contents( CLIP_DEBUG_PARMS_ENTINFO( self ) current.position, clipModel, mat3_identity, clipMask, self ) ) {
 			gameLocal.DWarning( "rigid body in solid for entity '%s' type '%s' at (%s)",
-								self->name.c_str(), self->GetType()->classname, current.position.ToString(0) );
+								self->name.c_str(), self->GetType()->classname, current.position.ToString( 0 ) );
 			Rest();
 			dropToFloor = false;
 			return;
@@ -225,13 +225,13 @@ void anPhysics_SimpleRigidBody::DropToFloorAndRest( void ) {
 		EvaluateContacts( CLIP_DEBUG_PARMS_ENTINFO_ONLY( self ) );
 		if ( !TestIfAtRest() ) {
 			gameLocal.DWarning( "rigid body not at rest for entity '%s' type '%s' at (%s)",
-								self->name.c_str(), self->GetType()->classname, current.position.ToString(0) );
+								self->name.c_str(), self->GetType()->classname, current.position.ToString( 0 ) );
 		}
 		Rest();
 		dropToFloor = false;
 	} else if ( IsOutsideWorld() ) {
 //		gameLocal.Warning( "rigid body outside world bounds for entity '%s' type '%s' at (%s)",
-//							self->name.c_str(), self->GetType()->classname, current.position.ToString(0) );
+//							self->name.c_str(), self->GetType()->classname, current.position.ToString( 0 ) );
 		Rest();
 		dropToFloor = false;
 	}
@@ -487,7 +487,7 @@ void anPhysics_SimpleRigidBody::Rest( void ) {
 	self->BecomeInactive( TH_PHYSICS );
 
 	if ( current.atRest != restTime ) {
-		sdScriptHelper h1;
+		idScriptHelper h1;
 		self->GetScriptObject()->CallNonBlockingScriptEvent( self->GetScriptObject()->GetFunction( "OnRest" ), h1 );
 	}
 }
@@ -706,7 +706,7 @@ bool anPhysics_SimpleRigidBody::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 	if ( IsOutsideWorld() ) {
 //		gameLocal.Warning( "rigid body moved outside world bounds for entity '%s' type '%s' at (%s)",
-//					self->name.c_str(), self->GetType()->classname, current.position.ToString(0) );
+//					self->name.c_str(), self->GetType()->classname, current.position.ToString( 0 ) );
 		Rest();
 	}
 
@@ -1092,7 +1092,7 @@ void anPhysics_SimpleRigidBody::SetPushed( int deltaTime ) {
 	rotation = ( saved.orientation * current.orientation ).ToRotation();
 
 	// velocity with which the af is pushed
-	current.pushVelocity.SubVec3(0) += ( current.position - saved.position ) / ( deltaTime * anMath::M_MS2SEC );
+	current.pushVelocity.SubVec3( 0 ) += ( current.position - saved.position ) / ( deltaTime * anMath::M_MS2SEC );
 	current.pushVelocity.SubVec3( 1 ) += rotation.GetVec() * -DEG2RAD( rotation.GetAngle() ) / ( deltaTime * anMath::M_MS2SEC );
 }
 
@@ -1102,7 +1102,7 @@ anPhysics_SimpleRigidBody::GetPushedLinearVelocity
 ================
 */
 const anVec3 &anPhysics_SimpleRigidBody::GetPushedLinearVelocity( const int id ) const {
-	return current.pushVelocity.SubVec3(0);
+	return current.pushVelocity.SubVec3( 0 );
 }
 
 /*
@@ -1119,7 +1119,7 @@ const anVec3 &anPhysics_SimpleRigidBody::GetPushedAngularVelocity( const int id 
 anPhysics_SimpleRigidBody::SetMaster
 ================
 */
-void anPhysics_SimpleRigidBody::SetMaster( arcEntity *master, const bool orientated ) {
+void anPhysics_SimpleRigidBody::SetMaster( anEntity *master, const bool orientated ) {
 	anVec3 masterOrigin;
 	anMat3 masterAxis;
 
@@ -1159,7 +1159,7 @@ void anPhysics_SimpleRigidBody::CheckWater( void ) {
 	const anBounds& absBounds = GetAbsBounds( -1 );
 
 	const anClipModel* waterModel;
-	arcCollisionModel* model;
+	anCollisionModel* model;
 	int count = gameLocal.clip.ClipModelsTouchingBounds( CLIP_DEBUG_PARMS_ENTINFO( self ) absBounds, CONTENTS_WATER, &waterModel, 1, nullptr );
 	if ( !count ) {
 		self->CheckWaterEffectsOnly();

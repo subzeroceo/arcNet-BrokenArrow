@@ -27,7 +27,7 @@ typedef enum {
 	DECLAF_JOINTMOD_BOTH
 } declAFJointMod_t;
 
-typedef bool (*getJointTransform_t)( void *model, const arcJointMat *frame, const char *jointName, anVec3 &origin, anMat3 &axis );
+typedef bool (*getJointTransform_t)( void *model, const anJointMat *frame, const char *jointName, anVec3 &origin, anMat3 &axis );
 
 class arcAFVector {
 public:
@@ -37,16 +37,16 @@ public:
 		VEC_BONECENTER,
 		VEC_BONEDIR
 	}						type;
-	anString					joint1;
-	anString					joint2;
+	anStr					joint1;
+	anStr					joint2;
 
 public:
 							arcAFVector();
 
 	bool					Parse( anLexer &src );
-	bool					Finish( const char *fileName, const getJointTransform_t GetJointTransform, const arcJointMat *frame, void *model ) const;
+	bool					Finish( const char *fileName, const getJointTransform_t GetJointTransform, const anJointMat *frame, void *model ) const;
 	bool					Write( anFile *f ) const;
-	const char *			ToString( anString &str, const int precision = 8 );
+	const char *			ToString( anStr &str, const int precision = 8 );
 	const anVec3 &			ToVec3() const { return vec; }
 	anVec3 &				ToVec3() { return vec; }
 
@@ -57,8 +57,8 @@ private:
 
 class anDeclAF_Body {
 public:
-	anString					name;
-	anString					jointName;
+	anStr					name;
+	anStr					jointName;
 	declAFJointMod_t		jointMod;
 	int						modelType;
 	arcAFVector				v1, v2;
@@ -74,7 +74,7 @@ public:
 	float					linearFriction;
 	float					angularFriction;
 	float					contactFriction;
-	anString					containedJoints;
+	anStr					containedJoints;
 	arcAFVector				frictionDirection;
 	arcAFVector				contactMotorDirection;
 public:
@@ -83,9 +83,9 @@ public:
 
 class anDeclAF_Constraint {
 public:
-	anString					name;
-	anString					body1;
-	anString					body2;
+	anStr					name;
+	anStr					body1;
+	anStr					body2;
 	declAFConstraintType_t	type;
 	float					friction;
 	float					stretch;
@@ -121,7 +121,7 @@ public:
 	virtual bool			Parse( const char *text, const int textLength, bool allowBinaryVersion );
 	virtual void			FreeData();
 
-	virtual void			Finish( const getJointTransform_t GetJointTransform, const arcJointMat *frame, void *model ) const;
+	virtual void			Finish( const getJointTransform_t GetJointTransform, const anJointMat *frame, void *model ) const;
 
 	bool					Save();
 
@@ -134,15 +134,15 @@ public:
 	void					DeleteConstraint( const char *name );
 
 	static int				ContentsFromString( const char *str );
-	static const char *		ContentsToString( const int contents, anString &str );
+	static const char *		ContentsToString( const int contents, anStr &str );
 
 	static declAFJointMod_t	JointModFromString( const char *str );
 	static const char *		JointModToString( declAFJointMod_t jointMod );
 
 public:
 	bool					modified;
-	anString					model;
-	anString					skin;
+	anStr					model;
+	anStr					skin;
 	float					defaultLinearFriction;
 	float					defaultAngularFriction;
 	float					defaultContactFriction;

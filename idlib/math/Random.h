@@ -9,9 +9,9 @@
 ===============================================================================
 */
 
-class arcRandom {
+class anRandom {
 public:
-						arcRandom( int seed = 0 );
+						anRandom( int seed = 0 );
 
 	void				SetSeed( int seed );
 	int					GetSeed( void ) const;
@@ -27,35 +27,35 @@ private:
 	int					seed;
 };
 
-ARC_INLINE arcRandom::arcRandom( int seed ) {
+inline anRandom::anRandom( int seed ) {
 	this->seed = seed;
 }
 
-ARC_INLINE void arcRandom::SetSeed( int seed ) {
+inline void anRandom::SetSeed( int seed ) {
 	this->seed = seed;
 }
 
-ARC_INLINE int arcRandom::GetSeed( void ) const {
+inline int anRandom::GetSeed( void ) const {
 	return seed;
 }
 
-ARC_INLINE int arcRandom::RandomInt( void ) {
+inline int anRandom::RandomInt( void ) {
 	seed = 69069 * seed + 1;
-	return ( seed & arcRandom::MAX_RAND );
+	return ( seed & anRandom::MAX_RAND );
 }
 
-ARC_INLINE int arcRandom::RandomInt( int max ) {
+inline int anRandom::RandomInt( int max ) {
 	if ( max == 0 ) {
 		return 0;			// avoid divide by zero error
 	}
 	return RandomInt() % max;
 }
 
-ARC_INLINE float arcRandom::RandomFloat( void ) {
-	return ( RandomInt() / ( float )( arcRandom::MAX_RAND + 1 ) );
+inline float anRandom::RandomFloat( void ) {
+	return ( RandomInt() / ( float )( anRandom::MAX_RAND + 1 ) );
 }
 
-ARC_INLINE float arcRandom::CRandomFloat( void ) {
+inline float anRandom::CRandomFloat( void ) {
 	return ( 2.0f * ( RandomFloat() - 0.5f ) );
 }
 
@@ -88,38 +88,38 @@ private:
 	static const unsigned long	IEEE_MASK = 0x007fffff;
 };
 
-ARC_INLINE aRcSecondaryRandom::aRcSecondaryRandom( unsigned long seed ) {
+inline aRcSecondaryRandom::aRcSecondaryRandom( unsigned long seed ) {
 	this->seed = seed;
 }
 
-ARC_INLINE void aRcSecondaryRandom::SetSeed( unsigned long seed ) {
+inline void aRcSecondaryRandom::SetSeed( unsigned long seed ) {
 	this->seed = seed;
 }
 
-ARC_INLINE unsigned long aRcSecondaryRandom::GetSeed( void ) const {
+inline unsigned long aRcSecondaryRandom::GetSeed( void ) const {
 	return seed;
 }
 
-ARC_INLINE int aRcSecondaryRandom::RandomInt( void ) {
+inline int aRcSecondaryRandom::RandomInt( void ) {
 	seed = 1664525L * seed + 1013904223L;
 	return ( ( int ) seed & aRcSecondaryRandom::MAX_RAND );
 }
 
-ARC_INLINE int aRcSecondaryRandom::RandomInt( int max ) {
+inline int aRcSecondaryRandom::RandomInt( int max ) {
 	if ( max == 0 ) {
 		return 0;		// avoid divide by zero error
 	}
 	return ( RandomInt() >> ( 16 - anMath::BitsForInteger( max ) ) ) % max;
 }
 
-ARC_INLINE float aRcSecondaryRandom::RandomFloat( void ) {
+inline float aRcSecondaryRandom::RandomFloat( void ) {
 	unsigned long i;
 	seed = 1664525L * seed + 1013904223L;
 	i = aRcSecondaryRandom::IEEE_ONE | ( seed & aRcSecondaryRandom::IEEE_MASK );
 	return ( ( *(float *)&i ) - 1.0f );
 }
 
-ARC_INLINE float aRcSecondaryRandom::CRandomFloat( void ) {
+inline float aRcSecondaryRandom::CRandomFloat( void ) {
 	unsigned long i;
 	seed = 1664525L * seed + 1013904223L;
 	i = aRcSecondaryRandom::IEEE_ONE | ( seed & aRcSecondaryRandom::IEEE_MASK );

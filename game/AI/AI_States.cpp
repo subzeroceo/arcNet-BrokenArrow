@@ -98,7 +98,7 @@ anSAAI::State_TriggerAnim
 ================
 */
 stateResult_t anSAAI::State_TriggerAnim ( const stateParms_t& parms ) {
-	const char* triggerAnim;
+	const char *triggerAnim;
 
 	// If we dont have the trigger anim, just skip it
 	triggerAnim = spawnArgs.GetString ( "trigger_anim" );
@@ -124,7 +124,7 @@ anSAAI::State_WakeUp
 ================
 */
 stateResult_t anSAAI::State_WakeUp ( const stateParms_t& parms ) {
-	const char* triggerAnim;
+	const char *triggerAnim;
 
 	WakeUp();
 
@@ -594,7 +594,7 @@ stateResult_t anSAAI::State_MoveFollow ( const stateParms_t& parms ) {
 			} else if ( DistanceTo ( leader ) < (move.followRange[0]+move.followRange[1])*0.5f && aiManager.ValidateDestination ( this, physicsObj.GetOrigin( ), false, leader ) ) {
 				move.fl.done = true;
 				/*
-				anEntity* leaderGroundElevator = leader->GetGroundElevator();
+				anEntity *leaderGroundElevator = leader->GetGroundElevator();
 				if ( leaderGroundElevator && GetGroundElevator(leaderGroundElevator) != leaderGroundElevator ) {
 					move.fl.done = false;
 				}
@@ -936,8 +936,8 @@ stateResult_t anSAAI::State_Torso_Idle ( const stateParms_t& parms ) {
 	}
 
 	// Start idle animation
-	const char* idleAnim = GetIdleAnimName ();
-	if ( !torsoAnim.IsIdle () || anString::Icmp ( idleAnim, animator.CurrentAnim ( ANIMCHANNEL_TORSO )->AnimName() ) ) {
+	const char *idleAnim = GetIdleAnimName ();
+	if ( !torsoAnim.IsIdle () || anStr::Icmp ( idleAnim, animator.CurrentAnim ( ANIMCHANNEL_TORSO )->AnimName() ) ) {
 		IdleAnim ( ANIMCHANNEL_TORSO, idleAnim, parms.blendFrames );
 	}
 
@@ -960,13 +960,13 @@ stateResult_t anSAAI::State_Torso_PassiveIdle ( const stateParms_t& parms ) {
 		STAGE_TALK_WAIT,
 	};
 
-	anString animName;
+	anStr animName;
 
 	switch ( parms.stage ) {
 		case STAGE_START:
 			// Talk animation?
 			if ( passive.talkTime > gameLocal.time ) {
-				anString postfix;
+				anStr postfix;
 				if ( talkMessage >= TALKMSG_LOOP ) {
 					postfix = aiTalkMessageString[TALKMSG_LOOP];
 					postfix += va( "%d", (int)(talkMessage - TALKMSG_LOOP+1) );
@@ -1074,7 +1074,7 @@ stateResult_t anSAAI::State_Torso_PassiveFidget ( const stateParms_t& parms ) {
 		STAGE_WAIT,
 	};
 
-	anString animName;
+	anStr animName;
 
 	switch ( parms.stage ) {
 		case STAGE_INIT:
@@ -1233,7 +1233,7 @@ stateResult_t anSAAI::State_Torso_Sight ( const stateParms_t& parms ) {
 			}
 			ExecScriptFunction ( funcs.sight );
 
-			anString animName = spawnArgs.GetString ( "anim_sight", spawnArgs.GetString ( "sight_anim" ) );
+			anStr animName = spawnArgs.GetString ( "anim_sight", spawnArgs.GetString ( "sight_anim" ) );
 			if ( HasAnim ( ANIMCHANNEL_TORSO, animName ) ) {
 				DisableAnimState ( ANIMCHANNEL_LEGS );
 				PlayAnim ( ANIMCHANNEL_TORSO, animName, parms.blendFrames );
@@ -1306,7 +1306,7 @@ stateResult_t anSAAI::State_Torso_Pain ( const stateParms_t& parms ) {
 		STAGE_END_WAIT
 	};
 
-	anString animName;
+	anStr animName;
 
 	switch ( parms.stage ) {
 		case STAGE_START:
@@ -1397,10 +1397,10 @@ stateResult_t anSAAI::State_Legs_Idle ( const stateParms_t& parms ) {
 	};
 	switch ( parms.stage ) {
 		case STAGE_INIT: {
-			const char* idleAnim;
+			const char *idleAnim;
 			move.fl.allowAnimMove = false;
 			idleAnim = GetIdleAnimName();
-			if ( !legsAnim.IsIdle () || anString::Icmp ( idleAnim, animator.CurrentAnim ( ANIMCHANNEL_LEGS )->AnimName() ) ) {
+			if ( !legsAnim.IsIdle () || anStr::Icmp ( idleAnim, animator.CurrentAnim ( ANIMCHANNEL_LEGS )->AnimName() ) ) {
 				IdleAnim ( ANIMCHANNEL_LEGS, idleAnim, parms.blendFrames );
 			}
 			return SRESULT_STAGE ( STAGE_WAIT );
@@ -1459,7 +1459,7 @@ anSAAI::State_Legs_Move
 ================
 */
 stateResult_t anSAAI::State_Legs_Move ( const stateParms_t& parms ) {
-	anString	animName;
+	anStr	animName;
 
 	move.fl.allowAnimMove = true;
 	move.fl.allowPrevAnimMove = false;
@@ -1686,7 +1686,7 @@ bool anSAAI::UpdateTactical ( int delay ) {
 
 bool anSAAI::UpdateTactical_r ( void ) {
 	// Mapping of tactical types to combat states
-	static const char* tacticalState [ ] = {
+	static const char *tacticalState [ ] = {
 		"State_Combat",				// AITACTICAL_NONE
 		"State_CombatMelee",		// AITACTICAL_MELEE
 		"State_MoveFollow",			// AITACTICAL_MOVE_FOLLOW
@@ -2022,7 +2022,7 @@ aiCTResult_t anSAAI::CheckTactical ( aiTactical_t tactical ) {
 				if ( DistanceTo ( leader ) < move.followRange[1] ) {
 					//unless the leader is on an elevator we should be standing on...
 					/*
-					anEntity* leaderGroundElevator = leader->GetGroundElevator();
+					anEntity *leaderGroundElevator = leader->GetGroundElevator();
 					if ( leaderGroundElevator && GetGroundElevator(leaderGroundElevator) != leaderGroundElevator ) {
 						return AICTRESULT_OK;
 					}
@@ -2119,7 +2119,7 @@ void anSAAI::WakeUpTargets ( void ) {
 	const anKeyValue* kv;
 
 	for ( kv = spawnArgs.MatchPrefix ( "wakeup_target" ); kv; kv = spawnArgs.MatchPrefix ( "wakeup_target", kv ) ) {
-		anEntity* ent;
+		anEntity *ent;
 		ent = gameLocal.FindEntity ( kv->GetValue() );
 		if ( !ent ) {
 			gameLocal.Warning ( "Unknown wakeup_target '%s' on entity '%s'", kv->GetValue().c_str(), GetName() );
@@ -2131,9 +2131,9 @@ void anSAAI::WakeUpTargets ( void ) {
 	}
 
 	// Find all the tether entities we target
-	const char* target;
+	const char *target;
 	if ( spawnArgs.GetString ( "tether_target", "", &target ) && *target ) {
-		anEntity* ent;
+		anEntity *ent;
 		ent = gameLocal.FindEntity ( target );
 		if ( ent && ent->IsType ( anSAAITether::GetClassType() ) ) {
 			ProcessEvent ( &EV_Activate, ent );

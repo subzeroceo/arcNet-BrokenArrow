@@ -25,7 +25,7 @@ anResourceContainers::Init
 ========================
 */
 bool anResourceContainers::Init( const char *fName, uint8 containerIndex ) {
-	if ( anString::Icmp( fName, "_ordered.resources" ) == 0 ) {
+	if ( anStr::Icmp( fName, "_ordered.resources" ) == 0 ) {
 		resFile = fileSystem->OpenFileReadMemory( fName );
 	} else {
 		resFile = fileSystem->OpenFileRead( fName );
@@ -66,9 +66,9 @@ bool anResourceContainers::Init( const char *fName, uint8 containerIndex ) {
 
 		const int key = cacheHash.GenerateKey( rt.filename, false );
 		bool found = false;
-		//for ( int index = cacheHash.GetFirst( key ); index != anHashIndex::NULL_INDEX; index = cacheHash.GetNext( index ) ) {
+		//for ( int index = cacheHash.GetFirst( key ); index != anHashIndex::nullptr_INDEX; index = cacheHash.GetNext( index ) ) {
 		//	anResourceCacheEntries & rtc = cacheTable[index];
-		//	if ( anString::Icmp( rtc.filename, rt.filename ) == 0 ) {
+		//	if ( anStr::Icmp( rtc.filename, rt.filename ) == 0 ) {
 		//		found = true;
 		//		break;
 		//	}
@@ -89,7 +89,7 @@ anResourceContainers::WriteManifestFile
 ========================
 */
 void anResourceContainers::WriteManifestFile( const char *name, const anStringList &list ) {
-	anString filename( name );
+	anStr filename( name );
 	filename.SetFileExtension( "manifest" );
 	filename.Insert( "maps/", 0 );
 	anFile *outFile = fileSystem->OpenFileWrite( filename );
@@ -112,7 +112,7 @@ int anResourceContainers::ReadManifestFile( const char *name, anStringList &list
 	anFile *inFile = fileSystem->OpenFileRead( name );
 	if ( inFile != nullptr ) {
 		list.SetGranularity( 16384 );
-		anString str;
+		anStr str;
 		int num;
 		list.Clear();
 		inFile->ReadBig( num );
@@ -208,11 +208,11 @@ void anResourceContainers::UpdateResourceFile( const char *fName, const anString
 	}
 
 	while ( filesToUpdate.Num() > 0 ) {
-		anFile *newFile = fileSystem->OpenFileReadMemory( filesToUpdate[ 0 ] );
+		anFile *newFile = fileSystem->OpenFileReadMemory( filesToUpdate[0] );
 		if ( newFile != nullptr ) {
-			anLibrary::Printf( "Appending %s\n", filesToUpdate[ 0 ].c_str() );
+			anLibrary::Printf( "Appending %s\n", filesToUpdate[0].c_str() );
 			anResourceCacheEntries rt;
-			rt.filename = filesToUpdate[ 0 ];
+			rt.filename = filesToUpdate[0];
 			rt.length = newFile->Length();
 			byte *fileData = (byte * )Mem_Alloc( rt.length, TAG_TEMP );
 			newFile->Read( fileData, rt.length );
@@ -262,7 +262,7 @@ void anResourceContainers::SetContainerIndex( const int & _idx ) {
 anResourceContainers::ExtractResourceFile
 ========================
 */
-void anResourceContainers::ExtractResourceFile ( const char *fName, const char *_outPath, bool _copyWavs ) {
+void anResourceContainers::ExtractResourceFile( const char *fName, const char *_outPath, bool _copyWavs ) {
 	anFile *inFile = fileSystem->OpenFileRead( fName );
 
 	if ( inFile == nullptr ) {
@@ -307,7 +307,7 @@ void anResourceContainers::ExtractResourceFile ( const char *fName, const char *
 			fbuf =  (byte *)Mem_Alloc( rt.length, TAG_RESOURCE );
 			inFile->Read( fbuf, rt.length );
 		}
-		anString outName = _outPath;
+		anStr outName = _outPath;
 		outName.AppendPath( rt.filename );
 		anFile *outFile = fileSystem->OpenExplicitFileWrite( outName );
 		if ( outFile != nullptr ) {
@@ -353,10 +353,10 @@ void anResourceContainers::WriteResourceFile( const char *manifestName, const an
 	outPutFiles.Append( flist );
 
 	if ( _writeManifest ) {
-		anString temp = manifestName;
-		temp.Replace( "maps/", "manifests/" );
+		anStr temp = manifestName;
+		temp.Replace( "maps/", "rcData/" );
 		temp.StripFileExtension();
-		temp.SetFileExtension( "manifest" );
+		temp.SetFileExtension( "rcData" );
 		outManifest.WriteManifestFile( temp );
 	}
 
@@ -366,7 +366,7 @@ void anResourceContainers::WriteResourceFile( const char *manifestName, const an
 			continue;
 		}
 
-		anString fileName = manifestName;
+		anStr fileName = manifestName;
 		if ( idx > 0 ) {
 			fileName = va( "%s_%02d", manifestName, idx );
 		}
@@ -402,7 +402,7 @@ void anResourceContainers::WriteResourceFile( const char *manifestName, const an
 			ent.offset = 0;
 
 			anFile *file = fileSystem->OpenFileReadMemory( ent.filename, false );
-			anFileMemory *fm = dynamic_cast< anFileMemory* >( file );
+			anFileMemory *fm = dynamic_cast<anFileMemory*>( file );
 			if ( fm == nullptr ) {
 				continue;
 			}

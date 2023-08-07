@@ -12,7 +12,7 @@ int anEventLoop::JournalLevel( void ) const { return 0; }
 /*
 ==============================================================
 
-	anCommon
+	arCNet
 
 ==============================================================
 */
@@ -26,7 +26,7 @@ int anEventLoop::JournalLevel( void ) const { return 0; }
 	va_end( argptr )
 
 
-class anCommonLocal : public anCommon {
+class anCommonLocal : public arCNet {
 public:
 							anCommonLocal( void ) {}
 
@@ -74,12 +74,12 @@ public:
 anCVarSystem com_developer( "developer", "0", CVAR_BOOL|CVAR_SYSTEM, "developer mode" );
 
 anCommonLocal		commonLocal;
-anCommon *			common = &commonLocal;
+arCNet *			common = &commonLocal;
 
 /*
 ==============================================================
 
-	arcSystem
+	anSystem
 
 ==============================================================
 */
@@ -98,7 +98,7 @@ const char *Sys_Cwd( void ) {
 	_getcwd( cwd, sizeof( cwd ) - 1 );
 	cwd[sizeof( cwd ) - 1] = 0;
 
-	int i = anString::FindText( cwd, CD_BASEDIR, false );
+	int i = anStr::FindText( cwd, CD_BASEDIR, false );
 	if ( i >= 0 ) {
 		cwd[i + strlen( CD_BASEDIR )] = '\0';
 	}
@@ -123,7 +123,7 @@ const char *Sys_EXEPath( void ) {
 }
 
 int Sys_ListFiles( const char *directory, const char *extension, anStringList &list ) {
-	anString		search;
+	anStr		search;
 	struct _finddata_t findinfo;
 	int			findhandle;
 	int			flag;
@@ -221,7 +221,7 @@ void			anSystemLocal::StartProcess( const char *exeName, bool quit ) { }
 void			anSystemLocal::FPU_EnableExceptions( int exceptions ) { }
 
 anSystemLocal	sysLocal;
-arcSystem *		sys = &sysLocal;
+anSystem *		sys = &sysLocal;
 
 
 /*
@@ -233,7 +233,7 @@ arcSystem *		sys = &sysLocal;
 */
 
 int main( int argc, char** argv ) {
-	anString fileName, sourcePath;
+	anStr fileName, sourcePath;
 	anInfoGen *generator;
 
 	anLibrary::common = common;
@@ -251,7 +251,7 @@ int main( int argc, char** argv ) {
 
 
 	if ( argc > 1 ) {
-		sourcePath = anString( "../" SOURCE_CODE_BASE_FOLDER"/" ) + argv[1];
+		sourcePath = anStr( "../" SOURCE_CODE_BASE_FOLDER"/" ) + argv[1];
 	//} else {
 		//sourcePath = "../" SOURCE_FOLDER"/game";
 	}

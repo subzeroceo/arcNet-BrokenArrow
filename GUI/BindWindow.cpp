@@ -68,9 +68,9 @@ const char *idBindWindow::HandleEvent(const sysEvent_t *event, bool *updateVisua
 	if (waitingOnKey) {
 		waitingOnKey = false;
 		if (key == K_ESCAPE) {
-			anString::snPrintf( ret, sizeof( ret ), "clearbind \"%s\"", bindName.GetName());
+			anStr::snPrintf( ret, sizeof( ret ), "clearbind \"%s\"", bindName.GetName());
 		} else {
-			anString::snPrintf( ret, sizeof( ret ), "bind %i \"%s\"", key, bindName.GetName());
+			anStr::snPrintf( ret, sizeof( ret ), "bind %i \"%s\"", key, bindName.GetName());
 		}
 		return ret;
 	} else {
@@ -86,7 +86,7 @@ const char *idBindWindow::HandleEvent(const sysEvent_t *event, bool *updateVisua
 
 idWinVar *idBindWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** owner) {
 
-	if (anString::Icmp(_name, "bind" ) == 0) {
+	if (anStr::Icmp(_name, "bind" ) == 0) {
 		return &bindName;
 	}
 
@@ -104,7 +104,7 @@ void idBindWindow::PostParse() {
 void idBindWindow::Draw( inttime, float x, float y) {
 	anVec4 color = foreColor;
 
-	anString str;
+	anStr str;
 	if ( waitingOnKey ) {
 		str = common->GetLanguageDict()->GetString( "#str_07000" );
 	} else if ( bindName.Length() ) {
@@ -122,7 +122,7 @@ void idBindWindow::Draw( inttime, float x, float y) {
 	dc->DrawText( str, textScale, textAlign, color, textRect, false, -1);
 }
 
-void idBindWindow::Activate( bool activate, anString &act ) {
+void idBindWindow::Activate( bool activate, anStr &act ) {
 	idWindow::Activate( activate, act );
 	bindName.Update();
 }

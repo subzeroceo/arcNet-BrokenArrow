@@ -95,7 +95,7 @@ anVec3&	seasFeature_s::Normal()
 ///////////////////////////////////////////////////////////////////////////////
 // seasFeature_s::Origin()
 ///////////////////////////////////////////////////////////////////////////////
-anVec3& seasFeature_s::Origin()
+anVec3 &seasFeature_s::Origin()
 {
 	static anVec3 o;
 	o.Set(( float )x, ( float )y, ( float )z);
@@ -105,7 +105,7 @@ anVec3& seasFeature_s::Origin()
 ///////////////////////////////////////////////////////////////////////////////
 // seasFeature_s::GetLookPos()
 ///////////////////////////////////////////////////////////////////////////////
-int seasFeature_s::GetLookPos( anVec3& lookPos,  const anVec3& aimAtOrigin, const float leanDistance )
+int seasFeature_s::GetLookPos( anVec3 &lookPos,  const anVec3 &aimAtOrigin, const float leanDistance )
 {
 	static anVec3		up(0.0f,0.0f,1.0f);
 	static anVec3		direction;
@@ -268,8 +268,8 @@ struct rvTest
 		return fabsf(mWeight);
 	}
 
-	void			DrawDebugInfo(const anVec4 color, const anVec3& origin, const anVec3& direction);
-	void			DrawDebugInfo(const anVec4 color, const anVec3& origin);
+	void			DrawDebugInfo(const anVec4 color, const anVec3 &origin, const anVec3 &direction);
+	void			DrawDebugInfo(const anVec4 color, const anVec3 &origin);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -413,7 +413,7 @@ struct rvTestSet
 	///////////////////////////////////////////////////////////////////////////
 	// SetupOriginAndFacing - Called For Each Test Set
 	///////////////////////////////////////////////////////////////////////////
-	void			SetupOriginAndFacing(const anEntity* ent, const anVec3* originOverride=0, const anVec3* facingOverride=0)
+	void			SetupOriginAndFacing(const anEntity *ent, const anVec3* originOverride=0, const anVec3* facingOverride=0)
 	{
 		if ( !ent)
 		{
@@ -425,7 +425,7 @@ struct rvTestSet
 			const anActor* entActor = dynamic_cast<const anActor*>(ent);	// bleh.  Base entity class should properly return origin, angles, and forward vector
 
 			mOrigin		= (originOverride)?(*originOverride):(ent->GetPhysics()->GetOrigin());
-			mFacing		= (facingOverride)?(*facingOverride):(entActor?entActor->viewAxis[0]:ent->GetPhysics()->GetAxis(0)[0]);
+			mFacing		= (facingOverride)?(*facingOverride):(entActor?entActor->viewAxis[0]:ent->GetPhysics()->GetAxis( 0 )[0]);
 		}
 
 		mFacing[2]	= 0;
@@ -453,7 +453,7 @@ struct rvTestSet
 		mFacing.Normalize();
 	}
 
-	void			DrawDebugInfo(const anVec4& color, const anVec3& nonProjectedOrigin);
+	void			DrawDebugInfo(const anVec4& color, const anVec3 &nonProjectedOrigin);
 };
 
 
@@ -476,7 +476,7 @@ struct anSEASTacticalSensorLocal : anSEASTacticalSensor
 
 	// Search Parameters
 	///////////////////////////////////////////////////////////////////////////////
-	anString					mSearchName;			// Current Search Name
+	anStr					mSearchName;			// Current Search Name
 	int						mFlagsMatchAny;			// Features must match AT LEAST ONE of these flags
 	int						mFlagsMatchAll;			// Features must match ALL of these flags
 	int						mFlagsMatchNone;		// Features must match NONE of these flags
@@ -520,10 +520,10 @@ struct anSEASTacticalSensorLocal : anSEASTacticalSensor
 	// Search
 	///////////////////////////////////////////////////////////////////////////////
 	void			Search();
-	void			SearchReset(anEntity* enemyOverride=0, float ownerRangeMin=0.0f, float ownerRangeMax=1.0f);
-	void			SearchRadius(const anVec3& origin=vec3_origin, float rangeMin=0.0f, float rangeMax=1.0f);
+	void			SearchReset(anEntity *enemyOverride=0, float ownerRangeMin=0.0f, float ownerRangeMax=1.0f);
+	void			SearchRadius(const anVec3 &origin=vec3_origin, float rangeMin=0.0f, float rangeMax=1.0f);
 	void			SearchCover(float rangeMin=0.0f, float rangeMax=1.0f);
-	void			SearchHide(anEntity* from=0);
+	void			SearchHide(anEntity *from=0);
 	void			SearchFlank();
 	void			SearchAdvance();
 	void			SearchRetreat();
@@ -582,7 +582,7 @@ anSEASTacticalSensorLocal::anSEASTacticalSensorLocal() {
 
 // Destructor
 anSEASTacticalSensorLocal::~anSEASTacticalSensorLocal() {
-	Reserve(0);
+	Reserve( 0 );
 }
 
 void			anSEASTacticalSensorLocal::Clear() {
@@ -650,7 +650,7 @@ void	anSEASTacticalSensorLocal::Restore( anRestoreGame *savefile ) {
 //
 // If called regularly, this function will handle drawing debug information
 void anSEASTacticalSensorLocal::Update() {
-	anSEAS* aas = (mOwnerAI)?(mOwnerAI->aas):(gameLocal.GetAAS(0));
+	anSEAS* aas = (mOwnerAI)?(mOwnerAI->aas):(gameLocal.GetAAS( 0 ));
 	if ( !aas || !aas->GetFile() || !aas->GetFile()->GetNumFeatures() || !mOwner || mOwner->IsHidden()) {
 		return;
 	}
@@ -708,8 +708,8 @@ void anSEASTacticalSensorLocal::Update() {
 		velocityFwd.NormalVectors(velocityLeft, velocityDown);
 		// Check If We Should Clear The Look Feature
 		if (mLook) {
-			const anVec3& featureOrigin = mLook->Origin();
-			const anVec3& featureNormal = mLook->Normal();
+			const anVec3 &featureOrigin = mLook->Origin();
+			const anVec3 &featureNormal = mLook->Normal();
 
 			// Too Far?
 			//----------
@@ -736,8 +736,8 @@ void anSEASTacticalSensorLocal::Update() {
 
 		// And, If We Are Moving, Check The Near Feature To See If It Qualifies As A Look Feature
 		if (mNear && mNear!=mLook && (gameLocal.GetTime() - mLookStartTime)>3000) {
-			const anVec3& featureOrigin = mNear->Origin();
-			const anVec3& featureNormal = mNear->Normal();
+			const anVec3 &featureOrigin = mNear->Origin();
+			const anVec3 &featureNormal = mNear->Normal();
 
 			// Compute Feature Direction
 
@@ -1048,7 +1048,7 @@ void anSEASTacticalSensorLocal::SearchDebug()
 ///////////////////////////////////////////////////////////////////////////////
 // anSEASTacticalSensorLocal::SearchRadius
 ///////////////////////////////////////////////////////////////////////////////
-void anSEASTacticalSensorLocal::SearchRadius(const anVec3& origin, float rangeMin, float rangeMax)
+void anSEASTacticalSensorLocal::SearchRadius(const anVec3 &origin, float rangeMin, float rangeMax)
 {
 	SearchReset(0, rangeMin, rangeMax);
 	mSearchName							= "Radius";
@@ -1073,7 +1073,7 @@ void anSEASTacticalSensorLocal::SearchCover(float rangeMin, float rangeMax)
 ///////////////////////////////////////////////////////////////////////////////
 // anSEASTacticalSensorLocal::SearchHide
 ///////////////////////////////////////////////////////////////////////////////
-void anSEASTacticalSensorLocal::SearchHide(anEntity* from)
+void anSEASTacticalSensorLocal::SearchHide(anEntity *from)
 {
 	SearchReset(from);
 	mSearchName							= "Hide";
@@ -1193,7 +1193,7 @@ float anSEASTacticalSensorLocal::SearchComputeWeight()
 ///////////////////////////////////////////////////////////////////////////////
 // SortFeature function (used by Search() below)
 ///////////////////////////////////////////////////////////////////////////////
-ARC_INLINE int rvSortFeature( const TFeaturePtr *a, const TFeaturePtr *b )
+inline int rvSortFeature( const TFeaturePtr *a, const TFeaturePtr *b )
 {
 	if ((*a)->weight > (*b)->weight)
 	{
@@ -1207,7 +1207,7 @@ ARC_INLINE int rvSortFeature( const TFeaturePtr *a, const TFeaturePtr *b )
 ///////////////////////////////////////////////////////////////////////////////
 void anSEASTacticalSensorLocal::Search()
 {
-	anSEAS* aas = (mOwnerAI)?(mOwnerAI->aas):(gameLocal.GetAAS(0));
+	anSEAS* aas = (mOwnerAI)?(mOwnerAI->aas):(gameLocal.GetAAS( 0 ));
 	if ( !mOwner || !aas || !aas->GetFile() || !aas->GetFile()->GetNumFeatures())
 	{
 		return;
@@ -1484,7 +1484,7 @@ void seasFeature_t::DrawDebugInfo( int index )
 ///////////////////////////////////////////////////////////////////////////
 // rvTest::DrawDebugInfo
 ///////////////////////////////////////////////////////////////////////////
-void			rvTest::DrawDebugInfo(const anVec4 color, const anVec3& origin, const anVec3& direction)
+void			rvTest::DrawDebugInfo(const anVec4 color, const anVec3 &origin, const anVec3 &direction)
 {
 	gameRenderWorld->DebugFOV(color, origin, direction, mMax, 20.0f, mMin, 10.0f, 20.0f);
 }
@@ -1492,7 +1492,7 @@ void			rvTest::DrawDebugInfo(const anVec4 color, const anVec3& origin, const anV
 ///////////////////////////////////////////////////////////////////////////
 // rvTest::DrawDebugInfo
 ///////////////////////////////////////////////////////////////////////////
-void			rvTest::DrawDebugInfo(const anVec4 color, const anVec3& origin)
+void			rvTest::DrawDebugInfo(const anVec4 color, const anVec3 &origin)
 {
 	static	anVec3	up(0.0f,0.0f,-1.0f);
  	if (mMax<1.0f)
@@ -1507,7 +1507,7 @@ void			rvTest::DrawDebugInfo(const anVec4 color, const anVec3& origin)
 ///////////////////////////////////////////////////////////////////////////
 // rvTestSet::DrawDebugInfo
 ///////////////////////////////////////////////////////////////////////////
-void			rvTestSet::DrawDebugInfo(const anVec4& color, const anVec3& nonProjectedOrigin)
+void			rvTestSet::DrawDebugInfo(const anVec4& color, const anVec3 &nonProjectedOrigin)
 {
 	static	int		lifetime = 0;
 	static	anVec3	origin;
@@ -1528,7 +1528,7 @@ void			rvTestSet::DrawDebugInfo(const anVec4& color, const anVec3& nonProjectedO
 ///////////////////////////////////////////////////////////////////////////////
 void anSEASTacticalSensorLocal::DrawDebugInfo()
 {
-	anSEAS* aas = (mOwnerAI)?(mOwnerAI->aas):(gameLocal.GetAAS(0));
+	anSEAS* aas = (mOwnerAI)?(mOwnerAI->aas):(gameLocal.GetAAS( 0 ));
 	if ( !aas || !aas->GetFile() || !aas->GetFile()->GetNumFeatures() || !mOwner || mOwner->IsHidden() || (ai_showTacticalFeatures.GetInteger()<2 && !mOwner->DebugFilter(ai_showTacticalFeatures) && !mOwner->DebugFilter(ai_debugTactical)))
 	{
 		return;
@@ -1592,7 +1592,7 @@ void anSEASTacticalSensorLocal::DrawDebugInfo()
 	if (mOwner==gameLocal.GetLocalPlayer() && ai_showTacticalFeatures.GetInteger()>=2)
 	{
 		anSEASFile* file = aas->GetFile();
-		const anVec3& playerOrigin = gameLocal.GetLocalPlayer()->GetPhysics()->GetOrigin();
+		const anVec3 &playerOrigin = gameLocal.GetLocalPlayer()->GetPhysics()->GetOrigin();
 		for ( int i=0; i<file->GetNumFeatures(); i++ )
 		{
 			if (file->GetFeature( i ).Origin().Dist(playerOrigin)<600.0f)

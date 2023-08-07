@@ -73,9 +73,9 @@ typedef struct renderEntity_s {
 	// The callback function should clear renderEntity->callback if it doesn't
 	// want to be called again next time the entity is referenced (ie, if the
 	// callback has now made the entity valid until the next updateEntity)
-	anBounds					bounds;					// only needs to be set for deferred models and md5s
+	anBounds						bounds;					// only needs to be set for deferred models and md5s
 	deferredEntityCallback_t 		callback;
-	void							*callbackData;			// used for whatever the callback wants
+	void *							callbackData;			// used for whatever the callback wants
 
 	// player bodies and possibly player shadows should be suppressed in views from
 	// that player's eyes, but will show up in mirrors and other subviews
@@ -107,7 +107,7 @@ typedef struct renderEntity_s {
 	const anMaterial 				*customShader;	// if non-0, all surfaces will use this
 	const anMaterial 				*shaderRef;		// used so flares can reference the proper light shader
 	const anDeclSkin 				*customSkin;		// 0 for no remappings
-	class ARCSoundEmitter			*sndRef;			// for shader sound tables, allowing effects to vary with sounds
+	class anSoundEmitter			*sndRef;			// for shader sound tables, allowing effects to vary with sounds
 	float							shaderParms[ MAX_ENTITY_SHADER_PARMS ];	// can be used in any way by shader or model generation
 
 	// networking: see WriteGUIToSnapshot / ReadGUIFromSnapshot
@@ -116,8 +116,8 @@ typedef struct renderEntity_s {
 	struct renderView_s				*remoteRenderView;		// any remote camera surfaces will use this
 
 	int								numJoints;
-	arcJointMat 					*joints;					// array of joints that will modify vertices.
-													// nullptr if non-deformable model.  NOT freed by renderer
+	anJointMat *					joints;					// array of joints that will modify vertices.
+														// nullptr if non-deformable model.  NOT freed by renderer
 
 	float							modelDepthHack;			// squash depth range so particle effects don't clip into walls
 
@@ -149,7 +149,7 @@ typedef struct renderEntity_s {
 	//anVec3							*dummies;
 
 	int								numAreas;
-	int								*areas;
+	int *							areas;
 } renderEntity_t;
 
 typedef struct renderLight_s {
@@ -205,7 +205,7 @@ typedef struct renderLight_s {
 
 	const anMaterial		*shader;				// nullptr = either lights/defaultPointLight or lights/defaultProjectedLight
 	float					shaderParms[MAX_ENTITY_SHADER_PARMS];		// can be used in any way by shader
-	ARCSoundEmitter			*sndRef;		// for shader sound tables, allowing effects to vary with sounds
+	anSoundEmitter			*sndRef;		// for shader sound tables, allowing effects to vary with sounds
 	//int						ApplyChanges( const renderLight_t &other );
 } renderLight_t;
 
@@ -255,7 +255,7 @@ typedef struct modelTrace_s {
 	anVec3						surfaceColor;
 	const renderEntity_t		*entity;			// render entity that was hit
 	int							jointNumber;	// md5 joint nearest to the hit triangle
-	const class idRenderEntity	*def;
+	const class anRenderEntity	*def;
 	const anDeclSurfaceType		*surfaceType; // for material types/classes
 } modelTrace_t;
 
@@ -326,9 +326,9 @@ public:
 	virtual void			ProjectOverlay( arcNetHandle_t entityHandle, const anPlane localTextureAxis[2], const anMaterial *material ) = 0;
 
 	// Removes all decals and overlays from the given entity def.
-	virtual void			RemoveDecals( arcNetHandle_t entityHandle ) = 0;
+	void					RemoveDecals( arcNetHandle_t entityHandle ) = 0;
 
-	virtual void			ClearDecals( void ) = 0;
+	void					ClearDecals( void ) = 0;
 	//-------------- Scene Rendering -----------------
 	//virtual void			AddEnvBounds( anVec3 const &origin, anVec3 const &scale, const char *cubemap ) = 0;
 
@@ -431,7 +431,7 @@ public:
 	// Text drawing for debug visualization.
 	virtual void			DrawText( const char *text, const anVec3 &origin, float scale, const anVec4 &color, const anMat3 &viewAxis, const int align = 1, const int lifeTime = 0, bool depthTest = false ) = 0;
 
-	//virtual const arcDeclAtmosphere*	GetAtmosphere() const = 0;
+	//virtual const anDeclAtmosphere*	GetAtmosphere() const = 0;
 	//virtual void			SetAtmosphere( const sdDeclAtmosphere* atmosphere ) = 0;
 	//virtual void			SetupMatrices( const renderView_t* renderView, float* projectionMatrix, float* modelViewMatrix, const bool allowJitter ) = 0;
 	//virtual struct atmosLightProjection_t *FindAtmosLightProjection( int lightID ) = 0;

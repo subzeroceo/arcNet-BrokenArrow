@@ -16,7 +16,7 @@
 */
 
 anSystem *	anLibrary::sys		= nullptr;
-anCommon *	anLibrary::common		= nullptr;
+arCNet *	anLibrary::common		= nullptr;
 anCVarSystem *	anLibrary::cvarSystem	= nullptr;
 anFile *		anLibrary::fileSystem	= nullptr;
 int				anLibrary::frameNumber = 0;
@@ -30,11 +30,11 @@ void anLibrary::Init( void ) {
 	assert( sizeof( bool ) == 1 );
 	Swap_Init();			// initialize little/big endian conversion
 	Mem_Init();				// initialize memory manager
-	anString::InitMemory();	// init string memory allocator
-	arcSIMD::Init();			// initialize generic SIMD implementation
+	anStr::InitMemory();	// init string memory allocator
+	anSIMD::Init();			// initialize generic SIMD implementation
 	anMath::Init();		// initialize math
 	anMatX::Test();		// test anMatX
-	arcPolynomial::Test();	// test arcPolynomial
+	anPolynomial::Test();	// test anPolynomial
 	anDict::Init(); // initialize the dictionary string pools
 }
 
@@ -45,8 +45,8 @@ anLibrary::ShutDown
 */
 void anLibrary::ShutDown( void ) {
 	anDict::Shutdown();	// shut down the dictionary string pools
-	anString::ShutdownMemory(); // shut down the string memory allocator
-	arcSIMD::Shutdown();		// shut down the SIMD engine
+	anStr::ShutdownMemory(); // shut down the string memory allocator
+	anSIMD::Shutdown();		// shut down the SIMD engine
 	Mem_Shutdown();			// shut down the memory manager
 }
 
@@ -84,7 +84,7 @@ static dword colorMask[2] = { 255, 0 };
 ColorFloatToByte
 ================
 */
-ARC_INLINE static byte ColorFloatToByte( float c ) {
+inline static byte ColorFloatToByte( float c ) {
 	return ( byte ) ( ( ( dword ) ( c * 255.0f ) ) & colorMask[FLOATSIGNBITSET( c )] );
 }
 
@@ -177,7 +177,7 @@ void anLibrary::Error( const char *fmt, ... ) {
 	char		text[MAX_STRING_CHARS];
 
 	va_start( argptr, fmt );
-	anString::vsnPrintf( text, sizeof( text ), fmt, argptr );
+	anStr::vsnPrintf( text, sizeof( text ), fmt, argptr );
 	va_end( argptr );
 
 	common->Error( "%s", text );
@@ -193,7 +193,7 @@ void anLibrary::Warning( const char *fmt, ... ) {
 	char		text[MAX_STRING_CHARS];
 
 	va_start( argptr, fmt );
-	anString::vsnPrintf( text, sizeof( text ), fmt, argptr );
+	anStr::vsnPrintf( text, sizeof( text ), fmt, argptr );
 	va_end( argptr );
 
 	common->Warning( "%s", text );
@@ -463,7 +463,7 @@ void Swap_Init( void ) {
 	byte	swaptest[2] = {1,0};
 
 	// set the byte swapping variables in a portable manner
-	if ( *( short *)swaptest == 1 ) {
+	if ( *(short *)swaptest == 1 ) {
 		// little endian ex: x86
 		_BigShort = ShortSwap;
 		_LittleShort = ShortNoSwap;
@@ -499,7 +499,7 @@ Swap_IsBigEndian
 */
 bool Swap_IsBigEndian( void ) {
 	byte	swaptest[2] = {1,0};
-	return *( short *)swaptest != 1;
+	return *(short *)swaptest != 1;
 }
 
 /*

@@ -45,31 +45,31 @@ idSliderWindow::~idSliderWindow() {
 }
 
 bool idSliderWindow::ParseInternalVar(const char *_name, anParser *src) {
-	if (anString::Icmp(_name, "stepsize" ) == 0 || anString::Icmp(_name, "step" ) == 0) {
+	if (anStr::Icmp(_name, "stepsize" ) == 0 || anStr::Icmp(_name, "step" ) == 0) {
 		stepSize = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "low" ) == 0) {
+	if (anStr::Icmp(_name, "low" ) == 0) {
 		low = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "high" ) == 0) {
+	if (anStr::Icmp(_name, "high" ) == 0) {
 		high = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "vertical" ) == 0) {
+	if (anStr::Icmp(_name, "vertical" ) == 0) {
 		vertical = src->ParseBool();
 		return true;
 	}
-	if (anString::Icmp(_name, "verticalflip" ) == 0) {
+	if (anStr::Icmp(_name, "verticalflip" ) == 0) {
 		verticalFlip = src->ParseBool();
 		return true;
 	}
-	if (anString::Icmp(_name, "scrollbar" ) == 0) {
+	if (anStr::Icmp(_name, "scrollbar" ) == 0) {
 		scrollbar = src->ParseBool();
 		return true;
 	}
-	if (anString::Icmp(_name, "thumbshader" ) == 0) {
+	if (anStr::Icmp(_name, "thumbshader" ) == 0) {
 		ParseString( src, thumbShader);
 		declManager->FindMaterial(thumbShader);
 		return true;
@@ -79,16 +79,16 @@ bool idSliderWindow::ParseInternalVar(const char *_name, anParser *src) {
 
 idWinVar *idSliderWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** owner) {
  
-	if (anString::Icmp(_name, "value" ) == 0) {
+	if (anStr::Icmp(_name, "value" ) == 0) {
 		return &value;
 	}
-	if (anString::Icmp(_name, "cvar" ) == 0) {
+	if (anStr::Icmp(_name, "cvar" ) == 0) {
 		return &cvarStr;
 	}
-	if ( anString::Icmp( _name, "liveUpdate" ) == 0 ) {
+	if ( anStr::Icmp( _name, "liveUpdate" ) == 0 ) {
 		return &liveUpdate;
 	}
-	if ( anString::Icmp( _name, "cvarGroup" ) == 0 ) {
+	if ( anStr::Icmp( _name, "cvarGroup" ) == 0 ) {
 		return &cvarGroup;
 	}
 	
@@ -311,7 +311,7 @@ const char *idSliderWindow::RouteMouseCoords(float xd, float yd) {
 }
 
 
-void idSliderWindow::Activate(bool activate, anString &act) {
+void idSliderWindow::Activate(bool activate, anStr &act) {
 	idWindow::Activate(activate, act);
 	if ( activate ) {
 		UpdateCvar( true, true );
@@ -368,16 +368,16 @@ void idSliderWindow::UpdateCvar( bool read, bool force ) {
 idSliderWindow::RunNamedEvent
 ============
 */
-void idSliderWindow::RunNamedEvent( const char* eventName ) {
-	anString event, group;
+void idSliderWindow::RunNamedEvent( const char *eventName ) {
+	anStr event, group;
 	
-	if ( !anString::Cmpn( eventName, "cvar read ", 10 ) ) {
+	if ( !anStr::Cmpn( eventName, "cvar read ", 10 ) ) {
 		event = eventName;
 		group = event.Mid( 10, event.Length() - 10 );
 		if ( !group.Cmp( cvarGroup ) ) {
 			UpdateCvar( true, true );
 		}
-	} else if ( !anString::Cmpn( eventName, "cvar write ", 11 ) ) {
+	} else if ( !anStr::Cmpn( eventName, "cvar write ", 11 ) ) {
 		event = eventName;
 		group = event.Mid( 11, event.Length() - 11 );
 		if ( !group.Cmp( cvarGroup ) ) {

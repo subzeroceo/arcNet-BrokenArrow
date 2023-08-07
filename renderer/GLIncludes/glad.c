@@ -54,12 +54,12 @@ static PFNWGLGETPROCADDRESSPROC_PRIVATE gladGetProcAddressPtr;
 #endif
 
 static
-int open_gl(void) {
+int open_gl( void ) {
 #ifndef IS_UWP
     libGL = LoadLibraryW(L"opengl32.dll" );
     if (libGL != nullptr ) {
-        void (* tmp)(void);
-        tmp = (void(*)(void)) GetProcAddress(libGL, "wglGetProcAddress" );
+        void (* tmp)( void );
+        tmp = (void(*)( void )) GetProcAddress(libGL, "wglGetProcAddress" );
         gladGetProcAddressPtr = (PFNWGLGETPROCADDRESSPROC_PRIVATE) tmp;
         return gladGetProcAddressPtr != nullptr;
     }
@@ -69,7 +69,7 @@ int open_gl(void) {
 }
 
 static
-void close_gl(void) {
+void close_gl( void ) {
     if (libGL != nullptr ) {
         FreeLibrary((HMODULE) libGL);
         libGL = nullptr;
@@ -85,7 +85,7 @@ static PFNGLXGETPROCADDRESSPROC_PRIVATE gladGetProcAddressPtr;
 #endif
 
 static
-int open_gl(void) {
+int open_gl( void ) {
 #ifdef __APPLE__
     static const char *NAMES[] = {
         "../Frameworks/OpenGL.framework/OpenGL",
@@ -100,7 +100,6 @@ int open_gl(void) {
     unsigned int index = 0;
     for (index = 0; index < ( sizeof(NAMES) / sizeof(NAMES[0])); index++ ) {
         libGL = dlopen(NAMES[index], RTLD_NOW | RTLD_GLOBAL);
-
         if (libGL != nullptr ) {
 #if defined(__APPLE__) || defined(__HAIKU__)
             return 1;
@@ -116,7 +115,7 @@ int open_gl(void) {
 }
 
 static
-void close_gl(void) {
+void close_gl( void ) {
     if (libGL != nullptr ) {
         dlclose(libGL);
         libGL = nullptr;
@@ -145,7 +144,7 @@ void* get_proc(const char *namez) {
     return result;
 }
 
-int gladLoadGL(void) {
+int gladLoadGL( void ) {
     int status = 0;
 
     if (open_gl()) {
@@ -169,7 +168,7 @@ static const char *exts = nullptr;
 static int num_exts_i = 0;
 static char **exts_i = nullptr;
 
-static int get_exts(void) {
+static int get_exts( void ) {
 #ifdef _GLAD_IS_SOME_NEW_VERSION
     if (max_loaded_major < 3) {
 #endif
@@ -203,7 +202,7 @@ static int get_exts(void) {
     return 1;
 }
 
-static void free_exts(void) {
+static void free_exts( void ) {
     if (exts_i != nullptr ) {
         int index;
         for (index = 0; index < num_exts_i; index++ ) {
@@ -2432,14 +2431,14 @@ static void load_GL_VERSION_4_6(GLADloadproc load) {
 	glad_glMultiDrawElementsIndirectCount = (PFNGLMULTIDRAWELEMENTSINDIRECTCOUNTPROC)load( "glMultiDrawElementsIndirectCount" );
 	glad_glPolygonOffsetClamp = (PFNGLPOLYGONOFFSETCLAMPPROC)load( "glPolygonOffsetClamp" );
 }
-static int find_extensionsGL(void) {
+static int find_extensionsGL( void ) {
 	if ( !get_exts()) return 0;
-	(void)&has_ext;
+	( void )&has_ext;
 	free_exts();
 	return 1;
 }
 
-static void find_coreGL(void) {
+static void find_coreGL( void ) {
 
     /* Thank you @elmindreda
      * https://github.com/elmindreda/greg/blob/master/templates/greg.c.in#L176
@@ -2447,8 +2446,8 @@ static void find_coreGL(void) {
      */
     int i, major, minor;
 
-    const char* version;
-    const char* prefixes[] = {
+    const char *version;
+    const char *prefixes[] = {
         "OpenGL ES-CM ",
         "OpenGL ES-CL ",
         "OpenGL ES ",

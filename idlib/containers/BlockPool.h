@@ -1,8 +1,6 @@
 #ifndef __BLOCKPOOL_H__
 #define __BLOCKPOOL_H__
 
-#ifdef _MEM_SYS_SUPPORT
-
 /*
 ===============================================================================
 
@@ -65,9 +63,9 @@ anBlockQue<type,blockSize,memoryTag,heapID>::~anBlockQue( void ) {
 template<class type, int blockSize, byte memoryTag, sys_Heap_ID_t heapID>
 type *anBlockQue<type,blockSize,memoryTag,heapID>::Alloc( void ) {
 	if ( !free ) {
-		PUSH_SYS_HEAP_ID(heapID);
+		PushSystemHeapID( heapID );
 		block_t *block = new block_t;
-		POP_HEAP();
+		PopSystemHeap();
 		block->next = blocks;
 		blocks = block;
 		for ( int i = 0; i < blockSize; i++ ) {
@@ -85,7 +83,7 @@ type *anBlockQue<type,blockSize,memoryTag,heapID>::Alloc( void ) {
 
 template<class type, int blockSize, byte memoryTag, sys_Heap_ID_t heapID>
 void anBlockQue<type,blockSize,memoryTag,heapID>::Free( type *t ) {
-	element_t *element = (element_t *)( ( (unsigned char *) t ) - ( (int) &((element_t *)0)->t ) );
+	element_t *element = (element_t *)( ( (unsigned char *) t ) - ( ( int ) &( (element_t *)0 )->t ) );
 	element->next = free;
 	free = element;
 	active--;
@@ -103,5 +101,4 @@ void anBlockQue<type,blockSize,memoryTag,heapID>::Shutdown( void ) {
 	total = active = 0;
 }
 
-#endif // _MEM_SYS_SUPPORT
 #endif // __BLOCKPOOL_H__

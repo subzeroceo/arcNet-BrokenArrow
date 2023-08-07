@@ -25,7 +25,7 @@ class anMatX;
 class anPlane;
 class anDrawVertex;
 class anJointQuat;
-class arcJointMat;
+class anJointMat;
 struct dominantTri_s;
 
 // SIMD macro for loading values from memory
@@ -72,12 +72,12 @@ struct dominantTri_s;
 }
 #pragma once
 
-class arcSIMD_AVX : public arcSIMDProcessor {
+class anSIMD_AVX : public anSIMDProcessor {
 public:
 	cpuid_t							cpuid;
 
-    VPCALL arcSIMD_AVX( int n ) = 0;
-    VPCALL arcSIMD_AVX( size_t numElements ) : arcSIMDProcessor( numElements ) { }
+    VPCALL anSIMD_AVX( int n ) = 0;
+    VPCALL anSIMD_AVX( size_t numElements ) : anSIMDProcessor( numElements ) { }
     const char *VPCALL GetName( void ) const;
    	float VPCALL DotProduct( const float *src1, const float *src2, const int count ) = 0;
     void VPCALL Sub16 ( float *dst, const float *src1, const float *src2, const int count ) = 0;
@@ -111,12 +111,12 @@ public:
     virtual bool VPCALL MatX_LDLTFactor( anMatX &mat, anVecX& invDiag, const int n ) = 0;
 
     virtual void VPCALL BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int* index, const int numJoints ) = 0;
-    virtual void VPCALL ConvertJointQuatsToJointMats(arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) = 0;
-    virtual void VPCALL ConvertJointMatsToJointQuats(anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) = 0;
+    virtual void VPCALL ConvertJointQuatsToJointMats(anJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) = 0;
+    virtual void VPCALL ConvertJointMatsToJointQuats(anJointQuat *jointQuats, const anJointMat *jointMats, const int numJoints ) = 0;
 
-    virtual void VPCALL TransformJoints( arcJointMat *jointMats, const int* parents, const int firstJoint, const int lastJoint ) = 0;
-    virtual void VPCALL UntransformJoints( arcJointMat *jointMats, const int* parents, const int firstJoint, const int lastJoint ) = 0;
-    virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4* weights, const int* index, const int numWeights ) = 0;
+    virtual void VPCALL TransformJoints( anJointMat *jointMats, const int* parents, const int firstJoint, const int lastJoint ) = 0;
+    virtual void VPCALL UntransformJoints( anJointMat *jointMats, const int* parents, const int firstJoint, const int lastJoint ) = 0;
+    virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const anJointMat *joints, const anVec4* weights, const int* index, const int numWeights ) = 0;
 
     static void GetCropBounds( const frustumCorners_t &corners, const float *renderMat, anBounds &bounds );
 
@@ -133,4 +133,4 @@ public:
 };
 
 // pointer to SIMD processor
-extern arcSIMD_AVX *AVXProcessor;
+extern anSIMD_AVX *AVXProcessor;

@@ -83,16 +83,16 @@ idChoiceWindow::~idChoiceWindow() {
 
 }
 
-void idChoiceWindow::RunNamedEvent( const char* eventName ) {
-	anString event, group;
+void idChoiceWindow::RunNamedEvent( const char *eventName ) {
+	anStr event, group;
 	
-	if ( !anString::Cmpn( eventName, "cvar read ", 10 ) ) {
+	if ( !anStr::Cmpn( eventName, "cvar read ", 10 ) ) {
 		event = eventName;
 		group = event.Mid( 10, event.Length() - 10 );
 		if ( !group.Cmp( updateGroup ) ) {
 			UpdateVars( true, true );
 		}
-	} else if ( !anString::Cmpn( eventName, "cvar write ", 11 ) ) {
+	} else if ( !anStr::Cmpn( eventName, "cvar write ", 11 ) ) {
 		event = eventName;
 		group = event.Mid( 11, event.Length() - 11 );
 		if ( !group.Cmp( updateGroup ) ) {
@@ -221,8 +221,8 @@ void idChoiceWindow::UpdateChoice() {
 	if ( choiceType == 0 ) {
 		// ChoiceType 0 stores current as an integer in either cvar or gui
 		// If both cvar and gui are defined then cvar wins, but they are both updated
-		if ( updateStr[ 0 ]->NeedsUpdate() ) {
-			currentChoice = atoi( updateStr[ 0 ]->c_str() );
+		if ( updateStr[0]->NeedsUpdate() ) {
+			currentChoice = atoi( updateStr[0]->c_str() );
 		}
 		ValidateChoice();
 	} else {
@@ -230,7 +230,7 @@ void idChoiceWindow::UpdateChoice() {
 		int c = ( values.Num() ) ? values.Num() : choices.Num();
 		int i;
 		for ( i = 0; i < c; i++ ) {
-			if ( anString::Icmp( cvarStr.c_str(), ( values.Num() ) ? values[i] : choices[i] ) == 0 ) {
+			if ( anStr::Icmp( cvarStr.c_str(), ( values.Num() ) ? values[i] : choices[i] ) == 0 ) {
 				break;
 			}
 		}
@@ -243,11 +243,11 @@ void idChoiceWindow::UpdateChoice() {
 }
 
 bool idChoiceWindow::ParseInternalVar(const char *_name, anParser *src) {
-	if (anString::Icmp(_name, "choicetype" ) == 0) {
+	if (anStr::Icmp(_name, "choicetype" ) == 0) {
 		choiceType = src->ParseInt();
 		return true;
 	}
-	if (anString::Icmp(_name, "currentchoice" ) == 0) {
+	if (anStr::Icmp(_name, "currentchoice" ) == 0) {
 		currentChoice = src->ParseInt();
 		return true;
 	}
@@ -256,22 +256,22 @@ bool idChoiceWindow::ParseInternalVar(const char *_name, anParser *src) {
 
 
 idWinVar *idChoiceWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** owner) {
-	if ( anString::Icmp( _name, "choices" ) == 0 ) {
+	if ( anStr::Icmp( _name, "choices" ) == 0 ) {
 		return &choicesStr;
 	}
-	if ( anString::Icmp( _name, "values" ) == 0 ) {
+	if ( anStr::Icmp( _name, "values" ) == 0 ) {
 		return &choiceVals;
 	}
-	if ( anString::Icmp( _name, "cvar" ) == 0 ) {
+	if ( anStr::Icmp( _name, "cvar" ) == 0 ) {
 		return &cvarStr;
 	}
-	if ( anString::Icmp( _name, "gui" ) == 0 ) {
+	if ( anStr::Icmp( _name, "gui" ) == 0 ) {
 		return &guiStr;
 	}
-	if ( anString::Icmp( _name, "liveUpdate" ) == 0 ) {
+	if ( anStr::Icmp( _name, "liveUpdate" ) == 0 ) {
 		return &liveUpdate;
 	}
-	if ( anString::Icmp( _name, "updateGroup" ) == 0 ) {
+	if ( anStr::Icmp( _name, "updateGroup" ) == 0 ) {
 		return &updateGroup;
 	}
 	
@@ -281,7 +281,7 @@ idWinVar *idChoiceWindow::GetWinVarByName(const char *_name, bool fixup, drawWin
 // update the lists whenever the WinVar have changed
 void idChoiceWindow::UpdateChoicesAndVals( void ) {
 	anToken token;
-	anString str2, str3;
+	anStr str2, str3;
 	anLexer src;
 
 	if ( latchedChoices.Icmp( choicesStr ) ) {
@@ -371,7 +371,7 @@ void idChoiceWindow::Draw( inttime, float x, float y) {
 	textAlign = 0;
 
 	if ( textShadow ) {
-		anString shadowText = choices[currentChoice];
+		anStr shadowText = choices[currentChoice];
 		idRectangle shadowRect = textRect;
 
 		shadowText.RemoveColors();
@@ -393,7 +393,7 @@ void idChoiceWindow::Draw( inttime, float x, float y) {
 	dc->DrawText( choices[currentChoice], textScale, textAlign, color, textRect, false, -1 );
 }
 
-void idChoiceWindow::Activate( bool activate, anString &act ) {
+void idChoiceWindow::Activate( bool activate, anStr &act ) {
 	idWindow::Activate( activate, act );
 	if ( activate ) {
 		// sets the gui state based on the current choice the window contains

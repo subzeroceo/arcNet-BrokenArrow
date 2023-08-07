@@ -24,7 +24,7 @@ public:
 		inFile->WriteBig( tokenType );
 		inFile->WriteBig( tokenSubType );
 	}
-	anString token;
+	anStr token;
 	int8  tokenType;
 	short tokenSubType;
 };
@@ -67,7 +67,7 @@ public:
 	}
 private:
 	anList< short > tokenIndexes;
-	anString fileName;
+	anStr fileName;
 };
 
 class anTokenParser {

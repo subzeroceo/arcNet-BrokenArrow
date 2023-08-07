@@ -80,7 +80,7 @@ protected:
 anSurface::anSurface
 ====================
 */
-ARC_INLINE anSurface::anSurface( void ) {
+inline anSurface::anSurface( void ) {
 }
 
 /*
@@ -88,7 +88,7 @@ ARC_INLINE anSurface::anSurface( void ) {
 anSurface::anSurface
 =================
 */
-ARC_INLINE anSurface::anSurface( const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+inline anSurface::anSurface( const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 	assert( verts != nullptr && indexes != nullptr && numVerts > 0 && numIndexes > 0 );
 	this->verts.SetNum( numVerts );
 	memcpy( this->verts.Ptr(), verts, numVerts * sizeof( verts[0] ) );
@@ -102,7 +102,7 @@ ARC_INLINE anSurface::anSurface( const anDrawVertex *verts, const int numVerts, 
 anSurface::anSurface
 ====================
 */
-ARC_INLINE anSurface::anSurface( const anSurface &surf ) {
+inline anSurface::anSurface( const anSurface &surf ) {
 	this->verts = surf.verts;
 	this->indexes = surf.indexes;
 	this->edges = surf.edges;
@@ -114,7 +114,7 @@ ARC_INLINE anSurface::anSurface( const anSurface &surf ) {
 anSurface::~anSurface
 ====================
 */
-ARC_INLINE anSurface::~anSurface( void ) {
+inline anSurface::~anSurface( void ) {
 }
 
 /*
@@ -122,7 +122,7 @@ ARC_INLINE anSurface::~anSurface( void ) {
 anSurface::operator[]
 =================
 */
-ARC_INLINE const anDrawVertex &anSurface::operator[]( const int index ) const {
+inline const anDrawVertex &anSurface::operator[]( const int index ) const {
 	return verts[index];
 };
 
@@ -131,7 +131,7 @@ ARC_INLINE const anDrawVertex &anSurface::operator[]( const int index ) const {
 anSurface::operator[]
 =================
 */
-ARC_INLINE anDrawVertex &anSurface::operator[]( const int index ) {
+inline anDrawVertex &anSurface::operator[]( const int index ) {
 	return verts[index];
 };
 
@@ -140,7 +140,7 @@ ARC_INLINE anDrawVertex &anSurface::operator[]( const int index ) {
 anSurface::operator+=
 =================
 */
-ARC_INLINE anSurface &anSurface::operator+=( const anSurface &surf ) {
+inline anSurface &anSurface::operator+=( const anSurface &surf ) {
 	int i, m, n;
 	n = verts.Num();
 	m = indexes.Num();
@@ -158,7 +158,7 @@ ARC_INLINE anSurface &anSurface::operator+=( const anSurface &surf ) {
 anSurface::Clear
 =================
 */
-ARC_INLINE void anSurface::Clear( void ) {
+inline void anSurface::Clear( void ) {
 	verts.Clear();
 	indexes.Clear();
 	edges.Clear();
@@ -170,7 +170,7 @@ ARC_INLINE void anSurface::Clear( void ) {
 anSurface::SwapTriangles
 =================
 */
-ARC_INLINE void anSurface::SwapTriangles( anSurface &surf ) {
+inline void anSurface::SwapTriangles( anSurface &surf ) {
 	verts.Swap( surf.verts );
 	indexes.Swap( surf.indexes );
 	edges.Swap( surf.edges );
@@ -182,7 +182,7 @@ ARC_INLINE void anSurface::SwapTriangles( anSurface &surf ) {
 anSurface::TranslateSelf
 =================
 */
-ARC_INLINE void anSurface::TranslateSelf( const anVec3 &translation ) {
+inline void anSurface::TranslateSelf( const anVec3 &translation ) {
 	for ( int i = 0; i < verts.Num(); i++ ) {
 		verts[i].xyz += translation;
 	}
@@ -193,7 +193,7 @@ ARC_INLINE void anSurface::TranslateSelf( const anVec3 &translation ) {
 anSurface::RotateSelf
 =================
 */
-ARC_INLINE void anSurface::RotateSelf( const anMat3 &rotation ) {
+inline void anSurface::RotateSelf( const anMat3 &rotation ) {
 	for ( int i = 0; i < verts.Num(); i++ ) {
 		verts[i].xyz *= rotation;
 		verts[i].normal *= rotation;

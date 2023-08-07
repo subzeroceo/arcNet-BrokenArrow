@@ -7,17 +7,17 @@
 
 //===============================================================
 //
-//	MMX implementation of arcSIMDProcessor
+//	MMX implementation of anSIMDProcessor
 //
 //===============================================================
 
 #if defined(MACOS_X) && defined(__i386__)
 /*
 ============
-arcSIMD_MMX::GetName
+anSIMD_MMX::GetName
 ============
 */
-const char *arcSIMD_MMX::GetName( void ) const {
+const char *anSIMD_MMX::GetName( void ) const {
 	return "MMX";
 }
 
@@ -27,10 +27,10 @@ const char *arcSIMD_MMX::GetName( void ) const {
 
 /*
 ============
-arcSIMD_MMX::GetName
+anSIMD_MMX::GetName
 ============
 */
-const char *arcSIMD_MMX::GetName( void ) const {
+const char *anSIMD_MMX::GetName( void ) const {
 	return "MMX";
 }
 
@@ -190,12 +190,12 @@ loopL1ToMem:
 
 /*
 ================
-arcSIMD_MMX::Memcpy
+anSIMD_MMX::Memcpy
 
   optimized memory copy routine that handles all alignment cases and block sizes efficiently
 ================
 */
-void VPCALL arcSIMD_MMX::Memcpy( void *dest0, const void *src0, const int count0 ) {
+void VPCALL anSIMD_MMX::Memcpy( void *dest0, const void *src0, const int count0 ) {
 	// if copying more than 16 bytes and we can copy 8 byte aligned
 	if ( count0 > 16 && !( ( ( int )dest0 ^ ( int )src0 ) & 7 ) ) {
 		byte *dest = (byte *)dest0;
@@ -247,10 +247,10 @@ void VPCALL arcSIMD_MMX::Memcpy( void *dest0, const void *src0, const int count0
 
 /*
 ================
-arcSIMD_MMX::Memset
+anSIMD_MMX::Memset
 ================
 */
-void VPCALL arcSIMD_MMX::Memset( void* dest0, const int val, const int count0 ) {
+void VPCALL anSIMD_MMX::Memset( void* dest0, const int val, const int count0 ) {
 	union {
 		byte	bytes[8];
 		word	words[4];

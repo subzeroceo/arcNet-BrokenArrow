@@ -17,13 +17,34 @@ private:
 
 
 private:
-	void			SaveEntityPosition( arcEntity *ent );
-	bool			RotateEntityToAxial( arcEntity *ent, anVec3 rotationPoint );
+	void			SaveEntityPosition( anEntity *ent );
+	bool			RotateEntityToAxial( anEntity *ent, anVec3 rotationPoint );
 #ifdef NEW_PUSH
-	bool			CanEntityFloat( arcEntity *ent, arcEntity *pusher, arcEntity *initialPusher, const int flags );
-	void			AddEntityToBouyGroup( arcEntity *ent, float fraction, bool waterContact );
-	bool			IsFullySubmerged( arcEntity *ent );
+	bool			CanEntityFloat( anEntity *ent, anEntity *pusher, anEntity *initialPusher, const int flags );
+	void			AddEntityToBouyGroup( anEntity *ent, float fraction, bool waterContact );
+	bool			IsFullySubmerged( anEntity *ent );
 
+};
+
+/*
+===============================================================================
+
+	basic spawning function for liquids
+
+===============================================================================
+*/
+
+class anLiquid : public anEntity {
+public:
+	CLASS_PROTOTYPE( anLiquid );
+
+										anLiquid( void );
+	void								Spawn( void );
+
+	virtual void						GetWaterCurrent( anVec3 &waterCurrent ) const { waterCurrent = current; }
+
+private:
+	anVec3								current;
 };
 
 #endif // __WATER_H__

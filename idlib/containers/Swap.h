@@ -48,7 +48,6 @@ public:
 	template<class type> static void Big( type &c ) {
 		// byte swapping pointers is pointless because we should never store pointers on disk
 		assert( !IsPointer( c ) );
-
 			if ( sizeof( type ) == 1 ) {
 			} else if ( sizeof( type ) == 2 ) {
 				byte *b = (byte *)&c;
@@ -98,7 +97,7 @@ public:
 	}
 
 public:		// specializations
-#ifndef ID_SWAP_LITE // avoid dependency avalanche for SPU code
+#ifndef AN_SWAP_LITE // avoid dependency avalanche for SPU code
 #define SWAP_VECTOR( x ) \
 	static void Little( x &c ) { LittleArray( c.ToFloatPtr(), c.GetDimension() ); } \
 	static void Big( x &c ) {    BigArray( c.ToFloatPtr(), c.GetDimension() ); }
@@ -182,7 +181,6 @@ public:
 			size += count * sizeof( type );
 		#endif
 	}
-
 #ifdef _DEBUG
 private:
 	int size;

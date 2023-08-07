@@ -4,7 +4,7 @@
 /*
 ===============================================================================
 
-arcMultiModelAF
+anMultiModelAF
 
 Entity using multiple separate visual models animated with a single
 articulated figure. Only used for debugging!
@@ -13,12 +13,12 @@ articulated figure. Only used for debugging!
 */
 const int GIB_DELAY = 200;  // only gib this often to keep performace hits when blowing up several mobs
 
-class arcMultiModelAF : public arcEntity {
+class anMultiModelAF : public anEntity {
 public:
-	CLASS_PROTOTYPE( arcMultiModelAF );
+	CLASS_PROTOTYPE( anMultiModelAF );
 
 	void					Spawn( void );
-							~arcMultiModelAF( void );
+							~anMultiModelAF( void );
 
 	virtual void			Think( void );
 	virtual void			Present( void );
@@ -26,56 +26,56 @@ public:
 protected:
 	anPhysics_AF			physicsObj;
 
-	void					SetModelForId( int id, const anString &modelName );
+	void					SetModelForId( int id, const anStr &modelName );
 
 private:
-	arcList<anRenderModel *>	modelHandles;
-	arcList<int>				modelDefHandles;
+	anList<anRenderModel *>	modelHandles;
+	anList<int>				modelDefHandles;
 };
 
 /*
 ===============================================================================
 
-arcNetChain
+anAFChain
 
 Chain hanging down from the ceiling. Only used for debugging!
 
 ===============================================================================
 */
 
-class arcNetChain : public arcMultiModelAF {
+class anAFChain : public anMultiModelAF {
 public:
-	CLASS_PROTOTYPE( arcNetChain );
+	CLASS_PROTOTYPE( anAFChain );
 
 	void					Spawn( void );
 
 protected:
-	void					BuildChain( const anString &name, const anVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld = true );
+	void					BuildChain( const anStr &name, const anVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld = true );
 };
 
 /*
 ===============================================================================
 
-arcAFAttachment
+anAFAttachment
 
 ===============================================================================
 */
 
-class arcAFAttachment : public arcAnimatedEntity {
+class anAFAttachment : public anAnimatedEntity {
 public:
-	CLASS_PROTOTYPE( arcAFAttachment );
+	CLASS_PROTOTYPE( anAFAttachment );
 
-							arcAFAttachment( void );
-	virtual					~arcAFAttachment( void );
+							anAFAttachment( void );
+	virtual					~anAFAttachment( void );
 
 	void					Spawn( void );
 
-	void					Save( arcSaveGame *savefile ) const;
-	void					Restore( arcRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
-	void					SetBody( arcEntity *bodyEnt, const char *headModel, jointHandle_t attachJoint );
+	void					SetBody( anEntity *bodyEnt, const char *headModel, jointHandle_t attachJoint );
 	void					ClearBody( void );
-	arcEntity *				GetBody( void ) const;
+	anEntity *				GetBody( void ) const;
 
 	virtual void			Think( void );
 
@@ -84,11 +84,11 @@ public:
 
 	void					PlayIdleAnim( int blendTime );
 
-	virtual void			GetImpactInfo( arcEntity *ent, int id, const anVec3 &point, impactInfo_t *info );
-	virtual void			ApplyImpulse( arcEntity *ent, int id, const anVec3 &point, const anVec3 &impulse );
-	virtual void			AddForce( arcEntity *ent, int id, const anVec3 &point, const anVec3 &force );
+	virtual void			GetImpactInfo( anEntity *ent, int id, const anVec3 &point, impactInfo_t *info );
+	virtual void			ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &impulse );
+	virtual void			AddForce( anEntity *ent, int id, const anVec3 &point, const anVec3 &force );
 
-	virtual	void			Damage( arcEntity *inflictor, arcEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
+	virtual	void			Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
 	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName );
 
 	void					SetCombatModel( void );
@@ -97,7 +97,7 @@ public:
 	virtual void			UnlinkCombat( void );
 
 protected:
-	arcEntity *				body;
+	anEntity *				body;
 	anClipModel *			combatModel;	// render model for hit detection of head
 	int						idleAnim;
 	jointHandle_t			attachJoint;
@@ -106,27 +106,28 @@ protected:
 /*
 ===============================================================================
 
-arcAFEntity_Base
+anAFEntity_Base
 
 ===============================================================================
 */
 
-class arcAFEntity_Base : public arcAnimatedEntity {
+class anAFEntity_Base : public anAnimatedEntity {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_Base );
+	CLASS_PROTOTYPE( anAFEntity_Base );
 
-							arcAFEntity_Base( void );
-	virtual					~arcAFEntity_Base( void );
+							anAFEntity_Base( void );
+	virtual					~anAFEntity_Base( void );
 
 	void					Spawn( void );
 
-	void					Save( arcSaveGame *savefile ) const;
-	void					Restore( arcRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	virtual void			Think( void );
-	virtual void			GetImpactInfo( arcEntity *ent, int id, const anVec3 &point, impactInfo_t *info );
-	virtual void			ApplyImpulse( arcEntity *ent, int id, const anVec3 &point, const anVec3 &impulse );
-	virtual void			AddForce( arcEntity *ent, int id, const anVec3 &point, const anVec3 &force );
+	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName );
+	virtual void			GetImpactInfo( anEntity *ent, int id, const anVec3 &point, impactInfo_t *info );
+	virtual void			ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &impulse );
+	virtual void			AddForce( anEntity *ent, int id, const anVec3 &point, const anVec3 &force );
 	virtual bool			Collide( const trace_t &collision, const anVec3 &velocity );
 	virtual bool			GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis );
 	virtual bool			UpdateAnimationControllers( void );
@@ -136,6 +137,7 @@ public:
 	bool					IsActiveAF( void ) const { return af.IsActive(); }
 	const char *			GetAFName( void ) const { return af.GetName(); }
 	anPhysics_AF *			GetAFPhysics( void ) { return af.GetPhysics(); }
+	const anAF &			GetAF( void ) { return af; }
 
 	void					SetCombatModel( void );
 	anClipModel *			GetCombatModel( void ) const;
@@ -149,12 +151,14 @@ public:
 	void					SaveState( anDict &args ) const;
 	void					LoadState( const anDict &args );
 
+	virtual void			Unbind( void );
+	virtual bool			InitBind( anEntity *master );
 	void					AddBindConstraints( void );
 	void					RemoveBindConstraints( void );
 
 	virtual void			ShowEditingDialog( void );
 
-	static void				DropAFs( arcEntity *ent, const char *type, arcList<arcEntity *> *list );
+	static void				DropAFs( anEntity *ent, const char *type, anList<anEntity *> *list );
 
 protected:
 	arcAF					af;				// articulated figure
@@ -170,64 +174,68 @@ protected:
 /*
 ===============================================================================
 
-arcAFEntity_Gibbable
+anAFEntity_Fragged
 
 ===============================================================================
 */
 
-extern const arcEventDef		EV_Gib;
-extern const arcEventDef		EV_Gibbed;
+extern const anEventDef		EV_Gib;
+extern const anEventDef		EV_Gibbed;
 
-class arcAFEntity_Gibbable : public arcAFEntity_Base {
+class anAFEntity_Fragged : public anAFEntity_Base {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_Gibbable );
+	CLASS_PROTOTYPE( anAFEntity_Fragged );
 
-							arcAFEntity_Gibbable( void );
-							~arcAFEntity_Gibbable( void );
+							anAFEntity_Fragged( void );
+							~anAFEntity_Fragged( void );
 
 	void					Spawn( void );
-	void					Save( arcSaveGame *savefile ) const;
-	void					Restore( arcRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 	virtual void			Present( void );
-	virtual	void			Damage( arcEntity *inflictor, arcEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
+	virtual	void			Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location );
+	void					SetThrown( bool isThrown );
 	virtual void			SpawnGibs( const anVec3 &dir, const char *damageDefName );
+
+	bool					IsGibbed() { return gibbed; };
 
 protected:
 	anRenderModel *			skeletonModel;
 	int						skeletonModelDefHandle;
 	bool					gibbed;
+	bool 					wasThrown;
 
 	virtual void			Gib( const anVec3 &dir, const char *damageDefName );
 	void					InitSkeletonModel( void );
 
-	void					Event_Gib( const char *damageDefName );
+	void					Event_Exploded( const char *damageDefName );
 };
 
 /*
 ===============================================================================
 
-	arcAFEntity_Generic
+	anAFEntity_Generic
 
 ===============================================================================
 */
 
-class arcAFEntity_Generic : public arcAFEntity_Gibbable {
+class anAFEntity_Generic : public anAFEntity_Fragged {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_Generic );
+	CLASS_PROTOTYPE( anAFEntity_Generic );
 
-							arcAFEntity_Generic( void );
-							~arcAFEntity_Generic( void );
+							anAFEntity_Generic( void );
+							~anAFEntity_Generic( void );
 
 	void					Spawn( void );
 
-	void					Save( arcSaveGame *savefile ) const;
-	void					Restore( arcRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	virtual void			Think( void );
 	void					KeepRunningPhysics( void ) { keepRunningPhysics = true; }
 
 private:
-	void					Event_Activate( arcEntity *activator );
+	void					Event_Activate( anEntity *activator );
 
 	bool					keepRunningPhysics;
 };
@@ -235,22 +243,22 @@ private:
 /*
 ===============================================================================
 
-arcAFEntity_WithAttachedHead
+anAFEntity_AttachedHead
 
 ===============================================================================
 */
 
-class arcAFEntity_WithAttachedHead : public arcAFEntity_Gibbable {
+class anAFEntity_AttachedHead : public anAFEntity_Fragged {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_WithAttachedHead );
+	CLASS_PROTOTYPE( anAFEntity_AttachedHead );
 
-							arcAFEntity_WithAttachedHead();
-							~arcAFEntity_WithAttachedHead();
+							anAFEntity_AttachedHead();
+							~anAFEntity_AttachedHead();
 
 	void					Spawn( void );
 
-	void					Save( arcSaveGame *savefile ) const;
-	void					Restore( arcRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	void					SetupHead( void );
 
@@ -267,31 +275,31 @@ protected:
 	virtual void			Gib( const anVec3 &dir, const char *damageDefName );
 
 private:
-	arcEntityPtr<arcAFAttachment>	head;
+	anEntityPtr<anAFAttachment>	head;
 
-	void					Event_Gib( const char *damageDefName );
-	void					Event_Activate( arcEntity *activator );
+	void					Event_Exploded( const char *damageDefName );
+	void					Event_Activate( anEntity *activator );
 };
 
 /*
 ===============================================================================
 
-arcAFEntity_Vehicle
+anAFEntity_Vehicle
 
 ===============================================================================
 */
 
-class arcAFEntity_Vehicle : public arcAFEntity_Base {
+class anAFEntity_Vehicle : public anAFEntity_Base {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_Vehicle );
+	CLASS_PROTOTYPE( anAFEntity_Vehicle );
 
-							arcAFEntity_Vehicle( void );
+							anAFEntity_Vehicle( void );
 
 	void					Spawn( void );
-	void					Use( arcNetBasePlayer *player );
+	void					Use( anBasePlayer *player );
 
 protected:
-	arcNetBasePlayer *		player;
+	anBasePlayer *			player;
 	jointHandle_t			eyesJoint;
 	jointHandle_t			steeringWheelJoint;
 	float					wheelRadius;
@@ -305,17 +313,17 @@ protected:
 /*
 ===============================================================================
 
-arcAFEntity_VehicleSimple
+anAFEntity_VehicleSimple
 
 ===============================================================================
 */
 
-class arcAFEntity_VehicleSimple : public arcAFEntity_Vehicle {
+class anAFEntity_VehicleSimple : public anAFEntity_Vehicle {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_VehicleSimple );
+	CLASS_PROTOTYPE( anAFEntity_VehicleSimple );
 
-							arcAFEntity_VehicleSimple( void );
-							~arcAFEntity_VehicleSimple( void );
+							anAFEntity_VehicleSimple( void );
+							~anAFEntity_VehicleSimple( void );
 
 	void					Spawn( void );
 	virtual void			Think( void );
@@ -330,16 +338,16 @@ protected:
 /*
 ===============================================================================
 
-arcAFEntity_VehicleFourWheels
+anAFEntity_VehicleFourWheels
 
 ===============================================================================
 */
 
-class arcAFEntity_VehicleFourWheels : public arcAFEntity_Vehicle {
+class anAFEntity_VehicleFourWheels : public anAFEntity_Vehicle {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_VehicleFourWheels );
+	CLASS_PROTOTYPE( anAFEntity_VehicleFourWheels );
 
-							arcAFEntity_VehicleFourWheels( void );
+							anAFEntity_VehicleFourWheels( void );
 
 	void					Spawn( void );
 	virtual void			Think( void );
@@ -355,20 +363,22 @@ protected:
 /*
 ===============================================================================
 
-arcAFEntity_VehicleSixWheels
+anAFEntity_VehicleSixWheels
 
 ===============================================================================
 */
 
-class arcAFEntity_VehicleSixWheels : public arcAFEntity_Vehicle {
+class anAFEntity_VehicleSixWheels : public anAFEntity_Vehicle {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_VehicleSixWheels );
+	CLASS_PROTOTYPE( anAFEntity_VehicleSixWheels );
 
-							arcAFEntity_VehicleSixWheels( void );
+							anAFEntity_VehicleSixWheels( void );
 
 	void					Spawn( void );
 	virtual void			Think( void );
-
+	float					force;
+	float					velocity;
+	float					steerAngle;
 private:
 	arcAFBody *				wheels[6];
 	arcAFConstraint_Hinge *	steering[4];
@@ -379,21 +389,51 @@ private:
 /*
 ===============================================================================
 
-arcAFEntity_SteamPipe
+anAFEntity_VehicleAutomated
 
 ===============================================================================
 */
 
-class arcAFEntity_SteamPipe : public arcAFEntity_Base {
+class anAFEntity_VehicleAutomated : public anAFEntity_VehicleSixWheels {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_SteamPipe );
-
-							arcAFEntity_SteamPipe( void );
-							~arcAFEntity_SteamPipe( void );
+	CLASS_PROTOTYPE( anAFEntity_VehicleAutomated );
 
 	void					Spawn( void );
-	void					Save( arcSaveGame *savefile ) const;
-	void					Restore( arcRestoreGame *savefile );
+	void					PostSpawn( void );
+	virtual void			Think( void );
+
+private:
+
+	anEntity *	waypoint;
+	float		steeringSpeed;
+	float		currentSteering;
+	float		idealSteering;
+	float		originHeight;
+
+	void		Event_SetVelocity( float _velocity );
+	void		Event_SetTorque( float _torque );
+	void		Event_SetSteeringSpeed( float _steeringSpeed );
+	void		Event_SetWayPoint( anEntity *_waypoint );
+};
+
+/*
+===============================================================================
+
+anAFEntity_SteamPipe
+
+===============================================================================
+*/
+
+class anAFEntity_SteamPipe : public anAFEntity_Base {
+public:
+	CLASS_PROTOTYPE( anAFEntity_SteamPipe );
+
+							anAFEntity_SteamPipe( void );
+							~anAFEntity_SteamPipe( void );
+
+	void					Spawn( void );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 	virtual void			Think( void );
 
@@ -411,26 +451,110 @@ private:
 /*
 ===============================================================================
 
-arcAFEntity_ClawFourFingers
+anAFEntity_ClawFourFingers
 
 ===============================================================================
 */
 
-class arcAFEntity_ClawFourFingers : public arcAFEntity_Base {
+class anAFEntity_ClawFourFingers : public anAFEntity_Base {
 public:
-	CLASS_PROTOTYPE( arcAFEntity_ClawFourFingers );
+	CLASS_PROTOTYPE( anAFEntity_ClawFourFingers );
 
-							arcAFEntity_ClawFourFingers( void );
+							anAFEntity_ClawFourFingers( void );
 
 	void					Spawn( void );
-	void					Save( arcSaveGame *savefile ) const;
-	void					Restore( arcRestoreGame *savefile );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
 
 private:
 	arcAFConstraint_Hinge *	fingers[4];
 
 	void					Event_SetFingerAngle( float angle );
 	void					Event_StopFingers( void );
+};
+
+/*
+===============================================================================
+
+Harvestable contains all of the code required to turn an entity into a harvestable
+entity. The entity must create an instance of this class and call the appropriate
+interface methods at the correct time.
+
+===============================================================================
+*/
+class anHarvest : public anEntity {
+public:
+	CLASS_PROTOTYPE( anHarvest );
+
+							anHarvest( void );
+							~anHarvest( void );
+
+	void					Spawn( void );
+	void					Init( anEntity *parent );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
+
+	void					SetParent( anEntity *parent );
+
+	void					Think( void );
+	void					Gib( void );
+
+protected:
+	anEntityPtr<anEntity>	parentEnt;
+	float					triggersize;
+	anClipModel *			trigger;
+	float					giveDelay;
+	float					removeDelay;
+	bool					given;
+
+	anEntityPtr<anBasePlayer> player;
+	int						startTime;
+
+	bool					fxFollowPlayer;
+	anEntityPtr<anEntityFx>	fx;
+	anStr					fxOrient;
+
+protected:
+	void					BeginBurn( void );
+	void					BeginFX( void );
+	void					CalcTriggerBounds( float size, anBounds &bounds );
+
+	bool					GetFxOrientationAxis( anMat3 &mat );
+
+	void					Event_SpawnHarvestTrigger( void );
+	void					Event_Touch( anEntity *other, trace_t *trace );
+} ;
+
+
+/*
+===============================================================================
+
+anAFEntity_Harvest
+
+===============================================================================
+*/
+
+class anAFEntity_Harvest : public anAFEntity_AttachedHead {
+public:
+	CLASS_PROTOTYPE( anAFEntity_Harvest );
+
+	anAFEntity_Harvest();
+	~anAFEntity_Harvest();
+
+	void					Spawn( void );
+
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
+
+	virtual void			Think( void );
+
+	virtual void			Gib( const anVec3 &dir, const char *damageDefName );
+
+protected:
+	anEntityPtr<anHarvest> harvestEnt;
+protected:
+	void					Event_SpawnHarvestEntity( void );
+
 };
 
 #endif // !__GAME_AFENTITY_H__

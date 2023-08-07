@@ -557,7 +557,7 @@ void R_AllocStaticTriSurfPlanes( srfTriangles_t *tri, int numIndexes ) {
 
 static void R_ByteSwapTri( srfTriangles_t *tri ) {
 	for ( int i = 0; i < sizeof( srfTriangles_t )/4 ; i++ ) {
-		( ( int*)tri )[i] = BigLong( ( ( int*)tri )[i] );
+		( (int *)tri )[i] = BigLong( ( (int *)tri )[i] );
 	}
 }
 
@@ -686,7 +686,7 @@ static int *R_CreateSilRemap( const srfTriangles_t *tri ) {
 	int		i, j, hashKey;
 	const anDrawVertex *v1, *v2;
 
-	remap = ( int*)R_ClearedStaticAlloc( tri->numVerts * sizeof( remap[0] ) );
+	remap = (int *)R_ClearedStaticAlloc( tri->numVerts * sizeof( remap[0] ) );
 
 	if ( !r_useSilRemap.GetBool() ) {
 		for ( i = 0; i < tri->numVerts; i++ ) {
@@ -755,7 +755,7 @@ R_CreateDupVerts
 =====================
 */
 void R_CreateDupVerts( srfTriangles_t *tri ) {
-	int *remap = ( int*) _alloca16( tri->numVerts * sizeof( remap[0] ) );
+	int *remap = (int *) _alloca16( tri->numVerts * sizeof( remap[0] ) );
 
 	// initialize vertex remap in case there are unused verts
 	for ( int i = 0; i < tri->numVerts; i++ ) {
@@ -768,7 +768,7 @@ void R_CreateDupVerts( srfTriangles_t *tri ) {
 	}
 
 	// create duplicate vertex index based on the vertex remap
-	int * tempDupVerts = ( int*) _alloca16( tri->numVerts * 2 * sizeof( tempDupVerts[0] ) );
+	int * tempDupVerts = (int *) _alloca16( tri->numVerts * 2 * sizeof( tempDupVerts[0] ) );
 	tri->numDupVerts = 0;
 	for ( int i = 0; i < tri->numVerts; i++ ) {
 		if ( remap[i] != i ) {
@@ -1611,7 +1611,7 @@ void R_DeriveTangentsWithoutNormals( srfTriangles_t *tri ) {
 	tri->tangentsCalculated = true;
 }
 
-static ARC_INLINE void VectorNormalizeFast2( const anVec3 &v, anVec3 &out) {
+static inline void VectorNormalizeFast2( const anVec3 &v, anVec3 &out) {
 	float	ilength;
 
 	ilength = anMath::RSqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
@@ -2116,7 +2116,7 @@ void R_RemoveUnusedVerts( srfTriangles_t *tri ) {
 	int		index;
 	int		used;
 
-	mark = ( int*)R_ClearedStaticAlloc( tri->numVerts * sizeof( *mark ) );
+	mark = (int *)R_ClearedStaticAlloc( tri->numVerts * sizeof( *mark ) );
 
 	for ( i = 0; i < tri->numIndexes; i++ ) {
 		index = tri->indexes[i];
@@ -2748,7 +2748,7 @@ void R_RenderGuiSurf( anUserInterfaces *gui, drawSurf_t *drawSurf ) {
 	guiModelMatrix[11] = 0;
 	guiModelMatrix[15] = 1;
 
-	GL_MultMatrix( guiModelMatrix, drawSurf->space->modelMatrix, modelMatrix );
+	GL_MultMatrixAligned( guiModelMatrix, drawSurf->space->modelMatrix, modelMatrix );
 
 	tr.guiRecursionLevel++;
 
@@ -2775,7 +2775,7 @@ Should we also reload the map models?
 void R_ReloadGuis_f( const anCommandArgs &args ) {
 	bool all;
 
-	if ( !anString::Icmp( args.Argv(1 ), "all" ) ) {
+	if ( !anStr::Icmp( args.Argv(1 ), "all" ) ) {
 		all = true;
 		common->Printf( "Reloading all gui files...\n" );
 	} else {

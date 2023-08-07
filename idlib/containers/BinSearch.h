@@ -19,7 +19,7 @@ BinSearch_GreaterEqual
 ====================
 */
 template<class type>
-ARC_INLINE int BinSearch_Less( const type *array, const int arraySize, const type &value ) {
+inline int BinSearch_Less( const type *array, const int arraySize, const type &value ) {
 	int len = arraySize;
 	int mid = len;
 	int offset = 0;
@@ -41,7 +41,7 @@ BinSearch_GreaterEqual
 ====================
 */
 template<class type>
-ARC_INLINE int BinSearch_LessEqual( const type *array, const int arraySize, const type &value ) {
+inline int BinSearch_LessEqual( const type *array, const int arraySize, const type &value ) {
 	int len = arraySize;
 	int mid = len;
 	int offset = 0;
@@ -63,7 +63,7 @@ BinSearch_Greater
 ====================
 */
 template<class type>
-ARC_INLINE int BinSearch_Greater( const type *array, const int arraySize, const type &value ) {
+inline int BinSearch_Greater( const type *array, const int arraySize, const type &value ) {
 	int len = arraySize;
 	int mid = len;
 	int offset = 0;
@@ -89,7 +89,7 @@ BinSearch_GreaterEqual
 ====================
 */
 template<class type>
-ARC_INLINE int BinSearch_GreaterEqual( const type *array, const int arraySize, const type &value ) {
+inline int BinSearch_GreaterEqual( const type *array, const int arraySize, const type &value ) {
 	int len = arraySize;
 	int mid = len;
 	int offset = 0;

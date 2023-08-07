@@ -1921,7 +1921,7 @@ bool anPhysics_Player::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 		// IsOutsideWorld uses self, so it needs to be non null
 		if ( IsOutsideWorld() ) {
-			gameLocal.Warning( "clip model outside world bounds for entity '%s' at (%s)", self ? "nullptr" : self->name.c_str(), current.origin.ToString(0) );
+			gameLocal.Warning( "clip model outside world bounds for entity '%s' at (%s)", self ? "nullptr" : self->name.c_str(), current.origin.ToString( 0 ) );
 		}
 	}
 

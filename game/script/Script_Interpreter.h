@@ -26,7 +26,7 @@ private:
 
 	int					popParms;
 	const idEventDef	*multiFrameEvent;
-	idEntity			*eventEntity;
+	abEntity			*eventEntity;
 
 	idThread			*thread;
 
@@ -38,7 +38,7 @@ private:
 	void				SetString( idVarDef *def, const char *from );
 	const char			*GetString( idVarDef *def );
 	varEval_t			GetVariable( idVarDef *def );
-	idEntity			*GetEntity( int entnum ) const;
+	abEntity			*GetEntity( int entnum ) const;
 	idScriptObject		*GetScriptObject( int entnum ) const;
 	void				NextInstruction( int position );
 
@@ -55,8 +55,8 @@ public:
 						idInterpreter();
 
 	// save games
-	void				Save( idSaveGame *savefile ) const;				// archives object for save game file
-	void				Restore( idRestoreGame *savefile );				// unarchives object from save game file
+	void				Save( anSaveGame *savefile ) const;				// archives object for save game file
+	void				Restore( anRestoreGame *savefile );				// unarchives object from save game file
 
 	void				SetThread( idThread *pThread );
 
@@ -65,22 +65,22 @@ public:
 	int					CurrentLine( void ) const;
 	const char			*CurrentFile( void ) const;
 
-	void				Error( char *fmt, ... ) const id_attribute((format(printf,2,3)));
-	void				Warning( char *fmt, ... ) const id_attribute((format(printf,2,3)));
+	void				Error( char *fmt, ... ) const an_attribute( ( format( printf, 2, 3 ) ) );
+	void				Warning( char *fmt, ... ) const an_attribute( ( format( printf, 2, 3 ) ) );
 	void				DisplayInfo( void ) const;
 
-	bool				BeginMultiFrameEvent( idEntity *ent, const idEventDef *event );
-	void				EndMultiFrameEvent( idEntity *ent, const idEventDef *event );
+	bool				BeginMultiFrameEvent( abEntity *ent, const idEventDef *event );
+	void				EndMultiFrameEvent( abEntity *ent, const idEventDef *event );
 	bool				MultiFrameEventInProgress( void ) const;
 
 	void				ThreadCall( idInterpreter *source, const function_t *func, int args );
 	void				EnterFunction( const function_t *func, bool clearStack );
-	void				EnterObjectFunction( idEntity *self, const function_t *func, bool clearStack );
+	void				EnterObjectFunction( abEntity *self, const function_t *func, bool clearStack );
 
 	bool				Execute( void );
 	void				Reset( void );
 
-	bool				GetRegisterValue( const char *name, idStr &out, int scopeDepth );
+	bool				GetRegisterValue( const char *name, anStr &out, int scopeDepth );
 	int					GetCallstackDepth( void ) const;
 	const prstack_t		*GetCallstack( void ) const;
 	const function_t	*GetCurrentFunction( void ) const;
@@ -93,7 +93,7 @@ public:
 idInterpreter::PopParms
 ====================
 */
-ARC_INLINE void idInterpreter::PopParms( int numParms ) {
+inline void idInterpreter::PopParms( int numParms ) {
 	// pop our parms off the stack
 	if ( localstackUsed < numParms ) {
 		Error( "locals stack underflow\n" );
@@ -107,7 +107,7 @@ ARC_INLINE void idInterpreter::PopParms( int numParms ) {
 idInterpreter::Push
 ====================
 */
-ARC_INLINE void idInterpreter::Push( int value ) {
+inline void idInterpreter::Push( int value ) {
 	if ( localstackUsed + sizeof( int ) > LOCALSTACK_SIZE ) {
 		Error( "Push: locals stack overflow\n" );
 	}
@@ -120,11 +120,11 @@ ARC_INLINE void idInterpreter::Push( int value ) {
 idInterpreter::PushString
 ====================
 */
-ARC_INLINE void idInterpreter::PushString( const char *string ) {
+inline void idInterpreter::PushString( const char *string ) {
 	if ( localstackUsed + MAX_STRING_LEN > LOCALSTACK_SIZE ) {
 		Error( "PushString: locals stack overflow\n" );
 	}
-	idStr::Copynz( ( char * )&localstack[ localstackUsed ], string, MAX_STRING_LEN );
+	anStr::Copynz( (char *)&localstack[ localstackUsed ], string, MAX_STRING_LEN );
 	localstackUsed += MAX_STRING_LEN;
 }
 
@@ -133,7 +133,7 @@ ARC_INLINE void idInterpreter::PushString( const char *string ) {
 idInterpreter::FloatToString
 ====================
 */
-ARC_INLINE const char *idInterpreter::FloatToString( float value ) {
+inline const char *idInterpreter::FloatToString( float value ) {
 	static char	text[ 32 ];
 
 	if ( value == ( float )( int )value ) {
@@ -149,11 +149,11 @@ ARC_INLINE const char *idInterpreter::FloatToString( float value ) {
 idInterpreter::AppendString
 ====================
 */
-ARC_INLINE void idInterpreter::AppendString( idVarDef *def, const char *from ) {
+inline void idInterpreter::AppendString( idVarDef *def, const char *from ) {
 	if ( def->initialized == idVarDef::stackVariable ) {
-		idStr::Append( ( char * )&localstack[ localstackBase + def->value.stackOffset ], MAX_STRING_LEN, from );
+		anStr::Append( (char *)&localstack[ localstackBase + def->value.stackOffset ], MAX_STRING_LEN, from );
 	} else {
-		idStr::Append( def->value.stringPtr, MAX_STRING_LEN, from );
+		anStr::Append( def->value.stringPtr, MAX_STRING_LEN, from );
 	}
 }
 
@@ -162,11 +162,11 @@ ARC_INLINE void idInterpreter::AppendString( idVarDef *def, const char *from ) {
 idInterpreter::SetString
 ====================
 */
-ARC_INLINE void idInterpreter::SetString( idVarDef *def, const char *from ) {
+inline void idInterpreter::SetString( idVarDef *def, const char *from ) {
 	if ( def->initialized == idVarDef::stackVariable ) {
-		idStr::Copynz( ( char * )&localstack[ localstackBase + def->value.stackOffset ], from, MAX_STRING_LEN );
+		anStr::Copynz( (char *)&localstack[ localstackBase + def->value.stackOffset ], from, MAX_STRING_LEN );
 	} else {
-		idStr::Copynz( def->value.stringPtr, from, MAX_STRING_LEN );
+		anStr::Copynz( def->value.stringPtr, from, MAX_STRING_LEN );
 	}
 }
 
@@ -175,9 +175,9 @@ ARC_INLINE void idInterpreter::SetString( idVarDef *def, const char *from ) {
 idInterpreter::GetString
 ====================
 */
-ARC_INLINE const char *idInterpreter::GetString( idVarDef *def ) {
+inline const char *idInterpreter::GetString( idVarDef *def ) {
 	if ( def->initialized == idVarDef::stackVariable ) {
-		return ( char * )&localstack[ localstackBase + def->value.stackOffset ];
+		return (char *)&localstack[ localstackBase + def->value.stackOffset ];
 	} else {
 		return def->value.stringPtr;
 	}
@@ -188,7 +188,7 @@ ARC_INLINE const char *idInterpreter::GetString( idVarDef *def ) {
 idInterpreter::GetVariable
 ====================
 */
-ARC_INLINE varEval_t idInterpreter::GetVariable( idVarDef *def ) {
+inline varEval_t idInterpreter::GetVariable( idVarDef *def ) {
 	if ( def->initialized == idVarDef::stackVariable ) {
 		varEval_t val;
 		val.intPtr = ( int * )&localstack[ localstackBase + def->value.stackOffset ];
@@ -203,12 +203,12 @@ ARC_INLINE varEval_t idInterpreter::GetVariable( idVarDef *def ) {
 idInterpreter::GetEntity
 ================
 */
-ARC_INLINE idEntity *idInterpreter::GetEntity( int entnum ) const{
+inline abEntity *idInterpreter::GetEntity( int entnum ) const{
 	assert( entnum <= MAX_GENTITIES );
 	if ( ( entnum > 0 ) && ( entnum <= MAX_GENTITIES ) ) {
 		return gameLocal.entities[ entnum - 1 ];
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -216,8 +216,8 @@ ARC_INLINE idEntity *idInterpreter::GetEntity( int entnum ) const{
 idInterpreter::GetScriptObject
 ================
 */
-ARC_INLINE idScriptObject *idInterpreter::GetScriptObject( int entnum ) const {
-	idEntity *ent;
+inline idScriptObject *idInterpreter::GetScriptObject( int entnum ) const {
+	abEntity *ent;
 
 	assert( entnum <= MAX_GENTITIES );
 	if ( ( entnum > 0 ) && ( entnum <= MAX_GENTITIES ) ) {
@@ -226,7 +226,7 @@ ARC_INLINE idScriptObject *idInterpreter::GetScriptObject( int entnum ) const {
 			return &ent->scriptObject;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -234,7 +234,7 @@ ARC_INLINE idScriptObject *idInterpreter::GetScriptObject( int entnum ) const {
 idInterpreter::NextInstruction
 ====================
 */
-ARC_INLINE void idInterpreter::NextInstruction( int position ) {
+inline void idInterpreter::NextInstruction( int position ) {
 	// Before we execute an instruction, we increment instructionPointer,
 	// therefore we need to compensate for that here.
 	instructionPointer = position - 1;

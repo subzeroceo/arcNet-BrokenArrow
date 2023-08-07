@@ -5,7 +5,7 @@ namespace sdDetails {
 /*
 ===============================================================================
 
-Block based allocator for fixed size objects. (based off of idBlockAlloc)
+Block based allocator for fixed size objects. (based off of anBlockAlloc)
 All objects of the 'type' are NOT constructed.
 
 ===============================================================================
@@ -17,15 +17,15 @@ public:
 	anPoolAlloc( void );
 	~anPoolAlloc( void );
 
-	void					Shutdown( void );
+	void						Shutdown( void );
 
-	type *					Alloc( void );
-	void					Free( type *element );
-	int						Compact( void );
+	type *						Alloc( void );
+	void						Free( type *element );
+	int							Compact( void );
 
-	int						GetTotalCount( void ) const { return total; }
-	int						GetAllocCount( void ) const { return active; }
-	int						GetFreeCount( void ) const { return total - active; }
+	int							GetTotalCount( void ) const { return total; }
+	int							GetAllocCount( void ) const { return active; }
+	int							GetFreeCount( void ) const { return total - active; }
 
 private:
 	struct element_t {
@@ -268,7 +268,7 @@ public:
 
 	virtual void		PrintInfo() = 0;
 	virtual void		Accumulate( int& baseBytes, int& freeBytes ) = 0;
-	virtual const char* GetName() const = 0;
+	virtual const char *GetName() const = 0;
 	virtual int			Compact() = 0;
 	virtual void		Purge() = 0;
 	virtual bool		IsValid() const = 0;
@@ -280,7 +280,7 @@ public:
 	static void			CompactPools();
 
 protected:
-	typedef idList< sdDynamicBlockManagerBase* > blockManagerList_t;
+	typedef anList< sdDynamicBlockManagerBase* > blockManagerList_t;
 	static blockManagerList_t& GetList() {
 		static blockManagerList_t list;
 		return list;
@@ -292,7 +292,7 @@ protected:
 sdDynamicBlockManager
 ============
 */
-template< class T, const char* blockName, size_t blockSize >
+template< class T, const char *blockName, size_t blockSize >
 class sdDynamicBlockManager :
 	public sdDynamicBlockManagerBase {
 public:
@@ -387,7 +387,7 @@ private:
 sdPoolAllocator
 ============
 */
-template< class T, const char* name = sdPoolAllocator_DefaultIdentifier, size_t baseBlockSize = 512, class lockingPolicy = sdLockingPolicy_None >
+template< class T, const char *name = sdPoolAllocator_DefaultIdentifier, size_t baseBlockSize = 512, class lockingPolicy = sdLockingPolicy_None >
 class sdPoolAllocator {
 
 public:
@@ -403,11 +403,11 @@ public:
 	operator new
 	============
 	*/
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #undef new
 #endif
 	void* operator new( size_t size ) {
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #define new ID_DEBUG_NEW
 #endif
 		if ( size != sizeof( T )) {
@@ -420,11 +420,11 @@ public:
 		return retVal;
 	}
 
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #undef new
 #endif
 	void* operator new( size_t size, size_t t1, int t2, char *fileName, int lineNumber ) {
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #define new ID_DEBUG_NEW
 #endif
 		if ( size != sizeof( T )) {
@@ -464,11 +464,11 @@ public:
 	operator new[]
 	============
 	*/
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #undef new
 #endif
 	void* operator new[]( size_t size ) {
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #define new ID_DEBUG_NEW
 #endif
 		return ::new char[ size ];
@@ -479,11 +479,11 @@ public:
 	operator new[]
 	============
 	*/
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #undef new
 #endif
 	void* operator new[]( size_t size, size_t t1, int t2, char *fileName, int lineNumber ) {
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #define new ID_DEBUG_NEW
 #endif
 		return ::new char[ size ];
@@ -495,7 +495,7 @@ public:
 	============
 	*/
 	void operator delete[]( void* ptr, size_t size ) {
-		::delete[]( static_cast< char* >( ptr ) );
+		::delete[]( static_cast< char *>( ptr ) );
 	}
 
 	/*
@@ -504,7 +504,7 @@ public:
 	============
 	*/
 	void operator delete[]( void *ptr, size_t size, int t2, char *fileName, int lineNumber ) {
-		::delete[]( static_cast< char* >( ptr ) );
+		::delete[]( static_cast< char *>( ptr ) );
 	}
 
 private:
@@ -521,7 +521,7 @@ private:
 	}
 };
 
-template< class T, const char* name, size_t baseBlockSize, class lockingPolicy >
+template< class T, const char *name, size_t baseBlockSize, class lockingPolicy >
 typename sdPoolAllocator< T, name, baseBlockSize, lockingPolicy >::LockingPolicy sdPoolAllocator< T, name, baseBlockSize, lockingPolicy >::lock;
 
 #endif // !__LIB_POOL_ALLOCATOR_H__

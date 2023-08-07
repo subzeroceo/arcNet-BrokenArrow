@@ -11,8 +11,8 @@
 
 class anLangKeyValue {
 public:
-	anString					key;
-	anString					value;
+	anStr					key;
+	anStr					value;
 };
 
 class anLangDict {

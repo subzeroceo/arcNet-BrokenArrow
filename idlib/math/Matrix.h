@@ -8,6 +8,15 @@
 
 ===============================================================================
 */
+
+#ifndef inline
+#ifdef _WIN32
+#define inline __inline
+#else
+#define inline inline
+#endif
+#endif
+
 #include "/home/fzcpro/Documents/codename-FUBARBROKENARROW/sys/Lib.h"
 #include "Vector.h"
 #define MATRIX_INVERSE_EPSILON		1e-14
@@ -31,7 +40,7 @@ public:
 					anMat2( void );
 					explicit anMat2( const anVec2 &x, const anVec2 &y );
 					explicit anMat2( const float xx, const float xy, const float yx, const float yy );
-					explicit anMat2( const float src[ 2 ][ 2 ] );
+					explicit anMat2( const float src[2][2] );
 
 	const anVec2 &	operator[]( int index ) const;
 	anVec2 &		operator[]( int index );
@@ -84,7 +93,7 @@ public:
 	float *			ToFloatPtr( void );
 	const char *	ToString( int precision = 2 ) const;
 private:
-	anVec2			mat[ 2 ];
+	anVec2			mat[2];
 	float			xx, yy;
 	float			xy, yx;
 	float 			tx, ty;
@@ -94,47 +103,47 @@ extern anMat2 mat2_zero;
 extern anMat2 mat2_identity;
 #define mat2_default	mat2_identity
 
-ARC_INLINE anMat2::anMat2Table() : xx( 1.0f ), yy( 1.0f ), yx( 0.0f ), xy( 0.0f ), tx( 0.0f ), ty( 0.0f ){}
+inline anMat2::anMat2Table() : xx( 1.0f ), yy( 1.0f ), yx( 0.0f ), xy( 0.0f ), tx( 0.0f ), ty( 0.0f ){}
 
-ARC_INLINE anMat2::anMat2( void ) {
+inline anMat2::anMat2( void ) {
 }
 
-ARC_INLINE anMat2::anMat2( const anVec2 &x, const anVec2 &y ) {
-	mat[ 0 ].x = x.x; mat[ 0 ].y = x.y;
-	mat[ 1 ].x = y.x; mat[ 1 ].y = y.y;
+inline anMat2::anMat2( const anVec2 &x, const anVec2 &y ) {
+	mat[0].x = x.x; mat[0].y = x.y;
+	mat[1].x = y.x; mat[1].y = y.y;
 }
 
-ARC_INLINE anMat2::anMat2( const float xx, const float xy, const float yx, const float yy ) {
-	mat[ 0 ].x = xx; mat[ 0 ].y = xy;
-	mat[ 1 ].x = yx; mat[ 1 ].y = yy;
+inline anMat2::anMat2( const float xx, const float xy, const float yx, const float yy ) {
+	mat[0].x = xx; mat[0].y = xy;
+	mat[1].x = yx; mat[1].y = yy;
 }
 
-ARC_INLINE anMat2::anMat2( const float src[ 2 ][ 2 ] ) {
+inline anMat2::anMat2( const float src[2][2] ) {
 	memcpy( mat, src, 2 * 2 * sizeof( float ) );
 }
 
-ARC_INLINE const anVec2 &anMat2::operator[]( int index ) const {
+inline const anVec2 &anMat2::operator[]( int index ) const {
 	//assert( ( index >= 0 ) && ( index < 2 ) );
 	return mat[index];
 }
 
-ARC_INLINE anVec2 &anMat2::operator[]( int index ) {
+inline anVec2 &anMat2::operator[]( int index ) {
 	//assert( ( index >= 0 ) && ( index < 2 ) );
 	return mat[index];
 }
 
-ARC_INLINE anMat2 anMat2::operator-() const {
+inline anMat2 anMat2::operator-() const {
 	return anMat2(	-mat[0][0], -mat[0][1],
 					-mat[1][0], -mat[1][1] );
 }
 
-ARC_INLINE anVec2 anMat2::operator*( const anVec2 &vec ) const {
+inline anVec2 anMat2::operator*( const anVec2 &vec ) const {
 	return anVec2(
-		mat[ 0 ].x * vec.x + mat[ 0 ].y * vec.y,
-		mat[ 1 ].x * vec.x + mat[ 1 ].y * vec.y );
+		mat[0].x * vec.x + mat[0].y * vec.y,
+		mat[1].x * vec.x + mat[1].y * vec.y );
 }
 
-ARC_INLINE anMat2 anMat2::operator*( const anMat2 &a ) const {
+inline anMat2 anMat2::operator*( const anMat2 &a ) const {
 	return anMat2(
 		mat[0].x * a[0].x + mat[0].y * a[1].x,
 		mat[0].x * a[0].y + mat[0].y * a[1].y,
@@ -142,32 +151,32 @@ ARC_INLINE anMat2 anMat2::operator*( const anMat2 &a ) const {
 		mat[1].x * a[0].y + mat[1].y * a[1].y );
 }
 
-ARC_INLINE anMat2 anMat2::operator*( const float a ) const {
+inline anMat2 anMat2::operator*( const float a ) const {
 	return anMat2(
 		mat[0].x * a, mat[0].y * a,
 		mat[1].x * a, mat[1].y * a );
 }
 
-ARC_INLINE anMat2 anMat2::operator+( const anMat2 &a ) const {
+inline anMat2 anMat2::operator+( const anMat2 &a ) const {
 	return anMat2(
 		mat[0].x + a[0].x, mat[0].y + a[0].y,
 		mat[1].x + a[1].x, mat[1].y + a[1].y );
 }
 
-ARC_INLINE anMat2 anMat2::operator-( const anMat2 &a ) const {
+inline anMat2 anMat2::operator-( const anMat2 &a ) const {
 	return anMat2(
 		mat[0].x - a[0].x, mat[0].y - a[0].y,
 		mat[1].x - a[1].x, mat[1].y - a[1].y );
 }
 
-ARC_INLINE anMat2 &anMat2::operator*=( const float a ) {
+inline anMat2 &anMat2::operator*=( const float a ) {
 	mat[0].x *= a; mat[0].y *= a;
 	mat[1].x *= a; mat[1].y *= a;
 
     return *this;
 }
 
-ARC_INLINE anMat2 &anMat2::operator*=( const anMat2 &a ) {
+inline anMat2 &anMat2::operator*=( const anMat2 &a ) {
 	float x, y;
 	x = mat[0].x; y = mat[0].y;
 	mat[0].x = x * a[0].x + y * a[1].x;
@@ -178,34 +187,34 @@ ARC_INLINE anMat2 &anMat2::operator*=( const anMat2 &a ) {
 	return *this;
 }
 
-ARC_INLINE anMat2 &anMat2::operator+=( const anMat2 &a ) {
+inline anMat2 &anMat2::operator+=( const anMat2 &a ) {
 	mat[0].x += a[0].x; mat[0].y += a[0].y;
 	mat[1].x += a[1].x; mat[1].y += a[1].y;
 
     return *this;
 }
 
-ARC_INLINE anMat2 &anMat2::operator-=( const anMat2 &a ) {
+inline anMat2 &anMat2::operator-=( const anMat2 &a ) {
 	mat[0].x -= a[0].x; mat[0].y -= a[0].y;
 	mat[1].x -= a[1].x; mat[1].y -= a[1].y;
 
     return *this;
 }
 
-ARC_INLINE anVec2 operator*( const anVec2 &vec, const anMat2 &mat ) {
+inline anVec2 operator*( const anVec2 &vec, const anMat2 &mat ) {
 	return mat * vec;
 }
 
-ARC_INLINE anMat2 operator*( const float a, anMat2 const &mat ) {
+inline anMat2 operator*( const float a, anMat2 const &mat ) {
 	return mat * a;
 }
 
-ARC_INLINE anVec2 &operator*=( anVec2 &vec, const anMat2 &mat ) {
+inline anVec2 &operator*=( anVec2 &vec, const anMat2 &mat ) {
 	vec = mat * vec;
 	return vec;
 }
 
-ARC_INLINE bool anMat2::Compare( const anMat2 &a ) const {
+inline bool anMat2::Compare( const anMat2 &a ) const {
 	if ( mat[0].Compare( a[0] ) &&
 		mat[1].Compare( a[1] ) ) {
 		return true;
@@ -213,7 +222,7 @@ ARC_INLINE bool anMat2::Compare( const anMat2 &a ) const {
 	return false;
 }
 
-ARC_INLINE bool anMat2::Compare( const anMat2 &a, const float epsilon ) const {
+inline bool anMat2::Compare( const anMat2 &a, const float epsilon ) const {
 	if ( mat[0].Compare( a[0], epsilon ) &&
 		mat[1].Compare( a[1], epsilon ) ) {
 		return true;
@@ -221,32 +230,32 @@ ARC_INLINE bool anMat2::Compare( const anMat2 &a, const float epsilon ) const {
 	return false;
 }
 
-ARC_INLINE bool anMat2::operator==( const anMat2 &a ) const {
+inline bool anMat2::operator==( const anMat2 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool anMat2::operator!=( const anMat2 &a ) const {
+inline bool anMat2::operator!=( const anMat2 &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void anMat2::Zero( void ) {
+inline void anMat2::Zero( void ) {
 	mat[0].Zero();
 	mat[1].Zero();
 }
 
-ARC_INLINE void anMat2::Identity( void ) {
+inline void anMat2::Identity( void ) {
 	*this = mat2_identity;
 }
 
-ARC_INLINE bool anMat2::IsIdentity( const float epsilon ) const {
+inline bool anMat2::IsIdentity( const float epsilon ) const {
 	return Compare( mat2_identity, epsilon );
 }
 
-ARC_INLINE bool anMat2::IsSymmetric( const float epsilon ) const {
+inline bool anMat2::IsSymmetric( const float epsilon ) const {
 	return ( anMath::Fabs( mat[0][1] - mat[1][0] ) < epsilon );
 }
 
-ARC_INLINE bool anMat2::IsDiagonal( const float epsilon ) const {
+inline bool anMat2::IsDiagonal( const float epsilon ) const {
 	if ( anMath::Fabs( mat[0][1] ) > epsilon ||
 		anMath::Fabs( mat[1][0] ) > epsilon ) {
 		return false;
@@ -254,25 +263,25 @@ ARC_INLINE bool anMat2::IsDiagonal( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE float anMat2::Trace( void ) const {
+inline float anMat2::Trace( void ) const {
 	return ( mat[0][0] + mat[1][1] );
 }
 
-ARC_INLINE float anMat2::Determinant( void ) const {
+inline float anMat2::Determinant( void ) const {
 	return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
 }
 
-ARC_INLINE anVec2 anMat2::Scale( const anVec2 & in ) const {
+inline anVec2 anMat2::Scale( const anVec2 & in ) const {
 	return anVec2( ( in.x * xx ) + ( in.y * xy ),
 					( in.y * yy ) + ( in.x * yx ) );
 }
 
-ARC_INLINE anMat2 anMat2::Transpose( void ) const {
+inline anMat2 anMat2::Transpose( void ) const {
 	return anMat2(	mat[0][0], mat[1][0],
 					mat[0][1], mat[1][1] );
 }
 
-ARC_INLINE anMat2 &anMat2::TransposeSelf( void ) {
+inline anMat2 &anMat2::TransposeSelf( void ) {
 	float tmp;
 
 	tmp = mat[0][1];
@@ -282,12 +291,12 @@ ARC_INLINE anMat2 &anMat2::TransposeSelf( void ) {
 	return *this;
 }
 
-ARC_INLINE anVec2 anMat2::Transform( const anVec2 & in ) const {
+inline anVec2 anMat2::Transform( const anVec2 & in ) const {
 	return anVec2( ( in.x * xx ) + ( in.y * xy ) + tx,
 					( in.y * yy ) + ( in.x * yx ) + ty );
 }
 
-ARC_INLINE anMat2 anMat2::Inverse() const {
+inline anMat2 anMat2::Inverse() const {
 	anMat2 inverse;
 	float det = ( ( xx * yy ) - ( yx * xy ) );
 	if ( anMath::Fabs( det ) < anMath::FLT_SMALLEST_NON_DENORMAL ) {
@@ -303,7 +312,7 @@ ARC_INLINE anMat2 anMat2::Inverse() const {
 	return inverse;
 }
 
-ARC_INLINE anMat2 anMat2::Inverse( void ) const {
+inline anMat2 anMat2::Inverse( void ) const {
 	anMat2 invMat;
 
 	invMat = *this;
@@ -312,7 +321,7 @@ ARC_INLINE anMat2 anMat2::Inverse( void ) const {
 	return invMat;
 }
 
-ARC_INLINE anMat2 anMat2::InverseFast( void ) const {
+inline anMat2 anMat2::InverseFast( void ) const {
 	anMat2 invMat;
 
 	invMat = *this;
@@ -321,7 +330,7 @@ ARC_INLINE anMat2 anMat2::InverseFast( void ) const {
 	return invMat;
 }
 
-ARC_INLINE anMat2 anMat2::Multiply( const swfMatrix_t & a ) const {
+inline anMat2 anMat2::Multiply( const swfMatrix_t & a ) const {
 	anMat2 result;
     result.xx = xx * a.xx + yx * a.xy;
     result.yx = xx * a.yx + yx * a.yy;
@@ -332,15 +341,15 @@ ARC_INLINE anMat2 anMat2::Multiply( const swfMatrix_t & a ) const {
 	return result;
 }
 
-ARC_INLINE int anMat2::GetDimension( void ) const {
+inline int anMat2::GetDimension( void ) const {
 	return 4;
 }
 
-ARC_INLINE const float *anMat2::ToFloatPtr( void ) const {
+inline const float *anMat2::ToFloatPtr( void ) const {
 	return mat[0].ToFloatPtr();
 }
 
-ARC_INLINE float *anMat2::ToFloatPtr( void ) {
+inline float *anMat2::ToFloatPtr( void ) {
 	return mat[0].ToFloatPtr();
 }
 
@@ -358,7 +367,7 @@ public:
 					anMat3( void );
 					explicit anMat3( const anVec3 &x, const anVec3 &y, const anVec3 &z );
 					explicit anMat3( const float xx, const float xy, const float xz, const float yx, const float yy, const float yz, const float zx, const float zy, const float zz );
-					explicit anMat3( const float src[ 3 ][ 3 ] );
+					explicit anMat3( const float src[3][3] );
 
 	const anVec3 &	operator[]( int index ) const;
 	anVec3 &		operator[]( int index );
@@ -377,7 +386,7 @@ public:
 
 	friend anMat3	operator*( const float a, const anMat3 &mat );
 	friend anVec3	operator*( const anVec3 &vec, const anMat3 &mat );
-	friend anVec3 &operator*=( anVec3 &vec, const anMat3 &mat );
+	friend anVec3 &	operator*=( anVec3 &vec, const anMat3 &mat );
 
 	bool			Compare( const anMat3 &a ) const;						// exact compare, no epsilon
 	bool			Compare( const anMat3 &a, const float epsilon ) const;	// compare with epsilon
@@ -402,22 +411,31 @@ public:
 	// uniformed scale version to all axes.
 	anVec3			UniformScale( const float &scaleFactor ) const;
 	// seperate scaling for each individual axis
-	anVec3 		IndividualScale( const anVec3 &in ) const;
+	anVec3 			IndividualScale( const anVec3 &in ) const;
 
 	// non-uniform scaling with individual axes
-	anVec3 		NonUniformScale( const float &scaleX, const float &scaleY, const float &scaleZ ) const;
+	anVec3 			NonUniformScale( const float &scaleX, const float &scaleY, const float &scaleZ ) const;
 
 	anVec3			Scale( const anVec3 &in ) const;
 
 	float			Determinant( void ) const;
 	anMat3			OrthoNormalize( void ) const;
 	anMat3 &		OrthoNormalizeSelf( void );
-	anMat3			Transpose( void ) const;	// returns transpose
+					// Returns a new transposed matrix 
+	anMat3 			Transpose() const;
+					// returns transpose
+	anMat3			Transpose( void ) const;
 	anMat3 &		TransposeSelf( void );
-	anMat3			Inverse( void ) const;		// returns the inverse ( m * m.Inverse() = identity )
-	bool			InverseSelf( void );		// returns false if determinant is zero
-	anMat3			InverseFast( void ) const;	// returns the inverse ( m * m.Inverse() = identity )
-	bool			InverseFastSelf( void );	// returns false if determinant is zero
+					// Transposes the matrix in-place
+	void 			TransposeInPlace();
+					// returns the inverse ( m * m.Inverse() = identity )
+	anMat3			Inverse( void ) const;
+					// returns false if determinant is zero
+	bool			InverseSelf( void );
+					// returns the inverse ( m * m.Inverse() = identity )	
+	anMat3			InverseFast( void ) const;
+					// returns false if determinant is zero
+	bool			InverseFastSelf( void );
 	anMat3			TransposeMultiply( const anMat3 &b ) const;
 
 	anMat3			InertiaTranslate( const float mass, const anVec3 &centerOfMass, const anVec3 &translation ) const;
@@ -428,7 +446,8 @@ public:
 	int				GetDimension( void ) const;
 
 	anAngles		ToAngles( void ) const;
-	anQuats		ToQuat( void ) const;
+	anAngles		ToAngles_Legacy( void );
+	anQuats			ToQuat( void ) const;
 	anCQuats		ToCQuat( void ) const;
 	anRotation		ToRotation( void ) const;
 	anMat4			ToMat4( void ) const;
@@ -438,56 +457,58 @@ public:
 	const char *	ToString( int precision = 2 ) const;
 
 	friend void		TransposeMultiply( const anMat3 &inv, const anMat3 &b, anMat3 &dst );
+
 	friend anMat3	SkewSymmetric( anVec3 const &src );
+	void			Clear( void );
 
 private:
-	anVec3			mat[ 3 ];
+	anVec3			mat[3];
 };
 
 extern anMat3 mat3_zero;
 extern anMat3 mat3_identity;
 #define mat3_default	mat3_identity
 
-ARC_INLINE anMat3::anMat3( void ) {
+inline anMat3::anMat3( void ) {
 }
 
-ARC_INLINE anMat3::anMat3( const anVec3 &x, const anVec3 &y, const anVec3 &z ) {
-	mat[ 0 ].x = x.x; mat[ 0 ].y = x.y; mat[ 0 ].z = x.z;
-	mat[ 1 ].x = y.x; mat[ 1 ].y = y.y; mat[ 1 ].z = y.z;
-	mat[ 2 ].x = z.x; mat[ 2 ].y = z.y; mat[ 2 ].z = z.z;
+inline anMat3::anMat3( const anVec3 &x, const anVec3 &y, const anVec3 &z ) {
+	mat[0].x = x.x; mat[0].y = x.y; mat[0].z = x.z;
+	mat[1].x = y.x; mat[1].y = y.y; mat[1].z = y.z;
+	mat[2].x = z.x; mat[2].y = z.y; mat[2].z = z.z;
 }
 
-ARC_INLINE anMat3::anMat3( const float xx, const float xy, const float xz, const float yx, const float yy, const float yz, const float zx, const float zy, const float zz ) {
-	mat[ 0 ].x = xx; mat[ 0 ].y = xy; mat[ 0 ].z = xz;
-	mat[ 1 ].x = yx; mat[ 1 ].y = yy; mat[ 1 ].z = yz;
-	mat[ 2 ].x = zx; mat[ 2 ].y = zy; mat[ 2 ].z = zz;
+inline anMat3::anMat3( const float xx, const float xy, const float xz, const float yx, const float yy, const float yz, const float zx, const float zy, const float zz ) {
+	mat[0].x = xx; mat[0].y = xy; mat[0].z = xz;
+	mat[1].x = yx; mat[1].y = yy; mat[1].z = yz;
+	mat[2].x = zx; mat[2].y = zy; mat[2].z = zz;
 }
 
-ARC_INLINE anMat3::anMat3( const float src[ 3 ][ 3 ] ) {
+inline anMat3::anMat3( const float src[3][3] ) {
 	memcpy( mat, src, 3 * 3 * sizeof( float ) );
 }
 
-ARC_INLINE const anVec3 &anMat3::operator[]( int index ) const {
+inline const anVec3 &anMat3::operator[]( int index ) const {
 	//assert( ( index >= 0 ) && ( index < 3 ) );
 	return mat[index];
 }
 
-ARC_INLINE anVec3 &anMat3::operator[]( int index ) {
+inline anVec3 &anMat3::operator[]( int index ) {
 	//assert( ( index >= 0 ) && ( index < 3 ) );
 	return mat[index];
 }
 
-ARC_INLINE anMat3 anMat3::operator-() const {
+inline anMat3 anMat3::operator-() const {
 	return anMat3(	-mat[0][0], -mat[0][1], -mat[0][2], -mat[1][0], -mat[1][1], -mat[1][2], -mat[2][0], -mat[2][1], -mat[2][2] );
 }
 
-ARC_INLINE anVec3 anMat3::operator*( const anVec3 &vec ) const {
-	return anVec3( mat[ 0 ].x * vec.x + mat[ 1 ].x * vec.y + mat[ 2 ].x * vec.z,
-		mat[ 0 ].y * vec.x + mat[ 1 ].y * vec.y + mat[ 2 ].y * vec.z,
-		mat[ 0 ].z * vec.x + mat[ 1 ].z * vec.y + mat[ 2 ].z * vec.z );
+inline anVec3 anMat3::operator*( const anVec3 &vec ) const {
+	return anVec3( mat[0].x * vec.x + mat[1].x * vec.y + mat[2].x * vec.z,
+		mat[0].y * vec.x + mat[1].y * vec.y + mat[2].y * vec.z,
+		mat[0].z * vec.x + mat[1].z * vec.y + mat[2].z * vec.z );
 }
 
-ARC_INLINE anMat3 anMat3::operator*( const anMat3 &a ) const {;
+inline anMat3 anMat3::operator*( const anMat3 &a ) const {;
 	anMat3 dst;
 
 	const float *m1Ptr = reinterpret_cast<const float *>( this );
@@ -504,24 +525,24 @@ ARC_INLINE anMat3 anMat3::operator*( const anMat3 &a ) const {;
 	return dst;
 }
 
-ARC_INLINE anMat3 anMat3::operator*( const float a ) const {
+inline anMat3 anMat3::operator*( const float a ) const {
 	return anMat3( mat[0].x * a, mat[0].y * a, mat[0].z * a,
 		mat[1].x * a, mat[1].y * a, mat[1].z * a,
 		mat[2].x * a, mat[2].y * a, mat[2].z * a );
 }
 
-ARC_INLINE anVec3 anMat3::operator/( const anVec3 &vec ) const {
+inline anVec3 anMat3::operator/( const anVec3 &vec ) const {
 	return( anVec3( mat[0].x * vec.x + mat[0].y * vec.y + mat[0].z * vec.z,
 		mat[1].x * vec.x + mat[1].y * vec.y + mat[1].z * vec.z,
 		mat[2].x * vec.x + mat[2].y * vec.y + mat[2].z * vec.z ) );
 }
 
-ARC_INLINE anMat3& anMat3::operator=( const anMat3 &a ) {
-	memcpy( mat[ 0 ].ToFloatPtr(), a.mat[ 0 ].ToFloatPtr(), sizeof( mat ) );
+inline anMat3 &anMat3::operator=( const anMat3 &a ) {
+	memcpy( mat[0].ToFloatPtr(), a.mat[0].ToFloatPtr(), sizeof( mat ) );
 	return *this;
 }
 
-ARC_INLINE anMat3 anMat3::operator/( const anMat3 &a ) const {
+inline anMat3 anMat3::operator/( const anMat3 &a ) const {
 	anMat3 dst;
 	dst[0].x = mat[0].x * a.mat[0].x + mat[0].y * a.mat[0].y + mat[0].z * a.mat[0].z;
 	dst[0].y = mat[0].x * a.mat[1].x + mat[0].y * a.mat[1].y + mat[0].z * a.mat[1].z;
@@ -538,19 +559,19 @@ ARC_INLINE anMat3 anMat3::operator/( const anMat3 &a ) const {
 	return( dst );
 }
 
-ARC_INLINE anMat3 anMat3::operator+( const anMat3 &a ) const {
+inline anMat3 anMat3::operator+( const anMat3 &a ) const {
 	return anMat3( mat[0].x + a[0].x, mat[0].y + a[0].y, mat[0].z + a[0].z,
 		mat[1].x + a[1].x, mat[1].y + a[1].y, mat[1].z + a[1].z,
 		mat[2].x + a[2].x, mat[2].y + a[2].y, mat[2].z + a[2].z );
 }
 
-ARC_INLINE anMat3 anMat3::operator-( const anMat3 &a ) const {
+inline anMat3 anMat3::operator-( const anMat3 &a ) const {
 	return anMat3( mat[0].x - a[0].x, mat[0].y - a[0].y, mat[0].z - a[0].z,
 		mat[1].x - a[1].x, mat[1].y - a[1].y, mat[1].z - a[1].z,
 		mat[2].x - a[2].x, mat[2].y - a[2].y, mat[2].z - a[2].z );
 }
 
-ARC_INLINE anMat3 &anMat3::operator*=( const float a ) {
+inline anMat3 &anMat3::operator*=( const float a ) {
 	mat[0].x *= a; mat[0].y *= a; mat[0].z *= a;
 	mat[1].x *= a; mat[1].y *= a; mat[1].z *= a;
 	mat[2].x *= a; mat[2].y *= a; mat[2].z *= a;
@@ -558,7 +579,7 @@ ARC_INLINE anMat3 &anMat3::operator*=( const float a ) {
     return *this;
 }
 
-ARC_INLINE anMat3 &anMat3::operator*=( const anMat3 &a ) {
+inline anMat3 &anMat3::operator*=( const anMat3 &a ) {
 	float dst[3];
 	float *m1Ptr = reinterpret_cast<float *>( this );
 	const float *m2Ptr = reinterpret_cast<const float *>( & a );
@@ -572,7 +593,7 @@ ARC_INLINE anMat3 &anMat3::operator*=( const anMat3 &a ) {
 	return *this;
 }
 
-ARC_INLINE anMat3 &anMat3::operator+=( const anMat3 &a ) {
+inline anMat3 &anMat3::operator+=( const anMat3 &a ) {
 	mat[0].x += a[0].x; mat[0].y += a[0].y; mat[0].z += a[0].z;
 	mat[1].x += a[1].x; mat[1].y += a[1].y; mat[1].z += a[1].z;
 	mat[2].x += a[2].x; mat[2].y += a[2].y; mat[2].z += a[2].z;
@@ -580,7 +601,7 @@ ARC_INLINE anMat3 &anMat3::operator+=( const anMat3 &a ) {
     return *this;
 }
 
-ARC_INLINE anMat3 &anMat3::operator-=( const anMat3 &a ) {
+inline anMat3 &anMat3::operator-=( const anMat3 &a ) {
 	mat[0].x -= a[0].x; mat[0].y -= a[0].y; mat[0].z -= a[0].z;
 	mat[1].x -= a[1].x; mat[1].y -= a[1].y; mat[1].z -= a[1].z;
 	mat[2].x -= a[2].x; mat[2].y -= a[2].y; mat[2].z -= a[2].z;
@@ -588,24 +609,24 @@ ARC_INLINE anMat3 &anMat3::operator-=( const anMat3 &a ) {
     return *this;
 }
 
-ARC_INLINE anVec3 operator*( const anVec3 &vec, const anMat3 &mat ) {
+inline anVec3 operator*( const anVec3 &vec, const anMat3 &mat ) {
 	return mat * vec;
 }
 
-ARC_INLINE anMat3 operator*( const float a, const anMat3 &mat ) {
+inline anMat3 operator*( const float a, const anMat3 &mat ) {
 	return mat * a;
 }
 
-ARC_INLINE anVec3 &operator*=( anVec3 &vec, const anMat3 &mat ) {
-	float x = mat[ 0 ].x * vec.x + mat[ 1 ].x * vec.y + mat[ 2 ].x * vec.z;
-	float y = mat[ 0 ].y * vec.x + mat[ 1 ].y * vec.y + mat[ 2 ].y * vec.z;
-	vec.z = mat[ 0 ].z * vec.x + mat[ 1 ].z * vec.y + mat[ 2 ].z * vec.z;
+inline anVec3 &operator*=( anVec3 &vec, const anMat3 &mat ) {
+	float x = mat[0].x * vec.x + mat[1].x * vec.y + mat[2].x * vec.z;
+	float y = mat[0].y * vec.x + mat[1].y * vec.y + mat[2].y * vec.z;
+	vec.z = mat[0].z * vec.x + mat[1].z * vec.y + mat[2].z * vec.z;
 	vec.x = x;
 	vec.y = y;
 	return vec;
 }
 
-ARC_INLINE bool anMat3::Compare( const anMat3 &a ) const {
+inline bool anMat3::Compare( const anMat3 &a ) const {
 	if ( mat[0].Compare( a[0] ) &&
 		mat[1].Compare( a[1] ) &&
 		mat[2].Compare( a[2] ) ) {
@@ -614,7 +635,7 @@ ARC_INLINE bool anMat3::Compare( const anMat3 &a ) const {
 	return false;
 }
 
-ARC_INLINE bool anMat3::Compare( const anMat3 &a, const float epsilon ) const {
+inline bool anMat3::Compare( const anMat3 &a, const float epsilon ) const {
 	if ( mat[0].Compare( a[0], epsilon ) &&
 		mat[1].Compare( a[1], epsilon ) &&
 		mat[2].Compare( a[2], epsilon ) ) {
@@ -623,27 +644,27 @@ ARC_INLINE bool anMat3::Compare( const anMat3 &a, const float epsilon ) const {
 	return false;
 }
 
-ARC_INLINE bool anMat3::operator==( const anMat3 &a ) const {
+inline bool anMat3::operator==( const anMat3 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool anMat3::operator!=( const anMat3 &a ) const {
+inline bool anMat3::operator!=( const anMat3 &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void anMat3::Zero( void ) {
+inline void anMat3::Zero( void ) {
 	memset( mat, 0, sizeof( anMat3 ) );
 }
 
-ARC_INLINE void anMat3::Identity( void ) {
+inline void anMat3::Identity( void ) {
 	*this = mat3_identity;
 }
 
-ARC_INLINE bool anMat3::IsIdentity( const float epsilon ) const {
+inline bool anMat3::IsIdentity( const float epsilon ) const {
 	return Compare( mat3_identity, epsilon );
 }
 
-ARC_INLINE bool anMat3::IsSymmetric( const float epsilon ) const {
+inline bool anMat3::IsSymmetric( const float epsilon ) const {
 	if ( anMath::Fabs( mat[0][1] - mat[1][0] ) > epsilon ) {
 		return false;
 	}
@@ -656,7 +677,7 @@ ARC_INLINE bool anMat3::IsSymmetric( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat3::IsDiagonal( const float epsilon ) const {
+inline bool anMat3::IsDiagonal( const float epsilon ) const {
 	if ( anMath::Fabs( mat[0][1] ) > epsilon ||
 		anMath::Fabs( mat[0][2] ) > epsilon ||
 		anMath::Fabs( mat[1][0] ) > epsilon ||
@@ -668,83 +689,83 @@ ARC_INLINE bool anMat3::IsDiagonal( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat3::IsRotated( void ) const {
+inline bool anMat3::IsRotated( void ) const {
 	return !Compare( mat3_identity );
 }
 
-ARC_INLINE void anMat3::ProjectVector( const anVec3 &src, anVec3 &dst ) const {
-	dst.x = src * mat[ 0 ];
-	dst.y = src * mat[ 1 ];
-	dst.z = src * mat[ 2 ];
+inline void anMat3::ProjectVector( const anVec3 &src, anVec3 &dst ) const {
+	dst.x = src * mat[0];
+	dst.y = src * mat[1];
+	dst.z = src * mat[2];
 }
 
-ARC_INLINE void anMat3::UnprojectVector( const anVec3 &src, anVec3 &dst ) const {
-	dst = mat[ 0 ] * src.x + mat[ 1 ] * src.y + mat[ 2 ] * src.z;
+inline void anMat3::UnprojectVector( const anVec3 &src, anVec3 &dst ) const {
+	dst = mat[0] * src.x + mat[1] * src.y + mat[2] * src.z;
 }
 
-ARC_INLINE bool anMat3::FixDegeneracies( void ) {
+inline bool anMat3::FixDegeneracies( void ) {
 	bool r = mat[0].FixDegenerateNormal();
 	r |= mat[1].FixDegenerateNormal();
 	r |= mat[2].FixDegenerateNormal();
 	return r;
 }
 
-ARC_INLINE bool anMat3::FixDenormals( void ) {
+inline bool anMat3::FixDenormals( void ) {
 	bool r = mat[0].FixDenormals();
 	r |= mat[1].FixDenormals();
 	r |= mat[2].FixDenormals();
 	return r;
 }
 
-ARC_INLINE float anMat3::Trace( void ) const {
+inline float anMat3::Trace( void ) const {
 	return ( mat[0][0] + mat[1][1] + mat[2][2] );
 }
 
-ARC_INLINE anMat3 anMat3::OrthoNormalize( void ) const {
+inline anMat3 anMat3::OrthoNormalize( void ) const {
 	anMat3 ortho = *this;
-	ortho[ 0 ].Normalize();
-	ortho[ 2 ].Cross( mat[ 0 ], mat[ 1 ] );
-	ortho[ 2 ].Normalize();
-	ortho[ 1 ].Cross( mat[ 2 ], mat[ 0 ] );
-	ortho[ 1 ].Normalize();
+	ortho[0].Normalize();
+	ortho[2].Cross( mat[0], mat[1] );
+	ortho[2].Normalize();
+	ortho[1].Cross( mat[2], mat[0] );
+	ortho[1].Normalize();
 	return ortho;
 }
 
-ARC_INLINE anMat3 &anMat3::OrthoNormalizeSelf( void ) {
-	mat[ 0 ].Normalize();
-	mat[ 2 ].Cross( mat[ 0 ], mat[ 1 ] );
-	mat[ 2 ].Normalize();
-	mat[ 1 ].Cross( mat[ 2 ], mat[ 0 ] );
-	mat[ 1 ].Normalize();
+inline anMat3 &anMat3::OrthoNormalizeSelf( void ) {
+	mat[0].Normalize();
+	mat[2].Cross( mat[0], mat[1] );
+	mat[2].Normalize();
+	mat[1].Cross( mat[2], mat[0] );
+	mat[1].Normalize();
 	return *this;
 }
 
-ARC_INLINE anVec3 anMat3::Scale( const anVec3 &in ) const {
+inline anVec3 anMat3::Scale( const anVec3 &in ) const {
 	return anVec3( ( in.x * xx ) + ( in.y * xy ),
 					( in.y * yy ) + ( in.x * yx ),
 					( in.y * zz ) + ( in.x * zx ) );
 }
 
 // uniformed scale version to all axes.
-ARC_INLINE anVec3 anMat3::UniformScale( const float &scaleFactor ) const {
+inline anVec3 anMat3::UniformScale( const float &scaleFactor ) const {
     return anVec3( xx * scaleFactor, yy * scaleFactor, zz * scaleFactor );
 }
 // seperate scaling for each individual axis
-ARC_INLINE anVec3 anMat3::IndividualScale( const anVec3 &in ) const {
+inline anVec3 anMat3::IndividualScale( const anVec3 &in ) const {
     return anVec3( in.x * xx, in.y * yy, in.z * zz );
 }
 // non-uniform scaling with individual axes
-ARC_INLINE anVec3 anMat3::NonUniformScale( const float &scaleX, const float &scaleY, const float &scaleZ ) const {
+inline anVec3 anMat3::NonUniformScale( const float &scaleX, const float &scaleY, const float &scaleZ ) const {
     return anVec3( xx * scaleX, yy * scaleY, zz * scaleZ );
 }
 
-ARC_INLINE anMat3 anMat3::Transpose( void ) const {
+inline anMat3 anMat3::Transpose( void ) const {
 	return anMat3(	mat[0][0], mat[1][0], mat[2][0],
 					mat[0][1], mat[1][1], mat[2][1],
 					mat[0][2], mat[1][2], mat[2][2] );
 }
 
-ARC_INLINE anMat3 &anMat3::TransposeSelf( void ) {
+inline anMat3 &anMat3::TransposeSelf( void ) {
 	float tmp0 = mat[0][1];
 	mat[0][1] = mat[1][0];
 	mat[1][0] = tmp0;
@@ -758,21 +779,21 @@ ARC_INLINE anMat3 &anMat3::TransposeSelf( void ) {
 	return *this;
 }
 
-ARC_INLINE anMat3 anMat3::Inverse( void ) const {
+inline anMat3 anMat3::Inverse( void ) const {
 	anMat3 invMat = *this;
 	int r = invMat.InverseSelf();
 	assert( r );
 	return invMat;
 }
 
-ARC_INLINE anMat3 anMat3::InverseFast( void ) const {
+inline anMat3 anMat3::InverseFast( void ) const {
 	anMat3 invMat = *this;
 	int r = invMat.InverseFastSelf();
 	assert( r );
 	return invMat;
 }
 
-ARC_INLINE anMat3 anMat3::TransposeMultiply( const anMat3 &b ) const {
+inline anMat3 anMat3::TransposeMultiply( const anMat3 &b ) const {
 	return anMat3(	mat[0].x * b[0].x + mat[1].x * b[1].x + mat[2].x * b[2].x,
 					mat[0].x * b[0].y + mat[1].x * b[1].y + mat[2].x * b[2].y,
 					mat[0].x * b[0].z + mat[1].x * b[1].z + mat[2].x * b[2].z,
@@ -784,7 +805,7 @@ ARC_INLINE anMat3 anMat3::TransposeMultiply( const anMat3 &b ) const {
 					mat[0].z * b[0].z + mat[1].z * b[1].z + mat[2].z * b[2].z );
 }
 
-ARC_INLINE void anMat3::TransposeMultiply( const anMat3 &transpose, const anMat3 &b, anMat3 &dst ) {
+inline void anMat3::TransposeMultiply( const anMat3 &transpose, const anMat3 &b, anMat3 &dst ) {
 	dst[0].x = transpose[0].x * b[0].x + transpose[1].x * b[1].x + transpose[2].x * b[2].x;
 	dst[0].y = transpose[0].x * b[0].y + transpose[1].x * b[1].y + transpose[2].x * b[2].y;
 	dst[0].z = transpose[0].x * b[0].z + transpose[1].x * b[1].z + transpose[2].x * b[2].z;
@@ -796,56 +817,62 @@ ARC_INLINE void anMat3::TransposeMultiply( const anMat3 &transpose, const anMat3
 	dst[2].z = transpose[0].z * b[0].z + transpose[1].z * b[1].z + transpose[2].z * b[2].z;
 }
 
-ARC_INLINE anMat3 anMat3::SkewSymmetric( anVec3 const &src ) {
+inline anMat3 anMat3::SkewSymmetric( anVec3 const &src ) {
 	return anMat3( 0.0f, -src.z,  src.y, src.z,   0.0f, -src.x, -src.y,  src.x,   0.0f );
 }
 
-ARC_INLINE int anMat3::GetDimension( void ) const {
+inline void anMat3::Clear( void ) {
+	mat[0].Set( 1, 0, 0 );
+	mat[1].Set( 0, 1, 0 );
+	mat[2].Set( 0, 0, 1 );
+}
+
+inline int anMat3::GetDimension( void ) const {
 	return 9;
 }
 
-ARC_INLINE const float *anMat3::ToFloatPtr( void ) const {
+inline const float *anMat3::ToFloatPtr( void ) const {
 	return mat[0].ToFloatPtr();
 }
 
-ARC_INLINE float *anMat3::ToFloatPtr( void ) {
+inline float *anMat3::ToFloatPtr( void ) {
 	return mat[0].ToFloatPtr();
 }
 
-ARC_INLINE anMat3 anMat3::ToMaya( void ) const {
+inline anMat3 anMat3::ToMaya( void ) const {
 	anMat3 matMaya = *this;
 	matMaya.ToMayaSelf();
 	return matMaya;
 }
 
-ARC_INLINE anMat3 &anMat3::ToMayaSelf( void ) {
-	Swap( mat[ 0 ][ 2 ], mat[ 0 ][ 1 ] );
-	mat[ 0 ][ 2 ] = -mat[ 0 ][ 2 ];
+inline anMat3 &anMat3::ToMayaSelf( void ) {
+	Swap( mat[0][2], mat[0][1] );
+	mat[0][2] = -mat[0][2];
 
-	Swap( mat[ 1 ][ 2 ], mat[ 1 ][ 1 ] );
-	mat[ 1 ][ 2 ] = -mat[ 1 ][ 2 ];
+	Swap( mat[1][2], mat[1][1] );
+	mat[1][2] = -mat[1][2];
 
-	Swap( mat[ 2 ][ 1 ], mat[ 2 ][ 2 ] );
-	mat[ 2 ][ 2 ] = -mat[ 2 ][ 2 ];
+	Swap( mat[2][1], mat[2][2] );
+	mat[2][2] = -mat[2][2];
 
 	return (*this);
 }
 
-ARC_INLINE anMat3 anMat3::FromMaya( void ) const {
+inline anMat3 anMat3::FromMaya( void ) const {
 	anMat3 matId = *this;
 	matId.FromMayaSelf();
 	return matId;
 }
 
-ARC_INLINE anMat3 &anMat3::FromMayaSelf( void ) {
-	Swap( mat[ 0 ][ 2 ], mat[ 0 ][ 1 ] );
-	mat[ 0 ][ 1 ] = -mat[ 0 ][ 1 ];
+inline anMat3 &anMat3::FromMayaSelf( void ) {
+	Swap( mat[0][2], mat[0][1] );
+	mat[0][1] = -mat[0][1];
 
-	Swap( mat[ 1 ][ 2 ], mat[ 1 ][ 1 ] );
-	mat[ 1 ][ 1 ] = -mat[ 1 ][ 1 ];
+	Swap( mat[1][2], mat[1][1] );
+	mat[1][1] = -mat[1][1];
 
-	Swap( mat[ 2 ][ 1 ], mat[ 2 ][ 2 ] );
-	mat[ 2 ][ 1 ] = -mat[ 2 ][ 1 ];
+	Swap( mat[2][1], mat[2][2] );
+	mat[2][1] = -mat[2][1];
 
 	return (* this);
 }
@@ -866,23 +893,23 @@ ARC_INLINE anMat3 &anMat3::FromMayaSelf( void ) {
 ===============================================================================
 */
 
-class aRcMat3x4 {
+class anMat3x4 {
 public:
 
 	void			SetRotation( const anMat3 &m );
 	void			SetTranslation( const anVec3 &t );
 
-	bool			Compare( const aRcMat3x4 &a ) const;							// exact compare, no epsilon
-	bool			Compare( const aRcMat3x4 &a, const float epsilon ) const;	// compare with epsilon
-	bool			operator==(	const aRcMat3x4 &a ) const;						// exact compare, no epsilon
-	bool			operator!=(	const aRcMat3x4 &a ) const;						// exact compare, no epsilon
+	bool			Compare( const anMat3x4 &a ) const;							// exact compare, no epsilon
+	bool			Compare( const anMat3x4 &a, const float epsilon ) const;	// compare with epsilon
+	bool			operator==(	const anMat3x4 &a ) const;						// exact compare, no epsilon
+	bool			operator!=(	const anMat3x4 &a ) const;						// exact compare, no epsilon
 
 	void			Identity( void );
 	void			Invert( void );
 
-	void			LeftMultiply( const aRcMat3x4 &m );
+	void			LeftMultiply( const anMat3x4 &m );
 	void			LeftMultiply( const anMat3 &m );
-	void			RightMultiply( const aRcMat3x4 &m );
+	void			RightMultiply( const anMat3x4 &m );
 	void			RightMultiply( const anMat3 &m );
 
 	void			Transform( anVec3 &result, const anVec3 &v ) const;
@@ -901,10 +928,10 @@ private:
 
 /*
 =============
-aRcMat3x4::SetRotation
+anMat3x4::SetRotation
 =============
 */
-ARC_INLINE void aRcMat3x4::SetRotation( const anMat3 &m ) {
+inline void anMat3x4::SetRotation( const anMat3 &m ) {
 	// NOTE: anMat3 is transposed because it is column-major
 	mat[0 * 4 + 0] = m[0][0];
 	mat[0 * 4 + 1] = m[1][0];
@@ -919,10 +946,10 @@ ARC_INLINE void aRcMat3x4::SetRotation( const anMat3 &m ) {
 
 /*
 =============
-aRcMat3x4::SetTranslation
+anMat3x4::SetTranslation
 =============
 */
-ARC_INLINE void aRcMat3x4::SetTranslation( const anVec3 &t ) {
+inline void anMat3x4::SetTranslation( const anVec3 &t ) {
 	mat[0 * 4 + 3] = t[0];
 	mat[1 * 4 + 3] = t[1];
 	mat[2 * 4 + 3] = t[2];
@@ -930,10 +957,10 @@ ARC_INLINE void aRcMat3x4::SetTranslation( const anVec3 &t ) {
 
 /*
 =============
-aRcMat3x4::Compare
+anMat3x4::Compare
 =============
 */
-ARC_INLINE bool aRcMat3x4::Compare( const aRcMat3x4 &a ) const {
+inline bool anMat3x4::Compare( const anMat3x4 &a ) const {
 	int i;
 
 	for ( i = 0; i < 12; i++ ) {
@@ -946,10 +973,10 @@ ARC_INLINE bool aRcMat3x4::Compare( const aRcMat3x4 &a ) const {
 
 /*
 =============
-aRcMat3x4::Compare
+anMat3x4::Compare
 =============
 */
-ARC_INLINE bool aRcMat3x4::Compare( const aRcMat3x4 &a, const float epsilon ) const {
+inline bool anMat3x4::Compare( const anMat3x4 &a, const float epsilon ) const {
 	int i;
 
 	for ( i = 0; i < 12; i++ ) {
@@ -960,20 +987,20 @@ ARC_INLINE bool aRcMat3x4::Compare( const aRcMat3x4 &a, const float epsilon ) co
 	return true;
 }
 
-ARC_INLINE bool aRcMat3x4::operator==( const aRcMat3x4 &a ) const {
+inline bool anMat3x4::operator==( const anMat3x4 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool aRcMat3x4::operator!=( const aRcMat3x4 &a ) const {
+inline bool anMat3x4::operator!=( const anMat3x4 &a ) const {
 	return !Compare( a );
 }
 
 /*
 =============
-aRcMat3x4::Identity
+anMat3x4::Identity
 =============
 */
-ARC_INLINE void aRcMat3x4::Identity( void ) {
+inline void anMat3x4::Identity( void ) {
 	mat[0 * 4 + 0] = 1.0f; mat[0 * 4 + 1] = 0.0f; mat[0 * 4 + 2] = 0.0f; mat[0 * 4 + 3] = 0.0f;
 	mat[0 * 4 + 0] = 0.0f; mat[0 * 4 + 1] = 1.0f; mat[0 * 4 + 2] = 0.0f; mat[0 * 4 + 3] = 0.0f;
 	mat[0 * 4 + 0] = 0.0f; mat[0 * 4 + 1] = 0.0f; mat[0 * 4 + 2] = 1.0f; mat[0 * 4 + 3] = 0.0f;
@@ -981,10 +1008,10 @@ ARC_INLINE void aRcMat3x4::Identity( void ) {
 
 /*
 =============
-aRcMat3x4::Invert
+anMat3x4::Invert
 =============
 */
-ARC_INLINE void aRcMat3x4::Invert( void ) {
+inline void anMat3x4::Invert( void ) {
 	float tmp[3];
 
 	// negate inverse rotated translation part
@@ -1009,10 +1036,10 @@ ARC_INLINE void aRcMat3x4::Invert( void ) {
 
 /*
 =============
-aRcMat3x4::LeftMultiply
+anMat3x4::LeftMultiply
 =============
 */
-ARC_INLINE void aRcMat3x4::LeftMultiply( const aRcMat3x4 &m ) {
+inline void anMat3x4::LeftMultiply( const anMat3x4 &m ) {
 	float t0 = m.mat[0 * 4 + 0] * mat[0 * 4 + 0] + m.mat[0 * 4 + 1] * mat[1 * 4 + 0] + m.mat[0 * 4 + 2] * mat[2 * 4 + 0];
 	float t1 = m.mat[1 * 4 + 0] * mat[0 * 4 + 0] + m.mat[1 * 4 + 1] * mat[1 * 4 + 0] + m.mat[1 * 4 + 2] * mat[2 * 4 + 0];
 	mat[2 * 4 + 0]	= m.mat[2 * 4 + 0] * mat[0 * 4 + 0] + m.mat[2 * 4 + 1] * mat[1 * 4 + 0] + m.mat[2 * 4 + 2] * mat[2 * 4 + 0];
@@ -1044,10 +1071,10 @@ ARC_INLINE void aRcMat3x4::LeftMultiply( const aRcMat3x4 &m ) {
 
 /*
 =============
-aRcMat3x4::LeftMultiply
+anMat3x4::LeftMultiply
 =============
 */
-ARC_INLINE void aRcMat3x4::LeftMultiply( const anMat3 &m ) {
+inline void anMat3x4::LeftMultiply( const anMat3 &m ) {
 	// NOTE: anMat3 is column-major
 	float t0 = m[0][0] * mat[0 * 4 + 0] + m[1][0] * mat[1 * 4 + 0] + m[2][0] * mat[2 * 4 + 0];
 	float t1 = m[0][1] * mat[0 * 4 + 0] + m[1][1] * mat[1 * 4 + 0] + m[2][1] * mat[2 * 4 + 0];
@@ -1083,7 +1110,7 @@ ARC_INLINE void aRcMat3x4::LeftMultiply( const anMat3 &m ) {
 anMat3::RightMultiply
 =============
 */
-ARC_INLINE void aRcMat3x4::RightMultiply( const aRcMat3x4 &m ) {
+inline void anMat3x4::RightMultiply( const anMat3x4 &m ) {
 
 	float t0 = mat[0 * 4 + 0] * m.mat[0 * 4 + 0] + mat[0 * 4 + 1] * m.mat[1 * 4 + 0] + mat[0 * 4 + 2] * m.mat[2 * 4 + 0];
 	float t1 = mat[0 * 4 + 0] * m.mat[0 * 4 + 1] + mat[0 * 4 + 1] * m.mat[1 * 4 + 1] + mat[0 * 4 + 2] * m.mat[2 * 4 + 1];
@@ -1115,10 +1142,10 @@ ARC_INLINE void aRcMat3x4::RightMultiply( const aRcMat3x4 &m ) {
 
 /*
 =============
-aRcMat3x4::RightMultiply
+anMat3x4::RightMultiply
 =============
 */
-ARC_INLINE void aRcMat3x4::RightMultiply( const anMat3 &m ) {
+inline void anMat3x4::RightMultiply( const anMat3 &m ) {
 	// NOTE: anMat3 is column-major
 	float t0 = mat[0 * 4 + 0] * m[0][0] + mat[0 * 4 + 1] * m[0][1] + mat[0 * 4 + 2] * m[0][2];
 	float t1 = mat[0 * 4 + 0] * m[1][0] + mat[0 * 4 + 1] * m[1][1] + mat[0 * 4 + 2] * m[1][2];
@@ -1147,10 +1174,10 @@ ARC_INLINE void aRcMat3x4::RightMultiply( const anMat3 &m ) {
 
 /*
 =============
-aRcMat3x4::Transform
+anMat3x4::Transform
 =============
 */
-ARC_INLINE void aRcMat3x4::Transform( anVec3 &result, const anVec3 &v ) const {
+inline void anMat3x4::Transform( anVec3 &result, const anVec3 &v ) const {
 	result.x = mat[0 * 4 + 0] * v.x + mat[0 * 4 + 1] * v.y + mat[0 * 4 + 2] * v.z + mat[0 * 4 + 3];
 	result.y = mat[1 * 4 + 0] * v.x + mat[1 * 4 + 1] * v.y + mat[1 * 4 + 2] * v.z + mat[1 * 4 + 3];
 	result.z = mat[2 * 4 + 0] * v.x + mat[2 * 4 + 1] * v.y + mat[2 * 4 + 2] * v.z + mat[2 * 4 + 3];
@@ -1158,10 +1185,10 @@ ARC_INLINE void aRcMat3x4::Transform( anVec3 &result, const anVec3 &v ) const {
 
 /*
 =============
-aRcMat3x4::Rotate
+anMat3x4::Rotate
 =============
 */
-ARC_INLINE void aRcMat3x4::Rotate( anVec3 &result, const anVec3 &v ) const {
+inline void anMat3x4::Rotate( anVec3 &result, const anVec3 &v ) const {
 	result.x = mat[0 * 4 + 0] * v.x + mat[0 * 4 + 1] * v.y + mat[0 * 4 + 2] * v.z;
 	result.y = mat[1 * 4 + 0] * v.x + mat[1 * 4 + 1] * v.y + mat[1 * 4 + 2] * v.z;
 	result.z = mat[2 * 4 + 0] * v.x + mat[2 * 4 + 1] * v.y + mat[2 * 4 + 2] * v.z;
@@ -1169,10 +1196,10 @@ ARC_INLINE void aRcMat3x4::Rotate( anVec3 &result, const anVec3 &v ) const {
 
 /*
 =============
-aRcMat3x4::ToMat3
+anMat3x4::ToMat3
 =============
 */
-ARC_INLINE anMat3 aRcMat3x4::ToMat3( void ) const {
+inline anMat3 anMat3x4::ToMat3( void ) const {
 	return anMat3(	mat[0 * 4 + 0], mat[1 * 4 + 0], mat[2 * 4 + 0],
 					mat[0 * 4 + 1], mat[1 * 4 + 1], mat[2 * 4 + 1],
 					mat[0 * 4 + 2], mat[1 * 4 + 2], mat[2 * 4 + 2] );
@@ -1180,23 +1207,23 @@ ARC_INLINE anMat3 aRcMat3x4::ToMat3( void ) const {
 
 /*
 =============
-aRcMat3x4::ToVec3
+anMat3x4::ToVec3
 =============
 */
-ARC_INLINE anVec3 aRcMat3x4::ToVec3( void ) const {
+inline anVec3 anMat3x4::ToVec3( void ) const {
 	return anVec3( mat[0 * 4 + 3], mat[1 * 4 + 3], mat[2 * 4 + 3] );
 }
 
 /*
 =============
-aRcMat3x4::ToFloatPtr
+anMat3x4::ToFloatPtr
 =============
 */
-ARC_INLINE const float *aRcMat3x4::ToFloatPtr( void ) const {
+inline const float *anMat3x4::ToFloatPtr( void ) const {
 	return mat;
 }
 
-ARC_INLINE float *aRcMat3x4::ToFloatPtr( void ) {
+inline float *anMat3x4::ToFloatPtr( void ) {
 	return mat;
 }
 
@@ -1275,17 +1302,17 @@ extern anMat4 mat4_zero;
 extern anMat4 mat4_identity;
 #define mat4_default	mat4_identity
 
-ARC_INLINE anMat4::anMat4( void ) {
+inline anMat4::anMat4( void ) {
 }
 
-ARC_INLINE anMat4::anMat4( const anVec4 &x, const anVec4 &y, const anVec4 &z, const anVec4 &w ) {
-	mat[ 0 ] = x;
-	mat[ 1 ] = y;
-	mat[ 2 ] = z;
-	mat[ 3 ] = w;
+inline anMat4::anMat4( const anVec4 &x, const anVec4 &y, const anVec4 &z, const anVec4 &w ) {
+	mat[0] = x;
+	mat[1] = y;
+	mat[2] = z;
+	mat[3] = w;
 }
 
-ARC_INLINE anMat4::anMat4( const float xx, const float xy, const float xz, const float xw,
+inline anMat4::anMat4( const float xx, const float xy, const float xz, const float xw,
 							const float yx, const float yy, const float yz, const float yw,
 							const float zx, const float zy, const float zz, const float zw,
 							const float wx, const float wy, const float wz, const float ww ) {
@@ -1295,41 +1322,41 @@ ARC_INLINE anMat4::anMat4( const float xx, const float xy, const float xz, const
 	mat[3][0] = wx; mat[3][1] = wy; mat[3][2] = wz; mat[3][3] = ww;
 }
 
-ARC_INLINE anMat4::anMat4( const anMat3 &rotation, const anVec3 &translation ) {
+inline anMat4::anMat4( const anMat3 &rotation, const anVec3 &translation ) {
 	// NOTE: anMat3 is transposed because it is column-major
-	mat[ 0 ][ 0 ] = rotation[0][0];
-	mat[ 0 ][ 1 ] = rotation[1][0];
-	mat[ 0 ][ 2 ] = rotation[2][0];
-	mat[ 0 ][ 3 ] = translation[0];
-	mat[ 1 ][ 0 ] = rotation[0][1];
-	mat[ 1 ][ 1 ] = rotation[1][1];
-	mat[ 1 ][ 2 ] = rotation[2][1];
-	mat[ 1 ][ 3 ] = translation[1];
-	mat[ 2 ][ 0 ] = rotation[0][2];
-	mat[ 2 ][ 1 ] = rotation[1][2];
-	mat[ 2 ][ 2 ] = rotation[2][2];
-	mat[ 2 ][ 3 ] = translation[2];
-	mat[ 3 ][ 0 ] = 0.0f;
-	mat[ 3 ][ 1 ] = 0.0f;
-	mat[ 3 ][ 2 ] = 0.0f;
-	mat[ 3 ][ 3 ] = 1.0f;
+	mat[0][0] = rotation[0][0];
+	mat[0][1] = rotation[1][0];
+	mat[0][2] = rotation[2][0];
+	mat[0][3] = translation[0];
+	mat[1][0] = rotation[0][1];
+	mat[1][1] = rotation[1][1];
+	mat[1][2] = rotation[2][1];
+	mat[1][3] = translation[1];
+	mat[2][0] = rotation[0][2];
+	mat[2][1] = rotation[1][2];
+	mat[2][2] = rotation[2][2];
+	mat[2][3] = translation[2];
+	mat[3][0] = 0.0f;
+	mat[3][1] = 0.0f;
+	mat[3][2] = 0.0f;
+	mat[3][3] = 1.0f;
 }
 
-ARC_INLINE anMat4::anMat4( const float src[ 4 ][ 4 ] ) {
+inline anMat4::anMat4( const float src[ 4 ][ 4 ] ) {
 	memcpy( mat, src, 4 * 4 * sizeof( float ) );
 }
 
-ARC_INLINE const anVec4 &anMat4::operator[]( int index ) const {
+inline const anVec4 &anMat4::operator[]( int index ) const {
 	//assert( ( index >= 0 ) && ( index < 4 ) );
 	return mat[index];
 }
 
-ARC_INLINE anVec4 &anMat4::operator[]( int index ) {
+inline anVec4 &anMat4::operator[]( int index ) {
 	//assert( ( index >= 0 ) && ( index < 4 ) );
 	return mat[index];
 }
 
-ARC_INLINE anMat4 anMat4::operator*( const float a ) const {
+inline anMat4 anMat4::operator*( const float a ) const {
 	return anMat4(
 		mat[0].x * a, mat[0].y * a, mat[0].z * a, mat[0].w * a,
 		mat[1].x * a, mat[1].y * a, mat[1].z * a, mat[1].w * a,
@@ -1337,35 +1364,35 @@ ARC_INLINE anMat4 anMat4::operator*( const float a ) const {
 		mat[3].x * a, mat[3].y * a, mat[3].z * a, mat[3].w * a );
 }
 
-ARC_INLINE anVec4 anMat4::operator*( const anVec4 &vec ) const {
+inline anVec4 anMat4::operator*( const anVec4 &vec ) const {
 	return anVec4(
-		mat[ 0 ].x * vec.x + mat[ 0 ].y * vec.y + mat[ 0 ].z * vec.z + mat[ 0 ].w * vec.w,
-		mat[ 1 ].x * vec.x + mat[ 1 ].y * vec.y + mat[ 1 ].z * vec.z + mat[ 1 ].w * vec.w,
-		mat[ 2 ].x * vec.x + mat[ 2 ].y * vec.y + mat[ 2 ].z * vec.z + mat[ 2 ].w * vec.w,
-		mat[ 3 ].x * vec.x + mat[ 3 ].y * vec.y + mat[ 3 ].z * vec.z + mat[ 3 ].w * vec.w );
+		mat[0].x * vec.x + mat[0].y * vec.y + mat[0].z * vec.z + mat[0].w * vec.w,
+		mat[1].x * vec.x + mat[1].y * vec.y + mat[1].z * vec.z + mat[1].w * vec.w,
+		mat[2].x * vec.x + mat[2].y * vec.y + mat[2].z * vec.z + mat[2].w * vec.w,
+		mat[3].x * vec.x + mat[3].y * vec.y + mat[3].z * vec.z + mat[3].w * vec.w );
 }
 
-ARC_INLINE anVec3 anMat4::operator*( const anVec3 &vec ) const {
-	float s = mat[ 3 ].x * vec.x + mat[ 3 ].y * vec.y + mat[ 3 ].z * vec.z + mat[ 3 ].w;
+inline anVec3 anMat4::operator*( const anVec3 &vec ) const {
+	float s = mat[3].x * vec.x + mat[3].y * vec.y + mat[3].z * vec.z + mat[3].w;
 	if ( s == 0.0f ) {
 		return anVec3( 0.0f, 0.0f, 0.0f );
 	}
 	if ( s == 1.0f ) {
 		return anVec3(
-			mat[ 0 ].x * vec.x + mat[ 0 ].y * vec.y + mat[ 0 ].z * vec.z + mat[ 0 ].w,
-			mat[ 1 ].x * vec.x + mat[ 1 ].y * vec.y + mat[ 1 ].z * vec.z + mat[ 1 ].w,
-			mat[ 2 ].x * vec.x + mat[ 2 ].y * vec.y + mat[ 2 ].z * vec.z + mat[ 2 ].w );
+			mat[0].x * vec.x + mat[0].y * vec.y + mat[0].z * vec.z + mat[0].w,
+			mat[1].x * vec.x + mat[1].y * vec.y + mat[1].z * vec.z + mat[1].w,
+			mat[2].x * vec.x + mat[2].y * vec.y + mat[2].z * vec.z + mat[2].w );
 	}
 	else {
 		float invS = 1.0f / s;
 		return anVec3(
-			(mat[ 0 ].x * vec.x + mat[ 0 ].y * vec.y + mat[ 0 ].z * vec.z + mat[ 0 ].w) * invS,
-			(mat[ 1 ].x * vec.x + mat[ 1 ].y * vec.y + mat[ 1 ].z * vec.z + mat[ 1 ].w) * invS,
-			(mat[ 2 ].x * vec.x + mat[ 2 ].y * vec.y + mat[ 2 ].z * vec.z + mat[ 2 ].w) * invS );
+			(mat[0].x * vec.x + mat[0].y * vec.y + mat[0].z * vec.z + mat[0].w) * invS,
+			(mat[1].x * vec.x + mat[1].y * vec.y + mat[1].z * vec.z + mat[1].w) * invS,
+			(mat[2].x * vec.x + mat[2].y * vec.y + mat[2].z * vec.z + mat[2].w) * invS );
 	}
 }
 
-ARC_INLINE anMat4 anMat4::operator*( const anMat4 &a ) const {
+inline anMat4 anMat4::operator*( const anMat4 &a ) const {
 	int i, j;
 	const float *m1Ptr, *m2Ptr;
 	float *dstPtr;
@@ -1388,7 +1415,7 @@ ARC_INLINE anMat4 anMat4::operator*( const anMat4 &a ) const {
 	return dst;
 }
 
-ARC_INLINE anMat4 anMat4::operator+( const anMat4 &a ) const {
+inline anMat4 anMat4::operator+( const anMat4 &a ) const {
 	return anMat4(
 		mat[0].x + a[0].x, mat[0].y + a[0].y, mat[0].z + a[0].z, mat[0].w + a[0].w,
 		mat[1].x + a[1].x, mat[1].y + a[1].y, mat[1].z + a[1].z, mat[1].w + a[1].w,
@@ -1396,7 +1423,7 @@ ARC_INLINE anMat4 anMat4::operator+( const anMat4 &a ) const {
 		mat[3].x + a[3].x, mat[3].y + a[3].y, mat[3].z + a[3].z, mat[3].w + a[3].w );
 }
 
-ARC_INLINE anMat4 anMat4::operator-( const anMat4 &a ) const {
+inline anMat4 anMat4::operator-( const anMat4 &a ) const {
 	return anMat4(
 		mat[0].x - a[0].x, mat[0].y - a[0].y, mat[0].z - a[0].z, mat[0].w - a[0].w,
 		mat[1].x - a[1].x, mat[1].y - a[1].y, mat[1].z - a[1].z, mat[1].w - a[1].w,
@@ -1404,7 +1431,7 @@ ARC_INLINE anMat4 anMat4::operator-( const anMat4 &a ) const {
 		mat[3].x - a[3].x, mat[3].y - a[3].y, mat[3].z - a[3].z, mat[3].w - a[3].w );
 }
 
-ARC_INLINE anMat4 &anMat4::operator*=( const float a ) {
+inline anMat4 &anMat4::operator*=( const float a ) {
 	mat[0].x *= a; mat[0].y *= a; mat[0].z *= a; mat[0].w *= a;
 	mat[1].x *= a; mat[1].y *= a; mat[1].z *= a; mat[1].w *= a;
 	mat[2].x *= a; mat[2].y *= a; mat[2].z *= a; mat[2].w *= a;
@@ -1412,12 +1439,12 @@ ARC_INLINE anMat4 &anMat4::operator*=( const float a ) {
     return *this;
 }
 
-ARC_INLINE anMat4 &anMat4::operator*=( const anMat4 &a ) {
+inline anMat4 &anMat4::operator*=( const anMat4 &a ) {
 	*this = (*this) * a;
 	return *this;
 }
 
-ARC_INLINE anMat4 &anMat4::operator+=( const anMat4 &a ) {
+inline anMat4 &anMat4::operator+=( const anMat4 &a ) {
 	mat[0].x += a[0].x; mat[0].y += a[0].y; mat[0].z += a[0].z; mat[0].w += a[0].w;
 	mat[1].x += a[1].x; mat[1].y += a[1].y; mat[1].z += a[1].z; mat[1].w += a[1].w;
 	mat[2].x += a[2].x; mat[2].y += a[2].y; mat[2].z += a[2].z; mat[2].w += a[2].w;
@@ -1425,7 +1452,7 @@ ARC_INLINE anMat4 &anMat4::operator+=( const anMat4 &a ) {
     return *this;
 }
 
-ARC_INLINE anMat4 &anMat4::operator-=( const anMat4 &a ) {
+inline anMat4 &anMat4::operator-=( const anMat4 &a ) {
 	mat[0].x -= a[0].x; mat[0].y -= a[0].y; mat[0].z -= a[0].z; mat[0].w -= a[0].w;
 	mat[1].x -= a[1].x; mat[1].y -= a[1].y; mat[1].z -= a[1].z; mat[1].w -= a[1].w;
 	mat[2].x -= a[2].x; mat[2].y -= a[2].y; mat[2].z -= a[2].z; mat[2].w -= a[2].w;
@@ -1433,29 +1460,29 @@ ARC_INLINE anMat4 &anMat4::operator-=( const anMat4 &a ) {
     return *this;
 }
 
-ARC_INLINE anMat4 operator*( const float a, const anMat4 &mat ) {
+inline anMat4 operator*( const float a, const anMat4 &mat ) {
 	return mat * a;
 }
 
-ARC_INLINE anVec4 operator*( const anVec4 &vec, const anMat4 &mat ) {
+inline anVec4 operator*( const anVec4 &vec, const anMat4 &mat ) {
 	return mat * vec;
 }
 
-ARC_INLINE anVec3 operator*( const anVec3 &vec, const anMat4 &mat ) {
+inline anVec3 operator*( const anVec3 &vec, const anMat4 &mat ) {
 	return mat * vec;
 }
 
-ARC_INLINE anVec4 &operator*=( anVec4 &vec, const anMat4 &mat ) {
+inline anVec4 &operator*=( anVec4 &vec, const anMat4 &mat ) {
 	vec = mat * vec;
 	return vec;
 }
 
-ARC_INLINE anVec3 &operator*=( anVec3 &vec, const anMat4 &mat ) {
+inline anVec3 &operator*=( anVec3 &vec, const anMat4 &mat ) {
 	vec = mat * vec;
 	return vec;
 }
 
-ARC_INLINE bool anMat4::Compare( const anMat4 &a ) const {
+inline bool anMat4::Compare( const anMat4 &a ) const {
 	dword i;
 	const float *ptr1, *ptr2;
 
@@ -1469,7 +1496,7 @@ ARC_INLINE bool anMat4::Compare( const anMat4 &a ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat4::Compare( const anMat4 &a, const float epsilon ) const {
+inline bool anMat4::Compare( const anMat4 &a, const float epsilon ) const {
 	dword i;
 	const float *ptr1, *ptr2;
 
@@ -1483,27 +1510,27 @@ ARC_INLINE bool anMat4::Compare( const anMat4 &a, const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat4::operator==( const anMat4 &a ) const {
+inline bool anMat4::operator==( const anMat4 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool anMat4::operator!=( const anMat4 &a ) const {
+inline bool anMat4::operator!=( const anMat4 &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void anMat4::Zero( void ) {
+inline void anMat4::Zero( void ) {
 	memset( mat, 0, sizeof( anMat4 ) );
 }
 
-ARC_INLINE void anMat4::Identity( void ) {
+inline void anMat4::Identity( void ) {
 	*this = mat4_identity;
 }
 
-ARC_INLINE bool anMat4::IsIdentity( const float epsilon ) const {
+inline bool anMat4::IsIdentity( const float epsilon ) const {
 	return Compare( mat4_identity, epsilon );
 }
 
-ARC_INLINE bool anMat4::IsSymmetric( const float epsilon ) const {
+inline bool anMat4::IsSymmetric( const float epsilon ) const {
 	for ( int i = 1; i < 4; i++ ) {
 		for ( int j = 0; j < i; j++ ) {
 			if ( anMath::Fabs( mat[i][j] - mat[j][i] ) > epsilon ) {
@@ -1514,7 +1541,7 @@ ARC_INLINE bool anMat4::IsSymmetric( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat4::IsDiagonal( const float epsilon ) const {
+inline bool anMat4::IsDiagonal( const float epsilon ) const {
 	for ( int i = 0; i < 4; i++ ) {
 		for ( int j = 0; j < 4; j++ ) {
 			if ( i != j && anMath::Fabs( mat[i][j] ) > epsilon ) {
@@ -1525,31 +1552,31 @@ ARC_INLINE bool anMat4::IsDiagonal( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat4::IsRotated( void ) const {
-	if ( !mat[ 0 ][ 1 ] && !mat[ 0 ][ 2 ] &&
-		!mat[ 1 ][ 0 ] && !mat[ 1 ][ 2 ] &&
-		!mat[ 2 ][ 0 ] && !mat[ 2 ][ 1 ] ) {
+inline bool anMat4::IsRotated( void ) const {
+	if ( !mat[0][1] && !mat[0][2] &&
+		!mat[1][0] && !mat[1][2] &&
+		!mat[2][0] && !mat[2][1] ) {
 		return false;
 	}
 	return true;
 }
 
-ARC_INLINE void anMat4::ProjectVector( const anVec4 &src, anVec4 &dst ) const {
-	dst.x = src * mat[ 0 ];
-	dst.y = src * mat[ 1 ];
-	dst.z = src * mat[ 2 ];
-	dst.w = src * mat[ 3 ];
+inline void anMat4::ProjectVector( const anVec4 &src, anVec4 &dst ) const {
+	dst.x = src * mat[0];
+	dst.y = src * mat[1];
+	dst.z = src * mat[2];
+	dst.w = src * mat[3];
 }
 
-ARC_INLINE void anMat4::UnprojectVector( const anVec4 &src, anVec4 &dst ) const {
-	dst = mat[ 0 ] * src.x + mat[ 1 ] * src.y + mat[ 2 ] * src.z + mat[ 3 ] * src.w;
+inline void anMat4::UnprojectVector( const anVec4 &src, anVec4 &dst ) const {
+	dst = mat[0] * src.x + mat[1] * src.y + mat[2] * src.z + mat[3] * src.w;
 }
 
-ARC_INLINE float anMat4::Trace( void ) const {
+inline float anMat4::Trace( void ) const {
 	return ( mat[0][0] + mat[1][1] + mat[2][2] + mat[3][3] );
 }
 
-ARC_INLINE anMat4 anMat4::Inverse( void ) const {
+inline anMat4 anMat4::Inverse( void ) const {
 	anMat4 invMat;
 
 	invMat = *this;
@@ -1558,7 +1585,7 @@ ARC_INLINE anMat4 anMat4::Inverse( void ) const {
 	return invMat;
 }
 
-ARC_INLINE anMat4 anMat4::InverseFast( void ) const {
+inline anMat4 anMat4::InverseFast( void ) const {
 	anMat4 invMat;
 
 	invMat = *this;
@@ -1567,7 +1594,7 @@ ARC_INLINE anMat4 anMat4::InverseFast( void ) const {
 	return invMat;
 }
 
-ARC_INLINE anMat4 anMat3::ToMat4( void ) const {
+inline anMat4 anMat3::ToMat4( void ) const {
 	// NOTE: anMat3 is transposed because it is column-major
 	return anMat4(	mat[0][0],	mat[1][0],	mat[2][0],	0.0f,
 					mat[0][1],	mat[1][1],	mat[2][1],	0.0f,
@@ -1575,15 +1602,15 @@ ARC_INLINE anMat4 anMat3::ToMat4( void ) const {
 					0.0f,		0.0f,		0.0f,		1.0f );
 }
 
-ARC_INLINE int anMat4::GetDimension( void ) const {
+inline int anMat4::GetDimension( void ) const {
 	return 16;
 }
 
-ARC_INLINE const float *anMat4::ToFloatPtr( void ) const {
+inline const float *anMat4::ToFloatPtr( void ) const {
 	return mat[0].ToFloatPtr();
 }
 
-ARC_INLINE float *anMat4::ToFloatPtr( void ) {
+inline float *anMat4::ToFloatPtr( void ) {
 	return mat[0].ToFloatPtr();
 }
 
@@ -1650,14 +1677,14 @@ extern anMat5 mat5_zero;
 extern anMat5 mat5_identity;
 #define mat5_default	mat5_identity
 
-ARC_INLINE anMat5::anMat5( void ) {
+inline anMat5::anMat5( void ) {
 }
 
-ARC_INLINE anMat5::anMat5( const float src[ 5 ][ 5 ] ) {
+inline anMat5::anMat5( const float src[ 5 ][ 5 ] ) {
 	memcpy( mat, src, 5 * 5 * sizeof( float ) );
 }
 
-ARC_INLINE anMat5::anMat5( const anVec5 &v0, const anVec5 &v1, const anVec5 &v2, const anVec5 &v3, const anVec5 &v4 ) {
+inline anMat5::anMat5( const anVec5 &v0, const anVec5 &v1, const anVec5 &v2, const anVec5 &v3, const anVec5 &v4 ) {
 	mat[0] = v0;
 	mat[1] = v1;
 	mat[2] = v2;
@@ -1665,17 +1692,17 @@ ARC_INLINE anMat5::anMat5( const anVec5 &v0, const anVec5 &v1, const anVec5 &v2,
 	mat[4] = v4;
 }
 
-ARC_INLINE const anVec5 &anMat5::operator[]( int index ) const {
+inline const anVec5 &anMat5::operator[]( int index ) const {
 	//assert( ( index >= 0 ) && ( index < 5 ) );
 	return mat[index];
 }
 
-ARC_INLINE anVec5 &anMat5::operator[]( int index ) {
+inline anVec5 &anMat5::operator[]( int index ) {
 	//assert( ( index >= 0 ) && ( index < 5 ) );
 	return mat[index];
 }
 
-ARC_INLINE anMat5 anMat5::operator*( const anMat5 &a ) const {
+inline anMat5 anMat5::operator*( const anMat5 &a ) const {
 	int i, j;
 	const float *m1Ptr, *m2Ptr;
 	float *dstPtr;
@@ -1699,7 +1726,7 @@ ARC_INLINE anMat5 anMat5::operator*( const anMat5 &a ) const {
 	return dst;
 }
 
-ARC_INLINE anMat5 anMat5::operator*( const float a ) const {
+inline anMat5 anMat5::operator*( const float a ) const {
 	return anMat5(
 		anVec5( mat[0][0] * a, mat[0][1] * a, mat[0][2] * a, mat[0][3] * a, mat[0][4] * a ),
 		anVec5( mat[1][0] * a, mat[1][1] * a, mat[1][2] * a, mat[1][3] * a, mat[1][4] * a ),
@@ -1708,7 +1735,7 @@ ARC_INLINE anMat5 anMat5::operator*( const float a ) const {
 		anVec5( mat[4][0] * a, mat[4][1] * a, mat[4][2] * a, mat[4][3] * a, mat[4][4] * a ) );
 }
 
-ARC_INLINE anVec5 anMat5::operator*( const anVec5 &vec ) const {
+inline anVec5 anMat5::operator*( const anVec5 &vec ) const {
 	return anVec5(
 		mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2] + mat[0][3] * vec[3] + mat[0][4] * vec[4],
 		mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2] + mat[1][3] * vec[3] + mat[1][4] * vec[4],
@@ -1717,7 +1744,7 @@ ARC_INLINE anVec5 anMat5::operator*( const anVec5 &vec ) const {
 		mat[4][0] * vec[0] + mat[4][1] * vec[1] + mat[4][2] * vec[2] + mat[4][3] * vec[3] + mat[4][4] * vec[4] );
 }
 
-ARC_INLINE anMat5 anMat5::operator+( const anMat5 &a ) const {
+inline anMat5 anMat5::operator+( const anMat5 &a ) const {
 	return anMat5(
 		anVec5( mat[0][0] + a[0][0], mat[0][1] + a[0][1], mat[0][2] + a[0][2], mat[0][3] + a[0][3], mat[0][4] + a[0][4] ),
 		anVec5( mat[1][0] + a[1][0], mat[1][1] + a[1][1], mat[1][2] + a[1][2], mat[1][3] + a[1][3], mat[1][4] + a[1][4] ),
@@ -1726,7 +1753,7 @@ ARC_INLINE anMat5 anMat5::operator+( const anMat5 &a ) const {
 		anVec5( mat[4][0] + a[4][0], mat[4][1] + a[4][1], mat[4][2] + a[4][2], mat[4][3] + a[4][3], mat[4][4] + a[4][4] ) );
 }
 
-ARC_INLINE anMat5 anMat5::operator-( const anMat5 &a ) const {
+inline anMat5 anMat5::operator-( const anMat5 &a ) const {
 	return anMat5(
 		anVec5( mat[0][0] - a[0][0], mat[0][1] - a[0][1], mat[0][2] - a[0][2], mat[0][3] - a[0][3], mat[0][4] - a[0][4] ),
 		anVec5( mat[1][0] - a[1][0], mat[1][1] - a[1][1], mat[1][2] - a[1][2], mat[1][3] - a[1][3], mat[1][4] - a[1][4] ),
@@ -1735,7 +1762,7 @@ ARC_INLINE anMat5 anMat5::operator-( const anMat5 &a ) const {
 		anVec5( mat[4][0] - a[4][0], mat[4][1] - a[4][1], mat[4][2] - a[4][2], mat[4][3] - a[4][3], mat[4][4] - a[4][4] ) );
 }
 
-ARC_INLINE anMat5 &anMat5::operator*=( const float a ) {
+inline anMat5 &anMat5::operator*=( const float a ) {
 	mat[0][0] *= a; mat[0][1] *= a; mat[0][2] *= a; mat[0][3] *= a; mat[0][4] *= a;
 	mat[1][0] *= a; mat[1][1] *= a; mat[1][2] *= a; mat[1][3] *= a; mat[1][4] *= a;
 	mat[2][0] *= a; mat[2][1] *= a; mat[2][2] *= a; mat[2][3] *= a; mat[2][4] *= a;
@@ -1744,12 +1771,12 @@ ARC_INLINE anMat5 &anMat5::operator*=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE anMat5 &anMat5::operator*=( const anMat5 &a ) {
+inline anMat5 &anMat5::operator*=( const anMat5 &a ) {
 	*this = *this * a;
 	return *this;
 }
 
-ARC_INLINE anMat5 &anMat5::operator+=( const anMat5 &a ) {
+inline anMat5 &anMat5::operator+=( const anMat5 &a ) {
 	mat[0][0] += a[0][0]; mat[0][1] += a[0][1]; mat[0][2] += a[0][2]; mat[0][3] += a[0][3]; mat[0][4] += a[0][4];
 	mat[1][0] += a[1][0]; mat[1][1] += a[1][1]; mat[1][2] += a[1][2]; mat[1][3] += a[1][3]; mat[1][4] += a[1][4];
 	mat[2][0] += a[2][0]; mat[2][1] += a[2][1]; mat[2][2] += a[2][2]; mat[2][3] += a[2][3]; mat[2][4] += a[2][4];
@@ -1758,7 +1785,7 @@ ARC_INLINE anMat5 &anMat5::operator+=( const anMat5 &a ) {
 	return *this;
 }
 
-ARC_INLINE anMat5 &anMat5::operator-=( const anMat5 &a ) {
+inline anMat5 &anMat5::operator-=( const anMat5 &a ) {
 	mat[0][0] -= a[0][0]; mat[0][1] -= a[0][1]; mat[0][2] -= a[0][2]; mat[0][3] -= a[0][3]; mat[0][4] -= a[0][4];
 	mat[1][0] -= a[1][0]; mat[1][1] -= a[1][1]; mat[1][2] -= a[1][2]; mat[1][3] -= a[1][3]; mat[1][4] -= a[1][4];
 	mat[2][0] -= a[2][0]; mat[2][1] -= a[2][1]; mat[2][2] -= a[2][2]; mat[2][3] -= a[2][3]; mat[2][4] -= a[2][4];
@@ -1767,20 +1794,20 @@ ARC_INLINE anMat5 &anMat5::operator-=( const anMat5 &a ) {
 	return *this;
 }
 
-ARC_INLINE anVec5 operator*( const anVec5 &vec, const anMat5 &mat ) {
+inline anVec5 operator*( const anVec5 &vec, const anMat5 &mat ) {
 	return mat * vec;
 }
 
-ARC_INLINE anMat5 operator*( const float a, anMat5 const &mat ) {
+inline anMat5 operator*( const float a, anMat5 const &mat ) {
 	return mat * a;
 }
 
-ARC_INLINE anVec5 &operator*=( anVec5 &vec, const anMat5 &mat ) {
+inline anVec5 &operator*=( anVec5 &vec, const anMat5 &mat ) {
 	vec = mat * vec;
 	return vec;
 }
 
-ARC_INLINE bool anMat5::Compare( const anMat5 &a ) const {
+inline bool anMat5::Compare( const anMat5 &a ) const {
 	dword i;
 	const float *ptr1, *ptr2;
 
@@ -1794,7 +1821,7 @@ ARC_INLINE bool anMat5::Compare( const anMat5 &a ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat5::Compare( const anMat5 &a, const float epsilon ) const {
+inline bool anMat5::Compare( const anMat5 &a, const float epsilon ) const {
 	dword i;
 	const float *ptr1, *ptr2;
 
@@ -1808,27 +1835,27 @@ ARC_INLINE bool anMat5::Compare( const anMat5 &a, const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat5::operator==( const anMat5 &a ) const {
+inline bool anMat5::operator==( const anMat5 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool anMat5::operator!=( const anMat5 &a ) const {
+inline bool anMat5::operator!=( const anMat5 &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void anMat5::Zero( void ) {
+inline void anMat5::Zero( void ) {
 	memset( mat, 0, sizeof( anMat5 ) );
 }
 
-ARC_INLINE void anMat5::Identity( void ) {
+inline void anMat5::Identity( void ) {
 	*this = mat5_identity;
 }
 
-ARC_INLINE bool anMat5::IsIdentity( const float epsilon ) const {
+inline bool anMat5::IsIdentity( const float epsilon ) const {
 	return Compare( mat5_identity, epsilon );
 }
 
-ARC_INLINE bool anMat5::IsSymmetric( const float epsilon ) const {
+inline bool anMat5::IsSymmetric( const float epsilon ) const {
 	for ( int i = 1; i < 5; i++ ) {
 		for ( int j = 0; j < i; j++ ) {
 			if ( anMath::Fabs( mat[i][j] - mat[j][i] ) > epsilon ) {
@@ -1839,7 +1866,7 @@ ARC_INLINE bool anMat5::IsSymmetric( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat5::IsDiagonal( const float epsilon ) const {
+inline bool anMat5::IsDiagonal( const float epsilon ) const {
 	for ( int i = 0; i < 5; i++ ) {
 		for ( int j = 0; j < 5; j++ ) {
 			if ( i != j && anMath::Fabs( mat[i][j] ) > epsilon ) {
@@ -1850,11 +1877,11 @@ ARC_INLINE bool anMat5::IsDiagonal( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE float anMat5::Trace( void ) const {
+inline float anMat5::Trace( void ) const {
 	return ( mat[0][0] + mat[1][1] + mat[2][2] + mat[3][3] + mat[4][4] );
 }
 
-ARC_INLINE anMat5 anMat5::Inverse( void ) const {
+inline anMat5 anMat5::Inverse( void ) const {
 	anMat5 invMat;
 
 	invMat = *this;
@@ -1863,7 +1890,7 @@ ARC_INLINE anMat5 anMat5::Inverse( void ) const {
 	return invMat;
 }
 
-ARC_INLINE anMat5 anMat5::InverseFast( void ) const {
+inline anMat5 anMat5::InverseFast( void ) const {
 	anMat5 invMat;
 
 	invMat = *this;
@@ -1872,15 +1899,15 @@ ARC_INLINE anMat5 anMat5::InverseFast( void ) const {
 	return invMat;
 }
 
-ARC_INLINE int anMat5::GetDimension( void ) const {
+inline int anMat5::GetDimension( void ) const {
 	return 25;
 }
 
-ARC_INLINE const float *anMat5::ToFloatPtr( void ) const {
+inline const float *anMat5::ToFloatPtr( void ) const {
 	return mat[0].ToFloatPtr();
 }
 
-ARC_INLINE float *anMat5::ToFloatPtr( void ) {
+inline float *anMat5::ToFloatPtr( void ) {
 	return mat[0].ToFloatPtr();
 }
 
@@ -1949,10 +1976,10 @@ extern anMat6 mat6_zero;
 extern anMat6 mat6_identity;
 #define mat6_default	mat6_identity
 
-ARC_INLINE anMat6::anMat6( void ) {
+inline anMat6::anMat6( void ) {
 }
 
-ARC_INLINE anMat6::anMat6( const anMat3 &m0, const anMat3 &m1, const anMat3 &m2, const anMat3 &m3 ) {
+inline anMat6::anMat6( const anMat3 &m0, const anMat3 &m1, const anMat3 &m2, const anMat3 &m3 ) {
 	mat[0] = anVec6( m0[0][0], m0[0][1], m0[0][2], m1[0][0], m1[0][1], m1[0][2] );
 	mat[1] = anVec6( m0[1][0], m0[1][1], m0[1][2], m1[1][0], m1[1][1], m1[1][2] );
 	mat[2] = anVec6( m0[2][0], m0[2][1], m0[2][2], m1[2][0], m1[2][1], m1[2][2] );
@@ -1961,7 +1988,7 @@ ARC_INLINE anMat6::anMat6( const anMat3 &m0, const anMat3 &m1, const anMat3 &m2,
 	mat[5] = anVec6( m2[2][0], m2[2][1], m2[2][2], m3[2][0], m3[2][1], m3[2][2] );
 }
 
-ARC_INLINE anMat6::anMat6( const anVec6 &v0, const anVec6 &v1, const anVec6 &v2, const anVec6 &v3, const anVec6 &v4, const anVec6 &v5 ) {
+inline anMat6::anMat6( const anVec6 &v0, const anVec6 &v1, const anVec6 &v2, const anVec6 &v3, const anVec6 &v4, const anVec6 &v5 ) {
 	mat[0] = v0;
 	mat[1] = v1;
 	mat[2] = v2;
@@ -1970,21 +1997,21 @@ ARC_INLINE anMat6::anMat6( const anVec6 &v0, const anVec6 &v1, const anVec6 &v2,
 	mat[5] = v5;
 }
 
-ARC_INLINE anMat6::anMat6( const float src[ 6 ][ 6 ] ) {
+inline anMat6::anMat6( const float src[ 6 ][ 6 ] ) {
 	memcpy( mat, src, 6 * 6 * sizeof( float ) );
 }
 
-ARC_INLINE const anVec6 &anMat6::operator[]( int index ) const {
+inline const anVec6 &anMat6::operator[]( int index ) const {
 	//assert( ( index >= 0 ) && ( index < 6 ) );
 	return mat[index];
 }
 
-ARC_INLINE anVec6 &anMat6::operator[]( int index ) {
+inline anVec6 &anMat6::operator[]( int index ) {
 	//assert( ( index >= 0 ) && ( index < 6 ) );
 	return mat[index];
 }
 
-ARC_INLINE anMat6 anMat6::operator*( const anMat6 &a ) const {
+inline anMat6 anMat6::operator*( const anMat6 &a ) const {
 	int i, j;
 	const float *m1Ptr, *m2Ptr;
 	float *dstPtr;
@@ -2009,7 +2036,7 @@ ARC_INLINE anMat6 anMat6::operator*( const anMat6 &a ) const {
 	return dst;
 }
 
-ARC_INLINE anMat6 anMat6::operator*( const float a ) const {
+inline anMat6 anMat6::operator*( const float a ) const {
 	return anMat6(
 		anVec6( mat[0][0] * a, mat[0][1] * a, mat[0][2] * a, mat[0][3] * a, mat[0][4] * a, mat[0][5] * a ),
 		anVec6( mat[1][0] * a, mat[1][1] * a, mat[1][2] * a, mat[1][3] * a, mat[1][4] * a, mat[1][5] * a ),
@@ -2019,7 +2046,7 @@ ARC_INLINE anMat6 anMat6::operator*( const float a ) const {
 		anVec6( mat[5][0] * a, mat[5][1] * a, mat[5][2] * a, mat[5][3] * a, mat[5][4] * a, mat[5][5] * a ) );
 }
 
-ARC_INLINE anVec6 anMat6::operator*( const anVec6 &vec ) const {
+inline anVec6 anMat6::operator*( const anVec6 &vec ) const {
 	return anVec6(
 		mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2] + mat[0][3] * vec[3] + mat[0][4] * vec[4] + mat[0][5] * vec[5],
 		mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2] + mat[1][3] * vec[3] + mat[1][4] * vec[4] + mat[1][5] * vec[5],
@@ -2029,7 +2056,7 @@ ARC_INLINE anVec6 anMat6::operator*( const anVec6 &vec ) const {
 		mat[5][0] * vec[0] + mat[5][1] * vec[1] + mat[5][2] * vec[2] + mat[5][3] * vec[3] + mat[5][4] * vec[4] + mat[5][5] * vec[5] );
 }
 
-ARC_INLINE anMat6 anMat6::operator+( const anMat6 &a ) const {
+inline anMat6 anMat6::operator+( const anMat6 &a ) const {
 	return anMat6(
 		anVec6( mat[0][0] + a[0][0], mat[0][1] + a[0][1], mat[0][2] + a[0][2], mat[0][3] + a[0][3], mat[0][4] + a[0][4], mat[0][5] + a[0][5] ),
 		anVec6( mat[1][0] + a[1][0], mat[1][1] + a[1][1], mat[1][2] + a[1][2], mat[1][3] + a[1][3], mat[1][4] + a[1][4], mat[1][5] + a[1][5] ),
@@ -2039,7 +2066,7 @@ ARC_INLINE anMat6 anMat6::operator+( const anMat6 &a ) const {
 		anVec6( mat[5][0] + a[5][0], mat[5][1] + a[5][1], mat[5][2] + a[5][2], mat[5][3] + a[5][3], mat[5][4] + a[5][4], mat[5][5] + a[5][5] ) );
 }
 
-ARC_INLINE anMat6 anMat6::operator-( const anMat6 &a ) const {
+inline anMat6 anMat6::operator-( const anMat6 &a ) const {
 	return anMat6(
 		anVec6( mat[0][0] - a[0][0], mat[0][1] - a[0][1], mat[0][2] - a[0][2], mat[0][3] - a[0][3], mat[0][4] - a[0][4], mat[0][5] - a[0][5] ),
 		anVec6( mat[1][0] - a[1][0], mat[1][1] - a[1][1], mat[1][2] - a[1][2], mat[1][3] - a[1][3], mat[1][4] - a[1][4], mat[1][5] - a[1][5] ),
@@ -2049,7 +2076,7 @@ ARC_INLINE anMat6 anMat6::operator-( const anMat6 &a ) const {
 		anVec6( mat[5][0] - a[5][0], mat[5][1] - a[5][1], mat[5][2] - a[5][2], mat[5][3] - a[5][3], mat[5][4] - a[5][4], mat[5][5] - a[5][5] ) );
 }
 
-ARC_INLINE anMat6 &anMat6::operator*=( const float a ) {
+inline anMat6 &anMat6::operator*=( const float a ) {
 	mat[0][0] *= a; mat[0][1] *= a; mat[0][2] *= a; mat[0][3] *= a; mat[0][4] *= a; mat[0][5] *= a;
 	mat[1][0] *= a; mat[1][1] *= a; mat[1][2] *= a; mat[1][3] *= a; mat[1][4] *= a; mat[1][5] *= a;
 	mat[2][0] *= a; mat[2][1] *= a; mat[2][2] *= a; mat[2][3] *= a; mat[2][4] *= a; mat[2][5] *= a;
@@ -2059,12 +2086,12 @@ ARC_INLINE anMat6 &anMat6::operator*=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE anMat6 &anMat6::operator*=( const anMat6 &a ) {
+inline anMat6 &anMat6::operator*=( const anMat6 &a ) {
 	*this = *this * a;
 	return *this;
 }
 
-ARC_INLINE anMat6 &anMat6::operator+=( const anMat6 &a ) {
+inline anMat6 &anMat6::operator+=( const anMat6 &a ) {
 	mat[0][0] += a[0][0]; mat[0][1] += a[0][1]; mat[0][2] += a[0][2]; mat[0][3] += a[0][3]; mat[0][4] += a[0][4]; mat[0][5] += a[0][5];
 	mat[1][0] += a[1][0]; mat[1][1] += a[1][1]; mat[1][2] += a[1][2]; mat[1][3] += a[1][3]; mat[1][4] += a[1][4]; mat[1][5] += a[1][5];
 	mat[2][0] += a[2][0]; mat[2][1] += a[2][1]; mat[2][2] += a[2][2]; mat[2][3] += a[2][3]; mat[2][4] += a[2][4]; mat[2][5] += a[2][5];
@@ -2074,7 +2101,7 @@ ARC_INLINE anMat6 &anMat6::operator+=( const anMat6 &a ) {
 	return *this;
 }
 
-ARC_INLINE anMat6 &anMat6::operator-=( const anMat6 &a ) {
+inline anMat6 &anMat6::operator-=( const anMat6 &a ) {
 	mat[0][0] -= a[0][0]; mat[0][1] -= a[0][1]; mat[0][2] -= a[0][2]; mat[0][3] -= a[0][3]; mat[0][4] -= a[0][4]; mat[0][5] -= a[0][5];
 	mat[1][0] -= a[1][0]; mat[1][1] -= a[1][1]; mat[1][2] -= a[1][2]; mat[1][3] -= a[1][3]; mat[1][4] -= a[1][4]; mat[1][5] -= a[1][5];
 	mat[2][0] -= a[2][0]; mat[2][1] -= a[2][1]; mat[2][2] -= a[2][2]; mat[2][3] -= a[2][3]; mat[2][4] -= a[2][4]; mat[2][5] -= a[2][5];
@@ -2084,20 +2111,20 @@ ARC_INLINE anMat6 &anMat6::operator-=( const anMat6 &a ) {
 	return *this;
 }
 
-ARC_INLINE anVec6 operator*( const anVec6 &vec, const anMat6 &mat ) {
+inline anVec6 operator*( const anVec6 &vec, const anMat6 &mat ) {
 	return mat * vec;
 }
 
-ARC_INLINE anMat6 operator*( const float a, anMat6 const &mat ) {
+inline anMat6 operator*( const float a, anMat6 const &mat ) {
 	return mat * a;
 }
 
-ARC_INLINE anVec6 &operator*=( anVec6 &vec, const anMat6 &mat ) {
+inline anVec6 &operator*=( anVec6 &vec, const anMat6 &mat ) {
 	vec = mat * vec;
 	return vec;
 }
 
-ARC_INLINE bool anMat6::Compare( const anMat6 &a ) const {
+inline bool anMat6::Compare( const anMat6 &a ) const {
 	const float *ptr1 = reinterpret_cast<const float *>(mat);
 	const float *ptr2 = reinterpret_cast<const float *>(a.mat);
 	for ( dword i = 0; i < 6*6; i++ ) {
@@ -2108,7 +2135,7 @@ ARC_INLINE bool anMat6::Compare( const anMat6 &a ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat6::Compare( const anMat6 &a, const float epsilon ) const {
+inline bool anMat6::Compare( const anMat6 &a, const float epsilon ) const {
 	const float *ptr1 = reinterpret_cast<const float *>(mat);
 	const float *ptr2 = reinterpret_cast<const float *>(a.mat);
 	for ( dword i = 0; i < 6*6; i++ ) {
@@ -2119,27 +2146,27 @@ ARC_INLINE bool anMat6::Compare( const anMat6 &a, const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat6::operator==( const anMat6 &a ) const {
+inline bool anMat6::operator==( const anMat6 &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool anMat6::operator!=( const anMat6 &a ) const {
+inline bool anMat6::operator!=( const anMat6 &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void anMat6::Zero( void ) {
+inline void anMat6::Zero( void ) {
 	memset( mat, 0, sizeof( anMat6 ) );
 }
 
-ARC_INLINE void anMat6::Identity( void ) {
+inline void anMat6::Identity( void ) {
 	*this = mat6_identity;
 }
 
-ARC_INLINE bool anMat6::IsIdentity( const float epsilon ) const {
+inline bool anMat6::IsIdentity( const float epsilon ) const {
 	return Compare( mat6_identity, epsilon );
 }
 
-ARC_INLINE bool anMat6::IsSymmetric( const float epsilon ) const {
+inline bool anMat6::IsSymmetric( const float epsilon ) const {
 	for ( int i = 1; i < 6; i++ ) {
 		for ( int j = 0; j < i; j++ ) {
 			if ( anMath::Fabs( mat[i][j] - mat[j][i] ) > epsilon ) {
@@ -2150,7 +2177,7 @@ ARC_INLINE bool anMat6::IsSymmetric( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMat6::IsDiagonal( const float epsilon ) const {
+inline bool anMat6::IsDiagonal( const float epsilon ) const {
 	for ( int i = 0; i < 6; i++ ) {
 		for ( int j = 0; j < 6; j++ ) {
 			if ( i != j && anMath::Fabs( mat[i][j] ) > epsilon ) {
@@ -2161,7 +2188,7 @@ ARC_INLINE bool anMat6::IsDiagonal( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE anMat3 anMat6::SubMat3( int n ) const {
+inline anMat3 anMat6::SubMat3( int n ) const {
 	assert( n >= 0 && n < 4 );
 	int b0 = ( ( n & 2 ) >> 1 ) * 3;
 	int b1 = ( n & 1 ) * 3;
@@ -2171,11 +2198,11 @@ ARC_INLINE anMat3 anMat6::SubMat3( int n ) const {
 		mat[b0 + 2][b1 + 0], mat[b0 + 2][b1 + 1], mat[b0 + 2][b1 + 2] );
 }
 
-ARC_INLINE float anMat6::Trace( void ) const {
+inline float anMat6::Trace( void ) const {
 	return ( mat[0][0] + mat[1][1] + mat[2][2] + mat[3][3] + mat[4][4] + mat[5][5] );
 }
 
-ARC_INLINE anMat6 anMat6::Inverse( void ) const {
+inline anMat6 anMat6::Inverse( void ) const {
 	anMat6 invMat;
 
 	invMat = *this;
@@ -2184,7 +2211,7 @@ ARC_INLINE anMat6 anMat6::Inverse( void ) const {
 	return invMat;
 }
 
-ARC_INLINE anMat6 anMat6::InverseFast( void ) const {
+inline anMat6 anMat6::InverseFast( void ) const {
 	anMat6 invMat;
 
 	invMat = *this;
@@ -2193,15 +2220,15 @@ ARC_INLINE anMat6 anMat6::InverseFast( void ) const {
 	return invMat;
 }
 
-ARC_INLINE int anMat6::GetDimension( void ) const {
+inline int anMat6::GetDimension( void ) const {
 	return 36;
 }
 
-ARC_INLINE const float *anMat6::ToFloatPtr( void ) const {
+inline const float *anMat6::ToFloatPtr( void ) const {
 	return mat[0].ToFloatPtr();
 }
 
-ARC_INLINE float *anMat6::ToFloatPtr( void ) {
+inline float *anMat6::ToFloatPtr( void ) {
 	return mat[0].ToFloatPtr();
 }
 
@@ -2430,36 +2457,36 @@ private:
 	bool			HessenbergToRealSchur( anMatX &H, anVecX &realEigenValues, anVecX &imaginaryEigenValues );
 };
 
-ARC_INLINE anMatX::anMatX( void ) {
+inline anMatX::anMatX( void ) {
 	numRows = numColumns = alloced = 0;
 	mat = nullptr;
 }
 
-ARC_INLINE anMatX::~anMatX( void ) {
+inline anMatX::~anMatX( void ) {
 	// if not temp memory
 	if ( mat != nullptr && ( mat < anMatX::tempPtr || mat > anMatX::tempPtr + MATX_MAX_TEMP ) && alloced != -1 ) {
 		Mem_Free16( mat );
 	}
 }
 
-ARC_INLINE anMatX::anMatX( int rows, int columns ) {
+inline anMatX::anMatX( int rows, int columns ) {
 	numRows = numColumns = alloced = 0;
 	mat = nullptr;
 	SetSize( rows, columns );
 }
 
-ARC_INLINE anMatX::anMatX( int rows, int columns, float *src ) {
+inline anMatX::anMatX( int rows, int columns, float *src ) {
 	numRows = numColumns = alloced = 0;
 	mat = nullptr;
 	SetData( rows, columns, src );
 }
 
-ARC_INLINE void anMatX::Set( int rows, int columns, const float *src ) {
+inline void anMatX::Set( int rows, int columns, const float *src ) {
 	SetSize( rows, columns );
 	memcpy( this->mat, src, rows * columns * sizeof( float ) );
 }
 
-ARC_INLINE void anMatX::Set( const anMat3 &m1, const anMat3 &m2 ) {
+inline void anMatX::Set( const anMat3 &m1, const anMat3 &m2 ) {
 	SetSize( 3, 6 );
 	for ( int i = 0; i < 3; i++ ) {
 		for ( int j = 0; j < 3; j++ ) {
@@ -2469,7 +2496,7 @@ ARC_INLINE void anMatX::Set( const anMat3 &m1, const anMat3 &m2 ) {
 	}
 }
 
-ARC_INLINE void anMatX::Set( const anMat3 &m1, const anMat3 &m2, const anMat3 &m3, const anMat3 &m4 ) {
+inline void anMatX::Set( const anMat3 &m1, const anMat3 &m2, const anMat3 &m3, const anMat3 &m4 ) {
 	SetSize( 6, 6 );
 	for ( int i = 0; i < 3; i++ ) {
 		for ( int j = 0; j < 3; j++ ) {
@@ -2481,17 +2508,17 @@ ARC_INLINE void anMatX::Set( const anMat3 &m1, const anMat3 &m2, const anMat3 &m
 	}
 }
 
-ARC_INLINE const float *anMatX::operator[]( int index ) const {
+inline const float *anMatX::operator[]( int index ) const {
 	assert( ( index >= 0 ) && ( index < numRows ) );
 	return mat + index * numColumns;
 }
 
-ARC_INLINE float *anMatX::operator[]( int index ) {
+inline float *anMatX::operator[]( int index ) {
 	assert( ( index >= 0 ) && ( index < numRows ) );
 	return mat + index * numColumns;
 }
 
-ARC_INLINE anMatX &anMatX::operator=( const anMatX &a ) {
+inline anMatX &anMatX::operator=( const anMatX &a ) {
 	SetSize( a.numRows, a.numColumns );
 #ifdef MATX_SIMD
 	SIMDProcessor->Copy16( mat, a.mat, a.numRows * a.numColumns );
@@ -2502,7 +2529,7 @@ ARC_INLINE anMatX &anMatX::operator=( const anMatX &a ) {
 	return *this;
 }
 
-ARC_INLINE anMatX anMatX::operator*( const float a ) const {
+inline anMatX anMatX::operator*( const float a ) const {
 	anMatX m;
 
 	m.SetTempSize( numRows, numColumns );
@@ -2518,7 +2545,7 @@ ARC_INLINE anMatX anMatX::operator*( const float a ) const {
 	return m;
 }
 
-ARC_INLINE anVecX anMatX::operator*( const anVecX &vec ) const {
+inline anVecX anMatX::operator*( const anVecX &vec ) const {
 	anVecX dst;
 
 	assert( numColumns == vec.GetSize() );
@@ -2532,7 +2559,7 @@ ARC_INLINE anVecX anMatX::operator*( const anVecX &vec ) const {
 	return dst;
 }
 
-ARC_INLINE anMatX anMatX::operator*( const anMatX &a ) const {
+inline anMatX anMatX::operator*( const anMatX &a ) const {
 	anMatX dst;
 
 	assert( numColumns == a.numRows );
@@ -2546,7 +2573,7 @@ ARC_INLINE anMatX anMatX::operator*( const anMatX &a ) const {
 	return dst;
 }
 
-ARC_INLINE anMatX anMatX::operator+( const anMatX &a ) const {
+inline anMatX anMatX::operator+( const anMatX &a ) const {
 	anMatX m;
 
 	assert( numRows == a.numRows && numColumns == a.numColumns );
@@ -2562,7 +2589,7 @@ ARC_INLINE anMatX anMatX::operator+( const anMatX &a ) const {
 	return m;
 }
 
-ARC_INLINE anMatX anMatX::operator-( const anMatX &a ) const {
+inline anMatX anMatX::operator-( const anMatX &a ) const {
 	anMatX m;
 
 	assert( numRows == a.numRows && numColumns == a.numColumns );
@@ -2578,7 +2605,7 @@ ARC_INLINE anMatX anMatX::operator-( const anMatX &a ) const {
 	return m;
 }
 
-ARC_INLINE anMatX &anMatX::operator*=( const float a ) {
+inline anMatX &anMatX::operator*=( const float a ) {
 #ifdef MATX_SIMD
 	SIMDProcessor->MulAssign16( mat, a, numRows * numColumns );
 #else
@@ -2591,13 +2618,13 @@ ARC_INLINE anMatX &anMatX::operator*=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE anMatX &anMatX::operator*=( const anMatX &a ) {
+inline anMatX &anMatX::operator*=( const anMatX &a ) {
 	*this = *this * a;
 	anMatX::tempIndex = 0;
 	return *this;
 }
 
-ARC_INLINE anMatX &anMatX::operator+=( const anMatX &a ) {
+inline anMatX &anMatX::operator+=( const anMatX &a ) {
 	assert( numRows == a.numRows && numColumns == a.numColumns );
 #ifdef MATX_SIMD
 	SIMDProcessor->AddAssign16( mat, a.mat, numRows * numColumns );
@@ -2611,7 +2638,7 @@ ARC_INLINE anMatX &anMatX::operator+=( const anMatX &a ) {
 	return *this;
 }
 
-ARC_INLINE anMatX &anMatX::operator-=( const anMatX &a ) {
+inline anMatX &anMatX::operator-=( const anMatX &a ) {
 	assert( numRows == a.numRows && numColumns == a.numColumns );
 #ifdef MATX_SIMD
 	SIMDProcessor->SubAssign16( mat, a.mat, numRows * numColumns );
@@ -2625,20 +2652,20 @@ ARC_INLINE anMatX &anMatX::operator-=( const anMatX &a ) {
 	return *this;
 }
 
-ARC_INLINE anMatX operator*( const float a, anMatX const &m ) {
+inline anMatX operator*( const float a, anMatX const &m ) {
 	return m * a;
 }
 
-ARC_INLINE anVecX operator*( const anVecX &vec, const anMatX &m ) {
+inline anVecX operator*( const anVecX &vec, const anMatX &m ) {
 	return m * vec;
 }
 
-ARC_INLINE anVecX &operator*=( anVecX &vec, const anMatX &m ) {
+inline anVecX &operator*=( anVecX &vec, const anMatX &m ) {
 	vec = m * vec;
 	return vec;
 }
 
-ARC_INLINE bool anMatX::Compare( const anMatX &a ) const {
+inline bool anMatX::Compare( const anMatX &a ) const {
 	assert( numRows == a.numRows && numColumns == a.numColumns );
 
 	int s = numRows * numColumns;
@@ -2650,7 +2677,7 @@ ARC_INLINE bool anMatX::Compare( const anMatX &a ) const {
 	return true;
 }
 
-ARC_INLINE bool anMatX::Compare( const anMatX &a, const float epsilon ) const {
+inline bool anMatX::Compare( const anMatX &a, const float epsilon ) const {
 	assert( numRows == a.numRows && numColumns == a.numColumns );
 
 	int s = numRows * numColumns;
@@ -2662,15 +2689,15 @@ ARC_INLINE bool anMatX::Compare( const anMatX &a, const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMatX::operator==( const anMatX &a ) const {
+inline bool anMatX::operator==( const anMatX &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool anMatX::operator!=( const anMatX &a ) const {
+inline bool anMatX::operator!=( const anMatX &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void anMatX::SetSize( int rows, int columns ) {
+inline void anMatX::SetSize( int rows, int columns ) {
 	assert( mat < anMatX::tempPtr || mat > anMatX::tempPtr + MATX_MAX_TEMP );
 	int alloc = ( rows * columns + 3 ) & ~3;
 	if ( alloc > alloced && alloced != -1 ) {
@@ -2685,7 +2712,7 @@ ARC_INLINE void anMatX::SetSize( int rows, int columns ) {
 	MATX_CLEAREND();
 }
 
-ARC_INLINE void anMatX::SetTempSize( int rows, int columns ) {
+inline void anMatX::SetTempSize( int rows, int columns ) {
 	int newSize;
 
 	newSize = ( rows * columns + 3 ) & ~3;
@@ -2701,7 +2728,7 @@ ARC_INLINE void anMatX::SetTempSize( int rows, int columns ) {
 	MATX_CLEAREND();
 }
 
-ARC_INLINE void anMatX::SetData( int rows, int columns, float *data ) {
+inline void anMatX::SetData( int rows, int columns, float *data ) {
 	assert( mat < anMatX::tempPtr || mat > anMatX::tempPtr + MATX_MAX_TEMP );
 	if ( mat != nullptr && alloced != -1 ) {
 		Mem_Free16( mat );
@@ -2714,7 +2741,7 @@ ARC_INLINE void anMatX::SetData( int rows, int columns, float *data ) {
 	MATX_CLEAREND();
 }
 
-ARC_INLINE void anMatX::Zero( void ) {
+inline void anMatX::Zero( void ) {
 #ifdef MATX_SIMD
 	SIMDProcessor->Zero16( mat, numRows * numColumns );
 #else
@@ -2722,7 +2749,7 @@ ARC_INLINE void anMatX::Zero( void ) {
 #endif
 }
 
-ARC_INLINE void anMatX::Zero( int rows, int columns ) {
+inline void anMatX::Zero( int rows, int columns ) {
 	SetSize( rows, columns );
 #ifdef MATX_SIMD
 	SIMDProcessor->Zero16( mat, numRows * numColumns );
@@ -2731,7 +2758,7 @@ ARC_INLINE void anMatX::Zero( int rows, int columns ) {
 #endif
 }
 
-ARC_INLINE void anMatX::Identity( void ) {
+inline void anMatX::Identity( void ) {
 	assert( numRows == numColumns );
 #ifdef MATX_SIMD
 	SIMDProcessor->Zero16( mat, numRows * numColumns );
@@ -2743,21 +2770,21 @@ ARC_INLINE void anMatX::Identity( void ) {
 	}
 }
 
-ARC_INLINE void anMatX::Identity( int rows, int columns ) {
+inline void anMatX::Identity( int rows, int columns ) {
 	assert( rows == columns );
 	SetSize( rows, columns );
 	anMatX::Identity();
 }
 
-ARC_INLINE void anMatX::Diag( const anVecX &v ) {
+inline void anMatX::Diag( const anVecX &v ) {
 	Zero( v.GetSize(), v.GetSize() );
 	for ( int i = 0; i < v.GetSize(); i++ ) {
 		mat[i * numColumns + i] = v[i];
 	}
 }
 
-ARC_INLINE void anMatX::Random( int seed, float l, float u ) {
-	arcRandom rnd( seed);
+inline void anMatX::Random( int seed, float l, float u ) {
+	anRandom rnd( seed);
 
 	float c = u - l;
 	int s = numRows * numColumns;
@@ -2766,8 +2793,8 @@ ARC_INLINE void anMatX::Random( int seed, float l, float u ) {
 	}
 }
 
-ARC_INLINE void anMatX::Random( int rows, int columns, int seed, float l, float u ) {
-	arcRandom rnd( seed);
+inline void anMatX::Random( int rows, int columns, int seed, float l, float u ) {
+	anRandom rnd( seed);
 
 	SetSize( rows, columns );
 	float c = u - l;
@@ -2777,7 +2804,7 @@ ARC_INLINE void anMatX::Random( int rows, int columns, int seed, float l, float 
 	}
 }
 
-ARC_INLINE void anMatX::Negate( void ) {
+inline void anMatX::Negate( void ) {
 #ifdef MATX_SIMD
 	SIMDProcessor->Negate16( mat, numRows * numColumns );
 #else
@@ -2788,7 +2815,7 @@ ARC_INLINE void anMatX::Negate( void ) {
 #endif
 }
 
-ARC_INLINE void anMatX::Clamp( float min, float max ) {
+inline void anMatX::Clamp( float min, float max ) {
 	int s = numRows * numColumns;
 	for ( int i = 0; i < s; i++ ) {
 		if ( mat[i] < min ) {
@@ -2799,7 +2826,7 @@ ARC_INLINE void anMatX::Clamp( float min, float max ) {
 	}
 }
 
-ARC_INLINE anMatX &anMatX::SwapRows( int r1, int r2 ) {
+inline anMatX &anMatX::SwapRows( int r1, int r2 ) {
 	float *ptr;
 
 	ptr = (float *) _alloca16( numColumns * sizeof( float ) );
@@ -2810,7 +2837,7 @@ ARC_INLINE anMatX &anMatX::SwapRows( int r1, int r2 ) {
 	return *this;
 }
 
-ARC_INLINE anMatX &anMatX::SwapColumns( int r1, int r2 ) {
+inline anMatX &anMatX::SwapColumns( int r1, int r2 ) {
 	for ( int i = 0; i < numRows; i++ ) {
 		float *ptr = mat + i * numColumns;
 		float tmp = ptr[r1];
@@ -2821,27 +2848,27 @@ ARC_INLINE anMatX &anMatX::SwapColumns( int r1, int r2 ) {
 	return *this;
 }
 
-ARC_INLINE anMatX &anMatX::SwapRowsColumns( int r1, int r2 ) {
+inline anMatX &anMatX::SwapRowsColumns( int r1, int r2 ) {
 	SwapRows( r1, r2 );
 	SwapColumns( r1, r2 );
 	return *this;
 }
 
-ARC_INLINE void anMatX::ClearUpperTriangle( void ) {
+inline void anMatX::ClearUpperTriangle( void ) {
 	assert( numRows == numColumns );
 	for ( int i = numRows-2; i >= 0; i-- ) {
 		memset( mat + i * numColumns + i + 1, 0, (numColumns - 1 - i) * sizeof( float ) );
 	}
 }
 
-ARC_INLINE void anMatX::ClearLowerTriangle( void ) {
+inline void anMatX::ClearLowerTriangle( void ) {
 	assert( numRows == numColumns );
 	for ( int i = 1; i < numRows; i++ ) {
 		memset( mat + i * numColumns, 0, i * sizeof( float ) );
 	}
 }
 
-ARC_INLINE void anMatX::SquareSubMatrix( const anMatX &m, int size ) {
+inline void anMatX::SquareSubMatrix( const anMatX &m, int size ) {
 	assert( size <= m.numRows && size <= m.numColumns );
 	SetSize( size, size );
 	for ( int i = 0; i < size; i++ ) {
@@ -2849,7 +2876,7 @@ ARC_INLINE void anMatX::SquareSubMatrix( const anMatX &m, int size ) {
 	}
 }
 
-ARC_INLINE float anMatX::MaxDifference( const anMatX &m ) const {
+inline float anMatX::MaxDifference( const anMatX &m ) const {
 	assert( numRows == m.numRows && numColumns == m.numColumns );
 
 	float maxDiff = -1.0f;
@@ -2864,7 +2891,7 @@ ARC_INLINE float anMatX::MaxDifference( const anMatX &m ) const {
 	return maxDiff;
 }
 
-ARC_INLINE bool anMatX::IsZero( const float epsilon ) const {
+inline bool anMatX::IsZero( const float epsilon ) const {
 	// returns true if (*this) == Zero
 	for ( int i = 0; i < numRows; i++ ) {
 		for ( int j = 0; j < numColumns; j++ ) {
@@ -2876,7 +2903,7 @@ ARC_INLINE bool anMatX::IsZero( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMatX::IsIdentity( const float epsilon ) const {
+inline bool anMatX::IsIdentity( const float epsilon ) const {
 	// returns true if (*this) == Identity
 	assert( numRows == numColumns );
 	for ( int i = 0; i < numRows; i++ ) {
@@ -2889,7 +2916,7 @@ ARC_INLINE bool anMatX::IsIdentity( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMatX::IsDiagonal( const float epsilon ) const {
+inline bool anMatX::IsDiagonal( const float epsilon ) const {
 	// returns true if all elements are zero except for the elements on the diagonal
 	assert( numRows == numColumns );
 	for ( int i = 0; i < numRows; i++ ) {
@@ -2902,7 +2929,7 @@ ARC_INLINE bool anMatX::IsDiagonal( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMatX::IsTriDiagonal( const float epsilon ) const {
+inline bool anMatX::IsTriDiagonal( const float epsilon ) const {
 	// returns true if all elements are zero except for the elements on the diagonal plus or minus one column
 	if ( numRows != numColumns ) {
 		return false;
@@ -2920,7 +2947,7 @@ ARC_INLINE bool anMatX::IsTriDiagonal( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE bool anMatX::IsSymmetric( const float epsilon ) const {
+inline bool anMatX::IsSymmetric( const float epsilon ) const {
 	// (*this)[i][j] == (*this)[j][i]
 	if ( numRows != numColumns ) {
 		return false;
@@ -2935,7 +2962,7 @@ ARC_INLINE bool anMatX::IsSymmetric( const float epsilon ) const {
 	return true;
 }
 
-ARC_INLINE float anMatX::Trace( void ) const {
+inline float anMatX::Trace( void ) const {
 	float trace = 0.0f;
 
 	assert( numRows == numColumns );
@@ -2947,7 +2974,7 @@ ARC_INLINE float anMatX::Trace( void ) const {
 	return trace;
 }
 
-ARC_INLINE float anMatX::Determinant( void ) const {
+inline float anMatX::Determinant( void ) const {
 	assert( numRows == numColumns );
 
 	switch ( numRows ) {
@@ -2969,7 +2996,7 @@ ARC_INLINE float anMatX::Determinant( void ) const {
 	return 0.0f;
 }
 
-ARC_INLINE anMatX anMatX::Transpose( void ) const {
+inline anMatX anMatX::Transpose( void ) const {
 	anMatX transpose.SetTempSize( numColumns, numRows );
 
 	for ( int i = 0; i < numRows; i++ ) {
@@ -2981,12 +3008,12 @@ ARC_INLINE anMatX anMatX::Transpose( void ) const {
 	return transpose;
 }
 
-ARC_INLINE anMatX &anMatX::TransposeSelf( void ) {
+inline anMatX &anMatX::TransposeSelf( void ) {
 	*this = Transpose();
 	return *this;
 }
 
-ARC_INLINE anMatX anMatX::Inverse( void ) const {
+inline anMatX anMatX::Inverse( void ) const {
 	anMatX invMat.SetTempSize( numRows, numColumns );
 	memcpy( invMat.mat, mat, numRows * numColumns * sizeof( float ) );
 	int r = invMat.InverseSelf();
@@ -2994,7 +3021,7 @@ ARC_INLINE anMatX anMatX::Inverse( void ) const {
 	return invMat;
 }
 
-ARC_INLINE bool anMatX::InverseSelf( void ) {
+inline bool anMatX::InverseSelf( void ) {
 	assert( numRows == numColumns );
 	switch ( numRows ) {
 		case 1:
@@ -3018,7 +3045,7 @@ ARC_INLINE bool anMatX::InverseSelf( void ) {
 	}
 }
 
-ARC_INLINE anMatX anMatX::InverseFast( void ) const {
+inline anMatX anMatX::InverseFast( void ) const {
 	anMatX invMat.SetTempSize( numRows, numColumns );
 	memcpy( invMat.mat, mat, numRows * numColumns * sizeof( float ) );
 	int r = invMat.InverseFastSelf();
@@ -3026,7 +3053,7 @@ ARC_INLINE anMatX anMatX::InverseFast( void ) const {
 	return invMat;
 }
 
-ARC_INLINE bool anMatX::InverseFastSelf( void ) {
+inline bool anMatX::InverseFastSelf( void ) {
 	assert( numRows == numColumns );
 	switch ( numRows ) {
 		case 1:
@@ -3051,7 +3078,7 @@ ARC_INLINE bool anMatX::InverseFastSelf( void ) {
 	return false;
 }
 
-ARC_INLINE anVecX anMatX::Multiply( const anVecX &vec ) const {
+inline anVecX anMatX::Multiply( const anVecX &vec ) const {
 	anVecX dst;
 
 	assert( numColumns == vec.GetSize() );
@@ -3065,7 +3092,7 @@ ARC_INLINE anVecX anMatX::Multiply( const anVecX &vec ) const {
 	return dst;
 }
 
-ARC_INLINE anMatX anMatX::Multiply( const anMatX &a ) const {
+inline anMatX anMatX::Multiply( const anMatX &a ) const {
 	anMatX dst;
 
 	assert( numColumns == a.numRows );
@@ -3079,7 +3106,7 @@ ARC_INLINE anMatX anMatX::Multiply( const anMatX &a ) const {
 	return dst;
 }
 
-ARC_INLINE anVecX anMatX::TransposeMultiply( const anVecX &vec ) const {
+inline anVecX anMatX::TransposeMultiply( const anVecX &vec ) const {
 	anVecX dst;
 
 	assert( numRows == vec.GetSize() );
@@ -3093,7 +3120,7 @@ ARC_INLINE anVecX anMatX::TransposeMultiply( const anVecX &vec ) const {
 	return dst;
 }
 
-ARC_INLINE anMatX anMatX::TransposeMultiply( const anMatX &a ) const {
+inline anMatX anMatX::TransposeMultiply( const anMatX &a ) const {
 	anMatX dst;
 
 	assert( numRows == a.numRows );
@@ -3107,7 +3134,7 @@ ARC_INLINE anMatX anMatX::TransposeMultiply( const anMatX &a ) const {
 	return dst;
 }
 
-ARC_INLINE void anMatX::Multiply( anVecX &dst, const anVecX &vec ) const {
+inline void anMatX::Multiply( anVecX &dst, const anVecX &vec ) const {
 #ifdef MATX_SIMD
 	SIMDProcessor->MatX_MultiplyVecX( dst, *this, vec );
 #else
@@ -3125,7 +3152,7 @@ ARC_INLINE void anMatX::Multiply( anVecX &dst, const anVecX &vec ) const {
 #endif
 }
 
-ARC_INLINE void anMatX::MultiplyAdd( anVecX &dst, const anVecX &vec ) const {
+inline void anMatX::MultiplyAdd( anVecX &dst, const anVecX &vec ) const {
 #ifdef MATX_SIMD
 	SIMDProcessor->MatX_MultiplyAddVecX( dst, *this, vec );
 #else
@@ -3143,7 +3170,7 @@ ARC_INLINE void anMatX::MultiplyAdd( anVecX &dst, const anVecX &vec ) const {
 #endif
 }
 
-ARC_INLINE void anMatX::MultiplySub( anVecX &dst, const anVecX &vec ) const {
+inline void anMatX::MultiplySub( anVecX &dst, const anVecX &vec ) const {
 #ifdef MATX_SIMD
 	SIMDProcessor->MatX_MultiplySubVecX( dst, *this, vec );
 #else
@@ -3161,7 +3188,7 @@ ARC_INLINE void anMatX::MultiplySub( anVecX &dst, const anVecX &vec ) const {
 #endif
 }
 
-ARC_INLINE void anMatX::TransposeMultiply( anVecX &dst, const anVecX &vec ) const {
+inline void anMatX::TransposeMultiply( anVecX &dst, const anVecX &vec ) const {
 #ifdef MATX_SIMD
 	SIMDProcessor->MatX_TransposeMultiplyVecX( dst, *this, vec );
 #else
@@ -3179,7 +3206,7 @@ ARC_INLINE void anMatX::TransposeMultiply( anVecX &dst, const anVecX &vec ) cons
 #endif
 }
 
-ARC_INLINE void anMatX::TransposeMultiplyAdd( anVecX &dst, const anVecX &vec ) const {
+inline void anMatX::TransposeMultiplyAdd( anVecX &dst, const anVecX &vec ) const {
 #ifdef MATX_SIMD
 	SIMDProcessor->MatX_TransposeMultiplyAddVecX( dst, *this, vec );
 #else
@@ -3197,7 +3224,7 @@ ARC_INLINE void anMatX::TransposeMultiplyAdd( anVecX &dst, const anVecX &vec ) c
 #endif
 }
 
-ARC_INLINE void anMatX::TransposeMultiplySub( anVecX &dst, const anVecX &vec ) const {
+inline void anMatX::TransposeMultiplySub( anVecX &dst, const anVecX &vec ) const {
 #ifdef MATX_SIMD
 	SIMDProcessor->MatX_TransposeMultiplySubVecX( dst, *this, vec );
 #else
@@ -3219,7 +3246,7 @@ ARC_INLINE void anMatX::TransposeMultiplySub( anVecX &dst, const anVecX &vec ) c
 #endif
 }
 
-ARC_INLINE void anMatX::Multiply( anMatX &dst, const anMatX &a ) const {
+inline void anMatX::Multiply( anMatX &dst, const anMatX &a ) const {
 #ifdef MATX_SIMD
 	SIMDProcessor->MatX_MultiplyMatX( dst, *this, a );
 #else
@@ -3246,7 +3273,7 @@ ARC_INLINE void anMatX::Multiply( anMatX &dst, const anMatX &a ) const {
 #endif
 }
 
-ARC_INLINE void anMatX::TransposeMultiply( anMatX &dst, const anMatX &a ) const {
+inline void anMatX::TransposeMultiply( anMatX &dst, const anMatX &a ) const {
 #ifdef MATX_SIMD
 	SIMDProcessor->MatX_TransposeMultiplyMatX( dst, *this, a );
 #else
@@ -3273,39 +3300,39 @@ ARC_INLINE void anMatX::TransposeMultiply( anMatX &dst, const anMatX &a ) const 
 #endif
 }
 
-ARC_INLINE int anMatX::GetDimension( void ) const {
+inline int anMatX::GetDimension( void ) const {
 	return numRows * numColumns;
 }
 
-ARC_INLINE const anVec6 &anMatX::SubVec6( int row ) const {
+inline const anVec6 &anMatX::SubVec6( int row ) const {
 	assert( numColumns >= 6 && row >= 0 && row < numRows );
 	return *reinterpret_cast<const anVec6 *>(mat + row * numColumns);
 }
 
-ARC_INLINE anVec6 &anMatX::SubVec6( int row ) {
+inline anVec6 &anMatX::SubVec6( int row ) {
 	assert( numColumns >= 6 && row >= 0 && row < numRows );
 	return *reinterpret_cast<anVec6 *>(mat + row * numColumns);
 }
 
-ARC_INLINE const anVecX anMatX::SubVecX( int row ) const {
+inline const anVecX anMatX::SubVecX( int row ) const {
 	anVecX v;
 	assert( row >= 0 && row < numRows );
 	v.SetData( numColumns, mat + row * numColumns );
 	return v;
 }
 
-ARC_INLINE anVecX anMatX::SubVecX( int row ) {
+inline anVecX anMatX::SubVecX( int row ) {
 	anVecX v;
 	assert( row >= 0 && row < numRows );
 	v.SetData( numColumns, mat + row * numColumns );
 	return v;
 }
 
-ARC_INLINE const float *anMatX::ToFloatPtr( void ) const {
+inline const float *anMatX::ToFloatPtr( void ) const {
 	return mat;
 }
 
-ARC_INLINE float *anMatX::ToFloatPtr( void ) {
+inline float *anMatX::ToFloatPtr( void ) {
 	return mat;
 }
 

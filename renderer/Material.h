@@ -39,8 +39,8 @@ class anUserInterfaces;
 class idMegaTexture;
 class anAudioSystem;
 
-#include "/home/subzeroceo/ArC-NetSoftware-Projects/brokenarrow/renderer/GLIncludes/qgl.h"
-#include "/home/subzeroceo/ArC-NetSoftware-Projects/brokenarrow/renderer/GLIncludes/qgl_linked.h"
+#include "GLIncludes/qgl.h"
+#include "GLIncludes/qgl_linked.h"
 
 #include "Model_local.h"
 
@@ -308,7 +308,7 @@ const int MAX_ENTITY_SHADER_PARMS = 12;
 
 // material flags
 typedef enum {
-	MF_DEFAULTED = BIT(0),
+	MF_DEFAULTED = BIT( 0 ),
 	MF_POLYGONOFFSET = BIT( 1 ),
 	MF_NOSHADOWS = BIT(2),
 	MF_FORCESHADOWS = BIT(3),
@@ -320,7 +320,7 @@ typedef enum {
 // contents flags, NOTE: make sure to keep the defines in doom_defs.script up to
 // date with these!
 typedef enum {
-	CONTENTS_SOLID = BIT(0),        // an eye is never valid in a solid
+	CONTENTS_SOLID = BIT( 0 ),        // an eye is never valid in a solid
 	CONTENTS_OPAQUE = BIT( 1 ),       // blocks visibility (for ai)
 	CONTENTS_WATER = BIT(2),        // used for water
 	CONTENTS_PLAYERCLIP = BIT(3),   // solid to players
@@ -374,7 +374,7 @@ typedef enum {   // why twice to define the  same things?
 
 // surface flags
 typedef enum {
-	SURF_TYPE_BIT0 = BIT(0), // encodes the material type (metal, flesh, concrete, etc.)
+	SURF_TYPE_BIT0 = BIT( 0 ), // encodes the material type (metal, flesh, concrete, etc.)
 	SURF_TYPE_BIT1 = BIT( 1 ), // "
 	SURF_TYPE_BIT2 = BIT(2), // "
 	SURF_TYPE_BIT3 = BIT(3), // "
@@ -388,11 +388,11 @@ typedef enum {
 	SURF_NOSTEPS = BIT(9),     // no footstep sounds
 	SURF_DISCRETE = BIT(10),   // not clipped or merged by utilities
 	SURF_NOFRAGMENT = BIT(11), // dmap won't cut surface at each bsp boundary
-	SURF_NULLNORMAL = BIT(12)  // renderbump will draw this surface as 0x80 0x80
+	SURF_nullptrNORMAL = BIT(12)  // renderbump will draw this surface as 0x80 0x80
 	                            // 0x80, which won't collect light from any angle
 } surfaceFlags_t;
 
-class ARCSoundEmitter;
+class anSoundEmitter;
 
 class anMaterial : public anDecl {
 public:
@@ -667,7 +667,7 @@ void AddToSurfaceArea( float area ) { surfaceArea += area; }
 
   // regs should point to a float array large enough to hold GetNumRegisters()
   // floats
-  void EvaluateRegisters( float *regs, const float entityParms[MAX_ENTITY_SHADER_PARMS], const struct viewDef_s *view, ARCSoundEmitter *soundEmitter = nullptr ) const;
+  void EvaluateRegisters( float *regs, const float entityParms[MAX_ENTITY_SHADER_PARMS], const struct viewDef_s *view, anSoundEmitter *soundEmitter = nullptr ) const;
 
   // if a material only uses constants (no entityParm or globalparm references),
   // this will return a pointer to an internal table, and EvaluateRegisters will
@@ -701,16 +701,16 @@ private:
   int ParseExpressionPriority( anLexer &src, int priority );
   int ParseExpression( anLexer &src );
   void ClearStage( materialStage_t *ss );
-  int NameToSrcBlendMode( const anString &name );
-  int NameToDstBlendMode( const anString &name );
+  int NameToSrcBlendMode( const anStr &name );
+  int NameToDstBlendMode( const anStr &name );
   void MultiplyTextureMatrix( textureStage_t *ts,int registers[2][3] ); // FIXME: for some reason the const is bad for gcc and Mac
   void SortInteractionStages();
   void AddImplicitStages( const textureRepeat_t trpDefault = TR_REPEAT);
   void CheckForConstantRegisters();
 
 private:
-    anString desc;       // description
-    anString renderBump; // renderbump command options, without the "renderbump"
+    anStr desc;       // description
+    anStr renderBump; // renderbump command options, without the "renderbump"
                           // at the start
 
     anImage *lightFalloffImage;
@@ -772,7 +772,7 @@ private:
     // doesn't load up all the invisible and uncompressed images. If editorImage
     // is nullptr, it will atempt to load editorImageName, and set editorImage to
     // that or defaultImage
-    anString editorImageName;
+    anStr editorImageName;
     mutable anImage *editorImage; // image used for non-shaded preview
     float editorAlpha;
 

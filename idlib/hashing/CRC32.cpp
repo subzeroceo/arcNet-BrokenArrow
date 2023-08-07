@@ -142,7 +142,7 @@ void CRC32_Update( unsigned long &crcvalue, const byte data ) {
 
 void CRC32_UpdateChecksum( unsigned long &crcvalue, const void *data, int length ) {
 	unsigned long crc;
-	const unsigned char* buf = reinterpret_cast<const unsigned char *>(data);
+	const unsigned char *buf = reinterpret_cast<const unsigned char *>(data);
 
 	crc = crcvalue;
 	while ( length-- ) {

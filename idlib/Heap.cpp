@@ -228,7 +228,7 @@ void *qBlockmAlloc( size_t nSize ) {
 	// round up to threshold
 	int nAllocSize = nSize % MEM_BLOCKSIZE;
 	if ( nAllocSize > 0
-		&& nAllocSize < nSize + sizeof(aRcSecondaryHeap)) {
+		&& nAllocSize < nSize + sizeof(anSecondaryHeap)) {
 	    nSize += MEM_BLOCKSIZE - nAllocSize;
 	}
 	void *b = malloc( nSize + 1 );
@@ -326,7 +326,7 @@ void *anHeap::Allocate16( const dword bytes ) {
 	if ( alignedPtr - ptr < 4 ) {
 		alignedPtr += 16;
 	}
-	*( ( int*)(alignedPtr - 4) ) = ( int ) ptr;
+	*( (int *)(alignedPtr - 4) ) = ( int ) ptr;
 	return (void *) alignedPtr;
 }
 
@@ -336,7 +336,7 @@ anHeap::Free16
 ================
 */
 void anHeap::Free16( void *p ) {
-	free( (void *) *( ( int*) ( ( (byte *) p ) - 4 ) ) );
+	free( (void *) *( (int *) ( ( (byte *) p ) - 4 ) ) );
 }
 
 /*
@@ -1051,7 +1051,7 @@ void *Mem_Alloc( const int size ) {
 	}
 	if ( !mem_heap ) {
 #ifdef CRASH_ON_STATIC_ALLOCATION
-		*( ( int*)0x0) = 1;
+		*( (int *)0x0) = 1;
 #endif
 		return malloc( size );
 	}
@@ -1071,7 +1071,7 @@ void Mem_Free( void *ptr ) {
 	}
 	if ( !mem_heap ) {
 #ifdef CRASH_ON_STATIC_ALLOCATION
-		*( ( int*)0x0) = 1;
+		*( (int *)0x0) = 1;
 #endif
 		free( ptr );
 		return;
@@ -1091,7 +1091,7 @@ void *Mem_Alloc16( const int size ) {
 	}
 	if ( !mem_heap ) {
 #ifdef CRASH_ON_STATIC_ALLOCATION
-		*( ( int*)0x0) = 1;
+		*( (int *)0x0) = 1;
 #endif
 		return malloc( size );
 	}
@@ -1112,7 +1112,7 @@ void Mem_Free16( void *ptr ) {
 	}
 	if ( !mem_heap ) {
 #ifdef CRASH_ON_STATIC_ALLOCATION
-		*( ( int*)0x0) = 1;
+		*( (int *)0x0) = 1;
 #endif
 		free( ptr );
 		return;
@@ -1234,7 +1234,7 @@ Mem_CleanupFileName
 */
 const char *Mem_CleanupFileName( const char *fileName ) {
 	int i1, i2;
-	anString newFileName;
+	 newFileName;
 	static char newFileNames[4][MAX_STRING_CHARS];
 	static int index;
 
@@ -1270,7 +1270,7 @@ void Mem_Dump( const char *fileName ) {
 	int i, numBlocks, totalSize;
 	char dump[32], *ptr;
 	debugMemory_t *b;
-	anString module, funcName;
+	 module, funcName;
 	FILE *f;
 
 	f = fopen( fileName, "wb" );
@@ -1347,7 +1347,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 	int numBlocks, totalSize, r, j;
 	debugMemory_t *b;
 	allocInfo_t *a, *nexta, *allocInfo = nullptr, *sortedAllocInfo = nullptr, *prevSorted, *nextSorted;
-	anString module, funcName;
+	 module, funcName;
 	FILE *f;
 
 	// build list with memory allocations
@@ -1374,7 +1374,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 			if ( j < MAX_CALLSTACK_DEPTH ) {
 				continue;
 			}
-			if ( anString::Cmp( a->fileName, b->fileName ) != 0 ) {
+			if ( ::Cmp( a->fileName, b->fileName ) != 0 ) {
 				continue;
 			}
 			a->numAllocs++;
@@ -1415,7 +1415,7 @@ void Mem_DumpCompressed( const char *fileName, memorySortType_t memSort, int sor
 			// sort on file name and line number
 			case MEMSORT_LOCATION: {
 				for ( nextSorted = sortedAllocInfo; nextSorted; nextSorted = nextSorted->next ) {
-					r = anString::Cmp( Mem_CleanupFileName( a->fileName ), Mem_CleanupFileName( nextSorted->fileName ) );
+					r = ::Cmp( Mem_CleanupFileName( a->fileName ), Mem_CleanupFileName( nextSorted->fileName ) );
 					if ( r < 0 || ( r == 0 && a->lineNumber < nextSorted->lineNumber ) ) {
 						break;
 					}
@@ -1489,19 +1489,19 @@ void Mem_DumpCompressed_f( const anCommandArgs &args ) {
 	arg = args.Argv( argNum );
 	while ( arg[0] == '-' ) {
 		arg = args.Argv( ++argNum );
-		if ( anString::Icmp( arg, "s" ) == 0 ) {
+		if ( ::Icmp( arg, "s" ) == 0 ) {
 			memSort = MEMSORT_SIZE;
-		} else if ( anString::Icmp( arg, "l" ) == 0 ) {
+		} else if ( ::Icmp( arg, "l" ) == 0 ) {
 			memSort = MEMSORT_LOCATION;
-		} else if ( anString::Icmp( arg, "a" ) == 0 ) {
+		} else if ( ::Icmp( arg, "a" ) == 0 ) {
 			memSort = MEMSORT_NUMALLOCS;
-		} else if ( anString::Icmp( arg, "cs1" ) == 0 ) {
+		} else if ( ::Icmp( arg, "cs1" ) == 0 ) {
 			memSort = MEMSORT_CALLSTACK;
 			sortCallStack = 2;
-		} else if ( anString::Icmp( arg, "cs2" ) == 0 ) {
+		} else if ( ::Icmp( arg, "cs2" ) == 0 ) {
 			memSort = MEMSORT_CALLSTACK;
 			sortCallStack = 1;
-		} else if ( anString::Icmp( arg, "cs3" ) == 0 ) {
+		} else if ( ::Icmp( arg, "cs3" ) == 0 ) {
 			memSort = MEMSORT_CALLSTACK;
 			sortCallStack = 0;
 		} else if ( arg[0] == 'f' ) {
@@ -1545,7 +1545,7 @@ void *Mem_AllocDebugMemory( const int size, const char *fileName, const int line
 
 	if ( !mem_heap ) {
 #ifdef CRASH_ON_STATIC_ALLOCATION
-		*( ( int*)0x0) = 1;
+		*( (int *)0x0) = 1;
 #endif
 		// NOTE: set a breakpoint here to find memory allocations before mem_heap is initialized
 		return malloc( size );
@@ -1588,7 +1588,7 @@ void Mem_FreeDebugMemory( void *p, const char *fileName, const int lineNumber, c
 
 	if ( !mem_heap ) {
 #ifdef CRASH_ON_STATIC_ALLOCATION
-		*( ( int*)0x0) = 1;
+		*( (int *)0x0) = 1;
 #endif
 		// NOTE: set a breakpoint here to find memory being freed before mem_heap is initialized
 		free( p );
@@ -1735,7 +1735,7 @@ Mem_EnableLeakTest
 ==================
 */
 void Mem_EnableLeakTest( const char *name ) {
-	anString::Copynz( mem_leakName, name, sizeof( mem_leakName ) );
+	::Copynz( mem_leakName, name, sizeof( mem_leakName ) );
 }
 
 #endif

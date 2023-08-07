@@ -22,32 +22,61 @@ class anFileSystem;
 class anFile {
 public:
 	virtual					~anFile( void ) {};
+
 							// Get the name of the file.
 	virtual const char *	GetName( void );
+
 							// Get the full file path.
 	virtual const char *	GetFullPath( void );
+
 							// Read data from the file to the buffer.
 	virtual int				Read( void *buffer, int len );
+
 							// Write data from the buffer to the file.
 	virtual int				Write( const void *buffer, int len );
+
 							// Returns the length of the file.
 	virtual int				Length( void );
+
+							// adjust and sets the length of the file.
+	void * 					SetLength( unsigned int newLength );
+
 							// Return a time value for reload operations.
 	virtual ARC_TIME_T		Timestamp( void );
+
 							// Returns offset in file.
 	virtual int				Tell( void );
+
 							// Forces flush on files being writting to.
 	virtual void			ForceFlush( void );
+
 							// Causes any buffered data to be written to the file.
 	virtual void			Flush( void );
+
 							// Seek on a file.
 	virtual int				Seek( long offset, fsOrigin_t origin );
+	virtual int 			GetFileErrorCode( const anFile *file );
+	virtual void 			SetFileError( anFile *file );
+	virtual bool			EndOfFile( void ) {}
+
+	//size_t*					GetSectorSize( const anFile * );
+	int *					GetDevice( const anFile * file );
+	bool *					IsOSNative( const anFile * file );
+#ifdef USE_FILE_LOCKING
+	static bool				LockFile( anFile *file, unsigned vv, fsLock_t fl ) {
+		_lock_file( reinterpret_cast<anFile *>( file )->m_cfile );
+		return true;
+	}
+#endif
 							// Go back to the beginning of the file.
 	virtual void			Rewind( void );
+
 							// Like fprintf.
 	virtual int				Printf( const char *fmt, ... ) an_attribute( ( format( printf, 2, 3 )  ) );
+
 							// Like fprintf but with argument pointer
 	virtual int				VPrintf( const char *fmt, va_list arg );
+
 							// Write a string with high precision floating point numbers to the file.
 	virtual int				WriteFloatString( const char *fmt, ... ) an_attribute( ( format( printf, 2, 3 ) ) );
 	
@@ -61,7 +90,7 @@ public:
 	virtual int				ReadFloat( float &value );
 	virtual int				ReadDouble( double &value );
 	virtual int				ReadBool( bool &value );
-	virtual int				ReadString( anString &string );
+	virtual int				ReadString( anStr &string );
 	virtual int				ReadVec2( anVec2 &vec );
 	virtual int				ReadVec3( anVec3 &vec );
 	virtual int				ReadVec4( anVec4 &vec );
@@ -95,6 +124,32 @@ public:
 	virtual int				Write1DFloatArray( const int num, const float *src );
 	virtual int				WriteFloatArray( const float *src, const int num );
 };
+template<class type> inline size_t anFile::ReadBig( type &c ) {
+		size_t r = Read( &c, sizeof( c ) );
+		anSwap::Big( c );
+		return r;
+	}
+
+	template<class type> inline size_t anFile::ReadBigArray( type *c, int count ) {
+		size_t r = Read( c, sizeof( c[0] ) * count );
+		anSwap::BigArray( c, count );
+		return r;
+	}
+
+	template<class type> inline size_t anFile::WriteBig( const type &c ) {
+		type b = c;
+		anSwap::Big( b );
+		return Write( &b, sizeof( b ) );
+	}
+
+	template<class type> inline size_t anFile::WriteBigArray( const type *c, int count ) {
+		size_t r = 0;
+		for ( int i = 0; i < count; i++ ) {
+			r += WriteBig( c[i] );
+		}
+		return r;
+	}
+
 
 class anFileMemory : public anFile {
 	friend class			anFileSystem;
@@ -110,11 +165,18 @@ public:
 	virtual int				Read( void *buffer, int len );
 	virtual int				Write( const void *buffer, int len );
 	virtual int				Length( void );
-	virtual ARC_TIME_T		Timestamp( void );
+	virtual	unsigned int	Timestamp( void );
 	virtual int				Tell( void );
 	virtual void			ForceFlush( void );
 	virtual void			Flush( void );
 	virtual int				Seek( long offset, fsOrigin_t origin );
+
+	virtual int 			GetFileErrorCode( const anFile *file );
+	virtual void 			SetFileError( anFile *file );
+
+	virtual bool			EndOfFile( void ) {}
+
+	virtual bool			ReturnFalse() { return false; }
 
 							// changes memory file to read only
 	virtual void			MakeReadOnly( void );
@@ -128,14 +190,17 @@ public:
 	void					SetGranularity( int g ) { assert( g > 0 ); granularity = g; }
 
 private:
-	anString				name;			// name of the file
+	anStr				name;			// name of the file, static so we can use files across map heap boundaries without pushing heap
 	int						mode;			// open mode
 	int						maxSize;		// maximum size of file
 	int						fileSize;		// size of the file
 	int						allocated;		// allocated size
+	// needed when an anFile_memory is substituted for a real file
+	unsigned int			timestamp;
 	int						granularity;	// file granularity
 	char *					filePtr;		// buffer holding the file data
 	char *					curPtr;			// current read/write pointer
+	bool					ownsData;
 };
 
 class anFileBitMsg : public anFile {
@@ -157,7 +222,7 @@ public:
 	virtual int				Seek( long offset, fsOrigin_t origin );
 
 private:
-	anString				name;			// name of the file
+	anStr				name;			// name of the file
 	int						mode;			// open mode
 	anBitMsg *				msg;
 };
@@ -179,16 +244,19 @@ public:
 	virtual void			Flush( void );
 	virtual int				Seek( long offset, fsOrigin_t origin );
 
+	bool					ReturnFalse() { return false; }
+
 	// returns file pointer
 	FILE *					GetFilePtr( void ) { return o; }
 
 private:
-	anString				name;			// relative path of the file - relative path
-	anString				fullPath;		// full file path - OS path
+	anStr					name;			// relative path of the file - relative path
+	anStr					fullPath;		// full file path - OS path
 	int						mode;			// open mode
 	int						fileSize;		// size of the file
 	FILE *					o;				// file handle
 	bool					handleSync;		// true if written data is immediately flushed
+	timeStamp;
 };
 
 class anFileBuffered : public anFile {
@@ -241,15 +309,15 @@ public:
 	virtual int				Seek( long offset, fsOrigin_t origin );
 
 private:
-	anString				name;			// name of the file in the pak
-	anString				fullPath;		// full file path including pak file name
+	anStr					name;			// name of the file in the pak
+	anStr					fullPath;		// full file path including pak file name
 	int						zipFilePos;		// zip file info position in pak
 	int						fileSize;		// size of the file
 	void *					z;				// unzip info
 };
 
-class anFileCached : public idFile_Permanent {
-	friend class			idFileSystemLocal;
+class anFileCached : public anFile_Permanent {
+	friend class			anFileSystemLocal;
 public:
 	anFileCached();
 	virtual					~anFileCached();

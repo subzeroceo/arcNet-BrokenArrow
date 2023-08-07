@@ -72,7 +72,7 @@ void Sys_Error( const char *error, ... ) {
 
 	va_start (argptr, error);
 	vprintf ( error, argptr);
-	va_end (argptr);
+	va_end ( argptr );
 	printf( "\n" );
 
 	exit( 1 );
@@ -136,11 +136,11 @@ sysEvent_t	Sys_GetEvent( void ) {
 void	Sys_Mkdir( const char *path ) {
 }
 
-const char *Sys_DefaultCDPath(void) {
+const char *Sys_DefaultCDPath( void ) {
 	return "";
 }
 
-const char *Sys_DefaultBasePath(void) {
+const char *Sys_DefaultBasePath( void ) {
 	return "";
 }
 
@@ -168,12 +168,12 @@ int Sys_ListFiles( const char *directory, const char *extension, anStringList &l
 	}
 
 	while ((d = readdir(fdir)) != nullptr ) {
-		anString::snprintf( search, sizeof( search), "%s/%s", directory, d->d_name );
+		anStr::snprintf( search, sizeof( search), "%s/%s", directory, d->d_name );
 		if ( stat( search, &st ) == -1 )
 			continue;
 		if ( !dironly) {
-		    anString look( search);
-		    anString ext;
+		    anStr look( search);
+		    anStr ext;
 		    look.ExtractFileExtension( ext );
 		    if ( extension && extension[0] && ext.Icmp( &extension[1] ) != 0 ) {
 			continue;
@@ -202,9 +202,9 @@ const char *Sys_NetAdrToString( const netadr_t a ) {
 	static char s[64];
 
 	if ( a.type == NA_LOOPBACK ) {
-		anString::snPrintf( s, sizeof( s), "localhost" );
+		anStr::snPrintf( s, sizeof( s), "localhost" );
 	} else if ( a.type == NA_IP ) {
-		anString::snPrintf( s, sizeof( s), "%i.%i.%i.%i:%i",
+		anStr::snPrintf( s, sizeof( s), "%i.%i.%i.%i:%i",
 			a.ip[0], a.ip[1], a.ip[2], a.ip[3], BigShort(a.port) );
 	}
 	return s;

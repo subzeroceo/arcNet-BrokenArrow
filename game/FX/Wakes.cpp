@@ -1,7 +1,7 @@
 #include "../Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -208,7 +208,7 @@ void WakeLayer::AddNode( const anVec3 &origin, const anVec3 &emitLeft, float alp
 
 void WakeLayer::Update( srfTriangles_t *triangles ) {
 	// Remove nodes that timed out (they will be at the front)
-	while ( ( ( gameLocal.time - GetNode(0).spawnTime ) > lifeTime) && numNodes ) {
+	while ( ( ( gameLocal.time - GetNode( 0 ).spawnTime ) > lifeTime) && numNodes ) {
 		PopFront();
 	}
 
@@ -246,8 +246,8 @@ void WakeLayer::Update( srfTriangles_t *triangles ) {
 
 	// First and last are always transparent
 	if ( numNodes ) {
-		triangles->verts[firstVert+RemapIndex(0)*2+0].color[3] = 0;
-		triangles->verts[firstVert+RemapIndex(0)*2+1].color[3] = 0;
+		triangles->verts[firstVert+RemapIndex( 0 )*2+0].color[3] = 0;
+		triangles->verts[firstVert+RemapIndex( 0 )*2+1].color[3] = 0;
 		triangles->verts[firstVert+RemapIndex(numNodes-1)*2+0].color[3] = 0;
 		triangles->verts[firstVert+RemapIndex(numNodes-1)*2+1].color[3] = 0;
 	}
@@ -300,7 +300,7 @@ void Wake::Init(  const WakeParms &params, int ticket ) {
 	triangleVerts[0].SetNum( ( WakeLayer::MAX_NODES * 2 + 2) );
 	triangleVerts[1].SetNum( ( WakeLayer::MAX_NODES * 2 + 2)*MAX_POINTS );
 
-	const_cast<modelSurface_t *>(renderEntity.hModel->Surface(0))->material = params.centerMat;
+	const_cast<modelSurface_t *>(renderEntity.hModel->Surface( 0 ))->material = params.centerMat;
 	const_cast<modelSurface_t *>(renderEntity.hModel->Surface( 1 ))->material = params.edgeMat;
 	numPoints = params.numPoints;
 	for ( int i=0; i<numPoints; i++ ) {
@@ -436,20 +436,20 @@ void Wake::Update( const anVec3 &forward, const anVec3 &origin, const anMat3 &ax
 void Wake::Update( void ) {
 	anRenderModel *prevModel = renderEntity.hModel;
 	SetDoubleBufferedModel();
-	memcpy( renderEntity.hModel->Surface(0)->geometry->verts, triangleVerts[0].Begin(), triangleVerts[0].Num() * sizeof(anDrawVertex) );
+	memcpy( renderEntity.hModel->Surface( 0 )->geometry->verts, triangleVerts[0].Begin(), triangleVerts[0].Num() * sizeof(anDrawVertex) );
 	memcpy( renderEntity.hModel->Surface( 1 )->geometry->verts, triangleVerts[1].Begin(), triangleVerts[1].Num() * sizeof(anDrawVertex) );
 
 	renderEntity.hModel->FreeVertexCache();
-	GetTriSurf(0)->numIndexes = 0;
+	GetTriSurf( 0 )->numIndexes = 0;
 	GetTriSurf( 1 )->numIndexes = 0;
 	for ( int i=0; i<numPoints; i++ ) {
 		layer[i].Update( GetTriSurf( 1 ) );
 	}
 //	GetTriSurf( 1 )->numIndexes = 0;
-	layer3.Update( GetTriSurf(0) );
-	renderEntity.bounds = GetTriSurf(0)->bounds;
+	layer3.Update( GetTriSurf( 0 ) );
+	renderEntity.bounds = GetTriSurf( 0 )->bounds;
 
-	//if ( GetTriSurf(0)->numIndexes ) {
+	//if ( GetTriSurf( 0 )->numIndexes ) {
 	PresentRenderEntity();
 	//}
 
@@ -500,7 +500,7 @@ unsigned int WakeManagerLocal::AllocateWake( const WakeParms &params ) {
 			if ( g_debugWakes.GetBool() ) {
 				common->Printf( "Initializing wake %i-%i (%s) (%i)\n", i, ticket, params.centerMat->GetName(), gameLocal.time );
 			}
-			if ( !anString::Cmp( "_default", params.centerMat->GetName() ) ) {
+			if ( !anStr::Cmp( "_default", params.centerMat->GetName() ) ) {
 				common->Printf( "defaulted\n" );
 			}
 			wakes[i].Init( params, ticket );

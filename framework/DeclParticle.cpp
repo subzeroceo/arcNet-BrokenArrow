@@ -72,7 +72,7 @@ void anDeclParticle::GetStageBounds( anParticleStage *stage ) {
 	g.origin.Zero();
 	g.axis = mat3_identity;
 
-	arcRandom	steppingRandom;
+	anRandom	steppingRandom;
 	steppingRandom.SetSeed( 0 );
 
 	// just step through a lot of possible particles as a representative sampling
@@ -498,7 +498,7 @@ bool anDeclParticle::LoadBinary( anFile * file, unsigned int checksum ) {
 
 	struct local {
 		static void LoadParticleParm( anFile * file, anParticleParm & parm ) {
-			anString name;
+			anStr name;
 			file->ReadString( name );
 			if ( name.IsEmpty() ) {
 				parm.table = nullptr;
@@ -530,7 +530,7 @@ bool anDeclParticle::LoadBinary( anFile * file, unsigned int checksum ) {
 		anParticleStage * s = new (TAG_DECL) anParticleStage;
 		stages.Append( s );
 		assert( stages.Num() <= MAX_PARTICLE_STAGES );
-		anString name;
+		anStr name;
 		file->ReadString( name );
 		if ( name.IsEmpty() ) {
 			s->material = nullptr;
@@ -842,14 +842,14 @@ anParticleParm
 ====================================================================================
 */
 
-float anParticleParm::Eval( float frac, arcRandom &rand ) const {
+float anParticleParm::Eval( float frac, anRandom &rand ) const {
 	if ( table ) {
 		return table->TableLookup( frac );
 	}
 	return from + frac * ( to - from );
 }
 
-float anParticleParm::Integrate( float frac, arcRandom &rand ) const {
+float anParticleParm::Integrate( float frac, anRandom &rand ) const {
 	if ( table ) {
 		common->Printf( "anParticleParm::Integrate: can't integrate tables\n" );
 		return 0;
@@ -1214,7 +1214,7 @@ int	anParticleStage::ParticleVerts( particleGen_t *g, anVec3 origin, anDrawVerte
 
 	if ( orientation == POR_AIMED ) {
 		// reset the values to an earlier time to get a previous origin
-		arcRandom	currentRandom = g->random;
+		anRandom	currentRandom = g->random;
 		float		currentAge = g->age;
 		float		currentFrac = g->frac;
 		anDrawVertex *verts_p = verts;
@@ -1498,7 +1498,7 @@ int anParticleStage::CreateParticle( particleGen_t *g, anDrawVertex *verts ) con
 anParticleStage::GetCustomPathName
 ==================
 */
-const char* anParticleStage::GetCustomPathName() {
+const char *anParticleStage::GetCustomPathName() {
 	int index = ( customPathType < CustomParticleCount ) ? customPathType : 0;
 	return ParticleCustomDesc[index].name;
 }
@@ -1508,7 +1508,7 @@ const char* anParticleStage::GetCustomPathName() {
 anParticleStage::GetCustomPathDesc
 ==================
 */
-const char* anParticleStage::GetCustomPathDesc() {
+const char *anParticleStage::GetCustomPathDesc() {
 	int index = ( customPathType < CustomParticleCount ) ? customPathType : 0;
 	return ParticleCustomDesc[index].desc;
 }
@@ -1531,7 +1531,7 @@ anParticleStage::SetCustomPathType
 void anParticleStage::SetCustomPathType( const char *p ) {
 	customPathType = PPATH_STANDARD;
 	for ( int i = 0; i < CustomParticleCount; i ++ ) {
-		if ( anString::Icmp( p, ParticleCustomDesc[i].name ) == 0 ) {
+		if ( anStr::Icmp( p, ParticleCustomDesc[i].name ) == 0 ) {
 			customPathType = static_cast<prtCustomPth_t>( i );
 			break;
 		}

@@ -37,7 +37,7 @@ protected:
 anSurface_Polytope::anSurface_Polytope
 ====================
 */
-ARC_INLINE anSurface_Polytope::anSurface_Polytope( void ) {
+inline anSurface_Polytope::anSurface_Polytope( void ) {
 }
 
 #endif // !__SURFACE_POLYTOPE_H__

@@ -18,13 +18,13 @@ anListSortCompare<type>
 #ifdef __INTEL_COMPILER
 // the intel compiler doesn't do the right thing here
 template<class type>
-ARC_INLINE int anListSortCompare( const type *a, const type *b ) {
+inline int anListSortCompare( const type *a, const type *b ) {
 	assert( 0 );
 	return 0;
 }
 #else
 template<class type>
-ARC_INLINE int anListSortCompare( const type *a, const type *b ) {
+inline int anListSortCompare( const type *a, const type *b ) {
 	return *a - *b;
 }
 #endif
@@ -35,7 +35,7 @@ anListNewElement<type>
 ================
 */
 template<class type>
-ARC_INLINE type *anListNewElement( void ) {
+inline type *anListNewElement( void ) {
 	return new type;
 }
 
@@ -45,7 +45,7 @@ anSwap<type>
 ================
 */
 template<class type>
-ARC_INLINE void anSwap( type &a, type &b ) {
+inline void anSwap( type &a, type &b ) {
 	type c = a;
 	a = b;
 	b = c;
@@ -79,27 +79,38 @@ public:
 	void			Condense( void );									// resizes list to exactly the number of elements it contains
 	void			Resize( int newSize );								// resizes list to the given number of elements
 	void			Resize( int newSize, int newGranularity	 );			// resizes list and sets new granularity
+
 	void			SetNum( int newNum, bool resize = true );			// set number of elements in list and resize to exactly this number if necessary
+	void			SetNum( int total );
+
 	void			AssureSize( int newSize);							// assure list has given number of elements, but leave them uninitialized
 	void			AssureSize( int newSize, const type &initValue );	// assure list has given number of elements and initialize any new elements
 	void			AssureSizeAlloc( int newSize, new_t *allocator );	// assure the pointer list has the given number of elements and allocate any new elements
 
 	type *			Ptr( void );										// returns a pointer to the list
 	const type *	Ptr( void ) const;									// returns a pointer to the list
+
 	type &			Alloc( void );										// returns reference to a new data element at the end of the list
+
 	int				Append( const type & obj );							// append element
 	int				Append( const anList<type> &other );				// append list
 	int				AddUnique( const type & obj );						// add unique element
+
 	int				Insert( const type & obj, int index = 0 );			// insert the element at the given index
 	int				FindIndex( const type & obj ) const;				// find the index for the given element
 	type *			Find( type const & obj ) const;						// find pointer to the given element
 	int				FindNull( void ) const;								// find the index for the first nullptr pointer in the list
+
 	int				IndexOf( const type *obj ) const;					// returns the index for the pointer to an element in the list
+
 	bool			RemoveIndex( int index );							// remove the element at the given index
 	bool			Remove( const type & obj );							// remove the element
+
 	void			Sort( cmp_t *compare = ( cmp_t * )&anListSortCompare<type> );
 	void			SortSubSection( int startIndex, int endIndex, cmp_t *compare = ( cmp_t * )&anListSortCompare<type> );
+
 	void			Swap( anList<type> &other );						// swap the contents of the lists
+
 	void			DeleteContents( bool clear );						// delete the contents of the list
 
 private:
@@ -115,7 +126,7 @@ anList::anList
 ================
 */
 template<class type>
-ARC_INLINE anList<type>::anList( int newGranularity ) {
+inline anList<type>::anList( int newGranularity ) {
 	assert( newGranularity > 0 );
 	list		= nullptr;
 	granularity	= newGranularity;
@@ -128,7 +139,7 @@ anList::anList
 ================
 */
 template<class type>
-ARC_INLINE anList<type>::anList( const anList<type> &other ) {
+inline anList<type>::anList( const anList<type> &other ) {
 	list = nullptr;
 	*this = other;
 }
@@ -139,7 +150,7 @@ anList::~anList
 ================
 */
 template<class type>
-ARC_INLINE anList<type>::~anList( void ) {
+inline anList<type>::~anList( void ) {
 	Clear();
 }
 
@@ -151,7 +162,7 @@ Frees up the memory allocated by the list.  Assumes that type automatically hand
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::Clear( void ) {
+inline void anList<type>::Clear( void ) {
 	if ( list ) {
 		delete[] list;
 	}
@@ -174,7 +185,7 @@ list to nullptr.
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::DeleteContents( bool clear ) {
+inline void anList<type>::DeleteContents( bool clear ) {
 	for ( int i = 0; i < num; i++ ) {
 		delete list[i];
 		list[i] = nullptr;
@@ -195,7 +206,7 @@ return total memory allocated for the list in bytes, but doesn't take into accou
 ================
 */
 template<class type>
-ARC_INLINE size_t anList<type>::Allocated( void ) const {
+inline size_t anList<type>::Allocated( void ) const {
 	return size * sizeof( type );
 }
 
@@ -207,7 +218,7 @@ return total size of list in bytes, but doesn't take into account additional mem
 ================
 */
 template<class type>
-ARC_INLINE size_t anList<type>::Size( void ) const {
+inline size_t anList<type>::Size( void ) const {
 	return sizeof( anList<type> ) + Allocated();
 }
 
@@ -217,7 +228,7 @@ anList::MemoryUsed
 ================
 */
 template<class type>
-ARC_INLINE size_t anList<type>::MemoryUsed( void ) const {
+inline size_t anList<type>::MemoryUsed( void ) const {
 	return num * sizeof( *list );
 }
 
@@ -230,7 +241,7 @@ Note that this is NOT an indication of the memory allocated.
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::Num( void ) const {
+inline int anList<type>::Num( void ) const {
 	return num;
 }
 
@@ -242,7 +253,7 @@ Returns the number of elements currently allocated for.
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::NumAllocated( void ) const {
+inline int anList<type>::NumAllocated( void ) const {
 	return size;
 }
 
@@ -254,12 +265,27 @@ Resize to the exact size specified irregardless of granularity
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::SetNum( int newNum, bool resize ) {
+inline void anList<type>::SetNum( int newNum, bool resize ) {
 	assert( newNum >= 0 );
 	if ( resize || newNum > size ) {
 		Resize( newNum );
 	}
 	num = newNum;
+}
+
+/*
+================
+idList<type>::SetNum
+================
+*/
+template<class type>
+inline void anList<type>::SetNum( int total ) {
+	assert( num >= 0 );
+	if ( total > size ) {
+		// resize it up to the closest level of granularity
+		Resize( ( ( num + granularity - 1 ) / granularity ) * granularity );
+	}
+	num = total;
 }
 
 /*
@@ -270,7 +296,7 @@ Sets the base size of the array and resizes the array to match.
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::SetGranularity( int newGranularity ) {
+inline void anList<type>::SetGranularity( int newGranularity ) {
 	int newSize;
 
 	assert( newGranularity > 0 );
@@ -294,7 +320,7 @@ Get the current granularity.
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::GetGranularity( void ) const {
+inline int anList<type>::GetGranularity( void ) const {
 	return granularity;
 }
 
@@ -306,7 +332,7 @@ Resizes the array to exactly the number of elements it contains or frees up memo
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::Condense( void ) {
+inline void anList<type>::Condense( void ) {
 	if ( list ) {
 		if ( num ) {
 			Resize( num );
@@ -325,7 +351,7 @@ Contents are copied using their = operator so that data is correnctly instantiat
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::Resize( int newSize ) {
+inline void anList<type>::Resize( int newSize ) {
 	assert( newSize >= 0 );
 
 	// free up the list if no data is being reserved
@@ -366,7 +392,7 @@ Contents are copied using their = operator so that data is correnctly instantiat
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::Resize( int newSize, int newGranularity ) {
+inline void anList<type>::Resize( int newSize, int newGranularity ) {
 	assert( newSize >= 0 );
 
 	assert( newGranularity > 0 );
@@ -404,7 +430,7 @@ Makes sure the list has at least the given number of elements.
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::AssureSize( int newSize ) {
+inline void anList<type>::AssureSize( int newSize ) {
 	int newNum = newSize;
 
 	if ( newSize > size ) {
@@ -428,7 +454,7 @@ Makes sure the list has at least the given number of elements and initialize any
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::AssureSize( int newSize, const type &initValue ) {
+inline void anList<type>::AssureSize( int newSize, const type &initValue ) {
 	int newNum = newSize;
 
 	if ( newSize > size ) {
@@ -460,7 +486,7 @@ on non-pointer lists will cause a compiler error.
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::AssureSizeAlloc( int newSize, new_t *allocator ) {
+inline void anList<type>::AssureSizeAlloc( int newSize, new_t *allocator ) {
 	int newNum = newSize;
 
 	if ( newSize > size ) {
@@ -489,7 +515,7 @@ Copies the contents and size attributes of another list.
 ================
 */
 template<class type>
-ARC_INLINE anList<type> &anList<type>::operator=( const anList<type> &other ) {
+inline anList<type> &anList<type>::operator=( const anList<type> &other ) {
 	Clear();
 
 	num			= other.num;
@@ -515,7 +541,7 @@ Release builds do no range checking.
 ================
 */
 template<class type>
-ARC_INLINE const type &anList<type>::operator[]( int index ) const {
+inline const type &anList<type>::operator[]( int index ) const {
 	assert( index >= 0 );
 	assert( index < num );
 
@@ -531,7 +557,7 @@ Release builds do no range checking.
 ================
 */
 template<class type>
-ARC_INLINE type &anList<type>::operator[]( int index ) {
+inline type &anList<type>::operator[]( int index ) {
 	assert( index >= 0 );
 	assert( index < num );
 
@@ -550,7 +576,7 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template<class type>
-ARC_INLINE type *anList<type>::Ptr( void ) {
+inline type *anList<type>::Ptr( void ) {
 	return list;
 }
 
@@ -566,7 +592,7 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template<class type>
-const ARC_INLINE type *anList<type>::Ptr( void ) const {
+const inline type *anList<type>::Ptr( void ) const {
 	return list;
 }
 
@@ -578,7 +604,7 @@ Returns a reference to a new data element at the end of the list.
 ================
 */
 template<class type>
-ARC_INLINE type &anList<type>::Alloc( void ) {
+inline type &anList<type>::Alloc( void ) {
 	if ( !list ) {
 		Resize( granularity );
 	}
@@ -600,7 +626,7 @@ Returns the index of the new element.
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::Append( type const & obj ) {
+inline int anList<type>::Append( type const & obj ) {
 	if ( !list ) {
 		Resize( granularity );
 	}
@@ -632,7 +658,7 @@ Returns the index of the new element.
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::Insert( type const & obj, int index ) {
+inline int anList<type>::Insert( type const & obj, int index ) {
 	if ( !list ) {
 		Resize( granularity );
 	}
@@ -670,7 +696,7 @@ Returns the size of the new combined list
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::Append( const anList<type> &other ) {
+inline int anList<type>::Append( const anList<type> &other ) {
 	if ( !list ) {
 		if ( granularity == 0 ) {	// this is a hack to fix our memset classes
 			granularity = 16;
@@ -694,7 +720,7 @@ Adds the data to the list if it doesn't already exist.  Returns the index of the
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::AddUnique( type const & obj ) {
+inline int anList<type>::AddUnique( type const & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -713,7 +739,7 @@ Searches for the specified data in the list and returns it's index.  Returns -1 
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::FindIndex( type const & obj ) const {
+inline int anList<type>::FindIndex( type const & obj ) const {
 	int i;
 
 	for ( i = 0; i < num; i++ ) {
@@ -734,7 +760,7 @@ Searches for the specified data in the list and returns it's address. Returns nu
 ================
 */
 template<class type>
-ARC_INLINE type *anList<type>::Find( type const & obj ) const {
+inline type *anList<type>::Find( type const & obj ) const {
 	int i;
 
 	i = FindIndex( obj );
@@ -756,7 +782,7 @@ on non-pointer lists will cause a compiler error.
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::FindNull( void ) const {
+inline int anList<type>::FindNull( void ) const {
 	int i;
 
 	for ( i = 0; i < num; i++ ) {
@@ -780,7 +806,7 @@ but remains silent in release builds.
 ================
 */
 template<class type>
-ARC_INLINE int anList<type>::IndexOf( type const *objptr ) const {
+inline int anList<type>::IndexOf( type const *objptr ) const {
 	int index;
 
 	index = objptr - list;
@@ -801,7 +827,7 @@ Note that the element is not destroyed, so any memory used by it may not be free
 ================
 */
 template<class type>
-ARC_INLINE bool anList<type>::RemoveIndex( int index ) {
+inline bool anList<type>::RemoveIndex( int index ) {
 	int i;
 
 	assert( list != nullptr );
@@ -830,7 +856,7 @@ the element is not destroyed, so any memory used by it may not be freed until th
 ================
 */
 template<class type>
-ARC_INLINE bool anList<type>::Remove( type const & obj ) {
+inline bool anList<type>::Remove( type const & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -850,7 +876,7 @@ list, so any pointers to data within the list may no longer be valid.
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::Sort( cmp_t *compare ) {
+inline void anList<type>::Sort( cmp_t *compare ) {
 	if ( !list ) {
 		return;
 	}
@@ -868,7 +894,7 @@ Sorts a subsection of the list.
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::SortSubSection( int startIndex, int endIndex, cmp_t *compare ) {
+inline void anList<type>::SortSubSection( int startIndex, int endIndex, cmp_t *compare ) {
 	if ( !list ) {
 		return;
 	}
@@ -895,7 +921,7 @@ Swaps the contents of two lists
 ================
 */
 template<class type>
-ARC_INLINE void anList<type>::Swap( anList<type> &other ) {
+inline void anList<type>::Swap( anList<type> &other ) {
 	anSwap( num, other.num );
 	anSwap( size, other.size );
 	anSwap( granularity, other.granularity );

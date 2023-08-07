@@ -227,7 +227,7 @@ public:
 					idKey() { down = false; repeats = 0; usercmdAction = 0; }
 	bool			down;
 	int				repeats;		// if > 1, it is autorepeating
-	anString			binding;
+	anStr			binding;
 	int				usercmdAction;	// for testing by the asyncronous usercmd generation
 };
 
@@ -290,7 +290,7 @@ keyNum_t idKeyInput::StringToKeyNum( const char *str ) {
 
 	// scan for a text match
 	for ( keyname_t * kn = keynames; kn->name; kn++ ) {
-		if ( !anString::Icmp( str, kn->name ) ) {
+		if ( !anStr::Icmp( str, kn->name ) ) {
 			return kn->keynum;
 		}
 	}
@@ -332,7 +332,7 @@ const char *idKeyInput::LocalizedKeyName( keyNum_t keynum ) {
 			result = ToUnicode( vkey, scancode, keystate, temp, sizeof( temp ) / sizeof( temp[0] ), 0 );
 		}
 		if ( result > 0 && temp[0] > ' ' && iswprint( temp[0] ) ) {
-			static anString bindStr;
+			static anStr bindStr;
 			bindStr.Empty();
 			bindStr.AppendUTF8Char( temp[0] );
 			return bindStr;
@@ -487,7 +487,7 @@ void Key_BindUnBindTwo_f( const anCommandArgs &args ) {
 		return;
 	}
 	int key = atoi( args.Argv( 1 ) );
-	anString bind = args.Argv( 2 );
+	anStr bind = args.Argv( 2 );
 	if ( idKeyInput::NumBinds( bind ) >= 2 && !idKeyInput::KeyIsBoundTo( key, bind ) ) {
 		idKeyInput::UnbindBinding( bind );
 	}
@@ -541,16 +541,16 @@ const char *idKeyInput::KeysFromBinding( const char *bind ) {
 		for ( int i = 0; i < K_LAST_KEY; i++ ) {
 			if ( keys[i].binding.Icmp( bind ) == 0 ) {
 				if ( keyName[0] != '\0' ) {
-					anString::Append( keyName, sizeof( keyName ), ARCLocalization::GetString( "#str_07183" ) );
+					anStr::Append( keyName, sizeof( keyName ), ARCLocalization::GetString( "#str_07183" ) );
 				}
-				anString::Append( keyName, sizeof( keyName ), LocalizedKeyName( (keyNum_t)i ) );
+				anStr::Append( keyName, sizeof( keyName ), LocalizedKeyName( (keyNum_t)i ) );
 			}
 		}
 	}
 	if ( keyName[0] == '\0' ) {
-		anString::Copynz( keyName, ARCLocalization::GetString( "#str_07133" ), sizeof( keyName ) );
+		anStr::Copynz( keyName, ARCLocalization::GetString( "#str_07133" ), sizeof( keyName ) );
 	}
-	anString::ToLower( keyName );
+	anStr::ToLower( keyName );
 	return keyName;
 }
 
@@ -562,9 +562,9 @@ return: bindings for keyboard mouse and gamepad
 ========================
 */
 keyBindings_t idKeyInput::KeyBindingsFromBinding( const char *bind, bool firstOnly, bool localized ) {
-	anString keyboard;
-	anString mouse;
-	anString gamepad;
+	anStr keyboard;
+	anStr mouse;
+	anStr gamepad;
 
 	if ( bind && *bind ) {
 		for ( int i = 0; i < K_LAST_KEY; i++ ) {
@@ -576,7 +576,7 @@ keyBindings_t idKeyInput::KeyBindingsFromBinding( const char *bind, bool firstOn
 					} else {
 						gamepadKey = KeyNumToString( (keyNum_t)i );
 					}
-					if ( anString::Icmp( gamepadKey, "" ) != 0 ) {
+					if ( anStr::Icmp( gamepadKey, "" ) != 0 ) {
 						if ( !gamepad.IsEmpty() ) {
 							if ( firstOnly ) {
 								continue;
@@ -592,7 +592,7 @@ keyBindings_t idKeyInput::KeyBindingsFromBinding( const char *bind, bool firstOn
 					} else {
 						mouseKey = KeyNumToString( (keyNum_t)i );
 					}
-					if ( anString::Icmp( mouseKey, "" ) != 0 ) {
+					if ( anStr::Icmp( mouseKey, "" ) != 0 ) {
 						if ( !mouse.IsEmpty() ) {
 							if ( firstOnly ) {
 								continue;
@@ -608,7 +608,7 @@ keyBindings_t idKeyInput::KeyBindingsFromBinding( const char *bind, bool firstOn
 					} else {
 						tmp = KeyNumToString( (keyNum_t)i );
 					}
-					if ( anString::Icmp( tmp, "" ) != 0 && anString::Icmp( tmp, keyboard ) != 0 ) {
+					if ( anStr::Icmp( tmp, "" ) != 0 && anStr::Icmp( tmp, keyboard ) != 0 ) {
 						if ( !keyboard.IsEmpty() ) {
 							if ( firstOnly ) {
 								continue;

@@ -42,16 +42,16 @@ void *		Mem_Alloc16( const int size );
 void		Mem_Free16( void *ptr );
 
 //#ifdef ARC_REDIRECT_NEWDELETE
-ARC_INLINE void *operator new( size_t s ) {
+inline void *operator new( size_t s ) {
 	return Mem_Alloc( s );
 }
-ARC_INLINE void operator delete( void *p ) {
+inline void operator delete( void *p ) {
 	Mem_Free( p );
 }
-ARC_INLINE void *operator new[]( size_t s ) {
+inline void *operator new[]( size_t s ) {
 	return Mem_Alloc( s );
 }
-ARC_INLINE void operator delete[]( void *p ) {
+inline void operator delete[]( void *p ) {
 	Mem_Free( p );
 }
 //#endif
@@ -64,28 +64,28 @@ void *		Mem_Alloc16( const int size, const char *fileName, const int lineNumber 
 void		Mem_Free16( void *ptr, const char *fileName, const int lineNumber );
 
 //#ifdef ARC_REDIRECT_NEWDELETE
-ARC_INLINE void *operator new( size_t s, int t1, int t2, char *fileName, int lineNumber ) {
+inline void *operator new( size_t s, int t1, int t2, char *fileName, int lineNumber ) {
 	return Mem_Alloc( s, fileName, lineNumber );
 }
-ARC_INLINE void operator delete( void *p, int t1, int t2, char *fileName, int lineNumber ) {
+inline void operator delete( void *p, int t1, int t2, char *fileName, int lineNumber ) {
 	Mem_Free( p, fileName, lineNumber );
 }
-ARC_INLINE void *operator new[]( size_t s, int t1, int t2, char *fileName, int lineNumber ) {
+inline void *operator new[]( size_t s, int t1, int t2, char *fileName, int lineNumber ) {
 	return Mem_Alloc( s, fileName, lineNumber );
 }
-ARC_INLINE void operator delete[]( void *p, int t1, int t2, char *fileName, int lineNumber ) {
+inline void operator delete[]( void *p, int t1, int t2, char *fileName, int lineNumber ) {
 	Mem_Free( p, fileName, lineNumber );
 }
-ARC_INLINE void *operator new( size_t s ) {
+inline void *operator new( size_t s ) {
 	return Mem_Alloc( s, "", 0 );
 }
-ARC_INLINE void operator delete( void *p ) {
+inline void operator delete( void *p ) {
 	Mem_Free( p, "", 0 );
 }
-ARC_INLINE void *operator new[]( size_t s ) {
+inline void *operator new[]( size_t s ) {
 	return Mem_Alloc( s, "", 0 );
 }
-ARC_INLINE void operator delete[]( void *p ) {
+inline void operator delete[]( void *p ) {
 	Mem_Free( p, "", 0 );
 }
 
@@ -810,14 +810,14 @@ void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::FreeInternal( anDyn
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-ARC_INLINE void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::LinkFreeInternal( anDynamicAlloc<type> *block ) {
+inline void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::LinkFreeInternal( anDynamicAlloc<type> *block ) {
 	block->node = freeTree.Add( block, block->GetSize() );
 	numFreeBlocks++;
 	freeBlockMemory += block->GetSize();
 }
 
 template<class type, int baseBlockSize, int minBlockSize>
-ARC_INLINE void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::UnlinkFreeInternal( anDynamicAlloc<type> *block ) {
+inline void anDynamicBlockAlloc<type, baseBlockSize, minBlockSize>::UnlinkFreeInternal( anDynamicAlloc<type> *block ) {
 	freeTree.Remove( block->node );
 	block->node = nullptr;
 	numFreeBlocks--;

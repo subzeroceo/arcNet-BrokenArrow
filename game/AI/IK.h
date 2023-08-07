@@ -12,10 +12,10 @@
 
 #define IK_ANIM				"ik_pose"
 
-class idIK {
+class anIK {
 public:
-							idIK( void );
-	virtual					~idIK( void );
+							anIK( void );
+	virtual					~anIK( void );
 
 	void					Save( anSaveGame *savefile ) const;
 	void					Restore( anRestoreGame *savefile );
@@ -33,7 +33,7 @@ protected:
 	bool					initialized;
 	bool					ik_activate;
 	anEntity *				self;				// entity using the animated model
-	idAnimator *			animator;			// animator on entity
+	anAnimator *			animator;			// animator on entity
 	int						modifiedAnim;		// animation modified by the IK
 	anVec3					modelOffset;
 };
@@ -47,11 +47,11 @@ protected:
 ===============================================================================
 */
 
-class idIK_Walk : public idIK {
+class anIK_Walk : public anIK {
 public:
 
-							idIK_Walk( void );
-	virtual					~idIK_Walk( void );
+							anIK_Walk( void );
+	virtual					~anIK_Walk( void );
 
 	void					Save( anSaveGame *savefile ) const;
 	void					Restore( anRestoreGame *savefile );
@@ -118,11 +118,11 @@ private:
 ===============================================================================
 */
 
-class idIK_Reach : public idIK {
+class anIK_Reach : public anIK {
 public:
 
-							idIK_Reach( void );
-	virtual					~idIK_Reach( void );
+							anIK_Reach( void );
+	virtual					~anIK_Reach( void );
 
 	void					Save( anSaveGame *savefile ) const;
 	void					Restore( anRestoreGame *savefile );

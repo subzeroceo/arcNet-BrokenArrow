@@ -1,30 +1,3 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
 #include "../../idlib/Lib.h"
 #pragma hdrstop
 
@@ -47,7 +20,6 @@ anCVar net_socksServer( "net_socksServer", "", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
 anCVar net_socksPort( "net_socksPort", "1080", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "" );
 anCVar net_socksUsername( "net_socksUsername", "", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
 anCVar net_socksPassword( "net_socksPassword", "", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
-
 
 static struct sockaddr	socksRelayAddr;
 
@@ -134,15 +106,14 @@ void Net_NetadrToSockadr( const netadr_t *a, struct sockaddr *s ) {
 	memset( s, 0, sizeof(*s) );
 
 	if ( a->type == NA_BROADCAST ) {
-		(( struct sockaddr_in *)s)->sin_family = AF_INET;
-		(( struct sockaddr_in *)s)->sin_addr.s_addr = INADDR_BROADCAST;
-	}
-	else if ( a->type == NA_IP || a->type == NA_LOOPBACK ) {
-		(( struct sockaddr_in *)s)->sin_family = AF_INET;
-		(( struct sockaddr_in *)s)->sin_addr.s_addr = *( int*)&a->ip;
+		( (struct sockaddr_in *)s)->sin_family = AF_INET;
+		( (struct sockaddr_in *)s)->sin_addr.s_addr = INADDR_BROADCAST;
+	} else if ( a->type == NA_IP || a->type == NA_LOOPBACK ) {
+		( (struct sockaddr_in *)s)->sin_family = AF_INET;
+		( (struct sockaddr_in *)s)->sin_addr.s_addr = *(int *)&a->ip;
 	}
 
-	(( struct sockaddr_in *)s)->sin_port = htons( ( short)a->port );
+	( (struct sockaddr_in *)s)->sin_port = htons( ( short)a->port );
 }
 
 
@@ -206,7 +177,7 @@ static bool Net_StringToSockaddr( const char *s, struct sockaddr *sadr, bool doD
 	if ( s[0] >= '0' && s[0] <= '9' ) {
 		unsigned long ret = inet_addr( s);
 		if ( ret != INADDR_NONE ) {
-			*( int*)&(( struct sockaddr_in *)sadr)->sin_addr = ret;
+			*(int *)&(( struct sockaddr_in *)sadr)->sin_addr = ret;
 		} else {
 			// check for port
 			if ( !Net_ExtractPort( s, buf, sizeof( buf ), &port ) ) {
@@ -216,7 +187,7 @@ static bool Net_StringToSockaddr( const char *s, struct sockaddr *sadr, bool doD
 			if ( ret == INADDR_NONE ) {
 				return false;
 			}
-			*( int*)&(( struct sockaddr_in *)sadr)->sin_addr = ret;
+			*(int *)&(( struct sockaddr_in *)sadr)->sin_addr = ret;
 			(( struct sockaddr_in *)sadr)->sin_port = htons( port );
 		}
 	} else if ( doDNSResolve ) {
@@ -229,7 +200,7 @@ static bool Net_StringToSockaddr( const char *s, struct sockaddr *sadr, bool doD
 		if ( h == 0 ) {
 			return false;
 		}
-		*( int*)&(( struct sockaddr_in *)sadr)->sin_addr = *( int*)h->h_addr_list[0];
+		*(int *)&(( struct sockaddr_in *)sadr)->sin_addr = *(int *)h->h_addr_list[0];
 	}
 
 	return true;
@@ -273,7 +244,7 @@ int NET_IPSocket( const char *net_interface, int port, netadr_t *bound_to ) {
 		return 0;
 	}
 
-	if ( !net_interface || !net_interface[0] || !anString::Icmp( net_interface, "localhost" ) ) {
+	if ( !net_interface || !net_interface[0] || !anStr::Icmp( net_interface, "localhost" ) ) {
 		address.sin_addr.s_addr = INADDR_ANY;
 	}
 	else {
@@ -340,7 +311,7 @@ void NET_OpenSocks( int port ) {
 		return;
 	}
 	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = *( int*)h->h_addr_list[0];
+	address.sin_addr.s_addr = *(int *)h->h_addr_list[0];
 	address.sin_port = htons( ( short)net_socksPort.GetInteger() );
 
 	if ( connect( socks_socket, ( struct sockaddr *)&address, sizeof( address ) ) == SOCKET_ERROR ) {
@@ -446,8 +417,8 @@ void NET_OpenSocks( int port ) {
 	buf[1] = 3;		// command: UDP associate
 	buf[2] = 0;		// reserved
 	buf[3] = 1;		// address type: IPV4
-	*( int*)&buf[4] = INADDR_ANY;
-	*( short *)&buf[8] = htons( ( short)port );		// port
+	*(int *)&buf[4] = INADDR_ANY;
+	*(short *)&buf[8] = htons( ( short)port );		// port
 	if ( send( socks_socket, (const char *)buf, 10, 0 ) == SOCKET_ERROR ) {
 		err = WSAGetLastError();
 		common->Printf( "NET_OpenSocks: send: %s\n", NET_ErrorString() );
@@ -475,8 +446,8 @@ void NET_OpenSocks( int port ) {
 		return;
 	}
 	(( struct sockaddr_in *)&socksRelayAddr)->sin_family = AF_INET;
-	(( struct sockaddr_in *)&socksRelayAddr)->sin_addr.s_addr = *( int*)&buf[4];
-	(( struct sockaddr_in *)&socksRelayAddr)->sin_port = *( short *)&buf[8];
+	(( struct sockaddr_in *)&socksRelayAddr)->sin_addr.s_addr = *(int *)&buf[4];
+	(( struct sockaddr_in *)&socksRelayAddr)->sin_port = *(short *)&buf[8];
 	memset( (( struct sockaddr_in *)&socksRelayAddr)->sin_zero, 0, 8 );
 
 	usingSocks = true;
@@ -563,7 +534,7 @@ bool Net_GetUDPPacket( int netSocket, netadr_t &net_from, char *data, int &size,
 		net_from.ip[1] = data[5];
 		net_from.ip[2] = data[6];
 		net_from.ip[3] = data[7];
-		net_from.port = *( short *)&data[8];
+		net_from.port = *(short *)&data[8];
 		memmove( data, &data[10], ret - 10 );
 	} else {
 		Net_SockadrToNetadr( &from, &net_from );
@@ -601,8 +572,8 @@ void Net_SendUDPPacket( int netSocket, int length, const void *data, const netad
 		socksBuf[1] = 0;
 		socksBuf[2] = 0;	// fragment (not fragmented)
 		socksBuf[3] = 1;	// address type: IPV4
-		*( int*)&socksBuf[4] = (( struct sockaddr_in *)&addr)->sin_addr.s_addr;
-		*( short *)&socksBuf[8] = (( struct sockaddr_in *)&addr)->sin_port;
+		*(int *)&socksBuf[4] = (( struct sockaddr_in *)&addr)->sin_addr.s_addr;
+		*(short *)&socksBuf[8] = (( struct sockaddr_in *)&addr)->sin_port;
 		memcpy( &socksBuf[10], data, length );
 		ret = sendto( netSocket, socksBuf, length+10, 0, &socksRelayAddr, sizeof( socksRelayAddr) );
 	} else {
@@ -680,7 +651,7 @@ void Sys_InitNetworking( void ) {
 			pIPAddrString = &pAdapter->IpAddressList;
 			while( pIPAddrString ) {
 				unsigned long ip_a, ip_m;
-				if ( !anString::Icmp( "127.0.0.1", pIPAddrString->IpAddress.String ) ) {
+				if ( !anStr::Icmp( "127.0.0.1", pIPAddrString->IpAddress.String ) ) {
 					foundloopback = true;
 				}
 				ip_a = ntohl( inet_addr( pIPAddrString->IpAddress.String ) );
@@ -760,12 +731,12 @@ const char *Sys_NetAdrToString( const netadr_t a ) {
 
 	if ( a.type == NA_LOOPBACK ) {
 		if ( a.port ) {
-			anString::snPrintf( s, 64, "localhost:%i", a.port );
+			anStr::snPrintf( s, 64, "localhost:%i", a.port );
 		} else {
-			anString::snPrintf( s, 64, "localhost" );
+			anStr::snPrintf( s, 64, "localhost" );
 		}
 	} else if ( a.type == NA_IP ) {
-		anString::snPrintf( s, 64, "%i.%i.%i.%i:%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3], a.port );
+		anStr::snPrintf( s, 64, "%i.%i.%i.%i:%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3], a.port );
 	}
 	return s;
 }

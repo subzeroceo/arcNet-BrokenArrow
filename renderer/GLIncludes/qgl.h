@@ -1,33 +1,32 @@
+#include "../../idlib/Lib.h"
 #ifndef __QGL_H__
 #define __QGL_H__
-#include "../../idlib/Lib.h"
-#if defined( _WIN32 )
+#include "qgldefines.h"
+// non-windows systems will just redefine qgl* to gl*
+//defined( ID_GL_HARDLINK )
+#include "qgl_linked.h"
+//#else
 
-#include <gl/gl.h>
+
+//#if defined( _WIN32 )
+#include "gl.h"
 #include <stdio.h>
 #include <float.h>
 #include <string.h>
-
 #elif defined( MACOS_X )
-
 // magic flag to keep tiger gl.h from loading glext.h
 #define GL_GLEXT_LEGACY
 #include <OpenGL/gl.h>
-#elif defined( __linux__ ) || defined( __FreeBSD__ ) || defined( __APPLE__ )
+#elif defined( __linux__ ) || defined( __FreeBSD__ )
 #include <dlfcn.h>
 // using our local glext.h
-// http://oss.sgi.com/projects/ogl-sample/ABI/
 #define GL_GLEXT_LEGACY
 #define GLX_GLXEXT_LEGACY
 #include <GL/gl.h>
 #include <GL/glx.h>
-
 #else
-
 #include <gl.h>
-
 #endif
-
 #ifndef APIENTRY
 #define APIENTRY
 #endif
@@ -55,35 +54,34 @@ GLExtension_t GLimp_ExtensionPointer( const char *name );
 
 #if defined( _WIN32 )
 #pragma warning (disable : 4113 4133 4047 4018 )
-
 int ( WINAPI * qwglChoosePixelFormat )( HDC, CONST PIXELFORMATDESCRIPTOR * );
 int ( WINAPI * qwglDescribePixelFormat )( HDC, int, UINT, LPPIXELFORMATDESCRIPTOR );
 int ( WINAPI * qwglGetPixelFormat )( HDC );
-BOOL ( WINAPI * qwglSetPixelFormat )( HDC, int, CONST PIXELFORMATDESCRIPTOR * );
-BOOL ( WINAPI * qwglSwapBuffers )( HDC );
+bool ( WINAPI * qwglSetPixelFormat )( HDC, int, CONST PIXELFORMATDESCRIPTOR * );
+bool ( WINAPI * qwglSwapBuffers )( HDC );
 
-BOOL ( WINAPI * qwglCopyContext )( HGLRC, HGLRC, UINT );
+bool ( WINAPI * qwglCopyContext )( HGLRC, HGLRC, UINT );
 HGLRC ( WINAPI * qwglCreateContext )( HDC );
 HGLRC ( WINAPI * qwglCreateLayerContext )( HDC, int );
-BOOL ( WINAPI * qwglDeleteContext )( HGLRC );
+bool ( WINAPI * qwglDeleteContext )( HGLRC );
 HGLRC ( WINAPI * qwglGetCurrentContext )( VOID );
 HDC ( WINAPI * qwglGetCurrentDC )( VOID );
 PROC ( WINAPI * qwglGetProcAddress )( LPCSTR );
-BOOL ( WINAPI * qwglMakeCurrent )( HDC, HGLRC );
-BOOL ( WINAPI * qwglShareLists )( HGLRC, HGLRC );
-BOOL ( WINAPI * qwglUseFontBitmaps )( HDC, DWORD, DWORD, DWORD );
+bool ( WINAPI * qwglMakeCurrent )( HDC, HGLRC );
+bool ( WINAPI * qwglShareLists )( HGLRC, HGLRC );
+bool ( WINAPI * qwglUseFontBitmaps )( HDC, DWORD, DWORD, DWORD );
 
-BOOL ( WINAPI * qwglUseFontOutlines )( HDC, DWORD, DWORD, DWORD, FLOAT, FLOAT, int, LPGLYPHMETRICSFLOAT );
+bool ( WINAPI * qwglUseFontOutlines )( HDC, DWORD, DWORD, DWORD, FLOAT, FLOAT, int, LPGLYPHMETRICSFLOAT );
 
-BOOL ( WINAPI * qwglDescribeLayerPlane )( HDC, int, int, UINT, LPLAYERPLANEDESCRIPTOR );
+bool ( WINAPI * qwglDescribeLayerPlane )( HDC, int, int, UINT, LPLAYERPLANEDESCRIPTOR );
 int ( WINAPI * qwglSetLayerPaletteEntries )( HDC, int, int, int, CONST COLORREF * );
 int ( WINAPI * qwglGetLayerPaletteEntries )( HDC, int, int, int, COLORREF * );
-BOOL ( WINAPI * qwglRealizeLayerPalette )( HDC, int, BOOL );
-BOOL ( WINAPI * qwglSwapLayerBuffers )( HDC, UINT );
+bool ( WINAPI * qwglRealizeLayerPalette )( HDC, int, bool );
+bool ( WINAPI * qwglSwapLayerBuffers )( HDC, UINT );
 
-BOOL ( WINAPI * qwglGetDeviceGammaRampEXT )( unsigned char *, unsigned char *, unsigned char * );
-BOOL ( WINAPI * qwglSetDeviceGammaRampEXT )( const unsigned char *, const unsigned char *, const unsigned char * );
-BOOL ( WINAPI * qwglSwapIntervalEXT )( int interval );
+bool ( WINAPI * qwglGetDeviceGammaRampEXT )( unsigned char *, unsigned char *, unsigned char * );
+bool ( WINAPI * qwglSetDeviceGammaRampEXT )( const unsigned char *, const unsigned char *, const unsigned char * );
+bool ( WINAPI * qwglSwapIntervalEXT )( int interval );
 #endif
 
 // multitexture
@@ -95,34 +93,31 @@ extern	void ( APIENTRY * qglActiveTextureARB )( GLenum texture );
 extern	void ( APIENTRY * qglClientActiveTextureARB )( GLenum texture );
 
 // ARB_vertex_buffer_object
-extern PFNGLBINDBUFFERARBPROC qglBindBufferARB;
-extern PFNGLDELETEBUFFERSARBPROC qglDeleteBuffersARB;
-extern PFNGLGENBUFFERSARBPROC qglGenBuffersARB;
-extern PFNGLISBUFFERARBPROC qglIsBufferARB;
-extern PFNGLBUFFERDATAARBPROC qglBufferDataARB;
-extern PFNGLBUFFERSUBDATAARBPROC qglBufferSubDataARB;
-extern PFNGLGETBUFFERSUBDATAARBPROC qglGetBufferSubDataARB;
-extern PFNGLMAPBUFFERARBPROC qglMapBufferARB;
-extern PFNGLUNMAPBUFFERARBPROC qglUnmapBufferARB;
+extern PFNGLBINDBUFFERARBPROC 			qglBindBufferARB;
+extern PFNGLDELETEBUFFERSARBPROC 		qglDeleteBuffersARB;
+extern PFNGLGENBUFFERSARBPROC 			qglGenBuffersARB;
+extern PFNGLISBUFFERARBPROC 			qglIsBufferARB;
+extern PFNGLBUFFERDATAARBPROC 			qglBufferDataARB;
+extern PFNGLBUFFERSUBDATAARBPROC 		qglBufferSubDataARB;
+extern PFNGLGETBUFFERSUBDATAARBPROC 	qglGetBufferSubDataARB;
+extern PFNGLMAPBUFFERARBPROC 			qglMapBufferARB;
+extern PFNGLUNMAPBUFFERARBPROC 			qglUnmapBufferARB;
 extern PFNGLGETBUFFERPARAMETERIVARBPROC qglGetBufferParameterivARB;
-extern PFNGLGETBUFFERPOINTERVARBPROC qglGetBufferPointervARB;
+extern PFNGLGETBUFFERPOINTERVARBPROC 	qglGetBufferPointervARB;
 
 // NV_register_combiners
 extern	void ( APIENTRY *qglCombinerParameterfvNV )( GLenum pname, const GLfloat *params );
 extern	void ( APIENTRY *qglCombinerParameterivNV )( GLenum pname, const GLint *params );
 extern	void ( APIENTRY *qglCombinerParameterfNV )( GLenum pname, const GLfloat param );
 extern	void ( APIENTRY *qglCombinerParameteriNV )( GLenum pname, const GLint param );
-extern	void ( APIENTRY *qglCombinerInputNV )( GLenum stage, GLenum portion, GLenum variable, GLenum input,
-											  GLenum mapping, GLenum componentUsage );
-extern	void ( APIENTRY *qglCombinerOutputNV )( GLenum stage, GLenum portion, GLenum abOutput, GLenum cdOutput,
-											   GLenum sumOutput, GLenum scale, GLenum bias, GLboolean abDotProduct,
-											   GLboolean cdDotProduct, GLboolean muxSum );
+extern	void ( APIENTRY *qglCombinerInputNV )( GLenum stage, GLenum portion, GLenum variable, GLenum input, GLenum mapping, GLenum componentUsage );
+extern	void ( APIENTRY *qglCombinerOutputNV )( GLenum stage, GLenum portion, GLenum abOutput, GLenum cdOutput, GLenum sumOutput, GLenum scale, GLenum bias, GLboolean abDotProduct, GLboolean cdDotProduct, GLboolean muxSum );
 extern	void ( APIENTRY *qglFinalCombinerInputNV )( GLenum variable, GLenum input, GLenum mapping, GLenum componentUsage );
 
 // NV_vertex_program / NV_fragment_program
-extern void ( APIENTRY *qglBindProgramNV ) (GLenum, GLuint);
-extern void ( APIENTRY *qglLoadProgramNV ) (GLenum, GLuint, GLsizei, const GLubyte * RESTRICT );
-extern void ( APIENTRY *qglProgramParameter4fvNV ) (GLenum, GLuint, const GLfloat * RESTRICT );
+extern void ( APIENTRY *qglBindProgramNV )(GLenum, GLuint);
+extern void ( APIENTRY *qglLoadProgramNV )(GLenum, GLuint, GLsizei, const GLubyte * RESTRICT );
+extern void ( APIENTRY *qglProgramParameter4fvNV )(GLenum, GLuint, const GLfloat * RESTRICT );
 
 // 3D textures
 extern void ( APIENTRY *qglTexImage3D)( GLenum, GLint, GLint, GLsizei, GLsizei, GLsizei, GLint, GLenum, GLenum, const GLvoid *);
@@ -150,7 +145,7 @@ extern	PFNGLALPHAFRAGMENTOP3ATIPROC	qglAlphaFragmentOp3ATI;
 extern	PFNGLSETFRAGMENTSHADERCONSTANTATIPROC	qglSetFragmentShaderConstantATI;
 
 // EXT_stencil_two_side
-extern	PFNGLACTIVESTENCILFACEEXTPROC	qglActiveStencilFaceEXT;
+extern	PFNGLACTIVESTENCILFACEEXTPROC		qglActiveStencilFaceEXT;
 
 // ATI_separate_stencil
 extern	PFNGLSTENCILOPSEPARATEATIPROC		qglStencilOpSeparateATI;
@@ -296,11 +291,6 @@ extern PFNGLGETQUERYOBJECTUI64VEXTPROC		qglGetQueryObjectui64vEXT;
 extern PFNGLSTRINGMARKERGREMEDYPROC			qglStringMarkerGREMEDY;
 extern PFNGLSECONDARYCOLOR3BPROC			qglSecondaryColor3b;
 //===========================================================================
-
-// non-windows systems will just redefine qgl* to gl*
-#if defined( __APPLE__ ) || defined( ID_GL_HARDLINK )
-#include "qgl_linked.h"
-#else
 
 // windows systems use a function pointer for each call so we can do our log file intercepts
 
@@ -683,52 +673,48 @@ extern void ( APIENTRY * qglMultiTexCoord4ivARB )( GLenum target, const GLint *v
 extern void ( APIENTRY * qglMultiTexCoord4sARB )( GLenum target, GLshort s );
 extern void ( APIENTRY * qglMultiTexCoord4svARB )( GLenum target, const GLshort *v );
 
-#if defined( _WIN32 )
+//#if defined( _WIN32 )
 typedef struct tagPIXELFORMATDESCRIPTOR PIXELFORMATDESCRIPTOR, *PPIXELFORMATDESCRIPTOR, FAR *LPPIXELFORMATDESCRIPTOR;
 
 extern  int   ( WINAPI * qwglChoosePixelFormat )(HDC, CONST PIXELFORMATDESCRIPTOR *);
-extern  int   ( WINAPI * qwglDescribePixelFormat) (HDC, int, UINT, LPPIXELFORMATDESCRIPTOR);
+extern  int   ( WINAPI * qwglDescribePixelFormat)(HDC, int, UINT, LPPIXELFORMATDESCRIPTOR);
 extern  int   ( WINAPI * qwglGetPixelFormat)(HDC);
-extern  BOOL  ( WINAPI * qwglSetPixelFormat)(HDC, int, CONST PIXELFORMATDESCRIPTOR *);
-extern  BOOL  ( WINAPI * qwglSwapBuffers)(HDC);
+extern  bool  ( WINAPI * qwglSetPixelFormat)(HDC, int, CONST PIXELFORMATDESCRIPTOR *);
+extern  bool  ( WINAPI * qwglSwapBuffers)(HDC);
 
 typedef struct HPBUFFERARB__ *HPBUFFERARB;
-extern BOOL  ( WINAPI * qwglBindTexImageARB)(HPBUFFERARB, int);
-extern BOOL	 ( WINAPI * qwglChoosePixelFormatARB)(HDC hdc, const int * RESTRICT piAttribIList, const FLOAT * RESTRICT pfAttribFList, UINT nMaxFormats, int * RESTRICT piFormats, UINT * RESTRICT nNumFormats);
+extern bool  ( WINAPI * qwglBindTexImageARB)(HPBUFFERARB, int);
+extern bool	 ( WINAPI * qwglChoosePixelFormatARB)(HDC hdc, const int * RESTRICT piAttribIList, const FLOAT * RESTRICT pfAttribFList, UINT nMaxFormats, int * RESTRICT piFormats, UINT * RESTRICT nNumFormats);
 extern HPBUFFERARB ( WINAPI * qwglCreatePbufferARB)(HDC hDC, int iPixelFormat, int iWidth, int iHeight, const int * RESTRICT piAttribList);
-extern BOOL  ( WINAPI * qwglDestroyPbufferARB)(HPBUFFERARB);
+extern bool  ( WINAPI * qwglDestroyPbufferARB)(HPBUFFERARB);
 extern HDC	 ( WINAPI * qwglGetPbufferDCARB)(HPBUFFERARB);
 extern int	 ( WINAPI * qwglReleasePbufferDCARB)(HPBUFFERARB, HDC);
-extern BOOL  ( WINAPI * qwglReleaseTexImageARB)(HPBUFFERARB, int);
-extern BOOL  ( WINAPI * qwglSetPbufferAttribARB)(HPBUFFERARB, const int * RESTRICT );
+extern bool  ( WINAPI * qwglReleaseTexImageARB)(HPBUFFERARB, int);
+extern bool  ( WINAPI * qwglSetPbufferAttribARB)(HPBUFFERARB, const int * RESTRICT );
 
-extern BOOL  ( WINAPI * qwglCopyContext)(HGLRC, HGLRC, UINT);
+extern bool  ( WINAPI * qwglCopyContext)(HGLRC, HGLRC, UINT);
 extern HGLRC ( WINAPI * qwglCreateContext)(HDC);
 extern HGLRC ( WINAPI * qwglCreateLayerContext)(HDC, int);
-extern BOOL  ( WINAPI * qwglDeleteContext)(HGLRC);
-extern HGLRC ( WINAPI * qwglGetCurrentContext)(VOID);
-extern HDC   ( WINAPI * qwglGetCurrentDC)(VOID);
+extern bool  ( WINAPI * qwglDeleteContext)(HGLRC);
+extern HGLRC ( WINAPI * qwglGetCurrentContext)( void );
+extern HDC   ( WINAPI * qwglGetCurrentDC)( void );
 extern PROC  ( WINAPI * qwglGetProcAddress)(LPCSTR);
-extern BOOL  ( WINAPI * qwglMakeCurrent)(HDC, HGLRC);
-extern BOOL  ( WINAPI * qwglShareLists)(HGLRC, HGLRC);
-extern BOOL  ( WINAPI * qwglUseFontBitmaps)(HDC, DWORD, DWORD, DWORD);
+extern bool  ( WINAPI * qwglMakeCurrent)(HDC, HGLRC);
+extern bool  ( WINAPI * qwglShareLists)(HGLRC, HGLRC);
+extern bool  ( WINAPI * qwglUseFontBitmaps)(HDC, DWORD, DWORD, DWORD);
 
-extern BOOL  ( WINAPI * qwglUseFontOutlines)(HDC, DWORD, DWORD, DWORD, FLOAT,FLOAT, int, LPGLYPHMETRICSFLOAT);
+extern bool  ( WINAPI * qwglUseFontOutlines)(HDC, DWORD, DWORD, DWORD, FLOAT,FLOAT, int, LPGLYPHMETRICSFLOAT);
 
-extern BOOL ( WINAPI * qwglDescribeLayerPlane)(HDC, int, int, UINT,LPLAYERPLANEDESCRIPTOR);
+extern bool ( WINAPI * qwglDescribeLayerPlane)(HDC, int, int, UINT,LPLAYERPLANEDESCRIPTOR);
 extern int  ( WINAPI * qwglSetLayerPaletteEntries)(HDC, int, int, int,CONST COLORREF *);
 extern int  ( WINAPI * qwglGetLayerPaletteEntries)(HDC, int, int, int,COLORREF *);
-extern BOOL ( WINAPI * qwglRealizeLayerPalette)(HDC, int, BOOL);
-extern BOOL ( WINAPI * qwglSwapLayerBuffers )( HDC, UINT );
+extern bool ( WINAPI * qwglRealizeLayerPalette)(HDC, int, bool);
+extern bool ( WINAPI * qwglSwapLayerBuffers )( HDC, UINT );
 
-extern BOOL ( WINAPI * qwglSwapIntervalEXT )( int interval );
+extern bool ( WINAPI * qwglSwapIntervalEXT )( int interval );
 
-extern BOOL ( WINAPI * qwglGetDeviceGammaRampEXT )( unsigned char *pRed, unsigned char *pGreen, unsigned char *pBlue );
-extern BOOL ( WINAPI * qwglSetDeviceGammaRampEXT )( const unsigned char *pRed, const unsigned char *pGreen, const unsigned char *pBlue );
-
-#endif	// _WIN32
-
-#if defined( __linux__ )
+extern bool ( WINAPI * qwglGetDeviceGammaRampEXT )( unsigned char *pRed, unsigned char *pGreen, unsigned char *pBlue );
+extern bool ( WINAPI * qwglSetDeviceGammaRampEXT )( const unsigned char *pRed, const unsigned char *pGreen, const unsigned char *pBlue );
 
 // GLX Functions
 extern XVisualInfo * (*qglXChooseVisual)( Display *dpy, int screen, int *attribList );
@@ -756,21 +742,107 @@ extern GLExtension_t (*qglXGetProcAddressARB)( const GLubyte *procname );
 	#include "../sys/linux/qgl_enforce.h"
 #endif
 
-#endif // __linux__
-extern void ( APIENTRY* qgluPerspective )( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar );
-extern void ( APIENTRY* qgluLookAt )( GLdouble eyex, GLdouble eyey, GLdouble eyez, GLdouble centerx, GLdouble centery, GLdouble centerz, GLdouble upx, GLdouble upy, GLdouble upz );
+extern void ( APIENTRY *qgluPerspective )( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar );
+extern void ( APIENTRY *qgluLookAt )( GLdouble eyex, GLdouble eyey, GLdouble eyez, GLdouble centerx, GLdouble centery, GLdouble centerz, GLdouble upx, GLdouble upy, GLdouble upz );
 extern const GLubyte * ( APIENTRY * qgluErrorString )(GLenum errCode );
-extern void ( APIENTRY * qglSetTexCacheDefault2DImageId ) ( int id);
-extern void ( APIENTRY * qglSetTexCacheDefaultCubeImageId ) ( int id);
-extern  GLboolean ( APIENTRY * qglTexImageExistsInBundles ) ( unsigned long texNameCRC32 );
+
+extern void ( GLAPIENTRY *qgluBeginCurve)(GLUnurbs *nurb);
+extern void ( GLAPIENTRY *qgluBeginPolygon)( GLUtesselator *tess);
+extern void ( GLAPIENTRY *qgluBeginSurface)(GLUnurbs *nurb);
+extern void ( GLAPIENTRY *qgluBeginTrim)(GLUnurbs *nurb);
+extern GLint ( GLAPIENTRY qgluBuild1DMipmapLevels)( GLenum target, GLint internalFormat, GLsizei width, GLenum format, GLenum type, GLint level, GLint base, GLint max, const void *data);
+extern GLint ( GLAPIENTRY qgluBuild1DMipmaps)( GLenum target, GLint internalFormat, GLsizei width, GLenum format, GLenum type, const void *data);
+extern GLint ( GLAPIENTRY qgluBuild2DMipmapLevels)( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLint level, GLint base, GLint max, const void *data);
+extern GLint ( GLAPIENTRY qgluBuild2DMipmaps)( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *data);
+extern GLint ( GLAPIENTRY qgluBuild3DMipmapLevels)( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLint level, GLint base, GLint max, const void *data);
+extern GLint ( GLAPIENTRY qgluBuild3DMipmaps)( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const void *data);
+extern GLboolean ( GLAPIENTRY qgluCheckExtension)(const GLubyte *extName, const GLubyte *extString);
+extern void ( GLAPIENTRY *qgluCylinder)( GLUquadric *quad, GLdouble base, GLdouble top, GLdouble height, GLint slices, GLint stacks);
+extern void ( GLAPIENTRY *qgluDeleteNurbsRenderer)(GLUnurbs *nurb);
+extern void ( GLAPIENTRY *qgluDeleteQuadric)( GLUquadric *quad);
+extern void ( GLAPIENTRY *qgluDeleteTess)( GLUtesselator *tess);
+extern void ( GLAPIENTRY *qgluDisk)( GLUquadric *quad, GLdouble inner, GLdouble outer, GLint slices, GLint loops);
+extern void ( GLAPIENTRY *qgluEndCurve)(GLUnurbs *nurb);
+extern void ( GLAPIENTRY *qgluEndPolygon)( GLUtesselator *tess);
+extern void ( GLAPIENTRY *qgluEndSurface)(GLUnurbs *nurb);
+extern void ( GLAPIENTRY *qgluEndTrim)(GLUnurbs *nurb);
+extern const GLubyte (* GLAPIENTRY qgluErrorString)( GLenum error);
+extern void ( GLAPIENTRY *qgluGetNurbsProperty)(GLUnurbs *nurb, GLenum property, GLfloat* data);
+extern const GLubyte (* GLAPIENTRY qgluGetString)( GLenum name);
+extern void ( GLAPIENTRY *qgluGetTessProperty)( GLUtesselator *tess, GLenum which, GLdouble* data);
+extern void ( GLAPIENTRY *qgluLoadSamplingMatrices)(GLUnurbs *nurb, const GLfloat *model, const GLfloat *perspective, const GLint *view);
+extern void ( GLAPIENTRY *qgluLookAt)( GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ, GLdouble centerX, GLdouble centerY, GLdouble centerZ, GLdouble upX, GLdouble upY, GLdouble upZ);
+extern GLUnurbs (* GLAPIENTRY qgluNewNurbsRenderer)( void );
+extern GLUquadric (* GLAPIENTRY qgluNewQuadric)( void );
+extern GLUtesselator (*GLAPIENTRY qgluNewTess)( void );
+extern void ( GLAPIENTRY *qgluNextContour)( GLUtesselator *tess, GLenum type);
+extern void ( GLAPIENTRY *qgluNurbsCallback)(GLUnurbs *nurb, GLenum which, _GLUfuncptr CallBackFunc);
+extern void ( GLAPIENTRY *qgluNurbsCallbackData)(GLUnurbs *nurb, GLvoid* userData);
+extern void ( GLAPIENTRY *qgluNurbsCallbackDataEXT)(GLUnurbs *nurb, GLvoid* userData);
+extern void ( GLAPIENTRY *qgluNurbsCurve)(GLUnurbs *nurb, GLint knotCount, GLfloat *knots, GLint stride, GLfloat *control, GLint order, GLenum type);
+extern void ( GLAPIENTRY *qgluNurbsProperty)(GLUnurbs *nurb, GLenum property, GLfloat value);
+extern void ( GLAPIENTRY *qgluNurbsSurface)(GLUnurbs *nurb, GLint sKnotCount, GLfloat* sKnots, GLint tKnotCount, GLfloat* tKnots, GLint sStride, GLint tStride, GLfloat* control, GLint sOrder, GLint tOrder, GLenum type);
+extern void ( GLAPIENTRY *qgluOrtho2D)( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top);
+extern void ( GLAPIENTRY *qgluPartialDisk)( GLUquadric *quad, GLdouble inner, GLdouble outer, GLint slices, GLint loops, GLdouble start, GLdouble sweep);
+extern void ( GLAPIENTRY *qgluPerspective)( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
+extern void ( GLAPIENTRY *qgluPickMatrix)( GLdouble x, GLdouble y, GLdouble delX, GLdouble delY, GLint *viewport);
+GLAPI GLint ( GLAPIENTRY qgluProject)( GLdouble objX, GLdouble objY, GLdouble objZ, const GLdouble *model, const GLdouble *proj, const GLint *view, GLdouble* winX, GLdouble* winY, GLdouble* winZ);
+extern void ( GLAPIENTRY *qgluPwlCurve)(GLUnurbs *nurb, GLint count, GLfloat* data, GLint stride, GLenum type);
+extern void ( GLAPIENTRY *qgluQuadricCallback)( GLUquadric *quad, GLenum which, _GLUfuncptr CallBackFunc);
+extern void ( GLAPIENTRY *qgluQuadricDrawStyle)( GLUquadric *quad, GLenum draw );
+extern void ( GLAPIENTRY *qgluQuadricNormals)( GLUquadric *quad, GLenum normal);
+extern void ( GLAPIENTRY *qgluQuadricOrientation)( GLUquadric *quad, GLenum orientation);
+extern void ( GLAPIENTRY *qgluQuadricTexture)( GLUquadric *quad, GLboolean texture);
+extern GLint( GLAPIENTRY qgluScaleImage)( GLenum format, GLsizei wIn, GLsizei hIn, GLenum typeIn, const void *dataIn, GLsizei wOut, GLsizei hOut, GLenum typeOut, GLvoid *dataOut );
+extern void ( GLAPIENTRY *qgluSphere)( GLUquadric *quad, GLdouble radius, GLint slices, GLint stacks);
+extern void ( GLAPIENTRY *qgluTessBeginContour)( GLUtesselator *tess);
+extern void ( GLAPIENTRY *qgluTessBeginPolygon)( GLUtesselator *tess, GLvoid* data);
+extern void ( GLAPIENTRY *qgluTessCallback)( GLUtesselator *tess, GLenum which, _GLUfuncptr CallBackFunc);
+extern void ( GLAPIENTRY *qgluTessEndContour)( GLUtesselator *tess);
+extern void ( GLAPIENTRY *qgluTessEndPolygon)( GLUtesselator *tess);
+extern void ( GLAPIENTRY *qgluTessNormal)( GLUtesselator *tess, GLdouble valueX, GLdouble valueY, GLdouble valueZ);
+extern void ( GLAPIENTRY *qgluTessProperty)( GLUtesselator *tess, GLenum which, GLdouble data);
+extern void ( GLAPIENTRY *qgluTessVertex)( GLUtesselator *tess, GLdouble *location, GLvoid* data);
+extern GLint ( GLAPIENTRY qgluUnProject)( GLdouble winX, GLdouble winY, GLdouble winZ, const GLdouble *model, const GLdouble *proj, const GLint *view, GLdouble *objX, GLdouble *objY, GLdouble *objZ );
+extern GLint ( GLAPIENTRY qgluUnProject4)( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble clipW, const GLdouble *model, const GLdouble *proj, const GLint *view, GLdouble nearVal, GLdouble farVal, GLdouble *objX, GLdouble *objY, GLdouble *objZ, GLdouble *objW );
+
+extern void ( APIENTRY * qglSetTexCacheDefault2DImageId )( int id);
+extern void ( APIENTRY * qglSetTexCacheDefaultCubeImageId )( int id);
+extern  GLboolean ( APIENTRY * qglTexImageExistsInBundles )( unsigned long texNameCRC32 );
 extern  void ( APIENTRY * qglTexImageFromCache )( int id, unsigned long texNameCRC32 );
 
 // capture backbuffer to memory
-extern void xglCapture( int width, int height, void * RESTRICT pixels );
+extern void qxglCapture( int width, int height, void * RESTRICT pixels );
 
 // allow us to directly use the results of resolving from the EDRAM rendertarget as texture.
 extern void ( APIENTRY * qglTexImageFromFrontBuffer )( void );
 
-#endif	// hardlinlk vs dlopen
-
-#endif
+typedef byte				GLubyte;
+typedef float				GLfloat;
+typedef unsigned char		GLubyte8;		// 8-bit unsigned integer
+typedef unsigned short		GLuint16;		// 16-bit unsigned integer
+typedef unsigned int		GLuint32;		// 32-bit unsigned integer
+typedef unsigned long long	GLuint64;		// 64-bit unsigned integer
+typedef signed char			GLbyte;		// 8-bit signed integer
+typedef signed short		GLshort16;		// 16-bit signed integer
+typedef signed int			GLint32;		// 32-bit signed integer
+typedef signed long long	GLint64;		// 64-bit signed integer
+typedef float				GLfloat32;		// 32-bit floating-point number
+typedef double				GLfloat64;		// 64-bit floating-point number
+typedef unsigned int		GLenum;
+typedef unsigned char		GLboolean;
+typedef bool				GLbool;
+typedef unsigned int		GLbitfield;
+typedef void				GLvoid;
+typedef signed char			GLbyte;		// 1-byte signed
+typedef short				GLshort;	// 2-byte signed
+typedef int					GLint;		// 4-byte signed
+typedef unsigned char		GLubyte;	// 1-byte unsigne
+typedef unsigned short		GLushort;	// 2-byte unsigned
+typedef unsigned int		GLuint;		// 4-byte unsigned
+typedef int					GLsizei;	// 4-byte signed
+typedef float				GLfloat;	// single precision float
+typedef float				GLclampf;	// single precision float in [0,1]
+typedef double				GLdouble;	// double precision float
+typedef double				GLclampd;	// double precision float in [0,1]
+typedef unsigned char		byte

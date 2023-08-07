@@ -29,7 +29,7 @@ public:
 	void						OptimizeForTracing( const float traceFraction = 1.f );
 
 								// intersection point is start + dir * scale
-	bool						RayIntersection( /*arcList< int >& tracedTris,*/ const anVec3 &start, const anVec3 &dir, float &scale, anDrawVertex& dv, bool backFaceCull = false ) const;
+	bool						RayIntersection( /*anList< int >& tracedTris,*/ const anVec3 &start, const anVec3 &dir, float &scale, anDrawVertex& dv, bool backFaceCull = false ) const;
 
 protected:
 	class TraceableTriHash {
@@ -48,7 +48,7 @@ protected:
 							~TraceableTriHash( void );
 
 		const anBounds&		GetBounds( void ) const { return bounds; }
-		hashBin_t*			GetHashBin( const anVec3& point );
+		hashBin_t*			GetHashBin( const anVec3 &point );
 
 	private:
 		int					binsPerAxis;
@@ -57,8 +57,8 @@ protected:
 
 		hashBin_t *			bins;
 		anVec3				scale;
-		int					intMins[ 3 ];
-		int					intScale[ 3 ];
+		int					intMins[3];
+		int					intScale[3];
 
 		anBlockAlloc< hashTriangle_t, 128 >	triangleAllocator;
 
@@ -78,7 +78,7 @@ protected:
 
 protected:
 	void						GenerateHash( void );
-	void						GenerateIntersectionDrawVert( const anVec3& intersection, const int intersectedTriIndex, anDrawVertex& dv ) const;
+	void						GenerateIntersectionDrawVert( const anVec3 &intersection, const int intersectedTriIndex, anDrawVertex& dv ) const;
 };
 
 /*
@@ -86,7 +86,7 @@ protected:
 anSurface_Traceable::TraceableTriHash::~TraceableTriHash
 ====================
 */
-ARC_INLINE anSurface_Traceable::TraceableTriHash::~TraceableTriHash( void ) {
+inline anSurface_Traceable::TraceableTriHash::~TraceableTriHash( void ) {
 	delete [] bins;
 	triangleAllocator.Shutdown();
 }
@@ -96,8 +96,8 @@ ARC_INLINE anSurface_Traceable::TraceableTriHash::~TraceableTriHash( void ) {
 anSurface_Traceable::TraceableTriHash::GetHashBin
 ====================
 */
-ARC_INLINE anSurface_Traceable::TraceableTriHash::hashBin_t* anSurface_Traceable::TraceableTriHash::GetHashBin( const anVec3& point ) {
-	int block[ 3 ];
+inline anSurface_Traceable::TraceableTriHash::hashBin_t* anSurface_Traceable::TraceableTriHash::GetHashBin( const anVec3 &point ) {
+	int block[3];
 
 	// snap the point to integral values
 	for ( int i = 0; i < 3; i++ ) {
@@ -110,7 +110,7 @@ ARC_INLINE anSurface_Traceable::TraceableTriHash::hashBin_t* anSurface_Traceable
 		}
 	}
 
-	return &bins[ BinIndex( block[ 0 ], block[ 1 ], block[ 2 ] ) ];
+	return &bins[ BinIndex( block[0], block[1], block[2] ) ];
 }
 
 /*
@@ -118,7 +118,7 @@ ARC_INLINE anSurface_Traceable::TraceableTriHash::hashBin_t* anSurface_Traceable
 anSurface_Traceable::anSurface_Traceable
 ====================
 */
-ARC_INLINE anSurface_Traceable::anSurface_Traceable( void ) :
+inline anSurface_Traceable::anSurface_Traceable( void ) :
 	hash( nullptr ),
 	traceCount( 0 ),
 	triPlanes( nullptr ),
@@ -131,7 +131,7 @@ ARC_INLINE anSurface_Traceable::anSurface_Traceable( void ) :
 anSurface_Traceable::~anSurface_Traceable
 ====================
 */
-ARC_INLINE anSurface_Traceable::~anSurface_Traceable( void ) {
+inline anSurface_Traceable::~anSurface_Traceable( void ) {
 	delete hash;
 	delete [] triPlanes;
 	delete [] lastTriTrace;
@@ -142,7 +142,7 @@ ARC_INLINE anSurface_Traceable::~anSurface_Traceable( void ) {
 anSurface_Traceable::GetBounds
 ====================
 */
-ARC_INLINE const anBounds& anSurface_Traceable::GetBounds( void ) {
+inline const anBounds& anSurface_Traceable::GetBounds( void ) {
 	if ( bounds.IsCleared() ) {
 		//SIMDProcessor->MinMax( bounds[0], bounds[1], verts.Begin(), indexes.Begin(), indexes.Num() );
 	}
@@ -155,7 +155,7 @@ ARC_INLINE const anBounds& anSurface_Traceable::GetBounds( void ) {
 anSurface_Traceable::SetTraceFraction
 ====================
 */
-ARC_INLINE void anSurface_Traceable::SetTraceFraction( const float traceFraction ) {
+inline void anSurface_Traceable::SetTraceFraction( const float traceFraction ) {
 	traceDist = 0.f;
 
 	// the traceDist will be the traceFrac times the largest bounds axis
@@ -173,7 +173,7 @@ ARC_INLINE void anSurface_Traceable::SetTraceFraction( const float traceFraction
 anSurface_Traceable::OptimizeForTracing
 ====================
 */
-ARC_INLINE void anSurface_Traceable::OptimizeForTracing( const float traceFraction ) {
+inline void anSurface_Traceable::OptimizeForTracing( const float traceFraction ) {
 	delete hash;
 	delete [] triPlanes;
 	delete [] lastTriTrace;
@@ -317,31 +317,31 @@ private:
 };
 
 
-ARC_INLINE anTraceModel::anTraceModel( void ) {
+inline anTraceModel::anTraceModel( void ) {
 	type = TRM_INVALID;
 	numVerts = numEdges = numPolys = 0;
 	bounds.Zero();
 }
 
-ARC_INLINE anTraceModel::anTraceModel( const anBounds &boxBounds ) {
+inline anTraceModel::anTraceModel( const anBounds &boxBounds ) {
 	InitBox();
 	SetupBox( boxBounds );
 }
 
-ARC_INLINE anTraceModel::anTraceModel( const anBounds &cylBounds, const int numSides ) {
+inline anTraceModel::anTraceModel( const anBounds &cylBounds, const int numSides ) {
 	SetupCylinder( cylBounds, numSides );
 }
 
-ARC_INLINE anTraceModel::anTraceModel( const float length, const float width ) {
+inline anTraceModel::anTraceModel( const float length, const float width ) {
 	InitBone();
 	SetupBone( length, width );
 }
 
-ARC_INLINE bool anTraceModel::operator==( const anTraceModel &trm ) const {
+inline bool anTraceModel::operator==( const anTraceModel &trm ) const {
 	return Compare( trm );
 }
 
-ARC_INLINE bool anTraceModel::operator!=( const anTraceModel &trm ) const {
+inline bool anTraceModel::operator!=( const anTraceModel &trm ) const {
 	return !Compare( trm );
 }
 

@@ -120,7 +120,7 @@ bool anBasePlayerStart::ClientReceiveEvent( int event, int time, const anBitMsg 
 		}
 		case EVENT_TELEPORTITEM: {
 			entityNumber = msg.ReadBits( GENTITYNUM_BITS );
-			anEntity* activator = gameLocal.entities[ entityNumber ];
+			anEntity *activator = gameLocal.entities[ entityNumber ];
 
 			if ( activator != nullptr ) {
 				Event_TeleportEntity( activator, false );
@@ -212,14 +212,14 @@ anBasePlayerStart::Teleport
 For non-players
 ================
 */
-void anBasePlayerStart::Teleport( anEntity* other ) {
+void anBasePlayerStart::Teleport( anEntity *other ) {
 	other->SetOrigin( GetPhysics()->GetOrigin() );
 	anVec3 vel = other->GetPhysics()->GetLinearVelocity();
 	vel *= GetPhysics()->GetAxis();
 	other->GetPhysics()->SetLinearVelocity( vel );
 }
 
-void anBasePlayerStart::Event_TeleportEntity( anEntity* activator, bool predicted, anVec3& prevOrigin ) {
+void anBasePlayerStart::Event_TeleportEntity( anEntity *activator, bool predicted, anVec3 &prevOrigin ) {
 	anBasePlayer *player;
 
 	if ( activator->IsType( anBasePlayer::GetClassType() ) ) {
@@ -352,12 +352,12 @@ void idActivator::Spawn( void ) {
 	if ( spawnArgs.GetString( "clipmodel", "", &temp ) ) {
 
 // mwhitlock: Dynamic memory consolidation
-		PUSH_HEAP_MEM(this);
+		PushHeapMemory(this);
 
 		GetPhysics()->SetClipModel( new anClipModel(temp), 1.0f );
 
 // mwhitlock: Dynamic memory consolidation
-		POP_HEAP();
+		PopSystemHeap();
 
 	} else {
 		GetPhysics()->SetClipBox( anBounds( vec3_origin ).Expand( 4 ), 1.0f );
@@ -546,7 +546,7 @@ idDamagable::Restore
 */
 void idDamagable::Restore( anRestoreGame *savefile ) {
 
-	const char* stageName;
+	const char *stageName;
 
 	savefile->ReadInt( invincibleTime );
 
@@ -576,7 +576,7 @@ idDamagable::Spawn
 ================
 */
 void idDamagable::Spawn( void ) {
-	anString	broken;
+	anStr	broken;
 	bool	keepContents;
 
 
@@ -606,7 +606,7 @@ void idDamagable::Spawn( void ) {
 	// make sure the model gets cached
 	spawnArgs.GetString( "broken", "", broken );
 	if ( broken.Length() && !renderModelManager->CheckModel( broken ) ) {
-		gameLocal.Error( "idDamagable '%s' at (%s): cannot load broken model '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), broken.c_str() );
+		gameLocal.Error( "idDamagable '%s' at (%s): cannot load broken model '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), broken.c_str() );
 	}
 
 
@@ -649,7 +649,7 @@ void idDamagable::BecomeBroken( anEntity *activator ) {
 		}
 	}
 
-	anString	broken;
+	anStr	broken;
 
 	spawnArgs.GetString( "broken", "", broken );
 	if ( broken.Length() ) {
@@ -700,7 +700,7 @@ void idDamagable::Damage( anEntity *inflictor, anEntity *attacker, const anVec3 
 	}
 
 	// If there is a damage filter we need to check to see if the damage def meets the requirement
-	const char* damageFilter;
+	const char *damageFilter;
 	if ( spawnArgs.GetString ( "damage_filter", "", &damageFilter ) && *damageFilter ) {
 		const anDict *damageDef = gameLocal.FindEntityDefDict( damageDefName, false );
 		if ( !damageDef ) {
@@ -763,7 +763,7 @@ void idDamagable::UpdateStage ( void ) {
 			activateStageOnTrigger = false;
 
 			// Get the stage name, if there is none then there are no more stages
-			const char* stageName;
+			const char *stageName;
 			if ( !spawnArgs.GetString ( va( "def_stage%d", stage ), "", &stageName ) || !stageName ) {
 				stage = 0;
 				break;
@@ -877,13 +877,13 @@ void idDamagable::ExecuteStage ( void ) {
 	}
 
 	// Switch model?
-	const char* model;
+	const char *model;
 	if ( stageDict->GetString ( "model", "", &model ) && *model ) {
 		SetModel( model );
 	}
 
 	// Skin?
-	const char* skin;
+	const char *skin;
 	if ( stageDict->GetString ( "skin", "", &skin ) && *skin ) {
 		renderEntity.customSkin = declManager->FindSkin ( skin, false );
 	}
@@ -904,7 +904,7 @@ void idDamagable::ExecuteStage ( void ) {
 idDamagable::GetStageVector
 ================
 */
-anVec3 idDamagable::GetStageVector ( const char* key, const char* defaultString ) const {
+anVec3 idDamagable::GetStageVector ( const char *key, const char *defaultString ) const {
 	anVec3 mins;
 	if ( stageDict->GetVector ( va( "%s_min", key ), "", mins ) ) {
 		anVec3 maxs;
@@ -920,7 +920,7 @@ anVec3 idDamagable::GetStageVector ( const char* key, const char* defaultString 
 idDamagable::GetStageFloat
 ================
 */
-float idDamagable::GetStageFloat	( const char* key, const char* defaultString ) const {
+float idDamagable::GetStageFloat	( const char *key, const char *defaultString ) const {
 	float minValue;
 	if ( stageDict->GetFloat ( va( "%s_min", key ), "", minValue ) ) {
 		float maxValue;
@@ -936,7 +936,7 @@ float idDamagable::GetStageFloat	( const char* key, const char* defaultString ) 
 idDamagable::GetStageInt
 ================
 */
-int idDamagable::GetStageInt	( const char* key, const char* defaultString ) const {
+int idDamagable::GetStageInt	( const char *key, const char *defaultString ) const {
 	int minValue;
 	if ( stageDict->GetInt ( va( "%s_min", key ), "", minValue ) ) {
 		int maxValue;
@@ -1076,7 +1076,7 @@ idSpring::Event_LinkSpring
 ================
 */
 void idSpring::Event_LinkSpring( void ) {
-	anString name1, name2;
+	anStr name1, name2;
 
 	spawnArgs.GetString( "ent1", "", name1 );
 	spawnArgs.GetString( "ent2", "", name2 );
@@ -1084,7 +1084,7 @@ void idSpring::Event_LinkSpring( void ) {
 	if ( name1.Length() ) {
 		ent1 = gameLocal.FindEntity( name1 );
 		if ( !ent1 ) {
-			gameLocal.Error( "idSpring '%s' at (%s): cannot find first entity '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), name1.c_str() );
+			gameLocal.Error( "idSpring '%s' at (%s): cannot find first entity '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), name1.c_str() );
 		}
 	}
 	else {
@@ -1094,7 +1094,7 @@ void idSpring::Event_LinkSpring( void ) {
 	if ( name2.Length() ) {
 		ent2 = gameLocal.FindEntity( name2 );
 		if ( !ent2 ) {
-			gameLocal.Error( "idSpring '%s' at (%s): cannot find second entity '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), name2.c_str() );
+			gameLocal.Error( "idSpring '%s' at (%s): cannot find second entity '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), name2.c_str() );
 		}
 	}
 	else {
@@ -1249,12 +1249,12 @@ void anForceField::Spawn( void ) {
 	// set the collision model on the force field
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_HEAP_MEM(this);
+	PushHeapMemory(this);
 
 	forceField.SetClipModel( new anClipModel( GetPhysics()->GetClipModel() ) );
 
 // mwhitlock: Dynamic memory consolidation
-	POP_HEAP();
+	PopSystemHeap();
 
 	forceField.SetOwner( this );
 	// remove the collision model from the physics object
@@ -1342,7 +1342,7 @@ void rvJumpPad::Think( void ) {
 		if ( forceField.GetLastApplyTime() - lastEffectTime > JUMPPAD_EFFECT_DELAY ) {
 			// start locally
 			StartSound( "snd_jump", SND_CHANNEL_ITEM, 0, false, nullptr );
-			if ( spawnArgs.GetString( "fx_jump" )[ 0 ] ) {
+			if ( spawnArgs.GetString( "fx_jump" )[0] ) {
 				PlayEffect( "fx_jump", renderEntity.origin, effectAxis, false, vec3_origin, false );
 			}
 
@@ -1383,7 +1383,7 @@ void rvJumpPad::Event_FindTargets( void ) {
 	FindTargets();
 	RemoveNullTargets();
 	if ( targets.Num() ) {
-		anEntity* ent;
+		anEntity *ent;
 		ent = targets[0].GetEntity();
 		assert( ent );
 
@@ -1431,7 +1431,7 @@ rvJumpPad::ClientReceiveEvent
 bool rvJumpPad::ClientReceiveEvent( int event, int time, const anBitMsg &msg ) {
 	switch ( event ) {
 	case EVENT_JUMPFX: {
-		if ( spawnArgs.GetString( "fx_jump" )[ 0 ] ) {
+		if ( spawnArgs.GetString( "fx_jump" )[0] ) {
 			PlayEffect( "fx_jump", renderEntity.origin, effectAxis, false, vec3_origin, false );
 		}
 		StartSound( "snd_jump", SND_CHANNEL_ITEM, 0, false, nullptr );
@@ -1498,8 +1498,8 @@ idAnimated::idAnimated() {
 	activated = false;
 	combatModel = nullptr;
 	activator = nullptr;
-	current_anim_index = 0;
-	num_anims = 0;
+	currentAnimIndex = 0;
+	numAnims = 0;
 
 // bdube: script control
 	scriptThread = nullptr;
@@ -1532,8 +1532,8 @@ idAnimated::Save
 void idAnimated::Save( anSaveGame *savefile ) const {
 	int		i;
 
-	savefile->WriteInt( num_anims );
-	savefile->WriteInt( current_anim_index );
+	savefile->WriteInt( numAnims );
+	savefile->WriteInt( currentAnimIndex );
 	savefile->WriteInt( anim );
 	savefile->WriteInt( blendFrames );
 	savefile->WriteJoint( soundJoint );
@@ -1558,8 +1558,8 @@ idAnimated::Restore
 void idAnimated::Restore( anRestoreGame *savefile ) {
 	int		i;
 
-	savefile->ReadInt( num_anims );
-	savefile->ReadInt( current_anim_index );
+	savefile->ReadInt( numAnims );
+	savefile->ReadInt( currentAnimIndex );
 	savefile->ReadInt( anim );
 	savefile->ReadInt( blendFrames );
 	savefile->ReadJoint( soundJoint );
@@ -1582,7 +1582,7 @@ idAnimated::Spawn
 ================
 */
 void idAnimated::Spawn( void ) {
-	anString		animname;
+	anStr		animname;
 	int			anim2;
 	float		wait;
 	const char	*joint;
@@ -1590,7 +1590,7 @@ void idAnimated::Spawn( void ) {
 	joint = spawnArgs.GetString( "sound_bone", "origin" );
 	soundJoint = animator.GetJointHandle( joint );
 	if ( soundJoint == INVALID_JOINT ) {
-		gameLocal.Warning( "idAnimated '%s' at (%s): cannot find joint '%s' for sound playback", name.c_str(), GetPhysics()->GetOrigin().ToString(0), joint );
+		gameLocal.Warning( "idAnimated '%s' at (%s): cannot find joint '%s' for sound playback", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), joint );
 	}
 
 	LoadAF( nullptr );
@@ -1599,12 +1599,12 @@ void idAnimated::Spawn( void ) {
 	if ( spawnArgs.GetBool( "combatModel", "0" ) ) {
 
 // mwhitlock: Dynamic memory consolidation
-		PUSH_HEAP_MEM(this);
+		PushHeapMemory(this);
 
 		combatModel = new anClipModel( modelDefHandle );
 
 // mwhitlock: Dynamic memory consolidation
-		POP_HEAP();
+		PopSystemHeap();
 
 	}
 
@@ -1618,7 +1618,7 @@ void idAnimated::Spawn( void ) {
 
 // bdube: script control
 	// setup script object
-	const char* scriptObjectName;
+	const char *scriptObjectName;
 	if ( spawnArgs.GetString( "scriptobject", nullptr, &scriptObjectName ) ) {
 		if ( !scriptObject.SetType( scriptObjectName ) ) {
 			gameLocal.Error( "Script object '%s' not found on entity '%s'.", scriptObjectName, name.c_str() );
@@ -1634,12 +1634,12 @@ void idAnimated::Spawn( void ) {
 			// start a thread that will initialize after Spawn is done being called
 
 // mwhitlock: Dynamic memory consolidation
-			PUSH_HEAP_MEM(this);
+			PushHeapMemory(this);
 
 			scriptThread = new anThread();
 
 // mwhitlock: Dynamic memory consolidation
-			POP_HEAP();
+			PopSystemHeap();
 
 			scriptThread->ManualDelete();
 			scriptThread->ManualControl();
@@ -1654,31 +1654,31 @@ void idAnimated::Spawn( void ) {
 	}
 
 
-	current_anim_index = 0;
-	spawnArgs.GetInt( "num_anims", "0", num_anims );
+	currentAnimIndex = 0;
+	spawnArgs.GetInt( "numAnims", "0", numAnims );
 
 	blendFrames = spawnArgs.GetInt( "blend_in" );
 
-	animname = spawnArgs.GetString( num_anims ? "anim1" : "anim" );
+	animname = spawnArgs.GetString( numAnims ? "anim1" : "anim" );
 	if ( !animname.Length() ) {
 		anim = 0;
 	} else {
 		anim = animator.GetAnim( animname );
 		if ( !anim ) {
-			gameLocal.Error( "idAnimated '%s' at (%s): cannot find anim '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), animname.c_str() );
+			gameLocal.Error( "idAnimated '%s' at (%s): cannot find anim '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), animname.c_str() );
 		}
 	}
 
 	if ( spawnArgs.GetBool( "hide" ) ) {
 		Hide();
 
-		if ( !num_anims ) {
+		if ( !numAnims ) {
 			blendFrames = 0;
 		}
 	} else if ( spawnArgs.GetString( "start_anim", "", animname ) ) {
 		anim2 = animator.GetAnim( animname );
 		if ( !anim2 ) {
-			gameLocal.Error( "idAnimated '%s' at (%s): cannot find anim '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), animname.c_str() );
+			gameLocal.Error( "idAnimated '%s' at (%s): cannot find anim '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), animname.c_str() );
 		}
 		animator.CycleAnim( ANIMCHANNEL_ALL, anim2, gameLocal.time, 0 );
 	} else if ( anim ) {
@@ -1688,7 +1688,7 @@ void idAnimated::Spawn( void ) {
 		animator.SetFrame( ANIMCHANNEL_ALL, anim, frameBlend );
 
 
-		if ( !num_anims ) {
+		if ( !numAnims ) {
 			blendFrames = 0;
 		}
 	}
@@ -1705,8 +1705,8 @@ void idAnimated::Spawn( void ) {
 idAnimated::LoadAF
 ===============
 */
-bool idAnimated::LoadAF( const char* keyname ) {
-	anString fileName;
+bool idAnimated::LoadAF( const char *keyname ) {
+	anStr fileName;
 
 	if ( !keyname || !*keyname ) {
 		keyname = "ragdoll";
@@ -1765,20 +1765,20 @@ void idAnimated::PlayNextAnim( void ) {
 	int len;
 	int cycle;
 
-	if ( current_anim_index >= num_anims ) {
+	if ( currentAnimIndex >= numAnims ) {
 		Hide();
 		if ( spawnArgs.GetBool( "remove" ) ) {
 			PostEventMS( &EV_Remove, 0 );
 		} else {
-			current_anim_index = 0;
+			currentAnimIndex = 0;
 		}
 		return;
 	}
 
 	Show();
-	current_anim_index++;
+	currentAnimIndex++;
 
-	spawnArgs.GetString( va( "anim%d", current_anim_index ), nullptr, &animname );
+	spawnArgs.GetString( va( "anim%d", currentAnimIndex ), nullptr, &animname );
 	if ( !animname ) {
 		anim = 0;
 		animator.Clear( ANIMCHANNEL_ALL, gameLocal.time, FRAME2MS( blendFrames ) );
@@ -1792,11 +1792,11 @@ void idAnimated::PlayNextAnim( void ) {
 	}
 
 	if ( g_debugCinematic.GetBool() ) {
-		gameLocal.Printf( "%d: '%s' start anim '%s'\n", gameLocal.framenum, GetName(), animname );
+		gameLocal.Printf( "%d: '%s' start anim '%s'\n", gameLocal.frameNum, GetName(), animname );
 	}
 
 	spawnArgs.GetInt( "cycle", "1", cycle );
-	if ( ( current_anim_index == num_anims ) && spawnArgs.GetBool( "loop_last_anim" ) ) {
+	if ( ( currentAnimIndex == numAnims ) && spawnArgs.GetBool( "loop_last_anim" ) ) {
 		cycle = -1;
 	}
 
@@ -1805,7 +1805,7 @@ void idAnimated::PlayNextAnim( void ) {
 
 	len = animator.CurrentAnim( ANIMCHANNEL_ALL )->PlayLength();
 	if ( len >= 0 ) {
-		PostEventMS( &EV_AnimDone, len, current_anim_index );
+		PostEventMS( &EV_AnimDone, len, currentAnimIndex );
 	}
 
 	// offset the start time of the shader to sync it to the game time
@@ -1834,10 +1834,10 @@ idAnimated::Event_AnimDone
 void idAnimated::Event_AnimDone( int animindex ) {
 	if ( g_debugCinematic.GetBool() ) {
 		const idAnim *animPtr = animator.GetAnim( anim );
-		gameLocal.Printf( "%d: '%s' end anim '%s'\n", gameLocal.framenum, GetName(), animPtr ? animPtr->Name() : "" );
+		gameLocal.Printf( "%d: '%s' end anim '%s'\n", gameLocal.frameNum, GetName(), animPtr ? animPtr->Name() : "" );
 	}
 
-	if ( ( animindex >= num_anims ) && spawnArgs.GetBool( "remove" ) ) {
+	if ( ( animindex >= numAnims ) && spawnArgs.GetBool( "remove" ) ) {
 		Hide();
 		PostEventMS( &EV_Remove, 0 );
 	} else if ( spawnArgs.GetBool( "auto_advance" ) ) {
@@ -1863,7 +1863,7 @@ void idAnimated::Event_Activate( anEntity *_activator ) {
 	}
 
 
-	if ( num_anims ) {
+	if ( numAnims ) {
 		PlayNextAnim();
 		activator = _activator;
 		return;
@@ -1890,7 +1890,7 @@ void idAnimated::Event_Start( void ) {
 
 	Show();
 
-	if ( num_anims ) {
+	if ( numAnims ) {
 		PlayNextAnim();
 		return;
 	}
@@ -1898,7 +1898,7 @@ void idAnimated::Event_Start( void ) {
 	if ( anim ) {
 		if ( g_debugCinematic.GetBool() ) {
 			const idAnim *animPtr = animator.GetAnim( anim );
-			gameLocal.Printf( "%d: '%s' start anim '%s'\n", gameLocal.framenum, GetName(), animPtr ? animPtr->Name() : "" );
+			gameLocal.Printf( "%d: '%s' start anim '%s'\n", gameLocal.frameNum, GetName(), animPtr ? animPtr->Name() : "" );
 		}
 		spawnArgs.GetInt( "cycle", "1", cycle );
 		animator.CycleAnim( ANIMCHANNEL_ALL, anim, gameLocal.time, FRAME2MS( blendFrames ) );
@@ -1946,7 +1946,7 @@ void idAnimated::Event_LaunchMissilesUpdate( int launchjoint, int targetjoint, i
 	projectilename = spawnArgs.GetString( "projectilename" );
 	projectileDef = gameLocal.FindEntityDefDict( projectilename, false );
 	if ( !projectileDef ) {
-		gameLocal.Warning( "idAnimated '%s' at (%s): 'launchMissiles' called with unknown projectile '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), projectilename );
+		gameLocal.Warning( "idAnimated '%s' at (%s): 'launchMissiles' called with unknown projectile '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), projectilename );
 		return;
 	}
 
@@ -1974,7 +1974,7 @@ void idAnimated::Event_LaunchMissilesUpdate( int launchjoint, int targetjoint, i
 
 	if ( !ent || !ent->IsType( idProjectile::GetClassType() ) ) {
 
-		gameLocal.Error( "idAnimated '%s' at (%s): in 'launchMissiles' call '%s' is not an idProjectile", name.c_str(), GetPhysics()->GetOrigin().ToString(0), projectilename );
+		gameLocal.Error( "idAnimated '%s' at (%s): in 'launchMissiles' call '%s' is not an idProjectile", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), projectilename );
 	}
 	projectile = ( idProjectile * )ent;
 	projectile->Create( this, launchPos, dir );
@@ -1997,13 +1997,13 @@ void idAnimated::Event_LaunchMissiles( const char *projectilename, const char *s
 
 	projectileDef = gameLocal.FindEntityDefDict( projectilename, false );
 	if ( !projectileDef ) {
-		gameLocal.Warning( "idAnimated '%s' at (%s): unknown projectile '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), projectilename );
+		gameLocal.Warning( "idAnimated '%s' at (%s): unknown projectile '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), projectilename );
 		return;
 	}
 
 	launch = animator.GetJointHandle( launchjoint );
 	if ( launch == INVALID_JOINT ) {
-		gameLocal.Warning( "idAnimated '%s' at (%s): unknown launch joint '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), launchjoint );
+		gameLocal.Warning( "idAnimated '%s' at (%s): unknown launch joint '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), launchjoint );
 		gameLocal.Error( "Unknown joint '%s'", launchjoint );
 	}
 
@@ -2011,7 +2011,7 @@ void idAnimated::Event_LaunchMissiles( const char *projectilename, const char *s
 
 // bdube: invalid is ok now, it means shoot out the direction of the bone
 //	if ( target == INVALID_JOINT ) {
-//		gameLocal.Warning( "idAnimated '%s' at (%s): unknown target joint '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), targetjoint );
+//		gameLocal.Warning( "idAnimated '%s' at (%s): unknown target joint '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), targetjoint );
 //	}
 
 
@@ -2056,7 +2056,7 @@ void idAnimated::Think ( void ) {
 idAnimated::Think
 =====================
 */
-void idAnimated::Damage ( anEntity* inflictor, anEntity* attacker, const anVec3& dir, const char* damageDefName, const float damageScale, const int location ) {
+void idAnimated::Damage ( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
 	if ( !scriptThread ) {
 		return;
 	}
@@ -2124,7 +2124,7 @@ void idAnimated::Event_AnimDone2( int channel, int blend ) {
 idAnimated::Event_SetAnimState
 ===============
 */
-void idAnimated::Event_SetAnimState  ( const char* statename, int blend ) {
+void idAnimated::Event_SetAnimState  ( const char *statename, int blend ) {
 	const function_t *func;
 
 	func = scriptObject.GetFunction( statename );
@@ -2172,7 +2172,7 @@ void idAnimated::UpdateScript( void ) {
 idAnimated::CallHandler
 =====================
 */
-void idAnimated::CallHandler ( const char* handler ) {
+void idAnimated::CallHandler ( const char *handler ) {
 	const function_t *func;
 	func = scriptObject.GetFunction( handler );
 	if ( !func ) {
@@ -2301,7 +2301,7 @@ void idStaticEntity::Spawn( void ) {
 	spawnTime = gameLocal.time;
 	active = false;
 
-	anString model = spawnArgs.GetString( "model" );
+	anStr model = spawnArgs.GetString( "model" );
 	// FIXME: temp also catch obsolete .ips extension
 	if ( model.Find( ".ips" ) >= 0 || model.Find( ".prt" ) >= 0 ) {
 		// we want the parametric particles out of sync with each other
@@ -2406,7 +2406,7 @@ idStaticEntity::Event_Activate
 ================
 */
 void idStaticEntity::Event_Activate( anEntity *activator ) {
-	anString activateGui;
+	anStr activateGui;
 
 	spawnTime = gameLocal.time;
 	active = !active;
@@ -2971,7 +2971,7 @@ rvGravityArea::IsEqualTo
 */
 bool rvGravityArea::IsEqualTo( const rvGravityArea* area ) const {
 	assert( area );
-	return !anString::Icmp( GetName(), area->GetName() );
+	return !anStr::Icmp( GetName(), area->GetName() );
 }
 
 /*
@@ -3062,7 +3062,7 @@ END_CLASS
 rvGravityArea_SurfaceNormal::GetGravity
 ================
 */
-const anVec3 rvGravityArea_SurfaceNormal::GetGravity( const anVec3& origin, const anMat3& axis, int clipMask, anEntity* passEntity ) const {
+const anVec3 rvGravityArea_SurfaceNormal::GetGravity( const anVec3 &origin, const anMat3 &axis, int clipMask, anEntity *passEntity ) const {
 	trace_t results;
 
 
@@ -3080,7 +3080,7 @@ const anVec3 rvGravityArea_SurfaceNormal::GetGravity( const anVec3& origin, cons
 rvGravityArea_SurfaceNormal::GetGravity
 ================
 */
-const anVec3 rvGravityArea_SurfaceNormal::GetGravity( const anEntity* ent ) const {
+const anVec3 rvGravityArea_SurfaceNormal::GetGravity( const anEntity *ent ) const {
 	return GetGravity( ent->GetPhysics() );
 }
 
@@ -3121,7 +3121,7 @@ idLocationEntity::Spawn
 ======================
 */
 void idLocationEntity::Spawn() {
-	anString realName;
+	anStr realName;
 
 	// this just holds dict information
 
@@ -3461,12 +3461,12 @@ void idShaking::Spawn( void ) {
 	physicsObj.SetSelf( this );
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_HEAP_MEM(this);
+	PushHeapMemory(this);
 
 	physicsObj.SetClipModel( new anClipModel( GetPhysics()->GetClipModel() ), 1.0f );
 
 // mwhitlock: Dynamic memory consolidation
-	POP_HEAP();
+	PopSystemHeap();
 
 	physicsObj.SetOrigin( GetPhysics()->GetOrigin() );
 	physicsObj.SetAxis( GetPhysics()->GetAxis() );

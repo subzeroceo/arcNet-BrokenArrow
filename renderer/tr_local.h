@@ -5,7 +5,7 @@
 
 class anRenderWorldLocal;
 class anMaterial;
-class arcDeclMaterial;
+class anDeclMaterial;
 
 const int FALLOFF_TEXTURE_SIZE =	64;
 const float	DEFAULT_FOG_DISTANCE =	500.0f;
@@ -52,7 +52,7 @@ void LocalVectorToGlobal( const float modelMatrix[16], const anVec3 &in, anVec3 
 void LocalPlaneToGlobal( const float modelMatrix[16], const anPlane &in, anPlane &out );
 void TransformModelToClip( const anVec3 &src, const float *modelMatrix, const float *projectionMatrix, anPlane &eye, anPlane &dst );
 void TransformEyeZToWin( float srcZ, const float *projectionMatrix, float &dstZ );
-void GL_MultMatrix( const float *a, const float *b, float *out );
+void GL_MultMatrixAligned( const float *a, const float *b, float *out );
 static float CalcSplit( float n, float f, float i, float m );
 
 /*
@@ -84,7 +84,7 @@ typedef struct drawSurf_s {
 	vertCacheHandle_t		indexCache;			// triIndex_t
 	vertCacheHandle_t		ambientCache;		// anDrawVertex
 	vertCacheHandle_t		shadowCache;		// anShadowCache / anShadowCache
-	vertCacheHandle_t		jointCache;			// arcJointMat
+	vertCacheHandle_t		jointCache;			// anJointMat
 
 	const struct viewEntity_s *space;
 	const anMaterial		*material;			// may be nullptr for shadow volumes
@@ -206,8 +206,8 @@ public:
 	struct viewLight_s *	viewLight;
 
 	areaReference_t *		references;				// each area the light is present in will have a lightRef
-	an Interaction *		firstInteraction;		// doubly linked list
-	an Interaction *		lastInteraction;
+	anInteraction *		firstInteraction;		// doubly linked list
+	anInteraction *		lastInteraction;
 
 	struct doublePortal_s *	foggedPortals;
 };
@@ -261,8 +261,8 @@ public:
 	anRenderModelOverlay *	overlay;				// blood overlays on animated models
 
 	areaReference_t *		entityRefs;				// chain of all references
-	an Interaction *		firstInteraction;		// doubly linked list
-	an Interaction *		lastInteraction;
+	anInteraction *		firstInteraction;		// doubly linked list
+	anInteraction *		lastInteraction;
 
 	bool					needsPortalSky;
 };
@@ -438,7 +438,7 @@ typedef struct {
 typedef struct {
 	int					sphereCull, sphereClip, sphereCullOut;
 	int					boxCull, boxCullOut;
-	int					createInteractions;	// number of calls to an Interaction::CreateInteraction
+	int					createInteractions;	// number of calls to anInteraction::CreateInteraction
 	int					createLightTris;
 	int					createShadowVolumes;
 	int					generateMD5;
@@ -448,9 +448,9 @@ typedef struct {
 	int					shadowViewEntities;
 	int					viewLights;
 	int					numViews;			// number of total views rendered
-	int					deformedSurfs;		// anM8DMesh::GenerateSurface
-	int					deformedVerts;		// anM8DMesh::GenerateSurface
-	int					deformedIndexes;	// anM8DMesh::GenerateSurface
+	int					deformedSurfs;		// anMD5Mesh::GenerateSurface
+	int					deformedVerts;		// anMD5Mesh::GenerateSurface
+	int					deformedIndexes;	// anMD5Mesh::GenerateSurface
 	int					tangentIndexes;		// R_DeriveTangents()
 	int					entityUpdates, lightUpdates, entityReferences, lightReferences;
 	int					guiSurfaces;
@@ -1042,7 +1042,7 @@ void RB_DrawView( const void *data );
 
 void RB_DetermineLightScale( void );
 void RB_STD_LightScale( void );
-void RB_BeginDrawingView ( void );
+void RB_BeginDrawingView( void );
 
 /*
 ============================================================

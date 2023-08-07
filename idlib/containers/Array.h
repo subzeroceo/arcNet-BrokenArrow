@@ -36,8 +36,8 @@ public:
 	void			Memset( const char fill ) { memset( ptr, fill, numElements * sizeof( *ptr ) ); }
 
 	// array operators
-	const T_ &		operator[]( int index ) const { assert( (unsigned)index < (unsigned)numElements ); return ptr[index]; }
-	T_ &			operator[]( int index ) { assert( (unsigned)index < (unsigned)numElements ); return ptr[index]; }
+	const T_ &		operator[]( int index ) const { assert( ( unsigned )index < ( unsigned )numElements ); return ptr[index]; }
+	T_ &			operator[]( int index ) { assert( ( unsigned )index < ( unsigned )numElements ); return ptr[index]; }
 
 	// returns a pointer to the list
 	const T_ *		Ptr() const { return ptr; }
@@ -47,8 +47,11 @@ private:
 	T_				ptr[numElements];
 };
 
-#define ARRAY_COUNT( arrayName ) ( sizeof( arrayName )/sizeof( arrayName[0] ) )
-#define ARRAY_DEF( arrayName ) arrayName, ARRAY_COUNT( arrayName )
+#define ArrayCount( arrayName ) ( sizeof( arrayName )/sizeof( arrayName[0] ) )
+#define ArrayDef( arrayName ) arrayName, ArrayCount( arrayName )
+
+//#define ARRAY_COUNT( arrayName ) ( sizeof( arrayName )/sizeof( arrayName[0] ) )
+//#define ARRAY_DEF( arrayName ) arrayName, ARRAY_COUNT( arrayName )
 
 /*
 ================================================

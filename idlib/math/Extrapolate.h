@@ -56,7 +56,7 @@ anExtrapolation::anExtrapolation
 ====================
 */
 template<class type>
-ARC_INLINE anExtrapolation<type>::anExtrapolation() {
+inline anExtrapolation<type>::anExtrapolation() {
 	extrapolationType = EXTRAPOLATION_NONE;
 	startTime = duration = 0.0f;
 	memset( &startValue, 0, sizeof( startValue ) );
@@ -72,7 +72,7 @@ anExtrapolation::Init
 ====================
 */
 template<class type>
-ARC_INLINE void anExtrapolation<type>::Init( const float startTime, const float duration, const type &startValue, const type &baseSpeed, const type &speed, const extrapolation_t extrapolationType ) {
+inline void anExtrapolation<type>::Init( const float startTime, const float duration, const type &startValue, const type &baseSpeed, const type &speed, const extrapolation_t extrapolationType ) {
 	this->extrapolationType = extrapolationType;
 	this->startTime = startTime;
 	this->duration = duration;
@@ -89,7 +89,7 @@ anExtrapolation::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anExtrapolation<type>::GetCurrentValue( float time ) const {
+inline type anExtrapolation<type>::GetCurrentValue( float time ) const {
 	float deltaTime, s;
 
 	if ( time == currentTime ) {
@@ -167,7 +167,7 @@ anExtrapolation::GetCurrentSpeed
 ====================
 */
 template<class type>
-ARC_INLINE type anExtrapolation<type>::GetCurrentSpeed( float time ) const {
+inline type anExtrapolation<type>::GetCurrentSpeed( float time ) const {
 	float deltaTime, s;
 
 	if ( time < startTime || !duration ) {

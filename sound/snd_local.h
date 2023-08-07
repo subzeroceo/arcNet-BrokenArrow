@@ -185,7 +185,7 @@ public:
 				    idWaveFile( void );
 					~idWaveFile( void );
 
-    int				Open( const char* strFileName, waveformatex_t* pwfx = nullptr );
+    int				Open( const char *strFileName, waveformatex_t* pwfx = nullptr );
     int				OpenFromMemory( short* pbData, int ulDataSize, waveformatextensible_t* pwfx );
     int				Read( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead );
 	int				Seek( int offset );
@@ -217,7 +217,7 @@ private:
 private:
     int				ReadMMIO( void );
 
-    int				OpenOGG( const char* strFileName, waveformatex_t* pwfx = nullptr );
+    int				OpenOGG( const char *strFileName, waveformatex_t* pwfx = nullptr );
 	int				ReadOGG( byte* pBuffer, int dwSizeToRead, int *pdwSizeRead );
 	int				CloseOGG( void );
 };
@@ -431,7 +431,7 @@ public:
 
 };
 
-class anAudioSystemLocal : public ARCSoundEmitter {
+class anAudioSystemLocal : public anSoundEmitter {
 public:
 
 						anAudioSystemLocal( void );
@@ -544,7 +544,7 @@ typedef struct soundPortalTrace_s {
 	const struct soundPortalTrace_s	*prevStack;
 } soundPortalTrace_t;
 
-class idSoundWorldLocal : public ARCSoundWorld {
+class idSoundWorldLocal : public anSoundWorld {
 public:
 	virtual					~idSoundWorldLocal( void );
 
@@ -553,17 +553,17 @@ public:
 	virtual void			StopAllSounds( void );
 
 	// get a new emitter that can play sounds in this world
-	virtual ARCSoundEmitter *AllocSoundEmitter( void );
+	virtual anSoundEmitter *AllocSoundEmitter( void );
 
 	// for load games
-	virtual ARCSoundEmitter *EmitterForIndex( int index );
+	virtual anSoundEmitter *EmitterForIndex( int index );
 
 	// query data from all emitters in the world
 	virtual float			CurrentShakeAmplitudeForPosition( const int time, const anVec3 &listererPosition );
 
 	// where is the camera/microphone
 	// listenerId allows listener-private sounds to be added
-	virtual void			PlaceListener( const anVec3 &origin, const anMat3 &axis, const int listenerId, const int gameTime, const anString& areaName );
+	virtual void			PlaceListener( const anVec3 &origin, const anMat3 &axis, const int listenerId, const int gameTime, const anStr& areaName );
 
 	// fade all sounds in the world with a given shader soundClass
 	// to is in Db ( sigh), over is in seconds
@@ -619,7 +619,7 @@ public:
 												int current44kHz, int numSpeakers, float *finalMixBuffer );
 	void					MixLoop( int current44kHz, int numSpeakers, float *finalMixBuffer );
 	void					AVIUpdate( void );
-	void					ResolveOrigin( const int stackDepth, const soundPortalTrace_t *prevStack, const int soundArea, const float dist, const anVec3& soundOrigin, anAudioSystemLocal *def );
+	void					ResolveOrigin( const int stackDepth, const soundPortalTrace_t *prevStack, const int soundArea, const float dist, const anVec3 &soundOrigin, anAudioSystemLocal *def );
 	float					FindAmplitude( anAudioSystemLocal *sound, const int localTime, const anVec3 *listenerPosition, const s_channelType channel, bool shakesOnly );
 
 	//============================================
@@ -632,7 +632,7 @@ public:
 	int						listenerPrivateId;
 	anVec3					listenerQU;			// position in "quake units"
 	int						listenerArea;
-	anString					listenerAreaName;
+	anStr					listenerAreaName;
 	int						listenerEnvironmentID;
 
 	int						gameMsec;
@@ -646,8 +646,8 @@ public:
 
 	// avi stuff
 	anFile *				fpa[6];
-	anString					aviDemoPath;
-	anString					aviDemoName;
+	anStr					aviDemoPath;
+	anStr					aviDemoName;
 
 	anAudioSystemLocal *	localSound;		// just for playShaderDirectly()
 
@@ -704,14 +704,14 @@ public:
 	int						GetSoundDecoderInfo( int index, soundDecoderInfo_t &decoderInfo );
 
 	// if rw == nullptr, no portal occlusion or rendered debugging is available
-	virtual ARCSoundWorld	*AllocSoundWorld( anRenderWorld *rw );
+	virtual anSoundWorld	*AllocSoundWorld( anRenderWorld *rw );
 
 	// specifying nullptr will cause silence to be played
-	virtual void			SetPlayingSoundWorld( ARCSoundWorld *soundWorld );
+	virtual void			SetPlayingSoundWorld( anSoundWorld *soundWorld );
 
 	// some tools, like the sound dialog, may be used in both the game and the editor
 	// This can return nullptr, so check!
-	virtual ARCSoundWorld	*GetPlayingSoundWorld( void );
+	virtual anSoundWorld	*GetPlayingSoundWorld( void );
 
 	virtual	void			BeginLevelLoad( void );
 	virtual	void			EndLevelLoad( const char *mapString );
@@ -844,7 +844,7 @@ public:
 							idSoundSample();
 							~idSoundSample();
 
-	anString					name;						// name of the sample file
+	anStr					name;						// name of the sample file
 	ARC_TIME_T		 			timestamp;					// the most recent of all images used in creation, for reloadImages command
 
 	waveformatex_t			objectInfo;					// what are we caching
@@ -908,7 +908,7 @@ public:
 							idSoundCache();
 							~idSoundCache();
 
-	idSoundSample *			FindSound( const anString &fname, bool loadOnDemandOnly );
+	idSoundSample *			FindSound( const anStr &fname, bool loadOnDemandOnly );
 
 	const int				GetNumObjects( void ) { return listCache.Num(); }
 	const idSoundSample *	GetObject( const int index ) const;

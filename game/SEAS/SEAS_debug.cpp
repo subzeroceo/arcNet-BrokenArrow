@@ -256,8 +256,8 @@ void anSEASLocal::ShowArea( const anVec3 &origin ) const {
 	}
 
 	if ( org != origin ) {
-		anBounds bnds = file->GetSettings().boundingBoxes[ 0 ];
-		bnds[ 1 ].z = bnds[ 0 ].z;
+		anBounds bnds = file->GetSettings().boundingBoxes[0];
+		bnds[1].z = bnds[0].z;
 		gameRenderWorld->DebugBounds( colorYellow, bnds, org );
 	}
 
@@ -316,9 +316,9 @@ void anSEASLocal::DrawSimpleFace( int faceNum, bool visited ) const {
 		// need to find the first common edge so that we go form the polygon in the right direction
 		if ( file->GetVertex( edge->vertexNum[0] ) == file->GetVertex( nextEdge->vertexNum[0] ) ||
 			file->GetVertex( edge->vertexNum[0] ) == file->GetVertex( nextEdge->vertexNum[1] ) ) {
-			sides[ 0 ] = file->GetVertex( edge->vertexNum[0] );
+			sides[0] = file->GetVertex( edge->vertexNum[0] );
 		} else {
-			sides[ 0 ] = file->GetVertex( edge->vertexNum[1] );
+			sides[0] = file->GetVertex( edge->vertexNum[1] );
 		}
 
 		for ( i = 1; i < numEdges; i++ ) {
@@ -396,7 +396,7 @@ anSEASLocal::ShowAreas
 */
 void anSEASLocal::ShowAreas( const anVec3 &origin, bool ShowProblemAreas ) const {
 	int				i, areaNum;
-	idPlayer		*player;
+	anBasePlayer		*player;
 	int				*areaQueue, curArea, queueStart, queueEnd;
 	byte			*areasVisited;
 	const seasArea_t *area;
@@ -417,7 +417,7 @@ void anSEASLocal::ShowAreas( const anVec3 &origin, bool ShowProblemAreas ) const
 
 	areasVisited = (byte *) _alloca16( file->GetNumAreas() );
 	memset( areasVisited, 0, file->GetNumAreas() * sizeof( byte ) );
-	areaQueue = ( int*) _alloca16( file->GetNumAreas() * sizeof( int ) );
+	areaQueue = (int *) _alloca16( file->GetNumAreas() * sizeof( int ) );
 
 	queueStart = 0;
 	queueEnd = 1;
@@ -699,7 +699,7 @@ anSEASLocal::ShowWallEdges
 void anSEASLocal::ShowWallEdges( const anVec3 &origin ) const {
 	int i, areaNum, numEdges, edges[1024];
 	anVec3 start, end;
-	idPlayer *player;
+	anBasePlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player ) {
@@ -751,9 +751,9 @@ anSEASLocal::PullPlayer
 bool anSEASLocal::PullPlayer( const anVec3 &origin, int toAreaNum ) const {
 	int areaNum;
 	anVec3 areaCenter, dir, vel;
-	idAngles delta;
+	anAngles delta;
 	seasPath_t path;
-	idPlayer *player;
+	anBasePlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player ) {

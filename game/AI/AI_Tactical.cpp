@@ -19,7 +19,7 @@ CLASS_DECLARATION( anSAAI, rvAITactical )
 	EVENT( EV_PostSpawn,					rvAITactical::Event_PostSpawn )
 END_CLASS
 
-static const char* aiPostureString[AIPOSTURE_MAX] = {
+static const char *aiPostureString[AIPOSTURE_MAX] = {
 	"stand",				// AIPOSTURE_STAND,
 	"crouch",				// AIPOSTURE_CROUCH,
 	"cover_left",			// AIPOSTURE_STAND_COVER_LEFT,
@@ -65,11 +65,11 @@ void rvAITactical::Spawn ( void ) {
 	InitSpawnArgsVariables();
 
 	// Force a posture?
-	const char* temp;
+	const char *temp;
 	postureForce = AIPOSTURE_DEFAULT;
 	if ( spawnArgs.GetString ( "forcePosture", "", &temp ) && *temp ) {
 		for ( postureForce = AIPOSTURE_STAND; postureForce != AIPOSTURE_MAX; ((int&)postureForce)++ ) {
-			if ( !anString::Icmp ( aiPostureString[postureForce], temp ) ) {
+			if ( !anStr::Icmp ( aiPostureString[postureForce], temp ) ) {
 				break;
 			}
 		}
@@ -412,7 +412,7 @@ bool rvAITactical::CheckRelaxed ( void ) const {
 rvAITactical::GetIdleAnimName
 ================
 */
-const char* rvAITactical::GetIdleAnimName ( void ) {
+const char *rvAITactical::GetIdleAnimName ( void ) {
 	return "idle";
 }
 
@@ -539,11 +539,11 @@ void rvAITactical::OnPostureChange ( void ) {
 rvAITactical::OnSetKey
 ============
 */
-void rvAITactical::OnSetKey	( const char* key, const char* value ) {
+void rvAITactical::OnSetKey	( const char *key, const char *value ) {
 	anSAAI::OnSetKey ( key, value );
 
 /*
-	if ( !anString::Icmp ( key, "annoyed" ) ) {
+	if ( !anStr::Icmp ( key, "annoyed" ) ) {
 		playerAnnoyTime = SEC2MS( atof ( value ) );
 	}
 */
@@ -575,7 +575,7 @@ void rvAITactical::OnStopMoving	( aiMoveCommand_t oldMoveCommand ) {
 rvAITactical::CalculateShots
 ================
 */
-void rvAITactical::CalculateShots ( const char* fireAnim ) {
+void rvAITactical::CalculateShots ( const char *fireAnim ) {
 	// Random number of shots ( scale by aggression range)
 	shots = (minShots + gameLocal.random.RandomInt(maxShots-minShots+1)) * combat.aggressiveScale;
 	if ( shots > ammo ) {
@@ -670,7 +670,7 @@ stateResult_t rvAITactical::State_Torso_SetPosture ( const stateParms_t& parms )
 	};
 	switch ( parms.stage ) {
 		case STAGE_INIT: {
-			anString transAnim = va( "%s_to_%s", aiPostureString[postureCurrent], aiPostureString[postureIdeal] );
+			anStr transAnim = va( "%s_to_%s", aiPostureString[postureCurrent], aiPostureString[postureIdeal] );
 			if ( !HasAnim ( ANIMCHANNEL_TORSO, transAnim ) ) {
 				postureCurrent = postureIdeal;
 				OnPostureChange();

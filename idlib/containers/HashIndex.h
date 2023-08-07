@@ -80,7 +80,7 @@ private:
 anHashIndex::anHashIndex
 ================
 */
-ARC_INLINE anHashIndex::anHashIndex( void ) {
+inline anHashIndex::anHashIndex( void ) {
 	Init( DEFAULT_HASH_SIZE, DEFAULT_HASH_SIZE );
 }
 
@@ -89,7 +89,7 @@ ARC_INLINE anHashIndex::anHashIndex( void ) {
 anHashIndex::anHashIndex
 ================
 */
-ARC_INLINE anHashIndex::anHashIndex( const int initialHashSize, const int initialIndexSize ) {
+inline anHashIndex::anHashIndex( const int initialHashSize, const int initialIndexSize ) {
 	Init( initialHashSize, initialIndexSize );
 }
 
@@ -98,7 +98,7 @@ ARC_INLINE anHashIndex::anHashIndex( const int initialHashSize, const int initia
 anHashIndex::~anHashIndex
 ================
 */
-ARC_INLINE anHashIndex::~anHashIndex( void ) {
+inline anHashIndex::~anHashIndex( void ) {
 	Free();
 }
 
@@ -107,7 +107,7 @@ ARC_INLINE anHashIndex::~anHashIndex( void ) {
 anHashIndex::Allocated
 ================
 */
-ARC_INLINE size_t anHashIndex::Allocated( void ) const {
+inline size_t anHashIndex::Allocated( void ) const {
 	return hashSize * sizeof( int ) + indexSize * sizeof( int );
 }
 
@@ -116,7 +116,7 @@ ARC_INLINE size_t anHashIndex::Allocated( void ) const {
 anHashIndex::Size
 ================
 */
-ARC_INLINE size_t anHashIndex::Size( void ) const {
+inline size_t anHashIndex::Size( void ) const {
 	return sizeof( *this ) + Allocated();
 }
 
@@ -125,7 +125,7 @@ ARC_INLINE size_t anHashIndex::Size( void ) const {
 anHashIndex::operator=
 ================
 */
-ARC_INLINE anHashIndex &anHashIndex::operator=( const anHashIndex &other ) {
+inline anHashIndex &anHashIndex::operator=( const anHashIndex &other ) {
 	granularity = other.granularity;
 	hashMask = other.hashMask;
 	lookupMask = other.lookupMask;
@@ -162,7 +162,7 @@ ARC_INLINE anHashIndex &anHashIndex::operator=( const anHashIndex &other ) {
 anHashIndex::Add
 ================
 */
-ARC_INLINE void anHashIndex::Add( const int key, const int index ) {
+inline void anHashIndex::Add( const int key, const int index ) {
 	int h;
 
 	assert( index >= 0 );
@@ -182,7 +182,7 @@ ARC_INLINE void anHashIndex::Add( const int key, const int index ) {
 anHashIndex::Remove
 ================
 */
-ARC_INLINE void anHashIndex::Remove( const int key, const int index ) {
+inline void anHashIndex::Remove( const int key, const int index ) {
 	int k = key & hashMask;
 
 	if ( hash == INVALID_INDEX ) {
@@ -207,7 +207,7 @@ ARC_INLINE void anHashIndex::Remove( const int key, const int index ) {
 anHashIndex::First
 ================
 */
-ARC_INLINE int anHashIndex::First( const int key ) const {
+inline int anHashIndex::First( const int key ) const {
 	return hash[key & hashMask & lookupMask];
 }
 
@@ -216,7 +216,7 @@ ARC_INLINE int anHashIndex::First( const int key ) const {
 anHashIndex::Next
 ================
 */
-ARC_INLINE int anHashIndex::Next( const int index ) const {
+inline int anHashIndex::Next( const int index ) const {
 	assert( index >= 0 && index < indexSize );
 	return indexChain[index & lookupMask];
 }
@@ -226,7 +226,7 @@ ARC_INLINE int anHashIndex::Next( const int index ) const {
 anHashIndex::InsertIndex
 ================
 */
-ARC_INLINE void anHashIndex::InsertIndex( const int key, const int index ) {
+inline void anHashIndex::InsertIndex( const int key, const int index ) {
 	int i, max;
 
 	if ( hash != INVALID_INDEX ) {
@@ -263,7 +263,7 @@ ARC_INLINE void anHashIndex::InsertIndex( const int key, const int index ) {
 anHashIndex::RemoveIndex
 ================
 */
-ARC_INLINE void anHashIndex::RemoveIndex( const int key, const int index ) {
+inline void anHashIndex::RemoveIndex( const int key, const int index ) {
 	int i, max;
 
 	Remove( key, index );
@@ -297,7 +297,7 @@ ARC_INLINE void anHashIndex::RemoveIndex( const int key, const int index ) {
 anHashIndex::Clear
 ================
 */
-ARC_INLINE void anHashIndex::Clear( void ) {
+inline void anHashIndex::Clear( void ) {
 	// only clear the hash table because clearing the indexChain is not really needed
 	if ( hash != INVALID_INDEX ) {
 		memset( hash, 0xff, hashSize * sizeof( hash[0] ) );
@@ -309,7 +309,7 @@ ARC_INLINE void anHashIndex::Clear( void ) {
 anHashIndex::Clear
 ================
 */
-ARC_INLINE void anHashIndex::Clear( const int newHashSize, const int newIndexSize ) {
+inline void anHashIndex::Clear( const int newHashSize, const int newIndexSize ) {
 	Free();
 	hashSize = newHashSize;
 	indexSize = newIndexSize;
@@ -320,7 +320,7 @@ ARC_INLINE void anHashIndex::Clear( const int newHashSize, const int newIndexSiz
 anHashIndex::GetHashSize
 ================
 */
-ARC_INLINE int anHashIndex::GetHashSize( void ) const {
+inline int anHashIndex::GetHashSize( void ) const {
 	return hashSize;
 }
 
@@ -329,7 +329,7 @@ ARC_INLINE int anHashIndex::GetHashSize( void ) const {
 anHashIndex::GetIndexSize
 ================
 */
-ARC_INLINE int anHashIndex::GetIndexSize( void ) const {
+inline int anHashIndex::GetIndexSize( void ) const {
 	return indexSize;
 }
 
@@ -338,7 +338,7 @@ ARC_INLINE int anHashIndex::GetIndexSize( void ) const {
 anHashIndex::SetGranularity
 ================
 */
-ARC_INLINE void anHashIndex::SetGranularity( const int newGranularity ) {
+inline void anHashIndex::SetGranularity( const int newGranularity ) {
 	assert( newGranularity > 0 );
 	granularity = newGranularity;
 }
@@ -348,11 +348,11 @@ ARC_INLINE void anHashIndex::SetGranularity( const int newGranularity ) {
 anHashIndex::GenerateKey
 ================
 */
-ARC_INLINE int anHashIndex::GenerateKey( const char *string, bool caseSensitive ) const {
+inline int anHashIndex::GenerateKey( const char *string, bool caseSensitive ) const {
 	if ( caseSensitive ) {
-		return ( anString::Hash( string ) & hashMask );
+		return ( anStr::Hash( string ) & hashMask );
 	} else {
-		return ( anString::IHash( string ) & hashMask );
+		return ( anStr::IHash( string ) & hashMask );
 	}
 }
 
@@ -361,7 +361,7 @@ ARC_INLINE int anHashIndex::GenerateKey( const char *string, bool caseSensitive 
 anHashIndex::GenerateKey
 ================
 */
-ARC_INLINE int anHashIndex::GenerateKey( const anVec3 &v ) const {
+inline int anHashIndex::GenerateKey( const anVec3 &v ) const {
 	return ( ( ( ( int ) v[0] ) + ( ( int ) v[1] ) + ( ( int ) v[2] ) ) & hashMask );
 }
 
@@ -370,7 +370,7 @@ ARC_INLINE int anHashIndex::GenerateKey( const anVec3 &v ) const {
 anHashIndex::GenerateKey
 ================
 */
-ARC_INLINE int anHashIndex::GenerateKey( const int n1, const int n2 ) const {
+inline int anHashIndex::GenerateKey( const int n1, const int n2 ) const {
 	return ( ( n1 + n2 ) & hashMask );
 }
 

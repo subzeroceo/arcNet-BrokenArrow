@@ -4,12 +4,12 @@
 /*
 ===============================================================================
 
-	SSE implementation of arcSIMDProcessor
+	SSE implementation of anSIMDProcessor
 
 ===============================================================================
 */
 
-class idSIMD_SSE : public arcSIMD_MMX {
+class idSIMD_SSE : public anSIMD_MMX {
 public:
 #if defined(MACOS_X) && defined(__i386__)
 	virtual const char *VPCALL GetName( void ) const;
@@ -84,11 +84,11 @@ public:
 	virtual bool VPCALL MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, const int n );
 
 	virtual void VPCALL BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints );
-	virtual void VPCALL ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints );
-	virtual void VPCALL ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints );
-	virtual void VPCALL TransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
-	virtual void VPCALL UntransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
-	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights );
+	virtual void VPCALL ConvertJointQuatsToJointMats( anJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints );
+	virtual void VPCALL ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const anJointMat *jointMats, const int numJoints );
+	virtual void VPCALL TransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
+	virtual void VPCALL UntransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
+	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const anJointMat *joints, const anVec4 *weights, const int *index, const int numWeights );
 	virtual void VPCALL TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts );
 	virtual void VPCALL DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts );
 	virtual void VPCALL OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts );

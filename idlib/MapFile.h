@@ -15,6 +15,7 @@
 ===============================================================================
 */
 
+#include "Str.h"
 const int OLD_MAP_VERSION					= 1;
 const int CURRENT_MAP_VERSION				= 2;
 const int DEFAULT_CURVE_SUBDIVISION			= 4;
@@ -31,7 +32,7 @@ public: enum {
 		TYPE_PATCH
 	};
 
-	anDict			epairs;
+	anDict					epairs;
 
 							anMapPrimitive( void ) { type = TYPE_INVALID; }
 	virtual					~anMapPrimitive( void ) { }
@@ -56,20 +57,20 @@ public:
 	void					GetTextureVectors( anVec4 v[2] ) const;
 	void					TranslateSelf( const anVec3 &translation );
 protected:
-	anString				material;
+	anStr					material;
 	anPlane					plane;
 	anVec3					texMat[2];
 	anVec3					origin;
 };
 
-ARC_INLINE anMapBrushSides::anMapBrushSides( void ) {
+inline anMapBrushSides::anMapBrushSides( void ) {
 	plane.Zero();
 	texMat[0].Zero();
 	texMat[1].Zero();
 	origin.Zero();
 }
 
-ARC_INLINE void anMapBrushSides::TranslateSelf( const anVec3 &translation ) {
+inline void anMapBrushSides::TranslateSelf( const anVec3 &translation ) {
 	origin += translation;
 }
 
@@ -79,7 +80,7 @@ public:
 							~anMapBrush( void ) { sides.DeleteContents( true ); }
 	static anMapBrush *		Parse( anLexer &src, const anVec3 &origin, bool newFormat = true, float version = CURRENT_MAP_VERSION );
 	static anMapBrush *		ParseQ3( anLexer &src, const anVec3 &origin );
-	bool					Write( anString &buffer, int primitiveNum, const anVec3 &origin ) const;
+	bool					Write( anStr &buffer, int primitiveNum, const anVec3 &origin ) const;
 	bool					Write( anFile *fp, int primitiveNum, const anVec3 &origin ) const;
 	int						GetNumSides( void ) const { return sides.Num(); }
 	int						AddSide( anMapBrushSides *side ) { return sides.Append( side ); }
@@ -97,7 +98,7 @@ public:
 							anMapPatch( int maxPatchWidth, int maxPatchHeight );
 							~anMapPatch( void ) { }
 	static anMapPatch *	Parse( anLexer &src, const anVec3 &origin, bool patchDef3 = true, float version = CURRENT_MAP_VERSION );
-	bool					Write( anString &buffer, int primitiveNum, const anVec3 &origin ) const;
+	bool					Write( anStr &buffer, int primitiveNum, const anVec3 &origin ) const;
 	bool					Write( anFile *fp, int primitiveNum, const anVec3 &origin ) const;
 	const char *			GetMaterial( void ) const { return material; }
 	void					SetMaterial( const char *p ) { material = p; }
@@ -110,13 +111,13 @@ public:
 	unsigned int			GetGeometryCRC( void ) const;
 
 protected:
-	anString				material;
+	anStr					material;
 	int						horzSubdivisions;
 	int						vertSubdivisions;
 	bool					explicitSubdivisions;
 };
 
-ARC_INLINE anMapPatch::anMapPatch( void ) {
+inline anMapPatch::anMapPatch( void ) {
 	type = TYPE_PATCH;
 	horzSubdivisions = vertSubdivisions = 0;
 	explicitSubdivisions = false;
@@ -125,7 +126,7 @@ ARC_INLINE anMapPatch::anMapPatch( void ) {
 	expanded = false;
 }
 
-ARC_INLINE anMapPatch::anMapPatch( int maxPatchWidth, int maxPatchHeight ) {
+inline anMapPatch::anMapPatch( int maxPatchWidth, int maxPatchHeight ) {
 	type = TYPE_PATCH;
 	horzSubdivisions = vertSubdivisions = 0;
 	explicitSubdivisions = false;
@@ -137,25 +138,31 @@ ARC_INLINE anMapPatch::anMapPatch( int maxPatchWidth, int maxPatchHeight ) {
 }
 
 class anMapEntity {
-	friend class			anMapFile;
+	friend class				anMapFile;
 public:
-	anDict					epairs;
+	anDict						epairs;
 public:
-							anMapEntity( void ) { epairs.SetHashSize( 64 ); }
-							~anMapEntity( void ) { primitives.DeleteContents( true ); }
+								anMapEntity( void ) { epairs.SetHashSize( 64 ); }
+								~anMapEntity( void ) { primitives.DeleteContents( true ); }
 
-	static anMapEntity *	Parse( anLexer &src, bool worldSpawn = false, float version = CURRENT_MAP_VERSION );
-	static anapEntity *		ParseActions( idLexer &src );
+	static anMapEntity *		Parse( anLexer &src, bool worldSpawn = false, float version = CURRENT_MAP_VERSION );
+	static anapEntity *			ParseActions( anLexer &src );
 
-	bool					Write( anFile *fp, int entityNum ) const;
-	int						GetNumPrimitives( void ) const { return primitives.Num(); }
-	anMapPrimitive *				GetPrimitive( int i ) const { return primitives[i]; }
-	void					AddPrimitive( anMapPrimitive *p ) { primitives.Append( p ); }
-	unsigned int			GetGeometryCRC( void ) const;
-	void					RemovePrimitiveData();
+	bool						Write( anFile *fp, int entityNum ) const;
+	int							GetNumPrimitives( void ) const { return primitives.Num(); }
+	anMapPrimitive *			GetPrimitive( int i ) const { return primitives[i]; }
+	void						AddPrimitive( anMapPrimitive *p ) { primitives.Append( p ); }
+	unsigned int				GetGeometryCRC( void ) const;
+	void						RemovePrimitiveData();
 
 protected:
-	anList<anMapPrimitive*>	primitives;
+	anList<anMapPrimitive *>	primitives;
+	anDeclEntityDef *			entityDef;
+	int 						entityDefLine;
+	anStr 						refId;		// reference map id, "" by default
+	//anMapEntityEditorData *	mapEntityEditorData;
+private:
+	void					SetGeometryCRC( void );
 };
 
 class anMapFile {
@@ -163,8 +170,8 @@ public:
 							anMapFile( void );
 							~anMapFile( void ) { entities.DeleteContents( true ); }
 
-	bool					ParseBuffer( const anString &buffer, const anString &name, bool moveFuncGroups = true );
-	bool					WriteBuffer( anString &buffer );
+	bool					ParseBuffer( const anStr &buffer, const anStr &name, bool moveFuncGroups = true );
+	bool					WriteBuffer( anStr &buffer );
 
 							// filename does not require an extension
 							// normally this will use a .reg file instead of a .map file if it exists,
@@ -205,23 +212,26 @@ public:
 	float					GetVersion() {return version;}
 
 protected:
+	anStr 					name;
 	float					version;
 	ARC_TIME_T				fileTime;
+	//unsigned int 			fileTime
 	unsigned int			geometryCRC;
 	anList<anMapEntity *>	entities;
-	anString				name;
 	bool					hasPrimitiveData;
-
+	anStr					mapModelFolder;
+	//anList <anPair <anStr, anStr>, TAG_IDLIST, false> properties;
 private:
 	void					SetGeometryCRC( void );
 };
 
-ARC_INLINE anMapFile::anMapFile( void ) {
+inline anMapFile::anMapFile( void ) {
 	version = CURRENT_MAP_VERSION;
 	fileTime = 0;
 	geometryCRC = 0;
 	entities.Resize( 1024, 256 );
 	hasPrimitiveData = false;
+	//mapModelFolder = "maps/";
 }
 
 #endif

@@ -28,13 +28,13 @@ public :
 	void					Save( anSaveGame *savefile ) const;
 	void					Restore( anRestoreGame *savefile );
 
-	void					Create( anEntity *owner, const anVec3 &start, const anVec3 &dir, anEntity* ignore = nullptr, anEntity* extraPassEntity = nullptr );
+	void					Create( anEntity *owner, const anVec3 &start, const anVec3 &dir, anEntity *ignore = nullptr, anEntity *extraPassEntity = nullptr );
 	virtual void			Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float dmgPower = 1.0f );
 
 	virtual void			FreeLightDef( void );
 
 //RITUAL BEGIN
-	void					SetOwner(anEntity* ent)	{ owner = ent;	}
+	void					SetOwner(anEntity *ent)	{ owner = ent;	}
 // RITUAL END
 
 	anEntity *				GetOwner( void ) const;
@@ -104,7 +104,7 @@ protected:
 	int						bounceCount;
 	bool					sticky;
 
-	anString					impactEntity;
+	anStr					impactEntity;
 	int						numImpactEntities;
 	int						ieMinPitch;
 	int						ieMaxPitch;
@@ -126,8 +126,8 @@ protected:
 
 	projectileState_t		state;
 
-	void					PlayPainEffect		( anEntity* ent, int damage, const rvDeclMatType* materialType, const anVec3& origin, const anVec3& direction );
-	virtual void			PlayDetonateEffect	( const anVec3& origin, const anMat3& axis );
+	void					PlayPainEffect		( anEntity *ent, int damage, const rvDeclMatType* materialType, const anVec3 &origin, const anVec3 &direction );
+	virtual void			PlayDetonateEffect	( const anVec3 &origin, const anMat3 &axis );
 
 private:
 	void					DefaultDamageEffect	( const trace_t &collision, const anVec3 &velocity, const char *damageDefName );
@@ -149,7 +149,7 @@ private:
 	float					launchSpeed;
 };
 
-ARC_INLINE float idProjectile::GetSpeed ( void ) const {
+inline float idProjectile::GetSpeed ( void ) const {
 	return speed.GetCurrentValue( gameLocal.time );
 }
 
@@ -186,9 +186,9 @@ public :
 	virtual void			Think( void );
 	virtual void			Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float dmgPower = 1.0f );
 
-	void					GuideTo			( const anVec3& post, const anVec3& dir );
-	void					GuideTo			( const anVec3& pos );
-	void					GuideTo			( anEntity* ent, jointHandle_t guideJoint=INVALID_JOINT, const anVec3 &offset=vec3_origin );
+	void					GuideTo			( const anVec3 &post, const anVec3 &dir );
+	void					GuideTo			( const anVec3 &pos );
+	void					GuideTo			( anEntity *ent, jointHandle_t guideJoint=INVALID_JOINT, const anVec3 &offset=vec3_origin );
 	void					CancelGuide		( void );
 
 	int						GetGuideType	( void ) const;
@@ -223,22 +223,22 @@ private:
 	int						driftDelay;
 };
 
-ARC_INLINE int idGuidedProjectile::GetGuideType ( void ) const {
+inline int idGuidedProjectile::GetGuideType ( void ) const {
 	return guideType;
 }
 
-ARC_INLINE void idGuidedProjectile::GuideTo ( const anVec3& pos, const anVec3& dir ) {
+inline void idGuidedProjectile::GuideTo ( const anVec3 &pos, const anVec3 &dir ) {
 	guideType = GUIDE_DIR;
 	guidePos  = pos;
 	guideDir  = dir;
 }
 
-ARC_INLINE void idGuidedProjectile::GuideTo ( const anVec3& pos ) {
+inline void idGuidedProjectile::GuideTo ( const anVec3 &pos ) {
 	guideType = GUIDE_POS;
 	guidePos  = pos;
 }
 
-ARC_INLINE void idGuidedProjectile::GuideTo ( anEntity* ent, jointHandle_t joint, const anVec3 &offset ) {
+inline void idGuidedProjectile::GuideTo ( anEntity *ent, jointHandle_t joint, const anVec3 &offset ) {
 	guideType = GUIDE_ENTITY;
 	guideEnt  = ent;
 	guideJoint = joint;
@@ -249,7 +249,7 @@ ARC_INLINE void idGuidedProjectile::GuideTo ( anEntity* ent, jointHandle_t joint
 	}
 }
 
-ARC_INLINE void idGuidedProjectile::CancelGuide ( void ) {
+inline void idGuidedProjectile::CancelGuide ( void ) {
 	guideType = GUIDE_NONE;
 
 	// twhitaker: TEMP

@@ -8,7 +8,7 @@
 
 //===============================================================
 //                                                        M
-//  SSE implementation of arcSIMDProcessor                MrE
+//  SSE implementation of anSIMDProcessor                MrE
 //                                                        E
 //===============================================================
 
@@ -287,7 +287,7 @@ void VPCALL idSIMD_SSE::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *sr
 		minps		xmm0, xmm4
 		maxps		xmm1, xmm4
 	*/
-			edx = *(( int*)(indexes_p+count_l+0 ) );
+			edx = *((int *)(indexes_p+count_l+0 ) );
 			edx = edx * DRAWVERT_SIZE;
 			xmm4 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+8) );
 			xmm4 = _mm_loadh_pi(xmm4, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
@@ -302,7 +302,7 @@ void VPCALL idSIMD_SSE::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *sr
 		minps		xmm2, xmm5
 		maxps		xmm3, xmm5
 	*/
-			edx = *(( int*)(indexes_p+count_l+4) );
+			edx = *((int *)(indexes_p+count_l+4) );
 			edx = edx * DRAWVERT_SIZE;
 			xmm5 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
 			xmm5 = _mm_loadh_pi(xmm5, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+4) );
@@ -317,7 +317,7 @@ void VPCALL idSIMD_SSE::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *sr
 		minps		xmm0, xmm6
 		maxps		xmm1, xmm6
 	*/
-			edx = *(( int*)(indexes_p+count_l+8) );
+			edx = *((int *)(indexes_p+count_l+8) );
 			edx = edx * DRAWVERT_SIZE;
 			xmm6 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+8) );
 			xmm6 = _mm_loadh_pi(xmm6, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
@@ -332,7 +332,7 @@ void VPCALL idSIMD_SSE::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *sr
 		minps		xmm2, xmm7
 		maxps		xmm3, xmm7
 	*/
-			edx = *(( int*)(indexes_p+count_l+12) );
+			edx = *((int *)(indexes_p+count_l+12) );
 			edx = edx * DRAWVERT_SIZE;
 			xmm7 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
 			xmm7 = _mm_loadh_pi(xmm7, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+4) );
@@ -375,7 +375,7 @@ void VPCALL idSIMD_SSE::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *sr
 		minps		xmm0, xmm4
 		maxps		xmm1, xmm4
 	*/
-			edx = *(( int*)(indexes_p+count_l+0 ) );
+			edx = *((int *)(indexes_p+count_l+0 ) );
 			edx = edx * DRAWVERT_SIZE;
 			xmm4 = _mm_load_ss((float *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+8) );
 			xmm4 = _mm_loadh_pi(xmm4, (__m64 *) ( src_p+edx+DRAWVERT_XYZ_OFFSET+0 ) );
@@ -11663,10 +11663,10 @@ void VPCALL idSIMD_SSE::BlendJoints( anJointQuat *joints, const anJointQuat *ble
 idSIMD_SSE::ConvertJointQuatsToJointMats
 ============
 */
-void VPCALL idSIMD_SSE::ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) {
+void VPCALL idSIMD_SSE::ConvertJointQuatsToJointMats( anJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) {
 
 	assert( sizeof( anJointQuat ) == JOINTQUAT_SIZE );
-	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
+	assert( sizeof( anJointMat ) == JOINTMAT_SIZE );
 	assert( ( int )(&((anJointQuat *)0 )->t) == ( int )(&((anJointQuat *)0 )->q) + ( int )sizeof( ((anJointQuat *)0 )->q ) );
 
 	for ( int i = 0; i < numJoints; i++ ) {
@@ -11723,10 +11723,10 @@ void VPCALL idSIMD_SSE::ConvertJointQuatsToJointMats( arcJointMat *jointMats, co
 idSIMD_SSE::ConvertJointMatsToJointQuats
 ============
 */
-void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) {
+void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const anJointMat *jointMats, const int numJoints ) {
 
 	assert( sizeof( anJointQuat ) == JOINTQUAT_SIZE );
-	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
+	assert( sizeof( anJointMat ) == JOINTMAT_SIZE );
 	assert( ( int )(&((anJointQuat *)0 )->t) == ( int )(&((anJointQuat *)0 )->q) + ( int )sizeof( ((anJointQuat *)0 )->q ) );
 
 #if 1
@@ -12240,10 +12240,10 @@ void VPCALL idSIMD_SSE::ConvertJointMatsToJointQuats( anJointQuat *jointQuats, c
 idSIMD_SSE::TransformJoints
 ============
 */
-void VPCALL idSIMD_SSE::TransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
+void VPCALL idSIMD_SSE::TransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
 #if 1
 
-	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
+	assert( sizeof( anJointMat ) == JOINTMAT_SIZE );
 
 	__asm {
 
@@ -12348,10 +12348,10 @@ void VPCALL idSIMD_SSE::TransformJoints( arcJointMat *jointMats, const int *pare
 idSIMD_SSE::UntransformJoints
 ============
 */
-void VPCALL idSIMD_SSE::UntransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
+void VPCALL idSIMD_SSE::UntransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
 #if 1
 
-	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
+	assert( sizeof( anJointMat ) == JOINTMAT_SIZE );
 
 	__asm {
 
@@ -12450,13 +12450,13 @@ void VPCALL idSIMD_SSE::UntransformJoints( arcJointMat *jointMats, const int *pa
 idSIMD_SSE::TransformVerts
 ============
 */
-void VPCALL idSIMD_SSE::TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights ) {
+void VPCALL idSIMD_SSE::TransformVerts( anDrawVertex *verts, const int numVerts, const anJointMat *joints, const anVec4 *weights, const int *index, const int numWeights ) {
 #if 1
 
 	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
 	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 	assert( sizeof( anVec4 ) == JOINTWEIGHT_SIZE );
-	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
+	assert( sizeof( anJointMat ) == JOINTMAT_SIZE );
 
 	__asm
 	{
@@ -12542,10 +12542,10 @@ void VPCALL idSIMD_SSE::TransformVerts( anDrawVertex *verts, const int numVerts,
 	for ( j = i = 0; i < numVerts; i++ ) {
 		anVec3 v;
 
-		v = ( *(arcJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
+		v = ( *(anJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
 		while( index[j*2+1] == 0 ) {
 			j++;
-			v += ( *(arcJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
+			v += ( *(anJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
 		}
 		j++;
 

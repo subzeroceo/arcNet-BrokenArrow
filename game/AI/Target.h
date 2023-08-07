@@ -327,8 +327,8 @@ private:
 	float				flashIn;
 	float				flashOut;
 	float				delay;
-	anString				flashInSound;
-	anString				flashOutSound;
+	anStr				flashInSound;
+	anStr				flashOutSound;
 	anEntity *			switchToCamera;
 	idInterpolate<float>fovSetting;
 	bool				soundFaded;
@@ -682,7 +682,7 @@ rvTarget_AmmoStash
 typedef struct	ammodata_s	{
 
 	int			ammoIndex;
-	anString		ammoName;
+	anStr		ammoName;
 	int			ammoCount;
 	int			ammoMax;
 	float		percentFull;

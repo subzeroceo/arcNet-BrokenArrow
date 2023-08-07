@@ -334,7 +334,7 @@ R_LoadARBProgram
 void R_LoadARBProgram( int progIndex ) {
 	int		ofs;
 	int		err;
-	anString	fullPath = "glprogs/";
+	anStr	fullPath = "glprogs/";
 	fullPath += progs[progIndex].name;
 	char	*fileBuffer;
 	char	*buffer;
@@ -434,7 +434,7 @@ a text file if it hasn't already been loaded.
 */
 int R_FindARBProgram( GLenum target, const char *program ) {
 	int		i;
-	anString	stripped = program;
+	anStr	stripped = program;
 
 	stripped.StripFileExtension();
 
@@ -444,10 +444,10 @@ int R_FindARBProgram( GLenum target, const char *program ) {
 			continue;
 		}
 
-		anString	compare = progs[i].name;
+		anStr	compare = progs[i].name;
 		compare.StripFileExtension();
 
-		if ( !anString::Icmp( stripped.c_str(), compare.c_str() ) ) {
+		if ( !anStr::Icmp( stripped.c_str(), compare.c_str() ) ) {
 			return progs[i].ident;
 		}
 	}

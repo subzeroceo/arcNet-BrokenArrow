@@ -348,7 +348,7 @@ void anPhysics_RigidBody::DropToFloorAndRest( void ) {
 		if ( gameLocal.Contents( self, current.i.position, clipModel, current.i.orientation, clipMask, self ) ) {
 
 			gameLocal.DWarning( "rigid body in solid for entity '%s' type '%s' at (%s)",
-								self->name.c_str(), self->GetType()->classname, current.i.position.ToString(0) );
+								self->name.c_str(), self->GetType()->classname, current.i.position.ToString( 0 ) );
 			Rest();
 			dropToFloor = false;
 			return;
@@ -373,13 +373,13 @@ void anPhysics_RigidBody::DropToFloorAndRest( void ) {
 		EvaluateContacts();
 		if ( !TestIfAtRest() ) {
 			gameLocal.DWarning( "rigid body not at rest for entity '%s' type '%s' at (%s)",
-								self->name.c_str(), self->GetType()->classname, current.i.position.ToString(0) );
+								self->name.c_str(), self->GetType()->classname, current.i.position.ToString( 0 ) );
 		}
 		Rest();
 		dropToFloor = false;
 	} else if ( IsOutsideWorld() ) {
 		gameLocal.Warning( "rigid body outside world bounds for entity '%s' type '%s' at (%s)",
-							self->name.c_str(), self->GetType()->classname, current.i.position.ToString(0) );
+							self->name.c_str(), self->GetType()->classname, current.i.position.ToString( 0 ) );
 		Rest();
 		dropToFloor = false;
 	}
@@ -980,7 +980,7 @@ bool anPhysics_RigidBody::Evaluate( int timeStepMSec, int endTimeMSec ) {
 
 	if ( IsOutsideWorld() ) {
 		gameLocal.Warning( "rigid body moved outside world bounds for entity '%s' type '%s' at (%s)",
-					self->name.c_str(), self->GetType()->classname, current.i.position.ToString(0) );
+					self->name.c_str(), self->GetType()->classname, current.i.position.ToString( 0 ) );
 		Rest();
 	}
 
@@ -1360,9 +1360,9 @@ bool anPhysics_RigidBody::EvaluateContacts( void ) {
 
 	contacts.SetNum( 10, false );
 
-	dir.SubVec3(0) = current.i.linearMomentum + current.lastTimeStep * gravityVector * mass;
+	dir.SubVec3( 0 ) = current.i.linearMomentum + current.lastTimeStep * gravityVector * mass;
 	dir.SubVec3( 1 ) = current.i.angularMomentum;
-	dir.SubVec3(0).Normalize();
+	dir.SubVec3( 0 ).Normalize();
 	dir.SubVec3( 1 ).Normalize();
 	num = gameLocal.Contacts( self, &contacts[0], 10, clipModel->GetOrigin(),
 					dir, CONTACT_EPSILON, clipModel, clipModel->GetAxis(), clipMask, self );
@@ -1383,7 +1383,7 @@ void anPhysics_RigidBody::SetPushed( int deltaTime ) {
 	rotation = ( saved.i.orientation * current.i.orientation ).ToRotation();
 
 	// velocity with which the af is pushed
-	current.pushVelocity.SubVec3(0) += ( current.i.position - saved.i.position ) / ( deltaTime * anMath::M_MS2SEC );
+	current.pushVelocity.SubVec3( 0 ) += ( current.i.position - saved.i.position ) / ( deltaTime * anMath::M_MS2SEC );
 	current.pushVelocity.SubVec3( 1 ) += rotation.GetVec() * -DEG2RAD( rotation.GetAngle() ) / ( deltaTime * anMath::M_MS2SEC );
 }
 
@@ -1393,7 +1393,7 @@ anPhysics_RigidBody::GetPushedLinearVelocity
 ================
 */
 const anVec3 &anPhysics_RigidBody::GetPushedLinearVelocity( const int id ) const {
-	return current.pushVelocity.SubVec3(0);
+	return current.pushVelocity.SubVec3( 0 );
 }
 
 /*

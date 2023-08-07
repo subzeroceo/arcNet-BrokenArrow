@@ -23,8 +23,8 @@ typedef struct parametricPState_s {
 	anMat3									axis;					// world axis
 	anVec3									localOrigin;			// local origin
 	anAngles								localAngles;			// local angles
-	idExtrapolate<anVec3>					linearExtrapolation;	// extrapolation based description of the position over time
-	idExtrapolate<anAngles>					angularExtrapolation;	// extrapolation based description of the orientation over time
+	anExtrapolate<anVec3>					linearExtrapolation;	// extrapolation based description of the position over time
+	anExtrapolate<anAngles>					angularExtrapolation;	// extrapolation based description of the orientation over time
 	idInterpolateAccelDecelLinear<anVec3>	linearInterpolation;	// interpolation based description of the position over time
 	idInterpolateAccelDecelLinear<anAngles>	angularInterpolation;	// interpolation based description of the orientation over time
 	anCurve_Spline<anVec3> *				spline;					// spline based description of the position over time
@@ -67,7 +67,7 @@ public:
 
 
 // abahr: a method for hiding gimblelock
-	void					SetAxisOffset( const anMat3& offset ) { axisOffset = offset; useAxisOffset = true; }
+	void					SetAxisOffset( const anMat3 &offset ) { axisOffset = offset; useAxisOffset = true; }
 	const anMat3&			GetAxisOffset() const { return axisOffset; }
 	anMat3&					GetAxisOffset() { return axisOffset; }
 	bool					UseAxisOffset() const { return useAxisOffset; }

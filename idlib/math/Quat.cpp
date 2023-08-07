@@ -63,7 +63,7 @@ first calculates the trace of the matrix, which is the sum of the diagonal eleme
 =====================
 */
 void anQuats::Mat3ToQuat( const anMat3 &src, const anQuat &dst ) const {
-	static int next[ 3 ] = { 1, 2, 0 };
+	static int next[3] = { 1, 2, 0 };
 
 	float trace = src[0][0] + src[1][1] + src[2][2];
 	if ( trace > 0.0f ) {
@@ -190,7 +190,7 @@ anQuats::ToString
 =============
 */
 const char *anQuats::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
@@ -297,5 +297,5 @@ anCQuats::ToString
 =============
 */
 const char *anCQuats::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }

@@ -8,7 +8,7 @@ Worldspawn class.  Each map has one worldspawn which handles global spawnargs.
 #include "Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -23,7 +23,7 @@ idWorldspawn
 Every map should have exactly one worldspawn.
 ================
 */
-CLASS_DECLARATION( arcEntity, idWorldspawn )
+CLASS_DECLARATION( anEntity, idWorldspawn )
 END_CLASS
 
 /*

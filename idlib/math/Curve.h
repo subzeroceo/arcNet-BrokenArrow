@@ -1,6 +1,19 @@
 #ifndef __MATH_CURVE_H__
 #define __MATH_CURVE_H__
 
+// time in milliseconds
+// velocity where 1.0f equal rough walking speed
+struct anVelocity {
+	anVelocity( long start, long duration, float s ) {
+		startTime = start;
+		time = duration;
+		speed = s;
+	}
+	long	startTime;
+	long	time;
+	float	speed;
+};
+
 /*
 ===============================================================================
 
@@ -62,7 +75,7 @@ anCurve::anCurve
 ====================
 */
 template<class type>
-ARC_INLINE anCurve<type>::anCurve( void ) {
+inline anCurve<type>::anCurve( void ) {
 	currentIndex = -1;
 	changed = false;
 }
@@ -73,7 +86,7 @@ anCurve::~anCurve
 ====================
 */
 template<class type>
-ARC_INLINE anCurve<type>::~anCurve( void ) {
+inline anCurve<type>::~anCurve( void ) {
 }
 
 /*
@@ -85,10 +98,8 @@ anCurve::AddValue
 ====================
 */
 template<class type>
-ARC_INLINE int anCurve<type>::AddValue( const float time, const type &value ) {
-	int i;
-
-	i = IndexForTime( time );
+inline int anCurve<type>::AddValue( const float time, const type &value ) {
+	int i = IndexForTime( time );
 	times.Insert( time, i );
 	values.Insert( value, i );
 	changed = true;
@@ -103,10 +114,8 @@ anCurve::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve<type>::GetCurrentValue( const float time ) const {
-	int i;
-
-	i = IndexForTime( time );
+inline type anCurve<type>::GetCurrentValue( const float time ) const {
+	int i = IndexForTime( time );
 	if ( i >= values.Num() ) {
 		return values[values.Num() - 1];
 	} else {
@@ -122,7 +131,7 @@ anCurve::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve<type>::GetCurrentFirstDerivative( const float time ) const {
 	return ( values[0] - values[0] );
 }
 
@@ -134,7 +143,7 @@ anCurve::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve<type>::GetCurrentSecondDerivative( const float time ) const {
 	return ( values[0] - values[0] );
 }
 
@@ -144,7 +153,7 @@ anCurve::IsDone
 ====================
 */
 template<class type>
-ARC_INLINE bool anCurve<type>::IsDone( const float time ) const {
+inline bool anCurve<type>::IsDone( const float time ) const {
 	return ( time >= times[ times.Num() - 1 ] );
 }
 
@@ -154,7 +163,7 @@ anCurve::GetSpeed
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve<type>::GetSpeed( const float time ) const {
+inline float anCurve<type>::GetSpeed( const float time ) const {
 	int i;
 	float speed;
 	type value;
@@ -172,7 +181,7 @@ anCurve::RombergIntegral
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve<type>::RombergIntegral( const float t0, const float t1, const int order ) const {
+inline float anCurve<type>::RombergIntegral( const float t0, const float t1, const int order ) const {
 	int i, j, k, m, n;
 	float sum, delta;
 	float *temp[2];
@@ -184,7 +193,6 @@ ARC_INLINE float anCurve<type>::RombergIntegral( const float t0, const float t1,
 	temp[0][0] = 0.5f * delta * ( GetSpeed( t0 ) + GetSpeed( t1 ) );
 
 	for ( i = 2, m = 1; i <= order; i++, m *= 2, delta *= 0.5f ) {
-
 		// approximate using the trapezoid rule
 		sum = 0.0f;
 		for ( j = 1; j <= m; j++ ) {
@@ -210,7 +218,7 @@ anCurve::GetLengthBetweenKnots
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve<type>::GetLengthBetweenKnots( const int i0, const int i1 ) const {
+inline float anCurve<type>::GetLengthBetweenKnots( const int i0, const int i1 ) const {
 	float length = 0.0f;
 	for ( int i = i0; i < i1; i++ ) {
 		length += RombergIntegral( times[i], times[i+1], 5 );
@@ -224,7 +232,7 @@ anCurve::GetLengthForTime
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve<type>::GetLengthForTime( const float time ) const {
+inline float anCurve<type>::GetLengthForTime( const float time ) const {
 	float length = 0.0f;
 	int index = IndexForTime( time );
 	for ( int i = 0; i < index; i++ ) {
@@ -240,7 +248,7 @@ anCurve::GetTimeForLength
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve<type>::GetTimeForLength( const float length, const float epsilon ) const {
+inline float anCurve<type>::GetTimeForLength( const float length, const float epsilon ) const {
 	int i, index;
 	float *accumLength, totalLength, len0, len1, t, diff;
 
@@ -288,7 +296,7 @@ anCurve::MakeUniform
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve<type>::MakeUniform( const float totalTime ) {
+inline void anCurve<type>::MakeUniform( const float totalTime ) {
 	int i, n;
 
 	n = times.Num() - 1;
@@ -304,7 +312,7 @@ anCurve::SetConstantSpeed
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve<type>::SetConstantSpeed( const float totalTime ) {
+inline void anCurve<type>::SetConstantSpeed( const float totalTime ) {
 	int i, j;
 	float *length, totalLength, scale, t;
 
@@ -329,7 +337,7 @@ anCurve::ShiftTime
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve<type>::ShiftTime( const float deltaTime ) {
+inline void anCurve<type>::ShiftTime( const float deltaTime ) {
 	for ( int i = 0; i < times.Num(); i++ ) {
 		times[i] += deltaTime;
 	}
@@ -342,7 +350,7 @@ anCurve::Translate
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve<type>::Translate( const type &translation ) {
+inline void anCurve<type>::Translate( const type &translation ) {
 	for ( int i = 0; i < values.Num(); i++ ) {
 		values[i] += translation;
 	}
@@ -357,7 +365,7 @@ anCurve::IndexForTime
 ====================
 */
 template<class type>
-ARC_INLINE int anCurve<type>::IndexForTime( const float time ) const {
+inline int anCurve<type>::IndexForTime( const float time ) const {
 	int len, mid, offset, res;
 
 	if ( currentIndex >= 0 && currentIndex <= times.Num() ) {
@@ -409,7 +417,7 @@ anCurve::ValueForIndex
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve<type>::ValueForIndex( const int index ) const {
+inline type anCurve<type>::ValueForIndex( const int index ) const {
 	int n = values.Num()-1;
 
 	if ( index < 0 ) {
@@ -428,7 +436,7 @@ anCurve::TimeForIndex
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve<type>::TimeForIndex( const int index ) const {
+inline float anCurve<type>::TimeForIndex( const int index ) const {
 	int n = times.Num()-1;
 
 	if ( index < 0 ) {
@@ -470,7 +478,7 @@ anCurve_Bezier::anCurve_Bezier
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_Bezier<type>::anCurve_Bezier( void ) {
+inline anCurve_Bezier<type>::anCurve_Bezier( void ) {
 }
 
 /*
@@ -481,7 +489,7 @@ anCurve_Bezier::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_Bezier<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_Bezier<type>::GetCurrentValue( const float time ) const {
 	int i;
 	float *bvals;
 	type v;
@@ -504,7 +512,7 @@ anCurve_Bezier::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_Bezier<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_Bezier<type>::GetCurrentFirstDerivative( const float time ) const {
 	int i;
 	float *bvals, d;
 	type v;
@@ -528,7 +536,7 @@ anCurve_Bezier::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_Bezier<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_Bezier<type>::GetCurrentSecondDerivative( const float time ) const {
 	int i;
 	float *bvals, d;
 	type v;
@@ -552,7 +560,7 @@ anCurve_Bezier::Basis
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_Bezier<type>::Basis( const int order, const float t, float *bvals ) const {
+inline void anCurve_Bezier<type>::Basis( const int order, const float t, float *bvals ) const {
 	int i, j, d;
 	float *c, c1, c2, s, o, ps, po;
 
@@ -598,7 +606,7 @@ anCurve_Bezier::BasisFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_Bezier<type>::BasisFirstDerivative( const int order, const float t, float *bvals ) const {
+inline void anCurve_Bezier<type>::BasisFirstDerivative( const int order, const float t, float *bvals ) const {
 	int i;
 
 	Basis( order-1, t, bvals+1 );
@@ -616,7 +624,7 @@ anCurve_Bezier::BasisSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_Bezier<type>::BasisSecondDerivative( const int order, const float t, float *bvals ) const {
+inline void anCurve_Bezier<type>::BasisSecondDerivative( const int order, const float t, float *bvals ) const {
 	int i;
 
 	BasisFirstDerivative( order-1, t, bvals+1 );
@@ -658,7 +666,7 @@ anCurve_QuadraticBezier::anCurve_QuadraticBezier
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_QuadraticBezier<type>::anCurve_QuadraticBezier( void ) {
+inline anCurve_QuadraticBezier<type>::anCurve_QuadraticBezier( void ) {
 }
 
 
@@ -670,7 +678,7 @@ anCurve_QuadraticBezier::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_QuadraticBezier<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_QuadraticBezier<type>::GetCurrentValue( const float time ) const {
 	float bvals[3];
 	assert( this->values.Num() == 3 );
 	Basis( time, bvals );
@@ -685,7 +693,7 @@ anCurve_QuadraticBezier::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_QuadraticBezier<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_QuadraticBezier<type>::GetCurrentFirstDerivative( const float time ) const {
 	float bvals[3], d;
 	assert( this->values.Num() == 3 );
 	BasisFirstDerivative( time, bvals );
@@ -701,7 +709,7 @@ anCurve_QuadraticBezier::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_QuadraticBezier<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_QuadraticBezier<type>::GetCurrentSecondDerivative( const float time ) const {
 	float bvals[3], d;
 	assert( this->values.Num() == 3 );
 	BasisSecondDerivative( time, bvals );
@@ -717,7 +725,7 @@ anCurve_QuadraticBezier::Basis
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_QuadraticBezier<type>::Basis( const float t, float *bvals ) const {
+inline void anCurve_QuadraticBezier<type>::Basis( const float t, float *bvals ) const {
 	float s1 = ( float ) ( t - this->times[0] ) / ( this->times[2] - this->times[0] );
 	float s2 = s1 * s1;
 	bvals[0] = s2 - 2.0f * s1 + 1.0f;
@@ -733,7 +741,7 @@ anCurve_QuadraticBezier::BasisFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_QuadraticBezier<type>::BasisFirstDerivative( const float t, float *bvals ) const {
+inline void anCurve_QuadraticBezier<type>::BasisFirstDerivative( const float t, float *bvals ) const {
 	float s1 = ( float ) ( t - this->times[0] ) / ( this->times[2] - this->times[0] );
 	bvals[0] = 2.0f * s1 - 2.0f;
 	bvals[1] = -4.0f * s1 + 2.0f;
@@ -748,7 +756,7 @@ anCurve_QuadraticBezier::BasisSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_QuadraticBezier<type>::BasisSecondDerivative( const float t, float *bvals ) const {
+inline void anCurve_QuadraticBezier<type>::BasisSecondDerivative( const float t, float *bvals ) const {
 	float s1 = ( float ) ( t - this->times[0] ) / ( this->times[2] - this->times[0] );
 	bvals[0] = 2.0f;
 	bvals[1] = -4.0f;
@@ -787,7 +795,7 @@ anCurve_CubicBezier::anCurve_CubicBezier
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_CubicBezier<type>::anCurve_CubicBezier( void ) {
+inline anCurve_CubicBezier<type>::anCurve_CubicBezier( void ) {
 }
 
 
@@ -799,7 +807,7 @@ anCurve_CubicBezier::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_CubicBezier<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_CubicBezier<type>::GetCurrentValue( const float time ) const {
 	float bvals[4];
 	assert( this->values.Num() == 4 );
 	Basis( time, bvals );
@@ -814,7 +822,7 @@ anCurve_CubicBezier::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_CubicBezier<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_CubicBezier<type>::GetCurrentFirstDerivative( const float time ) const {
 	float bvals[4], d;
 	assert( this->values.Num() == 4 );
 	BasisFirstDerivative( time, bvals );
@@ -830,7 +838,7 @@ anCurve_CubicBezier::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_CubicBezier<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_CubicBezier<type>::GetCurrentSecondDerivative( const float time ) const {
 	float bvals[4], d;
 	assert( this->values.Num() == 4 );
 	BasisSecondDerivative( time, bvals );
@@ -846,7 +854,7 @@ anCurve_CubicBezier::Basis
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_CubicBezier<type>::Basis( const float t, float *bvals ) const {
+inline void anCurve_CubicBezier<type>::Basis( const float t, float *bvals ) const {
 	float s1 = ( float ) ( t - this->times[0] ) / ( this->times[3] - this->times[0] );
 	float s2 = s1 * s1;
 	float s3 = s2 * s1;
@@ -864,7 +872,7 @@ anCurve_CubicBezier::BasisFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_CubicBezier<type>::BasisFirstDerivative( const float t, float *bvals ) const {
+inline void anCurve_CubicBezier<type>::BasisFirstDerivative( const float t, float *bvals ) const {
 	float s1 = ( float ) ( t - this->times[0] ) / ( this->times[3] - this->times[0] );
 	float s2 = s1 * s1;
 	bvals[0] = -3.0f * s2 + 6.0f * s1 - 3.0f;
@@ -881,7 +889,7 @@ anCurve_CubicBezier::BasisSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_CubicBezier<type>::BasisSecondDerivative( const float t, float *bvals ) const {
+inline void anCurve_CubicBezier<type>::BasisSecondDerivative( const float t, float *bvals ) const {
 	float s1 = ( float ) ( t - this->times[0] ) / ( this->times[3] - this->times[0] );
 	bvals[0] = -6.0f * s1 + 6.0f;
 	bvals[1] = 18.0f * s1 - 12.0f;
@@ -929,7 +937,7 @@ anCurveSpline::anCurveSpline
 ====================
 */
 template<class type>
-ARC_INLINE anCurveSpline<type>::anCurveSpline( void ) {
+inline anCurveSpline<type>::anCurveSpline( void ) {
 	boundaryType = BT_FREE;
 	closeTime = 0.0f;
 }
@@ -942,7 +950,7 @@ anCurveSpline::ValueForIndex
 ====================
 */
 template<class type>
-ARC_INLINE type anCurveSpline<type>::ValueForIndex( const int index ) const {
+inline type anCurveSpline<type>::ValueForIndex( const int index ) const {
 	int n = this->values.Num()-1;
 
 	if ( index < 0 ) {
@@ -972,7 +980,7 @@ anCurveSpline::TimeForIndex
 ====================
 */
 template<class type>
-ARC_INLINE float anCurveSpline<type>::TimeForIndex( const int index ) const {
+inline float anCurveSpline<type>::TimeForIndex( const int index ) const {
 	int n = this->times.Num()-1;
 
 	if ( index < 0 ) {
@@ -1002,7 +1010,7 @@ anCurveSpline::ClampedTime
 ====================
 */
 template<class type>
-ARC_INLINE float anCurveSpline<type>::ClampedTime( const float t ) const {
+inline float anCurveSpline<type>::ClampedTime( const float t ) const {
 	if ( boundaryType == BT_CLAMPED ) {
 		if ( t < this->times[0] ) {
 			return this->times[0];
@@ -1020,7 +1028,7 @@ anCurveSpline::IsDone
 ====================
 */
 template<class type>
-ARC_INLINE bool anCurveSpline<type>::IsDone( const float time ) const {
+inline bool anCurveSpline<type>::IsDone( const float time ) const {
 	return ( boundaryType != BT_CLOSED && time >= this->times[ this->times.Num() - 1 ] );
 }
 
@@ -1062,7 +1070,7 @@ anCurve_NaturalCubicSpline::anCurve_NaturalCubicSpline
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_NaturalCubicSpline<type>::anCurve_NaturalCubicSpline( void ) {
+inline anCurve_NaturalCubicSpline<type>::anCurve_NaturalCubicSpline( void ) {
 }
 
 /*
@@ -1073,7 +1081,7 @@ anCurve_NaturalCubicSpline::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_NaturalCubicSpline<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_NaturalCubicSpline<type>::GetCurrentValue( const float time ) const {
 	float clampedTime = this->ClampedTime( time );
 	int i = this->IndexForTime( clampedTime );
 	float s = time - this->TimeForIndex( i );
@@ -1089,7 +1097,7 @@ anCurve_NaturalCubicSpline::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_NaturalCubicSpline<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_NaturalCubicSpline<type>::GetCurrentFirstDerivative( const float time ) const {
 	float clampedTime = this->ClampedTime( time );
 	int i = this->IndexForTime( clampedTime );
 	float s = time - this->TimeForIndex( i );
@@ -1105,7 +1113,7 @@ anCurve_NaturalCubicSpline::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_NaturalCubicSpline<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_NaturalCubicSpline<type>::GetCurrentSecondDerivative( const float time ) const {
 	float clampedTime = this->ClampedTime( time );
 	int i = this->IndexForTime( clampedTime );
 	float s = time - this->TimeForIndex( i );
@@ -1119,7 +1127,7 @@ anCurve_NaturalCubicSpline::Setup
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_NaturalCubicSpline<type>::Setup( void ) const {
+inline void anCurve_NaturalCubicSpline<type>::Setup( void ) const {
 	if ( this->changed ) {
 		switch ( this->boundaryType ) {
 			case anCurveSpline<type>::BT_FREE:		SetupFree(); break;
@@ -1136,7 +1144,7 @@ anCurve_NaturalCubicSpline::SetupFree
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_NaturalCubicSpline<type>::SetupFree( void ) const {
+inline void anCurve_NaturalCubicSpline<type>::SetupFree( void ) const {
 	int i;
 	float inv;
 	float *d0, *d1, *beta, *gamma;
@@ -1196,7 +1204,7 @@ anCurve_NaturalCubicSpline::SetupClamped
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_NaturalCubicSpline<type>::SetupClamped( void ) const {
+inline void anCurve_NaturalCubicSpline<type>::SetupClamped( void ) const {
 	int i;
 	float inv;
 	float *d0, *d1, *beta, *gamma;
@@ -1264,7 +1272,7 @@ anCurve_NaturalCubicSpline::SetupClosed
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_NaturalCubicSpline<type>::SetupClosed( void ) const {
+inline void anCurve_NaturalCubicSpline<type>::SetupClosed( void ) const {
 	int i, j;
 	float c0, c1;
 	float *d0;
@@ -1357,7 +1365,7 @@ anCurve_CatmullRomSpline::anCurve_CatmullRomSpline
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_CatmullRomSpline<type>::anCurve_CatmullRomSpline( void ) {
+inline anCurve_CatmullRomSpline<type>::anCurve_CatmullRomSpline( void ) {
 }
 
 /*
@@ -1368,7 +1376,7 @@ anCurve_CatmullRomSpline::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_CatmullRomSpline<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_CatmullRomSpline<type>::GetCurrentValue( const float time ) const {
 	int i, j, k;
 	float bvals[4], clampedTime;
 	type v;
@@ -1396,7 +1404,7 @@ anCurve_CatmullRomSpline::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_CatmullRomSpline<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_CatmullRomSpline<type>::GetCurrentFirstDerivative( const float time ) const {
 	int i, j, k;
 	float bvals[4], d, clampedTime;
 	type v;
@@ -1425,7 +1433,7 @@ anCurve_CatmullRomSpline::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_CatmullRomSpline<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_CatmullRomSpline<type>::GetCurrentSecondDerivative( const float time ) const {
 	int i, j, k;
 	float bvals[4], d, clampedTime;
 	type v;
@@ -1454,7 +1462,7 @@ anCurve_CatmullRomSpline::Basis
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_CatmullRomSpline<type>::Basis( const int index, const float t, float *bvals ) const {
+inline void anCurve_CatmullRomSpline<type>::Basis( const int index, const float t, float *bvals ) const {
 	float s = ( float ) ( t - this->TimeForIndex( index ) ) / ( this->TimeForIndex( index+1 ) - this->TimeForIndex( index ) );
 	bvals[0] = ( ( -s + 2.0f ) * s - 1.0f ) * s * 0.5f;				// -0.5f s * s * s + s * s - 0.5f * s
 	bvals[1] = ( ( ( 3.0f * s - 5.0f ) * s ) * s + 2.0f ) * 0.5f;	// 1.5f * s * s * s - 2.5f * s * s + 1.0f
@@ -1470,7 +1478,7 @@ anCurve_CatmullRomSpline::BasisFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_CatmullRomSpline<type>::BasisFirstDerivative( const int index, const float t, float *bvals ) const {
+inline void anCurve_CatmullRomSpline<type>::BasisFirstDerivative( const int index, const float t, float *bvals ) const {
 	float s = ( float ) ( t - this->TimeForIndex( index ) ) / ( this->TimeForIndex( index+1 ) - this->TimeForIndex( index ) );
 	bvals[0] = ( -1.5f * s + 2.0f ) * s - 0.5f;						// -1.5f * s * s + 2.0f * s - 0.5f
 	bvals[1] = ( 4.5f * s - 5.0f ) * s;								// 4.5f * s * s - 5.0f * s
@@ -1486,7 +1494,7 @@ anCurve_CatmullRomSpline::BasisSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_CatmullRomSpline<type>::BasisSecondDerivative( const int index, const float t, float *bvals ) const {
+inline void anCurve_CatmullRomSpline<type>::BasisSecondDerivative( const int index, const float t, float *bvals ) const {
 	float s = ( float ) ( t - this->TimeForIndex( index ) ) / ( this->TimeForIndex( index+1 ) - this->TimeForIndex( index ) );
 	bvals[0] = -3.0f * s + 2.0f;
 	bvals[1] = 9.0f * s - 5.0f;
@@ -1539,7 +1547,7 @@ anCurve_KochanekBartelsSpline::anCurve_KochanekBartelsSpline
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_KochanekBartelsSpline<type>::anCurve_KochanekBartelsSpline( void ) {
+inline anCurve_KochanekBartelsSpline<type>::anCurve_KochanekBartelsSpline( void ) {
 }
 
 /*
@@ -1551,7 +1559,7 @@ anCurve_KochanekBartelsSpline::AddValue
 ====================
 */
 template<class type>
-ARC_INLINE int anCurve_KochanekBartelsSpline<type>::AddValue( const float time, const type &value ) {
+inline int anCurve_KochanekBartelsSpline<type>::AddValue( const float time, const type &value ) {
 	int i;
 
 	i = this->IndexForTime( time );
@@ -1572,7 +1580,7 @@ anCurve_KochanekBartelsSpline::AddValue
 ====================
 */
 template<class type>
-ARC_INLINE int anCurve_KochanekBartelsSpline<type>::AddValue( const float time, const type &value, const float tension, const float continuity, const float bias ) {
+inline int anCurve_KochanekBartelsSpline<type>::AddValue( const float time, const type &value, const float tension, const float continuity, const float bias ) {
 	int i;
 
 	i = this->IndexForTime( time );
@@ -1592,7 +1600,7 @@ anCurve_KochanekBartelsSpline::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_KochanekBartelsSpline<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_KochanekBartelsSpline<type>::GetCurrentValue( const float time ) const {
 	int i;
 	float bvals[4], clampedTime;
 	type v, t0, t1;
@@ -1620,7 +1628,7 @@ anCurve_KochanekBartelsSpline::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_KochanekBartelsSpline<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_KochanekBartelsSpline<type>::GetCurrentFirstDerivative( const float time ) const {
 	int i;
 	float bvals[4], d, clampedTime;
 	type v, t0, t1;
@@ -1649,7 +1657,7 @@ anCurve_KochanekBartelsSpline::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_KochanekBartelsSpline<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_KochanekBartelsSpline<type>::GetCurrentSecondDerivative( const float time ) const {
 	int i;
 	float bvals[4], d, clampedTime;
 	type v, t0, t1;
@@ -1676,7 +1684,7 @@ anCurve_KochanekBartelsSpline::TangentsForIndex
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_KochanekBartelsSpline<type>::TangentsForIndex( const int index, type &t0, type &t1 ) const {
+inline void anCurve_KochanekBartelsSpline<type>::TangentsForIndex( const int index, type &t0, type &t1 ) const {
 	float dt, omt, omc, opc, omb, opb, adj, s0, s1;
 	type delta;
 
@@ -1716,7 +1724,7 @@ anCurve_KochanekBartelsSpline::Basis
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_KochanekBartelsSpline<type>::Basis( const int index, const float t, float *bvals ) const {
+inline void anCurve_KochanekBartelsSpline<type>::Basis( const int index, const float t, float *bvals ) const {
 	float s = ( float ) ( t - this->TimeForIndex( index ) ) / ( this->TimeForIndex( index+1 ) - this->TimeForIndex( index ) );
 	bvals[0] = ( ( 2.0f * s - 3.0f ) * s ) * s + 1.0f;				// 2.0f * s * s * s - 3.0f * s * s + 1.0f
 	bvals[1] = ( ( -2.0f * s + 3.0f ) * s ) * s;					// -2.0f * s * s * s + 3.0f * s * s
@@ -1732,7 +1740,7 @@ anCurve_KochanekBartelsSpline::BasisFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_KochanekBartelsSpline<type>::BasisFirstDerivative( const int index, const float t, float *bvals ) const {
+inline void anCurve_KochanekBartelsSpline<type>::BasisFirstDerivative( const int index, const float t, float *bvals ) const {
 	float s = ( float ) ( t - this->TimeForIndex( index ) ) / ( this->TimeForIndex( index+1 ) - this->TimeForIndex( index ) );
 	bvals[0] = ( 6.0f * s - 6.0f ) * s;								// 6.0f * s * s - 6.0f * s
 	bvals[1] = ( -6.0f * s + 6.0f ) * s;							// -6.0f * s * s + 6.0f * s
@@ -1748,7 +1756,7 @@ anCurve_KochanekBartelsSpline::BasisSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_KochanekBartelsSpline<type>::BasisSecondDerivative( const int index, const float t, float *bvals ) const {
+inline void anCurve_KochanekBartelsSpline<type>::BasisSecondDerivative( const int index, const float t, float *bvals ) const {
 	float s = ( float ) ( t - this->TimeForIndex( index ) ) / ( this->TimeForIndex( index+1 ) - this->TimeForIndex( index ) );
 	bvals[0] = 12.0f * s - 6.0f;
 	bvals[1] = -12.0f * s + 6.0f;
@@ -1793,7 +1801,7 @@ anCurve_BSpline::anCurve_NaturalCubicSpline
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_BSpline<type>::anCurve_BSpline( void ) {
+inline anCurve_BSpline<type>::anCurve_BSpline( void ) {
 	order = 4;	// default to cubic
 }
 
@@ -1805,7 +1813,7 @@ anCurve_BSpline::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_BSpline<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_BSpline<type>::GetCurrentValue( const float time ) const {
 	int i, j, k;
 	float clampedTime;
 	type v;
@@ -1832,7 +1840,7 @@ anCurve_BSpline::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_BSpline<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_BSpline<type>::GetCurrentFirstDerivative( const float time ) const {
 	int i, j, k;
 	float clampedTime;
 	type v;
@@ -1859,7 +1867,7 @@ anCurve_BSpline::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_BSpline<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_BSpline<type>::GetCurrentSecondDerivative( const float time ) const {
 	int i, j, k;
 	float clampedTime;
 	type v;
@@ -1886,7 +1894,7 @@ anCurve_BSpline::Basis
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve_BSpline<type>::Basis( const int index, const int order, const float t ) const {
+inline float anCurve_BSpline<type>::Basis( const int index, const int order, const float t ) const {
 	if ( order <= 1 ) {
 		if ( this->TimeForIndex( index ) < t && t <= this->TimeForIndex( index + 1 ) ) {
 			return 1.0f;
@@ -1916,7 +1924,7 @@ anCurve_BSpline::BasisFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve_BSpline<type>::BasisFirstDerivative( const int index, const int order, const float t ) const {
+inline float anCurve_BSpline<type>::BasisFirstDerivative( const int index, const int order, const float t ) const {
 	return ( Basis( index, order-1, t ) - Basis( index+1, order-1, t ) ) *
 			( float ) ( order - 1 ) / ( this->TimeForIndex( index + ( order - 1 ) - 2 ) - this->TimeForIndex( index - 2 ) );
 }
@@ -1929,7 +1937,7 @@ anCurve_BSpline::BasisSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve_BSpline<type>::BasisSecondDerivative( const int index, const int order, const float t ) const {
+inline float anCurve_BSpline<type>::BasisSecondDerivative( const int index, const int order, const float t ) const {
 	return ( BasisFirstDerivative( index, order-1, t ) - BasisFirstDerivative( index+1, order-1, t ) ) *
 			( float ) ( order - 1 ) / ( this->TimeForIndex( index + ( order - 1 ) - 2 ) - this->TimeForIndex( index - 2 ) );
 }
@@ -1965,7 +1973,7 @@ anCurve_UniformCubicBSpline::anCurve_UniformCubicBSpline
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_UniformCubicBSpline<type>::anCurve_UniformCubicBSpline( void ) {
+inline anCurve_UniformCubicBSpline<type>::anCurve_UniformCubicBSpline( void ) {
 	this->order = 4;	// always cubic
 }
 
@@ -1977,7 +1985,7 @@ anCurve_UniformCubicBSpline::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_UniformCubicBSpline<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_UniformCubicBSpline<type>::GetCurrentValue( const float time ) const {
 	int i, j, k;
 	float bvals[4], clampedTime;
 	type v;
@@ -2005,7 +2013,7 @@ anCurve_UniformCubicBSpline::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_UniformCubicBSpline<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_UniformCubicBSpline<type>::GetCurrentFirstDerivative( const float time ) const {
 	int i, j, k;
 	float bvals[4], d, clampedTime;
 	type v;
@@ -2034,7 +2042,7 @@ anCurve_UniformCubicBSpline::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_UniformCubicBSpline<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_UniformCubicBSpline<type>::GetCurrentSecondDerivative( const float time ) const {
 	int i, j, k;
 	float bvals[4], d, clampedTime;
 	type v;
@@ -2063,7 +2071,7 @@ anCurve_UniformCubicBSpline::Basis
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_UniformCubicBSpline<type>::Basis( const int index, const float t, float *bvals ) const {
+inline void anCurve_UniformCubicBSpline<type>::Basis( const int index, const float t, float *bvals ) const {
 	float s = ( float ) ( t - this->TimeForIndex( index ) ) / ( this->TimeForIndex( index+1 ) - this->TimeForIndex( index ) );
 	bvals[0] = ( ( ( -s + 3.0f ) * s - 3.0f ) * s + 1.0f ) * ( 1.0f / 6.0f );
 	bvals[1] = ( ( ( 3.0f * s - 6.0f ) * s ) * s + 4.0f ) * ( 1.0f / 6.0f );
@@ -2079,7 +2087,7 @@ anCurve_UniformCubicBSpline::BasisFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_UniformCubicBSpline<type>::BasisFirstDerivative( const int index, const float t, float *bvals ) const {
+inline void anCurve_UniformCubicBSpline<type>::BasisFirstDerivative( const int index, const float t, float *bvals ) const {
 	float s = ( float ) ( t - this->TimeForIndex( index ) ) / ( this->TimeForIndex( index+1 ) - this->TimeForIndex( index ) );
 	bvals[0] = -0.5f * s * s + s - 0.5f;
 	bvals[1] = 1.5f * s * s - 2.0f * s;
@@ -2095,7 +2103,7 @@ anCurve_UniformCubicBSpline::BasisSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_UniformCubicBSpline<type>::BasisSecondDerivative( const int index, const float t, float *bvals ) const {
+inline void anCurve_UniformCubicBSpline<type>::BasisSecondDerivative( const int index, const float t, float *bvals ) const {
 	float s = ( float ) ( t - this->TimeForIndex( index ) ) / ( this->TimeForIndex( index+1 ) - this->TimeForIndex( index ) );
 	bvals[0] = -s + 1.0f;
 	bvals[1] = 3.0f * s - 2.0f;
@@ -2134,7 +2142,7 @@ anCurve_NonUniformBSpline::anCurve_NonUniformBSpline
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_NonUniformBSpline<type>::anCurve_NonUniformBSpline( void ) {
+inline anCurve_NonUniformBSpline<type>::anCurve_NonUniformBSpline( void ) {
 }
 
 /*
@@ -2145,7 +2153,7 @@ anCurve_NonUniformBSpline::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_NonUniformBSpline<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_NonUniformBSpline<type>::GetCurrentValue( const float time ) const {
 	int i, j, k;
 	float clampedTime;
 	type v;
@@ -2174,7 +2182,7 @@ anCurve_NonUniformBSpline::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_NonUniformBSpline<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_NonUniformBSpline<type>::GetCurrentFirstDerivative( const float time ) const {
 	int i, j, k;
 	float clampedTime;
 	type v;
@@ -2203,7 +2211,7 @@ anCurve_NonUniformBSpline::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_NonUniformBSpline<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_NonUniformBSpline<type>::GetCurrentSecondDerivative( const float time ) const {
 	int i, j, k;
 	float clampedTime;
 	type v;
@@ -2232,7 +2240,7 @@ anCurve_NonUniformBSpline::Basis
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_NonUniformBSpline<type>::Basis( const int index, const int order, const float t, float *bvals ) const {
+inline void anCurve_NonUniformBSpline<type>::Basis( const int index, const int order, const float t, float *bvals ) const {
     int r, s, i;
     float omega;
 
@@ -2257,7 +2265,7 @@ anCurve_NonUniformBSpline::BasisFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_NonUniformBSpline<type>::BasisFirstDerivative( const int index, const int order, const float t, float *bvals ) const {
+inline void anCurve_NonUniformBSpline<type>::BasisFirstDerivative( const int index, const int order, const float t, float *bvals ) const {
 	int i;
 
 	Basis( index, order-1, t, bvals+1 );
@@ -2277,7 +2285,7 @@ anCurve_NonUniformBSpline::BasisSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE void anCurve_NonUniformBSpline<type>::BasisSecondDerivative( const int index, const int order, const float t, float *bvals ) const {
+inline void anCurve_NonUniformBSpline<type>::BasisSecondDerivative( const int index, const int order, const float t, float *bvals ) const {
 	int i;
 
 	BasisFirstDerivative( index, order-1, t, bvals+1 );
@@ -2325,7 +2333,7 @@ anCurve_NURBS::anCurve_NURBS
 ====================
 */
 template<class type>
-ARC_INLINE anCurve_NURBS<type>::anCurve_NURBS( void ) {
+inline anCurve_NURBS<type>::anCurve_NURBS( void ) {
 }
 
 /*
@@ -2337,7 +2345,7 @@ anCurve_NURBS::AddValue
 ====================
 */
 template<class type>
-ARC_INLINE int anCurve_NURBS<type>::AddValue( const float time, const type &value ) {
+inline int anCurve_NURBS<type>::AddValue( const float time, const type &value ) {
 	int i;
 
 	i = this->IndexForTime( time );
@@ -2356,7 +2364,7 @@ anCurve_NURBS::AddValue
 ====================
 */
 template<class type>
-ARC_INLINE int anCurve_NURBS<type>::AddValue( const float time, const type &value, const float weight ) {
+inline int anCurve_NURBS<type>::AddValue( const float time, const type &value, const float weight ) {
 	int i;
 
 	i = this->IndexForTime( time );
@@ -2374,7 +2382,7 @@ anCurve_NURBS::GetCurrentValue
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_NURBS<type>::GetCurrentValue( const float time ) const {
+inline type anCurve_NURBS<type>::GetCurrentValue( const float time ) const {
 	int i, j, k;
 	float w, b, *bvals, clampedTime;
 	type v;
@@ -2407,7 +2415,7 @@ anCurve_NURBS::GetCurrentFirstDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_NURBS<type>::GetCurrentFirstDerivative( const float time ) const {
+inline type anCurve_NURBS<type>::GetCurrentFirstDerivative( const float time ) const {
 	int i, j, k;
 	float w, wb, wd1, b, d1, *bvals, *d1vals, clampedTime;
 	type v, vb, vd1;
@@ -2447,7 +2455,7 @@ anCurve_NURBS::GetCurrentSecondDerivative
 ====================
 */
 template<class type>
-ARC_INLINE type anCurve_NURBS<type>::GetCurrentSecondDerivative( const float time ) const {
+inline type anCurve_NURBS<type>::GetCurrentSecondDerivative( const float time ) const {
 	int i, j, k;
 	float w, wb, wd1, wd2, b, d1, d2, *bvals, *d1vals, *d2vals, clampedTime;
 	type v, vb, vd1, vd2;
@@ -2492,7 +2500,7 @@ anCurve_NURBS::WeightForIndex
 ====================
 */
 template<class type>
-ARC_INLINE float anCurve_NURBS<type>::WeightForIndex( const int index ) const {
+inline float anCurve_NURBS<type>::WeightForIndex( const int index ) const {
 	int n = weights.Num()-1;
 
 	if ( index < 0 ) {

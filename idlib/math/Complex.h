@@ -70,48 +70,48 @@ public:
 extern TeckComplex complexOrigin;
 #define complex_zero complexOrigin
 
-ARC_INLINE TeckComplex::TeckComplex( void ) {
+inline TeckComplex::TeckComplex( void ) {
 }
 
-ARC_INLINE TeckComplex::TeckComplex( const float r, const float i ) {
+inline TeckComplex::TeckComplex( const float r, const float i ) {
 	//this->r = r;
 	//this->i = i;
 }
 
-ARC_INLINE void TeckComplex::Set( const float r, const float i ) {
+inline void TeckComplex::Set( const float r, const float i ) {
 	this->r = r;
 	this->i = i;
 }
 
-ARC_INLINE void TeckComplex::Zero( void ) {
+inline void TeckComplex::Zero( void ) {
 	r = i = 0.0f;
 }
 
-ARC_INLINE float TeckComplex::operator[]( int index ) const {
+inline float TeckComplex::operator[]( int index ) const {
 	assert( index >= 0 && index < 2 );
 	return ( &r )[index];
 }
 
-ARC_INLINE float& TeckComplex::operator[]( int index ) {
+inline float& TeckComplex::operator[]( int index ) {
 	assert( index >= 0 && index < 2 );
 	return ( &r )[index];
 }
 
-ARC_INLINE TeckComplex TeckComplex::operator-() const {
+inline TeckComplex TeckComplex::operator-() const {
 	return TeckComplex( -r, -i );
 }
 
-ARC_INLINE TeckComplex &TeckComplex::operator=( const TeckComplex &a ) {
+inline TeckComplex &TeckComplex::operator=( const TeckComplex &a ) {
 	r = a.r;
 	i = a.i;
 	return *this;
 }
 
-ARC_INLINE TeckComplex TeckComplex::operator*( const TeckComplex &a ) const {
+inline TeckComplex TeckComplex::operator*( const TeckComplex &a ) const {
 	return TeckComplex( r * a.r - i * a.i, i * a.r + r * a.i );
 }
 
-ARC_INLINE TeckComplex TeckComplex::operator/( const TeckComplex &a ) const {
+inline TeckComplex TeckComplex::operator/( const TeckComplex &a ) const {
 	float s, t;
 	if ( anMath::Fabs( a.r ) >= anMath::Fabs( a.i ) ) {
 		s = a.i / a.r;
@@ -124,20 +124,20 @@ ARC_INLINE TeckComplex TeckComplex::operator/( const TeckComplex &a ) const {
 	}
 }
 
-ARC_INLINE TeckComplex TeckComplex::operator+( const TeckComplex &a ) const {
+inline TeckComplex TeckComplex::operator+( const TeckComplex &a ) const {
 	return TeckComplex( r + a.r, i + a.i );
 }
 
-ARC_INLINE TeckComplex TeckComplex::operator-( const TeckComplex &a ) const {
+inline TeckComplex TeckComplex::operator-( const TeckComplex &a ) const {
 	return TeckComplex( r - a.r, i - a.i );
 }
 
-ARC_INLINE TeckComplex &TeckComplex::operator*=( const TeckComplex &a ) {
+inline TeckComplex &TeckComplex::operator*=( const TeckComplex &a ) {
 	*this = TeckComplex( r * a.r - i * a.i, i * a.r + r * a.i );
 	return *this;
 }
 
-ARC_INLINE TeckComplex &TeckComplex::operator/=( const TeckComplex &a ) {
+inline TeckComplex &TeckComplex::operator/=( const TeckComplex &a ) {
 	float s, t;
 	if ( anMath::Fabs( a.r ) >= anMath::Fabs( a.i ) ) {
 		s = a.i / a.r;
@@ -151,63 +151,63 @@ ARC_INLINE TeckComplex &TeckComplex::operator/=( const TeckComplex &a ) {
 	return *this;
 }
 
-ARC_INLINE TeckComplex &TeckComplex::operator+=( const TeckComplex &a ) {
+inline TeckComplex &TeckComplex::operator+=( const TeckComplex &a ) {
 	r += a.r;
 	i += a.i;
 	return *this;
 }
 
-ARC_INLINE TeckComplex &TeckComplex::operator-=( const TeckComplex &a ) {
+inline TeckComplex &TeckComplex::operator-=( const TeckComplex &a ) {
 	r -= a.r;
 	i -= a.i;
 	return *this;
 }
 
-ARC_INLINE TeckComplex TeckComplex::operator*( const float a ) const {
+inline TeckComplex TeckComplex::operator*( const float a ) const {
 	return TeckComplex( r * a, i * a );
 }
 
-ARC_INLINE TeckComplex TeckComplex::operator/( const float a ) const {
+inline TeckComplex TeckComplex::operator/( const float a ) const {
 	float s = 1.0f / a;
 	return TeckComplex( r * s, i * s );
 }
 
-ARC_INLINE TeckComplex TeckComplex::operator+( const float a ) const {
+inline TeckComplex TeckComplex::operator+( const float a ) const {
 	return TeckComplex( r + a, i );
 }
 
-ARC_INLINE TeckComplex TeckComplex::operator-( const float a ) const {
+inline TeckComplex TeckComplex::operator-( const float a ) const {
 	return TeckComplex( r - a, i );
 }
 
-ARC_INLINE TeckComplex &TeckComplex::operator*=( const float a ) {
+inline TeckComplex &TeckComplex::operator*=( const float a ) {
 	r *= a;
 	i *= a;
 	return *this;
 }
 
-ARC_INLINE TeckComplex &TeckComplex::operator/=( const float a ) {
+inline TeckComplex &TeckComplex::operator/=( const float a ) {
 	float s = 1.0f / a;
 	r *= s;
 	i *= s;
 	return *this;
 }
 
-ARC_INLINE TeckComplex &TeckComplex::operator+=( const float a ) {
+inline TeckComplex &TeckComplex::operator+=( const float a ) {
 	r += a;
 	return *this;
 }
 
-ARC_INLINE TeckComplex &TeckComplex::operator-=( const float a ) {
+inline TeckComplex &TeckComplex::operator-=( const float a ) {
 	r -= a;
 	return *this;
 }
 
-ARC_INLINE TeckComplex operator*( const float a, const TeckComplex &b ) {
+inline TeckComplex operator*( const float a, const TeckComplex &b ) {
 	return TeckComplex( a * b.r, a * b.i );
 }
 
-ARC_INLINE TeckComplex operator/( const float a, const TeckComplex &b ) {
+inline TeckComplex operator/( const float a, const TeckComplex &b ) {
 	float s, t;
 	if ( anMath::Fabs( b.r ) >= anMath::Fabs( b.i ) ) {
 		s = b.i / b.r;
@@ -220,15 +220,15 @@ ARC_INLINE TeckComplex operator/( const float a, const TeckComplex &b ) {
 	}
 }
 
-ARC_INLINE TeckComplex operator+( const float a, const TeckComplex &b ) {
+inline TeckComplex operator+( const float a, const TeckComplex &b ) {
 	return TeckComplex( a + b.r, b.i );
 }
 
-ARC_INLINE TeckComplex operator-( const float a, const TeckComplex &b ) {
+inline TeckComplex operator-( const float a, const TeckComplex &b ) {
 	return TeckComplex( a - b.r, -b.i );
 }
 
-ARC_INLINE TeckComplex TeckComplex::Reciprocal( void ) const {
+inline TeckComplex TeckComplex::Reciprocal( void ) const {
 	float s, t;
 	if ( anMath::Fabs( r ) >= anMath::Fabs( i ) ) {
 		s = i / r;
@@ -241,7 +241,7 @@ ARC_INLINE TeckComplex TeckComplex::Reciprocal( void ) const {
 	}
 }
 
-ARC_INLINE TeckComplex TeckComplex::Sqrt( void ) const {
+inline TeckComplex TeckComplex::Sqrt( void ) const {
 	float x, y, w;
 
 	if ( r == 0.0f && i == 0.0f ) {
@@ -266,7 +266,7 @@ ARC_INLINE TeckComplex TeckComplex::Sqrt( void ) const {
 	}
 }
 
-ARC_INLINE float TeckComplex::Abs( void ) const {
+inline float TeckComplex::Abs( void ) const {
 	float x, y, t;
 	x = anMath::Fabs( r );
 	y = anMath::Fabs( i );
@@ -283,11 +283,11 @@ ARC_INLINE float TeckComplex::Abs( void ) const {
 	}
 }
 
-ARC_INLINE bool TeckComplex::Compare( const TeckComplex &a ) const {
+inline bool TeckComplex::Compare( const TeckComplex &a ) const {
 	return ( ( r == a.r ) && ( i == a.i ) );
 }
 
-ARC_INLINE bool TeckComplex::Compare( const TeckComplex &a, const float epsilon ) const {
+inline bool TeckComplex::Compare( const TeckComplex &a, const float epsilon ) const {
 	if ( anMath::Fabs( r - a.r ) > epsilon ) {
 		return false;
 	}
@@ -297,23 +297,23 @@ ARC_INLINE bool TeckComplex::Compare( const TeckComplex &a, const float epsilon 
 	return true;
 }
 
-ARC_INLINE bool TeckComplex::operator==( const TeckComplex &a ) const {
+inline bool TeckComplex::operator==( const TeckComplex &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool TeckComplex::operator!=( const TeckComplex &a ) const {
+inline bool TeckComplex::operator!=( const TeckComplex &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE int TeckComplex::GetDimension( void ) const {
+inline int TeckComplex::GetDimension( void ) const {
 	return 2;
 }
 
-ARC_INLINE const float *TeckComplex::ToFloatPtr( void ) const {
+inline const float *TeckComplex::ToFloatPtr( void ) const {
 	return &r;
 }
 
-ARC_INLINE float *TeckComplex::ToFloatPtr( void ) {
+inline float *TeckComplex::ToFloatPtr( void ) {
 	return &r;
 }
 

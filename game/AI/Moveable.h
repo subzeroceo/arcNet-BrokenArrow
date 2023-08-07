@@ -42,13 +42,13 @@ public:
 	virtual void			WriteToSnapshot( anBitMsgDelta &msg ) const;
 	virtual void			ReadFromSnapshot( const anBitMsgDelta &msg );
 
-	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor );
+	virtual void			AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor );
 
 protected:
 
 	anPhysics_RigidBody		physicsObj;				// physics object
-	anString					brokenModel;			// model set when health drops down to or below zero
-	anString					damage;					// if > 0 apply damage to hit entities
+	anStr					brokenModel;			// model set when health drops down to or below zero
+	anStr					damage;					// if > 0 apply damage to hit entities
 	int						nextCollideFxTime;		// next time it is ok to spawn collision fx
 	float					minDamageVelocity;		// minimum velocity before moveable applies damage
 	float					maxDamageVelocity;		// velocity at which the maximum damage is applied
@@ -73,7 +73,7 @@ protected:
 	void					Event_IsAtRest( void );
 	void					Event_CanDamage ( float enable );
 	void					Event_SetHealth ( float newHealth );
-	void					Event_RadiusDamage( anEntity *attacker, const char* splash );
+	void					Event_RadiusDamage( anEntity *attacker, const char *splash );
 };
 
 

@@ -16,7 +16,7 @@ int FS_WriteFloatString( char *buf, const char *fmt, va_list argPtr ) {
 	double f;
 	char *str;
 	int index;
-	anString tmp, format;
+	anStr tmp, format;
 
 	index = 0;
 
@@ -176,13 +176,16 @@ int anFile::Length( void ) {
 	return end;//0;
 }
 
+static void SetLength( anFile *thiz, unsigned newl ) {
+}
+
 /*
 =================
 anFile::Timestamp
 =================
 */
 ARC_TIME_T anFile::Timestamp( void ) {
-	return 0;
+	return timeStamp;;
 }
 
 /*
@@ -218,7 +221,22 @@ anFile::Seek
 int anFile::Seek( long offset, fsOrigin_t origin ) {
 	return -1;
 }
+static int do_seekex( anFile *thiz, long long offs, fsOrigin_t origin)  {
+		unsigned outseekd = 0;
+		auto t = reinterpret_cast<cs_idfile_override_t *>( thiz );
 
+		switch ( origin ) {
+		case FS_SEEK_CUR:
+			outseekd = SEEK_CUR;
+			break;
+		case FS_SEEK_END:
+			outseekd = SEEK_END;
+			break;
+		case FS_SEEK_SET:
+			outseekd = SEEK_SET;
+			break;
+		}
+		return EXTIOFN_LOCK(_fseeki64,t->m_cfile, offs, outseekd);
 /*
 =================
 anFile::Rewind
@@ -239,11 +257,11 @@ int anFile::Printf( const char *fmt, ... ) {
 	va_list argptr;
 
 	va_start( argptr, fmt );
-	length = anString::vsnPrintf( buf, MAX_PRINT_MSG-1, fmt, argptr );
+	length = anStr::vsnPrintf( buf, MAX_PRINT_MSG-1, fmt, argptr );
 	va_end( argptr );
 
 	// so notepad formats the lines correctly
-  	anString	work( buf );
+  	anStr work( buf );
  	work.Replace( "\n", "\r\n" );
   
   	return Write( work.c_str(), work.Length() );
@@ -258,7 +276,7 @@ int anFile::VPrintf( const char *fmt, va_list args ) {
 	char buf[MAX_PRINT_MSG];
 	int length;
 
-	length = anString::vsnPrintf( buf, MAX_PRINT_MSG-1, fmt, args );
+	length = anStr::vsnPrintf( buf, MAX_PRINT_MSG-1, fmt, args );
 	return Write( buf, length );
 }
 
@@ -369,14 +387,15 @@ int anFile::ReadBool( bool &value ) {
  anFile::ReadString
  =================
  */
-int anFile::ReadString( anString &string ) {
+int anFile::ReadString( anStr &outStr ) {
+	//char scratchbuffer[4096];
 	int len;
 	int result = 0;
 	
 	ReadInt( len );
 	if ( len >= 0 ) {
-		string.Fill( ' ', len );
-		result = Read( &string[ 0 ], len );
+		outStr.Fill( ' ', len );
+		intresult = Read( &outStr[0], len );
 	}
 	return result;
 }
@@ -520,9 +539,7 @@ int anFile::WriteBool( const bool value ) {
  =================
  */
 int anFile::WriteString( const char *value ) {
-	int len;
-	
-	len = strlen( value );
+	int len = strlen( value );
 	WriteInt( len );
     return Write( value, len );
 }
@@ -581,6 +598,44 @@ int anFile::WriteMat3( const anMat3 &mat ) {
 	LittleRevBytes( &v, sizeof( float ), sizeof( v )/sizeof( float ) );
 	return Write( &v, sizeof( v ) );
 }
+FILE* ResourceOVerride( const char *name, size_t *size_out ) {
+	FILE* resfile = nullptr;
+
+	char pathBuf[4096];
+	if ( ( gOverrideFileName != nullptr ) && ( strstr( name, ".entities" ) != 0 ) && ( gOverrideName == anStr::Icmp( name ) ) ) {
+		strcpy_s( pathBuf, gOverrideFileName );
+		gOverrideFileName = nullptr;
+
+	} else {
+		sprintf_s( pathbuf, ".\\overrides\\%s", name );
+	}
+
+	if ( strstr( name, ".entities") != 0) {
+		gLastLoadedEntities = name;
+	}
+	if ( !g_readfile_log ) {
+		fopen_s (&g_readfile_log, "readfile_eternal.txt", "w" );
+		atexit( dispose_log );
+	}
+	fprintf( g_readfile_log, "%s\n", name ) ;
+
+	unsigned i = 0;
+	for ( unsigned i = 0; pathBuf[i]; ++i ) {
+		if ( pathBuf[i] == '/') {
+			pathBuf[i] = '\\';
+		}
+	}
+	fopen_s( &resfile, pathBuf, "rb" );
+	if ( !resfile )
+		return nullptr;
+
+	fseek( resfile, 0, SEEK_END );
+
+	*size_out = ftell( resfile );
+
+	fseek( resfile, 0, SEEK_SET );
+	return resfile;
+}
 
 /*
 =================================================================================
@@ -604,8 +659,8 @@ anFileMemory::anFileMemory( void ) {
 	granularity = 16384;
 
 	mode = ( 1 << FS_WRITE );
-	filePtr = nullptrptr;
-	curPtr = nullptrptr;
+	filePtr = nullptr;
+	curPtr = nullptr;
 }
 
 /*
@@ -621,8 +676,8 @@ anFileMemory::anFileMemory( const char *name ) {
 	granularity = 16384;
 
 	mode = ( 1 << FS_WRITE );
-	filePtr = nullptrptr;
-	curPtr = nullptrptr;
+	filePtr = nullptr;
+	curPtr = nullptr;
 }
 
 /*
@@ -739,8 +794,8 @@ int anFileMemory::Length( void ) {
 anFileMemory::Timestamp
 =================
 */
-ARC_TIME_T anFileMemory::Timestamp( void ) {
-	return 0;
+unsigned int anFileMemory::Timestamp( void ) {
+	return timestamp;
 }
 
 /*
@@ -767,7 +822,7 @@ anFileMemory::Flush
 */
 void anFileMemory::Flush( void ) {
 	anFile *file = FS_FileForHandle( f );
-	setvbuf( file, nullptrptr, _IONBF, 0 );
+	setvbuf( file, nullptr, _IONBF, 0 );
 }
 
 /*
@@ -828,8 +883,8 @@ void anFileMemory::Clear( bool freeMemory ) {
 	if ( freeMemory ) {
 		allocated = 0;
 		Mem_Free( filePtr );
-		filePtr = nullptrptr;
-		curPtr = nullptrptr;
+		filePtr = nullptr;
+		curPtr = nullptr;
 	} else {
 		curPtr = filePtr;
 	}
@@ -848,6 +903,14 @@ void anFileMemory::SetData( const char *data, int length ) {
 	mode = 1 << FS_READ;
 	filePtr = const_cast<char *>( data );
 	curPtr = filePtr;
+}
+
+void WriteOverloadMemory( void *buf, void *data, size_t size, size_t offset ) {
+	anFile_Memory *file = (anFile_Memory *)buf;
+	memcpy( file->filePtr + offset, data, size );
+	char string[MAX_PATH];
+	sprintf( string, "MemoryOverload: Written %llu bytes from %llX to %llX\n", size, ( int )data, ( int )file->filePtr );
+	//OutputDebugStringA( String );
 }
 
 /*
@@ -1146,6 +1209,7 @@ anFilePermanent::Length
 ================
 */
 int anFilePermanent::Length( void ) {
+	//auto fileSize = reinterpret_cast<const *>( filePtr );
 	return fileSize;
 }
 
@@ -1165,30 +1229,30 @@ anFilePermanent::Seek
   returns zero on success and -1 on failure
 =================
 */
-int anFilePermanent::Seek( long offset, fsOrigin_t origin ) {
-	int _origin;
+unsigned anFilePermanent::Seek( long offset, fsOrigin_t origin ) {
+	unsigned seeked;
 
 	switch ( origin ) {
 		case FS_SEEK_CUR: {
-			_origin = SEEK_CUR;
+			seeked = SEEK_CUR;
 			break;
 		}
 		case FS_SEEK_END: {
-			_origin = SEEK_END;
+			seeked = SEEK_END;
 			break;
 		}
 		case FS_SEEK_SET: {
-			_origin = SEEK_SET;
+			seeked = SEEK_SET;
 			break;
 		}
 		default: {
-			_origin = SEEK_CUR;
+			seeked = SEEK_CUR;
 			common->FatalError( "anFilePermanent::Seek: bad origin for %s\n", name.c_str() );
 			break;
 		}
 	}
 
-	return fseek( o, offset, _origin );
+	return fseek( o, offset, seeked );
 }
 
 
@@ -1230,7 +1294,7 @@ Properly handles partial reads
 =================
 */
 int anCompressedArchive::Read( void *buffer, int len ) {
-	int l = unzReadCurrentFile( z, buffer, len );
+	int l = PAK_ReadCurrentFile( z, buffer, len );
 	fileSystem->AddToReadCount( l );
 	return l;
 }
@@ -1294,11 +1358,10 @@ ARC_TIME_T anCompressedArchive::Timestamp( void ) {
 =================
 anCompressedArchive::Seek
 
-  returns zero on success and -1 on failure
+returns zero on success and -1 on failure
 =================
 */
 #define ZIP_SEEK_BUF_SIZE	(1<<15)
-
 int anCompressedArchive::Seek( long offset, fsOrigin_t origin ) {
 	int res, i;
 	char *buf;
@@ -1318,12 +1381,12 @@ int anCompressedArchive::Seek( long offset, fsOrigin_t origin ) {
 		case FS_SEEK_CUR: {
 			buf = (char *) _alloca16( ZIP_SEEK_BUF_SIZE );
 			for ( i = 0; i < ( offset - ZIP_SEEK_BUF_SIZE ); i += ZIP_SEEK_BUF_SIZE ) {
-				res = unzReadCurrentFile( z, buf, ZIP_SEEK_BUF_SIZE );
+				res = PAK_ReadCurrentFile( z, buf, ZIP_SEEK_BUF_SIZE );
 				if ( res < ZIP_SEEK_BUF_SIZE ) {
 					return -1;
 				}
 			}
-			res = i + unzReadCurrentFile( z, buf, offset - i );
+			res = i + PAK_ReadCurrentFile( z, buf, offset - i );
 			return ( res == offset ) ? 0 : -1;
 		}
 		default: {

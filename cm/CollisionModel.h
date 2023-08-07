@@ -125,7 +125,7 @@ typedef struct cm_nodeBlock_s {
 } cm_nodeBlock_t;
 
 typedef struct cm_model_s {
-	anString				name;				// model name
+	anStr				name;				// model name
 	anBounds				bounds;				// model bounds
 	int						contents;			// all contents of the model ored together
 	bool					isConvex;			// set if model is convex
@@ -353,7 +353,7 @@ public:
 	const anVec3 &				GetVertex( int vertexNum ) const = 0;
 
 								// Gets an edge of the model.
-	void						GetEdge( int edgeNum, anVec3& start, anVec3& end ) const = 0;
+	void						GetEdge( int edgeNum, anVec3 &start, anVec3 &end ) const = 0;
 
 								// Gets a polygon of the model.
 	void						GetPolygon( int polygonNum, anFixedWinding &winding ) const = 0;
@@ -503,7 +503,7 @@ public:
 	bool			WriteCollisionModelForMapEntity( const anMapEntity *mapEnt, const char *filename, const bool testTraceModel = true ) = 0;
 
 private:				// collision map data
-	anString			mapName;
+	anStr			mapName;
 	ARC_TIME_T			mapFileTime;
 	int					loaded;
 						// for multi-check avoidance

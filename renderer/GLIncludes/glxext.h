@@ -101,7 +101,7 @@ typedef void ( *PFNGLXDESTROYPBUFFERPROC) (Display *dpy, GLXPbuffer pbuf);
 typedef void ( *PFNGLXQUERYDRAWABLEPROC) (Display *dpy, GLXDrawable draw, int attribute, unsigned int *value);
 typedef GLXContext ( *PFNGLXCREATENEWCONTEXTPROC) (Display *dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct);
 typedef Bool ( *PFNGLXMAKECONTEXTCURRENTPROC) (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx);
-typedef GLXDrawable ( *PFNGLXGETCURRENTREADDRAWABLEPROC) ( void );
+typedef GLXDrawable ( *PFNGLXGETCURRENTREADDRAWABLEPROC)( void );
 typedef int ( *PFNGLXQUERYCONTEXTPROC) (Display *dpy, GLXContext ctx, int attribute, int *value);
 typedef void ( *PFNGLXSELECTEVENTPROC) (Display *dpy, GLXDrawable draw, unsigned long event_mask);
 typedef void ( *PFNGLXGETSELECTEDEVENTPROC) (Display *dpy, GLXDrawable draw, unsigned long *event_mask);
@@ -119,7 +119,7 @@ void glXDestroyPbuffer (Display *dpy, GLXPbuffer pbuf);
 void glXQueryDrawable (Display *dpy, GLXDrawable draw, int attribute, unsigned int *value);
 GLXContext glXCreateNewContext (Display *dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct);
 Bool glXMakeContextCurrent (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx);
-GLXDrawable glXGetCurrentReadDrawable ( void );
+GLXDrawable glXGetCurrentReadDrawable( void );
 int glXQueryContext (Display *dpy, GLXContext ctx, int attribute, int *value);
 void glXSelectEvent (Display *dpy, GLXDrawable draw, unsigned long event_mask);
 void glXGetSelectedEvent (Display *dpy, GLXDrawable draw, unsigned long *event_mask);
@@ -241,7 +241,7 @@ typedef GLXContext ( *PFNGLXCREATEASSOCIATEDCONTEXTAMDPROC) (unsigned int id, GL
 typedef GLXContext ( *PFNGLXCREATEASSOCIATEDCONTEXTATTRIBSAMDPROC) (unsigned int id, GLXContext share_context, const int *attribList);
 typedef Bool ( *PFNGLXDELETEASSOCIATEDCONTEXTAMDPROC) (GLXContext ctx);
 typedef Bool ( *PFNGLXMAKEASSOCIATEDCONTEXTCURRENTAMDPROC) (GLXContext ctx);
-typedef GLXContext ( *PFNGLXGETCURRENTASSOCIATEDCONTEXTAMDPROC) ( void );
+typedef GLXContext ( *PFNGLXGETCURRENTASSOCIATEDCONTEXTAMDPROC)( void );
 typedef void ( *PFNGLXBLITCONTEXTFRAMEBUFFERAMDPROC) (GLXContext dstCtx, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
 #ifdef GLX_GLXEXT_PROTOTYPES
 unsigned int glXGetGPUIDsAMD (unsigned int maxCount, unsigned int *ids);
@@ -251,7 +251,7 @@ GLXContext glXCreateAssociatedContextAMD (unsigned int id, GLXContext share_list
 GLXContext glXCreateAssociatedContextAttribsAMD (unsigned int id, GLXContext share_context, const int *attribList);
 Bool glXDeleteAssociatedContextAMD (GLXContext ctx);
 Bool glXMakeAssociatedContextCurrentAMD (GLXContext ctx);
-GLXContext glXGetCurrentAssociatedContextAMD ( void );
+GLXContext glXGetCurrentAssociatedContextAMD( void );
 void glXBlitContextFramebufferAMD (GLXContext dstCtx, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
 #endif
 #endif /* GLX_AMD_gpu_association */
@@ -299,13 +299,13 @@ void glXBlitContextFramebufferAMD (GLXContext dstCtx, GLint srcX0, GLint srcY0, 
 #define GLX_SHARE_CONTEXT_EXT             0x800A
 #define GLX_VISUAL_ID_EXT                 0x800B
 #define GLX_SCREEN_EXT                    0x800C
-typedef Display *( *PFNGLXGETCURRENTDISPLAYEXTPROC) ( void );
+typedef Display *( *PFNGLXGETCURRENTDISPLAYEXTPROC)( void );
 typedef int ( *PFNGLXQUERYCONTEXTINFOEXTPROC) (Display *dpy, GLXContext context, int attribute, int *value);
 typedef GLXContextID ( *PFNGLXGETCONTEXTIDEXTPROC) (const GLXContext context);
 typedef GLXContext ( *PFNGLXIMPORTCONTEXTEXTPROC) (Display *dpy, GLXContextID contextID);
 typedef void ( *PFNGLXFREECONTEXTEXTPROC) (Display *dpy, GLXContext context);
 #ifdef GLX_GLXEXT_PROTOTYPES
-Display *glXGetCurrentDisplayEXT ( void );
+Display *glXGetCurrentDisplayEXT( void );
 int glXQueryContextInfoEXT (Display *dpy, GLXContext context, int attribute, int *value);
 GLXContextID glXGetContextIDEXT (const GLXContext context);
 GLXContext glXImportContextEXT (Display *dpy, GLXContextID contextID);
@@ -501,10 +501,10 @@ GLboolean glXSet3DfxModeMESA (GLint mode);
 
 #ifndef GLX_MESA_swap_control
 #define GLX_MESA_swap_control 1
-typedef int ( *PFNGLXGETSWAPINTERVALMESAPROC) ( void );
+typedef int ( *PFNGLXGETSWAPINTERVALMESAPROC)( void );
 typedef int ( *PFNGLXSWAPINTERVALMESAPROC) (unsigned int interval);
 #ifdef GLX_GLXEXT_PROTOTYPES
-int glXGetSwapIntervalMESA ( void );
+int glXGetSwapIntervalMESA( void );
 int glXSwapIntervalMESA (unsigned int interval);
 #endif
 #endif /* GLX_MESA_swap_control */
@@ -914,10 +914,10 @@ void glXCushionSGI (Display *dpy, Window window, float cushion);
 #ifndef GLX_SGI_make_current_read
 #define GLX_SGI_make_current_read 1
 typedef Bool ( *PFNGLXMAKECURRENTREADSGIPROC) (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx);
-typedef GLXDrawable ( *PFNGLXGETCURRENTREADDRAWABLESGIPROC) ( void );
+typedef GLXDrawable ( *PFNGLXGETCURRENTREADDRAWABLESGIPROC)( void );
 #ifdef GLX_GLXEXT_PROTOTYPES
 Bool glXMakeCurrentReadSGI (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx);
-GLXDrawable glXGetCurrentReadDrawableSGI ( void );
+GLXDrawable glXGetCurrentReadDrawableSGI( void );
 #endif
 #endif /* GLX_SGI_make_current_read */
 

@@ -32,8 +32,8 @@ typedef struct simpleRigidBodyPState_s {
 
 	virtual void			MakeDefault( void );
 
-	virtual void			Write( anFile* file ) const;
-	virtual void			Read( anFile* file );
+	virtual void			Write( anFile *file ) const;
+	virtual void			Read( anFile *file );
 
 	anVec3					position;
 	anCQuat 				orientation;
@@ -134,7 +134,7 @@ public:	// common physics interface
 	const anVec3 &			GetPushedLinearVelocity( const int id = 0 ) const;
 	const anVec3 &			GetPushedAngularVelocity( const int id = 0 ) const;
 
-	void					SetMaster( arcEntity *master, const bool orientated );
+	void					SetMaster( anEntity *master, const bool orientated );
 
 	virtual void			DrawDebugInfo( void ) { DebugDraw(); }
 
@@ -185,7 +185,7 @@ private:
 
 	bool					orientedClip;
 
-	//const sdProgram::sdFunction* restFunc;
+	//const idProgram::sdFunction* restFunc;
 
 private:
 	void					Integrate( const float deltaTime, simpleRigidBodyPState_t &next );

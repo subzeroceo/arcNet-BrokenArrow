@@ -7,17 +7,17 @@ anPerlin::anPerlin( float _persistence, int _octaves, float _frequency ) {
 	frequency		= _frequency;
 
 	// "no" tiling
-	tilex = 0x0FFFFFFF;
-	tiley = 0x0FFFFFFF;
+	tileX = 0x0FFFFFFF;
+	tileY = 0x0FFFFFFF;
 	tilez = 0x0FFFFFFF;
 }
 
 void anPerlin::SetTileX( int tile ) {
-	tilex = ( int )( tile * frequency );
+	tileX = ( int )( tile * frequency );
 }
 
 void anPerlin::SetTileY( int tile ) {
-	tiley = ( int )( tile * frequency );
+	tileY = ( int )( tile * frequency );
 }
 
 void anPerlin::SetTileZ( int tile ) {
@@ -28,34 +28,31 @@ float anPerlin::RawNoise( int x, int y, int z ) {
 	int n = x + y * 57 + z * 227;
 	n = ( n << 13 ) ^ n;
 	//if (alternative)
-	//	return (1 - ( ( n * ( n * n * 19417 + 189851) + 4967243) & 4945007) / 3354521.0);
+	//	return (1 - ( ( n * ( n * n * 19417 + 189851 ) + 4967243) & 4945007) / 3354521.0f );
 	//else
-	return   1 - ( (n *  ( n * n * 15731 + 789221) + 1376312589) & 0x7fffffff ) / 1073741824.0;
+	return   1 - ( ( n *  ( n * n * 15731 + 789221 ) + 1376312589 ) & 0x7fffffff ) / 1073741824.0f;
 }
 
 /*
-float anPerlin::SmoothedNoise (int x, int y) {
-    float corners = ( Noise(x-1, y-1)+Noise(x+1, y-1)+Noise(x-1, y+1)+Noise(x+1, y+1) ) / 16;
-    float sides   = ( Noise(x-1, y)  +Noise(x+1, y)  +Noise(x, y-1)  +Noise(x, y+1) ) /  8;
-    float center  =  Noise(x, y) / 4;
+float anPerlin::SmoothedNoise( int x, int y ) {
+    float corners = ( Noise( x-1, y-1 )+Noise( x+1, y-1 )+Noise( x-1, y+1 )+Noise( x+1, y+1 ) ) / 16;
+    float sides   = ( Noise( x-1, y )  +Noise( x+1, y )  +Noise( x, y-1 )  +Noise( x, y+1 ) ) /  8;
+    float center  =  Noise( x, y ) / 4;
     return corners + sides + center;
 }
 */
 
-/**
-	Interpolated 3d noize
-*/
-float anPerlin::InterpolatedNoise (float x, float y, float z) {
-	int ix, iy, iz;
-	float fx, fy, fz;
 
-	ix = static_cast< int >( x );
-	iy = static_cast< int >( y );
-	iz = static_cast< int >( z );
+//	Interpolated 3d noize
 
-	fx = x - ix;
-	fy = y - iy;
-	fz = z - iz;
+float anPerlin::InterpolatedNoise( float x, float y, float z ) {
+	int ix = static_cast< int >( x );
+	int iy = static_cast< int >( y );
+	int iz = static_cast< int >( z );
+
+	float fx = x - ix;
+	float fy = y - iy;
+	float fz = z - iz;
 
 	float v1, v2, v3, v4, v5, v6, v7, v8;
 	v1 = RawNoise( ix,     iy,     iz );
@@ -102,23 +99,17 @@ float anPerlin::NoiseFloat( const anVec3 &pos ) {
       return rez;
 }
 
-
-
-
-
-
-
 #if 0
 
-bool	anPerlin2::inited = false;
-int		anPerlin2::p[ ( PERLIN_RANDOM_SAMPLES + 1 ) * 2 ];
-anVec3	anPerlin2::g[ ( PERLIN_RANDOM_SAMPLES + 1 ) * 2 ];
+bool	anNoiseGradient::inited = false;
+int		anNoiseGradient::p[ ( PERLIN_RANDOM_SAMPLES + 1 ) * 2 ];
+anVec3	anNoiseGradient::g[ ( PERLIN_RANDOM_SAMPLES + 1 ) * 2 ];
 
-anPerlin2::anPerlin2( void ) {
+anNoiseGradient::anNoiseGradient( void ) {
 	Init();
 }
 
-void anPerlin2::Init( void ) {
+void anNoiseGradient::Init( void ) {
 	if ( inited ) {
 		return;
 	}
@@ -163,66 +154,64 @@ void Perlin_Setup( const float& v, int& b0, int& b1, float& r0, float& r1 ) {
 	r1 = r0 - 1;
 }
 
-ARC_INLINE float Perlin_At( const anVec3& q, float r0, float r1, float r2 ) {
-	return ( q[ 0 ] * r0 ) + ( q[ 1 ] * r1 ) + ( q[ 2 ] * r2 );
+inline float Perlin_At( const anVec3 &q, float r0, float r1, float r2 ) {
+	return ( q[0] * r0 ) + ( q[1] * r1 ) + ( q[2] * r2 );
 }
 
-ARC_INLINE float Perlin_SCurve( float t ) {
+inline float Perlin_SCurve( float t ) {
 	return ( t * t * ( 3 - ( 2 * t ) ) );
 }
 
-ARC_INLINE float Perlin_Lerp( float a, float b, float t ) {
+inline float Perlin_Lerp( float a, float b, float t ) {
 	return ( a + (  t * ( b - a ) ) );
 }
 
-float anPerlin2::Noise( const anVec3& noisePos ) {
+float anNoiseGradient::Noise( const anVec3 &noisePos ) {
 	int b00, b01, b11, b10;
-	int b0[ 3 ], b1[ 3 ];
+	int b0[3], b1[3];
 	anVec3 r0, r1, s;
 
 	anVec3 vec = noisePos; // * 0.0037972f;
 
-	Perlin_Setup( vec[ 0 ], b0[ 0 ], b1[ 0 ], r0[ 0 ], r1[ 0 ] );
-	Perlin_Setup( vec[ 1 ], b0[ 1 ], b1[ 1 ], r0[ 1 ], r1[ 1 ] );
-	Perlin_Setup( vec[ 2 ], b0[ 2 ], b1[ 2 ], r0[ 2 ], r1[ 2 ] );
+	Perlin_Setup( vec[0], b0[0], b1[0], r0[0], r1[0] );
+	Perlin_Setup( vec[1], b0[1], b1[1], r0[1], r1[1] );
+	Perlin_Setup( vec[2], b0[2], b1[2], r0[2], r1[2] );
 
-	int i, j;
-	i = p[ b0[ 0 ] ];
-	j = p[ b1[ 0 ] ];
+	int i = p[ b0[0] ];
+	int j = p[ b1[0] ];
 
-	b00 = p[ i + b0[ 1 ] ];
-	b10 = p[ j + b0[ 1 ] ];
-	b01 = p[ i + b1[ 1 ] ];
-	b11 = p[ j + b1[ 1 ] ];
+	b00 = p[ i + b0[1] ];
+	b10 = p[ j + b0[1] ];
+	b01 = p[ i + b1[1] ];
+	b11 = p[ j + b1[1] ];
 
-	s[ 0 ] = Perlin_SCurve( r0[ 0 ] );
-	s[ 1 ] = Perlin_SCurve( r0[ 1 ] );
-	s[ 2 ] = Perlin_SCurve( r0[ 2 ] );
+	s[0] = Perlin_SCurve( r0[0] );
+	s[1] = Perlin_SCurve( r0[1] );
+	s[2] = Perlin_SCurve( r0[2] );
 
 	float u, v, a, b, c ,d;
 
-	u = Perlin_At( g[ b00 + b0[ 2 ] ], r0[ 0 ], r0[ 1 ], r0[ 2 ] );
-	v = Perlin_At( g[ b10 + b0[ 2 ] ], r1[ 0 ], r0[ 1 ], r0[ 2 ] );
-	a = Perlin_Lerp( s[ 0 ], u, v );
+	u = Perlin_At( g[ b00 + b0[2] ], r0[0], r0[1], r0[2] );
+	v = Perlin_At( g[ b10 + b0[2] ], r1[0], r0[1], r0[2] );
+	a = Perlin_Lerp( s[0], u, v );
 
-	u = Perlin_At( g[ b01 + b0[ 2 ] ], r0[ 0 ], r1[ 1 ], r0[ 2 ] );
-	v = Perlin_At( g[ b11 + b0[ 2 ] ], r1[ 0 ], r1[ 1 ], r0[ 2 ] );
-	b = Perlin_Lerp( s[ 0 ], u, v );
+	u = Perlin_At( g[ b01 + b0[2] ], r0[0], r1[1], r0[2] );
+	v = Perlin_At( g[ b11 + b0[2] ], r1[0], r1[1], r0[2] );
+	b = Perlin_Lerp( s[0], u, v );
 
-	c = Perlin_Lerp( s[ 1 ], a, b );
+	c = Perlin_Lerp( s[1], a, b );
 
+	u = Perlin_At( g[ b00 + b1[2] ], r0[0], r0[1], r1[2] );
+	v = Perlin_At( g[ b10 + b1[2] ], r1[0], r0[1], r1[2] );
+	a = Perlin_Lerp( s[0], u, v );
 
-	u = Perlin_At( g[ b00 + b1[ 2 ] ], r0[ 0 ], r0[ 1 ], r1[ 2 ] );
-	v = Perlin_At( g[ b10 + b1[ 2 ] ], r1[ 0 ], r0[ 1 ], r1[ 2 ] );
-	a = Perlin_Lerp( s[ 0 ], u, v );
+	u = Perlin_At( g[ b01 + b1[2] ], r0[0], r1[1], r1[2] );
+	v = Perlin_At( g[ b11 + b1[2] ], r1[0], r1[1], r1[2] );
+	b = Perlin_Lerp( s[0], u, v );
 
-	u = Perlin_At( g[ b01 + b1[ 2 ] ], r0[ 0 ], r1[ 1 ], r1[ 2 ] );
-	v = Perlin_At( g[ b11 + b1[ 2 ] ], r1[ 0 ], r1[ 1 ], r1[ 2 ] );
-	b = Perlin_Lerp( s[ 0 ], u, v );
+	d = Perlin_Lerp( s[1], a, b );
 
-	d = Perlin_Lerp( s[ 1 ], a, b );
-
-	d = Perlin_Lerp( s[ 2 ], c, d );
+	d = Perlin_Lerp( s[2], c, d );
 	if ( d > 1.f ) {
 		d = 1.f;
 	} else if ( d < -1.f ) {
@@ -230,77 +219,66 @@ float anPerlin2::Noise( const anVec3& noisePos ) {
 	}
 	return d;
 }
-
 #endif // 0
-
-
-
-
-
-
-
-
-
-
 
 // TODO: change these preprocessor macros into inline functions
 
-// S curve is (3x^2 - 2x^3) because it's quick to calculate
-// though -cos(x * PI) * 0.5 + 0.5 would work too
+// -cos(x * PI) * 0.5f + 0.5f is the correct calculations and forumla for a proper s-curve
 
-ARC_INLINE float EaseCurve( float t ) {
-	return t * t * ( 3.0 - 2.0 * t );
+inline float EasePolynomialCurve( float t ) {
+	return t * t * ( 3.0f - 2.0f * t );
+}
+inline float EaseCubics( float t ) {
+	return t * t * ( 3.0f * t - 2.0f * t );
 }
 
-ARC_INLINE float LinearInterp( float t, float a, float b ) {
+float TrueEaseCurve( float t ) {
+	return 0.5f * ( 1.0f - cos( t * 3.14159f ) );
+}
+
+inline float LinearInterp( float t, float a, float b ) {
 	return a + t * ( b - a );
 }
 
-ARC_INLINE float Dot2( float rx, float ry, float* q ) {
-	return rx * q[ 0 ] + ry * q[ 1 ];
+inline float Dot2( float rx, float ry, float *q ) {
+	return rx * q[0] + ry * q[1];
 }
 
-ARC_INLINE float Dot3( float rx, float ry, float rz, float* q ) {
-	return rx * q[ 0 ] + ry * q[ 1 ] + rz * q[ 2 ];
+inline float Dot3( float rx, float ry, float rz, float* q ) {
+	return rx * q[0] + ry * q[1] + rz * q[2];
 }
 
 #define SetupValues( t, axis, g0, g1, d0, d1, pos ) \
 	t = pos[axis] + NOISE_LARGE_PWR2; \
-	g0 = ((int)t) & NOISE_MOD_MASK; \
-	g1 = (g0 + 1) & NOISE_MOD_MASK; \
-	d0 = t - (int)t; \
-	d1 = d0 - 1.0;
+	g0 = ( ( int )t ) & NOISE_MOD_MASK; \
+	g1 = ( g0 + 1 ) & NOISE_MOD_MASK; \
+	d0 = t - ( int )t; \
+	d1 = d0 - 1.0f;
 
-/////////////////////////////////////////////////////////////////////
 // return a random float in [-1,1]
 
-ARC_INLINE float anPerlin2::RandNoiseFloat() {
-	return (float)((rand() % (NOISE_WRAP_INDEX + NOISE_WRAP_INDEX)) -
-		NOISE_WRAP_INDEX) / NOISE_WRAP_INDEX;
+inline float anNoiseGradient::RandNoiseFloat() {
+	return ( float )( (rand() % ( NOISE_WRAP_INDEX + NOISE_WRAP_INDEX ) ) -
+		NOISE_WRAP_INDEX ) / NOISE_WRAP_INDEX;
 };
 
-/////////////////////////////////////////////////////////////////////
 // convert a 2D vector into unit length
-
-void anPerlin2::Normalize2d(float vector[2]) {
-	float length = sqrt((vector[0] * vector[0]) + (vector[1] * vector[1]));
+void anNoiseGradient::Normalize2d( float vector[2] ) {
+	float length = sqrt( ( vector[0] * vector[0] ) + ( vector[1] * vector[1] ) );
 	vector[0] /= length;
 	vector[1] /= length;
 }
 
-/////////////////////////////////////////////////////////////////////
 // convert a 3D vector into unit length
-
-void anPerlin2::Normalize3d(float vector[3]) {
-	float length = sqrt((vector[0] * vector[0]) +
-		(vector[1] * vector[1]) +
-		(vector[2] * vector[2]));
+void anNoiseGradient::Normalize3d( float vector[3] ) {
+	float length = sqrt( ( vector[0] * vector[0] ) +
+		( vector[1] * vector[1]) +
+		( vector[2] * vector[2]));
 	vector[0] /= length;
 	vector[1] /= length;
 	vector[2] /= length;
 }
 
-/////////////////////////////////////////////////////////////////////
 //
 // Mnemonics used in the following 3 functions:
 //   L = left		(-X direction)
@@ -315,17 +293,15 @@ void anPerlin2::Normalize3d(float vector[3]) {
 // noise1d - create 1-dimensional coherent noise
 //   if you want to learn about how noise works, look at this
 //   and then look at noise2d.
-
-float anPerlin2::Noise1d(float pos[1]) {
+float anNoiseGradient::Noise1d( float pos[1] ) {
 	int   gridPointL, gridPointR;
 	float distFromL, distFromR, sX, t, u, v;
-
 	if ( !initialized ) {
 		Reseed();
 	}
 
 	// find out neighboring grid points to pos and signed distances from pos to them.
-	SetupValues(t, 0, gridPointL, gridPointR, distFromL, distFromR, pos);
+	SetupValues( t, 0, gridPointL, gridPointR, distFromL, distFromR, pos);
 
 	sX = EaseCurve( distFromL );
 
@@ -338,10 +314,9 @@ float anPerlin2::Noise1d(float pos[1]) {
 	return LinearInterp( sX, u, v );
 }
 
-/////////////////////////////////////////////////////////////////////
 // create 2d coherent noise
 
-float anPerlin2::Noise2d(float pos[2]) {
+float anNoiseGradient::Noise2d( float pos[2] ) {
 	int gridPointL, gridPointR, gridPointD, gridPointU;
 	int indexLD, indexRD, indexLU, indexRU;
 	float distFromL, distFromR, distFromD, distFromU;
@@ -386,24 +361,22 @@ float anPerlin2::Noise2d(float pos[2]) {
 	return LinearInterp( sY, a, b );
 }
 
-/////////////////////////////////////////////////////////////////////
-// you guessed it -- 3D coherent noise
-
-float anPerlin2::Noise3d(float pos[2]) {
+// 3D coherent noise
+float anNoiseGradient::Noise3d( float pos[2] ) {
 	int gridPointL, gridPointR, gridPointD, gridPointU, gridPointB, gridPointF;
 	int indexLD, indexLU, indexRD, indexRU;
 	float distFromL, distFromR, distFromD, distFromU, distFromB, distFromF;
 	float *q, sX, sY, sZ, a, b, c, d, t, u, v;
 	register int indexL, indexR;
 
-	if (! initialized) {
+	if ( !initialized ) {
 		Reseed();
 	}
 
 	// find out neighboring grid points to pos and signed distances from pos to them.
-	SetupValues(t, 0, gridPointL, gridPointR, distFromL, distFromR, pos);
-	SetupValues(t, 1, gridPointD, gridPointU, distFromD, distFromU, pos);
-	SetupValues(t, 2, gridPointB, gridPointF, distFromB, distFromF, pos);
+	SetupValues( t, 0, gridPointL, gridPointR, distFromL, distFromR, pos );
+	SetupValues( t, 1, gridPointD, gridPointU, distFromD, distFromU, pos );
+	SetupValues( t, 2, gridPointB, gridPointF, distFromB, distFromF, pos );
 
 	indexL = permutationTable[ gridPointL ];
 	indexR = permutationTable[ gridPointR ];
@@ -440,62 +413,52 @@ float anPerlin2::Noise3d(float pos[2]) {
 	return LinearInterp( sZ, c, d );
 }
 
-/////////////////////////////////////////////////////////////////////
-// you can call noise component-wise, too.
-
-float anPerlin2::Noise(float x) {
-	return Noise1d(&x);
+float anNoiseGradient::Noise( float x ) {
+	return Noise1d( &x );
 }
 
-float anPerlin2::Noise(float x, float y) {
+float anNoiseGradient::Noise( float x, float y ) {
 	float p[2] = { x, y };
-	return Noise2d(p);
+	return Noise2d( p );
 }
 
-float anPerlin2::Noise(float x, float y, float z) {
+float anNoiseGradient::Noise( float x, float y, float z ) {
 	float p[3] = { x, y, z };
-	return Noise3d(p);
+	return Noise3d( p );
 }
 
-/////////////////////////////////////////////////////////////////////
 // reinitialize with new, random values.
-
-void anPerlin2::Reseed() {
-	srand((unsigned int) (time(NULL) + rand()));
+void anNoiseGradient::Reseed() {
+	srand( ( unsigned int ) ( time( nullptr ) + rand() ) );
+	GenerateLookupTables();
+}
+// reinitialize using a user-specified random seed
+void anNoiseGradient::Reseed( unsigned int rSeed ) {
+	srand( rSeed );
 	GenerateLookupTables();
 }
 
-/////////////////////////////////////////////////////////////////////
-// reinitialize using a user-specified random seed.
-
-void anPerlin2::Reseed(unsigned int rSeed) {
-	srand(rSeed);
-	GenerateLookupTables();
-}
-
-/////////////////////////////////////////////////////////////////////
 // initialize everything during constructor or reseed -- note
 // that space was already allocated for the gradientTable
 // during the constructor
-
-void anPerlin2::GenerateLookupTables() {
+void anNoiseGradient::GenerateLookupTables() {
 	unsigned i, j, temp;
-
-	for (i=0; i<NOISE_WRAP_INDEX; i++) {
+	for ( i = 0; i < NOISE_WRAP_INDEX; i++ ) {
 		// put index into permutationTable[index], we will shuffle later
 		permutationTable[i] = i;
-
 		gradientTable1d[i] = RandNoiseFloat();
-
-		for (j=0; j<2; j++) { gradientTable2d[i][j] = RandNoiseFloat(); }
-		Normalize2d(gradientTable2d[i]);
-
-		for (j=0; j<3; j++) { gradientTable3d[i][j] = RandNoiseFloat(); }
-		Normalize3d(gradientTable3d[i]);
+		for ( j = 0; j < 2; j++ ) {
+			gradientTable2d[i][j] = RandNoiseFloat();
+		}
+		Normalize2d( gradientTable2d[i] );
+		for ( j = 0; j < 3; j++ ) {
+			gradientTable3d[i][j] = RandNoiseFloat();
+		}
+		Normalize3d( gradientTable3d[i] );
 	}
 
 	// Shuffle permutation table up to NOISE_WRAP_INDEX
-	for (i=0; i<NOISE_WRAP_INDEX; i++) {
+	for ( i = 0; i < NOISE_WRAP_INDEX; i++ ) {
 		j = rand() & NOISE_MOD_MASK;
 		temp = permutationTable[i];
 		permutationTable[i] = permutationTable[j];
@@ -508,16 +471,14 @@ void anPerlin2::GenerateLookupTables() {
 	//
 	// This is the only part of the algorithm that I don't understand 100%.
 
-	for (i=0; i<NOISE_WRAP_INDEX+2; i++) {
+	for ( i = 0; i < NOISE_WRAP_INDEX+2; i++ ) {
 		permutationTable[NOISE_WRAP_INDEX + i] = permutationTable[i];
-
 		gradientTable1d[NOISE_WRAP_INDEX + i] = gradientTable1d[i];
-
-		for (j=0; j<2; j++) {
+		for ( j = 0; j < 2; j++ ) {
 			gradientTable2d[NOISE_WRAP_INDEX + i][j] = gradientTable2d[i][j];
 		}
 
-		for (j=0; j<3; j++) {
+		for ( j = 0; j < 3; j++ ) {
 			gradientTable3d[NOISE_WRAP_INDEX + i][j] = gradientTable3d[i][j];
 		}
 	}
@@ -525,8 +486,6 @@ void anPerlin2::GenerateLookupTables() {
 	// And we're done. Set initialized to true
 	initialized = 1;
 }
-
-////////////////////////////////////
 
 int anPerlin3::p[ 512 ] = {
 	151,160,137,91,90,15,

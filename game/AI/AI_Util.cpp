@@ -93,7 +93,7 @@ anVec3 anSAAIHelper::GetDirection	( const anSAAI* ai ) const {
 anSAAIHelper::ValidateDestination
 ================
 */
-bool anSAAIHelper::ValidateDestination ( const anSAAI* ent, const anVec3& dest ) const {
+bool anSAAIHelper::ValidateDestination ( const anSAAI* ent, const anVec3 &dest ) const {
 	return true;
 }
 
@@ -114,7 +114,7 @@ public:
 	void			Spawn				( void );
 
 	virtual bool	IsCombat			( void ) const;
-	virtual bool	ValidateDestination ( const anSAAI* ent, const anVec3& dest ) const;
+	virtual bool	ValidateDestination ( const anSAAI* ent, const anVec3 &dest ) const;
 
 protected:
 
@@ -173,7 +173,7 @@ bool rvAICombatHelper::IsCombat ( void ) const {
 rvAICombatHelper::ValidateDestination
 ================
 */
-bool rvAICombatHelper::ValidateDestination ( const anSAAI* ai, const anVec3& dest ) const {
+bool rvAICombatHelper::ValidateDestination ( const anSAAI* ai, const anVec3 &dest ) const {
 	// If tethering to a location then see if the location of the given points matches our tethered location
 	if ( location ) {
 		if ( gameLocal.LocationForPoint ( dest - ai->GetPhysics()->GetGravityNormal() * 32.0f ) != location ) {
@@ -439,7 +439,7 @@ void rvAITrigger::FindTargets ( void ) {
 	anEntity::FindTargets();
 
 	for ( t = 0; t < targets.Num(); t ++ ) {
-		anEntity* ent = targets[t];
+		anEntity *ent = targets[t];
 		if ( !ent ) {
 			continue;
 		}
@@ -486,7 +486,7 @@ void rvAITrigger::Event_Activate( anEntity *activator ) {
 rvAITrigger::Event_AppendFromSpawner
 ================
 */
-void rvAITrigger::Event_AppendFromSpawner ( rvSpawner* spawner, anEntity* spawned ) {
+void rvAITrigger::Event_AppendFromSpawner ( rvSpawner* spawner, anEntity *spawned ) {
 	// If its an ai entity being spawned then add it to our test list
 	if ( spawned && spawned->IsType ( anSAAI::GetClassType() ) ) {
 		testAI.Append ( anEntityPtr<anSAAI>( static_cast<anSAAI*>( spawned)) );
@@ -626,7 +626,7 @@ bool anSAAITether::ValidateAAS ( anSAAI* ai ) {
 anSAAITether::ValidateDestination
 ================
 */
-bool anSAAITether::ValidateDestination ( anSAAI* ai, const anVec3& dest ) {
+bool anSAAITether::ValidateDestination ( anSAAI* ai, const anVec3 &dest ) {
 	if ( location ) {
 		if ( gameLocal.LocationForPoint ( dest - ai->GetPhysics()->GetGravityNormal() * 32.0f ) != location ) {
 			return false;
@@ -755,7 +755,7 @@ void anSAAITetherBehind::Restore ( anRestoreGame* savefile ) {
 anSAAITetherBehind::ValidateDestination
 ================
 */
-bool anSAAITetherBehind::ValidateDestination ( anSAAI* ai, const anVec3& dest ) {
+bool anSAAITetherBehind::ValidateDestination ( anSAAI* ai, const anVec3 &dest ) {
 	// Check base tether first
 	if ( !anSAAITether::ValidateDestination ( ai, dest ) ) {
 		return false;
@@ -866,7 +866,7 @@ void anSAAITetherRadius::Restore ( anRestoreGame* savefile ) {
 anSAAITetherRadius::ValidateDestination
 ================
 */
-bool anSAAITetherRadius::ValidateDestination ( anSAAI* ai, const anVec3& dest ) {
+bool anSAAITetherRadius::ValidateDestination ( anSAAI* ai, const anVec3 &dest ) {
 	// Check base tether first
 	if ( !anSAAITether::ValidateDestination ( ai, dest ) ) {
 		return false;

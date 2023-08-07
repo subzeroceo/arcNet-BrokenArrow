@@ -9,10 +9,10 @@ Contains the DebugGraph implementation.
 
 /*
 ========================
-arcDebugGraph::arcDebugGraph
+anDebugGraph::anDebugGraph
 ========================
 */
-arcDebugGraph::arcDebugGraph( int numItems ) :
+anDebugGraph::anDebugGraph( int numItems ) :
 	bgColor( 0.0f, 0.0f, 0.0f, 0.5f ),
 	fontColor( 1.0f, 1.0f, 1.0f, 1.0f ),
 	enable( true ),
@@ -26,10 +26,10 @@ arcDebugGraph::arcDebugGraph( int numItems ) :
 
 /*
 ========================
-arcDebugGraph::Init
+anDebugGraph::Init
 ========================
 */
-void arcDebugGraph::Init( int numBars ) {
+void anDebugGraph::Init( int numBars ) {
 	bars.SetNum( numBars );
 	labels.Clear();
 
@@ -40,10 +40,10 @@ void arcDebugGraph::Init( int numBars ) {
 
 /*
 ========================
-arcDebugGraph::AddGridLine
+anDebugGraph::AddGridLine
 ========================
 */
-void arcDebugGraph::AddGridLine( float value, const anVec4 & color ) {
+void anDebugGraph::AddGridLine( float value, const anVec4 & color ) {
 	graphPlot_t & line = grid.Alloc();
 	line.value = value;
 	line.color = color;
@@ -51,10 +51,10 @@ void arcDebugGraph::AddGridLine( float value, const anVec4 & color ) {
 
 /*
 ========================
-arcDebugGraph::SetValue
+anDebugGraph::SetValue
 ========================
 */
-void arcDebugGraph::SetValue( int b, float value, const anVec4 & color ) {
+void anDebugGraph::SetValue( int b, float value, const anVec4 & color ) {
 	if ( !enable ) {
 		return;
 	}
@@ -71,10 +71,10 @@ void arcDebugGraph::SetValue( int b, float value, const anVec4 & color ) {
 
 /*
 ========================
-arcDebugGraph::SetLabel
+anDebugGraph::SetLabel
 ========================
 */
-void arcDebugGraph::SetLabel( int b, const char *text ) {
+void anDebugGraph::SetLabel( int b, const char *text ) {
 	if ( labels.Num() != bars.Num() ) {
 		labels.SetNum( bars.Num() );
 	}
@@ -83,10 +83,10 @@ void arcDebugGraph::SetLabel( int b, const char *text ) {
 
 /*
 ========================
-arcDebugGraph::Render
+anDebugGraph::Render
 ========================
 */
-void arcDebugGraph::Render( anRenderSystem * gui ) {
+void anDebugGraph::Render( anRenderSystem * gui ) {
 	if ( !enable ) {
 		return;
 	}

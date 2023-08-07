@@ -115,7 +115,7 @@ static void PC_PrintDefineHashTable( define_t **defineHash ) {
 PC_NameHash
 ================
 */
-ARC_INLINE int PC_NameHash( const char *name ) {
+inline int PC_NameHash( const char *name ) {
 	int hash, i;
 
 	hash = 0;
@@ -363,7 +363,7 @@ void anParser::PushScript( anLexer *script ) {
 	anLexer *s;
 
 	for ( s = anParser::scriptStack; s; s = s->next ) {
-		if ( !anString::Icmp( s->GetFileName(), script->GetFileName() ) ) {
+		if ( !anStr::Icmp( s->GetFileName(), script->GetFileName() ) ) {
 			anParser::Warning( "'%s' recursively included", script->GetFileName() );
 			return;
 		}
@@ -895,7 +895,7 @@ anParser::DirectiveInclude
 int anParser::DirectiveInclude( void ) {
 	anLexer *script;
 	anToken token;
-	anString path;
+	anStr path;
 
 	if ( !anParser::ReadSourceToken( &token ) ) {
 		anParser::Error( "#include without file name" );
@@ -2337,7 +2337,7 @@ anParser::ExpectTokenType
 ================
 */
 int anParser::ExpectTokenType( int type, int subtype, anToken *token ) {
-	anString str;
+	anStr str;
 
 	if ( !anParser::ReadToken( token ) ) {
 		anParser::Error( "couldn't read expected token" );
@@ -2556,7 +2556,7 @@ Maintains the exact formating of the braced section
   FIXME: what about precompilation ?
 =================
 */
-const char *anParser::ParseBracedSectionExact( anString &out, int tabs ) {
+const char *anParser::ParseBracedSectionExact( anStr &out, int tabs ) {
 	return scriptStack->ParseBracedSectionExact( out, tabs );
 }
 
@@ -2569,7 +2569,7 @@ Parses until a matching close brace is found.
 Internal brace depths are properly skipped.
 =================
 */
-const char *anParser::ParseBracedSection( anString &out, int tabs ) {
+const char *anParser::ParseBracedSection( anStr &out, int tabs ) {
 	anToken token;
 	int i, depth;
 	bool doTabs = false;
@@ -2637,7 +2637,7 @@ anParser::ParseRestOfLine
   parse the rest of the line
 =================
 */
-const char *anParser::ParseRestOfLine( anString &out ) {
+const char *anParser::ParseRestOfLine( anStr &out ) {
 	anToken token;
 
 	out.Empty();
@@ -2818,7 +2818,7 @@ int anParser::Parse3DMatrix( int z, int y, int x, float *m ) {
 anParser::GetLastWhiteSpace
 ================
 */
-int anParser::GetLastWhiteSpace( anString &whiteSpace ) const {
+int anParser::GetLastWhiteSpace( anStr &whiteSpace ) const {
 	if ( scriptStack ) {
 		scriptStack->GetLastWhiteSpace( whiteSpace );
 	} else {
@@ -2843,7 +2843,7 @@ anParser::GetStringFromMarker
   FIXME: this is very bad code, the script isn't even garrenteed to still be around
 ================
 */
-void anParser::GetStringFromMarker( anString& out, bool clean ) {
+void anParser::GetStringFromMarker( anStr& out, bool clean ) {
 	char*	p;
 	char	save;
 

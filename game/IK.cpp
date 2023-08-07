@@ -4,7 +4,7 @@
 #include "Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -19,20 +19,20 @@ static char THIS_FILE[] = __FILE__;
 /*
 ===============================================================================
 
-  idIK
+  anIK
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( anClass, idIK )
+CLASS_DECLARATION( anClass, anIK )
 END_CLASS
 
 /*
 ================
-idIK::idIK
+anIK::anIK
 ================
 */
-idIK::idIK( void ) {
+anIK::anIK( void ) {
 	ik_activate = false;
 	initialized = false;
 	self = nullptr;
@@ -43,54 +43,54 @@ idIK::idIK( void ) {
 
 /*
 ================
-idIK::~idIK
+anIK::~anIK
 ================
 */
-idIK::~idIK( void ) {
+anIK::~anIK( void ) {
 }
 
 /*
 ================
-idIK::IsInitialized
+anIK::IsInitialized
 ================
 */
-bool idIK::IsInitialized( void ) const {
+bool anIK::IsInitialized( void ) const {
 	return initialized && ik_enable.GetBool();
 }
 
 /*
 ================
-idIK::IsInhibited
+anIK::IsInhibited
 ================
 */
-bool idIK::IsInhibited( void ) const {
+bool anIK::IsInhibited( void ) const {
 	return gameLocal.isClient && ( self->aorFlags & AOR_INHIBIT_IK );
 }
 
 /*
 ================
-idIK::GetPhysics
+anIK::GetPhysics
 ================
 */
-anPhysics* idIK::GetPhysics() {
+anPhysics* anIK::GetPhysics() {
 	return self->GetPhysics();
 }
 
 /*
 ================
-idIK::GetAnimator
+anIK::GetAnimator
 ================
 */
-arcAnimator* idIK::GetAnimator() {
+anAnimator *anIK::GetAnimator() {
 	return animator;
 }
 
 /*
 ================
-idIK::Init
+anIK::Init
 ================
 */
-bool idIK::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) {
+bool anIK::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	anRenderModel *model;
 
 	if ( self == nullptr ) {
@@ -101,25 +101,25 @@ bool idIK::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) 
 
 	animator = self->GetAnimator();
 	if ( animator == nullptr || animator->ModelDef() == nullptr ) {
-		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no model set.",
-							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "anIK::Init: IK for entity '%s' at (%s) has no model set.",
+							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 	if ( animator->ModelDef()->ModelHandle() == nullptr ) {
-		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) uses default model.",
-							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "anIK::Init: IK for entity '%s' at (%s) uses default model.",
+							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 	model = animator->ModelHandle();
 	if ( model == nullptr ) {
-		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no model set.",
-							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "anIK::Init: IK for entity '%s' at (%s) has no model set.",
+							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 	modifiedAnim = animator->GetAnim( anim );
 	if ( modifiedAnim == 0 ) {
-		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no modified animation.",
-								self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "anIK::Init: IK for entity '%s' at (%s) has no modified animation.",
+								self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 
@@ -130,28 +130,28 @@ bool idIK::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) 
 
 /*
 ================
-idIK::Evaluate
+anIK::Evaluate
 ================
 */
-bool idIK::Evaluate( void ) {
+bool anIK::Evaluate( void ) {
 	return false;
 }
 
 /*
 ================
-idIK::ClearJointMods
+anIK::ClearJointMods
 ================
 */
-void idIK::ClearJointMods( void ) {
+void anIK::ClearJointMods( void ) {
 	ik_activate = false;
 }
 
 /*
 ================
-idIK::SolveTwoBones
+anIK::SolveTwoBones
 ================
 */
-bool idIK::SolveTwoBones( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, float len0, float len1, anVec3 &jointPos ) {
+bool anIK::SolveTwoBones( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, float len0, float len1, anVec3 &jointPos ) {
 	float length, lengthSqr, lengthInv, x, y;
 	anVec3 vec0, vec1;
 
@@ -180,10 +180,10 @@ bool idIK::SolveTwoBones( const anVec3 &startPos, const anVec3 &endPos, const an
 
 /*
 ================
-idIK::GetBoneAxis
+anIK::GetBoneAxis
 ================
 */
-float idIK::GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, anMat3 &axis ) {
+float anIK::GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, anMat3 &axis ) {
 	axis[0] = endPos - startPos;
 	float length = axis[0].Normalize();
 
@@ -198,20 +198,20 @@ float idIK::GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anV
 /*
 ===============================================================================
 
-  idIK_Walk
+  anIK_Walk
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( idIK, idIK_Walk )
+CLASS_DECLARATION( anIK, anIK_Walk )
 END_CLASS
 
 /*
 ================
-idIK_Walk::idIK_Walk
+anIK_Walk::anIK_Walk
 ================
 */
-idIK_Walk::idIK_Walk( void ) {
+anIK_Walk::anIK_Walk( void ) {
 	initialized = false;
 	footModel = nullptr;
 	numLegs = 0;
@@ -254,19 +254,19 @@ idIK_Walk::idIK_Walk( void ) {
 
 /*
 ================
-idIK_Walk::~idIK_Walk
+anIK_Walk::~anIK_Walk
 ================
 */
-idIK_Walk::~idIK_Walk( void ) {
+anIK_Walk::~anIK_Walk( void ) {
 	gameLocal.clip.DeleteClipModel( footModel );
 }
 
 /*
 ================
-idIK_Walk::Init
+anIK_Walk::Init
 ================
 */
-bool idIK_Walk::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) {
+bool anIK_Walk::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	int i;
 	float footSize;
 	anVec3 verts[4];
@@ -291,7 +291,7 @@ bool idIK_Walk::Init( arcEntity *self, const char *anim, const anVec3 &modelOffs
 		return true;
 	}
 
-	if ( !idIK::Init( self, anim, modelOffset ) ) {
+	if ( !anIK::Init( self, anim, modelOffset ) ) {
 		return false;
 	}
 
@@ -308,25 +308,25 @@ bool idIK_Walk::Init( arcEntity *self, const char *anim, const anVec3 &modelOffs
 		jointName = self->spawnArgs.GetString( va( "ik_foot%d", i+1 ) );
 		footJoints[i] = animator->GetJointHandle( jointName );
 		if ( footJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Walk::Init: invalid foot joint '%s'", jointName );
+			gameLocal.Error( "anIK_Walk::Init: invalid foot joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_ankle%d", i+1 ) );
 		ankleJoints[i] = animator->GetJointHandle( jointName );
 		if ( ankleJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Walk::Init: invalid ankle joint '%s'", jointName );
+			gameLocal.Error( "anIK_Walk::Init: invalid ankle joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_knee%d", i+1 ) );
 		kneeJoints[i] = animator->GetJointHandle( jointName );
 		if ( kneeJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Walk::Init: invalid knee joint '%s'", jointName );
+			gameLocal.Error( "anIK_Walk::Init: invalid knee joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_hip%d", i+1 ) );
 		hipJoints[i] = animator->GetJointHandle( jointName );
 		if ( hipJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Walk::Init: invalid hip joint '%s'", jointName );
+			gameLocal.Error( "anIK_Walk::Init: invalid hip joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_dir%d", i+1 ) );
@@ -338,7 +338,7 @@ bool idIK_Walk::Init( arcEntity *self, const char *anim, const anVec3 &modelOffs
 	jointName = self->spawnArgs.GetString( "ik_waist" );
 	waistJoint = animator->GetJointHandle( jointName );
 	if ( waistJoint == INVALID_JOINT ) {
-		gameLocal.Error( "idIK_Walk::Init: invalid waist joint '%s'", jointName );
+		gameLocal.Error( "anIK_Walk::Init: invalid waist joint '%s'", jointName );
 	}
 
 	// get the leg bone lengths and rotation matrices
@@ -402,10 +402,10 @@ bool idIK_Walk::Init( arcEntity *self, const char *anim, const anVec3 &modelOffs
 
 /*
 ================
-idIK_Walk::Evaluate
+anIK_Walk::Evaluate
 ================
 */
-bool idIK_Walk::Evaluate( void ) {
+bool anIK_Walk::Evaluate( void ) {
 	int i, newPivotFoot;
 	float modelHeight, jointHeight, lowestHeight, floorHeights[MAX_LEGS];
 	float shift, smallestShift, newHeight, step, newPivotYaw, height, largestAnkleHeight;
@@ -488,7 +488,7 @@ bool idIK_Walk::Evaluate( void ) {
 	// test whether or not the character is standing on a plat
 	bool onPlat = false;
 	for ( i = 0; i < phys->GetNumContacts(); i++ ) {
-		arcEntity *ent = gameLocal.entities[ phys->GetContact( i ).entityNum ];
+		anEntity *ent = gameLocal.entities[ phys->GetContact( i ).entityNum ];
 		if ( ent != nullptr && ent->IsType( idPlat::Type ) ) {
 			onPlat = true;
 			break;
@@ -615,10 +615,10 @@ bool idIK_Walk::Evaluate( void ) {
 
 /*
 ================
-idIK_Walk::ClearJointMods
+anIK_Walk::ClearJointMods
 ================
 */
-void idIK_Walk::ClearJointMods( void ) {
+void anIK_Walk::ClearJointMods( void ) {
 	if ( !self || !ik_activate ) {
 		return;
 	}
@@ -636,39 +636,39 @@ void idIK_Walk::ClearJointMods( void ) {
 
 /*
 ================
-idIK_Walk::EnableAll
+anIK_Walk::EnableAll
 ================
 */
-void idIK_Walk::EnableAll( void ) {
+void anIK_Walk::EnableAll( void ) {
 	enabledLegs = ( 1 << numLegs ) - 1;
 	oldHeightsValid = false;
 }
 
 /*
 ================
-idIK_Walk::DisableAll
+anIK_Walk::DisableAll
 ================
 */
-void idIK_Walk::DisableAll( void ) {
+void anIK_Walk::DisableAll( void ) {
 	enabledLegs = 0;
 	oldHeightsValid = false;
 }
 
 /*
 ================
-idIK_Walk::EnableLeg
+anIK_Walk::EnableLeg
 ================
 */
-void idIK_Walk::EnableLeg( int num ) {
+void anIK_Walk::EnableLeg( int num ) {
 	enabledLegs |= 1 << num;
 }
 
 /*
 ================
-idIK_Walk::DisableLeg
+anIK_Walk::DisableLeg
 ================
 */
-void idIK_Walk::DisableLeg( int num ) {
+void anIK_Walk::DisableLeg( int num ) {
 	enabledLegs &= ~( 1 << num );
 }
 
@@ -676,20 +676,20 @@ void idIK_Walk::DisableLeg( int num ) {
 /*
 ===============================================================================
 
-  idIK_Reach
+  anIK_Reach
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( idIK, idIK_Reach )
+CLASS_DECLARATION( anIK, anIK_Reach )
 END_CLASS
 
 /*
 ================
-idIK_Reach::idIK_Reach
+anIK_Reach::anIK_Reach
 ================
 */
-idIK_Reach::idIK_Reach() {
+anIK_Reach::anIK_Reach() {
 	int i;
 
 	initialized = false;
@@ -711,18 +711,18 @@ idIK_Reach::idIK_Reach() {
 
 /*
 ================
-idIK_Reach::~idIK_Reach
+anIK_Reach::~anIK_Reach
 ================
 */
-idIK_Reach::~idIK_Reach() {
+anIK_Reach::~anIK_Reach() {
 }
 
 /*
 ================
-idIK_Reach::Init
+anIK_Reach::Init
 ================
 */
-bool idIK_Reach::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) {
+bool anIK_Reach::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	int i;
 	const char *jointName;
 	anTraceModel trm;
@@ -738,7 +738,7 @@ bool idIK_Reach::Init( arcEntity *self, const char *anim, const anVec3 &modelOff
 		return true;
 	}
 
-	if ( !idIK::Init( self, anim, modelOffset ) ) {
+	if ( !anIK::Init( self, anim, modelOffset ) ) {
 		return false;
 	}
 
@@ -755,19 +755,19 @@ bool idIK_Reach::Init( arcEntity *self, const char *anim, const anVec3 &modelOff
 		jointName = self->spawnArgs.GetString( va( "ik_hand%d", i+1 ) );
 		handJoints[i] = animator->GetJointHandle( jointName );
 		if ( handJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Reach::Init: invalid hand joint '%s'", jointName );
+			gameLocal.Error( "anIK_Reach::Init: invalid hand joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_elbow%d", i+1 ) );
 		elbowJoints[i] = animator->GetJointHandle( jointName );
 		if ( elbowJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Reach::Init: invalid elbow joint '%s'", jointName );
+			gameLocal.Error( "anIK_Reach::Init: invalid elbow joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_shoulder%d", i+1 ) );
 		shoulderJoints[i] = animator->GetJointHandle( jointName );
 		if ( shoulderJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Reach::Init: invalid shoulder joint '%s'", jointName );
+			gameLocal.Error( "anIK_Reach::Init: invalid shoulder joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_elbowDir%d", i+1 ) );
@@ -814,10 +814,10 @@ bool idIK_Reach::Init( arcEntity *self, const char *anim, const anVec3 &modelOff
 
 /*
 ================
-idIK_Reach::Evaluate
+anIK_Reach::Evaluate
 ================
 */
-bool idIK_Reach::Evaluate( void ) {
+bool anIK_Reach::Evaluate( void ) {
 	return false;
 	int i;
 	anVec3 modelOrigin, shoulderOrigin, elbowOrigin, handOrigin, shoulderDir, elbowDir;
@@ -876,10 +876,10 @@ bool idIK_Reach::Evaluate( void ) {
 
 /*
 ================
-idIK_Reach::ClearJointMods
+anIK_Reach::ClearJointMods
 ================
 */
-void idIK_Reach::ClearJointMods( void ) {
+void anIK_Reach::ClearJointMods( void ) {
 	if ( !self || !ik_activate ) {
 		return;
 	}
@@ -897,37 +897,37 @@ void idIK_Reach::ClearJointMods( void ) {
 /*
 ===============================================================================
 
-	arcIK_Aim
+	anIK_Aim
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( idIK, arcIK_Aim )
+CLASS_DECLARATION( anIK, anIK_Aim )
 END_CLASS
 
 /*
 ================
-arcIK_Aim::arcIK_Aim
+anIK_Aim::anIK_Aim
 ================
 */
-arcIK_Aim::arcIK_Aim( void ) {
+anIK_Aim::anIK_Aim( void ) {
 }
 
 /*
 ================
-arcIK_Aim::~arcIK_Aim
+anIK_Aim::~anIK_Aim
 ================
 */
-arcIK_Aim::~arcIK_Aim( void ) {
+anIK_Aim::~anIK_Aim( void ) {
 }
 
 /*
 ================
-arcIK_Aim::Init
+anIK_Aim::Init
 ================
 */
-bool arcIK_Aim::Init( arcEntity *self, const char *anim, const anVec3 &modelOffset ) {
-	if ( !idIK::Init( self, anim, modelOffset ) ) {
+bool anIK_Aim::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
+	if ( !anIK::Init( self, anim, modelOffset ) ) {
 		return false;
 	}
 
@@ -935,8 +935,8 @@ bool arcIK_Aim::Init( arcEntity *self, const char *anim, const anVec3 &modelOffs
 
 	int i;
 	for ( i = 0; i < count; i++ ) {
-		const char* jointname1		= self->spawnArgs.GetString( va( "ik_set%i_joint1", i ) );
-		const char* jointname2		= self->spawnArgs.GetString( va( "ik_set%i_joint2", i ) );
+		const char *jointname1		= self->spawnArgs.GetString( va( "ik_set%i_joint1", i ) );
+		const char *jointname2		= self->spawnArgs.GetString( va( "ik_set%i_joint2", i ) );
 
 		jointGroup_t& group = jointGroups.Alloc();
 
@@ -953,10 +953,10 @@ extern anCVar r_debugAxisLength;
 
 /*
 ================
-arcIK_Aim::Evaluate
+anIK_Aim::Evaluate
 ================
 */
-bool arcIK_Aim::Evaluate( void ) {
+bool anIK_Aim::Evaluate( void ) {
 	for ( int i = 0; i < jointGroups.Num(); i++ ) {
 		jointGroup_t &group = jointGroups[i];
 
@@ -996,24 +996,24 @@ bool arcIK_Aim::Evaluate( void ) {
 		group.lastDir.Normalize();
 
 
-		axes1[ 0 ] = org2 - org1;
-		axes1[ 0 ] *= axis1.Transpose();
-		axes1[ 0 ].Normalize();
+		axes1[0] = org2 - org1;
+		axes1[0] *= axis1.Transpose();
+		axes1[0].Normalize();
 
-		axes1[ 2 ].Set( 0.f, 0.f, 1.f );
-		axes1[ 2 ] -= ( axes1[ 0 ] * axes1[ 2 ] ) * axes1[ 0 ];
-		axes1[ 2 ].Normalize();
+		axes1[2].Set( 0.f, 0.f, 1.f );
+		axes1[2] -= ( axes1[0] * axes1[2] ) * axes1[0];
+		axes1[2].Normalize();
 
-		axes1[ 1 ] = axes1[ 2 ].Cross( axes1[ 0 ] );
-		axes2[ 0 ] = org1 - org2;
-		axes2[ 0 ] *= axis2.Transpose();
-		axes2[ 0 ].Normalize();
+		axes1[1] = axes1[2].Cross( axes1[0] );
+		axes2[0] = org1 - org2;
+		axes2[0] *= axis2.Transpose();
+		axes2[0].Normalize();
 
-		axes2[ 2 ].Set( 0.f, 0.f, 1.f );
-		axes2[ 2 ] -= ( axes2[ 0 ] * axes2[ 2 ] ) * axes2[ 0 ];
-		axes2[ 2 ].Normalize();
+		axes2[2].Set( 0.f, 0.f, 1.f );
+		axes2[2] -= ( axes2[0] * axes2[2] ) * axes2[0];
+		axes2[2].Normalize();
 
-		axes2[ 1 ] = axes2[ 2 ].Cross( axes2[ 0 ] );
+		axes2[1] = axes2[2].Cross( axes2[0] );
 
 		self->GetAnimator()->SetJointAxis( group.joint1, JOINTMOD_LOCAL, axes1 );
 		self->GetAnimator()->SetJointAxis( group.joint2, JOINTMOD_LOCAL, axes2 );
@@ -1024,10 +1024,10 @@ bool arcIK_Aim::Evaluate( void ) {
 
 /*
 ================
-arcIK_Aim::ClearJointMods
+anIK_Aim::ClearJointMods
 ================
 */
-void arcIK_Aim::ClearJointMods( void ) {
+void anIK_Aim::ClearJointMods( void ) {
 	if ( !self ) {
 		return;
 	}
@@ -1038,4 +1038,708 @@ void arcIK_Aim::ClearJointMods( void ) {
 		self->GetAnimator()->SetJointAxis( group.joint1, JOINTMOD_NONE, mat3_identity );
 		self->GetAnimator()->SetJointAxis( group.joint2, JOINTMOD_NONE, mat3_identity );
 	}
+}
+
+/*
+===============================================================================
+
+	anIK_WheeledVehicle
+
+===============================================================================
+*/
+
+CLASS_DECLARATION( idIK, anIK_WheeledVehicle )
+END_CLASS
+
+/*
+================
+anIK_WheeledVehicle::anIK_WheeledVehicle
+================
+*/
+anIK_WheeledVehicle::anIK_WheeledVehicle( void ) {
+}
+
+/*
+================
+anIK_WheeledVehicle::~anIK_WheeledVehicle
+================
+*/
+anIK_WheeledVehicle::~anIK_WheeledVehicle( void ) {
+}
+
+/*
+================
+anIK_WheeledVehicle::AddWheel
+================
+*/
+void anIK_WheeledVehicle::AddWheel( anVehicleRigidBodyWheel &wheel ) {
+	wheels.Alloc() = &wheel;
+}
+
+/*
+================
+anIK_WheeledVehicle::ClearWheels
+================
+*/
+void anIK_WheeledVehicle::ClearWheels( void ) {
+	wheels.Clear();
+}
+
+/*
+================
+anIK_WheeledVehicle::ClearJointMods
+================
+*/
+void anIK_WheeledVehicle::ClearJointMods( void ) {
+	if ( !self ) {
+		return;
+	}
+
+	for ( int i = 0; i < list.Num(); i++ ) {
+		jointGroup_t &group = jointGroups[i];
+
+		self->GetAnimator()->SetJointAxis( group.joint1, JOINTMOD_NONE, mat3_identity );
+		self->GetAnimator()->SetJointAxis( group.joint2, JOINTMOD_NONE, mat3_identity );
+	}
+	/*vehicleDriveObjectList_t &list = rbParent->GetDriveObjects();
+	for ( int i = 0; i < list.Num(); i++ ) {
+		sdVehicleDriveObject *object = list[i];
+		object->ClearSuspensionIK();
+	}*/
+}
+
+/*
+================
+anIK_WheeledVehicle::Evaluate
+================
+*/
+bool anIK_WheeledVehicle::Evaluate( void ) {
+	anAnimator *animator = self->GetAnimator();
+	bool changed = false;
+
+	vehicleDriveObjectList_t &list = rbParent->GetDriveObjects();
+
+	for ( int i = 0; i < list.Num(); i++ ) {
+		sdVehicleDriveObject *object = list[ i ];
+		changed |= object->UpdateSuspensionIK();
+	}
+
+	for ( int i = 0; i < wheels.Num(); i++ ) {
+		anVehicleRigidBodyWheel *wheel = wheels[ i ];
+		if ( !wheel->HasVisualStateChanged() ) {
+			continue;
+		}
+		wheel->ResetVisualState();
+
+		const anMat3 &frictionAxes = wheel->GetFrictionAxes();
+		const anMat3 &baseAxes = wheel->GetBaseAxes();
+
+		anRotation rotation;
+		rotation.SetVec( wheel->GetRotationAxis() );
+		rotation.SetAngle( wheel->GetWheelAngle() );
+
+		animator->SetJointAxis( wheel->GetWheelJoint(), JOINTMOD_WORLD_OVERRIDE, baseAxes * rotation.ToMat3() * frictionAxes );
+
+		changed = true;
+	}
+
+	return changed;
+}
+
+/*
+================
+anIK_WheeledVehicle::Init
+================
+*/
+bool anIK_WheeledVehicle::Init( anTransport_RB *self, const char *anim, const anVec3 &modelOffset ) {
+	rbParent = self;
+
+	if ( !idIK::Init( self, anim, modelOffset ) ) {
+		return false;
+	}
+
+	initialized = true;
+
+	return true;
+}
+
+/*
+===============================================================================
+
+	anVehicleIKSystem
+
+===============================================================================
+*/
+
+ABSTRACT_DECLARATION( idClass, anVehicleIKSystem )
+END_CLASS
+
+/*
+================
+anVehicleIKSystem::Setup
+================
+*/
+bool anVehicleIKSystem::Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms ) {
+	vehicle = vhcle;
+
+	clampYaw = yaw;
+	clampPitch = pitch;
+
+	const char* weaponName = ikParms.GetString( "weapon" );
+	if ( *weaponName ) {
+		weapon = vhcle->GetWeapon( weaponName );
+		if ( !weapon ) {
+			gameLocal.Warning( "anVehicleIKSystem::Setup Invalid Weapon '%s'", weaponName );
+			return false;
+		}
+	} else {
+		weapon = nullptr;
+	}
+	return true;
+}
+
+/*
+================
+anVehicleIKSystem::GetPlayer
+================
+*/
+anBasePlayer *anVehicleIKSystem::GetPlayer( void ) {	
+	return weapon ? weapon->GetPlayer() : position->GetPlayer();
+}
+
+/*
+===============================================================================
+
+	anPlayerVehicleArmsIK
+
+===============================================================================
+*/
+
+CLASS_DECLARATION( anVehicleIKSystem, anPlayerVehicleArmsIK )
+END_CLASS
+
+/*
+================
+anPlayerVehicleArmsIK::Setup
+================
+*/
+bool anPlayerVehicleArmsIK::Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms ) {
+	for ( int i = 0; i < ARM_JOINT_NUM_JOINTS; i++ ) {
+		ikJoints[ i ] = INVALID_JOINT;
+	}
+
+	if ( !anVehicleIKSystem::Setup( vhcle, yaw, pitch, ikParms ) ) {
+		return false;
+	}
+
+	yawSound = nullptr;
+	if ( clampYaw.sound != nullptr ) {
+		yawSound = vehicle->GetMotorSounds().Alloc();
+		yawSound->Start( clampYaw.sound );
+	}
+
+	pitchSound = nullptr;
+	if ( clampPitch.sound != nullptr ) {
+		pitchSound = vehicle->GetMotorSounds().Alloc();
+		pitchSound->Start( clampPitch.sound );
+	}
+
+	jointAngles.Zero();
+
+	anAnimator *animator = vehicle->GetAnimator();
+	const anDict &dict = ikParms;
+
+	const char* joint;
+
+
+	joint = dict.GetString( "jointWrist" );
+	if ( *joint ) {
+		ikJoints[ ARM_JOINT_INDEX_WRIST ] = animator->GetJointHandle( joint );
+	}
+
+	joint = dict.GetString( "jointMuzzle" );
+	if ( *joint ) {
+		ikJoints[ ARM_JOINT_INDEX_MUZZLE ] = animator->GetJointHandle( joint );
+	}
+
+	joint = dict.GetString( "jointElbow" );
+	if ( *joint ) {
+		ikJoints[ ARM_JOINT_INDEX_ELBOW ] = animator->GetJointHandle( joint );
+	}
+
+	ikJoints[ ARM_JOINT_INDEX_SHOULDER ] = animator->GetJointParent( ikJoints[ ARM_JOINT_INDEX_ELBOW ] );
+
+	for ( int i = 0; i < ARM_JOINT_NUM_JOINTS; i++ ) {
+		animator->GetJointTransform( ikJoints[ i ], gameLocal.time, baseJointPositions[ i ], baseJointAxes[ i ] );
+	}
+
+	pitchAxis = dict.GetInt( "pitchAxis", "2" );	
+	requireTophat = dict.GetBool( "require_tophat" );
+
+	oldParentAxis = mat3_identity;
+
+	return true;
+}
+
+/*
+================
+anPlayerVehicleArmsIK::Update
+================
+*/
+void anPlayerVehicleArmsIK::Update( void ) {
+	anEntity *vehicleEnt = vehicle;
+	if ( !vehicleEnt ) {
+		return;
+	}
+
+	anVec3 shoulderPos;
+	anMat3 temp;
+
+	anAnimator *animator = vehicleEnt->GetAnimator();
+	animator->GetJointTransform( ikJoints[ ARM_JOINT_INDEX_SHOULDER ], gameLocal.time, shoulderPos, temp );
+
+	anVec3 shoulderToElbow	= baseJointPositions[ ARM_JOINT_INDEX_ELBOW ] - baseJointPositions[ ARM_JOINT_INDEX_SHOULDER ];
+	anVec3 elbowToWrist		= baseJointPositions[ ARM_JOINT_INDEX_WRIST ] - baseJointPositions[ ARM_JOINT_INDEX_ELBOW ];
+	anVec3 wristToMuzzle	= baseJointPositions[ ARM_JOINT_INDEX_MUZZLE ] - baseJointPositions[ ARM_JOINT_INDEX_WRIST ];
+	anVec3 elbowToMuzzle	= baseJointPositions[ ARM_JOINT_INDEX_MUZZLE ] - baseJointPositions[ ARM_JOINT_INDEX_ELBOW ];
+
+	anMat3 shoulderAxis;
+	TransposeMultiply( baseJointAxes[ ARM_JOINT_INDEX_SHOULDER ], temp, shoulderAxis );
+	anMat3 transposedShoulderAxis = shoulderAxis.Transpose();
+
+	anBasePlayer* player = GetPlayer();
+	if ( player && requireTophat ) {
+		if ( !gameLocal.usercmds[ player->entityNumber ].buttons.btn.tophat ) {
+			player = nullptr;
+		}
+	}
+
+	bool changed = false;
+
+	changed |= !oldParentAxis.Compare( temp, 0.005f );
+
+	anAngles newAngles;
+
+	renderView_t* view = player ? player->GetRenderView() : nullptr;
+	renderEntity_t* renderEnt = vehicleEnt->GetRenderEntity();
+
+	trace_t trace;
+	anVec3 modelTarget;
+	if ( view ) {
+		anVec3 end = view->vieworg + ( 8192 * view->viewaxis[ 0 ] );
+		gameLocal.clip.TracePoint( CLIP_DEBUG_PARMS trace, view->vieworg, end, CONTENTS_SOLID | CONTENTS_OPAQUE, player );
+
+		modelTarget = trace.endpos;
+
+		modelTarget -= renderEnt->origin;
+		modelTarget *= renderEnt->axis.Transpose();
+
+		modelTarget -= shoulderPos;
+		modelTarget *= transposedShoulderAxis;
+
+		modelTarget -= shoulderToElbow;
+	}
+
+
+	if ( view ) {
+		anVec3 target = modelTarget;
+		const anVec3 &dir = baseJointAxes[ ARM_JOINT_INDEX_MUZZLE ][ 0 ];
+		
+		target -= elbowToMuzzle - ( ( dir * elbowToMuzzle ) * dir );
+		target *= baseJointAxes[ ARM_JOINT_INDEX_MUZZLE ].Transpose();
+
+		newAngles.yaw = RAD2DEG( atan2( target[ 1 ], target[ 0 ] ) );
+	} else {
+		newAngles.yaw = 0;
+	}
+
+	bool yawChanged = !sdVehiclePosition::ClampAngle( newAngles, jointAngles, clampYaw, 1, 0.1f );
+	if ( yawSound != nullptr ) {
+		yawSound->Update( yawChanged );
+	}
+	changed |= yawChanged;
+
+	anMat3 yawMat;
+	anAngles::YawToMat3( newAngles.yaw, yawMat );
+
+	if ( view ) {
+		anVec3 target = modelTarget;
+
+		anVec3 newElbowToWrist	= elbowToWrist * yawMat;
+		anVec3 newWristToMuzzle	= wristToMuzzle * yawMat;
+
+		anMat3 muzzleAxis = baseJointAxes[ ARM_JOINT_INDEX_MUZZLE ] * yawMat;
+
+		target -= newElbowToWrist;
+		target -= newWristToMuzzle - ( ( muzzleAxis[ 0 ] * newWristToMuzzle ) * muzzleAxis[ 0 ] );
+		target *= muzzleAxis.Transpose();
+
+		newAngles.pitch = -RAD2DEG( atan2( target[ 2 ], target[ 0 ] ) );
+	} else {
+		newAngles.pitch = 0;
+	}
+
+	bool pitchChanged = !sdVehiclePosition::ClampAngle( newAngles, jointAngles, clampPitch,	0, 0.1f );
+	if ( pitchSound != nullptr ) {
+		pitchSound->Update( pitchChanged );
+	}
+	changed |= pitchChanged;
+
+	// configurable pitching axis - to support vertically oriented arms (eg badger, bumblebee)
+	// as well as horizontally oriented arms (eg goliath)
+	int truePitchAxis = pitchAxis;
+	if ( truePitchAxis < 0 ) {
+		newAngles.pitch = -newAngles.pitch;
+		truePitchAxis = -truePitchAxis;
+	}
+
+	anAngles pitchAngles( 0.0f, 0.0f, 0.0f );
+	if ( truePitchAxis == 1 ) {					// x-axis
+		pitchAngles.roll = newAngles.pitch;
+	} else if ( truePitchAxis == 3 ) {			// z-axis
+		pitchAngles.yaw = newAngles.pitch;
+	} else {									// y-axis
+		pitchAngles.pitch = newAngles.pitch;
+	}
+
+	anMat3 pitchMat = pitchAngles.ToMat3();
+
+	if ( changed ) {
+		oldParentAxis = temp;
+		jointAngles = newAngles;
+
+		animator->SetJointAxis( ikJoints[ ARM_JOINT_INDEX_ELBOW ], JOINTMOD_WORLD_OVERRIDE, baseJointAxes[ ARM_JOINT_INDEX_ELBOW ] * yawMat * shoulderAxis );
+		animator->SetJointAxis( ikJoints[ ARM_JOINT_INDEX_WRIST ], JOINTMOD_WORLD_OVERRIDE, pitchMat * baseJointAxes[ ARM_JOINT_INDEX_WRIST ] * yawMat * shoulderAxis );
+	}
+}
+
+/*
+===============================================================================
+
+	anVehicleSwivel
+
+===============================================================================
+*/
+
+CLASS_DECLARATION( anVehicleIKSystem, anVehicleSwivel )
+END_CLASS
+
+/*
+================
+anVehicleSwivel::Setup
+================
+*/
+bool anVehicleSwivel::Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms ) {
+	joint = INVALID_JOINT;
+
+	if ( !anVehicleIKSystem::Setup( vhcle, yaw, pitch, ikParms ) ) {
+		return false;
+	}
+
+	angles.Zero();
+
+	anAnimator *animator = vehicle->GetAnimator();
+	joint = animator->GetJointHandle( ikParms.GetString( "joint" ) );
+
+	animator->GetJointTransform( joint, gameLocal.time, baseAxis );
+
+	yawSound = nullptr;
+	if ( clampYaw.sound != nullptr ) {
+		yawSound = vehicle->GetMotorSounds().Alloc();
+		yawSound->Start( clampYaw.sound );
+	}
+
+	return true;
+}
+
+/*
+================
+anVehicleSwivel::Update
+================
+*/
+void anVehicleSwivel::Update( void ) {
+	anEntity *vehicleEnt = vehicle;
+	if ( !vehicleEnt ) {
+		return;
+	}
+
+	anAnimator *animator = vehicleEnt->GetAnimator();
+
+	anBasePlayer* player = GetPlayer();
+	anAngles newAngles;
+
+	if ( player ) {
+		float diff = anMath::AngleDelta( player->clientViewAngles.yaw, angles.yaw );
+		newAngles.yaw = angles.yaw + diff * (1.f-clampYaw.filter);//clampYaw.filter * angles.yaw + (1.f - clampYaw.filter) * player->clientViewAngles.yaw;
+	} else {
+		newAngles.yaw = 0;
+	}
+
+	bool changed = !sdVehiclePosition::ClampAngle( newAngles, angles, clampYaw,	1, 0.1f );
+	if ( yawSound != nullptr ) {
+		yawSound->Update( changed );
+	}
+
+	if ( changed ) {
+		angles = newAngles;
+
+		anMat3 yawAxis;
+		anAngles::YawToMat3( angles.yaw, yawAxis );
+		animator->SetJointAxis( joint, JOINTMOD_WORLD, yawAxis );
+	}
+}
+
+/*
+===============================================================================
+
+	anVehicleJointAimer
+
+===============================================================================
+*/
+
+CLASS_DECLARATION( anVehicleIKSystem, anVehicleJointAimer )
+END_CLASS
+
+/*
+================
+anVehicleJointAimer::Setup
+================
+*/
+bool anVehicleJointAimer::Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms ) {
+	joint = INVALID_JOINT;
+
+	if ( !anVehicleIKSystem::Setup( vhcle, yaw, pitch, ikParms ) ) {
+		return false;
+	}
+
+	yawSound = nullptr;
+	if ( clampYaw.sound != nullptr ) {
+		yawSound = vehicle->GetMotorSounds().Alloc();
+		yawSound->Start( clampYaw.sound );
+	}
+
+	pitchSound = nullptr;
+	if ( clampPitch.sound != nullptr ) {
+		pitchSound = vehicle->GetMotorSounds().Alloc();
+		pitchSound->Start( clampPitch.sound );
+	}
+
+	anAnimator *animator = vehicle->GetAnimator();
+	joint = animator->GetJointHandle( ikParms.GetString( "joint" ) );
+
+	if ( joint == INVALID_JOINT ) {
+		return false;
+	}
+
+	animator->GetJointTransform( joint, gameLocal.time, baseAxis );
+	angles = baseAxis.ToAngles();
+
+	const char* weapon2Name = ikParms.GetString( "weapon2" );
+	if ( *weapon2Name ) {
+		weapon2 = vhcle->GetWeapon( weapon2Name );
+		if ( !weapon2 ) {
+			gameLocal.Warning( "anVehicleIKSystem::Setup Invalid Weapon '%s'", weapon2Name );
+			return false;
+		}
+	} else {
+		weapon2 = nullptr;
+	}
+
+	return true;
+}
+
+/*
+================
+anVehicleIKSystem::GetPlayer
+================
+*/
+anBasePlayer *anVehicleJointAimer::GetPlayer( void ) {	
+	anBasePlayer *player = weapon ? weapon->GetPlayer() : position->GetPlayer();
+	if ( !player ) {
+		return weapon2 ? weapon2->GetPlayer() : position->GetPlayer();
+	}
+
+	return player;
+}
+
+/*
+================
+anVehicleJointAimer::Update
+================
+*/
+void anVehicleJointAimer::Update( void ) {
+	anEntity *vehicleEnt = vehicle;
+	if ( !vehicleEnt ) {
+		return;
+	}
+
+	if ( joint == INVALID_JOINT ) {
+		return;
+	}
+
+	anAnimator *animator = vehicleEnt->GetAnimator();
+
+	anBasePlayer *player = GetPlayer();
+	anMat3 tempJointAxis;
+	anVec3 jointPos;
+	animator->GetJointTransform( joint, gameLocal.time, jointPos, tempJointAxis );
+	renderView_t *view = player ? player->GetRenderView() : nullptr;
+	renderEntity_t *renderEnt = vehicleEnt->GetRenderEntity();
+
+	trace_t trace;
+	anVec3 modelTarget;
+	if ( view ) {
+		// find what is being aimed at
+		anVec3 end = view->vieworg + ( 8192 * view->viewaxis[ 0 ] );
+		gameLocal.clip.TracePoint( CLIP_DEBUG_PARMS trace, view->vieworg, end, CONTENTS_SOLID | CONTENTS_OPAQUE, player );
+		modelTarget = trace.endpos;
+
+		// transform modelTarget into entity space
+		modelTarget -= renderEnt->origin;
+		modelTarget *= renderEnt->axis.Transpose();
+
+		// make target relative to joint
+		modelTarget -= jointPos;
+
+		// calculate the vector to the target
+		anVec3 direction = modelTarget;
+		direction.Normalize();
+		anMat3 newAxis = direction.ToMat3();
+		anAngles newAngles = newAxis.ToAngles();
+		
+		// clamp the angles
+		
+		bool yawChanged = !sdVehiclePosition::ClampAngle( newAngles, angles, clampYaw, 1, 0.1f );
+		if ( yawSound != nullptr ) {
+			yawSound->Update( yawChanged );
+		}
+
+		bool pitchChanged = !sdVehiclePosition::ClampAngle( newAngles, angles, clampPitch, 0, 0.1f );
+		if ( pitchSound != nullptr ) {
+			pitchSound->Update( pitchChanged );
+		}
+
+		if ( yawChanged || pitchChanged ) {
+			// set the angles
+			angles = newAngles;
+			animator->SetJointAxis( joint, JOINTMOD_WORLD_OVERRIDE, newAngles.ToMat3() );
+		}
+	}
+}
+
+/*
+===============================================================================
+
+  anVehicleIK_Steering
+
+===============================================================================
+*/
+
+CLASS_DECLARATION( anVehicleIKSystem, anVehicleIK_Steering )
+END_CLASS
+
+/*
+================
+anVehicleIK_Steering::anVehicleIK_Steering
+================
+*/
+anVehicleIK_Steering::anVehicleIK_Steering( void ) {
+}
+
+/*
+================
+anVehicleIK_Steering::~anVehicleIK_Steering
+================
+*/
+anVehicleIK_Steering::~anVehicleIK_Steering( void ) {
+}
+
+/*
+================
+anVehicleIK_Steering::Init
+================
+*/
+bool anVehicleIK_Steering::Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms ) {
+	if ( !anVehicleIKSystem::Setup( vhcle, yaw, pitch, ikParms ) ) {
+		return false;
+	}
+
+	if ( !ik.Init( vehicle, ikParms ) ) {
+		return false;
+	}
+
+	return true;
+}
+
+/*
+================
+anVehicleIK_Steering::Update
+================
+*/
+void anVehicleIK_Steering::Update( void ) {
+	anBasePlayer *player = GetPlayer();
+	if ( player == nullptr ) {
+		return;
+	}
+
+	ik.Update( player, vehicle );
+}
+
+/*
+===============================================================================
+
+  anVehicleWeaponAimer
+
+===============================================================================
+*/
+
+CLASS_DECLARATION( anVehicleIKSystem, anVehicleWeaponAimer )
+END_CLASS
+
+/*
+================
+anVehicleWeaponAimer::Update
+================
+*/
+void anVehicleWeaponAimer::Update( void ) {
+	anBasePlayer* player = GetPlayer();
+	if ( player ) {
+		const renderView_t& renderView = player->renderView;
+
+		trace_t trace;
+		gameLocal.clip.TracePoint( CLIP_DEBUG_PARMS trace, renderView.vieworg, renderView.vieworg + ( renderView.viewaxis[ 0 ] * 4096 ), CONTENTS_SOLID | CONTENTS_OPAQUE, player );
+
+		aimer.SetTarget( trace.endpos );
+	} else {
+		aimer.ClearTarget();
+	}
+
+	aimer.Update();
+}
+
+/*
+================
+anVehicleWeaponAimer::Setup
+================
+*/
+bool anVehicleWeaponAimer::Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms ) {
+	if ( !anVehicleIKSystem::Setup( vhcle, yaw, pitch, ikParms ) ) {
+		return false;
+	}
+
+	anAnimator *animator = vehicle->GetAnimator();
+
+	jointHandle_t pitchJoint	= animator->GetJointHandle( ikParms.GetString( "jointWrist" ) );
+	jointHandle_t yawJoint		= animator->GetJointHandle( ikParms.GetString( "jointElbow" ) );
+	jointHandle_t muzzleJoint	= animator->GetJointHandle( ikParms.GetString( "jointMuzzle" ) );
+	jointHandle_t shoulderJoint = animator->GetJointHandle( ikParms.GetString( "jointShoulder" ) );
+	if ( shoulderJoint == INVALID_JOINT ) {
+		shoulderJoint = animator->GetJointParent( yawJoint );
+	}
+
+	int anim = animator->GetAnim( ikParms.GetString( "deployed_anim" ) );
+
+	aimer.Init( ikParms.GetBool( "fix_barrel" ), ikParms.GetBool( "invert_pitch" ), vhcle, anim, yawJoint, pitchJoint, muzzleJoint, shoulderJoint, clampYaw, clampPitch );
+
+	return true;
 }

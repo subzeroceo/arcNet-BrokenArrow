@@ -16,7 +16,7 @@ char *idCompiler::punctuation[] = {
 	"+=", "-=", "*=", "/=", "%=", "&=", "|=", "++", "--",
 	"&&", "||", "<=", ">=", "==", "!=", "::", ";",  ",",
 	"~",  "!",  "*",  "/",  "%",  "(",   ")",  "-", "+",
-	"=",  "[",  "]",  ".",  "<",  ">" ,  "&",  "|", ":",  NULL
+	"=",  "[",  "]",  ".",  "<",  ">" ,  "&",  "|", ":",  nullptr
 };
 
 opcode_t idCompiler::opcodes[] = {
@@ -172,7 +172,7 @@ opcode_t idCompiler::opcodes[] = {
 	{ "<BREAK>", "BREAK", -1, false, &def_float, &def_void, &def_void },
 	{ "<CONTINUE>", "CONTINUE", -1, false, &def_float, &def_void, &def_void },
 
-	{ NULL }
+	{ nullptr }
 };
 
 /*
@@ -185,7 +185,7 @@ idCompiler::idCompiler() {
 	int		id;
 
 	// make sure we have the right # of opcodes in the table
-	assert( ( sizeof( opcodes ) / sizeof( opcodes[ 0 ] ) ) == ( NUM_OPCODES + 1 ) );
+	assert( ( sizeof( opcodes ) / sizeof( opcodes[0] ) ) == ( NUM_OPCODES + 1 ) );
 
 	eof	= true;
 	parserPtr = &parser;
@@ -194,8 +194,8 @@ idCompiler::idCompiler() {
 	loopDepth			= 0;
 	eof					= false;
 	braceDepth			= 0;
-	immediateType		= NULL;
-	basetype			= NULL;
+	immediateType		= nullptr;
+	basetype			= nullptr;
 	currentLineNumber	= 0;
 	currentFileNumber	= 0;
 	errorCount			= 0;
@@ -204,7 +204,7 @@ idCompiler::idCompiler() {
 
 	memset( &immediate, 0, sizeof( immediate ) );
 	memset( punctuationValid, 0, sizeof( punctuationValid ) );
-	for( ptr = punctuation; *ptr != NULL; ptr++ ) {
+	for( ptr = punctuation; *ptr != nullptr; ptr++ ) {
 		id = parserPtr->GetPunctuationId( *ptr );
 		if ( ( id >= 0 ) && ( id < 256 ) ) {
 			punctuationValid[ id ] = true;
@@ -255,7 +255,7 @@ idCompiler::VirtualFunctionConstant
 Creates a def for an index into a virtual function table
 ============
 */
-ARC_INLINE idVarDef *idCompiler::VirtualFunctionConstant( idVarDef *func ) {
+inline idVarDef *idCompiler::VirtualFunctionConstant( idVarDef *func ) {
 	eval_t eval;
 
 	memset( &eval, 0, sizeof( eval ) );
@@ -274,7 +274,7 @@ idCompiler::SizeConstant
 Creates a def for a size constant
 ============
 */
-ARC_INLINE idVarDef *idCompiler::SizeConstant( int size ) {
+inline idVarDef *idCompiler::SizeConstant( int size ) {
 	eval_t eval;
 
 	memset( &eval, 0, sizeof( eval ) );
@@ -289,7 +289,7 @@ idCompiler::JumpConstant
 Creates a def for a jump constant
 ============
 */
-ARC_INLINE idVarDef *idCompiler::JumpConstant( int value ) {
+inline idVarDef *idCompiler::JumpConstant( int value ) {
 	eval_t eval;
 
 	memset( &eval, 0, sizeof( eval ) );
@@ -304,7 +304,7 @@ idCompiler::JumpDef
 Creates a def for a relative jump from one code location to another
 ============
 */
-ARC_INLINE idVarDef *idCompiler::JumpDef( int jumpfrom, int jumpto ) {
+inline idVarDef *idCompiler::JumpDef( int jumpfrom, int jumpto ) {
 	return JumpConstant( jumpto - jumpfrom );
 }
 
@@ -315,7 +315,7 @@ idCompiler::JumpTo
 Creates a def for a relative jump from current code location
 ============
 */
-ARC_INLINE idVarDef *idCompiler::JumpTo( int jumpto ) {
+inline idVarDef *idCompiler::JumpTo( int jumpto ) {
 	return JumpDef( gameLocal.program.NumStatements(), jumpto );
 }
 
@@ -326,7 +326,7 @@ idCompiler::JumpFrom
 Creates a def for a relative jump from code location to current code location
 ============
 */
-ARC_INLINE idVarDef *idCompiler::JumpFrom( int jumpfrom ) {
+inline idVarDef *idCompiler::JumpFrom( int jumpfrom ) {
 	return JumpDef( jumpfrom, gameLocal.program.NumStatements() );
 }
 
@@ -335,7 +335,7 @@ ARC_INLINE idVarDef *idCompiler::JumpFrom( int jumpfrom ) {
 idCompiler::Divide
 ============
 */
-ARC_INLINE float idCompiler::Divide( float numerator, float denominator ) {
+inline float idCompiler::Divide( float numerator, float denominator ) {
 	if ( denominator == 0 ) {
 		Error( "Divide by zero" );
 		return 0;
@@ -358,7 +358,7 @@ idVarDef *idCompiler::FindImmediate( const idTypeDef *type, const eval_t *eval, 
 	etype = type->Type();
 
 	// check for a constant with the same value
-	for( def = gameLocal.program.GetDefList( "<IMMEDIATE>" ); def != NULL; def = def->Next() ) {
+	for( def = gameLocal.program.GetDefList( "<IMMEDIATE>" ); def != nullptr; def = def->Next() ) {
 		if ( def->TypeDef() != type ) {
 			continue;
 		}
@@ -389,7 +389,7 @@ idVarDef *idCompiler::FindImmediate( const idTypeDef *type, const eval_t *eval, 
 			break;
 
 		case ev_string :
-			if ( idStr::Cmp( def->value.stringPtr, string ) == 0 ) {
+			if ( anStr::Cmp( def->value.stringPtr, string ) == 0 ) {
 				return def;
 			}
 			break;
@@ -408,9 +408,9 @@ idVarDef *idCompiler::FindImmediate( const idTypeDef *type, const eval_t *eval, 
 
 
 		case ev_vector :
-			if ( ( def->value.vectorPtr->x == eval->vector[ 0 ] ) && 
-				( def->value.vectorPtr->y == eval->vector[ 1 ] ) && 
-				( def->value.vectorPtr->z == eval->vector[ 2 ] ) ) {
+			if ( ( def->value.vectorPtr->x == eval->vector[0] ) && 
+				( def->value.vectorPtr->y == eval->vector[1] ) && 
+				( def->value.vectorPtr->z == eval->vector[2] ) ) {
 				return def;
 			}
 			break;
@@ -421,7 +421,7 @@ idVarDef *idCompiler::FindImmediate( const idTypeDef *type, const eval_t *eval, 
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -462,13 +462,13 @@ idVarDef *idCompiler::OptimizeOpcode( const opcode_t *op, idVarDef *var_a, idVar
 	idTypeDef	*type;
 
 	if ( var_a && var_a->initialized != idVarDef::initializedConstant ) {
-		return NULL;
+		return nullptr;
 	}
 	if ( var_b && var_b->initialized != idVarDef::initializedConstant ) {
-		return NULL;
+		return nullptr;
 	}
 
-	idVec3 &vec_c = *reinterpret_cast<idVec3 *>( &c.vector[ 0 ] );
+	anVec3 &vec_c = *reinterpret_cast<anVec3 *>( &c.vector[0] );
 
 	memset( &c, 0, sizeof( c ) );
 	switch( op - opcodes ) {
@@ -512,23 +512,23 @@ idVarDef *idCompiler::OptimizeOpcode( const opcode_t *op, idVarDef *var_a, idVar
 		case OP_UINC_F:		c._float = *var_a->value.floatPtr + 1; type = &type_float; break;
 		case OP_UDEC_F:		c._float = *var_a->value.floatPtr - 1; type = &type_float; break;
 		case OP_COMP_F:		c._float = ( float )~( int )*var_a->value.floatPtr; type = &type_float; break;
-		default:			type = NULL; break;
+		default:			type = nullptr; break;
 	}
 
 	if ( !type ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( var_a ) {
 		var_a->numUsers--;
 		if ( var_a->numUsers <= 0 ) {
-			gameLocal.program.FreeDef( var_a, NULL );
+			gameLocal.program.FreeDef( var_a, nullptr );
 		}
 	}
 	if ( var_b ) {
 		var_b->numUsers--;
 		if ( var_b->numUsers <= 0 ) {
-			gameLocal.program.FreeDef( var_b, NULL );
+			gameLocal.program.FreeDef( var_b, nullptr );
 		}
 	}
 
@@ -564,7 +564,7 @@ idVarDef *idCompiler::EmitOpcode( const opcode_t *op, idVarDef *var_a, idVarDef 
 	
 	if ( ( op->type_c == &def_void ) || op->rightAssociative ) {
 		// ifs, gotos, and assignments don't need vars allocated
-		var_c = NULL;
+		var_c = nullptr;
 	} else {
 		// allocate result space
 		// try to reuse result defs as much as possible
@@ -592,7 +592,7 @@ idCompiler::EmitOpcode
 Emits a primitive statement, returning the var it places it's value in
 ============
 */
-ARC_INLINE idVarDef *idCompiler::EmitOpcode( int op, idVarDef *var_a, idVarDef *var_b ) {
+inline idVarDef *idCompiler::EmitOpcode( int op, idVarDef *var_a, idVarDef *var_b ) {
 	return EmitOpcode( &opcodes[ op ], var_a, var_b );
 }
 
@@ -607,7 +607,7 @@ bool idCompiler::EmitPush( idVarDef *expression, const idTypeDef *funcArg ) {
 	opcode_t *op;
 	opcode_t *out;
 
-	out = NULL;
+	out = nullptr;
 	for( op = &opcodes[ OP_PUSH_F ]; op->name && !strcmp( op->name, "<PUSH>" ); op++ ) {
 		if ( ( funcArg->Type() == op->type_a->Type() ) && ( expression->Type() == op->type_b->Type() ) ) {
 			out = op;
@@ -639,7 +639,7 @@ void idCompiler::NextToken( void ) {
 	int i;
 
 	// reset our type
-	immediateType = NULL;
+	immediateType = nullptr;
 	memset( &immediate, 0, sizeof( immediate ) );
 
 	// Save the token's line number and filename since when we emit opcodes the current 
@@ -676,7 +676,7 @@ void idCompiler::NextToken( void ) {
 	case TT_LITERAL: {
 		// handle quoted vectors as a unit
 		immediateType = &type_vector;
-		idLexer lex( token, token.Length(), parserPtr->GetFileName(), LEXFL_NOERRORS );
+		anLexer lex( token, token.Length(), parserPtr->GetFileName(), LEXFL_NOERRORS );
 		idToken token2;
 		for( i = 0; i < 3; i++ ) {
 			if ( !lex.ReadToken( &token2 ) ) {
@@ -775,7 +775,7 @@ idCompiler::ParseName
 Checks to see if the current token is a valid name
 ============
 */
-void idCompiler::ParseName( idStr &name ) {
+void idCompiler::ParseName( anStr &name ) {
 	if ( token.type != TT_NAME ) {
 		Error( "'%s' is not a name", token.c_str() );
 	}
@@ -847,7 +847,7 @@ idTypeDef *idCompiler::CheckType( void ) {
 	} else {
 		type = gameLocal.program.FindType( token.c_str() );
 		if ( type && !type->Inherits( &type_object ) ) {
-			type = NULL;
+			type = nullptr;
 		}
 	}
 	
@@ -955,7 +955,7 @@ idVarDef *idCompiler::EmitFunctionParms( int op, idVarDef *func, int startarg, i
 	} else if ( ( op == OP_OBJECTCALL ) || ( op == OP_OBJTHREAD ) ) {
 		EmitOpcode( op, object, VirtualFunctionConstant( func ) );
 
-		// need arg size seperate since script object may be NULL
+		// need arg size seperate since script object may be nullptr
 		statement_t &statement = gameLocal.program.GetStatement( gameLocal.program.NumStatements() - 1 );
 		statement.c = SizeConstant( func->value.functionPtr->parmTotal );
 	} else {
@@ -1043,7 +1043,7 @@ idVarDef *idCompiler::ParseFunctionCall( idVarDef *funcDef ) {
 			Error( "Built-in functions cannot be called as threads" );
 		}
 		callthread = false;
-		return EmitFunctionParms( OP_THREAD, funcDef, 0, 0, NULL );
+		return EmitFunctionParms( OP_THREAD, funcDef, 0, 0, nullptr );
 	} else {
 		if ( ( funcDef->initialized != idVarDef::uninitialized ) && funcDef->value.functionPtr->eventdef ) {
 			if ( ( scope->Type() != ev_namespace ) && ( scope->scope->Type() == ev_object ) ) {
@@ -1059,7 +1059,7 @@ idVarDef *idCompiler::ParseFunctionCall( idVarDef *funcDef ) {
 			}
 		}
 
-		return EmitFunctionParms( OP_CALL, funcDef, 0, 0, NULL );
+		return EmitFunctionParms( OP_CALL, funcDef, 0, 0, nullptr );
 	}
 }
 
@@ -1102,7 +1102,7 @@ idVarDef *idCompiler::ParseEventCall( idVarDef *object, idVarDef *funcDef ) {
 		EmitPush( object, object->TypeDef() );
 	}
 
-	return EmitFunctionParms( OP_EVENTCALL, funcDef, 0, type_object.Size(), NULL );
+	return EmitFunctionParms( OP_EVENTCALL, funcDef, 0, type_object.Size(), nullptr );
 }
 
 /*
@@ -1127,7 +1127,7 @@ idVarDef *idCompiler::ParseSysObjectCall( idVarDef *funcDef ) {
 		Error( "\"%s\" is not callable as a 'sys' function", funcDef->Name() );
 	}
 
-	return EmitFunctionParms( OP_SYSCALL, funcDef, 0, 0, NULL );
+	return EmitFunctionParms( OP_SYSCALL, funcDef, 0, 0, nullptr );
 }
 
 /*
@@ -1146,16 +1146,16 @@ idVarDef *idCompiler::LookupDef( const char *name, const idVarDef *baseobj ) {
 	if ( baseobj && ( baseobj->Type() == ev_object ) ) {
 		const idVarDef *tdef;
 
-		def = NULL;
+		def = nullptr;
 		for( tdef = baseobj; tdef != &def_object; tdef = tdef->TypeDef()->SuperClass()->def ) {
-			def = gameLocal.program.GetDef( NULL, name, tdef );
+			def = gameLocal.program.GetDef( nullptr, name, tdef );
 			if ( def ) {
 				break;
 			}
 		}
 	} else {
 		// first look through the defs in our scope
-		def = gameLocal.program.GetDef( NULL, name, scope );
+		def = gameLocal.program.GetDef( nullptr, name, scope );
 		if ( !def ) {
 			// if we're in a member function, check types local to the object
 			if ( ( scope->Type() != ev_namespace ) && ( scope->scope->Type() == ev_object ) ) {
@@ -1229,7 +1229,7 @@ Returns the def for the current token
 idVarDef *idCompiler::ParseValue( void ) {
 	idVarDef	*def;
 	idVarDef	*namespaceDef;
-	idStr		name;
+	anStr		name;
 	
 	if ( immediateType == &type_entity ) {
 		// if an immediate entity ($-prefaced name) then create or lookup a def for it.
@@ -1259,7 +1259,7 @@ idVarDef *idCompiler::ParseValue( void ) {
 			ExpectToken( "::" );
 			ParseName( name );
 			namespaceDef = def;
-			def = gameLocal.program.GetDef( NULL, name, namespaceDef );
+			def = gameLocal.program.GetDef( nullptr, name, namespaceDef );
 			if ( !def ) {
 				Error( "Unknown value \"%s::%s\"", namespaceDef->GlobalName(), name.c_str() );
 			}
@@ -1487,7 +1487,7 @@ idVarDef *idCompiler::GetExpression( int priority ) {
 		oldtype = basetype;
 
 		// field access needs scope from object
-		if ( ( op->name[ 0 ] == '.' ) && e->TypeDef()->Inherits( &type_object ) ) {
+		if ( ( op->name[0] == '.' ) && e->TypeDef()->Inherits( &type_object ) ) {
 			// save off what type this field is part of
 			basetype = e->TypeDef()->def;
 		}
@@ -1516,7 +1516,7 @@ idVarDef *idCompiler::GetExpression( int priority ) {
 		type_b = e2->Type();
 
 		// field access gets type from field
-		if ( op->name[ 0 ] == '.' ) {
+		if ( op->name[0] == '.' ) {
 			if ( ( e2->Type() == ev_function ) && e2->TypeDef()->ReturnType() ) {
 				type_c = e2->TypeDef()->ReturnType()->Type();
 			} else if ( e2->TypeDef()->FieldType() ) {
@@ -1955,7 +1955,7 @@ void idCompiler::ParseStatement( void ) {
 		return;
 	}
 
-	if ( CheckType() != NULL ) {
+	if ( CheckType() != nullptr ) {
 		ParseDefs();
 		return;
 	}
@@ -1979,9 +1979,9 @@ void idCompiler::ParseObjectDef( const char *objname ) {
 	idTypeDef	*type;
 	idTypeDef	*parentType;
 	idTypeDef	*fieldtype;
-	idStr		name;
+	anStr		name;
 	const char  *fieldname;
-	idTypeDef	newtype( ev_field, NULL, "", 0, NULL );
+	idTypeDef	newtype( ev_field, nullptr, "", 0, nullptr );
 	idVarDef	*oldscope;
 	int			num;
 	int			i;
@@ -1992,7 +1992,7 @@ void idCompiler::ParseObjectDef( const char *objname ) {
 	}
 
 	// make sure it doesn't exist before we create it
-	if ( gameLocal.program.FindType( objname ) != NULL ) {
+	if ( gameLocal.program.FindType( objname ) != nullptr ) {
 		Error( "'%s' : redefinition; different basic types", objname );
 	}
 
@@ -2006,7 +2006,7 @@ void idCompiler::ParseObjectDef( const char *objname ) {
 		}
 	}
 	
-	objtype = gameLocal.program.AllocType( ev_object, NULL, objname, parentType == &type_object ? 0 : parentType->Size(), parentType );
+	objtype = gameLocal.program.AllocType( ev_object, nullptr, objname, parentType == &type_object ? 0 : parentType->Size(), parentType );
 	objtype->def = gameLocal.program.AllocDef( objtype, objname, scope, true );
 	scope = objtype->def;
 
@@ -2058,7 +2058,7 @@ parse a function type
 ============
 */
 idTypeDef *idCompiler::ParseFunction( idTypeDef *returnType, const char *name ) {
-	idTypeDef	newtype( ev_function, NULL, name, type_function.Size(), returnType );
+	idTypeDef	newtype( ev_function, nullptr, name, type_function.Size(), returnType );
 	idTypeDef	*type;
 	
 	if ( scope->Type() != ev_namespace ) {
@@ -2067,7 +2067,7 @@ idTypeDef *idCompiler::ParseFunction( idTypeDef *returnType, const char *name ) 
 	}
 
 	if ( !CheckToken( ")" ) ) {
-		idStr parmName;
+		anStr parmName;
 		do {
 			type = ParseType();
 			ParseName( parmName );
@@ -2152,9 +2152,9 @@ void idCompiler::ParseFunctionDef( idTypeDef *returnType, const char *name ) {
 	func->firstStatement = gameLocal.program.NumStatements();
 
 	// check if we should call the super class constructor
-	if ( oldscope->TypeDef()->Inherits( &type_object ) && !idStr::Icmp( name, "init" ) ) {
+	if ( oldscope->TypeDef()->Inherits( &type_object ) && !anStr::Icmp( name, "init" ) ) {
 		idTypeDef *superClass;
-		function_t *constructorFunc = NULL;
+		function_t *constructorFunc = nullptr;
 
 		// find the superclass constructor
 		for( superClass = oldscope->TypeDef()->SuperClass(); superClass != &type_object; superClass = superClass->SuperClass() ) {
@@ -2179,9 +2179,9 @@ void idCompiler::ParseFunctionDef( idTypeDef *returnType, const char *name ) {
 	}
 
 	// check if we should call the super class destructor
-	if ( oldscope->TypeDef()->Inherits( &type_object ) && !idStr::Icmp( name, "destroy" ) ) {
+	if ( oldscope->TypeDef()->Inherits( &type_object ) && !anStr::Icmp( name, "destroy" ) ) {
 		idTypeDef *superClass;
-		function_t *destructorFunc = NULL;
+		function_t *destructorFunc = nullptr;
 
 		// find the superclass destructor
 		for( superClass = oldscope->TypeDef()->SuperClass(); superClass != &type_object; superClass = superClass->SuperClass() ) {
@@ -2310,7 +2310,7 @@ void idCompiler::ParseVariableDef( idTypeDef *type, const char *name ) {
 		}
 	} else if ( type->Inherits( &type_object ) ) {
 		if ( scope->Type() != ev_function ) {
-			def->SetObject( NULL );
+			def->SetObject( nullptr );
 		}
 	}
 }
@@ -2342,7 +2342,7 @@ idTypeDef *idCompiler::GetTypeForEventArg( char argType ) {
 		break;
 
 	case D_EVENT_ENTITY :
-	case D_EVENT_ENTITY_NULL :
+	case D_EVENT_ENTITY_nullptr :
 		type = &type_entity;
 		break;
 
@@ -2352,12 +2352,12 @@ idTypeDef *idCompiler::GetTypeForEventArg( char argType ) {
 
 	case D_EVENT_TRACE :
 		// This data type isn't available from script
-		type = NULL;
+		type = nullptr;
 		break;
 
 	default:
 		// probably a typo
-		type = NULL;
+		type = nullptr;
 		break;
 	}
 	
@@ -2377,7 +2377,7 @@ void idCompiler::ParseEventDef( idTypeDef *returnType, const char *name ) {
 	int				num;
 	const char		*format;
 	const idEventDef *ev;
-	idStr			parmName;
+	anStr			parmName;
 
 	ev = idEventDef::FindEvent( name );
 	if ( !ev ) {
@@ -2393,7 +2393,7 @@ void idCompiler::ParseEventDef( idTypeDef *returnType, const char *name ) {
 		Error( "Return type doesn't match internal return type '%s'", expectedType->Name() );
 	}
 
-	idTypeDef newtype( ev_function, NULL, name, type_function.Size(), returnType );
+	idTypeDef newtype( ev_function, nullptr, name, type_function.Size(), returnType );
 
 	ExpectToken( "(" );
 
@@ -2457,7 +2457,7 @@ Called at the outer layer and when a local statement is hit
 ================
 */
 void idCompiler::ParseDefs( void ) {
-	idStr 		name;
+	anStr 		name;
 	idTypeDef	*type;
 	idVarDef	*def;
 	idVarDef	*oldscope;
@@ -2484,7 +2484,7 @@ void idCompiler::ParseDefs( void ) {
 		}
 		ParseNamespace( def );
 	} else if ( CheckToken( "::" ) ) {
-		def = gameLocal.program.GetDef( NULL, name, scope );
+		def = gameLocal.program.GetDef( nullptr, name, scope );
 		if ( !def ) {
 			Error( "Unknown object name '%s'", name.c_str() );
 		}
@@ -2552,12 +2552,12 @@ void idCompiler::CompileFile( const char *text, const char *filename, bool toCon
 	compile_time.Start();
 
 	scope				= &def_namespace;
-	basetype			= NULL;
+	basetype			= nullptr;
 	callthread			= false;
 	loopDepth			= 0;
 	eof					= false;
 	braceDepth			= 0;
-	immediateType		= NULL;
+	immediateType		= nullptr;
 	currentLineNumber	= 0;
 	console				= toConsole;
 	
@@ -2600,7 +2600,7 @@ void idCompiler::CompileFile( const char *text, const char *filename, bool toCon
 	}
 		
 	catch( idCompileError &err ) {
-		idStr error;
+		anStr error;
 
 		if ( console ) {
 			// don't print line number of an error if were calling script from the console using the "script" command

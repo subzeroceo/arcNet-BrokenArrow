@@ -108,7 +108,7 @@ idAnimState::Init
 */
 
 // bdube: converted self to entity ptr so any entity can use it
-void idAnimState::Init( anEntity *owner, idAnimator *_animator, int animchannel ) {
+void idAnimState::Init( anEntity *owner, anAnimator *_animator, int animchannel ) {
 
 	assert( owner );
 	assert( _animator );
@@ -134,7 +134,7 @@ void idAnimState::Shutdown( void ) {
 idAnimState::PostState
 =====================
 */
-void idAnimState::PostState ( const char* statename, int blendFrames, int delay, int flags ) {
+void idAnimState::PostState ( const char *statename, int blendFrames, int delay, int flags ) {
 	if ( SRESULT_OK != stateThread.PostState ( statename, blendFrames, delay, flags ) ) {
 		gameLocal.Error ( "Could not find state function '%s' for entity '%s'", statename, self->GetName() );
 	}
@@ -515,7 +515,7 @@ anActor::Spawn
 */
 void anActor::Spawn( void ) {
 	anEntity		*ent;
-	anString			jointName;
+	anStr			jointName;
 	float			fovDegrees;
 	float			fovDegreesClose;
 
@@ -584,7 +584,7 @@ void anActor::Spawn( void ) {
 	animator.ClearAllAnims( gameLocal.time, 0 );
 
 	anEntity *headEnt = head.GetEntity();
-	idAnimator *headAnimator;
+	anAnimator *headAnimator;
 	if ( headEnt ) {
 		headAnimator = headEnt->GetAnimator();
 	} else {
@@ -601,7 +601,7 @@ void anActor::Spawn( void ) {
 	if ( spawnArgs.GetString( "sound_bone", "", jointName ) ) {
 		soundJoint = animator.GetJointHandle( jointName );
 		if ( soundJoint == INVALID_JOINT ) {
-			gameLocal.Warning( "idAnimated '%s' at (%s): cannot find joint '%s' for sound playback", name.c_str(), GetPhysics()->GetOrigin().ToString(0), jointName.c_str() );
+			gameLocal.Warning( "idAnimated '%s' at (%s): cannot find joint '%s' for sound playback", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), jointName.c_str() );
 		}
 	}
 
@@ -680,9 +680,9 @@ void anActor::FinishSetup( void ) {
 anActor::SetupHead
 ================
 */
-void anActor::SetupHead( const char* headDefName, anVec3 headOffset ) {
+void anActor::SetupHead( const char *headDefName, anVec3 headOffset ) {
 	idAFAttachment		*headEnt;
-	anString				jointName;
+	anStr				jointName;
 	jointHandle_t		joint;
 	const anKeyValue	*sndKV;
 
@@ -691,16 +691,16 @@ void anActor::SetupHead( const char* headDefName, anVec3 headOffset ) {
 	}
 
 	// If we don't pass in a specific head model, try looking it up
-	if ( !headDefName[ 0 ] ) {
+	if ( !headDefName[0] ) {
 		headDefName = spawnArgs.GetString( "def_head", "" );
 // jshepard: allow for heads to override persona defs
 		headDefName = spawnArgs.GetString( "override_head", headDefName );
 	}
 
-	if ( headDefName[ 0 ] ) {
+	if ( headDefName[0] ) {
 		// free the old head if we want a new one
 		if ( gameLocal.isServer ) {
-			if ( head && anString::Icmp( head->spawnArgs.GetString( "classname" ), headDefName ) ) {
+			if ( head && anStr::Icmp( head->spawnArgs.GetString( "classname" ), headDefName ) ) {
 				head->SetName( va( "%s_oldhead", name.c_str() ) );
 				head->PostEventMS( &EV_Remove, 0 );
 				head = nullptr;
@@ -1102,8 +1102,8 @@ void anActor::ProjectOverlay( const anVec3 &origin, const anVec3 &dir, float siz
 anActor::LoadAF
 ================
 */
-bool anActor::LoadAF( const char* keyname, bool purgeAF /* = false */ ) {
-	anString fileName;
+bool anActor::LoadAF( const char *keyname, bool purgeAF /* = false */ ) {
+	anStr fileName;
 
 	if ( !keyname || !*keyname ) {
 		keyname = "ragdoll";
@@ -1123,7 +1123,7 @@ anActor::SetupBody
 */
 void anActor::SetupBody( void ) {
 	const char*		jointname;
-	idAnimator*		headAnimator;
+	anAnimator*		headAnimator;
 	float			height;
 
 	animator.ClearAllAnims( gameLocal.time, 0 );
@@ -1195,7 +1195,7 @@ void anActor::CheckBlink( void ) {
 		return;
 	}
 
-	idAnimator *animator = head.GetEntity() ? head->GetAnimator() : &this->animator;
+	anAnimator *animator = head.GetEntity() ? head->GetAnimator() : &this->animator;
 	animator->PlayAnim( ANIMCHANNEL_EYELIDS, blink_anim, gameLocal.time, 1 );
 
 	// set the next blink time
@@ -1282,7 +1282,7 @@ void anActor::SetState( const char *statename, int flags ) {
 anActor::PostState
 =====================
 */
-void anActor::PostState ( const char* statename, int delay, int flags ) {
+void anActor::PostState ( const char *statename, int delay, int flags ) {
 	if ( SRESULT_OK != stateThread.PostState ( statename, 0, delay, flags ) ) {
 		gameLocal.Error ( "unknown state '%s' on entity '%s'", statename, GetName() );
 	}
@@ -1293,7 +1293,7 @@ void anActor::PostState ( const char* statename, int delay, int flags ) {
 anActor::InterruptState
 =====================
 */
-void anActor::InterruptState ( const char* statename, int delay, int flags ) {
+void anActor::InterruptState ( const char *statename, int delay, int flags ) {
 	if ( SRESULT_OK != stateThread.InterruptState ( statename, 0, delay, flags ) ) {
 		gameLocal.Error ( "unknown state '%s' on entity '%s'", statename, GetName() );
 	}
@@ -1377,7 +1377,7 @@ anVec3 anActor::GetChestPosition ( void ) const {
 anActor::GetGroundEntity
 =====================
 */
-anEntity* anActor::GetGroundEntity( void ) const {
+anEntity *anActor::GetGroundEntity( void ) const {
 	return static_cast<anPhysics_Actor*>(GetPhysics())->GetGroundEntity();
 }
 
@@ -1406,7 +1406,7 @@ void anActor::Event_Teleport( anVec3 &newPos, anVec3 &newAngles ) {
 anActor::Event_EnterVehicle
 =====================
 */
-void anActor::Event_EnterVehicle ( anEntity* vehicle ) {
+void anActor::Event_EnterVehicle ( anEntity *vehicle ) {
 	if ( IsInVehicle() ) {
 		return;
 	}
@@ -1442,7 +1442,7 @@ void anActor::Event_PreExitVehicle ( bool force ) {
 	// this is done because having an exit delay when the player is dead was causing bustedness if you died in the walker
 	//	specifically the restart menu would not appear if you were still in the walker
 	if ( health > 0 ) {
-		PostEventMS( &AI_PostExitVehicle, vehicleController.GetVehicle()->spawnArgs.GetInt( "exit_vehicle_delay" ), force );
+		PostEventMS( &AI_PostExitVehicle, vehicleController.GetVehicle()->spawnArgs.GetInt( "exitvhcle_delay" ), force );
 	}
 	else {
 		ExitVehicle( true );
@@ -1563,7 +1563,7 @@ bool anActor::CheckFOV( const anVec3 &pos, float ang ) const {
 	delta -= gravityDir * ( gravityDir * delta );
 
 	delta.Normalize();
-	dot = viewAxis[ 0 ] * delta;
+	dot = viewAxis[0] * delta;
 
 	return ( dot >= testAng );
 }
@@ -1595,7 +1595,7 @@ bool anActor::CanSee( const anEntity *ent, bool useFov ) const {
 anActor::CanSeeFrom
 =====================
 */
-bool anActor::CanSeeFrom ( const anVec3& from, const anEntity *ent, bool useFov ) const {
+bool anActor::CanSeeFrom ( const anVec3 &from, const anEntity *ent, bool useFov ) const {
 	anVec3 toPos;
 
 	if ( !ent || ent->IsHidden() ) {
@@ -1611,7 +1611,7 @@ bool anActor::CanSeeFrom ( const anVec3& from, const anEntity *ent, bool useFov 
 	return CanSeeFrom ( from, toPos, useFov );
 }
 
-bool anActor::CanSeeFrom ( const anVec3& from, const anVec3& toPos, bool useFov ) const {
+bool anActor::CanSeeFrom ( const anVec3 &from, const anVec3 &toPos, bool useFov ) const {
 	trace_t tr;
 
 	if ( useFov && !CheckFOV( toPos ) ) {
@@ -1664,12 +1664,12 @@ void anActor::SetCombatModel( void ) {
 		} else {
 
 // mwhitlock: Dynamic memory consolidation
-			PUSH_HEAP_MEM(this);
+			PushHeapMemory(this);
 
 			combatModel = new anClipModel( modelDefHandle );
 
 // mwhitlock: Dynamic memory consolidation
-			POP_HEAP();
+			PopSystemHeap();
 
 		}
 
@@ -1857,7 +1857,7 @@ bool anActor::UpdateAnimationControllers( void ) {
 	}
 
 	if ( DebugFilter( ai_debugMove ) ) { // RED = Eye Pos & orientation
-		gameRenderWorld->DebugArrow( colorRed, GetEyePosition(), GetEyePosition() + viewAxis[ 0 ] * 32.0f, 4, gameLocal.msec );
+		gameRenderWorld->DebugArrow( colorRed, GetEyePosition(), GetEyePosition() + viewAxis[0] * 32.0f, 4, gameLocal.msec );
 	}
 
 	// Dynamically update the chest offset if a joint was specified
@@ -1867,7 +1867,7 @@ bool anActor::UpdateAnimationControllers( void ) {
 	}
 
 	if ( DebugFilter( ai_debugMove ) ) { // RED = Eye Pos & orientation
-		gameRenderWorld->DebugArrow( colorPink, GetChestPosition(), GetChestPosition() + viewAxis[ 0 ] * 32.0f, 4, gameLocal.msec );
+		gameRenderWorld->DebugArrow( colorPink, GetChestPosition(), GetChestPosition() + viewAxis[0] * 32.0f, 4, gameLocal.msec );
 	}
 
 	return false;
@@ -1900,7 +1900,7 @@ void anActor::Attach( anEntity *ent ) {
 	anVec3			origin;
 	anMat3			axis;
 	jointHandle_t	joint;
-	anString			jointName;
+	anStr			jointName;
 	idAttachInfo	&attach = attachments.Alloc();
 	anAngles		angleOffset;
 	anVec3			originOffset;
@@ -1926,10 +1926,10 @@ void anActor::Attach( anEntity *ent ) {
 	ent->cinematic = cinematic;
 }
 
-anEntity* anActor::FindAttachment( const char* attachmentName )
+anEntity *anActor::FindAttachment( const char *attachmentName )
 {
 	anEntity *ent = nullptr;
-	const char* fullName = va( "idAFAttachment_%s",attachmentName);
+	const char *fullName = va( "idAFAttachment_%s",attachmentName);
 	// find the specified attachment
 	for ( int i = 0; i < attachments.Num(); i++ ) {
 		ent = attachments[i].ent.GetEntity();
@@ -1940,7 +1940,7 @@ anEntity* anActor::FindAttachment( const char* attachmentName )
 	return nullptr;
 }
 
-void anActor::HideAttachment( const char* attachmentName )
+void anActor::HideAttachment( const char *attachmentName )
 {
 	anEntity *ent = FindAttachment( attachmentName );
 	if ( ent )
@@ -1949,7 +1949,7 @@ void anActor::HideAttachment( const char* attachmentName )
 	}
 }
 
-void anActor::ShowAttachment( const char* attachmentName )
+void anActor::ShowAttachment( const char *attachmentName )
 {
 	anEntity *ent = FindAttachment( attachmentName );
 	if ( ent )
@@ -2139,7 +2139,7 @@ void anActor::StopAnimState ( int channel ) {
 anActor::PostAnimState
 =====================
 */
-void anActor::PostAnimState ( int channel, const char* statename, int blendFrames, int delay, int flags ) {
+void anActor::PostAnimState ( int channel, const char *statename, int blendFrames, int delay, int flags ) {
 	GetAnimState ( channel ).PostState ( statename, blendFrames, delay, flags );
 }
 
@@ -2217,7 +2217,7 @@ anActor::GetAnim
 int anActor::GetAnim( int channel, const char *animname, bool forcePrefix ) {
 	int			anim;
 	const char *temp;
-	idAnimator *animatorPtr;
+	anAnimator *animatorPtr;
 
 	if ( channel == ANIMCHANNEL_HEAD ) {
 		if ( !head.GetEntity() ) {
@@ -2252,7 +2252,7 @@ anActor::SyncAnimChannels
 ===============
 */
 void anActor::SyncAnimChannels( int channel, int syncToChannel, int blendFrames ) {
-	idAnimator		*headAnimator;
+	anAnimator		*headAnimator;
 	idAFAttachment	*headEnt;
 	int				anim;
 	idAnimBlend		*syncAnim;
@@ -2549,7 +2549,7 @@ void anActor::Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir
 anActor::InitDeathPush
 =====================
 */
-void anActor::InitDeathPush ( const anVec3& dir, int location, const anDict* damageDict, float pushScale ) {
+void anActor::InitDeathPush ( const anVec3 &dir, int location, const anDict* damageDict, float pushScale ) {
 	anVec2	forceMin;
 	anVec2	forceMax;
 
@@ -2614,7 +2614,7 @@ void anActor::DeathPush ( void ) {
 anActor::SkipImpulse
 =====================
 */
-bool anActor::SkipImpulse( anEntity* ent, int id ) {
+bool anActor::SkipImpulse( anEntity *ent, int id ) {
 	return idAFEntity_Gibbable::SkipImpulse( ent, id ) || health <= 0 || gibbed || ent->IsType( anActor::GetClassType() ) || ent->IsType( idProjectile::GetClassType() );
 }
 
@@ -2623,7 +2623,7 @@ bool anActor::SkipImpulse( anEntity* ent, int id ) {
 anActor::AddDamageEffect
 =====================
 */
-void anActor::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor ) {
+void anActor::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor ) {
 	if ( !gameLocal.isMultiplayer && inflictor && inflictor->IsType ( anActor::GetClassType() ) ) {
 		if ( static_cast<anActor*>(inflictor)->team == team ) {
 			return;
@@ -2701,7 +2701,7 @@ bool anActor::Pain( anEntity *inflictor, anEntity *attacker, int damage, const a
 	}
 
 	// set the pain anim
-	anString damageGroup = GetDamageGroup( location );
+	anStr damageGroup = GetDamageGroup( location );
 
 	painAnim.Clear();
 
@@ -2761,7 +2761,7 @@ FIXME: only store group names once and store an index for each joint
 void anActor::SetupDamageGroups( void ) {
 	int						i;
 	const anKeyValue		*arg;
-	anString					groupname;
+	anStr					groupname;
 	anList<jointHandle_t>	jointList;
 	int						jointnum;
 	float					scale;
@@ -2876,7 +2876,7 @@ bool anActor::ExitVehicle ( bool force ) {
 anActor::EnterVehicle
 =====================
 */
-bool anActor::EnterVehicle ( anEntity* ent ) {
+bool anActor::EnterVehicle ( anEntity *ent ) {
 
 
 	if ( IsInVehicle() || !ent->IsType ( anVehicle::GetClassType() ) ) {
@@ -3716,7 +3716,7 @@ void anActor::EnableAnimState ( int channel ) {
 	GetAnimState ( channel ).Enable ( 4 );
 }
 
-bool anActor::HasAnim ( int channel, const char* animname, bool forcePrefix ) {
+bool anActor::HasAnim ( int channel, const char *animname, bool forcePrefix ) {
 	return GetAnim( channel, animname, forcePrefix ) != nullptr;
 }
 
@@ -3792,8 +3792,8 @@ void anActor::Event_JointCrawlEffect ( const char *effectKeyName, float crawlSec
 	}
 }
 
-anEntity* anActor::GetGroundElevator( anEntity* testElevator ) const {
-	anEntity* groundEnt = GetGroundEntity();
+anEntity *anActor::GetGroundElevator( anEntity *testElevator ) const {
+	anEntity *groundEnt = GetGroundEntity();
 	if ( !groundEnt ) {
 		return nullptr;
 	}
@@ -3809,7 +3809,7 @@ anEntity* anActor::GetGroundElevator( anEntity* testElevator ) const {
 		return groundEnt;
 	}
 
-	anEntity* traceEnt;
+	anEntity *traceEnt;
 	anVec3 testPoint = GetPhysics()->GetOrigin();
 	anVec3 testBottom;
 	testPoint.z += 1.0f;

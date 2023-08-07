@@ -25,10 +25,10 @@ public:
 	void Init( const char *splashEffectName, const char *wakeEffectName, anVec3 &offset, const anDict &wakeArgs );
 
 	// Check the object against the water collision model, updating effects and splashes if needed
-	void CheckWater( arcEntity *ent, const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel, bool showWake = true );
+	void CheckWater( anEntity *ent, const anVec3 &waterBodyOrg, const anMat3 &waterBodyAxis, anCollisionModel* waterBodyModel, bool showWake = true );
 
 	// Skips some checks if the user already has this data
-	void CheckWater( arcEntity *ent, bool newWaterState, float waterlevel, bool submerged, bool showWake = true );
+	void CheckWater( anEntity *ent, bool newWaterState, float waterlevel, bool submerged, bool showWake = true );
 
 	// Update the effects only
 	void CheckWaterEffectsOnly( void );

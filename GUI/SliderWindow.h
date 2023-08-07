@@ -25,10 +25,10 @@ public:
 	virtual void		Draw( inttime, float x, float y);
 	virtual void		DrawBackground(const idRectangle &drawRect);
 	virtual const char *RouteMouseCoords(float xd, float yd);
-	virtual void		Activate(bool activate, anString &act);
+	virtual void		Activate(bool activate, anStr &act);
 	virtual void		SetBuddy(idWindow *buddy);
 
-	void				RunNamedEvent( const char* eventName );
+	void				RunNamedEvent( const char *eventName );
 	
 private:
 	virtual bool		ParseInternalVar(const char *name, anParser *src);
@@ -52,7 +52,7 @@ private:
 	bool				verticalFlip;
 	bool				scrollbar;
 	idWindow *			buddyWin;
-	anString				thumbShader;
+	anStr				thumbShader;
 	
 	idWinStr			cvarStr;
 	anCVar *			cvar;

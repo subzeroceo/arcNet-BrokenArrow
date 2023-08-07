@@ -131,21 +131,21 @@ private:
 private:
 
 	void					DropToFloorAndRest	( void );
-	bool					SlideMove			( anVec3& start, anVec3& velocity, const anVec3& delta );
+	bool					SlideMove			( anVec3 &start, anVec3 &velocity, const anVec3 &delta );
 	void					CheckGround			( void );
 	void					ApplyFriction		( float timeStep );
 	void					DebugDraw			( void );
 };
 
-ARC_INLINE bool anPhysics_Particle::IsOnGround ( void ) const {
+inline bool anPhysics_Particle::IsOnGround ( void ) const {
 	return current.onGround;
 }
 
-ARC_INLINE bool anPhysics_Particle::IsInWater ( void ) const {
+inline bool anPhysics_Particle::IsInWater ( void ) const {
 	return current.inWater;
 }
 
-ARC_INLINE bool anPhysics_Particle::CanBounce ( void ) const {
+inline bool anPhysics_Particle::CanBounce ( void ) const {
 	return allowBounce;
 }
 

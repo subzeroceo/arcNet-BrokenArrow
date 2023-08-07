@@ -10,7 +10,7 @@
 
 ***********************************************************************/
 
-static anString				Maya_Error;
+static anStr				Maya_Error;
 
 static exporterInterface_t	Maya_ConvertModel = nullptr;
 static exporterShutdown_t	Maya_Shutdown = nullptr;
@@ -59,16 +59,15 @@ bool idModelExport::CheckMayaInstall( void ) {
 #ifndef _WIN32
 	return false;
 #elif 0
-	HKEY	hKey;
-	long	lres, lType;
+	HKEY hKey;
 
-	lres = RegOpenKey( HKEY_LOCAL_MACHINE, "SOFTWARE\\Alias|Wavefront\\Maya\\4.5\\Setup\\InstallPath", &hKey );
+	long lres = RegOpenKey( HKEY_LOCAL_MACHINE, "SOFTWARE\\Alias|Wavefront\\Maya\\4.5\\Setup\\InstallPath", &hKey );
 
 	if ( lres != ERROR_SUCCESS ) {
 		return false;
 	}
 
-	lres = RegQueryValueEx( hKey, "MAYA_INSTALL_LOCATION", nullptr, (unsigned long*)&lType, (unsigned char*)nullptr, (unsigned long*)nullptr );
+	long lres = RegQueryValueEx( hKey, "MAYA_INSTALL_LOCATION", nullptr, (unsigned long*)&lType, (unsigned char*)nullptr, (unsigned long*)nullptr );
 
 	RegCloseKey( hKey );
 
@@ -77,11 +76,10 @@ bool idModelExport::CheckMayaInstall( void ) {
 	}
 	return true;
 #else
-	HKEY	hKey;
-	long	lres;
+	HKEY hKey;
 
 	// only check the non-version specific key so that we only have to update the maya dll when new versions are released
-	lres = RegOpenKey( HKEY_LOCAL_MACHINE, "SOFTWARE\\Alias|Wavefront\\Maya", &hKey );
+	long lres = RegOpenKey( HKEY_LOCAL_MACHINE, "SOFTWARE\\Alias|Wavefront\\Maya", &hKey );
 	RegCloseKey( hKey );
 
 	if ( lres != ERROR_SUCCESS ) {
@@ -103,7 +101,7 @@ void idModelExport::LoadMayaDll( void ) {
 	char				dllPath[ MAX_OSPATH ];
 
 	fileSystem->FindDLL( "MayaImport", dllPath, false );
-	if ( !dllPath[ 0 ] ) {
+	if ( !dllPath[0] ) {
 		return;
 	}
 	importDLL = sys->DLL_Load( dllPath );
@@ -150,7 +148,7 @@ bool idModelExport::ConvertMayaToMD5( void ) {
 	ARC_TIME_T		destTime;
 	int			version;
 	anToken		cmdLine;
-	anString		path;
+	anStr		path;
 
 	// check if our DLL got loaded
 	if ( initialized && !Maya_ConvertModel ) {
@@ -158,8 +156,8 @@ bool idModelExport::ConvertMayaToMD5( void ) {
 		return false;
 	}
 
-	// if arcAnimManager::forceExport is set then we always reexport Maya models
-	if ( arcAnimManager::forceExport ) {
+	// if anAnimManager::forceExport is set then we always reexport Maya models
+	if ( anAnimManager::forceExport ) {
 		force = true;
 	}
 
@@ -179,7 +177,6 @@ bool idModelExport::ConvertMayaToMD5( void ) {
 			// check the command line
 			if ( parser.CheckTokenString( "commandline" ) ) {
 				parser.ReadToken( &cmdLine );
-
 				// check the file time, scale, and version
 				if ( ( destTime >= sourceTime ) && ( version == MD5_VERSION ) && ( cmdLine == commandLine ) ) {
 					// don't convert it
@@ -273,7 +270,7 @@ idModelExport::ExportAnim
 */
 bool idModelExport::ExportAnim( const char *anim ) {
 	const char *game = cvarSystem->GetCVarString( "fs_enginepath" );
-	if ( strlen(game) == 0 ) {
+	if ( strlen( game ) == 0 ) {
 		game = BASE_GAMEDIR;
 	}
 
@@ -298,8 +295,8 @@ idModelExport::ParseOptions
 */
 bool idModelExport::ParseOptions( anLexer &lex ) {
 	anToken	token;
-	anString	destdir;
-	anString	sourcedir;
+	anStr	destdir;
+	anStr	sourcedir;
 
 	if ( !lex.ReadToken( &token ) ) {
 		lex.Error( "Expected filename" );
@@ -364,14 +361,14 @@ idModelExport::ParseExportSection
 int idModelExport::ParseExportSection( anParser &parser ) {
 	anToken	command;
 	anToken	token;
-	anString	defaultCommands;
+	anStr	defaultCommands;
 	anLexer lex;
-	anString	temp;
-	anString	parms;
+	anStr	temp;
+	anStr	parms;
 	int		count;
 
 	// only export sections that match our export mask
-	if ( g_exportMask.GetString()[ 0 ] ) {
+	if ( g_exportMask.GetString()[0] ) {
 		if ( parser.CheckTokenString( "{" ) ) {
 			parser.SkipBracedSection( false );
 			return 0;
@@ -393,8 +390,7 @@ int idModelExport::ParseExportSection( anParser &parser ) {
 
 	lex.SetFlags( LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWPATHNAMES | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
 
-	while( 1 ) {
-
+	while ( 1 ) {
 		if ( !parser.ReadToken( &command ) ) {
 			parser.Error( "Unexpoected end-of-file" );
 			break;
@@ -444,7 +440,7 @@ int idModelExport::ParseExportSection( anParser &parser ) {
 				} else {
 					dest.SetFileExtension( command );
 				}
-				anString back = commandLine;
+				anStr back = commandLine;
 				sprintf( commandLine, "%s %s -dest %s -game %s%s", command.c_str(), src.c_str(), dest.c_str(), game, commandLine.c_str() );
 				if ( ConvertMayaToMD5() ) {
 					count++;
@@ -506,7 +502,7 @@ int idModelExport::ExportModels( const char *pathname, const char *extension ) {
 	}
 
 	gameLocal.Printf( "--------- Exporting models --------\n" );
-	if ( !g_exportMask.GetString()[ 0 ] ) {
+	if ( !g_exportMask.GetString()[0] ) {
 		gameLocal.Printf( "  Export mask: '%s'\n", g_exportMask.GetString() );
 	}
 

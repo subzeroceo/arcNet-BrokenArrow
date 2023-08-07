@@ -51,19 +51,19 @@ anList<fontInfoEx_t> idDeviceContext::fonts;
 int idDeviceContext::FindFont( const char *name ) {
 	int c = fonts.Num();
 	for ( int i = 0; i < c; i++ ) {
-		if (anString::Icmp(name, fonts[i].name) == 0) {
+		if (anStr::Icmp(name, fonts[i].name) == 0) {
 			return i;
 		}
 	}
 
 	// If the font was not found, try to register it
-	anString fileName = name;
+	anStr fileName = name;
 	fileName.Replace( "fonts", va( "fonts/%s", fontLang.c_str()) );
 
 	fontInfoEx_t fontInfo;
 		int index = fonts.Append( fontInfo );
 		if ( renderSystem->RegisterFont( fileName, fonts[index] ) ){
-		anString::Copynz( fonts[index].name, name, sizeof( fonts[index].name ) );
+		anStr::Copynz( fonts[index].name, name, sizeof( fonts[index].name ) );
 		return index;
 		} else {
 		common->Printf( "Could not register font %s [%s]\n", name, fileName.c_str() );
@@ -162,7 +162,7 @@ void idDeviceContext::SetTransformInfo(const anVec3 &org, const anMat3 &m) {
 
 // 
 //  added method
-void idDeviceContext::GetTransformInfo(anVec3& org, anMat3& m )
+void idDeviceContext::GetTransformInfo(anVec3 &org, anMat3 &m )
 {
 	m = mat;
 	org = origin;
@@ -705,11 +705,11 @@ int idDeviceContext::DrawText(float x, float y, float scale, anVec4 color, const
 			// (Assets.textFont.glyphs[text[i]].imageHeight -
 			// Assets.textFont.glyphs[text[i]].height);
 			//
-			if ( anString::IsColor((const char*)s) ) {
+			if ( anStr::IsColor((const char*)s) ) {
 				if ( *( s+1) == C_COLOR_DEFAULT ) {
 					newColor = color;
 				} else {
-					newColor = anString::ColorForIndex( *( s+1) );
+					newColor = anStr::ColorForIndex( *( s+1) );
 					newColor[3] = color[3];
 				}
 				if (cursor == count || cursor == count+1) {
@@ -777,7 +777,7 @@ int idDeviceContext::TextWidth( const char *text, float scale, int limit ) {
 	width = 0;
 	if ( limit > 0 ) {
 		for ( i = 0; text[i] != '\0' && i < limit; i++ ) {
-			if ( anString::IsColor( text + i ) ) {
+			if ( anStr::IsColor( text + i ) ) {
 				i++;
 			} else {
 				width += glyphs[((const unsigned char *)text)[i]].xSkip;
@@ -785,7 +785,7 @@ int idDeviceContext::TextWidth( const char *text, float scale, int limit ) {
 		}
 	} else {
 		for ( i = 0; text[i] != '\0'; i++ ) {
-			if ( anString::IsColor( text + i ) ) {
+			if ( anStr::IsColor( text + i ) ) {
 				i++;
 			} else {
 				width += glyphs[((const unsigned char *)text)[i]].xSkip;
@@ -814,7 +814,7 @@ int idDeviceContext::TextHeight(const char *text, float scale, int limit) {
 
 		count = 0;
 		while ( s && *s && count < len) {
-			if ( anString::IsColor( s) ) {
+			if ( anStr::IsColor( s) ) {
 				s += 2;
 				continue;
 			}
@@ -971,7 +971,7 @@ int idDeviceContext::DrawText( const char *text, float textScale, int textAlign,
 	p = textPtr;
 
 	if ( breaks ) {
-		breaks->Append(0);
+		breaks->Append( 0 );
 	}
 	count = 0;
 	textWidth = 0;
@@ -986,7 +986,7 @@ int idDeviceContext::DrawText( const char *text, float textScale, int textAlign,
 			}
 		}
 
-		int nextCharWidth = ( anString::CharIsPrintable(*p) ? CharWidth( *p, textScale ) : cursorSkip );
+		int nextCharWidth = ( anStr::CharIsPrintable(*p) ? CharWidth( *p, textScale ) : cursorSkip );
 		// FIXME: this is a temp hack until the guis can be fixed not not overflow the bounding rectangles
 		//		  the side-effect is that list boxes and edit boxes will draw over their scroll bars
 		//	The following line and the !linebreak in the if statement below should be removed

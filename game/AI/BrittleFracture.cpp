@@ -179,14 +179,14 @@ void idBrittleFracture::Restore( anRestoreGame *savefile ) {
 	shards.SetNum( num );
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_HEAP_MEM(this);
+	PushHeapMemory(this);
 
 	for ( i = 0; i < num; i++ ) {
 		shards[i] = new shard_t;
 	}
 
 // mwhitlock: Dynamic memory consolidation
-	POP_HEAP();
+	PopSystemHeap();
 
 
 	for ( i = 0; i < num; i++ ) {
@@ -197,12 +197,12 @@ void idBrittleFracture::Restore( anRestoreGame *savefile ) {
 		for ( j = 0; j < shards[i]->decals.Num(); j++ ) {
 
 // mwhitlock: Dynamic memory consolidation
-			PUSH_HEAP_MEM(this);
+			PushHeapMemory(this);
 
 			shards[i]->decals[j] = new anFixedWinding;
 
 // mwhitlock: Dynamic memory consolidation
-			POP_HEAP();
+			PopSystemHeap();
 
 			savefile->ReadWinding( *shards[i]->decals[j] );
 		}
@@ -289,12 +289,12 @@ idBrittleFracture::AddShard
 void idBrittleFracture::AddShard( anClipModel *clipModel, anFixedWinding &w ) {
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_HEAP_MEM(this);
+	PushHeapMemory(this);
 
 	shard_t *shard = new shard_t;
 
 // mwhitlock: Dynamic memory consolidation
-	POP_HEAP();
+	PopSystemHeap();
 
 	shard->clipModel = clipModel;
 	shard->droppedTime = -1;
@@ -732,8 +732,8 @@ void idBrittleFracture::ProjectDecal( const anVec3 &point, const anVec3 &dir, co
 	axis[2] = -dir;
 	axis[2].Normalize();
 	axis[2].NormalVectors( axistemp[0], axistemp[1] );
-	axis[0] = axistemp[ 0 ] * c + axistemp[ 1 ] * s;
-	axis[1] = axistemp[ 0 ] * s + axistemp[ 1 ] * -c;
+	axis[0] = axistemp[0] * c + axistemp[1] * s;
+	axis[1] = axistemp[0] * s + axistemp[1] * -c;
 
 	textureAxis[0] = axis[0] * ( 1.0f / decalSize );
 	textureAxis[0][3] = -( point * textureAxis[0].Normal() ) + 0.5f;
@@ -769,12 +769,12 @@ void idBrittleFracture::ProjectDecal( const anVec3 &point, const anVec3 &dir, co
 		}
 
 // mwhitlock: Dynamic memory consolidation
-		PUSH_HEAP_MEM(this);
+		PushHeapMemory(this);
 
 		anFixedWinding *decal = new anFixedWinding;
 
 // mwhitlock: Dynamic memory consolidation
-		POP_HEAP();
+		PopSystemHeap();
 
 		shards[i]->decals.Append( decal );
 
@@ -1029,7 +1029,7 @@ void idBrittleFracture::Killed( anEntity *inflictor, anEntity *attacker, int dam
 idBrittleFracture::AddDamageEffect
 ================
 */
-void idBrittleFracture::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor ) {
+void idBrittleFracture::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor ) {
 	if ( !disableFracture ) {
 		ProjectDecal( collision.c.point, collision.c.normal, gameLocal.time, damageDefName );
 	}
@@ -1064,8 +1064,8 @@ void idBrittleFracture::Fracture_r( anFixedWinding &w ) {
 		s = -anMath::Sin( a );
 		axis[2] = windingPlane.Normal();
 		axis[2].NormalVectors( axistemp[0], axistemp[1] );
-		axis[0] = axistemp[ 0 ] * c + axistemp[ 1 ] * s;
-		axis[1] = axistemp[ 0 ] * s + axistemp[ 1 ] * -c;
+		axis[0] = axistemp[0] * c + axistemp[1] * s;
+		axis[1] = axistemp[0] * s + axistemp[1] * -c;
 
 		// get the best split plane
 		bestDist = 0.0f;
@@ -1102,12 +1102,12 @@ void idBrittleFracture::Fracture_r( anFixedWinding &w ) {
 	trm.Shrink( CM_CLIP_EPSILON );
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_HEAP_MEM(this);
+	PushHeapMemory(this);
 
 	clipModel = new anClipModel( trm );
 
 // mwhitlock: Dynamic memory consolidation
-	POP_HEAP();
+	PopSystemHeap();
 
 	physicsObj.SetClipModel( clipModel, 1.0f, shards.Num() );
 	physicsObj.SetOrigin( GetPhysics()->GetOrigin() + origin, shards.Num() );

@@ -40,7 +40,7 @@ typedef enum {
 	#define ARC_STATICTEMPLATE			static
 #endif
 
-#define ARC_INLINE						__forceinline
+#define inline						__forceinline
 #define ARC_TLS							__declspec( thread )
 #define ARC_DEPRECATED					__declspec( deprecated )
 
@@ -125,7 +125,7 @@ public:
 #define ASSERT							assert
 
 #define ARC_STATICTEMPLATE
-#define ARC_INLINE						inline
+#define inline						inline
 #define ARC_DEPRECATED
 // from gcc 4.0 manual:
 // The __thread specifier may be used alone, with the extern or static specifiers, but with no other storage class specifier. When used with extern or static, __thread must appear immediately after the other storage class specifier.
@@ -166,7 +166,7 @@ public:
 #define ASSERT							assert
 
 #define ARC_STATICTEMPLATE
-#define ARC_INLINE						inline
+#define inline						inline
 #define ARC_TLS							__thread
 #define ARC_DEPRECATED
 
@@ -176,7 +176,7 @@ public:
 
 #endif
 
-template< typename T > ARC_INLINE void Swap( T& l, T& r ) {
+template< typename T > inline void Swap( T& l, T& r ) {
 	T temp = l;
 	l = r;
 	r = temp;

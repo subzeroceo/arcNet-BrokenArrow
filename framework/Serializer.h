@@ -7,7 +7,7 @@
 #define SERIALIZE_CVAR_INT( ser, cvar )		{ int a = cvar.GetInteger(); ser.Serialize( a ); cvar.SetInteger( a ); }
 #define SERIALIZE_CVAR_BOOL( ser, cvar )	{ bool a = cvar.GetBool(); SERIALIZE_BOOL( ser, a ); cvar.SetBool( a ); }
 
-#define SERIALIZE_MATX( ser, var )				\ {												\
+#define SERIALIZE_MATX( ser, var ) {			\
 	int rows = var.GetNumRows();				\
 	int cols = var.GetNumColumns();				\
 	ser.Serialize( rows );						\
@@ -22,7 +22,7 @@
 	}											\
 }												\
 
-#define SERIALIZE_VECX( ser, var )	{												\
+#define SERIALIZE_VECX( ser, var ) {			\
 	int size = var.GetSize();					\
 	ser.Serialize( size );						\
 	if ( ser.IsReading() ) {					\
@@ -33,11 +33,10 @@
 	}											\
 }												\
 
-#define SERIALIZE_JOINT( ser, var )				\
-{												\
-	uint16 jointIndex = ( var == NULL_JOINT_INDEX ) ? 65535 : var;	\
+#define SERIALIZE_JOINT( ser, var )	{			\
+	uint16 jointIndex = ( var == nullptr_JOINT_INDEX ) ? 65535 : var;	\
 	ser.Serialize( jointIndex );					\
-	var = ( jointIndex == 65535 ) ? NULL_JOINT_INDEX : (jointIndex_t)jointIndex; \
+	var = ( jointIndex == 65535 ) ? nullptr_JOINT_INDEX : (jointIndex_t)jointIndex; \
 }												\
 
 //#define ENABLE_SERIALIZE_CHECKPOINTS
@@ -89,7 +88,7 @@ public:
 	int	SerializeUMaxNonRef( int value, int maxSize ) {					// Unsigned only
 		SanityCheck();
 		if ( writing ) {
-			msg->WriteBits(value, anMath::BitsForInteger( maxSize ) );
+			msg->WriteBits( value, anMath::BitsForInteger( maxSize ) );
 		} else {
 			value = msg->ReadBits( anMath::BitsForInteger( maxSize ) );
 		}
@@ -100,9 +99,9 @@ public:
 	//void SerializeBitMsg( anBitMessage & inOutMsg, int numBytes ) { SanityCheck(); if ( writing ) { msg->WriteBitMsg( inOutMsg, numBytes ); } else { msg->ReadBitMsg( inOutMsg, numBytes ); } }
 
 	// this is still needed to compile Rage code
-	void	SerializeBytes( void * bytes, int numBytes ) { SanityCheck(); for ( int i = 0; i < numBytes; i++ ) { Serialize( ((uint8 *)bytes)[i] ); } };
+	void	SerializeBytes( void *bytes, int numBytes ) { SanityCheck(); for ( int i = 0; i < numBytes; i++ ) { Serialize( ((uint8 *)bytes )[i] ); } };
 
-	bool	SerializeBoolNonRef( bool value )	{ SanityCheck(); if ( writing ) { msg->WriteBool(value); }		else { value = msg->ReadBool(); } return value; }		// We return a value so we can support bit fields (can't pass by reference)
+	bool	SerializeBoolNonRef( bool value )	{ SanityCheck(); if ( writing ) { msg->WriteBool( value ); }		else { value = msg->ReadBool(); } return value; }		// We return a value so we can support bit fields (can't pass by reference)
 
 
 #ifdef SERIALIZE_NO_QUANT
@@ -134,9 +133,9 @@ public:
 	void	SerializeSPacked( int & original);
 
 	void	SerializeString( char * s, int bufferSize )	{ SanityCheck(); if ( writing ) { msg->WriteString( s); } else { msg->ReadString( s, bufferSize ); } }
-	//void	SerializeString( idAtomicString & s )		{ SanityCheck(); if ( writing ) { msg->WriteString( s); } else { anString temp; msg->ReadString( temp ); s.Set( temp ); } }
-	void	SerializeString( anString & s )				{ SanityCheck(); if ( writing ) { msg->WriteString( s); } else { msg->ReadString( s ); } }
-	//void	SerializeString( anStringId & s )				{ SanityCheck(); if ( writing ) { msg->WriteString( s.GetKey() ); } else { anString key; msg->ReadString( key ); s.Set( key );} }
+	//void	SerializeString( idAtomicString & s )		{ SanityCheck(); if ( writing ) { msg->WriteString( s); } else { anStr temp; msg->ReadString( temp ); s.Set( temp ); } }
+	void	SerializeString( anStr & s )				{ SanityCheck(); if ( writing ) { msg->WriteString( s); } else { msg->ReadString( s ); } }
+	//void	SerializeString( anStringId & s )				{ SanityCheck(); if ( writing ) { msg->WriteString( s.GetKey() ); } else { anStr key; msg->ReadString( key ); s.Set( key );} }
 
 	void	SerializeDelta( int32 & value, const int32 & base ) { SanityCheck(); if ( writing ) { msg->WriteDeltaLong( base, value ); } else { value = msg->ReadDeltaLong( base ); } }
 	void	SerializeDelta( int16 & value, const int16 & base ) { SanityCheck(); if ( writing ) { msg->WriteDeltaShort( base, value ); } else { value = msg->ReadDeltaShort( base ); } }
@@ -147,23 +146,22 @@ public:
 
 	void	SerializeDelta( float & value, const float & base ) { SanityCheck(); if ( writing ) { msg->WriteDeltaFloat( base, value ); } else { value = msg->ReadDeltaFloat( base ); } }
 
-
-	// Common types, no compression
-	void	Serialize( int64 & value )		{ SanityCheck(); if ( writing ) { msg->WriteLongLong(value); }		else { value = msg->ReadLongLong(); } }
-	void	Serialize( uint64 & value )		{ SanityCheck(); if ( writing ) { msg->WriteLongLong(value); }		else { value = msg->ReadLongLong(); } }
-	void	Serialize( int32 & value )		{ SanityCheck(); if ( writing ) { msg->WriteLong(value); }			else { value = msg->ReadLong(); } }
-	void	Serialize( uint32 & value )		{ SanityCheck(); if ( writing ) { msg->WriteLong(value); }			else { value = msg->ReadLong(); } }
-	void	Serialize( int16 & value )		{ SanityCheck(); if ( writing ) { msg->WriteShort(value); }			else { value = msg->ReadShort(); } }
-	void	Serialize( uint16 & value )		{ SanityCheck(); if ( writing ) { msg->WriteUShort(value); }		else { value = msg->ReadUShort(); } }
-	void	Serialize( uint8 & value )		{ SanityCheck(); if ( writing ) { msg->WriteByte(value); }			else { value = msg->ReadByte(); } }
-	void	Serialize( int8 & value )		{ SanityCheck(); if ( writing ) { msg->WriteChar(value); }			else { value = msg->ReadChar(); } }
+	// arCNet types, no compression
+	void	Serialize( int64 & value )		{ SanityCheck(); if ( writing ) { msg->WriteLongLong( value ); }		else { value = msg->ReadLongLong(); } }
+	void	Serialize( uint64 & value )		{ SanityCheck(); if ( writing ) { msg->WriteLongLong( value ); }		else { value = msg->ReadLongLong(); } }
+	void	Serialize( int32 & value )		{ SanityCheck(); if ( writing ) { msg->WriteLong( value ); }			else { value = msg->ReadLong(); } }
+	void	Serialize( uint32 & value )		{ SanityCheck(); if ( writing ) { msg->WriteLong( value ); }			else { value = msg->ReadLong(); } }
+	void	Serialize( int16 & value )		{ SanityCheck(); if ( writing ) { msg->WriteShort( value ); }			else { value = msg->ReadShort(); } }
+	void	Serialize( uint16 & value )		{ SanityCheck(); if ( writing ) { msg->WriteUShort( value ); }		else { value = msg->ReadUShort(); } }
+	void	Serialize( uint8 & value )		{ SanityCheck(); if ( writing ) { msg->WriteByte( value ); }			else { value = msg->ReadByte(); } }
+	void	Serialize( int8 & value )		{ SanityCheck(); if ( writing ) { msg->WriteChar( value ); }			else { value = msg->ReadChar(); } }
 	void	Serialize( bool & value )		{ SanityCheck(); if ( writing ) { msg->WriteByte(value?1:0 ); }		else { value = msg->ReadByte() != 0; } }
-	void	Serialize( float & value )		{ SanityCheck(); if ( writing ) { msg->WriteFloat(value); }			else { value = msg->ReadFloat(); } }
-	void	Serialize( idRandom2 & value )	{ SanityCheck(); if ( writing ) { msg->WriteLong(value.GetSeed() ); } else { value.SetSeed( msg->ReadLong() ); } }
-	void	Serialize( anVec3 & value )		{ SanityCheck(); if ( writing ) { msg->WriteVectorFloat(value); }	else { msg->ReadVectorFloat(value); } }
-	void	Serialize( anVec2 & value )		{ SanityCheck(); if ( writing ) { msg->WriteVectorFloat(value); }	else { msg->ReadVectorFloat(value); } }
-	void	Serialize( anVec6 & value )		{ SanityCheck(); if ( writing ) { msg->WriteVectorFloat(value); }	else { msg->ReadVectorFloat(value); } }
-	void	Serialize( anVec4 & value )		{ SanityCheck(); if ( writing ) { msg->WriteVectorFloat(value); }	else { msg->ReadVectorFloat(value); } }
+	void	Serialize( float & value )		{ SanityCheck(); if ( writing ) { msg->WriteFloat( value ); }			else { value = msg->ReadFloat(); } }
+	void	Serialize( anRandom & value )	{ SanityCheck(); if ( writing ) { msg->WriteLong(value.GetSeed() ); } else { value.SetSeed( msg->ReadLong() ); } }
+	void	Serialize( anVec3 & value )		{ SanityCheck(); if ( writing ) { msg->WriteVectorFloat( value ); }	else { msg->ReadVectorFloat( value ); } }
+	void	Serialize( anVec2 & value )		{ SanityCheck(); if ( writing ) { msg->WriteVectorFloat( value ); }	else { msg->ReadVectorFloat( value ); } }
+	void	Serialize( anVec6 & value )		{ SanityCheck(); if ( writing ) { msg->WriteVectorFloat( value ); }	else { msg->ReadVectorFloat( value ); } }
+	void	Serialize( anVec4 & value )		{ SanityCheck(); if ( writing ) { msg->WriteVectorFloat( value ); }	else { msg->ReadVectorFloat( value ); } }
 
 	// serialize an angle, normalized to between 0 to 360 and quantized to 16 bits
 	void	SerializeAngle( float & value ) {
@@ -275,7 +273,6 @@ public:
 	}
 
 	~idSerializerScopedBlock() {
-
 		// Serialize remaining bits
 		while ( ser->GetMsg().GetWriteBit() != startWriteBits ) {
 			ser->SerializeBoolNonRef( false );
@@ -314,7 +311,7 @@ idSerializer::SerializeQ
 ========================
 */
 #ifndef SERIALIZE_NO_QUANT
-ARC_INLINE void idSerializer::SerializeQ( anMat3 &axis, int bits ) {
+inline void idSerializer::SerializeQ( anMat3 &axis, int bits ) {
 	SanityCheck();
 
 	const float scale = ( ( 1 << ( bits - 1 ) ) - 1 );
@@ -341,9 +338,9 @@ ARC_INLINE void idSerializer::SerializeQ( anMat3 &axis, int bits ) {
 			out.y = quat[( maxIndex + 2 ) & 3];
 			out.z = quat[( maxIndex + 3 ) & 3];
 		}
-		msg->WriteBits( anMath::Ftoi( out.x * scale ), -bits);
-		msg->WriteBits( anMath::Ftoi( out.y * scale ), -bits);
-		msg->WriteBits( anMath::Ftoi( out.z * scale ), -bits);
+		msg->WriteBits( anMath::Ftoi( out.x * scale ), -bits );
+		msg->WriteBits( anMath::Ftoi( out.y * scale ), -bits );
+		msg->WriteBits( anMath::Ftoi( out.z * scale ), -bits );
 
 	} else if ( IsReading() ) {
 		anQuats quat;
@@ -351,9 +348,9 @@ ARC_INLINE void idSerializer::SerializeQ( anMat3 &axis, int bits ) {
 
 		int maxIndex = msg->ReadBits(2);
 
-		in.x = ( float )msg->ReadBits(-bits) / scale;
-		in.y = ( float )msg->ReadBits(-bits) / scale;
-		in.z = ( float )msg->ReadBits(-bits) / scale;
+		in.x = ( float )msg->ReadBits( -bits ) / scale;
+		in.y = ( float )msg->ReadBits( -bits ) / scale;
+		in.z = ( float )msg->ReadBits( -bits ) / scale;
 
 		quat[( maxIndex + 1 ) & 3] = in.x;
 		quat[( maxIndex + 2 ) & 3] = in.y;
@@ -371,9 +368,8 @@ ARC_INLINE void idSerializer::SerializeQ( anMat3 &axis, int bits ) {
 idSerializer::Serialize
 ========================
 */
-ARC_INLINE void idSerializer::Serialize( anMat3 & axis ) {
+inline void idSerializer::Serialize( anMat3 & axis ) {
 	SanityCheck();
-
 	Serialize( axis[0] );
 	Serialize( axis[1] );
 	Serialize( axis[2] );
@@ -384,12 +380,11 @@ ARC_INLINE void idSerializer::Serialize( anMat3 & axis ) {
 idSerializer::SerializeC
 ========================
 */
-ARC_INLINE void idSerializer::SerializeC( anMat3 & axis ) {
+inline void idSerializer::SerializeC( anMat3 & axis ) {
 	SanityCheck();
 
 	if ( IsWriting() ) {
 		anCQuats cquat = axis.ToCQuat();
-
 		Serialize( cquat.x );
 		Serialize( cquat.y );
 		Serialize( cquat.z );
@@ -410,7 +405,7 @@ idSerializer::SerializeListElement
 ========================
 */
 template<typename _type_>
-ARC_INLINE void idSerializer::SerializeListElement( const anList<_type_* > & list, const _type_ *&element ) {
+inline void idSerializer::SerializeListElement( const anList<_type_* > & list, const _type_ *&element ) {
 	SanityCheck();
 
 	if ( IsWriting() ) {
@@ -427,18 +422,18 @@ ARC_INLINE void idSerializer::SerializeListElement( const anList<_type_* > & lis
 /*
 ========================
 idSerializer::SerializePacked
+
 Writes out 7 bits at a time, using every 8th bit to signify more bits exist
 
 NOTE - Signed values work with this function, but take up more bytes
 Use SerializeSPacked if you anticipate lots of negative values
 ========================
 */
-ARC_INLINE void idSerializer::SerializePacked( int & original) {
+inline void idSerializer::SerializePacked( int & original) {
 	SanityCheck();
 
 	if ( IsWriting() ) {
 		uint32 value = original;
-
 		while ( true ) {
 			uint8 byte = value & 0x7F;
 			value >>= 7;
@@ -472,7 +467,7 @@ NOTE - An extra bit of the first byte is used to store the sign
 (this function supports negative values, but will use 2 bytes for values greater than 63)
 ========================
 */
-ARC_INLINE void idSerializer::SerializeSPacked( int & value) {
+inline void idSerializer::SerializeSPacked( int & value) {
 	SanityCheck();
 
 	if ( IsWriting() ) {
@@ -496,7 +491,7 @@ ARC_INLINE void idSerializer::SerializeSPacked( int & value) {
 		// Load the first byte specifically to handle the sign bit
 		uint8 byte		= msg->ReadByte();
 		uint32 uvalue	= byte & 0x3f;
-		bool sgn		= (byte & 0x40) ? true : false;
+		bool sgn		= ( byte & 0x40 ) ? true : false;
 		int32 shift		= 6;
 
 		while ( byte & 0x80 && shift < 32 ) {
@@ -505,7 +500,7 @@ ARC_INLINE void idSerializer::SerializeSPacked( int & value) {
 			shift += 7;
 		}
 
-		value = sgn ? -( ( int )uvalue) : uvalue;
+		value = sgn ? -( ( int )uvalue ) : uvalue;
 	}
 }
 

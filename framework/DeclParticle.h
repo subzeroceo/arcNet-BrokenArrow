@@ -19,8 +19,8 @@ public:
 	float					from;
 	float					to;
 
-	float					Eval( float frac, arcRandom &rand ) const;
-	float					Integrate( float frac, arcRandom &rand ) const;
+	float					Eval( float frac, anRandom &rand ) const;
+	float					Integrate( float frac, anRandom &rand ) const;
 };
 
 
@@ -61,13 +61,13 @@ typedef struct {
 	const renderView_t *	renderView;
 	int						index;				// particle number in the system
 	float					frac;				// 0.0 to 1.0
-	arcRandom				random;
+	anRandom				random;
 	anVec3					origin;				// dynamic smoke particles can have individual origins and axis
 	anMat3					axis;
 
 
 	float					age;				// in seconds, calculated as fraction * stage->particleLife
-	arcRandom				originalRandom;		// needed so aimed particles can reset the random for another origin calculation
+	anRandom				originalRandom;		// needed so aimed particles can reset the random for another origin calculation
 	float					animationFrameFrac;	// set by ParticleTexCoords, used to make the cross faded version
 } particleGen_t;
 

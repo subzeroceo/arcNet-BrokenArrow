@@ -45,7 +45,7 @@ void MA_ParseNodeHeader(anParser& parser, maNodeHeader_t* header) {
 	}
 }
 
-bool MA_ParseHeaderIndex(maAttribHeader_t* header, int& minIndex, int& maxIndex, const char* headerType, const char* skipString) {
+bool MA_ParseHeaderIndex(maAttribHeader_t* header, int& minIndex, int& maxIndex, const char *headerType, const char *skipString) {
 
 	anParser miniParse;
 	anToken token;
@@ -87,7 +87,7 @@ bool MA_ParseAttribHeader(anParser &parser, maAttribHeader_t* header) {
 	return true;
 }
 
-bool MA_ReadVec3(anParser& parser, anVec3& vec) {
+bool MA_ReadVec3(anParser& parser, anVec3 &vec) {
 	anToken token;
 	if ( !parser.SkipUntilString( "double3" ) ) {
 		throw anExceptions( va( "Maya Loader '%s': Invalid Vec3", parser.GetFileName() ) );
@@ -743,7 +743,7 @@ void MA_ParseCreateNode(anParser& parser) {
 }
 
 
-int MA_AddMaterial(const char* materialName) {
+int MA_AddMaterial(const char *materialName) {
 
 
 	maMaterialNode_t**	destNode;
@@ -763,7 +763,7 @@ int MA_AddMaterial(const char* materialName) {
 			memset( material, 0, sizeof( maMaterial_t ) );
 
 			//Remove the OS stuff
-			anString qPath;
+			anStr qPath;
 			qPath = fileSystem->OSPathToRelativePath( matNode->file->path );
 
 			strcpy(material->name, qPath.c_str() );
@@ -777,11 +777,11 @@ int MA_AddMaterial(const char* materialName) {
 
 bool MA_ParseConnectAttr(anParser& parser) {
 
-	anString temp;
-	anString srcName;
-	anString srcType;
-	anString destName;
-	anString destType;
+	anStr temp;
+	anStr srcName;
+	anStr srcType;
+	anStr destName;
+	anStr destType;
 
 	anToken token;
 	parser.ReadToken( &token );
@@ -929,7 +929,7 @@ void MA_ApplyTransformation(maModel_t *model) {
 MA_Parse
 =================
 */
-maModel_t *MA_Parse( const char *buffer, const char* filename, bool verbose ) {
+maModel_t *MA_Parse( const char *buffer, const char *filename, bool verbose ) {
 	memset( &maGlobal, 0, sizeof( maGlobal ) );
 
 	maGlobal.verbose = verbose;

@@ -171,7 +171,7 @@ static int anMath::IsFinite( float f ) {
 	if ( fi.u == 0xFF800000 || fi.u == 0x7F800000 )
 		return 0; // -INF or +INF
 
-	fi.u = 0x7F800000 - (fi.u & 0x7FFFFFFF);
+	fi.u = 0x7F800000 - ( fi.u & 0x7FFFFFFF );
 	if ( (int)( fi.u >> 31 ) )
 		return 0; // -NAN or +NAN
 
@@ -540,7 +540,7 @@ anVec3	anMath::NearestBoundaryPoint( const anVec3 &pt, const anBounds &bounds ) 
 anMath::ProjectPointOntoLine
 ================
 */
-anVec3 anMath::ProjectPointOntoLine( const anVec3& point, const anVec3& line, const anVec3& lineStartPoint ) {
+anVec3 anMath::ProjectPointOntoLine( const anVec3 &point, const anVec3 &line, const anVec3 &lineStartPoint ) {
 	anVec3 lineDir = line;
 	lineDir.Normalize();
 	float dot = ( point - lineStartPoint ) * lineDir;
@@ -553,7 +553,7 @@ anVec3 anMath::ProjectPointOntoLine( const anVec3& point, const anVec3& line, co
 anMath::DistFromPointToLine
 ================
 */
-float anMath::DistFromPointToLine( const anVec3& point, const anVec3& line, const anVec3& lineStartPoint ) {
+float anMath::DistFromPointToLine( const anVec3 &point, const anVec3 &line, const anVec3 &lineStartPoint ) {
 	assert( line.Length() );
 
 	return ( ( point - lineStartPoint ).Cross( line ) ).Length() / line.Length();

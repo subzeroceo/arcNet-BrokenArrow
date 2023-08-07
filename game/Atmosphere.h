@@ -81,7 +81,7 @@ private:
 	const sdHeightMapInstance*			cachedHeightMap;
 };
 
-class sdAtmosphere : public arcEntity {
+class sdAtmosphere : public anEntity {
 public:
 	CLASS_PROTOTYPE( sdAtmosphere );
 
@@ -120,7 +120,7 @@ private:
 	void						Event_GetDefaultPostProcessGlareBrightnessThreshold();
 	void						Event_GetDefaultPostProcessGlareThresholdDependency();
 
-	void						Event_SetPostProcessTint( const anVec3& tint );
+	void						Event_SetPostProcessTint( const anVec3 &tint );
 	void						Event_SetPostProcessSaturation( float saturation );
 	void						Event_SetPostProcessContrast( float contrast );
 	void						Event_SetPostProcessGlareParms( float sourceBrightness, float blurBrightness, float brightnessThreshold, float thresholdDep );
@@ -135,7 +135,7 @@ private:
 	float						windStrength;
 	anVec3						windVector;
 
-	const sdProgram::sdFunction*	updatePostProcessFunction;
+	const idProgram::sdFunction*	updatePostProcessFunction;
 
 	sdAtmosphereInstance*			currentAtmosphereInstance;
 	anList< sdAtmosphereInstance* > instances;
@@ -148,7 +148,7 @@ private:
 };
 
 
-class sdAmbientLight : public arcEntity {
+class sdAmbientLight : public anEntity {
 public:
 	CLASS_PROTOTYPE( sdAmbientLight );
 

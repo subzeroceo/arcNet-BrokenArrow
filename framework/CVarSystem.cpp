@@ -7,18 +7,18 @@ anCVarSystem * anCVarSystem::staticVars = nullptr;
 /*
 ===============================================================================
 
-	ARCInternalCVarSys
+	anInternalCVar
 
 ===============================================================================
 */
 
-class ARCInternalCVarSys : public anCVarSystem {
+class anInternalCVar : public anCVarSystem {
 	friend class anCVarSysLocal;
 public:
-							ARCInternalCVarSys();
-							ARCInternalCVarSys( const char *newName, const char *newValue, int newFlags );
-							ARCInternalCVarSys( const anCVarSystem *cvar );
-	virtual					~ARCInternalCVarSys();
+							anInternalCVar();
+							anInternalCVar( const char *newName, const char *newValue, int newFlags );
+							anInternalCVar( const anCVarSystem *cvar );
+	virtual					~anInternalCVar();
 
 	const char **			CopyValueStrings( const char **strings );
 	void					Update( const anCVarSystem *cvar );
@@ -28,10 +28,10 @@ public:
 	void					Reset();
 
 private:
-	anString				nameString;				// name
-	anString				resetString;			// resetting will change to this value
-	anString				valueString;			// value
-	anString				descriptionString;		// description
+	anStr				nameString;				// name
+	anStr				resetString;			// resetting will change to this value
+	anStr				valueString;			// value
+	anStr				descriptionString;		// description
 
 	virtual const char *	InternalGetResetString() const;
 
@@ -45,18 +45,18 @@ private:
 
 /*
 ============
-ARCInternalCVarSys::ARCInternalCVarSys
+anInternalCVar::anInternalCVar
 ============
 */
-ARCInternalCVarSys::ARCInternalCVarSys() {
+anInternalCVar::anInternalCVar() {
 }
 
 /*
 ============
-ARCInternalCVarSys::ARCInternalCVarSys
+anInternalCVar::anInternalCVar
 ============
 */
-ARCInternalCVarSys::ARCInternalCVarSys( const char *newName, const char *newValue, int newFlags ) {
+anInternalCVar::anInternalCVar( const char *newName, const char *newValue, int newFlags ) {
 	nameString = newName;
 	name = nameString.c_str();
 	valueString = newValue;
@@ -76,10 +76,10 @@ ARCInternalCVarSys::ARCInternalCVarSys( const char *newName, const char *newValu
 
 /*
 ============
-ARCInternalCVarSys::ARCInternalCVarSys
+anInternalCVar::anInternalCVar
 ============
 */
-ARCInternalCVarSys::ARCInternalCVarSys( const anCVarSystem *cvar ) {
+anInternalCVar::anInternalCVar( const anCVarSystem *cvar ) {
 	nameString = cvar->GetName();
 	name = nameString.c_str();
 	valueString = cvar->GetString();
@@ -100,20 +100,20 @@ ARCInternalCVarSys::ARCInternalCVarSys( const anCVarSystem *cvar ) {
 
 /*
 ============
-ARCInternalCVarSys::~ARCInternalCVarSys
+anInternalCVar::~anInternalCVar
 ============
 */
-ARCInternalCVarSys::~ARCInternalCVarSys() {
+anInternalCVar::~anInternalCVar() {
 	Mem_Free( valueStrings );
 	valueStrings = nullptr;
 }
 
 /*
 ============
-ARCInternalCVarSys::CopyValueStrings
+anInternalCVar::CopyValueStrings
 ============
 */
-const char **ARCInternalCVarSys::CopyValueStrings( const char **strings ) {
+const char **anInternalCVar::CopyValueStrings( const char **strings ) {
 	int i, totalLength;
 	const char **ptr;
 	char *str;
@@ -124,16 +124,16 @@ const char **ARCInternalCVarSys::CopyValueStrings( const char **strings ) {
 
 	totalLength = 0;
 	for ( i = 0; strings[i] != nullptr; i++ ) {
-		totalLength += anString::Length( strings[i] ) + 1;
+		totalLength += anStr::Length( strings[i] ) + 1;
 	}
 
-	ptr = (const char **) Mem_Alloc( ( i + 1 ) * sizeof( char * ) + totalLength, TAG_CVAR );
-	str = (char *)( ( (byte *) ptr ) + ( i + 1 ) * sizeof( char * ) );
+	ptr = (const char **) Mem_Alloc( ( i + 1 ) * sizeof(char *) + totalLength, TAG_CVAR );
+	str = (char *)( ( (byte *) ptr ) + ( i + 1 ) * sizeof(char *) );
 
 	for ( i = 0; strings[i] != nullptr; i++ ) {
 		ptr[i] = str;
 		strcpy( str, strings[i] );
-		str += anString::Length( strings[i] ) + 1;
+		str += anStr::Length( strings[i] ) + 1;
 	}
 	ptr[i] = nullptr;
 
@@ -142,10 +142,10 @@ const char **ARCInternalCVarSys::CopyValueStrings( const char **strings ) {
 
 /*
 ============
-ARCInternalCVarSys::Update
+anInternalCVar::Update
 ============
 */
-void ARCInternalCVarSys::Update( const anCVarSystem *cvar ) {
+void anInternalCVar::Update( const anCVarSystem *cvar ) {
 	// if this is a statically declared variable
 	if ( cvar->GetFlags() & CVAR_STATIC ) {
 		if ( flags & CVAR_STATIC ) {
@@ -188,17 +188,17 @@ void ARCInternalCVarSys::Update( const anCVarSystem *cvar ) {
 
 /*
 ============
-ARCInternalCVarSys::UpdateValue
+anInternalCVar::UpdateValue
 ============
 */
-void ARCInternalCVarSys::UpdateValue() {
+void anInternalCVar::UpdateValue() {
 	bool clamped = false;
 
 	if ( flags & CVAR_BOOL ) {
 		integerValue = ( atoi( value ) != 0 );
 		floatValue = integerValue;
-		if ( anString::Icmp( value, "0" ) != 0 && anString::Icmp( value, "1" ) != 0 ) {
-			valueString = anString( (bool)( integerValue != 0 ) );
+		if ( anStr::Icmp( value, "0" ) != 0 && anStr::Icmp( value, "1" ) != 0 ) {
+			valueString = anStr( (bool)( integerValue != 0 ) );
 			value = valueString.c_str();
 		}
 	} else if ( flags & CVAR_INTEGER ) {
@@ -212,8 +212,8 @@ void ARCInternalCVarSys::UpdateValue() {
 				clamped = true;
 			}
 		}
-		if ( clamped || !anString::IsNumeric( value ) || anString::FindChar( value, '.' ) ) {
-			valueString = anString( integerValue );
+		if ( clamped || !anStr::IsNumeric( value ) || anStr::FindChar( value, '.' ) ) {
+			valueString = anStr( integerValue );
 			value = valueString.c_str();
 		}
 		floatValue = ( float )integerValue;
@@ -228,14 +228,14 @@ void ARCInternalCVarSys::UpdateValue() {
 				clamped = true;
 			}
 		}
-		if ( clamped || !anString::IsNumeric( value ) ) {
-			valueString = anString( floatValue );
+		if ( clamped || !anStr::IsNumeric( value ) ) {
+			valueString = anStr( floatValue );
 			value = valueString.c_str();
 		}
 		integerValue = ( int )floatValue;
     } else if ( flags & CVAR_BYTE ) {
         byteValue = ( byte )byteValue;
-        valueString = anString( byteValue );
+        valueString = anStr( byteValue );
         value = valueString.c_str();
         integerValue = ( int )byteValue;
         floatValue = ( float )byteValue;
@@ -263,10 +263,10 @@ void ARCInternalCVarSys::UpdateValue() {
 
 /*
 ============
-ARCInternalCVarSys::UpdateCheat
+anInternalCVar::UpdateCheat
 ============
 */
-void ARCInternalCVarSys::UpdateCheat() {
+void anInternalCVar::UpdateCheat() {
 	// all variables are considered cheats except for a few types
 	if ( flags & ( CVAR_NOCHEAT | CVAR_INIT | CVAR_ROM | CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_NETWORKSYNC ) ) {
 		flags &= ~CVAR_CHEAT;
@@ -277,10 +277,10 @@ void ARCInternalCVarSys::UpdateCheat() {
 
 /*
 ============
-ARCInternalCVarSys::Set
+anInternalCVar::Set
 ============
 */
-void ARCInternalCVarSys::Set( const char *newValue, bool force, bool fromServer ) {
+void anInternalCVar::Set( const char *newValue, bool force, bool fromServer ) {
 	if ( !newValue ) {
 		newValue = resetString.c_str();
 	}
@@ -311,10 +311,10 @@ void ARCInternalCVarSys::Set( const char *newValue, bool force, bool fromServer 
 
 /*
 ============
-ARCInternalCVarSys::Reset
+anInternalCVar::Reset
 ============
 */
-void ARCInternalCVarSys::Reset() {
+void anInternalCVar::Reset() {
 	valueString = resetString;
 	value = valueString.c_str();
 	UpdateValue();
@@ -322,65 +322,65 @@ void ARCInternalCVarSys::Reset() {
 
 /*
 ============
-ARCInternalCVarSys::InternalGetResetString
+anInternalCVar::InternalGetResetString
 ============
 */
-const char *ARCInternalCVarSys::InternalGetResetString() const {
+const char *anInternalCVar::InternalGetResetString() const {
 	return resetString;
 }
 
 /*
 ============
-ARCInternalCVarSys::InternalSetString
+anInternalCVar::InternalSetString
 ============
 */
-void ARCInternalCVarSys::InternalSetString( const char *newValue ) {
+void anInternalCVar::InternalSetString( const char *newValue ) {
 	Set( newValue, true, false );
 }
 
 /*
 ===============
-ARCInternalCVarSys::InternalServerSetString
+anInternalCVar::InternalServerSetString
 ===============
 */
-void ARCInternalCVarSys::InternalServerSetString( const char *newValue ) {
+void anInternalCVar::InternalServerSetString( const char *newValue ) {
 	Set( newValue, true, true );
 }
 
 /*
 ============
-ARCInternalCVarSys::InternalSetBool
+anInternalCVar::InternalSetBool
 ============
 */
-void ARCInternalCVarSys::InternalSetBool( const bool newValue ) {
-	Set( anString( newValue ), true, false );
+void anInternalCVar::InternalSetBool( const bool newValue ) {
+	Set( anStr( newValue ), true, false );
 }
 
 /*
 ============
-ARCInternalCVarSys::InternalSetInteger
+anInternalCVar::InternalSetInteger
 ============
 */
-void ARCInternalCVarSys::InternalSetInteger( const int newValue ) {
-	Set( anString( newValue ), true, false );
+void anInternalCVar::InternalSetInteger( const int newValue ) {
+	Set( anStr( newValue ), true, false );
 }
 
 /*
 ============
-ARCInternalCVarSys::InternalSetFloat
+anInternalCVar::InternalSetFloat
 ============
 */
-void ARCInternalCVarSys::InternalSetFloat( const float newValue ) {
-	Set( anString( newValue ), true, false );
+void anInternalCVar::InternalSetFloat( const float newValue ) {
+	Set( anStr( newValue ), true, false );
 }
 
 /*
 ============
-ARCInternalCVarSys::InternalSetFloat
+anInternalCVar::InternalSetFloat
 ============
 */
-void ARCInternalCVarSys::InternalSetByte( const byte *newValue ) {
-	Set( anString( newValue ), true, false );
+void anInternalCVar::InternalSetByte( const byte *newValue ) {
+	Set( anStr( newValue ), true, false );
 }
 
 /*
@@ -432,12 +432,12 @@ public:
 	virtual void			SetCVarsFromDict( const anDict &dict );
 
 	void					RegisterInternal( anCVarSystem *cvar );
-	ARCInternalCVarSys		*FindInternal( const char *name ) const;
+	anInternalCVar		*FindInternal( const char *name ) const;
 	void					SetInternal( const char *name, const char *value, int flags );
 
 private:
 	bool					initialized;
-	anList<ARCInternalCVarSys*, TAG_CVAR>	cvars;
+	anList<anInternalCVar*, TAG_CVAR>	cvars;
 	anHashIndex				cvarHash;
 	int						modifiedFlags;
 
@@ -459,7 +459,7 @@ anCVarSystem *				cvarSystem = &localCVarSystem;
 #define NUM_DESCRIPTION_CHARS	( NUM_COLUMNS - NUM_NAME_CHARS )
 #define FORMAT_STRING			"%-32s "
 
-const char *CreateColumn( const char *text, int columnWidth, const char *indent, anString &string ) {
+const char *CreateColumn( const char *text, int columnWidth, const char *indent, anStr &string ) {
 	int i, lastLine;
 
 	string.Clear();
@@ -486,7 +486,7 @@ const char *CreateColumn( const char *text, int columnWidth, const char *indent,
 anCVarSysLocal::FindInternal
 ============
 */
-ARCInternalCVarSys *anCVarSysLocal::FindInternal( const char *name ) const {
+anInternalCVar *anCVarSysLocal::FindInternal( const char *name ) const {
 	int hash = cvarHash.GenerateKey( name, false );
 	for ( int i = cvarHash.First( hash ); i != -1; i = cvarHash.Next( i ) ) {
 		if ( cvars[i]->nameString.Icmp( name ) == 0 ) {
@@ -502,14 +502,14 @@ anCVarSysLocal::SetInternal
 ============
 */
 void anCVarSysLocal::SetInternal( const char *name, const char *value, int flags ) {
-	ARCInternalCVarSys *internal = FindInternal( name );
+	anInternalCVar *internal = FindInternal( name );
 
 	if ( internal ) {
 		internal->InternalSetString( value );
 		internal->flags |= flags & ~CVAR_STATIC;
 		internal->UpdateCheat();
 	} else {
-		internal = new (TAG_SYSTEM) ARCInternalCVarSys( name, value, flags );
+		internal = new (TAG_SYSTEM) anInternalCVar( name, value, flags );
 		int hash = cvarHash.GenerateKey( internal->nameString.c_str(), false );
 		cvarHash.Add( hash, cvars.Append( internal ) );
 	}
@@ -575,12 +575,12 @@ anCVarSysLocal::Register
 void anCVarSysLocal::Register( anCVarSystem *cvar ) {
 	cvar->SetInternalVar( cvar );
 
-	ARCInternalCVarSys *internal = FindInternal( cvar->GetName() );
+	anInternalCVar *internal = FindInternal( cvar->GetName() );
 
 	if ( internal ) {
 		internal->Update( cvar );
 	} else {
-		internal = new (TAG_SYSTEM) ARCInternalCVarSys( cvar );
+		internal = new (TAG_SYSTEM) anInternalCVar( cvar );
 		int hash = cvarHash.GenerateKey( internal->nameString.c_str(), false );
 		cvarHash.Add( hash, cvars.Append( internal ) );
 	}
@@ -612,7 +612,7 @@ anCVarSysLocal::SetCVarBool
 ============
 */
 void anCVarSysLocal::SetCVarBool( const char *name, const bool value, int flags ) {
-	SetInternal( name, anString( value ), flags );
+	SetInternal( name, anStr( value ), flags );
 }
 
 /*
@@ -621,7 +621,7 @@ anCVarSysLocal::SetCVarInteger
 ============
 */
 void anCVarSysLocal::SetCVarInteger( const char *name, const int value, int flags ) {
-	SetInternal( name, anString( value ), flags );
+	SetInternal( name, anStr( value ), flags );
 }
 
 /*
@@ -630,7 +630,7 @@ anCVarSysLocal::SetCVarFloat
 ============
 */
 void anCVarSysLocal::SetCVarFloat( const char *name, const float value, int flags ) {
-	SetInternal( name, anString( value ), flags );
+	SetInternal( name, anStr( value ), flags );
 }
 
 /*
@@ -639,7 +639,7 @@ anCVarSysLocal::GetCVarString
 ============
 */
 const char *anCVarSysLocal::GetCVarString( const char *name ) const {
-	ARCInternalCVarSys *internal = FindInternal( name );
+	anInternalCVar *internal = FindInternal( name );
 	if ( internal ) {
 		return internal->GetString();
 	}
@@ -652,7 +652,7 @@ anCVarSysLocal::GetCVarBool
 ============
 */
 bool anCVarSysLocal::GetCVarBool( const char *name ) const {
-	ARCInternalCVarSys *internal = FindInternal( name );
+	anInternalCVar *internal = FindInternal( name );
 	if ( internal ) {
 		return internal->GetBool();
 	}
@@ -665,7 +665,7 @@ anCVarSysLocal::GetCVarInteger
 ============
 */
 int anCVarSysLocal::GetCVarInteger( const char *name ) const {
-	ARCInternalCVarSys *internal = FindInternal( name );
+	anInternalCVar *internal = FindInternal( name );
 	if ( internal ) {
 		return internal->GetInteger();
 	}
@@ -678,7 +678,7 @@ anCVarSysLocal::GetCVarFloat
 ============
 */
 float anCVarSysLocal::GetCVarFloat( const char *name ) const {
-	ARCInternalCVarSys *internal = FindInternal( name );
+	anInternalCVar *internal = FindInternal( name );
 	if ( internal ) {
 		return internal->GetFloat();
 	}
@@ -691,7 +691,7 @@ anCVarSysLocal::Command
 ============
 */
 bool anCVarSysLocal::Command( const anCommandArgs &args ) {
-	ARCInternalCVarSys *internal = FindInternal( args.Argv( 0 ) );
+	anInternalCVar *internal = FindInternal( args.Argv( 0 ) );
 
 	if ( internal == nullptr ) {
 		return false;
@@ -700,7 +700,7 @@ bool anCVarSysLocal::Command( const anCommandArgs &args ) {
 	if ( args.Argc() == 1 ) {
 		// print the variable
 		common->Printf( "\"%s\" is:\"%s\"" S_COLOR_WHITE " default:\"%s\"\n", internal->nameString.c_str(), internal->valueString.c_str(), internal->resetString.c_str() );
-		if ( anString::Length( internal->GetDescription() ) > 0 ) {
+		if ( anStr::Length( internal->GetDescription() ) > 0 ) {
 			common->Printf( S_COLOR_WHITE "%s\n", internal->GetDescription() );
 		}
 	} else {
@@ -733,7 +733,7 @@ void anCVarSysLocal::ArgCompletion( const char *cmdString, void(*callback)( cons
 		if ( !cvars[i]->valueCompletion ) {
 			continue;
 		}
-		if ( anString::Icmp( args.Argv( 0 ), cvars[i]->nameString.c_str() ) == 0 ) {
+		if ( anStr::Icmp( args.Argv( 0 ), cvars[i]->nameString.c_str() ) == 0 ) {
 			cvars[i]->valueCompletion( args, callback );
 			break;
 		}
@@ -774,7 +774,7 @@ anCVarSysLocal::ResetFlaggedVariables
 */
 void anCVarSysLocal::ResetFlaggedVariables( int flags ) {
 	for ( int i = 0; i < cvars.Num(); i++ ) {
-		ARCInternalCVarSys *cvar = cvars[i];
+		anInternalCVar *cvar = cvars[i];
 		if ( cvar->GetFlags() & flags ) {
 			cvar->Set( nullptr, true, true );
 		}
@@ -788,7 +788,7 @@ anCVarSysLocal::RemoveFlaggedAutoCompletion
 */
 void anCVarSysLocal::RemoveFlaggedAutoCompletion( int flags ) {
 	for ( int i = 0; i < cvars.Num(); i++ ) {
-		ARCInternalCVarSys *cvar = cvars[i];
+		anInternalCVar *cvar = cvars[i];
 		if ( cvar->GetFlags() & flags ) {
 			cvar->valueCompletion = nullptr;
 		}
@@ -805,7 +805,7 @@ with the "flags" flag set to true.
 */
 void anCVarSysLocal::WriteFlaggedVariables( int flags, const char *setCmd, anFile *f ) const {
 	for ( int i = 0; i < cvars.Num(); i++ ) {
-		ARCInternalCVarSys *cvar = cvars[i];
+		anInternalCVar *cvar = cvars[i];
 		if ( cvar->GetFlags() & flags ) {
 			f->Printf( "%s %s \"%s\"\n", setCmd, cvar->GetName(), cvar->GetString() );
 		}
@@ -822,7 +822,7 @@ void anCVarSysLocal::MoveCVarsToDict( int flags, anDict & dict, bool onlyModifie
 	for ( int i = 0; i < cvars.Num(); i++ ) {
 		anCVarSystem *cvar = cvars[i];
 		if ( cvar->GetFlags() & flags ) {
-			if ( onlyModified && anString::Icmp( cvar->GetString(), cvar->GetDefaultString() ) == 0 ) {
+			if ( onlyModified && anStr::Icmp( cvar->GetString(), cvar->GetDefaultString() ) == 0 ) {
 				continue;
 			}
 			dict.Set( cvar->GetName(), cvar->GetString() );
@@ -838,7 +838,7 @@ anCVarSysLocal::SetCVarsFromDict
 void anCVarSysLocal::SetCVarsFromDict( const anDict &dict ) {
 	for ( int i = 0; i < dict.GetNumKeyVals(); i++ ) {
 		const anKeyValue *kv = dict.GetKeyVal( i );
-		ARCInternalCVarSys *internal = FindInternal( kv->GetKey() );
+		anInternalCVar *internal = FindInternal( kv->GetKey() );
 		if ( internal ) {
 			internal->InternalServerSetString( kv->GetValue() );
 		}
@@ -863,7 +863,7 @@ void anCVarSysLocal::Toggle_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	ARCInternalCVarSys *cvar = localCVarSystem.FindInternal( args.Argv( 1 ) );
+	anInternalCVar *cvar = localCVarSystem.FindInternal( args.Argv( 1 ) );
 
 	if ( cvar == nullptr ) {
 		common->Warning( "Toggle_f: cvar \"%s\" not found", args.Argv( 1 ) );
@@ -874,7 +874,7 @@ void anCVarSysLocal::Toggle_f( const anCommandArgs &args ) {
 		// cycle through multiple values
 		text = cvar->GetString();
 		for ( int i = 2; i < argc; i++ ) {
-			if ( !anString::Icmp( text, args.Argv( i ) ) ) {
+			if ( !anStr::Icmp( text, args.Argv( i ) ) ) {
 				// point to next value
 				i++;
 				break;
@@ -900,7 +900,7 @@ void anCVarSysLocal::Toggle_f( const anCommandArgs &args ) {
 			current = 0.0f;
 		}
 		common->Printf( "set %s = %f\n", args.Argv(1 ), current );
-		cvar->Set( anString( current ), false, false );
+		cvar->Set( anStr( current ), false, false );
 	}
 }
 
@@ -924,7 +924,7 @@ void anCVarSysLocal::Reset_f( const anCommandArgs &args ) {
 		common->Printf ( "usage: reset <variable>\n" );
 		return;
 	}
-	ARCInternalCVarSys *cvar = localCVarSystem.FindInternal( args.Argv( 1 ) );
+	anInternalCVar *cvar = localCVarSystem.FindInternal( args.Argv( 1 ) );
 	if ( !cvar ) {
 		return;
 	}
@@ -942,7 +942,7 @@ void anCVarSysLocal::CvarAdd_f( const anCommandArgs &args ) {
 		common->Printf ( "usage: cvarAdd <variable> <value>\n" );
 	}
 
-	ARCInternalCVarSys *cvar = localCVarSystem.FindInternal( args.Argv( 1 ) );
+	anInternalCVar *cvar = localCVarSystem.FindInternal( args.Argv( 1 ) );
 	if ( !cvar ) {
 		return;
 	}
@@ -957,14 +957,14 @@ void anCVarSysLocal::CvarAdd_f( const anCommandArgs &args ) {
 //anSortCommandDef
 //================================================
 //*/
-//class anSortInternalCVar : public anSortQuick< const ARCInternalCVarSys *, anSortInternalCVar > {
+//class anSortInternalCVar : public anSortQuick< const anInternalCVar *, anSortInternalCVar > {
 //public:
-//	int Compare( const ARCInternalCVarSys * & a, const ARCInternalCVarSys * & b ) const { return anString::Icmp( a.GetName(), b.GetName() ); }
+//	int Compare( const anInternalCVar * & a, const anInternalCVar * & b ) const { return anStr::Icmp( a.GetName(), b.GetName() ); }
 //};
 
 void anCVarSysLocal::ListByFlags( const anCommandArgs &args, cvarFlags_t flags ) {
-	anString indent;
-	anList<const ARCInternalCVarSys *, TAG_CVAR>cvarList;
+	anStr indent;
+	anList<const anInternalCVar *, TAG_CVAR>cvarList;
 
 	enum {
 		SHOW_VALUE,
@@ -976,28 +976,28 @@ void anCVarSysLocal::ListByFlags( const anCommandArgs &args, cvarFlags_t flags )
 	int argNum = 1;
 	show = SHOW_VALUE;
 
-	if ( anString::Icmp( args.Argv( argNum ), "-" ) == 0 || anString::Icmp( args.Argv( argNum ), "/" ) == 0 ) {
-		if ( anString::Icmp( args.Argv( argNum + 1 ), "help" ) == 0 || anString::Icmp( args.Argv( argNum + 1 ), "?" ) == 0 ) {
+	if ( anStr::Icmp( args.Argv( argNum ), "-" ) == 0 || anStr::Icmp( args.Argv( argNum ), "/" ) == 0 ) {
+		if ( anStr::Icmp( args.Argv( argNum + 1 ), "help" ) == 0 || anStr::Icmp( args.Argv( argNum + 1 ), "?" ) == 0 ) {
 			argNum = 3;
 			show = SHOW_DESCRIPTION;
-		} else if ( anString::Icmp( args.Argv( argNum + 1 ), "type" ) == 0 || anString::Icmp( args.Argv( argNum + 1 ), "range" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( argNum + 1 ), "type" ) == 0 || anStr::Icmp( args.Argv( argNum + 1 ), "range" ) == 0 ) {
 			argNum = 3;
 			show = SHOW_TYPE;
-		} else if ( anString::Icmp( args.Argv( argNum + 1 ), "flags" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( argNum + 1 ), "flags" ) == 0 ) {
 			argNum = 3;
 			show = SHOW_FLAGS;
 		}
 	}
 
 	if ( args.Argc() > argNum ) {
-		anString match = args.Args( argNum, -1 );
+		anStr match = args.Args( argNum, -1 );
 		match.Replace( " ", "" );
 	} else {
-		anString match = "";
+		anStr match = "";
 	}
 
 	for ( int i = 0; i < localCVarSystem.cvars.Num(); i++ ) {
-		const ARCInternalCVarSys *cvar = localCVarSystem.cvars[i];
+		const anInternalCVar *cvar = localCVarSystem.cvars[i];
 		if ( !( cvar->GetFlags() & flags ) ) {
 			continue;
 		}
@@ -1014,23 +1014,23 @@ void anCVarSysLocal::ListByFlags( const anCommandArgs &args, cvarFlags_t flags )
 	switch ( show ) {
 		case SHOW_VALUE: {
 			for ( i = 0; i < cvarList.Num(); i++ ) {
-				const ARCInternalCVarSys *cvar = cvarList[i];
+				const anInternalCVar *cvar = cvarList[i];
 				common->Printf( FORMAT_STRING S_COLOR_WHITE "\"%s\"\n", cvar->nameString.c_str(), cvar->valueString.c_str() );
 			}
 			break;
 		}
 		case SHOW_DESCRIPTION: {
-			anString indent.Fill( ' ', NUM_NAME_CHARS );
-			anString indent.Insert( "\n", 0 );
+			anStr indent.Fill( ' ', NUM_NAME_CHARS );
+			anStr indent.Insert( "\n", 0 );
 			for ( i = 0; i < cvarList.Num(); i++ ) {
-				const ARCInternalCVarSys *cvar = cvarList[i];
+				const anInternalCVar *cvar = cvarList[i];
 				common->Printf( FORMAT_STRING S_COLOR_WHITE "%s\n", cvar->nameString.c_str(), CreateColumn( cvar->GetDescription(), NUM_DESCRIPTION_CHARS, indent, string ) );
 			}
 			break;
 		}
 		case SHOW_TYPE: {
 			for ( i = 0; i < cvarList.Num(); i++ ) {
-			const ARCInternalCVarSys *cvar = cvarList[i];
+			const anInternalCVar *cvar = cvarList[i];
 				if ( cvar->GetFlags() & CVAR_BOOL ) {
 					common->Printf( FORMAT_STRING S_COLOR_CYAN "bool\n", cvar->GetName() );
 				} else if ( cvar->GetFlags() & CVAR_INTEGER ) {
@@ -1041,7 +1041,7 @@ void anCVarSysLocal::ListByFlags( const anCommandArgs &args, cvarFlags_t flags )
 					}
 				} else if ( cvar->GetFlags() & CVAR_FLOAT ) {
 					if ( cvar->GetMinValue() < cvar->GetMaxValue() ) {
-						common->Printf( FORMAT_STRING S_COLOR_RED "float " S_COLOR_WHITE "[%s, %s]\n", cvar->GetName(), anString( cvar->GetMinValue() ).c_str(), anString( cvar->GetMaxValue() ).c_str() );
+						common->Printf( FORMAT_STRING S_COLOR_RED "float " S_COLOR_WHITE "[%s, %s]\n", cvar->GetName(), anStr( cvar->GetMinValue() ).c_str(), anStr( cvar->GetMaxValue() ).c_str() );
 					} else {
 						common->Printf( FORMAT_STRING S_COLOR_RED "float\n", cvar->GetName() );
 					}
@@ -1063,9 +1063,9 @@ void anCVarSysLocal::ListByFlags( const anCommandArgs &args, cvarFlags_t flags )
 		}
 		case SHOW_FLAGS: {
 			for ( int i = 0; i < cvarList.Num(); i++ ) {
-				const ARCInternalCVarSys *cvar = cvarList[i];
+				const anInternalCVar *cvar = cvarList[i];
 				common->Printf( FORMAT_STRING, cvar->GetName() );
-				anString string = "";
+				anStr string = "";
 				if ( cvar->GetFlags() & CVAR_BOOL ) {
 					string += S_COLOR_CYAN "B ";
 				} else if ( cvar->GetFlags() & CVAR_INTEGER ) {
@@ -1127,7 +1127,7 @@ anCVarSysLocal::Restart_f
 */
 void anCVarSysLocal::Restart_f( const anCommandArgs &args ) {
 	for ( int i = 0; i < localCVarSystem.cvars.Num(); i++ ) {
-	ARCInternalCVarSys *cvar = localCVarSystem.cvars[i];
+	anInternalCVar *cvar = localCVarSystem.cvars[i];
 		// don't mess with rom values
 		if ( cvar->flags & ( CVAR_ROM | CVAR_INIT ) ) {
 			continue;

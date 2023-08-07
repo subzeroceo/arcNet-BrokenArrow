@@ -4,7 +4,7 @@ class anVec4;
 class anDrawVertex;
 class anPlane;
 class anVec3;
-class anString;
+class anStr;
 
 #include <gl/gl.h>
 #include "../GLIncludes/qgl.h"
@@ -430,9 +430,9 @@ void R_RenderLightFrustum( const struct renderLight_s &renderLight, anPlane ligh
 //void LightProjectionMatrix( const anVec3 &origin, const anPlane &rearPlane, anVec4 mat[4] );
 
 // used by the view shot taker
-void R_ScreenshotFilename( int &lastNumber, const char *base, anString &fileName );
+void R_ScreenshotFilename( int &lastNumber, const char *base, anStr &fileName );
 
-ARC_INLINE void	GL_Scissor( const anScreenRect & rect ) { GL_Scissor( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
-ARC_INLINE void	GL_Viewport( const anScreenRect & rect ) { GL_Viewport( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
-ARC_INLINE void	GL_ViewportAndScissor( int x, int y, int w, int h ) { GL_Viewport( x, y, w, h ); GL_Scissor( x, y, w, h ); }
-ARC_INLINE void	GL_ViewportAndScissor( const anScreenRect& rect ) { GL_Viewport( rect ); GL_Scissor( rect ); }
+inline void	GL_Scissor( const anScreenRect & rect ) { GL_Scissor( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
+inline void	GL_Viewport( const anScreenRect & rect ) { GL_Viewport( rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1 ); }
+inline void	GL_ViewportAndScissor( int x, int y, int w, int h ) { GL_Viewport( x, y, w, h ); GL_Scissor( x, y, w, h ); }
+inline void	GL_ViewportAndScissor( const anScreenRect& rect ) { GL_Viewport( rect ); GL_Scissor( rect ); }

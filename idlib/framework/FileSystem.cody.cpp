@@ -1,7 +1,7 @@
 ```cpp
 #include "FileSystem.h"
 
-bool anFileSystem::RemoveExplicitDir(const char* OSPath, bool nonEmpty, bool recursive) {
+bool anFileSystem::RemoveExplicitDir(const char *OSPath, bool nonEmpty, bool recursive) {
 
   // Check if OSPath is empty
   if ( !OSPath[0]) {
@@ -9,7 +9,7 @@ bool anFileSystem::RemoveExplicitDir(const char* OSPath, bool nonEmpty, bool rec
   }
 
   // Build full path 
-  anString fullPath = BuildOSPath(fs_savepath.GetString(), engineFolder, OSPath);
+  anStr fullPath = BuildOSPath(fs_savepath.GetString(), engineFolder, OSPath);
 
   // Check if recursive delete
   if ( !recursive) {

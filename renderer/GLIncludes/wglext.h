@@ -329,10 +329,10 @@ typedef BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int *piAt
 #define WGL_ARB_make_current_read 1
 #ifdef WGL_WGLEXT_PROTOTYPES
 extern BOOL WINAPI wglMakeContextCurrentARB (HDC, HDC, HGLRC);
-extern HDC WINAPI wglGetCurrentReadDCARB ( void );
+extern HDC WINAPI wglGetCurrentReadDCARB( void );
 #endif
 typedef BOOL (WINAPI * PFNWGLMAKECONTEXTCURRENTARBPROC) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
-typedef HDC (WINAPI * PFNWGLGETCURRENTREADDCARBPROC) ( void );
+typedef HDC (WINAPI * PFNWGLGETCURRENTREADDCARBPROC)( void );
 #endif
 
 #ifndef WGL_ARB_pbuffer
@@ -380,19 +380,19 @@ typedef VOID (WINAPI * PFNWGLDESTROYDISPLAYCOLORTABLEEXTPROC) ( GLushort id);
 #ifndef WGL_EXT_extensions_string
 #define WGL_EXT_extensions_string 1
 #ifdef WGL_WGLEXT_PROTOTYPES
-extern const char *WINAPI wglGetExtensionsStringEXT ( void );
+extern const char *WINAPI wglGetExtensionsStringEXT( void );
 #endif
-typedef const char *(WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC) ( void );
+typedef const char *(WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC)( void );
 #endif
 
 #ifndef WGL_EXT_make_current_read
 #define WGL_EXT_make_current_read 1
 #ifdef WGL_WGLEXT_PROTOTYPES
 extern BOOL WINAPI wglMakeContextCurrentEXT (HDC, HDC, HGLRC);
-extern HDC WINAPI wglGetCurrentReadDCEXT ( void );
+extern HDC WINAPI wglGetCurrentReadDCEXT( void );
 #endif
 typedef BOOL (WINAPI * PFNWGLMAKECONTEXTCURRENTEXTPROC) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
-typedef HDC (WINAPI * PFNWGLGETCURRENTREADDCEXTPROC) ( void );
+typedef HDC (WINAPI * PFNWGLGETCURRENTREADDCEXTPROC)( void );
 #endif
 
 #ifndef WGL_EXT_pbuffer
@@ -427,10 +427,10 @@ typedef BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATEXTPROC) (HDC hdc, const int *piAt
 #define WGL_EXT_swap_control 1
 #ifdef WGL_WGLEXT_PROTOTYPES
 extern BOOL WINAPI wglSwapIntervalEXT ( int );
-extern int WINAPI wglGetSwapIntervalEXT ( void );
+extern int WINAPI wglGetSwapIntervalEXT( void );
 #endif
 typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC) ( int interval);
-typedef int (WINAPI * PFNWGLGETSWAPINTERVALEXTPROC) ( void );
+typedef int (WINAPI * PFNWGLGETSWAPINTERVALEXTPROC)( void );
 #endif
 
 #ifndef WGL_EXT_depth_float
@@ -549,8 +549,8 @@ extern BOOL WINAPI wglDisableFrameLockI3D( void );
 extern BOOL WINAPI wglIsEnabledFrameLockI3D(BOOL *);
 extern BOOL WINAPI wglQueryFrameLockMasterI3D(BOOL *);
 #endif
-typedef BOOL (WINAPI * PFNWGLENABLEFRAMELOCKI3DPROC) ( void );
-typedef BOOL (WINAPI * PFNWGLDISABLEFRAMELOCKI3DPROC) ( void );
+typedef BOOL (WINAPI * PFNWGLENABLEFRAMELOCKI3DPROC)( void );
+typedef BOOL (WINAPI * PFNWGLDISABLEFRAMELOCKI3DPROC)( void );
 typedef BOOL (WINAPI * PFNWGLISENABLEDFRAMELOCKI3DPROC) (BOOL *pFlag);
 typedef BOOL (WINAPI * PFNWGLQUERYFRAMELOCKMASTERI3DPROC) (BOOL *pFlag);
 #endif
@@ -564,8 +564,8 @@ extern BOOL WINAPI wglEndFrameTrackingI3D( void );
 extern BOOL WINAPI wglQueryFrameTrackingI3D(DWORD *, DWORD *, float *);
 #endif
 typedef BOOL (WINAPI * PFNWGLGETFRAMEUSAGEI3DPROC) (float *pUsage);
-typedef BOOL (WINAPI * PFNWGLBEGINFRAMETRACKINGI3DPROC) ( void );
-typedef BOOL (WINAPI * PFNWGLENDFRAMETRACKINGI3DPROC) ( void );
+typedef BOOL (WINAPI * PFNWGLBEGINFRAMETRACKINGI3DPROC)( void );
+typedef BOOL (WINAPI * PFNWGLENDFRAMETRACKINGI3DPROC)( void );
 typedef BOOL (WINAPI * PFNWGLQUERYFRAMETRACKINGI3DPROC) (DWORD *pFrameCount, DWORD *pMissedFrames, float *pLastMissedUsage);
 #endif
 

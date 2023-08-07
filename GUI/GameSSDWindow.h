@@ -42,7 +42,7 @@ public:
 	//SSDEntity Information
 	int					type;
 	int					id;
-	anString				materialName;
+	anStr				materialName;
 	const anMaterial*	material;
 	anVec3				position;
 	anVec2				size;
@@ -52,7 +52,7 @@ public:
 
 	anVec4				matColor;
 
-	anString				text;
+	anStr				text;
 	float				textScale;
 	anVec4				foreColor;
 
@@ -78,8 +78,8 @@ public:
 	void				EntityInit();
 
 	void				SetGame(idGameSSDWindow* _game);
-	void				SetMaterial(const char* _name);
-	void				SetPosition(const anVec3& _position);
+	void				SetMaterial(const char *_name);
+	void				SetPosition(const anVec3 &_position);
 	void				SetSize(const anVec2& _size);
 	void				SetRadius(float _radius, float _hitFactor = 1.0f);
 	void				SetRotation(float _rotation);
@@ -96,9 +96,9 @@ public:
 	virtual void		OnStrikePlayer() {};
 
 	anBounds			WorldToScreen(const anBounds worldBounds);
-	anVec3				WorldToScreen(const anVec3& worldPos);
+	anVec3				WorldToScreen(const anVec3 &worldPos);
 
-	anVec3				ScreenToWorld(const anVec3& screenPos);
+	anVec3				ScreenToWorld(const anVec3 &screenPos);
 
 };
 
@@ -121,7 +121,7 @@ public:
 	virtual void	WriteToSaveGame( anFile *savefile );
 	virtual void	ReadFromSaveGame( anFile *savefile,  idGameSSDWindow* _game  );
 
-	void				MoverInit(const anVec3& _speed, float _rotationSpeed);
+	void				MoverInit(const anVec3 &_speed, float _rotationSpeed);
 
 	virtual void		EntityUpdate();
 
@@ -149,10 +149,10 @@ public:
 	virtual void	WriteToSaveGame( anFile *savefile );
 	virtual void	ReadFromSaveGame( anFile *savefile,  idGameSSDWindow* _game  );
 
-	void				Init(idGameSSDWindow* _game, const anVec3& startPosition, const anVec2& _size, float _speed, float rotate, int _health);
+	void				Init(idGameSSDWindow* _game, const anVec3 &startPosition, const anVec2& _size, float _speed, float rotate, int _health);
 
 	virtual void		EntityUpdate();
-	static SSDAsteroid*	GetNewAsteroid(idGameSSDWindow* _game, const anVec3& startPosition, const anVec2& _size, float _speed, float rotate, int _health);
+	static SSDAsteroid*	GetNewAsteroid(idGameSSDWindow* _game, const anVec3 &startPosition, const anVec2& _size, float _speed, float rotate, int _health);
 	static SSDAsteroid*	GetSpecificAsteroid( int id);
 	static void			WriteAsteroids(anFile* savefile);
 	static void			ReadAsteroids(anFile* savefile, idGameSSDWindow* _game);
@@ -184,9 +184,9 @@ public:
 	virtual void	WriteToSaveGame( anFile *savefile );
 	virtual void	ReadFromSaveGame( anFile *savefile,  idGameSSDWindow* _game  );
 
-	void					Init(idGameSSDWindow* _game, const anVec3& startPosition, float _speed, float rotate, int _health);
+	void					Init(idGameSSDWindow* _game, const anVec3 &startPosition, float _speed, float rotate, int _health);
 
-	static SSDAstronaut*	GetNewAstronaut(idGameSSDWindow* _game, const anVec3& startPosition, float _speed, float rotate, int _health);
+	static SSDAstronaut*	GetNewAstronaut(idGameSSDWindow* _game, const anVec3 &startPosition, float _speed, float rotate, int _health);
 	static SSDAstronaut*	GetSpecificAstronaut( int id);
 	static void				WriteAstronauts(anFile* savefile);
 	static void				ReadAstronauts(anFile* savefile, idGameSSDWindow* _game);
@@ -229,10 +229,10 @@ public:
 	virtual void	WriteToSaveGame( anFile *savefile );
 	virtual void	ReadFromSaveGame( anFile *savefile,  idGameSSDWindow* _game  );
 
-	void				Init(idGameSSDWindow* _game, const anVec3& _position, const anVec2& _size, int _length, int _type, SSDEntity* _buddy, bool _killBuddy = true, bool _followBuddy = true);
+	void				Init(idGameSSDWindow* _game, const anVec3 &_position, const anVec2& _size, int _length, int _type, SSDEntity* _buddy, bool _killBuddy = true, bool _followBuddy = true);
 
 	virtual void		EntityUpdate();
-	static SSDExplosion*	GetNewExplosion(idGameSSDWindow* _game, const anVec3& _position, const anVec2& _size, int _length, int _type, SSDEntity* _buddy, bool _killBuddy = true, bool _followBuddy = true);
+	static SSDExplosion*	GetNewExplosion(idGameSSDWindow* _game, const anVec3 &_position, const anVec2& _size, int _length, int _type, SSDEntity* _buddy, bool _killBuddy = true, bool _followBuddy = true);
 	static SSDExplosion*	GetSpecificExplosion( int id);
 	static void				WriteExplosions(anFile* savefile);
 	static void				ReadExplosions(anFile* savefile, idGameSSDWindow* _game);
@@ -294,10 +294,10 @@ public:
 	virtual void	WriteToSaveGame( anFile *savefile );
 	virtual void	ReadFromSaveGame( anFile *savefile,  idGameSSDWindow* _game  );
 
-	void				Init(idGameSSDWindow* _game, const anVec3& _beginPosition, const anVec3& _endPosition, float _speed, float _size);
+	void				Init(idGameSSDWindow* _game, const anVec3 &_beginPosition, const anVec3 &_endPosition, float _speed, float _size);
 	virtual void		EntityUpdate();
 
-	static SSDProjectile* GetNewProjectile(idGameSSDWindow* _game, const anVec3& _beginPosition, const anVec3& _endPosition, float _speed, float _size);
+	static SSDProjectile* GetNewProjectile(idGameSSDWindow* _game, const anVec3 &_beginPosition, const anVec3 &_endPosition, float _speed, float _size);
 	static SSDProjectile* GetSpecificProjectile( int id);
 	static void				WriteProjectiles(anFile* savefile);
 	static void				ReadProjectiles(anFile* savefile, idGameSSDWindow* _game);
@@ -478,7 +478,7 @@ public:
 
 	SSDEntity*			GetSpecificEntity( inttype, int id);
 
-	void				PlaySound(const char* sound);
+	void				PlaySound(const char *sound);
 
 
 
@@ -490,11 +490,11 @@ private:
 	
 	//Initialization
 	virtual bool		ParseInternalVar(const char *name, anParser *src);
-	void				ParseLevelData( intlevel, const anString& levelDataString);
-	void				ParseAsteroidData( intlevel, const anString& asteroidDataString);
-	void				ParseWeaponData( intweapon, const anString& weaponDataString);
-	void				ParseAstronautData( intlevel, const anString& astronautDataString);
-	void				ParsePowerupData( intlevel, const anString& powerupDataString);
+	void				ParseLevelData( intlevel, const anStr& levelDataString);
+	void				ParseAsteroidData( intlevel, const anStr& asteroidDataString);
+	void				ParseWeaponData( intweapon, const anStr& weaponDataString);
+	void				ParseAstronautData( intlevel, const anStr& astronautDataString);
+	void				ParsePowerupData( intlevel, const anStr& powerupDataString);
 
 	void				CommonInit();
 	void				ResetGameStats();

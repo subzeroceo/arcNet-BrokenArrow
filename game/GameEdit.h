@@ -1,6 +1,3 @@
-// Copyright (C) 2007 Id Software, Inc.
-//
-
 #ifndef __GAME_EDIT_H__
 #define __GAME_EDIT_H__
 
@@ -14,7 +11,7 @@
 ===============================================================================
 */
 
-class idCursor3D : public arcEntity {
+class idCursor3D : public anEntity {
 public:
 	CLASS_PROTOTYPE( idCursor3D );
 
@@ -25,7 +22,7 @@ public:
 	void					Present( void );
 	void					Think( void );
 
-	arcForce_Drag			drag;
+	anForce_Drag			drag;
 	anVec3					draggedPosition;
 };
 
@@ -44,22 +41,22 @@ public:
 							~idDragEntity( void );
 
 	void					Clear();
-	void					Update( arcNetBasePlayer *player );
-	void					SetSelected( arcEntity *ent );
-	arcEntity *				GetSelected( void ) const { return selected.GetEntity(); }
+	void					Update( anBasePlayer *player );
+	void					SetSelected( anEntity *ent );
+	anEntity *				GetSelected( void ) const { return selected.GetEntity(); }
 	void					DeleteSelected( void );
 	void					BindSelected( void );
 	void					UnbindSelected( void );
 
 private:
-	arcEntityPtr<arcEntity>	dragEnt;			// entity being dragged
+	anEntityPtr<anEntity>	dragEnt;			// entity being dragged
 	jointHandle_t			joint;				// joint being dragged
 	int						id;					// id of body being dragged
 	anVec3					localEntityPoint;	// dragged point in entity space
 	anVec3					localPlayerPoint;	// dragged point in player space
-	anString					bodyName;			// name of the body being dragged
+	anStr					bodyName;			// name of the body being dragged
 	idCursor3D*				cursor;				// cursor entity
-	arcEntityPtr<arcEntity>	selected;			// last dragged entity
+	anEntityPtr<anEntity>	selected;			// last dragged entity
 
 	void					StopDrag( void );
 };
@@ -74,23 +71,23 @@ private:
 */
 typedef struct selectedTypeInfo_s {
 	idTypeInfo *typeInfo;
-	anString		textKey;
+	anStr		textKey;
 } selectedTypeInfo_t;
 
 class idEditEntities {
 public:
 							idEditEntities( void );
-	bool					SelectEntity( const anVec3 &origin, const anVec3 &dir, const arcEntity *skip );
-	void					AddSelectedEntity( arcEntity *ent );
-	void					RemoveSelectedEntity( arcEntity *ent );
+	bool					SelectEntity( const anVec3 &origin, const anVec3 &dir, const anEntity *skip );
+	void					AddSelectedEntity( anEntity *ent );
+	void					RemoveSelectedEntity( anEntity *ent );
 	void					ClearSelectedEntities( void );
-	anList<arcEntity *>&		GetSelectedEntities( void );
+	anList<anEntity *>&		GetSelectedEntities( void );
 	void					DisplayEntities( void );
-	bool					EntityIsSelectable( arcEntity *ent, anVec4 *color = nullptr, anString *text = nullptr );
+	bool					EntityIsSelectable( anEntity *ent, anVec4 *color = nullptr, anStr *text = nullptr );
 private:
 	int						nextSelectTime;
 	anList<selectedTypeInfo_t> selectableEntityClasses;
-	anList<arcEntity *>		selectedEntities;
+	anList<anEntity *>		selectedEntities;
 };
 
-#endif /* !__GAME_EDIT_H__ */
+#endif // !__GAME_EDIT_H__

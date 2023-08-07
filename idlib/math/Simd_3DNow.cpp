@@ -8,7 +8,7 @@
 
 //===============================================================
 //
-//	3DNow! implementation of arcSIMDProcessor
+//	3DNow! implementation of anSIMDProcessor
 //
 //===============================================================
 

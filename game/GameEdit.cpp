@@ -4,7 +4,7 @@
 #include "Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -32,7 +32,7 @@ static char THIS_FILE[] = __FILE__;
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, idCursor3D )
+CLASS_DECLARATION( anEntity, idCursor3D )
 END_CLASS
 
 /*
@@ -159,14 +159,14 @@ void idDragEntity::StopDrag( void ) {
 idDragEntity::Update
 ==============
 */
-void idDragEntity::Update( arcNetBasePlayer *player ) {
+void idDragEntity::Update( anBasePlayer *player ) {
 	anVec3 viewPoint, origin;
 	anMat3 viewAxis, axis;
 	trace_t trace;
-	arcEntity *newEnt;
+	anEntity *newEnt;
 	anAngles angles;
 	jointHandle_t newJoint;
-	anString newBodyName;
+	anStr newBodyName;
 
 	player->GetViewPos( viewPoint, viewAxis );
 
@@ -190,8 +190,8 @@ void idDragEntity::Update( arcNetBasePlayer *player ) {
 						newEnt = newEnt->GetBindMaster();
 					}
 
-					if ( newEnt->IsType( arcAFEntity_Base::Type ) && static_cast<arcAFEntity_Base *>(newEnt)->IsActiveAF() ) {
-						arcAFEntity_Base *af = static_cast<arcAFEntity_Base *>(newEnt);
+					if ( newEnt->IsType( anAFEntity_Base::Type ) && static_cast<anAFEntity_Base *>(newEnt)->IsActiveAF() ) {
+						anAFEntity_Base *af = static_cast<anAFEntity_Base *>(newEnt);
 
 						// joint being dragged
 						newJoint = CLIPMODEL_ID_TO_JOINT_HANDLE( trace.c.id );
@@ -200,8 +200,8 @@ void idDragEntity::Update( arcNetBasePlayer *player ) {
 						// get the name of the body being dragged
 						newBodyName = af->GetAFPhysics()->GetBody( trace.c.id )->GetName();
 
-					} else if ( newEnt->IsType( sdTransport_AF::Type ) ) {
-						sdTransport_AF *af = static_cast<sdTransport_AF *>(newEnt);
+					} else if ( newEnt->IsType( anTransport_AF::Type ) ) {
+						anTransport_AF *af = static_cast<anTransport_AF *>(newEnt);
 
 						// joint being dragged
 						newJoint = CLIPMODEL_ID_TO_JOINT_HANDLE( trace.c.id );
@@ -212,7 +212,7 @@ void idDragEntity::Update( arcNetBasePlayer *player ) {
 						// always drag the center of the body for stability
 						trace.c.point = af->GetAFPhysics()->GetOrigin( trace.c.id );
 
-					} else if ( newEnt->IsType( sdTransport::Type ) ) {
+					} else if ( newEnt->IsType( anTransport::Type ) ) {
 
 						// joint being dragged
 						newJoint = CLIPMODEL_ID_TO_JOINT_HANDLE( trace.c.id );
@@ -268,7 +268,7 @@ void idDragEntity::Update( arcNetBasePlayer *player ) {
 	}
 
 	// if there is an entity selected for dragging
-	arcEntity *drag = dragEnt.GetEntity();
+	anEntity *drag = dragEnt.GetEntity();
 	if ( drag ) {
 
 		if ( !player->usercmd.buttons.btn.attack ) {
@@ -284,7 +284,7 @@ void idDragEntity::Update( arcNetBasePlayer *player ) {
 			cursor->drag.SetDragPosition( cursor->GetPhysics()->GetOrigin() );
 
 			renderEntity_t *renderEntity = drag->GetRenderEntity();
-			arcAnimator *dragAnimator = drag->GetAnimator();
+			anAnimator *dragAnimator = drag->GetAnimator();
 
 			if ( joint != INVALID_JOINT && renderEntity && dragAnimator ) {
 				dragAnimator->GetJointTransform( joint, gameLocal.time, cursor->draggedPosition, axis );
@@ -316,7 +316,7 @@ void idDragEntity::Update( arcNetBasePlayer *player ) {
 idDragEntity::SetSelected
 ==============
 */
-void idDragEntity::SetSelected( arcEntity *ent ) {
+void idDragEntity::SetSelected( anEntity *ent ) {
 	selected = ent;
 	StopDrag();
 }
@@ -341,13 +341,13 @@ void idDragEntity::BindSelected( void ) {
 	int num, largestNum;
 	anLexer lexer;
 	anToken type, bodyName;
-	anString key, value, bindBodyName;
+	anStr key, value, bindBodyName;
 	const anKeyValue *kv;
-	arcAFEntity_Base *af;
+	anAFEntity_Base *af;
 
-	af = static_cast<arcAFEntity_Base *>(dragEnt.GetEntity());
+	af = static_cast<anAFEntity_Base *>(dragEnt.GetEntity());
 
-	if ( !af || !af->IsType( arcAFEntity_Base::Type ) || !af->IsActiveAF() ) {
+	if ( !af || !af->IsType( anAFEntity_Base::Type ) || !af->IsActiveAF() ) {
 		return;
 	}
 
@@ -395,11 +395,11 @@ idDragEntity::UnbindSelected
 */
 void idDragEntity::UnbindSelected( void ) {
 	const anKeyValue *kv;
-	arcAFEntity_Base *af;
+	anAFEntity_Base *af;
 
-	af = static_cast<arcAFEntity_Base *>( selected.GetEntity());
+	af = static_cast<anAFEntity_Base *>( selected.GetEntity());
 
-	if ( !af || !af->IsType( arcAFEntity_Base::Type ) || !af->IsActiveAF() ) {
+	if ( !af || !af->IsType( anAFEntity_Base::Type ) || !af->IsActiveAF() ) {
 		return;
 	}
 
@@ -443,9 +443,9 @@ idEditEntities::idEditEntities( void ) {
 idEditEntities::SelectEntity
 =============
 */
-bool idEditEntities::SelectEntity( const anVec3 &origin, const anVec3 &dir, const arcEntity *skip ) {
+bool idEditEntities::SelectEntity( const anVec3 &origin, const anVec3 &dir, const anEntity *skip ) {
 	anVec3		end;
-	arcEntity	*ent;
+	anEntity	*ent;
 
 	if ( !g_editEntityMode.GetInteger() || selectableEntityClasses.Num() == 0 ) {
 		return false;
@@ -482,7 +482,7 @@ bool idEditEntities::SelectEntity( const anVec3 &origin, const anVec3 &dir, cons
 idEditEntities::AddSelectedEntity
 =============
 */
-void idEditEntities::AddSelectedEntity(arcEntity *ent) {
+void idEditEntities::AddSelectedEntity(anEntity *ent) {
 	ent->fl.selected = true;
 	selectedEntities.AddUnique(ent);
 }
@@ -492,7 +492,7 @@ void idEditEntities::AddSelectedEntity(arcEntity *ent) {
 idEditEntities::RemoveSelectedEntity
 ==============
 */
-void idEditEntities::RemoveSelectedEntity( arcEntity *ent ) {
+void idEditEntities::RemoveSelectedEntity( anEntity *ent ) {
     if ( selectedEntities.FindElement( ent ) ) {
 		selectedEntities.Remove( ent );
 	}
@@ -518,7 +518,7 @@ void idEditEntities::ClearSelectedEntities() {
 idEditEntities::GetSelectedEntities
 =============
 */
-anList<arcEntity *>& idEditEntities::GetSelectedEntities( void ) {
+anList<anEntity *>& idEditEntities::GetSelectedEntities( void ) {
 	return selectedEntities;
 }
 
@@ -527,7 +527,7 @@ anList<arcEntity *>& idEditEntities::GetSelectedEntities( void ) {
 idEditEntities::EntityIsSelectable
 =============
 */
-bool idEditEntities::EntityIsSelectable( arcEntity *ent, anVec4 *color, anString *text ) {
+bool idEditEntities::EntityIsSelectable( anEntity *ent, anVec4 *color, anStr *text ) {
 	for ( int i = 0; i < selectableEntityClasses.Num(); i++ ) {
 		if ( ent->GetType() == selectableEntityClasses[i].typeInfo ) {
 			if ( text ) {
@@ -561,7 +561,7 @@ idEditEntities::DisplayEntities
 =============
 */
 void idEditEntities::DisplayEntities( void ) {
-	arcEntity *ent;
+	anEntity *ent;
 
 	if ( !gameLocal.GetLocalPlayer() ) {
 		return;
@@ -585,7 +585,7 @@ void idEditEntities::DisplayEntities( void ) {
 			selectableEntityClasses.Append( sit );
 			break;
 		case 3:
-			sit.typeInfo = &arcAFEntity_Base::Type;
+			sit.typeInfo = &anAFEntity_Base::Type;
 			sit.textKey = "articulatedFigure";
 			selectableEntityClasses.Append( sit );
 			break;
@@ -597,12 +597,12 @@ void idEditEntities::DisplayEntities( void ) {
 			*/
 			break;
 		case 6:
-			sit.typeInfo = &arcEntity::Type;
+			sit.typeInfo = &anEntity::Type;
 			sit.textKey = "name";
 			selectableEntityClasses.Append( sit );
 			break;
 		case 7:
-			sit.typeInfo = &arcEntity::Type;
+			sit.typeInfo = &anEntity::Type;
 			sit.textKey = "model";
 			selectableEntityClasses.Append( sit );
 			break;
@@ -617,7 +617,7 @@ void idEditEntities::DisplayEntities( void ) {
 	viewTextBounds.ExpandSelf( 128 );
 	viewBounds.ExpandSelf( g_maxShowDistance.GetFloat() );
 
-	anString textKey;
+	anStr textKey;
 
 	for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
 
@@ -629,19 +629,19 @@ void idEditEntities::DisplayEntities( void ) {
 		}
 
 		bool drawArrows = false;
-		if ( ent->GetType() == &arcAFEntity_Base::Type ) {
-			if ( !static_cast<arcAFEntity_Base *>(ent)->IsActiveAF() ) {
+		if ( ent->GetType() == &anAFEntity_Base::Type ) {
+			if ( !static_cast<anAFEntity_Base *>(ent)->IsActiveAF() ) {
 				continue;
 			}
 		} else if ( ent->GetType() == &idSound::Type ) {
 			if ( ent->fl.selected ) {
 				drawArrows = true;
 			}
-			const char* string = ent->spawnArgs.GetString( textKey );
+			const char *string = ent->spawnArgs.GetString( textKey );
 
 			const idSoundShader *ss = nullptr;
 
-			if ( anString::Length( string ) > 0 ) {
+			if ( anStr::Length( string ) > 0 ) {
 				ss = declHolder.declSoundShaderType.LocalFind( string );
 			}
 			if ( !ss || ss->HasDefaultSound() || ss->base->GetState() == DS_DEFAULTED ) {
@@ -703,9 +703,9 @@ anGameEdit *		gameEdit = &gameEditLocal;
 anGameEdit::GetSelectedEntities
 =============
 */
-int anGameEdit::GetSelectedEntities( arcEntity *list[], int max ) {
+int anGameEdit::GetSelectedEntities( anEntity *list[], int max ) {
 	int num = 0;
-	arcEntity *ent;
+	anEntity *ent;
 
 	for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
 		if ( ent->fl.selected ) {
@@ -723,9 +723,9 @@ int anGameEdit::GetSelectedEntities( arcEntity *list[], int max ) {
 anGameEdit::GetSelectedEntitiesByName
 =============
 */
-int anGameEdit::GetSelectedEntitiesByName( anString *list[], int max ) {
+int anGameEdit::GetSelectedEntitiesByName( anStr *list[], int max ) {
 	int num = 0;
-	arcEntity *ent;
+	anEntity *ent;
 
 	for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
 		if ( ent->fl.selected ) {
@@ -744,7 +744,7 @@ anGameEdit::TriggerSelected
 =============
 */
 void anGameEdit::TriggerSelected() {
-	arcEntity *ent;
+	anEntity *ent;
 	for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
 		if ( ent->fl.selected ) {
 			ent->ProcessEvent( &EV_Activate, gameLocal.GetLocalPlayer() );
@@ -761,7 +761,7 @@ void anGameEdit::ClearEntitySelection() {
 	if ( gameLocal.editEntities == nullptr ) {
 		return;
 	}
-	arcEntity *ent;
+	anEntity *ent;
 
 	for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
 		ent->fl.selected = false;
@@ -774,7 +774,7 @@ void anGameEdit::ClearEntitySelection() {
 anGameEdit::AddSelectedEntity
 ================
 */
-void anGameEdit::AddSelectedEntity( arcEntity *ent ) {
+void anGameEdit::AddSelectedEntity( anEntity *ent ) {
 	if ( gameLocal.editEntities == nullptr ) {
 		return;
 	}
@@ -788,7 +788,7 @@ void anGameEdit::AddSelectedEntity( arcEntity *ent ) {
 anGameEdit::RemoveSelectedEntity
 ================
 */
-void anGameEdit::RemoveSelectedEntity( arcEntity *ent ) {
+void anGameEdit::RemoveSelectedEntity( anEntity *ent ) {
 	if ( gameLocal.editEntities == nullptr ) {
 		return;
 	}
@@ -812,7 +812,7 @@ const anDict *anGameEdit::FindEntityDefDict( const char *name, bool makeDefault 
 anGameEdit::SpawnEntityDef
 ================
 */
-void anGameEdit::SpawnEntityDef( const anDict &args, arcEntity **ent ) {
+void anGameEdit::SpawnEntityDef( const anDict &args, anEntity **ent ) {
 	gameLocal.SpawnEntityDef( args, true, ent );
 }
 
@@ -821,7 +821,7 @@ void anGameEdit::SpawnEntityDef( const anDict &args, arcEntity **ent ) {
 anGameEdit::FindEntity
 ================
 */
-arcEntity *anGameEdit::FindEntity( const char *name ) const {
+anEntity *anGameEdit::FindEntity( const char *name ) const {
 	return gameLocal.FindEntity( name );
 }
 
@@ -838,14 +838,14 @@ const char *anGameEdit::GetUniqueEntityName( const char *classname ) const {
 
 	// can only have MAX_GENTITIES, so if we have a spot available, we're guaranteed to find one
 	for ( id = 0; id < MAX_GENTITIES; id++ ) {
-		anString::snPrintf( name, sizeof( name ), "%s_%d", classname, id );
+		anStr::snPrintf( name, sizeof( name ), "%s_%d", classname, id );
 		if ( !gameLocal.FindEntity( name ) ) {
 			return name;
 		}
 	}
 
 	// id == MAX_GENTITIES + 1, which can't be in use if we get here
-	anString::snPrintf( name, sizeof( name ), "%s_%d", classname, id );
+	anStr::snPrintf( name, sizeof( name ), "%s_%d", classname, id );
 	return name;
 }
 
@@ -854,7 +854,7 @@ const char *anGameEdit::GetUniqueEntityName( const char *classname ) const {
 anGameEdit::EntityGetOrigin
 ================
 */
-void  anGameEdit::EntityGetOrigin( arcEntity *ent, anVec3 &org ) const {
+void  anGameEdit::EntityGetOrigin( anEntity *ent, anVec3 &org ) const {
 	if ( ent ) {
 		org = ent->GetPhysics()->GetOrigin();
 	}
@@ -865,7 +865,7 @@ void  anGameEdit::EntityGetOrigin( arcEntity *ent, anVec3 &org ) const {
 anGameEdit::EntityGetAxis
 ================
 */
-void anGameEdit::EntityGetAxis( arcEntity *ent, anMat3 &axis ) const {
+void anGameEdit::EntityGetAxis( anEntity *ent, anMat3 &axis ) const {
 	if ( ent ) {
 		axis = ent->GetPhysics()->GetAxis();
 	}
@@ -876,7 +876,7 @@ void anGameEdit::EntityGetAxis( arcEntity *ent, anMat3 &axis ) const {
 anGameEdit::EntitySetOrigin
 ================
 */
-void anGameEdit::EntitySetOrigin( arcEntity *ent, const anVec3 &org ) {
+void anGameEdit::EntitySetOrigin( anEntity *ent, const anVec3 &org ) {
 	if ( ent ) {
 		ent->SetOrigin( org );
 	}
@@ -887,7 +887,7 @@ void anGameEdit::EntitySetOrigin( arcEntity *ent, const anVec3 &org ) {
 anGameEdit::EntitySetAxis
 ================
 */
-void anGameEdit::EntitySetAxis( arcEntity *ent, const anMat3 &axis ) {
+void anGameEdit::EntitySetAxis( anEntity *ent, const anMat3 &axis ) {
 	if ( ent ) {
 		ent->SetAxis( axis );
 	}
@@ -898,7 +898,7 @@ void anGameEdit::EntitySetAxis( arcEntity *ent, const anMat3 &axis ) {
 anGameEdit::EntitySetColor
 ================
 */
-void anGameEdit::EntitySetColor( arcEntity *ent, const anVec3 color ) {
+void anGameEdit::EntitySetColor( anEntity *ent, const anVec3 color ) {
 	if ( ent ) {
 		ent->SetColor( color );
 	}
@@ -909,7 +909,7 @@ void anGameEdit::EntitySetColor( arcEntity *ent, const anVec3 color ) {
 anGameEdit::EntityTranslate
 ================
 */
-void anGameEdit::EntityTranslate( arcEntity *ent, const anVec3 &org ) {
+void anGameEdit::EntityTranslate( anEntity *ent, const anVec3 &org ) {
 	if ( ent ) {
 		ent->GetPhysics()->Translate( org );
 	}
@@ -920,7 +920,7 @@ void anGameEdit::EntityTranslate( arcEntity *ent, const anVec3 &org ) {
 anGameEdit::EntityGetSpawnArgs
 ================
 */
-const anDict *anGameEdit::EntityGetSpawnArgs( arcEntity *ent ) const {
+const anDict *anGameEdit::EntityGetSpawnArgs( anEntity *ent ) const {
 	if ( ent ) {
 		return &ent->spawnArgs;
 	}
@@ -932,7 +932,7 @@ const anDict *anGameEdit::EntityGetSpawnArgs( arcEntity *ent ) const {
 anGameEdit::EntityUpdateChangeableSpawnArgs
 ================
 */
-void anGameEdit::EntityUpdateChangeableSpawnArgs( arcEntity *ent, const anDict *dict ) {
+void anGameEdit::EntityUpdateChangeableSpawnArgs( anEntity *ent, const anDict *dict ) {
 	if ( ent ) {
 		ent->UpdateChangeableSpawnArgs( dict );
 	}
@@ -943,7 +943,7 @@ void anGameEdit::EntityUpdateChangeableSpawnArgs( arcEntity *ent, const anDict *
 anGameEdit::EntityChangeSpawnArgs
 ================
 */
-void anGameEdit::EntityChangeSpawnArgs( arcEntity *ent, const anDict *newArgs ) {
+void anGameEdit::EntityChangeSpawnArgs( anEntity *ent, const anDict *newArgs ) {
 	if ( ent ) {
 		for ( int i = 0 ; i < newArgs->GetNumKeyVals () ; i ++ ) {
 			const anKeyValue *kv = newArgs->GetKeyVal( i );
@@ -962,7 +962,7 @@ void anGameEdit::EntityChangeSpawnArgs( arcEntity *ent, const anDict *newArgs ) 
 anGameEdit::EntityUpdateVisuals
 ================
 */
-void anGameEdit::EntityUpdateVisuals( arcEntity *ent ) {
+void anGameEdit::EntityUpdateVisuals( anEntity *ent ) {
 	if ( ent ) {
 		ent->UpdateVisuals();
 	}
@@ -973,7 +973,7 @@ void anGameEdit::EntityUpdateVisuals( arcEntity *ent ) {
 anGameEdit::EntitySetModel
 ================
 */
-void anGameEdit::EntitySetModel( arcEntity *ent, const char *val ) {
+void anGameEdit::EntitySetModel( anEntity *ent, const char *val ) {
 	if ( ent ) {
 		ent->spawnArgs.Set( "model", val );
 		ent->SetModel( val );
@@ -985,7 +985,7 @@ void anGameEdit::EntitySetModel( arcEntity *ent, const char *val ) {
 anGameEdit::EntityStopSound
 ================
 */
-void anGameEdit::EntityStopSound( arcEntity *ent ) {
+void anGameEdit::EntityStopSound( anEntity *ent ) {
 	if ( ent ) {
 		ent->StopSound( SND_ANY );
 	}
@@ -996,7 +996,7 @@ void anGameEdit::EntityStopSound( arcEntity *ent ) {
 anGameEdit::EntityDelete
 ================
 */
-void anGameEdit::EntityDelete( arcEntity *ent ) {
+void anGameEdit::EntityDelete( anEntity *ent ) {
 	ent->ProcessEvent( &EV_Remove );
 }
 
@@ -1005,7 +1005,7 @@ void anGameEdit::EntityDelete( arcEntity *ent ) {
 anGameEdit::EntityToSafeId
 ================
 */
-int anGameEdit::EntityToSafeId ( arcEntity* ent ) const {
+int anGameEdit::EntityToSafeId ( anEntity *ent ) const {
 	return gameLocal.GetSpawnId( ent );
 }
 
@@ -1014,7 +1014,7 @@ int anGameEdit::EntityToSafeId ( arcEntity* ent ) const {
 anGameEdit::EntityFromSafeId
 ================
 */
-arcEntity *anGameEdit::EntityFromSafeId( int safeID ) const {
+anEntity *anGameEdit::EntityFromSafeId( int safeID ) const {
 	return gameLocal.EntityForSpawnId( safeID );
 }
 
@@ -1023,7 +1023,7 @@ arcEntity *anGameEdit::EntityFromSafeId( int safeID ) const {
 anGameEdit::EntityFromIndex
 ================
 */
-arcEntity *anGameEdit::EntityFromIndex( int index ) const {
+anEntity *anGameEdit::EntityFromIndex( int index ) const {
 	if ( index < 0 || index >= MAX_GENTITIES ) {
 		return nullptr;
 	}
@@ -1117,7 +1117,7 @@ void anGameEdit::MapSave( const char *path ) const {
 anGameEdit::MapSaveClass
 ================
 */
-void anGameEdit::MapSaveClass( const char *path, const char* classname ) const {
+void anGameEdit::MapSaveClass( const char *path, const char *classname ) const {
 
 	anMapFile *mapFile = gameLocal.GetLevelMap();
 	if ( mapFile != nullptr ) {
@@ -1126,7 +1126,7 @@ void anGameEdit::MapSaveClass( const char *path, const char* classname ) const {
 			int num = 0;
 			for ( int i = 0; i < mapFile->GetNumEntities(); i++ ) {
 				anMapEntity* ent = mapFile->GetEntity( i );
-				if ( anString::Icmp( ent->epairs.GetString( "classname" ), classname ) == 0 ) {
+				if ( anStr::Icmp( ent->epairs.GetString( "classname" ), classname ) == 0 ) {
 					ent->Write( f, num );
 					num++;
 				}
@@ -1229,7 +1229,7 @@ void anGameEdit::MapRemoveEntity( const char *name ) const {
 anGameEdit::MapGetEntitiesMatchignClassWithString
 ================
 */
-int anGameEdit::MapGetEntitiesMatchingClassWithString( const char *classname, const char *list[], const int max, const char* matchKey, const char *matchValue ) const {
+int anGameEdit::MapGetEntitiesMatchingClassWithString( const char *classname, const char *list[], const int max, const char *matchKey, const char *matchValue ) const {
 	anMapFile *mapFile = gameLocal.GetLevelMap();
 	int count = 0;
 	if ( mapFile ) {
@@ -1237,7 +1237,7 @@ int anGameEdit::MapGetEntitiesMatchingClassWithString( const char *classname, co
 		for ( int i = 0 ; i < entCount; i++ ) {
 			anMapEntity *ent = mapFile->GetEntity( i );
 			if ( ent != nullptr ) {
-				anString work = ent->epairs.GetString( "classname" );
+				anStr work = ent->epairs.GetString( "classname" );
 				if ( work.Icmp( classname ) == 0 ) {
 					if ( matchKey && *matchKey && matchValue && *matchValue ) {
 						work = ent->epairs.GetString( matchKey );
@@ -1356,7 +1356,7 @@ anRenderWorld* anGameEdit::GetRenderWorld() const {
 anGameEdit::GetRenderWorld
 ================
 */
-const char* anGameEdit::MapGetName() const {
+const char *anGameEdit::MapGetName() const {
 	return gameLocal.GetMapName();
 }
 
@@ -1367,7 +1367,7 @@ anGameEdit::KillClass
 */
 void KillEntities( const anCommandArgs &args, const idTypeInfo &superClass, bool delayed );
 
-void anGameEdit::KillClass( const char* classname ) {
+void anGameEdit::KillClass( const char *classname ) {
 	if ( classname == nullptr || classname[0] == '\0' ) {
 		return;
 	}

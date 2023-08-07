@@ -10,7 +10,7 @@ instancing of objects.
 #include "../Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -45,7 +45,7 @@ are initialized before superclasses.
 ================
 */
 idTypeInfo::idTypeInfo( const char *classname, const char *superclass, idEventFunc<anClass> *eventCallbacks, anClass *( *_createInstance )( void ),
-	void ( anClass::*Spawn )( void ), bool ( *_inhibitSpawn )( const anDict& args ) ) {
+	void ( anClass::*Spawn )( void ), bool ( *_inhibitSpawn )( const anDict &args ) ) {
 
 	idTypeInfo *type;
 	idTypeInfo **insert;
@@ -64,16 +64,16 @@ idTypeInfo::idTypeInfo( const char *classname, const char *superclass, idEventFu
 
 	// Check if any subclasses were initialized before their superclass
 	for ( type = typelist; type != nullptr; type = type->next ) {
-		if ( ( type->super == nullptr ) && !anString::Cmp( type->superclass, this->classname ) &&
-			anString::Cmp( type->classname, "anClass" ) ) {
+		if ( ( type->super == nullptr ) && !anStr::Cmp( type->superclass, this->classname ) &&
+			anStr::Cmp( type->classname, "anClass" ) ) {
 			type->super	= this;
 		}
 	}
 
 	// Insert sorted
 	for ( insert = &typelist; *insert; insert = &(*insert)->next ) {
-		assert( anString::Cmp( classname, (*insert)->classname ) );
-		if ( anString::Cmp( classname, (*insert)->classname ) < 0 ) {
+		assert( anStr::Cmp( classname, (*insert)->classname ) );
+		if ( anStr::Cmp( classname, (*insert)->classname ) < 0 ) {
 			next = *insert;
 			*insert = this;
 			break;
@@ -145,7 +145,7 @@ void idTypeInfo::Init( void ) {
 	// Allocate our new table.  It has to have as many entries as there
 	// are events.  NOTE: could save some space by keeping track of the maximum
 	// event that the class responds to and doing range checking.
-	num = arcEventDef::NumEventCommands();
+	num = anEventDef::NumEventCommands();
 	eventMap = new eventCallback_t[ num ];
 	memset( eventMap, 0, sizeof( eventCallback_t ) * num );
 	eventCallbackMemory += sizeof( eventCallback_t ) * num;
@@ -203,9 +203,9 @@ void idTypeInfo::Shutdown() {
 
 ***********************************************************************/
 
-const arcEventDefInternal EV_Remove( "internal_immediateremove", nullptr );
-const arcEventDef EV_SafeRemove( "remove", '\0', DOC_TEXT( "Schedules the object for removal at the end of the frame." ), 0, nullptr );
-const arcEventDef EV_IsClass( "isClass", 'd', DOC_TEXT( "Returns whether the object is of the type specified, including being derived from the type." ), 1, "Type handles can be looked up using $event:getTypeHandle$.", "d", "handle", "Handle to the type to check for." );
+const anEventDefInternal EV_Remove( "internal_immediateremove", nullptr );
+const anEventDef EV_SafeRemove( "remove", '\0', DOC_TEXT( "Schedules the object for removal at the end of the frame." ), 0, nullptr );
+const anEventDef EV_IsClass( "isClass", 'd', DOC_TEXT( "Returns whether the object is of the type specified, including being derived from the type." ), 1, "Type handles can be looked up using $event:getTypeHandle$.", "d", "handle", "Handle to the type to check for." );
 
 ABSTRACT_DECLARATION( nullptr, anClass )
 	EVENT( EV_Remove,				anClass::Event_Remove )
@@ -335,7 +335,7 @@ anClass::WikiClassPage_f
 ================
 */
 void anClass::WikiClassPage_f( const anCommandArgs &args ) {
-	const char* typeName = args.Argv( 1 );
+	const char *typeName = args.Argv( 1 );
 	if ( *typeName == '\0' ) {
 		for ( int i = 0; i < types.Num(); i++ ) {
 			sdWikiFormatter wiki;
@@ -363,7 +363,7 @@ anClass::WikiClassTree_f
 void anClass::WikiClassTree_f( const anCommandArgs &args ) {
 	idTypeInfo* type = nullptr;
 
-	const char* baseTypeName = args.Argv( 1 );
+	const char *baseTypeName = args.Argv( 1 );
 	if ( *baseTypeName != '\0' ) {
 		type = anClass::GetClass( baseTypeName );
 		if ( type == nullptr ) {
@@ -534,7 +534,7 @@ void anClass::operator delete( void *ptr ) {
 	int *p;
 
 	if ( ptr ) {
-		p = ( ( int*)ptr ) - 1;
+		p = ( (int *)ptr ) - 1;
 		memused -= *p;
 		numobjects--;
         Mem_Free( p );
@@ -545,7 +545,7 @@ void anClass::operator delete( void *ptr, int, int, char *, int ) {
 	int *p;
 
 	if ( ptr ) {
-		p = ( ( int*)ptr ) - 1;
+		p = ( (int *)ptr ) - 1;
 		memused -= *p;
 		numobjects--;
         Mem_Free( p );
@@ -570,7 +570,7 @@ idTypeInfo *anClass::GetClass( const char *name ) {
 	if ( !initialized ) {
 		// anClass::Init hasn't been called yet, so do a slow lookup
 		for ( c = typelist; c != nullptr; c = c->next ) {
-			if ( !anString::Cmp( c->classname, name ) ) {
+			if ( !anStr::Cmp( c->classname, name ) ) {
 				return c;
 			}
 		}
@@ -581,7 +581,7 @@ idTypeInfo *anClass::GetClass( const char *name ) {
 		while( min <= max ) {
 			mid = ( min + max ) / 2;
 			c = types[ mid ];
-			order = anString::Cmp( c->classname, name );
+			order = anStr::Cmp( c->classname, name );
 			if ( !order ) {
 				return c;
 			} else if ( order > 0 ) {
@@ -661,7 +661,7 @@ const char *anClass::GetSuperclass( void ) const {
 anClass::CancelEvents
 ================
 */
-void anClass::CancelEvents( const arcEventDef *ev ) {
+void anClass::CancelEvents( const anEventDef *ev ) {
 	idEvent::CancelEvents( this, ev );
 }
 
@@ -670,7 +670,7 @@ void anClass::CancelEvents( const arcEventDef *ev ) {
 anClass::PostEventArgs
 ================
 */
-bool anClass::PostEventArgs( const arcEventDef *ev, int time, int numargs, bool guiEvent, ... ) {
+bool anClass::PostEventArgs( const anEventDef *ev, int time, int numargs, bool guiEvent, ... ) {
 	idTypeInfo	*c;
 	idEvent		*event;
 	va_list		args;
@@ -701,7 +701,7 @@ bool anClass::PostEventArgs( const arcEventDef *ev, int time, int numargs, bool 
 anClass::PostGUIEventMS
 ================
 */
-bool anClass::PostGUIEventMS( const arcEventDef *ev, int time ) {
+bool anClass::PostGUIEventMS( const anEventDef *ev, int time ) {
 	return PostEventArgs( ev, time, 0, true );
 }
 
@@ -710,10 +710,10 @@ bool anClass::PostGUIEventMS( const arcEventDef *ev, int time ) {
 anClass::PostEventMS
 ================
 */
-bool anClass::PostEventMS( const arcEventDef *ev, int time ) {
+bool anClass::PostEventMS( const anEventDef *ev, int time ) {
 	if ( gameLocal.isClient ) {
 		if ( ev == &EV_SafeRemove ) {
-			if ( IsType( arcEntity::Type ) ) {
+			if ( IsType( anEntity::Type ) ) {
 				// Clients aren't allowed to do this.
 				assert( false );
 				gameLocal.Warning( "Client called anClass::PostEventMS with EV_Remove or EV_SafeRemove!" );
@@ -730,7 +730,7 @@ bool anClass::PostEventMS( const arcEventDef *ev, int time ) {
 anClass::PostEventMS
 ================
 */
-bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1 ) {
+bool anClass::PostEventMS( const anEventDef *ev, int time, idEventArg arg1 ) {
 	return PostEventArgs( ev, time, 1, false, &arg1 );
 }
 
@@ -739,7 +739,7 @@ bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1 ) {
 anClass::PostEventMS
 ================
 */
-bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2 ) {
+bool anClass::PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2 ) {
 	return PostEventArgs( ev, time, 2, false, &arg1, &arg2 );
 }
 
@@ -748,7 +748,7 @@ bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idE
 anClass::PostEventMS
 ================
 */
-bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
+bool anClass::PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
 	return PostEventArgs( ev, time, 3, false, &arg1, &arg2, &arg3 );
 }
 
@@ -757,7 +757,7 @@ bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idE
 anClass::PostEventMS
 ================
 */
-bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
+bool anClass::PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
 	return PostEventArgs( ev, time, 4, false, &arg1, &arg2, &arg3, &arg4 );
 }
 
@@ -766,7 +766,7 @@ bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idE
 anClass::PostEventMS
 ================
 */
-bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
+bool anClass::PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
 	return PostEventArgs( ev, time, 5, false, &arg1, &arg2, &arg3, &arg4, &arg5 );
 }
 
@@ -775,7 +775,7 @@ bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idE
 anClass::PostEventMS
 ================
 */
-bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
+bool anClass::PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
 	return PostEventArgs( ev, time, 6, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6 );
 }
 
@@ -784,7 +784,7 @@ bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idE
 anClass::PostEventMS
 ================
 */
-bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
+bool anClass::PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
 	return PostEventArgs( ev, time, 7, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7 );
 }
 
@@ -793,7 +793,7 @@ bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idE
 anClass::PostEventMS
 ================
 */
-bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
+bool anClass::PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
 	return PostEventArgs( ev, time, 8, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7, &arg8 );
 }
 
@@ -802,7 +802,7 @@ bool anClass::PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idE
 anClass::PostEventSec
 ================
 */
-bool anClass::PostEventSec( const arcEventDef *ev, float time ) {
+bool anClass::PostEventSec( const anEventDef *ev, float time ) {
 	return PostEventArgs( ev, SEC2MS( time ), 0, false );
 }
 
@@ -811,7 +811,7 @@ bool anClass::PostEventSec( const arcEventDef *ev, float time ) {
 anClass::PostEventSec
 ================
 */
-bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1 ) {
+bool anClass::PostEventSec( const anEventDef *ev, float time, idEventArg arg1 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 1, false, &arg1 );
 }
 
@@ -820,7 +820,7 @@ bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1 )
 anClass::PostEventSec
 ================
 */
-bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2 ) {
+bool anClass::PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 2, false, &arg1, &arg2 );
 }
 
@@ -829,7 +829,7 @@ bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, 
 anClass::PostEventSec
 ================
 */
-bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
+bool anClass::PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 3, false, &arg1, &arg2, &arg3 );
 }
 
@@ -838,7 +838,7 @@ bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, 
 anClass::PostEventSec
 ================
 */
-bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
+bool anClass::PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 4, false, &arg1, &arg2, &arg3, &arg4 );
 }
 
@@ -847,7 +847,7 @@ bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, 
 anClass::PostEventSec
 ================
 */
-bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
+bool anClass::PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 5, false, &arg1, &arg2, &arg3, &arg4, &arg5 );
 }
 
@@ -856,7 +856,7 @@ bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, 
 anClass::PostEventSec
 ================
 */
-bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
+bool anClass::PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 6, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6 );
 }
 
@@ -865,7 +865,7 @@ bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, 
 anClass::PostEventSec
 ================
 */
-bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
+bool anClass::PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 7, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7 );
 }
 
@@ -874,7 +874,7 @@ bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, 
 anClass::PostEventSec
 ================
 */
-bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
+bool anClass::PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
 	return PostEventArgs( ev, SEC2MS( time ), 8, false, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7, &arg8 );
 }
 
@@ -883,7 +883,7 @@ bool anClass::PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, 
 anClass::ProcessEventArgs
 ================
 */
-bool anClass::ProcessEventArgs( const arcEventDef *ev, int numargs, ... ) {
+bool anClass::ProcessEventArgs( const anEventDef *ev, int numargs, ... ) {
 	idTypeInfo	*c;
 	int			num;
 	UINT_PTR	data[ D_EVENT_MAXARGS ];
@@ -913,7 +913,7 @@ bool anClass::ProcessEventArgs( const arcEventDef *ev, int numargs, ... ) {
 anClass::ProcessEvent
 ================
 */
-bool anClass::ProcessEvent( const arcEventDef *ev ) {
+bool anClass::ProcessEvent( const anEventDef *ev ) {
 	return ProcessEventArgs( ev, 0 );
 }
 
@@ -922,7 +922,7 @@ bool anClass::ProcessEvent( const arcEventDef *ev ) {
 anClass::ProcessEvent
 ================
 */
-bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1 ) {
+bool anClass::ProcessEvent( const anEventDef *ev, idEventArg arg1 ) {
 	return ProcessEventArgs( ev, 1, &arg1 );
 }
 
@@ -931,7 +931,7 @@ bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1 ) {
 anClass::ProcessEvent
 ================
 */
-bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2 ) {
+bool anClass::ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2 ) {
 	return ProcessEventArgs( ev, 2, &arg1, &arg2 );
 }
 
@@ -940,7 +940,7 @@ bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg a
 anClass::ProcessEvent
 ================
 */
-bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
+bool anClass::ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3 ) {
 	return ProcessEventArgs( ev, 3, &arg1, &arg2, &arg3 );
 }
 
@@ -949,7 +949,7 @@ bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg a
 anClass::ProcessEvent
 ================
 */
-bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
+bool anClass::ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 ) {
 	return ProcessEventArgs( ev, 4, &arg1, &arg2, &arg3, &arg4 );
 }
 
@@ -958,7 +958,7 @@ bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg a
 anClass::ProcessEvent
 ================
 */
-bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
+bool anClass::ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 ) {
 	return ProcessEventArgs( ev, 5, &arg1, &arg2, &arg3, &arg4, &arg5 );
 }
 
@@ -967,7 +967,7 @@ bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg a
 anClass::ProcessEvent
 ================
 */
-bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
+bool anClass::ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 ) {
 	return ProcessEventArgs( ev, 6, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6 );
 }
 
@@ -976,7 +976,7 @@ bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg a
 anClass::ProcessEvent
 ================
 */
-bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
+bool anClass::ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 ) {
 	return ProcessEventArgs( ev, 7, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7 );
 }
 
@@ -985,7 +985,7 @@ bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg a
 anClass::ProcessEvent
 ================
 */
-bool anClass::ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
+bool anClass::ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 ) {
 	return ProcessEventArgs( ev, 8, &arg1, &arg2, &arg3, &arg4, &arg5, &arg6, &arg7, &arg8 );
 }
 
@@ -998,7 +998,7 @@ extern anCVar g_fpuExceptions;
 anClass::ProcessEventArgPtr
 ================
 */
-bool anClass::ProcessEventArgPtr( const arcEventDef *ev, const UINT_PTR *data ) {
+bool anClass::ProcessEventArgPtr( const anEventDef *ev, const UINT_PTR *data ) {
 	idTypeInfo	*c;
 	int			num;
 	eventCallback_t	callback;
@@ -1052,42 +1052,42 @@ http://developer.apple.com/documentation/DeveloperTools/Conceptual/MachORuntime/
 
 	case 1 :
 		typedef void ( anClass::*eventCallback_1_t )( const UINT_PTR );
-		( this->*( eventCallback_1_t )callback )( data[ 0 ] );
+		( this->*( eventCallback_1_t )callback )( data[0] );
 		break;
 
 	case 2 :
 		typedef void ( anClass::*eventCallback_2_t )( const UINT_PTR, const UINT_PTR );
-		( this->*( eventCallback_2_t )callback )( data[ 0 ], data[ 1 ] );
+		( this->*( eventCallback_2_t )callback )( data[0], data[1] );
 		break;
 
 	case 3 :
 		typedef void ( anClass::*eventCallback_3_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR );
-		( this->*( eventCallback_3_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ] );
+		( this->*( eventCallback_3_t )callback )( data[0], data[1], data[2] );
 		break;
 
 	case 4 :
 		typedef void ( anClass::*eventCallback_4_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
-		( this->*( eventCallback_4_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ] );
+		( this->*( eventCallback_4_t )callback )( data[0], data[1], data[2], data[3] );
 		break;
 
 	case 5 :
 		typedef void ( anClass::*eventCallback_5_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
-		( this->*( eventCallback_5_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ], data[ 4 ] );
+		( this->*( eventCallback_5_t )callback )( data[0], data[1], data[2], data[3], data[ 4 ] );
 		break;
 
 	case 6 :
 		typedef void ( anClass::*eventCallback_6_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
-		( this->*( eventCallback_6_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ], data[ 4 ], data[ 5 ] );
+		( this->*( eventCallback_6_t )callback )( data[0], data[1], data[2], data[3], data[ 4 ], data[ 5 ] );
 		break;
 
 	case 7 :
 		typedef void ( anClass::*eventCallback_7_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
-		( this->*( eventCallback_7_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ], data[ 4 ], data[ 5 ], data[ 6 ] );
+		( this->*( eventCallback_7_t )callback )( data[0], data[1], data[2], data[3], data[ 4 ], data[ 5 ], data[ 6 ] );
 		break;
 
 	case 8 :
 		typedef void ( anClass::*eventCallback_8_t )( const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR, const UINT_PTR );
-		( this->*( eventCallback_8_t )callback )( data[ 0 ], data[ 1 ], data[ 2 ], data[ 3 ], data[ 4 ], data[ 5 ], data[ 6 ], data[ 7 ] );
+		( this->*( eventCallback_8_t )callback )( data[0], data[1], data[2], data[3], data[ 4 ], data[ 5 ], data[ 6 ], data[ 7 ] );
 		break;
 
 	default:
@@ -1124,7 +1124,7 @@ anClass::Event_SafeRemove
 ================
 */
 void anClass::Event_SafeRemove( void ) {
-	if ( gameLocal.isClient && IsType( arcEntity::Type ) ) {
+	if ( gameLocal.isClient && IsType( anEntity::Type ) ) {
 		// Clients aren't allowed to do this.
 		assert( false );
 		gameLocal.Warning( "Client called anClass::Event_SafeRemove!" );
@@ -1143,11 +1143,11 @@ anClass::Event_IsClass
 void anClass::Event_IsClass( int typeNumber ) {
 	idTypeInfo* type = anClass::GetType( typeNumber );
 	if ( !type ) {
-		sdProgram::ReturnInteger( 0 );
+		idProgram::ReturnInteger( 0 );
 		return;
 	}
 
-	sdProgram::ReturnInteger( IsType( *type ) );
+	idProgram::ReturnInteger( IsType( *type ) );
 }
 
 /*
@@ -1171,6 +1171,6 @@ anClass* idTypeInfo::CreateInstance( void ) const {
 idTypeInfo::InhibitSpawn
 ================
 */
-bool idTypeInfo::InhibitSpawn( const anDict& args ) const {
+bool idTypeInfo::InhibitSpawn( const anDict &args ) const {
 	return _inhibitSpawn( args );
 }

@@ -34,6 +34,10 @@ typedef struct {
 
 
 typedef struct {
+	// REMINDER:
+	struct surfaceInteraction_t *next;
+	srfTriangles_t *		tri;
+	// -- end added
 	// if lightTris == LIGHT_TRIS_DEFERRED, then the calculation of the
 	// lightTris has been deferred, and must be done if ambientTris is visible
 	srfTriangles_t *		lightTris;
@@ -52,6 +56,12 @@ typedef struct {
 	srfCullInfo_t			cullInfo;
 } surfaceInteraction_t;
 
+typedef struct srfIndex_s {
+	anBounds				bounds;
+	anRadians				rads;
+	unsigned short			radius;
+	int						iCount;			// no this is not Imac implementation how funny IndexCount.
+} srfIndex_t;
 
 typedef struct areaNumRef_s {
 	struct areaNumRef_s *	next;
@@ -62,7 +72,7 @@ typedef struct areaNumRef_s {
 class anRenderEntityLocal;
 class anRenderLightsLocal;
 
-class an Interaction {
+class anInteraction {
 public:
 	// this may be 0 if the light and entity do not actually intersect
 	// -1 = an untested interaction
@@ -77,18 +87,18 @@ public:
 	anRenderEntityLocal *	entityDef;
 	anRenderLightsLocal *	lightDef;
 
-	an Interaction *			lightNext;				// for lightDef chains
-	an Interaction *			lightPrev;
-	an Interaction *			entityNext;				// for entityDef chains
-	an Interaction *			entityPrev;
+	anInteraction *			lightNext;				// for lightDef chains
+	anInteraction *			lightPrev;
+	anInteraction *			entityNext;				// for entityDef chains
+	anInteraction *			entityPrev;
 
 public:
-							an Interaction( void );
+							anInteraction( void );
 
 	// because these are generated and freed each game tic for active elements all
 	// over the world, we use a custom pool allocater to avoid memory allocation overhead
 	// and fragmentation
-	static an Interaction *	AllocAndLink( anRenderEntityLocal *edef, anRenderLightsLocal *ldef );
+	static anInteraction *	AllocAndLink( anRenderEntityLocal *edef, anRenderLightsLocal *ldef );
 
 	// unlinks from the entity and light, frees all surfaceInteractions,
 	// and puts it back on the free list
@@ -153,4 +163,4 @@ void R_FreeInteractionCullInfo( srfCullInfo_t &cullInfo );
 
 void R_ShowInteractionMemory_f( const anCommandArgs &args );
 
-#endif /* !__INTERACTION_H__ */
+#endif // !__INTERACTION_H__

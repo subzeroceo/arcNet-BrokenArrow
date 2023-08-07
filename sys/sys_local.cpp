@@ -1,16 +1,16 @@
-#include "/idlib/Lib.h"
+#include "../idlib/Lib.h"
 #pragma hdrstop
 #include "sys_local.h"
 
-const char *sysLanguageNames[] = {
+const char *sysLangNames[] = {
 	"english", "spanish", "italian", "german", "french", "russian",
 	"polish", "korean", "japanese", "chinese", nullptr
 };
 
-anCVarSystem sys_lang( "sys_lang", "english", CVAR_SYSTEM | CVAR_ARCHIVE,  "", sysLanguageNames, arcCmdSystem::ArgCompletion_String<sysLanguageNames> );
+anCVar sys_lang( "sys_lang", "english", CVAR_SYSTEM | CVAR_ARCHIVE,  "", sysLangNames, anCommandSystem::ArgCompletion_String<sysLangNames> );
 
 anSystemLocal			sysLocal;
-arcSystem *				sys = &sysLocal;
+anSystem *				sys = &sysLocal;
 
 void anSystemLocal::DebugPrintf( const char *fmt, ... ) {
 	va_list argptr;
@@ -42,11 +42,11 @@ void anSystemLocal::DLL_Unload( int dllHandle ) { Sys_DLL_Unload( dllHandle ); }
 
 void anSystemLocal::DLL_GetFileName( const char *baseName, char *dllName, int maxLength ) {
 #ifdef _WIN32
-	anString::snPrintf( dllName, maxLength, "%s" CPUSTRING ".dll", baseName );
+	anStr::snPrintf( dllName, maxLength, "%s" CPUSTRING ".dll", baseName );
 #elif defined( __linux__ )
-	anString::snPrintf( dllName, maxLength, "%s" CPUSTRING ".so", baseName );
+	anStr::snPrintf( dllName, maxLength, "%s" CPUSTRING ".so", baseName );
 #elif defined( MACOS_X )
-	anString::snPrintf( dllName, maxLength, "%s" ".dylib", baseName );
+	anStr::snPrintf( dllName, maxLength, "%s" ".dylib", baseName );
 #else
 #error OS define is required
 #endif
@@ -79,10 +79,10 @@ const char *Sys_TimeStampToStr( ARC_TIME_T timeStamp ) {
 	static char timeString[MAX_STRING_CHARS];
 	timeString[0] = '\0';
 
-	tm*	time = localtime( &timeStamp );
-	anString out;
+	tm*	time = localTime( &timeStamp );
+	anStr out;
 
-	anString lang = cvarSystem->GetCVarString( "sys_lang" );
+	anStr lang = cvarSystem->GetCVarString( "sys_lang" );
 	if ( lang.Icmp( "english" ) == 0 ) {
 		// english gets "month/day/year  hour:min" + "am" or "pm"
 		out = va( "%02d", time->tm_mon + 1 );
@@ -117,6 +117,6 @@ const char *Sys_TimeStampToStr( ARC_TIME_T timeStamp ) {
 		out += ":";
 		out += va( "%02d", time->tm_min );
 	}
-	anString::Copynz( timeString, out, sizeof( timeString ) );
+	anStr::Copynz( timeString, out, sizeof( timeString ) );
 	return timeString;
 }

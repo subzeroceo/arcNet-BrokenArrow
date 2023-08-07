@@ -11,9 +11,9 @@
 ===============================================================================
 */
 
-class ARCModelManager {
+class anModelManager {
 public:
-	virtual					~ARCModelManager() {}
+	virtual					~anModelManager() {}
 
 	// registers console commands and clears the list
 	virtual	void			Init() = 0;
@@ -80,6 +80,6 @@ public:
 };
 
 // this will be statically pointed at a private implementation
-extern	ARCModelManager	*renderModelManager;
+extern	anModelManager	*renderModelManager;
 
 #endif

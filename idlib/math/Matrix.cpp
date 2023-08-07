@@ -98,7 +98,7 @@ anMat2::ToString
 =============
 */
 const char *anMat2::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 
@@ -113,13 +113,39 @@ anMat3 mat3_identity( anVec3( 1, 0, 0 ), anVec3( 0, 1, 0 ), anVec3( 0, 0, 1 ) );
 
 /*
 ============
+anMat3::Transpose
+============
+*/
+anMat3 anMat3::TransposeInPlace() const {
+	anMat3	transpose;
+
+	for ( int i = 0; i < 3; i++ ) {
+		for ( int j = 0; j < 3; j++ ) {
+			transpose[i][j] = mat[j][i];
+        }
+	}
+	return transpose;
+}
+
+void anMat3::Transpose() {
+	for ( int i = 0; i < 3; i++ ) {
+		for ( int j = i + 1; j < 3; j++ ) {
+			float temp = mat[i][j];
+			mat[ i ][ j ] = mat[j][i];
+			mat[ j ][ i ] = temp;
+		}
+	}
+}
+
+/*
+============
 anMat3::ToAngles
 ============
 */
 anAngles anMat3::ToAngles( void ) const {
 	anAngles	angles;
 
-	float sp = mat[ 0 ][ 2 ];
+	float sp = mat[0][2];
 
 	// cap off our sin value so that we don't get any NANs
 	if ( sp > 1.0f ) {
@@ -133,14 +159,42 @@ anAngles anMat3::ToAngles( void ) const {
 
 	if ( cp > 8192.0f * anMath::FLT_EPSILON ) {
 		angles.pitch	= RAD2DEG( theta );
-		angles.yaw		= RAD2DEG( atan2( mat[ 0 ][ 1 ], mat[ 0 ][ 0 ] ) );
-		angles.roll		= RAD2DEG( atan2( mat[ 1 ][ 2 ], mat[ 2 ][ 2 ] ) );
+		angles.yaw		= RAD2DEG( atan2( mat[0][1], mat[0][0] ) );
+		angles.roll		= RAD2DEG( atan2( mat[1][2], mat[2][2] ) );
 	} else {
 		angles.pitch	= RAD2DEG( theta );
-		angles.yaw		= RAD2DEG( -atan2( mat[ 1 ][ 0 ], mat[ 1 ][ 1 ] ) );
+		angles.yaw		= RAD2DEG( -atan2( mat[1][0], mat[1][1] ) );
 		angles.roll		= 0;
 	}
 	return angles;
+}
+
+anAngles anVec3::ToAngles_Legacy( void ) {
+	float forward;
+	float yaw;
+	float pitch;
+
+	if ( ( x == 0 ) && ( y == 0 ) ) {
+		yaw = 0;
+		if ( z > 0 ) {
+			pitch = 90;
+		} else {
+			pitch = 270;
+		}
+	} else {
+		yaw = atan2( y, x ) * 180 / anMath::PI;
+		if ( yaw < 0 ) {
+			yaw += 360;
+		}
+
+		forward = ( float )anMath::Sqrt( x * x + y * y );
+		pitch = atan2( z, forward ) * 180 / anMath:PI;
+		if ( pitch < 0 ) {
+			pitch += 360;
+		}
+	}
+
+	return anAngles( -pitch, yaw, 0 );
 }
 
 /*
@@ -151,23 +205,23 @@ anMat3::ToQuat
 anQuats anMat3::ToQuat( void ) const {
 	anQuats q;
 
-	static int 	next[ 3 ] = { 1, 2, 0 };
-	float trace = mat[ 0 ][ 0 ] + mat[ 1 ][ 1 ] + mat[ 2 ][ 2 ];
+	static int 	next[3] = { 1, 2, 0 };
+	float trace = mat[0][0] + mat[1][1] + mat[2][2];
 
 	if ( trace > 0.0f ) {
 		float t = trace + 1.0f;
 		float s = anMath::InvSqrt( t ) * 0.5f;
 
 		q[3] = s * t;
-		q[0] = ( mat[ 2 ][ 1 ] - mat[ 1 ][ 2 ] ) * s;
-		q[1] = ( mat[ 0 ][ 2 ] - mat[ 2 ][ 0 ] ) * s;
-		q[2] = ( mat[ 1 ][ 0 ] - mat[ 0 ][ 1 ] ) * s;
+		q[0] = ( mat[2][1] - mat[1][2] ) * s;
+		q[1] = ( mat[0][2] - mat[2][0] ) * s;
+		q[2] = ( mat[1][0] - mat[0][1] ) * s;
 	} else {
 		int i = 0;
-		if ( mat[ 1 ][ 1 ] > mat[ 0 ][ 0 ] ) {
+		if ( mat[1][1] > mat[0][0] ) {
 			i = 1;
 		}
-		if ( mat[ 2 ][ 2 ] > mat[i][i] ) {
+		if ( mat[2][2] > mat[i][i] ) {
 			i = 2;
 		}
 
@@ -185,6 +239,12 @@ anQuats anMat3::ToQuat( void ) const {
 
 	return q;
 }
+void anMat3::toQuat( anVec3 src, anQuats dst ) {
+	dst.x = src.x;
+	dst.y = src.y;
+	dst.z = src.z;
+	dst.w = 0.0f;
+}
 
 /*
 ============
@@ -192,7 +252,7 @@ anMat3::ToCQuat
 ============
 */
 anCQuats anMat3::ToCQuat( void ) const {
-	anQuats q = ToQuat();
+	anCQuats q = ToQuat();
 	if ( q.w < 0.0f ) {
 		return anCQuats( -q.x, -q.y, -q.z );
 	}
@@ -212,24 +272,24 @@ anRotation anMat3::ToRotation( void ) const {
 	int     	i;
 	int			j;
 	int			k;
-	static int 	next[ 3 ] = { 1, 2, 0 };
+	static int 	next[3] = { 1, 2, 0 };
 
-	trace = mat[ 0 ][ 0 ] + mat[ 1 ][ 1 ] + mat[ 2 ][ 2 ];
+	trace = mat[0][0] + mat[1][1] + mat[2][2];
 	if ( trace > 0.0f ) {
 
 		t = trace + 1.0f;
 		s = anMath::InvSqrt( t ) * 0.5f;
 
 		r.angle = s * t;
-		r.vec[0] = ( mat[ 2 ][ 1 ] - mat[ 1 ][ 2 ] ) * s;
-		r.vec[1] = ( mat[ 0 ][ 2 ] - mat[ 2 ][ 0 ] ) * s;
-		r.vec[2] = ( mat[ 1 ][ 0 ] - mat[ 0 ][ 1 ] ) * s;
+		r.vec[0] = ( mat[2][1] - mat[1][2] ) * s;
+		r.vec[1] = ( mat[0][2] - mat[2][0] ) * s;
+		r.vec[2] = ( mat[1][0] - mat[0][1] ) * s;
 	} else {
 		i = 0;
-		if ( mat[ 1 ][ 1 ] > mat[ 0 ][ 0 ] ) {
+		if ( mat[1][1] > mat[0][0] ) {
 			i = 1;
 		}
-		if ( mat[ 2 ][ 2 ] > mat[i][i] ) {
+		if ( mat[2][2] > mat[i][i] ) {
 			i = 2;
 		}
 		j = next[i];
@@ -566,7 +626,7 @@ anMat3::ToString
 =============
 */
 const char *anMat3::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 //===============================================================
@@ -1000,7 +1060,7 @@ anMat4::ToString
 =============
 */
 const char *anMat4::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 
@@ -1693,7 +1753,7 @@ anMat5::ToString
 =============
 */
 const char *anMat5::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 
@@ -2882,7 +2942,7 @@ anMat6::ToString
 =============
 */
 const char *anMat6::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 
@@ -3394,7 +3454,7 @@ anMatX::ToString
 =============
 */
 const char *anMatX::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
@@ -3580,8 +3640,8 @@ bool anMatX::Inverse_GaussJordan( void ) {
 
 	assert( numRows == numColumns );
 
-	int *columnIndex = ( int*) _alloca16( numRows * sizeof( int ) );
-	int *rowIndex = ( int*) _alloca16( numRows * sizeof( int ) );
+	int *columnIndex = (int *) _alloca16( numRows * sizeof( int ) );
+	int *rowIndex = (int *) _alloca16( numRows * sizeof( int ) );
 	bool *pivot = (bool *) _alloca16( numRows * sizeof( bool ) );
 
 	memset( pivot, 0, numRows * sizeof( bool ) );
@@ -7097,7 +7157,7 @@ float anMatX::DeterminantGeneric( void ) const {
 	float det;
 	anMatX tmp;
 
-	index = ( int*) _alloca16( numRows * sizeof( int ) );
+	index = (int *) _alloca16( numRows * sizeof( int ) );
 	tmp.SetData( numRows, numColumns, MATX_ALLOCA( numRows * numColumns ) );
 	tmp = *this;
 
@@ -7118,7 +7178,7 @@ bool anMatX::InverseSelfGeneric( void ) {
 	anMatX tmp;
 	anVecX x, b;
 
-	index = ( int*) _alloca16( numRows * sizeof( int ) );
+	index = (int *) _alloca16( numRows * sizeof( int ) );
 	tmp.SetData( numRows, numColumns, MATX_ALLOCA( numRows * numColumns ) );
 	tmp = *this;
 
@@ -7156,8 +7216,8 @@ void anMatX::Test( void ) {
 	original.Random( size, size, 0 );
 	original = original * original.Transpose();
 
-	index1 = ( int*) _alloca16( ( size + 1 ) * sizeof( index1[0] ) );
-	index2 = ( int*) _alloca16( ( size + 1 ) * sizeof( index2[0] ) );
+	index1 = (int *) _alloca16( ( size + 1 ) * sizeof( index1[0] ) );
+	index2 = (int *) _alloca16( ( size + 1 ) * sizeof( index2[0] ) );
 
 	/*
 		anMatX::LowerTriangularInverse

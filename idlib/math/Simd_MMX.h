@@ -4,12 +4,12 @@
 /*
 ===============================================================================
 
-	MMX implementation of arcSIMDProcessor
+	MMX implementation of anSIMDProcessor
 
 ===============================================================================
 */
 
-class arcSIMD_MMX : public arcSIMD_Generic {
+class anSIMD_MMX : public anSIMD_Generic {
 public:
 #if defined(MACOS_X) && defined(__i386__)
 	virtual const char *VPCALL GetName( void ) const;

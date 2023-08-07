@@ -1,6 +1,6 @@
 #include "Lib.h"
 #pragma hdrstop
-
+#include "Lexer.h"
 #define PUNCTABLE
 
 //longer punctuations first
@@ -79,7 +79,7 @@ punctuation_t default_punctuations[] = {
 };
 
 int default_punctuationtable[256];
-int default_nextpunctuation[sizeof( default_punctuations ) / sizeof(punctuation_t)];
+int default_nextpunctuation[sizeof( default_punctuations ) / sizeof( punctuation_t )];
 int default_setup;
 
 char anLexer::baseFolder[ 256 ];
@@ -90,7 +90,7 @@ anLexer::CreatePunctuationTable
 ================
 */
 void anLexer::CreatePunctuationTable( const punctuation_t *punctuations ) {
-	int i, n, lastp;
+	int lastp;
 	const punctuation_t *p, *newp;
 
 	//get memory for the table
@@ -101,26 +101,26 @@ void anLexer::CreatePunctuationTable( const punctuation_t *punctuations ) {
 			return;
 		}
 		default_setup = true;
-		i = sizeof(default_punctuations) / sizeof(punctuation_t);
+		int i = sizeof( default_punctuations)  / sizeof( punctuation_t );
 	} else {
 		if ( !anLexer::punctuationtable || anLexer::punctuationtable == default_punctuationtable ) {
-			anLexer::punctuationtable = ( int*) Mem_Alloc(256 * sizeof( int) );
+			anLexer::punctuationtable = (int *) Mem_Alloc(256 * sizeof( int) );
 		}
 		if ( anLexer::nextpunctuation && anLexer::nextpunctuation != default_nextpunctuation ) {
 			Mem_Free( anLexer::nextpunctuation );
 		}
-		for ( i = 0; punctuations[i].p; i++ ) {
+		for ( int i = 0; punctuations[i].p; i++ ) {
 		}
-		anLexer::nextpunctuation = ( int*) Mem_Alloc( i * sizeof( int) );
+		anLexer::nextpunctuation = (int *) Mem_Alloc( i * sizeof( int) );
 	}
 	memset( anLexer::punctuationtable, 0xFF, 256 * sizeof( int) );
 	memset( anLexer::nextpunctuation, 0xFF, i * sizeof( int) );
 	//add the punctuations in the list to the punctuation table
-	for ( i = 0; punctuations[i].p; i++ ) {
+	for ( int i = 0; punctuations[i].p; i++ ) {
 		newp = &punctuations[i];
 		lastp = -1;
 		//sort the punctuations in this table entry on length (longer punctuations first)
-		for ( n = anLexer::punctuationtable[(unsigned int) newp->p[0]]; n >= 0; n = anLexer::nextpunctuation[n] ) {
+		for ( int n = anLexer::punctuationtable[(unsigned int) newp->p[0]]; n >= 0; n = anLexer::nextpunctuation[n] ) {
 			p = &punctuations[n];
 			if ( strlen( p->p ) < strlen(newp->p ) ) {
 				anLexer::nextpunctuation[i] = n;
@@ -135,10 +135,9 @@ void anLexer::CreatePunctuationTable( const punctuation_t *punctuations ) {
 		}
 		if ( n < 0 ) {
 			anLexer::nextpunctuation[i] = -1;
-			if (lastp >= 0 ) {
+			if ( lastp >= 0 ) {
 				anLexer::nextpunctuation[lastp] = i;
-			}
-			else {
+			} else {
 				anLexer::punctuationtable[( unsigned int ) newp->p[0]] = i;
 			}
 		}
@@ -151,9 +150,7 @@ anLexer::GetPunctuationFromId
 ================
 */
 const char *anLexer::GetPunctuationFromId( int id ) {
-	int i;
-
-	for ( i = 0; anLexer::punctuations[i].p; i++ ) {
+	for ( int i = 0; anLexer::punctuations[i].p; i++ ) {
 		if ( anLexer::punctuations[i].n == id ) {
 			return anLexer::punctuations[i].p;
 		}
@@ -167,9 +164,7 @@ anLexer::GetPunctuationId
 ================
 */
 int anLexer::GetPunctuationId( const char *p ) {
-	int i;
-
-	for ( i = 0; anLexer::punctuations[i].p; i++ ) {
+	for ( int i = 0; anLexer::punctuations[i].p; i++ ) {
 		if ( !strcmp( anLexer::punctuations[i].p, p ) ) {
 			return anLexer::punctuations[i].n;
 		}
@@ -320,7 +315,7 @@ anLexer::ReadEscapeCharacter
 ================
 */
 int anLexer::ReadEscapeCharacter( char *ch ) {
-	int c, val, i;
+	int c, val;
 
 	// step over the leading '\\'
 	anLexer::script_p++;
@@ -339,21 +334,21 @@ int anLexer::ReadEscapeCharacter( char *ch ) {
 		case '\?': c = '\?'; break;
 		case 'x': {
 			anLexer::script_p++;
-			for ( i = 0, val = 0;; i++, anLexer::script_p++ ) {
+			for ( int i = 0, val = 0;; i++, anLexer::script_p++ ) {
 				c = *anLexer::script_p;
-				if (c >= '0' && c <= '9' ) {
+				if ( c >= '0' && c <= '9' ) {
 					c = c - '0';
-				} else if (c >= 'A' && c <= 'Z' ) {
+				} else if ( c >= 'A' && c <= 'Z' ) {
 					c = c - 'A' + 10;
-				} else if (c >= 'a' && c <= 'z' ) {
+				} else if ( c >= 'a' && c <= 'z' ) {
 					c = c - 'a' + 10;
 				} else {
 					break;
 			}
-				val = (val << 4) + c;
+				val = ( val << 4 ) + c;
 			}
 			anLexer::script_p--;
-			if (val > 0xFF) {
+			if ( val > 0xFF ) {
 				anLexer::Warning( "too large value in escape character" );
 				val = 0xFF;
 			}
@@ -364,16 +359,16 @@ int anLexer::ReadEscapeCharacter( char *ch ) {
 			if ( *anLexer::script_p < '0' || *anLexer::script_p > '9' ) {
 				anLexer::Error( "unknown escape char" );
 			}
-			for ( i = 0, val = 0;; i++, anLexer::script_p++ ) {
+			for ( int i = 0, val = 0;; i++, anLexer::script_p++ ) {
 				c = *anLexer::script_p;
-				if (c >= '0' && c <= '9' )
+				if ( c >= '0' && c <= '9' )
 					c = c - '0';
 				else
 					break;
 				val = val * 10 + c;
 			}
 			anLexer::script_p--;
-			if (val > 0xFF) {
+			if ( val > 0xFF ) {
 				anLexer::Warning( "[WARNING]too large value in escape character" );
 				val = 0xFF;
 			}
@@ -423,8 +418,7 @@ int anLexer::ReadString( anToken *token, int quote ) {
 			// step over the quote
 			anLexer::script_p++;
 			// if consecutive strings should not be concatenated
-			if ( ( anLexer::flags & LEXFL_NOSTRINGCONCAT) &&
-					( !( anLexer::flags & LEXFL_ALLOWBACKSLASHSTRINGCONCAT) || (quote != '\"' ) ) ) {
+			if ( ( anLexer::flags & LEXFL_NOSTRINGCONCAT) && ( !( anLexer::flags & LEXFL_ALLOWBACKSLASHSTRINGCONCAT) || (quote != '\"' ) ) ) {
 				break;
 			}
 
@@ -499,16 +493,12 @@ int anLexer::ReadName( anToken *token ) {
 	do {
 		token->AppendDirty( *anLexer::script_p++ );
 		c = *anLexer::script_p;
-	} while ( ( c >= 'a' && c <= 'z' ) ||
-				( c >= 'A' && c <= 'Z' ) ||
-				( c >= '0' && c <= '9' ) ||
-				c == '_' ||
-				// if treating all tokens as strings, don't parse '-' as a seperate token
-				( ( anLexer::flags & LEXFL_ONLYSTRINGS) && (c == '-' ) ) ||
+		// if treating all tokens as strings, don't parse '-' as a seperate token.
+	} while ( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) || c == '_' ||
 				// if special path name characters are allowed
-				( ( anLexer::flags & LEXFL_ALLOWPATHNAMES) && (c == '/' || c == '\\' || c == ':' || c == '.' ) ) );
+				( ( anLexer::flags & LEXFL_ONLYSTRINGS ) && ( c == '-' ) ) || ( ( anLexer::flags & LEXFL_ALLOWPATHNAMES ) && ( c == '/' || c == '\\' || c == ':' || c == '.' ) ) );
 	token->data[token->len] = '\0';
-	//the sub type is the length of the name
+	// the sub type is the length of the name
 	token->subtype = token->Length();
 	return 1;
 }
@@ -518,7 +508,7 @@ int anLexer::ReadName( anToken *token ) {
 anLexer::CheckString
 ================
 */
-ARC_INLINE int anLexer::CheckString( const char *str ) const {
+inline int anLexer::CheckString( const char *str ) const {
 	for ( int i = 0; str[i]; i++ ) {
 		if ( anLexer::script_p[i] != str[i] ) {
 			return false;
@@ -551,7 +541,7 @@ int anLexer::ReadNumber( anToken *token ) {
 			token->AppendDirty( *anLexer::script_p++ );
 			token->AppendDirty( *anLexer::script_p++ );
 			c = *anLexer::script_p;
-			while ((c >= '0' && c <= '9' ) || (c >= 'a' && c <= 'f' ) || (c >= 'A' && c <= 'F' ) ) {
+			while (( c >= '0' && c <= '9' ) || ( c >= 'a' && c <= 'f' ) || ( c >= 'A' && c <= 'F' ) ) {
 				token->AppendDirty( c );
 				c = *( ++anLexer::script_p );
 			}
@@ -636,7 +626,7 @@ int anLexer::ReadNumber( anToken *token ) {
 					token->AppendDirty( c );
 					c = *( ++anLexer::script_p );
 				}
-				if ( !( anLexer::flags & LEXFL_ALLOWFLOATEXCEPTIONS) ) {
+				if ( !( anLexer::flags & LEXFL_ALLOWFLOATEXCEPTIONS ) ) {
 					token->AppendDirty( 0 );	// zero terminate for c_str
 					anLexer::Error( "parsed %s", token->c_str() );
 				}
@@ -709,35 +699,26 @@ anLexer::ReadPunctuation
 ================
 */
 int anLexer::ReadPunctuation( anToken *token ) {
-	int l, n, i;
-	char *p;
-	const punctuation_t *punc;
-
 #ifdef PUNCTABLE
-	for (n = anLexer::punctuationtable[(unsigned int)*( anLexer::script_p )]; n >= 0; n = anLexer::nextpunctuation[n] )
-	{
-		punc = &( anLexer::punctuations[n] );
+	for ( int n = anLexer::punctuationtable[( unsigned int )*( anLexer::script_p )]; n >= 0; n = anLexer::nextpunctuation[n] ) {
+		const punctuation_t *punc = &( anLexer::punctuations[n] );
 #else
-	int i;
-
-	for ( i = 0; anLexer::punctuations[i].p; i++ ) {
-		punc = &anLexer::punctuations[i];
+	for ( int i = 0; anLexer::punctuations[i].p; i++ ) 
+		const punctuation_t *punc = &anLexer::punctuations[i];
 #endif
-		p = punc->p;
+		char *p; = punc->p;
 		// check for this punctuation in the script
-		for ( l = 0; p[l] && anLexer::script_p[l]; l++ ) {
+		for ( int l = 0; p[l] && anLexer::script_p[l]; l++ ) {
 			if ( anLexer::script_p[l] != p[l] ) {
 				break;
 			}
 		}
 		if ( !p[l] ) {
-			//
 			token->EnsureAlloced( l+1, false );
-			for ( i = 0; i <= l; i++ ) {
+			for ( int i = 0; i <= l; i++ ) {
 				token->data[i] = p[i];
 			}
 			token->len = l;
-			//
 			anLexer::script_p += l;
 			token->type = TT_PUNCTUATION;
 			// sub type is the punctuation id
@@ -754,8 +735,6 @@ anLexer::ReadToken
 ================
 */
 int anLexer::ReadToken( anToken *token ) {
-	int c;
-
 	if ( !loaded ) {
 		anLibrary::common->Error( "anBinaryLexer::ReadToken: no file loaded" );
 		return 0;
@@ -791,7 +770,7 @@ int anLexer::ReadToken( anToken *token ) {
 	// clear token flags
 	token->flags = 0;
 
-	c = *anLexer::script_p;
+	int c = *anLexer::script_p;
 
 	// if we're keeping everything as whitespace deliminated strings
 	if ( anLexer::flags & LEXFL_ONLYSTRINGS ) {
@@ -803,17 +782,16 @@ int anLexer::ReadToken( anToken *token ) {
 		} else if ( !anLexer::ReadName( token ) ) {
 			return 0;
 		}
-	}
 	// if there is a number
-	else if ( (c >= '0' && c <= '9' ) ||
-			(c == '.' && ( *( anLexer::script_p + 1 ) >= '0' && *( anLexer::script_p + 1 ) <= '9' ) ) ) {
+	} else if ( ( c >= '0' && c <= '9' ) ||
+			( c == '.' && ( *( anLexer::script_p + 1 ) >= '0' && *( anLexer::script_p + 1 ) <= '9' ) ) ) {
 		if ( !anLexer::ReadNumber( token ) ) {
 			return 0;
 		}
 		// if names are allowed to start with a number
 		if ( anLexer::flags & LEXFL_ALLOWNUMBERNAMES ) {
 			c = *anLexer::script_p;
-			if ( (c >= 'a' && c <= 'z' ) ||	(c >= 'A' && c <= 'Z' ) || c == '_' ) {
+			if ( ( c >= 'a' && c <= 'z' ) ||	( c >= 'A' && c <= 'Z' ) || c == '_' ) {
 				if ( !anLexer::ReadName( token ) ) {
 					return 0;
 				}
@@ -825,12 +803,12 @@ int anLexer::ReadToken( anToken *token ) {
 			return 0;
 		}
 		// if there is a name
-	} else if ( (c >= 'a' && c <= 'z' ) ||	(c >= 'A' && c <= 'Z' ) || c == '_' ) {
+	} else if ( ( c >= 'a' && c <= 'z' ) ||	( c >= 'A' && c <= 'Z' ) || c == '_' ) {
 		if ( !anLexer::ReadName( token ) ) {
 			return 0;
 		}
 	// names may also start with a slash when pathnames are allowed
-	} else if ( ( anLexer::flags & LEXFL_ALLOWPATHNAMES ) && ( (c == '/' || c == '\\' ) || c == '.' ) ) {
+	} else if ( ( anLexer::flags & LEXFL_ALLOWPATHNAMES ) && ( ( c == '/' || c == '\\' ) || c == '.' ) ) {
 		if ( !anLexer::ReadName( token ) ) {
 			return 0;
 		}
@@ -868,7 +846,7 @@ anLexer::ExpectTokenType
 ================
 */
 int anLexer::ExpectTokenType( int type, int subtype, anToken *token ) {
-	anString str;
+	anStr str;
 
 	if ( !anLexer::ReadToken( token ) ) {
 		anLexer::Error( "[ERROR] couldn't read expected token" );
@@ -902,8 +880,7 @@ int anLexer::ExpectTokenType( int type, int subtype, anToken *token ) {
 			anLexer::Error( "[WARNING] expected %s but found '%s'", str.c_str(), token->c_str() );
 			return 0;
 		}
-	}
-	else if ( token->type == TT_PUNCTUATION ) {
+	} else if ( token->type == TT_PUNCTUATION ) {
 		if ( subtype < 0 ) {
 			anLexer::Error( "[ERROR] wrong punctuation subtype" );
 			return 0;
@@ -963,7 +940,7 @@ int anLexer::CheckTokenType( int type, int subtype, anToken *token ) {
 		return 0;
 	}
 	// if the type matches
-	if (tok.type == type && (tok.subtype & subtype) == subtype) {
+	if ( tok.type == type && ( tok.subtype & subtype ) == subtype ) {
 		*token = tok;
 		return 1;
 	}
@@ -1125,7 +1102,7 @@ int anLexer::ReadTokenOnLine( anToken *token ) {
 anLexer::ReadRestOfLine
 ================
 */
-const char*	anLexer::ReadRestOfLine( anString& out) {
+const char*	anLexer::ReadRestOfLine( anStr &out ) {
 	while ( 1 ) {
 		if ( *anLexer::script_p == '\n' ) {
 			anLexer::line++;
@@ -1294,11 +1271,7 @@ Maintains exact characters between braces.
   FIXME: this should use ReadToken and replace the token white space with correct indents and newlines
 =================
 */
-const char *anLexer::ParseBracedSectionExact( anString &out, int tabs ) {
-	int		depth;
-	bool	doTabs;
-	bool	skipWhite;
-
+const char *anLexer::ParseBracedSectionExact( anStr &out, int tabs ) {
 	out.Empty();
 
 	if ( !anLexer::ExpectTokenString( "{" ) ) {
@@ -1306,9 +1279,9 @@ const char *anLexer::ParseBracedSectionExact( anString &out, int tabs ) {
 	}
 
 	out = "{";
-	depth = 1;
-	skipWhite = false;
-	doTabs = tabs >= 0;
+	int depth = 1;
+	bool skipWhite = false;
+	bool doTabs = tabs >= 0;
 
 	while ( depth && *anLexer::script_p ) {
 		char c = *( anLexer::script_p++ );
@@ -1361,16 +1334,15 @@ Parses until a matching close brace is found.
 Internal brace depths are properly skipped.
 =================
 */
-const char *anLexer::ParseBracedSection( anString &out ) {
+const char *anLexer::ParseBracedSection( anStr &out ) {
 	anToken token;
-	int depth;
 
 	out.Empty();
 	if ( !anLexer::ExpectTokenString( "{" ) ) {
 		return out.c_str();
 	}
 	out = "{";
-	depth = 1;
+	int depth = 1;
 	do {
 		if ( !anLexer::ReadToken( &token ) ) {
 			Error( "[WARNING] missing closing brace" );
@@ -1408,7 +1380,7 @@ anLexer::ParseRestOfLine
   parse the rest of the line
 =================
 */
-const char *anLexer::ParseRestOfLine( anString &out ) {
+const char *anLexer::ParseRestOfLine( anStr &out ) {
 	anToken token;
 
 	out.Empty();
@@ -1431,7 +1403,7 @@ const char *anLexer::ParseRestOfLine( anString &out ) {
 anLexer::GetLastWhiteSpace
 ================
 */
-int anLexer::GetLastWhiteSpace( anString &whiteSpace ) const {
+int anLexer::GetLastWhiteSpace( anStr &whiteSpace ) const {
 	whiteSpace.Clear();
 	for ( const char *p = whiteSpaceStart_p; p < whiteSpaceEnd_p; p++ ) {
 		whiteSpace.Append( *p );
@@ -1505,7 +1477,7 @@ anLexer::LoadFile
 */
 int anLexer::LoadFile( const char *filename, bool OSPath ) {
 	anFile *fp;
-	anString pathname;
+	anStr pathname;
 	int length;
 	char *buf;
 
@@ -1698,7 +1670,7 @@ anLexer::SetBaseFolder
 ================
 */
 void anLexer::SetBaseFolder( const char *path ) {
-	anString::Copynz( baseFolder, path, sizeof( baseFolder ) );
+	anStr::Copynz( baseFolder, path, sizeof( baseFolder ) );
 }
 
 /*

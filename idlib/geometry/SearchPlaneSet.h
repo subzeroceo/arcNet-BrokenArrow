@@ -10,10 +10,10 @@
 ===============================================================================
 */
 
-class arcPlaneSet : public arcList<anPlane> {
+class arcPlaneSet : public anList<anPlane> {
 public:
 
-	void					Clear( void ) { arcList<anPlane>::Clear(); hash.Free(); }
+	void					Clear( void ) { anList<anPlane>::Clear(); hash.Free(); }
 
 	int						FindPlane( const anPlane &plane, const float normalEps, const float distEps );
 
@@ -21,7 +21,7 @@ private:
 	arcHashIndex				hash;
 };
 
-ARC_INLINE int arcPlaneSet::FindPlane( const anPlane &plane, const float normalEps, const float distEps ) {
+inline int arcPlaneSet::FindPlane( const anPlane &plane, const float normalEps, const float distEps ) {
 	assert( distEps <= 0.125f );
 	int hashKey = (int)( anMath::Fabs( plane.Dist() ) * 0.125f );
 	for ( int border = -1; border <= 1; border++ ) {

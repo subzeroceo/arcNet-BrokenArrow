@@ -118,7 +118,7 @@ private:
 	bool					onDemand;					// only load when played, and free when finished
 	int						speakerMask;
 	const anSoundShader *	altSound;
-	anString					desc;						// description
+	anStr					desc;						// description
 	bool					errorDuringParse;
 	float					leadinVolume;				// allows light breaking leadin sounds to be much louder than the broken loop
 
@@ -147,9 +147,9 @@ static const int SCHANNEL_ONE = 1;	// any following integer can be used as a cha
 typedef int s_channelType;	// the game uses its own series of enums, and we don't want to require casts
 
 
-class ARCSoundEmitter {
+class anSoundEmitter {
 public:
-	virtual					~ARCSoundEmitter( void ) {}
+	virtual					~anSoundEmitter( void ) {}
 
 	// a non-immediate free will let all currently playing sounds complete
 	// soundEmitters are not actually deleted, they are just marked as
@@ -194,19 +194,19 @@ option existing simultaniously with a live game.
 ===============================================================================
 */
 
-class ARCSoundWorld {
+class anSoundWorld {
 public:
-	virtual					~ARCSoundWorld( void ) {}
+	virtual					~anSoundWorld( void ) {}
 
 	// call at each map start
 	virtual void			ClearAllSoundEmitters( void ) = 0;
 	virtual void			StopAllSounds( void ) = 0;
 
 	// get a new emitter that can play sounds in this world
-	virtual ARCSoundEmitter *AllocSoundEmitter( void ) = 0;
+	virtual anSoundEmitter *AllocSoundEmitter( void ) = 0;
 
 	// for load games, index 0 will return nullptr
-	virtual ARCSoundEmitter *EmitterForIndex( int index ) = 0;
+	virtual anSoundEmitter *EmitterForIndex( int index ) = 0;
 
 	// query sound samples from all emitters reaching a given position
 	virtual	float			CurrentShakeAmplitudeForPosition( const int time, const anVec3 &listenerPosition ) = 0;
@@ -215,7 +215,7 @@ public:
 	// listenerId allows listener-private and antiPrivate sounds to be filtered
 	// gameTime is in msec, and is used to time sound queries and removals so that they are independent
 	// of any race conditions with the async update
-	virtual	void			PlaceListener( const anVec3 &origin, const anMat3 &axis, const int listenerId, const int gameTime, const anString& areaName ) = 0;
+	virtual	void			PlaceListener( const anVec3 &origin, const anMat3 &axis, const int listenerId, const int gameTime, const anStr& areaName ) = 0;
 
 	// fade all sounds in the world with a given shader soundClass
 	// to is in Db ( sigh), over is in seconds
@@ -267,8 +267,8 @@ public:
 */
 
 typedef struct {
-	anString					name;
-	anString					format;
+	anStr					name;
+	anStr					format;
 	int						numChannels;
 	int						numSamplesPerSecond;
 	int						num44kHzSamples;
@@ -317,14 +317,14 @@ public:
 	virtual int				GetSoundDecoderInfo( int index, soundDecoderInfo_t &decoderInfo ) = 0;
 
 	// if rw == nullptr, no portal occlusion or rendered debugging is available
-	virtual ARCSoundWorld *	AllocSoundWorld( anRenderWorld *rw ) = 0;
+	virtual anSoundWorld *	AllocSoundWorld( anRenderWorld *rw ) = 0;
 
 	// specifying nullptr will cause silence to be played
-	virtual void			SetPlayingSoundWorld( ARCSoundWorld *soundWorld ) = 0;
+	virtual void			SetPlayingSoundWorld( anSoundWorld *soundWorld ) = 0;
 
 	// some tools, like the sound dialog, may be used in both the game and the editor
 	// This can return nullptr, so check!
-	virtual ARCSoundWorld *	GetPlayingSoundWorld( void ) = 0;
+	virtual anSoundWorld *	GetPlayingSoundWorld( void ) = 0;
 
 	// Mark all soundSamples as currently unused,
 	// but don't free anything.

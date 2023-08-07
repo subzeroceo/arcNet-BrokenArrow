@@ -7,12 +7,12 @@
 	Single Instruction Multiple Data (SIMD)
 
 	For optimal use data should be aligned on a 16 byte boundary.
-	All arcSIMDProcessor routines are thread safe.
+	All anSIMDProcessor routines are thread safe.
 
 ===============================================================================
 */
 
-class arcSIMD {
+class anSIMD {
 public:
 	static void			Init( void );
 	static void			InitProcessor( const char *module, bool forceGeneric );
@@ -50,7 +50,7 @@ class anMatX;
 class anPlane;
 class anDrawVertex;
 class anJointQuat;
-class arcJointMat;
+class anJointMat;
 struct dominantTri_s;
 
 const int MIXBUFFER_SAMPLES = 4096;
@@ -65,9 +65,9 @@ typedef enum {
 } speakerLabel;
 
 
-class arcSIMDProcessor {
+class anSIMDProcessor {
 public:
-									arcSIMDProcessor( void ) { cpuid = CPUID_NONE; }
+									anSIMDProcessor( void ) { cpuid = CPUID_NONE; }
 
 	cpuid_t							cpuid;
 
@@ -143,11 +143,11 @@ public:
 
 	// rendering
 	virtual void VPCALL BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) = 0;
-	virtual void VPCALL ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) = 0;
-	virtual void VPCALL ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) = 0;
-	virtual void VPCALL TransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) = 0;
-	virtual void VPCALL UntransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) = 0;
-	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights ) = 0;
+	virtual void VPCALL ConvertJointQuatsToJointMats( anJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) = 0;
+	virtual void VPCALL ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const anJointMat *jointMats, const int numJoints ) = 0;
+	virtual void VPCALL TransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) = 0;
+	virtual void VPCALL UntransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) = 0;
+	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const anJointMat *joints, const anVec4 *weights, const int *index, const int numWeights ) = 0;
 	virtual void VPCALL TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) = 0;
 	virtual void VPCALL DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) = 0;
 	virtual void VPCALL OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) = 0;
@@ -171,6 +171,6 @@ public:
 };
 
 // pointer to SIMD processor
-extern arcSIMDProcessor *SIMDProcessor;
+extern anSIMDProcessor *SIMDProcessor;
 
 #endif

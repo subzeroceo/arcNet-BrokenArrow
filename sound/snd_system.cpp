@@ -1215,7 +1215,7 @@ int idSoundSystemLocal::GetSoundDecoderInfo( int index, soundDecoderInfo_t &deco
 idSoundSystemLocal::AllocSoundWorld
 ===================
 */
-ARCSoundWorld *idSoundSystemLocal::AllocSoundWorld( anRenderWorld *rw ) {
+anSoundWorld *idSoundSystemLocal::AllocSoundWorld( anRenderWorld *rw ) {
 	idSoundWorldLocal	*local = new idSoundWorldLocal;
 
 	local->Init( rw );
@@ -1257,7 +1257,7 @@ idSoundSystemLocal::SetPlayingSoundWorld
 specifying nullptr will cause silence to be played
 ===================
 */
-void idSoundSystemLocal::SetPlayingSoundWorld( ARCSoundWorld *soundWorld ) {
+void idSoundSystemLocal::SetPlayingSoundWorld( anSoundWorld *soundWorld ) {
 	currentSoundWorld = static_cast<idSoundWorldLocal *>( soundWorld);
 }
 
@@ -1266,7 +1266,7 @@ void idSoundSystemLocal::SetPlayingSoundWorld( ARCSoundWorld *soundWorld ) {
 idSoundSystemLocal::GetPlayingSoundWorld
 ===================
 */
-ARCSoundWorld *idSoundSystemLocal::GetPlayingSoundWorld( void ) {
+anSoundWorld *idSoundSystemLocal::GetPlayingSoundWorld( void ) {
 	return currentSoundWorld;
 }
 
@@ -1299,8 +1299,8 @@ void idSoundSystemLocal::EndLevelLoad( const char *mapstring ) {
 	}
 	soundCache->EndLevelLoad();
 
-	anString efxname( "efxs/" );
-	anString mapname( mapstring );
+	anStr efxname( "efxs/" );
+	anStr mapname( mapstring );
 
 	mapname.SetFileExtension( ".efx" );
 	mapname.StripPath();

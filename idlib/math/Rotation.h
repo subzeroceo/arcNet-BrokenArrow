@@ -67,113 +67,113 @@ private:
 };
 
 
-ARC_INLINE anRotation::anRotation( void ) {
+inline anRotation::anRotation( void ) {
 }
 
-ARC_INLINE anRotation::anRotation( const anVec3 &rotationOrigin, const anVec3 &rotationVec, const float rotationAngle ) {
+inline anRotation::anRotation( const anVec3 &rotationOrigin, const anVec3 &rotationVec, const float rotationAngle ) {
 	origin = rotationOrigin;
 	vec = rotationVec;
 	angle = rotationAngle;
 	axisValid = false;
 }
 
-ARC_INLINE void anRotation::Set( const anVec3 &rotationOrigin, const anVec3 &rotationVec, const float rotationAngle ) {
+inline void anRotation::Set( const anVec3 &rotationOrigin, const anVec3 &rotationVec, const float rotationAngle ) {
 	origin = rotationOrigin;
 	vec = rotationVec;
 	angle = rotationAngle;
 	axisValid = false;
 }
 
-ARC_INLINE void anRotation::SetOrigin( const anVec3 &rotationOrigin ) {
+inline void anRotation::SetOrigin( const anVec3 &rotationOrigin ) {
 	origin = rotationOrigin;
 }
 
-ARC_INLINE void anRotation::SetVec( const anVec3 &rotationVec ) {
+inline void anRotation::SetVec( const anVec3 &rotationVec ) {
 	vec = rotationVec;
 	axisValid = false;
 }
 
-ARC_INLINE void anRotation::SetVec( float x, float y, float z ) {
+inline void anRotation::SetVec( float x, float y, float z ) {
 	vec[0] = x;
 	vec[1] = y;
 	vec[2] = z;
 	axisValid = false;
 }
 
-ARC_INLINE void anRotation::SetAngle( const float rotationAngle ) {
+inline void anRotation::SetAngle( const float rotationAngle ) {
 	angle = rotationAngle;
 	axisValid = false;
 }
 
-ARC_INLINE void anRotation::Scale( const float s ) {
+inline void anRotation::Scale( const float s ) {
 	angle *= s;
 	axisValid = false;
 }
 
-ARC_INLINE void anRotation::ReCalculateMatrix( void ) {
+inline void anRotation::ReCalculateMatrix( void ) {
 	axisValid = false;
 	ToMat3();
 }
 
-ARC_INLINE const anVec3 &anRotation::GetOrigin( void ) const {
+inline const anVec3 &anRotation::GetOrigin( void ) const {
 	return origin;
 }
 
-ARC_INLINE const anVec3 &anRotation::GetVec( void ) const  {
+inline const anVec3 &anRotation::GetVec( void ) const  {
 	return vec;
 }
 
-ARC_INLINE float anRotation::GetAngle( void ) const  {
+inline float anRotation::GetAngle( void ) const  {
 	return angle;
 }
 
-ARC_INLINE anRotation anRotation::operator-() const {
+inline anRotation anRotation::operator-() const {
 	return anRotation( origin, vec, -angle );
 }
 
-ARC_INLINE anRotation anRotation::operator*( const float s ) const {
+inline anRotation anRotation::operator*( const float s ) const {
 	return anRotation( origin, vec, angle * s );
 }
 
-ARC_INLINE anRotation anRotation::operator/( const float s ) const {
+inline anRotation anRotation::operator/( const float s ) const {
 	assert( s != 0.0f );
 	return anRotation( origin, vec, angle / s );
 }
 
-ARC_INLINE anRotation &anRotation::operator*=( const float s ) {
+inline anRotation &anRotation::operator*=( const float s ) {
 	angle *= s;
 	axisValid = false;
 	return *this;
 }
 
-ARC_INLINE anRotation &anRotation::operator/=( const float s ) {
+inline anRotation &anRotation::operator/=( const float s ) {
 	assert( s != 0.0f );
 	angle /= s;
 	axisValid = false;
 	return *this;
 }
 
-ARC_INLINE anVec3 anRotation::operator*( const anVec3 &v ) const {
+inline anVec3 anRotation::operator*( const anVec3 &v ) const {
 	if ( !axisValid ) {
 		ToMat3();
 	}
 	return ( ( v - origin) * axis + origin);
 }
 
-ARC_INLINE anRotation operator*( const float s, const anRotation &r ) {
+inline anRotation operator*( const float s, const anRotation &r ) {
 	return r * s;
 }
 
-ARC_INLINE anVec3 operator*( const anVec3 &v, const anRotation &r ) {
+inline anVec3 operator*( const anVec3 &v, const anRotation &r ) {
 	return r * v;
 }
 
-ARC_INLINE anVec3 &operator*=( anVec3 &v, const anRotation &r ) {
+inline anVec3 &operator*=( anVec3 &v, const anRotation &r ) {
 	v = r * v;
 	return v;
 }
 
-ARC_INLINE void anRotation::RotatePoint( anVec3 &point ) const {
+inline void anRotation::RotatePoint( anVec3 &point ) const {
 	if ( !axisValid ) {
 		ToMat3();
 	}

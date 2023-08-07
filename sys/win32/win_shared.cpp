@@ -385,7 +385,7 @@ void Sym_Init( long addr ) {
 	// skip up to " Address" on a new line
 	while( *ptr != '\0' ) {
 		SkipWhiteSpace( &ptr );
-		if ( anString::Cmpn( ptr, "Address", 7 ) == 0 ) {
+		if ( anStr::Cmpn( ptr, "Address", 7 ) == 0 ) {
 			SkipRestOfLine( &ptr );
 			break;
 		}
@@ -467,7 +467,7 @@ void Sym_Shutdown( void ) {
 Sym_GetFuncInfo
 ==================
 */
-void Sym_GetFuncInfo( long addr, anString &module, anString &funcName ) {
+void Sym_GetFuncInfo( long addr, anStr &module, anStr &funcName ) {
 	MEMORY_BASIC_INFORMATION mbi;
 	module_t *m;
 	symbol_t *s;
@@ -512,7 +512,7 @@ void Sym_GetFuncInfo( long addr, anString &module, anString &funcName ) {
 
 DWORD lastAllocationBase = -1;
 HANDLE processHandle;
-anString lastModule;
+anStr lastModule;
 
 /*
 ==================
@@ -564,7 +564,7 @@ void Sym_Shutdown( void ) {
 Sym_GetFuncInfo
 ==================
 */
-void Sym_GetFuncInfo( long addr, anString &module, anString &funcName ) {
+void Sym_GetFuncInfo( long addr, anStr &module, anStr &funcName ) {
 	MEMORY_BASIC_INFORMATION mbi;
 
 	VirtualQuery( (void*)addr, &mbi, sizeof(mbi) );
@@ -633,7 +633,7 @@ void Sym_Shutdown( void ) {
 Sym_GetFuncInfo
 ==================
 */
-void Sym_GetFuncInfo( long addr, anString &module, anString &funcName ) {
+void Sym_GetFuncInfo( long addr, anStr &module, anStr &funcName ) {
 	module = "";
 	sprintf( funcName, "0x%08x", addr );
 }
@@ -725,7 +725,7 @@ Sys_GetCallStackStr
 const char *Sys_GetCallStackStr( const address_t *callStack, const int callStackSize ) {
 	static char string[MAX_STRING_CHARS*2];
 	int index, i;
-	anString module, funcName;
+	anStr module, funcName;
 
 	index = 0;
 	for ( i = callStackSize-1; i >= 0; i-- ) {

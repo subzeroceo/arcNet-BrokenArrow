@@ -338,9 +338,9 @@ bool anSEASSettings::FromParser( anLexer &src ) {
 anSEASSettings::FromFile
 ============
 */
-bool anSEASSettings::FromFile( const anString &fileName ) {
+bool anSEASSettings::FromFile( const anStr &fileName ) {
 	anLexer src( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT );
-	anString name = fileName;
+	anStr name = fileName;
 
 	common->Printf( "loading %s\n", name.c_str() );
 
@@ -505,11 +505,11 @@ bool anSEASSettings::ValidForBounds( const anBounds &bounds ) const {
 
 /*
 ============
-anSEASSettings::ValidEntity
+anSEASSettings::ValabEntity
 ============
 */
-bool anSEASSettings::ValidEntity( const char *classname ) const {
-	anString use_aas;
+bool anSEASSettings::ValabEntity( const char *classname ) const {
+	anStr use_aas;
 	anVec3 size;
 	anBounds bounds;
 
@@ -608,7 +608,7 @@ void anSEASFileLocal::Clear() {
 anSEASFileLocal::Write
 ================
 */
-bool anSEASFileLocal::Write( const anString &fileName, unsigned int mapFileCRC ) {
+bool anSEASFileLocal::Write( const anStr &fileName, unsigned int mapFileCRC ) {
   int num;
   anFile *aasFile;
   anReachability *reach;
@@ -1071,7 +1071,7 @@ void anSEASFileLocal::FinishAreas() {
 anSEASFileLocal::Load
 ================
 */
-bool anSEASFileLocal::Load( const anString &fileName, unsigned int mapFileCRC) {
+bool anSEASFileLocal::Load( const anStr &fileName, unsigned int mapFileCRC) {
   anLexer src(LEXFL_NOFATALERRORS | LEXFL_NOSTRINGESCAPECHARS |
 			LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWPATHNAMES);
   anToken token;

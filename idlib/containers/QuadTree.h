@@ -41,29 +41,29 @@ public:
 	class sdQuadNode {
 	public:
 								sdQuadNode( void ) {
-									parent = NULL;
+									parent = nullptr;
 									memset( children, 0, sizeof( children ) );
 									memset( neighbors, 0, sizeof( neighbors ) );
-									data = NULL;
+									data = nullptr;
 									bounds.Clear();
 								}
-								explicit sdQuadNode( const idBounds &bounds ) {
-									parent = NULL;
+								explicit sdQuadNode( const anBounds &bounds ) {
+									parent = nullptr;
 									memset( children, 0, sizeof( children ) );
 									memset( neighbors, 0, sizeof( neighbors ) );
-									data = NULL;
+									data = nullptr;
 									this->bounds = bounds;
 								}
-								explicit sdQuadNode( type *data, const idBounds &bounds ) {
-									assert( data != NULL );
-									parent = NULL;
+								explicit sdQuadNode( type *data, const anBounds &bounds ) {
+									assert( data != nullptr );
+									parent = nullptr;
 									memset( children, 0, sizeof( children ) );
 									memset( neighbors, 0, sizeof( neighbors ) );
 									this->data = data;
 									this->bounds = bounds;
 								}
 		virtual					~sdQuadNode( void ) {
-									assert( data == NULL );
+									assert( data == nullptr );
 								}
 
 		void					SetData( type *data ) {
@@ -84,7 +84,7 @@ public:
 									assert( index >= 0 && index < 4 );
 									neighbors[ index ] = &neighbor;
 								}
-		void					SetBounds( const idBounds &bounds ) {
+		void					SetBounds( const anBounds &bounds ) {
 									this->bounds = bounds;
 								}
 
@@ -99,7 +99,7 @@ public:
 									assert( index >= 0 && index < 4 );
 									return neighbors[ index ];
 								}
-		idBounds &				GetBounds( void ) {
+		anBounds &				GetBounds( void ) {
 									return bounds;
 								}
 
@@ -125,13 +125,13 @@ public:
 		sdQuadNode *	neighbors[4];
 		type *			data;
 
-		idBounds		bounds;
+		anBounds		bounds;
 
 		// keep track of the position in the tree
 		nodePosition_t	nodePosition;
 	};
 
-						explicit sdQuadTree( const idBounds &bounds, const int depth = 6 );
+						explicit sdQuadTree( const anBounds &bounds, const int depth = 6 );
 	virtual				~sdQuadTree( void );
 
 	void				BuildQuadTree( void );
@@ -143,13 +143,13 @@ public:
 	const sdQuadNode *	GetHeadNode( void ) const { return headNode; }
 	sdQuadNode *		GetHeadNode( void ) { return headNode; }
 
-	sdQuadNode *		FindNode( const idVec3 &point );
+	sdQuadNode *		FindNode( const anVec3 &point );
 
-	sdQuadNode *		GetNode( const idBounds &bounds );
+	sdQuadNode *		GetNode( const anBounds &bounds );
 	sdQuadNode *		GetNode( const nodePosition_t &nodePosition );
 	sdQuadNode **		GetNodes( const int nodeLevel, int &numNodes ) {
 							assert( nodeLevel >=0 && nodeLevel < depth );
-							numNodes = idMath::Pow( 2, nodeLevel * 2 );
+							numNodes = anMath::Pow( 2, nodeLevel * 2 );
 							return nodes[ nodeLevel ];
 						}
 
@@ -177,7 +177,7 @@ private:
 	void				FindNeighbors_r( const int nodeLevel );
 
 	void				FreeNode( sdQuadNode &node ) {
-							nodes[ node.GetNodePosition().level ][ ( node.GetNodePosition().y << ( node.GetNodePosition().level ) ) + node.GetNodePosition().x ] = NULL;
+							nodes[ node.GetNodePosition().level ][ ( node.GetNodePosition().y << ( node.GetNodePosition().level ) ) + node.GetNodePosition().x ] = nullptr;
 							delete &node;
 						}
 
@@ -186,8 +186,8 @@ private:
 	sdQuadNode ***		nodes;
 
 	int					depth;
-	idBounds			bounds;
-	idVec2				nodeScale;
+	anBounds			bounds;
+	anVec2				nodeScale;
 };
 
 /*
@@ -196,7 +196,7 @@ sdQuadTree<type>::sdQuadTree( const int depth )
 ================
 */
 template< class type >
-ARC_INLINE sdQuadTree<type>::sdQuadTree( const idBounds &bounds, const int depth ) {
+inline sdQuadTree<type>::sdQuadTree( const anBounds &bounds, const int depth ) {
 	assert( depth > 0 );
 
 	this->depth = depth;
@@ -205,13 +205,13 @@ ARC_INLINE sdQuadTree<type>::sdQuadTree( const idBounds &bounds, const int depth
 	// expand by 1 unit so everything fits completely in it
 	this->bounds.ExpandSelf( 1.f );
 
-	nodeScale.x = idMath::Pow( 2, depth - 1 ) / ( this->bounds[ 1 ].x - this->bounds[ 0 ].x );
-	nodeScale.y = idMath::Pow( 2, depth - 1 ) / ( this->bounds[ 1 ].y - this->bounds[ 0 ].y );
+	nodeScale.x = anMath::Pow( 2, depth - 1 ) / ( this->bounds[1].x - this->bounds[0].x );
+	nodeScale.y = anMath::Pow( 2, depth - 1 ) / ( this->bounds[1].y - this->bounds[0].y );
 
 	nodes = new sdQuadNode** [ depth ];
 
 	for ( int i = 0; i < depth; i++ ) {
-		int nCells = idMath::Pow( 2, i * 2 );
+		int nCells = anMath::Pow( 2, i * 2 );
 
 		nodes[i] = new sdQuadNode* [ nCells ];
 		memset( nodes[i], 0, nCells * sizeof( sdQuadNode* ) );
@@ -222,7 +222,7 @@ ARC_INLINE sdQuadTree<type>::sdQuadTree( const idBounds &bounds, const int depth
 	headNode->SetBounds( bounds );
 
 	// put in node array
-	nodes[ 0 ][ 0 ] = headNode;
+	nodes[0][0] = headNode;
 }
 
 /*
@@ -231,10 +231,10 @@ sdQuadTree<type>::~sdQuadTree
 ================
 */
 template< class type >
-ARC_INLINE sdQuadTree<type>::~sdQuadTree( void ) {
+inline sdQuadTree<type>::~sdQuadTree( void ) {
 	if ( nodes ) {
 		for ( int i = 0; i < depth; i++ ) {
-			int nCells = static_cast< int >( idMath::Pow( 2.f, i * 2.f ) );
+			int nCells = static_cast< int >( anMath::Pow( 2.f, i * 2.f ) );
 
 			for ( int j = 0; j < nCells; j++ ) {
 				if ( nodes[i][ j ] ) {
@@ -277,7 +277,7 @@ sdQuadTree<type>::GetUsedDepth
 ================
 */
 template< class type >
-ARC_INLINE const int sdQuadTree<type>::GetUsedDepth( void ) const {
+inline const int sdQuadTree<type>::GetUsedDepth( void ) const {
 	int		maxReachedDepth = 0;
 
 	GetUsedDepth_r( *headNode, 1, &maxReachedDepth );
@@ -291,7 +291,7 @@ sdQuadTree<type>::BuildQuadTree
 ================
 */
 template< class type >
-ARC_INLINE void sdQuadTree<type>::BuildQuadTree( void ) {
+inline void sdQuadTree<type>::BuildQuadTree( void ) {
 #if 1
 	FindChildren_r( *headNode, 1, 0, 0 );
 #else
@@ -306,7 +306,7 @@ sdQuadTree<type>::BuildQuadTree
 ================
 */
 template< class type >
-ARC_INLINE void sdQuadTree<type>::BuildQuadTree( typename sdQuadTree<type>::sdQuadNode &node ) {
+inline void sdQuadTree<type>::BuildQuadTree( typename sdQuadTree<type>::sdQuadNode &node ) {
 	// TODO
 }
 
@@ -316,16 +316,16 @@ sdQuadTree<type>::FindNode
 ================
 */
 template< class type >
-ARC_INLINE typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::FindNode( const idVec3 &point ) {
+inline typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::FindNode( const anVec3 &point ) {
 	int			nodeDepth, x, y;
 	sdQuadNode	*node;
 
 	if ( !bounds.ContainsPoint( point ) ) {
-		return NULL;
+		return nullptr;
 	}
 
-	x = (int)( ( point.x - bounds[ 0 ].x ) * nodeScale.x );
-	y = (int)( ( point.y - bounds[ 0 ].y ) * nodeScale.y );
+	x = (int)( ( point.x - bounds[0].x ) * nodeScale.x );
+	y = (int)( ( point.y - bounds[0].y ) * nodeScale.y );
 
 	for ( nodeDepth = depth - 1; nodeDepth >= 0; nodeDepth--, x >>= 1, y >>= 1 ) {
 		node = nodes[ nodeDepth ][ ( y << nodeDepth ) + x ];
@@ -336,20 +336,20 @@ ARC_INLINE typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::FindNode( c
 	}
 
 	// should never happen
-	return NULL;
+	return nullptr;
 }
 
 /*
 ================
-sdQuadTree<type>::GetNode( const idBounds & )
+sdQuadTree<type>::GetNode( const anBounds & )
 ================
 */
 template< class type >
-ARC_INLINE typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::GetNode( const idBounds &bounds ) {
-	int x = (int)( ( bounds[ 0 ].x - this->bounds[ 0 ].x ) * nodeScale.x );
-	int y = (int)( ( bounds[ 0 ].y - this->bounds[ 0 ].y ) * nodeScale.y );
-	int xR = x ^ (int)( ( bounds[ 1 ].x - this->bounds[ 0 ].x ) * nodeScale.x );
-	int yR = y ^ (int)( ( bounds[ 1 ].y - this->bounds[ 0 ].y ) * nodeScale.y );
+inline typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::GetNode( const anBounds &bounds ) {
+	int x = (int)( ( bounds[0].x - this->bounds[0].x ) * nodeScale.x );
+	int y = (int)( ( bounds[0].y - this->bounds[0].y ) * nodeScale.y );
+	int xR = x ^ (int)( ( bounds[1].x - this->bounds[0].x ) * nodeScale.x );
+	int yR = y ^ (int)( ( bounds[1].y - this->bounds[0].y ) * nodeScale.y );
 
 	int nodeDepth = depth;
 
@@ -381,7 +381,7 @@ sdQuadTree<type>::GetNode( const nodePosition_t &nodePosition  )
 ================
 */
 template< class type >
-ARC_INLINE typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::GetNode( const nodePosition_t &nodePosition ) {
+inline typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::GetNode( const nodePosition_t &nodePosition ) {
 	sdQuadNode** node = &nodes[ nodePosition.level ][ ( nodePosition.y << ( nodePosition.level ) ) + nodePosition.x ];
 
 	if ( *node ) {
@@ -434,19 +434,19 @@ sdQuadTree<type>::AllocNode
 ================
 */
 template< class type >
-ARC_INLINE typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::AllocNode( sdQuadNode **node, int nodeLevel, int x, int y ) {
-	int			levelDimensions = idMath::Pow( 2, nodeLevel );
-	idVec2		cellSize( ( headNode->GetBounds()[ 1 ].x - headNode->GetBounds()[ 0 ].x ) / levelDimensions,
-						  ( headNode->GetBounds()[ 1 ].y - headNode->GetBounds()[ 0 ].y ) / levelDimensions );
-	idBounds	nodeBounds;
-	idVec2		nodeMins, pCellsize;
+inline typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::AllocNode( sdQuadNode **node, int nodeLevel, int x, int y ) {
+	int			levelDimensions = anMath::Pow( 2, nodeLevel );
+	anVec2		cellSize( ( headNode->GetBounds()[1].x - headNode->GetBounds()[0].x ) / levelDimensions,
+						  ( headNode->GetBounds()[1].y - headNode->GetBounds()[0].y ) / levelDimensions );
+	anBounds	nodeBounds;
+	anVec2		nodeMins, pCellsize;
 	int			pX, pY, pNodeLevel;
 
 	// create the new node
 	nodeBounds.Clear();
-	nodeMins.Set( headNode->GetBounds()[ 0 ].x + x * cellSize.x, headNode->GetBounds()[ 0 ].y + y * cellSize.y );
-	nodeBounds.AddPoint( idVec3( nodeMins.x, nodeMins.y, 0.f ) );
-	nodeBounds.AddPoint( idVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
+	nodeMins.Set( headNode->GetBounds()[0].x + x * cellSize.x, headNode->GetBounds()[0].y + y * cellSize.y );
+	nodeBounds.AddPoint( anVec3( nodeMins.x, nodeMins.y, 0.f ) );
+	nodeBounds.AddPoint( anVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
 	*node = new sdQuadNode( nodeBounds );
 
 	(*node)->SetNodePosition( nodeLevel, x, y );
@@ -465,15 +465,15 @@ ARC_INLINE typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::AllocNode( 
 		parent = &nodes[ pNodeLevel ][ ( pY << ( pNodeLevel ) ) + pX ];
 
 		if ( !(*parent) ) {
-			levelDimensions = idMath::Pow( 2, pNodeLevel );
-			pCellsize.Set( ( headNode->GetBounds()[ 1 ].x - headNode->GetBounds()[ 0 ].x ) / levelDimensions,
-						   ( headNode->GetBounds()[ 1 ].y - headNode->GetBounds()[ 0 ].y ) / levelDimensions );
+			levelDimensions = anMath::Pow( 2, pNodeLevel );
+			pCellsize.Set( ( headNode->GetBounds()[1].x - headNode->GetBounds()[0].x ) / levelDimensions,
+						   ( headNode->GetBounds()[1].y - headNode->GetBounds()[0].y ) / levelDimensions );
 
 			// create the new node
 			nodeBounds.Clear();
-			nodeMins.Set( headNode->GetBounds()[ 0 ].x + pX * pCellsize.x, headNode->GetBounds()[ 0 ].y + pY * pCellsize.y );
-			nodeBounds.AddPoint( idVec3( nodeMins.x, nodeMins.y, 0.f ) );
-			nodeBounds.AddPoint( idVec3( nodeMins.x + pCellsize.x, nodeMins.y + pCellsize.y, 0.f ) );
+			nodeMins.Set( headNode->GetBounds()[0].x + pX * pCellsize.x, headNode->GetBounds()[0].y + pY * pCellsize.y );
+			nodeBounds.AddPoint( anVec3( nodeMins.x, nodeMins.y, 0.f ) );
+			nodeBounds.AddPoint( anVec3( nodeMins.x + pCellsize.x, nodeMins.y + pCellsize.y, 0.f ) );
 			*parent = new sdQuadNode( nodeBounds );
 
 			(*parent)->SetNodePosition( pNodeLevel, pX, pY );
@@ -497,9 +497,9 @@ ARC_INLINE typename sdQuadTree<type>::sdQuadNode * sdQuadTree<type>::AllocNode( 
 
 			// create the new node
 			nodeBounds.Clear();
-			nodeMins.Set( headNode->GetBounds()[ 0 ].x + x * cellSize.x, headNode->GetBounds()[ 0 ].y + y * cellSize.y );
-			nodeBounds.AddPoint( idVec3( nodeMins.x, nodeMins.y, 0.f ) );
-			nodeBounds.AddPoint( idVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
+			nodeMins.Set( headNode->GetBounds()[0].x + x * cellSize.x, headNode->GetBounds()[0].y + y * cellSize.y );
+			nodeBounds.AddPoint( anVec3( nodeMins.x, nodeMins.y, 0.f ) );
+			nodeBounds.AddPoint( anVec3( nodeMins.x + cellSize.x, nodeMins.y + cellSize.y, 0.f ) );
 			*sibling = new sdQuadNode( nodeBounds );
 			(*sibling)->SetParent( *((*node)->GetParent()) );
 			(*sibling)->SetNodePosition( nodeLevel, x, y );
@@ -517,7 +517,7 @@ sdQuadTree<type>::FindChildren_r
 template< class type >
 void sdQuadTree<type>::FindChildren_r( sdQuadNode &parent, const int nodeLevel ) {
 	int			x, y;
-	int			levelDimensions = idMath::Pow( 2, nodeLevel );
+	int			levelDimensions = anMath::Pow( 2, nodeLevel );
 	sdQuadNode*	child;
 
 	// find all nodes with this node as a parent
@@ -573,7 +573,7 @@ void sdQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
 	int			x, y;
 	int			nbX, nbY;
 	int			pX, pY, pNodeLevel;
-	int			levelDimensions = idMath::Pow( 2, nodeLevel );
+	int			levelDimensions = anMath::Pow( 2, nodeLevel );
 	sdQuadNode	*node, *neighbor;
 
 	for ( x = 0; x < levelDimensions; x++ ) {
@@ -585,7 +585,7 @@ void sdQuadTree<type>::FindNeighbors_r( const int nodeLevel ) {
 				continue;
 			}
 
-			// bottom neighbor (0)
+			// bottom neighbor ( 0 )
 			if ( y > 0 ) {
 				nbX = x;
 				nbY = y - 1;

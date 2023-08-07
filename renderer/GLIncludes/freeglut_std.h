@@ -302,17 +302,17 @@ FGAPI void    FGAPIENTRY qglutInit( int* pargc, char** argv );
 FGAPI void    FGAPIENTRY qglutInitWindowPosition( int x, int y );
 FGAPI void    FGAPIENTRY qglutInitWindowSize( int width, int height );
 FGAPI void    FGAPIENTRY qglutInitDisplayMode( unsigned int displayMode );
-FGAPI void    FGAPIENTRY qglutInitDisplayString( const char* displayMode );
+FGAPI void    FGAPIENTRY qglutInitDisplayString( const char *displayMode );
 
 FGAPI void    FGAPIENTRY qglutMainLoop( void );
 
-FGAPI int     FGAPIENTRY qglutCreateWindow( const char* title );
+FGAPI int     FGAPIENTRY qglutCreateWindow( const char *title );
 FGAPI int     FGAPIENTRY qglutCreateSubWindow( int window, int x, int y, int width, int height );
 FGAPI void    FGAPIENTRY qglutDestroyWindow( int window );
 FGAPI void    FGAPIENTRY qglutSetWindow( int window );
 FGAPI int     FGAPIENTRY qglutGetWindow( void );
-FGAPI void    FGAPIENTRY qglutSetWindowTitle( const char* title );
-FGAPI void    FGAPIENTRY qglutSetIconTitle( const char* title );
+FGAPI void    FGAPIENTRY qglutSetWindowTitle( const char *title );
+FGAPI void    FGAPIENTRY qglutSetIconTitle( const char *title );
 FGAPI void    FGAPIENTRY qglutReshapeWindow( int width, int height );
 FGAPI void    FGAPIENTRY qglutPositionWindow( int x, int y );
 FGAPI void    FGAPIENTRY qglutShowWindow( void );
@@ -342,10 +342,10 @@ FGAPI int     FGAPIENTRY qglutCreateMenu( void (* callback)( int menu ) );
 FGAPI void    FGAPIENTRY qglutDestroyMenu( int menu );
 FGAPI int     FGAPIENTRY qglutGetMenu( void );
 FGAPI void    FGAPIENTRY qglutSetMenu( int menu );
-FGAPI void    FGAPIENTRY qglutAddMenuEntry( const char* label, int value );
-FGAPI void    FGAPIENTRY qglutAddSubMenu( const char* label, int subMenu );
-FGAPI void    FGAPIENTRY qglutChangeToMenuEntry( int item, const char* label, int value );
-FGAPI void    FGAPIENTRY qglutChangeToSubMenu( int item, const char* label, int value );
+FGAPI void    FGAPIENTRY qglutAddMenuEntry( const char *label, int value );
+FGAPI void    FGAPIENTRY qglutAddSubMenu( const char *label, int subMenu );
+FGAPI void    FGAPIENTRY qglutChangeToMenuEntry( int item, const char *label, int value );
+FGAPI void    FGAPIENTRY qglutChangeToSubMenu( int item, const char *label, int value );
 FGAPI void    FGAPIENTRY qglutRemoveMenuItem( int item );
 FGAPI void    FGAPIENTRY qglutAttachMenu( int button );
 FGAPI void    FGAPIENTRY qglutDetachMenu( int button );
@@ -389,8 +389,8 @@ FGAPI int     FGAPIENTRY qglutBitmapWidth( void* font, int character );
 FGAPI void    FGAPIENTRY qglutStrokeCharacter( void* font, int character );
 FGAPI int     FGAPIENTRY qglutStrokeWidth( void* font, int character );
 FGAPI GLfloat FGAPIENTRY qglutStrokeWidthf( void* font, int character ); /* GLUT 3.8 */
-FGAPI int     FGAPIENTRY qglutBitmapLength( void* font, const unsigned char* string );
-FGAPI int     FGAPIENTRY qglutStrokeLength( void* font, const unsigned char* string );
+FGAPI int     FGAPIENTRY qglutBitmapLength( void* font, const unsigned char *string );
+FGAPI int     FGAPIENTRY qglutStrokeLength( void* font, const unsigned char *string );
 FGAPI GLfloat FGAPIENTRY qglutStrokeLengthf( void* font, const unsigned char *string ); /* GLUT 3.8 */
 
 
@@ -417,7 +417,7 @@ FGAPI void    FGAPIENTRY qglutSolidTeapot( double size );
 /*
  * Game mode functions, see fg_gamemode.c
  */
-FGAPI void    FGAPIENTRY qglutGameModeString( const char* string );
+FGAPI void    FGAPIENTRY qglutGameModeString( const char *string );
 FGAPI int     FGAPIENTRY qglutEnterGameMode( void );
 FGAPI void    FGAPIENTRY qglutLeaveGameMode( void );
 FGAPI int     FGAPIENTRY qglutGameModeGet( GLenum query );
@@ -437,7 +437,7 @@ FGAPI void    FGAPIENTRY qglutIgnoreKeyRepeat( int ignore );
 FGAPI void    FGAPIENTRY qglutSetKeyRepeat( int repeatMode );
 FGAPI void    FGAPIENTRY qglutForceJoystickFunc( void );
 
-FGAPI int     FGAPIENTRY qglutExtensionSupported( const char* extension );
+FGAPI int     FGAPIENTRY qglutExtensionSupported( const char *extension );
 FGAPI void    FGAPIENTRY qglutReportErrors( void );
 
 /* Comment from glut.h of classic GLUT:

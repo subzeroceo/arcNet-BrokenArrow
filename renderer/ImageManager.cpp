@@ -53,7 +53,7 @@ void anImageManager::ChangeTextureFilter( void ) {
 
 	const char *string; = image_filter.GetString();
 	for ( int i = 0; i < 6; i++ ) {
-		if ( !anString::Icmp( textureFilters[i].name, string ) ) {
+		if ( !anStr::Icmp( textureFilters[i].name, string ) ) {
 			break;
 		}
 	}
@@ -221,7 +221,7 @@ void R_ReloadImages_f( const anCommandArgs &args ) {
 	bool all = false;
 
 	if ( args.Argc() == 2 ) {
-		if ( !anString::Icmp( args.Argv( 1 ), "all" ) ) {
+		if ( !anStr::Icmp( args.Argv( 1 ), "all" ) ) {
 			all = true;
 		} else {
 			common->Printf( "USAGE: reloadImages <all>\n" );
@@ -255,7 +255,7 @@ static int R_QSortImageSizes( const void *a, const void *b ) {
 	if ( ea->size < eb->size ) {
 		return 1;
 	}
-	return anString::Icmp( ea->image->GetName(), eb->image->GetName() );
+	return anStr::Icmp( ea->image->GetName(), eb->image->GetName() );
 }
 
 /*
@@ -269,7 +269,7 @@ static int R_QsortImageName( const void* a, const void* b ) {
 	ea = ( sortedImage_t *)a;
 	eb = ( sortedImage_t *)b;
 
-	return anString::Icmp( ea->image->GetName(), eb->image->GetName() );
+	return anStr::Icmp( ea->image->GetName(), eb->image->GetName() );
 }
 
 /*
@@ -293,17 +293,17 @@ void R_ListImages_f( const anCommandArgs &args ) {
 	if ( args.Argc() == 1 ) {
 
 	} else if ( args.Argc() == 2 ) {
-		if ( anString::Icmp( args.Argv( 1 ), "uncompressed" ) == 0 ) {
+		if ( anStr::Icmp( args.Argv( 1 ), "uncompressed" ) == 0 ) {
 			uncompressedOnly = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "sorted" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "sorted" ) == 0 ) {
 			sorted = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "namesort" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "namesort" ) == 0 ) {
 			sortByName = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "unloaded" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "unloaded" ) == 0 ) {
 			unloaded = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "duplicated" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "duplicated" ) == 0 ) {
 			duplicated = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "oversized" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "oversized" ) == 0 ) {
 			sorted = true;
 			overSized = true;
 		} else {
@@ -340,7 +340,7 @@ void R_ListImages_f( const anCommandArgs &args ) {
 		if ( duplicated ) {
 			int j;
 			for ( j = i+1 ; j < globalImages->images.Num() ; j++ ) {
-				if ( anString::Icmp( image->GetName(), globalImages->images[ j ]->GetName() ) == 0 ) {
+				if ( anStr::Icmp( image->GetName(), globalImages->images[ j ]->GetName() ) == 0 ) {
 					break;
 				}
 			}
@@ -394,7 +394,7 @@ copies the name, and adds it to the hash chain.
 */
 anImage *anImageManager::AllocImage( const char *name ) {
 	anImage * image = new anImage( name );
-	int hash = anString( name ).FileNameHash();
+	int hash = anStr( name ).FileNameHash();
 	if ( !image ) {
 		common->Warning( "Failed to allocate memory for image %s\n", name )
 	}
@@ -435,16 +435,16 @@ GetImageWithParameters
 ==============
 */
 anImage	*anImageManager::GetImageWithParameters( const char *_name, textureFilter_t filter, textureRepeat_t repeat, textureUsage_t usage, cubeFiles_t cubeMap ) const {
-	if ( !_name || !_name[0] || anString::Icmp( _name, "default" ) == 0 || anString::Icmp( _name, "_default" ) == 0 ) {
+	if ( !_name || !_name[0] || anStr::Icmp( _name, "default" ) == 0 || anStr::Icmp( _name, "_default" ) == 0 ) {
 		declManager->MediaPrint( "DEFAULTED\n" );
 		return globalImages->defaultImage;
 	}
 
-	if ( anString::Icmpn( _name, "fonts", 5 ) == 0 || anString::Icmpn( _name, "newFonts", 8 ) == 0 ) {
+	if ( anStr::Icmpn( _name, "fonts", 5 ) == 0 || anStr::Icmpn( _name, "newFonts", 8 ) == 0 ) {
 		usage = TD_FONT;
 	}
 
-	if ( anString::Icmpn( _name, "lights", 6 ) == 0 ) {
+	if ( anStr::Icmpn( _name, "lights", 6 ) == 0 ) {
 		usage = TD_LIGHT;
 	}
 
@@ -495,13 +495,13 @@ Loading of the image may be deferred for dynamic loading.
 ==============
 */
 anImage *anImageManager::ImageFromFile( const char *_name, textureFilter_t filter, bool allowDownSize, textureRepeat_t repeat, textureDepth_t depth, cubeFiles_t cubeMap ) {
-	if ( !_name || !_name[0] || anString::Icmp( _name, "default" ) == 0 || anString::Icmp( _name, "_default" ) == 0 ) {
+	if ( !_name || !_name[0] || anStr::Icmp( _name, "default" ) == 0 || anStr::Icmp( _name, "_default" ) == 0 ) {
 		declManager->MediaPrint( "DEFAULTED\n" );
 		return globalImages->defaultImage;
 	}
 
 	// strip any .tga file extensions from anywhere in the _name, including image program parameters
-	anString name = _name;
+	anStr name = _name;
 	name.Replace( ".tga", "" );
 	name.BackSlashesToSlashes();
 
@@ -644,7 +644,7 @@ anImage *anImageManager::ImageFromFunction( const char *_name, void (*generatorF
 	}
 
 	// strip any .tga file extensions from anywhere in the _name
-	anString name = _name;
+	anStr name = _name;
 	name.Replace( ".tga", "" );
 	name.BackSlashesToSlashes();
 
@@ -683,13 +683,13 @@ anImageManager::GetImage
 ===============
 */
 anImage *anImageManager::GetImage( const char *_name ) const {
-	if ( !_name || !_name[0] || anString::Icmp( _name, "default" ) == 0 || anString::Icmp( _name, "_default" ) == 0 ) {
+	if ( !_name || !_name[0] || anStr::Icmp( _name, "default" ) == 0 || anStr::Icmp( _name, "_default" ) == 0 ) {
 		declManager->MediaPrint( "DEFAULTED\n" );
 		return globalImages->defaultImage;
 	}
 
 	// strip any .tga file extensions from anywhere in the _name, including image program parameters
-	anString name = _name;
+	anStr name = _name;
 	name.Replace( ".tga", "" );
 	name.BackSlashesToSlashes();
 
@@ -1163,12 +1163,12 @@ void anImageManager::FinishBuild( bool removeDups ) {
 	if ( removeDups ) {
 		ddsList.Clear();
 		if ( const char *buffer = nullptr; fileSystem->ReadFile( "makedds.bat", reinterpret_cast<void **>( &buffer ) ) ) {
-			anString str = buffer;
+			anStr str = buffer;
 			while ( str.Length() ) {
 				int n = str.Find( '\n' );
 				if ( n > 0 ) {
-					anString line = str.Left( n + 1 );
-					anString right;
+					anStr line = str.Left( n + 1 );
+					anStr right;
 					str.Right( str.Length() - n - 1, right );
 					str = right;
 					ddsList.AddUnique( line );
@@ -1226,13 +1226,13 @@ void anImageManager::PrintMemInfo( MemInfo_t *mi ) {
 		int size = im->StorageSize();
 		total += size;
 
-		f->Printf( "%s %3i %s\n", anString::FormatNumber( size ).c_str(), im->refCount, im->GetName() );
+		f->Printf( "%s %3i %s\n", anStr::FormatNumber( size ).c_str(), im->refCount, im->GetName() );
 	}
 
 	delete [] sortIndex;
 	mi->imageAssetsTotal = total;
 
-	f->Printf( "\nTotal image bytes allocated: %s\n", anString::FormatNumber( total ).c_str() );
+	f->Printf( "\nTotal image bytes allocated: %s\n", anStr::FormatNumber( total ).c_str() );
 	fileSystem->CloseFile( f );
 }
 

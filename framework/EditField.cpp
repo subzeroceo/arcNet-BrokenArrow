@@ -11,12 +11,12 @@ FindMatches
 static void FindMatches( const char *s ) {
 	int		i;
 
-	if ( anString::Icmpn( s, globalAutoComplete.completionString, strlen( globalAutoComplete.completionString ) ) != 0 ) {
+	if ( anStr::Icmpn( s, globalAutoComplete.completionString, strlen( globalAutoComplete.completionString ) ) != 0 ) {
 		return;
 	}
 	globalAutoComplete.matchCount++;
 	if ( globalAutoComplete.matchCount == 1 ) {
-		anString::Copynz( globalAutoComplete.currentMatch, s, sizeof( globalAutoComplete.currentMatch ) );
+		anStr::Copynz( globalAutoComplete.currentMatch, s, sizeof( globalAutoComplete.currentMatch ) );
 		return;
 	}
 
@@ -36,12 +36,12 @@ FindIndexMatch
 ===============
 */
 static void FindIndexMatch( const char *s ) {
-	if ( anString::Icmpn( s, globalAutoComplete.completionString, strlen( globalAutoComplete.completionString ) ) != 0 ) {
+	if ( anStr::Icmpn( s, globalAutoComplete.completionString, strlen( globalAutoComplete.completionString ) ) != 0 ) {
 		return;
 	}
 
 	if ( globalAutoComplete.findMatchIndex == globalAutoComplete.matchIndex ) {
-		anString::Copynz( globalAutoComplete.currentMatch, s, sizeof( globalAutoComplete.currentMatch ) );
+		anStr::Copynz( globalAutoComplete.currentMatch, s, sizeof( globalAutoComplete.currentMatch ) );
 	}
 
 	globalAutoComplete.findMatchIndex++;
@@ -53,7 +53,7 @@ PrintMatches
 ===============
 */
 static void PrintMatches( const char *s ) {
-	if ( anString::Icmpn( s, globalAutoComplete.currentMatch, strlen( globalAutoComplete.currentMatch ) ) == 0 ) {
+	if ( anStr::Icmpn( s, globalAutoComplete.currentMatch, strlen( globalAutoComplete.currentMatch ) ) == 0 ) {
 		common->Printf( "    %s\n", s );
 	}
 }
@@ -64,35 +64,35 @@ PrintCvarMatches
 ===============
 */
 static void PrintCvarMatches( const char *s ) {
-	if ( anString::Icmpn( s, globalAutoComplete.currentMatch, strlen( globalAutoComplete.currentMatch ) ) == 0 ) {
+	if ( anStr::Icmpn( s, globalAutoComplete.currentMatch, strlen( globalAutoComplete.currentMatch ) ) == 0 ) {
 		common->Printf( "    %s" S_COLOR_WHITE " = \"%s\"\n", s, cvarSystem->GetCVarString( s ) );
 	}
 }
 
 /*
 ===============
-arcEditField::arcEditField
+anEditField::anEditField
 ===============
 */
-arcEditField::arcEditField() {
+anEditField::anEditField() {
 	widthInChars = 0;
 	Clear();
 }
 
 /*
 ===============
-arcEditField::~arcEditField
+anEditField::~anEditField
 ===============
 */
-arcEditField::~arcEditField() {
+anEditField::~anEditField() {
 }
 
 /*
 ===============
-arcEditField::Clear
+anEditField::Clear
 ===============
 */
-void arcEditField::Clear() {
+void anEditField::Clear() {
 	buffer[0] = 0;
 	cursor = 0;
 	scroll = 0;
@@ -102,39 +102,39 @@ void arcEditField::Clear() {
 
 /*
 ===============
-arcEditField::SetWidthInChars
+anEditField::SetWidthInChars
 ===============
 */
-void arcEditField::SetWidthInChars( int w ) {
+void anEditField::SetWidthInChars( int w ) {
 	assert( w <= MAX_EDIT_LINE );
 	widthInChars = w;
 }
 
 /*
 ===============
-arcEditField::SetCursor
+anEditField::SetCursor
 ===============
 */
-void arcEditField::SetCursor( int c ) {
+void anEditField::SetCursor( int c ) {
 	assert( c <= MAX_EDIT_LINE );
 	cursor = c;
 }
 
 /*
 ===============
-arcEditField::GetCursor
+anEditField::GetCursor
 ===============
 */
-int arcEditField::GetCursor() const {
+int anEditField::GetCursor() const {
 	return cursor;
 }
 
 /*
 ===============
-arcEditField::ClearAutoComplete
+anEditField::ClearAutoComplete
 ===============
 */
-void arcEditField::ClearAutoComplete() {
+void anEditField::ClearAutoComplete() {
 	if ( autoComplete.length > 0 && autoComplete.length <= ( int ) strlen( buffer ) ) {
 		buffer[autoComplete.length] = '\0';
 		if ( cursor > autoComplete.length ) {
@@ -147,26 +147,26 @@ void arcEditField::ClearAutoComplete() {
 
 /*
 ===============
-arcEditField::GetAutoCompleteLength
+anEditField::GetAutoCompleteLength
 ===============
 */
-int arcEditField::GetAutoCompleteLength() const {
+int anEditField::GetAutoCompleteLength() const {
 	return autoComplete.length;
 }
 
 /*
 ===============
-arcEditField::AutoComplete
+anEditField::AutoComplete
 ===============
 */
-void arcEditField::AutoComplete() {
+void anEditField::AutoComplete() {
 	char completionArgString[MAX_EDIT_LINE];
 	anCommandArgs args;
 
 	if ( !autoComplete.valid ) {
 		args.TokenizeString( buffer, false );
-		anString::Copynz( autoComplete.completionString, args.Argv( 0 ), sizeof( autoComplete.completionString ) );
-		anString::Copynz( completionArgString, args.Args(), sizeof( completionArgString ) );
+		anStr::Copynz( autoComplete.completionString, args.Argv( 0 ), sizeof( autoComplete.completionString ) );
+		anStr::Copynz( completionArgString, args.Args(), sizeof( completionArgString ) );
 		autoComplete.matchCount = 0;
 		autoComplete.matchIndex = 0;
 		autoComplete.currentMatch[0] = 0;
@@ -189,8 +189,8 @@ void arcEditField::AutoComplete() {
 		// when there's only one match or there's an argument
 		if ( autoComplete.matchCount == 1 || completionArgString[0] != '\0' ) {
 			/// try completing arguments
-			anString::Append( autoComplete.completionString, sizeof( autoComplete.completionString ), " " );
-			anString::Append( autoComplete.completionString, sizeof( autoComplete.completionString ), completionArgString );
+			anStr::Append( autoComplete.completionString, sizeof( autoComplete.completionString ), " " );
+			anStr::Append( autoComplete.completionString, sizeof( autoComplete.completionString ), completionArgString );
 			autoComplete.matchCount = 0;
 
 			globalAutoComplete = autoComplete;
@@ -200,21 +200,21 @@ void arcEditField::AutoComplete() {
 
 			autoComplete = globalAutoComplete;
 
-			anString::snPrintf( buffer, sizeof( buffer ), "%s", autoComplete.currentMatch );
+			anStr::snPrintf( buffer, sizeof( buffer ), "%s", autoComplete.currentMatch );
 
 			if ( autoComplete.matchCount == 0 ) {
 				// no argument matches
-				anString::Append( buffer, sizeof( buffer ), " " );
-				anString::Append( buffer, sizeof( buffer ), completionArgString );
+				anStr::Append( buffer, sizeof( buffer ), " " );
+				anStr::Append( buffer, sizeof( buffer ), completionArgString );
 				SetCursor( strlen( buffer ) );
 				return;
 			}
 		} else {
 			// multiple matches, complete to shortest
-			anString::snPrintf( buffer, sizeof( buffer ), "%s", autoComplete.currentMatch );
+			anStr::snPrintf( buffer, sizeof( buffer ), "%s", autoComplete.currentMatch );
 			if ( strlen( completionArgString ) ) {
-				anString::Append( buffer, sizeof( buffer ), " " );
-				anString::Append( buffer, sizeof( buffer ), completionArgString );
+				anStr::Append( buffer, sizeof( buffer ), " " );
+				anStr::Append( buffer, sizeof( buffer ), completionArgString );
 			}
 		}
 
@@ -249,7 +249,7 @@ void arcEditField::AutoComplete() {
 		autoComplete = globalAutoComplete;
 
 		// and print it
-		anString::snPrintf( buffer, sizeof( buffer ), autoComplete.currentMatch );
+		anStr::snPrintf( buffer, sizeof( buffer ), autoComplete.currentMatch );
 		if ( autoComplete.length > ( int )strlen( buffer ) ) {
 			autoComplete.length = strlen( buffer );
 		}
@@ -259,10 +259,10 @@ void arcEditField::AutoComplete() {
 
 /*
 ===============
-arcEditField::CharEvent
+anEditField::CharEvent
 ===============
 */
-void arcEditField::CharEvent( int ch ) {
+void anEditField::CharEvent( int ch ) {
 	int		len;
 
 	if ( ch == 'v' - 'a' + 1 ) {	// ctrl-v is paste
@@ -334,10 +334,10 @@ void arcEditField::CharEvent( int ch ) {
 
 /*
 ===============
-arcEditField::KeyDownEvent
+anEditField::KeyDownEvent
 ===============
 */
-void arcEditField::KeyDownEvent( int key ) {
+void anEditField::KeyDownEvent( int key ) {
 	int		len;
 
 	// shift-insert is paste
@@ -448,10 +448,10 @@ void arcEditField::KeyDownEvent( int key ) {
 
 /*
 ===============
-arcEditField::Paste
+anEditField::Paste
 ===============
 */
-void arcEditField::Paste() {
+void anEditField::Paste() {
 	char	*cbd;
 	int		pasteLen, i;
 
@@ -472,30 +472,30 @@ void arcEditField::Paste() {
 
 /*
 ===============
-arcEditField::GetBuffer
+anEditField::GetBuffer
 ===============
 */
-char *arcEditField::GetBuffer() {
+char *anEditField::GetBuffer() {
 	return buffer;
 }
 
 /*
 ===============
-arcEditField::SetBuffer
+anEditField::SetBuffer
 ===============
 */
-void arcEditField::SetBuffer( const char *buf ) {
+void anEditField::SetBuffer( const char *buf ) {
 	Clear();
-	anString::Copynz( buffer, buf, sizeof( buffer ) );
+	anStr::Copynz( buffer, buf, sizeof( buffer ) );
 	SetCursor( strlen( buffer ) );
 }
 
 /*
 ===============
-arcEditField::Draw
+anEditField::Draw
 ===============
 */
-void arcEditField::Draw( int x, int y, int width, bool showCursor ) {
+void anEditField::Draw( int x, int y, int width, bool showCursor ) {
 	int		len;
 	int		drawLen;
 	int		prestep;
@@ -521,10 +521,10 @@ void arcEditField::Draw( int x, int y, int width, bool showCursor ) {
 		prestep = scroll;
 
 		// Skip color code
-		if ( anString::IsColor( buffer + prestep ) ) {
+		if ( anStr::IsColor( buffer + prestep ) ) {
 			prestep += 2;
 		}
-		if ( prestep > 0 && anString::IsColor( buffer + prestep - 1 ) ) {
+		if ( prestep > 0 && anStr::IsColor( buffer + prestep - 1 ) ) {
 			prestep++;
 		}
 	}
@@ -561,7 +561,7 @@ void arcEditField::Draw( int x, int y, int width, bool showCursor ) {
 
 	// Move the cursor back to account for color codes
 	for ( int i = 0; i<cursor; i++ ) {
-		if ( anString::IsColor( &str[i] ) ) {
+		if ( anStr::IsColor( &str[i] ) ) {
 			i++;
 			prestep += 2;
 		}

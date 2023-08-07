@@ -1,31 +1,4 @@
 /*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-/*
 ** WIN_GLIMP.C
 **
 ** This file contains ALL Win32 specific stuff having to do with the
@@ -50,7 +23,6 @@ If you have questions concerning this license or the applicable additional terms
 
 static void		GLW_InitExtensions( void );
 
-
 // WGL_ARB_extensions_string
 PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;
 
@@ -74,73 +46,107 @@ PFNWGLBINDTEXIMAGEARBPROC		wglBindTexImageARB;
 PFNWGLRELEASETEXIMAGEARBPROC	wglReleaseTexImageARB;
 PFNWGLSETPBUFFERATTRIBARBPROC	wglSetPbufferAttribARB;
 
+// WGL_ARB_create_context
+PFNWGLCREATECONTEXTATTRIBSARBPROC		wglCreateContextAttribsARB;
 
+// ARB_pixel_format
+#define WGL_NUMBER_PIXEL_FORMATS_ARB	   0x2000
+#define WGL_DRAW_TO_WINDOW_ARB			 0x2001
+#define WGL_DRAW_TO_BITMAP_ARB			 0x2002
+#define WGL_ACCELERATION_ARB			   0x2003
+#define WGL_NEED_PALETTE_ARB			   0x2004
+#define WGL_NEED_SYSTEM_PALETTE_ARB		0x2005
+#define WGL_SWAP_LAYER_BUFFERS_ARB		 0x2006
+#define WGL_SWAP_METHOD_ARB				0x2007
+#define WGL_NUMBER_OVERLAYS_ARB			0x2008
+#define WGL_NUMBER_UNDERLAYS_ARB		   0x2009
+#define WGL_TRANSPARENT_ARB				0x200A
+#define WGL_SHARE_DEPTH_ARB				0x200C
+#define WGL_SHARE_STENCIL_ARB			  0x200D
+#define WGL_SHARE_ACCUM_ARB				0x200E
+#define WGL_SUPPORT_GDI_ARB				0x200F
+#define WGL_SUPPORT_OPENGL_ARB			 0x2010
+#define WGL_DOUBLE_BUFFER_ARB			  0x2011
+#define WGL_STEREO_ARB					 0x2012
+#define WGL_PIXEL_TYPE_ARB				 0x2013
+#define WGL_COLOR_BITS_ARB				 0x2014
+#define WGL_RED_BITS_ARB				   0x2015
+#define WGL_RED_SHIFT_ARB				  0x2016
+#define WGL_GREEN_BITS_ARB				 0x2017
+#define WGL_GREEN_SHIFT_ARB				0x2018
+#define WGL_BLUE_BITS_ARB				  0x2019
+#define WGL_BLUE_SHIFT_ARB				 0x201A
+#define WGL_ALPHA_BITS_ARB				 0x201B
+#define WGL_ALPHA_SHIFT_ARB				0x201C
+#define WGL_ACCUM_BITS_ARB				 0x201D
+#define WGL_ACCUM_RED_BITS_ARB			 0x201E
+#define WGL_ACCUM_GREEN_BITS_ARB		   0x201F
+#define WGL_ACCUM_BLUE_BITS_ARB			0x2020
+#define WGL_ACCUM_ALPHA_BITS_ARB		   0x2021
+#define WGL_DEPTH_BITS_ARB				 0x2022
+#define WGL_STENCIL_BITS_ARB			   0x2023
+#define WGL_AUX_BUFFERS_ARB				0x2024
+#define WGL_NO_ACCELERATION_ARB			0x2025
+#define WGL_GENERIC_ACCELERATION_ARB	   0x2026
+#define WGL_FULL_ACCELERATION_ARB		  0x2027
+#define WGL_SWAP_EXCHANGE_ARB			  0x2028
+#define WGL_SWAP_COPY_ARB				  0x2029
+#define WGL_SWAP_UNDEFINED_ARB			 0x202A
+#define WGL_TYPE_RGBA_ARB				  0x202B
+#define WGL_TYPE_COLORINDEX_ARB			0x202C
+#define WGL_TRANSPARENT_RED_VALUE_ARB	  0x2037
+#define WGL_TRANSPARENT_GREEN_VALUE_ARB	0x2038
+#define WGL_TRANSPARENT_BLUE_VALUE_ARB	 0x2039
+#define WGL_TRANSPARENT_ALPHA_VALUE_ARB	0x203A
+#define WGL_TRANSPARENT_INDEX_VALUE_ARB	0x203B
 
-/* ARB_pixel_format */
-#define WGL_NUMBER_PIXEL_FORMATS_ARB       0x2000
-#define WGL_DRAW_TO_WINDOW_ARB             0x2001
-#define WGL_DRAW_TO_BITMAP_ARB             0x2002
-#define WGL_ACCELERATION_ARB               0x2003
-#define WGL_NEED_PALETTE_ARB               0x2004
-#define WGL_NEED_SYSTEM_PALETTE_ARB        0x2005
-#define WGL_SWAP_LAYER_BUFFERS_ARB         0x2006
-#define WGL_SWAP_METHOD_ARB                0x2007
-#define WGL_NUMBER_OVERLAYS_ARB            0x2008
-#define WGL_NUMBER_UNDERLAYS_ARB           0x2009
-#define WGL_TRANSPARENT_ARB                0x200A
-#define WGL_SHARE_DEPTH_ARB                0x200C
-#define WGL_SHARE_STENCIL_ARB              0x200D
-#define WGL_SHARE_ACCUM_ARB                0x200E
-#define WGL_SUPPORT_GDI_ARB                0x200F
-#define WGL_SUPPORT_OPENGL_ARB             0x2010
-#define WGL_DOUBLE_BUFFER_ARB              0x2011
-#define WGL_STEREO_ARB                     0x2012
-#define WGL_PIXEL_TYPE_ARB                 0x2013
-#define WGL_COLOR_BITS_ARB                 0x2014
-#define WGL_RED_BITS_ARB                   0x2015
-#define WGL_RED_SHIFT_ARB                  0x2016
-#define WGL_GREEN_BITS_ARB                 0x2017
-#define WGL_GREEN_SHIFT_ARB                0x2018
-#define WGL_BLUE_BITS_ARB                  0x2019
-#define WGL_BLUE_SHIFT_ARB                 0x201A
-#define WGL_ALPHA_BITS_ARB                 0x201B
-#define WGL_ALPHA_SHIFT_ARB                0x201C
-#define WGL_ACCUM_BITS_ARB                 0x201D
-#define WGL_ACCUM_RED_BITS_ARB             0x201E
-#define WGL_ACCUM_GREEN_BITS_ARB           0x201F
-#define WGL_ACCUM_BLUE_BITS_ARB            0x2020
-#define WGL_ACCUM_ALPHA_BITS_ARB           0x2021
-#define WGL_DEPTH_BITS_ARB                 0x2022
-#define WGL_STENCIL_BITS_ARB               0x2023
-#define WGL_AUX_BUFFERS_ARB                0x2024
-#define WGL_NO_ACCELERATION_ARB            0x2025
-#define WGL_GENERIC_ACCELERATION_ARB       0x2026
-#define WGL_FULL_ACCELERATION_ARB          0x2027
-#define WGL_SWAP_EXCHANGE_ARB              0x2028
-#define WGL_SWAP_COPY_ARB                  0x2029
-#define WGL_SWAP_UNDEFINED_ARB             0x202A
-#define WGL_TYPE_RGBA_ARB                  0x202B
-#define WGL_TYPE_COLORINDEX_ARB            0x202C
-#define WGL_TRANSPARENT_RED_VALUE_ARB      0x2037
-#define WGL_TRANSPARENT_GREEN_VALUE_ARB    0x2038
-#define WGL_TRANSPARENT_BLUE_VALUE_ARB     0x2039
-#define WGL_TRANSPARENT_ALPHA_VALUE_ARB    0x203A
-#define WGL_TRANSPARENT_INDEX_VALUE_ARB    0x203B
+// ARB_multisample
+#define WGL_SAMPLE_BUFFERS_ARB			 0x2041
+#define WGL_SAMPLES_ARB					0x2042
 
-/* ARB_multisample */
-#define WGL_SAMPLE_BUFFERS_ARB             0x2041
-#define WGL_SAMPLES_ARB                    0x2042
-
-
+anCVar r_useOpenGL32( "r_useOpenGL46", "1", CVAR_INTEGER, "0 = OpenGL 2.0, 1 = OpenGL 3.2 compatibility profile, 2 = OpenGL 3.2 core profile, 4 = Open GL 4", 0, 2 );
 
 //
 // function declaration
 //
 bool QGL_Init( const char *dllname );
-void     QGL_Shutdown( void );
+void	 QGL_Shutdown( void );
 
+/*
+========================
+GLimp_TestSwapBuffers
+========================
+*/
+void GLimp_TestSwapBuffers( const anCommandArgs &args ) {
+	anLib::Printf( "Initializing Test SMP\n" );
+	static const int MAX_FRAMES = 5;
+	unsigned int timestamps[MAX_FRAMES];
+	qglDisable( GL_SCISSOR_TEST );
 
+	int frameMilliseconds = 16;
+	for ( int swapInterval = 2 ; swapInterval >= -1 ; swapInterval-- ) {
+		wglSwapIntervalEXT( swapInterval );
+		for ( int i = 0 ; i < MAX_FRAMES ; i++ ) {
+			if ( swapInterval == -1 ) {
+				Sys_Sleep( frameMilliseconds );
+			}
+			if ( i & 1 ) {
+				qglClearColor( 0, 1, 0, 1 );
+			} else {
+				qglClearColor( 1, 0, 0, 1 );
+			}
+			qglClear( GL_COLOR_BUFFER_BIT );
+			qwglSwapBuffers( win32.hDC );
+			qglFinish();
+			timestamps[i] = Sys_Microseconds();
+		}
 
+		anLib::Printf( "\nswapinterval %i\n", swapInterval );
+		for ( int i = 1 ; i < MAX_FRAMES ; i++ ) {
+			anLib::Printf( "%i microseconds\n", (int)( timestamps[i] - timestamps[i-1] ) );
+		}
+	}
+}
 /*
 ========================
 GLimp_GetOldGammaRamp
@@ -177,7 +183,6 @@ static void GLimp_RestoreGamma( void ) {
 	ReleaseDC( GetDesktopWindow(), hDC );
 }
 
-
 /*
 ========================
 GLimp_SetGamma
@@ -187,13 +192,12 @@ The renderer calls this when the user adjusts r_gamma or r_brightness
 */
 void GLimp_SetGamma( unsigned short red[256], unsigned short green[256], unsigned short blue[256] ) {
 	unsigned short table[3][256];
-	int i;
 
 	if ( !win32.hDC ) {
 		return;
 	}
 
-	for ( i = 0; i < 256; i++ ) {
+	for ( int i = 0; i < 256; i++ ) {
 		table[0][i] = red[i];
 		table[1][i] = green[i];
 		table[2][i] = blue[i];
@@ -221,57 +225,36 @@ FakeWndProc
 Only used to get wglExtensions
 ====================
 */
-LONG WINAPI FakeWndProc (
-    HWND    hWnd,
-    UINT    uMsg,
-    WPARAM  wParam,
-    LPARAM  lParam) {
-
+LONG WINAPI FakeWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM  lParam) {
 	if ( uMsg == WM_DESTROY ) {
-        PostQuitMessage(0);
+		PostQuitMessage( 0 );
 	}
 
 	if ( uMsg != WM_CREATE ) {
-	    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		return DefWindowProc( hWnd, uMsg, wParam, lParam );
 	}
 
 	const static PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR),
-		1,
-		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-		PFD_TYPE_RGBA,
-		24,
-		0, 0, 0, 0, 0, 0,
-		8, 0,
-		0, 0, 0, 0,
-		24, 8,
-		0,
-		PFD_MAIN_PLANE,
-		0,
-		0,
-		0,
-		0,
+		sizeof( PIXELFORMATDESCRIPTOR ), 1, PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, PFD_TYPE_RGBA, 24, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 24, 8, 0, PFD_MAIN_PLANE, 0,0,0,0,
 	};
-	int		pixelFormat;
 	HDC hDC;
 	HGLRC hGLRC;
 
-    hDC = GetDC(hWnd);
+	hDC = GetDC( hWnd );
 
-    // Set up OpenGL
-    pixelFormat = ChoosePixelFormat(hDC, &pfd);
-    SetPixelFormat(hDC, pixelFormat, &pfd);
-    hGLRC = qwglCreateContext(hDC);
-    qwglMakeCurrent(hDC, hGLRC);
+	// Set up OpenGL
+	int pixelFormat = ChoosePixelFormat( hDC, &pfd );
+	SetPixelFormat( hDC, pixelFormat, &pfd );
+	hGLRC = qwglCreateContext( hDC );
+	qwglMakeCurrent( hDC, hGLRC);
 
 	// free things
-    wglMakeCurrent(nullptr, nullptr );
-    wglDeleteContext(hGLRC);
-    ReleaseDC(hWnd, hDC);
+	wglMakeCurrent( nullptr, nullptr );
+	wglDeleteContext( hGLRC );
+	ReleaseDC( hWnd, hDC );
 
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	return DefWindowProc( hWnd, uMsg, wParam, lParam );
 }
-
 
 /*
 ==================
@@ -279,14 +262,15 @@ GLW_GetWGLExtensionsWithFakeWindow
 ==================
 */
 void GLW_CheckWGLExtensions( HDC hDC ) {
-	wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC)
-							  GLimp_ExtensionPointer( "wglGetExtensionsStringARB" );
+	wglGetExtensionsStringARB = ( PFNWGLGETEXTENSIONSSTRINGARBPROC ) GLimp_ExtensionPointer( "wglGetExtensionsStringARB" );
 	if ( wglGetExtensionsStringARB ) {
-		glConfig.wgl_extensions_string = (const char *) wglGetExtensionsStringARB(hDC);
+		qglConfig.wgl_extensions_string = (const char *) wglGetExtensionsStringARB( hDC );
 	} else {
-		glConfig.wgl_extensions_string = "";
+		qglConfig.wgl_extensions_string = "";
 	}
 
+	// WGL_EXT_swap_control_tear
+	qglConfig.swapControlTearAvailable = R_CheckWinExtension( "WGL_EXT_swap_control_tear" );
 	// WGL_EXT_swap_control
 	wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC) GLimp_ExtensionPointer( "wglSwapIntervalEXT" );
 	r_swapInterval.SetModified();	// force a set next frame
@@ -307,6 +291,9 @@ void GLW_CheckWGLExtensions( HDC hDC ) {
 	wglBindTexImageARB = (PFNWGLBINDTEXIMAGEARBPROC)GLimp_ExtensionPointer( "wglBindTexImageARB" );
 	wglReleaseTexImageARB = (PFNWGLRELEASETEXIMAGEARBPROC)GLimp_ExtensionPointer( "wglReleaseTexImageARB" );
 	wglSetPbufferAttribARB = (PFNWGLSETPBUFFERATTRIBARBPROC)GLimp_ExtensionPointer( "wglSetPbufferAttribARB" );
+
+	// wglCreateContextAttribsARB
+	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress( "wglCreateContextAttribsARB" );
 }
 
 /*
@@ -316,32 +303,27 @@ GLW_GetWGLExtensionsWithFakeWindow
 */
 static void GLW_GetWGLExtensionsWithFakeWindow( void ) {
 	HWND	hWnd;
-    MSG		msg;
+	MSG		msg;
 
-    // Create a window for the sole purpose of getting
+	// Create a window for the sole purpose of getting
 	// a valid context to get the wglextensions
-    hWnd = CreateWindow(WIN32_FAKE_WINDOW_CLASS_NAME, GAME_NAME,
-        WS_OVERLAPPEDWINDOW,
-        40, 40,
-        640,
-        480,
-        nullptr, nullptr, win32.hInstance, nullptr );
-    if ( !hWnd ) {
-        common->FatalError( "GLW_GetWGLExtensionsWithFakeWindow: Couldn't create fake window" );
-    }
+	hWnd = CreateWindow( WIN32_FAKE_WINDOW_CLASS_NAME, GAME_NAME, WS_OVERLAPPEDWINDOW, 40, 40, 640, 480, nullptr, nullptr, win32.hInstance, nullptr );
+	if ( !hWnd ) {
+		common->FatalError( "GLW_GetWGLExtensionsWithFakeWindow: Couldn't create fake window" );
+	}
 
-    HDC hDC = GetDC( hWnd );
+	HDC hDC = GetDC( hWnd );
 	HGLRC gRC = wglCreateContext( hDC );
 	wglMakeCurrent( hDC, gRC );
 	GLW_CheckWGLExtensions( hDC );
 	wglDeleteContext( gRC );
 	ReleaseDC( hWnd, hDC );
 
-    DestroyWindow( hWnd );
-    while ( GetMessage( &msg, nullptr, 0, 0 ) ) {
-        TranslateMessage( &msg );
-        DispatchMessage( &msg );
-    }
+	DestroyWindow( hWnd );
+	while ( GetMessage( &msg, nullptr, 0, 0 ) ) {
+		TranslateMessage( &msg );
+		DispatchMessage( &msg );
+	}
 }
 
 //=============================================================================
@@ -354,8 +336,6 @@ GLW_WM_CREATE
 void GLW_WM_CREATE( HWND hWnd ) {
 }
 
-
-
 /*
 ====================
 GLW_InitDriver
@@ -365,9 +345,8 @@ shown, and create the rendering context
 ====================
 */
 static bool GLW_InitDriver( glimpParms_t parms ) {
-    PIXELFORMATDESCRIPTOR src =
-	{
-		sizeof(PIXELFORMATDESCRIPTOR),	// size of this pfd
+	PIXELFORMATDESCRIPTOR src = {
+		sizeof( PIXELFORMATDESCRIPTOR ),	// size of this pfd
 		1,								// version number
 		PFD_DRAW_TO_WINDOW |			// support window
 		PFD_SUPPORT_OPENGL |			// support OpenGL
@@ -385,7 +364,7 @@ static bool GLW_InitDriver( glimpParms_t parms ) {
 		PFD_MAIN_PLANE,					// main layer
 		0,								// reserved
 		0, 0, 0							// layer masks ignored
-    };
+	};
 
 	common->Printf( "Initializing OpenGL driver\n" );
 
@@ -393,8 +372,7 @@ static bool GLW_InitDriver( glimpParms_t parms ) {
 	// get a DC for our window if we don't already have one allocated
 	//
 	if ( win32.hDC == nullptr ) {
-		common->Printf( "...getting DC: " );
-
+		common->Printf( "...Retrieving Context: " );
 		if ( ( win32.hDC = GetDC( win32.hWnd ) ) == nullptr ) {
 			common->Printf( "^3failed^0\n" );
 			return false;
@@ -430,6 +408,9 @@ static bool GLW_InitDriver( glimpParms_t parms ) {
 		iAttributes[18] = 0;
 		iAttributes[19] = 0;
 
+	// the multisample path uses the wgl 
+	if ( wglChoosePixelFormatARB ) {
+		//win32.pixelformat = GLW_ChoosePixelFormat( win32.hDC, parms.multiSamples, parms.stereo );
 		wglChoosePixelFormatARB( win32.hDC, iAttributes, fAttributes, 1, &win32.pixelformat, &numFormats );
 	} else {
 		// this is the "classic" choose pixel format path
@@ -455,13 +436,13 @@ static bool GLW_InitDriver( glimpParms_t parms ) {
 
 	// get the full info
 	DescribePixelFormat( win32.hDC, win32.pixelformat, sizeof( win32.pfd ), &win32.pfd );
-	glConfig.colorBits = win32.pfd.cColorBits;
-	glConfig.depthBits = win32.pfd.cDepthBits;
-	glConfig.stencilBits = win32.pfd.cStencilBits;
+	qglConfig.colorBits = win32.pfd.cColorBits;
+	qglConfig.depthBits = win32.pfd.cDepthBits;
+	qglConfig.stencilBits = win32.pfd.cStencilBits;
 
 	// XP seems to set this incorrectly
-	if ( !glConfig.stencilBits ) {
-		glConfig.stencilBits = 8;
+	if ( !qglConfig.stencilBits ) {
+		qglConfig.stencilBits = 8;
 	}
 
 	// the same SetPixelFormat is used either way
@@ -474,7 +455,8 @@ static bool GLW_InitDriver( glimpParms_t parms ) {
 	// startup the OpenGL subsystem by creating a context and making it current
 	//
 	common->Printf( "...creating GL context: " );
-	if ( ( win32.hGLRC = qwglCreateContext( win32.hDC ) ) == 0 ) {
+	//win32.hGLRC = CreateOpenGLContextOnDC( win32.hDC, r_debugContext.GetBool() );
+	if ( win32.hGLRC == 0 ) {
 		common->Printf( "^3failed^0\n" );
 		return false;
 	}
@@ -509,13 +491,13 @@ static void GLW_CreateWindowClasses( void ) {
 
 	memset( &wc, 0, sizeof( wc ) );
 
-	wc.style         = 0;
+	wc.style		 = 0;
 	wc.lpfnWndProc   = (WNDPROC) MainWndProc;
-	wc.cbClsExtra    = 0;
-	wc.cbWndExtra    = 0;
-	wc.hInstance     = win32.hInstance;
-	wc.hIcon         = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
-	wc.hCursor       = LoadCursor (nullptr,IDC_ARROW);
+	wc.cbClsExtra	= 0;
+	wc.cbWndExtra	= 0;
+	wc.hInstance	 = win32.hInstance;
+	wc.hIcon		 = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	wc.hCursor	   = LoadCursor (nullptr,IDC_ARROW);
 	wc.hbrBackground = ( struct HBRUSH__ *)COLOR_GRAYTEXT;
 	wc.lpszMenuName  = 0;
 	wc.lpszClassName = WIN32_WINDOW_CLASS_NAME;
@@ -527,13 +509,13 @@ static void GLW_CreateWindowClasses( void ) {
 
 	// now register the fake window class that is only used
 	// to get wgl extensions
-	wc.style         = 0;
+	wc.style		 = 0;
 	wc.lpfnWndProc   = (WNDPROC) FakeWndProc;
-	wc.cbClsExtra    = 0;
-	wc.cbWndExtra    = 0;
-	wc.hInstance     = win32.hInstance;
-	wc.hIcon         = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
-	wc.hCursor       = LoadCursor (nullptr,IDC_ARROW);
+	wc.cbClsExtra	= 0;
+	wc.cbWndExtra	= 0;
+	wc.hInstance	 = win32.hInstance;
+	wc.hIcon		 = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	wc.hCursor	   = LoadCursor (nullptr,IDC_ARROW);
 	wc.hbrBackground = ( struct HBRUSH__ *)COLOR_GRAYTEXT;
 	wc.lpszMenuName  = 0;
 	wc.lpszClassName = WIN32_FAKE_WINDOW_CLASS_NAME;
@@ -605,16 +587,7 @@ static bool GLW_CreateWindow( glimpParms_t parms ) {
 		}
 	}
 
-	win32.hWnd = CreateWindowEx (
-		 exstyle,
-		 WIN32_WINDOW_CLASS_NAME,
-		 GAME_NAME,
-		 stylebits,
-		 x, y, w, h,
-		 nullptr,
-		 nullptr,
-		 win32.hInstance,
-		 nullptr );
+	win32.hWnd = CreateWindowEx ( exstyle, WIN32_WINDOW_CLASS_NAME, GAME_NAME, stylebits, x, y, w, h, nullptr, nullptr, win32.hInstance, nullptr );
 
 	if ( !win32.hWnd ) {
 		common->Printf( "^3GLW_CreateWindow() - Couldn't create window^0\n" );
@@ -637,12 +610,10 @@ static bool GLW_CreateWindow( glimpParms_t parms ) {
 	SetForegroundWindow( win32.hWnd );
 	SetFocus( win32.hWnd );
 
-	glConfig.isFullscreen = parms.fullScreen;
+	qglConfig.isFullscreen = parms.fullScreen;
 
 	return true;
 }
-
-
 
 static void PrintCDSError( int value ) {
 	switch ( value ) {
@@ -669,7 +640,6 @@ static void PrintCDSError( int value ) {
 		break;
 	}
 }
-
 
 /*
 ===================
@@ -724,7 +694,7 @@ static bool GLW_SetFullScreen( glimpParms_t parms ) {
 	dm.dmPelsWidth  = parms.width;
 	dm.dmPelsHeight = parms.height;
 	dm.dmBitsPerPel = 32;
-	dm.dmFields     = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
+	dm.dmFields	 = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
 
 	if ( parms.displayHz != 0 ) {
 		dm.dmDisplayFrequency = parms.displayHz;
@@ -773,8 +743,6 @@ static bool GLW_SetFullScreen( glimpParms_t parms ) {
 	return false;
 }
 
-
-
 /*
 ===================
 GLimp_Init
@@ -819,6 +787,31 @@ bool GLimp_Init( glimpParms_t parms ) {
 	// this will load the dll and set all our qgl* function pointers,
 	// but doesn't create a window
 
+	{
+		qwglCopyContext = wglCopyContext;
+		qwglCreateContext = wglCreateContext;
+		qwglCreateLayerContext = wglCreateLayerContext;
+		qwglDeleteContext = wglDeleteContext;
+		qwglDescribeLayerPlane = wglDescribeLayerPlane;
+		qwglGetCurrentContext = wglGetCurrentContext;
+		qwglGetCurrentDC = wglGetCurrentDC;
+		qwglGetLayerPaletteEntries = wglGetLayerPaletteEntries;
+		qwglGetProcAddress = wglGetProcAddress;
+		qwglMakeCurrent = wglMakeCurrent;
+		qwglRealizeLayerPalette = wglRealizeLayerPalette;
+		qwglSetLayerPaletteEntries = wglSetLayerPaletteEntries;
+		qwglShareLists = wglShareLists;
+		qwglSwapLayerBuffers = wglSwapLayerBuffers;
+		qwglUseFontBitmaps = wglUseFontBitmapsA;
+		qwglUseFontOutlines = wglUseFontOutlinesA;
+
+		qwglChoosePixelFormat = ChoosePixelFormat;
+		qwglDescribePixelFormat = DescribePixelFormat;
+		qwglGetPixelFormat = GetPixelFormat;
+		qwglSetPixelFormat = SetPixelFormat;
+		qwglSwapBuffers = SwapBuffers;
+	}
+
 	// r_glDriver is only intended for using instrumented OpenGL
 	// dlls.  Normal users should never have to use it, and it is
 	// not archived.
@@ -856,7 +849,6 @@ bool GLimp_Init( glimpParms_t parms ) {
 	return true;
 }
 
-
 /*
 ===================
 GLimp_SetScreenParms
@@ -872,14 +864,14 @@ bool GLimp_SetScreenParms( glimpParms_t parms ) {
 
 	memset( &dm, 0, sizeof( dm ) );
 	dm.dmSize = sizeof( dm );
-	dm.dmFields     = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
+	dm.dmFields	 = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
 	if ( parms.displayHz != 0 ) {
 		dm.dmDisplayFrequency = parms.displayHz;
 		dm.dmFields |= DM_DISPLAYFREQUENCY;
 	}
 
 	win32.cdsFullscreen = parms.fullScreen;
-	glConfig.isFullscreen = parms.fullScreen;
+	qglConfig.isFullscreen = parms.fullScreen;
 
 	if ( parms.fullScreen ) {
 		exstyle = WS_EX_TOPMOST;
@@ -997,7 +989,6 @@ void GLimp_Shutdown( void ) {
 	QGL_Shutdown();
 }
 
-
 /*
 =====================
 GLimp_SwapBuffers
@@ -1010,15 +1001,22 @@ void GLimp_SwapBuffers( void ) {
 	//
 	if ( r_swapInterval.IsModified() ) {
 		r_swapInterval.ClearModified();
-
 		if ( wglSwapIntervalEXT ) {
 			wglSwapIntervalEXT( r_swapInterval.GetInteger() );
 		}
 	}
 
-	qwglSwapBuffers( win32.hDC );
 
-//Sys_DebugPrintf( "*** SwapBuffers() ***\n" );
+#if defined( ARC_ALLOW_TOOLS )
+	if ( com_editors ) {
+		RadiantSwapBuffer();
+	} else {
+		qwglSwapBuffers( win32.hDC );
+	}
+#else
+	qwglSwapBuffers( win32.hDC );
+#endif
+	//Sys_DebugPrintf( "*** SwapBuffers() ***\n" );
 }
 
 /*
@@ -1034,7 +1032,6 @@ SMP acceleration
 /*
 ===================
 GLimp_ActivateContext
-
 ===================
 */
 void GLimp_ActivateContext( void ) {
@@ -1046,7 +1043,6 @@ void GLimp_ActivateContext( void ) {
 /*
 ===================
 GLimp_DeactivateContext
-
 ===================
 */
 void GLimp_DeactivateContext( void ) {
@@ -1060,13 +1056,11 @@ void GLimp_DeactivateContext( void ) {
 		win32.wglErrors++;
 	}
 #endif
-
 }
 
 /*
 ===================
 GLimp_RenderThreadWrapper
-
 ===================
 */
 static void GLimp_RenderThreadWrapper( void ) {
@@ -1099,13 +1093,7 @@ bool GLimp_SpawnRenderThread( void (*function)( void ) ) {
 
 	win32.glimpRenderThread = function;
 
-	win32.renderThreadHandle = CreateThread(
-	   nullptr,	// LPSECURITY_ATTRIBUTES lpsa,
-	   0,		// DWORD cbStack,
-	   (LPTHREAD_START_ROUTINE)GLimp_RenderThreadWrapper,	// LPTHREAD_START_ROUTINE lpStartAddr,
-	   0,			// LPVOID lpvThreadParm,
-	   0,			//   DWORD fdwCreate,
-	   &win32.renderThreadId );
+	win32.renderThreadHandle = CreateThread( nullptr, 0, ( LPTHREAD_START_ROUTINE )GLimp_RenderThreadWrapper, 0, 0, &win32.renderThreadId );
 
 	if ( !win32.renderThreadHandle ) {
 		common->Error( "GLimp_SpawnRenderThread: failed" );
@@ -1117,12 +1105,10 @@ bool GLimp_SpawnRenderThread( void (*function)( void ) ) {
 	SetThreadAffinityMask( GetCurrentThread, 1 );
 	SetThreadAffinityMask( win32.renderThreadHandle, 2 );
 #endif
-
 	return true;
 }
 
-
-//#define	DEBUG_PRINTS
+//#define DEBUG_PRINTS
 
 /*
 ===================
@@ -1152,7 +1138,7 @@ OutputDebugString( "-->GLimp_BackEndSleep\n" );
 	SetEvent( win32.renderActiveEvent );
 
 #ifdef DEBUG_PRINTS
-OutputDebugString( "<--GLimp_BackEndSleep\n" );
+OutputDebugString( "-----GLimp_BackEndSleep\n" );
 #endif
 	return data;
 }
@@ -1168,7 +1154,6 @@ void GLimp_FrontEndSleep( void ) {
 OutputDebugString( "-->GLimp_FrontEndSleep\n" );
 #endif
 	WaitForSingleObject( win32.renderCompletedEvent, INFINITE );
-
 #ifdef DEBUG_PRINTS
 OutputDebugString( "<--GLimp_FrontEndSleep\n" );
 #endif
@@ -1228,9 +1213,7 @@ Returns a function pointer for an OpenGL extension entry point
 ===================
 */
 GLExtension_t GLimp_ExtensionPointer( const char *name ) {
-	void	(*proc)(void);
-
-	proc = (GLExtension_t)qwglGetProcAddress( name );
+	void (*proc)( void ) proc = ( GLExtension_t )qwglGetProcAddress( name );
 
 	if ( !proc ) {
 		common->Printf( "Couldn't find proc address for: %s\n", name );
@@ -1238,4 +1221,3 @@ GLExtension_t GLimp_ExtensionPointer( const char *name ) {
 
 	return proc;
 }
-

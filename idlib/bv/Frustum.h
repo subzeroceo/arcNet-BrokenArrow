@@ -116,19 +116,19 @@ private:
 	bool			ClipLine( const anVec3 localPoints[8], const anVec3 points[8], int startIndex, int endIndex, anVec3 &start, anVec3 &end, int &startClip, int &endClip ) const;
 };
 
-ARC_INLINE anFrustum::anFrustum( void ) {
+inline anFrustum::anFrustum( void ) {
 	dNear = dFar = 0.0f;
 }
 
-ARC_INLINE void anFrustum::SetOrigin( const anVec3 &origin ) {
+inline void anFrustum::SetOrigin( const anVec3 &origin ) {
 	this->origin = origin;
 }
 
-ARC_INLINE void anFrustum::SetAxis( const anMat3 &axis ) {
+inline void anFrustum::SetAxis( const anMat3 &axis ) {
 	this->axis = axis;
 }
 
-ARC_INLINE void anFrustum::SetSize( float dNear, float dFar, float dLeft, float dUp ) {
+inline void anFrustum::SetSize( float dNear, float dFar, float dLeft, float dUp ) {
 	assert( dNear >= 0.0f && dFar > dNear && dLeft > 0.0f && dUp > 0.0f );
 	this->dNear = dNear;
 	this->dFar = dFar;
@@ -137,7 +137,7 @@ ARC_INLINE void anFrustum::SetSize( float dNear, float dFar, float dLeft, float 
 	this->invFar = 1.0f / dFar;
 }
 
-ARC_INLINE void anFrustum::SetPyramid( float dNear, float dFar ) {
+inline void anFrustum::SetPyramid( float dNear, float dFar ) {
 	assert( dNear >= 0.0f && dFar > dNear );
 	this->dNear = dNear;
 	this->dFar = dFar;
@@ -146,12 +146,12 @@ ARC_INLINE void anFrustum::SetPyramid( float dNear, float dFar ) {
 	this->invFar = 1.0f / dFar;
 }
 
-ARC_INLINE void anFrustum::MoveNearDistance( float dNear ) {
+inline void anFrustum::MoveNearDistance( float dNear ) {
 	assert( dNear >= 0.0f );
 	this->dNear = dNear;
 }
 
-ARC_INLINE void anFrustum::MoveFarDistance( float dFar ) {
+inline void anFrustum::MoveFarDistance( float dFar ) {
 	assert( dFar > this->dNear );
 	float scale = dFar / this->dFar;
 	this->dFar = dFar;
@@ -160,39 +160,39 @@ ARC_INLINE void anFrustum::MoveFarDistance( float dFar ) {
 	this->invFar = 1.0f / dFar;
 }
 
-ARC_INLINE const anVec3 &anFrustum::GetOrigin( void ) const {
+inline const anVec3 &anFrustum::GetOrigin( void ) const {
 	return origin;
 }
 
-ARC_INLINE const anMat3 &anFrustum::GetAxis( void ) const {
+inline const anMat3 &anFrustum::GetAxis( void ) const {
 	return axis;
 }
 
-ARC_INLINE anVec3 anFrustum::GetCenter( void ) const {
+inline anVec3 anFrustum::GetCenter( void ) const {
 	return ( origin + axis[0] * ( ( dFar - dNear ) * 0.5f ) );
 }
 
-ARC_INLINE bool anFrustum::IsValid( void ) const {
+inline bool anFrustum::IsValid( void ) const {
 	return ( dFar > dNear );
 }
 
-ARC_INLINE float anFrustum::GetNearDistance( void ) const {
+inline float anFrustum::GetNearDistance( void ) const {
 	return dNear;
 }
 
-ARC_INLINE float anFrustum::GetFarDistance( void ) const {
+inline float anFrustum::GetFarDistance( void ) const {
 	return dFar;
 }
 
-ARC_INLINE float anFrustum::GetLeft( void ) const {
+inline float anFrustum::GetLeft( void ) const {
 	return dLeft;
 }
 
-ARC_INLINE float anFrustum::GetUp( void ) const {
+inline float anFrustum::GetUp( void ) const {
 	return dUp;
 }
 
-ARC_INLINE anFrustum anFrustum::Expand( const float d ) const {
+inline anFrustum anFrustum::Expand( const float d ) const {
 	anFrustum f = *this;
 	f.origin -= d * f.axis[0];
 	f.dFar += 2.0f * d;
@@ -202,7 +202,7 @@ ARC_INLINE anFrustum anFrustum::Expand( const float d ) const {
 	return f;
 }
 
-ARC_INLINE anFrustum &anFrustum::ExpandSelf( const float d ) {
+inline anFrustum &anFrustum::ExpandSelf( const float d ) {
 	origin -= d * axis[0];
 	dFar += 2.0f * d;
 	dLeft = dFar * dLeft * invFar;
@@ -211,24 +211,24 @@ ARC_INLINE anFrustum &anFrustum::ExpandSelf( const float d ) {
 	return *this;
 }
 
-ARC_INLINE anFrustum anFrustum::Translate( const anVec3 &translation ) const {
+inline anFrustum anFrustum::Translate( const anVec3 &translation ) const {
 	anFrustum f = *this;
 	f.origin += translation;
 	return f;
 }
 
-ARC_INLINE anFrustum &anFrustum::TranslateSelf( const anVec3 &translation ) {
+inline anFrustum &anFrustum::TranslateSelf( const anVec3 &translation ) {
 	origin += translation;
 	return *this;
 }
 
-ARC_INLINE anFrustum anFrustum::Rotate( const anMat3 &rotation ) const {
+inline anFrustum anFrustum::Rotate( const anMat3 &rotation ) const {
 	anFrustum f = *this;
 	f.axis *= rotation;
 	return f;
 }
 
-ARC_INLINE anFrustum &anFrustum::RotateSelf( const anMat3 &rotation ) {
+inline anFrustum &anFrustum::RotateSelf( const anMat3 &rotation ) {
 	axis *= rotation;
 	return *this;
 }

@@ -1,31 +1,4 @@
 /*
-===========================================================================
-
-Doom 3 BFG Edition GPL Source Code
-Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 BFG Edition GPL Source Code ( "Doom 3 BFG Edition Source Code" ).
-
-Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 BFG Edition Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 BFG Edition Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 BFG Edition Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 BFG Edition Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-/*
 =============================================================================
 
   MODEL TESTING
@@ -54,7 +27,7 @@ move around it to view it from different angles.
 
 #include "../Game_local.h"
 
-CLASS_DECLARATION( arcAnimatedEntity, idTestModel )
+CLASS_DECLARATION( anAnimatedEntity, idTestModel )
 	EVENT( EV_FootstepLeft,			idTestModel::Event_Footstep )
 	EVENT( EV_FootstepRight,		idTestModel::Event_Footstep )
 END_CLASS
@@ -80,7 +53,7 @@ idTestModel::idTestModel() {
 idTestModel::Save
 ================
 */
-void idTestModel::Save( arcSaveGame *savefile ) {
+void idTestModel::Save( anSaveGame *savefile ) {
 }
 
 /*
@@ -88,7 +61,7 @@ void idTestModel::Save( arcSaveGame *savefile ) {
 idTestModel::Restore
 ================
 */
-void idTestModel::Restore( arcRestoreGame *savefile ) {
+void idTestModel::Restore( anRestoreGame *savefile ) {
 	// FIXME: one day we may actually want to save/restore test models, but for now we'll just delete them
 	delete this;
 }
@@ -103,7 +76,7 @@ void idTestModel::Spawn() {
 	anBounds			bounds;
 	const char			*headModel;
 	jointHandle_t		joint;
-	anString				jointName;
+	anStr				jointName;
 	anVec3				origin, modelOffset;
 	anMat3				axis;
 	const anKeyValue	*kv;
@@ -127,8 +100,8 @@ void idTestModel::Spawn() {
 		physicsObj.SetClipBox( bounds, 1.0f );
 		physicsObj.SetContents( 0 );
 	} else if ( spawnArgs.GetVector( "size", nullptr, size ) ) {
-		bounds[ 0 ].Set( size.x * -0.5f, size.y * -0.5f, 0.0f );
-		bounds[ 1 ].Set( size.x * 0.5f, size.y * 0.5f, size.z );
+		bounds[0].Set( size.x * -0.5f, size.y * -0.5f, 0.0f );
+		bounds[1].Set( size.x * 0.5f, size.y * 0.5f, size.z );
 		physicsObj.SetClipBox( bounds, 1.0f );
 		physicsObj.SetContents( 0 );
 	}
@@ -137,7 +110,7 @@ void idTestModel::Spawn() {
 
 	// add the head model if it has one
 	headModel = spawnArgs.GetString( "def_head", "" );
-	if ( headModel[ 0 ] ) {
+	if ( headModel[0] ) {
 		jointName = spawnArgs.GetString( "head_joint" );
 		joint = animator.GetJointHandle( jointName );
 		if ( joint == INVALID_JOINT ) {
@@ -151,7 +124,7 @@ void idTestModel::Spawn() {
 				sndKV = spawnArgs.MatchPrefix( "snd_", sndKV );
 			}
 
-			head = gameLocal.SpawnEntityType( arcAnimatedEntity::Type, &args );
+			head = gameLocal.SpawnEntityType( anAnimatedEntity::Type, &args );
 			animator.GetJointTransform( joint, gameLocal.time, origin, axis );
 			origin = GetPhysics()->GetOrigin() + ( origin + modelOffset ) * GetPhysics()->GetAxis();
 			head.GetEntity()->SetModel( headModel );
@@ -164,7 +137,6 @@ void idTestModel::Spawn() {
 			// set up the list of joints to copy to the head
 			for ( kv = spawnArgs.MatchPrefix( "copy_joint", nullptr ); kv != nullptr; kv = spawnArgs.MatchPrefix( "copy_joint", kv ) ) {
 				jointName = kv->GetKey();
-
 				if ( jointName.StripLeadingOnce( "copy_joint_world " ) ) {
 					copyJoint.mod = JOINTMOD_WORLD_OVERRIDE;
 				} else {
@@ -232,7 +204,7 @@ void idTestModel::Event_Footstep() {
 ================
 idTestModel::ShouldConstructScriptObjectAtSpawn
 
-Called during arcEntity::Spawn to see if it should construct the script object or not.
+Called during anEntity::Spawn to see if it should construct the script object or not.
 Overridden by subclasses that need to spawn the script object themselves.
 ================
 */
@@ -524,9 +496,9 @@ idTestModel::TestAnim
 ================
 */
 void idTestModel::TestAnim( const anCommandArgs &args ) {
-	anString			name;
+	anStr			name;
 	int				animNum;
-	const arcAnim	*newanim;
+	const anAnim	*newanim;
 
 	if ( args.Argc() < 2 ) {
 		gameLocal.Printf( "usage: testanim <animname>\n" );
@@ -637,8 +609,8 @@ Sets a skin on an existing testModel
 */
 void idTestModel::TestSkin_f( const anCommandArgs &args ) {
 	anVec3		offset;
-	anString		name;
-	arcNetBasePlayer *	player;
+	anStr		name;
+	anBasePlayer *	player;
 	anDict		dict;
 
 	player = gameLocal.GetLocalPlayer();
@@ -671,8 +643,8 @@ Sets a shaderParm on an existing testModel
 */
 void idTestModel::TestShaderParm_f( const anCommandArgs &args ) {
 	anVec3		offset;
-	anString		name;
-	arcNetBasePlayer *	player;
+	anStr		name;
+	anBasePlayer *	player;
 	anDict		dict;
 
 	player = gameLocal.GetLocalPlayer();
@@ -698,7 +670,7 @@ void idTestModel::TestShaderParm_f( const anCommandArgs &args ) {
 	}
 
 	float	value;
-	if ( !anString::Icmp( args.Argv( 2 ), "time" ) ) {
+	if ( !anStr::Icmp( args.Argv( 2 ), "time" ) ) {
 		value = gameLocal.time * -0.001;
 	} else {
 		value = atof( args.Argv( 2 ) );
@@ -717,8 +689,8 @@ can then be moved around
 */
 void idTestModel::TestModel_f( const anCommandArgs &args ) {
 	anVec3			offset;
-	anString			name;
-	arcNetBasePlayer *		player;
+	anStr			name;
+	anBasePlayer *		player;
 	const anDict *	entityDef;
 	anDict			dict;
 
@@ -748,7 +720,7 @@ void idTestModel::TestModel_f( const anCommandArgs &args ) {
 		} else {
 			// allow map models with underscore prefixes to be tested during development
 			// without appending an ase
-			if ( name[ 0 ] != '_' ) {
+			if ( name[0] != '_' ) {
 				name.DefaultFileExtension( ".ase" );
 			}
 			if ( !renderModelManager->CheckModel( name ) ) {
@@ -777,11 +749,11 @@ void idTestModel::ArgCompletion_TestModel( const anCommandArgs &args, void(*call
 
 	num = declManager->GetNumDecls( DECL_ENTITYDEF );
 	for ( i = 0; i < num; i++ ) {
-		callback( anString( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( DECL_ENTITYDEF, i , false )->GetName() );
+		callback( anStr( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( DECL_ENTITYDEF, i , false )->GetName() );
 	}
 	num = declManager->GetNumDecls( DECL_MODELDEF );
 	for ( i = 0; i < num; i++ ) {
-		callback( anString( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( DECL_MODELDEF, i , false )->GetName() );
+		callback( anStr( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( DECL_MODELDEF, i , false )->GetName() );
 	}
 	cmdSystem->ArgCompletion_FolderExtension( args, callback, "models/", false, ".lwo", ".ase", ".md5mesh", ".ma", ".mb", nullptr );
 }
@@ -823,7 +795,7 @@ idTestModel::ArgCompletion_TestAnim
 */
 void idTestModel::ArgCompletion_TestAnim( const anCommandArgs &args, void(*callback)( const char *s ) ) {
 	if ( gameLocal.testmodel ) {
-		arcAnimator *animator = gameLocal.testmodel->GetAnimator();
+		anAnimator *animator = gameLocal.testmodel->GetAnimator();
 		for ( int i = 0; i < animator->NumAnims(); i++ ) {
 			callback( va( "%s %s", args.Argv( 0 ), animator->AnimFullName( i ) ) );
 		}

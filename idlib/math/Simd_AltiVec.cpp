@@ -12,7 +12,7 @@
 
 //===============================================================
 //
-//	AltiVec implementation of arcSIMDProcessor
+//	AltiVec implementation of anSIMDProcessor
 //
 //===============================================================
 
@@ -226,10 +226,10 @@
 
 /*
 ============
-arcSIMD_AltiVec::GetName
+anSIMD_AltiVec::GetName
 ============
 */
-const char *arcSIMD_AltiVec::GetName( void ) const {
+const char *anSIMD_AltiVec::GetName( void ) const {
 	return "AltiVec";
 }
 
@@ -443,7 +443,7 @@ inline vector float VectorSin16( vector float v ) {
 */
 // splats an element across a vector using a runtime variable
 inline vector float vecSplatWithRunTime( vector float v, int i ) {
-		vector unsigned char rotate = vec_lvsl( i * sizeof( float ), ( int*) 0L );
+		vector unsigned char rotate = vec_lvsl( i * sizeof( float ), (int *) 0L );
 		v = vec_perm( v, v, rotate );
 		return vec_splat( v, 0 );
 }
@@ -576,12 +576,12 @@ inline void FastScalarInvSqrt_x6( float *arg1, float *arg2, float *arg3, float *
 
 /*
 ============
-arcSIMD_AltiVec::Add
+anSIMD_AltiVec::Add
 
   dst[i] = constant + src[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Add( float *dst, const float constant, const float *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Add( float *dst, const float constant, const float *src, const int count ) {
     vector float v0, v1, v2, v3;
 	vector float v0_low, v0_hi, v1_hi;
     vector unsigned char permVec;
@@ -597,7 +597,7 @@ void VPCALL arcSIMD_AltiVec::Add( float *dst, const float constant, const float 
     constVec = loadSplatUnalignedScalar( &constant );
 
 	//calculate permute and do first load
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src[i] ), (vector unsigned char)(1 ) );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src[i] ), (vector unsigned char)(1 ) );
 	v1_hi = vec_ld( 0, &src[i] );
 
     //vectorize!
@@ -625,12 +625,12 @@ void VPCALL arcSIMD_AltiVec::Add( float *dst, const float constant, const float 
 
 /*
 ============
-arcSIMD_AltiVec::Add
+anSIMD_AltiVec::Add
 
   dst[i] = src0[i] + src1[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Add( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_AltiVec::Add( float *dst, const float *src0, const float *src1, const int count ) {
 
     register vector float v0, v1, v2, v3, v4, v5;
     //src0
@@ -649,8 +649,8 @@ void VPCALL arcSIMD_AltiVec::Add( float *dst, const float *src0, const float *sr
     }
 
 	//calculate permute and do loads
-	permVec1 = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneCharVector );
-	permVec2 = vec_add( vec_lvsl( -1, ( int*) &src1[i] ), oneCharVector );
+	permVec1 = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneCharVector );
+	permVec2 = vec_add( vec_lvsl( -1, (int *) &src1[i] ), oneCharVector );
 	v2_hi = vec_ld( 0, &src0[i] );
 	v3_hi = vec_ld( 0, &src1[i] );
 
@@ -687,12 +687,12 @@ void VPCALL arcSIMD_AltiVec::Add( float *dst, const float *src0, const float *sr
 
 /*
 ============
-arcSIMD_AltiVec::Sub
+anSIMD_AltiVec::Sub
 
   dst[i] = constant - src[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Sub( float *dst, const float constant, const float *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Sub( float *dst, const float constant, const float *src, const int count ) {
 
     register vector float v0, v1, v2, v3;
 	register vector float v0_low, v0_hi, v1_low, v1_hi;
@@ -710,7 +710,7 @@ void VPCALL arcSIMD_AltiVec::Sub( float *dst, const float constant, const float 
     constVec = loadSplatUnalignedScalar( &constant );
 
 	//calculate permute vector and do first load
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src[i] ), oneCharVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src[i] ), oneCharVector );
 	v1_hi = vec_ld( 0, &src[i] );
 
     //vectorize!
@@ -738,12 +738,12 @@ void VPCALL arcSIMD_AltiVec::Sub( float *dst, const float constant, const float 
 
 /*
 ============
-arcSIMD_AltiVec::Sub
+anSIMD_AltiVec::Sub
 
   dst[i] = src0[i] - src1[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Sub( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_AltiVec::Sub( float *dst, const float *src0, const float *src1, const int count ) {
     register vector float v0, v1, v2, v3, v4, v5;
 	//src0
 	register vector float v0_low, v0_hi, v2_low, v2_hi;
@@ -759,8 +759,8 @@ void VPCALL arcSIMD_AltiVec::Sub( float *dst, const float *src0, const float *sr
     }
 
 	//calculate permute and do first loads
-	permVec1 = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneCharVector );
-	permVec2 = vec_add( vec_lvsl( -1, ( int*) &src1[i] ), oneCharVector );
+	permVec1 = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneCharVector );
+	permVec2 = vec_add( vec_lvsl( -1, (int *) &src1[i] ), oneCharVector );
 	v2_hi = vec_ld( 0, &src0[i] );
 	v3_hi = vec_ld( 0, &src1[i] );
 
@@ -796,12 +796,12 @@ void VPCALL arcSIMD_AltiVec::Sub( float *dst, const float *src0, const float *sr
 
 /*
 ============
-arcSIMD_AltiVec::Mul
+anSIMD_AltiVec::Mul
 
   dst[i] = constant * src[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Mul( float *dst, const float constant, const float *src, const int count) {
+void VPCALL anSIMD_AltiVec::Mul( float *dst, const float constant, const float *src, const int count) {
     register vector float v0, v0_low, v0_hi, v1_low, v1_hi, v1, v2, v3;
     register vector float constVec;
     register vector unsigned char permVec;
@@ -817,7 +817,7 @@ void VPCALL arcSIMD_AltiVec::Mul( float *dst, const float constant, const float 
     //splat constant into a vector
     constVec = loadSplatUnalignedScalar( &constant );
 
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src[i] ), oneCharVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src[i] ), oneCharVector );
 	v1_hi = vec_ld( 0, &src[i] );
 
     //vectorize!
@@ -845,12 +845,12 @@ void VPCALL arcSIMD_AltiVec::Mul( float *dst, const float constant, const float 
 
 /*
 ============
-arcSIMD_AltiVec::Mul
+anSIMD_AltiVec::Mul
 
   dst[i] = src0[i] * src1[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Mul( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_AltiVec::Mul( float *dst, const float *src0, const float *src1, const int count ) {
     register vector float v0, v1, v2, v3, v4, v5;
 	//src0
 	register vector float v0_low, v0_hi, v2_low, v2_hi;
@@ -868,8 +868,8 @@ void VPCALL arcSIMD_AltiVec::Mul( float *dst, const float *src0, const float *sr
     }
 
 	//calculate permute and do loads
-	permVec1 = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneCharVector );
-	permVec2 = vec_add( vec_lvsl( -1, ( int*) &src1[i] ), oneCharVector );
+	permVec1 = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneCharVector );
+	permVec2 = vec_add( vec_lvsl( -1, (int *) &src1[i] ), oneCharVector );
 	v2_hi = vec_ld( 0, &src0[i] );
 	v3_hi = vec_ld( 0, &src1[i] );
 
@@ -907,12 +907,12 @@ void VPCALL arcSIMD_AltiVec::Mul( float *dst, const float *src0, const float *sr
 
 /*
 ============
-arcSIMD_AltiVec::Div
+anSIMD_AltiVec::Div
 
   dst[i] = constant / divisor[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Div( float *dst, const float constant, const float *divisor, const int count ) {
+void VPCALL anSIMD_AltiVec::Div( float *dst, const float constant, const float *divisor, const int count ) {
     register vector float v0, v1, v2, v3;
     register vector float v0_low, v0_hi, v1_low, v1_hi;
 	register vector unsigned char permVec;
@@ -929,7 +929,7 @@ void VPCALL arcSIMD_AltiVec::Div( float *dst, const float constant, const float 
     constVec = loadSplatUnalignedScalar( &constant );
 
 	//calculate permute and do first loads
-	permVec = vec_add( vec_lvsl( -1, ( int*) &divisor[i] ), oneCharVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &divisor[i] ), oneCharVector );
  	v1_hi = vec_ld( 0, &divisor[i] );
 
     //vectorize!
@@ -957,12 +957,12 @@ void VPCALL arcSIMD_AltiVec::Div( float *dst, const float constant, const float 
 
 /*
 ============
-arcSIMD_AltiVec::Div
+anSIMD_AltiVec::Div
 
   dst[i] = src0[i] / src1[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Div( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_AltiVec::Div( float *dst, const float *src0, const float *src1, const int count ) {
     register vector float v0, v1, v2, v3, v4, v5;
 	 //src0
 	register vector float v0_low, v0_hi, v2_low, v2_hi;
@@ -979,8 +979,8 @@ void VPCALL arcSIMD_AltiVec::Div( float *dst, const float *src0, const float *sr
     }
 
 	//calculate permute and do loads
-	permVec1 = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneCharVector );
-	permVec2 = vec_add( vec_lvsl( -1, ( int*) &src1[i] ), oneCharVector );
+	permVec1 = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneCharVector );
+	permVec2 = vec_add( vec_lvsl( -1, (int *) &src1[i] ), oneCharVector );
 	v2_hi = vec_ld( 0, &src0[i] );
 	v3_hi = vec_ld( 0, &src1[i] );
 
@@ -1016,12 +1016,12 @@ void VPCALL arcSIMD_AltiVec::Div( float *dst, const float *src0, const float *sr
 
 /*
 ============
-arcSIMD_AltiVec::MulAdd
+anSIMD_AltiVec::MulAdd
 
   dst[i] += constant * src[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::MulAdd( float *dst, const float constant, const float *src, const int count ) {
+void VPCALL anSIMD_AltiVec::MulAdd( float *dst, const float constant, const float *src, const int count ) {
     register vector float v0, v1, v2, v3, v4, v5;
     register vector float constVec;
 	 //src
@@ -1040,7 +1040,7 @@ void VPCALL arcSIMD_AltiVec::MulAdd( float *dst, const float constant, const flo
 	constVec = loadSplatUnalignedScalar( &constant );
 
 	//calculate permute and do loads
-	permVec1 = vec_add( vec_lvsl( -1, ( int*) &src[i] ), oneCharVector );
+	permVec1 = vec_add( vec_lvsl( -1, (int *) &src[i] ), oneCharVector );
 	v2_hi = vec_ld( 0, &src[i] );
 
     //vectorize!
@@ -1071,12 +1071,12 @@ void VPCALL arcSIMD_AltiVec::MulAdd( float *dst, const float constant, const flo
 
 /*
 ============
-arcSIMD_AltiVec::MulAdd
+anSIMD_AltiVec::MulAdd
 
   dst[i] += src0[i] * src1[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::MulAdd( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_AltiVec::MulAdd( float *dst, const float *src0, const float *src1, const int count ) {
     register vector float v0, v1, v2, v3, v4, v5, v6, v7;
     //src0
 	register vector float v0_low, v0_hi, v2_low, v2_hi;
@@ -1092,8 +1092,8 @@ void VPCALL arcSIMD_AltiVec::MulAdd( float *dst, const float *src0, const float 
     }
 
 	//calculate permute and do loads
-	permVec1 = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneCharVector );
-	permVec2 = vec_add( vec_lvsl( -1, ( int*) &src1[i] ), oneCharVector );
+	permVec1 = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneCharVector );
+	permVec2 = vec_add( vec_lvsl( -1, (int *) &src1[i] ), oneCharVector );
 	v2_hi = vec_ld( 0, &src0[i] );
 	v3_hi = vec_ld( 0, &src1[i] );
 
@@ -1134,12 +1134,12 @@ void VPCALL arcSIMD_AltiVec::MulAdd( float *dst, const float *src0, const float 
 
 /*
 ============
-arcSIMD_AltiVec::MulSub
+anSIMD_AltiVec::MulSub
 
   dst[i] -= constant * src[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::MulSub( float *dst, const float constant, const float *src, const int count ) {
+void VPCALL anSIMD_AltiVec::MulSub( float *dst, const float constant, const float *src, const int count ) {
     register vector float v0, v1, v2, v3, v4, v5;
     register vector float constVec;
 	 //src
@@ -1157,7 +1157,7 @@ void VPCALL arcSIMD_AltiVec::MulSub( float *dst, const float constant, const flo
 	constVec = loadSplatUnalignedScalar( &constant );
 
 	//calculate permute and do loads
-	permVec1 = vec_add( vec_lvsl( -1, ( int*) &src[i] ), oneCharVector );
+	permVec1 = vec_add( vec_lvsl( -1, (int *) &src[i] ), oneCharVector );
 	v2_hi = vec_ld( 0, &src[i] );
 
     //vectorize!
@@ -1189,12 +1189,12 @@ void VPCALL arcSIMD_AltiVec::MulSub( float *dst, const float constant, const flo
 
 /*
 ============
-arcSIMD_AltiVec::MulSub
+anSIMD_AltiVec::MulSub
 
   dst[i] -= src0[i] * src1[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::MulSub( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_AltiVec::MulSub( float *dst, const float *src0, const float *src1, const int count ) {
     register vector float v0, v1, v2, v3, v4, v5, v6, v7;
     //src0
 	register vector float v0_low, v0_hi, v2_low, v2_hi;
@@ -1210,8 +1210,8 @@ void VPCALL arcSIMD_AltiVec::MulSub( float *dst, const float *src0, const float 
     }
 
 	//calculate permute and do loads
-	permVec1 = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneCharVector );
-	permVec2 = vec_add( vec_lvsl( -1, ( int*) &src1[i] ), oneCharVector );
+	permVec1 = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneCharVector );
+	permVec2 = vec_add( vec_lvsl( -1, (int *) &src1[i] ), oneCharVector );
 	v2_hi = vec_ld( 0, &src0[i] );
 	v3_hi = vec_ld( 0, &src1[i] );
 
@@ -1256,12 +1256,12 @@ void VPCALL arcSIMD_AltiVec::MulSub( float *dst, const float *src0, const float 
 #ifdef ENABLE_DOT
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dst[i] = constant * src[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anVec3 *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anVec3 *src, const int count ) {
 		register vector float vecLd1, vecLd2, vecLd3, vecLd4, vecLd5, vecLd6;
 		register vector float vecX, vecY, vecZ;
 		vector float vecX2, vecY2, vecZ2;
@@ -1368,12 +1368,12 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anVe
 
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dst[i] = constant * src[i].Normal() + src[i][3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anPlane *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anPlane *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant * src[(X)].Normal() + src[(X)][3];
 	assert( sizeof(anPlane)  == PLANE_OFFSET * sizeof( float ) );
 	float constVal[4];
@@ -1487,12 +1487,12 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anPl
 #ifndef DRAWVERT_PADDED
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dst[i] = constant * src[i].xyz;
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant * src[(X)].xyz;
 		// anDrawVertex size is 60 bytes
 		assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -1572,12 +1572,12 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anDr
 #else
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dst[i] = constant * src[i].xyz;
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant * src[(X)].xyz;
 
 		// anDrawVertex size is 64 bytes
@@ -1643,12 +1643,12 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 &constant, const anDr
 
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dst[i] = constant.Normal() * src[i] + constant[3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anVec3 *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anVec3 *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant.Normal() * src[(X)] + constant[3];
 		register vector float vecLd1, vecLd2, vecLd3, vecLd4, vecLd5, vecLd6;
 		register vector float vecX, vecY, vecZ, vecX2, vecY2, vecZ2;
@@ -1751,12 +1751,12 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anV
 
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dst[i] = constant.Normal() * src[i].Normal() + constant[3] * src[i][3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anPlane *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anPlane *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant.Normal() * src[(X)].Normal() + constant[3] * src[(X)][3];
 	// check plane size
 	assert( sizeof(anPlane) == PLANE_OFFSET * sizeof( float ) );
@@ -1873,12 +1873,12 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anP
 #ifndef DRAWVERT_PADDED
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dst[i] = constant.Normal() * src[i].xyz + constant[3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant.Normal() * src[(X)].xyz + constant[3];
 	// anDrawVertex size is 60 bytes
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -1979,12 +1979,12 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anD
 #else
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dst[i] = constant.Normal() * src[i].xyz + constant[3];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
 //#define OPER(X) dst[(X)] = constant.Normal() * src[(X)].xyz + constant[3];
 
 	// anDrawVertex size is 60 bytes
@@ -2072,12 +2072,12 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anPlane &constant, const anD
 
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dst[i] = src0[i] * src1[i];
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 *src0, const anVec3 *src1, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float *dst, const anVec3 *src0, const anVec3 *src1, const int count ) {
 //#define OPER(X) dst[(X)] = src0[(X)] * src1[(X)];
 
 	int i;
@@ -2202,12 +2202,12 @@ void VPCALL arcSIMD_AltiVec::Dot( float *dst, const anVec3 *src0, const anVec3 *
 
 /*
 ============
-arcSIMD_AltiVec::Dot
+anSIMD_AltiVec::Dot
 
   dot = src1[0] * src2[0] + src1[1] * src2[1] + src1[2] * src2[2] + ...
 ============
 */
-void VPCALL arcSIMD_AltiVec::Dot( float &dot, const float *src1, const float *src2, const int count ) {
+void VPCALL anSIMD_AltiVec::Dot( float &dot, const float *src1, const float *src2, const int count ) {
 	dot = 0.0f;
 
     register vector float v0, v1, v2, v3;
@@ -2229,8 +2229,8 @@ void VPCALL arcSIMD_AltiVec::Dot( float &dot, const float *src1, const float *sr
 
     if ( count >= 8 ) {
 		//calculate permute and do loads
-		permVec1 = vec_add( vec_lvsl( -1, ( int*) &src1[i] ), oneCharVector );
-		permVec2 = vec_add( vec_lvsl( -1, ( int*) &src2[i] ), oneCharVector );
+		permVec1 = vec_add( vec_lvsl( -1, (int *) &src1[i] ), oneCharVector );
+		permVec2 = vec_add( vec_lvsl( -1, (int *) &src2[i] ), oneCharVector );
 		v2_hi = vec_ld( 0, &src1[i] );
 		v3_hi = vec_ld( 0, &src2[i] );
 
@@ -2280,13 +2280,13 @@ void VPCALL arcSIMD_AltiVec::Dot( float &dot, const float *src1, const float *sr
 
 /*
 ============
-arcSIMD_AltiVec::CmpGT
+anSIMD_AltiVec::CmpGT
 
   dst[i] = src0[i] > constant;
 ============
 */
 
-void VPCALL arcSIMD_AltiVec::CmpGT( byte *dst, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::CmpGT( byte *dst, const float *src0, const float constant, const int count ) {
 //#define OPER(X) dst[(X)] = src0[(X)] > constant;
 
     register vector float v0, v1, v2, v3;
@@ -2309,7 +2309,7 @@ void VPCALL arcSIMD_AltiVec::CmpGT( byte *dst, const float *src0, const float co
     constVec = loadSplatUnalignedScalar( &constant );
 
 	//calculate permute and do loads
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneVector );
 	v3_hi = vec_ld( 0, &src0[i] );
 
     //vectorize!
@@ -2359,12 +2359,12 @@ void VPCALL arcSIMD_AltiVec::CmpGT( byte *dst, const float *src0, const float co
 
 /*
 ============
-arcSIMD_AltiVec::CmpGT
+anSIMD_AltiVec::CmpGT
 
   dst[i] |= ( src0[i] > constant ) << bitNum;
 ============
 */
-void VPCALL arcSIMD_AltiVec::CmpGT( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::CmpGT( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
 //#define OPER(X) dst[(X)] |= ( src0[(X)] > constant ) << bitNum;
 
 	// Temp vector registers
@@ -2402,7 +2402,7 @@ void VPCALL arcSIMD_AltiVec::CmpGT( byte *dst, const byte bitNum, const float *s
     bitNumVec = vec_splat( bitNumVec, 0 );
 
 	//calculate permute and do loads
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneVector );
 	vs3_hi = vec_ld( 0, &src0[i] );
 
     //vectorize!
@@ -2457,12 +2457,12 @@ void VPCALL arcSIMD_AltiVec::CmpGT( byte *dst, const byte bitNum, const float *s
 
 /*
 ============
-arcSIMD_AltiVec::CmpGE
+anSIMD_AltiVec::CmpGE
 
   dst[i] = src0[i] >= constant;
 ============
 */
-void VPCALL arcSIMD_AltiVec::CmpGE( byte *dst, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::CmpGE( byte *dst, const float *src0, const float constant, const int count ) {
 
     register vector float v0, v1, v2, v3;
     register vector bool int vr1, vr2, vr3, vr4;
@@ -2484,7 +2484,7 @@ void VPCALL arcSIMD_AltiVec::CmpGE( byte *dst, const float *src0, const float co
     constVec = loadSplatUnalignedScalar( &constant );
 
 	//calculate permute and do loads
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneVector );
 	v3_hi = vec_ld( 0, &src0[i] );
 
     //vectorize!
@@ -2533,12 +2533,12 @@ void VPCALL arcSIMD_AltiVec::CmpGE( byte *dst, const float *src0, const float co
 
 /*
 ============
-arcSIMD_AltiVec::CmpGE
+anSIMD_AltiVec::CmpGE
 
   dst[i] |= ( src0[i] >= constant ) << bitNum;
 ============
 */
-void VPCALL arcSIMD_AltiVec::CmpGE( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::CmpGE( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
     register vector bool int vtbi0, vtbi1, vtbi2, vtbi3;
 	register vector bool short vtbs0, vtbs1;
 	register vector bool char vtbc0;
@@ -2573,7 +2573,7 @@ void VPCALL arcSIMD_AltiVec::CmpGE( byte *dst, const byte bitNum, const float *s
     bitNumVec = vec_splat( bitNumVec, 0 );
 
 	//calculate permute and do loads
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneVector );
 	vs3_hi = vec_ld( 0, &src0[i] );
 
     //vectorize!
@@ -2629,12 +2629,12 @@ void VPCALL arcSIMD_AltiVec::CmpGE( byte *dst, const byte bitNum, const float *s
 
 /*
 ============
-arcSIMD_AltiVec::CmpLT
+anSIMD_AltiVec::CmpLT
 
   dst[i] = src0[i] < constant;
 ============
 */
-void VPCALL arcSIMD_AltiVec::CmpLT( byte *dst, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::CmpLT( byte *dst, const float *src0, const float constant, const int count ) {
 //#define OPER(X) dst[(X)] = src0[(X)] < constant;
     register vector float v0, v1, v2, v3;
     register vector bool int vr1, vr2, vr3, vr4;
@@ -2656,7 +2656,7 @@ void VPCALL arcSIMD_AltiVec::CmpLT( byte *dst, const float *src0, const float co
     constVec = loadSplatUnalignedScalar( &constant );
 
 	//calculate permute and do loads
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneVector );
 	v3_hi = vec_ld( 0, &src0[i] );
 
     //vectorize!
@@ -2705,12 +2705,12 @@ void VPCALL arcSIMD_AltiVec::CmpLT( byte *dst, const float *src0, const float co
 
 /*
 ============
-arcSIMD_AltiVec::CmpLT
+anSIMD_AltiVec::CmpLT
 
   dst[i] |= ( src0[i] < constant ) << bitNum;
 ============
 */
-void VPCALL arcSIMD_AltiVec::CmpLT( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::CmpLT( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
 //#define OPER(X) dst[(X)] |= ( src0[(X)] < constant ) << bitNum;
     register vector bool int vtbi0, vtbi1, vtbi2, vtbi3;
 	register vector bool short vtbs0, vtbs1;
@@ -2746,7 +2746,7 @@ void VPCALL arcSIMD_AltiVec::CmpLT( byte *dst, const byte bitNum, const float *s
     bitNumVec = vec_splat( bitNumVec, 0 );
 
 	//calculate permute and do loads
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneVector );
 	vs3_hi = vec_ld( 0, &src0[i] );
 
     //vectorize!
@@ -2803,12 +2803,12 @@ void VPCALL arcSIMD_AltiVec::CmpLT( byte *dst, const byte bitNum, const float *s
 
 /*
 ============
-arcSIMD_AltiVec::CmpLE
+anSIMD_AltiVec::CmpLE
 
   dst[i] = src0[i] <= constant;
 ============
 */
-void VPCALL arcSIMD_AltiVec::CmpLE( byte *dst, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::CmpLE( byte *dst, const float *src0, const float constant, const int count ) {
 //#define OPER(X) dst[(X)] = src0[(X)] <= constant;
     register vector float v0, v1, v2, v3;
     register vector bool int vr1, vr2, vr3, vr4;
@@ -2830,7 +2830,7 @@ void VPCALL arcSIMD_AltiVec::CmpLE( byte *dst, const float *src0, const float co
     constVec = loadSplatUnalignedScalar( &constant );
 
 	//calculate permute and do loads
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneVector );
 	v3_hi = vec_ld( 0, &src0[i] );
 
     //vectorize!
@@ -2879,12 +2879,12 @@ void VPCALL arcSIMD_AltiVec::CmpLE( byte *dst, const float *src0, const float co
 
 /*
 ============
-arcSIMD_AltiVec::CmpLE
+anSIMD_AltiVec::CmpLE
 
   dst[i] |= ( src0[i] <= constant ) << bitNum;
 ============
 */
-void VPCALL arcSIMD_AltiVec::CmpLE( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::CmpLE( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
 //#define OPER(X) dst[(X)] |= ( src0[(X)] <= constant ) << bitNum;
     register vector bool int vtbi0, vtbi1, vtbi2, vtbi3;
 	register vector bool short vtbs0, vtbs1;
@@ -2920,7 +2920,7 @@ void VPCALL arcSIMD_AltiVec::CmpLE( byte *dst, const byte bitNum, const float *s
     bitNumVec = vec_splat( bitNumVec, 0 );
 
 	//calculate permute and do loads
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src0[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src0[i] ), oneVector );
 	vs3_hi = vec_ld( 0, &src0[i] );
 
     //vectorize!
@@ -2978,10 +2978,10 @@ void VPCALL arcSIMD_AltiVec::CmpLE( byte *dst, const byte bitNum, const float *s
 
 /*
 ============
-arcSIMD_AltiVec::MinMax
+anSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( float &min, float &max, const float *src, const int count ) {
+void VPCALL anSIMD_AltiVec::MinMax( float &min, float &max, const float *src, const int count ) {
 	min = anMath::INFINITY; max = -anMath::INFINITY;
 //#define OPER(X) if ( src[(X)] < min ) {min = src[(X)];} if ( src[(X)] > max ) {max = src[(X)];}
 
@@ -2996,7 +2996,7 @@ void VPCALL arcSIMD_AltiVec::MinMax( float &min, float &max, const float *src, c
 
 		//calculate permute and do first load to
 		//get a starting point for min and max
-		permVec = vec_add( vec_lvsl( -1, ( int*) &src[0] ), oneCharVector );
+		permVec = vec_add( vec_lvsl( -1, (int *) &src[0] ), oneCharVector );
 		v1_hi = vec_ld( 0, &src[0] );
 
 		maxVec = loadSplatUnalignedScalar( &max );
@@ -3050,10 +3050,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( float &min, float &max, const float *src, c
 
 /*
 ============
-arcSIMD_AltiVec::MinMax
+anSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( anVec2 &min, anVec2 &max, const anVec2 *src, const int count ) {
+void VPCALL anSIMD_AltiVec::MinMax( anVec2 &min, anVec2 &max, const anVec2 *src, const int count ) {
 	min[0] = min[1] = anMath::INFINITY; max[0] = max[1] = -anMath::INFINITY;
 //#define OPER(X) const anVec2 &v = src[(X)]; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; }
 
@@ -3142,10 +3142,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( anVec2 &min, anVec2 &max, const anVec2 *src
 
 /*
 ============
-arcSIMD_AltiVec::MinMax
+anSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anVec3 *src, const int count ) {
+void VPCALL anSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anVec3 *src, const int count ) {
 	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 //#define OPER(X) const anVec3 &v = src[(X)]; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; } if ( v[2] < min[2] ) { min[2] = v[2]; } if ( v[2] > max[2] ) { max[2] = v[2]; }
 
@@ -3243,10 +3243,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anVec3 *src
 #ifndef DRAWVERT_PADDED
 /*
 ============
-arcSIMD_AltiVec::MinMax
+anSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) {
+void VPCALL anSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) {
 
 	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 	anVec3 v;
@@ -3342,10 +3342,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVerte
 #else
 /*
 ============
-arcSIMD_AltiVec::MinMax
+anSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) {
+void VPCALL anSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) {
 
 	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 	anVec3 v;
@@ -3430,10 +3430,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVerte
 #ifndef DRAWVERT_PADDED
 /*
 ============
-arcSIMD_AltiVec::MinMax
+anSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
+void VPCALL anSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
 	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 
 	anVec3 v;
@@ -3536,10 +3536,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVerte
 #else
 /*
 ============
-arcSIMD_AltiVec::MinMax
+anSIMD_AltiVec::MinMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
+void VPCALL anSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
 	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 
 	anVec3 v;
@@ -3635,10 +3635,10 @@ void VPCALL arcSIMD_AltiVec::MinMax( anVec3 &min, anVec3 &max, const anDrawVerte
 
 /*
 ============
-arcSIMD_AltiVec::Clamp
+anSIMD_AltiVec::Clamp
 ============
 */
-void VPCALL arcSIMD_AltiVec::Clamp( float *dst, const float *src, const float min, const float max, const int count ) {
+void VPCALL anSIMD_AltiVec::Clamp( float *dst, const float *src, const float min, const float max, const int count ) {
 //#define OPER(X) dst[(X)] = src[(X)] < min ? min : src[(X)] > max ? max : src[(X)];
     register vector float v0, v1, v2, v3, v4, v5;
     register vector unsigned char permVec;
@@ -3657,7 +3657,7 @@ void VPCALL arcSIMD_AltiVec::Clamp( float *dst, const float *src, const float mi
 	maxVec = loadSplatUnalignedScalar( &max );
 
 	//calculate permute and do first load
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src[i] ), oneVector );
  	v1_hi = vec_ld( 0, &src[i] );
 
 
@@ -3691,10 +3691,10 @@ void VPCALL arcSIMD_AltiVec::Clamp( float *dst, const float *src, const float mi
 
 /*
 ============
-arcSIMD_AltiVec::ClampMin
+anSIMD_AltiVec::ClampMin
 ============
 */
-void VPCALL arcSIMD_AltiVec::ClampMin( float *dst, const float *src, const float min, const int count ) {
+void VPCALL anSIMD_AltiVec::ClampMin( float *dst, const float *src, const float min, const int count ) {
 //#define OPER(X) dst[(X)] = src[(X)] < min ? min : src[(X)];
     register vector float v0, v1, v2, v3;
     register vector unsigned char permVec;
@@ -3712,7 +3712,7 @@ void VPCALL arcSIMD_AltiVec::ClampMin( float *dst, const float *src, const float
     constVec = loadSplatUnalignedScalar( &min );
 
 	//calculate permute and do first load
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src[i] ), oneVector );
  	v1_hi = vec_ld( 0, &src[i] );
 
     //vectorize!
@@ -3740,10 +3740,10 @@ void VPCALL arcSIMD_AltiVec::ClampMin( float *dst, const float *src, const float
 
 /*
 ============
-arcSIMD_AltiVec::ClampMax
+anSIMD_AltiVec::ClampMax
 ============
 */
-void VPCALL arcSIMD_AltiVec::ClampMax( float *dst, const float *src, const float max, const int count ) {
+void VPCALL anSIMD_AltiVec::ClampMax( float *dst, const float *src, const float max, const int count ) {
 //#define OPER(X) dst[(X)] = src[(X)] > max ? max : src[(X)];
     register vector float v0, v1, v2, v3;
     register vector unsigned char permVec;
@@ -3761,7 +3761,7 @@ void VPCALL arcSIMD_AltiVec::ClampMax( float *dst, const float *src, const float
     constVec = loadSplatUnalignedScalar( &max );
 
 	//calculate permute and do first load
-	permVec = vec_add( vec_lvsl( -1, ( int*) &src[i] ), oneVector );
+	permVec = vec_add( vec_lvsl( -1, (int *) &src[i] ), oneVector );
  	v1_hi = vec_ld( 0, &src[i] );
 
     //vectorize!
@@ -3792,22 +3792,22 @@ void VPCALL arcSIMD_AltiVec::ClampMax( float *dst, const float *src, const float
 
 /*
 ============
-arcSIMD_AltiVec::Zero16
+anSIMD_AltiVec::Zero16
 ============
 */
-void VPCALL arcSIMD_AltiVec::Zero16( float *dst, const int count ) {
+void VPCALL anSIMD_AltiVec::Zero16( float *dst, const int count ) {
 	memset( dst, 0, count * sizeof( float ) );
 }
 
 /*
 ============
-arcSIMD_AltiVec::Negate16
+anSIMD_AltiVec::Negate16
 
 	Assumptions:
 		dst is aligned
 ============
 */
-void VPCALL arcSIMD_AltiVec::Negate16( float *dst, const int count ) {
+void VPCALL anSIMD_AltiVec::Negate16( float *dst, const int count ) {
 //#define OPER(X) ptr[(X)] ^= ( 1 << 31 )		// IEEE 32 bits float sign bit
 
 	// dst is aligned
@@ -3839,23 +3839,23 @@ void VPCALL arcSIMD_AltiVec::Negate16( float *dst, const int count ) {
 
 /*
 ============
-arcSIMD_AltiVec::Copy16
+anSIMD_AltiVec::Copy16
 ============
 */
-void VPCALL arcSIMD_AltiVec::Copy16( float *dst, const float *src, const int count ) {
+void VPCALL anSIMD_AltiVec::Copy16( float *dst, const float *src, const int count ) {
 //#define OPER(X) dst[(X)] = src[(X)]
 	memcpy( dst, src, sizeof( float ) * count );
 }
 
 /*
 ============
-arcSIMD_AltiVec::Add16
+anSIMD_AltiVec::Add16
 
 	Assumptions:
 		Assumes dst, src1, src2 all start at aligned address
 ============
 */
-void VPCALL arcSIMD_AltiVec::Add16( float *dst, const float *src1, const float *src2, const int count ) {
+void VPCALL anSIMD_AltiVec::Add16( float *dst, const float *src1, const float *src2, const int count ) {
 //#define OPER(X) dst[(X)] = src1[(X)] + src2[(X)]
 
 	// dst is aligned
@@ -3894,13 +3894,13 @@ void VPCALL arcSIMD_AltiVec::Add16( float *dst, const float *src1, const float *
 
 /*
 ============
-arcSIMD_AltiVec::Sub16
+anSIMD_AltiVec::Sub16
 
 	Assumptions:
 		Assumes that dst, src1, and src2 all start at aligned address
 ============
 */
-void VPCALL arcSIMD_AltiVec::Sub16( float *dst, const float *src1, const float *src2, const int count ) {
+void VPCALL anSIMD_AltiVec::Sub16( float *dst, const float *src1, const float *src2, const int count ) {
 //#define OPER(X) dst[(X)] = src1[(X)] - src2[(X)]
 	// dst is aligned
 	assert( IS_16BYTE_ALIGNED( dst[0] ) );
@@ -3938,13 +3938,13 @@ void VPCALL arcSIMD_AltiVec::Sub16( float *dst, const float *src1, const float *
 
 /*
 ============
-arcSIMD_AltiVec::Mul16
+anSIMD_AltiVec::Mul16
 
 	Assumptions:
 		Assumes that dst and src1 start at aligned address
 ============
 */
-void VPCALL arcSIMD_AltiVec::Mul16( float *dst, const float *src1, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::Mul16( float *dst, const float *src1, const float constant, const int count ) {
 //#define OPER(X) dst[(X)] = src1[(X)] * constant
 
   	// dst is aligned
@@ -3982,13 +3982,13 @@ void VPCALL arcSIMD_AltiVec::Mul16( float *dst, const float *src1, const float c
 
 /*
 ============
-arcSIMD_AltiVec::AddAssign16
+anSIMD_AltiVec::AddAssign16
 
 	Assumptions:
 		Assumes that dst and src start at aligned address
 ============
 */
-void VPCALL arcSIMD_AltiVec::AddAssign16( float *dst, const float *src, const int count ) {
+void VPCALL anSIMD_AltiVec::AddAssign16( float *dst, const float *src, const int count ) {
 //#define OPER(X) dst[(X)] += src[(X)]
 
 	// dst is aligned
@@ -4023,13 +4023,13 @@ void VPCALL arcSIMD_AltiVec::AddAssign16( float *dst, const float *src, const in
 
 /*
 ============
-arcSIMD_AltiVec::SubAssign16
+anSIMD_AltiVec::SubAssign16
 
 	Assumptions:
 		Assumes that dst and src start at aligned address
 ============
 */
-void VPCALL arcSIMD_AltiVec::SubAssign16( float *dst, const float *src, const int count ) {
+void VPCALL anSIMD_AltiVec::SubAssign16( float *dst, const float *src, const int count ) {
 //#define OPER(X) dst[(X)] -= src[(X)]
     register vector float v0, v1, v2, v3, v4, v5;
     int i=0;
@@ -4062,13 +4062,13 @@ void VPCALL arcSIMD_AltiVec::SubAssign16( float *dst, const float *src, const in
 
 /*
 ============
-arcSIMD_AltiVec::MulAssign16
+anSIMD_AltiVec::MulAssign16
 
 	Assumptions:
 		Assumes that dst starts at aligned address and count is multiple of 4
 ============
 */
-void VPCALL arcSIMD_AltiVec::MulAssign16( float *dst, const float constant, const int count ) {
+void VPCALL anSIMD_AltiVec::MulAssign16( float *dst, const float constant, const int count ) {
 //#define OPER(X) dst[(X)] *= constant
 
 	// dst is aligned
@@ -4106,7 +4106,7 @@ void VPCALL arcSIMD_AltiVec::MulAssign16( float *dst, const float constant, cons
 
 /*
 ============
-arcSIMD_AltiVec::MatX_LowerTriangularSolve
+anSIMD_AltiVec::MatX_LowerTriangularSolve
 
   solves x in L * x = b for the first n rows of L
   if skip > 0 the first skip elements of x are assumed to be valid already
@@ -4115,7 +4115,7 @@ arcSIMD_AltiVec::MatX_LowerTriangularSolve
 ============
 */
 
-void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip ) {
+void VPCALL anSIMD_AltiVec::MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip ) {
 
 	int i, j;
 	const float *lptr;
@@ -4303,14 +4303,14 @@ void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolve( const anMatX &L, float *
 
 /*
 ============
-arcSIMD_AltiVec::MatX_LowerTriangularSolveTranspose
+anSIMD_AltiVec::MatX_LowerTriangularSolveTranspose
 
   solves x in L.Transpose() * x = b for the first n rows of L
   L has to be a lower triangular matrix with (implicit) ones on the diagonal
   x == b is allowed
 ============
 */
-void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n ) {
+void VPCALL anSIMD_AltiVec::MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n ) {
 
 	int nc;
 	const float *lptr;
@@ -4467,10 +4467,10 @@ void VPCALL arcSIMD_AltiVec::MatX_LowerTriangularSolveTranspose( const anMatX &L
 
 /*
 ============
-arcSIMD_AltiVec::MatX_LDLTFactor
+anSIMD_AltiVec::MatX_LDLTFactor
 ============
 */
-bool VPCALL arcSIMD_AltiVec::MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, const int n ) {
+bool VPCALL anSIMD_AltiVec::MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, const int n ) {
 	int i, j, k, nc;
 	float *v, *diag, *mptr;
 	float s0, s1, s2, s3, sum, d;
@@ -4713,10 +4713,10 @@ bool VPCALL arcSIMD_AltiVec::MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, cons
 #ifdef LIVE_VICARIOUSLY
 /*
 ============
-arcSIMD_AltiVec::BlendJoints
+anSIMD_AltiVec::BlendJoints
 ============
 */
-void VPCALL arcSIMD_AltiVec::BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) {
+void VPCALL anSIMD_AltiVec::BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) {
 	int i;
 
 	// since lerp is a constant, we can special case the two cases if they're true
@@ -5041,13 +5041,13 @@ void VPCALL arcSIMD_AltiVec::BlendJoints( anJointQuat *joints, const anJointQuat
 
 /*
 ============
-arcSIMD_AltiVec::ConvertJointQuatsToJointMats
+anSIMD_AltiVec::ConvertJointQuatsToJointMats
 ============
 */
 
 // SSE doesn't vectorize this, and I don't think we should either. Its mainly just copying data, there's very little math involved and
 // it's not easily parallelizable
-void VPCALL arcSIMD_AltiVec::ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) {
+void VPCALL anSIMD_AltiVec::ConvertJointQuatsToJointMats( anJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) {
 
 	for ( int i = 0; i < numJoints; i++ ) {
 
@@ -5100,10 +5100,10 @@ void VPCALL arcSIMD_AltiVec::ConvertJointQuatsToJointMats( arcJointMat *jointMat
 
 /*
 ============
-arcSIMD_AltiVec::ConvertJointMatsToJointQuats
+anSIMD_AltiVec::ConvertJointMatsToJointQuats
 ============
 */
-void VPCALL arcSIMD_AltiVec::ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) {
+void VPCALL anSIMD_AltiVec::ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const anJointMat *jointMats, const int numJoints ) {
 
 	int index;
 
@@ -5170,10 +5170,10 @@ void VPCALL arcSIMD_AltiVec::ConvertJointMatsToJointQuats( anJointQuat *jointQua
 
 /*
 ============
-arcSIMD_AltiVec::TransformJoints
+anSIMD_AltiVec::TransformJoints
 ============
 */
-void VPCALL arcSIMD_AltiVec::TransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
+void VPCALL anSIMD_AltiVec::TransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
 	int i;
 #if 0
 	for ( i = firstJoint; i <= lastJoint; i++ ) {
@@ -5244,10 +5244,10 @@ void VPCALL arcSIMD_AltiVec::TransformJoints( arcJointMat *jointMats, const int 
 
 /*
 ============
-arcSIMD_AltiVec::UntransformJoints
+anSIMD_AltiVec::UntransformJoints
 ============
 */
-void VPCALL arcSIMD_AltiVec::UntransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
+void VPCALL anSIMD_AltiVec::UntransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
 	int i;
 #if 0
 	for ( i = lastJoint; i >= firstJoint; i-- ) {
@@ -5338,20 +5338,20 @@ void VPCALL arcSIMD_AltiVec::UntransformJoints( arcJointMat *jointMats, const in
 
 /*
 ============
-arcSIMD_AltiVec::TransformVerts
+anSIMD_AltiVec::TransformVerts
 ============
 */
 
 // Here we don't have much for the vector unit to do, and the gain we get from doing the math
 // in parallel is eaten by doing unaligned stores.
-void VPCALL arcSIMD_AltiVec::TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, int numWeights ) {
+void VPCALL anSIMD_AltiVec::TransformVerts( anDrawVertex *verts, const int numVerts, const anJointMat *joints, const anVec4 *weights, const int *index, int numWeights ) {
 	int i, j;
 	const byte *jointsPtr = (byte *)joints;
 
 	for ( j = i = 0; i < numVerts; i++ ) {
 		anVec3 v;
 
-		float *matPtrOrig = ( *(arcJointMat *)( jointsPtr + index[j*2] ) ).ToFloatPtr();
+		float *matPtrOrig = ( *(anJointMat *)( jointsPtr + index[j*2] ) ).ToFloatPtr();
 		float *weightPtr = (float*) weights[j].ToFloatPtr();
 
 		v[0] = matPtrOrig[0] * weightPtr[0];
@@ -5371,7 +5371,7 @@ void VPCALL arcSIMD_AltiVec::TransformVerts( anDrawVertex *verts, const int numV
 
 		while( index[j*2+1] == 0 ) {
 			j++;
-			float *matPtr = ( *(arcJointMat *)( jointsPtr + index[j*2] ) ).ToFloatPtr();
+			float *matPtr = ( *(anJointMat *)( jointsPtr + index[j*2] ) ).ToFloatPtr();
 			weightPtr = (float*) weights[j].ToFloatPtr();
 
 			v[0] += matPtr[0] * weightPtr[0];
@@ -5401,10 +5401,10 @@ void VPCALL arcSIMD_AltiVec::TransformVerts( anDrawVertex *verts, const int numV
 #ifndef DRAWVERT_PADDED
 /*
 ============
-arcSIMD_AltiVec::TracePointCull
+anSIMD_AltiVec::TracePointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
 	// anDrawVertex size
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -5640,10 +5640,10 @@ void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, cons
 
 /*
 ============
-arcSIMD_AltiVec::TracePointCull
+anSIMD_AltiVec::TracePointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
 	// anDrawVertex size
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -5864,10 +5864,10 @@ void VPCALL arcSIMD_AltiVec::TracePointCull( byte *cullBits, byte &totalOr, cons
 #ifndef DRAWVERT_PADDED
 /*
 ============
-arcSIMD_AltiVec::DecalPointCull
+anSIMD_AltiVec::DecalPointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_AltiVec::DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
 	// anDrawVertex size
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -6118,10 +6118,10 @@ void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const anPlane *plan
 
 /*
 ============
-arcSIMD_AltiVec::DecalPointCull
+anSIMD_AltiVec::DecalPointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_AltiVec::DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
 	// anDrawVertex size
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -6357,10 +6357,10 @@ void VPCALL arcSIMD_AltiVec::DecalPointCull( byte *cullBits, const anPlane *plan
 #ifndef DRAWVERT_PADDED
 /*
 ============
-arcSIMD_AltiVec::OverlayPointCull
+anSIMD_AltiVec::OverlayPointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_AltiVec::OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
 	// anDrawVertex size
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -6556,10 +6556,10 @@ void VPCALL arcSIMD_AltiVec::OverlayPointCull( byte *cullBits, anVec2 *texCoords
 
 /*
 ============
-arcSIMD_AltiVec::OverlayPointCull
+anSIMD_AltiVec::OverlayPointCull
 ============
 */
-void VPCALL arcSIMD_AltiVec::OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_AltiVec::OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 
 	// anDrawVertex size
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -6743,12 +6743,12 @@ void VPCALL arcSIMD_AltiVec::OverlayPointCull( byte *cullBits, anVec2 *texCoords
 #ifdef ENABLE_DERIVE
 /*
 ============
-arcSIMD_AltiVec::DeriveTriPlanes
+anSIMD_AltiVec::DeriveTriPlanes
 
 	Derives a plane equation for each triangle.
 ============
 */
-void VPCALL arcSIMD_AltiVec::DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL anSIMD_AltiVec::DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
 	// anDrawVertex size
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -7057,7 +7057,7 @@ void VPCALL arcSIMD_AltiVec::DeriveTriPlanes( anPlane *planes, const anDrawVerte
 
 /*
 ============
-arcSIMD_AltiVec::DeriveTangents
+anSIMD_AltiVec::DeriveTangents
 
 	Derives the normal and orthogonal tangent vectors for the triangle vertices.
 	For each vertex the normal and tangent vectors are derived from all triangles
@@ -7066,7 +7066,7 @@ arcSIMD_AltiVec::DeriveTangents
 
 ============
 */
-void VPCALL arcSIMD_AltiVec::DeriveTangents( anPlane *planes, anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL anSIMD_AltiVec::DeriveTangents( anPlane *planes, anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 	int i;
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
@@ -7189,14 +7189,14 @@ void VPCALL arcSIMD_AltiVec::DeriveTangents( anPlane *planes, anDrawVertex *vert
 
 /*
 ============
-arcSIMD_AltiVec::DeriveUnsmoothedTangents
+anSIMD_AltiVec::DeriveUnsmoothedTangents
 
 	Derives the normal and orthogonal tangent vectors for the triangle vertices.
 	For each vertex the normal and tangent vectors are derived from a single dominant triangle.
 ============
 */
 #define DERIVE_UNSMOOTHED_BITANGENT
-void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) {
+void VPCALL anSIMD_AltiVec::DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) {
 
 	int i;
 	// anDrawVertex size
@@ -7386,10 +7386,10 @@ void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( anDrawVertex *verts, cons
 		vecD12 = vec_sub( v5, vec_sld( v5, v5, 4 ) );
 
 		// get permute vectors for loading from dt
-		vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &dominantTris[i].normalizationScale[0] ), (vector unsigned char)(1 ) );
-		vecPerm2 = vec_add( vec_lvsl( -1, ( int*) &dominantTris[i+1].normalizationScale[0] ), (vector unsigned char)(1 ) );
-		vecPerm3 = vec_add( vec_lvsl( -1, ( int*) &dominantTris[i+2].normalizationScale[0] ), (vector unsigned char)(1 ) );
-		vecPerm4 = vec_add( vec_lvsl( -1, ( int*) &dominantTris[i+3].normalizationScale[0] ), (vector unsigned char)(1 ) );
+		vecPerm1 = vec_add( vec_lvsl( -1, (int *) &dominantTris[i].normalizationScale[0] ), (vector unsigned char)(1 ) );
+		vecPerm2 = vec_add( vec_lvsl( -1, (int *) &dominantTris[i+1].normalizationScale[0] ), (vector unsigned char)(1 ) );
+		vecPerm3 = vec_add( vec_lvsl( -1, (int *) &dominantTris[i+2].normalizationScale[0] ), (vector unsigned char)(1 ) );
+		vecPerm4 = vec_add( vec_lvsl( -1, (int *) &dominantTris[i+3].normalizationScale[0] ), (vector unsigned char)(1 ) );
 
 		// load S values from dominantTris
 		v0 = vec_ld( 0, &dominantTris[i].normalizationScale[0] );
@@ -7681,7 +7681,7 @@ void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( anDrawVertex *verts, cons
 #else
 /*
 ============
-arcSIMD_AltiVec::DeriveUnsmoothedTangents
+anSIMD_AltiVec::DeriveUnsmoothedTangents
 
 	Derives the normal and orthogonal tangent vectors for the triangle vertices.
 	For each vertex the normal and tangent vectors are derived from a single dominant triangle.
@@ -7689,7 +7689,7 @@ arcSIMD_AltiVec::DeriveUnsmoothedTangents
 */
 #define DERIVE_UNSMOOTHED_BITANGENT
 
-void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) {
+void VPCALL anSIMD_AltiVec::DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) {
 	int i;
 
 	for ( i = 0; i < numVerts; i++ ) {
@@ -7761,13 +7761,13 @@ void VPCALL arcSIMD_AltiVec::DeriveUnsmoothedTangents( anDrawVertex *verts, cons
 
 /*
 ============
-arcSIMD_AltiVec::NormalizeTangents
+anSIMD_AltiVec::NormalizeTangents
 
 	Normalizes each vertex normal and projects and normalizes the
 	tangent vectors onto the plane orthogonal to the vertex normal.
 ============
 */
-void VPCALL arcSIMD_AltiVec::NormalizeTangents( anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_AltiVec::NormalizeTangents( anDrawVertex *verts, const int numVerts ) {
 
 	// anDrawVertex size
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -8174,7 +8174,7 @@ void VPCALL arcSIMD_AltiVec::NormalizeTangents( anDrawVertex *verts, const int n
 
 /*
 ============
-arcSIMD_AltiVec::CreateTextureSpaceLightVectors
+anSIMD_AltiVec::CreateTextureSpaceLightVectors
 
 	Calculates light vectors in texture space for the given triangle vertices.
 	For each vertex the direction towards the light origin is projected onto texture space.
@@ -8182,7 +8182,7 @@ arcSIMD_AltiVec::CreateTextureSpaceLightVectors
 ============
 */
 
-void VPCALL arcSIMD_AltiVec::CreateTextureSpaceLightVectors( anVec3 *lightVectors, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL anSIMD_AltiVec::CreateTextureSpaceLightVectors( anVec3 *lightVectors, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
 	memset( used, 0, numVerts * sizeof( used[0] ) );
@@ -8263,7 +8263,7 @@ void VPCALL arcSIMD_AltiVec::CreateTextureSpaceLightVectors( anVec3 *lightVector
 #if 1
 /*
 ============
-arcSIMD_AltiVec::CreateSpecularTextureCoords
+anSIMD_AltiVec::CreateSpecularTextureCoords
 
 	Calculates specular texture coordinates for the given triangle vertices.
 	For each vertex the normalized direction towards the light origin is added to the
@@ -8271,7 +8271,7 @@ arcSIMD_AltiVec::CreateSpecularTextureCoords
 	The texture coordinates are only calculated for the vertices referenced by the indexes.
 ============
 */
-void VPCALL arcSIMD_AltiVec::CreateSpecularTextureCoords( anVec4 *texCoords, const anVec3 &lightOrigin, const anVec3 &viewOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL anSIMD_AltiVec::CreateSpecularTextureCoords( anVec4 *texCoords, const anVec3 &lightOrigin, const anVec3 &viewOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
 	memset( used, 0, numVerts * sizeof( used[0] ) );
@@ -8516,10 +8516,10 @@ void VPCALL arcSIMD_AltiVec::CreateSpecularTextureCoords( anVec4 *texCoords, con
 #ifdef VERTEXCACHE_ALIGNED
 /*
 ============
-arcSIMD_AltiVec::CreateShadowCache
+anSIMD_AltiVec::CreateShadowCache
 ============
 */
-int VPCALL arcSIMD_AltiVec::CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) {
+int VPCALL anSIMD_AltiVec::CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) {
 	int outVerts = 0;
 	int i = 0;
 
@@ -8662,10 +8662,10 @@ int VPCALL arcSIMD_AltiVec::CreateShadowCache( anVec4 *vertexCache, int *vertRem
 
 /*
 ============
-arcSIMD_AltiVec::CreateShadowCache
+anSIMD_AltiVec::CreateShadowCache
 ============
 */
-int VPCALL arcSIMD_AltiVec::CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) {
+int VPCALL anSIMD_AltiVec::CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) {
 	int outVerts = 0;
 	int i = 0;
 
@@ -8808,10 +8808,10 @@ int VPCALL arcSIMD_AltiVec::CreateShadowCache( anVec4 *vertexCache, int *vertRem
 #ifdef VERTEXCACHE_ALIGNED
 /*
 ============
-arcSIMD_AltiVec::CreateVertexProgramShadowCache
+anSIMD_AltiVec::CreateVertexProgramShadowCache
 ============
 */
-int VPCALL arcSIMD_AltiVec::CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) {
+int VPCALL anSIMD_AltiVec::CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) {
 
 	// vertexCache aligned
 	assert( IS_16BYTE_ALIGNED( vertexCache[0] ) );
@@ -8900,10 +8900,10 @@ int VPCALL arcSIMD_AltiVec::CreateVertexProgramShadowCache( anVec4 *vertexCache,
 #else
 /*
 ============
-arcSIMD_AltiVec::CreateVertexProgramShadowCache
+anSIMD_AltiVec::CreateVertexProgramShadowCache
 ============
 */
-int VPCALL arcSIMD_AltiVec::CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) {
+int VPCALL anSIMD_AltiVec::CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) {
 
 	// anDrawVertex size
 	assert( sizeof(anDrawVertex) == DRAWVERT_OFFSET * sizeof( float ) );
@@ -9019,7 +9019,7 @@ int VPCALL arcSIMD_AltiVec::CreateVertexProgramShadowCache( anVec4 *vertexCache,
 #ifdef SOUND_DEST_ALIGNED
 /*
 ============
-arcSIMD_AltiVec::UpSamplePCMTo44kHz
+anSIMD_AltiVec::UpSamplePCMTo44kHz
 
   Duplicate samples for 44kHz output.
 
@@ -9027,7 +9027,7 @@ arcSIMD_AltiVec::UpSamplePCMTo44kHz
 		Assumes that dest starts at aligned address
 ============
 */
-void arcSIMD_AltiVec::UpSamplePCMTo44kHz( float *dest, const short *src, const int numSamples, const int kHz, const int numChannels ) {
+void anSIMD_AltiVec::UpSamplePCMTo44kHz( float *dest, const short *src, const int numSamples, const int kHz, const int numChannels ) {
 
 	// dest is aligned
 	assert( IS_16BYTE_ALIGNED( dest[0] ) );
@@ -9218,7 +9218,7 @@ void arcSIMD_AltiVec::UpSamplePCMTo44kHz( float *dest, const short *src, const i
 
 /*
 ============
-arcSIMD_AltiVec::UpSamplePCMTo44kHz
+anSIMD_AltiVec::UpSamplePCMTo44kHz
 
   Duplicate samples for 44kHz output.
 
@@ -9226,7 +9226,7 @@ arcSIMD_AltiVec::UpSamplePCMTo44kHz
 		No assumptions
 ============
 */
-void arcSIMD_AltiVec::UpSamplePCMTo44kHz( float *dest, const short *src, const int numSamples, const int kHz, const int numChannels ) {
+void anSIMD_AltiVec::UpSamplePCMTo44kHz( float *dest, const short *src, const int numSamples, const int kHz, const int numChannels ) {
 
 	vector signed short vs0, vs1;
 	register vector signed int vi0, vi1;
@@ -9486,7 +9486,7 @@ void arcSIMD_AltiVec::UpSamplePCMTo44kHz( float *dest, const short *src, const i
 #ifdef SOUND_DEST_ALIGNED
 /*
 ============
-arcSIMD_AltiVec::UpSampleOGGTo44kHz
+anSIMD_AltiVec::UpSampleOGGTo44kHz
 
   Duplicate samples for 44kHz output.
 
@@ -9494,7 +9494,7 @@ arcSIMD_AltiVec::UpSampleOGGTo44kHz
 		Assumes that dest starts at aligned address
 ============
 */
-void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg, const int numSamples, const int kHz, const int numChannels ) {
+void anSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg, const int numSamples, const int kHz, const int numChannels ) {
 	// dest is aligned
 	assert( IS_16BYTE_ALIGNED( dest[0] ) );
 
@@ -9517,7 +9517,7 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 	if ( kHz == 11025 ) {
 		if ( numChannels == 1 ) {
 			 // calculate perm vector and do first load
-    		 vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
+    		 vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
 			 v10 = vec_ld( 0, &ogg[0][0] );
 
 			 int i;
@@ -9562,8 +9562,8 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 		} else {
 
 			// calculate perm vec for ogg
-    		vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
-			vecPerm2 = vec_add( vec_lvsl( -1, ( int*) &ogg[1][0] ), (vector unsigned char)(1 ) );
+    		vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
+			vecPerm2 = vec_add( vec_lvsl( -1, (int *) &ogg[1][0] ), (vector unsigned char)(1 ) );
 			v7 = vec_ld( 0, &ogg[1][0] );
 			v9 = vec_ld( 0, &ogg[0][0] );
 			int i;
@@ -9628,7 +9628,7 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 		if ( numChannels == 1 ) {
 
 			 // calculate perm vector and do first load
-    		 vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
+    		 vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
 			 v10 = vec_ld( 0, &ogg[0][0] );
 
 			int i;
@@ -9661,8 +9661,8 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 		} else {
 
 			// calculate perm vector and do first load
-    		vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
-    		vecPerm2 = vec_add( vec_lvsl( -1, ( int*) &ogg[1][0] ), (vector unsigned char)(1 ) );
+    		vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
+    		vecPerm2 = vec_add( vec_lvsl( -1, (int *) &ogg[1][0] ), (vector unsigned char)(1 ) );
 			v7 = vec_ld( 0, &ogg[1][0] );
 			v9 = vec_ld( 0, &ogg[0][0] );
 
@@ -9700,7 +9700,7 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 	} else if ( kHz == 44100 ) {
 		if ( numChannels == 1 ) {
 			// calculate perm vector and do first load
-			vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
+			vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
 
 			v9 = vec_ld( 0, &ogg[0][0] );
 			int i;
@@ -9729,8 +9729,8 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 		} else {
 
 			// calculate perm vector and do first load
-    		vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
-    		vecPerm2 = vec_add( vec_lvsl( -1, ( int*) &ogg[1][0] ), (vector unsigned char)(1 ) );
+    		vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
+    		vecPerm2 = vec_add( vec_lvsl( -1, (int *) &ogg[1][0] ), (vector unsigned char)(1 ) );
 			v7 = vec_ld( 0, &ogg[1][0] );
 			v9 = vec_ld( 0, &ogg[0][0] );
 			int i;
@@ -9771,7 +9771,7 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 
 /*
 ============
-arcSIMD_AltiVec::UpSampleOGGTo44kHz
+anSIMD_AltiVec::UpSampleOGGTo44kHz
 
   Duplicate samples for 44kHz output.
 
@@ -9779,7 +9779,7 @@ arcSIMD_AltiVec::UpSampleOGGTo44kHz
 		No assumptions
 ============
 */
-void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg, const int numSamples, const int kHz, const int numChannels ) {
+void anSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg, const int numSamples, const int kHz, const int numChannels ) {
 
 	register vector float oggVec1, oggVec2, oggVec3, oggVec4, oggVec5, oggVec6, oggVec7, oggVec8;
 	register vector float constVec, zeroVector;
@@ -9808,7 +9808,7 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 	if ( kHz == 11025 ) {
 		if ( numChannels == 1 ) {
 			 // calculate perm vector and do first load
-    		 vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
+    		 vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
 			 v10 = vec_ld( 0, &ogg[0][0] );
 
 			 int i;
@@ -9872,8 +9872,8 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 		} else {
 
 			// calculate perm vec for ogg
-    		vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
-			vecPerm2 = vec_add( vec_lvsl( -1, ( int*) &ogg[1][0] ), (vector unsigned char)(1 ) );
+    		vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
+			vecPerm2 = vec_add( vec_lvsl( -1, (int *) &ogg[1][0] ), (vector unsigned char)(1 ) );
 			v7 = vec_ld( 0, &ogg[1][0] );
 			v9 = vec_ld( 0, &ogg[0][0] );
 			int i;
@@ -9958,7 +9958,7 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 		if ( numChannels == 1 ) {
 
 		 // calculate perm vector and do first load
-    		 vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
+    		 vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
 			 v10 = vec_ld( 0, &ogg[0][0] );
 
 			int i;
@@ -10005,8 +10005,8 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 		} else {
 
 			// calculate perm vector and do first load
-    		vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
-    		vecPerm2 = vec_add( vec_lvsl( -1, ( int*) &ogg[1][0] ), (vector unsigned char)(1 ) );
+    		vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
+    		vecPerm2 = vec_add( vec_lvsl( -1, (int *) &ogg[1][0] ), (vector unsigned char)(1 ) );
 			v7 = vec_ld( 0, &ogg[1][0] );
 			v9 = vec_ld( 0, &ogg[0][0] );
 
@@ -10057,7 +10057,7 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 	} else if ( kHz == 44100 ) {
 		if ( numChannels == 1 ) {
 			// calculate perm vector and do first load
-			vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
+			vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
 
 			v9 = vec_ld( 0, &ogg[0][0] );
 			int i;
@@ -10095,8 +10095,8 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 		} else {
 
 			// calculate perm vector and do first load
-    		vecPerm1 = vec_add( vec_lvsl( -1, ( int*) &ogg[0][0] ), (vector unsigned char)(1 ) );
-    		vecPerm2 = vec_add( vec_lvsl( -1, ( int*) &ogg[1][0] ), (vector unsigned char)(1 ) );
+    		vecPerm1 = vec_add( vec_lvsl( -1, (int *) &ogg[0][0] ), (vector unsigned char)(1 ) );
+    		vecPerm2 = vec_add( vec_lvsl( -1, (int *) &ogg[1][0] ), (vector unsigned char)(1 ) );
 			v7 = vec_ld( 0, &ogg[1][0] );
 			v9 = vec_ld( 0, &ogg[0][0] );
 			int i;
@@ -10137,13 +10137,13 @@ void arcSIMD_AltiVec::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 #ifdef SOUND_DEST_ALIGNED
 /*
 ============
-arcSIMD_AltiVec::MixSoundTwoSpeakerMono
+anSIMD_AltiVec::MixSoundTwoSpeakerMono
 
 	Assumptions:
 		Assumes that mixBuffer starts at aligned address
 ============
 */
-void VPCALL arcSIMD_AltiVec::MixSoundTwoSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
+void VPCALL anSIMD_AltiVec::MixSoundTwoSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
 
 	// mixBuffer is aligned
 	assert( IS_16BYTE_ALIGNED( mixBuffer[0] ) );
@@ -10245,13 +10245,13 @@ void VPCALL arcSIMD_AltiVec::MixSoundTwoSpeakerMono( float *mixBuffer, const flo
 
 /*
 ============
-arcSIMD_AltiVec::MixSoundTwoSpeakerMono
+anSIMD_AltiVec::MixSoundTwoSpeakerMono
 
 	Assumptions:
 		No assumptions
 ============
 */
-void VPCALL arcSIMD_AltiVec::MixSoundTwoSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
+void VPCALL anSIMD_AltiVec::MixSoundTwoSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
 
 	int i;
 	float inc[2];
@@ -10359,13 +10359,13 @@ void VPCALL arcSIMD_AltiVec::MixSoundTwoSpeakerMono( float *mixBuffer, const flo
 #ifdef SOUND_DEST_ALIGNED
 /*
 ============
-arcSIMD_AltiVec::MixSoundTwoSpeakerStereo
+anSIMD_AltiVec::MixSoundTwoSpeakerStereo
 
 	Assumptions:
 		Assumes that mixBuffer starts at aligned address
 ============
 */
-void VPCALL arcSIMD_AltiVec::MixSoundTwoSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
+void VPCALL anSIMD_AltiVec::MixSoundTwoSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
 	// mixBuffer is aligned
 	assert( IS_16BYTE_ALIGNED( mixBuffer[0] ) );
 
@@ -10457,13 +10457,13 @@ void VPCALL arcSIMD_AltiVec::MixSoundTwoSpeakerStereo( float *mixBuffer, const f
 
 /*
 ============
-arcSIMD_AltiVec::MixSoundTwoSpeakerStereo
+anSIMD_AltiVec::MixSoundTwoSpeakerStereo
 
 	Assumptions:
 		No assumptions
 ============
 */
-void VPCALL arcSIMD_AltiVec::MixSoundTwoSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
+void VPCALL anSIMD_AltiVec::MixSoundTwoSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
 
 	int i, k;
 	float inc[2];
@@ -10562,13 +10562,13 @@ void VPCALL arcSIMD_AltiVec::MixSoundTwoSpeakerStereo( float *mixBuffer, const f
 #ifdef SOUND_DEST_ALIGNED
 /*
 ============
-arcSIMD_AltiVec::MixSoundSixSpeakerMono
+anSIMD_AltiVec::MixSoundSixSpeakerMono
 
 	Assumptions:
 		Assumes that mixBuffer starts at aligned address
 ============
 */
-void VPCALL arcSIMD_AltiVec::MixSoundSixSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
+void VPCALL anSIMD_AltiVec::MixSoundSixSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
 
 	// mixBuffer is aligned
 	assert( IS_16BYTE_ALIGNED( mixBuffer[0] ) );
@@ -10703,13 +10703,13 @@ void VPCALL arcSIMD_AltiVec::MixSoundSixSpeakerMono( float *mixBuffer, const flo
 
 /*
 ============
-arcSIMD_AltiVec::MixSoundSixSpeakerMono
+anSIMD_AltiVec::MixSoundSixSpeakerMono
 
 	Assumptions:
 		No assumptions
 ============
 */
-void VPCALL arcSIMD_AltiVec::MixSoundSixSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
+void VPCALL anSIMD_AltiVec::MixSoundSixSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
 
 	float incL[24];
 	float sL[24];
@@ -10852,14 +10852,14 @@ void VPCALL arcSIMD_AltiVec::MixSoundSixSpeakerMono( float *mixBuffer, const flo
 #ifdef SOUND_DEST_ALIGNED
 /*
 ============
-arcSIMD_AltiVec::MixSoundSixSpeakerStereo
+anSIMD_AltiVec::MixSoundSixSpeakerStereo
 
 	Assumptions:
 		Assumes that mixBuffer starts at aligned address
 ============
 */
 
-void VPCALL arcSIMD_AltiVec::MixSoundSixSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
+void VPCALL anSIMD_AltiVec::MixSoundSixSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
 
 	// mixBuffer is aligned
 	assert( IS_16BYTE_ALIGNED( mixBuffer[0] ) );
@@ -10977,13 +10977,13 @@ void VPCALL arcSIMD_AltiVec::MixSoundSixSpeakerStereo( float *mixBuffer, const f
 
 /*
 ============
-arcSIMD_AltiVec::MixSoundSixSpeakerStereo
+anSIMD_AltiVec::MixSoundSixSpeakerStereo
 
 	Assumptions:
 		No assumptions
 ============
 */
-void VPCALL arcSIMD_AltiVec::MixSoundSixSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
+void VPCALL anSIMD_AltiVec::MixSoundSixSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
 
 	float incL[12];
 	float sL[12];
@@ -11107,10 +11107,10 @@ void VPCALL arcSIMD_AltiVec::MixSoundSixSpeakerStereo( float *mixBuffer, const f
 
 /*
 ============
-arcSIMD_AltiVec::MixedSoundToSamples
+anSIMD_AltiVec::MixedSoundToSamples
 ============
 */
-void VPCALL arcSIMD_AltiVec::MixedSoundToSamples( short *samples, const float *mixBuffer, const int numSamples ) {
+void VPCALL anSIMD_AltiVec::MixedSoundToSamples( short *samples, const float *mixBuffer, const int numSamples ) {
      //this is basically a clamp for sound mixing
     register vector float v0, v1, v2, v3, v4, v5, v6, v7;
 	register vector signed int vi0, vi1, vi2, vi3;

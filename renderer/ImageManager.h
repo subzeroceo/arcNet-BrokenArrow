@@ -491,7 +491,7 @@ struct imageParams_t {
 anImageOpts::anImageOpts
 ========================
 */
-ARC_INLINE anImageOpts::anImageOpts() {
+inline anImageOpts::anImageOpts() {
 	format		= FMT_NONE;
 	colorFormat	= CFM_DEFAULT;
 	width		= 0;
@@ -508,7 +508,7 @@ ARC_INLINE anImageOpts::anImageOpts() {
 anImageOpts::operator
 ========================
 */
-ARC_INLINE bool anImageOpts::operator==( const anImageOpts & opts ) {
+inline bool anImageOpts::operator==( const anImageOpts & opts ) {
 	return ( memcmp( this, &opts, sizeof(* this) ) == 0 );
 }
 

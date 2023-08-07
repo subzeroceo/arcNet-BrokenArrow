@@ -610,7 +610,7 @@ R_FreeEntityDefDerivedData
 */
 void R_ClearEntityDefDynamicModel( anRenderEntityLocal *def ) {
 	// free all the interaction surfaces
-	for ( an Interaction *inter = def->firstInteraction; inter != nullptr && !inter->IsEmpty(); inter = inter->entityNext ) {
+	for ( anInteraction *inter = def->firstInteraction; inter != nullptr && !inter->IsEmpty(); inter = inter->entityNext ) {
 		inter->FreeSurfaces();
 	}
 

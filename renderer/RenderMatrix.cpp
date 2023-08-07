@@ -19,7 +19,7 @@
 #define CLAMP(a,b,c) MIN(MAX((a),(b)),(c))
 #endif
 #include "..//idlib/math/math.h"
-const anGL_RenderMatrix anGL_RenderMatrix::arcEntity;
+const anGL_RenderMatrix anGL_RenderMatrix::anEntity;
 
 int anGL_RenderMatrix::GetPixelsPerMeter( int pixelWidth ) const {
 	anVec3 result = xform( vec3_origin( 1, 0, -1 ) );
@@ -150,7 +150,7 @@ anGL_RenderMatrix anGL_RenderMatrix::CreateInfiniteProjectionMatrix( float fov, 
 anGL_RenderMatrix::CreateLookAtMatrix
 ================
 */
-anGL_RenderMatrix anGL_RenderMatrix::CreateLookAtMatrix( const anVec3& viewOrigin, const anVec3& at, const anVec3& up ) {
+anGL_RenderMatrix anGL_RenderMatrix::CreateLookAtMatrix( const anVec3 &viewOrigin, const anVec3 &at, const anVec3 &up ) {
 	anGL_RenderMatrix rot = CreateLookAtMatrix( at - viewOrigin, up );
 	anGL_RenderMatrix translate[12] = -viewOrigin.x;
 	anGL_RenderMatrix translate[13] = -viewOrigin.y;
@@ -159,11 +159,92 @@ anGL_RenderMatrix anGL_RenderMatrix::CreateLookAtMatrix( const anVec3& viewOrigi
 }
 
 /*
+==========================
+anGL_RenderMatrix::Transform
+==========================
+*/
+void anGL_RenderMatrix::Transform( const anVec3 &src, anVec2 &dst ) const {
+	anPlane eye, clip;
+
+	for ( int i = 0 ; i < 4 ; i++ ) {
+		eye[i] = 
+			src[0] * modelViewMatrix[ i + 0 * 4 ] +
+			src[1] * modelViewMatrix[ i + 1 * 4 ] +
+			src[2] * modelViewMatrix[ i + 2 * 4 ] +
+			modelViewMatrix[ i + 3 * 4 ];
+	}
+
+	for ( int i = 0 ; i < 4 ; i++ ) {
+		clip[i] = 
+			eye[0] * projectionMatrix[ i + 0 * 4 ] +
+			eye[1] * projectionMatrix[ i + 1 * 4 ] +
+			eye[2] * projectionMatrix[ i + 2 * 4 ] +
+			eye[3] * projectionMatrix[ i + 3 * 4 ];
+	}
+
+	if ( clip[ 3 ] <= 0.01f ) {
+		clip[ 3 ] = 0.01f;
+	}
+
+	dst[ 0 ] = clip[ 0 ] / clip[ 3 ];
+	dst[ 1 ] = clip[ 1 ] / clip[ 3 ];
+
+	dst[ 0 ] = ( 0.5f * ( 1.0f + dst[ 0 ] ) * extents[ 0 ] );
+	dst[ 1 ] = ( 0.5f * ( 1.0f - dst[ 1 ] ) * extents[ 1 ] );
+}
+
+/*
+==========================
+anGL_RenderMatrix::Transform
+==========================
+*/
+void anGL_RenderMatrix::Transform( const anBounds &src, const anMat3 &axes, const anVec3 &origin, anBounds2D &dst ) const {
+	anVec3 point;
+	anVec2 screenPoint;
+
+	dst.Clear();
+
+	for ( int i = 0; i < 8; i++ ) {
+		point[ 0 ] = src[ ( i & 1 ) >> 0 ][ 0 ];
+		point[ 1 ] = src[ ( i & 2 ) >> 1 ][ 1 ];
+		point[ 2 ] = src[ ( i & 4 ) >> 2 ][ 2 ];
+
+		point *= axes;
+		point += origin;
+
+		Transform( point, screenPoint );
+
+		dst.AddPoint( screenPoint );
+	}
+}
+
+/*
+======================
+anGL_RenderMatrix::TransformClipped
+======================
+*/
+bool anGL_RenderMatrix::TransformClipped( const anBounds &bounds, const anMat3 &axes, const anVec3 &origin, anBounds2D &dst, const anFrustum &frustum, const anVec2 &extents ) {
+	anBounds temp;
+	if ( !frustum.ProjectionBounds( anBox( bounds, origin, axes ), temp ) ) {
+		return false;
+	}
+
+	dst.GetMins().x = 0.5f * ( 1.0f - temp[ 1 ].y ) * extents.x;
+	dst.GetMaxs().x = 0.5f * ( 1.0f - temp[ 0 ].y ) * extents.x;
+
+	dst.GetMins().y = 0.5f * ( 1.0f - temp[ 1 ].z ) * extents.y;
+	dst.GetMaxs().y = 0.5f * ( 1.0f - temp[ 0 ].z ) * extents.y;
+
+	return true;
+}
+
+
+/*
 ================
 anGL_RenderMatrix::CreateLookAtMatrix
 ================
 */
-anGL_RenderMatrix anGL_RenderMatrix::CreateLookAtMatrix( const anVec3& dir, const anVec3& up ) {
+anGL_RenderMatrix anGL_RenderMatrix::CreateLookAtMatrix( const anVec3 &dir, const anVec3 &up ) {
 	anVec3 zAxis = ( dir * -1 ).Normalized();
 	anVec3 xAxis = up.Cross( zAxis ).Normalized();
 	anVec3 yAxis = zAxis.Cross( xAxis );
@@ -188,7 +269,7 @@ anGL_RenderMatrix anGL_RenderMatrix::CreateLookAtMatrix( const anVec3& dir, cons
 anGL_RenderMatrix::CreateViewMatrix
 ================
 */
-anGL_RenderMatrix anGL_RenderMatrix::CreateViewMatrix( const anVec3& origin ) {
+anGL_RenderMatrix anGL_RenderMatrix::CreateViewMatrix( const anVec3 &origin ) {
 	anGL_RenderMatrix m;
 	m[12] = -origin.x;
 	m[13] = -origin.y;
@@ -366,10 +447,10 @@ void anGL_RenderMatrix::FullInvert( const float a[16], float r[16] ) {
 
 /*
 ==========================
-anGL_RenderMatrix::GL_MultMatrix
+anGL_RenderMatrix::GL_MultMatrixAligned
 ==========================
 */
-void anGL_RenderMatrix::GL_MultMatrix( const float a[16], const float b[16], float out[16] ) {
+void anGL_RenderMatrix::GL_MultMatrixAligned( const float a[16], const float b[16], float out[16] ) {
 #if 0
 	for ( int i = 0; i < 4; i++ ) {
 		for ( int j = 0; j < 4; j++ ) {
@@ -380,23 +461,101 @@ void anGL_RenderMatrix::GL_MultMatrix( const float a[16], const float b[16], flo
 				+ a [ i * 4 + 3 ] * b [ 3 * 4 + j ];
 		}
 	}
+
+#elif defined( ID_WIN_X86_SSE )
+	__asm {
+		mov edx, a
+		mov eax, output
+		mov ecx, b
+		movss xmm0, dword ptr [edx]
+		movaps xmm1, xmmword ptr [ecx]
+		shufps xmm0, xmm0, 0
+		movss xmm2, dword ptr [edx+4]
+		mulps xmm0, xmm1
+		shufps xmm2, xmm2, 0
+		movaps xmm3, xmmword ptr [ecx+10h]
+		movss xmm7, dword ptr [edx+8]
+		mulps xmm2, xmm3
+		shufps xmm7, xmm7, 0
+		addps xmm0, xmm2
+		movaps xmm4, xmmword ptr [ecx+20h]
+		movss xmm2, dword ptr [edx+0Ch]
+		mulps xmm7, xmm4
+		shufps xmm2, xmm2, 0
+		addps xmm0, xmm7
+		movaps xmm5, xmmword ptr [ecx+30h]
+		movss xmm6, dword ptr [edx+10h]
+		mulps xmm2, xmm5
+		movss xmm7, dword ptr [edx+14h]
+		shufps xmm6, xmm6, 0
+		addps xmm0, xmm2
+		shufps xmm7, xmm7, 0
+		movlps qword ptr [eax], xmm0
+		movhps qword ptr [eax+8], xmm0
+		mulps xmm7, xmm3
+		movss xmm0, dword ptr [edx+18h]
+		mulps xmm6, xmm1
+		shufps xmm0, xmm0, 0
+		addps xmm6, xmm7
+		mulps xmm0, xmm4
+		movss xmm2, dword ptr [edx+24h]
+		addps xmm6, xmm0
+		movss xmm0, dword ptr [edx+1Ch]
+		movss xmm7, dword ptr [edx+20h]
+		shufps xmm0, xmm0, 0
+		shufps xmm7, xmm7, 0
+		mulps xmm0, xmm5
+		mulps xmm7, xmm1
+		addps xmm6, xmm0
+		shufps xmm2, xmm2, 0
+		movlps qword ptr [eax+10h], xmm6
+		movhps qword ptr [eax+18h], xmm6
+		mulps xmm2, xmm3
+		movss xmm6, dword ptr [edx+28h]
+		addps xmm7, xmm2
+		shufps xmm6, xmm6, 0
+		movss xmm2, dword ptr [edx+2Ch]
+		mulps xmm6, xmm4
+		shufps xmm2, xmm2, 0
+		addps xmm7, xmm6
+		mulps xmm2, xmm5
+		movss xmm0, dword ptr [edx+34h]
+		addps xmm7, xmm2
+		shufps xmm0, xmm0, 0
+		movlps qword ptr [eax+20h], xmm7
+		movss xmm2, dword ptr [edx+30h]
+		movhps qword ptr [eax+28h], xmm7
+		mulps xmm0, xmm3
+		shufps xmm2, xmm2, 0
+		movss xmm6, dword ptr [edx+38h]
+		mulps xmm2, xmm1
+		shufps xmm6, xmm6, 0
+		addps xmm2, xmm0
+		mulps xmm6, xmm4
+		movss xmm7, dword ptr [edx+3Ch]
+		shufps xmm7, xmm7, 0
+		addps xmm2, xmm6
+		mulps xmm7, xmm5
+		addps xmm2, xmm7
+		movaps xmmword ptr [eax+30h], xmm2
+	}
 #else
-	out[0*4+0] = a[0*4+0]*b[0*4+0] + a[0*4+1]*b[1*4+0] + a[0*4+2]*b[2*4+0] + a[0*4+3]*b[3*4+0];
-	out[0*4+1] = a[0*4+0]*b[0*4+1] + a[0*4+1]*b[1*4+1] + a[0*4+2]*b[2*4+1] + a[0*4+3]*b[3*4+1];
-	out[0*4+2] = a[0*4+0]*b[0*4+2] + a[0*4+1]*b[1*4+2] + a[0*4+2]*b[2*4+2] + a[0*4+3]*b[3*4+2];
-	out[0*4+3] = a[0*4+0]*b[0*4+3] + a[0*4+1]*b[1*4+3] + a[0*4+2]*b[2*4+3] + a[0*4+3]*b[3*4+3];
-	out[1*4+0] = a[1*4+0]*b[0*4+0] + a[1*4+1]*b[1*4+0] + a[1*4+2]*b[2*4+0] + a[1*4+3]*b[3*4+0];
-	out[1*4+1] = a[1*4+0]*b[0*4+1] + a[1*4+1]*b[1*4+1] + a[1*4+2]*b[2*4+1] + a[1*4+3]*b[3*4+1];
-	out[1*4+2] = a[1*4+0]*b[0*4+2] + a[1*4+1]*b[1*4+2] + a[1*4+2]*b[2*4+2] + a[1*4+3]*b[3*4+2];
-	out[1*4+3] = a[1*4+0]*b[0*4+3] + a[1*4+1]*b[1*4+3] + a[1*4+2]*b[2*4+3] + a[1*4+3]*b[3*4+3];
-	out[2*4+0] = a[2*4+0]*b[0*4+0] + a[2*4+1]*b[1*4+0] + a[2*4+2]*b[2*4+0] + a[2*4+3]*b[3*4+0];
-	out[2*4+1] = a[2*4+0]*b[0*4+1] + a[2*4+1]*b[1*4+1] + a[2*4+2]*b[2*4+1] + a[2*4+3]*b[3*4+1];
-	out[2*4+2] = a[2*4+0]*b[0*4+2] + a[2*4+1]*b[1*4+2] + a[2*4+2]*b[2*4+2] + a[2*4+3]*b[3*4+2];
-	out[2*4+3] = a[2*4+0]*b[0*4+3] + a[2*4+1]*b[1*4+3] + a[2*4+2]*b[2*4+3] + a[2*4+3]*b[3*4+3];
-	out[3*4+0] = a[3*4+0]*b[0*4+0] + a[3*4+1]*b[1*4+0] + a[3*4+2]*b[2*4+0] + a[3*4+3]*b[3*4+0];
-	out[3*4+1] = a[3*4+0]*b[0*4+1] + a[3*4+1]*b[1*4+1] + a[3*4+2]*b[2*4+1] + a[3*4+3]*b[3*4+1];
-	out[3*4+2] = a[3*4+0]*b[0*4+2] + a[3*4+1]*b[1*4+2] + a[3*4+2]*b[2*4+2] + a[3*4+3]*b[3*4+2];
-	out[3*4+3] = a[3*4+0]*b[0*4+3] + a[3*4+1]*b[1*4+3] + a[3*4+2]*b[2*4+3] + a[3*4+3]*b[3*4+3];
+	output[0*4+0] = a[0*4+0]*b[0*4+0] + a[0*4+1]*b[1*4+0] + a[0*4+2]*b[2*4+0] + a[0*4+3]*b[3*4+0];
+	output[0*4+1] = a[0*4+0]*b[0*4+1] + a[0*4+1]*b[1*4+1] + a[0*4+2]*b[2*4+1] + a[0*4+3]*b[3*4+1];
+	output[0*4+2] = a[0*4+0]*b[0*4+2] + a[0*4+1]*b[1*4+2] + a[0*4+2]*b[2*4+2] + a[0*4+3]*b[3*4+2];
+	output[0*4+3] = a[0*4+0]*b[0*4+3] + a[0*4+1]*b[1*4+3] + a[0*4+2]*b[2*4+3] + a[0*4+3]*b[3*4+3];
+	output[1*4+0] = a[1*4+0]*b[0*4+0] + a[1*4+1]*b[1*4+0] + a[1*4+2]*b[2*4+0] + a[1*4+3]*b[3*4+0];
+	output[1*4+1] = a[1*4+0]*b[0*4+1] + a[1*4+1]*b[1*4+1] + a[1*4+2]*b[2*4+1] + a[1*4+3]*b[3*4+1];
+	output[1*4+2] = a[1*4+0]*b[0*4+2] + a[1*4+1]*b[1*4+2] + a[1*4+2]*b[2*4+2] + a[1*4+3]*b[3*4+2];
+	output[1*4+3] = a[1*4+0]*b[0*4+3] + a[1*4+1]*b[1*4+3] + a[1*4+2]*b[2*4+3] + a[1*4+3]*b[3*4+3];
+	output[2*4+0] = a[2*4+0]*b[0*4+0] + a[2*4+1]*b[1*4+0] + a[2*4+2]*b[2*4+0] + a[2*4+3]*b[3*4+0];
+	output[2*4+1] = a[2*4+0]*b[0*4+1] + a[2*4+1]*b[1*4+1] + a[2*4+2]*b[2*4+1] + a[2*4+3]*b[3*4+1];
+	output[2*4+2] = a[2*4+0]*b[0*4+2] + a[2*4+1]*b[1*4+2] + a[2*4+2]*b[2*4+2] + a[2*4+3]*b[3*4+2];
+	output[2*4+3] = a[2*4+0]*b[0*4+3] + a[2*4+1]*b[1*4+3] + a[2*4+2]*b[2*4+3] + a[2*4+3]*b[3*4+3];
+	output[3*4+0] = a[3*4+0]*b[0*4+0] + a[3*4+1]*b[1*4+0] + a[3*4+2]*b[2*4+0] + a[3*4+3]*b[3*4+0];
+	output[3*4+1] = a[3*4+0]*b[0*4+1] + a[3*4+1]*b[1*4+1] + a[3*4+2]*b[2*4+1] + a[3*4+3]*b[3*4+1];
+	output[3*4+2] = a[3*4+0]*b[0*4+2] + a[3*4+1]*b[1*4+2] + a[3*4+2]*b[2*4+2] + a[3*4+3]*b[3*4+2];
+	output[3*4+3] = a[3*4+0]*b[0*4+3] + a[3*4+1]*b[1*4+3] + a[3*4+2]*b[2*4+3] + a[3*4+3]*b[3*4+3];
 #endif
 }
 
@@ -712,7 +871,7 @@ void R_SetViewMatrix( viewDef_t *viewDef ) {
 
 	// convert from our coordinate system (looking down X)
 	// to OpenGL's coordinate system (looking down -Z)
-	GL_MultMatrix( viewerMatrix, s_flipMatrix, world->modelViewMatrix );
+	GL_MultMatrixAligned( viewerMatrix, s_flipMatrix, world->modelViewMatrix );
 }
 
 /*
@@ -846,13 +1005,13 @@ This uses the "infinite far z" trick
 ===============
 */
 void R_SetupProjection( void ) {
-	static arcRandom random;
+	static anRandom random;
 
 	// random jittering is usefull when multiple
 	// frames are going to be blended together
 	// for motion blurred anti-aliasing
 	if ( r_jitter.GetBool() ) {
-		float jitterX = random.RandomFloat();//= static arcRandom random = random.RandomFloat();
+		float jitterX = random.RandomFloat();//= static anRandom random = random.RandomFloat();
 		float jitterY = random.RandomFloat();
 	} else {
 		float jitterX = jitterY = 0;
@@ -1013,7 +1172,7 @@ int FindBoundsIntersectionsSimSIMD( const shortBounds_t testBounds, const shortB
 		bool	compare[8];
 		int		count = 0;
 		for ( int j = 0; j < 8; j++ ) {
-			if ( ( ( short *)&compareBounds )[j] >= (( short *)&listBounds )[j] ) {
+			if ( ( (short *)&compareBounds )[j] >= ((short *)&listBounds )[j] ) {
 				compare[j] = true;
 				count++;
 			} else {
@@ -1061,7 +1220,7 @@ int anBoundsTrack::FindIntersections( const anBounds & testBounds, int intersect
 
 void anBoundsTrack::Test() {
 	ClearAll();
-	arcRandom	r;
+	anRandom	r;
 
 	for ( int i = 0; i < 1800; i++ ) {
 		anBounds b;

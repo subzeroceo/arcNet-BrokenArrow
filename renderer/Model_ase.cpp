@@ -125,8 +125,8 @@ static void ASE_KeyMAP_DIFFUSE( const char *token ) {
 	aseMaterial_t *material;
 
 	if ( !strcmp( token, "*BITMAP" ) ) {
-		anString	qpath;
-		anString	matname;
+		anStr	qpath;
+		anStr	matname;
 
 		ASE_GetToken( false );
 
@@ -140,7 +140,7 @@ static void ASE_KeyMAP_DIFFUSE( const char *token ) {
 		// convert the 3DSMax material pathname to a qpath
 		matname.BackSlashesToSlashes();
 		qpath = fileSystem->OSPathToRelativePath( matname );
-		anString::Copynz( ase.currentMaterial->name, qpath, sizeof( ase.currentMaterial->name ) );
+		anStr::Copynz( ase.currentMaterial->name, qpath, sizeof( ase.currentMaterial->name ) );
 	} else if ( !strcmp( token, "*UVW_U_OFFSET" ) ) {
 		material = ase.model->materials[ase.model->materials.Num() - 1];
 		ASE_GetToken( false );
@@ -516,7 +516,7 @@ static void ASE_KeyGEOMOBJECT( const char *token ) {
 	if ( !strcmp( token, "*NODE_NAME" ) ) {
 		ASE_GetToken( true );
 		VERBOSE( ( " %s\n", ase.token ) );
-		anString::Copynz( object->name, ase.token, sizeof( object->name ) );
+		anStr::Copynz( object->name, ase.token, sizeof( object->name ) );
 	} else if ( !strcmp( token, "*NODE_PARENT" ) ) {
 		ASE_SkipRestOfLine();
 	// ignore unused data blocks
@@ -894,21 +894,21 @@ static void ASE_KeyMESH_FACE_LIST( const char *token ) {
 	aseMesh_t *pMesh = ASE_GetCurrentMesh();
 
 	if ( !strcmp( token, "*MESH_FACE" ) ) {
-		ASE_GetToken( qfalse );	// skip face number
+		ASE_GetToken( false );	// skip face number
 
-		ASE_GetToken( qfalse );	// skip label
-		ASE_GetToken( qfalse );	// first vertex
+		ASE_GetToken( false );	// skip label
+		ASE_GetToken( false );	// first vertex
 		pMesh->faces[pMesh->currentFace][0] = atoi( s_token );
 
-		ASE_GetToken( qfalse );	// skip label
-		ASE_GetToken( qfalse );	// second vertex
+		ASE_GetToken( false );	// skip label
+		ASE_GetToken( false );	// second vertex
 		pMesh->faces[pMesh->currentFace][2] = atoi( s_token );
 
-		ASE_GetToken( qfalse );	// skip label
-		ASE_GetToken( qfalse );	// third vertex
+		ASE_GetToken( false );	// skip label
+		ASE_GetToken( false );	// third vertex
 		pMesh->faces[pMesh->currentFace][1] = atoi( s_token );
 
-		ASE_GetToken( qtrue );
+		ASE_GetToken( true );
 
 /*		if ( ( p = strstr( s_token, "*MESH_MTLID" ) ) != 0 ) {
 			p += strlen( "*MESH_MTLID" ) + 1;
@@ -929,13 +929,13 @@ static void ASE_KeyTFACE_LIST( const char *token ) {
 	if ( !strcmp( token, "*MESH_TFACE" ) ) {
 		int a, b, c;
 
-		ASE_GetToken( qfalse );
+		ASE_GetToken( false );
 
-		ASE_GetToken( qfalse );
+		ASE_GetToken( false );
 		a = atoi( s_token );
-		ASE_GetToken( qfalse );
+		ASE_GetToken( false );
 		c = atoi( s_token );
-		ASE_GetToken( qfalse );
+		ASE_GetToken( false );
 		b = atoi( s_token );
 
 		pMesh->tfaces[pMesh->currentFace][0] = a;
@@ -973,7 +973,7 @@ static void ASE_KeyGEOMOBJECT( const char *token ) {
 	if ( !strcmp( token, "*NODE_NAME" ) ) {
 		char *name = ase.objects[ase.currentObject].name;
 
-		ASE_GetToken( qtrue );
+		ASE_GetToken( true );
 		VERBOSE( ( " %s\n", s_token ) );
 		strcpy( ase.objects[ase.currentObject].name, s_token + 1 );
 		if ( strchr( ase.objects[ase.currentObject].name, '"' ) )
@@ -1016,7 +1016,7 @@ static void ASE_KeyGEOMOBJECT( const char *token ) {
 		}*/
 	// according to spec these are obsolete
 	} else if ( !strcmp( token, "*MATERIAL_REF" ) ) {
-		ASE_GetToken( qfalse );
+		ASE_GetToken( false );
 		ase.objects[ase.currentObject].materialRef = atoi( s_token );
 	// loads a sequence of animation frames
 	} else if ( !strcmp( token, "*MESH_ANIMATION" ) ) {
@@ -1076,7 +1076,7 @@ static void CollapseObjects( void ) {
 */
 static void ASE_Process( void )
 {
-	while ( ASE_GetToken( qfalse ) )
+	while ( ASE_GetToken( false ) )
 	{
 		if ( !strcmp( s_token, "*3DSMAX_ASCIIEXPORT" ) ||
 			 !strcmp( s_token, "*COMMENT" ) )

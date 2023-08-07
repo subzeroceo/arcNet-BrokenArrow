@@ -13,19 +13,19 @@
 class anEncodeBase64 {
 public:
 				anEncodeBase64( void );
-				anEncodeBase64( const anString &s );
+				anEncodeBase64( const anStr &s );
 				~anEncodeBase64( void );
 
 	void		Encode( const byte *from, int size );
-	void		Encode( const anString &src );
+	void		Encode( const anStr &src );
 	int			DecodeLength( void ) const; // minimum size in bytes of destination buffer for decoding
 	int			Decode( byte *to ) const; // does not append a \0 - needs a DecodeLength() bytes buffer
-	void		Decode( anString &dest ) const; // decodes the binary content to an anString (a bit dodgy, \0 and other non-ascii are possible in the decoded content)
+	void		Decode( anStr &dest ) const; // decodes the binary content to an anStr (a bit dodgy, \0 and other non-ascii are possible in the decoded content)
 	void		Decode( anFile *dest ) const;
 
 	const char	*c_str() const;
 
-	void 		operator=( const anString &s );
+	void 		operator=( const anStr &s );
 
 private:
 	byte *		data;
@@ -37,37 +37,37 @@ private:
 	void		EnsureAlloced( int size );
 };
 
-ARC_INLINE anEncodeBase64::anEncodeBase64( void ) {
+inline anEncodeBase64::anEncodeBase64( void ) {
 	Init();
 }
 
-ARC_INLINE anEncodeBase64::anEncodeBase64( const anString &s ) {
+inline anEncodeBase64::anEncodeBase64( const anStr &s ) {
 	Init();
 	*this = s;
 }
 
-ARC_INLINE anEncodeBase64::~anEncodeBase64( void ) {
+inline anEncodeBase64::~anEncodeBase64( void ) {
 	Release();
 }
 
-ARC_INLINE const char *anEncodeBase64::c_str( void ) const {
+inline const char *anEncodeBase64::c_str( void ) const {
 	return (const char *)data;
 }
 
-ARC_INLINE void anEncodeBase64::Init( void ) {
+inline void anEncodeBase64::Init( void ) {
 	len = 0;
 	alloced = 0;
 	data = nullptr;
 }
 
-ARC_INLINE void anEncodeBase64::Release( void ) {
+inline void anEncodeBase64::Release( void ) {
 	if ( data ) {
 		delete[] data;
 	}
 	Init();
 }
 
-ARC_INLINE void anEncodeBase64::EnsureAlloced( int size ) {
+inline void anEncodeBase64::EnsureAlloced( int size ) {
 	if ( size > alloced ) {
 		Release();
 	}
@@ -75,7 +75,7 @@ ARC_INLINE void anEncodeBase64::EnsureAlloced( int size ) {
 	alloced = size;
 }
 
-ARC_INLINE void anEncodeBase64::operator=( const anString &s ) {
+inline void anEncodeBase64::operator=( const anStr &s ) {
 	EnsureAlloced( s.Length()+1 ); // trailing \0 - beware, this does a Release
 	strcpy( (char *)data, s.c_str() );
 	len = s.Length();

@@ -21,8 +21,8 @@ class anKeyValue {
 	friend class anDict;
 
 public:
-	const anString &	GetKey( void ) const { return *key; }
-	const anString &	GetValue( void ) const { return *value; }
+	const  &	GetKey( void ) const { return *key; }
+	const  &	GetValue( void ) const { return *value; }
 
 	size_t				Allocated( void ) const { return key->Allocated() + value->Allocated(); }
 	size_t				Size( void ) const { return sizeof( *this ) + key->Size() + value->Size(); }
@@ -30,8 +30,8 @@ public:
 	bool				operator==( const anKeyValue &kv ) const { return ( key == kv.key && value == kv.value ); }
 
 private:
-	const ARCPoolString *	key;
-	const ARCPoolString *	value;
+	const anPoolString *	key;
+	const anPoolString *	value;
 };
 
 class anDict {
@@ -84,7 +84,7 @@ public:
 	anMat3				GetMatrix( const char *key, const char *defaultString = nullptr ) const;
 
 	bool				GetString( const char *key, const char *defaultString, const char **out ) const;
-	bool				GetString( const char *key, const char *defaultString, anString &out ) const;
+	bool				GetString( const char *key, const char *defaultString,  &out ) const;
 	bool				GetFloat( const char *key, const char *defaultString, float &out ) const;
 	bool				GetInt( const char *key, const char *defaultString, int &out ) const;
 	bool				GetBool( const char *key, const char *defaultString, bool &out ) const;
@@ -108,7 +108,7 @@ public:
 						// lastMatch can be used to do additional searches past the first match.
 	const anKeyValue *	MatchPrefix( const char *prefix, const anKeyValue *lastMatch = nullptr ) const;
 						// randomly chooses one of the key/value pairs with the given key prefix and returns it's value
-	const char *		RandomPrefix( const char *prefix, arcRandom &random ) const;
+	const char *		RandomPrefix( const char *prefix, anRandom &random ) const;
 
 	void				WriteToFileHandle( anFile *f ) const;
 	void				ReadFromFileHandle( anFile *f );
@@ -132,64 +132,64 @@ private:
 };
 
 
-ARC_INLINE anDict::anDict( void ) {
+inline anDict::anDict( void ) {
 	args.SetGranularity( 16 );
 	argHash.SetGranularity( 16 );
 	argHash.Clear( 128, 16 );
 }
 
-ARC_INLINE anDict::anDict( const anDict &other ) {
+inline anDict::anDict( const anDict &other ) {
 	*this = other;
 }
 
-ARC_INLINE anDict::~anDict( void ) {
+inline anDict::~anDict( void ) {
 	Clear();
 }
 
-ARC_INLINE void anDict::SetGranularity( int granularity ) {
+inline void anDict::SetGranularity( int granularity ) {
 	args.SetGranularity( granularity );
 	argHash.SetGranularity( granularity );
 }
 
-ARC_INLINE void anDict::SetHashSize( int hashSize ) {
+inline void anDict::SetHashSize( int hashSize ) {
 	if ( args.Num() == 0 ) {
 		argHash.Clear( hashSize, 16 );
 	}
 }
 
-ARC_INLINE void anDict::SetFloat( const char *key, float val ) {
+inline void anDict::SetFloat( const char *key, float val ) {
 	Set( key, va( "%f", val ) );
 }
 
-ARC_INLINE void anDict::SetInt( const char *key, int val ) {
+inline void anDict::SetInt( const char *key, int val ) {
 	Set( key, va( "%i", val ) );
 }
 
-ARC_INLINE void anDict::SetBool( const char *key, bool val ) {
+inline void anDict::SetBool( const char *key, bool val ) {
 	Set( key, va( "%i", val ) );
 }
 
-ARC_INLINE void anDict::SetVector( const char *key, const anVec3 &val ) {
+inline void anDict::SetVector( const char *key, const anVec3 &val ) {
 	Set( key, val.ToString() );
 }
 
-ARC_INLINE void anDict::SetVec4( const char *key, const anVec4 &val ) {
+inline void anDict::SetVec4( const char *key, const anVec4 &val ) {
 	Set( key, val.ToString() );
 }
 
-ARC_INLINE void anDict::SetVec2( const char *key, const anVec2 &val ) {
+inline void anDict::SetVec2( const char *key, const anVec2 &val ) {
 	Set( key, val.ToString() );
 }
 
-ARC_INLINE void anDict::SetAngles( const char *key, const anAngles &val ) {
+inline void anDict::SetAngles( const char *key, const anAngles &val ) {
 	Set( key, val.ToString() );
 }
 
-ARC_INLINE void anDict::SetMatrix( const char *key, const anMat3 &val ) {
+inline void anDict::SetMatrix( const char *key, const anMat3 &val ) {
 	Set( key, val.ToString() );
 }
 
-ARC_INLINE bool anDict::GetString( const char *key, const char *defaultString, const char **out ) const {
+inline bool anDict::GetString( const char *key, const char *defaultString, const char **out ) const {
 	const anKeyValue *kv = FindKey( key );
 	if ( kv ) {
 		*out = kv->GetValue();
@@ -199,7 +199,7 @@ ARC_INLINE bool anDict::GetString( const char *key, const char *defaultString, c
 	return false;
 }
 
-ARC_INLINE bool anDict::GetString( const char *key, const char *defaultString, anString &out ) const {
+inline bool anDict::GetString( const char *key, const char *defaultString,  &out ) const {
 	const anKeyValue *kv = FindKey( key );
 	if ( kv ) {
 		out = kv->GetValue();
@@ -209,7 +209,7 @@ ARC_INLINE bool anDict::GetString( const char *key, const char *defaultString, a
 	return false;
 }
 
-ARC_INLINE const char *anDict::GetString( const char *key, const char *defaultString ) const {
+inline const char *anDict::GetString( const char *key, const char *defaultString ) const {
 	const anKeyValue *kv = FindKey( key );
 	if ( kv ) {
 		return kv->GetValue();
@@ -217,53 +217,53 @@ ARC_INLINE const char *anDict::GetString( const char *key, const char *defaultSt
 	return defaultString;
 }
 
-ARC_INLINE float anDict::GetFloat( const char *key, const char *defaultString ) const {
+inline float anDict::GetFloat( const char *key, const char *defaultString ) const {
 	return atof( GetString( key, defaultString ) );
 }
 
-ARC_INLINE int anDict::GetInt( const char *key, const char *defaultString ) const {
+inline int anDict::GetInt( const char *key, const char *defaultString ) const {
 	return atoi( GetString( key, defaultString ) );
 }
 
-ARC_INLINE bool anDict::GetBool( const char *key, const char *defaultString ) const {
+inline bool anDict::GetBool( const char *key, const char *defaultString ) const {
 	return ( atoi( GetString( key, defaultString ) ) != 0 );
 }
 
-ARC_INLINE anVec3 anDict::GetVector( const char *key, const char *defaultString ) const {
+inline anVec3 anDict::GetVector( const char *key, const char *defaultString ) const {
 	anVec3 out;
 	GetVector( key, defaultString, out );
 	return out;
 }
 
-ARC_INLINE anVec2 anDict::GetVec2( const char *key, const char *defaultString ) const {
+inline anVec2 anDict::GetVec2( const char *key, const char *defaultString ) const {
 	anVec2 out;
 	GetVec2( key, defaultString, out );
 	return out;
 }
 
-ARC_INLINE anVec4 anDict::GetVec4( const char *key, const char *defaultString ) const {
+inline anVec4 anDict::GetVec4( const char *key, const char *defaultString ) const {
 	anVec4 out;
 	GetVec4( key, defaultString, out );
 	return out;
 }
 
-ARC_INLINE anAngles anDict::GetAngles( const char *key, const char *defaultString ) const {
+inline anAngles anDict::GetAngles( const char *key, const char *defaultString ) const {
 	anAngles out;
 	GetAngles( key, defaultString, out );
 	return out;
 }
 
-ARC_INLINE anMat3 anDict::GetMatrix( const char *key, const char *defaultString ) const {
+inline anMat3 anDict::GetMatrix( const char *key, const char *defaultString ) const {
 	anMat3 out;
 	GetMatrix( key, defaultString, out );
 	return out;
 }
 
-ARC_INLINE int anDict::GetNumKeyVals( void ) const {
+inline int anDict::GetNumKeyVals( void ) const {
 	return args.Num();
 }
 
-ARC_INLINE const anKeyValue *anDict::GetKeyVal( int index ) const {
+inline const anKeyValue *anDict::GetKeyVal( int index ) const {
 	if ( index >= 0 && index < args.Num() ) {
 		return &args[index];
 	}

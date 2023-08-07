@@ -181,7 +181,7 @@ void GetPointOutsideObstacles( const obstacle_t *obstacles, const int numObstacl
 		return;
 	}
 
-	queue = ( int*) _alloca( numObstacles * sizeof( queue[0] ) );
+	queue = (int *) _alloca( numObstacles * sizeof( queue[0] ) );
 	obstacleVisited = (bool *) _alloca( numObstacles * sizeof( obstacleVisited[0] ) );
 
 	queueStart = 0;
@@ -453,7 +453,7 @@ int GetObstacles( const anActor* owner, const anPhysics *physics, const anSEAS *
 
 	// create obstacles for AAS walls
 	if ( aas ) {
-		float halfBoundsSize = ( expBounds[ 1 ].x - expBounds[ 0 ].x ) * 0.5f;
+		float halfBoundsSize = ( expBounds[1].x - expBounds[0].x ) * 0.5f;
 
 		numWallEdges = aas->GetWallEdges( areaNum, clipBounds, TFL_WALK, wallEdges, MAX_AAS_WALL_EDGES );
 		aas->SortWallEdges( wallEdges, numWallEdges );

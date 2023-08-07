@@ -672,7 +672,7 @@ Sets surfaceInteraction_t->cullBits
 ==================
 */
 void RB_EXP_CullInteractions( viewLight_t *vLight, anPlane frustumPlanes[6] ) {
-	for ( an Interaction *inter = vLight->lightDef->firstInteraction; inter; inter = inter->lightNext ) {
+	for ( anInteraction *inter = vLight->lightDef->firstInteraction; inter; inter = inter->lightNext ) {
 		const anRenderEntityLocal *entityDef = inter->entityDef;
 		if ( !entityDef ) {
 			continue;
@@ -736,7 +736,7 @@ RB_EXP_RenderOccluders
 ==================
 */
 void RB_EXP_RenderOccluders( viewLight_t *vLight ) {
-	for ( an Interaction *inter = vLight->lightDef->firstInteraction; inter; inter = inter->lightNext ) {
+	for ( anInteraction *inter = vLight->lightDef->firstInteraction; inter; inter = inter->lightNext ) {
 		const anRenderEntityLocal *entityDef = inter->entityDef;
 		if ( !entityDef ) {
 			continue;
@@ -748,7 +748,7 @@ void RB_EXP_RenderOccluders( viewLight_t *vLight ) {
 		// no need to check for current on this, because each interaction is always
 		// a different space
 		float	matrix[16];
-		GL_MultMatrix( inter->entityDef->modelMatrix, lightMatrix, matrix );
+		GL_MultMatrixAligned( inter->entityDef->modelMatrix, lightMatrix, matrix );
 		qglLoadMatrixf( matrix );
 
 		// draw each surface
@@ -936,7 +936,7 @@ void    RB_RenderShadowBuffer( viewLight_t	*vLight, int side ) {
 	viewMatrix[15] = 1;
 
 	memcpy( unflippedLightMatrix, viewMatrix, sizeof( unflippedLightMatrix ) );
-	GL_MultMatrix( viewMatrix, s_flipMatrix,lightMatrix);
+	GL_MultMatrixAligned( viewMatrix, s_flipMatrix,lightMatrix);
 
 	// create frustum planes
 	anPlane	globalFrustum[6];
@@ -1101,8 +1101,8 @@ void	RB_EXP_DrawInteraction( const drawInteraction_t *din ) {
 	float	qRow[4];
 	float	matrix[16];
 	float	matrix2[16];
-	GL_MultMatrix( din->surf->space->modelMatrix, lightMatrix, matrix );
-	GL_MultMatrix( matrix, lightProjectionMatrix, matrix2 );
+	GL_MultMatrixAligned( din->surf->space->modelMatrix, lightMatrix, matrix );
+	GL_MultMatrixAligned( matrix, lightProjectionMatrix, matrix2 );
 
 	// the final values need to be in 0.0 : 1.0 range instead of -1 : 1
 	sRow[0] = 0.5 * lightBufferSizeFraction * ( matrix2[0] + matrix2[3] );
@@ -1511,10 +1511,10 @@ PARAM	jitterTexOffset				= program.local[9];
 	InvertByTranspose( backEnd.viewDef->worldSpace.modelViewMatrix, invertedView );
 
 	// then we go from world to light view space (looking down negative Z)
-	GL_MultMatrix( invertedView, lightMatrix, matrix );
+	GL_MultMatrixAligned( invertedView, lightMatrix, matrix );
 
 	// then to light projection, giving X/w, Y/w, Z/w in the -1 : 1 range
-	GL_MultMatrix( matrix, lightProjectionMatrix, matrix2 );
+	GL_MultMatrixAligned( matrix, lightProjectionMatrix, matrix2 );
 
 	// the final values need to be in 0.0 : 1.0 range instead of -1 : 1
 	sRow[0] = 0.5 * ( matrix2[0] + matrix2[3] ) * lightBufferSizeFraction;
@@ -2391,7 +2391,7 @@ RB_CreateBloomTable();
 
 	common->Printf( "Available.\n" );
 
-	if ( !anString::Icmp( r_renderer.GetString(), "exp" ) ) {
+	if ( !anStr::Icmp( r_renderer.GetString(), "exp" ) ) {
 		R_Exp_Allocate();
 	}
 

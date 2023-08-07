@@ -66,7 +66,7 @@ typedef anMath anMath
 F16toF32
 ========================
 */
-ARC_INLINE float F16toF32( halfFloat x ) {
+inline float F16toF32( halfFloat x ) {
 	int e = HF_EXP( x );
 	int m = HF_MANTISSA( x );
 	int s = HF_SIGN( x );
@@ -84,7 +84,7 @@ ARC_INLINE float F16toF32( halfFloat x ) {
 F32toF16
 ========================
 */
-ARC_INLINE halfFloat F32toF16( float a ) {
+inline halfFloat F32toF16( float a ) {
 	unsigned int f = *(unsigned *)( &a );
 	unsigned int signbit  = ( f & 0x80000000 ) >> 16;
 	int exponent = ( ( f & 0x7F800000 ) >> 23 ) - 112;
@@ -151,7 +151,7 @@ public:
 	const anVec4 		GetTangentVec4( void ) const;
 
 	void				SetBiTangent( float x, float y, float z );
-	ARC_INLINE void		SetBiTangent( const anVec3 &t );
+	inline void		SetBiTangent( const anVec3 &t );
 
 	float				GetBiTangentSign() const;
 	byte				GetBiTangentSignBit() const;
@@ -168,8 +168,8 @@ public:
 	const halfFloat		GetTexCoordNativeT() const;
 
 	// either 1.0f or -1.0f
-	ARC_INLINE void		SetBiTangentSign( float sign );
-	ARC_INLINE void		SetBiTangentSignBit( byte bit );
+	inline void		SetBiTangentSign( float sign );
+	inline void		SetBiTangentSignBit( byte bit );
 
 	void				Lerp( const anDrawVertex &a, const anDrawVertex &b, const float f );
 	void				LerpAll( const anDrawVertex &a, const anDrawVertex &b, const float f );
@@ -204,19 +204,19 @@ public:
 	static anVec3		GetSkinnedDrawVertPosition( const anDrawVertex & vert, const arcJointMatrix * joints );
 };
 
-ARC_INLINE float anDrawVertex::operator[]( const int index ) const {
+inline float anDrawVertex::operator[]( const int index ) const {
 	assert( index >= 0 && index < 5 );
 	return ( (float *)( ( &xyz ) ) )[index];
 }
-ARC_INLINE float &anDrawVertex::operator[]( const int index ) {
+inline float &anDrawVertex::operator[]( const int index ) {
 	assert( index >= 0 && index < 5 );
 	return ( (float *)( ( &xyz ) ) )[index];
 }
-ARC_INLINE bool anDrawVertex::operator==( const anDrawVertex &ndx ) const {
+inline bool anDrawVertex::operator==( const anDrawVertex &ndx ) const {
 	return ( ndx.xyz.Compare( xyz ) && ( ndx._st[0] == _st[0] && ndx._st[1] == _st[1] ) );
 }
 
-ARC_INLINE void anDrawVertex::Clear( void ) {
+inline void anDrawVertex::Clear( void ) {
 	xyz.Zero();
 	st.Zero();
 	normal.Zero();
@@ -230,7 +230,7 @@ ARC_INLINE void anDrawVertex::Clear( void ) {
 anDrawVertex::GetNormal
 ========================
 */
-ARC_INLINE const anVec3 anDrawVertex::GetNormal() const {
+inline const anVec3 anDrawVertex::GetNormal() const {
 	anVec3 n( VERTEX_BYTE_TO_FLOAT( normal[0] ), VERTEX_BYTE_TO_FLOAT( normal[1] ), VERTEX_BYTE_TO_FLOAT( normal[2] ) );
 	n.Normalize();	// after the normal has been compressed & uncompressed, it may not be normalized anymore
 	return n;
@@ -241,7 +241,7 @@ ARC_INLINE const anVec3 anDrawVertex::GetNormal() const {
 anDrawVertex::GetNormalRaw
 ========================
 */
-ARC_INLINE const anVec3 anDrawVertex::GetNormalRaw() const {
+inline const anVec3 anDrawVertex::GetNormalRaw() const {
 	anVec3 n( VERTEX_BYTE_TO_FLOAT( normal[0] ), VERTEX_BYTE_TO_FLOAT( normal[1] ), VERTEX_BYTE_TO_FLOAT( normal[2] ) );
 	// don't re-normalize just like we do in the vertex programs
 	return n;
@@ -253,7 +253,7 @@ anDrawVertex::SetNormal
 must be normalized already!
 ========================
 */
-ARC_INLINE void anDrawVertex::SetNormal( const anVec3 & n ) {
+inline void anDrawVertex::SetNormal( const anVec3 & n ) {
 	VertexFloatToByte( n.x, n.y, n.z, normal );
 }
 
@@ -262,7 +262,7 @@ ARC_INLINE void anDrawVertex::SetNormal( const anVec3 & n ) {
 anDrawVertex::SetNormal
 ========================
 */
-ARC_INLINE void anDrawVertex::SetNormal( float x, float y, float z ) {
+inline void anDrawVertex::SetNormal( float x, float y, float z ) {
 	VertexFloatToByte( x, y, z, normal );
 }
 
@@ -271,7 +271,7 @@ ARC_INLINE void anDrawVertex::SetNormal( float x, float y, float z ) {
 &anDrawVertex::GetTangent
 ========================
 */
-ARC_INLINE const anVec3 anDrawVertex::GetTangent() const {
+inline const anVec3 anDrawVertex::GetTangent() const {
 	anVec3 t( VERTEX_BYTE_TO_FLOAT( tangent[0] ), VERTEX_BYTE_TO_FLOAT( tangent[1] ), VERTEX_BYTE_TO_FLOAT( tangent[2] ) );
 	t.Normalize();
 	return t;
@@ -282,7 +282,7 @@ ARC_INLINE const anVec3 anDrawVertex::GetTangent() const {
 &anDrawVertex::GetTangentRaw
 ========================
 */
-ARC_INLINE const anVec3 anDrawVertex::GetTangentRaw() const {
+inline const anVec3 anDrawVertex::GetTangentRaw() const {
 	anVec3 t( VERTEX_BYTE_TO_FLOAT( tangent[0] ), VERTEX_BYTE_TO_FLOAT( tangent[1] ), VERTEX_BYTE_TO_FLOAT( tangent[2] ) );
 	// don't re-normalize just like we do in the vertex programs
 	return t;
@@ -293,7 +293,7 @@ ARC_INLINE const anVec3 anDrawVertex::GetTangentRaw() const {
 anDrawVertex::SetTangent
 ========================
 */
-ARC_INLINE void anDrawVertex::SetTangent( float x, float y, float z ) {
+inline void anDrawVertex::SetTangent( float x, float y, float z ) {
 	VertexFloatToByte( x, y, z, tangent );
 }
 
@@ -302,7 +302,7 @@ ARC_INLINE void anDrawVertex::SetTangent( float x, float y, float z ) {
 anDrawVertex::SetTangent
 ========================
 */
-ARC_INLINE void anDrawVertex::SetTangent( const anVec3 & t ) {
+inline void anDrawVertex::SetTangent( const anVec3 & t ) {
 	VertexFloatToByte( t.x, t.y, t.z, tangent );
 }
 
@@ -311,7 +311,7 @@ ARC_INLINE void anDrawVertex::SetTangent( const anVec3 & t ) {
 anDrawVertex::GetBiTangent
 ========================
 */
-ARC_INLINE const anVec3 anDrawVertex::GetBiTangent() const {
+inline const anVec3 anDrawVertex::GetBiTangent() const {
 	// derive from the normal, tangent, and bitangent direction flag
 	anVec3 bitangent;
 	bitangent.Cross( GetNormal(), GetTangent() );
@@ -324,7 +324,7 @@ ARC_INLINE const anVec3 anDrawVertex::GetBiTangent() const {
 anDrawVertex::GetBiTangentRaw
 ========================
 */
-ARC_INLINE const anVec3 anDrawVertex::GetBiTangentRaw() const {
+inline const anVec3 anDrawVertex::GetBiTangentRaw() const {
 	// derive from the normal, tangent, and bitangent direction flag
 	// don't re-normalize just like we do in the vertex programs
 	anVec3 bitangent;
@@ -338,7 +338,7 @@ ARC_INLINE const anVec3 anDrawVertex::GetBiTangentRaw() const {
 anDrawVertex::SetBiTangent
 ========================
 */
-ARC_INLINE void anDrawVertex::SetBiTangent( float x, float y, float z ) {
+inline void anDrawVertex::SetBiTangent( float x, float y, float z ) {
 	SetBiTangent( anVec3( x, y, z ) );
 }
 
@@ -347,7 +347,7 @@ ARC_INLINE void anDrawVertex::SetBiTangent( float x, float y, float z ) {
 anDrawVertex::SetBiTangent
 ========================
 */
-ARC_INLINE void anDrawVertex::SetBiTangent( const anVec3 &t ) {
+inline void anDrawVertex::SetBiTangent( const anVec3 &t ) {
 	anVec3 bitangent;
 	bitangent.Cross( GetNormal(), GetTangent() );
 	SetBiTangentSign( bitangent * t );
@@ -358,7 +358,7 @@ ARC_INLINE void anDrawVertex::SetBiTangent( const anVec3 &t ) {
 anDrawVertex::GetBiTangentSign
 ========================
 */
-ARC_INLINE float anDrawVertex::GetBiTangentSign() const {
+inline float anDrawVertex::GetBiTangentSign() const {
 	return ( tangent[3] < 128 ) ? -1.0f : 1.0f;
 }
 
@@ -367,7 +367,7 @@ ARC_INLINE float anDrawVertex::GetBiTangentSign() const {
 anDrawVertex::GetBiTangentSignBit
 ========================
 */
-ARC_INLINE byte anDrawVertex::GetBiTangentSignBit() const {
+inline byte anDrawVertex::GetBiTangentSignBit() const {
 	return ( tangent[3] < 128 ) ? 1 : 0;
 }
 
@@ -376,7 +376,7 @@ ARC_INLINE byte anDrawVertex::GetBiTangentSignBit() const {
 anDrawVertex::SetBiTangentSign
 ========================
 */
-ARC_INLINE void anDrawVertex::SetBiTangentSign( float sign ) {
+inline void anDrawVertex::SetBiTangentSign( float sign ) {
 	tangent[3] = ( sign < 0.0f ) ? 0 : 255;
 }
 
@@ -385,11 +385,11 @@ ARC_INLINE void anDrawVertex::SetBiTangentSign( float sign ) {
 anDrawVertex::SetBiTangentSignBit
 ========================
 */
-ARC_INLINE void anDrawVertex::SetBiTangentSignBit( byte sign ) {
+inline void anDrawVertex::SetBiTangentSignBit( byte sign ) {
 	tangent[3] = sign ? 0 : 255;
 }
 
-ARC_INLINE void anDrawVertex::SetIndexCoords( int idx, float v ) {
+inline void anDrawVertex::SetIndexCoords( int idx, float v ) {
 #if defined( SD_USE_DRAWVERT_SIZE_32 )
 	_st[idx] = ( short)( v * FLOAT_TO_ST );
 #else
@@ -406,7 +406,7 @@ ARC_INLINE void anDrawVertex::SetIndexCoords( int idx, float v ) {
 }
 
 
-ARC_INLINE float anDrawVertex::GetZ( short x, short y, byte sign ) const {
+inline float anDrawVertex::GetZ( short x, short y, byte sign ) const {
 	float v = 1.0f - ( x * x + y * y ) / ( 32767.0f * 32767.0f );
 	float sqrtv = v > 0.f ? sqrtf( v ) : 0.f;
 	return sqrtv * ( ( float )sign - 1.f );
@@ -417,12 +417,12 @@ ARC_INLINE float anDrawVertex::GetZ( short x, short y, byte sign ) const {
 anDrawVertex::Lerp
 ========================
 */
-ARC_INLINE void anDrawVertex::LerpSetCord( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
+inline void anDrawVertex::LerpSetCord( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
 	xyz = a.xyz + f * ( b.xyz - a.xyz );
 	SetTexCoord( ::Lerp( a.GetTexCoord(), b.GetTexCoord(), f ) );
 }
 
-ARC_INLINE void anDrawVertex::Lerp( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
+inline void anDrawVertex::Lerp( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
 	xyz = a.xyz + f * ( b.xyz - a.xyz );
 	st = a.st + f * ( b.st - a.st );
 }
@@ -432,7 +432,7 @@ ARC_INLINE void anDrawVertex::Lerp( const anDrawVertex &a, const anDrawVertex &b
 anDrawVertex::LerpAll
 ========================
 */
-ARC_INLINE void anDrawVertex::LerpAllNotOptimized( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
+inline void anDrawVertex::LerpAllNotOptimized( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
 	xyz = ::Lerp( a.xyz, b.xyz, f );
 	SetTexCoord( ::Lerp( a.GetTexCoord(), b.GetTexCoord(), f ) );
 
@@ -462,7 +462,7 @@ ARC_INLINE void anDrawVertex::LerpAllNotOptimized( const anDrawVertex &a, const 
 anDrawVertex::LerpAll
 ========================
 */
-ARC_INLINE void anDrawVertex::LerpAll( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
+inline void anDrawVertex::LerpAll( const anDrawVertex &a, const anDrawVertex &b, const float f ) {
 	xyz = a.xyz + f * ( b.xyz - a.xyz );
 	st = a.st + f * ( b.st - a.st );
 
@@ -477,11 +477,11 @@ ARC_INLINE void anDrawVertex::LerpAll( const anDrawVertex &a, const anDrawVertex
 	color[3] = ( byte )( a.color[3] + f * ( b.color[3] - a.color[3] ) );
 }
 
-ARC_INLINE void anDrawVertex::SetColor( dword color ) {
+inline void anDrawVertex::SetColor( dword color ) {
 	*reinterpret_cast<dword *>( this->color ) = color;
 }
 
-ARC_INLINE dword anDrawVertex::GetColor( void ) const {
+inline dword anDrawVertex::GetColor( void ) const {
 	return *reinterpret_cast<const dword *>( this->color );
 }
 
@@ -490,7 +490,7 @@ ARC_INLINE dword anDrawVertex::GetColor( void ) const {
 anDrawVertex::SetNativeOrderColor
 ========================
 */
-ARC_INLINE void anDrawVertex::SetNativeOrderColor( dword color ) {
+inline void anDrawVertex::SetNativeOrderColor( dword color ) {
 	*reinterpret_cast<dword *>( this->color ) = color;
 }
 
@@ -499,7 +499,7 @@ ARC_INLINE void anDrawVertex::SetNativeOrderColor( dword color ) {
 anDrawVertex::SetTexCoordNative
 ========================
 */
-ARC_INLINE void anDrawVertex::SetTexCoordNative( const halfFloat s, const halfFloat t ) {
+inline void anDrawVertex::SetTexCoordNative( const halfFloat s, const halfFloat t ) {
 	st[0] = s;
 	st[1] = t;
 }
@@ -509,7 +509,7 @@ ARC_INLINE void anDrawVertex::SetTexCoordNative( const halfFloat s, const halfFl
 anDrawVertex::SetTexCoord
 ========================
 */
-ARC_INLINE void anDrawVertex::SetTexCoord( const anVec2 & st ) {
+inline void anDrawVertex::SetTexCoord( const anVec2 & st ) {
 	SetTexCoordS( st.x );
 	SetTexCoordT( st.y );
 }
@@ -519,7 +519,7 @@ ARC_INLINE void anDrawVertex::SetTexCoord( const anVec2 & st ) {
 anDrawVertex::SetTexCoord
 ========================
 */
-ARC_INLINE void anDrawVertex::SetTexCoord( float s, float t ) {
+inline void anDrawVertex::SetTexCoord( float s, float t ) {
 	SetTexCoordS( s );
 	SetTexCoordT( t );
 }
@@ -529,7 +529,7 @@ ARC_INLINE void anDrawVertex::SetTexCoord( float s, float t ) {
 anDrawVertex::SetTexCoordS
 ========================
 */
-ARC_INLINE void anDrawVertex::SetTexCoordS( float s ) {
+inline void anDrawVertex::SetTexCoordS( float s ) {
 	st[0] = F32toF16( s );
 }
 
@@ -538,7 +538,7 @@ ARC_INLINE void anDrawVertex::SetTexCoordS( float s ) {
 anDrawVertex::SetTexCoordT
 ========================
 */
-ARC_INLINE void anDrawVertex::SetTexCoordT( float t ) {
+inline void anDrawVertex::SetTexCoordT( float t ) {
 	st[1] = F32toF16( t );
 }
 
@@ -547,7 +547,7 @@ ARC_INLINE void anDrawVertex::SetTexCoordT( float t ) {
 anDrawVertex::GetTexCoord
 ========================
 */
-ARC_INLINE const anVec2 anDrawVertex::GetTexCoord() const {
+inline const anVec2 anDrawVertex::GetTexCoord() const {
 	return anVec2( F16toF32( st[0] ), F16toF32( st[1] ) );
 }
 
@@ -556,7 +556,7 @@ ARC_INLINE const anVec2 anDrawVertex::GetTexCoord() const {
 anDrawVertex::GetTexCoordNativeS
 ========================
 */
-ARC_INLINE const halfFloat anDrawVertex::GetTexCoordNativeS() const {
+inline const halfFloat anDrawVertex::GetTexCoordNativeS() const {
 	return st[0];
 }
 
@@ -565,7 +565,7 @@ ARC_INLINE const halfFloat anDrawVertex::GetTexCoordNativeS() const {
 anDrawVertex::GetTexCoordNativeT
 ========================
 */
-ARC_INLINE const halfFloat anDrawVertex::GetTexCoordNativeT() const {
+inline const halfFloat anDrawVertex::GetTexCoordNativeT() const {
 	return st[1];
 }
 
@@ -574,7 +574,7 @@ ARC_INLINE const halfFloat anDrawVertex::GetTexCoordNativeT() const {
 anDrawVertex::SetNativeOrderColor2
 ========================
 */
-ARC_INLINE void anDrawVertex::SetNativeOrderColor2( dword color2 ) {
+inline void anDrawVertex::SetNativeOrderColor2( dword color2 ) {
 	*reinterpret_cast<dword *>(this->color2) = color2;
 }
 
@@ -583,7 +583,7 @@ ARC_INLINE void anDrawVertex::SetNativeOrderColor2( dword color2 ) {
 anDrawVertex::SetColor
 ========================
 */
-ARC_INLINE void anDrawVertex::SetColor2( dword color2 ) {
+inline void anDrawVertex::SetColor2( dword color2 ) {
 	*reinterpret_cast<dword *>(this->color2) = color2;
 }
 
@@ -592,7 +592,7 @@ ARC_INLINE void anDrawVertex::SetColor2( dword color2 ) {
 anDrawVertex::ClearColor2
 ========================
 */
-ARC_INLINE void anDrawVertex::ClearColor2() {
+inline void anDrawVertex::ClearColor2() {
 	*reinterpret_cast<dword *>(this->color2) = 0x80808080;
 }
 
@@ -601,7 +601,7 @@ ARC_INLINE void anDrawVertex::ClearColor2() {
 anDrawVertex::GetColor2
 ========================
 */
-ARC_INLINE dword anDrawVertex::GetColor2() const {
+inline dword anDrawVertex::GetColor2() const {
 	return *reinterpret_cast<const dword *>(this->color2);
 }
 
@@ -612,11 +612,11 @@ WriteDrawVerts16
 Use 16-byte in-order SIMD writes because the destVerts may live in write-combined memory
 ========================
 */
-ARC_INLINE void WriteDrawVerts16( anDrawVertex * destVerts, const anDrawVertex * localVerts, int numVerts ) {
+inline void WriteDrawVerts16( anDrawVertex * destVerts, const anDrawVertex * localVerts, int numVerts ) {
 	assert_sizeof( anDrawVertex, 32 );
 	assert_16_byte_aligned( destVerts );
 	assert_16_byte_aligned( localVerts );
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	for ( int i = 0; i < numVerts; i++ ) {
 		__m128i v0 = _mm_load_si128( (const __m128i *)( (byte *)( localVerts + i ) +  0 ) );
 		__m128i v1 = _mm_load_si128( (const __m128i *)( (byte *)( localVerts + i ) + 16 ) );
@@ -633,7 +633,7 @@ ARC_INLINE void WriteDrawVerts16( anDrawVertex * destVerts, const anDrawVertex *
 anDrawVertex::GetSkinnedDrawVert
 =====================
 */
-ARC_INLINE anDrawVertex anDrawVertex::GetSkinnedDrawVert( const anDrawVertex & vert, const arcJointMatrix * joints ) {
+inline anDrawVertex anDrawVertex::GetSkinnedDrawVert( const anDrawVertex & vert, const arcJointMatrix * joints ) {
 	if ( joints == nullptr ) {
 		return vert;
 	}
@@ -672,7 +672,7 @@ ARC_INLINE anDrawVertex anDrawVertex::GetSkinnedDrawVert( const anDrawVertex & v
 anDrawVertex::GetSkinnedDrawVertPosition
 =====================
 */
-ARC_INLINE anVec3 anDrawVertex::GetSkinnedDrawVertPosition( const anDrawVertex & vert, const arcJointMatrix * joints ) {
+inline anVec3 anDrawVertex::GetSkinnedDrawVertPosition( const anDrawVertex & vert, const arcJointMatrix * joints ) {
 	if ( joints == nullptr ) {
 		return vert.xyz;
 	}
@@ -717,7 +717,7 @@ public:
 };
 
 
-#define SHADOWVERTSKINNED_XYZW_OFFSET		(0)
+#define SHADOWVERTSKINNED_XYZW_OFFSET		( 0 )
 #define SHADOWVERTSKINNED_COLOR_OFFSET		(16)
 #define SHADOWVERTSKINNED_COLOR2_OFFSET		(20)
 
@@ -725,18 +725,18 @@ assert_offsetof( anShadowCache, xyzw, SHADOWVERTSKINNED_XYZW_OFFSET );
 assert_offsetof( anShadowCache, color, SHADOWVERTSKINNED_COLOR_OFFSET );
 assert_offsetof( anShadowCache, color2, SHADOWVERTSKINNED_COLOR2_OFFSET );
 
-#define SHADOWVERT_XYZW_OFFSET		(0)
+#define SHADOWVERT_XYZW_OFFSET		( 0 )
 #define SHADOWVERT_SIZE				16			// sizeof( anDrawVertex )
 #define SHADOWVERT_SIZE_SHIFT		4			// log2( sizeof( anDrawVertex ) )
 assert_sizeof( anShadowCache, SHADOWVERT_SIZE );
 assert_sizeof( anShadowCache, (1<<SHADOWVERT_SIZE_SHIFT) );
 assert_offsetof( anShadowCache, xyzw, SHADOWVERT_XYZW_OFFSET );
 
-ARC_INLINE void anShadowCache::Clear() {
+inline void anShadowCache::Clear() {
 	xyzw.Zero();
 }
 
-ARC_INLINE void anShadowCache::CreateSkinned() {
+inline void anShadowCache::CreateSkinned() {
 	xyzw.Zero();
 }
 #endif

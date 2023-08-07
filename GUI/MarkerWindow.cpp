@@ -35,21 +35,21 @@ idMarkerWindow::~idMarkerWindow() {
 }
 
 bool idMarkerWindow::ParseInternalVar(const char *_name, anParser *src) {
-	if (anString::Icmp(_name, "markerMat" ) == 0) {
-		anString str;
+	if (anStr::Icmp(_name, "markerMat" ) == 0) {
+		anStr str;
 		ParseString( src, str);
 		markerMat = declManager->FindMaterial( str);
 		markerMat->SetSort( SS_GUI );
 		return true;
 	}
-	if (anString::Icmp(_name, "markerStop" ) == 0) {
-		anString str;
+	if (anStr::Icmp(_name, "markerStop" ) == 0) {
+		anStr str;
 		ParseString( src, str);
 		markerStop = declManager->FindMaterial( str);
 		markerStop->SetSort( SS_GUI );
 		return true;
 	}
-	if (anString::Icmp(_name, "markerColor" ) == 0) {
+	if (anStr::Icmp(_name, "markerColor" ) == 0) {
 		ParseVec4( src, markerColor);
 		return true;
 	}
@@ -235,7 +235,7 @@ void idMarkerWindow::Line( intx1, int y1, int x2, int y2, dword* out, dword colo
 }
 
 
-void idMarkerWindow::Activate(bool activate, anString &act) {
+void idMarkerWindow::Activate(bool activate, anStr &act) {
 	idWindow::Activate(activate, act);
 	if (activate) {
 		int i;
@@ -250,7 +250,7 @@ void idMarkerWindow::Activate(bool activate, anString &act) {
 		numStats = 0;
 		if ( statData.Length()) {
 			anFile *file = fileSystem->OpenFileRead( statData);
-			if (file) {
+			if ( file ) {
 				file->Read(&numStats, sizeof(numStats));
 				file->Read(loggedStats, numStats * sizeof(loggedStats[0]));
 				for ( i = 0; i < numStats; i++ ) {
@@ -267,16 +267,16 @@ void idMarkerWindow::Activate(bool activate, anString &act) {
 						loggedStats[i].combat = 0;
 					}
 				}
-				fileSystem->CloseFile(file);
+				fileSystem->CloseFile( file );
 			}
 		}
 
 		if (numStats > 1 && background) {
-			anString markerPath = statData;
+			anStr markerPath = statData;
 			markerPath.StripFilename();
 			anFileList *markers;
 			markers = fileSystem->ListFiles( markerPath, ".tga", false, true );
-			anString name;
+			anStr name;
 			for ( i = 0; i < markers->GetNumFiles(); i++ ) {
 				name = markers->GetFile( i );
 				markerData_t md;
@@ -311,7 +311,7 @@ void idMarkerWindow::Activate(bool activate, anString &act) {
 				y2 = 63 * ( ( float )loggedStats[i+1].combat / COMBAT_MAX);
 				Line(x1, y1, x2, y2, imageBuff, 0xff00ffff);
 			}
-			const shaderStage_t *stage = background->GetStage(0);
+			const shaderStage_t *stage = background->GetStage( 0 );
 			if ( stage) {
 				stage->texture.image->UploadScratch((byte*)imageBuff, 512, 64);			
 			}

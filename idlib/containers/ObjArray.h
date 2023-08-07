@@ -16,7 +16,7 @@
 
 
 template<class type, int gran>
-ARC_INLINE int idObjArrayCompare( const type *a, const type *b ) {
+inline int idObjArrayCompare( const type *a, const type *b ) {
 	return *a - *b;
 }
 
@@ -75,7 +75,7 @@ idObjArray::idObjArray
 ================
 */
 template<class type, int gran>
-ARC_INLINE idObjArray<type,gran>::idObjArray( void ) {
+inline idObjArray<type,gran>::idObjArray( void ) {
 	num = size = 0;
 	array = nullptr;
 }
@@ -86,7 +86,7 @@ idObjArray::idObjArray
 ================
 */
 template<class type, int gran>
-ARC_INLINE idObjArray<type,gran>::idObjArray( const idObjArray<type,gran> &other ) {
+inline idObjArray<type,gran>::idObjArray( const idObjArray<type,gran> &other ) {
 	num = size = 0;
 	array = nullptr;
 	*this = other;
@@ -98,7 +98,7 @@ idObjArray::~idObjArray
 ================
 */
 template<class type, int gran>
-ARC_INLINE idObjArray<type,gran>::~idObjArray( void ) {
+inline idObjArray<type,gran>::~idObjArray( void ) {
 	Clear();
 }
 
@@ -110,7 +110,7 @@ Frees up the memory allocated by the array.  Assumes that type automatically han
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idObjArray<type,gran>::Clear( void ) {
+inline void idObjArray<type,gran>::Clear( void ) {
 	if ( array ) {
 		delete[] array;
 	}
@@ -128,7 +128,7 @@ return total memory allocated for the array in bytes, but doesn't take into acco
 ================
 */
 template<class type, int gran>
-ARC_INLINE size_t idObjArray<type,gran>::Allocated( void ) const {
+inline size_t idObjArray<type,gran>::Allocated( void ) const {
 	return size * sizeof( type );
 }
 
@@ -140,7 +140,7 @@ return total size of array in bytes, but doesn't take into account additional me
 ================
 */
 template<class type, int gran>
-ARC_INLINE size_t idObjArray<type,gran>::Size( void ) const {
+inline size_t idObjArray<type,gran>::Size( void ) const {
 	return sizeof( idObjArray<type,gran> ) + Allocated();
 }
 
@@ -150,7 +150,7 @@ idObjArray::MemoryUsed
 ================
 */
 template<class type, int gran>
-ARC_INLINE size_t idObjArray<type,gran>::MemoryUsed( void ) const {
+inline size_t idObjArray<type,gran>::MemoryUsed( void ) const {
 	return num * sizeof( *array );
 }
 
@@ -163,7 +163,7 @@ Note that this is NOT an indication of the memory allocated.
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idObjArray<type,gran>::Num( void ) const {
+inline int idObjArray<type,gran>::Num( void ) const {
 	return num;
 }
 
@@ -175,7 +175,7 @@ Resize to the exact size specified irregardless of gran
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idObjArray<type,gran>::SetNum( int newnum, bool resize ) {
+inline void idObjArray<type,gran>::SetNum( int newnum, bool resize ) {
 	assert( newnum >= 0 );
 	if ( resize || newnum > size ) {
 		Resize( newnum );
@@ -191,7 +191,7 @@ Resizes the array to exactly the number of elements it contains or frees up memo
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idObjArray<type,gran>::Condense( void ) {
+inline void idObjArray<type,gran>::Condense( void ) {
 	if ( array ) {
 		if ( num ) {
 			Resize( num );
@@ -210,7 +210,7 @@ Contents are copied using their = operator so that data is correnctly instantiat
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idObjArray<type,gran>::Resize( int newsize ) {
+inline void idObjArray<type,gran>::Resize( int newsize ) {
 	type	*temp;
 	int		i;
 
@@ -253,7 +253,7 @@ Makes sure the array has at least the given number of elements.
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idObjArray<type,gran>::AssureSize( int newSize ) {
+inline void idObjArray<type,gran>::AssureSize( int newSize ) {
 	if ( newSize > size ) {
 		newSize += gran - 1;
 		newSize -= newSize % gran;
@@ -269,7 +269,7 @@ Makes sure the array has at least the given number of elements and initialize an
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idObjArray<type,gran>::AssureSize( int newSize, const type &initValue ) {
+inline void idObjArray<type,gran>::AssureSize( int newSize, const type &initValue ) {
 	int oldSize;
 
 	if ( newSize > size ) {
@@ -293,7 +293,7 @@ Copies the contents and size attributes of another array.
 ================
 */
 template<class type, int gran>
-ARC_INLINE idObjArray<type,gran> &idObjArray<type,gran>::operator=( const idObjArray<type,gran> &other ) {
+inline idObjArray<type,gran> &idObjArray<type,gran>::operator=( const idObjArray<type,gran> &other ) {
 	int	i;
 
 	Clear();
@@ -320,7 +320,7 @@ Release builds do no range checking.
 ================
 */
 template<class type, int gran>
-ARC_INLINE const type &idObjArray<type,gran>::operator[]( int index ) const {
+inline const type &idObjArray<type,gran>::operator[]( int index ) const {
 	assert( index >= 0 );
 	assert( index < num );
 
@@ -336,7 +336,7 @@ Release builds do no range checking.
 ================
 */
 template<class type, int gran>
-ARC_INLINE type &idObjArray<type,gran>::operator[]( int index ) {
+inline type &idObjArray<type,gran>::operator[]( int index ) {
 	assert( index >= 0 );
 	assert( index < num );
 
@@ -355,7 +355,7 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template<class type, int gran>
-ARC_INLINE type *idObjArray<type,gran>::Ptr( void ) {
+inline type *idObjArray<type,gran>::Ptr( void ) {
 	return array;
 }
 
@@ -371,7 +371,7 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template<class type, int gran>
-const ARC_INLINE type *idObjArray<type,gran>::Ptr( void ) const {
+const inline type *idObjArray<type,gran>::Ptr( void ) const {
 	return array;
 }
 
@@ -383,7 +383,7 @@ Returns a reference to a new data element at the end of the array.
 ================
 */
 template<class type, int gran>
-ARC_INLINE type &idObjArray<type,gran>::Alloc( void ) {
+inline type &idObjArray<type,gran>::Alloc( void ) {
 	if ( !array ) {
 		Resize( gran );
 	}
@@ -405,7 +405,7 @@ Returns the index of the new element.
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idObjArray<type,gran>::Append( const type & obj ) {
+inline int idObjArray<type,gran>::Append( const type & obj ) {
 	if ( !array ) {
 		Resize( gran );
 	}
@@ -435,7 +435,7 @@ Returns the index of the new element.
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idObjArray<type,gran>::Insert( const type & obj, int index ) {
+inline int idObjArray<type,gran>::Insert( const type & obj, int index ) {
 	if ( !array ) {
 		Resize( gran );
 	}
@@ -471,7 +471,7 @@ Returns the size of the new combined array
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idObjArray<type,gran>::Append( const idObjArray<type,gran> &other ) {
+inline int idObjArray<type,gran>::Append( const idObjArray<type,gran> &other ) {
 	if ( !array ) {
 		Resize( gran );
 	}
@@ -492,7 +492,7 @@ Adds the data to the array if it doesn't already exist.  Returns the index of th
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idObjArray<type,gran>::AddUnique( const type & obj ) {
+inline int idObjArray<type,gran>::AddUnique( const type & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -511,7 +511,7 @@ Searches for the specified data in the array and returns it's index.  Returns -1
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idObjArray<type,gran>::FindIndex( const type & obj ) const {
+inline int idObjArray<type,gran>::FindIndex( const type & obj ) const {
 	int i;
 
 	for( i = 0; i < num; i++ ) {
@@ -532,7 +532,7 @@ Searches for the specified data in the array and returns it's address. Returns n
 ================
 */
 template<class type, int gran>
-ARC_INLINE type *idObjArray<type,gran>::Find( const type & obj ) const {
+inline type *idObjArray<type,gran>::Find( const type & obj ) const {
 	int i;
 
 	i = FindIndex( obj );
@@ -553,7 +553,7 @@ Note that the element is not destroyed, so any memory used by it may not be free
 ================
 */
 template<class type, int gran>
-ARC_INLINE bool idObjArray<type,gran>::RemoveIndex( int index ) {
+inline bool idObjArray<type,gran>::RemoveIndex( int index ) {
 	int i;
 
 	assert( array != nullptr );
@@ -585,7 +585,7 @@ so any memory used by it may not be freed until the destruction of the array.
 ===============
 */
 template<class type, int gran>
-ARC_INLINE bool idObjArray<type,gran>::RemoveIndexFast( int index ) {
+inline bool idObjArray<type,gran>::RemoveIndexFast( int index ) {
 	assert( array != nullptr );
 	assert( index >= 0 );
 	assert( index < num );
@@ -610,7 +610,7 @@ the element is not destroyed, so any memory used by it may not be freed until th
 ================
 */
 template<class type, int gran>
-ARC_INLINE bool idObjArray<type,gran>::Remove( const type & obj ) {
+inline bool idObjArray<type,gran>::Remove( const type & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -631,7 +631,7 @@ the element is not destroyed, so any memory used by it may not be freed until th
 ================
 */
 template<class type, int gran>
-ARC_INLINE bool idObjArray<type,gran>::RemoveFast( const type & obj ) {
+inline bool idObjArray<type,gran>::RemoveFast( const type & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -651,7 +651,7 @@ array, so any pointers to data within the array may no longer be valid.
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idObjArray<type,gran>::Sort( cmp_t *compare ) {
+inline void idObjArray<type,gran>::Sort( cmp_t *compare ) {
 	if ( !array ) {
 		return;
 	}
@@ -667,7 +667,7 @@ Swaps the contents of two lists
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idObjArray<type,gran>::Swap( idObjArray<type,gran> &other ) {
+inline void idObjArray<type,gran>::Swap( idObjArray<type,gran> &other ) {
 	idSwap( num, other.num );
 	idSwap( size, other.size );
 	idSwap( array, other.array );

@@ -143,10 +143,10 @@ bool anGameEdit::ParseSpawnArgsToRenderLight( const anDict *args, renderLight_t 
 	anMat3 mat;
 	if ( !args->GetMatrix( "light_rotation", "1 0 0 0 1 0 0 0 1", mat ) ) {
 		if ( !args->GetMatrix( "rotation", "1 0 0 0 1 0 0 0 1", mat ) ) {
-	   		args->GetFloat( "angle", "0", angles[ 1 ] );
-   			angles[ 0 ] = 0;
-			angles[ 1 ] = anMath::AngleNormalize360( angles[ 1 ] );
-	   		angles[ 2 ] = 0;
+	   		args->GetFloat( "angle", "0", angles[1] );
+   			angles[0] = 0;
+			angles[1] = anMath::AngleNormalize360( angles[1] );
+	   		angles[2] = 0;
 			mat = angles.ToMat3();
 		}
 	}
@@ -408,7 +408,7 @@ void idLight::Spawn( void ) {
 	// but there may still be a chance to get it wrong if the game moves
 	// a light before the first present, and doesn't clear the prelight
 	renderLight.prelightModel = 0;
-	if ( name[ 0 ] ) {
+	if ( name[0] ) {
 		// this will return 0 if not found
 		renderLight.prelightModel = renderModelManager->CheckModel( va( "_prelight_%s", name.c_str() ) );
 	}
@@ -432,7 +432,7 @@ void idLight::Spawn( void ) {
 
 	// if we have a health make light breakable
 	if ( health ) {
-		anString model = spawnArgs.GetString( "model" );		// get the visual model
+		anStr model = spawnArgs.GetString( "model" );		// get the visual model
 		if ( !model.Length() ) {
 			gameLocal.Error( "Breakable light without a model set on entity #%d(%s)", entityNumber, name.c_str() );
 		}
@@ -475,7 +475,7 @@ void idLight::Spawn( void ) {
 
 
 // bdube: light guis
-	const char* lightGUI;
+	const char *lightGUI;
 	if ( spawnArgs.GetString ( "light_gui", "", &lightGUI ) ) {
 		PostEventMS( &EV_Light_SetLightGUI, 0, lightGUI );
 	}
@@ -511,12 +511,12 @@ void idLight::SetLightLevel( void ) {
 
 	intensity = ( float )currentLevel / ( float )levels;
 	color = baseColor * intensity;
-	renderLight.shaderParms[ SHADERPARM_RED ]	= color[ 0 ];
-	renderLight.shaderParms[ SHADERPARM_GREEN ]	= color[ 1 ];
-	renderLight.shaderParms[ SHADERPARM_BLUE ]	= color[ 2 ];
-	renderEntity.shaderParms[ SHADERPARM_RED ]	= color[ 0 ];
-	renderEntity.shaderParms[ SHADERPARM_GREEN ]= color[ 1 ];
-	renderEntity.shaderParms[ SHADERPARM_BLUE ]	= color[ 2 ];
+	renderLight.shaderParms[ SHADERPARM_RED ]	= color[0];
+	renderLight.shaderParms[ SHADERPARM_GREEN ]	= color[1];
+	renderLight.shaderParms[ SHADERPARM_BLUE ]	= color[2];
+	renderEntity.shaderParms[ SHADERPARM_RED ]	= color[0];
+	renderEntity.shaderParms[ SHADERPARM_GREEN ]= color[1];
+	renderEntity.shaderParms[ SHADERPARM_BLUE ]	= color[2];
 	PresentLightDefChange();
 	PresentModelDefChange();
 }
@@ -527,9 +527,9 @@ idLight::GetColor
 ================
 */
 void idLight::GetColor( anVec3 &out ) const {
-	out[ 0 ] = renderLight.shaderParms[ SHADERPARM_RED ];
-	out[ 1 ] = renderLight.shaderParms[ SHADERPARM_GREEN ];
-	out[ 2 ] = renderLight.shaderParms[ SHADERPARM_BLUE ];
+	out[0] = renderLight.shaderParms[ SHADERPARM_RED ];
+	out[1] = renderLight.shaderParms[ SHADERPARM_GREEN ];
+	out[2] = renderLight.shaderParms[ SHADERPARM_BLUE ];
 }
 
 /*
@@ -538,10 +538,10 @@ idLight::GetColor
 ================
 */
 void idLight::GetColor( anVec4 &out ) const {
-	out[ 0 ] = renderLight.shaderParms[ SHADERPARM_RED ];
-	out[ 1 ] = renderLight.shaderParms[ SHADERPARM_GREEN ];
-	out[ 2 ] = renderLight.shaderParms[ SHADERPARM_BLUE ];
-	out[ 3 ] = renderLight.shaderParms[ SHADERPARM_ALPHA ];
+	out[0] = renderLight.shaderParms[ SHADERPARM_RED ];
+	out[1] = renderLight.shaderParms[ SHADERPARM_GREEN ];
+	out[2] = renderLight.shaderParms[ SHADERPARM_BLUE ];
+	out[3] = renderLight.shaderParms[ SHADERPARM_ALPHA ];
 }
 
 /*
@@ -561,8 +561,8 @@ idLight::SetColor
 */
 void idLight::SetColor( const anVec4 &color ) {
 	baseColor = color.ToVec3();
-	renderLight.shaderParms[ SHADERPARM_ALPHA ]		= color[ 3 ];
-	renderEntity.shaderParms[ SHADERPARM_ALPHA ]	= color[ 3 ];
+	renderLight.shaderParms[ SHADERPARM_ALPHA ]		= color[3];
+	renderEntity.shaderParms[ SHADERPARM_ALPHA ]	= color[3];
 	SetLightLevel();
 }
 
@@ -643,14 +643,14 @@ void idLight::On( void ) {
 	renderLight.shaderParms[ SHADERPARM_TIMEOFFSET ] = -MS2SEC( gameLocal.time );
 
 
-	anString	blinkOnSound;
+	anStr	blinkOnSound;
 	if ( spawnArgs.GetString( "snd_blinkOn", "", blinkOnSound))
 	{
 		refSound.shader = declManager->FindSound(blinkOnSound);
 		int howLongInMS = StartSoundShader( refSound.shader, SND_CHANNEL_ANY, 0, false, nullptr );
 		PostEventMS(&EV_Light_DoneBlinking, howLongInMS);
 		soundWasPlaying = false;
-		anString	blinkOnTexture;
+		anStr	blinkOnTexture;
 		if ( spawnArgs.GetString( "mtr_blinkOn", "", blinkOnTexture ) )
 		{
 			renderLight.shader = declManager->FindMaterial( blinkOnTexture, false );
@@ -677,14 +677,14 @@ idLight::Off
 void idLight::Off( void ) {
 
 // kfuller: lights can flicker off
-	anString	blinkOffSound;
+	anStr	blinkOffSound;
 	if ( spawnArgs.GetString( "snd_blinkOff", "", blinkOffSound))
 	{
 		refSound.shader = declManager->FindSound(blinkOffSound);
 		int howLongInMS = StartSoundShader( refSound.shader, SND_CHANNEL_ANY, 0, false, nullptr );//*1000;
 		PostEventMS(&EV_Light_DoneBlinkingOff, howLongInMS);
 		soundWasPlaying = false;
-		anString	blinkOffTexture;
+		anStr	blinkOffTexture;
 		if ( spawnArgs.GetString( "mtr_blinkOff", "", blinkOffTexture ) )
 		{
 			renderLight.shader = declManager->FindMaterial( blinkOffTexture, false );
@@ -769,12 +769,12 @@ void idLight::BecomeBroken( anEntity *activator ) {
 		if ( !spawnArgs.GetBool( "nonsolid" ) ) {
 
 // mwhitlock: Dynamic memory consolidation
-			PUSH_HEAP_MEM(this);
+			PushHeapMemory(this);
 
 			GetPhysics()->SetClipModel( new anClipModel( brokenModel.c_str() ), 1.0f );
 
 // mwhitlock: Dynamic memory consolidation
-			POP_HEAP();
+			PopSystemHeap();
 
 			GetPhysics()->SetContents( CONTENTS_SOLID );
 		}
@@ -1369,14 +1369,14 @@ void idLight::Event_Break(anEntity *activator, float turnOff)
 void idLight::Event_DoneBlinking()
 {
 	// switch to a new (possibly non-blinking) shader for the light as well as a new looping sound
-	anString	blinkedOn;
+	anStr	blinkedOn;
 	if ( spawnArgs.GetString( "mtr_doneBlinking", "", blinkedOn ) )
 	{
 		renderLight.shader = declManager->FindMaterial( blinkedOn, false );
 		UpdateVisuals();
 		Present();
 	}
-	anString	doneBlinkingSound;
+	anStr	doneBlinkingSound;
 	if ( spawnArgs.GetBool( "doneBlinkingNoSound" ) )
 	{
 		StopSound( SCHANNEL_ANY, false );
@@ -1454,7 +1454,7 @@ void idLight::Event_EarthQuake(float requiresLOS)
 idLight::Event_SetLightGUI
 ================
 */
-void idLight::Event_SetLightGUI ( const char* gui ) {
+void idLight::Event_SetLightGUI ( const char *gui ) {
 	lightGUI = gameLocal.FindEntity( gui );
 	if ( lightGUI && lightGUI->GetRenderEntity() && lightGUI->GetRenderEntity()->gui[0] ) {
 		BecomeActive( TH_THINK );

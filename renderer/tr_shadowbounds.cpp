@@ -208,7 +208,7 @@ srfTriangles_t *R_CreateTurboShadowVolume( const anRenderEntityLocal *ent, const
 
 	R_GlobalPointToLocal( ent->modelMatrix, light->globalLightOrigin, localLightOrigin );
 
-	int	*vertRemap = ( int*)_alloca16( tri->numVerts * sizeof( vertRemap[0] ) );
+	int	*vertRemap = (int *)_alloca16( tri->numVerts * sizeof( vertRemap[0] ) );
 
 	SIMDProcessor->Memset( vertRemap, -1, tri->numVerts * sizeof( vertRemap[0] ) );
 
@@ -1164,7 +1164,7 @@ void R_RenderShadowEdges( void ) {
 
 			// if it doesn't share the edge with another front facing
 			// triangle, it is a sil edge
-			if ( hit[ 1 ] == 0 ) {
+			if ( hit[1] == 0 ) {
 				qglBegin( GL_TRIANGLE_STRIP );
 				qglVertex3fv( tess.xyz[ i ] );
 				qglVertex3fv( shadowXyz[ i ] );
@@ -2108,7 +2108,7 @@ void R_MakeShadowFrustums( anRenderLightsLocal *light ) {
 
 	// projected light
 	light->numShadowFrustums = 1;
-	shadowFrustum_t	*frust = &light->shadowFrustums[ 0 ];
+	shadowFrustum_t	*frust = &light->shadowFrustums[0];
 
 	// flip and transform the frustum planes so the positive side faces
 	// inward in local coordinates
@@ -2215,7 +2215,7 @@ srfTriangles_t *R_CreateShadowVolume( const anRenderEntityLocal *ent, const srfT
 	// from a point light, as well as for any directed lights
 	globalFacing = cullInfo.facing;
 	faceCastsShadow = (byte *)_alloca16( tri->numIndexes / 3 + 1 );	// + 1 for fake dangling edge face
-	remap = ( int*)_alloca16( tri->numVerts * sizeof( remap[0] ) );
+	remap = (int *)_alloca16( tri->numVerts * sizeof( remap[0] ) );
 
 	R_GlobalPointToLocal( ent->modelMatrix, light->globalLightOrigin, lightOrigin );
 

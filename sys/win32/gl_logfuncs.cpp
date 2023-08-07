@@ -427,12 +427,12 @@ static void APIENTRY logEnableClientState(GLenum array) {
 	dllEnableClientState(array);
 }
 
-static void APIENTRY logEnd(void) {
+static void APIENTRY logEnd( void ) {
 	fprintf( tr.logFile, "glEnd\n" );
 	dllEnd();
 }
 
-static void APIENTRY logEndList(void) {
+static void APIENTRY logEndList( void ) {
 	fprintf( tr.logFile, "glEndList\n" );
 	dllEndList();
 }
@@ -507,12 +507,12 @@ static void APIENTRY logFeedbackBuffer(GLsizei size, GLenum type, GLfloat *buffe
 	dllFeedbackBuffer( size, type, buffer);
 }
 
-static void APIENTRY logFinish(void) {
+static void APIENTRY logFinish( void ) {
 	fprintf( tr.logFile, "glFinish\n" );
 	dllFinish();
 }
 
-static void APIENTRY logFlush(void) {
+static void APIENTRY logFlush( void ) {
 	fprintf( tr.logFile, "glFlush\n" );
 	dllFlush();
 }
@@ -578,7 +578,7 @@ static void APIENTRY logGetDoublev(GLenum pname, GLdouble *params) {
 	dllGetDoublev(pname, params);
 }
 
-static GLenum APIENTRY logGetError(void) {
+static GLenum APIENTRY logGetError( void ) {
 	fprintf( tr.logFile, "glGetError\n" );
 	return dllGetError();
 }
@@ -803,7 +803,7 @@ static void APIENTRY logIndexubv(const GLubyte *c) {
 	dllIndexubv(c);
 }
 
-static void APIENTRY logInitNames(void) {
+static void APIENTRY logInitNames( void ) {
 	fprintf( tr.logFile, "glInitNames\n" );
 	dllInitNames();
 }
@@ -888,7 +888,7 @@ static void APIENTRY logListBase(GLuint base) {
 	dllListBase(base);
 }
 
-static void APIENTRY logLoadIdentity(void) {
+static void APIENTRY logLoadIdentity( void ) {
 	fprintf( tr.logFile, "glLoadIdentity\n" );
 	dllLoadIdentity();
 }
@@ -1138,22 +1138,22 @@ static void APIENTRY logPolygonStipple(const GLubyte *mask) {
 	dllPolygonStipple(mask);
 }
 
-static void APIENTRY logPopAttrib(void) {
+static void APIENTRY logPopAttrib( void ) {
 	fprintf( tr.logFile, "glPopAttrib\n" );
 	dllPopAttrib();
 }
 
-static void APIENTRY logPopClientAttrib(void) {
+static void APIENTRY logPopClientAttrib( void ) {
 	fprintf( tr.logFile, "glPopClientAttrib\n" );
 	dllPopClientAttrib();
 }
 
-static void APIENTRY logPopMatrix(void) {
+static void APIENTRY logPopMatrix( void ) {
 	fprintf( tr.logFile, "glPopMatrix\n" );
 	dllPopMatrix();
 }
 
-static void APIENTRY logPopName(void) {
+static void APIENTRY logPopName( void ) {
 	fprintf( tr.logFile, "glPopName\n" );
 	dllPopName();
 }
@@ -1177,7 +1177,7 @@ static void APIENTRY logPushClientAttrib(GLbitfield mask) {
 	dllPushClientAttrib(mask);
 }
 
-static void APIENTRY logPushMatrix(void) {
+static void APIENTRY logPushMatrix( void ) {
 	fprintf( tr.logFile, "glPushMatrix\n" );
 	dllPushMatrix();
 }

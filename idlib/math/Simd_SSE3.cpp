@@ -10,7 +10,7 @@
 
 //===============================================================
 //
-//	SSE3 implementation of arcSIMDProcessor
+//	SSE3 implementation of anSIMDProcessor
 //
 //===============================================================
 
@@ -18,10 +18,10 @@
 
 /*
 ============
-arcSIMD_SSE3::GetName
+anSIMD_SSE3::GetName
 ============
 */
-const char *arcSIMD_SSE3::GetName( void ) const {
+const char *anSIMD_SSE3::GetName( void ) const {
 	return "MMX & SSE & SSE2 & SSE3";
 }
 
@@ -227,25 +227,25 @@ float SSE3_Dot( const anVec4 &v1, const anVec4 &v2 ) {
 
 /*
 ============
-arcSIMD_SSE3::GetName
+anSIMD_SSE3::GetName
 ============
 */
-const char *arcSIMD_SSE3::GetName( void ) const {
+const char *anSIMD_SSE3::GetName( void ) const {
 	return "MMX & SSE & SSE2 & SSE3";
 }
 
 /*
 ============
-arcSIMD_SSE3::TransformVerts
+anSIMD_SSE3::TransformVerts
 ============
 */
-void VPCALL arcSIMD_SSE3::TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights ) {
+void VPCALL anSIMD_SSE3::TransformVerts( anDrawVertex *verts, const int numVerts, const anJointMat *joints, const anVec4 *weights, const int *index, const int numWeights ) {
 #if 1
 
 	assert( sizeof( anDrawVertex ) == DRAWVERT_SIZE );
 	assert( ( int )&((anDrawVertex *)0 )->xyz == DRAWVERT_XYZ_OFFSET );
 	assert( sizeof( anVec4 ) == JOINTWEIGHT_SIZE );
-	assert( sizeof( arcJointMat ) == JOINTMAT_SIZE );
+	assert( sizeof( anJointMat ) == JOINTMAT_SIZE );
 
 	__asm {
 		mov			eax, numVerts
@@ -319,10 +319,10 @@ void VPCALL arcSIMD_SSE3::TransformVerts( anDrawVertex *verts, const int numVert
 	const byte *jointsPtr = (byte *)joints;
 	for ( int j = i = 0; i < numVerts; i++ ) {
 		anVec3 v;
-		v = ( *(arcJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
+		v = ( *(anJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
 		while( index[j*2+1] == 0 ) {
 			j++;
-			v += ( *(arcJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
+			v += ( *(anJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
 		}
 		j++;
 

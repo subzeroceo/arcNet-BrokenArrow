@@ -106,7 +106,7 @@ void idSimpleWindow::SetupTransforms(float x, float y) {
 	trans.Identity();
 	org.Set( origin.x + x, origin.y + y, 0 );
 	if ( rotate ) {
-		static idRotation rot;
+		static anRotation rot;
 		static anVec3 vec( 0, 0, 1 );
 		rot.Set( org, vec, rotate );
 		trans = rot.ToMat3();
@@ -207,7 +207,7 @@ void idSimpleWindow::Redraw(float x, float y) {
 	DrawBackground(drawRect);
 	DrawBorderAndCaption(drawRect);
 	if ( textShadow ) {
-		anString shadowText = text;
+		anStr shadowText = text;
 		idRectangle shadowRect = textRect;
 
 		shadowText.RemoveColors();
@@ -265,37 +265,37 @@ int idSimpleWindow::GetWinVarOffset( idWinVar *wv, drawWin_t* owner) {
 
 idWinVar *idSimpleWindow::GetWinVarByName(const char *_name) {
 	idWinVar *retVar = nullptr;
-	if (anString::Icmp(_name, "background" ) == 0) {
+	if (anStr::Icmp(_name, "background" ) == 0) {
 		retVar = &backGroundName;
 	}
-	if (anString::Icmp(_name, "visible" ) == 0) {
+	if (anStr::Icmp(_name, "visible" ) == 0) {
 		retVar = &visible;
 	}
-	if (anString::Icmp(_name, "rect" ) == 0) {
+	if (anStr::Icmp(_name, "rect" ) == 0) {
 		retVar = &rect;
 	}
-	if (anString::Icmp(_name, "backColor" ) == 0) {
+	if (anStr::Icmp(_name, "backColor" ) == 0) {
 		retVar = &backColor;
 	}
-	if (anString::Icmp(_name, "matColor" ) == 0) {
+	if (anStr::Icmp(_name, "matColor" ) == 0) {
 		retVar = &matColor;
 	}
-	if (anString::Icmp(_name, "foreColor" ) == 0) {
+	if (anStr::Icmp(_name, "foreColor" ) == 0) {
 		retVar = &foreColor;
 	}
-	if (anString::Icmp(_name, "borderColor" ) == 0) {
+	if (anStr::Icmp(_name, "borderColor" ) == 0) {
 		retVar = &borderColor;
 	}
-	if (anString::Icmp(_name, "textScale" ) == 0) {
+	if (anStr::Icmp(_name, "textScale" ) == 0) {
 		retVar = &textScale;
 	}
-	if (anString::Icmp(_name, "rotate" ) == 0) {
+	if (anStr::Icmp(_name, "rotate" ) == 0) {
 		retVar = &rotate;
 	}
-	if (anString::Icmp(_name, "shear" ) == 0) {
+	if (anStr::Icmp(_name, "shear" ) == 0) {
 		retVar = &shear;
 	}
-	if (anString::Icmp(_name, "text" ) == 0) {
+	if (anStr::Icmp(_name, "text" ) == 0) {
 		retVar = &text;
 	}
 	return retVar;
@@ -383,7 +383,7 @@ void idSimpleWindow::ReadFromSaveGame( anFile *savefile ) {
 
 	savefile->Read( &stringLen, sizeof( stringLen ) );
 	if ( stringLen > 0 ) {
-		anString backName;
+		anStr backName;
 
 		backName.Fill( ' ', stringLen );
 		savefile->Read( &(backName)[0], stringLen );

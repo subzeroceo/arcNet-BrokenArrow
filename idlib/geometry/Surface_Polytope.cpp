@@ -12,7 +12,7 @@ anSurface_Polytope::FromPlanes
 void anSurface_Polytope::FromPlanes( const anPlane *planes, const int numPlanes ) {
 	anDrawVertex newVert;
 
-	int *windingVerts = ( int*) _alloca( MAX_POINTS_ON_WINDING * sizeof( int ) );
+	int *windingVerts = (int *) _alloca( MAX_POINTS_ON_WINDING * sizeof( int ) );
 	memset( &newVert, 0, sizeof( newVert ) );
 
 	for ( int i = 0; i < numPlanes; i++ ) {
@@ -236,8 +236,8 @@ int anSurface_Polytope::SplitPolytope( const anPlane &plane, const float epsilon
 	anSurface_Polytope *polytopeSurfaces[2], *surf;
 	int *onPlaneEdges[2];
 
-	onPlaneEdges[0] = ( int*) _alloca( indexes.Num() / 3 * sizeof( int ) );
-	onPlaneEdges[1] = ( int*) _alloca( indexes.Num() / 3 * sizeof( int ) );
+	onPlaneEdges[0] = (int *) _alloca( indexes.Num() / 3 * sizeof( int ) );
+	onPlaneEdges[1] = (int *) _alloca( indexes.Num() / 3 * sizeof( int ) );
 
 	int side = Split( plane, epsilon, &surface[0], &surface[1], onPlaneEdges[0], onPlaneEdges[1] );
 

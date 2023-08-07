@@ -50,16 +50,16 @@ public:
 	virtual void				Init		( void );
 	virtual void				Finish		( void );
 
-	testResult_t				Test		( class anSEAS *aas, int areaNum, const anVec3& origin, float minDistance, float maxDistance, const anVec3* point, seasGoal_t& goal );
+	testResult_t				Test		( class anSEAS *aas, int areaNum, const anVec3 &origin, float minDistance, float maxDistance, const anVec3* point, seasGoal_t& goal );
 
 protected:
 
 	virtual bool				TestArea	( class anSEAS *aas, int areaNum, const seasArea_t& area );
-	virtual	bool				TestPoint	( class anSEAS *aas, const anVec3& pos, const float zAllow=0.0f );
+	virtual	bool				TestPoint	( class anSEAS *aas, const anVec3 &pos, const float zAllow=0.0f );
 
 private:
 
-	bool		TestPointDistance		( const anVec3& origin, const anVec3& point, float minDistance, float maxDistance );
+	bool		TestPointDistance		( const anVec3 &origin, const anVec3 &point, float minDistance, float maxDistance );
 };
 
 typedef int seasHandle_t;
@@ -69,7 +69,7 @@ public:
 	static anSEAS *				Alloc( void );
 	virtual						~anSEAS( void ) = 0;
 								// Initialize for the given map.
-	virtual bool				Init( const anString &mapName, unsigned int mapFileCRC ) = 0;
+	virtual bool				Init( const anStr &mapName, unsigned int mapFileCRC ) = 0;
 								// Prints out the memory used by this AAS
 	virtual size_t				StatsSummary( void ) const = 0;
 

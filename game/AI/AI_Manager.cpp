@@ -51,7 +51,7 @@ void rvAIManager::RunFrame ( void ){
 	// Display current ai speeds
 	if ( ai_speeds.GetBool() && thinkCount > 0 ) {
 		gameLocal.Printf ( "ai:%6i  n:%2i s:%2i all:%5.2f t:%5.2f e:%5.2f m:%5.f\n",
-			gameLocal.framenum, thinkCount, simpleThinkCount,
+			gameLocal.frameNum, thinkCount, simpleThinkCount,
 			timerThink.Milliseconds(),
 			timerTactical.Milliseconds(),
 			timerFindEnemy.Milliseconds(),
@@ -381,7 +381,7 @@ rvAIManager::ValidateDestination
 Validate whether or not the destinations is a destination
 ================
 */
-bool rvAIManager::ValidateDestination ( anSAAI* ai, const anVec3& dest, bool skipCurrent, anActor* skipActor ) const {
+bool rvAIManager::ValidateDestination ( anSAAI* ai, const anVec3 &dest, bool skipCurrent, anActor* skipActor ) const {
 	int			i;
 	anBounds	bounds;
 	anSAAI*		ignore;
@@ -501,7 +501,7 @@ rvAIManager::NearestTeammateEnemy
 Returns the closest enemy of an ally.
 ================
 */
-anEntity* rvAIManager::NearestTeammateEnemy( anActor* from, float maxRange, bool checkFOV, bool checkLOS, anActor** closestAllyWithEnemy ) {
+anEntity *rvAIManager::NearestTeammateEnemy( anActor* from, float maxRange, bool checkFOV, bool checkLOS, anActor** closestAllyWithEnemy ) {
 	anActor*	actor;
 	anSAAI*		allyAI;
 	anEntity*	allyEnemy;
@@ -689,7 +689,7 @@ void rvAIManager::UnregisterHelper ( anSAAIHelper* helper ) {
 rvAIManager::FindClosestHelper
 =====================
 */
-anSAAIHelper* rvAIManager::FindClosestHelper ( const anVec3& origin ) {
+anSAAIHelper* rvAIManager::FindClosestHelper ( const anVec3 &origin ) {
 	anSAAIHelper* helper;
 	anSAAIHelper*	bestHelper;
 	float		bestDist;

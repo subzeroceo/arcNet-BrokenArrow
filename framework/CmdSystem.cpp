@@ -62,7 +62,7 @@ private:
 	int						textLength;
 	byte					textBuf[MAX_COMMANDBUFFER];
 
-	anString					completionString;
+	anStr					completionString;
 	aRcStrList				completionParms;
 
 	// piggybacks on the text buffer, avoids tokenize again and screwing it up
@@ -99,7 +99,7 @@ anSortCommandDef
 */
 class anSortCommandDef : public anSortQuick< commandDef_t, anSortCommandDef > {
 public:
-	int Compare( const commandDef_t & a, const commandDef_t & b ) const { return anString::Icmp( a.name, b.name ); }
+	int Compare( const commandDef_t & a, const commandDef_t & b ) const { return anStr::Icmp( a.name, b.name ); }
 };
 
 /*
@@ -109,7 +109,7 @@ ARCCmdSysLocal::ListByFlags
 */
 void ARCCmdSysLocal::ListByFlags( const anCommandArgs &args, cmdFlags_t flags ) {
 	int i;
-	anString match;
+	anStr match;
 	const commandDef_t *cmd;
 	anList<const commandDef_t *> cmdList;
 
@@ -124,7 +124,7 @@ void ARCCmdSysLocal::ListByFlags( const anCommandArgs &args, cmdFlags_t flags ) 
 		if ( !( cmd->flags & flags ) ) {
 			continue;
 		}
-		if ( match.Length() && anString( cmd->name ).Filter( match, false ) == 0 ) {
+		if ( match.Length() && anStr( cmd->name ).Filter( match, false ) == 0 ) {
 			continue;
 		}
 
@@ -204,7 +204,7 @@ ARCCmdSysLocal::Exec_f
 void ARCCmdSysLocal::Exec_f( const anCommandArgs &args ) {
 	char *	f;
 	int		len;
-	anString	filename;
+	anStr	filename;
 
 	if ( args.Argc () != 2 ) {
 		common->Printf( "exec <filename> : execute a script file\n" );
@@ -346,7 +346,7 @@ void ARCCmdSysLocal::AddCommand( const char *cmdName, cmdFunction_t function, in
 
 	// fail if the command already exists
 	for ( cmd = commands; cmd; cmd = cmd->next ) {
-		if ( anString::Cmp( cmdName, cmd->name ) == 0 ) {
+		if ( anStr::Cmp( cmdName, cmd->name ) == 0 ) {
 			if ( function != cmd->function ) {
 				common->Printf( "ARCCmdSysLocal::AddCommand: %s already defined\n", cmdName );
 			}
@@ -373,7 +373,7 @@ void ARCCmdSysLocal::RemoveCommand( const char *cmdName ) {
 	commandDef_t *cmd, **last;
 
 	for ( last = &commands, cmd = *last; cmd; cmd = *last ) {
-		if ( anString::Cmp( cmdName, cmd->name ) == 0 ) {
+		if ( anStr::Cmp( cmdName, cmd->name ) == 0 ) {
 			*last = cmd->next;
 			Mem_Free( cmd->name );
 			Mem_Free( cmd->description );
@@ -432,7 +432,7 @@ void ARCCmdSysLocal::ArgCompletion( const char *cmdString, void(*callback)( cons
 		if ( !cmd->argCompletion ) {
 			continue;
 		}
-		if ( anString::Icmp( args.Argv( 0 ), cmd->name ) == 0 ) {
+		if ( anStr::Icmp( args.Argv( 0 ), cmd->name ) == 0 ) {
 			cmd->argCompletion( args, callback );
 			break;
 		}
@@ -455,7 +455,7 @@ void ARCCmdSysLocal::ExecuteTokenizedString( const anCommandArgs &args ) {
 	// check registered command functions
 	for ( prev = &commands; *prev; prev = &cmd->next ) {
 		cmd = *prev;
-		if ( anString::Icmp( args.Argv( 0 ), cmd->name ) == 0 ) {
+		if ( anStr::Icmp( args.Argv( 0 ), cmd->name ) == 0 ) {
 			// rearrange the links so that the command will be
 			// near the head of the list next time it is used
 			*prev = cmd->next;
@@ -622,8 +622,8 @@ void ARCCmdSysLocal::ExecuteCommandBuffer() {
 
 		char *text[i] = 0;
 
-		if ( !anString::Cmp( text, "_execTokenized" ) ) {
-			args = tokenizedCmds[ 0 ];
+		if ( !anStr::Cmp( text, "_execTokenized" ) ) {
+			args = tokenizedCmds[0];
 			tokenizedCmds.RemoveIndex( 0 );
 		} else {
 			args.TokenizeString( text, false );
@@ -652,7 +652,7 @@ ARCCmdSysLocal::ArgCompletion_FolderExtension
 */
 void ARCCmdSysLocal::ArgCompletion_FolderExtension( const anCommandArgs &args, void(*callback)( const char *s ), const char *folder, bool stripFolder, ... ) {
 	//char path[MAX_STRING_CHARS];
-	//anString filename;
+	//anStr filename;
 
 	//filename.Format( "%s/%s", folder, args.Argv( 0 ) );
 	//callback( filename.c_str() );
@@ -666,7 +666,7 @@ void ARCCmdSysLocal::ArgCompletion_FolderExtension( const anCommandArgs &args, v
 	aRcStrstring += args.Argv( 1 );
 
 	if ( string.Icmp( completionString ) != 0 ) {
-		anString parm, path;
+		anStr parm, path;
 		anFileList *names;
 
 		completionString = string;
@@ -682,7 +682,7 @@ void ARCCmdSysLocal::ArgCompletion_FolderExtension( const anCommandArgs &args, v
 		// list folders
 		names = fileSystem->ListFiles( path, "/", true, true );
 		for ( int i = 0; i < names->GetNumFiles(); i++ ) {
-			anString name = names->GetFile( i );
+			anStr name = names->GetFile( i );
 			if ( stripFolder ) {
 				name.Strip( folder );
 			} else {
@@ -698,7 +698,7 @@ void ARCCmdSysLocal::ArgCompletion_FolderExtension( const anCommandArgs &args, v
 		for ( extension = va_arg( argPtr, const char *); extension; extension = va_arg( argPtr, const char *) ) {
 			names = fileSystem->ListFiles( path, extension, true, true );
 			for ( i = 0; i < names->GetNumFiles(); i++ ) {
-				anString name = names->GetFile( i );
+				anStr name = names->GetFile( i );
 				if ( stripFolder ) {
 					name.Strip( folder );
 				} else {
@@ -728,7 +728,7 @@ void ARCCmdSysLocal::ArgCompletion_DeclName( const anCommandArgs &args, void(*ca
 
 	int num = declManager->GetNumDecls( ( declType_t )type );
 	for ( int i = 0; i < num; i++ ) {
-		callback( anString( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( ( declType_t )type, i , false )->GetName() );
+		callback( anStr( args.Argv( 0 ) ) + " " + declManager->DeclByIndex( ( declType_t )type, i , false )->GetName() );
 	}
 }
 

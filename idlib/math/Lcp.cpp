@@ -293,7 +293,7 @@ anLCPSquared::CalcForceDelta
   modifies this->delta_f
 ============
 */
-ARC_INLINE void anLCPSquared::CalcForceDelta( int d, float dir ) {
+inline void anLCPSquared::CalcForceDelta( int d, float dir ) {
 	delta_f[d] = dir;
 
 	if ( numClamped == 0 ) {
@@ -325,7 +325,7 @@ anLCPSquared::CalcAccelDelta
   modifies this->delta_a and uses this->delta_f
 ============
 */
-ARC_INLINE void anLCPSquared::CalcAccelDelta( int d ) {
+inline void anLCPSquared::CalcAccelDelta( int d ) {
 	float dot;
 
 	// only the not clamped variables, including the current variable, can have a change in acceleration
@@ -343,7 +343,7 @@ anLCPSquared::ChangeForce
   modifies this->f and uses this->delta_f
 ============
 */
-ARC_INLINE void anLCPSquared::ChangeForce( int d, float step ) {
+inline void anLCPSquared::ChangeForce( int d, float step ) {
 	// only the clamped variables and current variable have a force delta unequal zero
 	SIMDProcessor->MulAdd( f.ToFloatPtr(), step, delta_f.ToFloatPtr(), numClamped );
 	f[d] += step * delta_f[d];
@@ -356,7 +356,7 @@ anLCPSquared::ChangeAccel
   modifies this->a and uses this->delta_a
 ============
 */
-ARC_INLINE void anLCPSquared::ChangeAccel( int d, float step ) {
+inline void anLCPSquared::ChangeAccel( int d, float step ) {
 	// only the not clamped variables, including the current variable, can have an acceleration unequal zero
 	SIMDProcessor->MulAdd( a.ToFloatPtr() + numClamped, step, delta_a.ToFloatPtr() + numClamped, d - numClamped + 1 );
 }
@@ -472,7 +472,7 @@ bool anLCPSquared::Solve( const anMatX &o_m, anVecX &o_x, const anVecX &o_b, con
 	lo.SetData( o_lo.GetSize(), VECX_ALLOCA( o_lo.GetSize() ) );
 	hi.SetData( o_hi.GetSize(), VECX_ALLOCA( o_hi.GetSize() ) );
 	if ( o_boxIndex ) {
-		boxIndex = ( int*)_alloca16( o_x.GetSize() * sizeof( int ) );
+		boxIndex = (int *)_alloca16( o_x.GetSize() * sizeof( int ) );
 		memcpy( boxIndex, o_boxIndex, o_x.GetSize() * sizeof( int ) );
 	} else {
 		boxIndex = nullptr;
@@ -493,10 +493,10 @@ bool anLCPSquared::Solve( const anMatX &o_m, anVecX &o_x, const anVecX &o_b, con
 	}
 
 	// tells if a variable is at the low boundary, high boundary or inbetween
-	side = ( int*) _alloca16( m.GetNumRows() * sizeof( int ) );
+	side = (int *) _alloca16( m.GetNumRows() * sizeof( int ) );
 
 	// index to keep track of the permutation
-	permuted = ( int*) _alloca16( m.GetNumRows() * sizeof( int ) );
+	permuted = (int *) _alloca16( m.GetNumRows() * sizeof( int ) );
 	for ( i = 0; i < m.GetNumRows(); i++ ) {
 		permuted[i] = i;
 	}
@@ -1065,7 +1065,7 @@ anLCP_Symmetry::CalcForceDelta
   modifies this->delta_f
 ============
 */
-ARC_INLINE void anLCP_Symmetry::CalcForceDelta( int d, float dir ) {
+inline void anLCP_Symmetry::CalcForceDelta( int d, float dir ) {
 	int i;
 	float *ptr;
 
@@ -1094,7 +1094,7 @@ anLCP_Symmetry::CalcAccelDelta
   modifies this->delta_a and uses this->delta_f
 ============
 */
-ARC_INLINE void anLCP_Symmetry::CalcAccelDelta( int d ) {
+inline void anLCP_Symmetry::CalcAccelDelta( int d ) {
 	int j;
 	float dot;
 
@@ -1113,7 +1113,7 @@ anLCP_Symmetry::ChangeForce
   modifies this->f and uses this->delta_f
 ============
 */
-ARC_INLINE void anLCP_Symmetry::ChangeForce( int d, float step ) {
+inline void anLCP_Symmetry::ChangeForce( int d, float step ) {
 	// only the clamped variables and current variable have a force delta unequal zero
 	SIMDProcessor->MulAdd( f.ToFloatPtr(), step, delta_f.ToFloatPtr(), numClamped );
 	f[d] += step * delta_f[d];
@@ -1126,7 +1126,7 @@ anLCP_Symmetry::ChangeAccel
   modifies this->a and uses this->delta_a
 ============
 */
-ARC_INLINE void anLCP_Symmetry::ChangeAccel( int d, float step ) {
+inline void anLCP_Symmetry::ChangeAccel( int d, float step ) {
 	// only the not clamped variables, including the current variable, can have an acceleration unequal zero
 	SIMDProcessor->MulAdd( a.ToFloatPtr() + numClamped, step, delta_a.ToFloatPtr() + numClamped, d - numClamped + 1 );
 }
@@ -1245,7 +1245,7 @@ bool anLCP_Symmetry::Solve( const anMatX &o_m, anVecX &o_x, const anVecX &o_b, c
 	lo.SetData( o_lo.GetSize(), VECX_ALLOCA( o_lo.GetSize() ) );
 	hi.SetData( o_hi.GetSize(), VECX_ALLOCA( o_hi.GetSize() ) );
 	if ( o_boxIndex ) {
-		boxIndex = ( int*)_alloca16( o_x.GetSize() * sizeof( int ) );
+		boxIndex = (int *)_alloca16( o_x.GetSize() * sizeof( int ) );
 		memcpy( boxIndex, o_boxIndex, o_x.GetSize() * sizeof( int ) );
 	} else {
 		boxIndex = nullptr;
@@ -1266,10 +1266,10 @@ bool anLCP_Symmetry::Solve( const anMatX &o_m, anVecX &o_x, const anVecX &o_b, c
 	}
 
 	// tells if a variable is at the low boundary, high boundary or inbetween
-	side = ( int*) _alloca16( m.GetNumRows() * sizeof( int ) );
+	side = (int *) _alloca16( m.GetNumRows() * sizeof( int ) );
 
 	// index to keep track of the permutation
-	permuted = ( int*) _alloca16( m.GetNumRows() * sizeof( int ) );
+	permuted = (int *) _alloca16( m.GetNumRows() * sizeof( int ) );
 	for ( i = 0; i < m.GetNumRows(); i++ ) {
 		permuted[i] = i;
 	}

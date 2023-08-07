@@ -16,19 +16,19 @@ const int NEXT_FRAME_EVENT_TIME = -999;
 
 class anClass;
 class idTypeInfo;
-class arcEventDef;
+class anEventDef;
 class idScriptObject;
-class arcAnimator;
+class anAnimator;
 
-extern const arcEventDefInternal EV_Remove;
-extern const arcEventDef EV_SafeRemove;
-extern const arcEventDef EV_IsType;
+extern const anEventDefInternal EV_Remove;
+extern const anEventDef EV_SafeRemove;
+extern const anEventDef EV_IsType;
 
 typedef void ( anClass::*eventCallback_t )( void );
 
 template<class Type>
 struct idEventFunc {
-	const arcEventDef	*event;
+	const anEventDef	*event;
 	eventCallback_t		function;
 };
 
@@ -47,11 +47,11 @@ public:
 	idEventArg( bool data )						{ type = D_EVENT_BOOLEAN; value = data; };
 	idEventArg( float data )					{ type = D_EVENT_FLOAT; value = *reinterpret_cast<UINT_PTR *>( &data ); };
 	idEventArg( anVec3 &data )					{ type = D_EVENT_VECTOR; value = reinterpret_cast<UINT_PTR>( &data ); };
-	idEventArg( const anString &data )				{ type = D_EVENT_STRING; value = reinterpret_cast<UINT_PTR>( data.c_str() ); };
+	idEventArg( const anStr &data )				{ type = D_EVENT_STRING; value = reinterpret_cast<UINT_PTR>( data.c_str() ); };
 	idEventArg( const char *data )				{ type = D_EVENT_STRING; value = reinterpret_cast<UINT_PTR>( data ); };
 	idEventArg( const idWStr &data )			{ type = D_EVENT_WSTRING; value = reinterpret_cast<UINT_PTR>( data.c_str() ); };
 	idEventArg( const wchar_t *data )			{ type = D_EVENT_WSTRING; value = reinterpret_cast<UINT_PTR>( data ); };
-	idEventArg( const class arcEntity *data )	{ type = D_EVENT_ENTITY; value = reinterpret_cast<UINT_PTR>( data ); };
+	idEventArg( const class anEntity *data )	{ type = D_EVENT_ENTITY; value = reinterpret_cast<UINT_PTR>( data ); };
 
 	void SetHandle( int data )					{ type = D_EVENT_HANDLE; value = data; };
 };
@@ -164,14 +164,14 @@ class anClass {
 public:
 	ABSTRACT_PROTOTYPE( anClass );
 
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #undef new
 #endif
 	void *						operator new( size_t );
 	void *						operator new( size_t s, int, int, char *, int );
 	void						operator delete( void * );
 	void						operator delete( void *, int, int, char *, int );
-#ifdef ID_REDIRECT_NEWDELETE
+#ifdef ARC_REDIRECT_NEWDELETE
 #define new ID_DEBUG_NEW
 #endif
 
@@ -190,42 +190,42 @@ public:
 	template< typename T >
 	const T*					Cast( void ) const { return this ? ( IsType( T::Type ) ? static_cast< const T* >( this ) : nullptr ) : nullptr; }
 
-	bool						RespondsTo( const arcEventDef &ev ) const;
+	bool						RespondsTo( const anEventDef &ev ) const;
 
-	bool						PostGUIEventMS( const arcEventDef *ev, int time );
+	bool						PostGUIEventMS( const anEventDef *ev, int time );
 
-	bool						PostEventMS( const arcEventDef *ev, int time );
-	bool						PostEventMS( const arcEventDef *ev, int time, idEventArg arg1 );
-	bool						PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2 );
-	bool						PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3 );
-	bool						PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 );
-	bool						PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 );
-	bool						PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 );
-	bool						PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 );
-	bool						PostEventMS( const arcEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 );
+	bool						PostEventMS( const anEventDef *ev, int time );
+	bool						PostEventMS( const anEventDef *ev, int time, idEventArg arg1 );
+	bool						PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2 );
+	bool						PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3 );
+	bool						PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 );
+	bool						PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 );
+	bool						PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 );
+	bool						PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 );
+	bool						PostEventMS( const anEventDef *ev, int time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 );
 
-	bool						PostEventSec( const arcEventDef *ev, float time );
-	bool						PostEventSec( const arcEventDef *ev, float time, idEventArg arg1 );
-	bool						PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2 );
-	bool						PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3 );
-	bool						PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 );
-	bool						PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 );
-	bool						PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 );
-	bool						PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 );
-	bool						PostEventSec( const arcEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 );
+	bool						PostEventSec( const anEventDef *ev, float time );
+	bool						PostEventSec( const anEventDef *ev, float time, idEventArg arg1 );
+	bool						PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2 );
+	bool						PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3 );
+	bool						PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 );
+	bool						PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 );
+	bool						PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 );
+	bool						PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 );
+	bool						PostEventSec( const anEventDef *ev, float time, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 );
 
-	bool						ProcessEvent( const arcEventDef *ev );
-	bool						ProcessEvent( const arcEventDef *ev, idEventArg arg1 );
-	bool						ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2 );
-	bool						ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3 );
-	bool						ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 );
-	bool						ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 );
-	bool						ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 );
-	bool						ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 );
-	bool						ProcessEvent( const arcEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 );
+	bool						ProcessEvent( const anEventDef *ev );
+	bool						ProcessEvent( const anEventDef *ev, idEventArg arg1 );
+	bool						ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2 );
+	bool						ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3 );
+	bool						ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4 );
+	bool						ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5 );
+	bool						ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6 );
+	bool						ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 );
+	bool						ProcessEvent( const anEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 );
 
-	bool						ProcessEventArgPtr( const arcEventDef *ev, const UINT_PTR *data );
-	void						CancelEvents( const arcEventDef *ev );
+	bool						ProcessEventArgPtr( const anEventDef *ev, const UINT_PTR *data );
+	void						CancelEvents( const anEventDef *ev );
 
 	void						Event_Remove( void );
 	void						Event_SafeRemove( void );
@@ -235,14 +235,14 @@ public:
 	bool						IsSpawning( void ) { return spawningObjects.FindIndex( this ) != -1; }
 
 	virtual anLinkList< anClass >*	GetInstanceNode( void ) { return nullptr; }
-	static bool					InhibitSpawn( const anDict& args ) { return false; }
+	static bool					InhibitSpawn( const anDict &args ) { return false; }
 
 	virtual void				BecomeActive( int flags, bool force = false ) { assert( false ); }
 	virtual void				BecomeInactive( int flags, bool force = false ) { assert( false ); }
 	virtual idScriptObject*		GetScriptObject( void ) const { return nullptr; }
 	virtual void				SetSkin( const anDeclSkin* skin ) { ; }
 	virtual const char*			GetName( void ) const { return nullptr; }
-	virtual arcAnimator*			GetAnimator( void ) { return nullptr; }
+	virtual anAnimator*			GetAnimator( void ) { return nullptr; }
 
 	// Static functions
 	static void					InitClasses( void );
@@ -264,8 +264,8 @@ public:
 private:
 	classSpawnFunc_t			CallSpawnFunc( idTypeInfo *cls );
 
-	bool						PostEventArgs( const arcEventDef *ev, int time, int numargs, bool guiEvent, ... );
-	bool						ProcessEventArgs( const arcEventDef *ev, int numargs, ... );
+	bool						PostEventArgs( const anEventDef *ev, int time, int numargs, bool guiEvent, ... );
+	bool						ProcessEventArgs( const anEventDef *ev, int numargs, ... );
 
 	void						Event_IsClass( int typeNumber );
 
@@ -284,7 +284,7 @@ private:
 
 ***********************************************************************/
 
-typedef void ( *mediaCacheFunc_t )( const anDict& );
+typedef void ( *mediaCacheFunc_t )( const anDict &);
 typedef void ( *classCallback_t )( anClass* );
 
 template< typename T >
@@ -324,7 +324,7 @@ public:
 											idEventFunc<anClass> *eventCallbacks,
 											anClass* ( *CreateInstance )( void ),
 											void ( anClass::*Spawn )( void ),
-											bool ( *inhibitSpawn )( const anDict& dict )
+											bool ( *inhibitSpawn )( const anDict &dict )
 											);
 
 								~idTypeInfo();
@@ -333,10 +333,10 @@ public:
 	void						Shutdown( void );
 
 	anClass*					CreateInstance( void ) const;
-	bool						InhibitSpawn( const anDict& args ) const;
+	bool						InhibitSpawn( const anDict &args ) const;
 
 	bool						IsType( const idTypeInfo &superclass ) const;
-	bool						RespondsTo( const arcEventDef &ev ) const;
+	bool						RespondsTo( const anEventDef &ev ) const;
 
 	template< typename T >
 	void GetInstances( T& callback, bool includeChildren ) const {
@@ -355,7 +355,7 @@ public:
 
 private:
 	anClass*					( *_createInstance )( void );
-	bool						( *_inhibitSpawn )( const anDict& args );
+	bool						( *_inhibitSpawn )( const anDict &args );
 };
 
 /*
@@ -366,7 +366,7 @@ Checks if the object's class is a subclass of the class defined by the
 passed in idTypeInfo.
 ================
 */
-ARC_INLINE bool idTypeInfo::IsType( const idTypeInfo &type ) const {
+inline bool idTypeInfo::IsType( const idTypeInfo &type ) const {
 	return ( ( typeNum >= type.typeNum ) && ( typeNum <= type.lastChild ) );
 }
 
@@ -375,7 +375,7 @@ ARC_INLINE bool idTypeInfo::IsType( const idTypeInfo &type ) const {
 idTypeInfo::RespondsTo
 ================
 */
-ARC_INLINE bool idTypeInfo::RespondsTo( const arcEventDef &ev ) const {
+inline bool idTypeInfo::RespondsTo( const anEventDef &ev ) const {
 	assert( idEvent::initialized );
 	return eventMap[ ev.GetEventNum() ] != nullptr;
 }
@@ -388,7 +388,7 @@ Checks if the object's class is a subclass of the class defined by the
 passed in idTypeInfo.
 ================
 */
-ARC_INLINE bool anClass::IsType( const idTypeInfo &superclass ) const {
+inline bool anClass::IsType( const idTypeInfo &superclass ) const {
 	idTypeInfo *subclass;
 
 	subclass = GetType();
@@ -400,7 +400,7 @@ ARC_INLINE bool anClass::IsType( const idTypeInfo &superclass ) const {
 anClass::RespondsTo
 ================
 */
-ARC_INLINE bool anClass::RespondsTo( const arcEventDef &ev ) const {
+inline bool anClass::RespondsTo( const anEventDef &ev ) const {
 	const idTypeInfo *c;
 
 	assert( idEvent::initialized );

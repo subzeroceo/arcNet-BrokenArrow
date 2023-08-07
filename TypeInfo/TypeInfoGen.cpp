@@ -46,9 +46,9 @@ int anInfoGen::GetInheritance( const char *typeName ) const {
 anInfoGen::EvaluateIntegerString
 ================
 */
-int anInfoGen::EvaluateIntegerString( const anString &string ) {
+int anInfoGen::EvaluateIntegerString( const anStr &string ) {
 	anParser src;
-	anString evalString;
+	anStr evalString;
 
 	if ( string.Find( "::" ) != -1 ) {
 		return 0;
@@ -63,9 +63,9 @@ int anInfoGen::EvaluateIntegerString( const anString &string ) {
 anInfoGen::EvaluateFloatString
 ================
 */
-float anInfoGen::EvaluateFloatString( const anString &string ) {
+float anInfoGen::EvaluateFloatString( const anStr &string ) {
 	anParser src;
-	anString evalString;
+	anStr evalString;
 
 	if ( string.Find( "::" ) != -1 ) {
 		return 0.0f;
@@ -95,7 +95,7 @@ anInfoGen::GetIntegerConstant
 ================
 */
 int anInfoGen::GetIntegerConstant( const char *scope, const char *name, anParser &src ) {
-	anConstantInfo *constant = FindConstant( anString( scope ) + name );
+	anConstantInfo *constant = FindConstant( anStr( scope ) + name );
 	if ( constant == nullptr ) {
 		constant = FindConstant( name );
 	}
@@ -112,7 +112,7 @@ anInfoGen::GetFloatConstant
 ================
 */
 float anInfoGen::GetFloatConstant( const char *scope, const char *name, anParser &src ) {
-	anConstantInfo *constant = FindConstant( anString( scope ) + name );
+	anConstantInfo *constant = FindConstant( anStr( scope ) + name );
 	if ( constant == nullptr ) {
 		constant = FindConstant( name );
 	}
@@ -130,7 +130,7 @@ anInfoGen::ParseArraySize
 */
 int anInfoGen::ParseArraySize( const char *scope, anParser &src ) {
 	anToken token;
-	anString sizeString, constantString;
+	anStr sizeString, constantString;
 	int size, totalSize;
 
 	if ( !src.CheckTokenString( "[" ) ) {
@@ -171,9 +171,9 @@ int anInfoGen::ParseArraySize( const char *scope, anParser &src ) {
 anInfoGen::ParseConstantValue
 ================
 */
-void anInfoGen::ParseConstantValue( const char *scope, anParser &src, anString &value ) {
+void anInfoGen::ParseConstantValue( const char *scope, anParser &src, anStr &value ) {
 	anToken token;
-	anString constantString;
+	anStr constantString;
 
 	int indent = 0;
 	while( src.ReadToken( &token ) ) {
@@ -207,7 +207,7 @@ anEnumTypeInfo *anInfoGen::ParseEnumType( const char *scope, bool isTemplate, bo
 	anToken token;
 	anEnumTypeInfo *typeInfo;
 	anEnumValueInfo enumValue;
-	anString valueString;
+	anStr valueString;
 
 	typeInfo = new anEnumTypeInfo;
 	typeInfo->scope = scope;
@@ -233,7 +233,7 @@ anEnumTypeInfo *anInfoGen::ParseEnumType( const char *scope, bool isTemplate, bo
 		enumValue.name = token;
 
 		if ( src.CheckTokenString( "=" ) ) {
-			anString valueString;
+			anStr valueString;
 			ParseConstantValue( scope, src, valueString );
 			if ( valueString.Length() ) {
 				value = EvaluateIntegerString( valueString );
@@ -369,7 +369,7 @@ void anInfoGen::ParseScope( const char *scope, bool isTemplate, anParser &src, a
 	anToken token;
 	anClassTypeInfo *classInfo;
 	anEnumTypeInfo *enumInfo;
-	anString varType;
+	anStr varType;
 	bool isConst = false;
 	bool isStatic = false;
 
@@ -699,7 +699,7 @@ anInfoGen::CreateTypeInfo
 */
 void anInfoGen::CreateTypeInfo( const char *path ) {
 	int i, j, inheritance;
-	anString fileName;
+	anStr fileName;
 	anFileList *files;
 	anParser src;
 	//#modified-fva; BEGIN
@@ -763,7 +763,7 @@ void anInfoGen::CreateTypeInfo( const char *path ) {
 CleanName
 ================
 */
-void CleanName( anString &name ) {
+void CleanName( anStr &name ) {
 	name.Replace( "::", "_" );
 	name.Replace( " , ", "_" );
 	name.Replace( "< ", "_" );
@@ -778,7 +778,7 @@ anInfoGen::WriteTypeInfo
 */
 void anInfoGen::WriteTypeInfo( const char *fileName ) const {
 	int i, j;
-	anString path, define;
+	anStr path, define;
 	anFile *file;
 
 	path = fileSystem->RelativePathToOSPath( fileName );
@@ -863,7 +863,7 @@ void anInfoGen::WriteTypeInfo( const char *fileName ) const {
 	for ( i = 0; i < enums.Num(); i++ ) {
 		anEnumTypeInfo *info = enums[i];
 
-		anString typeInfoName = info->scope + info->typeName;
+		anStr typeInfoName = info->scope + info->typeName;
 		CleanName( typeInfoName );
 
 		file->WriteFloatString( "static enumValueInfo_t %s_typeInfo[] = {\n", typeInfoName.c_str() );
@@ -885,8 +885,8 @@ void anInfoGen::WriteTypeInfo( const char *fileName ) const {
 	for ( i = 0; i < enums.Num(); i++ ) {
 		anEnumTypeInfo *info = enums[i];
 
-		anString typeName = info->scope + info->typeName;
-		anString typeInfoName = typeName;
+		anStr typeName = info->scope + info->typeName;
+		anStr typeInfoName = typeName;
 		CleanName( typeInfoName );
 
 		if ( info->isTemplate ) {
@@ -901,8 +901,8 @@ void anInfoGen::WriteTypeInfo( const char *fileName ) const {
 	// class variables
 	for ( i = 0; i < classes.Num(); i++ ) {
 		anClassTypeInfo *info = classes[i];
-		anString typeName = info->scope + info->typeName;
-		anString typeInfoName = typeName;
+		anStr typeName = info->scope + info->typeName;
+		anStr typeInfoName = typeName;
 		CleanName( typeInfoName );
 
 		file->WriteFloatString( "static classVariableInfo_t %s_typeInfo[] = {\n", typeInfoName.c_str() );
@@ -926,8 +926,8 @@ void anInfoGen::WriteTypeInfo( const char *fileName ) const {
 	for ( i = 0; i < classes.Num(); i++ ) {
 		anClassTypeInfo *info = classes[i];
 
-		anString typeName = info->scope + info->typeName;
-		anString typeInfoName = typeName;
+		anStr typeName = info->scope + info->typeName;
+		anStr typeInfoName = typeName;
 		CleanName( typeInfoName );
 
 		if ( info->unnamed || info->isTemplate ) {

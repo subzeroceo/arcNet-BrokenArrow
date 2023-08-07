@@ -9,8 +9,8 @@
 ===============================================================================
 */
 
-#define LEXB_EXTENSION		".lxb"
-#define LEXB_VERSION		"LXB01"
+#define LEXB_EXTENSION		".binLex"
+#define LEXB_VERSION		"BINLX00"
 
 class anTokenCache {
 public:
@@ -27,32 +27,32 @@ public:
 	int							Num( void ) const;
 	size_t						Allocated( void ) const { return uniqueTokens.Allocated() + uniqueTokenHash.Allocated(); }
 
-	const anToken &			operator[]( int index ) const { return uniqueTokens[ index ]; }
+	const anToken &				operator[]( int index ) const { return uniqueTokens[ index ]; }
 
 private:
-	anList<anToken>		uniqueTokens;
+	anList<anToken>				uniqueTokens;
 	arcHashIndexUShort			uniqueTokenHash;
 };
 
-ARC_INLINE anTokenCache::anTokenCache() {
+inline anTokenCache::anTokenCache() {
 	uniqueTokens.SetGranularity( 128 );
 	uniqueTokenHash.SetGranularity( 128 );
 }
 
-ARC_INLINE anTokenCache::~anTokenCache() {
+inline anTokenCache::~anTokenCache() {
 }
 
-ARC_INLINE void anTokenCache::Swap( anTokenCache& rhs ) {
+inline void anTokenCache::Swap( anTokenCache& rhs ) {
 	uniqueTokens.Swap( rhs.uniqueTokens );
 	uniqueTokenHash.Swap( rhs.uniqueTokenHash );
 }
 
-ARC_INLINE void anTokenCache::Clear() {
+inline void anTokenCache::Clear() {
 	uniqueTokens.Clear();
 	uniqueTokenHash.Clear();
 }
 
-ARC_INLINE int anTokenCache::Num( void ) const {
+inline int anTokenCache::Num( void ) const {
 	return uniqueTokens.Num();
 }
 
@@ -99,22 +99,22 @@ private:
 	const anTokenCache *	tokenCacheData;
 };
 
-ARC_INLINE anBinaryLexer::anBinaryLexer( void ) {
+inline anBinaryLexer::anBinaryLexer( void ) {
 	Clear();
 	tokens.SetGranularity( 256 );
 }
 
-ARC_INLINE anBinaryLexer::~anBinaryLexer( void ) {
+inline anBinaryLexer::~anBinaryLexer( void ) {
 }
 
-ARC_INLINE void anBinaryLexer::Swap( anBinaryLexer& rhs ) {
+inline void anBinaryLexer::Swap( anBinaryLexer& rhs ) {
 	tokens.Swap( rhs.tokens );
 	tokenCache.Swap( rhs.tokenCache );
 	::Swap( nextToken, rhs.nextToken );
 	::Swap( isLoaded, rhs.isLoaded );
 }
 
-ARC_INLINE void anBinaryLexer::Clear( void ) {
+inline void anBinaryLexer::Clear( void ) {
 	isLoaded = false;
 	nextToken = 0;
 	tokens.Clear();
@@ -123,23 +123,23 @@ ARC_INLINE void anBinaryLexer::Clear( void ) {
 	tokenCacheData = nullptr;
 }
 
-ARC_INLINE void anBinaryLexer::ResetParsing( void ) {
+inline void anBinaryLexer::ResetParsing( void ) {
 	nextToken = 0;
 }
 
-ARC_INLINE int anBinaryLexer::NumTokens( void ) const {
+inline int anBinaryLexer::NumTokens( void ) const {
 	return tokensData != nullptr ? tokensData->Num() : tokens.Num();
 }
 
-ARC_INLINE void anBinaryLexer::SetData( const anList<unsigned short>* indices, const anTokenCache* cache ) {
+inline void anBinaryLexer::SetData( const anList<unsigned short>* indices, const anTokenCache* cache ) {
 	tokenCacheData = cache;
 	tokensData = indices;
 	isLoaded = true;
 }
 
 
-ARC_INLINE int anBinaryLexer::EndOfFile() const {
+inline int anBinaryLexer::EndOfFile() const {
 	return nextToken >= tokens.Num();
 }
 
-#endif /* !__LEXERBINARY_H__ */
+#endif // !__LEXERBINARY_H__

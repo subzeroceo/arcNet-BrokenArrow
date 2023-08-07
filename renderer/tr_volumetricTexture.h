@@ -6,7 +6,7 @@ Stores volume texture data
 Methods for initialization, loading data, sampling, etc.
 Volume texture file format loading
 
-Function(s) to parse specific volume data file formats (like .vox)
+Function( s) to parse specific volume data file formats (like .vox)
 Read voxel data from files into idVolumeTexture
 Volume texture sampling
 
@@ -80,7 +80,7 @@ private:
 };
 extern anVolumeTexture voxTexture;
 
-ARC_INLINE void anVolumeTexture::LoadFromFile( const char *filename ) {
+inline void anVolumeTexture::LoadFromFile( const char *filename ) {
 	// Open volume texture file for reading
 	anFile *file = fileSystem->OpenFileRead( filename ); 
 	  
@@ -124,10 +124,10 @@ void LoadFromFile(const char *filename) {
 
 
 	// Check for any file read errors
-	if(!file->IsEOF()) {
+	if (!file->IsEOF()) {
 			// Handle error case
  	 }
 
-  fileSystem->CloseFile(file);
+  fileSystem->CloseFile( file );
 
 }

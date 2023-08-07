@@ -1,31 +1,3 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
 #include "../../idlib/Lib.h"
 #pragma hdrstop
 
@@ -472,7 +444,6 @@ int IN_DIMapKey ( intkey) {
 	}
 }
 
-
 /*
 ==========================
 IN_DeactivateKeyboard
@@ -588,7 +559,6 @@ bool IN_InitDIMouse( void ) {
 	return true;
 }
 
-
 /*
 ==========================
 IN_ActivateMouse
@@ -625,15 +595,13 @@ IN_DeactivateMouse
 ==========================
 */
 void IN_DeactivateMouse( void ) {
-	int i;
-
 	if ( !win32.g_pMouse || !win32.mouseGrabbed ) {
 		return;
 	}
 
 	win32.g_pMouse->Unacquire();
 
-	for ( i = 0; i < 10; i++ ) {
+	for ( int i = 0; i < 10; i++ ) {
 		if ( ::ShowCursor( true ) >= 0 ) {
 			break;
 		}
@@ -711,7 +679,7 @@ Sys_InitScanTable
 ===========
 */
 void Sys_InitScanTable( void ) {
-	anString lang = cvarSystem->GetCVarString( "sys_lang" );
+	anStr lang = cvarSystem->GetCVarString( "sys_lang" );
 	if ( lang.Length() == 0 ) {
 		lang = "english";
 	}
@@ -795,10 +763,8 @@ void IN_Frame( void ) {
 		}
 	}
 }
-
-
-void	Sys_GrabMouseCursor( bool grabIt ) {
-#ifndef	ID_DEDICATED
+void Sys_GrabMouseCursor( bool grabIt ) {
+#ifndef	ARC_DEDICATED
 	win32.mouseReleased = !grabIt;
 	if ( !grabIt ) {
 		// release it right now
@@ -866,9 +832,7 @@ int Sys_PollKeyboardInputEvents( void ) {
 
 	return dwElements;
 }
-
 #else
-
 /*
 ====================
 Sys_PollKeyboardInputEvents
@@ -878,15 +842,14 @@ and checking transitions
 ====================
 */
 int Sys_PollKeyboardInputEvents( void ) {
-    HRESULT            hr;
+	HRESULT hr;
 
-    if ( win32.g_pKeyboard == nullptr ) {
+	if ( win32.g_pKeyboard == nullptr ) {
         return 0;
 	}
 
 	hr = win32.g_pKeyboard->GetDeviceState( sizeof( toggleFetch[ diFetch ] ), toggleFetch[ diFetch ] );
-    if ( hr != DI_OK )
-    {
+	if ( hr != DI_OK ) {
         // We got an error or we got DI_BUFFEROVERFLOW.
         //
         // Either way, it means that continuous contact with the
@@ -909,7 +872,7 @@ int Sys_PollKeyboardInputEvents( void ) {
 	}
 
 	// build faked events
-	int		numChanges = 0;
+	int numChanges = 0;
 
 	for ( int i = 0 ; i < 256 ; i++ ) {
 		if ( toggleFetch[0][i] != toggleFetch[1][i] ) {
@@ -918,12 +881,9 @@ int Sys_PollKeyboardInputEvents( void ) {
 			numChanges++;
 		}
 	}
-
 	diFetch ^= 1;
-
 	return numChanges;
 }
-
 #endif
 
 /*
@@ -951,12 +911,13 @@ void Sys_EndKeyboardInputEvents( void ) {
 void Sys_QueMouseEvents( int dwElements ) {
 	int i, value;
 
-	for ( i = 0; i < dwElements; i++ ) {
+	for (  int i = 0; i < dwElements; i++ ) {
 		if ( polled_didod[i].dwOfs >= DIMOFS_BUTTON0 && polled_didod[i].dwOfs <= DIMOFS_BUTTON7 ) {
-			value = (polled_didod[i].dwData & 0x80) == 0x80;
+			value = ( polled_didod[i].dwData & 0x80 ) == 0x80;
 			Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_KEY, K_MOUSE1 + ( polled_didod[i].dwOfs - DIMOFS_BUTTON0 ), value, 0, nullptr );
 		} else {
-			switch (polled_didod[i].dwOfs) {
+			switch ( polled_didod[i].dwOfs ) {
+			int i;
 			case DIMOFS_X:
 				value = polled_didod[i].dwData;
 				Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_MOUSE, value, 0, 0, nullptr );
@@ -969,7 +930,7 @@ void Sys_QueMouseEvents( int dwElements ) {
 				value = ( (int) polled_didod[i].dwData ) / WHEEL_DELTA;
 				int key = value < 0 ? K_MWHEELDOWN : K_MWHEELUP;
 				value = abs( value );
-				while( value-- > 0 ) {
+				while ( value-- > 0 ) {
 					Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_KEY, key, true, 0, nullptr );
 					Sys_QueEvent( polled_didod[i].dwTimeStamp, SE_KEY, key, false, 0, nullptr );
 				}

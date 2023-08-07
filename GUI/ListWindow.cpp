@@ -142,7 +142,7 @@ const char *anListWindow::HandleEvent(const sysEvent_t *event, bool *updateVisua
 			return ret;
 		}
 	} else if ( event->evType == SE_CHAR ) {
-		if ( !anString::CharIsPrintable(key) ) {
+		if ( !anStr::CharIsPrintable(key) ) {
 			return ret;
 		}
 
@@ -153,7 +153,7 @@ const char *anListWindow::HandleEvent(const sysEvent_t *event, bool *updateVisua
 		typed.Append( key );
 
 		for ( int i=0; i<listItems.Num(); i++ ) {
-			if ( anString::Icmpn( typed, listItems[i], typed.Length() ) == 0 ) {
+			if ( anStr::Icmpn( typed, listItems[i], typed.Length() ) == 0 ) {
 				SetCurrentSel( i );
 				break;
 			}
@@ -213,46 +213,46 @@ const char *anListWindow::HandleEvent(const sysEvent_t *event, bool *updateVisua
 
 
 bool anListWindow::ParseInternalVar(const char *_name, anParser *src) {
-	if (anString::Icmp(_name, "horizontal" ) == 0) {
+	if (anStr::Icmp(_name, "horizontal" ) == 0) {
 		horizontal = src->ParseBool();
 		return true;
 	}
-	if (anString::Icmp(_name, "listname" ) == 0) {
+	if (anStr::Icmp(_name, "listname" ) == 0) {
 		ParseString( src, listName);
 		return true;
 	}
-	if (anString::Icmp(_name, "tabstops" ) == 0) {
+	if (anStr::Icmp(_name, "tabstops" ) == 0) {
 		ParseString( src, tabStopStr);
 		return true;
 	}
-	if (anString::Icmp(_name, "tabaligns" ) == 0) {
+	if (anStr::Icmp(_name, "tabaligns" ) == 0) {
 		ParseString( src, tabAlignStr);
 		return true;
 	}
-	if (anString::Icmp(_name, "multipleSel" ) == 0) {
+	if (anStr::Icmp(_name, "multipleSel" ) == 0) {
 		multipleSel = src->ParseBool();
 		return true;
 	}
-	if (anString::Icmp(_name, "tabvaligns" ) == 0) {
+	if (anStr::Icmp(_name, "tabvaligns" ) == 0) {
 		ParseString( src, tabVAlignStr);
 		return true;
 	}
-	if (anString::Icmp(_name, "tabTypes" ) == 0) {
+	if (anStr::Icmp(_name, "tabTypes" ) == 0) {
 		ParseString( src, tabTypeStr);
 		return true;
 	}
-	if (anString::Icmp(_name, "tabIconSizes" ) == 0) {
+	if (anStr::Icmp(_name, "tabIconSizes" ) == 0) {
 		ParseString( src, tabIconSizeStr);
 		return true;
 	}
-	if (anString::Icmp(_name, "tabIconVOffset" ) == 0) {
+	if (anStr::Icmp(_name, "tabIconVOffset" ) == 0) {
 		ParseString( src, tabIconVOffsetStr);
 		return true;
 	}
 	
-	anString strName = _name;
-	if (anString::Icmp( strName.Left(4), "mtr_" ) == 0) {
-		anString matName;
+	anStr strName = _name;
+	if (anStr::Icmp( strName.Left(4), "mtr_" ) == 0) {
+		anStr matName;
 		const anMaterial* mat;
 
 		ParseString( src, matName);
@@ -428,7 +428,7 @@ void anListWindow::InitScroller( bool horizontal )
 
 void anListWindow::Draw( inttime, float x, float y) {
 	anVec4 color;
-	anString work;
+	anStr work;
 	int count = listItems.Num();
 	idRectangle rect = textRect;
 	float scale = textScale;
@@ -542,7 +542,7 @@ void anListWindow::Draw( inttime, float x, float y) {
 	}
 }
 
-void anListWindow::Activate(bool activate, anString &act) {
+void anListWindow::Activate(bool activate, anStr &act) {
 	idWindow::Activate(activate, act);
 
 	if ( activate ) {
@@ -555,7 +555,7 @@ void anListWindow::HandleBuddyUpdate(idWindow *buddy) {
 }
 
 void anListWindow::UpdateList() {
-	anString str, strName;
+	anStr str, strName;
 	listItems.Clear();
 	for ( int i = 0; i < MAX_LIST_ITEMS; i++ ) {
 		if (gui->State().GetString( va( "%s_item_%i", listName.c_str(), i), "", str) ) {

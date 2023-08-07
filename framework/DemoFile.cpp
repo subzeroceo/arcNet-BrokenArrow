@@ -193,9 +193,9 @@ const char *anDemoFile::ReadHashString() {
 
 	if ( index == -1 ) {
 		// read a new string for the table
-		anString	*str = new (TAG_SYSTEM) anString;
+		anStr	*str = new (TAG_SYSTEM) anStr;
 
-		anString data;
+		anStr data;
 		ReadString( data );
 		*str = data;
 
@@ -231,7 +231,7 @@ void anDemoFile::WriteHashString( const char *str ) {
 	}
 
 	// add it to our table and the demo table
-	anString	*copy = new (TAG_SYSTEM) anString( str );
+	anStr	*copy = new (TAG_SYSTEM) anStr( str );
 //common->Printf( "hash:%i = %s\n", demoStrings.Num(), str );
 	demoStrings.Append( copy );
 	int cmd = -1;
@@ -246,7 +246,7 @@ anDemoFile::ReadDict
 */
 void anDemoFile::ReadDict( anDict &dict ) {
 	int i, c;
-	anString key, val;
+	anStr key, val;
 
 	dict.Clear();
 	ReadInt( c );

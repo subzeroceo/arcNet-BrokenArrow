@@ -87,7 +87,7 @@ anAASTargetOutOfRange::anAASTargetOutOfRange( anSAAI* _owner ) {
 anSEASFindAreaOutOfRange::TestArea
 ============
 */
-bool anAASTargetOutOfRange::TestPoint ( anSEAS* aas, const anVec3& pos, const float zAllow ) {
+bool anAASTargetOutOfRange::TestPoint ( anSEAS* aas, const anVec3 &pos, const float zAllow ) {
 	return aiManager.ValidateDestination ( owner, pos );
 }
 
@@ -170,7 +170,7 @@ bool anAASHolstileCoordnation::TestArea( class anSEAS *aas, int areaNum, const s
 anAASHolstileCoordnation::TestPoint
 ============
 */
-bool anAASHolstileCoordnation::TestPoint( class anSEAS *aas, const anVec3& point, const float zAllow ) {
+bool anAASHolstileCoordnation::TestPoint( class anSEAS *aas, const anVec3 &point, const float zAllow ) {
 	float dist;
 
 	anVec3 localPoint = point;
@@ -314,7 +314,7 @@ bool SEASTegtherObjective::TestArea( class anSEAS *aas, int areaNum, const seasA
 SEASTegtherObjective::TestPoint
 ============
 */
-bool SEASTegtherObjective::TestPoint( class anSEAS* aas, const anVec3& point, const float zAllow ) {
+bool SEASTegtherObjective::TestPoint( class anSEAS* aas, const anVec3 &point, const float zAllow ) {
 	if ( !tether ) {
 		return false;
 	}

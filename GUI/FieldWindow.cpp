@@ -59,11 +59,11 @@ idFieldWindow::~idFieldWindow() {
 }
 
 bool idFieldWindow::ParseInternalVar(const char *_name, anParser *src) {
-	if (anString::Icmp(_name, "cursorvar" ) == 0) {
+	if (anStr::Icmp(_name, "cursorvar" ) == 0) {
 		ParseString( src, cursorVar);
 		return true;
 	}
-	if (anString::Icmp(_name, "showcursor" ) == 0) {
+	if (anStr::Icmp(_name, "showcursor" ) == 0) {
 		showCursor = src->ParseBool();
 		return true;
 	}

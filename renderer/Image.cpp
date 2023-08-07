@@ -56,7 +56,7 @@ const imageClassificate_t IC_Info[] = {
 };
 
 static int ClassifyImage( const char *name ) {
-	anString str = name;
+	anStr str = name;
 	for ( int i = 0; i < IC_COUNT; i++ ) {
 		if ( str.Find( IC_Info[i].rootPath, false ) == 0 ) {
 			return IC_Info[i].type;
@@ -1194,7 +1194,7 @@ void R_RotatePic( GLbyte *data, int width ) {
 		for ( int j = 0; j < width; j++ ) {
 			int sourceIndex = j * width + i, destIndex = i * width + ( width - 1 - j );
 			temp[destIndex] = data[sourceIndex];
-			//*( temp + i * width + j ) = *( ( int*)data + j * width + i );
+			//*( temp + i * width + j ) = *( (int *)data + j * width + i );
 		}
 	}
 
@@ -1334,11 +1334,11 @@ void R_CreateBuiltinImages( void ) {
 		}
 	}
 
-	tr.identityLightImage = R_CreateImage( "*identityLight", (GLbyte *)data, 8, 8, qfalse, qfalse, GL_REPEAT );
+	tr.identityLightImage = R_CreateImage( "*identityLight", (GLbyte *)data, 8, 8, false, false, GL_REPEAT );
 
 	for ( x = 0; x < 32; x++ ) {
 		// scratchimage is usually used for cinematic drawing
-		tr.scratchImage[x] = R_CreateImage( "*scratch", (GLbyte *)data, DEFAULT_SIZE, DEFAULT_SIZE, qfalse, qtrue, GL_CLAMP );
+		tr.scratchImage[x] = R_CreateImage( "*scratch", (GLbyte *)data, DEFAULT_SIZE, DEFAULT_SIZE, false, true, GL_CLAMP );
 	}
 
 	R_CreateDlightImage();
@@ -1642,7 +1642,7 @@ static void R_CreateDlightImage( void ) {
 	}
 	R_WriteTGA( "lights/dlight.tga", buffer, width, height );
 	R_StaticFree( buffer );
-	//lightImage = R_CreateImage( "_dlight", (GLbyte *)data, DLIGHT_SIZE, DLIGHT_SIZE, qfalse, qfalse, GL_CLAMP );
+	//lightImage = R_CreateImage( "_dlight", (GLbyte *)data, DLIGHT_SIZE, DLIGHT_SIZE, false, false, GL_CLAMP );
 }
 
 static void CreateFlashOff( void ) {
@@ -2517,9 +2517,9 @@ AppendToken
 static void AppendToken( anToken &token ) {
 	// add a leading space if not at the beginning
 	if ( parseBuffer[0] ) {
-		anString::Append( parseBuffer, MAX_IMAGE_NAME, " " );
+		anStr::Append( parseBuffer, MAX_IMAGE_NAME, " " );
 	}
-	anString::Append( parseBuffer, MAX_IMAGE_NAME, token.c_str() );
+	anStr::Append( parseBuffer, MAX_IMAGE_NAME, token.c_str() );
 }
 
 /*
@@ -2532,7 +2532,7 @@ static void MatchAndAppendToken( anLexer &src, const char *match ) {
 		return;
 	}
 	// a matched token won't need a leading space
-	anString::Append( parseBuffer, MAX_IMAGE_NAME, match );
+	anStr::Append( parseBuffer, MAX_IMAGE_NAME, match );
 }
 
 /*
@@ -2854,9 +2854,9 @@ void R_ReloadImages_f( const anCommandArgs &args ) {
 	bool checkPrecompressed = false;		// if we are doing this as a vid_restart, look for precompressed like normal
 
 	if ( args.Argc() == 2 ) {
-		if ( !anString::Icmp( args.Argv(1 ), "all" ) ) {
+		if ( !anStr::Icmp( args.Argv(1 ), "all" ) ) {
 			all = true;
-		} else if ( !anString::Icmp( args.Argv(1 ), "reload" ) ) {
+		} else if ( !anStr::Icmp( args.Argv(1 ), "reload" ) ) {
 			all = true;
 			checkPrecompressed = true;
 		} else {
@@ -2893,7 +2893,7 @@ static int R_QSortImageSizes( const void *a, const void *b ) {
 	if ( ea->size < eb->size ) {
 		return 1;
 	}
-	return anString::Icmp( ea->image->imgName, eb->image->imgName );
+	return anStr::Icmp( ea->image->imgName, eb->image->imgName );
 }
 
 /*
@@ -2907,7 +2907,7 @@ static int R_QsortImageName( const void *a, const void *b ) {
 	ea = ( sortImage *)a;
 	eb = ( sortImage *)b;
 
-	return anString::Icmp( ea->image->GetName(), eb->image->GetName() );
+	return anStr::Icmp( ea->image->GetName(), eb->image->GetName() );
 }
 
 /*
@@ -2925,28 +2925,28 @@ void R_ListImages_f( const anCommandArgs &args ) {
 
 	if ( args.Argc() == 1 ) {
 	} else if ( args.Argc() == 2 ) {
-		if ( anString::Icmp( args.Argv( 1 ), "uncompressed" ) == 0 ) {
+		if ( anStr::Icmp( args.Argv( 1 ), "uncompressed" ) == 0 ) {
 			uncompressedOnly = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "sorted" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "sorted" ) == 0 ) {
 			sorted = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "partial" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "partial" ) == 0 ) {
 			partial = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "unloaded" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "unloaded" ) == 0 ) {
 			unloaded = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "cached" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "cached" ) == 0 ) {
 			cached = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "uncached" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "uncached" ) == 0 ) {
 			uncached = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "tagged" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "tagged" ) == 0 ) {
 			matchTag = 1;
-		} else if ( anString::Icmp( args.Argv( 1 ), "duplicated" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "duplicated" ) == 0 ) {
 			duplicated = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "touched" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "touched" ) == 0 ) {
 			touched = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "classify" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "classify" ) == 0 ) {
 			byClassification = true;
 			sorted = true;
-		} else if ( anString::Icmp( args.Argv( 1 ), "oversized" ) == 0 ) {
+		} else if ( anStr::Icmp( args.Argv( 1 ), "oversized" ) == 0 ) {
 			byClassification = true;
 			sorted = true;
 			overSized = true;
@@ -2997,7 +2997,7 @@ void R_ListImages_f( const anCommandArgs &args ) {
 		// only print duplicates (from mismatched wrap / clamp, etc)
 		if ( duplicated ) {
 			for ( int j = i + 1; j < globalImages->images.Num(); j++ ) {
-				if ( anString::Icmp( image->imgName, globalImages->images[ j ]->imgName ) == 0 ) {
+				if ( anStr::Icmp( image->imgName, globalImages->images[ j ]->imgName ) == 0 ) {
 					break;
 				}
 			}
@@ -3087,7 +3087,7 @@ int anImage::GetImageId( const char *name ) const {
 	return -1;
 }
 
-static void anImage::GetGeneratedName( anString &_name, const textureUsage_t &_usage, const cubeFiles_t &_cube ) {
+static void anImage::GetGeneratedName( anStr &_name, const textureUsage_t &_usage, const cubeFiles_t &_cube ) {
 	anStringStatic< 64 > extension;
 
 	_name.ExtractFileExtension( extension );
@@ -3128,7 +3128,7 @@ void R_CombineCubeImages_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	anString baseName = args.Argv( 1 );
+	anStr baseName = args.Argv( 1 );
 	common->SetRefreshOnPrint( true );
 	char filename[MAX_IMAGE_NAME];
 	GLbyte *pics[6];
@@ -3210,7 +3210,7 @@ void R_ApplyCubeMapTransforms( int iter, GLbyte *data, int size ) {
 
 	if ( iter == 1 ) {
 		R_VerticalFlip( data, size, size );
-	} else if( iter == 3 ) {
+	} else if ( iter == 3 ) {
 		R_HorizontalFlip( data, size, size );
 	}
 }
@@ -4386,11 +4386,11 @@ void anImage::WritePrecompressedImage() {
 	}
 
 	if ( globalImages->image_useOffLineCompression.GetBool() && FormatIsDXT( altInternalFormat ) ) {
-		anString outFile = fileSystem->RelativePathToOSPath( filename, "fs_basepath" );
-		anString inFile = outFile;
+		anStr outFile = fileSystem->RelativePathToOSPath( filename, "fs_basepath" );
+		anStr inFile = outFile;
 		inFile.StripFileExtension();
 		inFile.SetFileExtension( "tga" );
-		anString format;
+		anStr format;
 		if ( depth == TD_BUMP ) {
 			format = "RXGB +red 0.0 +green 0.5 +blue 0.5";
 		} else {

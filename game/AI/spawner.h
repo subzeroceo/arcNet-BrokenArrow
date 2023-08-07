@@ -13,11 +13,11 @@ const int MAX_SPAWN_TYPES	= 32;
 
 class rvSpawner;
 
-typedef void (*spawnerCallbackProc_t) ( rvSpawner* spawner, anEntity* spawned, int userdata );
+typedef void (*spawnerCallbackProc_t) ( rvSpawner* spawner, anEntity *spawned, int userdata );
 
 typedef struct {
 	anEntityPtr<anEntity>	ent;
-	anString					event;
+	anStr					event;
 } spawnerCallback_t;
 
 /*
@@ -34,14 +34,14 @@ public:
 	void				Spawn					( void );
 	void				Think					( void );
 
-	void				Attach					( anEntity* ent );
-	void				Detach					( anEntity* ent );
+	void				Attach					( anEntity *ent );
+	void				Detach					( anEntity *ent );
 
 	void				Save					( anSaveGame *savefile ) const;
 	void				Restore					( anRestoreGame *savefile );
 
-	void				AddSpawnPoint			( anEntity* point );
-	void				RemoveSpawnPoint		( anEntity* point );
+	void				AddSpawnPoint			( anEntity *point );
+	void				RemoveSpawnPoint		( anEntity *point );
 
 	int					GetNumSpawnPoints		( void ) const;
 	int					GetNumActive			( void ) const;
@@ -51,9 +51,9 @@ public:
 	virtual void		FindTargets				( void );
 	bool				ActiveListChanged		( void );
 
-	void				CallScriptEvents		( const char* prefixKey, anEntity* parm );
+	void				CallScriptEvents		( const char *prefixKey, anEntity *parm );
 
-	void				AddCallback				( anEntity* owner, const anEventDef* ev );
+	void				AddCallback				( anEntity *owner, const anEventDef* ev );
 
 protected:
 
@@ -84,7 +84,7 @@ protected:
 	anEntity*			GetSpawnPoint			( void );
 
 	// Get a random spawn type
-	const char*			GetSpawnType			( anEntity* spawnPoint );
+	const char*			GetSpawnType			( anEntity *spawnPoint );
 
 	// Validate the given spawn point for spawning
 	bool				ValidateSpawnPoint		( const anVec3 origin, const anBounds &bounds );
@@ -101,19 +101,19 @@ private:
 };
 
 
-ARC_INLINE int rvSpawner::GetNumSpawnPoints( void ) const {
+inline int rvSpawner::GetNumSpawnPoints( void ) const {
 	return spawnPoints.Num();
 }
 
-ARC_INLINE anEntity* rvSpawner::GetSpawnPoint( int index ) {
+inline anEntity *rvSpawner::GetSpawnPoint( int index ) {
 	return spawnPoints[index];
 }
 
-ARC_INLINE int rvSpawner::GetNumActive( void ) const {
+inline int rvSpawner::GetNumActive( void ) const {
 	return currentActive.Num();
 }
 
-ARC_INLINE int rvSpawner::GetMaxActive( void ) const {
+inline int rvSpawner::GetMaxActive( void ) const {
 	return maxActive;
 }
 

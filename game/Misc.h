@@ -21,7 +21,7 @@ that can be bound to other entities.  Should not be subclassed.
 ===============================================================================
 */
 
-class arcSpawnableEntity : public arcEntity {
+class arcSpawnableEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( arcSpawnableEntity );
 
@@ -38,7 +38,7 @@ private:
 ===============================================================================
 */
 
-class arcPlayerStart : public arcEntity {
+class arcPlayerStart : public anEntity {
 public:
 	CLASS_PROTOTYPE( arcPlayerStart );
 
@@ -48,23 +48,23 @@ public:
 
 	bool				ShouldConstructScriptObjectAtSpawn( void ) const { return false; }
 
-	static bool			InhibitSpawn( const anDict& args );
+	static bool			InhibitSpawn( const anDict &args );
 };
 
 /*
 ===============================================================================
 
-  arcAnimated
+  anAnimated
 
 ===============================================================================
 */
 
-class arcAnimated : public arcAFEntity_Base {
+class anAnimated : public anAFEntity_Base {
 public:
-	CLASS_PROTOTYPE( arcAnimated );
+	CLASS_PROTOTYPE( anAnimated );
 
-							arcAnimated();
-							~arcAnimated();
+							anAnimated();
+							~anAnimated();
 
 	void					Spawn( void );
 	virtual bool			LoadAF( void );
@@ -72,17 +72,17 @@ public:
 	virtual bool			GetPhysicsToSoundTransform( anVec3 &origin, anMat3 &axis );
 
 private:
-	int						num_anims;
-	int						current_anim_index;
+	int						numAnims;
+	int						currentAnimIndex;
 	int						anim;
 	int						blendFrames;
 	jointHandle_t			soundJoint;
-	arcEntityPtr<arcEntity>	activator;
+	anEntityPtr<anEntity>	activator;
 	bool					activated;
 
 	void					PlayNextAnim( void );
 
-	void					Event_Activate( arcEntity *activator );
+	void					Event_Activate( anEntity *activator );
 	void					Event_Start( void );
 	void					Event_StartRagdoll( void );
 	void					Event_AnimDone( int animIndex );
@@ -97,7 +97,7 @@ private:
 ===============================================================================
 */
 
-class arcStaticEntity : public arcEntity {
+class arcStaticEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( arcStaticEntity );
 
@@ -109,7 +109,7 @@ public:
 	virtual void		Show( void );
 	virtual void		Think( void );
 
-	static bool			InhibitSpawn( const anDict& args );
+	static bool			InhibitSpawn( const anDict &args );
 
 	virtual void		PostMapSpawn( void );
 
@@ -124,7 +124,7 @@ public:
 ===============================================================================
 */
 
-class arcEntityEnvDefinition : public arcEntity {
+class arcEntityEnvDefinition : public anEntity {
 public:
 	CLASS_PROTOTYPE( arcEntityEnvDefinition );
 
@@ -140,7 +140,7 @@ public:
 ===============================================================================
 */
 
-class arcLiquid : public arcEntity {
+class arcLiquid : public anEntity {
 public:
 	CLASS_PROTOTYPE( arcLiquid );
 
@@ -161,7 +161,7 @@ private:
 ===============================================================================
 */
 
-class arcLODEntity : public arcEntity {
+class arcLODEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( arcLODEntity );
 
@@ -171,7 +171,7 @@ public:
 	void						Spawn();
 	void						PostMapSpawn();
 
-	void						AddClipModel( anClipModel* model, const anVec3& origin, const anMat3& axes );
+	void						AddClipModel( anClipModel* model, const anVec3 &origin, const anMat3 &axes );
 	void						AddRenderEntity( const renderEntity_t& entity, int ID );
 
 private:
@@ -191,7 +191,7 @@ private:
 ===============================================================================
 */
 
-class arcEnvBoundsEntity : public arcEntity {
+class arcEnvBoundsEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( arcEnvBoundsEntity );
 
@@ -203,12 +203,12 @@ public:
 /*
 ===============================================================================
 
-	sdLadderEntity
+	anLadderEntity
 
 ===============================================================================
 */
 
-class arcLadderEntity : public arcEntity {
+class arcLadderEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( arcLadderEntity );
 
@@ -236,7 +236,7 @@ private:
 ===============================================================================
 */
 
-class anSEASObstacleEntity : public arcEntity {
+class anSEASObstacleEntity : public anEntity {
 public:
 	CLASS_PROTOTYPE( anSEASObstacleEntity );
 
@@ -248,7 +248,7 @@ public:
 	int					GetTeam( void ) { return team; }
 
 private:
-	void				Event_Activate( arcEntity *activator );
+	void				Event_Activate( anEntity *activator );
 
 	void				ChangeAreaState();
 

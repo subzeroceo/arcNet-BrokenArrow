@@ -153,7 +153,7 @@ anUserInterface *anUserInterfaceManager::FindGui( const char *path, bool autoLoa
 
 	for ( int i = 0; i < c; i++ ) {
 		anUserInterface *gui = guis[i];
-		if ( !anString::Icmp( guis[i]->GetSourceFile(), path ) ) {
+		if ( !anStr::Icmp( guis[i]->GetSourceFile(), path ) ) {
 			if ( !forceNOTUnique && ( needUnique || guis[i]->IsInteractive() ) ) {
 				break;
 			}
@@ -177,7 +177,7 @@ anUserInterface *anUserInterfaceManager::FindGui( const char *path, bool autoLoa
 anUserInterface *anUserInterfaceManager::FindDemoGui( const char *path ) {
 	int c = demoGuis.Num();
 	for ( int i = 0; i < c; i++ ) {
-		if ( !anString::Icmp( demoGuis[i]->GetSourceFile(), path ) ) {
+		if ( !anStr::Icmp( demoGuis[i]->GetSourceFile(), path ) ) {
 			return demoGuis[i];
 		}
 	}
@@ -262,7 +262,7 @@ bool anUserInterface::InitFromFile( const char *path, bool rebuild, bool cache )
 	if ( src.IsLoaded() ) {
 		anToken token;
 		while( src.ReadToken( &token ) ) {
-			if ( anString::Icmp( token, "windowDef" ) == 0 ) {
+			if ( anStr::Icmp( token, "windowDef" ) == 0 ) {
 				desktop->SetDC( &uiManager.dc );
 				if ( desktop->Parse( &src, rebuild ) ) {
 					desktop->SetFlag( WIN_DESKTOP );
@@ -322,7 +322,7 @@ const char *anUserInterface::HandleEvent( const sysEvent_t *event, int _time, bo
 	return "";
 }
 
-void anUserInterface::HandleNamedEvent ( const char* eventName ) {
+void anUserInterface::HandleNamedEvent ( const char *eventName ) {
 	desktop->RunNamedEvent( eventName );
 }
 
@@ -370,19 +370,19 @@ void anUserInterface::SetStateFloat( const char *varName, const float value ) {
 	state.SetFloat( varName, value );
 }
 
-const char* anUserInterface::GetStateString( const char *varName, const char* defaultString ) const {
+const char *anUserInterface::GetStateString( const char *varName, const char *defaultString ) const {
 	return state.GetString( varName, defaultString );
 }
 
-bool anUserInterface::GetStateBool( const char *varName, const char* defaultString ) const {
+bool anUserInterface::GetStateBool( const char *varName, const char *defaultString ) const {
 	return state.GetBool( varName, defaultString ); 
 }
 
-int anUserInterface::GetStateInt( const char *varName, const char* defaultString ) const {
+int anUserInterface::GetStateInt( const char *varName, const char *defaultString ) const {
 	return state.GetInt( varName, defaultString );
 }
 
-float anUserInterface::GetStateFloat( const char *varName, const char* defaultString ) const {
+float anUserInterface::GetStateFloat( const char *varName, const char *defaultString ) const {
 	return state.GetFloat( varName, defaultString );
 }
 
@@ -421,7 +421,7 @@ void anUserInterface::Trigger( int _time ) {
 }
 
 void anUserInterface::ReadFromDemoFile( class anSavedGamesFile *f ) {
-	anString work;
+	anStr work;
 	f->ReadDict( state );
 	source = state.GetString( "name" );
 
@@ -454,7 +454,7 @@ void anUserInterface::ReadFromDemoFile( class anSavedGamesFile *f ) {
 }
 
 void anUserInterface::WriteToDemoFile( class anSavedGamesFile *f ) {
-	anString work;
+	anStr work;
 	f->WriteDict( state );
 	if ( desktop ) {
 		desktop->WriteToDemoFile( f );
@@ -510,8 +510,8 @@ bool anUserInterface::WriteToSaveGame( anFile *savefile ) const {
 bool anUserInterface::ReadFromSaveGame( anFile *savefile ) {
 	int num;
 	int i, len;
-	anString key;
-	anString value;
+	anStr key;
+	anStr value;
 
 	savefile->Read( &num, sizeof( num ) );
 

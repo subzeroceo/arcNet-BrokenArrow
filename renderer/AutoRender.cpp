@@ -120,200 +120,200 @@ idGuiModel* tr_guiModel;
 // functions that are not called every frame
 glconfig_t	glConfig;
 
-idCVar r_requestStereoPixelFormat( "r_requestStereoPixelFormat", "1", CVAR_RENDERER, "Ask for a stereo GL pixel format on startup" );
-idCVar r_debugContext( "r_debugContext", "0", CVAR_RENDERER, "Enable various levels of context debug." );
-idCVar r_glDriver( "r_glDriver", "", CVAR_RENDERER, "\"opengl32\", etc." );
-idCVar r_skipIntelWorkarounds( "r_skipIntelWorkarounds", "0", CVAR_RENDERER | CVAR_BOOL, "skip workarounds for Intel driver bugs" );
+anCVar r_requestStereoPixelFormat( "r_requestStereoPixelFormat", "1", CVAR_RENDERER, "Ask for a stereo GL pixel format on startup" );
+anCVar r_debugContext( "r_debugContext", "0", CVAR_RENDERER, "Enable various levels of context debug." );
+anCVar r_glDriver( "r_glDriver", "", CVAR_RENDERER, "\"opengl32\", etc." );
+anCVar r_skipIntelWorkarounds( "r_skipIntelWorkarounds", "0", CVAR_RENDERER | CVAR_BOOL, "skip workarounds for Intel driver bugs" );
 // RB: disabled 16x MSAA
-idCVar r_multiSamples( "r_multiSamples", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "number of antialiasing samples", 0, 8 );
+anCVar r_multiSamples( "r_multiSamples", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "number of antialiasing samples", 0, 8 );
 // RB end
-idCVar r_vidMode( "r_vidMode", "0", CVAR_ARCHIVE | CVAR_RENDERER | CVAR_INTEGER, "fullscreen video mode number" );
-idCVar r_displayRefresh( "r_displayRefresh", "0", CVAR_RENDERER | CVAR_INTEGER | CVAR_NOCHEAT, "optional display refresh rate option for vid mode", 0.0f, 240.0f );
+anCVar r_vidMode( "r_vidMode", "0", CVAR_ARCHIVE | CVAR_RENDERER | CVAR_INTEGER, "fullscreen video mode number" );
+anCVar r_displayRefresh( "r_displayRefresh", "0", CVAR_RENDERER | CVAR_INTEGER | CVAR_NOCHEAT, "optional display refresh rate option for vid mode", 0.0f, 240.0f );
 #ifdef WIN32
-idCVar r_fullscreen( "r_fullscreen", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "0 = windowed, 1 = full screen on monitor 1, 2 = full screen on monitor 2, etc" );
+anCVar r_fullscreen( "r_fullscreen", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "0 = windowed, 1 = full screen on monitor 1, 2 = full screen on monitor 2, etc" );
 #else
 // DG: add mode -2 for SDL, also defaulting to windowed mode, as that causes less trouble on linux
-idCVar r_fullscreen( "r_fullscreen", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "-2 = use current monitor, -1 = (reserved), 0 = windowed, 1 = full screen on monitor 1, 2 = full screen on monitor 2, etc" );
+anCVar r_fullscreen( "r_fullscreen", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "-2 = use current monitor, -1 = (reserved), 0 = windowed, 1 = full screen on monitor 1, 2 = full screen on monitor 2, etc" );
 // DG end
 #endif
-idCVar r_customWidth( "r_customWidth", "1280", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen width. set r_vidMode to -1 to activate" );
-idCVar r_customHeight( "r_customHeight", "720", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen height. set r_vidMode to -1 to activate" );
-idCVar r_windowX( "r_windowX", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "Non-fullscreen parameter" );
-idCVar r_windowY( "r_windowY", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "Non-fullscreen parameter" );
-idCVar r_windowWidth( "r_windowWidth", "1280", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "Non-fullscreen parameter" );
-idCVar r_windowHeight( "r_windowHeight", "720", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "Non-fullscreen parameter" );
+anCVar r_customWidth( "r_customWidth", "1280", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen width. set r_vidMode to -1 to activate" );
+anCVar r_customHeight( "r_customHeight", "720", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "custom screen height. set r_vidMode to -1 to activate" );
+anCVar r_windowX( "r_windowX", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "Non-fullscreen parameter" );
+anCVar r_windowY( "r_windowY", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "Non-fullscreen parameter" );
+anCVar r_windowWidth( "r_windowWidth", "1280", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "Non-fullscreen parameter" );
+anCVar r_windowHeight( "r_windowHeight", "720", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "Non-fullscreen parameter" );
 
-idCVar r_useViewBypass( "r_useViewBypass", "1", CVAR_RENDERER | CVAR_INTEGER, "bypass a frame of latency to the view" );
-idCVar r_useLightPortalFlow( "r_useLightPortalFlow", "1", CVAR_RENDERER | CVAR_BOOL, "use a more precise area reference determination" );
-idCVar r_singleTriangle( "r_singleTriangle", "0", CVAR_RENDERER | CVAR_BOOL, "only draw a single triangle per primitive" );
-idCVar r_checkBounds( "r_checkBounds", "0", CVAR_RENDERER | CVAR_BOOL, "compare all surface bounds with precalculated ones" );
-idCVar r_useConstantMaterials( "r_useConstantMaterials", "1", CVAR_RENDERER | CVAR_BOOL, "use pre-calculated material registers if possible" );
-idCVar r_useSilRemap( "r_useSilRemap", "1", CVAR_RENDERER | CVAR_BOOL, "consider verts with the same XYZ, but different ST the same for shadows" );
-idCVar r_useNodeCommonChildren( "r_useNodeCommonChildren", "1", CVAR_RENDERER | CVAR_BOOL, "stop pushing reference bounds early when possible" );
-idCVar r_useShadowSurfaceScissor( "r_useShadowSurfaceScissor", "1", CVAR_RENDERER | CVAR_BOOL, "scissor shadows by the scissor rect of the interaction surfaces" );
-idCVar r_useCachedDynamicModels( "r_useCachedDynamicModels", "1", CVAR_RENDERER | CVAR_BOOL, "cache snapshots of dynamic models" );
-idCVar r_useSeamlessCubeMap( "r_useSeamlessCubeMap", "1", CVAR_RENDERER | CVAR_BOOL, "use ARB_seamless_cube_map if available" );
-idCVar r_useSRGB( "r_useSRGB", "0", CVAR_RENDERER | CVAR_INTEGER | CVAR_ARCHIVE, "1 = both texture and framebuffer, 2 = framebuffer only, 3 = texture only" );
-idCVar r_maxAnisotropicFiltering( "r_maxAnisotropicFiltering", "8", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "limit aniso filtering" );
-idCVar r_useTrilinearFiltering( "r_useTrilinearFiltering", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "Extra quality filtering" );
+anCVar r_useViewBypass( "r_useViewBypass", "1", CVAR_RENDERER | CVAR_INTEGER, "bypass a frame of latency to the view" );
+anCVar r_useLightPortalFlow( "r_useLightPortalFlow", "1", CVAR_RENDERER | CVAR_BOOL, "use a more precise area reference determination" );
+anCVar r_singleTriangle( "r_singleTriangle", "0", CVAR_RENDERER | CVAR_BOOL, "only draw a single triangle per primitive" );
+anCVar r_checkBounds( "r_checkBounds", "0", CVAR_RENDERER | CVAR_BOOL, "compare all surface bounds with precalculated ones" );
+anCVar r_useConstantMaterials( "r_useConstantMaterials", "1", CVAR_RENDERER | CVAR_BOOL, "use pre-calculated material registers if possible" );
+anCVar r_useSilRemap( "r_useSilRemap", "1", CVAR_RENDERER | CVAR_BOOL, "consider verts with the same XYZ, but different ST the same for shadows" );
+anCVar r_useNodeCommonChildren( "r_useNodeCommonChildren", "1", CVAR_RENDERER | CVAR_BOOL, "stop pushing reference bounds early when possible" );
+anCVar r_useShadowSurfaceScissor( "r_useShadowSurfaceScissor", "1", CVAR_RENDERER | CVAR_BOOL, "scissor shadows by the scissor rect of the interaction surfaces" );
+anCVar r_useCachedDynamicModels( "r_useCachedDynamicModels", "1", CVAR_RENDERER | CVAR_BOOL, "cache snapshots of dynamic models" );
+anCVar r_useSeamlessCubeMap( "r_useSeamlessCubeMap", "1", CVAR_RENDERER | CVAR_BOOL, "use ARB_seamless_cube_map if available" );
+anCVar r_useSRGB( "r_useSRGB", "0", CVAR_RENDERER | CVAR_INTEGER | CVAR_ARCHIVE, "1 = both texture and framebuffer, 2 = framebuffer only, 3 = texture only" );
+anCVar r_maxAnisotropicFiltering( "r_maxAnisotropicFiltering", "8", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "limit aniso filtering" );
+anCVar r_useTrilinearFiltering( "r_useTrilinearFiltering", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "Extra quality filtering" );
 // RB: not used anymore
-idCVar r_lodBias( "r_lodBias", "0.5", CVAR_RENDERER | CVAR_ARCHIVE, "UNUSED: image lod bias" );
+anCVar r_lodBias( "r_lodBias", "0.5", CVAR_RENDERER | CVAR_ARCHIVE, "UNUSED: image lod bias" );
 // RB end
 
-idCVar r_useStateCaching( "r_useStateCaching", "1", CVAR_RENDERER | CVAR_BOOL, "avoid redundant state changes in GL_*() calls" );
+anCVar r_useStateCaching( "r_useStateCaching", "1", CVAR_RENDERER | CVAR_BOOL, "avoid redundant state changes in GL_*() calls" );
 
-idCVar r_znear( "r_znear", "3", CVAR_RENDERER | CVAR_FLOAT, "near Z clip plane distance", 0.001f, 200.0f );
+anCVar r_znear( "r_znear", "3", CVAR_RENDERER | CVAR_FLOAT, "near Z clip plane distance", 0.001f, 200.0f );
 
-idCVar r_ignoreGLErrors( "r_ignoreGLErrors", "0", CVAR_RENDERER | CVAR_BOOL, "ignore GL errors" );
-idCVar r_swapInterval( "r_swapInterval", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "0 = tear, 1 = swap-tear where available, 2 = always v-sync" );
+anCVar r_ignoreGLErrors( "r_ignoreGLErrors", "0", CVAR_RENDERER | CVAR_BOOL, "ignore GL errors" );
+anCVar r_swapInterval( "r_swapInterval", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "0 = tear, 1 = swap-tear where available, 2 = always v-sync" );
 
-idCVar r_gamma( "r_gamma", "1.0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "changes gamma tables", 0.5f, 3.0f );
-idCVar r_brightness( "r_brightness", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "changes gamma tables", 0.5f, 2.0f );
+anCVar r_gamma( "r_gamma", "1.0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "changes gamma tables", 0.5f, 3.0f );
+anCVar r_brightness( "r_brightness", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "changes gamma tables", 0.5f, 2.0f );
 
-idCVar r_jitter( "r_jitter", "0", CVAR_RENDERER | CVAR_BOOL, "randomly subpixel jitter the projection matrix" );
+anCVar r_jitter( "r_jitter", "0", CVAR_RENDERER | CVAR_BOOL, "randomly subpixel jitter the projection matrix" );
 
-idCVar r_skipStaticInteractions( "r_skipStaticInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "skip interactions created at level load" );
-idCVar r_skipDynamicInteractions( "r_skipDynamicInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "skip interactions created after level load" );
-idCVar r_skipSuppress( "r_skipSuppress", "0", CVAR_RENDERER | CVAR_BOOL, "ignore the per-view suppressions" );
-idCVar r_skipPostProcess( "r_skipPostProcess", "0", CVAR_RENDERER | CVAR_BOOL, "skip all post-process renderings" );
-idCVar r_skipInteractions( "r_skipInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "skip all light/surface interaction drawing" );
-idCVar r_skipDynamicTextures( "r_skipDynamicTextures", "0", CVAR_RENDERER | CVAR_BOOL, "don't dynamically create textures" );
-idCVar r_skipCopyTexture( "r_skipCopyTexture", "0", CVAR_RENDERER | CVAR_BOOL, "do all rendering, but don't actually copyTexSubImage2D" );
-idCVar r_skipBackEnd( "r_skipBackEnd", "0", CVAR_RENDERER | CVAR_BOOL, "don't draw anything" );
-idCVar r_skipRender( "r_skipRender", "0", CVAR_RENDERER | CVAR_BOOL, "skip 3D rendering, but pass 2D" );
+anCVar r_skipStaticInteractions( "r_skipStaticInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "skip interactions created at level load" );
+anCVar r_skipDynamicInteractions( "r_skipDynamicInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "skip interactions created after level load" );
+anCVar r_skipSuppress( "r_skipSuppress", "0", CVAR_RENDERER | CVAR_BOOL, "ignore the per-view suppressions" );
+anCVar r_skipPostProcess( "r_skipPostProcess", "0", CVAR_RENDERER | CVAR_BOOL, "skip all post-process renderings" );
+anCVar r_skipInteractions( "r_skipInteractions", "0", CVAR_RENDERER | CVAR_BOOL, "skip all light/surface interaction drawing" );
+anCVar r_skipDynamicTextures( "r_skipDynamicTextures", "0", CVAR_RENDERER | CVAR_BOOL, "don't dynamically create textures" );
+anCVar r_skipCopyTexture( "r_skipCopyTexture", "0", CVAR_RENDERER | CVAR_BOOL, "do all rendering, but don't actually copyTexSubImage2D" );
+anCVar r_skipBackEnd( "r_skipBackEnd", "0", CVAR_RENDERER | CVAR_BOOL, "don't draw anything" );
+anCVar r_skipRender( "r_skipRender", "0", CVAR_RENDERER | CVAR_BOOL, "skip 3D rendering, but pass 2D" );
 // RB begin
-idCVar r_skipRenderContext( "r_skipRenderContext", "0", CVAR_RENDERER | CVAR_BOOL, "DISABLED: nullptr the rendering context during backend 3D rendering" );
+anCVar r_skipRenderContext( "r_skipRenderContext", "0", CVAR_RENDERER | CVAR_BOOL, "DISABLED: nullptr the rendering context during backend 3D rendering" );
 // RB end
-idCVar r_skipTranslucent( "r_skipTranslucent", "0", CVAR_RENDERER | CVAR_BOOL, "skip the translucent interaction rendering" );
-idCVar r_skipAmbient( "r_skipAmbient", "0", CVAR_RENDERER | CVAR_BOOL, "bypasses all non-interaction drawing" );
-idCVar r_skipNewAmbient( "r_skipNewAmbient", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "bypasses all vertex/fragment program ambient drawing" );
-idCVar r_skipBlendLights( "r_skipBlendLights", "0", CVAR_RENDERER | CVAR_BOOL, "skip all blend lights" );
-idCVar r_skipFogLights( "r_skipFogLights", "0", CVAR_RENDERER | CVAR_BOOL, "skip all fog lights" );
-idCVar r_skipDeforms( "r_skipDeforms", "0", CVAR_RENDERER | CVAR_BOOL, "leave all deform materials in their original state" );
-idCVar r_skipFrontEnd( "r_skipFrontEnd", "0", CVAR_RENDERER | CVAR_BOOL, "bypasses all front end work, but 2D gui rendering still draws" );
-idCVar r_skipUpdates( "r_skipUpdates", "0", CVAR_RENDERER | CVAR_BOOL, "1 = don't accept any entity or light updates, making everything static" );
-idCVar r_skipDecals( "r_skipDecals", "0", CVAR_RENDERER | CVAR_BOOL, "skip decal surfaces" );
-idCVar r_skipOverlays( "r_skipOverlays", "0", CVAR_RENDERER | CVAR_BOOL, "skip overlay surfaces" );
-idCVar r_skipSpecular( "r_skipSpecular", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_CHEAT | CVAR_ARCHIVE, "use black for specular1" );
-idCVar r_skipBump( "r_skipBump", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "uses a flat surface instead of the bump map" );
-idCVar r_skipDiffuse( "r_skipDiffuse", "0", CVAR_RENDERER | CVAR_BOOL, "use black for diffuse" );
-idCVar r_skipSubviews( "r_skipSubviews", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = don't render any gui elements on surfaces" );
-idCVar r_skipGuiShaders( "r_skipGuiShaders", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = skip all gui elements on surfaces, 2 = skip drawing but still handle events, 3 = draw but skip events", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
-idCVar r_skipParticles( "r_skipParticles", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = skip all particle systems", 0, 1, idCmdSystem::ArgCompletion_Integer<0, 1> );
-idCVar r_skipShadows( "r_skipShadows", "0", CVAR_RENDERER | CVAR_BOOL  | CVAR_ARCHIVE, "disable shadows" );
+anCVar r_skipTranslucent( "r_skipTranslucent", "0", CVAR_RENDERER | CVAR_BOOL, "skip the translucent interaction rendering" );
+anCVar r_skipAmbient( "r_skipAmbient", "0", CVAR_RENDERER | CVAR_BOOL, "bypasses all non-interaction drawing" );
+anCVar r_skipNewAmbient( "r_skipNewAmbient", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "bypasses all vertex/fragment program ambient drawing" );
+anCVar r_skipBlendLights( "r_skipBlendLights", "0", CVAR_RENDERER | CVAR_BOOL, "skip all blend lights" );
+anCVar r_skipFogLights( "r_skipFogLights", "0", CVAR_RENDERER | CVAR_BOOL, "skip all fog lights" );
+anCVar r_skipDeforms( "r_skipDeforms", "0", CVAR_RENDERER | CVAR_BOOL, "leave all deform materials in their original state" );
+anCVar r_skipFrontEnd( "r_skipFrontEnd", "0", CVAR_RENDERER | CVAR_BOOL, "bypasses all front end work, but 2D gui rendering still draws" );
+anCVar r_skipUpdates( "r_skipUpdates", "0", CVAR_RENDERER | CVAR_BOOL, "1 = don't accept any entity or light updates, making everything static" );
+anCVar r_skipDecals( "r_skipDecals", "0", CVAR_RENDERER | CVAR_BOOL, "skip decal surfaces" );
+anCVar r_skipOverlays( "r_skipOverlays", "0", CVAR_RENDERER | CVAR_BOOL, "skip overlay surfaces" );
+anCVar r_skipSpecular( "r_skipSpecular", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_CHEAT | CVAR_ARCHIVE, "use black for specular1" );
+anCVar r_skipBump( "r_skipBump", "0", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "uses a flat surface instead of the bump map" );
+anCVar r_skipDiffuse( "r_skipDiffuse", "0", CVAR_RENDERER | CVAR_BOOL, "use black for diffuse" );
+anCVar r_skipSubviews( "r_skipSubviews", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = don't render any gui elements on surfaces" );
+anCVar r_skipGuiShaders( "r_skipGuiShaders", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = skip all gui elements on surfaces, 2 = skip drawing but still handle events, 3 = draw but skip events", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
+anCVar r_skipParticles( "r_skipParticles", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = skip all particle systems", 0, 1, idCmdSystem::ArgCompletion_Integer<0, 1> );
+anCVar r_skipShadows( "r_skipShadows", "0", CVAR_RENDERER | CVAR_BOOL  | CVAR_ARCHIVE, "disable shadows" );
 
-idCVar r_useLightPortalCulling( "r_useLightPortalCulling", "1", CVAR_RENDERER | CVAR_INTEGER, "0 = none, 1 = cull frustum corners to plane, 2 = exact clip the frustum faces", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2> );
-idCVar r_useLightAreaCulling( "r_useLightAreaCulling", "1", CVAR_RENDERER | CVAR_BOOL, "0 = off, 1 = on" );
-idCVar r_useLightScissors( "r_useLightScissors", "3", CVAR_RENDERER | CVAR_INTEGER, "0 = no scissor, 1 = non-clipped scissor, 2 = near-clipped scissor, 3 = fully-clipped scissor", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
-idCVar r_useEntityPortalCulling( "r_useEntityPortalCulling", "1", CVAR_RENDERER | CVAR_INTEGER, "0 = none, 1 = cull frustum corners to plane, 2 = exact clip the frustum faces", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2> );
-idCVar r_logFile( "r_logFile", "0", CVAR_RENDERER | CVAR_INTEGER, "number of frames to emit GL logs" );
-idCVar r_clear( "r_clear", "2", CVAR_RENDERER, "force screen clear every frame, 1 = purple, 2 = black, 'r g b' = custom" );
+anCVar r_useLightPortalCulling( "r_useLightPortalCulling", "1", CVAR_RENDERER | CVAR_INTEGER, "0 = none, 1 = cull frustum corners to plane, 2 = exact clip the frustum faces", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2> );
+anCVar r_useLightAreaCulling( "r_useLightAreaCulling", "1", CVAR_RENDERER | CVAR_BOOL, "0 = off, 1 = on" );
+anCVar r_useLightScissors( "r_useLightScissors", "3", CVAR_RENDERER | CVAR_INTEGER, "0 = no scissor, 1 = non-clipped scissor, 2 = near-clipped scissor, 3 = fully-clipped scissor", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
+anCVar r_useEntityPortalCulling( "r_useEntityPortalCulling", "1", CVAR_RENDERER | CVAR_INTEGER, "0 = none, 1 = cull frustum corners to plane, 2 = exact clip the frustum faces", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2> );
+anCVar r_logFile( "r_logFile", "0", CVAR_RENDERER | CVAR_INTEGER, "number of frames to emit GL logs" );
+anCVar r_clear( "r_clear", "2", CVAR_RENDERER, "force screen clear every frame, 1 = purple, 2 = black, 'r g b' = custom" );
 
-idCVar r_offsetFactor( "r_offsetfactor", "0", CVAR_RENDERER | CVAR_FLOAT, "polygon offset parameter" );
-idCVar r_offsetUnits( "r_offsetunits", "-600", CVAR_RENDERER | CVAR_FLOAT, "polygon offset parameter" );
+anCVar r_offsetFactor( "r_offsetfactor", "0", CVAR_RENDERER | CVAR_FLOAT, "polygon offset parameter" );
+anCVar r_offsetUnits( "r_offsetunits", "-600", CVAR_RENDERER | CVAR_FLOAT, "polygon offset parameter" );
 
-idCVar r_shadowPolygonOffset( "r_shadowPolygonOffset", "-1", CVAR_RENDERER | CVAR_FLOAT, "bias value added to depth test for stencil shadow drawing" );
-idCVar r_shadowPolygonFactor( "r_shadowPolygonFactor", "0", CVAR_RENDERER | CVAR_FLOAT, "scale value for stencil shadow drawing" );
-idCVar r_subviewOnly( "r_subviewOnly", "0", CVAR_RENDERER | CVAR_BOOL, "1 = don't render main view, allowing subviews to be debugged" );
-idCVar r_testGamma( "r_testGamma", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels", 0, 195 );
-idCVar r_testGammaBias( "r_testGammaBias", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels" );
-idCVar r_lightScale( "r_lightScale", "3", CVAR_ARCHIVE | CVAR_RENDERER | CVAR_FLOAT, "all light intensities are multiplied by this" );
-idCVar r_flareSize( "r_flareSize", "1", CVAR_RENDERER | CVAR_FLOAT, "scale the flare deforms from the material def" );
+anCVar r_shadowPolygonOffset( "r_shadowPolygonOffset", "-1", CVAR_RENDERER | CVAR_FLOAT, "bias value added to depth test for stencil shadow drawing" );
+anCVar r_shadowPolygonFactor( "r_shadowPolygonFactor", "0", CVAR_RENDERER | CVAR_FLOAT, "scale value for stencil shadow drawing" );
+anCVar r_subviewOnly( "r_subviewOnly", "0", CVAR_RENDERER | CVAR_BOOL, "1 = don't render main view, allowing subviews to be debugged" );
+anCVar r_testGamma( "r_testGamma", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels", 0, 195 );
+anCVar r_testGammaBias( "r_testGammaBias", "0", CVAR_RENDERER | CVAR_FLOAT, "if > 0 draw a grid pattern to test gamma levels" );
+anCVar r_lightScale( "r_lightScale", "3", CVAR_ARCHIVE | CVAR_RENDERER | CVAR_FLOAT, "all light intensities are multiplied by this" );
+anCVar r_flareSize( "r_flareSize", "1", CVAR_RENDERER | CVAR_FLOAT, "scale the flare deforms from the material def" );
 
-idCVar r_skipPrelightShadows( "r_skipPrelightShadows", "0", CVAR_RENDERER | CVAR_BOOL, "skip the dmap generated static shadow volumes" );
-idCVar r_useScissor( "r_useScissor", "1", CVAR_RENDERER | CVAR_BOOL, "scissor clip as portals and lights are processed" );
-idCVar r_useLightDepthBounds( "r_useLightDepthBounds", "1", CVAR_RENDERER | CVAR_BOOL, "use depth bounds test on lights to reduce both shadow and interaction fill" );
-idCVar r_useShadowDepthBounds( "r_useShadowDepthBounds", "1", CVAR_RENDERER | CVAR_BOOL, "use depth bounds test on individual shadow volumes to reduce shadow fill" );
+anCVar r_skipPrelightShadows( "r_skipPrelightShadows", "0", CVAR_RENDERER | CVAR_BOOL, "skip the dmap generated static shadow volumes" );
+anCVar r_useScissor( "r_useScissor", "1", CVAR_RENDERER | CVAR_BOOL, "scissor clip as portals and lights are processed" );
+anCVar r_useLightDepthBounds( "r_useLightDepthBounds", "1", CVAR_RENDERER | CVAR_BOOL, "use depth bounds test on lights to reduce both shadow and interaction fill" );
+anCVar r_useShadowDepthBounds( "r_useShadowDepthBounds", "1", CVAR_RENDERER | CVAR_BOOL, "use depth bounds test on individual shadow volumes to reduce shadow fill" );
 // RB begin
-idCVar r_useHalfLambertLighting( "r_useHalfLambertLighting", "1", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "use Half-Lambert lighting instead of classic Lambert, requires reloadShaders" );
+anCVar r_useHalfLambertLighting( "r_useHalfLambertLighting", "1", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "use Half-Lambert lighting instead of classic Lambert, requires reloadShaders" );
 // RB end
 
-idCVar r_screenFraction( "r_screenFraction", "100", CVAR_RENDERER | CVAR_INTEGER, "for testing fill rate, the resolution of the entire screen can be changed" );
-idCVar r_usePortals( "r_usePortals", "1", CVAR_RENDERER | CVAR_BOOL, " 1 = use portals to perform area culling, otherwise draw everything" );
-idCVar r_singleLight( "r_singleLight", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one light" );
-idCVar r_singleEntity( "r_singleEntity", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one entity" );
-idCVar r_singleSurface( "r_singleSurface", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one surface on each entity" );
-idCVar r_singleArea( "r_singleArea", "0", CVAR_RENDERER | CVAR_BOOL, "only draw the portal area the view is actually in" );
-idCVar r_orderIndexes( "r_orderIndexes", "1", CVAR_RENDERER | CVAR_BOOL, "perform index reorganization to optimize vertex use" );
-idCVar r_lightAllBackFaces( "r_lightAllBackFaces", "0", CVAR_RENDERER | CVAR_BOOL, "light all the back faces, even when they would be shadowed" );
+anCVar r_screenFraction( "r_screenFraction", "100", CVAR_RENDERER | CVAR_INTEGER, "for testing fill rate, the resolution of the entire screen can be changed" );
+anCVar r_usePortals( "r_usePortals", "1", CVAR_RENDERER | CVAR_BOOL, " 1 = use portals to perform area culling, otherwise draw everything" );
+anCVar r_singleLight( "r_singleLight", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one light" );
+anCVar r_singleEntity( "r_singleEntity", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one entity" );
+anCVar r_singleSurface( "r_singleSurface", "-1", CVAR_RENDERER | CVAR_INTEGER, "suppress all but one surface on each entity" );
+anCVar r_singleArea( "r_singleArea", "0", CVAR_RENDERER | CVAR_BOOL, "only draw the portal area the view is actually in" );
+anCVar r_orderIndexes( "r_orderIndexes", "1", CVAR_RENDERER | CVAR_BOOL, "perform index reorganization to optimize vertex use" );
+anCVar r_lightAllBackFaces( "r_lightAllBackFaces", "0", CVAR_RENDERER | CVAR_BOOL, "light all the back faces, even when they would be shadowed" );
 
 // visual debugging info
-idCVar r_showPortals( "r_showPortals", "0", CVAR_RENDERER | CVAR_BOOL, "draw portal outlines in color based on passed / not passed" );
-idCVar r_showUnsmoothedTangents( "r_showUnsmoothedTangents", "0", CVAR_RENDERER | CVAR_BOOL, "if 1, put all nvidia register combiner programming in display lists" );
-idCVar r_showSilhouette( "r_showSilhouette", "0", CVAR_RENDERER | CVAR_BOOL, "highlight edges that are casting shadow planes" );
-idCVar r_showVertexColor( "r_showVertexColor", "0", CVAR_RENDERER | CVAR_BOOL, "draws all triangles with the solid vertex color" );
-idCVar r_showUpdates( "r_showUpdates", "0", CVAR_RENDERER | CVAR_BOOL, "report entity and light updates and ref counts" );
-idCVar r_showDemo( "r_showDemo", "0", CVAR_RENDERER | CVAR_BOOL, "report reads and writes to the demo file" );
-idCVar r_showDynamic( "r_showDynamic", "0", CVAR_RENDERER | CVAR_BOOL, "report stats on dynamic surface generation" );
-idCVar r_showTrace( "r_showTrace", "0", CVAR_RENDERER | CVAR_INTEGER, "show the intersection of an eye trace with the world", idCmdSystem::ArgCompletion_Integer<0, 2> );
-idCVar r_showIntensity( "r_showIntensity", "0", CVAR_RENDERER | CVAR_BOOL, "draw the screen colors based on intensity, red = 0, green = 128, blue = 255" );
-idCVar r_showLights( "r_showLights", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = just print volumes numbers, highlighting ones covering the view, 2 = also draw planes of each volume, 3 = also draw edges of each volume", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
-idCVar r_showShadows( "r_showShadows", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = visualize the stencil shadow volumes, 2 = draw filled in", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
-idCVar r_showLightScissors( "r_showLightScissors", "0", CVAR_RENDERER | CVAR_BOOL, "show light scissor rectangles" );
-idCVar r_showLightCount( "r_showLightCount", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = colors surfaces based on light count, 2 = also count everything through walls, 3 = also print overdraw", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
-idCVar r_showViewEntitys( "r_showViewEntitys", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = displays the bounding boxes of all view models, 2 = print index numbers" );
-idCVar r_showTris( "r_showTris", "0", CVAR_RENDERER | CVAR_INTEGER, "enables wireframe rendering of the world, 1 = only draw visible ones, 2 = draw all front facing, 3 = draw all, 4 = draw with alpha", 0, 4, idCmdSystem::ArgCompletion_Integer<0, 4> );
-idCVar r_showSurfaceInfo( "r_showSurfaceInfo", "0", CVAR_RENDERER | CVAR_BOOL, "show surface material name under crosshair" );
-idCVar r_showNormals( "r_showNormals", "0", CVAR_RENDERER | CVAR_FLOAT, "draws wireframe normals" );
-idCVar r_showMemory( "r_showMemory", "0", CVAR_RENDERER | CVAR_BOOL, "print frame memory utilization" );
-idCVar r_showCull( "r_showCull", "0", CVAR_RENDERER | CVAR_BOOL, "report sphere and box culling stats" );
-idCVar r_showAddModel( "r_showAddModel", "0", CVAR_RENDERER | CVAR_BOOL, "report stats from tr_addModel" );
-idCVar r_showDepth( "r_showDepth", "0", CVAR_RENDERER | CVAR_BOOL, "display the contents of the depth buffer and the depth range" );
-idCVar r_showSurfaces( "r_showSurfaces", "0", CVAR_RENDERER | CVAR_BOOL, "report surface/light/shadow counts" );
-idCVar r_showPrimitives( "r_showPrimitives", "0", CVAR_RENDERER | CVAR_INTEGER, "report drawsurf/index/vertex counts" );
-idCVar r_showEdges( "r_showEdges", "0", CVAR_RENDERER | CVAR_BOOL, "draw the sil edges" );
-idCVar r_showTexturePolarity( "r_showTexturePolarity", "0", CVAR_RENDERER | CVAR_BOOL, "shade triangles by texture area polarity" );
-idCVar r_showTangentSpace( "r_showTangentSpace", "0", CVAR_RENDERER | CVAR_INTEGER, "shade triangles by tangent space, 1 = use 1st tangent vector, 2 = use 2nd tangent vector, 3 = use normal vector", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
-idCVar r_showDominantTri( "r_showDominantTri", "0", CVAR_RENDERER | CVAR_BOOL, "draw lines from vertexes to center of dominant triangles" );
-idCVar r_showTextureVectors( "r_showTextureVectors", "0", CVAR_RENDERER | CVAR_FLOAT, " if > 0 draw each triangles texture (tangent) vectors" );
-idCVar r_showOverDraw( "r_showOverDraw", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = geometry overdraw, 2 = light interaction overdraw, 3 = geometry and light interaction overdraw", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
+anCVar r_showPortals( "r_showPortals", "0", CVAR_RENDERER | CVAR_BOOL, "draw portal outlines in color based on passed / not passed" );
+anCVar r_showUnsmoothedTangents( "r_showUnsmoothedTangents", "0", CVAR_RENDERER | CVAR_BOOL, "if 1, put all nvidia register combiner programming in display lists" );
+anCVar r_showSilhouette( "r_showSilhouette", "0", CVAR_RENDERER | CVAR_BOOL, "highlight edges that are casting shadow planes" );
+anCVar r_showVertexColor( "r_showVertexColor", "0", CVAR_RENDERER | CVAR_BOOL, "draws all triangles with the solid vertex color" );
+anCVar r_showUpdates( "r_showUpdates", "0", CVAR_RENDERER | CVAR_BOOL, "report entity and light updates and ref counts" );
+anCVar r_showDemo( "r_showDemo", "0", CVAR_RENDERER | CVAR_BOOL, "report reads and writes to the demo file" );
+anCVar r_showDynamic( "r_showDynamic", "0", CVAR_RENDERER | CVAR_BOOL, "report stats on dynamic surface generation" );
+anCVar r_showTrace( "r_showTrace", "0", CVAR_RENDERER | CVAR_INTEGER, "show the intersection of an eye trace with the world", idCmdSystem::ArgCompletion_Integer<0, 2> );
+anCVar r_showIntensity( "r_showIntensity", "0", CVAR_RENDERER | CVAR_BOOL, "draw the screen colors based on intensity, red = 0, green = 128, blue = 255" );
+anCVar r_showLights( "r_showLights", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = just print volumes numbers, highlighting ones covering the view, 2 = also draw planes of each volume, 3 = also draw edges of each volume", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
+anCVar r_showShadows( "r_showShadows", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = visualize the stencil shadow volumes, 2 = draw filled in", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
+anCVar r_showLightScissors( "r_showLightScissors", "0", CVAR_RENDERER | CVAR_BOOL, "show light scissor rectangles" );
+anCVar r_showLightCount( "r_showLightCount", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = colors surfaces based on light count, 2 = also count everything through walls, 3 = also print overdraw", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
+anCVar r_showViewEntitys( "r_showViewEntitys", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = displays the bounding boxes of all view models, 2 = print index numbers" );
+anCVar r_showTris( "r_showTris", "0", CVAR_RENDERER | CVAR_INTEGER, "enables wireframe rendering of the world, 1 = only draw visible ones, 2 = draw all front facing, 3 = draw all, 4 = draw with alpha", 0, 4, idCmdSystem::ArgCompletion_Integer<0, 4> );
+anCVar r_showSurfaceInfo( "r_showSurfaceInfo", "0", CVAR_RENDERER | CVAR_BOOL, "show surface material name under crosshair" );
+anCVar r_showNormals( "r_showNormals", "0", CVAR_RENDERER | CVAR_FLOAT, "draws wireframe normals" );
+anCVar r_showMemory( "r_showMemory", "0", CVAR_RENDERER | CVAR_BOOL, "print frame memory utilization" );
+anCVar r_showCull( "r_showCull", "0", CVAR_RENDERER | CVAR_BOOL, "report sphere and box culling stats" );
+anCVar r_showAddModel( "r_showAddModel", "0", CVAR_RENDERER | CVAR_BOOL, "report stats from tr_addModel" );
+anCVar r_showDepth( "r_showDepth", "0", CVAR_RENDERER | CVAR_BOOL, "display the contents of the depth buffer and the depth range" );
+anCVar r_showSurfaces( "r_showSurfaces", "0", CVAR_RENDERER | CVAR_BOOL, "report surface/light/shadow counts" );
+anCVar r_showPrimitives( "r_showPrimitives", "0", CVAR_RENDERER | CVAR_INTEGER, "report drawsurf/index/vertex counts" );
+anCVar r_showEdges( "r_showEdges", "0", CVAR_RENDERER | CVAR_BOOL, "draw the sil edges" );
+anCVar r_showTexturePolarity( "r_showTexturePolarity", "0", CVAR_RENDERER | CVAR_BOOL, "shade triangles by texture area polarity" );
+anCVar r_showTangentSpace( "r_showTangentSpace", "0", CVAR_RENDERER | CVAR_INTEGER, "shade triangles by tangent space, 1 = use 1st tangent vector, 2 = use 2nd tangent vector, 3 = use normal vector", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
+anCVar r_showDominantTri( "r_showDominantTri", "0", CVAR_RENDERER | CVAR_BOOL, "draw lines from vertexes to center of dominant triangles" );
+anCVar r_showTextureVectors( "r_showTextureVectors", "0", CVAR_RENDERER | CVAR_FLOAT, " if > 0 draw each triangles texture (tangent) vectors" );
+anCVar r_showOverDraw( "r_showOverDraw", "0", CVAR_RENDERER | CVAR_INTEGER, "1 = geometry overdraw, 2 = light interaction overdraw, 3 = geometry and light interaction overdraw", 0, 3, idCmdSystem::ArgCompletion_Integer<0, 3> );
 // RB begin
-idCVar r_showShadowMaps( "r_showShadowMaps", "0", CVAR_RENDERER | CVAR_BOOL, "" );
-idCVar r_showShadowMapLODs( "r_showShadowMapLODs", "0", CVAR_RENDERER | CVAR_INTEGER, "" );
+anCVar r_showShadowMaps( "r_showShadowMaps", "0", CVAR_RENDERER | CVAR_BOOL, "" );
+anCVar r_showShadowMapLODs( "r_showShadowMapLODs", "0", CVAR_RENDERER | CVAR_INTEGER, "" );
 // RB end
 
-idCVar r_useEntityCallbacks( "r_useEntityCallbacks", "1", CVAR_RENDERER | CVAR_BOOL, "if 0, issue the callback immediately at update time, rather than defering" );
+anCVar r_useEntityCallbacks( "r_useEntityCallbacks", "1", CVAR_RENDERER | CVAR_BOOL, "if 0, issue the callback immediately at update time, rather than defering" );
 
-idCVar r_showSkel( "r_showSkel", "0", CVAR_RENDERER | CVAR_INTEGER, "draw the skeleton when model animates, 1 = draw model with skeleton, 2 = draw skeleton only", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2> );
-idCVar r_jointNameScale( "r_jointNameScale", "0.02", CVAR_RENDERER | CVAR_FLOAT, "size of joint names when r_showskel is set to 1" );
-idCVar r_jointNameOffset( "r_jointNameOffset", "0.5", CVAR_RENDERER | CVAR_FLOAT, "offset of joint names when r_showskel is set to 1" );
+anCVar r_showSkel( "r_showSkel", "0", CVAR_RENDERER | CVAR_INTEGER, "draw the skeleton when model animates, 1 = draw model with skeleton, 2 = draw skeleton only", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2> );
+anCVar r_jointNameScale( "r_jointNameScale", "0.02", CVAR_RENDERER | CVAR_FLOAT, "size of joint names when r_showskel is set to 1" );
+anCVar r_jointNameOffset( "r_jointNameOffset", "0.5", CVAR_RENDERER | CVAR_FLOAT, "offset of joint names when r_showskel is set to 1" );
 
-idCVar r_debugLineDepthTest( "r_debugLineDepthTest", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "perform depth test on debug lines" );
-idCVar r_debugLineWidth( "r_debugLineWidth", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "width of debug lines" );
-idCVar r_debugArrowStep( "r_debugArrowStep", "120", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "step size of arrow cone line rotation in degrees", 0, 120 );
-idCVar r_debugPolygonFilled( "r_debugPolygonFilled", "1", CVAR_RENDERER | CVAR_BOOL, "draw a filled polygon" );
+anCVar r_debugLineDepthTest( "r_debugLineDepthTest", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "perform depth test on debug lines" );
+anCVar r_debugLineWidth( "r_debugLineWidth", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "width of debug lines" );
+anCVar r_debugArrowStep( "r_debugArrowStep", "120", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "step size of arrow cone line rotation in degrees", 0, 120 );
+anCVar r_debugPolygonFilled( "r_debugPolygonFilled", "1", CVAR_RENDERER | CVAR_BOOL, "draw a filled polygon" );
 
-idCVar r_materialOverride( "r_materialOverride", "", CVAR_RENDERER, "overrides all materials", idCmdSystem::ArgCompletion_Decl<DECL_MATERIAL> );
+anCVar r_materialOverride( "r_materialOverride", "", CVAR_RENDERER, "overrides all materials", idCmdSystem::ArgCompletion_Decl<DECL_MATERIAL> );
 
-idCVar r_debugRenderToTexture( "r_debugRenderToTexture", "0", CVAR_RENDERER | CVAR_INTEGER, "" );
+anCVar r_debugRenderToTexture( "r_debugRenderToTexture", "0", CVAR_RENDERER | CVAR_INTEGER, "" );
 
-idCVar stereoRender_enable( "stereoRender_enable", "0", CVAR_INTEGER | CVAR_ARCHIVE, "1 = side-by-side compressed, 2 = top and bottom compressed, 3 = side-by-side, 4 = 720 frame packed, 5 = interlaced, 6 = OpenGL quad buffer" );
-idCVar stereoRender_swapEyes( "stereoRender_swapEyes", "0", CVAR_BOOL | CVAR_ARCHIVE, "reverse eye adjustments" );
-idCVar stereoRender_deGhost( "stereoRender_deGhost", "0.05", CVAR_FLOAT | CVAR_ARCHIVE, "subtract from opposite eye to reduce ghosting" );
+anCVar stereoRender_enable( "stereoRender_enable", "0", CVAR_INTEGER | CVAR_ARCHIVE, "1 = side-by-side compressed, 2 = top and bottom compressed, 3 = side-by-side, 4 = 720 frame packed, 5 = interlaced, 6 = OpenGL quad buffer" );
+anCVar stereoRender_swapEyes( "stereoRender_swapEyes", "0", CVAR_BOOL | CVAR_ARCHIVE, "reverse eye adjustments" );
+anCVar stereoRender_deGhost( "stereoRender_deGhost", "0.05", CVAR_FLOAT | CVAR_ARCHIVE, "subtract from opposite eye to reduce ghosting" );
 
-idCVar r_useVirtualScreenResolution( "r_useVirtualScreenResolution", "1", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "do 2D rendering at 640x480 and stretch to the current resolution" );
+anCVar r_useVirtualScreenResolution( "r_useVirtualScreenResolution", "1", CVAR_RENDERER | CVAR_BOOL | CVAR_ARCHIVE, "do 2D rendering at 640x480 and stretch to the current resolution" );
 
 // RB: shadow mapping parameters
-idCVar r_useShadowMapping( "r_useShadowMapping", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "use shadow mapping instead of stencil shadows" );
-idCVar r_shadowMapFrustumFOV( "r_shadowMapFrustumFOV", "92", CVAR_RENDERER | CVAR_FLOAT, "oversize FOV for point light side matching" );
-idCVar r_shadowMapSingleSide( "r_shadowMapSingleSide", "-1", CVAR_RENDERER | CVAR_INTEGER, "only draw a single side (0-5) of point lights" );
-idCVar r_shadowMapImageSize( "r_shadowMapImageSize", "1024", CVAR_RENDERER | CVAR_INTEGER, "", 128, 2048 );
-idCVar r_shadowMapJitterScale( "r_shadowMapJitterScale", "3", CVAR_RENDERER | CVAR_FLOAT, "scale factor for jitter offset" );
-idCVar r_shadowMapBiasScale( "r_shadowMapBiasScale", "0.0001", CVAR_RENDERER | CVAR_FLOAT, "scale factor for jitter bias" );
-idCVar r_shadowMapRandomizeJitter( "r_shadowMapRandomizeJitter", "1", CVAR_RENDERER | CVAR_BOOL, "randomly offset jitter texture each draw" );
-idCVar r_shadowMapSamples( "r_shadowMapSamples", "1", CVAR_RENDERER | CVAR_INTEGER, "0, 1, 4, or 16" );
-idCVar r_shadowMapSplits( "r_shadowMapSplits", "3", CVAR_RENDERER | CVAR_INTEGER, "number of splits for cascaded shadow mapping with parallel lights", 0, 4 );
-idCVar r_shadowMapSplitWeight( "r_shadowMapSplitWeight", "0.9", CVAR_RENDERER | CVAR_FLOAT, "" );
-idCVar r_shadowMapLodScale( "r_shadowMapLodScale", "1.4", CVAR_RENDERER | CVAR_FLOAT, "" );
-idCVar r_shadowMapLodBias( "r_shadowMapLodBias", "0", CVAR_RENDERER | CVAR_INTEGER, "" );
-idCVar r_shadowMapPolygonFactor( "r_shadowMapPolygonFactor", "2", CVAR_RENDERER | CVAR_FLOAT, "polygonOffset factor for drawing shadow buffer" );
-idCVar r_shadowMapPolygonOffset( "r_shadowMapPolygonOffset", "3000", CVAR_RENDERER | CVAR_FLOAT, "polygonOffset units for drawing shadow buffer" );
-idCVar r_shadowMapOccluderFacing( "r_shadowMapOccluderFacing", "2", CVAR_RENDERER | CVAR_INTEGER, "0 = front faces, 1 = back faces, 2 = twosided" );
+anCVar r_useShadowMapping( "r_useShadowMapping", "0", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, "use shadow mapping instead of stencil shadows" );
+anCVar r_shadowMapFrustumFOV( "r_shadowMapFrustumFOV", "92", CVAR_RENDERER | CVAR_FLOAT, "oversize FOV for point light side matching" );
+anCVar r_shadowMapSingleSide( "r_shadowMapSingleSide", "-1", CVAR_RENDERER | CVAR_INTEGER, "only draw a single side (0-5) of point lights" );
+anCVar r_shadowMapImageSize( "r_shadowMapImageSize", "1024", CVAR_RENDERER | CVAR_INTEGER, "", 128, 2048 );
+anCVar r_shadowMapJitterScale( "r_shadowMapJitterScale", "3", CVAR_RENDERER | CVAR_FLOAT, "scale factor for jitter offset" );
+anCVar r_shadowMapBiasScale( "r_shadowMapBiasScale", "0.0001", CVAR_RENDERER | CVAR_FLOAT, "scale factor for jitter bias" );
+anCVar r_shadowMapRandomizeJitter( "r_shadowMapRandomizeJitter", "1", CVAR_RENDERER | CVAR_BOOL, "randomly offset jitter texture each draw" );
+anCVar r_shadowMapSamples( "r_shadowMapSamples", "1", CVAR_RENDERER | CVAR_INTEGER, "0, 1, 4, or 16" );
+anCVar r_shadowMapSplits( "r_shadowMapSplits", "3", CVAR_RENDERER | CVAR_INTEGER, "number of splits for cascaded shadow mapping with parallel lights", 0, 4 );
+anCVar r_shadowMapSplitWeight( "r_shadowMapSplitWeight", "0.9", CVAR_RENDERER | CVAR_FLOAT, "" );
+anCVar r_shadowMapLodScale( "r_shadowMapLodScale", "1.4", CVAR_RENDERER | CVAR_FLOAT, "" );
+anCVar r_shadowMapLodBias( "r_shadowMapLodBias", "0", CVAR_RENDERER | CVAR_INTEGER, "" );
+anCVar r_shadowMapPolygonFactor( "r_shadowMapPolygonFactor", "2", CVAR_RENDERER | CVAR_FLOAT, "polygonOffset factor for drawing shadow buffer" );
+anCVar r_shadowMapPolygonOffset( "r_shadowMapPolygonOffset", "3000", CVAR_RENDERER | CVAR_FLOAT, "polygonOffset units for drawing shadow buffer" );
+anCVar r_shadowMapOccluderFacing( "r_shadowMapOccluderFacing", "2", CVAR_RENDERER | CVAR_INTEGER, "0 = front faces, 1 = back faces, 2 = twosided" );
 // RB end
 
-const char* fileExten[3] = { "tga", "png", "jpg" };
-const char* envDirection[6] = { "_nx", "_py", "_ny", "_pz", "_nz", "_px" };
-const char* skyDirection[6] = { "_forward", "_back", "_left", "_right", "_up", "_down" };
+const char *fileExten[3] = { "tga", "png", "jpg" };
+const char *envDirection[6] = { "_nx", "_py", "_ny", "_pz", "_nz", "_px" };
+const char *skyDirection[6] = { "_forward", "_back", "_left", "_right", "_up", "_down" };
 /*
 ===========================================================================
 
@@ -353,17 +353,17 @@ If you have questions concerning this license or the applicable additional terms
 #include "vr/Vr.h" // Koz
 #include "d3xp/Game_local.h" //Koz
 
-idCVar r_drawEyeColor( "r_drawEyeColor", "0", CVAR_RENDERER | CVAR_BOOL, "Draw a colored box, red = left eye, blue = right eye, grey = non-stereo" );
-idCVar r_motionBlur( "r_motionBlur", "0", CVAR_RENDERER | CVAR_INTEGER | CVAR_ARCHIVE, "1 - 5, log2 of the number of motion blur samples" );
-idCVar r_forceZPassStencilShadows( "r_forceZPassStencilShadows", "0", CVAR_RENDERER | CVAR_BOOL, "force Z-pass rendering for performance testing" );
-idCVar r_useStencilShadowPreload( "r_useStencilShadowPreload", "1", CVAR_RENDERER | CVAR_ARCHIVE| CVAR_BOOL, "use stencil shadow preload algorithm instead of Z-fail" );
-idCVar r_skipShaderPasses( "r_skip`R_USE`ShaderPasses", "0", CVAR_RENDERER | CVAR_BOOL, "" );
-idCVar r_skipInteractionFastPath( "r_skipInteractionFastPath", "1", CVAR_RENDERER | CVAR_BOOL, "" );
-idCVar r_useLightStencilSelect( "r_useLightStencilSelect", "0", CVAR_RENDERER | CVAR_BOOL, "use stencil select pass" );
+anCVar r_drawEyeColor( "r_drawEyeColor", "0", CVAR_RENDERER | CVAR_BOOL, "Draw a colored box, red = left eye, blue = right eye, grey = non-stereo" );
+anCVar r_motionBlur( "r_motionBlur", "0", CVAR_RENDERER | CVAR_INTEGER | CVAR_ARCHIVE, "1 - 5, log2 of the number of motion blur samples" );
+anCVar r_forceZPassStencilShadows( "r_forceZPassStencilShadows", "0", CVAR_RENDERER | CVAR_BOOL, "force Z-pass rendering for performance testing" );
+anCVar r_useStencilShadowPreload( "r_useStencilShadowPreload", "1", CVAR_RENDERER | CVAR_ARCHIVE| CVAR_BOOL, "use stencil shadow preload algorithm instead of Z-fail" );
+anCVar r_skipShaderPasses( "r_skip`R_USE`ShaderPasses", "0", CVAR_RENDERER | CVAR_BOOL, "" );
+anCVar r_skipInteractionFastPath( "r_skipInteractionFastPath", "1", CVAR_RENDERER | CVAR_BOOL, "" );
+anCVar r_useLightStencilSelect( "r_useLightStencilSelect", "0", CVAR_RENDERER | CVAR_BOOL, "use stencil select pass" );
 
-//idCVar vr_gui2( "vr_gui2", "-.03", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "vr in game gui separation" );
+//anCVar vr_gui2( "vr_gui2", "-.03", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_FLOAT, "vr in game gui separation" );
 
-extern idCVar stereoRender_swapEyes;
+extern anCVar stereoRender_swapEyes;
 
 backEndState_t	backEnd;
 
@@ -372,7 +372,7 @@ backEndState_t	backEnd;
 SetVertexParm
 ================
 */
-static ARC_INLINE void SetVertexParm( renderParm_t rp, const float* value )
+static inline void SetVertexParm( renderParm_t rp, const float* value )
 {
 	renderProgManager.SetUniformValue( rp, value );
 }
@@ -382,7 +382,7 @@ static ARC_INLINE void SetVertexParm( renderParm_t rp, const float* value )
 SetVertexParms
 ================
 */
-static ARC_INLINE void SetVertexParms( renderParm_t rp, const float* value, int num )
+static inline void SetVertexParms( renderParm_t rp, const float* value, int num )
 {
 	for( int i = 0; i < num; i++ )
 	{
@@ -395,7 +395,7 @@ static ARC_INLINE void SetVertexParms( renderParm_t rp, const float* value, int 
 SetFragmentParm
 ================
 */
-static ARC_INLINE void SetFragmentParm( renderParm_t rp, const float* value )
+static inline void SetFragmentParm( renderParm_t rp, const float* value )
 {
 	renderProgManager.SetUniformValue( rp, value );
 }
@@ -461,14 +461,14 @@ void RB_DrawElementsWithCounters( const drawSurf_t* surf )
 	// get vertex buffer
 	const vertCacheHandle_t vbHandle = surf->ambientCache;
 	idVertexBuffer* vertexBuffer;
-	if( vertexCache.CacheIsStatic( vbHandle ) )
+	if ( vertexCache.CacheIsStatic( vbHandle ) )
 	{
 		vertexBuffer = &vertexCache.staticData.vertexBuffer;
 	}
 	else
 	{
 		const uint64 frameNum = ( int )( vbHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
-		if( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
+		if ( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
 		{
 			idLib::Warning( "RB_DrawElementsWithCounters, vertexBuffer == nullptr" );
 			return;
@@ -480,14 +480,14 @@ void RB_DrawElementsWithCounters( const drawSurf_t* surf )
 	// get index buffer
 	const vertCacheHandle_t ibHandle = surf->indexCache;
 	idIndexBuffer* indexBuffer;
-	if( vertexCache.CacheIsStatic( ibHandle ) )
+	if ( vertexCache.CacheIsStatic( ibHandle ) )
 	{
 		indexBuffer = &vertexCache.staticData.indexBuffer;
 	}
 	else
 	{
 		const uint64 frameNum = ( int )( ibHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
-		if( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
+		if ( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
 		{
 			idLib::Warning( "RB_DrawElementsWithCounters, indexBuffer == nullptr" );
 			return;
@@ -500,7 +500,7 @@ void RB_DrawElementsWithCounters( const drawSurf_t* surf )
 	
 	RENDERLOG_PRINTF( "Binding Buffers: %p:%i %p:%i\n", vertexBuffer, vertOffset, indexBuffer, indexOffset );
 	
-	if( surf->jointCache )
+	if ( surf->jointCache )
 	{
 		// DG: this happens all the time in the erebus1 map with blendlight.vfp,
 		// so don't call assert (through verify) here until it's fixed (if fixable)
@@ -508,8 +508,8 @@ void RB_DrawElementsWithCounters( const drawSurf_t* surf )
 		
 		// FIXME: fix this properly if possible?
 		// RB: yes but it would require an additional blend light skinned shader
-		//if( !verify( renderProgManager.ShaderUsesJoints() ) )
-		if( !renderProgManager.ShaderUsesJoints() )
+		//if ( !verify( renderProgManager.ShaderUsesJoints() ) )
+		if ( !renderProgManager.ShaderUsesJoints() )
 			// DG end
 		{
 			return;
@@ -517,17 +517,17 @@ void RB_DrawElementsWithCounters( const drawSurf_t* surf )
 	}
 	else
 	{
-		if( !verify( !renderProgManager.ShaderUsesJoints() || renderProgManager.ShaderHasOptionalSkinning() ) )
+		if ( !verify( !renderProgManager.ShaderUsesJoints() || renderProgManager.ShaderHasOptionalSkinning() ) )
 		{
 			return;
 		}
 	}
 	
 	
-	if( surf->jointCache )
+	if ( surf->jointCache )
 	{
 		idJointBuffer jointBuffer;
-		if( !vertexCache.GetJointBuffer( surf->jointCache, &jointBuffer ) )
+		if ( !vertexCache.GetJointBuffer( surf->jointCache, &jointBuffer ) )
 		{
 			idLib::Warning( "RB_DrawElementsWithCounters, jointBuffer == nullptr" );
 			return;
@@ -538,19 +538,19 @@ void RB_DrawElementsWithCounters( const drawSurf_t* surf )
 		const GLintptr ubo = reinterpret_cast< GLintptr >( jointBuffer.GetAPIObject() );
 		// RB end
 		
-		glBindBufferRange( GL_UNIFORM_BUFFER, 0, ubo, jointBuffer.GetOffset(), jointBuffer.GetNumJoints() * sizeof( idJointMat ) );
+		glBindBufferRange( GL_UNIFORM_BUFFER, 0, ubo, jointBuffer.GetOffset(), jointBuffer.GetNumJoints() * sizeof( anJointMat ) );
 	}
 	
 	renderProgManager.CommitUniforms();
 	
 	// RB: 64 bit fixes, changed GLuint to GLintptr
-	if( backEnd.glState.currentIndexBuffer != ( GLintptr )indexBuffer->GetAPIObject() || !r_useStateCaching.GetBool() )
+	if ( backEnd.glState.currentIndexBuffer != ( GLintptr )indexBuffer->GetAPIObject() || !r_useStateCaching.GetBool() )
 	{
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ( GLintptr )indexBuffer->GetAPIObject() );
 		backEnd.glState.currentIndexBuffer = ( GLintptr )indexBuffer->GetAPIObject();
 	}
 	
-	if( ( backEnd.glState.vertexLayout != LAYOUT_DRAW_VERT ) || ( backEnd.glState.currentVertexBuffer != ( GLintptr )vertexBuffer->GetAPIObject() ) || !r_useStateCaching.GetBool() )
+	if ( ( backEnd.glState.vertexLayout != LAYOUT_DRAW_VERT ) || ( backEnd.glState.currentVertexBuffer != ( GLintptr )vertexBuffer->GetAPIObject() ) || !r_useStateCaching.GetBool() )
 	{
 		glBindBuffer( GL_ARRAY_BUFFER, ( GLintptr )vertexBuffer->GetAPIObject() );
 		backEnd.glState.currentVertexBuffer = ( GLintptr )vertexBuffer->GetAPIObject();
@@ -668,7 +668,7 @@ void RB_DrawStripWithCounters( const drawSurf_t *surf ) {
 		assert( (jointBuffer.GetOffset() & (glConfig.uniformBufferOffsetAlignment - 1)) == 0 );
 
 		const GLintptr ubo = reinterpret_cast< GLintptr >(jointBuffer.GetAPIObject());
-		glBindBufferRange( GL_UNIFORM_BUFFER, 0, ubo, jointBuffer.GetOffset(), jointBuffer.GetNumJoints() * sizeof( idJointMat ) );
+		glBindBufferRange( GL_UNIFORM_BUFFER, 0, ubo, jointBuffer.GetOffset(), jointBuffer.GetNumJoints() * sizeof( anJointMat ) );
 	}
 
 	renderProgManager.CommitUniforms();
@@ -727,11 +727,11 @@ static void RB_GetShaderTextureMatrix( const float* shaderRegisters, const textu
 	
 	// we attempt to keep scrolls from generating incredibly large texture values, but
 	// center rotations and center scales can still generate offsets that need to be > 1
-	if( matrix[3 * 4 + 0] < -40.0f || matrix[12] > 40.0f )
+	if ( matrix[3 * 4 + 0] < -40.0f || matrix[12] > 40.0f )
 	{
 		matrix[3 * 4 + 0] -= ( int )matrix[3 * 4 + 0];
 	}
-	if( matrix[13] < -40.0f || matrix[13] > 40.0f )
+	if ( matrix[13] < -40.0f || matrix[13] > 40.0f )
 	{
 		matrix[13] -= ( int )matrix[13];
 	}
@@ -757,7 +757,7 @@ static void RB_LoadShaderTextureMatrix( const float* shaderRegisters, const text
 	float texS[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
 	float texT[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
 	
-	if( texture->hasMatrix )
+	if ( texture->hasMatrix )
 	{
 		float matrix[16];
 		RB_GetShaderTextureMatrix( shaderRegisters, texture, matrix );
@@ -834,11 +834,11 @@ Handles generating a cinematic frame if needed
 */
 static void RB_BindVariableStageImage( const textureStage_t* texture, const float* shaderRegisters )
 {
-	if( texture->cinematic )
+	if ( texture->cinematic )
 	{
 		cinData_t cin;
 		
-		if( r_skipDynamicTextures.GetBool() )
+		if ( r_skipDynamicTextures.GetBool() )
 		{
 			globalImages->defaultImage->Bind();
 			return;
@@ -848,7 +848,7 @@ static void RB_BindVariableStageImage( const textureStage_t* texture, const floa
 		// We make no attempt to optimize for multiple identical cinematics being in view, or
 		// for cinematics going at a lower framerate than the renderer.
 		cin = texture->cinematic->ImageForTime( backEnd.viewDef->renderView.time[0] + anMath::Ftoi( 1000.0f * backEnd.viewDef->renderView.shaderParms[11] ) );
-		if( cin.imageY != nullptr )
+		if ( cin.imageY != nullptr )
 		{
 			GL_SelectTexture( 0 );
 			cin.imageY->Bind();
@@ -858,7 +858,7 @@ static void RB_BindVariableStageImage( const textureStage_t* texture, const floa
 			cin.imageCb->Bind();
 			
 		}
-		else if( cin.image != nullptr )
+		else if ( cin.image != nullptr )
 		{
 			//Carl: A single RGB image works better with the FFMPEG BINK codec.
 			GL_SelectTexture( 0 );
@@ -877,7 +877,7 @@ static void RB_BindVariableStageImage( const textureStage_t* texture, const floa
 	else
 	{
 		// FIXME: see why image is invalid
-		if( texture->image != nullptr )
+		if ( texture->image != nullptr )
 		{
 			texture->image->Bind();
 		}
@@ -897,12 +897,12 @@ static void RB_PrepareStageTexturing( const shaderStage_t* pStage,  const drawSu
 	RB_LoadShaderTextureMatrix( surf->shaderRegisters, &pStage->texture );
 	
 	// texgens
-	if( pStage->texture.texgen == TG_REFLECT_CUBE )
+	if ( pStage->texture.texgen == TG_REFLECT_CUBE )
 	{
 	
 		// see if there is also a bump map specified
 		const shaderStage_t* bumpStage = surf->material->GetBumpStage();
-		if( bumpStage != nullptr )
+		if ( bumpStage != nullptr )
 		{
 			// per-pixel reflection mapping with bump mapping
 			GL_SelectTexture( 1 );
@@ -910,7 +910,7 @@ static void RB_PrepareStageTexturing( const shaderStage_t* pStage,  const drawSu
 			GL_SelectTexture( 0 );
 			
 			RENDERLOG_PRINTF( "TexGen: TG_REFLECT_CUBE: Bumpy Environment\n" );
-			if( surf->jointCache )
+			if ( surf->jointCache )
 			{
 				renderProgManager.BindShader_BumpyEnvironmentSkinned();
 			}
@@ -922,7 +922,7 @@ static void RB_PrepareStageTexturing( const shaderStage_t* pStage,  const drawSu
 		else
 		{
 			RENDERLOG_PRINTF( "TexGen: TG_REFLECT_CUBE: Environment\n" );
-			if( surf->jointCache )
+			if ( surf->jointCache )
 			{
 				renderProgManager.BindShader_EnvironmentSkinned();
 			}
@@ -933,13 +933,13 @@ static void RB_PrepareStageTexturing( const shaderStage_t* pStage,  const drawSu
 		}
 		
 	}
-	else if( pStage->texture.texgen == TG_SKYBOX_CUBE )
+	else if ( pStage->texture.texgen == TG_SKYBOX_CUBE )
 	{
 	
 		renderProgManager.BindShader_SkyBox();
 		
 	}
-	else if( pStage->texture.texgen == TG_WOBBLESKY_CUBE )
+	else if ( pStage->texture.texgen == TG_WOBBLESKY_CUBE )
 	{
 	
 		const int* parms = surf->material->GetTexGenRegisters();
@@ -997,7 +997,7 @@ static void RB_PrepareStageTexturing( const shaderStage_t* pStage,  const drawSu
 		renderProgManager.BindShader_WobbleSky();
 		
 	}
-	else if( ( pStage->texture.texgen == TG_SCREEN ) || ( pStage->texture.texgen == TG_SCREEN2 ) )
+	else if ( ( pStage->texture.texgen == TG_SCREEN ) || ( pStage->texture.texgen == TG_SCREEN2 ) )
 	{
 	
 		useTexGenParm[0] = 1.0f;
@@ -1036,14 +1036,14 @@ static void RB_PrepareStageTexturing( const shaderStage_t* pStage,  const drawSu
 		renderLog.Outdent();
 		
 	}
-	else if( pStage->texture.texgen == TG_DIFFUSE_CUBE )
+	else if ( pStage->texture.texgen == TG_DIFFUSE_CUBE )
 	{
 	
 		// As far as I can tell, this is never used
 		idLib::Warning( "Using Diffuse Cube! Please contact Brian!" );
 		
 	}
-	else if( pStage->texture.texgen == TG_GLASSWARP )
+	else if ( pStage->texture.texgen == TG_GLASSWARP )
 	{
 	
 		// As far as I can tell, this is never used
@@ -1061,7 +1061,7 @@ RB_FinishStageTexturing
 static void RB_FinishStageTexturing( const shaderStage_t* pStage, const drawSurf_t* surf )
 {
 
-	if( pStage->texture.cinematic )
+	if ( pStage->texture.cinematic )
 	{
 		// unbind the extra bink textures
 		GL_SelectTexture( 1 );
@@ -1071,11 +1071,11 @@ static void RB_FinishStageTexturing( const shaderStage_t* pStage, const drawSurf
 		GL_SelectTexture( 0 );
 	}
 	
-	if( pStage->texture.texgen == TG_REFLECT_CUBE )
+	if ( pStage->texture.texgen == TG_REFLECT_CUBE )
 	{
 		// see if there is also a bump map specified
 		const shaderStage_t* bumpStage = surf->material->GetBumpStage();
-		if( bumpStage != nullptr )
+		if ( bumpStage != nullptr )
 		{
 			// per-pixel reflection mapping with bump mapping
 			GL_SelectTexture( 1 );
@@ -1126,11 +1126,11 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 	for( int i = 0; i < numDrawSurfs; i++ )
 	{
 		const drawSurf_t* drawSurf = drawSurfs[i];
-		const idMaterial* shader = drawSurf->material;
+		const anMaterial* shader = drawSurf->material;
 		
 		// translucent surfaces don't put anything in the depth buffer and don't
 		// test against it, which makes them fail the mirror clip plane operation
-		if( shader->Coverage() == MC_TRANSLUCENT )
+		if ( shader->Coverage() == MC_TRANSLUCENT )
 		{
 			continue;
 		}
@@ -1144,18 +1144,18 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 		{
 			const shaderStage_t* pStage = shader->GetStage( stage );
 			// check the stage enable condition
-			if( regs[ pStage->conditionRegister ] != 0 )
+			if ( regs[ pStage->conditionRegister ] != 0 )
 			{
 				break;
 			}
 		}
-		if( stage == shader->GetNumStages() )
+		if ( stage == shader->GetNumStages() )
 		{
 			continue;
 		}
 		
 		// change the matrix if needed
-		if( drawSurf->space != backEnd.currentSpace )
+		if ( drawSurf->space != backEnd.currentSpace )
 		{
 			RB_SetMVP( drawSurf->space->mvp );
 			
@@ -1165,7 +1165,7 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 		uint64 surfGLState = 0;
 		
 		// set polygon offset if necessary
-		if( shader->TestMaterialFlag( MF_POLYGONOFFSET ) )
+		if ( shader->TestMaterialFlag( MF_POLYGONOFFSET ) )
 		{
 			surfGLState |= GLS_POLYGON_OFFSET;
 			GL_PolygonOffset( r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset() );
@@ -1173,7 +1173,7 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 		
 		// subviews will just down-modulate the color buffer
 		anVec4 color;
-		if( shader->GetSort() == SS_SUBVIEW )
+		if ( shader->GetSort() == SS_SUBVIEW )
 		{
 			surfGLState |= GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO | GLS_DEPTHFUNC_LESS;
 			color[0] = 1.0f;
@@ -1193,11 +1193,11 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 		renderLog.OpenBlock( shader->GetName() );
 		
 		bool drawSolid = false;
-		if( shader->Coverage() == MC_OPAQUE )
+		if ( shader->Coverage() == MC_OPAQUE )
 		{
 			drawSolid = true;
 		}
-		else if( shader->Coverage() == MC_PERFORATED )
+		else if ( shader->Coverage() == MC_PERFORATED )
 		{
 			// we may have multiple alpha tested stages
 			// if the only alpha tested stages are condition register omitted,
@@ -1209,13 +1209,13 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 			{
 				const shaderStage_t* pStage = shader->GetStage( stage );
 				
-				if( !pStage->hasAlphaTest )
+				if ( !pStage->hasAlphaTest )
 				{
 					continue;
 				}
 				
 				// check the stage enable condition
-				if( regs[ pStage->conditionRegister ] == 0 )
+				if ( regs[ pStage->conditionRegister ] == 0 )
 				{
 					continue;
 				}
@@ -1228,7 +1228,7 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 				color[3] = regs[ pStage->color.registers[3] ];
 				
 				// skip the entire stage if alpha would be black
-				if( color[3] <= 0.0f )
+				if ( color[3] <= 0.0f )
 				{
 					continue;
 				}
@@ -1236,7 +1236,7 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 				uint64 stageGLState = surfGLState;
 				
 				// set privatePolygonOffset if necessary
-				if( pStage->privatePolygonOffset )
+				if ( pStage->privatePolygonOffset )
 				{
 					GL_PolygonOffset( r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * pStage->privatePolygonOffset );
 					stageGLState |= GLS_POLYGON_OFFSET;
@@ -1252,7 +1252,7 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 				GL_State( stageGLState | GLS_ALPHATEST_FUNC_GREATER | GLS_ALPHATEST_MAKE_REF( anMath::Ftob( 255.0f * regs[ pStage->alphaTestRegister ] ) ) );
 #endif
 				
-				if( drawSurf->jointCache )
+				if ( drawSurf->jointCache )
 				{
 					renderProgManager.BindShader_TextureVertexColorSkinned();
 				}
@@ -1280,22 +1280,22 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 				RB_FinishStageTexturing( pStage, drawSurf );
 				
 				// unset privatePolygonOffset if necessary
-				if( pStage->privatePolygonOffset )
+				if ( pStage->privatePolygonOffset )
 				{
 					GL_PolygonOffset( r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset() );
 				}
 			}
 			
-			if( !didDraw )
+			if ( !didDraw )
 			{
 				drawSolid = true;
 			}
 		}
 		
 		// draw the entire surface solid
-		if( drawSolid )
+		if ( drawSolid )
 		{
-			if( shader->GetSort() == SS_SUBVIEW )
+			if ( shader->GetSort() == SS_SUBVIEW )
 			{
 				renderProgManager.BindShader_Color();
 				GL_Color( color );
@@ -1303,7 +1303,7 @@ static void RB_FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs, int n
 			}
 			else
 			{
-				if( drawSurf->jointCache )
+				if ( drawSurf->jointCache )
 				{
 					renderProgManager.BindShader_DepthSkinned();
 				}
@@ -1349,13 +1349,13 @@ on the 360.
 */
 static void RB_FillDepthBufferFast( drawSurf_t** drawSurfs, int numDrawSurfs )
 {
-	if( numDrawSurfs == 0 )
+	if ( numDrawSurfs == 0 )
 	{
 		return;
 	}
 	
 	// if we are just doing 2D rendering, no need to fill the depth buffer
-	if( backEnd.viewDef->viewEntitys == nullptr )
+	if ( backEnd.viewDef->viewEntitys == nullptr )
 	{
 		return;
 	}
@@ -1375,7 +1375,7 @@ static void RB_FillDepthBufferFast( drawSurf_t** drawSurfs, int numDrawSurfs )
 	int	surfNum;
 	for( surfNum = 0; surfNum < numDrawSurfs; surfNum++ )
 	{
-		if( drawSurfs[surfNum]->material->GetSort() != SS_SUBVIEW )
+		if ( drawSurfs[surfNum]->material->GetSort() != SS_SUBVIEW )
 		{
 			break;
 		}
@@ -1393,14 +1393,14 @@ static void RB_FillDepthBufferFast( drawSurf_t** drawSurfs, int numDrawSurfs )
 	for( ; surfNum < numDrawSurfs; surfNum++ )
 	{
 		const drawSurf_t* surf = drawSurfs[ surfNum ];
-		const idMaterial* shader = surf->material;
+		const anMaterial* shader = surf->material;
 		
 		// translucent surfaces don't put anything in the depth buffer
-		if( shader->Coverage() == MC_TRANSLUCENT )
+		if ( shader->Coverage() == MC_TRANSLUCENT )
 		{
 			continue;
 		}
-		if( shader->Coverage() == MC_PERFORATED )
+		if ( shader->Coverage() == MC_PERFORATED )
 		{
 			// save for later drawing
 			perforatedSurfaces[ numPerforatedSurfaces ] = surf;
@@ -1411,7 +1411,7 @@ static void RB_FillDepthBufferFast( drawSurf_t** drawSurfs, int numDrawSurfs )
 		// set polygon offset?
 		
 		// set mvp matrix
-		if( surf->space != backEnd.currentSpace )
+		if ( surf->space != backEnd.currentSpace )
 		{
 			RB_SetMVP( surf->space->mvp );
 			backEnd.currentSpace = surf->space;
@@ -1419,7 +1419,7 @@ static void RB_FillDepthBufferFast( drawSurf_t** drawSurfs, int numDrawSurfs )
 		
 		renderLog.OpenBlock( shader->GetName() );
 		
-		if( surf->jointCache )
+		if ( surf->jointCache )
 		{
 			renderProgManager.BindShader_DepthSkinned();
 		}
@@ -1438,7 +1438,7 @@ static void RB_FillDepthBufferFast( drawSurf_t** drawSurfs, int numDrawSurfs )
 	}
 	
 	// draw all perforated surfaces with the general code path
-	if( numPerforatedSurfaces > 0 )
+	if ( numPerforatedSurfaces > 0 )
 	{
 		RB_FillDepthBufferGeneric( perforatedSurfaces, numPerforatedSurfaces );
 	}
@@ -1475,7 +1475,7 @@ static void RB_SetupInteractionStage( const shaderStage_t* surfaceStage, const f
 									  anVec4 matrix[2], float color[4] )
 {
 
-	if( surfaceStage->texture.hasMatrix )
+	if ( surfaceStage->texture.hasMatrix )
 	{
 		matrix[0][0] = surfaceRegs[surfaceStage->texture.matrix[0][0]];
 		matrix[0][1] = surfaceRegs[surfaceStage->texture.matrix[0][1]];
@@ -1489,11 +1489,11 @@ static void RB_SetupInteractionStage( const shaderStage_t* surfaceStage, const f
 		
 		// we attempt to keep scrolls from generating incredibly large texture values, but
 		// center rotations and center scales can still generate offsets that need to be > 1
-		if( matrix[0][3] < -40.0f || matrix[0][3] > 40.0f )
+		if ( matrix[0][3] < -40.0f || matrix[0][3] > 40.0f )
 		{
 			matrix[0][3] -= anMath::Ftoi( matrix[0][3] );
 		}
-		if( matrix[1][3] < -40.0f || matrix[1][3] > 40.0f )
+		if ( matrix[1][3] < -40.0f || matrix[1][3] > 40.0f )
 		{
 			matrix[1][3] -= anMath::Ftoi( matrix[1][3] );
 		}
@@ -1511,7 +1511,7 @@ static void RB_SetupInteractionStage( const shaderStage_t* surfaceStage, const f
 		matrix[1][3] = 0.0f;
 	}
 	
-	if( color != nullptr )
+	if ( color != nullptr )
 	{
 		for( int i = 0; i < 4; i++ )
 		{
@@ -1530,23 +1530,23 @@ RB_DrawSingleInteraction
 */
 static void RB_DrawSingleInteraction( drawInteraction_t* din )
 {
-	if( din->bumpImage == nullptr )
+	if ( din->bumpImage == nullptr )
 	{
 		// stage wasn't actually an interaction
 		return;
 	}
 	
-	if( din->diffuseImage == nullptr || r_skipDiffuse.GetBool() )
+	if ( din->diffuseImage == nullptr || r_skipDiffuse.GetBool() )
 	{
 		// this isn't a YCoCg black, but it doesn't matter, because
 		// the diffuseColor will also be 0
 		din->diffuseImage = globalImages->blackImage;
 	}
-	if( din->specularImage == nullptr || r_skipSpecular.GetBool() || din->ambientLight )
+	if ( din->specularImage == nullptr || r_skipSpecular.GetBool() || din->ambientLight )
 	{
 		din->specularImage = globalImages->blackImage;
 	}
-	if( r_skipBump.GetBool() )
+	if ( r_skipBump.GetBool() )
 	{
 		din->bumpImage = globalImages->flatNormalMap;
 	}
@@ -1556,7 +1556,7 @@ static void RB_DrawSingleInteraction( drawInteraction_t* din )
 								|| ( ( din->diffuseColor[0] <= 0 ) && ( din->diffuseColor[1] <= 0 ) && ( din->diffuseColor[2] <= 0 ) );
 	const bool specularIsBlack = ( din->specularImage == globalImages->blackImage )
 								 || ( ( din->specularColor[0] <= 0 ) && ( din->specularColor[1] <= 0 ) && ( din->specularColor[2] <= 0 ) );
-	if( diffuseIsBlack && specularIsBlack )
+	if ( diffuseIsBlack && specularIsBlack )
 	{
 		return;
 	}
@@ -1632,13 +1632,13 @@ With added sorting and trivial path work.
 */
 static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t* vLight, int depthFunc, bool performStencilTest, bool useLightDepthBounds )
 {
-	if( surfList == nullptr )
+	if ( surfList == nullptr )
 	{
 		return;
 	}
 	
 	// change the scissor if needed, it will be constant across all the surfaces lit by the light
-	if( !backEnd.currentScissor.Equals( vLight->scissorRect ) && r_useScissor.GetBool() )
+	if ( !backEnd.currentScissor.Equals( vLight->scissorRect ) && r_useScissor.GetBool() )
 	{
 		GL_Scissor( backEnd.viewDef->viewport.x1 + vLight->scissorRect.x1,
 					backEnd.viewDef->viewport.y1 + vLight->scissorRect.y1,
@@ -1648,7 +1648,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 	}
 	
 	// perform setup here that will be constant for all interactions
-	if( performStencilTest )
+	if ( performStencilTest )
 	{
 		GL_State( GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE | GLS_DEPTHMASK | depthFunc | GLS_STENCIL_FUNC_EQUAL | GLS_STENCIL_MAKE_REF( STENCIL_SHADOW_TEST_VALUE ) | GLS_STENCIL_MAKE_MASK( STENCIL_SHADOW_MASK_VALUE ) );
 		
@@ -1659,7 +1659,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 	}
 	
 	// some rare lights have multiple animating stages, loop over them outside the surface list
-	const idMaterial* lightShader = vLight->lightShader;
+	const anMaterial* lightShader = vLight->lightShader;
 	const float* lightRegs = vLight->shaderRegisters;
 	
 	drawInteraction_t inter = {};
@@ -1680,7 +1680,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 	{
 	
 		// make sure the triangle culling is done
-		if( walk->shadowVolumeState != SHADOWVOLUME_DONE )
+		if ( walk->shadowVolumeState != SHADOWVOLUME_DONE )
 		{
 			assert( walk->shadowVolumeState == SHADOWVOLUME_UNFINISHED || walk->shadowVolumeState == SHADOWVOLUME_DONE );
 			
@@ -1694,8 +1694,8 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 			backEnd.pc.shadowMicroSec += end - start;
 		}
 		
-		const idMaterial* surfaceShader = walk->material;
-		if( surfaceShader->GetFastPathBumpImage() )
+		const anMaterial* surfaceShader = walk->material;
+		if ( surfaceShader->GetFastPathBumpImage() )
 		{
 			allSurfaces.Append( walk );
 		}
@@ -1712,7 +1712,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 	bool lightDepthBoundsDisabled = false;
 	
 	// RB begin
-	if( r_useShadowMapping.GetBool() )
+	if ( r_useShadowMapping.GetBool() )
 	{
 		const static int JITTER_SIZE = 128;
 		
@@ -1736,7 +1736,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 		SetFragmentParm( RENDERPARM_JITTERTEXSCALE, jitterTexScale ); // rpJitterTexScale
 		
 		float jitterTexOffset[4];
-		if( r_shadowMapRandomizeJitter.GetBool() )
+		if ( r_shadowMapRandomizeJitter.GetBool() )
 		{
 			jitterTexOffset[0] = ( rand() & 255 ) / 255.0;
 			jitterTexOffset[1] = ( rand() & 255 ) / 255.0;
@@ -1750,7 +1750,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 		jitterTexOffset[3] = 0.0f;
 		SetFragmentParm( RENDERPARM_JITTERTEXOFFSET, jitterTexOffset ); // rpJitterTexOffset
 		
-		if( vLight->parallel )
+		if ( vLight->parallel )
 		{
 			float cascadeDistances[4];
 			cascadeDistances[0] = backEnd.viewDef->frustumSplitDistances[0];
@@ -1768,7 +1768,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 		const shaderStage_t*	lightStage = lightShader->GetStage( lightStageNum );
 		
 		// ignore stages that fail the condition
-		if( !lightRegs[ lightStage->conditionRegister ] )
+		if ( !lightRegs[ lightStage->conditionRegister ] )
 		{
 			continue;
 		}
@@ -1784,7 +1784,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 		const anVec4 specularColor = lightColor * 2.0f;
 		
 		float lightTextureMatrix[16];
-		if( lightStage->texture.hasMatrix )
+		if ( lightStage->texture.hasMatrix )
 		{
 			RB_GetShaderTextureMatrix( lightRegs, &lightStage->texture, lightTextureMatrix );
 		}
@@ -1797,7 +1797,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 		GL_SelectTexture( INTERACTION_TEXUNIT_PROJECTION );
 		lightStage->texture.image->Bind();
 		
-		if( r_useShadowMapping.GetBool() )
+		if ( r_useShadowMapping.GetBool() )
 		{
 			// texture 5 will be the shadow maps array
 			GL_SelectTexture( INTERACTION_TEXUNIT_SHADOWMAPS );
@@ -1805,11 +1805,11 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 			
 			// texture 6 will be the jitter texture for soft shadowing
 			GL_SelectTexture( INTERACTION_TEXUNIT_JITTER );
-			if( r_shadowMapSamples.GetInteger() == 16 )
+			if ( r_shadowMapSamples.GetInteger() == 16 )
 			{
 				globalImages->jitterImage16->Bind();
 			}
-			else if( r_shadowMapSamples.GetInteger() == 4 )
+			else if ( r_shadowMapSamples.GetInteger() == 4 )
 			{
 				globalImages->jitterImage4->Bind();
 			}
@@ -1838,9 +1838,9 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 			const drawSurf_t* const surf = allSurfaces[ sortedSurfNum ];
 			
 			// select the render prog
-			if( lightShader->IsAmbientLight() )
+			if ( lightShader->IsAmbientLight() )
 			{
-				if( surf->jointCache )
+				if ( surf->jointCache )
 				{
 					renderProgManager.BindShader_InteractionAmbientSkinned();
 				}
@@ -1851,13 +1851,13 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 			}
 			else
 			{
-				if( r_useShadowMapping.GetBool() && vLight->globalShadows )
+				if ( r_useShadowMapping.GetBool() && vLight->globalShadows )
 				{
 					// RB: we have shadow mapping enabled and shadow maps so do a shadow compare
 					
-					if( vLight->parallel )
+					if ( vLight->parallel )
 					{
-						if( surf->jointCache )
+						if ( surf->jointCache )
 						{
 							renderProgManager.BindShader_Interaction_ShadowMapping_Parallel_Skinned();
 						}
@@ -1866,9 +1866,9 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 							renderProgManager.BindShader_Interaction_ShadowMapping_Parallel();
 						}
 					}
-					else if( vLight->pointLight )
+					else if ( vLight->pointLight )
 					{
-						if( surf->jointCache )
+						if ( surf->jointCache )
 						{
 							renderProgManager.BindShader_Interaction_ShadowMapping_Point_Skinned();
 						}
@@ -1879,7 +1879,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 					}
 					else
 					{
-						if( surf->jointCache )
+						if ( surf->jointCache )
 						{
 							renderProgManager.BindShader_Interaction_ShadowMapping_Spot_Skinned();
 						}
@@ -1891,7 +1891,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 				}
 				else
 				{
-					if( surf->jointCache )
+					if ( surf->jointCache )
 					{
 						renderProgManager.BindShader_InteractionSkinned();
 					}
@@ -1902,22 +1902,22 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 				}
 			}
 			
-			const idMaterial* surfaceShader = surf->material;
+			const anMaterial* surfaceShader = surf->material;
 			const float* surfaceRegs = surf->shaderRegisters;
 			
 			inter.surf = surf;
 			
 			// change the MVP matrix, view/light origin and light projection vectors if needed
-			if( surf->space != backEnd.currentSpace )
+			if ( surf->space != backEnd.currentSpace )
 			{
 				backEnd.currentSpace = surf->space;
 				
 				// turn off the light depth bounds test if this model is rendered with a depth hack
-				if( useLightDepthBounds )
+				if ( useLightDepthBounds )
 				{
-					if( !surf->space->weaponDepthHack && surf->space->modelDepthHack == 0.0f )
+					if ( !surf->space->weaponDepthHack && surf->space->modelDepthHack == 0.0f )
 					{
-						if( lightDepthBoundsDisabled )
+						if ( lightDepthBoundsDisabled )
 						{
 							GL_DepthBoundsTest( vLight->scissorRect.zmin, vLight->scissorRect.zmax );
 							lightDepthBoundsDisabled = false;
@@ -1925,7 +1925,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 					}
 					else
 					{
-						if( !lightDepthBoundsDisabled )
+						if ( !lightDepthBoundsDisabled )
 						{
 							GL_DepthBoundsTest( 0.0f, 0.0f );
 							lightDepthBoundsDisabled = true;
@@ -1969,7 +1969,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 				}
 				
 				// optionally multiply the local light projection by the light texture matrix
-				if( lightStage->texture.hasMatrix )
+				if ( lightStage->texture.hasMatrix )
 				{
 					RB_BakeTextureMatrixIntoTexgen( lightProjection, lightTextureMatrix );
 				}
@@ -1981,9 +1981,9 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 				SetVertexParm( RENDERPARM_LIGHTFALLOFF_S, lightProjection[3].ToFloatPtr() );
 				
 				// RB begin
-				if( r_useShadowMapping.GetBool() )
+				if ( r_useShadowMapping.GetBool() )
 				{
-					if( vLight->parallel )
+					if ( vLight->parallel )
 					{
 						for( int i = 0; i < ( r_shadowMapSplits.GetInteger() + 1 ); i++ )
 						{
@@ -1999,7 +1999,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 							SetVertexParms( ( renderParm_t )( RENDERPARM_SHADOW_MATRIX_0_X + i * 4 ), shadowWindowMVP[0], 4 );
 						}
 					}
-					else if( vLight->pointLight )
+					else if ( vLight->pointLight )
 					{
 						for( int i = 0; i < 6; i++ )
 						{
@@ -2033,7 +2033,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 			}
 			
 			// check for the fast path
-			if( surfaceShader->GetFastPathBumpImage() && !r_skipInteractionFastPath.GetBool() )
+			if ( surfaceShader->GetFastPathBumpImage() && !r_skipInteractionFastPath.GetBool() )
 			{
 				renderLog.OpenBlock( surf->material->GetName() );
 				
@@ -2090,12 +2090,12 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 					case SL_BUMP:
 					{
 						// ignore stage that fails the condition
-						if( !surfaceRegs[ surfaceStage->conditionRegister ] )
+						if ( !surfaceRegs[ surfaceStage->conditionRegister ] )
 						{
 							break;
 						}
 						// draw any previous interaction
-						if( inter.bumpImage != nullptr )
+						if ( inter.bumpImage != nullptr )
 						{
 							RB_DrawSingleInteraction( &inter );
 						}
@@ -2109,12 +2109,12 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 					case SL_DIFFUSE:
 					{
 						// ignore stage that fails the condition
-						if( !surfaceRegs[ surfaceStage->conditionRegister ] )
+						if ( !surfaceRegs[ surfaceStage->conditionRegister ] )
 						{
 							break;
 						}
 						// draw any previous interaction
-						if( inter.diffuseImage != nullptr )
+						if ( inter.diffuseImage != nullptr )
 						{
 							RB_DrawSingleInteraction( &inter );
 						}
@@ -2127,12 +2127,12 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 					case SL_SPECULAR:
 					{
 						// ignore stage that fails the condition
-						if( !surfaceRegs[ surfaceStage->conditionRegister ] )
+						if ( !surfaceRegs[ surfaceStage->conditionRegister ] )
 						{
 							break;
 						}
 						// draw any previous interaction
-						if( inter.specularImage != nullptr )
+						if ( inter.specularImage != nullptr )
 						{
 							RB_DrawSingleInteraction( &inter );
 						}
@@ -2152,7 +2152,7 @@ static void RB_RenderInteractions( const drawSurf_t* surfList, const viewLight_t
 		}
 	}
 	
-	if( useLightDepthBounds && lightDepthBoundsDisabled )
+	if ( useLightDepthBounds && lightDepthBoundsDisabled )
 	{
 		GL_DepthBoundsTest( vLight->scissorRect.zmin, vLight->scissorRect.zmax );
 	}
@@ -2177,12 +2177,12 @@ The stencil buffer should have been set to 128 on any surfaces that might receiv
 */
 static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t* vLight )
 {
-	if( r_skipShadows.GetBool() )
+	if ( r_skipShadows.GetBool() )
 	{
 		return;
 	}
 	
-	if( drawSurfs == nullptr )
+	if ( drawSurfs == nullptr )
 	{
 		return;
 	}
@@ -2197,11 +2197,11 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 	uint64 glState = 0;
 	
 	// for visualizing the shadows
-	if( r_showShadows.GetInteger() )
+	if ( r_showShadows.GetInteger() )
 	{
 		// set the debug shadow color
 		SetFragmentParm( RENDERPARM_COLOR, colorMagenta.ToFloatPtr() );
-		if( r_showShadows.GetInteger() == 2 )
+		if ( r_showShadows.GetInteger() == 2 )
 		{
 			// draw filled in
 			glState = GLS_DEPTHMASK | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_LESS;
@@ -2235,14 +2235,14 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 	
 	for( const drawSurf_t* drawSurf = drawSurfs; drawSurf != nullptr; drawSurf = drawSurf->nextOnLight )
 	{
-		if( drawSurf->scissorRect.IsEmpty() )
+		if ( drawSurf->scissorRect.IsEmpty() )
 		{
 			continue;	// !@# FIXME: find out why this is sometimes being hit!
 			// temporarily jump over the scissor and draw so the gl error callback doesn't get hit
 		}
 		
 		// make sure the shadow volume is done
-		if( drawSurf->shadowVolumeState != SHADOWVOLUME_DONE )
+		if ( drawSurf->shadowVolumeState != SHADOWVOLUME_DONE )
 		{
 			assert( drawSurf->shadowVolumeState == SHADOWVOLUME_UNFINISHED || drawSurf->shadowVolumeState == SHADOWVOLUME_DONE );
 			
@@ -2256,12 +2256,12 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 			backEnd.pc.shadowMicroSec += end - start;
 		}
 		
-		if( drawSurf->numIndexes == 0 )
+		if ( drawSurf->numIndexes == 0 )
 		{
 			continue;	// a job may have created an empty shadow volume
 		}
 		
-		if( !backEnd.currentScissor.Equals( drawSurf->scissorRect ) && r_useScissor.GetBool() )
+		if ( !backEnd.currentScissor.Equals( drawSurf->scissorRect ) && r_useScissor.GetBool() )
 		{
 			// change the scissor
 			GL_Scissor( backEnd.viewDef->viewport.x1 + drawSurf->scissorRect.x1,
@@ -2271,7 +2271,7 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 			backEnd.currentScissor = drawSurf->scissorRect;
 		}
 		
-		if( drawSurf->space != backEnd.currentSpace )
+		if ( drawSurf->space != backEnd.currentSpace )
 		{
 			// change the matrix
 			RB_SetMVP( drawSurf->space->mvp );
@@ -2284,9 +2284,9 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 			backEnd.currentSpace = drawSurf->space;
 		}
 		
-		if( r_showShadows.GetInteger() == 0 )
+		if ( r_showShadows.GetInteger() == 0 )
 		{
-			if( drawSurf->jointCache )
+			if ( drawSurf->jointCache )
 			{
 				renderProgManager.BindShader_ShadowSkinned();
 			}
@@ -2297,7 +2297,7 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 		}
 		else
 		{
-			if( drawSurf->jointCache )
+			if ( drawSurf->jointCache )
 			{
 				renderProgManager.BindShader_ShadowDebugSkinned();
 			}
@@ -2308,7 +2308,7 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 		}
 		
 		// set depth bounds per shadow
-		if( r_useShadowDepthBounds.GetBool() )
+		if ( r_useShadowDepthBounds.GetBool() )
 		{
 			GL_DepthBoundsTest( drawSurf->scissorRect.zmin, drawSurf->scissorRect.zmax );
 		}
@@ -2329,13 +2329,13 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 		const bool renderZPass = ( drawSurf->renderZFail == 0 ) || r_forceZPassStencilShadows.GetBool();
 		
 		
-		if( renderZPass )
+		if ( renderZPass )
 		{
 			// Z-pass
 			glStencilOpSeparate( GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR );
 			glStencilOpSeparate( GL_BACK, GL_KEEP, GL_KEEP, GL_DECR );
 		}
-		else if( r_useStencilShadowPreload.GetBool() )
+		else if ( r_useStencilShadowPreload.GetBool() )
 		{
 			// preload + Z-pass
 			glStencilOpSeparate( GL_FRONT, GL_KEEP, GL_DECR, GL_DECR );
@@ -2354,14 +2354,14 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 		// get vertex buffer
 		const vertCacheHandle_t vbHandle = drawSurf->shadowCache;
 		idVertexBuffer* vertexBuffer;
-		if( vertexCache.CacheIsStatic( vbHandle ) )
+		if ( vertexCache.CacheIsStatic( vbHandle ) )
 		{
 			vertexBuffer = &vertexCache.staticData.vertexBuffer;
 		}
 		else
 		{
 			const uint64 frameNum = ( int )( vbHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
-			if( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
+			if ( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
 			{
 				idLib::Warning( "RB_DrawElementsWithCounters, vertexBuffer == nullptr" );
 				continue;
@@ -2373,14 +2373,14 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 		// get index buffer
 		const vertCacheHandle_t ibHandle = drawSurf->indexCache;
 		idIndexBuffer* indexBuffer;
-		if( vertexCache.CacheIsStatic( ibHandle ) )
+		if ( vertexCache.CacheIsStatic( ibHandle ) )
 		{
 			indexBuffer = &vertexCache.staticData.indexBuffer;
 		}
 		else
 		{
 			const uint64 frameNum = ( int )( ibHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
-			if( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
+			if ( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
 			{
 				idLib::Warning( "RB_DrawElementsWithCounters, indexBuffer == nullptr" );
 				continue;
@@ -2392,18 +2392,18 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 		RENDERLOG_PRINTF( "Binding Buffers: %p %p\n", vertexBuffer, indexBuffer );
 		
 		// RB: 64 bit fixes, changed GLuint to GLintptr
-		if( backEnd.glState.currentIndexBuffer != ( GLintptr )indexBuffer->GetAPIObject() || !r_useStateCaching.GetBool() )
+		if ( backEnd.glState.currentIndexBuffer != ( GLintptr )indexBuffer->GetAPIObject() || !r_useStateCaching.GetBool() )
 		{
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ( GLintptr )indexBuffer->GetAPIObject() );
 			backEnd.glState.currentIndexBuffer = ( GLintptr )indexBuffer->GetAPIObject();
 		}
 		
-		if( drawSurf->jointCache )
+		if ( drawSurf->jointCache )
 		{
 			assert( renderProgManager.ShaderUsesJoints() );
 			
 			idJointBuffer jointBuffer;
-			if( !vertexCache.GetJointBuffer( drawSurf->jointCache, &jointBuffer ) )
+			if ( !vertexCache.GetJointBuffer( drawSurf->jointCache, &jointBuffer ) )
 			{
 				idLib::Warning( "RB_DrawElementsWithCounters, jointBuffer == nullptr" );
 				continue;
@@ -2411,9 +2411,9 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 			assert( ( jointBuffer.GetOffset() & ( glConfig.uniformBufferOffsetAlignment - 1 ) ) == 0 );
 			
 			const GLintptr ubo = reinterpret_cast< GLintptr >( jointBuffer.GetAPIObject() );
-			glBindBufferRange( GL_UNIFORM_BUFFER, 0, ubo, jointBuffer.GetOffset(), jointBuffer.GetNumJoints() * sizeof( idJointMat ) );
+			glBindBufferRange( GL_UNIFORM_BUFFER, 0, ubo, jointBuffer.GetOffset(), jointBuffer.GetNumJoints() * sizeof( anJointMat ) );
 			
-			if( ( backEnd.glState.vertexLayout != LAYOUT_DRAW_SHADOW_VERT_SKINNED ) || ( backEnd.glState.currentVertexBuffer != ( GLintptr )vertexBuffer->GetAPIObject() ) || !r_useStateCaching.GetBool() )
+			if ( ( backEnd.glState.vertexLayout != LAYOUT_DRAW_SHADOW_VERT_SKINNED ) || ( backEnd.glState.currentVertexBuffer != ( GLintptr )vertexBuffer->GetAPIObject() ) || !r_useStateCaching.GetBool() )
 			{
 				glBindBuffer( GL_ARRAY_BUFFER, ( GLintptr )vertexBuffer->GetAPIObject() );
 				backEnd.glState.currentVertexBuffer = ( GLintptr )vertexBuffer->GetAPIObject();
@@ -2441,7 +2441,7 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 		}
 		else
 		{
-			if( ( backEnd.glState.vertexLayout != LAYOUT_DRAW_SHADOW_VERT ) || ( backEnd.glState.currentVertexBuffer != ( GLintptr )vertexBuffer->GetAPIObject() ) || !r_useStateCaching.GetBool() )
+			if ( ( backEnd.glState.vertexLayout != LAYOUT_DRAW_SHADOW_VERT ) || ( backEnd.glState.currentVertexBuffer != ( GLintptr )vertexBuffer->GetAPIObject() ) || !r_useStateCaching.GetBool() )
 			{
 				glBindBuffer( GL_ARRAY_BUFFER, ( GLintptr )vertexBuffer->GetAPIObject() );
 				backEnd.glState.currentVertexBuffer = ( GLintptr )vertexBuffer->GetAPIObject();
@@ -2466,7 +2466,7 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 		
 		renderProgManager.CommitUniforms();
 		
-		if( drawSurf->jointCache )
+		if ( drawSurf->jointCache )
 		{
 #if defined(USE_GLES3) //defined(USE_GLES2)
 			glDrawElements( GL_TRIANGLES, r_singleTriangle.GetBool() ? 3 : drawSurf->numIndexes, GL_INDEX_TYPE, ( triIndex_t* )indexOffset );
@@ -2488,13 +2488,13 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 		backEnd.pc.c_shadowIndexes += drawSurf->numIndexes;
 		// RB end
 		
-		if( !renderZPass && r_useStencilShadowPreload.GetBool() )
+		if ( !renderZPass && r_useStencilShadowPreload.GetBool() )
 		{
 			// render again with Z-pass
 			glStencilOpSeparate( GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR );
 			glStencilOpSeparate( GL_BACK, GL_KEEP, GL_KEEP, GL_DECR );
 			
-			if( drawSurf->jointCache )
+			if ( drawSurf->jointCache )
 			{
 #if defined(USE_GLES3)
 				glDrawElements( GL_TRIANGLES, r_singleTriangle.GetBool() ? 3 : drawSurf->numIndexes, GL_INDEX_TYPE, ( triIndex_t* )indexOffset );
@@ -2523,9 +2523,9 @@ static void RB_StencilShadowPass( const drawSurf_t* drawSurfs, const viewLight_t
 	GL_Cull( CT_FRONT_SIDED );
 	
 	// reset depth bounds
-	if( r_useShadowDepthBounds.GetBool() )
+	if ( r_useShadowDepthBounds.GetBool() )
 	{
-		if( r_useLightDepthBounds.GetBool() )
+		if ( r_useLightDepthBounds.GetBool() )
 		{
 			GL_DepthBoundsTest( vLight->scissorRect.zmin, vLight->scissorRect.zmax );
 		}
@@ -2550,7 +2550,7 @@ static void RB_StencilSelectLight( const viewLight_t* vLight )
 	renderLog.OpenBlock( "Stencil Select" );
 	
 	// enable the light scissor
-	if( !backEnd.currentScissor.Equals( vLight->scissorRect ) && r_useScissor.GetBool() )
+	if ( !backEnd.currentScissor.Equals( vLight->scissorRect ) && r_useScissor.GetBool() )
 	{
 		GL_Scissor( backEnd.viewDef->viewport.x1 + vLight->scissorRect.x1,
 					backEnd.viewDef->viewport.y1 + vLight->scissorRect.y1,
@@ -2662,7 +2662,7 @@ void MatrixCrop( float m[16], const anVec3 mins, const anVec3 maxs )
 	m[15] = 1;
 }
 
-void MatrixLookAtRH( float m[16], const anVec3& eye, const anVec3& dir, const anVec3& up )
+void MatrixLookAtRH( float m[16], const anVec3 &eye, const anVec3 &dir, const anVec3 &up )
 {
 	anVec3 dirN;
 	anVec3 upN;
@@ -2702,12 +2702,12 @@ RB_ShadowMapPass
 */
 static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vLight, int side )
 {
-	if( r_skipShadows.GetBool() )
+	if ( r_skipShadows.GetBool() )
 	{
 		return;
 	}
 	
-	if( drawSurfs == nullptr )
+	if ( drawSurfs == nullptr )
 	{
 		return;
 	}
@@ -2748,20 +2748,20 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 	idRenderMatrix lightViewRenderMatrix;
 	
 	
-	if( vLight->parallel && side >= 0 )
+	if ( vLight->parallel && side >= 0 )
 	{
 		assert( side >= 0 && side < 6 );
 		
 		// original light direction is from surface to light origin
 		anVec3 lightDir = -vLight->lightCenter;
-		if( lightDir.Normalize() == 0.0f )
+		if ( lightDir.Normalize() == 0.0f )
 		{
 			lightDir[2] = -1.0f;
 		}
 		
-		idMat3 rotation = lightDir.ToMat3();
-		//idAngles angles = lightDir.ToAngles();
-		//idMat3 rotation = angles.ToMat3();
+		anMat3 rotation = lightDir.ToMat3();
+		//anAngles angles = lightDir.ToAngles();
+		//anMat3 rotation = angles.ToMat3();
 		
 		const anVec3 viewDir = backEnd.viewDef->renderView.viewaxis[0];
 		const anVec3 viewPos = backEnd.viewDef->renderView.vieworg;
@@ -2805,7 +2805,7 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 		// invert the MVP projection so we can deform zero-to-one cubes into the frustum pyramid shape and calculate global bounds
 		
 		idRenderMatrix splitFrustumInverse;
-		if( !idRenderMatrix::Inverse( backEnd.viewDef->frustumMVPs[FRUSTUM_CASCADE1 + side], splitFrustumInverse ) )
+		if ( !idRenderMatrix::Inverse( backEnd.viewDef->frustumMVPs[FRUSTUM_CASCADE1 + side], splitFrustumInverse ) )
 		{
 			idLib::Warning( "splitFrustumMVP invert failed" );
 		}
@@ -2867,22 +2867,22 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 		}
 		
 		// don't let the frustum AABB be bigger than the light AABB
-		if( cropBounds[0][0] < lightBounds[0][0] )
+		if ( cropBounds[0][0] < lightBounds[0][0] )
 		{
 			cropBounds[0][0] = lightBounds[0][0];
 		}
 		
-		if( cropBounds[0][1] < lightBounds[0][1] )
+		if ( cropBounds[0][1] < lightBounds[0][1] )
 		{
 			cropBounds[0][1] = lightBounds[0][1];
 		}
 		
-		if( cropBounds[1][0] > lightBounds[1][0] )
+		if ( cropBounds[1][0] > lightBounds[1][0] )
 		{
 			cropBounds[1][0] = lightBounds[1][0];
 		}
 		
-		if( cropBounds[1][1] > lightBounds[1][1] )
+		if ( cropBounds[1][1] > lightBounds[1][1] )
 		{
 			cropBounds[1][1] = lightBounds[1][1];
 		}
@@ -2905,7 +2905,7 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 		backEnd.shadowV[side] = lightViewRenderMatrix;
 		backEnd.shadowP[side] = lightProjectionRenderMatrix;
 	}
-	else if( vLight->pointLight && side >= 0 )
+	else if ( vLight->pointLight && side >= 0 )
 	{
 		assert( side >= 0 && side < 6 );
 		
@@ -3042,7 +3042,7 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 	
 	globalFramebuffers.shadowFBO[vLight->shadowLOD]->Bind();
 	
-	if( side < 0 )
+	if ( side < 0 )
 	{
 		globalFramebuffers.shadowFBO[vLight->shadowLOD]->AttachImageDepthLayer( globalImages->shadowImage[vLight->shadowLOD], 0 );
 	}
@@ -3066,7 +3066,7 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 	
 #if 1
 		// make sure the shadow occluder geometry is done
-		if( drawSurf->shadowVolumeState != SHADOWVOLUME_DONE )
+		if ( drawSurf->shadowVolumeState != SHADOWVOLUME_DONE )
 		{
 			assert( drawSurf->shadowVolumeState == SHADOWVOLUME_UNFINISHED || drawSurf->shadowVolumeState == SHADOWVOLUME_DONE );
 			
@@ -3081,12 +3081,12 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 		}
 #endif
 		
-		if( drawSurf->numIndexes == 0 )
+		if ( drawSurf->numIndexes == 0 )
 		{
 			continue;	// a job may have created an empty shadow geometry
 		}
 		
-		if( drawSurf->space != backEnd.currentSpace )
+		if ( drawSurf->space != backEnd.currentSpace )
 		{
 			idRenderMatrix modelRenderMatrix;
 			idRenderMatrix::Transpose( *( idRenderMatrix* )drawSurf->space->modelMatrix, modelRenderMatrix );
@@ -3097,14 +3097,14 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 			idRenderMatrix clipMVP;
 			idRenderMatrix::Multiply( lightProjectionRenderMatrix, modelToLightRenderMatrix, clipMVP );
 			
-			if( vLight->parallel )
+			if ( vLight->parallel )
 			{
 				idRenderMatrix MVP;
 				idRenderMatrix::Multiply( renderMatrix_clipSpaceToWindowSpace, clipMVP, MVP );
 				
 				RB_SetMVP( clipMVP );
 			}
-			else if( side < 0 )
+			else if ( side < 0 )
 			{
 				// from OpenGL view space to OpenGL NDC ( -1 : 1 in XYZ )
 				idRenderMatrix MVP;
@@ -3129,7 +3129,7 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 		
 		bool didDraw = false;
 		
-		const idMaterial* shader = drawSurf->material;
+		const anMaterial* shader = drawSurf->material;
 		
 		// get the expressions for conditionals / color / texcoords
 		const float* regs = drawSurf->shaderRegisters;
@@ -3138,27 +3138,27 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 		uint64 surfGLState = 0;
 		
 		// set polygon offset if necessary
-		if( shader && shader->TestMaterialFlag( MF_POLYGONOFFSET ) )
+		if ( shader && shader->TestMaterialFlag( MF_POLYGONOFFSET ) )
 		{
 			surfGLState |= GLS_POLYGON_OFFSET;
 			GL_PolygonOffset( r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset() );
 		}
 		
 #if 1
-		if( shader && shader->Coverage() == MC_PERFORATED )
+		if ( shader && shader->Coverage() == MC_PERFORATED )
 		{
 			// perforated surfaces may have multiple alpha tested stages
 			for( int stage = 0; stage < shader->GetNumStages(); stage++ )
 			{
 				const shaderStage_t* pStage = shader->GetStage( stage );
 				
-				if( !pStage->hasAlphaTest )
+				if ( !pStage->hasAlphaTest )
 				{
 					continue;
 				}
 				
 				// check the stage enable condition
-				if( regs[ pStage->conditionRegister ] == 0 )
+				if ( regs[ pStage->conditionRegister ] == 0 )
 				{
 					continue;
 				}
@@ -3171,7 +3171,7 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 				color[3] = regs[ pStage->color.registers[3] ];
 				
 				// skip the entire stage if alpha would be black
-				if( color[3] <= 0.0f )
+				if ( color[3] <= 0.0f )
 				{
 					continue;
 				}
@@ -3179,7 +3179,7 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 				uint64 stageGLState = surfGLState;
 				
 				// set privatePolygonOffset if necessary
-				if( pStage->privatePolygonOffset )
+				if ( pStage->privatePolygonOffset )
 				{
 					GL_PolygonOffset( r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * pStage->privatePolygonOffset );
 					stageGLState |= GLS_POLYGON_OFFSET;
@@ -3195,7 +3195,7 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 				GL_State( stageGLState | GLS_ALPHATEST_FUNC_GREATER | GLS_ALPHATEST_MAKE_REF( anMath::Ftob( 255.0f * regs[ pStage->alphaTestRegister ] ) ) );
 #endif
 				
-				if( drawSurf->jointCache )
+				if ( drawSurf->jointCache )
 				{
 					renderProgManager.BindShader_TextureVertexColorSkinned();
 				}
@@ -3223,7 +3223,7 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 				RB_FinishStageTexturing( pStage, drawSurf );
 				
 				// unset privatePolygonOffset if necessary
-				if( pStage->privatePolygonOffset )
+				if ( pStage->privatePolygonOffset )
 				{
 					GL_PolygonOffset( r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset() );
 				}
@@ -3231,9 +3231,9 @@ static void RB_ShadowMapPass( const drawSurf_t* drawSurfs, const viewLight_t* vL
 		}
 #endif
 		
-		if( !didDraw )
+		if ( !didDraw )
 		{
-			if( drawSurf->jointCache )
+			if ( drawSurf->jointCache )
 			{
 				renderProgManager.BindShader_DepthSkinned();
 			}
@@ -3273,7 +3273,7 @@ RB_DrawInteractions
 */
 static void RB_DrawInteractions( const viewDef_t* viewDef )
 {
-	if( r_skipInteractions.GetBool() )
+	if ( r_skipInteractions.GetBool() )
 	{
 		return;
 	}
@@ -3292,42 +3292,42 @@ static void RB_DrawInteractions( const viewDef_t* viewDef )
 	for( const viewLight_t* vLight = backEnd.viewDef->viewLights; vLight != nullptr; vLight = vLight->next )
 	{
 		// do fogging later
-		if( vLight->lightShader->IsFogLight() )
+		if ( vLight->lightShader->IsFogLight() )
 		{
 			continue;
 		}
-		if( vLight->lightShader->IsBlendLight() )
-		{
-			continue;
-		}
-		
-		if( vLight->localInteractions == nullptr && vLight->globalInteractions == nullptr && vLight->translucentInteractions == nullptr )
+		if ( vLight->lightShader->IsBlendLight() )
 		{
 			continue;
 		}
 		
-		const idMaterial* lightShader = vLight->lightShader;
+		if ( vLight->localInteractions == nullptr && vLight->globalInteractions == nullptr && vLight->translucentInteractions == nullptr )
+		{
+			continue;
+		}
+		
+		const anMaterial* lightShader = vLight->lightShader;
 		renderLog.OpenBlock( lightShader->GetName() );
 		
 		// set the depth bounds for the whole light
-		if( useLightDepthBounds )
+		if ( useLightDepthBounds )
 		{
 			GL_DepthBoundsTest( vLight->scissorRect.zmin, vLight->scissorRect.zmax );
 		}
 		
 		// RB: shadow mapping
-		if( r_useShadowMapping.GetBool() )
+		if ( r_useShadowMapping.GetBool() )
 		{
 			int	side, sideStop;
 			
-			if( vLight->parallel )
+			if ( vLight->parallel )
 			{
 				side = 0;
 				sideStop = r_shadowMapSplits.GetInteger() + 1;
 			}
-			else if( vLight->pointLight )
+			else if ( vLight->pointLight )
 			{
-				if( r_shadowMapSingleSide.GetInteger() != -1 )
+				if ( r_shadowMapSingleSide.GetInteger() != -1 )
 				{
 					side = r_shadowMapSingleSide.GetInteger();
 					sideStop = side + 1;
@@ -3352,14 +3352,14 @@ static void RB_DrawInteractions( const viewDef_t* viewDef )
 			// go back from light view to default camera view
 			RB_ResetViewportAndScissorToDefaultCamera( viewDef );
 			
-			if( vLight->localInteractions != nullptr )
+			if ( vLight->localInteractions != nullptr )
 			{
 				renderLog.OpenBlock( "Local Light Interactions" );
 				RB_RenderInteractions( vLight->localInteractions, vLight, GLS_DEPTHFUNC_EQUAL, false, useLightDepthBounds );
 				renderLog.CloseBlock();
 			}
 			
-			if( vLight->globalInteractions != nullptr )
+			if ( vLight->globalInteractions != nullptr )
 			{
 				renderLog.OpenBlock( "Global Light Interactions" );
 				RB_RenderInteractions( vLight->globalInteractions, vLight, GLS_DEPTHFUNC_EQUAL, false, useLightDepthBounds );
@@ -3375,9 +3375,9 @@ static void RB_DrawInteractions( const viewDef_t* viewDef )
 			// in the normal case, so simply disable the stencil select in the mirror case
 			const bool useLightStencilSelect = ( r_useLightStencilSelect.GetBool() && backEnd.viewDef->isMirror == false );
 			
-			if( performStencilTest )
+			if ( performStencilTest )
 			{
-				if( useLightStencilSelect )
+				if ( useLightStencilSelect )
 				{
 					// write a stencil mask for the visible light bounds to hi-stencil
 					RB_StencilSelectLight( vLight );
@@ -3391,7 +3391,7 @@ static void RB_DrawInteractions( const viewDef_t* viewDef )
 					rect.x2 = ( vLight->scissorRect.x2 + 15 ) & ~15;
 					rect.y2 = ( vLight->scissorRect.y2 + 15 ) & ~15;
 					
-					if( !backEnd.currentScissor.Equals( rect ) && r_useScissor.GetBool() )
+					if ( !backEnd.currentScissor.Equals( rect ) && r_useScissor.GetBool() )
 					{
 						GL_Scissor( backEnd.viewDef->viewport.x1 + rect.x1,
 									backEnd.viewDef->viewport.y1 + rect.y1,
@@ -3404,28 +3404,28 @@ static void RB_DrawInteractions( const viewDef_t* viewDef )
 				}
 			}
 			
-			if( vLight->globalShadows != nullptr )
+			if ( vLight->globalShadows != nullptr )
 			{
 				renderLog.OpenBlock( "Global Light Shadows" );
 				RB_StencilShadowPass( vLight->globalShadows, vLight );
 				renderLog.CloseBlock();
 			}
 			
-			if( vLight->localInteractions != nullptr )
+			if ( vLight->localInteractions != nullptr )
 			{
 				renderLog.OpenBlock( "Local Light Interactions" );
 				RB_RenderInteractions( vLight->localInteractions, vLight, GLS_DEPTHFUNC_EQUAL, performStencilTest, useLightDepthBounds );
 				renderLog.CloseBlock();
 			}
 			
-			if( vLight->localShadows != nullptr )
+			if ( vLight->localShadows != nullptr )
 			{
 				renderLog.OpenBlock( "Local Light Shadows" );
 				RB_StencilShadowPass( vLight->localShadows, vLight );
 				renderLog.CloseBlock();
 			}
 			
-			if( vLight->globalInteractions != nullptr )
+			if ( vLight->globalInteractions != nullptr )
 			{
 				renderLog.OpenBlock( "Global Light Interactions" );
 				RB_RenderInteractions( vLight->globalInteractions, vLight, GLS_DEPTHFUNC_EQUAL, performStencilTest, useLightDepthBounds );
@@ -3434,13 +3434,13 @@ static void RB_DrawInteractions( const viewDef_t* viewDef )
 		}
 		// RB end
 		
-		if( vLight->translucentInteractions != nullptr && !r_skipTranslucent.GetBool() )
+		if ( vLight->translucentInteractions != nullptr && !r_skipTranslucent.GetBool() )
 		{
 			renderLog.OpenBlock( "Translucent Interactions" );
 			
 			// Disable the depth bounds test because translucent surfaces don't work with
 			// the depth bounds tests since they did not write depth during the depth pass.
-			if( useLightDepthBounds )
+			if ( useLightDepthBounds )
 			{
 				GL_DepthBoundsTest( 0.0f, 0.0f );
 			}
@@ -3473,7 +3473,7 @@ static void RB_DrawInteractions( const viewDef_t* viewDef )
 	GL_SelectTexture( 0 );
 	
 	// reset depth bounds
-	if( useLightDepthBounds )
+	if ( useLightDepthBounds )
 	{
 		GL_DepthBoundsTest( 0.0f, 0.0f );
 	}
@@ -3508,7 +3508,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 	float guiSort = 0.0f;
 	
 	// only obey skipAmbient if we are rendering a view
-	if( backEnd.viewDef->viewEntitys && r_skipAmbient.GetBool() )
+	if ( backEnd.viewDef->viewEntitys && r_skipAmbient.GetBool() )
 	{
 		return numDrawSurfs;
 	}
@@ -3527,39 +3527,39 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 	for( ; i < numDrawSurfs; i++ )
 	{
 		const drawSurf_t* surf = drawSurfs[i];
-		const idMaterial* shader = surf->material;
+		const anMaterial* shader = surf->material;
 		
-		if( !shader->HasAmbient() )
+		if ( !shader->HasAmbient() )
 		{
 			continue;
 		}
 		
-		if( shader->IsPortalSky() )
+		if ( shader->IsPortalSky() )
 		{
 			continue;
 		}
 		
 		// some deforms may disable themselves by setting numIndexes = 0
-		if( surf->numIndexes == 0 )
+		if ( surf->numIndexes == 0 )
 		{
 			continue;
 		}
 		
-		if( shader->SuppressInSubview() )
+		if ( shader->SuppressInSubview() )
 		{
 			continue;
 		}
 		
-		if( backEnd.viewDef->isXraySubview && surf->space->entityDef )
+		if ( backEnd.viewDef->isXraySubview && surf->space->entityDef )
 		{
-			if( surf->space->entityDef->parms.xrayIndex != 2 )
+			if ( surf->space->entityDef->parms.xrayIndex != 2 )
 			{
 				continue;
 			}
 		}
 		
 		// we need to draw the post process shaders after we have drawn the fog lights
-		if( shader->GetSort() >= SS_POST_PROCESS && !backEnd.currentRenderCopied )
+		if ( shader->GetSort() >= SS_POST_PROCESS && !backEnd.currentRenderCopied )
 		{
 			break;
 		}
@@ -3569,7 +3569,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 		// if the stereoEye value of a surface is 0 then we need to draw it for both eyes.
 		const int shaderStereoEye = shader->GetStereoEye();
 		const bool isEyeValid = stereoRender_swapEyes.GetBool() ? ( shaderStereoEye == stereoEye ) : ( shaderStereoEye != stereoEye );
-		if( ( stereoEye != 0 ) && ( shaderStereoEye != 0 ) && ( isEyeValid ) )
+		if ( ( stereoEye != 0 ) && ( shaderStereoEye != 0 ) && ( isEyeValid ) )
 		{
 			continue;
 		}
@@ -3607,7 +3607,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 
 
 		// change the matrix and other space related vars if needed
-		if( surf->space != backEnd.currentSpace || thisGuiStereoOffset != currentGuiStereoOffset )
+		if ( surf->space != backEnd.currentSpace || thisGuiStereoOffset != currentGuiStereoOffset )
 		{
 						
 			backEnd.currentSpace = surf->space;
@@ -3615,7 +3615,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 	
 			const viewEntity_t* space = backEnd.currentSpace;
 			
-			//if( guiStereoScreenOffset != 0.0f  
+			//if ( guiStereoScreenOffset != 0.0f  
 			if ( guiOffset != 0.0f ) // Koz
 			{
 				RB_SetMVPWithStereoOffset( space->mvp, currentGuiStereoOffset );
@@ -3645,7 +3645,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 		}
 		
 		// change the scissor if needed
-		if( !backEnd.currentScissor.Equals( surf->scissorRect ) && r_useScissor.GetBool() )
+		if ( !backEnd.currentScissor.Equals( surf->scissorRect ) && r_useScissor.GetBool() )
 		{
 			GL_Scissor( backEnd.viewDef->viewport.x1 + surf->scissorRect.x1,
 						backEnd.viewDef->viewport.y1 + surf->scissorRect.y1,
@@ -3658,7 +3658,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 		const float*	regs = surf->shaderRegisters;
 		
 		// set face culling appropriately
-		if( surf->space->isGuiSurface )
+		if ( surf->space->isGuiSurface )
 		{
 			GL_Cull( CT_TWO_SIDED );
 		}
@@ -3670,7 +3670,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 		uint64 surfGLState = surf->extraGLState;
 		
 		// set polygon offset if necessary
-		if( shader->TestMaterialFlag( MF_POLYGONOFFSET ) )
+		if ( shader->TestMaterialFlag( MF_POLYGONOFFSET ) )
 		{
 			GL_PolygonOffset( r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset() );
 			surfGLState = GLS_POLYGON_OFFSET;
@@ -3681,25 +3681,25 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 			const shaderStage_t* pStage = shader->GetStage( stage );
 			
 			// check the enable condition
-			if( regs[ pStage->conditionRegister ] == 0 )
+			if ( regs[ pStage->conditionRegister ] == 0 )
 			{
 				continue;
 			}
 			
 			// skip the stages involved in lighting
-			if( pStage->lighting != SL_AMBIENT )
+			if ( pStage->lighting != SL_AMBIENT )
 			{
 				continue;
 			}
 			
 			uint64 stageGLState = surfGLState;
-			if( ( surfGLState & GLS_OVERRIDE ) == 0 )
+			if ( ( surfGLState & GLS_OVERRIDE ) == 0 )
 			{
 				stageGLState |= pStage->drawStateBits;
 			}
 			
 			// skip if the stage is ( GL_ZERO, GL_ONE ), which is used for some alpha masks
-			if( ( stageGLState & ( GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS ) ) == ( GLS_SRCBLEND_ZERO | GLS_DSTBLEND_ONE ) )
+			if ( ( stageGLState & ( GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS ) ) == ( GLS_SRCBLEND_ZERO | GLS_DSTBLEND_ONE ) )
 			{
 				continue;
 			}
@@ -3707,14 +3707,14 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 			
 			// see if we are a new-style stage
 			newShaderStage_t* newStage = pStage->newStage;
-			if( newStage != nullptr )
+			if ( newStage != nullptr )
 			{
 				//--------------------------
 				//
 				// new style stages
 				//
 				//--------------------------
-				if( r_skipNewAmbient.GetBool() )
+				if ( r_skipNewAmbient.GetBool() )
 				{
 					continue;
 				}
@@ -3739,7 +3739,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 				}
 				
 				// set rpEnableSkinning if the shader has optional support for skinning
-				if( surf->jointCache && renderProgManager.ShaderHasOptionalSkinning() )
+				if ( surf->jointCache && renderProgManager.ShaderHasOptionalSkinning() )
 				{
 					const anVec4 skinningParm( 1.0f );
 					SetVertexParm( RENDERPARM_ENABLE_SKINNING, skinningParm.ToFloatPtr() );
@@ -3749,7 +3749,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 				for( int j = 0; j < newStage->numFragmentProgramImages; j++ )
 				{
 					anImage* image = newStage->fragmentProgramImages[j];
-					if( image != nullptr )
+					if ( image != nullptr )
 					{
 						GL_SelectTexture( j );
 						image->Bind();
@@ -3763,7 +3763,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 				for( int j = 0; j < newStage->numFragmentProgramImages; j++ )
 				{
 					anImage* image = newStage->fragmentProgramImages[j];
-					if( image != nullptr )
+					if ( image != nullptr )
 					{
 						GL_SelectTexture( j );
 						globalImages->BindNull();
@@ -3771,7 +3771,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 				}
 				
 				// clear rpEnableSkinning if it was set
-				if( surf->jointCache && renderProgManager.ShaderHasOptionalSkinning() )
+				if ( surf->jointCache && renderProgManager.ShaderHasOptionalSkinning() )
 				{
 					const anVec4 skinningParm( 0.0f );
 					SetVertexParm( RENDERPARM_ENABLE_SKINNING, skinningParm.ToFloatPtr() );
@@ -3798,14 +3798,14 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 			color[3] = regs[ pStage->color.registers[3] ];
 			
 			// skip the entire stage if an add would be black
-			if( ( stageGLState & ( GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS ) ) == ( GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE )
+			if ( ( stageGLState & ( GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS ) ) == ( GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE )
 					&& color[0] <= 0 && color[1] <= 0 && color[2] <= 0 )
 			{
 				continue;
 			}
 			
 			// skip the entire stage if a blend would be completely transparent
-			if( ( stageGLState & ( GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS ) ) == ( GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA )
+			if ( ( stageGLState & ( GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS ) ) == ( GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA )
 					&& color[3] <= 0 )
 			{
 				continue;
@@ -3816,15 +3816,15 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 			renderLog.OpenBlock( "Old Shader Stage" );
 			GL_Color( color );
 			
-			if( surf->space->isGuiSurface )
+			if ( surf->space->isGuiSurface )
 			{
 				// Force gui surfaces to always be SVC_MODULATE
 				svc = SVC_MODULATE;
 				
 				// use special shaders for bink cinematics
-				if( pStage->texture.cinematic )
+				if ( pStage->texture.cinematic )
 				{
-					if( ( stageGLState & GLS_OVERRIDE ) != 0 )
+					if ( ( stageGLState & GLS_OVERRIDE ) != 0 )
 					{
 						// This is a hack... Only SWF Guis set GLS_OVERRIDE
 						// Old style guis do not, and we don't want them to use the new GUI renederProg
@@ -3837,7 +3837,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 				}
 				else
 				{
-					if( ( stageGLState & GLS_OVERRIDE ) != 0 )
+					if ( ( stageGLState & GLS_OVERRIDE ) != 0 )
 					{
 						// This is a hack... Only SWF Guis set GLS_OVERRIDE
 						// Old style guis do not, and we don't want them to use the new GUI renderProg
@@ -3845,7 +3845,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 					}
 					else
 					{
-						if( surf->jointCache )
+						if ( surf->jointCache )
 						{
 							renderProgManager.BindShader_TextureVertexColorSkinned();
 						}
@@ -3856,17 +3856,17 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 					}
 				}
 			}
-			else if( ( pStage->texture.texgen == TG_SCREEN ) || ( pStage->texture.texgen == TG_SCREEN2 ) )
+			else if ( ( pStage->texture.texgen == TG_SCREEN ) || ( pStage->texture.texgen == TG_SCREEN2 ) )
 			{
 				renderProgManager.BindShader_TextureTexGenVertexColor();
 			}
-			else if( pStage->texture.cinematic )
+			else if ( pStage->texture.cinematic )
 			{
 				renderProgManager.BindShader_Bink();
 			}
 			else
 			{
-				if( surf->jointCache )
+				if ( surf->jointCache )
 				{
 					renderProgManager.BindShader_TextureVertexColorSkinned();
 				}
@@ -3882,7 +3882,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 			RB_BindVariableStageImage( &pStage->texture, regs );
 			
 			// set privatePolygonOffset if necessary
-			if( pStage->privatePolygonOffset )
+			if ( pStage->privatePolygonOffset )
 			{
 				GL_PolygonOffset( r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * pStage->privatePolygonOffset );
 				stageGLState |= GLS_POLYGON_OFFSET;
@@ -3899,7 +3899,7 @@ static int RB_DrawShaderPasses( const drawSurf_t* const* const drawSurfs, const 
 			RB_FinishStageTexturing( pStage, surf );
 			
 			// unset privatePolygonOffset if necessary
-			if( pStage->privatePolygonOffset )
+			if ( pStage->privatePolygonOffset )
 			{
 				GL_PolygonOffset( r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset() );
 			}
@@ -3933,12 +3933,12 @@ static void RB_T_BlendLight( const drawSurf_t* drawSurfs, const viewLight_t* vLi
 	backEnd.currentSpace = nullptr;
 	
 	for( const drawSurf_t* drawSurf = drawSurfs; drawSurf != nullptr; drawSurf = drawSurf->nextOnLight ) {
-		if( drawSurf->scissorRect.IsEmpty() ) {
+		if ( drawSurf->scissorRect.IsEmpty() ) {
 			continue;	// !@# FIXME: find out why this is sometimes being hit!
 			// temporarily jump over the scissor and draw so the gl error callback doesn't get hit
 		}
 		
-		if( !backEnd.currentScissor.Equals( drawSurf->scissorRect ) && r_useScissor.GetBool() ) {
+		if ( !backEnd.currentScissor.Equals( drawSurf->scissorRect ) && r_useScissor.GetBool() ) {
 			// change the scissor
 			GL_Scissor( backEnd.viewDef->viewport.x1 + drawSurf->scissorRect.x1,
 						backEnd.viewDef->viewport.y1 + drawSurf->scissorRect.y1,
@@ -3947,7 +3947,7 @@ static void RB_T_BlendLight( const drawSurf_t* drawSurfs, const viewLight_t* vLi
 			backEnd.currentScissor = drawSurf->scissorRect;
 		}
 		
-		if( drawSurf->space != backEnd.currentSpace ) {
+		if ( drawSurf->space != backEnd.currentSpace ) {
 			// change the matrix
 			RB_SetMVP( drawSurf->space->mvp );
 			// change the light projection matrix
@@ -3978,17 +3978,17 @@ mode to the framebuffer, instead of interacting with the surface texture
 */
 static void RB_BlendLight( const drawSurf_t* drawSurfs, const drawSurf_t* drawSurfs2, const viewLight_t* vLight )
 {
-	if( drawSurfs == nullptr )
+	if ( drawSurfs == nullptr )
 	{
 		return;
 	}
-	if( r_skipBlendLights.GetBool() )
+	if ( r_skipBlendLights.GetBool() )
 	{
 		return;
 	}
 	renderLog.OpenBlock( vLight->lightShader->GetName() );
 	
-	const idMaterial* lightShader = vLight->lightShader;
+	const anMaterial* lightShader = vLight->lightShader;
 	const float*	 regs = vLight->shaderRegisters;
 	
 	// texture 1 will get the falloff texture
@@ -4004,7 +4004,7 @@ static void RB_BlendLight( const drawSurf_t* drawSurfs, const drawSurf_t* drawSu
 	{
 		const shaderStage_t*	stage = lightShader->GetStage( i );
 		
-		if( !regs[ stage->conditionRegister ] )
+		if ( !regs[ stage->conditionRegister ] )
 		{
 			continue;
 		}
@@ -4014,7 +4014,7 @@ static void RB_BlendLight( const drawSurf_t* drawSurfs, const drawSurf_t* drawSu
 		GL_SelectTexture( 0 );
 		stage->texture.image->Bind();
 		
-		if( stage->texture.hasMatrix )
+		if ( stage->texture.hasMatrix )
 		{
 			RB_LoadShaderTextureMatrix( regs, &stage->texture );
 		}
@@ -4059,13 +4059,13 @@ static void RB_T_BasicFog( const drawSurf_t* drawSurfs, const idPlane fogPlanes[
 	
 	for( const drawSurf_t* drawSurf = drawSurfs; drawSurf != nullptr; drawSurf = drawSurf->nextOnLight )
 	{
-		if( drawSurf->scissorRect.IsEmpty() )
+		if ( drawSurf->scissorRect.IsEmpty() )
 		{
 			continue;	// !@# FIXME: find out why this is sometimes being hit!
 			// temporarily jump over the scissor and draw so the gl error callback doesn't get hit
 		}
 		
-		if( !backEnd.currentScissor.Equals( drawSurf->scissorRect ) && r_useScissor.GetBool() )
+		if ( !backEnd.currentScissor.Equals( drawSurf->scissorRect ) && r_useScissor.GetBool() )
 		{
 			// change the scissor
 			GL_Scissor( backEnd.viewDef->viewport.x1 + drawSurf->scissorRect.x1,
@@ -4075,10 +4075,10 @@ static void RB_T_BasicFog( const drawSurf_t* drawSurfs, const idPlane fogPlanes[
 			backEnd.currentScissor = drawSurf->scissorRect;
 		}
 		
-		if( drawSurf->space != backEnd.currentSpace )
+		if ( drawSurf->space != backEnd.currentSpace )
 		{
 			idPlane localFogPlanes[4];
-			if( inverseBaseLightProject == nullptr )
+			if ( inverseBaseLightProject == nullptr )
 			{
 				RB_SetMVP( drawSurf->space->mvp );
 				for( int i = 0; i < 4; i++ )
@@ -4105,7 +4105,7 @@ static void RB_T_BasicFog( const drawSurf_t* drawSurfs, const idPlane fogPlanes[
 			backEnd.currentSpace = ( inverseBaseLightProject == nullptr ) ? drawSurf->space : nullptr;
 		}
 		
-		if( drawSurf->jointCache )
+		if ( drawSurf->jointCache )
 		{
 			renderProgManager.BindShader_FogSkinned();
 		}
@@ -4127,7 +4127,7 @@ static void RB_FogPass( const drawSurf_t* drawSurfs,  const drawSurf_t* drawSurf
 	renderLog.OpenBlock( vLight->lightShader->GetName() );
 	
 	// find the current color and density of the fog
-	const idMaterial* lightShader = vLight->lightShader;
+	const anMaterial* lightShader = vLight->lightShader;
 	const float* regs = vLight->shaderRegisters;
 	// assume fog shaders have only a single stage
 	const shaderStage_t* stage = lightShader->GetStage( 0 );
@@ -4144,7 +4144,7 @@ static void RB_FogPass( const drawSurf_t* drawSurfs,  const drawSurf_t* drawSurf
 	float a;
 	
 	// if they left the default value on, set a fog distance of 500
-	if( lightColor[3] <= 1.0f )
+	if ( lightColor[3] <= 1.0f )
 	{
 		a = -0.5f / DEFAULT_FOG_DISTANCE;
 	}
@@ -4274,9 +4274,9 @@ void RB_DrawViewInternal( const viewDef_t* viewDef, const int stereoEye ) {
 	for( int i = 0; i < numDrawSurfs; i++ )
 	{
 		const drawSurf_t* ds = viewDef->drawSurfs[i];
-		if( ds->material != nullptr )
+		if ( ds->material != nullptr )
 		{
-			const_cast<idMaterial*>( ds->material )->EnsureNotPurged();
+			const_cast<anMaterial*>( ds->material )->EnsureNotPurged();
 		}
 	}
 	
@@ -4353,7 +4353,7 @@ void RB_DrawViewInternal( const viewDef_t* viewDef, const int stereoEye ) {
 	// now draw any non-light dependent shading passes
 	//-------------------------------------------------
 	int processed = 0;
-	if( !r_skipShaderPasses.GetBool() )
+	if ( !r_skipShaderPasses.GetBool() )
 	{
 		renderLog.OpenMainBlock( MRB_DRAW_SHADER_PASSES );
 		float guiScreenOffset;
@@ -4366,7 +4366,7 @@ void RB_DrawViewInternal( const viewDef_t* viewDef, const int stereoEye ) {
 		{
 			// Koz fixme guiScreenOffset = stereoEye * viewDef->renderView.stereoScreenSeparation;
 			
-			extern idCVar vr_guiSeparation;
+			extern anCVar vr_guiSeparation;
 			guiScreenOffset = stereoEye * vr_guiSeparation.GetFloat(); //viewDef->renderView.stereoScreenSeparation;
 
 		}
@@ -4383,7 +4383,7 @@ void RB_DrawViewInternal( const viewDef_t* viewDef, const int stereoEye ) {
 	//-------------------------------------------------
 	// capture the depth for the motion blur before rendering any post process surfaces that may contribute to the depth
 	//-------------------------------------------------
-	if( r_motionBlur.GetInteger() > 0 )
+	if ( r_motionBlur.GetInteger() > 0 )
 	{
 		const idScreenRect& viewport = backEnd.viewDef->viewport;
 		globalImages->currentDepthImage->CopyDepthbuffer( viewport.x1, viewport.y1, viewport.GetWidth(), viewport.GetHeight() );
@@ -4392,7 +4392,7 @@ void RB_DrawViewInternal( const viewDef_t* viewDef, const int stereoEye ) {
 	//-------------------------------------------------
 	// now draw any screen warping post-process effects using _currentRender
 	//-------------------------------------------------
-	if( processed < numDrawSurfs && !r_skipPostProcess.GetBool() )
+	if ( processed < numDrawSurfs && !r_skipPostProcess.GetBool() )
 	{
 		
 		int x = backEnd.viewDef->viewport.x1;
@@ -4449,14 +4449,14 @@ Experimental feature
 ==================
 */
 void RB_MotionBlur() {
-	if( !backEnd.viewDef->viewEntitys ) {
+	if ( !backEnd.viewDef->viewEntitys ) {
 		// 3D views only
 		return;
 	}
-	if( r_motionBlur.GetInteger() <= 0 ) {
+	if ( r_motionBlur.GetInteger() <= 0 ) {
 		return;
 	}
-	if( backEnd.viewDef->isSubview ) {
+	if ( backEnd.viewDef->isSubview ) {
 		return;
 	}
 	
@@ -4475,26 +4475,26 @@ void RB_MotionBlur() {
 	drawSurf_t** drawSurfs = ( drawSurf_t** )&backEnd.viewDef->drawSurfs[0];
 	for ( int surfNum = 0; surfNum < backEnd.viewDef->numDrawSurfs; surfNum++ ) {
 		const drawSurf_t* surf = drawSurfs[ surfNum ];
-		if( !surf->space->weaponDepthHack && !surf->space->skipMotionBlur && !surf->material->HasSubview() ) {
+		if ( !surf->space->weaponDepthHack && !surf->space->skipMotionBlur && !surf->material->HasSubview() ) {
 			// Apply motion blur to this object
 			continue;
 		}
 		
-		const idMaterial* shader = surf->material;
-		if( shader->Coverage() == MC_TRANSLUCENT ) {
+		const anMaterial* shader = surf->material;
+		if ( shader->Coverage() == MC_TRANSLUCENT ) {
 			// muzzle flash, etc
 			continue;
 		}
 
 		// set mvp matrix
-		if( surf->space != backEnd.currentSpace )
+		if ( surf->space != backEnd.currentSpace )
 		{
 			RB_SetMVP( surf->space->mvp );
 			backEnd.currentSpace = surf->space;
 		}
 
 		// this could just be a color, but we don't have a skinned color-only prog
-		if( surf->jointCache )
+		if ( surf->jointCache )
 		{
 			renderProgManager.BindShader_TextureVertexColorSkinned();
 		}
@@ -4564,13 +4564,13 @@ void RB_DrawView( const void* data, const int stereoEye ) {
 	backEnd.currentRenderCopied = false;
 	
 	// if there aren't any drawsurfs, do nothing
-	if( !backEnd.viewDef->numDrawSurfs ) {
+	if ( !backEnd.viewDef->numDrawSurfs ) {
 		return;
 	}
 	
 	// skip render bypasses everything that has models, assuming
 	// them to be 3D views, but leaves 2D rendering visible
-	if( r_skipRender.GetBool() && backEnd.viewDef->viewEntitys ) {
+	if ( r_skipRender.GetBool() && backEnd.viewDef->viewEntitys ) {
 		return;
 	}
 	
@@ -4579,7 +4579,7 @@ void RB_DrawView( const void* data, const int stereoEye ) {
 	// that all gl calls just return if the context isn't valid
 	
 	// RB: not really needed
-	//if( r_skipRenderContext.GetBool() && backEnd.viewDef->viewEntitys )
+	//if ( r_skipRenderContext.GetBool() && backEnd.viewDef->viewEntitys )
 	//{
 	//	GLimp_DeactivateContext();
 	//}
@@ -4598,11 +4598,11 @@ void RB_DrawView( const void* data, const int stereoEye ) {
 	{
 			
 		static anVec3 hmdPosDelta = vec3_zero;
-		static idMat3 hmdAxisDelta = mat3_identity;
+		static anMat3 hmdAxisDelta = mat3_identity;
 		static float ipdOffset = 0.0f;
 
 		anVec3 &drawViewOrigin = cmd->viewDef->renderView.vieworg;
-		idMat3 &drawViewAxis = cmd->viewDef->renderView.viewaxis;
+		anMat3 &drawViewAxis = cmd->viewDef->renderView.viewaxis;
 		
 		hmdPosDelta = ( commonVr->poseHmdAbsolutePosition - commonVr->poseLastHmdAbsolutePosition ) ; // the delta in hmd position since the frame was initialy created and now
 		hmdAxisDelta = commonVr->poseHmdAngles.ToMat3() * commonVr->poseLastHmdAngles.ToMat3().Inverse();// the delta in hmd rotation since the frame was initialy created and now
@@ -4658,7 +4658,7 @@ void RB_DrawView( const void* data, const int stereoEye ) {
 	
 	// restore the context for 2D drawing if we were stubbing it out
 	// RB: not really needed
-	//if( r_skipRenderContext.GetBool() && backEnd.viewDef->viewEntitys )
+	//if ( r_skipRenderContext.GetBool() && backEnd.viewDef->viewEntitys )
 	//{
 	//	GLimp_ActivateContext();
 	//	GL_SetDefaultState();
@@ -4666,7 +4666,7 @@ void RB_DrawView( const void* data, const int stereoEye ) {
 	// RB end
 	
 	// optionally draw a box colored based on the eye number
-	if( r_drawEyeColor.GetBool() ) {
+	if ( r_drawEyeColor.GetBool() ) {
 		const idScreenRect& r = backEnd.viewDef->viewport;
 		GL_Scissor( ( r.x1 + r.x2 ) / 2, ( r.y1 + r.y2 ) / 2, 32, 32 );
 		switch ( stereoEye ) {
@@ -4693,7 +4693,7 @@ Copy part of the current framebuffer to an image
 void RB_CopyRender( const void* data ) {
 	const copyRenderCommand_t* cmd = ( const copyRenderCommand_t* )data;
 	
-	if( r_skipCopyTexture.GetBool() ) {
+	if ( r_skipCopyTexture.GetBool() ) {
 		return;
 	}
 	
@@ -4714,7 +4714,7 @@ RB_PostProcess
 
 ==================
 */
-extern idCVar rs_enable;
+extern anCVar rs_enable;
 void RB_PostProcess( const void* data ) {
 	// only do the post process step if resolution scaling is enabled. Prevents the unnecessary copying of the framebuffer and
 	// corresponding full screen quad pass.

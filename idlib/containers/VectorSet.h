@@ -38,7 +38,7 @@ private:
 };
 
 template< class type, int dimension >
-ARC_INLINE anVectorSet<type,dimension>::anVectorSet( void ) {
+inline anVectorSet<type,dimension>::anVectorSet( void ) {
 	hash.Clear( anMath::IPow( boxHashSize, dimension ), 128 );
 	boxHashSize = 16;
 	memset( boxInvSize, 0, dimension * sizeof( boxInvSize[0] ) );
@@ -46,12 +46,12 @@ ARC_INLINE anVectorSet<type,dimension>::anVectorSet( void ) {
 }
 
 template< class type, int dimension >
-ARC_INLINE anVectorSet<type,dimension>::anVectorSet( const type &mins, const type &maxs, const int boxHashSize, const int initialSize ) {
+inline anVectorSet<type,dimension>::anVectorSet( const type &mins, const type &maxs, const int boxHashSize, const int initialSize ) {
 	Init( mins, maxs, boxHashSize, initialSize );
 }
 
 template< class type, int dimension >
-ARC_INLINE void anVectorSet<type,dimension>::Init( const type &mins, const type &maxs, const int boxHashSize, const int initialSize ) {
+inline void anVectorSet<type,dimension>::Init( const type &mins, const type &maxs, const int boxHashSize, const int initialSize ) {
 	int i;
 	float boxSize;
 
@@ -72,19 +72,19 @@ ARC_INLINE void anVectorSet<type,dimension>::Init( const type &mins, const type 
 }
 
 template< class type, int dimension >
-ARC_INLINE void anVectorSet<type,dimension>::ResizeIndex( const int newSize ) {
+inline void anVectorSet<type,dimension>::ResizeIndex( const int newSize ) {
 	anList<type>::Resize( newSize );
 	hash.ResizeIndex( newSize );
 }
 
 template< class type, int dimension >
-ARC_INLINE void anVectorSet<type,dimension>::Clear( void ) {
+inline void anVectorSet<type,dimension>::Clear( void ) {
 	anList<type>::Clear();
 	hash.Clear();
 }
 
 template< class type, int dimension >
-ARC_INLINE int anVectorSet<type,dimension>::FindVector( const type &v, const float epsilon ) {
+inline int anVectorSet<type,dimension>::FindVector( const type &v, const float epsilon ) {
 	int i, j, k, hashKey, partialHashKey[dimension];
 
 	for ( i = 0; i < dimension; i++ ) {
@@ -162,7 +162,7 @@ private:
 };
 
 template< class type, int dimension >
-ARC_INLINE anVectorSubset<type,dimension>::anVectorSubset( void ) {
+inline anVectorSubset<type,dimension>::anVectorSubset( void ) {
 	hash.Clear( anMath::IPow( boxHashSize, dimension ), 128 );
 	boxHashSize = 16;
 	memset( boxInvSize, 0, dimension * sizeof( boxInvSize[0] ) );
@@ -170,12 +170,12 @@ ARC_INLINE anVectorSubset<type,dimension>::anVectorSubset( void ) {
 }
 
 template< class type, int dimension >
-ARC_INLINE anVectorSubset<type,dimension>::anVectorSubset( const type &mins, const type &maxs, const int boxHashSize, const int initialSize ) {
+inline anVectorSubset<type,dimension>::anVectorSubset( const type &mins, const type &maxs, const int boxHashSize, const int initialSize ) {
 	Init( mins, maxs, boxHashSize, initialSize );
 }
 
 template< class type, int dimension >
-ARC_INLINE void anVectorSubset<type,dimension>::Init( const type &mins, const type &maxs, const int boxHashSize, const int initialSize ) {
+inline void anVectorSubset<type,dimension>::Init( const type &mins, const type &maxs, const int boxHashSize, const int initialSize ) {
 	int i;
 	float boxSize;
 
@@ -193,13 +193,13 @@ ARC_INLINE void anVectorSubset<type,dimension>::Init( const type &mins, const ty
 }
 
 template< class type, int dimension >
-ARC_INLINE void anVectorSubset<type,dimension>::Clear( void ) {
+inline void anVectorSubset<type,dimension>::Clear( void ) {
 	anList<type>::Clear();
 	hash.Clear();
 }
 
 template< class type, int dimension >
-ARC_INLINE int anVectorSubset<type,dimension>::FindVector( const type *vectorList, const int vectorNum, const float epsilon ) {
+inline int anVectorSubset<type,dimension>::FindVector( const type *vectorList, const int vectorNum, const float epsilon ) {
 	int i, j, k, hashKey, partialHashKey[dimension];
 	const type &v = vectorList[vectorNum];
 

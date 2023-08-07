@@ -63,13 +63,13 @@ protected:
 	virtual const char*	GetIdleAnimName					( void );
 	virtual void		OnStopMoving					( aiMoveCommand_t oldMoveCommand );
 	virtual void		OnPostureChange					( void );
-	virtual void		OnSetKey						( const char* key, const char* value );
+	virtual void		OnSetKey						( const char *key, const char *value );
 
 	bool				CheckRelaxed					( void ) const;
 
 	void				InitPostureInfo					( void );
 	bool				UpdatePosture					( void );
-	void				CalculateShots					( const char* fireAnim );
+	void				CalculateShots					( const char *fireAnim );
 	void				UseAmmo							( int amount );
 	void				SetPosture						( aiPosture_t newPosture );
 	void				UpdateAnimPrefix				( void );

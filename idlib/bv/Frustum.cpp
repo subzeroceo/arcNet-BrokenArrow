@@ -420,7 +420,7 @@ anFrustum::CullWinding
 */
 bool anFrustum::CullWinding( const anWinding &winding ) const {
 	anVec3 *localPoints = (anVec3 *) _alloca16( winding.GetNumPoints() * sizeof( anVec3 ) );
-	int *pointCull = ( int*) _alloca16( winding.GetNumPoints() * sizeof( int ) );
+	int *pointCull = (int *) _alloca16( winding.GetNumPoints() * sizeof( int ) );
 
 	anMat3 transpose = axis.Transpose();
 	for ( int i = 0; i < winding.GetNumPoints(); i++ ) {
@@ -1053,7 +1053,7 @@ bool anFrustum::IntersectsWinding( const anWinding &winding ) const {
 	anPlane plane;
 
 	anVec3 *localPoints = (anVec3 *) _alloca16( winding.GetNumPoints() * sizeof( anVec3 ) );
-	int *pointCull = ( int*) _alloca16( winding.GetNumPoints() * sizeof( int ) );
+	int *pointCull = (int *) _alloca16( winding.GetNumPoints() * sizeof( int ) );
 
 	anMat3 transpose = axis.Transpose();
 	for ( int i = 0; i < winding.GetNumPoints(); i++ ) {
@@ -2243,7 +2243,7 @@ bool anFrustum::ProjectionBounds( const anWinding &winding, anBounds &projection
 	// test the winding edges
 	culled = -1;
 	outside = 0;
-	pointCull = ( int*) _alloca16( winding.GetNumPoints() * sizeof( int ) );
+	pointCull = (int *) _alloca16( winding.GetNumPoints() * sizeof( int ) );
 	for ( i = 0; i < winding.GetNumPoints(); i += 2 ) {
 		p1 = i;
 		p2 = ( i+1 )%winding.GetNumPoints();
@@ -2507,7 +2507,7 @@ static int capPointIndex[4][2] = {
 	{ 2, 3 }
 };
 
-ARC_INLINE bool anFrustum::AddLocalCapsToProjectionBounds( const anVec3 endPoints[4], const int endPointCull[4], const anVec3 &point, int pointCull, int pointClip, anBounds &projectionBounds ) const {
+inline bool anFrustum::AddLocalCapsToProjectionBounds( const anVec3 endPoints[4], const int endPointCull[4], const anVec3 &point, int pointCull, int pointClip, anBounds &projectionBounds ) const {
 	int *p;
 
 	if ( pointClip < 0 ) {

@@ -22,7 +22,7 @@ void idWinVar::SetGuiInfo( anDict *gd, const char *_name ) {
 }
 
 void idWinVar::Init( const char *_name, idWindow *win ) {
-	anString key = _name;
+	anStr key = _name;
 	guiDict = nullptr;
 	int len = key.Length();
 	if (len > 5 && key[0] == 'g' && key[1] == 'u' && key[2] == 'i' && key[3] == ':') {

@@ -66,7 +66,7 @@ idWaveFile::~idWaveFile( void ) {
 // Name: idWaveFile::Open()
 // Desc: Opens a wave file for reading
 //-----------------------------------------------------------------------------
-int idWaveFile::Open( const char* strFileName, waveformatex_t* pwfx ) {
+int idWaveFile::Open( const char *strFileName, waveformatex_t* pwfx ) {
 
 	mbIsReadingFromMemory = false;
 
@@ -77,7 +77,7 @@ int idWaveFile::Open( const char* strFileName, waveformatex_t* pwfx ) {
 		return -1;
 	}
 
-	anString name = strFileName;
+	anStr name = strFileName;
 
 	// note: used to only check for .wav when making a build
 	name.SetFileExtension( ".ogg" );

@@ -1,15 +1,8 @@
-// Copyright (C) 2007 Id Software, Inc.
-//
-/*
-
-Various utility objects and functions.
-
-*/
-
-#include "Lib.h"
+#include "/idlib/Lib.h"
+#include "game_local.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -18,13 +11,16 @@ static char THIS_FILE[] = __FILE__;
 #include "Misc.h"
 #include "Player.h"
 #include "Camera.h"
-//#include "ai/AI.h"
+#include "ai/AI.h"
 #include "Projectile.h"
 #include "WorldSpawn.h"
 #include "ContentMask.h"
 #include "Moveable.h"
-#include "../decllib/declTypeHolder.h"
-#include "../decllib/declImposter.h"
+/*
+
+Various utility objects and functions.
+
+*/
 
 /*
 ===============================================================================
@@ -38,7 +34,7 @@ that can be bound to other entities.  Should not be subclassed.
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, idSpawnableEntity )
+CLASS_DECLARATION( anEntity, idSpawnableEntity )
 END_CLASS
 
 /*
@@ -57,13 +53,13 @@ sdModelStatic
 
 A simple, spawnable entity with a collision model and no functionable ability of its own.
 
-	NOTE: this entity is really a hack, and can go as soon as arcEntity is cleaned up
+	NOTE: this entity is really a hack, and can go as soon as anEntity is cleaned up
 	( that is, when it has no renderEntity anymore )
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, sdModelStatic )
+CLASS_DECLARATION( anEntity, sdModelStatic )
 END_CLASS
 
 /*
@@ -82,13 +78,13 @@ sdModelStatic::PostMapSpawn
 ===============
 */
 void sdModelStatic::PostMapSpawn( void ) {
-	arcEntity::PostMapSpawn();
+	anEntity::PostMapSpawn();
 
 	sdInstanceCollector< sdLODEntity > lodEntity( false );
 	if ( lodEntity.Num() < 1 ) {
 		return;
 	}
-	sdLODEntity* lodEnt = lodEntity[ 0 ];
+	sdLODEntity* lodEnt = lodEntity[0];
 
 	lodEnt->AddClipModel( new anClipModel( GetPhysics()->GetClipModel() ), GetPhysics()->GetOrigin(), GetPhysics()->GetAxis() );
 
@@ -100,18 +96,18 @@ void sdModelStatic::PostMapSpawn( void ) {
 sdModelStatic::InhibitSpawn
 ================
 */
-bool sdModelStatic::InhibitSpawn( const anDict& args ) {
+bool sdModelStatic::InhibitSpawn( const anDict &args ) {
 	if ( args.GetBool( "noClipModel" ) ) {
 		return true;
 	}
 
 	if ( args.GetBool( "mergecm" ) ) {
-		assert( 0 );	// jrad - the map compiler isn't doing its job if we ever get here
+		assert( 0 );	// the map compiler isn't doing its job if we ever get here
 		return true;
 	}
 
 	if ( args.GetBool( "inlineCollisionModel" ) ) {
-		assert( 0 );	// jrad - the map compiler isn't doing its job if we ever get here
+		assert( 0 );	// the map compiler isn't doing its job if we ever get here
 		return true;
 	}
 
@@ -161,55 +157,55 @@ void sdDynamicSpawnPoint::Spawn( void ) {
 sdDynamicSpawnPoint::CanCollide
 ==============
 */
-bool sdDynamicSpawnPoint::CanCollide( const arcEntity* other, int traceId ) const {
+bool sdDynamicSpawnPoint::CanCollide( const anEntity *other, int traceId ) const {
 	if ( traceId == TM_THIRDPERSON_OFFSET ) {
 		return false;
 	}
-	return arcEntity::CanCollide( other, traceId );
+	return anEntity::CanCollide( other, traceId );
 }
 
 /*
 ===============================================================================
 
-	arcNetBasePlayerStart
+	anBasePlayerStart
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, arcNetBasePlayerStart )
+CLASS_DECLARATION( anEntity, anBasePlayerStart )
 END_CLASS
 
 /*
 ===============
-arcNetBasePlayerStart::arcNetBasePlayerStart
+anBasePlayerStart::anBasePlayerStart
 ================
 */
-arcNetBasePlayerStart::arcNetBasePlayerStart( void ) {
+anBasePlayerStart::anBasePlayerStart( void ) {
 }
 
 /*
 ===============
-arcNetBasePlayerStart::InhibitSpawn
+anBasePlayerStart::InhibitSpawn
 ================
 */
-bool arcNetBasePlayerStart::InhibitSpawn( const anDict& args ) {
+bool anBasePlayerStart::InhibitSpawn( const anDict &args ) {
 	return gameLocal.isClient && !gameLocal.serverIsRepeater;
 }
 
 /*
 ===============
-arcNetBasePlayerStart::PostMapSpawn
+anBasePlayerStart::PostMapSpawn
 ================
 */
-void arcNetBasePlayerStart::PostMapSpawn( void ) {
-	sdSpawnPoint* spot;
+void anBasePlayerStart::PostMapSpawn( void ) {
+	idSpawnPoint *spot;
 
 	anAngles angles;
 
-	const char* targetName = spawnArgs.GetString( "target" );
-	arcEntity* target = gameLocal.FindEntity( targetName );
+	const char *targetName = spawnArgs.GetString( "target" );
+	anEntity *target = gameLocal.FindEntity( targetName );
 
-	const char* ownerName = spawnArgs.GetString( "owner" );
+	const char *ownerName = spawnArgs.GetString( "owner" );
 
 	bool parachute = spawnArgs.GetBool( "parachute" );
 	anVec3 origin = GetPhysics()->GetOrigin();
@@ -218,9 +214,9 @@ void arcNetBasePlayerStart::PostMapSpawn( void ) {
 	}
 
 	if ( *ownerName ) {
-		arcEntity* owner = gameLocal.FindEntity( ownerName );
+		anEntity *owner = gameLocal.FindEntity( ownerName );
 		if ( !owner ) {
-			gameLocal.Error( "arcNetBasePlayerStart::PostMapSpawn Could not find owner '%s'", ownerName );
+			gameLocal.Error( "anBasePlayerStart::PostMapSpawn Could not find owner '%s'", ownerName );
 		}
 
 		anVec3 org = ( origin - owner->GetPhysics()->GetOrigin() ) * owner->GetPhysics()->GetAxis().Transpose();
@@ -253,38 +249,38 @@ void arcNetBasePlayerStart::PostMapSpawn( void ) {
 /*
 ===============================================================================
 
-  arcForceField
+  anForceField
 
 ===============================================================================
 */
 
-const arcEventDef EV_Toggle( "toggle", '\0', DOC_TEXT( "Toggles the state of the force field." ), 0, "Calling $event:activate$ on a force field will toggle the state, then reset it after a set wait period, using $event:toggle$ will not reset." );
+const anEventDef EV_Toggle( "toggle", '\0', DOC_TEXT( "Toggles the state of the force field." ), 0, "Calling $event:activate$ on a force field will toggle the state, then reset it after a set wait period, using $event:toggle$ will not reset." );
 
-CLASS_DECLARATION( arcEntity, arcForceField )
-	EVENT( EV_Activate,		arcForceField::Event_Activate )
-	EVENT( EV_Toggle,		arcForceField::Event_Toggle )
-	EVENT( EV_FindTargets,	arcForceField::Event_FindTargets )
-	EVENT( EV_GetMins,		arcForceField::Event_GetMins )
-	EVENT( EV_GetMaxs,		arcForceField::Event_GetMaxs )
+CLASS_DECLARATION( anEntity, anForceField )
+	EVENT( EV_Activate,		anForceField::Event_Activate )
+	EVENT( EV_Toggle,		anForceField::Event_Toggle )
+	EVENT( EV_FindTargets,	anForceField::Event_FindTargets )
+	EVENT( EV_GetMins,		anForceField::Event_GetMins )
+	EVENT( EV_GetMaxs,		anForceField::Event_GetMaxs )
 END_CLASS
 
 anCVar g_debugForceFields( "g_debugForceFields", "0", CVAR_GAME | CVAR_BOOL, "" );
 
 /*
 ===============
-arcForceField::Toggle
+anForceField::Toggle
 ================
 */
-void arcForceField::Toggle( void ) {
+void anForceField::Toggle( void ) {
 	active = !active;
 }
 
 /*
 ================
-arcForceField::Think
+anForceField::Think
 ================
 */
-void arcForceField::Think( void ) {
+void anForceField::Think( void ) {
 	if ( active ) {
 		// evaluate force
 		forceField.Evaluate( gameLocal.time );
@@ -298,10 +294,10 @@ void arcForceField::Think( void ) {
 
 /*
 ================
-arcForceField::Spawn
+anForceField::Spawn
 ================
 */
-void arcForceField::Spawn( void ) {
+void anForceField::Spawn( void ) {
 	anVec3 uniform;
 	float explosion, implosion, randomTorque;
 
@@ -343,19 +339,19 @@ void arcForceField::Spawn( void ) {
 
 /*
 ===============
-arcForceField::Event_Toggle
+anForceField::Event_Toggle
 ================
 */
-void arcForceField::Event_Toggle( void ) {
+void anForceField::Event_Toggle( void ) {
 	Toggle();
 }
 
 /*
 ================
-arcForceField::Event_Activate
+anForceField::Event_Activate
 ================
 */
-void arcForceField::Event_Activate( arcEntity *activator ) {
+void anForceField::Event_Activate( anEntity *activator ) {
 	float wait;
 
 	Toggle();
@@ -366,10 +362,10 @@ void arcForceField::Event_Activate( arcEntity *activator ) {
 
 /*
 ================
-arcForceField::Event_FindTargets
+anForceField::Event_FindTargets
 ================
 */
-void arcForceField::Event_FindTargets( void ) {
+void anForceField::Event_FindTargets( void ) {
 	FindTargets();
 	RemoveNullTargets();
 	if ( targets.Num() ) {
@@ -379,346 +375,20 @@ void arcForceField::Event_FindTargets( void ) {
 
 /*
 ================
-arcForceField::Event_GetMins
+anForceField::Event_GetMins
 ================
 */
-void arcForceField::Event_GetMins( void ) {
-	sdProgram::ReturnVector( forceField.GetClipModel()->GetBounds()[ 0 ] );
+void anForceField::Event_GetMins( void ) {
+	idProgram::ReturnVector( forceField.GetClipModel()->GetBounds()[0] );
 }
 
 /*
 ================
-arcForceField::Event_GetMaxs
+anForceField::Event_GetMaxs
 ================
 */
-void arcForceField::Event_GetMaxs( void ) {
-	sdProgram::ReturnVector( forceField.GetClipModel()->GetBounds()[ 1 ] );
-}
-
-
-/*
-===============================================================================
-
-	arcAnimated
-
-===============================================================================
-*/
-
-const arcEventDefInternal EV_Animated_Start( "internal_start" );
-const arcEventDefInternal EV_AnimDone( "internal_animDone", "d" );
-const arcEventDef EV_StartRagdoll( "startRagdoll", '\0', DOC_TEXT( "Switches the entity into ragdoll mode from its current animation pose." ), 0, "This will do nothing if the entity does not have an $decl:articulatedFigure$ set up." );
-
-CLASS_DECLARATION( arcAFEntity_Base, arcAnimated )
-	EVENT( EV_Activate,				arcAnimated::Event_Activate )
-	EVENT( EV_Animated_Start,		arcAnimated::Event_Start )
-	EVENT( EV_StartRagdoll,			arcAnimated::Event_StartRagdoll )
-	EVENT( EV_AnimDone,				arcAnimated::Event_AnimDone )
-END_CLASS
-
-/*
-===============
-arcAnimated::arcAnimated
-================
-*/
-arcAnimated::arcAnimated() {
-	anim = 0;
-	blendFrames = 0;
-	soundJoint = INVALID_JOINT;
-	activated = false;
-	combatModel = nullptr;
-	activator = nullptr;
-	current_anim_index = 0;
-	num_anims = 0;
-
-}
-
-/*
-===============
-arcAnimated::arcAnimated
-================
-*/
-arcAnimated::~arcAnimated() {
-	gameLocal.clip.DeleteClipModel( combatModel );
-	combatModel = nullptr;
-}
-
-/*
-===============
-arcAnimated::Spawn
-================
-*/
-void arcAnimated::Spawn( void ) {
-	anString		animname;
-	int			anim2;
-	float		wait;
-	const char	*joint;
-
-	joint = spawnArgs.GetString( "sound_bone", "origin" );
-	soundJoint = animator.GetJointHandle( joint );
-	if ( soundJoint == INVALID_JOINT ) {
-		gameLocal.Warning( "arcAnimated '%s' at (%s): cannot find joint '%s' for sound playback", name.c_str(), GetPhysics()->GetOrigin().ToString(0), joint );
-	}
-
-	LoadAF();
-
-	// allow bullets to collide with a combat model
-	if ( spawnArgs.GetBool( "combatModel", "0" ) ) {
-		combatModel = new anClipModel( modelDefHandle );
-	}
-
-	// allow the entity to take damage
-	if ( spawnArgs.GetBool( "takeDamage", "0" ) ) {
-		fl.takedamage = true;
-	}
-
-	blendFrames = 0;
-
-	current_anim_index = 0;
-	spawnArgs.GetInt( "num_anims", "0", num_anims );
-
-	blendFrames = spawnArgs.GetInt( "blend_in" );
-
-	animname = spawnArgs.GetString( num_anims ? "anim1" : "anim" );
-	if ( !animname.Length() ) {
-		anim = 0;
-	} else {
-		anim = animator.GetAnim( animname );
-		if ( !anim ) {
-			gameLocal.Error( "arcAnimated '%s' at (%s): cannot find anim '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), animname.c_str() );
-		}
-	}
-
-	if ( spawnArgs.GetBool( "hide" ) ) {
-		Hide();
-
-		if ( !num_anims ) {
-			blendFrames = 0;
-		}
-	} else if ( spawnArgs.GetString( "start_anim", "", animname ) ) {
-		anim2 = animator.GetAnim( animname );
-		if ( !anim2 ) {
-			gameLocal.Error( "arcAnimated '%s' at (%s): cannot find anim '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), animname.c_str() );
-		}
-		animator.CycleAnim( ANIMCHANNEL_ALL, anim2, gameLocal.time, 0 );
-	} else if ( anim ) {
-		// init joints to the first frame of the animation
-		animator.SetFrame( ANIMCHANNEL_ALL, anim, 1, gameLocal.time, 0 );
-
-		if ( !num_anims ) {
-			blendFrames = 0;
-		}
-	}
-
-	spawnArgs.GetFloat( "wait", "-1", wait );
-
-	if ( wait >= 0 ) {
-		PostEventSec( &EV_Activate, wait, this );
-	}
-}
-
-/*
-===============
-arcAnimated::LoadAF
-===============
-*/
-bool arcAnimated::LoadAF( void ) {
-	anString fileName;
-
-	if ( !spawnArgs.GetString( "ragdoll", "*unknown*", fileName ) ) {
-		return false;
-	}
-	af.SetAnimator( GetAnimator() );
-	return af.Load( this, fileName );
-}
-
-/*
-===============
-arcAnimated::GetPhysicsToSoundTransform
-===============
-*/
-bool arcAnimated::GetPhysicsToSoundTransform( anVec3 &origin, anMat3 &axis ) {
-	animator.GetJointTransform( soundJoint, gameLocal.time, origin, axis );
-	axis = renderEntity.axis;
-	return true;
-}
-
-/*
-================
-arcAnimated::StartRagdoll
-================
-*/
-bool arcAnimated::StartRagdoll( void ) {
-	// if no AF loaded
-	if ( !af.IsLoaded() ) {
-		return false;
-	}
-
-	// if the AF is already active
-	if ( af.IsActive() ) {
-		return true;
-	}
-
-	// disable any collision model used
-	GetPhysics()->UnlinkClip();
-
-	// start using the AF
-	af.StartFromCurrentPose( spawnArgs.GetInt( "velocityTime", "0" ) );
-
-	return true;
-}
-
-/*
-=====================
-arcAnimated::PlayNextAnim
-=====================
-*/
-void arcAnimated::PlayNextAnim( void ) {
-	const char *animname;
-	int len;
-	int cycle;
-
-	if ( current_anim_index >= num_anims ) {
-		Hide();
-		if ( spawnArgs.GetBool( "remove" ) ) {
-			PostEventMS( &EV_Remove, 0 );
-		} else {
-			current_anim_index = 0;
-		}
-		return;
-	}
-
-	Show();
-	current_anim_index++;
-
-	spawnArgs.GetString( va( "anim%d", current_anim_index ), nullptr, &animname );
-	if ( !animname ) {
-		anim = 0;
-		animator.Clear( ANIMCHANNEL_ALL, gameLocal.time, FRAME2MS( blendFrames ) );
-		return;
-	}
-
-	anim = animator.GetAnim( animname );
-	if ( !anim ) {
-		gameLocal.Warning( "missing anim '%s' on %s", animname, name.c_str() );
-		return;
-	}
-
-	if ( g_debugCinematic.GetBool() ) {
-		gameLocal.Printf( "%d: '%s' start anim '%s'\n", gameLocal.framenum, GetName(), animname );
-	}
-
-	spawnArgs.GetInt( "cycle", "1", cycle );
-	if ( ( current_anim_index == num_anims ) && spawnArgs.GetBool( "loop_last_anim" ) ) {
-		cycle = -1;
-	}
-
-	animator.CycleAnim( ANIMCHANNEL_ALL, anim, gameLocal.time, FRAME2MS( blendFrames ) );
-	animator.CurrentAnim( ANIMCHANNEL_ALL )->SetCycleCount( cycle );
-
-	len = animator.CurrentAnim( ANIMCHANNEL_ALL )->PlayLength();
-	if ( len >= 0 ) {
-		PostEventMS( &EV_AnimDone, len, current_anim_index );
-	}
-
-	// offset the start time of the shader to sync it to the game time
-	renderEntity.shaderParms[ SHADERPARM_TIMEOFFSET ] = -MS2SEC( gameLocal.time );
-
-	animator.ForceUpdate();
-	UpdateAnimation();
-	UpdateVisuals();
-	Present();
-}
-
-/*
-===============
-arcAnimated::Event_StartRagdoll
-================
-*/
-void arcAnimated::Event_StartRagdoll( void ) {
-	StartRagdoll();
-}
-
-/*
-===============
-arcAnimated::Event_AnimDone
-================
-*/
-void arcAnimated::Event_AnimDone( int animindex ) {
-	if ( g_debugCinematic.GetBool() ) {
-		const arcAnim *animPtr = animator.GetAnim( anim );
-		gameLocal.Printf( "%d: '%s' end anim '%s'\n", gameLocal.framenum, GetName(), animPtr ? animPtr->Name() : "" );
-	}
-
-	if ( ( animindex >= num_anims ) && spawnArgs.GetBool( "remove" ) ) {
-		Hide();
-		PostEventMS( &EV_Remove, 0 );
-	} else if ( spawnArgs.GetBool( "auto_advance" ) ) {
-		PlayNextAnim();
-	} else {
-		activated = false;
-	}
-}
-
-/*
-===============
-arcAnimated::Event_Activate
-================
-*/
-void arcAnimated::Event_Activate( arcEntity *_activator ) {
-	if ( num_anims ) {
-		PlayNextAnim();
-		activator = _activator;
-		return;
-	}
-
-	if ( activated ) {
-		// already activated
-		return;
-	}
-
-	activated = true;
-	activator = _activator;
-	ProcessEvent( &EV_Animated_Start );
-}
-
-/*
-===============
-arcAnimated::Event_Start
-================
-*/
-void arcAnimated::Event_Start( void ) {
-	int cycle;
-	int len;
-
-	Show();
-
-	if ( num_anims ) {
-		PlayNextAnim();
-		return;
-	}
-
-	if ( anim ) {
-		if ( g_debugCinematic.GetBool() ) {
-			const arcAnim *animPtr = animator.GetAnim( anim );
-			gameLocal.Printf( "%d: '%s' start anim '%s'\n", gameLocal.framenum, GetName(), animPtr ? animPtr->Name() : "" );
-		}
-		spawnArgs.GetInt( "cycle", "1", cycle );
-		animator.CycleAnim( ANIMCHANNEL_ALL, anim, gameLocal.time, FRAME2MS( blendFrames ) );
-		animator.CurrentAnim( ANIMCHANNEL_ALL )->SetCycleCount( cycle );
-
-		len = animator.CurrentAnim( ANIMCHANNEL_ALL )->PlayLength();
-		if ( len >= 0 ) {
-			PostEventMS( &EV_AnimDone, len, 1 );
-		}
-	}
-
-	// offset the start time of the shader to sync it to the game time
-	renderEntity.shaderParms[ SHADERPARM_TIMEOFFSET ] = -MS2SEC( gameLocal.time );
-
-	animator.ForceUpdate();
-	UpdateAnimation();
-	UpdateVisuals();
-	Present();
+void anForceField::Event_GetMaxs( void ) {
+	idProgram::ReturnVector( forceField.GetClipModel()->GetBounds()[1] );
 }
 
 /*
@@ -746,7 +416,7 @@ void sdStaticEntityNetworkData::MakeDefault( void ) {
 sdStaticEntityNetworkData::Write
 ===============
 */
-void sdStaticEntityNetworkData::Write( anFile* file ) const {
+void sdStaticEntityNetworkData::Write( anFile *file ) const {
 	if ( physicsData != nullptr ) {
 		physicsData->Write( file );
 	}
@@ -757,7 +427,7 @@ void sdStaticEntityNetworkData::Write( anFile* file ) const {
 sdStaticEntityNetworkData::Read
 ===============
 */
-void sdStaticEntityNetworkData::Read( anFile* file ) {
+void sdStaticEntityNetworkData::Read( anFile *file ) {
 	if ( physicsData != nullptr ) {
 		physicsData->Read( file );
 	}
@@ -790,7 +460,7 @@ sdStaticEntityBroadcastData::~sdStaticEntityBroadcastData( void ) {
 sdStaticEntityBroadcastData::Write
 ===============
 */
-void sdStaticEntityBroadcastData::Write( anFile* file ) const {
+void sdStaticEntityBroadcastData::Write( anFile *file ) const {
 	if ( physicsData != nullptr ) {
 		physicsData->Write( file );
 	}
@@ -804,7 +474,7 @@ void sdStaticEntityBroadcastData::Write( anFile* file ) const {
 sdStaticEntityBroadcastData::Read
 ===============
 */
-void sdStaticEntityBroadcastData::Read( anFile* file ) {
+void sdStaticEntityBroadcastData::Read( anFile *file ) {
 	if ( physicsData != nullptr ) {
 		physicsData->Read( file );
 	}
@@ -826,7 +496,7 @@ void sdStaticEntityBroadcastData::Read( anFile* file ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, idStaticEntity )
+CLASS_DECLARATION( anEntity, idStaticEntity )
 END_CLASS
 
 /*
@@ -889,14 +559,14 @@ idStaticEntity::PostMapSpawn
 ===============
 */
 void idStaticEntity::PostMapSpawn( void ) {
-	arcEntity::PostMapSpawn();
+	anEntity::PostMapSpawn();
 
 	if ( !IsNetSynced() && !spawnArgs.GetBool( "dynamic" ) ) {
 		sdInstanceCollector< sdLODEntity > lodEntity( false );
 		if ( lodEntity.Num() < 1 ) {
 			return;
 		}
-		sdLODEntity* lodEnt = lodEntity[ 0 ];
+		sdLODEntity* lodEnt = lodEntity[0];
 
 		if ( GetPhysics()->GetNumClipModels() > 0 ) {
 			lodEnt->AddClipModel( new anClipModel( GetPhysics()->GetClipModel() ), GetPhysics()->GetOrigin(), GetPhysics()->GetAxis() );
@@ -915,7 +585,7 @@ void idStaticEntity::PostMapSpawn( void ) {
 idStaticEntity::InhibitSpawn
 ================
 */
-bool idStaticEntity::InhibitSpawn( const anDict& args ) {
+bool idStaticEntity::InhibitSpawn( const anDict &args ) {
 	assert( gameLocal.world != nullptr );
 
 	// an inline static model will not do anything at all
@@ -932,7 +602,7 @@ idStaticEntity::Think
 ================
 */
 void idStaticEntity::Think( void ) {
-	arcEntity::Think();
+	anEntity::Think();
 }
 
 /*
@@ -941,7 +611,7 @@ idStaticEntity::Hide
 ================
 */
 void idStaticEntity::Hide( void ) {
-	arcEntity::Hide();
+	anEntity::Hide();
 	fl.forceDisableClip = true;
 	DisableClip();
 }
@@ -952,137 +622,9 @@ idStaticEntity::Show
 ================
 */
 void idStaticEntity::Show( void ) {
-	arcEntity::Show();
+	anEntity::Show();
 	fl.forceDisableClip = false;
 	EnableClip();
-}
-
-/*
-================
-idStaticEntity::ApplyNetworkState
-================
-*/
-void idStaticEntity::ApplyNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& newState ) {
-	if ( mode == NSM_VISIBLE ) {
-		NET_GET_NEW( sdStaticEntityNetworkData );
-		NET_APPLY_STATE_PHYSICS;
-	} else if ( mode == NSM_BROADCAST ) {
-		NET_GET_NEW( sdStaticEntityBroadcastData );
-		NET_APPLY_STATE_PHYSICS;
-
-		if ( newData.hidden > 0 ) {
-			Hide();
-		} else {
-			Show();
-		}
-
-		if ( newData.forceDisableClip > 0 ) {
-			ForceDisableClip();
-		} else {
-			ForceEnableClip();
-		}
-	}
-}
-
-/*
-================
-idStaticEntity::ReadNetworkState
-================
-*/
-void idStaticEntity::ReadNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, const anBitMsg& msg ) const {
-	if ( mode == NSM_VISIBLE ) {
-		NET_GET_STATES( sdStaticEntityNetworkData );
-		NET_READ_STATE_PHYSICS
-
-		return;
-	}
-	if ( mode == NSM_BROADCAST ) {
-		NET_GET_STATES( sdStaticEntityBroadcastData );
-		NET_READ_STATE_PHYSICS;
-
-		newData.hidden = msg.ReadBool() ? 1 : 0;
-		newData.forceDisableClip = msg.ReadBool() ? 1 : 0;
-		return;
-	}
-	return;
-}
-
-/*
-================
-idStaticEntity::WriteNetworkState
-================
-*/
-void idStaticEntity::WriteNetworkState( networkStateMode_t mode, const sdEntityStateNetworkData& baseState, sdEntityStateNetworkData& newState, anBitMsg& msg ) const {
-	if ( mode == NSM_VISIBLE ) {
-		NET_GET_STATES( sdStaticEntityNetworkData );
-		NET_WRITE_STATE_PHYSICS
-
-		return;
-	}
-	if ( mode == NSM_BROADCAST ) {
-		NET_GET_STATES( sdStaticEntityBroadcastData );
-		NET_WRITE_STATE_PHYSICS;
-
-		newData.hidden = fl.hidden ? 1 : 0;
-		newData.forceDisableClip = fl.forceDisableClip ? 1 : 0;
-
-		msg.WriteBool( fl.hidden );
-		msg.WriteBool( fl.forceDisableClip );
-
-		return;
-	}
-	return;
-}
-
-/*
-================
-idStaticEntity::CheckNetworkStateChanges
-================
-*/
-bool idStaticEntity::CheckNetworkStateChanges( networkStateMode_t mode, const sdEntityStateNetworkData& baseState ) const {
-	if ( mode == NSM_VISIBLE ) {
-		NET_GET_BASE( sdStaticEntityNetworkData );
-		NET_CHECK_STATE_PHYSICS
-
-		return false;
-	}
-	if ( mode == NSM_BROADCAST ) {
-		NET_GET_BASE( sdStaticEntityBroadcastData );
-		NET_CHECK_STATE_PHYSICS
-
-		if ( ( fl.hidden ? 1 : 0 ) != baseData.hidden ) {
-			return true;
-		}
-		if ( ( fl.forceDisableClip ? 1 : 0 ) != baseData.forceDisableClip ) {
-			return true;
-		}
-
-		return false;
-	}
-	return false;
-}
-
-/*
-================
-idStaticEntity::CreateNetworkStructure
-================
-*/
-sdEntityStateNetworkData* idStaticEntity::CreateNetworkStructure( networkStateMode_t mode ) const {
-	if ( mode == NSM_VISIBLE ) {
-		sdStaticEntityNetworkData* newData = new sdStaticEntityNetworkData();
-
-		newData->physicsData = GetPhysics()->CreateNetworkStructure( mode );
-
-		return newData;
-	}
-	if ( mode == NSM_BROADCAST ) {
-		sdStaticEntityBroadcastData* newData = new sdStaticEntityBroadcastData();
-
-		newData->physicsData = GetPhysics()->CreateNetworkStructure( mode );
-
-		return newData;
-	}
-	return nullptr;
 }
 
 /*
@@ -1093,7 +635,7 @@ sdEntityStateNetworkData* idStaticEntity::CreateNetworkStructure( networkStateMo
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, sdEnvDefinitionEntity )
+CLASS_DECLARATION( anEntity, sdEnvDefinitionEntity )
 END_CLASS
 
 /*
@@ -1102,7 +644,6 @@ sdEnvDefinition::Spawn
 ================
 */
 void sdEnvDefinitionEntity::Spawn( void ) {
-
 	sdEnvDefinition env;
 	spawnArgs.GetVector( "origin", "0 0 0", env.origin );
 	spawnArgs.GetString( "env_name", "", env.name );
@@ -1120,50 +661,21 @@ void sdEnvDefinitionEntity::Spawn( void ) {
 /*
 ===============================================================================
 
-	sdSpawnController
+	idSpawnController
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( sdScriptEntity, sdSpawnController )
+CLASS_DECLARATION( sdScriptEntity, idSpawnController )
 END_CLASS
 
 /*
 ================
-sdSpawnController::Spawn
+idSpawnController::Spawn
 ================
 */
-void sdSpawnController::Spawn( void ) {
+void idSpawnController::Spawn( void ) {
 	spawnRequirements.Load( spawnArgs, "require_spawn" );
-}
-
-
-/*
-===============================================================================
-
-	sdLiquid
-
-===============================================================================
-*/
-
-CLASS_DECLARATION( arcEntity, sdLiquid )
-END_CLASS
-
-/*
-================
-sdLiquid::sdLiquid
-================
-*/
-sdLiquid::sdLiquid( void ) {
-}
-
-/*
-================
-sdLiquid::Spawn
-================
-*/
-void sdLiquid::Spawn( void ) {
-	current = spawnArgs.GetVector( "current" );
 }
 
 /*
@@ -1174,7 +686,7 @@ void sdLiquid::Spawn( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, sdLODEntity )
+CLASS_DECLARATION( anEntity, sdLODEntity )
 END_CLASS
 
 /*
@@ -1201,12 +713,10 @@ sdLODEntity::FreeModelDefs
 */
 void sdLODEntity::FreeModelDefs() {
 	for ( int i = 0; i < modelDefHandles.Num(); i++ ) {
-		int& modelDefHandle = modelDefHandles[i];
-
+		int &modelDefHandle = modelDefHandles[i];
 		if ( modelDefHandle != -1 ) {
 			renderEntity_t *re = gameRenderWorld->GetRenderEntity( modelDefHandle );
 			delete []re->dummies;
-
 			gameRenderWorld->FreeEntityDef( modelDefHandle );
 			modelDefHandle = -1;
 		}
@@ -1228,9 +738,8 @@ void sdLODEntity::AddRenderEntity( const renderEntity_t& entity, int ID ) {
 sdLODEntity::AddClipModel
 ================
 */
-void sdLODEntity::AddClipModel( anClipModel* clipModel, const anVec3& origin, const anMat3& axes ) {
-	int				numClipModels = physicsObj.GetNumClipModels();
-
+void sdLODEntity::AddClipModel( anClipModel* clipModel, const anVec3 &origin, const anMat3 &axes ) {
+	int numClipModels = physicsObj.GetNumClipModels();
 	physicsObj.SetClipModel( clipModel, 1.0f, numClipModels );
 	physicsObj.SetOrigin( origin, numClipModels );
 	physicsObj.SetAxis( axes, numClipModels );
@@ -1258,19 +767,17 @@ void sdLODEntity::Spawn() {
 	renderEntity.shaderParms[ SHADERPARM_BLUE ] = 1.0f;
 	renderEntity.shaderParms[ SHADERPARM_ALPHA ] = 1.0f;
 
-	const char* temp = nullptr;
+	const char *temp = nullptr;
 
 	for ( int i = 0; i < spawnArgs.GetNumKeyVals(); i++ ) {
 		arg = spawnArgs.GetKeyVal( i );
-
-		if ( !arg->GetKey().Icmpn( "model", anString::Length( "model" ) ) ) {
-			const char* model = arg->GetValue();
-
+		if ( !arg->GetKey().Icmpn( "model", anStr::Length( "model" ) ) ) {
+			const char *model = arg->GetValue();
 			if ( *model != '\0' ) {
 				renderEntity.hModel = renderModelManager->FindModel( model );
 			}
 
-			anString modelID = ( arg->GetKey().c_str() + anString::Length( "model" ) );
+			anStr modelID = ( arg->GetKey().c_str() + anStr::Length( "model" ) );
 
 			if ( renderEntity.hModel != nullptr && !renderEntity.hModel->IsDefaultModel() ) {
 				renderEntity.bounds		= renderEntity.hModel->Bounds();
@@ -1288,7 +795,7 @@ void sdLODEntity::Spawn() {
 				renderEntity.dummies = nullptr;
 				renderEntity.numVisDummies = 0;
 
-				anString gpuSpecParam = spawnArgs.GetString( "drawSpec" + modelID, "low" );
+				anStr gpuSpecParam = spawnArgs.GetString( "drawSpec" + modelID, "low" );
 				if ( gpuSpecParam.Icmp( "high" ) == 0 ) {
 					renderEntity.drawSpec = 2;
 				} else if ( gpuSpecParam.Icmp( "med" ) == 0 || gpuSpecParam.Icmp( "medium" ) == 0 ) {
@@ -1299,7 +806,7 @@ void sdLODEntity::Spawn() {
 					renderEntity.drawSpec = 0;
 				}
 
-				anString shadowSpec = spawnArgs.GetString( "shadowSpec" + modelID , "low" );
+				anStr shadowSpec = spawnArgs.GetString( "shadowSpec" + modelID , "low" );
 				if ( shadowSpec.Icmp( "high" ) == 0 ) {
 					renderEntity.shadowSpec = 2;
 				} else if ( shadowSpec.Icmp( "med" ) == 0 || shadowSpec.Icmp( "medium" ) == 0 ) {
@@ -1346,24 +853,19 @@ void sdLODEntity::Spawn() {
 }
 
 void sdLODEntity::PostMapSpawn() {
-	arcEntity::PostMapSpawn();
+	anEntity::PostMapSpawn();
 	for ( int i = 0; i < modelID.Num(); i++ ) {
 		int ID = modelID[i];
 		if ( ID != -1 ) {
 			renderEntity_t *re = gameRenderWorld->GetRenderEntity( modelDefHandles[i] );
-
-			anString value = spawnArgs.GetString( va( "visDummies%d", ID ) );
-
+			anStr value = spawnArgs.GetString( va( "visDummies%d", ID ) );
 			if ( !value.IsEmpty() ) {
-
 				anStringList strlist;
 				idSplitStringIntoList( strlist, value, "," );
-
-				anList< arcEntityPtr<arcEntity> > dummies;
-
+				anList< anEntityPtr<anEntity> > dummies;
 				anList< int > areas;
 				for ( intj=0; j<strlist.Num(); j++ ) {
-					arcEntity *ent = gameLocal.FindEntity( strlist[j] );
+					anEntity *ent = gameLocal.FindEntity( strlist[j] );
 					if ( ent ) {
 						anVec3 org = ent->GetPhysics()->GetOrigin();
 						int areaNum = gameRenderWorld->PointInArea( org );
@@ -1371,7 +873,7 @@ void sdLODEntity::PostMapSpawn() {
 							bool found = areas.FindIndex( areaNum ) != -1;
 
 							if ( !found ) {
-								arcEntityPtr<arcEntity> &entityPtr = dummies.Alloc();
+								anEntityPtr<anEntity> &entityPtr = dummies.Alloc();
 								entityPtr = ent;
 								areas.Alloc() = areaNum;
 							}
@@ -1400,461 +902,12 @@ void sdLODEntity::PostMapSpawn() {
 /*
 ===============================================================================
 
-sdImposterEntity
-
-===============================================================================
-*/
-
-CLASS_DECLARATION( arcEntity, sdImposterEntity )
-END_CLASS
-
-
-sdImposterEntity::sdImposterEntity() {
-}
-
-sdImposterEntity::~sdImposterEntity() {
-	FreeModelDefs();
-}
-
-/*
-================
-sdImposterEntity::FreeModelDefs
-================
-*/
-void sdImposterEntity::FreeModelDefs() {
-	for ( int i = 0; i < modelDefHandles.Num(); i++ ) {
-		int& modelDefHandle = modelDefHandles[i];
-
-		if ( modelDefHandle != -1 ) {
-			renderEntity_t *re = gameRenderWorld->GetRenderEntity( modelDefHandle );
-			if ( re->insts != nullptr ) {
-				delete[] re->insts;
-			}
-			re->insts = nullptr;
-			gameRenderWorld->FreeEntityDef( modelDefHandle );
-			modelDefHandle = -1;
-		}
-	}
-}
-
-/*
-================
-sdImposterEntity::Spawn
-================
-*/
-struct imposterGather_s {
-	anString name;
-	int count;
-};
-#if 1
-void sdImposterEntity::Spawn() {
-	const char* defaultMaxVisDist = spawnArgs.GetString( "maxvisdist", "0" );
-	const int imposterStrLen = anString::Length( "imposter" );
-	anList< imposterGather_s > imposterList;
-	for ( int i = 0; i < spawnArgs.GetNumKeyVals(); i++ )	{
-		const anKeyValue* imposterKey = spawnArgs.GetKeyVal( i );
-		if ( imposterKey->GetKey().Icmpn( "imposter", imposterStrLen ) != 0 ) {
-			continue;
-		}
-		bool found = false;
-		for ( intj=0; j<imposterList.Num(); j++ ) {
-			if ( imposterKey->GetValue().Icmp( imposterList[j].name.c_str() ) == 0 ) {
-				imposterList[j].count++;
-				found = true;
-			}
-		}
-		if ( !found ) {
-			imposterGather_s entry;
-			entry.name = imposterKey->GetValue();
-			entry.count = 1;
-			imposterList.Alloc() = entry;
-		}
-	}
-
-	bool errors = false;
-	renderEntity_t *renderEntity = new renderEntity_t[ imposterList.Num() ];
-	for ( int i=0; i<imposterList.Num(); i++ ) {
-		anDict tempDict;
-		tempDict.Set( "forceimposter", "1" );
-		tempDict.Set( "model", "_default" );
-		tempDict.Set( "imposter", imposterList[i].name );
-		gameEdit->ParseSpawnArgsToRenderEntity( tempDict, renderEntity[i] );
-		if ( renderEntity[i].imposter == nullptr ) {
-			common->Warning( "Imposter '%s' not found", imposterList[i].name.c_str() );
-			errors = true;
-		}
-
-		renderEntity[i].numInsts = 0;
-		renderEntity[i].insts = new sdInstInfo[ imposterList[i].count ];
-		renderEntity[i].bounds.Clear();
-		renderEntity[i].flags.overridenBounds = true;
-		renderEntity[i].flags.pushByInstances = true;
-	}
-	if ( errors ) {
-		common->Error( "sdImposterEntity: imposters not found" );
-	}
-
-	for ( int i = 0; i < spawnArgs.GetNumKeyVals(); i++ ) {
-		const anKeyValue* imposterKey = spawnArgs.GetKeyVal( i );
-		if ( imposterKey->GetKey().Icmpn( "imposter", imposterStrLen ) != 0 ) {
-			continue;
-		}
-
-		int found = -1;
-		for ( intj=0; j<imposterList.Num(); j++ ) {
-			if ( imposterKey->GetValue().Icmp( imposterList[j].name.c_str() ) == 0 ) {
-				imposterList[j].count++;
-				found = j;
-			}
-		}
-
-		if ( found != -1 ) {
-			const char* imposterId = imposterKey->GetKey().c_str() + imposterStrLen;
-			sdInstInfo &inst = renderEntity[found].insts[ renderEntity[found].numInsts++ ];
-
-			inst.inst.origin = spawnArgs.GetVector( va( "origin%s", imposterId ), "0 0 0" );
-			inst.fadeOrigin = inst.inst.origin;
-			inst.inst.axis = spawnArgs.GetMatrix(va( "rotation%s", imposterId ), "1 0 0 0 1 0 0 0 1" );
-			inst.maxVisDist = spawnArgs.GetFloat( va( "maxvisdist%s", imposterId ), defaultMaxVisDist );
-			inst.minVisDist = 0.f;
-//			inst.maxVisDist *= inst.maxVisDist;
-
-			float scalex = renderEntity[found].imposter->GetScaleX();
-			float scaley = renderEntity[found].imposter->GetScaleY();
-			anBounds bb;
-			bb.Clear();
-			bb.AddPoint( anVec3( -scalex, -scalex, -scaley ) );
-			bb.AddPoint( anVec3(  scalex,  scalex,  scaley ) );
-			bb.RotateSelf( inst.inst.axis );
-			bb.TranslateSelf( inst.inst.origin );
-			renderEntity[found].bounds.AddBounds( bb );
-
-			anVec3 fadeOrigin;
-			if ( spawnArgs.GetVector( va( "fadeOrigin%s", imposterId ), "0 0 0", fadeOrigin ) ) {
-				inst.fadeOrigin = fadeOrigin;
-			}
-		}
-	}
-
-	for ( int i=0; i<imposterList.Num(); i++ ) {
-		modelDefHandles.Alloc() = gameRenderWorld->AddEntityDef( &renderEntity[i] );
-	}
-
-	delete []renderEntity;
-}
-#else
-void sdImposterEntity::Spawn() {
-	renderEntity_t renderEntity;
-	anDict tempDict;
-	tempDict.Set( "forceimposter", "1" );
-	tempDict.Set( "model", "_default" );
-
-	const char* defaultMaxVisDist = spawnArgs.GetString( "maxvisdist", "0" );
-
-	const int imposterStrLen = anString::Length( "imposter" );
-
-	for ( int i = 0; i < spawnArgs.GetNumKeyVals(); i++ )	{
-		const anKeyValue* imposterKey = spawnArgs.GetKeyVal( i );
-		if ( imposterKey->GetKey().Icmpn( "imposter", imposterStrLen ) != 0 ) {
-			continue;
-		}
-
-		const char* imposterId = imposterKey->GetKey().c_str() + imposterStrLen;
-		tempDict.Set( "imposter",	imposterKey->GetValue() );
-		tempDict.Set( "origin",		spawnArgs.GetString( va( "origin%s", imposterId ), "0 0 0" ) );
-		tempDict.Set( "rotation",	spawnArgs.GetString( va( "rotation%s", imposterId ), "1 0 0 0 1 0 0 0 1" ) );
-		tempDict.Set( "maxvisdist",	spawnArgs.GetString( va( "maxvisdist%s", imposterId ), defaultMaxVisDist ) );
-
-		anString fadeOrigin;
-		if ( spawnArgs.GetString( va( "fadeOrigin%s", imposterId ), "0 0 0", fadeOrigin ) ) {
-			tempDict.Set( "fadeOrigin",	fadeOrigin );
-		}
-
-		gameEdit->ParseSpawnArgsToRenderEntity( tempDict, renderEntity );
-		modelDefHandles.Alloc() = gameRenderWorld->AddEntityDef( &renderEntity );
-	}
-
-	PostEventMS( &EV_Remove, 0 );
-}
-#endif
-/*
-===============================================================================
-
-sdJumpPad
-
-===============================================================================
-*/
-
-CLASS_DECLARATION( idTrigger_Multi, sdJumpPad )
-END_CLASS
-
-/*
-=========================
-sdJumpPad::Spawn
-=========================
-*/
-void sdJumpPad::Spawn( void ) {
-	forceField.SetApplyType( FORCEFIELD_APPLY_VELOCITY );
-	forceField.SetClipModel( new anClipModel( GetPhysics()->GetClipModel() ) );
-
-	spawnArgs.GetInt( "trigger_wait", "0", triggerWait );
-
-	nextTriggerTime = 0;
-}
-
-/*
-=========================
-sdJumpPad::OnTouch
-=========================
-*/
-void sdJumpPad::OnTouch( arcEntity *other, const trace_t& trace ) {
-	if ( gameLocal.time < nextTriggerTime ) {
-		return;
-	}
-
-	if ( GetEntityAllegiance( other ) == TA_ENEMY ) {
-		return;
-	}
-
-	arcNetBasePlayer* player = other->Cast< arcNetBasePlayer >();
-	if ( player != nullptr && !player->IsSpectator() && player->GetHealth() <= 0 ) {
-		return;
-	}
-
-	nextTriggerTime = gameLocal.time + triggerWait;
-	forceField.Evaluate( gameLocal.time );
-
-	StartSound( "snd_jump", SND_MOVER_MOVE, 0, nullptr );
-	PlayEffect( "fx_jump", anVec3( 1.f, 1.f, 1.f ), nullptr, GetPhysics()->GetOrigin(), effectAxis );
-}
-
-/*
-=========================
-sdJumpPad::PostMapSpawn
-=========================
-*/
-void sdJumpPad::PostMapSpawn( void ) {
-	FindTargets();
-	RemoveNullTargets();
-
-	if ( targets.Num() != 1 ) {
-		gameLocal.Warning( "sdJumpPad::PostMapSpawn: jumppad %s should have only 1 target", name.c_str() );
-		return;
-	}
-
-	arcEntity* target = targets[ 0 ];
-	if ( target == nullptr ) {
-		assert( target != nullptr );
-		gameLocal.Warning( "sdJumpPad::PostMapSpawn: jumppad %s has a nullptr target entity", name.c_str() );
-		return;
-	}
-
-	anVec3 diff = target->GetPhysics()->GetOrigin() - GetPhysics()->GetOrigin();
-	anVec3 gravity( GetPhysics()->GetGravity() );
-	anVec3 gravityNormal( 0, 0, -1.f );
-	anVec3 vertical( 0.f, 0.f, diff.z );
-
-	float time = anMath::Sqrt( vertical.Length() / ( 0.5f * gravity.Length() ) );
-	if ( time <= anMath::FLT_EPSILON ) {
-		// no point in having the jumppad
-		gameLocal.Warning( "sdJumpPad::PostMapSpawn: removing jumppad %s as target too close to trigger", name.c_str() );
-		PostEventMS( &EV_Remove, 0 );
-		return;
-	}
-
-	// calc the non-vertical velocity
-	anVec3 velocity( diff - vertical );
-	float distance = velocity.Normalize();
-	velocity = velocity * ( distance / time );
-
-	// add the vertical velocity
-	velocity += (gravity * -time);
-
-	forceField.Uniform( velocity );
-
-	// calc the effect axis for playing the effect
-	diff.Normalize();
-	effectAxis = diff.ToMat3();
-}
-
-
-/*
-===============================================================================
-
-	sdInstStatic
-
-===============================================================================
-*/
-
-CLASS_DECLARATION( arcEntity, sdInstStatic )
-END_CLASS
-
-/*
-================
-sdInstStatic::sdInstStatic
-================
-*/
-sdInstStatic::sdInstStatic() {
-}
-
-/*
-================
-sdInstStatic::~sdInstStatic
-================
-*/
-sdInstStatic::~sdInstStatic() {
-	FreeModelDefs();
-}
-
-/*
-================
-sdInstStatic::FreeModelDefs
-================
-*/
-void sdInstStatic::FreeModelDefs() {
-	for ( int i = 0; i < modelDefHandles.Num(); i++ ) {
-		int& modelDefHandle = modelDefHandles[i];
-
-		if ( modelDefHandle != -1 ) {
-			renderEntity_t *re = gameRenderWorld->GetRenderEntity( modelDefHandle );
-			if ( re->insts != nullptr ) {
-				delete[] re->insts;
-			}
-			re->insts = nullptr;
-			gameRenderWorld->FreeEntityDef( modelDefHandle );
-			modelDefHandle = -1;
-		}
-	}
-}
-
-/*
-================
-sdInstStatic::AddRenderEntity
-================
-*/
-void sdInstStatic::AddRenderEntity( const renderEntity_t& entity ) {
-	modelDefHandles.Alloc() = gameRenderWorld->AddEntityDef( &entity );
-}
-
-/*
-================
-sdInstStatic::AddClipModel
-================
-*/
-void sdInstStatic::AddClipModel( anClipModel* clipModel, const anVec3& origin, const anMat3& axes ) {
-	int				numClipModels = physicsObj.GetNumClipModels();
-
-	physicsObj.SetClipModel( clipModel, 1.0f, numClipModels );
-	physicsObj.SetOrigin( origin, numClipModels );
-	physicsObj.SetAxis( axes, numClipModels );
-}
-
-/*
-================
-sdInstStatic::Spawn
-================
-*/
-void sdInstStatic::Spawn() {
-	physicsObj.SetSelf( this );
-	physicsObj.SetOrigin( GetPhysics()->GetOrigin(), 0 );
-	physicsObj.SetAxis( GetPhysics()->GetAxis(), 0 );
-
-	// add models
-	const anKeyValue*	arg;
-	renderEntity_t		renderEntity;
-	const char* modelInstance = spawnArgs.GetString( "model_instance" );
-
-	memset( &renderEntity, 0, sizeof( renderEntity ) );
-	renderEntity.spawnID = gameLocal.GetSpawnId( this );//	renderEntity.entityNum = entityNumber;
-	renderEntity.axis.Identity();
-	renderEntity.shaderParms[ SHADERPARM_RED ] = 1.0f;
-	renderEntity.shaderParms[ SHADERPARM_GREEN ] = 1.0f;
-	renderEntity.shaderParms[ SHADERPARM_BLUE ] = 1.0f;
-	renderEntity.shaderParms[ SHADERPARM_ALPHA ] = 1.0f;
-	renderEntity.hModel = renderModelManager->FindModel( modelInstance );
-	renderEntity.flags.overridenBounds = true;
-	renderEntity.flags.noShadow = true;
-	renderEntity.flags.pushByInstances = true;
-	renderEntity.flags.pushByCenter = spawnArgs.GetBool( "pushByOrigin" );
-
-	if ( renderEntity.hModel == nullptr ) {
-		gameLocal.Warning( "sdInstStatic::Spawn : no model for entity '%s'", GetName() );
-		PostEventMS( &EV_Remove, 0 );
-		return;
-	}
-
-	const char* temp;
-	temp = spawnArgs.GetString( "imposter_instance" );
-	if ( *temp != '\0' ) {
-		renderEntity.imposter = declHolder.FindImposter( temp );
-	}
-
-	int count = 0;
-	for ( int i = 0; i < spawnArgs.GetNumKeyVals(); i++ ) {
-		arg = spawnArgs.GetKeyVal( i );
-		char prefix[32];
-		sprintf( prefix, "%d ", i );
-		if ( spawnArgs.MatchPrefix( prefix ) ) {
-			count++;
-		} else {
-			break;
-		}
-	}
-
-	renderEntity.bounds.Clear();
-	renderEntity.numInsts = count;
-	renderEntity.insts = new sdInstInfo[ count ];
-
-	int index = 0;
-	const anKeyValue*	lastArg = nullptr;
-	for ( int i = 0; i < count; i++ ) {
-		char cprefix[32];
-		sprintf(cprefix, "%d ", i );
-		anString prefix;
-		prefix = cprefix;
-		arg = spawnArgs.MatchPrefix( prefix, lastArg );
-		if ( arg ) {
-			lastArg = arg;
-			arg = spawnArgs.MatchPrefix( prefix, lastArg );
-
-			sdInstInfo &info = renderEntity.insts[i];
-
-			info.inst.origin = spawnArgs.GetVector( prefix + "origin" );
-			info.fadeOrigin = info.inst.origin;
-			info.maxVisDist = spawnArgs.GetInt( prefix + "maxVisDist" );
-			info.minVisDist = spawnArgs.GetInt( prefix + "minVisDist" );
-			info.inst.axis = spawnArgs.GetMatrix( prefix + "rotation", "1 0 0 0 1 0 0 0 1" );
-			info.inst.color[0] = 255;
-			info.inst.color[1] = 255;
-			info.inst.color[2] = 255;
-			info.inst.color[3] = 255;
-
-			anBounds bb;
-			bb.FromTransformedBounds( renderEntity.hModel->Bounds(), info.inst.origin, info.inst.axis );
-			renderEntity.bounds.AddBounds( bb );
-
-			anString cm;
-			if ( spawnArgs.GetString( prefix + "cm_model", "", cm ) ) {
-				AddClipModel( new anClipModel( cm ), info.inst.origin, info.inst.axis );
-			}
-		}
-	}
-
-	AddRenderEntity( renderEntity );
-
-	physicsObj.SetContents( CONTENTS_SOLID );
-	SetPhysics( &physicsObj );
-}
-
-/*
-===============================================================================
-
 	sdEnvBounds
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, sdEnvBoundsEntity )
+CLASS_DECLARATION( anEntity, sdEnvBoundsEntity )
 END_CLASS
 
 /*
@@ -1865,7 +918,7 @@ sdEnvDefinition::Spawn
 void sdEnvBoundsEntity::Spawn( void ) {
 
 	anVec3 origin, size;
-	anString name;
+	anStr name;
 	spawnArgs.GetVector( "origin", "0 0 0", origin );
 	spawnArgs.GetVector( "size", "8 8 8", size );
 	spawnArgs.GetString( "env_name", "", name );
@@ -1879,37 +932,33 @@ void sdEnvBoundsEntity::Spawn( void ) {
 
 }
 
-
-
-
-
 /*
 ===============================================================================
 
-	sdLadderEntity
+	anLadderEntity
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, sdLadderEntity )
+CLASS_DECLARATION( anEntity, anLadderEntity )
 END_CLASS
 
 /*
 ================
-sdLadderEntity::Spawn
+anLadderEntity::Spawn
 ================
 */
-void sdLadderEntity::Spawn( void ) {
+void anLadderEntity::Spawn( void ) {
 	ladderModel = nullptr;
 
 	anClipModel* model = GetPhysics()->GetClipModel();
 	if ( model == nullptr ) {
-		gameLocal.Error( "sdLadderEntity::Spawn No Collision Model" );
+		gameLocal.Error( "anLadderEntity::Spawn No Collision Model" );
 	}
 
 	bool surfaceFound = false;
 	for ( int i = 0; i < model->GetNumCollisionModels(); i++ ) {
-		arcCollisionModel* cm = model->GetCollisionModel( i );
+		anCollisionModel* cm = model->GetCollisionModel( i );
 		for ( int j = 0; j < cm->GetNumPolygons(); j++ ) {
 			const anMaterial* material = cm->GetPolygonMaterial( j );
 			if ( material == nullptr ) {
@@ -1921,7 +970,7 @@ void sdLadderEntity::Spawn( void ) {
 			}
 
 			if ( surfaceFound ) {
-				gameLocal.Error( "sdLadderEntity::Spawn Multiple Ladder Surfaces" );
+				gameLocal.Error( "anLadderEntity::Spawn Multiple Ladder Surfaces" );
 			}
 			surfaceFound = true;
 
@@ -1937,7 +986,7 @@ void sdLadderEntity::Spawn( void ) {
 		}
 	}
 	if ( !surfaceFound ) {
-		gameLocal.Error( "sdLadderEntity::Spawn No Ladder Surface Found" );
+		gameLocal.Error( "anLadderEntity::Spawn No Ladder Surface Found" );
 	}
 
 //	BecomeActive( TH_THINK );
@@ -1945,75 +994,28 @@ void sdLadderEntity::Spawn( void ) {
 
 /*
 ================
-sdLadderEntity::~sdLadderEntity
+anLadderEntity::~anLadderEntity
 ================
 */
-sdLadderEntity::~sdLadderEntity( void ) {
+anLadderEntity::~anLadderEntity( void ) {
 	gameLocal.clip.DeleteClipModel( ladderModel );
 }
 
 /*
 ================
-sdLadderEntity::Think
+anLadderEntity::Think
 ================
 */
-void sdLadderEntity::Think( void ) {
-	arcEntity::Think();
-
+void anLadderEntity::Think( void ) {
+	anEntity::Think();
 //	ladderModel->Draw( GetPhysics()->GetOrigin(), GetPhysics()->GetAxis() );
 }
 
 /*
 ================
-sdLadderEntity::GetLadderNormal
+anLadderEntity::GetLadderNormal
 ================
 */
-anVec3 sdLadderEntity::GetLadderNormal( void ) const {
+anVec3 anLadderEntity::GetLadderNormal( void ) const {
 	return GetPhysics()->GetAxis() * ladderNormal;
-}
-
-#include "botai/BotThreadData.h"
-
-CLASS_DECLARATION( arcEntity, anSEASObstacleEntity )
-	EVENT( EV_Activate,		anSEASObstacleEntity::Event_Activate )
-END_CLASS
-
-/*
-===============
-anSEASObstacleEntity::anSEASObstacleEntity
-================
-*/
-anSEASObstacleEntity::anSEASObstacleEntity( void ) {
-	enabled = false;
-	team = 2;
-}
-
-/*
-===============
-anSEASObstacleEntity::Spawn
-================
-*/
-void anSEASObstacleEntity::Spawn( ) {
-	enabled = !spawnArgs.GetBool( "start_on", "1" );
-	team = spawnArgs.GetInt( "team", "2" );
-	ChangeAreaState();
-}
-
-/*
-===============
-anSEASObstacleEntity::Event_Activate
-================
-*/
-void anSEASObstacleEntity::Event_Activate( arcEntity *activator ) {
-	enabled = !enabled;
-	ChangeAreaState();
-}
-
-/*
-===============
-anSEASObstacleEntity::ChangeAreaState
-================
-*/
-void anSEASObstacleEntity::ChangeAreaState( ) {
-	botThreadData.EnableArea( GetPhysics()->GetAbsBounds(), AAS_AREA_CONTENTS_OBSTACLE, team, enabled );
 }

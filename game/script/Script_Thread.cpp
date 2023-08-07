@@ -3,12 +3,12 @@
 
 #include "../Game_local.h"
 
-const idEventDef EV_Thread_Execute( "<execute>", NULL );
-const idEventDef EV_Thread_SetCallback( "<script_setcallback>", NULL );
+const idEventDef EV_Thread_Execute( "<execute>", nullptr );
+const idEventDef EV_Thread_SetCallback( "<script_setcallback>", nullptr );
 																	
 // script callable events
 const idEventDef EV_Thread_TerminateThread( "terminate", "d" );
-const idEventDef EV_Thread_Pause( "pause", NULL );
+const idEventDef EV_Thread_Pause( "pause", nullptr );
 const idEventDef EV_Thread_Wait( "wait", "f" );
 const idEventDef EV_Thread_WaitFrame( "waitFrame" );
 const idEventDef EV_Thread_WaitFor( "waitFor", "e" );
@@ -21,7 +21,7 @@ const idEventDef EV_Thread_Trigger( "trigger", "e" );
 const idEventDef EV_Thread_SetCvar( "setcvar", "ss" );
 const idEventDef EV_Thread_GetCvar( "getcvar", "s", 's' );
 const idEventDef EV_Thread_Random( "random", "f", 'f' );
-const idEventDef EV_Thread_GetTime( "getTime", NULL, 'f' );
+const idEventDef EV_Thread_GetTime( "getTime", nullptr, 'f' );
 const idEventDef EV_Thread_KillThread( "killthread", "s" );
 const idEventDef EV_Thread_SetThreadName( "threadname", "s" );
 const idEventDef EV_Thread_GetEntity( "getEntity", "s", 'e' );
@@ -50,15 +50,15 @@ const idEventDef EV_Thread_VecToAngles( "VecToAngles", "v", 'v' );
 const idEventDef EV_Thread_OnSignal( "onSignal", "des" );
 const idEventDef EV_Thread_ClearSignal( "clearSignalThread", "de" );
 const idEventDef EV_Thread_SetCamera( "setCamera", "e" );
-const idEventDef EV_Thread_FirstPerson( "firstPerson", NULL );
+const idEventDef EV_Thread_FirstPerson( "firstPerson", nullptr );
 const idEventDef EV_Thread_Trace( "trace", "vvvvde", 'f' );
 const idEventDef EV_Thread_TracePoint( "tracePoint", "vvde", 'f' );
-const idEventDef EV_Thread_GetTraceFraction( "getTraceFraction", NULL, 'f' );
-const idEventDef EV_Thread_GetTraceEndPos( "getTraceEndPos", NULL, 'v' );
-const idEventDef EV_Thread_GetTraceNormal( "getTraceNormal", NULL, 'v' );
-const idEventDef EV_Thread_GetTraceEntity( "getTraceEntity", NULL, 'e' );
-const idEventDef EV_Thread_GetTraceJoint( "getTraceJoint", NULL, 's' );
-const idEventDef EV_Thread_GetTraceBody( "getTraceBody", NULL, 's' );
+const idEventDef EV_Thread_GetTraceFraction( "getTraceFraction", nullptr, 'f' );
+const idEventDef EV_Thread_GetTraceEndPos( "getTraceEndPos", nullptr, 'v' );
+const idEventDef EV_Thread_GetTraceNormal( "getTraceNormal", nullptr, 'v' );
+const idEventDef EV_Thread_GetTraceEntity( "getTraceEntity", nullptr, 'e' );
+const idEventDef EV_Thread_GetTraceJoint( "getTraceJoint", nullptr, 's' );
+const idEventDef EV_Thread_GetTraceBody( "getTraceBody", nullptr, 's' );
 const idEventDef EV_Thread_FadeIn( "fadeIn", "vf" );
 const idEventDef EV_Thread_FadeOut( "fadeOut", "vf" );
 const idEventDef EV_Thread_FadeTo( "fadeTo", "vff" );
@@ -72,18 +72,18 @@ const idEventDef EV_Thread_StrSkip( "strSkip", "sd", 's' );
 const idEventDef EV_Thread_StrMid( "strMid", "sdd", 's' );
 const idEventDef EV_Thread_StrToFloat( "strToFloat", "s", 'f' );
 const idEventDef EV_Thread_RadiusDamage( "radiusDamage", "vEEEsf" );
-const idEventDef EV_Thread_IsClient( "isClient", NULL, 'f' );
-const idEventDef EV_Thread_IsMultiplayer( "isMultiplayer", NULL, 'f' );
-const idEventDef EV_Thread_GetFrameTime( "getFrameTime", NULL, 'f' );
-const idEventDef EV_Thread_GetTicsPerSecond( "getTicsPerSecond", NULL, 'f' );
+const idEventDef EV_Thread_IsClient( "isClient", nullptr, 'f' );
+const idEventDef EV_Thread_IsMultiplayer( "isMultiplayer", nullptr, 'f' );
+const idEventDef EV_Thread_GetFrameTime( "getFrameTime", nullptr, 'f' );
+const idEventDef EV_Thread_GetTicsPerSecond( "getTicsPerSecond", nullptr, 'f' );
 const idEventDef EV_Thread_DebugLine( "debugLine", "vvvf" );
 const idEventDef EV_Thread_DebugArrow( "debugArrow", "vvvdf" );
 const idEventDef EV_Thread_DebugCircle( "debugCircle", "vvvfdf" );
 const idEventDef EV_Thread_DebugBounds( "debugBounds", "vvvf" );
 const idEventDef EV_Thread_DrawText( "drawText", "svfvdf" );
-const idEventDef EV_Thread_InfluenceActive( "influenceActive", NULL, 'd' );
+const idEventDef EV_Thread_InfluenceActive( "influenceActive", nullptr, 'd' );
 
-CLASS_DECLARATION( idClass, idThread )
+CLASS_DECLARATION( anClass, idThread )
 	EVENT( EV_Thread_Execute,				idThread::Event_Execute )
 	EVENT( EV_Thread_TerminateThread,		idThread::Event_TerminateThread )
 	EVENT( EV_Thread_Pause,					idThread::Event_Pause )
@@ -164,9 +164,9 @@ CLASS_DECLARATION( idClass, idThread )
 	EVENT( EV_Thread_InfluenceActive,		idThread::Event_InfluenceActive )
 END_CLASS
 
-idThread			*idThread::currentThread = NULL;
+idThread			*idThread::currentThread = nullptr;
 int					idThread::threadIndex = 0;
-idList<idThread *>	idThread::threadList;
+anList<idThread *>	idThread::threadList;
 trace_t				idThread::trace;
 
 /*
@@ -196,7 +196,7 @@ int idThread::CurrentThreadNum( void ) {
 idThread::BeginMultiFrameEvent
 ================
 */
-bool idThread::BeginMultiFrameEvent( idEntity *ent, const idEventDef *event ) {
+bool idThread::BeginMultiFrameEvent( abEntity *ent, const idEventDef *event ) {
 	if ( !currentThread ) {
 		gameLocal.Error( "idThread::BeginMultiFrameEvent called without a current thread" );
 	}
@@ -208,7 +208,7 @@ bool idThread::BeginMultiFrameEvent( idEntity *ent, const idEventDef *event ) {
 idThread::EndMultiFrameEvent
 ================
 */
-void idThread::EndMultiFrameEvent( idEntity *ent, const idEventDef *event ) {
+void idThread::EndMultiFrameEvent( abEntity *ent, const idEventDef *event ) {
 	if ( !currentThread ) {
 		gameLocal.Error( "idThread::EndMultiFrameEvent called without a current thread" );
 	}
@@ -233,7 +233,7 @@ idThread::idThread() {
 idThread::idThread
 ================
 */
-idThread::idThread( idEntity *self, const function_t *func ) {
+idThread::idThread( abEntity *self, const function_t *func ) {
 	assert( self );
 	
 	Init();
@@ -278,7 +278,7 @@ idThread::idThread( idInterpreter *source, const function_t *func, int args ) {
 idThread::idThread
 ================
 */
-idThread::idThread( idInterpreter *source, idEntity *self, const function_t *func, int args ) {
+idThread::idThread( idInterpreter *source, abEntity *self, const function_t *func, int args ) {
 	assert( self );
 
 	Init();
@@ -312,7 +312,7 @@ idThread::~idThread() {
 	}
 
 	if ( currentThread == this ) {
-		currentThread = NULL;
+		currentThread = nullptr;
 	}
 }
 
@@ -330,7 +330,7 @@ void idThread::ManualDelete( void ) {
 idThread::Save
 ================
 */
-void idThread::Save( idSaveGame *savefile ) const {
+void idThread::Save( anSaveGame *savefile ) const {
 
 	// We will check on restore that threadNum is still the same,
 	//  threads should have been restored in the same order.
@@ -356,10 +356,10 @@ void idThread::Save( idSaveGame *savefile ) const {
 idThread::Restore
 ================
 */
-void idThread::Restore( idRestoreGame *savefile ) {
+void idThread::Restore( anRestoreGame *savefile ) {
 	savefile->ReadInt( threadNum );
 
-	savefile->ReadObject( reinterpret_cast<idClass *&>( waitingForThread ) );
+	savefile->ReadObject( reinterpret_cast<anClass *&>( waitingForThread ) );
 	savefile->ReadInt( waitingFor );
 	savefile->ReadInt( waitingUntil );
 
@@ -418,7 +418,7 @@ idThread *idThread::GetThread( int num ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -465,7 +465,7 @@ void idThread::DisplayInfo( void ) {
 idThread::ListThreads_f
 ================
 */
-void idThread::ListThreads_f( const idCmdArgs &args ) {
+void idThread::ListThreads_f( const anCommandArgs &args ) {
 	int	i;
 	int	n;
 
@@ -489,7 +489,7 @@ void idThread::Restart( void ) {
 	// reset the threadIndex
 	threadIndex = 0;
 
-	currentThread = NULL;
+	currentThread = nullptr;
 	n = threadList.Num();
 	for( i = n - 1; i >= 0; i-- ) {
 		delete threadList[ i ];
@@ -541,7 +541,7 @@ void idThread::SetThreadName( const char *name ) {
 idThread::ObjectMoveDone
 ================
 */
-void idThread::ObjectMoveDone( int threadnum, idEntity *obj ) {
+void idThread::ObjectMoveDone( int threadnum, abEntity *obj ) {
 	idThread *thread;
 
 	if ( !threadnum ) {
@@ -589,7 +589,7 @@ void idThread::KillThread( const char *name ) {
 	num = threadList.Num();
 	for( i = 0; i < num; i++ ) {
 		thread = threadList[ i ];
-		if ( !idStr::Cmpn( thread->GetThreadName(), name, len ) ) {
+		if ( !anStr::Cmpn( thread->GetThreadName(), name, len ) ) {
 			thread->End();
 		}
 	}
@@ -685,7 +685,7 @@ idThread::CallFunction
 NOTE: If this is called from within a event called by this thread, the function arguments will be invalid after calling this function.
 ================
 */
-void idThread::CallFunction( idEntity *self, const function_t *func, bool clearStack ) {
+void idThread::CallFunction( abEntity *self, const function_t *func, bool clearStack ) {
 	assert( self );
 	ClearWaitFor();
 	interpreter.EnterObjectFunction( self, func, clearStack );
@@ -698,7 +698,7 @@ idThread::ClearWaitFor
 */
 void idThread::ClearWaitFor( void ) {
 	waitingFor			= ENTITYNUM_NONE;
-	waitingForThread	= NULL;
+	waitingForThread	= nullptr;
 	waitingUntil		= 0;
 }
 
@@ -707,7 +707,7 @@ void idThread::ClearWaitFor( void ) {
 idThread::IsWaitingFor
 ================
 */
-bool idThread::IsWaitingFor( idEntity *obj ) {
+bool idThread::IsWaitingFor( abEntity *obj ) {
 	assert( obj );
 	return waitingFor == obj->entityNumber;
 }
@@ -717,7 +717,7 @@ bool idThread::IsWaitingFor( idEntity *obj ) {
 idThread::ObjectMoveDone
 ================
 */
-void idThread::ObjectMoveDone( idEntity *obj ) {
+void idThread::ObjectMoveDone( abEntity *obj ) {
 	assert( obj );
 
 	if ( IsWaitingFor( obj ) ) {
@@ -817,7 +817,7 @@ void idThread::ReturnInt( int value ) {
 idThread::ReturnVector
 ================
 */
-void idThread::ReturnVector( idVec3 const &vec ) {
+void idThread::ReturnVector( anVec3 const &vec ) {
 	gameLocal.program.ReturnVector( vec );
 }
 
@@ -826,7 +826,7 @@ void idThread::ReturnVector( idVec3 const &vec ) {
 idThread::ReturnEntity
 ================
 */
-void idThread::ReturnEntity( idEntity *ent ) {
+void idThread::ReturnEntity( abEntity *ent ) {
 	gameLocal.program.ReturnEntity( ent );
 }
 
@@ -933,7 +933,7 @@ void idThread::Event_WaitFrame( void ) {
 idThread::Event_WaitFor
 ================
 */
-void idThread::Event_WaitFor( idEntity *ent ) {
+void idThread::Event_WaitFor( abEntity *ent ) {
 	if ( ent && ent->RespondsTo( EV_Thread_SetCallback ) ) {
 		ent->ProcessEvent( &EV_Thread_SetCallback );
 		if ( gameLocal.program.GetReturnedInteger() ) {
@@ -1004,7 +1004,7 @@ void idThread::Event_Assert( float value ) {
 idThread::Event_Trigger
 ================
 */
-void idThread::Event_Trigger( idEntity *ent ) {
+void idThread::Event_Trigger( abEntity *ent ) {
 	if ( ent ) {
 		ent->Signal( SIG_TRIGGER );
 		ent->ProcessEvent( &EV_Activate, gameLocal.GetLocalPlayer() );
@@ -1067,12 +1067,12 @@ idThread::Event_GetEntity
 */
 void idThread::Event_GetEntity( const char *name ) {
 	int			entnum;
-	idEntity	*ent;
+	abEntity	*ent;
 
 	assert( name );
 
-	if ( name[ 0 ] == '*' ) {
-		entnum = atoi( &name[ 1 ] );
+	if ( name[0] == '*' ) {
+		entnum = atoi( &name[1] );
 		if ( ( entnum < 0 ) || ( entnum >= MAX_GENTITIES ) ) {
 			Error( "Entity number in string out of range." );
 		}
@@ -1089,7 +1089,7 @@ idThread::Event_Spawn
 ================
 */
 void idThread::Event_Spawn( const char *classname ) {
-	idEntity *ent;
+	abEntity *ent;
 
 	spawnArgs.Set( "classname", classname );
 	gameLocal.SpawnEntityDef( spawnArgs, &ent );
@@ -1102,7 +1102,7 @@ void idThread::Event_Spawn( const char *classname ) {
 idThread::Event_CopySpawnArgs
 ================
 */
-void idThread::Event_CopySpawnArgs( idEntity *ent ) {
+void idThread::Event_CopySpawnArgs( abEntity *ent ) {
 	spawnArgs.Copy( ent->spawnArgs );
 }
 
@@ -1144,8 +1144,8 @@ void idThread::Event_SpawnFloat( const char *key, float defaultvalue ) {
 idThread::Event_SpawnVector
 ================
 */
-void idThread::Event_SpawnVector( const char *key, idVec3 &defaultvalue ) {
-	idVec3 result;
+void idThread::Event_SpawnVector( const char *key, anVec3 &defaultvalue ) {
+	anVec3 result;
 
 	spawnArgs.GetVector( key, va( "%f %f %f", defaultvalue.x, defaultvalue.y, defaultvalue.z ), result );
 	ReturnVector( result );
@@ -1200,7 +1200,7 @@ idThread::Event_GetPersistantVector
 ================
 */
 void idThread::Event_GetPersistantVector( const char *key ) {
-	idVec3 result;
+	anVec3 result;
 
 	gameLocal.persistentLevelInfo.GetVector( key, "0 0 0", result );
 	ReturnVector( result );
@@ -1211,7 +1211,7 @@ void idThread::Event_GetPersistantVector( const char *key ) {
 idThread::Event_AngToForward
 ================
 */
-void idThread::Event_AngToForward( idAngles &ang ) {
+void idThread::Event_AngToForward( anAngles &ang ) {
 	ReturnVector( ang.ToForward() );
 }
 
@@ -1220,10 +1220,10 @@ void idThread::Event_AngToForward( idAngles &ang ) {
 idThread::Event_AngToRight
 ================
 */
-void idThread::Event_AngToRight( idAngles &ang ) {
-	idVec3 vec;
+void idThread::Event_AngToRight( anAngles &ang ) {
+	anVec3 vec;
 
-	ang.ToVectors( NULL, &vec );
+	ang.ToVectors( nullptr, &vec );
 	ReturnVector( vec );
 }
 
@@ -1232,10 +1232,10 @@ void idThread::Event_AngToRight( idAngles &ang ) {
 idThread::Event_AngToUp
 ================
 */
-void idThread::Event_AngToUp( idAngles &ang ) {
-	idVec3 vec;
+void idThread::Event_AngToUp( anAngles &ang ) {
+	anVec3 vec;
 
-	ang.ToVectors( NULL, NULL, &vec );
+	ang.ToVectors( nullptr, nullptr, &vec );
 	ReturnVector( vec );
 }
 
@@ -1245,7 +1245,7 @@ idThread::Event_GetSine
 ================
 */
 void idThread::Event_GetSine( float angle ) {
-	ReturnFloat( idMath::Sin( DEG2RAD( angle ) ) );
+	ReturnFloat( anMath::Sin( DEG2RAD( angle ) ) );
 }
 
 /*
@@ -1254,7 +1254,7 @@ idThread::Event_GetCosine
 ================
 */
 void idThread::Event_GetCosine( float angle ) {
-	ReturnFloat( idMath::Cos( DEG2RAD( angle ) ) );
+	ReturnFloat( anMath::Cos( DEG2RAD( angle ) ) );
 }
 
 /*
@@ -1263,7 +1263,7 @@ idThread::Event_GetSquareRoot
 ================
 */
 void idThread::Event_GetSquareRoot( float theSquare ) {
-	ReturnFloat( idMath::Sqrt( theSquare ) );
+	ReturnFloat( anMath::Sqrt( theSquare ) );
 }
 
 /*
@@ -1271,8 +1271,8 @@ void idThread::Event_GetSquareRoot( float theSquare ) {
 idThread::Event_VecNormalize
 ================
 */
-void idThread::Event_VecNormalize( idVec3 &vec ) {
-	idVec3 n;
+void idThread::Event_VecNormalize( anVec3 &vec ) {
+	anVec3 n;
 
 	n = vec;
 	n.Normalize();
@@ -1284,7 +1284,7 @@ void idThread::Event_VecNormalize( idVec3 &vec ) {
 idThread::Event_VecLength
 ================
 */
-void idThread::Event_VecLength( idVec3 &vec ) {
+void idThread::Event_VecLength( anVec3 &vec ) {
 	ReturnFloat( vec.Length() );
 }
 
@@ -1293,7 +1293,7 @@ void idThread::Event_VecLength( idVec3 &vec ) {
 idThread::Event_VecDotProduct
 ================
 */
-void idThread::Event_VecDotProduct( idVec3 &vec1, idVec3 &vec2 ) {
+void idThread::Event_VecDotProduct( anVec3 &vec1, anVec3 &vec2 ) {
 	ReturnFloat( vec1 * vec2 );
 }
 
@@ -1302,7 +1302,7 @@ void idThread::Event_VecDotProduct( idVec3 &vec1, idVec3 &vec2 ) {
 idThread::Event_VecCrossProduct
 ================
 */
-void idThread::Event_VecCrossProduct( idVec3 &vec1, idVec3 &vec2 ) {
+void idThread::Event_VecCrossProduct( anVec3 &vec1, anVec3 &vec2 ) {
 	ReturnVector( vec1.Cross( vec2 ) );
 }
 
@@ -1311,9 +1311,9 @@ void idThread::Event_VecCrossProduct( idVec3 &vec1, idVec3 &vec2 ) {
 idThread::Event_VecToAngles
 ================
 */
-void idThread::Event_VecToAngles( idVec3 &vec ) {
-	idAngles ang = vec.ToAngles();
-	ReturnVector( idVec3( ang[0], ang[1], ang[2] ) );
+void idThread::Event_VecToAngles( anVec3 &vec ) {
+	anAngles ang = vec.ToAngles();
+	ReturnVector( anVec3( ang[0], ang[1], ang[2] ) );
 }
 
 /*
@@ -1321,7 +1321,7 @@ void idThread::Event_VecToAngles( idVec3 &vec ) {
 idThread::Event_OnSignal
 ================
 */
-void idThread::Event_OnSignal( int signal, idEntity *ent, const char *func ) {
+void idThread::Event_OnSignal( int signal, abEntity *ent, const char *func ) {
 	const function_t *function;
 
 	assert( func );
@@ -1347,7 +1347,7 @@ void idThread::Event_OnSignal( int signal, idEntity *ent, const char *func ) {
 idThread::Event_ClearSignalThread
 ================
 */
-void idThread::Event_ClearSignalThread( int signal, idEntity *ent ) {
+void idThread::Event_ClearSignalThread( int signal, abEntity *ent ) {
 	if ( !ent ) {
 		Error( "Entity not found" );
 	}
@@ -1364,7 +1364,7 @@ void idThread::Event_ClearSignalThread( int signal, idEntity *ent ) {
 idThread::Event_SetCamera
 ================
 */
-void idThread::Event_SetCamera( idEntity *ent ) {
+void idThread::Event_SetCamera( abEntity *ent ) {
 	if ( !ent ) {
 		Error( "Entity not found" );
 		return;
@@ -1384,7 +1384,7 @@ idThread::Event_FirstPerson
 ================
 */
 void idThread::Event_FirstPerson( void ) {
-	gameLocal.SetCamera( NULL );
+	gameLocal.SetCamera( nullptr );
 }
 
 /*
@@ -1392,11 +1392,11 @@ void idThread::Event_FirstPerson( void ) {
 idThread::Event_Trace
 ================
 */
-void idThread::Event_Trace( const idVec3 &start, const idVec3 &end, const idVec3 &mins, const idVec3 &maxs, int contents_mask, idEntity *passEntity ) {
+void idThread::Event_Trace( const anVec3 &start, const anVec3 &end, const anVec3 &mins, const anVec3 &maxs, int contents_mask, abEntity *passEntity ) {
 	if ( mins == vec3_origin && maxs == vec3_origin ) {
 		gameLocal.clip.TracePoint( trace, start, end, contents_mask, passEntity );
 	} else {
-		gameLocal.clip.TraceBounds( trace, start, end, idBounds( mins, maxs ), contents_mask, passEntity );
+		gameLocal.clip.TraceBounds( trace, start, end, anBounds( mins, maxs ), contents_mask, passEntity );
 	}
 	ReturnFloat( trace.fraction );
 }
@@ -1406,7 +1406,7 @@ void idThread::Event_Trace( const idVec3 &start, const idVec3 &end, const idVec3
 idThread::Event_TracePoint
 ================
 */
-void idThread::Event_TracePoint( const idVec3 &start, const idVec3 &end, int contents_mask, idEntity *passEntity ) {
+void idThread::Event_TracePoint( const anVec3 &start, const anVec3 &end, int contents_mask, abEntity *passEntity ) {
 	gameLocal.clip.TracePoint( trace, start, end, contents_mask, passEntity );
 	ReturnFloat( trace.fraction );
 }
@@ -1451,7 +1451,7 @@ void idThread::Event_GetTraceEntity( void ) {
 	if ( trace.fraction < 1.0f ) {
 		ReturnEntity( gameLocal.entities[ trace.c.entityNum ] );
 	} else {
-		ReturnEntity( ( idEntity * )NULL );
+		ReturnEntity( ( abEntity * )nullptr );
 	}
 }
 
@@ -1496,13 +1496,13 @@ void idThread::Event_GetTraceBody( void ) {
 idThread::Event_FadeIn
 ================
 */
-void idThread::Event_FadeIn( idVec3 &color, float time ) {
-	idVec4		fadeColor;
-	idPlayer	*player;
+void idThread::Event_FadeIn( anVec3 &color, float time ) {
+	anVec4		fadeColor;
+	anBasePlayer	*player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( player ) {
-		fadeColor.Set( color[ 0 ], color[ 1 ], color[ 2 ], 0.0f );
+		fadeColor.Set( color[0], color[1], color[2], 0.0f );
 		player->playerView.Fade(fadeColor, SEC2MS( time ) );
 	}
 }
@@ -1512,13 +1512,13 @@ void idThread::Event_FadeIn( idVec3 &color, float time ) {
 idThread::Event_FadeOut
 ================
 */
-void idThread::Event_FadeOut( idVec3 &color, float time ) {
-	idVec4		fadeColor;
-	idPlayer	*player;
+void idThread::Event_FadeOut( anVec3 &color, float time ) {
+	anVec4		fadeColor;
+	anBasePlayer	*player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( player ) {
-		fadeColor.Set( color[ 0 ], color[ 1 ], color[ 2 ], 1.0f );
+		fadeColor.Set( color[0], color[1], color[2], 1.0f );
 		player->playerView.Fade(fadeColor, SEC2MS( time ) );
 	}
 }
@@ -1528,13 +1528,13 @@ void idThread::Event_FadeOut( idVec3 &color, float time ) {
 idThread::Event_FadeTo
 ================
 */
-void idThread::Event_FadeTo( idVec3 &color, float alpha, float time ) {
-	idVec4		fadeColor;
-	idPlayer	*player;
+void idThread::Event_FadeTo( anVec3 &color, float alpha, float time ) {
+	anVec4		fadeColor;
+	anBasePlayer	*player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( player ) {
-		fadeColor.Set( color[ 0 ], color[ 1 ], color[ 2 ], alpha );
+		fadeColor.Set( color[0], color[1], color[2], alpha );
 		player->playerView.Fade(fadeColor, SEC2MS( time ) );
 	}
 }
@@ -1610,7 +1610,7 @@ void idThread::Event_StrLeft( const char *string, int num ) {
 		return;
 	}
 
-	idStr result( string, 0, num );
+	anStr result( string, 0, num );
 	idThread::ReturnString( result );
 }
 
@@ -1683,7 +1683,7 @@ void idThread::Event_StrMid( const char *string, int start, int num ) {
 		num = len - start;
 	}
 
-	idStr result( string, start, start + num );
+	anStr result( string, start, start + num );
 	idThread::ReturnString( result );
 }
 
@@ -1704,7 +1704,7 @@ void idThread::Event_StrToFloat( const char *string ) {
 idThread::Event_RadiusDamage
 ================
 */
-void idThread::Event_RadiusDamage( const idVec3 &origin, idEntity *inflictor, idEntity *attacker, idEntity *ignore, const char *damageDefName, float dmgPower ) {
+void idThread::Event_RadiusDamage( const anVec3 &origin, abEntity *inflictor, abEntity *attacker, abEntity *ignore, const char *damageDefName, float dmgPower ) {
 	gameLocal.RadiusDamage( origin, inflictor, attacker, ignore, ignore, damageDefName, dmgPower );
 }
 
@@ -1758,8 +1758,8 @@ void idThread::Event_CacheSoundShader( const char *soundName ) {
 idThread::Event_DebugLine
 ================
 */
-void idThread::Event_DebugLine( const idVec3 &color, const idVec3 &start, const idVec3 &end, const float lifetime ) {
-	gameRenderWorld->DebugLine( idVec4( color.x, color.y, color.z, 0.0f ), start, end, SEC2MS( lifetime ) );
+void idThread::Event_DebugLine( const anVec3 &color, const anVec3 &start, const anVec3 &end, const float lifetime ) {
+	gameRenderWorld->DebugLine( anVec4( color.x, color.y, color.z, 0.0f ), start, end, SEC2MS( lifetime ) );
 }
 
 /*
@@ -1767,8 +1767,8 @@ void idThread::Event_DebugLine( const idVec3 &color, const idVec3 &start, const 
 idThread::Event_DebugArrow
 ================
 */
-void idThread::Event_DebugArrow( const idVec3 &color, const idVec3 &start, const idVec3 &end, const int size, const float lifetime ) {
-	gameRenderWorld->DebugArrow( idVec4( color.x, color.y, color.z, 0.0f ), start, end, size, SEC2MS( lifetime ) );
+void idThread::Event_DebugArrow( const anVec3 &color, const anVec3 &start, const anVec3 &end, const int size, const float lifetime ) {
+	gameRenderWorld->DebugArrow( anVec4( color.x, color.y, color.z, 0.0f ), start, end, size, SEC2MS( lifetime ) );
 }
 
 /*
@@ -1776,8 +1776,8 @@ void idThread::Event_DebugArrow( const idVec3 &color, const idVec3 &start, const
 idThread::Event_DebugCircle
 ================
 */
-void idThread::Event_DebugCircle( const idVec3 &color, const idVec3 &origin, const idVec3 &dir, const float radius, const int numSteps, const float lifetime ) {
-	gameRenderWorld->DebugCircle( idVec4( color.x, color.y, color.z, 0.0f ), origin, dir, radius, numSteps, SEC2MS( lifetime ) );
+void idThread::Event_DebugCircle( const anVec3 &color, const anVec3 &origin, const anVec3 &dir, const float radius, const int numSteps, const float lifetime ) {
+	gameRenderWorld->DebugCircle( anVec4( color.x, color.y, color.z, 0.0f ), origin, dir, radius, numSteps, SEC2MS( lifetime ) );
 }
 
 /*
@@ -1785,8 +1785,8 @@ void idThread::Event_DebugCircle( const idVec3 &color, const idVec3 &origin, con
 idThread::Event_DebugBounds
 ================
 */
-void idThread::Event_DebugBounds( const idVec3 &color, const idVec3 &mins, const idVec3 &maxs, const float lifetime ) {
-	gameRenderWorld->DebugBounds( idVec4( color.x, color.y, color.z, 0.0f ), idBounds( mins, maxs ), vec3_origin, SEC2MS( lifetime ) );
+void idThread::Event_DebugBounds( const anVec3 &color, const anVec3 &mins, const anVec3 &maxs, const float lifetime ) {
+	gameRenderWorld->DebugBounds( anVec4( color.x, color.y, color.z, 0.0f ), anBounds( mins, maxs ), vec3_origin, SEC2MS( lifetime ) );
 }
 
 /*
@@ -1794,8 +1794,8 @@ void idThread::Event_DebugBounds( const idVec3 &color, const idVec3 &mins, const
 idThread::Event_DrawText
 ================
 */
-void idThread::Event_DrawText( const char *text, const idVec3 &origin, float scale, const idVec3 &color, const int align, const float lifetime ) {
-	gameRenderWorld->DrawText( text, origin, scale, idVec4( color.x, color.y, color.z, 0.0f ), gameLocal.GetLocalPlayer()->viewAngles.ToMat3(), align, SEC2MS( lifetime ) );
+void idThread::Event_DrawText( const char *text, const anVec3 &origin, float scale, const anVec3 &color, const int align, const float lifetime ) {
+	gameRenderWorld->DrawText( text, origin, scale, anVec4( color.x, color.y, color.z, 0.0f ), gameLocal.GetLocalPlayer()->viewAngles.ToMat3(), align, SEC2MS( lifetime ) );
 }
 
 /*
@@ -1804,7 +1804,7 @@ idThread::Event_InfluenceActive
 ================
 */
 void idThread::Event_InfluenceActive( void ) {
-	idPlayer *player;
+	anBasePlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( player && player->GetInfluenceLevel() ) {

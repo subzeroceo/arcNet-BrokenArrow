@@ -70,7 +70,7 @@ public:
 							idAFConstraint( void );
 	virtual					~idAFConstraint( void );
 	constraintType_t		GetType( void ) const { return type; }
-	const anString &			GetName( void ) const { return name; }
+	const anStr &			GetName( void ) const { return name; }
 	idAFBody *				GetBody1( void ) const { return body1; }
 	idAFBody *				GetBody2( void ) const { return body2; }
 	void					SetPhysics( anPhysics_AF *p ) { physics = p; }
@@ -87,7 +87,7 @@ public:
 
 protected:
 	constraintType_t		type;						// constraint type
-	anString					name;						// name of constraint
+	anStr					name;						// name of constraint
 	idAFBody *				body1;						// first constrained body
 	idAFBody *				body2;						// second constrained body, nullptr for world
 	anPhysics_AF *			physics;					// for adding additional constraints like limits
@@ -125,7 +125,7 @@ protected:
 class idAFConstraint_Fixed : public idAFConstraint {
 
 public:
-							idAFConstraint_Fixed( const anString &name, idAFBody *body1, idAFBody *body2 );
+							idAFConstraint_Fixed( const anStr &name, idAFBody *body1, idAFBody *body2 );
 	void					SetRelativeOrigin( const anVec3 &origin ) { this->offset = origin; }
 	void					SetRelativeAxis( const anMat3 &axis ) { this->relAxis = axis; }
 	virtual void			SetBody1( idAFBody *body );
@@ -152,7 +152,7 @@ protected:
 class idAFConstraint_BallAndSocketJoint : public idAFConstraint {
 
 public:
-							idAFConstraint_BallAndSocketJoint( const anString &name, idAFBody *body1, idAFBody *body2 );
+							idAFConstraint_BallAndSocketJoint( const anStr &name, idAFBody *body1, idAFBody *body2 );
 							~idAFConstraint_BallAndSocketJoint( void );
 	void					SetAnchor( const anVec3 &worldPosition );
 	anVec3					GetAnchor( void ) const;
@@ -207,7 +207,7 @@ protected:
 class idAFConstraint_UniversalJoint : public idAFConstraint {
 
 public:
-							idAFConstraint_UniversalJoint( const anString &name, idAFBody *body1, idAFBody *body2 );
+							idAFConstraint_UniversalJoint( const anStr &name, idAFBody *body1, idAFBody *body2 );
 							~idAFConstraint_UniversalJoint( void );
 	void					SetAnchor( const anVec3 &worldPosition );
 	anVec3					GetAnchor( void ) const;
@@ -268,7 +268,7 @@ protected:
 class idAFConstraint_CylindricalJoint : public idAFConstraint {
 
 public:
-							idAFConstraint_CylindricalJoint( const anString &name, idAFBody *body1, idAFBody *body2 );
+							idAFConstraint_CylindricalJoint( const anStr &name, idAFBody *body1, idAFBody *body2 );
 	virtual void			DebugDraw( void );
 	virtual void			Translate( const anVec3 &translation );
 	virtual void			Rotate( const anRotation &rotation );
@@ -285,7 +285,7 @@ protected:
 class idAFConstraint_Hinge : public idAFConstraint {
 
 public:
-							idAFConstraint_Hinge( const anString &name, idAFBody *body1, idAFBody *body2 );
+							idAFConstraint_Hinge( const anStr &name, idAFBody *body1, idAFBody *body2 );
 							~idAFConstraint_Hinge( void );
 	void					SetAnchor( const anVec3 &worldPosition );
 	anVec3					GetAnchor( void ) const;
@@ -374,7 +374,7 @@ protected:
 class idAFConstraint_Slider : public idAFConstraint {
 
 public:
-							idAFConstraint_Slider( const anString &name, idAFBody *body1, idAFBody *body2 );
+							idAFConstraint_Slider( const anStr &name, idAFBody *body1, idAFBody *body2 );
 	void					SetAxis( const anVec3 &ax );
 	virtual void			DebugDraw( void );
 	virtual void			Translate( const anVec3 &translation );
@@ -398,7 +398,7 @@ protected:
 class idAFConstraint_Line : public idAFConstraint {
 
 public:
-							idAFConstraint_Line( const anString &name, idAFBody *body1, idAFBody *body2 );
+							idAFConstraint_Line( const anStr &name, idAFBody *body1, idAFBody *body2 );
 	virtual void			DebugDraw( void );
 	virtual void			Translate( const anVec3 &translation );
 	virtual void			Rotate( const anRotation &rotation );
@@ -415,7 +415,7 @@ protected:
 class idAFConstraint_Plane : public idAFConstraint {
 
 public:
-							idAFConstraint_Plane( const anString &name, idAFBody *body1, idAFBody *body2 );
+							idAFConstraint_Plane( const anStr &name, idAFBody *body1, idAFBody *body2 );
 	void					SetPlane( const anVec3 &normal, const anVec3 &anchor );
 	virtual void			DebugDraw( void );
 	virtual void			Translate( const anVec3 &translation );
@@ -438,7 +438,7 @@ protected:
 class idAFConstraint_Spring : public idAFConstraint {
 
 public:
-							idAFConstraint_Spring( const anString &name, idAFBody *body1, idAFBody *body2 );
+							idAFConstraint_Spring( const anStr &name, idAFBody *body1, idAFBody *body2 );
 	void					SetAnchor( const anVec3 &worldAnchor1, const anVec3 &worldAnchor2 );
 	void					SetSpring( const float stretch, const float compress, const float damping, const float restLength );
 	void					SetLimit( const float minLength, const float maxLength );
@@ -590,14 +590,14 @@ class idAFBody {
 
 public:
 							idAFBody( void );
-							idAFBody( const anString &name, anClipModel *clipModel, float density );
+							idAFBody( const anStr &name, anClipModel *clipModel, float density );
 							~idAFBody( void );
 
 	void					Init( void );
-	const anString &			GetName( void ) const { return name; }
+	const anStr &			GetName( void ) const { return name; }
 	const anVec3 &			GetWorldOrigin( void ) const { return current->worldOrigin; }
 	const anMat3 &			GetWorldAxis( void ) const { return current->worldAxis; }
-	const anVec3 &			GetLinearVelocity( void ) const { return current->spatialVelocity.SubVec3(0); }
+	const anVec3 &			GetLinearVelocity( void ) const { return current->spatialVelocity.SubVec3( 0 ); }
 	const anVec3 &			GetAngularVelocity( void ) const { return current->spatialVelocity.SubVec3( 1 ); }
 	anVec3					GetPointVelocity( const anVec3 &point ) const;
 	const anVec3 &			GetCenterOfMass( void ) const { return centerOfMass; }
@@ -608,7 +608,7 @@ public:
 	void					SetSelfCollision( const bool enable ) { fl.selfCollision = enable; }
 	void					SetWorldOrigin( const anVec3 &origin ) { current->worldOrigin = origin; }
 	void					SetWorldAxis( const anMat3 &axis ) { current->worldAxis = axis; }
-	void					SetLinearVelocity( const anVec3 &linear ) const { current->spatialVelocity.SubVec3(0) = linear; }
+	void					SetLinearVelocity( const anVec3 &linear ) const { current->spatialVelocity.SubVec3( 0 ) = linear; }
 	void					SetAngularVelocity( const anVec3 &angular ) const { current->spatialVelocity.SubVec3( 1 ) = angular; }
 	void					SetFriction( float linear, float angular, float contact );
 	float					GetContactFriction( void ) const { return contactFriction; }
@@ -637,7 +637,7 @@ public:
 
 private:
 							// properties
-	anString				name;						// name of body
+	anStr				name;						// name of body
 	idAFBody *				parent;						// parent of this body
 	anList<idAFBody *>		children;					// children of this body
 	anClipModel *			clipModel;					// model used for collision detection

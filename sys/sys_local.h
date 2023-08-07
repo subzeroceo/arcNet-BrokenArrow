@@ -9,7 +9,7 @@
 ==============================================================
 */
 
-class anSystemLocal : public arcSystem {
+class anSystemLocal : public anSystem {
 public:
 	virtual void			DebugPrintf( const char *fmt, ... )an_attribute( ( format( printf,2,3 ) ) );
 	virtual void			DebugVPrintf( const char *fmt, va_list arg );

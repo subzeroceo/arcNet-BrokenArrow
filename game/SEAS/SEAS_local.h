@@ -59,7 +59,7 @@ class anSEASLocal : public anSEAS {
 public:
 								anSEASLocal( void );
 	virtual						~anSEASLocal( void );
-	virtual bool				Init( const anString &mapName, unsigned int mapFileCRC );
+	virtual bool				Init( const anStr &mapName, unsigned int mapFileCRC );
 	virtual void				Shutdown( void );
 
 	virtual size_t				StatsSummary( void ) const;
@@ -107,7 +107,7 @@ public:
 
 private:
 	anSEASFile *					file;
-	anString						name;
+	anStr						name;
 
 private:	// routing data
 	SEASRouteCache ***			areaCacheIndex;			// for each area in each cluster the travel times to all other areas in the cluster

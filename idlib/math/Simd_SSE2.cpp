@@ -9,7 +9,7 @@
 
 //===============================================================
 //
-//	SSE2 implementation of arcSIMDProcessor
+//	SSE2 implementation of anSIMDProcessor
 //
 //===============================================================
 #if defined(MACOS_X) && defined(__i386__)
@@ -113,9 +113,9 @@ void VPCALL idSIMD_SSE2::CmpLT( byte *dst, const byte bitNum, const float *src0,
 				// End
 				mask_l = mask_l &  0x01010101;
 				mask_l = mask_l << bitNum;
-				dst_l  = *(( int*) dst_p);
+				dst_l  = *((int *) dst_p);
 				mask_l = mask_l | dst_l;
-				*(( int*) dst_p) = mask_l;
+				*((int *) dst_p) = mask_l;
 				src0_p = src0_p + 16;
 				dst_p = dst_p + 4;
 				cnt_l = cnt_l + 1;
@@ -194,9 +194,9 @@ void VPCALL idSIMD_SSE2::CmpLT( byte *dst, const byte bitNum, const float *src0,
 					// End
 					mask_l = mask_l &  0x01010101;
 					mask_l = mask_l << bitNum;
-					dst_l  = *(( int*) dst_p);
+					dst_l  = *((int *) dst_p);
 					mask_l = mask_l | dst_l;
-					*(( int*) dst_p) = mask_l;
+					*((int *) dst_p) = mask_l;
 					src0_p = src0_p + 16;
 					dst_p = dst_p + 4;
 					cnt_l = cnt_l + 1;

@@ -222,7 +222,7 @@ static infoParm_t	infoParms[] = {
 	{"aasobstacle",	0,	0,	CONTENTS_OBSTACLE_SEAS },// used to compile an obstacle into AAS that can be enabled/disabled
 	//{"flashlight_trigger", 0, 0, CONTENTS_LIGHT_TRIGGER }, // used for triggers that are activated by the flashlight
 	{"nonsolid",	1,	0,	0 			},			// clears the solid flag
-	{"nullNormal",	0,	SURF_NULLNORMAL,0 },		// renderbump will draw as 0x80 0x80 0x80
+	{"nullNormal",	0,	SURF_nullptrNORMAL,0 },		// renderbump will draw as 0x80 0x80 0x80
 
 	// utility relevant attributes
 	{"areaportal",	1,	0,	CONTENTS_AREAPORTAL },	// divides areas
@@ -743,7 +743,7 @@ void anMaterial::ClearStage( materialStage_t *ss ) {
 anMaterial::NameToSrcBlendMode
 ===============
 */
-int anMaterial::NameToSrcBlendMode( const anString &name ) {
+int anMaterial::NameToSrcBlendMode( const anStr &name ) {
 	if ( !name.Icmp( "GL_ONE" ) ) {
 		return GLS_SRCBLEND_ONE;
 	} else if ( !name.Icmp( "GL_ZERO" ) ) {
@@ -775,7 +775,7 @@ int anMaterial::NameToSrcBlendMode( const anString &name ) {
 anMaterial::NameToDstBlendMode
 ===============
 */
-int anMaterial::NameToDstBlendMode( const anString &name ) {
+int anMaterial::NameToDstBlendMode( const anStr &name ) {
 	if ( !name.Icmp( "GL_ONE" ) ) {
 		return GLS_DSTBLEND_ONE;
 	} else if ( !name.Icmp( "GL_ZERO" ) ) {
@@ -964,7 +964,7 @@ void anMaterial::ParseFragmentMap( anLexer &src, materialStage_t *newStage ) {
 			trp = TR_CLAMP;
 			continue;
 		}
-		if ( !token.Icmp( "noclamp" ) ) {
+		if ( !token.Icmp( "repeat" ) ) {
 			trp = TR_REPEAT;
 			continue;
 		}
@@ -1114,7 +1114,7 @@ void anMaterial::ParseStage( anLexer &src, const textureRepeat_t trpDefault ) {
 
 		if ( !token.Icmp( "map" ) ) {
 			const char *str = R_ParsePastImageProgram( src );
-			anString::Copynz( imageName, str, sizeof( imageName ) );
+			anStr::Copynz( imageName, str, sizeof( imageName ) );
 			continue;
 		}
 
@@ -1185,14 +1185,14 @@ void anMaterial::ParseStage( anLexer &src, const textureRepeat_t trpDefault ) {
 
 		if ( !token.Icmp( "cubeMap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			anString::Copynz( imageName, str, sizeof( imageName ) );
+			anStr::Copynz( imageName, str, sizeof( imageName ) );
 			cubeMap = CF_NATIVE;
 			continue;
 		}
 
 		if ( !token.Icmp( "cameraCubeMap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			anString::Copynz( imageName, str, sizeof( imageName ) );
+			anStr::Copynz( imageName, str, sizeof( imageName ) );
 			cubeMap = CF_CAMERA;
 			continue;
 		}
@@ -1353,10 +1353,10 @@ void anMaterial::ParseStage( anLexer &src, const textureRepeat_t trpDefault ) {
 			// this subtracts 0.5, then scales, then adds 0.5
 			matrix[0][0] = a;
 			matrix[0][1] = GetExpressionConstant( 0 );
-			matrix[0][2] = EmitOp( GetExpressionConstant( 0.5 ), EmitOp( GetExpressionConstant( 0.5 ), a, OP_TYPE_MULTIPLY ), OP_TYPE_SUBTRACT );
+			matrix[0][2] = EmitOp( GetExpressionConstant( 0.5f ), EmitOp( GetExpressionConstant( 0.5f ), a, OP_TYPE_MULTIPLY ), OP_TYPE_SUBTRACT );
 			matrix[1][0] = GetExpressionConstant( 0 );
 			matrix[1][1] = b;
-			matrix[1][2] = EmitOp( GetExpressionConstant( 0.5 ), EmitOp( GetExpressionConstant( 0.5 ), b, OP_TYPE_MULTIPLY ), OP_TYPE_SUBTRACT );
+			matrix[1][2] = EmitOp( GetExpressionConstant( 0.5f ), EmitOp( GetExpressionConstant( 0.5f ), b, OP_TYPE_MULTIPLY ), OP_TYPE_SUBTRACT );
 
 			MultiplyTextureMatrix( ts, matrix );
 			continue;
@@ -1368,10 +1368,10 @@ void anMaterial::ParseStage( anLexer &src, const textureRepeat_t trpDefault ) {
 			// this subtracts 0.5, then shears, then adds 0.5
 			matrix[0][0] = GetExpressionConstant( 1 );
 			matrix[0][1] = a;
-			matrix[0][2] = EmitOp( GetExpressionConstant( -0.5 ), a, OP_TYPE_MULTIPLY );
+			matrix[0][2] = EmitOp( GetExpressionConstant( -0.5f ), a, OP_TYPE_MULTIPLY );
 			matrix[1][0] = b;
 			matrix[1][1] = GetExpressionConstant( 1 );
-			matrix[1][2] = EmitOp( GetExpressionConstant( -0.5 ), b, OP_TYPE_MULTIPLY );
+			matrix[1][2] = EmitOp( GetExpressionConstant( -0.5f ), b, OP_TYPE_MULTIPLY );
 
 			MultiplyTextureMatrix( ts, matrix );
 			continue;
@@ -1402,9 +1402,9 @@ void anMaterial::ParseStage( anLexer &src, const textureRepeat_t trpDefault ) {
 			// this subtracts 0.5, then rotates, then adds 0.5
 			matrix[0][0] = cosReg;
 			matrix[0][1] = EmitOp( GetExpressionConstant( 0 ), sinReg, OP_TYPE_SUBTRACT );
-			matrix[0][2] = EmitOp( EmitOp( EmitOp( GetExpressionConstant( -0.5 ), cosReg, OP_TYPE_MULTIPLY ),
-										EmitOp( GetExpressionConstant( 0.5 ), sinReg, OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
-										GetExpressionConstant( 0.5 ), OP_TYPE_ADD );
+			matrix[0][2] = EmitOp( EmitOp( EmitOp( GetExpressionConstant( -0.5f ), cosReg, OP_TYPE_MULTIPLY ),
+										EmitOp( GetExpressionConstant( 0.5f ), sinReg, OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
+										GetExpressionConstant( -0.5f ), OP_TYPE_ADD );
 
 			matrix[1][0] = sinReg;
 			matrix[1][1] = cosReg;
@@ -1546,13 +1546,10 @@ void anMaterial::ParseStage( anLexer &src, const textureRepeat_t trpDefault ) {
 			ParseFragmentMap( src, &newStage );
 			continue;
 		}
-
-
 		common->Warning( "unknown token '%s' in material '%s'", token.c_str(), GetName() );
 		SetMaterialFlag( MF_DEFAULTED );
 		return;
 	}
-
 
 	// if we are using newStage, allocate a copy of it
 	if ( newStage.fragmentProgram || newStage.vertexProgram ) {
@@ -1689,12 +1686,9 @@ It is valid to have a reflection map and a bump map for bumpy reflection
 ==============
 */
 void anMaterial::AddImplicitStages( const textureRepeat_t trpDefault /* = TR_REPEAT  */ ) {
-	char	buffer[1024];
-	anLexer		newSrc;
-	bool hasDiffuse = false;
-	bool hasSpecular = false;
-	bool hasBump = false;
-	bool hasReflection = false;
+	char buffer[1024];
+	anLexer newSrc;
+	bool hasDiffuse = false, hasSpecular = false, hasBump = false, hasReflection = false;
 
 	for ( int i = 0; i < numStages; i++ ) {
 		if ( pd->parseStages[i].lighting == SL_BUMP ) {
@@ -1721,7 +1715,7 @@ void anMaterial::AddImplicitStages( const textureRepeat_t trpDefault /* = TR_REP
 	}
 
 	if ( !hasBump ) {
-		anString::snPrintf( buffer, sizeof( buffer ), "blend bumpmap\nmap _flat\n}\n" );
+		anStr::snPrintf( buffer, sizeof( buffer ), "blend bumpmap\nmap _flat\n}\n" );
 		newSrc.LoadMemory( buffer, strlen(buffer), "bumpmap" );
 		newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 		ParseStage( newSrc, trpDefault );
@@ -1729,13 +1723,12 @@ void anMaterial::AddImplicitStages( const textureRepeat_t trpDefault /* = TR_REP
 	}
 
 	if ( !hasDiffuse && !hasSpecular && !hasReflection ) {
-		anString::snPrintf( buffer, sizeof( buffer ), "blend diffusemap\nmap _white\n}\n" );
+		anStr::snPrintf( buffer, sizeof( buffer ), "blend diffusemap\nmap _white\n}\n" );
 		newSrc.LoadMemory( buffer, strlen(buffer), "diffusemap" );
 		newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 		ParseStage( newSrc, trpDefault );
 		newSrc.FreeSource();
 	}
-
 }
 
 /*
@@ -1792,17 +1785,15 @@ If there is any error during parsing, defaultShader will be set.
 */
 void anMaterial::ParseMaterial( anLexer &src ) {
 	anToken		token;
-	int			s;
 	char		buffer[1024];
 	const char	*str;
 	anLexer		newSrc;
-	int			i;
 
-	s = 0;
+	int s = 0;
 
 	numOps = 0;
 	numRegisters = EXP_REG_NUM_PREDEFINED;	// leave space for the parms to be copied in
-	for ( i = 0; i < numRegisters; i++ ) {
+	for ( int i = 0; i < numRegisters; i++ ) {
 		pd->registerIsTemporary[i] = true;		// they aren't constants that can be folded
 	}
 
@@ -1939,7 +1930,7 @@ void anMaterial::ParseMaterial( anLexer &src ) {
 		// light volumes
 		} else if ( !token.Icmp( "lightFalloffImage" ) ) {
 			str = R_ParsePastImageProgram( src );
-			anString	copy;
+			anStr	copy;
 
 			copy = str;	// so other things don't step on it
 			lightFalloffImage = globalImages->ImageFromFile( copy, TF_DEFAULT, false, TR_CLAMP /* TR_CLAMP_TO_ZERO */, TD_DEFAULT );
@@ -1983,7 +1974,7 @@ void anMaterial::ParseMaterial( anLexer &src ) {
 		// diffusemap for stage shortcut
 		} else if ( !token.Icmp( "diffusemap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			anString::snPrintf( buffer, sizeof( buffer ), "blend diffusemap\nmap %s\n}\n", str );
+			anStr::snPrintf( buffer, sizeof( buffer ), "blend diffusemap\nmap %s\n}\n", str );
 			newSrc.LoadMemory( buffer, strlen(buffer), "diffusemap" );
 			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 			ParseStage( newSrc, trpDefault );
@@ -1992,7 +1983,7 @@ void anMaterial::ParseMaterial( anLexer &src ) {
 		// specularmap for stage shortcut
 		} else if ( !token.Icmp( "specularmap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			anString::snPrintf( buffer, sizeof( buffer ), "blend specularmap\nmap %s\n}\n", str );
+			anStr::snPrintf( buffer, sizeof( buffer ), "blend specularmap\nmap %s\n}\n", str );
 			newSrc.LoadMemory( buffer, strlen(buffer), "specularmap" );
 			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 			ParseStage( newSrc, trpDefault );
@@ -2001,7 +1992,7 @@ void anMaterial::ParseMaterial( anLexer &src ) {
 		// normalmap for stage shortcut
 		} else if ( !token.Icmp( "bumpmap" ) ) {
 			str = R_ParsePastImageProgram( src );
-			anString::snPrintf( buffer, sizeof( buffer ), "blend bumpmap\nmap %s\n}\n", str );
+			anStr::snPrintf( buffer, sizeof( buffer ), "blend bumpmap\nmap %s\n}\n", str );
 			newSrc.LoadMemory( buffer, strlen(buffer), "bumpmap" );
 			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
 			ParseStage( newSrc, trpDefault );
@@ -2048,7 +2039,7 @@ void anMaterial::ParseMaterial( anLexer &src ) {
 	// we can't just call ReceivesLighting(), because the stages are still
 	// in temporary form
 	if ( cullType == CT_TWO_SIDED ) {
-		for ( i = 0; i < numStages; i++ ) {
+		for ( int i = 0; i < numStages; i++ ) {
 			if ( pd->parseStages[i].lighting != SL_AMBIENT || pd->parseStages[i].texture.texgen != TG_EXPLICIT ) {
 				if ( cullType == CT_TWO_SIDED ) {
 					cullType = CT_FRONT_SIDED;
@@ -2061,7 +2052,7 @@ void anMaterial::ParseMaterial( anLexer &src ) {
 
 	// currently a surface can only have one unique texgen for all the stages on old hardware
 	texGen_t firstGen = TG_EXPLICIT;
-	for ( i = 0; i < numStages; i++ ) {
+	for ( int i = 0; i < numStages; i++ ) {
 		if ( pd->parseStages[i].texture.texgen != TG_EXPLICIT ) {
 			if ( firstGen == TG_EXPLICIT ) {
 				firstGen = pd->parseStages[i].texture.texgen;
@@ -2116,8 +2107,8 @@ bool anMaterial::Parse( const char *text, const int textLength ) {
 	//
 	// count non-lit stages
 	numAmbientStages = 0;
-	int i;
-	for ( i = 0; i < numStages; i++ ) {
+
+	for ( int i = 0; i < numStages; i++ ) {
 		if ( pd->parseStages[i].lighting == SL_AMBIENT ) {
 			numAmbientStages++;
 		}
@@ -2128,7 +2119,7 @@ bool anMaterial::Parse( const char *text, const int textLength ) {
 		hasSubview = true;
 	} else {
 		hasSubview = false;
-		for ( i = 0; i < numStages; i++ ) {
+		for ( int i = 0; i < numStages; i++ ) {
 			if ( pd->parseStages[i].texture.dynamic ) {
 				hasSubview = true;
 			}
@@ -2187,8 +2178,7 @@ bool anMaterial::Parse( const char *text, const int textLength ) {
 
 	// anything that references _currentRender will automatically get sort = SS_POST_PROCESS
 	// and coverage = MC_TRANSLUCENT
-
-	for ( i = 0; i < numStages; i++ ) {
+	for ( int i = 0; i < numStages; i++ ) {
 		materialStage_t	*pStage = &pd->parseStages[i];
 		if ( pStage->texture.image == globalImages->currentRenderImage ) {
 			if ( sort != SS_PORTAL_SKY ) {
@@ -2361,7 +2351,7 @@ then all expressions are evaluated, leaving the material registers
 set to their apropriate values.
 ===============
 */
-void anMaterial::EvaluateRegisters( float *registers, const float shaderParms[MAX_ENTITY_SHADER_PARMS], const viewDef_t *view, ARCSoundEmitter *soundEmitter ) const {
+void anMaterial::EvaluateRegisters( float *registers, const float shaderParms[MAX_ENTITY_SHADER_PARMS], const viewDef_t *view, anSoundEmitter *soundEmitter ) const {
 	// copy the material constants
 	for ( int i = EXP_REG_NUM_PREDEFINED; i < numRegisters; i++ ) {
 		registers[i] = expressionRegisters[i];
@@ -2476,8 +2466,8 @@ anMaterial::GetImageWidth
 =============
 */
 int anMaterial::GetImageWidth( void ) const {
-	assert( GetStage(0 ) && GetStage(0 )->texture.image );
-	return GetStage(0 )->texture.image->uploadWidth;
+	assert( GetStage( 0 ) && GetStage( 0 )->texture.image );
+	return GetStage( 0 )->texture.image->uploadWidth;
 }
 
 /*
@@ -2486,8 +2476,8 @@ anMaterial::GetImageHeight
 =============
 */
 int anMaterial::GetImageHeight( void ) const {
-	assert( GetStage(0 ) && GetStage(0 )->texture.image );
-	return GetStage(0 )->texture.image->uploadHeight;
+	assert( GetStage( 0 ) && GetStage( 0 )->texture.image );
+	return GetStage( 0 )->texture.image->uploadHeight;
 }
 
 /*
@@ -2630,16 +2620,17 @@ bool anMaterial::SetDefaultText( void ) {
 	// if there exists an image with the same name
 	if ( 1 ) { //fileSystem->ReadFile( GetName(), nullptr ) != -1 ) {
 		char generated[2048];
-		anString::snPrintf( generated, sizeof( generated ),
-		"material %s // IMPLICITLY GENERATED\n"
+		anStr::snPrintf( generated, sizeof( generated ),
+		"// IMPLICITLY GENERATED\n"
+		"material %s // add your .mtl to this obj's .def y\n"
 		"{\n"
 		"{\n"
-		"blend blend\n"
-		"colored\n"
-		"map \"%s\"\n"
-		"clamp\n"
+		"blend blend // texture blend modes, defaulted as is\n"
+		"colored  // vertex coloring\n"
+		"map \"%s// texture via relative path\\n"
+		"clampto // desired clamp/tiling modes\n"
 		"}\n"
-		"}\n", GetName(), GetName() );
+		"} // EXPLICITLY ENDED\n", GetName(), GetName() );
 		SetText( generated );
 		return true;
 	} else {
@@ -2662,7 +2653,6 @@ const char *anMaterial::DefaultDefinition() const {
 		"}";
 }
 
-
 /*
 ===================
 anMaterial::GetBumpStage
@@ -2682,8 +2672,7 @@ const materialStage_t *anMaterial::GetBumpStage( void ) const {
 anMaterial::ReloadImages
 ===================
 */
-void anMaterial::ReloadImages( bool force ) const
-{
+void anMaterial::ReloadImages( bool force ) const {
 	for ( int i = 0; i < numStages; i++ ) {
 		if ( stages[i].newStage ) {
 			for ( int j = 0; j < stages[i].newStage->numFragmentProgramImages; j++ ) {

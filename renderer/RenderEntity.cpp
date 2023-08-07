@@ -6,6 +6,7 @@ anRenderEntityLocal::anRenderEntityLocal() {
 	memset( &parms, 0, sizeof( parms ) );
 	memset( modelMatrix, 0, sizeof( modelMatrix ) );
 
+	handle 					= -1;
 	world					= nullptr;
 	index					= 0;
 	lastModifiedFrameNum	= 0;
@@ -37,11 +38,48 @@ void anRenderEntityLocal::UpdateRenderEntity( const renderEntity_t *re, bool for
 void anRenderEntityLocal::GetRenderEntity( renderEntity_t *re ) {
 }
 
+/*
+================
+anRenderEntityLocal::Copy
+================
+*/
+void anRenderEntityLocal::Copy( const renderEntity_t &re ) {
+	entityRefs = re;
+	UpdateRenderEntity();
+}
+
 void anRenderEntityLocal::ForceUpdate() {
+}
+
+/*
+================
+anRenderEntityLocal::Show
+================
+*/
+void anRenderEntityLocal::Show( void ) {
+	if ( handle != -1 ) {
+		return;
+	}
+
+	handle = rw->AddEntityDef( &entityRefs );
 }
 
 int anRenderEntityLocal::GetIndex() {
 	return index;
+}
+
+/*
+================
+sdRenderEntityBundle::Hide
+================
+*/
+void sdRenderEntityBundle::Hide( void ) {
+	if ( handle == -1 ) {
+		return;
+	}
+
+	rw->FreeEntityDef( handle );
+	handle = -1;
 }
 
 void anRenderEntityLocal::ProjectOverlay( const anPlane localTextureAxis[2], const anMaterial *material ) {

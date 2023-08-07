@@ -4,7 +4,7 @@
 #include "Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -43,7 +43,7 @@ void sdProjectileNetworkData::MakeDefault( void ) {
 sdProjectileNetworkData::Write
 ================
 */
-void sdProjectileNetworkData::Write( anFile* file ) const {
+void sdProjectileNetworkData::Write( anFile *file ) const {
 	if ( physicsData ) {
 		physicsData->Write( file );
 	}
@@ -56,7 +56,7 @@ void sdProjectileNetworkData::Write( anFile* file ) const {
 sdProjectileNetworkData::Read
 ================
 */
-void sdProjectileNetworkData::Read( anFile* file ) {
+void sdProjectileNetworkData::Read( anFile *file ) {
 	if ( physicsData ) {
 		physicsData->Read( file );
 	}
@@ -99,7 +99,7 @@ void sdProjectileBroadcastData::MakeDefault( void ) {
 sdProjectileBroadcastData::Write
 ================
 */
-void sdProjectileBroadcastData::Write( anFile* file ) const {
+void sdProjectileBroadcastData::Write( anFile *file ) const {
 	if ( physicsData ) {
 		physicsData->Write( file );
 	}
@@ -124,7 +124,7 @@ void sdProjectileBroadcastData::Write( anFile* file ) const {
 sdProjectileBroadcastData::Read
 ================
 */
-void sdProjectileBroadcastData::Read( anFile* file ) {
+void sdProjectileBroadcastData::Read( anFile *file ) {
 	if ( physicsData ) {
 		physicsData->Read( file );
 	}
@@ -158,26 +158,26 @@ void sdProjectileBroadcastData::Read( anFile* file ) {
 ===============================================================================
 */
 
-extern const arcEventDef EV_SetOwner;
-extern const arcEventDef EV_AddOwner;
-extern const arcEventDef EV_Launch;
-extern const arcEventDef EV_SetEnemy;
-extern const arcEventDef EV_GetEnemy;
-extern const arcEventDef EV_Freeze;
-extern const arcEventDef EV_SetState;
-extern const arcEventDef EV_GetOwner;
-extern const arcEventDef EV_GetLaunchTime;
+extern const anEventDef EV_SetOwner;
+extern const anEventDef EV_AddOwner;
+extern const anEventDef EV_Launch;
+extern const anEventDef EV_SetEnemy;
+extern const anEventDef EV_GetEnemy;
+extern const anEventDef EV_Freeze;
+extern const anEventDef EV_SetState;
+extern const anEventDef EV_GetOwner;
+extern const anEventDef EV_GetLaunchTime;
 
-const arcEventDef EV_GetDamagePower( "getDamagePower", 'f', DOC_TEXT( "Returns the projectile's damage multiplier." ), 0, nullptr );
-const arcEventDef EV_SetOwner( "setOwner", '\0', DOC_TEXT( "Sets the entity which owns the owner." ), 1, "The owner of a projectile cannot collide with it, and vice versa.", "E", "owner", "The new owner to set." );
-const arcEventDef EV_GetLaunchTime( "getLaunchTime", 'f', DOC_TEXT( "Returns the game time in seconds at which the projectile was launched." ), 0, "The result will be 0 if the projectile has not yet been fired." );
-const arcEventDef EV_Launch( "launch", '\0', DOC_TEXT( "Fires the projectile with the given world space velocity." ), 1, nullptr, "v", "velocity", "The velocity to fire the projectile with." );
-const arcEventDef EV_AddOwner( "addOwner", '\0', DOC_TEXT( "Adds an entity to the list of owners for the projectile." ), 1, "Owners cannot collide with the projectile, or vice versa.", "e", "owner", "New owner to add." );
-const arcEventDef EV_SetEnemy( "setEnemy", '\0', DOC_TEXT( "Sets the target entity for this object." ), 1, nullptr, "E", "target", "New target to set." );
-const arcEventDef EV_GetEnemy( "getEnemy", 'e', DOC_TEXT( "Returns the entity's current target." ), 0, nullptr );
-const arcEventDef EV_IsOwner( "isOwner", 'b', DOC_TEXT( "Returns whether the given entity is an owner of this projectile." ), 1, nullptr, "e", "owner", "Entity to check." );
+const anEventDef EV_GetDamagePower( "getDamagePower", 'f', DOC_TEXT( "Returns the projectile's damage multiplier." ), 0, nullptr );
+const anEventDef EV_SetOwner( "setOwner", '\0', DOC_TEXT( "Sets the entity which owns the owner." ), 1, "The owner of a projectile cannot collide with it, and vice versa.", "E", "owner", "The new owner to set." );
+const anEventDef EV_GetLaunchTime( "getLaunchTime", 'f', DOC_TEXT( "Returns the game time in seconds at which the projectile was launched." ), 0, "The result will be 0 if the projectile has not yet been fired." );
+const anEventDef EV_Launch( "launch", '\0', DOC_TEXT( "Fires the projectile with the given world space velocity." ), 1, nullptr, "v", "velocity", "The velocity to fire the projectile with." );
+const anEventDef EV_AddOwner( "addOwner", '\0', DOC_TEXT( "Adds an entity to the list of owners for the projectile." ), 1, "Owners cannot collide with the projectile, or vice versa.", "e", "owner", "New owner to add." );
+const anEventDef EV_SetEnemy( "setEnemy", '\0', DOC_TEXT( "Sets the target entity for this object." ), 1, nullptr, "E", "target", "New target to set." );
+const anEventDef EV_GetEnemy( "getEnemy", 'e', DOC_TEXT( "Returns the entity's current target." ), 0, nullptr );
+const anEventDef EV_IsOwner( "isOwner", 'b', DOC_TEXT( "Returns whether the given entity is an owner of this projectile." ), 1, nullptr, "e", "owner", "Entity to check." );
 
-CLASS_DECLARATION( arcEntity, idProjectile )
+CLASS_DECLARATION( anEntity, idProjectile )
 	EVENT( EV_SetState,			idProjectile::Event_SetState )
 	EVENT( EV_GetDamagePower,	idProjectile::Event_GetDamagePower )
 	EVENT( EV_GetOwner,			idProjectile::Event_GetOwner )
@@ -310,7 +310,7 @@ void idProjectile::Event_Freeze( bool frozen ) {
 idProjectile::CanCollide
 ================
 */
-bool idProjectile::CanCollide( const arcEntity* other, int traceId ) const {
+bool idProjectile::CanCollide( const anEntity *other, int traceId ) const {
 	if ( !projectileFlags.allowOwnerCollisions && traceId != TM_CROSSHAIR_INFO ) {
 		if ( other == owner ) {
 			return false;
@@ -321,7 +321,7 @@ bool idProjectile::CanCollide( const arcEntity* other, int traceId ) const {
 			}
 		}
 	}
-	return arcEntity::CanCollide( other, traceId );
+	return anEntity::CanCollide( other, traceId );
 }
 
 /*
@@ -329,7 +329,7 @@ bool idProjectile::CanCollide( const arcEntity* other, int traceId ) const {
 idProjectile::Create
 ================
 */
-void idProjectile::Create( arcEntity* _owner, const anVec3 &start, const anVec3 &dir ) {
+void idProjectile::Create( anEntity *_owner, const anVec3 &start, const anVec3 &dir ) {
 	Unbind();
 
 	owner = _owner;
@@ -356,7 +356,7 @@ void idProjectile::InitPhysics( void ) {
 idProjectile::InitLaunchPhysics
 =================
 */
-void idProjectile::InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity ) {
+void idProjectile::InitLaunchPhysics( float launchPower, const anVec3 &origin, const anMat3 &axes, const anVec3 &pushVelocity ) {
 }
 
 /*
@@ -365,7 +365,7 @@ idProjectile::Event_GetLaunchTime
 =================
 */
 void idProjectile::Event_GetLaunchTime( void ) {
-	sdProgram::ReturnFloat( MS2SEC( launchTime ) );
+	idProgram::ReturnFloat( MS2SEC( launchTime ) );
 }
 
 /*
@@ -373,7 +373,7 @@ void idProjectile::Event_GetLaunchTime( void ) {
 idProjectile::Event_Launch
 ================
 */
-void idProjectile::Event_Launch( const anVec3& velocity ) {
+void idProjectile::Event_Launch( const anVec3 &velocity ) {
 	anVec3 org = GetPhysics()->GetOrigin();
 	anVec3 dir = velocity;
 	dir.Normalize();
@@ -385,7 +385,7 @@ void idProjectile::Event_Launch( const anVec3& velocity ) {
 idProjectile::Launch
 =================
 */
-void idProjectile::Launch( const anVec3& start, const anVec3& dir, const anVec3& pushVelocity, const float timeSinceFire, const float launchPower, const float dmgPower ) {
+void idProjectile::Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire, const float launchPower, const float dmgPower ) {
 	damagePower = dmgPower;
 	SetLaunchTime( gameLocal.time - SEC2MS( timeSinceFire ) );
 
@@ -408,7 +408,7 @@ void idProjectile::Launch( const anVec3& start, const anVec3& dir, const anVec3&
 	anAngles tracerMuzzleAngles = axes.ToAngles();
 	anVec3 anglesVec( tracerMuzzleAngles.pitch, tracerMuzzleAngles.yaw, tracerMuzzleAngles.roll );
 
-	sdScriptHelper helper;
+	idScriptHelper helper;
 	helper.Push( start );
 	helper.Push( anglesVec );
 	CallNonBlockingScriptEvent( scriptObject->GetFunction( "OnLaunch" ), helper );
@@ -419,12 +419,12 @@ void idProjectile::Launch( const anVec3& start, const anVec3& dir, const anVec3&
 idProjectile::SetEnemy
 ================
 */
-void idProjectile::SetEnemy( arcEntity* newEnemy ) {
+void idProjectile::SetEnemy( anEntity *newEnemy ) {
 	if ( enemy == newEnemy ) {
 		return;
 	}
 
-	sdScriptHelper helper;
+	idScriptHelper helper;
 	helper.Push( enemy ? enemy->GetScriptObject() : nullptr );
 	helper.Push( newEnemy ? newEnemy->GetScriptObject() : nullptr );
 
@@ -438,7 +438,7 @@ void idProjectile::SetEnemy( arcEntity* newEnemy ) {
 idProjectile::Event_AddOwner
 ================
 */
-void idProjectile::Event_AddOwner( arcEntity* other ) {
+void idProjectile::Event_AddOwner( anEntity *other ) {
 	AddOwner( other );
 }
 
@@ -448,7 +448,7 @@ idProjectile::Event_GetEnemy
 ================
 */
 void idProjectile::Event_GetEnemy( void ) {
-	sdProgram::ReturnEntity( enemy );
+	idProgram::ReturnEntity( enemy );
 }
 
 /*
@@ -456,7 +456,7 @@ void idProjectile::Event_GetEnemy( void ) {
 idProjectile::Event_SetEnemy
 ================
 */
-void idProjectile::Event_SetEnemy( arcEntity* other ) {
+void idProjectile::Event_SetEnemy( anEntity *other ) {
 	CancelEvents( &EV_SetEnemy );
 
 	SetEnemy( other );
@@ -467,8 +467,8 @@ void idProjectile::Event_SetEnemy( arcEntity* other ) {
 idProjectile::Event_IsOwner
 ================
 */
-void idProjectile::Event_IsOwner( arcEntity* other ) {
-	sdProgram::ReturnBoolean( IsOwner( other ) );
+void idProjectile::Event_IsOwner( anEntity *other ) {
+	idProgram::ReturnBoolean( IsOwner( other ) );
 }
 
 /*
@@ -476,7 +476,7 @@ void idProjectile::Event_IsOwner( arcEntity* other ) {
 idProjectile::GetOwner
 ================
 */
-arcEntity *idProjectile::GetOwner( void ) const {
+anEntity *idProjectile::GetOwner( void ) const {
 	return owner.GetEntity();
 }
 
@@ -485,7 +485,7 @@ arcEntity *idProjectile::GetOwner( void ) const {
 idProjectile::IsOwner
 ================
 */
-bool idProjectile::IsOwner( arcEntity* other ) const {
+bool idProjectile::IsOwner( anEntity *other ) const {
 	if ( other == owner ) {
 		return true;
 	}
@@ -507,7 +507,7 @@ idProjectile::Thrust
 */
 void idProjectile::Thrust( void ) {
 	anVec3 vel = GetPhysics()->GetLinearVelocity();
-	vel += ( thrustPower * MS2SEC( gameLocal.msec ) ) * GetPhysics()->GetAxis()[ 0 ];	// apply thrust ( adjusted to per second )
+	vel += ( thrustPower * MS2SEC( gameLocal.msec ) ) * GetPhysics()->GetAxis()[0];	// apply thrust ( adjusted to per second )
 	vel.Truncate( launchSpeed );
 
 	GetPhysics()->SetLinearVelocity( vel );
@@ -523,7 +523,7 @@ void idProjectile::UpdateTargeting( void ) {
 		return;
 	}
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	scriptObject->CallNonBlockingScriptEvent( targetingFunction, h1 );
 }
 
@@ -593,7 +593,7 @@ idProjectile::PostThink
 */
 void idProjectile::PostThink( void ) {
 	if ( onPostThink != nullptr ) {
-		sdScriptHelper helper;
+		idScriptHelper helper;
 		CallNonBlockingScriptEvent( onPostThink, helper );
 	}
 }
@@ -603,7 +603,7 @@ void idProjectile::PostThink( void ) {
 idProjectile::GetPostThinkNode
 ================
 */
-anLinkList< arcEntity >* idProjectile::GetPostThinkNode( void ) {
+anLinkList< anEntity >* idProjectile::GetPostThinkNode( void ) {
 	return &postThinkEntNode;
 }
 
@@ -658,7 +658,7 @@ void idProjectile::UpdateScript( void ) {
 idProjectile::SetState
 =====================
 */
-bool idProjectile::SetState( const sdProgram::sdFunction* newState ) {
+bool idProjectile::SetState( const idProgram::sdFunction* newState ) {
 	if ( !newState ) {
 		gameLocal.Error( "idProjectile::SetState nullptr state" );
 	}
@@ -676,8 +676,8 @@ bool idProjectile::SetState( const sdProgram::sdFunction* newState ) {
 idProjectile::Event_SetState
 ================
 */
-void idProjectile::Event_SetState( const char* stateName ) {
-	const sdProgram::sdFunction* func = scriptObject->GetFunction( stateName );
+void idProjectile::Event_SetState( const char *stateName ) {
+	const idProgram::sdFunction* func = scriptObject->GetFunction( stateName );
 	if ( !func ) {
 		gameLocal.Error( "idProjectile::Event_SetState Can't find function '%s' in object '%s'", stateName, scriptObject->GetTypeName() );
 	}
@@ -692,7 +692,7 @@ idProjectile::Event_GetDamagePower
 ================
 */
 void idProjectile::Event_GetDamagePower( void ) {
-	sdProgram::ReturnFloat( damagePower );
+	idProgram::ReturnFloat( damagePower );
 }
 
 /*
@@ -701,7 +701,7 @@ idProjectile::Event_GetOwner
 ================
 */
 void idProjectile::Event_GetOwner( void ) {
-	sdProgram::ReturnEntity( owner.GetEntity() );
+	idProgram::ReturnEntity( owner.GetEntity() );
 }
 
 /*
@@ -709,7 +709,7 @@ void idProjectile::Event_GetOwner( void ) {
 idProjectile::Event_SetOwner
 ================
 */
-void idProjectile::Event_SetOwner( arcEntity* _owner ) {
+void idProjectile::Event_SetOwner( anEntity *_owner ) {
 	owner = _owner;
 }
 
@@ -718,8 +718,8 @@ void idProjectile::Event_SetOwner( arcEntity* _owner ) {
 idProjectile::Killed
 ================
 */
-void idProjectile::Killed( arcEntity *inflictor, arcEntity *attacker, int damage, const anVec3 &dir, int location, const sdDeclDamage* damageDecl ) {
-	sdScriptHelper h;
+void idProjectile::Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location, const sdDeclDamage* damageDecl ) {
+	idScriptHelper h;
 	CallNonBlockingScriptEvent( scriptObject->GetFunction( "OnKilled" ), h );
 }
 
@@ -740,12 +740,12 @@ void idProjectile::SetLaunchTime( int time ) {
 	if ( !gameLocal.isClient ) {
 		int delay = targetForgetTime - gameLocal.time;
 		if ( delay > 0 ) {
-			PostEventMS( &EV_SetEnemy, delay, ( arcEntity* )nullptr );
+			PostEventMS( &EV_SetEnemy, delay, ( anEntity *)nullptr );
 		}
 	}
 
 	if ( scriptObject ) {
-		sdScriptHelper h1;
+		idScriptHelper h1;
 		scriptObject->CallNonBlockingScriptEvent( scriptObject->GetFunction( "OnLaunchTimeChanged" ), h1 );
 	}
 }
@@ -755,10 +755,10 @@ void idProjectile::SetLaunchTime( int time ) {
 idProjectile::Collide
 =================
 */
-bool idProjectile::Collide( const trace_t &collision, const anVec3& velocity, int bodyId ) {
+bool idProjectile::Collide( const trace_t &collision, const anVec3 &velocity, int bodyId ) {
 	sdLoggedTrace* loggedTrace = gameLocal.RegisterLoggedTrace( collision );
 
-	sdScriptHelper helper;
+	idScriptHelper helper;
 	helper.Push( loggedTrace ? loggedTrace->GetScriptObject() : nullptr );
 	helper.Push( velocity );
 	helper.Push( bodyId );
@@ -774,15 +774,15 @@ bool idProjectile::Collide( const trace_t &collision, const anVec3& velocity, in
 idProjectile::OnTouch
 ================
 */
-void idProjectile::OnTouch( arcEntity *other, const trace_t& trace ) {
-	arcNetBasePlayer* player = other->Cast< arcNetBasePlayer >();
+void idProjectile::OnTouch( anEntity *other, const trace_t& trace ) {
+	anBasePlayer* player = other->Cast< anBasePlayer >();
 	if ( player != nullptr && !player->IsSpectator() && player->GetHealth() <= 0 ) {
 		return;
 	}
 
 	sdLoggedTrace* loggedTrace = gameLocal.RegisterLoggedTrace( trace );
 
-	sdScriptHelper helper;
+	idScriptHelper helper;
 	helper.Push( other->GetScriptObject() );
 	helper.Push( loggedTrace ? loggedTrace->GetScriptObject() : nullptr );
 	CallNonBlockingScriptEvent( scriptObject->GetFunction( "OnTouch" ), helper );
@@ -1100,13 +1100,13 @@ void idProjectile_RigidBody::InitPhysics( void ) {
 idProjectile_RigidBody::InitLaunchPhysics
 =================
 */
-void idProjectile_RigidBody::InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity ) {
+void idProjectile_RigidBody::InitLaunchPhysics( float launchPower, const anVec3 &origin, const anMat3 &axes, const anVec3 &pushVelocity ) {
 	anVec3 velocity				= spawnArgs.GetVector( "velocity", "0 0 0" );
 	anVec3 angular_velocity		= spawnArgs.GetVector( "angular_velocity", "0 0 0" );
 
 	float speed					= velocity.Length() + launchPower;
 
-	physicsObj.SetLinearVelocity( ( axes[ 0 ] * speed ) + pushVelocity );
+	physicsObj.SetLinearVelocity( ( axes[0] * speed ) + pushVelocity );
 	physicsObj.SetAngularVelocity( DEG2RAD( angular_velocity ) * axes );
 }
 
@@ -1115,7 +1115,7 @@ void idProjectile_RigidBody::InitLaunchPhysics( float launchPower, const anVec3&
 idProjectile_RigidBody::CheckWater
 ================
 */
-void idProjectile_RigidBody::CheckWater( const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel ) {
+void idProjectile_RigidBody::CheckWater( const anVec3 &waterBodyOrg, const anMat3 &waterBodyAxis, anCollisionModel* waterBodyModel ) {
 	if ( waterEffects ) {
 		waterEffects->SetOrigin( GetPhysics()->GetOrigin() );
 		waterEffects->SetAxis( GetPhysics()->GetAxis() );
@@ -1185,10 +1185,10 @@ void sdProjectile_Parabolic::InitPhysics( void ) {
 sdProjectile_Parabolic::InitLaunchPhysics
 =================
 */
-void sdProjectile_Parabolic::InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity ) {
+void sdProjectile_Parabolic::InitLaunchPhysics( float launchPower, const anVec3 &origin, const anMat3 &axes, const anVec3 &pushVelocity ) {
 	anVec3 velocity				= spawnArgs.GetVector( "velocity", "0 0 0" );
 	float speed					= velocity.Length() + launchPower;
-	velocity					= ( axes[ 0 ] * speed ) + pushVelocity;
+	velocity					= ( axes[0] * speed ) + pushVelocity;
 
 	physicsObj.Init( origin, velocity, vec3_zero, axes, gameLocal.time, -1 );
 }
@@ -1198,7 +1198,7 @@ void sdProjectile_Parabolic::InitLaunchPhysics( float launchPower, const anVec3&
 sdProjectile_Parabolic::CheckWater
 ==============
 */
-void sdProjectile_Parabolic::CheckWater( const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel ) {
+void sdProjectile_Parabolic::CheckWater( const anVec3 &waterBodyOrg, const anMat3 &waterBodyAxis, anCollisionModel* waterBodyModel ) {
 	if ( waterEffects ) {
 		waterEffects->SetOrigin( GetPhysics()->GetOrigin() );
 		waterEffects->SetAxis( GetPhysics()->GetAxis() );

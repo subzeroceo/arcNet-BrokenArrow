@@ -159,13 +159,13 @@ public:
 			data = guiDict->GetString(GetName());
 		} 
 	}
-	int	operator==(	const anString &other ) const {
+	int	operator==(	const anStr &other ) const {
 		return (other == data);
 	}
 	int	operator==(	const char *other ) const {
 		return (data == other);
 	}
-	anString &operator=(	const anString &other ) {
+	anStr &operator=(	const anStr &other ) {
 		data = other;
 		if (guiDict) {
 			guiDict->Set(GetName(), data);
@@ -180,7 +180,7 @@ public:
 	operator const char *() const {
 		return data.c_str();
 	}
-	operator const anString &() const {
+	operator const anStr &() const {
 		return data;
 	}
 	int LengthWithoutColors() {
@@ -249,7 +249,7 @@ public:
 	virtual float x( void ) const { return data[0] ? 1.0f : 0.0f; };
 
 protected:
-	anString data;
+	anStr data;
 };
 
 class idWinInt : public idWinVar {
@@ -721,13 +721,13 @@ public:
 			data = guiDict->GetString(GetName());
 		} 
 	}
-	int	operator==(	const anString &other ) const {
+	int	operator==(	const anStr &other ) const {
 		return (other == data);
 	}
 	int	operator==(	const char *other ) const {
 		return (data == other);
 	}
-	anString &operator=(	const anString &other ) {
+	anStr &operator=(	const anStr &other ) {
 		data = other;
 		if (guiDict) {
 			guiDict->Set(GetName(), data);
@@ -757,7 +757,7 @@ public:
 	operator const char *() const {
 		return data.c_str();
 	}
-	operator const anString &() const {
+	operator const anStr &() const {
 		return data;
 	}
 	int Length() {
@@ -835,7 +835,7 @@ public:
 	}
 
 protected:
-	anString data;
+	anStr data;
 	const anMaterial **mat;
 };
 

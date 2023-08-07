@@ -161,7 +161,7 @@ idTarget_EndLevel::Event_Activate
 ================
 */
 void idTarget_EndLevel::Event_Activate( anEntity *activator ) {
-	anString nextMap;
+	anStr nextMap;
 
 #ifdef ARCNET_DEMO_BUILD
 	if ( spawnArgs.GetBool( "endOfGame" ) ) {
@@ -191,7 +191,7 @@ void idTarget_EndLevel::Event_Activate( anEntity *activator ) {
 
 
 // jscott: additional info for multiple maps
-	const char* entityFilter;
+	const char *entityFilter;
 	if ( spawnArgs.GetString( "entityFilter", "", &entityFilter ) && *entityFilter ) {
 		gameLocal.sessionCommand += " ";
 		gameLocal.sessionCommand += entityFilter;
@@ -302,7 +302,7 @@ void idTarget_SetShaderParm::Event_Activate( anEntity *activator ) {
 		for ( i = 0; i < targets.Num(); i++ ) {
 			ent = targets[i].GetEntity();
 			if ( ent ) {
-				ent->SetColor( color[ 0 ], color[ 1 ], color[ 2 ] );
+				ent->SetColor( color[0], color[1], color[2] );
 			}
 		}
 	}
@@ -659,7 +659,7 @@ void idTarget_Give::Event_Activate( anEntity *activator ) {
 						const anKeyValue *kv = ent->spawnArgs.FindKey( "weaponclass" );
 						if ( kv ) {
 							// does player already have this weapon selected?
-							if ( player->weapon && anString::Icmp(player->weapon->GetClassname(), kv->GetValue())) {
+							if ( player->weapon && anStr::Icmp(player->weapon->GetClassname(), kv->GetValue())) {
 								kv = ent->spawnArgs.FindKey( "inv_weapon" );
 								if ( kv ) {
 									// nope, so attempt to switch to this weapon
@@ -998,7 +998,7 @@ void idTarget_SetInfluence::Event_GatherEntities() {
 				soundList.Append( ent->entityNumber );
 				continue;
 			}
-			if ( guis && ent->GetRenderEntity() && ent->GetRenderEntity()->gui[ 0 ] && ent->spawnArgs.FindKey( "gui_demonic" ) ) {
+			if ( guis && ent->GetRenderEntity() && ent->GetRenderEntity()->gui[0] && ent->spawnArgs.FindKey( "gui_demonic" ) ) {
 				guiList.Append( ent->entityNumber );
 				continue;
 			}
@@ -1011,7 +1011,7 @@ void idTarget_SetInfluence::Event_GatherEntities() {
 			}
 		}
 	}
-	anString temp;
+	anStr temp;
 	temp = spawnArgs.GetString( "switchToView" );
 	switchToCamera = ( temp.Length() ) ? gameLocal.FindEntity( temp ) : nullptr;
 
@@ -1324,7 +1324,7 @@ idTarget_SetKeyVal::Event_Activate
 */
 void idTarget_SetKeyVal::Event_Activate( anEntity *activator ) {
 	int i;
-	anString key, val;
+	anStr key, val;
 	anEntity *ent;
 	const anKeyValue *kv;
 	int n;
@@ -1341,7 +1341,7 @@ void idTarget_SetKeyVal::Event_Activate( anEntity *activator ) {
 					ent->spawnArgs.Set( key, val );
 					for ( int j = 0; j < MAX_RENDERENTITY_GUI; j++ ) {
 						if ( ent->GetRenderEntity()->gui[ j ] ) {
-							if ( anString::Icmpn( key, "gui_", 4 ) == 0 ) {
+							if ( anStr::Icmpn( key, "gui_", 4 ) == 0 ) {
 								ent->GetRenderEntity()->gui[ j ]->SetStateString( key, val );
 								ent->GetRenderEntity()->gui[ j ]->StateChanged( gameLocal.time );
 							}
@@ -1541,7 +1541,7 @@ rvTarget_BossBattle::Event_Activate
 */
 void rvTarget_BossBattle::Event_Activate( anEntity *activator ) {
 	anBasePlayer* player = gameLocal.GetLocalPlayer();
-	anEntity* enemy  = gameLocal.FindEntity ( spawnArgs.GetString ( "target" ) );
+	anEntity *enemy  = gameLocal.FindEntity ( spawnArgs.GetString ( "target" ) );
 	if ( player && enemy ) {
 		player->StartBossBattle ( enemy );
 	}
@@ -1819,16 +1819,16 @@ void rvTarget_AmmoStash::Event_Activate( anEntity *activator )	{
 	int i;
 	//run through our targets until we have no more targets.
 	for ( i = targets.Num() - 1; i >= 0; i -- ) {
-		anEntity* ent;
+		anEntity *ent;
 		ent = targets[i];
-		if ( anString::Icmp ( ent->spawnArgs.GetString ( "classname" ), "target_null" ) ) {
+		if ( anStr::Icmp ( ent->spawnArgs.GetString ( "classname" ), "target_null" ) ) {
 			continue;
 		}
 
 		//drop the most needed ammo at ent's location.
 		args.Set	   ( "origin",			ent->GetPhysics()->GetOrigin().ToString() );
 		args.SetFloat  ( "angle",			ent->GetPhysics()->GetAxis().ToAngles()[YAW] );
-		args.Set	   ( "classname",		AmmoArray[ 0 ].ammoName );
+		args.Set	   ( "classname",		AmmoArray[0].ammoName );
 
 		gameLocal.SpawnEntityDef ( args, &entAmmo );
 
@@ -1839,8 +1839,8 @@ void rvTarget_AmmoStash::Event_Activate( anEntity *activator )	{
 		if ( kv )	{
 
 			//add the ammo as if the player picked it up
-			AmmoArray[ 0 ].ammoCount +=  atoi(kv->GetValue().c_str());
-			AmmoArray[ 0 ].percentFull = ( float )AmmoArray[ 0 ].ammoCount / ( float )AmmoArray[ 0 ].ammoMax;
+			AmmoArray[0].ammoCount +=  atoi(kv->GetValue().c_str());
+			AmmoArray[0].percentFull = ( float )AmmoArray[0].ammoCount / ( float )AmmoArray[0].ammoMax;
 
 			//resort the ammo.
 			qsort( ( void * )AmmoArray, AMMO_ARRAY_SIZE ,sizeof( ammodata_t), CompareAmmoData );
@@ -1994,12 +1994,12 @@ void idTarget_CallObjectFunction::Event_Activate( anEntity *activator ) {
 			// create a thread and call the function
 
 // mwhitlock: Dynamic memory consolidation
-			PUSH_HEAP_MEM(this);
+			PushHeapMemory(this);
 
 			thread = new anThread();
 
 // mwhitlock: Dynamic memory consolidation
-			POP_HEAP();
+			PopSystemHeap();
 
 			thread->CallFunction( ent, func, true );
 			thread->Start();
@@ -2042,7 +2042,7 @@ void idTarget_EnableLevelWeapons::Event_Activate( anEntity *activator ) {
 		for ( i = 0; i < gameLocal.numClients; i++ ) {
 			if ( gameLocal.entities[i] ) {
 				gameLocal.entities[i]->ProcessEvent( &EV_Player_EnableWeapon );
-				if ( weap && weap[ 0 ] ) {
+				if ( weap && weap[0] ) {
 					gameLocal.entities[i]->PostEventSec( &EV_Player_SelectWeapon, 0.5f, weap );
 				}
 			}

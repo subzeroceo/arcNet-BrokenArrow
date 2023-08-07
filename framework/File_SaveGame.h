@@ -30,10 +30,10 @@ public:
 	virtual ~anFile_SaveGame() { }
 
 	bool operator==( const anFile_SaveGame & other ) const {
-		return anString::Icmp( GetName(), other.GetName() ) == 0;
+		return anStr::Icmp( GetName(), other.GetName() ) == 0;
 	}
 	bool operator==( const char *_name ) const {
-		return anString::Icmp( GetName(), _name ) == 0;
+		return anStr::Icmp( GetName(), _name ) == 0;
 	}
 	void SetNameAndType( const char *_name, int _type ) {
 		name = _name;
@@ -145,8 +145,8 @@ private:
 	friend class idSGFdecompressThread;
 	friend class idSGFcompressThread;
 
-	anString					name;		// Name of the file.
-	anString					osPath;		// OS path.
+	anStr					name;		// Name of the file.
+	anStr					osPath;		// OS path.
 	mode_t					mode;		// Open mode.
 	size_t					compressedLength;
 

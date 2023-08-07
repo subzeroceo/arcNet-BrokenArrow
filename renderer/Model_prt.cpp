@@ -72,10 +72,10 @@ anRenderModel *idRenderModelPrt::InstantiateDynamicModel( const struct renderEnt
 	}*/
 
 	if ( cachedModel != nullptr ) {
-		assert( dynamic_cast<anModelStatic *>(cachedModel) != nullptr );
-		assert( anString::Icmp( cachedModel->Name(), parametricParticle_SnapshotName ) == 0 );
+		assert( dynamic_cast<anModelStatic *>( cachedModel ) != nullptr );
+		assert( anStr::Icmp( cachedModel->Name(), parametricParticle_SnapshotName ) == 0 );
 
-		staticModel = static_cast<anModelStatic *>(cachedModel);
+		staticModel = static_cast<anModelStatic *>( cachedModel );
 	} else {
 		staticModel = new anModelStatic;
 		staticModel->InitEmpty( parametricParticle_SnapshotName );
@@ -101,15 +101,15 @@ anRenderModel *idRenderModelPrt::InstantiateDynamicModel( const struct renderEnt
 			continue;
 		}
 
-		arcRandom steppingRandom, steppingRandom2;
+		anRandom steppingRandom, steppingRandom2;
 
 		int stageAge = g.renderView->time + renderEntity->shaderParms[SS_TIMEOFFSET] * 1000 - stage->timeOffset * 1000;
 		int	stageCycle = stageAge / stage->cycleMsec;
 		int	inCycleTime = stageAge - stageCycle * stage->cycleMsec;
 
 		// some particles will be in this cycle, some will be in the previous cycle
-		steppingRandom.SetSeed( ( ( stageCycle << 10 ) & arcRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * arcRandom::MAX_RAND )  );
-		steppingRandom2.SetSeed( ( ( ( stageCycle-1 ) << 10 ) & arcRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * arcRandom::MAX_RAND )  );
+		steppingRandom.SetSeed( ( ( stageCycle << 10 ) & anRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * anRandom::MAX_RAND )  );
+		steppingRandom2.SetSeed( ( ( ( stageCycle-1 ) << 10 ) & anRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * anRandom::MAX_RAND )  );
 
 		int	count = stage->totalParticles * stage->NumQuadsPerParticle();
 
@@ -214,6 +214,15 @@ anRenderModel *idRenderModelPrt::InstantiateDynamicModel( const struct renderEnt
 }
 
 /*
+===============
+idRenderModelPrt::IsLoaded
+===============
+*/
+bool idRenderModelPrt::IsLoaded() const {
+	return true;
+}
+
+/*
 ====================
 idRenderModelPrt::IsDynamicModel
 ====================
@@ -229,6 +238,15 @@ idRenderModelPrt::Bounds
 */
 anBounds idRenderModelPrt::Bounds( const struct renderEntity_s *ent ) const {
 	return particleSystem->bounds;
+}
+/*
+====================
+idRenderModelPrt::DepthHack
+====================
+*/
+int idRenderModelPrt::NumFrames() const {
+	//return particleSystem->stages.Num();
+	return numFrames;
 }
 
 /*
@@ -260,20 +278,17 @@ int idRenderModelPrt::Memory() const {
 
 	return total;
 }
+	int						CreateParticle( particleGen_t *g, anDrawVertex *verts ) const;
 
+void idRenderModelPrt::CreateParticle( float simScale, anMat3 axis, int size, anDrawVert *verts ) const {}
+void idRenderModelPrt::LoadModel( void ) {}
+void idRenderModelPrt::ProcessGeometryVolumes( int frameNum, anMat3 axis, modelSurface_t *surf ) {}
 
-#include "../idlib/Lib.h"
-#pragma hdrstop
+void idRenderModelPrt::Parse( anParser *src ) {}
+void idRenderModelPrt::ParseSimulation( const char *fileName ) {}
 
-#include "tr_local.h"
-#include "Model_local.h"
-
-/*
-
-A simple sprite model that always faces the view axis.
-
-*/
-
+/*===========================================================================*/
+// A simple sprite model that always faces the view axis.
 static const char *sprite_SnapshotName = "_sprite_Snapshot_";
 
 /*
@@ -316,7 +331,7 @@ anRenderModel *idRenderModelSprite::InstantiateDynamicModel( const struct render
 
 	if ( cachedModel != nullptr ) {
 		assert( dynamic_cast<anModelStatic *>( cachedModel ) != nullptr );
-		assert( anString::Icmp( cachedModel->Name(), sprite_SnapshotName ) == 0 );
+		assert( anStr::Icmp( cachedModel->Name(), sprite_SnapshotName ) == 0 );
 
 		staticModel = static_cast<anModelStatic *>( cachedModel );
 		surf = *staticModel->Surface( 0 );
@@ -329,38 +344,38 @@ anRenderModel *idRenderModelSprite::InstantiateDynamicModel( const struct render
 		R_AllocStaticTriSurfVerts( tri, 4 );
 		R_AllocStaticTriSurfIndexes( tri, 6 );
 
-		tri->verts[ 0 ].Clear();
-		tri->verts[ 0 ].normal.Set( 1.0f, 0.0f, 0.0f );
-		tri->verts[ 0 ].tangents[0].Set( 0.0f, 1.0f, 0.0f );
-		tri->verts[ 0 ].tangents[1].Set( 0.0f, 0.0f, 1.0f );
-		tri->verts[ 0 ].st[ 0 ] = 0.0f;
-		tri->verts[ 0 ].st[ 1 ] = 0.0f;
+		tri->verts[0].Clear();
+		tri->verts[0].normal.Set( 1.0f, 0.0f, 0.0f );
+		tri->verts[0].tangents[0].Set( 0.0f, 1.0f, 0.0f );
+		tri->verts[0].tangents[1].Set( 0.0f, 0.0f, 1.0f );
+		tri->verts[0].st[0] = 0.0f;
+		tri->verts[0].st[1] = 0.0f;
 
-		tri->verts[ 1 ].Clear();
-		tri->verts[ 1 ].normal.Set( 1.0f, 0.0f, 0.0f );
-		tri->verts[ 1 ].tangents[0].Set( 0.0f, 1.0f, 0.0f );
-		tri->verts[ 1 ].tangents[1].Set( 0.0f, 0.0f, 1.0f );
-		tri->verts[ 1 ].st[ 0 ] = 1.0f;
-		tri->verts[ 1 ].st[ 1 ] = 0.0f;
+		tri->verts[1].Clear();
+		tri->verts[1].normal.Set( 1.0f, 0.0f, 0.0f );
+		tri->verts[1].tangents[0].Set( 0.0f, 1.0f, 0.0f );
+		tri->verts[1].tangents[1].Set( 0.0f, 0.0f, 1.0f );
+		tri->verts[1].st[0] = 1.0f;
+		tri->verts[1].st[1] = 0.0f;
 
-		tri->verts[ 2 ].Clear();
-		tri->verts[ 2 ].normal.Set( 1.0f, 0.0f, 0.0f );
-		tri->verts[ 2 ].tangents[0].Set( 0.0f, 1.0f, 0.0f );
-		tri->verts[ 2 ].tangents[1].Set( 0.0f, 0.0f, 1.0f );
-		tri->verts[ 2 ].st[ 0 ] = 1.0f;
-		tri->verts[ 2 ].st[ 1 ] = 1.0f;
+		tri->verts[2].Clear();
+		tri->verts[2].normal.Set( 1.0f, 0.0f, 0.0f );
+		tri->verts[2].tangents[0].Set( 0.0f, 1.0f, 0.0f );
+		tri->verts[2].tangents[1].Set( 0.0f, 0.0f, 1.0f );
+		tri->verts[2].st[0] = 1.0f;
+		tri->verts[2].st[1] = 1.0f;
 
-		tri->verts[ 3 ].Clear();
-		tri->verts[ 3 ].normal.Set( 1.0f, 0.0f, 0.0f );
-		tri->verts[ 3 ].tangents[0].Set( 0.0f, 1.0f, 0.0f );
-		tri->verts[ 3 ].tangents[1].Set( 0.0f, 0.0f, 1.0f );
-		tri->verts[ 3 ].st[ 0 ] = 0.0f;
-		tri->verts[ 3 ].st[ 1 ] = 1.0f;
+		tri->verts[3].Clear();
+		tri->verts[3].normal.Set( 1.0f, 0.0f, 0.0f );
+		tri->verts[3].tangents[0].Set( 0.0f, 1.0f, 0.0f );
+		tri->verts[3].tangents[1].Set( 0.0f, 0.0f, 1.0f );
+		tri->verts[3].st[0] = 0.0f;
+		tri->verts[3].st[1] = 1.0f;
 
-		tri->indexes[ 0 ] = 0;
-		tri->indexes[ 1 ] = 1;
-		tri->indexes[ 2 ] = 3;
-		tri->indexes[ 3 ] = 1;
+		tri->indexes[0] = 0;
+		tri->indexes[1] = 1;
+		tri->indexes[2] = 3;
+		tri->indexes[3] = 1;
 		tri->indexes[ 4 ] = 2;
 		tri->indexes[ 5 ] = 3;
 
@@ -381,29 +396,29 @@ anRenderModel *idRenderModelSprite::InstantiateDynamicModel( const struct render
 	anVec3 right	= anVec3( 0.0f, renderEntity->shaderParms[ SHADERPARM_SPRITE_WIDTH ] * 0.5f, 0.0f );
 	anVec3 up		= anVec3( 0.0f, 0.0f, renderEntity->shaderParms[ SHADERPARM_SPRITE_HEIGHT ] * 0.5f );
 
-	tri->verts[ 0 ].xyz = up + right;
-	tri->verts[ 0 ].color[ 0 ] = red;
-	tri->verts[ 0 ].color[ 1 ] = green;
-	tri->verts[ 0 ].color[ 2 ] = blue;
-	tri->verts[ 0 ].color[ 3 ] = alpha;
+	tri->verts[0].xyz = up + right;
+	tri->verts[0].color[0] = red;
+	tri->verts[0].color[1] = green;
+	tri->verts[0].color[2] = blue;
+	tri->verts[0].color[3] = alpha;
 
-	tri->verts[ 1 ].xyz = up - right;
-	tri->verts[ 1 ].color[ 0 ] = red;
-	tri->verts[ 1 ].color[ 1 ] = green;
-	tri->verts[ 1 ].color[ 2 ] = blue;
-	tri->verts[ 1 ].color[ 3 ] = alpha;
+	tri->verts[1].xyz = up - right;
+	tri->verts[1].color[0] = red;
+	tri->verts[1].color[1] = green;
+	tri->verts[1].color[2] = blue;
+	tri->verts[1].color[3] = alpha;
 
-	tri->verts[ 2 ].xyz = - right - up;
-	tri->verts[ 2 ].color[ 0 ] = red;
-	tri->verts[ 2 ].color[ 1 ] = green;
-	tri->verts[ 2 ].color[ 2 ] = blue;
-	tri->verts[ 2 ].color[ 3 ] = alpha;
+	tri->verts[2].xyz = - right - up;
+	tri->verts[2].color[0] = red;
+	tri->verts[2].color[1] = green;
+	tri->verts[2].color[2] = blue;
+	tri->verts[2].color[3] = alpha;
 
-	tri->verts[ 3 ].xyz = right - up;
-	tri->verts[ 3 ].color[ 0 ] = red;
-	tri->verts[ 3 ].color[ 1 ] = green;
-	tri->verts[ 3 ].color[ 2 ] = blue;
-	tri->verts[ 3 ].color[ 3 ] = alpha;
+	tri->verts[3].xyz = right - up;
+	tri->verts[3].color[0] = red;
+	tri->verts[3].color[1] = green;
+	tri->verts[3].color[2] = blue;
+	tri->verts[3].color[3] = alpha;
 
 	R_BoundTriSurf( tri );
 

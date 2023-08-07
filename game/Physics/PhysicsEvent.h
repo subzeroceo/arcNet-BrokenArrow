@@ -21,7 +21,7 @@ private:
 
 class anPhysicsEvent_RadiusPush : public anPhysicsEvent {
 public:
-								anPhysicsEvent_RadiusPush( nodeType_t &list, const anVec3 &origin, float radius, const arcDeclDamage *damageDecl, float push, const arcEntity *inflictor, const arcEntity *ignore, int flags );
+								anPhysicsEvent_RadiusPush( nodeType_t &list, const anVec3 &origin, float radius, const anDeclDamage *damageDecl, float push, const anEntity *inflictor, const anEntity *ignore, int flags );
 
 	void						Apply( void ) const;
 
@@ -29,10 +29,10 @@ private:
 	anVec3						_origin;
 	float						_radius;
 	float						_push;
-	arcEntityPtr< arcEntity >		_inflictor;
-	arcEntityPtr< arcEntity >		_ignore;
+	anEntityPtr< anEntity >		_inflictor;
+	anEntityPtr< anEntity >		_ignore;
 	int							_flags;
-	//const arcDeclDamage*			_damageDecl;
+	//const anDeclDamage*			_damageDecl;
 };
 
 #endif // __PHYSICS_EVENT_H__

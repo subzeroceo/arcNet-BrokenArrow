@@ -1,7 +1,4 @@
-class idTextureTile {
-public:
-	int		x, y;
-};
+
 
 static const int TILE_PER_LEVEL = 4;
 static const int MAX_MEGA_CHANNELS = 3;		// normal, diffuse, specular
@@ -12,10 +9,28 @@ static const int TILE_SIZE = MAX_LEVEL_WIDTH / TILE_PER_LEVEL;
 class idMegaTexture;
 
 typedef struct {
-	int		tileSize;
-	int		tilesWide;
-	int		tilesHigh;
+	int						tileSize;
+	int						tilesWide;
+	int						tilesHigh;
 } megaTextureHeader_t;
+
+typedef struct {
+	void *					fileHandle;
+	void *					currentTriMapping;
+	float					origin[3];
+	float					axis[4][2];
+	int						level;
+	textureLevel_t			levels[MAX_LEVELS];
+	megaTextureHeader_t		header;
+} idMegaTexture;
+
+class idTextureTile {
+public:
+							~idTextureTile( void ) { x = nullptr; y = nullptr; }
+	int						GetTexTilingCoordX() { return x; }
+	int						GetTexTilingCoordY() { return y; }
+	int						x, y;
+};
 
 class idMegaTexture {
 public:
@@ -80,22 +95,22 @@ private:
 	float					heightScale;
 	float					heightOffset;
 	anList<byte>			data;
-	int						dimensions[ 2 ];
+	int						dimensions[2];
 
 	static anCVar			r_megaTextureLevel;
 	static anCVar			r_showMegaTexture;
 	static anCVar			r_showMegaTextureLabels;
 	static anCVar			r_skipMegaTexture;
 	static anCVar			r_terrainScale;
-};
+}; extern megaTexture;
 
-#define ID_MEGATEXTURE_SIZE( sizeof(void *) + sizeof(void *) + 3*sizeof( float ) + \ 8*sizeof( float ) + sizeof(int) + \ MAX_LEVELS * sizeof(textureLevel_t) + \ MEGATEXTUREHEADER_BYTES )
-#define MEGATEXTUREHEADER_BYTES (3 * sizeof(int))
+#define ID_MEGATEXTURE_SIZE( sizeof(void *) + sizeof(void *) + 3 * sizeof( float ) + \ 8 * sizeof( float ) + sizeof( int ) + \ MAX_LEVELS * sizeof( textureLevel_t ) + \ MEGATEXTUREHEADER_BYTES )
+#define MEGATEXTUREHEADER_BYTES ( 3 * sizeof( int )  )
 
 void ReadMegaTextureHeader( megaTextureHeader_t *header, unsigned char *buffer ) {
-	header->tileSize = *( int*)( buffer );
-	header->tilesWide = *( int*)( buffer + sizeof( int ) );
-	header->tilesHigh = *( int*)( buffer + 2*sizeof( int ) );
+	header->tileSize = *(int *)( buffer );
+	header->tilesWide = *(int *)( buffer + sizeof( int ) );
+	header->tilesHigh = *(int *)( buffer + 2*sizeof( int ) );
 }
 
 void WriteMegaTextureHeader( megaTextureHeader_t *header, unsigned char *buffer) {
@@ -104,17 +119,7 @@ void WriteMegaTextureHeader( megaTextureHeader_t *header, unsigned char *buffer)
 	*(int*)( b uffer + 2 * sizeof( int ) ) = header->tilesHigh;
 }
 
-typedef struct {
-	void* fileHandle;
-	void* currentTriMapping;
-	float origin[3];
-	float axis[4][2];
-	int level;
-	textureLevel_t levels[MAX_LEVELS];
-	megaTextureHeader_t header;
-} idMegaTexture;
-
-ARC_INLINE void Init( const anBounds &bounds ) {
+inline void Init( const anBounds &bounds ) {
 	mins = bounds.GetMins();
 	size = bounds.Size();
 
@@ -126,9 +131,9 @@ ARC_INLINE void Init( const anBounds &bounds ) {
 	heightOffset = mins[2];
 }
 
-ARC_INLINE float GetHeight( const anVec3 &pos, const anHeightMapScaleData &scale ) const {
-	int coords[ 2 ];
-	coords[ 0 ] = anMath::ClampFloat( 0.0f, 1.0f, ( pos[ 0 ] - scale.mins[ 0 ] ) * scale.invSize[ 0 ] ) * ( dimensions[ 0 ] - 1 );
-	coords[ 1 ] = anMath::ClampFloat( 0.0f, 1.0f, ( pos[ 1 ] - scale.mins[ 1 ] ) * scale.invSize[ 1 ] ) * ( dimensions[ 1 ] - 1 );
-	return ( data[ coords[ 0 ] + ( coords[ 1 ] * dimensions[ 0 ] ) ] * scale.heightScale ) + scale.heightOffset;
+inline float GetHeight( const anVec3 &pos, const anHeightMapScaleData &scale ) const {
+	int coords[2];
+	coords[0] = anMath::ClampFloat( 0.0f, 1.0f, ( pos[0] - scale.mins[0] ) * scale.invSize[0] ) * ( dimensions[0] - 1 );
+	coords[1] = anMath::ClampFloat( 0.0f, 1.0f, ( pos[1] - scale.mins[1] ) * scale.invSize[1] ) * ( dimensions[1] - 1 );
+	return ( data[ coords[0] + ( coords[1] * dimensions[0] ) ] * scale.heightScale ) + scale.heightOffset;
 }

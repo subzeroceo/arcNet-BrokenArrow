@@ -79,7 +79,7 @@ unsigned short anSEASLocal::AreaTravelTime( int areaNum, const anVec3 &start, co
 anSEASLocal::CalculateAreaTravelTimes
 ============
 */
-void anSEASLocal::CalculateAreaTravelTimes(void) {
+void anSEASLocal::CalculateAreaTravelTimes( void ) {
 	int n, i, j, numReach, numRevReach, t, maxt;
 	byte *bytePtr;
 	anReachability *reach, *rev_reach;
@@ -681,7 +681,7 @@ anReachability *anSEASLocal::GetAreaReachability( int areaNum, int reachabilityN
 anSEASLocal::ClusterAreaNum
 ============
 */
-ARC_INLINE int anSEASLocal::ClusterAreaNum( int clusterNum, int areaNum ) const {
+inline int anSEASLocal::ClusterAreaNum( int clusterNum, int areaNum ) const {
 	int side, areaCluster;
 
 	areaCluster = file->GetArea( areaNum ).cluster;

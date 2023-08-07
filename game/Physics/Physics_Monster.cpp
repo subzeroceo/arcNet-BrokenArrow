@@ -550,7 +550,7 @@ bool anPhysics_Monster::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	current.pushVelocity.Zero();
 
 	if ( IsOutsideWorld() ) {
-		gameLocal.Warning( "clip model outside world bounds for entity '%s' at (%s)", self->name.c_str(), current.origin.ToString(0) );
+		gameLocal.Warning( "clip model outside world bounds for entity '%s' at (%s)", self->name.c_str(), current.origin.ToString( 0 ) );
 		Rest();
 	}
 

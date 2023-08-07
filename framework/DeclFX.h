@@ -29,9 +29,9 @@ typedef struct {
 	int						type;
 	int						sibling;
 
-	anString					data;
-	anString					name;
-	anString					fire;
+	anStr					data;
+	anStr					name;
+	anStr					fire;
 
 	float					delay;
 	float					duration;
@@ -76,7 +76,7 @@ public:
 	virtual void			List() const;
 
 	anList<idFXSingleAction, TAG_FX>events;
-	anString					joint;
+	anStr					joint;
 
 private:
 	void					ParseSingleFXAction( anLexer &src, idFXSingleAction& FXAction );

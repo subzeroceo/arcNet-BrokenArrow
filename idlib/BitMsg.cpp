@@ -151,7 +151,7 @@ void anBitMessage::WriteString( const char *s, int maxLength, bool make7Bit ) {
 		byte *dataPtr;
 		const byte *bytePtr;
 
-		l = anString::Length( s );
+		l = anStr::Length( s );
 		if ( maxLength >= 0 && l >= maxLength ) {
 			l = maxLength - 1;
 		}
@@ -750,7 +750,7 @@ void anBitMsgDelta::WriteString( const char *s, int maxLength ) {
 	} else {
 		char baseString[MAX_DATA_BUFFER];
 		base->ReadString( baseString, sizeof( baseString ) );
-		if ( anString::Cmp( s, baseString ) == 0 ) {
+		if ( anStr::Cmp( s, baseString ) == 0 ) {
 			writeDelta->WriteBits( 0, 1 );
 		} else {
 			writeDelta->WriteBits( 1, 1 );
@@ -895,7 +895,7 @@ void anBitMsgDelta::ReadString( char *buffer, int bufferSize ) const {
 		char baseString[MAX_DATA_BUFFER];
 		base->ReadString( baseString, sizeof( baseString ) );
 		if ( !readDelta || readDelta->ReadBits( 1 ) == 0 ) {
-			anString::Copynz( buffer, baseString, bufferSize );
+			anStr::Copynz( buffer, baseString, bufferSize );
 		} else {
 			readDelta->ReadString( buffer, bufferSize );
 			changed = true;

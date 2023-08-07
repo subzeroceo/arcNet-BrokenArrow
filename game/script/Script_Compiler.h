@@ -188,12 +188,12 @@ private:
 	int				currentFileNumber;
 	int				errorCount;
 					
-	idVarDef		*scope;				// the function being parsed, or NULL
+	idVarDef		*scope;				// the function being parsed, or nullptr
 	const idVarDef	*basetype;			// for accessing fields
 
 	float			Divide( float numerator, float denominator );
-	void			Error( const char *error, ... ) const id_attribute((format(printf,2,3)));
-	void			Warning( const char *message, ... ) const id_attribute((format(printf,2,3)));
+	void			Error( const char *error, ... ) const an_attribute( ( format( printf, 2, 3 ) ) );
+	void			Warning( const char *message, ... ) const an_attribute( ( format( printf, 2, 3 ) ) );
 	idVarDef		*OptimizeOpcode( const opcode_t *op, idVarDef *var_a, idVarDef *var_b );
 	idVarDef		*EmitOpcode( const opcode_t *op, idVarDef *var_a, idVarDef *var_b );
 	idVarDef		*EmitOpcode( int op, idVarDef *var_a, idVarDef *var_b );
@@ -201,7 +201,7 @@ private:
 	void			NextToken( void );
 	void			ExpectToken( const char *string );
 	bool			CheckToken( const char *string );
-	void			ParseName( idStr &name );
+	void			ParseName( anStr &name );
 	void			SkipOutOfFunction( void );
 	void			SkipToSemicolon( void );
 	idTypeDef		*CheckType( void );

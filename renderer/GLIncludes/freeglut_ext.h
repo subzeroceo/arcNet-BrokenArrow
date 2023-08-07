@@ -150,7 +150,7 @@
  */
 FGAPI void    FGAPIENTRY glutMainLoopEvent( void );
 FGAPI void    FGAPIENTRY glutLeaveMainLoop( void );
-FGAPI void    FGAPIENTRY glutExit         ( void );
+FGAPI void    FGAPIENTRY glutExit        ( void );
 
 /*
  * Window management functions, see fg_window.c

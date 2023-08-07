@@ -235,11 +235,11 @@ private:
 
 };
 
-ARC_INLINE int anForce_Field::GetLastApplyTime( void ) const {
+inline int anForce_Field::GetLastApplyTime( void ) const {
 	return lastApplyTime;
 }
 
-ARC_INLINE void anForce_Field::SetOwner( anEntity *ent ) {
+inline void anForce_Field::SetOwner( anEntity *ent ) {
 	owner = ent;
 }
 

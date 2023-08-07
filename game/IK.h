@@ -1,6 +1,3 @@
-// Copyright (C) 2007 Id Software, Inc.
-//
-
 #ifndef __GAME_IK_H__
 #define __GAME_IK_H__
 
@@ -15,19 +12,19 @@
 #define IK_ANIM				"ik_pose"
 
 class anPhysics;
-class arcAnimator;
+class anAnimator;
 
-class idIK : public anClass {
+class anIK : public anClass {
 public:
-	CLASS_PROTOTYPE( idIK );
+	CLASS_PROTOTYPE( anIK );
 
-							idIK( void );
-	virtual					~idIK( void );
+							anIK( void );
+	virtual					~anIK( void );
 
 	virtual bool			IsInitialized( void ) const;
 	bool					IsInhibited( void ) const;
 
-	virtual bool			Init( arcEntity *self, const char *anim, const anVec3 &modelOffset );
+	virtual bool			Init( anEntity *self, const char *anim, const anVec3 &modelOffset );
 	virtual bool			Evaluate( void );
 	virtual void			ClearJointMods( void );
 
@@ -35,13 +32,13 @@ public:
 	static float			GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, anMat3 &axis );
 
 	anPhysics*				GetPhysics();
-	arcAnimator*				GetAnimator();
+	anAnimator*				GetAnimator();
 
 protected:
 	bool					initialized;
 	bool					ik_activate;
-	arcEntity *				self;				// entity using the animated model
-	arcAnimator *			animator;			// animator on entity
+	anEntity *				self;				// entity using the animated model
+	anAnimator *			animator;			// animator on entity
 	int						modifiedAnim;		// animation modified by the IK
 	anVec3					modelOffset;
 };
@@ -54,14 +51,17 @@ protected:
 ===============================================================================
 */
 
-class idIK_Walk : public idIK {
+class anIK_Walk : public anIK {
 public:
-	CLASS_PROTOTYPE( idIK_Walk );
+	CLASS_PROTOTYPE( anIK_Walk );
 
-							idIK_Walk( void );
-	virtual					~idIK_Walk( void );
+							anIK_Walk( void );
+	virtual					~anIK_Walk( void );
 
-	virtual bool			Init( arcEntity *self, const char *anim, const anVec3 &modelOffset );
+	void					Save( anSaveGame *savefile ) const;
+	void					Restore( anRestoreGame *savefile );
+
+	virtual bool			Init( anEntity *self, const char *anim, const anVec3 &modelOffset );
 	virtual bool			Evaluate( void );
 	virtual void			ClearJointMods( void );
 
@@ -123,14 +123,14 @@ private:
 ===============================================================================
 */
 
-class idIK_Reach : public idIK {
+class anIK_Reach : public anIK {
 public:
-	CLASS_PROTOTYPE( idIK_Reach );
+	CLASS_PROTOTYPE( anIK_Reach );
 
-							idIK_Reach( void );
-	virtual					~idIK_Reach( void );
+							anIK_Reach( void );
+	virtual					~anIK_Reach( void );
 
-	virtual bool			Init( arcEntity *self, const char *anim, const anVec3 &modelOffset );
+	virtual bool			Init( anEntity *self, const char *anim, const anVec3 &modelOffset );
 	virtual bool			Evaluate( void );
 	virtual void			ClearJointMods( void );
 
@@ -163,14 +163,14 @@ private:
 ===============================================================================
 */
 
-class arcIK_Aim : public idIK {
+class anIK_Aim : public anIK {
 public:
-	CLASS_PROTOTYPE( arcIK_Aim );
+	CLASS_PROTOTYPE( anIK_Aim );
 
-							arcIK_Aim( void );
-	virtual					~arcIK_Aim( void );
+							anIK_Aim( void );
+	virtual					~anIK_Aim( void );
 
-	virtual bool			Init( arcEntity *self, const char *anim, const anVec3& modelOffset );
+	virtual bool			Init( anEntity *self, const char *anim, const anVec3 &modelOffset );
 	virtual bool			Evaluate( void );
 	virtual void			ClearJointMods( void );
 
@@ -185,4 +185,120 @@ protected:
 	anList< jointGroup_t >		jointGroups;
 };
 
-#endif /* !__GAME_IK_H__ */
+/*
+===============================================================================
+
+	IK controller for wheel based vehicle suspension
+
+===============================================================================
+*/
+
+class anVehicleRigidBodyWheel;
+class anTransport_RB;
+//class anMotorSound;
+
+class anIK_WheeledVehicle : public anIK {
+public:
+	CLASS_PROTOTYPE( anIK_WheeledVehicle );
+
+							anIK_WheeledVehicle( void );
+	virtual					~anIK_WheeledVehicle( void );
+
+	void					AddWheel( anVehicleRigidBodyWheel &wheel );
+	void					ClearWheels( void );
+	virtual bool			Evaluate( void );
+	virtual void			ClearJointMods( void );
+
+	bool					Init( anTransport_RB *self, const char *anim, const anVec3 &modelOffset );
+
+	int						GetNumWheels( void ) const { return wheels.Num(); }
+
+protected:
+	anList<anVehicleRigidBodyWheel *>	wheels;
+	anTransport_RB *					rbParent;
+};
+
+class anTransport;
+class snVehiclePosition;
+class anBasePlayer;
+
+class anVehicleIKSystem : public anClass {
+public:
+	ABSTRACT_PROTOTYPE( anVehicleIKSystem );
+	//virtual					anVehicleIKSystem( void ) {}
+	virtual					~anVehicleIKSystem( void ) {}
+
+	void					InitClamp( const angleClamp_t &yaw, const angleClamp_t &pitch );
+	void					SetPosition( sdVehiclePosition *_position ) { position = _position; }
+	virtual anBasePlayer *	GetPlayer( void );
+
+	virtual bool			Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms );
+	virtual void			Update( void ) = 0;
+
+protected:
+	anTransport *				vehicle;
+	angleClamp_t				clampYaw;
+	angleClamp_t				clampPitch;
+	anVehiclePosition *			position;
+	anVehicleWeapon *			weapon;
+};
+
+class anVehicleSwivel : public anVehicleIKSystem {
+public:
+	CLASS_PROTOTYPE( anVehicleSwivel );
+
+	virtual void			Update( void );
+	virtual bool			Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms );
+
+protected:
+	anMotorSound*			yawSound;
+
+	anAngles				angles;
+	anMat3					baseAxis;
+	jointHandle_t			joint;
+};
+
+class anVehicleWeaponAimer : public anVehicleIKSystem {
+public:
+	CLASS_PROTOTYPE( anVehicleWeaponAimer );
+
+	virtual void			Update( void );
+	virtual bool			Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms );
+
+protected:
+	idScriptedEntityHelper_Aimer aimer;
+};
+
+class anVehicleJointAimer : public anVehicleIKSystem {
+public:
+	CLASS_PROTOTYPE( anVehicleJointAimer );
+
+	virtual void			Update( void );
+	virtual bool			Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms );
+	virtual anBasePlayer *	GetPlayer( void );
+
+protected:
+	anMotorSound *			yawSound;
+	anMotorSound *			pitchSound;
+
+	anAngles				angles;
+	anMat3					baseAxis;
+	jointHandle_t			joint;
+	sdVehicleWeapon *		weapon2;
+};
+
+class anVehicleIK_Steering : public anVehicleIKSystem {
+public:
+	CLASS_PROTOTYPE( anVehicleIK_Steering );
+
+							anVehicleIK_Steering( void );
+	virtual					~anVehicleIK_Steering( void );
+
+	virtual void			Update( void );
+	virtual bool			Setup( anTransport *vhcle, const angleClamp_t &yaw, const angleClamp_t &pitch, const anDict &ikParms );
+
+private:
+	anPlayerArmIK			ik;
+};
+
+#endif // !__GAME_IK_H__

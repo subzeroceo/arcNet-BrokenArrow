@@ -62,11 +62,11 @@ private:
 	anVec2			p[MAX_POINTS_ON_WINDING_2D];
 };
 
-ARC_INLINE idWinding2D::idWinding2D( void ) {
+inline idWinding2D::idWinding2D( void ) {
 	numPoints = 0;
 }
 
-ARC_INLINE idWinding2D &idWinding2D::operator=( const idWinding2D &winding ) {
+inline idWinding2D &idWinding2D::operator=( const idWinding2D &winding ) {
 	int i;
 
 	for ( i = 0; i < winding.numPoints; i++ ) {
@@ -76,27 +76,27 @@ ARC_INLINE idWinding2D &idWinding2D::operator=( const idWinding2D &winding ) {
 	return *this;
 }
 
-ARC_INLINE const anVec2 &idWinding2D::operator[]( const int index ) const {
+inline const anVec2 &idWinding2D::operator[]( const int index ) const {
 	return p[index];
 }
 
-ARC_INLINE anVec2 &idWinding2D::operator[]( const int index ) {
+inline anVec2 &idWinding2D::operator[]( const int index ) {
 	return p[index];
 }
 
-ARC_INLINE void idWinding2D::Clear( void ) {
+inline void idWinding2D::Clear( void ) {
 	numPoints = 0;
 }
 
-ARC_INLINE void idWinding2D::AddPoint( const anVec2 &point ) {
+inline void idWinding2D::AddPoint( const anVec2 &point ) {
 	p[numPoints++] = point;
 }
 
-ARC_INLINE int idWinding2D::GetNumPoints( void ) const {
+inline int idWinding2D::GetNumPoints( void ) const {
 	return numPoints;
 }
 
-ARC_INLINE anVec3 idWinding2D::Plane2DFromPoints( const anVec2 &start, const anVec2 &end, const bool normalize ) {
+inline anVec3 idWinding2D::Plane2DFromPoints( const anVec2 &start, const anVec2 &end, const bool normalize ) {
 	anVec3 plane;
 	plane.x = start.y - end.y;
 	plane.y = end.x - start.x;
@@ -107,7 +107,7 @@ ARC_INLINE anVec3 idWinding2D::Plane2DFromPoints( const anVec2 &start, const anV
 	return plane;
 }
 
-ARC_INLINE anVec3 idWinding2D::Plane2DFromVecs( const anVec2 &start, const anVec2 &dir, const bool normalize ) {
+inline anVec3 idWinding2D::Plane2DFromVecs( const anVec2 &start, const anVec2 &dir, const bool normalize ) {
 	anVec3 plane;
 	plane.x = -dir.y;
 	plane.y = dir.x;
@@ -118,7 +118,7 @@ ARC_INLINE anVec3 idWinding2D::Plane2DFromVecs( const anVec2 &start, const anVec
 	return plane;
 }
 
-ARC_INLINE bool idWinding2D::Plane2DIntersection( const anVec3 &plane1, const anVec3 &plane2, anVec2 &point ) {
+inline bool idWinding2D::Plane2DIntersection( const anVec3 &plane1, const anVec3 &plane2, anVec2 &point ) {
 	float n00, n01, n11, det, invDet, f0, f1;
 
 	n00 = plane1.x * plane1.x + plane1.y * plane1.y;

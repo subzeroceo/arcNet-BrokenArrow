@@ -21,7 +21,7 @@ public:
 	virtual void PostParse();
 	virtual void Draw( inttime, float x, float y);
 	virtual const char *RouteMouseCoords(float xd, float yd);
-	virtual void		Activate(bool activate, anString &act);
+	virtual void		Activate(bool activate, anStr &act);
 	virtual void MouseExit();
 	virtual void MouseEnter();
 
@@ -33,7 +33,7 @@ private:
 	void Point( intx, int y, dword *out, dword color);
 	logStats_t loggedStats[MAX_LOGGED_STATS];
 	anList<markerData_t> markerTimes;
-	anString statData;
+	anStr statData;
 	int numStats;
 	dword *imageBuff;
 	const anMaterial *markerMat;

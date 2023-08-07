@@ -49,7 +49,7 @@ sdHandles<T>::Acquire
 template< class T >
 typename sdHandles<T>::handle_t sdHandles<T>::Acquire() {
 	for( int i = 0; i < items.Num(); i++ ) {
-		if( items[i] == nullptr ) {
+		if ( items[i] == nullptr ) {
 			return handle_t( i );
 		}
 	}	
@@ -117,7 +117,7 @@ sdHandles<T>::IsValid
 */
 template< class T >
 bool sdHandles<T>::IsValid( const handle_t& handle ) const {
-	if( !handle.IsValid() ) {
+	if ( !handle.IsValid() ) {
 		return false;
 	}
 	return items[ handle ] != nullptr;
@@ -141,7 +141,7 @@ sdHandles<T>::GetFirst
 template< class T >
 typename sdHandles<T>::handle_t sdHandles<T>::GetFirst() const {
 	for( int i = 0; i < items.Num(); i++ ) {
-		if( IsValid( i ) ) {
+		if ( IsValid( i ) ) {
 			return handle_t( i );
 		}
 	}
@@ -155,12 +155,12 @@ sdHandles<T>::GetNext
 */
 template< class T >
 typename sdHandles<T>::handle_t sdHandles<T>::GetNext( const handle_t& handle ) const {
-	if( !handle.IsValid() || handle >= items.Num() ) {
+	if ( !handle.IsValid() || handle >= items.Num() ) {
 		return handle_t();
 	}
 
 	for( int i = handle + 1; i < items.Num(); i++ ) {
-		if( IsValid( i ) ) {
+		if ( IsValid( i ) ) {
 			return handle_t( i );
 		}
 	}

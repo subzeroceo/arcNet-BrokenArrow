@@ -640,7 +640,7 @@ int anSEASLocal::GetWallEdges( int areaNum, const anBounds &bounds, int travelFl
 
 	areasVisited = (byte *) _alloca16( file->GetNumAreas() );
 	memset( areasVisited, 0, file->GetNumAreas() * sizeof( byte ) );
-	areaQueue = ( int*) _alloca16( file->GetNumAreas() * sizeof( int ) );
+	areaQueue = (int *) _alloca16( file->GetNumAreas() * sizeof( int ) );
 
 	queueStart = -1;
 	queueEnd = 0;

@@ -1,7 +1,7 @@
 #include "../Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -61,7 +61,7 @@ void WaterFX::Init( const char *splashEffectName, const char *wakeEffectName, an
 	wakeParms.ParseFromDict( wakeArgs );
 }
 
-void WaterFX::CheckWater( arcEntity *ent, const anVec3 &waterBodyOrg, const anMat3 &waterBodyAxis, arcCollisionModel *waterBodyModel, bool showWake ) {
+void WaterFX::CheckWater( anEntity *ent, const anVec3 &waterBodyOrg, const anMat3 &waterBodyAxis, anCollisionModel *waterBodyModel, bool showWake ) {
 	if ( !gameLocal.isNewFrame ) {
 		return;
 	}
@@ -82,7 +82,7 @@ void WaterFX::CheckWater( arcEntity *ent, const anVec3 &waterBodyOrg, const anMa
 	CheckWater( ent, newInWater, waterBounds.GetMaxs()[2] + waterBodyOrg.z, submerged, showWake );
 }
 
-void WaterFX::CheckWater( arcEntity *ent, bool newInWater, float waterlevel, bool submerged, bool showWake ) {
+void WaterFX::CheckWater( anEntity *ent, bool newInWater, float waterlevel, bool submerged, bool showWake ) {
 	if ( !gameLocal.isNewFrame ) {
 		return;
 	}

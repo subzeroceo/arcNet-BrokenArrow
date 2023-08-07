@@ -3,10 +3,10 @@
 
 /*
 =============
-arcJointMat::ToJointQuat
+anJointMat::ToJointQuat
 =============
 */
-anJointQuat arcJointMat::ToJointQuat( void ) const {
+anJointQuat anJointMat::ToJointQuat( void ) const {
 	anJointQuat	jq;
 	float		trace;
 	float		s;

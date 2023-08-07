@@ -18,7 +18,7 @@ public:
 	void			Redraw(float x, float y);
 	void			StateChanged( bool redraw );
 
-	anString			name;
+	anStr			name;
 
 	idWinVar *		GetWinVarByName(const char *_name);
 	int				GetWinVarOffset( idWinVar *wv, drawWin_t* owner);

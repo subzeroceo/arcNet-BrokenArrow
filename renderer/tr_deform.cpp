@@ -1017,15 +1017,15 @@ static void R_ParticleDeform( drawSurf_t *surf, bool useArea ) {
 
 			tri->numVerts = 0;
 
-			arcRandom steppingRandom, steppingRandom2;
+			anRandom steppingRandom, steppingRandom2;
 
 			int stageAge = g.renderView->time + renderEntity->shaderParms[SS_TIMEOFFSET] * 1000 - stage->timeOffset * 1000;
 			int	stageCycle = stageAge / stage->cycleMsec;
 			int	inCycleTime = stageAge - stageCycle * stage->cycleMsec;
 
 			// some particles will be in this cycle, some will be in the previous cycle
-			steppingRandom.SetSeed( ( ( stageCycle << 10 ) & arcRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * arcRandom::MAX_RAND )  );
-			steppingRandom2.SetSeed( ( ( ( stageCycle-1 ) << 10 ) & arcRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * arcRandom::MAX_RAND )  );
+			steppingRandom.SetSeed( ( ( stageCycle << 10 ) & anRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * anRandom::MAX_RAND )  );
+			steppingRandom2.SetSeed( ( ( ( stageCycle-1 ) << 10 ) & anRandom::MAX_RAND) ^ ( int )( renderEntity->shaderParms[SP_DIVERSITY] * anRandom::MAX_RAND )  );
 
 			for ( int index = 0; index < totalParticles; index++ ) {
 				g.index = index;

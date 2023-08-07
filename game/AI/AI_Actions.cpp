@@ -26,7 +26,7 @@ rvAIActionTimer::rvAIActionTimer ( void ) {
 rvAIActionTimer::Init
 ================
 */
-bool rvAIActionTimer::Init ( const anDict& args, const char* name ) {
+bool rvAIActionTimer::Init ( const anDict &args, const char *name ) {
 	rate = SEC2MS ( args.GetFloat ( va( "%s_rate",name), "0" ) );
 	return true;
 }
@@ -102,7 +102,7 @@ rvAIAction::rvAIAction ( void ) {
 rvAIAction::Init
 ================
 */
-bool rvAIAction::Init ( const anDict& args, const char* name, const char* defaultState, int _flags ) {
+bool rvAIAction::Init ( const anDict &args, const char *name, const char *defaultState, int _flags ) {
 	const anKeyValue* kv;
 
 	if ( _flags & AIACTIONF_ATTACK ) {
@@ -137,7 +137,7 @@ bool rvAIAction::Init ( const anDict& args, const char* name, const char* defaul
 	state = args.GetString ( va( "%s_state",name), ( !defaultState||!*defaultState) ? "Torso_Action" : defaultState );
 
 	// allow for multiple animations
-	const char* prefix = va( "%s_anim",name);
+	const char *prefix = va( "%s_anim",name);
 	for ( kv = args.MatchPrefix ( prefix, nullptr ); kv; kv = args.MatchPrefix ( prefix, kv ) ) {
 		if ( kv->GetValue().Length() ) {
 			anims.Append ( kv->GetValue() );
@@ -399,7 +399,7 @@ bool anSAAI::CheckActions ( void ) {
 anSAAI::PerformAction
 ================
 */
-void anSAAI::PerformAction ( const char* stateName, int blendFrames, bool noPain ) {
+void anSAAI::PerformAction ( const char *stateName, int blendFrames, bool noPain ) {
 	// Allow movement in actions
 	move.fl.allowAnimMove = true;
 

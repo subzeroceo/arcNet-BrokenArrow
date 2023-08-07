@@ -11,7 +11,7 @@
 
 // these library functions should not be used for cross platform compatibility
 #include <cstddef>
-#define strcmp			anString::Cmp		// use_anStr_Cmp
+#define strcmp			anStr::Cmp		// use_anStr_Cmp
 #define strncmp			use_anStr_Cmpn
 
 #if defined( StrCmpN )
@@ -34,7 +34,7 @@
 #endif
 #define StrCmpNI		use_anStr_Icmpn
 
-#define stricmp			anString::Icmp		// use_anStr_Icmp
+#define stricmp			anStr::Icmp		// use_anStr_Icmp
 #define _stricmp		use_anStr_Icmp
 #define strcasecmp		use_anStr_Icmp
 #define strnicmp		use_anStr_Icmpn
@@ -94,7 +94,7 @@ const int C_COLOR_ORANGE			= 'D';
 #define S_COLOR_MDPURPLE			"^C"
 #define S_COLOR_ORANGE				"^D"
 
-// make anString a multiple of 16 bytes long
+// make anStr a multiple of 16 bytes long
 // don't make too large to keep memory requirements to a minimum
 const int STR_ALLOC_BASE			= 20;
 const int STR_ALLOC_GRAN			= 32;
@@ -104,7 +104,7 @@ typedef enum {
 	MEASURE_BANDWIDTH
 } Measure_t;
 
-class anString {
+class anStr {
 public:
 	struct TimeFormat {
 		TimeFormat() : showMinutes( false ), showHours( false ), showSeconds( true ) {}
@@ -112,17 +112,17 @@ public:
 		bool showHours;
 		bool showSeconds;
 	};
-						anString( void );
-						anString( const anString &text );
-						anString( const anString &text, int start, int end );
-						anString( const char *text );
-						anString( const char *text, int start, int end );
-						explicit anString( const bool b );
-						explicit anString( const char c );
-						explicit anString( const int i );
-						explicit anString( const unsigned u );
-						explicit anString( const float f );
-						~anString( void );
+						anStr( void );
+						anStr( const anStr &text );
+						anStr( const anStr &text, int start, int end );
+						anStr( const char *text );
+						anStr( const char *text, int start, int end );
+						explicit anStr( const bool b );
+						explicit anStr( const char c );
+						explicit anStr( const int i );
+						explicit anStr( const unsigned u );
+						explicit anStr( const float f );
+						~anStr( void );
 
 	size_t				Size( void ) const;
 	const char *		c_str( void ) const;
@@ -132,36 +132,36 @@ public:
 	char				operator[]( int index ) const;
 	char &				operator[]( int index );
 
-	void				operator=( const anString &text );
+	void				operator=( const anStr &text );
 	void				operator=( const char *text );
 
-	friend anString		operator+( const anString &a, const anString &b );
-	friend anString		operator+( const anString &a, const char *b );
-	friend anString		operator+( const char *a, const anString &b );
+	friend anStr		operator+( const anStr &a, const anStr &b );
+	friend anStr		operator+( const anStr &a, const char *b );
+	friend anStr		operator+( const char *a, const anStr &b );
 
-	friend anString		operator+( const anString &a, const float b );
-	friend anString		operator+( const anString &a, const int b );
-	friend anString		operator+( const anString &a, const unsigned b );
-	friend anString		operator+( const anString &a, const bool b );
-	friend anString		operator+( const anString &a, const char b );
+	friend anStr		operator+( const anStr &a, const float b );
+	friend anStr		operator+( const anStr &a, const int b );
+	friend anStr		operator+( const anStr &a, const unsigned b );
+	friend anStr		operator+( const anStr &a, const bool b );
+	friend anStr		operator+( const anStr &a, const char b );
 
-	anString &			operator+=( const anString &a );
-	anString &			operator+=( const char *a );
-	anString &			operator+=( const float a );
-	anString &			operator+=( const char a );
-	anString &			operator+=( const int a );
-	anString &			operator+=( const unsigned a );
-	anString &			operator+=( const bool a );
-
-						// case sensitive compare
-	friend bool			operator==( const anString &a, const anString &b );
-	friend bool			operator==( const anString &a, const char *b );
-	friend bool			operator==( const char *a, const anString &b );
+	anStr &			operator+=( const anStr &a );
+	anStr &			operator+=( const char *a );
+	anStr &			operator+=( const float a );
+	anStr &			operator+=( const char a );
+	anStr &			operator+=( const int a );
+	anStr &			operator+=( const unsigned a );
+	anStr &			operator+=( const bool a );
 
 						// case sensitive compare
-	friend bool			operator!=( const anString &a, const anString &b );
-	friend bool			operator!=( const anString &a, const char *b );
-	friend bool			operator!=( const char *a, const anString &b );
+	friend bool			operator==( const anStr &a, const anStr &b );
+	friend bool			operator==( const anStr &a, const char *b );
+	friend bool			operator==( const char *a, const anStr &b );
+
+						// case sensitive compare
+	friend bool			operator!=( const anStr &a, const anStr &b );
+	friend bool			operator!=( const anStr &a, const char *b );
+	friend bool			operator!=( const char *a, const anStr &b );
 
 						// case sensitive compare
 	int					Cmp( const char *text ) const;
@@ -187,7 +187,7 @@ public:
 	bool				IsEmpty( void ) const;
 	void				Clear( void );
 	void				Append( const char a );
-	void				Append( const anString &text );
+	void				Append( const anStr &text );
 	void				Append( const char *text );
 	void				Append( int count, const char c );
 
@@ -198,13 +198,13 @@ public:
 	void				ToUpper( void );
 	bool				IsNumeric( void ) const;
 
-	void				Swap( anString& rhs );
+	void				Swap( anStr& rhs );
 
 	bool				IsColor( void ) const;
 	bool				IsHexColor( void ) const;
 	bool				HasHexColorAlpha( void ) const;
 	int					LengthWithoutColors( void ) const;
-	anString &			RemoveColors( void );
+	anStr &				RemoveColors( void );
 
 	bool				HasLower( void ) const;
 	bool				HasUpper( void ) const;
@@ -214,20 +214,20 @@ public:
 
 	int					Find( const char c, int start = 0, int end = -1 ) const;
 	int					Find( const char *text, bool casesensitive = true, int start = 0, int end = -1 ) const;
-	const char *		FindString( const char* text, bool casesensitive = true, int start = 0, int end = INVALID_POSITION ) const;
+	const char *		FindString( const char *text, bool casesensitive = true, int start = 0, int end = INVALID_POSITION ) const;
 	int					CountChar( const char c );
 	bool				Filter( const char *filter, bool casesensitive ) const;
 
 	int					Last( const char c, int index = INVALID_POSITION ) const;
 	int					Last( const char c ) const;						// return the index to the last occurance of 'c', returns -1 if not found
-	const char *		Left( int len, anString &result ) const;		// store the leftmost 'len' characters in the result
-	anString			Left( int len ) const;							// return the leftmost 'len' characters
+	const char *		Left( int len, anStr &result ) const;		// store the leftmost 'len' characters in the result
+	anStr				Left( int len ) const;							// return the leftmost 'len' characters
 
-	const char *		Right( int len, anString &result ) const;		// store the rightmost 'len' characters in the result
-	const char *		Mid( int start, int len, anString &result ) const;// store 'len' characters starting at 'start' in result
+	const char *		Right( int len, anStr &result ) const;		// store the rightmost 'len' characters in the result
+	const char *		Mid( int start, int len, anStr &result ) const;// store 'len' characters starting at 'start' in result
 
-	anString			Right( int len ) const;							// return the rightmost 'len' characters
-	anString			Mid( int start, int len ) const;				// return 'len' characters starting at 'start'
+	anStr				Right( int len ) const;							// return the rightmost 'len' characters
+	anStr				Mid( int start, int len ) const;				// return 'len' characters starting at 'start'
 	void				StripLeading( const char c );					// strip char from front as many times as the char occurs
 	void				StripLeading( const char *string );				// strip string from front as many times as the string occurs
 	bool				StripLeadingOnce( const char *string );			// strip string from front just once if it occurs
@@ -238,7 +238,7 @@ public:
 	void				Strip( const char *string );					// strip string from front and end as many times as the string occurs
 	void				StripLeadingWhiteSpace( void );					// strip leading white space characters
 	void				StripTrailingWhitespace( void );				// strip trailing white space characters
-	anString &			StripQuotes( void );							// strip quotes around string
+	anStr &				StripQuotes( void );							// strip quotes around string
 	void				Replace( const char *old, const char *nw );
 
 	void				ReplaceFirst( const char *old, const char *nw );
@@ -249,31 +249,31 @@ public:
 
 	// file name methods
 	int					FileNameHash( void ) const;						// hash key for the filename ( skips extension)
-	anString &			CollapsePath( void );							// where possible removes /../ and /./ from path
+	anStr &				CollapsePath( void );							// where possible removes /../ and /./ from path
 
-	anString &			BackSlashesToSlashes( void );					// convert slashes
-	anString &			SlashesToBackSlashes( void );					// convert slashes
+	anStr &				BackSlashesToSlashes( void );					// convert slashes
+	anStr &				SlashesToBackSlashes( void );					// convert slashes
 
-	anString &			SetFileExtension( const char *extension );		// set the given file extension
-	anString &			StripFileExtension( void );						// remove any file extension
-	anString &			StripAbsoluteFileExtension( void );				// remove any file extension looking from front (useful if there are multiple .'s)
-	anString &			DefaultFileExtension( const char *extension );	// if there's no file extension use the default
-	anString &			DefaultPath( const char *basepath );			// if there's no path use the default
+	anStr &				SetFileExtension( const char *extension );		// set the given file extension
+	anStr &				StripFileExtension( void );						// remove any file extension
+	anStr &				StripAbsoluteFileExtension( void );				// remove any file extension looking from front (useful if there are multiple .'s)
+	anStr &				DefaultFileExtension( const char *extension );	// if there's no file extension use the default
+	anStr &				DefaultPath( const char *basepath );			// if there's no path use the default
 	void				AppendPath( const char *text );					// append a partial path
-	anString &			StripFilename( void );							// remove the filename from a path
-	anString &			StripPath( void );								// remove the path from the filename
-	void				ExtractFilePath( anString &dest ) const;			// copy the file path to another string
-	void				ExtractFileName( anString &dest ) const;			// copy the filename to another string
-	void				ExtractFileBase( anString &dest ) const;			// copy the filename minus the extension to another string
-	void				ExtractFileExtension( anString &dest ) const;		// copy the file extension to another string
+	anStr &				StripFilename( void );							// remove the filename from a path
+	anStr &				StripPath( void );								// remove the path from the filename
+	void				ExtractFilePath( anStr &dest ) const;			// copy the file path to another string
+	void				ExtractFileName( anStr &dest ) const;			// copy the filename to another string
+	void				ExtractFileBase( anStr &dest ) const;			// copy the filename minus the extension to another string
+	void				ExtractFileExtension( anStr &dest ) const;		// copy the file extension to another string
 	bool				CheckExtension( const char *ext );
 
-	anString &			StripComments();								// remove C++ and C style comments
-	anString & 			Indent();										// indents brace-delimited text, preserving tabs in the middle of lines
-	anString & 			Unindent();										// unindents brace-delimited text, preserving tabs in the middle of lines
-	anString &			CleanFilename( void );							// strips bad characters
+	anStr &				StripComments();								// remove C++ and C style comments
+	anStr & 			Indent();										// indents brace-delimited text, preserving tabs in the middle of lines
+	anStr & 			Unindent();										// unindents brace-delimited text, preserving tabs in the middle of lines
+	anStr &				CleanFilename( void );							// strips bad characters
 	bool				IsValidEmailAddress( void );
-	anString &			CollapseColors( void );							// removes redundant color codes
+	anStr &				CollapseColors( void );							// removes redundant color codes
 
 	// char * methods to replace library functions
 	static int			Length( const char *s );
@@ -310,7 +310,7 @@ public:
 	static int			FindChar( const char *str, const char c, int start = 0, int end = -1 );
 	static int			FindText( const char *str, const char *text, bool casesensitive = true, int start = 0, int end = -1 );
 	static bool			Filter( const char *filter, const char *name, bool casesensitive );
-	static void			StripMediaName( const char *name, anString &mediaName );
+	static void			StripMediaName( const char *name, anStr &mediaName );
 	static bool			CheckExtension( const char *name, const char *ext );
 
 	static const char *	FloatArrayToString( const float *array, const int length, const int precision );
@@ -318,12 +318,12 @@ public:
 	static bool			ToCRLF( const char *src, char *dest, int maxLength );
 	static const char *	CStyleQuote( const char *str );
 	static const char *	CStyleUnQuote( const char *str );
-	static void			IndentAndPad( int indent, int pad, anString &str, const char *fmt, ... );  // indent and pad out formatted text
+	static void			IndentAndPad( int indent, int pad, anStr &str, const char *fmt, ... );  // indent and pad out formatted text
 
-	static void			StringToBinaryString( anString &out, void *pv, int size);
-	static bool			BinaryStringToString( const char* str,  void *pv, int size );
+	static void			StringToBinaryString( anStr &out, void *pv, int size);
+	static bool			BinaryStringToString( const char *str,  void *pv, int size );
 
-    static bool			IsValidEmailAddress( const char* address );
+    static bool			IsValidEmailAddress( const char *address );
 
 	static const char *	MS2HMS( double ms, const TimeFormat &formatSpec = defaultHMSFormat );
 	static const char *	FormatInt( const int num );	 // formats an integer as a value with commas
@@ -351,8 +351,8 @@ public:
 	static const char*	StrForColorIndex( int i );
 	static int			HexForChar( int c );
 
-	friend int			sprintf( anString &dest, const char *fmt, ... );
-	friend int			vsprintf( anString &dest, const char *fmt, va_list ap );
+	friend int			sprintf( anStr &dest, const char *fmt, ... );
+	friend int			vsprintf( anStr &dest, const char *fmt, va_list ap );
 
 	void				ReAllocate( int amount, bool keepOld );				// reallocate string data buffer
 	void				FreeData( void );									// free allocated string memory
@@ -369,7 +369,7 @@ public:
 	static void			ShowMemoryUsage_f( const anCommandArgs &args );
 
 	int					DynamicMemoryUsed() const;
-	static anString	FormatNumber( int number );
+	static anStr		FormatNumber( int number );
 
 	static void			SetStringAllocator( stringDataAllocator_t *allocator );
 	static stringDataAllocator_t *GetStringAllocator( void );
@@ -384,6 +384,9 @@ protected:
 	void				Init( void );										// initialize string using base buffer
 	void				EnsureAlloced( int amount, bool keepold = true );	// ensure string data buffer is large anough
 
+	// FIXME: Finished this!
+	void 				EnsureDataWritable( void );
+
 	static				stringDataAllocator_t *	stringDataAllocator;
 	static				bool					stringAllocatorIsShared;
 	static TimeFormat	defaultHMSFormat;
@@ -392,27 +395,27 @@ protected:
 char *					va( const char *fmt, ... ) an_attribute( ( format( printf, 1, 2 )  ) );
 
 
-ARC_INLINE void anString::EnsureAlloced( int amount, bool keepold ) {
+inline void anStr::EnsureAlloced( int amount, bool keepold ) {
 	if ( amount > alloced ) {
 		ReAllocate( amount, keepold );
 	}
 }
 
-ARC_INLINE void anString::Init( void ) {
+inline void anStr::Init( void ) {
 	len = 0;
 	alloced = STR_ALLOC_BASE;
 	data = baseBuffer;
-	data[ 0 ] = '\0';
+	data[0] = '\0';
 #ifdef ARC_DEBUG_UNINITIALIZED_MEMORY
 	memset( baseBuffer, 0, sizeof( baseBuffer ) );
 #endif
 }
 
-ARC_INLINE anString::anString( void ) {
+inline anStr::anStr( void ) {
 	Init();
 }
 
-ARC_INLINE anString::anString( const anString &text ) {
+inline anStr::anStr( const anStr &text ) {
 	Init();
 	int l = text.Length();
 	EnsureAlloced( l + 1 );
@@ -420,7 +423,7 @@ ARC_INLINE anString::anString( const anString &text ) {
 	len = l;
 }
 
-ARC_INLINE anString::anString( const anString &text, int start, int end ) {
+inline anStr::anStr( const anStr &text, int start, int end ) {
 	Init();
 	if ( end > text.Length() ) {
 		end = text.Length();
@@ -446,7 +449,7 @@ ARC_INLINE anString::anString( const anString &text, int start, int end ) {
 	len = l;
 }
 
-ARC_INLINE anString::anString( const char *text ) {
+inline anStr::anStr( const char *text ) {
 	Init();
 	if ( text ) {
 		int l = strlen( text );
@@ -456,7 +459,7 @@ ARC_INLINE anString::anString( const char *text ) {
 	}
 }
 
-ARC_INLINE anString::anString( const char *text, int start, int end ) {
+inline anStr::anStr( const char *text, int start, int end ) {
 	int l = strlen( text );
 
 	Init();
@@ -484,23 +487,23 @@ ARC_INLINE anString::anString( const char *text, int start, int end ) {
 	len = l;
 }
 
-ARC_INLINE anString::anString( const bool b ) {
+inline anStr::anStr( const bool b ) {
 	Init();
 	EnsureAlloced( 2 );
-	data[ 0 ] = b ? '1' : '0';
-	data[ 1 ] = '\0';
+	data[0] = b ? '1' : '0';
+	data[1] = '\0';
 	len = 1;
 }
 
-ARC_INLINE anString::anString( const char c ) {
+inline anStr::anStr( const char c ) {
 	Init();
 	EnsureAlloced( 2 );
-	data[ 0 ] = c;
-	data[ 1 ] = '\0';
+	data[0] = c;
+	data[1] = '\0';
 	len = 1;
 }
 
-ARC_INLINE anString::anString( const int i ) {
+inline anStr::anStr( const int i ) {
 	char text[ 64 ];
 
 	Init();
@@ -510,7 +513,7 @@ ARC_INLINE anString::anString( const int i ) {
 	len = l;
 }
 
-ARC_INLINE anString::anString( const unsigned u ) {
+inline anStr::anStr( const unsigned u ) {
 	char text[ 64 ];
 	Init();
 	int l = sprintf( text, "%u", u );
@@ -519,10 +522,10 @@ ARC_INLINE anString::anString( const unsigned u ) {
 	len = l;
 }
 
-ARC_INLINE anString::anString( const float f ) {
+inline anStr::anStr( const float f ) {
 	char text[ 64 ];
 	Init();
-	int l = anString::snPrintf( text, sizeof( text ), "%f", f );
+	int l = anStr::snPrintf( text, sizeof( text ), "%f", f );
 	while ( l > 0 && text[l-1] == '0' ) text[--l] = '\0';
 	while ( l > 0 && text[l-1] == '.' ) text[--l] = '\0';
 	EnsureAlloced( l + 1 );
@@ -530,37 +533,37 @@ ARC_INLINE anString::anString( const float f ) {
 	len = l;
 }
 
-ARC_INLINE anString::~anString( void ) {
+inline anStr::~anStr( void ) {
 	FreeData();
 }
 
-ARC_INLINE size_t anString::Size( void ) const {
+inline size_t anStr::Size( void ) const {
 	return sizeof( *this ) + Allocated();
 }
 
-ARC_INLINE const char *anString::c_str( void ) const {
+inline const char *anStr::c_str( void ) const {
 	return data;
 }
 
-ARC_INLINE anString::operator const char *( void ) {
+inline anStr::operator const char *( void ) {
 	return c_str();
 }
 
-ARC_INLINE anString::operator const char *( void ) const {
+inline anStr::operator const char *( void ) const {
 	return c_str();
 }
 
-ARC_INLINE char anString::operator[]( int index ) const {
+inline char anStr::operator[]( int index ) const {
 	assert( ( index >= 0 ) && ( index <= len ) );
 	return data[index];
 }
 
-ARC_INLINE char &anString::operator[]( int index ) {
+inline char &anStr::operator[]( int index ) {
 	assert( ( index >= 0 ) && ( index <= len ) );
 	return data[index];
 }
 
-ARC_INLINE void anString::operator=( const anString &text ) {
+inline void anStr::operator=( const anStr &text ) {
 	int l = text.Length();
 	EnsureAlloced( l + 1, false );
 	memcpy( data, text.data, l );
@@ -568,39 +571,39 @@ ARC_INLINE void anString::operator=( const anString &text ) {
 	len = l;
 }
 
-ARC_INLINE anString operator+( const anString &a, const anString &b ) {
-	anString result( a );
+inline anStr operator+( const anStr &a, const anStr &b ) {
+	anStr result( a );
 	result.Append( b );
 	return result;
 }
 
-ARC_INLINE anString operator+( const anString &a, const char *b ) {
-	anString result( a );
+inline anStr operator+( const anStr &a, const char *b ) {
+	anStr result( a );
 	result.Append( b );
 	return result;
 }
 
-ARC_INLINE anString operator+( const char *a, const anString &b ) {
-	anString result( a );
+inline anStr operator+( const char *a, const anStr &b ) {
+	anStr result( a );
 	result.Append( b );
 	return result;
 }
 
-ARC_INLINE anString operator+( const anString &a, const bool b ) {
-	anString result( a );
+inline anStr operator+( const anStr &a, const bool b ) {
+	anStr result( a );
 	result.Append( b ? "true" : "false" );
 	return result;
 }
 
-ARC_INLINE anString operator+( const anString &a, const char b ) {
-	anString result( a );
+inline anStr operator+( const anStr &a, const char b ) {
+	anStr result( a );
 	result.Append( b );
 	return result;
 }
 
-ARC_INLINE anString operator+( const anString &a, const float b ) {
+inline anStr operator+( const anStr &a, const float b ) {
 	char	text[ 64 ];
-	anString	result( a );
+	anStr	result( a );
 
 	sprintf( text, "%f", b );
 	result.Append( text );
@@ -608,9 +611,9 @@ ARC_INLINE anString operator+( const anString &a, const float b ) {
 	return result;
 }
 
-ARC_INLINE anString operator+( const anString &a, const int b ) {
+inline anStr operator+( const anStr &a, const int b ) {
 	char	text[ 64 ];
-	anString	result( a );
+	anStr	result( a );
 
 	sprintf( text, "%d", b );
 	result.Append( text );
@@ -618,9 +621,9 @@ ARC_INLINE anString operator+( const anString &a, const int b ) {
 	return result;
 }
 
-ARC_INLINE anString operator+( const anString &a, const unsigned b ) {
+inline anStr operator+( const anStr &a, const unsigned b ) {
 	char	text[ 64 ];
-	anString	result( a );
+	anStr	result( a );
 
 	sprintf( text, "%u", b );
 	result.Append( text );
@@ -628,7 +631,7 @@ ARC_INLINE anString operator+( const anString &a, const unsigned b ) {
 	return result;
 }
 
-ARC_INLINE anString &anString::operator+=( const float a ) {
+inline anStr &anStr::operator+=( const float a ) {
 	char text[ 64 ];
 
 	sprintf( text, "%f", a );
@@ -637,7 +640,7 @@ ARC_INLINE anString &anString::operator+=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE anString &anString::operator+=( const int a ) {
+inline anStr &anStr::operator+=( const int a ) {
 	char text[ 64 ];
 
 	sprintf( text, "%d", a );
@@ -646,7 +649,7 @@ ARC_INLINE anString &anString::operator+=( const int a ) {
 	return *this;
 }
 
-ARC_INLINE anString &anString::operator+=( const unsigned a ) {
+inline anStr &anStr::operator+=( const unsigned a ) {
 	char text[ 64 ];
 
 	sprintf( text, "%u", a );
@@ -655,107 +658,107 @@ ARC_INLINE anString &anString::operator+=( const unsigned a ) {
 	return *this;
 }
 
-ARC_INLINE anString &anString::operator+=( const anString &a ) {
+inline anStr &anStr::operator+=( const anStr &a ) {
 	Append( a );
 	return *this;
 }
 
-ARC_INLINE anString &anString::operator+=( const char *a ) {
+inline anStr &anStr::operator+=( const char *a ) {
 	Append( a );
 	return *this;
 }
 
-ARC_INLINE anString &anString::operator+=( const char a ) {
+inline anStr &anStr::operator+=( const char a ) {
 	Append( a );
 	return *this;
 }
 
-ARC_INLINE anString &anString::operator+=( const bool a ) {
+inline anStr &anStr::operator+=( const bool a ) {
 	Append( a ? "true" : "false" );
 	return *this;
 }
 
-ARC_INLINE bool operator==( const anString &a, const anString &b ) {
-	return ( !anString::Cmp( a.data, b.data ) );
+inline bool operator==( const anStr &a, const anStr &b ) {
+	return ( !anStr::Cmp( a.data, b.data ) );
 }
 
-ARC_INLINE bool operator==( const anString &a, const char *b ) {
+inline bool operator==( const anStr &a, const char *b ) {
 	assert( b );
-	return ( !anString::Cmp( a.data, b ) );
+	return ( !anStr::Cmp( a.data, b ) );
 }
 
-ARC_INLINE bool operator==( const char *a, const anString &b ) {
+inline bool operator==( const char *a, const anStr &b ) {
 	assert( a );
-	return ( !anString::Cmp( a, b.data ) );
+	return ( !anStr::Cmp( a, b.data ) );
 }
 
-ARC_INLINE bool operator!=( const anString &a, const anString &b ) {
+inline bool operator!=( const anStr &a, const anStr &b ) {
 	return !( a == b );
 }
 
-ARC_INLINE bool operator!=( const anString &a, const char *b ) {
+inline bool operator!=( const anStr &a, const char *b ) {
 	return !( a == b );
 }
 
-ARC_INLINE bool operator!=( const char *a, const anString &b ) {
+inline bool operator!=( const char *a, const anStr &b ) {
 	return !( a == b );
 }
 
-ARC_INLINE int anString::Cmp( const char *text ) const {
+inline int anStr::Cmp( const char *text ) const {
 	assert( text );
-	return anString::Cmp( data, text );
+	return anStr::Cmp( data, text );
 }
 
-ARC_INLINE int anString::Cmpn( const char *text, int n ) const {
+inline int anStr::Cmpn( const char *text, int n ) const {
 	assert( text );
-	return anString::Cmpn( data, text, n );
+	return anStr::Cmpn( data, text, n );
 }
 
-ARC_INLINE int anString::CmpPrefix( const char *text ) const {
+inline int anStr::CmpPrefix( const char *text ) const {
 	assert( text );
-	return anString::Cmpn( data, text, strlen( text ) );
+	return anStr::Cmpn( data, text, strlen( text ) );
 }
 
-ARC_INLINE int anString::Icmp( const char *text ) const {
+inline int anStr::Icmp( const char *text ) const {
 	assert( text );
-	return anString::Icmp( data, text );
+	return anStr::Icmp( data, text );
 }
 
-ARC_INLINE int anString::Icmpn( const char *text, int n ) const {
+inline int anStr::Icmpn( const char *text, int n ) const {
 	assert( text );
-	return anString::Icmpn( data, text, n );
+	return anStr::Icmpn( data, text, n );
 }
 
-ARC_INLINE int anString::IcmpPrefix( const char *text ) const {
+inline int anStr::IcmpPrefix( const char *text ) const {
 	assert( text );
-	return anString::Icmpn( data, text, strlen( text ) );
+	return anStr::Icmpn( data, text, strlen( text ) );
 }
 
-ARC_INLINE int anString::IcmpNoColor( const char *text ) const {
+inline int anStr::IcmpNoColor( const char *text ) const {
 	assert( text );
-	return anString::IcmpNoColor( data, text );
+	return anStr::IcmpNoColor( data, text );
 }
 
-ARC_INLINE int anString::IcmpPath( const char *text ) const {
+inline int anStr::IcmpPath( const char *text ) const {
 	assert( text );
-	return anString::IcmpPath( data, text );
+	return anStr::IcmpPath( data, text );
 }
 
-ARC_INLINE int anString::IcmpnPath( const char *text, int n ) const {
+inline int anStr::IcmpnPath( const char *text, int n ) const {
 	assert( text );
-	return anString::IcmpnPath( data, text, n );
+	return anStr::IcmpnPath( data, text, n );
 }
 
-ARC_INLINE int anString::IcmpPrefixPath( const char *text ) const {
+inline int anStr::IcmpPrefixPath( const char *text ) const {
 	assert( text );
-	return anString::IcmpnPath( data, text, strlen( text ) );
+	return anStr::IcmpnPath( data, text, strlen( text ) );
 }
 
-ARC_INLINE int anString::Length( void ) const {
+inline int anStr::Length( void ) const {
 	return len;
 }
 
-ARC_INLINE int anString::Allocated( void ) const {
+inline int anStr::Allocated( void ) const {
 	if ( data != baseBuffer ) {
 		return alloced;
 	} else {
@@ -763,29 +766,29 @@ ARC_INLINE int anString::Allocated( void ) const {
 	}
 }
 
-ARC_INLINE void anString::Empty( void ) {
+inline void anStr::Empty( void ) {
 	EnsureAlloced( 1 );
-	data[ 0 ] = '\0';
+	data[0] = '\0';
 	len = 0;
 }
 
-ARC_INLINE bool anString::IsEmpty( void ) const {
-	return ( anString::Cmp( data, "" ) == 0 );
+inline bool anStr::IsEmpty( void ) const {
+	return ( anStr::Cmp( data, "" ) == 0 );
 }
 
-ARC_INLINE void anString::Clear( void ) {
+inline void anStr::Clear( void ) {
 	FreeData();
 	Init();
 }
 
-ARC_INLINE void anString::Append( const char a ) {
+inline void anStr::Append( const char a ) {
 	EnsureAlloced( len + 2 );
 	data[ len ] = a;
 	len++;
 	data[ len ] = '\0';
 }
 
-ARC_INLINE void anString::Append( const anString &text ) {
+inline void anStr::Append( const anStr &text ) {
 	int newLen = len + text.Length();
 	EnsureAlloced( newLen + 1 );
 	for ( int i = 0; i < text.len; i++ ) {
@@ -795,7 +798,7 @@ ARC_INLINE void anString::Append( const anString &text ) {
 	data[ len ] = '\0';
 }
 
-ARC_INLINE void anString::Append( const char *text ) {
+inline void anStr::Append( const char *text ) {
 	if ( text ) {
 		int newLen = len + strlen( text );
 		EnsureAlloced( newLen + 1 );
@@ -807,7 +810,7 @@ ARC_INLINE void anString::Append( const char *text ) {
 	}
 }
 
-ARC_INLINE void anString::Append( const char *text, int l ) {
+inline void anStr::Append( const char *text, int l ) {
 	if ( text && l ) {
 		int newLen = len + l;
 		EnsureAlloced( newLen + 1 );
@@ -819,7 +822,7 @@ ARC_INLINE void anString::Append( const char *text, int l ) {
 	}
 }
 
-ARC_INLINE void anString::Insert( const char a, int index ) {
+inline void anStr::Insert( const char a, int index ) {
 	if ( index < 0 ) {
 		index = 0;
 	} else if ( index > len ) {
@@ -835,7 +838,7 @@ ARC_INLINE void anString::Insert( const char a, int index ) {
 	len++;
 }
 
-ARC_INLINE void anString::Insert( const char *text, int index ) {
+inline void anStr::Insert( const char *text, int index ) {
 	if ( index < 0 ) {
 		index = 0;
 	} else if ( index > len ) {
@@ -853,7 +856,7 @@ ARC_INLINE void anString::Insert( const char *text, int index ) {
 	len += l;
 }
 
-ARC_INLINE void anString::ToLower( void ) {
+inline void anStr::ToLower( void ) {
 	for ( int i = 0; data[i]; i++ ) {
 		if ( CharIsUpper( data[i] ) ) {
 			data[i] += ( 'a' - 'A' );
@@ -861,7 +864,7 @@ ARC_INLINE void anString::ToLower( void ) {
 	}
 }
 
-ARC_INLINE void anString::ToUpper( void ) {
+inline void anStr::ToUpper( void ) {
 	for ( int i = 0; data[i]; i++ ) {
 		if ( CharIsLower( data[i] ) ) {
 			data[i] -= ( 'a' - 'A' );
@@ -869,70 +872,93 @@ ARC_INLINE void anString::ToUpper( void ) {
 	}
 }
 
-ARC_INLINE bool anString::IsNumeric( void ) const {
-	return anString::IsNumeric( data );
+inline bool anStr::IsNumeric( void ) const {
+	return anStr::IsNumeric( data );
 }
 
-ARC_INLINE bool anString::IsColor( void ) const {
-	return anString::IsColor( data );
+inline bool anStr::IsColor( void ) const {
+	return anStr::IsColor( data );
 }
 
-ARC_INLINE bool anString::HasLower( void ) const {
-	return anString::HasLower( data );
+inline bool anStr::HasLower( void ) const {
+	return anStr::HasLower( data );
 }
 
-ARC_INLINE bool anString::HasUpper( void ) const {
-	return anString::HasUpper( data );
+inline bool anStr::HasUpper( void ) const {
+	return anStr::HasUpper( data );
 }
 
-ARC_INLINE anString &anString::RemoveColors( void ) {
-	anString::RemoveColors( data );
+inline anStr &anStr::RemoveColors( void ) {
+	anStr::RemoveColors( data );
 	len = Length( data );
 	return *this;
 }
 
-ARC_INLINE int anString::LengthWithoutColors( void ) const {
-	return anString::LengthWithoutColors( data );
+inline int anStr::LengthWithoutColors( void ) const {
+	return anStr::LengthWithoutColors( data );
 }
 
-ARC_INLINE void anString::CapLength( int newlen ) {
+inline void anStr::CapLength( int newlen ) {
+	//assert( data );
 	if ( len <= newlen ) {
 		return;
 	}
+	//EnsureDataWritable();
 	data[ newlen ] = 0;
 	len = newlen;
 }
 
-ARC_INLINE void anString::Fill( const char ch, int newlen ) {
+inline void idStr::EnsureDataWritable( void ) {
+	assert( data );
+	strdata *oldData;
+	int len;
+
+	if ( !data->refcount ) {
+		return;
+	}
+
+	oldData = data;
+	len = length();
+
+	data = new strdata;
+
+	EnsureAlloced( len + 1, false );
+	strncpy( data->data, oldData->data, len + 1 );
+	data->len = len;
+
+	oldData->DelRef();
+}
+
+inline void anStr::Fill( const char ch, int newlen ) {
 	EnsureAlloced( newlen + 1 );
 	len = newlen;
 	memset( data, ch, len );
 	data[ len ] = 0;
 }
 
-ARC_INLINE int anString::Find( const char c, int start, int end ) const {
+inline int anStr::Find( const char c, int start, int end ) const {
 	if ( end == -1 ) {
 		end = len;
 	}
-	return anString::FindChar( data, c, start, end );
+	return anStr::FindChar( data, c, start, end );
 }
 
-ARC_INLINE int anString::Find( const char *text, bool casesensitive, int start, int end ) const {
+inline int anStr::Find( const char *text, bool casesensitive, int start, int end ) const {
 	if ( end == -1 ) {
 		end = len;
 	}
-	return anString::FindText( data, text, casesensitive, start, end );
+	return anStr::FindText( data, text, casesensitive, start, end );
 }
 
-ARC_INLINE bool anString::Filter( const char *filter, bool casesensitive ) const {
-	return anString::Filter( filter, data, casesensitive );
+inline bool anStr::Filter( const char *filter, bool casesensitive ) const {
+	return anStr::Filter( filter, data, casesensitive );
 }
 
-ARC_INLINE const char *anString::Left( int len, anString &result ) const {
+inline const char *anStr::Left( int len, anStr &result ) const {
 	return Mid( 0, len, result );
 }
 
-ARC_INLINE const char *anString::Right( int len, anString &result ) const {
+inline const char *anStr::Right( int len, anStr &result ) const {
 	if ( len >= Length() ) {
 		result = *this;
 		return result;
@@ -940,38 +966,38 @@ ARC_INLINE const char *anString::Right( int len, anString &result ) const {
 	return Mid( Length() - len, len, result );
 }
 
-ARC_INLINE anString anString::Left( int len ) const {
+inline anStr anStr::Left( int len ) const {
 	return Mid( 0, len );
 }
 
-ARC_INLINE anString anString::Right( int len ) const {
+inline anStr anStr::Right( int len ) const {
 	if ( len >= Length() ) {
 		return *this;
 	}
 	return Mid( Length() - len, len );
 }
 
-ARC_INLINE void anString::Strip( const char c ) {
+inline void anStr::Strip( const char c ) {
 	StripLeading( c );
 	StripTrailing( c );
 }
 
-ARC_INLINE void anString::Strip( const char *string ) {
+inline void anStr::Strip( const char *string ) {
 	StripLeading( string );
 	StripTrailing( string );
 }
 
-ARC_INLINE bool anString::CheckExtension( const char *ext ) {
-	return anString::CheckExtension( data, ext );
+inline bool anStr::CheckExtension( const char *ext ) {
+	return anStr::CheckExtension( data, ext );
 }
 
-ARC_INLINE int anString::Length( const char *s ) {
+inline int anStr::Length( const char *s ) {
 	for ( int i = 0; s[i]; i++ ) {
 		return i;
 	}
 }
 
-ARC_INLINE char *anString::ToLower( char *s ) {
+inline char *anStr::ToLower( char *s ) {
 	for ( int i = 0; s[i]; i++ ) {
 		if ( CharIsUpper( s[i] ) ) {
 			s[i] += ( 'a' - 'A' );
@@ -980,7 +1006,7 @@ ARC_INLINE char *anString::ToLower( char *s ) {
 	return s;
 }
 
-ARC_INLINE char *anString::ToUpper( char *s ) {
+inline char *anStr::ToUpper( char *s ) {
 	for ( int i = 0; s[i]; i++ ) {
 		if ( CharIsLower( s[i] ) ) {
 			s[i] -= ( 'a' - 'A' );
@@ -989,7 +1015,7 @@ ARC_INLINE char *anString::ToUpper( char *s ) {
 	return s;
 }
 
-ARC_INLINE int anString::Hash( const char *string ) {
+inline int anStr::Hash( const char *string ) {
 	int hash = 0;
 	for ( int i = 0; *string != '\0'; i++ ) {
 		hash += ( *string++ ) * ( i + 119 );
@@ -997,7 +1023,7 @@ ARC_INLINE int anString::Hash( const char *string ) {
 	return hash;
 }
 
-ARC_INLINE int anString::Hash( const char *string, int length ) {
+inline int anStr::Hash( const char *string, int length ) {
 	int hash = 0;
 	for ( int i = 0; i < length; i++ ) {
 		hash += ( *string++ ) * ( i + 119 );
@@ -1005,7 +1031,7 @@ ARC_INLINE int anString::Hash( const char *string, int length ) {
 	return hash;
 }
 
-ARC_INLINE int anString::IHash( const char *string ) {
+inline int anStr::IHash( const char *string ) {
 	int hash = 0;
 	for ( int i = 0; *string != '\0'; i++ ) {
 		hash += ToLower( *string++ ) * ( i + 119 );
@@ -1013,7 +1039,7 @@ ARC_INLINE int anString::IHash( const char *string ) {
 	return hash;
 }
 
-ARC_INLINE int anString::IHash( const char *string, int length ) {
+inline int anStr::IHash( const char *string, int length ) {
 	int hash = 0;
 	for ( int i = 0; i < length; i++ ) {
 		hash += ToLower( *string++ ) * ( i + 119 );
@@ -1021,146 +1047,146 @@ ARC_INLINE int anString::IHash( const char *string, int length ) {
 	return hash;
 }
 
-ARC_INLINE bool anString::IsColor( const char *s ) {
+inline bool anStr::IsColor( const char *s ) {
 	return ( s[0] == C_COLOR_ESCAPE && s[1] != '\0' && s[1] != ' ' );
 }
 
-ARC_INLINE char anString::ToLower( char c ) {
+inline char anStr::ToLower( char c ) {
 	if ( c <= 'Z' && c >= 'A' ) {
 		return ( c + ( 'a' - 'A' ) );
 	}
 	return c;
 }
 
-ARC_INLINE char anString::ToUpper( char c ) {
+inline char anStr::ToUpper( char c ) {
 	if ( c >= 'a' && c <= 'z' ) {
 		return ( c - ( 'a' - 'A' ) );
 	}
 	return c;
 }
 
-ARC_INLINE bool anString::CharIsPrintable( int c ) {
+inline bool anStr::CharIsPrintable( int c ) {
 	// test for regular ascii and western European high-ascii chars
 	return ( c >= 0x20 && c <= 0x7E ) || ( c >= 0xA1 && c <= 0xFF );
 }
 
-ARC_INLINE bool anString::CharIsLower( int c ) {
+inline bool anStr::CharIsLower( int c ) {
 	// test for regular ascii and western European high-ascii chars
 	return ( c >= 'a' && c <= 'z' ) || ( c >= 0xE0 && c <= 0xFF );
 }
 
-ARC_INLINE bool anString::CharIsUpper( int c ) {
+inline bool anStr::CharIsUpper( int c ) {
 	// test for regular ascii and western European high-ascii chars
 	return ( c <= 'Z' && c >= 'A' ) || ( c >= 0xC0 && c <= 0xDF );
 }
 
-ARC_INLINE bool anString::CharIsAlpha( int c ) {
+inline bool anStr::CharIsAlpha( int c ) {
 	// test for regular ascii and western European high-ascii chars
 	return ( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= 0xC0 && c <= 0xFF ) );
 }
 
-ARC_INLINE bool anString::CharIsNumeric( int c ) {
+inline bool anStr::CharIsNumeric( int c ) {
 	return ( c <= '9' && c >= '0' );
 }
 
-ARC_INLINE bool anString::CharIsNewLine( char c ) {
+inline bool anStr::CharIsNewLine( char c ) {
 	return ( c == '\n' || c == '\r' || c == '\v' );
 }
 
-ARC_INLINE bool anString::CharIsTab( char c ) {
+inline bool anStr::CharIsTab( char c ) {
 	return ( c == '\t' );
 }
 
-ARC_INLINE int anString::ColorIndex( int c ) {
+inline int anStr::ColorIndex( int c ) {
 	return ( c & 15 );
 }
 
-ARC_INLINE int anString::DynamicMemoryUsed() const {
+inline int anStr::DynamicMemoryUsed() const {
 	return ( data == baseBuffer ) ? 0 : alloced;
 }
 
 template< int _size_ >
-class anStaticString : public anString {
+class anStaticString : public anStr {
 public:
-ARC_INLINE void operator=( const anStaticString &text ) {
+inline void operator=( const anStaticString &text ) {
 	// we should only get here when the types, including the size, are identical
 	len = text.Length();
 	memcpy( data, text.data, len+1 );
 }
 
-// all anString operators are overloaded and the anString default constructor is called so that the
+// all anStr operators are overloaded and the anStr default constructor is called so that the
 // static buffer can be initialized in the body of the constructor before the data is ever
 // copied.
-ARC_INLINE	anStaticString() {
-	buffer[ 0 ] = '\0';
+inline	anStaticString() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
 }
 
-ARC_INLINE	anStaticString( const anStaticString & text ) :
-	anString() {
-	buffer[ 0 ] = '\0';
+inline	anStaticString( const anStaticString & text ) :
+	anStr() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
-	anString::operator=( text );
+	anStr::operator=( text );
 }
 
-ARC_INLINE	anStaticString( const anString & text ) :
-	anString() {
-	buffer[ 0 ] = '\0';
+inline	anStaticString( const anStr & text ) :
+	anStr() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
-	anString::operator=( text );
+	anStr::operator=( text );
 }
 
-ARC_INLINE	anStaticString( const anStaticString & text, int start, int end ) :
-	anString() {
-	buffer[ 0 ] = '\0';
+inline	anStaticString( const anStaticString & text, int start, int end ) :
+	anStr() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
 	CopyRange( text.c_str(), start, end );
 }
 
-ARC_INLINE	anStaticString( const char *text ) :
-	anString() {
-	buffer[ 0 ] = '\0';
+inline	anStaticString( const char *text ) :
+	anStr() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
-	anString::operator=( text );
+	anStr::operator=( text );
 }
 
-ARC_INLINE	anStaticString( const char *text, int start, int end ) :
-	anString() {
-	buffer[ 0 ] = '\0';
+inline	anStaticString( const char *text, int start, int end ) :
+	anStr() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
 	CopyRange( text, start, end );
 }
 
-ARC_INLINE	explicit anStaticString( const bool b ) :
-	anString() {
-	buffer[ 0 ] = '\0';
+inline	explicit anStaticString( const bool b ) :
+	anStr() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
-	anString::operator=( b );
+	anStr::operator=( b );
 }
 
-ARC_INLINE	explicit anStaticString( const char c ) :
-	anString() {
-	buffer[ 0 ] = '\0';
+inline	explicit anStaticString( const char c ) :
+	anStr() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
-	anString::operator=( c );
+	anStr::operator=( c );
 }
 
-ARC_INLINE	explicit anStaticString( const int i ) :
-	anString() {
-	buffer[ 0 ] = '\0';
+inline	explicit anStaticString( const int i ) :
+	anStr() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
-	anString::operator=( i );
+	anStr::operator=( i );
 }
 
-ARC_INLINE	explicit anStaticString( const unsigned u ) :
-	anString() {
-	buffer[ 0 ] = '\0';
+inline	explicit anStaticString( const unsigned u ) :
+	anStr() {
+	buffer[0] = '\0';
 	SetStaticBuffer( buffer, _size_ );
-	anString::operator=( u );
+	anStr::operator=( u );
 }
 
-ARC_INLINE	explicit anStaticString( const float f ) :
-	anString() { buffer[ 0 ] = '\0'; SetStaticBuffer( buffer, _size_ ); anString::operator=( f );
+inline	explicit anStaticString( const float f ) :
+	anStr() { buffer[0] = '\0'; SetStaticBuffer( buffer, _size_ ); anStr::operator=( f );
 }
 
 private:

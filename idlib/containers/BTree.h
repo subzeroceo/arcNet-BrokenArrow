@@ -61,29 +61,29 @@ private:
 
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE anBinaryTree<objType,keyType,maxChildrenPerNode>::anBinaryTree( void ) {
+inline anBinaryTree<objType,keyType,maxChildrenPerNode>::anBinaryTree( void ) {
 	assert( maxChildrenPerNode >= 4 );
 	root = nullptr;
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE anBinaryTree<objType,keyType,maxChildrenPerNode>::~anBinaryTree( void ) {
+inline anBinaryTree<objType,keyType,maxChildrenPerNode>::~anBinaryTree( void ) {
 	Shutdown();
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::Init( void ) {
+inline void anBinaryTree<objType,keyType,maxChildrenPerNode>::Init( void ) {
 	root = AllocNode();
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::Shutdown( void ) {
+inline void anBinaryTree<objType,keyType,maxChildrenPerNode>::Shutdown( void ) {
 	nodeAllocator.Shutdown();
 	root = nullptr;
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::Add( objType *object, keyType key ) {
+inline anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::Add( objType *object, keyType key ) {
 	anBinaryTreeNode<objType,keyType> *node, *child, *newNode;
 
 	if ( root->numChildren >= maxChildrenPerNode ) {
@@ -102,7 +102,6 @@ ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxCh
 	newNode->object = object;
 
 	for ( node = root; node->firstChild != nullptr; node = child ) {
-
 		if ( key > node->key ) {
 			node->key = key;
 		}
@@ -115,7 +114,6 @@ ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxCh
 		}
 
 		if ( child->object ) {
-
 			if ( key <= child->key ) {
 				// insert new node before child
 				if ( child->prev ) {
@@ -144,7 +142,6 @@ ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxCh
 #ifdef BTREE_CHECK
 			CheckTree();
 #endif
-
 			return newNode;
 		}
 
@@ -172,11 +169,9 @@ ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxCh
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::Remove( anBinaryTreeNode<objType,keyType> *node ) {
+inline void anBinaryTree<objType,keyType,maxChildrenPerNode>::Remove( anBinaryTreeNode<objType,keyType> *node ) {
 	anBinaryTreeNode<objType,keyType> *parent;
-
 	assert( node->object != nullptr );
-
 	// unlink the node from it's parent
 	if ( node->prev ) {
 		node->prev->next = node->next;
@@ -233,9 +228,8 @@ ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::Remove( anBina
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE objType *anBinaryTree<objType,keyType,maxChildrenPerNode>::Find( keyType key ) const {
+inline objType *anBinaryTree<objType,keyType,maxChildrenPerNode>::Find( keyType key ) const {
 	anBinaryTreeNode<objType,keyType> *node;
-
 	for ( node = root->firstChild; node != nullptr; node = node->firstChild ) {
 		while( node->next ) {
 			if ( node->key >= key ) {
@@ -255,9 +249,8 @@ ARC_INLINE objType *anBinaryTree<objType,keyType,maxChildrenPerNode>::Find( keyT
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE objType *anBinaryTree<objType,keyType,maxChildrenPerNode>::FindSmallestLargerEqual( keyType key ) const {
+inline objType *anBinaryTree<objType,keyType,maxChildrenPerNode>::FindSmallestLargerEqual( keyType key ) const {
 	anBinaryTreeNode<objType,keyType> *node;
-
 	for ( node = root->firstChild; node != nullptr; node = node->firstChild ) {
 		while( node->next ) {
 			if ( node->key >= key ) {
@@ -277,9 +270,8 @@ ARC_INLINE objType *anBinaryTree<objType,keyType,maxChildrenPerNode>::FindSmalle
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE objType *anBinaryTree<objType,keyType,maxChildrenPerNode>::FindLargestSmallerEqual( keyType key ) const {
+inline objType *anBinaryTree<objType,keyType,maxChildrenPerNode>::FindLargestSmallerEqual( keyType key ) const {
 	anBinaryTreeNode<objType,keyType> *node;
-
 	for ( node = root->lastChild; node != nullptr; node = node->lastChild ) {
 		while( node->prev ) {
 			if ( node->key <= key ) {
@@ -299,17 +291,17 @@ ARC_INLINE objType *anBinaryTree<objType,keyType,maxChildrenPerNode>::FindLarges
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::GetRoot( void ) const {
+inline anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::GetRoot( void ) const {
 	return root;
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE int anBinaryTree<objType,keyType,maxChildrenPerNode>::GetNodeCount( void ) const {
+inline int anBinaryTree<objType,keyType,maxChildrenPerNode>::GetNodeCount( void ) const {
 	return nodeAllocator.GetAllocCount();
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::GetNext( anBinaryTreeNode<objType,keyType> *node ) const {
+inline anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::GetNext( anBinaryTreeNode<objType,keyType> *node ) const {
 	if ( node->firstChild ) {
 		return node->firstChild;
 	} else {
@@ -321,7 +313,7 @@ ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxCh
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::GetNextLeaf( anBinaryTreeNode<objType,keyType> *node ) const {
+inline anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::GetNextLeaf( anBinaryTreeNode<objType,keyType> *node ) const {
 	if ( node->firstChild ) {
 		while ( node->firstChild ) {
 			node = node->firstChild;
@@ -344,7 +336,7 @@ ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxCh
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::AllocNode( void ) {
+inline anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::AllocNode( void ) {
 	anBinaryTreeNode<objType,keyType> *node = nodeAllocator.Alloc();
 	node->key = 0;
 	node->parent = nullptr;
@@ -358,12 +350,12 @@ ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxCh
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::FreeNode( anBinaryTreeNode<objType,keyType> *node ) {
+inline void anBinaryTree<objType,keyType,maxChildrenPerNode>::FreeNode( anBinaryTreeNode<objType,keyType> *node ) {
 	nodeAllocator.Free( node );
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::SplitNode( anBinaryTreeNode<objType,keyType> *node ) {
+inline void anBinaryTree<objType,keyType,maxChildrenPerNode>::SplitNode( anBinaryTreeNode<objType,keyType> *node ) {
 	int i;
 	anBinaryTreeNode<objType,keyType> *child, *newNode;
 
@@ -406,7 +398,7 @@ ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::SplitNode( anB
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::MergeNodes( anBinaryTreeNode<objType,keyType> *node1, anBinaryTreeNode<objType,keyType> *node2 ) {
+inline anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxChildrenPerNode>::MergeNodes( anBinaryTreeNode<objType,keyType> *node1, anBinaryTreeNode<objType,keyType> *node2 ) {
 	anBinaryTreeNode<objType,keyType> *child;
 
 	assert( node1->parent == node2->parent );
@@ -438,7 +430,7 @@ ARC_INLINE anBinaryTreeNode<objType,keyType> *anBinaryTree<objType,keyType,maxCh
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::CheckTree_r( anBinaryTreeNode<objType,keyType> *node, int &numNodes ) const {
+inline void anBinaryTree<objType,keyType,maxChildrenPerNode>::CheckTree_r( anBinaryTreeNode<objType,keyType> *node, int &numNodes ) const {
 	int numChildren;
 	anBinaryTreeNode<objType,keyType> *child;
 
@@ -471,7 +463,7 @@ ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::CheckTree_r( a
 }
 
 template< class objType, class keyType, int maxChildrenPerNode >
-ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::CheckTree( void ) const {
+inline void anBinaryTree<objType,keyType,maxChildrenPerNode>::CheckTree( void ) const {
 	int numNodes = 0;
 	anBinaryTreeNode<objType,keyType> *node, *lastNode;
 
@@ -489,4 +481,4 @@ ARC_INLINE void anBinaryTree<objType,keyType,maxChildrenPerNode>::CheckTree( voi
 	}
 }
 
-#endif /* !__BTREE_H__ */
+#endif // !__BTREE_H__

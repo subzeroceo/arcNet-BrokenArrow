@@ -38,11 +38,11 @@ missing reload over a previously explicit definition
 // for the decl manager.. the type of decl and class along with folders it uses.
 class anDeclClassType {
 public:
-	anString						typeName;
+	anStr						typeName;
 	declType_t						type;
 	anDecl *				(*allocator)();
-	anString						folder;
-	anString						extension;
+	anStr						folder;
+	anStr						extension;
 	declType_t						defaultType;
 };
 
@@ -100,7 +100,7 @@ protected:
 private:
 	anDecl *					self;
 
-	anString					name;					// name of the decl
+	anStr					name;					// name of the decl
 	char *						textSource;			// decl text definition
 	int							textLength;				// length of textSource
 	int							compressedLength;		// compressed length
@@ -130,7 +130,7 @@ public:
 	int							LoadAndParse();
 
 public:
-	anString					fileName;
+	anStr					fileName;
 	declType_t					defaultType;
 
 	ARC_TIME_T					timestamp;
@@ -162,7 +162,7 @@ public:
 	virtual const anDecl *			DeclByIndex( declType_t type, int index, bool forceParse = true );
 
 	virtual const anDecl*			FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault = true );
-	virtual void					ReloadFile( const char* filename, bool force );
+	virtual void					ReloadFile( const char *filename, bool force );
 
 	virtual void					ListType( const anCommandArgs &args, declType_t type );
 	virtual void					PrintType( const anCommandArgs &args, declType_t type );
@@ -170,7 +170,7 @@ public:
 	virtual anDecl *		CreateNewDecl( declType_t type, const char *name, const char *fileName );
 
 	//BSM Added for the material editors rename capabilities
-	virtual bool					RenameDecl( declType_t type, const char* oldName, const char* newName );
+	virtual bool					RenameDecl( declType_t type, const char *oldName, const char *newName );
 
 	virtual void					MediaPrint( VERIFY_FORMAT_STRING const char *fmt, ... );
 	virtual void					WritePrecacheCommands( anFile *f );
@@ -572,7 +572,7 @@ int anDeclFile::LoadAndParse() {
 	char *		buffer;
 	int			length, size;
 	int			sourceLine;
-	anString	name;
+	anStr	name;
 	anDeclLocal *newDecl;
 	bool		reparse;
 
@@ -913,7 +913,7 @@ anDeclManagerLocal::RegisterDeclFolder
 ===================
 */
 void anDeclManagerLocal::RegisterDeclFolder( const char *folder, const char *extension, declType_t defaultType ) {
-	anString fileName;
+	anStr fileName;
 	anDeclClassType *declFolder;
 	anFileList *fileList;
 	anDeclFile *df;
@@ -972,7 +972,7 @@ int anDeclManagerLocal::GetChecksum() const {
 		total += linearLists[i].Num();
 	}
 
-	checksumData = ( int*) _alloca16( total * 2 * sizeof( int ) );
+	checksumData = (int *) _alloca16( total * 2 * sizeof( int ) );
 
 	total = 0;
 	for ( int i = 0; i < DECL_MAX_TYPES; i++ ) {
@@ -1044,7 +1044,7 @@ External users will always cause the decl to be parsed before returning
 */
 const anDecl *anDeclManagerLocal::FindType( declType_t type, const char *name, bool makeDefault ) {
 	anDeclLocal *decl;
-	idScopedCriticalSection cs( mutex );
+	anScopedCriticalSection cs( mutex );
 
 	if ( !name || !name[0] ) {
 		name = "_emptyName";
@@ -1097,7 +1097,7 @@ const anDecl* anDeclManagerLocal::FindDeclWithoutParsing( declType_t type, const
 anDeclManagerLocal::ReloadFile
 ===============
 */
-void anDeclManagerLocal::ReloadFile( const char* filename, bool force ) {
+void anDeclManagerLocal::ReloadFile( const char *filename, bool force ) {
 	for ( int i = 0; i < loadedFiles.Num(); i++ ) {
 		if ( !loadedFiles[i]->fileName.Icmp( filename ) ) {
 			checksum ^= loadedFiles[i]->checksum;
@@ -1167,12 +1167,12 @@ FIXME: alphabetized, wildcards?
 void anDeclManagerLocal::ListType( const anCommandArgs &args, declType_t type ) {
 	bool all, ever;
 
-	if ( !anString::Icmp( args.Argv( 1 ), "all" ) ) {
+	if ( !anStr::Icmp( args.Argv( 1 ), "all" ) ) {
 		all = true;
 	} else {
 		all = false;
 	}
-	if ( !anString::Icmp( args.Argv( 1 ), "ever" ) ) {
+	if ( !anStr::Icmp( args.Argv( 1 ), "ever" ) ) {
 		ever = true;
 	} else {
 		ever = false;
@@ -1291,7 +1291,7 @@ anDecl *anDeclManagerLocal::CreateNewDecl( declType_t type, const char *name, co
 
 	MakeNameCanonical( name, canonicalName, sizeof( canonicalName ) );
 
-	anString fileName = _fileName;
+	anStr fileName = _fileName;
 	fileName.BackSlashesToSlashes();
 
 	// see if it already exists
@@ -1323,18 +1323,18 @@ anDecl *anDeclManagerLocal::CreateNewDecl( declType_t type, const char *name, co
 	decl->type = type;
 	decl->declState = DS_UNPARSED;
 	decl->AllocateSelf();
-	anString header = declTypes[typeIndex]->typeName;
-	anString defaultText = decl->self->DefaultDefinition();
+	anStr header = declTypes[typeIndex]->typeName;
+	anStr defaultText = decl->self->DefaultDefinition();
 
 
-	int size = header.Length() + 1 + anString::Length( canonicalName ) + 1 + defaultText.Length();
-	char *declText = ( char * ) _alloca( size + 1 );
+	int size = header.Length() + 1 + anStr::Length( canonicalName ) + 1 + defaultText.Length();
+	char *declText = (char *) _alloca( size + 1 );
 
 	memcpy( declText, header, header.Length() );
 	declText[header.Length()] = ' ';
-	memcpy( declText + header.Length() + 1, canonicalName, anString::Length( canonicalName ) );
-	declText[header.Length() + 1 + anString::Length( canonicalName )] = ' ';
-	memcpy( declText + header.Length() + 1 + anString::Length( canonicalName ) + 1, defaultText, defaultText.Length() + 1 );
+	memcpy( declText + header.Length() + 1, canonicalName, anStr::Length( canonicalName ) );
+	declText[header.Length() + 1 + anStr::Length( canonicalName )] = ' ';
+	memcpy( declText + header.Length() + 1 + anStr::Length( canonicalName ) + 1, defaultText, defaultText.Length() + 1 );
 
 	decl->SetTextLocal( declText, size );
 	decl->sourceFile = sourceFile;
@@ -1360,7 +1360,7 @@ anDecl *anDeclManagerLocal::CreateNewDecl( declType_t type, const char *name, co
 anDeclManagerLocal::RenameDecl
 ===============
 */
-bool anDeclManagerLocal::RenameDecl( declType_t type, const char* oldName, const char* newName ) {
+bool anDeclManagerLocal::RenameDecl( declType_t type, const char *oldName, const char *newName ) {
 	char canonicalOldName[MAX_STRING_CHARS];
 	MakeNameCanonical( oldName, canonicalOldName, sizeof( canonicalOldName ) );
 
@@ -1418,7 +1418,7 @@ void anDeclManagerLocal::MediaPrint( const char *fmt, ... ) {
 	va_list argptr;
 	char buffer[1024];
 	va_start( argptr, fmt );
-	anString::vsnPrintf( buffer, sizeof( buffer ), fmt, argptr );
+	anStr::vsnPrintf( buffer, sizeof( buffer ), fmt, argptr );
 	va_end( argptr ) ;
 	buffer[sizeof( buffer )-1] = '\0';
 
@@ -1502,7 +1502,7 @@ void anDeclManagerLocal::MakeNameCanonical( const char *name, char *result, int 
 			lastDot = i;
 			result[i] = c;
 		} else {
-			result[i] = anString::ToLower( c );
+			result[i] = anStr::ToLower( c );
 		}
 	}
 	if ( lastDot != -1 ) {
@@ -1561,7 +1561,7 @@ A reload will never cause anything to be purged.
 ===================
 */
 void anDeclManagerLocal::ReloadDecls_f( const anCommandArgs &args ) {
-	if ( !anString::Icmp( args.Argv( 1 ), "all" ) ) {
+	if ( !anStr::Icmp( args.Argv( 1 ), "all" ) ) {
 		bool force = true;
 		common->Printf( "reloading all decl files:\n" );
 	} else {
@@ -1822,7 +1822,7 @@ anDeclLocal::SetText
 =================
 */
 void anDeclLocal::SetText( const char *text ) {
-	SetTextLocal( text, anString::Length( text ) );
+	SetTextLocal( text, anStr::Length( text ) );
 }
 
 /*

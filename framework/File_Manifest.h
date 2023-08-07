@@ -25,7 +25,7 @@ public:
 
 	int FindFile( const char *fileName );
 
-	const anString & GetFileNameByIndex( int idx ) const;
+	const anStr & GetFileNameByIndex( int idx ) const;
 
 
 	const char *GetManifestName() { return filename; }
@@ -33,7 +33,7 @@ public:
 	void RemoveAll( const char *filename );
 	void AddFile( const char *filename );
 
-	void PopulateList( arcStaticList< anString, 16384 > &dest ) {
+	void PopulateList( anStaticList< anStr, 16384 > &dest ) {
 		dest.Clear();
 		for ( int i = 0; i < cacheTable.Num(); i++ ) {
 			dest.Append( cacheTable[i] );
@@ -44,7 +44,7 @@ public:
 		anLibrary::Printf( "dump for manifest %s\n", GetManifestName() );
 		anLibrary::Printf( "---------------------------------------\n" );
 		for ( int i = 0; i < NumFiles(); i++ ) {
-			const anString & name = GetFileNameByIndex( i );
+			const anStr & name = GetFileNameByIndex( i );
 			if ( name.Find( ".idwav", false ) >= 0 ) {
 				anLibrary::Printf( "%s\n", GetFileNameByIndex( i ).c_str() );
 			}
@@ -54,7 +54,7 @@ public:
 private:
 	anStringList cacheTable;
 	anHashIndex	cacheHash;
-	anString filename;
+	anStr filename;
 };
 
 // image preload
@@ -121,7 +121,7 @@ struct preloadEntry_s {
 	}
 
 	int				resType;		// type
-	anString		resourceName;	// resource name
+	anStr		resourceName;	// resource name
 	imagePreload_s	imgData;		// image specific data
 };
 
@@ -165,7 +165,7 @@ public:
 		return entries[ idx ];
 	}
 
-	const anString & GetResourceNameByIndex( int idx ) const {
+	const anStr & GetResourceNameByIndex( int idx ) const {
 		return entries[ idx ].resourceName;
 	}
 
@@ -224,7 +224,7 @@ public:
 
 	int FindResource( const char *name ) {
 		for ( int i = 0; i < entries.Num(); i++ ) {
-			if ( anString::Icmp( name, entries[i].resourceName ) == 0 ) {
+			if ( anStr::Icmp( name, entries[i].resourceName ) == 0 ) {
 				return i;
 			}
 		}
@@ -240,7 +240,7 @@ public:
 	}
 private:
 	anList< preloadEntry_s > entries;
-	anString filename;
+	anStr filename;
 };
 
 

@@ -46,10 +46,10 @@ protected:
 
 private:
 
-	void			Event_Activate			( anEntity* activator );
+	void			Event_Activate			( anEntity *activator );
 	void			Event_PostRestore		( void );
 
-	void			Event_AppendFromSpawner	( rvSpawner* spawner, anEntity* spawned );
+	void			Event_AppendFromSpawner	( rvSpawner* spawner, anEntity *spawned );
 };
 
 /*
@@ -70,7 +70,7 @@ public:
 	void			InitNonPersistentSpawnArgs	( void );
 
 	virtual bool	ValidateAAS				( anSAAI* ai );
-	virtual bool	ValidateDestination		( anSAAI* ai, const anVec3& dest );
+	virtual bool	ValidateDestination		( anSAAI* ai, const anVec3 &dest );
 	virtual bool	ValidateBounds			( const anBounds& bounds );
 
 	virtual bool	FindGoal				( anSAAI* ai, seasGoal_t& goal );
@@ -101,24 +101,24 @@ protected:
 
 private:
 
-	void			Event_Activate				( anEntity* activator );
+	void			Event_Activate				( anEntity *activator );
 	void			Event_TetherSetupLocation	( void );
 	void			Event_TetherGetLocation		( void );
 };
 
-ARC_INLINE bool anSAAITether::CanBreak ( void ) const {
+inline bool anSAAITether::CanBreak ( void ) const {
 	return tfl.canBreak;
 }
 
-ARC_INLINE bool anSAAITether::IsWalkForced ( void ) const {
+inline bool anSAAITether::IsWalkForced ( void ) const {
 	return tfl.forceWalk;
 }
 
-ARC_INLINE bool anSAAITether::IsRunForced ( void ) const {
+inline bool anSAAITether::IsRunForced ( void ) const {
 	return tfl.forceRun;
 }
 
-ARC_INLINE bool anSAAITether::IsAutoBreak ( void ) const {
+inline bool anSAAITether::IsAutoBreak ( void ) const {
 	return tfl.autoBreak;
 }
 
@@ -139,7 +139,7 @@ public:
 	void			Restore						( anRestoreGame *savefile );
 	void			InitNonPersistentSpawnArgs	( void );
 
-	virtual bool	ValidateDestination			( anSAAI* ai, const anVec3& dest );
+	virtual bool	ValidateDestination			( anSAAI* ai, const anVec3 &dest );
 	virtual bool	ValidateBounds				( const anBounds& bounds );
 	virtual void	DebugDraw					( void );
 
@@ -165,7 +165,7 @@ public:
 	void			Restore						( anRestoreGame *savefile );
 	void			InitNonPersistentSpawnArgs	( void );
 
-	virtual bool	ValidateDestination			( anSAAI* ai, const anVec3& dest );
+	virtual bool	ValidateDestination			( anSAAI* ai, const anVec3 &dest );
 	virtual bool	ValidateBounds				( const anBounds& bounds );
 	virtual void	DebugDraw					( void );
 
@@ -210,7 +210,7 @@ public:
 
 private:
 
-	void			Event_Activate			( anEntity* activator );
+	void			Event_Activate			( anEntity *activator );
 };
 
 /*
@@ -225,7 +225,7 @@ public:
 
 private:
 
-	void			Event_Activate			( anEntity* activator );
+	void			Event_Activate			( anEntity *activator );
 };
 
 #endif // __AI_UTIL__

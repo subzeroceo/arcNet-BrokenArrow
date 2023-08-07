@@ -81,11 +81,11 @@ public:
 
 };
 
-ARC_INLINE const anVec4 &idRectangle::ToVec4() const {
+inline const anVec4 &idRectangle::ToVec4() const {
 	return *reinterpret_cast<const anVec4 *>( &x) ;
 }
 
-ARC_INLINE idRectangle &idRectangle::operator+=( const idRectangle &a ) {
+inline idRectangle &idRectangle::operator+=( const idRectangle &a ) {
 	x += a.x;
 	y += a.y;
 	w += a.w;
@@ -93,7 +93,7 @@ ARC_INLINE idRectangle &idRectangle::operator+=( const idRectangle &a ) {
 	return *this;
 }
 
-ARC_INLINE idRectangle &idRectangle::operator/=( const idRectangle &a ) {
+inline idRectangle &idRectangle::operator/=( const idRectangle &a ) {
 	x /= a.x;
 	y /= a.y;
 	w /= a.w;
@@ -101,7 +101,7 @@ ARC_INLINE idRectangle &idRectangle::operator/=( const idRectangle &a ) {
 	return *this;
 }
 
-ARC_INLINE idRectangle &idRectangle::operator/=( const float a ) {
+inline idRectangle &idRectangle::operator/=( const float a ) {
 	float inva = 1.0f / a;
 	x *= inva;
 	y *= inva;
@@ -110,7 +110,7 @@ ARC_INLINE idRectangle &idRectangle::operator/=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE idRectangle &idRectangle::operator-=( const idRectangle &a ) {
+inline idRectangle &idRectangle::operator-=( const idRectangle &a ) {
 	x -= a.x;
 	y -= a.y;
 	w -= a.w;
@@ -118,7 +118,7 @@ ARC_INLINE idRectangle &idRectangle::operator-=( const idRectangle &a ) {
 	return *this;
 }
 
-ARC_INLINE idRectangle &idRectangle::operator*=( const float a ) {
+inline idRectangle &idRectangle::operator*=( const float a ) {
 	x *= a;
 	y *= a;
 	w *= a;
@@ -126,7 +126,7 @@ ARC_INLINE idRectangle &idRectangle::operator*=( const float a ) {
 	return *this;
 }
 
-ARC_INLINE idRectangle &idRectangle::operator=( const anVec4 v ) {
+inline idRectangle &idRectangle::operator=( const anVec4 v ) {
 	x = v.x;
 	y = v.y;
 	w = v.z;
@@ -134,11 +134,11 @@ ARC_INLINE idRectangle &idRectangle::operator=( const anVec4 v ) {
 	return *this;
 }
 
-ARC_INLINE int idRectangle::operator==( const idRectangle &a ) const {
+inline int idRectangle::operator==( const idRectangle &a ) const {
 	return (x == a.x && y == a.y && w == a.w && a.h);
 }
 
-ARC_INLINE float &idRectangle::operator[]( int index ) {
+inline float &idRectangle::operator[]( int index ) {
 	return ( &x )[ index ];
 }
 

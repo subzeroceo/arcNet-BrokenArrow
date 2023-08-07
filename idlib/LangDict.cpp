@@ -121,7 +121,7 @@ const char *anLangDict::GetString( const char *str ) const {
 		return "";
 	}
 
-	if ( anString::Cmpn( str, STRTABLE_ID, STRTABLE_ID_LENGTH ) != 0 ) {
+	if ( ::Cmpn( str, STRTABLE_ID, STRTABLE_ID_LENGTH ) != 0 ) {
 		return str;
 	}
 
@@ -148,7 +148,7 @@ const char *anLangDict::AddString( const char *str ) {
 
 	int c = args.Num();
 	for ( int j = 0; j < c; j++ ) {
-		if ( anString::Cmp( args[j].value, str ) == 0 ){
+		if ( ::Cmp( args[j].value, str ) == 0 ){
 			return args[j].key;
 		}
 	}
@@ -211,11 +211,11 @@ bool anLangDict::ExcludeString( const char *str ) const {
 		return true;
 	}
 
-	if ( anString::Cmpn( str, STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 ) {
+	if ( ::Cmpn( str, STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 ) {
 		return true;
 	}
 
-	if ( anString::Icmpn( str, "gui::", strlen( "gui::" ) ) == 0 ) {
+	if ( ::Icmpn( str, "gui::", strlen( "gui::" ) ) == 0 ) {
 		return true;
 	}
 
@@ -249,7 +249,7 @@ int anLangDict::GetNextId( void ) const {
 		return id;
 	}
 
-	anString work;
+	 work;
 	for ( int j = 0; j < c; j++ ) {
 		work = args[j].key;
 		work.StripLeading( STRTABLE_ID );

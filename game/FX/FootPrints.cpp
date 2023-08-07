@@ -1,7 +1,7 @@
 #include "../Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -57,7 +57,7 @@ arcFootPrintManagerLocal::Init
 ==============
 */
 void arcFootPrintManagerLocal::Init( void ) {
-	const arcDeclStringMap* map = gameLocal.declStringMapType[ "footPrintDef" ];
+	const anDeclStringMap* map = gameLocal.declStringMapType[ "footPrintDef" ];
 	if ( !map ) {
 		gameLocal.Error( "FootPrints stringMap 'footPrintDef' not found" );
 		return;

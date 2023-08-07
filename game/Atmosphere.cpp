@@ -1,6 +1,3 @@
-// Copyright (C) 2007 Id Software, Inc.
-//
-
 /*
 Atmosphere class
 
@@ -10,7 +7,7 @@ The level designer places this entity class in his level if he wants an atmosphe
 #include "Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -191,7 +188,7 @@ sdAtmosphereInstance::UpdatePrecipitationParms
 void sdAtmosphereInstance::UpdatePrecipitationParms( bool force ) {
 	const sdHeightMapInstance* newHeightMap = &defaultHeightMapInst;
 
-	arcNetBasePlayer* player = gameLocal.GetLocalViewPlayer();
+	anBasePlayer* player = gameLocal.GetLocalViewPlayer();
 	if ( player != nullptr ) {
 		const sdPlayZone* pz = gameLocal.GetPlayZone( player->renderView.vieworg, sdPlayZone::PZF_HEIGHTMAP );
 		if ( pz != nullptr ) {
@@ -305,19 +302,19 @@ void sdAtmosphereInstance::SetupPrecipitation( const sdHeightMapInstance* height
 ===============================================================================
 */
 
-const arcEventDef EV_Atmosphere_resetPostProcess( "resetPostProcess", '\0', DOC_TEXT( "Resets post process settings back to their default settings." ), 0, nullptr );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessSaturation( "getDefaultPostProcessSaturation", 'f', DOC_TEXT( "Returns the default saturation value for the current atmosphere." ), 0, nullptr );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareSourceBrightness( "getDefaultPostProcessGlareSourceBrightness", 'f', DOC_TEXT( "Returns the default glare source brightness value for the current atmosphere." ), 0, nullptr );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareBlurBrightness( "getDefaultPostProcessGlareBlurBrightness", 'f', DOC_TEXT( "Returns the default glare blur value for the current atmosphere." ), 0, nullptr );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareBrightnessThreshold( "getDefaultPostProcessGlareBrightnessThreshold", 'f', DOC_TEXT( "Returns the default glare brightness threshold for the current atmosphere." ), 0, nullptr );
-const arcEventDef EV_Atmosphere_getDefaultPostProcessGlareThresholdDependency( "getDefaultPostProcessGlareThresholdDependency", 'f', DOC_TEXT( "Returns the default glare threshold dependency for the current atmosphere." ), 0, nullptr );
-const arcEventDef EV_Atmosphere_setPostProcessTint( "setPostProcessTint", '\0', DOC_TEXT( "Overrides the post process tint value." ), 1, nullptr, "v", "tint", "Tint value to override with." );
-const arcEventDef EV_Atmosphere_setPostProcessSaturation( "setPostProcessSaturation", '\0', DOC_TEXT( "Overrides the post process saturation value." ), 1, nullptr, "f", "saturation", "Saturation value to override with." );
-const arcEventDef EV_Atmosphere_setPostProcessContrast( "setPostProcessContrast", '\0', DOC_TEXT( "Overrides the post process constrast value." ), 1, nullptr, "f", "cotrast", "Cotrast value to override with." );
-const arcEventDef EV_Atmosphere_setPostProcessGlareParms( "setPostProcessGlareParms", '\0', DOC_TEXT( "Overries the post process glare parms." ), 4, nullptr, "f", "sourceBrightness", "Source brightness to override with.", "f", "blurBrightness", "Blur brightness to override with.", "f", "brightnessThreshold", "Brightness threshold to override with.", "f", "thresholdDependency", "Threshold dependency to override with." );
-const arcEventDef EV_Atmosphere_isNight( "isNight", 'b', DOC_TEXT( "Returns whether the current $decl:atmosphere$ is marked as being at night" ), 0, nullptr );
+const anEventDef EV_Atmosphere_resetPostProcess( "resetPostProcess", '\0', DOC_TEXT( "Resets post process settings back to their default settings." ), 0, nullptr );
+const anEventDef EV_Atmosphere_getDefaultPostProcessSaturation( "getDefaultPostProcessSaturation", 'f', DOC_TEXT( "Returns the default saturation value for the current atmosphere." ), 0, nullptr );
+const anEventDef EV_Atmosphere_getDefaultPostProcessGlareSourceBrightness( "getDefaultPostProcessGlareSourceBrightness", 'f', DOC_TEXT( "Returns the default glare source brightness value for the current atmosphere." ), 0, nullptr );
+const anEventDef EV_Atmosphere_getDefaultPostProcessGlareBlurBrightness( "getDefaultPostProcessGlareBlurBrightness", 'f', DOC_TEXT( "Returns the default glare blur value for the current atmosphere." ), 0, nullptr );
+const anEventDef EV_Atmosphere_getDefaultPostProcessGlareBrightnessThreshold( "getDefaultPostProcessGlareBrightnessThreshold", 'f', DOC_TEXT( "Returns the default glare brightness threshold for the current atmosphere." ), 0, nullptr );
+const anEventDef EV_Atmosphere_getDefaultPostProcessGlareThresholdDependency( "getDefaultPostProcessGlareThresholdDependency", 'f', DOC_TEXT( "Returns the default glare threshold dependency for the current atmosphere." ), 0, nullptr );
+const anEventDef EV_Atmosphere_setPostProcessTint( "setPostProcessTint", '\0', DOC_TEXT( "Overrides the post process tint value." ), 1, nullptr, "v", "tint", "Tint value to override with." );
+const anEventDef EV_Atmosphere_setPostProcessSaturation( "setPostProcessSaturation", '\0', DOC_TEXT( "Overrides the post process saturation value." ), 1, nullptr, "f", "saturation", "Saturation value to override with." );
+const anEventDef EV_Atmosphere_setPostProcessContrast( "setPostProcessContrast", '\0', DOC_TEXT( "Overrides the post process constrast value." ), 1, nullptr, "f", "cotrast", "Cotrast value to override with." );
+const anEventDef EV_Atmosphere_setPostProcessGlareParms( "setPostProcessGlareParms", '\0', DOC_TEXT( "Overries the post process glare parms." ), 4, nullptr, "f", "sourceBrightness", "Source brightness to override with.", "f", "blurBrightness", "Blur brightness to override with.", "f", "brightnessThreshold", "Brightness threshold to override with.", "f", "thresholdDependency", "Threshold dependency to override with." );
+const anEventDef EV_Atmosphere_isNight( "isNight", 'b', DOC_TEXT( "Returns whether the current $decl:atmosphere$ is marked as being at night" ), 0, nullptr );
 
-CLASS_DECLARATION( arcEntity, sdAtmosphere )
+CLASS_DECLARATION( anEntity, sdAtmosphere )
 	EVENT( EV_Atmosphere_resetPostProcess,			sdAtmosphere::Event_ResetPostProcess )
 
 	EVENT( EV_Atmosphere_getDefaultPostProcessSaturation,				sdAtmosphere::Event_GetDefaultPostProcessSaturation )
@@ -376,9 +373,8 @@ void sdAtmosphere::GetAtmosphereLightDetails_f( const anCommandArgs &args ) {
 		gameLocal.Printf( "Sun Direction: %s\n", sunDir.ToString() );
 		gameLocal.Printf( "Sun Color: %s\n", sunColor.ToString() );
 
-		// ugh
-		sunColor.x *= .9f;
-		sunColor.y *= .9f;
+		sunColor.x *= 0.9f;
+		sunColor.y *= 0.9f;
 		gameLocal.Printf( "WARNING: sun light material modulates color: %s\n", sunColor.ToString() );
 	}
 }
@@ -517,7 +513,7 @@ sdAtmosphere::FreeModelDef
 ================
 */
 void sdAtmosphere::FreeModelDef() {
-	arcEntity::FreeModelDef();
+	anEntity::FreeModelDef();
 	if ( currentAtmosphereInstance ) {
 		currentAtmosphereInstance->DeActivate();
 	}
@@ -540,14 +536,13 @@ sdAtmosphere::Think
 ================
 */
 void sdAtmosphere::Think( void ) {
-
-	renderView_t* useView = nullptr;
+	renderView_t *useView = nullptr;
 
 	renderView_t view;
 	if ( sdDemoManager::GetInstance().CalculateRenderView( &view ) ) {
 		useView = &view;
 	} else {
-		arcNetBasePlayer* player = gameLocal.GetLocalViewPlayer();
+		anBasePlayer* player = gameLocal.GetLocalViewPlayer();
 		if ( player != nullptr ) {
 			useView = player->GetRenderView();
 		}
@@ -641,7 +636,7 @@ sdAtmosphere::Event_GetDefaultPostProcessSaturation
 void sdAtmosphere::Event_GetDefaultPostProcessSaturation() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
 	if ( atm != nullptr ) {
-		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().saturation );
+		idProgram::ReturnFloat( atm->GetDefaultPostProcessParms().saturation );
 	}
 }
 
@@ -653,7 +648,7 @@ sdAtmosphere::Event_GetDefaultPostProcessGlareSourceBrightness
 void sdAtmosphere::Event_GetDefaultPostProcessGlareSourceBrightness() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
 	if ( atm != nullptr ) {
-		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[ 0 ] );
+		idProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[0] );
 	}
 }
 
@@ -665,7 +660,7 @@ sdAtmosphere::Event_GetDefaultPostProcessGlareBlurBrightness
 void sdAtmosphere::Event_GetDefaultPostProcessGlareBlurBrightness() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
 	if ( atm != nullptr ) {
-		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[ 1 ] );
+		idProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[1] );
 	}
 }
 
@@ -677,7 +672,7 @@ sdAtmosphere::Event_GetDefaultPostProcessGlareBrightnessThreshold
 void sdAtmosphere::Event_GetDefaultPostProcessGlareBrightnessThreshold() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
 	if ( atm != nullptr ) {
-		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[ 2 ] );
+		idProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[2] );
 	}
 }
 
@@ -689,7 +684,7 @@ sdAtmosphere::Event_GetDefaultPostProcessGlareThresholdDependency
 void sdAtmosphere::Event_GetDefaultPostProcessGlareThresholdDependency() {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
 	if ( atm != nullptr ) {
-		sdProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[ 3 ] );
+		idProgram::ReturnFloat( atm->GetDefaultPostProcessParms().glareParms[3] );
 	}
 }
 
@@ -698,7 +693,7 @@ void sdAtmosphere::Event_GetDefaultPostProcessGlareThresholdDependency() {
 sdAtmosphere::Event_SetPostProcessTint
 ================
 */
-void sdAtmosphere::Event_SetPostProcessTint( const anVec3& tint ) {
+void sdAtmosphere::Event_SetPostProcessTint( const anVec3 &tint ) {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
 	if ( atm != nullptr ) {
 		atm->GetPostProcessParms().tint = tint;
@@ -737,10 +732,10 @@ sdAtmosphere::Event_SetPostProcessGlareParms
 void sdAtmosphere::Event_SetPostProcessGlareParms( float sourceBrightness, float blurBrightness, float brightnessThreshold, float thresholdDep ) {
 	const sdDeclAtmosphere* atm = gameRenderWorld->GetAtmosphere();
 	if ( atm != nullptr ) {
-		atm->GetPostProcessParms().glareParms[ 0 ] = sourceBrightness;
-		atm->GetPostProcessParms().glareParms[ 1 ] = blurBrightness;
-		atm->GetPostProcessParms().glareParms[ 2 ] = brightnessThreshold;
-		atm->GetPostProcessParms().glareParms[ 3 ] = thresholdDep;
+		atm->GetPostProcessParms().glareParms[0] = sourceBrightness;
+		atm->GetPostProcessParms().glareParms[1] = blurBrightness;
+		atm->GetPostProcessParms().glareParms[2] = brightnessThreshold;
+		atm->GetPostProcessParms().glareParms[3] = thresholdDep;
 	}
 }
 
@@ -750,7 +745,7 @@ sdAtmosphere::Event_IsNight
 ================
 */
 void sdAtmosphere::Event_IsNight( void ) {
-	sdProgram::ReturnBoolean( currentAtmosphereInstance->GetDecl()->IsNight() );
+	idProgram::ReturnBoolean( currentAtmosphereInstance->GetDecl()->IsNight() );
 }
 
 /*
@@ -763,7 +758,7 @@ void sdAtmosphere::DrawPostProcess( sdUserInterfaceLocal* ui, float x, float y, 
 		return;
 	}
 
-	arcNetBasePlayer* player = gameLocal.GetLocalViewPlayer();
+	anBasePlayer* player = gameLocal.GetLocalViewPlayer();
 	if ( !player ) {
 		return;
 	}
@@ -774,7 +769,7 @@ void sdAtmosphere::DrawPostProcess( sdUserInterfaceLocal* ui, float x, float y, 
 	}
 
 	if ( currentAtmosphere->updatePostProcessFunction ) {
-		sdScriptHelper helper;
+		idScriptHelper helper;
 		helper.Push( player->GetScriptObject() );
 		currentAtmosphere->CallNonBlockingScriptEvent( currentAtmosphere->updatePostProcessFunction, helper );
 	}
@@ -786,11 +781,11 @@ void sdAtmosphere::DrawPostProcess( sdUserInterfaceLocal* ui, float x, float y, 
 ================
 sdAmbientLight
 
-	This floods an ambient cubemap into connected areas
+This floods an ambient cubemap into connected areas
 ================
 */
 
-CLASS_DECLARATION( arcEntity, sdAmbientLight )
+CLASS_DECLARATION( anEntity, sdAmbientLight )
 END_CLASS
 
 /*
@@ -815,10 +810,9 @@ sdAmbientLight::Spawn
 ================
 */
 void sdAmbientLight::Spawn() {
-	const char* temp = spawnArgs.GetString( "ambientCubeMap" );
+	const char *temp = spawnArgs.GetString( "ambientCubeMap" );
 	if ( *temp != '\0' ) {
 		const sdDeclAmbientCubeMap* ambientCubeMap = declHolder.FindAmbientCubeMap( temp );
-
 		sdAtmosphere::FloodAmbientCubeMap( GetPhysics()->GetOrigin(), ambientCubeMap );
 	} else {
 		gameLocal.Warning( "sdAmbientLight::Spawn : no ambientCubeMap specified on entity '%s'", GetName() );

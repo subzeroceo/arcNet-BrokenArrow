@@ -88,12 +88,12 @@ void idProjectile::Spawn( void ) {
  	physicsObj.SetSelf( this );
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_HEAP_MEM(this);
+	PushHeapMemory(this);
 
  	physicsObj.SetClipModel( new anClipModel( GetPhysics()->GetClipModel() ), 1.0f );
 
 // mwhitlock: Dynamic memory consolidation
-	POP_HEAP();
+	PopSystemHeap();
 
  	physicsObj.SetContents( 0 );
  	physicsObj.SetClipMask( 0 );
@@ -238,9 +238,9 @@ void idProjectile::SetSpeed( float s, int accelTime ) {
 idProjectile::Create
 ================
 */
-void idProjectile::Create( anEntity* _owner, const anVec3 &start, const anVec3 &dir, anEntity* ignore, anEntity* extraPassEntity ) {
+void idProjectile::Create( anEntity *_owner, const anVec3 &start, const anVec3 &dir, anEntity *ignore, anEntity *extraPassEntity ) {
 	anDict		args;
-	anString		shaderName;
+	anStr		shaderName;
 	anVec3		light_color;
 	anVec3		light_offset;
 	anVec3		tmp;
@@ -469,7 +469,7 @@ void idProjectile::Launch( const anVec3 &start, const anVec3 &dir, const anVec3 
 		}
 	}
 
-	idQuat q( dir.ToMat3().ToQuat() );
+	anQuat q( dir.ToMat3().ToQuat() );
 	rotation.Init( gameLocal.GetTime(), 0.0f, q, q );
 
 	if ( projectileFlags.isTracer ) {
@@ -612,7 +612,7 @@ void idProjectile::UpdateVisualAngles() {
 	}
 
 	visualAngles += angularVelocity;
-	idQuat q = visualAngles.ToQuat() * linearVelocity.ToNormal().ToMat3().ToQuat();
+	anQuat q = visualAngles.ToQuat() * linearVelocity.ToNormal().ToMat3().ToQuat();
 	rotation.Init( gameLocal.GetTime(), gameLocal.GetMSec(), rotation.GetCurrentValue(gameLocal.GetTime()), q  );
 }
 
@@ -643,7 +643,7 @@ bool idProjectile::Collide( const trace_t &collision, const anVec3 &velocity, bo
 	// allow projectiles to hit triggers (teleports)
 	// predict this on a client
 	if ( collision.c.contents & CONTENTS_TRIGGER_SEAS ) {
-		anEntity* trigger = gameLocal.entities[ collision.c.entityNum ];
+		anEntity *trigger = gameLocal.entities[ collision.c.entityNum ];
 
 		if ( trigger ) {
 			if ( trigger->RespondsTo( EV_Touch ) || trigger->HasSignal( SIG_TOUCH ) ) {
@@ -676,7 +676,7 @@ bool idProjectile::Collide( const trace_t &collision, const anVec3 &velocity, bo
 			anMat3 mat( collision.c.normal, right, up );
 
 			physicsObj.SetLinearVelocity( -1.0f * (physicsObj.GetLinearVelocity() * mat.Transpose()) );
-			physicsObj.SetLinearVelocity( anVec3( physicsObj.GetLinearVelocity()[ 0 ], -1.0 *physicsObj.GetLinearVelocity()[ 1 ], -1.0 * physicsObj.GetLinearVelocity()[ 2 ] ) );
+			physicsObj.SetLinearVelocity( anVec3( physicsObj.GetLinearVelocity()[0], -1.0 *physicsObj.GetLinearVelocity()[1], -1.0 * physicsObj.GetLinearVelocity()[2] ) );
 
 			// update the projectile's launchdir and launch origin
 			// this will propagate the change to the clients for prediction
@@ -1015,7 +1015,7 @@ idProjectile::DefaultDamageEffect
 =================
 */
 void idProjectile::DefaultDamageEffect( const trace_t &tr, const anVec3 &velocity, const char *damageDefName ) {
-	anEntity* ent;
+	anEntity *ent;
 	anMat3	  axis;
 	ent = gameLocal.entities[ tr.c.entityNum ];
 
@@ -1119,7 +1119,7 @@ void idProjectile::Event_RadiusDamage( anEntity *ignore ) {
 idProjectile::Event_ResidualDamage
 ================
 */
-void idProjectile::Event_ResidualDamage ( anEntity* ignore ) {
+void idProjectile::Event_ResidualDamage ( anEntity *ignore ) {
 	const char *residual_damage = spawnArgs.GetString( "def_residual_damage" );
 	if ( residual_damage[0] != '\0' ) {
 		gameLocal.RadiusDamage( physicsObj.GetOrigin(), this, owner, ignore, this, residual_damage, damagePower, &hitCount );
@@ -1259,7 +1259,7 @@ anVec3 idProjectile::GetGravity( const anDict *projectile ) {
 idProjectile::PlayPainEffect
 ================
 */
-void idProjectile::PlayPainEffect ( anEntity* ent, int damage, const rvDeclMatType* materialType, const anVec3& origin, const anVec3& dir )  {
+void idProjectile::PlayPainEffect ( anEntity *ent, int damage, const rvDeclMatType* materialType, const anVec3 &origin, const anVec3 &dir )  {
 	static int  damageTable[] = { 100, 50, 25, 10, 0 };
 	int			index;
 
@@ -1284,7 +1284,7 @@ void idProjectile::PlayPainEffect ( anEntity* ent, int damage, const rvDeclMatTy
 idProjectile::PlayDetonateEffect
 ================
 */
-void idProjectile::PlayDetonateEffect( const anVec3& origin, const anMat3& axis ) {
+void idProjectile::PlayDetonateEffect( const anVec3 &origin, const anMat3 &axis ) {
 	if ( physicsObj.HasGroundContacts() ) {
 		if ( spawnArgs.GetBool( "detonateTestGroundMaterial" ) ) {
 			trace_t tr;
@@ -1308,7 +1308,7 @@ idProjectile::Event_Explode
 */
 void idProjectile::Event_Explode( void ) {
 	// events are processed outside of the think loop, so set the current thinking ent appropriately
-	anEntity* think = gameLocal.currentThinkingEntity;
+	anEntity *think = gameLocal.currentThinkingEntity;
 	gameLocal.currentThinkingEntity = this;
 	Explode( nullptr, true );
 	gameLocal.currentThinkingEntity = think;
@@ -1320,7 +1320,7 @@ idProjectile::Event_Fizzle
 ================
 */
 void idProjectile::Event_Fizzle( void ) {
-	anEntity* think = gameLocal.currentThinkingEntity;
+	anEntity *think = gameLocal.currentThinkingEntity;
 	gameLocal.currentThinkingEntity = this;
 	Fizzle();
 	gameLocal.currentThinkingEntity = think;
@@ -1337,7 +1337,7 @@ void idProjectile::Event_Touch( anEntity *other, trace_t *trace ) {
 	}
 
 	if ( other != owner.GetEntity() ) {
-		anEntity* think = gameLocal.currentThinkingEntity;
+		anEntity *think = gameLocal.currentThinkingEntity;
 		gameLocal.currentThinkingEntity = this;
 
 		trace_t collision;
@@ -1387,9 +1387,9 @@ void idProjectile::WriteToSnapshot( anBitMsgDelta &msg ) const {
 		// feed the client with start position, direction and time. let the client do everything else
 		// this won't change during projectile life and be completely deltified away
 		msg.WriteLong( launchTime );
-		msg.WriteFloat( launchOrig[ 0 ] );
-		msg.WriteFloat( launchOrig[ 1 ] );
-		msg.WriteFloat( launchOrig[ 2 ] );
+		msg.WriteFloat( launchOrig[0] );
+		msg.WriteFloat( launchOrig[1] );
+		msg.WriteFloat( launchOrig[2] );
 		msg.WriteDir( launchDir, 24 );
 	}
 }
@@ -1409,9 +1409,9 @@ void idProjectile::ReadFromSnapshot( const anBitMsgDelta &msg ) {
 	newState = (projectileState_t) msg.ReadBits( 3 );
 	if ( newState >= LAUNCHED ) {
 		launchTime = msg.ReadLong();
-		launchOrig[ 0 ] = msg.ReadFloat();
-		launchOrig[ 1 ] = msg.ReadFloat();
-		launchOrig[ 2 ] = msg.ReadFloat();
+		launchOrig[0] = msg.ReadFloat();
+		launchOrig[1] = msg.ReadFloat();
+		launchOrig[2] = msg.ReadFloat();
 		launchDir = msg.ReadDir( 24 );
 	}
 	// we always create and launch at the same time
@@ -2016,10 +2016,10 @@ rvSpawnerProjectile::Event_PostSpawn
 =================
 */
 void rvSpawnerProjectile::Event_PostSpawn ( void ) {
-	const char* temp;
+	const char *temp;
 	temp = spawnArgs.GetString ( "spawner" );
 	if ( temp && *temp ) {
-		anEntity* ent;
+		anEntity *ent;
 		ent = gameLocal.FindEntity ( temp );
 		if ( !ent ) {
 			gameLocal.Warning ( "spawner entity ('%s') not found for rvSpawnerProjectile '%s'", temp, GetName() );
@@ -2082,7 +2082,7 @@ void rvMIRVProjectile::Event_LaunchWarheads( void )
 */
 void rvMIRVProjectile::Event_LaunchWarheads( void ) {
 
-	const char* warhead;
+	const char *warhead;
 	int count;
 
 	warhead = spawnArgs.GetString( "def_warhead","" );

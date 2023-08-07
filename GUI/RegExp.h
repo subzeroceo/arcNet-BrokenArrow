@@ -16,7 +16,7 @@ public:
 
 	bool				enabled;
 	short				type;
-	anString				name;
+	anStr				name;
 	int					regCount;
 	unsigned short		regs[4];
 	idWinVar *			var;
@@ -31,10 +31,10 @@ public:
 	void				ReadFromSaveGame( anFile *savefile );
 };
 
-ARC_INLINE anRegister::anRegister( void ) {
+inline anRegister::anRegister( void ) {
 }
 
-ARC_INLINE anRegister::anRegister( const char *p, int t ) {
+inline anRegister::anRegister( const char *p, int t ) {
 	name = p;
 	type = t;
 	assert( t >= 0 && t < NUMTYPES );
@@ -43,7 +43,7 @@ ARC_INLINE anRegister::anRegister( const char *p, int t ) {
 	var = nullptr;
 };
 
-ARC_INLINE void anRegister::CopyRegs( anRegister *src ) {
+inline void anRegister::CopyRegs( anRegister *src ) {
 	regs[0] = src->regs[0];
 	regs[1] = src->regs[1];
 	regs[2] = src->regs[2];
@@ -73,13 +73,13 @@ private:
 	anHashIndex			regHash;
 };
 
-ARC_INLINE anRegisterList::anRegisterList() {
+inline anRegisterList::anRegisterList() {
 	regs.SetGranularity( 4 );
 	regHash.SetGranularity( 4 );
 	regHash.Clear( 32, 4 );
 }
 
-ARC_INLINE anRegisterList::~anRegisterList() {
+inline anRegisterList::~anRegisterList() {
 }
 
 #endif /* !__REGEXP_H__ */

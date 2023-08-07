@@ -132,7 +132,7 @@ void R_DeleteTextures( void ) {
 	}
 	memset( tr.images, 0, sizeof( tr.images ) );
 	// Ridah
-	//%	R_InitTexnumImages(qtrue);
+	//%	R_InitTexnumImages(true);
 	// done.
 
 	memset( qglState.currenttmu, 0, sizeof( qglState.currenttmu ) );
@@ -1291,7 +1291,7 @@ static void	RB_SetBuffer( const void *data ) {
 	// clear screen for debugging
 	// automatically enable this with several other debug tools
 	// that might leave unrendered portions of the screen
-	if ( r_clear.GetFloat() || anString::Length( r_clear.GetString() ) != 1 || r_lockSurfaces.GetBool() || r_singleArea.GetBool() || r_showOverDraw.GetBool() ) {
+	if ( r_clear.GetFloat() || anStr::Length( r_clear.GetString() ) != 1 || r_lockSurfaces.GetBool() || r_singleArea.GetBool() || r_showOverDraw.GetBool() ) {
 		float c[3];
 		switch ( r_clear.GetInteger() ) {
 			case 2:
@@ -1405,7 +1405,7 @@ const void *RB_ClearDepth(const void *data) {
 	const clearDepthCommand_t *cmd = data;
 
 	// finish any 2D drawing if needed
-	if(tess.numIndexes)
+	if (tess.numIndexes)
 		RB_EndSurface();
 
 	// texture swapping test
@@ -1414,7 +1414,7 @@ const void *RB_ClearDepth(const void *data) {
 
 	if (glRefConfig.framebufferObject) {
 		if (!tr.renderFbo || backEnd.framePostProcessed) {
-			FBO_Bind(NULL);
+			FBO_Bind(nullptr);
 		} else {
 			FBO_Bind(tr.renderFbo);
 		}

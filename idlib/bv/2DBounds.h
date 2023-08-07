@@ -98,7 +98,7 @@ extern an2DBounds bounds2d_zero;
 an2DBounds::an2DBounds
 ============
 */
-ARC_INLINE an2DBounds::an2DBounds( const float x, const float y, const float w, const float h ) {
+inline an2DBounds::an2DBounds( const float x, const float y, const float w, const float h ) {
 	FromRectangle( x, y, w, h );
 }
 
@@ -107,7 +107,7 @@ ARC_INLINE an2DBounds::an2DBounds( const float x, const float y, const float w, 
 an2DBounds::an2DBounds
 ============
 */
-ARC_INLINE an2DBounds::an2DBounds( const anVec4& vec ) {
+inline an2DBounds::an2DBounds( const anVec4& vec ) {
 	FromRectangle( vec.x, vec.y, vec.z, vec.w );
 }
 
@@ -116,7 +116,7 @@ ARC_INLINE an2DBounds::an2DBounds( const anVec4& vec ) {
 an2DBounds::FromRectangle
 ============
 */
-ARC_INLINE void an2DBounds::FromRectangle( const float x, const float y, const float w, const float h ) {
+inline void an2DBounds::FromRectangle( const float x, const float y, const float w, const float h ) {
 	bounds[0][0] = x;
 	bounds[1][0] = x + w;
 	bounds[0][1] = y;
@@ -128,7 +128,7 @@ ARC_INLINE void an2DBounds::FromRectangle( const float x, const float y, const f
 an2DBounds::GetWidth
 ============
 */
-ARC_INLINE float	an2DBounds::GetWidth() const {
+inline float	an2DBounds::GetWidth() const {
 	return bounds[1][0] - bounds[0][0];
 }
 
@@ -137,7 +137,7 @@ ARC_INLINE float	an2DBounds::GetWidth() const {
 an2DBounds::GetHeight
 ============
 */
-ARC_INLINE float	an2DBounds::GetHeight() const {
+inline float	an2DBounds::GetHeight() const {
 	return bounds[1][1] - bounds[0][1];
 }
 
@@ -146,7 +146,7 @@ ARC_INLINE float	an2DBounds::GetHeight() const {
 an2DBounds::operator[]
 ============
 */
-ARC_INLINE const anVec2& an2DBounds::operator[]( int index ) const {
+inline const anVec2& an2DBounds::operator[]( int index ) const {
 	return bounds[ index ];
 }
 
@@ -155,7 +155,7 @@ ARC_INLINE const anVec2& an2DBounds::operator[]( int index ) const {
 an2DBounds::operator[]
 ============
 */
-ARC_INLINE anVec2&	an2DBounds::operator[]( int index ) {
+inline anVec2&	an2DBounds::operator[]( int index ) {
 	return bounds[index];
 }
 
@@ -164,7 +164,7 @@ ARC_INLINE anVec2&	an2DBounds::operator[]( int index ) {
 an2DBounds::Zero
 ============
 */
-ARC_INLINE void an2DBounds::Zero() {
+inline void an2DBounds::Zero() {
 	bounds[0] = bounds[1] = vec2_zero;
 }
 
@@ -173,7 +173,7 @@ ARC_INLINE void an2DBounds::Zero() {
 an2DBounds::GetMins
 ============
 */
-ARC_INLINE const anVec2& an2DBounds::GetMins() const {
+inline const anVec2& an2DBounds::GetMins() const {
 	return bounds[0];
 }
 
@@ -182,7 +182,7 @@ ARC_INLINE const anVec2& an2DBounds::GetMins() const {
 an2DBounds::GetMaxs
 ============
 */
-ARC_INLINE const anVec2& an2DBounds::GetMaxs() const {
+inline const anVec2& an2DBounds::GetMaxs() const {
 	return bounds[1];
 }
 
@@ -191,7 +191,7 @@ ARC_INLINE const anVec2& an2DBounds::GetMaxs() const {
 an2DBounds::GetMins
 ============
 */
-ARC_INLINE anVec2& an2DBounds::GetMins() {
+inline anVec2& an2DBounds::GetMins() {
 	return bounds[0];
 }
 
@@ -200,7 +200,7 @@ ARC_INLINE anVec2& an2DBounds::GetMins() {
 an2DBounds::GetMaxs
 ============
 */
-ARC_INLINE anVec2& an2DBounds::GetMaxs() {
+inline anVec2& an2DBounds::GetMaxs() {
 	return bounds[1];
 }
 
@@ -209,7 +209,7 @@ ARC_INLINE anVec2& an2DBounds::GetMaxs() {
 an2DBounds::GetCenter
 ============
 */
-ARC_INLINE anVec2 an2DBounds::GetCenter() const {
+inline anVec2 an2DBounds::GetCenter() const {
 	return bounds[0] + ( ( bounds[1] - bounds[0] ) * 0.5f );
 }
 
@@ -218,7 +218,7 @@ ARC_INLINE anVec2 an2DBounds::GetCenter() const {
 an2DBounds::operator+
 ============
 */
-ARC_INLINE an2DBounds an2DBounds::operator+( const an2DBounds &rhs ) const {
+inline an2DBounds an2DBounds::operator+( const an2DBounds &rhs ) const {
 	an2DBounds newBounds;
 	newBounds = *this;
 	newBounds.AddBounds( rhs );
@@ -230,7 +230,7 @@ ARC_INLINE an2DBounds an2DBounds::operator+( const an2DBounds &rhs ) const {
 an2DBounds::operator+=
 ============
 */
-ARC_INLINE an2DBounds &an2DBounds::operator+=( const an2DBounds &rhs ) {
+inline an2DBounds &an2DBounds::operator+=( const an2DBounds &rhs ) {
 	an2DBounds::AddBounds( rhs );
 	return *this;
 }
@@ -240,7 +240,7 @@ ARC_INLINE an2DBounds &an2DBounds::operator+=( const an2DBounds &rhs ) {
 an2DBounds::AddBounds
 ============
 */
-ARC_INLINE bool an2DBounds::AddBounds( const an2DBounds &rhs ) {
+inline bool an2DBounds::AddBounds( const an2DBounds &rhs ) {
 	bool expanded = false;
 	if ( rhs.bounds[0][0] < bounds[0][0] ) {
 		bounds[0][0] = rhs.bounds[0][0];
@@ -266,7 +266,7 @@ ARC_INLINE bool an2DBounds::AddBounds( const an2DBounds &rhs ) {
 an2DBounds::Clear
 ============
 */
-ARC_INLINE void an2DBounds::Clear(){
+inline void an2DBounds::Clear(){
 	bounds[0].Set( anMath::INFINITY, anMath::INFINITY );
 	bounds[1].Set( -anMath::INFINITY, -anMath::INFINITY );
 }
@@ -276,7 +276,7 @@ ARC_INLINE void an2DBounds::Clear(){
 an2DBounds::IsCleared
 ============
 */
-ARC_INLINE bool an2DBounds::IsCleared() const {
+inline bool an2DBounds::IsCleared() const {
 	return( bounds[0][0] > bounds[1][0] );
 }
 
@@ -285,7 +285,7 @@ ARC_INLINE bool an2DBounds::IsCleared() const {
 an2DBounds::IsCollapsed
 ============
 */
-ARC_INLINE bool an2DBounds::IsCollapsed( float epsilon ) const {
+inline bool an2DBounds::IsCollapsed( float epsilon ) const {
 	return(	( anMath::Fabs( bounds[1][0] - bounds[0][0] ) < epsilon )  ||
 			( anMath::Fabs( bounds[1][1] - bounds[0][1] ) < epsilon ) );
 }
@@ -295,7 +295,7 @@ ARC_INLINE bool an2DBounds::IsCollapsed( float epsilon ) const {
 an2DBounds::operator*=
 ============
 */
-ARC_INLINE an2DBounds an2DBounds::operator*=( const anVec2& s ) const {
+inline an2DBounds an2DBounds::operator*=( const anVec2& s ) const {
 	return an2DBounds( anVec2( bounds[0][0] * s[0], bounds[0][1] * s[1] ), anVec2( bounds[1][0] * s[0], bounds[1][1] * s[1] ) );
 }
 
@@ -304,7 +304,7 @@ ARC_INLINE an2DBounds an2DBounds::operator*=( const anVec2& s ) const {
 an2DBounds::Compare
 ============
 */
-ARC_INLINE bool an2DBounds::Compare( const an2DBounds& rhs ) const {
+inline bool an2DBounds::Compare( const an2DBounds& rhs ) const {
 	return ( bounds[0].Compare( rhs.bounds[0] ) && bounds[1].Compare( rhs.bounds[1] ) );
 }
 
@@ -313,7 +313,7 @@ ARC_INLINE bool an2DBounds::Compare( const an2DBounds& rhs ) const {
 an2DBounds::operator*=
 ============
 */
-ARC_INLINE an2DBounds & an2DBounds::operator*=( const anVec2& s ) {
+inline an2DBounds & an2DBounds::operator*=( const anVec2& s ) {
 	this->bounds[0][0] *= s[0];
 	this->bounds[0][1] *= s[1];
 	this->bounds[1][0] *= s[0];
@@ -326,7 +326,7 @@ ARC_INLINE an2DBounds & an2DBounds::operator*=( const anVec2& s ) {
 an2DBounds::operator==
 ============
 */
-ARC_INLINE bool an2DBounds::operator==( const an2DBounds& rhs ) const {
+inline bool an2DBounds::operator==( const an2DBounds& rhs ) const {
 	return Compare( rhs );
 }
 
@@ -335,7 +335,7 @@ ARC_INLINE bool an2DBounds::operator==( const an2DBounds& rhs ) const {
 an2DBounds::operator!=
 ============
 */
-ARC_INLINE bool an2DBounds::operator!=( const an2DBounds& rhs ) const {
+inline bool an2DBounds::operator!=( const an2DBounds& rhs ) const {
 	return !Compare( rhs );
 }
 
@@ -344,7 +344,7 @@ ARC_INLINE bool an2DBounds::operator!=( const an2DBounds& rhs ) const {
 an2DBounds::GetLargestAxis
 ============
 */
-ARC_INLINE int an2DBounds::GetLargestAxis( void ) const {
+inline int an2DBounds::GetLargestAxis( void ) const {
 	anVec2 work = bounds[1] - bounds[0];
 	int axis = 0;
 
@@ -359,7 +359,7 @@ ARC_INLINE int an2DBounds::GetLargestAxis( void ) const {
 an2DBounds::MakeValid
 ============
 */
-ARC_INLINE void an2DBounds::MakeValid() {
+inline void an2DBounds::MakeValid() {
 	if ( bounds[0].x > bounds[1].x ) {
 		anSwap(bounds[0].x, bounds[1].x );
 	}
@@ -373,7 +373,7 @@ ARC_INLINE void an2DBounds::MakeValid() {
 an2DBounds::SideForPoint
 ============
 */
-ARC_INLINE int an2DBounds::SideForPoint( const anVec2& point, eScreenSpace space ) const {
+inline int an2DBounds::SideForPoint( const anVec2& point, eScreenSpace space ) const {
 	int sides = 0;
 	if ( point.x < bounds[0].x ) {
 		sides |= SIDE_LEFT;
@@ -399,7 +399,7 @@ ARC_INLINE int an2DBounds::SideForPoint( const anVec2& point, eScreenSpace space
 an2DBounds::an2DBounds
 ============
 */
-ARC_INLINE an2DBounds::an2DBounds() {
+inline an2DBounds::an2DBounds() {
 }
 
 /*
@@ -407,7 +407,7 @@ ARC_INLINE an2DBounds::an2DBounds() {
 an2DBounds::an2DBounds
 ============
 */
-ARC_INLINE an2DBounds::an2DBounds( const anBounds& rhs, size_t ignoreAxis ) {
+inline an2DBounds::an2DBounds( const anBounds& rhs, size_t ignoreAxis ) {
 	const anVec3 &mins = rhs.GetMins();
 	const anVec3 &maxs = rhs.GetMaxs();
 
@@ -441,7 +441,7 @@ ARC_INLINE an2DBounds::an2DBounds( const anBounds& rhs, size_t ignoreAxis ) {
 an2DBounds::an2DBounds
 ============
 */
-ARC_INLINE an2DBounds::an2DBounds( const anVec2& mins, const anVec2& maxs ) {
+inline an2DBounds::an2DBounds( const anVec2& mins, const anVec2& maxs ) {
 	bounds[0] = mins;
 	bounds[1] = maxs;
 }
@@ -451,7 +451,7 @@ ARC_INLINE an2DBounds::an2DBounds( const anVec2& mins, const anVec2& maxs ) {
 an2DBounds::AddPoint
 ============
 */
-ARC_INLINE bool an2DBounds::AddPoint( const anVec2& p ) {
+inline bool an2DBounds::AddPoint( const anVec2& p ) {
 	bool expanded = false;
 	for ( int j = 0; j < 2; j++ ) {
 		if ( p[j] < bounds[0][j] ) {
@@ -471,7 +471,7 @@ ARC_INLINE bool an2DBounds::AddPoint( const anVec2& p ) {
 an2DBounds::ContainsPoint
 ============
 */
-ARC_INLINE bool an2DBounds::ContainsPoint( const anVec2& point ) const {
+inline bool an2DBounds::ContainsPoint( const anVec2& point ) const {
 	bool contained = true;
 	for (  int i = 0; i < 2; i++ ) {
 		if ( point[i] < bounds[0][i] ) {
@@ -491,7 +491,7 @@ ARC_INLINE bool an2DBounds::ContainsPoint( const anVec2& point ) const {
 an2DBounds::ContainsBounds
 ============
 */
-ARC_INLINE bool an2DBounds::ContainsBounds( const an2DBounds& bounds ) const {
+inline bool an2DBounds::ContainsBounds( const an2DBounds& bounds ) const {
 	return ( ( bounds.GetMins().x >= GetMins().x ) &&
 			( bounds.GetMins().y >= GetMins().y ) &&
 			( bounds.GetMaxs().x <= GetMaxs().x ) &&
@@ -503,7 +503,7 @@ ARC_INLINE bool an2DBounds::ContainsBounds( const an2DBounds& bounds ) const {
 an2DBounds::IntersectsBounds
 ============
 */
-ARC_INLINE bool an2DBounds::IntersectsBounds( const an2DBounds& other ) const {
+inline bool an2DBounds::IntersectsBounds( const an2DBounds& other ) const {
 	if ( &other == this ) {
 		return true;
 	}
@@ -521,7 +521,7 @@ ARC_INLINE bool an2DBounds::IntersectsBounds( const an2DBounds& other ) const {
 an2DBounds::IntersectBounds
 ============
 */
-ARC_INLINE void an2DBounds::IntersectBounds( const an2DBounds& other, an2DBounds& result ) const {
+inline void an2DBounds::IntersectBounds( const an2DBounds& other, an2DBounds& result ) const {
 	if ( &other == this ) {
 		result = *this;
 		return;
@@ -549,7 +549,7 @@ ARC_INLINE void an2DBounds::IntersectBounds( const an2DBounds& other, an2DBounds
 an2DBounds::TranslateSelf
 ============
 */
-ARC_INLINE void an2DBounds::TranslateSelf( const anVec2& offset ) {
+inline void an2DBounds::TranslateSelf( const anVec2& offset ) {
 	TranslateSelf( offset.x, offset.y );
 }
 
@@ -558,7 +558,7 @@ ARC_INLINE void an2DBounds::TranslateSelf( const anVec2& offset ) {
 an2DBounds::TranslateSelf
 ============
 */
-ARC_INLINE void an2DBounds::TranslateSelf( const float xOffset, const float yOffset ) {
+inline void an2DBounds::TranslateSelf( const float xOffset, const float yOffset ) {
 	GetMins().x += xOffset;
 	GetMaxs().x += xOffset;
 
@@ -571,7 +571,7 @@ ARC_INLINE void an2DBounds::TranslateSelf( const float xOffset, const float yOff
 an2DBounds::ExpandSelf
 ============
 */
-ARC_INLINE anVec2 an2DBounds::GetSize( void ) const {
+inline anVec2 an2DBounds::GetSize( void ) const {
 	return GetMaxs() - GetMins();
 }
 
@@ -580,7 +580,7 @@ ARC_INLINE anVec2 an2DBounds::GetSize( void ) const {
 an2DBounds::ExpandSelf
 ============
 */
-ARC_INLINE void an2DBounds::ExpandSelf( const float xOffset, const float yOffset ) {
+inline void an2DBounds::ExpandSelf( const float xOffset, const float yOffset ) {
 	GetMins().x -= xOffset;
 	GetMaxs().x += xOffset;
 
@@ -593,7 +593,7 @@ ARC_INLINE void an2DBounds::ExpandSelf( const float xOffset, const float yOffset
 an2DBounds::ExpandSelf
 ============
 */
-ARC_INLINE void an2DBounds::ExpandSelf( const anVec2& offset ) {
+inline void an2DBounds::ExpandSelf( const anVec2& offset ) {
 	ExpandSelf( offset.x, offset.y );
 }
 
@@ -602,7 +602,7 @@ ARC_INLINE void an2DBounds::ExpandSelf( const anVec2& offset ) {
 an2DBounds::GetLeft
 ============
 */
-ARC_INLINE float an2DBounds::GetLeft() const {
+inline float an2DBounds::GetLeft() const {
 	return GetMins().x;
 }
 
@@ -611,7 +611,7 @@ ARC_INLINE float an2DBounds::GetLeft() const {
 an2DBounds::Right
 ============
 */
-ARC_INLINE float an2DBounds::GetRight() const {
+inline float an2DBounds::GetRight() const {
 	return GetMaxs().x;
 }
 
@@ -620,7 +620,7 @@ ARC_INLINE float an2DBounds::GetRight() const {
 an2DBounds::GetTop
 ============
 */
-ARC_INLINE float an2DBounds::GetTop( eScreenSpace space ) const {
+inline float an2DBounds::GetTop( eScreenSpace space ) const {
 	return ( space == ARIAL_SPACE_INCREASAE ) ? GetMins().y : GetMaxs().y;
 }
 
@@ -629,7 +629,7 @@ ARC_INLINE float an2DBounds::GetTop( eScreenSpace space ) const {
 an2DBounds::GetBottom
 ============
 */
-ARC_INLINE float an2DBounds::GetBottom( eScreenSpace space ) const {
+inline float an2DBounds::GetBottom( eScreenSpace space ) const {
 	return ( space == ARIAL_SPACE_INCREASAE ) ? GetMaxs().y : GetMins().y;
 }
 
@@ -638,7 +638,7 @@ ARC_INLINE float an2DBounds::GetBottom( eScreenSpace space ) const {
 an2DBounds::GetLeft
 ============
 */
-ARC_INLINE float &an2DBounds::GetLeft() {
+inline float &an2DBounds::GetLeft() {
 	return GetMins().x;
 }
 
@@ -647,7 +647,7 @@ ARC_INLINE float &an2DBounds::GetLeft() {
 an2DBounds::GetRight
 ============
 */
-ARC_INLINE float &an2DBounds::GetRight() {
+inline float &an2DBounds::GetRight() {
 	return GetMaxs().x;
 }
 
@@ -656,7 +656,7 @@ ARC_INLINE float &an2DBounds::GetRight() {
 an2DBounds::GetTop
 ============
 */
-ARC_INLINE float &an2DBounds::GetTop( eScreenSpace space ) {
+inline float &an2DBounds::GetTop( eScreenSpace space ) {
 	return ( space == ARIAL_SPACE_INCREASAE ) ? GetMins().y : GetMaxs().y;
 }
 
@@ -665,7 +665,7 @@ ARC_INLINE float &an2DBounds::GetTop( eScreenSpace space ) {
 an2DBounds::GetBottom
 ============
 */
-ARC_INLINE float &an2DBounds::GetBottom( eScreenSpace space ) {
+inline float &an2DBounds::GetBottom( eScreenSpace space ) {
 	return ( space == ARIAL_SPACE_INCREASAE ) ? GetMaxs().y : GetMins().y;
 }
 
@@ -675,7 +675,7 @@ ARC_INLINE float &an2DBounds::GetBottom( eScreenSpace space ) {
 an2DBounds::ToVec4
 ============
 */
-ARC_INLINE anVec4 an2DBounds::ToVec4() {
+inline anVec4 an2DBounds::ToVec4() {
 	return anVec4( GetMins().x, GetMins().y, GetWidth(), GetHeight() );
 }
 
@@ -684,7 +684,7 @@ ARC_INLINE anVec4 an2DBounds::ToVec4() {
 an2DBounds::FromRectangle
 ============
 */
-ARC_INLINE void an2DBounds::FromRectangle( const anVec4& rect ) {
+inline void an2DBounds::FromRectangle( const anVec4& rect ) {
 	FromRectangle( rect.x, rect.y, rect.z, rect.w );
 }
 

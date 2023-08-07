@@ -161,9 +161,8 @@ private:
 //===============================================================
 
 template<class objType>
-ARC_INLINE idGridObject<objType> * idGridNearbyObjectList<objType>::GetNextObject() const {
+inline idGridObject<objType> * idGridNearbyObjectList<objType>::GetNextObject() const {
 	idGridObject<objType> *object;
-
 	do {
 		if ( nextObject != nullptr ) {
 			object = nextObject->gridObject;
@@ -187,9 +186,8 @@ ARC_INLINE idGridObject<objType> * idGridNearbyObjectList<objType>::GetNextObjec
 }
 
 template<class objType>
-ARC_INLINE idGridObject<objType> * idGranBoundsObjectList<objType>::GetNextObject() const {
+inline idGridObject<objType> * idGranBoundsObjectList<objType>::GetNextObject() const {
 	idGridObject<objType> *object;
-
 	do {
 		if ( nextObject != nullptr ) {
 			object = nextObject->gridObject;
@@ -208,7 +206,7 @@ ARC_INLINE idGridObject<objType> * idGranBoundsObjectList<objType>::GetNextObjec
 }
 
 template<class objType>
-ARC_INLINE idGrid3D<objType>::idGrid3D() {
+inline idGrid3D<objType>::idGrid3D() {
 	granBounds.Clear();
 	desiredCellSize = 1.0f;
 	cellSize[0] = cellSize[1] = cellSize[2] = 0.0f;
@@ -219,12 +217,12 @@ ARC_INLINE idGrid3D<objType>::idGrid3D() {
 }
 
 template<class objType>
-ARC_INLINE idGrid3D<objType>::~idGrid3D() {
+inline idGrid3D<objType>::~idGrid3D() {
 	Clear();
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::Clear( ) {
+inline void idGrid3D<objType>::Clear( ) {
 	Mem_Free( grid );
 	grid = nullptr;
 	gridObjectAllocator.Shutdown();
@@ -238,8 +236,7 @@ ARC_INLINE void idGrid3D<objType>::Clear( ) {
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::Init( const anBounds &bounds, float desiredCellSize ) {
-	int i, j;
+inline void idGrid3D<objType>::Init( const anBounds &bounds, float desiredCellSize ) {
 	float size;
 	byte *data;
 
@@ -248,9 +245,9 @@ ARC_INLINE void idGrid3D<objType>::Init( const anBounds &bounds, float desiredCe
 	this->granBounds = bounds;
 	this->desiredCellSize = desiredCellSize;
 
-	for ( i = 0; i < 3; i++ ) {
+	for ( int i = 0; i < 3; i++ ) {
 		size = granBounds[1][i] - granBounds[0][i];
-		cellsPerAxis[i] = idMath::Ftoi( size / desiredCellSize );
+		cellsPerAxis[i] = anMath::Ftoi( size / desiredCellSize );
 		if ( cellsPerAxis[i] < 2 ) {
 			cellsPerAxis[i] = 2;
 		} else if ( cellsPerAxis[i] > 128 ) {
@@ -266,10 +263,10 @@ ARC_INLINE void idGrid3D<objType>::Init( const anBounds &bounds, float desiredCe
 
 	grid = (idGridLink<objType> ***) data;
 	data += cellsPerAxis[0] * sizeof( idGridLink<objType> ** );
-	for ( i = 0; i < cellsPerAxis[0]; i++ ) {
+	for ( int i = 0; i < cellsPerAxis[0]; i++ ) {
 		grid[i] = (idGridLink<objType> **) data;
 		data += cellsPerAxis[1] * sizeof( idGridLink<objType> * );
-		for ( j = 0; j < cellsPerAxis[1]; j++ ) {
+		for ( int j = 0; j < cellsPerAxis[1]; j++ ) {
 			grid[i][j] = (idGridLink<objType> *) data;
 			data += cellsPerAxis[2] * sizeof( idGridLink<objType> );
 			memset( grid[i][j], 0, cellsPerAxis[2] * sizeof( idGridLink<objType> ) );
@@ -280,18 +277,16 @@ ARC_INLINE void idGrid3D<objType>::Init( const anBounds &bounds, float desiredCe
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::GetGridCells( const anBounds &bounds, int iBounds[2][3] ) const {
-	int i;
-
-	for ( i = 0; i < 3; i++ ) {
-		iBounds[0][i] = idMath::Ftoi( ( bounds[0][i] - granBounds[0][i] - 0.001f ) * invCellSize[i] );
+inline void idGrid3D<objType>::GetGridCells( const anBounds &bounds, int iBounds[2][3] ) const {
+	for ( int i = 0; i < 3; i++ ) {
+		iBounds[0][i] = anMath::Ftoi( ( bounds[0][i] - granBounds[0][i] - 0.001f ) * invCellSize[i] );
 		if ( iBounds[0][i] < 0 ) {
 			iBounds[0][i] = 0;
 		} else if ( iBounds[0][i] >= cellsPerAxis[i] ) {
 			iBounds[0][i] = cellsPerAxis[i] - 1;
 		}
 
-		iBounds[1][i] = idMath::Ftoi( ( bounds[1][i] - granBounds[0][i] + 0.001f ) * invCellSize[i] );
+		iBounds[1][i] = anMath::Ftoi( ( bounds[1][i] - granBounds[0][i] + 0.001f ) * invCellSize[i] );
 		if ( iBounds[1][i] < 0 ) {
 			iBounds[1][i] = 0;
 		} else if ( iBounds[1][i] >= cellsPerAxis[i] ) {
@@ -301,8 +296,7 @@ ARC_INLINE void idGrid3D<objType>::GetGridCells( const anBounds &bounds, int iBo
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::LinkObject( idGridObject<objType> *gridObject, const anBounds &bounds, const float epsilon ) {
-	int i, j, k;
+inline void idGrid3D<objType>::LinkObject( idGridObject<objType> *gridObject, const anBounds &bounds, const float epsilon ) {
 	int iBounds[2][3];
 	idGridLink<objType> *gridLink;
 
@@ -311,9 +305,9 @@ ARC_INLINE void idGrid3D<objType>::LinkObject( idGridObject<objType> *gridObject
 	GetGridCells( bounds.Expand( epsilon ), iBounds );
 
 	// add the links
-	for ( i = iBounds[0][0]; i <= iBounds[1][0]; i++ ) {
-		for ( j = iBounds[0][1]; j <= iBounds[1][1]; j++ ) {
-			for ( k = iBounds[0][2]; k <= iBounds[1][2]; k++ ) {
+	for ( int i = iBounds[0][0]; i <= iBounds[1][0]; i++ ) {
+		for ( int j = iBounds[0][1]; j <= iBounds[1][1]; j++ ) {
+			for ( int k = iBounds[0][2]; k <= iBounds[1][2]; k++ ) {
 				gridLink = gridLinkAllocator.Alloc();
 				gridLink->gridObject = gridObject;
 				gridLink->nextObject = grid[i][j][k].nextObject;
@@ -330,9 +324,8 @@ ARC_INLINE void idGrid3D<objType>::LinkObject( idGridObject<objType> *gridObject
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::UnlinkObject( idGridObject<objType> *gridObject ) {
+inline void idGrid3D<objType>::UnlinkObject( idGridObject<objType> *gridObject ) {
 	idGridLink<objType> *gridLink, *nextGridLink;
-
 	assert( gridObject->firstCell != nullptr );
 
 	for ( gridLink = gridObject->firstCell; gridLink != nullptr; gridLink = nextGridLink ) {
@@ -349,9 +342,8 @@ ARC_INLINE void idGrid3D<objType>::UnlinkObject( idGridObject<objType> *gridObje
 }
 
 template<class objType>
-ARC_INLINE idGridObject<objType> * idGrid3D<objType>::AddObject( objType	object, const anBounds &bounds, const float epsilon ) {
+inline idGridObject<objType> * idGrid3D<objType>::AddObject( objType	object, const anBounds &bounds, const float epsilon ) {
 	idGridObject<objType> *gridObject;
-
 	assert( grid != nullptr );		// make sure the grid is initialized
 
 	gridObject = gridObjectAllocator.Alloc();
@@ -366,8 +358,7 @@ ARC_INLINE idGridObject<objType> * idGrid3D<objType>::AddObject( objType	object,
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::RemoveObject( idGridObject<objType> *gridObject ) {
-
+inline void idGrid3D<objType>::RemoveObject( idGridObject<objType> *gridObject ) {
 	assert( grid != nullptr );		// make sure the grid is initialized
 
 	UnlinkObject( gridObject );
@@ -381,14 +372,14 @@ ARC_INLINE void idGrid3D<objType>::RemoveObject( idGridObject<objType> *gridObje
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::ChangeObjectBounds( idGridObject<objType> *gridObject, const anBounds &bounds, const float epsilon ) {
+inline void idGrid3D<objType>::ChangeObjectBounds( idGridObject<objType> *gridObject, const anBounds &bounds, const float epsilon ) {
 	assert( grid != nullptr );		// make sure the grid is initialized
 	UnlinkObject( gridObject );
 	LinkObject( gridObject, bounds, epsilon );
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::GetNearbyObjects( idGridObject<objType> *object, idGridNearbyObjectList<objType> &list ) {
+inline void idGrid3D<objType>::GetNearbyObjects( idGridObject<objType> *object, idGridNearbyObjectList<objType> &list ) {
 	list.gridObject = object;
 	list.checkCount = checkCount++;
 	list.nextObject = object->firstCell->nextObject;
@@ -397,8 +388,7 @@ ARC_INLINE void idGrid3D<objType>::GetNearbyObjects( idGridObject<objType> *obje
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::GetBoundsObjects( const anBounds &bounds, const float epsilon, idGranBoundsObjectList<objType> &list ) {
-	int i, j, k;
+inline void idGrid3D<objType>::GetBoundsObjects( const anBounds &bounds, const float epsilon, idGranBoundsObjectList<objType> &list ) {
 	int iBounds[2][3];
 
 	GetGridCells( bounds.Expand( epsilon ), iBounds );
@@ -406,9 +396,9 @@ ARC_INLINE void idGrid3D<objType>::GetBoundsObjects( const anBounds &bounds, con
 	list.nextObject = nullptr;
 	list.checkCount = checkCount++;
 	list.cells.SetNum( 0 );
-	for ( i = iBounds[0][0]; i <= iBounds[1][0]; i++ ) {
-		for ( j = iBounds[0][1]; j <= iBounds[1][1]; j++ ) {
-			for ( k = iBounds[0][2]; k <= iBounds[1][2]; k++ ) {
+	for ( int i = iBounds[0][0]; i <= iBounds[1][0]; i++ ) {
+		for ( int j = iBounds[0][1]; j <= iBounds[1][1]; j++ ) {
+			for ( int k = iBounds[0][2]; k <= iBounds[1][2]; k++ ) {
 				list.cells.Append( &grid[i][j][k] );
 			}
 		}
@@ -421,15 +411,14 @@ ARC_INLINE void idGrid3D<objType>::GetBoundsObjects( const anBounds &bounds, con
 }
 
 template<class objType>
-ARC_INLINE void idGrid3D<objType>::Test() {
-	int i;
+inline void idGrid3D<objType>::Test() {
 	idGrid3D<int> grid;
 	idGridObject<int> *obj1, *obj2;
 	idGridNearbyObjectList<int> list;
 
-	grid.Init( anBounds( idVec3( -8 ), idVec3( 8 ) ), 4.0f );
+	grid.Init( anBounds( anVec3( -8 ), anVec3( 8 ) ), 4.0f );
 
-	for ( i = 0; i < grid.GetNumObjects(); i++ ) {
+	for ( int i = 0; i < grid.GetNumObjects(); i++ ) {
 		obj1 = grid.GetObject( i );
 
 		grid.GetNearbyObjects( obj1, list );

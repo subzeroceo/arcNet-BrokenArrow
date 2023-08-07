@@ -62,7 +62,7 @@ private:
 anSurface_Patch::anSurface_Patch
 =================
 */
-ARC_INLINE anSurface_Patch::anSurface_Patch( void ) {
+inline anSurface_Patch::anSurface_Patch( void ) {
 	height = width = maxHeight = maxWidth = 0;
 	expanded = false;
 }
@@ -72,7 +72,7 @@ ARC_INLINE anSurface_Patch::anSurface_Patch( void ) {
 anSurface_Patch::anSurface_Patch
 =================
 */
-ARC_INLINE anSurface_Patch::anSurface_Patch( int maxPatchWidth, int maxPatchHeight ) {
+inline anSurface_Patch::anSurface_Patch( int maxPatchWidth, int maxPatchHeight ) {
 	width = height = 0;
 	maxWidth = maxPatchWidth;
 	maxHeight = maxPatchHeight;
@@ -85,7 +85,7 @@ ARC_INLINE anSurface_Patch::anSurface_Patch( int maxPatchWidth, int maxPatchHeig
 anSurface_Patch::anSurface_Patch
 =================
 */
-ARC_INLINE anSurface_Patch::anSurface_Patch( const anSurface_Patch &patch ) {
+inline anSurface_Patch::anSurface_Patch( const anSurface_Patch &patch ) {
 	(*this) = patch;
 }
 
@@ -94,7 +94,7 @@ ARC_INLINE anSurface_Patch::anSurface_Patch( const anSurface_Patch &patch ) {
 anSurface_Patch::~anSurface_Patch
 =================
 */
-ARC_INLINE anSurface_Patch::~anSurface_Patch() {
+inline anSurface_Patch::~anSurface_Patch() {
 }
 
 /*
@@ -102,7 +102,7 @@ ARC_INLINE anSurface_Patch::~anSurface_Patch() {
 anSurface_Patch::GetWidth
 =================
 */
-ARC_INLINE int anSurface_Patch::GetWidth( void ) const {
+inline int anSurface_Patch::GetWidth( void ) const {
 	return width;
 }
 
@@ -111,7 +111,7 @@ ARC_INLINE int anSurface_Patch::GetWidth( void ) const {
 anSurface_Patch::GetHeight
 =================
 */
-ARC_INLINE int anSurface_Patch::GetHeight( void ) const {
+inline int anSurface_Patch::GetHeight( void ) const {
 	return height;
 }
 

@@ -23,14 +23,14 @@ private:
   anRenderWorld *world;
   renderEntity_t worldEntity;
   renderLight_t rLight;
-  const anM8DAnim *modelAnim;
+  const anMD6Anim *modelAnim;
 
   qhandle_t worldModelDef;
   qhandle_t lightDef;
   qhandle_t modelDef;
   idWinStr modelName;
   idWinStr animName;
-  anString animClass;
+  anStr animClass;
   idWinVec4 lightOrigin;
   idWinVec4 lightColor;
   idWinVec4 modelOrigin;

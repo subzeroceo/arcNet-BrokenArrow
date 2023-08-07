@@ -6,10 +6,10 @@
 const int IMPULSE_DELAY = 150;
 /*
 ==============
-arcNetBasePlayerView::arcNetBasePlayerView
+anBasePlayerView::anBasePlayerView
 ==============
 */
-arcNetBasePlayerView::arcNetBasePlayerView() {
+anBasePlayerView::anBasePlayerView() {
 	memset( screenBlobs, 0, sizeof( screenBlobs ) );
 	memset( &view, 0, sizeof( view ) );
 	player = nullptr;
@@ -32,19 +32,19 @@ arcNetBasePlayerView::arcNetBasePlayerView() {
 
 /*
 ==============
-arcNetBasePlayerView::SetPlayerEntity
+anBasePlayerView::SetPlayerEntity
 ==============
 */
-void arcNetBasePlayerView::SetPlayerEntity( arcNetBasePlayer *playerEnt ) {
+void anBasePlayerView::SetPlayerEntity( anBasePlayer *playerEnt ) {
 	player = playerEnt;
 }
 
 /*
 ==============
-arcNetBasePlayerView::ClearEffects
+anBasePlayerView::ClearEffects
 ==============
 */
-void arcNetBasePlayerView::ClearEffects() {
+void anBasePlayerView::ClearEffects() {
 	lastDamageTime = MS2SEC( gameLocal.time - 99999 );
 
 	dvFinishTime = ( gameLocal.time - 99999 );
@@ -60,10 +60,10 @@ void arcNetBasePlayerView::ClearEffects() {
 
 /*
 ==============
-arcNetBasePlayerView::GetScreenBlob
+anBasePlayerView::GetScreenBlob
 ==============
 */
-screenBlob_t *arcNetBasePlayerView::GetScreenBlob() {
+screenBlob_t *anBasePlayerView::GetScreenBlob() {
 	screenBlob_t *oldest = &screenBlobs[0];
 
 	for ( int i = 1 ; i < MAX_SCREEN_BLOBS ; i++ ) {
@@ -76,13 +76,13 @@ screenBlob_t *arcNetBasePlayerView::GetScreenBlob() {
 
 /*
 ==============
-arcNetBasePlayerView::DamageImpulse
+anBasePlayerView::DamageImpulse
 
 LocalKickDir is the direction of force in the player's coordinate system,
 which will determine the head kick direction
 ==============
 */
-void arcNetBasePlayerView::DamageImpulse( anVec3 localKickDir, const anDict *damageDef ) {
+void anBasePlayerView::DamageImpulse( anVec3 localKickDir, const anDict *damageDef ) {
 	float dvTime = damageDef->GetFloat( "dv_time" );
 	if ( dvTime ) {
 		if ( dvFinishTime < gameLocal.time ) {
@@ -154,23 +154,23 @@ void arcNetBasePlayerView::DamageImpulse( anVec3 localKickDir, const anDict *dam
 
 /*
 ==================
-arcNetBasePlayerView::AddBloodSpray
+anBasePlayerView::AddBloodSpray
 
 If we need a more generic way to add blobs then we can do that
 but having it localized here lets the material be pre-looked up etc.
 ==================
 */
-void arcNetBasePlayerView::AddBloodSpray( float duration ) {
+void anBasePlayerView::AddBloodSpray( float duration ) {
 }
 
 /*
 ==================
-arcNetBasePlayerView::WeaponFireFeedback
+anBasePlayerView::WeaponFireFeedback
 
 Called when a weapon fires, generates head twitches, etc
 ==================
 */
-void arcNetBasePlayerView::WeaponFireFeedback( const anDict *weaponDef ) {
+void anBasePlayerView::WeaponFireFeedback( const anDict *weaponDef ) {
 	int recoilTime = weaponDef->GetInt( "recoilTime" );
 	// don't shorten a damage kick in progress
 	if ( recoilTime && kickFinishTime < gameLocal.time ) {
@@ -184,10 +184,10 @@ void arcNetBasePlayerView::WeaponFireFeedback( const anDict *weaponDef ) {
 
 /*
 ===================
-arcNetBasePlayerView::CalculateShake
+anBasePlayerView::CalculateShake
 ===================
 */
-void arcNetBasePlayerView::CalculateShake() {
+void anBasePlayerView::CalculateShake() {
 	anVec3	origin, matrix;
 
 	float shakeVolume = gameSoundWorld->CurrentShakeAmplitudeForPosition( gameLocal.time, player->firstPersonViewOrigin );
@@ -204,21 +204,21 @@ void arcNetBasePlayerView::CalculateShake() {
 
 /*
 ===================
-arcNetBasePlayerView::ShakeAxis
+anBasePlayerView::ShakeAxis
 ===================
 */
-anMat3 arcNetBasePlayerView::ShakeAxis() const {
+anMat3 anBasePlayerView::ShakeAxis() const {
 	return shakeAng.ToMat3();
 }
 
 /*
 ===================
-arcNetBasePlayerView::AngleOffset
+anBasePlayerView::AngleOffset
 
   kickVector, a world space direction that the attack should
 ===================
 */
-anAngles arcNetBasePlayerView::AngleOffset() const {
+anAngles anBasePlayerView::AngleOffset() const {
 	anAngles ang.Zero();
 
 	if ( gameLocal.time < kickFinishTime ) {
@@ -239,10 +239,10 @@ anAngles arcNetBasePlayerView::AngleOffset() const {
 
 /*
 ==================
-arcNetBasePlayerView::SingleView
+anBasePlayerView::SingleView
 ==================
 */
-void arcNetBasePlayerView::SingleView( anUserInterface *hud, const renderView_t *view ) {
+void anBasePlayerView::SingleView( anUserInterface *hud, const renderView_t *view ) {
 	// normal rendering
 	if ( !view ) {
 		return;
@@ -299,27 +299,27 @@ void arcNetBasePlayerView::SingleView( anUserInterface *hud, const renderView_t 
 
 /*
 =================
-arcNetBasePlayerView::Flash
+anBasePlayerView::Flash
 
 flashes the player view with the given color
 =================
 */
-void arcNetBasePlayerView::Flash( anVec4 color, int time ) {
+void anBasePlayerView::Flash( anVec4 color, int time ) {
 	Fade( anVec4( 0, 0, 0, 0), time );
 	fadeFromColor = colorWhite;
 }
 
 /*
 =================
-arcNetBasePlayerView::Fade
+anBasePlayerView::Fade
 
 used for level transition fades
 assumes: color.w is 0 or 1
 =================
 */
-void arcNetBasePlayerView::Fade( anVec4 color, int time ) {
+void anBasePlayerView::Fade( anVec4 color, int time ) {
 	if ( !fadeTime ) {
-		fadeFromColor.Set( 0.0f, 0.0f, 0.0f, 1.0f - color[ 3 ] );
+		fadeFromColor.Set( 0.0f, 0.0f, 0.0f, 1.0f - color[3] );
 	} else {
 		fadeFromColor = fadeColor;
 	}
@@ -342,10 +342,10 @@ void arcNetBasePlayerView::Fade( anVec4 color, int time ) {
 
 /*
 =================
-arcNetBasePlayerView::ScreenFade
+anBasePlayerView::ScreenFade
 =================
 */
-void arcNetBasePlayerView::ScreenFade() {
+void anBasePlayerView::ScreenFade() {
 	int		msec;
 	float	t;
 
@@ -357,7 +357,7 @@ void arcNetBasePlayerView::ScreenFade() {
 
 	if ( msec <= 0 ) {
 		fadeColor = fadeToColor;
-		if ( fadeColor[ 3 ] == 0.0f ) {
+		if ( fadeColor[3] == 0.0f ) {
 			fadeTime = 0;
 		}
 	} else {
@@ -365,18 +365,18 @@ void arcNetBasePlayerView::ScreenFade() {
 		fadeColor = fadeFromColor * t + fadeToColor * ( 1.0f - t );
 	}
 
-	if ( fadeColor[ 3 ] != 0.0f ) {
-		renderSystem->SetColor4( fadeColor[ 0 ], fadeColor[ 1 ], fadeColor[ 2 ], fadeColor[ 3 ] );
+	if ( fadeColor[3] != 0.0f ) {
+		renderSystem->SetColor4( fadeColor[0], fadeColor[1], fadeColor[2], fadeColor[3] );
 		renderSystem->DrawStretchPic( 0, 0, 640, 480, 0, 0, 1, 1, declManager->FindMaterial( "_white" ) );
 	}
 }
 
 /*
 ===================
-arcNetBasePlayerView::RenderPlayerView
+anBasePlayerView::RenderPlayerView
 ===================
 */
-void arcNetBasePlayerView::RenderPlayerView( anUserInterface *hud ) {
+void anBasePlayerView::RenderPlayerView( anUserInterface *hud ) {
 	const renderView_t *view = player->GetRenderView();
 	SingleView( hud, view );
 	ScreenFade();

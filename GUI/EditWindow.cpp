@@ -37,35 +37,35 @@ If you have questions concerning this license or the applicable additional terms
 
 
 bool idEditWindow::ParseInternalVar( const char *_name, anParser *src ) {
-	if ( anString::Icmp( _name, "maxchars" ) == 0) {
+	if ( anStr::Icmp( _name, "maxchars" ) == 0) {
 		maxChars = src->ParseInt();
 		return true;
 	}
-	if ( anString::Icmp( _name, "numeric" ) == 0) {
+	if ( anStr::Icmp( _name, "numeric" ) == 0) {
 		numeric = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp( _name, "wrap" ) == 0) {
+	if ( anStr::Icmp( _name, "wrap" ) == 0) {
 		wrap = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp( _name, "readonly" ) == 0) {
+	if ( anStr::Icmp( _name, "readonly" ) == 0) {
 		readonly = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp( _name, "forceScroll" ) == 0) {
+	if ( anStr::Icmp( _name, "forceScroll" ) == 0) {
 		forceScroll = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp( _name, "source" ) == 0) {
+	if ( anStr::Icmp( _name, "source" ) == 0) {
 		ParseString( src, sourceFile );
 		return true;
 	}
-	if ( anString::Icmp( _name, "password" ) == 0 ) { 
+	if ( anStr::Icmp( _name, "password" ) == 0 ) { 
 		password = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp( _name, "cvarMax" ) == 0) {
+	if ( anStr::Icmp( _name, "cvarMax" ) == 0) {
 		cvarMax = src->ParseInt();
 		return true;
 	}
@@ -74,16 +74,16 @@ bool idEditWindow::ParseInternalVar( const char *_name, anParser *src ) {
 }
 
 idWinVar *idEditWindow::GetWinVarByName( const char *_name, bool fixup, drawWin_t** owner ) {
-	if ( anString::Icmp( _name, "cvar" ) == 0 ) {
+	if ( anStr::Icmp( _name, "cvar" ) == 0 ) {
 		return &cvarStr;
 	}
-	if ( anString::Icmp( _name, "password" ) == 0 ) {
+	if ( anStr::Icmp( _name, "password" ) == 0 ) {
 		return &password;
 	}
-	if ( anString::Icmp( _name, "liveUpdate" ) == 0 ) {
+	if ( anStr::Icmp( _name, "liveUpdate" ) == 0 ) {
 		return &liveUpdate;
 	}
-	if ( anString::Icmp( _name, "cvarGroup" ) == 0 ) {
+	if ( anStr::Icmp( _name, "cvarGroup" ) == 0 ) {
 		return &cvarGroup;
 	}
 	return idWindow::GetWinVarByName( _name, fixup, owner );
@@ -144,10 +144,10 @@ void idEditWindow::Draw( int time, float x, float y ) {
 	}
 	float scale = textScale;
 
-	anString		pass;
-	const char* buffer;
+	anStr		pass;
+	const char *buffer;
 	if ( password ) {		
-		const char* temp = text;
+		const char *temp = text;
 		for ( ; *temp; temp++ )	{
 			pass += "*";
 		}
@@ -205,7 +205,7 @@ const char *idEditWindow::HandleEvent(const sysEvent_t *event, bool *updateVisua
 		return ret;
 	}
 
-	anString::Copynz( buffer, text.c_str(), sizeof( buffer ) );
+	anStr::Copynz( buffer, text.c_str(), sizeof( buffer ) );
 	int key = event->evValue;
 	int len = text.Length();
 
@@ -259,7 +259,7 @@ const char *idEditWindow::HandleEvent(const sysEvent_t *event, bool *updateVisua
    		// ignore any non printable chars (except enter when wrap is enabled)
    		//
 		if ( wrap && (key == K_ENTER || key == K_KP_ENTER) ) {
-		} else if ( !anString::CharIsPrintable( key ) ) {
+		} else if ( !anStr::CharIsPrintable( key ) ) {
 			return "";
 		}
 
@@ -513,7 +513,7 @@ void idEditWindow::EnsureCursorVisible()
 		} else {
 			int i = 0;
 			while ( i < text.Length() && i < cursorPos ) {
-				if ( anString::IsColor( &text[i] ) ) {
+				if ( anStr::IsColor( &text[i] ) ) {
 					i += 2;
 				} else {
 					cursorX += dc->CharWidth( text[i], textScale );
@@ -575,7 +575,7 @@ void idEditWindow::EnsureCursorVisible()
 	}
 }
 
-void idEditWindow::Activate(bool activate, anString &act) {
+void idEditWindow::Activate(bool activate, anStr &act) {
 	idWindow::Activate(activate, act);
 	if ( activate ) {
 		UpdateCvar( true, true );
@@ -629,16 +629,16 @@ void idEditWindow::UpdateCvar( bool read, bool force ) {
 idEditWindow::RunNamedEvent
 ============
 */
-void idEditWindow::RunNamedEvent( const char* eventName ) {
-	anString event, group;
+void idEditWindow::RunNamedEvent( const char *eventName ) {
+	anStr event, group;
 	
-	if ( !anString::Cmpn( eventName, "cvar read ", 10 ) ) {
+	if ( !anStr::Cmpn( eventName, "cvar read ", 10 ) ) {
 		event = eventName;
 		group = event.Mid( 10, event.Length() - 10 );
 		if ( !group.Cmp( cvarGroup ) ) {
 			UpdateCvar( true, true );
 		}
-	} else if ( !anString::Cmpn( eventName, "cvar write ", 11 ) ) {
+	} else if ( !anStr::Cmpn( eventName, "cvar write ", 11 ) ) {
 		event = eventName;
 		group = event.Mid( 11, event.Length() - 11 );
 		if ( !group.Cmp( cvarGroup ) ) {

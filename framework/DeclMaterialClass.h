@@ -3,7 +3,7 @@
 #define __DECLMATCLASS_H__
 
 // Defines a material type - such as concrete, metal, glass etc
-class anDeclSurfaceType : public arcDecl {
+class anDeclSurfaceType : public anDecl {
 public:
 						anDeclSurfaceType();
 						anDeclSurfaceType( void ) { *(unsigned long *)mTint = 0; }
@@ -12,11 +12,11 @@ public:
 	virtual void		Write( SerialOutputStream &stream ) const;
 	virtual void		AddReferences() const;
 
-	void				SetDescription( anString &desc ) { mDescription = desc; }
-	const anString &	GetDescription( void ) const { return( mDescription ); }
+	void				SetDescription( anStr &desc ) { mDescription = desc; }
+	const anStr &	GetDescription( void ) const { return( mDescription ); }
 
 	void				SetTint( byte tint[4] ) { *(unsigned long *)mTint = *(unsigned long *)tint; }
-	int					GetTint( void ) const { return ( *( int*)mTint ); }
+	int					GetTint( void ) const { return ( *(int *)mTint ); }
 
 	float				GetRed( void ) const { return ( mTint[0] / 255.0f ); }
 	float				GetGreen( void ) const { return ( mTint[1] / 255.0f ); }
@@ -33,18 +33,18 @@ public:
 
 	const anDict &		GetProperties( void ) const { return properties; }
 	virtual	bool		RebuildTextSource( void ) { return false; }
-	virtual bool		Validate( const char *psText, int iTextLength, anString &strReportTo ) const;
+	virtual bool		Validate( const char *psText, int iTextLength, anStr &strReportTo ) const;
 
 private:
-	anString				mDescription;
+	anStr				mDescription;
 	GLbyte					mTint[4];
-	anString				type;
+	anStr				type;
 	anDict					properties;
 	const anMaterial *		material;
 	anList<an2DBounds>		images;
 };
 
-byte *ST_GetSurfaceTypeArray( anString image, int &width, int &height );
+byte *ST_GetSurfaceTypeArray( anStr image, int &width, int &height );
 
 
 /*

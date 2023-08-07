@@ -8,7 +8,7 @@
 #include "../Atmosphere.h"
 #include "Effects.h"
 
-class sdSnowEffect : public arcEntity {
+class sdSnowEffect : public anEntity {
 public:
 	CLASS_PROTOTYPE( sdSnowEffect );
 

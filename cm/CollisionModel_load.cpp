@@ -78,7 +78,7 @@ anSoftBodiesPhysicsManager::LoadProcBSP
 ================
 */
 void anSoftBodiesPhysicsManager::LoadProcBSP( const char *name ) {
-	anString filename;
+	anStr filename;
 	anToken token;
 	anLexer *src;
 
@@ -2106,7 +2106,7 @@ void anSoftBodiesPhysicsManager::ClearHash( anBounds &bounds ) {
 anSoftBodiesPhysicsManager::HashVec
 ================
 */
-ARC_INLINE int anSoftBodiesPhysicsManager::HashVec(const anVec3 &vec) {
+inline int anSoftBodiesPhysicsManager::HashVec(const anVec3 &vec) {
 /*	int x, y;
 
 	x = ((( int )( vec[0] - cm_modelBounds[0].x + 0.5 ) ) >> cm_vertexShift) & (VERTEX_HASH_BOXSIZE-1);
@@ -2717,7 +2717,7 @@ anSoftBodiesPhysicsManager::OptimizeArrays
 ==================
 */
 void anSoftBodiesPhysicsManager::OptimizeArrays( cm_model_t *model ) {
-	int *remap = ( int*) Mem_ClearedAlloc( Max( model->numVertices, model->numEdges ) * sizeof( int ) );
+	int *remap = (int *) Mem_ClearedAlloc( Max( model->numVertices, model->numEdges ) * sizeof( int ) );
 	// get all used vertices
 	for ( int i = 0; i < model->numEdges; i++ ) {
 		remap[ model->edges[i].vertexNum[0] ] = true;
@@ -2811,10 +2811,10 @@ anSoftBodiesPhysicsManager::LoadRenderModel
 ================
 */
 cm_model_t *anSoftBodiesPhysicsManager::LoadRenderModel( const char *fileName ) {
-	anString extension;
+	anStr extension;
 
 	// only load ASE and LWO models
-	anString( fileName ).ExtractFileExtension( extension );
+	anStr( fileName ).ExtractFileExtension( extension );
 	if ( ( extension.Icmp( "ase" ) != 0 ) && ( extension.Icmp( "lwo" ) != 0 ) && ( extension.Icmp( "ma" ) != 0 ) ) {
 		return nullptr;
 	}
@@ -3327,7 +3327,7 @@ anSoftBodiesPhysicsManager::GetSurfacePolyCount
 ===================
 */
 
-int anSoftBodiesPhysicsManager::GetSurfacePolyCount( const cm_model_t *model, const anString &entityName ) {
+int anSoftBodiesPhysicsManager::GetSurfacePolyCount( const cm_model_t *model, const anStr &entityName ) {
     // Iterate over the polygons and count the ones belonging to the entity
     int numPolygons = 0;
     for ( int i = 0; i < model->numPolygons; i++ ) {
@@ -3469,7 +3469,7 @@ cmHandle_t anSoftBodiesPhysicsManager::LoadModel( const char *modelName, const b
 anSoftBodiesPhysicsManager::LoadBinaryModel
 ================
 */
-cm_model_t* anSoftBodiesPhysicsManager::LoadBinaryModel( const char* fileName, ARC_TIME_T sourceTimeStamp ) {
+cm_model_t* anSoftBodiesPhysicsManager::LoadBinaryModel( const char *fileName, ARC_TIME_T sourceTimeStamp ) {
 	anFileLocal file( fileSystem->OpenFileReadMemory( fileName ) );
 	if ( file == nullptr )
 	{
@@ -3483,7 +3483,7 @@ cm_model_t* anSoftBodiesPhysicsManager::LoadBinaryModel( const char* fileName, A
 anSoftBodiesPhysicsManager::WriteBinaryModel
 ================
 */
-void anSoftBodiesPhysicsManager::WriteBinaryModelToFile( cm_model_t* model, anFile* file, ARC_TIME_T sourceTimeStamp ) {
+void anSoftBodiesPhysicsManager::WriteBinaryModelToFile( cm_model_t* model, anFile *file, ARC_TIME_T sourceTimeStamp ) {
 	file->WriteBig( BCM_MAGIC );
 	file->WriteBig( sourceTimeStamp );
 	file->WriteString( model->name );
@@ -3539,7 +3539,7 @@ void anSoftBodiesPhysicsManager::WriteBinaryModelToFile( cm_model_t* model, anFi
 				BuildUniqueLists( node->children[1], polys, brushes );
 			}
 		}
-		static void WriteNodeTree( anFile* file, cm_node_t* node, anList< cm_polygon_t* >& polys, anList< cm_brush_t* >& brushes )
+		static void WriteNodeTree( anFile *file, cm_node_t* node, anList< cm_polygon_t* >& polys, anList< cm_brush_t* >& brushes )
 		{
 			file->WriteBig( node->planeType );
 			file->WriteBig( node->planeDist );
@@ -3615,7 +3615,7 @@ void anSoftBodiesPhysicsManager::WriteBinaryModelToFile( cm_model_t* model, anFi
 anSoftBodiesPhysicsManager::WriteBinaryModel
 ================
 */
-void anSoftBodiesPhysicsManager::WriteBinaryModel( cm_model_t* model, const char* fileName, ARC_TIME_T sourceTimeStamp )
+void anSoftBodiesPhysicsManager::WriteBinaryModel( cm_model_t* model, const char *fileName, ARC_TIME_T sourceTimeStamp )
 {
 	anFileLocal file( fileSystem->OpenFileWrite( fileName, "fs_basepath" ) );
 	if ( file == nullptr )
@@ -3631,7 +3631,7 @@ void anSoftBodiesPhysicsManager::WriteBinaryModel( cm_model_t* model, const char
 anSoftBodiesPhysicsManager::LoadRenderModel
 ================
 */
-cm_model_t* anSoftBodiesPhysicsManager::LoadRenderModel( const char* fileName )
+cm_model_t* anSoftBodiesPhysicsManager::LoadRenderModel( const char *fileName )
 
 	int i, j;
 	anRenderModel* renderModel;
@@ -3642,10 +3642,10 @@ cm_model_t* anSoftBodiesPhysicsManager::LoadRenderModel( const char* fileName )
 	anPlane plane;
 	anBounds bounds;
 	bool collisionSurface;
-	anString extension;
+	anStr extension;
 
 	// only load ASE and LWO models
-	anString( fileName ).ExtractFileExtension( extension );
+	anStr( fileName ).ExtractFileExtension( extension );
 
 	// RB: DAE support
 	if ( ( extension.Icmp( "ase" ) != 0 ) && ( extension.Icmp( "lwo" ) != 0 ) && ( extension.Icmp( "ma" ) != 0 ) && ( extension.Icmp( "dae" ) != 0 ) )

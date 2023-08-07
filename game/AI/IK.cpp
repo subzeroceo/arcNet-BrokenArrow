@@ -7,17 +7,17 @@
 /*
 ===============================================================================
 
-  idIK
+  anIK
 
 ===============================================================================
 */
 
 /*
 ================
-idIK::idIK
+anIK::anIK
 ================
 */
-idIK::idIK( void ) {
+anIK::anIK( void ) {
 	ik_activate = false;
 	initialized = false;
 	self = nullptr;
@@ -28,18 +28,18 @@ idIK::idIK( void ) {
 
 /*
 ================
-idIK::~idIK
+anIK::~anIK
 ================
 */
-idIK::~idIK( void ) {
+anIK::~anIK( void ) {
 }
 
 /*
 ================
-idIK::Save
+anIK::Save
 ================
 */
-void idIK::Save( anSaveGame *savefile ) const {
+void anIK::Save( anSaveGame *savefile ) const {
 	savefile->WriteBool( initialized );
 	savefile->WriteBool( ik_activate );
 	savefile->WriteObject( self );
@@ -50,11 +50,11 @@ void idIK::Save( anSaveGame *savefile ) const {
 
 /*
 ================
-idIK::Restore
+anIK::Restore
 ================
 */
-void idIK::Restore( anRestoreGame *savefile ) {
-	anString anim;
+void anIK::Restore( anRestoreGame *savefile ) {
+	anStr anim;
 
 	savefile->ReadBool( initialized );
 	savefile->ReadBool( ik_activate );
@@ -66,13 +66,13 @@ void idIK::Restore( anRestoreGame *savefile ) {
 	if ( self ) {
 		animator = self->GetAnimator();
 		if ( animator == nullptr || animator->ModelDef() == nullptr ) {
-			gameLocal.Warning( "idIK::Restore: IK for entity '%s' at (%s) has no model set.",
-								self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+			gameLocal.Warning( "anIK::Restore: IK for entity '%s' at (%s) has no model set.",
+								self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		}
 		modifiedAnim = animator->GetAnim( anim );
 		if ( modifiedAnim == 0 ) {
-			gameLocal.Warning( "idIK::Restore: IK for entity '%s' at (%s) has no modified animation.",
-									self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+			gameLocal.Warning( "anIK::Restore: IK for entity '%s' at (%s) has no modified animation.",
+									self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		}
 	} else {
 		animator = nullptr;
@@ -82,19 +82,19 @@ void idIK::Restore( anRestoreGame *savefile ) {
 
 /*
 ================
-idIK::IsInitialized
+anIK::IsInitialized
 ================
 */
-bool idIK::IsInitialized( void ) const {
+bool anIK::IsInitialized( void ) const {
 	return initialized && ik_enable.GetBool();
 }
 
 /*
 ================
-idIK::Init
+anIK::Init
 ================
 */
-bool idIK::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
+bool anIK::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	anRenderModel *model;
 
 	if ( self == nullptr ) {
@@ -105,25 +105,25 @@ bool idIK::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 
 	animator = self->GetAnimator();
 	if ( animator == nullptr || animator->ModelDef() == nullptr ) {
-		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no model set.",
-							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "anIK::Init: IK for entity '%s' at (%s) has no model set.",
+							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 	if ( animator->ModelDef()->ModelHandle() == nullptr ) {
-		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) uses default model.",
-							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "anIK::Init: IK for entity '%s' at (%s) uses default model.",
+							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 	model = animator->ModelHandle();
 	if ( model == nullptr ) {
-		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no model set.",
-							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "anIK::Init: IK for entity '%s' at (%s) has no model set.",
+							self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 	modifiedAnim = animator->GetAnim( anim );
 	if ( modifiedAnim == 0 ) {
-		gameLocal.Warning( "idIK::Init: IK for entity '%s' at (%s) has no modified animation.",
-								self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "anIK::Init: IK for entity '%s' at (%s) has no modified animation.",
+								self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 
@@ -134,27 +134,27 @@ bool idIK::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 
 /*
 ================
-idIK::Evaluate
+anIK::Evaluate
 ================
 */
-void idIK::Evaluate( void ) {
+void anIK::Evaluate( void ) {
 }
 
 /*
 ================
-idIK::ClearJointMods
+anIK::ClearJointMods
 ================
 */
-void idIK::ClearJointMods( void ) {
+void anIK::ClearJointMods( void ) {
 	ik_activate = false;
 }
 
 /*
 ================
-idIK::SolveTwoBones
+anIK::SolveTwoBones
 ================
 */
-bool idIK::SolveTwoBones( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, float len0, float len1, anVec3 &jointPos ) {
+bool anIK::SolveTwoBones( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, float len0, float len1, anVec3 &jointPos ) {
 	float length, lengthSqr, lengthInv, x, y;
 	anVec3 vec0, vec1;
 
@@ -183,10 +183,10 @@ bool idIK::SolveTwoBones( const anVec3 &startPos, const anVec3 &endPos, const an
 
 /*
 ================
-idIK::GetBoneAxis
+anIK::GetBoneAxis
 ================
 */
-float idIK::GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, anMat3 &axis ) {
+float anIK::GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anVec3 &dir, anMat3 &axis ) {
 	float length;
 	axis[0] = endPos - startPos;
 	length = axis[0].Normalize();
@@ -200,17 +200,17 @@ float idIK::GetBoneAxis( const anVec3 &startPos, const anVec3 &endPos, const anV
 /*
 ===============================================================================
 
-  idIK_Walk
+  anIK_Walk
 
 ===============================================================================
 */
 
 /*
 ================
-idIK_Walk::idIK_Walk
+anIK_Walk::anIK_Walk
 ================
 */
-idIK_Walk::idIK_Walk() {
+anIK_Walk::anIK_Walk() {
 	int i;
 
 	initialized = false;
@@ -255,10 +255,10 @@ idIK_Walk::idIK_Walk() {
 
 /*
 ================
-idIK_Walk::~idIK_Walk
+anIK_Walk::~anIK_Walk
 ================
 */
-idIK_Walk::~idIK_Walk() {
+anIK_Walk::~anIK_Walk() {
 	if ( footModel ) {
 		delete footModel;
 	}
@@ -266,11 +266,11 @@ idIK_Walk::~idIK_Walk() {
 
 /*
 ================
-idIK_Walk::Save
+anIK_Walk::Save
 ================
 */
-void idIK_Walk::Save( anSaveGame *savefile ) const {
-	idIK::Save( savefile );
+void anIK_Walk::Save( anSaveGame *savefile ) const {
+	anIK::Save( savefile );
 
 	savefile->WriteClipModel( footModel );
 
@@ -314,11 +314,11 @@ void idIK_Walk::Save( anSaveGame *savefile ) const {
 
 /*
 ================
-idIK_Walk::Restore
+anIK_Walk::Restore
 ================
 */
-void idIK_Walk::Restore( anRestoreGame *savefile ) {
-	idIK::Restore( savefile );
+void anIK_Walk::Restore( anRestoreGame *savefile ) {
+	anIK::Restore( savefile );
 
 	savefile->ReadClipModel( footModel );
 
@@ -362,10 +362,10 @@ void idIK_Walk::Restore( anRestoreGame *savefile ) {
 
 /*
 ================
-idIK_Walk::Init
+anIK_Walk::Init
 ================
 */
-bool idIK_Walk::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
+bool anIK_Walk::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	int i;
 	float footSize;
 	anVec3 verts[4];
@@ -390,7 +390,7 @@ bool idIK_Walk::Init( anEntity *self, const char *anim, const anVec3 &modelOffse
 		return true;
 	}
 
-	if ( !idIK::Init( self, anim, modelOffset ) ) {
+	if ( !anIK::Init( self, anim, modelOffset ) ) {
 		return false;
 	}
 
@@ -408,25 +408,25 @@ bool idIK_Walk::Init( anEntity *self, const char *anim, const anVec3 &modelOffse
 		jointName = self->spawnArgs.GetString( va( "ik_foot%d", i+1 ) );
 		footJoints[i] = animator->GetJointHandle( jointName );
 		if ( footJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Walk::Init: invalid foot joint '%s'", jointName );
+			gameLocal.Error( "anIK_Walk::Init: invalid foot joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_ankle%d", i+1 ) );
 		ankleJoints[i] = animator->GetJointHandle( jointName );
 		if ( ankleJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Walk::Init: invalid ankle joint '%s'", jointName );
+			gameLocal.Error( "anIK_Walk::Init: invalid ankle joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_knee%d", i+1 ) );
 		kneeJoints[i] = animator->GetJointHandle( jointName );
 		if ( kneeJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Walk::Init: invalid knee joint '%s'\n", jointName );
+			gameLocal.Error( "anIK_Walk::Init: invalid knee joint '%s'\n", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_hip%d", i+1 ) );
 		hipJoints[i] = animator->GetJointHandle( jointName );
 		if ( hipJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Walk::Init: invalid hip joint '%s'\n", jointName );
+			gameLocal.Error( "anIK_Walk::Init: invalid hip joint '%s'\n", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_dir%d", i+1 ) );
@@ -438,7 +438,7 @@ bool idIK_Walk::Init( anEntity *self, const char *anim, const anVec3 &modelOffse
 	jointName = self->spawnArgs.GetString( "ik_waist" );
 	waistJoint = animator->GetJointHandle( jointName );
 	if ( waistJoint == INVALID_JOINT ) {
-		gameLocal.Error( "idIK_Walk::Init: invalid waist joint '%s'\n", jointName );
+		gameLocal.Error( "anIK_Walk::Init: invalid waist joint '%s'\n", jointName );
 	}
 
 	// get the leg bone lengths and rotation matrices
@@ -502,10 +502,10 @@ bool idIK_Walk::Init( anEntity *self, const char *anim, const anVec3 &modelOffse
 
 /*
 ================
-idIK_Walk::Evaluate
+anIK_Walk::Evaluate
 ================
 */
-void idIK_Walk::Evaluate( void ) {
+void anIK_Walk::Evaluate( void ) {
 	int i, newPivotFoot = 0;
 	float modelHeight, jointHeight, lowestHeight, floorHeights[MAX_LEGS];
 	float shift, smallestShift, newHeight, step, newPivotYaw, height, largestAnkleHeight;
@@ -727,10 +727,10 @@ void idIK_Walk::Evaluate( void ) {
 
 /*
 ================
-idIK_Walk::ClearJointMods
+anIK_Walk::ClearJointMods
 ================
 */
-void idIK_Walk::ClearJointMods( void ) {
+void anIK_Walk::ClearJointMods( void ) {
 	int i;
 
 	if ( !self || !ik_activate ) {
@@ -750,39 +750,39 @@ void idIK_Walk::ClearJointMods( void ) {
 
 /*
 ================
-idIK_Walk::EnableAll
+anIK_Walk::EnableAll
 ================
 */
-void idIK_Walk::EnableAll( void ) {
+void anIK_Walk::EnableAll( void ) {
 	enabledLegs = ( 1 << numLegs ) - 1;
 	oldHeightsValid = false;
 }
 
 /*
 ================
-idIK_Walk::DisableAll
+anIK_Walk::DisableAll
 ================
 */
-void idIK_Walk::DisableAll( void ) {
+void anIK_Walk::DisableAll( void ) {
 	enabledLegs = 0;
 	oldHeightsValid = false;
 }
 
 /*
 ================
-idIK_Walk::EnableLeg
+anIK_Walk::EnableLeg
 ================
 */
-void idIK_Walk::EnableLeg( int num ) {
+void anIK_Walk::EnableLeg( int num ) {
 	enabledLegs |= 1 << num;
 }
 
 /*
 ================
-idIK_Walk::DisableLeg
+anIK_Walk::DisableLeg
 ================
 */
-void idIK_Walk::DisableLeg( int num ) {
+void anIK_Walk::DisableLeg( int num ) {
 	enabledLegs &= ~( 1 << num );
 }
 
@@ -790,17 +790,17 @@ void idIK_Walk::DisableLeg( int num ) {
 /*
 ===============================================================================
 
-  idIK_Reach
+  anIK_Reach
 
 ===============================================================================
 */
 
 /*
 ================
-idIK_Reach::idIK_Reach
+anIK_Reach::anIK_Reach
 ================
 */
-idIK_Reach::idIK_Reach() {
+anIK_Reach::anIK_Reach() {
 	int i;
 
 	initialized = false;
@@ -822,19 +822,19 @@ idIK_Reach::idIK_Reach() {
 
 /*
 ================
-idIK_Reach::~idIK_Reach
+anIK_Reach::~anIK_Reach
 ================
 */
-idIK_Reach::~idIK_Reach() {
+anIK_Reach::~anIK_Reach() {
 }
 
 /*
 ================
-idIK_Reach::Save
+anIK_Reach::Save
 ================
 */
-void idIK_Reach::Save( anSaveGame *savefile ) const {
-	idIK::Save( savefile );
+void anIK_Reach::Save( anSaveGame *savefile ) const {
+	anIK::Save( savefile );
 
 	savefile->WriteInt( numArms );
 	savefile->WriteInt( enabledArms );
@@ -855,11 +855,11 @@ void idIK_Reach::Save( anSaveGame *savefile ) const {
 
 /*
 ================
-idIK_Reach::Restore
+anIK_Reach::Restore
 ================
 */
-void idIK_Reach::Restore( anRestoreGame *savefile ) {
-	idIK::Restore( savefile );
+void anIK_Reach::Restore( anRestoreGame *savefile ) {
+	anIK::Restore( savefile );
 
 	savefile->ReadInt( numArms );
 	savefile->ReadInt( enabledArms );
@@ -880,10 +880,10 @@ void idIK_Reach::Restore( anRestoreGame *savefile ) {
 
 /*
 ================
-idIK_Reach::Init
+anIK_Reach::Init
 ================
 */
-bool idIK_Reach::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
+bool anIK_Reach::Init( anEntity *self, const char *anim, const anVec3 &modelOffset ) {
 	int i;
 	const char *jointName;
 	anTraceModel trm;
@@ -899,7 +899,7 @@ bool idIK_Reach::Init( anEntity *self, const char *anim, const anVec3 &modelOffs
 		return true;
 	}
 
-	if ( !idIK::Init( self, anim, modelOffset ) ) {
+	if ( !anIK::Init( self, anim, modelOffset ) ) {
 		return false;
 	}
 
@@ -917,19 +917,19 @@ bool idIK_Reach::Init( anEntity *self, const char *anim, const anVec3 &modelOffs
 		jointName = self->spawnArgs.GetString( va( "ik_hand%d", i+1 ) );
 		handJoints[i] = animator->GetJointHandle( jointName );
 		if ( handJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Reach::Init: invalid hand joint '%s'", jointName );
+			gameLocal.Error( "anIK_Reach::Init: invalid hand joint '%s'", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_elbow%d", i+1 ) );
 		elbowJoints[i] = animator->GetJointHandle( jointName );
 		if ( elbowJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Reach::Init: invalid elbow joint '%s'\n", jointName );
+			gameLocal.Error( "anIK_Reach::Init: invalid elbow joint '%s'\n", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_shoulder%d", i+1 ) );
 		shoulderJoints[i] = animator->GetJointHandle( jointName );
 		if ( shoulderJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idIK_Reach::Init: invalid shoulder joint '%s'\n", jointName );
+			gameLocal.Error( "anIK_Reach::Init: invalid shoulder joint '%s'\n", jointName );
 		}
 
 		jointName = self->spawnArgs.GetString( va( "ik_elbowDir%d", i+1 ) );
@@ -977,10 +977,10 @@ bool idIK_Reach::Init( anEntity *self, const char *anim, const anVec3 &modelOffs
 
 /*
 ================
-idIK_Reach::Evaluate
+anIK_Reach::Evaluate
 ================
 */
-void idIK_Reach::Evaluate( void ) {
+void anIK_Reach::Evaluate( void ) {
 	int i;
 	anVec3 modelOrigin, shoulderOrigin, elbowOrigin, handOrigin, shoulderDir, elbowDir;
 	anMat3 modelAxis, axis;
@@ -1042,10 +1042,10 @@ void idIK_Reach::Evaluate( void ) {
 
 /*
 ================
-idIK_Reach::ClearJointMods
+anIK_Reach::ClearJointMods
 ================
 */
-void idIK_Reach::ClearJointMods( void ) {
+void anIK_Reach::ClearJointMods( void ) {
 	int i;
 
 	if ( !self || !ik_activate ) {

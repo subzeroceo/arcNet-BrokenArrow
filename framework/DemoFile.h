@@ -50,10 +50,10 @@ private:
 	anFile *		f;
 	anCompressor *	compressor;
 
-	anList<anString*>	demoStrings;
+	anList<anStr*>	demoStrings;
 	anFile *		fLog;
 	bool			log;
-	anString			logStr;
+	anStr			logStr;
 
 	static anCVarSystem	com_logDemos;
 	static anCVarSystem	com_compressDemos;

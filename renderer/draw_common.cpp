@@ -63,7 +63,7 @@ void RB_BakeTextureMatrixIntoTexgen( anPlane lightProject[3], const float *textu
 	genMatrix[11] = lightProject[2][2];
 	genMatrix[15] = lightProject[2][3];
 
-	GL_MultMatrix( genMatrix, backEnd.lightTextureMatrix, final );
+	GL_MultMatrixAligned( genMatrix, backEnd.lightTextureMatrix, final );
 
 	lightProject[0][0] = final[0];
 	lightProject[0][1] = final[4];
@@ -106,7 +106,7 @@ void RB_PrepareStageTexturing( const materialStage_t *pStage,  const drawSurf_t 
 		qglEnable( GL_TEXTURE_GEN_Q );
 
 		float	mat[16], plane[4];
-		GL_MultMatrix( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
+		GL_MultMatrixAligned( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
 
 		plane[0] = mat[0];
 		plane[1] = mat[4];
@@ -133,7 +133,7 @@ void RB_PrepareStageTexturing( const materialStage_t *pStage,  const drawSurf_t 
 		qglEnable( GL_TEXTURE_GEN_Q );
 
 		float	mat[16], plane[4];
-		GL_MultMatrix( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
+		GL_MultMatrixAligned( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
 
 		plane[0] = mat[0];
 		plane[1] = mat[4];
@@ -170,7 +170,7 @@ void RB_PrepareStageTexturing( const materialStage_t *pStage,  const drawSurf_t 
 			qglEnable( GL_TEXTURE_GEN_Q );
 
 			float	mat[16], plane[4];
-			GL_MultMatrix( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
+			GL_MultMatrixAligned( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
 
 			plane[0] = mat[0];
 			plane[1] = mat[4];
@@ -541,7 +541,7 @@ void RB_STD_FillDepthBuffer( drawSurf_t **drawSurfs, int numDrawSurfs ) {
 	qglBindBuffer( GL_ARRAY_BUFFER, &vbo );
 
  	// Set up vertex attribute pointers
-    //qglEnableVertexAttribArray(0);
+    //qglEnableVertexAttribArray( 0 );
    //qglVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( srfVert_t ), (void*)offsetof( srfVert_t, xyz ) );
 
     // Set up texture coordinate attribute pointers
@@ -551,7 +551,7 @@ void RB_STD_FillDepthBuffer( drawSurf_t **drawSurfs, int numDrawSurfs ) {
 	RB_RenderDrawSurfListWithFunction( drawSurfs, numDrawSurfs, RB_T_FillDepthBuffer );
 
 	// unbind the vao and vbo's
-	//qglDisableVertexAttribArray(0);
+	//qglDisableVertexAttribArray( 0 );
 	//qglDisableVertexAttribArray( 1 );
 	qglBindBuffer( GL_ARRAY_BUFFER, 0 )
 	qglBindVertexArray( 0 );

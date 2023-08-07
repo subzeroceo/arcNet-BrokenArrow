@@ -55,9 +55,7 @@ typedef enum {
 	CPUID_CMOV							= 0x02000,	// Conditional Move (CMOV) and fast floating point comparison (FCOMI) instructions
 	CPUID_FTZ							= 0x04000,	// Flush-To-Zero mode (denormal results are flushed to zero)
 	CPUID_DAZ							= 0x08000,	// Denormals-Are-Zero mode (denormal source operands are set to zero)
-#ifdef MACOS_X
 	CPUID_PPC							= 0x40000	// PowerPC G4/G5
-#endif
 } cpuid_t;
 
 #define STRTABLE_ID				"#str_"
@@ -72,7 +70,7 @@ typedef enum {
 	#define ARC_STATICTEMPLATE			static
 #endif
 
-#define ARC_INLINE						__forceinline
+#define inline						__forceinline
 #define ARC_TLS							__declspec( thread )
 #define ARC_DEPRECATED					__declspec( deprecated )
 
@@ -157,7 +155,6 @@ public:
 #define ASSERT							assert
 
 #define ARC_STATICTEMPLATE
-#define ARC_INLINE						inline
 #define ARC_DEPRECATED
 // from gcc 4.0 manual:
 // The __thread specifier may be used alone, with the extern or static specifiers, but with no other storage class specifier. When used with extern or static, __thread must appear immediately after the other storage class specifier.
@@ -198,7 +195,7 @@ public:
 #define ASSERT							assert
 
 #define ARC_STATICTEMPLATE
-#define ARC_INLINE						inline
+#define inline						inline
 #define ARC_TLS							__thread
 #define ARC_DEPRECATED
 #define ARC_FORCE_INLINE				forceinline
@@ -207,7 +204,7 @@ public:
 
 #endif
 
-template< typename T > ARC_INLINE void Swap( T& l, T& r ) {
+template< typename T > inline void Swap( T& l, T& r ) {
 	T temp = l;
 	l = r;
 	r = temp;
@@ -310,6 +307,8 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 #include "../renderer/Material.h"
 #include "../renderer/Model.h"
 #include "../renderer/ModelManager.h"
+//#include "../renderer/model_md5.h"
+//#include "../renderer/model_md6.h"
 #include "../renderer/RenderSystem.h"
 #include "../renderer/RenderWorld.h"
 
@@ -353,7 +352,7 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 #include "../tools/compilers/compiler_public.h"
 #include "containers/HashIndexImpl.h"
 
-#endif /* !ENGINE_DLL */
+#endif // !ENGINE_DLL
 
 //-----------------------------------------------------
 
@@ -365,19 +364,19 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 	#include <crtdbg.h>
 	#endif // _WIN32
 
-	inline void* __cdecl operator new(size_t nSize, const char* lpszFileName, int nLine) {
+	inline void* __cdecl operator new(size_t nSize, const char *lpszFileName, int nLine) {
 		return ::operator new(nSize, _NORMAL_BLOCK, lpszFileName, nLine);
 	}
 
-	inline void __cdecl operator delete(void* pData, const char* /* lpszFileName */, int /* nLine */) {
+	inline void __cdecl operator delete(void* pData, const char */* lpszFileName */, int /* nLine */) {
 		::operator delete(pData);
 	}
 
-	inline void* __cdecl operator new[](size_t nSize, const char* lpszFileName, int nLine) {
+	inline void* __cdecl operator new[](size_t nSize, const char *lpszFileName, int nLine) {
 		return ::operator new[](nSize, _NORMAL_BLOCK, lpszFileName, nLine);
 	}
 
-	inline void __cdecl operator delete[](void* pData, const char* /* lpszFileName */, int /* nLine */) {
+	inline void __cdecl operator delete[](void* pData, const char */* lpszFileName */, int /* nLine */) {
 		::operator delete(pData);
 	}
 	#endif
@@ -399,7 +398,7 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 	do have static variables, but such variables are initialized once and
 	read-only after initialization (they do not maintain a modifiable state).
 
-	The interface pointers anSys, anCommon, anCVarSystem and anFileSystem
+	The interface pointers anSys, arCNet, anCVarSystem and anFileSystem
 	should be set before using idLib. The pointers stored here should not
 	be used by any part of the engine except for idLib.
 
@@ -412,7 +411,7 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 class anLib {
 public:
 	static class anSys *		sys;
-	static class anCommon *		common;
+	static class arCNet *		common;
 	static class anCVarSystem *	cvarSystem;
 	static class anFileSystem *	fileSystem;
 	static int					frameNumber;
@@ -420,7 +419,7 @@ public:
 	static void					Init( void );
 	static void					ShutDown( void );
 
-	// wrapper to anCommon functions
+	// wrapper to arCNet functions
 	static void		   			Printf( const char *fmt, ... );
 	static void					Error( const char *fmt, ... );
 	static void					Warning( const char *fmt, ... );
@@ -453,7 +452,7 @@ template<> struct sdCompileTimeAssert<true> { static void assertX() {}; };
 void AssertFailed( const char *file, int line, const char *expression );
 #undef assert
 
-	#ifdef ID_CONDITIONAL_ASSERT
+	#ifdef ARC_CONDITIONAL_ASSERT
 		// lets you disable an assertion at runtime when needed
 		// could extend this to count and produce an assert log - useful for 'release with asserts' builds
 		#define assert( x ) \
@@ -476,13 +475,11 @@ void AssertFailed( const char *file, int line, const char *expression );
 		#define assert( x )		if ( x ) { } else AssertFailed( __FILE__, __LINE__, #x )
 		#define verify( x )		( ( x ) ? true : ( AssertFailed( __FILE__, __LINE__, #x ), false ) )
 	#endif
-
 #else
 
 #define verify( x )		( ( x ) ? true : false )
 #undef assert
 #define assert( x )
-
 #endif
 
 #define assert_8_byte_aligned( pointer )		assert( ( ((UINT_PTR)(pointer)) &  7 ) == 0 );
@@ -514,7 +511,6 @@ void AssertFailed( const char *file, int line, const char *expression );
 class anException {
 public:
 	char error[1024];
-
 	anException( const char *text = "" ) { strcpy( error, text ); }
 };
 
@@ -522,7 +518,7 @@ public:
 	#define an_attribute(x) __attribute__(x)
 #else
 	#define an_attribute(x)
-#endif /* __GNUC__ */
+#endif // __GNUC__
 
 /*
 ===============================================================================
@@ -632,11 +628,11 @@ assert_sizeof( wchar_t, 2 );
 
 typedef int						qhandle_t;
 
-class idFile;
+class anFile;
 class anVec4;
 
 struct idNullPtr {
-	// one pointer member initialized to zero so you can pass NULL as a vararg
+	// one pointer member initialized to zero so you can pass nullptr as a vararg
 	void *value; idNullPtr() : value( 0 ) { }
 	// implicit conversion to all pointer types
 	template<typename T1> operator T1*() const { return 0; }
@@ -644,11 +640,11 @@ struct idNullPtr {
 	template<typename T1, typename T2> operator T1 T2::*() const { return 0; }
 };
 
-#undef NULL
+#undef nullptr
 #if defined( _WIN32 ) && !( defined( _AFXEXT ) || defined( _USRDLL ) )
-#define NULL					idNullPtr()
+#define nullptr					idNullPtr()
 #else
-#define NULL					0
+#define nullptr					0
 #endif
 #define nullPtr 				nullptr
 
@@ -680,7 +676,7 @@ extern	const anVec4 colorLtBlue;
 extern	const anVec4 colorDkRed;
 
 // little/big endian conversion
-ARC_INLINE bool		Swap_IsBigEndian( void ) { short s = 256; return ( *((byte *)&s) != 0 ); }
+inline bool		Swap_IsBigEndian( void ) { short s = 256; return ( *((byte *)&s) != 0 ); }
 void				Swap_Init( void );
 
 short				BigShort( short l );
@@ -694,13 +690,13 @@ void				BigRevBytes( void *bp, int elsize, int elcount );
 void				LittleRevBytes( void *bp, int elsize, int elcount );
 void				LittleBitField( void *bp, int elsize );
 
-ARC_INLINE void		SwapLittleShort( short &c ) { c = LittleShort( c ); }
-ARC_INLINE void		SwapLittleUnsignedShort( unsigned short &c ) { c = LittleShort( c ); }
-ARC_INLINE void		SwapLittleInt( int &c ) { c = LittleLong( c ); }
-ARC_INLINE void		SwapLittleUnsignedInt( unsigned int &c ) { c = LittleLong( c ); }
-ARC_INLINE void		SwapLittleFloat( float &c ) { c = LittleFloat( c ); }
+inline void		SwapLittleShort( short &c ) { c = LittleShort( c ); }
+inline void		SwapLittleUnsignedShort( unsigned short &c ) { c = LittleShort( c ); }
+inline void		SwapLittleInt( int &c ) { c = LittleLong( c ); }
+inline void		SwapLittleUnsignedInt( unsigned int &c ) { c = LittleLong( c ); }
+inline void		SwapLittleFloat( float &c ) { c = LittleFloat( c ); }
 template<class type>
-ARC_INLINE void		SwapLittleFloatClass( type &c ) { for ( int i = 0; i < c.GetDimension(); i++ ) { c.ToFloatPtr()[i] = LittleFloat( c.ToFloatPtr()[i] ); } }
+inline void		SwapLittleFloatClass( type &c ) { for ( int i = 0; i < c.GetDimension(); i++ ) { c.ToFloatPtr()[i] = LittleFloat( c.ToFloatPtr()[i] ); } }
 
 // for base64
 void				SixtetsForInt( byte *out, int src);
@@ -728,8 +724,8 @@ int					IntForSixtets( byte *in );
 
 ===============================================================================
 */
-#define ARC_INLINE inline __attribute__((always_inline))
-#define ARC_INLINE __inline__
+#define inline inline __attribute__((always_inline))
+#define inline __inline__
 
 // turn float to int conversions into compile errors
 #include "math/FloatErrors.h"

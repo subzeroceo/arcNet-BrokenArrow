@@ -99,15 +99,15 @@ private:
 	anList<frameLookup_t>		frameLookup;
 	anList<frameCommand_t>		frameCommands;
 	int							frameRate;
-	anString						name;
-	anString						realname;
+	anStr						name;
+	anStr						realname;
 
 public:
 								rvCameraAnimation();
 								rvCameraAnimation( const idDeclCameraDef *cameraDef, const rvCameraAnimation *anim );
 								~rvCameraAnimation();
 
-	void						SetAnim( const idDeclCameraDef *cameraDef, const char *sourcename, const char *animname, anString filename );
+	void						SetAnim( const idDeclCameraDef *cameraDef, const char *sourcename, const char *animname, anStr filename );
 	const char					*Name( void ) const;
 	const char					*FullName( void ) const;
 	int							NumFrames( void ) const;
@@ -118,18 +118,18 @@ public:
 
 	const char					*AddFrameCommand( const class idDeclCameraDef *cameraDef, const anList<int>& frames, anLexer &src, const anDict *def );
 	void						CallFrameCommands( anEntity *ent, int from, int to ) const;
-	void						CallFrameCommandSound ( const frameCommand_t& command, anEntity* ent, const s_channelType channel ) const;
+	void						CallFrameCommandSound ( const frameCommand_t& command, anEntity *ent, const s_channelType channel ) const;
 };
 
-ARC_INLINE const cameraFrame_t *rvCameraAnimation::GetAnim( int index ) const {
+inline const cameraFrame_t *rvCameraAnimation::GetAnim( int index ) const {
 	return &camera[ index ];
 }
 
-ARC_INLINE const int rvCameraAnimation::GetCut( int index ) const {
+inline const int rvCameraAnimation::GetCut( int index ) const {
 	return cameraCuts[ index ];
 }
 
-ARC_INLINE const int rvCameraAnimation::GetFrameRate( void ) const {
+inline const int rvCameraAnimation::GetFrameRate( void ) const {
 	return frameRate;
 }
 
@@ -166,7 +166,7 @@ public:
 // jscott: to prevent a recursive crash
 	virtual	bool				RebuildTextSource( void ) { return( false ); }
 // scork: for detailed error-reporting
-	virtual bool				Validate( const char *psText, int iTextLength, anString &strReportTo ) const;
+	virtual bool				Validate( const char *psText, int iTextLength, anStr &strReportTo ) const;
 
 
 	void						Touch( void ) const;
@@ -185,7 +185,7 @@ private:
 	anList<rvCameraAnimation *>	anims;
 };
 
-ARC_INLINE const rvCameraAnimation *idDeclCameraDef::GetAnim( int index ) const {
+inline const rvCameraAnimation *idDeclCameraDef::GetAnim( int index ) const {
 	if ( ( index < 1 ) || ( index > anims.Num() ) ) {
 		return nullptr;
 	}

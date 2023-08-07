@@ -28,7 +28,7 @@ void R_ListRenderLightDefs_f( const anCommandArgs &args ) {
 
 		// count up the interactions
 		int	iCount = 0;
-		for ( an Interaction *inter = ldef->firstInteraction; inter != nullptr; inter = inter->lightNext ) {
+		for ( anInteraction *inter = ldef->firstInteraction; inter != nullptr; inter = inter->lightNext ) {
 			iCount++;
 		}
 		totalIntr += iCount;
@@ -72,7 +72,7 @@ void R_ListRenderEntityDefs_f( const anCommandArgs &args ) {
 
 		// count up the interactions
 		int	iCount = 0;
-		for ( an Interaction *inter = mdef->firstInteraction; inter != nullptr; inter = inter->entityNext ) {
+		for ( anInteraction *inter = mdef->firstInteraction; inter != nullptr; inter = inter->entityNext ) {
 			iCount++;
 		}
 		totalIntr += iCount;
@@ -276,9 +276,9 @@ void anRenderWorldLocal::FreeEntityDef( arcNetHandle_t entityHandle ) {
 	// in R_FreeEntityDefDerivedData(), otherwise the gui
 	// object still exists in the game
 
-	def->parms.gui[ 0 ] = nullptr;
-	def->parms.gui[ 1 ] = nullptr;
-	def->parms.gui[ 2 ] = nullptr;
+	def->parms.gui[0] = nullptr;
+	def->parms.gui[1] = nullptr;
+	def->parms.gui[2] = nullptr;
 
 	delete def;
 	entityDefs[ entityHandle ] = nullptr;
@@ -1067,7 +1067,7 @@ bool anRenderWorldLocal::ModelTrace( modelTrace_t &trace, arcNetHandle_t entityH
 anRenderWorldLocal::Trace
 ===================
 */
-const char* playerModelExcludeList[] = {
+const char *playerModelExcludeList[] = {
 	"file://models/md5/.md5mesh",
 	"file://models/md5/.md5mesh",
 	nullptr
@@ -1122,7 +1122,7 @@ bool anRenderWorldLocal::Trace( modelTrace_t &trace, const anVec3 &start, const 
 
 #if 1
 				if ( skipPlayer ) {
-					anString name = model->Name();
+					anStr name = model->Name();
 					const char *exclude;
 					int k;
 
@@ -1163,7 +1163,7 @@ bool anRenderWorldLocal::Trace( modelTrace_t &trace, const anVec3 &start, const 
 
 #if 1
 				if ( skipPlayer ) {
-					anString name = shader->GetName();
+					anStr name = shader->GetName();
 					for ( int k = 0; playerMaterialExcludeList[k]; k++ ) {
 						const char *exclude = playerMaterialExcludeList[k];
 						if ( name == exclude ) {
@@ -1388,14 +1388,14 @@ void anRenderWorldLocal::GenerateAllInteractions() {
 		interactionTableWidth = entityDefs.Num() + 100;
 		interactionTableHeight = lightDefs.Num() + 100;
 		int	size = interactionTableWidth * interactionTableHeight * sizeof( *interactionTable );
-		interactionTable = ( an Interaction **)R_ClearedStaticAlloc( size );
+		interactionTable = ( anInteraction **)R_ClearedStaticAlloc( size );
 		int	count = 0;
 		for ( int i = 0; i < this->lightDefs.Num(); i++ ) {
 			anRenderLightsLocal	*ldef = this->lightDefs[i];
 			if ( !ldef ) {
 				continue;
 			}
-			an Interaction	*inter;
+			anInteraction	*inter;
 			for ( inter = ldef->firstInteraction; inter != nullptr; inter = inter->lightNext ) {
 				anRenderEntityLocal	*edef = inter->entityDef;
 				int index = ldef->index * interactionTableWidth + edef->index;
@@ -1406,7 +1406,7 @@ void anRenderWorldLocal::GenerateAllInteractions() {
 		}
 
 		common->Printf( "interactionTable size: %i bytes\n", size );
-		common->Printf( "%i interaction take %i bytes\n", count, count * sizeof( an Interaction ) );
+		common->Printf( "%i interaction take %i bytes\n", count, count * sizeof( anInteraction ) );
 	}
 
 	// entities flagged as noDynamicInteractions will no longer make any

@@ -53,5 +53,5 @@ anPluecker::ToString
 =============
 */
 const char *anPluecker::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }

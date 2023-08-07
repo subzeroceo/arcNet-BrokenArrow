@@ -66,7 +66,7 @@ SwapValues
 ========================
 */
 template<typename _type_>
-ARC_INLINE void SwapValues( _type_ & a, _type_ & b ) {
+inline void SwapValues( _type_ & a, _type_ & b ) {
 	_type_ c = a;
 	a = b;
 	b = c;
@@ -99,17 +99,17 @@ public:
 			return;
 		}
 
-		const int64 MAX_LEVELS = 128;
-		int64 lo[MAX_LEVELS], hi[MAX_LEVELS];
+		const int MAX_LEVELS = 128;
+		int lo[MAX_LEVELS], hi[MAX_LEVELS];
 
 		// 'lo' is the lower index, 'hi' is the upper index
 		// of the region of the array that is being sorted.
 		lo[0] = 0;
 		hi[0] = num - 1;
 
-		for ( int64 level = 0; level >= 0; ) {
-			int64 i = lo[level];
-			int64 j = hi[level];
+		for ( int level = 0; level >= 0; ) {
+			int i = lo[level];
+			int j = hi[level];
 
 			// Only use quick-sort when there are 4 or more elements in this region and we are below MAX_LEVELS.
 			// Otherwise fall back to an insertion-sort.
@@ -117,7 +117,7 @@ public:
 				// Use the center element as the pivot.
 				// The median of a multi point sample could be used
 				// but simply taking the center works quite well.
-				int64 pi = ( i + j ) / 2;
+				int pi = ( i + j ) / 2;
 
 				// Move the pivot element to the end of the region.
 				SwapValues( base[j], base[pi] );
@@ -150,8 +150,8 @@ public:
 			} else {
 				// Insertion-sort of the remaining elements.
 				for ( ; i < j; j-- ) {
-					int64 m = i;
-					for ( int64 k = i + 1; k <= j; k++ ) {
+					int m = i;
+					for ( int k = i + 1; k <= j; k++ ) {
 						if ( static_cast<const _derived_ *>( this )->Compare( base[k], base[m] )> 0 ) {
 							m = k;
 						}

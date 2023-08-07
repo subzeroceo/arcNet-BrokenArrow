@@ -297,7 +297,7 @@ void idWindow::Draw( int time, float x, float y ) {
 		return;
 	}
 	if ( textShadow ) {
-		anString shadowText = text;
+		anStr shadowText = text;
 		idRectangle shadowRect = textRect;
 
 		shadowText.RemoveColors();
@@ -388,7 +388,7 @@ idWindow::RouteMouseCoords
 ================
 */
 const char *idWindow::RouteMouseCoords(float xd, float yd) {
-	anString str;
+	anStr str;
 	if (GetCaptureChild()) {
 		//FIXME: unkludge this whole mechanism
 		return GetCaptureChild()->RouteMouseCoords(xd, yd);
@@ -445,7 +445,7 @@ const char *idWindow::RouteMouseCoords(float xd, float yd) {
 idWindow::Activate
 ================
 */
-void idWindow::Activate( bool activate,	anString &act ) {
+void idWindow::Activate( bool activate,	anStr &act ) {
 	int n = (activate) ? ON_ACTIVATE : ON_DEACTIVATE;
 
 	//  make sure win vars are updated before activation
@@ -647,7 +647,7 @@ idWindow::AddCommand
 ================
 */
 void idWindow::AddCommand(const char *_cmd) {
-	anString str = cmd;
+	anStr str = cmd;
 	if ( str.Length()) {
 		str += " ; ";
 		str += _cmd;
@@ -917,7 +917,7 @@ void idWindow::DebugDraw( inttime, float x, float y) {
 			dc->DrawRect(drawRect.x, drawRect.y, drawRect.w, drawRect.h, 1, idDeviceContext::colorRed);
 		} else if (gui_debug.GetInteger() == 2) {
 			char out[1024];
-			anString str;
+			anStr str;
 			str = text.c_str();
 			
 			if ( str.Length()) {
@@ -1096,7 +1096,7 @@ void idWindow::SetupTransforms(float x, float y) {
 	org.Set( origin.x + x, origin.y + y, 0 );
 
 	if ( rotate ) {
-		static idRotation rot;
+		static anRotation rot;
 		static anVec3 vec(0, 0, 1);
 		rot.Set( org, vec, rotate );
 		trans = rot.ToMat3();
@@ -1142,7 +1142,7 @@ idWindow::Redraw
 ================
 */
 void idWindow::Redraw(float x, float y) {
-	anString str;
+	anStr str;
 
 	if (r_skipGuiShaders.GetInteger() == 1 || dc == nullptr ) {
 		return;
@@ -1357,7 +1357,7 @@ idWindow::SetupFromState
 ================
 */
 void idWindow::SetupFromState() {
-	anString str;
+	anStr str;
 	background = nullptr;
 
 	SetupBackground();
@@ -1632,7 +1632,7 @@ idWindow::ParseScriptEntry
 */
 bool idWindow::ParseScriptEntry( const char *name, anParser *src) {
 	for ( int i = 0; i < SCRIPT_COUNT; i++ ) {
-		if ( anString::Icmp( name, ScriptNames[i] ) == 0 ) {
+		if ( anStr::Icmp( name, ScriptNames[i] ) == 0 ) {
 			delete scripts[i];
 			scripts[i] = new idGuiScriptList;
 			return ParseScript( src, *scripts[i] );
@@ -1732,57 +1732,57 @@ idWinVar *idWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** o
 		*owner = nullptr;
 	}
 
-	if (anString::Icmp(_name, "noTime" ) == 0) {
+	if (anStr::Icmp(_name, "noTime" ) == 0) {
 		retVar = &noTime;
 	}
-	if (anString::Icmp(_name, "bg" ) == 0) {
+	if (anStr::Icmp(_name, "bg" ) == 0) {
 		retVar = &backGroundName;
 	}
-	if (anString::Icmp(_name, "vis" ) == 0) {
+	if (anStr::Icmp(_name, "vis" ) == 0) {
 		retVar = &visible;
 	}
-	if (anString::Icmp(_name, "rect" ) == 0) {
+	if (anStr::Icmp(_name, "rect" ) == 0) {
 		retVar = &rect;
 	}
-	if (anString::Icmp(_name, "bkColor" ) == 0) {
+	if (anStr::Icmp(_name, "bkColor" ) == 0) {
 		retVar = &backColor;
 	}
-	if (anString::Icmp(_name, "matColor" ) == 0) {
+	if (anStr::Icmp(_name, "matColor" ) == 0) {
 		retVar = &matColor;
 	}
-	if (anString::Icmp(_name, "foreColor" ) == 0) {
+	if (anStr::Icmp(_name, "foreColor" ) == 0) {
 		retVar = &foreColor;
 	}
-	if (anString::Icmp(_name, "hoverColor" ) == 0) {
+	if (anStr::Icmp(_name, "hoverColor" ) == 0) {
 		retVar = &hoverColor;
 	}
-	if (anString::Icmp(_name, "borderColor" ) == 0) {
+	if (anStr::Icmp(_name, "borderColor" ) == 0) {
 		retVar = &borderColor;
 	}
-	if (anString::Icmp(_name, "textScale" ) == 0) {
+	if (anStr::Icmp(_name, "textScale" ) == 0) {
 		retVar = &textScale;
 	}
-	if (anString::Icmp(_name, "rot" ) == 0) {
+	if (anStr::Icmp(_name, "rot" ) == 0) {
 		retVar = &rotate;
 	}
-	if (anString::Icmp(_name, "noEvents" ) == 0) {
+	if (anStr::Icmp(_name, "noEvents" ) == 0) {
 		retVar = &noEvents;
 	}
-	if (anString::Icmp(_name, "txt" ) == 0) {
+	if (anStr::Icmp(_name, "txt" ) == 0) {
 		retVar = &text;
 	}
-	if (anString::Icmp(_name, "bgName" ) == 0) {
+	if (anStr::Icmp(_name, "bgName" ) == 0) {
 		retVar = &backGroundName;
 	}
-	if (anString::Icmp(_name, "hideCursor" ) == 0) {
+	if (anStr::Icmp(_name, "hideCursor" ) == 0) {
 		retVar = &hideCursor;
 	}
 
-	anString key = _name;
+	anStr key = _name;
 	bool guiVar = (key.Find(VAR_GUIPREFIX) >= 0);
 	int c = definedVars.Num();
 	for ( int i = 0; i < c; i++ ) {
-		if (anString::Icmp(_name, (guiVar) ? va( "%s",definedVars[i]->GetName()) : definedVars[i]->GetName()) == 0) {
+		if (anStr::Icmp(_name, (guiVar) ? va( "%s",definedVars[i]->GetName()) : definedVars[i]->GetName()) == 0) {
 			retVar = definedVars[i];
 			break;
 		}
@@ -1809,8 +1809,8 @@ idWinVar *idWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** o
 	} else if (fixup) {
 		int n = key.Find( "::" );
 		if (n > 0) {
-			anString winName = key.Left(n);
-			anString var = key.Right(key.Length() - n - 2);
+			anStr winName = key.Left(n);
+			anStr var = key.Right(key.Length() - n - 2);
 			drawWin_t *win = GetGui()->GetDesktop()->FindChildByName(winName);
 			if (win) {
 				if (win->win) {
@@ -1832,7 +1832,7 @@ idWinVar *idWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** o
 idWindow::ParseString
 ================
 */
-void idWindow::ParseString(anParser *src, anString &out) {
+void idWindow::ParseString(anParser *src, anStr &out) {
 	anToken tok;
 	if ( src->ReadToken(&tok)) {
 		out = tok;
@@ -1865,61 +1865,61 @@ idWindow::ParseInternalVar
 ================
 */
 bool idWindow::ParseInternalVar(const char *_name, anParser *src) {
-	if (anString::Icmp(_name, "showtime" ) == 0) {
+	if (anStr::Icmp(_name, "showtime" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_SHOWTIME;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "showcoords" ) == 0) {
+	if (anStr::Icmp(_name, "showcoords" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_SHOWCOORDS;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "forceaspectwidth" ) == 0) {
+	if (anStr::Icmp(_name, "forceaspectwidth" ) == 0) {
 		forceAspectWidth = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "forceaspectheight" ) == 0) {
+	if (anStr::Icmp(_name, "forceaspectheight" ) == 0) {
 		forceAspectHeight = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "matscalex" ) == 0) {
+	if (anStr::Icmp(_name, "matscalex" ) == 0) {
 		matScalex = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "matscaley" ) == 0) {
+	if (anStr::Icmp(_name, "matscaley" ) == 0) {
 		matScaley = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "bordersize" ) == 0) {
+	if (anStr::Icmp(_name, "bordersize" ) == 0) {
 		borderSize = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "nowrap" ) == 0) {
+	if (anStr::Icmp(_name, "nowrap" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_NOWRAP;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "shadow" ) == 0) {
+	if (anStr::Icmp(_name, "shadow" ) == 0) {
 		textShadow = src->ParseInt();
 		return true;
 	}
-	if (anString::Icmp(_name, "textalign" ) == 0) {
+	if (anStr::Icmp(_name, "textalign" ) == 0) {
 		textAlign = src->ParseInt();
 		return true;
 	}
-	if (anString::Icmp(_name, "textalignx" ) == 0) {
+	if (anStr::Icmp(_name, "textalignx" ) == 0) {
 		textAlignx = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "textaligny" ) == 0) {
+	if (anStr::Icmp(_name, "textaligny" ) == 0) {
 		textAligny = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "shear" ) == 0) {
+	if (anStr::Icmp(_name, "shear" ) == 0) {
 		shear.x = src->ParseFloat();
 		anToken tok;
 		src->ReadToken( &tok );
@@ -1930,64 +1930,64 @@ bool idWindow::ParseInternalVar(const char *_name, anParser *src) {
 		shear.y = src->ParseFloat();
 		return true;
 	}
-	if (anString::Icmp(_name, "wantenter" ) == 0) {
+	if (anStr::Icmp(_name, "wantenter" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_WANTENTER;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "naturalmatscale" ) == 0) {
+	if (anStr::Icmp(_name, "naturalmatscale" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_NATURALMAT;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "noclip" ) == 0) {
+	if (anStr::Icmp(_name, "noclip" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_NOCLIP;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "nocursor" ) == 0) {
+	if (anStr::Icmp(_name, "nocursor" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_NOCURSOR;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "menugui" ) == 0) {
+	if (anStr::Icmp(_name, "menugui" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_MENUGUI;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "modal" ) == 0) {
+	if (anStr::Icmp(_name, "modal" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_MODAL;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "invertrect" ) == 0) {
+	if (anStr::Icmp(_name, "invertrect" ) == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_INVERTRECT;
 		}
 		return true;
 	}
-	if (anString::Icmp(_name, "name" ) == 0) {
+	if (anStr::Icmp(_name, "name" ) == 0) {
 		ParseString( src, name);
 		return true;
 	}
-	if (anString::Icmp(_name, "play" ) == 0) {
+	if (anStr::Icmp(_name, "play" ) == 0) {
 		common->Warning( "play encountered during gui parse.. see Robert\n" );
-		anString playStr;
+		anStr playStr;
 		ParseString( src, playStr);
 		return true;
 	}
-	if (anString::Icmp(_name, "comment" ) == 0) {
+	if (anStr::Icmp(_name, "comment" ) == 0) {
 		ParseString( src, comment);
 		return true;
 	}
-	if ( anString::Icmp( _name, "font" ) == 0 ) {
-		anString fontStr;
+	if ( anStr::Icmp( _name, "font" ) == 0 ) {
+		anStr fontStr;
 		ParseString( src, fontStr );
 		fontNum = dc->FindFont( fontStr );
 		return true;
@@ -2001,14 +2001,14 @@ idWindow::ParseRegEntry
 ================
 */
 bool idWindow::ParseRegEntry( const char *name, anParser *src ) {
-	anString work;
+	anStr work;
 	work = name;
 	work.ToLower();
 
 	idWinVar *var = GetWinVarByName(work, nullptr );
 	if ( var ) {
 		for ( int i = 0; i < NumRegisterVars; i++ ) {
-			if ( anString::Icmp(work, RegisterVars[i].name) == 0) {
+			if ( anStr::Icmp(work, RegisterVars[i].name) == 0) {
 				regList.AddReg(work, RegisterVars[i].type, src, this, var);
 				return true;
 			}
@@ -2080,7 +2080,7 @@ idWindow::Parse
 */
 bool idWindow::Parse( anParser *src, bool rebuild) {
 	anToken token, token2, token3, token4, token5, token6, token7;
-	anString work;
+	anStr work;
 
 	if (rebuild) {
 		CleanUp();
@@ -2103,7 +2103,7 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 	bool ret = true;
 
 	// attach a window wrapper to the window if the gui editor is running
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 	if ( com_editors & EDITOR_GUI ) {
 		new rvGEWindowWrapper ( this, rvGEWindowWrapper::WT_NORMAL );
 	}
@@ -2273,10 +2273,10 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 
 			// If we are in the gui editor then add the internal var to the 
 			// the wrapper
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 			if ( com_editors & EDITOR_GUI ) {
-				anString str;
-				anString out;
+				anStr str;
+				anStr out;
 				
 				// Grab the string from the last marker
 				src->GetStringFromMarker ( str, false );
@@ -2309,10 +2309,10 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 			// add the script to the wrappers script list
 			// If we are in the gui editor then add the internal var to the 
 			// the wrapper
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 			if ( com_editors & EDITOR_GUI ) {
-				anString str;
-				anString out;
+				anStr str;
+				anStr out;
 				
 				// Grab the string from the last marker
 				src->GetStringFromMarker ( str, false );
@@ -2344,9 +2344,9 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 			regList.AddReg(work, anRegister::FLOAT, src, this, varf);
 
 			// If we are in the gui editor then add the float to the defines
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 			if ( com_editors & EDITOR_GUI ) {
-				anString str;
+				anStr str;
 				
 				// Grab the string from the last marker and save it in the wrapper
 				src->GetStringFromMarker ( str, true );							
@@ -2372,9 +2372,9 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 
 			// store the original vec4 for the editor
 			// If we are in the gui editor then add the float to the defines
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 			if ( com_editors & EDITOR_GUI ) {
-				anString str;
+				anStr str;
 				
 				// Grab the string from the last marker and save it in the wrapper
 				src->GetStringFromMarker ( str, true );							
@@ -2397,9 +2397,9 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 			regList.AddReg(work, anRegister::FLOAT, src, this, varf);
 
 			// If we are in the gui editor then add the float to the defines
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 			if ( com_editors & EDITOR_GUI ) {
-				anString str;
+				anStr str;
 				
 				// Grab the string from the last marker and save it in the wrapper
 				src->GetStringFromMarker ( str, true );							
@@ -2410,10 +2410,10 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 			// add the script to the wrappers script list
 			// If we are in the gui editor then add the internal var to the 
 			// the wrapper
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 			if ( com_editors & EDITOR_GUI ) {
-				anString str;
-				anString out;
+				anStr str;
+				anStr out;
 				
 				// Grab the string from the last marker
 				src->GetStringFromMarker ( str, false );
@@ -2430,9 +2430,9 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 			// gui editor support		
 			// If we are in the gui editor then add the internal var to the 
 			// the wrapper
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 			if ( com_editors & EDITOR_GUI ) {
-				anString str;
+				anStr str;
 				src->GetStringFromMarker ( str );
 				rvGEWindowWrapper::GetWrapper ( this )->SetStateKey ( token, str, false );
 			}
@@ -2442,9 +2442,9 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 			// hook into the main window parsing for the gui editor
 			// If we are in the gui editor then add the internal var to the 
 			// the wrapper
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 			if ( com_editors & EDITOR_GUI ) {
-				anString str;
+				anStr str;
 				src->GetStringFromMarker ( str );
 				rvGEWindowWrapper::GetWrapper ( this )->SetStateKey ( token, str, false );
 			}
@@ -2467,7 +2467,7 @@ bool idWindow::Parse( anParser *src, bool rebuild) {
 	// hook into the main window parsing for the gui editor
 	// If we are in the gui editor then add the internal var to the 
 	// the wrapper
-#ifdef ID_ALLOW_TOOLS
+#ifdef ARC_ALLOW_TOOLS
 	if ( com_editors & EDITOR_GUI ) {
 		rvGEWindowWrapper::GetWrapper ( this )->Finish();
 	}
@@ -2487,7 +2487,7 @@ idSimpleWindow *idWindow::FindSimpleWinByName(const char *_name) {
 		if (drawWindows[i].simp == nullptr ) {
 			continue;
 		}
-		if ( anString::Icmp(drawWindows[i].simp->name, _name) == 0 ) {
+		if ( anStr::Icmp(drawWindows[i].simp->name, _name) == 0 ) {
 			return drawWindows[i].simp;
 		} 
 	}
@@ -2501,7 +2501,7 @@ idWindow::FindChildByName
 */
 drawWin_t *idWindow::FindChildByName(const char *_name) {
 	static drawWin_t dw;
-	if ( anString::Icmp(name,_name) == 0) {
+	if ( anStr::Icmp(name,_name) == 0) {
 		dw.simp = nullptr;
 		dw.win = this;
 		return &dw;
@@ -2509,7 +2509,7 @@ drawWin_t *idWindow::FindChildByName(const char *_name) {
 	int c = drawWindows.Num();
 	for ( int i = 0; i < c; i++ ) {
 		if  (drawWindows[i].win) {
-			if ( anString::Icmp(drawWindows[i].win->name, _name) == 0) {
+			if ( anStr::Icmp(drawWindows[i].win->name, _name) == 0) {
 				return &drawWindows[i];
 			}
 			drawWin_t *win = drawWindows[i].win->FindChildByName(_name);
@@ -2517,7 +2517,7 @@ drawWin_t *idWindow::FindChildByName(const char *_name) {
 				return win;
 			}
 		} else {
-			if (anString::Icmp(drawWindows[i].simp->name, _name) == 0) {
+			if (anStr::Icmp(drawWindows[i].simp->name, _name) == 0) {
 				return &drawWindows[i];
 			}
 		}
@@ -2530,7 +2530,7 @@ drawWin_t *idWindow::FindChildByName(const char *_name) {
 idWindow::GetStrPtrByName
 ================
 */
-anString *idWindow::GetStrPtrByName( const char *_name ) {
+anStr *idWindow::GetStrPtrByName( const char *_name ) {
 	return nullptr;
 }
 
@@ -2663,7 +2663,7 @@ int idWindow::ExpressionTemporary() {
 	}
 	int i = expressionRegisters.Num();
 	registerIsTemporary[i] = true;
-	i = expressionRegisters.Append(0);
+	i = expressionRegisters.Append( 0 );
 	return i;
 }
 
@@ -3119,7 +3119,7 @@ void idWindow::ReadFromDemoFile( class anSavedGamesFile *f, bool rebuild ) {
 	f->ReadFloat( yOffset);
 	int c;
 
-	anString work;
+	anStr work;
 	if (rebuild) {
 		f->SetLog( true, ( work + "-scripts" ) );
 		for ( int i = 0; i < SCRIPT_COUNT; i++ ) {
@@ -3263,7 +3263,7 @@ void idWindow::WriteToDemoFile( class anSavedGamesFile *f ) {
 	f->WriteFloat( textRect.h );
 	f->WriteFloat( xOffset );
 	f->WriteFloat( yOffset );
-	anString work;
+	anStr work;
 	f->SetLog( true, work);
 
  	int c;
@@ -3329,7 +3329,7 @@ idWindow::WriteSaveGameTransition
 */
 void idWindow::WriteSaveGameTransition( idTransitionData &trans, anFile *savefile ) {
 	drawWin_t dw, *fdw;
-	anString winName( "" );
+	anStr winName( "" );
 	dw.simp = nullptr;
 	dw.win = nullptr;
 	int offset = gui->GetDesktop()->GetWinVarOffset( trans.data, &dw );
@@ -3357,7 +3357,7 @@ void idWindow::ReadSaveGameTransition( idTransitionData &trans, anFile *savefile
 
 	savefile->Read( &offset, sizeof( offset ) );
 	if ( offset != -1 ) {
-		anString winName;
+		anStr winName;
 		ReadSaveGameString( winName, savefile );
 		savefile->Read( &trans.interp, sizeof( trans.interp ) );
 		trans.data = nullptr;
@@ -3494,7 +3494,7 @@ void idWindow::WriteToSaveGame( anFile *savefile ) {
 idWindow::ReadSaveGameString
 ===============
 */
-void idWindow::ReadSaveGameString( anString &string, anFile *savefile ) {
+void idWindow::ReadSaveGameString( anStr &string, anFile *savefile ) {
 	int len;
 
 	savefile->Read( &len, sizeof( len ) );
@@ -4079,7 +4079,7 @@ values of the dictionary onto the window is for the window to interpret the
 dictionary as if were a file being parsed.
 ================
 */
-bool idWindow::UpdateFromDictionary( anDict& dict ) {
+bool idWindow::UpdateFromDictionary( anDict &dict ) {
 	const anKeyValue*	kv;
 	int					i;
 	

@@ -11,19 +11,19 @@
 #include "Simd_AVX.h"
 #include "Simd_Macros.h"
 
-arcSIMDProcessor	*	processor = nullptr;			// pointer to SIMD processor
-arcSIMDProcessor *	generic = nullptr;				// pointer to generic SIMD implementation
-arcSIMDProcessor *	SIMDProcessor = nullptr;
+anSIMDProcessor	*	processor = nullptr;			// pointer to SIMD processor
+anSIMDProcessor *	generic = nullptr;				// pointer to generic SIMD implementation
+anSIMDProcessor *	SIMDProcessor = nullptr;
 
-arcSIMD::arcSIMD() {
-	LOG( "Constructing arcSIMD object" );
+anSIMD::anSIMD() {
+	LOG( "Constructing anSIMD object" );
 }
 
-arcSIMD::~arcSIMD() {
+anSIMD::~anSIMD() {
 }
 
 // r = s0 + s1
-void arcSIMD::AddPS(float *r, float *s0, float *s1) {
+void anSIMD::AddPS(float *r, float *s0, float *s1) {
     __m128 a, b, c;
 
     a = _mm_load_ps( s0);
@@ -33,7 +33,7 @@ void arcSIMD::AddPS(float *r, float *s0, float *s1) {
 }
 
 // r = s0 + s1
-void arcSIMD::AddPS(float *r, float *s0, float *s1, int n) {
+void anSIMD::AddPS(float *r, float *s0, float *s1, int n) {
     __m128 a, b, c;
 
     for ( int i = 0; i < n; i++ ) {
@@ -49,7 +49,7 @@ void arcSIMD::AddPS(float *r, float *s0, float *s1, int n) {
 
 
 // r = s0 + s1
-void arcSIMD::AddPS(float *r, float *s0, float *s1, int n) {
+void anSIMD::AddPS(float *r, float *s0, float *s1, int n) {
     __m128 a, b, c;
 
     for ( int i = 0; i < n; i++ ) {
@@ -64,7 +64,7 @@ void arcSIMD::AddPS(float *r, float *s0, float *s1, int n) {
 }
 
 // r = s0 - s1
-void arcSIMD::Subtract(float *r, float *s0, float *s1, int n) {
+void anSIMD::Subtract(float *r, float *s0, float *s1, int n) {
     __m128 a, b, c;
 
     for ( int i = 0; i < n; i++ ) {
@@ -80,7 +80,7 @@ void arcSIMD::Subtract(float *r, float *s0, float *s1, int n) {
 
 
 // r = s0 * s1
-void arcSIMD::Multiply(float *r, float *s0, float *s1) {
+void anSIMD::Multiply(float *r, float *s0, float *s1) {
     __m128 a, b, c;
 
     a = _mm_load_ps( s0);
@@ -90,7 +90,7 @@ void arcSIMD::Multiply(float *r, float *s0, float *s1) {
 }
 
 // r = s0 * s1
-void arcSIMD::Multiply(float *r, float *s0, float *s1, int n) {
+void anSIMD::Multiply(float *r, float *s0, float *s1, int n) {
     __m128 a, b, c;
 
     for ( int i = 0; i < n; i++ ) {
@@ -106,11 +106,11 @@ void arcSIMD::Multiply(float *r, float *s0, float *s1, int n) {
 
 /*
 ================
-arcSIMD::Init
+anSIMD::Init
 ================
 */
-void arcSIMD::Init( void ) {
-	generic = new arcSIMD_Generic;
+void anSIMD::Init( void ) {
+	generic = new anSIMD_Generic;
 	generic->cpuid = CPUID_GENERIC;
 	processor = nullptr;
 	SIMDProcessor = generic;
@@ -118,12 +118,12 @@ void arcSIMD::Init( void ) {
 
 /*
 ============
-arcSIMD::InitProcessor
+anSIMD::InitProcessor
 ============
 */
-void arcSIMD::InitProcessor( const char *module, bool forceGeneric ) {
+void anSIMD::InitProcessor( const char *module, bool forceGeneric ) {
 	cpuid_t cpuid;
-	arcSIMDProcessor *newProcessor;
+	anSIMDProcessor *newProcessor;
 
 	cpuid = anLibrary::sys->GetProcessorId();
 
@@ -132,9 +132,9 @@ void arcSIMD::InitProcessor( const char *module, bool forceGeneric ) {
 	} else {
 		if ( !processor ) {
 			if ( ( cpuid & CPUID_ALTIVEC ) ) {
-				processor = new arcSIMD_AltiVec;
+				processor = new anSIMD_AltiVec;
 			} else if ( ( cpuid & CPUID_MMX ) && ( cpuid & CPUID_SSE ) && ( cpuid & CPUID_SSE2 ) && ( cpuid & CPUID_SSE3 ) ) {
-				processor = new arcSIMD_SSE3;
+				processor = new anSIMD_SSE3;
 			} else if ( ( cpuid & CPUID_MMX ) && ( cpuid & CPUID_SSE ) && ( cpuid & CPUID_SSE2 ) ) {
 				processor = new idSIMD_SSE2;
 			} else if ( ( cpuid & CPUID_MMX ) && ( cpuid & CPUID_SSE ) ) {
@@ -142,7 +142,7 @@ void arcSIMD::InitProcessor( const char *module, bool forceGeneric ) {
 			} else if ( ( cpuid & CPUID_MMX ) && ( cpuid & CPUID_3DNOW ) ) {
 				processor = new idSIMD_3DNow;
 			} else if ( ( cpuid & CPUID_MMX ) ) {
-				processor = new arcSIMD_MMX;
+				processor = new anSIMD_MMX;
 			} else {
 				processor = generic;
 			}
@@ -170,10 +170,10 @@ void arcSIMD::InitProcessor( const char *module, bool forceGeneric ) {
 
 /*
 ================
-arcSIMD::Shutdown
+anSIMD::Shutdown
 ================
 */
-void arcSIMD::Shutdown( void ) {
+void anSIMD::Shutdown( void ) {
 	if ( processor != generic ) {
 		delete processor;
 	}
@@ -195,8 +195,8 @@ void arcSIMD::Shutdown( void ) {
 
 #define RANDOM_SEED		1013904223L	//( ( int )anLibrary::sys->GetClockTicks() )
 
-arcSIMDProcessor *p_simd;
-arcSIMDProcessor *p_generic;
+anSIMDProcessor *p_simd;
+anSIMDProcessor *p_generic;
 long baseClocks = 0;
 
 #define TIME_TYPE int
@@ -361,7 +361,7 @@ PrintClocks
 */
 void PrintClocks( char *string, int dataCount, int clocks, int otherClocks = 0 ) {
 	anLibrary::common->Printf( string );
-	for ( int i = anString::LengthWithoutColors( string ); i < 48; i++ ) {
+	for ( int i = anStr::LengthWithoutColors( string ); i < 48; i++ ) {
 		anLibrary::common->Printf( " " );
 	}
 	clocks -= baseClocks;
@@ -402,7 +402,7 @@ void TestAdd( void ) {
 	ALIGN16( float fdst1[COUNT] );
 	ALIGN16( float fsrc0[COUNT] );
 	ALIGN16( float fsrc1[COUNT] );
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( int i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -475,7 +475,7 @@ void TestSub( void ) {
 	ALIGN16( float fsrc1[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( int i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -549,7 +549,7 @@ void TestMul( void ) {
 	ALIGN16( float fsrc1[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -624,7 +624,7 @@ void TestDiv( void ) {
 	ALIGN16( float fsrc1[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -700,7 +700,7 @@ void TestMulAdd( void ) {
 	ALIGN16( float fsrc0[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -755,7 +755,7 @@ void TestMulSub( void ) {
 	ALIGN16( float fsrc0[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -817,7 +817,7 @@ void TestDot( void ) {
 	ALIGN16( anDrawVertex drawVerts[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -1057,7 +1057,7 @@ void TestCompare( void ) {
 	ALIGN16( byte bytedst2[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -1298,7 +1298,7 @@ void TestMinMax( void ) {
 	anVec3 vmin, vmax, vmin2, vmax2;
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -1429,7 +1429,7 @@ void TestClamp( void ) {
 	ALIGN16( float fsrc0[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = srnd.CRandomFloat() * 10.0f;
@@ -1524,7 +1524,7 @@ void TestMemcpy( void ) {
 	byte test0[8192];
 	byte test1[8192];
 
-	arcRandom random( RANDOM_SEED );
+	anRandom random( RANDOM_SEED );
 
 	anLibrary::common->Printf( "====================================\n" );
 
@@ -2325,7 +2325,7 @@ void TestBlendJoints( void ) {
 	float lerp = 0.3f;
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		anAngles angles;
@@ -2390,11 +2390,11 @@ void TestConvertJointQuatsToJointMats( void ) {
 	int i;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	ALIGN16( anJointQuat baseJoints[COUNT] );
-	ALIGN16( arcJointMat joints1[COUNT] );
-	ALIGN16( arcJointMat joints2[COUNT] );
+	ALIGN16( anJointMat joints1[COUNT] );
+	ALIGN16( anJointMat joints2[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		anAngles angles;
@@ -2441,12 +2441,12 @@ TestConvertJointMatsToJointQuats
 void TestConvertJointMatsToJointQuats( void ) {
 	int i;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcJointMat baseJoints[COUNT] );
+	ALIGN16( anJointMat baseJoints[COUNT] );
 	ALIGN16( anJointQuat joints1[COUNT] );
 	ALIGN16( anJointQuat joints2[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		anAngles angles;
@@ -2500,13 +2500,13 @@ TestTransformJoints
 void TestTransformJoints( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcJointMat joints[COUNT+1] );
-	ALIGN16( arcJointMat joints1[COUNT+1] );
-	ALIGN16( arcJointMat joints2[COUNT+1] );
+	ALIGN16( anJointMat joints[COUNT+1] );
+	ALIGN16( anJointMat joints1[COUNT+1] );
+	ALIGN16( anJointMat joints2[COUNT+1] );
 	ALIGN16( int parents[COUNT+1] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i <= COUNT; i++ ) {
 		anAngles angles;
@@ -2562,13 +2562,13 @@ TestUntransformJoints
 void TestUntransformJoints( void ) {
 	int i, j;
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
-	ALIGN16( arcJointMat joints[COUNT+1] );
-	ALIGN16( arcJointMat joints1[COUNT+1] );
-	ALIGN16( arcJointMat joints2[COUNT+1] );
+	ALIGN16( anJointMat joints[COUNT+1] );
+	ALIGN16( anJointMat joints1[COUNT+1] );
+	ALIGN16( anJointMat joints2[COUNT+1] );
 	ALIGN16( int parents[COUNT+1] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i <= COUNT; i++ ) {
 		anAngles angles;
@@ -2628,12 +2628,12 @@ void TestTransformVerts( void ) {
 	TIME_TYPE start, end, bestClocksGeneric, bestClocksSIMD;
 	ALIGN16( anDrawVertex drawVerts1[NUMVERTS] );
 	ALIGN16( anDrawVertex drawVerts2[NUMVERTS] );
-	ALIGN16( arcJointMat joints[NUMJOINTS] );
+	ALIGN16( anJointMat joints[NUMJOINTS] );
 	ALIGN16( anVec4 weights[COUNT] );
 	ALIGN16( int weightIndex[COUNT*2] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < NUMJOINTS; i++ ) {
 		anAngles angles;
@@ -2653,7 +2653,7 @@ void TestTransformVerts( void ) {
 		weights[i][1] = srnd.CRandomFloat() * 2.0f;
 		weights[i][2] = srnd.CRandomFloat() * 2.0f;
 		weights[i][3] = srnd.CRandomFloat();
-		weightIndex[i*2+0] = ( i * NUMJOINTS / COUNT ) * sizeof( arcJointMat );
+		weightIndex[i*2+0] = ( i * NUMJOINTS / COUNT ) * sizeof( anJointMat );
 		weightIndex[i*2+1] = i & 1;
 	}
 
@@ -2698,7 +2698,7 @@ void TestTracePointCull( void ) {
 	byte totalOr1 = 0, totalOr2 = 0;
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	planes[0].SetNormal( anVec3(  1,  0, 0 ) );
 	planes[1].SetNormal( anVec3( -1,  0, 0 ) );
@@ -2755,7 +2755,7 @@ void TestDecalPointCull( void ) {
 	ALIGN16( byte cullBits2[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	planes[0].SetNormal( anVec3(  1,  0,  0 ) );
 	planes[1].SetNormal( anVec3( -1,  0,  0 ) );
@@ -2818,7 +2818,7 @@ void TestOverlayPointCull( void ) {
 	ALIGN16( anVec2 texCoords2[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	planes[0].SetNormal( anVec3( 0.3f, 0.2f, 0.9f ) );
 	planes[1].SetNormal( anVec3( 0.9f, 0.2f, 0.3f ) );
@@ -2875,7 +2875,7 @@ void TestDeriveTriPlanes( void ) {
 	ALIGN16( int indexes[COUNT*3] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		for ( j = 0; j < 3; j++ ) {
@@ -2934,7 +2934,7 @@ void TestDeriveTangents( void ) {
 	ALIGN16( int indexes[COUNT*3] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		for ( j = 0; j < 3; j++ ) {
@@ -3017,7 +3017,7 @@ void TestDeriveUnsmoothedTangents( void ) {
 	ALIGN16( dominantTri_s dominantTris[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		for ( j = 0; j < 3; j++ ) {
@@ -3093,7 +3093,7 @@ void TestNormalizeTangents( void ) {
 	ALIGN16( anDrawVertex drawVerts2[COUNT] );
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		for ( j = 0; j < 3; j++ ) {
@@ -3159,7 +3159,7 @@ void TestGetTextureSpaceLightVectors( void ) {
 	anVec3 lightOrigin;
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		for ( j = 0; j < 3; j++ ) {
@@ -3223,7 +3223,7 @@ void TestGetSpecularTextureCoords( void ) {
 	anVec3 lightOrigin, viewOrigin;
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		for ( j = 0; j < 3; j++ ) {
@@ -3291,7 +3291,7 @@ void TestCreateShadowCache( void ) {
 	int numVerts1 = 0, numVerts2 = 0;
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		drawVerts[i].xyz[0] = srnd.CRandomFloat() * 100.0f;
@@ -3391,7 +3391,7 @@ void TestSoundUpSampling( void ) {
 	int kHz, numSpeakers;
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < MIXBUFFER_SAMPLES*2; i++ ) {
 		pcm[i] = srnd.RandomInt( (1<<16) ) - (1<<15);
@@ -3483,7 +3483,7 @@ void TestSoundMixing( void ) {
 	float currentV[6];
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < 6; i++ ) {
 		lastV[i] = srnd.CRandomFloat();
@@ -3675,7 +3675,7 @@ void TestMath( void ) {
 	float tst = -1.0f;
 	float tst2 = 1.0f;
 	float testvar = 1.0f;
-	arcRandom rnd;
+	anRandom rnd;
 
 	bestClocks = 0;
 	tst = rnd.CRandomFloat();
@@ -3693,7 +3693,7 @@ void TestMath( void ) {
 	tst = rnd.CRandomFloat();
 	for ( i = 0; i < NUMTESTS; i++ ) {
 		StartRecordTime( start );
-		int tmp = * ( int*) &tst;
+		int tmp = * (int *) &tst;
 		tmp &= 0x7FFFFFFF;
 		tst = * ( float * ) &tmp;
 		StopRecordTime( end );
@@ -4079,7 +4079,7 @@ void TestNegate( void ) {
 
 	const char *result;
 
-	arcRandom srnd( RANDOM_SEED );
+	anRandom srnd( RANDOM_SEED );
 
 	for ( i = 0; i < COUNT; i++ ) {
 		fsrc0[i] = fsrc1[i] = fsrc2[i] = srnd.CRandomFloat() * 10.0f;
@@ -4123,10 +4123,10 @@ void TestNegate( void ) {
 
 /*
 ============
-arcSIMD::Test_f
+anSIMD::Test_f
 ============
 */
-void arcSIMD::Test_f( const anCommandArgs &args ) {
+void anSIMD::Test_f( const anCommandArgs &args ) {
 
 #ifdef _WIN32
 	SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL );
@@ -4135,48 +4135,48 @@ void arcSIMD::Test_f( const anCommandArgs &args ) {
 	p_simd = processor;
 	p_generic = generic;
 
-	if ( anString::Length( args.Argv( 1 ) ) != 0 ) {
+	if ( anStr::Length( args.Argv( 1 ) ) != 0 ) {
 		cpuid_t cpuid = anLibrary::sys->GetProcessorId();
-		anString argString = args.Args();
+		anStr argString = args.Args();
 
 		argString.Replace( " ", "" );
 
-		if ( anString::Icmp( argString, "MMX" ) == 0 ) {
+		if ( anStr::Icmp( argString, "MMX" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) ) {
 				common->Printf( "CPU does not support MMX\n" );
 				return;
 			}
-			p_simd = new arcSIMD_MMX;
-		} else if ( anString::Icmp( argString, "3DNow" ) == 0 ) {
+			p_simd = new anSIMD_MMX;
+		} else if ( anStr::Icmp( argString, "3DNow" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) || !( cpuid & CPUID_3DNOW ) ) {
 				common->Printf( "CPU does not support MMX & 3DNow\n" );
 				return;
 			}
 			p_simd = new idSIMD_3DNow;
-		} else if ( anString::Icmp( argString, "SSE" ) == 0 ) {
+		} else if ( anStr::Icmp( argString, "SSE" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) || !( cpuid & CPUID_SSE ) ) {
 				common->Printf( "CPU does not support MMX & SSE\n" );
 				return;
 			}
 			p_simd = new idSIMD_SSE;
-		} else if ( anString::Icmp( argString, "SSE2" ) == 0 ) {
+		} else if ( anStr::Icmp( argString, "SSE2" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) || !( cpuid & CPUID_SSE ) || !( cpuid & CPUID_SSE2 ) ) {
 				common->Printf( "CPU does not support MMX & SSE & SSE2\n" );
 				return;
 			}
 			p_simd = new idSIMD_SSE2;
-		} else if ( anString::Icmp( argString, "SSE3" ) == 0 ) {
+		} else if ( anStr::Icmp( argString, "SSE3" ) == 0 ) {
 			if ( !( cpuid & CPUID_MMX ) || !( cpuid & CPUID_SSE ) || !( cpuid & CPUID_SSE2 ) || !( cpuid & CPUID_SSE3 ) ) {
 				common->Printf( "CPU does not support MMX & SSE & SSE2 & SSE3\n" );
 				return;
 			}
-			p_simd = new arcSIMD_SSE3();
-		} else if ( anString::Icmp( argString, "AltiVec" ) == 0 ) {
+			p_simd = new anSIMD_SSE3();
+		} else if ( anStr::Icmp( argString, "AltiVec" ) == 0 ) {
 			if ( !( cpuid & CPUID_ALTIVEC ) ) {
 				common->Printf( "CPU does not support AltiVec\n" );
 				return;
 			}
-			p_simd = new arcSIMD_AltiVec();
+			p_simd = new anSIMD_AltiVec();
 		} else {
 			common->Printf( "invalid argument, use: MMX, 3DNow, SSE, SSE2, SSE3, AltiVec\n" );
 			return;

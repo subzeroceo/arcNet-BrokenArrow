@@ -53,7 +53,7 @@ void anTokenParser::WriteToFile( const char *filename ) {
 bool anTokenParser::StartParsing( const char *filename ) {
 	currentTokenList = -1;
 	for ( int i = 0; i < guiTokenIndexes.Num(); i++ ) {
-		if ( anString::Icmp( filename, guiTokenIndexes[i].GetName() ) == 0 ) {
+		if ( anStr::Icmp( filename, guiTokenIndexes[i].GetName() ) == 0 ) {
 			currentTokenList = i;
 			break;
 		}
@@ -88,7 +88,7 @@ int	anTokenParser::ExpectTokenString( const char *string ) {
 }
 // expect a certain token type
 int	anTokenParser::ExpectTokenType( int type, int subtype, anToken *token ) {
-	anString str;
+	anStr str;
 
 	if ( !ReadToken( token ) ) {
 		Error( "couldn't read expected token" );

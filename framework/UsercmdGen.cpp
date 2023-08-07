@@ -781,8 +781,8 @@ void	DrawJoypadTexture(
 	}
 
 	memset( image, 0, size * size * 4 );
-#define PLOT(x,y) ( ( int*)image)[( int )(y)*size+( int )(x)]=0xffffffff
-#define CPLOT(x,y) ( ( int*)image)[( int )(halfSize+y)*size+( int )(halfSize+x)]=0xffffffff
+#define PLOT(x,y) ( (int *)image)[( int )(y)*size+( int )(x)]=0xffffffff
+#define CPLOT(x,y) ( (int *)image)[( int )(halfSize+y)*size+( int )(halfSize+x)]=0xffffffff
 
 	int	clampedX = halfSize + Min( halfSize-1, ( int )(halfSize * clamped.x) );
 	int	clampedY = halfSize + Min( halfSize-1, ( int )(halfSize * clamped.y) );
@@ -1058,7 +1058,7 @@ Returns the button if the command string is used by the usercmd generator.
 */
 int	idUsercmdGenLocal::CommandStringUsercmdData( const char *cmdString ) {
 	for ( userCmdString_t *ucs = userCmdStrings; ucs->string; ucs++ ) {
-		if ( anString::Icmp( cmdString, ucs->string ) == 0 ) {
+		if ( anStr::Icmp( cmdString, ucs->string ) == 0 ) {
 			return ucs->button;
 		}
 	}

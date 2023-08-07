@@ -12,10 +12,10 @@ Script_Set
 =========================
 */
 void Script_Set(idWindow *window, anList<idGSWinVar> *src) {
-	anString key, val;
+	anStr key, val;
 	idWinStr *dest = dynamic_cast<idWinStr*>((*src)[0].var);
 	if (dest) {
-		if (anString::Icmp(*dest, "cmd" ) == 0) {
+		if (anStr::Icmp(*dest, "cmd" ) == 0) {
 			dest = dynamic_cast<idWinStr*>((*src)[1].var);
 			int parmCount = src->Num();
 			if (parmCount > 2) {
@@ -79,7 +79,7 @@ Script_RunScript
 void Script_RunScript(idWindow *window, anList<idGSWinVar> *src) {
 	idWinStr *parm = dynamic_cast<idWinStr*>((*src)[0].var);
 	if (parm) {
-		anString str = window->cmd;
+		anStr str = window->cmd;
 		str += " ; runScript ";
 		str += parm->c_str();
 		window->cmd = str;
@@ -321,7 +321,7 @@ bool idGuiScript::Parse(anParser *src) {
 	handler	= nullptr;
 	
 	for ( int i = 0; i < scriptCommandCount ; i++ ) {
-		if ( anString::Icmp(token, commandList[i].name) == 0 ) {
+		if ( anStr::Icmp(token, commandList[i].name) == 0 ) {
 			handler = commandList[i].handler;
 			break;
 		}
@@ -339,11 +339,11 @@ bool idGuiScript::Parse(anParser *src) {
 			return false;
 		}
 		
-		if ( anString::Icmp( token, ";" ) == 0 ) {
+		if ( anStr::Icmp( token, ";" ) == 0 ) {
 			break;
 		}
 
-		if ( anString::Icmp( token, "}" ) == 0 ) {
+		if ( anStr::Icmp( token, "}" ) == 0 ) {
 			src->UnreadToken( &token);
 			break;
 		}
@@ -411,13 +411,13 @@ void idGuiScript::FixupParms( idWindow *win ) {
 			if ( dynamic_cast<idWinBackground *>(dest) != nullptr ) {
 				precacheBackground = true;
 			}
-		} else if ( anString::Icmp( str->c_str(), "cmd" ) == 0 ) {
+		} else if ( anStr::Icmp( str->c_str(), "cmd" ) == 0 ) {
 			precacheSounds = true;
 		}
 		int parmCount = parms.Num();
 		for ( int i = 1; i < parmCount; i++ ) {
 			idWinStr *str = dynamic_cast<idWinStr*>(parms[i].var);		
-			if (anString::Icmpn(*str, "gui::", 5) == 0) {
+			if (anStr::Icmpn(*str, "gui::", 5) == 0) {
 				//  always use a string here, no point using a float if it is one
 				//  FIXME: This creates duplicate variables, while not technically a problem since they
 				//  are all bound to the same guiDict, it does consume extra memory and is generally a bad thing
@@ -441,7 +441,7 @@ void idGuiScript::FixupParms( idWindow *win ) {
 					parms[i].var = dest;
 					parms[i].own = false;
 				}
-			} else if ( anString::Cmpn( str->c_str(), STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 ) {
+			} else if ( anStr::Cmpn( str->c_str(), STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 ) {
 				str->Set( common->GetLanguageDict()->GetString( str->c_str() ) );
 			} else if ( precacheBackground ) {
 				const anMaterial *mat = declManager->FindMaterial( str->c_str() );

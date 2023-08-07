@@ -411,7 +411,7 @@ viewEntity_t *R_SetEntityDefViewEntity( anRenderEntityLocal *def ) {
 
 	// we may not have a viewDef if we are just creating shadows at entity creation time
 	if ( tr.viewDef ) {
-		GL_MultMatrix( vModel->modelMatrix, tr.viewDef->worldSpace.modelViewMatrix, vModel->modelViewMatrix );
+		GL_MultMatrixAligned( vModel->modelMatrix, tr.viewDef->worldSpace.modelViewMatrix, vModel->modelViewMatrix );
 
 		vModel->next = tr.viewDef->viewEntitys;
 		tr.viewDef->viewEntitys = vModel;
@@ -556,7 +556,7 @@ void anRenderWorldLocal::CreateLightDefInteractions( anRenderLightsLocal *ldef )
 	areaReference_t		*lref;
 	anRenderEntityLocal		*edef;
 	portalArea_t	*area;
-	an Interaction	*inter;
+	anInteraction	*inter;
 
 	for ( lref = ldef->references; lref; lref = lref->ownerNext ) {
 		area = lref->area;
@@ -631,7 +631,7 @@ void anRenderWorldLocal::CreateLightDefInteractions( anRenderLightsLocal *ldef )
 			//
 			// create a new interaction, but don't do any work other than bbox to frustum culling
 			//
-			an Interaction *inter = an Interaction::AllocAndLink( edef, ldef );
+			anInteraction *inter = anInteraction::AllocAndLink( edef, ldef );
 
 			// do a check of the entity reference bounds against the light frustum,
 			// trying to avoid creating a viewEntity if it hasn't been already
@@ -1541,8 +1541,8 @@ void R_AddModelSurfaces( void ) {
 		//
 		if ( tr.viewDef->isXraySubview ) {
 			if ( vEntity->entityDef->parms.xrayIndex == 2 ) {
-				for ( an Interaction *inter = vEntity->entityDef->firstInteraction; inter != nullptr && !inter->IsEmpty(); inter = next ) {
-						an Interaction *next = inter->entityNext;
+				for ( anInteraction *inter = vEntity->entityDef->firstInteraction; inter != nullptr && !inter->IsEmpty(); inter = next ) {
+						anInteraction *next = inter->entityNext;
 					if ( inter->lightDef->viewCount != tr.viewCount ) {
 						continue;
 					}
@@ -1552,8 +1552,8 @@ void R_AddModelSurfaces( void ) {
 		} else {
 			// all empty interactions are at the end of the list so once the
 			// first is encountered all the remaining interactions are empty
-			for ( an Interaction *inter = vEntity->entityDef->firstInteraction; inter != nullptr && !inter->IsEmpty(); inter = next ) {
-				an Interaction *next = inter->entityNext;
+			for ( anInteraction *inter = vEntity->entityDef->firstInteraction; inter != nullptr && !inter->IsEmpty(); inter = next ) {
+				anInteraction *next = inter->entityNext;
 
 				// skip any lights that aren't currently visible
 				// this is run after any lights that are turned off have already

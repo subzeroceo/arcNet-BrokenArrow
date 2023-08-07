@@ -12,7 +12,7 @@
 //			so there is no need for unaligned loads and stores everywhere
 
 #ifdef _lint
-#undef ID_WIN_X86_SSE2_INTRIN
+#undef ARC_WIN_X86_SSE2_INTRIN
 #endif
 
 //lint -e438	// the non-SSE code isn't lint friendly, either
@@ -64,7 +64,7 @@ SIMD constants
 ================================================================================================
 */
 
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 
 static const __m128i vector_int_1							= _mm_set1_epi32( 1 );
 static const __m128i vector_int_4							= _mm_set1_epi32( 4 );
@@ -505,7 +505,7 @@ front bits:
   bit 5 = pos-Z is front facing
 ========================
 */
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 
 static int GetBoxFrontBits_SSE2( const __m128 & b0, const __m128 & b1, const __m128 & viewOrigin ) {
 	const __m128 dir0 = _mm_sub_ps( viewOrigin, b0 );
@@ -709,7 +709,7 @@ The result matrix will transform the unit-cube to exactly cover the bounds.
 void anGLMatrix::OffsetScaleForBounds( const anGLMatrix &src, const anBounds &bounds, anGLMatrix &out ) {
 	assert( &src != &out );
 
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	__m128 b0 = _mm_loadu_bounds_0( bounds );
 	__m128 b1 = _mm_loadu_bounds_1( bounds );
 
@@ -792,7 +792,7 @@ The result matrix will transform the bounds to exactly cover the unit-cube.
 void anGLMatrix::InverseOffsetScaleForBounds( const anGLMatrix & src, const anBounds & bounds, anGLMatrix & out ) {
 	assert( &src != &out );
 
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 
 	__m128 b0 = _mm_loadu_bounds_0( bounds );
 	__m128 b1 = _mm_loadu_bounds_1( bounds );
@@ -858,7 +858,7 @@ anGLMatrix::Transpose
 */
 void anGLMatrix::Transpose( const anGLMatrix & src, anGLMatrix & out ) {
 	assert( &src != &out );
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	const __m128 a0 = _mm_loadu_ps( src.m + 0*4 );
 	const __m128 a1 = _mm_loadu_ps( src.m + 1*4 );
 	const __m128 a2 = _mm_loadu_ps( src.m + 2*4 );
@@ -895,7 +895,7 @@ anGLMatrix::Multiply
 ========================
 */
 void anGLMatrix::Multiply( const anGLMatrix & a, const anGLMatrix & b, anGLMatrix & out ) {
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	__m128 a0 = _mm_loadu_ps( a.m + 0*4 );
 	__m128 a1 = _mm_loadu_ps( a.m + 1*4 );
 	__m128 a2 = _mm_loadu_ps( a.m + 2*4 );
@@ -979,7 +979,7 @@ can get really, really small.
 ========================
 */
 bool anGLMatrix::Inverse( const anGLMatrix & src, anGLMatrix & out ) {
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	const __m128 r0 = _mm_loadu_ps( src.m + 0 * 4 );
 	const __m128 r1 = _mm_loadu_ps( src.m + 1 * 4 );
 	const __m128 r2 = _mm_loadu_ps( src.m + 2 * 4 );
@@ -1282,7 +1282,7 @@ bool anGLMatrix::InverseByDoubles( const anGLMatrix & src, anGLMatrix & out ) {
 DeterminantIsNegative
 ========================
 */
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 void DeterminantIsNegative( bool & negativeDeterminant, const __m128 & r0, const __m128 & r1, const __m128 & r2, const __m128 & r3 ) {
 	const __m128 r1u1 = _mm_perm_ps( r1, _MM_SHUFFLE( 2, 1, 0, 3 ) );
 	const __m128 r1u2 = _mm_perm_ps( r1, _MM_SHUFFLE( 1, 0, 3, 2 ) );
@@ -1358,7 +1358,7 @@ void anGLMatrix::CopyMatrix( const anGLMatrix & matrix, anVec4 & row0, anVec4 & 
 	assert_16_byte_aligned( row2.ToFloatPtr() );
 	assert_16_byte_aligned( row3.ToFloatPtr() );
 
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	const __m128 r0 = _mm_loadu_ps( matrix.m + 0 * 4 );
 	const __m128 r1 = _mm_loadu_ps( matrix.m + 1 * 4 );
 	const __m128 r2 = _mm_loadu_ps( matrix.m + 2 * 4 );
@@ -1425,7 +1425,7 @@ static anVec3 LocalNearClipCenterFromMVP( const anGLMatrix & mvp ) {
 	return anVec3( x * invW, y * invW, z * invW );
 }
 
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 
 /*
 ========================
@@ -1672,7 +1672,7 @@ the given bounds in which case the projected bounds should be set to fully cover
 ========================
 */
 void anGLMatrix::ProjectedFullyClippedBounds( anBounds & projected, const anGLMatrix & mvp, const anBounds & bounds, bool windowSpace ) {
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	const __m128 mvp0 = _mm_loadu_ps( mvp[0] );
 	const __m128 mvp1 = _mm_loadu_ps( mvp[1] );
 	const __m128 mvp2 = _mm_loadu_ps( mvp[2] );
@@ -2036,7 +2036,7 @@ anGLMatrix::GetFrustumCorners
 void anGLMatrix::GetFrustumCorners( frustumCorners_t & corners, const anGLMatrix & frustumTransform, const anBounds & frustumBounds ) {
 	assert_16_byte_aligned( &corners );
 
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	__m128 mvp0 = _mm_loadu_ps( frustumTransform[0] );
 	__m128 mvp1 = _mm_loadu_ps( frustumTransform[1] );
 	__m128 mvp2 = _mm_loadu_ps( frustumTransform[2] );
@@ -2145,7 +2145,7 @@ anGLMatrix::CullFrustumCornersToPlane
 frustumCull_t anGLMatrix::CullFrustumCornersToPlane( const frustumCorners_t & corners, const anPlane & plane ) {
 	assert_16_byte_aligned( &corners );
 
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	__m128 vp = _mm_loadu_ps( plane.ToFloatPtr() );
 
 	__m128 x0 = _mm_load_ps( corners.x + 0 );

@@ -57,10 +57,10 @@ public:
 	void						SetStateFloat( const char *varName, const float value );
 
 								// Gets a gui state variable
-	const char*					GetStateString( const char *varName, const char* defaultString = "" ) const;
-	bool						GetStateBool( const char *varName, const char* defaultString = "0" ) const;
-	int							GetStateInt( const char *varName, const char* defaultString = "0" ) const;
-	float						GetStateFloat( const char *varName, const char* defaultString = "0" ) const;
+	const char*					GetStateString( const char *varName, const char *defaultString = "" ) const;
+	bool						GetStateBool( const char *varName, const char *defaultString = "0" ) const;
+	int							GetStateInt( const char *varName, const char *defaultString = "0" ) const;
+	float						GetStateFloat( const char *varName, const char *defaultString = "0" ) const;
 
 								// The state has changed and the gui needs to update from the state anDict.
 	void						StateChanged( int time, bool redraw = false );
@@ -101,8 +101,8 @@ public:
 	int							GetRefs() { return refs; }
 
 	void						RecurseSetKeyBindingNames( idWindow *window );
-	anString &					GetPendingCmd() { return pendingCmd; };
-	anString &					GetReturnCmd() { return returnCmd; };
+	anStr &					GetPendingCmd() { return pendingCmd; };
+	anStr &					GetReturnCmd() { return returnCmd; };
 private:
 	bool						active;
 	bool						loading;
@@ -113,10 +113,10 @@ private:
 	idWindow *					desktop;
 	idWindow *					bindHandler;
 
-	anString					source;
-	anString					activateStr;
-	anString					pendingCmd;
-	anString					returnCmd;
+	anStr					source;
+	anStr					activateStr;
+	anStr					pendingCmd;
+	anStr					returnCmd;
 	ARC_TIME_T					timeStamp;
 
 	float						cursorX;

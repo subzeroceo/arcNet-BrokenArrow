@@ -1,7 +1,7 @@
 #include "../Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -10,7 +10,7 @@ static char THIS_FILE[] = __FILE__;
 #include "../Atmosphere.h"
 #include "RainEffect.h"
 
-CLASS_DECLARATION( arcEntity, RainFX )
+CLASS_DECLARATION( anEntity, RainFX )
 END_CLASS
 
 /*

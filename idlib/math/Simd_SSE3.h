@@ -4,12 +4,12 @@
 /*
 ===============================================================================
 
-	SSE3 implementation of arcSIMDProcessor
+	SSE3 implementation of anSIMDProcessor
 
 ===============================================================================
 */
 
-class arcSIMD_SSE3 : public idSIMD_SSE2 {
+class anSIMD_SSE3 : public idSIMD_SSE2 {
 public:
 #if defined(MACOS_X) && defined(__i386__)
 	virtual const char *VPCALL GetName( void ) const;
@@ -17,7 +17,7 @@ public:
 #elif defined(_WIN32)
 	virtual const char *VPCALL GetName( void ) const;
 
-	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights );
+	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const anJointMat *joints, const anVec4 *weights, const int *index, const int numWeights );
 
 #endif
 };

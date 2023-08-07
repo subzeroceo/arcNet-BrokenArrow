@@ -79,7 +79,7 @@ public:
 	void SetPrimaryBufferFormat( dword dwPrimaryFreq, dword dwPrimaryBitRate, dword dwSpeakers );
 
     int Create( idWaveFile* pWaveFile, idAudioBuffer** ppiab );
-    int Create( idAudioBuffer** ppSound, const char* strWaveFileName, dword dwCreationFlags = 0 );
+    int Create( idAudioBuffer** ppSound, const char *strWaveFileName, dword dwCreationFlags = 0 );
     int CreateFromMemory( idAudioBufferWIN32** ppSound, byte* pbData, ulong ulDataSize, waveformatextensible_t *pwfx, dword dwCreationFlags = 0 );
 
 	bool Lock( void **pDSLockedBuffer, ulong *dwDSLockedBufferSize );
@@ -311,7 +311,7 @@ idAudioHardwareWIN32::Create
 ===============
 */
 int idAudioHardwareWIN32::Create( idAudioBuffer** ppSound,
-                               const char* strWaveFileName,
+                               const char *strWaveFileName,
 							   dword dwCreationFlags ) {
     int hr;
     LPDIRECTSOUNDBUFFER   apDSBuffer     = nullptr;
@@ -344,7 +344,7 @@ int idAudioHardwareWIN32::Create( idAudioBuffer** ppSound,
     dsbd.dwSize          = sizeof(DSBUFFERDESC);
     dsbd.dwFlags         = dwCreationFlags;
     dsbd.dwBufferBytes   = dwDSBufferSize;
-    dsbd.guid3DAlgorithm = GUID_NULL;
+    dsbd.guid3DAlgorithm = GUID_nullptr;
     dsbd.lpwfxFormat     = (WAVEFORMATEX*)&pWaveFile->mpwfx;
 
     // DirectSound is only guarenteed to play PCM data.  Other
@@ -400,7 +400,7 @@ int idAudioHardwareWIN32::Create( idWaveFile* pWaveFile, idAudioBuffer** ppiab )
     dsbd.dwSize          = sizeof(DSBUFFERDESC);
     dsbd.dwFlags         = 0;
     dsbd.dwBufferBytes   = dwDSBufferSize;
-    dsbd.guid3DAlgorithm = GUID_NULL;
+    dsbd.guid3DAlgorithm = GUID_nullptr;
     dsbd.lpwfxFormat     = (WAVEFORMATEX*)&pWaveFile->mpwfx;
 
     // DirectSound is only guarenteed to play PCM data.  Other
@@ -440,7 +440,7 @@ int idAudioHardwareWIN32::CreateFromMemory( idAudioBufferWIN32** ppSound,
 
     pWaveFile = new idWaveFile();
 
-    pWaveFile->OpenFromMemory( ( short *)pbData, ulDataSize, (waveformatextensible_t *)pwfx);
+    pWaveFile->OpenFromMemory( (short *)pbData, ulDataSize, (waveformatextensible_t *)pwfx);
 
 
     // Make the DirectSound buffer the same size as the wav file
@@ -454,7 +454,7 @@ int idAudioHardwareWIN32::CreateFromMemory( idAudioBufferWIN32** ppSound,
     dsbd.dwSize          = sizeof(DSBUFFERDESC);
     dsbd.dwFlags         = dwCreationFlags | DSBCAPS_GETCURRENTPOSITION2;
     dsbd.dwBufferBytes   = dwDSBufferSize;
-    dsbd.guid3DAlgorithm = GUID_NULL;
+    dsbd.guid3DAlgorithm = GUID_nullptr;
     dsbd.lpwfxFormat     = (WAVEFORMATEX *)pwfx;
 
     if ( FAILED( hr = m_pDS->CreateSoundBuffer( &dsbd, &apDSBuffer, nullptr ) ) )
@@ -561,7 +561,7 @@ idAudioBufferWIN32::idAudioBufferWIN32( LPDIRECTSOUNDBUFFER apDSBuffer, dword dw
 	if (pWaveFile) {
 	    FillBufferWithSound( m_apDSBuffer, false );
 
-		m_apDSBuffer->SetCurrentPosition(0);
+		m_apDSBuffer->SetCurrentPosition( 0 );
 	}
 }
 

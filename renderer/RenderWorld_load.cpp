@@ -430,7 +430,7 @@ bool anRenderWorldLocal::InitFromMap( const char *name ) {
 	}
 
 	// load it
-	anString filename = name;
+	anStr filename = name;
 	filename.SetFileExtension( PROC_FILE_EXT );
 
 	// if we are reloading the same map, check the timestamp
@@ -579,7 +579,7 @@ void anRenderWorldLocal::AddWorldModelEntities() {
 
 		for ( int j = 0; j < hModel->NumSurfaces(); j++ ) {
 			const modelSurface_t *surf = hModel->Surface( j );
-			if ( surf->shader->GetName() == anString( "textures/smf/portal_sky" ) ) {
+			if ( surf->shader->GetName() == anStr( "textures/smf/portal_sky" ) ) {
 				def->needsPortalSky = true;
 			}
 		}

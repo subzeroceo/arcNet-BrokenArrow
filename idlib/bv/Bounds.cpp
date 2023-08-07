@@ -392,7 +392,7 @@ is W=0 clipped.
 ========================
 */
 void anBounds::ProjectedBounds( anBounds & projected, const anGLMatrix & mvp, const anBounds & bounds, bool windowSpace ) {
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	__m128 mvp0 = _mm_loadu_ps( mvp[0] );
 	__m128 mvp1 = _mm_loadu_ps( mvp[1] );
 	__m128 mvp2 = _mm_loadu_ps( mvp[2] );
@@ -613,7 +613,7 @@ completely branchless SIMD.
 ========================
 */
 void anBounds::ProjectedNearClippedBounds( anBounds & projected, const anGLMatrix & mvp, const anBounds & bounds, bool windowSpace ) {
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	const __m128 mvp0 = _mm_loadu_ps( mvp[0] );
 	const __m128 mvp1 = _mm_loadu_ps( mvp[1] );
 	const __m128 mvp2 = _mm_loadu_ps( mvp[2] );
@@ -1181,7 +1181,7 @@ The given bounding box is not clipped to the MVP so the depth bounds may not be 
 ========================
 */
 void anGLMatrix::DepthBoundsForBounds( float & min, float & max, const anGLMatrix & mvp, const anBounds & bounds, bool windowSpace ) {
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	__m128 mvp2 = _mm_loadu_ps( mvp[2] );
 	__m128 mvp3 = _mm_loadu_ps( mvp[3] );
 
@@ -1300,7 +1300,7 @@ The extruded bounding box is not clipped to the MVP so the depth bounds may not 
 */
 void anGLMatrix::DepthBoundsForExtrudedBounds( float & min, float & max, const anGLMatrix & mvp, const anBounds & bounds, const anVec3 & extrudeDirection, const anPlane & clipPlane, bool windowSpace ) {
 	assert( anMath::Fabs( extrudeDirection * clipPlane.Normal() ) >= anMath::FLT_SMALLEST_NON_DENORMAL );
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
  	__m128 mvp2 = _mm_loadu_ps( mvp[2] );
 	__m128 mvp3 = _mm_loadu_ps( mvp[3] );
 
@@ -1522,7 +1522,7 @@ testing if the center of the far clipping plane is contained inside the shadow v
 ========================
 */
 void anGLMatrix::DepthBoundsForShadowBounds( float & min, float & max, const anGLMatrix & mvp, const anBounds & bounds, const anVec3 & localLightOrigin, bool windowSpace ) {
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 	const __m128 mvp0 = _mm_loadu_ps( mvp[0] );
 	const __m128 mvp1 = _mm_loadu_ps( mvp[1] );
 	const __m128 mvp2 = _mm_loadu_ps( mvp[2] );

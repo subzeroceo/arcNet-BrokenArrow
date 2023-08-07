@@ -63,17 +63,17 @@ const anMat3 &anRotation::ToMat3( void ) const {
 	wy = c * y2;
 	wz = c * z2;
 
-	axis[ 0 ][ 0 ] = 1.0f - ( yy + zz );
-	axis[ 0 ][ 1 ] = xy - wz;
-	axis[ 0 ][ 2 ] = xz + wy;
+	axis[0][0] = 1.0f - ( yy + zz );
+	axis[0][1] = xy - wz;
+	axis[0][2] = xz + wy;
 
-	axis[ 1 ][ 0 ] = xy + wz;
-	axis[ 1 ][ 1 ] = 1.0f - ( xx + zz );
-	axis[ 1 ][ 2 ] = yz - wx;
+	axis[1][0] = xy + wz;
+	axis[1][1] = 1.0f - ( xx + zz );
+	axis[1][2] = yz - wx;
 
-	axis[ 2 ][ 0 ] = xz - wy;
-	axis[ 2 ][ 1 ] = yz + wx;
-	axis[ 2 ][ 2 ] = 1.0f - ( xx + yy );
+	axis[2][0] = xz - wy;
+	axis[2][1] = yz + wx;
+	axis[2][2] = 1.0f - ( xx + yy );
 
 	axisValid = true;
 

@@ -43,7 +43,7 @@ static void R_EmptyLevelImage( anImage *image ) {
 	byte *data = (byte *)_alloca( c*4 );
 
 	for ( int i = 0 ; i < c ; i++ ) {
-		( ( int*)data )[i] = fillColor.intVal;
+		( (int *)data )[i] = fillColor.intVal;
 	}
 
 	// FIXME: this won't live past vid mode changes
@@ -56,7 +56,7 @@ InitFromMegaFile
 ====================
 */
 bool idMegaTexture::InitFromMegaFile( const char *fileBase ) {
-	anString	name = "megaTexture/";
+	anStr	name = "megaTexture/";
 	name += fileBase;
 	name.StripFileExtension();
 	name += ".mgat";
@@ -139,7 +139,7 @@ idMegaTextureFile *idMegaTextureFile::LoadMegaTextureFile( const char *name ) {
 		return nullptr;
 	}
 
-	megaTextureFile->fileHandle->Read( &megaTextureFile->header, sizeof (megaTextureFile->header ) );
+	megaTextureFile->fileHandle->Read( &megaTextureFile->header, sizeof( megaTextureFile->header ) );
 	if ( megaTextureFile->header.tileSize < 64 || megaTextureFile->header.tilesWide < 1 || megaTextureFile->header.tilesHigh < 1 ) {
 		common->Printf( "idMegaTexture: bad header on %s\n", name );
 		delete megaTextureFile;
@@ -155,7 +155,6 @@ idMegaTextureFile *idMegaTextureFile::LoadMegaTextureFile( const char *name ) {
 	memset( megaTextureFile->levels, 0, sizeof( levels ));
 	while ( 1 ) {
 		idTextureLevel *level = &megaTextureFile->levels[megaTextureFile->numLevels];
-
 		level->mega = megaTextureFile;
 		level->tileOffset = tileOffset;
 		level->tilesWide = width;
@@ -175,8 +174,8 @@ idMegaTextureFile *idMegaTextureFile::LoadMegaTextureFile( const char *name ) {
 		for ( int i = 0; i < 4; i++ ) {
 			fillColor.color[i] = colors[megaTextureFile->numLevels + 1][i];
 		}
-		// jmarshall - adapted to idTech 5 image code from BFG
-		idImageOpts opts;
+		// adapted to idTech 5 image code from BFG
+		anImageOpts opts;
 		opts.format = FMT_DXT5;
 		opts.colorFormat = CFM_DEFAULT;
 		opts.gammaMips = 0;
@@ -189,8 +188,8 @@ idMegaTextureFile *idMegaTextureFile::LoadMegaTextureFile( const char *name ) {
 
 		anTempArray<byte>data( MAX_LEVEL_WIDTH * MAX_LEVEL_WIDTH * 4 );
 
-		for ( inti = 0; i < MAX_LEVEL_WIDTH * MAX_LEVEL_WIDTH; i++ ) {
-			( ( int*)data.Ptr())[i] = fillColor.intVal;
+		for ( int i = 0; i < MAX_LEVEL_WIDTH * MAX_LEVEL_WIDTH; i++ ) {
+			( (int *)data.Ptr() )[i] = fillColor.intVal;
 		}
 
 		megaTextureFile->levels[megaTextureFile->numLevels].image = globalImages->ScratchImage( str, &opts, TF_LINEAR, TR_REPEAT, TD_DIFFUSE );
@@ -252,7 +251,6 @@ void idMegaTexture::SetMappingForSurface( const srfTriangles_t *tri ) {
 		anVec3	dir = axis[i].xyz - origin.xyz;
 		float texLen = axis[i].st[i] - origin.st[i];
 		float spaceLen = ( axis[i].xyz - origin.xyz ).Length();
-
 		float scale = texLen / ( spaceLen*spaceLen );
 		dir *= scale;
 
@@ -364,6 +362,7 @@ void idMegaTexture::SetViewOrigin( const anVec3 viewOrig ) {
 		levels[i].UpdateForCenter( texCenter );
 	}
 }
+
 /*
 ========================
 idMegaTextureFile::ReadTile
@@ -371,9 +370,8 @@ idMegaTextureFile::ReadTile
 */
 void idMegaTextureFile::ReadTile( byte *tileBuffer, int tileNum ) {
 	int tileSize = TILE_SIZE * TILE_SIZE;
-
 	fileHandle->Seek( tileNum * tileSize, FS_SEEK_SET );
-	//memset(data, 128, sizeof(data));
+	//memset(data, 128, sizeof ( data ) );
 	fileHandle->Read( tileBuffer, tileSize );
 }
 
@@ -410,7 +408,7 @@ void idTextureLevel::UpdateTile( int localX, int localY, int globalX, int global
 	tile->x = globalX;
 	tile->y = globalY;
 
-	byte data[ TILE_SIZE * TILE_SIZE * 4 ];
+	byte data[TILE_SIZE * TILE_SIZE * 4];
 
 	if ( globalX >= tilesWide || globalX < 0 || globalY >= tilesHigh || globalY < 0 ) {
 		// off the map
@@ -424,10 +422,13 @@ void idTextureLevel::UpdateTile( int localX, int localY, int globalX, int global
 		mega->fileHandle->Read( data, tileSize );
 		if ( idMegaTexture::r_showMegaTextureLabels.GetBool() ) {
 			// put a color marker in it
-			byte color[4] = { static_cast<byte>( 255 * localX / TILE_PER_LEVEL ), static_cast<byte>( 255 * localY / TILE_PER_LEVEL ), 0, 0};
+			byte color[4] = {
+			static_cast<byte>( 255 * localX / TILE_PER_LEVEL ),
+			static_cast<byte>( 255 * localY / TILE_PER_LEVEL ),
+			0, 0};
 			for ( int x = 0; x < 8; x++ ) {
 				for ( int y = 0; y < 8; y++ ) {
-					*( int*) & data[ ( ( y + TILE_SIZE / 2 - 4 ) * TILE_SIZE + x + TILE_SIZE / 2 - 4 ) * 4 ] = *( int*)color;
+					*(int *) & data[ ( ( y + TILE_SIZE / 2 - 4 ) * TILE_SIZE + x + TILE_SIZE / 2 - 4 ) * 4 ] = *(int *)color;
 				}
 			}
 		}
@@ -504,7 +505,7 @@ void idTextureLevel::UpdateTile( int localX, int localY, int globalX, int global
         byte color[4] = {255 * localX / TILE_PER_LEVEL, 255 * localY / TILE_PER_LEVEL, 0, 0};
         for ( intx = 0; x < 8; x++ ) {
             for ( inty = 0; y < 8; y++ ) {
-                *( int*)&data[((y + TILE_SIZE / 2 - 4) * TILE_SIZE + x + TILE_SIZE / 2 - 4) * 4] = *( int*)color;
+                *(int *)&data[((y + TILE_SIZE / 2 - 4) * TILE_SIZE + x + TILE_SIZE / 2 - 4) * 4] = *(int *)color;
             }
         }
     }
@@ -705,7 +706,7 @@ void idMegaTexture::GenerateMegaPreview( const char *fileName ) {
 		return;
 	}
 
-	anString	outName = fileName;
+	anStr	outName = fileName;
 	outName.StripFileExtension();
 	outName += "_preview.tga";
 
@@ -796,7 +797,7 @@ void idMegaTexture::MakeMegaTexture_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	anString name_s = "megaTexture/";
+	anStr name_s = "megaTexture/";
 	name_s += args.Argv( 1 );
 	name_s.StripFileExtension();
 	name_s += ".tga";
@@ -863,7 +864,7 @@ void idMegaTexture::MakeMegaTexture_f( const anCommandArgs &args ) {
 	mtHeader.tilesWide = RoundDownToPowerOfTwo( tgaHeader.width ) / TILE_SIZE;
 	mtHeader.tilesHigh = RoundDownToPowerOfTwo( tgaHeader.height ) / TILE_SIZE;
 
-	anString	outName = name;
+	anStr	outName = name;
 	outName.StripFileExtension();
 	outName += ".mgat";
 
@@ -1312,7 +1313,7 @@ float anHeightMap::GetHeight( const anVec3 &start, const anVec3 &end, const anHe
 anHeightMap::TracePoint
 ==============
 */
-float anHeightMap::TracePoint( const anVec3& start, const anVec3& end, anVec3& result, float heightOffset, const anHeightMapScaleData& scale ) const {
+float anHeightMap::TracePoint( const anVec3 &start, const anVec3 &end, anVec3 &result, float heightOffset, const anHeightMapScaleData& scale ) const {
 	result = end;
 	if ( data.Num() == 0 ) {
 		gameLocal.Warning( "[HeightMap::TracePoint] - no heightmap data!" );
@@ -1428,7 +1429,7 @@ float anHeightMap::TracePoint( const anVec3& start, const anVec3& end, anVec3& r
 	// TODO: Could optimize this a lot by using ints only in here
 	anVec3 testCoords = startCoords;
 	for ( int travelled = 0; travelled < fullDistance; travelled++ ) {
-		int intTestCoords[ 3 ];
+		int intTestCoords[3];
 		intTestCoords[0] = testCoords[0];
 		intTestCoords[1] = testCoords[1];
 
@@ -1486,7 +1487,7 @@ sdDeclHeightMap::~sdDeclHeightMap( void ) {
 sdDeclHeightMap::DefaultDefinition
 ================
 */
-const char* sdDeclHeightMap::DefaultDefinition( void ) const {
+const char *sdDeclHeightMap::DefaultDefinition( void ) const {
 	return		\
 		"{\n"	\
 		"}\n";
@@ -1557,7 +1558,7 @@ void sdDeclHeightMap::FreeData( void ) {
 sdDeclHeightMap::CacheFromDict
 ================
 */
-void sdDeclHeightMap::CacheFromDict( const anDict& dict ) {
+void sdDeclHeightMap::CacheFromDict( const anDict &dict ) {
 	const anKeyValue *kv;
 	kv = nullptr;
 	while( kv = dict.MatchPrefix( "hm_", kv ) ) {

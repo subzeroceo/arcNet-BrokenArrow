@@ -81,7 +81,7 @@ bool anDeclSkin::SetDefaultText() {
 	if ( declManager->FindType( DECL_MATERIAL, GetName(), false ) ) {
 		char generated[2048];
 
-		anString::snPrintf( generated, sizeof( generated ),
+		anStr::snPrintf( generated, sizeof( generated ),
 						"skin %s // IMPLICITLY GENERATED\n"
 						"{\n"
 						"_default %s\n"

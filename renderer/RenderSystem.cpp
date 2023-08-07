@@ -286,7 +286,7 @@ void R_LockSurfaceScene( viewDef_t *parms ) {
 	// update the view origin and axis, and all
 	// the entity matricies
 	for ( vModel = tr.lockSurfacesCmd.viewDef->viewEntitys; vModel; vModel = vModel->next ) {
-		GL_MultMatrix( vModel->modelMatrix,
+		GL_MultMatrixAligned( vModel->modelMatrix,
 			tr.lockSurfacesCmd.viewDef->worldSpace.modelViewMatrix,
 			vModel->modelViewMatrix );
 	}
@@ -612,18 +612,18 @@ Coordinates are at 640 by 480 virtual resolution
 void anRenderSystemLocal::DrawSmallStringExt( int x, int y, const char *string, const anVec4 &setColor, bool forceColor, const anMaterial *material ) {
 	//const anMaterial	*mtlOveride = nullptr;
 	// draw the colored text
-	const unsigned char *s = ( const unsigned char* )string;
+	const unsigned char *s = ( const unsigned char *)string;
 	int xx = x;
 
 	SetColor( setColor );
 
 	while ( *s ) {
-		if ( anString::IsColor( ( const char* )s ) ) {
+		if ( anStr::IsColor( ( const char *)s ) ) {
 			if ( !forceColor ) {
 				if ( *( s+1 ) == C_COLOR_DEFAULT ) {
 					SetColor( setColor );
 				} else {
-					color = anString::ColorForIndex( *( s+1 ) );
+					color = anStr::ColorForIndex( *( s+1 ) );
 					anVec4 color[3] = setColor[3];
 					SetColor( color );
 				}
@@ -684,12 +684,12 @@ void anRenderSystemLocal::DrawBigStringExt( int x, int y, const char *string, co
 	int xx = x;
 	SetColor( setColor );
 	while ( *s ) {
-		if ( anString::IsColor( s ) ) {
+		if ( anStr::IsColor( s ) ) {
 			if ( !forceColor ) {
 				if ( *( s+1 ) == C_COLOR_DEFAULT ) {
 					SetColor( setColor );
 				} else {
-					anVec4 color = anString::ColorForIndex( *( s+1 ) );
+					anVec4 color = anStr::ColorForIndex( *( s+1 ) );
 					color[3] = setColor[3];
 					SetColor( color );
 				}
@@ -787,25 +787,25 @@ void anRenderSystemLocal::SetBackEndRenderer() {
 
 	backEndRenderer = BE_BAD;
 
-	if ( anString::Icmp( r_renderer.GetString(), "arb" ) == 0 ) {
+	if ( anStr::Icmp( r_renderer.GetString(), "arb" ) == 0 ) {
 		backEndRenderer = BE_ARB;
-	} else if ( anString::Icmp( r_renderer.GetString(), "arb2" ) == 0 ) {
+	} else if ( anStr::Icmp( r_renderer.GetString(), "arb2" ) == 0 ) {
 		if ( qglConfig.ARB2Path ) {
 			backEndRenderer = BE_ARB2;
 		}
-	} else if ( anString::Icmp( r_renderer.GetString(), "nv10" ) == 0 ) {
+	} else if ( anStr::Icmp( r_renderer.GetString(), "nv10" ) == 0 ) {
 		if ( qglConfig.NV10Path ) {
 			backEndRenderer = BE_NV10;
 		}
-	} else if ( anString::Icmp( r_renderer.GetString(), "nv20" ) == 0 ) {
+	} else if ( anStr::Icmp( r_renderer.GetString(), "nv20" ) == 0 ) {
 		if ( qglConfig.NV20Path ) {
 			backEndRenderer = BE_NV20;
 		}
-	} else if ( anString::Icmp( r_renderer.GetString(), "r200" ) == 0 ) {
+	} else if ( anStr::Icmp( r_renderer.GetString(), "r200" ) == 0 ) {
 		if ( qglConfig.R200Path ) {
 			backEndRenderer = BE_R200;
 		}
-	} else if ( anString::Icmp( r_renderer.GetString(), "GL_4_6" ) == 0 ) {
+	} else if ( anStr::Icmp( r_renderer.GetString(), "GL_4_6" ) == 0 ) {
 		if ( qglConfig.ARB_GLARBpath ) {
 			backEndRenderer = BE_GLARB;
 		}

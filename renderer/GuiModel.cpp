@@ -82,7 +82,7 @@ EmitToCurrentView
 void anInteractiveGuiModel::EmitToCurrentView( float modelMatrix[16], bool depthHack ) {
 	float	modelViewMatrix[16];
 
-	GL_MultMatrix( modelMatrix, tr.viewDef->worldSpace.modelViewMatrix, modelViewMatrix );
+	GL_MultMatrixAligned( modelMatrix, tr.viewDef->worldSpace.modelViewMatrix, modelViewMatrix );
 
 	for ( int i = 0; i < surfaces.Num(); i++ ) {
 		EmitSurface( &surfaces[i], modelMatrix, modelViewMatrix, depthHack );

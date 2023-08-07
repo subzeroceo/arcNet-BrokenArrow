@@ -1,7 +1,4 @@
-// Copyright (C) 2007 Id Software, Inc.
-//
-
-#include "../Lib.h"
+#include "..//../idlib/Lib.h"
 #pragma hdrstop
 
 #include "Anim_FrameCommands.h"
@@ -57,7 +54,7 @@ void sdAnimFrameCommand::Shutdown( void ) {
 sdAnimFrameCommand::Alloc
 ============
 */
-sdAnimFrameCommand*	sdAnimFrameCommand::Alloc( const char* typeName ) {
+sdAnimFrameCommand*	sdAnimFrameCommand::Alloc( const char *typeName ) {
 	return frameCommandFactory.CreateType( typeName );
 }
 
@@ -96,8 +93,6 @@ void sdAnimFrameCommand_ScriptFunction::Run( anClass* ent ) const {
 	gameLocal.CallFrameCommand( gameLocal.program->FindFunction( functionName ) );
 }
 
-
-
 /*
 ===============================================================================
 
@@ -133,7 +128,6 @@ void sdAnimFrameCommand_ScriptObjectFunction::Run( anClass* ent ) const {
 	gameLocal.CallObjectFrameCommand( ent->GetScriptObject(), functionName, false );
 }
 
-
 /*
 ===============================================================================
 
@@ -154,7 +148,7 @@ bool sdAnimFrameCommand_Event::Init( anParser& src ) {
 		return false;
 	}
 
-	ev = arcEventDef::FindEvent( token );
+	ev = anEventDef::FindEvent( token );
 	if ( !ev ) {
 		src.Error( "sdAnimFrameCommand_Event::Init Event '%s' not found", token.c_str() );
 		return false;
@@ -178,7 +172,6 @@ void sdAnimFrameCommand_Event::Run( anClass* ent ) const {
 	}
 	ent->ProcessEvent( ev );
 }
-
 
 /*
 ===============================================================================
@@ -229,14 +222,13 @@ sdAnimFrameCommand_Sound::Run
 ============
 */
 void sdAnimFrameCommand_Sound::Run( anClass* ent ) const {
-	arcEntity* entity = ent->Cast< arcEntity >();
+	anEntity *entity = ent->Cast< anEntity >();
 	if ( entity ) {
 		entity->StartSound( soundName, soundChannel, 0, nullptr );
 	} else {
 		gameLocal.Warning( "sdAnimFrameCommand_Sound::Run Not Currently Supported on Client Entities" );
 	}
 }
-
 
 /*
 ===============================================================================
@@ -285,7 +277,6 @@ bool sdAnimFrameCommand_Fade::Init( anParser& src ) {
 	}
 
 	over = token.GetFloatValue();
-
 	return true;
 }
 
@@ -295,7 +286,7 @@ sdAnimFrameCommand_Fade::Run
 ============
 */
 void sdAnimFrameCommand_Fade::Run( anClass* ent ) const {
-	arcEntity* entity = ent->Cast< arcEntity >();
+	anEntity *entity = ent->Cast< anEntity >();
 	if ( entity ) {
 		entity->FadeSound( soundChannel, to, over );
 	} else {
@@ -393,21 +384,13 @@ void sdAnimFrameCommand_Effect::Run( anClass* ent ) const {
 		return;
 	}
 
-	arcEntity *entity = ent->Cast< arcEntity >();
+	anEntity *entity = ent->Cast< anEntity >();
 	if ( entity ) {
 		jointHandle_t handle = entity->GetAnimator()->GetJointHandle( jointName );
 		if ( handle == INVALID_JOINT ) {
 			gameLocal.Warning( "sdAnimFrameCommand_Effect::Run Invalid Joint %s", jointName.c_str() );
 			return;
 		}
-		entity->PlayEffect( effectName, colorWhite.ToVec3(), nullptr, handle );
-		return;
-	}
-
-	rvClientEntity* clientEnt = ent->Cast< rvClientEntity >();
-	if ( clientEnt ) {
-		arcAnimator* clientAnimator = clientEnt->GetAnimator();
-		clientEnt->PlayEffect( effectName, colorWhite.ToVec3(), nullptr, clientAnimator ? clientAnimator->GetJointHandle( jointName ) : INVALID_JOINT );
 		return;
 	}
 }
@@ -449,7 +432,7 @@ sdAnimFrameCommand_FootStep::Run
 ============
 */
 void sdAnimFrameCommand_FootStep::Run( anClass* ent ) const {
-	arcNetBasePlayer* player = ent->Cast< arcNetBasePlayer >();
+	anBasePlayer* player = ent->Cast< anBasePlayer >();
 	if ( player == nullptr ) {
 		gameLocal.Warning( "sdAnimFrameCommand_FootStep::Run: Invalid Entity" );
 		return;
@@ -531,7 +514,7 @@ sdAnimFrameCommand_WeaponState::Run
 ============
 */
 void sdAnimFrameCommand_WeaponState::Run( anClass* ent ) const {
-	arcNetBasePlayer* player = ent->Cast< arcNetBasePlayer >();
+	anBasePlayer* player = ent->Cast< anBasePlayer >();
 	if ( !player ) {
 		gameLocal.Warning( "FrameCommand 'weaponState' on entity '%s' is only supported for players.", ent->GetName() );
 		return;
@@ -551,7 +534,7 @@ void sdAnimFrameCommand_WeaponState::Run( anClass* ent ) const {
 	}
 
 	if ( g_debugFrameCommands.GetBool() ) {
-		if ( !anString::Length( g_debugFrameCommandsFilter.GetString()) || anString::FindText( GetTypeName(), g_debugFrameCommandsFilter.GetString(), false ) != anString::INVALID_POSITION )  {
+		if ( !anStr::Length( g_debugFrameCommandsFilter.GetString()) || anStr::FindText( GetTypeName(), g_debugFrameCommandsFilter.GetString(), false ) != anStr::INVALID_POSITION )  {
 			gameLocal.Printf( "Command '%s': state '%s'\n", GetTypeName(), command.c_str() );
 		}
 	}

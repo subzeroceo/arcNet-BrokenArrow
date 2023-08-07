@@ -513,7 +513,7 @@ anSAAI::SetAAS
 =====================
 */
 void anSAAI::SetAAS( void ) {
-	anString use_aas;
+	anStr use_aas;
 
 	spawnArgs.GetString( "use_aas", nullptr, use_aas );
 	if ( !use_aas || !use_aas[0] ) {
@@ -739,7 +739,7 @@ float anSAAI::TravelDistance ( anEntity *ent ) const {
 	return TravelDistance ( physicsObj.GetOrigin(), ent->GetPhysics()->GetOrigin() );
 }
 
-float anSAAI::TravelDistance( anEntity* start, anEntity* end ) const {
+float anSAAI::TravelDistance( anEntity *start, anEntity *end ) const {
 	assert( start );
 	assert( end );
 	return TravelDistance( start->GetPhysics()->GetOrigin(), end->GetPhysics()->GetOrigin() );
@@ -754,7 +754,7 @@ float anSAAI::TravelDistance( const anVec3 &pos ) const {
 anSAAI::ScriptedPlaybackMove
 ============
 */
-void anSAAI::ScriptedPlaybackMove ( const char* playback, int flags, int numFrames ) {
+void anSAAI::ScriptedPlaybackMove ( const char *playback, int flags, int numFrames ) {
 	// Start the scripted sequence
 	if ( !ScriptedBegin ( false ) ) {
 		return;
@@ -843,7 +843,7 @@ anSAAI::StartMove
 Initialize a new movement by setting up the movement structure
 =====================
 */
-bool anSAAI::StartMove ( aiMoveCommand_t command, const anVec3& goalOrigin, int goalArea, anEntity* goalEntity, seasFeature_t* feature, float range ) {
+bool anSAAI::StartMove ( aiMoveCommand_t command, const anVec3 &goalOrigin, int goalArea, anEntity *goalEntity, seasFeature_t* feature, float range ) {
 	// If we are already there then we are done
 	if ( ReachedPos( goalOrigin, command ) ) {
 		StopMove( MOVE_STATUS_DONE );
@@ -1278,7 +1278,7 @@ bool anSAAI::MoveToHide ( void ) {
 		return false;
 	}
 
-	const anVec3& org  = physicsObj.GetOrigin();
+	const anVec3 &org  = physicsObj.GetOrigin();
 	obstacle.absBounds = enemy.ent->GetPhysics()->GetAbsBounds();
 	pos				   = LastKnownPosition ( enemy.ent );
 
@@ -1335,7 +1335,7 @@ bool anSAAI::WanderAround( void ) {
 
 	StopMove( MOVE_STATUS_DONE );
 
-	dest = physicsObj.GetOrigin() + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 256.0f;
+	dest = physicsObj.GetOrigin() + viewAxis[0] * physicsObj.GetGravityAxis() * 256.0f;
 	if ( !NewWanderDir( dest ) ) {
 		StopMove( MOVE_STATUS_DEST_UNREACHABLE );
 		move.fl.goalUnreachable = true;
@@ -1414,7 +1414,7 @@ anSAAI::NewWanderDir
 */
 bool anSAAI::NewWanderDir( const anVec3 &dest ) {
 	float	deltax, deltay;
-	float	d[ 3 ];
+	float	d[3];
 	float	tdir, olddir, turnaround;
 
 	move.nextWanderTime = gameLocal.time + ( gameLocal.random.RandomFloat() * 500 + 500 );
@@ -1426,27 +1426,27 @@ bool anSAAI::NewWanderDir( const anVec3 &dest ) {
 	deltax = dest.x - org.x;
 	deltay = dest.y - org.y;
 	if ( deltax > 10 ) {
-		d[ 1 ]= 0;
+		d[1]= 0;
 	} else if ( deltax < -10 ) {
-		d[ 1 ] = 180;
+		d[1] = 180;
 	} else {
-		d[ 1 ] = DI_NODIR;
+		d[1] = DI_NODIR;
 	}
 
 	if ( deltay < -10 ) {
-		d[ 2 ] = 270;
+		d[2] = 270;
 	} else if ( deltay > 10 ) {
-		d[ 2 ] = 90;
+		d[2] = 90;
 	} else {
-		d[ 2 ] = DI_NODIR;
+		d[2] = DI_NODIR;
 	}
 
 	// try direct route
-	if ( d[ 1 ] != DI_NODIR && d[ 2 ] != DI_NODIR ) {
-		if ( d[ 1 ] == 0 ) {
-			tdir = d[ 2 ] == 90 ? 45 : 315;
+	if ( d[1] != DI_NODIR && d[2] != DI_NODIR ) {
+		if ( d[1] == 0 ) {
+			tdir = d[2] == 90 ? 45 : 315;
 		} else {
-			tdir = d[ 2 ] == 90 ? 135 : 215;
+			tdir = d[2] == 90 ? 135 : 215;
 		}
 
 		if ( tdir != turnaround && StepDirection( tdir ) ) {
@@ -1456,16 +1456,16 @@ bool anSAAI::NewWanderDir( const anVec3 &dest ) {
 
 	// try other directions
 	if ( ( gameLocal.random.RandomInt() & 1 ) || abs( deltay ) > abs( deltax ) ) {
-		tdir = d[ 1 ];
-		d[ 1 ] = d[ 2 ];
-		d[ 2 ] = tdir;
+		tdir = d[1];
+		d[1] = d[2];
+		d[2] = tdir;
 	}
 
-	if ( d[ 1 ] != DI_NODIR && d[ 1 ] != turnaround && StepDirection( d[1] ) ) {
+	if ( d[1] != DI_NODIR && d[1] != turnaround && StepDirection( d[1] ) ) {
 		return true;
 	}
 
-	if ( d[ 2 ] != DI_NODIR && d[ 2 ] != turnaround	&& StepDirection( d[ 2 ] ) ) {
+	if ( d[2] != DI_NODIR && d[2] != turnaround	&& StepDirection( d[2] ) ) {
 		return true;
 	}
 
@@ -1570,7 +1570,7 @@ bool anSAAI::GetMovePos( anVec3 &seekPos, anReachability** seekReach ) {
 	result = false;
 
 	if ( move.moveCommand == MOVE_WANDER ) {
-		move.moveDest = org + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 256.0f;
+		move.moveDest = org + viewAxis[0] * physicsObj.GetGravityAxis() * 256.0f;
 	} else {
 		if ( ReachedPos( move.moveDest, move.moveCommand, move.range ) ) {
 			StopMove( MOVE_STATUS_DONE );
@@ -1735,7 +1735,7 @@ bool anSAAI::TurnTowardLeader( bool faceLeaderByDefault ) {
 		}
 	}
 	gameLocal.TracePoint( this, tr, start, end, MASK_OPAQUE, this );
-	anEntity* traceEnt = gameLocal.entities[ tr.c.entityNum ];
+	anEntity *traceEnt = gameLocal.entities[ tr.c.entityNum ];
 	if ( tr.fraction < 1.0f
 		&& (tr.fraction<0.5f||!traceEnt||!traceEnt->IsType(idDoor::GetClassType())) ) {
 		//wall there - NOTE: okay to look at doors
@@ -1855,7 +1855,7 @@ void anSAAI::Turn( void ) {
 
 		// get the total rotation from the start of the anim
 		animator.GetDeltaRotation( 0, gameLocal.time, rotateAxis );
-		move.current_yaw = anMath::AngleNormalize180( move.anim_turn_yaw + rotateAxis[ 0 ].ToYaw() );
+		move.current_yaw = anMath::AngleNormalize180( move.anim_turn_yaw + rotateAxis[0].ToYaw() );
 	} else {
 		diff = anMath::AngleNormalize180( move.ideal_yaw - move.current_yaw );
 
@@ -2251,14 +2251,14 @@ void anSAAI::AdjustFlyingAngles( void ) {
 		roll = 0.0f;
 		pitch = 0.0f;
 	} else {
-		roll = vel * viewAxis[ 1 ] * -move.fly_roll_scale / move.fly_speed;
+		roll = vel * viewAxis[1] * -move.fly_roll_scale / move.fly_speed;
 		if ( roll > move.fly_roll_max ) {
 			roll = move.fly_roll_max;
 		} else if ( roll < -move.fly_roll_max ) {
 			roll = -move.fly_roll_max;
 		}
 
-		pitch = vel * viewAxis[ 0 ] * -move.fly_pitch_scale / move.fly_speed;
+		pitch = vel * viewAxis[0] * -move.fly_pitch_scale / move.fly_speed;
 		if ( pitch > move.fly_pitch_max ) {
 			pitch = move.fly_pitch_max;
 		} else if ( pitch < -move.fly_pitch_max ) {
@@ -2287,7 +2287,7 @@ void anSAAI::AddFlyBob( anVec3 &vel ) {
 
 	if ( move.fly_bob_strength ) {
 		t = MS2SEC( gameLocal.time + entityNumber * 497 );
-		fly_bob_add = ( viewAxis[ 1 ] * anMath::Sin16( t * move.fly_bob_horz ) + viewAxis[ 2 ] * anMath::Sin16( t * move.fly_bob_vert ) ) * move.fly_bob_strength;
+		fly_bob_add = ( viewAxis[1] * anMath::Sin16( t * move.fly_bob_horz ) + viewAxis[2] * anMath::Sin16( t * move.fly_bob_vert ) ) * move.fly_bob_strength;
 		vel += fly_bob_add * MS2SEC( gameLocal.msec );
 		if ( DebugFilter(ai_debugMove) ) { // FlyBob
 			const anVec3 &origin = physicsObj.GetOrigin();
@@ -2543,7 +2543,7 @@ void anSAAI::FlyMove( void ) {
 	monsterMoveResult_t	moveResult = physicsObj.GetMoveResult();
 	anEntity *blockEnt = physicsObj.GetSlideMoveEntity();
 	if ( blockEnt && blockEnt->IsType( idMoveable::GetClassType() ) && blockEnt->GetPhysics()->IsPushable() ) {
-		KickObstacles( viewAxis[ 0 ], move.kickForce, blockEnt );
+		KickObstacles( viewAxis[0], move.kickForce, blockEnt );
 	} else if ( moveResult == MM_BLOCKED ) {
 		move.blockTime = gameLocal.time + 500;
 		move.fl.blocked = true;
@@ -2560,7 +2560,7 @@ void anSAAI::FlyMove( void ) {
 		gameRenderWorld->DebugBounds( colorMagenta, physicsObj.GetBounds(), move.moveDest, gameLocal.msec );
 		gameRenderWorld->DebugLine( colorRed, org, org + physicsObj.GetLinearVelocity(), gameLocal.msec, true );
 		gameRenderWorld->DebugLine( colorBlue, org, move.seekPos, gameLocal.msec, true );
-		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
+		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[0] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
 		DrawRoute();
 	}
 }
@@ -2587,7 +2587,7 @@ void anSAAI::UpdatePlayback ( anVec3 &goalPos, anVec3 &delta, anVec3 &oldorigin,
 
 	// Keep the yaw updated
 	anVec3 local_dir;
-	physicsObj.GetGravityAxis().ProjectVector( viewAxis[ 0 ], local_dir );
+	physicsObj.GetGravityAxis().ProjectVector( viewAxis[0], local_dir );
 	move.current_yaw		= local_dir.ToYaw();
 	move.ideal_yaw		= anMath::AngleNormalize180( move.current_yaw );
 
@@ -2635,7 +2635,7 @@ void anSAAI::PlaybackMove( void ){
 
 	if ( blockEnt && blockEnt->IsType( idMoveable::GetClassType() ) && blockEnt->GetPhysics()->IsPushable() ) {
 
-		KickObstacles( viewAxis[ 0 ], move.kickForce, blockEnt );
+		KickObstacles( viewAxis[0], move.kickForce, blockEnt );
 	} else {
 		move.fl.blocked = true;
 	}
@@ -2652,7 +2652,7 @@ void anSAAI::PlaybackMove( void ){
 	if ( DebugFilter(ai_debugMove) ) { // Playback Move
 		gameRenderWorld->DebugBounds( colorMagenta, physicsObj.GetBounds(), org );
 		gameRenderWorld->DebugBounds( colorMagenta, physicsObj.GetBounds(), move.moveDest );
-		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
+		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[0] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
 		DrawRoute();
 	}
 }
@@ -2663,7 +2663,7 @@ anSAAI::StaticMove
 =====================
 */
 void anSAAI::StaticMove( void ) {
-	anEntity* enemyEnt = enemy.ent;
+	anEntity *enemyEnt = enemy.ent;
 
 	if ( aifl.dead ) {
 		return;
@@ -2687,7 +2687,7 @@ void anSAAI::StaticMove( void ) {
 		const anVec3 &org = physicsObj.GetOrigin();
 		gameRenderWorld->DebugBounds( colorMagenta, physicsObj.GetBounds(), org, gameLocal.msec );
 		gameRenderWorld->DebugLine( colorBlue, org, move.moveDest, gameLocal.msec, true );
-		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
+		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[0] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
 	}
 }
 
@@ -2783,7 +2783,7 @@ void anSAAI::SlideMove( void ) {
 
 	if ( blockEnt && blockEnt->IsType( idMoveable::GetClassType() ) && blockEnt->GetPhysics()->IsPushable() ) {
 
-		KickObstacles( viewAxis[ 0 ], move.kickForce, blockEnt );
+		KickObstacles( viewAxis[0], move.kickForce, blockEnt );
 	}
 
 	BlockedFailSafe();
@@ -2798,7 +2798,7 @@ void anSAAI::SlideMove( void ) {
 	if ( DebugFilter(ai_debugMove) ) { // SlideMove
 		gameRenderWorld->DebugBounds( colorMagenta, physicsObj.GetBounds(), org, gameLocal.msec );
 		gameRenderWorld->DebugBounds( colorMagenta, physicsObj.GetBounds(), move.moveDest, gameLocal.msec );
-		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[ 0 ] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
+		gameRenderWorld->DebugLine( colorYellow, GetEyePosition(), GetEyePosition() + viewAxis[0] * physicsObj.GetGravityAxis() * 16.0f, gameLocal.msec, true );
 		DrawRoute();
 	}
 }
@@ -2909,14 +2909,14 @@ void anSAAI::AnimMove( void ) {
 
 	if ( blockEnt && blockEnt->IsType( idMoveable::GetClassType() ) && blockEnt->GetPhysics()->IsPushable() ) {
 
-		KickObstacles( viewAxis[ 0 ], move.kickForce, blockEnt );
+		KickObstacles( viewAxis[0], move.kickForce, blockEnt );
 	}
 
 	BlockedFailSafe();
 
 	move.fl.onGround = physicsObj.OnGround();
 
-	const anVec3& org = physicsObj.GetOrigin();
+	const anVec3 &org = physicsObj.GetOrigin();
 	if ( oldorigin != org ) {
 		TouchTriggers();
 	}
@@ -2964,7 +2964,7 @@ const float		REACHED_RADIUS_SQUARE	= REACHED_RADIUS*REACHED_RADIUS;
 LineIntersection2D
 =====================
 */
-bool  LineIntersection2D(const anVec3& A, const anVec3& B, const anVec3& C, const anVec3& D, anVec3& contactPoint) {
+bool  LineIntersection2D(const anVec3 &A, const anVec3 &B, const anVec3 &C, const anVec3 &D, anVec3 &contactPoint) {
 
 	// Test If Parallel
 	//------------------
@@ -3059,10 +3059,10 @@ struct rvWindingBox {
 	LineIntersection
 	=====================
 	*/
-	bool  LineIntersection(const anVec3& start, const anVec3& end, anVec3& contactPoint, int& v1, int& v2) const  {
+	bool  LineIntersection(const anVec3 &start, const anVec3 &end, anVec3 &contactPoint, int& v1, int& v2) const  {
 		for ( int i=0; i<4; i++ ) {
 			v1 = i;
-			v2 = (i<3)?(i+1):(0);
+			v2 = (i<3)?(i+1):( 0 );
 
 			if ( start.IsLeftOf(verts[v1], verts[v2]) && LineIntersection2D( start, end, verts[v1], verts[v2], contactPoint)) {
 				return true;
@@ -3076,10 +3076,10 @@ struct rvWindingBox {
 	PointInside
 	=====================
 	*/
-	bool PointInside(const anVec3& point) const {
+	bool PointInside(const anVec3 &point) const {
 		for ( int i=0; i<4; i++ ) {
-			const anVec3& vert1 = verts[i];
-			const anVec3& vert2 = verts[(i<3)?(i+1):(0)];
+			const anVec3 &vert1 = verts[i];
+			const anVec3 &vert2 = verts[(i<3)?(i+1):( 0 )];
 
 			if (point.IsLeftOf(vert1, vert2)) {
 				return false;
@@ -3095,8 +3095,8 @@ struct rvWindingBox {
 	*/
 	bool DrawDebugGraphics() const  {
 		for ( int i=0; i<4; i++ ) {
-			const anVec3& vert1 = verts[i];
-			const anVec3& vert2 = verts[(i<3)?(i+1):(0)];
+			const anVec3 &vert1 = verts[i];
+			const anVec3 &vert2 = verts[(i<3)?(i+1):( 0 )];
 
 			gameRenderWorld->DebugLine(colorYellow, vert1, vert2, gameLocal.msec);
 			if ( !areas[i] || obstacles[i]) {
@@ -3154,7 +3154,7 @@ struct rvObstacle {
 	Initialize
 	============
 	*/
-	void Initialize(anEntity* ent) {
+	void Initialize(anEntity *ent) {
 		entity			= ent;
 		origin			= vec3_zero;
 		originFuture	= vec3_zero;
@@ -3247,7 +3247,7 @@ struct rvObstacle {
 	PointInsideArea
 	============
 	*/
-	bool PointInsideArea( const anVec3& point, seasArea_t* area ) {
+	bool PointInsideArea( const anVec3 &point, seasArea_t* area ) {
 		int i, faceNum;
 
 		for ( i = 0; i < area->numFaces; i++ ) {
@@ -3323,7 +3323,7 @@ struct rvObstacle {
 
 
 		pendingUpdate = false;
-		anEntity* ent = entity.GetEntity();
+		anEntity *ent = entity.GetEntity();
 		if ( !ent || ent->health<=0 || ent->fl.hidden || !ent->GetPhysics()) {
 			RemoveMarkers();
 			return false;	// Means This Obstacle Structure Should Be Retired
@@ -3393,7 +3393,7 @@ struct rvObstacle {
 			// Setup Each Vertex On The Winding
 			//----------------------------------
 			for (v=0; v<4; v++ ) {
-				const anVec3& myVertex = myWinding->verts[v];
+				const anVec3 &myVertex = myWinding->verts[v];
 
 				myWinding->areas[v] = nullptr;
 				for (a=0; a<areas.Num(); a++ ) {
@@ -3453,7 +3453,7 @@ struct rvObstacle {
 	VertexValid
 	=====================
 	*/
-	static bool VertexValid(const rvWindingBox& bounds, int v, const seasArea_t* inArea, const anEntity* ignore)  {
+	static bool VertexValid(const rvWindingBox& bounds, int v, const seasArea_t* inArea, const anEntity *ignore)  {
 		return (bounds.areas[v] && (bounds.obstacles[v]== nullptr || bounds.obstacles[v]->entity.GetEntity()==ignore));
 	}
 
@@ -3466,7 +3466,7 @@ struct rvObstacle {
  		if ((gameLocal.time - lastTimeMoved) < time) {
 			return true;
 		}
-	//	anEntity* ent = entity.GetEntity();
+	//	anEntity *ent = entity.GetEntity();
 	//	if (ent && ent->IsType(anSAAI::GetClassType())) {
 	//		return !((anSAAI*)ent)->move.fl.done;
 	//	}
@@ -3581,7 +3581,7 @@ struct rvObstacleFinder {
 	MarkEntityForUpdate
 	============
 	*/
-	void MarkEntityForUpdate(anEntity* ent) {
+	void MarkEntityForUpdate(anEntity *ent) {
 
 		// Ignore Non Physics Entities
 		//-----------------------------
@@ -3617,7 +3617,7 @@ struct rvObstacleFinder {
 	RecordContact
 	============
 	*/
-	void RecordContact(float maxDistance, const anVec3& start, rvObstacle* obstacle, const anVec3& point, int vert1=-1, int vert2=-1) {
+	void RecordContact(float maxDistance, const anVec3 &start, rvObstacle* obstacle, const anVec3 &point, int vert1=-1, int vert2=-1) {
 		static float distance;
 		distance = point.DistXY( start);
 		if ((maxDistance==0.0f || distance<maxDistance) && (contact.distance > distance || !contact.obstacle)) {
@@ -3634,7 +3634,7 @@ struct rvObstacleFinder {
 	RayTrace
 	============
 	*/
-	bool RayTrace(float maxDistance, const seasArea_t* area, const anVec3& start, const anVec3& stop, int aasNum, const anEntity* ignore1, const anEntity* ignore2=nullptr, const anEntity* ignore3=nullptr ) {
+	bool RayTrace(float maxDistance, const seasArea_t* area, const anVec3 &start, const anVec3 &stop, int aasNum, const anEntity *ignore1, const anEntity *ignore2=nullptr, const anEntity *ignore3=nullptr ) {
 		static anMarker*	marker;
 		static anVec3		p;
 		static int			v1;
@@ -3843,7 +3843,7 @@ public:
 	XYLineIntersection
 	=====================
 	*/
-	bool  XYLineIntersection(const anVec3& A, const anVec3& B, const anVec3& C, const anVec3& D, anVec3& P) {
+	bool  XYLineIntersection(const anVec3 &A, const anVec3 &B, const anVec3 &C, const anVec3 &D, anVec3 &P) {
 		float q = (((B.x-A.x)*(D.y-C.y))-((B.y-A.y)*(D.x-C.x)));
 		if (fabsf(q)>0.01f) {
 			float s = (((A.y-C.y)*(B.x-A.x))-((A.x-C.x)*(B.y-A.y))) / q;
@@ -3874,7 +3874,7 @@ public:
 	GetSeekPosition
 	=====================
 	*/
-	const anVec3& GetSeekPosition(anReachability* reach, int vertexNum) {
+	const anVec3 &GetSeekPosition(anReachability* reach, int vertexNum) {
 		return ((vertexNum)?(myAAS->GetFile()->GetVertex(vertexNum)):(reach->start));
 	}
 
@@ -3883,7 +3883,7 @@ public:
 	GetSeekPosition
 	=====================
 	*/
-	const anVec3& GetSeekPosition(visitNode* node) {
+	const anVec3 &GetSeekPosition(visitNode* node) {
 		return  GetSeekPosition(node->reach, node->vertexNum);
 	}
 
@@ -3933,8 +3933,8 @@ public:
 			// Smooth The Path One Pass
 			//--------------------------
 			if (pathAt.reach->travelType==TFL_WALK) {
-				const anVec3& walkA = (at==count) ?		(myMove->myPos)		:(pathPrev.seekPos);
-				const anVec3& walkB = (at==0) ?			(myMove->goalPos)	:(pathNext.seekPos);
+				const anVec3 &walkA = (at==count) ?		(myMove->myPos)		:(pathPrev.seekPos);
+				const anVec3 &walkB = (at==0) ?			(myMove->goalPos)	:(pathNext.seekPos);
 
 				isCorner = !XYLineIntersection(edgeA, edgeB, walkA, walkB, smoothedPos);
 
@@ -3993,7 +3993,7 @@ public:
 	=====================
 	*/
 	bool	ErrorCondition() {
-		assert(0);
+		assert( 0 );
 		// Stats?
 		return false;
 	}
@@ -4195,7 +4195,7 @@ public:
 		//-------------------------------------------------------------------
 		} else {
 
-			const anVec3& pos	= GetSeekPosition(reach, vertexNum);
+			const anVec3 &pos	= GetSeekPosition(reach, vertexNum);
 
 			// Constant Data (Will Never Change)
 			//-----------------------------------
@@ -4348,7 +4348,7 @@ public:
 	FindPath
 	=====================
 	*/
-	bool	FindPath(anSEAS* aas, idMoveState& move, float radius, bool inDebugMode, anEntity* ignoreEntity, anEntity* ignoreEntity2) {
+	bool	FindPath(anSEAS* aas, idMoveState& move, float radius, bool inDebugMode, anEntity *ignoreEntity, anEntity *ignoreEntity2) {
 		myAAS				= aas;
 		myMove				= &move;
 		myRadius			= radius;
@@ -4444,7 +4444,7 @@ rvPathFinder	pathFinder;
 
 
 
-void AI_EntityMoved(anEntity* ent) {
+void AI_EntityMoved(anEntity *ent) {
 	obstacleFinder.MarkEntityForUpdate(ent);
 }
 void AI_MoveInitialize() {
@@ -4732,7 +4732,7 @@ void anSAAI::RVMasterMove( void ) {
 	// Push Things Out Of The Way
 	//----------------------------
 	if (moveBlockEnt && moveBlockEnt->IsType( idMoveable::GetClassType() ) && moveBlockEnt->GetPhysics()->IsPushable()) {
-		KickObstacles( viewAxis[ 0 ], move.kickForce, moveBlockEnt );
+		KickObstacles( viewAxis[0], move.kickForce, moveBlockEnt );
 	}
 
 	// Touch Triggers
@@ -4773,7 +4773,7 @@ void anSAAI::RVMasterMove( void ) {
 
 	if (DebugFilter(ai_showObstacleAvoidance)) {
 		static const anVec3	upSeek(0.0f, 0.0f, 3.0f);
-		const anVec3& obstaclePos = (move.obstacle.GetEntity())?(move.obstacle->GetPhysics()->GetOrigin()):(move.seekPos);
+		const anVec3 &obstaclePos = (move.obstacle.GetEntity())?(move.obstacle->GetPhysics()->GetOrigin()):(move.seekPos);
 
 		if ( !DebugFilter(ai_debugMove)) {
 			gameRenderWorld->DebugArrow(colorGreen,		origin+upSeek,	move.seekPos + upSeek,	5,	gameLocal.msec);	// Seek: GREEN

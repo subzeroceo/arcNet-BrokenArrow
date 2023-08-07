@@ -115,7 +115,7 @@ void anSAAI::Event_SetTalkState( int state )													{ SetTalkState ( (talkS
 void anSAAI::Event_Speak( const char *speechDecl )											{ Speak( speechDecl ); }
 void anSAAI::Event_SpeakRandom( const char *speechDecl )										{ Speak( speechDecl, true ); }
 void anSAAI::Event_GetLeader( void )															{ anThread::ReturnEntity( leader ); }
-void anSAAI::Event_SetLeader( anEntity* ent )													{ SetLeader ( ent ); }
+void anSAAI::Event_SetLeader( anEntity *ent )													{ SetLeader ( ent ); }
 void anSAAI::Event_GetEnemy( void )															{ anThread::ReturnEntity( enemy.ent ); }
 void anSAAI::Event_TakeDamage( float takeDamage )												{ fl.takedamage = ( takeDamage ) ? true : false; }
 void anSAAI::Event_SetUndying( float setUndying )												{ aifl.undying = ( setUndying ) ? true : false; }
@@ -541,7 +541,7 @@ void anSAAI::Event_BecomePassive ( int ignoreEnemies ) {
 anSAAI::Event_LookAt
 =====================
 */
-void anSAAI::Event_LookAt	( anEntity* lookAt ) {
+void anSAAI::Event_LookAt	( anEntity *lookAt ) {
 	lookTarget = lookAt;
 }
 
@@ -938,7 +938,7 @@ void anSAAI::Event_GetReachableEntityPosition( anEntity *ent ) {
 anSAAI::Event_ScriptedMove
 ================
 */
-void anSAAI::Event_ScriptedMove ( anEntity* destEnt, float minDist, bool endWithIdle ) {
+void anSAAI::Event_ScriptedMove ( anEntity *destEnt, float minDist, bool endWithIdle ) {
 	ScriptedMove ( destEnt, minDist, endWithIdle );
 }
 
@@ -947,7 +947,7 @@ void anSAAI::Event_ScriptedMove ( anEntity* destEnt, float minDist, bool endWith
 anSAAI::Event_ScriptedFace
 ================
 */
-void anSAAI::Event_ScriptedFace ( anEntity* faceEnt, bool endWithIdle ) {
+void anSAAI::Event_ScriptedFace ( anEntity *faceEnt, bool endWithIdle ) {
 	ScriptedFace ( faceEnt, endWithIdle );
 }
 
@@ -956,7 +956,7 @@ void anSAAI::Event_ScriptedFace ( anEntity* faceEnt, bool endWithIdle ) {
 anSAAI::Event_ScriptedAnim
 ================
 */
-void anSAAI::Event_ScriptedAnim ( const char* animname, int blendFrames, bool loop, bool endWithIdle ) {
+void anSAAI::Event_ScriptedAnim ( const char *animname, int blendFrames, bool loop, bool endWithIdle ) {
 	ScriptedAnim ( animname, blendFrames, loop, endWithIdle );
 }
 
@@ -965,7 +965,7 @@ void anSAAI::Event_ScriptedAnim ( const char* animname, int blendFrames, bool lo
 anSAAI::Event_ScriptedAction
 ================
 */
-void anSAAI::Event_ScriptedAction ( anEntity* actionEnt, bool endWithIdle ) {
+void anSAAI::Event_ScriptedAction ( anEntity *actionEnt, bool endWithIdle ) {
 	ScriptedAction ( actionEnt, endWithIdle );
 }
 
@@ -974,7 +974,7 @@ void anSAAI::Event_ScriptedAction ( anEntity* actionEnt, bool endWithIdle ) {
 anSAAI::Event_ScriptedPlaybackMove
 ================
 */
-void anSAAI::Event_ScriptedPlaybackMove ( const char* playback, int flags, int numFrames ) {
+void anSAAI::Event_ScriptedPlaybackMove ( const char *playback, int flags, int numFrames ) {
 	ScriptedPlaybackMove ( playback, flags, numFrames );
 }
 
@@ -983,7 +983,7 @@ void anSAAI::Event_ScriptedPlaybackMove ( const char* playback, int flags, int n
 anSAAI::Event_ScriptedPlaybackAim
 ================
 */
-void anSAAI::Event_ScriptedPlaybackAim( const char* playback, int flags, int numFrames ) {
+void anSAAI::Event_ScriptedPlaybackAim( const char *playback, int flags, int numFrames ) {
 	ScriptedPlaybackAim ( playback, flags, numFrames );
 }
 
@@ -1019,7 +1019,7 @@ void anSAAI::Event_AllowHiddenMovement( int enable ) {
 anSAAI::Event_SetScript
 ================
 */
-void anSAAI::Event_SetScript ( const char* scriptName, const char* funcName ) {
+void anSAAI::Event_SetScript ( const char *scriptName, const char *funcName ) {
 	SetScript ( scriptName, funcName );
 }
 
@@ -1052,7 +1052,7 @@ void anSAAI::Event_SetMoveSpeed ( int speed ) {
 anSAAI::Event_SetPassivePrefix
 ================
 */
-void anSAAI::Event_SetPassivePrefix ( const char* prefix ) {
+void anSAAI::Event_SetPassivePrefix ( const char *prefix ) {
 	SetPassivePrefix ( prefix );
 }
 
@@ -1061,7 +1061,7 @@ void anSAAI::Event_SetPassivePrefix ( const char* prefix ) {
 anSAAI::Event_Attack
 ================
 */
-void anSAAI::Event_Attack ( const char* attackName, const char* jointName ) {
+void anSAAI::Event_Attack ( const char *attackName, const char *jointName ) {
 	Attack ( attackName, animator.GetJointHandle ( jointName ), enemy.ent ); // , physicsObj.GetPushedLinearVelocity() );
 }
 
@@ -1070,7 +1070,7 @@ void anSAAI::Event_Attack ( const char* attackName, const char* jointName ) {
 anSAAI::Event_AttackMelee
 ================
 */
-void anSAAI::Event_AttackMelee( const char* meleeName ) {
+void anSAAI::Event_AttackMelee( const char *meleeName ) {
 	const anDict* meleeDict;
 	meleeDict = gameLocal.FindEntityDefDict ( spawnArgs.GetString ( va( "def_attack_%s", meleeName ) ), false );
 	if ( !meleeDict ) {

@@ -11,12 +11,12 @@
 */
 
 template<class type,int size>
-class arcStaticList {
+class anStaticList {
 public:
 
-						arcStaticList();
-						arcStaticList( const arcStaticList<type,size> &other );
-						~arcStaticList<type,size>( void );
+						anStaticList();
+						anStaticList( const anStaticList<type,size> &other );
+						~anStaticList<type,size>( void );
 
 	void				Clear( void );										// marks the list as empty.  does not deallocate or intialize data.
 	int					Num( void ) const;									// returns number of elements in list
@@ -34,7 +34,7 @@ public:
 	const type *		Ptr( void ) const;									// returns a pointer to the list
 	type *				Alloc( void );										// returns reference to a new data element at the end of the list.  returns nullptr when full.
 	int					Append( const type & obj );							// append element
-	int					Append( const arcStaticList<type,size> &other );		// append list
+	int					Append( const anStaticList<type,size> &other );		// append list
 	int					AddUnique( const type & obj );						// add unique element
 	int					Insert( const type & obj, int index );				// insert the element at the given index
 	int					FindIndex( const type & obj ) const;				// find the index for the given element
@@ -43,7 +43,7 @@ public:
 	int					IndexOf( const type *obj ) const;					// returns the index for the pointer to an element in the list
 	bool				RemoveIndex( int index );							// remove the element at the given index
 	bool				Remove( const type & obj );							// remove the element
-	void				Swap( arcStaticList<type,size> &other );				// swap the contents of the lists
+	void				Swap( anStaticList<type,size> &other );				// swap the contents of the lists
 	void				DeleteContents( bool clear );						// delete the contents of the list
 
 private:
@@ -53,48 +53,48 @@ private:
 
 /*
 ================
-arcStaticList<type,size>::arcStaticList()
+anStaticList<type,size>::anStaticList()
 ================
 */
 template<class type,int size>
-ARC_INLINE arcStaticList<type,size>::arcStaticList() {
+inline anStaticList<type,size>::anStaticList() {
 	num = 0;
 }
 
 /*
 ================
-arcStaticList<type,size>::arcStaticList( const arcStaticList<type,size> &other )
+anStaticList<type,size>::anStaticList( const anStaticList<type,size> &other )
 ================
 */
 template<class type,int size>
-ARC_INLINE arcStaticList<type,size>::arcStaticList( const arcStaticList<type,size> &other ) {
+inline anStaticList<type,size>::anStaticList( const anStaticList<type,size> &other ) {
 	*this = other;
 }
 
 /*
 ================
-arcStaticList<type,size>::~arcStaticList<type,size>
+anStaticList<type,size>::~anStaticList<type,size>
 ================
 */
 template<class type,int size>
-ARC_INLINE arcStaticList<type,size>::~arcStaticList( void ) {
+inline anStaticList<type,size>::~anStaticList( void ) {
 }
 
 /*
 ================
-arcStaticList<type,size>::Clear
+anStaticList<type,size>::Clear
 
 Sets the number of elements in the list to 0.  Assumes that type automatically handles freeing up memory.
 ================
 */
 template<class type,int size>
-ARC_INLINE void arcStaticList<type,size>::Clear( void ) {
+inline void anStaticList<type,size>::Clear( void ) {
 	num	= 0;
 }
 
 /*
 ================
-arcStaticList<type,size>::DeleteContents
+anStaticList<type,size>::DeleteContents
 
 Calls the destructor of all elements in the list.  Conditionally frees up memory used by the list.
 Note that this only works on lists containing pointers to objects and will cause a compiler error
@@ -105,7 +105,7 @@ list to nullptr.
 ================
 */
 template<class type,int size>
-ARC_INLINE void arcStaticList<type,size>::DeleteContents( bool clear ) {
+inline void anStaticList<type,size>::DeleteContents( bool clear ) {
 	int i;
 
 	for ( i = 0; i < size; i++ ) {
@@ -122,67 +122,67 @@ ARC_INLINE void arcStaticList<type,size>::DeleteContents( bool clear ) {
 
 /*
 ================
-arcStaticList<type,size>::Num
+anStaticList<type,size>::Num
 
 Returns the number of elements currently contained in the list.
 ================
 */
 template<class type,int size>
-ARC_INLINE int arcStaticList<type,size>::Num( void ) const {
+inline int anStaticList<type,size>::Num( void ) const {
 	return num;
 }
 
 /*
 ================
-arcStaticList<type,size>::Num
+anStaticList<type,size>::Num
 
 Returns the maximum number of elements in the list.
 ================
 */
 template<class type,int size>
-ARC_INLINE int arcStaticList<type,size>::Max( void ) const {
+inline int anStaticList<type,size>::Max( void ) const {
 	return size;
 }
 
 /*
 ================
-arcStaticList<type>::Allocated
+anStaticList<type>::Allocated
 ================
 */
 template<class type,int size>
-ARC_INLINE size_t arcStaticList<type,size>::Allocated( void ) const {
+inline size_t anStaticList<type,size>::Allocated( void ) const {
 	return size * sizeof( type );
 }
 
 /*
 ================
-arcStaticList<type>::Size
+anStaticList<type>::Size
 ================
 */
 template<class type,int size>
-ARC_INLINE size_t arcStaticList<type,size>::Size( void ) const {
-	return sizeof( arcStaticList<type,size> ) + Allocated();
+inline size_t anStaticList<type,size>::Size( void ) const {
+	return sizeof( anStaticList<type,size> ) + Allocated();
 }
 
 /*
 ================
-arcStaticList<type,size>::Num
+anStaticList<type,size>::Num
 ================
 */
 template<class type,int size>
-ARC_INLINE size_t arcStaticList<type,size>::MemoryUsed( void ) const {
-	return num * sizeof( list[ 0 ] );
+inline size_t anStaticList<type,size>::MemoryUsed( void ) const {
+	return num * sizeof( list[0] );
 }
 
 /*
 ================
-arcStaticList<type,size>::SetNum
+anStaticList<type,size>::SetNum
 
 Set number of elements in list.
 ================
 */
 template<class type,int size>
-ARC_INLINE void arcStaticList<type,size>::SetNum( int newNum ) {
+inline void anStaticList<type,size>::SetNum( int newNum ) {
 	assert( newNum >= 0 );
 	assert( newNum <= size );
 	num = newNum;
@@ -190,14 +190,14 @@ ARC_INLINE void arcStaticList<type,size>::SetNum( int newNum ) {
 
 /*
 ================
-arcStaticList<type,size>::operator[] const
+anStaticList<type,size>::operator[] const
 
 Access operator.  Index must be within range or an assert will be issued in debug builds.
 Release builds do no range checking.
 ================
 */
 template<class type,int size>
-ARC_INLINE const type &arcStaticList<type,size>::operator[]( int index ) const {
+inline const type &anStaticList<type,size>::operator[]( int index ) const {
 	assert( index >= 0 );
 	assert( index < num );
 
@@ -206,14 +206,14 @@ ARC_INLINE const type &arcStaticList<type,size>::operator[]( int index ) const {
 
 /*
 ================
-arcStaticList<type,size>::operator[]
+anStaticList<type,size>::operator[]
 
 Access operator.  Index must be within range or an assert will be issued in debug builds.
 Release builds do no range checking.
 ================
 */
 template<class type,int size>
-ARC_INLINE type &arcStaticList<type,size>::operator[]( int index ) {
+inline type &anStaticList<type,size>::operator[]( int index ) {
 	assert( index >= 0 );
 	assert( index < num );
 
@@ -222,7 +222,7 @@ ARC_INLINE type &arcStaticList<type,size>::operator[]( int index ) {
 
 /*
 ================
-arcStaticList<type,size>::Ptr
+anStaticList<type,size>::Ptr
 
 Returns a pointer to the begining of the array.  Useful for iterating through the list in loops.
 
@@ -232,13 +232,13 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template<class type,int size>
-ARC_INLINE type *arcStaticList<type,size>::Ptr( void ) {
-	return &list[ 0 ];
+inline type *anStaticList<type,size>::Ptr( void ) {
+	return &list[0];
 }
 
 /*
 ================
-arcStaticList<type,size>::Ptr
+anStaticList<type,size>::Ptr
 
 Returns a pointer to the begining of the array.  Useful for iterating through the list in loops.
 
@@ -248,19 +248,19 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template<class type,int size>
-ARC_INLINE const type *arcStaticList<type,size>::Ptr( void ) const {
-	return &list[ 0 ];
+inline const type *anStaticList<type,size>::Ptr( void ) const {
+	return &list[0];
 }
 
 /*
 ================
-arcStaticList<type,size>::Alloc
+anStaticList<type,size>::Alloc
 
 Returns a pointer to a new data element at the end of the list.
 ================
 */
 template<class type,int size>
-ARC_INLINE type *arcStaticList<type,size>::Alloc( void ) {
+inline type *anStaticList<type,size>::Alloc( void ) {
 	if ( num >= size ) {
 		return nullptr;
 	}
@@ -270,7 +270,7 @@ ARC_INLINE type *arcStaticList<type,size>::Alloc( void ) {
 
 /*
 ================
-arcStaticList<type,size>::Append
+anStaticList<type,size>::Append
 
 Increases the size of the list by one element and copies the supplied data into it.
 
@@ -278,7 +278,7 @@ Returns the index of the new element, or -1 when list is full.
 ================
 */
 template<class type,int size>
-ARC_INLINE int arcStaticList<type,size>::Append( type const & obj ) {
+inline int anStaticList<type,size>::Append( type const & obj ) {
 	assert( num < size );
 	if ( num < size ) {
 		list[ num ] = obj;
@@ -292,7 +292,7 @@ ARC_INLINE int arcStaticList<type,size>::Append( type const & obj ) {
 
 /*
 ================
-arcStaticList<type,size>::Insert
+anStaticList<type,size>::Insert
 
 Increases the size of the list by at leat one element if necessary
 and inserts the supplied data into it.
@@ -301,7 +301,7 @@ Returns the index of the new element, or -1 when list is full.
 ================
 */
 template<class type,int size>
-ARC_INLINE int arcStaticList<type,size>::Insert( type const & obj, int index ) {
+inline int anStaticList<type,size>::Insert( type const & obj, int index ) {
 	int i;
 
 	assert( num < size );
@@ -327,7 +327,7 @@ ARC_INLINE int arcStaticList<type,size>::Insert( type const & obj, int index ) {
 
 /*
 ================
-arcStaticList<type,size>::Append
+anStaticList<type,size>::Append
 
 adds the other list to this one
 
@@ -335,7 +335,7 @@ Returns the size of the new combined list
 ================
 */
 template<class type,int size>
-ARC_INLINE int arcStaticList<type,size>::Append( const arcStaticList<type,size> &other ) {
+inline int anStaticList<type,size>::Append( const anStaticList<type,size> &other ) {
 	int i;
 	int n = other.Num();
 
@@ -351,13 +351,13 @@ ARC_INLINE int arcStaticList<type,size>::Append( const arcStaticList<type,size> 
 
 /*
 ================
-arcStaticList<type,size>::AddUnique
+anStaticList<type,size>::AddUnique
 
 Adds the data to the list if it doesn't already exist.  Returns the index of the data in the list.
 ================
 */
 template<class type,int size>
-ARC_INLINE int arcStaticList<type,size>::AddUnique( type const & obj ) {
+inline int anStaticList<type,size>::AddUnique( type const & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -370,13 +370,13 @@ ARC_INLINE int arcStaticList<type,size>::AddUnique( type const & obj ) {
 
 /*
 ================
-arcStaticList<type,size>::FindIndex
+anStaticList<type,size>::FindIndex
 
 Searches for the specified data in the list and returns it's index.  Returns -1 if the data is not found.
 ================
 */
 template<class type,int size>
-ARC_INLINE int arcStaticList<type,size>::FindIndex( type const & obj ) const {
+inline int anStaticList<type,size>::FindIndex( type const & obj ) const {
 	int i;
 
 	for ( i = 0; i < num; i++ ) {
@@ -391,13 +391,13 @@ ARC_INLINE int arcStaticList<type,size>::FindIndex( type const & obj ) const {
 
 /*
 ================
-arcStaticList<type,size>::Find
+anStaticList<type,size>::Find
 
 Searches for the specified data in the list and returns it's address. Returns nullptr if the data is not found.
 ================
 */
 template<class type,int size>
-ARC_INLINE type *arcStaticList<type,size>::Find( type const & obj ) const {
+inline type *anStaticList<type,size>::Find( type const & obj ) const {
 	int i;
 
 	i = FindIndex( obj );
@@ -410,7 +410,7 @@ ARC_INLINE type *arcStaticList<type,size>::Find( type const & obj ) const {
 
 /*
 ================
-arcStaticList<type,size>::FindNull
+anStaticList<type,size>::FindNull
 
 Searches for a nullptr pointer in the list.  Returns -1 if nullptr is not found.
 
@@ -419,7 +419,7 @@ on non-pointer lists will cause a compiler error.
 ================
 */
 template<class type,int size>
-ARC_INLINE int arcStaticList<type,size>::FindNull( void ) const {
+inline int anStaticList<type,size>::FindNull( void ) const {
 	int i;
 
 	for ( i = 0; i < num; i++ ) {
@@ -434,7 +434,7 @@ ARC_INLINE int arcStaticList<type,size>::FindNull( void ) const {
 
 /*
 ================
-arcStaticList<type,size>::IndexOf
+anStaticList<type,size>::IndexOf
 
 Takes a pointer to an element in the list and returns the index of the element.
 This is NOT a guarantee that the object is really in the list.
@@ -443,7 +443,7 @@ but remains silent in release builds.
 ================
 */
 template<class type,int size>
-ARC_INLINE int arcStaticList<type,size>::IndexOf( type const *objptr ) const {
+inline int anStaticList<type,size>::IndexOf( type const *objptr ) const {
 	int index;
 
 	index = objptr - list;
@@ -456,7 +456,7 @@ ARC_INLINE int arcStaticList<type,size>::IndexOf( type const *objptr ) const {
 
 /*
 ================
-arcStaticList<type,size>::RemoveIndex
+anStaticList<type,size>::RemoveIndex
 
 Removes the element at the specified index and moves all data following the element down to fill in the gap.
 The number of elements in the list is reduced by one.  Returns false if the index is outside the bounds of the list.
@@ -464,7 +464,7 @@ Note that the element is not destroyed, so any memory used by it may not be free
 ================
 */
 template<class type,int size>
-ARC_INLINE bool arcStaticList<type,size>::RemoveIndex( int index ) {
+inline bool anStaticList<type,size>::RemoveIndex( int index ) {
 	int i;
 
 	assert( index >= 0 );
@@ -484,7 +484,7 @@ ARC_INLINE bool arcStaticList<type,size>::RemoveIndex( int index ) {
 
 /*
 ================
-arcStaticList<type,size>::Remove
+anStaticList<type,size>::Remove
 
 Removes the element if it is found within the list and moves all data following the element down to fill in the gap.
 The number of elements in the list is reduced by one.  Returns false if the data is not found in the list.  Note that
@@ -492,7 +492,7 @@ the element is not destroyed, so any memory used by it may not be freed until th
 ================
 */
 template<class type,int size>
-ARC_INLINE bool arcStaticList<type,size>::Remove( type const & obj ) {
+inline bool anStaticList<type,size>::Remove( type const & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -505,16 +505,16 @@ ARC_INLINE bool arcStaticList<type,size>::Remove( type const & obj ) {
 
 /*
 ================
-arcStaticList<type,size>::Swap
+anStaticList<type,size>::Swap
 
 Swaps the contents of two lists
 ================
 */
 template<class type,int size>
-ARC_INLINE void arcStaticList<type,size>::Swap( arcStaticList<type,size> &other ) {
-	arcStaticList<type,size> temp = *this;
+inline void anStaticList<type,size>::Swap( anStaticList<type,size> &other ) {
+	anStaticList<type,size> temp = *this;
 	*this = other;
 	other = temp;
 }
 
-#endif /* !__STATICLIST_H__ */
+#endif // !__STATICLIST_H__

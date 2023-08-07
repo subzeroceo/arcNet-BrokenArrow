@@ -25,7 +25,7 @@ void anPhysics_Particle::DropToFloorAndRest( void ) {
 		testSolid = false;
 		if ( gameLocal.Contents( self, current.origin, clipModel, clipModel->GetAxis(), clipMask, self ) ) {
 			gameLocal.Warning( "entity in solid '%s' type '%s' at (%s)",
-								self->name.c_str(), self->GetType()->classname, current.origin.ToString(0) );
+								self->name.c_str(), self->GetType()->classname, current.origin.ToString( 0 ) );
 			PutToRest();
 			dropToFloor = false;
 			return;
@@ -46,7 +46,7 @@ void anPhysics_Particle::DropToFloorAndRest( void ) {
 		dropToFloor = false;
 	} else if ( IsOutsideWorld() ) {
 		gameLocal.Warning( "entity outside world bounds '%s' type '%s' at (%s)",
-							self->name.c_str(), self->GetType()->classname, current.origin.ToString(0) );
+							self->name.c_str(), self->GetType()->classname, current.origin.ToString( 0 ) );
 		PutToRest();
 		dropToFloor = false;
 	}
@@ -438,7 +438,7 @@ bool anPhysics_Particle::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	current.pushVelocity.Zero();
 
 	if ( IsOutsideWorld() ) {
-		gameLocal.Warning( "clip model outside world bounds for entity '%s' at (%s)", self->name.c_str(), current.origin.ToString(0) );
+		gameLocal.Warning( "clip model outside world bounds for entity '%s' at (%s)", self->name.c_str(), current.origin.ToString( 0 ) );
 		PutToRest();
 	}
 
@@ -829,7 +829,7 @@ bool anPhysics_Particle::SlideMove( anVec3 &start, anVec3 &velocity, const anVec
 		// let the entity know about the collision
 		collide = self->Collide( tr, current.velocity, hitTeleporter );
 
-		anEntity* ent;
+		anEntity *ent;
 		ent = gameLocal.entities[tr.c.entityNum];
 		assert ( ent );
 

@@ -43,7 +43,7 @@ void idRenderWindow::BuildAnimation( inttime) {
 
 	if (animName.Length() && animClass.Length()) {
 		worldEntity.numJoints = worldEntity.hModel->NumJoints();
-		worldEntity.joints = ( idJointMat * )Mem_Alloc16( worldEntity.numJoints * sizeof( *worldEntity.joints ) );
+		worldEntity.joints = ( anJointMat * )Mem_Alloc16( worldEntity.numJoints * sizeof( *worldEntity.joints ) );
 		modelAnim = gameEdit->ANIM_GetAnimFromEntityDef(animClass, animName);
 		if (modelAnim) {
 			animLength = gameEdit->ANIM_GetLength(modelAnim);
@@ -136,35 +136,35 @@ void idRenderWindow::PostParse() {
 }
 
 idWinVar *idRenderWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** owner ) {
-	if (anString::Icmp(_name, "model" ) == 0) {
+	if (anStr::Icmp(_name, "model" ) == 0) {
 		return &modelName;
 	}
-	if (anString::Icmp(_name, "anim" ) == 0) {
+	if (anStr::Icmp(_name, "anim" ) == 0) {
 		return &animName;
 	}
-	if (anString::Icmp(_name, "lightOrigin" ) == 0) {
+	if (anStr::Icmp(_name, "lightOrigin" ) == 0) {
 		return &lightOrigin;
 	}
-	if (anString::Icmp(_name, "lightColor" ) == 0) {
+	if (anStr::Icmp(_name, "lightColor" ) == 0) {
 		return &lightColor;
 	}
-	if (anString::Icmp(_name, "modelOrigin" ) == 0) {
+	if (anStr::Icmp(_name, "modelOrigin" ) == 0) {
 		return &modelOrigin;
 	}
-	if (anString::Icmp(_name, "modelRotate" ) == 0) {
+	if (anStr::Icmp(_name, "modelRotate" ) == 0) {
 		return &modelRotate;
 	}
-	if (anString::Icmp(_name, "viewOffset" ) == 0) {
+	if (anStr::Icmp(_name, "viewOffset" ) == 0) {
 		return &viewOffset;
 	}
-	if (anString::Icmp(_name, "needsRender" ) == 0) {
+	if (anStr::Icmp(_name, "needsRender" ) == 0) {
 		return &needsRender;
 	}
 	return idWindow::GetWinVarByName(_name, fixup, owner);
 }
 
 bool idRenderWindow::ParseInternalVar(const char *_name, anParser *src) {
-	if (anString::Icmp(_name, "animClass" ) == 0) {
+	if (anStr::Icmp(_name, "animClass" ) == 0) {
 		ParseString( src, animClass);
 		return true;
 	}

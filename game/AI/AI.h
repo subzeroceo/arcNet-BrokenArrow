@@ -174,7 +174,7 @@ typedef struct rvAIPain_s {
 	float					takenThisFrame;
 	int						lastTakenTime;
 	int						loopEndTime;
-	anString					loopType;
+	anStr					loopType;
 } rvAIPain_t;
 
 typedef struct rvAIEnemy_s {
@@ -212,13 +212,13 @@ typedef struct rvAIPassive_s {
 		bool		fidget			:1;						// Has fidget animations
 	} fl;
 
-	anString					animIdlePrefix;
-	anString					animFidgetPrefix;
-	anString					animTalkPrefix;
-	//anString					talkPrefix;
+	anStr					animIdlePrefix;
+	anStr					animFidgetPrefix;
+	anStr					animTalkPrefix;
+	//anStr					talkPrefix;
 
-	anString					prefix;
-	anString					idleAnim;
+	anStr					prefix;
+	anStr					idleAnim;
 	int						idleAnimChangeTime;
 	int						fidgetTime;
 	int						talkTime;
@@ -229,7 +229,7 @@ typedef struct rvAIAttackAnimInfo_s {
 	anVec3					eyeOffset;
 } rvAIAttackAnimInfo_t;
 
-#define AIACTIONF_ATTACK	BIT(0)
+#define AIACTIONF_ATTACK	BIT( 0 )
 #define AIACTIONF_MELEE		BIT( 1 )
 
 class rvAIActionTimer {
@@ -237,7 +237,7 @@ public:
 
 	rvAIActionTimer ( void );
 
-	bool	Init			( const anDict& args, const char* name );
+	bool	Init			( const anDict &args, const char *name );
 
 	void	Save			( anSaveGame *savefile ) const;
 	void	Restore			( anRestoreGame *savefile );
@@ -257,15 +257,15 @@ protected:
 	int			rate;
 };
 
-ARC_INLINE bool rvAIActionTimer::IsDone ( int currentTime ) const {
+inline bool rvAIActionTimer::IsDone ( int currentTime ) const {
 	return currentTime >= time;
 }
 
-ARC_INLINE int rvAIActionTimer::GetTime ( void ) const {
+inline int rvAIActionTimer::GetTime ( void ) const {
 	return time;
 }
 
-ARC_INLINE int rvAIActionTimer::GetRate ( void ) const {
+inline int rvAIActionTimer::GetRate ( void ) const {
 	return rate;
 }
 class rvAIAction {
@@ -273,7 +273,7 @@ public:
 
 	rvAIAction ( void );
 
-	bool	Init			( const anDict& args, const char* name, const char* defaultState, int flags );
+	bool	Init			( const anDict &args, const char *name, const char *defaultState, int flags );
 
 	void	Save			( anSaveGame *savefile ) const;
 	void	Restore			( anRestoreGame *savefile );
@@ -305,7 +305,7 @@ public:
 
 
 	anStringList			anims;
-	anString				state;
+	anStr				state;
 
 	rvAIActionTimer		timer;
 
@@ -374,7 +374,7 @@ const float AI_PAIN_LOOP_DELAY			= 200;
 const int	DEFAULT_FLY_OFFSET			= 68.0f;
 
 #define ATTACK_IGNORE					0
-#define ATTACK_ON_DAMAGE				BIT(0)
+#define ATTACK_ON_DAMAGE				BIT( 0 )
 #define ATTACK_ON_ACTIVATE				BIT( 1 )
 #define ATTACK_ON_SIGHT					BIT(2)
 
@@ -474,7 +474,7 @@ public:
  	bool					IsBehindCover					( void ) const;
  	bool					IsLipSyncing					( void ) const;
  	bool					IsSpeaking						( void ) const;
-   	bool					IsFacingEnt						( anEntity* targetEnt );
+   	bool					IsFacingEnt						( anEntity *targetEnt );
  	bool					IsCoverValid					( void ) const;
 	virtual bool			IsCrouching						( void ) const;
 
@@ -658,8 +658,8 @@ public:
 	// navigation
 	float					TravelDistance					( const anVec3 &end ) const;
 	float					TravelDistance					( const anVec3 &start, const anVec3 &end ) const;
-	float					TravelDistance					( anEntity* ent ) const;
-	float					TravelDistance					( anEntity* start, anEntity* end ) const;
+	float					TravelDistance					( anEntity *ent ) const;
+	float					TravelDistance					( anEntity *start, anEntity *end ) const;
 	int						PointReachableAreaNum			( const anVec3 &pos, const float boundsScale = 2.0f ) const;
 	bool					PathToGoal						( seasPath_t &path, int areaNum, const anVec3 &origin, int goalAreaNum, const anVec3 &goalOrigin ) const;
 	void					BlockedFailSafe					( void );
@@ -686,8 +686,8 @@ public:
 									Reactions
 	===============================================================================
 	*/
-	void					ReactToShotAt					( anEntity* attacker, const anVec3 &origOrigin, const anVec3 &origDir );
-	void					ReactToPain						( anEntity* attacker, int damage );
+	void					ReactToShotAt					( anEntity *attacker, const anVec3 &origOrigin, const anVec3 &origDir );
+	void					ReactToPain						( anEntity *attacker, int damage );
 
 	/*
 	===============================================================================
@@ -724,11 +724,11 @@ public:
 public:
 
 	void					SetTalkState					( talkState_t state );
-	void					SetPassivePrefix				( const char* prefix );
+	void					SetPassivePrefix				( const char *prefix );
 
 protected:
 
-	bool					GetPassiveAnimPrefix			( const char* animName, anString& animPrefix );
+	bool					GetPassiveAnimPrefix			( const char *animName, anStr& animPrefix );
 
 	/*
 	===============================================================================
@@ -747,8 +747,8 @@ public:
 	void					UpdateEnemyVisibility			( void );
 
 	// Attack direction
-	bool					GetAimDir						( const anVec3& source, const anEntity* aimAtEnt, const anDict* projectileDict, anEntity *ignore, anVec3 &aimDir, float aimOffset, float predict ) const;
-	void					GetPredictedAimDirOffset		( const anVec3& source, const anVec3& target, float projectileSpeed, const anVec3& targetVelocity, anVec3& offset ) const;
+	bool					GetAimDir						( const anVec3 &source, const anEntity *aimAtEnt, const anDict* projectileDict, anEntity *ignore, anVec3 &aimDir, float aimOffset, float predict ) const;
+	void					GetPredictedAimDirOffset		( const anVec3 &source, const anVec3 &target, float projectileSpeed, const anVec3 &targetVelocity, anVec3 &offset ) const;
 
 	// damage
 	virtual bool			Pain							( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location );
@@ -756,10 +756,10 @@ public:
 	bool					CheckDeathCausesMissionFailure	( void );
 
 	// attacks
-	virtual bool			Attack							( const char* attackName, jointHandle_t joint, anEntity* target, const anVec3& pushVelocity = vec3_origin );
-	virtual idProjectile*	AttackRanged					( const char* attackName, const anDict* attackDict, jointHandle_t joint, anEntity* target, const anVec3& pushVelocity = vec3_origin );
+	virtual bool			Attack							( const char *attackName, jointHandle_t joint, anEntity *target, const anVec3 &pushVelocity = vec3_origin );
+	virtual idProjectile*	AttackRanged					( const char *attackName, const anDict* attackDict, jointHandle_t joint, anEntity *target, const anVec3 &pushVelocity = vec3_origin );
 	virtual idProjectile*	AttackProjectile				( const anDict* projectileDict, const anVec3 &org, const anAngles &ang );
-	virtual bool			AttackMelee						( const char* attackName, const anDict* meleeDict );
+	virtual bool			AttackMelee						( const char *attackName, const anDict* meleeDict );
 
 	void					CreateProjectileClipModel		( void ) const;
 	idProjectile*			CreateProjectile				( const anDict* projectileDict, const anVec3 &pos, const anVec3 &dir );
@@ -777,7 +777,7 @@ public:
 
 	// AI script state management
 	void					UpdateStates					( void );
-	void					UpdateFocus						( const anMat3& orientationAxis );
+	void					UpdateFocus						( const anMat3 &orientationAxis );
 	void					SetFocus						( aiFocus_t focus, int time );
 
 	// event?
@@ -826,13 +826,13 @@ public:
 
 	int						TestTrajectory					( const anVec3 &firePos, const anVec3 &target, const char *projectileName );
 	bool					TestAnimMove					( int animNum, anEntity *ignore = nullptr, anVec3 *pMoveVec = nullptr );
-	void					ExecScriptFunction				( rvScriptFuncUtility& func, anEntity* parm = nullptr );
+	void					ExecScriptFunction				( rvScriptFuncUtility& func, anEntity *parm = nullptr );
 	void					SetLeader						( anEntity *newLeader );
 
 	int						CheckMelee						( bool disableAttack );
 	bool					CheckForEnemy					( bool useFov, bool force = false );
  	bool					CheckForCloserEnemy				( void );
- 	bool					CheckForReplaceEnemy			( anEntity* replacement );
+ 	bool					CheckForReplaceEnemy			( anEntity *replacement );
 	bool					CheckForTeammateEnemy			( void );
 
  	void					DrawSuspicion					( void );
@@ -896,7 +896,7 @@ public:
 protected:
 
 	virtual void			UpdateThreat					( void );
-	virtual float			CalculateEnemyThreat			( anEntity* enemy );
+	virtual float			CalculateEnemyThreat			( anEntity *enemy );
 
 	/*
 	===============================================================================
@@ -919,15 +919,15 @@ public:
 
 public:
 
-	void					ScriptedMove					( anEntity* destEnt, float minDist, bool endWithIdle );
-	void					ScriptedFace					( anEntity* faceEnt, bool endWithIdle );
-	void					ScriptedAnim					( const char* animname, int blendFrames, bool loop, bool endWithIdle );
-	void					ScriptedPlaybackMove			( const char* playback, int flags, int numFrames );
-	void					ScriptedPlaybackAim				( const char* playback, int flags, int numFrames );
-	void					ScriptedAction					( anEntity* actionEnt, bool endWithIdle );
+	void					ScriptedMove					( anEntity *destEnt, float minDist, bool endWithIdle );
+	void					ScriptedFace					( anEntity *faceEnt, bool endWithIdle );
+	void					ScriptedAnim					( const char *animname, int blendFrames, bool loop, bool endWithIdle );
+	void					ScriptedPlaybackMove			( const char *playback, int flags, int numFrames );
+	void					ScriptedPlaybackAim				( const char *playback, int flags, int numFrames );
+	void					ScriptedAction					( anEntity *actionEnt, bool endWithIdle );
 	void					ScriptedStop					( void );
 
-	void					SetScript						( const char* scriptName, const char* funcName );
+	void					SetScript						( const char *scriptName, const char *funcName );
 
 private:
 
@@ -945,8 +945,8 @@ protected:
 	virtual void			OnDeath							( void );
 	virtual void			OnStateChange					( int channel );
 	virtual void			OnUpdatePlayback				( const rvDeclPlaybackData& pbd );
-	virtual void			OnEnemyChange					( anEntity* oldEnemy );
-	virtual void			OnLeaderChange					( anEntity* oldLeader );
+	virtual void			OnEnemyChange					( anEntity *oldEnemy );
+	virtual void			OnLeaderChange					( anEntity *oldLeader );
 	virtual void			OnStartMoving					( void );
 	virtual void			OnStopMoving					( aiMoveCommand_t oldMoveCommand );
 	virtual void			OnTacticalChange				( aiTactical_t oldTactical );
@@ -958,7 +958,7 @@ protected:
 	virtual void			OnEnemyVisiblityChange			( bool oldVisible );
 	virtual void			OnStartAction					( void );
 	virtual void			OnStopAction					( void );
-	virtual void			OnSetKey						( const char* key, const char* value );
+	virtual void			OnSetKey						( const char *key, const char *value );
 
 	/*
 	===============================================================================
@@ -968,7 +968,7 @@ protected:
 
 protected:
 
-	bool					StartMove						( aiMoveCommand_t command, const anVec3& goalOrigin, int goalArea, anEntity* goalEntity, seasFeature_t* feature, float range );
+	bool					StartMove						( aiMoveCommand_t command, const anVec3 &goalOrigin, int goalArea, anEntity *goalEntity, seasFeature_t* feature, float range );
 	void					StopMove						( moveStatus_t status );
 
 	bool					MoveTo							( const anVec3 &pos, float range = 0.0f );
@@ -1041,7 +1041,7 @@ protected:
 	virtual bool			CheckPainActions					( void );
 
 	bool					PerformAction						( rvAIAction* action, bool (anSAAI::*)(rvAIAction*,int), rvAIActionTimer* timer = nullptr );
-	void					PerformAction						( const char* stateName, int blendFrames = 0, bool noPain = false );
+	void					PerformAction						( const char *stateName, int blendFrames = 0, bool noPain = false );
 
 
 	// twhitaker: needed this for difficulty settings
@@ -1083,7 +1083,7 @@ private:
 
 	void					Event_Activate						( anEntity *activator );
 	void					Event_Touch							( anEntity *other, trace_t *trace );
-	void					Event_LookAt						( anEntity* lookAt );
+	void					Event_LookAt						( anEntity *lookAt );
 
 	void					Event_SetAngles						( anAngles const &ang );
 	void					Event_SetEnemy						( anEntity *ent );
@@ -1091,15 +1091,15 @@ private:
 	void					Event_SetTalkTarget					( anEntity *target );
 	void					Event_SetTalkState					( int state );
 	void					Event_SetLeader						( anEntity *newLeader );
-	void					Event_SetScript						( const char* scriptName, const char* funcName );
+	void					Event_SetScript						( const char *scriptName, const char *funcName );
 	void					Event_SetMoveSpeed					( int speed );
-	void					Event_SetPassivePrefix				( const char* prefix );
+	void					Event_SetPassivePrefix				( const char *prefix );
 
 	void					Event_GetAngles						( void );
 	void					Event_GetEnemy						( void );
 	void					Event_GetLeader						( void );
 
-	void					Event_Attack						( const char* attackName, const char* jointName );
+	void					Event_Attack						( const char *attackName, const char *jointName );
 	void					Event_AttackMelee					( const char *meleeDefName );
 
 	void					Event_DirectDamage					( anEntity *damageTarget, const char *damageDefName );
@@ -1153,12 +1153,12 @@ private:
 	void					Event_Speak							( const char *speechDecl );
 	void					Event_SpeakRandom					( const char *speechDecl );
 
-	void					Event_ScriptedMove					( anEntity* destEnt, float minDist, bool endWithIdle );
-	void					Event_ScriptedFace					( anEntity* faceEnt, bool endWithIdle );
-	void					Event_ScriptedAnim					( const char* animname, int blendFrames, bool loop, bool endWithIdle );
-	void					Event_ScriptedPlaybackMove			( const char* playback, int flags, int numFrames );
-	void					Event_ScriptedPlaybackAim			( const char* playback, int flags, int numFrames );
-	void					Event_ScriptedAction				( anEntity* actionEnt, bool endWithIdle );
+	void					Event_ScriptedMove					( anEntity *destEnt, float minDist, bool endWithIdle );
+	void					Event_ScriptedFace					( anEntity *faceEnt, bool endWithIdle );
+	void					Event_ScriptedAnim					( const char *animname, int blendFrames, bool loop, bool endWithIdle );
+	void					Event_ScriptedPlaybackMove			( const char *playback, int flags, int numFrames );
+	void					Event_ScriptedPlaybackAim			( const char *playback, int flags, int numFrames );
+	void					Event_ScriptedAction				( anEntity *actionEnt, bool endWithIdle );
 	void					Event_ScriptedDone					( void );
 	void					Event_ScriptedStop					( void );
 	void					Event_ScriptedJumpDown				( float yaw );
@@ -1244,39 +1244,39 @@ protected:
 ===============================================================================
 */
 
-ARC_INLINE int DelayTime( int min, int range ) {
+inline int DelayTime( int min, int range ) {
 	return min + gameLocal.random.RandomInt ( range + 1 );
 }
 
-ARC_INLINE const anVec2& anSAAI::GetAttackRange ( void ) const {
+inline const anVec2& anSAAI::GetAttackRange ( void ) const {
 	return combat.attackRange;
 }
 
-ARC_INLINE const anVec2& anSAAI::GetFollowRange ( void ) const {
+inline const anVec2& anSAAI::GetFollowRange ( void ) const {
 	return move.followRange;
 }
 
-ARC_INLINE int anSAAI::GetTravelFlags ( void ) const {
+inline int anSAAI::GetTravelFlags ( void ) const {
 	return move.travelFlags;
 }
 
-ARC_INLINE bool anSAAI::IsEnemyVisible ( void ) const {
+inline bool anSAAI::IsEnemyVisible ( void ) const {
 	return enemy.ent && enemy.fl.visible;
 }
 
-ARC_INLINE bool anSAAI::IsEnemyRecentlyVisible( float maxLostVisTimeScale ) const {
+inline bool anSAAI::IsEnemyRecentlyVisible( float maxLostVisTimeScale ) const {
 	return (enemy.ent
 			&& combat.fl.seenEnemyDirectly
  			&& (enemy.lastVisibleTime && gameLocal.time-enemy.lastVisibleTime < (combat.maxLostVisTime * maxLostVisTimeScale)));
 }
 
-ARC_INLINE bool anSAAI::LookAtCoverTall( void ) const {
+inline bool anSAAI::LookAtCoverTall( void ) const {
  	return ( aasSensor->Look()
  			&& (aasSensor->Look()->flags&FEATURE_LOOK_OVER)
  			&& aasSensor->Look()->height > 40.0f );
 }
 
-ARC_INLINE bool anSAAI::InLookAtCoverMode ( void ) const {
+inline bool anSAAI::InLookAtCoverMode ( void ) const {
  	return ( !IsBehindCover()
  			&& !aifl.action
 			&& move.fl.moving
@@ -1287,68 +1287,68 @@ ARC_INLINE bool anSAAI::InLookAtCoverMode ( void ) const {
  			&& !IsEnemyRecentlyVisible(0.2f));
 }
 
-ARC_INLINE bool anSAAI::InCoverMode ( void ) const {
+inline bool anSAAI::InCoverMode ( void ) const {
 	return ( (1<<combat.tacticalCurrent) & AITACTICAL_COVER_BITS ) && aasSensor->Reserved();
 }
 
-ARC_INLINE bool anSAAI::InCrouchCoverMode ( void ) const {
+inline bool anSAAI::InCrouchCoverMode ( void ) const {
 	return ( InCoverMode() && (aasSensor->Reserved()->flags&FEATURE_LOOK_OVER) );
 }
 
-ARC_INLINE bool anSAAI::IsBehindCover ( void ) const {
+inline bool anSAAI::IsBehindCover ( void ) const {
 	return ( InCoverMode() && move.fl.done && (aifl.action || DistanceTo2d ( aasSensor->ReservedOrigin() ) < AI_COVER_MINRANGE) );
 }
 
-ARC_INLINE bool anSAAI::IsSpeaking ( void ) const {
+inline bool anSAAI::IsSpeaking ( void ) const {
 	return speakTime && gameLocal.time < speakTime;
 }
 
-ARC_INLINE bool anSAAI::IsFacingEnt ( anEntity* targetEnt ) {
+inline bool anSAAI::IsFacingEnt ( anEntity *targetEnt ) {
 	return( move.moveCommand == MOVE_FACE_ENTITY && move.goalEntity == targetEnt && FacingIdeal() );
 }
 
-ARC_INLINE bool anSAAI::IsCoverValid (  ) const {
+inline bool anSAAI::IsCoverValid (  ) const {
  	return combat.coverValidTime && (gameLocal.time - combat.coverValidTime < combat.maxInvalidCoverTime);
 }
 
-ARC_INLINE anActor* anSAAI::GetLeader ( void ) const {
+inline anActor* anSAAI::GetLeader ( void ) const {
 	return leader;
 }
 
-ARC_INLINE anEntity* anSAAI::GetGoalEntity ( void ) const {
+inline anEntity *anSAAI::GetGoalEntity ( void ) const {
 	return move.goalEntity;
 }
 
-ARC_INLINE bool anSAAI::CanTakeDamage( void ) const {
+inline bool anSAAI::CanTakeDamage( void ) const {
 	return anActor::CanTakeDamage( );
 }
 
-ARC_INLINE bool anSAAI::CanTakePain ( void ) const {
+inline bool anSAAI::CanTakePain ( void ) const {
 	return !disablePain;
 }
 
-ARC_INLINE bool anSAAI::CanTurn ( void ) const {
+inline bool anSAAI::CanTurn ( void ) const {
 	return move.turnRate && !move.fl.noTurn && !move.fl.disabled;
 }
 
-ARC_INLINE bool anSAAI::CanMove ( void ) const {
+inline bool anSAAI::CanMove ( void ) const {
 	return !move.fl.disabled && !move.fl.blocked && gameLocal.GetTime()>move.blockTime;
 }
 
-ARC_INLINE bool anSAAI::CanAnnounce ( float chance ) const {
+inline bool anSAAI::CanAnnounce ( float chance ) const {
 	return !aifl.dead && !IsSpeaking() && !af.IsActive() && !combat.fl.noChatter && ( gameLocal.random.RandomFloat() < chance );
 }
 
-ARC_INLINE void anSAAI::SetFocus ( aiFocus_t focus, int time ) {
+inline void anSAAI::SetFocus ( aiFocus_t focus, int time ) {
 	focusType = focus;
 	focusTime = gameLocal.time + time;
 }
 
-ARC_INLINE anEntity *anSAAI::GetEnemy( void ) const {
+inline anEntity *anSAAI::GetEnemy( void ) const {
 	return enemy.ent;
 }
 
-ARC_INLINE void anSAAI::ForceTacticalUpdate ( void ) {
+inline void anSAAI::ForceTacticalUpdate ( void ) {
 	combat.tacticalUpdateTime = 0;
 	combat.tacticalMaskUpdate = 0;
 	delete aasFind;
@@ -1363,11 +1363,11 @@ ARC_INLINE void anSAAI::ForceTacticalUpdate ( void ) {
 ===============================================================================
 */
 
-extern const char* aiActionStatusString [ rvAIAction::STATUS_MAX ];
-extern const char* aiTalkMessageString	[ ];
-extern const char* aiTacticalString		[ AITACTICAL_MAX ];
-extern const char* aiMoveCommandString	[ NUM_MOVE_COMMANDS ];
-extern const char* aiFocusString		[ AIFOCUS_MAX ];
+extern const char *aiActionStatusString [ rvAIAction::STATUS_MAX ];
+extern const char *aiTalkMessageString	[ ];
+extern const char *aiTacticalString		[ AITACTICAL_MAX ];
+extern const char *aiMoveCommandString	[ NUM_MOVE_COMMANDS ];
+extern const char *aiFocusString		[ AIFOCUS_MAX ];
 
 #endif /* !__AI_H__ */
 

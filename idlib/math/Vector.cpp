@@ -21,7 +21,7 @@ anVec2::ToString
 =============
 */
 const char *anVec2::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
@@ -77,9 +77,9 @@ anVec3::Rotate
 =============
 */
 void anVec3::Rotate( anVec3 in, anMat3 matrix[3], anVec3 out ) {
-	out[0] = Dot( in, matrix[0] );
-	out[1] = Dot( in, matrix[1] );
-	out[2] = Dot( in, matrix[2] );
+	out[0] = anMath::Dot( in, matrix[0] );
+	out[1] = anMath::Dot( in, matrix[1] );
+	out[2] = anMath::Dot( in, matrix[2] );
 }
 
 /*
@@ -159,7 +159,23 @@ TeKRadians anVec3::ToRadians( void ) const {
 		}
 	}
 
-	return( rvAngles( -pitch, yaw, 0.0f ) );
+	return( anAngles( -pitch, yaw, 0.0f ) );
+}
+/*
+=============
+anVec3::ToVec4
+=============
+*/
+
+anVec4 anVec3::ToVec4( void ) const {
+	anVec4 v;
+
+	v.x = x;
+	v.y = y;
+	v.z = z;
+	v.w = 0;
+
+	return v;
 }
 
 /*
@@ -259,7 +275,7 @@ anVec3::ToString
 =============
 */
 const char *anVec3::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
@@ -405,7 +421,7 @@ anVec4::ToString
 =============
 */
 const char *anVec4::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
@@ -443,7 +459,7 @@ anVec5::ToString
 =============
 */
 const char *anVec5::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
@@ -478,7 +494,7 @@ anVec6::ToString
 =============
 */
 const char *anVec6::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 //===============================================================
@@ -497,7 +513,7 @@ anVecX::ToString
 =============
 */
 const char *anVecX::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 void anVecX::Copy( vec3_origin *in, vec3_origin *out ) {

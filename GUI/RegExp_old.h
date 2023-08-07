@@ -19,7 +19,7 @@ public:
 	int regCount;
 	enum REGTYPE { VEC4 = 0, FLOAT, BOOL, INT, STRING, VEC2, VEC3, NUMTYPES } ;
 	static int REGCOUNT[NUMTYPES];
-	anString name;
+	anStr name;
 	int regs[4];
 	void SetToRegs(float *registers, idTypedDict *state);
 	void SetToRegList(anList<float> *registers, idTypedDict *state);
@@ -43,13 +43,13 @@ class anRegisterList {
 public:
 	
 	// 
-	void RemoveReg ( const char* name );
+	void RemoveReg ( const char *name );
 	// 
 
 	void AddReg(const char *name, int type, anParser *src, idWindow *win);
 	void AddReg(const char *name, int type, anVec4 data, idWindow *win);
 	anRegister *FindReg(const char *name);
-	int			FindRegIndex ( const char* name );
+	int			FindRegIndex ( const char *name );
 	void SetToRegs(float *registers, idTypedDict *state);
 	void GetFromRegs(float *registers, idTypedDict *state);
 	void Reset();

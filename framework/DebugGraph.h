@@ -9,12 +9,12 @@ Contains the DebugGraph declaration.
 
 /*
 ================================================
-The *Debug Graph, arcDebugGraph, contains graphing functionality common to many debug tools.
+The *Debug Graph, anDebugGraph, contains graphing functionality common to many debug tools.
 ================================================
 */
-class arcDebugGraph {
+class anDebugGraph {
 public:
-	arcDebugGraph( int numItems = 0 );
+	anDebugGraph( int numItems = 0 );
 
 	void	Enable( bool b ) { enable = b; }
 
@@ -70,7 +70,7 @@ private:
 	};
 	anList< graphPlot_t >	bars;
 	anList< graphPlot_t >	grid;
-	anList< anString >			labels;
+	anList< anStr >			labels;
 };
 
 #endif

@@ -55,7 +55,7 @@ void rvAIMedic::InitSpawnArgsVariables( void )
 
 	/*
 	// JTD: check for player being strogg, since the limits will be different in that case..
-	anString str = gameLocal.world->spawnArgs.GetString ( "player", "player_marine" );
+	anStr str = gameLocal.world->spawnArgs.GetString ( "player", "player_marine" );
 	str.Strip( "player_" );
 	// ...we'll end up with something like minMarineHeal...or minStroggHeal
 	*/
@@ -511,7 +511,7 @@ rvAIMedic::OnStateThreadClear
 =====================
 */
 void rvAIMedic::OnStateThreadClear( const char *statename, int flags ) {
-	if ( anString::Icmp( statename, "State_Medic" ) ) {
+	if ( anStr::Icmp( statename, "State_Medic" ) ) {
 		if ( patient ) {
 			//BAH!  Someone changed our state on us!
 			if ( lookTarget == patient ) {
@@ -697,7 +697,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 			const char  *preHealAnim;
 			spawnArgs.GetString( "anim_preHeal", "", &preHealAnim );
 
-			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anString::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), preHealAnim ) )
+			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anStr::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), preHealAnim ) )
 			{//finished or interrupted
 				PlayAnim( ANIMCHANNEL_TORSO, "medic_treating_player_start", 4 );
 				return SRESULT_STAGE ( STAGE_HEAL_START_WAIT );
@@ -718,7 +718,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 			*/
 			TurnToward ( patient->GetPhysics()->GetOrigin() );
 
-			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anString::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player_start" ) )
+			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anStr::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player_start" ) )
 			{//finished or interrupted
 //				PlayCycle( ANIMCHANNEL_TORSO, "medic_treating_player", 4 );
 				PlayAnim( ANIMCHANNEL_TORSO, "medic_treating_player", 4 );
@@ -788,7 +788,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 				*/
 
 				//jshepard: tech/medic dependent speech
-				if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anString::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player" ) ) {
+				if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anStr::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player" ) ) {
 					if ( !isTech ) {
 						patient->health = patient->health+healAmt>maxPatientValue?maxPatientValue:patient->health+healAmt;
 						if ( !silent) {
@@ -822,7 +822,7 @@ stateResult_t rvAIMedic::State_Medic ( const stateParms_t& parms ) {
 			return SRESULT_WAIT;
 
 		case STAGE_WAIT_FINISH:
-			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anString::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player_end" ) )
+			if ( AnimDone( ANIMCHANNEL_TORSO, 4 ) || anStr::Icmp( animator.CurrentAnim( ANIMCHANNEL_TORSO )->AnimName(), "medic_treating_player_end" ) )
 			{//finished or interrupted
 				//turn off the tool, just in case we were interrupted
 				DropPatient();

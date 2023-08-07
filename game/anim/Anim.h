@@ -1,30 +1,3 @@
-/*
-===========================================================================
-
-Doom 3 BFG Edition GPL Source Code
-Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Doom 3 BFG Edition GPL Source Code ( "Doom 3 BFG Edition Source Code" ).
-
-Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 BFG Edition Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 BFG Edition Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 BFG Edition Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 BFG Edition Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
 #ifndef __ANIM_H__
 #define __ANIM_H__
 
@@ -45,17 +18,17 @@ const int ANIMCHANNEL_HEAD			= 3;
 const int ANIMCHANNEL_EYELIDS		= 4;
 
 // for converting from 24 frames per second to milliseconds
-ARC_INLINE int FRAME2MS( int framenum ) {
-	return ( framenum * 1000 ) / 24;
+inline int FRAME2MS( int frameNum ) {
+	return ( frameNum * 1000 ) / 24;
 }
 
 class anRenderModel;
-class arcAnimator;
-class arcAnimBlend;
+class anAnimator;
+class anAnimBlend;
 class function_t;
-class arcEntity;
-class arcSaveGame;
-class arcRestoreGame;
+class anEntity;
+class anSaveGame;
+class anRestoreGame;
 
 typedef struct {
 	int		cycleCount;	// how many times the anim has wrapped to the begining (0 for clamped anims)
@@ -152,8 +125,8 @@ typedef enum {
 	FC_ENABLE_LEG_IK,
 	FC_DISABLE_LEG_IK,
 	FC_RECORDDEMO,
-	FC_AVIGAME
-	, FC_LAUNCH_PROJECTILE,
+	FC_AVIGAME,
+	FC_LAUNCH_PROJECTILE,
 	FC_TRIGGER_FX,
 	FC_START_EMITTER,
 	FC_STOP_EMITTER,
@@ -166,7 +139,7 @@ typedef struct {
 
 typedef struct {
 	frameCommandType_t		type;
-	anString					*string;
+	anStr					*string;
 
 	union {
 		const idSoundShader	*soundShader;
@@ -186,12 +159,12 @@ typedef struct {
 /*
 ==============================================================================================
 
-	anM8DAnim
+	anMD6Anim
 
 ==============================================================================================
 */
 
-class anM8DAnim {
+class anMD6Anim {
 private:
 	int						numFrames;
 	int						frameRate;
@@ -202,13 +175,13 @@ private:
 	anList<jointAnimInfo_t, TAG_MD5_ANIM>	jointInfo;
 	anList<anJointQuat, TAG_MD5_ANIM>		baseFrame;
 	anList<float, TAG_MD5_ANIM>			componentFrames;
-	anString					name;
+	anStr					name;
 	anVec3					totaldelta;
-	mutable int				ref_count;
+	mutable int				refCount;
 
 public:
-							anM8DAnim();
-							~anM8DAnim();
+							anMD6Anim();
+							~anMD6Anim();
 
 	void					Free();
 	bool					Reload();
@@ -224,59 +197,59 @@ public:
 
 	void					CheckModelHierarchy( const anRenderModel *model ) const;
 	void					GetInterpolatedFrame( frameBlend_t &frame, anJointQuat *joints, const int *index, int numIndexes ) const;
-	void					GetSingleFrame( int framenum, anJointQuat *joints, const int *index, int numIndexes ) const;
+	void					GetSingleFrame( int frameNum, anJointQuat *joints, const int *index, int numIndexes ) const;
 	int						Length() const;
 	int						NumFrames() const;
 	int						NumJoints() const;
 	const anVec3			&TotalMovementDelta() const;
 	const char				*Name() const;
 
-	void					GetFrameBlend( int framenum, frameBlend_t &frame ) const;	// frame 1 is first frame
+	void					GetFrameBlend( int frameNum, frameBlend_t &frame ) const;	// frame 1 is first frame
 	void					ConvertTimeToFrame( int time, int cyclecount, frameBlend_t &frame ) const;
 
 	void					GetOrigin( anVec3 &offset, int currentTime, int cyclecount ) const;
-	void					GetOriginRotation( idQuat &rotation, int time, int cyclecount ) const;
+	void					GetOriginRotation( anQuat &rotation, int time, int cyclecount ) const;
 	void					GetBounds( anBounds &bounds, int currentTime, int cyclecount ) const;
 };
 
 /*
 ==============================================================================================
 
-	arcAnim
+	anAnim
 
 ==============================================================================================
 */
 
-class arcAnim {
+class anAnim {
 private:
-	const class arcDeclModelDef	*modelDef;
-	const anM8DAnim				*anims[ ANIM_MaxSyncedAnims ];
+	const class anDeclModelDef	*modelDef;
+	const anMD6Anim				*anims[ ANIM_MaxSyncedAnims ];
 	int							numAnims;
-	anString						name;
-	anString						realname;
+	anStr						name;
+	anStr						realname;
 	anList<frameLookup_t, TAG_ANIM>		frameLookup;
 	anList<frameCommand_t, TAG_ANIM>		frameCommands;
 	animFlags_t					flags;
 
 public:
-								arcAnim();
-								arcAnim( const arcDeclModelDef *modelDef, const arcAnim *anim );
-								~arcAnim();
+								anAnim();
+								anAnim( const anDeclModelDef *modelDef, const anAnim *anim );
+								~anAnim();
 
-	void						SetAnim( const arcDeclModelDef *modelDef, const char *sourcename, const char *animname, int num, const anM8DAnim *md5anims[ ANIM_MaxSyncedAnims ] );
+	void						SetAnim( const anDeclModelDef *modelDef, const char *sourcename, const char *animname, int num, const anMD6Anim *md5anims[ ANIM_MaxSyncedAnims ] );
 	const char					*Name() const;
 	const char					*FullName() const;
-	const anM8DAnim				*MD5Anim( int num ) const;
-	const arcDeclModelDef		*ModelDef() const;
+	const anMD6Anim				*MD5Anim( int num ) const;
+	const anDeclModelDef		*ModelDef() const;
 	int							Length() const;
 	int							NumFrames() const;
 	int							NumAnims() const;
 	const anVec3				&TotalMovementDelta() const;
 	bool						GetOrigin( anVec3 &offset, int animNum, int time, int cyclecount ) const;
-	bool						GetOriginRotation( idQuat &rotation, int animNum, int currentTime, int cyclecount ) const;
+	bool						GetOriginRotation( anQuat &rotation, int animNum, int currentTime, int cyclecount ) const;
 	bool						GetBounds( anBounds &bounds, int animNum, int time, int cyclecount ) const;
-	const char					*AddFrameCommand( const class arcDeclModelDef *modelDef, int framenum, anLexer &src, const anDict *def );
-	void						CallFrameCommands( arcEntity *ent, int from, int to ) const;
+	const char					*AddFrameCommand( const class anDeclModelDef *modelDef, int frameNum, anLexer &src, const anDict *def );
+	void						CallFrameCommands( anEntity *ent, int from, int to ) const;
 	bool						HasFrameCommands() const;
 
 								// returns first frame (zero based) that command occurs.  returns -1 if not found.
@@ -288,15 +261,15 @@ public:
 /*
 ==============================================================================================
 
-	arcDeclModelDef
+	anDeclModelDef
 
 ==============================================================================================
 */
 
-class arcDeclModelDef : public arcDecl {
+class anDeclModelDef : public anDecl {
 public:
-								arcDeclModelDef();
-								~arcDeclModelDef();
+								anDeclModelDef();
+								~anDeclModelDef();
 
 	virtual size_t				Size() const;
 	virtual const char *		DefaultDefinition() const;
@@ -313,7 +286,7 @@ public:
 	const jointInfo_t *			FindJoint( const char *name ) const;
 
 	int							NumAnims() const;
-	const arcAnim *				GetAnim( int index ) const;
+	const anAnim *				GetAnim( int index ) const;
 	int							GetSpecificAnim( const char *name ) const;
 	int							GetAnim( const char *name ) const;
 	bool						HasAnim( const char *name ) const;
@@ -330,7 +303,7 @@ public:
 	const anVec3 &				GetVisualOffset() const;
 
 private:
-	void						CopyDecl( const arcDeclModelDef *decl );
+	void						CopyDecl( const anDeclModelDef *decl );
 	bool						ParseAnim( anLexer &src, int numDefaultAnims );
 
 private:
@@ -339,21 +312,21 @@ private:
 	anList<int, TAG_ANIM>					jointParents;
 	anList<int, TAG_ANIM>					channelJoints[ ANIM_NumAnimChannels ];
 	anRenderModel *				modelHandle;
-	anList<arcAnim *, TAG_ANIM>			anims;
+	anList<anAnim *, TAG_ANIM>			anims;
 	const anDeclSkin *			skin;
 };
 
 /*
 ==============================================================================================
 
-	arcAnimBlend
+	anAnimBlend
 
 ==============================================================================================
 */
 
-class arcAnimBlend {
+class anAnimBlend {
 private:
-	const class arcDeclModelDef	*modelDef;
+	const class anDeclModelDef	*modelDef;
 	int							starttime;
 	int							endtime;
 	int							timeOffset;
@@ -371,23 +344,23 @@ private:
 	bool						allowMove;
 	bool						allowFrameCommands;
 
-	friend class				arcAnimator;
+	friend class				anAnimator;
 
-	void						Reset( const arcDeclModelDef *_modelDef );
-	void						CallFrameCommands( arcEntity *ent, int fromtime, int totime ) const;
-	void						SetFrame( const arcDeclModelDef *modelDef, int animnum, int frame, int currenttime, int blendtime );
-	void						CycleAnim( const arcDeclModelDef *modelDef, int animnum, int currenttime, int blendtime );
-	void						PlayAnim( const arcDeclModelDef *modelDef, int animnum, int currenttime, int blendtime );
+	void						Reset( const anDeclModelDef *_modelDef );
+	void						CallFrameCommands( anEntity *ent, int fromtime, int totime ) const;
+	void						SetFrame( const anDeclModelDef *modelDef, int animnum, int frame, int currenttime, int blendtime );
+	void						CycleAnim( const anDeclModelDef *modelDef, int animnum, int currenttime, int blendtime );
+	void						PlayAnim( const anDeclModelDef *modelDef, int animnum, int currenttime, int blendtime );
 	bool						BlendAnim( int currentTime, int channel, int numJoints, anJointQuat *blendFrame, float &blendWeight, bool removeOrigin, bool overrideBlend, bool printInfo ) const;
 	void						BlendOrigin( int currentTime, anVec3 &blendPos, float &blendWeight, bool removeOriginOffset ) const;
 	void						BlendDelta( int fromtime, int totime, anVec3 &blendDelta, float &blendWeight ) const;
-	void						BlendDeltaRotation( int fromtime, int totime, idQuat &blendDelta, float &blendWeight ) const;
+	void						BlendDeltaRotation( int fromtime, int totime, anQuat &blendDelta, float &blendWeight ) const;
 	bool						AddBounds( int currentTime, anBounds &bounds, bool removeOriginOffset ) const;
 
 public:
-								arcAnimBlend();
-	void						Save( arcSaveGame *savefile ) const;
-	void						Restore( arcRestoreGame *savefile, const arcDeclModelDef *modelDef );
+								anAnimBlend();
+	void						Save( anSaveGame *savefile ) const;
+	void						Restore( anRestoreGame *savefile, const anDeclModelDef *modelDef );
 	const char					*AnimName() const;
 	const char					*AnimFullName() const;
 	float						GetWeight( int currenttime ) const;
@@ -412,14 +385,14 @@ public:
 	int							PlayLength() const;
 	void						AllowMovement( bool allow );
 	void						AllowFrameCommands( bool allow );
-	const arcAnim				*Anim() const;
+	const anAnim				*Anim() const;
 	int							AnimNum() const;
 };
 
 /*
 ==============================================================================================
 
-	arcAFPoseJointMod
+	anAFPoseJointMod
 
 ==============================================================================================
 */
@@ -430,16 +403,16 @@ typedef enum {
 	AF_JOINTMOD_BOTH
 } AFJointModType_t;
 
-class arcAFPoseJointMod {
+class anAFPoseJointMod {
 public:
-								arcAFPoseJointMod();
+								anAFPoseJointMod();
 
 	AFJointModType_t			mod;
 	anMat3						axis;
 	anVec3						origin;
 };
 
-ARC_INLINE arcAFPoseJointMod::arcAFPoseJointMod() {
+inline anAFPoseJointMod::anAFPoseJointMod() {
 	mod = AF_JOINTMOD_AXIS;
 	axis.Identity();
 	origin.Zero();
@@ -448,31 +421,31 @@ ARC_INLINE arcAFPoseJointMod::arcAFPoseJointMod() {
 /*
 ==============================================================================================
 
-	arcAnimator
+	anAnimator
 
 ==============================================================================================
 */
 
-class arcAnimator {
+class anAnimator {
 public:
-								arcAnimator();
-								~arcAnimator();
+								anAnimator();
+								~anAnimator();
 
 	size_t						Allocated() const;
 	size_t						Size() const;
 
-	void						Save( arcSaveGame *savefile ) const;					// archives object for save game file
-	void						Restore( arcRestoreGame *savefile );					// unarchives object from save game file
+	void						Save( anSaveGame *savefile ) const;					// archives object for save game file
+	void						Restore( anRestoreGame *savefile );					// unarchives object from save game file
 
-	void						SetEntity( arcEntity *ent );
-	arcEntity					*GetEntity() const ;
+	void						SetEntity( anEntity *ent );
+	anEntity					*GetEntity() const ;
 	void						RemoveOriginOffset( bool remove );
 	bool						RemoveOrigin() const;
 
 	void						GetJointList( const char *jointnames, anList<jointHandle_t> &jointList ) const;
 
 	int							NumAnims() const;
-	const arcAnim				*GetAnim( int index ) const;
+	const anAnim				*GetAnim( int index ) const;
 	int							GetAnim( const char *name ) const;
 	bool						HasAnim( const char *name ) const;
 
@@ -486,7 +459,7 @@ public:
 
 	anRenderModel				*SetModel( const char *modelname );
 	anRenderModel				*ModelHandle() const;
-	const arcDeclModelDef		*ModelDef() const;
+	const anDeclModelDef		*ModelDef() const;
 
 	void						ForceUpdate();
 	void						ClearForceUpdate();
@@ -497,7 +470,7 @@ public:
 	void						GetOrigin( int currentTime, anVec3 &pos ) const;
 	bool						GetBounds( int currentTime, anBounds &bounds );
 
-	arcAnimBlend					*CurrentAnim( int channelNum );
+	anAnimBlend					*CurrentAnim( int channelNum );
 	void						Clear( int channelNum, int currentTime, int cleartime );
 	void						SetFrame( int channelNum, int animnum, int frame, int currenttime, int blendtime );
 	void						CycleAnim( int channelNum, int animnum, int currenttime, int blendtime );
@@ -540,10 +513,10 @@ private:
 	void						PushAnims( int channel, int currentTime, int blendTime );
 
 private:
-	const arcDeclModelDef *		modelDef;
-	arcEntity *					entity;
+	const anDeclModelDef *		modelDef;
+	anEntity *					entity;
 
-	arcAnimBlend					channels[ ANIM_NumAnimChannels ][ ANIM_MaxAnimsPerChannel ];
+	anAnimBlend					channels[ ANIM_NumAnimChannels ][ ANIM_MaxAnimsPerChannel ];
 	anList<jointMod_t *, TAG_ANIM>		jointMods;
 	int							numJoints;
 	anJointMat *				joints;
@@ -556,9 +529,9 @@ private:
 	anBounds					frameBounds;
 
 	float						AFPoseBlendWeight;
-	anList<int, TAG_ANIM>					AFPoseJoints;
-	anList<arcAFPoseJointMod, TAG_ANIM>	AFPoseJointMods;
-	anList<anJointQuat, TAG_ANIM>			AFPoseJointFrame;
+	anList<int, TAG_ANIM>		AFPoseJoints;
+	anList<anAFPoseJointMod, TAG_ANIM> AFPoseJointMods;
+	anList<anJointQuat, TAG_ANIM>AFPoseJointFrame;
 	anBounds					AFPoseBounds;
 	int							AFPoseTime;
 };
@@ -566,20 +539,20 @@ private:
 /*
 ==============================================================================================
 
-	arcAnimManager
+	anAnimManager
 
 ==============================================================================================
 */
 
-class arcAnimManager {
+class anAnimManager {
 public:
-								arcAnimManager();
-								~arcAnimManager();
+								anAnimManager();
+								~anAnimManager();
 
 	static bool					forceExport;
 
 	void						Shutdown();
-	anM8DAnim *					GetAnim( const char *name );
+	anMD6Anim *					GetAnim( const char *name );
 	void						Preload( const idPreloadManifest &manifest );
 	void						ReloadAnims();
 	void						ListAnims() const;
@@ -590,9 +563,9 @@ public:
 	void						FlushUnusedAnims();
 
 private:
-	idHashTable<anM8DAnim *>	animations;
-	anStringList					jointnames;
+	idHashTable<anMD6Anim *>	animations;
+	anStringList				jointnames;
 	anHashIndex					jointnamesHash;
 };
 
-#endif /* !__ANIM_H__ */
+#endif // !__ANIM_H__

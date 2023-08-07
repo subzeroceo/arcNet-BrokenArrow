@@ -9,6 +9,8 @@
 ===============================================================================
 */
 
+class anMaterial;
+
 // shared between the renderer, game, and Maya export DLL
 #define MD5_VERSION_STRING		"MD5Version"
 #define MD5_MESH_EXT			"md5mesh"
@@ -23,11 +25,9 @@
 #include					<GL/glew.h>
 #define GL_INDEX_TYPE		GL_UNSIGNED_INT
 typedef int qglIndex_t;
-
 #else
 #include					<GL/gl.h>
 #include					<GL/glew.h>
-
 #define GL_INDEX_TYPE		GL_UNSIGNED_SHORT
 typedef short qglIndex_t;
 #endif
@@ -67,6 +67,14 @@ typedef struct surfTriangles_s {
 	bool						perfectHull;			// true if there aren't any dangling edges
 	bool						deformedSurface;		// if true, indexes, silIndexes, mirrorVerts, and silEdges are
 														// pointers into the original surface, and should not be freed
+	// REMINDER: newly added friendly HERE.
+	bool						sharedSurface;			// if true, verts are shared between instances and ambientSurface is
+														// a pointer into the original surface and should not be freed
+
+	int							numAllocedVerts;		// additional allocations
+	int							numAllocedIndices;		// additional allocations
+	bool						frameAlloced;			// we have our frames to allocated too
+	// -- end
 
 	int							numVerts;				// number of vertices
 	anDrawVertex *				verts;					// vertices, allocated with special allocator
@@ -85,9 +93,12 @@ typedef struct surfTriangles_s {
 	int							numSilEdges;			// number of silhouette edges
 	silEdge_t *					silEdges;				// silhouette edges
 
-	anPlane *					facePlanes;				// [numIndexes/3] plane equations
+	int							numAllocatedFacePlanes;
 
+	// REMINDER: newly added friendly HERE.
+	anPlane *					facePlanes;				// [numIndexes/3] plane equations
 	dominantTri_t *				dominantTris;			// [numVerts] for deformed surface fast tangent calculation
+	// -- end
 
 	int							numShadowIndexesNoFrontCaps; // shadow volumes with front caps omitted
 	int							numShadowIndexesNoCaps; // shadow volumes with the front and rear caps omitted
@@ -104,13 +115,36 @@ typedef struct surfTriangles_s {
 														// the interaction, which we will get the ambientCache from
 
 	struct surfTriangles_s *	nextDeferredFree;		// chain of tris to free next frame
+	// REMINDER: newly added friendly HERE. //
+	int							mode;					// what primitive time to render is GL_TRIANGLES by default
+	// -- end //
 
 	// data in vertex object space, not directly readable by the CPU
 	struct vertCache_s *		indexCache;				// int
 	struct vertCache_s *		ambientCache;			// anDrawVertex
 	struct vertCache_s *		lightingCache;			// lightingCache_t
 	struct vertCache_s *		shadowCache;			// anShadowCache
+	// REMINDER: newly added friendly HERE. //
 	anVec3						aliasPoint[3];
+
+	int							numJoints;
+	anJointMat *				joints;
+
+	int							numIndexTree;
+	srfIndexTree_t *			indexTree;
+
+	srfInteractionRef_t			*interactions;
+
+	// borrowed Legacy code from wolf 
+	float						texCoordScale;
+
+	const char *				indexesAllocFileName;
+	const char *				deferredFreeFileName;
+	const char *				ambientCacheFilename;
+	// just so we are clear this is a POINTER to the IDENTIFACTION of the Vertex and Index I.D.!!!
+	int							vertPointer;
+	int							indexPointer;
+	// -- end //
 } srfTriangles_t;
 
 typedef anList<srfTriangles_t *> anTriangleList;
@@ -128,14 +162,17 @@ typedef enum {
 } dynamicModel_t;
 
 typedef enum {
+	//CATMULL_JOINT,
+	//TCBSPLINE_JOINT,
+	//
 	INVALID_JOINT				= -1
 } jointHandle_t;
 
-class anM8DJoint {
+class anMD6Joint {
 public:
-								anM8DJoint() { parent = nullptr; }
-	anString						name;
-	const anM8DJoint *			parent;
+								anMD6Joint() { parent = nullptr; }
+	anStr					name;
+	const anMD6Joint *			parent;
 };
 
 // the init methods may be called again on an already created model when
@@ -266,7 +303,7 @@ public:
 	virtual int					NumJoints( void ) const = 0;
 
 	// Returns the MD5 joints or nullptr if the model is not an MD5
-	virtual const anM8DJoint *	GetJoints( void ) const = 0;
+	virtual const anMD6Joint *	GetJoints( void ) const = 0;
 
 	// Returns the handle for the joint with the given name.
 	virtual jointHandle_t		GetJointHandle( const char *name ) const = 0;

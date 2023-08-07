@@ -26,11 +26,11 @@ struct sdPrecipArgs {
 	float currentWaterHeight;
 	anBounds bounds;
 
-	ARC_INLINE float GetGroundHeightAtPos( const anVec3 &pos, const anVec3 &origin ) {
+	inline float GetGroundHeightAtPos( const anVec3 &pos, const anVec3 &origin ) {
 		return heightMap->GetHeight( pos - origin );
 	}
 
-	ARC_INLINE float GetPrecipitationDistance( void ) {
+	inline float GetPrecipitationDistance( void ) {
 		return p.precipitationDistance;
 	}
 };
@@ -87,7 +87,7 @@ template < class ParticleClass > void sdPrecipitationSystem<ParticleClass>::Pres
 	int count = gameLocal.clip.ClipModelsTouchingBounds( CLIP_DEBUG_PARMS this->params.bounds, CONTENTS_WATER, &clipModel, 1, nullptr );
 	if ( count ) {
 		if ( clipModel->GetNumCollisionModels() ) {
-			arcCollisionModel* model = clipModel->GetCollisionModel( 0 );
+			anCollisionModel* model = clipModel->GetCollisionModel( 0 );
 			int numPlanes = model->GetNumBrushPlanes();
 			if ( numPlanes ) {
 				this->params.currentWaterHeight = clipModel->GetAbsBounds().GetMaxs()[2];

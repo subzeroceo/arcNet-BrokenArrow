@@ -29,17 +29,17 @@ namespace anColorSpaces {
 	void	ConvertMonochromeToRGB( byte *rgb, const byte *mono, int width, int height );
 };
 
-ARC_INLINE anColorRGB_t::ColorRGB_t() :
+inline anColorRGB_t::ColorRGB_t() :
 r( 255 ), g( 255 ), b( 255 ){}
 
-ARC_INLINE anVec4 anColorRGB_t::ToVec4() const {
+inline anVec4 anColorRGB_t::ToVec4() const {
 	return anVec4( r * ( 1.0f / 255.0f ), g * ( 1.0f / 255.0f ), b * ( 1.0f / 255.0f ), 1.0f );
 }
 
-ARC_INLINE anColorRGBA_t::anColorRGBA_t() :
+inline anColorRGBA_t::anColorRGBA_t() :
 a( 255 ){}
 
-ARC_INLINE anVec4 anColorRGBA_t::ToVec4() const {
+inline anVec4 anColorRGBA_t::ToVec4() const {
 	return anVec4( r * ( 1.0f / 255.0f ), g * ( 1.0f / 255.0f ), b * ( 1.0f / 255.0f ), a * ( 1.0f / 255.0f ) );
 }
 

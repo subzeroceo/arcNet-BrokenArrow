@@ -114,95 +114,95 @@ private:
 	static int				GetTraceModelHashKey( const anTraceModel &trm );
 };
 
-ARC_INLINE void anClipModel::Translate( const anVec3 &translation ) {
+inline void anClipModel::Translate( const anVec3 &translation ) {
 	Unlink();
 	origin += translation;
 }
 
-ARC_INLINE void anClipModel::Rotate( const anRotation &rotation ) {
+inline void anClipModel::Rotate( const anRotation &rotation ) {
 	Unlink();
 	origin *= rotation;
 	axis *= rotation.ToMat3();
 }
 
-ARC_INLINE void anClipModel::Enable( void ) {
+inline void anClipModel::Enable( void ) {
 	enabled = true;
 }
 
-ARC_INLINE void anClipModel::Disable( void ) {
+inline void anClipModel::Disable( void ) {
 	enabled = false;
 }
 
-ARC_INLINE void anClipModel::SetContents( int newContents ) {
+inline void anClipModel::SetContents( int newContents ) {
 	contents = newContents;
 	UpdateDynamicContents();
 }
 
-ARC_INLINE int anClipModel::GetContents( void ) const {
+inline int anClipModel::GetContents( void ) const {
 	return contents;
 }
 
-ARC_INLINE void anClipModel::SetEntity( anEntity *newEntity ) {
+inline void anClipModel::SetEntity( anEntity *newEntity ) {
 	entity = newEntity;
 }
 
-ARC_INLINE anEntity *anClipModel::GetEntity( void ) const {
+inline anEntity *anClipModel::GetEntity( void ) const {
 	return entity;
 }
 
-ARC_INLINE void anClipModel::SetId( int newId ) {
+inline void anClipModel::SetId( int newId ) {
 	id = newId;
 }
 
-ARC_INLINE int anClipModel::GetId( void ) const {
+inline int anClipModel::GetId( void ) const {
 	return id;
 }
 
-ARC_INLINE void anClipModel::SetOwner( anEntity *newOwner ) {
+inline void anClipModel::SetOwner( anEntity *newOwner ) {
 	owner = newOwner;
 }
 
-ARC_INLINE anEntity *anClipModel::GetOwner( void ) const {
+inline anEntity *anClipModel::GetOwner( void ) const {
 	return owner;
 }
 
-ARC_INLINE const anBounds &anClipModel::GetBounds( void ) const {
+inline const anBounds &anClipModel::GetBounds( void ) const {
 	return bounds;
 }
 
-ARC_INLINE const anBounds &anClipModel::GetAbsBounds( void ) const {
+inline const anBounds &anClipModel::GetAbsBounds( void ) const {
 	return absBounds;
 }
 
-ARC_INLINE const anVec3 &anClipModel::GetOrigin( void ) const {
+inline const anVec3 &anClipModel::GetOrigin( void ) const {
 	return origin;
 }
 
-ARC_INLINE const anMat3 &anClipModel::GetAxis( void ) const {
+inline const anMat3 &anClipModel::GetAxis( void ) const {
 	return axis;
 }
 
-ARC_INLINE bool anClipModel::IsRenderModel( void ) const {
+inline bool anClipModel::IsRenderModel( void ) const {
 	return ( renderModelHandle != -1 );
 }
 
-ARC_INLINE bool anClipModel::IsTraceModel( void ) const {
+inline bool anClipModel::IsTraceModel( void ) const {
 	return ( traceModelIndex != -1 );
 }
 
-ARC_INLINE bool anClipModel::IsLinked( void ) const {
+inline bool anClipModel::IsLinked( void ) const {
 	return ( clipLinks != nullptr );
 }
 
-ARC_INLINE bool anClipModel::IsEnabled( void ) const {
+inline bool anClipModel::IsEnabled( void ) const {
 	return enabled;
 }
 
-ARC_INLINE bool anClipModel::IsEqual( const anTraceModel &trm ) const {
+inline bool anClipModel::IsEqual( const anTraceModel &trm ) const {
 	return ( traceModelIndex != -1 && *GetCachedTraceModel( traceModelIndex ) == trm );
 }
 
-ARC_INLINE const anTraceModel *anClipModel::GetTraceModel( void ) const {
+inline const anTraceModel *anClipModel::GetTraceModel( void ) const {
 	if ( !IsTraceModel() ) {
 		return nullptr;
 	}
@@ -316,28 +316,28 @@ private:
 	void					GetClipSectorsStaticContents( void );
 };
 
-ARC_INLINE bool anClip::TracePoint( trace_t &results, const anVec3 &start, const anVec3 &end, int contentMask, const anEntity *passEntity ) {
+inline bool anClip::TracePoint( trace_t &results, const anVec3 &start, const anVec3 &end, int contentMask, const anEntity *passEntity ) {
 	Translation( results, start, end, nullptr, mat3_identity, contentMask, passEntity );
 	return ( results.fraction < 1.0f );
 }
 
-ARC_INLINE bool anClip::TraceBounds( trace_t &results, const anVec3 &start, const anVec3 &end, const anBounds &bounds, int contentMask, const anEntity *passEntity ) {
+inline bool anClip::TraceBounds( trace_t &results, const anVec3 &start, const anVec3 &end, const anBounds &bounds, int contentMask, const anEntity *passEntity ) {
 	temporaryClipModel.LoadModel( anTraceModel( bounds ), nullptr, true );
 	Translation( results, start, end, &temporaryClipModel, mat3_identity, contentMask, passEntity );
 	return ( results.fraction < 1.0f );
 }
 
-ARC_INLINE const anBounds & anClip::GetWorldBounds( void ) const {
+inline const anBounds & anClip::GetWorldBounds( void ) const {
 	return worldBounds;
 }
 
-ARC_INLINE void anClip::CoordsForBounds( int* coords, anBounds& bounds ) const {
+inline void anClip::CoordsForBounds( int* coords, anBounds& bounds ) const {
 	float fCoords[ 4 ];
 
-	fCoords[ 0 ] = ( bounds[ 0 ].x - nodeOffset.x ) * nodeScale.x;
-	fCoords[ 1 ] = ( bounds[ 0 ].y - nodeOffset.y ) * nodeScale.y;
-	fCoords[ 2 ] = ( bounds[ 1 ].x - nodeOffset.x ) * nodeScale.x;
-	fCoords[ 3 ] = ( bounds[ 1 ].y - nodeOffset.y ) * nodeScale.y;
+	fCoords[0] = ( bounds[0].x - nodeOffset.x ) * nodeScale.x;
+	fCoords[1] = ( bounds[0].y - nodeOffset.y ) * nodeScale.y;
+	fCoords[2] = ( bounds[1].x - nodeOffset.x ) * nodeScale.x;
+	fCoords[3] = ( bounds[1].y - nodeOffset.y ) * nodeScale.y;
 
 	int i;
 	for ( i = 0; i < 4; i++ ) {
@@ -350,7 +350,7 @@ ARC_INLINE void anClip::CoordsForBounds( int* coords, anBounds& bounds ) const {
 			coords[i] = CLIPSECTOR_WIDTH - 1;
 		}
 	}
-	coords[ 2 ]++; coords[ 3 ]++;
+	coords[2]++; coords[3]++;
 }
 
 #endif // !__CLIP_H__

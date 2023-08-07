@@ -13,7 +13,7 @@
 #define SEAS_FILEVERSION			"1.08"
 
 // travel flags
-#define TFL_INVALID					BIT(0)		// not valid
+#define TFL_INVALID					BIT( 0 )		// not valid
 #define TFL_WALK					BIT( 1 )		// walking
 #define TFL_CROUCH					BIT(2)		// crouching
 #define TFL_WALKOFFLEDGE			BIT(3)		// walking of a ledge
@@ -30,14 +30,14 @@
 #define TFL_AIR						BIT(14)		// travel through air
 
 // face flags
-#define FACE_SOLID					BIT(0)		// solid at the other side
+#define FACE_SOLID					BIT( 0 )		// solid at the other side
 #define FACE_LADDER					BIT( 1 )		// ladder surface
 #define FACE_FLOOR					BIT(2)		// standing on floor when on this face
 #define FACE_LIQUID					BIT(3)		// face seperating two areas with liquid
 #define FACE_LIQUIDSURFACE			BIT(4)		// face seperating liquid and air
 
 // area flags
-#define AREA_FLOOR					BIT(0)		// AI can stand on the floor in this area
+#define AREA_FLOOR					BIT( 0 )		// AI can stand on the floor in this area
 #define AREA_GAP					BIT( 1 )		// area has a gap
 #define AREA_LEDGE					BIT(2)		// if entered the AI bbox partly floats above a ledge
 #define AREA_LADDER					BIT(3)		// area contains one or more ladder faces
@@ -51,7 +51,7 @@
 #define AREA_NOPUSH					BIT(11)		// push into area failed because the area winding is malformed
 
 // area contents flags
-#define AREACONTENTS_SOLID			BIT(0)		// solid, not a valid area
+#define AREACONTENTS_SOLID			BIT( 0 )		// solid, not a valid area
 #define AREACONTENTS_WATER			BIT( 1 )		// area contains water
 #define AREACONTENTS_CLUSTERPORTAL	BIT(2)		// area is a cluster portal
 #define AREACONTENTS_OBSTACLE		BIT(3)		// area contains (part of) a dynamic obstacle
@@ -62,7 +62,7 @@
 #define AREACONTENTS_BBOX_BIT		24
 
 // feature bits
-#define FEATURE_COVER				BIT(0)		// provides cover
+#define FEATURE_COVER				BIT( 0 )		// provides cover
 #define FEATURE_LOOK_LEFT			BIT( 1 )		// attack by leaning left
 #define FEATURE_LOOK_RIGHT			BIT(2)		// attack by leaning right
 #define FEATURE_LOOK_OVER			BIT(3)		// attack by leaning over the cover
@@ -270,7 +270,7 @@ public:
 	int							SEASOnly;	// 0, else 32,48,96,250 or -1 for all
 
 	//int							type;
-	anString					fileExtension;
+	anStr					fileExtension;
 
 								// physics settings
 	anVec3						gravity;
@@ -303,7 +303,7 @@ public:
 public:
 								anSEASSettings( void );
 
-	bool						FromFile( const anString &fileName );
+	bool						FromFile( const anStr &fileName );
 
 // changed to be anBinaryLexer instead of anLexer so that we have the ability to read binary files
 	bool						FromParser( anBinaryLexer &src );
@@ -313,8 +313,8 @@ public:
 	bool						FromDict( const char *name, const anDict *dict );
 	bool						WriteToFile( anFile *fp ) const;
 	bool						ValidForBounds( const anBounds &bounds ) const;
-	bool						ValidEntity( const char *classname, bool *needFlyReachabilities = nullptr ) const;
-//	bool						ValidEntity( const anMapFile *mapFile, const char *classname ) const;
+	bool						ValabEntity( const char *classname, bool *needFlyReachabilities = nullptr ) const;
+//	bool						ValabEntity( const anMapFile *mapFile, const char *classname ) const;
 
 	float						Radius( float scale = 1.0f ) const;
 
@@ -450,8 +450,8 @@ public:
 	virtual size_t					GetMemorySize( void ) = 0;
 
 	void						Init( void ) = 0;
-	virtual bool					Load( const anString &fileName, unsigned int mapFileCRC ) = 0;
-	bool						Write( const anString &fileName, unsigned int mapFileCRC ) = 0;
+	virtual bool					Load( const anStr &fileName, unsigned int mapFileCRC ) = 0;
+	bool						Write( const anStr &fileName, unsigned int mapFileCRC ) = 0;
 	void						Clear( void ) = 0;
 	void						FinishAreas( void ) = 0;
 	void						ReportRoutingEfficiency( void ) const = 0;

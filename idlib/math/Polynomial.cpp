@@ -5,10 +5,10 @@ const float EPSILON		= 1e-6f;
 
 /*
 =============
-arcPolynomial::Laguer
+anPolynomial::Laguer
 =============
 */
-int arcPolynomial::Laguer( const aRcComplex *coef, const int degree, aRcComplex &x ) const {
+int anPolynomial::Laguer( const aRcComplex *coef, const int degree, aRcComplex &x ) const {
 	const int MT = 10, MAX_ITERATIONS = MT * 8;
 	static const float frac[] = { 0.0f, 0.5f, 0.25f, 0.75f, 0.13f, 0.38f, 0.62f, 0.88f, 1.0f };
 
@@ -65,10 +65,10 @@ int arcPolynomial::Laguer( const aRcComplex *coef, const int degree, aRcComplex 
 
 /*
 =============
-arcPolynomial::GetRoots
+anPolynomial::GetRoots
 =============
 */
-int arcPolynomial::GetRoots( aRcComplex *roots ) const {
+int anPolynomial::GetRoots( aRcComplex *roots ) const {
 	aRcComplex *coef = (aRcComplex *) _alloca16( ( degree + 1 ) * sizeof( aRcComplex ) );
 
 	for ( int i = 0; i <= degree; i++ ) {
@@ -115,10 +115,10 @@ int arcPolynomial::GetRoots( aRcComplex *roots ) const {
 
 /*
 =============
-arcPolynomial::GetRoots
+anPolynomial::GetRoots
 =============
 */
-int arcPolynomial::GetRoots( float *roots ) const {
+int anPolynomial::GetRoots( float *roots ) const {
 	aRcComplex *complexRoots;
 
 	switch ( degree ) {
@@ -150,23 +150,23 @@ int arcPolynomial::GetRoots( float *roots ) const {
 
 /*
 =============
-arcPolynomial::ToString
+anPolynomial::ToString
 =============
 */
-const char *arcPolynomial::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+const char *anPolynomial::ToString( int precision ) const {
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }
 
 /*
 =============
-arcPolynomial::Test
+anPolynomial::Test
 =============
 */
-void arcPolynomial::Test( void ) {
+void anPolynomial::Test( void ) {
 	float roots[4], value;
 	aRcComplex complexRoots[4], complexValue;
 
-	arcPolynomial p = arcPolynomial( -5.0f, 4.0f );
+	anPolynomial p = anPolynomial( -5.0f, 4.0f );
 	int num = p.GetRoots( roots );
 
 	for ( int i = 0; i < num; i++ ) {
@@ -174,7 +174,7 @@ void arcPolynomial::Test( void ) {
 		assert( anMath::Fabs( value ) < 1e-4f );
 	}
 
-	arcPolynomial p = arcPolynomial( -5.0f, 4.0f, 3.0f );
+	anPolynomial p = anPolynomial( -5.0f, 4.0f, 3.0f );
 	int num = p.GetRoots( roots );
 
 	for ( int i = 0; i < num; i++ ) {
@@ -182,7 +182,7 @@ void arcPolynomial::Test( void ) {
 		assert( anMath::Fabs( value ) < 1e-4f );
 	}
 
-	arcPolynomial p = arcPolynomial( 1.0f, 4.0f, 3.0f, -2.0f );
+	anPolynomial p = anPolynomial( 1.0f, 4.0f, 3.0f, -2.0f );
 	int num = p.GetRoots( roots );
 
 	for ( int i = 0; i < num; i++ ) {
@@ -190,7 +190,7 @@ void arcPolynomial::Test( void ) {
 		assert( anMath::Fabs( value ) < 1e-4f );
 	}
 
-	arcPolynomial p = arcPolynomial( 5.0f, 4.0f, 3.0f, -2.0f );
+	anPolynomial p = anPolynomial( 5.0f, 4.0f, 3.0f, -2.0f );
 	int num = p.GetRoots( roots );
 
 	for ( int i = 0; i < num; i++ ) {
@@ -198,7 +198,7 @@ void arcPolynomial::Test( void ) {
 		assert( anMath::Fabs( value ) < 1e-4f );
 	}
 
-	arcPolynomial p = arcPolynomial( -5.0f, 4.0f, 3.0f, 2.0f, 1.0f );
+	anPolynomial p = anPolynomial( -5.0f, 4.0f, 3.0f, 2.0f, 1.0f );
 	int num = p.GetRoots( roots );
 
 	for ( int i = 0; i < num; i++ ) {
@@ -206,7 +206,7 @@ void arcPolynomial::Test( void ) {
 		assert( anMath::Fabs( value ) < 1e-4f );
 	}
 
-	arcPolynomial p = arcPolynomial( 1.0f, 4.0f, 3.0f, -2.0f );
+	anPolynomial p = anPolynomial( 1.0f, 4.0f, 3.0f, -2.0f );
 	int num = p.GetRoots( complexRoots );
 
 	for ( int i = 0; i < num; i++ ) {
@@ -214,7 +214,7 @@ void arcPolynomial::Test( void ) {
 		assert( anMath::Fabs( complexValue.r ) < 1e-4f && anMath::Fabs( complexValue.i ) < 1e-4f );
 	}
 
-	arcPolynomial p = arcPolynomial( 5.0f, 4.0f, 3.0f, -2.0f );
+	anPolynomial p = anPolynomial( 5.0f, 4.0f, 3.0f, -2.0f );
 	int num = p.GetRoots( complexRoots );
 
 	for ( int i = 0; i < num; i++ ) {

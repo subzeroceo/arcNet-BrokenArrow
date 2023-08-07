@@ -57,9 +57,9 @@ public:
 private:
 	int					teleportStage;
 
-	void				Event_TeleportEntity( anEntity *activator, bool predicted, anVec3& prevOrigin = vec3_origin );
+	void				Event_TeleportEntity( anEntity *activator, bool predicted, anVec3 &prevOrigin = vec3_origin );
 	void				Event_Teleport( anEntity *activator );
-	void				Teleport( anEntity* other );
+	void				Teleport( anEntity *other );
 	void				Event_TeleportStage( anBasePlayer *player );
 	void				Event_ResetCamera( anBasePlayer *player );
 	void				TeleportPlayer( anBasePlayer *player );
@@ -174,9 +174,9 @@ protected:
 
 	virtual void		ExecuteStage	( void );
 	void				UpdateStage		( void );
-	anVec3				GetStageVector	( const char* key, const char* defaultString = "" ) const;
-	float				GetStageFloat	( const char* key, const char* defaultString = "" ) const;
-	int					GetStageInt		( const char* key, const char* defaultString = "" ) const;
+	anVec3				GetStageVector	( const char *key, const char *defaultString = "" ) const;
+	float				GetStageFloat	( const char *key, const char *defaultString = "" ) const;
+	int					GetStageInt		( const char *key, const char *defaultString = "" ) const;
 
 
 	int					count;
@@ -331,7 +331,7 @@ public:
 	void					Restore( anRestoreGame *savefile );
 
 	void					Spawn( void );
-	virtual bool			LoadAF( const char* keyname );
+	virtual bool			LoadAF( const char *keyname );
 	bool					StartRagdoll( void );
 	virtual bool			GetPhysicsToSoundTransform( anVec3 &origin, anMat3 &axis );
 
@@ -344,8 +344,8 @@ public:
 
 
 private:
-	int						num_anims;
-	int						current_anim_index;
+	int						numAnims;
+	int						currentAnimIndex;
 	int						anim;
 	int						blendFrames;
 	jointHandle_t			soundJoint;
@@ -356,14 +356,14 @@ private:
 // bdube: script variables
 	// script control
 	anThread *				scriptThread;
-	anString					state;
-	anString					idealState;
+	anStr					state;
+	anStr					idealState;
 	int						animDoneTime[ANIM_NumAnimChannels];
 
 	// Script state management
 	void					UpdateScript( void );
 	void					SetState( const char *statename, int blend );
-	void					CallHandler ( const char* handler );
+	void					CallHandler ( const char *handler );
 
 
 	void					PlayNextAnim( void );
@@ -378,7 +378,7 @@ private:
 
 
 // kfuller: added
-	void					Event_SetAnimState( const char* state, int blendframes );
+	void					Event_SetAnimState( const char *state, int blendframes );
 	void					Event_PlayAnim( int channel, const char *animname );
 	void					Event_PlayCycle( int channel, const char *animname );
 	void					Event_AnimDone2( int channel, int blendFrames );
@@ -535,7 +535,7 @@ public:
 	virtual void		ClientPredictionThink( void );
 
 private:
-	anString				text;
+	anStr				text;
 	bool				playerOriented;
 };
 
@@ -620,8 +620,8 @@ public:
 	void					Spawn( void );
 
 	virtual int				GetArea() const { return area; }
-	virtual const anVec3	GetGravity( const anVec3& origin, const anMat3& axis, int clipMask, anEntity* passEntity ) const = 0;
-	virtual const anVec3	GetGravity( const anEntity* ent ) const = 0;
+	virtual const anVec3	GetGravity( const anVec3 &origin, const anMat3 &axis, int clipMask, anEntity *passEntity ) const = 0;
+	virtual const anVec3	GetGravity( const anEntity *ent ) const = 0;
 	virtual const anVec3	GetGravity( const rvClientEntity* ent ) const = 0;
 
 	void					Save( anSaveGame *savefile ) const;
@@ -643,8 +643,8 @@ public:
 
 	void					Spawn( void );
 
-	virtual const anVec3	GetGravity( const anVec3& origin, const anMat3& axis, int clipMask, anEntity* passEntity ) const { return gravity; }
-	virtual const anVec3	GetGravity( const anEntity* ent ) const { return gravity; }
+	virtual const anVec3	GetGravity( const anVec3 &origin, const anMat3 &axis, int clipMask, anEntity *passEntity ) const { return gravity; }
+	virtual const anVec3	GetGravity( const anEntity *ent ) const { return gravity; }
 	virtual const anVec3	GetGravity( const rvClientEntity* ent ) const { return gravity; }
 
 	void					Save( anSaveGame *savefile ) const;
@@ -658,8 +658,8 @@ class rvGravityArea_SurfaceNormal : public rvGravityArea {
 public:
 	CLASS_PROTOTYPE( rvGravityArea_SurfaceNormal );
 
-	virtual const anVec3	GetGravity( const anVec3& origin, const anMat3& axis, int clipMask, anEntity* passEntity ) const;
-	virtual const anVec3	GetGravity( const anEntity* ent ) const;
+	virtual const anVec3	GetGravity( const anVec3 &origin, const anMat3 &axis, int clipMask, anEntity *passEntity ) const;
+	virtual const anVec3	GetGravity( const anEntity *ent ) const;
 	virtual const anVec3	GetGravity( const rvClientEntity* ent ) const;
 
 protected:

@@ -9,7 +9,7 @@ static const char *M8D_SnapshotName = "_M8D5_Snapshot_";
 
 /***********************************************************************
 
-	anM8DMesh
+	anMD5Mesh
 
 ***********************************************************************/
 
@@ -26,10 +26,10 @@ typedef struct vertexWeight_s {
 
 /*
 ====================
-anM8DMesh::anM8DMesh
+anMD5Mesh::anMD5Mesh
 ====================
 */
-anM8DMesh::anM8DMesh() {
+anMD5Mesh::anMD5Mesh() {
 	scaledWeights	= nullptr;
 	weightIndex		= nullptr;
 	shader			= nullptr;
@@ -40,10 +40,10 @@ anM8DMesh::anM8DMesh() {
 
 /*
 ====================
-anM8DMesh::~anM8DMesh
+anMD5Mesh::~anMD5Mesh
 ====================
 */
-anM8DMesh::~anM8DMesh() {
+anMD5Mesh::~anMD5Mesh() {
 	Mem_Free16( scaledWeights );
 	Mem_Free16( weightIndex );
 	if ( deformInfo ) {
@@ -54,16 +54,16 @@ anM8DMesh::~anM8DMesh() {
 
 /*
 ====================
-anM8DMesh::ParseMesh
+anMD5Mesh::ParseMesh
 ====================
 */
-void anM8DMesh::ParseMesh( anLexer &parser, int numJoints, const arcJointMat *joints ) {
+void anMD5Mesh::ParseMesh( anLexer &parser, int numJoints, const anJointMat *joints ) {
 	anToken		token;
 	anToken		name;
 	int			num;
 	int			count;
 	int			jointnum;
-	anString		shaderName;
+	anStr		shaderName;
 	int			i, j;
 	anList<int>	tris;
 	anList<int>	firstWeightForVertex;
@@ -176,7 +176,7 @@ void anM8DMesh::ParseMesh( anLexer &parser, int numJoints, const arcJointMat *jo
 
 	// create pre-scaled weights and an index for the vertex/joint lookup
 	scaledWeights = (anVec4 *) Mem_Alloc16( numWeights * sizeof( scaledWeights[0] ) );
-	weightIndex = ( int*) Mem_Alloc16( numWeights * 2 * sizeof( weightIndex[0] ) );
+	weightIndex = (int *) Mem_Alloc16( numWeights * 2 * sizeof( weightIndex[0] ) );
 	memset( weightIndex, 0, numWeights * 2 * sizeof( weightIndex[0] ) );
 
 	count = 0;
@@ -185,7 +185,7 @@ void anM8DMesh::ParseMesh( anLexer &parser, int numJoints, const arcJointMat *jo
 		for ( j = 0; j < numWeightsForVertex[i]; j++, num++, count++ ) {
 			scaledWeights[count].ToVec3() = tempWeights[num].offset * tempWeights[num].jointWeight;
 			scaledWeights[count].w = tempWeights[num].jointWeight;
-			weightIndex[count * 2 + 0] = tempWeights[num].joint * sizeof( arcJointMat );
+			weightIndex[count * 2 + 0] = tempWeights[num].joint * sizeof( anJointMat );
 		}
 		weightIndex[count * 2 - 1] = 1;
 	}
@@ -219,21 +219,21 @@ void anM8DMesh::ParseMesh( anLexer &parser, int numJoints, const arcJointMat *jo
 
 /*
 ====================
-anM8DMesh::TransformVerts
+anMD5Mesh::TransformVerts
 ====================
 */
-void anM8DMesh::TransformVerts( anDrawVertex *verts, const arcJointMat *entJoints ) {
+void anMD5Mesh::TransformVerts( anDrawVertex *verts, const anJointMat *entJoints ) {
 	SIMDProcessor->TransformVerts( verts, texCoords.Num(), entJoints, scaledWeights, weightIndex, numWeights );
 }
 
 /*
 ====================
-anM8DMesh::TransformScaledVerts
+anMD5Mesh::TransformScaledVerts
 
 Special transform to make the mesh seem fat or skinny.  May be used for zombie deaths
 ====================
 */
-void anM8DMesh::TransformScaledVerts( anDrawVertex *verts, const arcJointMat *entJoints, float scale ) {
+void anMD5Mesh::TransformScaledVerts( anDrawVertex *verts, const anJointMat *entJoints, float scale ) {
 	anVec4 *scaledWeights = (anVec4 *) _alloca16( numWeights * sizeof( scaledWeights[0] ) );
 	SIMDProcessor->Mul( scaledWeights[0].ToFloatPtr(), scale, scaledWeights[0].ToFloatPtr(), numWeights * 4 );
 	SIMDProcessor->TransformVerts( verts, texCoords.Num(), entJoints, scaledWeights, weightIndex, numWeights );
@@ -241,10 +241,10 @@ void anM8DMesh::TransformScaledVerts( anDrawVertex *verts, const arcJointMat *en
 
 /*
 ====================
-anM8DMesh::UpdateSurface
+anMD5Mesh::UpdateSurface
 ====================
 */
-void anM8DMesh::UpdateSurface( const struct renderEntity_s *ent, const arcJointMat *entJoints, modelSurface_t *surf ) {
+void anMD5Mesh::UpdateSurface( const struct renderEntity_s *ent, const anJointMat *entJoints, modelSurface_t *surf ) {
 	tr.pc.c_deformedSurfaces++;
 	tr.pc.c_deformedVerts += deformInfo->numOutputVerts;
 	tr.pc.c_deformedIndexes += deformInfo->numIndexes;
@@ -317,10 +317,10 @@ void anM8DMesh::UpdateSurface( const struct renderEntity_s *ent, const arcJointM
 
 /*
 ====================
-anM8DMesh::CalcBounds
+anMD5Mesh::CalcBounds
 ====================
 */
-anBounds anM8DMesh::CalcBounds( const arcJointMat *entJoints ) {
+anBounds anMD5Mesh::CalcBounds( const anJointMat *entJoints ) {
 	anBounds	bounds;
 	anDrawVertex *verts = (anDrawVertex *) _alloca16( texCoords.Num() * sizeof( anDrawVertex ) );
 
@@ -333,10 +333,10 @@ anBounds anM8DMesh::CalcBounds( const arcJointMat *entJoints ) {
 
 /*
 ====================
-anM8DMesh::NearestJoint
+anMD5Mesh::NearestJoint
 ====================
 */
-int anM8DMesh::NearestJoint( int a, int b, int c ) const {
+int anMD5Mesh::NearestJoint( int a, int b, int c ) const {
 	// duplicated vertices might not have weights
 	if ( a >= 0 && a < texCoords.Num() ) {
 		int vertNum = a;
@@ -357,11 +357,11 @@ int anM8DMesh::NearestJoint( int a, int b, int c ) const {
 
 	// get the joint for the largest weight
 	float bestWeight = scaledWeights[i].w;
-	int bestJoint = weightIndex[i*2+0] / sizeof( arcJointMat );
+	int bestJoint = weightIndex[i*2+0] / sizeof( anJointMat );
 	for (; weightIndex[i*2+1] == 0; i++ ) {
 		if ( scaledWeights[i].w > bestWeight ) {
 			bestWeight = scaledWeights[i].w;
-			bestJoint = weightIndex[i*2+0] / sizeof( arcJointMat );
+			bestJoint = weightIndex[i*2+0] / sizeof( anJointMat );
 		}
 	}
 	return bestJoint;
@@ -369,28 +369,28 @@ int anM8DMesh::NearestJoint( int a, int b, int c ) const {
 
 /*
 ====================
-anM8DMesh::NumVerts
+anMD5Mesh::NumVerts
 ====================
 */
-int anM8DMesh::NumVerts( void ) const {
+int anMD5Mesh::NumVerts( void ) const {
 	return texCoords.Num();
 }
 
 /*
 ====================
-anM8DMesh::NumTris
+anMD5Mesh::NumTris
 ====================
 */
-int	anM8DMesh::NumTris( void ) const {
+int	anMD5Mesh::NumTris( void ) const {
 	return numTris;
 }
 
 /*
 ====================
-anM8DMesh::NumWeights
+anMD5Mesh::NumWeights
 ====================
 */
-int	anM8DMesh::NumWeights( void ) const {
+int	anMD5Mesh::NumWeights( void ) const {
 	return numWeights;
 }
 
@@ -405,7 +405,7 @@ int	anM8DMesh::NumWeights( void ) const {
 anRenderModelM8D::ParseJoint
 ====================
 */
-void anRenderModelM8D::ParseJoint( anLexer &parser, anM8DJoint *joint, anJointQuat *defaultPose ) {
+void anRenderModelM8D::ParseJoint( anLexer &parser, anMD6Joint *joint, anJointQuat *defaultPose ) {
 	anToken	token;
 
 	// parse name
@@ -455,8 +455,8 @@ void anRenderModelM8D::LoadModel() {
 	anToken		token;
 	anLexer		parser( LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS );
 	anJointQuat	*pose;
-	anM8DJoint	*joint;
-	arcJointMat *poseMat3;
+	anMD6Joint	*joint;
+	anJointMat *poseMat3;
 
 	if ( !purged ) {
 		PurgeModel();
@@ -488,7 +488,7 @@ void anRenderModelM8D::LoadModel() {
 	joints.SetNum( num );
 	defaultPose.SetGranularity( 1 );
 	defaultPose.SetNum( num );
-	poseMat3 = ( arcJointMat * )_alloca16( num * sizeof( *poseMat3 ) );
+	poseMat3 = ( anJointMat * )_alloca16( num * sizeof( *poseMat3 ) );
 
 	// parse num meshes
 	parser.ExpectTokenString( "numMeshes" );
@@ -538,9 +538,6 @@ anRenderModelM8D::Print
 ==============
 */
 void anRenderModelM8D::Print() const {
-	const anM8DMesh	*mesh;
-	int			i;
-
 	common->Printf( "%s\n", name.c_str() );
 	common->Printf( "Dynamic model.\n" );
 	common->Printf( "Generated smooth normals.\n" );
@@ -548,7 +545,7 @@ void anRenderModelM8D::Print() const {
 	int	totalVerts = 0;
 	int	totalTris = 0;
 	int	totalWeights = 0;
-	for ( mesh = meshes.Ptr(), i = 0; i < meshes.Num(); i++, mesh++ ) {
+	for ( const anMD5Mesh *mesh = meshes.Ptr(), int i = 0; i < meshes.Num(); i++, mesh++ ) {
 		totalVerts += mesh->NumVerts();
 		totalTris += mesh->NumTris();
 		totalWeights += mesh->NumWeights();
@@ -567,9 +564,8 @@ anRenderModelM8D::List
 ==============
 */
 void anRenderModelM8D::List() const {
-	const anM8DMesh	*mesh;
-	int totalTris = 0;
-	int totalVerts = 0;
+	const anMD5Mesh	*mesh;
+	int totalTris = 0, totalVerts = 0;
 
 	for ( mesh = meshes.Ptr(), int i = 0; i < meshes.Num(); i++, mesh++ ) {
 		totalTris += mesh->numTris;
@@ -589,8 +585,8 @@ void anRenderModelM8D::List() const {
 anRenderModelM8D::CalculateBounds
 ====================
 */
-void anRenderModelM8D::CalculateBounds( const arcJointMat *entJoints ) {
-	anM8DMesh *mesh;
+void anRenderModelM8D::CalculateBounds( const anJointMat *entJoints ) {
+	anMD5Mesh *mesh;
 
 	bounds.Clear();
 	for ( mesh = meshes.Ptr(), int i = 0; i < meshes.Num(); i++, mesh++ ) {
@@ -631,8 +627,8 @@ anRenderModelM8D::DrawJoints
 void anRenderModelM8D::DrawJoints( const renderEntity_t *ent, const struct viewDef_s *view ) const {
 	int					num;
 	anVec3				pos;
-	const arcJointMat	*joint;
-	const anM8DJoint	*md5Joint;
+	const anJointMat	*joint;
+	const anMD6Joint	*md5Joint;
 	int					parentNum;
 
 	num = ent->numJoints;
@@ -645,9 +641,9 @@ void anRenderModelM8D::DrawJoints( const renderEntity_t *ent, const struct viewD
 			rw->DebugLine( colorWhite, ent->origin + ent->joints[ parentNum ].ToVec3() * ent->axis, pos );
 		}
 
-		rw->DebugLine( colorRed,	pos, pos + joint->ToMat3()[ 0 ] * 2.0f * ent->axis );
-		rw->DebugLine( colorGreen,	pos, pos + joint->ToMat3()[ 1 ] * 2.0f * ent->axis );
-		rw->DebugLine( colorBlue,	pos, pos + joint->ToMat3()[ 2 ] * 2.0f * ent->axis );
+		rw->DebugLine( colorRed,	pos, pos + joint->ToMat3()[0] * 2.0f * ent->axis );
+		rw->DebugLine( colorGreen,	pos, pos + joint->ToMat3()[1] * 2.0f * ent->axis );
+		rw->DebugLine( colorBlue,	pos, pos + joint->ToMat3()[2] * 2.0f * ent->axis );
 	}
 
 	anBounds bounds;
@@ -676,7 +672,7 @@ anRenderModelM8D::InstantiateDynamicModel
 */
 anRenderModel *anRenderModelM8D::InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, anRenderModel *cachedModel ) {
 	int				i, surfaceNum;
-	anM8DMesh		*mesh;
+	anMD5Mesh		*mesh;
 	anModelStatic	*staticModel;
 
 	if ( cachedModel && !r_useCachedDynamicModels.GetBool() ) {
@@ -690,11 +686,11 @@ anRenderModel *anRenderModelM8D::InstantiateDynamicModel( const struct renderEnt
 	}
 
 	if ( !ent->joints ) {
-		common->Printf( "anRenderModelM8D::InstantiateDynamicModel: nullptr joints on renderEntity for '%s'\n", Name() );
+		common->Printf( "RenderModelM8D::InstantiateDynamicModel: nullptr joints on renderEntity for '%s'\n", Name() );
 		delete cachedModel;
 		return nullptr;
 	} else if ( ent->numJoints != joints.Num() ) {
-		common->Printf( "anRenderModelM8D::InstantiateDynamicModel: renderEntity has different number of joints than model for '%s'\n", Name() );
+		common->Printf( "RenderModelM8D::InstantiateDynamicModel: renderEntity has different number of joints than model for '%s'\n", Name() );
 		delete cachedModel;
 		return nullptr;
 	}
@@ -702,9 +698,9 @@ anRenderModel *anRenderModelM8D::InstantiateDynamicModel( const struct renderEnt
 	tr.pc.c_generateMd5++;
 
 	if ( cachedModel ) {
-		assert( dynamic_cast<anModelStatic *>(cachedModel) != nullptr );
-		assert( anString::Icmp( cachedModel->Name(), M8D_SnapshotName ) == 0 );
-		staticModel = static_cast<anModelStatic *>(cachedModel);
+		assert( dynamic_cast<anModelStatic *>( cachedModel ) != nullptr );
+		assert( anStr::Icmp( cachedModel->Name(), M8D_SnapshotName ) == 0 );
+		staticModel = static_cast<anModelStatic *>( cachedModel );
 	} else {
 		staticModel = new anModelStatic;
 		staticModel->InitEmpty( M8D_SnapshotName );
@@ -785,7 +781,7 @@ int anRenderModelM8D::NumJoints( void ) const {
 anRenderModelM8D::GetJoints
 ====================
 */
-const anM8DJoint *anRenderModelM8D::GetJoints( void ) const {
+const anMD6Joint *anRenderModelM8D::GetJoints( void ) const {
 	return joints.Ptr();
 }
 
@@ -804,12 +800,9 @@ anRenderModelM8D::GetJointHandle
 ====================
 */
 jointHandle_t anRenderModelM8D::GetJointHandle( const char *name ) const {
-	const anM8DJoint *joint;
-	int	i;
-
-	joint = joints.Ptr();
-	for ( i = 0; i < joints.Num(); i++, joint++ ) {
-		if ( anString::Icmp( joint->name.c_str(), name ) == 0 ) {
+	const anMD6Joint *joint = joints.Ptr();
+	for ( int i = 0; i < joints.Num(); i++, joint++ ) {
+		if ( anStr::Icmp( joint->name.c_str(), name ) == 0 ) {
 			return ( jointHandle_t )i;
 		}
 	}
@@ -836,7 +829,7 @@ anRenderModelM8D::NearestJoint
 ====================
 */
 int anRenderModelM8D::NearestJoint( int surfaceNum, int a, int b, int c ) const {
-	const anM8DMesh *mesh;
+	const anMD5Mesh *mesh;
 
 	if ( surfaceNum > meshes.Num() ) {
 		common->Error( "anRenderModelM8D::NearestJoint: surfaceNum > meshes.Num()" );
@@ -860,10 +853,7 @@ are kept loaded
 ====================
 */
 void anRenderModelM8D::TouchData() {
-	anM8DMesh	*mesh;
-	int			i;
-
-	for ( mesh = meshes.Ptr(), i = 0; i < meshes.Num(); i++, mesh++ ) {
+	for ( anMD5Mesh	*mesh = meshes.Ptr(), int i = 0; i < meshes.Num(); i++, mesh++ ) {
 		declManager->FindMaterial( mesh->shader->GetName() );
 	}
 }
@@ -899,7 +889,7 @@ int	anRenderModelM8D::Memory() const {
 
 	// count up meshes
 	for ( int i = 0; i < meshes.Num(); i++ ) {
-		const anM8DMesh *mesh = &meshes[i];
+		const anMD5Mesh *mesh = &meshes[i];
 
 		total += mesh->texCoords.MemoryUsed() + mesh->numWeights * ( sizeof( mesh->scaledWeights[0] ) + sizeof( mesh->weightIndex[0] ) * 2 );
 

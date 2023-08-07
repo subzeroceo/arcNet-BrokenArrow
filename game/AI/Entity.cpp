@@ -336,7 +336,7 @@ void anGameEdit::ParseSpawnArgsToRenderEntity( const anDict *args, renderEntity_
 	renderEntity->shaderParms[ SHADERPARM_RED ]		= color[0];
 	renderEntity->shaderParms[ SHADERPARM_GREEN ]	= color[1];
 	renderEntity->shaderParms[ SHADERPARM_BLUE ]	= color[2];
-	renderEntity->shaderParms[ 3 ]					= args->GetFloat( "shaderParm3", "1" );
+	renderEntity->shaderParms[3]					= args->GetFloat( "shaderParm3", "1" );
 	renderEntity->shaderParms[ 4 ]					= args->GetFloat( "shaderParm4", "0" );
 	renderEntity->shaderParms[ 5 ]					= args->GetFloat( "shaderParm5", "0" );
 	renderEntity->shaderParms[ 6 ]					= args->GetFloat( "shaderParm6", "0" );
@@ -358,7 +358,7 @@ void anGameEdit::ParseSpawnArgsToRenderEntity( const anDict *args, renderEntity_
 	// init any guis, including entity-specific states
 	for ( i = 0; i < MAX_RENDERENTITY_GUI; i++ ) {
 		temp = args->GetString( i == 0 ? "gui" : va( "gui%d", i + 1 ) );
-		if ( temp[ 0 ] != '\0' ) {
+		if ( temp[0] != '\0' ) {
 			AddRenderGui( temp, &renderEntity->gui[i], args );
 		}
 	}
@@ -827,7 +827,7 @@ void anEntity::Restore( anRestoreGame *savefile ) {
 	int				i, j;
 	int				num;
 	rvClientEntity	*temp;
-	anString			funcname;
+	anStr			funcname;
 
 	savefile->ReadInt( entityNumber );
 	savefile->ReadInt( entityDefNumber );
@@ -1203,7 +1203,7 @@ anEntity::SetColor
 ================
 */
 void anEntity::SetColor( const anVec3 &color ) {
-	SetColor( color[ 0 ], color[ 1 ], color[ 2 ] );
+	SetColor( color[0], color[1], color[2] );
 	UpdateVisuals();
 }
 
@@ -1213,9 +1213,9 @@ anEntity::GetColor
 ================
 */
 void anEntity::GetColor( anVec3 &out ) const {
-	out[ 0 ] = renderEntity.shaderParms[ SHADERPARM_RED ];
-	out[ 1 ] = renderEntity.shaderParms[ SHADERPARM_GREEN ];
-	out[ 2 ] = renderEntity.shaderParms[ SHADERPARM_BLUE ];
+	out[0] = renderEntity.shaderParms[ SHADERPARM_RED ];
+	out[1] = renderEntity.shaderParms[ SHADERPARM_GREEN ];
+	out[2] = renderEntity.shaderParms[ SHADERPARM_BLUE ];
 }
 
 /*
@@ -1224,10 +1224,10 @@ anEntity::SetColor
 ================
 */
 void anEntity::SetColor( const anVec4 &color ) {
-	renderEntity.shaderParms[ SHADERPARM_RED ]		= color[ 0 ];
-	renderEntity.shaderParms[ SHADERPARM_GREEN ]	= color[ 1 ];
-	renderEntity.shaderParms[ SHADERPARM_BLUE ]		= color[ 2 ];
-	renderEntity.shaderParms[ SHADERPARM_ALPHA ]	= color[ 3 ];
+	renderEntity.shaderParms[ SHADERPARM_RED ]		= color[0];
+	renderEntity.shaderParms[ SHADERPARM_GREEN ]	= color[1];
+	renderEntity.shaderParms[ SHADERPARM_BLUE ]		= color[2];
+	renderEntity.shaderParms[ SHADERPARM_ALPHA ]	= color[3];
 	UpdateVisuals();
 }
 
@@ -1237,10 +1237,10 @@ anEntity::GetColor
 ================
 */
 void anEntity::GetColor( anVec4 &out ) const {
-	out[ 0 ] = renderEntity.shaderParms[ SHADERPARM_RED ];
-	out[ 1 ] = renderEntity.shaderParms[ SHADERPARM_GREEN ];
-	out[ 2 ] = renderEntity.shaderParms[ SHADERPARM_BLUE ];
-	out[ 3 ] = renderEntity.shaderParms[ SHADERPARM_ALPHA ];
+	out[0] = renderEntity.shaderParms[ SHADERPARM_RED ];
+	out[1] = renderEntity.shaderParms[ SHADERPARM_GREEN ];
+	out[2] = renderEntity.shaderParms[ SHADERPARM_BLUE ];
+	out[3] = renderEntity.shaderParms[ SHADERPARM_ALPHA ];
 }
 
 /*
@@ -1560,8 +1560,8 @@ void anEntity::ProjectOverlay( const anVec3 &origin, const anVec3 &dir, float si
 
 	axis[2] = -dir;
 	axis[2].NormalVectors( axistemp[0], axistemp[1] );
-	axis[0] = axistemp[ 0 ] * c + axistemp[ 1 ] * -s;
-	axis[1] = axistemp[ 0 ] * -s + axistemp[ 1 ] * -c;
+	axis[0] = axistemp[0] * c + axistemp[1] * -s;
+	axis[1] = axistemp[0] * -s + axistemp[1] * -c;
 
 	renderEntity.axis.ProjectVector( origin - renderEntity.origin, localOrigin );
 	renderEntity.axis.ProjectVector( axis[0], localAxis[0] );
@@ -1659,7 +1659,7 @@ bool anEntity::UpdateRenderEntity( renderEntity_s *renderEntity, const renderVie
 		return false;
 	}
 
-	idAnimator *animator = GetAnimator();
+	anAnimator *animator = GetAnimator();
 	if ( animator ) {
 		return animator->CreateFrame( gameLocal.time, false );
 	}
@@ -1692,7 +1692,7 @@ anEntity::GetAnimator
 Subclasses will be responsible for allocating animator.
 ================
 */
-idAnimator *anEntity::GetAnimator( void ) {
+anAnimator *anEntity::GetAnimator( void ) {
 	return nullptr;
 }
 
@@ -1740,7 +1740,7 @@ renderView_t *anEntity::GetRenderView( void ) {
 anEntity::PlayEffect
 ================
 */
-rvClientEffect* anEntity::PlayEffect( const idDecl *effect, jointHandle_t joint, const anVec3& originOffset, const anMat3& axisOffset, bool loop, const anVec3& endOrigin, bool broadcast, effectCategory_t category, const anVec4& effectTint ) {
+rvClientEffect* anEntity::PlayEffect( const idDecl *effect, jointHandle_t joint, const anVec3 &originOffset, const anMat3 &axisOffset, bool loop, const anVec3 &endOrigin, bool broadcast, effectCategory_t category, const anVec4& effectTint ) {
 	if ( joint == INVALID_JOINT ) {
 		return nullptr;
 	}
@@ -1784,9 +1784,9 @@ rvClientEffect* anEntity::PlayEffect( const idDecl *effect, jointHandle_t joint,
 	}
 
 
-	PUSH_SYS_HEAP_ID(RV_HEAP_ID_MULTIPLE_FRAME);
+	PushSystemHeapID(RV_HEAP_ID_MULTIPLE_FRAME);
 	rvClientEffect* clientEffect = new rvClientEffect( effect );
-	POP_HEAP();
+	PopSystemHeap();
 
 	if ( !clientEffect ) {
 		common->Warning( "Failed to create effect \'%s\'\n", effect->GetName() );
@@ -1809,15 +1809,15 @@ rvClientEffect* anEntity::PlayEffect( const idDecl *effect, jointHandle_t joint,
 		return nullptr;
 	}
 
-	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_RED ]		= effectTint[ 0 ];
-	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_GREEN ]	= effectTint[ 1 ];
-	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_BLUE ]		= effectTint[ 2 ];
-	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_ALPHA ]	= effectTint[ 3 ];
+	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_RED ]		= effectTint[0];
+	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_GREEN ]	= effectTint[1];
+	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_BLUE ]		= effectTint[2];
+	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_ALPHA ]	= effectTint[3];
 
 	return clientEffect;
 }
 
-rvClientEffect* anEntity::PlayEffect( const idDecl *effect, const anVec3& origin, const anMat3& axis, bool loop, const anVec3& endOrigin, bool broadcast, effectCategory_t category, const anVec4& effectTint ) {
+rvClientEffect* anEntity::PlayEffect( const idDecl *effect, const anVec3 &origin, const anMat3 &axis, bool loop, const anVec3 &endOrigin, bool broadcast, effectCategory_t category, const anVec4& effectTint ) {
 	anVec3 localOrigin;
 	anMat3 localAxis;
 
@@ -1878,9 +1878,9 @@ rvClientEffect* anEntity::PlayEffect( const idDecl *effect, const anVec3& origin
 
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_SYS_HEAP_ID(RV_HEAP_ID_MULTIPLE_FRAME);
+	PushSystemHeapID(RV_HEAP_ID_MULTIPLE_FRAME);
 	rvClientEffect* clientEffect = new rvClientEffect( effect );
-	POP_HEAP();
+	PopSystemHeap();
 
 
 	if ( !clientEffect ) {
@@ -1904,10 +1904,10 @@ rvClientEffect* anEntity::PlayEffect( const idDecl *effect, const anVec3& origin
 		return nullptr;
 	}
 
-	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_RED ]		= effectTint[ 0 ];
-	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_GREEN ]	= effectTint[ 1 ];
-	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_BLUE ]		= effectTint[ 2 ];
-	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_ALPHA ]	= effectTint[ 3 ];
+	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_RED ]		= effectTint[0];
+	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_GREEN ]	= effectTint[1];
+	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_BLUE ]		= effectTint[2];
+	clientEffect->GetRenderEffect()->shaderParms[ SHADERPARM_ALPHA ]	= effectTint[3];
 
 	return clientEffect;
 }
@@ -1960,7 +1960,7 @@ void anEntity::StopEffect( const idDecl *effect, bool destroyParticles ) {
 	}
 }
 
-void anEntity::StopEffect( const char* effectName, bool destroyParticles ) {
+void anEntity::StopEffect( const char *effectName, bool destroyParticles ) {
 	StopEffect( gameLocal.GetEffect( spawnArgs, effectName ), destroyParticles );
 }
 
@@ -1998,7 +1998,7 @@ bool anEntity::StartSound( const char *soundName, const s_channelType channel, i
 
 	// we should ALWAYS be playing sounds from the def.
 	// hardcoded sounds MUST be avoided at all times because they won't get precached.
-	anString soundNameStr = soundName;
+	anStr soundNameStr = soundName;
 	if ( soundNameStr.CmpPrefix( "snd_" ) && soundNameStr.CmpPrefix( "lipsync_" ) ) {
 		common->Warning( "Non precached sound \'%s\'", soundName );
 	}
@@ -2358,7 +2358,7 @@ anEntity::BindToJoint
 */
 void anEntity::BindToJoint( anEntity *master, const char *jointname, bool orientated ) {
 	jointHandle_t	jointnum;
-	idAnimator		*masterAnimator;
+	anAnimator		*masterAnimator;
 
 	if ( !InitBind( master ) ) {
 		return;
@@ -2705,7 +2705,7 @@ anVec3 anEntity::GetLocalCoordinates( const anVec3 &vec ) const {
 anEntity::DistanceTo2d
 ================
 */
-float anEntity::DistanceTo2d ( const anVec3& pos ) const {
+float anEntity::DistanceTo2d ( const anVec3 &pos ) const {
 	anVec3 pos1;
 	anVec3 pos2;
 	pos1 = pos - (pos * GetPhysics()->GetGravityNormal()) * GetPhysics()->GetGravityNormal();
@@ -2788,7 +2788,7 @@ anEntity::GetMasterPosition
 bool anEntity::GetMasterPosition( anVec3 &masterOrigin, anMat3 &masterAxis ) const {
 	anVec3		localOrigin;
 	anMat3		localAxis;
-	idAnimator	*masterAnimator;
+	anAnimator	*masterAnimator;
 
 	if ( bindMaster ) {
 		// if bound to a joint of an animated model
@@ -2825,7 +2825,7 @@ bool anEntity::GetMasterPosition( anVec3 &masterOrigin, anMat3 &masterAxis ) con
 anEntity::GetPosition
 ================
 */
-void anEntity::GetPosition( anVec3& origin, anMat3& axis ) const {
+void anEntity::GetPosition( anVec3 &origin, anMat3 &axis ) const {
 	origin = renderEntity.origin;
 	axis = renderEntity.axis;
 }
@@ -2994,12 +2994,12 @@ void anEntity::InitDefaultPhysics( const anVec3 &origin, const anMat3 &axis ) {
 	if ( spawnArgs.GetString( "clipmodel", "", &temp ) ) {
 
 // mwhitlock: Dynamic memory consolidation
-		PUSH_HEAP_MEM(this);
+		PushHeapMemory(this);
 
 		clipModel = new anClipModel( temp );
 
 // mwhitlock: Dynamic memory consolidation
-		POP_HEAP();
+		PopSystemHeap();
 
 	}
 
@@ -3044,12 +3044,12 @@ void anEntity::InitDefaultPhysics( const anVec3 &origin, const anMat3 &axis ) {
 				}
 
 // mwhitlock: Dynamic memory consolidation
-				PUSH_HEAP_MEM(this);
+				PushHeapMemory(this);
 
 				clipModel = new anClipModel( trm );
 
 // mwhitlock: Dynamic memory consolidation
-				POP_HEAP();
+				PopSystemHeap();
 
 			}
 		}
@@ -3060,11 +3060,11 @@ void anEntity::InitDefaultPhysics( const anVec3 &origin, const anMat3 &axis ) {
 			if ( ( temp != nullptr ) && ( *temp != 0 ) ) {
 
 // jscott:slash problems
-				anString canonical = temp;
+				anStr canonical = temp;
 				canonical.BackSlashesToSlashes();
 
 // mwhitlock: Dynamic memory consolidation
-				PUSH_HEAP_MEM(this);
+				PushHeapMemory(this);
 
 				clipModel = new anClipModel();
 				if ( !clipModel->LoadModel( canonical ) ) {
@@ -3073,7 +3073,7 @@ void anEntity::InitDefaultPhysics( const anVec3 &origin, const anMat3 &axis ) {
 				}
 
 // mwhitlock: Dynamic memory consolidation
-				POP_HEAP();
+				PopSystemHeap();
 
 			}
 		}
@@ -3507,7 +3507,7 @@ explosions and melee attacks.
 */
 
 // bdube: added ignore entity
-bool anEntity::CanDamage( const anVec3 &origin, anVec3 &damagePoint, anEntity* ignoreEnt ) const {
+bool anEntity::CanDamage( const anVec3 &origin, anVec3 &damagePoint, anEntity *ignoreEnt ) const {
 
 	anVec3 	dest;
 	trace_t	tr;
@@ -3690,7 +3690,7 @@ bool anEntity::SkipImpulse( anEntity *ent, int id ) {
 anEntity::ApplyImpulse
 ============
 */
-void anEntity::ApplyImpulse( anEntity* ent, int id, const anVec3& point, const anVec3& dir, const anDict* damageDef ) {
+void anEntity::ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &dir, const anDict* damageDef ) {
 	ApplyImpulse( ent, id, point, dir * damageDef->GetFloat( "push", "5000" ) );
 }
 
@@ -3700,7 +3700,7 @@ void anEntity::ApplyImpulse( anEntity* ent, int id, const anVec3& point, const a
 anEntity::AddDamageEffect
 ================
 */
-void anEntity::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor ) {
+void anEntity::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor ) {
 	const char *sound, *decal, *key;
 
 	const anDeclEntityDef *def = gameLocal.FindEntityDef( damageDefName, false );
@@ -3743,7 +3743,7 @@ void anEntity::AddDamageEffect( const trace_t &collision, const anVec3 &velocity
 anEntity::CanPlayImpactEffect
 ================
 */
-bool anEntity::CanPlayImpactEffect ( anEntity* owner, anEntity* ent ) {
+bool anEntity::CanPlayImpactEffect ( anEntity *owner, anEntity *ent ) {
 	if ( gameLocal.isMultiplayer ) {
 		if ( gameLocal.IsTeamGame() && !cvarSystem->GetCVarBool( "si_teamDamage" ) && owner->IsType( anBasePlayer::GetClassType() ) && ent->IsType( anBasePlayer::GetClassType() ) && ((anBasePlayer*)owner)->team == ((anBasePlayer*)ent)->team ) {
 			return false;
@@ -3832,12 +3832,12 @@ anThread *anEntity::ConstructScriptObject( void ) {
 		// start a thread that will initialize after Spawn is done being called
 
 // mwhitlock: Dynamic memory consolidation
-		PUSH_HEAP_MEM(this);
+		PushHeapMemory(this);
 
 		thread = new anThread();
 
 // mwhitlock: Dynamic memory consolidation
-		POP_HEAP();
+		PopSystemHeap();
 
 		thread->SetThreadName( name.c_str() );
 		thread->CallFunction( this, constructor, true );
@@ -3876,12 +3876,12 @@ void anEntity::DeconstructScriptObject( void ) {
 		// start a thread that will run immediately and be destroyed
 
 // mwhitlock: Dynamic memory consolidation
-		PUSH_SYS_HEAP_ID(RV_HEAP_ID_TEMPORARY);
+		PushSystemHeapID(RV_HEAP_ID_TEMPORARY);
 
 		thread = new anThread();
 
 // mwhitlock: Dynamic memory consolidation
-		POP_HEAP();
+		PopSystemHeap();
 
 		thread->SetThreadName( name.c_str() );
 		thread->CallFunction( this, destructor, true );
@@ -4169,7 +4169,7 @@ bool anEntity::HandleGuiCommands( anEntity *entityGui, const char *cmds ) {
 
 			// handy for debugging GUI stuff
 			if ( !token.Icmp( "print" ) ) {
-				anString msg;
+				anStr msg;
 				while ( src.ReadToken( &token2 ) ) {
 					if ( token2 == ";" ) {
 						src.UnreadToken( &token2 );
@@ -4382,7 +4382,7 @@ void anEntity::Event_GetLastBlocker(anThread *thread) {
 anEntity::ShowSurface
 ================
 */
-void anEntity::ShowSurface ( const char* surface ) {
+void anEntity::ShowSurface ( const char *surface ) {
 	if ( !renderEntity.hModel || !surface || !*surface ) {
 		return;
 	}
@@ -4395,7 +4395,7 @@ void anEntity::ShowSurface ( const char* surface ) {
 anEntity::Event_ShowSurface
 ================
 */
-void anEntity::Event_ShowSurface ( const char* surface ) {
+void anEntity::Event_ShowSurface ( const char *surface ) {
 	ShowSurface ( surface );
 }
 
@@ -4404,7 +4404,7 @@ void anEntity::Event_ShowSurface ( const char* surface ) {
 anEntity::HideSurface
 ================
 */
-void anEntity::HideSurface ( const char* surface ) {
+void anEntity::HideSurface ( const char *surface ) {
 	if ( !renderEntity.hModel || !surface || !*surface ) {
 		return;
 	}
@@ -4417,7 +4417,7 @@ void anEntity::HideSurface ( const char* surface ) {
 anEntity::Event_HideSurface
 ================
 */
-void anEntity::Event_HideSurface ( const char* surface ) {
+void anEntity::Event_HideSurface ( const char *surface ) {
 	HideSurface ( surface );
 }
 
@@ -4426,7 +4426,7 @@ void anEntity::Event_HideSurface ( const char* surface ) {
 anEntity::Event_GuiEvent
 ================
 */
-void anEntity::Event_GuiEvent ( const char* eventName ) {
+void anEntity::Event_GuiEvent ( const char *eventName ) {
 	if ( renderEntity.gui[0] ) {
 		renderEntity.gui[0]->HandleNamedEvent ( eventName );
 	}
@@ -4495,7 +4495,7 @@ void anEntity::Event_ApplyImpulse( anEntity *source, const anVec3 &point, const 
 anEntity::Event_PlayEffect
 ================
 */
-void anEntity::Event_PlayEffect( const char *effectName, const char* jointName, bool loop ) {
+void anEntity::Event_PlayEffect( const char *effectName, const char *jointName, bool loop ) {
 	jointHandle_t joint;
 	joint = GetAnimator() ? GetAnimator()->GetJointHandle ( jointName ) : INVALID_JOINT;
 	if ( joint != INVALID_JOINT ) {
@@ -4624,9 +4624,9 @@ anCurve_Spline<anVec3> *anEntity::GetSpline( void ) const {
 
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_HEAP_MEM(this);
+	PushHeapMemory(this);
 
-	anString str = kv->GetKey().Right( kv->GetKey().Length() - strlen( curveTag ) );
+	anStr str = kv->GetKey().Right( kv->GetKey().Length() - strlen( curveTag ) );
 	if ( str.Icmp( "CatmullRomSpline" ) == 0 ) {
 		spline = new anCurve_CatmullRomSpline<anVec3>();
 	} else if ( str.Icmp( "nubs" ) == 0 ) {
@@ -4638,7 +4638,7 @@ anCurve_Spline<anVec3> *anEntity::GetSpline( void ) const {
 	}
 
 // mwhitlock: Dynamic memory consolidation
-	POP_HEAP();
+	PopSystemHeap();
 
 
 	spline->SetBoundaryType( anCurve_Spline<anVec3>::BT_CLAMPED );
@@ -4770,7 +4770,7 @@ void anEntity::Event_RandomTarget( const char *ignore ) {
 	}
 
 	ignoreNum = -1;
-	if ( ignore && ( ignore[ 0 ] != 0 ) && ( targets.Num() > 1 ) ) {
+	if ( ignore && ( ignore[0] != 0 ) && ( targets.Num() > 1 ) ) {
 		for ( i = 0; i < targets.Num(); i++ ) {
 			ent = targets[i].GetEntity();
 			if ( ent && ( ent->name == ignore ) ) {
@@ -4837,7 +4837,7 @@ void anEntity::Event_ClearTargetList( float destroyContents ) {
 anEntity::Event_MatchPrefix
 ================
 */
-void anEntity::Event_MatchPrefix( const char *prefix, const char* previousKey ) {
+void anEntity::Event_MatchPrefix( const char *prefix, const char *previousKey ) {
 	const anKeyValue* kv = (previousKey[0]) ? spawnArgs.FindKey(previousKey) : nullptr;
 
 	kv = spawnArgs.MatchPrefix( prefix, kv );
@@ -4854,7 +4854,7 @@ void anEntity::Event_MatchPrefix( const char *prefix, const char* previousKey ) 
 anEntity::Event_IsA
 ================
 */
-void anEntity::Event_IsA( const char* entityDefName ) {
+void anEntity::Event_IsA( const char *entityDefName ) {
 	const anDict* dict = gameLocal.FindEntityDefDict( entityDefName );
 	if ( !dict ) {
 		anThread::ReturnFloat( false );
@@ -4875,7 +4875,7 @@ void anEntity::Event_IsA( const char* entityDefName ) {
 anEntity::Event_IsSameTypeAs
 ================
 */
-void anEntity::Event_IsSameTypeAs( const anEntity* ent ) {
+void anEntity::Event_IsSameTypeAs( const anEntity *ent ) {
 	assert( ent );
 
 	anThread::ReturnFloat( IsType(ent->Type) );
@@ -4951,10 +4951,10 @@ void anEntity::Event_SpawnBind( void ) {
 	int				id;
 	const idAnim	*anim;
 	int				animNum;
-	idAnimator		*parentAnimator;
+	anAnimator		*parentAnimator;
 
 	if ( spawnArgs.GetString( "bind", "", &bind ) ) {
-		if ( anString::Icmp( bind, "worldspawn" ) == 0 ) {
+		if ( anStr::Icmp( bind, "worldspawn" ) == 0 ) {
 			//FIXME: Completely unneccessary since the worldspawn is called "world"
 			parent = gameLocal.world;
 		} else {
@@ -5337,10 +5337,10 @@ anEntity::Event_SetGuiParm
 void anEntity::Event_SetGuiParm( const char *key, const char *val ) {
 
 // mekberg: added
-	anString temp = key;
+	anStr temp = key;
 	for ( int i = 0; i < MAX_RENDERENTITY_GUI; i++ ) {
 		if ( renderEntity.gui[i] ) {
-			if ( anString::Icmpn( key, "gui_", 4 ) ) {
+			if ( anStr::Icmpn( key, "gui_", 4 ) ) {
 				temp.Insert( "gui_", 0 );
 			}
 			spawnArgs.Set( temp.c_str(), val );
@@ -5487,9 +5487,9 @@ void anEntity::Event_RestorePosition( void ) {
 	if ( spawnArgs.GetMatrix( "rotation", "1 0 0 0 1 0 0 0 1", axis ) ) {
 		angles = axis.ToAngles();
 	} else {
-   		angles[ 0 ] = 0;
-   		angles[ 1 ] = spawnArgs.GetFloat( "angle" );
-   		angles[ 2 ] = 0;
+   		angles[0] = 0;
+   		angles[1] = spawnArgs.GetFloat( "angle" );
+   		angles[2] = 0;
 	}
 
 	Teleport( org, angles, nullptr );
@@ -5529,7 +5529,7 @@ void anEntity::Event_UpdateCameraTarget( void ) {
 		kv = cameraTarget->spawnArgs.MatchPrefix( "target", nullptr );
 		while( kv ) {
 			anEntity *ent = gameLocal.FindEntity( kv->GetValue() );
-			if ( ent && anString::Icmp( ent->GetEntityDefName(), "target_null" ) == 0) {
+			if ( ent && anStr::Icmp( ent->GetEntityDefName(), "target_null" ) == 0) {
 				dir = ent->GetPhysics()->GetOrigin() - cameraTarget->GetPhysics()->GetOrigin();
 				dir.Normalize();
 				cameraTarget->SetAxis( dir.ToMat3() );
@@ -5770,8 +5770,8 @@ anEntity::WriteGUIToSnapshot
 */
 void anEntity::WriteGUIToSnapshot( anBitMsgDelta &msg ) const {
 	// no need to loop over MAX_RENDERENTITY_GUI at this time
-	if ( renderEntity.gui[ 0 ] ) {
-		msg.WriteByte( renderEntity.gui[ 0 ]->State().GetInt( "networkState" ) );
+	if ( renderEntity.gui[0] ) {
+		msg.WriteByte( renderEntity.gui[0]->State().GetInt( "networkState" ) );
 	} else {
 		msg.WriteByte( 0 );
 	}
@@ -5786,7 +5786,7 @@ void anEntity::ReadGUIFromSnapshot( const anBitMsgDelta &msg ) {
 	int state;
 	anUserInterface *gui;
 	state = msg.ReadByte( );
-	gui = renderEntity.gui[ 0 ];
+	gui = renderEntity.gui[0];
 	if ( gui && state != mpGUIState ) {
 		mpGUIState = state;
 		gui->SetStateInt( "networkState", state );
@@ -5993,9 +5993,9 @@ bool anEntity::ClientReceiveEvent( int event, int time, const anBitMsg &msg ) {
 
 			if ( bse->CanPlayRateLimited( category ) ) {
 			// mwhitlock: Dynamic memory consolidation
-				PUSH_SYS_HEAP_ID(RV_HEAP_ID_MULTIPLE_FRAME);
+				PushSystemHeapID(RV_HEAP_ID_MULTIPLE_FRAME);
 				clientEffect = new rvClientEffect( effect );
-				POP_HEAP();
+				PopSystemHeap();
 
 				clientEffect->SetOrigin ( vec3_origin );
 				clientEffect->SetAxis ( mat3_identity );
@@ -6033,9 +6033,9 @@ bool anEntity::ClientReceiveEvent( int event, int time, const anBitMsg &msg ) {
 
 			if ( bse->CanPlayRateLimited( category ) ) {
 				// mwhitlock: Dynamic memory consolidation
-				PUSH_SYS_HEAP_ID(RV_HEAP_ID_MULTIPLE_FRAME);
+				PushSystemHeapID(RV_HEAP_ID_MULTIPLE_FRAME);
 				clientEffect = new rvClientEffect( effect );
-				POP_HEAP();
+				PopSystemHeap();
 
 				clientEffect->SetOrigin ( origin );
 				clientEffect->SetAxis ( quat.ToMat3() );
@@ -6084,7 +6084,7 @@ Returns the entity that should take damage in place of this entity.  The default
 entity itself.
 ================
 */
-anEntity* anEntity::GetDamageEntity( void ) {
+anEntity *anEntity::GetDamageEntity( void ) {
 	return forwardDamageEnt.IsValid() ? forwardDamageEnt.GetEntity() : this;
 }
 
@@ -6101,7 +6101,7 @@ void anEntity::DrawDebugEntityInfo( anBounds *viewBounds, anBounds *viewTextBoun
 	}
 
 	anMat3 axis = player->viewAngles.ToMat3();
-	anVec3 up = axis[ 2 ] * 5.0f;
+	anVec3 up = axis[2] * 5.0f;
 
 	// skip if the entity is very far away
 	if ( viewBounds && !viewBounds->IntersectsBounds( GetPhysics()->GetAbsBounds() ) ) {
@@ -6409,7 +6409,7 @@ void anAnimatedEntity::UpdateAnimation( void ) {
 anAnimatedEntity::GetAnimator
 ================
 */
-idAnimator *anAnimatedEntity::GetAnimator( void ) {
+anAnimator *anAnimatedEntity::GetAnimator( void ) {
 	return &animator;
 }
 
@@ -6505,7 +6505,7 @@ anAnimatedEntity::AddDamageEffect
   Dammage effects track the animating impact position, spitting out particles.
 ==============
 */
-void anAnimatedEntity::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor ) {
+void anAnimatedEntity::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor ) {
 	// ddynerman: note, on client the collision struct is incomplete.  Only contains impact point and material
 	const char *splat, *decal, *key;
 	anVec3 dir;
@@ -6638,7 +6638,7 @@ anAnimatedEntity::UpdateRenderEntityCallback
 */
 void anAnimatedEntity::UpdateRenderEntityCallback() {
 	// check if the entity has an MD5 model
-	idAnimator *animator = GetAnimator();
+	anAnimator *animator = GetAnimator();
 	if ( animator && animator->ModelHandle() ) {
 		// set the callback to update the joints
 		renderEntity.callback = anEntity::ModelCallback;
@@ -6752,7 +6752,7 @@ void anAnimatedEntity::Event_GetJointAngle( jointHandle_t jointnum ) {
 	}
 
 	anAngles ang = axis.ToAngles();
-	anVec3 vec( ang[ 0 ], ang[ 1 ], ang[ 2 ] );
+	anVec3 vec( ang[0], ang[1], ang[2] );
 	anThread::ReturnVector( vec );
 }
 
@@ -6763,7 +6763,7 @@ void anAnimatedEntity::Event_GetJointAngle( jointHandle_t jointnum ) {
 anAnimatedEntity::Event_SetJointAngularVelocity
 ================
 */
-void anAnimatedEntity::Event_SetJointAngularVelocity ( const char* jointName, float pitch, float yaw, float roll, int blendTime ) {
+void anAnimatedEntity::Event_SetJointAngularVelocity ( const char *jointName, float pitch, float yaw, float roll, int blendTime ) {
 	jointHandle_t joint = animator.GetJointHandle ( jointName );
 	if ( joint == INVALID_JOINT ) {
 		return;
@@ -6777,7 +6777,7 @@ void anAnimatedEntity::Event_SetJointAngularVelocity ( const char* jointName, fl
 anAnimatedEntity::Event_CollapseJoints
 ================
 */
-void anAnimatedEntity::Event_CollapseJoints ( const char* jointnames, const char* collapseTo ) {
+void anAnimatedEntity::Event_CollapseJoints ( const char *jointnames, const char *collapseTo ) {
 	jointHandle_t collapseToJoint = animator.GetJointHandle ( collapseTo );
 	if ( collapseToJoint == INVALID_JOINT ) {
 		return;

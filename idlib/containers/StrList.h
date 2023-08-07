@@ -9,19 +9,19 @@
 ===============================================================================
 */
 
-typedef anList<anString> anStringList;
-typedef anList<anString*> anStringPtrList;
-typedef anString *anStringPtr;
+typedef anList<anStr> anStringList;
+typedef anList<anStr*> anStringPtrList;
+typedef anStr *anStringPtr;
 
 /*
 ================
-arcListSortCompare<anStringPtr>
+anListSortCompare<anStringPtr>
 
-Compares two pointers to strings. Used to sort a list of string pointers alphabetically in anList<anString>::Sort.
+Compares two pointers to strings. Used to sort a list of string pointers alphabetically in anList<anStr>::Sort.
 ================
 */
 template<>
-ARC_INLINE int arcListSortCompare<anStringPtr>( const anStringPtr *a, const anStringPtr *b ) {
+inline int anListSortCompare<anStringPtr>( const anStringPtr *a, const anStringPtr *b ) {
 	return ( *a )->Icmp( **b );
 }
 
@@ -34,12 +34,12 @@ pointer list. Then copies the strings into another list using the ordered list o
 ================
 */
 template<>
-ARC_INLINE void anStringList::Sort( cmp_t *compare ) {
+inline void anStringList::Sort( cmp_t *compare ) {
 	if ( !num ) {
 		return;
 	}
 
-	anList<anString>		other;
+	anList<anStr>		other;
 	anList<anStringPtr>	pointerList;
 
 	pointerList.SetNum( num );
@@ -66,7 +66,7 @@ Sorts a subsection of the list of strings alphabetically.
 ================
 */
 template<>
-ARC_INLINE void anStringList::SortSubSection( int startIndex, int endIndex, cmp_t *compare ) {
+inline void anStringList::SortSubSection( int startIndex, int endIndex, cmp_t *compare ) {
 	if ( !num ) {
 		return;
 	}
@@ -80,7 +80,7 @@ ARC_INLINE void anStringList::SortSubSection( int startIndex, int endIndex, cmp_
 		return;
 	}
 
-	anList<anString>		other;
+	anList<anStr>		other;
 	anList<anStringPtr>	pointerList;
 
 	int s = endIndex - startIndex + 1;
@@ -104,7 +104,7 @@ anStringList::Size
 ================
 */
 template<>
-ARC_INLINE size_t anStringList::Size( void ) const {
+inline size_t anStringList::Size( void ) const {
 	size_t s = sizeof( *this );
 	for ( int i = 0; i < Num(); i++ ) {
 		s += ( *this )[i].Size();
@@ -125,11 +125,11 @@ ARC_INLINE size_t anStringList::Size( void ) const {
 ================
 anListSortComparePaths
 
-Compares two pointers to strings. Used to sort a list of string pointers alphabetically in anList<anString>::Sort.
+Compares two pointers to strings. Used to sort a list of string pointers alphabetically in anList<anStr>::Sort.
 ================
 */
 template<class anStringPtr>
-ARC_INLINE int anListSortComparePaths( const anStringPtr *a, const anStringPtr *b ) {
+inline int anListSortComparePaths( const anStringPtr *a, const anStringPtr *b ) {
 	return ( *a )->IcmpPath( **b );
 }
 
@@ -140,12 +140,12 @@ anStringListSortPaths
 Sorts the list of path strings alphabetically and makes sure folders come first.
 ================
 */
-ARC_INLINE void anStringListSortPaths( anStringList &list ) {
+inline void anStringListSortPaths( anStringList &list ) {
 	if ( !list.Num() ) {
 		return;
 	}
 
-	anList<anString>		other;
+	anList<anStr>		other;
 	anList<anStringPtr>	pointerList;
 
 	pointerList.SetNum( list.Num() );

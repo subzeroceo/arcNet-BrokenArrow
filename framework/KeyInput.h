@@ -2,9 +2,9 @@
 #define __KEYINPUT_H__
 
 struct keyBindings_t {
-	anString keyboard;
-	anString mouse;
-	anString gamepad;
+	anStr keyboard;
+	anStr mouse;
+	anStr gamepad;
 };
 
 class idSerializer;

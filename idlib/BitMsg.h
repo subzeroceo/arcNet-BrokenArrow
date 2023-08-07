@@ -123,43 +123,43 @@ private:
 	int				ReadDelta( int oldValue, int numBits ) const;
 };
 
-ARC_INLINE void anBitMessage::Init( byte *data, int length ) {
+inline void anBitMessage::Init( byte *data, int length ) {
 	writeData = data;
 	readData = data;
 	maxSize = length;
 }
 
-ARC_INLINE void anBitMessage::Init( const byte *data, int length ) {
+inline void anBitMessage::Init( const byte *data, int length ) {
 	writeData = nullptr;
 	readData = data;
 	maxSize = length;
 }
 
-ARC_INLINE byte *anBitMessage::GetData( void ) {
+inline byte *anBitMessage::GetData( void ) {
 	return writeData;
 }
 
-ARC_INLINE const byte *anBitMessage::GetData( void ) const {
+inline const byte *anBitMessage::GetData( void ) const {
 	return readData;
 }
 
-ARC_INLINE int anBitMessage::GetMaxSize( void ) const {
+inline int anBitMessage::GetMaxSize( void ) const {
 	return maxSize;
 }
 
-ARC_INLINE void anBitMessage::SetAllowOverflow( bool set ) {
+inline void anBitMessage::SetAllowOverflow( bool set ) {
 	allowOverflow = set;
 }
 
-ARC_INLINE bool anBitMessage::IsOverflowed( void ) const {
+inline bool anBitMessage::IsOverflowed( void ) const {
 	return overflowed;
 }
 
-ARC_INLINE int anBitMessage::GetSize( void ) const {
+inline int anBitMessage::GetSize( void ) const {
 	return curSize;
 }
 
-ARC_INLINE void anBitMessage::SetSize( int size ) {
+inline void anBitMessage::SetSize( int size ) {
 	if ( size > maxSize ) {
 		curSize = maxSize;
 	} else {
@@ -167,31 +167,31 @@ ARC_INLINE void anBitMessage::SetSize( int size ) {
 	}
 }
 
-ARC_INLINE int anBitMessage::GetWriteBit( void ) const {
+inline int anBitMessage::GetWriteBit( void ) const {
 	return writeBit;
 }
 
-ARC_INLINE void anBitMessage::SetWriteBit( int bit ) {
+inline void anBitMessage::SetWriteBit( int bit ) {
 	writeBit = bit & 7;
 	if ( writeBit ) {
 		writeData[curSize - 1] &= ( 1 << writeBit ) - 1;
 	}
 }
 
-ARC_INLINE int anBitMessage::GetNumBitsWritten( void ) const {
+inline int anBitMessage::GetNumBitsWritten( void ) const {
 	return ( ( curSize << 3 ) - ( ( 8 - writeBit ) & 7 ) );
 }
 
-ARC_INLINE int anBitMessage::GetRemainingWriteBits( void ) const {
+inline int anBitMessage::GetRemainingWriteBits( void ) const {
 	return ( maxSize << 3 ) - GetNumBitsWritten();
 }
 
-ARC_INLINE void anBitMessage::SaveWriteState( int &s, int &b ) const {
+inline void anBitMessage::SaveWriteState( int &s, int &b ) const {
 	s = curSize;
 	b = writeBit;
 }
 
-ARC_INLINE void anBitMessage::RestoreWriteState( int s, int b ) {
+inline void anBitMessage::RestoreWriteState( int s, int b ) {
 	curSize = s;
 	writeBit = b & 7;
 	if ( writeBit ) {
@@ -199,200 +199,200 @@ ARC_INLINE void anBitMessage::RestoreWriteState( int s, int b ) {
 	}
 }
 
-ARC_INLINE int anBitMessage::GetReadCount( void ) const {
+inline int anBitMessage::GetReadCount( void ) const {
 	return readCount;
 }
 
-ARC_INLINE void anBitMessage::SetReadCount( int bytes ) {
+inline void anBitMessage::SetReadCount( int bytes ) {
 	readCount = bytes;
 }
 
-ARC_INLINE int anBitMessage::GetReadBit( void ) const {
+inline int anBitMessage::GetReadBit( void ) const {
 	return readBit;
 }
 
-ARC_INLINE void anBitMessage::SetReadBit( int bit ) {
+inline void anBitMessage::SetReadBit( int bit ) {
 	readBit = bit & 7;
 }
 
-ARC_INLINE int anBitMessage::GetNumBitsRead( void ) const {
+inline int anBitMessage::GetNumBitsRead( void ) const {
 	return ( ( readCount << 3 ) - ( ( 8 - readBit ) & 7 ) );
 }
 
-ARC_INLINE int anBitMessage::GetRemainingReadBits( void ) const {
+inline int anBitMessage::GetRemainingReadBits( void ) const {
 	return ( curSize << 3 ) - GetNumBitsRead();
 }
 
-ARC_INLINE void anBitMessage::SaveReadState( int &c, int &b ) const {
+inline void anBitMessage::SaveReadState( int &c, int &b ) const {
 	c = readCount;
 	b = readBit;
 }
 
-ARC_INLINE void anBitMessage::RestoreReadState( int c, int b ) {
+inline void anBitMessage::RestoreReadState( int c, int b ) {
 	readCount = c;
 	readBit = b & 7;
 }
 
-ARC_INLINE void anBitMessage::BeginWriting( void ) {
+inline void anBitMessage::BeginWriting( void ) {
 	curSize = 0;
 	overflowed = false;
 	writeBit = 0;
 }
 
-ARC_INLINE int anBitMessage::GetRemainingSpace( void ) const {
+inline int anBitMessage::GetRemainingSpace( void ) const {
 	return maxSize - curSize;
 }
 
-ARC_INLINE void anBitMessage::WriteByteAlign( void ) {
+inline void anBitMessage::WriteByteAlign( void ) {
 	writeBit = 0;
 }
 
-ARC_INLINE void anBitMessage::WriteChar( int c ) {
+inline void anBitMessage::WriteChar( int c ) {
 	WriteBits( c, -8 );
 }
 
-ARC_INLINE void anBitMessage::WriteByte( int c ) {
+inline void anBitMessage::WriteByte( int c ) {
 	WriteBits( c, 8 );
 }
 
-ARC_INLINE void anBitMessage::WriteShort( int c ) {
+inline void anBitMessage::WriteShort( int c ) {
 	WriteBits( c, -16 );
 }
 
-ARC_INLINE void anBitMessage::WriteUShort( int c ) {
+inline void anBitMessage::WriteUShort( int c ) {
 	WriteBits( c, 16 );
 }
 
-ARC_INLINE void anBitMessage::WriteLong( int c ) {
+inline void anBitMessage::WriteLong( int c ) {
 	WriteBits( c, 32 );
 }
 
-ARC_INLINE void anBitMessage::WriteFloat( float f ) {
+inline void anBitMessage::WriteFloat( float f ) {
 	WriteBits( *reinterpret_cast<int *>(&f), 32 );
 }
 
-ARC_INLINE void anBitMessage::WriteFloat( float f, int exponentBits, int mantissaBits ) {
+inline void anBitMessage::WriteFloat( float f, int exponentBits, int mantissaBits ) {
 	int bits = anMath::FloatToBits( f, exponentBits, mantissaBits );
 	WriteBits( bits, 1 + exponentBits + mantissaBits );
 }
 
-ARC_INLINE void anBitMessage::WriteAngle8( float f ) {
+inline void anBitMessage::WriteAngle8( float f ) {
 	WriteByte( ANGLE2BYTE( f ) );
 }
 
-ARC_INLINE void anBitMessage::WriteAngle16( float f ) {
+inline void anBitMessage::WriteAngle16( float f ) {
 	WriteShort( ANGLE2SHORT(f) );
 }
 
-ARC_INLINE void anBitMessage::WriteDir( const anVec3 &dir, int numBits ) {
+inline void anBitMessage::WriteDir( const anVec3 &dir, int numBits ) {
 	WriteBits( DirToBits( dir, numBits ), numBits );
 }
 
-ARC_INLINE void anBitMessage::WriteDeltaChar( int oldValue, int newValue ) {
+inline void anBitMessage::WriteDeltaChar( int oldValue, int newValue ) {
 	WriteDelta( oldValue, newValue, -8 );
 }
 
-ARC_INLINE void anBitMessage::WriteDeltaByte( int oldValue, int newValue ) {
+inline void anBitMessage::WriteDeltaByte( int oldValue, int newValue ) {
 	WriteDelta( oldValue, newValue, 8 );
 }
 
-ARC_INLINE void anBitMessage::WriteDeltaShort( int oldValue, int newValue ) {
+inline void anBitMessage::WriteDeltaShort( int oldValue, int newValue ) {
 	WriteDelta( oldValue, newValue, -16 );
 }
 
-ARC_INLINE void anBitMessage::WriteDeltaLong( int oldValue, int newValue ) {
+inline void anBitMessage::WriteDeltaLong( int oldValue, int newValue ) {
 	WriteDelta( oldValue, newValue, 32 );
 }
 
-ARC_INLINE void anBitMessage::WriteDeltaFloat( float oldValue, float newValue ) {
+inline void anBitMessage::WriteDeltaFloat( float oldValue, float newValue ) {
 	WriteDelta( *reinterpret_cast<int *>(&oldValue), *reinterpret_cast<int *>(&newValue), 32 );
 }
 
-ARC_INLINE void anBitMessage::WriteDeltaFloat( float oldValue, float newValue, int exponentBits, int mantissaBits ) {
+inline void anBitMessage::WriteDeltaFloat( float oldValue, float newValue, int exponentBits, int mantissaBits ) {
 	int oldBits = anMath::FloatToBits( oldValue, exponentBits, mantissaBits );
 	int newBits = anMath::FloatToBits( newValue, exponentBits, mantissaBits );
 	WriteDelta( oldBits, newBits, 1 + exponentBits + mantissaBits );
 }
 
-ARC_INLINE void anBitMessage::BeginReading( void ) const {
+inline void anBitMessage::BeginReading( void ) const {
 	readCount = 0;
 	readBit = 0;
 }
 
-ARC_INLINE int anBitMessage::GetRemaingData( void ) const {
+inline int anBitMessage::GetRemaingData( void ) const {
 	return curSize - readCount;
 }
 
-ARC_INLINE void anBitMessage::ReadByteAlign( void ) const {
+inline void anBitMessage::ReadByteAlign( void ) const {
 	readBit = 0;
 }
 
-ARC_INLINE int anBitMessage::ReadChar( void ) const {
+inline int anBitMessage::ReadChar( void ) const {
 	return ( signed char)ReadBits( -8 );
 }
 
-ARC_INLINE int anBitMessage::ReadByte( void ) const {
+inline int anBitMessage::ReadByte( void ) const {
 	return (unsigned char)ReadBits( 8 );
 }
 
-ARC_INLINE int anBitMessage::ReadShort( void ) const {
+inline int anBitMessage::ReadShort( void ) const {
 	return ( short)ReadBits( -16 );
 }
 
-ARC_INLINE int anBitMessage::ReadUShort( void ) const {
+inline int anBitMessage::ReadUShort( void ) const {
 	return (unsigned short)ReadBits( 16 );
 }
 
-ARC_INLINE int anBitMessage::ReadLong( void ) const {
+inline int anBitMessage::ReadLong( void ) const {
 	return ReadBits( 32 );
 }
 
-ARC_INLINE float anBitMessage::ReadFloat( void ) const {
+inline float anBitMessage::ReadFloat( void ) const {
 	float value;
 	*reinterpret_cast<int *>(&value) = ReadBits( 32 );
 	return value;
 }
 
-ARC_INLINE float anBitMessage::ReadFloat( int exponentBits, int mantissaBits ) const {
+inline float anBitMessage::ReadFloat( int exponentBits, int mantissaBits ) const {
 	int bits = ReadBits( 1 + exponentBits + mantissaBits );
 	return anMath::BitsToFloat( bits, exponentBits, mantissaBits );
 }
 
-ARC_INLINE float anBitMessage::ReadAngle8( void ) const {
+inline float anBitMessage::ReadAngle8( void ) const {
 	return BYTE2ANGLE( ReadByte() );
 }
 
-ARC_INLINE float anBitMessage::ReadAngle16( void ) const {
+inline float anBitMessage::ReadAngle16( void ) const {
 	return SHORT2ANGLE( ReadShort() );
 }
 
-ARC_INLINE anVec3 anBitMessage::ReadDir( int numBits ) const {
+inline anVec3 anBitMessage::ReadDir( int numBits ) const {
 	return BitsToDir( ReadBits( numBits ), numBits );
 }
 
-ARC_INLINE int anBitMessage::ReadDeltaChar( int oldValue ) const {
+inline int anBitMessage::ReadDeltaChar( int oldValue ) const {
 	return ( signed char)ReadDelta( oldValue, -8 );
 }
 
-ARC_INLINE int anBitMessage::ReadDeltaByte( int oldValue ) const {
+inline int anBitMessage::ReadDeltaByte( int oldValue ) const {
 	return (unsigned char)ReadDelta( oldValue, 8 );
 }
 
-ARC_INLINE int anBitMessage::ReadDeltaShort( int oldValue ) const {
+inline int anBitMessage::ReadDeltaShort( int oldValue ) const {
 	return ( short)ReadDelta( oldValue, -16 );
 }
 
-ARC_INLINE int anBitMessage::ReadDeltaLong( int oldValue ) const {
+inline int anBitMessage::ReadDeltaLong( int oldValue ) const {
 	return ReadDelta( oldValue, 32 );
 }
 
-ARC_INLINE float anBitMessage::ReadDeltaFloat( float oldValue ) const {
+inline float anBitMessage::ReadDeltaFloat( float oldValue ) const {
 	float value;
 	*reinterpret_cast<int *>(&value) = ReadDelta( *reinterpret_cast<int *>(&oldValue), 32 );
 	return value;
 }
 
-ARC_INLINE float anBitMessage::ReadDeltaFloat( float oldValue, int exponentBits, int mantissaBits ) const {
+inline float anBitMessage::ReadDeltaFloat( float oldValue, int exponentBits, int mantissaBits ) const {
 	int oldBits = anMath::FloatToBits( oldValue, exponentBits, mantissaBits );
 	int newBits = ReadDelta( oldBits, 1 + exponentBits + mantissaBits );
 	return anMath::BitsToFloat( newBits, exponentBits, mantissaBits );
@@ -478,7 +478,7 @@ private:
 	int				ReadDelta( int oldValue, int numBits ) const;
 };
 
-ARC_INLINE anBitMsgDelta::anBitMsgDelta() {
+inline anBitMsgDelta::anBitMsgDelta() {
 	base = nullptr;
 	newBase = nullptr;
 	writeDelta = nullptr;
@@ -486,7 +486,7 @@ ARC_INLINE anBitMsgDelta::anBitMsgDelta() {
 	changed = false;
 }
 
-ARC_INLINE void anBitMsgDelta::Init( const anBitMessage *base, anBitMessage *newBase, anBitMessage *delta ) {
+inline void anBitMsgDelta::Init( const anBitMessage *base, anBitMessage *newBase, anBitMessage *delta ) {
 	this->base = base;
 	this->newBase = newBase;
 	this->writeDelta = delta;
@@ -494,7 +494,7 @@ ARC_INLINE void anBitMsgDelta::Init( const anBitMessage *base, anBitMessage *new
 	this->changed = false;
 }
 
-ARC_INLINE void anBitMsgDelta::Init( const anBitMessage *base, anBitMessage *newBase, const anBitMessage *delta ) {
+inline void anBitMsgDelta::Init( const anBitMessage *base, anBitMessage *newBase, const anBitMessage *delta ) {
 	this->base = base;
 	this->newBase = newBase;
 	this->writeDelta = nullptr;
@@ -502,143 +502,143 @@ ARC_INLINE void anBitMsgDelta::Init( const anBitMessage *base, anBitMessage *new
 	this->changed = false;
 }
 
-ARC_INLINE bool anBitMsgDelta::HasChanged( void ) const {
+inline bool anBitMsgDelta::HasChanged( void ) const {
 	return changed;
 }
 
-ARC_INLINE void anBitMsgDelta::WriteChar( int c ) {
+inline void anBitMsgDelta::WriteChar( int c ) {
 	WriteBits( c, -8 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteByte( int c ) {
+inline void anBitMsgDelta::WriteByte( int c ) {
 	WriteBits( c, 8 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteShort( int c ) {
+inline void anBitMsgDelta::WriteShort( int c ) {
 	WriteBits( c, -16 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteUShort( int c ) {
+inline void anBitMsgDelta::WriteUShort( int c ) {
 	WriteBits( c, 16 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteLong( int c ) {
+inline void anBitMsgDelta::WriteLong( int c ) {
 	WriteBits( c, 32 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteFloat( float f ) {
+inline void anBitMsgDelta::WriteFloat( float f ) {
 	WriteBits( *reinterpret_cast<int *>(&f), 32 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteFloat( float f, int exponentBits, int mantissaBits ) {
+inline void anBitMsgDelta::WriteFloat( float f, int exponentBits, int mantissaBits ) {
 	int bits = anMath::FloatToBits( f, exponentBits, mantissaBits );
 	WriteBits( bits, 1 + exponentBits + mantissaBits );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteAngle8( float f ) {
+inline void anBitMsgDelta::WriteAngle8( float f ) {
 	WriteBits( ANGLE2BYTE( f ), 8 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteAngle16( float f ) {
+inline void anBitMsgDelta::WriteAngle16( float f ) {
 	WriteBits( ANGLE2SHORT(f), 16 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteDir( const anVec3 &dir, int numBits ) {
+inline void anBitMsgDelta::WriteDir( const anVec3 &dir, int numBits ) {
 	WriteBits( anBitMessage::DirToBits( dir, numBits ), numBits );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteDeltaChar( int oldValue, int newValue ) {
+inline void anBitMsgDelta::WriteDeltaChar( int oldValue, int newValue ) {
 	WriteDelta( oldValue, newValue, -8 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteDeltaByte( int oldValue, int newValue ) {
+inline void anBitMsgDelta::WriteDeltaByte( int oldValue, int newValue ) {
 	WriteDelta( oldValue, newValue, 8 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteDeltaShort( int oldValue, int newValue ) {
+inline void anBitMsgDelta::WriteDeltaShort( int oldValue, int newValue ) {
 	WriteDelta( oldValue, newValue, -16 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteDeltaLong( int oldValue, int newValue ) {
+inline void anBitMsgDelta::WriteDeltaLong( int oldValue, int newValue ) {
 	WriteDelta( oldValue, newValue, 32 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteDeltaFloat( float oldValue, float newValue ) {
+inline void anBitMsgDelta::WriteDeltaFloat( float oldValue, float newValue ) {
 	WriteDelta( *reinterpret_cast<int *>(&oldValue), *reinterpret_cast<int *>(&newValue), 32 );
 }
 
-ARC_INLINE void anBitMsgDelta::WriteDeltaFloat( float oldValue, float newValue, int exponentBits, int mantissaBits ) {
+inline void anBitMsgDelta::WriteDeltaFloat( float oldValue, float newValue, int exponentBits, int mantissaBits ) {
 	int oldBits = anMath::FloatToBits( oldValue, exponentBits, mantissaBits );
 	int newBits = anMath::FloatToBits( newValue, exponentBits, mantissaBits );
 	WriteDelta( oldBits, newBits, 1 + exponentBits + mantissaBits );
 }
 
-ARC_INLINE int anBitMsgDelta::ReadChar( void ) const {
+inline int anBitMsgDelta::ReadChar( void ) const {
 	return ( signed char)ReadBits( -8 );
 }
 
-ARC_INLINE int anBitMsgDelta::ReadByte( void ) const {
+inline int anBitMsgDelta::ReadByte( void ) const {
 	return (unsigned char)ReadBits( 8 );
 }
 
-ARC_INLINE int anBitMsgDelta::ReadShort( void ) const {
+inline int anBitMsgDelta::ReadShort( void ) const {
 	return ( short)ReadBits( -16 );
 }
 
-ARC_INLINE int anBitMsgDelta::ReadUShort( void ) const {
+inline int anBitMsgDelta::ReadUShort( void ) const {
 	return (unsigned short)ReadBits( 16 );
 }
 
-ARC_INLINE int anBitMsgDelta::ReadLong( void ) const {
+inline int anBitMsgDelta::ReadLong( void ) const {
 	return ReadBits( 32 );
 }
 
-ARC_INLINE float anBitMsgDelta::ReadFloat( void ) const {
+inline float anBitMsgDelta::ReadFloat( void ) const {
 	float value;
 	*reinterpret_cast<int *>(&value) = ReadBits( 32 );
 	return value;
 }
 
-ARC_INLINE float anBitMsgDelta::ReadFloat( int exponentBits, int mantissaBits ) const {
+inline float anBitMsgDelta::ReadFloat( int exponentBits, int mantissaBits ) const {
 	int bits = ReadBits( 1 + exponentBits + mantissaBits );
 	return anMath::BitsToFloat( bits, exponentBits, mantissaBits );
 }
 
-ARC_INLINE float anBitMsgDelta::ReadAngle8( void ) const {
+inline float anBitMsgDelta::ReadAngle8( void ) const {
 	return BYTE2ANGLE( ReadByte() );
 }
 
-ARC_INLINE float anBitMsgDelta::ReadAngle16( void ) const {
+inline float anBitMsgDelta::ReadAngle16( void ) const {
 	return SHORT2ANGLE( ReadShort() );
 }
 
-ARC_INLINE anVec3 anBitMsgDelta::ReadDir( int numBits ) const {
+inline anVec3 anBitMsgDelta::ReadDir( int numBits ) const {
 	return anBitMessage::BitsToDir( ReadBits( numBits ), numBits );
 }
 
-ARC_INLINE int anBitMsgDelta::ReadDeltaChar( int oldValue ) const {
+inline int anBitMsgDelta::ReadDeltaChar( int oldValue ) const {
 	return ( signed char)ReadDelta( oldValue, -8 );
 }
 
-ARC_INLINE int anBitMsgDelta::ReadDeltaByte( int oldValue ) const {
+inline int anBitMsgDelta::ReadDeltaByte( int oldValue ) const {
 	return (unsigned char)ReadDelta( oldValue, 8 );
 }
 
-ARC_INLINE int anBitMsgDelta::ReadDeltaShort( int oldValue ) const {
+inline int anBitMsgDelta::ReadDeltaShort( int oldValue ) const {
 	return ( short)ReadDelta( oldValue, -16 );
 }
 
-ARC_INLINE int anBitMsgDelta::ReadDeltaLong( int oldValue ) const {
+inline int anBitMsgDelta::ReadDeltaLong( int oldValue ) const {
 	return ReadDelta( oldValue, 32 );
 }
 
-ARC_INLINE float anBitMsgDelta::ReadDeltaFloat( float oldValue ) const {
+inline float anBitMsgDelta::ReadDeltaFloat( float oldValue ) const {
 	float value;
 	*reinterpret_cast<int *>(&value) = ReadDelta( *reinterpret_cast<int *>(&oldValue), 32 );
 	return value;
 }
 
-ARC_INLINE float anBitMsgDelta::ReadDeltaFloat( float oldValue, int exponentBits, int mantissaBits ) const {
+inline float anBitMsgDelta::ReadDeltaFloat( float oldValue, int exponentBits, int mantissaBits ) const {
 	int oldBits = anMath::FloatToBits( oldValue, exponentBits, mantissaBits );
 	int newBits = ReadDelta( oldBits, 1 + exponentBits + mantissaBits );
 	return anMath::BitsToFloat( newBits, exponentBits, mantissaBits );

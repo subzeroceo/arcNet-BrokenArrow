@@ -91,7 +91,7 @@ anSoftBodiesPhysicsManager::ContentsFromString
 */
 int anSoftBodiesPhysicsManager::ContentsFromString( const char *string ) const {
 	int contents = 0;
-	anLexer src( string, anString::Length( string ), "ContentsFromString" );
+	anLexer src( string, anStr::Length( string ), "ContentsFromString" );
 	anToken token;
 
 	while( src.ReadToken( &token ) ) {
@@ -123,9 +123,9 @@ const char *anSoftBodiesPhysicsManager::StringFromContents( const int contents )
 	for ( int i = 1; cm_contentsFlagByIndex[i] != 0; i++ ) {
 		if ( contents & cm_contentsFlagByIndex[i] ) {
 			if ( length != 0 ) {
-				length += anString::snPrintf( contentsString + length, sizeof( contentsString ) - length, "," );
+				length += anStr::snPrintf( contentsString + length, sizeof( contentsString ) - length, "," );
 			}
-			length += anString::snPrintf( contentsString + length, sizeof( contentsString ) - length, cm_contentsNameByIndex[i] );
+			length += anStr::snPrintf( contentsString + length, sizeof( contentsString ) - length, cm_contentsNameByIndex[i] );
 		}
 	}
 

@@ -159,7 +159,7 @@ int ov_openFile( anFile *f, OggVorbis_File *vf ) {
 idWaveFile::OpenOGG
 ====================
 */
-int idWaveFile::OpenOGG( const char* strFileName, waveformatex_t *pwfx ) {
+int idWaveFile::OpenOGG( const char *strFileName, waveformatex_t *pwfx ) {
 	OggVorbis_File *ov;
 
 	memset( pwfx, 0, sizeof( waveformatex_t ) );

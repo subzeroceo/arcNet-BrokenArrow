@@ -20,7 +20,7 @@ private:
 	anHashIndex				hash;
 };
 
-ARC_INLINE int aRcPlaneSet::FindPlane( const anPlane &plane, const float normalEps, const float distEps ) {
+inline int aRcPlaneSet::FindPlane( const anPlane &plane, const float normalEps, const float distEps ) {
 	int i, border, hashKey;
 
 	assert( distEps <= 0.125f );

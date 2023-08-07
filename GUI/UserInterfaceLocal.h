@@ -12,7 +12,7 @@ public:
 	virtual bool				IsInteractive() const;
 	virtual bool				InitFromFile( const char *qpath, bool rebuild = true, bool cache = true );
 	virtual const char *		HandleEvent( const sysEvent_t *event, int time, bool *updateVisuals );
-	virtual void				HandleNamedEvent( const char* namedEvent );
+	virtual void				HandleNamedEvent( const char *namedEvent );
 	virtual void				Redraw( int time );
 	virtual void				DrawCursor();
 	virtual const anDict &		State() const;
@@ -23,10 +23,10 @@ public:
 	virtual void				SetStateFloat( const char *varName, const float value );
 
 	// Gets a gui state variable
-	virtual const char*			GetStateString( const char *varName, const char* defaultString = "" ) const;
-	virtual bool				GetStateBool( const char *varName, const char* defaultString = "0" ) const;
-	virtual int					GetStateInt( const char *varName, const char* defaultString = "0" ) const;
-	virtual float				GetStateFloat( const char *varName, const char* defaultString = "0" ) const;
+	virtual const char*			GetStateString( const char *varName, const char *defaultString = "" ) const;
+	virtual bool				GetStateBool( const char *varName, const char *defaultString = "0" ) const;
+	virtual int					GetStateInt( const char *varName, const char *defaultString = "0" ) const;
+	virtual float				GetStateFloat( const char *varName, const char *defaultString = "0" ) const;
 
 	virtual void				StateChanged( int time, bool redraw );
 	virtual const char *		Activate( bool activate, int time );
@@ -61,8 +61,8 @@ public:
 	int							GetRefs() { return refs; }
 
 	void						RecurseSetKeyBindingNames( idWindow *window );
-	anString						&GetPendingCmd() { return pendingCmd; };
-	anString						&GetReturnCmd() { return returnCmd; };
+	anStr						&GetPendingCmd() { return pendingCmd; };
+	anStr						&GetReturnCmd() { return returnCmd; };
 
 private:
 	bool						active;
@@ -74,10 +74,10 @@ private:
 	idWindow *					desktop;
 	idWindow *					bindHandler;
 
-	anString						source;
-	anString						activateStr;
-	anString						pendingCmd;
-	anString						returnCmd;
+	anStr						source;
+	anStr						activateStr;
+	anStr						pendingCmd;
+	anStr						returnCmd;
 	ARC_TIME_T						timeStamp;
 
 	float						cursorX;

@@ -14,12 +14,12 @@ public:
 	virtual const char	*HandleEvent(const sysEvent_t *event, bool *updateVisuals);
 	virtual void 		PostParse();
 	virtual void 		Draw( inttime, float x, float y);
-	virtual void		Activate( bool activate, anString &act );
+	virtual void		Activate( bool activate, anStr &act );
 	virtual size_t		Allocated(){return idWindow::Allocated();}; 
   
 	virtual idWinVar	*GetWinVarByName(const char *_name, bool winLookup = false, drawWin_t** owner = nullptr );
 
-	void				RunNamedEvent( const char* eventName );
+	void				RunNamedEvent( const char *eventName );
 	
 private:
 	virtual bool		ParseInternalVar(const char *name, anParser *src);
@@ -37,9 +37,9 @@ private:
 	
 	int					currentChoice;
 	int					choiceType;
-	anString				latchedChoices;
+	anStr				latchedChoices;
 	idWinStr			choicesStr;
-	anString				latchedVals;
+	anStr				latchedVals;
 	idWinStr			choiceVals;
 	anStringList			choices;
 	anStringList			values;

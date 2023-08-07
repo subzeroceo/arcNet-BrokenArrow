@@ -40,7 +40,7 @@
 // punctuation sub type is the punctuation id
 // name sub type is the length of the name
 
-class anToken : public anString {
+class anToken : public anStr {
 	friend class anParser;
 	friend class anLexer;
 
@@ -56,7 +56,7 @@ public:
 					anToken( const anToken *token );
 					~anToken( void );
 
-	void			operator=( const anString& text );
+	void			operator=( const anStr& text );
 	void			operator=( const char *text );
 
 	double			GetDoubleValue( void );				// double value of TT_NUMBER
@@ -79,25 +79,25 @@ private:
 };
 extern anToken;
 
-ARC_INLINE anToken::anToken( void ) {
+inline anToken::anToken( void ) {
 }
 
-ARC_INLINE anToken::anToken( const anToken *token ) {
+inline anToken::anToken( const anToken *token ) {
 	*this = *token;
 }
 
-ARC_INLINE anToken::~anToken( void ) {
+inline anToken::~anToken( void ) {
 }
 
-ARC_INLINE void anToken::operator=( const char *text) {
-	*static_cast<anString *>( this ) = text;
+inline void anToken::operator=( const char *text) {
+	*static_cast<anStr *>( this ) = text;
 }
 
-ARC_INLINE void anToken::operator=( const anString& text ) {
-	*static_cast<anString *>( this ) = text;
+inline void anToken::operator=( const anStr& text ) {
+	*static_cast<anStr *>( this ) = text;
 }
 
-ARC_INLINE double anToken::GetDoubleValue( void ) {
+inline double anToken::GetDoubleValue( void ) {
 	if ( type != TT_NUMBER ) {
 		return 0.0;
 	}
@@ -107,11 +107,11 @@ ARC_INLINE double anToken::GetDoubleValue( void ) {
 	return floatvalue;
 }
 
-ARC_INLINE float anToken::GetFloatValue( void ) {
+inline float anToken::GetFloatValue( void ) {
 	return ( float ) GetDoubleValue();
 }
 
-ARC_INLINE unsigned long	anToken::GetUnsignedLongValue( void ) {
+inline unsigned long	anToken::GetUnsignedLongValue( void ) {
 	if ( type != TT_NUMBER ) {
 		return 0;
 	}
@@ -121,15 +121,15 @@ ARC_INLINE unsigned long	anToken::GetUnsignedLongValue( void ) {
 	return intvalue;
 }
 
-ARC_INLINE int anToken::GetIntValue( void ) {
+inline int anToken::GetIntValue( void ) {
 	return ( int ) GetUnsignedLongValue();
 }
 
-ARC_INLINE int anToken::WhiteSpaceBeforeToken( void ) const {
+inline int anToken::WhiteSpaceBeforeToken( void ) const {
 	return ( whiteSpaceEnd_p > whiteSpaceStart_p );
 }
 
-ARC_INLINE void anToken::AppendDirty( const char a ) {
+inline void anToken::AppendDirty( const char a ) {
 	EnsureAlloced( len + 2, true );
 	data[len++] = a;
 }

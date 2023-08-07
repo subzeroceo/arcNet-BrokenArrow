@@ -9,7 +9,7 @@ enum justify_t {
 };
 
 class idOverlayHandle {
-friend class aRcConsoleLocal;
+friend class ArcNetConsoleLocal;
 public:
 			idOverlayHandle() : index( -1 ), time( 0 ) {}
 private:
@@ -30,14 +30,17 @@ private:
 ===============================================================================
 */
 
-class aRcConsole {
+class ArcNetConsole {
 public:
-	virtual				~aRcConsole() {}
+	virtual				~ArcNetConsole() {}
 
 	virtual void		Init() = 0;
 	virtual void		Shutdown() = 0;
 
-	virtual bool		ProcessEvent( const sysEvent_t * event, bool forceAccept ) = 0;
+	// can't be combined with Init, because Init happens before renderer is started
+	virtual void		LoadGraphics() = 0;
+
+	virtual bool		ProcessEvent( const sysEvent_t *event, bool forceAccept ) = 0;
 
 	// the system code can release the mouse pointer when the console is active
 	virtual bool		Active() = 0;
@@ -53,10 +56,10 @@ public:
 
 	virtual void		PrintOverlay( idOverlayHandle & handle, justify_t justify, VERIFY_FORMAT_STRING const char *text, ... ) = 0;
 
-	virtual arcDebugGraph *CreateGraph( int numItems ) = 0;
-	virtual void		DestroyGraph( arcDebugGraph * graph ) = 0;
+	virtual anDebugGraph *CreateGraph( int numItems ) = 0;
+	virtual void		DestroyGraph( anDebugGraph * graph ) = 0;
 };
 
-extern aRcConsole *	console; // statically initialized to an aRcConsoleLocal
+extern ArcNetConsole *	console; // statically initialized to ArcNetConsoleLocal
 
-#endif
+#endif // !__CONSOLE_H__

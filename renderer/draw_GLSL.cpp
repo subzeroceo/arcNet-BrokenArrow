@@ -113,7 +113,7 @@ void RB_GLSL_DrawInteraction(const drawInteraction_t *din) {
 	// set the textures
 
 	// texture 0 will be the per-surface bump map
-	GL_SelectTexture(0);
+	GL_SelectTexture( 0 );
 	din->bumpImage->Bind();
 
 	// texture 1 will be the light falloff texture
@@ -132,7 +132,7 @@ void RB_GLSL_DrawInteraction(const drawInteraction_t *din) {
 	GL_SelectTexture(4);
 	din->specularImage->Bind();
 
-	GL_SelectTexture(0); //k2023
+	GL_SelectTexture( 0 ); //k2023
 
 	// draw it
 	RB_DrawElementsWithCounters(din->surf->geo);
@@ -223,7 +223,7 @@ void RB_GLSL_CreateDrawInteractions( const drawSurf_t *surf ) {
 	globalImages->BindNull();
 
 	backEnd.qglState.currenttmu = -1;
-	GL_SetCurrentTextureUnit(0);
+	GL_SetCurrentTextureUnit( 0 );
 
 	GL_UseProgram(nullptr );
 }
@@ -237,7 +237,7 @@ void RB_GLSL_DrawInteractions( void ) {
 	viewLight_t		*vLight;
 	const anMaterial *lightShader;
 
-	//GL_SetCurrentTextureUnit(0); //k2023
+	//GL_SetCurrentTextureUnit( 0 ); //k2023
 
 	//
 	// for each light, perform adding and shadowing
@@ -301,7 +301,7 @@ void RB_GLSL_DrawInteractions( void ) {
 	if (r_shadows.GetBool() )
 	qglStencilFunc( GL_ALWAYS, 128, 255);
 
-	//GL_SetCurrentTextureUnit(0); //k2023
+	//GL_SetCurrentTextureUnit( 0 ); //k2023
 }
 
 //===================================================================================
@@ -316,10 +316,10 @@ loads GLSL vertex or fragment shaders
 */
 static void R_LoadGLSLShader( const char *name, shaderProgram_t *shaderProgram, GLenum type) {
 #if 0
-	anString	fullPath = "gl2progs/";
+	anStr	fullPath = "gl2progs/";
 	fullPath += name;
 #else
-	anString	fullPath = cvarSystem->GetCVarString( "r_tst_shaderProgramDir" );
+	anStr	fullPath = cvarSystem->GetCVarString( "r_tst_shaderProgramDir" );
 	if (fullPath.IsEmpty() )
 		fullPath = _GLPROGS;
 	fullPath.AppendPath(name);
@@ -491,19 +491,19 @@ static void RB_GLSL_GetUniformLocations( shaderProgram_t *shader ) {
 	shader->attr_Color = qglGetAttribLocation( shader->program, "attr_Color" );
 
 	for ( i = 0; i < MAX_VERTEX_PARMS; i++ ) {
-		anString::snPrintf(buffer, sizeof( buffer ), "u_vertexParm%d", i );
+		anStr::snPrintf(buffer, sizeof( buffer ), "u_vertexParm%d", i );
 		shader->u_vertexParm[i] = qglGetAttribLocation( shader->program, buffer );
 	}
 
 	for ( i = 0; i < MAX_FRAGMENT_IMAGES; i++ ) {
-		anString::snPrintf(buffer, sizeof( buffer ), "u_fragmentMap%d", i );
+		anStr::snPrintf(buffer, sizeof( buffer ), "u_fragmentMap%d", i );
 		shader->u_fragmentMap[i] = qglGetUniformLocation( shader->program, buffer );
 		glUniform1i( shader->u_fragmentMap[i], i);
 	}
 
 	//k: add cubemap texture units
 	for ( i = 0; i < MAX_FRAGMENT_IMAGES; i++ ) {
-		anString::snPrintf( buffer, sizeof( buffer ), "u_fragmentCubeMap%d", i );
+		anStr::snPrintf( buffer, sizeof( buffer ), "u_fragmentCubeMap%d", i );
 		shader->u_fragmentCubeMap[i] = qglGetUniformLocation( shader->program, buffer );
 		glUniform1i( shader->u_fragmentCubeMap[i], i );
 	}
@@ -550,7 +550,7 @@ R_ReloadGLSLPrograms_f
 */
 static void R_InitGLSLCvars( void ) {
 	const char *lightModel = harm_r_lightModel.GetString();
-	r_usePhong = !( lightModel && !anString::Icmp( INTERACTION_SHADER_BLINNPHONG, lightModel ) );
+	r_usePhong = !( lightModel && !anStr::Icmp( INTERACTION_SHADER_BLINNPHONG, lightModel ) );
 
 	float f = harm_r_specularExponent.GetFloat();
 	if ( f <= 0.0f ) {
@@ -762,7 +762,7 @@ int LoadGLSLShaderProgram( const char *name, shaderProgram_t *program, const cha
 void R_CheckGLSLCvars( void ) {
 	if ( r_tst_lightModel.IsModified() ) {
 		const char *lightModel = r_tst_lightModel.GetString();
-		r_usePhong = !( lightModel && !anString::Icmp(HARM_INTERACTION_SHADER_BLINNPHONG, lightModel ) );
+		r_usePhong = !( lightModel && !anStr::Icmp(HARM_INTERACTION_SHADER_BLINNPHONG, lightModel ) );
 		r_tst_lightModel.ClearModified();
 	}
 

@@ -1,36 +1,8 @@
-/*
-===========================================================================
-
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
-
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
-
-Doom 3 Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Doom 3 Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
 #ifndef __WIN_LOCAL_H__
 #define __WIN_LOCAL_H__
 
 #include <windows.h>
-#include "../../renderer/wglext.h"		// windows OpenGL extensions
+#include "../../renderer/GLIncludes/wglext.h"		// windows OpenGL extensions
 
 // WGL_ARB_extensions_string
 extern	PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;
@@ -55,30 +27,29 @@ extern	PFNWGLBINDTEXIMAGEARBPROC		wglBindTexImageARB;
 extern	PFNWGLRELEASETEXIMAGEARBPROC	wglReleaseTexImageARB;
 extern	PFNWGLSETPBUFFERATTRIBARBPROC	wglSetPbufferAttribARB;
 
-
 #define	MAX_OSPATH			256
 
-#define	WINDOW_STYLE	(WS_OVERLAPPED|WS_BORDER|WS_CAPTION|WS_VISIBLE | WS_THICKFRAME)
+#define	WINDOW_STYLE( WS_OVERLAPPED|WS_BORDER|WS_CAPTION|WS_VISIBLE | WS_THICKFRAME )
 
 void	Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
 
 void	Sys_CreateConsole( void );
 void	Sys_DestroyConsole( void );
 
-char	*Sys_ConsoleInput (void);
+char	*Sys_ConsoleInput( void );
 char	*Sys_GetCurrentUser( void );
 
 void	Win_SetErrorText( const char *text );
 
 cpuid_t	Sys_GetCPUId( void );
 
-int		MapKey ( intkey);
+int		MapKey( intkey);
 
 
 // Input subsystem
 
-void	IN_Init (void);
-void	IN_Shutdown (void);
+void	IN_Init( void );
+void	IN_Shutdown( void );
 // add additional non keyboard / non mouse movement on top of the keyboard move cmd
 
 void	IN_DeactivateMouseIfWindowed( void );
@@ -93,7 +64,7 @@ void	DisableTaskKeys( BOOL bDisable, BOOL bBeep, BOOL bTaskMgr );
 
 
 // window procedure
-LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 void Conbuf_AppendText( const char *msg );
 
@@ -167,9 +138,8 @@ typedef struct {
 	void			*smpData;
 	int				wglErrors;
 	// SMP acceleration vars
-
 } Win32Vars_t;
 
 extern Win32Vars_t	win32;
 
-#endif /* !__WIN_LOCAL_H__ */
+#endif // !__WIN_LOCAL_H__

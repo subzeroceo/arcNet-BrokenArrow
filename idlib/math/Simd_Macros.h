@@ -502,17 +502,17 @@
 ================================================================================================
 */
 
-ARC_INLINE_EXTERN float __fmuls( float a, float b )				{	return ( a * b ); }
-ARC_INLINE_EXTERN float __fmadds( float a, float b, float c )	{	return ( a * b + c ); }
-ARC_INLINE_EXTERN float __fnmsubs( float a, float b, float c )	{	return ( c - a * b ); }
-ARC_INLINE_EXTERN float __fsels( float a, float b, float c )		{	return ( a >= 0.0f ) ? b : c; }
-ARC_INLINE_EXTERN float __frcps( float x )						{	return ( 1.0f / x ); }
-ARC_INLINE_EXTERN float __fdivs( float x, float y )				{	return ( x / y ); }
-ARC_INLINE_EXTERN float __frsqrts( float x )						{	return ( 1.0f / sqrtf( x ) ); }
-ARC_INLINE_EXTERN float __frcps16( float x )						{	return ( 1.0f / x ); }
-ARC_INLINE_EXTERN float __fdivs16( float x, float y )			{	return ( x / y ); }
-ARC_INLINE_EXTERN float __frsqrts16( float x )					{	return ( 1.0f / sqrtf( x ) ); }
-ARC_INLINE_EXTERN float __frndz( float x )						{	return ( float )( (int)( x ) ); }
+inline_EXTERN float __fmuls( float a, float b )				{	return ( a * b ); }
+inline_EXTERN float __fmadds( float a, float b, float c )	{	return ( a * b + c ); }
+inline_EXTERN float __fnmsubs( float a, float b, float c )	{	return ( c - a * b ); }
+inline_EXTERN float __fsels( float a, float b, float c )		{	return ( a >= 0.0f ) ? b : c; }
+inline_EXTERN float __frcps( float x )						{	return ( 1.0f / x ); }
+inline_EXTERN float __fdivs( float x, float y )				{	return ( x / y ); }
+inline_EXTERN float __frsqrts( float x )						{	return ( 1.0f / sqrtf( x ) ); }
+inline_EXTERN float __frcps16( float x )						{	return ( 1.0f / x ); }
+inline_EXTERN float __fdivs16( float x, float y )			{	return ( x / y ); }
+inline_EXTERN float __frsqrts16( float x )					{	return ( 1.0f / sqrtf( x ) ); }
+inline_EXTERN float __frndz( float x )						{	return ( float )( (int)( x ) ); }
 
 /*
 ================================================================================================
@@ -522,7 +522,7 @@ ARC_INLINE_EXTERN float __frndz( float x )						{	return ( float )( (int)( x ) )
 ================================================================================================
 */
 
-#ifdef ID_WIN_X86_SSE2_INTRIN
+#ifdef ARC_WIN_X86_SSE2_INTRIN
 
 // The code below assumes that a cache line is 64 bytes.
 // We specify the cache line size as 128 here to make the code consistent with the consoles.
@@ -561,12 +561,12 @@ ARC_FORCE_INLINE void FlushCacheLine( const void * ptr, int offset ) {
 
 #define CACHE_LINE_SIZE						128
 
-ARC_INLINE void Prefetch( const void * ptr, int offset ) {}
-ARC_INLINE void ZeroCacheLine( void * ptr, int offset ) {
+inline void Prefetch( const void * ptr, int offset ) {}
+inline void ZeroCacheLine( void * ptr, int offset ) {
 	byte * bytePtr = (byte *)( ( ( (UINT_PTR) ( ptr ) ) + ( offset ) ) & ~( CACHE_LINE_SIZE - 1 ) );
 	memset( bytePtr, 0, CACHE_LINE_SIZE );
 }
-ARC_INLINE void FlushCacheLine( const void * ptr, int offset ) {}
+inline void FlushCacheLine( const void * ptr, int offset ) {}
 
 #endif
 
@@ -577,7 +577,7 @@ ARC_INLINE void FlushCacheLine( const void * ptr, int offset ) {}
 */
 
 // number of additional elements that are potentially cleared when clearing whole cache lines at a time
-ARC_INLINE_EXTERN int CACHE_LINE_CLEAR_OVERFLOW_COUNT( int size ) {
+inline_EXTERN int CACHE_LINE_CLEAR_OVERFLOW_COUNT( int size ) {
 	if ( ( size & ( CACHE_LINE_SIZE - 1 ) ) == 0 ) {
 		return 0;
 	}

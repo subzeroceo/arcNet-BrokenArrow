@@ -109,12 +109,12 @@ class rvNamedEvent
 {
 public:
 
-	rvNamedEvent(const char* name)
+	rvNamedEvent(const char *name)
 	{
 		mEvent = new idGuiScriptList;
 		mName  = name;
 	}
-	~rvNamedEvent(void)
+	~rvNamedEvent( void )
 	{
 		delete mEvent;
 	}
@@ -123,7 +123,7 @@ public:
 		return sizeof(*this) + mEvent->Size();
 	}
 	
-	anString				mName;
+	anStr				mName;
 	idGuiScriptList*	mEvent;
 };
 
@@ -198,7 +198,7 @@ public:
 	bool Contains(float x, float y);
 	size_t Size();
 	virtual size_t Allocated();
-	anString* GetStrPtrByName(const char *_name);
+	anStr* GetStrPtrByName(const char *_name);
 
 	virtual idWinVar *GetWinVarByName	(const char *_name, bool winLookup = false, drawWin_t** owner = nullptr );
 
@@ -226,7 +226,7 @@ public:
 	virtual void ArchiveToDictionary(anDict *dict, bool useNames = true);
 	virtual void InitFromDictionary(anDict *dict, bool byName = true);
 	virtual void PostParse();
-	virtual void Activate( bool activate, anString &act );
+	virtual void Activate( bool activate, anStr &act );
 	virtual void Trigger();
 	virtual void GainFocus();
 	virtual void LoseFocus();
@@ -249,7 +249,7 @@ public:
 	void			WriteSaveGameString( const char *string, anFile *savefile );
 	void			WriteSaveGameTransition( idTransitionData &trans, anFile *savefile );
 	virtual void	WriteToSaveGame( anFile *savefile );
-	void			ReadSaveGameString( anString &string, anFile *savefile );
+	void			ReadSaveGameString( anStr &string, anFile *savefile );
 	void			ReadSaveGameTransition( idTransitionData & trans, anFile *savefile );
 	virtual void	ReadFromSaveGame( anFile *savefile );
 	void			FixupTransitions();
@@ -257,7 +257,7 @@ public:
 	virtual void HasScripts(){};
 
 	void FixupParms();
-	void GetScriptString(const char *name, anString &out);
+	void GetScriptString(const char *name, anStr &out);
 	void SetScriptParams();
 	bool HasOps() {	return (ops.Num() > 0); };
 	float EvalRegs( inttest = -1, bool force = false);
@@ -285,9 +285,9 @@ public:
 	const char *GetComment() { return comment;  }
 	void SetComment( const char * p) { comment = p; }
 
-	anString cmd;
+	anStr cmd;
 
-	virtual void RunNamedEvent		( const char* eventName );
+	virtual void RunNamedEvent		( const char *eventName );
 
 	void		AddDefinedVar		( idWinVar* var );
 
@@ -301,7 +301,7 @@ public:
 	void		ScreenToClient		( idRectangle* rect );
 	void		ClientToScreen		( idRectangle* rect );
 
-	bool		UpdateFromDictionary ( anDict& dict );
+	bool		UpdateFromDictionary ( anDict &dict );
 
 protected:
 
@@ -333,9 +333,9 @@ protected:
 	bool ParseScriptEntry(const char *name, anParser *src);
 	bool ParseRegEntry(const char *name, anParser *src);
 	virtual bool ParseInternalVar(const char *name, anParser *src);
-	void ParseString(anParser *src, anString &out);
+	void ParseString(anParser *src, anStr &out);
 	void ParseVec4(anParser *src, anVec4 &out);
-	void ConvertRegEntry(const char *name, anParser *src, anString &out, int tabs);
+	void ConvertRegEntry(const char *name, anParser *src, anStr &out, int tabs);
 
 	float actualX;					// physical coords
 	float actualY;					// ''
@@ -356,8 +356,8 @@ protected:
 	float borderSize;
 	float textAlignx;
 	float textAligny;
-	anString	name;
-	anString	comment;
+	anStr	name;
+	anStr	comment;
 	anVec2	shear;
 
 	signed char	textShadow;
@@ -420,7 +420,7 @@ protected:
 	idWinBool	hideCursor;
 };
 
-ARC_INLINE void idWindow::AddDefinedVar( idWinVar* var ) {
+inline void idWindow::AddDefinedVar( idWinVar* var ) {
 	definedVars.AddUnique( var );
 }
 

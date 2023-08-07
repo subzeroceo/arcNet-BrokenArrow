@@ -129,7 +129,7 @@ void anCommandArgs::TokenizeString( const char *text, bool keepAsStrings ) {
 		argv[argc] = tokenized + totalLen;
 		argc++;
 
-		anString::Copynz( tokenized + totalLen, token.c_str(), sizeof( tokenized ) - totalLen );
+		::Copynz( tokenized + totalLen, token.c_str(), sizeof( tokenized ) - totalLen );
 
 		totalLen += len + 1;
 	}
@@ -143,11 +143,11 @@ anCommandArgs::AppendArg
 void anCommandArgs::AppendArg( const char *text ) {
 	if ( !argc ) {
 		argc = 1;
-		argv[ 0 ] = tokenized;
-		anString::Copynz( tokenized, text, sizeof( tokenized ) );
+		argv[0] = tokenized;
+		::Copynz( tokenized, text, sizeof( tokenized ) );
 	} else {
 		argv[ argc ] = argv[ argc-1 ] + strlen( argv[ argc-1 ] ) + 1;
-		anString::Copynz( argv[ argc ], text, sizeof( tokenized ) - ( argv[ argc ] - tokenized ) );
+		::Copynz( argv[ argc ], text, sizeof( tokenized ) - ( argv[ argc ] - tokenized ) );
 		argc++;
 	}
 }

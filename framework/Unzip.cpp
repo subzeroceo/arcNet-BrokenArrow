@@ -1,7 +1,7 @@
 #include "/idlib/Lib.h"
 #pragma hdrstop
 
-#include "Unzip.h"
+#include "Zip.h"
 #if !defined(unix) && !defined(CASESENSITIVITYDEFAULT_YES) && \
                       !defined(CASESENSITIVITYDEFAULT_NO)
 #define CASESENSITIVITYDEFAULT_NO
@@ -93,23 +93,23 @@ static int strcmpcasenosensitive_internal( const char *fileName1, const char *fi
         (like 1 on Unix, 2 on Windows)
 
 */
-extern int unzStringFileNameCompare( const char *fileName1, const char *fileName2, int caseSensitive ) {
+extern int PaK_CompareFilename( const char *fileName1, const char *fileName2, int caseSensitive ) {
 	if ( caseSensitive == 0 ) {
 		caseSensitive = CASESENSITIVITYDEFAULTVALUE;
 	}
 	if ( caseSensitive == 1 ) {
-		return strcmp( fileName1,fileName2 );
+		return strcmp( fileName1, fileName2 );
 	}
-	return STRCMPCASENOSENTIVEFUNCTION( fileName1,fileName2 );
+	return STRCMPCASENOSENTIVEFUNCTION( fileName1, fileName2 );
 }
 
 #define BUFREADCOMMENT( 0x400 )
 
 /*
-  Locate the Central directory of a zipfile (at the end, just before
-    the global comment)
+Locate the Central directory of a zipfile (at the end, just before
+the global comment)
 */
-static unsigned long pak_SearchCentralDirectory( anFile *file ) {
+static unsigned long PaK_SearchDirectory( anFile *file ) {
     unsigned long uSizeFile = file->Seek( 0, FS_SEEK_END );
     unsigned long uMaxBack = ( uSizeFile < 0xffff ) ? uSizeFile : 0xffff;
     unsigned long uPosFound = 0;
@@ -144,17 +144,17 @@ static unsigned long pak_SearchCentralDirectory( anFile *file ) {
     return uPosFound;
 }
 
-extern anPaKBFile PAK_ExplicitOpen( const char *path, anPaKBFile file ) {
+extern anPaKFile PAK_ExplicitOpen( const char *path, anPaKFile file ) {
 	anFile_Cached *fin = fileSystem->OpenExplicitPakFile( path );
 	if ( fin == nullptr ) {
 		return nullptr;
 	}
 
-    pakBFile_s *s = static_cast<pakBFile_s*>(file);
+    pKFile_s *s = static_cast<pKFile_s*>( file );
     s->file = fin;
     s->zippedFileInfo = nullptr;
 
-    return static_cast<anPaKBFile>(s);
+    return static_cast<anPaKFile>( s);
 }
 
 
@@ -164,12 +164,12 @@ extern anPaKBFile PAK_ExplicitOpen( const char *path, anPaKBFile file ) {
 	 "zlib/zlib109.zip".
 	 If the zipfile cannot be opened (file don't exist or in not valid), the
 	   return value is nullptr.
-     Else, the return value is a anPaKBFile Handle, usable with other function
+     Else, the return value is a anPaKFile Handle, usable with other function
 	   of this unzip package.
 */
-extern anPaKBFile PAK_Open( const char *path ) {
-	pakBFile_s us;
-	pakBFile_s *s;
+extern anPaKFile PAK_Open( const char *path ) {
+	pKFile_s us;
+	pKFile_s *s;
 	unsigned long dirBeginingPos,uL;
 	anFile_Cached * file;
 	// number of the current dist, used for spaning ZIP, unsupported, always 0
@@ -183,7 +183,7 @@ extern anPaKBFile PAK_Open( const char *path ) {
 	if ( file == nullptr ) {
 		return nullptr;
 	}
-	dirBeginingPos = pak_SearchCentralDirectory( file );
+	dirBeginingPos = PaK_SearchDirectory( file );
 	if ( dirBeginingPos == 0 || file->Seek( dirBeginingPos, FS_SEEK_SET ) != 0 ) {
 		error = UNZ_ERRNO;
 	}
@@ -227,11 +227,11 @@ extern anPaKBFile PAK_Open( const char *path ) {
 
 	us.file->CacheData( us.directoryOffset, us.directorySize );
 
-	s = (pakBFile_s *)ALLOC( sizeof( pakBFile_s ) );
+	s = (pKFile_s *)ALLOC( sizeof( pKFile_s ) );
 	*s = us;
 
-	//PAK_GoToFirstFile( ( anPaKBFile )s ) ;
-	return ( anPaKBFile )s;
+	//PAK_GoToFirstFile( ( anPaKFile )s ) ;
+	return ( anPaKFile )s;
 }
 
 /*
@@ -239,11 +239,11 @@ extern anPaKBFile PAK_Open( const char *path ) {
   If there is files inside the .Zip opened with unzipOpenCurrentFile ( see later),
     these files MUST be closed with unzipCloseCurrentFile before call unzipClose.
   return UNZ_OK if there is no problem. */
-extern int PAK_Close( anPaKBFile file ) {
+extern int PAK_Close( anPaKFile file ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
-	pakBFile_s *s = (pakBFile_s *)file;
+	pKFile_s *s = (pKFile_s *)file;
 
     if ( s->zippedFileInfo != nullptr ) {
         PAK_CloseCurrentFile( file );
@@ -253,32 +253,31 @@ extern int PAK_Close( anPaKBFile file ) {
 	return UNZ_OK;
 }
 
-
 /*
   Write info about the ZipFile in the *pglobal_info structure.
   No preparation of the structure is needed
   return UNZ_OK if there is no problem. */
-extern int PAK_GetDescription( anPaKBFile file, pakGlobalInfo *pglobal_info ) {
+extern int PAK_GetDescription( anPaKFile file, pakGlobalInfo *pglobal_info ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
-	pakBFile_s *s = (pakBFile_s *)file;
+	pKFile_s *s = (pKFile_s *)file;
 	*pglobal_info = s->gi;
 	return UNZ_OK;
 }
 
 
-// Translate date/time from Dos format to tm_unz (readable more easilty)
-static void DosTimeStampToSystemTime(unsigned long ulDosDate, tm_unz* ptm) {
+// Translate date/time from Dos format to pakTimeFmt_t (readable more easilty)
+static void PaK_DOSTimeStampToSystemTime( unsigned long ulDosDate, pakTimeFmt_t *ptm ) {
     unsigned long uDate;
-    uDate = (unsigned long)(ulDosDate>>16);
-    ptm->tm_mday = (unsigned int)(uDate&0x1f) ;
-    ptm->tm_mon =  (unsigned int)((((uDate)&0x1E0)/0x20)-1 ) ;
-    ptm->tm_year = (unsigned int)(((uDate&0x0FE00)/0x0200)+1980) ;
+    uDate = (unsigned long)( ulDosDate>>16 );
+    ptm->tm_mday = (unsigned int) ( uDate&0x1f ) ;
+    ptm->tm_mon =  (unsigned int) ( ( ( ( uDate )&0x1E0 )/0x20 )-1 ) ;
+    ptm->tm_year = (unsigned int) ( ( ( uDate&0x0FE00 )/0x0200 )+1980 ) ;
 
-    ptm->tm_hour = (unsigned int) ((ulDosDate &0xF800)/0x800);
-    ptm->tm_min =  (unsigned int) ((ulDosDate&0x7E0)/0x20) ;
-    ptm->tm_sec =  (unsigned int) (2*(ulDosDate&0x1f) ) ;
+    ptm->tm_hour = (unsigned int) ( ( ulDosDate &0xF800 )/0x800 );
+    ptm->tm_min =  (unsigned int) ( (ulDosDate&0x7E0 )/0x20 ) ;
+    ptm->tm_sec =  (unsigned int) (2*( ulDosDate&0x1f ) ) ;
 }
 
 /*
@@ -288,12 +287,12 @@ PAK_GetFilesInternalDescription
 Get Info about the current file in the zipfile, with internal only info
 =====================
 */
-static int anFileSystem::PAK_GetFilesInternalDescription( anPaKBFile file, pakFileInfo *fileDesc, internalPakInfo *fileDesc_internal, char *szFileName, unsigned long fileNameBufferSize, void *extraField, unsigned long extraFieldBufferSize, char *szComment, unsigned long commentBufferSize ) {
+static int anFileSystem::PAK_GetFilesInternalDescription( anPaKFile file, pakFileInfo *fileDesc, internalPakInfo *fileDesc_internal, char *szFileName, unsigned long fileNameBufferSize, void *extraField, unsigned long extraFieldBufferSize, char *szComment, unsigned long commentBufferSize ) {
     if ( file == nullptr ) {
         return UNZ_PARAMERROR;
     }
 
-	pakBFile_s *s = (pakBFile_s *)file;
+	pKFile_s *s = (pKFile_s *)file;
 	int error = UNZ_OK;
 
 	// Check if file position needs to be adjusted
@@ -307,7 +306,7 @@ static int anFileSystem::PAK_GetFilesInternalDescription( anPaKBFile file, pakFi
 			fs_seeksBackward.SetInteger( fs_seeksBackward.GetInteger() + 1 );
 		}
 
-		if ( fs_totalPakSeeks.GetInteger() == 0) {
+		if ( fs_totalPakSeeks.GetInteger() == 0 ) {
 			totalPkFileSeekSize = 0;
 		}
 		totalPkFileSeekSize += abs( s->file->Tell() );
@@ -346,10 +345,10 @@ static int anFileSystem::PAK_GetFilesInternalDescription( anPaKBFile file, pakFi
 		} else {
 			uSizeRead = fileNameBufferSize;
 		}
+
 		if ( ( fInfo.fileNameSize > 0 ) && ( fileNameBufferSize > 0 ) ) {
 			if ( s->file->Read(szFileName, uSizeRead ) != (int)uSizeRead ) {
-				error = UNZ_ERRNO;
-				}
+			error = UNZ_ERRNO;
 			}
 			lSeek -= uSizeRead;
 
@@ -366,7 +365,8 @@ static int anFileSystem::PAK_GetFilesInternalDescription( anPaKBFile file, pakFi
 			// Read and process file information (continued)
 			lSeek += fInfo.extraFieldLen - uSizeRead;
 		} else {
-		lSeek += fInfo.extraFieldLen;
+			lSeek += fInfo.extraFieldLen;
+		}
 	}
 
 	if ( ( error == UNZ_OK ) && ( fileDesc != nullptr ) ) {
@@ -383,20 +383,20 @@ static int anFileSystem::PAK_GetFilesInternalDescription( anPaKBFile file, pakFi
   No preparation of the structure is needed
   return UNZ_OK if there is no problem.
 */
-extern int PAK_GetFileDescription( anPaKBFile file, pakFileInfo *fileDesc, char *szFileName, unsigned long fileNameBufferSize, void *extraField, unsigned long extraFieldBufferSize, char *szComment, unsigned long commentBufferSize ) {
-	return PAK_GetFilesInternalDescription(file, fileDesc, nullptr, szFileName, fileNameBufferSize, extraField, extraFieldBufferSize, szComment, commentBufferSize );
+extern int PAK_GetFileDescription( anPaKFile file, pakFileInfo *fileDesc, char *szFileName, unsigned long fileNameBufferSize, void *extraField, unsigned long extraFieldBufferSize, char *szComment, unsigned long commentBufferSize ) {
+	return PAK_GetFilesInternalDescription( file, fileDesc, nullptr, szFileName, fileNameBufferSize, extraField, extraFieldBufferSize, szComment, commentBufferSize );
 }
 
 /*
   Set the current file of the zipfile to the first file.
   return UNZ_OK if there is no problem
 */
-extern int PAK_GoToFirstFile( anPaKBFile file ) {
+extern int PAK_GoToFirstFile( anPaKFile file ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
 
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );
+	pKFile_s *s = static_cast<pKFile_s *>( file );
 	s->fileLocation = s->directoryOffset;
 	s->fileNumber = 0;
 
@@ -415,12 +415,12 @@ extern int PAK_GoToFirstFile( anPaKBFile file ) {
   return UNZ_OK if there is no problem
   return UNZ_END_OF_LIST_OF_FILE if the actual file was the latest.
 */
-extern int PAK_NextFile( anPaKBFile file ) {
+extern int PAK_NextFile( anPaKFile file ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
 
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );
+	pKFile_s *s = static_cast<pKFile_s *>( file );
 	if ( !s->fileStatusCode ) {
 		return UNZ_END_OF_LIST_OF_FILE;
 	}
@@ -438,12 +438,12 @@ extern int PAK_NextFile( anPaKBFile file ) {
 Get the position of the info of the current file in the zip.
 return UNZ_OK if there is no problem
 */
-extern int PAK_GetFileStatus( anPaKBFile file, unsigned long *pos ) {
+extern int PAK_GetFileStatus( anPaKFile file, unsigned long *pos ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
 
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );//*s = (pakBFile_s *)file;
+	pKFile_s *s = static_cast<pKFile_s *>( file );//*s = (pKFile_s *)file;
 	*pos = s->fileLocation;
 	return UNZ_OK;
 }
@@ -452,11 +452,11 @@ extern int PAK_GetFileStatus( anPaKBFile file, unsigned long *pos ) {
   Set the position of the info of the current file in the zip.
   return UNZ_OK if there is no problem
 */
-extern int PAK_SetFileDataLocation( anPaKBFile file, unsigned long pos ) {
+extern int PAK_SetFileDataLocation( anPaKFile file, unsigned long pos ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
-    pakBFile_s *s = static_cast<pakBFile_s *>( file );
+    pKFile_s *s = static_cast<pKFile_s *>( file );
 
 	s->fileLocation = pos;
 	int error = PAK_GetFilesInternalDescription( file, &s->currentFileInfo, &s->internalFileInfo, nullptr, 0, nullptr, 0, nullptr, 0 );
@@ -472,14 +472,14 @@ extern int PAK_SetFileDataLocation( anPaKBFile file, unsigned long pos ) {
   UNZ_OK if the file is found. It becomes the current file.
   UNZ_END_OF_LIST_OF_FILE if the file is not found
 */
-extern int PAK_LocateFile( anPaKBFile file, const char *szFileName, int caseSensitive ) {
+extern int PAK_LocateFile( anPaKFile file, const char *szFileName, int caseSensitive ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
     if ( strlen( szFileName ) >= UNZ_MAXFILENAMEINZIP ) {
         return UNZ_PARAMERROR;
 	}
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );//*s = (pakBFile_s *)file;
+	pKFile_s *s = static_cast<pKFile_s *>( file );//*s = (pKFile_s *)file;
 	if ( !s->fileStatusCode ) {
 		return UNZ_END_OF_LIST_OF_FILE;
 	}
@@ -491,7 +491,7 @@ extern int PAK_LocateFile( anPaKBFile file, const char *szFileName, int caseSens
 	while ( error == UNZ_OK ) {
 		char szCurrentFileName[UNZ_MAXFILENAMEINZIP+1];
 		PAK_GetFileDescription( file, nullptr, szCurrentFileName,sizeof( szCurrentFileName)-1, nullptr,0,nullptr,0 );
-		if ( unzStringFileNameCompare( szCurrentFileName, szFileName,caseSensitive) == 0 ) {
+		if ( PaK_CompareFilename( szCurrentFileName, szFileName,caseSensitive) == 0 ) {
 			return UNZ_OK;
 		}
 		error = PAK_NextFile( file );
@@ -510,10 +510,10 @@ extern int PAK_LocateFile( anPaKBFile file, const char *szFileName, int caseSens
   store in *piSizeVar the size of extra info in static header
         (filename and size of extra field data)
 */
-static int unzlocal_CheckCurrentFileCoherencyHeader(pakBFile_s* s, unsigned int* piSizeVar, unsigned long *pextraFieldOffset, unsigned int *pextraFieldSize) {
+static int PaK_CheckCoherencyHeader( pKFile_s* s, unsigned int* piSizeVar, unsigned long *pextraFieldOffset, unsigned int *pextraFieldSize ) {
 	unsigned long magicNumber,uData,uFlags;
-	unsigned long fileNameSize;
-	unsigned long size_extra_field;
+	unsigned long size;
+	unsigned long extraFieldSize;
 	int error = UNZ_OK;
 
 	*piSizeVar = 0;
@@ -527,7 +527,7 @@ static int unzlocal_CheckCurrentFileCoherencyHeader(pakBFile_s* s, unsigned int*
 	if ( error == UNZ_OK ) {
 		if ( PaKLong( s->file,&magicNumber ) != UNZ_OK ) {
 			error = UNZ_ERRNO;
-		} else if ( magicNumber!=0x04034b50) {
+		} else if ( magicNumber != 0x04034b50 ) {
 			error = UNZ_BADZIPFILE;
 		}
 	if ( PaKShort( s->file, &uData ) != UNZ_OK ) {
@@ -540,59 +540,59 @@ static int unzlocal_CheckCurrentFileCoherencyHeader(pakBFile_s* s, unsigned int*
 	if ( PaKShort( s->file,&uFlags ) != UNZ_OK ) {
 		error = UNZ_ERRNO;
 	}
-	if ( PaKShort( s->file,&uData) != UNZ_OK ) {
+	if ( PaKShort( s->file,&uData ) != UNZ_OK ) {
 		error = UNZ_ERRNO;
-	} else if ( ( error == UNZ_OK ) && (uData!=s->currentFileInfo.compressionType) ) {
+	} else if ( ( error == UNZ_OK ) && ( uData != s->currentFileInfo.compressionType ) ) {
 		error = UNZ_BADZIPFILE;
 	}
-    if ( ( error == UNZ_OK ) && ( s->currentFileInfo.compressionType!=0 ) &&
-                         ( s->currentFileInfo.compressionType!=Z_DEFLATED) )
+    if ( ( error == UNZ_OK ) && ( s->currentFileInfo.compressionType != 0 ) &&
+                         ( s->currentFileInfo.compressionType != Z_DEFLATED ) )
         error = UNZ_BADZIPFILE;
 
-	if ( PaKLong( s->file,&uData) != UNZ_OK ) {
+	if ( PaKLong( s->file,&uData ) != UNZ_OK ) {
 		error = UNZ_ERRNO;
 	}
 
-	if ( PaKLong( s->file,&uData) != UNZ_OK ) {
+	if ( PaKLong( s->file,&uData ) != UNZ_OK ) {
 		error = UNZ_ERRNO;
-	} else if ( ( error == UNZ_OK ) && (uData!=s->currentFileInfo.crc) &&
+	} else if ( ( error == UNZ_OK ) && ( uData != s->currentFileInfo.crc ) &&
 		                      ( ( uFlags & 8 ) == 0 ) ) {
 		error = UNZ_BADZIPFILE;
 	}
-	if ( PaKLong( s->file,&uData) != UNZ_OK ) {
+	if ( PaKLong( s->file,&uData ) != UNZ_OK ) {
 		error = UNZ_ERRNO;
-	} else if ( ( error == UNZ_OK ) && (uData!=s->currentFileInfo.compressedSize) &&
+	} else if ( ( error == UNZ_OK ) && ( uData != s->currentFileInfo.compressedSize ) &&
 							  ( ( uFlags & 8 ) == 0 ) ) {
 		error = UNZ_BADZIPFILE;
 	}
-	if ( PaKLong( s->file,&uData) != UNZ_OK ) {
+	if ( PaKLong( s->file,&uData ) != UNZ_OK ) {
 		error = UNZ_ERRNO;
-	} else if ( ( error == UNZ_OK ) && (uData!=s->currentFileInfo.uncompressedSize) &&
+	} else if ( ( error == UNZ_OK ) && ( uData != s->currentFileInfo.uncompressedSize ) &&
 							  ( ( uFlags & 8 ) == 0 ) ) {
 		error = UNZ_BADZIPFILE;
 	}
 
-	if ( PaKShort( s->file,&fileNameSize) != UNZ_OK ) {
+	if ( PaKShort( s->file,&size ) != UNZ_OK ) {
 		error = UNZ_ERRNO;
-	} else if ( ( error == UNZ_OK ) && ( fileNameSize!=s->currentFileInfo.fileNameSize) )
+	} else if ( ( error == UNZ_OK ) && ( size != s->currentFileInfo.fileNameSize ) )
 		error = UNZ_BADZIPFILE;
 	}
-	*piSizeVar += (unsigned int)fileNameSize;
+	*piSizeVar += (unsigned int)size;
 
-	if ( PaKShort( s->file,&size_extra_field ) != UNZ_OK ) {
+	if ( PaKShort( s->file,&extraFieldSize ) != UNZ_OK ) {
 		error = UNZ_ERRNO;
 	}
-	*pextraFieldOffset= s->internalFileInfo.currentFileOffset + SIZEZIPLOCALHEADER + fileNameSize;
-	*pextraFieldSize = (unsigned int)size_extra_field;
+	*pextraFieldOffset= s->internalFileInfo.currentFileOffset + SIZEZIPLOCALHEADER + size;
+	*pextraFieldSize = (unsigned int)extraFieldSize;
 
-	*piSizeVar += (unsigned int)size_extra_field;
+	*piSizeVar += (unsigned int)extraFieldSize;
 
 	return error;
 }
 
 // Open for reading data the current file in the zipfile.
 // If there is no error and the file is opened, the return value is UNZ_OK.
-extern int PAK_OpenCurrentFile( anPaKBFile file ) {
+extern int PAK_OpenCurrentFile( anPaKFile file ) {
 	int error = UNZ_OK;
 	int Store;
 	unsigned int iSizeVar;
@@ -603,60 +603,58 @@ extern int PAK_OpenCurrentFile( anPaKBFile file ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );//*s = (pakBFile_s *)file;
+	pKFile_s *s = static_cast<pKFile_s *>( file );//*s = (pKFile_s *)file;
 	if ( !s->fileStatusCode ) {
 		return UNZ_PARAMERROR;
 	}
     if ( s->zippedFileInfo != nullptr ) {
         PAK_CloseCurrentFile( file );
 	}
-	if ( unzlocal_CheckCurrentFileCoherencyHeader( s, &iSizeVar, &extraFieldOffset, &extraFieldSize )!= UNZ_OK ) {
+	if ( PaK_CheckCoherencyHeader( s, &iSizeVar, &extraFieldOffset, &extraFieldSize )!= UNZ_OK ) {
 		return UNZ_BADZIPFILE;
 	}
 	zippedFileInfo = (pakReadInfo_s *) ALLOC( sizeof( pakReadInfo_s ) );
 	if ( zippedFileInfo == nullptr ) {
 		return UNZ_INTERNALERROR;
 	}
-	zippedFileInfo->readBuffer=(char *)ALLOC(UNZ_BUFSIZE);
+	zippedFileInfo->readBuffer=(char *)ALLOC( UNZ_BUFSIZE );
 	zippedFileInfo->extraFieldOffset = extraFieldOffset;
 	zippedFileInfo->extraFieldSize = extraFieldSize;
 	zippedFileInfo->extraFieldPos=0;
 
 	if ( zippedFileInfo->readBuffer == nullptr ) {
-		TRYFREE( zippedFileInfo);
+		TRYFREE( zippedFileInfo );
 		return UNZ_INTERNALERROR;
 	}
 
-	zippedFileInfo->initialised=0;
+	zippedFileInfo->initialised = 0;
 
-	if (( s->currentFileInfo.compressionType!=0 ) && ( s->currentFileInfo.compressionType!=Z_DEFLATED) ) {
+	if ( ( s->currentFileInfo.compressionType != 0 ) && ( s->currentFileInfo.compressionType != Z _DEFLATED ) ) {
 		error = UNZ_BADZIPFILE;
 	}
-	Store = s->currentFileInfo.compressionType==0;
+	Store = s->currentFileInfo.compressionType == 0;
 
 	zippedFileInfo->waitCRC32=s->currentFileInfo.crc;
-	zippedFileInfo->crc32=0;
+	zippedFileInfo->crc32 = 0;
 	zippedFileInfo->compressionType = s->currentFileInfo.compressionType;
-	zippedFileInfo->file=s->file;
+	zippedFileInfo->file = s->file;
 	zippedFileInfo->unCompressedSize=s->unCompressedSize;
 
     zippedFileInfo->stream.total_out = 0;
 
 	if ( !Store ) {
-	  zippedFileInfo->stream.zalloc = (alloc_func)0;
-	  zippedFileInfo->stream.zfree = (free_func)0;
-	  zippedFileInfo->stream.opaque = (voidp)0;
-
-	  error=inflateInit2( &zippedFileInfo->stream, -MAX_WBITS );
-	  if ( error == Z_OK ) {
-	    zippedFileInfo->initialised = 1;
+		zippedFileInfo->stream.zalloc = ( alloc_func )0;
+		zippedFileInfo->stream.zfree = ( free_func )0;
+		zippedFileInfo->stream.opaque = ( voidp )0;
+		error = inflateInit2( &zippedFileInfo->stream, -MAX_WBITS );
+		if ( error == Z_OK ) {
+			zippedFileInfo->initialised = 1;
+		}
 	}
 	zippedFileInfo->compressedRead = s->currentFileInfo.compressedSize;
 	zippedFileInfo->unCompressedRead = s->currentFileInfo.uncompressedSize;
 
-
 	zippedFileInfo->internalLocation = s->internalFileInfo.currentFileOffset + SIZEZIPLOCALHEADER + iSizeVar;
-
 	zippedFileInfo->stream.avail_in = (unsigned int)0;
 
 	s->zippedFileInfo = zippedFileInfo;
@@ -673,7 +671,7 @@ extern int PAK_OpenCurrentFile( anPaKBFile file ) {
   return <0 with error code if there is an error
     (UNZ_ERRNO for IO error, or zLib error for uncompress error)
 */
-extern int unzReadCurrentFile( anPaKBFile file, void *buf, unsigned len ) {
+extern int PAK_ReadCurrentFile( anPaKFile file, void *buf, unsigned len ) {
 	int error = UNZ_OK;
 	unsigned int iRead = 0;
 
@@ -681,7 +679,7 @@ extern int unzReadCurrentFile( anPaKBFile file, void *buf, unsigned len ) {
 		return UNZ_PARAMERROR;
 	}
 
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );//*s = (pakBFile_s *)file;
+	pKFile_s *s = static_cast<pKFile_s *>( file );//*s = (pKFile_s *)file;
     pakReadInfo_s *zippedFileInfo = s->zippedFileInfo;
 
 	if ( zippedFileInfo == nullptr ) {
@@ -728,43 +726,41 @@ extern int unzReadCurrentFile( anPaKBFile file, void *buf, unsigned len ) {
 			unsigned int uDoCopy;
 			if ( zippedFileInfo->stream.avail_out < zippedFileInfo->stream.avail_in ) {
 				uDoCopy = zippedFileInfo->stream.avail_out;
-		} else {
-			uDoCopy = zippedFileInfo->stream.avail_in;
-			for ( int i = 0; i < uDoCopy; i++ ) {
-				*( zipFileInfo->stream.next_out + i ) = *( zippedFileInfo->stream.next_in + i );
-			}
-			zippedFileInfo->crc32 = crc32( zippedFileInfo->crc32, zippedFileInfo->stream.next_out, uDoCopy );
-			zippedFileInfo->unCompressedRead -= uDoCopy;
-			zippedFileInfo->stream.avail_in -= uDoCopy;
-			zippedFileInfo->stream.avail_out -= uDoCopy;
-			zippedFileInfo->stream.next_out += uDoCopy;
-			zippedFileInfo->stream.next_in += uDoCopy;
-            zippedFileInfo->stream.total_out += uDoCopy;
-			iRead += uDoCopy;
-		} else {
-			unsigned long unCompressedSize, compressedSize;
-			const Byte *bufBefore;
-			unsigned long uOutThis;
-			int flush = Z_SYNC_FLUSH;
+			} else {
+				uDoCopy = zippedFileInfo->stream.avail_in;
+				for ( int i = 0; i < uDoCopy; i++ ) {
+					*( zipFileInfo->stream.next_out + i ) = *( zippedFileInfo->stream.next_in + i );
+				}
+				zippedFileInfo->crc32 = crc32( zippedFileInfo->crc32, zippedFileInfo->stream.next_out, uDoCopy );
+				zippedFileInfo->unCompressedRead -= uDoCopy;
+				zippedFileInfo->stream.avail_in -= uDoCopy;
+				zippedFileInfo->stream.avail_out -= uDoCopy;
+				zippedFileInfo->stream.next_out += uDoCopy;
+				zippedFileInfo->stream.next_in += uDoCopy;
+	            zippedFileInfo->stream.total_out += uDoCopy;
+				iRead += uDoCopy;
+			} else {
+				unsigned long unCompressedSize;
+				int flush = Z_SYNC_FLUSH;
 
-			compressedSize = zipFileInfo->stream.total_out;
-			bufBefore = zipFileInfo->stream.next_out;
+				unsigned long compressedSize = zipFileInfo->stream.total_out;
+				const Byte *bufBefore = zipFileInfo->stream.next_out;
 
-			error = inflate( &zipFileInfo->stream, flush );
+				error = inflate( &zipFileInfo->stream, flush );
 
-			compressedSize = zipFileInfo->stream.total_out;
-			uOutThis = compressedSize - unCompressedSize;
+				compressedSize = zipFileInfo->stream.total_out;
+				unsigned long uOutThis = compressedSize - unCompressedSize;
 
-			zippedFileInfo->crc32 = crc32( zippedFileInfo->crc32, bufBefore, (unsigned int)( uOutThis ) );
-			zippedFileInfo->unCompressedRead -= uOutThis;
+				zippedFileInfo->crc32 = crc32( zippedFileInfo->crc32, bufBefore, (unsigned int)( uOutThis ) );
+				zippedFileInfo->unCompressedRead -= uOutThis;
 
-			iRead += (unsigned int)( compressedSize - unCompressedSize );
-
-			if ( error == Z_STREAM_END ) {
-				return ( iRead == 0 ) ? UNZ_EOF : iRead;
-			}
-			if ( error != Z_OK ) {
-				break;
+				iRead += (unsigned int)( compressedSize - unCompressedSize );
+				if ( error == Z_STREAM_END ) {
+					return ( iRead == 0 ) ? UNZ_EOF : iRead;
+				}
+				if ( error != Z_OK ) {
+					break;
+				}
 			}
 		}
 	}
@@ -776,30 +772,31 @@ extern int unzReadCurrentFile( anPaKBFile file, void *buf, unsigned len ) {
 }
 
 // Give the current position in uncompressed data
-extern long PAK_Tell( anPaKBFile file ) {
+extern long PAK_Tell( anPaKFile file ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
 
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );//*s = (pakBFile_s *)file;
-   pakReadInfo_s *zipFileInfo = s->zippedFileInfo;
+	pKFile_s *s = static_cast<pKFile_s *>( file );//*s = (pKFile_s *)file;
+	pakReadInfo_s *zipFileInfo = s->zippedFileInfo;
 
 	if ( zipFileInfo == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
 	return (long)zipFileInfo->stream.total_out;
-}
+	}
+
 
 // return 1 if the end of file was reached, 0 elsewhere
-extern int unzeof( anPaKBFile file ) {
+extern int PaK_IsEoF( anPaKFile file ) {
 	pakReadInfo_s *zippedFileInfo;
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );//*s = (pakBFile_s *)file;
+	pKFile_s *s = static_cast<pKFile_s *>( file );//*s = (pKFile_s *)file;
     zippedFileInfo=s->zippedFileInfo;
 
-	if ( zippedFileInfo_inf o== nullptr ) {
+	if ( zippedFileInfo_info == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
 	if ( zippedFileInfo->unCompressedRead == 0 ) {
@@ -821,7 +818,7 @@ extern int unzeof( anPaKBFile file ) {
   the return value is the number of bytes copied in buf, or (if <0 )
 	the error code
 */
-extern int unzGetLocalExtrafield( anPaKBFile file,void *buf,unsigned len ) {
+extern int PaK_GetExtraField( anPaKFile file,void *buf,unsigned len ) {
 	pakReadInfo_s *zippedFileInfo;
 	unsigned int fRead;
 	unsigned long entryFieldReadSize;
@@ -829,10 +826,10 @@ extern int unzGetLocalExtrafield( anPaKBFile file,void *buf,unsigned len ) {
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );//*s = (pakBFile_s *)file;
+	pKFile_s *s = static_cast<pKFile_s *>( file );//*s = (pKFile_s *)file;
     zippedFileInfo=s->zippedFileInfo;
 
-	if ( zippedFileInfo== nullptr ) {
+	if ( zippedFileInfo == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
 	entryFieldReadSize = ( zippedFileInfo->extraFieldSize - zippedFileInfo->extraFieldPos );
@@ -860,14 +857,14 @@ extern int unzGetLocalExtrafield( anPaKBFile file,void *buf,unsigned len ) {
 
 // Close the file in zip opened with unzipOpenCurrentFile
 // Return UNZ_CRCERROR if all the file was read but the CRC is not good
-extern int PAK_CloseCurrentFile( anPaKBFile file ) {
+extern int PAK_CloseCurrentFile( anPaKFile file ) {
 	int error = UNZ_OK;
 	pakReadInfo_s *zippedFileInfo;
 	if ( file == nullptr ) {
 		return UNZ_PARAMERROR;
 	}
 
-	pakBFile_s *s = static_cast<pakBFile_s *>( file );//*s = (pakBFile_s *)file;
+	pKFile_s *s = static_cast<pKFile_s *>( file );//*s = (pKFile_s *)file;
     zippedFileInfo = s->zippedFileInfo;
 
 	if ( zippedFileInfo== nullptr ) {
@@ -897,11 +894,11 @@ extern int PAK_CloseCurrentFile( anPaKBFile file ) {
 
 // Get the global comment string of the ZipFile, in the szComment buffer.
 // uSizeBuf is the size of the szComment buffer. return the number of byte copied or an error code <
-extern int PAK_GetComments( anPaKBFile file, char *szComment, unsigned long uSizeBuf ) {
+extern int PAK_GetComments( anPaKFile file, char *szComment, unsigned long uSizeBuf ) {
     if ( file == nullptr ) {
         return UNZ_PARAMERROR;
 	}
-    pakBFile_s *s = static_cast<pakBFile_s *>( file );
+    pKFile_s *s = static_cast<pKFile_s *>( file );
 
     unsigned long readComments = uSizeBuf;
     if ( readComments > s->globalInfo.commentSize ) {

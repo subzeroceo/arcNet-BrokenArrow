@@ -116,5 +116,5 @@ anPlane::ToString
 =============
 */
 const char *anPlane::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }

@@ -86,153 +86,153 @@ private:
 
 extern anBox	box_zero;
 
-ARC_INLINE anBox::anBox( void ) {
+inline anBox::anBox( void ) {
 }
 
-ARC_INLINE anBox::anBox( const anVec3 &center, const anVec3 &extents, const anMat3 &axis ) {
+inline anBox::anBox( const anVec3 &center, const anVec3 &extents, const anMat3 &axis ) {
 	this->center = center;
 	this->extents = extents;
 	this->axis = axis;
 }
 
-ARC_INLINE anBox::anBox( const anVec3 &point ) {
+inline anBox::anBox( const anVec3 &point ) {
 	this->center = point;
 	this->extents.Zero();
 	this->axis.Identity();
 }
 
-ARC_INLINE anBox::anBox( const anBounds &bounds ) {
+inline anBox::anBox( const anBounds &bounds ) {
 	this->center = ( bounds[0] + bounds[1] ) * 0.5f;
 	this->extents = bounds[1] - this->center;
 	this->axis.Identity();
 }
 
-ARC_INLINE anBox::anBox( const anBounds &bounds, const anVec3 &origin, const anMat3 &axis ) {
+inline anBox::anBox( const anBounds &bounds, const anVec3 &origin, const anMat3 &axis ) {
 	this->center = ( bounds[0] + bounds[1] ) * 0.5f;
 	this->extents = bounds[1] - this->center;
 	this->center = origin + this->center * axis;
 	this->axis = axis;
 }
 
-ARC_INLINE anBox anBox::operator+( const anVec3 &t ) const {
+inline anBox anBox::operator+( const anVec3 &t ) const {
 	return anBox( center + t, extents, axis );
 }
 
-ARC_INLINE anBox &anBox::operator+=( const anVec3 &t ) {
+inline anBox &anBox::operator+=( const anVec3 &t ) {
 	center += t;
 	return *this;
 }
 
-ARC_INLINE anBox anBox::operator*( const anMat3 &r ) const {
+inline anBox anBox::operator*( const anMat3 &r ) const {
 	return anBox( center * r, extents, axis * r );
 }
 
-ARC_INLINE anBox &anBox::operator*=( const anMat3 &r ) {
+inline anBox &anBox::operator*=( const anMat3 &r ) {
 	center *= r;
 	axis *= r;
 	return *this;
 }
 
-ARC_INLINE anBox anBox::operator+( const anBox &a ) const {
+inline anBox anBox::operator+( const anBox &a ) const {
 	anBox newBox;
 	newBox = *this;
 	newBox.AddBox( a );
 	return newBox;
 }
 
-ARC_INLINE anBox &anBox::operator+=( const anBox &a ) {
+inline anBox &anBox::operator+=( const anBox &a ) {
 	anBox::AddBox( a );
 	return *this;
 }
 
-ARC_INLINE anBox anBox::operator-( const anBox &a ) const {
+inline anBox anBox::operator-( const anBox &a ) const {
 	return anBox( center, extents - a.extents, axis );
 }
 
-ARC_INLINE anBox &anBox::operator-=( const anBox &a ) {
+inline anBox &anBox::operator-=( const anBox &a ) {
 	extents -= a.extents;
 	return *this;
 }
 
-ARC_INLINE bool anBox::Compare( const anBox &a ) const {
+inline bool anBox::Compare( const anBox &a ) const {
 	return ( center.Compare( a.center ) && extents.Compare( a.extents ) && axis.Compare( a.axis ) );
 }
 
-ARC_INLINE bool anBox::Compare( const anBox &a, const float epsilon ) const {
+inline bool anBox::Compare( const anBox &a, const float epsilon ) const {
 	return ( center.Compare( a.center, epsilon ) && extents.Compare( a.extents, epsilon ) && axis.Compare( a.axis, epsilon ) );
 }
 
-ARC_INLINE bool anBox::operator==( const anBox &a ) const {
+inline bool anBox::operator==( const anBox &a ) const {
 	return Compare( a );
 }
 
-ARC_INLINE bool anBox::operator!=( const anBox &a ) const {
+inline bool anBox::operator!=( const anBox &a ) const {
 	return !Compare( a );
 }
 
-ARC_INLINE void anBox::Clear( void ) {
+inline void anBox::Clear( void ) {
 	center.Zero();
 	extents[0] = extents[1] = extents[2] = -anMath::INFINITY;
 	axis.Identity();
 }
 
-ARC_INLINE void anBox::Zero( void ) {
+inline void anBox::Zero( void ) {
 	center.Zero();
 	extents.Zero();
 	axis.Identity();
 }
 
-ARC_INLINE const anVec3 &anBox::GetCenter( void ) const {
+inline const anVec3 &anBox::GetCenter( void ) const {
 	return center;
 }
 
-ARC_INLINE const anVec3 &anBox::GetExtents( void ) const {
+inline const anVec3 &anBox::GetExtents( void ) const {
 	return extents;
 }
 
-ARC_INLINE const anMat3 &anBox::GetAxis( void ) const {
+inline const anMat3 &anBox::GetAxis( void ) const {
 	return axis;
 }
 
-ARC_INLINE float anBox::GetVolume( void ) const {
+inline float anBox::GetVolume( void ) const {
 	return ( extents * 2.0f ).LengthSqr();
 }
 
-ARC_INLINE bool anBox::IsCleared( void ) const {
+inline bool anBox::IsCleared( void ) const {
 	return extents[0] < 0.0f;
 }
 
-ARC_INLINE anBox anBox::Expand( const float d ) const {
+inline anBox anBox::Expand( const float d ) const {
 	return anBox( center, extents + anVec3( d, d, d ), axis );
 }
 
-ARC_INLINE anBox &anBox::ExpandSelf( const float d ) {
+inline anBox &anBox::ExpandSelf( const float d ) {
 	extents[0] += d;
 	extents[1] += d;
 	extents[2] += d;
 	return *this;
 }
 
-ARC_INLINE anBox anBox::Translate( const anVec3 &translation ) const {
+inline anBox anBox::Translate( const anVec3 &translation ) const {
 	return anBox( center + translation, extents, axis );
 }
 
-ARC_INLINE anBox &anBox::TranslateSelf( const anVec3 &translation ) {
+inline anBox &anBox::TranslateSelf( const anVec3 &translation ) {
 	center += translation;
 	return *this;
 }
 
-ARC_INLINE anBox anBox::Rotate( const anMat3 &rotation ) const {
+inline anBox anBox::Rotate( const anMat3 &rotation ) const {
 	return anBox( center * rotation, extents, axis * rotation );
 }
 
-ARC_INLINE anBox &anBox::RotateSelf( const anMat3 &rotation ) {
+inline anBox &anBox::RotateSelf( const anMat3 &rotation ) {
 	center *= rotation;
 	axis *= rotation;
 	return *this;
 }
 
-ARC_INLINE bool anBox::ContainsPoint( const anVec3 &p ) const {
+inline bool anBox::ContainsPoint( const anVec3 &p ) const {
 	anVec3 lp = p - center;
 	if ( anMath::Fabs( lp * axis[0] ) > extents[0] ||
 			anMath::Fabs( lp * axis[1] ) > extents[1] ||
@@ -242,11 +242,11 @@ ARC_INLINE bool anBox::ContainsPoint( const anVec3 &p ) const {
 	return true;
 }
 
-ARC_INLINE anSphere anBox::ToSphere( void ) const {
+inline anSphere anBox::ToSphere( void ) const {
 	return anSphere( center, extents.Length() );
 }
 
-ARC_INLINE void anBox::AxisProjection( const anVec3 &dir, float &min, float &max ) const {
+inline void anBox::AxisProjection( const anVec3 &dir, float &min, float &max ) const {
 	float d1 = dir * center;
 	float d2 = anMath::Fabs( extents[0] * ( dir * axis[0] ) ) +
 				anMath::Fabs( extents[1] * ( dir * axis[1] ) ) +
@@ -255,7 +255,7 @@ ARC_INLINE void anBox::AxisProjection( const anVec3 &dir, float &min, float &max
 	max = d1 + d2;
 }
 
-ARC_INLINE void anBox::AxisProjection( const anMat3 &ax, anBounds &bounds ) const {
+inline void anBox::AxisProjection( const anMat3 &ax, anBounds &bounds ) const {
 	for ( int i = 0; i < 3; i++ ) {
 		float d1 = ax[i] * center;
 		float d2 = anMath::Fabs( extents[0] * ( ax[i] * axis[0] ) ) +
@@ -267,12 +267,12 @@ ARC_INLINE void anBox::AxisProjection( const anMat3 &ax, anBounds &bounds ) cons
 }
 
 // Calculate the volume of a bounding box
-ARC_INLINE float CalcBoundingBoxVolume( const anBounds &bounds ) {
+inline float CalcBoundingBoxVolume( const anBounds &bounds ) {
     anVec3 dimensions = bounds.maxPoint - bounds.minPoint;
     return dimensions.x * dimensions.y * dimensions.z;
 }
 
-ARC_INLINE anBounds CalcBoundingBox( const anVec3 &points ) {
+inline anBounds CalcBoundingBox( const anVec3 &points ) {
     anVec3 MinPoint( float numeric_limits::max() );
     anVec3 MaxPoint( float numeric_limits::lowest() );
 

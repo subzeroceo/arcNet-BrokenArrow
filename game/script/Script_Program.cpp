@@ -32,21 +32,21 @@ If you have questions concerning this license or the applicable additional terms
 #include "../Game_local.h"
 
 // simple types.  function types are dynamically allocated
-idTypeDef	type_void( ev_void, &def_void, "void", 0, NULL );
-idTypeDef	type_scriptevent( ev_scriptevent, &def_scriptevent, "scriptevent", sizeof( void * ), NULL );
-idTypeDef	type_namespace( ev_namespace, &def_namespace, "namespace", sizeof( void * ), NULL );
-idTypeDef	type_string( ev_string, &def_string, "string", MAX_STRING_LEN, NULL );
-idTypeDef	type_float( ev_float, &def_float, "float", sizeof( float ), NULL );
-idTypeDef	type_vector( ev_vector, &def_vector, "vector", sizeof( idVec3 ), NULL );
-idTypeDef	type_entity( ev_entity, &def_entity, "entity", sizeof( int * ), NULL );					// stored as entity number pointer
-idTypeDef	type_field( ev_field, &def_field, "field", sizeof( void * ), NULL );
+idTypeDef	type_void( ev_void, &def_void, "void", 0, nullptr );
+idTypeDef	type_scriptevent( ev_scriptevent, &def_scriptevent, "scriptevent", sizeof( void * ), nullptr );
+idTypeDef	type_namespace( ev_namespace, &def_namespace, "namespace", sizeof( void * ), nullptr );
+idTypeDef	type_string( ev_string, &def_string, "string", MAX_STRING_LEN, nullptr );
+idTypeDef	type_float( ev_float, &def_float, "float", sizeof( float ), nullptr );
+idTypeDef	type_vector( ev_vector, &def_vector, "vector", sizeof( anVec3 ), nullptr );
+idTypeDef	type_entity( ev_entity, &def_entity, "entity", sizeof( int * ), nullptr );					// stored as entity number pointer
+idTypeDef	type_field( ev_field, &def_field, "field", sizeof( void * ), nullptr );
 idTypeDef	type_function( ev_function, &def_function, "function", sizeof( void * ), &type_void );
-idTypeDef	type_virtualfunction( ev_virtualfunction, &def_virtualfunction, "virtual function", sizeof( int ), NULL );
-idTypeDef	type_pointer( ev_pointer, &def_pointer, "pointer", sizeof( void * ), NULL );
-idTypeDef	type_object( ev_object, &def_object, "object", sizeof( int * ), NULL );					// stored as entity number pointer
-idTypeDef	type_jumpoffset( ev_jumpoffset, &def_jumpoffset, "<jump>", sizeof( int ), NULL );		// only used for jump opcodes
-idTypeDef	type_argsize( ev_argsize, &def_argsize, "<argsize>", sizeof( int ), NULL );				// only used for function call and thread opcodes
-idTypeDef	type_boolean( ev_boolean, &def_boolean, "boolean", sizeof( int ), NULL );
+idTypeDef	type_virtualfunction( ev_virtualfunction, &def_virtualfunction, "virtual function", sizeof( int ), nullptr );
+idTypeDef	type_pointer( ev_pointer, &def_pointer, "pointer", sizeof( void * ), nullptr );
+idTypeDef	type_object( ev_object, &def_object, "object", sizeof( int * ), nullptr );					// stored as entity number pointer
+idTypeDef	type_jumpoffset( ev_jumpoffset, &def_jumpoffset, "<jump>", sizeof( int ), nullptr );		// only used for jump opcodes
+idTypeDef	type_argsize( ev_argsize, &def_argsize, "<argsize>", sizeof( int ), nullptr );				// only used for function call and thread opcodes
+idTypeDef	type_boolean( ev_boolean, &def_boolean, "boolean", sizeof( int ), nullptr );
 
 idVarDef	def_void( &type_void );
 idVarDef	def_scriptevent( &type_scriptevent );
@@ -112,9 +112,9 @@ function_t::Clear
 ================
 */
 void function_t::Clear( void ) {
-	eventdef		= NULL;
-	def				= NULL;
-	type			= NULL;
+	eventdef		= nullptr;
+	def				= nullptr;
+	type			= nullptr;
 	firstStatement	= 0;
 	numStatements	= 0;
 	parmTotal		= 0;
@@ -206,7 +206,7 @@ bool idTypeDef::Inherits( const idTypeDef *basetype ) const {
 	if ( this == basetype ) {
 		return true;
 	}
-	for( superType = auxType; superType != NULL; superType = superType->auxType ) {
+	for( superType = auxType; superType != nullptr; superType = superType->auxType ) {
 		if ( superType == basetype ) {
 			return true;
 		}
@@ -269,7 +269,7 @@ bool idTypeDef::MatchesVirtualFunction( const idTypeDef &matchfunc ) const {
 	}
 
 	if ( parmTypes.Num() > 0 ) {
-		if ( !parmTypes[ 0 ]->Inherits( matchfunc.parmTypes[ 0 ] ) ) {
+		if ( !parmTypes[0]->Inherits( matchfunc.parmTypes[0] ) ) {
 			return false;
 		}
 	}
@@ -296,7 +296,7 @@ void idTypeDef::AddFunctionParm( idTypeDef *parmtype, const char *name ) {
 	}
 
 	parmTypes.Append( parmtype );
-	idStr &parmName = parmNames.Alloc();
+	anStr &parmName = parmNames.Alloc();
 	parmName = name;
 }
 
@@ -313,7 +313,7 @@ void idTypeDef::AddField( idTypeDef *fieldtype, const char *name ) {
 	}
 
 	parmTypes.Append( fieldtype );
-	idStr &parmName = parmNames.Alloc();
+	anStr &parmName = parmNames.Alloc();
 	parmName = name;
 
 	if ( fieldtype->FieldType()->Inherits( &type_object ) ) {
@@ -564,12 +564,12 @@ idVarDef::idVarDef()
 idVarDef::idVarDef( idTypeDef *typeptr ) {
 	typeDef		= typeptr;
 	num			= 0;
-	scope		= NULL;
+	scope		= nullptr;
 	numUsers	= 0;
 	initialized = idVarDef::uninitialized;
 	memset( &value, 0, sizeof( value ) );
-	name		= NULL;
-	next		= NULL;
+	name		= nullptr;
+	next		= nullptr;
 }
 
 /*
@@ -615,7 +615,7 @@ int idVarDef::DepthOfScope( const idVarDef *otherScope ) const {
 	int depth;
 
 	depth = 1;
-	for( def = otherScope; def != NULL; def = def->scope ) {
+	for( def = otherScope; def != nullptr; def = def->scope ) {
 		if ( def == scope ) {
 			return depth;
 		}
@@ -682,7 +682,7 @@ void idVarDef::SetValue( const eval_t &_value, bool constant ) {
 		break;
 
 	case ev_string :
-		idStr::Copynz( value.stringPtr, _value.stringPtr, MAX_STRING_LEN );
+		anStr::Copynz( value.stringPtr, _value.stringPtr, MAX_STRING_LEN );
 		break;
 
 	case ev_float :
@@ -690,9 +690,9 @@ void idVarDef::SetValue( const eval_t &_value, bool constant ) {
 		break;
 
 	case ev_vector :
-		value.vectorPtr->x = _value.vector[ 0 ];
-		value.vectorPtr->y = _value.vector[ 1 ];
-		value.vectorPtr->z = _value.vector[ 2 ];
+		value.vectorPtr->x = _value.vector[0];
+		value.vectorPtr->y = _value.vector[1];
+		value.vectorPtr->z = _value.vector[2];
 		break;
 
 	case ev_function :
@@ -726,7 +726,7 @@ void idVarDef::SetString( const char *string, bool constant ) {
 	}
 	
 	assert( typeDef && ( typeDef->Type() == ev_string ) );
-	idStr::Copynz( value.stringPtr, string, MAX_STRING_LEN );
+	anStr::Copynz( value.stringPtr, string, MAX_STRING_LEN );
 }
 
 /*
@@ -734,7 +734,7 @@ void idVarDef::SetString( const char *string, bool constant ) {
 idVarDef::PrintInfo
 ============
 */
-void idVarDef::PrintInfo( idFile *file, int instructionPointer ) const {
+void idVarDef::PrintInfo( anFile *file, int instructionPointer ) const {
 	statement_t	*jumpst;
 	int			jumpto;
 	etype_t		etype;
@@ -779,7 +779,7 @@ void idVarDef::PrintInfo( idFile *file, int instructionPointer ) const {
 				len = strlen( value.stringPtr );
 				ch = value.stringPtr;
 				for( i = 0; i < len; i++, ch++ ) {
-					if ( idStr::CharIsPrintable( *ch ) ) {
+					if ( anStr::CharIsPrintable( *ch ) ) {
 						file->Printf( "%c", *ch );
 					} else if ( *ch == '\n' ) {
 						file->Printf( "\\n" );
@@ -827,7 +827,7 @@ idVarDefName::AddDef
 ============
 */
 void idVarDefName::AddDef( idVarDef *def ) {
-	assert( def->next == NULL );
+	assert( def->next == nullptr );
 	def->name = this;
 	def->next = defs;
 	defs = def;
@@ -842,15 +842,15 @@ void idVarDefName::RemoveDef( idVarDef *def ) {
 	if ( defs == def ) {
 		defs = def->next;
 	} else {
-		for ( idVarDef *d = defs; d->next != NULL; d = d->next ) {
+		for ( idVarDef *d = defs; d->next != nullptr; d = d->next ) {
 			if ( d->next == def ) {
 				d->next = def->next;
 				break;
 			}
 		}
 	}
-	def->next = NULL;
-	def->name = NULL;
+	def->next = nullptr;
+	def->name = nullptr;
 }
 
 /***********************************************************************
@@ -865,7 +865,7 @@ idScriptObject::idScriptObject
 ============
 */
 idScriptObject::idScriptObject() {
-	data = NULL;
+	data = nullptr;
 	type = &type_object;
 }
 
@@ -888,7 +888,7 @@ void idScriptObject::Free( void ) {
 		Mem_Free( data );
 	}
 
-	data = NULL;
+	data = nullptr;
 	type = &type_object;
 }
 
@@ -897,10 +897,10 @@ void idScriptObject::Free( void ) {
 idScriptObject::Save
 ================
 */
-void idScriptObject::Save( idSaveGame *savefile ) const {
+void idScriptObject::Save( anSaveGame *savefile ) const {
 	size_t size;
 
-	if ( type == &type_object && data == NULL ) {
+	if ( type == &type_object && data == nullptr ) {
 		// Write empty string for uninitialized object
 		savefile->WriteString( "" );
 	} else {
@@ -916,8 +916,8 @@ void idScriptObject::Save( idSaveGame *savefile ) const {
 idScriptObject::Restore
 ================
 */
-void idScriptObject::Restore( idRestoreGame *savefile ) {
-	idStr typeName;
+void idScriptObject::Restore( anRestoreGame *savefile ) {
+	anStr typeName;
 	size_t size;
 
 	savefile->ReadString( typeName );
@@ -1057,7 +1057,7 @@ const function_t *idScriptObject::GetFunction( const char *name ) const {
 	const function_t *func;
 
 	if ( type == &type_object ) {
-		return NULL;
+		return nullptr;
 	}
 
 	func = gameLocal.program.FindFunction( name, type );
@@ -1076,7 +1076,7 @@ byte *idScriptObject::GetVariable( const char *name, etype_t etype ) const {
 	const idTypeDef	*parm;
 
 	if ( type == &type_object ) {
-		return NULL;
+		return nullptr;
 	}
 
 	t = type;
@@ -1090,7 +1090,7 @@ byte *idScriptObject::GetVariable( const char *name, etype_t etype ) const {
 			parm = t->GetParmType( i );
 			if ( !strcmp( t->GetParmName( i ), name ) ) {
 				if ( etype != parm->FieldType()->Type() ) {
-					return NULL;
+					return nullptr;
 				}
 				return &data[ pos ];
 			}
@@ -1104,7 +1104,7 @@ byte *idScriptObject::GetVariable( const char *name, etype_t etype ) const {
 		t = t->SuperClass();
 	} while( t && ( t != &type_object ) );
 
-	return NULL;
+	return nullptr;
 }
 
 /***********************************************************************
@@ -1160,7 +1160,7 @@ idTypeDef *idProgram::GetType( idTypeDef &type, bool allocate ) {
 	}
 
 	if ( !allocate ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// allocate a new one
@@ -1171,7 +1171,7 @@ idTypeDef *idProgram::GetType( idTypeDef &type, bool allocate ) {
 ============
 idProgram::FindType
 
-Returns a preexisting complex type that matches the name, or returns NULL if not found
+Returns a preexisting complex type that matches the name, or returns nullptr if not found
 ============
 */
 idTypeDef *idProgram::FindType( const char *name ) {
@@ -1185,7 +1185,7 @@ idTypeDef *idProgram::FindType( const char *name ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1198,11 +1198,11 @@ idVarDef *idProgram::GetDefList( const char *name ) const {
 
 	hash = varDefNameHash.GenerateKey( name, true );
 	for ( i = varDefNameHash.First( hash ); i != -1; i = varDefNameHash.Next( i ) ) {
-		if ( idStr::Cmp( varDefNames[i]->Name(), name ) == 0 ) {
+		if ( anStr::Cmp( varDefNames[i]->Name(), name ) == 0 ) {
 			return varDefNames[i]->GetDefs();
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1215,7 +1215,7 @@ void idProgram::AddDefToNameList( idVarDef *def, const char *name ) {
 
 	hash = varDefNameHash.GenerateKey( name, true );
 	for ( i = varDefNameHash.First( hash ); i != -1; i = varDefNameHash.Next( i ) ) {
-		if ( idStr::Cmp( varDefNames[i]->Name(), name ) == 0 ) {
+		if ( anStr::Cmp( varDefNames[i]->Name(), name ) == 0 ) {
 			break;
 		}
 	}
@@ -1233,7 +1233,7 @@ idProgram::AllocDef
 */
 idVarDef *idProgram::AllocDef( idTypeDef *type, const char *name, idVarDef *scope, bool constant ) {
 	idVarDef	*def;
-	idStr		element;
+	anStr		element;
 	idVarDef	*def_x;
 	idVarDef	*def_y;
 	idVarDef	*def_z;
@@ -1258,7 +1258,7 @@ idVarDef *idProgram::AllocDef( idTypeDef *type, const char *name, idVarDef *scop
 			def->initialized		= idVarDef::stackVariable;
 			scope->value.functionPtr->locals += type->Size();
 		} else if ( scope->TypeDef()->Inherits( &type_object ) ) {
-			idTypeDef	newtype( ev_field, NULL, "float field", 0, &type_float );
+			idTypeDef	newtype( ev_field, nullptr, "float field", 0, &type_float );
 			idTypeDef	*type = GetType( newtype, true );
 
 			// set the value to the variable's position in the object
@@ -1333,7 +1333,7 @@ idVarDef *idProgram::AllocDef( idTypeDef *type, const char *name, idVarDef *scop
 ============
 idProgram::GetDef
 
-If type is NULL, it will match any type
+If type is nullptr, it will match any type
 ============
 */
 idVarDef *idProgram::GetDef( const idTypeDef *type, const char *name, const idVarDef *scope ) const {
@@ -1343,8 +1343,8 @@ idVarDef *idProgram::GetDef( const idTypeDef *type, const char *name, const idVa
 	int				depth;
 
 	bestDepth = 0;
-	bestDef = NULL;
-	for( def = GetDefList( name ); def != NULL; def = def->Next() ) {
+	bestDef = nullptr;
+	for( def = GetDefList( name ); def != nullptr; def = def->Next() ) {
 		if ( def->scope->Type() == ev_namespace ) {
 			depth = def->DepthOfScope( scope );
 			if ( !depth ) {
@@ -1382,22 +1382,22 @@ void idProgram::FreeDef( idVarDef *def, const idVarDef *scope ) {
 	int i;
 
 	if ( def->Type() == ev_vector ) {
-		idStr name;
+		anStr name;
 
 		sprintf( name, "%s_x", def->Name() );
-		e = GetDef( NULL, name, scope );
+		e = GetDef( nullptr, name, scope );
 		if ( e ) {
 			FreeDef( e, scope );
 		}
 
 		sprintf( name, "%s_y", def->Name() );
-		e = GetDef( NULL, name, scope );
+		e = GetDef( nullptr, name, scope );
 		if ( e ) {
 			FreeDef( e, scope );
 		}
 
 		sprintf( name, "%s_z", def->Name() );
-		e = GetDef( NULL, name, scope );
+		e = GetDef( nullptr, name, scope );
 		if ( e ) {
 			FreeDef( e, scope );
 		}
@@ -1419,7 +1419,7 @@ idProgram::FindFreeResultDef
 idVarDef *idProgram::FindFreeResultDef( idTypeDef *type, const char *name, idVarDef *scope, const idVarDef *a, const idVarDef *b ) {
 	idVarDef *def;
 	
-	for( def = GetDefList( name ); def != NULL; def = def->Next() ) {
+	for( def = GetDefList( name ); def != nullptr; def = def->Next() ) {
 		if ( def == a || def == b ) {
 			continue;
 		}
@@ -1457,7 +1457,7 @@ function_t *idProgram::FindFunction( const char *name ) const {
 
 	assert( name );
 
-	idStr fullname = name;
+	anStr fullname = name;
 	start = 0;
 	namespaceDef = &def_namespace;
 	do {
@@ -1466,11 +1466,11 @@ function_t *idProgram::FindFunction( const char *name ) const {
 			break;
 		}
 
-		idStr namespaceName = fullname.Mid( start, pos - start );
-		def = GetDef( NULL, namespaceName, namespaceDef );
+		anStr namespaceName = fullname.Mid( start, pos - start );
+		def = GetDef( nullptr, namespaceName, namespaceDef );
 		if ( !def ) {
 			// couldn't find namespace
-			return NULL;
+			return nullptr;
 		}
 		namespaceDef = def;
 
@@ -1478,19 +1478,19 @@ function_t *idProgram::FindFunction( const char *name ) const {
 		start = pos + 2;
 	} while( def->Type() == ev_namespace );
 
-	idStr funcName = fullname.Right( fullname.Length() - start );
-	def = GetDef( NULL, funcName, namespaceDef );
+	anStr funcName = fullname.Right( fullname.Length() - start );
+	def = GetDef( nullptr, funcName, namespaceDef );
 	if ( !def ) {
 		// couldn't find function
-		return NULL;
+		return nullptr;
 	}
 
-	if ( ( def->Type() == ev_function ) && ( def->value.functionPtr->eventdef == NULL ) ) {
+	if ( ( def->Type() == ev_function ) && ( def->value.functionPtr->eventdef == nullptr ) ) {
 		return def->value.functionPtr;
 	}
 
 	// is not a function, or is an eventdef
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1508,15 +1508,15 @@ function_t *idProgram::FindFunction( const char *name, const idTypeDef *type ) c
 	const idVarDef	*def;
 
 	// look for the function
-	def = NULL;
+	def = nullptr;
 	for( tdef = type->def; tdef != &def_object; tdef = tdef->TypeDef()->SuperClass()->def ) {
-		def = GetDef( NULL, name, tdef );
+		def = GetDef( nullptr, name, tdef );
 		if ( def ) {
 			return def->value.functionPtr;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1531,7 +1531,7 @@ function_t &idProgram::AllocFunction( idVarDef *def ) {
 
 	// fill in the dfunction
 	function_t &func	= *functions.Alloc();
-	func.eventdef		= NULL;
+	func.eventdef		= nullptr;
 	func.def			= def;
 	func.type			= def->TypeDef();
 	func.firstStatement	= 0;
@@ -1552,15 +1552,15 @@ function_t &idProgram::AllocFunction( idVarDef *def ) {
 idProgram::SetEntity
 ================
 */
-void idProgram::SetEntity( const char *name, idEntity *ent ) {
+void idProgram::SetEntity( const char *name, abEntity *ent ) {
 	idVarDef	*def;
-	idStr		defName( "$" );
+	anStr		defName( "$" );
 
 	defName += name;
 
 	def = GetDef( &type_entity, defName, &def_namespace );
 	if ( def && ( def->initialized != idVarDef::stackVariable ) ) {
-		// 0 is reserved for NULL entity
+		// 0 is reserved for nullptr entity
 		if ( !ent ) {
 			*def->value.entityNumberPtr = 0;
 		} else {
@@ -1594,17 +1594,17 @@ void idProgram::BeginCompilation( void ) {
 	FreeData();
 
 	try {
-		// make the first statement a return for a "NULL" function
+		// make the first statement a return for a "nullptr" function
 		statement = AllocStatement();
 		statement->linenumber	= 0;
 		statement->file 		= 0;
 		statement->op			= OP_RETURN;
-		statement->a			= NULL;
-		statement->b			= NULL;
-		statement->c			= NULL;
+		statement->a			= nullptr;
+		statement->b			= nullptr;
+		statement->c			= nullptr;
 
-		// define NULL
-		//AllocDef( &type_void, "<NULL>", &def_namespace, true );
+		// define nullptr
+		//AllocDef( &type_void, "<nullptr>", &def_namespace, true );
 
 		// define the return def
 		returnDef = AllocDef( &type_vector, "<RETURN>", &def_namespace, false );
@@ -1626,7 +1626,7 @@ void idProgram::BeginCompilation( void ) {
 idProgram::DisassembleStatement
 ==============
 */
-void idProgram::DisassembleStatement( idFile *file, int instructionPointer ) const {
+void idProgram::DisassembleStatement( anFile *file, int instructionPointer ) const {
 	opcode_t			*op;
 	const statement_t	*statement;
 
@@ -1661,7 +1661,7 @@ void idProgram::Disassemble( void ) const {
 	int					i;
 	int					instructionPointer;
 	const function_t	*func;
-	idFile				*file;
+	anFile				*file;
 
 	file = fileSystem->OpenFileByMode( "script/disasm.txt", FS_WRITE );
 
@@ -1773,7 +1773,7 @@ bool idProgram::CompileText( const char *source, const char *text, bool console 
 	idCompiler	compiler;
 	int			i;
 	idVarDef	*def;
-	idStr		ospath;
+	anStr		ospath;
 
 	// use a full os path for GetFilenum since it calls OSPathToRelativePath to convert filenames from the parser
 	ospath = fileSystem->RelativePathToOSPath( source );
@@ -1839,7 +1839,7 @@ void idProgram::CompileFile( const char *filename ) {
 	char *src;
 	bool result;
 
-	if ( fileSystem->ReadFile( filename, ( void ** )&src, NULL ) < 0 ) {
+	if ( fileSystem->ReadFile( filename, ( void ** )&src, nullptr ) < 0 ) {
 		gameLocal.Error( "Couldn't load %s\n", filename );
 	}
 
@@ -1869,9 +1869,9 @@ void idProgram::FreeData( void ) {
 	varDefNames.DeleteContents( true );
 	varDefNameHash.Free();
 
-	returnDef		= NULL;
-	returnStringDef = NULL;
-	sysDef			= NULL;
+	returnDef		= nullptr;
+	returnStringDef = nullptr;
+	sysDef			= nullptr;
 
 	// free any special types we've created
 	types.DeleteContents( true );
@@ -1927,7 +1927,7 @@ void idProgram::Startup( const char *defaultScript ) {
 idProgram::Save
 ================
 */
-void idProgram::Save( idSaveGame *savefile ) const {
+void idProgram::Save( anSaveGame *savefile ) const {
 	int i;
 	int currentFileNum = top_files;
 
@@ -1960,10 +1960,10 @@ void idProgram::Save( idSaveGame *savefile ) const {
 idProgram::Restore
 ================
 */
-bool idProgram::Restore( idRestoreGame *savefile ) {
+bool idProgram::Restore( anRestoreGame *savefile ) {
 	int i, num, index;
 	bool result = true;
-	idStr scriptname;
+	anStr scriptname;
 
 	savefile->ReadInt( num );
 	for ( i = 0; i < num; i++ ) {
@@ -2099,7 +2099,7 @@ int idProgram::GetFilenum( const char *name ) {
 		return filenum;
 	}
 
-	idStr strippedName;
+	anStr strippedName;
 	strippedName = fileSystem->OSPathToRelativePath( name );
 	if ( !strippedName.Length() ) {
 		// not off the base path so just use the full path
@@ -2137,7 +2137,7 @@ idProgram::~idProgram() {
 idProgram::ReturnEntity
 ================
 */
-void idProgram::ReturnEntity( idEntity *ent ) {
+void idProgram::ReturnEntity( abEntity *ent ) {
 	if ( ent ) {
 		*returnDef->value.entityNumberPtr = ent->entityNumber + 1;
 	} else {

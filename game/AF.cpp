@@ -15,10 +15,10 @@
 
 /*
 ================
-arcAF::arcAF
+anAF::anAF
 ================
 */
-arcAF::arcAF( void ) {
+anAF::anAF( void ) {
 	self = nullptr;
 	animator = nullptr;
 	modifiedAnim = 0;
@@ -33,18 +33,18 @@ arcAF::arcAF( void ) {
 
 /*
 ================
-arcAF::~arcAF
+anAF::~anAF
 ================
 */
-arcAF::~arcAF( void ) {
+anAF::~anAF( void ) {
 }
 
 /*
 ================
-arcAF::Save
+anAF::Save
 ================
 */
-void arcAF::Save( arcSaveGame *savefile ) const {
+void anAF::Save( anSaveGame *savefile ) const {
 	savefile->WriteObject( self );
 	savefile->WriteString( GetName() );
 	savefile->WriteBool( hasBindConstraints );
@@ -59,10 +59,10 @@ void arcAF::Save( arcSaveGame *savefile ) const {
 
 /*
 ================
-arcAF::Restore
+anAF::Restore
 ================
 */
-void arcAF::Restore( arcRestoreGame *savefile ) {
+void anAF::Restore( anRestoreGame *savefile ) {
 	savefile->ReadObject( reinterpret_cast<anClass *&>( self ) );
 	savefile->ReadString( name );
 	savefile->ReadBool( hasBindConstraints );
@@ -102,11 +102,10 @@ void arcAF::Restore( arcRestoreGame *savefile ) {
 
 /*
 ================
-arcAF::UpdateAnimation
+anAF::UpdateAnimation
 ================
 */
-bool arcAF::UpdateAnimation( void ) {
-	int i;
+bool anAF::UpdateAnimation( void ) {
 	anVec3 origin, renderOrigin, bodyOrigin;
 	anMat3 axis, renderAxis, bodyAxis;
 	renderEntity_t *renderEntity;
@@ -139,7 +138,7 @@ bool arcAF::UpdateAnimation( void ) {
 
 	// create an animation frame which reflects the current pose of the articulated figure
 	animator->InitAFPose();
-	for ( i = 0; i < jointMods.Num(); i++ ) {
+	for ( int i = 0; i < jointMods.Num(); i++ ) {
 		// check for the origin joint
 		if ( jointMods[i].jointHandle == 0 ) {
 			continue;
@@ -158,14 +157,13 @@ bool arcAF::UpdateAnimation( void ) {
 
 /*
 ================
-arcAF::GetBounds
+anAF::GetBounds
 
-  returns bounds for the current pose
+returns bounds for the current pose
 ================
 */
-anBounds arcAF::GetBounds( void ) const {
-	int i;
-	arcAFBody *body;
+anBounds anAF::GetBounds( void ) const {
+	anAFBody *body;
 	anVec3 origin, entityOrigin;
 	anMat3 axis, entityAxis;
 	anBounds bounds, b;
@@ -180,7 +178,7 @@ anBounds arcAF::GetBounds( void ) const {
 	entityOrigin = origin - baseOrigin * entityAxis;
 
 	// get bounds relative to base
-	for ( i = 0; i < jointMods.Num(); i++ ) {
+	for ( int i = 0; i < jointMods.Num(); i++ ) {
 		body = physicsObj.GetBody( jointMods[i].bodyId );
 		origin = ( body->GetWorldOrigin() - entityOrigin ) * entityAxis.Transpose();
 		axis = body->GetWorldAxis() * entityAxis.Transpose();
@@ -194,17 +192,16 @@ anBounds arcAF::GetBounds( void ) const {
 
 /*
 ================
-arcAF::SetupPose
+anAF::SetupPose
 
-  Transforms the articulated figure to match the current animation pose of the given entity.
+Transforms the articulated figure to match the current animation pose of the given entity.
 ================
 */
-void arcAF::SetupPose( arcEntity *ent, int time ) {
-	int i;
-	arcAFBody *body;
+void anAF::SetupPose( anEntity *ent, int time ) {
+	anAFBody *body;
 	anVec3 origin;
 	anMat3 axis;
-	arcAnimator *animatorPtr;
+	anAnimator *animatorPtr;
 	renderEntity_t *renderEntity;
 
 	if ( !IsLoaded() || !ent ) {
@@ -232,7 +229,7 @@ void arcAF::SetupPose( arcEntity *ent, int time ) {
 	}
 	poseTime = time;
 
-	for ( i = 0; i < jointMods.Num(); i++ ) {
+	for ( int i = 0; i < jointMods.Num(); i++ ) {
 		body = physicsObj.GetBody( jointMods[i].bodyId );
 		animatorPtr->GetJointTransform( jointMods[i].jointHandle, time, origin, axis );
 		body->SetWorldOrigin( renderEntity->origin + ( origin + jointMods[i].jointBodyOrigin * axis ) * renderEntity->axis );
@@ -246,19 +243,18 @@ void arcAF::SetupPose( arcEntity *ent, int time ) {
 
 /*
 ================
-arcAF::ChangePose
+anAF::ChangePose
 
    Change the articulated figure to match the current animation pose of the given entity
    and set the velocity relative to the previous pose.
 ================
 */
-void arcAF::ChangePose( arcEntity *ent, int time ) {
-	int i;
+void anAF::ChangePose( anEntity *ent, int time ) {
 	float invDelta;
-	arcAFBody *body;
+	anAFBody *body;
 	anVec3 origin, lastOrigin;
 	anMat3 axis;
-	arcAnimator *animatorPtr;
+	anAnimator *animatorPtr;
 	renderEntity_t *renderEntity;
 
 	if ( !IsLoaded() || !ent ) {
@@ -287,7 +283,7 @@ void arcAF::ChangePose( arcEntity *ent, int time ) {
 	invDelta = 1.0f / MS2SEC( time - poseTime );
 	poseTime = time;
 
-	for ( i = 0; i < jointMods.Num(); i++ ) {
+	for ( int i = 0; i < jointMods.Num(); i++ ) {
 		body = physicsObj.GetBody( jointMods[i].bodyId );
 		animatorPtr->GetJointTransform( jointMods[i].jointHandle, time, origin, axis );
 		lastOrigin = body->GetWorldOrigin();
@@ -301,29 +297,25 @@ void arcAF::ChangePose( arcEntity *ent, int time ) {
 
 /*
 ================
-arcAF::EntitiesTouchingAF
+anAF::EntitiesTouchingAF
 ================
 */
-int arcAF::EntitiesTouchingAF( afTouch_t touchList[ MAX_GENTITIES ] ) const {
-	int i, j, numClipModels;
-	arcAFBody *body;
+int anAF::EntitiesTouchingAF( afTouch_t touchList[ MAX_GENTITIES ] ) const {
+	anAFBody *body;
 	anClipModel *cm;
 	anClipModel *clipModels[ MAX_GENTITIES ];
-	int numTouching;
 
 	if ( !IsLoaded() ) {
 		return 0;
 	}
 
-	numTouching = 0;
-	numClipModels = gameLocal.clip.ClipModelsTouchingBounds( physicsObj.GetAbsBounds(), -1, clipModels, MAX_GENTITIES );
+	int numTouching = 0;
+	int numClipModels = gameLocal.clip.ClipModelsTouchingBounds( physicsObj.GetAbsBounds(), -1, clipModels, MAX_GENTITIES );
 
-	for ( i = 0; i < jointMods.Num(); i++ ) {
+	for ( int i = 0; i < jointMods.Num(); i++ ) {
 		body = physicsObj.GetBody( jointMods[i].bodyId );
-
-		for ( j = 0; j < numClipModels; j++ ) {
+		for ( int j = 0; j < numClipModels; j++ ) {
 			cm = clipModels[j];
-
 			if ( !cm || cm->GetEntity() == self ) {
 				continue;
 			}
@@ -351,10 +343,10 @@ int arcAF::EntitiesTouchingAF( afTouch_t touchList[ MAX_GENTITIES ] ) const {
 
 /*
 ================
-arcAF::BodyForClipModelId
+anAF::BodyForClipModelId
 ================
 */
-int arcAF::BodyForClipModelId( int id ) const {
+int anAF::BodyForClipModelId( int id ) const {
 	if ( id >= 0 ) {
 		return id;
 	} else {
@@ -369,52 +361,52 @@ int arcAF::BodyForClipModelId( int id ) const {
 
 /*
 ================
-arcAF::GetPhysicsToVisualTransform
+anAF::GetPhysicsToVisualTransform
 ================
 */
-void arcAF::GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis ) const {
+void anAF::GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis ) const {
 	origin = - baseOrigin;
 	axis = baseAxis.Transpose();
 }
 
 /*
 ================
-arcAF::GetImpactInfo
+anAF::GetImpactInfo
 ================
 */
-void arcAF::GetImpactInfo( arcEntity *ent, int id, const anVec3 &point, impactInfo_t *info ) {
+void anAF::GetImpactInfo( anEntity *ent, int id, const anVec3 &point, impactInfo_t *info ) {
 	SetupPose( self, gameLocal.time );
 	physicsObj.GetImpactInfo( BodyForClipModelId( id ), point, info );
 }
 
 /*
 ================
-arcAF::ApplyImpulse
+anAF::ApplyImpulse
 ================
 */
-void arcAF::ApplyImpulse( arcEntity *ent, int id, const anVec3 &point, const anVec3 &impulse ) {
+void anAF::ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &impulse ) {
 	SetupPose( self, gameLocal.time );
 	physicsObj.ApplyImpulse( BodyForClipModelId( id ), point, impulse );
 }
 
 /*
 ================
-arcAF::AddForce
+anAF::AddForce
 ================
 */
-void arcAF::AddForce( arcEntity *ent, int id, const anVec3 &point, const anVec3 &force ) {
+void anAF::AddForce( anEntity *ent, int id, const anVec3 &point, const anVec3 &force ) {
 	SetupPose( self, gameLocal.time );
 	physicsObj.AddForce( BodyForClipModelId( id ), point, force );
 }
 
 /*
 ================
-arcAF::AddBody
+anAF::AddBody
 
   Adds a body.
 ================
 */
-void arcAF::AddBody( arcAFBody *body, const anJointMat *joints, const char *jointName, const AFJointModType_t mod ) {
+void anAF::AddBody( anAFBody *body, const anJointMat *joints, const char *jointName, const AFJointModType_t mod ) {
 	int index;
 	jointHandle_t handle;
 	anVec3 origin;
@@ -422,7 +414,7 @@ void arcAF::AddBody( arcAFBody *body, const anJointMat *joints, const char *join
 
 	handle = animator->GetJointHandle( jointName );
 	if ( handle == INVALID_JOINT ) {
-		gameLocal.Error( "arcAF for entity '%s' at (%s) modifies unknown joint '%s'", self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0), jointName );
+		gameLocal.Error( "anAF for entity '%s' at (%s) modifies unknown joint '%s'", self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ), jointName );
 	}
 
 	assert( handle < animator->NumJoints() );
@@ -440,12 +432,12 @@ void arcAF::AddBody( arcAFBody *body, const anJointMat *joints, const char *join
 
 /*
 ================
-arcAF::SetBase
+anAF::SetBase
 
   Sets the base body.
 ================
 */
-void arcAF::SetBase( arcAFBody *body, const anJointMat *joints ) {
+void anAF::SetBase( anAFBody *body, const anJointMat *joints ) {
 	physicsObj.ForceBodyId( body, 0 );
 	baseOrigin = body->GetWorldOrigin();
 	baseAxis = body->GetWorldAxis();
@@ -454,19 +446,19 @@ void arcAF::SetBase( arcAFBody *body, const anJointMat *joints ) {
 
 /*
 ================
-arcAF::LoadBody
+anAF::LoadBody
 ================
 */
-bool arcAF::LoadBody( const anDeclAF_Body *fb, const anJointMat *joints ) {
-	int id, i;
+bool anAF::LoadBody( const anDeclAF_Body *fb, const anJointMat *joints ) {
+	int id;
 	float length, mass;
 	anTraceModel trm;
 	anClipModel *clip;
-	arcAFBody *body;
+	anAFBody *body;
 	anMat3 axis, inertiaTensor;
 	anVec3 centerOfMass, origin;
 	anBounds bounds;
-	arcList<jointHandle_t> jointList;
+	anList<jointHandle_t> jointList;
 
 	origin = fb->origin.ToVec3();
 	axis = fb->angles.ToMat3();
@@ -534,7 +526,7 @@ bool arcAF::LoadBody( const anDeclAF_Body *fb, const anJointMat *joints ) {
 		clip = new anClipModel( trm );
 		clip->SetContents( fb->contents );
 		clip->Link( gameLocal.clip, self, 0, origin, axis );
-		body = new arcAFBody( fb->name, clip, fb->density );
+		body = new anAFBody( fb->name, clip, fb->density );
 		if ( fb->inertiaScale != mat3_identity ) {
 			body->SetDensity( fb->density, fb->inertiaScale );
 		}
@@ -571,11 +563,9 @@ bool arcAF::LoadBody( const anDeclAF_Body *fb, const anJointMat *joints ) {
 
 	// update table to find the nearest articulated figure body for a joint of the skeletal model
 	animator->GetJointList( fb->containedJoints, jointList );
-	for ( i = 0; i < jointList.Num(); i++ ) {
+	for ( int i = 0; i < jointList.Num(); i++ ) {
 		if ( jointBody[ jointList[i] ] != -1 ) {
-			gameLocal.Warning( "%s: joint '%s' is already contained by body '%s'",
-						name.c_str(), animator->GetJointName( (jointHandle_t)jointList[i] ),
-							physicsObj.GetBody( jointBody[ jointList[i] ] )->GetName().c_str() );
+			gameLocal.Warning( "%s: joint '%s' is already contained by body '%s'", name.c_str(), animator->GetJointName( (jointHandle_t)jointList[i] ), physicsObj.GetBody( jointBody[ jointList[i] ] )->GetName().c_str() );
 		}
 		jointBody[ jointList[i] ] = id;
 	}
@@ -585,38 +575,37 @@ bool arcAF::LoadBody( const anDeclAF_Body *fb, const anJointMat *joints ) {
 
 /*
 ================
-arcAF::LoadConstraint
+anAF::LoadConstraint
 ================
 */
-bool arcAF::LoadConstraint( const anDeclAF_Constraint *fc ) {
-	arcAFBody *body1, *body2;
+bool anAF::LoadConstraint( const anDeclAF_Constraint *fc ) {
 	anAngles angles;
 	anMat3 axis;
 
-	body1 = physicsObj.GetBody( fc->body1 );
-	body2 = physicsObj.GetBody( fc->body2 );
+	anAFBody *body1 = physicsObj.GetBody( fc->body1 );
+	anAFBody *body2 = physicsObj.GetBody( fc->body2 );
 
 	switch ( fc->type ) {
 		case DECLAF_CONSTRAINT_FIXED: {
-			arcAFConstraint_Fixed *c;
-			c = static_cast<arcAFConstraint_Fixed *>(physicsObj.GetConstraint( fc->name ) );
+			anAFConstraint_Fixed *c;
+			c = static_cast<anAFConstraint_Fixed *>( physicsObj.GetConstraint( fc->name ) );
 			if ( c ) {
 				c->SetBody1( body1 );
 				c->SetBody2( body2 );
 			} else {
-				c = new arcAFConstraint_Fixed( fc->name, body1, body2 );
+				c = new anAFConstraint_Fixed( fc->name, body1, body2 );
 				physicsObj.AddConstraint( c );
 			}
 			break;
 		}
 		case DECLAF_CONSTRAINT_BALLANDSOCKETJOINT: {
-			arcAFConstraint_BallAndSocketJoint *c;
-			c = static_cast<arcAFConstraint_BallAndSocketJoint *>(physicsObj.GetConstraint( fc->name ) );
+			anAFConstraint_BallAndSocketJoint *c;
+			c = static_cast<anAFConstraint_BallAndSocketJoint *>( physicsObj.GetConstraint( fc->name ) );
 			if ( c ) {
 				c->SetBody1( body1 );
 				c->SetBody2( body2 );
 			} else {
-				c = new arcAFConstraint_BallAndSocketJoint( fc->name, body1, body2 );
+				c = new anAFConstraint_BallAndSocketJoint( fc->name, body1, body2 );
 				physicsObj.AddConstraint( c );
 			}
 			c->SetAnchor( fc->anchor.ToVec3() );
@@ -641,13 +630,13 @@ bool arcAF::LoadConstraint( const anDeclAF_Constraint *fc ) {
 			break;
 		}
 		case DECLAF_CONSTRAINT_UNIVERSALJOINT: {
-			arcAFConstraint_UniversalJoint *c;
-			c = static_cast<arcAFConstraint_UniversalJoint *>(physicsObj.GetConstraint( fc->name ) );
+			anAFConstraint_UniversalJoint *c;
+			c = static_cast<anAFConstraint_UniversalJoint *>( physicsObj.GetConstraint( fc->name ) );
 			if ( c ) {
 				c->SetBody1( body1 );
 				c->SetBody2( body2 );
 			} else {
-				c = new arcAFConstraint_UniversalJoint( fc->name, body1, body2 );
+				c = new anAFConstraint_UniversalJoint( fc->name, body1, body2 );
 				physicsObj.AddConstraint( c );
 			}
 			c->SetAnchor( fc->anchor.ToVec3() );
@@ -673,13 +662,13 @@ bool arcAF::LoadConstraint( const anDeclAF_Constraint *fc ) {
 			break;
 		}
 		case DECLAF_CONSTRAINT_HINGE: {
-			arcAFConstraint_Hinge *c;
-			c = static_cast<arcAFConstraint_Hinge *>(physicsObj.GetConstraint( fc->name ) );
+			anAFConstraint_Hinge *c;
+			c = static_cast<anAFConstraint_Hinge *>( physicsObj.GetConstraint( fc->name ) );
 			if ( c ) {
 				c->SetBody1( body1 );
 				c->SetBody2( body2 );
 			} else {
-				c = new arcAFConstraint_Hinge( fc->name, body1, body2 );
+				c = new anAFConstraint_Hinge( fc->name, body1, body2 );
 				physicsObj.AddConstraint( c );
 			}
 			c->SetAnchor( fc->anchor.ToVec3() );
@@ -702,26 +691,26 @@ bool arcAF::LoadConstraint( const anDeclAF_Constraint *fc ) {
 			break;
 		}
 		case DECLAF_CONSTRAINT_SLIDER: {
-			arcAFConstraint_Slider *c;
-			c = static_cast<arcAFConstraint_Slider *>(physicsObj.GetConstraint( fc->name ) );
+			anAFConstraint_Slider *c;
+			c = static_cast<anAFConstraint_Slider *>( physicsObj.GetConstraint( fc->name ) );
 			if ( c ) {
 				c->SetBody1( body1 );
 				c->SetBody2( body2 );
 			} else {
-				c = new arcAFConstraint_Slider( fc->name, body1, body2 );
+				c = new anAFConstraint_Slider( fc->name, body1, body2 );
 				physicsObj.AddConstraint( c );
 			}
 			c->SetAxis( fc->axis.ToVec3() );
 			break;
 		}
 		case DECLAF_CONSTRAINT_SPRING: {
-			arcAFConstraint_Spring *c;
-			c = static_cast<arcAFConstraint_Spring *>(physicsObj.GetConstraint( fc->name ) );
+			anAFConstraint_Spring *c;
+			c = static_cast<anAFConstraint_Spring *>( physicsObj.GetConstraint( fc->name ) );
 			if ( c ) {
 				c->SetBody1( body1 );
 				c->SetBody2( body2 );
 			} else {
-				c = new arcAFConstraint_Spring( fc->name, body1, body2 );
+				c = new anAFConstraint_Spring( fc->name, body1, body2 );
 				physicsObj.AddConstraint( c );
 			}
 			c->SetAnchor( fc->anchor.ToVec3(), fc->anchor2.ToVec3() );
@@ -739,8 +728,8 @@ GetJointTransform
 ================
 */
 static bool GetJointTransform( void *model, const anJointMat *frame, const char *jointName, anVec3 &origin, anMat3 &axis ) {
-	jointHandle_t joint = reinterpret_cast<arcAnimator *>(model)->GetJointHandle( jointName );
-	if ( ( joint >= 0 ) && ( joint < reinterpret_cast<arcAnimator *>(model)->NumJoints() ) ) {
+	jointHandle_t joint = reinterpret_cast<anAnimator *>( model )->GetJointHandle( jointName );
+	if ( ( joint >= 0 ) && ( joint < reinterpret_cast<anAnimator *>( model )->NumJoints() ) ) {
 		origin = frame[ joint ].ToVec3();
 		axis = frame[ joint ].ToMat3();
 		return true;
@@ -751,13 +740,12 @@ static bool GetJointTransform( void *model, const anJointMat *frame, const char 
 
 /*
 ================
-arcAF::Load
+anAF::Load
 ================
 */
-bool arcAF::Load( arcEntity *ent, const char *fileName ) {
-	int i, j;
+bool anAF::Load( anEntity *ent, const char *fileName ) {
 	const anDeclAF *file;
-	const arcDeclModelDef *modelDef;
+	const anDeclModelDef *modelDef;
 	anRenderModel *model;
 	int numJoints;
 	anJointMat *joints;
@@ -768,7 +756,7 @@ bool arcAF::Load( arcEntity *ent, const char *fileName ) {
 	physicsObj.SetSelf( self );
 
 	if ( animator == nullptr ) {
-		gameLocal.Warning( "Couldn't load af '%s' for entity '%s' at (%s): nullptr animator\n", name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "Couldn't load af '%s' for entity '%s' at (%s): nullptr animator\n", name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 
@@ -777,35 +765,35 @@ bool arcAF::Load( arcEntity *ent, const char *fileName ) {
 
 	file = static_cast<const anDeclAF *>( declManager->FindType( DECL_AF, name ) );
 	if ( !file ) {
-		gameLocal.Warning( "Couldn't load af '%s' for entity '%s' at (%s)\n", name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "Couldn't load af '%s' for entity '%s' at (%s)\n", name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 
 	if ( file->bodies.Num() == 0 || file->bodies[0]->jointName != "origin" ) {
-		gameLocal.Warning( "arcAF::Load: articulated figure '%s' for entity '%s' at (%s) has no body which modifies the origin joint.",
-							name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "anAF::Load: articulated figure '%s' for entity '%s' at (%s) has no body which modifies the origin joint.",
+							name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString( 0 ) );
 		return false;
 	}
 
 	modelDef = animator->ModelDef();
 	if ( modelDef == nullptr || modelDef->GetState() == DS_DEFAULTED ) {
-		gameLocal.Warning( "arcAF::Load: articulated figure '%s' for entity '%s' at (%s) has no or defaulted modelDef '%s'",
-							name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString(0), modelDef ? modelDef->GetName() : "" );
+		gameLocal.Warning( "anAF::Load: articulated figure '%s' for entity '%s' at (%s) has no or defaulted modelDef '%s'",
+							name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString( 0 ), modelDef ? modelDef->GetName() : "" );
 		return false;
 	}
 
 	model = animator->ModelHandle();
 	if ( model == nullptr || model->IsDefaultModel() ) {
-		gameLocal.Warning( "arcAF::Load: articulated figure '%s' for entity '%s' at (%s) has no or defaulted model '%s'",
-							name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString(0), model ? model->Name() : "" );
+		gameLocal.Warning( "anAF::Load: articulated figure '%s' for entity '%s' at (%s) has no or defaulted model '%s'",
+							name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString( 0 ), model ? model->Name() : "" );
 		return false;
 	}
 
 	// get the modified animation
 	modifiedAnim = animator->GetAnim( ARTICULATED_FIGURE_ANIM );
 	if ( !modifiedAnim ) {
-		gameLocal.Warning( "arcAF::Load: articulated figure '%s' for entity '%s' at (%s) has no modified animation '%s'",
-							name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString(0), ARTICULATED_FIGURE_ANIM );
+		gameLocal.Warning( "anAF::Load: articulated figure '%s' for entity '%s' at (%s) has no modified animation '%s'",
+							name.c_str(), ent->name.c_str(), ent->GetPhysics()->GetOrigin().ToString( 0 ), ARTICULATED_FIGURE_ANIM );
 		return false;
 	}
 
@@ -831,14 +819,14 @@ bool arcAF::Load( arcEntity *ent, const char *fileName ) {
 
 	// clear the joint to body conversion list
 	jointBody.AssureSize( animator->NumJoints() );
-	for ( i = 0; i < jointBody.Num(); i++ ) {
+	for ( int i = 0; i < jointBody.Num(); i++ ) {
 		jointBody[i] = -1;
 	}
 
 	// delete any bodies in the physicsObj that are no longer in the anDeclAF
-	for ( i = 0; i < physicsObj.GetNumBodies(); i++ ) {
-		arcAFBody *body = physicsObj.GetBody( i );
-		for ( j = 0; j < file->bodies.Num(); j++ ) {
+	for ( int i = 0; i < physicsObj.GetNumBodies(); i++ ) {
+		anAFBody *body = physicsObj.GetBody( i );
+		for ( int j = 0; j < file->bodies.Num(); j++ ) {
 			if ( file->bodies[j]->name.Icmp( body->GetName() ) == 0 ) {
 				break;
 			}
@@ -850,37 +838,37 @@ bool arcAF::Load( arcEntity *ent, const char *fileName ) {
 	}
 
 	// delete any constraints in the physicsObj that are no longer in the anDeclAF
-	for ( i = 0; i < physicsObj.GetNumConstraints(); i++ ) {
-		arcAFConstraint *constraint = physicsObj.GetConstraint( i );
-		for ( j = 0; j < file->constraints.Num(); j++ ) {
+	for ( int i = 0; i < physicsObj.GetNumConstraints(); i++ ) {
+		anAFConstraint *constraint = physicsObj.GetConstraint( i );
+		for ( int j = 0; j < file->constraints.Num(); j++ ) {
 			if ( file->constraints[j]->name.Icmp( constraint->GetName() ) == 0 &&
 					file->constraints[j]->type == constraint->GetType() ) {
 				break;
 			}
 		}
-		if ( j >= file->constraints.Num() ) {
+		if ( int j >= file->constraints.Num() ) {
 			physicsObj.DeleteConstraint( i );
 			i--;
 		}
 	}
 
 	// load bodies from the file
-	for ( i = 0; i < file->bodies.Num(); i++ ) {
+	for ( int i = 0; i < file->bodies.Num(); i++ ) {
 		LoadBody( file->bodies[i], joints );
 	}
 
 	// load constraints from the file
-	for ( i = 0; i < file->constraints.Num(); i++ ) {
+	for ( int i = 0; i < file->constraints.Num(); i++ ) {
 		LoadConstraint( file->constraints[i] );
 	}
 
 	physicsObj.UpdateClipModels();
 
 	// check if each joint is contained by a body
-	for ( i = 0; i < animator->NumJoints(); i++ ) {
+	for ( int i = 0; i < animator->NumJoints(); i++ ) {
 		if ( jointBody[i] == -1 ) {
-			gameLocal.Warning( "arcAF::Load: articulated figure '%s' for entity '%s' at (%s) joint '%s' is not contained by a body",
-				name.c_str(), self->name.c_str(), self->GetPhysics()->GetOrigin().ToString(0), animator->GetJointName( (jointHandle_t)i ) );
+			gameLocal.Warning( "anAF::Load: articulated figure '%s' for entity '%s' at (%s) joint '%s' is not contained by a body",
+				name.c_str(), self->name.c_str(), self->GetPhysics()->GetOrigin().ToString( 0 ), animator->GetJointName( (jointHandle_t)i ) );
 		}
 	}
 
@@ -897,10 +885,10 @@ bool arcAF::Load( arcEntity *ent, const char *fileName ) {
 
 /*
 ================
-arcAF::Start
+anAF::Start
 ================
 */
-void arcAF::Start( void ) {
+void anAF::Start( void ) {
 	if ( !IsLoaded() ) {
 		return;
 	}
@@ -917,14 +905,13 @@ void arcAF::Start( void ) {
 
 /*
 ================
-arcAF::TestSolid
+anAF::TestSolid
 ================
 */
-bool arcAF::TestSolid( void ) const {
-	int i;
-	arcAFBody *body;
+bool anAF::TestSolid( void ) const {
+	anAFBody *body;
 	trace_t trace;
-	anString str;
+	anStr str;
 	bool solid;
 
 	if ( !IsLoaded() ) {
@@ -937,7 +924,7 @@ bool arcAF::TestSolid( void ) const {
 
 	solid = false;
 
-	for ( i = 0; i < physicsObj.GetNumBodies(); i++ ) {
+	for ( int i = 0; i < physicsObj.GetNumBodies(); i++ ) {
 		body = physicsObj.GetBody( i );
 		if ( gameLocal.clip.Translation( trace, body->GetWorldOrigin(), body->GetWorldOrigin(), body->GetClipModel(), body->GetWorldAxis(), body->GetClipMask(), self ) ) {
 			float depth = anMath::Fabs( trace.c.point * trace.c.normal - trace.c.dist );
@@ -952,10 +939,10 @@ bool arcAF::TestSolid( void ) const {
 
 /*
 ================
-arcAF::StartFromCurrentPose
+anAF::StartFromCurrentPose
 ================
 */
-void arcAF::StartFromCurrentPose( int inheritVelocityTime ) {
+void anAF::StartFromCurrentPose( int inheritVelocityTime ) {
 	if ( !IsLoaded() ) {
 		return;
 	}
@@ -989,10 +976,10 @@ void arcAF::StartFromCurrentPose( int inheritVelocityTime ) {
 
 /*
 ================
-arcAF::Stop
+anAF::Stop
 ================
 */
-void arcAF::Stop( void ) {
+void anAF::Stop( void ) {
 	// disable the articulated figure for collision detection
 	physicsObj.UnlinkClip();
 	isActive = false;
@@ -1000,22 +987,22 @@ void arcAF::Stop( void ) {
 
 /*
 ================
-arcAF::Rest
+anAF::Rest
 ================
 */
-void arcAF::Rest( void ) {
+void anAF::Rest( void ) {
 	physicsObj.PutToRest();
 }
 
 /*
 ================
-arcAF::SetConstraintPosition
+anAF::SetConstraintPosition
 
   Only moves constraints that bind the entity to another entity.
 ================
 */
-void arcAF::SetConstraintPosition( const char *name, const anVec3 &pos ) {
-	arcAFConstraint *constraint;
+void anAF::SetConstraintPosition( const char *name, const anVec3 &pos ) {
+	anAFConstraint *constraint;
 	constraint = GetPhysics()->GetConstraint( name );
 
 	if ( !constraint ) {
@@ -1030,17 +1017,17 @@ void arcAF::SetConstraintPosition( const char *name, const anVec3 &pos ) {
 
 	switch ( constraint->GetType() ) {
 		case CONSTRAINT_BALLANDSOCKETJOINT: {
-			arcAFConstraint_BallAndSocketJoint *bs = static_cast<arcAFConstraint_BallAndSocketJoint *>(constraint);
+			anAFConstraint_BallAndSocketJoint *bs = static_cast<anAFConstraint_BallAndSocketJoint *>(constraint);
 			bs->Translate( pos - bs->GetAnchor() );
 			break;
 		}
 		case CONSTRAINT_UNIVERSALJOINT: {
-			arcAFConstraint_UniversalJoint *uj = static_cast<arcAFConstraint_UniversalJoint *>(constraint);
+			anAFConstraint_UniversalJoint *uj = static_cast<anAFConstraint_UniversalJoint *>(constraint);
 			uj->Translate( pos - uj->GetAnchor() );
 			break;
 		}
 		case CONSTRAINT_HINGE: {
-			arcAFConstraint_Hinge *hinge = static_cast<arcAFConstraint_Hinge *>(constraint);
+			anAFConstraint_Hinge *hinge = static_cast<anAFConstraint_Hinge *>(constraint);
 			hinge->Translate( pos - hinge->GetAnchor() );
 			break;
 		}
@@ -1053,19 +1040,14 @@ void arcAF::SetConstraintPosition( const char *name, const anVec3 &pos ) {
 
 /*
 ================
-arcAF::SaveState
+anAF::SaveState
 ================
 */
-void arcAF::SaveState( anDict &args ) const {
-	int i;
-	arcAFBody *body;
-	anString key, value;
-
-	for ( i = 0; i < jointMods.Num(); i++ ) {
-		body = physicsObj.GetBody( jointMods[i].bodyId );
-
-		key = "body " + body->GetName();
-		value = body->GetWorldOrigin().ToString( 8 );
+void anAF::SaveState( anDict &args ) const {
+	for ( int i = 0; i < jointMods.Num(); i++ ) {
+		anAFBody body = physicsObj.GetBody( jointMods[i].bodyId );
+		anStr key = "body " + body->GetName();
+		anStr value = body->GetWorldOrigin().ToString( 8 );
 		value += " ";
 		value += body->GetWorldAxis().ToAngles().ToString( 8 );
 		args.Set( key, value );
@@ -1074,17 +1056,16 @@ void arcAF::SaveState( anDict &args ) const {
 
 /*
 ================
-arcAF::LoadState
+anAF::LoadState
 ================
 */
-void arcAF::LoadState( const anDict &args ) {
-	const anKeyValue *kv;
-	anString name;
-	arcAFBody *body;
+void anAF::LoadState( const anDict &args ) {
+	anStr name;
+	anAFBody *body;
 	anVec3 origin;
 	anAngles angles;
 
-	kv = args.MatchPrefix( "body ", nullptr );
+	const anKeyValue *kv = args.MatchPrefix( "body ", nullptr );
 	while ( kv ) {
 		name = kv->GetKey();
 		name.Strip( "body " );
@@ -1105,17 +1086,15 @@ void arcAF::LoadState( const anDict &args ) {
 
 /*
 ================
-arcAF::AddBindConstraints
+anAF::AddBindConstraints
 ================
 */
-void arcAF::AddBindConstraints( void ) {
+void anAF::AddBindConstraints( void ) {
 	const anKeyValue *kv;
-	anString name;
-	arcAFBody *body;
+	anStr name;
+	anAFBody *body;
 	anLexer lexer;
 	anToken type, bodyName, jointName;
-	anVec3 origin, renderOrigin;
-	anMat3 axis, renderAxis;
 
 	if ( !IsLoaded() ) {
 		return;
@@ -1124,10 +1103,10 @@ void arcAF::AddBindConstraints( void ) {
 	const anDict &args = self->spawnArgs;
 
 	// get the render position
-	origin = physicsObj.GetOrigin( 0 );
-	axis = physicsObj.GetAxis( 0 );
-	renderAxis = baseAxis.Transpose() * axis;
-	renderOrigin = origin - baseOrigin * renderAxis;
+	anVec3 origin = physicsObj.GetOrigin( 0 );
+	anMat3 axis = physicsObj.GetAxis( 0 );
+	anMat3 renderAxis = baseAxis.Transpose() * axis;
+	anVec3 renderOrigin = origin - baseOrigin * renderAxis;
 
 	// parse all the bind constraints
 	for ( kv = args.MatchPrefix( "bindConstraint ", nullptr ); kv; kv = args.MatchPrefix( "bindConstraint ", kv ) ) {
@@ -1140,42 +1119,42 @@ void arcAF::AddBindConstraints( void ) {
 		lexer.ReadToken( &bodyName );
 		body = physicsObj.GetBody( bodyName );
 		if ( !body ) {
-			gameLocal.Warning( "arcAF::AddBindConstraints: body '%s' not found on entity '%s'", bodyName.c_str(), self->name.c_str() );
+			gameLocal.Warning( "anAF::AddBindConstraints: body '%s' not found on entity '%s'", bodyName.c_str(), self->name.c_str() );
 			lexer.FreeSource();
 			continue;
 		}
 
 		if ( type.Icmp( "fixed" ) == 0 ) {
-			arcAFConstraint_Fixed *c = new arcAFConstraint_Fixed( name, body, nullptr );
+			anAFConstraint_Fixed *c = new anAFConstraint_Fixed( name, body, nullptr );
 			physicsObj.AddConstraint( c );
 		} else if ( type.Icmp( "ballAndSocket" ) == 0 ) {
-			arcAFConstraint_BallAndSocketJoint *c;
+			anAFConstraint_BallAndSocketJoint *c;
 
-			c = new arcAFConstraint_BallAndSocketJoint( name, body, nullptr );
+			c = new anAFConstraint_BallAndSocketJoint( name, body, nullptr );
 			physicsObj.AddConstraint( c );
 			lexer.ReadToken( &jointName );
 
 			jointHandle_t joint = animator->GetJointHandle( jointName );
 			if ( joint == INVALID_JOINT ) {
-				gameLocal.Warning( "arcAF::AddBindConstraints: joint '%s' not found", jointName.c_str() );
+				gameLocal.Warning( "anAF::AddBindConstraints: joint '%s' not found", jointName.c_str() );
 			}
 
 			animator->GetJointTransform( joint, gameLocal.time, origin, axis );
 			c->SetAnchor( renderOrigin + origin * renderAxis );
 		} else if ( type.Icmp( "universal" ) == 0 ) {
-			arcAFConstraint_UniversalJoint *c = new arcAFConstraint_UniversalJoint( name, body, nullptr );
+			anAFConstraint_UniversalJoint *c = new anAFConstraint_UniversalJoint( name, body, nullptr );
 			physicsObj.AddConstraint( c );
 			lexer.ReadToken( &jointName );
 
 			jointHandle_t joint = animator->GetJointHandle( jointName );
 			if ( joint == INVALID_JOINT ) {
-				gameLocal.Warning( "arcAF::AddBindConstraints: joint '%s' not found", jointName.c_str() );
+				gameLocal.Warning( "anAF::AddBindConstraints: joint '%s' not found", jointName.c_str() );
 			}
 			animator->GetJointTransform( joint, gameLocal.time, origin, axis );
 			c->SetAnchor( renderOrigin + origin * renderAxis );
 			c->SetShafts( anVec3( 0, 0, 1 ), anVec3( 0, 0, -1 ) );
 		} else {
-			gameLocal.Warning( "arcAF::AddBindConstraints: unknown constraint type '%s' on entity '%s'", type.c_str(), self->name.c_str() );
+			gameLocal.Warning( "anAF::AddBindConstraints: unknown constraint type '%s' on entity '%s'", type.c_str(), self->name.c_str() );
 		}
 
 		lexer.FreeSource();
@@ -1185,20 +1164,18 @@ void arcAF::AddBindConstraints( void ) {
 
 /*
 ================
-arcAF::RemoveBindConstraints
+anAF::RemoveBindConstraints
 ================
 */
-void arcAF::RemoveBindConstraints( void ) {
-	const anKeyValue *kv;
-
+void anAF::RemoveBindConstraints( void ) {
 	if ( !IsLoaded() ) {
 		return;
 	}
 
 	const anDict &args = self->spawnArgs;
-	anString name;
+	anStr name;
 
-	kv = args.MatchPrefix( "bindConstraint ", nullptr );
+	const anKeyValue *kv = args.MatchPrefix( "bindConstraint ", nullptr );
 	while ( kv ) {
 		name = kv->GetKey();
 		name.Strip( "bindConstraint " );

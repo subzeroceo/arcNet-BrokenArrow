@@ -9,7 +9,7 @@ WARNING: This is included by the radiant project as well... don't try to use any
 #include "Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -38,7 +38,7 @@ anCVar sdAtmosphereRenderable::a_glowSunBaseScale(			"a_glowSunBaseScale",			"0.
 sdAtmosphereRenderable::sdAtmosphereRenderable
 ================
 */
-sdAtmosphereRenderable::sdAtmosphereRenderable( anRenderWorld* renderWorld ) {
+sdAtmosphereRenderable::sdAtmosphereRenderable( anRenderWorld *renderWorld ) {
 	this->renderWorld = renderWorld;
 
 	//
@@ -114,7 +114,7 @@ sdAtmosphereRenderable::DrawPostProcess
 	Render a full screen quad with the vertex colors set up based on the atmospheric settings
 ================
 */
-void sdAtmosphereRenderable::DrawPostProcess( const renderView_t* view, float x, float y, float w, float h ) const {
+void sdAtmosphereRenderable::DrawPostProcess( const renderView_t *view, float x, float y, float w, float h ) const {
 	deviceContext->DrawRect( x, y, w, h, 0.0f, 0.0f, 1.0f, 1.0f, postProcessMaterial );
 }
 
@@ -160,7 +160,7 @@ void sdAtmosphereRenderable::FreeLightDef() {
 sdAtmosphereRenderable::UpdateCelestialBody
 ================
 */
-void sdAtmosphereRenderable::UpdateCelestialBody( parms_t& parms ) {
+void sdAtmosphereRenderable::UpdateCelestialBody( parms_t &parms ) {
 	//
 	// Update lightsource
 	//
@@ -168,9 +168,9 @@ void sdAtmosphereRenderable::UpdateCelestialBody( parms_t& parms ) {
 	anVec3 sunColor								= parms.atmosphere->GetSunColor() * sunIntensity;
 	skyLight.lightCenter						= parms.atmosphere->GetSunDirection() /** 100000.f*/;
 	skyLight.minSpecShadowColor					= sdColor4::PackColor( parms.atmosphere->GetMinSpecShadowColor(), 1.f );
-	skyLight.shaderParms[ SHADERPARM_RED ]		= sunColor[ 0 ];
-	skyLight.shaderParms[ SHADERPARM_GREEN ]	= sunColor[ 1 ];
-	skyLight.shaderParms[ SHADERPARM_BLUE ]		= sunColor[ 2 ];
+	skyLight.shaderParms[ SHADERPARM_RED ]		= sunColor[0];
+	skyLight.shaderParms[ SHADERPARM_GREEN ]	= sunColor[1];
+	skyLight.shaderParms[ SHADERPARM_BLUE ]		= sunColor[2];
 	skyLight.material							= parms.atmosphere->GetSunMaterial();
 	skyLight.origin								= parms.skyOrigin;
 	skyLight.atmosLightProjection				= renderWorld->FindAtmosLightProjection( parms.mapId );
@@ -178,20 +178,20 @@ void sdAtmosphereRenderable::UpdateCelestialBody( parms_t& parms ) {
 	if ( parms.mapId != 0 ) {
 		skyLight.mapId = parms.mapId;
 		skyLight.numPrelightModels = 0;
-		while ( renderModelManager->CheckModel( anString( va( "_prelightatmosphere_%d_%d", parms.mapId, skyLight.numPrelightModels ) ) ) ) {
+		while ( renderModelManager->CheckModel( anStr( va( "_prelightatmosphere_%d_%d", parms.mapId, skyLight.numPrelightModels ) ) ) ) {
 			skyLight.numPrelightModels++;
 		}
 		if ( skyLight.numPrelightModels > MAX_PRELIGHTS ) {
 			common->Warning( "Max number of prelights reached for atmosphere against areas" );
 		}
 		skyLight.numPrelightModels = Min( skyLight.numPrelightModels, MAX_PRELIGHTS );
-		for ( int i=0; i<skyLight.numPrelightModels; i++ ) {
-			skyLight.prelightModels[i] = renderModelManager->CheckModel( anString( va( "_prelightatmosphere_%d_%d", parms.mapId, i ) ) );
+		for ( int i = 0; i < skyLight.numPrelightModels; i++ ) {
+			skyLight.prelightModels[i] = renderModelManager->CheckModel( anStr( va( "_prelightatmosphere_%d_%d", parms.mapId, i ) ) );
 			assert( skyLight.prelightModels[i] != nullptr );
 		}
 	}
 
-	skyLight.flags.noShadows = ( sunColor.Length() <= 2/255.f );
+	skyLight.flags.noShadows = ( sunColor.Length() <= 2/255.0f );
 
 	if ( skyLightHandle != -1 ) {
 		renderWorld->UpdateLightDef( skyLightHandle, &skyLight );
@@ -265,7 +265,7 @@ void sdAtmosphereRenderable::UpdateCelestialBody( parms_t& parms ) {
 	skyLightGlowSprite.callback = glowSpriteCB;
 #pragma warning( push )
 #pragma warning( disable: 4312 )
-	skyLightGlowSprite.callbackData = (void*)Uid;
+	skyLightGlowSprite.callbackData = (void *)Uid;
 #pragma warning( pop )
 
 	skyLightGlowSprite.customShader = parms.atmosphere->GetSunFlareMaterial();
@@ -304,7 +304,7 @@ sdAtmosphereRenderable::UpdateCloudLayers
 ================
 */
 void sdAtmosphereRenderable::UpdateCloudLayers( parms_t& parms ) {
-	const anList< sdCloudLayer >& cloudLayers = parms.atmosphere->GetCloudLayers();
+	const anList<sdCloudLayer> &cloudLayers = parms.atmosphere->GetCloudLayers();
 
 	// If number of layers has changed free render ents and realloc
 	if ( renderEnts.Num() != cloudLayers.Num() ) {
@@ -324,7 +324,7 @@ void sdAtmosphereRenderable::UpdateCloudLayers( parms_t& parms ) {
 	}
 
 	for ( int i = 0; i < cloudLayers.Num(); i++ ) {
-		renderEntity_t* skyModel = &renderEnts[i];
+		renderEntity_t *skyModel = &renderEnts[i];
 
 		memset( skyModel, 0, sizeof( *skyModel ) );
 
@@ -368,12 +368,12 @@ bool sdAtmosphereRenderable::_glowSpriteCB( renderEntity_t *re, const renderView
 	occlusionTest_t def;
 	def.view = v->viewID;
 	def.bb.Zero();
-	def.bb.ExpandSelf( 1000.f );
+	def.bb.ExpandSelf( 1000.0f );
 	def.bb.TranslateSelf( anVec3( re->shaderParms[ SHADERPARM_SPRITE_OFFSET ], 0.0f, 0.0f ) );
 	def.origin = re->origin;
 	def.axis = re->axis;
 	if ( occtestHandle < 0 ) {
-		occtestHandle = renderWorld->AddOcclusionTestDef(&def );
+		occtestHandle = renderWorld->AddOcclusionTestDef( &def );
 	} else {
 		renderWorld->UpdateOcclusionTestDef( occtestHandle, &def );
 	}
@@ -385,28 +385,27 @@ bool sdAtmosphereRenderable::_glowSpriteCB( renderEntity_t *re, const renderView
 	float alpha;
 	if ( recentVisibleCount > 0 ) {
 		scale = recentVisibleCount / a_glowSpriteSize.GetFloat();
-		if ( scale > 1.f ) {
-			scale = 1.f;
+		if ( scale > 1.0f ) {
+			scale = 1.0f;
 		}
 		/*alpha = recentVisibleCount / a_glowSpriteAlpha.GetFloat();
-		if ( alpha > a_glowSpriteMaxAlpha.GetFloat() )
-		{
+		if ( alpha > a_glowSpriteMaxAlpha.GetFloat() ) {
 			alpha = a_glowSpriteMaxAlpha.GetFloat();
 		}*/
 	} else {
-		scale = 0.f;
-		alpha = 0.f;
+		scale = 0.0f;
+		alpha = 0.0f;
 	}
 	float dtscale = sunFlareTime * 0.001f;
-	if ( dtscale > 0.f ) {
+	if ( dtscale > 0.0f ) {
 		if ( scale < currentScale ) {
-			float inc = (1.f / dtscale) * 1.f/30.f;
+			float inc = ( 1.0f / dtscale ) * 1.0f/30.f;
 			currentScale -= inc;
 			if ( currentScale < scale ) {
 				currentScale = scale;
 			}
 		} else {
-			float inc = (1.f / dtscale) * 1.f/30.f;
+			float inc = ( 1.0f / dtscale ) * 1.0f/30.f;
 			currentScale += inc;
 			if ( currentScale > scale ) {
 				currentScale = scale;
@@ -417,13 +416,13 @@ bool sdAtmosphereRenderable::_glowSpriteCB( renderEntity_t *re, const renderView
 	}
 /*	float dtalpha = a_glowSpriteAlphaSpeed.GetFloat();
 	if ( alpha < currentAlpha ) {
-		float inc = (1.f / dtalpha) * 1.f/30.f;
+		float inc = ( 1.0f / dtalpha ) * 1.0f/30.f;
 		currentAlpha -= inc;
 		if ( currentAlpha < alpha ) {
 			currentAlpha = alpha;
 		}
 	} else {
-		float inc = (1.f / dtalpha) * 1.f/30.f;
+		float inc = ( 1.0f / dtalpha ) * 1.0f/30.f;
 		currentAlpha += inc;
 		if ( currentAlpha > alpha ) {
 			currentAlpha = alpha;

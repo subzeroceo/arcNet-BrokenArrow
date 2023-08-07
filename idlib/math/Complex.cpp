@@ -9,5 +9,5 @@ aRcComplex::ToString
 =============
 */
 const char *aRcComplex::ToString( int precision ) const {
-	return anString::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
+	return anStr::FloatArrayToString( ToFloatPtr(), GetDimension(), precision );
 }

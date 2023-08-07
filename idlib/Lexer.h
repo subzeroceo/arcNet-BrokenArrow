@@ -19,8 +19,8 @@
 
 // lexer flags
 typedef enum {
-	LEXFL_NOERRORS						= BIT(0 ),	// don't print any errors
-	LEXFL_NOWARNINGS					= BIT(1 ),	// don't print any warnings
+	LEXFL_NOERRORS						= BIT( 0 ),	// don't print any errors
+	LEXFL_NOWARNINGS					= BIT(1),	// don't print any warnings
 	LEXFL_NOFATALERRORS					= BIT(2),	// errors aren't fatal
 	LEXFL_NOSTRINGCONCAT				= BIT(3),	// multiple strings seperated by whitespaces are not concatenated
 	LEXFL_NOSTRINGESCAPECHARS			= BIT(4),	// no escape characters inside strings
@@ -100,8 +100,8 @@ typedef enum {
 
 // punctuation
 typedef struct punctuation_s {
-	char *p;						// punctuation character( s)
-	int n;							// punctuation id
+	char *			p;				// punctuation character( s)
+	int 			n;				// punctuation id
 } punctuation_t;
 
 class anLexer {
@@ -113,93 +113,129 @@ public:
 					anLexer( int flags );
 					anLexer( const char *filename, int flags = 0, bool OSPath = false );
 					anLexer( const char *ptr, int length, const char *name, int flags = 0 );
+
 					// destructor
 					~anLexer();
+			
 					// load a script from the given file at the given offset with the given length
 	int				LoadFile( const char *filename, bool OSPath = false );
+
 					// load a script from the given memory with the given length and a specified line offset,
 					// so source strings extracted from a file can still refer to proper line numbers in the file
 					// NOTE: the ptr is expected to point at a valid C string: ptr[length] == '\0'
 	int				LoadMemory( const char *ptr, int length, const char *name, int startLine = 1 );
+
 					// free the script
 	void			FreeSource( void );
+
 					// returns true if a script is loaded
 	int				IsLoaded( void ) { return anLexer::loaded; };
+
 					// read a token
 	int				ReadToken( anToken *token );
+
 					// expect a certain token, reads the token when available
 	int				ExpectTokenString( const char *string );
+
 					// expect a certain token type
 	int				ExpectTokenType( int type, int subtype, anToken *token );
+
 					// expect a token
 	int				ExpectAnyToken( anToken *token );
+
 					// returns true when the token is available
 	int				CheckTokenString( const char *string );
+
 					// returns true an reads the token when a token with the given type is available
 	int				CheckTokenType( int type, int subtype, anToken *token );
+
 					// returns true if the next token equals the given string but does not remove the token from the source
 	int				PeekTokenString( const char *string );
+
 					// returns true if the next token equals the given type but does not remove the token from the source
 	int				PeekTokenType( int type, int subtype, anToken *token );
+
 					// skip tokens until the given token string is read
 	int				SkipUntilString( const char *string );
+
 					// skip the rest of the current line
 	int				SkipRestOfLine( void );
+
 					// skip the braced section
 	int				SkipBracedSection( bool parseFirstBrace = true );
+
 					// unread the given token
 	void			UnreadToken( const anToken *token );
+
 					// read a token only if on the same line
 	int				ReadTokenOnLine( anToken *token );
 
 					//Returns the rest of the current line
-	const char*		ReadRestOfLine(anString& out);
+	const char *	ReadRestOfLine( anStr &out );
 
 					// read a signed integer
 	int				ParseInt( void );
+
 					// read a boolean
 	bool			ParseBool( void );
-					// read a floating point number.  If errorFlag is nullptr, a non-numeric token will
+
+					// read a floating point number. If errorFlag is nullptr, a non-numeric token will
 					// issue an Error().  If it isn't nullptr, it will issue a Warning() and set *errorFlag = true
 	float			ParseFloat( bool *errorFlag = nullptr );
+
 					// parse matrices with floats
 	int				Parse1DMatrix( int x, float *m );
 	int				Parse2DMatrix( int y, int x, float *m );
 	int				Parse3DMatrix( int z, int y, int x, float *m );
+
 					// parse a braced section into a string
-	const char *	ParseBracedSection( anString &out );
+	const char *	ParseBracedSection( anStr &out );
+
 					// parse a braced section into a string, maintaining indents and newlines
-	const char *	ParseBracedSectionExact ( anString &out, int tabs = -1 );
+	const char *	ParseBracedSectionExact ( anStr &out, int tabs = -1 );
+
 					// parse the rest of the line
-	const char *	ParseRestOfLine( anString &out );
+	const char *	ParseRestOfLine( anStr &out );
+
 					// retrieves the white space characters before the last read token
-	int				GetLastWhiteSpace( anString &whiteSpace ) const;
+	int				GetLastWhiteSpace( anStr &whiteSpace ) const;
+
 					// returns start index into text buffer of last white space
 	int				GetLastWhiteSpaceStart( void ) const;
+
 					// returns end index into text buffer of last white space
 	int				GetLastWhiteSpaceEnd( void ) const;
+
 					// set an array with punctuations, nullptr restores default C/C++ set, see default_punctuations for an example
 	void			SetPunctuations( const punctuation_t *p );
 					// returns a pointer to the punctuation with the given id
 	const char *	GetPunctuationFromId( int id );
+
 					// get the id for the given punctuation
 	int				GetPunctuationId( const char *p );
+
 					// set lexer flags
 	void			SetFlags( int flags );
+
 					// get lexer flags
 	int				GetFlags( void );
+
 					// reset the lexer
 	void			Reset( void );
+	
 					// returns true if at the end of the file
 	int				EndOfFile( void );
+
 					// returns the current filename
 	const char *	GetFileName( void );
+
 					// get offset in script
 	const int		GetFileOffset( void );
 					// get file time
-	const ARC_TIME_T	GetFileTime( void );
+	const ARC_TIME_T GetFileTime( void );
 					// returns the current line number
 	const int		GetLineNum( void );
+
 					// print an error message
 	void			Error( const char *str, ... ) an_attribute( ( format( printf, 2, 3 ) ) );
 					// print a warning message
@@ -212,7 +248,7 @@ public:
 
 private:
 	int				loaded;					// set when a script file is loaded from file or memory
-	anString			filename;				// file name of the script
+	anStr		filename;				// file name of the script
 	int				allocated;				// true if buffer memory was allocated
 	const char *	buffer;					// buffer containing the script
 	const char *	script_p;				// current pointer in the script
@@ -229,7 +265,7 @@ private:
 	const punctuation_t *punctuations;		// the punctuations used in the script
 	int *			punctuationtable;		// ASCII table with punctuations
 	int *			nextpunctuation;		// next punctuation in chain
-	anToken		token;					// available token
+	anToken			token;					// available token
 	anLexer *		next;					// next script in a chain
 	bool			hadError;				// set by anLexer::Error, even if the error is supressed
 
@@ -248,27 +284,27 @@ private:
 	int				NumLinesCrossed( void );
 };
 
-ARC_INLINE const char *anLexer::GetFileName( void ) {
+inline const char *anLexer::GetFileName( void ) {
 	return anLexer::filename;
 }
 
-ARC_INLINE const int anLexer::GetFileOffset( void ) {
+inline const int anLexer::GetFileOffset( void ) {
 	return anLexer::script_p - anLexer::buffer;
 }
 
-ARC_INLINE const ARC_TIME_T anLexer::GetFileTime( void ) {
+inline const ARC_TIME_T anLexer::GetFileTime( void ) {
 	return anLexer::fileTime;
 }
 
-ARC_INLINE const int anLexer::GetLineNum( void ) {
+inline const int anLexer::GetLineNum( void ) {
 	return anLexer::line;
 }
 
-ARC_INLINE void anLexer::SetFlags( int flags ) {
+inline void anLexer::SetFlags( int flags ) {
 	anLexer::flags = flags;
 }
 
-ARC_INLINE int anLexer::GetFlags( void ) {
+inline int anLexer::GetFlags( void ) {
 	return anLexer::flags;
 }
 

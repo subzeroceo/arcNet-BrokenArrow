@@ -89,7 +89,7 @@ anSoundShader::SetDefaultText
 ===================
 */
 bool anSoundShader::SetDefaultText( void ) {
-	anString wavname;
+	anStr wavname;
 
 	wavname = GetName();
 	wavname.DefaultFileExtension( ".wav" );		// if the name has .ogg in it, that will stay
@@ -97,7 +97,7 @@ bool anSoundShader::SetDefaultText( void ) {
 	// if there exists a wav file with the same name
 	if ( 1 ) { //fileSystem->ReadFile( wavname, nullptr ) != -1 ) {
 		char generated[2048];
-		anString::snPrintf( generated, sizeof( generated ),
+		anStr::snPrintf( generated, sizeof( generated ),
 						"sound %s // IMPLICITLY GENERATED\n"
 						"{\n"
 						"%s\n"
@@ -337,9 +337,9 @@ bool anSoundShader::ParseShader( anLexer &src ) {
 			// add to the wav list
 			if ( soundSystemLocal.soundCache && numEntries < maxSamples ) {
 				token.BackSlashesToSlashes();
-				anString lang = cvarSystem->GetCVarString( "sys_lang" );
+				anStr lang = cvarSystem->GetCVarString( "sys_lang" );
 				if ( lang.Icmp( "english" ) != 0 && token.Find( "sound/vo/", false ) >= 0 ) {
-					anString work = token;
+					anStr work = token;
 					work.ToLower();
 					work.StripLeading( "sound/vo/" );
 					work = va( "sound/vo/%s/%s", lang.c_str(), work.c_str() );
@@ -404,7 +404,7 @@ void anSoundShader::List() const {
 	anStringList	shaders;
 
 	common->Printf( "%4i: %s\n", Index(), GetName() );
-	if ( anString::Icmp( GetDescription(), "<no description>" ) != 0 ) {
+	if ( anStr::Icmp( GetDescription(), "<no description>" ) != 0 ) {
 		common->Printf( "      description: %s\n", GetDescription() );
 	}
 	for ( int k = 0; k < numLeadins; k++ ) {

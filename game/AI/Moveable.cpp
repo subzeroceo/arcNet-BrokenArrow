@@ -80,7 +80,7 @@ void idMoveable::Spawn( void ) {
 	anTraceModel trm;
 	float density, friction, bouncyness;
 	int clipShrink;
-	anString clipModelName;
+	anStr clipModelName;
 	bool setClipModel = false;
 	anBounds bounds;
 
@@ -142,7 +142,7 @@ void idMoveable::Spawn( void ) {
 
 	if ( health ) {
 		if ( brokenModel != "" && !renderModelManager->CheckModel( brokenModel ) ) {
-			gameLocal.Error( "idMoveable '%s' at (%s): cannot load broken model '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString(0), brokenModel.c_str() );
+			gameLocal.Error( "idMoveable '%s' at (%s): cannot load broken model '%s'", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ), brokenModel.c_str() );
 		}
 	}
 
@@ -152,12 +152,12 @@ void idMoveable::Spawn( void ) {
 	physicsObj.SetSelf( this );
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_HEAP_MEM( this );
+	PushHeapMemory( this );
 
 	physicsObj.SetClipModel( new anClipModel( trm, GetRenderModelMaterial() ), density );
 
 // mwhitlock: Dynamic memory consolidation
-	POP_HEAP();
+	PopSystemHeap();
 
 	physicsObj.SetOrigin( GetPhysics()->GetOrigin() );
 	physicsObj.SetAxis( GetPhysics()->GetAxis() );
@@ -400,8 +400,8 @@ void idMoveable::Killed( anEntity *inflictor, anEntity *attacker, int damage, co
 		gameLocal.PlayEffect ( gameLocal.GetEffect( spawnArgs, "fx_explode" ), GetPhysics()->GetOrigin(), (-GetPhysics()->GetGravityNormal()).ToMat3(), false, vec3_origin, true );
 	}
 
-	if ( renderEntity.gui[ 0 ] ) {
-		renderEntity.gui[ 0 ] = nullptr;
+	if ( renderEntity.gui[0] ) {
+		renderEntity.gui[0] = nullptr;
 	}
 
 	ActivateTargets( this );
@@ -432,7 +432,7 @@ void idMoveable::ExecuteStage ( void ) {
 idMoveable::AddDamageEffect
 ================
 */
-void idMoveable::AddDamageEffect ( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity* inflictor ) {
+void idMoveable::AddDamageEffect ( const trace_t &collision, const anVec3 &velocity, const char *damageDefName, anEntity *inflictor ) {
 
 	// Play an impact effect during this stage?
 	if ( stageDict ) {
@@ -635,7 +635,7 @@ idMoveable::Event_SetOwnerFromSpawnArgs
 ================
 */
 void idMoveable::Event_SetOwnerFromSpawnArgs( void ) {
-	anString owner;
+	anStr owner;
 
 	if ( spawnArgs.GetString( "owner", "", owner ) ) {
 		ProcessEvent( &EV_SetOwner, gameLocal.FindEntity( owner ) );
@@ -674,7 +674,7 @@ void idMoveable::Event_SetHealth( float newHealth ) {
 idMoveable::Event_RadiusDamage
 ================
 */
-void idMoveable::Event_RadiusDamage( anEntity *attacker, const char* splash ) {
+void idMoveable::Event_RadiusDamage( anEntity *attacker, const char *splash ) {
 	gameLocal.RadiusDamage( GetPhysics()->GetOrigin(), this, attacker, this, this, splash );
 }
 

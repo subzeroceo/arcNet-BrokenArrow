@@ -28,7 +28,7 @@ struct anSEASTacticalSensor {
 	// Search
 	virtual void			SearchRadius(const anVec3 &origin=vec3_origin, float rangeMin=0.0f, float rangeMax=1.0f) = 0;
 	virtual void			SearchCover(float rangeMin=0.0f, float rangeMax=1.0f) = 0;
-	virtual void			SearchHide( anEntity* from=0 ) = 0;
+	virtual void			SearchHide( anEntity *from=0 ) = 0;
 	virtual void			SearchFlank() = 0;
 	virtual void			SearchAdvance() = 0;
 	virtual void			SearchRetreat() = 0;

@@ -4,7 +4,7 @@
 #include "../Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -16,7 +16,7 @@ static char THIS_FILE[] = __FILE__;
 #include "../demos/DemoManager.h"
 
 
-CLASS_DECLARATION( arcEntity, sdSnowEffect )
+CLASS_DECLARATION( anEntity, sdSnowEffect )
 END_CLASS
 
 /*
@@ -38,7 +38,7 @@ void				sdSnowEffect::Spawn( void ) {
 
 	anBounds modelbb = re->hModel->Bounds();
 	anVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
-	arcNetBasePlayer *p = gameLocal.GetLocalViewPlayer();
+	anBasePlayer *p = gameLocal.GetLocalViewPlayer();
 	anVec3 const &v = p->GetViewPos();
 
 	for ( int i=0; i<MAX_GROUPS; i++ ) {
@@ -63,7 +63,7 @@ void		sdSnowEffect::Think( void ) {
 	anBounds modelbb = re->hModel->Bounds();
 	anVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
 
-	arcNetBasePlayer *p = gameLocal.GetLocalViewPlayer();
+	anBasePlayer *p = gameLocal.GetLocalViewPlayer();
 	anVec3 const &v = p->GetViewPos();
 
 	for ( int i=0; i<MAX_GROUPS; i++ ) {
@@ -152,7 +152,7 @@ sdSnowPrecipitation::sdSnowPrecipitation( sdPrecipitationParameters const &_parm
 
 	anBounds modelbb = re->hModel->Bounds();
 	anVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
-	arcNetBasePlayer *p = gameLocal.GetLocalViewPlayer();
+	anBasePlayer *p = gameLocal.GetLocalViewPlayer();
 	anVec3 const &v = p->GetViewPos();
 
 	for ( int i=0; i<MAX_GROUPS; i++ ) {
@@ -214,7 +214,7 @@ void sdSnowPrecipitation::Update( void ) {
 	anBounds modelbb = re->hModel->Bounds();
 	anVec3 extents = (modelbb.GetMaxs() - modelbb.GetMins()) * 0.5f;
 
-	arcNetBasePlayer *p = gameLocal.GetLocalViewPlayer();
+	anBasePlayer *p = gameLocal.GetLocalViewPlayer();
 	anVec3 const &v = p->GetViewPos();
 
 	for ( int i=0; i<MAX_GROUPS; i++ ) {
@@ -291,7 +291,7 @@ void sdSnowPrecipitation::Update( void ) {
 		viewOrg = view.vieworg;
 	} else {
 		// If we are inside don't run the bacground effect
-		arcNetBasePlayer* player = gameLocal.GetLocalViewPlayer();
+		anBasePlayer* player = gameLocal.GetLocalViewPlayer();
 
 		if ( player == nullptr ) {
 			return;

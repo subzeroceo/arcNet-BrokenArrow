@@ -51,9 +51,9 @@ public:
 	virtual idWinVar *	GetWinVarByName(const char *_name, bool winLookup = false, drawWin_t** owner = nullptr );
 	
 	virtual void 		HandleBuddyUpdate(idWindow *buddy);
-	virtual void		Activate(bool activate, anString &act);
+	virtual void		Activate(bool activate, anStr &act);
 	
-	void				RunNamedEvent( const char* eventName );
+	void				RunNamedEvent( const char *eventName );
 	
 private:
 
@@ -77,7 +77,7 @@ private:
 	bool				wrap;
 	bool				readonly;
 	bool				numeric;
-	anString				sourceFile;
+	anStr				sourceFile;
 	idSliderWindow *	scroller;
 	anList<int>			breaks;
 	float				sizeBias;

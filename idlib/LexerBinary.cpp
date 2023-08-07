@@ -1,6 +1,8 @@
-#include "../Lib.h"
+#include "Lib.h"
+#include "LexerBinary.h"
+#include "Lexer.h"
 #pragma hdrstop
-//#include "../../framework/Licensee.h"
+
 
 /*
 ============
@@ -9,7 +11,7 @@ anTokenCache::FindToken
 */
 unsigned short anTokenCache::FindToken( const anToken &token ) {
 	int hashKey = uniqueTokenHash.GenerateKey( token.c_str(), true );
-	for ( int i = uniqueTokenHash.GetFirst( hashKey ); i != arcHashIndexUShort::NULL_INDEX; i = uniqueTokenHash.GetNext( i ) ) {
+	for ( int i = uniqueTokenHash.GetFirst( hashKey ); i != arcHashIndexUShort::nullptr_INDEX; i = uniqueTokenHash.GetNext( i ) ) {
 		// from mac version
 		if ( ( i < 0 ) || ( i > uniqueTokens.Num() ) ) {
 			break;
@@ -60,7 +62,7 @@ bool anTokenCache::ReadBuffer( const byte *buffer, int length ) {
 	assert( buffer != nullptr );
 	assert( length > 0 );
 	anLibFileMemoryPtr f( anLib::fileSystem->OpenMemoryFile( "[Token Cache] ReadBuffer" ) );
-	f->SetData( reinterpret_cast< const char* >( buffer ), length );
+	f->SetData( reinterpret_cast< const char *>( buffer ), length );
 	return Read( f.Get() );
 }
 
@@ -69,7 +71,7 @@ bool anTokenCache::ReadBuffer( const byte *buffer, int length ) {
 anTokenCache::ReadFile
 ============
 */
-bool anTokenCache::Read( anFile* f ) {
+bool anTokenCache::Read( anFile *f ) {
 	int numTokens;
 	f->ReadInt( numTokens );
 	anTokenCache newCache.uniqueTokens.SetNum( numTokens );
@@ -90,7 +92,7 @@ bool anTokenCache::Read( anFile* f ) {
 		char whiteSpace;
 		f->ReadChar( whiteSpace );
 		token.whiteSpaceStart_p = nullptr;
-		token.whiteSpaceEnd_p = ( const char* )whiteSpace;
+		token.whiteSpaceEnd_p = ( const char *)whiteSpace;
 	}
 
 	assert( newCache.uniqueTokens.Num() == numTokens );
@@ -118,7 +120,7 @@ void anBinaryLexer::AddToken( const anToken &token, anTokenCache *cache ) {
 anBinaryLexer::WriteFile
 ============
 */
-bool anBinaryLexer::Write( anFile* f ) {
+bool anBinaryLexer::Write( anFile *f ) {
 	f->WriteString( LEXB_VERSION );
 	tokenCache.Write( f );
 	f->WriteInt( tokens.Num() );
@@ -138,7 +140,7 @@ bool anBinaryLexer::ReadBuffer( const byte *buffer, int length ) {
 	assert( buffer != nullptr );
 	assert( length > 0 );
 	anLibFileMemoryPtr f( anLib::fileSystem->OpenMemoryFile( "Binary-anBinaryLexer read buffer\n" ) );
-	f->SetData( reinterpret_cast< const char* >( buffer ), length );
+	f->SetData( reinterpret_cast< const char *>( buffer ), length );
 	return Read( f.Get() );
 }
 
@@ -152,7 +154,7 @@ bool anBinaryLexer::Read( anFile *f ) {
 
 	try {
 		// Header
-		anString temp;
+		anStr temp;
 		f->ReadString( temp );
 		if ( temp.Cmp( LEXB_VERSION ) != 0 ) {
 			anLib::common->Warning( "[Binary Lexer] ReadFile: expected '" LEXB_VERSION "' but found '%s'", temp.c_str() );

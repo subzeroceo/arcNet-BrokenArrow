@@ -153,22 +153,22 @@ private:
 };
 
 typedef anCVar cvar;
-ARC_INLINE anCVar::anCVar( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion ) {
+inline anCVar::anCVar( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion ) {
 	if ( !valueCompletion && ( flags & CVAR_BOOL ) ) {
 		valueCompletion = arcCmdSystem::ArgCompletion_Boolean;
 	}
 	Init( name, value, flags, description, 1, -1, nullptr, valueCompletion );
 }
 
-ARC_INLINE anCVar::anCVar( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, argCompletion_t valueCompletion ) {
+inline anCVar::anCVar( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, argCompletion_t valueCompletion ) {
 	Init( name, value, flags, description, valueMin, valueMax, nullptr, valueCompletion );
 }
 
-ARC_INLINE anCVar::anCVar( const char *name, const char *value, int flags, const char *description, const char **valueStrings, argCompletion_t valueCompletion ) {
+inline anCVar::anCVar( const char *name, const char *value, int flags, const char *description, const char **valueStrings, argCompletion_t valueCompletion ) {
 	Init( name, value, flags, description, 1, -1, valueStrings, valueCompletion );
 }
 
-ARC_INLINE anCVar::anCVar( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion, const byte *data ) {
+inline anCVar::anCVar( const char *name, const char *value, int flags, const char *description, argCompletion_t valueCompletion, const byte *data ) {
     if ( !valueCompletion && (flags & CVAR_BYTE)) {
         valueCompletion = arcCmdSystem::ArgCompletion_byte;
     }
@@ -254,7 +254,7 @@ extern anCVarSystem *		cvarSystem;
 ===============================================================================
 */
 
-ARC_INLINE void anCVar::Init( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, const char **valueStrings, argCompletion_t valueCompletion ) {
+inline void anCVar::Init( const char *name, const char *value, int flags, const char *description, float valueMin, float valueMax, const char **valueStrings, argCompletion_t valueCompletion ) {
 	this->name = name;
 	this->value = value;
 	this->flags = flags;
@@ -276,7 +276,7 @@ ARC_INLINE void anCVar::Init( const char *name, const char *value, int flags, co
 	}
 }
 
-ARC_INLINE void anCVar::RegisterStaticVars() {
+inline void anCVar::RegisterStaticVars() {
 	if ( staticVars != (anCVar *)0xFFFFFFFF ) {
 		for ( anCVar *cvar = staticVars; cvar; cvar = cvar->next ) {
 			cvarSystem->Register( cvar );

@@ -441,7 +441,7 @@ rvAIManager::AnnounceDeath
 Announce through an ally of the victem that they have died
 =====================
 */
-void rvAIManager::AnnounceDeath( anSAAI* victim, anEntity* attacker ) {
+void rvAIManager::AnnounceDeath( anSAAI* victim, anEntity *attacker ) {
 	anActor* teammate;
 	anSAAI*	 teammateAI;
 
@@ -463,7 +463,7 @@ void rvAIManager::AnnounceDeath( anSAAI* victim, anEntity* attacker ) {
 	//jshepard: double check to make sure we don't call out our own death!
 	if ( teammateAI == victim )	{
 		//MCG: note - NearestTeammateToPoint should *never* allow this, should never happen
-		assert(0);
+		assert( 0 );
 		return;
 	}
 
@@ -485,7 +485,7 @@ void rvAIManager::AnnounceDeath( anSAAI* victim, anEntity* attacker ) {
 	}
 */
 	// Annoucne specific death or just a generic death
-	const char* shortName;
+	const char *shortName;
 	if ( !victim->spawnArgs.GetString ( "npc_shortname", "", &shortName ) || !*shortName ||
 		 !teammateAI->Speak ( va( "lipsync_%s_killed", shortName ), true ) ) {
 		teammateAI->Speak( "lipsync_mandown", true );
@@ -499,7 +499,7 @@ anSAAI::AnnounceKill
 Announces an ai being killed
 =====================
 */
-void rvAIManager::AnnounceKill ( anSAAI* victim, anEntity* attacker, anEntity* inflictor ) {
+void rvAIManager::AnnounceKill ( anSAAI* victim, anEntity *attacker, anEntity *inflictor ) {
 	anActor* teammate;
 	anSAAI*	 teammateAI;
 

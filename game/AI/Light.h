@@ -76,7 +76,7 @@ private:
 	anVec3			localLightOrigin;			// light origin relative to the physics origin
 	anMat3			localLightAxis;				// light axis relative to physics axis
 	qhandle_t		lightDefHandle;				// handle to renderer light def
-	anString			brokenModel;
+	anStr			brokenModel;
 	int				levels;
 	int				currentLevel;
 	anVec3			baseColor;
@@ -132,7 +132,7 @@ private:
 	void			Event_FadeIn( float time );
 
 // bdube: set light gui
-	void			Event_SetLightGUI( const char* gui );
+	void			Event_SetLightGUI( const char *gui );
 
 };
 

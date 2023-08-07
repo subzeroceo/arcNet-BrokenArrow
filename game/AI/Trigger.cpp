@@ -28,7 +28,7 @@ idTrigger::DrawDebugInfo
 */
 void idTrigger::DrawDebugInfo( void ) {
 	anMat3		axis = gameLocal.GetLocalPlayer()->viewAngles.ToMat3();
-	anVec3		up = axis[ 2 ] * 5.0f;
+	anVec3		up = axis[2] * 5.0f;
 	anBounds	viewTextBounds( gameLocal.GetLocalPlayer()->GetPhysics()->GetOrigin() );
 	anBounds	viewBounds( gameLocal.GetLocalPlayer()->GetPhysics()->GetOrigin() );
 	anBounds	box( anVec3( -4.0f, -4.0f, -4.0f ), anVec3( 4.0f, 4.0f, 4.0f ) );
@@ -112,7 +112,7 @@ void idTrigger::Disable( void ) {
 idTrigger::CallScript
 ================
 */
-void idTrigger::CallScript( anEntity* scriptEntity ) {
+void idTrigger::CallScript( anEntity *scriptEntity ) {
 
 // abahr
 	for ( int ix = scriptFunctions.Num() - 1; ix >= 0; --ix ) {
@@ -216,7 +216,7 @@ void idTrigger::Spawn( void ) {
 
 		rvScriptFuncUtility& utility = scriptFunctions.Alloc();
 		if ( !utility.Init(kv->GetValue()) ) {
-			gameLocal.Warning( "Trigger '%s' at (%s) trying to call an unknown function.", name.c_str(), GetPhysics()->GetOrigin().ToString(0) );
+			gameLocal.Warning( "Trigger '%s' at (%s) trying to call an unknown function.", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ) );
 		}
 	}
 
@@ -330,12 +330,12 @@ void idTrigger_Multi::Spawn( void ) {
 
 	if ( random && ( random >= wait ) && ( wait >= 0 ) ) {
 		random = wait - 1;
-		gameLocal.Warning( "idTrigger_Multi '%s' at (%s) has random >= wait", name.c_str(), GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "idTrigger_Multi '%s' at (%s) has random >= wait", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ) );
 	}
 
 	if ( random_delay && ( random_delay >= delay ) && ( delay >= 0 ) ) {
 		random_delay = delay - 1;
-		gameLocal.Warning( "idTrigger_Multi '%s' at (%s) has random_delay >= delay", name.c_str(), GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "idTrigger_Multi '%s' at (%s) has random_delay >= delay", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ) );
 	}
 
 	spawnArgs.GetString( "requires", "", requires );
@@ -346,10 +346,10 @@ void idTrigger_Multi::Spawn( void ) {
 	spawnArgs.GetInt( "controlZone", "0", controlZoneTrigger);
 
 	if ( buyZoneTrigger == -1 )
-		gameLocal.Warning( "trigger_buyzone '%s' at (%s) has no buyZone key set!", name.c_str(), GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "trigger_buyzone '%s' at (%s) has no buyZone key set!", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ) );
 
 	if ( controlZoneTrigger == -1 )
-		gameLocal.Warning( "trigger_controlzone '%s' at (%s) has no controlZone key set!", name.c_str(), GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "trigger_controlzone '%s' at (%s) has no controlZone key set!", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ) );
 
 
 	if ( spawnArgs.GetBool( "onlyVehicle" ) ) {
@@ -638,13 +638,13 @@ void idTrigger_Multi::Event_Touch( anEntity *other, trace_t *trace ) {
 			if ( !touchClient ) {
 				return;
 			}
-			if ( static_cast< anBasePlayer * >( other )->spectating ) {
+			if ( static_cast< anBasePlayer *>( other )->spectating ) {
 				return;
 			}
 
 		    // Buy zone handling
 		    if ( buyZoneTrigger /*&& gameLocal.mpGame.mpGameState.gameState.currentState != 1*/ ) {
-			    anBasePlayer *p = static_cast< anBasePlayer * >( other );
+			    anBasePlayer *p = static_cast< anBasePlayer *>( other );
 			    if ( buyZoneTrigger-1 == p->team || buyZoneTrigger == 3)
 			    {
 				    p->inBuyZone = true;
@@ -654,7 +654,7 @@ void idTrigger_Multi::Event_Touch( anEntity *other, trace_t *trace ) {
 
 		    // Control zone handling
 		    if ( controlZoneTrigger > 0 ) {
-			    anBasePlayer *p = static_cast< anBasePlayer * >( other );
+			    anBasePlayer *p = static_cast< anBasePlayer *>( other );
 				if ( p->PowerUpActive(POWERUP_DEADZONE) || !spawnArgs.GetBool( "requiresDeadZonePowerup", "1" ) )
 					playersInTrigger.Append(p);
 		    }
@@ -811,19 +811,19 @@ void idTrigger_EntityName::Spawn( void ) {
 
 	if ( random && ( random >= wait ) && ( wait >= 0 ) ) {
 		random = wait - 1;
-		gameLocal.Warning( "idTrigger_EntityName '%s' at (%s) has random >= wait", name.c_str(), GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "idTrigger_EntityName '%s' at (%s) has random >= wait", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ) );
 	}
 
 	if ( random_delay && ( random_delay >= delay ) && ( delay >= 0 ) ) {
 		random_delay = delay - 1;
-		gameLocal.Warning( "idTrigger_EntityName '%s' at (%s) has random_delay >= delay", name.c_str(), GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "idTrigger_EntityName '%s' at (%s) has random_delay >= delay", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ) );
 	}
 
 	spawnArgs.GetBool( "triggerFirst", "0", triggerFirst );
 
 	entityName = spawnArgs.GetString( "entityname" );
 	if ( !entityName.Length() ) {
-		gameLocal.Error( "idTrigger_EntityName '%s' at (%s) doesn't have 'entityname' key specified", name.c_str(), GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Error( "idTrigger_EntityName '%s' at (%s) doesn't have 'entityname' key specified", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ) );
 	}
 
 	nextTriggerTime = 0;
@@ -841,7 +841,7 @@ idTrigger_EntityName::TriggerAction
 void idTrigger_EntityName::TriggerAction( anEntity *activator ) {
 
 // abahr: want same functionality as trigger_multi.  Need to move this code into these two function calls
-	anEntity* scriptEntity = spawnArgs.GetBool( "triggerWithSelf" ) ? this : activator;
+	anEntity *scriptEntity = spawnArgs.GetBool( "triggerWithSelf" ) ? this : activator;
 	ActivateTargets( scriptEntity );
 	CallScript( scriptEntity );
 
@@ -1026,7 +1026,7 @@ void idTrigger_Timer::Spawn( void ) {
 
 	if ( random >= wait && wait >= 0 ) {
 		random = wait - 0.001;
-		gameLocal.Warning( "idTrigger_Timer '%s' at (%s) has random >= wait", name.c_str(), GetPhysics()->GetOrigin().ToString(0) );
+		gameLocal.Warning( "idTrigger_Timer '%s' at (%s) has random >= wait", name.c_str(), GetPhysics()->GetOrigin().ToString( 0 ) );
 	}
 
 	if ( on ) {
@@ -1374,12 +1374,12 @@ void idTrigger_Touch::Spawn( void ) {
 	// get the clip model
 
 // mwhitlock: Dynamic memory consolidation
-	PUSH_HEAP_MEM(this);
+	PushHeapMemory(this);
 
 	clipModel = new anClipModel( GetPhysics()->GetClipModel() );
 
 // mwhitlock: Dynamic memory consolidation
-	POP_HEAP();
+	PopSystemHeap();
 
 	// remove the collision model from the physics object
 	GetPhysics()->SetClipModel( nullptr, 1.0f );
@@ -1388,14 +1388,14 @@ void idTrigger_Touch::Spawn( void ) {
 		BecomeActive( TH_THINK );
 	}
 	filterTeam = -1;
-	anString filterTeamStr = spawnArgs.GetString( "filterTeam" );
+	anStr filterTeamStr = spawnArgs.GetString( "filterTeam" );
 	if ( filterTeamStr.Size() )
 	{
-		if ( !anString::Icmp( "marine", filterTeamStr.c_str() ) )
+		if ( !anStr::Icmp( "marine", filterTeamStr.c_str() ) )
 		{
 			filterTeam = AITEAM_MARINE;
 		}
-		else if ( !anString::Icmp( "strogg", filterTeamStr.c_str() ) )
+		else if ( !anStr::Icmp( "strogg", filterTeamStr.c_str() ) )
 		{
 			filterTeam = AITEAM_STROGG;
 		}

@@ -50,7 +50,7 @@ public:
 
 protected:
 
-	virtual bool		TestPoint( class anSEAS *aas, const anVec3& point, const float zAllow=0.0f );
+	virtual bool		TestPoint( class anSEAS *aas, const anVec3 &point, const float zAllow=0.0f );
 
 private:
 
@@ -77,7 +77,7 @@ public:
 private:
 
 	virtual bool		TestArea( class anSEAS *aas, int areaNum, const seasArea_t& area );
-	virtual bool		TestPoint( class anSEAS *aas, const anVec3& point, const float zAllow=0.0f );
+	virtual bool		TestPoint( class anSEAS *aas, const anVec3 &point, const float zAllow=0.0f );
 
 	bool				TestCachedGoal( int index );
 
@@ -105,7 +105,7 @@ public:
 protected:
 
 	virtual bool		TestArea( class anSEAS *aas, int areaNum, const seasArea_t& area );
-	virtual bool		TestPoint( class anSEAS* aas, const anVec3& pos, const float zAllow=0.0f );
+	virtual bool		TestPoint( class anSEAS* aas, const anVec3 &pos, const float zAllow=0.0f );
 
 private:
 

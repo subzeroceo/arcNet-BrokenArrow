@@ -728,7 +728,7 @@ void anPhysics_Base::AddGroundContacts( const anClipModel *clipModel ) {
 	int index = contacts.Num();
 	contacts.SetNum( index + 10, false );
 
-	dir.SubVec3(0) = gravityNormal;
+	dir.SubVec3( 0 ) = gravityNormal;
 	dir.SubVec3( 1 ) = vec3_origin;
 
 

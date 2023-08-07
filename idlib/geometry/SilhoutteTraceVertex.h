@@ -45,25 +45,25 @@ assert_sizeof( anSilhoutteTraceVertex,			SILTRACEVERT_SIZE );
 assert_sizeof( anSilhoutteTraceVertex,			( 1<<SILTRACEVERT_SIZE_SHIFT ) );
 assert_offsetof( anSilhoutteTraceVertex, xyzw,	SILTRACEVERT_XYZW_OFFSET );
 
-ARC_INLINE float anSilhoutteTraceVertex::operator[]( const int index ) const {
+inline float anSilhoutteTraceVertex::operator[]( const int index ) const {
 	assert( index >= 0 && index < 4 );
 	return ( (float *)(& xyzw) )[index];
 }
 
-ARC_INLINE float &anSilhoutteTraceVertex::operator[]( const int index ) {
+inline float &anSilhoutteTraceVertex::operator[]( const int index ) {
 	assert( index >= 0 && index < 4 );
 	return ( (float *)(& xyzw) )[index];
 }
 
-ARC_INLINE void anSilhoutteTraceVertex::Clear( void ) {
+inline void anSilhoutteTraceVertex::Clear( void ) {
 	xyzw.Zero();
 }
 
-ARC_INLINE void anSilhoutteTraceVertex::Lerp( const anSilhoutteTraceVertex &a, const anSilhoutteTraceVertex &b, const float f ) {
+inline void anSilhoutteTraceVertex::Lerp( const anSilhoutteTraceVertex &a, const anSilhoutteTraceVertex &b, const float f ) {
 	xyzw = a.xyzw + f * ( b.xyzw - a.xyzw );
 }
 
-ARC_INLINE void anSilhoutteTraceVertex::LerpAll( const anSilhoutteTraceVertex &a, const anSilhoutteTraceVertex &b, const float f ) {
+inline void anSilhoutteTraceVertex::LerpAll( const anSilhoutteTraceVertex &a, const anSilhoutteTraceVertex &b, const float f ) {
 	xyzw = a.xyzw + f * ( b.xyzw - a.xyzw );
 }
 

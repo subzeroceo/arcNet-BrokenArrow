@@ -6,22 +6,22 @@ public:
     //anRay() : position(0,0,0), direction(0,0,1) {}
     //anRay( const anVec3 &pos, const anVec3 &dir ) : position(pos), direction(dir) {}
 
-    ARC_INLINE anRay( const anVec3 &origin, const anVec3 &dir ) : origin( origin ), dir( dir ) { }
+    inline anRay( const anVec3 &origin, const anVec3 &dir ) : origin( origin ), dir( dir ) { }
 
     // Comparision operators
     bool operator == ( const anRay& r ) const;
     bool operator != ( const anRay& r ) const;
 
-    ARC_INLINE anVec3 IntersectPlane( const anPlane &plane ) const {
+    inline anVec3 IntersectPlane( const anPlane &plane ) const {
         float t = -( Dot( origin, plane.normal ) + plane.dist ) / Dot( dir, plane.normal );
         return origin + dir * t;
     }
 
-    ARC_INLINE anVec3 Reflect( const anVec3 &normal ) const {
+    inline anVec3 Reflect( const anVec3 &normal ) const {
         return dir - 2.0f * Dot( dir, normal ) * normal;
     }
 
-	ARC_INLINE anVec3 Refract( const anVec3 &normal, float eta ) const {
+	inline anVec3 Refract( const anVec3 &normal, float eta ) const {
         float cosI = -Dot( dir, normal );
         float sinT2 = eta * eta * ( 1.0f - cosI * cosI );
         if ( sinT2 > 1.0f ) {
@@ -32,21 +32,21 @@ public:
 	}
 
 	// Calculate the intersection point of a ray and a plane
-	ARC_INLINE anVec3 IntersectRayPlane( const anRay &ray, const anPlane &plane ) {
+	inline anVec3 IntersectRayPlane( const anRay &ray, const anPlane &plane ) {
     float t = -( Dot( ray.origin, plane.normal ) + plane.dist ) / Dot( ray.dir, plane.normal );
     return ray.origin + ray.dir * t;
 	}
-	ARC_INLINE virtual void AddPoint( const anVec3 &v ) {}
-	ARC_INLINE virtual void RemovePoint( int index ) {}
-	ARC_INLINE virtual anVec3 *GetPoint( int index ) { return nullptr; }
+	inline virtual void AddPoint( const anVec3 &v ) {}
+	inline virtual void RemovePoint( int index ) {}
+	inline virtual anVec3 *GetPoint( int index ) { return nullptr; }
 
 
-	ARC_INLINE int SelectPointByRay( float ox, float oy, float oz, float dx, float dy, float dz, bool single ) {
+	inline int SelectPointByRay( float ox, float oy, float oz, float dx, float dy, float dz, bool single ) {
 		anVec3 origin( ox, oy, oz );
 		anVec3 dir( dx, dy, dz );
 		return SelectPointByRay( origin, dir, single );
 	}
-	ARC_INLINE int SelectPointByRay( const anVec3 origin, const anVec3 direction, bool single ) {
+	inline int SelectPointByRay( const anVec3 origin, const anVec3 direction, bool single ) {
 		// find the point closest to the ray
 		int besti = -1;
 		float bestd = 8;
@@ -100,7 +100,7 @@ float calcBBoxVolume( const anBounds &bounds ) {
     return dimensions.x * dimensions.y * dimensions.z;
 }/*
 void idInterpolatedPosition::write(fileHandle_t file, const char *p) {
-	anString s = va( "\t%s {\n", p);
+	anStr s = va( "\t%s {\n", p);
 	FS_Write( s.c_str(), s.length(), file);
 	idCameraPosition::write(file, p);
 	s = va( "\t\tstartPos ( %f %f %f )\n", startPos.x, startPos.y, startPos.z);
@@ -112,7 +112,7 @@ void idInterpolatedPosition::write(fileHandle_t file, const char *p) {
 }
 
 void idSplinePosition::write(fileHandle_t file, const char *p) {
-	anString s = va( "\t%s {\n", p);
+	anStr s = va( "\t%s {\n", p);
 	FS_Write( s.c_str(), s.length(), file);
 	idCameraPosition::write(file, p);
 	target.write(file, "target" );

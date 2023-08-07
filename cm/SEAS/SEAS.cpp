@@ -47,7 +47,7 @@ anSEASLocal::~anSEASLocal( void ) {
 anSEASLocal::Init
 ============
 */
-bool anSEASLocal::Init( const anString &mapName, unsigned int mapFileCRC ) {
+bool anSEASLocal::Init( const anStr &mapName, unsigned int mapFileCRC ) {
 	if ( file && mapName.Icmp( file->GetName() ) == 0 && mapFileCRC == file->GetCRC() ) {
 		gameLocal.Printf( "Keeping %s\n", file->GetName() );
 		RemoveAllObstacles();
@@ -322,7 +322,7 @@ anSEASCallback::~anSEASCallback( void ) {
 anSEASCallback::Test
 ============
 */
-anSEASCallback::testResult_t anSEASCallback::Test( class anSEAS *aas, int areaNum, const anVec3& origin, float minDistance, float maxDistance, const anVec3* point, seasGoal_t& goal ) {
+anSEASCallback::testResult_t anSEASCallback::Test( class anSEAS *aas, int areaNum, const anVec3 &origin, float minDistance, float maxDistance, const anVec3* point, seasGoal_t& goal ) {
 	// Get AAS file
 	anSEASFile* file = ( ( anSEAS & )*aas ).GetFile();
 	if ( !file ) {
@@ -437,6 +437,6 @@ bool anSEASCallback::TestArea( class anSEAS *aas, int areaNum, const seasArea_t&
 anSEASCallback::TestPoint
 ============
 */
-bool anSEASCallback::TestPoint( class anSEAS *aas, const anVec3& pos, const float zAllow ) {
+bool anSEASCallback::TestPoint( class anSEAS *aas, const anVec3 &pos, const float zAllow ) {
 	return true;
 }

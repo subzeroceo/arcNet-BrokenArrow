@@ -35,7 +35,7 @@ int anSoftBodiesPhysicsManager::Contacts( contactInfo_t *contacts, const int max
 	anSoftBodiesPhysicsManager::contacts = contacts;
 	anSoftBodiesPhysicsManager::maxContacts = maxContacts;
 	anSoftBodiesPhysicsManager::numContacts = 0;
-	end = start + dir.SubVec3(0) * depth;
+	end = start + dir.SubVec3( 0 ) * depth;
 	anSoftBodiesPhysicsManager::Translation( &results, start, end, trm, trmAxis, contentMask, model, origin, modelAxis );
 	if ( dir.SubVec3( 1 ).LengthSqr() != 0.0f ) {
 		// FIXME: rotational contacts

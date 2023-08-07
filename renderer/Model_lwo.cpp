@@ -1,6 +1,6 @@
 #include "../idlib/Lib.h"
 #pragma hdrstop
-
+#include "Model_local.h"
 #include "Model_lwo.h"
 
 /*
@@ -10,7 +10,160 @@
 
 ======================================================================
 */
+/*
+========================
+anRenderModelStatic::ParseOBJ
+========================
+*/
+void anRenderModelStatic::ParseOBJ( anList<anDrawVert> &drawVerts, const char *fileName, const char *objFileBuffer, int length ) {
+	anLexer src;
+	anToken	token, token2;
+	anList<anVec3> vertexes;
+	anList<anVec2> texCoords;
+	anList<anVec3> normals;
 
+	src.LoadMemory( objFileBuffer, length, fileName, 0 );
+
+	while ( 1 ) {
+		if ( !src.ReadToken( &token ) ) {
+			break;
+		}
+
+		if ( token == "v") {
+			anVec3 vertex;
+			vertex.x = src.ParseFloat();
+			vertex.z = src.ParseFloat();
+			vertex.y = -src.ParseFloat();
+			vertexes.Append(vertex);
+		} else if ( token == "vt") {
+			anVec2 st;
+			st.x = src.ParseFloat();
+			st.y = src.ParseFloat();
+			texCoords.Append(st);
+		} else if ( token == "#") {
+			anStr line;
+
+			// Skip comments
+			src.ReadRestOfLine(line);
+		} else if ( token == "mtllib") {
+			anStr line;
+
+			// We don't use obj materials.
+			src.ReadRestOfLine(line);
+		} else if ( token == "s") {
+			anStr line;
+			src.ReadRestOfLine(line);
+		} else if ( token == "g") {
+			anStr line;
+			src.ReadRestOfLine(line);
+		} else if ( token == "usemtl") {
+			anStr line;
+			src.ReadRestOfLine(line);
+		} else if ( token == "vn") {
+			anVec3 normal;
+			normal.x = src.ParseFloat();
+			normal.y = src.ParseFloat();
+			normal.z = src.ParseFloat();
+			normals.Append(normal);
+		} else if ( token == "f") {
+			anStr line;
+			int vertexIndex[3];
+			int uvIndex[3];
+			int normalIndex[3];
+
+			src.ReadRestOfLine(line);
+
+			int matches = sscanf(line.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
+			if (matches != 9) {
+				common->FatalError("Failed to parse face line");
+			}
+
+			for ( int i = 0; i < 3; i++ ) {
+				anDrawVert drawVert;
+
+				int vertidx = vertexIndex[i] - 1;
+				int texidx = uvIndex[i] - 1;
+				int normalidx = normalIndex[i] - 1;
+
+				drawVert.xyz = vertexes[vertidx];
+				drawVert.st = texCoords[texidx];
+				drawVert.normal = normals[normalidx];
+
+				drawVerts.Append( drawVert );
+			}
+		} else {
+			common->FatalError( "[ParseOBJ]: Unknown or unexpected token %s", token.c_str());
+		}
+	}
+}
+
+/*
+========================
+anRenderModelStatic::LoadOBJ
+========================
+*/
+bool anRenderModelStatic::LoadOBJ( const char *fileName ) {
+	const char *objBuffer;
+	anList<anDrawVert> drawVerts;
+
+	// Try to read in the entire obj file.
+	int objBufferLen = fileSystem->ReadFile(fileName, (void **)&objBuffer );
+	if (objBufferLen <= 0 || objBuffer == nullptr) {
+		common->Warning("anRenderModelStatic::LoadOBJ: Failed to readfile %s\n", fileName );
+		return false;
+	}
+
+	// Parse the OBJ.
+	ParseOBJ( drawVerts, fileName, objBuffer, objBufferLen );
+
+	// Load the material for our obj mesh.
+	anStr materialName = fileName;
+	materialName.StripFileExtension();
+	const anMaterial *material = declManager->FindMaterial( materialName );
+
+	// Build the surfaces for these draw vertexes.
+	bounds.Clear();
+
+	srfTriangles_t *tri = R_AllocStaticTriSurf();
+
+	// Due to the stupid format of OBJ's, our indexes are simply 1-N were N is vertex count.
+	R_AllocStaticTriSurfVerts(tri, drawVerts.Num());
+	R_AllocStaticTriSurfIndexes(tri, drawVerts.Num());
+
+	tri->numVerts = drawVerts.Num();
+	tri->numIndexes = drawVerts.Num();
+
+	tri->generateNormals = true;
+
+	for ( int i = 0; i < drawVerts.Num(); i++) {
+		tri->verts[i] = drawVerts[i];		
+	}
+
+	for ( int i = 0; i < drawVerts.Num(); i += 3 ) {
+		tri->indexes[i + 2] = i;
+		tri->indexes[i + 1] = i + 1;
+		tri->indexes[i + 0] = i + 2;
+	}
+
+	R_BoundTriSurf( tri );
+
+	{
+		modelSurface_t	surf;
+
+		surf.id = 0;
+		surf.geometry = tri;
+		surf.shader = material;
+
+		AddSurface(surf);
+		bounds.AddPoint(surf.geometry->bounds[0]);
+		bounds.AddPoint(surf.geometry->bounds[1]);
+	}
+
+	// Free the objBuffer.
+	fileSystem->FreeFile( (void *)objBuffer);
+
+	return true;
+}
 /*
 ======================================================================
 lwFreeClip()
@@ -344,11 +497,11 @@ lwEnvelope *lwGetEnvelope( anFile *fp, int cksize ) {
             break;
 
          case ID_PRE:
-            env->behavior[ 0 ] = getU2( fp );
+            env->behavior[0] = getU2( fp );
             break;
 
          case ID_POST:
-            env->behavior[ 1 ] = getU2( fp );
+            env->behavior[1] = getU2( fp );
             break;
 
          case ID_KEY:
@@ -371,9 +524,9 @@ lwEnvelope *lwGetEnvelope( anFile *fp, int cksize ) {
 
             switch ( key->shape ) {
                case ID_TCB:
-                  key->tension = f[ 0 ];
-                  key->continuity = f[ 1 ];
-                  key->bias = f[ 2 ];
+                  key->tension = f[0];
+                  key->continuity = f[1];
+                  key->bias = f[2];
                   break;
 
                case ID_BEZI:
@@ -566,19 +719,19 @@ static float bez2( lwKey *key0, lwKey *key1, float time )
    float x, y, t, t0 = 0.0f, t1 = 1.0f;
 
    if ( key0->shape == ID_BEZ2 )
-      x = key0->time + key0->param[ 2 ];
+      x = key0->time + key0->param[2];
    else
       x = key0->time + ( key1->time - key0->time ) / 3.0f;
 
-   t = bez2_time( key0->time, x, key1->time + key1->param[ 0 ], key1->time,
+   t = bez2_time( key0->time, x, key1->time + key1->param[0], key1->time,
       time, &t0, &t1 );
 
    if ( key0->shape == ID_BEZ2 )
-      y = key0->value + key0->param[ 3 ];
+      y = key0->value + key0->param[3];
    else
-      y = key0->value + key0->param[ 1 ] / 3.0f;
+      y = key0->value + key0->param[1] / 3.0f;
 
-   return bezier( key0->value, y, key1->param[ 1 ] + key1->value, key1->value, t );
+   return bezier( key0->value, y, key1->param[1] + key1->value, key1->value, t );
 }
 
 
@@ -626,15 +779,15 @@ static float outgoing( lwKey *key0, lwKey *key1 )
 
       case ID_BEZI:
       case ID_HERM:
-         out = key0->param[ 1 ];
+         out = key0->param[1];
          if ( key0->prev )
             out *= ( key1->time - key0->time ) / ( key1->time - key0->prev->time );
          break;
 
       case ID_BEZ2:
-         out = key0->param[ 3 ] * ( key1->time - key0->time );
-         if ( anMath::Fabs( key0->param[ 2 ] ) > 1e-5f )
-            out /= key0->param[ 2 ];
+         out = key0->param[3] * ( key1->time - key0->time );
+         if ( anMath::Fabs( key0->param[2] ) > 1e-5f )
+            out /= key0->param[2];
          else
             out *= 1e5f;
          break;
@@ -692,16 +845,16 @@ static float incoming( lwKey *key0, lwKey *key1 )
 
       case ID_BEZI:
       case ID_HERM:
-         in = key1->param[ 0 ];
+         in = key1->param[0];
          if ( key1->next )
             in *= ( key1->time - key0->time ) / ( key1->next->time - key0->time );
          break;
          return in;
 
       case ID_BEZ2:
-         in = key1->param[ 1 ] * ( key1->time - key0->time );
-         if ( anMath::Fabs( key1->param[ 0 ] ) > 1e-5f )
-            in /= key1->param[ 0 ];
+         in = key1->param[1] * ( key1->time - key0->time );
+         if ( anMath::Fabs( key1->param[0] ) > 1e-5f )
+            in /= key1->param[0];
          else
             in *= 1e5f;
          break;
@@ -748,7 +901,7 @@ float evalEnvelope( lwEnvelope *env, float time )
    /* use pre-behavior if time is before first key time */
 
    if ( time < skey->time ) {
-      switch ( env->behavior[ 0 ] )
+      switch ( env->behavior[0] )
       {
          case BEH_RESET:
             return 0.0f;
@@ -781,7 +934,7 @@ float evalEnvelope( lwEnvelope *env, float time )
    /* use post-behavior if time is after last key time */
 
    else if ( time > ekey->time ) {
-      switch ( env->behavior[ 1 ] )
+      switch ( env->behavior[1] )
       {
          case BEH_RESET:
             return 0.0f;
@@ -1259,7 +1412,7 @@ unsigned short sgetU2( unsigned char **bp )
    unsigned short i;
 
    if ( flen == FLEN_ERROR ) return 0;
-   i = ( buf[ 0 ] << 8 ) | buf[ 1 ];
+   i = ( buf[0] << 8 ) | buf[1];
    flen += 2;
    *bp += 2;
    return i;
@@ -1286,13 +1439,13 @@ int sgetVX( unsigned char **bp )
 
    if ( flen == FLEN_ERROR ) return 0;
 
-   if ( buf[ 0 ] != 0xFF ) {
-      i = buf[ 0 ] << 8 | buf[ 1 ];
+   if ( buf[0] != 0xFF ) {
+      i = buf[0] << 8 | buf[1];
       flen += 2;
       *bp += 2;
    }
    else {
-      i = ( buf[ 1 ] << 16 ) | ( buf[ 2 ] << 8 ) | buf[ 3 ];
+      i = ( buf[1] << 16 ) | ( buf[2] << 8 ) | buf[3];
       flen += 4;
       *bp += 4;
    }
@@ -1482,9 +1635,9 @@ lwObject *lwGetObject( const char *filename, unsigned int *failID, int *failpos 
             set_flen( 0 );
             layer->index = getU2( fp );
             layer->flags = getU2( fp );
-            layer->pivot[ 0 ] = getF4( fp );
-            layer->pivot[ 1 ] = getF4( fp );
-            layer->pivot[ 2 ] = getF4( fp );
+            layer->pivot[0] = getF4( fp );
+            layer->pivot[1] = getF4( fp );
+            layer->pivot[2] = getF4( fp );
             layer->name = getS0( fp );
 
             rlen = get_flen();
@@ -1722,8 +1875,8 @@ static int add_tvel( float pos[], float vel[], lwEnvelope **elist, int *nenvs )
       }
       env->key = key0;
       env->nkeys = 2;
-      env->behavior[ 0 ] = BEH_LINEAR;
-      env->behavior[ 1 ] = BEH_LINEAR;
+      env->behavior[0] = BEH_LINEAR;
+      env->behavior[1] = BEH_LINEAR;
 
       lwListAdd( (void**)elist, env );
    }
@@ -1747,9 +1900,9 @@ static lwTexture *get_texture( char *s )
    tex = (lwTexture*)Mem_ClearedAlloc( sizeof( lwTexture ) );
    if ( !tex ) return nullptr;
 
-   tex->tmap.size.val[ 0 ] =
-   tex->tmap.size.val[ 1 ] =
-   tex->tmap.size.val[ 2 ] = 1.0f;
+   tex->tmap.size.val[0] =
+   tex->tmap.size.val[1] =
+   tex->tmap.size.val[2] = 1.0f;
    tex->opacity.val = 1.0f;
    tex->enabled = 1;
 
@@ -1786,7 +1939,7 @@ lwSurface *lwGetSurface5( anFile *fp, int cksize, lwObject *obj )
    lwTexture *tex;
    lwPlugin *shdr;
    char *s;
-   float v[ 3 ];
+   float v[3];
    unsigned int id, flags;
    unsigned short sz;
    int pos, rlen, i;
@@ -1799,9 +1952,9 @@ lwSurface *lwGetSurface5( anFile *fp, int cksize, lwObject *obj )
 
    /* non-zero defaults */
 
-   surf->color.rgb[ 0 ] = 0.78431f;
-   surf->color.rgb[ 1 ] = 0.78431f;
-   surf->color.rgb[ 2 ] = 0.78431f;
+   surf->color.rgb[0] = 0.78431f;
+   surf->color.rgb[1] = 0.78431f;
+   surf->color.rgb[2] = 0.78431f;
    surf->diffuse.val    = 1.0f;
    surf->glossiness.val = 0.4f;
    surf->bump.val       = 1.0f;
@@ -1831,9 +1984,9 @@ lwSurface *lwGetSurface5( anFile *fp, int cksize, lwObject *obj )
 
       switch ( id ) {
          case ID_COLR:
-            surf->color.rgb[ 0 ] = getU1( fp ) / 255.0f;
-            surf->color.rgb[ 1 ] = getU1( fp ) / 255.0f;
-            surf->color.rgb[ 2 ] = getU1( fp ) / 255.0f;
+            surf->color.rgb[0] = getU1( fp ) / 255.0f;
+            surf->color.rgb[1] = getU1( fp ) / 255.0f;
+            surf->color.rgb[2] = getU1( fp ) / 255.0f;
             break;
 
          case ID_FLAG:
@@ -1996,7 +2149,7 @@ lwSurface *lwGetSurface5( anFile *fp, int cksize, lwObject *obj )
             break;
 
          case ID_TVAL:
-            tex->param.proc.value[ 0 ] = getI2( fp ) / 256.0f;
+            tex->param.proc.value[0] = getI2( fp ) / 256.0f;
             break;
 
          case ID_TAMP:
@@ -2125,7 +2278,7 @@ int lwGetPolygons5( anFile *fp, int cksize, lwPolygonList *plist, int ptoffset )
 
    bp = buf;
    pp = plist->pol + plist->offset;
-   pv = plist->pol[ 0 ].v + plist->voffset;
+   pv = plist->pol[0].v + plist->voffset;
 
    for ( i = 0; i < npols; i++ ) {
       nv = sgetU2( &bp );
@@ -2344,8 +2497,8 @@ void lwFreePolygons( lwPolygonList *plist )
                      Mem_Free( plist->pol[i].v[ j ].vm );
             }
          }
-         if ( plist->pol[ 0 ].v )
-            Mem_Free( plist->pol[ 0 ].v );
+         if ( plist->pol[0].v )
+            Mem_Free( plist->pol[0].v );
          Mem_Free( plist->pol );
       }
       memset( plist, 0, sizeof( lwPolygonList ) );
@@ -2391,9 +2544,9 @@ int lwGetPoints( anFile *fp, int cksize, lwPointList *point )
 	/* assign position values */
 
 	for ( i = 0, j = 0; i < np; i++, j += 3 ) {
-		point->pt[i].pos[ 0 ] = f[ j ];
-		point->pt[i].pos[ 1 ] = f[ j + 1 ];
-		point->pt[i].pos[ 2 ] = f[ j + 2 ];
+		point->pt[i].pos[0] = f[ j ];
+		point->pt[i].pos[1] = f[ j + 1 ];
+		point->pt[i].pos[2] = f[ j + 2 ];
 	}
 
 	Mem_Free( f );
@@ -2418,8 +2571,8 @@ void lwGetBoundingBox( lwPointList *point, float bbox[] )
 	for ( i = 0; i < 6; i++ )
 		if ( bbox[i] != 0.0f ) return;
 
-	bbox[ 0 ] = bbox[ 1 ] = bbox[ 2 ] = 1e20f;
-	bbox[ 3 ] = bbox[ 4 ] = bbox[ 5 ] = -1e20f;
+	bbox[0] = bbox[1] = bbox[2] = 1e20f;
+	bbox[3] = bbox[ 4 ] = bbox[ 5 ] = -1e20f;
 	for ( i = 0; i < point->count; i++ ) {
 		for ( j = 0; j < 3; j++ ) {
 			if ( bbox[ j ] > point->pt[i].pos[ j ] )
@@ -2457,12 +2610,12 @@ int lwAllocPolygons( lwPolygonList *plist, int npols, int nverts )
 	plist->vcount += nverts;
 	lwPolVert *oldpolv = plist->pol[0].v;
 	plist->pol[0].v = (lwPolVert*)Mem_Alloc( plist->vcount * sizeof( lwPolVert ) );
-	if ( !plist->pol[ 0 ].v ) return 0;
+	if ( !plist->pol[0].v ) return 0;
 	if ( oldpolv ) {
 		memcpy( plist->pol[0].v, oldpolv, plist->voffset * sizeof( lwPolVert ) );
 		Mem_Free( oldpolv );
 	}
-	memset( plist->pol[ 0 ].v + plist->voffset, 0, nverts * sizeof( lwPolVert ) );
+	memset( plist->pol[0].v + plist->voffset, 0, nverts * sizeof( lwPolVert ) );
 
 	/* fix up the old vertex pointers */
 
@@ -2521,7 +2674,7 @@ int lwGetPolygons( anFile *fp, int cksize, lwPolygonList *plist, int ptoffset )
 
    bp = buf;
    pp = plist->pol + plist->offset;
-   pv = plist->pol[ 0 ].v + plist->voffset;
+   pv = plist->pol[0].v + plist->voffset;
 
    for ( i = 0; i < npols; i++ ) {
       nv = sgetU2( &bp );
@@ -2561,15 +2714,15 @@ undefined for one- and two-point polygons.
 void lwGetPolyNormals( lwPointList *point, lwPolygonList *polygon )
 {
    int i, j;
-   float p1[ 3 ], p2[ 3 ], pn[ 3 ], v1[ 3 ], v2[ 3 ];
+   float p1[3], p2[3], pn[3], v1[3], v2[3];
 
    for ( i = 0; i < polygon->count; i++ ) {
       if ( polygon->pol[i].nverts < 3 ) continue;
       for ( j = 0; j < 3; j++ ) {
 
 		  // FIXME: track down why indexes are way out of range
-         p1[ j ] = point->pt[ polygon->pol[i].v[ 0 ].index ].pos[ j ];
-         p2[ j ] = point->pt[ polygon->pol[i].v[ 1 ].index ].pos[ j ];
+         p1[ j ] = point->pt[ polygon->pol[i].v[0].index ].pos[ j ];
+         p2[ j ] = point->pt[ polygon->pol[i].v[1].index ].pos[ j ];
          pn[ j ] = point->pt[ polygon->pol[i].v[ polygon->pol[i].nverts - 1 ].index ].pos[ j ];
       }
 
@@ -2607,7 +2760,7 @@ int lwGetPointPolygons( lwPointList *point, lwPolygonList *polygon )
 
    for ( i = 0; i < point->count; i++ ) {
       if ( point->pt[i].npols == 0 ) continue;
-      point->pt[i].pol = ( int*)Mem_ClearedAlloc( point->pt[i].npols * sizeof( int ) );
+      point->pt[i].pol = (int *)Mem_ClearedAlloc( point->pt[i].npols * sizeof( int ) );
       if ( !point->pt[i].pol ) return 0;
       point->pt[i].npols = 0;
    }
@@ -2786,13 +2939,13 @@ int lwGetTags( anFile *fp, int cksize, lwTagList *tlist )
 	tlist->offset = tlist->count;
 	tlist->count += ntags;
 	char **oldtag = tlist->tag;
-	tlist->tag = (char**)Mem_Alloc( tlist->count * sizeof( char * ) );
+	tlist->tag = (char**)Mem_Alloc( tlist->count * sizeof(char *) );
 	if ( !tlist->tag ) goto Fail;
 	if ( oldtag ) {
-		memcpy( tlist->tag, oldtag, tlist->offset * sizeof( char * ) );
+		memcpy( tlist->tag, oldtag, tlist->offset * sizeof(char *) );
 		Mem_Free( oldtag );
 	}
-	memset( &tlist->tag[ tlist->offset ], 0, ntags * sizeof( char * ) );
+	memset( &tlist->tag[ tlist->offset ], 0, ntags * sizeof(char *) );
 
 	/* copy the new tags to the tag array */
 
@@ -3249,9 +3402,9 @@ int lwGetProcedural( anFile *fp, int rsz, lwTexture *tex )
             break;
 
          case ID_VALU:
-            tex->param.proc.value[ 0 ] = getF4( fp );
-            if ( sz >= 8 ) tex->param.proc.value[ 1 ] = getF4( fp );
-            if ( sz >= 12 ) tex->param.proc.value[ 2 ] = getF4( fp );
+            tex->param.proc.value[0] = getF4( fp );
+            if ( sz >= 8 ) tex->param.proc.value[1] = getF4( fp );
+            if ( sz >= 12 ) tex->param.proc.value[2] = getF4( fp );
             break;
 
          case ID_FUNC:
@@ -3407,9 +3560,9 @@ lwTexture *lwGetTexture( anFile *fp, int bloksz, unsigned int type )
    if ( !tex ) return nullptr;
 
    tex->type = type;
-   tex->tmap.size.val[ 0 ] =
-   tex->tmap.size.val[ 1 ] =
-   tex->tmap.size.val[ 2 ] = 1.0f;
+   tex->tmap.size.val[0] =
+   tex->tmap.size.val[1] =
+   tex->tmap.size.val[2] = 1.0f;
    tex->opacity.val = 1.0f;
    tex->enabled = 1;
 
@@ -3594,9 +3747,9 @@ lwSurface *lwDefaultSurface( void )
    surf = (lwSurface*)Mem_ClearedAlloc( sizeof( lwSurface ) );
    if ( !surf ) return nullptr;
 
-   surf->color.rgb[ 0 ] = 0.78431f;
-   surf->color.rgb[ 1 ] = 0.78431f;
-   surf->color.rgb[ 2 ] = 0.78431f;
+   surf->color.rgb[0] = 0.78431f;
+   surf->color.rgb[1] = 0.78431f;
+   surf->color.rgb[2] = 0.78431f;
    surf->diffuse.val    = 1.0f;
    surf->glossiness.val = 0.4f;
    surf->bump.val       = 1.0f;
@@ -3631,9 +3784,9 @@ lwSurface *lwGetSurface( anFile *fp, int cksize )
 
    /* non-zero defaults */
 
-   surf->color.rgb[ 0 ] = 0.78431f;
-   surf->color.rgb[ 1 ] = 0.78431f;
-   surf->color.rgb[ 2 ] = 0.78431f;
+   surf->color.rgb[0] = 0.78431f;
+   surf->color.rgb[1] = 0.78431f;
+   surf->color.rgb[2] = 0.78431f;
    surf->diffuse.val    = 1.0f;
    surf->glossiness.val = 0.4f;
    surf->bump.val       = 1.0f;
@@ -3664,9 +3817,9 @@ lwSurface *lwGetSurface( anFile *fp, int cksize )
 
       switch ( id ) {
          case ID_COLR:
-            surf->color.rgb[ 0 ] = getF4( fp );
-            surf->color.rgb[ 1 ] = getF4( fp );
-            surf->color.rgb[ 2 ] = getF4( fp );
+            surf->color.rgb[0] = getF4( fp );
+            surf->color.rgb[1] = getF4( fp );
+            surf->color.rgb[2] = getF4( fp );
             surf->color.eindex = getVX( fp );
             break;
 
@@ -3844,15 +3997,15 @@ Fail:
 
 float dot( float a[], float b[] )
 {
-   return a[ 0 ] * b[ 0 ] + a[ 1 ] * b[ 1 ] + a[ 2 ] * b[ 2 ];
+   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
 
 void cross( float a[], float b[], float c[] )
 {
-   c[ 0 ] = a[ 1 ] * b[ 2 ] - a[ 2 ] * b[ 1 ];
-   c[ 1 ] = a[ 2 ] * b[ 0 ] - a[ 0 ] * b[ 2 ];
-   c[ 2 ] = a[ 0 ] * b[ 1 ] - a[ 1 ] * b[ 0 ];
+   c[0] = a[1] * b[2] - a[2] * b[1];
+   c[1] = a[2] * b[0] - a[0] * b[2];
+   c[2] = a[0] * b[1] - a[1] * b[0];
 }
 
 
@@ -3862,9 +4015,9 @@ void normalize( float v[] )
 
    r = ( float ) anMath::Sqrt( dot( v, v ) );
    if ( r > 0 ) {
-      v[ 0 ] /= r;
-      v[ 1 ] /= r;
-      v[ 2 ] /= r;
+      v[0] /= r;
+      v[1] /= r;
+      v[2] /= r;
    }
 }
 
@@ -3882,7 +4035,7 @@ void lwFreeVMap( lwVMap *vmap )
       if ( vmap->vindex ) Mem_Free( vmap->vindex );
       if ( vmap->pindex ) Mem_Free( vmap->pindex );
       if ( vmap->val ) {
-         if ( vmap->val[ 0 ] ) Mem_Free( vmap->val[ 0 ] );
+         if ( vmap->val[0] ) Mem_Free( vmap->val[0] );
          Mem_Free( vmap->val );
       }
       Mem_Free( vmap );
@@ -3943,10 +4096,10 @@ lwVMap *lwGetVMap( anFile *fp, int cksize, int ptoffset, int poloffset,
    /* allocate the vmap */
 
    vmap->nverts = npts;
-   vmap->vindex = ( int*)Mem_ClearedAlloc( npts * sizeof( int ) );
+   vmap->vindex = (int *)Mem_ClearedAlloc( npts * sizeof( int ) );
    if ( !vmap->vindex ) goto Fail;
    if ( perpoly ) {
-      vmap->pindex = ( int*)Mem_ClearedAlloc( npts * sizeof( int ) );
+      vmap->pindex = (int *)Mem_ClearedAlloc( npts * sizeof( int ) );
       if ( !vmap->pindex ) goto Fail;
    }
 

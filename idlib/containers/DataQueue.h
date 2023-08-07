@@ -25,7 +25,7 @@ private:
 		int		length;
 		int		dataOffset;
 	};
-	arcStaticList<msgItem_t, maxItems > items;
+	anStaticList<msgItem_t, maxItems > items;
 	int		dataLength;
 	byte	data[ maxBuffer ];
 };

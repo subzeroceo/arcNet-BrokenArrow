@@ -28,17 +28,17 @@
 #define PATHSEPERATOR_STR "\\"
 #define PATHSEPERATOR_CHAR '\\'
 
-#define ARC_INLINE __forceinline
+#define inline __forceinline
 #define ARC_STATICTEMPLATE static
 #define ARC_L_DYNAMIC
 
 // lint complains that extern used with definition is a hazard, but it
 // has the benefit (?) of making it illegal to take the address of the function
 #ifdef _lint
-#define ARC_INLINE_EXTERN				inline
+#define inline_EXTERN				inline
 #define ARC_FORCE_INLINE_EXTERN			__forceinline
 #else
-#define ARC_INLINE_EXTERN				extern inline
+#define inline_EXTERN				extern inline
 #define ARC_FORCE_INLINE_EXTERN			extern __forceinline
 #endif
 
@@ -77,7 +77,7 @@ _
 #define __cdecl
 #define ASSERT assert
 
-#define ARC_INLINE inline
+#define inline inline
 #define ARC_STATICTEMPLATE
 #define assertmem(x, y)
 #endif
@@ -107,7 +107,7 @@ _
 #define __cdecl
 #define ASSERT assert
 
-#define ARC_INLINE inline
+#define inline inline
 #define ARC_STATICTEMPLATE
 
 #define assertmem(x, y)
@@ -397,7 +397,7 @@ const char *Sys_EXEPath( void );
 // use fs_debug to verbose Sys_ListFiles
 // returns -1 if directory was not found (the list is cleared)
 int Sys_ListFiles(const char *directory, const char *extension,
-                  anList<class anString> &list);
+                  anList<class anStr> &list);
 
 // know early if we are performing a fatal error shutdown so the error message
 // doesn't get lost
@@ -471,7 +471,7 @@ private:
 idPort::GetTrafficStats
 ===============
 */
-ARC_INLINE void idPort::GetTrafficStats( int&_bytesSent, int &_packetsSent,
+inline void idPort::GetTrafficStats( int&_bytesSent, int &_packetsSent,
                                        int &_bytesReceived,
                                        int &_packetsReceived) const {
   _bytesSent = bytesWritten;
@@ -485,14 +485,14 @@ ARC_INLINE void idPort::GetTrafficStats( int&_bytesSent, int &_packetsSent,
 idPort::SetSilent
 ===============
 */
-ARC_INLINE void idPort::SetSilent(bool _silent) { silent = _silent; }
+inline void idPort::SetSilent(bool _silent) { silent = _silent; }
 
 /*
 ===============
 idPort::GetSilent
 ===============
 */
-ARC_INLINE bool idPort::GetSilent( void ) const { return silent; }
+inline bool idPort::GetSilent( void ) const { return silent; }
 
 class idTCP {
 public:
@@ -552,7 +552,7 @@ void Sys_DoPreferences( void );
 
 ==============================================================
 */
-template< typename T > ARC_INLINE void Swap( T& l, T& r ) {
+template< typename T > inline void Swap( T& l, T& r ) {
 	T temp = l;
 	l = r;
 	r = temp;
@@ -613,12 +613,12 @@ void Sys_TriggerEvent( int index = TRIGGER_EVENT_ZERO);
 /*
 ==============================================================
 
-        arcSystem
+        anSystem
 
 ==============================================================
 */
 
-class arcSystem {
+class anSystem {
 public:
   virtual void DebugPrintf(const char *fmt, ...)
       an_attribute((format(printf, 2, 3))) = 0;
@@ -657,7 +657,7 @@ public:
   virtual void StartProcess(const char *exePath, bool quit) = 0;
 };
 
-extern arcSystem *sys;
+extern anSystem *sys;
 
 bool Sys_LoadOpenAL( void );
 void Sys_FreeOpenAL( void );

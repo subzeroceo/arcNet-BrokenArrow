@@ -11,28 +11,28 @@
 */
 
 template<class type, int gran>
-ARC_INLINE int idPtrArrayCompare( const type *a, const type *b ) {
+inline int anPointerArrayCompare( const type *a, const type *b ) {
 	return *a - *b;
 }
 
 template<class type, int gran=16>
-class idPtrArray {
+class anPointerArray {
 public:
 
 	typedef int				cmp_t( const type *, const type * );
 
-							idPtrArray( void );
-							idPtrArray( const idPtrArray<type,gran> &other );
-							~idPtrArray( void );
+							anPointerArray( void );
+							anPointerArray( const anPointerArray<type,gran> &other );
+							~anPointerArray( void );
 
 	void					Clear( void );											// clear the array
 	int						Num( void ) const;										// returns number of elements in array
 
 	size_t					Allocated( void ) const;								// returns total size of allocated memory
-	size_t					Size( void ) const;										// returns total size of allocated memory including size of idPtrArray
+	size_t					Size( void ) const;										// returns total size of allocated memory including size of anPointerArray
 	size_t					MemoryUsed( void ) const;								// returns size of the used elements in the array
 
-	idPtrArray<type,gran> &	operator=( const idPtrArray<type,gran> &other );
+	anPointerArray<type,gran> &	operator=( const anPointerArray<type,gran> &other );
 	const type &			operator[]( int index ) const;
 	type &					operator[]( int index );
 
@@ -46,7 +46,7 @@ public:
 	const type *			Ptr( void ) const;										// returns a pointer to the array
 	type &					Alloc( void );											// returns reference to a new data element at the end of the array
 	int						Append( const type & obj );								// append element
-	int						Append( const idPtrArray<type,gran> &other );			// append array
+	int						Append( const anPointerArray<type,gran> &other );			// append array
 	int						AddUnique( const type & obj );							// add unique element
 	int						Insert( const type & obj, int index );					// insert the element at the given index
 	int						FindIndex( const type & obj ) const;					// find the index for the given element
@@ -55,8 +55,8 @@ public:
 	bool					RemoveIndexFast( int index );							// remove the element at the given index and put the last element into its spot
 	bool					Remove( const type & obj );								// remove the element
 	bool					RemoveFast( const type & obj );							// remove the element, move the last element into its spot
-	void					Sort( cmp_t *compare = idPtrArrayCompare<type,gran> );	// sort the array
-	void					Swap( idPtrArray<type,gran> &other );					// swap the contents of the lists
+	void					Sort( cmp_t *compare = anPointerArrayCompare<type,gran> );	// sort the array
+	void					Swap( anPointerArray<type,gran> &other );					// swap the contents of the lists
 
 private:
 	int						num;
@@ -66,22 +66,22 @@ private:
 
 /*
 ================
-idPtrArray::idPtrArray
+anPointerArray::anPointerArray
 ================
 */
 template<class type, int gran>
-ARC_INLINE idPtrArray<type,gran>::idPtrArray( void ) {
+inline anPointerArray<type,gran>::anPointerArray( void ) {
 	num = size = 0;
 	array = nullptr;
 }
 
 /*
 ================
-idPtrArray::idPtrArray
+anPointerArray::anPointerArray
 ================
 */
 template<class type, int gran>
-ARC_INLINE idPtrArray<type,gran>::idPtrArray( const idPtrArray<type,gran> &other ) {
+inline anPointerArray<type,gran>::anPointerArray( const anPointerArray<type,gran> &other ) {
 	num = size = 0;
 	array = nullptr;
 	*this = other;
@@ -89,23 +89,23 @@ ARC_INLINE idPtrArray<type,gran>::idPtrArray( const idPtrArray<type,gran> &other
 
 /*
 ================
-idPtrArray::~idPtrArray
+anPointerArray::~anPointerArray
 ================
 */
 template<class type, int gran>
-ARC_INLINE idPtrArray<type,gran>::~idPtrArray( void ) {
+inline anPointerArray<type,gran>::~anPointerArray( void ) {
 	Clear();
 }
 
 /*
 ================
-idPtrArray::Clear
+anPointerArray::Clear
 
 Frees up the memory allocated by the array.  Assumes that type automatically handles freeing up memory.
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idPtrArray<type,gran>::Clear( void ) {
+inline void anPointerArray<type,gran>::Clear( void ) {
 	if ( array ) {
 		delete[] array;
 	}
@@ -117,60 +117,60 @@ ARC_INLINE void idPtrArray<type,gran>::Clear( void ) {
 
 /*
 ================
-idPtrArray::Allocated
+anPointerArray::Allocated
 
 return total memory allocated for the array in bytes, but doesn't take into account additional memory allocated by type
 ================
 */
 template<class type, int gran>
-ARC_INLINE size_t idPtrArray<type,gran>::Allocated( void ) const {
+inline size_t anPointerArray<type,gran>::Allocated( void ) const {
 	return size * sizeof( type );
 }
 
 /*
 ================
-idPtrArray::Size
+anPointerArray::Size
 
 return total size of array in bytes, but doesn't take into account additional memory allocated by type
 ================
 */
 template<class type, int gran>
-ARC_INLINE size_t idPtrArray<type,gran>::Size( void ) const {
-	return sizeof( idPtrArray<type,gran> ) + Allocated();
+inline size_t anPointerArray<type,gran>::Size( void ) const {
+	return sizeof( anPointerArray<type,gran> ) + Allocated();
 }
 
 /*
 ================
-idPtrArray::MemoryUsed
+anPointerArray::MemoryUsed
 ================
 */
 template<class type, int gran>
-ARC_INLINE size_t idPtrArray<type,gran>::MemoryUsed( void ) const {
+inline size_t anPointerArray<type,gran>::MemoryUsed( void ) const {
 	return num * sizeof( *array );
 }
 
 /*
 ================
-idPtrArray::Num
+anPointerArray::Num
 
 Returns the number of elements currently contained in the array.
 Note that this is NOT an indication of the memory allocated.
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idPtrArray<type,gran>::Num( void ) const {
+inline int anPointerArray<type,gran>::Num( void ) const {
 	return num;
 }
 
 /*
 ================
-idPtrArray::SetNum
+anPointerArray::SetNum
 
 Resize to the exact size specified irregardless of gran
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idPtrArray<type,gran>::SetNum( int newnum, bool resize ) {
+inline void anPointerArray<type,gran>::SetNum( int newnum, bool resize ) {
 	assert( newnum >= 0 );
 	if ( resize || newnum > size ) {
 		Resize( newnum );
@@ -180,13 +180,13 @@ ARC_INLINE void idPtrArray<type,gran>::SetNum( int newnum, bool resize ) {
 
 /*
 ================
-idPtrArray::Condense
+anPointerArray::Condense
 
 Resizes the array to exactly the number of elements it contains or frees up memory if empty.
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idPtrArray<type,gran>::Condense( void ) {
+inline void anPointerArray<type,gran>::Condense( void ) {
 	if ( array ) {
 		if ( num ) {
 			Resize( num );
@@ -198,14 +198,14 @@ ARC_INLINE void idPtrArray<type,gran>::Condense( void ) {
 
 /*
 ================
-idPtrArray::Resize
+anPointerArray::Resize
 
 Allocates memory for the amount of elements requested while keeping the contents intact.
 Contents are copied using their = operator so that data is correnctly instantiated.
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idPtrArray<type,gran>::Resize( int newsize ) {
+inline void anPointerArray<type,gran>::Resize( int newsize ) {
 	type	*temp;
 	int		i;
 
@@ -242,13 +242,13 @@ ARC_INLINE void idPtrArray<type,gran>::Resize( int newsize ) {
 
 /*
 ================
-idPtrArray::AssureSize
+anPointerArray::AssureSize
 
 Makes sure the array has at least the given number of elements.
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idPtrArray<type,gran>::AssureSize( int newSize ) {
+inline void anPointerArray<type,gran>::AssureSize( int newSize ) {
 	if ( newSize > size ) {
 		newSize += gran - 1;
 		newSize -= newSize % gran;
@@ -258,13 +258,13 @@ ARC_INLINE void idPtrArray<type,gran>::AssureSize( int newSize ) {
 
 /*
 ================
-idPtrArray::AssureSize
+anPointerArray::AssureSize
 
 Makes sure the array has at least the given number of elements and initialize any elements not yet initialized.
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idPtrArray<type,gran>::AssureSize( int newSize, const type &initValue ) {
+inline void anPointerArray<type,gran>::AssureSize( int newSize, const type &initValue ) {
 	int oldSize;
 
 	if ( newSize > size ) {
@@ -282,13 +282,13 @@ ARC_INLINE void idPtrArray<type,gran>::AssureSize( int newSize, const type &init
 
 /*
 ================
-idPtrArray::operator=
+anPointerArray::operator=
 
 Copies the contents and size attributes of another array.
 ================
 */
 template<class type, int gran>
-ARC_INLINE idPtrArray<type,gran> &idPtrArray<type,gran>::operator=( const idPtrArray<type,gran> &other ) {
+inline anPointerArray<type,gran> &anPointerArray<type,gran>::operator=( const anPointerArray<type,gran> &other ) {
 	int	i;
 
 	Clear();
@@ -308,14 +308,14 @@ ARC_INLINE idPtrArray<type,gran> &idPtrArray<type,gran>::operator=( const idPtrA
 
 /*
 ================
-idPtrArray::operator[] const
+anPointerArray::operator[] const
 
 Access operator.  Index must be within range or an assert will be issued in debug builds.
 Release builds do no range checking.
 ================
 */
 template<class type, int gran>
-ARC_INLINE const type &idPtrArray<type,gran>::operator[]( int index ) const {
+inline const type &anPointerArray<type,gran>::operator[]( int index ) const {
 	assert( index >= 0 );
 	assert( index < num );
 
@@ -324,14 +324,14 @@ ARC_INLINE const type &idPtrArray<type,gran>::operator[]( int index ) const {
 
 /*
 ================
-idPtrArray::operator[]
+anPointerArray::operator[]
 
 Access operator.  Index must be within range or an assert will be issued in debug builds.
 Release builds do no range checking.
 ================
 */
 template<class type, int gran>
-ARC_INLINE type &idPtrArray<type,gran>::operator[]( int index ) {
+inline type &anPointerArray<type,gran>::operator[]( int index ) {
 	assert( index >= 0 );
 	assert( index < num );
 
@@ -340,7 +340,7 @@ ARC_INLINE type &idPtrArray<type,gran>::operator[]( int index ) {
 
 /*
 ================
-idPtrArray::Ptr
+anPointerArray::Ptr
 
 Returns a pointer to the begining of the array.  Useful for iterating through the array in loops.
 
@@ -350,13 +350,13 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template<class type, int gran>
-ARC_INLINE type *idPtrArray<type,gran>::Ptr( void ) {
+inline type *anPointerArray<type,gran>::Ptr( void ) {
 	return array;
 }
 
 /*
 ================
-idPtrArray::Ptr
+anPointerArray::Ptr
 
 Returns a pointer to the begining of the array.  Useful for iterating through the array in loops.
 
@@ -366,19 +366,19 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template<class type, int gran>
-const ARC_INLINE type *idPtrArray<type,gran>::Ptr( void ) const {
+const inline type *anPointerArray<type,gran>::Ptr( void ) const {
 	return array;
 }
 
 /*
 ================
-idPtrArray::Alloc
+anPointerArray::Alloc
 
 Returns a reference to a new data element at the end of the array.
 ================
 */
 template<class type, int gran>
-ARC_INLINE type &idPtrArray<type,gran>::Alloc( void ) {
+inline type &anPointerArray<type,gran>::Alloc( void ) {
 	if ( !array ) {
 		Resize( gran );
 	}
@@ -392,7 +392,7 @@ ARC_INLINE type &idPtrArray<type,gran>::Alloc( void ) {
 
 /*
 ================
-idPtrArray::Append
+anPointerArray::Append
 
 Increases the size of the array by one element and copies the supplied data into it.
 
@@ -400,7 +400,7 @@ Returns the index of the new element.
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idPtrArray<type,gran>::Append( const type & obj ) {
+inline int anPointerArray<type,gran>::Append( const type & obj ) {
 	if ( !array ) {
 		Resize( gran );
 	}
@@ -421,7 +421,7 @@ ARC_INLINE int idPtrArray<type,gran>::Append( const type & obj ) {
 
 /*
 ================
-idPtrArray::Insert
+anPointerArray::Insert
 
 Increases the size of the array by at leat one element if necessary 
 and inserts the supplied data into it.
@@ -430,7 +430,7 @@ Returns the index of the new element.
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idPtrArray<type,gran>::Insert( const type & obj, int index ) {
+inline int anPointerArray<type,gran>::Insert( const type & obj, int index ) {
 	if ( !array ) {
 		Resize( gran );
 	}
@@ -458,7 +458,7 @@ ARC_INLINE int idPtrArray<type,gran>::Insert( const type & obj, int index ) {
 
 /*
 ================
-idPtrArray::Append
+anPointerArray::Append
 
 adds the other array to this one
 
@@ -466,7 +466,7 @@ Returns the size of the new combined array
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idPtrArray<type,gran>::Append( const idPtrArray<type,gran> &other ) {
+inline int anPointerArray<type,gran>::Append( const anPointerArray<type,gran> &other ) {
 	if ( !array ) {
 		Resize( gran );
 	}
@@ -481,13 +481,13 @@ ARC_INLINE int idPtrArray<type,gran>::Append( const idPtrArray<type,gran> &other
 
 /*
 ================
-idPtrArray::AddUnique
+anPointerArray::AddUnique
 
 Adds the data to the array if it doesn't already exist.  Returns the index of the data in the array.
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idPtrArray<type,gran>::AddUnique( const type & obj ) {
+inline int anPointerArray<type,gran>::AddUnique( const type & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -500,13 +500,13 @@ ARC_INLINE int idPtrArray<type,gran>::AddUnique( const type & obj ) {
 
 /*
 ================
-idPtrArray::FindIndex
+anPointerArray::FindIndex
 
 Searches for the specified data in the array and returns it's index.  Returns -1 if the data is not found.
 ================
 */
 template<class type, int gran>
-ARC_INLINE int idPtrArray<type,gran>::FindIndex( const type & obj ) const {
+inline int anPointerArray<type,gran>::FindIndex( const type & obj ) const {
 	int i;
 
 	for( i = 0; i < num; i++ ) {
@@ -521,13 +521,13 @@ ARC_INLINE int idPtrArray<type,gran>::FindIndex( const type & obj ) const {
 
 /*
 ================
-idPtrArray::Find
+anPointerArray::Find
 
 Searches for the specified data in the array and returns it's address. Returns nullptr if the data is not found.
 ================
 */
 template<class type, int gran>
-ARC_INLINE type *idPtrArray<type,gran>::Find( const type & obj ) const {
+inline type *anPointerArray<type,gran>::Find( const type & obj ) const {
 	int i;
 
 	i = FindIndex( obj );
@@ -540,7 +540,7 @@ ARC_INLINE type *idPtrArray<type,gran>::Find( const type & obj ) const {
 
 /*
 ================
-idPtrArray::RemoveIndex
+anPointerArray::RemoveIndex
 
 Removes the element at the specified index and moves all data following the element down to fill in the gap.
 The number of elements in the array is reduced by one.  Returns false if the index is outside the bounds of the array.
@@ -548,7 +548,7 @@ Note that the element is not destroyed, so any memory used by it may not be free
 ================
 */
 template<class type, int gran>
-ARC_INLINE bool idPtrArray<type,gran>::RemoveIndex( int index ) {
+inline bool anPointerArray<type,gran>::RemoveIndex( int index ) {
 	int i;
 
 	assert( array != nullptr );
@@ -569,7 +569,7 @@ ARC_INLINE bool idPtrArray<type,gran>::RemoveIndex( int index ) {
 
 /*
 ===============
-idPtrArray::RemoveIndexFast
+anPointerArray::RemoveIndexFast
 
 Removes the element at the specified index and moves the last element into
 it's spot, rather than moving the whole array down by one.  Of course, this 
@@ -580,7 +580,7 @@ so any memory used by it may not be freed until the destruction of the array.
 ===============
 */
 template<class type, int gran>
-ARC_INLINE bool idPtrArray<type,gran>::RemoveIndexFast( int index ) {
+inline bool anPointerArray<type,gran>::RemoveIndexFast( int index ) {
 	assert( array != nullptr );
 	assert( index >= 0 );
 	assert( index < num );
@@ -597,7 +597,7 @@ ARC_INLINE bool idPtrArray<type,gran>::RemoveIndexFast( int index ) {
 
 /*
 ================
-idPtrArray::Remove
+anPointerArray::Remove
 
 Removes the element if it is found within the array and moves all data following the element down to fill in the gap.
 The number of elements in the array is reduced by one.  Returns false if the data is not found in the array.  Note that
@@ -605,7 +605,7 @@ the element is not destroyed, so any memory used by it may not be freed until th
 ================
 */
 template<class type, int gran>
-ARC_INLINE bool idPtrArray<type,gran>::Remove( const type & obj ) {
+inline bool anPointerArray<type,gran>::Remove( const type & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -618,7 +618,7 @@ ARC_INLINE bool idPtrArray<type,gran>::Remove( const type & obj ) {
 
 /*
 ================
-idPtrArray::RemoveFast
+anPointerArray::RemoveFast
 
 Removes the element if it is found within the array and moves the last element into the gap.
 The number of elements in the array is reduced by one.  Returns false if the data is not found in the array.  Note that
@@ -626,7 +626,7 @@ the element is not destroyed, so any memory used by it may not be freed until th
 ================
 */
 template<class type, int gran>
-ARC_INLINE bool idPtrArray<type,gran>::RemoveFast( const type & obj ) {
+inline bool anPointerArray<type,gran>::RemoveFast( const type & obj ) {
 	int index;
 
 	index = FindIndex( obj );
@@ -639,14 +639,14 @@ ARC_INLINE bool idPtrArray<type,gran>::RemoveFast( const type & obj ) {
 
 /*
 ================
-idPtrArray::Sort
+anPointerArray::Sort
 
 Performs a qsort on the array using the supplied comparison function.  Note that the data is merely moved around the
 array, so any pointers to data within the array may no longer be valid.
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idPtrArray<type,gran>::Sort( cmp_t *compare ) {
+inline void anPointerArray<type,gran>::Sort( cmp_t *compare ) {
 	if ( !array ) {
 		return;
 	}
@@ -656,13 +656,13 @@ ARC_INLINE void idPtrArray<type,gran>::Sort( cmp_t *compare ) {
 
 /*
 ================
-idPtrArray::Swap
+anPointerArray::Swap
 
 Swaps the contents of two lists
 ================
 */
 template<class type, int gran>
-ARC_INLINE void idPtrArray<type,gran>::Swap( idPtrArray<type,gran> &other ) {
+inline void anPointerArray<type,gran>::Swap( anPointerArray<type,gran> &other ) {
 	idSwap( num, other.num );
 	idSwap( size, other.size );
 	idSwap( array, other.array );

@@ -4,7 +4,7 @@
 #include "Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -41,7 +41,7 @@ static char THIS_FILE[] = __FILE__;
 sdWeaponLockInfo::Load
 ===============
 */
-void sdWeaponLockInfo::Load( const anDict& dict ) {
+void sdWeaponLockInfo::Load( const anDict &dict ) {
 	supported		= dict.GetBool( "lock_enabled" );
 	lockedSound		= gameLocal.declSoundShaderType[ dict.GetString( "snd_target_locked" ) ];
 	lockingSound	= gameLocal.declSoundShaderType[ dict.GetString( "snd_target_locking" ) ];
@@ -61,70 +61,70 @@ void sdWeaponLockInfo::Load( const anDict& dict ) {
 //
 // event defs
 //
-extern const arcEventDef EV_PlayCycle;
-extern const arcEventDef EV_PlayAnim;
-extern const arcEventDef EV_GetOwner;
+extern const anEventDef EV_PlayCycle;
+extern const anEventDef EV_PlayAnim;
+extern const anEventDef EV_GetOwner;
 
-const arcEventDefInternal EV_Clear( "internal_clear" );
-const arcEventDef EV_GetOwner( "getOwner", 'e', DOC_TEXT( "Returns the primary owner of this entity, or $null$ if none." ), 0, nullptr );
-const arcEventDef EV_Next( "nextWeapon", '\0', DOC_TEXT( "Switches to the next best weapon." ), 0, nullptr );
-const arcEventDef EV_State( "weaponState", '\0', DOC_TEXT( "Changes the script state in the same manner as $event:setState$, and also sets up the blend time for the next animation." ), 2, "An error will be thrown if the new state cannot be found.", "s", "state", "Name of the new state.", "d", "blendFrames", "Number of frames to blend the next animation in with." );
-const arcEventDef EV_GetState( "getWeaponState", 's', DOC_TEXT( "Returns the last state the weapon was put into with a call to $event:weaponState$." ), 0, nullptr );
-const arcEventDef EV_AddToClip( "addToClip", '\0', DOC_TEXT( "Adds the specified amount of ammo to the clip at the given index." ), 2, "The amount of ammo in the clip will be automatically capped by the maximum size of the clip, and the amount of ammo available.", "d", "index", "Clip index.", "d", "amount", "Amount of ammo to add." );
-const arcEventDef EV_AmmoInClip( "ammoInClip", 'd', DOC_TEXT( "Returns the amount of ammo in the clip at the given index." ), 1, "If the clip index is out of range, the result will be 0.", "d", "index", "Clip index." );
-const arcEventDef EV_AmmoAvailable( "ammoAvailable", 'd', DOC_TEXT( "Returns the number of shots available from the clip at the given index." ), 1, "If the clip index is out of range, or the clip does not use ammo, the result will be -1", "d", "index", "Clip index." );
-const arcEventDef EV_AmmoRequired( "ammoRequired", 'd', DOC_TEXT( "Returns the amount of ammo required per shot for the clip at the give index." ), 1, "If the clip index is out of range, the result will be 0.", "d", "index", "Clip index." );
-const arcEventDef EV_AmmoType( "ammoType", 'd', DOC_TEXT( "Returns the index of the $decl:ammoDef$ used by the clip at the given index." ), 1, "If the clip index is out of range, the result will be -1.", "d", "index", "Clip index." );
-const arcEventDef EV_UseAmmo( "useAmmo", '\0', DOC_TEXT( "Removes ammo from the player's inventory, of the specified amount and type." ), 2, "If the player does not have enough ammo to cover the reduction, the amount to remove will be reduced to the ammo that they have.", "d", "type", "Index of the $decl:ammoDef$.", "d", "amount", "Amount of ammo to use." );
-const arcEventDef EV_ClipSize( "clipSize", 'd', DOC_TEXT( "Returns the size of the clip at the given index." ), 1, "If the index is out of range, the result will be 0.", "d", "index", "Clip index." );
-const arcEventDef EV_WeaponReady( "weaponReady", '\0', DOC_TEXT( "Sets the internal state of the weapon to ready, and clears the weapon raising flag." ), 0, nullptr );
-const arcEventDef EV_WeaponReloading( "weaponReloading", '\0', DOC_TEXT( "Sets the internal state of the weapon to reloading, and sends a message to clients telling them that the weapon is reloading." ), 0, nullptr );
-const arcEventDef EV_WeaponHolstered( "weaponHolstered", '\0', DOC_TEXT( "Sets the internal state of the weapon to holstered, which allows weapon switches to occur, and clears the weapon lowering flag." ), 0, nullptr );
-const arcEventDef EV_WeaponRising( "weaponRising", '\0', DOC_TEXT( "Sets the internal state of the weapon to rising, clears the weapon lowering flag, and informs the player animation state machine that the weapon is being raised." ), 0, nullptr );
-const arcEventDef EV_WeaponLowering( "weaponLowering", '\0', DOC_TEXT( "Sets the internal state of the weapon to lowering, clears the weapon raising flag, and informs the player animation state machine that the weapon is being lowered." ), 0, nullptr );
-const arcEventDef EV_Weapon_DoProjectileTracer( "doProjectileTracer", "dvv" );
-const arcEventDef EV_LaunchProjectiles( "launchProjectiles", '\0', DOC_TEXT( "Launches the specified number and type of projectiles from the weapon." ), 6, "If the clip index is out of range, or the clip specified does not contain projectile information, no projectiles will be launched.\nLaunchPower and fuseOffset apply only to projectiles of type $class:idProjectile$.", "d", "count", "Number of projectiles to launch.", "d", "index", "Clip index to get the projectile info from.", "f", "spread", "Spread factor, in degrees.", "f", "fuseOffset", "Fuse offset to pass to the projectile.", "f", "launchPower", "Scale factor for launch velocity.", "f", "damagePower", "Scale factor for damage." );
-const arcEventDef EV_CreateProjectile( "createProjectile", 'e', DOC_TEXT( "Creates a projectile using projectile information from the specified clip. This entity will be return, and the weapon will keep track of it, and use as the first projectile for the next call to $event:launchProjectiles$. The projectile will remain hiden until then, so scripts can use this to modify parameters on the projectile prior to launch." ), 1, "If the clip index is out of range, or the clip does not contain any projectile info, no projectile will be spawned, and the result will be $null$.", "d", "index", "Clip index." );
-const arcEventDef EV_Melee( "melee", 'b', DOC_TEXT( "Performs a trace along the player's view axis, and returns whether it hit anything or not." ), 4, "The result of the trace can be saved using $event:saveMeleeTrace$.", "d", "mask", "Collision mask to use.", "f", "distance", "Distance to trace along the axis.", "b", "ignoreOwner", "Whether to ignore the player in the trace or not.", "b", "antiLag", "Whether the trace should use antilag information or not." );
-const arcEventDef EV_MeleeAttack( "meleeAttack", 'b', DOC_TEXT( "Applies damage to the entity hit in the last call to $event:melee$, if any, and returns whether it attempted to apply damage." ), 1, "This will always return false on network clients.\nIf the damage scale is negative, special damage will be used instead of the regular damage.", "f", "damageScale", "Damage scale factor." );
-const arcEventDef EV_SaveMeleeTrace( "saveMeleeTrace", 'o', DOC_TEXT( "Saves the result of the last call to $event:melee$." ), 0, "See also $event:saveTrace$." );
+const anEventDefInternal EV_Clear( "internal_clear" );
+const anEventDef EV_GetOwner( "getOwner", 'e', DOC_TEXT( "Returns the primary owner of this entity, or $null$ if none." ), 0, nullptr );
+const anEventDef EV_Next( "nextWeapon", '\0', DOC_TEXT( "Switches to the next best weapon." ), 0, nullptr );
+const anEventDef EV_State( "weaponState", '\0', DOC_TEXT( "Changes the script state in the same manner as $event:setState$, and also sets up the blend time for the next animation." ), 2, "An error will be thrown if the new state cannot be found.", "s", "state", "Name of the new state.", "d", "blendFrames", "Number of frames to blend the next animation in with." );
+const anEventDef EV_GetState( "getWeaponState", 's', DOC_TEXT( "Returns the last state the weapon was put into with a call to $event:weaponState$." ), 0, nullptr );
+const anEventDef EV_AddToClip( "addToClip", '\0', DOC_TEXT( "Adds the specified amount of ammo to the clip at the given index." ), 2, "The amount of ammo in the clip will be automatically capped by the maximum size of the clip, and the amount of ammo available.", "d", "index", "Clip index.", "d", "amount", "Amount of ammo to add." );
+const anEventDef EV_AmmoInClip( "ammoInClip", 'd', DOC_TEXT( "Returns the amount of ammo in the clip at the given index." ), 1, "If the clip index is out of range, the result will be 0.", "d", "index", "Clip index." );
+const anEventDef EV_AmmoAvailable( "ammoAvailable", 'd', DOC_TEXT( "Returns the number of shots available from the clip at the given index." ), 1, "If the clip index is out of range, or the clip does not use ammo, the result will be -1", "d", "index", "Clip index." );
+const anEventDef EV_AmmoRequired( "ammoRequired", 'd', DOC_TEXT( "Returns the amount of ammo required per shot for the clip at the give index." ), 1, "If the clip index is out of range, the result will be 0.", "d", "index", "Clip index." );
+const anEventDef EV_AmmoType( "ammoType", 'd', DOC_TEXT( "Returns the index of the $decl:ammoDef$ used by the clip at the given index." ), 1, "If the clip index is out of range, the result will be -1.", "d", "index", "Clip index." );
+const anEventDef EV_UseAmmo( "useAmmo", '\0', DOC_TEXT( "Removes ammo from the player's inventory, of the specified amount and type." ), 2, "If the player does not have enough ammo to cover the reduction, the amount to remove will be reduced to the ammo that they have.", "d", "type", "Index of the $decl:ammoDef$.", "d", "amount", "Amount of ammo to use." );
+const anEventDef EV_ClipSize( "clipSize", 'd', DOC_TEXT( "Returns the size of the clip at the given index." ), 1, "If the index is out of range, the result will be 0.", "d", "index", "Clip index." );
+const anEventDef EV_WeaponReady( "weaponReady", '\0', DOC_TEXT( "Sets the internal state of the weapon to ready, and clears the weapon raising flag." ), 0, nullptr );
+const anEventDef EV_WeaponReloading( "weaponReloading", '\0', DOC_TEXT( "Sets the internal state of the weapon to reloading, and sends a message to clients telling them that the weapon is reloading." ), 0, nullptr );
+const anEventDef EV_WeaponHolstered( "weaponHolstered", '\0', DOC_TEXT( "Sets the internal state of the weapon to holstered, which allows weapon switches to occur, and clears the weapon lowering flag." ), 0, nullptr );
+const anEventDef EV_WeaponRising( "weaponRising", '\0', DOC_TEXT( "Sets the internal state of the weapon to rising, clears the weapon lowering flag, and informs the player animation state machine that the weapon is being raised." ), 0, nullptr );
+const anEventDef EV_WeaponLowering( "weaponLowering", '\0', DOC_TEXT( "Sets the internal state of the weapon to lowering, clears the weapon raising flag, and informs the player animation state machine that the weapon is being lowered." ), 0, nullptr );
+const anEventDef EV_Weapon_DoProjectileTracer( "doProjectileTracer", "dvv" );
+const anEventDef EV_LaunchProjectiles( "launchProjectiles", '\0', DOC_TEXT( "Launches the specified number and type of projectiles from the weapon." ), 6, "If the clip index is out of range, or the clip specified does not contain projectile information, no projectiles will be launched.\nLaunchPower and fuseOffset apply only to projectiles of type $class:idProjectile$.", "d", "count", "Number of projectiles to launch.", "d", "index", "Clip index to get the projectile info from.", "f", "spread", "Spread factor, in degrees.", "f", "fuseOffset", "Fuse offset to pass to the projectile.", "f", "launchPower", "Scale factor for launch velocity.", "f", "damagePower", "Scale factor for damage." );
+const anEventDef EV_CreateProjectile( "createProjectile", 'e', DOC_TEXT( "Creates a projectile using projectile information from the specified clip. This entity will be return, and the weapon will keep track of it, and use as the first projectile for the next call to $event:launchProjectiles$. The projectile will remain hiden until then, so scripts can use this to modify parameters on the projectile prior to launch." ), 1, "If the clip index is out of range, or the clip does not contain any projectile info, no projectile will be spawned, and the result will be $null$.", "d", "index", "Clip index." );
+const anEventDef EV_Melee( "melee", 'b', DOC_TEXT( "Performs a trace along the player's view axis, and returns whether it hit anything or not." ), 4, "The result of the trace can be saved using $event:saveMeleeTrace$.", "d", "mask", "Collision mask to use.", "f", "distance", "Distance to trace along the axis.", "b", "ignoreOwner", "Whether to ignore the player in the trace or not.", "b", "antiLag", "Whether the trace should use antilag information or not." );
+const anEventDef EV_MeleeAttack( "meleeAttack", 'b', DOC_TEXT( "Applies damage to the entity hit in the last call to $event:melee$, if any, and returns whether it attempted to apply damage." ), 1, "This will always return false on network clients.\nIf the damage scale is negative, special damage will be used instead of the regular damage.", "f", "damageScale", "Damage scale factor." );
+const anEventDef EV_SaveMeleeTrace( "saveMeleeTrace", 'o', DOC_TEXT( "Saves the result of the last call to $event:melee$." ), 0, "See also $event:saveTrace$." );
 
-const arcEventDef EV_GetMeleeFraction( "getMeleeFraction", 'f', DOC_TEXT( "Returns the fraction that passed of the last melee." ), 0, "Use $event:melee$ to perform a melee trace." );
-const arcEventDef EV_GetMeleeEndPos( "getMeleeEndPos", 'v', DOC_TEXT( "Returns the end position of the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace." );
-const arcEventDef EV_GetMeleePoint( "getMeleePoint", 'v', DOC_TEXT( "Returns the point of collision, if any, of the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
-const arcEventDef EV_GetMeleeNormal( "getMeleeNormal", 'v', DOC_TEXT( "Returns the normal at the collision point from the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
-const arcEventDef EV_GetMeleeEntity( "getMeleeEntity", 'e', DOC_TEXT( "Returns the entity hit from the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
-const arcEventDef EV_GetMeleeSurfaceFlags( "getMeleeSurfaceFlags", 'd', DOC_TEXT( "Returns the surface flags of the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
-const arcEventDef EV_GetMeleeSurfaceType( "getMeleeSurfaceType", 's', DOC_TEXT( "Returns the name of the $decl:surfaceType$ of the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
-const arcEventDef EV_GetMeleeSurfaceColor( "getMeleeSurfaceColor", 'v', DOC_TEXT( "Returns the color of the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
-const arcEventDef EV_GetMeleeJoint( "getMeleeJoint", 's', DOC_TEXT( "Returns the name of the joint associated with the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid.\nIf the surface hit does not belong to an animated model, the result will be an empty string." );
-const arcEventDef EV_GetMeleeBody( "getMeleeBody", 's', DOC_TEXT( "Returns the name of the body associated with the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid.\nIf the surface hit does not belong to an articulated figure, the result will be an empty string." );
-const arcEventDef EV_Weapon_SendTracerMessage( "sendTracerMessage", "vvf" );
+const anEventDef EV_GetMeleeFraction( "getMeleeFraction", 'f', DOC_TEXT( "Returns the fraction that passed of the last melee." ), 0, "Use $event:melee$ to perform a melee trace." );
+const anEventDef EV_GetMeleeEndPos( "getMeleeEndPos", 'v', DOC_TEXT( "Returns the end position of the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace." );
+const anEventDef EV_GetMeleePoint( "getMeleePoint", 'v', DOC_TEXT( "Returns the point of collision, if any, of the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
+const anEventDef EV_GetMeleeNormal( "getMeleeNormal", 'v', DOC_TEXT( "Returns the normal at the collision point from the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
+const anEventDef EV_GetMeleeEntity( "getMeleeEntity", 'e', DOC_TEXT( "Returns the entity hit from the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
+const anEventDef EV_GetMeleeSurfaceFlags( "getMeleeSurfaceFlags", 'd', DOC_TEXT( "Returns the surface flags of the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
+const anEventDef EV_GetMeleeSurfaceType( "getMeleeSurfaceType", 's', DOC_TEXT( "Returns the name of the $decl:surfaceType$ of the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
+const anEventDef EV_GetMeleeSurfaceColor( "getMeleeSurfaceColor", 'v', DOC_TEXT( "Returns the color of the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid." );
+const anEventDef EV_GetMeleeJoint( "getMeleeJoint", 's', DOC_TEXT( "Returns the name of the joint associated with the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid.\nIf the surface hit does not belong to an animated model, the result will be an empty string." );
+const anEventDef EV_GetMeleeBody( "getMeleeBody", 's', DOC_TEXT( "Returns the name of the body associated with the surface hit by the last melee trace." ), 0, "Use $event:melee$ to perform a melee trace.\nIf no collision occured, this data is invalid.\nIf the surface hit does not belong to an articulated figure, the result will be an empty string." );
+const anEventDef EV_Weapon_SendTracerMessage( "sendTracerMessage", "vvf" );
 
-const arcEventDef EV_EnableTargetLock( "enableTargetLock", '\0', DOC_TEXT( "Enables/disables support for target locking." ), 1, "If the currently active weapon does not support target locking, this will have no effect.", "b", "state", "Should target locking be enabled or not." );
-const arcEventDef EV_SetFov( "setFov", '\0', DOC_TEXT( "Starts a fov transition." ), 3, nullptr, "f", "start", "Fov to start the transition at.", "f", "end", "Fov to end the transition at.", "f", "duration", "Length in seconds for the transition to take." );
-const arcEventDef EV_SetFovStart( "setFovStart", '\0', DOC_TEXT( "Starts a delayed fov transition." ), 4, nullptr, "f", "start", "Fov to start the transition at.", "f", "end", "Fov to end the transition at.", "f", "offset", "Time in seconds to delay the transition for.", "f", "duration", "Length in seconds for the transition to take." );
-const arcEventDef EV_ClearFov( "clearFov", '\0', DOC_TEXT( "Resets any active fov modifications." ), 0, nullptr );
-const arcEventDef EV_GetFov( "getFov", 'f', DOC_TEXT( "Returns the value of fov from any active fov modifications." ), 0, "If there are no active fov modifications, the result will be 0." );
-const arcEventDef EV_EnableClamp( "enableClamp", '\0', DOC_TEXT( "Enables view rate/limit clamping on the weapon, with the given base angles." ), 1, "See also $event:disableClamp$.", "v", "base", "Base set of angles that any limit clamps will be based on." );
-const arcEventDef EV_DisableClamp( "disableClamp", '\0', DOC_TEXT( "Disables view rate/limit clamping on the weapon." ), 0, "See also $event:enableClamp$." );
-const arcEventDef EV_GetspreadCurrentValue( "getCurrentSpread", 'f', DOC_TEXT( "Returns the current value of spread for the weapon." ), 0, nullptr );
-const arcEventDef EV_IncreaseSpreadValue( "increaseSpread", '\0', DOC_TEXT( "Increases the spread for the weapon based on the values for firing the weapon." ), 0, nullptr );
-const arcEventDef EV_SetSpreadModifier( "setSpreadModifier", '\0', DOC_TEXT( "Applies a spread modifier which will be applied to the current value before being returned." ), 1, nullptr, "f", "scale", "Scale to set." );
-const arcEventDef EV_Fired( "fired", '\0', DOC_TEXT( "Performs animation callbacks and view angle kicks as if a call to $event:launchProjectiles$ had occured." ), 0, nullptr );
-const arcEventDef EV_GetWorldModel( "getWorldModel", 'o', DOC_TEXT( "Returns the script object for the world model client entity at the specified index." ), 1, "If the index is out of range, the result will be $null$.", "d", "index", "Index of the model to return." );
-const arcEventDef EV_EnableSway( "enableSway", '\0', DOC_TEXT( "Enables/disables scope swaying." ), 1, nullptr, "b", "value", "Whether to enable or disable." );
-const arcEventDef EV_SetDriftScale( "setDriftScale", '\0', DOC_TEXT( "Sets the weapon visual drifting mode. If the factor is less than 0.1, ironsights mode will be used, otherwise regular mode will be used." ), 1, "FIXME: This event needs tidied up, it no longer does what it used to.", "f", "scale", "Scale factor to apply." );
-const arcEventDef EV_ResetTracerCounter( "resetTracerCounter", '\0', DOC_TEXT( "Resets the internal counter for counting the interval between tracers to 0." ), 0, nullptr );
-const arcEventDef EV_GetLastTracer( "getLastTracer", 'h', DOC_TEXT( "Returns a handle to the last tracer effect that was created." ), 0, "If the tracer no longer exist, or has never been created, the result is 0." );
-const arcEventDef EV_SetupAnimClass( "setupAnimClass", '\0', DOC_TEXT( "Modifies the weapon and weapon class prefixes for use by the player third person animations." ), 1, nullptr, "s", "key", "Key to use to look up the new prefixes." );
-const arcEventDef EV_HasWeaponAnim( "hasWeaponAnim", 'b', DOC_TEXT( "Returns whether the weapon has an animation with the specified name." ), 1, nullptr, "s", "anim", "Name of the animation to check for." );
-const arcEventDef EV_SetStatName( "setStatName", '\0', DOC_TEXT( "Allows on the fly changing of the name used for stat tracking for the weapon." ), 1, "If an empty string is passed, stats will be disabled.", "s", "name", "New stats name to use." );
+const anEventDef EV_EnableTargetLock( "enableTargetLock", '\0', DOC_TEXT( "Enables/disables support for target locking." ), 1, "If the currently active weapon does not support target locking, this will have no effect.", "b", "state", "Should target locking be enabled or not." );
+const anEventDef EV_SetFov( "setFov", '\0', DOC_TEXT( "Starts a fov transition." ), 3, nullptr, "f", "start", "Fov to start the transition at.", "f", "end", "Fov to end the transition at.", "f", "duration", "Length in seconds for the transition to take." );
+const anEventDef EV_SetFovStart( "setFovStart", '\0', DOC_TEXT( "Starts a delayed fov transition." ), 4, nullptr, "f", "start", "Fov to start the transition at.", "f", "end", "Fov to end the transition at.", "f", "offset", "Time in seconds to delay the transition for.", "f", "duration", "Length in seconds for the transition to take." );
+const anEventDef EV_ClearFov( "clearFov", '\0', DOC_TEXT( "Resets any active fov modifications." ), 0, nullptr );
+const anEventDef EV_GetFov( "getFov", 'f', DOC_TEXT( "Returns the value of fov from any active fov modifications." ), 0, "If there are no active fov modifications, the result will be 0." );
+const anEventDef EV_EnableClamp( "enableClamp", '\0', DOC_TEXT( "Enables view rate/limit clamping on the weapon, with the given base angles." ), 1, "See also $event:disableClamp$.", "v", "base", "Base set of angles that any limit clamps will be based on." );
+const anEventDef EV_DisableClamp( "disableClamp", '\0', DOC_TEXT( "Disables view rate/limit clamping on the weapon." ), 0, "See also $event:enableClamp$." );
+const anEventDef EV_GetspreadCurrentValue( "getCurrentSpread", 'f', DOC_TEXT( "Returns the current value of spread for the weapon." ), 0, nullptr );
+const anEventDef EV_IncreaseSpreadValue( "increaseSpread", '\0', DOC_TEXT( "Increases the spread for the weapon based on the values for firing the weapon." ), 0, nullptr );
+const anEventDef EV_SetSpreadModifier( "setSpreadModifier", '\0', DOC_TEXT( "Applies a spread modifier which will be applied to the current value before being returned." ), 1, nullptr, "f", "scale", "Scale to set." );
+const anEventDef EV_Fired( "fired", '\0', DOC_TEXT( "Performs animation callbacks and view angle kicks as if a call to $event:launchProjectiles$ had occured." ), 0, nullptr );
+const anEventDef EV_GetWorldModel( "getWorldModel", 'o', DOC_TEXT( "Returns the script object for the world model client entity at the specified index." ), 1, "If the index is out of range, the result will be $null$.", "d", "index", "Index of the model to return." );
+const anEventDef EV_EnableSway( "enableSway", '\0', DOC_TEXT( "Enables/disables scope swaying." ), 1, nullptr, "b", "value", "Whether to enable or disable." );
+const anEventDef EV_SetDriftScale( "setDriftScale", '\0', DOC_TEXT( "Sets the weapon visual drifting mode. If the factor is less than 0.1, ironsights mode will be used, otherwise regular mode will be used." ), 1, "FIXME: This event needs tidied up, it no longer does what it used to.", "f", "scale", "Scale factor to apply." );
+const anEventDef EV_ResetTracerCounter( "resetTracerCounter", '\0', DOC_TEXT( "Resets the internal counter for counting the interval between tracers to 0." ), 0, nullptr );
+const anEventDef EV_GetLastTracer( "getLastTracer", 'h', DOC_TEXT( "Returns a handle to the last tracer effect that was created." ), 0, "If the tracer no longer exist, or has never been created, the result is 0." );
+const anEventDef EV_SetupAnimClass( "setupAnimClass", '\0', DOC_TEXT( "Modifies the weapon and weapon class prefixes for use by the player third person animations." ), 1, nullptr, "s", "key", "Key to use to look up the new prefixes." );
+const anEventDef EV_HasWeaponAnim( "hasWeaponAnim", 'b', DOC_TEXT( "Returns whether the weapon has an animation with the specified name." ), 1, nullptr, "s", "anim", "Name of the animation to check for." );
+const anEventDef EV_SetStatName( "setStatName", '\0', DOC_TEXT( "Allows on the fly changing of the name used for stat tracking for the weapon." ), 1, "If an empty string is passed, stats will be disabled.", "s", "name", "New stats name to use." );
 
 //
 // class def
 //
-CLASS_DECLARATION( arcAnimatedEntity, idWeapon )
+CLASS_DECLARATION( anAnimatedEntity, idWeapon )
 	EVENT( EV_Clear,					idWeapon::Event_Clear )
 	EVENT( EV_GetOwner,					idWeapon::Event_GetOwner )
 	EVENT( EV_State,					idWeapon::Event_WeaponState )
@@ -203,19 +203,19 @@ END_CLASS
 sdWeaponNetworkInterface::HandleNetworkMessage
 ================
 */
-void sdWeaponNetworkInterface::HandleNetworkMessage( arcNetBasePlayer* player, const char* message ) {
+void sdWeaponNetworkInterface::HandleNetworkMessage( anBasePlayer* player, const char *message ) {
 	idScriptObject* scriptObject = owner->GetScriptObject();
 	if ( !scriptObject ) {
 		return;
 	}
-	const sdProgram::sdFunction* function = scriptObject->GetFunction( "OnNetworkMessage" );
+	const idProgram::sdFunction* function = scriptObject->GetFunction( "OnNetworkMessage" );
 	if ( !function ) {
 		return;
 	}
 
 	gameLocal.SetActionCommand( message );
 
-	sdScriptHelper helper;
+	idScriptHelper helper;
 	helper.Push( player->GetScriptObject() );
 	owner->CallNonBlockingScriptEvent( function, helper );
 }
@@ -225,20 +225,20 @@ void sdWeaponNetworkInterface::HandleNetworkMessage( arcNetBasePlayer* player, c
 sdWeaponNetworkInterface::HandleNetworkEvent
 ================
 */
-void sdWeaponNetworkInterface::HandleNetworkEvent( const char* message ) {
+void sdWeaponNetworkInterface::HandleNetworkEvent( const char *message ) {
 	if ( !owner->GetScriptObject() ) {
 		gameLocal.Warning( "sdWeaponNetworkInterface::HandleNetworkEvent With No Owner Scriptobject" );
 		return;
 	}
 
-	const sdProgram::sdFunction* function = owner->GetScriptObject()->GetFunction( "OnNetworkEvent" );
+	const idProgram::sdFunction* function = owner->GetScriptObject()->GetFunction( "OnNetworkEvent" );
 	if ( !function ) {
 		return;
 	}
 
 	gameLocal.SetActionCommand( message );
 
-	sdScriptHelper helper;
+	idScriptHelper helper;
 	owner->CallNonBlockingScriptEvent( function, helper );
 }
 
@@ -266,7 +266,7 @@ idWeapon::idWeapon() {
 	cleanupFunc				= nullptr;
 	climateSkin				= nullptr;
 
-	playerWeaponNum			= NULL_WEAP;
+	playerWeaponNum			= nullptr_WEAP;
 
 	getGrenadeFuseStartFunc = nullptr;
 	ironSightsEnabledFunc	= nullptr;
@@ -357,7 +357,7 @@ idWeapon::SetOwner
 Only called at player spawn time, not each weapon switch
 ================
 */
-void idWeapon::SetOwner( arcNetBasePlayer* _owner ) {
+void idWeapon::SetOwner( anBasePlayer* _owner ) {
 	owner = _owner;
 
 	UpdateVisibility();
@@ -411,7 +411,7 @@ void idWeapon::ScriptCleanup() {
 		return;
 	}
 
-	sdScriptHelper h;
+	idScriptHelper h;
 	scriptObject->CallNonBlockingScriptEvent( cleanupFunc, h );
 }
 
@@ -419,7 +419,7 @@ void idWeapon::ScriptCleanup() {
 ================
 idWeapon::ShouldConstructScriptObjectAtSpawn
 
-Called during arcEntity::Spawn to see if it should construct the script object or not.
+Called during anEntity::Spawn to see if it should construct the script object or not.
 Overridden by subclasses that need to spawn the script object themselves.
 ================
 */
@@ -552,10 +552,10 @@ idWeapon::InitWorldModel
 ================
 */
 void idWeapon::InitWorldModel( int index ) {
-	anString suffix = index > 0 ? va( "_%d", index + 1 ) : "";
+	anStr suffix = index > 0 ? va( "_%d", index + 1 ) : "";
 
-	const char* model	= spawnArgs.GetString( va( "model_world%s", suffix.c_str() ) );
-	const char* attach	= spawnArgs.GetString( va( "joint_attach%s", suffix.c_str() ) );
+	const char *model	= spawnArgs.GetString( va( "model_world%s", suffix.c_str() ) );
+	const char *attach	= spawnArgs.GetString( va( "joint_attach%s", suffix.c_str() ) );
 
 	sdClientAnimated* worldModel = worldModels[index].GetEntity();
 
@@ -564,7 +564,7 @@ void idWeapon::InitWorldModel( int index ) {
 		worldModel->Show();
 		worldModel->SetModel( model );
 
-		const arcDeclModelDef* modelDef = worldModel->GetAnimator()->ModelDef();
+		const anDeclModelDef* modelDef = worldModel->GetAnimator()->ModelDef();
 		if ( modelDef ) {
 			worldModel->SetSkin( modelDef->GetDefaultSkin() );
 		}
@@ -579,7 +579,7 @@ void idWeapon::InitWorldModel( int index ) {
 		worldModel->Hide();
 	}
 
-	arcAnimator* worldAnimator = worldModel->GetAnimator();
+	anAnimator *worldAnimator = worldModel->GetAnimator();
 	barrelJointsWorld[index]	= worldAnimator->GetJointHandle( "muzzle" );
 }
 
@@ -621,7 +621,7 @@ void idWeapon::LogTimeUsed( void ) {
 idWeapon::SetupAnimClass
 ================
 */
-void idWeapon::SetupAnimClass( const char* prefix ) {
+void idWeapon::SetupAnimClass( const char *prefix ) {
 	owner->SetPrefix( ANIMCHANNEL_ALL, anActor::AP_WEAPON_CLASS, spawnArgs.GetString( va( "%s_class", prefix ) ) );
 	owner->SetPrefix( ANIMCHANNEL_ALL, anActor::AP_WEAPON, spawnArgs.GetString( prefix ) );
 }
@@ -631,7 +631,7 @@ void idWeapon::SetupAnimClass( const char* prefix ) {
 idWeapon::GetWeaponDef
 ================
 */
-void idWeapon::GetWeaponDef( const sdDeclInvItem* item ) {
+void idWeapon::GetWeaponDef( const anInventoryItem* item ) {
 	const anDeclSkin* oldSkin = renderEntity.customSkin;
 	if ( oldSkin == climateSkin ) {
 		oldSkin = nullptr;
@@ -682,11 +682,11 @@ void idWeapon::GetWeaponDef( const sdDeclInvItem* item ) {
 	if ( spawnArgs.GetInt( "player_weapon_num", "", temp ) ) {
 		playerWeaponNum = ( playerWeaponTypes_t ) temp; //mal: get the weapon number, for quick and easy reference for the bots.
 	} else {
-		playerWeaponNum = NULL_WEAP;
+		playerWeaponNum = nullptr_WEAP;
 	}
 
 	// setup the view model
-	const char* vmodel = spawnArgs.GetString( "model_view" );
+	const char *vmodel = spawnArgs.GetString( "model_view" );
 	SetModel( vmodel );
 	renderEntity.flags.usePointTestForAmbientCubeMaps = true;
 
@@ -705,7 +705,7 @@ void idWeapon::GetWeaponDef( const sdDeclInvItem* item ) {
 	// find some joints in the model for locating effects
 	barrelJointView		= animator.GetJointHandle( "muzzle" );
 
-	const char* damagename = spawnArgs.GetString( "dmg_melee" );
+	const char *damagename = spawnArgs.GetString( "dmg_melee" );
 	if ( *damagename ) {
 		meleeDamage = gameLocal.declDamageType.LocalFind( damagename, false );
 		if ( !meleeDamage ) {
@@ -737,7 +737,7 @@ void idWeapon::GetWeaponDef( const sdDeclInvItem* item ) {
 		for ( int i = 0; i < renderEntity.hModel->NumGUISurfaces(); i++ ) {
 			const guiSurface_t* guiSurface = renderEntity.hModel->GetGUISurface( i );
 
-			const char* guiName = spawnArgs.GetString( "gui" );
+			const char *guiName = spawnArgs.GetString( "gui" );
 			if ( *guiName == '\0' ) {
 				continue;
 			}
@@ -819,9 +819,9 @@ void idWeapon::GetWeaponDef( const sdDeclInvItem* item ) {
 
 	climateSkin = nullptr;
 	if ( gameLocal.mapSkinPool != nullptr ) {
-		const char* skinKey = spawnArgs.GetString( "climate_skin_key" );
+		const char *skinKey = spawnArgs.GetString( "climate_skin_key" );
 		if ( *skinKey != '\0' ) {
-			const char* skinName = gameLocal.mapSkinPool->GetDict().GetString( va( "skin_%s", skinKey ) );
+			const char *skinName = gameLocal.mapSkinPool->GetDict().GetString( va( "skin_%s", skinKey ) );
 			if ( *skinName == '\0' ) {
 				gameLocal.Warning( "idWeapon::GetWeaponDef No Skin Set For '%s'", skinKey );
 			} else {
@@ -851,7 +851,7 @@ void idWeapon::GetWeaponDef( const sdDeclInvItem* item ) {
 		}
 	}
 
-	const char* objectType;
+	const char *objectType;
 	if ( !spawnArgs.GetString( "weapon_scriptobject", nullptr, &objectType ) ) {
 		gameLocal.Error( "No 'weapon_scriptobject' set on '%s'.", item->GetName() );
 	}
@@ -889,7 +889,7 @@ void idWeapon::GetWeaponDef( const sdDeclInvItem* item ) {
 
 	Show();
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	owner->CallNonBlockingScriptEvent( owner->GetScriptObject()->GetFunction( "OnWeaponChanged" ), h1 );
 
 	UpdatePlayerWeaponInfo(); //mal: update the player's weapon info
@@ -912,7 +912,7 @@ idWeapon::SetModel
 void idWeapon::SetModel( const char *modelname ) {
 	assert( modelname );
 
-	if ( !modelname[ 0 ] ) {
+	if ( !modelname[0] ) {
 		return;
 	}
 
@@ -949,7 +949,7 @@ bool idWeapon::GetGlobalJointTransform( bool viewModel, const jointHandle_t join
 		}
 	} else {
 		if ( worldModels.Num() > 0 ) { // FIXME
-			sdClientAnimated* worldModel = worldModels[ 0 ];
+			sdClientAnimated* worldModel = worldModels[0];
 
 			// world model
 			if ( worldModel->GetAnimator()->GetJointTransform( jointHandle, gameLocal.time, offset, axis ) ) {
@@ -1043,7 +1043,7 @@ void idWeapon::UpdateSpreadValue() {
 idWeapon::UpdateSpreadValue
 ============
 */
-void idWeapon::UpdateSpreadValue( const anVec3& velocity, const anAngles& angles, const anAngles& oldAngles ) {
+void idWeapon::UpdateSpreadValue( const anVec3 &velocity, const anAngles& angles, const anAngles& oldAngles ) {
 	if ( !gameLocal.isNewFrame ) {
 		return;
 	}
@@ -1106,13 +1106,13 @@ bool idWeapon::ClientReceiveEvent( int event, int time, const anBitMsg &msg ) {
 			}
 
 			if ( scriptObject != nullptr ) {
-				sdScriptHelper h1;
+				idScriptHelper h1;
 				scriptObject->CallNonBlockingScriptEvent( scriptObject->GetFunction( "OnNetworkReload" ), h1 );
 			}
 			return true;
 		}
 	}
-	return arcEntity::ClientReceiveEvent( event, time, msg );
+	return anEntity::ClientReceiveEvent( event, time, msg );
 }
 
 /*
@@ -1120,7 +1120,7 @@ bool idWeapon::ClientReceiveEvent( int event, int time, const anBitMsg &msg ) {
 idWeapon::ClientReceiveEvent
 ================
 */
-void idWeapon::Event_SendTracerMessage( const anVec3& start, const anVec3& end, float strength ) {
+void idWeapon::Event_SendTracerMessage( const anVec3 &start, const anVec3 &end, float strength ) {
 	if ( !gameLocal.isServer ) {
 		return;
 	}
@@ -1153,7 +1153,7 @@ bool idWeapon::ClientReceiveUnreliableEvent( int event, int time, const anBitMsg
 				anVec3 end = msg.ReadVector();
 				float strength = msg.ReadFloat();
 
-				sdScriptHelper h1;
+				idScriptHelper h1;
 				h1.Push( start );
 				h1.Push( end );
 				h1.Push( strength );
@@ -1467,7 +1467,7 @@ void idWeapon::SetState( const char *statename, int blendFrames ) {
 		return;
 	}
 
-	const sdProgram::sdFunction* func = scriptObject->GetFunction( statename );
+	const idProgram::sdFunction* func = scriptObject->GetFunction( statename );
 	if ( !func ) {
 		assert( 0 );
 		gameLocal.Error( "Can't find function '%s' in object '%s'", statename, scriptObject->GetTypeName() );
@@ -1528,21 +1528,21 @@ void idWeapon::MuzzleRise( anVec3 &origin, anMat3 &axis ) {
 ================
 idWeapon::ConstructScriptObject
 
-Called during arcEntity::Spawn.  Calls the constructor on the script object.
+Called during anEntity::Spawn.  Calls the constructor on the script object.
 Can be overridden by subclasses when a thread doesn't need to be allocated.
 ================
 */
-sdProgramThread* idWeapon::ConstructScriptObject( void ) {
+idProgramThread* idWeapon::ConstructScriptObject( void ) {
 	thread->EndThread();
 
 	// init the script object's data
 	scriptObject->ClearObject();
 
-	sdScriptHelper h;
+	idScriptHelper h;
 	CallNonBlockingScriptEvent( scriptObject->GetPreConstructor(), h );
 
 	// call script object's constructor
-	const sdProgram::sdFunction* constructor = scriptObject->GetConstructor();
+	const idProgram::sdFunction* constructor = scriptObject->GetConstructor();
 	if ( !constructor ) {
 		gameLocal.Error( "Missing constructor on '%s' for weapon", scriptObject->GetTypeName() );
 	}
@@ -1557,7 +1557,7 @@ sdProgramThread* idWeapon::ConstructScriptObject( void ) {
 ================
 idWeapon::DeconstructScriptObject
 
-Called during arcEntity::~arcEntity.  Calls the destructor on the script object.
+Called during anEntity::~anEntity.  Calls the destructor on the script object.
 Can be overridden by subclasses when a thread doesn't need to be allocated.
 Not called during idGameLocal::MapShutdown.
 ================
@@ -1581,10 +1581,10 @@ void idWeapon::DeconstructScriptObject( void ) {
 		thread->EndThread();
 
 		// call script object's destructor
-		const sdProgram::sdFunction* destructor = scriptObject->GetDestructor();
+		const idProgram::sdFunction* destructor = scriptObject->GetDestructor();
 		if ( destructor ) {
 			// start a thread that will run immediately and end
-			sdScriptHelper helper;
+			idScriptHelper helper;
 			CallNonBlockingScriptEvent( destructor, helper );
 		}
 	}
@@ -1653,7 +1653,7 @@ void idWeapon::Present( void ) {
 	}
 #endif
 
-	arcEntity::Present();
+	anEntity::Present();
 }
 
 /*
@@ -1666,7 +1666,7 @@ void idWeapon::FreeModelDef( void ) {
 		gameRenderWorld->FreeEntityDef( dofModelDefHandle );
 		dofModelDefHandle = -1;
 	}
-	arcEntity::FreeModelDef();
+	anEntity::FreeModelDef();
 }
 
 /*
@@ -1681,11 +1681,11 @@ void idWeapon::PresentWeapon( void ) {
 	bool ignorePitch = weaponItem ? weaponItem->GetIgnoreViewPitch() : false;
 	if ( ignorePitch ) {
 		// ignore the pitch component of the view
-		playerViewAxis[ 0 ].z = 0.0f;
-		playerViewAxis[ 1 ].z = 0.0f;
-		playerViewAxis[ 2 ].Set( 0.0f, 0.0f, 1.0f );
-		playerViewAxis[ 0 ].Normalize();
-		playerViewAxis[ 1 ].Normalize();
+		playerViewAxis[0].z = 0.0f;
+		playerViewAxis[1].z = 0.0f;
+		playerViewAxis[2].Set( 0.0f, 0.0f, 1.0f );
+		playerViewAxis[0].Normalize();
+		playerViewAxis[1].Normalize();
 	}
 
 	// calculate weapon position based on player movement bobbing
@@ -1708,7 +1708,7 @@ void idWeapon::PresentWeapon( void ) {
 			Hide();
 		}
 	}
-	viewWeaponOrigin += hideOffset * viewWeaponAxis[ 2 ];
+	viewWeaponOrigin += hideOffset * viewWeaponAxis[2];
 
 	// kick up based on repeat firing
 	MuzzleRise( viewWeaponOrigin, viewWeaponAxis );
@@ -1883,7 +1883,7 @@ void idWeapon::UpdateVisibility( void ) {
 			worldViewState = VS_NONE;
 		} else if ( owner->IsSpectating() ) {
 			worldViewState	= VS_NONE;
-		} else if ( arcEntity* proxy = owner->GetProxyEntity() ) {
+		} else if ( anEntity *proxy = owner->GetProxyEntity() ) {
 			if ( !proxy->GetUsableInterface()->GetAllowPlayerWeapon( owner ) ) {
 				worldViewState	= VS_NONE;
 			} else {
@@ -1980,7 +1980,7 @@ void idWeapon::OnProxyEnter( void ) {
 	UpdateVisibility();
 
 	if ( scriptObject ) {
-		sdScriptHelper h1;
+		idScriptHelper h1;
 		scriptObject->CallNonBlockingScriptEvent( scriptObject->GetFunction( "OnProxyEnter" ), h1 );
 	}
 }
@@ -1996,7 +1996,7 @@ void idWeapon::OnProxyExit( void ) {
 	UpdateVisibility();
 
 	if ( scriptObject ) {
-		sdScriptHelper h1;
+		idScriptHelper h1;
 		scriptObject->CallNonBlockingScriptEvent( scriptObject->GetFunction( "OnProxyExit" ), h1 );
 	}
 }
@@ -2042,7 +2042,7 @@ idWeapon::Event_GetOwner
 ===============
 */
 void idWeapon::Event_GetOwner( void ) {
-	sdProgram::ReturnEntity( owner );
+	idProgram::ReturnEntity( owner );
 }
 
 /*
@@ -2051,7 +2051,7 @@ idWeapon::Event_WeaponState
 ===============
 */
 void idWeapon::Event_WeaponState( const char *statename, int blendFrames ) {
-	const sdProgram::sdFunction* func = scriptObject->GetFunction( statename );
+	const idProgram::sdFunction* func = scriptObject->GetFunction( statename );
 	if ( !func ) {
 		assert( 0 );
 		gameLocal.Error( "Can't find function '%s' in object '%s'", statename, scriptObject->GetTypeName() );
@@ -2069,10 +2069,10 @@ idWeapon::Event_GetWeaponState
 */
 void idWeapon::Event_GetWeaponState( void ) {
 	if ( idealState.Length() ) {
-		sdProgram::ReturnString( idealState );
+		idProgram::ReturnString( idealState );
 		return;
 	}
-	sdProgram::ReturnString( state );
+	idProgram::ReturnString( state );
 }
 
 /*
@@ -2188,7 +2188,7 @@ idWeapon::Event_AmmoInClip
 ===============
 */
 void idWeapon::Event_AmmoInClip( int modIndex ) {
-	sdProgram::ReturnInteger( owner->GetClip( modIndex ) );
+	idProgram::ReturnInteger( owner->GetClip( modIndex ) );
 }
 
 /*
@@ -2197,7 +2197,7 @@ idWeapon::Event_AmmoAvailable
 ===============
 */
 void idWeapon::Event_AmmoAvailable( int modIndex ) {
-	sdProgram::ReturnInteger( ShotsAvailable( modIndex ) );
+	idProgram::ReturnInteger( ShotsAvailable( modIndex ) );
 }
 
 /*
@@ -2206,7 +2206,7 @@ idWeapon::Event_AmmoRequired
 ===============
 */
 void idWeapon::Event_AmmoRequired( int modIndex ) {
-	sdProgram::ReturnInteger( AmmoRequired( modIndex ) );
+	idProgram::ReturnInteger( AmmoRequired( modIndex ) );
 }
 
 /*
@@ -2215,7 +2215,7 @@ idWeapon::Event_AmmoType
 ===============
 */
 void idWeapon::Event_AmmoType( int modIndex ) {
-	sdProgram::ReturnInteger( GetAmmoType( modIndex ) );
+	idProgram::ReturnInteger( GetAmmoType( modIndex ) );
 }
 
 /*
@@ -2238,7 +2238,7 @@ idWeapon::Event_ClipSize
 ===============
 */
 void idWeapon::Event_ClipSize( int modIndex ) {
-	sdProgram::ReturnInteger( GetClipSize( modIndex ) );
+	idProgram::ReturnInteger( GetClipSize( modIndex ) );
 }
 
 /*
@@ -2345,7 +2345,7 @@ void idWeapon::Event_PlayAnim( animChannel_t channel, const char *animname ) {
 		for ( int i = 0; i < worldModels.Num(); i++ ) {
 			sdClientAnimated* worldModel = worldModels[i];
 
-			arcAnimator* worldAnimator = worldModel->GetAnimator();
+			anAnimator *worldAnimator = worldModel->GetAnimator();
 			anim = worldAnimator->GetAnim( animname );
 			if ( anim ) {
 				worldAnimator->PlayAnim( channel, anim, gameLocal.time, FRAME2MS( animBlendFrames ) );
@@ -2353,7 +2353,7 @@ void idWeapon::Event_PlayAnim( animChannel_t channel, const char *animname ) {
 		}
 	}
 	animBlendFrames = 0;
-	sdProgram::ReturnFloat( 0.0f );
+	idProgram::ReturnFloat( 0.0f );
 }
 
 /*
@@ -2381,14 +2381,14 @@ void idWeapon::Event_PlayCycle( animChannel_t channel, const char *animname ) {
 				continue;
 			}
 
-			arcAnimator* worldAnimator = worldModel->GetAnimator();
+			anAnimator *worldAnimator = worldModel->GetAnimator();
 
 			anim = worldAnimator->GetAnim( animname );
 			worldAnimator->CycleAnim( channel, anim, gameLocal.time, FRAME2MS( animBlendFrames ) );
 		}
 	}
 	animBlendFrames = 0;
-	sdProgram::ReturnFloat( 0.0f );
+	idProgram::ReturnFloat( 0.0f );
 }
 
 /*
@@ -2398,9 +2398,9 @@ idWeapon::Event_AnimDone
 */
 void idWeapon::Event_AnimDone( animChannel_t channel, int blendFrames ) {
 	if ( animDoneTime - FRAME2MS( blendFrames ) <= gameLocal.time ) {
-		sdProgram::ReturnBoolean( true );
+		idProgram::ReturnBoolean( true );
 	} else {
-		sdProgram::ReturnBoolean( false );
+		idProgram::ReturnBoolean( false );
 	}
 }
 
@@ -2419,7 +2419,7 @@ idWeapon::Event_GetBlendFrames
 ===============
 */
 void idWeapon::Event_GetBlendFrames( animChannel_t channel ) {
-	sdProgram::ReturnInteger( animBlendFrames );
+	idProgram::ReturnInteger( animBlendFrames );
 }
 
 /*
@@ -2447,13 +2447,13 @@ void idWeapon::Event_CreateProjectile( int modIndex ) {
 	}
 
 	if ( gameLocal.isClient ) {
-		sdProgram::ReturnEntity( nullptr );
+		idProgram::ReturnEntity( nullptr );
 		return;
 	}
 
 	if ( !weaponItem->GetClips()[ modIndex ].projectile ) {
 		gameLocal.Warning( "CreateProjectile: projectile for clip %d nullptr. Possibly out of range?", modIndex );
-		sdProgram::ReturnEntity( nullptr );
+		idProgram::ReturnEntity( nullptr );
 		return;
 	}
 
@@ -2464,9 +2464,9 @@ void idWeapon::Event_CreateProjectile( int modIndex ) {
 		projectileEnt->Bind( owner, false );
 		projectileEnt->Hide();
 		projectileEnt->SetOrigin( GetPhysics()->GetOrigin() );
-		sdProgram::ReturnEntity( projectileEnt );
+		idProgram::ReturnEntity( projectileEnt );
 	} else {
-		sdProgram::ReturnEntity( nullptr );
+		idProgram::ReturnEntity( nullptr );
 	}
 }
 
@@ -2486,7 +2486,7 @@ void idWeapon::Event_LaunchProjectiles( int numProjectiles, int projectileIndex,
 		return;
 	}
 
-	const anDict& projectileDict = projectileInfo.projectile->dict;
+	const anDict &projectileDict = projectileInfo.projectile->dict;
 	bool isBullet = projectileDict.GetBool( "is_bullet" );
 
 	missileRandom.SetSeed( gameLocal.time );
@@ -2527,7 +2527,7 @@ void idWeapon::Event_LaunchProjectiles( int numProjectiles, int projectileIndex,
 		viewModel = true;
 	} else {
 		if ( worldModels.Num() > 0 ) {
-			barrelJoint = barrelJointsWorld[ 0 ]; // FIXME
+			barrelJoint = barrelJointsWorld[0]; // FIXME
 			viewModel = false;
 		} else {
 			barrelJoint = INVALID_JOINT;
@@ -2565,7 +2565,7 @@ void idWeapon::Event_LaunchProjectiles( int numProjectiles, int projectileIndex,
 			float ang = anMath::Sin( spreadRad * missileRandom.RandomFloat() );
 			float spin = ( float )DEG2RAD( 360.0f ) * missileRandom.RandomFloat();
 
-			anVec3 dir = playerViewAxis[ 0 ] + playerViewAxis[ 2 ] * ( ang * anMath::Sin( spin ) ) - playerViewAxis[ 1 ] * ( ang * anMath::Cos( spin ) );
+			anVec3 dir = playerViewAxis[0] + playerViewAxis[2] * ( ang * anMath::Sin( spin ) ) - playerViewAxis[1] * ( ang * anMath::Cos( spin ) );
 			dir.Normalize();
 
 			if ( isBullet ) {
@@ -2598,7 +2598,7 @@ void idWeapon::Event_LaunchProjectiles( int numProjectiles, int projectileIndex,
 						clientEntity->Launch( owner, tracerMuzzleOrigin, tracerMuzzleAxis );
 					}
 				} else {
-					arcEntity* ent = nullptr;
+					anEntity *ent = nullptr;
 					if ( projectileEnt != nullptr ) {
 						ent = projectileEnt;
 						projectileEnt->Show();
@@ -2614,10 +2614,10 @@ void idWeapon::Event_LaunchProjectiles( int numProjectiles, int projectileIndex,
 					}
 
 					float distance;
-					anVec3 startPos = muzzleOrigin + playerViewAxis[ 0 ] * 2.0f;
+					anVec3 startPos = muzzleOrigin + playerViewAxis[0] * 2.0f;
 					anBounds projBounds = ent->GetPhysics()->GetBounds().Rotate( playerViewAxis );
-					if ( ( ownerBounds - projBounds ).RayIntersection( startPos, playerViewAxis[ 0 ], distance ) ) {
-						startPos += distance * playerViewAxis[ 0 ];
+					if ( ( ownerBounds - projBounds ).RayIntersection( startPos, playerViewAxis[0], distance ) ) {
+						startPos += distance * playerViewAxis[0];
 					}
 
 					anBounds newProjBounds = projBounds;
@@ -2631,10 +2631,10 @@ void idWeapon::Event_LaunchProjectiles( int numProjectiles, int projectileIndex,
 							// start from a point behind the muzzle and trace forwards to find the contact point
 							float halfbbox = pm_bboxwidth.GetFloat() * 0.5f;
 							trace_t	trace;
-							gameLocal.clip.Translation( CLIP_DEBUG_PARMS_SCRIPT trace, muzzleOrigin - ( halfbbox + distance ) * playerViewAxis[ 0 ],
+							gameLocal.clip.Translation( CLIP_DEBUG_PARMS_SCRIPT trace, muzzleOrigin - ( halfbbox + distance ) * playerViewAxis[0],
 														startPos, clipModel, playerViewAxis, contentMask, owner );
 
-							startPos = trace.endpos - playerViewAxis[ 0 ] * 0.25f;
+							startPos = trace.endpos - playerViewAxis[0] * 0.25f;
 
 							// NOTE: to be truly rigorous we should check here if its still inside something
 							//       and then kill the projectile or something like that, as its really an
@@ -2647,7 +2647,7 @@ void idWeapon::Event_LaunchProjectiles( int numProjectiles, int projectileIndex,
 						idProjectile* proj = ent->Cast< idProjectile >();
 						proj->Create( owner, startPos, dir );
 						proj->AddOwner( owner );
-						arcEntity* proxy = owner->GetProxyEntity();
+						anEntity *proxy = owner->GetProxyEntity();
 						if ( proxy ) {
 							proj->AddOwner( proxy );
 						}
@@ -2695,7 +2695,7 @@ void idWeapon::Event_LaunchProjectiles( int numProjectiles, int projectileIndex,
 idWeapon::Event_DoProjectileTracer
 =====================
 */
-void idWeapon::Event_DoProjectileTracer( int projectileIndex, const anVec3& start, const anVec3& end ) {
+void idWeapon::Event_DoProjectileTracer( int projectileIndex, const anVec3 &start, const anVec3 &end ) {
 	if ( projectileIndex < 0 || projectileIndex >= weaponItem->GetClips().Num() ) {
 		return;
 	}
@@ -2706,7 +2706,7 @@ void idWeapon::Event_DoProjectileTracer( int projectileIndex, const anVec3& star
 		return;
 	}
 
-	const anDict& projectileDict = projectileInfo.projectile->dict;
+	const anDict &projectileDict = projectileInfo.projectile->dict;
 	bool isBullet = projectileDict.GetBool( "is_bullet" );
 
 	// calculate the muzzle position
@@ -2730,7 +2730,7 @@ void idWeapon::Event_DoProjectileTracer( int projectileIndex, const anVec3& star
 		viewModel = true;
 	} else {
 		if ( worldModels.Num() > 0 ) {
-			barrelJoint = barrelJointsWorld[ 0 ]; // FIXME
+			barrelJoint = barrelJointsWorld[0]; // FIXME
 			viewModel = false;
 		} else {
 			barrelJoint = INVALID_JOINT;
@@ -2757,7 +2757,7 @@ idWeapon::Event_SaveMeleeTrace
 */
 void idWeapon::Event_SaveMeleeTrace( void ) {
 	sdLoggedTrace* trace = gameLocal.RegisterLoggedTrace( meleeTrace );
-	sdProgram::ReturnObject( trace ? trace->GetScriptObject() : nullptr );
+	idProgram::ReturnObject( trace ? trace->GetScriptObject() : nullptr );
 }
 
 /*
@@ -2766,7 +2766,7 @@ idWeapon::Event_GetMeleeFraction
 ================
 */
 void idWeapon::Event_GetMeleeFraction( void ) {
-	sdProgram::ReturnFloat( meleeTrace.fraction );
+	idProgram::ReturnFloat( meleeTrace.fraction );
 }
 
 /*
@@ -2775,7 +2775,7 @@ idWeapon::Event_GetMeleeEndPos
 ================
 */
 void idWeapon::Event_GetMeleeEndPos( void ) {
-	sdProgram::ReturnVector( meleeTrace.endpos );
+	idProgram::ReturnVector( meleeTrace.endpos );
 }
 
 /*
@@ -2784,7 +2784,7 @@ idWeapon::Event_GetMeleePoint
 ================
 */
 void idWeapon::Event_GetMeleePoint( void ) {
-	sdProgram::ReturnVector( meleeTrace.c.point );
+	idProgram::ReturnVector( meleeTrace.c.point );
 }
 
 /*
@@ -2794,9 +2794,9 @@ idWeapon::Event_GetMeleeNormal
 */
 void idWeapon::Event_GetMeleeNormal( void ) {
 	if ( meleeTrace.fraction < 1.0f ) {
-		sdProgram::ReturnVector( meleeTrace.c.normal );
+		idProgram::ReturnVector( meleeTrace.c.normal );
 	} else {
-		sdProgram::ReturnVector( vec3_origin );
+		idProgram::ReturnVector( vec3_origin );
 	}
 }
 
@@ -2807,9 +2807,9 @@ idWeapon::Event_GetMeleeEntity
 */
 void idWeapon::Event_GetMeleeEntity( void ) {
 	if ( meleeTrace.fraction < 1.0f ) {
-		sdProgram::ReturnEntity( gameLocal.entities[ meleeTrace.c.entityNum ] );
+		idProgram::ReturnEntity( gameLocal.entities[ meleeTrace.c.entityNum ] );
 	} else {
-		sdProgram::ReturnEntity( nullptr );
+		idProgram::ReturnEntity( nullptr );
 	}
 }
 
@@ -2820,13 +2820,13 @@ idWeapon::Event_GetMeleeJoint
 */
 void idWeapon::Event_GetMeleeJoint( void ) {
 	if ( meleeTrace.fraction < 1.0f && meleeTrace.c.id < 0 ) {
-		arcEntity* ent = gameLocal.entities[ meleeTrace.c.entityNum ];
+		anEntity *ent = gameLocal.entities[ meleeTrace.c.entityNum ];
 		if ( ent->GetAnimator() != nullptr ) {
-			sdProgram::ReturnString( ent->GetAnimator()->GetJointName( CLIPMODEL_ID_TO_JOINT_HANDLE( meleeTrace.c.id ) ) );
+			idProgram::ReturnString( ent->GetAnimator()->GetJointName( CLIPMODEL_ID_TO_JOINT_HANDLE( meleeTrace.c.id ) ) );
 			return;
 		}
 	}
-	sdProgram::ReturnString( "" );
+	idProgram::ReturnString( "" );
 }
 
 /*
@@ -2836,17 +2836,17 @@ idWeapon::Event_GetMeleeBody
 */
 void idWeapon::Event_GetMeleeBody( void ) {
 	if ( meleeTrace.fraction < 1.0f && meleeTrace.c.id < 0 ) {
-		arcAFEntity_Base *af = static_cast<arcAFEntity_Base *>( gameLocal.entities[ meleeTrace.c.entityNum ] );
-		if ( af && af->IsType( arcAFEntity_Base::Type ) && af->IsActiveAF() ) {
+		anAFEntity_Base *af = static_cast<anAFEntity_Base *>( gameLocal.entities[ meleeTrace.c.entityNum ] );
+		if ( af && af->IsType( anAFEntity_Base::Type ) && af->IsActiveAF() ) {
 			int bodyId = af->BodyForClipModelId( meleeTrace.c.id );
 			arcAFBody *body = af->GetAFPhysics()->GetBody( bodyId );
 			if ( body ) {
-				sdProgram::ReturnString( body->GetName() );
+				idProgram::ReturnString( body->GetName() );
 				return;
 			}
 		}
 	}
-	sdProgram::ReturnString( "" );
+	idProgram::ReturnString( "" );
 }
 
 /*
@@ -2856,10 +2856,10 @@ idWeapon::Event_GetMeleeSurfaceFlags
 */
 void idWeapon::Event_GetMeleeSurfaceFlags( void ) {
 	if ( meleeTrace.fraction < 1.0f && meleeTrace.c.material != nullptr ) {
-		sdProgram::ReturnInteger( meleeTrace.c.material->GetSurfaceFlags() );
+		idProgram::ReturnInteger( meleeTrace.c.material->GetSurfaceFlags() );
 		return;
 	}
-	sdProgram::ReturnInteger( 0 );
+	idProgram::ReturnInteger( 0 );
 }
 
 /*
@@ -2869,9 +2869,9 @@ idWeapon::Event_GetMeleeSurfaceType
 */
 void idWeapon::Event_GetMeleeSurfaceType( void ) {
 	if ( meleeTrace.fraction < 1.0f && meleeTrace.c.surfaceType ) {
-		sdProgram::ReturnString( meleeTrace.c.surfaceType->GetName() );
+		idProgram::ReturnString( meleeTrace.c.surfaceType->GetName() );
 	} else {
-		sdProgram::ReturnString( "" );
+		idProgram::ReturnString( "" );
 	}
 }
 
@@ -2881,7 +2881,7 @@ idWeapon::Event_GetMeleeSurfaceColor
 ================
 */
 void idWeapon::Event_GetMeleeSurfaceColor( void ) {
-	sdProgram::ReturnVector( meleeTrace.c.surfaceColor );
+	idProgram::ReturnVector( meleeTrace.c.surfaceColor );
 }
 
 
@@ -2894,8 +2894,8 @@ void idWeapon::Event_Melee( int contentMask, float distance, bool ignoreOwner, b
 	meleeTrace.fraction = 1.f;
 
 	anVec3 start = playerViewOrigin;
-	anVec3 end = start + playerViewAxis[ 0 ] * distance;
-	arcEntity* ignoree = ignoreOwner ? owner : nullptr;
+	anVec3 end = start + playerViewAxis[0] * distance;
+	anEntity *ignoree = ignoreOwner ? owner : nullptr;
 	if ( useAntiLag ) {
 		sdAntiLagManager::GetInstance().Trace( meleeTrace, start, end, contentMask, owner, ignoree );
 	} else {
@@ -2905,7 +2905,7 @@ void idWeapon::Event_Melee( int contentMask, float distance, bool ignoreOwner, b
 	if ( g_debugWeapon.GetBool() ) {
 		gameRenderWorld->DebugLine( colorYellow, start, end, 2000 );
 
-		arcEntity* ent = nullptr;
+		anEntity *ent = nullptr;
 		if ( meleeTrace.fraction < 1.0f ) {
 			ent = gameLocal.GetTraceEntity( meleeTrace );
 		}
@@ -2915,7 +2915,7 @@ void idWeapon::Event_Melee( int contentMask, float distance, bool ignoreOwner, b
 		}
 	}
 
-	sdProgram::ReturnBoolean( meleeTrace.fraction < 1.f );
+	idProgram::ReturnBoolean( meleeTrace.fraction < 1.f );
 }
 
 /*
@@ -2950,8 +2950,8 @@ void idWeapon::Event_MeleeAttack( float damageScale ) {
 	}
 
 	if ( !gameLocal.isClient ) {
-		arcEntity* ownerent = owner;
-		arcEntity* ent;
+		anEntity *ownerent = owner;
+		anEntity *ent;
 
 		if ( meleeTrace.fraction < 1.0f ) {
 			ent = gameLocal.GetTraceEntity( meleeTrace );
@@ -2978,11 +2978,11 @@ void idWeapon::Event_MeleeAttack( float damageScale ) {
 			}
 		}
 	} else {
-		sdProgram::ReturnBoolean( false );
+		idProgram::ReturnBoolean( false );
 	}
 
 	owner->WeaponFireFeedback( feedback );
-	sdProgram::ReturnBoolean( hit );
+	idProgram::ReturnBoolean( hit );
 }
 
 /*
@@ -2990,12 +2990,12 @@ void idWeapon::Event_MeleeAttack( float damageScale ) {
 idWeapon::OnUsed
 ===============
 */
-bool idWeapon::OnUsed( arcNetBasePlayer* player, float distance ) {
+bool idWeapon::OnUsed( anBasePlayer* player, float distance ) {
 	if ( onUsedFunc == nullptr ) {
 		return false;
 	}
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	h1.Push( player->GetScriptObject() );
 	h1.Push( distance );
 	scriptObject->CallNonBlockingScriptEvent( onUsedFunc, h1 );
@@ -3008,12 +3008,12 @@ bool idWeapon::OnUsed( arcNetBasePlayer* player, float distance ) {
 idWeapon::OnActivate
 ===============
 */
-bool idWeapon::OnActivate( arcNetBasePlayer* player, float distance ) {
+bool idWeapon::OnActivate( anBasePlayer* player, float distance ) {
 	if ( onActivateFunc == nullptr ) {
 		return false;
 	}
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	h1.Push( player->GetScriptObject() );
 	h1.Push( distance );
 	scriptObject->CallNonBlockingScriptEvent( onActivateFunc, h1 );
@@ -3026,12 +3026,12 @@ bool idWeapon::OnActivate( arcNetBasePlayer* player, float distance ) {
 idWeapon::OnActivateHeld
 ===============
 */
-bool idWeapon::OnActivateHeld( arcNetBasePlayer* player, float distance ) {
+bool idWeapon::OnActivateHeld( anBasePlayer* player, float distance ) {
 	if ( onActivateFuncHeld == nullptr ) {
 		return false;
 	}
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	h1.Push( player->GetScriptObject() );
 	h1.Push( distance );
 	scriptObject->CallNonBlockingScriptEvent( onActivateFuncHeld, h1 );
@@ -3049,7 +3049,7 @@ int idWeapon::GetGrenadeFuseTime( void ) {
 		return -1;
 	}
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	scriptObject->CallNonBlockingScriptEvent( getGrenadeFuseStartFunc, h1 );
 	return anMath::Ftoi( gameLocal.program->GetReturnedFloat() );
 }
@@ -3064,7 +3064,7 @@ bool idWeapon::IsIronSightsEnabled( void ) {
 		return false;
 	}
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	scriptObject->CallNonBlockingScriptEvent( ironSightsEnabledFunc, h1 );
 	return gameLocal.program->GetReturnedBoolean();
 }
@@ -3079,7 +3079,7 @@ bool idWeapon::OnWeapNext() {
 		return false;
 	}
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	scriptObject->CallNonBlockingScriptEvent( onWeapNextFunc, h1 );
 
 	return gameLocal.program->GetReturnedBoolean();
@@ -3095,7 +3095,7 @@ bool idWeapon::OnWeapPrev() {
 		return false;
 	}
 
-	sdScriptHelper h1;
+	idScriptHelper h1;
 	scriptObject->CallNonBlockingScriptEvent( onWeapPrevFunc, h1 );
 
 	return gameLocal.program->GetReturnedBoolean();
@@ -3142,7 +3142,7 @@ idWeapon::Event_GetFov
 void idWeapon::Event_GetFov( void ) {
 	float fov = 0.f;
 	GetFov( fov );
-	sdProgram::ReturnFloat( fov );
+	idProgram::ReturnFloat( fov );
 }
 
 /*
@@ -3152,7 +3152,7 @@ idWeapon::Event_GetSpreadFraction
 */
 void idWeapon::Event_GetSpreadValue( void ) {
 	// this is only used when zoomed, so it doesn't matter that it won't be reflected on the crosshair icon
-	sdProgram::ReturnFloat( GetSpreadValue() * spreadModifier );
+	idProgram::ReturnFloat( GetSpreadValue() * spreadModifier );
 }
 
 /*
@@ -3247,17 +3247,17 @@ idWeapon::Event_GetWorldModel
 */
 void idWeapon::Event_GetWorldModel( int index ) {
 	if ( index < 0 || index >= worldModels.Num() ) {
-		sdProgram::ReturnObject( nullptr );
+		idProgram::ReturnObject( nullptr );
 		return;
 	}
 
 	if ( !worldModels[index].IsValid() ) {
 		gameLocal.Warning( "idWeapon::Event_GetWorldModel Invalid model index" );
-		sdProgram::ReturnObject( nullptr );
+		idProgram::ReturnObject( nullptr );
 		return;
 	}
 
-	sdProgram::ReturnObject( worldModels[index]->GetScriptObject() );
+	idProgram::ReturnObject( worldModels[index]->GetScriptObject() );
 }
 
 /*
@@ -3267,9 +3267,9 @@ idWeapon::Event_GetLastTracer
 */
 void idWeapon::Event_GetLastTracer( void ) {
 	if ( lastTracer.IsValid() ) {
-		sdProgram::ReturnHandle( lastTracer.GetSpawnId() );
+		idProgram::ReturnHandle( lastTracer.GetSpawnId() );
 	} else {
-		sdProgram::ReturnHandle( 0 );
+		idProgram::ReturnHandle( 0 );
 	}
 }
 
@@ -3278,7 +3278,7 @@ void idWeapon::Event_GetLastTracer( void ) {
 idWeapon::Event_SetupAnimClass
 ============
 */
-void idWeapon::Event_SetupAnimClass( const char* prefix ) {
+void idWeapon::Event_SetupAnimClass( const char *prefix ) {
 	SetupAnimClass( prefix );
 }
 
@@ -3287,9 +3287,9 @@ void idWeapon::Event_SetupAnimClass( const char* prefix ) {
 idWeapon::Event_HasWeaponAnim
 ============
 */
-void idWeapon::Event_HasWeaponAnim( const char* anim ) {
+void idWeapon::Event_HasWeaponAnim( const char *anim ) {
 	bool hasAnim = animator.HasAnim( anim );
-	sdProgram::ReturnBoolean( hasAnim );
+	idProgram::ReturnBoolean( hasAnim );
 }
 
 /*
@@ -3297,7 +3297,7 @@ void idWeapon::Event_HasWeaponAnim( const char* anim ) {
 idWeapon::Event_SetStatName
 ============
 */
-void idWeapon::Event_SetStatName( const char* statName ) {
+void idWeapon::Event_SetStatName( const char *statName ) {
 	LogTimeUsed();
 	timeStartedUsing = gameLocal.time;
 	SetupStats( statName );
@@ -3308,7 +3308,7 @@ void idWeapon::Event_SetStatName( const char* statName ) {
 idWeapon::SetupStats
 ============
 */
-void idWeapon::SetupStats( const char* statName ) {
+void idWeapon::SetupStats( const char *statName ) {
 	if ( *statName ) {
 		sdStatsTracker& tracker = sdGlobalStatsTracker::GetInstance();
 
@@ -3333,7 +3333,7 @@ void idWeapon::UpdatePlayerWeaponInfo() {
 		return;
 	}
 
-	botThreadData.GetGameWorldState()->clientInfo[ owner->entityNumber ].weapInfo.weapon = GetPlayerWeaponNum();
+	botThreadData.GetGameWorldState()->clientInfo[owner->entityNumber].weapInfo.weapon = GetPlayerWeaponNum();
 }
 
 /*

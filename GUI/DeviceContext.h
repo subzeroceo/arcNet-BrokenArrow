@@ -48,7 +48,7 @@ public:
 	bool				Initialized() { return initialized; }
 	void				EnableLocalization();
 
-	void				GetTransformInfo(anVec3& origin, anMat3& mat );
+	void				GetTransformInfo(anVec3 &origin, anMat3 &mat );
 
 	void				SetTransformInfo(const anVec3 &origin, const anMat3 &mat);
 	void				DrawMaterial(float x, float y, float w, float h, const anMaterial *mat, const anVec4 &color, float scalex = 1.0, float scaley = 1.0);
@@ -140,7 +140,7 @@ private:
 	const anMaterial	*whiteImage;
 	fontInfoEx_t		*activeFont;
 	fontInfo_t			*useFont;
-	anString				fontName;
+	anStr				fontName;
 	float				xScale;
 	float				yScale;
 
@@ -152,7 +152,7 @@ private:
 	anList<idRectangle>	clipRects;
 	
 	static anList<fontInfoEx_t> fonts;
-	anString fontLang;
+	anStr fontLang;
 
 	bool				enableClipping;
 

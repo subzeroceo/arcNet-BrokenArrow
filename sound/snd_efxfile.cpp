@@ -60,7 +60,7 @@ idEFXFile::~idEFXFile( void ) {
 idEFXFile::FindEffect
 ===============
 */
-bool idEFXFile::FindEffect( anString &name, idSoundEffect **effect, int *index ) {
+bool idEFXFile::FindEffect( anStr &name, idSoundEffect **effect, int *index ) {
 	int i;
 
 	for ( i = 0; i < effects.Num(); i++ ) {

@@ -19,7 +19,7 @@
 ===============================================================================
 */
 
-extern const arcEventDef EV_DelayedLaunch;
+extern const anEventDef EV_DelayedLaunch;
 
 class sdProjectileNetworkData : public sdEntityStateNetworkData {
 public:
@@ -28,8 +28,8 @@ public:
 
 	virtual void				MakeDefault( void );
 
-	virtual void				Write( anFile* file ) const;
-	virtual void				Read( anFile* file );
+	virtual void				Write( anFile *file ) const;
+	virtual void				Read( anFile *file );
 
 	sdEntityStateNetworkData*	physicsData;
 	sdScriptObjectNetworkData	scriptData;
@@ -42,8 +42,8 @@ public:
 
 	virtual void				MakeDefault( void );
 
-	virtual void				Write( anFile* file ) const;
-	virtual void				Read( anFile* file );
+	virtual void				Write( anFile *file ) const;
+	virtual void				Read( anFile *file );
 
 	sdEntityStateNetworkData*	physicsData;
 	sdScriptObjectNetworkData	scriptData;
@@ -58,7 +58,7 @@ public:
 	sdBindNetworkData			bindData;
 };
 
-class idProjectile : public arcEntity {
+class idProjectile : public anEntity {
 public :
 	CLASS_PROTOTYPE( idProjectile );
 
@@ -67,21 +67,21 @@ public :
 
 	void					Spawn( void );
 
-	virtual void			Create( arcEntity *owner, const anVec3 &start, const anVec3 &dir );
+	virtual void			Create( anEntity *owner, const anVec3 &start, const anVec3 &dir );
 	virtual void			Launch( const anVec3 &start, const anVec3 &dir, const anVec3 &pushVelocity, const float timeSinceFire = 0.0f, const float launchPower = 1.0f, const float dmgPower = 1.0f );
 
 	virtual void			InitPhysics( void );
-	virtual void			InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity );
-	void					LaunchDelayed( int delay, arcEntity* owner, const anVec3& org, const anVec3& dir, const anVec3& push );
+	virtual void			InitLaunchPhysics( float launchPower, const anVec3 &origin, const anMat3 &axes, const anVec3 &pushVelocity );
+	void					LaunchDelayed( int delay, anEntity *owner, const anVec3 &org, const anVec3 &dir, const anVec3 &push );
 
-	arcEntity *				GetOwner( void ) const;
-	virtual bool			IsOwner( arcEntity* other ) const;
+	anEntity *				GetOwner( void ) const;
+	virtual bool			IsOwner( anEntity *other ) const;
 
 	virtual void			Think( void );
 	virtual void					PostThink( void );
-	virtual anLinkList<arcEntity>*	GetPostThinkNode( void );
+	virtual anLinkList<anEntity>*	GetPostThinkNode( void );
 
-	virtual void			Killed( arcEntity *inflictor, arcEntity *attacker, int damage, const anVec3 &dir, int location, const sdDeclDamage* damageDecl );
+	virtual void			Killed( anEntity *inflictor, anEntity *attacker, int damage, const anVec3 &dir, int location, const sdDeclDamage* damageDecl );
 	virtual bool			Collide( const trace_t &collision, const anVec3 &velocity, int bodyId );
 
 	void					Thrust( void );
@@ -91,12 +91,12 @@ public :
 
 	virtual bool			DoRadiusPush( void ) const { return false; }
 
-	virtual bool			CanCollide( const arcEntity* other, int traceId ) const;
+	virtual bool			CanCollide( const anEntity *other, int traceId ) const;
 
-	virtual void			SetEnemy( arcEntity* _enemy );
-	virtual void			SetTarget( const anVec3& target ) { }
+	virtual void			SetEnemy( anEntity *_enemy );
+	virtual void			SetTarget( const anVec3 &target ) { }
 
-	bool					SetState( const sdProgram::sdFunction* newState );
+	bool					SetState( const idProgram::sdFunction* newState );
 	void					UpdateScript( void );
 
 	virtual void			SetHealth( int count ) { health = count; }
@@ -117,7 +117,7 @@ public :
 
 	virtual void			UpdateModelTransform( void );
 
-	void					AddOwner( arcEntity* ent ) { assert( ent ); owners.AddUnique( ent ); }
+	void					AddOwner( anEntity *ent ) { assert( ent ); owners.AddUnique( ent ); }
 
 	void					Event_Hide( void );
 	void					Event_Show( void );
@@ -126,12 +126,12 @@ public :
 	void					SetThrust( bool value );
 	void					SetLaunchTime( int time );
 
-	virtual void			OnTouch( arcEntity *other, const trace_t& trace );
+	virtual void			OnTouch( anEntity *other, const trace_t& trace );
 
 protected:
-	arcEntityPtr< arcEntity >				owner;
-	anList< arcEntityPtr< arcEntity > >	owners;
-	arcEntityPtr< arcEntity >				enemy;
+	anEntityPtr< anEntity >				owner;
+	anList< anEntityPtr< anEntity > >	owners;
+	anEntityPtr< anEntity >				enemy;
 
 	typedef struct projectileFlags_s {
 		bool				scriptHide					: 1;
@@ -162,28 +162,28 @@ protected:
 	sdTeamInfo*				team;
 
 	// state variables
-	sdProgramThread*					baseScriptThread;
-	const sdProgram::sdFunction*		scriptState;
-	const sdProgram::sdFunction*		scriptIdealState;
+	idProgramThread*					baseScriptThread;
+	const idProgram::sdFunction*		scriptState;
+	const idProgram::sdFunction*		scriptIdealState;
 
-	const sdProgram::sdFunction*		targetingFunction;
+	const idProgram::sdFunction*		targetingFunction;
 
-	const sdProgram::sdFunction*		onPostThink;
-	anLinkList< arcEntity >				postThinkEntNode;
+	const idProgram::sdFunction*		onPostThink;
+	anLinkList< anEntity >				postThinkEntNode;
 
 protected:
 
-	void					Event_SetState( const char* stateName );
+	void					Event_SetState( const char *stateName );
 	void					Event_Fizzle( void );
-	void					Event_DelayedLaunch( arcEntity* owner, const anVec3 &org, anVec3 const &dir, anVec3 const &push );
+	void					Event_DelayedLaunch( anEntity *owner, const anVec3 &org, anVec3 const &dir, anVec3 const &push );
 	void					Event_GetDamagePower( void );
 	void					Event_GetOwner( void );
-	void					Event_SetOwner( arcEntity* _owner );
+	void					Event_SetOwner( anEntity *_owner );
 	void					Event_GetLaunchTime( void );
-	void					Event_Launch( const anVec3& velocity );
-	void					Event_AddOwner( arcEntity* other );
-	void					Event_SetEnemy( arcEntity* other );
-	void					Event_IsOwner( arcEntity* other );
+	void					Event_Launch( const anVec3 &velocity );
+	void					Event_AddOwner( anEntity *other );
+	void					Event_SetEnemy( anEntity *other );
+	void					Event_IsOwner( anEntity *other );
 	void					Event_GetEnemy( void );
 };
 
@@ -204,11 +204,11 @@ public :
 
 	virtual void			Spawn( void );
 	virtual void			InitPhysics( void );
-	virtual void			InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity );
+	virtual void			InitLaunchPhysics( float launchPower, const anVec3 &origin, const anMat3 &axes, const anVec3 &pushVelocity );
 
 	virtual bool			StartSynced( void ) const { return true; }
 
-	virtual void			CheckWater( const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel );
+	virtual void			CheckWater( const anVec3 &waterBodyOrg, const anMat3 &waterBodyAxis, anCollisionModel* waterBodyModel );
 
 protected:
 	sdPhysics_SimpleRigidBody		physicsObj;
@@ -232,11 +232,11 @@ public :
 
 	virtual void			Spawn( void );
 	virtual void			InitPhysics( void );
-	virtual void			InitLaunchPhysics( float launchPower, const anVec3& origin, const anMat3& axes, const anVec3& pushVelocity );
+	virtual void			InitLaunchPhysics( float launchPower, const anVec3 &origin, const anMat3 &axes, const anVec3 &pushVelocity );
 
 	virtual bool			StartSynced( void ) const { return true; }
 
-	virtual void			CheckWater( const anVec3& waterBodyOrg, const anMat3& waterBodyAxis, arcCollisionModel* waterBodyModel );
+	virtual void			CheckWater( const anVec3 &waterBodyOrg, const anMat3 &waterBodyAxis, anCollisionModel* waterBodyModel );
 
 protected:
 	sdPhysics_Parabola		physicsObj;

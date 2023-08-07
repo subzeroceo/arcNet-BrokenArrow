@@ -42,7 +42,7 @@ anTraceModelCache::FindTraceModel
 */
 int anTraceModelCache::FindTraceModel( const anTraceModel& trm, bool includeBrushes ) {
 	int hashKey = GetTraceModelHashKey( trm );
-	for ( int i = hash.GetFirst( hashKey ); i != anHashIndex::NULL_INDEX; i = hash.GetNext( i ) ) {
+	for ( int i = hash.GetFirst( hashKey ); i != anHashIndex::nullptr_INDEX; i = hash.GetNext( i ) ) {
 		if ( cache[i]->trm != trm ) {
 			continue;
 		}
@@ -61,7 +61,7 @@ int anTraceModelCache::FindTraceModel( const anTraceModel& trm, bool includeBrus
 anTraceModelCache::PrecacheTraceModel
 ===============
 */
-int anTraceModelCache::PrecacheTraceModel( const anTraceModel &trm, const char* fileName ) {
+int anTraceModelCache::PrecacheTraceModel( const anTraceModel &trm, const char *fileName ) {
 	int index = AllocTraceModel( trm, false );
 	cache[index]->refCount--;
 	if ( fileName != nullptr ) {
@@ -79,7 +79,7 @@ int anTraceModelCache::AllocTraceModel( const anTraceModel &trm, bool includeBru
 	int i, hashKey, traceModelIndex;
 
 	hashKey = GetTraceModelHashKey( trm );
-	for ( i = hash.GetFirst( hashKey ); i != anHashIndex::NULL_INDEX; i = hash.GetNext( i ) ) {
+	for ( i = hash.GetFirst( hashKey ); i != anHashIndex::nullptr_INDEX; i = hash.GetNext( i ) ) {
 		if ( cache[i]->trm == trm ) {
 			cache[i]->refCount++;
 			return i;
@@ -343,7 +343,7 @@ void anTraceModelCache::SetupWaterPoints( trmCache_t &entry ) {
 anTraceModelCache::Write
 ============
 */
-void anTraceModelCache::Write( int index, anFile* fp ) {
+void anTraceModelCache::Write( int index, anFile *fp ) {
 	if ( index < 0 || index >= cache.Num() ) {
 		gameLocal.Warning( "anClipModel::Write: tried to write uncached trace model" );
 		return;
@@ -373,7 +373,7 @@ void anTraceModelCache::Write( int index, anFile* fp ) {
 anTraceModelCache::TrmMaterialForName
 ============
 */
-const anMaterial* anTraceModelCache::TrmMaterialForName( const char* name ) {
+const anMaterial* anTraceModelCache::TrmMaterialForName( const char *name ) {
 	if ( *name == '\0' ) {
 		return nullptr;
 	}
@@ -385,7 +385,7 @@ const anMaterial* anTraceModelCache::TrmMaterialForName( const char* name ) {
 anTraceModelCache::TrmNameForMaterial
 ============
 */
-const char* anTraceModelCache::TrmNameForMaterial( const anMaterial *material ) {
+const char *anTraceModelCache::TrmNameForMaterial( const anMaterial *material ) {
 	if ( material == nullptr ) {
 		return "";
 	}
@@ -397,8 +397,8 @@ const char* anTraceModelCache::TrmNameForMaterial( const anMaterial *material ) 
 anTraceModelCache::Read
 ============
 */
-void anTraceModelCache::Read( anTraceModel& trm, anFile* fp ) {
-	anString header;
+void anTraceModelCache::Read( anTraceModel& trm, anFile *fp ) {
+	anStr header;
 	fp->ReadString( header );
 
 	if ( header != TRM_HEADER ) {
@@ -408,7 +408,7 @@ void anTraceModelCache::Read( anTraceModel& trm, anFile* fp ) {
 		return;
 	}
 
-	anString version;
+	anStr version;
 	fp->ReadString( version );
 	if ( version != TRM_VERSION ) {
 		gameLocal.Warning( "anTraceModelCache::Read File has Wrong Version '%s'", fp->GetName() );
@@ -463,7 +463,7 @@ void anTraceModelCache::Read( anTraceModel& trm, anFile* fp ) {
 anTraceModelCache::FindTraceModel
 ============
 */
-int anTraceModelCache::FindTraceModel( const char* fileName, bool includeBrushes ) {
+int anTraceModelCache::FindTraceModel( const char *fileName, bool includeBrushes ) {
 	int index = FindFileEntry( fileName, includeBrushes );
 	if ( index == -1 ) {
 		return -1;
@@ -478,7 +478,7 @@ anTraceModelCache::AllocFileEntry
 ============
 */
 void anTraceModelCache::AllocFileEntry( const char *fileName, int traceModelIndex ) {
-	int hashKey = anString::Hash( fileName );
+	int hashKey = anStr::Hash( fileName );
 
 	int cacheIndex = fileCache.Num();
 	trmFileCache_t& cache = fileCache.Alloc();
@@ -493,10 +493,10 @@ void anTraceModelCache::AllocFileEntry( const char *fileName, int traceModelInde
 anTraceModelCache::FindFileEntry
 ============
 */
-int anTraceModelCache::FindFileEntry( const char* fileName, bool includeBrushes ) {
-	int hashKey = anString::Hash( fileName );
+int anTraceModelCache::FindFileEntry( const char *fileName, bool includeBrushes ) {
+	int hashKey = anStr::Hash( fileName );
 
-	for ( int i = nameHash.GetFirst( hashKey ); i != anHashIndex::NULL_INDEX; i = nameHash.GetNext( i ) ) {
+	for ( int i = nameHash.GetFirst( hashKey ); i != anHashIndex::nullptr_INDEX; i = nameHash.GetNext( i ) ) {
 		if ( fileCache[i].fileName.Cmp( fileName ) != 0 ) {
 			continue;
 		}

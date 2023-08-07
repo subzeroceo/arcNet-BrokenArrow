@@ -21,14 +21,14 @@ typedef struct {
 
 #define	MAX_SCREEN_BLOBS	8
 
-class arcNetBasePlayerView {
+class anBasePlayerView {
 public:
-						arcNetBasePlayerView();
+						anBasePlayerView();
 
-	void				Save( arcSaveGame *savefile ) const;
-	void				Restore( arcRestoreGame *savefile );
+	void				Save( anSaveGame *savefile ) const;
+	void				Restore( anRestoreGame *savefile );
 
-	void				SetPlayerEntity( class arcNetBasePlayer *playerEnt );
+	void				SetPlayerEntity( class anBasePlayer *playerEnt );
 
 	void				ClearEffects( void );
 
@@ -83,7 +83,7 @@ private:
 
 	anAngles			shakeAng;			// from the sound sources
 
-	arcNetBasePlayer *			player;
+	anBasePlayer *			player;
 	renderView_t		view;
 };
 

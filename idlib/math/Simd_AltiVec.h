@@ -4,7 +4,7 @@
 /*
 ===============================================================================
 
-	AltiVec implementation of arcSIMDProcessor
+	AltiVec implementation of anSIMDProcessor
 
 ===============================================================================
 */
@@ -77,7 +77,7 @@
 // address
 //#define DRAWVERT_PADDED
 
-class arcSIMD_AltiVec : public arcSIMD_Generic {
+class anSIMD_AltiVec : public anSIMD_Generic {
 #if defined(MACOS_X) && defined(__ppc__)
 public:
 
@@ -175,14 +175,14 @@ public:
 #endif
 #ifdef LIVE_VICARIOUSLY
 	virtual void VPCALL BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints );
-	virtual void VPCALL ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints );
-	virtual void VPCALL ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints );
+	virtual void VPCALL ConvertJointQuatsToJointMats( anJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints );
+	virtual void VPCALL ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const anJointMat *jointMats, const int numJoints );
 #endif
 
 #ifdef LIVE_VICARIOUSLY
-	virtual void VPCALL TransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
-	virtual void VPCALL UntransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
-	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, const int numWeights );
+	virtual void VPCALL TransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
+	virtual void VPCALL UntransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint );
+	virtual void VPCALL TransformVerts( anDrawVertex *verts, const int numVerts, const anJointMat *joints, const anVec4 *weights, const int *index, const int numWeights );
 #endif
 
 #ifdef ENABLE_CULL

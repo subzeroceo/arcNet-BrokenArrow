@@ -37,15 +37,15 @@ If you have questions concerning this license or the applicable additional terms
 ==============================================================================================
 */
 
-class idTestModel : public arcAnimatedEntity {
+class idTestModel : public anAnimatedEntity {
 public:
 	CLASS_PROTOTYPE( idTestModel );
 
 							idTestModel();
 							~idTestModel();
 
-	void					Save( arcSaveGame *savefile );
-	void					Restore( arcRestoreGame *savefile );
+	void					Save( anSaveGame *savefile );
+	void					Restore( anRestoreGame *savefile );
 
 	void					Spawn();
 
@@ -73,11 +73,11 @@ public:
 	static void 			TestModelPrevFrame_f( const anCommandArgs &args );
 
 private:
-	arcEntityPtr<arcEntity>	head;
-	arcAnimator				*headAnimator;
-	arcAnim					customAnim;
+	anEntityPtr<anEntity>	head;
+	anAnimator				*headAnimator;
+	anAnim					customAnim;
 	anPhysics_Parametric	physicsObj;
-	anString					animname;
+	anStr					animname;
 	int						anim;
 	int						headAnim;
 	int						mode;

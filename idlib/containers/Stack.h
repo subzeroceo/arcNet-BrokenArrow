@@ -9,12 +9,12 @@
 ===============================================================================
 */
 
-#define idStack( type, next )		arcStackTemplate<type, ( int )&(((type*)nullptr )->next)>
+#define anStack( type, next ) anStackTemplate<type, ( int )&( ( (type *)nullptr )->next )>
 
 template< class type, int nextOffset >
-class arcStackTemplate {
+class anStackTemplate {
 public:
-							arcStackTemplate( void );
+							anStackTemplate( void );
 
 	void					Add( type *element );
 	type *					Get( void );
@@ -24,16 +24,16 @@ private:
 	type *					bottom;
 };
 
-#define STACK_NEXT_PTR( element ) (*(type**)(((byte*)element)+nextOffset) )
+#define STACK_NEXT_PTR( element ) ( *(type **)( ( (byte *)element ) + nextOffset ) )
 
 template< class type, int nextOffset >
-arcStackTemplate<type,nextOffset>::arcStackTemplate( void ) {
+anStackTemplate<type,nextOffset>::anStackTemplate( void ) {
 	top = bottom = nullptr;
 }
 
 template< class type, int nextOffset >
-void arcStackTemplate<type,nextOffset>::Add( type *element ) {
-	STACK_NEXT_PTR(element) = top;
+void anStackTemplate<type,nextOffset>::Add( type *element ) {
+	STACK_NEXT_PTR( element ) = top;
 	top = element;
 	if ( !bottom ) {
 		bottom = element;
@@ -41,12 +41,12 @@ void arcStackTemplate<type,nextOffset>::Add( type *element ) {
 }
 
 template< class type, int nextOffset >
-type *arcStackTemplate<type,nextOffset>::Get( void ) {
+type *anStackTemplate<type,nextOffset>::Get( void ) {
 	type *element;
 
 	element = top;
 	if ( element ) {
-		top = STACK_NEXT_PTR(top);
+		top = STACK_NEXT_PTR( top );
 		if ( bottom == element ) {
 			bottom = nullptr;
 		}
@@ -55,4 +55,4 @@ type *arcStackTemplate<type,nextOffset>::Get( void ) {
 	return element;
 }
 
-#endif /* !__STACK_H__ */
+#endif // !__STACK_H__

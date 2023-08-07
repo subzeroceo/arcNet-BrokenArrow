@@ -1,11 +1,11 @@
 #include "Lib.h"
 #pragma hdrstop
 
-ARC_INLINE unsigned int FloatCRC( float f ) {
+inline unsigned int FloatCRC( float f ) {
 	return *(unsigned int *)&f;
 }
 
-ARC_INLINE unsigned int StringCRC( const char *str ) {
+inline unsigned int StringCRC( const char *str ) {
     unsigned int crc = 0;
 	const unsigned char *ptr = reinterpret_cast<const unsigned char*>( str );
 	for ( unsigned int i = 0; str[i]; i++ ) {

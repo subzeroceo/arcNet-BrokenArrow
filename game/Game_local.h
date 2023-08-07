@@ -26,17 +26,17 @@ void gameError( const char *fmt, ... );
 template< typename T, const int MAX >
 class sdSafeArray {
 public:
-	ARC_INLINE T& operator[] ( int index ) {
+	inline T& operator[] ( int index ) {
 		assert( index >= 0 && index < MAX );
 		return data[index];
 	}
 
-	ARC_INLINE const T& operator[] ( int index ) const {
+	inline const T& operator[] ( int index ) const {
 		assert( index >= 0 && index < MAX );
 		return data[index];
 	}
 
-	ARC_INLINE void Memset( int value ) {
+	inline void Memset( int value ) {
 		memset( data, value, sizeof( data ) );
 	}
 
@@ -75,10 +75,10 @@ private:
 
 class sdUIScopeParser {
 public:
-				sdUIScopeParser( const char* text );
+				sdUIScopeParser( const char *text );
 
 	bool		IsLastEntry( void ) const { return entryIndex == entries.Num(); }
-	const char* GetNextEntry( void ) { if ( entryIndex < entries.Num() ) { return entries[ entryIndex++ ]; } return nullptr; }
+	const char *GetNextEntry( void ) { if ( entryIndex < entries.Num() ) { return entries[ entryIndex++ ]; } return nullptr; }
 	void		Revert( void ) { entryIndex--; assert( entryIndex >= 0 ); }
 
 private:
@@ -88,13 +88,13 @@ private:
 };
 
 struct userInfo_t {
-	void					ToDict( anDict& info ) const;
-	void					FromDict( const anDict& info );
+	void					ToDict( anDict &info ) const;
+	void					FromDict( const anDict &info );
 
-	anString					name;
-	anString					baseName;
-	anString					rawName;
-	anString					cleanName;
+	anStr					name;
+	anStr					baseName;
+	anStr					rawName;
+	anStr					cleanName;
 	idWStr					wideName;
 	bool					showGun;
 	bool					ignoreExplosiveWeapons;
@@ -141,10 +141,10 @@ const int NUM_RENDER_PORTAL_BITS	= anMath::BitsForInteger( PS_BLOCK_ALL );
 const unsigned short DOF_VIEWWEAPON_VIEW_ID	= 0xFFFD;
 
 // classes used by idGameLocal
-class arcNetBasePlayerStart;
-class arcEntity;
+class anBasePlayerStart;
+class anEntity;
 class anActor;
-class arcNetBasePlayer;
+class anBasePlayer;
 class idCamera;
 class idWorldspawn;
 class idTestModel;
@@ -161,7 +161,7 @@ class sdVehiclePathGrid;
 class sdDeployMask;
 class sdDeployRequest;
 class sdDeployZone;
-class sdProgram;
+class idProgram;
 class sdKeyCommand;
 class sdBindContext;
 class sdPlayerStatEntry;
@@ -198,7 +198,7 @@ public:
 		PZF_CHOOSABLE		= BITT< 7 >::VALUE,
 	};
 
-							sdPlayZone( const anDict& info, const anBounds& bounds );
+							sdPlayZone( const anDict &info, const anBounds& bounds );
 							~sdPlayZone( void );
 
 	const anVec2&			GetSize( void ) const { return _size; }
@@ -207,7 +207,7 @@ public:
 	const sdDeployMaskInstance*	GetMask( qhandle_t handle ) const;
 	int						GetPriority( void ) const { return _priority; }
 	const char*				GetTarget( void ) const { return _target; }
-	sdVehiclePathGrid*		GetPath( const char* name ) const;
+	sdVehiclePathGrid*		GetPath( const char *name ) const;
 	const sdHeightMapInstance&	GetHeightMap( void ) const { return _heightMap; }
 
 	void					SaveMasks( void );
@@ -222,12 +222,12 @@ private:
 	anList< sdDeployMaskInstance >	_masks;
 	int						_flags;
 	int						_priority;
-	anString					_target;
+	anStr					_target;
 	const anMaterial*		_commandmapMaterial;
 	sdHeightMapInstance		_heightMap;
 	const sdDeclLocStr*		_title;
 
-	typedef anPair< anString, sdVehiclePathGrid* > playzonePath_t;
+	typedef anPair< anStr, sdVehiclePathGrid* > playzonePath_t;
 	anList< playzonePath_t >	_paths;
 };
 
@@ -263,16 +263,16 @@ enum radiusPushFlags_t {
 
 /*
 ============
-sdSpawnPoint
+idSpawnPoint
 ============
 */
-class sdSpawnPoint {
+class idSpawnPoint {
 public:
-									sdSpawnPoint( void ) { _lastUsedTime = 0; _relativePosition = true; _parachute = false; _inUse = false; }
+									idSpawnPoint( void ) { _lastUsedTime = 0; _relativePosition = true; _parachute = false; _inUse = false; }
 
 	void							Clear( void );
 
-	arcEntity*						GetOwner( void ) const;
+	anEntity*						GetOwner( void ) const;
 	const sdRequirementContainer&	GetRequirements( void ) const { return _requirements; }
 	const anVec3&					GetOffset( void ) const { return _offset; }
 	const anAngles&					GetAngles( void ) const { return _angles; }
@@ -281,8 +281,8 @@ public:
 	void							SetLastUsedTime( int lastTime ) const { _lastUsedTime = lastTime; }
 
 	sdRequirementContainer&			GetRequirements( void ) { return _requirements; }
-	void							SetOwner( arcEntity* owner );
-	void							SetPosition( const anVec3& offset, const anAngles& angles ) { _offset = offset; _angles = angles; }
+	void							SetOwner( anEntity *owner );
+	void							SetPosition( const anVec3 &offset, const anAngles& angles ) { _offset = offset; _angles = angles; }
 	void							SetRelativePositioning( bool value ) { _relativePosition = value; }
 
 	bool							GetParachute( void ) const { return _parachute; }
@@ -292,7 +292,7 @@ public:
 	bool							InUse( void ) const { return _inUse; }
 
 private:
-	arcEntityPtr< arcEntity >			_owner;
+	anEntityPtr< anEntity >			_owner;
 
 	anVec3							_offset;
 	anAngles						_angles;
@@ -331,21 +331,21 @@ public:
 										sdEntityCollection( void ) { }
 										~sdEntityCollection( void ) { }
 
-	void								SetName( const char* _name ) { name = _name; }
+	void								SetName( const char *_name ) { name = _name; }
 
-	void								Add( arcEntity* entity ) { mask.Set( entity->entityNumber ); list.Alloc() = entity; }
-	void								Remove( arcEntity* entity );
+	void								Add( anEntity *entity ) { mask.Set( entity->entityNumber ); list.Alloc() = entity; }
+	void								Remove( anEntity *entity );
 	int									Num( void ) const { return list.Num(); }
-	arcEntity*							operator[]( int index ) const { return list[index]; }
+	anEntity*							operator[]( int index ) const { return list[index]; }
 	const char*							GetName( void ) const { return name; }
-	bool								Contains( arcEntity* entity ) const { return Contains( entity->entityNumber ); }
+	bool								Contains( anEntity *entity ) const { return Contains( entity->entityNumber ); }
 	bool								Contains( int entityNumber ) const { return mask[ entityNumber ] != 0; }
 	void								Clear( void ) { mask.Clear(); list.SetNum( 0, false ); }
 
 private:
-	anString								name;
+	anStr								name;
 	sdBitField< MAX_GENTITIES >			mask;
-	anList< arcEntityPtr< arcEntity > >	list;
+	anList< anEntityPtr< anEntity > >	list;
 };
 
 
@@ -362,15 +362,15 @@ public:
 
 							sdEntityNetEvent( void );
 
-	void					Create( const arcEntity* _entity, int _event, bool _saveEvent, const anBitMsg* _msg );
+	void					Create( const anEntity *_entity, int _event, bool _saveEvent, const anBitMsg* _msg );
 	void					Create( const sdEntityNetEvent& other );
 
 	void					Read( const anBitMsg& msg );
 	void					Write( anBitMsg& msg ) const;
 	void					OutputParms( anBitMsg& msg ) const;
 
-	void					Write( anFile* file ) const;
-	void					Read( anFile* file );
+	void					Write( anFile *file ) const;
+	void					Read( anFile *file );
 
 	int						GetEntityNumber( void ) const { return ( spawnId & ( ( 1 << GENTITYNUM_BITS ) - 1 ) ); }
 	int						GetId( void ) const { return spawnId >> GENTITYNUM_BITS; }
@@ -438,7 +438,7 @@ sdEnvDefinition
 */
 struct sdEnvDefinition {
 	anVec3 origin;
-	anString name;
+	anStr name;
 	int size;
 };
 
@@ -452,21 +452,21 @@ public:
 public:
 							sdEntityDebugInfo( void );
 
-	void					OnCreate( arcEntity* self );
-	void					OnDestroy( arcEntity* self );
+	void					OnCreate( anEntity *self );
+	void					OnDestroy( anEntity *self );
 
 	void					PrintStatus( int index );
 
 	int						lastOperationTime;
 	operation_t				lastOperation;
 	idTypeInfo*				type;
-	anString					name;
+	anStr					name;
 };
 
 struct savedPlayerStat_t {
 	const sdDeclRank*		rank;
 	const sdTeamInfo*		team;
-	anString					name;
+	anStr					name;
 	float					value;
 	float					data[ MAX_CLIENTS ];
 };
@@ -488,14 +488,14 @@ struct persistentRank_t {
 };
 
 struct lifeStat_t {
-	anString					stat;
+	anStr					stat;
 	const sdDeclLocStr*		text;			// used for lists
 	const sdDeclLocStr*		textLong;		// used for in-game announcements
 	bool					isTimeBased;
 };
 
 struct quickChatMuteEntry_t {
-	anString					name;
+	anStr					name;
 };
 
 class idGameLocal : public idGame {
@@ -526,8 +526,8 @@ public:
 	// ]
 
 	// [
-	sdSafeArray< arcEntity*, MAX_GENTITIES > entities;// index to entities
-	int						spawnIds[ MAX_GENTITIES ];// for use in arcEntityPtr
+	sdSafeArray< anEntity*, MAX_GENTITIES > entities;// index to entities
+	int						spawnIds[ MAX_GENTITIES ];// for use in anEntityPtr
 	sdEntityDebugInfo		entityDebugInfo[ MAX_GENTITIES ]; // for debugging ( mainly network ) issues
 	// ]
 
@@ -535,13 +535,13 @@ public:
 	int						numEntities;			// current number <= MAX_GENTITIES
 	anHashIndex				entityHash;				// hash table to quickly find entities by name
 	idWorldspawn*			world;					// world entity
-	anLinkList< arcEntity >	spawnedEntities;		// all spawned entities
-	anLinkList< arcEntity >	networkedEntities;		// all entities that want to send/receive network traffic
-	anLinkList< arcEntity >	nonNetworkedEntities;	// all entities that dont send/receive network traffic
-	anLinkList< arcEntity >	activeEntities;			// all thinking entities (arcEntity::thinkFlags != 0)
-	anLinkList< arcEntity >	activeNetworkEntities;	// all thinking entities (arcEntity::thinkFlags != 0)
-	anLinkList< arcEntity >	postThinkEntities;		//
-	anList< arcEntityPtr< arcEntity > > changedEntities;
+	anLinkList< anEntity >	spawnedEntities;		// all spawned entities
+	anLinkList< anEntity >	networkedEntities;		// all entities that want to send/receive network traffic
+	anLinkList< anEntity >	nonNetworkedEntities;	// all entities that dont send/receive network traffic
+	anLinkList< anEntity >	activeEntities;			// all thinking entities (anEntity::thinkFlags != 0)
+	anLinkList< anEntity >	activeNetworkEntities;	// all thinking entities (anEntity::thinkFlags != 0)
+	anLinkList< anEntity >	postThinkEntities;		//
+	anList< anEntityPtr< anEntity > > changedEntities;
 	bool					sortPushers;			// true if active lists needs to be reordered to place pushers at the front
 	bool					sortTeamMasters;		// true if active lists needs to be reordered to place physics team masters before their slaves
 	bool					insideExecuteMapChange;
@@ -562,12 +562,12 @@ public:
 
 	sdPhysicsEvent::nodeType_t	physicsEvents;
 
-	arcNetBasePlayerView				playerView;			// handles damage kicks and effects
+	anBasePlayerView				playerView;			// handles damage kicks and effects
 
 	anRandom				random;					// random number generator used throughout the game
 
-	sdProgram*				program;				// currently loaded script and data space
-	sdProgramThread*	frameCommandThread;
+	idProgram*				program;				// currently loaded script and data space
+	idProgramThread*	frameCommandThread;
 
 	arcClip					clip;					// collision detection
 	idPush					push;					// geometric pushing
@@ -592,7 +592,7 @@ public:
 	idEditEntities *		editEntities;			// in game editing
 
 	typedef struct targetTimer_s {
-		anString				name;
+		anStr				name;
 		int					endTimes[ MAX_CLIENTS ];
 		int					serverHandle;
 	} targetTimer_t;
@@ -604,7 +604,7 @@ public:
 	anList< savedPlayerStat_t > endGameStats;
 	anList< lifeStat_t >		lifeStats;
 
-	int						framenum;
+	int						frameNum;
 	int						startTime;
 	int						previousTime;			// time in msec of last frame
 	int						time;					// in msec
@@ -632,8 +632,8 @@ public:
 													// discriminates between the RunFrame path and the ClientPrediction path
 													// NOTE: on a listen server, isClient is false
 	int						localClientNum;			// number of the local client. MP: -1 on a dedicated
-	anLinkList<arcEntity>	snapshotEntities;		// entities from the last snapshot
-	anLinkList<arcEntity>	snapshotVisbileEntities;// entities from the last snapshot that are actually visible
+	anLinkList<anEntity>	snapshotEntities;		// entities from the last snapshot
+	anLinkList<anEntity>	snapshotVisbileEntities;// entities from the last snapshot that are actually visible
 	int						realClientTime;			// real client time
 	bool					isNewFrame;				// true if this is a new game frame, not a rerun due to prediction
 	bool					predictionUpdateRequired;
@@ -662,7 +662,7 @@ public:
 
 	// fps unlock
 	anCVar					*com_unlockFPS;			// shortcut to the core cvar
-	anLinkList<arcEntity>	interpolateEntities;	// entities marked for interpolation
+	anLinkList<anEntity>	interpolateEntities;	// entities marked for interpolation
 
 	struct idUnlock {
 		bool					canUnlockFrames;		// tracks when extra view and angles updates are allowed
@@ -686,16 +686,16 @@ public:
 
 	const anList< guiScope_t >& GetUIScopes() const { return uiScopes; }
 
-	sdEntityCollection*		GetEntityCollection( const char* name, bool allowCreate = false );
+	sdEntityCollection*		GetEntityCollection( const char *name, bool allowCreate = false );
 	qhandle_t				GetPlayZoneMask( void ) const { return playzoneMask; }
 
 	void					LoadScript( void );
 
 	void					OnPreMapStart( void );
-	void					OnNewMapLoad( const char* mapName );
+	void					OnNewMapLoad( const char *mapName );
 	void					OnMapStart( void );
 
-	static void				CleanName( anString& name );
+	static void				CleanName( anStr& name );
 
 	bool					IsMultiPlayer( void );
 	bool					IsMetaDataValidForPlay( const metaDataContext_t& context, bool checkBrowserStatus );
@@ -703,15 +703,15 @@ public:
 	virtual void			Init( void );
 	virtual void			Shutdown( void );
 	virtual void			UserInfoChanged( int clientNum );
-	virtual bool			ValidateUserInfo( int clientNum, anDict& _userInfo );
+	virtual bool			ValidateUserInfo( int clientNum, anDict &_userInfo );
 	virtual void			SetServerInfo( const anDict &serverInfo );
 	void					ParseServerInfo( void );
 
 	void					LoadLifeStatsData( void );
 
-	void					PushChangedEntity( arcEntity* ent );
+	void					PushChangedEntity( anEntity *ent );
 
-	sdDeployZone*			TerritoryForPoint( const anVec3& point, sdTeamInfo* team = nullptr, bool requireTeam = false, bool requireActive = false ) const;
+	sdDeployZone*			TerritoryForPoint( const anVec3 &point, sdTeamInfo* team = nullptr, bool requireTeam = false, bool requireActive = false ) const;
 
 	void					MakeRules( void );
 	idTypeInfo*				GetRulesType( bool errorOnFail );
@@ -738,10 +738,10 @@ public:
 
 	virtual void			InitFromNewMap( const char *mapName, anRenderWorld *renderWorld, idSoundWorld *soundWorld, bool isServer, bool isClient, int randSeed, int startTime, bool isUserChange );
 	virtual void			MapShutdown( void );
-	void					CacheDictionaryMedia_r( const idTypeInfo* cls, const anDict& dict );
-	virtual void			CacheDictionaryMedia( const anDict& dict );
+	void					CacheDictionaryMedia_r( const idTypeInfo* cls, const anDict &dict );
+	virtual void			CacheDictionaryMedia( const anDict &dict );
 	void					DumpOggSounds();
-	void					GetShakeSounds( const anDict& dict );
+	void					GetShakeSounds( const anDict &dict );
 	virtual void			FinishBuild( void );
 	virtual void			SpawnPlayer( int clientNum, bool isBot );
 	virtual void			RunFrame( const usercmd_t* clientCmds, int elapsedTime );
@@ -753,21 +753,21 @@ public:
 	void					OnPausedChanged( void );
 	void					SendPauseInfo( const sdReliableMessageClientInfoBase& info );
 	int						ToGuiTime( int time ) { return time + timeOffset; }
-	void					GetPausedView( anVec3& origin, anMat3& axis );
+	void					GetPausedView( anVec3 &origin, anMat3 &axis );
 	void					UpdatePauseNoClip( usercmd_t& cmd );
 
-	void					SetActionCommand( const char* action );
+	void					SetActionCommand( const char *action );
 
 	sdBindContext*			GetDefaultBindContext( void ) { return defaultBindContext; }
 
-	arcNetBasePlayer*				GetActiveViewer( void ) const;
+	anBasePlayer*				GetActiveViewer( void ) const;
 
 	virtual void			OnServerShutdown( void );
 	virtual allowReply_t	ServerAllowClient( int numClients, int numBots, const clientNetworkAddress_t& address, const sdNetClientId& netClientId, const char *guid, const char *password, allowFailureReason_t& reason );
 
-	void					HandleGuiScriptMessage( arcNetBasePlayer* player, arcEntity* entity, const char* message );
-	void					HandleNetworkMessage( arcNetBasePlayer* player, arcEntity* entity, const char* message );
-	void					HandleNetworkEvent( arcEntity* entity, const char* message );
+	void					HandleGuiScriptMessage( anBasePlayer* player, anEntity *entity, const char *message );
+	void					HandleNetworkMessage( anBasePlayer* player, anEntity *entity, const char *message );
+	void					HandleNetworkEvent( anEntity *entity, const char *message );
 
 	virtual void			PacifierUpdate();
 
@@ -776,7 +776,7 @@ public:
 	void					ReadGameState( extNetworkStateMode_t mode, snapshot_t* snapshot, const anBitMsg& msg );
 	void					ResetGameState( extNetworkStateMode_t mode );
 
-	void					ParseClamp( angleClamp_t& clamp, const char* prefix, const anDict& dict );
+	void					ParseClamp( angleClamp_t &clamp, const char *prefix, const anDict &dict );
 
 	void					FreeGameState( sdGameState* state );
 	void					FreeNetworkState( sdEntityState* state );
@@ -802,9 +802,9 @@ public:
 	virtual void			ServerWriteSnapshot( int clientNum, int sequence, anBitMsg &msg, anBitMsg &ucmdmsg );
 	virtual bool			ServerApplySnapshot( int clientNum, int sequence );
 	virtual void			ServerProcessReliableMessage( int clientNum, const anBitMsg &msg );
-	void					EnsureAlloced( int entityNum, arcEntity* ent, const char* oldState, const char* currentState );
-	void					ClientWriteGameState( anFile* file );
-	void					ClientReadGameState( anFile* file );
+	void					EnsureAlloced( int entityNum, anEntity *ent, const char *oldState, const char *currentState );
+	void					ClientWriteGameState( anFile *file );
+	void					ClientReadGameState( anFile *file );
 	bool					SetupClientAoR( void );
 	virtual bool			ClientReadSnapshot( int sequence, const int gameFrame, const int gameTime, const int numDuplicatedUsercmds, const int aheadOfServer, const anBitMsg &msg, const anBitMsg &ucmdmsg );
 	virtual bool			ClientApplySnapshot( int sequence );
@@ -813,18 +813,18 @@ public:
 	virtual void			OnSnapshotHitch( int snapshotTime );
 	virtual void			OnClientDisconnected( void );
 	virtual void			ClientUpdateView( const usercmd_t &cmd, int timeLeft );
-	virtual void			WriteClientNetworkInfo( anFile* file );
-	virtual void			ReadClientNetworkInfo( anFile* file );
-	virtual void			WriteUserInfo( anBitMsg& msg, const anDict& info );
-	virtual void			ReadUserInfo( const anBitMsg& msg, anDict& info );
+	virtual void			WriteClientNetworkInfo( anFile *file );
+	virtual void			ReadClientNetworkInfo( anFile *file );
+	virtual void			WriteUserInfo( anBitMsg& msg, const anDict &info );
+	virtual void			ReadUserInfo( const anBitMsg& msg, anDict &info );
 
-	virtual void			CreateStatusResponseDict( const anDict& serverInfo, anDict& statusResponseDict );
+	virtual void			CreateStatusResponseDict( const anDict &serverInfo, anDict &statusResponseDict );
 	virtual int				GetProbeTime() const;
 	virtual byte			GetProbeState() const;
 	virtual void			WriteExtendedProbeData( anBitMsg& msg );
 
-	void					LogComplaint( arcNetBasePlayer* player, arcNetBasePlayer* attacker );
-	bool					DoSkyCheck( const anVec3& location ) const;
+	void					LogComplaint( anBasePlayer* player, anBasePlayer* attacker );
+	bool					DoSkyCheck( const anVec3 &location ) const;
 
 	virtual bool			HandleGuiEvent( const sdSysEvent* event );
 	virtual bool			TranslateGuiBind( const idKey& key, sdKeyCommand** cmd );
@@ -840,7 +840,7 @@ public:
 
 	virtual void			AddChatLine( const wchar_t* text );
 
-	virtual userMapChangeResult_e OnUserStartMap( const char* text, anString& reason, anString& mapName );
+	virtual userMapChangeResult_e OnUserStartMap( const char *text, anStr& reason, anStr& mapName );
 	virtual void			ArgCompletion_StartGame( const anCommandArgs& args, argCompletionCallback_t callback );
 
 	virtual void			RunFrame();
@@ -849,9 +849,9 @@ public:
 	virtual bool			HTTPRequest( const char *IP, const char *file, bool isGamePak );
 
 #ifdef ARC_DEBUG_MEMORY
-	virtual void			MemDump( const char* fileName ) { Mem_Dump( fileName ); }
+	virtual void			MemDump( const char *fileName ) { Mem_Dump( fileName ); }
 	virtual void			MemDumpCompressed( const char *fileName, memoryGroupType_t memGroup, memorySortType_t memSort, int sortCallStack, int numFrames, bool xlFriendly ) { Mem_DumpCompressed( fileName, memGroup, memSort, sortCallStack, numFrames, xlFriendly ); }
-	virtual void			MemDumpPerClass( const char* fileName ) { Mem_DumpPerClass( fileName ); }
+	virtual void			MemDumpPerClass( const char *fileName ) { Mem_DumpPerClass( fileName ); }
 #endif
 
 	virtual void				OnInputInit( void );
@@ -861,36 +861,36 @@ public:
 	virtual void				OnLanguageShutdown( void );
 
 	virtual sdKeyCommand*		Translate( const idKey& key );
-	virtual usercmdbuttonType_t	SetupBinding( const char* binding, int& action );
+	virtual usercmdbuttonType_t	SetupBinding( const char *binding, int& action );
 	virtual void				HandleLocalImpulse( int action, bool down );
 
 	virtual int					GetBotFPS( void ) const;
 	virtual botDebugInfo_t		GetBotDebugInfo( int clientNum );
-	virtual bool				GetRandomBotName( int clientNum, anString& botName );
+	virtual bool				GetRandomBotName( int clientNum, anStr& botName );
 
-	const char*					GetCookieString( const char* value );
-	int							GetCookieInt( const char* value );
+	const char*					GetCookieString( const char *value );
+	int							GetCookieInt( const char *value );
 
-	void						SetCookieString( const char* key, const char* value );
-	void						SetCookieInt( const char* key, int value );
+	void						SetCookieString( const char *key, const char *value );
+	void						SetCookieInt( const char *key, int value );
 
 	sdProficiencyTable&			GetProficiencyTable( int entityNumber ) { return proficiencyTables[ entityNumber ]; }
 	const sdProficiencyTable&	GetProficiencyTable( int entityNumber ) const { return proficiencyTables[ entityNumber ]; }
 
-	int						ClassCount( const sdDeclPlayerClass* pc, arcNetBasePlayer* skip, sdTeamInfo* team );
+	int						ClassCount( const anDeclPlayerClass* pc, anBasePlayer* skip, sdTeamInfo* team );
 
-	void					SetTargetTimer( qhandle_t timerHandle, arcNetBasePlayer* player, int t );
-	qhandle_t				AllocTargetTimer( const char* targetName );
+	void					SetTargetTimer( qhandle_t timerHandle, anBasePlayer* player, int t );
+	qhandle_t				AllocTargetTimer( const char *targetName );
 	qhandle_t				GetTargetTimerForServerHandle( qhandle_t timerHandle );
 	const char*				GetTargetTimerName( qhandle_t timerHandle ) { return targetTimers[ timerHandle ].name; }
-	int						GetTargetTimerValue( qhandle_t timerHandle, arcNetBasePlayer* player );
+	int						GetTargetTimerValue( qhandle_t timerHandle, anBasePlayer* player );
 	void					ClearTargetTimers();
 
 	void					StartRecordingDemo( void );
-	void					GetDemoName( anString& output );
+	void					GetDemoName( anStr& output );
 
-	sdDeployRequest*		GetDeploymentRequest( arcNetBasePlayer* player );
-	bool					RequestDeployment( arcNetBasePlayer* player, const sdDeclDeployableObject* object, const anVec3& position, float rotation, int delayMS );
+	sdDeployRequest*		GetDeploymentRequest( anBasePlayer* player );
+	bool					RequestDeployment( anBasePlayer* player, const sdDeclDeployableObject* object, const anVec3 &position, float rotation, int delayMS );
 	void					UpdateDeploymentRequests( void );
 	void					ClearDeployRequests( void );
 	void					ClearDeployRequest( int deployIndex );
@@ -916,22 +916,22 @@ public:
 
 
 	// bdube: added effect calls
-	const rvDeclEffect *			FindEffect( const char* name, bool makeDefault = true );
-	virtual rvClientEffect*			PlayEffect			( const int effectHandle, const anVec3& color, const anVec3& origin, const anMat3& axis, bool loop = false, const anVec3& endOrigin = vec3_origin, float distanceOffset = 0.0f );
-	rvClientEffect*					PlayEffect			( const anDict& args, const anVec3& color, const char* effectName, const char* materialType, const anVec3& origin, const anMat3& axis, bool loop = false, const anVec3& endOrigin = vec3_origin );
-	int								GetEffectHandle		( const anDict& args, const char* effectName, const char* materialType );
-	int								GetDecal			( const anDict& args, const char* decalName, const char* materialType );
+	const rvDeclEffect *			FindEffect( const char *name, bool makeDefault = true );
+	virtual rvClientEffect*			PlayEffect			( const int effectHandle, const anVec3 &color, const anVec3 &origin, const anMat3 &axis, bool loop = false, const anVec3 &endOrigin = vec3_origin, float distanceOffset = 0.0f );
+	rvClientEffect*					PlayEffect			( const anDict &args, const anVec3 &color, const char *effectName, const char *materialType, const anVec3 &origin, const anMat3 &axis, bool loop = false, const anVec3 &endOrigin = vec3_origin );
+	int								GetEffectHandle		( const anDict &args, const char *effectName, const char *materialType );
+	int								GetDecal			( const anDict &args, const char *decalName, const char *materialType );
 
 	// jscott: for effects system
 	virtual void					StartViewEffect( int type, float time, float scale );
-	virtual void					GetPlayerView( anVec3& origin, anMat3& axis, float& fovx );
+	virtual void					GetPlayerView( anVec3 &origin, anMat3 &axis, float& fovx );
 	virtual void					TracePoint( trace_t& trace, const anVec3 &source, const anVec3 &dest, int clipMask );
 	virtual void					Translation( trace_t &trace, const anVec3 &source, const anVec3 &dest, const anTraceModel &trm, int clipMask );
-	virtual rvClientMoveable*		SpawnClientMoveable( const char* name, int lifetime, const anVec3& origin, const anMat3& axis, const anVec3& velocity, const anVec3& angular_velocity, int effectSet = 0 );
+	virtual rvClientMoveable*		SpawnClientMoveable( const char *name, int lifetime, const anVec3 &origin, const anMat3 &axis, const anVec3 &velocity, const anVec3 &angular_velocity, int effectSet = 0 );
 
 
 
-	void							AddCheapDecal( const anDict& decalDict, arcEntity *attachTo, anVec3 &origin, anVec3 &normal, int jointIdx, int id, const char* decalName, const char* materialName );
+	void							AddCheapDecal( const anDict &decalDict, anEntity *attachTo, anVec3 &origin, anVec3 &normal, int jointIdx, int id, const char *decalName, const char *materialName );
 
 	virtual bool					ClientsOnSameTeam( int clientNum1, int clientNum2, voiceMode_t voiceMode );
 	virtual bool					AllowClientAudio( int clientNum1, voiceMode_t voiceMode );
@@ -946,14 +946,14 @@ public:
 
 	virtual bool					KeyMove( char forward, char right, char up, usercmd_t& cmd );
 	virtual void					ControllerMove( bool doGameCallback, const int numControllers, const int* controllerNumbers,
-													const float** controllerAxis, anVec3& viewAngles, usercmd_t& cmd );
-	virtual void					MouseMove( const anVec3& angleBase, anVec3& angleDelta );
+													const float** controllerAxis, anVec3 &viewAngles, usercmd_t& cmd );
+	virtual void					MouseMove( const anVec3 &angleBase, anVec3 &angleDelta );
 
 	virtual bool					GetSensitivity( float& scaleX, float& scaleY );
 
 	virtual void					UsercommandCallback( usercmd_t& cmd );
 
-	virtual void					ShowLevelLoadScreen( const char* mapName );
+	virtual void					ShowLevelLoadScreen( const char *mapName );
 	virtual void					HideLevelLoadScreen( void );
 
 	bool							NextMap( void );
@@ -962,77 +962,77 @@ public:
 
 	void							StartAutorecording();
 	void							StopAutorecording();
-	void							GetScoreboardShotName( anString& output );
+	void							GetScoreboardShotName( anStr& output );
 	void							OnEndGameScoreboardActive();
 
 	virtual void					DrawLCD( sdLogitechLCDSystem* lcd );
 
-	void							MutePlayerLocal( arcNetBasePlayer* player, int clientIndex );
-	void							UnMutePlayerLocal( arcNetBasePlayer* player, int clientIndex );
+	void							MutePlayerLocal( anBasePlayer* player, int clientIndex );
+	void							UnMutePlayerLocal( anBasePlayer* player, int clientIndex );
 	void							MutePlayerQuickChatLocal( int clientIndex );
 	void							UnMutePlayerQuickChatLocal( int clientIndex );
-	bool							IsClientQuickChatMuted( arcNetBasePlayer* player );
+	bool							IsClientQuickChatMuted( anBasePlayer* player );
 
-	void							OnUserNameChanged( arcNetBasePlayer* player, anString oldName, anString newName );
+	void							OnUserNameChanged( anBasePlayer* player, anStr oldName, anStr newName );
 
-	guiHandle_t						LoadUserInterface( const char* name, bool requireUnique, bool permanent, const char* theme = "default", sdHudModule* module = nullptr );
+	guiHandle_t						LoadUserInterface( const char *name, bool requireUnique, bool permanent, const char *theme = "default", sdHudModule* module = nullptr );
 	void							FreeUserInterface( guiHandle_t handle );
 	sdUserInterfaceLocal*			GetUserInterface( guiHandle_t handle );
-	sdUIWindow*						GetUserInterfaceWindow( const guiHandle_t handle, const char* windowName );
-	sdProperties::sdProperty*		GetUserInterfaceProperty( const guiHandle_t handle, const char* propertyName, sdProperties::ePropertyType expectedType );
-	sdProperties::sdProperty*		GetUserInterfaceProperty_r( const guiHandle_t handle, const char* propertyName, sdProperties::ePropertyType expectedType );
-	sdUserInterfaceScope*			GetGlobalUserInterfaceScope( sdUserInterfaceScope& scope, const char* name );
+	sdUIWindow*						GetUserInterfaceWindow( const guiHandle_t handle, const char *windowName );
+	sdProperties::sdProperty*		GetUserInterfaceProperty( const guiHandle_t handle, const char *propertyName, sdProperties::ePropertyType expectedType );
+	sdProperties::sdProperty*		GetUserInterfaceProperty_r( const guiHandle_t handle, const char *propertyName, sdProperties::ePropertyType expectedType );
+	sdUserInterfaceScope*			GetGlobalUserInterfaceScope( sdUserInterfaceScope& scope, const char *name );
 
 	sdUserInterfaceScope*			GetUserInterfaceScope( sdUserInterfaceScope& scope, anLexer* src );
 	sdUserInterfaceScope*			GetUserInterfaceScope( sdUserInterfaceScope& scope, sdUIScopeParser& src );
 
-	void							SetGUIInt( int handle, const char* name, int value );
-	void							SetGUIFloat( int handle, const char* name, float value );
-	void							SetGUIVec2( int handle, const char* name, const anVec2& value );
-	void							SetGUIVec3( int handle, const char* name, const anVec3& value );
-	void							SetGUIVec4( int handle, const char* name, const anVec4& value );
-	void							SetGUIString( int handle, const char* name, const char* value );
-	void							SetGUIWString( int handle, const char* name, const wchar_t* value );
-	void							SetGUITheme( guiHandle_t handle, const char* theme );
-	void							GUIPostNamedEvent( int handle, const char* window, const char* name );
-	float							GetGUIFloat( int handle, const char* name );
+	void							SetGUIInt( int handle, const char *name, int value );
+	void							SetGUIFloat( int handle, const char *name, float value );
+	void							SetGUIVec2( int handle, const char *name, const anVec2& value );
+	void							SetGUIVec3( int handle, const char *name, const anVec3 &value );
+	void							SetGUIVec4( int handle, const char *name, const anVec4& value );
+	void							SetGUIString( int handle, const char *name, const char *value );
+	void							SetGUIWString( int handle, const char *name, const wchar_t* value );
+	void							SetGUITheme( guiHandle_t handle, const char *theme );
+	void							GUIPostNamedEvent( int handle, const char *window, const char *name );
+	float							GetGUIFloat( int handle, const char *name );
 
 	void							ResetEntityStates( void );
 	void							SetupGameStateBase( clientNetworkInfo_t& networkInfo );
 	void							SetupEntityStateBase( clientNetworkInfo_t& networkInfo );
 
-	qhandle_t						GetDeploymentMask( const char* name );
+	qhandle_t						GetDeploymentMask( const char *name );
 
 	// playzone manipulation
-	void							CreatePlayZone( const anDict& info, const anBounds& bounds );
+	void							CreatePlayZone( const anDict &info, const anBounds& bounds );
 	void							SavePlayZoneMasks( void );
 	void							ClearPlayZones( void );
 	void							DebugDeploymentMask( qhandle_t handle );
-	void							SetPlayZoneAreaName( int index, const char* name );
+	void							SetPlayZoneAreaName( int index, const char *name );
 	void							LinkPlayZoneAreas( void );
 
 	const sdDeclTargetInfo*			GetMDFExportTargets( void ) { return declTargetInfoType[ "target_mdfExport" ]; }
 
 	// playzone querying
-	int								GetWorldPlayZoneIndex( const anVec3& point ) const;
-	const sdPlayZone*				GetPlayZone( const anVec3& point, int flags ) const;
+	int								GetWorldPlayZoneIndex( const anVec3 &point ) const;
+	const sdPlayZone*				GetPlayZone( const anVec3 &point, int flags ) const;
 	const sdPlayZone*				GetChoosablePlayZone( int id ) const;
 	int								GetIndexForChoosablePlayZone( const sdPlayZone* zone ) const;
 	int								GetNumChoosablePlayZones() const;
-	const sdPlayZone*				ClosestPlayZone( const anVec3& point, float& dist, int flags ) const;
+	const sdPlayZone*				ClosestPlayZone( const anVec3 &point, float& dist, int flags ) const;
 
-	sdSpawnPoint&					RegisterSpawnPoint( arcEntity* owner, const anVec3& offset, const anAngles& angles );
-	void							UnRegisterSpawnPoint( sdSpawnPoint* point );
+	idSpawnPoint&					RegisterSpawnPoint( anEntity *owner, const anVec3 &offset, const anAngles& angles );
+	void							UnRegisterSpawnPoint( idSpawnPoint* point );
 
-	void							RegisterTargetEntity( anLinkList< arcEntity >& node );
-	void							RegisterIconEntity( anLinkList< arcEntity >& node );
+	void							RegisterTargetEntity( anLinkList< anEntity >& node );
+	void							RegisterIconEntity( anLinkList< anEntity >& node );
 
-	sdEntityState*					AllocEntityState( networkStateMode_t mode, arcEntity* ent ) const;
+	sdEntityState*					AllocEntityState( networkStateMode_t mode, anEntity *ent ) const;
 	sdGameState*					AllocGameState( const sdNetworkStateObject& object ) const;
 
 	int								AllocEndGameStat( void );
-	void							SetEndGameStatValue( int index, arcNetBasePlayer* player, float value );
-	void							SetEndGameStatWinner( int statIndex, arcNetBasePlayer* player );
+	void							SetEndGameStatValue( int index, anBasePlayer* player, float value );
+	void							SetEndGameStatWinner( int statIndex, anBasePlayer* player );
 	void							SendEndGameStats( const sdReliableMessageClientInfoBase& target );
 	void							ClearEndGameStats( void );
 	void							OnEndGameStatsReceived( void );
@@ -1055,7 +1055,7 @@ public:
 	static void						NextMap_f( const anCommandArgs &args );
 	static void						StartDemos_f( const anCommandArgs &args );
 
-	arcNetBasePlayer*						GetClient( int i ) const { assert( i >= 0 && i < MAX_CLIENTS ); return reinterpret_cast< arcNetBasePlayer * >( entities[i] ); }
+	anBasePlayer*						GetClient( int i ) const { assert( i >= 0 && i < MAX_CLIENTS ); return reinterpret_cast< anBasePlayer *>( entities[i] ); }
 
 	anMapFile *						GetLevelMap( void );
 	const char *					GetMapName( void ) const;
@@ -1067,17 +1067,17 @@ public:
 	T* SpawnEntityTypeT( bool callPostMapSpawn, const anDict *args = nullptr ) {
 		return static_cast< T* >( SpawnEntityType( T::Type, callPostMapSpawn, args ) );
 	}
-	arcEntity *						SpawnEntityType( const idTypeInfo &classdef, bool callPostMapSpawn, const anDict *args = nullptr );
-	bool							SpawnEntityDef( const anDict &args, bool callPostMapSpawn, arcEntity **ent = nullptr, int entityNum = -1, int mapSpawnId = -1 );
+	anEntity *						SpawnEntityType( const idTypeInfo &classdef, bool callPostMapSpawn, const anDict *args = nullptr );
+	bool							SpawnEntityDef( const anDict &args, bool callPostMapSpawn, anEntity **ent = nullptr, int entityNum = -1, int mapSpawnId = -1 );
 	bool							SpawnClientEntityDef( const anDict &args, rvClientEntity **ent = nullptr, int mapSpawnId = -1 );
 
-	int								GetSpawnId( const arcEntity* ent ) const { return ent ? ( ( spawnIds[ ent->entityNumber ] << GENTITYNUM_BITS ) | ent->entityNumber ) : 0; }
+	int								GetSpawnId( const anEntity *ent ) const { return ent ? ( ( spawnIds[ ent->entityNumber ] << GENTITYNUM_BITS ) | ent->entityNumber ) : 0; }
 	int								SpawnNumForSpawnId( int spawnId ) const { return spawnId >> GENTITYNUM_BITS; }
 	int								EntityNumForSpawnId( int spawnId ) const { return spawnId & ( ( 1 << GENTITYNUM_BITS ) - 1 ); }
-	arcEntity*						EntityForSpawnId( int spawnId ) const { int entityNum = EntityNumForSpawnId( spawnId ); return ( ( spawnId >> GENTITYNUM_BITS ) == spawnIds[ entityNum ] ) ? entities[ entityNum ] : nullptr; }
+	anEntity*						EntityForSpawnId( int spawnId ) const { int entityNum = EntityNumForSpawnId( spawnId ); return ( ( spawnId >> GENTITYNUM_BITS ) == spawnIds[ entityNum ] ) ? entities[ entityNum ] : nullptr; }
 
-	void							CallSpawnFuncs( arcEntity* entity, const anDict *args );
-	arcEntity*						CreateEntityType( const idTypeInfo &classdef );
+	void							CallSpawnFuncs( anEntity *entity, const anDict *args );
+	anEntity*						CreateEntityType( const idTypeInfo &classdef );
 
 	const anDict*					FindEntityDefDict( const char *name, bool makeDefault = false ) const;
 
@@ -1086,41 +1086,41 @@ public:
 	void							UnregisterClientEntity( rvClientEntity *cent );
 
 
-	float							RangeSquare( const arcEntity* ent1, const arcEntity* ent2 ) const	{ return ( ent1->GetPhysics()->GetOrigin() - ent2->GetPhysics()->GetOrigin() ).LengthSqr(); }
+	float							RangeSquare( const anEntity *ent1, const anEntity *ent2 ) const	{ return ( ent1->GetPhysics()->GetOrigin() - ent2->GetPhysics()->GetOrigin() ).LengthSqr(); }
 
-	void							ToggleGodMode( arcNetBasePlayer* player ) const;
-	void							ToggleNoclipMode( arcNetBasePlayer* player ) const;
-	void							NetworkSpawn( const char* classname, arcNetBasePlayer* player );
+	void							ToggleGodMode( anBasePlayer* player ) const;
+	void							ToggleNoclipMode( anBasePlayer* player ) const;
+	void							NetworkSpawn( const char *classname, anBasePlayer* player );
 
-	void							RegisterEntity( arcEntity *ent );
-	void							UnregisterEntity( arcEntity *ent );
+	void							RegisterEntity( anEntity *ent );
+	void							UnregisterEntity( anEntity *ent );
 
-	void							ForceNetworkUpdate( arcEntity *ent );
+	void							ForceNetworkUpdate( anEntity *ent );
 
 	void							SetCamera( idCamera *cam );
 	idCamera *						GetCamera( void ) const;
 	void							CalcFov( float base_fov, float &fov_x, float &fov_y, const int width = SCREEN_WIDTH, const int height = SCREEN_HEIGHT, const float correctYAspect = 0.f ) const;
 
-	void							AddEntityToHash( const char *name, arcEntity *ent );
-	bool							RemoveEntityFromHash( const char *name, arcEntity *ent );
-	int								GetTargets( const anDict &args, anList< arcEntityPtr<arcEntity> > &list, const char *ref ) const;
+	void							AddEntityToHash( const char *name, anEntity *ent );
+	bool							RemoveEntityFromHash( const char *name, anEntity *ent );
+	int								GetTargets( const anDict &args, anList< anEntityPtr<anEntity> > &list, const char *ref ) const;
 
 									// returns the master entity of a trace.  for example, if the trace entity is the player's head, it will return the player.
-	arcEntity *						GetTraceEntity( const trace_t &trace ) const;
+	anEntity *						GetTraceEntity( const trace_t &trace ) const;
 
 	static void						ArgCompletion_EntityName( const anCommandArgs &args, void(*callback)( const char *s ) );
-	arcEntity*						FindTraceEntity( anVec3 start, anVec3 end, const idTypeInfo &c, const arcEntity *skip ) const;
-	arcEntity*						FindEntity( const char *name ) const;
-	arcEntity*						FindEntityByType( arcEntity *from, const anDeclEntityDef* type ) const;
-	arcEntity*						FindClassType( arcEntity *from, const idTypeInfo& type, arcEntity *ignore = nullptr ) const;
-	arcEntity*						FindClassTypeReverse( arcEntity *from, const idTypeInfo& type, arcEntity *ignore = nullptr ) const;
-	arcEntity*						FindClassTypeInRadius( const anVec3& org, float radius, arcEntity *from, const idTypeInfo& type, arcEntity *ignore = nullptr ) const;
+	anEntity*						FindTraceEntity( anVec3 start, anVec3 end, const idTypeInfo &c, const anEntity *skip ) const;
+	anEntity*						FindEntity( const char *name ) const;
+	anEntity*						FindEntityByType( anEntity *from, const anDeclEntityDef* type ) const;
+	anEntity*						FindClassType( anEntity *from, const idTypeInfo& type, anEntity *ignore = nullptr ) const;
+	anEntity*						FindClassTypeReverse( anEntity *from, const idTypeInfo& type, anEntity *ignore = nullptr ) const;
+	anEntity*						FindClassTypeInRadius( const anVec3 &org, float radius, anEntity *from, const idTypeInfo& type, anEntity *ignore = nullptr ) const;
 
 
-	template< typename T > T* FindClassTypeT( arcEntity *from ) const;
+	template< typename T > T* FindClassTypeT( anEntity *from ) const;
 
 	template< typename T > T* EntityFromRenderEntity( renderEntity_t* entity ) const {
-			arcEntity* other = EntityForSpawnId( entity->spawnID );
+			anEntity *other = EntityForSpawnId( entity->spawnID );
 			if ( other == nullptr || !other->IsType( T::Type ) ) {
 				return nullptr;
 			}
@@ -1128,32 +1128,32 @@ public:
 			return static_cast< T* >( other );
 	}
 
-	int								EntitiesWithinRadius( const anVec3 org, float radius, arcEntity **entityList, int maxCount ) const;
-	int								EntitiesOfClass( const char *name, anList< arcEntityPtr<arcEntity> > &list ) const;
+	int								EntitiesWithinRadius( const anVec3 org, float radius, anEntity **entityList, int maxCount ) const;
+	int								EntitiesOfClass( const char *name, anList< anEntityPtr<anEntity> > &list ) const;
 
-	void							KillBox( arcEntity *ent );
-	void							RadiusDamage( const anVec3 &origin, arcEntity *inflictor, arcEntity *attacker, arcEntity *ignoreDamage, arcEntity *ignorePush, const sdDeclDamage* damage, float dmgPower = 1.f, float radiusScale = 1.f );
-	void							RadiusPush( const anVec3 &origin, float radius, const sdDeclDamage* damageDecl, float pushScale, const arcEntity *inflictor, const arcEntity *ignore, int flags, bool saveEvent );
+	void							KillBox( anEntity *ent );
+	void							RadiusDamage( const anVec3 &origin, anEntity *inflictor, anEntity *attacker, anEntity *ignoreDamage, anEntity *ignorePush, const sdDeclDamage* damage, float dmgPower = 1.f, float radiusScale = 1.f );
+	void							RadiusPush( const anVec3 &origin, float radius, const sdDeclDamage* damageDecl, float pushScale, const anEntity *inflictor, const anEntity *ignore, int flags, bool saveEvent );
 	void							RadiusPushClipModel( const anVec3 &origin, const float push, const anClipModel *clipModel );
-	void							RadiusPushEntities( const anVec3& origin, float force, float radius );
+	void							RadiusPushEntities( const anVec3 &origin, float force, float radius );
 
 	void							ProjectDecal( const anVec3 &origin, const anVec3 &dir, float depth, bool parallel, float size, const char *material, float angle = 0 );
 	void							CreateProjectedDecal( const anVec3 &origin, const anVec3 &dir, float depth, bool parallel, float width, float height, float angle, const anVec4& color, anRenderModel* model );
 	void							ProjectDecal( const anVec3 &origin, const anVec3 &dir, float depth, bool parallel, float size, const anMaterial *material, float angle = 0 );
 
-	void							CallFrameCommand( const sdProgram::sdFunction* frameCommand );
-	void							CallFrameCommand( idScriptObject* object, const sdProgram::sdFunction* frameCommand );
+	void							CallFrameCommand( const idProgram::sdFunction* frameCommand );
+	void							CallFrameCommand( idScriptObject* object, const idProgram::sdFunction* frameCommand );
 	void							CallObjectFrameCommand( idScriptObject* object, const char *frameCommand, bool allowError );
 
 	const anVec3&					GetGravity( void ) const;
 	const anVec3&					GetWindVector( const anVec3 & origin ) const;
 
 	// added the following to assist licensees with merge issues
-	int								GetFrameNum() const { return framenum; }
+	int								GetFrameNum() const { return frameNum; }
 	int								GetTime() const { return time; }
 	int								GetMSec() const { return msec; }
 
-	arcNetBasePlayer*						GetClientByName( const char *name ) const;
+	anBasePlayer*						GetClientByName( const char *name ) const;
 
 	void							OnLocalViewPlayerChanged( void );
 	void							OnLocalViewPlayerTeamChanged( void );
@@ -1163,8 +1163,8 @@ public:
 	void							CheckTeamBalance( void );
 	sdTeamInfo*						FindUnbalancedTeam( sdTeamInfo** lowest );
 
-	arcNetBasePlayer*						GetLocalViewPlayer( void ) const;
-	arcNetBasePlayer*						GetLocalPlayer( void ) const {
+	anBasePlayer*						GetLocalViewPlayer( void ) const;
+	anBasePlayer*						GetLocalPlayer( void ) const {
 		if ( localClientNum == ASYNC_DEMO_CLIENT_INDEX ) {
 			return nullptr;
 		}
@@ -1176,22 +1176,22 @@ public:
 		return GetClient( localClientNum );
 	}
 
-	arcNetBasePlayer*						GetSnapshotPlayer( void ) const { return snapShotPlayer; }
-	void							SetSnapShotPlayer( arcNetBasePlayer* player );
-	arcNetBasePlayer*						GetSnapshotClient( void ) const { return snapShotClient; }
-	void							SetSnapShotClient( arcNetBasePlayer* client );
+	anBasePlayer*						GetSnapshotPlayer( void ) const { return snapShotPlayer; }
+	void							SetSnapShotPlayer( anBasePlayer* player );
+	anBasePlayer*						GetSnapshotClient( void ) const { return snapShotClient; }
+	void							SetSnapShotClient( anBasePlayer* client );
 	void							UpdatePlayerShadows( void );
 	const snapshot_t*				GetActiveSnapshot( void ) { return activeSnapshot; }
-	bool							IsLocalViewPlayer( const arcEntity* player ) const;
-	bool							IsLocalPlayer( const arcEntity* player ) const { return player->entityNumber == localClientNum; }
+	bool							IsLocalViewPlayer( const anEntity *player ) const;
+	bool							IsLocalPlayer( const anEntity *player ) const { return player->entityNumber == localClientNum; }
 
 	bool							DoClientSideStuff() const;
 
-	void							LogDamage( const char* message );
-	void							LogProficiency( const char* message );
-	void							LogNetwork( const char* message );
-	void							LogObjective( const char* message );
-	void							LogDebugText( const arcEntity* entFrom, const char* fmt, ... );
+	void							LogDamage( const char *message );
+	void							LogProficiency( const char *message );
+	void							LogNetwork( const char *message );
+	void							LogObjective( const char *message );
+	void							LogDebugText( const anEntity *entFrom, const char *fmt, ... );
 
 	int								GetNumEntityDefBits( void ) const { return numEntityDefBits; }
 	int								GetNumDamageDeclBits( void ) const { return numDamageDeclBits; }
@@ -1201,21 +1201,21 @@ public:
 	int								GetNumPlayerClassBits( void ) const { return numPlayerClassBits; }
 	int								GetNumClientIndexBits( void ) const { return numClientIndexBits; }
 
-	bool							SelectInitialSpawnPointForRepeaterClient( anVec3& outputOrg, anAngles& outputAngles );
-	const sdSpawnPoint*				SelectInitialSpawnPoint( arcNetBasePlayer *player, anVec3& outputOrg, anAngles& outputAngles );
+	bool							SelectInitialSpawnPointForRepeaterClient( anVec3 &outputOrg, anAngles& outputAngles );
+	const idSpawnPoint*				SelectInitialSpawnPoint( anBasePlayer *player, anVec3 &outputOrg, anAngles& outputAngles );
 	static int						SortSpawnsByAge( const void* a, const void* b );
 
 	void							SetPortalState( qhandle_t portal, int blockingBits );
 	void							SaveEntityNetworkEvent( const sdEntityNetEvent& oldEvent );
-	void							FreeEntityNetworkEvents( const arcEntity *ent, int event );
-	void							SendUnreliableEntityNetworkEvent( const arcEntity *ent, int event, const anBitMsg *msg );
+	void							FreeEntityNetworkEvents( const anEntity *ent, int event );
+	void							SendUnreliableEntityNetworkEvent( const anEntity *ent, int event, const anBitMsg *msg );
 	void							SendUnreliableEntityNetworkEvent( const sdUnreliableEntityNetEvent& oldEvent );
 	void							WriteUnreliableEntityNetEvents( int clientNum, bool repeaterClient, anBitMsg &msg );
 
 	void							SetGlobalMaterial( const anMaterial *mat );
 	const anMaterial *				GetGlobalMaterial();
 
-	void							ServerSendQuickChatMessage( arcNetBasePlayer* player, const sdDeclQuickChat* quickChat, arcNetBasePlayer* recipient = nullptr, arcEntity* target = nullptr );
+	void							ServerSendQuickChatMessage( anBasePlayer* player, const sdDeclQuickChat* quickChat, anBasePlayer* recipient = nullptr, anEntity *target = nullptr );
 
 #ifdef SD_SUPPORT_REPEATER
 	clientNetworkInfo_t&			GetRepeaterNetworkInfo( int clientNum ) {
@@ -1290,8 +1290,8 @@ public:
 	sdNetManager&					GetSDNet() { return sdnet; }
 #endif
 
-	anLinkList< arcEntity >*			GetTargetEntities( void ) { return targetEntities.NextNode(); }
-	anLinkList< arcEntity >*			GetIconEntities( void ) { return iconEntities.NextNode(); }
+	anLinkList< anEntity >*			GetTargetEntities( void ) { return targetEntities.NextNode(); }
+	anLinkList< anEntity >*			GetIconEntities( void ) { return iconEntities.NextNode(); }
 
 	//int								GetBytesNeededForMapLoad( void ) const { return bytesNeededForMapLoad; }
 
@@ -1299,9 +1299,9 @@ public:
 
 	void							PurgeAndLoadTeamAssets( const sdDeclStringMap* newPartialLoadTeamAssets );
 
-	const anList< arcEntity* >&		GetOcclusionQueryList() const { return occlusionQueryList; }
-	qhandle_t						AddEntityOcclusionQuery( arcEntity *ent );
-	void							FreeEntityOcclusionQuery( arcEntity *ent );
+	const anList< anEntity *>&		GetOcclusionQueryList() const { return occlusionQueryList; }
+	qhandle_t						AddEntityOcclusionQuery( anEntity *ent );
+	void							FreeEntityOcclusionQuery( anEntity *ent );
 
 	const idWStrList&				GetSystemNotifications() { return systemNotifications; }
 
@@ -1311,7 +1311,7 @@ public:
 		return va( "%d-%02d-%02d %02d:%02d:%02d", 1900 + time.tm_year, 1 + time.tm_mon, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec );
 	}
 
-	sdGameRules*					GetRulesInstance( const char* type ) const;
+	sdGameRules*					GetRulesInstance( const char *type ) const;
 
 	bool							IsDoingMapRestart( void ) const { return doingMapRestart; }
 
@@ -1320,12 +1320,12 @@ public:
 	void							EnablePlayerHeadModels( void );
 	void							DisablePlayerHeadModels( void );
 
-	void							StartSendingBanList( arcNetBasePlayer* player );
-	void							SendBanList( arcNetBasePlayer* player );
+	void							StartSendingBanList( anBasePlayer* player );
+	void							SendBanList( anBasePlayer* player );
 
 private:
-//	int								GetBytesNeededForMapLoad( const char* map );
-//	void							SetBytesNeededForMapLoad( const char* map, int numBytes );
+//	int								GetBytesNeededForMapLoad( const char *map );
+//	void							SetBytesNeededForMapLoad( const char *map, int numBytes );
 
 	void							UpdateLagometer( int aheadOfServer, int numDuplicatedUsercmds );
 
@@ -1334,7 +1334,7 @@ private:
 
 	void							UpdateCampaignStats( bool allowMedia );
 
-	static void						SurfaceTypePostParse( arcDecl* decl );
+	static void						SurfaceTypePostParse( anDecl* decl );
 
 	void							LoadMainMenuPartialMedia( bool blocking );
 	void							PurgeMainMenuPartialMedia();
@@ -1353,8 +1353,8 @@ private:
 
 	int														commandmapOverlayIndex;
 
-	anLinkList< arcEntity >									targetEntities;
-	anLinkList< arcEntity >									iconEntities;
+	anLinkList< anEntity >									targetEntities;
+	anLinkList< anEntity >									iconEntities;
 
 	int														numEntityDefBits;		// bits required to store an entity def number
 	int														numDamageDeclBits;		//
@@ -1365,7 +1365,7 @@ private:
 	int														numClientIndexBits;		// bits required for a clientnumber
 
 	bool													reloadingSameMap;		// only guaranteed to be correct during map load
-	anString													mapFileName;			// name of the map, empty string if no map loaded
+	anStr													mapFileName;			// name of the map, empty string if no map loaded
 	anMapFile *												mapFile;				// will be nullptr during the game unless in-game editing is used
 	bool													doingMapRestart;
 	bool													useSimpleEffect;
@@ -1379,7 +1379,7 @@ private:
 	anList< sdPlayZone* >									worldPlayZones;
 	anList< sdPlayZone* >									choosablePlayZones;
 
-	arcEntityPtr< idCamera >									camera;
+	anEntityPtr< idCamera >									camera;
 	const anMaterial *										globalMaterial;			// for overriding everything
 
 	anDict													spawnArgs;				// spawn args used during entity spawning  FIXME: shouldn't be necessary anymore
@@ -1409,11 +1409,11 @@ private:
 
 	sdNetworkStateObject_Generic< idGameLocal, &idGameLocal::ApplyRulesData, &idGameLocal::ReadRulesData, &idGameLocal::WriteRulesData, &idGameLocal::CheckRulesData, &idGameLocal::CreateRulesData > rulesStateObject;
 
-	anStaticList< sdSpawnPoint, 256 >						spawnSpots;
+	anStaticList< idSpawnPoint, 256 >						spawnSpots;
 	anList< anList< sdPlayZone* >* >						playZoneAreas;
 	anStringList												playZoneAreaNames;
-	arcNetBasePlayer*												snapShotPlayer;
-	arcNetBasePlayer*												snapShotClient;
+	anBasePlayer*												snapShotPlayer;
+	anBasePlayer*												snapShotClient;
 	snapshot_t*												activeSnapshot;
 
 	anFile*													damageLogFile;
@@ -1456,7 +1456,7 @@ private:
 	};
 	anStaticList< reservedSlot_t, MAX_CLIENTS >				reservedClientSlots;
 
-	anList< arcEntity* >										occlusionQueryList;
+	anList< anEntity *>										occlusionQueryList;
 
 	enum fireTeamListType_t {
 		FIRETEAMLIST_MYFIRETEAM = 0,
@@ -1475,7 +1475,7 @@ private:
 	// an instance that doesn't match the current local rules
 	// (eg, the server browser needs to query information from rules running on servers)
 
-	typedef sdHashMapGeneric< anString, sdGameRules*, sdHashCompareStrCmp > rulesMap_t;
+	typedef sdHashMapGeneric< anStr, sdGameRules*, sdHashCompareStrCmp > rulesMap_t;
 	rulesMap_t rulesCache;
 
 	bool					isAutorecording;
@@ -1509,7 +1509,7 @@ public:
 #endif /* !SD_DEMO_BUILD */
 
 	void					CreateClientStatsHash( int clientIndex );
-	void					GetGlobalStatsValueMax( int clientIndex, const char* name, sdPlayerStatEntry::statValue_t& value );
+	void					GetGlobalStatsValueMax( int clientIndex, const char *name, sdPlayerStatEntry::statValue_t& value );
 	void					SetupFixedClientRank( int clientIndex );
 
 	const sdDeclRank*		FindRankForLevel( int rankLevel );
@@ -1526,12 +1526,12 @@ public:
 	void					ClientShowSnapshot( int clientNum ) const;
 	void					ClientShowAOR( int clientNum ) const;
 
-	bool					ClientReceiveEvent( const anVec3& origin, int event, int time, const anBitMsg &msg );
+	bool					ClientReceiveEvent( const anVec3 &origin, int event, int time, const anBitMsg &msg );
 
 							// call after any change to serverInfo. Will update various quick-access flags
 	void					UpdateServerInfoFlags( void );
 
-	void					UpdateHudStats( arcNetBasePlayer* player );
+	void					UpdateHudStats( anBasePlayer* player );
 
 	static void				CreateDemoList( sdUIList* list );
 	static void				CreateModList( sdUIList* list );
@@ -1540,7 +1540,7 @@ public:
 	static void				CreateActiveTaskList( sdUIList* list );
 	static qhandle_t		GetTaskListHandle( int index );
 	static void				CreateVehiclePlayerList( sdUIList* list );
-	static void				CreateFireTeamListEntry( sdUIList* list, int index, arcNetBasePlayer* player );
+	static void				CreateFireTeamListEntry( sdUIList* list, int index, anBasePlayer* player );
 	static void				CreateFireTeamList( sdUIList* list );
 	static void				CreateInventoryList( sdUIList* list );
 	static void				CreateScoreboardList( sdUIList* list );
@@ -1569,53 +1569,53 @@ public:
 	static void				CreatePredictedUpgradesList( sdUIList* list );
 	static void				CreateUpgradesReviewList( sdUIList* list );
 
-	static void				GeneratePlayerListForTask( anString& playerList, const sdPlayerTask* task );
+	static void				GeneratePlayerListForTask( anStr& playerList, const sdPlayerTask* task );
 	static int				InsertTask( sdUIList* list, const sdPlayerTask* task, bool highlightActive );
 
 	static void				TestGUI_f( const anCommandArgs& args );
 	static void				ListClientEntities_f( const anCommandArgs& args );
 
-	void					SetupMapMetaData( const char* mapName );
+	void					SetupMapMetaData( const char *mapName );
 
 public:
-	arcDeclTypeTemplate< arcDeclModelDef,			&declModelDefInfo >			declModelDefType;
-	arcDeclTypeTemplate< arcDecl,					&declExportDefInfo >		declExportDefType;
-	arcDeclTypeTemplate< sdDeclVehicleScript,	&declVehicleScriptDefInfo >	declVehicleScriptDefType;
-	arcDeclTypeTemplate< sdDeclAmmoType,			&declAmmoTypeInfo >			declAmmoTypeType;
-	arcDeclTypeTemplate< sdDeclInvSlot,			&declInvSlotInfo >			declInvSlotType;
-	arcDeclTypeTemplate< sdDeclInvItemType,		&declInvItemTypeInfo >		declInvItemTypeType;
-	arcDeclTypeTemplate< sdDeclInvItem,			&declInvItemInfo >			declInvItemType;
-	arcDeclTypeTemplate< sdDeclItemPackage,		&declItemPackageInfo >		declItemPackageType;
-	arcDeclTypeTemplate< sdDeclStringMap,		&declStringMapInfo >		declStringMapType;
-	arcDeclTypeTemplate< sdDeclDamage,			&declDamageInfo >			declDamageType;
-	arcDeclTypeTemplate< sdDeclDamageFilter,		&declDamageFilterInfo >		declDamageFilterType;
-	arcDeclTypeTemplate< sdDeclCampaign,			&declCampaignInfo >			declCampaignType;
-	arcDeclTypeTemplate< sdDeclQuickChat,		&declQuickChatInfo >		declQuickChatType;
-	arcDeclTypeTemplate< sdDeclMapInfo,			&declMapInfoInfo >			declMapInfoType;
-	arcDeclTypeTemplate< sdDeclToolTip,			&declToolTipInfo >			declToolTipType;
-	arcDeclTypeTemplate< sdDeclTargetInfo,		&declTargetInfoInfo >		declTargetInfoType;
-	arcDeclTypeTemplate< sdDeclProficiencyType,	&declProficiencyTypeInfo >	declProficiencyTypeType;
-	arcDeclTypeTemplate< sdDeclProficiencyItem,	&declProficiencyItemInfo >	declProficiencyItemType;
-	arcDeclTypeTemplate< sdDeclRank,				&declRankInfo >				declRankType;
-	arcDeclTypeTemplate< sdDeclDeployableObject,	&declDeployableObjectInfo >	declDeployableObjectType;
-	arcDeclTypeTemplate< sdDeclDeployableZone,	&declDeployableZoneInfo >	declDeployableZoneType;
-	arcDeclTypeTemplate< sdDeclPlayerClass,		&declPlayerClassInfo >		declPlayerClassType;
-	arcDeclTypeTemplate< sdDeclKeyBinding,		&declKeyBindingInfo >		declKeyBindingType;
+	anDeclTypeTemplate< anDeclModelDef,			&declModelDefInfo >			declModelDefType;
+	anDeclTypeTemplate< anDecl,					&declExportDefInfo >		declExportDefType;
+	anDeclTypeTemplate< sdDeclVehicleScript,	&declVehicleScriptDefInfo >	declVehicleScriptDefType;
+	anDeclTypeTemplate< sdDeclAmmoType,			&declAmmoTypeInfo >			declAmmoTypeType;
+	anDeclTypeTemplate< sdDeclInvSlot,			&declInvSlotInfo >			declInvSlotType;
+	anDeclTypeTemplate< anInventoryItemType,		&declInvItemTypeInfo >		declInvItemTypeType;
+	anDeclTypeTemplate< anInventoryItem,			&declInvItemInfo >			declInvItemType;
+	anDeclTypeTemplate< sdDeclItemPackage,		&declItemPackageInfo >		declItemPackageType;
+	anDeclTypeTemplate< sdDeclStringMap,		&declStringMapInfo >		declStringMapType;
+	anDeclTypeTemplate< sdDeclDamage,			&declDamageInfo >			declDamageType;
+	anDeclTypeTemplate< sdDeclDamageFilter,		&declDamageFilterInfo >		declDamageFilterType;
+	anDeclTypeTemplate< sdDeclCampaign,			&declCampaignInfo >			declCampaignType;
+	anDeclTypeTemplate< sdDeclQuickChat,		&declQuickChatInfo >		declQuickChatType;
+	anDeclTypeTemplate< sdDeclMapInfo,			&declMapInfoInfo >			declMapInfoType;
+	anDeclTypeTemplate< sdDeclToolTip,			&declToolTipInfo >			declToolTipType;
+	anDeclTypeTemplate< sdDeclTargetInfo,		&declTargetInfoInfo >		declTargetInfoType;
+	anDeclTypeTemplate< sdDeclProficiencyType,	&declProficiencyTypeInfo >	declProficiencyTypeType;
+	anDeclTypeTemplate< sdDeclProficiencyItem,	&declProficiencyItemInfo >	declProficiencyItemType;
+	anDeclTypeTemplate< sdDeclRank,				&declRankInfo >				declRankType;
+	anDeclTypeTemplate< sdDeclDeployableObject,	&declDeployableObjectInfo >	declDeployableObjectType;
+	anDeclTypeTemplate< sdDeclDeployableZone,	&declDeployableZoneInfo >	declDeployableZoneType;
+	anDeclTypeTemplate< anDeclPlayerClass,		&declPlayerClassInfo >		declPlayerClassType;
+	anDeclTypeTemplate< sdDeclKeyBinding,		&declKeyBindingInfo >		declKeyBindingType;
 
-	arcDeclTypeTemplate< sdDeclGUI,				&declGUIInfo >				declGUIType;
-	arcDeclTypeTemplate< sdDeclGUITheme,			&declGUIThemeInfo >			declGUIThemeType;
+	anDeclTypeTemplate< sdDeclGUI,				&declGUIInfo >				declGUIType;
+	anDeclTypeTemplate< sdDeclGUITheme,			&declGUIThemeInfo >			declGUIThemeType;
 
-	arcDeclTypeTemplate< sdDeclStringMap,		&declTeamInfoInfo >			declTeamInfoType;
-	arcDeclTypeTemplate< sdDeclPlayerTask,		&declPlayerTaskInfo >		declPlayerTaskType;
-	arcDeclTypeTemplate< sdDeclRequirement,		&declRequirementInfo >		declRequirementType;
+	anDeclTypeTemplate< sdDeclStringMap,		&declTeamInfoInfo >			declTeamInfoType;
+	anDeclTypeTemplate< sdDeclPlayerTask,		&declPlayerTaskInfo >		declPlayerTaskType;
+	anDeclTypeTemplate< sdDeclRequirement,		&declRequirementInfo >		declRequirementType;
 
-	arcDeclTypeTemplate< sdDeclVehiclePath,		&declVehiclePathInfo >		declVehiclePathType;
-	arcDeclTypeTemplate< sdDeclRadialMenu,		&declRadialMenuInfo >		declRadialMenuType;
-	arcDeclTypeTemplate< sdDeclAOR,				&declAreaOfRelevanceInfo >	declAORType;
-	arcDeclTypeTemplate< sdDeclRating,			&declRatingInfo >			declRatingType;
+	anDeclTypeTemplate< sdDeclVehiclePath,		&declVehiclePathInfo >		declVehiclePathType;
+	anDeclTypeTemplate< sdDeclRadialMenu,		&declRadialMenuInfo >		declRadialMenuType;
+	anDeclTypeTemplate< sdDeclAOR,				&declAreaOfRelevanceInfo >	declAORType;
+	anDeclTypeTemplate< sdDeclRating,			&declRatingInfo >			declRatingType;
 
-	arcDeclTypeTemplate< sdDeclHeightMap,		&declHeightMapInfo >		declHeightMapType;
-	arcDeclTypeTemplate< sdDeclDeployMask,		&declDeployMaskInfo >		declDeployMaskType;
+	anDeclTypeTemplate< sdDeclHeightMap,		&declHeightMapInfo >		declHeightMapType;
+	anDeclTypeTemplate< sdDeclDeployMask,		&declDeployMaskInfo >		declDeployMaskType;
 
 	sdDeclWrapperTemplate< anDeclTable >		declTableType;
 	sdDeclWrapperTemplate< anMaterial >			declMaterialType;
@@ -1640,20 +1640,20 @@ public:
 idGameLocal::ProjectDecal
 ===============
 */
-ARC_INLINE void idGameLocal::ProjectDecal( const anVec3 &origin, const anVec3 &dir, float depth, bool parallel, float size, const char *material, float angle ) {
+inline void idGameLocal::ProjectDecal( const anVec3 &origin, const anVec3 &dir, float depth, bool parallel, float size, const char *material, float angle ) {
 	ProjectDecal( origin, dir, depth, parallel, size, declHolder.declMaterialType.LocalFind( material ), angle );
 }
 
 
 // bdube: inlines
-ARC_INLINE rvClientEffect* idGameLocal::PlayEffect ( const anDict& args, const anVec3& color, const char* effectName, const char* materialType, const anVec3& origin, const anMat3& axis, bool loop, const anVec3& endOrigin ) {
+inline rvClientEffect* idGameLocal::PlayEffect ( const anDict &args, const anVec3 &color, const char *effectName, const char *materialType, const anVec3 &origin, const anMat3 &axis, bool loop, const anVec3 &endOrigin ) {
 	return PlayEffect ( GetEffectHandle ( args, effectName, materialType ), color, origin, axis, loop, endOrigin );
 }
 
 //============================================================================
 
 extern idGameLocal			gameLocal;
-extern arcAnimManager		animationLib;
+extern anAnimManager		animationLib;
 
 //============================================================================
 
@@ -1841,8 +1841,8 @@ typedef enum {
 //============================================================================
 
 // TTimo: those can't be inlined in the class declaration, as gameLocal is not defined yet
-ARC_INLINE arcEntity*	sdSpawnPoint::GetOwner( void ) const { return _owner.GetEntity(); }
-ARC_INLINE void		sdSpawnPoint::SetOwner( arcEntity* owner ) { _owner = owner; }
+inline anEntity*	idSpawnPoint::GetOwner( void ) const { return _owner.GetEntity(); }
+inline void		idSpawnPoint::SetOwner( anEntity *owner ) { _owner = owner; }
 
 #include "EntityPtr.h"
 #include "client/ClientEntityInlines.h"

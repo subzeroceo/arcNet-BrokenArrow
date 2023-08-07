@@ -5,7 +5,7 @@
 
 //===============================================================
 //
-//	Generic implementation of arcSIMDProcessor
+//	Generic implementation of anSIMDProcessor
 //
 //===============================================================
 
@@ -24,21 +24,21 @@
 
 /*
 ============
-arcSIMD_Generic::GetName
+anSIMD_Generic::GetName
 ============
 */
-const char *arcSIMD_Generic::GetName( void ) const {
+const char *anSIMD_Generic::GetName( void ) const {
 	return "generic code";
 }
 
 /*
 ============
-arcSIMD_Generic::Add
+anSIMD_Generic::Add
 
   dst[i] = constant + src[i];
 ============
 */
-void VPCALL arcSIMD_Generic::Add( float *dst, const float constant, const float *src, const int count ) {
+void VPCALL anSIMD_Generic::Add( float *dst, const float constant, const float *src, const int count ) {
 #define OPER(X) dst[(X)] = src[(X)] + constant;
 	UNROLL4(OPER)
 #undef OPER
@@ -46,12 +46,12 @@ void VPCALL arcSIMD_Generic::Add( float *dst, const float constant, const float 
 
 /*
 ============
-arcSIMD_Generic::Add
+anSIMD_Generic::Add
 
   dst[i] = src0[i] + src1[i];
 ============
 */
-void VPCALL arcSIMD_Generic::Add( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_Generic::Add( float *dst, const float *src0, const float *src1, const int count ) {
 #define OPER(X) dst[(X)] = src0[(X)] + src1[(X)];
 	UNROLL4(OPER)
 #undef OPER
@@ -59,12 +59,12 @@ void VPCALL arcSIMD_Generic::Add( float *dst, const float *src0, const float *sr
 
 /*
 ============
-arcSIMD_Generic::Sub
+anSIMD_Generic::Sub
 
   dst[i] = constant - src[i];
 ============
 */
-void VPCALL arcSIMD_Generic::Sub( float *dst, const float constant, const float *src, const int count ) {
+void VPCALL anSIMD_Generic::Sub( float *dst, const float constant, const float *src, const int count ) {
 	double c = constant;
 #define OPER(X) dst[(X)] = c - src[(X)];
 	UNROLL4(OPER)
@@ -73,12 +73,12 @@ void VPCALL arcSIMD_Generic::Sub( float *dst, const float constant, const float 
 
 /*
 ============
-arcSIMD_Generic::Sub
+anSIMD_Generic::Sub
 
   dst[i] = src0[i] - src1[i];
 ============
 */
-void VPCALL arcSIMD_Generic::Sub( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_Generic::Sub( float *dst, const float *src0, const float *src1, const int count ) {
 #define OPER(X) dst[(X)] = src0[(X)] - src1[(X)];
 	UNROLL4(OPER)
 #undef OPER
@@ -86,7 +86,7 @@ void VPCALL arcSIMD_Generic::Sub( float *dst, const float *src0, const float *sr
 
 /*
 ============
-arcSIMD_Generic::Mul
+anSIMD_Generic::Mul
 
   dst[i] = constant * src[i];
 ============
@@ -100,12 +100,12 @@ void VPCALL Mul( float *dst, const float constant, const float *src0, const int 
 
 /*
 ============
-arcSIMD_Generic::Mul
+anSIMD_Generic::Mul
 
   dst[i] = src0[i] * src1[i];
 ============
 */
-void VPCALL arcSIMD_Generic::Mul( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_Generic::Mul( float *dst, const float *src0, const float *src1, const int count ) {
 #define OPER(X) (dst[(X)] = src0[(X)] * src1[(X)] )
 	UNROLL4(OPER)
 #undef OPER
@@ -113,12 +113,12 @@ void VPCALL arcSIMD_Generic::Mul( float *dst, const float *src0, const float *sr
 
 /*
 ============
-arcSIMD_Generic::Div
+anSIMD_Generic::Div
 
   dst[i] = constant / divisor[i];
 ============
 */
-void VPCALL arcSIMD_Generic::Div( float *dst, const float constant, const float *divisor, const int count ) {
+void VPCALL anSIMD_Generic::Div( float *dst, const float constant, const float *divisor, const int count ) {
 	double c = constant;
 #define OPER(X) (dst[(X)] = (c / divisor[(X)] ) )
 	UNROLL4(OPER)
@@ -127,12 +127,12 @@ void VPCALL arcSIMD_Generic::Div( float *dst, const float constant, const float 
 
 /*
 ============
-arcSIMD_Generic::Div
+anSIMD_Generic::Div
 
   dst[i] = src0[i] / src1[i];
 ============
 */
-void VPCALL arcSIMD_Generic::Div( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_Generic::Div( float *dst, const float *src0, const float *src1, const int count ) {
 #define OPER(X) (dst[(X)] = src0[(X)] / src1[(X)] )
 	UNROLL4(OPER)
 #undef OPER
@@ -140,12 +140,12 @@ void VPCALL arcSIMD_Generic::Div( float *dst, const float *src0, const float *sr
 
 /*
 ============
-arcSIMD_Generic::MulAdd
+anSIMD_Generic::MulAdd
 
   dst[i] += constant * src[i];
 ============
 */
-void VPCALL arcSIMD_Generic::MulAdd( float *dst, const float constant, const float *src, const int count ) {
+void VPCALL anSIMD_Generic::MulAdd( float *dst, const float constant, const float *src, const int count ) {
 	double c = constant;
 #define OPER(X) (dst[(X)] += c * src[(X)] )
 	UNROLL4(OPER)
@@ -154,12 +154,12 @@ void VPCALL arcSIMD_Generic::MulAdd( float *dst, const float constant, const flo
 
 /*
 ============
-arcSIMD_Generic::MulAdd
+anSIMD_Generic::MulAdd
 
   dst[i] += src0[i] * src1[i];
 ============
 */
-void VPCALL arcSIMD_Generic::MulAdd( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_Generic::MulAdd( float *dst, const float *src0, const float *src1, const int count ) {
 #define OPER(X) (dst[(X)] += src0[(X)] * src1[(X)] )
 	UNROLL4(OPER)
 #undef OPER
@@ -167,12 +167,12 @@ void VPCALL arcSIMD_Generic::MulAdd( float *dst, const float *src0, const float 
 
 /*
 ============
-arcSIMD_Generic::MulSub
+anSIMD_Generic::MulSub
 
   dst[i] -= constant * src[i];
 ============
 */
-void VPCALL arcSIMD_Generic::MulSub( float *dst, const float constant, const float *src, const int count ) {
+void VPCALL anSIMD_Generic::MulSub( float *dst, const float constant, const float *src, const int count ) {
 	double c = constant;
 #define OPER(X) (dst[(X)] -= c * src[(X)] )
 	UNROLL4(OPER)
@@ -181,12 +181,12 @@ void VPCALL arcSIMD_Generic::MulSub( float *dst, const float constant, const flo
 
 /*
 ============
-arcSIMD_Generic::MulSub
+anSIMD_Generic::MulSub
 
   dst[i] -= src0[i] * src1[i];
 ============
 */
-void VPCALL arcSIMD_Generic::MulSub( float *dst, const float *src0, const float *src1, const int count ) {
+void VPCALL anSIMD_Generic::MulSub( float *dst, const float *src0, const float *src1, const int count ) {
 #define OPER(X) (dst[(X)] -= src0[(X)] * src1[(X)] )
 	UNROLL4(OPER)
 #undef OPER
@@ -194,12 +194,12 @@ void VPCALL arcSIMD_Generic::MulSub( float *dst, const float *src0, const float 
 
 /*
 ============
-arcSIMD_Generic::Dot
+anSIMD_Generic::Dot
 
   dst[i] = constant * src[i];
 ============
 */
-void VPCALL arcSIMD_Generic::Dot( float *dst, const anVec3 &constant, const anVec3 *src, const int count ) {
+void VPCALL anSIMD_Generic::Dot( float *dst, const anVec3 &constant, const anVec3 *src, const int count ) {
 #define OPER(X) dst[(X)] = constant * src[(X)];
 	UNROLL1(OPER)
 #undef OPER
@@ -207,12 +207,12 @@ void VPCALL arcSIMD_Generic::Dot( float *dst, const anVec3 &constant, const anVe
 
 /*
 ============
-arcSIMD_Generic::Dot
+anSIMD_Generic::Dot
 
   dst[i] = constant * src[i].Normal() + src[i][3];
 ============
 */
-void VPCALL arcSIMD_Generic::Dot( float *dst, const anVec3 &constant, const anPlane *src, const int count ) {
+void VPCALL anSIMD_Generic::Dot( float *dst, const anVec3 &constant, const anPlane *src, const int count ) {
 #define OPER(X) dst[(X)] = constant * src[(X)].Normal() + src[(X)][3];
 	UNROLL1(OPER)
 #undef OPER
@@ -220,12 +220,12 @@ void VPCALL arcSIMD_Generic::Dot( float *dst, const anVec3 &constant, const anPl
 
 /*
 ============
-arcSIMD_Generic::Dot
+anSIMD_Generic::Dot
 
   dst[i] = constant * src[i].xyz;
 ============
 */
-void VPCALL arcSIMD_Generic::Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) {
+void VPCALL anSIMD_Generic::Dot( float *dst, const anVec3 &constant, const anDrawVertex *src, const int count ) {
 #define OPER(X) dst[(X)] = constant * src[(X)].xyz;
 	UNROLL1(OPER)
 #undef OPER
@@ -233,12 +233,12 @@ void VPCALL arcSIMD_Generic::Dot( float *dst, const anVec3 &constant, const anDr
 
 /*
 ============
-arcSIMD_Generic::Dot
+anSIMD_Generic::Dot
 
   dst[i] = constant.Normal() * src[i] + constant[3];
 ============
 */
-void VPCALL arcSIMD_Generic::Dot( float *dst, const anPlane &constant, const anVec3 *src, const int count ) {
+void VPCALL anSIMD_Generic::Dot( float *dst, const anPlane &constant, const anVec3 *src, const int count ) {
 #define OPER(X) dst[(X)] = constant.Normal() * src[(X)] + constant[3];
 	UNROLL1(OPER)
 #undef OPER
@@ -246,12 +246,12 @@ void VPCALL arcSIMD_Generic::Dot( float *dst, const anPlane &constant, const anV
 
 /*
 ============
-arcSIMD_Generic::Dot
+anSIMD_Generic::Dot
 
   dst[i] = constant.Normal() * src[i].Normal() + constant[3] * src[i][3];
 ============
 */
-void VPCALL arcSIMD_Generic::Dot( float *dst, const anPlane &constant, const anPlane *src, const int count ) {
+void VPCALL anSIMD_Generic::Dot( float *dst, const anPlane &constant, const anPlane *src, const int count ) {
 #define OPER(X) dst[(X)] = constant.Normal() * src[(X)].Normal() + constant[3] * src[(X)][3];
 	UNROLL1(OPER)
 #undef OPER
@@ -259,12 +259,12 @@ void VPCALL arcSIMD_Generic::Dot( float *dst, const anPlane &constant, const anP
 
 /*
 ============
-arcSIMD_Generic::Dot
+anSIMD_Generic::Dot
 
   dst[i] = constant.Normal() * src[i].xyz + constant[3];
 ============
 */
-void VPCALL arcSIMD_Generic::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
+void VPCALL anSIMD_Generic::Dot( float *dst, const anPlane &constant, const anDrawVertex *src, const int count ) {
 #define OPER(X) dst[(X)] = constant.Normal() * src[(X)].xyz + constant[3];
 	UNROLL1(OPER)
 #undef OPER
@@ -272,12 +272,12 @@ void VPCALL arcSIMD_Generic::Dot( float *dst, const anPlane &constant, const anD
 
 /*
 ============
-arcSIMD_Generic::Dot
+anSIMD_Generic::Dot
 
   dst[i] = src0[i] * src1[i];
 ============
 */
-void VPCALL arcSIMD_Generic::Dot( float *dst, const anVec3 *src0, const anVec3 *src1, const int count ) {
+void VPCALL anSIMD_Generic::Dot( float *dst, const anVec3 *src0, const anVec3 *src1, const int count ) {
 #define OPER(X) dst[(X)] = src0[(X)] * src1[(X)];
 	UNROLL1(OPER)
 #undef OPER
@@ -285,12 +285,12 @@ void VPCALL arcSIMD_Generic::Dot( float *dst, const anVec3 *src0, const anVec3 *
 
 /*
 ============
-arcSIMD_Generic::Dot
+anSIMD_Generic::Dot
 
   dot = src1[0] * src2[0] + src1[1] * src2[1] + src1[2] * src2[2] + ...
 ============
 */
-void VPCALL arcSIMD_Generic::Dot( float &dot, const float *src1, const float *src2, const int count ) {
+void VPCALL anSIMD_Generic::Dot( float &dot, const float *src1, const float *src2, const int count ) {
 #if 1
 	switch ( count ) {
 		case 0: {
@@ -356,12 +356,12 @@ void VPCALL arcSIMD_Generic::Dot( float &dot, const float *src1, const float *sr
 
 /*
 ============
-arcSIMD_Generic::CmpGT
+anSIMD_Generic::CmpGT
 
   dst[i] = src0[i] > constant;
 ============
 */
-void VPCALL arcSIMD_Generic::CmpGT( byte *dst, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::CmpGT( byte *dst, const float *src0, const float constant, const int count ) {
 #define OPER(X) dst[(X)] = src0[(X)] > constant;
 	UNROLL4(OPER)
 #undef OPER
@@ -369,12 +369,12 @@ void VPCALL arcSIMD_Generic::CmpGT( byte *dst, const float *src0, const float co
 
 /*
 ============
-arcSIMD_Generic::CmpGT
+anSIMD_Generic::CmpGT
 
   dst[i] |= ( src0[i] > constant ) << bitNum;
 ============
 */
-void VPCALL arcSIMD_Generic::CmpGT( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::CmpGT( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
 #define OPER(X) dst[(X)] |= ( src0[(X)] > constant ) << bitNum;
 	UNROLL4(OPER)
 #undef OPER
@@ -382,12 +382,12 @@ void VPCALL arcSIMD_Generic::CmpGT( byte *dst, const byte bitNum, const float *s
 
 /*
 ============
-arcSIMD_Generic::CmpGE
+anSIMD_Generic::CmpGE
 
   dst[i] = src0[i] >= constant;
 ============
 */
-void VPCALL arcSIMD_Generic::CmpGE( byte *dst, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::CmpGE( byte *dst, const float *src0, const float constant, const int count ) {
 #define OPER(X) dst[(X)] = src0[(X)] >= constant;
 	UNROLL4(OPER)
 #undef OPER
@@ -395,12 +395,12 @@ void VPCALL arcSIMD_Generic::CmpGE( byte *dst, const float *src0, const float co
 
 /*
 ============
-arcSIMD_Generic::CmpGE
+anSIMD_Generic::CmpGE
 
   dst[i] |= ( src0[i] >= constant ) << bitNum;
 ============
 */
-void VPCALL arcSIMD_Generic::CmpGE( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::CmpGE( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
 #define OPER(X) dst[(X)] |= ( src0[(X)] >= constant ) << bitNum;
 	UNROLL4(OPER)
 #undef OPER
@@ -408,12 +408,12 @@ void VPCALL arcSIMD_Generic::CmpGE( byte *dst, const byte bitNum, const float *s
 
 /*
 ============
-arcSIMD_Generic::CmpLT
+anSIMD_Generic::CmpLT
 
   dst[i] = src0[i] < constant;
 ============
 */
-void VPCALL arcSIMD_Generic::CmpLT( byte *dst, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::CmpLT( byte *dst, const float *src0, const float constant, const int count ) {
 #define OPER(X) dst[(X)] = src0[(X)] < constant;
 	UNROLL4(OPER)
 #undef OPER
@@ -421,12 +421,12 @@ void VPCALL arcSIMD_Generic::CmpLT( byte *dst, const float *src0, const float co
 
 /*
 ============
-arcSIMD_Generic::CmpLT
+anSIMD_Generic::CmpLT
 
   dst[i] |= ( src0[i] < constant ) << bitNum;
 ============
 */
-void VPCALL arcSIMD_Generic::CmpLT( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::CmpLT( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
 #define OPER(X) dst[(X)] |= ( src0[(X)] < constant ) << bitNum;
 	UNROLL4(OPER)
 #undef OPER
@@ -434,12 +434,12 @@ void VPCALL arcSIMD_Generic::CmpLT( byte *dst, const byte bitNum, const float *s
 
 /*
 ============
-arcSIMD_Generic::CmpLE
+anSIMD_Generic::CmpLE
 
   dst[i] = src0[i] <= constant;
 ============
 */
-void VPCALL arcSIMD_Generic::CmpLE( byte *dst, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::CmpLE( byte *dst, const float *src0, const float constant, const int count ) {
 #define OPER(X) dst[(X)] = src0[(X)] <= constant;
 	UNROLL4(OPER)
 #undef OPER
@@ -447,12 +447,12 @@ void VPCALL arcSIMD_Generic::CmpLE( byte *dst, const float *src0, const float co
 
 /*
 ============
-arcSIMD_Generic::CmpLE
+anSIMD_Generic::CmpLE
 
   dst[i] |= ( src0[i] <= constant ) << bitNum;
 ============
 */
-void VPCALL arcSIMD_Generic::CmpLE( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::CmpLE( byte *dst, const byte bitNum, const float *src0, const float constant, const int count ) {
 #define OPER(X) dst[(X)] |= ( src0[(X)] <= constant ) << bitNum;
 	UNROLL4(OPER)
 #undef OPER
@@ -460,10 +460,10 @@ void VPCALL arcSIMD_Generic::CmpLE( byte *dst, const byte bitNum, const float *s
 
 /*
 ============
-arcSIMD_Generic::MinMax
+anSIMD_Generic::MinMax
 ============
 */
-void VPCALL arcSIMD_Generic::MinMax( float &min, float &max, const float *src, const int count ) {
+void VPCALL anSIMD_Generic::MinMax( float &min, float &max, const float *src, const int count ) {
 	min = anMath::INFINITY; max = -anMath::INFINITY;
 #define OPER(X) if ( src[(X)] < min ) {min = src[(X)];} if ( src[(X)] > max ) {max = src[(X)];}
 	UNROLL1(OPER)
@@ -472,10 +472,10 @@ void VPCALL arcSIMD_Generic::MinMax( float &min, float &max, const float *src, c
 
 /*
 ============
-arcSIMD_Generic::MinMax
+anSIMD_Generic::MinMax
 ============
 */
-void VPCALL arcSIMD_Generic::MinMax( anVec2 &min, anVec2 &max, const anVec2 *src, const int count ) {
+void VPCALL anSIMD_Generic::MinMax( anVec2 &min, anVec2 &max, const anVec2 *src, const int count ) {
 	min[0] = min[1] = anMath::INFINITY; max[0] = max[1] = -anMath::INFINITY;
 #define OPER(X) const anVec2 &v = src[(X)]; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; }
 	UNROLL1(OPER)
@@ -484,10 +484,10 @@ void VPCALL arcSIMD_Generic::MinMax( anVec2 &min, anVec2 &max, const anVec2 *src
 
 /*
 ============
-arcSIMD_Generic::MinMax
+anSIMD_Generic::MinMax
 ============
 */
-void VPCALL arcSIMD_Generic::MinMax( anVec3 &min, anVec3 &max, const anVec3 *src, const int count ) {
+void VPCALL anSIMD_Generic::MinMax( anVec3 &min, anVec3 &max, const anVec3 *src, const int count ) {
 	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 #define OPER(X) const anVec3 &v = src[(X)]; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; } if ( v[2] < min[2] ) { min[2] = v[2]; } if ( v[2] > max[2] ) { max[2] = v[2]; }
 	UNROLL1(OPER)
@@ -496,10 +496,10 @@ void VPCALL arcSIMD_Generic::MinMax( anVec3 &min, anVec3 &max, const anVec3 *src
 
 /*
 ============
-arcSIMD_Generic::MinMax
+anSIMD_Generic::MinMax
 ============
 */
-void VPCALL arcSIMD_Generic::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) {
+void VPCALL anSIMD_Generic::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int count ) {
 	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 #define OPER(X) const anVec3 &v = src[(X)].xyz; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; } if ( v[2] < min[2] ) { min[2] = v[2]; } if ( v[2] > max[2] ) { max[2] = v[2]; }
 	UNROLL1(OPER)
@@ -508,10 +508,10 @@ void VPCALL arcSIMD_Generic::MinMax( anVec3 &min, anVec3 &max, const anDrawVerte
 
 /*
 ============
-arcSIMD_Generic::MinMax
+anSIMD_Generic::MinMax
 ============
 */
-void VPCALL arcSIMD_Generic::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
+void VPCALL anSIMD_Generic::MinMax( anVec3 &min, anVec3 &max, const anDrawVertex *src, const int *indexes, const int count ) {
 	min[0] = min[1] = min[2] = anMath::INFINITY; max[0] = max[1] = max[2] = -anMath::INFINITY;
 #define OPER(X) const anVec3 &v = src[indexes[(X)]].xyz; if ( v[0] < min[0] ) { min[0] = v[0]; } if ( v[0] > max[0] ) { max[0] = v[0]; } if ( v[1] < min[1] ) { min[1] = v[1]; } if ( v[1] > max[1] ) { max[1] = v[1]; } if ( v[2] < min[2] ) { min[2] = v[2]; } if ( v[2] > max[2] ) { max[2] = v[2]; }
 	UNROLL1(OPER)
@@ -520,10 +520,10 @@ void VPCALL arcSIMD_Generic::MinMax( anVec3 &min, anVec3 &max, const anDrawVerte
 
 /*
 ============
-arcSIMD_Generic::Clamp
+anSIMD_Generic::Clamp
 ============
 */
-void VPCALL arcSIMD_Generic::Clamp( float *dst, const float *src, const float min, const float max, const int count ) {
+void VPCALL anSIMD_Generic::Clamp( float *dst, const float *src, const float min, const float max, const int count ) {
 #define OPER(X) dst[(X)] = src[(X)] < min ? min : src[(X)] > max ? max : src[(X)];
 	UNROLL1(OPER)
 #undef OPER
@@ -531,10 +531,10 @@ void VPCALL arcSIMD_Generic::Clamp( float *dst, const float *src, const float mi
 
 /*
 ============
-arcSIMD_Generic::ClampMin
+anSIMD_Generic::ClampMin
 ============
 */
-void VPCALL arcSIMD_Generic::ClampMin( float *dst, const float *src, const float min, const int count ) {
+void VPCALL anSIMD_Generic::ClampMin( float *dst, const float *src, const float min, const int count ) {
 #define OPER(X) dst[(X)] = src[(X)] < min ? min : src[(X)];
 	UNROLL1(OPER)
 #undef OPER
@@ -542,10 +542,10 @@ void VPCALL arcSIMD_Generic::ClampMin( float *dst, const float *src, const float
 
 /*
 ============
-arcSIMD_Generic::ClampMax
+anSIMD_Generic::ClampMax
 ============
 */
-void VPCALL arcSIMD_Generic::ClampMax( float *dst, const float *src, const float max, const int count ) {
+void VPCALL anSIMD_Generic::ClampMax( float *dst, const float *src, const float max, const int count ) {
 #define OPER(X) dst[(X)] = src[(X)] > max ? max : src[(X)];
 	UNROLL1(OPER)
 #undef OPER
@@ -553,37 +553,37 @@ void VPCALL arcSIMD_Generic::ClampMax( float *dst, const float *src, const float
 
 /*
 ================
-arcSIMD_Generic::Memcpy
+anSIMD_Generic::Memcpy
 ================
 */
-void VPCALL arcSIMD_Generic::Memcpy( void *dst, const void *src, const int count ) {
+void VPCALL anSIMD_Generic::Memcpy( void *dst, const void *src, const int count ) {
 	memcpy( dst, src, count );
 }
 
 /*
 ================
-arcSIMD_Generic::Memset
+anSIMD_Generic::Memset
 ================
 */
-void VPCALL arcSIMD_Generic::Memset( void *dst, const int val, const int count ) {
+void VPCALL anSIMD_Generic::Memset( void *dst, const int val, const int count ) {
 	memset( dst, val, count );
 }
 
 /*
 ============
-arcSIMD_Generic::Zero16
+anSIMD_Generic::Zero16
 ============
 */
-void VPCALL arcSIMD_Generic::Zero16( float *dst, const int count ) {
+void VPCALL anSIMD_Generic::Zero16( float *dst, const int count ) {
 	memset( dst, 0, count * sizeof( float ) );
 }
 
 /*
 ============
-arcSIMD_Generic::Negate16
+anSIMD_Generic::Negate16
 ============
 */
-void VPCALL arcSIMD_Generic::Negate16( float *dst, const int count ) {
+void VPCALL anSIMD_Generic::Negate16( float *dst, const int count ) {
 	unsigned int *ptr = reinterpret_cast<unsigned int *>(dst);
 #define OPER(X) ptr[(X)] ^= ( 1 << 31 )		// IEEE 32 bits float sign bit
 	UNROLL1(OPER)
@@ -592,10 +592,10 @@ void VPCALL arcSIMD_Generic::Negate16( float *dst, const int count ) {
 
 /*
 ============
-arcSIMD_Generic::Copy16
+anSIMD_Generic::Copy16
 ============
 */
-void VPCALL arcSIMD_Generic::Copy16( float *dst, const float *src, const int count ) {
+void VPCALL anSIMD_Generic::Copy16( float *dst, const float *src, const int count ) {
 #define OPER(X) dst[(X)] = src[(X)]
 	UNROLL1(OPER)
 #undef OPER
@@ -603,10 +603,10 @@ void VPCALL arcSIMD_Generic::Copy16( float *dst, const float *src, const int cou
 
 /*
 ============
-arcSIMD_Generic::Add16
+anSIMD_Generic::Add16
 ============
 */
-void VPCALL arcSIMD_Generic::Add16( float *dst, const float *src1, const float *src2, const int count ) {
+void VPCALL anSIMD_Generic::Add16( float *dst, const float *src1, const float *src2, const int count ) {
 #define OPER(X) dst[(X)] = src1[(X)] + src2[(X)]
 	UNROLL1(OPER)
 #undef OPER
@@ -614,10 +614,10 @@ void VPCALL arcSIMD_Generic::Add16( float *dst, const float *src1, const float *
 
 /*
 ============
-arcSIMD_Generic::Sub16
+anSIMD_Generic::Sub16
 ============
 */
-void VPCALL arcSIMD_Generic::Sub16( float *dst, const float *src1, const float *src2, const int count ) {
+void VPCALL anSIMD_Generic::Sub16( float *dst, const float *src1, const float *src2, const int count ) {
 #define OPER(X) dst[(X)] = src1[(X)] - src2[(X)]
 	UNROLL1(OPER)
 #undef OPER
@@ -625,10 +625,10 @@ void VPCALL arcSIMD_Generic::Sub16( float *dst, const float *src1, const float *
 
 /*
 ============
-arcSIMD_Generic::Mul16
+anSIMD_Generic::Mul16
 ============
 */
-void VPCALL arcSIMD_Generic::Mul16( float *dst, const float *src1, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::Mul16( float *dst, const float *src1, const float constant, const int count ) {
 #define OPER(X) dst[(X)] = src1[(X)] * constant
 	UNROLL1(OPER)
 #undef OPER
@@ -636,10 +636,10 @@ void VPCALL arcSIMD_Generic::Mul16( float *dst, const float *src1, const float c
 
 /*
 ============
-arcSIMD_Generic::AddAssign16
+anSIMD_Generic::AddAssign16
 ============
 */
-void VPCALL arcSIMD_Generic::AddAssign16( float *dst, const float *src, const int count ) {
+void VPCALL anSIMD_Generic::AddAssign16( float *dst, const float *src, const int count ) {
 #define OPER(X) dst[(X)] += src[(X)]
 	UNROLL1(OPER)
 #undef OPER
@@ -647,10 +647,10 @@ void VPCALL arcSIMD_Generic::AddAssign16( float *dst, const float *src, const in
 
 /*
 ============
-arcSIMD_Generic::SubAssign16
+anSIMD_Generic::SubAssign16
 ============
 */
-void VPCALL arcSIMD_Generic::SubAssign16( float *dst, const float *src, const int count ) {
+void VPCALL anSIMD_Generic::SubAssign16( float *dst, const float *src, const int count ) {
 #define OPER(X) dst[(X)] -= src[(X)]
 	UNROLL1(OPER)
 #undef OPER
@@ -658,10 +658,10 @@ void VPCALL arcSIMD_Generic::SubAssign16( float *dst, const float *src, const in
 
 /*
 ============
-arcSIMD_Generic::MulAssign16
+anSIMD_Generic::MulAssign16
 ============
 */
-void VPCALL arcSIMD_Generic::MulAssign16( float *dst, const float constant, const int count ) {
+void VPCALL anSIMD_Generic::MulAssign16( float *dst, const float constant, const int count ) {
 #define OPER(X) dst[(X)] *= constant
 	UNROLL1(OPER)
 #undef OPER
@@ -669,10 +669,10 @@ void VPCALL arcSIMD_Generic::MulAssign16( float *dst, const float constant, cons
 
 /*
 ============
-arcSIMD_Generic::MatX_MultiplyVecX
+anSIMD_Generic::MatX_MultiplyVecX
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_MultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
+void VPCALL anSIMD_Generic::MatX_MultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 	int i, j, numRows;
 	const float *mPtr, *vPtr;
 	float *dstPtr;
@@ -740,10 +740,10 @@ void VPCALL arcSIMD_Generic::MatX_MultiplyVecX( anVecX &dst, const anMatX &mat, 
 
 /*
 ============
-arcSIMD_Generic::MatX_MultiplyAddVecX
+anSIMD_Generic::MatX_MultiplyAddVecX
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_MultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
+void VPCALL anSIMD_Generic::MatX_MultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 	int i, j, numRows;
 	const float *mPtr, *vPtr;
 	float *dstPtr;
@@ -811,10 +811,10 @@ void VPCALL arcSIMD_Generic::MatX_MultiplyAddVecX( anVecX &dst, const anMatX &ma
 
 /*
 ============
-arcSIMD_Generic::MatX_MultiplySubVecX
+anSIMD_Generic::MatX_MultiplySubVecX
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_MultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
+void VPCALL anSIMD_Generic::MatX_MultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 	int i, j, numRows;
 	const float *mPtr, *vPtr;
 	float *dstPtr;
@@ -882,10 +882,10 @@ void VPCALL arcSIMD_Generic::MatX_MultiplySubVecX( anVecX &dst, const anMatX &ma
 
 /*
 ============
-arcSIMD_Generic::MatX_TransposeMultiplyVecX
+anSIMD_Generic::MatX_TransposeMultiplyVecX
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_TransposeMultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
+void VPCALL anSIMD_Generic::MatX_TransposeMultiplyVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 	int i, j, numColumns;
 	const float *mPtr, *vPtr;
 	float *dstPtr;
@@ -954,10 +954,10 @@ void VPCALL arcSIMD_Generic::MatX_TransposeMultiplyVecX( anVecX &dst, const anMa
 
 /*
 ============
-arcSIMD_Generic::MatX_TransposeMultiplyAddVecX
+anSIMD_Generic::MatX_TransposeMultiplyAddVecX
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_TransposeMultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
+void VPCALL anSIMD_Generic::MatX_TransposeMultiplyAddVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 	int i, j, numColumns;
 	const float *mPtr, *vPtr;
 	float *dstPtr;
@@ -1026,10 +1026,10 @@ void VPCALL arcSIMD_Generic::MatX_TransposeMultiplyAddVecX( anVecX &dst, const a
 
 /*
 ============
-arcSIMD_Generic::MatX_TransposeMultiplySubVecX
+anSIMD_Generic::MatX_TransposeMultiplySubVecX
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_TransposeMultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
+void VPCALL anSIMD_Generic::MatX_TransposeMultiplySubVecX( anVecX &dst, const anMatX &mat, const anVecX &vec ) {
 	int i, numColumns;
 	const float *mPtr, *vPtr;
 	float *dstPtr;
@@ -1098,7 +1098,7 @@ void VPCALL arcSIMD_Generic::MatX_TransposeMultiplySubVecX( anVecX &dst, const a
 
 /*
 ============
-arcSIMD_Generic::MatX_MultiplyMatX
+anSIMD_Generic::MatX_MultiplyMatX
 
 	optimizes the following matrix multiplications:
 
@@ -1110,7 +1110,7 @@ arcSIMD_Generic::MatX_MultiplyMatX
 	with N in the range [1-6].
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_MultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 ) {
+void VPCALL anSIMD_Generic::MatX_MultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 ) {
 	int i, j, k, l, n;
 	float *dstPtr;
 	const float *m1Ptr, *m2Ptr;
@@ -1445,7 +1445,7 @@ void VPCALL arcSIMD_Generic::MatX_MultiplyMatX( anMatX &dst, const anMatX &m1, c
 
 /*
 ============
-arcSIMD_Generic::MatX_TransposeMultiplyMatX
+anSIMD_Generic::MatX_TransposeMultiplyMatX
 
 	optimizes the following tranpose matrix multiplications:
 
@@ -1455,7 +1455,7 @@ arcSIMD_Generic::MatX_TransposeMultiplyMatX
 	with N in the range [1-6].
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_TransposeMultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 ) {
+void VPCALL anSIMD_Generic::MatX_TransposeMultiplyMatX( anMatX &dst, const anMatX &m1, const anMatX &m2 ) {
 	int i, j, k, l, n;
 	float *dstPtr;
 	const float *m1Ptr, *m2Ptr;
@@ -1689,7 +1689,7 @@ void VPCALL arcSIMD_Generic::MatX_TransposeMultiplyMatX( anMatX &dst, const anMa
 
 /*
 ============
-arcSIMD_Generic::MatX_LowerTriangularSolve
+anSIMD_Generic::MatX_LowerTriangularSolve
 
   solves x in Lx = b for the n * n sub-matrix of L
   if skip > 0 the first skip elements of x are assumed to be valid already
@@ -1697,7 +1697,7 @@ arcSIMD_Generic::MatX_LowerTriangularSolve
   x == b is allowed
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip ) {
+void VPCALL anSIMD_Generic::MatX_LowerTriangularSolve( const anMatX &L, float *x, const float *b, const int n, int skip ) {
 #if 1
 
 	int nc;
@@ -1823,14 +1823,14 @@ void VPCALL arcSIMD_Generic::MatX_LowerTriangularSolve( const anMatX &L, float *
 
 /*
 ============
-arcSIMD_Generic::MatX_LowerTriangularSolveTranspose
+anSIMD_Generic::MatX_LowerTriangularSolveTranspose
 
   solves x in L'x = b for the n * n sub-matrix of L
   L has to be a lower triangular matrix with (implicit) ones on the diagonal
   x == b is allowed
 ============
 */
-void VPCALL arcSIMD_Generic::MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n ) {
+void VPCALL anSIMD_Generic::MatX_LowerTriangularSolveTranspose( const anMatX &L, float *x, const float *b, const int n ) {
 #if 1
 
 	int nc;
@@ -1969,13 +1969,13 @@ void VPCALL arcSIMD_Generic::MatX_LowerTriangularSolveTranspose( const anMatX &L
 
 /*
 ============
-arcSIMD_Generic::MatX_LDLTFactor
+anSIMD_Generic::MatX_LDLTFactor
 
   in-place factorization LDL' of the n * n sub-matrix of mat
   the reciprocal of the diagonal elements are stored in invDiag
 ============
 */
-bool VPCALL arcSIMD_Generic::MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, const int n ) {
+bool VPCALL anSIMD_Generic::MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, const int n ) {
 #if 1
 
 	int i, j, k, nc;
@@ -2207,10 +2207,10 @@ bool VPCALL arcSIMD_Generic::MatX_LDLTFactor( anMatX &mat, anVecX &invDiag, cons
 
 /*
 ============
-arcSIMD_Generic::BlendJoints
+anSIMD_Generic::BlendJoints
 ============
 */
-void VPCALL arcSIMD_Generic::BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) {
+void VPCALL anSIMD_Generic::BlendJoints( anJointQuat *joints, const anJointQuat *blendJoints, const float lerp, const int *index, const int numJoints ) {
 	int i;
 
 	for ( i = 0; i < numJoints; i++ ) {
@@ -2222,10 +2222,10 @@ void VPCALL arcSIMD_Generic::BlendJoints( anJointQuat *joints, const anJointQuat
 
 /*
 ============
-arcSIMD_Generic::ConvertJointQuatsToJointMats
+anSIMD_Generic::ConvertJointQuatsToJointMats
 ============
 */
-void VPCALL arcSIMD_Generic::ConvertJointQuatsToJointMats( arcJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) {
+void VPCALL anSIMD_Generic::ConvertJointQuatsToJointMats( anJointMat *jointMats, const anJointQuat *jointQuats, const int numJoints ) {
 	int i;
 
 	for ( i = 0; i < numJoints; i++ ) {
@@ -2236,10 +2236,10 @@ void VPCALL arcSIMD_Generic::ConvertJointQuatsToJointMats( arcJointMat *jointMat
 
 /*
 ============
-arcSIMD_Generic::ConvertJointMatsToJointQuats
+anSIMD_Generic::ConvertJointMatsToJointQuats
 ============
 */
-void VPCALL arcSIMD_Generic::ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const arcJointMat *jointMats, const int numJoints ) {
+void VPCALL anSIMD_Generic::ConvertJointMatsToJointQuats( anJointQuat *jointQuats, const anJointMat *jointMats, const int numJoints ) {
 	int i;
 
 	for ( i = 0; i < numJoints; i++ ) {
@@ -2249,10 +2249,10 @@ void VPCALL arcSIMD_Generic::ConvertJointMatsToJointQuats( anJointQuat *jointQua
 
 /*
 ============
-arcSIMD_Generic::TransformJoints
+anSIMD_Generic::TransformJoints
 ============
 */
-void VPCALL arcSIMD_Generic::TransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
+void VPCALL anSIMD_Generic::TransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
 	int i;
 
 	for ( i = firstJoint; i <= lastJoint; i++ ) {
@@ -2263,10 +2263,10 @@ void VPCALL arcSIMD_Generic::TransformJoints( arcJointMat *jointMats, const int 
 
 /*
 ============
-arcSIMD_Generic::UntransformJoints
+anSIMD_Generic::UntransformJoints
 ============
 */
-void VPCALL arcSIMD_Generic::UntransformJoints( arcJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
+void VPCALL anSIMD_Generic::UntransformJoints( anJointMat *jointMats, const int *parents, const int firstJoint, const int lastJoint ) {
 	int i;
 
 	for ( i = lastJoint; i >= firstJoint; i-- ) {
@@ -2277,20 +2277,20 @@ void VPCALL arcSIMD_Generic::UntransformJoints( arcJointMat *jointMats, const in
 
 /*
 ============
-arcSIMD_Generic::TransformVerts
+anSIMD_Generic::TransformVerts
 ============
 */
-void VPCALL arcSIMD_Generic::TransformVerts( anDrawVertex *verts, const int numVerts, const arcJointMat *joints, const anVec4 *weights, const int *index, int numWeights ) {
+void VPCALL anSIMD_Generic::TransformVerts( anDrawVertex *verts, const int numVerts, const anJointMat *joints, const anVec4 *weights, const int *index, int numWeights ) {
 	int i, j;
 	const byte *jointsPtr = (byte *)joints;
 
 	for ( j = i = 0; i < numVerts; i++ ) {
 		anVec3 v;
 
-		v = ( *(arcJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
+		v = ( *(anJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
 		while( index[j*2+1] == 0 ) {
 			j++;
-			v += ( *(arcJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
+			v += ( *(anJointMat *) ( jointsPtr + index[j*2+0] ) ) * weights[j];
 		}
 		j++;
 
@@ -2300,10 +2300,10 @@ void VPCALL arcSIMD_Generic::TransformVerts( anDrawVertex *verts, const int numV
 
 /*
 ============
-arcSIMD_Generic::TracePointCull
+anSIMD_Generic::TracePointCull
 ============
 */
-void VPCALL arcSIMD_Generic::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_Generic::TracePointCull( byte *cullBits, byte &totalOr, const float radius, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 	int i;
 	byte tOr;
 
@@ -2348,10 +2348,10 @@ void VPCALL arcSIMD_Generic::TracePointCull( byte *cullBits, byte &totalOr, cons
 
 /*
 ============
-arcSIMD_Generic::DecalPointCull
+anSIMD_Generic::DecalPointCull
 ============
 */
-void VPCALL arcSIMD_Generic::DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_Generic::DecalPointCull( byte *cullBits, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 	for ( int i = 0; i < numVerts; i++ ) {
 		const anVec3 &v = verts[i].xyz;
 
@@ -2375,10 +2375,10 @@ void VPCALL arcSIMD_Generic::DecalPointCull( byte *cullBits, const anPlane *plan
 
 /*
 ============
-arcSIMD_Generic::OverlayPointCull
+anSIMD_Generic::OverlayPointCull
 ============
 */
-void VPCALL arcSIMD_Generic::OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_Generic::OverlayPointCull( byte *cullBits, anVec2 *texCoords, const anPlane *planes, const anDrawVertex *verts, const int numVerts ) {
 	int i;
 
 	for ( i = 0; i < numVerts; i++ ) {
@@ -2402,12 +2402,12 @@ void VPCALL arcSIMD_Generic::OverlayPointCull( byte *cullBits, anVec2 *texCoords
 
 /*
 ============
-arcSIMD_Generic::DeriveTriPlanes
+anSIMD_Generic::DeriveTriPlanes
 
 	Derives a plane equation for each triangle.
 ============
 */
-void VPCALL arcSIMD_Generic::DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL anSIMD_Generic::DeriveTriPlanes( anPlane *planes, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 	for ( int i = 0; i < numIndexes; i += 3 ) {
 		const anDrawVertex *a, *b, *c;
 		float d0[3], d1[3], f;
@@ -2443,7 +2443,7 @@ void VPCALL arcSIMD_Generic::DeriveTriPlanes( anPlane *planes, const anDrawVerte
 
 /*
 ============
-arcSIMD_Generic::DeriveTangents
+anSIMD_Generic::DeriveTangents
 
 	Derives the normal and orthogonal tangent vectors for the triangle vertices.
 	For each vertex the normal and tangent vectors are derived from all triangles
@@ -2451,7 +2451,7 @@ arcSIMD_Generic::DeriveTangents
 	In the process the triangle planes are calculated as well.
 ============
 */
-void VPCALL arcSIMD_Generic::DeriveTangents( anPlane *planes, anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL anSIMD_Generic::DeriveTangents( anPlane *planes, anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 	int i;
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
@@ -2564,7 +2564,7 @@ void VPCALL arcSIMD_Generic::DeriveTangents( anPlane *planes, anDrawVertex *vert
 
 /*
 ============
-arcSIMD_Generic::DeriveUnsmoothedTangents
+anSIMD_Generic::DeriveUnsmoothedTangents
 
 	Derives the normal and orthogonal tangent vectors for the triangle vertices.
 	For each vertex the normal and tangent vectors are derived from a single dominant triangle.
@@ -2572,7 +2572,7 @@ arcSIMD_Generic::DeriveUnsmoothedTangents
 */
 #define DERIVE_UNSMOOTHED_BITANGENT
 
-void VPCALL arcSIMD_Generic::DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) {
+void VPCALL anSIMD_Generic::DeriveUnsmoothedTangents( anDrawVertex *verts, const dominantTri_s *dominantTris, const int numVerts ) {
 	int i;
 
 	for ( i = 0; i < numVerts; i++ ) {
@@ -2640,13 +2640,13 @@ void VPCALL arcSIMD_Generic::DeriveUnsmoothedTangents( anDrawVertex *verts, cons
 
 /*
 ============
-arcSIMD_Generic::NormalizeTangents
+anSIMD_Generic::NormalizeTangents
 
 	Normalizes each vertex normal and projects and normalizes the
 	tangent vectors onto the plane orthogonal to the vertex normal.
 ============
 */
-void VPCALL arcSIMD_Generic::NormalizeTangents( anDrawVertex *verts, const int numVerts ) {
+void VPCALL anSIMD_Generic::NormalizeTangents( anDrawVertex *verts, const int numVerts ) {
 	for ( int i = 0; i < numVerts; i++ ) {
 		anVec3 &v = verts[i].normal;
 		float f;
@@ -2666,14 +2666,14 @@ void VPCALL arcSIMD_Generic::NormalizeTangents( anDrawVertex *verts, const int n
 
 /*
 ============
-arcSIMD_Generic::CreateTextureSpaceLightVectors
+anSIMD_Generic::CreateTextureSpaceLightVectors
 
 	Calculates light vectors in texture space for the given triangle vertices.
 	For each vertex the direction towards the light origin is projected onto texture space.
 	The light vectors are only calculated for the vertices referenced by the indexes.
 ============
 */
-void VPCALL arcSIMD_Generic::CreateTextureSpaceLightVectors( anVec3 *lightVectors, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL anSIMD_Generic::CreateTextureSpaceLightVectors( anVec3 *lightVectors, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
 	memset( used, 0, numVerts * sizeof( used[0] ) );
@@ -2699,7 +2699,7 @@ void VPCALL arcSIMD_Generic::CreateTextureSpaceLightVectors( anVec3 *lightVector
 
 /*
 ============
-arcSIMD_Generic::CreateSpecularTextureCoords
+anSIMD_Generic::CreateSpecularTextureCoords
 
 	Calculates specular texture coordinates for the given triangle vertices.
 	For each vertex the normalized direction towards the light origin is added to the
@@ -2707,7 +2707,7 @@ arcSIMD_Generic::CreateSpecularTextureCoords
 	The texture coordinates are only calculated for the vertices referenced by the indexes.
 ============
 */
-void VPCALL arcSIMD_Generic::CreateSpecularTextureCoords( anVec4 *texCoords, const anVec3 &lightOrigin, const anVec3 &viewOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
+void VPCALL anSIMD_Generic::CreateSpecularTextureCoords( anVec4 *texCoords, const anVec3 &lightOrigin, const anVec3 &viewOrigin, const anDrawVertex *verts, const int numVerts, const int *indexes, const int numIndexes ) {
 
 	bool *used = (bool *)_alloca16( numVerts * sizeof( used[0] ) );
 	memset( used, 0, numVerts * sizeof( used[0] ) );
@@ -2749,10 +2749,10 @@ void VPCALL arcSIMD_Generic::CreateSpecularTextureCoords( anVec4 *texCoords, con
 
 /*
 ============
-arcSIMD_Generic::CreateShadowCache
+anSIMD_Generic::CreateShadowCache
 ============
 */
-int VPCALL arcSIMD_Generic::CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) {
+int VPCALL anSIMD_Generic::CreateShadowCache( anVec4 *vertexCache, int *vertRemap, const anVec3 &lightOrigin, const anDrawVertex *verts, const int numVerts ) {
 	int outVerts = 0;
 
 	for ( int i = 0; i < numVerts; i++ ) {
@@ -2780,10 +2780,10 @@ int VPCALL arcSIMD_Generic::CreateShadowCache( anVec4 *vertexCache, int *vertRem
 
 /*
 ============
-arcSIMD_Generic::CreateVertexProgramShadowCache
+anSIMD_Generic::CreateVertexProgramShadowCache
 ============
 */
-int VPCALL arcSIMD_Generic::CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) {
+int VPCALL anSIMD_Generic::CreateVertexProgramShadowCache( anVec4 *vertexCache, const anDrawVertex *verts, const int numVerts ) {
 	for ( int i = 0; i < numVerts; i++ ) {
 		const float *v = verts[i].xyz.ToFloatPtr();
 		vertexCache[i*2+0][0] = v[0];
@@ -2800,12 +2800,12 @@ int VPCALL arcSIMD_Generic::CreateVertexProgramShadowCache( anVec4 *vertexCache,
 
 /*
 ============
-arcSIMD_Generic::UpSamplePCMTo44kHz
+anSIMD_Generic::UpSamplePCMTo44kHz
 
   Duplicate samples for 44kHz output.
 ============
 */
-void arcSIMD_Generic::UpSamplePCMTo44kHz( float *dest, const short *src, const int numSamples, const int kHz, const int numChannels ) {
+void anSIMD_Generic::UpSamplePCMTo44kHz( float *dest, const short *src, const int numSamples, const int kHz, const int numChannels ) {
 	if ( kHz == 11025 ) {
 		if ( numChannels == 1 ) {
 			for ( int i = 0; i < numSamples; i++ ) {
@@ -2839,12 +2839,12 @@ void arcSIMD_Generic::UpSamplePCMTo44kHz( float *dest, const short *src, const i
 
 /*
 ============
-arcSIMD_Generic::UpSampleOGGTo44kHz
+anSIMD_Generic::UpSampleOGGTo44kHz
 
   Duplicate samples for 44kHz output.
 ============
 */
-void arcSIMD_Generic::UpSampleOGGTo44kHz( float *dest, const float * const *ogg, const int numSamples, const int kHz, const int numChannels ) {
+void anSIMD_Generic::UpSampleOGGTo44kHz( float *dest, const float * const *ogg, const int numSamples, const int kHz, const int numChannels ) {
 	if ( kHz == 11025 ) {
 		if ( numChannels == 1 ) {
 			for ( int i = 0; i < numSamples; i++ ) {
@@ -2885,10 +2885,10 @@ void arcSIMD_Generic::UpSampleOGGTo44kHz( float *dest, const float * const *ogg,
 
 /*
 ============
-arcSIMD_Generic::MixSoundTwoSpeakerMono
+anSIMD_Generic::MixSoundTwoSpeakerMono
 ============
 */
-void VPCALL arcSIMD_Generic::MixSoundTwoSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
+void VPCALL anSIMD_Generic::MixSoundTwoSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
 	float sL = lastV[0];
 	float sR = lastV[1];
 	float incL = ( currentV[0] - lastV[0] ) / MIXBUFFER_SAMPLES;
@@ -2906,10 +2906,10 @@ void VPCALL arcSIMD_Generic::MixSoundTwoSpeakerMono( float *mixBuffer, const flo
 
 /*
 ============
-arcSIMD_Generic::MixSoundTwoSpeakerStereo
+anSIMD_Generic::MixSoundTwoSpeakerStereo
 ============
 */
-void VPCALL arcSIMD_Generic::MixSoundTwoSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
+void VPCALL anSIMD_Generic::MixSoundTwoSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[2], const float currentV[2] ) {
 	float sL = lastV[0];
 	float sR = lastV[1];
 	float incL = ( currentV[0] - lastV[0] ) / MIXBUFFER_SAMPLES;
@@ -2927,10 +2927,10 @@ void VPCALL arcSIMD_Generic::MixSoundTwoSpeakerStereo( float *mixBuffer, const f
 
 /*
 ============
-arcSIMD_Generic::MixSoundSixSpeakerMono
+anSIMD_Generic::MixSoundSixSpeakerMono
 ============
 */
-void VPCALL arcSIMD_Generic::MixSoundSixSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
+void VPCALL anSIMD_Generic::MixSoundSixSpeakerMono( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
 	float sL0 = lastV[0];
 	float sL1 = lastV[1];
 	float sL2 = lastV[2];
@@ -2965,10 +2965,10 @@ void VPCALL arcSIMD_Generic::MixSoundSixSpeakerMono( float *mixBuffer, const flo
 
 /*
 ============
-arcSIMD_Generic::MixSoundSixSpeakerStereo
+anSIMD_Generic::MixSoundSixSpeakerStereo
 ============
 */
-void VPCALL arcSIMD_Generic::MixSoundSixSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
+void VPCALL anSIMD_Generic::MixSoundSixSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) {
 	float sL0 = lastV[0];
 	float sL1 = lastV[1];
 	float sL2 = lastV[2];
@@ -3003,10 +3003,10 @@ void VPCALL arcSIMD_Generic::MixSoundSixSpeakerStereo( float *mixBuffer, const f
 
 /*
 ============
-arcSIMD_Generic::MixedSoundToSamples
+anSIMD_Generic::MixedSoundToSamples
 ============
 */
-void VPCALL arcSIMD_Generic::MixedSoundToSamples( short *samples, const float *mixBuffer, const int numSamples ) {
+void VPCALL anSIMD_Generic::MixedSoundToSamples( short *samples, const float *mixBuffer, const int numSamples ) {
 
 	for ( int i = 0; i < numSamples; i++ ) {
 		if ( mixBuffer[i] <= -32768.0f ) {

@@ -28,8 +28,8 @@ private:
 	float				frequency;
 	int					octaves;
 
-	int					tilex;
-	int					tiley;
+	int					tileX;
+	int					tileY;
 	int					tilez;
 
 	int					localtilex;							//for lower octaves with increased frequency
@@ -41,11 +41,11 @@ private:
 	float				InterpolatedNoise( float x, float y, float z );
 };
 
-ARC_INLINE int anPerlin::NoiseInt( const anVec3 &pos, int max ) {
+inline int anPerlin::NoiseInt( const anVec3 &pos, int max ) {
 	return anMath::Ftoi( NoiseFloat( pos ) * max );
 }
 
-ARC_INLINE float anPerlin::CosineInterp( float number1, float number2, float x ) {
+inline float anPerlin::CosineInterp( float number1, float number2, float x ) {
 	float f = ( 1 - anMath::Cos16( x * anMath::PI ) ) * 0.5f;
 	return number1 * ( 1 - f ) + number2 * f;
 }
@@ -54,12 +54,12 @@ ARC_INLINE float anPerlin::CosineInterp( float number1, float number2, float x )
 
 const int PERLIN_RANDOM_SAMPLES = 256;
 
-class anPerlin2 {
+class anNoiseGradient {
 public:
-						anPerlin2( void );
+						anNoiseGradient( void );
 
 	static void			Init( void );
-	float				Noise( const anVec3& noisePos );
+	float				Noise( const anVec3 &noisePos );
 
 protected:
 	static bool			inited;
@@ -73,7 +73,7 @@ const int NOISE_WRAP_INDEX	= 256;
 const int NOISE_MOD_MASK	= 255;
 const int NOISE_LARGE_PWR2	= 4096;
 
-class anPerlin2 {
+class anNoiseGradient {
 private:
 	unsigned long	initialized;
 
@@ -88,7 +88,7 @@ private:
 	void			GenerateLookupTables( void );	// fill in table entries
 
 public:
-					anPerlin2() :
+					anNoiseGradient() :
 						initialized( 0 ) {
 					}
 	void			Reseed( void );					// reseed random generator & regenerate tables
@@ -122,26 +122,26 @@ private:
 	static int		p[512];
 };
 
-ARC_INLINE float anPerlin3::Noise1D( float *pos ) {
+inline float anPerlin3::Noise1D( float *pos ) {
 	return Noise( *pos );
 }
 
-ARC_INLINE float anPerlin3::Noise2D( float *pos ) {
+inline float anPerlin3::Noise2D( float *pos ) {
 	return Noise( *pos, *(pos + 1) );
 }
 
-ARC_INLINE float anPerlin3::Noise3D( float *pos ) {
+inline float anPerlin3::Noise3D( float *pos ) {
 	return Noise( *pos, *(pos + 1), *(pos + 2) );
 }
 
-ARC_INLINE float anPerlin3::Fade( float t ) {
+inline float anPerlin3::Fade( float t ) {
 	return( t * t * t * ( t * ( t * 6 - 15 ) + 10 ) );
 }
 
-ARC_INLINE float anPerlin3::Lerp( float t, float a, float b ) {
+inline float anPerlin3::Lerp( float t, float a, float b ) {
 	return( a + t * ( b - a ) );
 }
-ARC_INLINE float anPerlin3::Grad( int hash, float x, float y, float z ) {
+inline float anPerlin3::Grad( int hash, float x, float y, float z ) {
 	int h = hash & 14;
 	float u = h < 8 ? x : y;
 	float v = h < 4 ? y : ( h == 12 || h == 14 ? x : z );

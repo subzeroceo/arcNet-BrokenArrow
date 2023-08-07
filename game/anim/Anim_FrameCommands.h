@@ -18,7 +18,7 @@ public:
 
 	static void					Init( void );
 	static void					Shutdown( void );
-	static sdAnimFrameCommand*	Alloc( const char* typeName );
+	static sdAnimFrameCommand*	Alloc( const char *typeName );
 
 	virtual const char*			GetTypeName( void ) const = 0;
 	virtual bool				Init( anParser& src ) = 0;
@@ -40,7 +40,7 @@ private:
 class sdAnimFrameCommand_ScriptFunction : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_ScriptFunction( void ) { ; }
-								sdAnimFrameCommand_ScriptFunction( const anString& _functionName ) : functionName( _functionName ) { ; }
+								sdAnimFrameCommand_ScriptFunction( const anStr& _functionName ) : functionName( _functionName ) { ; }
 								~sdAnimFrameCommand_ScriptFunction( void ) { ; }
 
 	static const char*			TypeName( void ) { return "call"; }
@@ -50,13 +50,13 @@ public:
 	virtual void				Run( anClass* ent ) const;
 
 private:
-	anString						functionName;
+	anStr						functionName;
 };
 
 class sdAnimFrameCommand_ScriptObjectFunction : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_ScriptObjectFunction( void ) { ; }
-								sdAnimFrameCommand_ScriptObjectFunction( const anString& _functionName ) : functionName( _functionName ) { ; }
+								sdAnimFrameCommand_ScriptObjectFunction( const anStr& _functionName ) : functionName( _functionName ) { ; }
 								~sdAnimFrameCommand_ScriptObjectFunction( void ) { ; }
 
 	static const char*			TypeName( void ) { return "object_call"; }
@@ -66,13 +66,13 @@ public:
 	virtual void				Run( anClass* ent ) const;
 
 private:
-	anString						functionName;
+	anStr						functionName;
 };
 
 class sdAnimFrameCommand_Event : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_Event( void ) : ev( nullptr ) { ; }
-								sdAnimFrameCommand_Event( const arcEventDef* _ev ) : ev( _ev ) { ; }
+								sdAnimFrameCommand_Event( const anEventDef* _ev ) : ev( _ev ) { ; }
 								~sdAnimFrameCommand_Event( void ) { ; }
 
 	static const char*			TypeName( void ) { return "event"; }
@@ -82,14 +82,14 @@ public:
 	virtual void				Run( anClass* ent ) const;
 
 private:
-	const arcEventDef*			ev;
+	const anEventDef*			ev;
 };
 
 
 class sdAnimFrameCommand_Sound : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_Sound( void ) { ; }
-								sdAnimFrameCommand_Sound( const anString& _soundName, soundChannel_t _soundChannel ) : soundName( _soundName ), soundChannel( _soundChannel ) { ; }
+								sdAnimFrameCommand_Sound( const anStr& _soundName, soundChannel_t _soundChannel ) : soundName( _soundName ), soundChannel( _soundChannel ) { ; }
 								~sdAnimFrameCommand_Sound( void ) { ; }
 
 	static const char*			TypeName( void ) { return "sound_channel"; }
@@ -99,7 +99,7 @@ public:
 	virtual void				Run( anClass* ent ) const;
 
 private:
-	anString						soundName;
+	anStr						soundName;
 	soundChannel_t				soundChannel;
 };
 
@@ -142,7 +142,7 @@ private:
 class sdAnimFrameCommand_Effect : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_Effect( void ) { ; }
-								sdAnimFrameCommand_Effect( const anString& _effectName, const anString& _jointName ) : effectName( _effectName ), jointName( _jointName ) { ; }
+								sdAnimFrameCommand_Effect( const anStr& _effectName, const anStr& _jointName ) : effectName( _effectName ), jointName( _jointName ) { ; }
 								~sdAnimFrameCommand_Effect( void ) { ; }
 
 	static const char*			TypeName( void ) { return "effect"; }
@@ -152,8 +152,8 @@ public:
 	virtual void				Run( anClass* ent ) const;
 
 private:
-	anString						effectName;
-	anString						jointName;
+	anStr						effectName;
+	anStr						jointName;
 };
 
 class sdAnimFrameCommand_FootStep : public sdAnimFrameCommand {
@@ -168,13 +168,13 @@ public:
 	virtual void				Run( anClass* ent ) const;
 
 	bool						rightFoot;
-	anString						prefix;
+	anStr						prefix;
 };
 
 class sdAnimFrameCommand_DemoScript : public sdAnimFrameCommand {
 public:
 								sdAnimFrameCommand_DemoScript( void ) { ; }
-								sdAnimFrameCommand_DemoScript( const anString& _command ) : command( _command ) { ; }
+								sdAnimFrameCommand_DemoScript( const anStr& _command ) : command( _command ) { ; }
 								~sdAnimFrameCommand_DemoScript( void ) { ; }
 
 	static const char*			TypeName( void ) { return "demoScriptEvent"; }
@@ -184,13 +184,13 @@ public:
 	virtual void				Run( anClass* ent ) const;
 
 private:
-	anString						command;
+	anStr						command;
 };
 
 class sdAnimFrameCommand_WeaponState : public sdAnimFrameCommand {
 public:
 	sdAnimFrameCommand_WeaponState( void ) { ; }
-	sdAnimFrameCommand_WeaponState( const anString& _command ) : command( _command ) { ; }
+	sdAnimFrameCommand_WeaponState( const anStr& _command ) : command( _command ) { ; }
 	~sdAnimFrameCommand_WeaponState( void ) { ; }
 
 	static const char*			TypeName( void ) { return "weaponState"; }
@@ -200,7 +200,7 @@ public:
 	virtual void				Run( anClass* ent ) const;
 
 private:
-	anString						command;
+	anStr						command;
 };
 
 #endif // __ANIM_FRAMECOMMANDS_H__

@@ -93,7 +93,7 @@ void BOEntity::ReadFromSaveGame( anFile *savefile, idGameBustOutWindow* _game ) 
 BOEntity::SetMaterial
 ======================
 */
-void BOEntity::SetMaterial(const char* name) {
+void BOEntity::SetMaterial(const char *name) {
 	materialName = name;
 	material = declManager->FindMaterial( name );
 	material->SetSort( SS_GUI );
@@ -661,27 +661,27 @@ idGameBustOutWindow::ParseInternalVar
 =============================
 */
 bool idGameBustOutWindow::ParseInternalVar(const char *_name, anParser *src) {
-	if ( anString::Icmp(_name, "gamerunning" ) == 0 ) {
+	if ( anStr::Icmp(_name, "gamerunning" ) == 0 ) {
 		gamerunning = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp(_name, "onFire" ) == 0 ) {
+	if ( anStr::Icmp(_name, "onFire" ) == 0 ) {
 		onFire = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp(_name, "onContinue" ) == 0 ) {
+	if ( anStr::Icmp(_name, "onContinue" ) == 0 ) {
 		onContinue = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp(_name, "onNewGame" ) == 0 ) {
+	if ( anStr::Icmp(_name, "onNewGame" ) == 0 ) {
 		onNewGame = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp(_name, "onNewLevel" ) == 0 ) {
+	if ( anStr::Icmp(_name, "onNewLevel" ) == 0 ) {
 		onNewLevel = src->ParseBool();
 		return true;
 	}
-	if ( anString::Icmp(_name, "numLevels" ) == 0 ) {
+	if ( anStr::Icmp(_name, "numLevels" ) == 0 ) {
 		numLevels = src->ParseInt();
 
 		// Load all the level images
@@ -700,15 +700,15 @@ idGameBustOutWindow::GetWinVarByName
 idWinVar *idGameBustOutWindow::GetWinVarByName(const char *_name, bool winLookup, drawWin_t** owner) {
 	idWinVar *retVar = nullptr;
 
-	if ( anString::Icmp(_name, "gamerunning" ) == 0 ) {
+	if ( anStr::Icmp(_name, "gamerunning" ) == 0 ) {
 		retVar = &gamerunning;
-	} else 	if ( anString::Icmp(_name, "onFire" ) == 0 ) {
+	} else 	if ( anStr::Icmp(_name, "onFire" ) == 0 ) {
 		retVar = &onFire;
-	} else 	if ( anString::Icmp(_name, "onContinue" ) == 0 ) {
+	} else 	if ( anStr::Icmp(_name, "onContinue" ) == 0 ) {
 		retVar = &onContinue;
-	} else 	if ( anString::Icmp(_name, "onNewGame" ) == 0 ) {
+	} else 	if ( anStr::Icmp(_name, "onNewGame" ) == 0 ) {
 		retVar = &onNewGame;
-	} else 	if ( anString::Icmp(_name, "onNewLevel" ) == 0 ) {
+	} else 	if ( anStr::Icmp(_name, "onNewLevel" ) == 0 ) {
 		retVar = &onNewLevel;
 	}
 
@@ -862,7 +862,7 @@ void idGameBustOutWindow::LoadBoardFiles( void ) {
 
 	for ( i=0; i<numLevels; i++ ) {
 		byte *pic;
-		anString	name = "guis/assets/bustout/level";
+		anStr	name = "guis/assets/bustout/level";
 		name += (i+1);
 		name += ".tga";
 

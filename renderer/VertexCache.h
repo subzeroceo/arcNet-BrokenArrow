@@ -420,6 +420,8 @@ typedef struct {
 	bool		stereo;
 	int			displayHz;
 	int			multiSamples;
+	float		pixelAspect;		// pixel width / height, should be 1.0 in most cases
+	bool		fullscreenAvail;
 } glimpParms_t;
 
 bool		GLimp_Init( glimpParms_t parms );

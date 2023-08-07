@@ -11,10 +11,10 @@
 
 /*
 ================
-arcAFVector::arcAFVector
+anAFVector::anAFVector
 ================
 */
-arcAFVector::arcAFVector() {
+anAFVector::anAFVector() {
 	type = VEC_COORDS;
 	vec.Zero();
 	negate = false;
@@ -22,10 +22,10 @@ arcAFVector::arcAFVector() {
 
 /*
 ================
-arcAFVector::Parse
+anAFVector::Parse
 ================
 */
-bool arcAFVector::Parse( anLexer &src ) {
+bool anAFVector::Parse( anLexer &src ) {
 	anToken token;
 
 	if ( !src.ReadToken( &token ) ) {
@@ -42,7 +42,7 @@ bool arcAFVector::Parse( anLexer &src ) {
 	}
 
 	if ( token == "( " ) {
-		type = arcAFVector::VEC_COORDS;
+		type = anAFVector::VEC_COORDS;
 		vec.x = src.ParseFloat();
 		src.ExpectTokenString( "," );
 		vec.y = src.ParseFloat();
@@ -50,13 +50,13 @@ bool arcAFVector::Parse( anLexer &src ) {
 		vec.z = src.ParseFloat();
 		src.ExpectTokenString( " )" );
 	} else if ( token == "joint" ) {
-		type = arcAFVector::VEC_JOINT;
+		type = anAFVector::VEC_JOINT;
 		src.ExpectTokenString( "( " );
 		src.ReadToken( &token );
 		joint1 = token;
 		src.ExpectTokenString( " )" );
 	} else if ( token == "bonecenter" ) {
-		type = arcAFVector::VEC_BONECENTER;
+		type = anAFVector::VEC_BONECENTER;
 		src.ExpectTokenString( "( " );
 		src.ReadToken( &token );
 		joint1 = token;
@@ -65,7 +65,7 @@ bool arcAFVector::Parse( anLexer &src ) {
 		joint2 = token;
 		src.ExpectTokenString( " )" );
 	} else if ( token == "bonedir" ) {
-		type = arcAFVector::VEC_BONEDIR;
+		type = anAFVector::VEC_BONEDIR;
 		src.ExpectTokenString( "( " );
 		src.ReadToken( &token );
 		joint1 = token;
@@ -83,25 +83,25 @@ bool arcAFVector::Parse( anLexer &src ) {
 
 /*
 ================
-arcAFVector::Finish
+anAFVector::Finish
 ================
 */
-bool arcAFVector::Finish( const char *fileName, const getJointTransform_t GetJointTransform, const arcJointMat *frame, void *model ) const {
+bool anAFVector::Finish( const char *fileName, const getJointTransform_t GetJointTransform, const anJointMat *frame, void *model ) const {
 	anMat3 axis;
 	anVec3 start, end;
 
 	switch ( type ) {
-		case arcAFVector::VEC_COORDS: {
+		case anAFVector::VEC_COORDS: {
 			break;
 		}
-		case arcAFVector::VEC_JOINT: {
+		case anAFVector::VEC_JOINT: {
 			if ( !GetJointTransform( model, frame, joint1, vec, axis ) ) {
 				common->Warning( "invalid joint %s in joint() in '%s'", joint1.c_str(), fileName );
 				vec.Zero();
 			}
 			break;
 		}
-		case arcAFVector::VEC_BONECENTER: {
+		case anAFVector::VEC_BONECENTER: {
 			if ( !GetJointTransform( model, frame, joint1, start, axis ) ) {
 				common->Warning( "invalid joint %s in bonecenter() in '%s'", joint1.c_str(), fileName );
 				start.Zero();
@@ -113,7 +113,7 @@ bool arcAFVector::Finish( const char *fileName, const getJointTransform_t GetJoi
 			vec = ( start + end ) * 0.5f;
 			break;
 		}
-		case arcAFVector::VEC_BONEDIR: {
+		case anAFVector::VEC_BONEDIR: {
 			if ( !GetJointTransform( model, frame, joint1, start, axis ) ) {
 				common->Warning( "invalid joint %s in bonedir() in '%s'", joint1.c_str(), fileName );
 				start.Zero();
@@ -140,27 +140,27 @@ bool arcAFVector::Finish( const char *fileName, const getJointTransform_t GetJoi
 
 /*
 ================
-arcAFVector::Write
+anAFVector::Write
 ================
 */
-bool arcAFVector::Write( anFile *f ) const {
+bool anAFVector::Write( anFile *f ) const {
 	if ( negate ) {
 		f->WriteFloatString( "-" );
 	}
 	switch ( type ) {
-		case arcAFVector::VEC_COORDS: {
+		case anAFVector::VEC_COORDS: {
 			f->WriteFloatString( "( %f, %f, %f )", vec.x, vec.y, vec.z );
 			break;
 		}
-		case arcAFVector::VEC_JOINT: {
+		case anAFVector::VEC_JOINT: {
 			f->WriteFloatString( "joint( \"%s\" )", joint1.c_str() );
 			break;
 		}
-		case arcAFVector::VEC_BONECENTER: {
+		case anAFVector::VEC_BONECENTER: {
 			f->WriteFloatString( "bonecenter( \"%s\", \"%s\" )", joint1.c_str(), joint2.c_str() );
 			break;
 		}
-		case arcAFVector::VEC_BONEDIR: {
+		case anAFVector::VEC_BONEDIR: {
 			f->WriteFloatString( "bonedir( \"%s\", \"%s\" )", joint1.c_str(), joint2.c_str() );
 			break;
 		}
@@ -173,26 +173,26 @@ bool arcAFVector::Write( anFile *f ) const {
 
 /*
 ================
-arcAFVector::ToString
+anAFVector::ToString
 ================
 */
-const char *arcAFVector::ToString( anString &str, const int precision ) {
+const char *anAFVector::ToString( anStr &str, const int precision ) {
 	switch ( type ) {
-		case arcAFVector::VEC_COORDS: {
+		case anAFVector::VEC_COORDS: {
 			char format[128];
 			sprintf( format, "( %%.%df, %%.%df, %%.%df )", precision, precision, precision );
 			sprintf( str, format, vec.x, vec.y, vec.z );
 			break;
 		}
-		case arcAFVector::VEC_JOINT: {
+		case anAFVector::VEC_JOINT: {
 			sprintf( str, "joint( \"%s\" )", joint1.c_str() );
 			break;
 		}
-		case arcAFVector::VEC_BONECENTER: {
+		case anAFVector::VEC_BONECENTER: {
 			sprintf( str, "bonecenter( \"%s\", \"%s\" )", joint1.c_str(), joint2.c_str() );
 			break;
 		}
-		case arcAFVector::VEC_BONEDIR: {
+		case anAFVector::VEC_BONEDIR: {
 			sprintf( str, "bonedir( \"%s\", \"%s\" )", joint1.c_str(), joint2.c_str() );
 			break;
 		}
@@ -214,9 +214,9 @@ anDeclAF_Body::SetDefault
 void anDeclAF_Body::SetDefault( const anDeclAF *file ) {
 	name = "noname";
 	modelType = TRM_BOX;
-	v1.type = arcAFVector::VEC_COORDS;
+	v1.type = anAFVector::VEC_COORDS;
 	v1.ToVec3().x = v1.ToVec3().y = v1.ToVec3().z = -10.0f;
-	v2.type = arcAFVector::VEC_COORDS;
+	v2.type = anAFVector::VEC_COORDS;
 	v2.ToVec3().x = v2.ToVec3().y = v2.ToVec3().z = 10.0f;
 	numSides = 3;
 	origin.ToVec3().Zero();
@@ -270,7 +270,7 @@ anDeclAF::WriteBody
 ================
 */
 bool anDeclAF::WriteBody( anFile *f, const anDeclAF_Body &body ) const {
-	anString str;
+	anStr str;
 
 	f->WriteFloatString( "\nbody \"%s\" {\n", body.name.c_str() );
 	f->WriteFloatString( "\tjoint \"%s\"\n", body.jointName.c_str() );
@@ -536,7 +536,7 @@ anDeclAF::WriteSettings
 ================
 */
 bool anDeclAF::WriteSettings( anFile *f ) const {
-	anString str;
+	anStr str;
 
 	f->WriteFloatString( "\nsettings {\n" );
 	f->WriteFloatString( "\tmodel \"%s\"\n", model.c_str() );
@@ -616,7 +616,7 @@ anDeclAF::ContentsFromString
 int anDeclAF::ContentsFromString( const char *str ) {
 	int c;
 	anToken token;
-	anLexer src( str, anString::Length( str ), "anDeclAF::ContentsFromString" );
+	anLexer src( str, anStr::Length( str ), "anDeclAF::ContentsFromString" );
 
 	c = 0;
 	while( src.ReadToken( &token ) ) {
@@ -653,7 +653,7 @@ int anDeclAF::ContentsFromString( const char *str ) {
 anDeclAF::ContentsToString
 ================
 */
-const char *anDeclAF::ContentsToString( const int contents, anString &str ) {
+const char *anDeclAF::ContentsToString( const int contents, anStr &str ) {
 	str = "";
 	if ( contents & CONTENTS_SOLID ) {
 		if ( str.Length() ) str += ", ";
@@ -687,13 +687,13 @@ anDeclAF::JointModFromString
 ================
 */
 declAFJointMod_t anDeclAF::JointModFromString( const char *str ) {
-	if ( anString::Icmp( str, "orientation" ) == 0 ) {
+	if ( anStr::Icmp( str, "orientation" ) == 0 ) {
 		return DECLAF_JOINTMOD_AXIS;
 	}
-	if ( anString::Icmp( str, "position" ) == 0 ) {
+	if ( anStr::Icmp( str, "position" ) == 0 ) {
 		return DECLAF_JOINTMOD_ORIGIN;
 	}
-	if ( anString::Icmp( str, "both" ) == 0 ) {
+	if ( anStr::Icmp( str, "both" ) == 0 ) {
 		return DECLAF_JOINTMOD_BOTH;
 	}
 	return DECLAF_JOINTMOD_AXIS;
@@ -735,7 +735,7 @@ anDeclAF::ParseContents
 */
 bool anDeclAF::ParseContents( anLexer &src, int &c ) const {
 	anToken token;
-	anString str;
+	anStr str;
 
 	while( src.ReadToken( &token ) ) {
 		str += token;
@@ -756,7 +756,7 @@ anDeclAF::ParseBody
 bool anDeclAF::ParseBody( anLexer &src ) {
 	bool hasJoint = false;
 	anToken token;
-	arcAFVector angles;
+	anAFVector angles;
 	anDeclAF_Body *body = new (TAG_DECL) anDeclAF_Body;
 
 	bodies.Alloc() = body;
@@ -1552,7 +1552,7 @@ void anDeclAF::FreeData() {
 anDeclAF::Finish
 ================
 */
-void anDeclAF::Finish( const getJointTransform_t GetJointTransform, const arcJointMat *frame, void *model ) const {
+void anDeclAF::Finish( const getJointTransform_t GetJointTransform, const anJointMat *frame, void *model ) const {
 	int i;
 
 	const char *name = GetName();
@@ -1624,16 +1624,14 @@ anDeclAF::DeleteBody
 ================
 */
 void anDeclAF::DeleteBody( const char *name ) {
-	int i;
-
-	for ( i = 0; i < bodies.Num(); i++ ) {
+	for ( int i = 0; i < bodies.Num(); i++ ) {
 		if ( bodies[i]->name.Icmp( name ) == 0 ) {
 			delete bodies[i];
 			bodies.RemoveIndex( i );
 			break;
 		}
 	}
-	for ( i = 0; i < constraints.Num(); i++ ) {
+	for ( int i = 0; i < constraints.Num(); i++ ) {
 		if ( constraints[i]->body1.Icmp( name ) == 0 ||
 			constraints[i]->body2.Icmp( name ) == 0 ) {
 			delete constraints[i];
@@ -1650,7 +1648,6 @@ anDeclAF::NewConstraint
 */
 void anDeclAF::NewConstraint( const char *name ) {
 	anDeclAF_Constraint *constraint;
-
 	constraint = new (TAG_DECL) anDeclAF_Constraint;
 	constraint->SetDefault( this );
 	constraint->name = name;
@@ -1663,9 +1660,7 @@ anDeclAF::RenameConstraint
 ================
 */
 void anDeclAF::RenameConstraint( const char *oldName, const char *newName ) {
-	int i;
-
-	for ( i = 0; i < constraints.Num(); i++ ) {
+	for ( int i = 0; i < constraints.Num(); i++ ) {
 		if ( constraints[i]->name.Icmp( oldName ) == 0 ) {
 			constraints[i]->name = newName;
 			return;
@@ -1679,9 +1674,7 @@ anDeclAF::DeleteConstraint
 ================
 */
 void anDeclAF::DeleteConstraint( const char *name ) {
-	int i;
-
-	for ( i = 0; i < constraints.Num(); i++ ) {
+	for ( int i = 0; i < constraints.Num(); i++ ) {
 		if ( constraints[i]->name.Icmp( name ) == 0 ) {
 			delete constraints[i];
 			constraints.RemoveIndex( i );

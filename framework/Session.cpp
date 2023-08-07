@@ -290,7 +290,7 @@ saveGameHandle_t idSessionLocal::LoadGame( const char *name, const anList< idSav
 idSessionLocal::SaveGame
 ========================
 */
-saveGameHandle_t idSessionLocal::SaveGame( const char *name, const anList< idSaveFileEntry > & files, const arcSaveGameDetails & description, uint64 skipErrorMask ) {
+saveGameHandle_t idSessionLocal::SaveGame( const char *name, const anList< idSaveFileEntry > & files, const anSaveGameDetails & description, uint64 skipErrorMask ) {
 	saveGameHandle_t ret = 0;
 
 	// serialize the description file behind their back...

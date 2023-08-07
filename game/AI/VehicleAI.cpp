@@ -200,7 +200,7 @@ const anEntity * rvVehicleAI::FindClosestNode ( void ) const {
 	float bestDistance = FLT_MAX;
 
 	for (;;) {
-		current = gameLocal.FindEntityUsingDef( current, "target_vehicle_path" );
+		current = gameLocal.FindEntityUsingDef( current, "targetvhcle_path" );
 
 		if ( !current ) {
 			break;

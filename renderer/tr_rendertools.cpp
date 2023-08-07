@@ -21,7 +21,7 @@ int				rb_debugLineTime = 0;
 #define MAX_DEBUG_TEXT			512
 
 typedef struct debugText_s {
-	anString		text;
+	anStr		text;
 	anVec3		origin;
 	float		scale;
 	anVec4		color;

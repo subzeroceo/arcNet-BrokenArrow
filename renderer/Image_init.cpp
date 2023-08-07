@@ -301,7 +301,7 @@ int anImageManager::GetImageHeight( const anImage *image ) const {
 anImageManager::R_FindImageFileExt
 
 Finds or loads the given image.
-Returns NULL if it fails, not a default image
+Returns nullptr if it fails, not a default image
 ===============
 */
 anImage *anImageManager::R_FindImageFileExt( const char *name, imgType_t type, imgFlags_t flags, bool mip ) {
@@ -314,7 +314,7 @@ anImage *anImageManager::R_FindImageFileExt( const char *name, imgType_t type, i
 	imgFlags_t checkFlagsTrue, checkFlagsFalse;
 
 	if ( !name ) {
-		return NULL;
+		return nullptr;
 	}
 
 	hash = generateHashValue( name );
@@ -323,9 +323,9 @@ anImage *anImageManager::R_FindImageFileExt( const char *name, imgType_t type, i
 	// see if the image is already loaded
 	//
 	for ( image = hashTable[hash]; image; image = image->next ) {
-		if ( !anString::icmp( name, image->imgName ) ) {
+		if ( !anStr::icmp( name, image->imgName ) ) {
 			// the white image can be used with any set of parms, but other mismatches are errors
-			if ( anString::Cmp( name, "_white" ) ) {
+			if ( anStr::Cmp( name, "_white" ) ) {
 				if ( image->flags != flags ) {
 					RB_Printf( "WARNING: reused image %s with mixed flags (%i vs %i)\n", name, image->flags, flags );
 				}
@@ -341,8 +341,8 @@ anImage *anImageManager::R_FindImageFileExt( const char *name, imgType_t type, i
 	// load the pic from disk
 	//
 	R_LoadImage( name, &pic, &width, &height, &picFormat, &picNumMips );
-	if ( pic == NULL ) {
-		return NULL;
+	if ( pic == nullptr ) {
+		return nullptr;
 	}
 
 	checkFlagsTrue = IMGFLAG_PICMIP | IMGFLAG_MIPMAP | IMGFLAG_GENNORMALMAP;
@@ -363,7 +363,7 @@ anImage *anImageManager::R_FindImageFileExt( const char *name, imgType_t type, i
 		normalImage = R_FindImageFile(normalName, IMGTYPE_NORMAL, normalFlags );
 
 		// if not, generate it
-		if ( normalImage == NULL)  {
+		if ( normalImage == nullptr)  {
 			byte *normalPic;
 			int x, y;
 
@@ -480,7 +480,7 @@ timeStamp.
 ===============
 */
 void anImageManager::LoadImage( const char *filename, byte **pic, int *width, int *height, ARC_TIME_T *timeStamp, bool makePowerOf2 ) {
-	anString name = filename;
+	anStr name = filename;
 		// Initialize variables
 	*pic = nullptr;
 	*timeStamp = 0xFFFFFFFF;
@@ -495,13 +495,13 @@ void anImageManager::LoadImage( const char *filename, byte **pic, int *width, in
 	}
 
 	name.ToLower();
-	anString ext;
+	anStr ext;
 	name.ExtractFileExtension( ext );
 
 	// ArC-Net added //
 	// If compressed textures are enabled, try loading a DDS first, it'll load fastest
 	if ( r_ext_compressed_textures.GetInteger() ) {
-		anString ddsName;
+		anStr ddsName;
 		ddsName.StripFileExtension();
 		ddsName.DefaultFileExtension( ".dds" );
 		LoadDDS( ddsName, pic, width, height, picFormat, numMips );
@@ -601,13 +601,13 @@ anImage *anImageManager::LoadTGA( const char *filename, byte **pic, int *width, 
 	targa.colorMapType = *targaBuffer++;
 	targa.imageType = *targaBuffer++;
 
-	targa.colorMapIndex = LittleShort( *( short *)targaBuffer ); targaBuffer += 2;
-	targa.colormapLength = LittleShort( *( short *)targaBuffer ); targaBuffer += 2;
+	targa.colorMapIndex = LittleShort( *(short *)targaBuffer ); targaBuffer += 2;
+	targa.colormapLength = LittleShort( *(short *)targaBuffer ); targaBuffer += 2;
 	targa.colorMapSize = *targaBuffer++;
-	targa.xOrigin = LittleShort( *( short *)targaBuffer ); targaBuffer += 2;
-	targa.yOrigin = LittleShort( *( short *)targaBuffer ); targaBuffer += 2;
-	targa.width = LittleShort( *( short *)targaBuffer ); targaBuffer += 2;
-	targa.height = LittleShort( *( short *)targaBuffer ); targaBuffer += 2;
+	targa.xOrigin = LittleShort( *(short *)targaBuffer ); targaBuffer += 2;
+	targa.yOrigin = LittleShort( *(short *)targaBuffer ); targaBuffer += 2;
+	targa.width = LittleShort( *(short *)targaBuffer ); targaBuffer += 2;
+	targa.height = LittleShort( *(short *)targaBuffer ); targaBuffer += 2;
 	targa.pixelSize = *targaBuffer++;
 	targa.attributes = *targaBuffer++;
 
@@ -1210,9 +1210,9 @@ public:
 
 	void UpdateVoxelData( const byte *data, int size );
 
-	float Sample( const idVec3 &uvw) const;
+	float Sample( const anVec3 &uvw) const;
 
-	void ApplyToSurface( idRenderEntity *entity );
+	void ApplyToSurface( anRenderEntity *entity );
 
 private:
 

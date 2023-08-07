@@ -101,18 +101,18 @@ protected:
 	virtual bool	ReAllocate( int n, bool keep = false );
 };
 
-ARC_INLINE anWinding::anWinding( void ) {
+inline anWinding::anWinding( void ) {
 	numPoints = allocedSize = 0;
 	p = nullptr;
 }
 
-ARC_INLINE anWinding::anWinding( int n ) {
+inline anWinding::anWinding( int n ) {
 	numPoints = allocedSize = 0;
 	p = nullptr;
 	EnsureAlloced( n );
 }
 
-ARC_INLINE anWinding::anWinding( const anVec3 *verts, const int n ) {
+inline anWinding::anWinding( const anVec3 *verts, const int n ) {
 	int i;
 
 	numPoints = allocedSize = 0;
@@ -128,19 +128,19 @@ ARC_INLINE anWinding::anWinding( const anVec3 *verts, const int n ) {
 	numPoints = n;
 }
 
-ARC_INLINE anWinding::anWinding( const anVec3 &normal, const float dist ) {
+inline anWinding::anWinding( const anVec3 &normal, const float dist ) {
 	numPoints = allocedSize = 0;
 	p = nullptr;
 	BaseForPlane( normal, dist );
 }
 
-ARC_INLINE anWinding::anWinding( const anPlane &plane ) {
+inline anWinding::anWinding( const anPlane &plane ) {
 	numPoints = allocedSize = 0;
 	p = nullptr;
 	BaseForPlane( plane );
 }
 
-ARC_INLINE anWinding::anWinding( const anWinding &winding ) {
+inline anWinding::anWinding( const anWinding &winding ) {
 	int i;
 	if ( !EnsureAlloced( winding.GetNumPoints() ) ) {
 		numPoints = 0;
@@ -152,12 +152,12 @@ ARC_INLINE anWinding::anWinding( const anWinding &winding ) {
 	numPoints = winding.GetNumPoints();
 }
 
-ARC_INLINE anWinding::~anWinding( void ) {
+inline anWinding::~anWinding( void ) {
 	delete[] p;
 	p = nullptr;
 }
 
-ARC_INLINE anWinding &anWinding::operator=( const anWinding &winding ) {
+inline anWinding &anWinding::operator=( const anWinding &winding ) {
 	int i;
 
 	if ( !EnsureAlloced( winding.numPoints ) ) {
@@ -171,27 +171,27 @@ ARC_INLINE anWinding &anWinding::operator=( const anWinding &winding ) {
 	return *this;
 }
 
-ARC_INLINE const anVec5 &anWinding::operator[]( const int index ) const {
+inline const anVec5 &anWinding::operator[]( const int index ) const {
 	//assert( index >= 0 && index < numPoints );
 	return p[index];
 }
 
-ARC_INLINE anVec5 &anWinding::operator[]( const int index ) {
+inline anVec5 &anWinding::operator[]( const int index ) {
 	//assert( index >= 0 && index < numPoints );
 	return p[index];
 }
 
-ARC_INLINE anWinding &anWinding::operator+=( const anVec3 &v ) {
+inline anWinding &anWinding::operator+=( const anVec3 &v ) {
 	AddPoint( v );
 	return *this;
 }
 
-ARC_INLINE anWinding &anWinding::operator+=( const anVec5 &v ) {
+inline anWinding &anWinding::operator+=( const anVec5 &v ) {
 	AddPoint( v );
 	return *this;
 }
 
-ARC_INLINE void anWinding::AddPoint( const anVec3 &v ) {
+inline void anWinding::AddPoint( const anVec3 &v ) {
 	if ( !EnsureAlloced(numPoints+1, true) ) {
 		return;
 	}
@@ -199,7 +199,7 @@ ARC_INLINE void anWinding::AddPoint( const anVec3 &v ) {
 	numPoints++;
 }
 
-ARC_INLINE void anWinding::AddPoint( const anVec5 &v ) {
+inline void anWinding::AddPoint( const anVec5 &v ) {
 	if ( !EnsureAlloced(numPoints+1, true) ) {
 		return;
 	}
@@ -207,28 +207,28 @@ ARC_INLINE void anWinding::AddPoint( const anVec5 &v ) {
 	numPoints++;
 }
 
-ARC_INLINE int anWinding::GetNumPoints( void ) const {
+inline int anWinding::GetNumPoints( void ) const {
 	return numPoints;
 }
 
-ARC_INLINE void anWinding::SetNumPoints( int n ) {
+inline void anWinding::SetNumPoints( int n ) {
 	if ( !EnsureAlloced( n, true ) ) {
 		return;
 	}
 	numPoints = n;
 }
 
-ARC_INLINE void anWinding::Clear( void ) {
+inline void anWinding::Clear( void ) {
 	numPoints = 0;
 	delete[] p;
 	p = nullptr;
 }
 
-ARC_INLINE void anWinding::BaseForPlane( const anPlane &plane ) {
+inline void anWinding::BaseForPlane( const anPlane &plane ) {
 	BaseForPlane( plane.Normal(), plane.Dist() );
 }
 
-ARC_INLINE bool anWinding::EnsureAlloced( int n, bool keep ) {
+inline bool anWinding::EnsureAlloced( int n, bool keep ) {
 	if ( n > allocedSize ) {
 		return ReAllocate( n, keep );
 	}
@@ -276,19 +276,19 @@ protected:
 	virtual bool	ReAllocate( int n, bool keep = false );
 };
 
-ARC_INLINE anFixedWinding::anFixedWinding( void ) {
+inline anFixedWinding::anFixedWinding( void ) {
 	numPoints = 0;
 	p = data;
 	allocedSize = MAX_POINTS_ON_WINDING;
 }
 
-ARC_INLINE anFixedWinding::anFixedWinding( int n ) {
+inline anFixedWinding::anFixedWinding( int n ) {
 	numPoints = 0;
 	p = data;
 	allocedSize = MAX_POINTS_ON_WINDING;
 }
 
-ARC_INLINE anFixedWinding::anFixedWinding( const anVec3 *verts, const int n ) {
+inline anFixedWinding::anFixedWinding( const anVec3 *verts, const int n ) {
 	int i;
 
 	numPoints = 0;
@@ -305,21 +305,21 @@ ARC_INLINE anFixedWinding::anFixedWinding( const anVec3 *verts, const int n ) {
 	numPoints = n;
 }
 
-ARC_INLINE anFixedWinding::anFixedWinding( const anVec3 &normal, const float dist ) {
+inline anFixedWinding::anFixedWinding( const anVec3 &normal, const float dist ) {
 	numPoints = 0;
 	p = data;
 	allocedSize = MAX_POINTS_ON_WINDING;
 	BaseForPlane( normal, dist );
 }
 
-ARC_INLINE anFixedWinding::anFixedWinding( const anPlane &plane ) {
+inline anFixedWinding::anFixedWinding( const anPlane &plane ) {
 	numPoints = 0;
 	p = data;
 	allocedSize = MAX_POINTS_ON_WINDING;
 	BaseForPlane( plane );
 }
 
-ARC_INLINE anFixedWinding::anFixedWinding( const anWinding &winding ) {
+inline anFixedWinding::anFixedWinding( const anWinding &winding ) {
 	int i;
 
 	p = data;
@@ -334,7 +334,7 @@ ARC_INLINE anFixedWinding::anFixedWinding( const anWinding &winding ) {
 	numPoints = winding.GetNumPoints();
 }
 
-ARC_INLINE anFixedWinding::anFixedWinding( const anFixedWinding &winding ) {
+inline anFixedWinding::anFixedWinding( const anFixedWinding &winding ) {
 	int i;
 
 	p = data;
@@ -349,11 +349,11 @@ ARC_INLINE anFixedWinding::anFixedWinding( const anFixedWinding &winding ) {
 	numPoints = winding.GetNumPoints();
 }
 
-ARC_INLINE anFixedWinding::~anFixedWinding( void ) {
+inline anFixedWinding::~anFixedWinding( void ) {
 	p = nullptr;	// otherwise it tries to free the fixed buffer
 }
 
-ARC_INLINE anFixedWinding &anFixedWinding::operator=( const anWinding &winding ) {
+inline anFixedWinding &anFixedWinding::operator=( const anWinding &winding ) {
 	int i;
 
 	if ( !EnsureAlloced( winding.GetNumPoints() ) ) {
@@ -367,7 +367,7 @@ ARC_INLINE anFixedWinding &anFixedWinding::operator=( const anWinding &winding )
 	return *this;
 }
 
-ARC_INLINE void anFixedWinding::Clear( void ) {
+inline void anFixedWinding::Clear( void ) {
 	numPoints = 0;
 }
 #endif	/* !__WINDING_H__ */

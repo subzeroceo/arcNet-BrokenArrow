@@ -63,31 +63,31 @@ private:
 	int								flags;
 };
 
-ARC_INLINE void rvVehicleAI::Random ( void ) {
+inline void rvVehicleAI::Random ( void ) {
 	flags = 0;
 	CustomMove();
 }
 
-ARC_INLINE void rvVehicleAI::StraightToEnemy ( void ) {
+inline void rvVehicleAI::StraightToEnemy ( void ) {
 	driver->ProcessEvent( &AI_ScriptedMove, enemy.ent.GetEntity(), 0.0f, 0 );
 }
 
-ARC_INLINE void rvVehicleAI::ChaseEnemy ( void ) {
+inline void rvVehicleAI::ChaseEnemy ( void ) {
 	flags = VAIF_Chase;
 	CustomMove();
 }
 
-ARC_INLINE void rvVehicleAI::AvoidEnemy ( void ) {
+inline void rvVehicleAI::AvoidEnemy ( void ) {
 	flags = VAIF_Avoid;
 	CustomMove();
 }
 
-ARC_INLINE void rvVehicleAI::Stop ( void ) {
+inline void rvVehicleAI::Stop ( void ) {
 	flags = ( flags & 0x03 ) | VAIF_Freeze;
 	driver->ProcessEvent( &AI_ScriptedStop );
 }
 
-ARC_INLINE void rvVehicleAI::Start ( void ) {
+inline void rvVehicleAI::Start ( void ) {
 	flags = ( flags & 0x03 ) & ~VAIF_Freeze;
 	//driver->ProcessEvent( &EV_Activate, this );
 	CustomMove();

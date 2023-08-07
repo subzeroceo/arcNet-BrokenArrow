@@ -102,7 +102,7 @@ int anEncodeBase64::Decode( byte *to ) const {
 anEncodeBase64::Encode
 ============
 */
-void anEncodeBase64::Encode( const anString &src ) {
+void anEncodeBase64::Encode( const anStr &src ) {
 	Encode( (const byte *)src.c_str(), src.Length() );
 }
 
@@ -111,7 +111,7 @@ void anEncodeBase64::Encode( const anString &src ) {
 anEncodeBase64::Decode
 ============
 */
-void anEncodeBase64::Decode( anString &dest ) const {
+void anEncodeBase64::Decode( anStr &dest ) const {
 	byte *buf = new byte[ DecodeLength()+1 ]; // +1 for trailing \0
 	int out = Decode( buf );
 	buf[out] = '\0';
@@ -133,7 +133,7 @@ void anEncodeBase64::Decode( anFile *dest ) const {
 
 #if 0
 void idBase64_TestBase64() {
-	anString src;
+	anStr src;
 	anEncodeBase64 dest;
 	src = "Encode me in base64";
 	dest.Encode( src );
@@ -177,7 +177,7 @@ void idBase64_TestBase64() {
 	void *buffer;
 	if ( anLibrary::fileSystem->ReadFile( "anDict.base64.test", &buffer ) != -1 ) {
 		anFileMemory mem_src( "dict" );
-		anLibrary::common->Printf( "read: %d %s\n", anString::Length( (char*)buffer ), buffer );
+		anLibrary::common->Printf( "read: %d %s\n", anStr::Length( (char*)buffer ), buffer );
 		base64_src = (char *)buffer;
 		base64_src.Decode( &mem_src );
 		mem_src.MakeReadOnly();

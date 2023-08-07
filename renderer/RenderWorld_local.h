@@ -102,7 +102,7 @@ public:
 
 	//-----------------------
 
-	anString				mapName;				// ie: maps/tim_dm2.proc, written to demoFile
+	anStr				mapName;				// ie: maps/tim_dm2.proc, written to demoFile
 	ARC_TIME_T				mapTimeStamp;			// for fast reloads of the same level
 
 	areaNode_t 				*areaNodes;
@@ -123,7 +123,7 @@ public:
 	anList<anRenderLightsLocal*> lightDefs;
 
 	anBlockAlloc<areaReference_t, 1024> areaReferenceAllocator;
-	anBlockAlloc<an Interaction, 256> interactionAllocator;
+	anBlockAlloc<anInteraction, 256> interactionAllocator;
 	anBlockAlloc<areaNumRef_t, 1024> areaNumRefAllocator;
 
 	// all light / entity interactions are referenced here for fast lookup without
@@ -131,7 +131,7 @@ public:
 	// cache access, because the table is accessed by light in anRenderWorldLocal::CreateLightDefInteractions()
 	// Growing this table is time consuming, so we add a pad value to the number
 	// of entityDefs and lightDefs
-	an Interaction **		interactionTable;
+	anInteraction **		interactionTable;
 	int						interactionTableWidth;		// entityDefs
 	int						interactionTableHeight;		// lightDefs
 

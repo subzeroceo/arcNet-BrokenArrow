@@ -11,46 +11,46 @@
 
 class anStringPool;
 
-class ARCPoolString : public anString {
+class anPoolString : public anStr {
 	friend class anStringPool;
 
 public:
-						ARCPoolString() { numUsers = 0; }
-						~ARCPoolString() { assert( numUsers == 0 ); }
+							anPoolString() { numUsers = 0; }
+							~anPoolString() { assert( numUsers == 0 ); }
 
-						// returns total size of allocated memory
-	size_t				Allocated( void ) const { return anString::Allocated(); }
-						// returns total size of allocated memory including size of string pool type
-	size_t				Size( void ) const { return sizeof( *this ) + Allocated(); }
-						// returns a pointer to the pool this string was allocated from
+							// returns total size of allocated memory
+	size_t					Allocated( void ) const { return anStr::Allocated(); }
+							// returns total size of allocated memory including size of string pool type
+	size_t					Size( void ) const { return sizeof( *this ) + Allocated(); }
+							// returns a pointer to the pool this string was allocated from
 	const anStringPool *	GetPool( void ) const { return pool; }
 
 private:
 	anStringPool *			pool;
-	mutable int			numUsers;
+	mutable int				numUsers;
 };
 
 class anStringPool {
 public:
-						anStringPool() { caseSensitive = true; }
+							anStringPool() { caseSensitive = true; }
 
-	void				SetCaseSensitive( bool caseSensitive );
+	void					SetCaseSensitive( bool caseSensitive );
 
-	int					Num( void ) const { return pool.Num(); }
-	size_t				Allocated( void ) const;
-	size_t				Size( void ) const;
+	int						Num( void ) const { return pool.Num(); }
+	size_t					Allocated( void ) const;
+	size_t					Size( void ) const;
 
-	const ARCPoolString *	operator[]( int index ) const { return pool[index]; }
+	const anPoolString *		operator[]( int index ) const { return pool[index]; }
 
-	const ARCPoolString *	AllocString( const char *string );
-	void				FreeString( const ARCPoolString *poolStr );
-	const ARCPoolString *	CopyString( const ARCPoolString *poolStr );
-	void				Clear( void );
+	const anPoolString *	AllocString( const char *string );
+	void					FreeString( const anPoolString *poolStr );
+	const anPoolString *	CopyString( const anPoolString *poolStr );
+	void					Clear( void );
 
 private:
-	bool				caseSensitive;
-	anList<ARCPoolString *>	pool;
-	anHashIndex			poolHash;
+	bool					caseSensitive;
+	anList<anPoolString *>	pool;
+	anHashIndex				poolHash;
 };
 
 /*
@@ -58,7 +58,7 @@ private:
 anStringPool::SetCaseSensitive
 ================
 */
-ARC_INLINE void anStringPool::SetCaseSensitive( bool caseSensitive ) {
+inline void anStringPool::SetCaseSensitive( bool caseSensitive ) {
 	this->caseSensitive = caseSensitive;
 }
 
@@ -67,9 +67,9 @@ ARC_INLINE void anStringPool::SetCaseSensitive( bool caseSensitive ) {
 anStringPool::AllocString
 ================
 */
-ARC_INLINE const ARCPoolString *anStringPool::AllocString( const char *string ) {
+inline const anPoolString *anStringPool::AllocString( const char *string ) {
 	int i, hash;
-	ARCPoolString *poolStr;
+	anPoolString *poolStr;
 
 	hash = poolHash.GenerateKey( string, caseSensitive );
 	if ( caseSensitive ) {
@@ -88,8 +88,8 @@ ARC_INLINE const ARCPoolString *anStringPool::AllocString( const char *string ) 
 		}
 	}
 
-	poolStr = new ARCPoolString;
-	*static_cast<anString *>(poolStr) = string;
+	poolStr = new anPoolString;
+	*static_cast<anStr *>(poolStr) = string;
 	poolStr->pool = this;
 	poolStr->numUsers = 1;
 	poolHash.Add( hash, pool.Append( poolStr ) );
@@ -101,7 +101,7 @@ ARC_INLINE const ARCPoolString *anStringPool::AllocString( const char *string ) 
 anStringPool::FreeString
 ================
 */
-ARC_INLINE void anStringPool::FreeString( const ARCPoolString *poolStr ) {
+inline void anStringPool::FreeString( const anPoolString *poolStr ) {
 	int i, hash;
 
 	assert( poolStr->numUsers >= 1 );
@@ -136,8 +136,7 @@ ARC_INLINE void anStringPool::FreeString( const ARCPoolString *poolStr ) {
 anStringPool::CopyString
 ================
 */
-ARC_INLINE const ARCPoolString *anStringPool::CopyString( const ARCPoolString *poolStr ) {
-
+inline const anPoolString *anStringPool::CopyString( const anPoolString *poolStr ) {
 	assert( poolStr->numUsers >= 1 );
 
 	if ( poolStr->pool == this ) {
@@ -155,10 +154,8 @@ ARC_INLINE const ARCPoolString *anStringPool::CopyString( const ARCPoolString *p
 anStringPool::Clear
 ================
 */
-ARC_INLINE void anStringPool::Clear( void ) {
-	int i;
-
-	for ( i = 0; i < pool.Num(); i++ ) {
+inline void anStringPool::Clear( void ) {
+	for ( int i = 0; i < pool.Num(); i++ ) {
 		pool[i]->numUsers = 0;
 	}
 	pool.DeleteContents( true );
@@ -170,12 +167,9 @@ ARC_INLINE void anStringPool::Clear( void ) {
 anStringPool::Allocated
 ================
 */
-ARC_INLINE size_t anStringPool::Allocated( void ) const {
-	int i;
-	size_t size;
-
-	size = pool.Allocated() + poolHash.Allocated();
-	for ( i = 0; i < pool.Num(); i++ ) {
+inline size_t anStringPool::Allocated( void ) const {
+	size_t size = pool.Allocated() + poolHash.Allocated();
+	for ( int i = 0; i < pool.Num(); i++ ) {
 		size += pool[i]->Allocated();
 	}
 	return size;
@@ -186,15 +180,12 @@ ARC_INLINE size_t anStringPool::Allocated( void ) const {
 anStringPool::Size
 ================
 */
-ARC_INLINE size_t anStringPool::Size( void ) const {
-	int i;
-	size_t size;
-
-	size = pool.Size() + poolHash.Size();
-	for ( i = 0; i < pool.Num(); i++ ) {
+inline size_t anStringPool::Size( void ) const {
+	size_t size = pool.Size() + poolHash.Size();
+	for ( int i = 0; i < pool.Num(); i++ ) {
 		size += pool[i]->Size();
 	}
 	return size;
 }
 
-#endif /* !__STRPOOL_H__ */
+#endif // !__STRPOOL_H__

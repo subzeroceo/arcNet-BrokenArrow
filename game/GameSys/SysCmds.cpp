@@ -1,7 +1,7 @@
 #include "../Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -29,7 +29,7 @@ Cmd_GetFloatArg
 ==================
 */
 float Cmd_GetFloatArg( const anCommandArgs &args, int &argNum ) {
-	const char* value = args.Argv( argNum++ );
+	const char *value = args.Argv( argNum++ );
 	return static_cast< float >( atof( value ) );
 }
 
@@ -39,7 +39,7 @@ Cmd_GetIntArg
 ==================
 */
 int Cmd_GetIntArg( const anCommandArgs &args, int &argNum ) {
-	const char* value = args.Argv( argNum++ );
+	const char *value = args.Argv( argNum++ );
 	return atoi( value );
 }
 
@@ -58,9 +58,9 @@ Cmd_WikiEventInfo_f
 ===================
 */
 void Cmd_WikiEventInfo_f( const anCommandArgs &args ) {
-	const char* eventName = args.Argv( 1 );
+	const char *eventName = args.Argv( 1 );
 
-	if ( anString::Icmp( eventName, "all" ) == 0 ) {
+	if ( anStr::Icmp( eventName, "all" ) == 0 ) {
 		sdWikiFormatter wiki;
 		wiki.ListAllEvents();
 		wiki.WriteToFile( "wiki/events.txt" );
@@ -68,7 +68,7 @@ void Cmd_WikiEventInfo_f( const anCommandArgs &args ) {
 	}
 
 	if ( *eventName != '\0' ) {
-		const arcEventDef* evt = arcEventDef::FindEvent( eventName );
+		const anEventDef* evt = anEventDef::FindEvent( eventName );
 		if ( evt == nullptr ) {
 			gameLocal.Warning( "Unknown Event '%s'", eventName );
 			return;
@@ -87,8 +87,8 @@ void Cmd_WikiEventInfo_f( const anCommandArgs &args ) {
 
 	int total = 0;
 	int written = 0;
-	for ( int i = 0; i < arcEventDef::NumEventCommands(); i++ ) {
-		const arcEventDef* evt = arcEventDef::GetEventCommand( i );
+	for ( int i = 0; i < anEventDef::NumEventCommands(); i++ ) {
+		const anEventDef* evt = anEventDef::GetEventCommand( i );
 		if ( !evt->GetAllowFromScript() ) {
 			continue;
 		}
@@ -101,7 +101,7 @@ void Cmd_WikiEventInfo_f( const anCommandArgs &args ) {
 
 		written++;
 
-		anString fileName = va( "wiki/events/%s.txt", evt->GetName() );
+		anStr fileName = va( "wiki/events/%s.txt", evt->GetName() );
 		sdWikiFormatter wiki;
 		wiki.BuildEventInfo( evt );
 		wiki.WriteToFile( fileName.c_str() );
@@ -115,15 +115,15 @@ void Cmd_WikiEventInfo_f( const anCommandArgs &args ) {
 Cmd_WikiFormatCode_r
 ===================
 */
-void Cmd_WikiFormatCode_r( const char* path ) {
+void Cmd_WikiFormatCode_r( const char *path ) {
 	anFileList* list = fileSystem->ListFiles( path, "script", false, true );
 
 	for ( int i = 0; i < list->GetNumFiles(); i++ ) {
-		const char* fileName = list->GetFile( i );
+		const char *fileName = list->GetFile( i );
 		sdWikiFormatter wiki;
 		wiki.FormatCode( fileName );
 
-		anString outputFileName = va( "wiki/%s", fileName );
+		anStr outputFileName = va( "wiki/%s", fileName );
 		outputFileName.StripFileExtension();
 		outputFileName.Append( "_formatted" );
 		outputFileName.SetFileExtension( ".txt" );
@@ -166,10 +166,10 @@ Cmd_WikiClassInfo_f
 ===================
 */
 void Cmd_WikiClassInfo_f( const anCommandArgs &args ) {
-	sdProgram* program = gameLocal.program;
+	idProgram* program = gameLocal.program;
 	int count = program->GetNumClasses();
 	for ( int i = 0; i < count; i++ ) {
-		const sdProgram::sdTypeInfo* type = program->GetClass( i );
+		const idProgram::sdTypeInfo* type = program->GetClass( i );
 
 		sdWikiFormatter wiki;
 		wiki.BuildScriptClassInfo( type );
@@ -199,7 +199,7 @@ Cmd_EntityList_f
 ===================
 */
 void Cmd_EntityList_f( const anCommandArgs &args ) {
-	anString match;
+	anStr match;
 	if ( args.Argc() > 1 ) {
 		match = args.Args();
 		match.Replace( " ", "" );
@@ -220,7 +220,7 @@ void Cmd_EntityList_f( const anCommandArgs &args ) {
 	gameLocal.Printf( "%-4s  %-20s %-20s %s\n", " Num", "EntityDef", "Class", "Name" );
 	gameLocal.Printf( "--------------------------------------------------------------------\n" );
 	for ( int e = 0; e < MAX_GENTITIES; e++ ) {
-		arcEntity* check = gameLocal.entities[ e ];
+		anEntity *check = gameLocal.entities[ e ];
 
 		if ( !check ) {
 			continue;
@@ -232,7 +232,7 @@ void Cmd_EntityList_f( const anCommandArgs &args ) {
 
 		counts[ check->GetType()->typeNum ].first++;
 
-		anString think;
+		anStr think;
 		if ( check->thinkFlags & TH_THINK ) {
 			think += "t";
 		}
@@ -267,7 +267,7 @@ Cmd_ActiveEntityList_f
 ===================
 */
 void Cmd_ActiveEntityList_f( const anCommandArgs &args ) {
-	arcEntity	*check;
+	anEntity	*check;
 	int			count;
 
 	count = 0;
@@ -290,7 +290,7 @@ Cmd_ListSpawnArgs_f
 */
 void Cmd_ListSpawnArgs_f( const anCommandArgs &args ) {
 	int i;
-	arcEntity *ent;
+	anEntity *ent;
 
 	ent = gameLocal.FindEntity( args.Argv( 1 ) );
 	if ( !ent ) {
@@ -345,7 +345,7 @@ Kills all the entities of the given class in a level.
 ==================
 */
 void KillEntities( const anCommandArgs &args, const idTypeInfo &superClass, bool delayed ) {
-	arcEntity	*ent, *nextEnt;
+	anEntity	*ent, *nextEnt;
 	anStringList	ignore;
 	const char *name;
 	int			i;
@@ -399,7 +399,7 @@ void KillEntities( const anDeclEntityDef* entityDef, bool delayed ) {
 		return;
 	}
 
-	arcEntity *ent, *nextEnt;
+	anEntity *ent, *nextEnt;
 	for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = nextEnt ) {
 		nextEnt = ent->spawnNode.Next();
 		if ( ent->entityDefNumber == entityDef->Index() ) {
@@ -418,7 +418,7 @@ ActivateEntityPhysics
 ==================
 */
 void ActivateEntityPhysics( const anCommandArgs &args, const idTypeInfo& superClass ) {
-	arcEntity	*ent;
+	anEntity	*ent;
 	anStringList	ignore;
 	const char *name;
 	int			i;
@@ -473,7 +473,7 @@ Cmd_KillTransports_f
 ==================
 */
 void Cmd_KillTransports_f( const anCommandArgs &args ) {
-	KillEntities( args, sdTransport::Type, true );
+	KillEntities( args, anTransport::Type, true );
 }
 
 /*
@@ -522,7 +522,7 @@ Cmd_ActivateAFs_f
 ==================
 */
 void Cmd_ActivateAFs_f( const anCommandArgs &args ) {
-	ActivateEntityPhysics( args, arcAFEntity_Base::Type );
+	ActivateEntityPhysics( args, anAFEntity_Base::Type );
 }
 
 /*
@@ -531,7 +531,7 @@ Cmd_ActivateVehicles_f
 ==================
 */
 void Cmd_ActivateVehicles_f( const anCommandArgs &args ) {
-	ActivateEntityPhysics( args, sdTransport::Type );
+	ActivateEntityPhysics( args, anTransport::Type );
 }
 
 /*
@@ -542,7 +542,7 @@ Kills all the ragdolls in a level.
 ==================
 */
 void Cmd_KillRagdolls_f( const anCommandArgs &args ) {
-	KillEntities( args, arcAFEntity_Generic::Type, true );
+	KillEntities( args, anAFEntity_Generic::Type, true );
 }
 
 /*
@@ -555,7 +555,7 @@ Give items to a client
 void Cmd_Give_f( const anCommandArgs &args ) {
 	const char *name;
 	bool		give_all;
-	arcNetBasePlayer	*player;
+	anBasePlayer	*player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -564,21 +564,21 @@ void Cmd_Give_f( const anCommandArgs &args ) {
 
 	name = args.Argv( 1 );
 
-	if ( anString::Icmp( name, "all" ) == 0 ) {
+	if ( anStr::Icmp( name, "all" ) == 0 ) {
 		give_all = true;
 	} else {
 		give_all = false;
 	}
 
-	if ( give_all || anString::Icmp( name, "health" ) == 0 )	{
+	if ( give_all || anStr::Icmp( name, "health" ) == 0 )	{
 		player->SetHealth( player->GetMaxHealth() );
 		if ( !give_all ) {
 			return;
 		}
 	}
 
-	if ( give_all || anString::Icmp( name, "ammo" ) == 0 ) {
-		sdInventory& inventory = player->GetInventory();
+	if ( give_all || anStr::Icmp( name, "ammo" ) == 0 ) {
+		anInventory& inventory = player->GetInventory();
 		for ( int i = 0; i < gameLocal.declAmmoTypeType.Num(); i++ ) {
 			inventory.SetAmmo( i, inventory.GetMaxAmmo( i ) );
 		}
@@ -587,14 +587,14 @@ void Cmd_Give_f( const anCommandArgs &args ) {
 		}
 	}
 
-	if ( !anString::Icmp( name, "class" ) ) {
-		const char* className = args.Argv( 2 );
+	if ( !anStr::Icmp( name, "class" ) ) {
+		const char *className = args.Argv( 2 );
 		if ( gameLocal.isClient ) {
 			sdReliableClientMessage msg( GAME_RELIABLE_CMESSAGE_GIVECLASS );
 			msg.WriteString( className );
 			msg.Send();
 		} else {
-			const sdDeclPlayerClass* pc = gameLocal.declPlayerClassType[ className ];
+			const anDeclPlayerClass* pc = gameLocal.declPlayerClassType[ className ];
 			if ( pc ) {
 				player->GetInventory().GiveClass( pc, true );
 			}
@@ -612,7 +612,7 @@ Cmd_God_f
 
 Sets client to godmode
 
-argv(0) god
+argv( 0 ) god
 ==================
 */
 void Cmd_God_f( const anCommandArgs& args ) {
@@ -631,12 +631,12 @@ Cmd_Notarget_f
 
 Sets client to notarget
 
-argv(0) notarget
+argv( 0 ) notarget
 ==================
 */
 void Cmd_Notarget_f( const anCommandArgs &args ) {
 	char		*msg;
-	arcNetBasePlayer	*player;
+	anBasePlayer	*player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -658,7 +658,7 @@ void Cmd_Notarget_f( const anCommandArgs &args ) {
 ==================
 Cmd_Noclip_f
 
-argv(0) noclip
+argv( 0 ) noclip
 ==================
 */
 void Cmd_Noclip_f( const anCommandArgs &args ) {
@@ -681,7 +681,7 @@ void Cmd_Kill_f( const anCommandArgs &args ) {
 		sdReliableClientMessage outMsg( GAME_RELIABLE_CMESSAGE_KILL );
 		outMsg.Send();
 	} else {
-		arcNetBasePlayer* player = gameLocal.GetLocalPlayer();
+		anBasePlayer* player = gameLocal.GetLocalPlayer();
 		if ( !player ) {
 			return;
 		}
@@ -788,7 +788,7 @@ Cmd_GetViewpos_f
 ==================
 */
 void Cmd_GetViewpos_f( const anCommandArgs &args ) {
-	arcNetBasePlayer	*player;
+	anBasePlayer	*player;
 	anVec3		origin;
 	anMat3		axis;
 
@@ -797,8 +797,8 @@ void Cmd_GetViewpos_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	anString output;
-	anString clipOutput;
+	anStr output;
+	anStr clipOutput;
 	const renderView_t *view = player->GetRenderView();
 	if ( view != nullptr ) {
 		anAngles angles = view->viewaxis[0].ToAngles();
@@ -824,7 +824,7 @@ void Cmd_SetViewpos_f( const anCommandArgs &args ) {
 	anVec3		origin;
 	anAngles	angles;
 	int			i;
-	arcNetBasePlayer	*player;
+	anBasePlayer	*player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -864,8 +864,8 @@ Cmd_Teleport_f
 void Cmd_Teleport_f( const anCommandArgs &args ) {
 	anVec3		origin;
 	anAngles	angles;
-	arcNetBasePlayer	*player;
-	arcEntity	*ent;
+	anBasePlayer	*player;
+	anEntity	*ent;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -884,7 +884,7 @@ void Cmd_Teleport_f( const anCommandArgs &args ) {
 	}
 
 	angles.Zero();
-	angles.yaw = ent->GetPhysics()->GetAxis()[ 0 ].ToYaw();
+	angles.yaw = ent->GetPhysics()->GetAxis()[0].ToYaw();
 	origin = ent->GetPhysics()->GetOrigin();
 
 	player->GetPhysics()->SetOrigin( origin );
@@ -899,8 +899,8 @@ Cmd_Trigger_f
 void Cmd_Trigger_f( const anCommandArgs &args ) {
 	anVec3		origin;
 	anAngles	angles;
-	arcNetBasePlayer	*player;
-	arcEntity	*ent;
+	anBasePlayer	*player;
+	anEntity	*ent;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -931,7 +931,7 @@ void Cmd_Spawn_f( const anCommandArgs &args ) {
 	int			i;
 	float		yaw;
 	anVec3		org;
-	arcNetBasePlayer	*player;
+	anBasePlayer	*player;
 	anDict		dict;
 
 	player = gameLocal.GetLocalPlayer();
@@ -1001,7 +1001,7 @@ void Cmd_Damage_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	arcEntity *ent = gameLocal.FindEntity( args.Argv( 1 ) );
+	anEntity *ent = gameLocal.FindEntity( args.Argv( 1 ) );
 	if ( !ent ) {
 		gameLocal.Printf( "entity not found\n" );
 		return;
@@ -1027,7 +1027,7 @@ void Cmd_Remove_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	arcEntity *ent = gameLocal.FindEntity( args.Argv( 1 ) );
+	anEntity *ent = gameLocal.FindEntity( args.Argv( 1 ) );
 	if ( !ent ) {
 		gameLocal.Printf( "entity not found\n" );
 		return;
@@ -1044,9 +1044,9 @@ Cmd_TestLight_f
 */
 void Cmd_TestLight_f( const anCommandArgs &args ) {
 	int			i;
-	anString		filename;
+	anStr		filename;
 	const char *key, *value, *name;
-	arcNetBasePlayer *	player;
+	anBasePlayer *	player;
 	anDict		dict;
 
 
@@ -1055,13 +1055,13 @@ void Cmd_TestLight_f( const anCommandArgs &args ) {
 
 	if ( *s == '0' && (*( s+1) == 'x' || *( s+1) == 'X') ) {
 		s += 2;
-		if ( anString::IsHexColor( s ) ) {
-			lightColor[0] = ( ( float )(anString::HexForChar(*( s)) * 16 + anString::HexForChar(*( s+1)))) / 255.f;
-			lightColor[1] = ( ( float )(anString::HexForChar(*( s+2)) * 16 + anString::HexForChar(*( s+3)))) / 255.f;
-			lightColor[2] = ( ( float )(anString::HexForChar(*( s+4)) * 16 + anString::HexForChar(*( s+5)))) / 255.f;
+		if ( anStr::IsHexColor( s ) ) {
+			lightColor[0] = ( ( float )(anStr::HexForChar(*( s)) * 16 + anStr::HexForChar(*( s+1)))) / 255.f;
+			lightColor[1] = ( ( float )(anStr::HexForChar(*( s+2)) * 16 + anStr::HexForChar(*( s+3)))) / 255.f;
+			lightColor[2] = ( ( float )(anStr::HexForChar(*( s+4)) * 16 + anStr::HexForChar(*( s+5)))) / 255.f;
 		}
 	} else {
-		sscanf( s, "%f %f %f", &lightColor[ 0 ], &lightColor[ 1 ], &lightColor[ 2 ] );
+		sscanf( s, "%f %f %f", &lightColor[0], &lightColor[1], &lightColor[2] );
 	}
 
 
@@ -1122,7 +1122,7 @@ Cmd_TestPointLight_f
 void Cmd_TestPointLight_f( const anCommandArgs &args ) {
 	const char *key, *value, *name;
 	int			i;
-	arcNetBasePlayer	*player;
+	anBasePlayer	*player;
 	anDict		dict;
 
 	player = gameLocal.GetLocalPlayer();
@@ -1168,7 +1168,7 @@ Cmd_PopLight_f
 ==================
 */
 void Cmd_PopLight_f( const anCommandArgs &args ) {
-	arcEntity	*ent;
+	anEntity	*ent;
 	anMapEntity *mapEnt;
 	anMapFile	*mapFile = gameLocal.GetLevelMap();
 	idLight		*lastLight;
@@ -1214,8 +1214,8 @@ Cmd_ClearLights_f
 ====================
 */
 void Cmd_ClearLights_f( const anCommandArgs &args ) {
-	arcEntity *ent;
-	arcEntity *next;
+	anEntity *ent;
+	anEntity *next;
 	idLight *light;
 	anMapEntity *mapEnt;
 	anMapFile *mapFile = gameLocal.GetLevelMap();
@@ -1249,7 +1249,7 @@ Cmd_TestFx_f
 void Cmd_TestFx_f( const anCommandArgs &args ) {
 	anVec3		offset;
 	const char *name;
-	arcNetBasePlayer *	player;
+	anBasePlayer *	player;
 	anDict		dict;
 
 	player = gameLocal.GetLocalPlayer();
@@ -1321,7 +1321,7 @@ static void Cmd_AddDebugLine_f( const anCommandArgs &args ) {
 		return;
 	}
 	value = args.Argv( 0 );
-	if ( !anString::Icmp( value, "addarrow" ) ) {
+	if ( !anStr::Icmp( value, "addarrow" ) ) {
 		debugLines[i].arrow = true;
 	} else {
 		debugLines[i].arrow = false;
@@ -1520,14 +1520,14 @@ static void Cmd_CollisionModelInfo_f( const anCommandArgs &args ) {
 	}
 
 	value = args.Argv( 1 );
-	if ( !anString::Icmp( value, "all" ) ) {
+	if ( !anStr::Icmp( value, "all" ) ) {
 		collisionModelManager->ModelInfo( -1 );
 	} else {
 		collisionModelManager->ModelInfo( atoi(value) );
 	}
 }
 
-#if defined( ID_ALLOW_TOOLS )
+#if defined( ARC_ALLOW_TOOLS )
 /*
 ==================
 Cmd_ExportModels_f
@@ -1535,7 +1535,7 @@ Cmd_ExportModels_f
 */
 static void Cmd_ExportModels_f( const anCommandArgs &args ) {
 	idModelExport	exporter;
-	anString			name;
+	anStr			name;
 
 	// don't allow exporting models when cheats are disabled,
 	// but if we're not in the game, it's ok
@@ -1560,7 +1560,7 @@ Cmd_ReexportModels_f
 */
 static void Cmd_ReexportModels_f( const anCommandArgs &args ) {
 	idModelExport	exporter;
-	anString			name;
+	anStr			name;
 
 	// don't allow exporting models when cheats are disabled,
 	// but if we're not in the game, it's ok
@@ -1568,7 +1568,7 @@ static void Cmd_ReexportModels_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	arcAnimManager::forceExport = true;
+	anAnimManager::forceExport = true;
 	if ( args.Argc() < 2 ) {
 		exporter.ExportModels( "def", ".def" );
 	} else {
@@ -1577,9 +1577,9 @@ static void Cmd_ReexportModels_f( const anCommandArgs &args ) {
 		name.DefaultFileExtension( ".def" );
 		exporter.ExportDefFile( name );
 	}
-	arcAnimManager::forceExport = false;
+	anAnimManager::forceExport = false;
 }
-#endif /* ID_ALLOW_TOOLS */
+#endif /* ARC_ALLOW_TOOLS */
 
 /*
 ==================
@@ -1625,17 +1625,17 @@ Cmd_ListAnims_f
 ==================
 */
 static void Cmd_ListAnims_f( const anCommandArgs &args ) {
-	arcEntity *		ent;
+	anEntity *		ent;
 	int				num;
 	size_t			size;
 	size_t			alloced;
-	arcAnimator *	animator;
+	anAnimator *	animator;
 	const char *	classname;
 	const anDict *	dict;
 	int				i;
 
 	if ( args.Argc() > 1 ) {
-		arcAnimator animator;
+		anAnimator animator;
 
 		classname = args.Argv( 1 );
 
@@ -1676,7 +1676,7 @@ Cmd_TestDamage_f
 ==================
 */
 static void Cmd_TestDamage_f( const anCommandArgs &args ) {
-	arcNetBasePlayer *player;
+	anBasePlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -1716,14 +1716,14 @@ Cmd_TestProficiency_f
 ==================
 */
 static void Cmd_TestProficiency_f( const anCommandArgs& args ) {
-	const char* profName = args.Argv( 1 );
+	const char *profName = args.Argv( 1 );
 
 	const sdDeclProficiencyItem* profItem = gameLocal.declProficiencyItemType[ profName ];
 	if ( !profItem ) {
 		return;
 	}
 
-	arcNetBasePlayer* localPlayer = gameLocal.GetLocalPlayer();
+	anBasePlayer* localPlayer = gameLocal.GetLocalPlayer();
 	if ( localPlayer ) {
 		sdProficiencyManager::GetInstance().GiveProficiency( profItem, localPlayer, 1.f, nullptr, "Cheat" );
 	}
@@ -1748,7 +1748,7 @@ static void Cmd_TestPrecache_f( const anCommandArgs& args ) {
 
 	fs_debug.SetBool( true );
 
-	arcEntity* other;
+	anEntity *other;
 	if ( gameLocal.SpawnEntityDef( entityDef->dict, true, &other ) ) {
 		other->PostEventMS( &EV_Remove, 0 );
 	}
@@ -1762,7 +1762,7 @@ Cmd_TestDamage_f
 ==================
 */
 static void Cmd_TestDeath_f( const anCommandArgs &args ) {
-	arcNetBasePlayer *player;
+	anBasePlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -1784,12 +1784,12 @@ Cmd_SaveSelected_f
 */
 static void Cmd_SaveSelected_f( const anCommandArgs &args ) {
 	int i;
-	arcNetBasePlayer *player;
-	arcEntity *s;
+	anBasePlayer *player;
+	anEntity *s;
 	anMapEntity *mapEnt;
 	anMapFile *mapFile = gameLocal.GetLevelMap();
 	anDict dict;
-	anString mapName;
+	anStr mapName;
 	const char *name;
 
 	player = gameLocal.GetLocalPlayer();
@@ -1832,10 +1832,10 @@ static void Cmd_SaveSelected_f( const anCommandArgs &args ) {
 		// save the moveable state
 		mapEnt->epairs.Set( "origin", s->GetPhysics()->GetOrigin().ToString( 8 ) );
 		mapEnt->epairs.Set( "rotation", s->GetPhysics()->GetAxis().ToString( 8 ) );
-	} else if ( s->IsType( arcAFEntity_Generic::Type ) ) {
+	} else if ( s->IsType( anAFEntity_Generic::Type ) ) {
 		// save the articulated figure state
 		dict.Clear();
-		static_cast<arcAFEntity_Base *>( s)->SaveState( dict );
+		static_cast<anAFEntity_Base *>( s)->SaveState( dict );
 		mapEnt->epairs.Copy( dict );
 	}
 
@@ -1849,7 +1849,7 @@ Cmd_DeleteSelected_f
 ==================
 */
 static void Cmd_DeleteSelected_f( const anCommandArgs &args ) {
-/*	arcNetBasePlayer *player;
+/*	anBasePlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -1871,7 +1871,7 @@ static void Cmd_SaveMoveables_f( const anCommandArgs &args ) {
 	idMoveable *m;
 	anMapEntity *mapEnt;
 	anMapFile *mapFile = gameLocal.GetLevelMap();
-	anString mapName;
+	anStr mapName;
 	const char *name;
 
 	if ( !gameLocal.CheatsOk() ) {
@@ -1950,11 +1950,11 @@ Cmd_SaveRagdolls_f
 */
 static void Cmd_SaveRagdolls_f( const anCommandArgs &args ) {
 	int e, i;
-	arcAFEntity_Base *af;
+	anAFEntity_Base *af;
 	anMapEntity *mapEnt;
 	anMapFile *mapFile = gameLocal.GetLevelMap();
 	anDict dict;
-	anString mapName;
+	anStr mapName;
 	const char *name;
 
 	if ( !gameLocal.CheatsOk() ) {
@@ -1970,13 +1970,13 @@ static void Cmd_SaveRagdolls_f( const anCommandArgs &args ) {
 	}
 
 	for ( e = 0; e < MAX_GENTITIES; e++ ) {
-		af = static_cast<arcAFEntity_Base *>(gameLocal.entities[ e ]);
+		af = static_cast<anAFEntity_Base *>(gameLocal.entities[ e ]);
 
 		if ( !af ) {
 			continue;
 		}
 
-		if ( !af->IsType( arcAFEntity_Generic::Type ) ) {
+		if ( !af->IsType( anAFEntity_Generic::Type ) ) {
 			continue;
 		}
 
@@ -2021,7 +2021,7 @@ Cmd_BindRagdoll_f
 ==================
 */
 static void Cmd_BindRagdoll_f( const anCommandArgs &args ) {
-/*	arcNetBasePlayer *player;
+/*	anBasePlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -2039,7 +2039,7 @@ Cmd_UnbindRagdoll_f
 ==================
 */
 static void Cmd_UnbindRagdoll_f( const anCommandArgs &args ) {
-/*	arcNetBasePlayer *player;
+/*	anBasePlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
 	if ( !player || !gameLocal.CheatsOk() ) {
@@ -2075,7 +2075,7 @@ Cmd_CheckRenderEntityHandles_f
 ==================
 */
 static void Cmd_CheckRenderEntityHandles_f( const anCommandArgs &args ) {
-	arcEntity::CheckForDuplicateRenderEntityHandles();
+	anEntity::CheckForDuplicateRenderEntityHandles();
 }
 
 /*
@@ -2093,7 +2093,7 @@ Cmd_TouchCollision_f
 ==================
 */
 static void Cmd_TouchCollision_f( const anCommandArgs &args ) {
-	arcCollisionModel* model = collisionModelManager->LoadModel( gameLocal.GetMapName(), args.Argv( 1 ) );
+	anCollisionModel* model = collisionModelManager->LoadModel( gameLocal.GetMapName(), args.Argv( 1 ) );
 	collisionModelManager->FreeModel( model );
 }
 
@@ -2112,8 +2112,8 @@ Cmd_DumpMonolithicInfo_f
 ==================
 */
 struct monolithicClassInfo_t {
-	anString classDef;
-	anString fileName;
+	anStr classDef;
+	anStr fileName;
 };
 static void Cmd_DumpMonolithicInfo_f( const anCommandArgs &args ) {
 	anList< monolithicClassInfo_t > classDefs;
@@ -2125,10 +2125,10 @@ static void Cmd_DumpMonolithicInfo_f( const anCommandArgs &args ) {
 		assert( loaded );
 
 		while ( !lexer.EndOfFile() ) {
-			anString str;
+			anStr str;
 			lexer.ParseCompleteLine( str );
 
-			if ( str.Find( "CLASS_PROTOTYPE" ) == anString::INVALID_POSITION && str.Find( "ABSTRACT_PROTOTYPE" ) == anString::INVALID_POSITION ) {
+			if ( str.Find( "CLASS_PROTOTYPE" ) == anStr::INVALID_POSITION && str.Find( "ABSTRACT_PROTOTYPE" ) == anStr::INVALID_POSITION ) {
 				continue;
 			}
 
@@ -2149,10 +2149,10 @@ static void Cmd_DumpMonolithicInfo_f( const anCommandArgs &args ) {
 	for ( int i = 0; i < anClass::GetNumTypes(); i++ ) {
 		idTypeInfo* type = anClass::GetType( i );
 
-		const char* fileName = nullptr;
+		const char *fileName = nullptr;
 
 		for ( int j = 0; j < classDefs.Num(); j++ ) {
-			if ( classDefs[ j ].classDef.Find( va( " %s ", type->classname ) ) == anString::INVALID_POSITION ) {
+			if ( classDefs[ j ].classDef.Find( va( " %s ", type->classname ) ) == anStr::INVALID_POSITION ) {
 				continue;
 			}
 
@@ -2163,7 +2163,7 @@ static void Cmd_DumpMonolithicInfo_f( const anCommandArgs &args ) {
 		if ( fileName == nullptr ) {
 			gameLocal.Warning( "Couldn't find header for class '%s'", type->classname );
 		} else {
-			anString strip = fileName;
+			anStr strip = fileName;
 			dependencies.AddUnique( strip.Right( strip.Length() - 5 ) );
 			monolithicTypesFile->WriteFloatString( "volatile static idTypeInfo& %sType = %s::Type;\n", type->classname, type->classname );
 		}
@@ -2247,7 +2247,7 @@ Cmd_Camera_f
 */
 static void Cmd_Camera_f( const anCommandArgs &args ) {
 	if ( args.Argc() == 2 ) {
-		arcEntity* ent = gameLocal.FindEntity( args.Argv( 1 ) );
+		anEntity *ent = gameLocal.FindEntity( args.Argv( 1 ) );
 		if ( !ent ) {
 			gameLocal.Printf( "entity not found\n" );
 			return;
@@ -2271,7 +2271,7 @@ Cmd_CameraNext_f
 ==================
 */
 static void Cmd_CameraNext_f( const anCommandArgs &args ) {
-	arcEntity* ent = gameLocal.GetCamera();
+	anEntity *ent = gameLocal.GetCamera();
 
 	if ( ent && !ent->IsType( sdCamera_Placement::Type ) ) {
 		return;
@@ -2299,7 +2299,7 @@ Cmd_CameraPrev_f
 ==================
 */
 static void Cmd_CameraPrev_f( const anCommandArgs &args ) {
-	arcEntity* ent = gameLocal.GetCamera();
+	anEntity *ent = gameLocal.GetCamera();
 
 	if ( ent && !ent->IsType( sdCamera_Placement::Type ) ) {
 		return;
@@ -2358,7 +2358,7 @@ void Cmd_UseWeapon_f( const anCommandArgs& args ) {
 		return;
 	}
 
-	const char* weaponName = args.Argv( 1 );
+	const char *weaponName = args.Argv( 1 );
 
 	if ( gameLocal.isClient ) {
 		sdReliableClientMessage msg( GAME_RELIABLE_CMESSAGE_SELECTWEAPON );
@@ -2367,7 +2367,7 @@ void Cmd_UseWeapon_f( const anCommandArgs& args ) {
 		return;
 	}
 
-	arcNetBasePlayer* localPlayer = gameLocal.GetLocalPlayer();
+	anBasePlayer* localPlayer = gameLocal.GetLocalPlayer();
 	if ( !localPlayer ) {
 		return;
 	}
@@ -2381,7 +2381,7 @@ Cmd_Vote_f
 ==================
 */
 void Cmd_Vote_f( const anCommandArgs &args ) {
-	const char* message = args.Argv( 1 );
+	const char *message = args.Argv( 1 );
 
 	bool voteResult;
 	if ( *message == 'y' ) {
@@ -2393,7 +2393,7 @@ void Cmd_Vote_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	arcNetBasePlayer* localPlayer = gameLocal.GetLocalPlayer();
+	anBasePlayer* localPlayer = gameLocal.GetLocalPlayer();
 	if ( localPlayer == nullptr ) {
 		return;
 	}
@@ -2427,7 +2427,7 @@ void Cmd_Fireteam_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	arcNetBasePlayer* player = gameLocal.GetLocalPlayer();
+	anBasePlayer* player = gameLocal.GetLocalPlayer();
 	if ( player ) {
 		sdFireTeamManager::GetInstance().PerformCommand( args, player );
 	}
@@ -2489,14 +2489,14 @@ static void Cmd_CollisionTest_f( const anCommandArgs& args ) {
 			expectNone = true;
 		}
 
-		if ( def->dict.GetVector( "mins", nullptr, bounds[ 0 ] ) ) {
+		if ( def->dict.GetVector( "mins", nullptr, bounds[0] ) ) {
 			hasMins = true;
 			if ( expectNone ) {
 				gameLocal.Warning( "Entity '%s': Unexpected Mins", def->GetName() );
 			}
 		}
 
-		if ( def->dict.GetVector( "maxs", nullptr, bounds[ 1 ] ) ) {
+		if ( def->dict.GetVector( "maxs", nullptr, bounds[1] ) ) {
 			hasMaxs = true;
 			if ( expectNone ) {
 				gameLocal.Warning( "Entity '%s': Unexpected Maxs", def->GetName() );
@@ -2520,7 +2520,7 @@ static void Cmd_CollisionTest_f( const anCommandArgs& args ) {
 			expectNone = true;
 		}
 
-		const char* clipModelName = def->dict.GetString( "cm_model" );
+		const char *clipModelName = def->dict.GetString( "cm_model" );
 		if ( *clipModelName ) {
 			gameLocal.clip.PrecacheModel( clipModelName );
 
@@ -2606,7 +2606,7 @@ static void Cmd_PrintUserGUID_f( const anCommandArgs &args ) {
 	sdNetAccount& account = user->GetAccount();
 	account.GetNetClientId( clientId );
 
-	const char* guid = va( "%u.%u", clientId.id[ 0 ], clientId.id[ 1 ] );
+	const char *guid = va( "%u.%u", clientId.id[0], clientId.id[1] );
 	gameLocal.Printf( "User Id: '%s'\n", guid );
 	sys->SetClipboardData( va( L"%hs", guid ) );
 }
@@ -2625,8 +2625,8 @@ static void SetSpectateClient( const anCommandArgs &args, int argOffset ) {
 
 	int spectateeNum = -1;
 
-	const char* name = args.Argv( 1 + argOffset );
-	if ( anString::IsNumeric( name ) ) {
+	const char *name = args.Argv( 1 + argOffset );
+	if ( anStr::IsNumeric( name ) ) {
 		spectateeNum = atoi( name );
 		if ( spectateeNum < 0 || spectateeNum >= MAX_CLIENTS ) {
 			spectateeNum = -1;
@@ -2636,7 +2636,7 @@ static void SetSpectateClient( const anCommandArgs &args, int argOffset ) {
 			}
 		}
 	} else {
-		arcNetBasePlayer* other = gameLocal.GetClientByName( name );
+		anBasePlayer* other = gameLocal.GetClientByName( name );
 		if ( other != nullptr ) {
 			spectateeNum = other->entityNumber;
 		}
@@ -2649,7 +2649,7 @@ static void SetSpectateClient( const anCommandArgs &args, int argOffset ) {
 
 	// don't spectate spectators unless you're on a repeater
 	if ( !gameLocal.serverIsRepeater ) {
-		arcNetBasePlayer* other = gameLocal.GetClient( spectateeNum );
+		anBasePlayer* other = gameLocal.GetClient( spectateeNum );
 		if ( other->IsSpectator() ) {
 			gameLocal.Printf( "Client %s is a spectator.\n", name );
 			return;
@@ -2701,7 +2701,7 @@ static void Cmd_Spectate_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	arcNetBasePlayer* player = gameLocal.GetLocalPlayer();
+	anBasePlayer* player = gameLocal.GetLocalPlayer();
 	if ( !gameLocal.serverIsRepeater ) {
 		if ( player == nullptr ) {
 			gameLocal.Printf( "No local player\n" );
@@ -2713,23 +2713,23 @@ static void Cmd_Spectate_f( const anCommandArgs &args ) {
 		}
 	}
 
-	const char* commandString = args.Argv( 1 );
-	arcNetBasePlayer::spectateCommand_t command = arcNetBasePlayer::SPECTATE_INVALID;
+	const char *commandString = args.Argv( 1 );
+	anBasePlayer::spectateCommand_t command = anBasePlayer::SPECTATE_INVALID;
 	anVec3 origin = vec3_origin;
 	anAngles angles = ang_zero;
 
-	if ( !anString::Icmp( "next", commandString ) ) {
-		command = arcNetBasePlayer::SPECTATE_NEXT;
-	} else if ( !anString::Icmp( "prev", commandString ) ) {
-		command = arcNetBasePlayer::SPECTATE_PREV;
-	} else if ( !anString::Icmp( "objective", commandString ) ) {
-		command = arcNetBasePlayer::SPECTATE_OBJECTIVE;
-	} else if ( !anString::Icmp( "client", commandString ) ) {
+	if ( !anStr::Icmp( "next", commandString ) ) {
+		command = anBasePlayer::SPECTATE_NEXT;
+	} else if ( !anStr::Icmp( "prev", commandString ) ) {
+		command = anBasePlayer::SPECTATE_PREV;
+	} else if ( !anStr::Icmp( "objective", commandString ) ) {
+		command = anBasePlayer::SPECTATE_OBJECTIVE;
+	} else if ( !anStr::Icmp( "client", commandString ) ) {
 		// client does magic stuff
 		SetSpectateClient( args, 1 );
 		return;
-	} else if ( !anString::Icmp( "position", commandString ) ) {
-		command = arcNetBasePlayer::SPECTATE_POSITION;
+	} else if ( !anStr::Icmp( "position", commandString ) ) {
+		command = anBasePlayer::SPECTATE_POSITION;
 
 		if ( args.Argc() < 5 || args.Argc() > 8 ) {
 			gameLocal.Printf( "usage: spectate position <x> <y> <z> <yaw> <pitch> <roll>\n" );
@@ -2754,22 +2754,22 @@ static void Cmd_Spectate_f( const anCommandArgs &args ) {
 	}
 
 
-	if ( command == arcNetBasePlayer::SPECTATE_INVALID ) {
+	if ( command == anBasePlayer::SPECTATE_INVALID ) {
 		gameLocal.Printf( "unknown command '%s'\n", commandString );
 		return;
 	}
 
 	if ( gameLocal.serverIsRepeater ) {
 		// client on a repeater has to do everything locally
-		if ( command == arcNetBasePlayer::SPECTATE_OBJECTIVE ) {
+		if ( command == anBasePlayer::SPECTATE_OBJECTIVE ) {
 			gameLocal.Printf( "cannot do spectate objective while connected to a repeater.\n" );
-		} else if ( command == arcNetBasePlayer::SPECTATE_POSITION ) {
+		} else if ( command == anBasePlayer::SPECTATE_POSITION ) {
 			gameLocal.ChangeLocalSpectateClient( -1 );
 			gameLocal.playerView.SetRepeaterViewPosition( origin, angles );
-		} else if ( command == arcNetBasePlayer::SPECTATE_NEXT || command == arcNetBasePlayer::SPECTATE_PREV ) {
+		} else if ( command == anBasePlayer::SPECTATE_NEXT || command == anBasePlayer::SPECTATE_PREV ) {
 			// go through and find a new client to spectate
 			int delta = 1;
-			if ( command == arcNetBasePlayer::SPECTATE_PREV ) {
+			if ( command == anBasePlayer::SPECTATE_PREV ) {
 				delta = -1;
 			}
 			int upto = gameLocal.repeaterClientFollowIndex;
@@ -2790,8 +2790,8 @@ static void Cmd_Spectate_f( const anCommandArgs &args ) {
 
 		// clients ask server to do it
 		sdReliableClientMessage outMsg( GAME_RELIABLE_CMESSAGE_SPECTATECOMMAND );
-		outMsg.WriteBits( command, anMath::BitsForInteger( arcNetBasePlayer::SPECTATE_MAX ) );
-		if ( command == arcNetBasePlayer::SPECTATE_POSITION ) {
+		outMsg.WriteBits( command, anMath::BitsForInteger( anBasePlayer::SPECTATE_MAX ) );
+		if ( command == anBasePlayer::SPECTATE_POSITION ) {
 			outMsg.WriteVector( origin );
 			outMsg.WriteFloat( angles.pitch );
 			outMsg.WriteFloat( angles.yaw );
@@ -2832,7 +2832,7 @@ static void Cmd_SetSpawnPoint_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	arcNetBasePlayer* player = gameLocal.GetLocalPlayer();
+	anBasePlayer* player = gameLocal.GetLocalPlayer();
 	if ( player == nullptr ) {
 		gameLocal.Printf( "No local player\n" );
 		return;
@@ -2843,14 +2843,14 @@ static void Cmd_SetSpawnPoint_f( const anCommandArgs &args ) {
 		return;
 	}
 
-	arcEntity* desiredSpawn = nullptr;
-	arcEntity* defaultSpawn = team->GetDefaultSpawn();
+	anEntity *desiredSpawn = nullptr;
+	anEntity *defaultSpawn = team->GetDefaultSpawn();
 
-	const char* commandString = args.Argv( 1 );
-	bool next = !anString::Icmp( "next", commandString );
-	bool prev = !anString::Icmp( "prev", commandString );
+	const char *commandString = args.Argv( 1 );
+	bool next = !anStr::Icmp( "next", commandString );
+	bool prev = !anStr::Icmp( "prev", commandString );
 	if ( next || prev ) {
-		const arcEntity* playerSpawnLoc = player->GetSpawnPoint();
+		const anEntity *playerSpawnLoc = player->GetSpawnPoint();
 		if ( playerSpawnLoc == nullptr ) {
 			playerSpawnLoc = defaultSpawn;
 		}
@@ -2874,16 +2874,16 @@ static void Cmd_SetSpawnPoint_f( const anCommandArgs &args ) {
 				indexUpto = ( indexUpto + numSpawns - 1 ) % numSpawns;
 			}
 
-			arcEntity* next = team->GetSpawnLocation( indexUpto );
+			anEntity *next = team->GetSpawnLocation( indexUpto );
 			if ( next != nullptr ) {
 				desiredSpawn = next;
 				break;
 			}
 		}
-	} else if ( !anString::Icmp( "default", commandString ) ) {
+	} else if ( !anStr::Icmp( "default", commandString ) ) {
 		desiredSpawn = defaultSpawn;
 
-	} else if ( !anString::Icmp( "base", commandString ) ) {
+	} else if ( !anStr::Icmp( "base", commandString ) ) {
 		desiredSpawn = team->GetSpawnLocation( team->GetNumSpawnLocations() - 1 );
 	}
 
@@ -2910,7 +2910,7 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "game_memory",			anClass::DisplayInfo_f,		CMD_FL_GAME,				"displays game class info" );
 	cmdSystem->AddCommand( "listClasses",			anClass::ListClasses_f,		CMD_FL_GAME,				"lists game classes" );
 
-	cmdSystem->AddCommand( "listThreads",			sdProgram::ListThreads_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"lists script threads" );
+	cmdSystem->AddCommand( "listThreads",			idProgram::ListThreads_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"lists script threads" );
 	cmdSystem->AddCommand( "listScriptObjects",		Cmd_ListScriptObjects_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"lists script objects" );
 	cmdSystem->AddCommand( "listEntities",			Cmd_EntityList_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"lists game entities" );
 	cmdSystem->AddCommand( "listActiveEntities",	Cmd_ActiveEntityList_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"lists active game entities" );
@@ -2942,8 +2942,8 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "killRagdolls",			Cmd_KillRagdolls_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"removes all ragdolls" );
 	cmdSystem->AddCommand( "killClass",				Cmd_KillClass_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"removes all entities of 'class'" );
 	cmdSystem->AddCommand( "killType",				Cmd_KillType_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"removes all entities of 'type'" );
-	cmdSystem->AddCommand( "activateAFs",			Cmd_ActivateAFs_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"activates arcAFEntity based entities" );
-	cmdSystem->AddCommand( "activateVehicles",		Cmd_ActivateVehicles_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"activates physics on sdTransport based entities" );
+	cmdSystem->AddCommand( "activateAFs",			Cmd_ActivateAFs_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"activates anAFEntity based entities" );
+	cmdSystem->AddCommand( "activateVehicles",		Cmd_ActivateVehicles_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"activates physics on anTransport based entities" );
 	cmdSystem->AddCommand( "addline",				Cmd_AddDebugLine_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"adds a debug line" );
 	cmdSystem->AddCommand( "addarrow",				Cmd_AddDebugLine_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"adds a debug arrow" );
 	cmdSystem->AddCommand( "removeline",			Cmd_RemoveDebugLine_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"removes a debug line" );
@@ -3011,13 +3011,13 @@ void idGameLocal::InitConsoleCommands( void ) {
 
 	cmdSystem->AddCommand( "disasmScript",			Cmd_DisasmScript_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"disassembles script" );
 
-#if defined( ID_ALLOW_TOOLS )
+#if defined( ARC_ALLOW_TOOLS )
 	cmdSystem->AddCommand( "exportmodels",			Cmd_ExportModels_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"exports models", ArgCompletion_DefFile );
 	cmdSystem->AddCommand( "reexportModels",		Cmd_ReexportModels_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"reexports models", ArgCompletion_DefFile );
-#endif // ID_ALLOW_TOOLS
+#endif // ARC_ALLOW_TOOLS
 
-	cmdSystem->AddCommand( "zoomInCommandMap",		arcNetBasePlayer::ZoomInCommandMap_f,	CMD_FL_GAME,			"zoom in the command map" );
-	cmdSystem->AddCommand( "zoomOutCommandMap",		arcNetBasePlayer::ZoomOutCommandMap_f,	CMD_FL_GAME,			"zoom out the command map" );
+	cmdSystem->AddCommand( "zoomInCommandMap",		anBasePlayer::ZoomInCommandMap_f,	CMD_FL_GAME,			"zoom in the command map" );
+	cmdSystem->AddCommand( "zoomOutCommandMap",		anBasePlayer::ZoomOutCommandMap_f,	CMD_FL_GAME,			"zoom out the command map" );
 
 	cmdSystem->AddCommand( "aasStats",				idBot::Cmd_AASStats_f,				CMD_FL_GAME,		"show AAS statistics\n" );
 	cmdSystem->AddCommand( "nodeAdd",				idBotNodeGraph::Cmd_NodeAdd_f,		CMD_FL_GAME,		"adds a vehicle nav node to the map for the bots" );

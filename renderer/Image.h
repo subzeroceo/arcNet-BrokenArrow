@@ -306,7 +306,7 @@ public:
 
 	bool			IsLoaded() const { return texnum != TEXTURE_NOT_LOADED; }
 
-	static void			GetGeneratedName( anString &_name, const textureUsage_t &_usage, const cubeFiles_t &_cube );
+	static void			GetGeneratedName( anStr &_name, const textureUsage_t &_usage, const cubeFiles_t &_cube );
 
 private:
 	friend class anImageManager;
@@ -333,7 +333,7 @@ private:
 	anImage *				bglNext;				// linked from tr.backgroundImageLoads
 
 	// parameters that define this image
-	anString				imgName;				// game path, including extension (except for cube maps), may be an image program
+	anStr				imgName;				// game path, including extension (except for cube maps), may be an image program
 	void					(*generatorFunction)( anImage *image );	// nullptr for files
 
 	bool					fromBackEnd;			// this is the image loaded from the back end
@@ -376,7 +376,7 @@ private:
 	int						refCount;				// overall ref count
 };
 
-ARC_INLINE anImage::anImage() {
+inline anImage::anImage() {
 	texnum = TEXTURE_NOT_LOADED;
 	partialImage = nullptr;
 	type = TT_DISABLED;
@@ -432,11 +432,11 @@ public:
 							anRenderImage();
 							~anRenderImage();
 
-	ARC_INLINE int			GetWidth() const { return ( colorImage != nullptr ) ? colorImage->GetUploadWidth() : depthImage->GetUploadWidth(); }
-	ARC_INLINE int			GetHeight() const { return ( colorImage != nullptr ) ? colorImage->GetUploadHeight() : depthImage->GetUploadHeight(); }
+	inline int			GetWidth() const { return ( colorImage != nullptr ) ? colorImage->GetUploadWidth() : depthImage->GetUploadWidth(); }
+	inline int			GetHeight() const { return ( colorImage != nullptr ) ? colorImage->GetUploadHeight() : depthImage->GetUploadHeight(); }
 
-	ARC_INLINE anImage *	GetColorImage() const { return colorImage; }
-	ARC_INLINE anImage *	GetDepthImage() const { return depthImage; }
+	inline anImage *	GetColorImage() const { return colorImage; }
+	inline anImage *	GetDepthImage() const { return depthImage; }
 
 
 	void					Resize( int width, int height );

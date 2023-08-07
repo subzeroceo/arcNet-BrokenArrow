@@ -30,7 +30,7 @@ typedef enum {
 	MOVEDIR_RIGHT,
 	MOVEDIR_MAX
 } aiMoveDir_t;
-extern const char* aiMoveDirectionString [ MOVEDIR_MAX ];
+extern const char *aiMoveDirectionString [ MOVEDIR_MAX ];
 
 /*
 =====================
@@ -100,7 +100,7 @@ typedef enum {
 	MOVE_STATUS_DISABLED,
 	NUM_MOVE_STATUS,
 } moveStatus_t;
-extern const char* aiMoveStatusString[ NUM_MOVE_STATUS ];
+extern const char *aiMoveStatusString[ NUM_MOVE_STATUS ];
 
 /*
 =====================
@@ -108,7 +108,7 @@ stopEvent_t - used by path prediction
 =====================
 */
 typedef enum {
-	SE_BLOCKED			= BIT(0),
+	SE_BLOCKED			= BIT( 0 ),
 	SE_ENTER_LEDGE_AREA	= BIT( 1 ),
 	SE_ENTER_OBSTACLE	= BIT(2),
 	SE_FALL				= BIT(3),
@@ -288,7 +288,7 @@ public:
 };
 
 // cdr: Obstacle Avoidance
-void AI_EntityMoved(anEntity* ent);
+void AI_EntityMoved(anEntity *ent);
 void AI_MoveInitialize();
 
 

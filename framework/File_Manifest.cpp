@@ -63,7 +63,7 @@ bool anManifest::LoadManifestFromFile( anFile *file ) {
 		return false;
 	}
 	filename = file->GetName();
-	anString str;
+	anStr str;
 	int num;
 	file->ReadBig( num );
 	cacheTable.SetNum( num );
@@ -89,7 +89,7 @@ void anManifest::WriteManifestFile( const char *fileName ) {
 	if ( file == nullptr ) {
 		return;
 	}
-	anString str;
+	anStr str;
 	int num = cacheTable.Num();
 	file->WriteBig( num );
 	for ( int i = 0; i < num; i++ ) {
@@ -118,8 +118,8 @@ anManifest::FindFile
 */
 int anManifest::FindFile( const char *fileName ) {
 	const int key = cacheHash.GenerateKey( fileName, false );
-	for ( int index = cacheHash.GetFirst( key ); index != anHashIndex::NULL_INDEX; index = cacheHash.GetNext( index ) ) {
-		if ( anString::Icmp( cacheTable[index], fileName ) == 0 ) {
+	for ( int index = cacheHash.GetFirst( key ); index != anHashIndex::nullptr_INDEX; index = cacheHash.GetNext( index ) ) {
+		if ( anStr::Icmp( cacheTable[index], fileName ) == 0 ) {
 			return index;
 		}
 	}
@@ -147,7 +147,7 @@ void anManifest::RemoveAll( const char *_fileName ) {
 anManifest::GetFileNameByIndex
 ========================
 */
-const anString &anManifest::GetFileNameByIndex( int idx ) const {
+const anStr &anManifest::GetFileNameByIndex( int idx ) const {
 	return cacheTable[ idx ];
 }
 

@@ -79,7 +79,7 @@ anSurface_Traceable::TraceableTriHash( anSurface_Traceable& surface, const int b
 anSurface_Traceable::RayIntersection
 ====================
 */
-bool anSurface_Traceable::RayIntersection( /*arcList< int >& tracedTris,*/ const anVec3& start, const anVec3& dir, float& scale, anDrawVertex& dv, bool backFaceCull ) const {
+bool anSurface_Traceable::RayIntersection( /*anList< int >& tracedTris,*/ const anVec3 &start, const anVec3 &dir, float& scale, anDrawVertex& dv, bool backFaceCull ) const {
 	//tracedTris.Clear();
 	if ( !hash ) {
 		return false;
@@ -226,11 +226,129 @@ void anSurface_Traceable::GenerateIntersectionDrawVert( const anVec3 &intersecti
 		dv.color[i] = anMath::Ftob( a * v0->color[i] + b * v1->color[i] + c * v2->color[i] );
 	}
 }
-/*====================================================================================================================*
-														ARC-NET TRACE MODEL
-														enjoy no lectures today
-																=)
-*====================================================================================================================*/
+
+/*
+============
+idTraceModel::SetupFrustum
+============
+*/
+void idTraceModel::SetupFrustum( const idBounds &boxBounds, float topOffset ) {
+	int i;
+
+	//
+	// Basically a box, but with the top square shrunk by topOffse
+	//
+	type = TRM_CUSTOM;
+	numVerts = 8;
+	numEdges = 12;
+	numPolys = 6;
+	SetNullPolygonMaterials();
+
+	// set box edges
+	for ( i = 0; i < 4; i++ ) {
+		edges[ i + 1 ].v[0] = i;
+		edges[ i + 1 ].v[1] = (i + 1) & 3;
+		edges[ i + 5 ].v[0] = 4 + i;
+		edges[ i + 5 ].v[1] = 4 + ((i + 1) & 3);
+		edges[ i + 9 ].v[0] = i;
+		edges[ i + 9 ].v[1] = 4 + i;
+	}
+
+	// all edges of a polygon go counter clockwise
+	polys[0].numEdges = 4;
+	polys[0].edges[0] = -4;
+	polys[0].edges[1] = -3;
+	polys[0].edges[2] = -2;
+	polys[0].edges[3] = -1;
+
+	polys[1].numEdges = 4;
+	polys[1].edges[0] = 5;
+	polys[1].edges[1] = 6;
+	polys[1].edges[2] = 7;
+	polys[1].edges[3] = 8;
+
+	polys[2].numEdges = 4;
+	polys[2].edges[0] = 1;
+	polys[2].edges[1] = 10;
+	polys[2].edges[2] = -5;
+	polys[2].edges[3] = -9;
+
+	polys[3].numEdges = 4;
+	polys[3].edges[0] = 2;
+	polys[3].edges[1] = 11;
+	polys[3].edges[2] = -6;
+	polys[3].edges[3] = -10;
+
+	polys[4].numEdges = 4;
+	polys[4].edges[0] = 3;
+	polys[4].edges[1] = 12;
+	polys[4].edges[2] = -7;
+	polys[4].edges[3] = -11;
+
+	polys[5].numEdges = 4;
+	polys[5].edges[0] = 4;
+	polys[5].edges[1] = 9;
+	polys[5].edges[2] = -8;
+	polys[5].edges[3] = -12;
+
+	// convex model
+	isConvex = true;
+
+
+	// offset to center
+	offset = ( boxBounds[0] + boxBounds[1] ) * 0.5f;
+	// set box vertices
+	for ( i = 0; i < 8; i++ ) {
+		verts[i][0] = boxBounds[(i^(i>>1))&1][0];
+		verts[i][1] = boxBounds[(i>>1)&1][1];
+		verts[i][2] = boxBounds[(i>>2)&1][2];
+	}
+
+	// offset the upper verts by the top offset to turn it into a frustum
+	verts[ 4 ][ 0 ] -= topOffset;
+	verts[ 4 ][ 1 ] -= topOffset;
+
+	verts[ 5 ][ 0 ] += topOffset;
+	verts[ 5 ][ 1 ] -= topOffset;
+
+	verts[ 6 ][ 0 ] += topOffset;
+	verts[ 6 ][ 1 ] += topOffset;
+
+	verts[ 7 ][ 0 ] -= topOffset;
+	verts[ 7 ][ 1 ] += topOffset;
+
+
+	// setup polygons
+	int e0, e1, e2, e3;
+	int v0, v1, v2, v3;
+	for ( i = 0; i < numPolys; i++ ) {
+		e0 = polys[i].edges[0];
+		e1 = polys[i].edges[1];
+		e2 = polys[i].edges[2];
+		e3 = polys[i].edges[3];
+		v0 = edges[abs(e0)].v[INTSIGNBITSET(e0)];
+		v1 = edges[abs(e0)].v[INTSIGNBITNOTSET(e0)];
+		v2 = edges[abs(e1)].v[INTSIGNBITNOTSET(e1)];
+		v3 = edges[abs(e2)].v[INTSIGNBITNOTSET(e2)];
+		// polygon plane
+		polys[i].normal = ( verts[v1] - verts[v0] ).Cross( verts[v2] - verts[v1] );
+		polys[i].normal.Normalize();
+		polys[i].dist = polys[i].normal * verts[v0];
+		// polygon bounds
+		polys[i].bounds[0] = polys[i].bounds[1] = verts[v0];
+		polys[i].bounds.AddPoint( verts[v0] );
+		polys[i].bounds.AddPoint( verts[v1] );
+		polys[i].bounds.AddPoint( verts[v2] );
+		polys[i].bounds.AddPoint( verts[v3] );
+	}
+
+	bounds = boxBounds;
+	for ( i = 0; i < numVerts; i++ ) {
+		bounds.AddPoint( verts[i] );
+	}
+
+	GenerateEdgeNormals();
+}
 
 /*
 ============
@@ -1128,6 +1246,18 @@ void anTraceModel::SetupPolygon( const anWinding &w ) {
 
 /*
 ============
+idTraceModel::SetupPolygonPrism
+============
+*/
+void idTraceModel::SetupPolygonPrism( const idWinding &w, float thickness ) {
+	idTraceModel trm;
+	trm.SetupPolygon( w );
+	trm.Translate( w.GetNormal() * -thickness );
+	trm.VolumeFromPolygon( *this, thickness );
+}
+
+/*
+============
 anTraceModel::VolumeFromPolygon
 ============
 */
@@ -1166,7 +1296,6 @@ anTraceModel::GenerateEdgeNormals
 ============
 */
 #define SHARP_EDGE_DOT	-0.7f
-
 int anTraceModel::GenerateEdgeNormals( void ) {
 	int i, j, edgeNum, numSharpEdges;
 	float dot;
@@ -1293,6 +1422,59 @@ void anTraceModel::Shrink( const float m ) {
 
 /*
 ============
+idTraceModel::ClearUnused
+============
+*/
+void idTraceModel::ClearUnused( void ) {
+	int i, j;
+
+	for ( i = numVerts; i < MAX_TRACEMODEL_VERTS; i++ ) {
+		verts[i].Zero();
+	}
+	memset( &edges[0], 0, sizeof( edges[0] ) );
+	for ( i = numEdges+1; i < MAX_TRACEMODEL_EDGES+1; i++ ) {
+		memset( &edges[i], 0, sizeof( edges[i] ) );
+	}
+	for ( i = 0; i < numPolys; i++ ) {
+		for ( j = polys[i].numEdges; j < MAX_TRACEMODEL_POLYEDGES; j++ ) {
+			polys[i].edges[j] = 0;
+		}
+	}
+	for ( i = numPolys; i < MAX_TRACEMODEL_POLYS; i++ ) {
+		memset( &polys[i], 0, sizeof( polys[i] ) );
+	}
+}
+
+/*
+============
+idTraceModel::Verify
+============
+*/
+bool idTraceModel::Verify( void ) {
+	int i, j, edgeNum, vertexNum;
+	traceModelPoly_t *poly;
+	traceModelEdge_t *edge;
+
+	// test whether or not the vertices are on the polygon planes
+	for ( i = 0; i < numPolys; i++ ) {
+		poly = &polys[i];
+
+		for ( j = 0; j < polys[i].numEdges; j++ ) {
+			edgeNum = poly->edges[j];
+			edge = &edges[abs(edgeNum)];
+			vertexNum = edge->v[ INTSIGNBITSET( edgeNum ) ];
+			float d = poly->normal * verts[vertexNum] - poly->dist;
+			if ( fabs( d ) > 1e-4f ) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+/*
+============
 anTraceModel::Compare
 ============
 */
@@ -1325,6 +1507,29 @@ bool anTraceModel::Compare( const anTraceModel &trm ) const {
 				}
 			}
 			break;
+	}
+	return true;
+}
+
+/*
+============
+idTraceModel::IsClosedSurface
+============
+*/
+bool idTraceModel::IsClosedSurface( void ) const {
+	int i, j, numEdgeUsers[MAX_TRACEMODEL_EDGES+1];
+
+	// each edge should be used exactly twice
+	memset( numEdgeUsers, 0, sizeof(numEdgeUsers) );
+	for ( i = 0; i < numPolys; i++ ) {
+		for ( j = 0; j < polys[i].numEdges; j++ ) {
+			numEdgeUsers[ abs( polys[i].edges[j] ) ]++;
+		}
+	}
+	for ( i = 1; i <= numEdges; i++ ) {
+		if ( numEdgeUsers[i] != 2 ) {
+			return false;
+		}
 	}
 	return true;
 }
@@ -1667,4 +1872,113 @@ void anTraceModel::GetMassProperties( const float density, float &mass, anVec3 &
 	inertiaTensor[0][1] = inertiaTensor[1][0] += mass * centerOfMass[0] * centerOfMass[1];
 	inertiaTensor[1][2] = inertiaTensor[2][1] += mass * centerOfMass[1] * centerOfMass[2];
 	inertiaTensor[2][0] = inertiaTensor[0][2] += mass * centerOfMass[2] * centerOfMass[0];
+}
+
+/*
+============
+idTraceModel::ContainsPoint
+============
+*/
+bool idTraceModel::ContainsPoint( const idVec3& point ) const {
+	for ( int i = 0; i < numPolys; i++ ) {
+		if ( ( polys[ i ].normal * point ) > polys[ i ].dist ) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/*
+============
+idTraceModel::Write
+============
+*/
+void idTraceModel::Write( anFile* fp, trmNameForMaterial_t lookup ) const {
+	fp->WriteInt( type );
+
+	fp->WriteInt( numVerts );
+	for ( int i = 0; i < numVerts; i++ ) {
+		fp->WriteVec3( verts[ i ] );
+	}
+
+	fp->WriteInt( numEdges );
+	for ( int i = 1; i <= numEdges; i++ ) {
+		fp->WriteInt( edges[ i ].v[ 0 ] );
+		fp->WriteInt( edges[ i ].v[ 1 ] );
+		fp->WriteVec3( edges[ i ].normal );
+	}
+
+	fp->WriteInt( numPolys );
+	for ( int i = 0; i < numPolys; i++ ) {
+		fp->WriteVec3( polys[ i ].normal );
+		fp->WriteFloat( polys[ i ].dist );
+		fp->WriteVec3( polys[ i ].bounds[ 0 ] );
+		fp->WriteVec3( polys[ i ].bounds[ 1 ] );
+		fp->WriteInt( polys[ i ].numEdges );
+		for ( int j = 0; j < polys[ i ].numEdges; j++ ) {
+			fp->WriteInt( polys[ i ].edges[ j ] );
+		}
+		fp->WriteString( lookup( polyMaterials[ i ] ) );
+	}
+
+	fp->WriteVec3( offset );
+	fp->WriteVec3( bounds[ 0 ] );
+	fp->WriteVec3( bounds[ 1 ] );
+	fp->WriteBool( isConvex );
+}
+
+/*
+============
+idTraceModel::Read
+============
+*/
+void idTraceModel::Read( anFile* fp, trmMaterialForName_t lookup ) {
+	int dummy;
+	fp->ReadInt( dummy );
+	type = ( traceModel_t )dummy;
+
+	fp->ReadInt( numVerts );
+	for ( int i = 0; i < numVerts; i++ ) {
+		fp->ReadVec3( verts[ i ] );
+	}
+
+	fp->ReadInt( numEdges );
+	for ( int i = 1; i <= numEdges; i++ ) {
+		fp->ReadInt( edges[ i ].v[ 0 ] );
+		fp->ReadInt( edges[ i ].v[ 1 ] );
+		fp->ReadVec3( edges[ i ].normal );
+	}
+
+	fp->ReadInt( numPolys );
+	for ( int i = 0; i < numPolys; i++ ) {
+		fp->ReadVec3( polys[ i ].normal );
+		fp->ReadFloat( polys[ i ].dist );
+		fp->ReadVec3( polys[ i ].bounds[ 0 ] );
+		fp->ReadVec3( polys[ i ].bounds[ 1 ] );
+		fp->ReadInt( polys[ i ].numEdges );
+		for ( int j = 0; j < polys[ i ].numEdges; j++ ) {
+			fp->ReadInt( polys[ i ].edges[ j ] );
+		}
+
+		anStr materialName;
+		fp->ReadString( materialName );
+		polyMaterials[ i ] = lookup( materialName.c_str() );
+	}
+
+	fp->ReadVec3( offset );
+	fp->ReadVec3( bounds[ 0 ] );
+	fp->ReadVec3( bounds[ 1 ] );
+	fp->ReadBool( isConvex );
+}
+
+/*
+============
+idTraceModel::SetNullPolygonMaterials
+============
+*/
+void idTraceModel::SetNullPolygonMaterials( void ) {
+	for ( int i = 0; i < numPolys; i++ ) {
+		polyMaterials[ i ] = NULL;
+	}
 }

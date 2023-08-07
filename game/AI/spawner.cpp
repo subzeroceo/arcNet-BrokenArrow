@@ -163,9 +163,9 @@ void rvSpawner::FindTargets ( void ) {
 
 	// Copy the relevant targets to the spawn point list (right now only target_null entities)
 	for ( i = targets.Num() - 1; i >= 0; i -- ) {
-		anEntity* ent;
+		anEntity *ent;
 		ent = targets[i];
-		if ( anString::Icmp ( ent->spawnArgs.GetString ( "classname" ), "target_null" ) ) {
+		if ( anStr::Icmp ( ent->spawnArgs.GetString ( "classname" ), "target_null" ) ) {
 			continue;
 		}
 
@@ -202,7 +202,7 @@ bool rvSpawner::ValidateSpawnPoint ( const anVec3 origin, const anBounds &bounds
 rvSpawner::AddSpawnPoint
 ==============
 */
-void rvSpawner::AddSpawnPoint ( anEntity* point ) {
+void rvSpawner::AddSpawnPoint ( anEntity *point ) {
 	anEntityPtr<anEntity> &entityPtr = spawnPoints.Alloc();
 	entityPtr = point;
 
@@ -217,7 +217,7 @@ void rvSpawner::AddSpawnPoint ( anEntity* point ) {
 rvSpawner::RemoveSpawnPoint
 ==============
 */
-void rvSpawner::RemoveSpawnPoint ( anEntity* point ) {
+void rvSpawner::RemoveSpawnPoint ( anEntity *point ) {
 	int i;
 	for ( i = spawnPoints.Num()-1; i >= 0; i -- ) {
 		if ( spawnPoints[i] == point ) {
@@ -232,7 +232,7 @@ void rvSpawner::RemoveSpawnPoint ( anEntity* point ) {
 rvSpawner::GetSpawnPoint
 ==============
 */
-void rvSpawner::AddCallback ( anEntity* owner, const anEventDef* ev ) {
+void rvSpawner::AddCallback ( anEntity *owner, const anEventDef* ev ) {
 	spawnerCallback_t& callback = callbacks.Alloc();
 	callback.event = ev->GetName();
 	callback.ent = owner;
@@ -281,14 +281,14 @@ anEntity *rvSpawner::GetSpawnPoint ( void ) {
 rvSpawner::GetSpawnType
 ==============
 */
-const char* rvSpawner::GetSpawnType ( anEntity* spawnPoint ) {
+const char *rvSpawner::GetSpawnType ( anEntity *spawnPoint ) {
 	const anKeyValue* kv;
 
 	if ( spawnPoint ) {
 		// If the spawn point has any "def_spawn" keys then they override the normal spawn keys
 		kv = spawnPoint->spawnArgs.MatchPrefix ( "def_spawn", nullptr );
 		if ( kv ) {
-			const char* types [ MAX_SPAWN_TYPES ];
+			const char *types [ MAX_SPAWN_TYPES ];
 			int			typeCount;
 
 			for ( typeCount = 0;
@@ -318,7 +318,7 @@ rvSpawner::CopyPrefixedSpawnArgs
 void rvSpawner::CopyPrefixedSpawnArgs( anEntity *src, const char *prefix, anDict &args ){
 	const anKeyValue *kv = src->spawnArgs.MatchPrefix( prefix, nullptr );
 	while( kv ) {
-		args.Set( kv->GetKey().c_str() + anString::Length( prefix ), kv->GetValue() );
+		args.Set( kv->GetKey().c_str() + anStr::Length( prefix ), kv->GetValue() );
 		kv = src->spawnArgs.MatchPrefix( prefix, kv );
 	}
 }
@@ -332,7 +332,7 @@ bool rvSpawner::SpawnEnt( void ){
 	anDict		args;
 	anEntity*	spawnPoint;
 	anEntity*	spawnedEnt;
-	const char* temp;
+	const char *temp;
 
 	// Find a spawn point to spawn the entity
 	spawnPoint = GetSpawnPoint();
@@ -471,7 +471,7 @@ void rvSpawner::CheckSpawn ( void ) {
 rvSpawner::CallScriptEvents
 ==============
 */
-void rvSpawner::CallScriptEvents( const char* prefixKey, anEntity* parm ) {
+void rvSpawner::CallScriptEvents( const char *prefixKey, anEntity *parm ) {
 	if ( !prefixKey || !prefixKey[0] ) {
 		return;
 	}
@@ -512,7 +512,7 @@ Attach the given AI to the spawner.  This will increase the active count of the 
 set the spawner pointer in the ai.
 ==============
 */
-void rvSpawner::Attach ( anEntity* ent ) {
+void rvSpawner::Attach ( anEntity *ent ) {
 	currentActive.AddUnique( ent );
 }
 
@@ -525,7 +525,7 @@ Attach the given AI to the spawner.  This will increase the active count of the 
 set the spawner pointer in the ai.
 ==============
 */
-void rvSpawner::Detach ( anEntity* ent ){
+void rvSpawner::Detach ( anEntity *ent ){
 	currentActive.Remove( ent );
 
 	nextSpawnTime = gameLocal.GetTime() + spawnDelay;

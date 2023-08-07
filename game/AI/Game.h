@@ -278,18 +278,18 @@ public:
 
 // jscott: for the effects system
 	virtual void				StartViewEffect( int type, float time, float scale ) = 0;
-	virtual rvClientEffect*		PlayEffect( const idDecl *effect, const anVec3& origin, const anMat3& axis, bool loop = false, const anVec3& endOrigin = vec3_origin, bool broadcast = false, bool predictBit = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one ) = 0;
+	virtual rvClientEffect*		PlayEffect( const idDecl *effect, const anVec3 &origin, const anMat3 &axis, bool loop = false, const anVec3 &endOrigin = vec3_origin, bool broadcast = false, bool predictBit = false, effectCategory_t category = EC_IGNORE, const anVec4& effectTint = vec4_one ) = 0;
 	virtual void				GetPlayerView( anVec3 &origin, anMat3 &axis ) = 0;
-	virtual const anVec3		GetCurrentGravity( const anVec3& origin, const anMat3& axis ) const = 0;
+	virtual const anVec3		GetCurrentGravity( const anVec3 &origin, const anMat3 &axis ) const = 0;
 	virtual void				Translation( trace_t &trace, anVec3 &source, anVec3 &dest, anTraceModel *trm, int clipMask ) = 0;
-	virtual void				SpawnClientMoveable ( const char* name, int lifetime, const anVec3& origin, const anMat3& axis, const anVec3& velocity, const anVec3& angular_velocity ) = 0;
+	virtual void				SpawnClientMoveable ( const char *name, int lifetime, const anVec3 &origin, const anMat3 &axis, const anVec3 &velocity, const anVec3 &angular_velocity ) = 0;
 // bdube: debugging stuff
-	virtual void				DebugSetString ( const char* name, const char* value ) = 0;
-	virtual void				DebugSetFloat ( const char* name, float value ) = 0;
-	virtual void				DebugSetInt ( const char* name, int value ) = 0;
-	virtual const char*			DebugGetStatString ( const char* name ) = 0;
-	virtual int					DebugGetStatInt ( const char* name ) = 0;
-	virtual float				DebugGetStatFloat ( const char* name ) = 0;
+	virtual void				DebugSetString ( const char *name, const char *value ) = 0;
+	virtual void				DebugSetFloat ( const char *name, float value ) = 0;
+	virtual void				DebugSetInt ( const char *name, int value ) = 0;
+	virtual const char*			DebugGetStatString ( const char *name ) = 0;
+	virtual int					DebugGetStatInt ( const char *name ) = 0;
+	virtual float				DebugGetStatFloat ( const char *name ) = 0;
 	virtual bool				IsDebugHudActive ( void ) const = 0;
 // rjohnson: for new note taking mechanism
 	virtual bool				GetPlayerInfo( anVec3 &origin, anMat3 &axis, int PlayerNum = -1, anAngles *deltaViewAngles = nullptr, int reqClientNum = -1 ) = 0;
@@ -297,11 +297,11 @@ public:
 	virtual	bool				PlayerChatDisabled( int clientNum ) = 0;
 	virtual void				SetViewComments( const char *text = 0 ) = 0;
 // ddynerman: utility functions
-	virtual void				GetPlayerName( int clientNum, char* name ) = 0;
-	virtual void				GetPlayerClan( int clientNum, char* clan ) = 0;
+	virtual void				GetPlayerName( int clientNum, char *name ) = 0;
+	virtual void				GetPlayerClan( int clientNum, char *clan ) = 0;
 	virtual void				SetFriend( int clientNum, bool isFriend ) = 0;
-	virtual const char*			GetLongGametypeName( const char* gametype ) = 0;
-	virtual void				ReceiveRemoteConsoleOutput( const char* output ) = 0;
+	virtual const char*			GetLongGametypeName( const char *gametype ) = 0;
+	virtual void				ReceiveRemoteConsoleOutput( const char *output ) = 0;
 // rjohnson: entity usage stats
 	virtual void				ListEntityStats( const anCommandArgs &args ) = 0;
 // shouchard:  for ban lists
@@ -334,10 +334,10 @@ public:
 	virtual void				SetRepeaterState( bool isRepeater, bool serverIsRepeater ) = 0;
 
 	// Writes current network info to a file (used as initial state for demo recording).
-	virtual void				WriteNetworkInfo( anFile* file, int clientNum ) = 0;
+	virtual void				WriteNetworkInfo( anFile *file, int clientNum ) = 0;
 
 	// Reads current network info from a file (used as initial state for demo playback).
-	virtual void				ReadNetworkInfo( int gameTime, anFile* file, int clientNum ) = 0;
+	virtual void				ReadNetworkInfo( int gameTime, anFile *file, int clientNum ) = 0;
 
 	// Let gamecode decide if it wants to accept demos from older releases of the engine.
 	virtual bool				ValidateDemoProtocol( int minor_ref, int minor ) = 0;
@@ -409,14 +409,14 @@ enum {
 };
 
 class anEntity;
-class anM8DAnim;
+class anMD6Anim;
 
 // bdube: more forward declarations
 class idProgram;
 class idInterpreter;
 class anThread;
 
-typedef void (*debugInfoProc_t) ( const char* classname, const char* name, const char* value, void *userdata );
+typedef void (*debugInfoProc_t) ( const char *classname, const char *name, const char *value, void *userdata );
 
 
 // FIXME: this interface needs to be reworked but it properly separates code for the time being
@@ -434,26 +434,26 @@ public:
 	virtual const anVec3 		&ANIM_GetModelOffsetFromEntityDef( const char *classname );
 	virtual anRenderModel *		ANIM_GetModelFromEntityDef( const anDict *args );
 	virtual anRenderModel *		ANIM_GetModelFromName( const char *modelName );
-	virtual const anM8DAnim *	ANIM_GetAnimFromEntityDef( const char *classname, const char *animname );
+	virtual const anMD6Anim *	ANIM_GetAnimFromEntityDef( const char *classname, const char *animname );
 
 // bdube: added
 // scork: added 'const' qualifiers so other stuff would compile
-	virtual const anM8DAnim *	ANIM_GetAnimFromEntity( const anEntity* ent, int animNum );
-	virtual float				ANIM_GetAnimPlaybackRateFromEntity ( anEntity* ent, int animNum );
-	virtual const char*			ANIM_GetAnimNameFromEntity ( const anEntity* ent, int animNum );
+	virtual const anMD6Anim *	ANIM_GetAnimFromEntity( const anEntity *ent, int animNum );
+	virtual float				ANIM_GetAnimPlaybackRateFromEntity ( anEntity *ent, int animNum );
+	virtual const char*			ANIM_GetAnimNameFromEntity ( const anEntity *ent, int animNum );
 
 	virtual int					ANIM_GetNumAnimsFromEntityDef( const anDict *args );
 	virtual const char *		ANIM_GetAnimNameFromEntityDef( const anDict *args, int animNum );
-	virtual const anM8DAnim *	ANIM_GetAnim( const char *fileName );
-	virtual int					ANIM_GetLength( const anM8DAnim *anim );
-	virtual int					ANIM_GetNumFrames( const anM8DAnim *anim );
+	virtual const anMD6Anim *	ANIM_GetAnim( const char *fileName );
+	virtual int					ANIM_GetLength( const anMD6Anim *anim );
+	virtual int					ANIM_GetNumFrames( const anMD6Anim *anim );
 
 // bdube: added
-	virtual const char *		ANIM_GetFilename( const anM8DAnim* anim );
-	virtual int					ANIM_ConvertFrameToTime ( const anM8DAnim* anim, int frame );
-	virtual int					ANIM_ConvertTimeToFrame ( const anM8DAnim* anim, int time );
+	virtual const char *		ANIM_GetFilename( const anMD6Anim* anim );
+	virtual int					ANIM_ConvertFrameToTime ( const anMD6Anim* anim, int frame );
+	virtual int					ANIM_ConvertTimeToFrame ( const anMD6Anim* anim, int time );
 
-	virtual void				ANIM_CreateAnimFrame( const anRenderModel *model, const anM8DAnim *anim, int numJoints, anJointMat *frame, int time, const anVec3 &offset, bool remove_origin_offset );
+	virtual void				ANIM_CreateAnimFrame( const anRenderModel *model, const anMD6Anim *anim, int numJoints, anJointMat *frame, int time, const anVec3 &offset, bool remove_origin_offset );
 	virtual anRenderModel *		ANIM_CreateMeshForAnim( anRenderModel *model, const char *classname, const char *animname, int frame, bool remove_origin_offset );
 
 
@@ -501,27 +501,27 @@ public:
 	virtual void				EntitySetColor( anEntity *ent, const anVec3 color );
 
 // bdube: added
-	virtual const char*			EntityGetName ( anEntity* ent ) const;
-	virtual int					EntityToSafeId( anEntity* ent ) const;
+	virtual const char*			EntityGetName ( anEntity *ent ) const;
+	virtual int					EntityToSafeId( anEntity *ent ) const;
 	virtual anEntity *			EntityFromSafeId( int safeID) const;
-	virtual void				EntitySetSkin ( anEntity *ent, const char* temp ) const;
+	virtual void				EntitySetSkin ( anEntity *ent, const char *temp ) const;
 	virtual void				EntityClearSkin ( anEntity *ent ) const;
-	virtual void				EntityShow ( anEntity* ent ) const;
-	virtual void				EntityHide ( anEntity* ent ) const;
-	virtual void				EntityGetBounds ( anEntity* ent, anBounds &bounds ) const;
-	virtual int					EntityPlayAnim ( anEntity* ent, int animNum, int time, int blendtime );
-	virtual void				EntitySetFrame ( anEntity* ent, int animNum, int frame, int time, int blendtime );
-	virtual void				EntityStopAllEffects ( anEntity* ent );
-	virtual void				EntityGetDelta ( anEntity* ent, int fromTime, int toTime, anVec3& delta );
-	virtual void				EntityRemoveOriginOffset ( anEntity* ent, bool remove );
-	virtual const char*			EntityGetClassname ( anEntity* ent ) const;
-	virtual bool				EntityIsDerivedFrom ( anEntity* ent, const char* classname ) const;
-	virtual renderEntity_t*		EntityGetRenderEntity ( anEntity* ent );
+	virtual void				EntityShow ( anEntity *ent ) const;
+	virtual void				EntityHide ( anEntity *ent ) const;
+	virtual void				EntityGetBounds ( anEntity *ent, anBounds &bounds ) const;
+	virtual int					EntityPlayAnim ( anEntity *ent, int animNum, int time, int blendtime );
+	virtual void				EntitySetFrame ( anEntity *ent, int animNum, int frame, int time, int blendtime );
+	virtual void				EntityStopAllEffects ( anEntity *ent );
+	virtual void				EntityGetDelta ( anEntity *ent, int fromTime, int toTime, anVec3 &delta );
+	virtual void				EntityRemoveOriginOffset ( anEntity *ent, bool remove );
+	virtual const char*			EntityGetClassname ( anEntity *ent ) const;
+	virtual bool				EntityIsDerivedFrom ( anEntity *ent, const char *classname ) const;
+	virtual renderEntity_t*		EntityGetRenderEntity ( anEntity *ent );
 // scork: accessor functions for various utils
 	virtual	anEntity *			EntityGetNextTeamEntity( anEntity *pEnt ) const;
 	virtual void				GetPlayerInfo( anVec3 &v3Origin, anMat3 &mat3Axis, int PlayerNum = -1, anAngles *deltaViewAngles = nullptr ) const;
 	virtual void				SetPlayerInfo( anVec3 &v3Origin, anMat3 &mat3Axis, int PlayerNum = -1 ) const;
-	virtual void				EntitySetName( anEntity* pEnt, const char *psName );
+	virtual void				EntitySetName( anEntity *pEnt, const char *psName );
 
 
 	// Player methods.
@@ -538,19 +538,19 @@ public:
 	virtual void				EffectRefreshTemplate ( const idDecl *effect ) const;
 
 	// Light entity methods
-	virtual void				LightSetParms ( anEntity* ent, int maxLevel, int currentLevel, float radius );
+	virtual void				LightSetParms ( anEntity *ent, int maxLevel, int currentLevel, float radius );
 
-	// Common editing functions
+	// arCNet editing functions
 	virtual int					GetGameTime ( int *previous = nullptr ) const;
 	virtual void				SetGameTime	( int time ) const;
 	virtual bool				TracePoint ( trace_t &results, const anVec3 &start, const anVec3 &end, int contentMask ) const;
 	virtual void				CacheDictionaryMedia ( const anDict* dict ) const;
-	virtual void				SetCamera ( anEntity* camera ) const;
+	virtual void				SetCamera ( anEntity *camera ) const;
 
 // bdube: added
 	virtual int					GetGameEntityRegisterTime ( void ) const;
 	virtual anEntity*			GetFirstSpawnedEntity ( void ) const;
-	virtual anEntity*			GetNextSpawnedEntity ( anEntity* from ) const;
+	virtual anEntity*			GetNextSpawnedEntity ( anEntity *from ) const;
 // jscott: added
 	virtual	void				DrawPlaybackDebugInfo( void );
 	virtual	void				RecordPlayback( const usercmd_t &cmd, anEntity *source );
@@ -569,7 +569,7 @@ public:
 	virtual const char*			ScriptGetCallstackFunctionName ( idInterpreter* interpreter, int depth ) const;
 	virtual int					ScriptGetCallstackStatement ( idInterpreter* interpreter, int depth ) const;
 	virtual bool				ScriptIsReturnOperator ( int op ) const;
-	virtual const char*			ScriptGetRegisterValue ( idInterpreter* interpreter, const char* varname, int callstackDepth ) const;
+	virtual const char*			ScriptGetRegisterValue ( idInterpreter* interpreter, const char *varname, int callstackDepth ) const;
 	virtual anThread*			ScriptGetThread ( idInterpreter* interpreter ) const;
 
 	// Thread methods
@@ -580,7 +580,7 @@ public:
 	virtual const char*			ThreadGetState ( anThread* thread );
 
 	// Class externals for entity viewer
-	virtual void				GetClassDebugInfo ( const anEntity* entity, debugInfoProc_t proc, void* userdata );
+	virtual void				GetClassDebugInfo ( const anEntity *entity, debugInfoProc_t proc, void* userdata );
 
 	// In game map editing support.
 	virtual const anDict *		MapGetEntityDict( const char *name ) const;
@@ -628,13 +628,13 @@ public:
 	virtual void		BeginFrame	( int time ) = 0;
 	virtual void		EndFrame	( void ) = 0;
 
-	virtual	void		Set			( const char* keyword, int value ) = 0;
-	virtual void		Set			( const char* keyword, float value ) = 0;
-	virtual void		Set			( const char* keyword, const char* value ) = 0;
-	virtual void		Set			( const char* keyword, bool value ) = 0;
+	virtual	void		Set			( const char *keyword, int value ) = 0;
+	virtual void		Set			( const char *keyword, float value ) = 0;
+	virtual void		Set			( const char *keyword, const char *value ) = 0;
+	virtual void		Set			( const char *keyword, bool value ) = 0;
 
-	virtual void		Add			( const char* keyword, int value ) = 0;
-	virtual void		Add			( const char* keyword, float value ) = 0;
+	virtual void		Add			( const char *keyword, int value ) = 0;
+	virtual void		Add			( const char *keyword, float value ) = 0;
 };
 
 extern rvGameLog *				gameLog;
@@ -673,7 +673,7 @@ struct gameImport_t {
 
 	int							version;				// API version
 	idSys *						sys;					// non-portable system services
-	idCommon *					common;					// common
+	arCNet *					common;					// common
 	idCmdSystem *				cmdSystem;				// console command system
 	anCVarSystem *				cvarSystem;				// console variable system
 	anFileSystem *				fileSystem;				// file system

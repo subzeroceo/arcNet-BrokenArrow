@@ -97,7 +97,6 @@ uintptr_t			Sys_CreateThread( xthread_t function, void *parms, xthreadPriority p
 void				Sys_WaitForThread( uintptr_t threadHandle );
 void				Sys_DestroyThread( uintptr_t threadHandle );
 void				Sys_SetCurrentThreadName( const char *name );
-
 void				Sys_SignalCreate( signalHandle_t & handle, bool manualReset );
 void				Sys_SignalDestroy( signalHandle_t & handle );
 void				Sys_SignalRaise( signalHandle_t & handle );

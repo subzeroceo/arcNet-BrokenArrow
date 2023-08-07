@@ -1,7 +1,7 @@
 #include "../Lib.h"
 #pragma hdrstop
 
-#if defined( _DEBUG ) && !defined( ID_REDIRECT_NEWDELETE )
+#if defined( _DEBUG ) && !defined( ARC_REDIRECT_NEWDELETE )
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -59,7 +59,7 @@ void anPhysics_Parabola::MakeDefault( void ) {
 anPhysics_Parabola::CalcProperties
 ================
 */
-void anPhysics_Parabola::CalcProperties( anVec3& origin, anVec3& velocity, int time ) const {
+void anPhysics_Parabola::CalcProperties( anVec3 &origin, anVec3 &velocity, int time ) const {
 	if ( time < startTime ) {
 		time = startTime;
 	}
@@ -83,7 +83,7 @@ void anPhysics_Parabola::CalcProperties( anVec3& origin, anVec3& velocity, int t
 anPhysics_Parabola::Init
 ================
 */
-void anPhysics_Parabola::Init( const anVec3& origin, const anVec3& velocity, const anVec3& acceleration, const anMat3& axes, int _startTime, int _endTime ) {
+void anPhysics_Parabola::Init( const anVec3 &origin, const anVec3 &velocity, const anVec3 &acceleration, const anMat3 &axes, int _startTime, int _endTime ) {
 	baseAxes			= axes;
 	baseOrg				= origin;
 	baseVelocity		= velocity;
@@ -172,7 +172,7 @@ anPhysics_Parabola::Evaluate
 ================
 */
 bool anPhysics_Parabola::CollisionResponse( trace_t &collision ) {
-	arcEntity* ent = gameLocal.entities[ collision.c.entityNum ];
+	anEntity *ent = gameLocal.entities[ collision.c.entityNum ];
 	if ( !ent ) {
 		gameLocal.Warning( "[Parabola-Physics] Collision Response against unknown entity" );
 		return false;
@@ -207,7 +207,7 @@ void anPhysics_Parabola::CheckWater( void ) {
 		return;
 	}
 
-	arcCollisionModel *model = clipModel->GetCollisionModel( 0 );
+	anCollisionModel *model = clipModel->GetCollisionModel( 0 );
 	int numPlanes = model->GetNumBrushPlanes();
 	if ( !numPlanes ) {
 		return;
@@ -271,7 +271,7 @@ anClipModel *anPhysics_Parabola::GetClipModel( int id ) const {
 anPhysics_Parabola::SetAxis
 ================
 */
-void anPhysics_Parabola::SetAxis( const anMat3& newAxis, int id ) {
+void anPhysics_Parabola::SetAxis( const anMat3 &newAxis, int id ) {
 	baseAxes = newAxis;
 	LinkClip();
 }
@@ -281,7 +281,7 @@ void anPhysics_Parabola::SetAxis( const anMat3& newAxis, int id ) {
 anPhysics_Parabola::SetOrigin
 ================
 */
-void anPhysics_Parabola::SetOrigin( const anVec3& newOrigin, int id ) {
+void anPhysics_Parabola::SetOrigin( const anVec3 &newOrigin, int id ) {
 	current.origin = newOrigin;
 	LinkClip();
 }

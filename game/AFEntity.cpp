@@ -7,29 +7,29 @@
 /*
 ===============================================================================
 
-  arcMultiModelAF
+  anMultiModelAF
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcEntity, arcMultiModelAF )
+CLASS_DECLARATION( anEntity, anMultiModelAF )
 END_CLASS
 
 /*
 ================
-arcMultiModelAF::Spawn
+anMultiModelAF::Spawn
 ================
 */
-void arcMultiModelAF::Spawn( void ) {
+void anMultiModelAF::Spawn( void ) {
 	physicsObj.SetSelf( this );
 }
 
 /*
 ================
-arcMultiModelAF::~arcMultiModelAF
+anMultiModelAF::~anMultiModelAF
 ================
 */
-arcMultiModelAF::~arcMultiModelAF( void ) {
+anMultiModelAF::~anMultiModelAF( void ) {
 	int i;
 
 	for ( i = 0; i < modelDefHandles.Num(); i++ ) {
@@ -42,10 +42,10 @@ arcMultiModelAF::~arcMultiModelAF( void ) {
 
 /*
 ================
-arcMultiModelAF::SetModelForId
+anMultiModelAF::SetModelForId
 ================
 */
-void arcMultiModelAF::SetModelForId( int id, const anString &modelName ) {
+void anMultiModelAF::SetModelForId( int id, const anStr &modelName ) {
 	modelHandles.AssureSize( id+1, nullptr );
 	modelDefHandles.AssureSize( id+1, -1 );
 	modelHandles[id] = renderModelManager->FindModel( modelName );
@@ -53,10 +53,10 @@ void arcMultiModelAF::SetModelForId( int id, const anString &modelName ) {
 
 /*
 ================
-arcMultiModelAF::Present
+anMultiModelAF::Present
 ================
 */
-void arcMultiModelAF::Present( void ) {
+void anMultiModelAF::Present( void ) {
 	int i;
 
 	// don't present to the renderer if the entity hasn't changed
@@ -87,10 +87,10 @@ void arcMultiModelAF::Present( void ) {
 
 /*
 ================
-arcMultiModelAF::Think
+anMultiModelAF::Think
 ================
 */
-void arcMultiModelAF::Think( void ) {
+void anMultiModelAF::Think( void ) {
 	RunPhysics();
 	Present();
 }
@@ -99,24 +99,24 @@ void arcMultiModelAF::Think( void ) {
 /*
 ===============================================================================
 
-  arcNetChain
+  anAFChain
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcMultiModelAF, arcNetChain )
+CLASS_DECLARATION( anMultiModelAF, anAFChain )
 END_CLASS
 
 /*
 ================
-arcNetChain::BuildChain
+anAFChain::BuildChain
 
   builds a chain hanging down from the ceiling
   the highest link is a child of the link below it etc.
   this allows an object to be attached to multiple chains while keeping a single tree structure
 ================
 */
-void arcNetChain::BuildChain( const anString &name, const anVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld ) {
+void anAFChain::BuildChain( const anStr &name, const anVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld ) {
 	int i;
 	float halfLinkLength = linkLength * 0.5f;
 	anTraceModel trm;
@@ -139,7 +139,7 @@ void arcNetChain::BuildChain( const anString &name, const anVec3 &origin, float 
 		clip = new anClipModel( trm );
 		clip->SetContents( CONTENTS_SOLID );
 		clip->Link( gameLocal.clip, this, 0, org, mat3_identity );
-		body = new arcAFBody( name + anString( i ), clip, density );
+		body = new arcAFBody( name + anStr( i ), clip, density );
 		physicsObj.AddBody( body );
 
 		// visual model for body
@@ -148,13 +148,13 @@ void arcNetChain::BuildChain( const anString &name, const anVec3 &origin, float 
 		// add constraint
 		if ( bindToWorld ) {
 			if ( !lastBody ) {
-				uj = new arcAFConstraint_UniversalJoint( name + anString( i ), body, lastBody );
+				uj = new arcAFConstraint_UniversalJoint( name + anStr( i ), body, lastBody );
 				uj->SetShafts( anVec3( 0, 0, -1 ), anVec3( 0, 0, 1 ) );
 				//uj->SetConeLimit( anVec3( 0, 0, -1 ), 30.0f );
 				//uj->SetPyramidLimit( anVec3( 0, 0, -1 ), anVec3( 1, 0, 0 ), 90.0f, 30.0f );
 			}
 			else {
-				uj = new arcAFConstraint_UniversalJoint( name + anString( i ), lastBody, body );
+				uj = new arcAFConstraint_UniversalJoint( name + anStr( i ), lastBody, body );
 				uj->SetShafts( anVec3( 0, 0, 1 ), anVec3( 0, 0, -1 ) );
 				//uj->SetConeLimit( anVec3( 0, 0, 1 ), 30.0f );
 			}
@@ -164,7 +164,7 @@ void arcNetChain::BuildChain( const anString &name, const anVec3 &origin, float 
 		}
 		else {
 			if ( lastBody ) {
-				bsj = new arcAFConstraint_BallAndSocketJoint( "joint" + anString( i ), lastBody, body );
+				bsj = new arcAFConstraint_BallAndSocketJoint( "joint" + anStr( i ), lastBody, body );
 				bsj->SetAnchor( org + anVec3( 0, 0, halfLinkLength ) );
 				bsj->SetConeLimit( anVec3( 0, 0, 1 ), 60.0f, anVec3( 0, 0, 1 ) );
 				physicsObj.AddConstraint( bsj );
@@ -179,10 +179,10 @@ void arcNetChain::BuildChain( const anString &name, const anVec3 &origin, float 
 
 /*
 ================
-arcNetChain::Spawn
+anAFChain::Spawn
 ================
 */
-void arcNetChain::Spawn( void ) {
+void anAFChain::Spawn( void ) {
 	int numLinks;
 	float length, linkLength, linkWidth, density;
 	bool drop;
@@ -190,7 +190,7 @@ void arcNetChain::Spawn( void ) {
 
 	spawnArgs.GetBool( "drop", "0", drop );
 	spawnArgs.GetInt( "links", "3", numLinks );
-	spawnArgs.GetFloat( "length", anString( numLinks * 32.0f ), length );
+	spawnArgs.GetFloat( "length", anStr( numLinks * 32.0f ), length );
 	spawnArgs.GetFloat( "width", "8", linkWidth );
 	spawnArgs.GetFloat( "density", "0.2", density );
 	linkLength = length / numLinks;
@@ -208,20 +208,20 @@ void arcNetChain::Spawn( void ) {
 /*
 ===============================================================================
 
-  arcAFAttachment
+  anAFAttachment
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcAnimatedEntity, arcAFAttachment )
+CLASS_DECLARATION( anAnimatedEntity, anAFAttachment )
 END_CLASS
 
 /*
 =====================
-arcAFAttachment::arcAFAttachment
+anAFAttachment::anAFAttachment
 =====================
 */
-arcAFAttachment::arcAFAttachment( void ) {
+anAFAttachment::anAFAttachment( void ) {
 	body			= nullptr;
 	combatModel		= nullptr;
 	idleAnim		= 0;
@@ -230,10 +230,10 @@ arcAFAttachment::arcAFAttachment( void ) {
 
 /*
 =====================
-arcAFAttachment::~arcAFAttachment
+anAFAttachment::~anAFAttachment
 =====================
 */
-arcAFAttachment::~arcAFAttachment( void ) {
+anAFAttachment::~anAFAttachment( void ) {
 
 	StopSound( SND_CHANNEL_ANY, false );
 
@@ -243,19 +243,19 @@ arcAFAttachment::~arcAFAttachment( void ) {
 
 /*
 =====================
-arcAFAttachment::Spawn
+anAFAttachment::Spawn
 =====================
 */
-void arcAFAttachment::Spawn( void ) {
+void anAFAttachment::Spawn( void ) {
 	idleAnim = animator.GetAnim( "idle" );
 }
 
 /*
 =====================
-arcAFAttachment::SetBody
+anAFAttachment::SetBody
 =====================
 */
-void arcAFAttachment::SetBody( arcEntity *bodyEnt, const char *model, jointHandle_t attachJoint ) {
+void anAFAttachment::SetBody( anEntity *bodyEnt, const char *model, jointHandle_t attachJoint ) {
 	bool bleed;
 
 	body = bodyEnt;
@@ -269,10 +269,10 @@ void arcAFAttachment::SetBody( arcEntity *bodyEnt, const char *model, jointHandl
 
 /*
 =====================
-arcAFAttachment::ClearBody
+anAFAttachment::ClearBody
 =====================
 */
-void arcAFAttachment::ClearBody( void ) {
+void anAFAttachment::ClearBody( void ) {
 	body = nullptr;
 	attachJoint = INVALID_JOINT;
 	Hide();
@@ -280,21 +280,21 @@ void arcAFAttachment::ClearBody( void ) {
 
 /*
 =====================
-arcAFAttachment::GetBody
+anAFAttachment::GetBody
 =====================
 */
-arcEntity *arcAFAttachment::GetBody( void ) const {
+anEntity *anAFAttachment::GetBody( void ) const {
 	return body;
 }
 
 /*
 ================
-arcAFAttachment::Save
+anAFAttachment::Save
 
 archive object for savegame file
 ================
 */
-void arcAFAttachment::Save( arcSaveGame *savefile ) const {
+void anAFAttachment::Save( anSaveGame *savefile ) const {
 	savefile->WriteObject( body );
 	savefile->WriteInt( idleAnim );
 	savefile->WriteJoint( attachJoint );
@@ -302,12 +302,12 @@ void arcAFAttachment::Save( arcSaveGame *savefile ) const {
 
 /*
 ================
-arcAFAttachment::Restore
+anAFAttachment::Restore
 
 unarchives object from save game file
 ================
 */
-void arcAFAttachment::Restore( arcRestoreGame *savefile ) {
+void anAFAttachment::Restore( anRestoreGame *savefile ) {
 	savefile->ReadObject( reinterpret_cast<anClass *&>( body ) );
 	savefile->ReadInt( idleAnim );
 	savefile->ReadJoint( attachJoint );
@@ -318,32 +318,32 @@ void arcAFAttachment::Restore( arcRestoreGame *savefile ) {
 
 /*
 ================
-arcAFAttachment::Hide
+anAFAttachment::Hide
 ================
 */
-void arcAFAttachment::Hide( void ) {
-	arcEntity::Hide();
+void anAFAttachment::Hide( void ) {
+	anEntity::Hide();
 	UnlinkCombat();
 }
 
 /*
 ================
-arcAFAttachment::Show
+anAFAttachment::Show
 ================
 */
-void arcAFAttachment::Show( void ) {
-	arcEntity::Show();
+void anAFAttachment::Show( void ) {
+	anEntity::Show();
 	LinkCombat();
 }
 
 /*
 ============
-arcAFAttachment::Damage
+anAFAttachment::Damage
 
 Pass damage to body at the bindjoint
 ============
 */
-void arcAFAttachment::Damage( arcEntity *inflictor, arcEntity *attacker, const anVec3 &dir,
+void anAFAttachment::Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir,
 	const char *damageDefName, const float damageScale, const int location ) {
 
 	if ( body ) {
@@ -353,10 +353,10 @@ void arcAFAttachment::Damage( arcEntity *inflictor, arcEntity *attacker, const a
 
 /*
 ================
-arcAFAttachment::AddDamageEffect
+anAFAttachment::AddDamageEffect
 ================
 */
-void arcAFAttachment::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName ) {
+void anAFAttachment::AddDamageEffect( const trace_t &collision, const anVec3 &velocity, const char *damageDefName ) {
 	if ( body ) {
 		trace_t c = collision;
 		c.c.id = JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint );
@@ -366,49 +366,49 @@ void arcAFAttachment::AddDamageEffect( const trace_t &collision, const anVec3 &v
 
 /*
 ================
-arcAFAttachment::GetImpactInfo
+anAFAttachment::GetImpactInfo
 ================
 */
-void arcAFAttachment::GetImpactInfo( arcEntity *ent, int id, const anVec3 &point, impactInfo_t *info ) {
+void anAFAttachment::GetImpactInfo( anEntity *ent, int id, const anVec3 &point, impactInfo_t *info ) {
 	if ( body ) {
 		body->GetImpactInfo( ent, JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint ), point, info );
 	} else {
-		arcEntity::GetImpactInfo( ent, id, point, info );
+		anEntity::GetImpactInfo( ent, id, point, info );
 	}
 }
 
 /*
 ================
-arcAFAttachment::ApplyImpulse
+anAFAttachment::ApplyImpulse
 ================
 */
-void arcAFAttachment::ApplyImpulse( arcEntity *ent, int id, const anVec3 &point, const anVec3 &impulse ) {
+void anAFAttachment::ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &impulse ) {
 	if ( body ) {
 		body->ApplyImpulse( ent, JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint ), point, impulse );
 	} else {
-		arcEntity::ApplyImpulse( ent, id, point, impulse );
+		anEntity::ApplyImpulse( ent, id, point, impulse );
 	}
 }
 
 /*
 ================
-arcAFAttachment::AddForce
+anAFAttachment::AddForce
 ================
 */
-void arcAFAttachment::AddForce( arcEntity *ent, int id, const anVec3 &point, const anVec3 &force ) {
+void anAFAttachment::AddForce( anEntity *ent, int id, const anVec3 &point, const anVec3 &force ) {
 	if ( body ) {
 		body->AddForce( ent, JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint ), point, force );
 	} else {
-		arcEntity::AddForce( ent, id, point, force );
+		anEntity::AddForce( ent, id, point, force );
 	}
 }
 
 /*
 ================
-arcAFAttachment::PlayIdleAnim
+anAFAttachment::PlayIdleAnim
 ================
 */
-void arcAFAttachment::PlayIdleAnim( int blendTime ) {
+void anAFAttachment::PlayIdleAnim( int blendTime ) {
 	if ( idleAnim && ( idleAnim != animator.CurrentAnim( ANIMCHANNEL_ALL )->AnimNum() ) ) {
 		animator.CycleAnim( ANIMCHANNEL_ALL, idleAnim, gameLocal.time, blendTime );
 	}
@@ -419,8 +419,8 @@ void arcAFAttachment::PlayIdleAnim( int blendTime ) {
 idAfAttachment::Think
 ================
 */
-void arcAFAttachment::Think( void ) {
-	arcAnimatedEntity::Think();
+void anAFAttachment::Think( void ) {
+	anAnimatedEntity::Think();
 	if ( thinkFlags & TH_UPDATEPARTICLES ) {
 		UpdateDamageEffects();
 	}
@@ -428,10 +428,10 @@ void arcAFAttachment::Think( void ) {
 
 /*
 ================
-arcAFAttachment::SetCombatModel
+anAFAttachment::SetCombatModel
 ================
 */
-void arcAFAttachment::SetCombatModel( void ) {
+void anAFAttachment::SetCombatModel( void ) {
 	if ( combatModel ) {
 		combatModel->Unlink();
 		combatModel->LoadModel( modelDefHandle );
@@ -443,19 +443,19 @@ void arcAFAttachment::SetCombatModel( void ) {
 
 /*
 ================
-arcAFAttachment::GetCombatModel
+anAFAttachment::GetCombatModel
 ================
 */
-anClipModel *arcAFAttachment::GetCombatModel( void ) const {
+anClipModel *anAFAttachment::GetCombatModel( void ) const {
 	return combatModel;
 }
 
 /*
 ================
-arcAFAttachment::LinkCombat
+anAFAttachment::LinkCombat
 ================
 */
-void arcAFAttachment::LinkCombat( void ) {
+void anAFAttachment::LinkCombat( void ) {
 	if ( fl.hidden ) {
 		return;
 	}
@@ -467,10 +467,10 @@ void arcAFAttachment::LinkCombat( void ) {
 
 /*
 ================
-arcAFAttachment::UnlinkCombat
+anAFAttachment::UnlinkCombat
 ================
 */
-void arcAFAttachment::UnlinkCombat( void ) {
+void anAFAttachment::UnlinkCombat( void ) {
 	if ( combatModel ) {
 		combatModel->Unlink();
 	}
@@ -480,15 +480,15 @@ void arcAFAttachment::UnlinkCombat( void ) {
 /*
 ===============================================================================
 
-  arcAFEntity_Base
+  anAFEntity_Base
 
 ===============================================================================
 */
 
-const arcEventDef EV_SetConstraintPosition( "SetConstraintPosition", "sv" );
+const anEventDef EV_SetConstraintPosition( "SetConstraintPosition", "sv" );
 
-CLASS_DECLARATION( arcAnimatedEntity, arcAFEntity_Base )
-	EVENT( EV_SetConstraintPosition,	arcAFEntity_Base::Event_SetConstraintPosition )
+CLASS_DECLARATION( anAnimatedEntity, anAFEntity_Base )
+	EVENT( EV_SetConstraintPosition,	anAFEntity_Base::Event_SetConstraintPosition )
 END_CLASS
 
 static const float BOUNCE_SOUND_MIN_VELOCITY	= 80.0f;
@@ -496,10 +496,10 @@ static const float BOUNCE_SOUND_MAX_VELOCITY	= 200.0f;
 
 /*
 ================
-arcAFEntity_Base::arcAFEntity_Base
+anAFEntity_Base::anAFEntity_Base
 ================
 */
-arcAFEntity_Base::arcAFEntity_Base( void ) {
+anAFEntity_Base::anAFEntity_Base( void ) {
 	combatModel = nullptr;
 	combatModelContents = 0;
 	nextSoundTime = 0;
@@ -509,20 +509,20 @@ arcAFEntity_Base::arcAFEntity_Base( void ) {
 
 /*
 ================
-arcAFEntity_Base::~arcAFEntity_Base
+anAFEntity_Base::~anAFEntity_Base
 ================
 */
-arcAFEntity_Base::~arcAFEntity_Base( void ) {
+anAFEntity_Base::~anAFEntity_Base( void ) {
 	delete combatModel;
 	combatModel = nullptr;
 }
 
 /*
 ================
-arcAFEntity_Base::Save
+anAFEntity_Base::Save
 ================
 */
-void arcAFEntity_Base::Save( arcSaveGame *savefile ) const {
+void anAFEntity_Base::Save( anSaveGame *savefile ) const {
 	savefile->WriteInt( combatModelContents );
 	savefile->WriteClipModel( combatModel );
 	savefile->WriteVec3( spawnOrigin );
@@ -533,10 +533,10 @@ void arcAFEntity_Base::Save( arcSaveGame *savefile ) const {
 
 /*
 ================
-arcAFEntity_Base::Restore
+anAFEntity_Base::Restore
 ================
 */
-void arcAFEntity_Base::Restore( arcRestoreGame *savefile ) {
+void anAFEntity_Base::Restore( anRestoreGame *savefile ) {
 	savefile->ReadInt( combatModelContents );
 	savefile->ReadClipModel( combatModel );
 	savefile->ReadVec3( spawnOrigin );
@@ -549,10 +549,10 @@ void arcAFEntity_Base::Restore( arcRestoreGame *savefile ) {
 
 /*
 ================
-arcAFEntity_Base::Spawn
+anAFEntity_Base::Spawn
 ================
 */
-void arcAFEntity_Base::Spawn( void ) {
+void anAFEntity_Base::Spawn( void ) {
 	spawnOrigin = GetPhysics()->GetOrigin();
 	spawnAxis = GetPhysics()->GetAxis();
 	nextSoundTime = 0;
@@ -560,11 +560,11 @@ void arcAFEntity_Base::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_Base::LoadAF
+anAFEntity_Base::LoadAF
 ================
 */
-bool arcAFEntity_Base::LoadAF( void ) {
-	anString fileName;
+bool anAFEntity_Base::LoadAF( void ) {
+	anStr fileName;
 
 	if ( !spawnArgs.GetString( "articulatedFigure", "*unknown*", fileName ) ) {
 		return false;
@@ -572,7 +572,7 @@ bool arcAFEntity_Base::LoadAF( void ) {
 
 	af.SetAnimator( GetAnimator() );
 	if ( !af.Load( this, fileName ) ) {
-		gameLocal.Error( "arcAFEntity_Base::LoadAF: Couldn't load af file '%s' on entity '%s'", fileName.c_str(), name.c_str() );
+		gameLocal.Error( "anAFEntity_Base::LoadAF: Couldn't load af file '%s' on entity '%s'", fileName.c_str(), name.c_str() );
 	}
 
 	af.Start();
@@ -591,10 +591,10 @@ bool arcAFEntity_Base::LoadAF( void ) {
 
 /*
 ================
-arcAFEntity_Base::Think
+anAFEntity_Base::Think
 ================
 */
-void arcAFEntity_Base::Think( void ) {
+void anAFEntity_Base::Think( void ) {
 	RunPhysics();
 	UpdateAnimation();
 	if ( thinkFlags & TH_UPDATEVISUALS ) {
@@ -605,19 +605,19 @@ void arcAFEntity_Base::Think( void ) {
 
 /*
 ================
-arcAFEntity_Base::BodyForClipModelId
+anAFEntity_Base::BodyForClipModelId
 ================
 */
-int arcAFEntity_Base::BodyForClipModelId( int id ) const {
+int anAFEntity_Base::BodyForClipModelId( int id ) const {
 	return af.BodyForClipModelId( id );
 }
 
 /*
 ================
-arcAFEntity_Base::SaveState
+anAFEntity_Base::SaveState
 ================
 */
-void arcAFEntity_Base::SaveState( anDict &args ) const {
+void anAFEntity_Base::SaveState( anDict &args ) const {
 	const anKeyValue *kv;
 
 	// save the ragdoll pose
@@ -647,78 +647,78 @@ void arcAFEntity_Base::SaveState( anDict &args ) const {
 
 /*
 ================
-arcAFEntity_Base::LoadState
+anAFEntity_Base::LoadState
 ================
 */
-void arcAFEntity_Base::LoadState( const anDict &args ) {
+void anAFEntity_Base::LoadState( const anDict &args ) {
 	af.LoadState( args );
 }
 
 /*
 ================
-arcAFEntity_Base::AddBindConstraints
+anAFEntity_Base::AddBindConstraints
 ================
 */
-void arcAFEntity_Base::AddBindConstraints( void ) {
+void anAFEntity_Base::AddBindConstraints( void ) {
 	af.AddBindConstraints();
 }
 
 /*
 ================
-arcAFEntity_Base::RemoveBindConstraints
+anAFEntity_Base::RemoveBindConstraints
 ================
 */
-void arcAFEntity_Base::RemoveBindConstraints( void ) {
+void anAFEntity_Base::RemoveBindConstraints( void ) {
 	af.RemoveBindConstraints();
 }
 
 /*
 ================
-arcAFEntity_Base::GetImpactInfo
+anAFEntity_Base::GetImpactInfo
 ================
 */
-void arcAFEntity_Base::GetImpactInfo( arcEntity *ent, int id, const anVec3 &point, impactInfo_t *info ) {
+void anAFEntity_Base::GetImpactInfo( anEntity *ent, int id, const anVec3 &point, impactInfo_t *info ) {
 	if ( af.IsActive() ) {
 		af.GetImpactInfo( ent, id, point, info );
 	} else {
-		arcEntity::GetImpactInfo( ent, id, point, info );
+		anEntity::GetImpactInfo( ent, id, point, info );
 	}
 }
 
 /*
 ================
-arcAFEntity_Base::ApplyImpulse
+anAFEntity_Base::ApplyImpulse
 ================
 */
-void arcAFEntity_Base::ApplyImpulse( arcEntity *ent, int id, const anVec3 &point, const anVec3 &impulse ) {
+void anAFEntity_Base::ApplyImpulse( anEntity *ent, int id, const anVec3 &point, const anVec3 &impulse ) {
 	if ( af.IsLoaded() ) {
 		af.ApplyImpulse( ent, id, point, impulse );
 	}
 	if ( !af.IsActive() ) {
-		arcEntity::ApplyImpulse( ent, id, point, impulse );
+		anEntity::ApplyImpulse( ent, id, point, impulse );
 	}
 }
 
 /*
 ================
-arcAFEntity_Base::AddForce
+anAFEntity_Base::AddForce
 ================
 */
-void arcAFEntity_Base::AddForce( arcEntity *ent, int id, const anVec3 &point, const anVec3 &force ) {
+void anAFEntity_Base::AddForce( anEntity *ent, int id, const anVec3 &point, const anVec3 &force ) {
 	if ( af.IsLoaded() ) {
 		af.AddForce( ent, id, point, force );
 	}
 	if ( !af.IsActive() ) {
-		arcEntity::AddForce( ent, id, point, force );
+		anEntity::AddForce( ent, id, point, force );
 	}
 }
 
 /*
 ================
-arcAFEntity_Base::Collide
+anAFEntity_Base::Collide
 ================
 */
-bool arcAFEntity_Base::Collide( const trace_t &collision, const anVec3 &velocity ) {
+bool anAFEntity_Base::Collide( const trace_t &collision, const anVec3 &velocity ) {
 	float v, f;
 
 	if ( af.IsActive() ) {
@@ -739,23 +739,23 @@ bool arcAFEntity_Base::Collide( const trace_t &collision, const anVec3 &velocity
 
 /*
 ================
-arcAFEntity_Base::GetPhysicsToVisualTransform
+anAFEntity_Base::GetPhysicsToVisualTransform
 ================
 */
-bool arcAFEntity_Base::GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis ) {
+bool anAFEntity_Base::GetPhysicsToVisualTransform( anVec3 &origin, anMat3 &axis ) {
 	if ( af.IsActive() ) {
 		af.GetPhysicsToVisualTransform( origin, axis );
 		return true;
 	}
-	return arcEntity::GetPhysicsToVisualTransform( origin, axis );
+	return anEntity::GetPhysicsToVisualTransform( origin, axis );
 }
 
 /*
 ================
-arcAFEntity_Base::UpdateAnimationControllers
+anAFEntity_Base::UpdateAnimationControllers
 ================
 */
-bool arcAFEntity_Base::UpdateAnimationControllers( void ) {
+bool anAFEntity_Base::UpdateAnimationControllers( void ) {
 	if ( af.IsActive() ) {
 		if ( af.UpdateAnimation() ) {
 			return true;
@@ -766,10 +766,10 @@ bool arcAFEntity_Base::UpdateAnimationControllers( void ) {
 
 /*
 ================
-arcAFEntity_Base::SetCombatModel
+anAFEntity_Base::SetCombatModel
 ================
 */
-void arcAFEntity_Base::SetCombatModel( void ) {
+void anAFEntity_Base::SetCombatModel( void ) {
 	if ( combatModel ) {
 		combatModel->Unlink();
 		combatModel->LoadModel( modelDefHandle );
@@ -780,19 +780,19 @@ void arcAFEntity_Base::SetCombatModel( void ) {
 
 /*
 ================
-arcAFEntity_Base::GetCombatModel
+anAFEntity_Base::GetCombatModel
 ================
 */
-anClipModel *arcAFEntity_Base::GetCombatModel( void ) const {
+anClipModel *anAFEntity_Base::GetCombatModel( void ) const {
 	return combatModel;
 }
 
 /*
 ================
-arcAFEntity_Base::SetCombatContents
+anAFEntity_Base::SetCombatContents
 ================
 */
-void arcAFEntity_Base::SetCombatContents( bool enable ) {
+void anAFEntity_Base::SetCombatContents( bool enable ) {
 	assert( combatModel );
 	if ( enable && combatModelContents ) {
 		assert( !combatModel->GetContents() );
@@ -807,10 +807,10 @@ void arcAFEntity_Base::SetCombatContents( bool enable ) {
 
 /*
 ================
-arcAFEntity_Base::LinkCombat
+anAFEntity_Base::LinkCombat
 ================
 */
-void arcAFEntity_Base::LinkCombat( void ) {
+void anAFEntity_Base::LinkCombat( void ) {
 	if ( fl.hidden ) {
 		return;
 	}
@@ -821,10 +821,10 @@ void arcAFEntity_Base::LinkCombat( void ) {
 
 /*
 ================
-arcAFEntity_Base::UnlinkCombat
+anAFEntity_Base::UnlinkCombat
 ================
 */
-void arcAFEntity_Base::UnlinkCombat( void ) {
+void anAFEntity_Base::UnlinkCombat( void ) {
 	if ( combatModel ) {
 		combatModel->Unlink();
 	}
@@ -832,26 +832,26 @@ void arcAFEntity_Base::UnlinkCombat( void ) {
 
 /*
 ================
-arcAFEntity_Base::FreeModelDef
+anAFEntity_Base::FreeModelDef
 ================
 */
-void arcAFEntity_Base::FreeModelDef( void ) {
+void anAFEntity_Base::FreeModelDef( void ) {
 	UnlinkCombat();
-	arcEntity::FreeModelDef();
+	anEntity::FreeModelDef();
 }
 
 /*
 ===============
-arcAFEntity_Base::ShowEditingDialog
+anAFEntity_Base::ShowEditingDialog
 ===============
 */
-void arcAFEntity_Base::ShowEditingDialog( void ) {
+void anAFEntity_Base::ShowEditingDialog( void ) {
 	common->InitTool( EDITOR_AF, &spawnArgs );
 }
 
 /*
 ================
-arcAFEntity_Base::DropAFs
+anAFEntity_Base::DropAFs
 
   The entity should have the following key/value pairs set:
 	"def_drop<type>AF"		"af def"
@@ -861,11 +861,11 @@ arcAFEntity_Base::DropAFs
   where * is an aribtrary string.
 ================
 */
-void arcAFEntity_Base::DropAFs( arcEntity *ent, const char *type, arcList<arcEntity *> *list ) {
+void anAFEntity_Base::DropAFs( anEntity *ent, const char *type, anList<anEntity *> *list ) {
 	const anKeyValue *kv;
 	const char *skinName;
-	arcEntity *newEnt;
-	arcAFEntity_Base *af;
+	anEntity *newEnt;
+	anAFEntity_Base *af;
 	anDict args;
 	const anDeclSkin *skin;
 
@@ -876,8 +876,8 @@ void arcAFEntity_Base::DropAFs( arcEntity *ent, const char *type, arcList<arcEnt
 		args.Set( "classname", kv->GetValue() );
 		gameLocal.SpawnEntityDef( args, &newEnt );
 
-		if ( newEnt && newEnt->IsType( arcAFEntity_Base::Type ) ) {
-			af = static_cast<arcAFEntity_Base *>(newEnt);
+		if ( newEnt && newEnt->IsType( anAFEntity_Base::Type ) ) {
+			af = static_cast<anAFEntity_Base *>(newEnt);
 			af->GetPhysics()->SetOrigin( ent->GetPhysics()->GetOrigin() );
 			af->GetPhysics()->SetAxis( ent->GetPhysics()->GetAxis() );
 			af->af.SetupPose( ent, gameLocal.time );
@@ -899,36 +899,36 @@ void arcAFEntity_Base::DropAFs( arcEntity *ent, const char *type, arcList<arcEnt
 
 /*
 ================
-arcAFEntity_Base::Event_SetConstraintPosition
+anAFEntity_Base::Event_SetConstraintPosition
 ================
 */
-void arcAFEntity_Base::Event_SetConstraintPosition( const char *name, const anVec3 &pos ) {
+void anAFEntity_Base::Event_SetConstraintPosition( const char *name, const anVec3 &pos ) {
 	af.SetConstraintPosition( name, pos );
 }
 
 /*
 ===============================================================================
 
-arcAFEntity_Gibbable
+anAFEntity_Fragged
 
 ===============================================================================
 */
 
-const arcEventDef EV_Gib( "gib", "s" );
-const arcEventDef EV_Gibbed( "<gibbed>" );
+const anEventDef EV_Gib( "gib", "s" );
+const anEventDef EV_Gibbed( "<gibbed>" );
 
-CLASS_DECLARATION( arcAFEntity_Base, arcAFEntity_Gibbable )
-	EVENT( EV_Gib,		arcAFEntity_Gibbable::Event_Gib )
-	EVENT( EV_Gibbed,	arcAFEntity_Base::Event_Remove )
+CLASS_DECLARATION( anAFEntity_Base, anAFEntity_Fragged )
+	EVENT( EV_Gib,		anAFEntity_Fragged::Event_Exploded )
+	EVENT( EV_Gibbed,	anAFEntity_Base::Event_Remove )
 END_CLASS
 
 
 /*
 ================
-arcAFEntity_Gibbable::arcAFEntity_Gibbable
+anAFEntity_Fragged::anAFEntity_Fragged
 ================
 */
-arcAFEntity_Gibbable::arcAFEntity_Gibbable( void ) {
+anAFEntity_Fragged::anAFEntity_Fragged( void ) {
 	skeletonModel = nullptr;
 	skeletonModelDefHandle = -1;
 	gibbed = false;
@@ -936,10 +936,10 @@ arcAFEntity_Gibbable::arcAFEntity_Gibbable( void ) {
 
 /*
 ================
-arcAFEntity_Gibbable::~arcAFEntity_Gibbable
+anAFEntity_Fragged::~anAFEntity_Fragged
 ================
 */
-arcAFEntity_Gibbable::~arcAFEntity_Gibbable() {
+anAFEntity_Fragged::~anAFEntity_Fragged() {
 	if ( skeletonModelDefHandle != -1 ) {
 		gameRenderWorld->FreeEntityDef( skeletonModelDefHandle );
 		skeletonModelDefHandle = -1;
@@ -948,20 +948,20 @@ arcAFEntity_Gibbable::~arcAFEntity_Gibbable() {
 
 /*
 ================
-arcAFEntity_Gibbable::Save
+anAFEntity_Fragged::Save
 ================
 */
-void arcAFEntity_Gibbable::Save( arcSaveGame *savefile ) const {
+void anAFEntity_Fragged::Save( anSaveGame *savefile ) const {
 	savefile->WriteBool( gibbed );
 	savefile->WriteBool( combatModel != nullptr );
 }
 
 /*
 ================
-arcAFEntity_Gibbable::Restore
+anAFEntity_Fragged::Restore
 ================
 */
-void arcAFEntity_Gibbable::Restore( arcRestoreGame *savefile ) {
+void anAFEntity_Fragged::Restore( anRestoreGame *savefile ) {
 	bool hasCombatModel;
 
 	savefile->ReadBool( gibbed );
@@ -977,10 +977,10 @@ void arcAFEntity_Gibbable::Restore( arcRestoreGame *savefile ) {
 
 /*
 ================
-arcAFEntity_Gibbable::Spawn
+anAFEntity_Fragged::Spawn
 ================
 */
-void arcAFEntity_Gibbable::Spawn( void ) {
+void anAFEntity_Fragged::Spawn( void ) {
 	InitSkeletonModel();
 
 	gibbed = false;
@@ -988,12 +988,12 @@ void arcAFEntity_Gibbable::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_Gibbable::InitSkeletonModel
+anAFEntity_Fragged::InitSkeletonModel
 ================
 */
-void arcAFEntity_Gibbable::InitSkeletonModel( void ) {
+void anAFEntity_Fragged::InitSkeletonModel( void ) {
 	const char *modelName;
-	const arcDeclModelDef *modelDef;
+	const anDeclModelDef *modelDef;
 
 	skeletonModel = nullptr;
 	skeletonModelDefHandle = -1;
@@ -1002,7 +1002,7 @@ void arcAFEntity_Gibbable::InitSkeletonModel( void ) {
 
 	modelDef = nullptr;
 	if ( modelName[0] != '\0' ) {
-		modelDef = static_cast<const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelName, false ) );
+		modelDef = static_cast<const anDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelName, false ) );
 		if ( modelDef ) {
 			skeletonModel = modelDef->ModelHandle();
 		} else {
@@ -1019,10 +1019,10 @@ void arcAFEntity_Gibbable::InitSkeletonModel( void ) {
 
 /*
 ================
-arcAFEntity_Gibbable::Present
+anAFEntity_Fragged::Present
 ================
 */
-void arcAFEntity_Gibbable::Present( void ) {
+void anAFEntity_Fragged::Present( void ) {
 	renderEntity_t skeleton;
 
 	if ( !gameLocal.isNewFrame ) {
@@ -1046,19 +1046,19 @@ void arcAFEntity_Gibbable::Present( void ) {
 		}
 	}
 
-	arcEntity::Present();
+	anEntity::Present();
 }
 
 /*
 ================
-arcAFEntity_Gibbable::Damage
+anAFEntity_Fragged::Damage
 ================
 */
-void arcAFEntity_Gibbable::Damage( arcEntity *inflictor, arcEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
+void anAFEntity_Fragged::Damage( anEntity *inflictor, anEntity *attacker, const anVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
 	if ( !fl.takedamage ) {
 		return;
 	}
-	arcAFEntity_Base::Damage( inflictor, attacker, dir, damageDefName, damageScale, location );
+	anAFEntity_Base::Damage( inflictor, attacker, dir, damageDefName, damageScale, location );
 	if ( health < -20 && spawnArgs.GetBool( "gib" ) ) {
 		Gib( dir, damageDefName );
 	}
@@ -1066,14 +1066,14 @@ void arcAFEntity_Gibbable::Damage( arcEntity *inflictor, arcEntity *attacker, co
 
 /*
 =====================
-arcAFEntity_Gibbable::SpawnGibs
+anAFEntity_Fragged::SpawnGibs
 =====================
 */
-void arcAFEntity_Gibbable::SpawnGibs( const anVec3 &dir, const char *damageDefName ) {
+void anAFEntity_Fragged::SpawnGibs( const anVec3 &dir, const char *damageDefName ) {
 	int i;
 	bool gibNonSolid;
 	anVec3 entityCenter, velocity;
-	arcList<arcEntity *> list;
+	anList<anEntity *> list;
 
 	assert( !gameLocal.isClient );
 
@@ -1083,7 +1083,7 @@ void arcAFEntity_Gibbable::SpawnGibs( const anVec3 &dir, const char *damageDefNa
 	}
 
 	// spawn gib articulated figures
-	arcAFEntity_Base::DropAFs( this, "gib", &list );
+	anAFEntity_Base::DropAFs( this, "gib", &list );
 
 	// spawn gib items
 	idMoveableItem::DropItems( this, "gib", &list );
@@ -1113,10 +1113,10 @@ void arcAFEntity_Gibbable::SpawnGibs( const anVec3 &dir, const char *damageDefNa
 
 /*
 ============
-arcAFEntity_Gibbable::Gib
+anAFEntity_Fragged::Gib
 ============
 */
-void arcAFEntity_Gibbable::Gib( const anVec3 &dir, const char *damageDefName ) {
+void anAFEntity_Fragged::Gib( const anVec3 &dir, const char *damageDefName ) {
 	// only gib once
 	if ( gibbed ) {
 		return;
@@ -1158,67 +1158,67 @@ void arcAFEntity_Gibbable::Gib( const anVec3 &dir, const char *damageDefName ) {
 
 /*
 ============
-arcAFEntity_Gibbable::Event_Gib
+anAFEntity_Fragged::Event_Exploded
 ============
 */
-void arcAFEntity_Gibbable::Event_Gib( const char *damageDefName ) {
+void anAFEntity_Fragged::Event_Exploded( const char *damageDefName ) {
 	Gib( anVec3( 0, 0, 1 ), damageDefName );
 }
 
 /*
 ===============================================================================
 
-  arcAFEntity_Generic
+  anAFEntity_Generic
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcAFEntity_Gibbable, arcAFEntity_Generic )
-	EVENT( EV_Activate,			arcAFEntity_Generic::Event_Activate )
+CLASS_DECLARATION( anAFEntity_Fragged, anAFEntity_Generic )
+	EVENT( EV_Activate,			anAFEntity_Generic::Event_Activate )
 END_CLASS
 
 /*
 ================
-arcAFEntity_Generic::arcAFEntity_Generic
+anAFEntity_Generic::anAFEntity_Generic
 ================
 */
-arcAFEntity_Generic::arcAFEntity_Generic( void ) {
+anAFEntity_Generic::anAFEntity_Generic( void ) {
 	keepRunningPhysics = false;
 }
 
 /*
 ================
-arcAFEntity_Generic::~arcAFEntity_Generic
+anAFEntity_Generic::~anAFEntity_Generic
 ================
 */
-arcAFEntity_Generic::~arcAFEntity_Generic( void ) {
+anAFEntity_Generic::~anAFEntity_Generic( void ) {
 }
 
 /*
 ================
-arcAFEntity_Generic::Save
+anAFEntity_Generic::Save
 ================
 */
-void arcAFEntity_Generic::Save( arcSaveGame *savefile ) const {
+void anAFEntity_Generic::Save( anSaveGame *savefile ) const {
 	savefile->WriteBool( keepRunningPhysics );
 }
 
 /*
 ================
-arcAFEntity_Generic::Restore
+anAFEntity_Generic::Restore
 ================
 */
-void arcAFEntity_Generic::Restore( arcRestoreGame *savefile ) {
+void anAFEntity_Generic::Restore( anRestoreGame *savefile ) {
 	savefile->ReadBool( keepRunningPhysics );
 }
 
 /*
 ================
-arcAFEntity_Generic::Think
+anAFEntity_Generic::Think
 ================
 */
-void arcAFEntity_Generic::Think( void ) {
-	arcAFEntity_Base::Think();
+void anAFEntity_Generic::Think( void ) {
+	anAFEntity_Base::Think();
 
 	if ( keepRunningPhysics ) {
 		BecomeActive( TH_PHYSICS );
@@ -1227,10 +1227,10 @@ void arcAFEntity_Generic::Think( void ) {
 
 /*
 ================
-arcAFEntity_Generic::Spawn
+anAFEntity_Generic::Spawn
 ================
 */
-void arcAFEntity_Generic::Spawn( void ) {
+void anAFEntity_Generic::Spawn( void ) {
 	if ( !LoadAF() ) {
 		gameLocal.Error( "Couldn't load af file on entity '%s'", name.c_str() );
 	}
@@ -1249,10 +1249,10 @@ void arcAFEntity_Generic::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_Generic::Event_Activate
+anAFEntity_Generic::Event_Activate
 ================
 */
-void arcAFEntity_Generic::Event_Activate( arcEntity *activator ) {
+void anAFEntity_Generic::Event_Activate( anEntity *activator ) {
 	float delay;
 	anVec3 init_velocity, init_avelocity;
 
@@ -1283,31 +1283,31 @@ void arcAFEntity_Generic::Event_Activate( arcEntity *activator ) {
 /*
 ===============================================================================
 
-  arcAFEntity_WithAttachedHead
+  anAFEntity_AttachedHead
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcAFEntity_Gibbable, arcAFEntity_WithAttachedHead )
-	EVENT( EV_Gib,				arcAFEntity_WithAttachedHead::Event_Gib )
-	EVENT( EV_Activate,			arcAFEntity_WithAttachedHead::Event_Activate )
+CLASS_DECLARATION( anAFEntity_Fragged, anAFEntity_AttachedHead )
+	EVENT( EV_Gib,				anAFEntity_AttachedHead::Event_Exploded )
+	EVENT( EV_Activate,			anAFEntity_AttachedHead::Event_Activate )
 END_CLASS
 
 /*
 ================
-arcAFEntity_WithAttachedHead::arcAFEntity_WithAttachedHead
+anAFEntity_AttachedHead::anAFEntity_AttachedHead
 ================
 */
-arcAFEntity_WithAttachedHead::arcAFEntity_WithAttachedHead() {
+anAFEntity_AttachedHead::anAFEntity_AttachedHead() {
 	head = nullptr;
 }
 
 /*
 ================
-arcAFEntity_WithAttachedHead::~arcAFEntity_WithAttachedHead
+anAFEntity_AttachedHead::~anAFEntity_AttachedHead
 ================
 */
-arcAFEntity_WithAttachedHead::~arcAFEntity_WithAttachedHead() {
+anAFEntity_AttachedHead::~anAFEntity_AttachedHead() {
 	if ( head.GetEntity() ) {
 		head.GetEntity()->ClearBody();
 		head.GetEntity()->PostEventMS( &EV_Remove, 0 );
@@ -1316,10 +1316,10 @@ arcAFEntity_WithAttachedHead::~arcAFEntity_WithAttachedHead() {
 
 /*
 ================
-arcAFEntity_WithAttachedHead::Spawn
+anAFEntity_AttachedHead::Spawn
 ================
 */
-void arcAFEntity_WithAttachedHead::Spawn( void ) {
+void anAFEntity_AttachedHead::Spawn( void ) {
 	SetupHead();
 
 	LoadAF();
@@ -1346,44 +1346,44 @@ void arcAFEntity_WithAttachedHead::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_WithAttachedHead::Save
+anAFEntity_AttachedHead::Save
 ================
 */
-void arcAFEntity_WithAttachedHead::Save( arcSaveGame *savefile ) const {
+void anAFEntity_AttachedHead::Save( anSaveGame *savefile ) const {
 	head.Save( savefile );
 }
 
 /*
 ================
-arcAFEntity_WithAttachedHead::Restore
+anAFEntity_AttachedHead::Restore
 ================
 */
-void arcAFEntity_WithAttachedHead::Restore( arcRestoreGame *savefile ) {
+void anAFEntity_AttachedHead::Restore( anRestoreGame *savefile ) {
 	head.Restore( savefile );
 }
 
 /*
 ================
-arcAFEntity_WithAttachedHead::SetupHead
+anAFEntity_AttachedHead::SetupHead
 ================
 */
-void arcAFEntity_WithAttachedHead::SetupHead( void ) {
-	arcAFAttachment		*headEnt;
-	anString				jointName;
+void anAFEntity_AttachedHead::SetupHead( void ) {
+	anAFAttachment		*headEnt;
+	anStr				jointName;
 	const char			*headModel;
 	jointHandle_t		joint;
 	anVec3				origin;
 	anMat3				axis;
 
 	headModel = spawnArgs.GetString( "def_head", "" );
-	if ( headModel[ 0 ] ) {
+	if ( headModel[0] ) {
 		jointName = spawnArgs.GetString( "head_joint" );
 		joint = animator.GetJointHandle( jointName );
 		if ( joint == INVALID_JOINT ) {
 			gameLocal.Error( "Joint '%s' not found for 'head_joint' on '%s'", jointName.c_str(), name.c_str() );
 		}
 
-		headEnt = static_cast<arcAFAttachment *>( gameLocal.SpawnEntityType( arcAFAttachment::Type, nullptr ) );
+		headEnt = static_cast<anAFAttachment *>( gameLocal.SpawnEntityType( anAFAttachment::Type, nullptr ) );
 		headEnt->SetName( va( "%s_head", name.c_str() ) );
 		headEnt->SetBody( this, headModel, joint );
 		headEnt->SetCombatModel();
@@ -1399,20 +1399,20 @@ void arcAFEntity_WithAttachedHead::SetupHead( void ) {
 
 /*
 ================
-arcAFEntity_WithAttachedHead::Think
+anAFEntity_AttachedHead::Think
 ================
 */
-void arcAFEntity_WithAttachedHead::Think( void ) {
-	arcAFEntity_Base::Think();
+void anAFEntity_AttachedHead::Think( void ) {
+	anAFEntity_Base::Think();
 }
 
 /*
 ================
-arcAFEntity_WithAttachedHead::LinkCombat
+anAFEntity_AttachedHead::LinkCombat
 ================
 */
-void arcAFEntity_WithAttachedHead::LinkCombat( void ) {
-	arcAFAttachment *headEnt;
+void anAFEntity_AttachedHead::LinkCombat( void ) {
+	anAFAttachment *headEnt;
 
 	if ( fl.hidden ) {
 		return;
@@ -1429,11 +1429,11 @@ void arcAFEntity_WithAttachedHead::LinkCombat( void ) {
 
 /*
 ================
-arcAFEntity_WithAttachedHead::UnlinkCombat
+anAFEntity_AttachedHead::UnlinkCombat
 ================
 */
-void arcAFEntity_WithAttachedHead::UnlinkCombat( void ) {
-	arcAFAttachment *headEnt;
+void anAFEntity_AttachedHead::UnlinkCombat( void ) {
+	anAFAttachment *headEnt;
 
 	if ( combatModel ) {
 		combatModel->Unlink();
@@ -1446,11 +1446,11 @@ void arcAFEntity_WithAttachedHead::UnlinkCombat( void ) {
 
 /*
 ================
-arcAFEntity_WithAttachedHead::Hide
+anAFEntity_AttachedHead::Hide
 ================
 */
-void arcAFEntity_WithAttachedHead::Hide( void ) {
-	arcAFEntity_Base::Hide();
+void anAFEntity_AttachedHead::Hide( void ) {
+	anAFEntity_Base::Hide();
 	if ( head.GetEntity() ) {
 		head.GetEntity()->Hide();
 	}
@@ -1459,11 +1459,11 @@ void arcAFEntity_WithAttachedHead::Hide( void ) {
 
 /*
 ================
-arcAFEntity_WithAttachedHead::Show
+anAFEntity_AttachedHead::Show
 ================
 */
-void arcAFEntity_WithAttachedHead::Show( void ) {
-	arcAFEntity_Base::Show();
+void anAFEntity_AttachedHead::Show( void ) {
+	anAFEntity_Base::Show();
 	if ( head.GetEntity() ) {
 		head.GetEntity()->Show();
 	}
@@ -1472,12 +1472,12 @@ void arcAFEntity_WithAttachedHead::Show( void ) {
 
 /*
 ================
-arcAFEntity_WithAttachedHead::ProjectOverlay
+anAFEntity_AttachedHead::ProjectOverlay
 ================
 */
-void arcAFEntity_WithAttachedHead::ProjectOverlay( const anVec3 &origin, const anVec3 &dir, float size, const char *material ) {
+void anAFEntity_AttachedHead::ProjectOverlay( const anVec3 &origin, const anVec3 &dir, float size, const char *material ) {
 
-	arcEntity::ProjectOverlay( origin, dir, size, material );
+	anEntity::ProjectOverlay( origin, dir, size, material );
 
 	if ( head.GetEntity() ) {
 		head.GetEntity()->ProjectOverlay( origin, dir, size, material );
@@ -1486,15 +1486,15 @@ void arcAFEntity_WithAttachedHead::ProjectOverlay( const anVec3 &origin, const a
 
 /*
 ============
-arcAFEntity_WithAttachedHead::Gib
+anAFEntity_AttachedHead::Gib
 ============
 */
-void arcAFEntity_WithAttachedHead::Gib( const anVec3 &dir, const char *damageDefName ) {
+void anAFEntity_AttachedHead::Gib( const anVec3 &dir, const char *damageDefName ) {
 	// only gib once
 	if ( gibbed ) {
 		return;
 	}
-	arcAFEntity_Gibbable::Gib( dir, damageDefName );
+	anAFEntity_Fragged::Gib( dir, damageDefName );
 	if ( head.GetEntity() ) {
 		head.GetEntity()->Hide();
 	}
@@ -1502,19 +1502,19 @@ void arcAFEntity_WithAttachedHead::Gib( const anVec3 &dir, const char *damageDef
 
 /*
 ============
-arcAFEntity_WithAttachedHead::Event_Gib
+anAFEntity_AttachedHead::Event_Exploded
 ============
 */
-void arcAFEntity_WithAttachedHead::Event_Gib( const char *damageDefName ) {
+void anAFEntity_AttachedHead::Event_Exploded( const char *damageDefName ) {
 	Gib( anVec3( 0, 0, 1 ), damageDefName );
 }
 
 /*
 ================
-arcAFEntity_WithAttachedHead::Event_Activate
+anAFEntity_AttachedHead::Event_Activate
 ================
 */
-void arcAFEntity_WithAttachedHead::Event_Activate( arcEntity *activator ) {
+void anAFEntity_AttachedHead::Event_Activate( anEntity *activator ) {
 	float delay;
 	anVec3 init_velocity, init_avelocity;
 
@@ -1545,20 +1545,20 @@ void arcAFEntity_WithAttachedHead::Event_Activate( arcEntity *activator ) {
 /*
 ===============================================================================
 
-  arcAFEntity_Vehicle
+  anAFEntity_Vehicle
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcAFEntity_Base, arcAFEntity_Vehicle )
+CLASS_DECLARATION( anAFEntity_Base, anAFEntity_Vehicle )
 END_CLASS
 
 /*
 ================
-arcAFEntity_Vehicle::arcAFEntity_Vehicle
+anAFEntity_Vehicle::anAFEntity_Vehicle
 ================
 */
-arcAFEntity_Vehicle::arcAFEntity_Vehicle( void ) {
+anAFEntity_Vehicle::anAFEntity_Vehicle( void ) {
 	player				= nullptr;
 	eyesJoint			= INVALID_JOINT;
 	steeringWheelJoint	= INVALID_JOINT;
@@ -1570,10 +1570,10 @@ arcAFEntity_Vehicle::arcAFEntity_Vehicle( void ) {
 
 /*
 ================
-arcAFEntity_Vehicle::Spawn
+anAFEntity_Vehicle::Spawn
 ================
 */
-void arcAFEntity_Vehicle::Spawn( void ) {
+void anAFEntity_Vehicle::Spawn( void ) {
 	const char *eyesJointName = spawnArgs.GetString( "eyesJoint", "eyes" );
 	const char *steeringWheelJointName = spawnArgs.GetString( "steeringWheelJoint", "steeringWheel" );
 
@@ -1586,11 +1586,11 @@ void arcAFEntity_Vehicle::Spawn( void ) {
 	fl.takedamage = true;
 
 	if ( !eyesJointName[0] ) {
-		gameLocal.Error( "arcAFEntity_Vehicle '%s' no eyes joint specified", name.c_str() );
+		gameLocal.Error( "anAFEntity_Vehicle '%s' no eyes joint specified", name.c_str() );
 	}
 	eyesJoint = animator.GetJointHandle( eyesJointName );
 	if ( !steeringWheelJointName[0] ) {
-		gameLocal.Error( "arcAFEntity_Vehicle '%s' no steering wheel joint specified", name.c_str() );
+		gameLocal.Error( "anAFEntity_Vehicle '%s' no steering wheel joint specified", name.c_str() );
 	}
 	steeringWheelJoint = animator.GetJointHandle( steeringWheelJointName );
 
@@ -1600,7 +1600,7 @@ void arcAFEntity_Vehicle::Spawn( void ) {
 	player = nullptr;
 	steerAngle = 0.0f;
 
-	const char *smokeName = spawnArgs.GetString( "smoke_vehicle_dust", "muzzlesmoke" );
+	const char *smokeName = spawnArgs.GetString( "smokevhcle_dust", "muzzlesmoke" );
 	if ( *smokeName != '\0' ) {
 		dustSmoke = static_cast<const anDeclParticle *>( declManager->FindType( DECL_PARTICLE, smokeName ) );
 	}
@@ -1608,10 +1608,10 @@ void arcAFEntity_Vehicle::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_Vehicle::Use
+anAFEntity_Vehicle::Use
 ================
 */
-void arcAFEntity_Vehicle::Use( arcNetBasePlayer *other ) {
+void anAFEntity_Vehicle::Use( anBasePlayer *other ) {
 	anVec3 origin;
 	anMat3 axis;
 
@@ -1637,10 +1637,10 @@ void arcAFEntity_Vehicle::Use( arcNetBasePlayer *other ) {
 
 /*
 ================
-arcAFEntity_Vehicle::GetSteerAngle
+anAFEntity_Vehicle::GetSteerAngle
 ================
 */
-float arcAFEntity_Vehicle::GetSteerAngle( void ) {
+float anAFEntity_Vehicle::GetSteerAngle( void ) {
 	float idealSteerAngle, angleDelta;
 
 	idealSteerAngle = player->usercmd.rightmove * ( 30.0f / 128.0f );
@@ -1661,20 +1661,20 @@ float arcAFEntity_Vehicle::GetSteerAngle( void ) {
 /*
 ===============================================================================
 
-  arcAFEntity_VehicleSimple
+  anAFEntity_VehicleSimple
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcAFEntity_Vehicle, arcAFEntity_VehicleSimple )
+CLASS_DECLARATION( anAFEntity_Vehicle, anAFEntity_VehicleSimple )
 END_CLASS
 
 /*
 ================
-arcAFEntity_VehicleSimple::arcAFEntity_VehicleSimple
+anAFEntity_VehicleSimple::anAFEntity_VehicleSimple
 ================
 */
-arcAFEntity_VehicleSimple::arcAFEntity_VehicleSimple( void ) {
+anAFEntity_VehicleSimple::anAFEntity_VehicleSimple( void ) {
 	int i;
 	for ( i = 0; i < 4; i++ ) {
 		suspension[i] = nullptr;
@@ -1683,20 +1683,20 @@ arcAFEntity_VehicleSimple::arcAFEntity_VehicleSimple( void ) {
 
 /*
 ================
-arcAFEntity_VehicleSimple::~arcAFEntity_VehicleSimple
+anAFEntity_VehicleSimple::~anAFEntity_VehicleSimple
 ================
 */
-arcAFEntity_VehicleSimple::~arcAFEntity_VehicleSimple( void ) {
+anAFEntity_VehicleSimple::~anAFEntity_VehicleSimple( void ) {
 	delete wheelModel;
 	wheelModel = nullptr;
 }
 
 /*
 ================
-arcAFEntity_VehicleSimple::Spawn
+anAFEntity_VehicleSimple::Spawn
 ================
 */
-void arcAFEntity_VehicleSimple::Spawn( void ) {
+void anAFEntity_VehicleSimple::Spawn( void ) {
 	static const char *wheelJointKeys[] = {
 		"wheelJointFrontLeft",
 		"wheelJointFrontRight",
@@ -1717,11 +1717,11 @@ void arcAFEntity_VehicleSimple::Spawn( void ) {
 	for ( i = 0; i < 4; i++ ) {
 		const char *wheelJointName = spawnArgs.GetString( wheelJointKeys[i], "" );
 		if ( !wheelJointName[0] ) {
-			gameLocal.Error( "arcAFEntity_VehicleSimple '%s' no '%s' specified", name.c_str(), wheelJointKeys[i] );
+			gameLocal.Error( "anAFEntity_VehicleSimple '%s' no '%s' specified", name.c_str(), wheelJointKeys[i] );
 		}
 		wheelJoints[i] = animator.GetJointHandle( wheelJointName );
 		if ( wheelJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "arcAFEntity_VehicleSimple '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName );
+			gameLocal.Error( "anAFEntity_VehicleSimple '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName );
 		}
 
 		GetAnimator()->GetJointTransform( wheelJoints[i], 0, origin, axis );
@@ -1729,11 +1729,11 @@ void arcAFEntity_VehicleSimple::Spawn( void ) {
 
 		suspension[i] = new arcAFConstraint_Suspension();
 		suspension[i]->Setup( va( "suspension%d", i ), af.GetPhysics()->GetBody( 0 ), origin, af.GetPhysics()->GetAxis( 0 ), wheelModel );
-		suspension[i]->SetSuspension(	g_vehicleSuspensionUp.GetFloat(),
-										g_vehicleSuspensionDown.GetFloat(),
-										g_vehicleSuspensionKCompress.GetFloat(),
-										g_vehicleSuspensionDamping.GetFloat(),
-										g_vehicleTireFriction.GetFloat() );
+		suspension[i]->SetSuspension(	gvhcleSuspensionUp.GetFloat(),
+										gvhcleSuspensionDown.GetFloat(),
+										gvhcleSuspensionKCompress.GetFloat(),
+										gvhcleSuspensionDamping.GetFloat(),
+										gvhcleTireFriction.GetFloat() );
 
 		af.GetPhysics()->AddConstraint( suspension[i] );
 	}
@@ -1744,10 +1744,10 @@ void arcAFEntity_VehicleSimple::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_VehicleSimple::Think
+anAFEntity_VehicleSimple::Think
 ================
 */
-void arcAFEntity_VehicleSimple::Think( void ) {
+void anAFEntity_VehicleSimple::Think( void ) {
 	int i;
 	float force = 0.0f, velocity = 0.0f, steerAngle = 0.0f;
 	anVec3 origin;
@@ -1758,11 +1758,11 @@ void arcAFEntity_VehicleSimple::Think( void ) {
 
 		if ( player ) {
 			// capture the input from a player
-			velocity = g_vehicleVelocity.GetFloat();
+			velocity = gvhcleVelocity.GetFloat();
 			if ( player->usercmd.forwardmove < 0 ) {
 				velocity = -velocity;
 			}
-			force = anMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
+			force = anMath::Fabs( player->usercmd.forwardmove * gvhcleForce.GetFloat() ) * (1.0f / 128.0f);
 			steerAngle = GetSteerAngle();
 		}
 
@@ -1791,11 +1791,11 @@ void arcAFEntity_VehicleSimple::Think( void ) {
 
 		// update suspension with latest cvar settings
 		for ( i = 0; i < 4; i++ ) {
-			suspension[i]->SetSuspension(	g_vehicleSuspensionUp.GetFloat(),
-											g_vehicleSuspensionDown.GetFloat(),
-											g_vehicleSuspensionKCompress.GetFloat(),
-											g_vehicleSuspensionDamping.GetFloat(),
-											g_vehicleTireFriction.GetFloat() );
+			suspension[i]->SetSuspension(	gvhcleSuspensionUp.GetFloat(),
+											gvhcleSuspensionDown.GetFloat(),
+											gvhcleSuspensionKCompress.GetFloat(),
+											gvhcleSuspensionDamping.GetFloat(),
+											gvhcleTireFriction.GetFloat() );
 		}
 
 		// run the physics
@@ -1830,7 +1830,7 @@ void arcAFEntity_VehicleSimple::Think( void ) {
 		}
 /*
 		// spawn dust particle effects
-		if ( force != 0.0f && !( gameLocal.framenum & 7 ) ) {
+		if ( force != 0.0f && !( gameLocal.frameNum & 7 ) ) {
 			int numContacts;
 			arcAFConstraint_Contact *contacts[2];
 			for ( i = 0; i < 4; i++ ) {
@@ -1854,21 +1854,21 @@ void arcAFEntity_VehicleSimple::Think( void ) {
 /*
 ===============================================================================
 
-  arcAFEntity_VehicleFourWheels
+  anAFEntity_VehicleFourWheels
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcAFEntity_Vehicle, arcAFEntity_VehicleFourWheels )
+CLASS_DECLARATION( anAFEntity_Vehicle, anAFEntity_VehicleFourWheels )
 END_CLASS
 
 
 /*
 ================
-arcAFEntity_VehicleFourWheels::arcAFEntity_VehicleFourWheels
+anAFEntity_VehicleFourWheels::anAFEntity_VehicleFourWheels
 ================
 */
-arcAFEntity_VehicleFourWheels::arcAFEntity_VehicleFourWheels( void ) {
+anAFEntity_VehicleFourWheels::anAFEntity_VehicleFourWheels( void ) {
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
@@ -1882,10 +1882,10 @@ arcAFEntity_VehicleFourWheels::arcAFEntity_VehicleFourWheels( void ) {
 
 /*
 ================
-arcAFEntity_VehicleFourWheels::Spawn
+anAFEntity_VehicleFourWheels::Spawn
 ================
 */
-void arcAFEntity_VehicleFourWheels::Spawn( void ) {
+void anAFEntity_VehicleFourWheels::Spawn( void ) {
 	int i;
 	static const char *wheelBodyKeys[] = {
 		"wheelBodyFrontLeft",
@@ -1909,30 +1909,30 @@ void arcAFEntity_VehicleFourWheels::Spawn( void ) {
 	for ( i = 0; i < 4; i++ ) {
 		wheelBodyName = spawnArgs.GetString( wheelBodyKeys[i], "" );
 		if ( !wheelBodyName[0] ) {
-			gameLocal.Error( "arcAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), wheelBodyKeys[i] );
+			gameLocal.Error( "anAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), wheelBodyKeys[i] );
 		}
 		wheels[i] = af.GetPhysics()->GetBody( wheelBodyName );
 		if ( !wheels[i] ) {
-			gameLocal.Error( "arcAFEntity_VehicleFourWheels '%s' can't find wheel body '%s'", name.c_str(), wheelBodyName );
+			gameLocal.Error( "anAFEntity_VehicleFourWheels '%s' can't find wheel body '%s'", name.c_str(), wheelBodyName );
 		}
 		wheelJointName = spawnArgs.GetString( wheelJointKeys[i], "" );
 		if ( !wheelJointName[0] ) {
-			gameLocal.Error( "arcAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), wheelJointKeys[i] );
+			gameLocal.Error( "anAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), wheelJointKeys[i] );
 		}
 		wheelJoints[i] = animator.GetJointHandle( wheelJointName );
 		if ( wheelJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "arcAFEntity_VehicleFourWheels '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName );
+			gameLocal.Error( "anAFEntity_VehicleFourWheels '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName );
 		}
 	}
 
 	for ( i = 0; i < 2; i++ ) {
 		steeringHingeName = spawnArgs.GetString( steeringHingeKeys[i], "" );
 		if ( !steeringHingeName[0] ) {
-			gameLocal.Error( "arcAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i] );
+			gameLocal.Error( "anAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i] );
 		}
 		steering[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( steeringHingeName ) );
 		if ( !steering[i] ) {
-			gameLocal.Error( "arcAFEntity_VehicleFourWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName );
+			gameLocal.Error( "anAFEntity_VehicleFourWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName );
 		}
 	}
 
@@ -1942,10 +1942,10 @@ void arcAFEntity_VehicleFourWheels::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_VehicleFourWheels::Think
+anAFEntity_VehicleFourWheels::Think
 ================
 */
-void arcAFEntity_VehicleFourWheels::Think( void ) {
+void anAFEntity_VehicleFourWheels::Think( void ) {
 	int i;
 	float force = 0.0f, velocity = 0.0f, steerAngle = 0.0f;
 	anVec3 origin;
@@ -1956,11 +1956,11 @@ void arcAFEntity_VehicleFourWheels::Think( void ) {
 
 		if ( player ) {
 			// capture the input from a player
-			velocity = g_vehicleVelocity.GetFloat();
+			velocity = gvhcleVelocity.GetFloat();
 			if ( player->usercmd.forwardmove < 0 ) {
 				velocity = -velocity;
 			}
-			force = anMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
+			force = anMath::Fabs( player->usercmd.forwardmove * gvhcleForce.GetFloat() ) * (1.0f / 128.0f);
 			steerAngle = GetSteerAngle();
 		}
 
@@ -2008,7 +2008,7 @@ void arcAFEntity_VehicleFourWheels::Think( void ) {
 		}
 
 		// spawn dust particle effects
-		if ( force != 0.0f && !( gameLocal.framenum & 7 ) ) {
+		if ( force != 0.0f && !( gameLocal.frameNum & 7 ) ) {
 			int numContacts;
 			arcAFConstraint_Contact *contacts[2];
 			for ( i = 0; i < 4; i++ ) {
@@ -2031,20 +2031,20 @@ void arcAFEntity_VehicleFourWheels::Think( void ) {
 /*
 ===============================================================================
 
-  arcAFEntity_VehicleSixWheels
+  anAFEntity_VehicleSixWheels
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcAFEntity_Vehicle, arcAFEntity_VehicleSixWheels )
+CLASS_DECLARATION( anAFEntity_Vehicle, anAFEntity_VehicleSixWheels )
 END_CLASS
 
 	/*
 ================
-arcAFEntity_VehicleSixWheels::arcAFEntity_VehicleSixWheels
+anAFEntity_VehicleSixWheels::anAFEntity_VehicleSixWheels
 ================
 */
-arcAFEntity_VehicleSixWheels::arcAFEntity_VehicleSixWheels( void ) {
+anAFEntity_VehicleSixWheels::anAFEntity_VehicleSixWheels( void ) {
 	int i;
 
 	for ( i = 0; i < 6; i++ ) {
@@ -2060,10 +2060,10 @@ arcAFEntity_VehicleSixWheels::arcAFEntity_VehicleSixWheels( void ) {
 
 /*
 ================
-arcAFEntity_VehicleSixWheels::Spawn
+anAFEntity_VehicleSixWheels::Spawn
 ================
 */
-void arcAFEntity_VehicleSixWheels::Spawn( void ) {
+void anAFEntity_VehicleSixWheels::Spawn( void ) {
 	int i;
 	static const char *wheelBodyKeys[] = {
 		"wheelBodyFrontLeft",
@@ -2093,30 +2093,30 @@ void arcAFEntity_VehicleSixWheels::Spawn( void ) {
 	for ( i = 0; i < 6; i++ ) {
 		wheelBodyName = spawnArgs.GetString( wheelBodyKeys[i], "" );
 		if ( !wheelBodyName[0] ) {
-			gameLocal.Error( "arcAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), wheelBodyKeys[i] );
+			gameLocal.Error( "anAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), wheelBodyKeys[i] );
 		}
 		wheels[i] = af.GetPhysics()->GetBody( wheelBodyName );
 		if ( !wheels[i] ) {
-			gameLocal.Error( "arcAFEntity_VehicleSixWheels '%s' can't find wheel body '%s'", name.c_str(), wheelBodyName );
+			gameLocal.Error( "anAFEntity_VehicleSixWheels '%s' can't find wheel body '%s'", name.c_str(), wheelBodyName );
 		}
 		wheelJointName = spawnArgs.GetString( wheelJointKeys[i], "" );
 		if ( !wheelJointName[0] ) {
-			gameLocal.Error( "arcAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), wheelJointKeys[i] );
+			gameLocal.Error( "anAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), wheelJointKeys[i] );
 		}
 		wheelJoints[i] = animator.GetJointHandle( wheelJointName );
 		if ( wheelJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "arcAFEntity_VehicleSixWheels '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName );
+			gameLocal.Error( "anAFEntity_VehicleSixWheels '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName );
 		}
 	}
 
 	for ( i = 0; i < 4; i++ ) {
 		steeringHingeName = spawnArgs.GetString( steeringHingeKeys[i], "" );
 		if ( !steeringHingeName[0] ) {
-			gameLocal.Error( "arcAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i] );
+			gameLocal.Error( "anAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i] );
 		}
 		steering[i] = static_cast<arcAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( steeringHingeName ) );
 		if ( !steering[i] ) {
-			gameLocal.Error( "arcAFEntity_VehicleSixWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName );
+			gameLocal.Error( "anAFEntity_VehicleSixWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName );
 		}
 	}
 
@@ -2126,10 +2126,10 @@ void arcAFEntity_VehicleSixWheels::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_VehicleSixWheels::Think
+anAFEntity_VehicleSixWheels::Think
 ================
 */
-void arcAFEntity_VehicleSixWheels::Think( void ) {
+void anAFEntity_VehicleSixWheels::Think( void ) {
 	int i;
 	float force = 0.0f, velocity = 0.0f, steerAngle = 0.0f;
 	anVec3 origin;
@@ -2140,11 +2140,11 @@ void arcAFEntity_VehicleSixWheels::Think( void ) {
 
 		if ( player ) {
 			// capture the input from a player
-			velocity = g_vehicleVelocity.GetFloat();
+			velocity = gvhcleVelocity.GetFloat();
 			if ( player->usercmd.forwardmove < 0 ) {
 				velocity = -velocity;
 			}
-			force = anMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
+			force = anMath::Fabs( player->usercmd.forwardmove * gvhcleForce.GetFloat() ) * (1.0f / 128.0f);
 			steerAngle = GetSteerAngle();
 		}
 
@@ -2198,7 +2198,7 @@ void arcAFEntity_VehicleSixWheels::Think( void ) {
 		}
 
 		// spawn dust particle effects
-		if ( force != 0.0f && !( gameLocal.framenum & 7 ) ) {
+		if ( force != 0.0f && !( gameLocal.frameNum & 7 ) ) {
 			int numContacts;
 			arcAFConstraint_Contact *contacts[2];
 			for ( i = 0; i < 6; i++ ) {
@@ -2221,21 +2221,21 @@ void arcAFEntity_VehicleSixWheels::Think( void ) {
 /*
 ===============================================================================
 
-  arcAFEntity_SteamPipe
+  anAFEntity_SteamPipe
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( arcAFEntity_Base, arcAFEntity_SteamPipe )
+CLASS_DECLARATION( anAFEntity_Base, anAFEntity_SteamPipe )
 END_CLASS
 
 
 /*
 ================
-arcAFEntity_SteamPipe::arcAFEntity_SteamPipe
+anAFEntity_SteamPipe::anAFEntity_SteamPipe
 ================
 */
-arcAFEntity_SteamPipe::arcAFEntity_SteamPipe( void ) {
+anAFEntity_SteamPipe::anAFEntity_SteamPipe( void ) {
 	steamBody			= 0;
 	steamForce			= 0.0f;
 	steamUpForce		= 0.0f;
@@ -2245,10 +2245,10 @@ arcAFEntity_SteamPipe::arcAFEntity_SteamPipe( void ) {
 
 /*
 ================
-arcAFEntity_SteamPipe::~arcAFEntity_SteamPipe
+anAFEntity_SteamPipe::~anAFEntity_SteamPipe
 ================
 */
-arcAFEntity_SteamPipe::~arcAFEntity_SteamPipe( void ) {
+anAFEntity_SteamPipe::~anAFEntity_SteamPipe( void ) {
 	if ( steamModelDefHandle >= 0 ){
 		gameRenderWorld->FreeEntityDef( steamModelDefHandle );
 	}
@@ -2256,27 +2256,27 @@ arcAFEntity_SteamPipe::~arcAFEntity_SteamPipe( void ) {
 
 /*
 ================
-arcAFEntity_SteamPipe::Save
+anAFEntity_SteamPipe::Save
 ================
 */
-void arcAFEntity_SteamPipe::Save( arcSaveGame *savefile ) const {
+void anAFEntity_SteamPipe::Save( anSaveGame *savefile ) const {
 }
 
 /*
 ================
-arcAFEntity_SteamPipe::Restore
+anAFEntity_SteamPipe::Restore
 ================
 */
-void arcAFEntity_SteamPipe::Restore( arcRestoreGame *savefile ) {
+void anAFEntity_SteamPipe::Restore( anRestoreGame *savefile ) {
 	Spawn();
 }
 
 /*
 ================
-arcAFEntity_SteamPipe::Spawn
+anAFEntity_SteamPipe::Spawn
 ================
 */
-void arcAFEntity_SteamPipe::Spawn( void ) {
+void anAFEntity_SteamPipe::Spawn( void ) {
 	anVec3 steamDir;
 	const char *steamBodyName;
 
@@ -2303,12 +2303,12 @@ void arcAFEntity_SteamPipe::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_SteamPipe::InitSteamRenderEntity
+anAFEntity_SteamPipe::InitSteamRenderEntity
 ================
 */
-void arcAFEntity_SteamPipe::InitSteamRenderEntity( void ) {
+void anAFEntity_SteamPipe::InitSteamRenderEntity( void ) {
 	const char	*temp;
-	const arcDeclModelDef *modelDef;
+	const anDeclModelDef *modelDef;
 
 	memset( &steamRenderEntity, 0, sizeof( steamRenderEntity ) );
 	steamRenderEntity.shaderParms[ SHADERPARM_RED ]		= 1.0f;
@@ -2318,7 +2318,7 @@ void arcAFEntity_SteamPipe::InitSteamRenderEntity( void ) {
 	temp = spawnArgs.GetString ( "model_steam" );
 	if ( *temp != '\0' ) {
 		if ( !strstr( temp, "." ) ) {
-			modelDef = static_cast<const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, temp, false ) );
+			modelDef = static_cast<const anDeclModelDef *>( declManager->FindType( DECL_MODELDEF, temp, false ) );
 			if ( modelDef ) {
 				steamRenderEntity.hModel = modelDef->ModelHandle();
 			}
@@ -2341,10 +2341,10 @@ void arcAFEntity_SteamPipe::InitSteamRenderEntity( void ) {
 
 /*
 ================
-arcAFEntity_SteamPipe::Think
+anAFEntity_SteamPipe::Think
 ================
 */
-void arcAFEntity_SteamPipe::Think( void ) {
+void anAFEntity_SteamPipe::Think( void ) {
 	anVec3 steamDir;
 
 	if ( thinkFlags & TH_THINK ) {
@@ -2362,24 +2362,24 @@ void arcAFEntity_SteamPipe::Think( void ) {
 		gameRenderWorld->UpdateEntityDef( steamModelDefHandle, &steamRenderEntity );
 	}
 
-	arcAFEntity_Base::Think();
+	anAFEntity_Base::Think();
 }
 
 
 /*
 ===============================================================================
 
-  arcAFEntity_ClawFourFingers
+  anAFEntity_ClawFourFingers
 
 ===============================================================================
 */
 
-const arcEventDef EV_SetFingerAngle( "setFingerAngle", "f" );
-const arcEventDef EV_StopFingers( "stopFingers" );
+const anEventDef EV_SetFingerAngle( "setFingerAngle", "f" );
+const anEventDef EV_StopFingers( "stopFingers" );
 
-CLASS_DECLARATION( arcAFEntity_Base, arcAFEntity_ClawFourFingers )
-	EVENT( EV_SetFingerAngle,		arcAFEntity_ClawFourFingers::Event_SetFingerAngle )
-	EVENT( EV_StopFingers,			arcAFEntity_ClawFourFingers::Event_StopFingers )
+CLASS_DECLARATION( anAFEntity_Base, anAFEntity_ClawFourFingers )
+	EVENT( EV_SetFingerAngle,		anAFEntity_ClawFourFingers::Event_SetFingerAngle )
+	EVENT( EV_StopFingers,			anAFEntity_ClawFourFingers::Event_StopFingers )
 END_CLASS
 
 static const char *clawConstraintNames[] = {
@@ -2388,10 +2388,10 @@ static const char *clawConstraintNames[] = {
 
 /*
 ================
-arcAFEntity_ClawFourFingers::arcAFEntity_ClawFourFingers
+anAFEntity_ClawFourFingers::anAFEntity_ClawFourFingers
 ================
 */
-arcAFEntity_ClawFourFingers::arcAFEntity_ClawFourFingers( void ) {
+anAFEntity_ClawFourFingers::anAFEntity_ClawFourFingers( void ) {
 	fingers[0]	= nullptr;
 	fingers[1]	= nullptr;
 	fingers[2]	= nullptr;
@@ -2400,10 +2400,10 @@ arcAFEntity_ClawFourFingers::arcAFEntity_ClawFourFingers( void ) {
 
 /*
 ================
-arcAFEntity_ClawFourFingers::Save
+anAFEntity_ClawFourFingers::Save
 ================
 */
-void arcAFEntity_ClawFourFingers::Save( arcSaveGame *savefile ) const {
+void anAFEntity_ClawFourFingers::Save( anSaveGame *savefile ) const {
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
@@ -2413,10 +2413,10 @@ void arcAFEntity_ClawFourFingers::Save( arcSaveGame *savefile ) const {
 
 /*
 ================
-arcAFEntity_ClawFourFingers::Restore
+anAFEntity_ClawFourFingers::Restore
 ================
 */
-void arcAFEntity_ClawFourFingers::Restore( arcRestoreGame *savefile ) {
+void anAFEntity_ClawFourFingers::Restore( anRestoreGame *savefile ) {
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
@@ -2430,10 +2430,10 @@ void arcAFEntity_ClawFourFingers::Restore( arcRestoreGame *savefile ) {
 
 /*
 ================
-arcAFEntity_ClawFourFingers::Spawn
+anAFEntity_ClawFourFingers::Spawn
 ================
 */
-void arcAFEntity_ClawFourFingers::Spawn( void ) {
+void anAFEntity_ClawFourFingers::Spawn( void ) {
 	int i;
 
 	LoadAF();
@@ -2456,10 +2456,10 @@ void arcAFEntity_ClawFourFingers::Spawn( void ) {
 
 /*
 ================
-arcAFEntity_ClawFourFingers::Event_SetFingerAngle
+anAFEntity_ClawFourFingers::Event_SetFingerAngle
 ================
 */
-void arcAFEntity_ClawFourFingers::Event_SetFingerAngle( float angle ) {
+void anAFEntity_ClawFourFingers::Event_SetFingerAngle( float angle ) {
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
@@ -2471,10 +2471,10 @@ void arcAFEntity_ClawFourFingers::Event_SetFingerAngle( float angle ) {
 
 /*
 ================
-arcAFEntity_ClawFourFingers::Event_StopFingers
+anAFEntity_ClawFourFingers::Event_StopFingers
 ================
 */
-void arcAFEntity_ClawFourFingers::Event_StopFingers( void ) {
+void anAFEntity_ClawFourFingers::Event_StopFingers( void ) {
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
@@ -2499,8 +2499,8 @@ anGameEdit::AF_SpawnEntity
 */
 bool anGameEdit::AF_SpawnEntity( const char *fileName ) {
 	anDict args;
-	arcNetBasePlayer *player;
-	arcAFEntity_Generic *ent;
+	anBasePlayer *player;
+	anAFEntity_Generic *ent;
 	const anDeclAF *af;
 	anVec3 org;
 	float yaw;
@@ -2519,7 +2519,7 @@ bool anGameEdit::AF_SpawnEntity( const char *fileName ) {
 	args.Set( "angle", va( "%f", yaw + 180 ) );
 	org = player->GetPhysics()->GetOrigin() + anAngles( 0, yaw, 0 ).ToForward() * 80 + anVec3( 0, 0, 1 );
 	args.Set( "origin", org.ToString() );
-	args.Set( "spawnclass", "arcAFEntity_Generic" );
+	args.Set( "spawnclass", "anAFEntity_Generic" );
 	if ( af->model[0] ) {
 		args.Set( "model", af->model.c_str() );
 	} else {
@@ -2530,7 +2530,7 @@ bool anGameEdit::AF_SpawnEntity( const char *fileName ) {
 	}
 	args.Set( "articulatedFigure", fileName );
 	args.Set( "nodrop", "1" );
-	ent = static_cast<arcAFEntity_Generic *>(gameLocal.SpawnEntityType( arcAFEntity_Generic::Type, &args));
+	ent = static_cast<anAFEntity_Generic *>(gameLocal.SpawnEntityType( anAFEntity_Generic::Type, &args));
 
 	// always update this entity
 	ent->BecomeActive( TH_THINK );
@@ -2548,17 +2548,17 @@ anGameEdit::AF_UpdateEntities
 ================
 */
 void anGameEdit::AF_UpdateEntities( const char *fileName ) {
-	arcEntity *ent;
-	arcAFEntity_Base *af;
-	anString name;
+	anEntity *ent;
+	anAFEntity_Base *af;
+	anStr name;
 
 	name = fileName;
 	name.StripFileExtension();
 
-	// reload any arcAFEntity_Generic which uses the given articulated figure file
+	// reload any anAFEntity_Generic which uses the given articulated figure file
 	for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
-		if ( ent->IsType( arcAFEntity_Base::Type ) ) {
-			af = static_cast<arcAFEntity_Base *>(ent);
+		if ( ent->IsType( anAFEntity_Base::Type ) ) {
+			af = static_cast<anAFEntity_Base *>(ent);
 			if ( name.Icmp( af->GetAFName() ) == 0 ) {
 				af->LoadAF();
 				af->GetAFPhysics()->PutToRest();
@@ -2574,13 +2574,13 @@ anGameEdit::AF_UndoChanges
 */
 void anGameEdit::AF_UndoChanges( void ) {
 	int i, c;
-	arcEntity *ent;
-	arcAFEntity_Base *af;
+	anEntity *ent;
+	anAFEntity_Base *af;
 	anDeclAF *decl;
 
 	c = declManager->GetNumDecls( DECL_AF );
 	for ( i = 0; i < c; i++ ) {
-		decl = static_cast<anDeclAF *>( const_cast<arcDecl *>( declManager->DeclByIndex( DECL_AF, i, false ) ) );
+		decl = static_cast<anDeclAF *>( const_cast<anDecl *>( declManager->DeclByIndex( DECL_AF, i, false ) ) );
 		if ( !decl->modified ) {
 			continue;
 		}
@@ -2590,9 +2590,9 @@ void anGameEdit::AF_UndoChanges( void ) {
 
 		// reload all AF entities using the file
 		for ( ent = gameLocal.spawnedEntities.Next(); ent != nullptr; ent = ent->spawnNode.Next() ) {
-			if ( ent->IsType( arcAFEntity_Base::Type ) ) {
-				af = static_cast<arcAFEntity_Base *>(ent);
-				if ( anString::Icmp( decl->GetName(), af->GetAFName() ) == 0 ) {
+			if ( ent->IsType( anAFEntity_Base::Type ) ) {
+				af = static_cast<anAFEntity_Base *>(ent);
+				if ( anStr::Icmp( decl->GetName(), af->GetAFName() ) == 0 ) {
 					af->LoadAF();
 				}
 			}
@@ -2607,7 +2607,7 @@ GetJointTransform
 */
 typedef struct {
 	renderEntity_t *ent;
-	const idMD5Joint *joints;
+	const anMD5Joint *joints;
 } jointTransformData_t;
 
 static bool GetJointTransform( void *model, const anJointMat *frame, const char *jointName, anVec3 &origin, anMat3 &axis ) {
@@ -2658,14 +2658,14 @@ anRenderModel *anGameEdit::AF_CreateMesh( const anDict &args, anVec3 &meshOrigin
 	anAngles angles;
 	const anDict *defArgs;
 	const anKeyValue *arg;
-	anString name;
+	anStr name;
 	jointTransformData_t data;
 	const char *classname, *afName, *modelName;
 	anRenderModel *md5;
-	const arcDeclModelDef *modelDef;
-	const anM8DAnim *MD5anim;
-	const idMD5Joint *MD5joint;
-	const idMD5Joint *MD5joints;
+	const anDeclModelDef *modelDef;
+	const anMD6Anim *MD5anim;
+	const anMD5Joint *MD5joint;
+	const anMD5Joint *MD5joints;
 	int numMD5joints;
 	anJointMat *originalJoints;
 	int parentNum;
@@ -2686,7 +2686,7 @@ anRenderModel *anGameEdit::AF_CreateMesh( const anDict &args, anVec3 &meshOrigin
 
 	// get the md5 model
 	modelName = GetArgString( args, defArgs, "model" );
-	modelDef = static_cast< const arcDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelName, false ) );
+	modelDef = static_cast< const anDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelName, false ) );
 	if ( !modelDef ) {
 		return nullptr;
 	}
@@ -2707,7 +2707,7 @@ anRenderModel *anGameEdit::AF_CreateMesh( const anDict &args, anVec3 &meshOrigin
 	if ( !animNum ) {
 		return nullptr;
 	}
-	const arcAnim *anim = modelDef->GetAnim( animNum );
+	const anAnim *anim = modelDef->GetAnim( animNum );
 	if ( !anim ) {
 		return nullptr;
 	}

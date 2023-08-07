@@ -2,39 +2,42 @@
 #define __DECL_BINARY__
 
 /*
-==============
-ARCBinaryDecl
+=================================================================================================================
+								anBinaryDecl
+			Binary.h - Declares a Binary class that represents a binary number.
+
 
 A helper class to ensure that binary data generation is handled uniformly across decl types
-Should be added to the Parse() member of an arcDecl-derived class
+Should be added to the Parse() member of an anDecl-derived class
 
 To ensure that tokens are generated consistently it should be created after the LEXFL_  parsing flags are set on the input anParser
 
 The destructor handles setting dependencies and storing any binary generated data
-==============
+
+=================================================================================================================
 */
 
 
 /*
 ============
-ARCBinaryDecl
+anBinaryDecl
 ============
 */
-class ARCBinaryDecl {
+class anBinaryDecl {
 public:
-							ARCBinaryDecl( arcDecl *decl_, const char *text, int textLength, anParser &src_ );
-							~ARCBinaryDecl();
+							anBinaryDecl( anDecl *decl_, const char *text, int textLength, anParser &src_ );
+							~anBinaryDecl();
 
 	void					GetBinaryBuffer( const byte *&buffer, int& length ) const;
-	const anFileMemory*	GetOutputFile() const { return binaryOutput; }
+	const anFileMemory *	GetOutputFile() const { return binaryOutput; }
 	void					Finish( void );
 
 private:
 	anParser				&src;				// parser that we're reading from/settings up
 	anFileMemory			*binaryOutput;		// tokenized parser output to be stored on the decl
 
-	anDeclAudio			*decl;				// source/target decl
-	anDeclSurfaceType	*type;				// type of the decl, used for decl type-specific behavior
+	anDeclAudio *			decl;				// source/target decl
+	anDeclSurfaceType *		type;				// type of the decl, used for decl type-specific behavior
 
 	byte*					declBuffer;			// binary buffer retrieved from the decl
 	int						declBufferLength;	// binary buffer length retrieved from the decl
@@ -43,10 +46,10 @@ private:
 
 /*
 ============
-ARCBinaryDecl::ARCBinaryDecl
+anBinaryDecl::anBinaryDecl
 ============
 */
-ARC_INLINE ARCBinaryDecl::ARCBinaryDecl( arcDecl *decl_, const char *text, int textLength, anParser &src_ ) :
+inline anBinaryDecl::anBinaryDecl( anDecl *decl_, const char *text, int textLength, anParser &src_ ) :
 	binaryOutput( nullptr ),
 	decl( decl_ ),
 	src( src_ ),
@@ -109,19 +112,19 @@ ARC_INLINE ARCBinaryDecl::ARCBinaryDecl( arcDecl *decl_, const char *text, int t
 
 /*
 ============
-ARCBinaryDecl::~ARCBinaryDecl
+anBinaryDecl::~anBinaryDecl
 ============
 */
-ARC_INLINE ARCBinaryDecl::~ARCBinaryDecl() {
+inline anBinaryDecl::~anBinaryDecl() {
 	Finish();
 }
 
 /*
 ============
-ARCBinaryDecl::GetBinaryBuffer
+anBinaryDecl::GetBinaryBuffer
 ============
 */
-ARC_INLINE void ARCBinaryDecl::GetBinaryBuffer( const byte*& buffer, int& length ) const {
+inline void anBinaryDecl::GetBinaryBuffer( const byte &buffer, int &length ) const {
 	if ( declBuffer == nullptr || declBufferLength == 0 ) {
 		if ( binaryOutput != nullptr ) {
 			buffer = reinterpret_cast< const byte* >( binaryOutput->GetDataPtr() );
@@ -136,10 +139,10 @@ ARC_INLINE void ARCBinaryDecl::GetBinaryBuffer( const byte*& buffer, int& length
 
 /*
 ============
-ARCBinaryDecl::Finish
+anBinaryDecl::Finish
 ============
 */
-ARC_INLINE void ARCBinaryDecl::Finish( void ) {
+inline void anBinaryDecl::Finish( void ) {
 	// no dependencies in binary mode, except for types that always generate
 	if ( decl != nullptr && ( binaryOutput == nullptr || type->AlwaysGenerateBinary() ) ) {
 		declManager->AddDependencies( decl, src );
@@ -163,4 +166,4 @@ ARC_INLINE void ARCBinaryDecl::Finish( void ) {
 }
 
 
-#endif // !__DECL_PARSE_HELPER__
+#endif // !__DECL_BINARY__

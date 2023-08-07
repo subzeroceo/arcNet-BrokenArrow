@@ -37,6 +37,8 @@
 #define	ANGLE2BYTE( x )				( anMath::FtoiFast( ( x ) * 256.0f / 360.0f ) & 255 )
 #define	BYTE2ANGLE( x )				( ( x ) * ( 360.0f / 256.0f ) )
 
+#define C_FLOAT_TO_INT( x )			(int)( x )
+
 #define FLOATSIGNBITSET( f )		( (*(const unsigned long *)&( f ) ) >> 31 )
 #define FLOATSIGNBITNOTSET( f )		( (~(*(const unsigned long *)&( f ) ) ) >> 31 )
 #define FLOATNOTZERO( f )			( (*(const unsigned long *)&( f ) ) & ~(1<<31 ) )
@@ -49,59 +51,226 @@
 #define	FLOAT_IS_DENORMAL( x )		( ( (*(const unsigned long *)&x) & 0x7f800000) == 0x00000000 && \
 									 ( (*(const unsigned long *)&x) & 0x007fffff) != 0x00000000 )
 
-#define IEEE_FLT_MANTISSA_BITS	23
-#define IEEE_FLT_EXPONENT_BITS	8
-#define IEEE_FLT_EXPONENT_BIAS	127
-#define IEEE_FLT_SIGN_BIT		31
+/*
+================================================================================================
 
-#define IEEE_DBL_MANTISSA_BITS	52
-#define IEEE_DBL_EXPONENT_BITS	11
-#define IEEE_DBL_EXPONENT_BIAS	1023
-#define IEEE_DBL_SIGN_BIT		63
+floating point sign bit tests, floating point bit layouts according
+to the IEEE 754-1985 and 754-2008 standard
 
-#define IEEE_DBLE_MANTISSA_BITS	63
-#define IEEE_DBLE_EXPONENT_BITS	15
-#define IEEE_DBLE_EXPONENT_BIAS	0
-#define IEEE_DBLE_SIGN_BIT		79
+================================================================================================
+*/
 
-template<class T> ARC_INLINE int	MaxIndex( T x, T y ) { return  ( x > y ) ? 0 : 1; }
-template<class T> ARC_INLINE int	MinIndex( T x, T y ) { return ( x < y ) ? 0 : 1; }
+#define IEEE_FLT16_MANTISSA_BITS	10
+#define IEEE_FLT16_EXPONENT_BITS	5
+#define IEEE_FLT16_EXPONENT_BIAS	15
+#define IEEE_FLT16_SIGN_BIT			15
+#define IEEE_FLT16_SIGN_MASK		( 1U << IEEE_FLT16_SIGN_BIT )
 
-template<class T> ARC_INLINE T		Max3( T x, T y, T z ) { return ( x > y ) ? ( ( x > z ) ? x : z ) : ( ( y > z ) ? y : z ); }
-template<class T> ARC_INLINE T		Min3( T x, T y, T z ) { return ( x < y ) ? ( ( x < z ) ? x : z ) : ( ( y < z ) ? y : z ); }
-template<class T> ARC_INLINE int	Max3Index( T x, T y, T z ) { return ( x > y ) ? ( ( x > z ) ? 0 : 2 ) : ( ( y > z ) ? 1 : 2 ); }
-template<class T> ARC_INLINE int	Min3Index( T x, T y, T z ) { return ( x < y ) ? ( ( x < z ) ? 0 : 2 ) : ( ( y < z ) ? 1 : 2 ); }
+#define IEEE_FLT_MANTISSA_BITS		23
+#define IEEE_FLT_EXPONENT_BITS		8
+#define IEEE_FLT_EXPONENT_BIAS		127
+#define IEEE_FLT_SIGN_BIT			31
+#define IEEE_FLT_SIGN_MASK			( 1UL << IEEE_FLT_SIGN_BIT )
 
-template<class T> ARC_INLINE T	Sign( T f ) { return ( f > 0 ) ? 1 : ( ( f < 0 ) ? -1 : 0 ); }
-template<class T> ARC_INLINE T	Square( T x ) { return x * x; }
-template<class T> ARC_INLINE T	Cube( T x ) { return x * x * x; }
+#define IEEE_DBL_MANTISSA_BITS		52
+#define IEEE_DBL_EXPONENT_BITS		11
+#define IEEE_DBL_EXPONENT_BIAS		1023
+#define IEEE_DBL_SIGN_BIT			63
+#define IEEE_DBL_SIGN_MASK			( 1ULL << IEEE_DBL_SIGN_BIT )
+
+#define IEEE_DBLE_MANTISSA_BITS		63
+#define IEEE_DBLE_EXPONENT_BITS		15
+#define IEEE_DBLE_EXPONENT_BIAS		0
+#define IEEE_DBLE_SIGN_BIT			79
+#define IEEE_FLT_SIGNBITSET( a )	( reinterpret_cast<const unsigned int &>( a ) >> IEEE_FLT_SIGN_BIT )
+#define IEEE_FLT_SIGNBITNOTSET( a )	( ( ~reinterpret_cast<const unsigned int &>( a ) ) >> IEEE_FLT_SIGN_BIT )
+#define IEEE_FLT_ISNOTZERO( a )		( reinterpret_cast<const unsigned int &>( a ) & ~( 1u<<IEEE_FLT_SIGN_BIT ) )
+
+/*
+================================================================================================
+
+	floating point special value tests
+
+================================================================================================
+*/
+
+/*
+========================
+IEEE_FLT_IS_NAN
+========================
+*/
+inline_EXTERN bool IEEE_FLT_IS_NAN( float x ) {
+	return x != x;
+}
+
+/*
+========================
+IEEE_FLT_IS_INF
+========================
+*/
+inline_EXTERN bool IEEE_FLT_IS_INF( float x )  {
+	return x == x && x * 0 != x * 0;
+}
+
+/*
+========================
+IEEE_FLT_IS_INF_NAN
+========================
+*/
+inline_EXTERN bool IEEE_FLT_IS_INF_NAN( float x )  {
+	return x * 0 != x * 0;
+}
+
+/*
+========================
+IEEE_FLT_IS_IND
+========================
+*/
+inline_EXTERN bool IEEE_FLT_IS_IND( float x )  {
+	return(reinterpret_cast<const unsigned int &>( x ) == 0xffc00000 );
+}
+
+/*
+========================
+IEEE_FLT_IS_DENORMAL
+========================
+*/
+inline_EXTERN bool IEEE_FLT_IS_DENORMAL( float x )  {
+	return( ( reinterpret_cast<const unsigned int &>( x ) & 0x7f800000 ) == 0x00000000 &&
+		( reinterpret_cast<const unsigned int &>( x ) & 0x007fffff ) != 0x00000000 );
+}
+
+
+/*
+========================
+IsNAN
+========================
+*/template<class type>
+inline_EXTERN bool IsNAN( const type &val ) {
+	for ( int i = 0; i < val.GetDimension(); i++ ) {
+		const float f = val.ToFloatPtr()[i];
+		if ( IEEE_FLT_IS_NAN( f ) || IEEE_FLT_IS_INF( f ) || IEEE_FLT_IS_IND( f ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/*
+========================
+IsValid
+========================
+*/
+template<class type>
+inline_EXTERN bool IsValid( const type &val ) {
+	for ( int i = 0; i < val.GetDimension(); i++ ) {
+		const float f = val.ToFloatPtr()[i];
+		if ( IEEE_FLT_IS_NAN( f ) || IEEE_FLT_IS_INF( f ) || IEEE_FLT_IS_IND( f ) || IEEE_FLT_IS_DENORMAL( f ) ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/*
+========================
+IsValid
+========================
+*/
+template<>
+inline_EXTERN bool IsValid( const float & f ) {	// these parameter must be a reference for the function to be considered a specialization
+	return !( IEEE_FLT_IS_NAN( f ) || IEEE_FLT_IS_INF( f ) || IEEE_FLT_IS_IND( f ) || IEEE_FLT_IS_DENORMAL( f ) );
+}
+
+/*
+========================
+IsNAN
+========================
+*/
+template<>
+inline_EXTERN bool IsNAN( const float & f ) {	// these parameter must be a reference for the function to be considered a specialization
+	if ( IEEE_FLT_IS_NAN( f ) || IEEE_FLT_IS_INF( f ) || IEEE_FLT_IS_IND( f ) ) {
+		return true;
+	}
+	return false;
+}
+
+/*
+========================
+IsInRange
+
+Returns true if any scalar is greater than the range or less than the negative range.
+========================
+*/
+template<class type>
+inline_EXTERN bool IsInRange( const type &val, const float range ) {
+	for ( int i = 0; i < val.GetDimension(); i++ ) {
+		const float f = val.ToFloatPtr()[i];
+		if (f > range || f < -range) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/*
+================================================================================================
+
+	integer sign bit tests
+
+================================================================================================
+*/
+#define INT8_SIGN_BIT			7
+#define INT16_SIGN_BIT			15
+#define INT8_SIGN_MASK			( 1 << INT8_SIGN_BIT )
+#define INT16_SIGN_MASK			( 1 << INT16_SIGN_BIT )
+#define INT32_SIGN_MASK			( 1UL << INT32_SIGN_BIT )
+#define INT64_SIGN_MASK			( 1ULL << INT64_SIGN_BIT )
+#define INT32_SIGN_BIT			31
+#define INT64_SIGN_BIT			63
+// If this was ever compiled on a system that had 64 bit unsigned ints,
+// it would fail.
+//compile_time_assert( sizeof( unsigned int ) == 4 );
+
+#define OLD_INT32_SIGNBITSET(i)		(static_cast<const unsigned int>(i) >> INT32_SIGN_BIT)
+#define OLD_INT32_SIGNBITNOTSET(i)	((~static_cast<const unsigned int>(i)) >> INT32_SIGN_BIT)
+
+// Unfortunately, /analyze can't figure out that these always return
+// either 0 or 1, so this extra wrapper is needed to avoid the static
+// alaysis warning.
+
+inline_EXTERN int INT32_SIGNBITSET( int i ) {
+	int	r = OLD_INT32_SIGNBITSET( i );
+	assert( r == 0 || r == 1 );
+	return r;
+}
+inline_EXTERN int INT32_SIGNBITNOTSET( int i ) {
+	int	r = OLD_INT32_SIGNBITNOTSET( i );
+	assert( r == 0 || r == 1 );
+	return r;
+}
+
+template<class T> inline T		Max3( T x, T y, T z ) { return ( x > y ) ? ( ( x > z ) ? x : z ) : ( ( y > z ) ? y : z ); }
+template<class T> inline T		Min3( T x, T y, T z ) { return ( x < y ) ? ( ( x < z ) ? x : z ) : ( ( y < z ) ? y : z ); }
+template<class T> inline int	Max3Index( T x, T y, T z ) { return ( x > y ) ? ( ( x > z ) ? 0 : 2 ) : ( ( y > z ) ? 1 : 2 ); }
+template<class T> inline int	Min3Index( T x, T y, T z ) { return ( x < y ) ? ( ( x < z ) ? 0 : 2 ) : ( ( y < z ) ? 1 : 2 ); }
+
+template<class T> inline T	Sign( T f ) { return ( f > 0 ) ? 1 : ( ( f < 0 ) ? -1 : 0 ); }
+template<class T> inline T	Square( T x ) { return x * x; }
+template<class T> inline T	Cube( T x ) { return x * x * x; }
 
 // move from Math.h to keep gcc happy, and now returned to ease gcc's stress.
-template<class T> ARC_INLINE T;	Max( T x, T y ) { return ( x > y ) ? x : y; }
-template<class T> ARC_INLINE T	Min( T x, T y ) { return ( x < y ) ? x : y; }
-template<class T> ARC_INLINE T	MaxElement( const T *begin, const T *end) {
-T maxVal = *begin; for ( const T* it = begin + 1; it != end; ++it ) {
-if ( *it > maxVal ) { maxVal = *it; } } return maxVal; }
-template <class T> ARC_INLINE T MinElement( const T array[], int size ) {
+template<class T> inline T;	Max( T x, T y ) { return ( x > y ) ? x : y; }
+template<class T> inline T	Min( T x, T y ) { return ( x < y ) ? x : y; }
+template<class T> inline T	MaxElement( const T *begin, const T *end ) { T maxVal = *begin; for ( const T* it = begin + 1; it != end; ++it ) { if ( *it > maxVal ) { maxVal = *it; } return maxVal; }
+
+template <class T> inline T MinElement( const T array[], int size ) }
 if ( size == 0) { return T(); } T min_element = array[0]; for ( int i = 1; i < size; i++ ) { if ( array[i] < min_element ) { min_element = array[i]; } return min_element; }
+nt intArray[] = {4, 2, 9, 5, 7};
+int minInt = MinElement<int>( intArray, 5 );  // returns 2
 
-//int intArray[] = {4, 2, 9, 5, 7};
-//int minInt = MinElement<int>(intArray, 5);  // returns 2
-
-//double doubleArray[] = {3.14, 2.718, 1.618};
-//double minDouble = MinElement<double>(doubleArray, 3);  // returns 1.618
-// time in milliseconds
-// velocity where 1.0 equal rough walking speed
-struct anVelocity {
-	anVelocity( long start, long duration, float s ) {
-		startTime = start;
-		time = duration;
-		speed = s;
-	}
-	long	startTime;
-	long	time;
-	float	speed;
-};
+double doubleArray[] = {3.14, 2.718, 1.618};
+double minDouble = MinElement<double>( doubleArray, 3 );  // returns 1.618
 
 class anMath {
 public:
@@ -192,8 +361,11 @@ public:
 	static void					BitSet( int array[], int bitNum );
 	static void 				BitClear( int array[], int bitNum );
 
-	static void					arcRandom( void ) { mSeed = 0x89abcdef; }
+	static void					Rand( void ) { mSeed = 0x89abcdef; }
+	static int					Random() { return rand(); }
+	static float				FloatRandRange( float min, float max ) { return min + ( max - min ) * FRand(); }
 
+	float						FloatRand() { return Rand() / ( float )RAND_MAX; }
 	static float				FloatRand( float min, float max );// Returns a float min <= x < max (exclusive; will get max - 0.00001; but never max)
 	static float				FloatRand();				// Returns a float min <= 0 < 1.0
 	static float				FloatRand( const anVec2& v );
@@ -210,6 +382,8 @@ public:
 	static int					FtoiFast( float f );		// fast float to int conversion but uses current FPU round mode (default round nearest)
 	static unsigned long		Ftol( float f );			// float to long conversion
 	static unsigned long		FtolFast( float );			// fast float to long conversion but uses current FPU round mode (default round nearest)
+	static byte					Ftob( float f );			// float to byte conversion, the result is clamped to the range [0-255]
+	const byte 					Ftob2( const float f ) const;
 
 	static signed char			ClampChar( int i );
 	static signed short			ClampShort( int i );
@@ -223,6 +397,20 @@ public:
 	static int					FloatToBits( float f, int exponentBits, int mantissaBits );
 	static float				BitsToFloat( int i, int exponentBits, int mantissaBits );
 	static int					FloatHash( const float *array, const int numFloats );
+
+	static float				Distance( anVec3 p1, anVec3 p2 );
+	static float				DistanceSquared( anVec3 p1, anVec3 p2 );
+	static float				AngleMod( float  a );
+
+	static anVec3				Cross( const anVec3 &a, const anVec3 &b );
+								// creates float vector 3 dims
+	static anVec3				Vector3( float x, float y, float z );
+								// creates float vector 4 dims
+	static anVec4				Vector4( float x, float y, float z, float w );
+
+	static anVec3				ReflectVector( anVec3 vec, anVec3 normal );
+								// Calculate the average of a vector of numbers
+	float						CalcVectorAvg( const float &numbers ) const;
 
 	static const float			PI;							// pi
 	static const float			TWO_PI;						// pi * 2
@@ -241,6 +429,7 @@ public:
 	static const float			INFINITY;					// huge number which should be larger than any valid number used
 	static const float			FLT_EPSILON;				// smallest positive number such that 1.0+FLT_EPSILON != 1.0
 	static const float			FLOAT_EPSILON;				// smallest positive number such that 1.0+FLT_EPSILON != 1.0
+	static const float			FLT_SM_NON_DENORMAL;		// smallest non-denormal 32-bit floating point value
 	static const int			INT_MIN;
 	static const int			INT_MAX;
 	static const float			VEC_EPSILON = 0.05f;
@@ -271,19 +460,19 @@ public:
 	static anVec3 				ProjectPointOntoLine( const anVec3 &point, const anVec3 &line, const anVec3 &lineStartPoint );
 
 	static float 				PointToLineDist( const anVec3 &point, const anVec3 &line, const anVec3 &lineStartPoint );
-	//static float 				LineToPointDist( const anVec3 &line, const anVec3 &lineStartPoint );
 
-	// Calculate the average of an array of numbers
-	float 						ArrayAvg( const float numbers[], int size );
+								// Calculate the average of an array of numbers
+	float 						CalcArrayAvg( const float numbers[], int size ) const;
 
-	// Calculate the average of a vector of numbers
-	float						VecAvg( const float &numbers );
+								// Calculate the average of two numbers
+	float						CalcAverages( float num1, float num2 ) const;
+								// Calculate the average of three numbers
+	float						CalcAverages( float num1, float num2, float num3 ) const ;
 
-	// Calculate the average of two numbers
-	float						CalcAvg( float num1, float num2 );
-
-	// Calculate the average of three numbers
-	float						CalcAvg( float num1, float num2, float num3 );
+	int 						ReadConstant( int numBytes );
+	int 						ReadIntConstant();
+	static int 					Constant4( void );
+	static int 					Constant1( void );
 
 private:
 	enum {
@@ -303,27 +492,23 @@ private:
 	static unsigned long		mSeed;
 	static dword				iSqrt[SQRT_TABLE_SIZE];
 	static bool					initialized;
+
+	static byte *				code;
 };
 
-/*
-===============
-anMath::arcMin
-===============
-*/
+inline byte CLAMP_BYTE( int x ) {
+	return ( ( x ) < 0 ? ( 0 ) : ( ( x ) > 255 ? 255 : ( byte )( x ) ) );
+}
+
 template<class T>anMath::Min( T Val1, T Val2 ) {
 	return Min( Val1, Val2 );
 }
 
-/*
-===============
-anMath::arcMax
-===============
-*/
 template<class T> anMath::Max( T Val1, T Val2 ) {
 	return Max( Val1, Val2 );
 }
 
-ARC_INLINE float anMath::RSqrt( float x ) {
+inline float anMath::RSqrt( float x ) {
 	long i;
 	float y, r;
 
@@ -335,7 +520,7 @@ ARC_INLINE float anMath::RSqrt( float x ) {
 	return r;
 }
 
-ARC_INLINE float anMath::InvSqrt16( float x ) {
+inline float anMath::InvSqrt16( float x ) {
 	dword a = ( (union _flint *)( &x ) )->i;
 	union _flint seed;
 
@@ -348,7 +533,7 @@ ARC_INLINE float anMath::InvSqrt16( float x ) {
 	return ( float ) r;
 }
 
-ARC_INLINE float anMath::InvSqrt( float x ) {
+inline float anMath::InvSqrt( float x ) {
 	dword a = ( (union _flint *)( &x ) )->i;
 	union _flint seed;
 
@@ -362,7 +547,7 @@ ARC_INLINE float anMath::InvSqrt( float x ) {
 	return ( float ) r;
 }
 
-ARC_INLINE double anMath::InvSqrt64( float x ) {
+inline double anMath::InvSqrt64( float x ) {
 	dword a = ( (union _flint*)( &x ) )->i;
 	union _flint seed;
 
@@ -377,23 +562,23 @@ ARC_INLINE double anMath::InvSqrt64( float x ) {
 	return r;
 }
 
-ARC_INLINE float anMath::Sqrt16( float x ) {
+inline float anMath::Sqrt16( float x ) {
 	return x * InvSqrt16( x );
 }
 
-ARC_INLINE float anMath::Sqrt( float x ) {
+inline float anMath::Sqrt( float x ) {
 	return x * InvSqrt( x );
 }
 
-ARC_INLINE double anMath::Sqrt64( float x ) {
+inline double anMath::Sqrt64( float x ) {
 	return x * InvSqrt64( x );
 }
 
-ARC_INLINE float anMath::Sin( float a ) {
+inline float anMath::Sin( float a ) {
 	return sinf( a );
 }
 
-ARC_INLINE float anMath::Sin16( float a ) {
+inline float anMath::Sin16( float a ) {
 	float s;
 
 	if ( ( a < 0.0f ) || ( a >= TWO_PI ) ) {
@@ -421,15 +606,15 @@ ARC_INLINE float anMath::Sin16( float a ) {
 	return a * ( ( ( ( ( -2.39e-08f * s + 2.7526e-06f ) * s - 1.98409e-04f ) * s + 8.3333315e-03f ) * s - 1.666666664e-01f ) * s + 1.0f );
 }
 
-ARC_INLINE double anMath::Sin64( float a ) {
+inline double anMath::Sin64( float a ) {
 	return sin( a );
 }
 
-ARC_INLINE float anMath::Cos( float a ) {
+inline float anMath::Cos( float a ) {
 	return cosf( a );
 }
 
-ARC_INLINE float anMath::Cos16( float a ) {
+inline float anMath::Cos16( float a ) {
 	float s, d;
 
 	if ( ( a < 0.0f ) || ( a >= TWO_PI ) ) {
@@ -465,11 +650,11 @@ ARC_INLINE float anMath::Cos16( float a ) {
 	return d * ( ( ( ( ( -2.605e-07f * s + 2.47609e-05f ) * s - 1.3888397e-03f ) * s + 4.16666418e-02f ) * s - 4.999999963e-01f ) * s + 1.0f );
 }
 
-ARC_INLINE double anMath::Cos64( float a ) {
+inline double anMath::Cos64( float a ) {
 	return cos( a );
 }
 
-ARC_INLINE void anMath::SinCos( float a, float &s, float &c ) {
+inline void anMath::SinCos( float a, float &s, float &c ) {
 #ifdef _WIN32
 	_asm {
 		fld		a
@@ -480,12 +665,14 @@ ARC_INLINE void anMath::SinCos( float a, float &s, float &c ) {
 		fstp	dword ptr [edx]
 	}
 #else
+	//byte_angle_t by = rad2byte(a);
+	// non-MSVC version
 	s = sinf( a );
 	c = cosf( a );
 #endif
 }
 
-ARC_INLINE void anMath::SinCos16( float a, float &s, float &c ) {
+inline void anMath::SinCos16( float a, float &s, float &c ) {
 	float t, d;
 
 	if ( ( a < 0.0f ) || ( a >= anMath::TWO_PI ) ) {
@@ -522,7 +709,7 @@ ARC_INLINE void anMath::SinCos16( float a, float &s, float &c ) {
 	c = d * ( ( ( ( ( -2.605e-07f * t + 2.47609e-05f ) * t - 1.3888397e-03f ) * t + 4.16666418e-02f ) * t - 4.999999963e-01f ) * t + 1.0f );
 }
 
-ARC_INLINE void anMath::SinCos64( float a, double &s, double &c ) {
+inline void anMath::SinCos64( float a, double &s, double &c ) {
 #ifdef _WIN32
 	_asm {
 		fld		a
@@ -538,11 +725,11 @@ ARC_INLINE void anMath::SinCos64( float a, double &s, double &c ) {
 #endif
 }
 
-ARC_INLINE float anMath::Tan( float a ) {
+inline float anMath::Tan( float a ) {
 	return tanf( a );
 }
 
-ARC_INLINE float anMath::Tan16( float a ) {
+inline float anMath::Tan16( float a ) {
 	float s;
 	bool reciprocal;
 
@@ -584,11 +771,11 @@ ARC_INLINE float anMath::Tan16( float a ) {
 	}
 }
 
-ARC_INLINE double anMath::Tan64( float a ) {
+inline double anMath::Tan64( float a ) {
 	return tan( a );
 }
 
-ARC_INLINE float anMath::ASin( float a ) {
+inline float anMath::ASin( float a ) {
 	if ( a <= -1.0f ) {
 		return -HALF_PI;
 	}
@@ -598,7 +785,7 @@ ARC_INLINE float anMath::ASin( float a ) {
 	return asinf( a );
 }
 
-ARC_INLINE float anMath::ASin16( float a ) {
+inline float anMath::ASin16( float a ) {
 	if ( FLOATSIGNBITSET( a ) ) {
 		if ( a <= -1.0f ) {
 			return -HALF_PI;
@@ -613,7 +800,7 @@ ARC_INLINE float anMath::ASin16( float a ) {
 	}
 }
 
-ARC_INLINE double anMath::ASin64( float a ) {
+inline double anMath::ASin64( float a ) {
 	if ( a <= -1.0f ) {
 		return -HALF_PI;
 	}
@@ -625,7 +812,7 @@ ARC_INLINE double anMath::ASin64( float a ) {
 	return asin( a );
 }
 
-ARC_INLINE float anMath::ACos( float a ) {
+inline float anMath::ACos( float a ) {
 	//angle = acosf( a );
 	if ( a <= -1.0f ) {
 		return PI;
@@ -638,7 +825,7 @@ ARC_INLINE float anMath::ACos( float a ) {
 	return acosf( a );
 }
 
-ARC_INLINE float anMath::ACos16( float a ) {
+inline float anMath::ACos16( float a ) {
 	if ( FLOATSIGNBITSET( a ) ) {
 		if ( a <= -1.0f ) {
 			return PI;
@@ -653,7 +840,7 @@ ARC_INLINE float anMath::ACos16( float a ) {
 	}
 }
 
-ARC_INLINE double anMath::ACos64( float a ) {
+inline double anMath::ACos64( float a ) {
 	if ( a <= -1.0f ) {
 		return PI;
 	}
@@ -663,11 +850,11 @@ ARC_INLINE double anMath::ACos64( float a ) {
 	return acos( a );
 }
 
-ARC_INLINE float anMath::ATan( float a ) {
+inline float anMath::ATan( float a ) {
 	return atanf( a );
 }
 
-ARC_INLINE float anMath::ATan16( float a ) {
+inline float anMath::ATan16( float a ) {
 	if ( fabs( a ) > 1.0f ) {
 		a = 1.0f / a;
 		float s = a * a;
@@ -685,15 +872,15 @@ ARC_INLINE float anMath::ATan16( float a ) {
 	}
 }
 
-ARC_INLINE double anMath::ATan64( float a ) {
+inline double anMath::ATan64( float a ) {
 	return atan( a );
 }
 
-ARC_INLINE float anMath::ATan( float y, float x ) {
+inline float anMath::ATan( float y, float x ) {
 	return atan2f( y, x );
 }
 
-ARC_INLINE float anMath::ATan16( float y, float x ) {
+inline float anMath::ATan16( float y, float x ) {
 	float a, s;
 
 	if ( fabs( y ) > fabs( x ) ) {
@@ -714,45 +901,45 @@ ARC_INLINE float anMath::ATan16( float y, float x ) {
 	}
 }
 
-ARC_INLINE double anMath::ATan64( float y, float x ) {
+inline double anMath::ATan64( float y, float x ) {
 	return atan2( y, x );
 }
 
-ARC_INLINE float anMath::Pow( float x, float y ) {
+inline float anMath::Pow( float x, float y ) {
 	return powf( x, y );
 }
 
-ARC_INLINE float anMath::Pow16( float x, float y ) {
+inline float anMath::Pow16( float x, float y ) {
 	return Exp16( y * Log16( x ) );
 }
 
-ARC_INLINE double anMath::Pow64( float x, float y ) {
+inline double anMath::Pow64( float x, float y ) {
 	return pow( x, y );
 }
-ARC_INLINE float anMath::Exp( float f ) {
+inline float anMath::Exp( float f ) {
 	return expf( f );
 }
-ARC_INLINE int anMath::GetExp32( int x ) {
+inline int anMath::GetExp32( int x ) {
     return ( x >> 23 & 0x0FF ) - 127;
 }
-ARC_INLINE unsigned long anMath::GetExp( unsigned long x ) {
+inline unsigned long anMath::GetExp( unsigned long x ) {
 	return ( unsigned long )( *(unsigned long *)&x >> 23 & 0x0FF ) - 127;
   }
 
-ARC_INLINE unsigned long anMath::GetExp( int x ) {
+inline unsigned long anMath::GetExp( int x ) {
 	return ( unsigned long )(*( (unsigned long *)&x + 1 ) >> 20 & 0x7FF ) - 1023;
 }
 
-ARC_INLINE unsigned long &anMath::SetExp( unsigned long &x, unsigned long iExp ) {
+inline unsigned long &anMath::SetExp( unsigned long &x, unsigned long iExp ) {
 	( *( unsigned long *)& x &= ~( 0x0FF << 23 ) ) |= ( ieExp + 127 ) << 23;
 	return x;
 }
-ARC_INLINE unsigned long &anMath::SetExp( unsigned long &x, unsigned long iExp ) {
+inline unsigned long &anMath::SetExp( unsigned long &x, unsigned long iExp ) {
 	( *( (unsigned long *)&x + 1 ) &= ~( 0x7FF << 20 ) ) |= ( iExp + 1023 ) << 20;
 	return x;
 }
 
-ARC_INLINE float anMath::Exp16( float f ) {
+inline float anMath::Exp16( float f ) {
 	int i, s, e, m, exponent;
 	float x, x2, y, p, q;
 
@@ -783,15 +970,15 @@ ARC_INLINE float anMath::Exp16( float f ) {
 	return x;
 }
 
-ARC_INLINE double anMath::Exp64( float f ) {
+inline double anMath::Exp64( float f ) {
 	return exp( f );
 }
 
-ARC_INLINE float anMath::Log( float f ) {
+inline float anMath::Log( float f ) {
 	return logf( f );
 }
 
-ARC_INLINE float anMath::Log16( float f ) {
+inline float anMath::Log16( float f ) {
 	int i, exponent;
 	float y, y2;
 
@@ -807,43 +994,43 @@ ARC_INLINE float anMath::Log16( float f ) {
 	return y;
 }
 
-ARC_INLINE double anMath::Log64( float f ) {
+inline double anMath::Log64( float f ) {
 	return log( f );
 }
 
-ARC_INLINE int anMath::IPow( int x, int y ) {
+inline int anMath::IPow( int x, int y ) {
 	int r; for ( r = x; y > 1; y-- ) { r *= x; } return r;
 }
 
-ARC_INLINE int anMath::ILog2( float f ) {
+inline int anMath::ILog2( float f ) {
 	return ( ( (*reinterpret_cast<int *>( &f ) ) >> IEEE_FLT_MANTISSA_BITS ) & ( ( 1 << IEEE_FLT_EXPONENT_BITS ) - 1 ) ) - IEEE_FLT_EXPONENT_BIAS;
 }
 
-ARC_INLINE int anMath::ILog2( int i ) {
+inline int anMath::ILog2( int i ) {
 	return ILog2( ( float )i );
 }
 
-ARC_INLINE int anMath::BitsForFloat( float f ) {
+inline int anMath::BitsForFloat( float f ) {
 	return ILog2( f ) + 1;
 }
 
-ARC_INLINE int anMath::BitsForInteger( int i ) {
+inline int anMath::BitsForInteger( int i ) {
 	return ILog2( ( float )i ) + 1;
 }
 
-ARC_INLINE int anMath::MaskForFloatSign( float f ) {
+inline int anMath::MaskForFloatSign( float f ) {
 	return ( (*reinterpret_cast<int *>( &f ) ) >> 31 );
 }
 
-ARC_INLINE int anMath::MaskForIntegerSign( int i ) {
+inline int anMath::MaskForIntegerSign( int i ) {
 	return ( i >> 31 );
 }
 
-ARC_INLINE int anMath::FloorPowerOfTwo( int x ) {
+inline int anMath::FloorPowerOfTwo( int x ) {
 	return CeilPowerOfTwo( x ) >> 1;
 }
 
-ARC_INLINE int anMath::CeilPowerOfTwo( int x ) {
+inline int anMath::CeilPowerOfTwo( int x ) {
 	x--;
 	x |= x >> 1;
 	x |= x >> 2;
@@ -854,11 +1041,11 @@ ARC_INLINE int anMath::CeilPowerOfTwo( int x ) {
 	return x;
 }
 
-ARC_INLINE bool anMath::IsPowerOfTwo( int x ) {
+inline bool anMath::IsPowerOfTwo( int x ) {
 	return ( x & ( x - 1 ) ) == 0 && x > 0;
 }
 
-ARC_INLINE int anMath::BitCount( int x ) {
+inline int anMath::BitCount( int x ) {
 	x -= ( ( x >> 1 ) & 0x55555555 );
 	x = ( ( ( x >> 2 ) & 0x33333333 ) + ( x & 0x33333333 ) );
 	x = ( ( ( x >> 4 ) + x ) & 0x0f0f0f0f );
@@ -866,7 +1053,7 @@ ARC_INLINE int anMath::BitCount( int x ) {
 	return ( ( x + ( x >> 16 ) ) & 0x0000003f );
 }
 
-ARC_INLINE int anMath::BitReverse( int x ) {
+inline int anMath::BitReverse( int x ) {
 	x = ( ( ( x >> 1 ) & 0x55555555 ) | ( ( x & 0x55555555 ) << 1 ) );
 	x = ( ( ( x >> 2 ) & 0x33333333 ) | ( ( x & 0x33333333 ) << 2 ) );
 	x = ( ( ( x >> 4 ) & 0x0f0f0f0f ) | ( ( x & 0x0f0f0f0f ) << 4 ) );
@@ -874,34 +1061,34 @@ ARC_INLINE int anMath::BitReverse( int x ) {
 	return ( ( x >> 16 ) | ( x << 16 ) );
 }
 
-ARC_INLINE int anMath::Abs( int x ) {
+inline int anMath::Abs( int x ) {
    int y = x >> 31;
    return ( ( x ^ y ) - y );
 }
 
-ARC_INLINE float anMath::Fabs( float f ) {
+inline float anMath::Fabs( float f ) {
 	int tmp = *reinterpret_cast<int *>( &f );
 	tmp &= 0x7FFFFFFF;
 	return *reinterpret_cast<float *>( &tmp );
 }
 
-ARC_INLINE float anMath::Floor( float f ) {
+inline float anMath::Floor( float f ) {
 	return floorf( f );
 }
 
-ARC_INLINE float anMath::Ceil( float f ) {
+inline float anMath::Ceil( float f ) {
 	return ceilf( f );
 }
 
-ARC_INLINE float anMath::Rint( float f ) {
+inline float anMath::Rint( float f ) {
 	return floorf( f + 0.5f );
 }
 
-ARC_INLINE int anMath::Ftoi( float f ) {
+inline int anMath::Ftoi( float f ) {
 	return ( int ) f;
 }
 
-ARC_INLINE int anMath::FtoiFast( float f ) {
+inline int anMath::FtoiFast( float f ) {
 #ifdef _WIN32
 	int i;
 	__asm fld		f
@@ -929,11 +1116,11 @@ ARC_INLINE int anMath::FtoiFast( float f ) {
 #endif
 }
 
-ARC_INLINE unsigned long anMath::Ftol( float f ) {
+inline unsigned long anMath::Ftol( float f ) {
 	return ( unsigned long ) f;
 }
 
-ARC_INLINE unsigned long anMath::FtolFast( float f ) {
+inline unsigned long anMath::FtolFast( float f ) {
 #ifdef _WIN32
 	// FIXME: this overflows on 31bits still .. same as FtoiFast
 	unsigned long i;
@@ -963,8 +1150,8 @@ ARC_INLINE unsigned long anMath::FtolFast( float f ) {
 #endif
 }
 
-ARC_INLINE byte anMath::Ftob( float f ) {
-#ifdef ID_WIN_X86_SSE
+inline byte anMath::Ftob( float f ) {
+#ifdef ARC_WIN_X86_SSE
 	// If a converted result is negative the value (0 ) is returned and if the
 	// converted result is larger than the maximum byte the value (255) is returned.
 	byte b;
@@ -987,7 +1174,32 @@ ARC_INLINE byte anMath::Ftob( float f ) {
 #endif
 }
 
-ARC_INLINE signed char anMath::ClampChar( int i ) {
+inline const byte anMath::Ftob2( const float f ) const {
+#ifdef ARC_WIN_X86_SSE
+	// If a converted result is negative the value ( 0 ) is returned and if the
+	// converted result is larger than the maximum byte the value (255) is returned.
+	__m128 x = _mm_load_ss( &f );
+	x = _mm_max_ss( x, SIMD_SP_zero );
+	x = _mm_min_ss( x, SIMD_SP_255 );
+	return static_cast<byte>( _mm_cvttss_si32( x ) );
+#else
+	// The converted result is clamped to the range [0,255].
+	int i = C_FLOAT_TO_INT( f );
+	if ( i < 0 ) {
+		return 0;
+	} else if ( i > 255 ) {
+		return 255;
+	}
+	return static_cast<byte>( i );
+#endif
+}
+
+inline float anMath::AngleMod( float a ) {
+	a = ( 360.0f / 65536 ) * ( ( int )( a * ( 65536 / 360.0f ) ) & 65535 );
+	return a;
+}
+
+inline signed char anMath::ClampChar( int i ) {
 	if ( i < -128 ) {
 		return -128;
 	}
@@ -997,7 +1209,7 @@ ARC_INLINE signed char anMath::ClampChar( int i ) {
 	return i;
 }
 
-ARC_INLINE signed short anMath::ClampShort( int i ) {
+inline signed short anMath::ClampShort( int i ) {
 	if ( i < -32768 ) {
 		return -32768;
 	}
@@ -1007,7 +1219,7 @@ ARC_INLINE signed short anMath::ClampShort( int i ) {
 	return i;
 }
 
-ARC_INLINE int anMath::ClampInt( int min, int max, int value ) {
+inline int anMath::ClampInt( int min, int max, int value ) {
 	if ( value < min ) {
 		return min;
 	}
@@ -1017,7 +1229,7 @@ ARC_INLINE int anMath::ClampInt( int min, int max, int value ) {
 	return value;
 }
 
-ARC_INLINE float anMath::ClampFloat( float min, float max, float value ) {
+inline float anMath::ClampFloat( float min, float max, float value ) {
 	if ( value < min ) {
 		return min;
 	}
@@ -1027,14 +1239,14 @@ ARC_INLINE float anMath::ClampFloat( float min, float max, float value ) {
 	return value;
 }
 
-ARC_INLINE float anMath::AngleNormalize360( float angle ) {
+inline float anMath::AngleNormalize360( float angle ) {
 	if ( ( angle >= 360.0f ) || ( angle < 0.0f ) ) {
 		angle -= floor( angle / 360.0f ) * 360.0f;
 	}
 	return angle;
 }
 
-ARC_INLINE float anMath::AngleNormalize180( float angle ) {
+inline float anMath::AngleNormalize180( float angle ) {
 	angle = AngleNormalize360( angle );
 	if ( angle > 180.0f ) {
 		angle -= 360.0f;
@@ -1042,11 +1254,11 @@ ARC_INLINE float anMath::AngleNormalize180( float angle ) {
 	return angle;
 }
 
-ARC_INLINE float anMath::AngleDelta( float angle1, float angle2 ) {
+inline float anMath::AngleDelta( float angle1, float angle2 ) {
 	return AngleNormalize180( angle1 - angle2 );
 }
 
-ARC_INLINE int anMath::FloatHash( const float *array, const int numFloats ) {
+inline int anMath::FloatHash( const float *array, const int numFloats ) {
 	int i, hash = 0;
 	const int *ptr;
 
@@ -1058,33 +1270,161 @@ ARC_INLINE int anMath::FloatHash( const float *array, const int numFloats ) {
 }
 
 // Calculate the average of an array of numbers
-ARC_INLINE float anMath::CalcAvg( const float numbers[], int size ) {
-    float sum = 0.0f;
-    for ( int i = 0; i < size; i++ )
-    {
-        sum += numbers[i];
-    }
-    return sum / size;
+inline float anMath::CalcArrayAvg( const float numbers[], int size ) const {
+	float sum = 0.0f;
+	for ( int i = 0; i < size; i++ ) {
+		sum += numbers[i];
+	}
+	return sum / size;
 }
 
 // Calculate the average of a vector of numbers
-ARC_INLINE float anMath::CalcAvg( const float &numbers ) {
-    float sum = 0.0f;
-    for ( float number : numbers )
-    {
-        sum += number;
-    }
-    return sum / numbers.Size();
+inline float anMath::CalcVectorAvg( const float &numbers ) const {
+	float sum = 0.0f;
+	for ( float number : numbers ) {
+		sum += number;
+	}
+	return sum / numbers.Size();
 }
 
 // Calculate the average of two numbers
-ARC_INLINE float anMath::CalcAvg( float num1, float num2 ) {
-    return ( num1 + num2 ) / 2;
+inline float anMath::CalcAverages( float num1, float num2 ) const {
+	return ( num1 + num2 ) / 2;
 }
 
 // Calculate the average of three numbers
-ARC_INLINE float anMath::CalcAvg( float num1, float num2, float num3 ) {
-    return ( num1 + num2 + num3 ) / 3;
+inline float anMath::CalcAverages( float num1, float num2, float num3 ) const {
+	return ( num1 + num2 + num3 ) / 3;
+}
+
+extern short FloatToFloat16( float value );
+extern float Float16ToFloat( short value );
+
+class float16 {
+protected:
+	short mValue;
+public:
+	float16();
+	float16( float value );
+	float16( const float16 &value );
+
+	operator float();
+	operator float() const;
+
+	friend float16 operator+( const float16 &value, const float16 &secondValue );
+	friend float16 operator-( const float16 &value, const float16 &secondValue );
+	friend float16 operator*( const float16 &value, const float16 &secondValue );
+	friend float16 operator/( const float16 &value, const float16 &secondValue );
+
+	float16 &operator=( const float16 &val );
+	float16 &operator+=( const float16 &val );
+	float16 &operator-=( const float16 &val );
+	float16 &operator*=( const float16 &val );
+	float16 &operator/=( const float16 &val );
+	float16 &operator-();
+};
+
+inline float16::float16() {}
+inline float16::float16( float val ) { mValue = FloatToFloat16( val ); }
+inline float16::float16( const float16 &val ) {
+	mValue = val.mValue;
+}
+
+inline float16::operator float() {
+	return Float16ToFloat( mValue );
+}
+
+inline float16::operator float() const {
+	return Float16ToFloat( mValue );
+}
+
+inline float16 &float16::operator=( const float16 &val ) {
+	mValue = val.mValue;
+}
+
+inline float16 &float16::operator+=( const float16 &val ) {
+	*this = *this + val;
+	return *this;
+}
+
+inline float16 &float16::operator-=( const float16 &val ) {
+	*this = *this - val;
+	return *this;
+}
+
+inline float16 &float16::operator*=( const float16 &val ) {
+	*this = *this * val;
+	return *this;
+}
+
+inline float16 &float16::operator/=( const float16 &val ) {
+	*this = *this / val;
+	return *this;
+}
+
+inline float16 &float16::operator-() {
+	*this = float16( - ( float ) * this );
+	return *this;
+}
+
+inline float16 operator+( const float16 &value, const float16 &secondValue ) {
+	return float16( ( float )value + ( float )secondValue );
+}
+
+inline float16 operator-( const float16 &value, const float16 &secondValue ) {
+	return float16( ( float )value - ( float )secondValue );
+}
+
+inline float16 operator*( const float16 &value, const float16 &secondValue ) {
+	return float16( ( float )value * ( float )secondValue );
+}
+
+inline float16 operator/( const float16 &value, const float16 &secondValue ) {
+	return float16( ( float )value / ( float )secondValue );
+}
+
+inline short FloatToFloat16( float val ) {
+	int fpInteger; // this is a Float point Integer sorry it looks bad and best name i could think of
+	memcpy( &fpInteger, &val, sizeof( float ) );
+	short floatPtInteger = ( ( fpInteger & 0x7fffffff ) >> 13 ) - ( 0x38000000 >> 13 );
+	floatPtInteger |= ( ( fpInteger & 0x80000000 ) >> 16 );
+	return floatPtInteger;
+}
+
+inline float Float16ToFloat( short floatPtInteger ) {
+	int fpInteger = ( ( floatPtInteger & 0x8000 ) << 16 );
+	fpInteger |= ( ( floatPtInteger & 0x7fff ) << 13 ) + 0x38000000;
+
+	float fRet;
+	memcpy( &fRet, &fpInteger, sizeof( float ) );
+	return fRet;
+}
+
+static int anMath::Constant4( void ) {
+	int v = code[pc] | ( code[pc + 1] << 8 ) | ( code[pc + 2] << 16 ) | ( code[pc + 3] << 24 );
+	pc += 4;
+	return v;
+}
+
+static int anMath::Constant1( void ) {
+	int v = code[pc];
+	pc += 1;
+	return v;
+}
+int anMath::ReadConstant( int numBytes ) {
+	int value = 0;
+	for ( int i = 0; i < numBytes; i++ ) {
+		value |= code[pc++] << ( i * 8 ); 
+	}
+	return value;
+}
+int anMath::ReadIntConstant() {
+	int value = 
+	( code[pc] << 24 ) | 
+	( code[pc+1] << 16 ) |
+	( code[pc+2] << 8 ) |
+	code[pc+3];
+	return *(int *)&value; 
 }
 
 #endif

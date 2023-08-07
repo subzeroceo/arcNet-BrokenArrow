@@ -69,7 +69,7 @@ public:
 	void			Spawn					( void );
 
 	virtual bool	IsCombat				( void ) const;
-	virtual bool	ValidateDestination		( const anSAAI* ent, const anVec3& dest ) const;
+	virtual bool	ValidateDestination		( const anSAAI* ent, const anVec3 &dest ) const;
 
 	anVec3			GetDirection			( const anSAAI* ent ) const;
 
@@ -121,8 +121,8 @@ public:
 	void				UnMarkAllReachBlocked	( void );
 	void				ReMarkAllReachBlocked	( void );
 	void				MarkReachBlocked		( anSEAS* aas, anReachability* reach, const anList<anEntity*>& blockers);
-	bool				ValidateDestination		( anSAAI* ignore, const anVec3& dest, bool skipCurrent = false, anActor* skipActor = nullptr ) const;
-	void				AddAvoid				( const anVec3& origin, float range, int team );
+	bool				ValidateDestination		( anSAAI* ignore, const anVec3 &dest, bool skipCurrent = false, anActor* skipActor = nullptr ) const;
+	void				AddAvoid				( const anVec3 &origin, float range, int team );
 
 	/*
 	===============================================================================
@@ -132,7 +132,7 @@ public:
 
 	void				RegisterHelper			( anSAAIHelper* helper );
 	void				UnregisterHelper		( anSAAIHelper* helper );
-	anSAAIHelper*			FindClosestHelper		( const anVec3& origin );
+	anSAAIHelper*			FindClosestHelper		( const anVec3 &origin );
 
 	/*
 	===============================================================================
@@ -167,8 +167,8 @@ public:
 	===============================================================================
 	*/
 
-	void				AnnounceKill			( anSAAI* victim, anEntity* attacker, anEntity* inflictor );
-	void				AnnounceDeath			( anSAAI* victim, anEntity* attacker );
+	void				AnnounceKill			( anSAAI* victim, anEntity *attacker, anEntity *inflictor );
+	void				AnnounceDeath			( anSAAI* victim, anEntity *attacker );
 
 	/*
 	===============================================================================
@@ -209,19 +209,19 @@ protected:
 	anList<aiAvoid_t>		avoids;
 };
 
-ARC_INLINE bool rvAIManager::CheckTeamTimer ( int team, aiTeamTimer_t timer ) {
+inline bool rvAIManager::CheckTeamTimer ( int team, aiTeamTimer_t timer ) {
 	return gameLocal.time >= teamTimers[team][timer];
 }
 
-ARC_INLINE void rvAIManager::ClearTeamTimer ( int team, aiTeamTimer_t timer ) {
+inline void rvAIManager::ClearTeamTimer ( int team, aiTeamTimer_t timer ) {
 	teamTimers[team][timer] = 0;
 }
 
-ARC_INLINE void rvAIManager::SetTeamTimer ( int team, aiTeamTimer_t timer, int delay ) {
+inline void rvAIManager::SetTeamTimer ( int team, aiTeamTimer_t timer, int delay ) {
 	teamTimers[team][timer] = gameLocal.time + delay;
 }
 
-ARC_INLINE void rvAIManager::AddAvoid ( const anVec3& origin, float radius, int team ) {
+inline void rvAIManager::AddAvoid ( const anVec3 &origin, float radius, int team ) {
 	if ( !IsActive() ) {
 		return;
 	}

@@ -10,35 +10,35 @@
 */
 
 
-class arcPolynomial {
+class anPolynomial {
 public:
-					arcPolynomial( void );
-					explicit arcPolynomial( int d );
-					explicit arcPolynomial( float a, float b );
-					explicit arcPolynomial( float a, float b, float c );
-					explicit arcPolynomial( float a, float b, float c, float d );
-					explicit arcPolynomial( float a, float b, float c, float d, float e );
+					anPolynomial( void );
+					explicit anPolynomial( int d );
+					explicit anPolynomial( float a, float b );
+					explicit anPolynomial( float a, float b, float c );
+					explicit anPolynomial( float a, float b, float c, float d );
+					explicit anPolynomial( float a, float b, float c, float d, float e );
 
 	float			operator[]( int index ) const;
 	float &			operator[]( int index );
 
-	arcPolynomial	operator-() const;
-	arcPolynomial &	operator=( const arcPolynomial &p );
+	anPolynomial	operator-() const;
+	anPolynomial &	operator=( const anPolynomial &p );
 
-	arcPolynomial	operator+( const arcPolynomial &p ) const;
-	arcPolynomial	operator-( const arcPolynomial &p ) const;
-	arcPolynomial	operator*( const float s ) const;
-	arcPolynomial	operator/( const float s ) const;
+	anPolynomial	operator+( const anPolynomial &p ) const;
+	anPolynomial	operator-( const anPolynomial &p ) const;
+	anPolynomial	operator*( const float s ) const;
+	anPolynomial	operator/( const float s ) const;
 
-	arcPolynomial &	operator+=( const arcPolynomial &p );
-	arcPolynomial &	operator-=( const arcPolynomial &p );
-	arcPolynomial &	operator*=( const float s );
-	arcPolynomial &	operator/=( const float s );
+	anPolynomial &	operator+=( const anPolynomial &p );
+	anPolynomial &	operator-=( const anPolynomial &p );
+	anPolynomial &	operator*=( const float s );
+	anPolynomial &	operator/=( const float s );
 
-	bool			Compare( const arcPolynomial &p ) const;						// exact compare, no epsilon
-	bool			Compare( const arcPolynomial &p, const float epsilon ) const;// compare with epsilon
-	bool			operator==(	const arcPolynomial &p ) const;					// exact compare, no epsilon
-	bool			operator!=(	const arcPolynomial &p ) const;					// exact compare, no epsilon
+	bool			Compare( const anPolynomial &p ) const;						// exact compare, no epsilon
+	bool			Compare( const anPolynomial &p, const float epsilon ) const;// compare with epsilon
+	bool			operator==(	const anPolynomial &p ) const;					// exact compare, no epsilon
+	bool			operator!=(	const anPolynomial &p ) const;					// exact compare, no epsilon
 
 	void			Zero( void );
 	void			Zero( int d );
@@ -47,8 +47,8 @@ public:
 	int				GetDegree( void ) const;									// get the degree of the polynomial
 	float			GetValue( const float x ) const;							// evaluate the polynomial with the given real value
 	aRcComplex		GetValue( const aRcComplex &x ) const;						// evaluate the polynomial with the given complex value
-	arcPolynomial	GetDerivative( void ) const;								// get the first derivative of the polynomial
-	arcPolynomial	GetAntiDerivative( void ) const;							// get the anti derivative of the polynomial
+	anPolynomial	GetDerivative( void ) const;								// get the first derivative of the polynomial
+	anPolynomial	GetAntiDerivative( void ) const;							// get the anti derivative of the polynomial
 
 	int				GetRoots( aRcComplex *roots ) const;							// get all roots
 	int				GetRoots( float *roots ) const;								// get the real roots
@@ -73,20 +73,20 @@ private:
 	int				Laguer( const aRcComplex *coef, const int degree, aRcComplex &r ) const;
 };
 
-ARC_INLINE arcPolynomial::arcPolynomial( void ) {
+inline anPolynomial::anPolynomial( void ) {
 	degree = -1;
 	allocated = 0;
 	coefficient = nullptr;
 }
 
-ARC_INLINE arcPolynomial::arcPolynomial( int d ) {
+inline anPolynomial::anPolynomial( int d ) {
 	degree = -1;
 	allocated = 0;
 	coefficient = nullptr;
 	Resize( d, false );
 }
 
-ARC_INLINE arcPolynomial::arcPolynomial( float a, float b ) {
+inline anPolynomial::anPolynomial( float a, float b ) {
 	degree = -1;
 	allocated = 0;
 	coefficient = nullptr;
@@ -95,7 +95,7 @@ ARC_INLINE arcPolynomial::arcPolynomial( float a, float b ) {
 	coefficient[1] = a;
 }
 
-ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c ) {
+inline anPolynomial::anPolynomial( float a, float b, float c ) {
 	degree = -1;
 	allocated = 0;
 	coefficient = nullptr;
@@ -105,7 +105,7 @@ ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c ) {
 	coefficient[2] = a;
 }
 
-ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c, float d ) {
+inline anPolynomial::anPolynomial( float a, float b, float c, float d ) {
 	degree = -1;
 	allocated = 0;
 	coefficient = nullptr;
@@ -116,7 +116,7 @@ ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c, float d ) {
 	coefficient[3] = a;
 }
 
-ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c, float d, float e ) {
+inline anPolynomial::anPolynomial( float a, float b, float c, float d, float e ) {
 	degree = -1;
 	allocated = 0;
 	coefficient = nullptr;
@@ -128,19 +128,19 @@ ARC_INLINE arcPolynomial::arcPolynomial( float a, float b, float c, float d, flo
 	coefficient[4] = a;
 }
 
-ARC_INLINE float arcPolynomial::operator[]( int index ) const {
+inline float anPolynomial::operator[]( int index ) const {
 	assert( index >= 0 && index <= degree );
 	return coefficient[index];
 }
 
-ARC_INLINE float& arcPolynomial::operator[]( int index ) {
+inline float& anPolynomial::operator[]( int index ) {
 	assert( index >= 0 && index <= degree );
 	return coefficient[index];
 }
 
-ARC_INLINE arcPolynomial arcPolynomial::operator-() const {
+inline anPolynomial anPolynomial::operator-() const {
 	int i;
-	arcPolynomial n;
+	anPolynomial n;
 
 	n = *this;
 	for ( i = 0; i <= degree; i++ ) {
@@ -149,7 +149,7 @@ ARC_INLINE arcPolynomial arcPolynomial::operator-() const {
 	return n;
 }
 
-ARC_INLINE arcPolynomial &arcPolynomial::operator=( const arcPolynomial &p ) {
+inline anPolynomial &anPolynomial::operator=( const anPolynomial &p ) {
 	Resize( p.degree, false );
 	for ( int i = 0; i <= degree; i++ ) {
 		coefficient[i] = p.coefficient[i];
@@ -157,9 +157,9 @@ ARC_INLINE arcPolynomial &arcPolynomial::operator=( const arcPolynomial &p ) {
 	return *this;
 }
 
-ARC_INLINE arcPolynomial arcPolynomial::operator+( const arcPolynomial &p ) const {
+inline anPolynomial anPolynomial::operator+( const anPolynomial &p ) const {
 	int i;
-	arcPolynomial n;
+	anPolynomial n;
 
 	if ( degree > p.degree ) {
 		n.Resize( degree, false );
@@ -192,9 +192,9 @@ ARC_INLINE arcPolynomial arcPolynomial::operator+( const arcPolynomial &p ) cons
 	return n;
 }
 
-ARC_INLINE arcPolynomial arcPolynomial::operator-( const arcPolynomial &p ) const {
+inline anPolynomial anPolynomial::operator-( const anPolynomial &p ) const {
 	int i;
-	arcPolynomial n;
+	anPolynomial n;
 
 	if ( degree > p.degree ) {
 		n.Resize( degree, false );
@@ -227,8 +227,8 @@ ARC_INLINE arcPolynomial arcPolynomial::operator-( const arcPolynomial &p ) cons
 	return n;
 }
 
-ARC_INLINE arcPolynomial arcPolynomial::operator*( const float s ) const {
-	arcPolynomial n;
+inline anPolynomial anPolynomial::operator*( const float s ) const {
+	anPolynomial n;
 
 	if ( s == 0.0f ) {
 		n.degree = 0;
@@ -241,9 +241,9 @@ ARC_INLINE arcPolynomial arcPolynomial::operator*( const float s ) const {
 	return n;
 }
 
-ARC_INLINE arcPolynomial arcPolynomial::operator/( const float s ) const {
+inline anPolynomial anPolynomial::operator/( const float s ) const {
 	float invs;
-	arcPolynomial n;
+	anPolynomial n;
 
 	assert( s != 0.0f );
 	n.Resize( degree, false );
@@ -254,7 +254,7 @@ ARC_INLINE arcPolynomial arcPolynomial::operator/( const float s ) const {
 	return n;
 }
 
-ARC_INLINE arcPolynomial &arcPolynomial::operator+=( const arcPolynomial &p ) {
+inline anPolynomial &anPolynomial::operator+=( const anPolynomial &p ) {
 	int i;
 
 	if ( degree > p.degree ) {
@@ -280,7 +280,7 @@ ARC_INLINE arcPolynomial &arcPolynomial::operator+=( const arcPolynomial &p ) {
 	return *this;
 }
 
-ARC_INLINE arcPolynomial &arcPolynomial::operator-=( const arcPolynomial &p ) {
+inline anPolynomial &anPolynomial::operator-=( const anPolynomial &p ) {
 	int i;
 
 	if ( degree > p.degree ) {
@@ -306,7 +306,7 @@ ARC_INLINE arcPolynomial &arcPolynomial::operator-=( const arcPolynomial &p ) {
 	return *this;
 }
 
-ARC_INLINE arcPolynomial &arcPolynomial::operator*=( const float s ) {
+inline anPolynomial &anPolynomial::operator*=( const float s ) {
 	if ( s == 0.0f ) {
 		degree = 0;
 	} else {
@@ -317,7 +317,7 @@ ARC_INLINE arcPolynomial &arcPolynomial::operator*=( const float s ) {
 	return *this;
 }
 
-ARC_INLINE arcPolynomial &arcPolynomial::operator/=( const float s ) {
+inline anPolynomial &anPolynomial::operator/=( const float s ) {
 	float invs;
 
 	assert( s != 0.0f );
@@ -328,7 +328,7 @@ ARC_INLINE arcPolynomial &arcPolynomial::operator/=( const float s ) {
 	return *this;;
 }
 
-ARC_INLINE bool arcPolynomial::Compare( const arcPolynomial &p ) const {
+inline bool anPolynomial::Compare( const anPolynomial &p ) const {
 	if ( degree != p.degree ) {
 		return false;
 	}
@@ -340,7 +340,7 @@ ARC_INLINE bool arcPolynomial::Compare( const arcPolynomial &p ) const {
 	return true;
 }
 
-ARC_INLINE bool arcPolynomial::Compare( const arcPolynomial &p, const float epsilon ) const {
+inline bool anPolynomial::Compare( const anPolynomial &p, const float epsilon ) const {
 	if ( degree != p.degree ) {
 		return false;
 	}
@@ -352,34 +352,34 @@ ARC_INLINE bool arcPolynomial::Compare( const arcPolynomial &p, const float epsi
 	return true;
 }
 
-ARC_INLINE bool arcPolynomial::operator==( const arcPolynomial &p ) const {
+inline bool anPolynomial::operator==( const anPolynomial &p ) const {
 	return Compare( p );
 }
 
-ARC_INLINE bool arcPolynomial::operator!=( const arcPolynomial &p ) const {
+inline bool anPolynomial::operator!=( const anPolynomial &p ) const {
 	return !Compare( p );
 }
 
-ARC_INLINE void arcPolynomial::Zero( void ) {
+inline void anPolynomial::Zero( void ) {
 	degree = 0;
 }
 
-ARC_INLINE void arcPolynomial::Zero( int d ) {
+inline void anPolynomial::Zero( int d ) {
 	Resize( d, false );
 	for ( int i = 0; i <= degree; i++ ) {
 		coefficient[i] = 0.0f;
 	}
 }
 
-ARC_INLINE int arcPolynomial::GetDimension( void ) const {
+inline int anPolynomial::GetDimension( void ) const {
 	return degree;
 }
 
-ARC_INLINE int arcPolynomial::GetDegree( void ) const {
+inline int anPolynomial::GetDegree( void ) const {
 	return degree;
 }
 
-ARC_INLINE float arcPolynomial::GetValue( const float x ) const {
+inline float anPolynomial::GetValue( const float x ) const {
 	float y, z;
 	y = coefficient[0];
 	z = x;
@@ -390,7 +390,7 @@ ARC_INLINE float arcPolynomial::GetValue( const float x ) const {
 	return y;
 }
 
-ARC_INLINE aRcComplex arcPolynomial::GetValue( const aRcComplex &x ) const {
+inline aRcComplex anPolynomial::GetValue( const aRcComplex &x ) const {
 	aRcComplex y, z;
 	y.Set( coefficient[0], 0.0f );
 	z = x;
@@ -401,8 +401,8 @@ ARC_INLINE aRcComplex arcPolynomial::GetValue( const aRcComplex &x ) const {
 	return y;
 }
 
-ARC_INLINE arcPolynomial arcPolynomial::GetDerivative( void ) const {
-	arcPolynomial n;
+inline anPolynomial anPolynomial::GetDerivative( void ) const {
+	anPolynomial n;
 
 	if ( degree == 0 ) {
 		return n;
@@ -414,8 +414,8 @@ ARC_INLINE arcPolynomial arcPolynomial::GetDerivative( void ) const {
 	return n;
 }
 
-ARC_INLINE arcPolynomial arcPolynomial::GetAntiDerivative( void ) const {
-	arcPolynomial n;
+inline anPolynomial anPolynomial::GetAntiDerivative( void ) const {
+	anPolynomial n;
 
 	if ( degree == 0 ) {
 		return n;
@@ -428,13 +428,13 @@ ARC_INLINE arcPolynomial arcPolynomial::GetAntiDerivative( void ) const {
 	return n;
 }
 
-ARC_INLINE int arcPolynomial::GetRoots1( float a, float b, float *roots ) {
+inline int anPolynomial::GetRoots1( float a, float b, float *roots ) {
 	assert( a != 0.0f );
 	roots[0] = - b / a;
 	return 1;
 }
 
-ARC_INLINE int arcPolynomial::GetRoots2( float a, float b, float c, float *roots ) {
+inline int anPolynomial::GetRoots2( float a, float b, float c, float *roots ) {
 	float inva, ds;
 
 	if ( a != 1.0f ) {
@@ -457,7 +457,7 @@ ARC_INLINE int arcPolynomial::GetRoots2( float a, float b, float c, float *roots
 	}
 }
 
-ARC_INLINE int arcPolynomial::GetRoots3( float a, float b, float c, float d, float *roots ) {
+inline int anPolynomial::GetRoots3( float a, float b, float c, float d, float *roots ) {
 	float inva, f, g, halfg, ofs, ds, dist, angle, cs, ss, t;
 
 	if ( a != 1.0f ) {
@@ -512,7 +512,7 @@ ARC_INLINE int arcPolynomial::GetRoots3( float a, float b, float c, float d, flo
 	}
 }
 
-ARC_INLINE int arcPolynomial::GetRoots4( float a, float b, float c, float d, float e, float *roots ) {
+inline int anPolynomial::GetRoots4( float a, float b, float c, float d, float e, float *roots ) {
 	int count;
 	float inva, y, ds, r, s1, s2, t1, t2, tp, tm;
 	float roots3[3];
@@ -572,15 +572,15 @@ ARC_INLINE int arcPolynomial::GetRoots4( float a, float b, float c, float d, flo
 	}
 }
 
-ARC_INLINE const float *arcPolynomial::ToFloatPtr( void ) const {
+inline const float *anPolynomial::ToFloatPtr( void ) const {
 	return coefficient;
 }
 
-ARC_INLINE float *arcPolynomial::ToFloatPtr( void ) {
+inline float *anPolynomial::ToFloatPtr( void ) {
 	return coefficient;
 }
 
-ARC_INLINE void arcPolynomial::Resize( int d, bool keep ) {
+inline void anPolynomial::Resize( int d, bool keep ) {
 	int alloc = ( d + 1 + 3 ) & ~3;
 	if ( alloc > allocated ) {
 		float *ptr = (float *) Mem_Alloc16( alloc * sizeof( float ) );

@@ -71,7 +71,7 @@ void R_InitFrameData( void ) {
 	frame->memory = block;
 	frame->memoryHighwater = 0;
 	// must be set before calling R_ToggleSmpFrame()
-	//frameData = &smpFrameData[ 0 ];
+	//frameData = &smpFrameData[0];
 
 	R_ToggleSmpFrame();
 }
@@ -441,7 +441,7 @@ anRenderCache::BindVertexArrayObject
 void anRenderCache::BindVertexArrayObject() {
 	if ( !vao ) {
 		//R_BindNullVao();
-		Error( "BindVertexArrayObject: NULL vao");
+		Error( "BindVertexArrayObject: nullptr vao");
 		return;
 	}
 
@@ -654,7 +654,7 @@ void anRenderCache::ActuallyFreeVertexBuffers() {
 	qglBindBuffer( GL_ARRAY_BUFFER, vertexBuffer );
 
 	// Set up the vertex attributes
-	//qglEnableVertexAttribArray(0);
+	//qglEnableVertexAttribArray( 0 );
 //	qglVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLfloat*)0);
 	//qglEnableVertexAttribArray( 1 );
 	//qglVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLfloat*)3 * sizeof(GLfloat));
@@ -1094,7 +1094,7 @@ void anVertexCache::Shutdown() {
 void anVertexCache::BeginBackEnd() {
 	mostUsedVertex = Max( mostUsedVertex, frameData[listNum].vertexMemUsed.GetValue() );
 	mostUsedIndex = Max( mostUsedIndex, frameData[listNum].indexMemUsed.GetValue() );
-	if( r_showVertexCache.GetBool() ) {
+	if ( r_showVertexCache.GetBool() ) {
 		idLib::Printf( "%08d: %d allocations, %dkB vertex, %dkB index : %dkB vertex, %dkB index\n",
 					   currentFrame, frameData[listNum].allocations,
 					   frameData[listNum].vertexMemUsed.GetValue() / 1024,

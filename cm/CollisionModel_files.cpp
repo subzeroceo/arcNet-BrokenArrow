@@ -217,7 +217,7 @@ anSoftBodiesPhysicsManager::WriteCollisionModelsToFile
 */
 void anSoftBodiesPhysicsManager::WriteCollisionModelsToFile( const char *filename, int firstModel, int lastModel, unsigned int mapFileCRC ) {
 	anFile *fp;
-	anString name;
+	anStr name;
 
 	name = filename;
 	name.SetFileExtension( CM_FILE_EXT );
@@ -250,7 +250,7 @@ anSoftBodiesPhysicsManager::WriteCollisionModelForMapEntity
 */
 bool anSoftBodiesPhysicsManager::WriteCollisionModelForMapEntity( const anMapEntity *mapEnt, const char *filename, const bool testTraceModel ) {
 	anFile *fp;
-	anString name;
+	anStr name;
 	cm_model_t *model;
 
 	SetupHash();
@@ -534,7 +534,7 @@ anSoftBodiesPhysicsManager::LoadCollisionModelFile
 ================
 */
 bool anSoftBodiesPhysicsManager::LoadCollisionModelFile( const char *name, unsigned int mapFileCRC ) {
-	anString fileName;
+	anStr fileName;
 	anToken token;
 	anLexer *src;
 	unsigned int crc;

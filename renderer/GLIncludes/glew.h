@@ -77,7 +77,7 @@ typedef HGLRC (WINAPI * PFNWGLCREATEASSOCIATEDCONTEXTAMDPROC) (UINT id);
 typedef HGLRC (WINAPI * PFNWGLCREATEASSOCIATEDCONTEXTATTRIBSAMDPROC) (UINT id, HGLRC hShareContext, const int* attribList);
 typedef BOOL (WINAPI * PFNWGLDELETEASSOCIATEDCONTEXTAMDPROC) (HGLRC hglrc);
 typedef UINT (WINAPI * PFNWGLGETCONTEXTGPUIDAMDPROC) (HGLRC hglrc);
-typedef HGLRC (WINAPI * PFNWGLGETCURRENTASSOCIATEDCONTEXTAMDPROC) ( void );
+typedef HGLRC (WINAPI * PFNWGLGETCURRENTASSOCIATEDCONTEXTAMDPROC)( void );
 typedef UINT (WINAPI * PFNWGLGETGPUIDSAMDPROC) (UINT maxCount, UINT* ids);
 typedef INT (WINAPI * PFNWGLGETGPUINFOAMDPROC) (UINT id, INT property, GLenum dataType, UINT size, void* data);
 typedef BOOL (WINAPI * PFNWGLMAKEASSOCIATEDCONTEXTCURRENTAMDPROC) (HGLRC hglrc);
@@ -187,7 +187,7 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 
 #ifndef WGL_ARB_extensions_string
 #define WGL_ARB_extensions_string 1
-typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
+typedef const char *(WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
 #define wglGetExtensionsStringARB WGLEW_GET_FUN(__wglewGetExtensionsStringARB)
 #define WGLEW_ARB_extensions_string WGLEW_GET_VAR(__WGLEW_ARB_extensions_string)
 
@@ -208,7 +208,7 @@ typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
 #define ERROR_INVALID_PIXEL_TYPE_ARB 0x2043
 #define ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB 0x2054
 
-typedef HDC (WINAPI * PFNWGLGETCURRENTREADDCARBPROC) (VOID);
+typedef HDC (WINAPI * PFNWGLGETCURRENTREADDCARBPROC)( void );
 typedef BOOL (WINAPI * PFNWGLMAKECONTEXTCURRENTARBPROC) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
 
 #define wglGetCurrentReadDCARB WGLEW_GET_FUN(__wglewGetCurrentReadDCARB)
@@ -490,7 +490,7 @@ typedef GLboolean (WINAPI * PFNWGLLOADDISPLAYCOLORTABLEEXTPROC) ( GLushort* tabl
 
 #ifndef WGL_EXT_extensions_string
 #define WGL_EXT_extensions_string 1
-typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC) ( void );
+typedef const char *(WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC)( void );
 #define wglGetExtensionsStringEXT WGLEW_GET_FUN(__wglewGetExtensionsStringEXT)
 #define WGLEW_EXT_extensions_string WGLEW_GET_VAR(__WGLEW_EXT_extensions_string)
 #endif
@@ -508,7 +508,7 @@ typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC) ( void );
 #ifndef WGL_EXT_make_current_read
 #define WGL_EXT_make_current_read 1
 #define ERROR_INVALID_PIXEL_TYPE_EXT 0x2043
-typedef HDC (WINAPI * PFNWGLGETCURRENTREADDCEXTPROC) (VOID);
+typedef HDC (WINAPI * PFNWGLGETCURRENTREADDCEXTPROC)( void );
 typedef BOOL (WINAPI * PFNWGLMAKECONTEXTCURRENTEXTPROC) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
 
 #define wglGetCurrentReadDCEXT WGLEW_GET_FUN(__wglewGetCurrentReadDCEXT)
@@ -630,7 +630,7 @@ typedef BOOL (WINAPI * PFNWGLGETPIXELFORMATATTRIBIVEXTPROC) (HDC hdc, int iPixel
 
 #ifndef WGL_EXT_swap_control
 #define WGL_EXT_swap_control 1
-typedef int (WINAPI * PFNWGLGETSWAPINTERVALEXTPROC) ( void );
+typedef int (WINAPI * PFNWGLGETSWAPINTERVALEXTPROC)( void );
 typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC) ( int interval);
 #define wglGetSwapIntervalEXT WGLEW_GET_FUN(__wglewGetSwapIntervalEXT)
 #define wglSwapIntervalEXT WGLEW_GET_FUN(__wglewSwapIntervalEXT)
@@ -741,8 +741,8 @@ typedef BOOL (WINAPI * PFNWGLRELEASEIMAGEBUFFEREVENTSI3DPROC) (HDC hdc, LPVOID* 
 
 #ifndef WGL_I3D_swap_frame_lock
 #define WGL_I3D_swap_frame_lock 1
-typedef BOOL (WINAPI * PFNWGLDISABLEFRAMELOCKI3DPROC) (VOID);
-typedef BOOL (WINAPI * PFNWGLENABLEFRAMELOCKI3DPROC) (VOID);
+typedef BOOL (WINAPI * PFNWGLDISABLEFRAMELOCKI3DPROC)( void );
+typedef BOOL (WINAPI * PFNWGLENABLEFRAMELOCKI3DPROC)( void );
 typedef BOOL (WINAPI * PFNWGLISENABLEDFRAMELOCKI3DPROC) (BOOL* pFlag);
 typedef BOOL (WINAPI * PFNWGLQUERYFRAMELOCKMASTERI3DPROC) (BOOL* pFlag);
 #define wglDisableFrameLockI3D WGLEW_GET_FUN(__wglewDisableFrameLockI3D)
@@ -756,8 +756,8 @@ typedef BOOL (WINAPI * PFNWGLQUERYFRAMELOCKMASTERI3DPROC) (BOOL* pFlag);
 
 #ifndef WGL_I3D_swap_frame_usage
 #define WGL_I3D_swap_frame_usage 1
-typedef BOOL (WINAPI * PFNWGLBEGINFRAMETRACKINGI3DPROC) ( void );
-typedef BOOL (WINAPI * PFNWGLENDFRAMETRACKINGI3DPROC) ( void );
+typedef BOOL (WINAPI * PFNWGLBEGINFRAMETRACKINGI3DPROC)( void );
+typedef BOOL (WINAPI * PFNWGLENDFRAMETRACKINGI3DPROC)( void );
 typedef BOOL (WINAPI * PFNWGLGETFRAMEUSAGEI3DPROC) (float* pUsage);
 typedef BOOL (WINAPI * PFNWGLQUERYFRAMETRACKINGI3DPROC) (DWORD* pFrameCount, DWORD *pMissedFrames, float *pLastMissedUsage);
 #define wglBeginFrameTrackingI3D WGLEW_GET_FUN(__wglewBeginFrameTrackingI3D)
@@ -1249,7 +1249,7 @@ GLEWAPI GLboolean GLEWAPIENTRY wglewIsSupported (const char *name);
 #define WGLEW_GET_FUN(x) x
 #endif
 
-GLEWAPI GLboolean GLEWAPIENTRY wglewGetExtension (const char *name);
+GLEWAPI GLboolean GLEWAPIENTRY wglewGetExtension( const char *name );
 
 #ifdef __cplusplus }
 #endif

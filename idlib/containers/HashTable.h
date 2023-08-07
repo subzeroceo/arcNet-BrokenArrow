@@ -38,11 +38,11 @@ public:
 
 private:
 	struct hashnode_s {
-		anString	key;
+		anStr	key;
 		Type		value;
 		hashnode_s * next;
 
-		hashnode_s( const anString &k, Type v, hashnode_s *n ) : key( k ), value( v ), next( n ) {};
+		hashnode_s( const anStr &k, Type v, hashnode_s *n ) : key( k ), value( v ), next( n ) {};
 		hashnode_s( const char *k, Type v, hashnode_s *n ) : key( k ), value( v ), next( n ) {};
 	};
 
@@ -61,7 +61,7 @@ anHashTable<Type>::anHashTable
 ================
 */
 template<class Type>
-ARC_INLINE anHashTable<Type>::anHashTable( int newtablesize ) {
+inline anHashTable<Type>::anHashTable( int newtablesize ) {
 	assert( anMath::IsPowerOfTwo( newtablesize ) );
 
 	tablesize = newtablesize;
@@ -80,7 +80,7 @@ anHashTable<Type>::anHashTable
 ================
 */
 template<class Type>
-ARC_INLINE anHashTable<Type>::anHashTable( const anHashTable<Type> &map ) {
+inline anHashTable<Type>::anHashTable( const anHashTable<Type> &map ) {
 	assert( map.tablesize > 0 );
 	tablesize		= map.tablesize;
 	heads			= new hashnode_s *[ tablesize ];
@@ -107,7 +107,7 @@ anHashTable<Type>::~anHashTable<Type>
 ================
 */
 template<class Type>
-ARC_INLINE anHashTable<Type>::~anHashTable( void ) {
+inline anHashTable<Type>::~anHashTable( void ) {
 	Clear();
 	delete[] heads;
 }
@@ -118,7 +118,7 @@ anHashTable<Type>::Allocated
 ================
 */
 template<class Type>
-ARC_INLINE size_t anHashTable<Type>::Allocated( void ) const {
+inline size_t anHashTable<Type>::Allocated( void ) const {
 	return sizeof( heads ) * tablesize + sizeof( *heads ) * numentries;
 }
 
@@ -128,7 +128,7 @@ anHashTable<Type>::Size
 ================
 */
 template<class Type>
-ARC_INLINE size_t anHashTable<Type>::Size( void ) const {
+inline size_t anHashTable<Type>::Size( void ) const {
 	return sizeof( anHashTable<Type> ) + sizeof( heads ) * tablesize + sizeof( *heads ) * numentries;
 }
 
@@ -138,8 +138,8 @@ anHashTable<Type>::GetHash
 ================
 */
 template<class Type>
-ARC_INLINE int anHashTable<Type>::GetHash( const char *key ) const {
-	return ( anString::Hash( key ) & tablesizemask );
+inline int anHashTable<Type>::GetHash( const char *key ) const {
+	return ( anStr::Hash( key ) & tablesizemask );
 }
 
 /*
@@ -148,7 +148,7 @@ anHashTable<Type>::Set
 ================
 */
 template<class Type>
-ARC_INLINE void anHashTable<Type>::Set( const char *key, Type &value ) {
+inline void anHashTable<Type>::Set( const char *key, Type &value ) {
 	hashnode_s *node, **nextPtr;
 	int hash = GetHash( key );
 	for ( hashnode_s **nextPtr = &(heads[hash] ), hashnode_s *node = *nextPtr; node != nullptr; nextPtr = &(node->next), node = *nextPtr ) {
@@ -174,7 +174,7 @@ anHashTable<Type>::Get
 ================
 */
 template<class Type>
-ARC_INLINE bool anHashTable<Type>::Get( const char *key, Type **value ) const {
+inline bool anHashTable<Type>::Get( const char *key, Type **value ) const {
 	int hash = GetHash( key );
 	for ( hashnode_s *node = heads[ hash ]; node != nullptr; node = node->next ) {
 		int s = node->key.Cmp( key );
@@ -205,7 +205,7 @@ exact index for a given element may change when new elements are added
 ================
 */
 template<class Type>
-ARC_INLINE Type *anHashTable<Type>::GetIndex( int index ) const {
+inline Type *anHashTable<Type>::GetIndex( int index ) const {
 	if ( ( index < 0 ) || ( index > numentries ) ) {
 		assert( 0 );
 		return nullptr;
@@ -230,7 +230,7 @@ anHashTable<Type>::Remove
 ================
 */
 template<class Type>
-ARC_INLINE bool anHashTable<Type>::Remove( const char *key ) {
+inline bool anHashTable<Type>::Remove( const char *key ) {
 	hashnode_s	*prev;
 	int hash = GetHash( key );
 	hashnode_s	**head = &heads[ hash ];
@@ -259,7 +259,7 @@ anHashTable<Type>::Clear
 ================
 */
 template<class Type>
-ARC_INLINE void anHashTable<Type>::Clear( void ) {
+inline void anHashTable<Type>::Clear( void ) {
 	int			i;
 	hashnode_s	*node;
 	hashnode_s	*next;
@@ -284,7 +284,7 @@ anHashTable<Type>::DeleteContents
 ================
 */
 template<class Type>
-ARC_INLINE void anHashTable<Type>::DeleteContents( void ) {
+inline void anHashTable<Type>::DeleteContents( void ) {
 	int			i;
 	hashnode_s	*node;
 	hashnode_s	*next;
@@ -310,7 +310,7 @@ anHashTable<Type>::Num
 ================
 */
 template<class Type>
-ARC_INLINE int anHashTable<Type>::Num( void ) const {
+inline int anHashTable<Type>::Num( void ) const {
 	return numentries;
 }
 

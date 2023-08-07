@@ -4,12 +4,12 @@
 /*
 ===============================================================================
 
-	3DNow! implementation of arcSIMDProcessor
+	3DNow! implementation of anSIMDProcessor
 
 ===============================================================================
 */
 
-class idSIMD_3DNow : public arcSIMD_MMX {
+class idSIMD_3DNow : public anSIMD_MMX {
 #ifdef _WIN32
 public:
 	virtual const char *VPCALL GetName( void ) const;
